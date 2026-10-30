@@ -4,8 +4,12 @@ Tenue par le manager. Dernière mise à jour: 2026-10-30.
 
 ## Phase 0: constitution du studio (terminée)
 
-- Équipe de 15 membres dans `.claude/agents/`, manuel du studio dans `CLAUDE.md`.
+- Équipe de 15 membres dans `.claude/agents/`, validée par le client le 2026-10-30. Manuel du studio dans `CLAUDE.md`.
+- Orientation technique validée par le client le 2026-10-30 (Electron, TypeScript, Three.js, Phaser ou PixiJS).
+- Machines connues: Mac à puce M1 (macOS arm64), PC Windows 11 à processeur Intel (x64).
 - Modèle de cahier des charges: `docs/modeles/cahier-des-charges.md`.
+- Boîte à outils de production testée de bout en bout (Blender, FluidSynth, pedalboard, rsvg-convert): `outils/installer-outils.sh`.
+- Branche de référence `main` créée.
 
 ## Phase 1: cadrage de la plateforme (prochaine)
 
@@ -30,7 +34,10 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 
 ## En attente du client
 
-- Machines: Mac à puce Apple ou Intel; PC sous Windows 10 ou 11, processeur x64 ou ARM.
-- Avis sur l'équipe et sur l'orientation technique (Electron, TypeScript, Three.js, Phaser ou PixiJS).
-- Facultatif: activer SpriteCook et autoriser les domaines d'assets libres dans les réglages réseau de l'environnement cloud.
+- Carte graphique du PC Windows, confirmation du processeur Intel, portable ou fixe pour chaque machine: cela fixe les budgets de performance des jeux 3D et l'échelle de l'interface.
+- Manettes disponibles, envie d'un mode solo contre l'ordinateur, envie d'un historique des parties et d'un score cumulé: questions de cadrage de la plateforme.
+- Basculer la branche par défaut du dépôt sur `main` dans les réglages GitHub.
+- Accord pour que le manager reporte lui-même le travail validé sur `main`.
+- Facultatif: coller `outils/installer-outils.sh` dans le « Setup script » de l'environnement cloud, pour que les outils soient prêts au démarrage de chaque session.
+- Facultatif: autoriser le connecteur SpriteCook dans les réglages claude.ai (sprites générés par IA, consomme des crédits SpriteCook).
 - Les idées de jeux, le moment venu.

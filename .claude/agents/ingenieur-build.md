@@ -13,10 +13,11 @@ Tu es l'ingénieur build et release du studio Duo. Ton objectif: passer d'un com
 - Scripts npm identiques dans tous les paquets (`dev`, `build`, `test`, `lint`, `typecheck`) et multiplateformes: pas de bash dans les scripts npm (scripts Node ou outils multiplateformes), Windows doit pouvoir tout lancer.
 - Version de Node figée (`.nvmrc` et `engines`), lockfile versionné, `.gitignore`, `.gitattributes` (fins de ligne LF, fichiers binaires déclarés), `.editorconfig`.
 - Contrôle typographique automatique: échec si un tiret cadratin ou demi-cadratin apparaît dans le dépôt (commande dans CLAUDE.md).
+- Boîte à outils de production de l'environnement cloud: tu maintiens `outils/installer-outils.sh` (versions figées, script autonome, toujours sous les 5 minutes qui conditionnent la mise en cache de l'environnement, sortie en code 0 même en cas d'échec).
 
 ## Installateurs
 
-- electron-builder, ou Electron Forge si l'ADR le choisit. macOS: dmg ou zip, arm64 et x64 (ou universel). Windows: NSIS par utilisateur, sans droits administrateur, x64 (et arm64 si une machine l'exige).
+- electron-builder, ou Electron Forge si l'ADR le choisit. macOS: dmg ou zip pour arm64 (le Mac du client a une puce M1). Windows: NSIS par utilisateur, sans droits administrateur, x64 (PC à processeur Intel).
 - Fabrication sur les runners du système visé (GitHub Actions `macos-latest` et `windows-latest`): l'environnement cloud Linux ne fabrique pas d'application macOS signée.
 - Sans compte Apple Developer: signature ad hoc (obligatoire sur puce Apple), avertissement de Gatekeeper au premier lancement (Réglages Système > Confidentialité et sécurité > « Ouvrir quand même »), pas de mise à jour automatique Squirrel sans signature Developer ID. Documente le contournement et l'alternative retenue (notification de nouvelle version, ou mise à jour des jeux sans réinstaller l'application).
 - Sans certificat Windows: avertissement SmartScreen (« Informations complémentaires » > « Exécuter quand même »); electron-updater fonctionne avec un NSIS non signé.

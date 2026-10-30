@@ -4,12 +4,12 @@ Lu par la session principale (le manager) et par chaque membre de l'équipe (sou
 
 ## Le projet
 
-- **Duo** est une application de bureau pour jouer à deux en réseau local: le Mac du client (propriétaire du dépôt) et le PC Windows de sa compagne. L'un héberge la partie, l'autre la rejoint.
+- **Duo** est une application de bureau pour jouer à deux en réseau local: le Mac du client (propriétaire du dépôt), à puce Apple M1, et le PC Windows 11 de sa compagne, à processeur Intel (carte graphique à confirmer). L'un héberge la partie, l'autre la rejoint. Cibles: macOS arm64 et Windows x64.
 - Elle accueille des jeux originaux créés par le studio, en 2D, 3D ou isométrique, ajoutés un par un.
 - Chaque jeu naît d'un cahier des charges (modèle: `docs/modeles/cahier-des-charges.md`) validé par le client avant toute production.
 - Avancement et décisions en attente: `docs/feuille-de-route.md`.
 
-## Orientation technique (à confirmer par ADR en phase 1)
+## Orientation technique (validée par le client le 2026-10-30, à formaliser par ADR en phase 1)
 
 - Application Electron: le même Chromium sur macOS et Windows, donc un rendu et un comportement identiques chez les deux joueurs, et testables ici avec le Chromium préinstallé.
 - TypeScript strict et Vite, en monorepo: l'application, un SDK commun aux jeux, un paquet par jeu.
@@ -88,6 +88,7 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 - Sources admises: créations du studio (code, SVG, scripts de génération, modèles Blender scriptés, synthèse sonore), génération par IA avec les outils fournis par le client, ressources externes sous CC0 ou CC-BY, polices sous OFL, code tiers sous licence permissive (MIT, BSD, ISC, Apache-2.0). GPL et licences non commerciales exclues.
 - Toute ressource externe est inscrite dans `CREDITS.md` (fichier, auteur, source, licence).
 - Les sources des assets générés (scripts, SVG, données) sont versionnées à côté des fichiers produits, pour pouvoir les régénérer et les retoucher.
+- Ces règles visent ce qui est livré dans Duo. Les outils de production (Blender, FluidSynth, ffmpeg, pedalboard) peuvent être sous GPL ou LGPL: ce qu'ils produisent appartient au studio. Exception: les échantillons d'une banque de sons se retrouvent dans les musiques rendues, donc la banque utilisée (FluidR3_GM, licence MIT) est inscrite dans `CREDITS.md` dès la première musique livrée.
 
 ### Technique
 
@@ -100,6 +101,7 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 
 ### Git
 
+- `main` est la branche de référence: les nouvelles sessions partent de là. Chaque session travaille sur sa propre branche, et le travail validé est reporté sur `main`.
 - Les membres ne committent pas et ne poussent pas: le manager relit, committe et pousse sur la branche de la session.
 - Commits conventionnels en français, à l'impératif, en minuscules: `feat(reseau): ajoute la découverte des hôtes sur le LAN`.
 
@@ -108,11 +110,17 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 - Une tâche n'est terminée qu'avec une preuve: sortie des tests, commande exécutée, capture d'écran examinée. Ce qui n'a pas pu être vérifié est dit, avec la raison.
 - Ce qui ne se vérifie que sur les vraies machines (installation, pare-feu, son, manette, performances) va dans la liste « À tester chez le client » du compte rendu.
 
-### Environnement cloud (constaté le 2026-10-30)
+### Environnement cloud (vérifié le 2026-10-30)
 
-- Disponibles: Node 22 et npm, Python 3.13 avec numpy et Pillow, ffmpeg (encodeurs Vorbis et Opus), ImageMagick (sans lecture des SVG: les rasteriser avec Chromium), xvfb-run, Chromium et Playwright préinstallés (`require('playwright')`, `chromium.launch()` sans option). WebGL2 fonctionne en rendu logiciel (SwiftShader), WebGPU non.
-- Blender: le module Python `bpy` 5.2 est proposé sur PyPI pour ce Python (installation non testée).
-- Réseau: npm, PyPI, raw.githubusercontent.com et les fichiers de release GitHub (dont le binaire Electron) accessibles. Refusés par la politique réseau de l'environnement: les sites d'assets libres (kenney.nl, polyhaven.com, quaternius.com, opengameart.org) et SpriteCook (mcp.spritecook.ai).
+- Préinstallés: Node 22 et npm, Python 3.13, ffmpeg (encodeurs Vorbis, Opus et AAC), ImageMagick (sans lecture des SVG), xvfb-run, Chromium et Playwright (`require('playwright')`, `chromium.launch()` sans option). WebGL2 fonctionne en rendu logiciel (SwiftShader), WebGPU non.
+- Boîte à outils du studio: `bash outils/installer-outils.sh` (moins de 2 minutes, relançable sans risque, inutile si le script est déjà dans le « Setup script » de l'environnement). Elle fournit:
+  - `duo-python`: Python avec Blender 5.2 (`bpy`), mido, Pillow, scipy et pedalboard;
+  - `fluidsynth` et la banque General MIDI `/usr/share/sounds/sf2/FluidR3_GM.sf2`;
+  - `rsvg-convert` pour passer les SVG en PNG.
+- Chaînes testées de bout en bout:
+  - 3D: modélisation par script dans Blender, export GLB, rendu Cycles sur CPU (960x540 en 9 s), puis le même GLB chargé dans Three.js 0.187 sous Chromium, animation comprise.
+  - Son: composition MIDI (mido), rendu FluidSynth, mastering (pedalboard), normalisation à -16 LUFS et encodage OGG avec ffmpeg; effets synthétisés avec numpy.
+- Réseau: npm, PyPI, les dépôts apt d'Ubuntu, raw.githubusercontent.com et les fichiers de release GitHub (dont le binaire Electron) sont accessibles. Les sites d'assets libres (kenney.nl, polyhaven.com, quaternius.com, opengameart.org) sont refusés par la politique réseau. SpriteCook devrait passer par son connecteur claude.ai une fois que le client l'aura autorisé, car le trafic des connecteurs ne dépend pas de cette politique (non vérifié).
 - Les machines cibles (macOS, Windows) ne sont pas accessibles d'ici.
 
 ### Compte rendu au manager (fin de chaque mission)

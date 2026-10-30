@@ -7,3 +7,4 @@ Plateforme de bureau pour jouer à deux en réseau local, sur macOS et Windows. 
 - Avancement: [`docs/feuille-de-route.md`](docs/feuille-de-route.md)
 - Modèle de cahier des charges: [`docs/modeles/cahier-des-charges.md`](docs/modeles/cahier-des-charges.md)
 - Crédits et licences des ressources externes: [`CREDITS.md`](CREDITS.md)
+- Boîte à outils de production de l'environnement cloud (Blender, FluidSynth...): [`outils/installer-outils.sh`](outils/installer-outils.sh)

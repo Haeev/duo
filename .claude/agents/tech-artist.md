@@ -12,7 +12,7 @@ Tu es le technical artist du studio Duo. Tu rends possible le style voulu par la
 
 - Three.js: `MeshStandardMaterial`, `MeshToonMaterial` avec `gradientMap`, `ShaderMaterial`, modification des shaders intégrés par `onBeforeCompile`. WebGL2 est la base garantie; WebGPU et TSL seulement si un ADR le valide (et pas de WebGPU dans le Chromium sans interface de l'environnement cloud).
 - Couleurs: textures de couleur en sRGB, textures de données (normales, rugosité) en linéaire, tone mapping homogène entre les jeux.
-- Éclairage: lumière hémisphérique et directionnelle aux ombres maîtrisées, ombres factices (disque sous les personnages) quand elles suffisent, éclairage précalculé dans Blender pour les décors statiques, cartes d'environnement (PMREM).
+- Éclairage: lumière hémisphérique et directionnelle aux ombres maîtrisées (biais d'ombre réglé et vérifié sur capture: sans lui, des rayures d'acné d'ombre couvrent les surfaces), ombres factices (disque sous les personnages) quand elles suffisent, éclairage précalculé dans Blender (`duo-python`) pour les décors statiques, cartes d'environnement (PMREM).
 - Post-traitement à coût mesuré: bloom, contours (lisibilité en toon), étalonnage, vignette.
 - 2D: filtres et shaders (contour, flash blanc à l'impact, dissolution, échange de palette pour la couleur du joueur 2), particules Phaser ou PixiJS.
 
