@@ -260,6 +260,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **EC-08** Livrer: on dépose les produits dans la caisse de la halte n'importe quel jour; on peut les reprendre jusqu'au départ du train. Au départ (16 h): chaque ligne remplie est payée 1,5 fois le prix de base; une commande complète rapporte 25 % de plus; une ligne incomplète n'est pas payée en commande, mais ses produits sont achetés au prix de base; rien n'est perdu. Le récapitulatif arrive au courrier (« La coopérative a reçu 4 lignes sur 5: 412 sous. Merci ! »).
 - **EC-09** Confiance de la coopérative: +1 point par ligne remplie, +2 pour une commande complète. Niveaux à 4, 9, 15, 24, 36, 50 et 66 points. Elle ne baisse jamais. Elle ouvre les chapitres (niveau 2 pour le chapitre 1, niveau 3 pour le chantier de la gare des Vergers) et les rayons du catalogue (EC-03).
 - **EC-10** Petites annonces: le tableau de la halte en affiche trois au plus, renouvelées chaque matin (livraisons, réparations, recherches). N'importe quel joueur les accepte et les remplit pour le duo. Récompense: 60 à 200 sous et +50 de lien avec le demandeur. Une annonce non faite reste affichée sept jours, puis cède la place, sans conséquence.
+- **EC-11** Réglages du duo (rythme de la journée, taille de la commande, seuil des gros achats, seuil d'absence): un changement devient une proposition chez l'autre, comme un gros achat (EC-04), et s'applique dès qu'il l'accepte; la taille de la commande vaut à partir de la commande suivante.
 
 ### 4.7 Maison, plan et chantiers
 
@@ -301,7 +302,7 @@ Les règles sont numérotées pour la recette (préfixe par système). « Le duo
 - **GE-03** Lever (charpente, marquise, cloche): maintenir ensemble pendant la durée du geste (5 s), avec une courte animation partagée.
 - **GE-04** Pomper la draisine: les deux à bord; maintenir l'action fait avancer à 4,5 m/s; alterner en rythme (un coup chacun, à 0,3 s près) donne 6 m/s. La draisine ne part qu'avec les deux à bord tant que la voie n'est pas rouverte; après le chapitre 2, un joueur seul la pompe à 3 m/s.
 - **GE-05** Danser (fêtes), se tenir la main en marchant, s'asseoir ensemble sur un banc, se faire un câlin à la veillée: gestes contemplatifs (Cœur +10, une fois par jour pour l'ensemble des gestes à deux). Leur liste dépend de la question Q4.
-- **GE-06** Déplacements: marche à 3,5 m/s (pas de course). Entre la Halte et les Vergers: le sentier (30 minutes de jeu, soit 24 s réelles, en fondu) ou la draisine (10 minutes de jeu). Sortir d'une zone par un bord la charge sur la machine de ce joueur seulement.
+- **GE-06** Déplacements: marche à 3,5 m/s (pas de course). Pendant le chapitre 2, la voie des Vergers est une zone qu'on parcourt en draisine (400 m, un peu plus d'une minute de pompage). Une fois la voie rouverte, on passe d'une gare à l'autre en fondu: par le sentier (30 minutes de jeu, soit 24 s réelles) ou en draisine depuis la remise (10 minutes de jeu, soit 8 s). Sortir d'une zone par un bord la charge sur la machine de ce joueur seulement.
 - **GE-07** Le repère: un joueur plante une épingle à sa couleur à l'endroit visé (dans le monde ou sur la carte), visible chez les deux pendant 15 s, avec un carillon chez l'autre. Une épingle par joueur à la fois.
 
 ### 4.11 Histoire et chapitres
@@ -369,7 +370,7 @@ L'hôte fait autorité (architecture, section 7): il reçoit les intentions des 
 | Taille d'un personnage | 1,7 m | gabarits de 1,6 à 1,8 m |
 | Vitesse de marche | 3,5 m/s | pas de course |
 | Portage à deux | 1,8 m/s | 0,9 m/s si un seul avance |
-| Draisine | 6 m/s en rythme, 4,5 m/s à deux, 3 m/s seul (après le chapitre 2) | |
+| Draisine | 6 m/s en rythme, 4,5 m/s à deux, 3 m/s seul (après le chapitre 2) | sur la voie du chapitre 2; ensuite, trajet en fondu de 10 minutes de jeu |
 | Portée d'une action | 1,5 m | la case devant soi et ses voisines |
 | Portée d'une conversation | 2,5 m | |
 | Portée d'un geste à deux | 2 m du point du geste | |
