@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | ingenieur-build (responsable du lot L1) |
@@ -40,7 +40,7 @@ L'orientation validée prévoit un monorepo: l'application, un SDK commun, un pa
 ```text
 duo/
   apps/
-    duo/                    application Electron
+    duo/                    application Electron (paquet nommé `duo`, demande de l'ADR 0011)
       src/main/             processus principal (modules de l'ADR 0003)
       src/preload/          preload-platform, preload-game
       src/renderer/         lanceur et écrans superposés (ADR 0012)

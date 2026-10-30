@@ -38,15 +38,17 @@ from synthese import (SR, couper_queue, crete_vraie_db, passe_haut, plateau_aigu
                       reverbe, sonie_momentanee_max)
 
 QUALITE_OGG_SONS = 3  # Vorbis VBR, environ 112 kbit/s en stéréo pleine, bien moins sur les queues
-QUALITE_OGG_MUSIQUE = 2  # environ 96 kbit/s: une nappe douce le supporte sans défaut mesurable
-DEBIT_M4A_SONS = "80k"  # copies d'écoute: peu de contenu au-dessus de 8 kHz
-DEBIT_M4A_MUSIQUE = "80k"
-DEBIT_M4A_PLANCHE = "80k"
+QUALITE_OGG_MUSIQUE = 1.5  # environ 88 kbit/s: une nappe douce le supporte sans défaut mesurable
+# Copies d'écoute: à 64 kbit/s, l'énergie de chaque octave reste à 1 dB de la source jusqu'à 12 kHz
+# (mesuré), et ces sons n'ont presque rien au-dessus de 8 kHz.
+DEBIT_M4A_SONS = "64k"
+DEBIT_M4A_MUSIQUE = "64k"
+DEBIT_M4A_PLANCHE = "64k"
 PLAFOND_DBTP = -1.5  # avant encodage; le contrôle exige -1,0 dBTP après décodage
 
 SILENCE_ENTRE_SONS = 0.7
 SILENCE_ENTRE_GROUPES = 1.6
-EXTRAIT_RACCORD = 10.0  # secondes de part et d'autre du point de boucle dans la planche
+EXTRAIT_RACCORD = 8.0  # secondes de part et d'autre du point de boucle dans la planche
 
 BUS = {"interface": "ui", "effets": "effects", "musique": "music"}
 
@@ -59,7 +61,7 @@ def ecrire_wav(chemin: Path, x: np.ndarray) -> None:
     wavfile.write(str(chemin), SR, x.astype(np.float32))
 
 
-def encoder_ogg(wav: Path, sortie: Path, qualite: int) -> None:
+def encoder_ogg(wav: Path, sortie: Path, qualite: float) -> None:
     ffmpeg("-i", str(wav), "-map_metadata", "-1", "-fflags", "+bitexact", "-flags:a", "+bitexact",
            "-c:a", "libvorbis", "-q:a", str(qualite), str(sortie))
 
@@ -76,7 +78,7 @@ def traiter(son: interface.Son, variante: int) -> tuple[np.ndarray, dict]:
     x = passe_haut(x, 120.0)  # rien sous 120 Hz: inutile sur des haut-parleurs de portable
     x = plateau_aigu(x, 6000.0, -3.0)  # aigus adoucis: confort sur une longue soirée
     x = reverbe(x, **son.reverbe)
-    x = couper_queue(x, seuil_db=-58.0)
+    x = couper_queue(x, seuil_db=-54.0)  # au-delà, plus bas que -60 dBFS: inaudible
     brut = sonie_momentanee_max(x)
     x = x * 10 ** ((son.cible_lufs - brut) / 20.0)
     tp = crete_vraie_db(x)
@@ -199,6 +201,14 @@ def main() -> int:
         "version": 1,
         "sampleRate": SR,
         "buses": ["music", "effects", "ui"],
+        "mix": {
+            "volumeCurve": "square",
+            "masterLimiter": {"thresholdDb": -3.0, "kneeDb": 0.0, "ratio": 20.0, "attackMs": 3.0, "releaseMs": 250.0},
+            "duck": {"attackMs": 80, "releaseMs": 700},
+            "pausedGame": {"musicDb": -10.0, "musicLowpassHz": 1200, "rampMs": 300},
+            "maxUiVoices": 6,
+            "programmaticFocusIsSilent": True,
+        },
         "sounds": manifeste_sons,
         "music": {
             "lounge": {

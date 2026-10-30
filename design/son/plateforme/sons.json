@@ -26,9 +26,9 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -28.0,
       "durationMs": [
-        553,
-        580,
-        553
+        507,
+        528,
+        507
       ]
     },
     "confirm": {
@@ -49,9 +49,9 @@
       "stereo": "toi",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        1075,
-        980,
-        1011
+        933,
+        895,
+        936
       ]
     },
     "back": {
@@ -72,9 +72,9 @@
       "stereo": "toi",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
-        1033,
-        1025,
-        1042
+        899,
+        897,
+        914
       ]
     },
     "error": {
@@ -94,8 +94,8 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
-        1134,
-        1177
+        1062,
+        1051
       ]
     },
     "notify": {
@@ -115,8 +115,8 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
-        1090,
-        1085
+        1054,
+        1055
       ]
     },
     "volume-test": {
@@ -135,7 +135,7 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        992
+        905
       ]
     },
     "peer-here": {
@@ -154,7 +154,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
-        2695
+        2670
       ]
     },
     "invite": {
@@ -173,7 +173,7 @@
       "stereo": "autre",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
-        2334
+        2252
       ]
     },
     "ready-self": {
@@ -192,7 +192,7 @@
       "stereo": "toi",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        1310
+        1224
       ]
     },
     "ready-peer": {
@@ -211,7 +211,7 @@
       "stereo": "autre",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        1305
+        1243
       ]
     },
     "not-ready-peer": {
@@ -230,7 +230,7 @@
       "stereo": "autre",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
-        1215
+        1121
       ]
     },
     "countdown-tick": {
@@ -249,7 +249,7 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        982
+        847
       ]
     },
     "countdown-go": {
@@ -268,7 +268,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
-        2350
+        2314
       ]
     },
     "countdown-cancel": {
@@ -287,7 +287,7 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
-        1085
+        984
       ]
     },
     "pause": {
@@ -306,7 +306,7 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        1238
+        1127
       ]
     },
     "resume": {
@@ -325,7 +325,7 @@
       "stereo": "centre",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
-        1330
+        1153
       ]
     },
     "connection-lost": {
@@ -344,7 +344,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
-        2315
+        2203
       ]
     },
     "connection-back": {
@@ -363,7 +363,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
-        2673
+        2608
       ]
     },
     "end-win": {
@@ -382,7 +382,7 @@
       "stereo": "toi",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
-        2992
+        2866
       ]
     },
     "end-peer-win": {
@@ -401,7 +401,7 @@
       "stereo": "autre",
       "loudnessMomentaryMaxLufs": -17.0,
       "durationMs": [
-        2913
+        2848
       ]
     },
     "end-draw": {
@@ -420,7 +420,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
-        2661
+        2516
       ]
     },
     "end-success": {
@@ -439,7 +439,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
-        3638
+        3568
       ]
     },
     "end-fail": {
@@ -458,7 +458,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -17.0,
       "durationMs": [
-        3478
+        3255
       ]
     },
     "new-game": {
@@ -477,7 +477,7 @@
       "stereo": "large",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
-        2281
+        2025
       ]
     }
   },

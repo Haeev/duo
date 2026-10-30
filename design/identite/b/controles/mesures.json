@@ -1,0 +1,908 @@
+{
+  "contrasts": [
+    {
+      "fgName": "text",
+      "fg": "#F3F1FA",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "texte",
+      "ratio": 16.66,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-muted",
+      "fg": "#A7ABD6",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "texte",
+      "ratio": 8.38,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "texte",
+      "ratio": 12.11,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "success",
+      "fg": "#6BD69A",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "texte",
+      "ratio": 10.39,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "error",
+      "fg": "#FF6B81",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "texte",
+      "ratio": 6.81,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-disabled",
+      "fg": "#6F74A3",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "inactif",
+      "ratio": 4.17,
+      "threshold": null,
+      "verdict": "exempté (élément inactif)"
+    },
+    {
+      "fgName": "text",
+      "fg": "#F3F1FA",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "texte",
+      "ratio": 14.36,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-muted",
+      "fg": "#A7ABD6",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "texte",
+      "ratio": 7.22,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "texte",
+      "ratio": 10.44,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "success",
+      "fg": "#6BD69A",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "texte",
+      "ratio": 8.96,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "error",
+      "fg": "#FF6B81",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "texte",
+      "ratio": 5.87,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-disabled",
+      "fg": "#6F74A3",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "inactif",
+      "ratio": 3.6,
+      "threshold": null,
+      "verdict": "exempté (élément inactif)"
+    },
+    {
+      "fgName": "text",
+      "fg": "#F3F1FA",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "texte",
+      "ratio": 12.14,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-muted",
+      "fg": "#A7ABD6",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "texte",
+      "ratio": 6.11,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "texte",
+      "ratio": 8.83,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "success",
+      "fg": "#6BD69A",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "texte",
+      "ratio": 7.57,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "error",
+      "fg": "#FF6B81",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "texte",
+      "ratio": 4.96,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "text-disabled",
+      "fg": "#6F74A3",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "inactif",
+      "ratio": 3.04,
+      "threshold": null,
+      "verdict": "exempté (élément inactif)"
+    },
+    {
+      "fgName": "on-accent",
+      "fg": "#0E1126",
+      "bgName": "accent",
+      "bg": "#FFC857",
+      "kind": "texte",
+      "ratio": 12.11,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "on-accent",
+      "fg": "#0E1126",
+      "bgName": "accent-hover",
+      "bg": "#FFD47A",
+      "kind": "texte",
+      "ratio": 13.27,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "on-accent",
+      "fg": "#0E1126",
+      "bgName": "accent-pressed",
+      "bg": "#F0B440",
+      "kind": "texte",
+      "ratio": 10.03,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-orb",
+      "bg": "#5CE1E6",
+      "kind": "texte",
+      "ratio": 11.86,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-crescent",
+      "bg": "#8D6CFF",
+      "kind": "texte",
+      "ratio": 5.08,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-star",
+      "bg": "#D4F27A",
+      "kind": "texte",
+      "ratio": 14.89,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-sun",
+      "bg": "#FC663F",
+      "kind": "texte",
+      "ratio": 6.31,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-planet",
+      "bg": "#E787B1",
+      "kind": "texte",
+      "ratio": 7.54,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-on",
+      "fg": "#0E1126",
+      "bgName": "player-comet",
+      "bg": "#22B07D",
+      "kind": "texte",
+      "ratio": 6.72,
+      "threshold": 4.5,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "outline",
+      "fg": "#7178BB",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 4.53,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "focus",
+      "fg": "#F3F1FA",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 16.66,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 12.11,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-orb",
+      "fg": "#5CE1E6",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 11.86,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-crescent",
+      "fg": "#8D6CFF",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 5.08,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-star",
+      "fg": "#D4F27A",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 14.89,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-sun",
+      "fg": "#FC663F",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 6.31,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-planet",
+      "fg": "#E787B1",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 7.54,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-comet",
+      "fg": "#22B07D",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "composant",
+      "ratio": 6.72,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "line",
+      "fg": "#3B4380",
+      "bgName": "bg",
+      "bg": "#0E1126",
+      "kind": "décor",
+      "ratio": 2.04,
+      "threshold": null,
+      "verdict": "décor, jamais seul porteur d'information"
+    },
+    {
+      "fgName": "outline",
+      "fg": "#7178BB",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 3.91,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "focus",
+      "fg": "#F3F1FA",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 14.36,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 10.44,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-orb",
+      "fg": "#5CE1E6",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 10.23,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-crescent",
+      "fg": "#8D6CFF",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 4.38,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-star",
+      "fg": "#D4F27A",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 12.84,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-sun",
+      "fg": "#FC663F",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 5.44,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-planet",
+      "fg": "#E787B1",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 6.5,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-comet",
+      "fg": "#22B07D",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "composant",
+      "ratio": 5.79,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "line",
+      "fg": "#3B4380",
+      "bgName": "surface",
+      "bg": "#1A1F3D",
+      "kind": "décor",
+      "ratio": 1.76,
+      "threshold": null,
+      "verdict": "décor, jamais seul porteur d'information"
+    },
+    {
+      "fgName": "outline",
+      "fg": "#7178BB",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 3.3,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "focus",
+      "fg": "#F3F1FA",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 12.14,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "accent",
+      "fg": "#FFC857",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 8.83,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-orb",
+      "fg": "#5CE1E6",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 8.65,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-crescent",
+      "fg": "#8D6CFF",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 3.7,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-star",
+      "fg": "#D4F27A",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 10.85,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-sun",
+      "fg": "#FC663F",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 4.6,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-planet",
+      "fg": "#E787B1",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 5.5,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "player-comet",
+      "fg": "#22B07D",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "composant",
+      "ratio": 4.9,
+      "threshold": 3,
+      "verdict": "AA"
+    },
+    {
+      "fgName": "line",
+      "fg": "#3B4380",
+      "bgName": "surface-raised",
+      "bg": "#252B52",
+      "kind": "décor",
+      "ratio": 1.49,
+      "threshold": null,
+      "verdict": "décor, jamais seul porteur d'information"
+    },
+    {
+      "fgName": "surface (panneau)",
+      "fg": "#1A1F3D",
+      "bgName": "voile sur jeu blanc #515362",
+      "bg": "#515362",
+      "kind": "information",
+      "ratio": 2.11,
+      "threshold": null,
+      "verdict": "mesure"
+    },
+    {
+      "fgName": "surface (panneau)",
+      "fg": "#1A1F3D",
+      "bgName": "voile sur jeu noir #0A0C1B",
+      "bg": "#0A0C1B",
+      "kind": "information",
+      "ratio": 1.21,
+      "threshold": null,
+      "verdict": "mesure"
+    }
+  ],
+  "players": {
+    "list": [
+      {
+        "id": "orb",
+        "label": "Astre aqua",
+        "color": "#5CE1E6",
+        "L": 82.8,
+        "sims": {
+          "normale": "#5CE1E6",
+          "protanopie": "#D2D7E7",
+          "deuteranopie": "#BDC7E7",
+          "tritanopie": "#00E8E2",
+          "gris": "#CECECE"
+        }
+      },
+      {
+        "id": "crescent",
+        "label": "Croissant mauve",
+        "color": "#8D6CFF",
+        "L": 55.7,
+        "sims": {
+          "normale": "#8D6CFF",
+          "protanopie": "#0088FF",
+          "deuteranopie": "#0082FC",
+          "tritanopie": "#6A8DAB",
+          "gris": "#858585"
+        }
+      },
+      {
+        "id": "star",
+        "label": "Étoile anis",
+        "color": "#D4F27A",
+        "L": 91.2,
+        "sims": {
+          "normale": "#D4F27A",
+          "protanopie": "#FEE66F",
+          "deuteranopie": "#FBE681",
+          "tritanopie": "#DDE8D7",
+          "gris": "#E6E6E6"
+        }
+      },
+      {
+        "id": "sun",
+        "label": "Soleil corail",
+        "color": "#FC663F",
+        "L": 62.1,
+        "sims": {
+          "normale": "#FC663F",
+          "protanopie": "#90813A",
+          "deuteranopie": "#B5A33A",
+          "tritanopie": "#FF425E",
+          "gris": "#969696"
+        }
+      },
+      {
+        "id": "planet",
+        "label": "Planète rose",
+        "color": "#E787B1",
+        "L": 67.6,
+        "sims": {
+          "normale": "#E787B1",
+          "protanopie": "#929BB2",
+          "deuteranopie": "#AAABAF",
+          "tritanopie": "#F48396",
+          "gris": "#A5A5A5"
+        }
+      },
+      {
+        "id": "comet",
+        "label": "Comète jade",
+        "color": "#22B07D",
+        "L": 64.1,
+        "sims": {
+          "normale": "#22B07D",
+          "protanopie": "#ADA27A",
+          "deuteranopie": "#9C9680",
+          "tritanopie": "#00B0A2",
+          "gris": "#9B9B9B"
+        }
+      }
+    ],
+    "pairs": [
+      {
+        "a": "orb",
+        "b": "crescent",
+        "normale": 42,
+        "protanopie": 30.7,
+        "deuteranopie": 26.2,
+        "tritanopie": 30.1,
+        "gris": 21.3,
+        "ecartL": 27.1
+      },
+      {
+        "a": "orb",
+        "b": "star",
+        "normale": 34.1,
+        "protanopie": 34.8,
+        "deuteranopie": 40.2,
+        "tritanopie": 22.5,
+        "gris": 5.5,
+        "ecartL": 8.4
+      },
+      {
+        "a": "orb",
+        "b": "sun",
+        "normale": 56.5,
+        "protanopie": 38.9,
+        "deuteranopie": 41.6,
+        "tritanopie": 71,
+        "gris": 15.6,
+        "ecartL": 20.7
+      },
+      {
+        "a": "orb",
+        "b": "planet",
+        "normale": 57.8,
+        "protanopie": 16.4,
+        "deuteranopie": 13,
+        "tritanopie": 73.6,
+        "gris": 10.9,
+        "ecartL": 15.2
+      },
+      {
+        "a": "orb",
+        "b": "comet",
+        "normale": 23.2,
+        "protanopie": 27.4,
+        "deuteranopie": 27.8,
+        "tritanopie": 14.5,
+        "gris": 14,
+        "ecartL": 18.8
+      },
+      {
+        "a": "crescent",
+        "b": "star",
+        "normale": 80.8,
+        "protanopie": 65.5,
+        "deuteranopie": 65,
+        "tritanopie": 32.6,
+        "gris": 26.6,
+        "ecartL": 35.5
+      },
+      {
+        "a": "crescent",
+        "b": "sun",
+        "normale": 45.1,
+        "protanopie": 54.3,
+        "deuteranopie": 60.8,
+        "tritanopie": 43.7,
+        "gris": 5.9,
+        "ecartL": 6.4
+      },
+      {
+        "a": "crescent",
+        "b": "planet",
+        "normale": 26.8,
+        "protanopie": 19.2,
+        "deuteranopie": 28.5,
+        "tritanopie": 38.5,
+        "gris": 10.5,
+        "ecartL": 12
+      },
+      {
+        "a": "crescent",
+        "b": "comet",
+        "normale": 48.6,
+        "protanopie": 47,
+        "deuteranopie": 40.8,
+        "tritanopie": 23.6,
+        "gris": 7.5,
+        "ecartL": 8.4
+      },
+      {
+        "a": "star",
+        "b": "sun",
+        "normale": 55.5,
+        "protanopie": 28.6,
+        "deuteranopie": 17.1,
+        "tritanopie": 46.8,
+        "gris": 20.9,
+        "ecartL": 29.1
+      },
+      {
+        "a": "star",
+        "b": "planet",
+        "normale": 62.9,
+        "protanopie": 42.8,
+        "deuteranopie": 30.4,
+        "tritanopie": 39.3,
+        "gris": 16.4,
+        "ecartL": 23.5
+      },
+      {
+        "a": "star",
+        "b": "comet",
+        "normale": 27.7,
+        "protanopie": 21.7,
+        "deuteranopie": 26.3,
+        "tritanopie": 26.9,
+        "gris": 19.4,
+        "ecartL": 27.1
+      },
+      {
+        "a": "sun",
+        "b": "planet",
+        "normale": 27.4,
+        "protanopie": 34.6,
+        "deuteranopie": 27.5,
+        "tritanopie": 12.8,
+        "gris": 4.7,
+        "ecartL": 5.5
+      },
+      {
+        "a": "sun",
+        "b": "comet",
+        "normale": 62.7,
+        "protanopie": 13.3,
+        "deuteranopie": 17.3,
+        "tritanopie": 66.9,
+        "gris": 1.6,
+        "ecartL": 1.9
+      },
+      {
+        "a": "planet",
+        "b": "comet",
+        "normale": 66.1,
+        "protanopie": 26.9,
+        "deuteranopie": 13.9,
+        "tritanopie": 59.7,
+        "gris": 3.1,
+        "ecartL": 3.6
+      }
+    ],
+    "worst": {
+      "normale": {
+        "value": 23.2,
+        "pair": [
+          "orb",
+          "comet"
+        ],
+        "threshold": 20
+      },
+      "protanopie": {
+        "value": 13.3,
+        "pair": [
+          "sun",
+          "comet"
+        ],
+        "threshold": 10
+      },
+      "deuteranopie": {
+        "value": 13,
+        "pair": [
+          "orb",
+          "planet"
+        ],
+        "threshold": 10
+      },
+      "tritanopie": {
+        "value": 12.8,
+        "pair": [
+          "sun",
+          "planet"
+        ],
+        "threshold": 10
+      },
+      "gris": {
+        "value": 1.6,
+        "pair": [
+          "sun",
+          "comet"
+        ],
+        "threshold": null
+      }
+    },
+    "thresholds": {
+      "normale": 20,
+      "protanopie": 10,
+      "deuteranopie": 10,
+      "tritanopie": 10
+    }
+  },
+  "silhouettes": {
+    "orb/crescent": 0.35,
+    "orb/star": 0.66,
+    "orb/sun": 0.37,
+    "orb/planet": 0.54,
+    "orb/comet": 0.53,
+    "crescent/orb": 0.35,
+    "crescent/star": 0.24,
+    "crescent/sun": 0.18,
+    "crescent/planet": 0.22,
+    "crescent/comet": 0.37,
+    "star/orb": 0.66,
+    "star/crescent": 0.24,
+    "star/sun": 0.54,
+    "star/planet": 0.53,
+    "star/comet": 0.5,
+    "sun/orb": 0.37,
+    "sun/crescent": 0.18,
+    "sun/star": 0.54,
+    "sun/planet": 0.39,
+    "sun/comet": 0.44,
+    "planet/orb": 0.54,
+    "planet/crescent": 0.22,
+    "planet/star": 0.53,
+    "planet/sun": 0.39,
+    "planet/comet": 0.48,
+    "comet/orb": 0.53,
+    "comet/crescent": 0.37,
+    "comet/star": 0.5,
+    "comet/sun": 0.44,
+    "comet/planet": 0.48
+  }
+}

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duo · icône d'application en petites tailles · contrôle</title>
+<link rel="stylesheet" href="../node_modules/@fontsource-variable/dm-sans/standard.css">
+<link rel="stylesheet" href="../jetons.css">
+<style>
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1280px; }
+body { background: #2B2B2B; color: #F3F3F3; font-family: var(--font-text); font-size: 15px; padding: 28px 32px; }
+h1 { font: 600 22px/1.2 var(--font-text); margin: 0 0 4px; }
+p { margin: 0 0 18px; color: #C8C8C8; }
+.ligne { display: flex; gap: 24px; margin-bottom: 22px; align-items: flex-start; }
+.cadre { border-radius: 10px; overflow: hidden; }
+.cadre h2 { font: 600 13px var(--font-text); margin: 0; padding: 8px 12px; background: #1F1F1F; color: #DDD; }
+/* barre de titre de fenêtre (16 px), barre des tâches (24 et 32 px), Dock (64 px) */
+.titre-fenetre { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; font-size: 12px; }
+.taches { display: flex; align-items: center; gap: 14px; height: 48px; padding: 0 16px; }
+.dock { display: flex; align-items: center; gap: 14px; height: 84px; padding: 0 18px; border-radius: 22px; }
+.clair { background: #F3F3F3; color: #1A1A1A; }
+.sombre { background: #202020; color: #F3F3F3; }
+.dock.clair { background: #E7E7EA; }
+.dock.sombre { background: #3A3A3F; }
+.factice { display: inline-block; border-radius: 6px; background: #8A8A8A; }
+img.px { image-rendering: pixelated; }
+.loupe { display: flex; gap: 18px; align-items: flex-end; }
+.loupe figure { margin: 0; text-align: center; font-size: 13px; color: #C8C8C8; }
+.loupe img { display: block; margin-bottom: 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>Icône d'application en petites tailles</h1>
+<p>Fichiers réels de duo.ico (Windows) et duo.icns (macOS), affichés à leur taille sur fonds clair et sombre, puis agrandis au pixel près.</p>
+<div class="ligne">
+  <div class="cadre"><h2>Barre de titre Windows · 16 px</h2>
+    <div class="titre-fenetre clair"><img class="px" src="../icone-app/png/windows-16.png" width="16" height="16" alt="">Duo</div>
+    <div class="titre-fenetre sombre"><img class="px" src="../icone-app/png/windows-16.png" width="16" height="16" alt="">Duo</div>
+  </div>
+  <div class="cadre"><h2>Barre des tâches · 24 px (100 %) et 32 px (125 à 150 %)</h2>
+    <div class="taches clair"><span class="factice" style="width:24px;height:24px"></span><img class="px" src="../icone-app/png/windows-24.png" width="24" height="24" alt=""><span class="factice" style="width:24px;height:24px"></span><span style="width:20px"></span><span class="factice" style="width:32px;height:32px"></span><img class="px" src="../icone-app/png/windows-32.png" width="32" height="32" alt=""><span class="factice" style="width:32px;height:32px"></span></div>
+    <div class="taches sombre"><span class="factice" style="width:24px;height:24px"></span><img class="px" src="../icone-app/png/windows-24.png" width="24" height="24" alt=""><span class="factice" style="width:24px;height:24px"></span><span style="width:20px"></span><span class="factice" style="width:32px;height:32px"></span><img class="px" src="../icone-app/png/windows-32.png" width="32" height="32" alt=""><span class="factice" style="width:32px;height:32px"></span></div>
+  </div>
+  <div class="cadre"><h2>Liste du Finder · 16 px et 16 px @2x</h2>
+    <div class="titre-fenetre clair"><img class="px" src="../icone-app/png/macos-16.png" width="16" height="16" alt="">Duo.app <img src="../icone-app/png/macos-16@2x.png" width="16" height="16" alt="" style="margin-left:12px">Retina</div>
+    <div class="titre-fenetre sombre"><img class="px" src="../icone-app/png/macos-16.png" width="16" height="16" alt="">Duo.app <img src="../icone-app/png/macos-16@2x.png" width="16" height="16" alt="" style="margin-left:12px">Retina</div>
+  </div>
+</div>
+<div class="ligne">
+  <div class="cadre"><h2>Dock macOS · 64 px (grille d'Apple: la plaque occupe 80 % de l'icône)</h2>
+    <div style="padding:10px;background:#555"><div class="dock clair"><span class="factice" style="width:52px;height:52px;border-radius:12px"></span><img src="../icone-app/png/macos-64.png" width="64" height="64" alt=""><img src="../icone-app/png/macos-128.png" width="64" height="64" alt=""><span class="factice" style="width:52px;height:52px;border-radius:12px"></span></div></div>
+    <div style="padding:10px;background:#555"><div class="dock sombre"><span class="factice" style="width:52px;height:52px;border-radius:12px"></span><img src="../icone-app/png/macos-64.png" width="64" height="64" alt=""><img src="../icone-app/png/macos-128.png" width="64" height="64" alt=""><span class="factice" style="width:52px;height:52px;border-radius:12px"></span></div></div>
+  </div>
+  <div class="loupe">
+    <figure><img class="px" src="../icone-app/png/windows-16.png" width="128" height="128" alt="">16 px, x8</figure>
+    <figure><img class="px" src="../icone-app/png/windows-24.png" width="120" height="120" alt="">24 px, x5</figure>
+    <figure><img class="px" src="../icone-app/png/windows-32.png" width="128" height="128" alt="">32 px, x4</figure>
+    <figure><img class="px" src="../icone-app/png/macos-32.png" width="128" height="128" alt="">macOS 32 px, x4</figure>
+    <figure><img src="../icone-app/png/windows-256.png" width="128" height="128" alt="">256 px</figure>
+  </div>
+</div>
+<script>window.planchePrete = true;</script>
+</body>
+</html>

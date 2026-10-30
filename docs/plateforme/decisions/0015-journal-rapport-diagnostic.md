@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée (ADR ajouté pour F14, absent de la liste initiale de `architecture.md` 0.1) |
+| Statut | acceptée (manager, 2026-10-30); ADR ajouté pour F14, absent de la liste initiale de `architecture.md` 0.1 |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | dev-plateforme, dev-reseau (état du réseau), ux-ui-designer (aperçu), qa-testeur (critères de F14) |
@@ -57,10 +57,10 @@ Pièges connus: un nom d'ordinateur contient souvent un prénom (« MacBook Air 
 
 - Le rapport se lit comme un document: le joueur sait ce qu'il envoie, le studio le lit sans outil.
 - Le nettoyage s'applique dès l'écriture du journal: aucun fichier du dossier `logs/` ne contient de donnée personnelle hors des pseudos.
-- « En un clic »: un clic ouvre l'aperçu, un second enregistre ou copie. ux-ui-designer et le manager diront si ce second clic convient au client (F14 exige que le joueur voie le contenu avant l'enregistrement).
+- « En un clic » et « voir avant d'enregistrer » (F14) se concilient ainsi: l'export est un seul clic (« Enregistrer » ou « Copier ») depuis un endroit où le contenu est déjà affiché. Là où le rapport n'est pas déjà à l'écran (fenêtre « Le jeu s'est arrêté », E13), un premier geste ouvre l'aperçu. ux-ui-designer peut aussi afficher le contenu directement dans Réglages > À propos et dans le diagnostic (E17); c'est à lui et au manager de choisir.
 - qa-testeur doit écrire les critères de F14 (roadmap): aperçu avant tout enregistrement, contenu par section, absence des marqueurs de données personnelles, taille.
 
 ### À vérifier
 
 - Contenu réel de `app.getGPUInfo('basic')` sur le PC (Intel UHD 620) et sur le Mac: champs utiles au diagnostic du rendu logiciel.
-- Accès au dossier Téléchargements sous macOS: aucune autorisation n'est attendue pour l'application elle-même, à confirmer sur une version signée ad hoc.
+- Accès au dossier Téléchargements sous macOS: macOS peut demander l'accord d'une application qui y écrit, et une application signée ad hoc pourrait voir cette demande revenir à chaque version (point soulevé par l'ADR 0011, non vérifié). Essai sur le Mac dès le prototype; si la demande apparaît, « Enregistrer » passe par la fenêtre d'enregistrement du système (`dialog.showSaveDialog`, dossier Téléchargements proposé), qui donne l'accès sans demande.

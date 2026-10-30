@@ -164,7 +164,7 @@ def pause(v: int) -> np.ndarray:
     x = toile(1.8)
     poser(x, verre(n("D6"), 1.6, 0.75, t60=0.8, brillance=0.8, graine=141), 0.0)
     poser(x, verre(n("A5"), 1.6, 0.8, t60=0.95, brillance=0.7, graine=142), 0.09)
-    poser(x, lueur(n("D4"), 0.15, 0.22, attaque=0.03, relache=0.9, coupure=900, voix=2, graine=143), 0.0)
+    poser(x, lueur(n("D4"), 0.15, 0.12, attaque=0.03, relache=0.9, coupure=900, voix=2, graine=143), 0.0)
     return passe_bas_variable(x, lambda t: 6500.0 * np.exp(-t / 0.22) + 800.0)
 
 
@@ -174,7 +174,7 @@ def resume(v: int) -> np.ndarray:
     poser(x, verre(n("A5"), 1.6, 0.7, t60=0.8, brillance=0.8, graine=151), 0.0)
     poser(x, verre(n("D6"), 1.6, 0.8, t60=0.9, brillance=0.85, graine=152), 0.075)
     poser(x, verre(n("E6"), 1.6, 0.5, t60=0.8, brillance=0.8, graine=153), 0.15)
-    poser(x, lueur(n("A4"), 0.25, 0.2, attaque=0.15, relache=0.8, coupure=1400, voix=2, graine=154), 0.0)
+    poser(x, lueur(n("A4"), 0.25, 0.12, attaque=0.15, relache=0.8, coupure=1400, voix=2, graine=154), 0.0)
     return passe_bas_variable(x, lambda t: 900.0 + 7500.0 * (1 - np.exp(-t / 0.18)))
 
 
@@ -304,7 +304,7 @@ class Lecture:
     intervalle_ms: int = 0  # deux lectures plus rapprochées: la seconde est ignorée
     relance: bool = False  # vrai: une nouvelle lecture coupe la précédente (fondu de 15 ms)
     attenue_musique_db: float = 0.0  # atténuation de la musique pendant le son
-    stereo: str = "centre"  # centre, toi (léger à gauche), autre (à droite), large
+    stereo: str = "center"  # center, self (toi, léger à gauche), peer (l'autre, à droite), wide (les deux)
 
 
 @dataclass(frozen=True)
@@ -352,9 +352,9 @@ SONS: list[Son] = [
     Son("focus", "focus", "Déplacement du focus (Tab, flèches, survol)", focus, 3, -28.0,
         "discret", REVERBE_DISCRET, _discret(hauteur=0.03, gain_db=1.5, intervalle_ms=45, relance=True), NAV),
     Son("confirm", "valider", "Validation (Entrée, Espace, clic sur un bouton)", confirm, 3, -18.0,
-        "reponse", REVERBE_REPONSE, _reponse(hauteur=0.015, gain_db=1.0, intervalle_ms=80, stereo="toi"), NAV),
+        "reponse", REVERBE_REPONSE, _reponse(hauteur=0.015, gain_db=1.0, intervalle_ms=80, stereo="self"), NAV),
     Son("back", "retour", "Retour (Échap, Retour, fermeture d'un panneau)", back, 3, -19.0,
-        "reponse", REVERBE_REPONSE, _reponse(hauteur=0.015, gain_db=1.0, intervalle_ms=80, stereo="toi"), NAV),
+        "reponse", REVERBE_REPONSE, _reponse(hauteur=0.015, gain_db=1.0, intervalle_ms=80, stereo="self"), NAV),
     Son("error", "erreur-douce", "Erreur douce (caractère refusé, champ vide, action impossible)", error, 2, -19.0,
         "reponse", REVERBE_REPONSE, _reponse(hauteur=0.01, gain_db=1.0, intervalle_ms=250), NAV),
     Son("notify", "notification", "Notification (a rejoint, a quitté, nouveau choix, copie de sauvegarde)", notify, 2, -19.0,
@@ -362,19 +362,19 @@ SONS: list[Son] = [
     Son("volume-test", "essai-de-volume", "Essai de volume (curseurs de Réglages > Son)", volume_test, 1, -18.0,
         "reponse", REVERBE_REPONSE, _reponse(intervalle_ms=60, relance=True), NAV),
     Son("peer-here", "autre-est-la", "L'autre joueur est là (l'autre ordinateur apparaît)", peer_here, 1, -16.0,
-        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=5000, stereo="large"), PRES),
+        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=5000, stereo="wide"), PRES),
     Son("invite", "invitation", "Invitation reçue (bandeau d'invitation)", invite, 1, -15.0,
-        "annonce", REVERBE_ANNONCE, _annonce(priorite=1, attenue_musique_db=-8.0, intervalle_ms=3000, stereo="autre"), PRES),
+        "annonce", REVERBE_ANNONCE, _annonce(priorite=1, attenue_musique_db=-8.0, intervalle_ms=3000, stereo="peer"), PRES),
     Son("ready-self", "cest-parti-toi", "« C'est parti ! » chez toi (aussi « Veut reprendre », « Veut rejouer »)", ready_self, 1, -18.0,
-        "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=300, stereo="toi"), SALON),
+        "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=300, stereo="self"), SALON),
     Son("ready-peer", "cest-parti-autre", "« C'est parti ! » chez l'autre, ou l'autre rejoint le salon (aussi ses « Veut reprendre », « Veut rejouer »)", ready_peer, 1, -18.0,
-        "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=300, stereo="autre"), SALON),
+        "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=300, stereo="peer"), SALON),
     Son("not-ready-peer", "pas-encore-autre", "L'autre repasse à « Pas encore » ou quitte le salon", not_ready_peer, 1, -19.0,
-        "reponse", REVERBE_REPONSE, _reponse(intervalle_ms=300, stereo="autre"), SALON),
+        "reponse", REVERBE_REPONSE, _reponse(intervalle_ms=300, stereo="peer"), SALON),
     Son("countdown-tick", "decompte", "Décompte 3, 2, 1 (départ et « Reprise dans 3 »)", countdown_tick, 1, -18.0,
         "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=500), SALON),
     Son("countdown-go", "depart", "Départ de la partie (fin du décompte)", countdown_go, 1, -16.0,
-        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=1000, stereo="large"), SALON),
+        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=1000, stereo="wide"), SALON),
     Son("countdown-cancel", "decompte-annule", "Décompte annulé (« Pas encore » ou Échap, d'un côté ou de l'autre)", countdown_cancel, 1, -19.0,
         "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=500), SALON),
     Son("pause", "pause", "Pause (Échap en partie, chez l'un ou l'autre)", pause, 1, -18.0,
@@ -382,21 +382,21 @@ SONS: list[Son] = [
     Son("resume", "reprise", "Reprise (fin du décompte « Reprise dans 3 »)", resume, 1, -18.0,
         "reponse", REVERBE_REPONSE, _reponse(priorite=2, intervalle_ms=500), PARTIE),
     Son("connection-lost", "connexion-perdue", "Connexion perdue (superposition E12, cartes du salon)", connection_lost, 1, -15.0,
-        "annonce", REVERBE_ANNONCE, _annonce(priorite=1, attenue_musique_db=-8.0, intervalle_ms=5000, stereo="large"), PARTIE),
+        "annonce", REVERBE_ANNONCE, _annonce(priorite=1, attenue_musique_db=-8.0, intervalle_ms=5000, stereo="wide"), PARTIE),
     Son("connection-back", "connexion-retrouvee", "Connexion retrouvée (« Sacha est de retour »)", connection_back, 1, -16.0,
-        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=5000, stereo="large"), PARTIE),
+        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=5000, stereo="wide"), PARTIE),
     Son("end-win", "fin-tu-as-gagne", "Fin de partie: « Tu as gagné ! »", end_win, 1, -15.0,
-        "annonce", REVERBE_ANNONCE, _annonce(stereo="toi"), FIN),
+        "annonce", REVERBE_ANNONCE, _annonce(stereo="self"), FIN),
     Son("end-peer-win", "fin-l-autre-a-gagne", "Fin de partie: « Sacha a gagné »", end_peer_win, 1, -17.0,
-        "annonce", REVERBE_ANNONCE, _annonce(stereo="autre"), FIN),
+        "annonce", REVERBE_ANNONCE, _annonce(stereo="peer"), FIN),
     Son("end-draw", "fin-egalite", "Fin de partie: « Égalité ! »", end_draw, 1, -16.0,
-        "annonce", REVERBE_ANNONCE, _annonce(stereo="large"), FIN),
+        "annonce", REVERBE_ANNONCE, _annonce(stereo="wide"), FIN),
     Son("end-success", "fin-vous-avez-reussi", "Fin de partie: « Vous avez réussi ! » (coopération)", end_success, 1, -15.0,
-        "annonce", REVERBE_ANNONCE, _annonce(stereo="large"), FIN),
+        "annonce", REVERBE_ANNONCE, _annonce(stereo="wide"), FIN),
     Son("end-fail", "fin-pas-cette-fois", "Fin de partie: « Pas cette fois » (coopération)", end_fail, 1, -17.0,
-        "annonce", REVERBE_ANNONCE, _annonce(stereo="large"), FIN),
+        "annonce", REVERBE_ANNONCE, _annonce(stereo="wide"), FIN),
     Son("new-game", "nouveau-jeu", "Nouveau jeu disponible (notification « Nouveau jeu »)", new_game, 1, -16.0,
-        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=3000, stereo="large"), BIB),
+        "annonce", REVERBE_ANNONCE, _annonce(intervalle_ms=3000, stereo="wide"), BIB),
 ]
 
 assert SR == 48000

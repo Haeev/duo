@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | qa-testeur, ingenieur-build, dev-reseau (banc réseau) |
@@ -64,14 +64,15 @@ Faits vérifiés le 2026-10-30: deux instances d'Electron pilotées par Playwrig
    - chaque push: `pnpm controler`, lint, typecheck, U, intégration réseau, P2, construction du gabarit et du jeu témoin, E rapide sous Linux;
    - demande de fusion vers `main` et push sur `main`: E et EL complets, sous-ensemble CI sur macOS et Windows;
    - chaque nuit sur `main`: endurance (CA-PF-117), dix plantages et dix lancements de suite (CA-PF-103, 104);
-   - tag de version: installateurs (ADR 0011), puis test de fumée du binaire publié (lancement jusqu'à l'accueil, absence des crochets et de la clé de test).
+   - tag de version: installateurs (ADR 0011), puis test de lancement de l'application empaquetée, sans Playwright puisque les fusibles ferment les options d'inspection: lancée avec `--duo-data-dir` sur un dossier temporaire, elle doit écrire la ligne « lanceur prêt » dans son journal (ADR 0015); contrôle de l'absence des crochets et de la clé de test dans l'archive.
+   - Les tests Playwright (E, EL, CI) tournent sur l'application non empaquetée (binaire d'Electron de `node_modules` et code compilé), sans fusibles (accord avec l'ADR 0011).
 6. **Règles**: aucune reprise automatique d'un test qui échoue; un test instable est corrigé, ou mis en quarantaine avec un `TODO(#n)` qui renvoie à un ticket. Délais mesurés selon la règle 1.3 des critères (10 essais, le pire compte). Horloges simulées dans les tests unitaires; temps réel avec tolérance dans E et EL.
 7. **Preuves**: rapports de test, traces et captures de Playwright, journaux des deux instances gardés en artefacts de la CI; rapport de recette `docs/plateforme/recette/AAAA-MM-JJ.md` par qa-testeur.
 8. **Electron en CI**: sous Linux, `xvfb-run`; bac à sable de Chromium conservé sur les runners (seul l'environnement cloud, qui tourne en root, impose `--no-sandbox`); WebGL2 en rendu logiciel par `--enable-unsafe-swiftshader`, pour les images seulement.
 
 ## Conséquences
 
-- Le binaire testé et le binaire publié diffèrent par les seuls crochets; le test de fumée du binaire publié et le contrôle des marqueurs ferment cet écart.
+- Le code testé par Playwright et l'application publiée diffèrent par les crochets et par l'empaquetage (archive, fusibles); le test de lancement de l'application empaquetée et le contrôle des marqueurs ferment cet écart.
 - La clé de test est versionnée: ce n'est pas un secret, une version publiée la refuse.
 - La recette chez le client reste nécessaire pour le matériel, les pare-feu et le Wi-Fi réel: 13 points dans la liste des critères (section 8), aidés par le journal et le rapport.
 - Chaque nouveau jeu hérite du gabarit: tests de sa simulation, de son manifeste, de ses migrations de sauvegarde, et un robot pour les tests à deux.

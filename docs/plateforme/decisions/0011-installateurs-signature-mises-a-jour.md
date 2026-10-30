@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | ingenieur-build |
 | À relire par | architecte-technique (cohérence avec les ADR 0001, 0002, 0003, 0006, 0010, 0013 et 0015), dev-reseau (pare-feu, `Info.plist`, autorisation Réseau local, ADR 0008), dev-plateforme (avis de nouvelle version), qa-testeur (critères vérifiés en CI) |

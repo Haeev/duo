@@ -1,193 +1,194 @@
 {
   "meta": {
-    "nom": "Duo, identité visuelle, piste B « Étoile double »",
+    "name": "Duo, identité visuelle, piste B « Étoile double »",
     "version": "1.0.0",
     "source": "design/identite/b/source/jetons.cjs",
-    "regle": "chaque chemin donne le nom de la variable CSS: couleur.surface-haute vaut --couleur-surface-haute"
+    "rule": "chaque chemin donne le nom de la variable CSS: color.surface-raised vaut --color-surface-raised",
+    "rem": "1rem vaut 16 px à la taille d'interface 100 %"
   },
-  "jetons": {
-    "couleur": {
-      "fond": "#0E1126",
-      "fond-lueur": "#1A1F48",
+  "tokens": {
+    "color": {
+      "bg": "#0E1126",
+      "bg-glow": "#1A1F48",
       "surface": "#1A1F3D",
-      "surface-haute": "#252B52",
-      "filet": "#2A3060",
-      "trait": "#3B4380",
-      "contour": "#7178BB",
-      "texte": "#F3F1FA",
-      "texte-2": "#A7ABD6",
-      "texte-inactif": "#6F74A3",
+      "surface-raised": "#252B52",
+      "hairline": "#2A3060",
+      "line": "#3B4380",
+      "outline": "#7178BB",
+      "text": "#F3F1FA",
+      "text-muted": "#A7ABD6",
+      "text-disabled": "#6F74A3",
       "accent": "#FFC857",
-      "accent-survol": "#FFD47A",
-      "accent-presse": "#F0B440",
-      "sur-accent": "#0E1126",
-      "succes": "#6BD69A",
-      "erreur": "#FF6B81",
+      "accent-hover": "#FFD47A",
+      "accent-pressed": "#F0B440",
+      "on-accent": "#0E1126",
+      "success": "#6BD69A",
+      "error": "#FF6B81",
       "focus": "#F3F1FA",
-      "voile": "#0E1126B8",
-      "ombre-1": "#090B1B",
-      "ombre-2": "#070915",
-      "ombre-3": "#05060F"
+      "scrim": "#0E1126B8",
+      "shadow-1": "#090B1B",
+      "shadow-2": "#070915",
+      "shadow-3": "#05060F"
     },
-    "joueur": {
-      "astre": "#5CE1E6",
-      "croissant": "#8D6CFF",
-      "etoile": "#D4F27A",
-      "soleil": "#FC663F",
-      "planete": "#E787B1",
-      "comete": "#22B07D",
-      "sur": "#0E1126",
-      "halo-opacite": "0.45"
+    "player": {
+      "orb": "#5CE1E6",
+      "crescent": "#8D6CFF",
+      "star": "#D4F27A",
+      "sun": "#FC663F",
+      "planet": "#E787B1",
+      "comet": "#22B07D",
+      "on": "#0E1126",
+      "halo-opacity": "0.45"
     },
-    "police": {
-      "titre": "'Jost Variable', 'Jost', system-ui, sans-serif",
-      "texte": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif"
+    "font": {
+      "display": "'Jost Variable', 'Jost', system-ui, sans-serif",
+      "text": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif"
     },
     "type": {
-      "affiche": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "56px",
-        "interligne": "60px",
-        "graisse": "300",
-        "approche": "-0.01em"
+      "display": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "3.5rem",
+        "line-height": "3.75rem",
+        "weight": "300",
+        "tracking": "-0.01em"
       },
-      "titre-1": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "40px",
-        "interligne": "48px",
-        "graisse": "300",
-        "approche": "0"
+      "title-1": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "2.5rem",
+        "line-height": "3rem",
+        "weight": "300",
+        "tracking": "0"
       },
-      "titre-2": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "30px",
-        "interligne": "36px",
-        "graisse": "400",
-        "approche": "0"
+      "title-2": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "1.875rem",
+        "line-height": "2.25rem",
+        "weight": "400",
+        "tracking": "0"
       },
-      "titre-3": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "22px",
-        "interligne": "28px",
-        "graisse": "500",
-        "approche": "0.01em"
+      "title-3": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "1.375rem",
+        "line-height": "1.75rem",
+        "weight": "500",
+        "tracking": "0.01em"
       },
-      "surtitre": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "14px",
-        "interligne": "18px",
-        "graisse": "500",
-        "approche": "0.24em"
+      "overline": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "0.875rem",
+        "line-height": "1.125rem",
+        "weight": "500",
+        "tracking": "0.24em"
       },
-      "corps-grand": {
-        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
-        "taille": "18px",
-        "interligne": "28px",
-        "graisse": "400",
-        "approche": "0"
+      "body-large": {
+        "family": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "size": "1.125rem",
+        "line-height": "1.75rem",
+        "weight": "400",
+        "tracking": "0"
       },
-      "corps": {
-        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
-        "taille": "16px",
-        "interligne": "24px",
-        "graisse": "400",
-        "approche": "0"
+      "body": {
+        "family": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "size": "1rem",
+        "line-height": "1.5rem",
+        "weight": "400",
+        "tracking": "0"
       },
-      "libelle": {
-        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
-        "taille": "16px",
-        "interligne": "20px",
-        "graisse": "600",
-        "approche": "0"
+      "label": {
+        "family": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "size": "1rem",
+        "line-height": "1.25rem",
+        "weight": "600",
+        "tracking": "0"
       },
-      "petit": {
-        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
-        "taille": "14px",
-        "interligne": "20px",
-        "graisse": "500",
-        "approche": "0.01em"
+      "small": {
+        "family": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "size": "0.875rem",
+        "line-height": "1.25rem",
+        "weight": "500",
+        "tracking": "0.01em"
       },
-      "chiffre": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "56px",
-        "interligne": "56px",
-        "graisse": "300",
-        "approche": "0.02em"
+      "figure": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "3.5rem",
+        "line-height": "3.5rem",
+        "weight": "300",
+        "tracking": "0.02em"
       },
-      "decompte": {
-        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
-        "taille": "160px",
-        "interligne": "160px",
-        "graisse": "300",
-        "approche": "0"
+      "countdown": {
+        "family": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "size": "10rem",
+        "line-height": "10rem",
+        "weight": "300",
+        "tracking": "0"
       }
     },
-    "espace": {
-      "1": "4px",
-      "2": "8px",
-      "3": "12px",
-      "4": "16px",
-      "5": "20px",
-      "6": "24px",
-      "8": "32px",
-      "10": "40px",
-      "12": "48px",
-      "16": "64px",
-      "20": "80px"
+    "space": {
+      "1": "0.25rem",
+      "2": "0.5rem",
+      "3": "0.75rem",
+      "4": "1rem",
+      "5": "1.25rem",
+      "6": "1.5rem",
+      "8": "2rem",
+      "10": "2.5rem",
+      "12": "3rem",
+      "16": "4rem",
+      "20": "5rem"
     },
-    "rayon": {
-      "petit": "8px",
-      "moyen": "14px",
-      "grand": "22px",
-      "capsule": "999px"
+    "radius": {
+      "small": "0.5rem",
+      "medium": "0.875rem",
+      "large": "1.375rem",
+      "pill": "999px"
     },
-    "trait": {
-      "filet": "1px",
-      "composant": "1.5px",
-      "focus": "3px",
-      "focus-decalage": "3px"
+    "stroke": {
+      "hairline": "1px",
+      "component": "0.125rem",
+      "focus": "0.1875rem",
+      "focus-offset": "0.1875rem"
     },
     "elevation": {
-      "1": "0 0 0 1px #2A3060, 0 2px 0 0 #090B1B",
-      "2": "0 0 0 1px #3B4380, 0 4px 0 0 #070915",
-      "3": "0 0 0 1px #3B4380, 0 8px 0 0 #05060F"
+      "1": "0 0 0 1px #2A3060, 0 0.125rem 0 0 #090B1B",
+      "2": "0 0 0 1px #3B4380, 0 0.25rem 0 0 #070915",
+      "3": "0 0 0 1px #3B4380, 0 0.5rem 0 0 #05060F"
     },
-    "icone": {
-      "taille": "24px",
-      "taille-grande": "32px",
-      "taille-petite": "20px",
-      "trait": "1.75",
-      "trait-petite": "1.8"
+    "icon": {
+      "size": "1.5rem",
+      "size-large": "2rem",
+      "size-small": "1.25rem",
+      "stroke": "1.75",
+      "stroke-small": "1.8"
     },
-    "duree": {
-      "rapide": "150ms",
-      "moyenne": "300ms",
-      "lente": "600ms",
-      "orbite": "4000ms",
-      "scintillement": "3600ms"
+    "duration": {
+      "fast": "150ms",
+      "medium": "300ms",
+      "slow": "600ms",
+      "orbit": "4000ms",
+      "twinkle": "3600ms"
     },
-    "courbe": {
+    "easing": {
       "standard": "cubic-bezier(0.45, 0, 0.25, 1)",
-      "entree": "cubic-bezier(0.2, 0, 0.2, 1)",
-      "sortie": "cubic-bezier(0.45, 0, 0.85, 0.5)"
+      "enter": "cubic-bezier(0.2, 0, 0.2, 1)",
+      "exit": "cubic-bezier(0.45, 0, 0.85, 0.5)"
     },
-    "boucles": {
-      "etat": "running"
+    "loops": {
+      "state": "running"
     }
   },
-  "variantes": {
-    "mouvement-reduit": {
-      "selecteur": ":root[data-mouvement=\"reduit\"]",
-      "jetons": {
-        "duree": {
-          "rapide": "0ms",
-          "moyenne": "0ms",
-          "lente": "0ms",
-          "orbite": "0ms",
-          "scintillement": "0ms"
+  "variants": {
+    "reduced-motion": {
+      "selector": ":root[data-motion=\"reduced\"]",
+      "tokens": {
+        "duration": {
+          "fast": "0ms",
+          "medium": "0ms",
+          "slow": "0ms",
+          "orbit": "0ms",
+          "twinkle": "0ms"
         },
-        "boucles": {
-          "etat": "paused"
+        "loops": {
+          "state": "paused"
         }
       }
     }

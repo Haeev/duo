@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | dev-plateforme, dev-reseau |

@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | dev-plateforme, dev-reseau (module `net`), dev-gameplay-2d, dev-gameplay-3d, ux-ui-designer (textes fournis par les jeux) |

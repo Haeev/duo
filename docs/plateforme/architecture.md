@@ -6,7 +6,7 @@
 | Version du document | 0.2 |
 | Dernière mise à jour | 2026-10-30 |
 | Rédacteur | architecte-technique |
-| Sources | `cahier-des-charges.md` 1.0 (validé le 2026-10-30), `ux/parcours.md` 0.1, `criteres-acceptation.md` 0.2, ADR 0001 à 0015 |
+| Sources | `cahier-des-charges.md` 1.0 (validé le 2026-10-30), `ux/parcours.md` 0.1, `criteres-acceptation.md` 0.2, ADR 0001 à 0006, 0009 à 0013 et 0015 (0007 et 0008 en rédaction par dev-reseau) |
 
 > Ce document résume l'architecture de la plateforme: processus, modules, flux de données, contrat des jeux, budgets, risques et découpage. Chaque choix structurant y renvoie à son ADR, qui fait foi (index: `decisions/README.md`). Le réseau (ADR 0007 et 0008, `reseau.md`) appartient à dev-reseau, les installateurs et les mises à jour de Duo (ADR 0011) à ingenieur-build: les sections 7 et 11 n'en donnent que ce que le reste de la plateforme en attend. Les faits marqués « vérifié » l'ont été le 2026-10-30 (versions npm, documentation officielle au tag de la version, essais jetables hors du dépôt); ce qui reste ouvert est regroupé en section 19. La correspondance entre les hypothèses H-01 à H-35 des critères et les décisions est dans `decisions/resolution-hypotheses.md`.
 
@@ -477,6 +477,7 @@ ADR 0011 (ingenieur-build) fait foi. Faits relevés en phase 1, versés à cet A
 - Depuis Electron 42, macOS n'affiche les notifications natives que pour une application signée: Duo signale l'invitation dans sa fenêtre, par le Dock et par la barre des tâches.
 - electron-updater passe par Squirrel.Mac sous macOS (signature Developer ID exigée); sous Windows il accepte un NSIS non signé tant que `publisherName` est absent. Le cahier retient pour la version 1 l'avis de nouvelle version et le téléchargement manuel.
 - Poids attendu: de 90 à 130 Mo par installateur (l'archive officielle d'Electron 45.2.0 pour macOS arm64 pèse 121 Mo).
+- L'ADR 0011 retient en outre: UUID de l'exécutable principal réécrit à l'empaquetage pour devenir propre à Duo (TN3179), releases des jeux et du catalogue sans la marque « Latest », réservée à l'application, et test de lancement de l'application empaquetée par la ligne « lanceur prêt » de son journal.
 
 ## 12. Journal et rapport de diagnostic (F14)
 
@@ -499,6 +500,8 @@ Décision: ADR 0013. Modes de vérification des critères: U, P2, E, EL, CI, D, 
 | Réseau virtuel (EL) | E dans deux espaces de noms reliés par un pont, passerelle piège, nftables, Toxiproxy | découverte, coupures, absence d'Internet, réseau dégradé, endurance | chaque fusion; endurance chaque nuit |
 | Systèmes réels (CI) | runners macOS et Windows | chemins, fichiers, installateurs, compte au nom accentué | chaque fusion, et sur tag |
 | Mesure | banc de mesure, affichage des performances | images par seconde, mémoire, chargements | chez le client, à chaque jalon |
+
+Les tests Playwright tournent sur l'application non empaquetée (les fusibles de l'application publiée ferment les options d'inspection); l'application empaquetée se vérifie sur tag par un test de lancement qui attend la ligne « lanceur prêt » de son journal (ADR 0011 et 0013).
 
 Prérequis de testabilité de qa-testeur, tous retenus (détail dans l'ADR 0013): deux instances sur une machine (dossier de données et ports en ligne de commande, verrou pris ensuite); `data-testid` et `data-message`; mode test compilé seulement dans les versions de test, absent des versions publiées (contrôlé sur chaque binaire publié); jeux d'essai signés avec la clé de test; journal local; affichage des performances dans toutes les versions; banc réseau virtuel.
 
@@ -582,7 +585,7 @@ Incidences du premier jeu (« La Petite Ligne », simulation de vie en coopérat
 | PC plus faible que l'hypothèse (4 Go, disque dur, pilote ancien) | moyenne | fort | relevé de configuration (Q4) avant le prototype; banc de mesure; budgets recalés | manager, tech-artist |
 | WebGL indisponible ou en rendu logiciel sur le PC | faible | fort | détection au démarrage, message « mettre à jour le pilote graphique », rapport de diagnostic | dev-plateforme |
 | Smart App Control actif sur le PC | moyenne | bloquant | vérifier son état avec Q4; guide pour le désactiver | ingenieur-build |
-| Autorisation Réseau local instable sous macOS (signature ad hoc, UUID partagé) | moyenne | fort | essai dès le prototype sur le Mac; guide pour réactiver l'autorisation; recours: le Mac héberge et le PC se connecte par adresse IP | ingenieur-build, dev-reseau |
+| Autorisation Réseau local instable sous macOS (signature ad hoc, UUID partagé) | moyenne | fort | UUID de l'exécutable réécrit pour Duo (ADR 0011); essai dès le prototype sur le Mac; guide pour réactiver l'autorisation; recours: le Mac héberge et le PC se connecte par adresse IP | ingenieur-build, dev-reseau |
 | Pare-feu Windows: règles de blocage silencieuses; réseau classé Public | moyenne | fort | écran d'explication avant l'alerte, diagnostic, guide (ADR 0008, 0011) | dev-reseau, ux-ui-designer |
 | Gigue du Wi-Fi | moyenne | moyen | tampon d'interpolation, banc d'injection, conseils | dev-reseau |
 | Simulation de l'hôte ralentie fenêtre réduite (App Nap, occultation) | moyenne | moyen | minuteurs, `backgroundThrottling` désactivé, blocage de la veille; sinon pause automatique | dev-plateforme |
@@ -613,7 +616,7 @@ Index tenu dans `decisions/README.md`. État au 2026-10-30:
 | 0008 | Découverte et pare-feu | en rédaction | dev-reseau |
 | 0009 | Données du duo | proposée | architecte-technique |
 | 0010 | Distribution des jeux | proposée | architecte-technique |
-| 0011 | Installateurs, signature et mises à jour de l'application | en rédaction | ingenieur-build |
+| 0011 | Installateurs, signature et mises à jour de l'application | proposée | ingenieur-build |
 | 0012 | Interface du lanceur | proposée | architecte-technique |
 | 0013 | Stratégie de test et CI | proposée | architecte-technique |
 | 0014 | Moteur 2D par défaut | différée au premier jeu 2D | architecte-technique |

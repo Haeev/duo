@@ -58,7 +58,7 @@ def zone(rng: random.Random, name: str, tilled: int, trees: int, objects: int, b
     }
 
 
-def world(rng: random.Random, gares: int, days: int) -> dict[str, Any]:
+def world(rng: random.Random, gares: int, days: int, villager_count: int, pages: int) -> dict[str, Any]:
     zones = [zone(rng, f"gare-{g}", tilled=150, trees=350, objects=500, building_parts=600) for g in range(gares)]
     characters = [{
         "id": f"p{p}", "playerId": f"machine-{p}", "name": "Prénom", "appearance": {k: rng.randint(0, 11) for k in (
@@ -78,7 +78,7 @@ def world(rng: random.Random, gares: int, days: int) -> dict[str, Any]:
                   "flags": {f"f{i}": rng.random() < 0.5 for i in range(20)},
                   "giftsThisWeek": {"p0": rng.randint(0, 3), "p1": rng.randint(0, 3)},
                   "memories": [{"day": rng.randint(1, days), "event": "cadeau-adore", "by": "p0", "item": "tarte"}
-                               for _ in range(40)], "errand": "epicerie"} for v in range(5 * gares)]
+                               for _ in range(40)], "errand": "epicerie"} for v in range(villager_count)]
     return {
         "dataSchema": 1, "contentVersion": "1.0.0", "episodes": ["v1"], "seed": 123456789,
         "rng": [rng.getrandbits(32) for _ in range(4)],
@@ -92,7 +92,7 @@ def world(rng: random.Random, gares: int, days: int) -> dict[str, Any]:
         "visitors": [{"id": f"visiteur-{i}", "template": "randonneuse", "request": "voir-martin-pecheur", "leavesDay": 3}
                      for i in range(3)],
         "notebook": [{"id": f"page-{i:03d}", "day": rng.randint(1, days), "zone": "gare-0", "together": rng.random() < 0.4}
-                     for i in range(165 * gares // 2)],
+                     for i in range(pages)],
         "story": {f"etape-{i}": rng.random() < 0.7 for i in range(150 * gares)},
         "journal": [{"day": d, "events": [{"id": "recolte", "params": {"item": "radis", "qty": 12}} for _ in range(4)]}
                     for d in range(1, days + 1)],
@@ -109,8 +109,9 @@ def measure(label: str, data: dict[str, Any]) -> None:
 def main() -> None:
     rng = random.Random(SEED)
     print("Taille d'une sauvegarde (JSON lisible, borne haute)")
-    measure("Fin de la version 1 (2 gares et la voie, 84 j)", world(rng, gares=3, days=84))
-    measure("Jeu complet à 100 h (6 gares, 361 j)", world(rng, gares=7, days=361))
+    # Zones: chaque gare, plus la voie des Vergers (comptée comme une zone pleine: borne haute).
+    measure("Fin de la version 1 (3 zones, 10 habitants, 84 j)", world(rng, gares=3, days=84, villager_count=10, pages=165))
+    measure("Jeu complet à 100 h (7 zones, 30 habitants, 361 j)", world(rng, gares=7, days=361, villager_count=30, pages=485))
 
 
 if __name__ == "__main__":

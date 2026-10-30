@@ -4,102 +4,108 @@
 // Usage: node outils/generer-jetons.cjs  (ou npm run jetons)
 const fs = require('fs');
 const path = require('path');
-const { jetons, variantes } = require('../source/jetons.cjs');
+const { tokens, variants } = require('../source/jetons.cjs');
 
-const RACINE = path.join(__dirname, '..');
-const CSS = path.join(RACINE, 'jetons.css');
-const JSON_ = path.join(RACINE, 'jetons.json');
+const ROOT = path.join(__dirname, '..');
+const CSS_FILE = path.join(ROOT, 'jetons.css');
+const JSON_FILE = path.join(ROOT, 'jetons.json');
 const VERSION = require('../package.json').version;
 
-// chemin d'objet vers liste [nom de variable, valeur]
-function aplatir(objet, prefixe = []) {
-  const sortie = [];
-  for (const [cle, valeur] of Object.entries(objet)) {
-    const chemin = [...prefixe, String(cle)];
-    if (valeur !== null && typeof valeur === 'object') sortie.push(...aplatir(valeur, chemin));
+// objet vers liste [nom de variable, valeur, groupe]
+function flatten(object, prefix = []) {
+  const out = [];
+  for (const [key, value] of Object.entries(object)) {
+    const keyPath = [...prefix, String(key)];
+    if (value !== null && typeof value === 'object') out.push(...flatten(value, keyPath));
     else {
-      if (typeof valeur !== 'string') throw new Error(`valeur non textuelle pour ${chemin.join('.')}`);
-      if (!/^[a-z0-9-]+$/.test(chemin.join('-'))) throw new Error(`nom invalide: ${chemin.join('.')}`);
-      sortie.push([`--${chemin.join('-')}`, valeur, prefixe.join('.')]);
+      if (typeof value !== 'string') throw new Error(`valeur non textuelle pour ${keyPath.join('.')}`);
+      if (!/^[a-z0-9-]+$/.test(keyPath.join('-'))) throw new Error(`nom invalide: ${keyPath.join('.')}`);
+      out.push([`--${keyPath.join('-')}`, value, prefix.join('.')]);
     }
   }
-  return sortie;
+  return out;
 }
 
-function blocCss(selecteur, objet) {
-  const lignes = [];
-  let groupe = null;
-  for (const [nom, valeur, famille] of aplatir(objet)) {
-    if (groupe !== null && famille !== groupe) lignes.push('');
-    groupe = famille;
-    lignes.push(`  ${nom}: ${valeur};`);
+function cssBlock(selector, object) {
+  const lines = [];
+  let group = null;
+  for (const [name, value, g] of flatten(object)) {
+    if (group !== null && g !== group) lines.push('');
+    group = g;
+    lines.push(`  ${name}: ${value};`);
   }
-  return `${selecteur} {\n${lignes.join('\n')}\n}\n`;
+  return `${selector} {\n${lines.join('\n')}\n}\n`;
 }
 
-const entete = [
+const header = [
   '/*',
   ` * Jetons de l'identité visuelle de Duo, piste B « Étoile double », version ${VERSION}.`,
   ' * Fichier généré par design/identite/b/outils/generer-jetons.cjs depuis source/jetons.cjs:',
   ' * ne pas le modifier à la main. Mêmes noms et mêmes valeurs que jetons.json.',
-  ' * Règles d\'usage: docs/plateforme/identite-visuelle.md',
+  ' * Rôles et règles d\'usage: docs/plateforme/identite-visuelle.md',
   ' */',
   '',
 ].join('\n');
 
-let css = entete + blocCss(':root', jetons);
-for (const [nom, { selecteur, jetons: j }] of Object.entries(variantes)) {
-  css += `\n/* variante « ${nom} » */\n` + blocCss(selecteur, j);
+let css = header + cssBlock(':root', tokens);
+for (const [name, { selector, tokens: t }] of Object.entries(variants)) {
+  css += `\n/* variante « ${name} » */\n` + cssBlock(selector, t);
 }
-fs.writeFileSync(CSS, css);
+fs.writeFileSync(CSS_FILE, css);
 
 const json = {
   meta: {
-    nom: 'Duo, identité visuelle, piste B « Étoile double »',
+    name: 'Duo, identité visuelle, piste B « Étoile double »',
     version: VERSION,
     source: 'design/identite/b/source/jetons.cjs',
-    regle: 'chaque chemin donne le nom de la variable CSS: couleur.surface-haute vaut --couleur-surface-haute',
+    rule: 'chaque chemin donne le nom de la variable CSS: color.surface-raised vaut --color-surface-raised',
+    rem: '1rem vaut 16 px à la taille d\'interface 100 %',
   },
-  jetons,
-  variantes,
+  tokens,
+  variants,
 };
-fs.writeFileSync(JSON_, JSON.stringify(json, null, 2) + '\n');
+fs.writeFileSync(JSON_FILE, JSON.stringify(json, null, 2) + '\n');
 
 // Vérification croisée: relire les deux fichiers produits, sans repasser par la source.
-function lireCss(texte) {
-  const blocs = {};
-  for (const [, selecteur, corps] of texte.matchAll(/([^{}\n][^{}]*?)\s*\{([^}]*)\}/g)) {
-    const sel = selecteur.replace(/\/\*[\s\S]*?\*\//g, '').trim();
+function parseCss(text) {
+  const blocks = {};
+  const clean = text.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const [, selector, body] of clean.matchAll(/([^{}]+?)\s*\{([^}]*)\}/g)) {
     const vars = {};
-    for (const [, nom, valeur] of corps.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) vars[nom] = valeur.trim();
-    blocs[sel] = vars;
+    for (const [, name, value] of body.matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) vars[name] = value.trim();
+    blocks[selector.trim()] = vars;
   }
-  return blocs;
+  return blocks;
 }
-const relu = JSON.parse(fs.readFileSync(JSON_, 'utf8'));
-const attendu = { ':root': Object.fromEntries(aplatir(relu.jetons).map(([n, v]) => [n, v])) };
-for (const { selecteur, jetons: j } of Object.values(relu.variantes)) attendu[selecteur] = Object.fromEntries(aplatir(j).map(([n, v]) => [n, v]));
-const lu = lireCss(fs.readFileSync(CSS, 'utf8'));
+const reread = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8'));
+const toMap = (o) => Object.fromEntries(flatten(o).map(([n, v]) => [n, v]));
+const expected = { ':root': toMap(reread.tokens) };
+for (const { selector, tokens: t } of Object.values(reread.variants)) expected[selector] = toMap(t);
+const found = parseCss(fs.readFileSync(CSS_FILE, 'utf8'));
 
-let ecarts = 0;
-const selecteurs = new Set([...Object.keys(attendu), ...Object.keys(lu)]);
-for (const sel of selecteurs) {
-  const a = attendu[sel] || {};
-  const b = lu[sel] || {};
-  for (const nom of new Set([...Object.keys(a), ...Object.keys(b)])) {
-    if (a[nom] !== b[nom]) {
-      ecarts++;
-      console.error(`écart ${sel} ${nom}: JSON ${a[nom]} / CSS ${b[nom]}`);
+let gaps = 0;
+for (const sel of new Set([...Object.keys(expected), ...Object.keys(found)])) {
+  const a = expected[sel] || {};
+  const b = found[sel] || {};
+  for (const name of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    if (a[name] !== b[name]) {
+      gaps++;
+      console.error(`écart ${sel} ${name}: JSON ${a[name]} / CSS ${b[name]}`);
     }
   }
 }
-// une variante ne redéfinit que des jetons qui existent
-for (const { selecteur, jetons: j } of Object.values(relu.variantes)) {
-  for (const [nom] of aplatir(j)) if (!(nom in attendu[':root'])) { ecarts++; console.error(`variante ${selecteur}: ${nom} inconnu`); }
+// une variante ne redéfinit que des jetons existants
+for (const { selector, tokens: t } of Object.values(reread.variants)) {
+  for (const [name] of flatten(t)) {
+    if (!(name in expected[':root'])) {
+      gaps++;
+      console.error(`variante ${selector}: ${name} inconnu`);
+    }
+  }
 }
-const total = Object.values(attendu).reduce((n, o) => n + Object.keys(o).length, 0);
-if (ecarts) {
-  console.error(`${ecarts} écart(s) entre jetons.css et jetons.json`);
+const total = Object.values(expected).reduce((n, o) => n + Object.keys(o).length, 0);
+if (gaps) {
+  console.error(`${gaps} écart(s) entre jetons.css et jetons.json`);
   process.exit(1);
 }
-console.log(`jetons.css et jetons.json identiques: ${total} jetons comparés (${Object.keys(attendu).length} blocs), 0 écart`);
+console.log(`jetons.css et jetons.json identiques: ${total} valeurs comparées dans ${Object.keys(expected).length} blocs, 0 écart`);

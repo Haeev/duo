@@ -209,7 +209,7 @@ def circulaire(traitement, x: np.ndarray, copies: int = 2) -> np.ndarray:
 
 # Sonies relatives des couches, en LU par rapport à la nappe (avant la normalisation finale).
 EQUILIBRE = {"nappe": 0.0, "basse": -13.0, "celesta": -2.0, "harpe": -2.0, "etoiles": -9.0}
-CIBLE_LUFS = -20.0
+CIBLE_LUFS = -21.0
 PLAFOND_DBTP = -1.5
 
 

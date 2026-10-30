@@ -39,7 +39,7 @@ PLAFOND_DBTP = -1.0
 def mesurer_ebur128(fichier: Path) -> dict:
     proc = subprocess.run(
         ["ffmpeg", "-hide_banner", "-nostats", "-i", str(fichier), "-af",
-         "apad=pad_dur=1,ebur128=peak=true:framelog=verbose", "-f", "null", "-"],
+         "apad=pad_dur=1,ebur128=peak=true", "-f", "null", "-"],
         capture_output=True, text=True, check=True)
     texte = proc.stderr
     m = [float(v) for v in re.findall(r"\bM:\s*(-?\d+(?:\.\d+)?)", texte)]

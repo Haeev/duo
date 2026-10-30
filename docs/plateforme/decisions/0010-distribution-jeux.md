@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | ingenieur-build (publication et signature en CI), dev-plateforme (installation), dev-reseau (copie par la liaison) |
@@ -57,7 +57,7 @@ Faits vérifiés le 2026-10-30: les adresses directes `https://github.com/<dép�
 
 ### 3. Publication (ingenieur-build, en CI)
 
-Sur un tag `jeu-<id>-v<version>`: tests du jeu, construction, contrôle du manifeste et des budgets de poids, archive, liste des fichiers, signature, release, puis mise à jour du catalogue. Une version déjà publiée ne se republie jamais.
+Sur un tag `jeu-<id>-v<version>`: tests du jeu, construction, contrôle du manifeste et des budgets de poids, archive, liste des fichiers, signature, release, puis mise à jour du catalogue. Une version déjà publiée ne se republie jamais. Les releases des jeux et celle du catalogue se créent avec `--latest=false`: la marque « Latest » reste réservée aux releases de l'application, que lisent le guide et l'avis de nouvelle version (ADR 0011). Les releases immuables de GitHub restent désactivées tant que `catalogue.json` est réécrit dans sa release à chaque publication (demande de l'ADR 0011).
 
 ### 4. Recherche et téléchargement (H-28)
 

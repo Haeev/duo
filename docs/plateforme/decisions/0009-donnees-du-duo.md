@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | architecte-technique |
 | À relire par | dev-plateforme (lot L9), dev-reseau (transport de la réplication), qa-testeur (critères F07 à F09) |
@@ -13,7 +13,7 @@
 
 Section 4 du cahier 1.0: les sauvegardes, l'historique et les scores appartiennent au duo et sont copiés sur les deux machines à chaque écriture; aucune perte en cas de plantage ou de coupure (écriture sûre, copies de secours); si deux copies d'une sauvegarde divergent, « la plus avancée dans sa chaîne de révisions l'emporte (et non la plus récente selon les horloges) », l'autre est gardée en secours et la plateforme le signale, mais un simple rattrapage ne se signale pas; une machine réinstallée doit pouvoir se rattacher au duo et récupérer ses données depuis l'autre. F08: une partie interrompue (plantage, abandon) est inscrite « interrompue », sans effet sur le score cumulé. F06: si l'application de l'hôte s'arrête, on reprend au dernier point de sauvegarde. F07: les trois versions précédentes d'une sauvegarde restent en copies de secours, visibles dans la fiche du jeu; une suppression garde une copie de secours.
 
-Volumes: le premier jeu envisagé (simulation de vie d'une centaine d'heures) peut produire des sauvegardes de 20 Mo (H-16). Les horloges des deux machines peuvent différer. Les deux machines ne sont pas toujours allumées ensemble, mais on ne joue jamais seul: une sauvegarde ne s'écrit que pendant une partie à deux.
+Volumes: les critères éprouvent des sauvegardes de 20 Mo (H-16), pour le premier jeu envisagé (simulation de vie d'une centaine d'heures). La première estimation de game-designer (`docs/jeux/jeu-1/simulations/taille_sauvegarde.py`, en cours, relancée le 2026-10-30) donne une borne haute bien plus faible: 1,6 Mo de JSON lisible à 100 heures, 183 Ko compressés. Les horloges des deux machines peuvent différer. Les deux machines ne sont pas toujours allumées ensemble, mais on ne joue jamais seul: une sauvegarde ne s'écrit que pendant une partie à deux.
 
 Essai jetable du 2026-10-30 (Node 22, 4 cœurs): une sauvegarde JSON de 8 Mo se sérialise en 46 ms, s'empreinte (SHA-256) en 8 ms, se compresse en gzip niveau 1 en 34 ms avec un rapport de 8,7, sans bloquer la boucle d'événements (retard maximal 5,6 ms, compression dans le pool de fils de `zlib`).
 
