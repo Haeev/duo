@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E17 Diagnostic</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .barre.simple { gap: 20px; }
+  .diag { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .diag h1 { font-size: 26px; }
+  .liste-verifs { display: grid; }
+  .verif .icone { width: 24px; height: 24px; margin-top: 1px; }
+  .verif .suite .bouton { justify-self: start; }
+  .champ-adresse { display: flex; gap: 10px; }
+  .champ-adresse input { flex: 1; min-width: 0; }
+  .colonne-droite { display: grid; gap: 16px; }
+</style>
+</head>
+<body data-retour="accueil.html" data-etat-defaut="windows">
+<div class="app">
+  <header class="barre simple">
+    <button class="bouton" data-aller="accueil.html"><span class="icone" data-icone="retour"></span>Retour <kbd>Échap</kbd></button>
+    <span class="logo">Duo</span>
+    <div class="droite">
+      <span class="moi" data-si="windows"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha</span>
+      <span class="moi" data-si="macos"><span class="symbole" data-forme="rond"></span>Camille</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur diag">
+      <section class="pile" aria-labelledby="titre-diag">
+        <div class="pile serree">
+          <h1 id="titre-diag">L’autre ordinateur n’apparaît pas ?</h1>
+          <p class="sous-titre">Duo vérifie ce qui peut l’empêcher de voir l’autre ordinateur.</p>
+        </div>
+
+        <!-- Vu depuis le PC de Sacha -->
+        <div class="liste-verifs" data-si="windows">
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Cet ordinateur est connecté au réseau (Wi‑Fi).</p></div>
+          <div class="verif probleme">
+            <span class="icone" data-icone="probleme"></span>
+            <p class="texte-verif fort">Ton réseau est réglé sur « Public » : Windows y empêche les ordinateurs de se voir.</p>
+            <div class="suite">
+              <p>Si c’est le réseau de ta maison, passe-le sur « Privé » :</p>
+              <ol>
+                <li>Clique sur « Ouvrir les paramètres réseau ».</li>
+                <li>Choisis ton réseau.</li>
+                <li>Sous « Type de profil réseau », choisis « Privé ».</li>
+              </ol>
+              <button class="bouton principal" data-focus>Ouvrir les paramètres réseau</button>
+            </div>
+          </div>
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Le pare-feu de Windows laisse passer Duo.</p></div>
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Aucun VPN actif.</p></div>
+          <div class="verif"><span class="icone" data-icone="question"></span><p class="texte-verif">Duo est-il ouvert sur l’autre ordinateur ?</p></div>
+          <div class="verif"><span class="icone" data-icone="question"></span><p class="texte-verif">Les deux ordinateurs sont-ils sur le même Wi‑Fi ? Pas le Wi‑Fi « invités » de la box : il empêche souvent les appareils de se voir.</p></div>
+        </div>
+
+        <!-- Vu depuis le Mac de Camille -->
+        <div class="liste-verifs" data-si="macos">
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Cet ordinateur est connecté au réseau (Wi‑Fi).</p></div>
+          <div class="verif probleme">
+            <span class="icone" data-icone="probleme"></span>
+            <p class="texte-verif fort">macOS empêche Duo de voir le réseau local.</p>
+            <div class="suite">
+              <ol>
+                <li>Clique sur « Ouvrir les Réglages Système ».</li>
+                <li>Dans « Réseau local », active Duo.</li>
+                <li>Reviens ici et relance les vérifications.</li>
+              </ol>
+              <button class="bouton principal" data-focus>Ouvrir les Réglages Système</button>
+            </div>
+          </div>
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Le coupe-feu de macOS est désactivé.</p></div>
+          <div class="verif"><span class="icone" data-icone="reussi"></span><p class="texte-verif">Aucun VPN actif.</p></div>
+          <div class="verif"><span class="icone" data-icone="question"></span><p class="texte-verif">Duo est-il ouvert sur l’autre ordinateur ?</p></div>
+          <div class="verif"><span class="icone" data-icone="question"></span><p class="texte-verif">Les deux ordinateurs sont-ils sur le même Wi‑Fi ? Pas le Wi‑Fi « invités » de la box : il empêche souvent les appareils de se voir.</p></div>
+        </div>
+
+        <div><button class="bouton">Relancer les vérifications</button></div>
+      </section>
+
+      <aside class="colonne-droite" aria-label="Recours">
+        <section class="bloc gris pile" aria-labelledby="titre-adresse">
+          <h2 id="titre-adresse">Se connecter avec une adresse</h2>
+          <p class="aide">L’adresse s’affiche sur l’autre ordinateur, dans Réglages &gt; Réseau, et dans son salon.</p>
+          <div class="champ">
+            <label for="adresse">Adresse de l’autre ordinateur</label>
+            <div class="champ-adresse">
+              <input type="text" id="adresse" inputmode="decimal" autocomplete="off" placeholder="Exemple : 192.168.1.42">
+              <button class="bouton principal" id="se-connecter">Se connecter</button>
+            </div>
+            <p class="aide" id="message-adresse" role="status"></p>
+          </div>
+        </section>
+        <section class="bloc pile serree">
+          <p data-si="windows">Adresse de cet ordinateur : <strong>192.168.1.23</strong></p>
+          <p data-si="macos">Adresse de cet ordinateur : <strong>192.168.1.42</strong></p>
+          <p class="aide">À donner à l’autre ordinateur s’il ne te voit pas.</p>
+        </section>
+        <div><button class="bouton">Copier le rapport pour le studio</button></div>
+      </aside>
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  // Connexion avec une adresse: vérification du format avant tout essai.
+  const MESSAGES = {
+    invalide: 'Ce n’est pas une adresse valide. Exemple : 192.168.1.42',
+    essai: (a) => 'Connexion à ' + a + '…'
+  };
+  function seConnecter() {
+    const champ = document.getElementById('adresse');
+    const valeur = champ.value.trim();
+    const ok = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.test(valeur) && valeur.split('.').every((n) => Number(n) <= 255);
+    document.getElementById('message-adresse').textContent = ok ? MESSAGES.essai(valeur) : MESSAGES.invalide;
+    if (!ok) champ.focus();
+  }
+  Duo.surEtat = function (etat) {
+    // L'exemple montre l'adresse de l'autre ordinateur, jamais la sienne.
+    document.getElementById('adresse').placeholder = 'Exemple\u00a0: ' + (etat === 'macos' ? '192.168.1.23' : '192.168.1.42');
+  };
+  document.getElementById('se-connecter').addEventListener('click', seConnecter);
+  document.getElementById('adresse').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') seConnecter();
+  });
+</script>
+</body>
+</html>

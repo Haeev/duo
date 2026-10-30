@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duo · piste C · Deux encres</title>
+<link rel="stylesheet" href="node_modules/@fontsource-variable/bricolage-grotesque/standard.css">
+<link rel="stylesheet" href="node_modules/@fontsource-variable/archivo/standard.css">
+<style>
+/* palette:debut (lue par controler.cjs: rôle et couleur de chaque variable) */
+:root {
+  --fond: #F5F3EE;
+  --surface: #FFFFFF;
+  --texte: #151515;
+  --texte-2: #57534E;
+  --accent: #FF3211;
+  --sur-accent: #151515;
+  --j1: #FF3D8B;
+  --sur-j1: #151515;
+  --j2: #FFD21F;
+  --sur-j2: #151515;
+  --succes: #0E7A4D;
+  --erreur: #A3102F;
+}
+/* palette:fin */
+:root {
+  --titre: 'Bricolage Grotesque Variable', sans-serif;
+  --corps: 'Archivo Variable', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body { background: var(--fond); color: var(--texte); font-family: var(--corps); font-size: 16px; font-stretch: 100%; }
+.titre { font-family: var(--titre); font-weight: 800; font-stretch: 75%; font-optical-sizing: auto; }
+.symboles { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.planche {
+  width: 1920px; height: 1080px; padding: 30px 48px 34px;
+  display: grid; grid-template-columns: 760px 1024px; column-gap: 40px;
+  grid-template-rows: 178px 1fr; row-gap: 26px;
+}
+header { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 5px solid var(--texte); padding-bottom: 18px; }
+.surtitre { font-weight: 700; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; margin: 0 0 6px; }
+h1.nom { font-size: 136px; line-height: .82; margin: 0; text-transform: uppercase; letter-spacing: -.005em; text-shadow: 5px 4px 0 var(--j1); }
+.intention { width: 880px; }
+.intention p { font-size: 24px; line-height: 1.38; margin: 0 0 16px; font-weight: 500; }
+.adjectifs { display: flex; gap: 14px; }
+.adjectifs span { font-weight: 800; font-size: 17px; letter-spacing: .1em; text-transform: uppercase; border: 3px solid var(--texte); background: var(--surface); padding: 6px 14px 6px 10px; display: flex; align-items: center; gap: 10px; }
+.adjectifs i { width: 16px; height: 16px; border: 2.5px solid var(--texte); display: inline-block; }
+
+.carte { background: var(--surface); border: 3px solid var(--texte); }
+.etiquette { font-weight: 800; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; margin: 0 0 10px; }
+.gauche { display: flex; flex-direction: column; gap: 20px; }
+.droite { display: flex; flex-direction: column; gap: 14px; }
+
+/* logo */
+.bloc-logo { height: 196px; display: flex; align-items: center; justify-content: space-between; padding: 14px 26px 14px 26px; }
+.logo-grand { width: 440px; height: 160px; }
+.icones-app { display: flex; align-items: flex-end; gap: 16px; }
+.icones-app figure { margin: 0; text-align: center; font-size: 12px; font-weight: 700; color: var(--texte-2); }
+.icones-app svg { display: block; margin: 0 auto 6px; }
+
+/* palette */
+.nuancier { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 12px; }
+.pastille-couleur { background: var(--surface); border: 3px solid var(--texte); }
+.pastille-couleur .aplat { height: 46px; border-bottom: 3px solid var(--texte); }
+.pastille-couleur .infos { padding: 6px 10px 7px; line-height: 1.2; }
+.pastille-couleur b { display: block; font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; }
+.pastille-couleur code { font-family: var(--corps); font-size: 13px; font-weight: 600; color: var(--texte-2); font-variant-numeric: tabular-nums; }
+.pastille-couleur small { display: block; font-size: 11.5px; color: var(--texte-2); font-weight: 600; margin-top: 1px; }
+
+/* typographies */
+.typos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.typo { padding: 12px 16px 12px; height: 162px; position: relative; }
+.typo .specimen-titre { font-size: 60px; line-height: .9; margin: 0 0 2px; text-transform: uppercase; }
+.typo .glyphes { font-size: 20px; margin: 0; color: var(--texte-2); }
+.typo .specimen-texte { font-size: 17px; line-height: 1.4; margin: 4px 0 6px; }
+.typo .licence { position: absolute; left: 16px; bottom: 10px; font-size: 12px; color: var(--texte-2); font-weight: 700; margin: 0; }
+
+/* signes et icônes */
+.bloc-signes { display: flex; align-items: center; gap: 20px; padding: 12px 20px; height: 124px; }
+.signe { display: flex; align-items: center; gap: 12px; width: 196px; }
+.signe svg { flex: none; }
+.signe b { display: block; font-size: 15px; font-weight: 800; text-transform: uppercase; }
+.signe span { font-size: 12.5px; color: var(--texte-2); font-weight: 600; line-height: 1.25; display: block; }
+.icones { display: flex; gap: 12px; margin-left: auto; }
+.icones figure { margin: 0; width: 46px; text-align: center; font-size: 10.5px; font-weight: 700; color: var(--texte-2); }
+.icones svg { width: 28px; height: 28px; display: block; margin: 0 auto 6px; fill: var(--texte); }
+
+/* maquette */
+.legende-maquette { display: flex; justify-content: space-between; align-items: baseline; margin: 0; height: 18px; }
+.legende-maquette span { font-size: 13px; color: var(--texte-2); font-weight: 600; }
+.cadre-ecran { width: 1024px; height: 576px; overflow: hidden; box-shadow: 0 0 0 3px var(--texte); flex: none; }
+.ecran { width: 1366px; height: 768px; transform: scale(.75); transform-origin: 0 0; background: var(--fond); display: flex; flex-direction: column; }
+.m-barre { height: 84px; display: flex; align-items: center; padding: 0 40px; gap: 40px; border-bottom: 4px solid var(--texte); background: var(--surface); flex: none; }
+.m-logo { display: flex; align-items: center; gap: 10px; }
+.m-logo span { font-size: 46px; line-height: 1; text-transform: uppercase; }
+.m-nav { display: flex; gap: 6px; }
+.m-nav span { font-size: 16px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 10px 14px; }
+.m-nav span.actif { background: var(--texte); color: var(--fond); }
+.m-profil { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.m-btn-icone { width: 48px; height: 48px; display: grid; place-items: center; border: 3px solid var(--texte); }
+.m-btn-icone svg { width: 24px; height: 24px; fill: var(--texte); }
+.m-puce { display: flex; align-items: center; gap: 10px; padding: 4px 16px 4px 4px; border: 3px solid var(--texte); }
+.m-puce b { font-size: 18px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.m-puce small { font-size: 14px; color: var(--texte-2); font-weight: 600; }
+.m-corps { flex: 1; display: grid; grid-template-columns: 1fr 480px; }
+.m-accueil { padding: 30px 40px 0 56px; }
+.m-surtitre { font-weight: 800; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; margin: 0; }
+.m-accueil h1 { font-size: 150px; line-height: .86; margin: 6px 0 22px; text-shadow: 5px 4px 0 var(--j2); }
+.m-sous { font-size: 21px; color: var(--texte-2); margin: 0 0 24px; font-weight: 500; }
+.m-actions { display: flex; gap: 24px; }
+.m-bloc { width: 330px; height: 134px; border: 3px solid var(--texte); background: var(--surface); padding: 14px 18px; display: flex; flex-direction: column; position: relative; }
+.m-bloc svg { width: 30px; height: 30px; fill: currentColor; position: absolute; right: 16px; top: 16px; }
+.m-bloc strong { font-family: var(--titre); font-weight: 800; font-stretch: 75%; font-size: 50px; line-height: .95; text-transform: uppercase; margin-top: auto; }
+.m-bloc span { font-size: 16px; font-weight: 600; margin-top: 4px; }
+.m-primaire { background: var(--accent); color: var(--sur-accent); }
+.m-focus { outline: 4px solid var(--texte); outline-offset: 6px; }
+.m-jeux { margin-top: 30px; width: 760px; }
+.m-jeux-titre { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 10px; font-size: 17px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.m-jeux-titre span { font-size: 15px; letter-spacing: .06em; border-bottom: 3px solid var(--accent); }
+.m-jeux-liste { display: flex; gap: 20px; }
+.m-jeu { width: 240px; border: 3px solid var(--texte); background: var(--texte); }
+.m-jeu svg { display: block; width: 100%; height: 96px; }
+.m-jeu b { display: block; padding: 5px 10px 6px; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--fond); }
+.m-duo { border-left: 4px solid var(--texte); background: var(--surface); position: relative; }
+.m-duo svg.encres { position: absolute; left: 0; top: 0; }
+.m-chiffre { position: absolute; text-align: center; line-height: 1; }
+.m-chiffre b { font-family: var(--titre); font-weight: 800; font-stretch: 75%; font-size: 86px; display: block; }
+.m-chiffre span { font-size: 13px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.m-nom { position: absolute; top: 438px; width: 210px; display: flex; gap: 12px; align-items: flex-start; }
+.m-nom svg { flex: none; margin-top: 2px; }
+.m-nom b { font-size: 20px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; display: block; }
+.m-nom small { font-size: 15px; color: var(--texte-2); font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+.m-pastille { width: 11px; height: 11px; background: var(--succes); display: inline-block; }
+.m-derniere { position: absolute; left: 0; right: 0; bottom: 0; border-top: 3px solid var(--texte); padding: 12px 24px 13px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.m-derniere svg { width: 20px; height: 20px; fill: var(--texte); flex: none; }
+.m-pied { height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 56px; font-size: 15px; font-weight: 600; color: var(--fond); background: var(--texte); flex: none; }
+.m-pied kbd { font-family: var(--corps); font-size: 14px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--texte); background: var(--fond); padding: 3px 10px 4px; margin-left: 16px; }
+.m-pied kbd:first-child { margin-left: 0; }
+
+/* mouvement */
+.bloc-mouvement { display: flex; align-items: center; gap: 18px; padding: 10px 24px 10px 16px; height: 150px; }
+.images { display: flex; gap: 6px; flex: none; }
+.images figure { margin: 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--texte-2); }
+.mouvement-texte b { font-family: var(--titre); font-weight: 800; font-stretch: 75%; font-size: 34px; line-height: 1; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.mouvement-texte p { margin: 0; font-size: 15.5px; line-height: 1.4; font-weight: 500; }
+.pied-planche { position: absolute; right: 48px; bottom: 12px; font-size: 12px; color: var(--texte-2); font-weight: 600; margin: 0; }
+</style>
+</head>
+<body>
+<svg class="symboles" aria-hidden="true">
+  <defs>
+    <!-- marque: le carré (joueur 2) et le rond (joueur 1) se superposent; l'intersection, vermillon, c'est le duo -->
+    <clipPath id="clip-carre"><rect x="5" y="25" width="110" height="110"/></clipPath>
+    <symbol id="marque" viewBox="0 0 180 160">
+      <rect x="5" y="25" width="110" height="110" fill="var(--j2)"/>
+      <circle cx="115" cy="80" r="55" fill="var(--j1)"/>
+      <circle cx="115" cy="80" r="55" fill="var(--accent)" clip-path="url(#clip-carre)"/>
+      <g fill="none" stroke="var(--texte)" stroke-width="5">
+        <rect x="5" y="25" width="110" height="110"/>
+        <circle cx="115" cy="80" r="55"/>
+      </g>
+    </symbol>
+    <symbol id="signe-j1" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="var(--j1)" stroke="var(--texte)" stroke-width="6"/></symbol>
+    <symbol id="signe-j2" viewBox="0 0 100 100"><rect x="8" y="8" width="84" height="84" fill="var(--j2)" stroke="var(--texte)" stroke-width="6"/></symbol>
+    <!-- vignettes de jeux fictives, identiques sur les trois planches -->
+    <symbol id="v-2d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#7CCBF4"/>
+      <path fill="#FFFFFF" d="M20 20h30v10H20zM30 10h10v10H30zM95 30h20v10H95zM100 20h10v10h-10z"/>
+      <path fill="#FFD84D" d="M130 10h20v20h-20zM85 25h10v10H85z"/>
+      <path fill="#5DB257" d="M0 50h40v10H0zM10 40h20v10H10zM90 50h70v10H90zM100 40h40v10h-40zM110 30h20v10h-20z"/>
+      <rect y="60" width="160" height="10" fill="#3F8F46"/>
+      <rect y="70" width="160" height="20" fill="#8C5B3A"/>
+      <path fill="#6E4329" d="M20 80h10v10H20zM70 75h10v5H70zM120 80h10v10h-10z"/>
+      <path fill="#F5C9A0" d="M60 30h10v10H60z"/>
+      <path fill="#E5483B" d="M60 40h10v20H60z"/>
+    </symbol>
+    <symbol id="v-3d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#1B2550"/>
+      <circle cx="128" cy="20" r="8" fill="#F3E7B0"/>
+      <g fill="#FFFFFF"><circle cx="20" cy="14" r="1"/><circle cx="48" cy="8" r="1"/><circle cx="84" cy="16" r="1"/><circle cx="104" cy="6" r="1"/><circle cx="150" cy="34" r="1"/></g>
+      <polygon points="0,72 30,36 56,62 82,24 112,64 136,42 160,60 160,90 0,90" fill="#33558F"/>
+      <polygon points="30,36 42,64 56,62" fill="#26437A"/>
+      <polygon points="82,24 94,66 112,64" fill="#26437A"/>
+      <polygon points="136,42 146,64 160,60" fill="#26437A"/>
+      <polygon points="82,24 75,36 88,35" fill="#E3ECF8"/>
+      <polygon points="30,36 25,43 36,43" fill="#E3ECF8"/>
+      <polygon points="0,80 46,70 96,82 160,72 160,90 0,90" fill="#132042"/>
+      <g fill="#2A7F6A"><polygon points="18,82 24,68 30,82"/><polygon points="28,84 34,72 40,84"/><polygon points="120,80 126,66 132,80"/></g>
+    </symbol>
+    <symbol id="v-iso" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#F4DDB9"/>
+      <polygon points="28,56 80,82 80,88 28,62" fill="#5E9B4A"/>
+      <polygon points="80,82 132,56 132,62 80,88" fill="#4E8640"/>
+      <polygon points="80,30 132,56 80,82 28,56" fill="#8CC56E"/>
+      <polygon points="60,35 78,44 78,62 60,53" fill="#F2F4F8"/>
+      <polygon points="78,44 96,35 96,53 78,62" fill="#C9D3E0"/>
+      <polygon points="78,26 96,35 78,44 60,35" fill="#E0604F"/>
+      <polygon points="66,47 71,49.5 71,57.5 66,55" fill="#6B4A3A"/>
+      <rect x="108" y="46" width="3" height="10" fill="#7A5235"/>
+      <circle cx="109.5" cy="42" r="8" fill="#3F8F4E"/>
+    </symbol>
+    <symbol id="i-heberger" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M3 3h18v18H3z M10.5 7h3v3.5H17v3h-3.5V17h-3v-3.5H7v-3h3.5z"/></symbol>
+    <symbol id="i-rejoindre" viewBox="0 0 24 24"><path d="M2 9.5h9V5l7.5 7-7.5 7v-4.5H2z"/><rect x="19.5" y="3" width="3" height="18"/></symbol>
+    <symbol id="i-bibliotheque" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></symbol>
+    <symbol id="i-historique" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4"/><rect x="3" y="10" width="11" height="4"/><rect x="3" y="16" width="15" height="4"/></symbol>
+    <symbol id="i-reglages" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="3"/><rect x="3" y="15" width="18" height="3"/><rect x="6" y="3" width="5" height="9"/><rect x="13" y="12" width="5" height="9"/></symbol>
+    <symbol id="i-score" viewBox="0 0 24 24"><polygon points="12.00,3.80 14.17,9.61 20.37,9.88 15.52,13.74 17.17,19.72 12.00,16.30 6.83,19.72 8.48,13.74 3.63,9.88 9.83,9.61"/></symbol>
+  </defs>
+</svg>
+
+<div class="planche">
+  <header>
+    <div>
+      <p class="surtitre">Duo · identité visuelle · piste C</p>
+      <h1 class="nom titre">Deux encres</h1>
+    </div>
+    <div class="intention">
+      <p>Chaque joueur est une encre&nbsp;; là où elles se superposent naît une troisième couleur, celle du duo. Une identité imprimée, franche, pleine d'élan.</p>
+      <div class="adjectifs">
+        <span><i style="background:var(--j1); border-radius:50%"></i>franche</span>
+        <span><i style="background:var(--j2)"></i>graphique</span>
+        <span><i style="background:var(--accent)"></i>vive</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="gauche">
+    <div class="carte bloc-logo">
+      <svg class="logo-grand" viewBox="0 0 440 160" role="img" aria-label="Logo Duo, piste C">
+        <use href="#marque" x="0" y="0" width="180" height="160"/>
+        <text x="190" y="136" class="titre" font-size="150" fill="var(--texte)" letter-spacing="1">DUO</text>
+      </svg>
+      <div class="icones-app">
+        <figure>
+          <svg width="112" height="112" viewBox="0 0 112 112">
+            <rect x="3" y="3" width="106" height="106" fill="var(--fond)" stroke="var(--texte)" stroke-width="6"/>
+            <use href="#marque" x="12" y="14" width="90" height="80"/>
+          </svg>
+          icône 112
+        </figure>
+        <figure>
+          <svg width="48" height="48" viewBox="0 0 112 112">
+            <rect x="4" y="4" width="104" height="104" fill="var(--fond)" stroke="var(--texte)" stroke-width="8"/>
+            <use href="#marque" x="12" y="14" width="90" height="80"/>
+          </svg>
+          48
+        </figure>
+        <figure>
+          <svg width="24" height="24" viewBox="0 0 112 112">
+            <clipPath id="clip-24"><rect x="18" y="26" width="52" height="52"/></clipPath>
+            <rect x="5" y="5" width="102" height="102" fill="var(--fond)" stroke="var(--texte)" stroke-width="10"/>
+            <rect x="18" y="26" width="52" height="52" fill="var(--j2)"/>
+            <circle cx="70" cy="52" r="26" fill="var(--j1)"/>
+            <circle cx="70" cy="52" r="26" fill="var(--accent)" clip-path="url(#clip-24)"/>
+          </svg>
+          24
+        </figure>
+      </div>
+    </div>
+
+    <div>
+      <p class="etiquette">Palette · rôle et contraste</p>
+      <div class="nuancier">
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--fond)"></div><div class="infos"><b>Papier</b><code data-hex="fond"></code><small>fond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--surface)"></div><div class="infos"><b>Blanc</b><code data-hex="surface"></code><small>surfaces</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte)"></div><div class="infos"><b>Encre noire</b><code data-hex="texte"></code><small><span data-contraste="texte fond"></span> sur papier</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte-2)"></div><div class="infos"><b>Gris</b><code data-hex="texte-2"></code><small><span data-contraste="texte-2 fond"></span> sur papier</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--accent)"></div><div class="infos"><b>Surimpression</b><code data-hex="accent"></code><small>accent, libellé <span data-contraste="sur-accent accent"></span></small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j1)"></div><div class="infos"><b>Encre rose</b><code data-hex="j1"></code><small>joueur 1, rond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j2)"></div><div class="infos"><b>Encre jaune</b><code data-hex="j2"></code><small>joueur 2, carré</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--succes)"></div><div class="infos"><b>Succès</b><code data-hex="succes"></code><small><span data-contraste="succes fond"></span> sur papier</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--erreur)"></div><div class="infos"><b>Erreur</b><code data-hex="erreur"></code><small><span data-contraste="erreur fond"></span> sur papier</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--surface)"><svg width="100%" height="40" viewBox="0 0 140 40"><use href="#marque" x="44" y="1" width="50" height="44"/></svg></div><div class="infos"><b>Rose × jaune</b><code>= vermillon</code><small>multiplication exacte</small></div></div>
+      </div>
+    </div>
+
+    <div class="typos">
+      <div class="carte typo">
+        <p class="etiquette">Titres · Bricolage Grotesque</p>
+        <p class="specimen-titre titre">On joue&#8239;?</p>
+        <p class="glyphes titre">Aa Éé Çç 0123 «&nbsp;!&nbsp;»</p>
+        <p class="licence">OFL · @fontsource-variable/bricolage-grotesque · 800</p>
+      </div>
+      <div class="carte typo">
+        <p class="etiquette">Texte · Archivo</p>
+        <p class="specimen-texte">Sam est visible sur le réseau. Choisis un jeu, il te rejoint d'une touche. Àà Éé Çç Œœ 0123</p>
+        <p class="licence">OFL · @fontsource-variable/archivo · 500 à 800</p>
+      </div>
+    </div>
+
+    <div class="carte bloc-signes">
+      <div class="signe"><svg width="60" height="60"><use href="#signe-j1"/></svg><div><b>Joueur 1</b><span>rond, encre rose</span></div></div>
+      <div class="signe"><svg width="60" height="60"><use href="#signe-j2"/></svg><div><b>Joueur 2</b><span>carré, encre jaune, plus clair</span></div></div>
+      <div class="icones">
+        <figure><svg><use href="#i-heberger"/></svg>Héberger</figure>
+        <figure><svg><use href="#i-rejoindre"/></svg>Rejoindre</figure>
+        <figure><svg><use href="#i-bibliotheque"/></svg>Jeux</figure>
+        <figure><svg><use href="#i-historique"/></svg>Historique</figure>
+        <figure><svg><use href="#i-reglages"/></svg>Réglages</figure>
+        <figure><svg><use href="#i-score"/></svg>Score</figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="droite">
+    <p class="legende-maquette"><span class="etiquette" style="margin:0">Écran d'accueil · maquette</span><span>dessinée en 1366x768, réduite à 75&nbsp;%, focus clavier sur «&nbsp;Héberger&nbsp;», vignettes de jeux fictives identiques sur les trois pistes</span></p>
+    <div class="cadre-ecran">
+      <div class="ecran">
+        <div class="m-barre">
+          <div class="m-logo"><svg width="58" height="52" viewBox="0 0 180 160"><use href="#marque"/></svg><span class="titre">Duo</span></div>
+          <nav class="m-nav"><span class="actif">Accueil</span><span>Bibliothèque</span><span>Historique</span></nav>
+          <div class="m-profil">
+            <span class="m-btn-icone"><svg><use href="#i-reglages"/></svg></span>
+            <div class="m-puce"><svg width="36" height="36"><use href="#signe-j1"/></svg><div><b>Alex</b> <small>mon profil</small></div></div>
+          </div>
+        </div>
+        <div class="m-corps">
+          <section class="m-accueil">
+            <p class="m-surtitre">Bonsoir Alex</p>
+            <h1 class="titre">On joue&#8239;?</h1>
+            <p class="m-sous">Sam est visible sur le réseau.</p>
+            <div class="m-actions">
+              <div class="m-bloc m-primaire m-focus">
+                <svg><use href="#i-heberger"/></svg>
+                <strong>Héberger</strong>
+                <span>Tu choisis le jeu, Sam te rejoint.</span>
+              </div>
+              <div class="m-bloc">
+                <svg><use href="#i-rejoindre"/></svg>
+                <strong>Rejoindre</strong>
+                <span>Rejoins le salon de Sam.</span>
+              </div>
+            </div>
+            <div class="m-jeux">
+              <p class="m-jeux-titre">Nos jeux <span>Toute la bibliothèque</span></p>
+              <div class="m-jeux-liste">
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-2d"/></svg><b>Vignette 2D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg><b>Vignette 3D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-iso"/></svg><b>Vignette isométrique</b></div>
+              </div>
+            </div>
+          </section>
+          <aside class="m-duo">
+            <svg class="encres" width="476" height="420" viewBox="0 0 476 420">
+              <defs>
+                <pattern id="trame" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.8" fill="var(--j1)"/></pattern>
+                <clipPath id="clip-maquette"><rect x="190" y="88" width="236" height="236"/></clipPath>
+              </defs>
+              <rect x="0" y="336" width="476" height="76" fill="url(#trame)"/>
+              <rect x="190" y="88" width="236" height="236" fill="var(--j2)"/>
+              <circle cx="176" cy="206" r="126" fill="var(--j1)"/>
+              <circle cx="176" cy="206" r="126" fill="var(--accent)" clip-path="url(#clip-maquette)"/>
+              <g fill="none" stroke="var(--texte)" stroke-width="5">
+                <rect x="190" y="88" width="236" height="236"/>
+                <circle cx="176" cy="206" r="126"/>
+              </g>
+            </svg>
+            <div class="m-chiffre" style="left:60px; top:152px; width:120px"><b>12</b><span>Alex</span></div>
+            <div class="m-chiffre" style="left:196px; top:152px; width:102px"><b>26</b><span>parties</span></div>
+            <div class="m-chiffre" style="left:310px; top:152px; width:110px"><b>14</b><span>Sam</span></div>
+            <div class="m-nom" style="left:36px"><svg width="30" height="30"><use href="#signe-j1"/></svg><div><b>Alex</b><small>toi, sur ce Mac</small></div></div>
+            <div class="m-nom" style="left:252px"><svg width="30" height="30"><use href="#signe-j2"/></svg><div><b>Sam</b><small><i class="m-pastille"></i>en ligne, sur le PC</small></div></div>
+            <div class="m-derniere"><svg><use href="#i-historique"/></svg>Dernière partie&nbsp;: hier soir, victoire de Sam.</div>
+          </aside>
+        </div>
+        <div class="m-pied"><kbd>Tab</kbd> naviguer <kbd>Entrée</kbd> choisir <kbd>Échap</kbd> revenir</div>
+      </div>
+    </div>
+
+    <div class="carte bloc-mouvement">
+      <div class="images">
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <circle cx="24" cy="52" r="20" fill="var(--j1)" stroke="var(--texte)" stroke-width="3"/>
+            <rect x="84" y="32" width="40" height="40" fill="var(--j2)" stroke="var(--texte)" stroke-width="3"/>
+            <path d="M50 46h12M50 58h8M78 46h-12M78 58h-8" stroke="var(--texte)" stroke-width="3"/>
+          </svg>
+          0 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <clipPath id="clip-f2"><rect x="62" y="30" width="44" height="44"/></clipPath>
+            <rect x="62" y="30" width="44" height="44" fill="var(--j2)"/>
+            <circle cx="56" cy="52" r="22" fill="var(--j1)"/>
+            <g transform="translate(4 3)"><circle cx="56" cy="52" r="22" fill="var(--accent)" clip-path="url(#clip-f2)"/></g>
+            <g fill="none" stroke="var(--texte)" stroke-width="3"><rect x="62" y="30" width="44" height="44"/><circle cx="56" cy="52" r="22"/></g>
+          </svg>
+          90 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <clipPath id="clip-f3"><rect x="62" y="30" width="44" height="44"/></clipPath>
+            <rect x="62" y="30" width="44" height="44" fill="var(--j2)"/>
+            <circle cx="56" cy="52" r="22" fill="var(--j1)"/>
+            <circle cx="56" cy="52" r="22" fill="var(--accent)" clip-path="url(#clip-f3)"/>
+            <g fill="none" stroke="var(--texte)" stroke-width="3"><rect x="62" y="30" width="44" height="44"/><circle cx="56" cy="52" r="22"/></g>
+          </svg>
+          160 ms
+        </figure>
+      </div>
+      <div class="mouvement-texte">
+        <b class="titre">Glisser, superposer, caler</b>
+        <p>Vif et net&nbsp;: 80 à 160 ms, glissements opposés qui se rejoignent, puis calage au repère (un décalage de 3 px qui se résorbe). Les états changent d'un coup, sans fondu mou. Avec «&nbsp;réduire les animations&nbsp;», changement instantané.</p>
+      </div>
+    </div>
+  </section>
+</div>
+<p class="pied-planche">Planche de proposition · 2026-10-30 · dessins originaux du studio, polices OFL embarquées</p>
+
+<script>
+(function () {
+  var css = getComputedStyle(document.documentElement);
+  function couleur(nom) { return css.getPropertyValue('--' + nom).trim(); }
+  function lineaire(c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function luminance(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return 0.2126 * lineaire((n >> 16) & 255) + 0.7152 * lineaire((n >> 8) & 255) + 0.0722 * lineaire(n & 255);
+  }
+  function rapport(a, b) {
+    var la = luminance(a), lb = luminance(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  document.querySelectorAll('[data-hex]').forEach(function (el) { el.textContent = couleur(el.dataset.hex).toUpperCase(); });
+  document.querySelectorAll('[data-contraste]').forEach(function (el) {
+    var p = el.dataset.contraste.split(' ');
+    el.textContent = rapport(couleur(p[0]), couleur(p[1])).toFixed(1).replace('.', ',') + ':1';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E05 Accueil</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .accueil-contenu { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
+  .duo { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; padding: 16px 24px; }
+  .duo-joueurs { display: flex; align-items: center; gap: 14px; font-size: 18px; }
+  .duo-joueurs .et { color: var(--encre-3); }
+  .duo-etat { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 360px; }
+  .duo-etat > div { min-width: 0; }
+  .duo-etat .bouton { margin-left: auto; }
+  .actions-centrales { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .action-centrale { display: grid; align-content: start; gap: 10px; padding: 24px 28px; min-height: 212px; }
+  .action-centrale h2 { font-size: 24px; }
+  .action-centrale .bouton.grand { justify-self: start; margin-top: 6px; }
+  .action-centrale .bouton.lien { justify-self: start; }
+  .salon-ouvert { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: center; border: 3px solid var(--encre); border-radius: 10px; padding: 12px 16px; }
+  .salon-ouvert .bouton { grid-column: 1 / -1; justify-self: start; margin-top: 8px; }
+  .rangee-bas { display: grid; grid-template-columns: 1.25fr 1fr; gap: 20px; }
+  .ligne-reprendre { display: grid; grid-template-columns: 136px 1fr auto; gap: 18px; align-items: center; }
+  .ligne-reprendre .vignette { width: 136px; }
+  .score-ligne { display: flex; align-items: baseline; gap: 22px; flex-wrap: wrap; }
+  .score-ligne .joueur-score { display: inline-flex; align-items: center; gap: 8px; font-size: 18px; }
+  .chiffre-score { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .score .bouton.lien { margin-top: 2px; }
+</style>
+</head>
+<body data-etat-defaut="normal">
+
+<!-- Vu par Camille (le Mac). États: normal, absent, versions, nouveau. -->
+<div class="app" data-si="normal absent versions nouveau">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <nav class="onglets" aria-label="Sections">
+      <button class="onglet" aria-current="page" data-raccourci="1">Accueil</button>
+      <button class="onglet" data-aller="bibliotheque.html" data-raccourci="2">Bibliothèque</button>
+      <button class="onglet" data-aller="historique.html" data-raccourci="3">Historique</button>
+      <button class="onglet" data-aller="reglages.html" data-raccourci="4">Réglages</button>
+    </nav>
+    <div class="droite">
+      <span class="presence" data-si="normal nouveau"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha est là</span>
+      <span class="presence" data-si="absent"><span class="icone" data-icone="alerte"></span>Sacha n’est pas visible</span>
+      <span class="presence" data-si="versions"><span class="icone" data-icone="alerte"></span>Versions de Duo différentes</span>
+      <span class="moi"><span class="symbole" data-forme="rond"></span>Camille</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur pile large accueil-contenu">
+      <section class="bloc duo" aria-label="Votre duo">
+        <div class="duo-joueurs">
+          <span class="ligne"><span class="symbole moyen" data-forme="rond"></span><strong>Camille</strong><span class="aide">(toi)</span></span>
+          <span class="et">et</span>
+          <span class="ligne"><span class="symbole moyen" data-forme="triangle" data-ton="clair"></span><strong>Sacha</strong></span>
+        </div>
+        <div class="duo-etat" data-si="normal nouveau" role="status">
+          <span class="icone moyenne" data-icone="reussi"></span>
+          <div>
+            <p class="fort">Sacha est là</p>
+            <p class="aide">Sur l’ordinateur « PC-SACHA ». Vous pouvez jouer ensemble.</p>
+          </div>
+        </div>
+        <div class="duo-etat" data-si="absent" role="status">
+          <span class="icone moyenne" data-icone="alerte"></span>
+          <div>
+            <p class="fort">Sacha n’est pas visible</p>
+            <p class="aide">Duo est-il ouvert sur son ordinateur ? Tu peux quand même héberger : l’invitation partira dès que Sacha sera là.</p>
+          </div>
+          <button class="bouton" data-aller="diagnostic.html#macos">Que faire ?</button>
+        </div>
+        <div class="duo-etat" data-si="versions" role="status">
+          <span class="icone moyenne" data-icone="alerte"></span>
+          <div>
+            <p class="fort">Duo n’a pas la même version sur vos deux ordinateurs</p>
+            <p class="aide">Ici 1.0.2, chez Sacha 1.0.3. Installe la version 1.0.3 sur cet ordinateur pour jouer ensemble.</p>
+          </div>
+          <button class="bouton principal" data-focus="2">Comment mettre Duo à jour</button>
+        </div>
+      </section>
+
+      <div class="actions-centrales">
+        <section class="bloc accent action-centrale" aria-labelledby="titre-heberger">
+          <h2 id="titre-heberger">Héberger</h2>
+          <p class="aide">Tu choisis le jeu, Sacha reçoit l’invitation.</p>
+          <button class="bouton principal grand" id="heberger" data-aller="bibliotheque.html" data-focus="1">Héberger une partie</button>
+          <p class="aide" data-si="versions">Impossible tant que vos versions de Duo sont différentes.</p>
+        </section>
+        <section class="bloc action-centrale" aria-labelledby="titre-rejoindre">
+          <h2 id="titre-rejoindre">Rejoindre</h2>
+          <p class="aide">Aucune partie ouverte pour l’instant. Quand Sacha en ouvrira une, l’invitation apparaîtra ici.</p>
+          <button class="bouton lien" data-aller="diagnostic.html#macos" data-si="normal absent nouveau">Sacha n’apparaît pas ? Se connecter avec une adresse</button>
+        </section>
+      </div>
+
+      <div class="rangee-bas">
+        <section class="bloc gris" aria-labelledby="titre-reprendre">
+          <h2 class="titre-bloc" id="titre-reprendre">Reprendre</h2>
+          <div class="ligne-reprendre">
+            <div class="vignette"><span>Vignette</span></div>
+            <div>
+              <p class="fort">Exemple coop</p>
+              <p class="meta">Niveau 3 · hier à 21 h 40</p>
+            </div>
+            <button class="bouton" id="heberger-reprise" data-aller="salon-hote.html#attente">Héberger cette partie</button>
+          </div>
+        </section>
+        <section class="bloc gris score" aria-labelledby="titre-score">
+          <h2 class="titre-bloc" id="titre-score">Score cumulé</h2>
+          <div class="score-ligne">
+            <span class="joueur-score"><span class="symbole" data-forme="rond"></span>Camille <span class="chiffre-score">31</span></span>
+            <span class="joueur-score"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha <span class="chiffre-score">34</span></span>
+            <span class="meta">3 égalités</span>
+          </div>
+          <p class="aide">Jeux en affrontement, toutes parties confondues</p>
+          <button class="bouton lien" data-aller="historique.html">Voir l’historique</button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div class="notification" role="status" data-si="nouveau">
+    <span class="icone moyenne" data-icone="nouveau"></span>
+    <p><strong>Nouveau jeu :</strong> Exemple duel est dans la bibliothèque.</p>
+    <div class="actions"><button class="bouton" data-aller="bibliotheque.html">Voir</button></div>
+  </div>
+</div>
+
+<!-- Vu par Sacha (le PC), qui reçoit l'invitation de Camille. État: invitation. -->
+<div class="app" data-si="invitation">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <nav class="onglets" aria-label="Sections">
+      <button class="onglet" aria-current="page" data-raccourci="1">Accueil</button>
+      <button class="onglet" data-aller="bibliotheque.html" data-raccourci="2">Bibliothèque</button>
+      <button class="onglet" data-aller="historique.html" data-raccourci="3">Historique</button>
+      <button class="onglet" data-aller="reglages.html" data-raccourci="4">Réglages</button>
+    </nav>
+    <div class="droite">
+      <span class="presence"><span class="symbole" data-forme="rond"></span>Camille est là</span>
+      <span class="moi"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur pile large accueil-contenu">
+      <section class="bloc duo" aria-label="Votre duo">
+        <div class="duo-joueurs">
+          <span class="ligne"><span class="symbole moyen" data-forme="triangle" data-ton="clair"></span><strong>Sacha</strong><span class="aide">(toi)</span></span>
+          <span class="et">et</span>
+          <span class="ligne"><span class="symbole moyen" data-forme="rond"></span><strong>Camille</strong></span>
+        </div>
+        <div class="duo-etat" role="status">
+          <span class="icone moyenne" data-icone="reussi"></span>
+          <div>
+            <p class="fort">Camille est là</p>
+            <p class="aide">Sur l’ordinateur « MacBook Air de Camille ». Vous pouvez jouer ensemble.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="actions-centrales">
+        <section class="bloc action-centrale" aria-labelledby="titre-heberger-s">
+          <h2 id="titre-heberger-s">Héberger</h2>
+          <p class="aide">Tu choisis le jeu, Camille reçoit l’invitation.</p>
+          <button class="bouton grand" data-aller="bibliotheque.html">Héberger une partie</button>
+        </section>
+        <section class="bloc accent action-centrale" aria-labelledby="titre-rejoindre-s">
+          <h2 id="titre-rejoindre-s">Rejoindre</h2>
+          <div class="salon-ouvert">
+            <span class="symbole moyen" data-forme="rond"></span>
+            <p class="fort">Camille a ouvert un salon</p>
+            <p class="meta" style="grid-column: 2">Exemple coop · Niveau 3</p>
+            <button class="bouton principal" id="rejoindre-carte" data-aller="salon-invite.html">Rejoindre</button>
+          </div>
+          <button class="bouton lien" data-aller="diagnostic.html">Camille n’apparaît pas ? Se connecter avec une adresse</button>
+        </section>
+      </div>
+
+      <div class="rangee-bas">
+        <section class="bloc gris" aria-labelledby="titre-reprendre-s">
+          <h2 class="titre-bloc" id="titre-reprendre-s">Reprendre</h2>
+          <div class="ligne-reprendre">
+            <div class="vignette"><span>Vignette</span></div>
+            <div>
+              <p class="fort">Exemple coop</p>
+              <p class="meta">Niveau 3 · hier à 21 h 40</p>
+            </div>
+            <button class="bouton" data-aller="salon-hote.html#attente">Héberger cette partie</button>
+          </div>
+        </section>
+        <section class="bloc gris score" aria-labelledby="titre-score-s">
+          <h2 class="titre-bloc" id="titre-score-s">Score cumulé</h2>
+          <div class="score-ligne">
+            <span class="joueur-score"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha <span class="chiffre-score">34</span></span>
+            <span class="joueur-score"><span class="symbole" data-forme="rond"></span>Camille <span class="chiffre-score">31</span></span>
+            <span class="meta">3 égalités</span>
+          </div>
+          <p class="aide">Jeux en affrontement, toutes parties confondues</p>
+          <button class="bouton lien" data-aller="historique.html">Voir l’historique</button>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <section class="bandeau-invitation" id="bandeau" role="alertdialog" aria-labelledby="inv-titre" aria-describedby="inv-detail">
+    <span class="symbole grand" data-forme="rond"></span>
+    <div>
+      <h2 id="inv-titre">Camille t’invite à jouer</h2>
+      <p id="inv-detail" class="meta">Exemple coop · Coopération · 20 à 40 min</p>
+      <p class="meta">Sauvegarde : Niveau 3, hier à 21 h 40</p>
+    </div>
+    <div class="actions rangee-boutons">
+      <button class="bouton principal grand" id="rejoindre" data-aller="salon-invite.html" data-focus="3">Rejoindre <kbd>Entrée</kbd></button>
+      <button class="bouton grand" id="plus-tard">Plus tard <kbd>Échap</kbd></button>
+    </div>
+  </section>
+</div>
+
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  // Plus tard (ou Échap): le bandeau se ferme, l'invitation reste dans le bloc Rejoindre.
+  function mettreDeCote() {
+    const bandeau = document.getElementById('bandeau');
+    if (!bandeau || bandeau.hidden || !Duo.visible(bandeau)) return false;
+    bandeau.hidden = true;
+    document.getElementById('rejoindre-carte').focus();
+    return true;
+  }
+  document.getElementById('plus-tard').addEventListener('click', mettreDeCote);
+  Duo.surEchap = function () {
+    return document.body.dataset.etat === 'invitation' ? mettreDeCote() : false;
+  };
+  Duo.surEtat = function (etat) {
+    document.getElementById('heberger').disabled = etat === 'versions';
+    document.getElementById('heberger-reprise').disabled = etat === 'versions';
+  };
+</script>
+</body>
+</html>

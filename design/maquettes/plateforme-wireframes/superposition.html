@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E11 et E12 Superpositions en partie</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  body { overflow: hidden; }
+  .jeu {
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(135deg, #d9d9d9 0 24px, #cfcfcf 24px 48px);
+  }
+  .jeu .hud { position: absolute; top: 20px; left: 24px; right: 24px; display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; }
+  .jeu .hud span { background: #fff; border: 2px solid #111; border-radius: 8px; padding: 4px 12px; }
+  .jeu .sol { position: absolute; left: 0; right: 0; bottom: 0; height: 18%; background: #9a9a9a; border-top: 3px solid #111; }
+  .jeu .plateforme { position: absolute; height: 28px; background: #8a8a8a; border: 3px solid #111; border-radius: 4px; }
+  .jeu .perso { position: absolute; width: 56px; height: 56px; }
+  .jeu .etiquette-jeu { position: absolute; left: 24px; bottom: 24px; background: #fff; border: 2px solid #111; border-radius: 6px; padding: 4px 10px; font-size: 15px; }
+  .voile { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.62); }
+  .panneau {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(620px, calc(100vw - 48px));
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    background: #fff;
+    border: 3px solid #111;
+    border-radius: 16px;
+    padding: 26px 32px 24px;
+    display: grid; gap: 14px;
+  }
+  .panneau h1 { font-size: 30px; }
+  .menu-pause { display: grid; gap: 8px; margin-top: 4px; }
+  .etats-joueurs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mini-joueur { display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; border: 2px solid var(--trait); border-radius: 10px; padding: 10px 12px; }
+  .mini-joueur.moi-meme { border: 3px solid #111; }
+  .mini-joueur .puce { grid-column: 1 / -1; justify-self: start; }
+  .statut { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 17px; }
+  .bandeau-retour { display: flex; align-items: center; gap: 10px; border: 3px solid #111; border-radius: 10px; padding: 10px 14px; font-weight: 700; }
+  .reprise { display: grid; justify-items: center; gap: 4px; padding: 6px 0; }
+  .reprise .chiffre { font-size: 64px; font-weight: 800; line-height: 1; }
+</style>
+</head>
+<body data-etat-defaut="pause">
+
+<div class="jeu" aria-hidden="true">
+  <div class="hud"><span>Niveau 2</span><span>Pièces 42</span></div>
+  <div class="plateforme" style="left: 12%; bottom: 32%; width: 22%"></div>
+  <div class="plateforme" style="left: 58%; bottom: 46%; width: 18%"></div>
+  <div class="plateforme" style="left: 40%; bottom: 62%; width: 12%"></div>
+  <span class="perso symbole" data-forme="rond" style="left: 20%; bottom: calc(32% + 31px)"></span>
+  <span class="perso symbole" data-forme="triangle" data-ton="clair" style="left: 64%; bottom: calc(46% + 31px)"></span>
+  <div class="sol"></div>
+  <span class="etiquette-jeu">Jeu en cours, figé</span>
+</div>
+<div class="voile"></div>
+
+<!-- E11 Pause (et retour après une coupure) -->
+<section class="panneau" role="dialog" aria-modal="true" aria-labelledby="titre-pause" data-si="pause reconnexion">
+  <div class="ligne"><span class="icone moyenne" data-icone="pause"></span><h1 id="titre-pause">Pause</h1></div>
+  <p class="sous-titre" data-si="pause">Pause demandée par Sacha.</p>
+  <p class="bandeau-retour" data-si="reconnexion" role="status"><span class="icone moyenne" data-icone="reussi"></span>Sacha est de retour. Reprenez quand vous voulez.</p>
+
+  <div class="menu-pause" id="menu-pause">
+    <button class="bouton principal grand large" id="reprendre" data-focus>Reprendre <kbd>Échap</kbd></button>
+    <button class="bouton grand large">Commandes</button>
+    <button class="bouton grand large">Réglages</button>
+    <button class="bouton grand large" data-ouvrir="fenetre-arreter">Retour au salon</button>
+  </div>
+
+  <div class="reprise" id="reprise" role="status" aria-live="assertive" hidden>
+    <span class="fort">Reprise dans</span>
+    <span class="chiffre" id="chiffre-reprise">3</span>
+  </div>
+
+  <div class="etats-joueurs">
+    <div class="mini-joueur moi-meme">
+      <span class="symbole" data-forme="rond"></span><span><span class="fort">Camille</span> <span class="aide">(toi)</span></span>
+      <span class="puce attente" id="puce-moi"><span class="icone" data-icone="pause"></span><span class="texte-puce">En pause</span></span>
+    </div>
+    <div class="mini-joueur">
+      <span class="symbole" data-forme="triangle" data-ton="clair"></span><span class="fort">Sacha</span>
+      <span class="puce ok" id="puce-autre"><span class="icone" data-icone="coche"></span><span class="texte-puce">Veut reprendre</span></span>
+    </div>
+  </div>
+  <p class="aide">La partie reprend quand vous avez choisi « Reprendre » sur les deux ordinateurs.</p>
+</section>
+
+<!-- E12 Connexion perdue -->
+<section class="panneau" role="dialog" aria-modal="true" aria-labelledby="titre-coupure" data-si="deconnexion">
+  <div class="ligne"><span class="icone moyenne" data-icone="alerte"></span><h1 id="titre-coupure">Connexion perdue avec Sacha</h1></div>
+  <p>La partie est en pause. Elle reprendra là où vous en étiez dès que Sacha sera de retour.</p>
+  <div class="statut" role="status"><span class="indicateur"></span><span>Duo réessaie tout seul… depuis 0:42</span></div>
+  <p class="aide">Vérifiez que Duo est toujours ouvert sur l’ordinateur de Sacha et que son Wi‑Fi fonctionne.</p>
+  <div class="etats-joueurs">
+    <div class="mini-joueur moi-meme">
+      <span class="symbole" data-forme="rond"></span><span><span class="fort">Camille</span> <span class="aide">(toi)</span></span>
+      <span class="puce attente"><span class="icone" data-icone="pause"></span>En pause</span>
+    </div>
+    <div class="mini-joueur">
+      <span class="symbole" data-forme="triangle" data-ton="clair"></span><span class="fort">Sacha</span>
+      <span class="puce alerte"><span class="icone" data-icone="alerte"></span>Connexion perdue</span>
+    </div>
+  </div>
+  <p class="ligne aide"><span class="icone" data-icone="enregistre"></span>Progression enregistrée jusqu’à la fin du niveau 2.</p>
+  <div class="rangee-boutons">
+    <button class="bouton principal grand" data-aller="diagnostic.html#macos" data-focus>Que faire ?</button>
+    <button class="bouton grand" data-ouvrir="fenetre-arreter-coupure">Arrêter la partie</button>
+  </div>
+</section>
+
+<dialog class="fenetre" id="fenetre-arreter" aria-labelledby="fa-titre">
+  <h2 id="fa-titre">Arrêter la partie ?</h2>
+  <p>La progression est enregistrée jusqu’à la fin du niveau 2 : ce que vous avez fait depuis sera perdu.</p>
+  <div class="rangee-boutons">
+    <button class="bouton" data-aller="salon-hote.html">Arrêter la partie</button>
+    <button class="bouton principal" data-fermer autofocus>Continuer à jouer</button>
+  </div>
+</dialog>
+
+<dialog class="fenetre" id="fenetre-arreter-coupure" aria-labelledby="fac-titre">
+  <h2 id="fac-titre">Arrêter la partie ?</h2>
+  <p>Progression enregistrée jusqu’à la fin du niveau 2.</p>
+  <div class="rangee-boutons">
+    <button class="bouton" data-aller="accueil.html#absent">Arrêter la partie</button>
+    <button class="bouton principal" data-fermer autofocus>Continuer d’attendre</button>
+  </div>
+</dialog>
+
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  const TXT = { veut: 'Veut reprendre', pause: 'En pause' };
+  const etat = { moi: false, autre: true, minuteur: null };
+
+  function puce(el, veut) {
+    el.className = 'puce ' + (veut ? 'ok' : 'attente');
+    el.querySelector('.icone').dataset.icone = veut ? 'coche' : 'pause';
+    el.querySelector('.texte-puce').textContent = veut ? TXT.veut : TXT.pause;
+    Duo.dessiner(el);
+  }
+  function rendre() {
+    puce(document.getElementById('puce-moi'), etat.moi);
+    puce(document.getElementById('puce-autre'), etat.autre);
+  }
+  function reprendre() {
+    if (etat.minuteur) return;
+    etat.moi = true;
+    rendre();
+    if (!etat.autre) return;
+    // Les deux veulent reprendre: compte à rebours, annulable par Échap.
+    const zone = document.getElementById('reprise');
+    let n = 3;
+    zone.hidden = false;
+    document.getElementById('menu-pause').hidden = true;
+    document.getElementById('chiffre-reprise').textContent = String(n);
+    etat.minuteur = setInterval(() => {
+      n -= 1;
+      if (n <= 0) {
+        clearInterval(etat.minuteur);
+        etat.minuteur = null;
+        document.querySelectorAll('.panneau, .voile').forEach((el) => { el.hidden = true; });
+      } else {
+        document.getElementById('chiffre-reprise').textContent = String(n);
+      }
+    }, 1000);
+  }
+  function annulerReprise() {
+    clearInterval(etat.minuteur);
+    etat.minuteur = null;
+    etat.moi = false;
+    rendre();
+    document.getElementById('reprise').hidden = true;
+    document.getElementById('menu-pause').hidden = false;
+    document.getElementById('reprendre').focus();
+  }
+  document.getElementById('reprendre').addEventListener('click', reprendre);
+
+  // Flèches haut et bas dans le menu de pause.
+  document.getElementById('menu-pause').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const boutons = [...e.currentTarget.querySelectorAll('button')];
+    const i = boutons.indexOf(document.activeElement);
+    if (i < 0) return;
+    e.preventDefault();
+    const pas = e.key === 'ArrowDown' ? 1 : -1;
+    boutons[(i + pas + boutons.length) % boutons.length].focus();
+  });
+
+  Duo.surEchap = function () {
+    const ecran = document.body.dataset.etat;
+    if (ecran === 'deconnexion') return true;
+    if (etat.minuteur) { annulerReprise(); return true; }
+    reprendre();
+    return true;
+  };
+  Duo.surEtat = function (ecran) {
+    // Au retour après une coupure, personne n'a encore demandé à reprendre.
+    etat.autre = ecran === 'pause';
+    etat.moi = false;
+    rendre();
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E08 Salon, côté invité</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .barre.salon { gap: 20px; }
+  .titre-salon { font-size: 22px; }
+  .salon-grille { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 24px; align-items: start; }
+  .colonne-joueurs { display: grid; gap: 20px; }
+  .carte-joueur { min-height: 150px; }
+  .depart { display: grid; gap: 10px; justify-items: start; }
+  .depart .bouton.grand { min-width: 280px; font-size: 20px; min-height: 64px; }
+  .colonne-partie { display: grid; gap: 14px; }
+  .resume-jeu { display: grid; grid-template-columns: 120px 1fr; gap: 6px 14px; align-items: center; }
+  .resume-jeu .vignette { width: 120px; grid-row: span 2; }
+  .colonne-joueurs .bloc.compact { justify-self: start; min-width: 360px; }
+  .commandes { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 0; font-size: 15px; align-items: center; }
+  .commandes dt { color: var(--encre-2); }
+  .commandes dd { margin: 0; display: flex; gap: 4px; flex-wrap: wrap; }
+  .bloc.compact { padding: 14px 18px; }
+  .sauvegarde-choisie { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; align-items: center; border: 2px solid var(--trait); border-radius: 10px; padding: 10px 14px; }
+  .sauvegarde-choisie .detail-option { grid-column: 2; font-size: 15px; color: var(--encre-2); }
+</style>
+</head>
+<body data-etat-defaut="rejoint">
+<div class="app">
+  <header class="barre salon">
+    <button class="bouton" id="bouton-quitter" data-ouvrir="fenetre-quitter"><span class="icone" data-icone="retour"></span>Quitter le salon <kbd>Échap</kbd></button>
+    <h1 class="titre-salon">Salon · Exemple coop</h1>
+    <div class="droite">
+      <span class="moi"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur salon-grille">
+      <section class="colonne-joueurs" aria-label="Joueurs">
+        <div class="joueurs">
+          <article class="carte-joueur moi-meme">
+            <span class="symbole grand" data-forme="triangle" data-ton="clair"></span>
+            <div>
+              <p class="nom">Sacha <span class="aide">(toi)</span></p>
+              <p class="role">a rejoint le salon</p>
+            </div>
+            <div class="etat"><span class="puce ok" id="puce-moi"><span class="icone" data-icone="coche"></span><span class="texte-puce">C’est parti</span></span></div>
+          </article>
+          <article class="carte-joueur">
+            <span class="symbole grand" data-forme="rond"></span>
+            <div>
+              <p class="nom">Camille</p>
+              <p class="role">héberge</p>
+            </div>
+            <div class="etat"><span class="puce attente" id="puce-autre"><span class="icone" data-icone="sablier"></span><span class="texte-puce">Pas encore</span></span></div>
+          </article>
+        </div>
+
+        <div class="depart">
+          <button class="bouton grand" id="bouton-depart" data-focus>Pas encore</button>
+          <p class="aide" id="aide-depart">Tu as dit « C’est parti » en rejoignant. On attend Camille.</p>
+          <p class="aide" id="aide-generale" hidden>La partie commence dès que vous avez dit « C’est parti » sur les deux ordinateurs.</p>
+        </div>
+        <section class="bloc compact">
+          <h2 class="titre-bloc">Commandes</h2>
+          <dl class="commandes">
+            <dt>Se déplacer</dt><dd><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd></dd>
+            <dt>Agir</dt><dd><kbd>Espace</kbd></dd>
+            <dt>Pause</dt><dd><kbd>Échap</kbd></dd>
+          </dl>
+        </section>
+      </section>
+
+      <aside class="colonne-partie" aria-label="Partie">
+        <section class="bloc compact resume-jeu">
+          <div class="vignette"><span>Vignette</span></div>
+          <p class="fort">Exemple coop</p>
+          <p class="meta">Coopération · 20 à 40 min</p>
+        </section>
+
+        <section class="bloc compact">
+          <h2 class="titre-bloc">Sauvegarde choisie par Camille</h2>
+          <div class="sauvegarde-choisie">
+            <span class="icone" data-icone="enregistre"></span>
+            <span class="fort" id="nom-sauvegarde">Niveau 3</span>
+            <span class="detail-option" id="date-sauvegarde">hier à 21 h 40</span>
+          </div>
+          <p class="aide" style="margin-top: 8px">Le jeu enregistre à la fin de chaque niveau.</p>
+        </section>
+
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="notification" id="notification" role="status" data-si="nouveau-choix">
+  <span class="icone moyenne" data-icone="info"></span>
+  <p data-texte>Camille a choisi une autre sauvegarde.</p>
+</div>
+
+<dialog class="fenetre" id="fenetre-quitter" aria-labelledby="fq-titre">
+  <h2 id="fq-titre">Quitter le salon ?</h2>
+  <p>Camille restera dans le salon et pourra t’inviter à nouveau.</p>
+  <div class="rangee-boutons">
+    <button class="bouton" data-aller="accueil.html#normal">Quitter le salon</button>
+    <button class="bouton principal" data-fermer autofocus>Rester</button>
+  </div>
+</dialog>
+
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  const TXT = {
+    parti: 'C’est parti',
+    partiBouton: 'C’est parti !',
+    pasEncore: 'Pas encore'
+  };
+  // En rejoignant depuis l'invitation, Sacha a dit « C'est parti ».
+  const moi = { pret: true };
+
+  function rendre() {
+    const p = document.getElementById('puce-moi');
+    p.className = 'puce ' + (moi.pret ? 'ok' : 'attente');
+    p.querySelector('.icone').dataset.icone = moi.pret ? 'coche' : 'sablier';
+    p.querySelector('.texte-puce').textContent = moi.pret ? TXT.parti : TXT.pasEncore;
+    Duo.dessiner(p);
+    const b = document.getElementById('bouton-depart');
+    b.textContent = moi.pret ? TXT.pasEncore : TXT.partiBouton;
+    b.classList.toggle('principal', !moi.pret);
+    document.getElementById('aide-depart').hidden = !moi.pret;
+    document.getElementById('aide-generale').hidden = moi.pret;
+  }
+  document.getElementById('bouton-depart').addEventListener('click', () => {
+    moi.pret = !moi.pret;
+    rendre();
+  });
+  Duo.surEchap = function () {
+    const fenetre = document.getElementById('fenetre-quitter');
+    fenetre._ouvreur = document.activeElement;
+    fenetre.showModal();
+    Duo.garde();
+    return true;
+  };
+  Duo.surEtat = function (etat) {
+    // Après un changement de sauvegarde par Camille, la puce de Sacha revient à « Pas encore ».
+    moi.pret = etat !== 'nouveau-choix';
+    if (etat === 'nouveau-choix') {
+      document.getElementById('nom-sauvegarde').textContent = 'Niveau 1';
+      document.getElementById('date-sauvegarde').textContent = '12 octobre à 20 h 05';
+    }
+    rendre();
+  };
+</script>
+</body>
+</html>

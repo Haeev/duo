@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duo · piste B · Étoile double</title>
+<link rel="stylesheet" href="node_modules/@fontsource-variable/jost/wght.css">
+<link rel="stylesheet" href="node_modules/@fontsource-variable/dm-sans/standard.css">
+<style>
+/* palette:debut (lue par controler.cjs: rôle et couleur de chaque variable) */
+:root {
+  --fond: #0E1126;
+  --surface: #1A1F3D;
+  --surface-2: #252B52;
+  --trait: #3B4380;
+  --texte: #F3F1FA;
+  --texte-2: #A7ABD6;
+  --accent: #FFC857;
+  --sur-accent: #0E1126;
+  --j1: #5CE1E6;
+  --sur-j1: #0E1126;
+  --j2: #8D6CFF;
+  --sur-j2: #0E1126;
+  --succes: #6BD69A;
+  --erreur: #FF6B81;
+}
+/* palette:fin */
+:root {
+  --filet: #2A3060;
+  --titre: 'Jost Variable', sans-serif;
+  --corps: 'DM Sans Variable', sans-serif;
+  --decoupe: var(--fond);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body {
+  background: radial-gradient(1400px 900px at 78% 18%, #1A1F48 0%, var(--fond) 62%);
+  color: var(--texte); font-family: var(--corps); font-size: 16px; position: relative;
+}
+.titre { font-family: var(--titre); }
+.symboles { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ciel { position: absolute; inset: 0; pointer-events: none; }
+
+.planche {
+  position: relative; width: 1920px; height: 1080px; padding: 30px 48px 34px;
+  display: grid; grid-template-columns: 760px 1024px; column-gap: 40px;
+  grid-template-rows: 178px 1fr; row-gap: 26px;
+}
+header { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: flex-end; }
+.surtitre { font-weight: 700; font-size: 13px; letter-spacing: .24em; text-transform: uppercase; color: var(--texte-2); margin: 0 0 26px; }
+h1.nom { font-size: 112px; line-height: .95; font-weight: 300; margin: 0; letter-spacing: -.01em; }
+.intention { width: 900px; padding-bottom: 8px; }
+.intention p { font-size: 24px; line-height: 1.42; margin: 0 0 18px; font-weight: 400; }
+.adjectifs { display: flex; gap: 14px; }
+.adjectifs span {
+  font-family: var(--titre); font-weight: 400; font-size: 21px; letter-spacing: .04em;
+  border: 1.5px solid var(--trait); border-radius: 999px; padding: 6px 22px 7px 18px; display: flex; align-items: center; gap: 10px;
+}
+.adjectifs span::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(255, 200, 87, .18); }
+
+.carte { background: var(--surface); border: 1px solid var(--filet); border-radius: 22px; --decoupe: var(--surface); }
+.etiquette { font-weight: 700; font-size: 12.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--texte-2); margin: 0 0 10px; }
+.gauche { display: flex; flex-direction: column; gap: 20px; }
+.droite { display: flex; flex-direction: column; gap: 14px; }
+
+/* logo */
+.bloc-logo { height: 196px; display: flex; align-items: center; justify-content: space-between; padding: 14px 26px 14px 34px; }
+.logo { display: inline-flex; align-items: baseline; font-family: var(--titre); font-weight: 300; color: var(--texte); line-height: 1; }
+.logo .o { display: inline-block; vertical-align: baseline; }
+.logo-grand { font-size: 150px; letter-spacing: .01em; }
+.logo-grand .o { width: 88px; height: 88px; margin-left: 6px; margin-bottom: -6px; }
+.icones-app { display: flex; align-items: flex-end; gap: 16px; }
+.icones-app figure { margin: 0; text-align: center; font-size: 12px; color: var(--texte-2); font-weight: 600; }
+.icones-app svg { display: block; margin: 0 auto 6px; }
+
+/* palette */
+.nuancier { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 12px; }
+.pastille-couleur { background: var(--surface); border: 1px solid var(--filet); border-radius: 16px; overflow: hidden; }
+.pastille-couleur .aplat { height: 48px; display: flex; }
+.pastille-couleur .aplat i { flex: 1; }
+.pastille-couleur .infos { padding: 7px 11px 8px; line-height: 1.22; }
+.pastille-couleur b { display: block; font-size: 14px; font-weight: 700; }
+.pastille-couleur code { font-family: var(--corps); font-size: 13px; font-weight: 500; color: var(--texte-2); font-variant-numeric: tabular-nums; }
+.pastille-couleur small { display: block; font-size: 11.5px; color: var(--texte-2); font-weight: 500; margin-top: 1px; }
+
+/* typographies */
+.typos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.typo { padding: 14px 18px 12px; height: 162px; position: relative; }
+.typo .specimen-titre { font-size: 46px; line-height: 1.05; font-weight: 300; margin: 0 0 4px; }
+.typo .glyphes { font-size: 20px; font-weight: 400; margin: 0; color: var(--texte-2); letter-spacing: .04em; }
+.typo .specimen-texte { font-size: 17px; line-height: 1.42; margin: 4px 0 6px; }
+.typo .licence { position: absolute; left: 18px; bottom: 10px; font-size: 12px; color: var(--texte-2); font-weight: 500; }
+
+/* signes et icônes */
+.bloc-signes { display: flex; align-items: center; gap: 20px; padding: 12px 20px; height: 124px; }
+.signe { display: flex; align-items: center; gap: 12px; width: 200px; }
+.signe svg { flex: none; }
+.signe b { display: block; font-size: 15px; font-weight: 700; }
+.signe span { font-size: 12.5px; color: var(--texte-2); font-weight: 500; line-height: 1.25; display: block; }
+.icones { display: flex; gap: 12px; margin-left: auto; }
+.icones figure { margin: 0; width: 46px; text-align: center; font-size: 10.5px; font-weight: 600; color: var(--texte-2); }
+.icones svg { width: 30px; height: 30px; display: block; margin: 0 auto 5px; }
+.ico { stroke: var(--texte); fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ico .plein { fill: currentColor; stroke: none; }
+.ico .creux { fill: var(--decoupe); }
+
+/* maquette */
+.legende-maquette { display: flex; justify-content: space-between; align-items: baseline; margin: 0; height: 18px; }
+.legende-maquette span { font-size: 13px; color: var(--texte-2); font-weight: 500; }
+.cadre-ecran { width: 1024px; height: 576px; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 1px var(--trait); flex: none; }
+.ecran {
+  width: 1366px; height: 768px; transform: scale(.75); transform-origin: 0 0; position: relative; display: flex; flex-direction: column;
+  background: radial-gradient(900px 620px at 76% 40%, #1C2254 0%, var(--fond) 66%); --decoupe: var(--fond);
+}
+.ecran > :not(.ciel) { position: relative; }
+.m-barre { height: 84px; display: flex; align-items: center; padding: 0 40px; gap: 44px; border-bottom: 1px solid var(--filet); }
+.m-logo { font-size: 46px; }
+.m-logo .o { width: 27px; height: 27px; margin-left: 2px; margin-bottom: -2px; }
+.m-nav { display: flex; gap: 30px; }
+.m-nav span { font-size: 17px; font-weight: 500; color: var(--texte-2); position: relative; padding: 6px 0; }
+.m-nav span.actif { color: var(--texte); }
+.m-nav span.actif::after { content: ''; position: absolute; left: 50%; bottom: -8px; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--accent); }
+.m-profil { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.m-btn-icone { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--trait); }
+.m-btn-icone svg { width: 24px; height: 24px; }
+.m-puce { display: flex; align-items: center; gap: 10px; padding: 5px 20px 5px 6px; border-radius: 999px; background: var(--surface); border: 1px solid var(--filet); --decoupe: var(--surface); }
+.m-puce b { font-size: 18px; font-weight: 600; }
+.m-puce small { font-size: 14px; color: var(--texte-2); font-weight: 500; }
+.m-corps { flex: 1; display: grid; grid-template-columns: 1fr 470px; gap: 30px; padding: 52px 40px 0 56px; }
+.m-surtitre { font-family: var(--titre); font-weight: 500; font-size: 15px; letter-spacing: .34em; text-transform: uppercase; color: var(--texte-2); margin: 0 0 6px; }
+.m-accueil h1 { font-size: 60px; line-height: 1.02; font-weight: 300; margin: 0 0 10px; }
+.m-sous { font-size: 20px; color: var(--texte-2); margin: 0 0 34px; }
+.m-actions { display: flex; gap: 22px; }
+.m-capsule {
+  width: 338px; height: 100px; border-radius: 50px; display: flex; align-items: center; gap: 16px; padding: 0 26px 0 20px;
+  border: 1.5px solid var(--texte-2); color: var(--texte);
+}
+.m-capsule .rond { width: 58px; height: 58px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; flex: none; }
+.m-capsule .rond svg { width: 28px; height: 28px; stroke: currentColor; }
+.m-capsule strong { font-family: var(--titre); font-weight: 500; font-size: 27px; display: block; line-height: 1.1; }
+.m-capsule span { font-size: 15px; line-height: 1.3; display: block; opacity: 1; }
+.m-primaire { background: var(--accent); color: var(--sur-accent); border-color: var(--accent); --decoupe: var(--accent); }
+.m-focus { outline: 2px solid var(--texte); outline-offset: 6px; }
+.m-jeux { margin-top: 54px; width: 760px; }
+.m-jeux-titre { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 12px; font-size: 22px; font-weight: 400; letter-spacing: .02em; }
+.m-jeux-titre span { font-family: var(--corps); font-size: 15px; font-weight: 600; color: var(--accent); }
+.m-jeux-liste { display: flex; gap: 22px; }
+.m-jeu { width: 236px; }
+.m-jeu svg { display: block; width: 236px; height: 112px; border-radius: 14px; box-shadow: 0 0 0 1px var(--trait); }
+.m-jeu b { display: block; padding: 8px 2px 0; font-size: 15px; font-weight: 600; }
+.m-orbite { position: relative; height: 470px; }
+.m-orbite > svg { position: absolute; left: 0; top: 0; }
+.m-joueur { position: absolute; top: 262px; width: 180px; text-align: center; }
+.m-joueur b { font-family: var(--titre); font-weight: 500; font-size: 24px; display: block; }
+.m-joueur small { font-size: 15px; color: var(--texte-2); display: inline-flex; align-items: center; gap: 8px; }
+.m-pastille { width: 9px; height: 9px; border-radius: 50%; background: var(--succes); display: inline-block; box-shadow: 0 0 0 4px rgba(107, 214, 154, .18); }
+.m-score { position: absolute; left: 0; right: 0; top: 108px; text-align: center; }
+.m-score b { font-family: var(--titre); font-weight: 300; font-size: 58px; line-height: 1; letter-spacing: .02em; }
+.m-score span { display: block; font-family: var(--titre); font-weight: 500; font-size: 13px; letter-spacing: .34em; text-transform: uppercase; color: var(--texte-2); margin-top: 6px; }
+.m-derniere { position: absolute; left: 30px; right: 30px; top: 372px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; color: var(--texte-2); padding: 12px 18px; border-radius: 999px; background: var(--surface); border: 1px solid var(--filet); }
+.m-derniere svg { width: 22px; height: 22px; stroke: var(--texte-2); }
+.m-pied { height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 56px; font-size: 15px; color: var(--texte-2); border-top: 1px solid var(--filet); }
+.m-pied kbd { font-family: var(--corps); font-size: 14px; font-weight: 600; color: var(--texte); border: 1.5px solid var(--trait); border-radius: 8px; padding: 2px 10px 3px; margin-left: 16px; }
+.m-pied kbd:first-child { margin-left: 0; }
+
+/* mouvement */
+.bloc-mouvement { display: flex; align-items: center; gap: 18px; padding: 10px 24px 10px 16px; height: 150px; }
+.images { display: flex; gap: 6px; flex: none; }
+.images figure { margin: 0; text-align: center; font-size: 12px; font-weight: 600; color: var(--texte-2); }
+.mouvement-texte b { font-family: var(--titre); font-weight: 400; font-size: 27px; display: block; margin-bottom: 4px; }
+.mouvement-texte p { margin: 0; font-size: 15.5px; line-height: 1.42; }
+.pied-planche { position: absolute; right: 48px; bottom: 12px; font-size: 12px; color: var(--texte-2); margin: 0; }
+</style>
+</head>
+<body>
+<svg class="ciel" id="ciel-planche" width="1920" height="1080" aria-hidden="true"></svg>
+<svg class="symboles" aria-hidden="true">
+  <defs>
+    <symbol id="croissant" viewBox="0 0 100 100"><path d="M 88.78 59.79 A 40 40 0 1 1 46.26 10.18 A 33 33 0 1 0 88.78 59.79 Z"/></symbol>
+    <!-- signes des joueurs: astre plein (joueur 1) et croissant (joueur 2), avec halo en anneau (sans flou) -->
+    <symbol id="signe-j1" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="var(--j1)" stroke-width="3" opacity=".45"/>
+      <circle cx="50" cy="50" r="32" fill="var(--j1)"/>
+    </symbol>
+    <symbol id="signe-j2" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="var(--j2)" stroke-width="3" opacity=".45"/>
+      <use href="#croissant" x="10" y="10" width="80" height="80" fill="var(--j2)"/>
+    </symbol>
+    <!-- anneau du logo: le « o » de duo est une orbite qui porte les deux astres -->
+    <symbol id="anneau" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="var(--texte)" stroke-width="10"/>
+      <circle cx="21.7" cy="21.7" r="19" fill="var(--decoupe)"/>
+      <circle cx="78.3" cy="78.3" r="19" fill="var(--decoupe)"/>
+      <circle cx="21.7" cy="21.7" r="13.5" fill="var(--j1)"/>
+      <use href="#croissant" x="61.4" y="61.4" width="33.8" height="33.8" fill="var(--j2)"/>
+    </symbol>
+    <!-- vignettes de jeux fictives, identiques sur les trois planches -->
+    <symbol id="v-2d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#7CCBF4"/>
+      <path fill="#FFFFFF" d="M20 20h30v10H20zM30 10h10v10H30zM95 30h20v10H95zM100 20h10v10h-10z"/>
+      <path fill="#FFD84D" d="M130 10h20v20h-20zM85 25h10v10H85z"/>
+      <path fill="#5DB257" d="M0 50h40v10H0zM10 40h20v10H10zM90 50h70v10H90zM100 40h40v10h-40zM110 30h20v10h-20z"/>
+      <rect y="60" width="160" height="10" fill="#3F8F46"/>
+      <rect y="70" width="160" height="20" fill="#8C5B3A"/>
+      <path fill="#6E4329" d="M20 80h10v10H20zM70 75h10v5H70zM120 80h10v10h-10z"/>
+      <path fill="#F5C9A0" d="M60 30h10v10H60z"/>
+      <path fill="#E5483B" d="M60 40h10v20H60z"/>
+    </symbol>
+    <symbol id="v-3d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#1B2550"/>
+      <circle cx="128" cy="20" r="8" fill="#F3E7B0"/>
+      <g fill="#FFFFFF"><circle cx="20" cy="14" r="1"/><circle cx="48" cy="8" r="1"/><circle cx="84" cy="16" r="1"/><circle cx="104" cy="6" r="1"/><circle cx="150" cy="34" r="1"/></g>
+      <polygon points="0,72 30,36 56,62 82,24 112,64 136,42 160,60 160,90 0,90" fill="#33558F"/>
+      <polygon points="30,36 42,64 56,62" fill="#26437A"/>
+      <polygon points="82,24 94,66 112,64" fill="#26437A"/>
+      <polygon points="136,42 146,64 160,60" fill="#26437A"/>
+      <polygon points="82,24 75,36 88,35" fill="#E3ECF8"/>
+      <polygon points="30,36 25,43 36,43" fill="#E3ECF8"/>
+      <polygon points="0,80 46,70 96,82 160,72 160,90 0,90" fill="#132042"/>
+      <g fill="#2A7F6A"><polygon points="18,82 24,68 30,82"/><polygon points="28,84 34,72 40,84"/><polygon points="120,80 126,66 132,80"/></g>
+    </symbol>
+    <symbol id="v-iso" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#F4DDB9"/>
+      <polygon points="28,56 80,82 80,88 28,62" fill="#5E9B4A"/>
+      <polygon points="80,82 132,56 132,62 80,88" fill="#4E8640"/>
+      <polygon points="80,30 132,56 80,82 28,56" fill="#8CC56E"/>
+      <polygon points="60,35 78,44 78,62 60,53" fill="#F2F4F8"/>
+      <polygon points="78,44 96,35 96,53 78,62" fill="#C9D3E0"/>
+      <polygon points="78,26 96,35 78,44 60,35" fill="#E0604F"/>
+      <polygon points="66,47 71,49.5 71,57.5 66,55" fill="#6B4A3A"/>
+      <rect x="108" y="46" width="3" height="10" fill="#7A5235"/>
+      <circle cx="109.5" cy="42" r="8" fill="#3F8F4E"/>
+    </symbol>
+    <symbol id="i-heberger" viewBox="0 0 24 24"><circle class="plein" cx="12" cy="12" r="2.4"/><path d="M8.2 8.2a5.4 5.4 0 0 0 0 7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.3 5.3a9.5 9.5 0 0 0 0 13.4M18.7 5.3a9.5 9.5 0 0 1 0 13.4"/></symbol>
+    <symbol id="i-rejoindre" viewBox="0 0 24 24"><circle cx="13.5" cy="13.5" r="7.5"/><circle class="plein" cx="8.2" cy="8.2" r="2.6"/><path d="M2.5 5.2l2 2M5.2 2.5l2 2"/></symbol>
+    <symbol id="i-bibliotheque" viewBox="0 0 24 24"><circle cx="6.5" cy="6.5" r="2.2"/><circle cx="17.5" cy="6.5" r="2.2"/><circle cx="6.5" cy="17.5" r="2.2"/><circle cx="17.5" cy="17.5" r="2.2"/><path d="M8.7 6.5h6.6M6.5 8.7v6.6M17.5 8.7v6.6M8.7 17.5h6.6"/></symbol>
+    <symbol id="i-historique" viewBox="0 0 24 24"><path d="M19.5 12A7.5 7.5 0 1 1 12 4.5"/><path d="M12 8.5V12l2.5 2"/><circle class="plein" cx="12" cy="4.5" r="2"/></symbol>
+    <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M4 8h16M4 16h16"/><circle class="creux" cx="9" cy="8" r="2.6"/><circle class="creux" cx="15" cy="16" r="2.6"/></symbol>
+    <symbol id="i-score" viewBox="0 0 24 24"><polygon points="12.00,3.80 14.17,9.61 20.37,9.88 15.52,13.74 17.17,19.72 12.00,16.30 6.83,19.72 8.48,13.74 3.63,9.88 9.83,9.61"/></symbol>
+  </defs>
+</svg>
+
+<div class="planche">
+  <header>
+    <div>
+      <p class="surtitre">Duo · identité visuelle · piste B</p>
+      <h1 class="nom titre">Étoile double</h1>
+    </div>
+    <div class="intention">
+      <p>Deux astres qui se trouvent dans la nuit et tournent ensemble&nbsp;: une interface calme et sombre, qui s'efface pour laisser briller les jeux.</p>
+      <div class="adjectifs"><span>calme</span><span>nocturne</span><span>complice</span></div>
+    </div>
+  </header>
+
+  <section class="gauche">
+    <div class="carte bloc-logo">
+      <span class="logo logo-grand" role="img" aria-label="Logo Duo, piste B">du<svg class="o" viewBox="0 0 100 100"><use href="#anneau"/></svg></span>
+      <div class="icones-app">
+        <figure>
+          <svg width="112" height="112" viewBox="0 0 112 112">
+            <rect x="1" y="1" width="110" height="110" rx="28" fill="var(--fond)" stroke="var(--trait)" stroke-width="2"/>
+            <g fill="var(--texte)"><circle cx="24" cy="26" r="1.4"/><circle cx="88" cy="20" r="1.1"/><circle cx="92" cy="86" r="1.4"/><circle cx="18" cy="84" r="1"/></g>
+            <svg x="22" y="22" width="68" height="68" viewBox="0 0 100 100" style="--decoupe: var(--fond)"><use href="#anneau"/></svg>
+          </svg>
+          icône 112
+        </figure>
+        <figure>
+          <svg width="48" height="48" viewBox="0 0 112 112">
+            <rect x="2" y="2" width="108" height="108" rx="28" fill="var(--fond)" stroke="var(--trait)" stroke-width="4"/>
+            <svg x="20" y="20" width="72" height="72" viewBox="0 0 100 100" style="--decoupe: var(--fond)"><use href="#anneau"/></svg>
+          </svg>
+          48
+        </figure>
+        <figure>
+          <svg width="24" height="24" viewBox="0 0 112 112">
+            <rect x="3" y="3" width="106" height="106" rx="28" fill="var(--fond)" stroke="var(--trait)" stroke-width="6"/>
+            <circle cx="40" cy="56" r="20" fill="var(--j1)"/>
+            <use href="#croissant" x="52" y="31" width="50" height="50" fill="var(--j2)"/>
+          </svg>
+          24
+        </figure>
+      </div>
+    </div>
+
+    <div>
+      <p class="etiquette">Palette · rôle et contraste</p>
+      <div class="nuancier">
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--fond); box-shadow: inset 0 0 0 1px var(--trait)"></div><div class="infos"><b>Fond</b><code data-hex="fond"></code><small>nuit indigo</small></div></div>
+        <div class="pastille-couleur"><div class="aplat"><i style="background:var(--surface)"></i><i style="background:var(--surface-2)"></i></div><div class="infos"><b>Surfaces</b><code><span data-hex="surface"></span> <span data-hex="surface-2"></span></code><small>panneaux, survol</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--trait)"></div><div class="infos"><b>Trait</b><code data-hex="trait"></code><small>orbites, bordures</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte)"></div><div class="infos"><b>Texte</b><code data-hex="texte"></code><small><span data-contraste="texte fond"></span> sur fond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte-2)"></div><div class="infos"><b>Texte second.</b><code data-hex="texte-2"></code><small><span data-contraste="texte-2 surface-2"></span> au pire</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--accent)"></div><div class="infos"><b>Accent</b><code data-hex="accent"></code><small>or, libellé <span data-contraste="sur-accent accent"></span></small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j1)"></div><div class="infos"><b>Joueur 1</b><code data-hex="j1"></code><small>aqua, clair</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j2)"></div><div class="infos"><b>Joueur 2</b><code data-hex="j2"></code><small>mauve, plus sombre</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--succes)"></div><div class="infos"><b>Succès</b><code data-hex="succes"></code><small><span data-contraste="succes surface"></span> sur surface</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--erreur)"></div><div class="infos"><b>Erreur</b><code data-hex="erreur"></code><small><span data-contraste="erreur surface"></span> sur surface</small></div></div>
+      </div>
+    </div>
+
+    <div class="typos">
+      <div class="carte typo">
+        <p class="etiquette">Titres · Jost</p>
+        <p class="specimen-titre titre">Bonsoir, Alex</p>
+        <p class="glyphes titre">Aa Éé Çç 0123 «&nbsp;?&nbsp;»</p>
+        <p class="licence">OFL · @fontsource-variable/jost · 300 à 500</p>
+      </div>
+      <div class="carte typo">
+        <p class="etiquette">Texte · DM Sans</p>
+        <p class="specimen-texte">Sam est visible sur le réseau. Choisis un jeu, il te rejoint d'une touche. Àà Éé Çç Œœ 0123</p>
+        <p class="licence">OFL · @fontsource-variable/dm-sans · 400 à 700</p>
+      </div>
+    </div>
+
+    <div class="carte bloc-signes">
+      <div class="signe"><svg width="64" height="64"><use href="#signe-j1"/></svg><div><b>Joueur 1</b><span>astre plein aqua, clair</span></div></div>
+      <div class="signe"><svg width="64" height="64"><use href="#signe-j2"/></svg><div><b>Joueur 2</b><span>croissant mauve, plus sombre</span></div></div>
+      <div class="icones">
+        <figure><svg class="ico"><use href="#i-heberger"/></svg>Héberger</figure>
+        <figure><svg class="ico"><use href="#i-rejoindre"/></svg>Rejoindre</figure>
+        <figure><svg class="ico"><use href="#i-bibliotheque"/></svg>Jeux</figure>
+        <figure><svg class="ico"><use href="#i-historique"/></svg>Historique</figure>
+        <figure><svg class="ico"><use href="#i-reglages"/></svg>Réglages</figure>
+        <figure><svg class="ico"><use href="#i-score"/></svg>Score</figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="droite">
+    <p class="legende-maquette"><span class="etiquette" style="margin:0">Écran d'accueil · maquette</span><span>dessinée en 1366x768, réduite à 75&nbsp;%, focus clavier sur «&nbsp;Héberger&nbsp;», vignettes de jeux fictives identiques sur les trois pistes</span></p>
+    <div class="cadre-ecran">
+      <div class="ecran">
+        <svg class="ciel" id="ciel-ecran" width="1366" height="768" aria-hidden="true"></svg>
+        <div class="m-barre">
+          <span class="logo m-logo">du<svg class="o" viewBox="0 0 100 100"><use href="#anneau"/></svg></span>
+          <nav class="m-nav"><span class="actif">Accueil</span><span>Bibliothèque</span><span>Historique</span></nav>
+          <div class="m-profil">
+            <span class="m-btn-icone"><svg class="ico"><use href="#i-reglages"/></svg></span>
+            <div class="m-puce"><svg width="38" height="38"><use href="#signe-j1"/></svg><div><b>Alex</b> <small>mon profil</small></div></div>
+          </div>
+        </div>
+        <div class="m-corps">
+          <section class="m-accueil">
+            <p class="m-surtitre">Ce soir</p>
+            <h1 class="titre">Bonsoir, Alex</h1>
+            <p class="m-sous">Sam est visible sur le réseau. On lance une partie&#8239;?</p>
+            <div class="m-actions">
+              <div class="m-capsule m-primaire m-focus">
+                <span class="rond"><svg class="ico"><use href="#i-heberger"/></svg></span>
+                <div><strong>Héberger</strong><span>Tu choisis le jeu, Sam te rejoint.</span></div>
+              </div>
+              <div class="m-capsule">
+                <span class="rond"><svg class="ico"><use href="#i-rejoindre"/></svg></span>
+                <div><strong>Rejoindre</strong><span>Rejoins le salon de Sam.</span></div>
+              </div>
+            </div>
+            <div class="m-jeux">
+              <p class="m-jeux-titre titre">Nos jeux <span>Toute la bibliothèque</span></p>
+              <div class="m-jeux-liste">
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-2d"/></svg><b>Vignette 2D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg><b>Vignette 3D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-iso"/></svg><b>Vignette isométrique</b></div>
+              </div>
+            </div>
+          </section>
+          <aside class="m-orbite">
+            <svg width="470" height="300" viewBox="0 0 470 300">
+              <ellipse cx="235" cy="150" rx="222" ry="92" fill="none" stroke="var(--filet)" stroke-width="1.5" stroke-dasharray="3 7"/>
+              <ellipse cx="235" cy="150" rx="185" ry="70" fill="none" stroke="var(--trait)" stroke-width="1.5"/>
+              <svg x="10" y="110" width="80" height="80"><use href="#signe-j1"/></svg>
+              <svg x="380" y="110" width="80" height="80"><use href="#signe-j2"/></svg>
+            </svg>
+            <div class="m-score"><b>12 · 14</b><span>victoires</span></div>
+            <div class="m-joueur" style="left:-40px"><b>Alex</b><small>toi, sur ce Mac</small></div>
+            <div class="m-joueur" style="left:330px"><b>Sam</b><small><i class="m-pastille"></i>en ligne, sur le PC</small></div>
+            <div class="m-derniere"><svg class="ico"><use href="#i-historique"/></svg><span>Dernière partie&nbsp;: hier soir, victoire de Sam.</span></div>
+          </aside>
+        </div>
+        <div class="m-pied"><kbd>Tab</kbd> naviguer <kbd>Entrée</kbd> choisir <kbd>Échap</kbd> revenir</div>
+      </div>
+    </div>
+
+    <div class="carte bloc-mouvement">
+      <div class="images">
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <path d="M24 52 Q44 30 64 40 M104 52 Q84 74 64 64" fill="none" stroke="var(--trait)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+            <svg x="10" y="40" width="24" height="24"><use href="#signe-j1"/></svg>
+            <svg x="94" y="40" width="24" height="24"><use href="#signe-j2"/></svg>
+          </svg>
+          0 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <path d="M24 52 Q34 36 44 34 M104 52 Q94 68 84 70" fill="none" stroke="var(--trait)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/>
+            <svg x="34" y="22" width="24" height="24"><use href="#signe-j1"/></svg>
+            <svg x="70" y="58" width="24" height="24"><use href="#signe-j2"/></svg>
+          </svg>
+          300 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104">
+            <ellipse cx="64" cy="52" rx="46" ry="17" fill="none" stroke="var(--trait)" stroke-width="1.5"/>
+            <svg x="6" y="40" width="24" height="24"><use href="#signe-j1"/></svg>
+            <svg x="98" y="40" width="24" height="24"><use href="#signe-j2"/></svg>
+          </svg>
+          600 ms
+        </figure>
+      </div>
+      <div class="mouvement-texte">
+        <b class="titre">Se trouver, puis graviter</b>
+        <p>Lent et continu&nbsp;: 300 à 600 ms, accélérations douces, jamais de rebond. Les attentes tournent en orbite (un tour en 4 s), cinq étoiles au plus scintillent. Avec «&nbsp;réduire les animations&nbsp;», tout reste fixe.</p>
+      </div>
+    </div>
+  </section>
+</div>
+<p class="pied-planche">Planche de proposition · 2026-10-30 · dessins originaux du studio, polices OFL embarquées</p>
+
+<script>
+(function () {
+  var css = getComputedStyle(document.documentElement);
+  function couleur(nom) { return css.getPropertyValue('--' + nom).trim(); }
+  function lineaire(c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function luminance(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return 0.2126 * lineaire((n >> 16) & 255) + 0.7152 * lineaire((n >> 8) & 255) + 0.0722 * lineaire(n & 255);
+  }
+  function rapport(a, b) {
+    var la = luminance(a), lb = luminance(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  document.querySelectorAll('[data-hex]').forEach(function (el) { el.textContent = couleur(el.dataset.hex).toUpperCase(); });
+  document.querySelectorAll('[data-contraste]').forEach(function (el) {
+    var p = el.dataset.contraste.split(' ');
+    el.textContent = rapport(couleur(p[0]), couleur(p[1])).toFixed(1).replace('.', ',') + ':1';
+  });
+
+  // Ciel étoilé statique: tirage pseudo-aléatoire à graine fixe, donc identique à chaque rendu.
+  // En production, le même script produira un fichier SVG figé (aucun calcul à l'exécution).
+  function graine(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function ciel(id, largeur, hauteur, nombre, germe) {
+    var svg = document.getElementById(id), alea = graine(germe), ns = 'http://www.w3.org/2000/svg';
+    for (var i = 0; i < nombre; i++) {
+      var c = document.createElementNS(ns, 'circle'), r = alea();
+      c.setAttribute('cx', (alea() * largeur).toFixed(1));
+      c.setAttribute('cy', (alea() * hauteur).toFixed(1));
+      c.setAttribute('r', (0.5 + r * r * 1.3).toFixed(2));
+      c.setAttribute('fill', alea() < 0.12 ? couleur('accent') : couleur('texte'));
+      c.setAttribute('opacity', (0.25 + alea() * 0.6).toFixed(2));
+      svg.appendChild(c);
+    }
+  }
+  ciel('ciel-planche', 1920, 1080, 170, 20261030);
+  ciel('ciel-ecran', 1366, 768, 80, 7);
+})();
+</script>
+</body>
+</html>

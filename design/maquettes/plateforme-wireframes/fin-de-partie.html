@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E14 Fin de partie</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .fin { max-width: 1000px; margin: 0 auto; display: grid; gap: 18px; min-height: 100%; align-content: center; }
+  .titre-fin { text-align: center; }
+  .titre-fin h1 { font-size: 44px; }
+  .carte-joueur { grid-template-columns: auto 1fr auto; min-height: 0; }
+  .carte-joueur .score-partie { font-size: 40px; font-weight: 800; font-variant-numeric: tabular-nums; text-align: right; }
+  .carte-joueur .score-partie span { font-size: 16px; font-weight: 600; color: var(--encre-2); }
+  .carte-joueur .stats { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; margin: 0; font-size: 15px; }
+  .carte-joueur .stats dt { color: var(--encre-2); }
+  .carte-joueur .stats dd { margin: 0; font-weight: 700; text-align: right; }
+  .carte-joueur .etat { min-height: 30px; }
+  .victoire { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; border-bottom: 3px solid #111; }
+  .cumul { display: grid; gap: 8px; }
+  .score-ligne { display: flex; align-items: baseline; gap: 26px; flex-wrap: wrap; }
+  .joueur-score { display: inline-flex; align-items: center; gap: 8px; font-size: 18px; }
+  .chiffre-score { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .plus-un { display: inline-block; border: 2px solid #111; border-radius: 999px; padding: 0 8px; font-weight: 800; font-size: 15px; }
+  .progression-commune { height: 18px; border: 2px solid #111; border-radius: 999px; overflow: hidden; display: grid; grid-template-columns: repeat(10, 1fr); }
+  .progression-commune span { border-right: 2px solid #111; }
+  .progression-commune span:last-child { border-right: none; }
+  .progression-commune span.fait { background: #111; }
+  .progression-commune span.nouveau { background: repeating-linear-gradient(135deg, #111 0 4px, #fff 4px 8px); }
+  .confirmations { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; }
+  .confirmations p { display: inline-flex; align-items: center; gap: 8px; }
+  .actions-fin { justify-content: center; }
+  .actions-fin .bouton.grand { min-width: 240px; }
+</style>
+</head>
+<body data-etat-defaut="affrontement">
+<div class="app">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <h1 style="font-size: 20px">Fin de partie</h1>
+    <div class="droite"><span class="moi"><span class="symbole" data-forme="rond"></span>Camille</span></div>
+  </header>
+
+  <main class="contenu">
+    <!-- Affrontement: vu par Camille, qui a gagné -->
+    <div class="fin" data-si="affrontement">
+      <div class="titre-fin">
+        <h1>Tu as gagné !</h1>
+        <p class="sous-titre">Jeu témoin · 3 min 12 s</p>
+      </div>
+      <div class="joueurs">
+        <article class="carte-joueur moi-meme">
+          <span class="symbole grand" data-forme="rond"></span>
+          <div>
+            <p class="nom">Camille <span class="aide">(toi)</span></p>
+            <span class="victoire"><span class="icone" data-icone="coche"></span>Victoire</span>
+          </div>
+          <p class="score-partie">12 <span>points</span></p>
+          <dl class="stats"><dt>Meilleure série</dt><dd>5</dd><dt>Précision</dt><dd>68 %</dd></dl>
+          <div class="etat"><span class="puce attente" id="puce-moi" hidden><span class="icone" data-icone="coche"></span>Veut rejouer</span></div>
+        </article>
+        <article class="carte-joueur">
+          <span class="symbole grand" data-forme="triangle" data-ton="clair"></span>
+          <div><p class="nom">Sacha</p></div>
+          <p class="score-partie">9 <span>points</span></p>
+          <dl class="stats"><dt>Meilleure série</dt><dd>4</dd><dt>Précision</dt><dd>61 %</dd></dl>
+          <div class="etat"><span class="puce ok"><span class="icone" data-icone="coche"></span>Veut rejouer</span></div>
+        </article>
+      </div>
+      <section class="bloc gris cumul" aria-labelledby="titre-cumul">
+        <h2 class="titre-bloc" id="titre-cumul">Score cumulé · Jeu témoin</h2>
+        <div class="score-ligne">
+          <span class="joueur-score"><span class="symbole" data-forme="rond"></span>Camille <span class="chiffre-score">13</span><span class="plus-un">+1</span></span>
+          <span class="joueur-score"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha <span class="chiffre-score">15</span></span>
+          <span class="meta">2 égalités</span>
+        </div>
+        <p class="aide">Tous les jeux en affrontement : Camille 32 · Sacha 34</p>
+      </section>
+      <div class="confirmations">
+        <p><span class="icone" data-icone="reussi"></span>Partie enregistrée dans votre historique.</p>
+      </div>
+      <div class="rangee-boutons actions-fin">
+        <button class="bouton principal grand" id="rejouer" data-focus>Rejouer</button>
+        <button class="bouton grand" data-aller="salon-hote.html">Retour au salon <kbd>Échap</kbd></button>
+      </div>
+    </div>
+
+    <!-- Coopération -->
+    <div class="fin" data-si="cooperation">
+      <div class="titre-fin">
+        <h1>Vous avez réussi !</h1>
+        <p class="sous-titre">Exemple coop · Niveau 3 terminé · 24 min</p>
+      </div>
+      <div class="joueurs">
+        <article class="carte-joueur moi-meme">
+          <span class="symbole grand" data-forme="rond"></span>
+          <div><p class="nom">Camille <span class="aide">(toi)</span></p></div>
+          <span></span>
+          <dl class="stats"><dt>Pièces</dt><dd>42</dd><dt>Chutes</dt><dd>3</dd></dl>
+          <div class="etat"></div>
+        </article>
+        <article class="carte-joueur">
+          <span class="symbole grand" data-forme="triangle" data-ton="clair"></span>
+          <div><p class="nom">Sacha</p></div>
+          <span></span>
+          <dl class="stats"><dt>Pièces</dt><dd>37</dd><dt>Chutes</dt><dd>1</dd></dl>
+          <div class="etat"><span class="puce ok"><span class="icone" data-icone="coche"></span>Veut continuer</span></div>
+        </article>
+      </div>
+      <section class="bloc gris cumul" aria-labelledby="titre-progression">
+        <h2 class="titre-bloc" id="titre-progression">Progression commune · Exemple coop</h2>
+        <div class="progression-commune" aria-hidden="true">
+          <span class="fait"></span><span class="fait"></span><span class="fait"></span><span class="nouveau"></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="fort">Niveau 4 sur 10 débloqué · 12 parties ensemble</p>
+      </section>
+      <div class="confirmations">
+        <p><span class="icone" data-icone="reussi"></span>Progression enregistrée.</p>
+        <p><span class="icone" data-icone="reussi"></span>Partie enregistrée dans votre historique.</p>
+      </div>
+      <div class="rangee-boutons actions-fin">
+        <button class="bouton principal grand" data-focus>Niveau suivant</button>
+        <button class="bouton grand" data-aller="salon-hote.html">Retour au salon <kbd>Échap</kbd></button>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  document.getElementById('rejouer').addEventListener('click', () => {
+    document.getElementById('puce-moi').hidden = false;
+    document.getElementById('puce-moi').className = 'puce ok';
+  });
+  Duo.surEchap = function () {
+    location.href = 'salon-hote.html';
+    return true;
+  };
+</script>
+</body>
+</html>

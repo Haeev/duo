@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duo · piste A · Boîte à jeux</title>
+<link rel="stylesheet" href="node_modules/@fontsource-variable/fraunces/full.css">
+<link rel="stylesheet" href="node_modules/@fontsource-variable/nunito/wght.css">
+<style>
+/* palette:debut (lue par controler.cjs: rôle et couleur de chaque variable) */
+:root {
+  --fond: #F3EADA;
+  --surface: #FFFAF1;
+  --tranche: #DCC8A6;
+  --texte: #2B2118;
+  --texte-2: #6B5747;
+  --accent: #1C6E6B;
+  --sur-accent: #FFFAF1;
+  --j1: #E3A33A;
+  --sur-j1: #2B2118;
+  --j2: #2E4A8B;
+  --sur-j2: #FFFAF1;
+  --succes: #2E6E35;
+  --erreur: #B83A2B;
+}
+/* palette:fin */
+:root {
+  --accent-tranche: #12504E;
+  --j1-tranche: #B07A1E;
+  --j2-tranche: #1D3263;
+  --titre: 'Fraunces Variable', serif;
+  --corps: 'Nunito Variable', sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body { background: var(--fond); color: var(--texte); font-family: var(--corps); font-size: 16px; }
+.titre { font-family: var(--titre); font-variation-settings: 'SOFT' 100, 'WONK' 1; font-optical-sizing: auto; }
+.symboles { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.planche {
+  width: 1920px; height: 1080px; padding: 30px 48px 34px;
+  display: grid; grid-template-columns: 760px 1024px; column-gap: 40px;
+  grid-template-rows: 178px 1fr; row-gap: 26px;
+}
+header { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: flex-end; }
+.surtitre { font-weight: 800; font-size: 14px; letter-spacing: .16em; text-transform: uppercase; color: var(--texte-2); margin: 0 0 6px; }
+h1.nom { font-size: 112px; line-height: .95; font-weight: 850; margin: 0; letter-spacing: -.015em; }
+.intention { width: 900px; padding-bottom: 8px; }
+.intention p { font-size: 25px; line-height: 1.38; margin: 0 0 18px; font-weight: 500; }
+.adjectifs { display: flex; gap: 14px; }
+.adjectifs span {
+  font-family: var(--titre); font-variation-settings: 'SOFT' 100, 'WONK' 0; font-weight: 700; font-size: 22px;
+  background: var(--surface); border: 2px solid var(--texte); border-radius: 999px; padding: 6px 20px 8px;
+  box-shadow: 0 5px 0 0 var(--tranche), 0 5px 0 2px var(--texte);
+}
+
+.carte { background: var(--surface); border: 2px solid var(--tranche); border-radius: 18px; box-shadow: 0 6px 0 var(--tranche); }
+.etiquette { font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--texte-2); margin: 0 0 10px; }
+.gauche { display: flex; flex-direction: column; gap: 20px; }
+.droite { display: flex; flex-direction: column; gap: 14px; }
+
+/* logo */
+.bloc-logo { height: 196px; display: flex; align-items: center; justify-content: space-between; padding: 18px 26px 16px 22px; }
+.logo-grand { width: 450px; height: 160px; }
+.icones-app { display: flex; align-items: flex-end; gap: 16px; }
+.icones-app figure { margin: 0; text-align: center; font-size: 12px; color: var(--texte-2); font-weight: 700; }
+.icones-app svg { display: block; margin: 0 auto 6px; }
+
+/* palette */
+.nuancier { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 12px; }
+.pastille-couleur { background: var(--surface); border: 2px solid var(--tranche); border-radius: 14px; overflow: hidden; box-shadow: 0 4px 0 var(--tranche); }
+.pastille-couleur .aplat { height: 46px; border-bottom: 2px solid var(--tranche); }
+.pastille-couleur .infos { padding: 6px 10px 7px; line-height: 1.2; }
+.pastille-couleur b { display: block; font-size: 14px; font-weight: 800; }
+.pastille-couleur code { font-family: var(--corps); font-size: 13px; font-weight: 700; color: var(--texte-2); font-variant-numeric: tabular-nums; }
+.pastille-couleur small { display: block; font-size: 11.5px; color: var(--texte-2); font-weight: 600; margin-top: 1px; }
+
+/* typographies */
+.typos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.typo { padding: 14px 18px 12px; height: 162px; position: relative; }
+.typo .specimen-titre { font-size: 42px; line-height: 1.05; font-weight: 800; margin: 0 0 4px; }
+.typo .specimen-texte { font-size: 17px; line-height: 1.4; margin: 4px 0 6px; }
+.typo .licence { position: absolute; left: 18px; bottom: 10px; font-size: 12px; color: var(--texte-2); font-weight: 700; }
+.typo .glyphes { font-size: 20px; font-weight: 600; margin: 0; color: var(--texte-2); }
+
+/* signes et icônes */
+.bloc-signes { display: flex; align-items: center; gap: 22px; padding: 12px 20px; height: 124px; }
+.signe { display: flex; align-items: center; gap: 10px; width: 196px; }
+.signe svg { flex: none; }
+.signe b { display: block; font-size: 15px; font-weight: 800; }
+.signe span { font-size: 12.5px; color: var(--texte-2); font-weight: 600; line-height: 1.25; display: block; }
+.icones { display: flex; gap: 12px; margin-left: auto; }
+.icones figure { margin: 0; width: 46px; text-align: center; font-size: 10.5px; font-weight: 700; color: var(--texte-2); }
+.icones svg { width: 30px; height: 30px; display: block; margin: 0 auto 5px; stroke: var(--texte); fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+
+/* maquette */
+.legende-maquette { display: flex; justify-content: space-between; align-items: baseline; margin: 0; height: 18px; }
+.legende-maquette span { font-size: 13px; color: var(--texte-2); font-weight: 700; }
+.cadre-ecran { width: 1024px; height: 576px; border-radius: 16px; overflow: hidden; box-shadow: 0 0 0 2px var(--texte), 0 8px 0 0 var(--tranche), 0 8px 0 2px var(--texte); flex: none; }
+.ecran { width: 1366px; height: 768px; transform: scale(.75); transform-origin: 0 0; background: var(--fond); position: relative; display: flex; flex-direction: column; }
+.m-barre { height: 84px; display: flex; align-items: center; padding: 0 40px; gap: 40px; border-bottom: 2px solid var(--tranche); background: var(--surface); }
+.m-logo { display: flex; align-items: center; gap: 8px; }
+.m-logo span { font-size: 40px; font-weight: 850; line-height: 1; margin-top: -6px; }
+.m-nav { display: flex; gap: 8px; }
+.m-nav span { font-size: 18px; font-weight: 800; padding: 10px 18px 11px; border-radius: 12px; color: var(--texte-2); }
+.m-nav span.actif { color: var(--texte); background: var(--fond); box-shadow: inset 0 0 0 2px var(--tranche); }
+.m-profil { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.m-btn-icone { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: var(--fond); border: 2px solid var(--tranche); }
+.m-btn-icone svg { width: 26px; height: 26px; stroke: var(--texte); fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+.m-puce { display: flex; align-items: center; gap: 10px; padding: 5px 18px 5px 8px; border-radius: 999px; background: var(--fond); border: 2px solid var(--tranche); }
+.m-puce b { font-size: 19px; font-weight: 800; }
+.m-puce small { font-size: 14px; color: var(--texte-2); font-weight: 700; }
+.m-corps { flex: 1; display: grid; grid-template-columns: 1fr 440px; gap: 40px; padding: 34px 40px 0 56px; }
+.m-accueil h1 { font-size: 58px; line-height: 1; font-weight: 800; margin: 0 0 10px; letter-spacing: -.01em; }
+.m-sous { font-size: 22px; color: var(--texte-2); margin: 0 0 26px; font-weight: 600; }
+.m-actions { display: flex; gap: 26px; }
+.m-tuile {
+  font: inherit; color: inherit; text-align: left; width: 330px; height: 196px; padding: 20px 24px; border-radius: 22px;
+  background: var(--surface); border: 2px solid var(--texte); box-shadow: 0 8px 0 0 var(--tranche), 0 8px 0 2px var(--texte);
+  display: flex; flex-direction: column; align-items: flex-start; position: relative;
+}
+.m-tuile svg { width: 46px; height: 46px; stroke: currentColor; fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; margin-bottom: auto; }
+.m-tuile strong { font-family: var(--titre); font-variation-settings: 'SOFT' 100, 'WONK' 1; font-optical-sizing: auto; font-size: 40px; font-weight: 800; line-height: 1.1; }
+.m-tuile span { font-size: 17px; font-weight: 600; line-height: 1.35; margin-top: 4px; }
+.m-primaire { background: var(--accent); color: var(--sur-accent); box-shadow: 0 8px 0 0 var(--accent-tranche), 0 8px 0 2px var(--texte); }
+.m-focus { outline: 4px solid var(--texte); outline-offset: 6px; }
+.m-touche { position: absolute; right: 18px; top: 20px; font-size: 13px; font-weight: 800; padding: 3px 9px 4px; border-radius: 8px; background: var(--sur-accent); color: var(--accent); }
+.m-derniere { margin: 18px 0 0; padding-top: 14px; border-top: 2px dashed var(--tranche); font-size: 16px; color: var(--texte-2); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.m-jeux { margin-top: 30px; width: 760px; }
+.m-jeux-titre { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 10px; font-size: 24px; font-weight: 800; }
+.m-jeux-titre span { font-family: var(--corps); font-size: 16px; font-weight: 800; color: var(--accent); }
+.m-jeux-liste { display: flex; gap: 20px; }
+.m-jeu { width: 240px; background: var(--surface); border: 2px solid var(--texte); border-radius: 16px; overflow: hidden; box-shadow: 0 6px 0 0 var(--tranche), 0 6px 0 2px var(--texte); }
+.m-jeu svg { display: block; width: 100%; height: 100px; border-bottom: 2px solid var(--texte); }
+.m-jeu b { display: block; padding: 6px 12px 8px; font-size: 16px; font-weight: 800; }
+.m-derniere svg { width: 24px; height: 24px; stroke: var(--texte-2); fill: none; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+.m-table { padding: 24px 28px; align-self: start; }
+.m-table h2 { font-size: 30px; font-weight: 800; margin: 0 0 16px; }
+.m-joueur { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 2px dashed var(--tranche); }
+.m-joueur b { display: block; font-size: 24px; font-weight: 850; }
+.m-joueur small { font-size: 16px; color: var(--texte-2); font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.m-pastille { width: 12px; height: 12px; border-radius: 50%; background: var(--succes); display: inline-block; }
+.m-score { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+.m-score div { display: flex; align-items: center; gap: 8px; }
+.m-score b { font-family: var(--titre); font-variation-settings: 'SOFT' 100, 'WONK' 0; font-size: 58px; font-weight: 800; line-height: 1; }
+.m-score span { font-size: 15px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--texte-2); }
+.m-pied { height: 62px; display: flex; align-items: center; gap: 12px; padding: 0 56px; font-size: 16px; font-weight: 700; color: var(--texte-2); border-top: 2px solid var(--tranche); }
+.m-pied kbd { font-family: var(--corps); font-size: 15px; font-weight: 800; color: var(--texte); background: var(--surface); border: 2px solid var(--texte); border-radius: 9px; padding: 2px 10px 3px; box-shadow: 0 3px 0 0 var(--tranche), 0 3px 0 2px var(--texte); margin-left: 14px; }
+.m-pied kbd:first-child { margin-left: 0; }
+
+/* mouvement */
+.bloc-mouvement { display: flex; align-items: center; gap: 18px; padding: 10px 22px 10px 14px; height: 150px; }
+.images { display: flex; gap: 6px; flex: none; }
+.images figure { margin: 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--texte-2); }
+.mouvement-texte b { font-family: var(--titre); font-variation-settings: 'SOFT' 100, 'WONK' 1; font-size: 26px; font-weight: 800; display: block; margin-bottom: 4px; }
+.mouvement-texte p { margin: 0; font-size: 15.5px; line-height: 1.4; font-weight: 600; }
+.pied-planche { position: absolute; right: 48px; bottom: 12px; font-size: 12px; color: var(--texte-2); font-weight: 700; }
+</style>
+</head>
+<body>
+<svg class="symboles" aria-hidden="true">
+  <defs>
+    <symbol id="pion" viewBox="0 0 100 100">
+      <g stroke="var(--texte)" stroke-width="4.5" stroke-linejoin="round">
+        <rect x="20" y="82" width="60" height="15" rx="7.5" fill="var(--j1-tranche)"/>
+        <path d="M41 46 Q44 66 32 81 L68 81 Q56 66 59 46 Z" fill="var(--j1)"/>
+        <rect x="20" y="76" width="60" height="15" rx="7.5" fill="var(--j1)"/>
+        <ellipse cx="50" cy="45" rx="15" ry="5" fill="var(--j1)"/>
+        <circle cx="50" cy="25" r="16" fill="var(--j1)"/>
+      </g>
+    </symbol>
+    <symbol id="de" viewBox="0 0 100 100">
+      <g stroke="var(--texte)" stroke-width="4.5" stroke-linejoin="round">
+        <rect x="13" y="20" width="74" height="74" rx="17" fill="var(--j2-tranche)"/>
+        <rect x="13" y="12" width="74" height="74" rx="17" fill="var(--j2)"/>
+      </g>
+      <circle cx="35" cy="33" r="8" fill="var(--surface)"/>
+      <circle cx="65" cy="65" r="8" fill="var(--surface)"/>
+    </symbol>
+    <!-- vignettes de jeux fictives, identiques sur les trois planches -->
+    <symbol id="v-2d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#7CCBF4"/>
+      <path fill="#FFFFFF" d="M20 20h30v10H20zM30 10h10v10H30zM95 30h20v10H95zM100 20h10v10h-10z"/>
+      <path fill="#FFD84D" d="M130 10h20v20h-20zM85 25h10v10H85z"/>
+      <path fill="#5DB257" d="M0 50h40v10H0zM10 40h20v10H10zM90 50h70v10H90zM100 40h40v10h-40zM110 30h20v10h-20z"/>
+      <rect y="60" width="160" height="10" fill="#3F8F46"/>
+      <rect y="70" width="160" height="20" fill="#8C5B3A"/>
+      <path fill="#6E4329" d="M20 80h10v10H20zM70 75h10v5H70zM120 80h10v10h-10z"/>
+      <path fill="#F5C9A0" d="M60 30h10v10H60z"/>
+      <path fill="#E5483B" d="M60 40h10v20H60z"/>
+    </symbol>
+    <symbol id="v-3d" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#1B2550"/>
+      <circle cx="128" cy="20" r="8" fill="#F3E7B0"/>
+      <g fill="#FFFFFF"><circle cx="20" cy="14" r="1"/><circle cx="48" cy="8" r="1"/><circle cx="84" cy="16" r="1"/><circle cx="104" cy="6" r="1"/><circle cx="150" cy="34" r="1"/></g>
+      <polygon points="0,72 30,36 56,62 82,24 112,64 136,42 160,60 160,90 0,90" fill="#33558F"/>
+      <polygon points="30,36 42,64 56,62" fill="#26437A"/>
+      <polygon points="82,24 94,66 112,64" fill="#26437A"/>
+      <polygon points="136,42 146,64 160,60" fill="#26437A"/>
+      <polygon points="82,24 75,36 88,35" fill="#E3ECF8"/>
+      <polygon points="30,36 25,43 36,43" fill="#E3ECF8"/>
+      <polygon points="0,80 46,70 96,82 160,72 160,90 0,90" fill="#132042"/>
+      <g fill="#2A7F6A"><polygon points="18,82 24,68 30,82"/><polygon points="28,84 34,72 40,84"/><polygon points="120,80 126,66 132,80"/></g>
+    </symbol>
+    <symbol id="v-iso" viewBox="0 0 160 90">
+      <rect width="160" height="90" fill="#F4DDB9"/>
+      <polygon points="28,56 80,82 80,88 28,62" fill="#5E9B4A"/>
+      <polygon points="80,82 132,56 132,62 80,88" fill="#4E8640"/>
+      <polygon points="80,30 132,56 80,82 28,56" fill="#8CC56E"/>
+      <polygon points="60,35 78,44 78,62 60,53" fill="#F2F4F8"/>
+      <polygon points="78,44 96,35 96,53 78,62" fill="#C9D3E0"/>
+      <polygon points="78,26 96,35 78,44 60,35" fill="#E0604F"/>
+      <polygon points="66,47 71,49.5 71,57.5 66,55" fill="#6B4A3A"/>
+      <rect x="108" y="46" width="3" height="10" fill="#7A5235"/>
+      <circle cx="109.5" cy="42" r="8" fill="#3F8F4E"/>
+    </symbol>
+    <symbol id="i-heberger" viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></symbol>
+    <symbol id="i-rejoindre" viewBox="0 0 24 24"><path d="M14 4h5.5v16H14"/><path d="M3 12h11.5"/><path d="M10.5 8l4 4-4 4"/></symbol>
+    <symbol id="i-bibliotheque" viewBox="0 0 24 24"><rect x="3.5" y="13" width="17" height="7.5" rx="2"/><rect x="5.5" y="4.5" width="13" height="8.5" rx="2"/><path d="M9.5 8.75h5"/></symbol>
+    <symbol id="i-historique" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h3"/></symbol>
+    <symbol id="i-reglages" viewBox="0 0 24 24"><path d="M10.33 2.55 L13.67 2.55 L13.92 5.06 L15.55 5.73 L17.51 4.14 L19.86 6.49 L18.27 8.45 L18.94 10.08 L21.45 10.33 L21.45 13.67 L18.94 13.92 L18.27 15.55 L19.86 17.51 L17.51 19.86 L15.55 18.27 L13.92 18.94 L13.67 21.45 L10.33 21.45 L10.08 18.94 L8.45 18.27 L6.49 19.86 L4.14 17.51 L5.73 15.55 L5.06 13.92 L2.55 13.67 L2.55 10.33 L5.06 10.08 L5.73 8.45 L4.14 6.49 L6.49 4.14 L8.45 5.73 L10.08 5.06 Z"/><circle cx="12" cy="12" r="3.2"/></symbol>
+    <symbol id="i-score" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="5.5"/><path d="M8.6 14.2 7.2 21l4.8-2.4 4.8 2.4-1.4-6.8"/></symbol>
+  </defs>
+</svg>
+
+<div class="planche">
+  <header>
+    <div>
+      <p class="surtitre">Duo · identité visuelle · piste A</p>
+      <h1 class="nom titre">Boîte à jeux</h1>
+    </div>
+    <div class="intention">
+      <p>On sort Duo comme on sort un jeu de société&nbsp;: du carton, des pions et des couleurs franches, posés sur la table du salon.</p>
+      <div class="adjectifs"><span>chaleureuse</span><span>tactile</span><span>familière</span></div>
+    </div>
+  </header>
+
+  <section class="gauche">
+    <div class="carte bloc-logo">
+      <svg class="logo-grand" viewBox="0 0 450 160" role="img" aria-label="Logo Duo, piste A">
+        <use href="#pion" x="0" y="14" width="118" height="118"/>
+        <g transform="rotate(-9 140 92)"><use href="#de" x="86" y="40" width="104" height="104"/></g>
+        <text x="200" y="124" class="titre" font-size="132" font-weight="850" fill="var(--texte)" letter-spacing="-3">duo</text>
+      </svg>
+      <div class="icones-app">
+        <figure>
+          <svg width="112" height="118" viewBox="0 0 112 118">
+            <rect x="2" y="10" width="108" height="104" rx="28" fill="var(--accent-tranche)" stroke="var(--texte)" stroke-width="3"/>
+            <rect x="2" y="2" width="108" height="104" rx="28" fill="var(--accent)" stroke="var(--texte)" stroke-width="3"/>
+            <use href="#pion" x="10" y="20" width="58" height="58"/>
+            <g transform="rotate(-9 74 62)"><use href="#de" x="46" y="34" width="56" height="56"/></g>
+          </svg>
+          icône 112
+        </figure>
+        <figure>
+          <svg width="48" height="51" viewBox="0 0 112 118">
+            <rect x="2" y="10" width="108" height="104" rx="28" fill="var(--accent-tranche)" stroke="var(--texte)" stroke-width="5"/>
+            <rect x="2" y="2" width="108" height="104" rx="28" fill="var(--accent)" stroke="var(--texte)" stroke-width="5"/>
+            <use href="#pion" x="10" y="20" width="58" height="58"/>
+            <g transform="rotate(-9 74 62)"><use href="#de" x="46" y="34" width="56" height="56"/></g>
+          </svg>
+          48
+        </figure>
+        <figure>
+          <svg width="24" height="25" viewBox="0 0 112 118">
+            <rect x="2" y="2" width="108" height="112" rx="28" fill="var(--accent)" stroke="var(--texte)" stroke-width="8"/>
+            <circle cx="38" cy="58" r="20" fill="var(--j1)" stroke="var(--texte)" stroke-width="8"/>
+            <rect x="56" y="40" width="40" height="40" rx="10" fill="var(--j2)" stroke="var(--texte)" stroke-width="8"/>
+          </svg>
+          24
+        </figure>
+      </div>
+    </div>
+
+    <div>
+      <p class="etiquette">Palette · rôle et contraste</p>
+      <div class="nuancier">
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--fond)"></div><div class="infos"><b>Fond</b><code data-hex="fond"></code><small>crème</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--surface)"></div><div class="infos"><b>Surfaces</b><code data-hex="surface"></code><small>cartes, barres</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--tranche)"></div><div class="infos"><b>Tranche</b><code data-hex="tranche"></code><small>épaisseur, filets</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte)"></div><div class="infos"><b>Texte</b><code data-hex="texte"></code><small><span data-contraste="texte fond"></span> sur fond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--texte-2)"></div><div class="infos"><b>Texte second.</b><code data-hex="texte-2"></code><small><span data-contraste="texte-2 fond"></span> sur fond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--accent)"></div><div class="infos"><b>Accent</b><code data-hex="accent"></code><small>libellé <span data-contraste="sur-accent accent"></span></small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j1)"></div><div class="infos"><b>Joueur 1</b><code data-hex="j1"></code><small>moutarde, cerclé</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--j2)"></div><div class="infos"><b>Joueur 2</b><code data-hex="j2"></code><small>marine, cerclé</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--succes)"></div><div class="infos"><b>Succès</b><code data-hex="succes"></code><small><span data-contraste="succes fond"></span> sur fond</small></div></div>
+        <div class="pastille-couleur"><div class="aplat" style="background:var(--erreur)"></div><div class="infos"><b>Erreur</b><code data-hex="erreur"></code><small><span data-contraste="erreur fond"></span> sur fond</small></div></div>
+      </div>
+    </div>
+
+    <div class="typos">
+      <div class="carte typo">
+        <p class="etiquette">Titres · Fraunces</p>
+        <p class="specimen-titre titre">Bonsoir, Alex&#8239;!</p>
+        <p class="glyphes titre">Aa Éé Çç 0123 «&nbsp;?&nbsp;»</p>
+        <p class="licence">OFL · @fontsource-variable/fraunces · 800, SOFT 100</p>
+      </div>
+      <div class="carte typo">
+        <p class="etiquette">Texte · Nunito</p>
+        <p class="specimen-texte">Sam est visible sur le réseau. Choisis un jeu, il te rejoint d'une touche. Àà Éé Çç Œœ 0123</p>
+        <p class="licence">OFL · @fontsource-variable/nunito · 600 à 850</p>
+      </div>
+    </div>
+
+    <div class="carte bloc-signes">
+      <div class="signe"><svg width="64" height="64"><use href="#pion"/></svg><div><b>Joueur 1</b><span>pion moutarde, clair</span></div></div>
+      <div class="signe"><svg width="64" height="64"><use href="#de"/></svg><div><b>Joueur 2</b><span>dé marine, foncé</span></div></div>
+      <div class="icones">
+        <figure><svg><use href="#i-heberger"/></svg>Héberger</figure>
+        <figure><svg><use href="#i-rejoindre"/></svg>Rejoindre</figure>
+        <figure><svg><use href="#i-bibliotheque"/></svg>Jeux</figure>
+        <figure><svg><use href="#i-historique"/></svg>Historique</figure>
+        <figure><svg><use href="#i-reglages"/></svg>Réglages</figure>
+        <figure><svg><use href="#i-score"/></svg>Score</figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="droite">
+    <p class="legende-maquette"><span class="etiquette" style="margin:0">Écran d'accueil · maquette</span><span>dessinée en 1366x768, réduite à 75&nbsp;%, focus clavier sur «&nbsp;Héberger&nbsp;», vignettes de jeux fictives identiques sur les trois pistes</span></p>
+    <div class="cadre-ecran">
+      <div class="ecran">
+        <div class="m-barre">
+          <div class="m-logo">
+            <svg width="66" height="50" viewBox="0 0 132 100"><use href="#pion" x="0" y="0" width="80" height="100"/><g transform="rotate(-9 96 62)"><use href="#de" x="58" y="24" width="72" height="72"/></g></svg>
+            <span class="titre">duo</span>
+          </div>
+          <nav class="m-nav"><span class="actif">Accueil</span><span>Bibliothèque</span><span>Historique</span></nav>
+          <div class="m-profil">
+            <span class="m-btn-icone"><svg><use href="#i-reglages"/></svg></span>
+            <div class="m-puce"><svg width="40" height="40"><use href="#pion"/></svg><div><b>Alex</b> <small>mon profil</small></div></div>
+          </div>
+        </div>
+        <div class="m-corps">
+          <section class="m-accueil">
+            <h1 class="titre">Bonsoir, Alex&#8239;!</h1>
+            <p class="m-sous">Sam est visible sur le réseau. On sort un jeu&#8239;?</p>
+            <div class="m-actions">
+              <div class="m-tuile m-primaire m-focus">
+                <span class="m-touche">Entrée</span>
+                <svg><use href="#i-heberger"/></svg>
+                <strong>Héberger</strong>
+                <span>Tu choisis le jeu, Sam te rejoint.</span>
+              </div>
+              <div class="m-tuile">
+                <svg><use href="#i-rejoindre"/></svg>
+                <strong>Rejoindre</strong>
+                <span>Rejoins le salon de Sam.</span>
+              </div>
+            </div>
+            <div class="m-jeux">
+              <p class="m-jeux-titre titre">Nos jeux <span>Toute la bibliothèque</span></p>
+              <div class="m-jeux-liste">
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-2d"/></svg><b>Vignette 2D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg><b>Vignette 3D</b></div>
+                <div class="m-jeu"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-iso"/></svg><b>Vignette isométrique</b></div>
+              </div>
+            </div>
+          </section>
+          <aside class="carte m-table">
+            <h2 class="titre">Notre table</h2>
+            <div class="m-joueur"><svg width="72" height="72"><use href="#pion"/></svg><div><b>Alex</b><small>toi, sur ce Mac</small></div></div>
+            <div class="m-joueur"><svg width="72" height="72"><use href="#de"/></svg><div><b>Sam</b><small><i class="m-pastille"></i>en ligne, sur le PC</small></div></div>
+            <div class="m-score">
+              <div><svg width="36" height="36"><use href="#pion"/></svg><b>12</b></div>
+              <span>victoires</span>
+              <div><b>14</b><svg width="36" height="36"><use href="#de"/></svg></div>
+            </div>
+            <p class="m-derniere"><svg><use href="#i-historique"/></svg>Dernière partie&nbsp;: hier soir, victoire de Sam.</p>
+          </aside>
+        </div>
+        <div class="m-pied"><kbd>Tab</kbd> naviguer <kbd>Entrée</kbd> choisir <kbd>Échap</kbd> revenir</div>
+      </div>
+    </div>
+
+    <div class="carte bloc-mouvement">
+      <div class="images">
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104"><rect x="4" y="80" width="120" height="14" rx="7" fill="var(--fond)" stroke="var(--tranche)" stroke-width="2"/><ellipse cx="64" cy="84" rx="16" ry="4" fill="var(--tranche)"/><use href="#pion" x="40" y="2" width="48" height="48"/><path d="M64 56v8M58 58l-2 4M70 58l2 4" stroke="var(--tranche)" stroke-width="3" stroke-linecap="round"/></svg>
+          0 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104"><rect x="4" y="80" width="120" height="14" rx="7" fill="var(--fond)" stroke="var(--tranche)" stroke-width="2"/><ellipse cx="64" cy="84" rx="28" ry="5" fill="var(--tranche)"/><use href="#pion" x="34" y="40" width="60" height="44" preserveAspectRatio="none"/></svg>
+          120 ms
+        </figure>
+        <figure>
+          <svg width="128" height="104" viewBox="0 0 128 104"><rect x="4" y="80" width="120" height="14" rx="7" fill="var(--fond)" stroke="var(--tranche)" stroke-width="2"/><ellipse cx="64" cy="84" rx="24" ry="5" fill="var(--tranche)"/><use href="#pion" x="38" y="32" width="52" height="52"/><path d="M28 70l-8-4M100 70l8-4M30 80h-9M98 80h9" stroke="var(--texte)" stroke-width="3" stroke-linecap="round"/></svg>
+          200 ms
+        </figure>
+      </div>
+      <div class="mouvement-texte">
+        <b class="titre">Poser, retourner, empiler</b>
+        <p>Des gestes de table, courts et physiques&nbsp;: 120 à 240 ms, arrivée avec un léger rebond, ombres pleines qui suivent l'objet. Boutons qui s'enfoncent de 3 px. Avec «&nbsp;réduire les animations&nbsp;», un simple fondu.</p>
+      </div>
+    </div>
+  </section>
+</div>
+<p class="pied-planche">Planche de proposition · 2026-10-30 · dessins originaux du studio, polices OFL embarquées</p>
+
+<script>
+// Valeurs hexadécimales et contrastes calculés depuis les variables CSS: la légende ne peut pas diverger de la palette.
+(function () {
+  var css = getComputedStyle(document.documentElement);
+  function couleur(nom) { return css.getPropertyValue('--' + nom).trim(); }
+  function lineaire(c) { c = c / 255; return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function luminance(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return 0.2126 * lineaire((n >> 16) & 255) + 0.7152 * lineaire((n >> 8) & 255) + 0.0722 * lineaire(n & 255);
+  }
+  function rapport(a, b) {
+    var la = luminance(a), lb = luminance(b);
+    return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+  }
+  document.querySelectorAll('[data-hex]').forEach(function (el) { el.textContent = couleur(el.dataset.hex).toUpperCase(); });
+  document.querySelectorAll('[data-contraste]').forEach(function (el) {
+    var p = el.dataset.contraste.split(' ');
+    el.textContent = rapport(couleur(p[0]), couleur(p[1])).toFixed(1).replace('.', ',') + ':1';
+  });
+})();
+</script>
+</body>
+</html>

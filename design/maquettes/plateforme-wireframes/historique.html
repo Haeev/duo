@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E15 Historique et scores</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  .filtre { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+  .histo { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .colonne { display: grid; gap: 18px; }
+  .total { display: flex; align-items: center; gap: 32px; flex-wrap: wrap; }
+  .total .joueur-score { display: inline-flex; align-items: center; gap: 10px; font-size: 20px; }
+  .total .chiffre-score { font-size: 44px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  td.progression-coop { color: var(--encre-2); }
+  th { white-space: nowrap; }
+  tr.ligne-total td { font-weight: 800; border-top: 2px solid var(--encre); border-bottom: none; }
+  .liste-parties { list-style: none; display: grid; }
+  .liste-parties li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 4px; border-bottom: 1.5px solid var(--fond-3); }
+  .liste-parties li:focus-visible { border-radius: 6px; }
+  .liste-parties .quand { font-size: 15px; color: var(--encre-2); }
+  .liste-parties .resultat { font-weight: 700; }
+  .liste-parties .jeu-duree { text-align: right; font-size: 15px; color: var(--encre-2); }
+  .defile { max-height: 470px; overflow-y: auto; padding-right: 4px; }
+  .vide { max-width: 640px; margin: 80px auto; text-align: center; display: grid; gap: 14px; justify-items: center; }
+</style>
+</head>
+<body data-retour="accueil.html" data-etat-defaut="liste">
+<div class="app">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <nav class="onglets" aria-label="Sections">
+      <button class="onglet" data-aller="accueil.html" data-raccourci="1">Accueil</button>
+      <button class="onglet" data-aller="bibliotheque.html" data-raccourci="2">Bibliothèque</button>
+      <button class="onglet" aria-current="page" data-raccourci="3">Historique</button>
+      <button class="onglet" data-aller="reglages.html" data-raccourci="4">Réglages</button>
+    </nav>
+    <div class="droite">
+      <span class="presence"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha est là</span>
+      <span class="moi"><span class="symbole" data-forme="rond"></span>Camille</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur">
+      <div class="entete">
+        <h1>Historique et scores</h1>
+        <label class="filtre" data-si="liste">Jeu
+          <select data-focus>
+            <option>Tous les jeux</option>
+            <option>Jeu témoin</option>
+            <option>Exemple duel</option>
+            <option>Exemple coop</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="histo" data-si="liste">
+        <div class="colonne">
+          <section class="bloc accent" aria-labelledby="titre-total">
+            <h2 class="titre-bloc" id="titre-total">Score cumulé</h2>
+            <div class="total">
+              <span class="joueur-score"><span class="symbole moyen" data-forme="rond"></span>Camille <span class="chiffre-score">32</span></span>
+              <span class="joueur-score"><span class="symbole moyen" data-forme="triangle" data-ton="clair"></span>Sacha <span class="chiffre-score">34</span></span>
+              <span class="meta">3 égalités</span>
+            </div>
+            <p class="aide">Jeux en affrontement, toutes parties confondues</p>
+          </section>
+
+          <section class="bloc" aria-labelledby="titre-par-jeu">
+            <h2 class="titre-bloc" id="titre-par-jeu">Par jeu</h2>
+            <table>
+              <thead>
+                <tr><th scope="col">Jeu</th><th scope="col">Type</th><th scope="col" class="nombre">Camille</th><th scope="col" class="nombre">Sacha</th><th scope="col" class="nombre">Égalités</th><th scope="col">Dernière partie</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="fort">Jeu témoin</td><td>Affrontement</td><td class="nombre">13</td><td class="nombre">15</td><td class="nombre">2</td><td>aujourd’hui</td></tr>
+                <tr><td class="fort">Exemple duel</td><td>Affrontement</td><td class="nombre">19</td><td class="nombre">19</td><td class="nombre">1</td><td>25 octobre</td></tr>
+                <tr><td class="fort">Exemple coop</td><td>Coopération</td><td colspan="3" class="progression-coop">Niveau 4 sur 10 · 12 parties</td><td>hier</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <section class="bloc" aria-labelledby="titre-dernieres">
+          <h2 class="titre-bloc" id="titre-dernieres">Dernières parties</h2>
+          <div class="defile" tabindex="0" aria-label="Dernières parties, liste défilante">
+            <ul class="liste-parties">
+              <li><span class="resultat">Camille a gagné 12 à 9</span><span class="jeu-duree">Jeu témoin · 3 min</span><span class="quand">Aujourd’hui à 21 h 40</span></li>
+              <li><span class="resultat">Sacha a gagné 11 à 7</span><span class="jeu-duree">Jeu témoin · 4 min</span><span class="quand">Aujourd’hui à 21 h 30</span></li>
+              <li><span class="resultat">Niveau 3 réussi</span><span class="jeu-duree">Exemple coop · 24 min</span><span class="quand">Hier à 21 h 40</span></li>
+              <li><span class="resultat">Niveau 3 raté</span><span class="jeu-duree">Exemple coop · 31 min</span><span class="quand">Hier à 21 h 05</span></li>
+              <li><span class="resultat">Égalité 3 à 3</span><span class="jeu-duree">Exemple duel · 8 min</span><span class="quand">25 octobre à 20 h 15</span></li>
+              <li><span class="resultat">Sacha a gagné 3 à 1</span><span class="jeu-duree">Exemple duel · 6 min</span><span class="quand">25 octobre à 20 h 02</span></li>
+              <li><span class="resultat">Interrompue, sans effet sur le score</span><span class="jeu-duree">Exemple coop · 12 min</span><span class="quand">24 octobre à 22 h 10</span></li>
+              <li><span class="resultat">Camille a gagné 3 à 2</span><span class="jeu-duree">Exemple duel · 7 min</span><span class="quand">24 octobre à 21 h 45</span></li>
+            </ul>
+            <button class="bouton lien" style="margin-top: 8px">Afficher 20 parties de plus</button>
+          </div>
+        </section>
+      </div>
+
+      <div class="vide" data-si="vide">
+        <span class="icone moyenne" data-icone="info"></span>
+        <p class="fort" style="font-size: 20px">Pas encore de partie.</p>
+        <p class="aide">Votre historique commencera à la fin de votre première partie.</p>
+        <button class="bouton principal grand" data-aller="bibliotheque.html" data-focus>Héberger une partie</button>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E16 Réglages</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .reglages { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 28px; align-items: start; margin-top: 18px; }
+  .liste-onglets { display: grid; gap: 4px; border-right: 2px solid var(--fond-3); padding-right: 16px; }
+  .onglet-vertical {
+    font: inherit; font-size: 17px; text-align: left; color: var(--encre);
+    background: none; border: 2px solid transparent; border-radius: 8px;
+    padding: 10px 14px; cursor: pointer;
+  }
+  .onglet-vertical:hover { background: var(--fond-2); }
+  .onglet-vertical[aria-selected="true"] { background: var(--encre); color: #fff; font-weight: 700; }
+  .panneau-reglage { display: grid; gap: 22px; max-width: 860px; }
+  .panneau-reglage h2 { font-size: 24px; }
+  .ligne-champ { display: flex; gap: 12px; align-items: center; }
+  .ligne-champ input { max-width: 360px; }
+  .enregistre { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+  .curseur { display: grid; grid-template-columns: 180px minmax(0, 1fr) 70px; gap: 16px; align-items: center; }
+  .curseur label { font-weight: 700; }
+  .curseur output { font-variant-numeric: tabular-nums; text-align: right; }
+  .choix-rangee { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .choix-rangee .tuile-choix { min-width: 130px; padding: 12px 18px; grid-auto-flow: column; gap: 10px; align-items: center; }
+  .case { display: flex; gap: 12px; align-items: center; font-weight: 700; }
+  .table-touches td { vertical-align: middle; }
+  .table-touches .capture { border: 3px dashed var(--encre); border-radius: 8px; padding: 6px 10px; font-weight: 700; }
+  .lignes-info { display: grid; grid-template-columns: auto 1fr; gap: 8px 18px; margin: 0; }
+  .lignes-info dt { color: var(--encre-2); }
+  .lignes-info dd { margin: 0; font-weight: 700; }
+</style>
+</head>
+<body data-retour="accueil.html" data-etat-defaut="profil">
+<div class="app">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <nav class="onglets" aria-label="Sections">
+      <button class="onglet" data-aller="accueil.html" data-raccourci="1">Accueil</button>
+      <button class="onglet" data-aller="bibliotheque.html" data-raccourci="2">Bibliothèque</button>
+      <button class="onglet" data-aller="historique.html" data-raccourci="3">Historique</button>
+      <button class="onglet" aria-current="page" data-raccourci="4">Réglages</button>
+    </nav>
+    <div class="droite">
+      <span class="presence"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha est là</span>
+      <span class="moi"><span class="symbole" data-forme="rond"></span>Camille</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur">
+      <h1>Réglages</h1>
+      <div class="reglages">
+        <div class="liste-onglets" role="tablist" aria-orientation="vertical" aria-label="Rubriques des réglages" id="onglets">
+          <button class="onglet-vertical" role="tab" id="onglet-profil" aria-controls="panneau-profil" data-rubrique="profil">Profil</button>
+          <button class="onglet-vertical" role="tab" id="onglet-son" aria-controls="panneau-son" data-rubrique="son">Son</button>
+          <button class="onglet-vertical" role="tab" id="onglet-affichage" aria-controls="panneau-affichage" data-rubrique="affichage">Affichage</button>
+          <button class="onglet-vertical" role="tab" id="onglet-touches" aria-controls="panneau-touches" data-rubrique="touches">Touches</button>
+          <button class="onglet-vertical" role="tab" id="onglet-reseau" aria-controls="panneau-reseau" data-rubrique="reseau">Réseau</button>
+          <button class="onglet-vertical" role="tab" id="onglet-apropos" aria-controls="panneau-apropos" data-rubrique="apropos">À propos</button>
+        </div>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-profil" aria-labelledby="onglet-profil">
+          <h2>Profil</h2>
+          <div class="champ">
+            <label for="pseudo">Pseudo</label>
+            <div class="ligne-champ">
+              <input type="text" id="pseudo" value="Camille" maxlength="16" autocomplete="off">
+              <button class="bouton">Enregistrer</button>
+            </div>
+            <p class="aide">7 sur 16 caractères. C’est le nom que l’autre ordinateur affiche.</p>
+          </div>
+          <fieldset>
+            <legend class="legende">Ta couleur</legend>
+            <p class="aide" style="margin: 4px 0 10px">Chaque couleur a son symbole : vous restez faciles à distinguer, même sans voir les couleurs.</p>
+            <div class="tuiles">
+              <label class="tuile-choix"><input type="radio" name="couleur" checked><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="rond"></span>Rond</label>
+              <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="carre" data-ton="moyen"></span>Carré</label>
+              <label class="tuile-choix"><input type="radio" name="couleur" disabled><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="triangle" data-ton="clair"></span>Prise par Sacha</label>
+              <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="losange" data-ton="moyen"></span>Losange</label>
+              <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="etoile"></span>Étoile</label>
+              <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="hexagone" data-ton="clair"></span>Hexagone</label>
+            </div>
+          </fieldset>
+          <p class="aide">Sacha voit tes changements tout de suite.</p>
+          <p class="enregistre" role="status"><span class="icone" data-icone="reussi"></span>Enregistré</p>
+        </section>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-son" aria-labelledby="onglet-son" hidden>
+          <h2>Son</h2>
+          <div class="curseur"><label for="v-general">Volume général</label><input type="range" id="v-general" min="0" max="100" step="5" value="80"><output for="v-general">80 %</output></div>
+          <div class="curseur"><label for="v-musique">Musique</label><input type="range" id="v-musique" min="0" max="100" step="5" value="60"><output for="v-musique">60 %</output></div>
+          <div class="curseur"><label for="v-effets">Effets</label><input type="range" id="v-effets" min="0" max="100" step="5" value="90"><output for="v-effets">90 %</output></div>
+          <div class="curseur"><label for="v-interface">Interface</label><input type="range" id="v-interface" min="0" max="100" step="5" value="0"><output for="v-interface">Coupé</output></div>
+          <p class="aide">Flèches : 5 % par appui. Origine et Fin : 0 et 100 %.</p>
+        </section>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-affichage" aria-labelledby="onglet-affichage" hidden>
+          <h2>Affichage</h2>
+          <fieldset>
+            <legend class="legende">Mode d’affichage</legend>
+            <div class="choix-rangee">
+              <label class="tuile-choix"><input type="radio" name="mode" checked><span class="icone" data-icone="ecran"></span>Fenêtre</label>
+              <label class="tuile-choix"><input type="radio" name="mode"><span class="icone" data-icone="ecran"></span>Plein écran <kbd>F11</kbd></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend class="legende">Taille de l’interface</legend>
+            <div class="choix-rangee">
+              <label class="tuile-choix"><input type="radio" name="taille" checked>100 %</label>
+              <label class="tuile-choix"><input type="radio" name="taille">125 %</label>
+              <label class="tuile-choix"><input type="radio" name="taille">150 %</label>
+            </div>
+          </fieldset>
+          <div class="pile serree">
+            <label class="case"><input type="checkbox" id="animations">Réduire les animations</label>
+            <p class="aide">Au départ, Duo suit le réglage de ton ordinateur.</p>
+          </div>
+        </section>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-touches" aria-labelledby="onglet-touches" hidden>
+          <h2>Touches</h2>
+          <div class="ligne">
+            <label class="fort" for="jeu-touches">Jeu</label>
+            <select id="jeu-touches"><option>Jeu témoin</option><option>Exemple coop</option><option>Exemple duel</option></select>
+          </div>
+          <p class="aide">Ces touches ne concernent que le clavier de cet ordinateur.</p>
+          <table class="table-touches">
+            <thead><tr><th scope="col">Action</th><th scope="col">Touche</th><th scope="col"><span class="visuellement-cache">Modifier</span></th></tr></thead>
+            <tbody>
+              <tr><td>Avancer</td><td><span class="capture" role="status">Appuie sur la nouvelle touche pour « Avancer ». Échap : annuler.</span></td><td><button class="bouton" id="modifier-avancer">Annuler</button></td></tr>
+              <tr><td>Reculer</td><td><kbd>S</kbd></td><td><button class="bouton">Modifier</button></td></tr>
+              <tr><td>Aller à gauche</td><td><kbd>Q</kbd></td><td><button class="bouton">Modifier</button></td></tr>
+              <tr><td>Aller à droite</td><td><kbd>D</kbd></td><td><button class="bouton">Modifier</button></td></tr>
+              <tr><td>Agir</td><td><kbd>Espace</kbd></td><td><button class="bouton">Modifier</button></td></tr>
+              <tr><td>Pause</td><td><kbd>Échap</kbd> <span class="aide">(réservée)</span></td><td></td></tr>
+            </tbody>
+          </table>
+          <div><button class="bouton">Rétablir les touches par défaut</button></div>
+        </section>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-reseau" aria-labelledby="onglet-reseau" hidden>
+          <h2>Réseau</h2>
+          <dl class="lignes-info">
+            <dt>Cet ordinateur</dt><dd>« MacBook Air de Camille »</dd>
+            <dt>Adresse</dt><dd>192.168.1.42</dd>
+            <dt>L’autre ordinateur</dt><dd>Sacha est là, sur « PC-SACHA ».</dd>
+          </dl>
+          <div class="rangee-boutons">
+            <button class="bouton" data-aller="diagnostic.html#macos">Lancer le diagnostic</button>
+            <button class="bouton" data-aller="premier-lancement.html#reseau-macos">Revoir l’explication des autorisations</button>
+          </div>
+        </section>
+
+        <section class="panneau-reglage" role="tabpanel" id="panneau-apropos" aria-labelledby="onglet-apropos" hidden>
+          <h2>À propos</h2>
+          <dl class="lignes-info">
+            <dt>Duo</dt><dd>1.0.0</dd>
+            <dt>Jeu témoin</dt><dd>1.1.0</dd>
+            <dt>Exemple coop</dt><dd>1.0.0</dd>
+          </dl>
+          <div class="rangee-boutons">
+            <button class="bouton">Copier les informations pour le studio</button>
+            <button class="bouton">Crédits et licences</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  // Onglets verticaux: flèches haut et bas; l'ancre (#touches...) choisit la rubrique ouverte.
+  const controle = Duo.onglets(document.getElementById('onglets'));
+  Duo.surEtat = function (etat) {
+    const tab = controle.tabs.find((t) => t.dataset.rubrique === etat) || controle.tabs[0];
+    controle.activer(tab, false);
+    controle.tabs.forEach((t) => { if (t === tab) t.setAttribute('data-focus', ''); else t.removeAttribute('data-focus'); });
+    if (etat === 'touches') document.getElementById('modifier-avancer').setAttribute('data-focus', '2');
+  };
+  document.querySelectorAll('input[type="range"]').forEach((curseur) => {
+    curseur.addEventListener('input', () => {
+      const sortie = document.querySelector(`output[for="${curseur.id}"]`);
+      sortie.textContent = curseur.value === '0' ? 'Coupé' : curseur.value + ' %';
+    });
+  });
+</script>
+</body>
+</html>

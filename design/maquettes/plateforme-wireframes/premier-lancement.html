@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E01 à E04 Premier lancement</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .barre .etapes { margin-left: 24px; }
+  .etape { max-width: 880px; margin: 0 auto; display: grid; gap: 18px; }
+  .etape.centre { text-align: center; justify-items: center; }
+  .contenu-centre { min-height: 100%; display: grid; align-content: center; }
+  .etape h1 { font-size: 32px; }
+  .intro { font-size: 20px; }
+  .grand-logo { font-size: 44px; padding: 8px 28px; border-width: 3px; }
+  .consignes { padding-left: 24px; font-size: 18px; font-weight: 700; display: grid; gap: 4px; }
+  .rangee-boutons.fin-etape { margin-top: 6px; }
+  .apercu { display: inline-flex; align-items: center; gap: 10px; font-size: 18px; }
+  .schema { margin: 0; display: grid; gap: 8px; justify-items: center; }
+  .fenetre-systeme {
+    width: 420px; max-width: 100%;
+    border: 2px solid #111; border-radius: 12px; background: var(--fond-2);
+    padding: 18px 20px; display: grid; gap: 10px; text-align: left;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.18);
+  }
+  .fenetre-systeme .titre-systeme { font-size: 14px; color: var(--encre-2); font-weight: 700; }
+  .fenetre-systeme .case-systeme { display: flex; align-items: center; gap: 8px; font-size: 15px; }
+  .fenetre-systeme .case-systeme span.boite { width: 18px; height: 18px; border: 2px solid #111; border-radius: 3px; display: inline-grid; place-content: center; }
+  .fenetre-systeme .case-systeme span.boite.cochee { background: #111; }
+  .boutons-systeme { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+  .faux-bouton { border: 2px solid #767676; border-radius: 6px; padding: 4px 14px; font-size: 15px; background: #fff; }
+  .faux-bouton.cible { border: 3px solid #111; font-weight: 800; position: relative; }
+  .faux-bouton.cible::after { content: ""; position: absolute; inset: -9px; border: 2px dashed #111; border-radius: 10px; }
+  .deux-colonnes { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 32px; align-items: center; }
+  .statut-recherche { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 700; }
+  .joueurs.trouves { width: 100%; max-width: 640px; text-align: left; }
+</style>
+</head>
+<body data-etat-defaut="bienvenue">
+<div class="app">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <ol class="etapes" aria-label="Étapes" data-si="profil reseau-macos reseau-windows recherche trouve" id="etapes">
+      <li data-pas="1"><span class="numero">1</span>Profil</li>
+      <li class="trait-etape" aria-hidden="true"></li>
+      <li data-pas="2"><span class="numero">2</span>Réseau</li>
+      <li class="trait-etape" aria-hidden="true"></li>
+      <li data-pas="3"><span class="numero">3</span>L’autre ordinateur</li>
+    </ol>
+  </header>
+
+  <main class="contenu">
+    <div class="contenu-centre">
+
+      <!-- E01 Bienvenue -->
+      <section class="etape centre" data-si="bienvenue" aria-labelledby="t-bienvenue">
+        <span class="logo grand-logo">Duo</span>
+        <h1 id="t-bienvenue">Bienvenue dans Duo</h1>
+        <p class="intro">Duo sert à jouer à deux, sur deux ordinateurs, dans la même pièce.</p>
+        <p class="aide">Trois étapes et c’est prêt : ton profil, le réseau, puis l’autre ordinateur.</p>
+        <button class="bouton principal grand" data-aller="#profil" data-focus>Commencer</button>
+      </section>
+
+      <!-- E02 Profil (Camille, sur le Mac) -->
+      <section class="etape" data-si="profil" aria-labelledby="t-profil">
+        <h1 id="t-profil">Comment veux-tu t’appeler ?</h1>
+        <div class="champ">
+          <label for="pseudo">Pseudo</label>
+          <input type="text" id="pseudo" value="Camille" maxlength="16" autocomplete="off" style="max-width: 420px" data-focus>
+          <p class="aide">C’est le nom que l’autre ordinateur affichera. 16 caractères au plus.</p>
+        </div>
+        <fieldset>
+          <legend class="legende">Ta couleur</legend>
+          <p class="aide" style="margin: 4px 0 10px">Chaque couleur a son symbole : vous restez faciles à distinguer, même sans voir les couleurs.</p>
+          <div class="tuiles">
+            <label class="tuile-choix"><input type="radio" name="couleur" checked><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="rond"></span>Rond</label>
+            <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="carre" data-ton="moyen"></span>Carré</label>
+            <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="triangle" data-ton="clair"></span>Triangle</label>
+            <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="losange" data-ton="moyen"></span>Losange</label>
+            <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="etoile"></span>Étoile</label>
+            <label class="tuile-choix"><input type="radio" name="couleur"><span class="coche-choix icone" data-icone="coche"></span><span class="symbole moyen" data-forme="hexagone" data-ton="clair"></span>Hexagone</label>
+          </div>
+        </fieldset>
+        <p class="apercu">Aperçu : <span class="symbole" data-forme="rond"></span><strong>Camille</strong></p>
+        <div class="rangee-boutons fin-etape">
+          <button class="bouton grand" data-aller="#bienvenue">Retour</button>
+          <button class="bouton principal grand" id="continuer-profil" data-aller="#reseau-macos">Continuer</button>
+        </div>
+      </section>
+
+      <!-- E03 Réseau, macOS (Camille) -->
+      <section class="etape" data-si="reseau-macos" aria-labelledby="t-mac">
+        <h1 id="t-mac">macOS va te demander d’autoriser Duo</h1>
+        <div class="deux-colonnes">
+          <div class="pile">
+            <p class="intro">Pour que vos deux ordinateurs se trouvent tout seuls, Duo doit pouvoir parler aux appareils de ton réseau local, c’est-à-dire le Wi‑Fi de la maison.</p>
+            <p class="fort" style="font-size: 18px">Dans la fenêtre qui va s’ouvrir, clique sur « Autoriser ».</p>
+            <p class="aide">Duo n’utilise Internet que pour télécharger les jeux. Pendant vos parties, tout reste chez vous.</p>
+          </div>
+          <figure class="schema">
+            <div class="fenetre-systeme" aria-hidden="true">
+              <span class="logo" style="justify-self: start; font-size: 15px">Duo</span>
+              <p class="fort">« Duo » souhaite rechercher des appareils sur votre réseau local et s’y connecter.</p>
+              <p class="petit">Duo cherche l’autre ordinateur de votre duo sur le réseau de la maison, pour lancer vos parties.</p>
+              <div class="boutons-systeme"><span class="faux-bouton">Refuser</span><span class="faux-bouton cible">Autoriser</span></div>
+            </div>
+            <figcaption class="aide">La fenêtre ressemble à celle-ci.</figcaption>
+          </figure>
+        </div>
+        <div class="rangee-boutons fin-etape">
+          <button class="bouton grand" data-aller="#profil">Retour</button>
+          <button class="bouton principal grand" data-aller="#recherche" data-focus>Continuer</button>
+          <button class="bouton lien">Passer cette étape</button>
+        </div>
+      </section>
+
+      <!-- E03 Réseau, Windows (Sacha) -->
+      <section class="etape" data-si="reseau-windows" aria-labelledby="t-win">
+        <h1 id="t-win">Windows va te demander d’autoriser Duo</h1>
+        <div class="deux-colonnes">
+          <div class="pile">
+            <p class="intro">Pour que vos deux ordinateurs se trouvent tout seuls, le pare-feu de Windows doit laisser passer Duo sur le réseau de la maison.</p>
+            <p class="fort" style="font-size: 18px">Dans la fenêtre qui va s’ouvrir :</p>
+            <ol class="consignes">
+              <li>Laisse « Réseaux privés » coché.</li>
+              <li>Clique sur « Autoriser ».</li>
+            </ol>
+            <p class="aide">Si Windows demande l’accord d’un administrateur, réponds « Oui ».</p>
+            <p class="aide">Duo n’utilise Internet que pour télécharger les jeux. Pendant vos parties, tout reste chez vous.</p>
+          </div>
+          <figure class="schema">
+            <div class="fenetre-systeme" aria-hidden="true">
+              <span class="titre-systeme">Sécurité Windows</span>
+              <p class="fort">Le pare-feu a bloqué certaines fonctionnalités de Duo.</p>
+              <p class="petit">Autoriser Duo à communiquer sur ces réseaux :</p>
+              <span class="case-systeme"><span class="boite cochee"></span>Réseaux privés, comme celui de la maison</span>
+              <span class="case-systeme"><span class="boite"></span>Réseaux publics</span>
+              <div class="boutons-systeme"><span class="faux-bouton cible">Autoriser</span><span class="faux-bouton">Annuler</span></div>
+            </div>
+            <figcaption class="aide">La fenêtre ressemble à celle-ci.</figcaption>
+          </figure>
+        </div>
+        <div class="rangee-boutons fin-etape">
+          <button class="bouton grand" data-aller="#profil">Retour</button>
+          <button class="bouton principal grand" data-aller="#recherche" data-focus>Continuer</button>
+          <button class="bouton lien">Passer cette étape</button>
+        </div>
+      </section>
+
+      <!-- E04 Recherche de l'autre ordinateur (Camille) -->
+      <section class="etape" data-si="recherche" aria-labelledby="t-recherche">
+        <h1 id="t-recherche">Cherchons l’autre ordinateur</h1>
+        <p class="intro">Ouvre Duo sur l’autre ordinateur : il apparaîtra ici tout seul.</p>
+        <div class="statut-recherche" role="status"><span class="indicateur"></span>Recherche en cours…</div>
+        <div class="bloc gris pile">
+          <p class="fort">Toujours rien ?</p>
+          <p>Vérifie que Duo est ouvert sur l’autre ordinateur et que les deux sont sur le même Wi‑Fi.</p>
+          <div class="rangee-boutons">
+            <button class="bouton" data-aller="diagnostic.html#macos" data-focus>Que faire ?</button>
+            <button class="bouton" data-aller="diagnostic.html#macos">Se connecter avec une adresse</button>
+          </div>
+        </div>
+        <div class="pile serree">
+          <button class="bouton lien" data-aller="accueil.html#absent" style="justify-self: start">Terminer sans l’autre ordinateur</button>
+          <p class="aide">Tu pourras le retrouver plus tard depuis l’accueil.</p>
+        </div>
+      </section>
+
+      <!-- E04 Trouvé -->
+      <section class="etape centre" data-si="trouve" aria-labelledby="t-trouve">
+        <span class="icone" data-icone="reussi" style="width: 56px; height: 56px"></span>
+        <h1 id="t-trouve">Sacha est là</h1>
+        <p class="intro">Sur l’ordinateur « PC-SACHA ». Vous pouvez jouer ensemble.</p>
+        <div class="joueurs trouves">
+          <article class="carte-joueur moi-meme">
+            <span class="symbole grand" data-forme="rond"></span>
+            <div><p class="nom">Camille <span class="aide">(toi)</span></p><p class="role">« MacBook Air de Camille »</p></div>
+          </article>
+          <article class="carte-joueur">
+            <span class="symbole grand" data-forme="triangle" data-ton="clair"></span>
+            <div><p class="nom">Sacha</p><p class="role">« PC-SACHA »</p></div>
+          </article>
+        </div>
+        <button class="bouton principal grand" data-aller="accueil.html" data-focus>Terminer</button>
+      </section>
+
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  const PAS = { profil: 1, 'reseau-macos': 2, 'reseau-windows': 2, recherche: 3, trouve: 3 };
+  Duo.surEtat = function (etat) {
+    const courant = PAS[etat] || 0;
+    document.querySelectorAll('#etapes li[data-pas]').forEach((li) => {
+      const n = Number(li.dataset.pas);
+      if (n === courant) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+      li.classList.toggle('faite', n < courant);
+    });
+  };
+  // Entrée dans le champ Pseudo: étape suivante, si le pseudo n'est pas vide.
+  document.getElementById('pseudo').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.target.value.trim() !== '') document.getElementById('continuer-profil').click();
+  });
+  Duo.surEchap = function () {
+    const precedent = { profil: '#bienvenue', 'reseau-macos': '#profil', 'reseau-windows': '#profil', recherche: '#reseau-macos' };
+    const cible = precedent[document.body.dataset.etat];
+    if (cible) location.hash = cible.slice(1);
+    return true;
+  };
+</script>
+</body>
+</html>

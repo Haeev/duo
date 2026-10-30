@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duo · wireframe · E07 Bibliothèque</title>
+<link rel="stylesheet" href="commun.css">
+<style>
+  .entete { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .biblio { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; }
+  .grille-jeux { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+  .carte-jeu {
+    position: relative;
+    font: inherit; color: inherit; text-align: left;
+    background: #fff;
+    border: 2px solid var(--trait);
+    border-radius: 12px;
+    padding: 10px 10px 12px;
+    cursor: pointer;
+    display: grid; gap: 8px; align-content: start;
+  }
+  .carte-jeu:hover { background: var(--fond-2); }
+  .carte-jeu.choisie { border: 3px solid var(--encre); padding: 9px 9px 11px; }
+  .carte-jeu[aria-disabled="true"] { cursor: default; }
+  .carte-jeu .nom-jeu { font-size: 18px; font-weight: 700; }
+  .badge {
+    position: absolute; top: 18px; left: 18px;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--encre); color: #fff;
+    border-radius: 999px; padding: 2px 10px 2px 6px;
+    font-size: 14px; font-weight: 700;
+    z-index: 2;
+  }
+  .badge.clair { background: #fff; color: var(--encre); border: 2px solid var(--encre); }
+  .progression { height: 10px; border: 2px solid var(--encre); border-radius: 999px; overflow: hidden; }
+  .progression > span { display: block; height: 100%; background: var(--encre); }
+  .fiche { border: 3px solid var(--encre); border-radius: 12px; padding: 18px 20px; display: grid; gap: 12px; }
+  .fiche .vignette { aspect-ratio: 21 / 9; }
+  .fiche h2 { font-size: 24px; }
+  .fiche .liste-sauvegardes { display: grid; gap: 4px; font-size: 15px; }
+  .fiche .liste-sauvegardes li { list-style: none; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1.5px solid var(--fond-3); padding: 4px 0; }
+  .fiche .bouton.principal { justify-self: start; }
+</style>
+</head>
+<body data-retour="accueil.html">
+<div class="app">
+  <header class="barre">
+    <span class="logo">Duo</span>
+    <nav class="onglets" aria-label="Sections">
+      <button class="onglet" data-aller="accueil.html" data-raccourci="1">Accueil</button>
+      <button class="onglet" aria-current="page" data-raccourci="2">Bibliothèque</button>
+      <button class="onglet" data-aller="historique.html" data-raccourci="3">Historique</button>
+      <button class="onglet" data-aller="reglages.html" data-raccourci="4">Réglages</button>
+    </nav>
+    <div class="droite">
+      <span class="presence"><span class="symbole" data-forme="triangle" data-ton="clair"></span>Sacha est là</span>
+      <span class="moi"><span class="symbole" data-forme="rond"></span>Camille</span>
+    </div>
+  </header>
+
+  <main class="contenu">
+    <div class="largeur">
+      <div class="entete">
+        <div>
+          <h1>Bibliothèque</h1>
+          <p class="sous-titre">Choisis un jeu, puis Entrée pour l’héberger avec Sacha.</p>
+        </div>
+        <button class="bouton">Chercher de nouveaux jeux</button>
+      </div>
+
+      <div class="biblio">
+        <div class="grille-jeux" id="grille" role="group" aria-label="Jeux installés">
+          <button class="carte-jeu choisie" data-cellule data-jeu="coop" data-aller="salon-hote.html#attente" data-focus tabindex="0">
+            <span class="vignette"><span>Vignette</span></span>
+            <span class="nom-jeu">Exemple coop</span>
+            <span class="meta">Coopération · 20 à 40 min</span>
+            <span class="meta">2 sauvegardes</span>
+          </button>
+          <button class="carte-jeu" data-cellule data-jeu="temoin" data-aller="salon-hote.html#attente" tabindex="-1">
+            <span class="badge clair">Mis à jour</span>
+            <span class="vignette"><span>Vignette</span></span>
+            <span class="nom-jeu">Jeu témoin</span>
+            <span class="meta">Affrontement · 3 min</span>
+            <span class="meta">Pas de sauvegarde</span>
+          </button>
+          <button class="carte-jeu" data-cellule data-jeu="duel" data-aller="salon-hote.html#attente" tabindex="-1">
+            <span class="badge"><span class="icone" data-icone="nouveau"></span>Nouveau</span>
+            <span class="vignette"><span>Vignette</span></span>
+            <span class="nom-jeu">Exemple duel</span>
+            <span class="meta">Affrontement · 5 à 10 min</span>
+            <span class="meta">Pas de sauvegarde</span>
+          </button>
+          <button class="carte-jeu" data-cellule data-jeu="iso" aria-disabled="true" tabindex="-1">
+            <span class="vignette"><span>Vignette</span></span>
+            <span class="nom-jeu">Exemple iso</span>
+            <span class="meta">Téléchargement : 45 %</span>
+            <span class="progression" aria-hidden="true"><span style="width: 45%"></span></span>
+            <span class="meta">Pas encore jouable</span>
+          </button>
+        </div>
+
+        <aside aria-label="Fiche du jeu">
+          <section class="fiche" data-fiche="coop">
+            <div class="vignette"><span>Grande vignette</span></div>
+            <h2>Exemple coop</h2>
+            <p class="meta">Coopération · 2 joueurs · 20 à 40 min</p>
+            <p>Description fournie par le jeu, en deux phrases au plus. Ce qu’on y fait ensemble et ce qui le rend amusant.</p>
+            <div>
+              <h3 class="titre-bloc">Sauvegardes</h3>
+              <ul class="liste-sauvegardes">
+                <li><span class="fort">Niveau 3</span><span>hier à 21 h 40</span></li>
+                <li><span class="fort">Niveau 1</span><span>12 octobre à 20 h 05</span></li>
+              </ul>
+              <button class="bouton lien petit">1 copie de secours</button>
+            </div>
+            <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
+          </section>
+          <section class="fiche" data-fiche="temoin" hidden>
+            <div class="vignette"><span>Grande vignette</span></div>
+            <h2>Jeu témoin</h2>
+            <p class="meta">Affrontement · 2 joueurs · 3 min</p>
+            <p>Le mini-jeu qui vérifie que tout marche : réseau, touches, son et historique.</p>
+            <div>
+              <h3 class="titre-bloc">Quoi de neuf</h3>
+              <p class="aide">Version 1.1 : corrections. Tes sauvegardes sont conservées.</p>
+            </div>
+            <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
+          </section>
+          <section class="fiche" data-fiche="duel" hidden>
+            <div class="vignette"><span>Grande vignette</span></div>
+            <h2>Exemple duel</h2>
+            <p class="meta">Affrontement · 2 joueurs · 5 à 10 min</p>
+            <p>Description fournie par le jeu, en deux phrases au plus.</p>
+            <p class="aide">Nouveau : arrivé aujourd’hui. Ce jeu ne garde pas de sauvegarde.</p>
+            <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
+          </section>
+          <section class="fiche" data-fiche="iso" hidden>
+            <div class="vignette"><span>Grande vignette</span></div>
+            <h2>Exemple iso</h2>
+            <p class="meta">Coopération · 2 joueurs · 30 min</p>
+            <p class="fort">Pas encore jouable</p>
+            <p class="aide">Téléchargement : 45 %. Duo l’installe tout seul, et Sacha le reçoit de son côté.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="commun.js"></script>
+<script>
+  'use strict';
+  // La fiche suit le jeu qui a le focus; Entrée sur une carte héberge ce jeu.
+  Duo.grille(document.getElementById('grille'), function (carte) {
+    document.querySelectorAll('.carte-jeu').forEach((c) => c.classList.toggle('choisie', c === carte));
+    document.querySelectorAll('[data-fiche]').forEach((f) => { f.hidden = f.dataset.fiche !== carte.dataset.jeu; });
+  });
+</script>
+</body>
+</html>
