@@ -10,7 +10,7 @@
 
 > Ce document est la section 7 du cahier des charges de la plateforme. Une fois le cahier validé par le client, la plateforme n'est livrée que si chaque critère est satisfait au jalon indiqué. Toute modification passe par le manager et s'inscrit dans l'historique (section 9).
 
-En bref: 117 critères, dont 105 vérifiés automatiquement dans l'environnement cloud, 8 rejoués sur les machines macOS et Windows de l'intégration continue, et 45 vérifiés chez le client (un critère peut avoir plusieurs modes). 31 hypothèses attendent une décision (section 2). La liste à tester chez le client pour la 1.0 tient en 12 points (section 8).
+En bref: 117 critères, dont 105 vérifiés automatiquement dans l'environnement cloud, 8 rejoués sur les machines macOS et Windows de l'intégration continue, et 45 vérifiés chez le client (un critère peut avoir plusieurs modes). 31 hypothèses attendent une décision (section 2). La liste à tester chez le client pour la 1.0 tient en 13 points, dont un facultatif (section 8).
 
 ## 1. Mode d'emploi
 
@@ -36,7 +36,7 @@ Faisabilité vérifiée le 2026-10-30 dans l'environnement cloud, avec des proto
 
 ### 1.3 Règles de mesure
 
-- **Délai « en moins de N s »**: de l'action qui déclenche (touche, coupure, lancement) à l'affichage de l'élément attendu, ou à l'événement correspondant dans le journal de Duo. En automatique, 10 essais, chacun sous le seuil: c'est le pire essai qui compte, pas la moyenne. Chez le client, 3 essais, au chronomètre ou d'après les horodatages du journal.
+- **Délai « en moins de N s »**: de l'action qui déclenche (touche, coupure, lancement) à l'affichage de l'élément attendu, ou à l'événement correspondant dans le journal de Duo. En automatique, 10 essais, chacun sous le seuil: c'est le pire essai qui compte, pas la moyenne. Chez le client, 3 essais sauf mention contraire, au chronomètre ou d'après les horodatages du journal.
 - **Identique sur les deux machines**: mêmes valeurs, champ par champ (EL), ou constatées côte à côte (M).
 - **Empreinte**: SHA-256 d'un fichier; pour l'état d'un jeu, l'empreinte fournie par le crochet de test du jeu (section 6).
 - **Mémoire de Duo**: somme des `workingSetSize` de tous ses processus (`app.getAppMetrics()`), relevée après un ramasse-miettes forcé.
@@ -58,7 +58,7 @@ Faisabilité vérifiée le 2026-10-30 dans l'environnement cloud, avec des proto
 | 1366x768 | 1 | même écran, plein écran |
 | 1536x864 | 1,25 | écran 1920x1080 à 125 %, plein écran |
 | 1920x1080 | 1 | écran 1920x1080 à 100 %, plein écran |
-| 1440x900 | 2 | MacBook Air M1 à son réglage par défaut, plein écran |
+| 1440x900 | 2 | MacBook Air M1 à son réglage par défaut, plein écran (modèle exact du Mac à confirmer) |
 
 - **Pseudos de test** (H-01):
   - acceptés tels quels: « Lou », « Hélène », « Jean-Kévin », « D'Artagnan », « D’Artagnan », « Zoé 2 », « Œdipe Çà », seize « W » d'affilée;
@@ -186,7 +186,7 @@ Chaque message attendu par un critère a un identifiant. ux-ui-designer en fixe 
 **CA-PF-007. Découverte automatique de l'hôte**
 - Étant donné A et B sur le même réseau local, autorisations réseau accordées, profils créés, B sur n'importe quel écran du lanceur,
 - quand A ouvre un salon,
-- alors B affiche l'invitation d'A (pseudo d'A et nom du jeu) en moins de 5 s, sans aucune saisie: 10 essais sur 10 en automatique; chez le client, 3 essais sur 3 avec le Mac comme hôte et 3 sur 3 avec le PC comme hôte.
+- alors B affiche l'invitation d'A (pseudo d'A et nom du jeu) en moins de 5 s, sans aucune saisie: 10 essais sur 10 en automatique; chez le client, 4 essais sur 4, dont 2 avec chaque machine comme hôte.
 - Vérification: EL, M. Jalon: prototype. Hypothèses: H-04, H-07.
 
 **CA-PF-008. Rejoindre d'une touche**
@@ -238,7 +238,7 @@ Chaque message attendu par un critère a un identifiant. ux-ui-designer en fixe 
 - Vérification: M. Jalon: bêta.
 
 **CA-PF-016. Diagnostic: pare-feu de macOS**
-- Étant donné le Mac dont le pare-feu est actif et règle Duo sur « bloquer les connexions entrantes »,
+- Étant donné le Mac dont le coupe-feu (le pare-feu de macOS) est activé et bloque les connexions entrantes de Duo,
 - quand le Mac ouvre un salon,
 - alors il affiche M-06 en moins de 5 s, et une fois ses étapes suivies, « Réessayer » suffit pour que le PC rejoigne.
 - Vérification: M. Jalon: bêta.
@@ -446,7 +446,7 @@ Chaque message attendu par un critère a un identifiant. ux-ui-designer en fixe 
 **CA-PF-049. Duo arrêté chez l'hôte**
 - Étant donné une partie en cours,
 - quand Duo est tué chez l'hôte, puis relancé,
-- alors l'invité passe en attente de reconnexion comme en CA-PF-044; moins de 10 s après le relancement chez l'hôte, l'invité affiche M-19 et revient à la bibliothèque; la dernière sauvegarde est intacte sur les deux machines.
+- alors l'invité passe en attente de reconnexion comme en CA-PF-044; moins de 10 s après l'affichage du lanceur relancé chez l'hôte, l'invité affiche M-19 et revient à la bibliothèque; la dernière sauvegarde est intacte sur les deux machines.
 - Vérification: EL. Jalon: alpha. Hypothèse: H-15.
 
 **CA-PF-050. Mise en veille d'une machine**
@@ -734,7 +734,7 @@ Chaque message attendu par un critère a un identifiant. ux-ui-designer en fixe 
 **CA-PF-094. Une partie en moins d'une minute**
 - Étant donné les deux machines allumées et sur le même réseau depuis plus de 2 min, Duo fermé des deux côtés, profils déjà créés, jeu témoin installé,
 - quand les deux joueurs ouvrent Duo, que l'un héberge le jeu témoin, que l'autre rejoint, et que les deux se déclarent prêts,
-- alors la partie démarre moins de 60 s après le premier double-clic d'ouverture, sans aucun réglage réseau ni saisie d'adresse: 3 essais sur 3, avec pour hôte le Mac, puis le PC, puis le Mac.
+- alors la partie démarre moins de 60 s après le premier double-clic d'ouverture, sans aucun réglage réseau ni saisie d'adresse: 4 essais sur 4, avec pour hôte le Mac, puis le PC, puis le Mac, puis le PC.
 - Vérification: M (chronomètre); EL (même parcours automatisé en moins de 20 s, garde-fou de non-régression). Jalon: 1.0, avec une mesure pour information dès le prototype.
 
 ### Performances
@@ -782,9 +782,9 @@ Chaque message attendu par un critère a un identifiant. ux-ui-designer en fixe 
 ### Chemins et noms d'utilisateur
 
 **CA-PF-101. Chemins avec espaces, accents, apostrophe et émoji**
-- Étant donné un dossier de données au chemin de test (section 1.4), puis le même chemin en Unicode décomposé (NFD),
+- Étant donné un dossier personnel et un dossier de données au chemin de test (section 1.4), puis les mêmes en Unicode décomposé (NFD),
 - quand on enchaîne création du profil, partie avec sauvegarde, historique, réglages et ajout d'un jeu,
-- alors chaque écriture et chaque relecture réussit, les données relues sont identiques, et rien n'est écrit hors de ce dossier, à part le dossier temporaire du système.
+- alors chaque écriture et chaque relecture réussit, les données relues sont identiques, et rien n'est écrit hors du dossier personnel de test et du dossier temporaire du système.
 - Vérification: E (faisabilité vérifiée avec deux instances Electron), CI Windows et macOS. Jalon: alpha.
 
 **CA-PF-102. Compte Windows au nom accentué**
@@ -890,7 +890,7 @@ Les cas de base sont décrits en F13 (CA-PF-090 à CA-PF-093); ce critère couvr
 **CA-PF-116. Réseau dégradé de référence**
 - Étant donné le profil réseau R1 entre les deux machines,
 - quand deux robots jouent au jeu témoin pendant 10 min,
-- alors aucune pause de déconnexion ne se déclenche, l'état reste synchronisé (empreintes identiques à chaque contrôle, au moins un par seconde), et pause, reprise et sauvegarde fonctionnent.
+- alors aucune pause de déconnexion ne se déclenche, l'état reste synchronisé (empreintes identiques à chaque contrôle, au moins un par seconde), et la pause, la reprise et la sauvegarde respectent CA-PF-035, CA-PF-036 et CA-PF-051.
 - Vérification: EL (pertes réelles par nftables, latence et gigue par le mandataire de perturbation). Jalon: alpha.
 
 **CA-PF-117. Endurance de deux heures**
@@ -939,17 +939,17 @@ Les cas de base sont décrits en F13 (CA-PF-090 à CA-PF-093); ce critère couvr
 | 60 images par seconde sur la machine de référence | section 6 | CA-PF-095, CA-PF-096 |
 | Sans Internet | section 6, F12 | CA-PF-097, CA-PF-098, CA-PF-088 |
 | Clavier AZERTY | section 1 | CA-PF-099, CA-PF-100, CA-PF-073, CA-PF-010 |
-| Noms d'utilisateur et chemins avec espaces et accents | règles techniques du studio | CA-PF-101, CA-PF-102 |
+| Noms d'utilisateur et chemins avec espaces et accents | règles techniques du studio (`CLAUDE.md`) | CA-PF-101, CA-PF-102 |
 | Reprise après le plantage d'un jeu | F05 | CA-PF-039, CA-PF-103, CA-PF-104 |
 | Coupure du réseau pendant une sauvegarde | section 4 | CA-PF-105, CA-PF-106, CA-PF-055 |
 | Versions incompatibles | F13 | CA-PF-107, CA-PF-090 à CA-PF-093 |
-| Contraste | section 5 | CA-PF-108, CA-PF-112 |
-| Daltonisme | section 5 | CA-PF-109, CA-PF-110 |
+| Contraste | absent du cahier v0.1, demandé par le manager et par les principes UX du studio (à ajouter en section 5) | CA-PF-108, CA-PF-112 |
+| Daltonisme | absent du cahier v0.1, demandé par le manager et par les principes UX du studio (à ajouter en section 5) | CA-PF-109, CA-PF-110 |
 | Navigation au clavier seul | section 5 | CA-PF-111, CA-PF-112 |
 | Lisible de 1366x768 à Retina | section 5 | CA-PF-113, CA-PF-114, CA-PF-072 |
 | Interface en français | section 5, Q2 | CA-PF-115 |
 | Aucune perte en cas de plantage ou de coupure | section 4 | CA-PF-053, CA-PF-054, CA-PF-058, CA-PF-105, CA-PF-106 |
-| Réseau dégradé, endurance | qualité du jeu en réseau | CA-PF-116, CA-PF-117 |
+| Réseau dégradé, endurance | F05, F06 | CA-PF-116, CA-PF-117 |
 
 ### 7.3 Parcours du cahier vers les critères
 
@@ -977,20 +977,23 @@ Premier jalon d'exigence: 9 critères au prototype, 88 à l'alpha, 19 à la bêt
 
 ## 8. À tester chez le client (jalon 1.0)
 
-À faire à deux, chacun sur son ordinateur, à la maison. Compter une heure environ. Pour chaque point, noter « OK » ou ce qui s'est passé; une photo de l'écran aide beaucoup. À la fin, envoyer aussi les journaux de Duo (bouton dans les réglages).
+À faire à deux, chacun sur son ordinateur, à la maison: compter une heure et demie. Pour chaque point, noter « OK » ou ce qui s'est passé; une photo de l'écran aide beaucoup. À la fin, envoyer aussi les journaux de Duo (bouton dans les réglages). Les numéros entre parenthèses renvoient aux critères: inutile de les lire.
 
-- [ ] 1. **Installer** Duo 1.0 sur le Mac et sur le PC en suivant le guide, par-dessus la version bêta si elle est là. Attendu: Duo s'ouvre après l'alerte de sécurité, sans mot de passe administrateur sur le PC; profils, sauvegardes, historique et scores de la bêta sont toujours là.
-- [ ] 2. **Premier lancement**, seulement sur un ordinateur où Duo n'avait jamais été installé: créer son profil, accepter l'autorisation réseau. Attendu: chacun voit l'autre ordinateur en moins de 5 minutes, sans aide.
-- [ ] 3. **Lancer une partie** du jeu témoin, Duo fermé au départ, chronomètre en main. Trois fois: le Mac héberge, puis le PC, puis le Mac. Attendu: la partie commence en moins d'une minute, sans taper d'adresse.
-- [ ] 4. **Couper le Wi-Fi** d'un ordinateur 30 secondes pendant une partie, puis le remettre. Recommencer en fermant le couvercle (ou en mettant l'ordinateur en veille) 1 minute. Attendu: pause des deux côtés, puis la partie reprend toute seule là où elle en était.
-- [ ] 5. **Sauvegarde croisée**: jouer jusqu'à une sauvegarde quand le Mac héberge, quitter, puis reprendre cette sauvegarde quand le PC héberge. Attendu: on repart exactement au même endroit.
-- [ ] 6. **Son**: pendant une partie, baisser puis remonter chacun des quatre volumes, sur chaque ordinateur, avec les haut-parleurs puis avec un casque si possible. Attendu: chaque réglage change seulement son type de son; à 0, on ne l'entend plus.
-- [ ] 7. **Clavier**: regarder les touches du jeu témoin dans les réglages, puis jouer. Taper aussi « Gaëlle » et « Jérôme » comme pseudo. Attendu: les touches affichées sont celles du clavier (Z, Q, S, D), elles marchent, et les accents s'écrivent normalement.
-- [ ] 8. **Écran**: passer en plein écran puis en fenêtre, sur chaque ordinateur. Attendu: tout est lisible, rien n'est coupé ni flou.
-- [ ] 9. **Fluidité sur le PC**: afficher le compteur d'images (raccourci donné dans le guide), parcourir la bibliothèque 1 minute, puis jouer 2 minutes. Photographier le compteur après chaque minute. Attendu: au moins 58 images par seconde; le reste se lit sur les photos.
-- [ ] 10. **Sans Internet**: débrancher le câble qui relie la box à la prise du mur (la box reste allumée), puis jouer une partie. Attendu: tout marche comme d'habitude. Si ce câble est délicat à manipuler (fibre), passer ce point: il est vérifié chez nous.
-- [ ] 11. **Nouveau jeu**: installer depuis la bibliothèque le jeu d'essai publié pour la recette, sur les deux ordinateurs. Attendu: il apparaît et se lance sans réinstaller Duo.
-- [ ] 12. **Facultatif, 10 minutes**: sur le PC, passer le Wi-Fi en réseau « Public » (Paramètres, Réseau et Internet, Wi-Fi, propriétés du réseau), puis ouvrir Duo pour héberger. Attendu: Duo explique comment repasser en « Privé », et après l'avoir fait, « Réessayer » retrouve le Mac.
+- [ ] 1. **Installer** Duo 1.0 sur le Mac et sur le PC en suivant le guide, par-dessus la bêta si elle est là, puis double-cliquer encore une fois sur l'icône de Duo. Attendu: Duo s'ouvre après l'alerte de sécurité, sans mot de passe administrateur sur le PC; profils, sauvegardes, historique et scores de la bêta sont toujours là; le second double-clic ramène la même fenêtre, sans en ouvrir une autre. (CA-PF-076, 077, 078, 081, 083)
+- [ ] 2. **Premier lancement**, seulement sur un ordinateur où Duo n'a jamais été installé: créer son profil, accepter l'autorisation réseau. Attendu: Duo explique la demande avant qu'elle n'apparaisse, et chacun voit l'autre ordinateur en moins de 5 minutes, sans aide. (CA-PF-079, 080)
+- [ ] 3. **Lancer une partie** du jeu témoin, Duo fermé au départ, chronomètre en main, quatre fois: le Mac héberge, puis le PC, puis le Mac, puis le PC. Une cinquième fois, rejoindre en tapant l'adresse affichée chez l'hôte. Attendu: l'invitation arrive toute seule, la partie commence en moins d'une minute, et l'adresse tapée marche aussi. (CA-PF-007, 008, 010, 022, 023, 024, 094)
+- [ ] 4. **Jouer**: pendant une partie, appuyer sur Échap, puis choisir « Reprendre »; tenir une touche de déplacement et passer à une autre fenêtre (Alt+Tab ou Cmd+Tab); aller jusqu'à la fin; dans une autre partie, fermer Duo en plein jeu. Attendu: la pause s'affiche chez les deux et la reprise suit un décompte; le personnage s'arrête au changement de fenêtre; les résultats sont les mêmes chez les deux; Duo demande confirmation avant de fermer, et l'autre ordinateur revient au salon. (CA-PF-035, 036, 037, 040, 042)
+- [ ] 5. **Coupures**: couper le Wi-Fi d'un ordinateur 30 secondes pendant une partie, puis le remettre; recommencer en fermant le couvercle (ou en mettant l'ordinateur en veille) 1 minute; enfin, Wi-Fi coupé, ouvrir l'écran pour héberger. Attendu: pause des deux côtés, puis la partie reprend toute seule là où elle en était; sans Wi-Fi, Duo dit qu'il n'y a pas de réseau, puis retrouve l'autre quand le Wi-Fi revient. (CA-PF-017, 044, 046, 050)
+- [ ] 6. **Sauvegarde croisée**: jouer jusqu'à une sauvegarde quand le Mac héberge, quitter, puis reprendre cette sauvegarde quand le PC héberge. Attendu: on repart exactement au même endroit. (CA-PF-051, 052)
+- [ ] 7. **Son**: pendant une partie, baisser puis remonter chacun des quatre volumes, sur chaque ordinateur, avec les haut-parleurs puis avec un casque si possible. Attendu: chaque réglage change seulement son type de son; à 0, on ne l'entend plus. (CA-PF-069)
+- [ ] 8. **Clavier**: regarder les touches du jeu témoin dans les réglages, puis jouer; taper « Gaëlle » et « Jérôme » comme pseudo; enfin, lancer une partie sans toucher la souris (Tab, flèches, Entrée, Échap). Attendu: les touches affichées sont celles du clavier (Z, Q, S, D) et elles marchent; les accents s'écrivent; tout se fait au clavier. (CA-PF-073, 099, 100, 111)
+- [ ] 9. **Écran et langue**: passer en plein écran puis en fenêtre, sur chaque ordinateur, et ouvrir les menus de Duo en haut de l'écran du Mac. Attendu: tout est lisible, rien n'est coupé; tout est en français, menus compris. (CA-PF-071, 113, 115)
+- [ ] 10. **Fluidité sur le PC**: afficher le compteur d'images (raccourci donné dans le guide), passer 1 minute dans la bibliothèque, 1 minute dans le salon et 1 minute dans les réglages, puis jouer 2 minutes comme hôte et 2 minutes comme invité. Photographier le compteur après chaque minute. Attendu: au moins 58 images par seconde; le reste se lit sur les photos. (CA-PF-095, 096)
+- [ ] 11. **Sans Internet**: débrancher le câble qui relie la box à la prise du mur (la box reste allumée), puis jouer une partie. Attendu: tout marche, sans autre message sur Internet qu'une mention discrète dans la bibliothèque. Si ce câble est délicat à manipuler (fibre), passer ce point: il est vérifié chez nous. (CA-PF-097)
+- [ ] 12. **Nouveau jeu**: installer depuis la bibliothèque le jeu d'essai publié pour la recette, sur les deux ordinateurs. Attendu: il apparaît et se lance sans réinstaller Duo. (CA-PF-084)
+- [ ] 13. **Facultatif, 10 minutes**: sur le PC, passer le Wi-Fi en réseau « Public » (Paramètres, Réseau et Internet, Wi-Fi, propriétés du réseau), puis ouvrir Duo pour héberger. Attendu: Duo explique comment repasser en « Privé », et une fois que c'est fait, « Réessayer » retrouve le Mac. (CA-PF-014)
+
+Les autres critères à vérifier chez le client (pare-feu et autorisations refusés, CA-PF-012 à CA-PF-016; plusieurs interfaces réseau, CA-PF-019; désinstallation, CA-PF-082; compte Windows au nom accentué, CA-PF-102) se vérifient à la recette bêta, pas à pas, avec les instructions du studio. La 1.0 ne les reprend que si le code concerné a changé depuis la bêta, ce que le rapport de recette établit par l'historique Git.
 
 ## 9. Historique
 

@@ -29,8 +29,7 @@
   .fenetre-systeme .case-systeme span.boite.cochee { background: #111; }
   .boutons-systeme { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
   .faux-bouton { border: 2px solid #767676; border-radius: 6px; padding: 4px 14px; font-size: 15px; background: #fff; }
-  .faux-bouton.cible { border: 3px solid #111; font-weight: 800; position: relative; }
-  .faux-bouton.cible::after { content: ""; position: absolute; inset: -9px; border: 2px dashed #111; border-radius: 10px; }
+  .faux-bouton.cible { border: 3px solid #111; font-weight: 800; outline: 2px dashed #111; outline-offset: 5px; }
   .deux-colonnes { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 32px; align-items: center; }
   .statut-recherche { display: flex; align-items: center; gap: 14px; font-size: 20px; font-weight: 700; }
   .joueurs.trouves { width: 100%; max-width: 640px; text-align: left; }
