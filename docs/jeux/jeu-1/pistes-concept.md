@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposition, en attente du choix du client |
+| Statut | piste A choisie par le client le 2026-10-30 |
 | Version du document | 0.1 |
 | Dernière mise à jour | 2026-10-30 |
 | Rédaction | game-designer |
@@ -473,3 +473,15 @@ Deux idées des autres pistes se greffent sans dénaturer A: les visiteurs compo
 | Q3 | Vos deux personnages vivent-ils ensemble ? | une maison commune; deux maisons voisines | une maison commune avec un coin à soi pour chacun (atelier, recoin à décorer), et pas de romance avec les habitants: le couple, c'est vous |
 | Q4 | Quelle part de défi ? | aucune; légère; réelle (dangers, combats) | légère: exploration, petites énigmes, aléas annoncés la veille, jamais de combat ni de perte définitive |
 | Q5 | Quel style visuel vous attire ? | 3D aux formes simples; 2D illustrée ou pixel art | 3D aux formes simples pour A et B, la plus adaptée à nos moyens de production et au PC; la décision finale revient au directeur artistique et à l'architecte, votre goût les guidera |
+
+## 8. Décisions du client (2026-10-30)
+
+Le client a suivi toutes les recommandations:
+
+| # | Décision |
+|---|---|
+| Q1 | Piste A, La Petite Ligne |
+| Q2 | Le monde n'avance que quand les deux joueurs jouent ensemble |
+| Q3 | Une maison commune avec un coin à soi pour chacun; pas de romance avec les habitants |
+| Q4 | Défi léger: exploration, petites énigmes, aléas annoncés la veille; jamais de combat ni de perte définitive |
+| Q5 | Style visuel laissé au studio. Décision du manager: 3D low poly en vue isométrique (caméra orthographique), à confirmer par un essai de style mesuré contre les budgets de la machine de référence (directeur-artistique, tech-artist, architecte-technique) |

@@ -3,8 +3,8 @@
 | Champ | Valeur |
 |---|---|
 | Identifiant | `plateforme` |
-| Statut | en revue (soumis au client le 2026-10-30) |
-| Version du document | 0.3 |
+| Statut | validé par le client le 2026-10-30 |
+| Version du document | 1.0 |
 | Dernière mise à jour | 2026-10-30 |
 
 > Rédigé par le manager à partir des réponses du client, complété par l'équipe. Documents liés: parcours et écrans (`docs/plateforme/ux/parcours.md`, wireframes dans `design/maquettes/plateforme-wireframes/`), pistes d'identité visuelle (`docs/plateforme/identite-visuelle-pistes.md`), architecture proposée (`docs/plateforme/architecture.md`), critères d'acceptation (`docs/plateforme/criteres-acceptation.md`). Une fois validé par le client, ce document est le contrat de la plateforme: toute modification passe par le manager et s'inscrit dans l'historique (section 10).
@@ -46,12 +46,13 @@ Détaillés dans `docs/plateforme/ux/parcours.md` (20 écrans, textes exacts, to
 | F05 | Cycle de vie d'un jeu | Chargement, pause (Échap, réservé à la pause dans tous les jeux), reprise quand les deux l'ont demandée, fin, rejouer à deux ou retour au salon. Pas de pause automatique à la perte de focus de la fenêtre (les touches sont relâchées). Un jeu qui plante ou se fige ramène les deux joueurs au salon en 5 secondes au plus (10 s s'il se fige), sans fermer Duo ni perdre la dernière sauvegarde. |
 | F06 | Déconnexion | Pause des deux côtés en 3 secondes au plus (aucune pour une micro-coupure), attente sans limite de temps, reconnexion automatique puis reprise à deux, là où la partie en était tant que l'application de l'hôte reste ouverte; sinon, reprise au dernier point de sauvegarde (sauvegarde automatique régulière pour les jeux longs). |
 | F07 | Sauvegardes | Chaque jeu enregistre la progression du duo. Une sauvegarde appartient au duo, existe sur les deux machines et se reprend quelle que soit la machine qui héberge. Remplacer une sauvegarde demande confirmation; les trois versions précédentes restent en copies de secours, visibles dans la fiche du jeu. Supprimer une sauvegarde demande confirmation et garde une copie de secours. |
-| F08 | Historique | Chaque partie ou séance est enregistrée: jeu, date de début, durée hors pauses, résultat, scores. Les jeux sans fin de partie (comme une simulation de vie) inscrivent des séances. Les deux copies de l'historique se fusionnent: aucune partie n'est perdue. |
+| F08 | Historique | Chaque partie ou séance est enregistrée: jeu, date de début, durée hors pauses, résultat, scores. Les jeux sans fin de partie (comme une simulation de vie) inscrivent des séances. Les deux copies de l'historique se fusionnent: aucune partie n'est perdue. Une partie interrompue (plantage, abandon) est inscrite « interrompue », sans effet sur le score cumulé. |
 | F09 | Score cumulé | Victoires de chacun, par jeu et au total, pour les jeux en affrontement; progression commune pour les jeux en coopération. Calculé à partir de l'historique. |
 | F10 | Réglages | Volumes (général, musique, effets, interface); plein écran ou fenêtre (fenêtre agrandie au premier lancement, plein écran en une touche); taille de l'interface 100, 125 ou 150 %; « Réduire les animations » (suit d'abord le réglage du système); touches de chaque jeu, réaffectables. |
 | F11 | Installation | Installateurs macOS (puce Apple) et Windows. Guide d'installation hors application (alertes de sécurité de macOS et de Windows, pare-feu), livrable à part d'ingenieur-build et ux-ui-designer. |
 | F12 | Nouveaux jeux | Ajout et mise à jour d'un jeu sans réinstaller l'application: téléchargement automatique en arrière-plan, jamais pendant une partie; copie depuis l'autre ordinateur par le réseau local si l'un n'a pas Internet; installation depuis un fichier en recours. Internet sert seulement à récupérer les jeux, jamais à jouer. |
 | F13 | Compatibilité | Les versions sont comparées dès que les deux ordinateurs se voient. On joue la version la plus récente d'un jeu présente sur l'une des deux machines: elle est copiée vers l'autre par le réseau local, en une action (« Mettre à jour et rejoindre »). Si l'application elle-même est trop ancienne sur une machine, message clair et marche à suivre. |
+| F14 | Rapport de diagnostic | Export en un clic d'un rapport (journaux, configuration de la machine, état du réseau et du rendu graphique, versions) à envoyer au studio. Aucune donnée personnelle en dehors des pseudos; le joueur voit ce que contient le rapport avant de l'enregistrer. |
 
 ### Plus tard
 
@@ -74,7 +75,7 @@ Détaillés dans `docs/plateforme/ux/parcours.md` (20 écrans, textes exacts, to
 
 ## 5. Interface et identité
 
-- Identité visuelle: trois pistes proposées par directeur-artistique; le client en choisit une (Q1).
+- Identité visuelle: piste B « Étoile double » choisie par le client (Q1): sombre et calme, traits fins, deux astres pour les deux joueurs. Détail dans `docs/plateforme/identite-visuelle.md` (à venir).
 - Identité sonore: définie par sound-designer après le choix de la piste visuelle.
 - Interface en français, en tutoyant les joueurs, avec une rédaction neutre: aucun texte ne s'accorde au genre d'un joueur (« Sacha a rejoint », jamais « Sacha est prête »).
 - Navigation complète au clavier, souris en complément. Contraste WCAG AA au minimum; les deux joueurs se distinguent aussi pour un daltonien (luminosité et symbole, pas seulement la teinte); option de réduction des animations.
@@ -115,12 +116,12 @@ Le jeu témoin est un mini-jeu à deux, très simple, qui éprouve toute la cha�
 
 | # | Question | Options | Recommandation | Décision du client | Date |
 |---|---|---|---|---|---|
-| Q1 | Piste d'identité visuelle | A Boîte à jeux, B Étoile double, C Deux encres | B: sombre et calme, elle met tous les jeux en valeur et reste confortable le soir | | |
+| Q1 | Piste d'identité visuelle | A Boîte à jeux, B Étoile double, C Deux encres | B: sombre et calme, elle met tous les jeux en valeur et reste confortable le soir | B | 2026-10-30 |
 | Q2 | Ton de l'interface | tutoiement, vouvoiement | tutoiement | tutoiement | 2026-10-30 |
 | Q3 | Visibilité du dépôt GitHub | public, privé | public | public | 2026-10-30 |
 | Q4 | Configuration réelle des machines | relevé guidé. PC: mémoire, disque, carte graphique, version de Windows, état de Smart App Control, réseau Privé ou Public, compte administrateur ou non, nom du dossier utilisateur, définition et mise à l'échelle de l'écran. Mac: modèle et version de macOS | la relever avant le prototype | | |
-| Q5 | Parties interrompues (plantage, abandon) | ignorées, ou inscrites « interrompues » dans l'historique | inscrites « interrompues », sans effet sur le score cumulé | | |
-| Q6 | Rapport de diagnostic exportable en un clic (journaux, configuration, état réseau et graphique) | l'ajouter en F14, ou non | l'ajouter: seul moyen de comprendre un problème sur des machines que le studio ne voit pas | | |
+| Q5 | Parties interrompues (plantage, abandon) | ignorées, ou inscrites « interrompues » dans l'historique | inscrites « interrompues », sans effet sur le score cumulé | inscrites « interrompues » (F08) | 2026-10-30 |
+| Q6 | Rapport de diagnostic exportable en un clic (journaux, configuration, état réseau et graphique) | l'ajouter en F14, ou non | l'ajouter: seul moyen de comprendre un problème sur des machines que le studio ne voit pas | ajouté (F14) | 2026-10-30 |
 
 ## 10. Historique
 
@@ -130,3 +131,4 @@ Le jeu témoin est un mini-jeu à deux, très simple, qui éprouve toute la cha�
 | 2026-10-30 | 0.1 | Décisions Q2 (tutoiement) et Q3 (dépôt public) | client |
 | 2026-10-30 | 0.2 | Section 6 et reformulations de F02, F06, F13 d'après `architecture.md`; questions Q5 et Q6 | architecte-technique, manager |
 | 2026-10-30 | 0.3 | Parcours « Dépanner »; précisions de F01 à F13 d'après la spécification UX et les critères d'acceptation; F13 joue la version la plus récente; règles de conflit par révisions; rédaction neutre et accessibilité; Q4 complétée; soumis au client | ux-ui-designer, qa-testeur, manager |
+| 2026-10-30 | 1.0 | Validation par le client: Q1 (piste B), Q5 (parties interrompues inscrites), Q6 (F14, rapport de diagnostic) | client |
