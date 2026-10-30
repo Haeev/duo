@@ -4,7 +4,10 @@ Lu par la session principale (le manager) et par chaque membre de l'équipe (sou
 
 ## Le projet
 
-- **Duo** est une application de bureau pour jouer à deux en réseau local: le Mac du client (propriétaire du dépôt), à puce Apple M1, et le PC Windows 11 de sa compagne, à processeur Intel (carte graphique à confirmer). L'un héberge la partie, l'autre la rejoint. Cibles: macOS arm64 et Windows x64.
+- **Duo** est une application de bureau pour jouer à deux en réseau local: le Mac du client (propriétaire du dépôt), à puce Apple M1, et le PC Windows 11 de sa compagne. L'un héberge la partie, l'autre la rejoint. Cibles: macOS arm64 et Windows x64.
+- **Machine de référence pour les performances**: le PC, de configuration inconnue. Hypothèse prudente validée par le client: Intel Core i3 de 2018 avec graphique intégré (Intel UHD 620), écran de portable possible (1366x768), mémoire inconnue.
+- **Joueurs**: toujours deux, dans la même pièce, chacun sur sa machine; pas de mode solo. Clavier AZERTY et souris, pas de manette.
+- **Mémoire des parties**: sauvegardes, historique et score cumulé, demandés dès le premier jeu.
 - Elle accueille des jeux originaux créés par le studio, en 2D, 3D ou isométrique, ajoutés un par un.
 - Chaque jeu naît d'un cahier des charges (modèle: `docs/modeles/cahier-des-charges.md`) validé par le client avant toute production.
 - Avancement et décisions en attente: `docs/feuille-de-route.md`.
@@ -92,7 +95,7 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 
 ### Technique
 
-- Hors ligne: aucune dépendance réseau à l'exécution en dehors du LAN. Pas de CDN; polices (paquets `@fontsource` sur npm), bibliothèques et assets embarqués.
+- Hors ligne: Duo et ses jeux fonctionnent sans Internet, avec le seul réseau local. Seule la récupération des nouveaux jeux et des mises à jour peut passer par Internet, sans jamais être indispensable pour jouer. Pas de CDN; polices (paquets `@fontsource` sur npm), bibliothèques et assets embarqués.
 - macOS et Windows à égalité: chemins construits avec `path` (espaces et accents dans les noms d'utilisateur), casse des noms de fichiers, fins de ligne, claviers AZERTY (touches lues par `KeyboardEvent.code`, libellés affichés selon la disposition réelle), écrans Retina et mise à l'échelle de Windows.
 - TypeScript strict: pas de `any` sans justification en commentaire, pas d'assertion non nulle (`!`) gratuite, données externes (réseau, fichiers, réglages) validées à l'exécution, types de retour explicites sur les fonctions exportées, unions discriminées plutôt que plusieurs booléens.
 - Valeurs de gameplay dans des fichiers de configuration typés, jamais en dur dans la logique.
@@ -102,13 +105,15 @@ Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal;
 ### Git
 
 - `main` est la branche de référence: les nouvelles sessions partent de là. Chaque session travaille sur sa propre branche, et le travail validé est reporté sur `main`.
+- Accord du client (2026-10-30): le manager reporte lui-même le travail vérifié sur `main` à la fin de chaque étape.
+- Le dépôt est public: tout ce qui y est versionné est visible par tous. Aucune donnée personnelle, aucun secret.
 - Les membres ne committent pas et ne poussent pas: le manager relit, committe et pousse sur la branche de la session.
 - Commits conventionnels en français, à l'impératif, en minuscules: `feat(reseau): ajoute la découverte des hôtes sur le LAN`.
 
 ### Preuve avant affirmation
 
 - Une tâche n'est terminée qu'avec une preuve: sortie des tests, commande exécutée, capture d'écran examinée. Ce qui n'a pas pu être vérifié est dit, avec la raison.
-- Ce qui ne se vérifie que sur les vraies machines (installation, pare-feu, son, manette, performances) va dans la liste « À tester chez le client » du compte rendu.
+- Ce qui ne se vérifie que sur les vraies machines (installation, pare-feu, son, performances) va dans la liste « À tester chez le client » du compte rendu.
 
 ### Environnement cloud (vérifié le 2026-10-30)
 

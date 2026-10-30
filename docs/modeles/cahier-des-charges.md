@@ -42,9 +42,9 @@
 
 ## 5. Contrôles (game-designer, ux-ui-designer)
 
-| Action | Clavier AZERTY | Clavier QWERTY | Souris | Manette |
-|---|---|---|---|---|
-| | | | | |
+| Action | Touche (clavier AZERTY) | Souris |
+|---|---|---|
+| | | |
 
 - Reconfiguration des touches: oui ou non.
 
