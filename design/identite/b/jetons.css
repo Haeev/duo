@@ -1,0 +1,162 @@
+/*
+ * Jetons de l'identité visuelle de Duo, piste B « Étoile double », version 1.0.0.
+ * Fichier généré par design/identite/b/outils/generer-jetons.cjs depuis source/jetons.cjs:
+ * ne pas le modifier à la main. Mêmes noms et mêmes valeurs que jetons.json.
+ * Règles d'usage: docs/plateforme/identite-visuelle.md
+ */
+:root {
+  --couleur-fond: #0E1126;
+  --couleur-fond-lueur: #1A1F48;
+  --couleur-surface: #1A1F3D;
+  --couleur-surface-haute: #252B52;
+  --couleur-filet: #2A3060;
+  --couleur-trait: #3B4380;
+  --couleur-contour: #7178BB;
+  --couleur-texte: #F3F1FA;
+  --couleur-texte-2: #A7ABD6;
+  --couleur-texte-inactif: #6F74A3;
+  --couleur-accent: #FFC857;
+  --couleur-accent-survol: #FFD47A;
+  --couleur-accent-presse: #F0B440;
+  --couleur-sur-accent: #0E1126;
+  --couleur-succes: #6BD69A;
+  --couleur-erreur: #FF6B81;
+  --couleur-focus: #F3F1FA;
+  --couleur-voile: #0E1126B8;
+  --couleur-ombre-1: #090B1B;
+  --couleur-ombre-2: #070915;
+  --couleur-ombre-3: #05060F;
+
+  --joueur-astre: #5CE1E6;
+  --joueur-croissant: #8D6CFF;
+  --joueur-etoile: #D4F27A;
+  --joueur-soleil: #FC663F;
+  --joueur-planete: #E787B1;
+  --joueur-comete: #22B07D;
+  --joueur-sur: #0E1126;
+  --joueur-halo-opacite: 0.45;
+
+  --police-titre: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --police-texte: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+
+  --type-affiche-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-affiche-taille: 56px;
+  --type-affiche-interligne: 60px;
+  --type-affiche-graisse: 300;
+  --type-affiche-approche: -0.01em;
+
+  --type-titre-1-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-titre-1-taille: 40px;
+  --type-titre-1-interligne: 48px;
+  --type-titre-1-graisse: 300;
+  --type-titre-1-approche: 0;
+
+  --type-titre-2-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-titre-2-taille: 30px;
+  --type-titre-2-interligne: 36px;
+  --type-titre-2-graisse: 400;
+  --type-titre-2-approche: 0;
+
+  --type-titre-3-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-titre-3-taille: 22px;
+  --type-titre-3-interligne: 28px;
+  --type-titre-3-graisse: 500;
+  --type-titre-3-approche: 0.01em;
+
+  --type-surtitre-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-surtitre-taille: 14px;
+  --type-surtitre-interligne: 18px;
+  --type-surtitre-graisse: 500;
+  --type-surtitre-approche: 0.24em;
+
+  --type-corps-grand-police: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --type-corps-grand-taille: 18px;
+  --type-corps-grand-interligne: 28px;
+  --type-corps-grand-graisse: 400;
+  --type-corps-grand-approche: 0;
+
+  --type-corps-police: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --type-corps-taille: 16px;
+  --type-corps-interligne: 24px;
+  --type-corps-graisse: 400;
+  --type-corps-approche: 0;
+
+  --type-libelle-police: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --type-libelle-taille: 16px;
+  --type-libelle-interligne: 20px;
+  --type-libelle-graisse: 600;
+  --type-libelle-approche: 0;
+
+  --type-petit-police: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --type-petit-taille: 14px;
+  --type-petit-interligne: 20px;
+  --type-petit-graisse: 500;
+  --type-petit-approche: 0.01em;
+
+  --type-chiffre-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-chiffre-taille: 56px;
+  --type-chiffre-interligne: 56px;
+  --type-chiffre-graisse: 300;
+  --type-chiffre-approche: 0.02em;
+
+  --type-decompte-police: 'Jost Variable', 'Jost', system-ui, sans-serif;
+  --type-decompte-taille: 160px;
+  --type-decompte-interligne: 160px;
+  --type-decompte-graisse: 300;
+  --type-decompte-approche: 0;
+
+  --espace-1: 4px;
+  --espace-2: 8px;
+  --espace-3: 12px;
+  --espace-4: 16px;
+  --espace-5: 20px;
+  --espace-6: 24px;
+  --espace-8: 32px;
+  --espace-10: 40px;
+  --espace-12: 48px;
+  --espace-16: 64px;
+  --espace-20: 80px;
+
+  --rayon-petit: 8px;
+  --rayon-moyen: 14px;
+  --rayon-grand: 22px;
+  --rayon-capsule: 999px;
+
+  --trait-filet: 1px;
+  --trait-composant: 1.5px;
+  --trait-focus: 3px;
+  --trait-focus-decalage: 3px;
+
+  --elevation-1: 0 0 0 1px #2A3060, 0 2px 0 0 #090B1B;
+  --elevation-2: 0 0 0 1px #3B4380, 0 4px 0 0 #070915;
+  --elevation-3: 0 0 0 1px #3B4380, 0 8px 0 0 #05060F;
+
+  --icone-taille: 24px;
+  --icone-taille-grande: 32px;
+  --icone-taille-petite: 20px;
+  --icone-trait: 1.75;
+  --icone-trait-petite: 1.8;
+
+  --duree-rapide: 150ms;
+  --duree-moyenne: 300ms;
+  --duree-lente: 600ms;
+  --duree-orbite: 4000ms;
+  --duree-scintillement: 3600ms;
+
+  --courbe-standard: cubic-bezier(0.45, 0, 0.25, 1);
+  --courbe-entree: cubic-bezier(0.2, 0, 0.2, 1);
+  --courbe-sortie: cubic-bezier(0.45, 0, 0.85, 0.5);
+
+  --boucles-etat: running;
+}
+
+/* variante « mouvement-reduit » */
+:root[data-mouvement="reduit"] {
+  --duree-rapide: 0ms;
+  --duree-moyenne: 0ms;
+  --duree-lente: 0ms;
+  --duree-orbite: 0ms;
+  --duree-scintillement: 0ms;
+
+  --boucles-etat: paused;
+}

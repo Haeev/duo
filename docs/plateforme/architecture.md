@@ -2,23 +2,24 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposition |
-| Version du document | 0.1 |
+| Statut | synthèse vivante; les décisions sont dans les ADR (`docs/plateforme/decisions/`), proposées le 2026-10-30 |
+| Version du document | 0.2 |
 | Dernière mise à jour | 2026-10-30 |
 | Rédacteur | architecte-technique |
-| Sources | `docs/plateforme/cahier-des-charges.md` (brouillon v0.1), fiches de l'équipe |
+| Sources | `cahier-des-charges.md` 1.0 (validé le 2026-10-30), `ux/parcours.md` 0.1, `criteres-acceptation.md` 0.2, ADR 0001 à 0015 |
 
-> Proposition à valider en même temps que le cahier des charges de la plateforme. Après validation, chaque choix structurant devient un ADR dans `docs/plateforme/decisions/` (liste ordonnée en section 16) et ce document en reste la synthèse vivante. Les faits marqués « vérifié » l'ont été le 2026-10-30 (versions npm, documentation officielle, essai jetable d'Electron 45 sous `xvfb-run`); les points marqués « à vérifier » restent ouverts et sont regroupés en section 18.
+> Ce document résume l'architecture de la plateforme: processus, modules, flux de données, contrat des jeux, budgets, risques et découpage. Chaque choix structurant y renvoie à son ADR, qui fait foi (index: `decisions/README.md`). Le réseau (ADR 0007 et 0008, `reseau.md`) appartient à dev-reseau, les installateurs et les mises à jour de Duo (ADR 0011) à ingenieur-build: les sections 7 et 11 n'en donnent que ce que le reste de la plateforme en attend. Les faits marqués « vérifié » l'ont été le 2026-10-30 (versions npm, documentation officielle au tag de la version, essais jetables hors du dépôt); ce qui reste ouvert est regroupé en section 19. La correspondance entre les hypothèses H-01 à H-35 des critères et les décisions est dans `decisions/resolution-hypotheses.md`.
 
 ## 1. L'essentiel
 
-1. Une fenêtre Electron et un seul processus principal, qui porte tout ce qui touche au système (réseau, fichiers, paquets de jeux). Deux sortes de vues web isolées: la vue de la plateforme (lanceur et écrans superposés au jeu) et une vue par partie en cours (le jeu).
-2. Chaque jeu tourne dans son propre processus de rendu, en bac à sable, sans Node ni accès réseau. S'il plante ou se bloque, la plateforme ferme sa vue et ramène les deux joueurs au salon.
-3. Un jeu est un paquet web statique (HTML, JavaScript, assets) accompagné d'un manifeste. Il parle à la plateforme par un unique canal de messages versionné, au travers du SDK `@duo/sdk` compilé dans le jeu.
-4. Réseau: seuls les deux processus principaux se parlent, en WebSocket sur le LAN; les jeux ne voient que des messages relayés. Par défaut, l'instance du jeu qui tourne chez l'hôte fait autorité.
-5. Les données du duo (sauvegardes, historique) sont des fichiers JSON du dossier de l'utilisateur, écrits de façon sûre et répliqués sur l'autre machine. L'historique est immuable; les scores en sont calculés.
-6. Les jeux s'installent et se mettent à jour sans réinstaller l'application: paquets signés publiés sur GitHub Releases, et copie automatique du paquet de l'hôte vers l'invité sur le LAN.
-7. Monorepo pnpm, TypeScript 6.0 strict, Vite 8, Vitest et Playwright; installateurs fabriqués par electron-builder dans GitHub Actions.
+1. Une fenêtre Electron et un seul processus principal, qui porte tout ce qui touche au système (réseau, fichiers, paquets de jeux, diagnostics). Deux sortes de vues web en bac à sable: la vue de la plateforme (lanceur et écrans superposés au jeu) et une vue par partie (le jeu). ADR 0003.
+2. Chaque jeu tourne dans son propre processus. S'il plante, les deux joueurs reviennent au salon en moins de 2 s; s'il se fige, en moins de 7 s. ADR 0004.
+3. Un jeu est un paquet web statique accompagné d'un manifeste. Il parle à la plateforme par un unique canal de messages versionné, au travers du SDK `@duo/sdk` compilé dans le jeu. ADR 0005.
+4. Réseau: seuls les deux processus principaux se parlent. Les deux applications se relient dès qu'elles se voient (présence, comparaison des versions, profils, données du duo, invitations); en partie, l'hôte fait autorité par défaut. ADR 0007 et 0008 (dev-reseau).
+5. Les données du duo sont des fichiers JSON du dossier de l'utilisateur, copiés sur les deux machines. Le duo a son propre identifiant et deux membres, ce qui permet à une machine réinstallée de reprendre sa place. Une sauvegarde est une suite de révisions immuables; deux copies divergentes se départagent par leur chaîne de révisions, jamais par les horloges. L'historique est immuable, parties interrompues comprises; les scores en sont calculés. ADR 0009.
+6. Les jeux s'installent et se mettent à jour sans réinstaller l'application: paquets signés publiés sur GitHub Releases, et copie par le réseau local de la version la plus récente présente sur l'une des deux machines, en une action, dans un sens ou dans l'autre. ADR 0006 et 0010.
+7. Un rapport de diagnostic texte, lisible et vérifié avant envoi, sans donnée personnelle hors des pseudos (F14). ADR 0015.
+8. Monorepo pnpm, TypeScript 6.0 strict, Vite 8, Preact 11 pour le lanceur, Vitest et Playwright; installateurs fabriqués par electron-builder dans GitHub Actions. ADR 0001, 0002, 0011, 0012, 0013.
 
 ## 2. Contexte, contraintes et versions
 
@@ -26,35 +27,39 @@
 
 - Deux joueurs, deux machines: un Mac M1 (macOS arm64) et un PC Windows 11 x64 (hypothèse: Intel Core i3 de 2018, Intel UHD 620, mémoire inconnue, écran de portable possible). Clavier AZERTY et souris, pas de manette.
 - Hors ligne: aucune dépendance réseau pendant le jeu en dehors du LAN. Internet sert seulement à récupérer les jeux et les nouvelles versions.
-- Pas de certificat de signature payant. Dépôt GitHub `Haeev/duo` public: ses fichiers de release se téléchargent sans authentification.
-- Ajouter ou mettre à jour un jeu ne doit pas imposer de réinstaller l'application (F12).
-- Les machines du client ne sont pas accessibles depuis le studio: ce qui ne se mesure que chez lui doit être instrumenté (journaux, rapport de diagnostic exportable, banc de mesure).
+- Pas de certificat de signature payant. Dépôt GitHub `Haeev/duo` public (Q3): ses fichiers de release se téléchargent sans authentification.
+- Ajouter ou mettre à jour un jeu ne doit pas imposer de réinstaller l'application (F12); on joue toujours la version la plus récente d'un jeu présente sur l'une des deux machines (F13).
+- Les données du duo existent sur les deux machines; une machine réinstallée se rattache au duo et récupère ses données (cahier, section 4).
+- Les machines du client ne sont pas accessibles depuis le studio: ce qui ne se mesure que chez lui est instrumenté (journal, rapport de diagnostic F14, affichage des performances, banc de mesure).
 - Electron 45 exige macOS 13 ou plus et Windows 10 ou plus (README du paquet): compatible avec les deux machines.
 
-### 2.2 Versions relevées le 2026-10-30
+### 2.2 Versions figées
 
-Vérifié avec `npm view`; poids mesurés avec esbuild (minifié, puis gzip -9) sur un point d'entrée représentatif.
+Relevées avec `npm view` le 2026-10-30, deux fois dans la journée (identiques), et figées par l'ADR 0001, qui fixe aussi la politique de montée de version.
 
 | Brique | Version | Licence | Remarque |
 |---|---|---|---|
-| electron | 45.2.0 | MIT | Chromium 156, Node 24.22.1, V8 15.6 (lus dans le binaire); 45.0.0 sortie le 2026-10-21; une majeure toutes les 8 semaines, seules les trois dernières sont maintenues (environ 6 mois chacune) |
-| electron-builder et electron-updater | 26.18.0 et 6.8.11 | MIT | |
+| electron | 45.2.0 | MIT | Chromium 156, Node 24.22.1, V8 15.6 (lus dans le binaire); 45.0.0 sortie le 2026-10-21; une majeure toutes les 8 semaines, les trois dernières maintenues |
 | electron-vite | 6.0.0 | MIT | accepte Vite 6 à 8 |
+| electron-builder et electron-updater | 26.18.0 et 6.8.11 | MIT | usage fixé par l'ADR 0011 |
 | vite | 8.3.5 | MIT | empaqueteur Rolldown |
 | vitest | 5.0.5 | MIT | Node 22.12 ou plus |
-| playwright | 1.64.1 (1.63.0 préinstallé) | Apache-2.0 | pilote Electron (vérifié avec 1.63.0) |
-| typescript | 7.0.2 (dernière), 6.0.3 | Apache-2.0 | typescript-eslint 8.72.1 exige `typescript <6.1.0`: on retient 6.0.3 |
+| playwright et @playwright/test | 1.64.1 (1.63.0 préinstallé) | Apache-2.0 | pilote Electron (vérifié avec 1.63.0) |
+| typescript | 6.0.3 (7.0.2 est la dernière) | Apache-2.0 | typescript-eslint 8.72.1 exige `typescript <6.1.0` |
 | eslint et typescript-eslint | 10.14.0 et 8.72.1 | MIT | |
+| prettier | 3.9.10 | MIT | |
 | pnpm | 12.16.1 | MIT | corepack 0.34.0 présent avec Node 22.22.0 |
+| valibot | 1.5.0 | MIT | validation sans génération de code; `object()` retire les champs inconnus |
+| ws | 8.22.0 | MIT | WebSocket des processus principaux |
+| preact et @preact/signals | 11.1.0 et 2.11.4 | MIT | 8,4 Ko gzip ensemble (mesuré); Preact 11.0.0 sortie le 2026-09-30 |
+| yauzl et yazl | 3.4.0 et 3.3.1 | MIT | lecture et écriture des paquets de jeux |
+| @fontsource-variable/jost et dm-sans | 5.3.0 | OFL-1.1 | polices de l'identité « Étoile double » |
 | three | 0.187.0 | MIT | 155 Ko gzip avec `GLTFLoader` et les classes courantes |
 | pixi.js | 8.22.0 | MIT | 173 Ko gzip pour un usage courant |
-| phaser | 4.2.1 | MIT | 4.0.0 sortie le 2026-04-10; 360 Ko gzip (bibliothèque entière) |
-| ws | 8.22.0 | MIT | serveur et client WebSocket des processus principaux |
-| valibot | 1.5.0 | MIT | validation sans génération de code, de l'ordre du kilo-octet |
-| zod | 4.6.7 | MIT | 90 Ko gzip en API classique, 4 Ko en `zod/mini` |
-| preact | 11.1.0 | MIT | 5 Ko gzip |
+| phaser | 4.2.1 | MIT | 360 Ko gzip (bibliothèque entière) |
+| zod (écarté) | 4.6.7 | MIT | sonde `new Function` sous CSP stricte, 90 Ko gzip en API classique |
 
-Node pour l'outillage: 22 (préinstallé dans l'environnement cloud, maintenu jusqu'en avril 2027). Electron embarque son propre Node 24.
+Node pour l'outillage: 22 (préinstallé dans l'environnement cloud, maintenu jusqu'en avril 2027), avec `@types/node` en 22. Electron embarque son propre Node 24.
 
 ## 3. Vue d'ensemble
 
@@ -63,10 +68,11 @@ flowchart LR
   subgraph H["Machine hôte"]
     direction TB
     subgraph PH["Processus principal (Node)"]
-      SessH["Session: serveur WebSocket, poignée de main, battements"]
+      SessH["Session et liaison: présence, salon, partie, battements"]
       DecH["Découverte UDP"]
-      DonH["Données du duo: écriture sûre, réplication"]
+      DonH["Données du duo: écriture sûre, réplication, rattachement"]
       PaqH["Paquets de jeux: catalogue, installation, copie LAN"]
+      DiagH["Diagnostics: journal, rapport"]
       ProtH["Protocoles duo:// et duo-game://"]
     end
     VPH["Vue plateforme: lanceur, écrans superposés"]
@@ -82,15 +88,14 @@ flowchart LR
     VPI <-->|"IPC typé"| PI
     VJI <-->|"MessagePort"| PI
   end
-  PI -->|"UDP: requête de découverte"| DecH
-  DecH -->|"UDP: réponse (adresse, port, versions)"| PI
-  PI <-->|"WebSocket LAN: session, messages de jeu, réplication, paquets"| SessH
+  PI <-->|"UDP: présence (versions, identifiant)"| DecH
+  PI <-->|"Liaison LAN: versions, données, invitations, messages de jeu, paquets"| SessH
   GH[("GitHub Releases: catalogue, paquets signés, versions de Duo")]
   PaqH -.->|"HTTPS si Internet"| GH
   PI -.->|"HTTPS si Internet"| GH
 ```
 
-Déroulé d'une partie, de la connexion au résultat:
+Déroulé d'une partie, de la rencontre au résultat:
 
 ```mermaid
 sequenceDiagram
@@ -98,11 +103,11 @@ sequenceDiagram
   participant PH as Principal hôte
   participant PI as Principal invité
   participant JI as Jeu chez l'invité
-  PI->>PH: découverte puis connexion WebSocket
-  PI->>PH: poignée de main (versions, profil, jeux installés)
-  PH-->>PI: accepté, synchronisation des données du duo
-  PH-->>PI: salon (jeu, version, sauvegarde choisie)
-  Note over PH,PI: si le jeu manque ou diffère chez l'invité, copie du paquet signé depuis l'hôte
+  PI->>PH: présence vue, liaison ouverte
+  PI->>PH: poignée de main (versions, profil, jeux installés, duos connus)
+  PH-->>PI: comparaison des index, rattrapage des données du duo
+  PH-->>PI: invitation (jeu, version, sauvegarde choisie)
+  Note over PH,PI: si les versions du jeu diffèrent, la plus récente est copiée vers l'autre machine, en une action
   PH->>JH: crée la vue, init (rôle hôte, graine, sauvegarde)
   PI->>JI: crée la vue, init (rôle invité, graine)
   JH-->>PH: prêt
@@ -117,59 +122,63 @@ sequenceDiagram
     PI->>JI: instantané, interpolé à l'affichage
   end
   JH->>PH: fin de partie (résultat), sauvegarde
-  PH->>PI: résultat, sauvegarde et partie répliquées
+  PH->>PI: révision de sauvegarde et entrée d'historique répliquées
 ```
 
 ## 4. Processus Electron
 
+Décisions: ADR 0003 (processus et sécurité) et 0004 (isolation et hébergement des jeux).
+
 ### 4.1 Processus principal
 
-Un seul processus principal porte tout ce qui touche au système.
+Un seul processus principal. Règles: aucun accès disque ou réseau synchrone; traitements lourds en flux, par l'API asynchrone de `zlib` ou dans un `worker_threads`; modules reliés par des appels typés, pour qu'un module puisse partir dans un `utilityProcess` si une mesure le justifie (le relais coûte 0,1 ms par passage, vérifié).
 
 | Module | Responsabilités |
 |---|---|
-| `window` | une `BaseWindow` et deux vues empilées (jeu dessous, plateforme dessus), plein écran, focus clavier, instance unique, blocage de la mise en veille pendant une partie (`powerSaveBlocker`) |
-| `protocols` | `duo://app/...` sert l'interface du lanceur; `duo-game://<id>/...` sert les fichiers du jeu installé, avec CSP, types MIME, requêtes partielles et contrôle des chemins |
-| `ipc` | API de la vue plateforme: canaux nommés, arguments validés par schéma, émetteur vérifié (URL du cadre) |
-| `game-host` | crée et détruit la vue jeu, relaie le canal du SDK, battement de cœur, détection de plantage et de blocage |
-| `session` | serveur WebSocket (hôte) ou client (invité), poignée de main, salon, battements, pause et reprise, relais des messages de jeu |
-| `discovery` | requêtes et réponses UDP, liste des hôtes visibles, adresses à afficher |
-| `data` | profil, réglages, sauvegardes, historique, scores; écriture sûre; réplication et conflits |
+| `window` | une `BaseWindow` et deux vues empilées (jeu dessous, plateforme dessus); fenêtre agrandie au premier lancement, plein écran retenu; instance unique; invitation signalée par le Dock ou la barre des tâches |
+| `protocols` | `duo://app/` sert le lanceur; `duo-game://<id>/` sert le jeu installé, avec CSP, types MIME, requêtes partielles et contrôle des chemins |
+| `ipc` | API de la vue plateforme: canaux nommés, arguments validés, émetteur vérifié |
+| `game-host` | vue jeu, pont du SDK, battement de cœur, plantages, interception d'Échap, blocage de la mise en veille |
+| `session` | liaison avec l'autre machine, poignée de main, salon, partie, pause et reprise, relais des messages de jeu (ADR 0007) |
+| `discovery` | présence et découverte sur le LAN, adresses à afficher (ADR 0008) |
+| `duo` | identité de la machine, profil, formation du duo, rattachement d'une machine |
+| `data` | réglages, sauvegardes, historique, scores; écriture sûre; réplication et conflits |
 | `packages` | catalogue, téléchargement, vérification de signature, installation, copie LAN, import depuis un fichier |
-| `versions` | numéros de version, règles de compatibilité, avis de nouvelle version de Duo |
-| `diagnostics` | journaux tournants (dont les erreurs de console des vues), rapports de plantage locaux (`crashReporter` sans envoi), état du rendu et du réseau, rapport exportable |
+| `versions` | numéros de version, règle de compatibilité, avis de nouvelle version de Duo |
+| `diagnostics` | journal, état du rendu et du réseau, rapport pour le studio, rapports de plantage locaux |
 
-Règles: aucun accès disque ou réseau synchrone; les traitements lourds (empreinte et extraction d'un paquet de 50 Mo) se font en flux ou dans un `worker_threads`, pour ne pas faire trembler le relais réseau. Option écartée pour la v1: déporter la session dans un `utilityProcess`. Le relais coûte 0,1 ms par passage (vérifié) et le principal a peu d'autres tâches; on y reviendra si une mesure montre de la gigue.
+### 4.2 Vues et isolation
 
-### 4.2 Vues
+- **Vue plateforme**: une seule, toujours vivante. Elle affiche le lanceur quand aucune partie ne tourne et, pendant une partie, les écrans bloquants par-dessus le jeu (pause, connexion perdue, erreur, résultats), sur fond transparent, panneaux opaques à 92 % sans flou. Masquée le reste du temps pour que le jeu reçoive clavier et souris.
+- **Vue jeu**: une `WebContentsView` par partie, détruite à la fin, dans une session Chromium dédiée aux jeux et non persistante.
 
-- **Vue plateforme**: une seule, toujours vivante. Elle affiche le lanceur quand aucune partie ne tourne et, pendant une partie, les écrans bloquants par-dessus le jeu (pause, joueur déconnecté, erreur, résultats), sur fond transparent. Elle est masquée (`setVisible(false)`) le reste du temps pour que le jeu reçoive clavier et souris.
-- **Vue jeu**: une `WebContentsView` créée au chargement de la partie et détruite à sa fin, dans une session Chromium dédiée aux jeux et non persistante.
+Quatre options d'isolation ont été comparées (import dynamique, iframe, vue dédiée, fenêtre dédiée): la vue dédiée l'emporte, car elle garantit le processus séparé, signale le plantage (`render-process-gone`), permet de tuer un jeu figé (`forcefullyCrashRenderer()`) et libère tout à sa destruction (ADR 0004). Repli si la superposition transparente pose problème sous macOS ou Windows: une image figée du jeu derrière les écrans de la plateforme.
 
-Isolation d'un jeu, quatre options comparées:
+| Événement | Détection | Retour des deux joueurs au salon |
+|---|---|---|
+| Plantage du processus du jeu | `render-process-gone` | moins de 2 s |
+| Erreur non rattrapée, promesse rejetée non gérée | gestionnaires du SDK, message `fatal` | moins de 2 s |
+| Jeu figé | 5 s sans battement de cœur en partie (10 s au chargement) | moins de 7 s (F05: 10 s) |
+| Chargement trop long | 30 s sans `ready` | échec du chargement, rien n'est inscrit |
 
-| Option | Plantage ou blocage du jeu | Libération des ressources | Écrans de la plateforme par-dessus | Complexité |
-|---|---|---|---|---|
-| A. Import dynamique dans la page du lanceur | aucune isolation: une boucle infinie ou une fuite fige le lanceur | dépend de la discipline de chaque jeu | triviaux (DOM) | la plus faible |
-| B. iframe d'un autre schéma dans la page du lanceur | processus séparé grâce à l'isolation des sites (vérifié sous Electron 45), mais sans garantie contractuelle; plantage visible seulement par battement de cœur | à la fermeture de l'iframe | triviaux (DOM) | faible |
-| C. `WebContentsView` dédiée dans la même fenêtre | processus séparé garanti; plantage signalé par `render-process-gone`; blocage tué par `forcefullyCrashRenderer()` | complète: le processus du jeu disparaît (vérifié) | vue plateforme transparente au-dessus (vérifié sous Linux) | moyenne |
-| D. Fenêtre dédiée au jeu | comme C | comme C | délicats (deux fenêtres, plein écran et Spaces de macOS) | forte |
-
-Recommandation: **C**. Elle apporte la garantie demandée par F05 sans dépendre d'un comportement implicite de Chromium, et elle règle la question des fuites côté jeu: chaque partie démarre dans un processus neuf. Repli si la superposition transparente pose problème sous macOS ou Windows: une image figée du jeu (`capturePage`) en fond des écrans de la plateforme, vue jeu masquée.
+Autres règles: Échap et F11 interceptés par `before-input-event` et jamais transmis au jeu; aucune pause à la perte du focus ni fenêtre réduite (touches relâchées, simulation de l'hôte cadencée par des minuteurs, `backgroundThrottling` désactivé); `powerSaveBlocker` en `prevent-display-sleep` pendant toute la partie; fermeture de Duo en partie interceptée, avec confirmation, sauvegarde de sortie et avis à l'autre machine.
 
 ### 4.3 Preloads
 
-- `preload-platform`: expose par `contextBridge` un objet `duo` typé (appels et abonnements), généré à partir d'une table de canaux partagée avec le principal.
-- `preload-game`: une dizaine de lignes qui transmettent à la page le `MessagePort` reçu du principal par `window.postMessage`, rien d'autre (vérifié dans l'essai). Depuis Electron 45, un preload en bac à sable n'a plus `Buffer`, `events`, `timers` ni `url`: API web uniquement.
+- `preload-platform`: expose par `contextBridge` un objet `duo` généré à partir de la table des canaux de `@duo/protocol`: appels et abonnements à des flux d'état.
+- `preload-game`: transmet à la page le `MessagePort` du pont, rien d'autre. Depuis Electron 45, un preload en bac à sable n'a plus `Buffer`, `events`, `timers` ni `url`: API web uniquement.
 
 ### 4.4 Sécurité
 
-- Toutes les vues: `sandbox: true`, `contextIsolation: true`, `nodeIntegration: false`, `webSecurity: true`; navigation et ouverture de fenêtres refusées; demandes d'autorisation refusées, sauf plein écran et verrouillage du pointeur.
-- Pas de `file://`: protocoles personnalisés `duo://` et `duo-game://` déclarés `standard` et `secure` (contexte sécurisé, `fetch` permis), `stream` pour `duo-game://` (lecture en flux des musiques).
-- CSP des jeux, envoyée par le protocole: `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'`. Vérifié: `eval` bloqué, `fetch` vers une adresse IP bloqué, `fetch` des fichiers du jeu permis, ni `require` ni `process` visibles depuis la page.
-- Les jeux n'ont aucun accès au réseau ni au disque: tout passe par le SDK et le principal, qui valide chaque message par schéma.
-- Fusibles Electron (option `electronFuses` d'electron-builder): `runAsNode`, `enableNodeOptionsEnvironmentVariable` et `enableNodeCliInspectArguments` désactivés; `onlyLoadAppFromAsar` et `enableEmbeddedAsarIntegrityValidation` activés (validation de l'archive prise en charge sous macOS et Windows selon la documentation d'Electron 45, à valider sur les deux systèmes).
-- Pas de menu d'application sous Windows (neutralise Alt, Ctrl+R, Ctrl+W et les outils de développement); sous macOS, un menu minimal (Quitter, Copier, Coller, Plein écran). Outils de développement fermés dans les versions publiées.
+- Toutes les vues: `sandbox`, `contextIsolation`, pas de `nodeIntegration`, `webSecurity`, pas de `webviewTag`; navigation et ouverture de fenêtres refusées; autorisations refusées, sauf plein écran et verrouillage du pointeur pour la vue jeu; liens externes et réglages du système ouverts par `shell.openExternal` sur une liste fermée.
+- Pas de `file://`: protocoles `duo://` et `duo-game://` déclarés `standard`, `secure`, `supportFetchAPI` (et `stream` pour les jeux).
+- CSP du lanceur: `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'`.
+- CSP des jeux: `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'`. Vérifié: `eval` bloqué, `fetch` vers une adresse IP bloqué, `fetch` des fichiers du jeu permis, ni `require` ni `process` visibles.
+- IPC et pont validés par schéma (Valibot), comme tout message du réseau.
+- Fusibles: `runAsNode`, `enableNodeOptionsEnvironmentVariable` et `enableNodeCliInspectArguments` désactivés; `onlyLoadAppFromAsar` et `enableEmbeddedAsarIntegrityValidation` activés.
+- Pas de menu d'application sous Windows; sous macOS, un menu minimal en français. Outils de développement fermés dans les versions publiées.
+- Aucune socket avant la validation de l'écran E03 du premier lancement (CA-PF-079).
+- `--duo-data-dir` appliqué par `app.setPath('userData', ...)` avant le verrou d'instance unique, qui est pris dans `userData` (vérifié dans le code source d'Electron 45.2.0): deux instances de test aux dossiers distincts coexistent.
 
 ### 4.5 Faits vérifiés par l'essai d'Electron 45.2.0 sous `xvfb-run`
 
@@ -180,87 +189,53 @@ Essai jetable, hors dépôt: une `BaseWindow`, une vue jeu et une vue plateforme
 | Vue jeu, vue plateforme et iframe d'un autre schéma dans des processus distincts | oui, trois PID différents |
 | Vue plateforme transparente au-dessus de la vue jeu | oui sous Linux (capture examinée); à confirmer sous macOS et Windows |
 | Plantage forcé du jeu | `render-process-gone` (raison `crashed`); la vue plateforme reste vivante |
-| Jeu bloqué dans une boucle infinie | détecté en 2 s par battement de cœur sur le `MessagePort`; l'événement natif `unresponsive` ne s'est pas déclenché en 45 s (il attend des entrées utilisateur en souffrance) |
+| Jeu bloqué dans une boucle infinie | détecté en 2 s par battement de cœur sur le `MessagePort`; l'événement natif `unresponsive` ne s'est pas déclenché en 45 s |
 | Aller-retour principal et page de jeu par `MessagePort` | médiane 0,10 ms, 99e centile 0,55 ms |
 | `navigator.keyboard.getLayoutMap()` dans `duo-game://` | disponible (contexte sécurisé) |
-| `AudioContext` sans geste de l'utilisateur | état `running` (politique par défaut d'Electron: `no-user-gesture-required`) |
-| WebGL2 sans processeur graphique (rendu logiciel) | seulement avec `--enable-unsafe-swiftshader`: Chromium ne bascule plus seul sur SwiftShader |
+| `AudioContext` sans geste de l'utilisateur | état `running` |
+| WebGL2 sans processeur graphique (rendu logiciel) | seulement avec `--enable-unsafe-swiftshader` |
 | Mémoire d'Electron presque vide (trois pages blanches) | 260 à 300 Mo en PSS, 140 à 165 Mo privés, sous Linux; la fermeture de la vue jeu rend 25 à 35 Mo |
 | Lancement en root (environnement cloud) | refusé sans `--no-sandbox` |
 | Playwright 1.63 pilote l'application | oui: chaque `WebContentsView` apparaît comme une page, captures possibles |
 
-## 5. Monorepo et outillage
+## 5. Monorepo, outillage et interface
 
-### 5.1 Arborescence proposée
+Décisions: ADR 0001 (versions), 0002 (monorepo), 0012 (interface du lanceur).
 
 ```text
 duo/
-  apps/
-    duo/                  application Electron
-      src/main/           processus principal (modules de la section 4.1)
-      src/preload/        preload-platform, preload-game
-      src/renderer/       interface du lanceur et écrans superposés
-      tests/e2e/          Playwright sur Electron (deux instances)
+  apps/duo/               application Electron (main, preload, renderer, tests e2e)
   packages/
-    protocol/             @duo/protocol: schémas (pont, session LAN, manifeste, catalogue) et numéros de version
-    sdk/                  @duo/sdk: pont, cycle de vie, boucle à pas fixe, entrées, réseau, audio, sauvegardes, résultats
-    sdk-dev/              @duo/sdk-dev: faux hôte navigateur, relais local avec latence simulée, bots, aides Playwright
-    config/               configurations partagées (tsconfig, ESLint, Vitest)
+    protocol/             @duo/protocol: schémas (IPC, pont, liaison LAN, manifeste, catalogue, données), numéros de version, règle de compatibilité
+    sdk/                  @duo/sdk: API des jeux
+    sdk-dev/              @duo/sdk-dev: faux hôte navigateur, relais local avec latence simulée, aides de test
+    config/               tsconfig, ESLint, Vitest partagés
   games/
-    _template/            gabarit copié par le script de création d'un jeu
-    jeu-temoin/           premier jeu
-      src/simulation/     logique pure, testable dans Node
-      src/render/         Three.js, PixiJS ou Phaser
-      assets/             fichiers livrés et leurs sources
-      duo-game.json       manifeste
-  outils/                 scripts du dépôt (création de jeu, empaquetage, signature, contrôles)
+    _template/            gabarit copié par `pnpm nouveau-jeu <id>`
+    _essais/              jeux d'essai des tests, jamais publiés
+    jeu-temoin/           src/simulation, src/render, assets, duo-game.json
+  outils/                 scripts en Node (création de jeu, empaquetage, signature, contrôles)
   docs/
 ```
 
-Règles: un jeu dépend de `@duo/sdk` et de son moteur, jamais d'un autre jeu; le code utile à deux jeux monte dans `packages/`; l'application ne dépend d'aucun jeu (hors jeu témoin intégré, copié au moment de l'empaquetage).
+- pnpm 12 (dépendances strictes, catalogues de versions des moteurs), versions exactes et fichier de verrouillage; un jeu dépend de `@duo/sdk` et de son moteur, jamais d'un autre jeu; l'application ne dépend d'aucun jeu.
+- TypeScript 6.0.3 strict (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`), ESLint 10 typé, Prettier, contrôles du dépôt en un script Node (tirets interdits, `TODO` sans référence, crédits, règles de dépendance); scripts sans bash.
+- Application construite par electron-vite (principal empaqueté avec ses dépendances, aucun `node_modules` dans l'archive); jeux construits par Vite (`base: './'`), puis empaquetés (ADR 0010).
+- Lanceur en Preact 11 et @preact/signals: le principal publie l'état (présence, salon, partie, téléchargements), l'interface en est une projection et n'envoie que des intentions; écrans en union discriminée, sans routeur; un seul fichier de textes; jetons de l'identité « Étoile double » en propriétés CSS, polices Jost et DM Sans embarquées; taille de l'interface par la taille de police de la racine (`rem`); `data-testid` et `data-message` sur chaque élément utile aux tests.
 
-### 5.2 Gestionnaire de paquets
+### 5.1 Moteurs de rendu
 
-| Critère | npm workspaces | pnpm workspaces |
-|---|---|---|
-| Installation | déjà présent | par corepack (présent avec Node 22), version figée par le champ `packageManager` |
-| Dépendances fantômes (un jeu qui importe `three` sans le déclarer) | possibles (installation à plat) | refusées (liens stricts) |
-| Une version commune d'un moteur pour les jeux | à surveiller à la main | catalogues (`catalog:`) |
-| Commandes par paquet | `-w`, limité | `--filter`, avec les dépendances |
-| Electron et electron-builder | sans souci | sans souci si l'application est entièrement empaquetée par Vite (aucun `node_modules` à embarquer), sinon `node-linker=hoisted` pour l'application |
-
-Recommandation: **pnpm**, pour la rigueur des dépendances entre une dizaine de jeux et les catalogues de versions. Depuis Electron 42, le paquet `electron` ne télécharge plus son binaire au `postinstall` (vérifié dans le paquet 45.2.0): plus de conflit avec le blocage des scripts d'installation par pnpm; le binaire arrive au premier lancement ou par `npx install-electron --no` (à prévoir dans le cache de CI).
-
-### 5.3 Construction et qualité
-
-Construction et empaquetage de l'application, trois options:
-
-| Option | Pour | Contre |
-|---|---|---|
-| electron-vite 6 et electron-builder 26 | une configuration Vite pour principal, preloads et interface; NSIS par utilisateur; electron-updater fonctionne avec un NSIS non signé (vérifié); fusibles intégrés | deux outils tiers à suivre |
-| Electron Forge 8 (greffon Vite, fabricants DMG, ZIP et Squirrel.Windows) | outil officiel d'Electron, tout en un | installateur Windows Squirrel plutôt que NSIS; intégration Vite plus jeune; changerait la fiche d'ingenieur-build |
-| Vite seul et scripts maison, puis electron-builder | aucune dépendance de plus | rechargement à chaud et relance du principal à écrire soi-même |
-
-Recommandation: **electron-vite et electron-builder**.
-
-- Application: electron-vite (principal, preloads et interface dans une seule configuration, rechargement à chaud). Le principal est empaqueté avec ses dépendances (`ws`, `valibot`): l'archive de l'application ne contient pas de `node_modules`.
-- Jeux: Vite en mode application, `base: './'`, sortie dans `games/<id>/dist/`, puis script d'empaquetage (zip, manifeste, empreintes, signature).
-- TypeScript 6.0.3 strict partout (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`). Passage à TypeScript 7 quand typescript-eslint le prendra en charge.
-- ESLint 10 et typescript-eslint en mode typé, formatage Prettier, contrôle typographique du dépôt (commande de CLAUDE.md), scripts npm sans bash (Windows doit pouvoir tout lancer).
-- Validation à l'exécution: **Valibot** plutôt que Zod 4. Valibot ne génère pas de code, donc s'accorde avec la CSP des jeux, et pèse de l'ordre du kilo-octet. Zod 4 sonde `new Function` pour accélérer ses analyses; sous une CSP stricte, cette sonde produit un rapport de violation (commentaire de son code source, vérifié) sauf configuration `jitless`, et l'API classique pèse 90 Ko gzip.
-- Interface du lanceur: bibliothèque à trancher par ADR. Recommandation: Preact (API de React, la plus répandue, pour 5 Ko gzip mesurés). Alternatives: TypeScript sans bibliothèque (simple au début, lourd à mesure que les états d'écran se multiplient), Svelte 5 (syntaxe récente, moins connue).
-
-### 5.4 Moteurs de rendu
-
-- 3D: Three.js 0.187 (orientation validée par le client), WebGL2.
-- 2D: PixiJS ou Phaser, à trancher au premier jeu 2D (ADR 0014). PixiJS est un moteur de rendu seul: il s'accorde naturellement avec une simulation pure qui vit hors du moteur. Phaser 4 est un cadre complet (scènes, physique, entrées, audio, caméras, cartes Tiled) dont une partie double le SDK (boucle, entrées, audio) et dont la physique vivrait côté rendu, hors de la simulation testable. Recommandation: PixiJS par défaut; Phaser possible pour un jeu qui tire parti de ses cartes et caméras, la simulation restant hors de Phaser.
-- Les moteurs sont empaquetés dans chaque jeu (155 à 360 Ko gzip): aucun moteur partagé à l'exécution, chaque jeu garde la version avec laquelle il a été testé.
+- 3D: Three.js 0.187, WebGL2. Le premier jeu (« La Petite Ligne », simulation de vie en coopération) est envisagé en 3D low poly isométrique, à confirmer par un essai de style mesuré.
+- 2D: PixiJS ou Phaser, à trancher au premier jeu 2D (ADR 0014, différé). PixiJS est un moteur de rendu seul, qui s'accorde avec une simulation pure hors du moteur; Phaser 4 est un cadre complet dont une partie double le SDK (boucle, entrées, audio). Recommandation: PixiJS par défaut; Phaser possible pour un jeu qui tire parti de ses cartes et caméras, la simulation restant hors de Phaser.
+- Les moteurs sont empaquetés dans chaque jeu (155 à 360 Ko gzip): chaque jeu garde la version avec laquelle il a été testé.
 
 ## 6. Contrat d'un jeu
 
+Décision: ADR 0005.
+
 ### 6.1 Paquet et manifeste
 
-Un jeu publié est une archive zip qui contient le site statique construit et un manifeste `duo-game.json` à la racine. Les clés sont des identifiants du code (anglais), les textes affichés sont en français.
+Un jeu publié est une archive `<id>-<version>.duogame` (zip) qui contient le site statique construit, son manifeste `duo-game.json`, et la liste signée de ses fichiers (ADR 0010).
 
 ```json
 {
@@ -272,25 +247,26 @@ Un jeu publié est une archive zip qui contient le site statique construit et un
   "view": "3d",
   "engine": "three",
   "mode": "coop",
+  "play": "match",
   "durationMinutes": [5, 10],
   "network": "host-authority",
   "entry": "index.html",
   "thumbnail": "thumbnail.webp",
   "description": "Un mini-jeu à deux qui éprouve toute la chaîne.",
+  "whatsNew": "Première version.",
   "actions": [
     { "id": "up", "label": "Monter", "keys": ["KeyW", "ArrowUp"] },
     { "id": "act", "label": "Agir", "keys": ["Space"], "mouse": "left" }
   ],
-  "saves": { "slots": 3, "maxBytes": 1048576, "moments": ["level-end", "exit"] },
-  "result": "winner",
-  "progress": null
+  "saves": { "slots": 3, "maxBytes": 1048576, "moments": ["level-end", "exit"], "help": "Le jeu enregistre à la fin de chaque niveau." },
+  "credits": "credits.json"
 }
 ```
 
-- `view`: `2d`, `3d` ou `iso`; `mode`: `coop` ou `versus` (F04); `network`: `host-authority`, `lockstep` ou `turns`; `result`: `winner`, `score` ou `progress` (F09); `progress` décrit la progression commune d'un jeu en coopération (`{ "label": "niveaux", "max": 12 }`).
-- Touches par défaut en `KeyboardEvent.code`, c'est-à-dire par position physique: `KeyW` est la touche marquée Z sur un clavier AZERTY. La plateforme affiche le vrai libellé grâce à `navigator.keyboard.getLayoutMap()`.
-- `saves` déclare les emplacements et les moments de sauvegarde (section 4 du cahier); `null` si le jeu ne sauvegarde rien.
-- Le manifeste est validé par le schéma de `@duo/protocol` à l'installation, au chargement et en CI. Le catalogue reprend le manifeste et ajoute adresse, taille, empreinte SHA-256 et signature.
+- `mode`: `coop` ou `versus` (F04, F09); `play`: `match` (parties avec un résultat) ou `session` (séances sans fin de partie); `network`: `host-authority`, `lockstep` ou `turns`.
+- Touches en `KeyboardEvent.code`, c'est-à-dire par position physique: `KeyW` est la touche marquée Z sur un clavier AZERTY; la plateforme affiche le vrai libellé par `navigator.keyboard.getLayoutMap()`. `Escape` est interdit.
+- `saves`: emplacements, plafond de taille (32 Mio au plus), moments parmi `level-end`, `exit`, `auto` (avec `autosaveSeconds`) et `manual`; `null` si le jeu ne sauvegarde rien.
+- Le manifeste est validé par le schéma de `@duo/protocol` en CI, à l'installation et au chargement.
 
 ### 6.2 Cycle de vie
 
@@ -302,9 +278,10 @@ stateDiagram-v2
   [*] --> Chargement: la plateforme crée la vue
   Chargement --> Pret: le jeu signale qu'il est prêt
   Pret --> EnJeu: départ synchronisé
-  EnJeu --> EnPause: pause demandée ou joueur déconnecté
-  EnPause --> EnJeu: reprise
+  EnJeu --> EnPause: pause demandée ou coupure
+  EnPause --> EnJeu: reprise demandée par les deux
   EnJeu --> Fin: résultat signalé par l'hôte
+  EnPause --> Fin: arrêt (partie interrompue)
   Fin --> [*]: retour au salon, vue détruite
   Chargement --> Erreur: délai dépassé ou plantage
   EnJeu --> Erreur: plantage ou blocage
@@ -312,401 +289,355 @@ stateDiagram-v2
   Erreur --> [*]: message, retour au salon, vue détruite
 ```
 
-- Plateforme vers jeu: `init` (rôle, joueurs, graine, réglages, sauvegarde chargée chez l'hôte), `start` (tic de départ), `pause` (raison), `resume`, `stop` (raison, sauvegarde demandée ou non).
-- Jeu vers plateforme: `loading` (progression), `ready`, `heartbeat` (automatique, chaque seconde), `requestPause`, `saveWrite`, `matchEnd`, `error`.
-- Délais proposés: chargement au plus 30 s; 3 s sans battement de cœur et le jeu est déclaré bloqué, sa vue est tuée; à la sortie, 2 s laissées au jeu pour sauvegarder.
-- Libération: la vue est détruite à la fin de chaque partie, ce qui libère WebGL, audio, écouteurs et minuteurs. Le SDK fournit quand même `dispose()` pour les tests et le faux hôte.
-- Un plantage chez l'un ramène les deux joueurs au salon, avec un message chez chacun; la partie est marquée interrompue (règle d'historique à valider, section 14).
+- Plateforme vers jeu: `init`, `start`, `pause`, `resume`, `settings`, `saveRequest`, `stop` (avec sa raison), `net`.
+- Jeu vers plateforme: `loading`, `ready`, `heartbeat` et `perf` (chaque seconde), `net`, `saveWrite` (hôte), `matchEnd` ou `sessionEnd` (hôte), `fatal`, `log`.
+- L'API est typée par rôle: chez l'invité, écrire une sauvegarde ou un résultat n'existe pas.
+- Un plantage ou un blocage, chez l'un ou chez l'autre, ramène les deux joueurs au salon; la partie est inscrite « interrompue » par l'hôte (section 8.5).
 
 ### 6.3 Pont entre le jeu et la plateforme
 
-Un seul `MessagePort` par partie, ouvert par le principal et transmis par `preload-game`. Les messages sont des objets typés et versionnés, validés à l'arrivée dans le principal, et dans le SDK pour ceux qui viennent de la plateforme.
-
-Deux options comparées:
-
-- SDK compilé dans chaque jeu, qui parle un protocole versionné (recommandé): chaque jeu garde la version du SDK avec laquelle il a été testé; la plateforme doit seulement rester compatible avec les versions majeures du protocole qu'elle annonce; un jeu se teste hors d'Electron avec le faux hôte.
-- SDK fourni par la plateforme à l'exécution (script injecté ou API exposée par le preload): un correctif touche tous les jeux d'un coup, mais une mise à jour de l'application peut casser un jeu publié, et un jeu ne se teste plus seul.
-
-Versionnement: le protocole du pont porte une version `majeure.mineure`; une mineure n'ajoute que des messages ou des champs facultatifs. Le manifeste déclare la version minimale (`"sdk": "1.2"`), l'application celle qu'elle implémente (par exemple 1.4): compatible si même majeure et si la mineure de l'application est supérieure ou égale.
+Un seul `MessagePort` par partie, ouvert par le principal et transmis par `preload-game`; messages typés et versionnés, validés à l'arrivée. Le SDK est compilé dans chaque jeu, qui garde la version avec laquelle il a été testé (l'option d'un SDK fourni à l'exécution, qui permettrait de corriger tous les jeux d'un coup, exposerait chaque jeu publié aux évolutions de l'application). Le pont porte une version `majeure.mineure`; le manifeste déclare la version minimale (`"sdk": "1.2"`), écrite par le script d'empaquetage; compatible si même majeure et mineure de l'application au moins égale.
 
 ### 6.4 API offerte par le SDK
 
 | Module | Ce qu'il offre | Règles |
 |---|---|---|
-| `session` | rôle (`host` ou `guest`), joueurs (identifiant, pseudo, couleur, local ou non), graine, version du jeu, événements du cycle de vie | |
-| `loop` | boucle à pas fixe (60 Hz par défaut, réglable par jeu), facteur d'interpolation pour le rendu | chez l'hôte, la simulation n'est pas cadencée par `requestAnimationFrame` (fenêtre réduite) |
+| `session` | rôle, joueurs (identifiant de membre, pseudo, couleur, symbole, local ou non), graine, version, cycle de vie | |
+| `loop` | boucle à pas fixe (60 Hz par défaut), facteur d'interpolation | simulation cadencée par des minuteurs chez l'hôte, rendu par `requestAnimationFrame` |
 | `random` | générateur pseudo-aléatoire à graine | `Math.random` interdit dans la simulation |
-| `input` | actions du manifeste (`isDown`, `wasPressed` par pas de simulation), pointeur (position, boutons, verrouillage), libellé réel d'une touche | touches lues par `KeyboardEvent.code`; tout est relâché à la perte de focus; liaisons fournies par les réglages (F10); Échap réservé à la pause; pas de manette |
-| `net` | envoi et réception de messages de jeu par canal; aides pour les instantanés (hôte vers invité) et les entrées (invité vers hôte); schémas Valibot; latence estimée | taille et débit plafonnés par la plateforme |
-| `audio` | un `AudioContext`, bus musique, effets et interface reliés aux volumes de la plateforme, effets décodés au chargement, musiques lues en flux | |
-| `assets` | préchargement avec progression, pour l'écran de chargement | adresses relatives au paquet, servies par `duo-game://` |
-| `saves` | lister, lire et écrire (hôte seulement) des emplacements JSON; sauvegarde automatique périodique si le jeu la demande | taille plafonnée par le manifeste et par un plafond absolu de la plateforme |
-| `results` | `endMatch` (hôte seulement): issue, scores par joueur, progression | alimente l'historique et les scores |
-| `ui` | facteur de taille de l'interface, réduction des animations, demande de pause | les écrans bloquants restent ceux de la plateforme |
-| `dev` | compteur d'images, latence, mode bot | absent des paquets publiés |
+| `input` | actions du manifeste, pointeur, libellé réel d'une touche | `KeyboardEvent.code`; tout relâché à `blur`; liaisons de la machine; pas de manette |
+| `net` | messages entre les deux instances, instantanés, entrées | défini par dev-reseau (ADR 0007) |
+| `audio` | un `AudioContext`, bus musique, effets et interface | gain effectif = général × catégorie |
+| `assets` | préchargement avec progression | adresses relatives au paquet; shaders compilés au chargement |
+| `saves` | sauvegarde choisie (dans `init`), écriture (hôte), sauvegarde automatique | seul l'emplacement choisi s'écrit, aux moments déclarés |
+| `results` | `end` (parties), `sessionEnd` (séances), hôte seulement | issue, scores, trois statistiques au plus, progression, libellé de « Rejouer » |
+| `ui` | taille de l'interface, réduction des animations | appliquées au HUD du jeu |
+| `perf` | temps d'image et rythme de simulation | présent dans toutes les versions (affichage des performances) |
+| `log` | journal du jeu | `console.log` interdit |
 
-Simulation séparée du rendu: la simulation de chaque jeu est du TypeScript pur (`src/simulation/`), testable dans Node par Vitest; chez l'hôte elle tourne dans la vue jeu, chez l'invité seule la présentation tourne (plus une éventuelle prédiction locale).
+Obligations d'un jeu: simulation en TypeScript pur (`src/simulation/`), sans DOM, sans `Math.random` ni horloge, testable dans Node, qui fournit `hash(state)` (empreinte de son état, pour les tests et le lockstep); données de sauvegarde en JSON avec un `dataSchema` et des migrations testées; textes en français, tutoiement, rédaction neutre; polices qui affichent tout pseudo valide; aucun accès au réseau, au disque ni au stockage du navigateur hors du SDK; budgets de la section 14; un robot facultatif pour les tests.
 
 ### 6.5 Faux hôte pour le développement et les tests
 
-`@duo/sdk-dev` émule la plateforme dans un navigateur: deux onglets (hôte et invité) reliés par un petit relais local, qui sait ajouter latence, gigue et pertes. Un jeu se développe avec le serveur de Vite sans lancer Electron, et se teste avec Playwright à deux contextes. En mode développement, l'application accepte aussi de charger un jeu depuis le serveur de Vite (rechargement à chaud).
+`@duo/sdk-dev` émule la plateforme dans un navigateur: deux onglets (hôte et invité) reliés par un relais local, qui sait ajouter latence, gigue et pertes. Un jeu se développe avec le serveur de Vite sans lancer Electron, et se teste avec Playwright à deux contextes. En développement, l'application accepte aussi un jeu servi par Vite.
 
-## 7. Réseau, à grands traits
+## 7. Réseau: ce que la plateforme en attend
 
-dev-reseau détaillera ces choix dans `docs/plateforme/reseau.md`.
+Les décisions de réseau appartiennent à dev-reseau: ADR 0007 (modèle réseau et transport), ADR 0008 (découverte et pare-feu) et `reseau.md`, qui font foi. Cette section rappelle les exigences que le reste de la plateforme et le cahier 1.0 leur imposent, et les faits relevés en phase 1.
 
-### 7.1 Topologie
+### 7.1 Exigences
 
-Seuls les processus principaux se parlent. Un message de jeu suit le chemin: jeu, principal (`MessagePort`), WebSocket, principal de l'autre machine, jeu. Coût mesuré d'un passage par le principal: 0,1 ms, négligeable devant les quelques millisecondes du Wi-Fi.
+| Exigence | Source |
+|---|---|
+| Seuls les deux processus principaux se parlent; un jeu ne voit que des messages relayés (le relais coûte 0,1 ms, vérifié) | ADR 0003, 0005 |
+| Chaque Duo ouvert s'annonce sur le LAN après l'accord du premier lancement, salon ouvert ou non; l'autre ordinateur apparaît en 3 s au plus | F02, H-34 |
+| Les deux applications se relient dès qu'elles se voient: présence, comparaison des versions avant toute invitation, profils (CA-PF-005), comparaison des index des données du duo, invitations | F02, F13, ADR 0006, 0009 |
+| Annonce de présence et premier message de la liaison à enveloppe figée pour toujours (signature, version de l'enveloppe, identifiant de machine, version de Duo, protocole) | ADR 0006 |
+| Transport des données: révisions de sauvegarde (compressées au-delà de 64 Kio), entrées d'historique, paquets de jeux en flux avec reprise; accusés de réception | ADR 0009, 0010 |
+| Pause des deux côtés en 3 s au plus après une coupure, aucune pour 500 ms ou moins, attente sans limite, reconnexion sans action | F06, H-14 |
+| Un plantage, un blocage, un arrêt ou la fermeture de Duo d'un côté est annoncé à l'autre | ADR 0004 |
+| Aucune socket avant la validation de E03; ports imposables en ligne de commande pour les tests | CA-PF-079, ADR 0013 |
+| Tout message reçu validé par schéma; adresses non privées et en-tête `Origin` refusés; débit et taille plafonnés | ADR 0003, CA-PF-021 |
 
-Où tourne la simulation de l'hôte? Deux options:
+### 7.2 Orientation proposée en phase 1 (à confirmer par les ADR 0007 et 0008)
 
-- Dans la vue jeu de l'hôte (recommandé): le code d'un jeu ne s'exécute qu'en bac à sable, jamais avec les droits de Node; une seule cible d'exécution par jeu; aucune latence pour le joueur hôte.
-- Dans un processus Node (`utilityProcess`) de l'hôte: séparation nette du serveur, mais du code téléchargé tournerait avec un accès complet au système, chaque jeu aurait deux points d'entrée, et le joueur hôte passerait lui aussi par l'interpolation.
+- Transport: WebSocket sur TCP (`ws`), une seule connexion pour la liaison, le jeu, la réplication et les paquets; une variante non fiable seulement si un jeu d'action la justifie, mesures à l'appui.
+- Découverte: diffusion UDP sur les interfaces privées, saisie d'adresse IP en recours (l'hôte affiche ses adresses). mDNS écarté pour ses conflits avec le répondeur de Windows et la déclaration Bonjour sous macOS.
+- Simulation de l'hôte dans sa vue jeu (le code d'un jeu ne s'exécute jamais avec les droits de Node; une seule cible d'exécution par jeu; aucune latence pour le joueur hôte), plutôt que dans un processus Node.
 
-### 7.2 Transport
+### 7.3 Faits relevés sur les systèmes
 
-| Option | Pour | Contre |
-|---|---|---|
-| WebSocket sur TCP (`ws`) | simple, fiable, ordonné; une seule connexion pour la session, le jeu, la réplication et les paquets | une perte bloque la file (pics de quelques dizaines à quelques centaines de millisecondes en Wi-Fi chargé) |
-| WebRTC DataChannel non fiable | pas de blocage de file | pile lourde, négociation, aucun besoin connu |
-| UDP brut avec fiabilité maison | contrôle total | tout à écrire et à éprouver |
+macOS 15 et suivants, autorisation « Réseau local » (note technique TN3179 d'Apple, révisée le 2026-10-06, vérifié): exigée pour une connexion TCP sortante vers le LAN, tout envoi UDP et la réception de diffusion ou de multicast; non exigée pour écouter et accepter des connexions TCP, ni pour recevoir de l'UDP unicast; clé `NSLocalNetworkUsageDescription`; suivi de l'application par sa signature, peu fiable avec une signature ad hoc; UUID de l'exécutable principal d'Electron 45.2.0 arm64 partagé par toutes les applications de cette version (`4c4c446b-5555-3144-a1a1-136b14fc37ac`, vérifié dans l'archive officielle); programmes lancés depuis le Terminal autorisés d'office; première opération parfois refusée avant la réponse de l'utilisateur; remise à zéro possible seulement à partir de macOS 27.2.
 
-Recommandation: **WebSocket** par défaut. Une variante non fiable seulement si un jeu d'action la justifie, mesures à l'appui. Messages JSON validés; binaire compact seulement si la mesure le justifie.
-
-### 7.3 Découverte et pare-feu
-
-| Option | Pour | Contre |
-|---|---|---|
-| Diffusion UDP sur un port fixe: l'invité interroge, l'hôte répond (et peut s'annoncer) | aucune dépendance; identique sur les deux systèmes; sous Windows, la réponse unicast à une diffusion passerait sans règle d'entrée chez l'invité (à vérifier) | à écrire; interfaces multiples à gérer |
-| mDNS et DNS-SD (`bonjour-service`) | standard | Windows a son propre répondeur mDNS sur le port 5353 (conflits possibles), Bonjour absent par défaut sous Windows, déclaration `NSBonjourServices` sous macOS |
-
-Recommandation: **diffusion UDP** sur toutes les interfaces privées (Wi-Fi, Ethernet), saisie d'adresse IP en recours (l'hôte affiche ses adresses). Le serveur n'écoute que pendant qu'un salon est ouvert.
-
-macOS 15 et suivants, autorisation « Réseau local » (vérifié dans la note technique TN3179 d'Apple, révisée le 2026-10-06):
-
-- exigée pour une connexion TCP sortante vers le LAN, tout envoi UDP (unicast, diffusion, multicast) et la réception de diffusion ou de multicast;
-- non exigée pour écouter et accepter des connexions TCP, ni pour recevoir de l'UDP unicast: un Mac hôte joint par adresse IP fonctionne même sans l'autorisation;
-- clé `NSLocalNetworkUsageDescription` dans `Info.plist`; pas d'entitlement multicast sur macOS;
-- le système suit l'application par sa signature; Apple recommande une identité de signature délivrée par Apple, car une signature ad hoc rend ce suivi peu fiable. La note demande aussi un UUID unique pour l'exécutable principal; or celui d'Electron 45.2.0 arm64 est le même pour toutes les applications bâties sur cette version (vérifié dans l'archive officielle: `4c4c446b-5555-3144-a1a1-136b14fc37ac`);
-- les programmes lancés depuis le Terminal sont autorisés d'office: un essai en développement ne reproduit pas le comportement de l'application installée;
-- l'alerte peut refuser la première opération avant même la réponse de l'utilisateur: prévoir des reprises;
-- remettre l'autorisation à zéro n'est possible qu'à partir de macOS 27.2; avant, l'utilisateur peut seulement la basculer dans Réglages Système.
-
-Windows (à vérifier sur le PC):
-
-- la première écoute déclenche l'alerte du pare-feu, et l'autoriser demande des droits d'administrateur; « Annuler » crée des règles de blocage qui ne redemanderont plus rien: le diagnostic doit les détecter et guider vers « Autoriser une application via le pare-feu Windows »;
-- un réseau classé « Public » bloque les connexions entrantes: diagnostic du profil réseau et marche à suivre pour le passer en « Privé »;
-- l'installation par utilisateur garde le même chemin d'exécutable d'une version à l'autre, donc la règle survit aux mises à jour.
-
-Pour expliquer avant que la fenêtre du système n'apparaisse (parcours 1 du cahier), la plateforme déclenche volontairement ces autorisations pendant le premier lancement, après un écran d'explication.
+Windows (à vérifier sur le PC): la première écoute déclenche l'alerte du pare-feu, l'autoriser demande des droits d'administrateur, « Annuler » crée des règles de blocage silencieuses; un réseau classé « Public » bloque les connexions entrantes; l'installation par utilisateur garde le même chemin d'exécutable d'une version à l'autre.
 
 ### 7.4 Modèles de synchronisation
 
 | Modèle | Pour quels jeux | Principe |
 |---|---|---|
-| Hôte qui fait autorité (par défaut) | action, coopération, la plupart des jeux | l'hôte simule à pas fixe et envoie des instantanés (20 à 30 par seconde); l'invité envoie ses entrées et interpole (environ 100 ms de tampon); prédiction locale de l'invité si le ressenti l'exige |
-| Lockstep déterministe | stratégie, nombreux objets, physique déterministe | les deux machines simulent à partir des entrées échangées; graine partagée, pas fixe, somme de contrôle régulière; versions identiques exigées |
+| Hôte qui fait autorité (par défaut) | action, coopération, la plupart des jeux | l'hôte simule à pas fixe et envoie des instantanés (20 à 30 par seconde); l'invité envoie ses entrées et interpole; prédiction locale si le ressenti l'exige |
+| Lockstep déterministe | stratégie, nombreux objets | les deux machines simulent à partir des entrées échangées; graine partagée, pas fixe, empreinte de l'état comparée régulièrement; même version du jeu et même Electron exigés (ADR 0006) |
 | Tour par tour ou événements | plateau, cartes, réflexion | l'hôte valide chaque action et diffuse l'état ou l'événement |
 
-Déterminisme entre arm64 et x64: les opérations de base sont identiques bit à bit, mais la norme ECMAScript ne garantit pas que `Math.sin`, `Math.exp`, `Math.pow` et les autres fonctions approchées donnent le même résultat d'une architecture à l'autre. Un jeu en lockstep s'en passe dans sa simulation (entiers, virgule fixe, tables) et compare une somme de contrôle de l'état.
+Déterminisme entre arm64 et x64: les opérations de base sont identiques bit à bit, mais `Math.sin`, `Math.exp`, `Math.pow` et les autres fonctions approchées peuvent différer d'une architecture à l'autre. Un jeu en lockstep s'en passe dans sa simulation (entiers, virgule fixe, tables).
 
-### 7.5 Session et robustesse
+## 8. Données du duo
 
-- Battement de cœur chaque seconde; l'autre machine est déclarée perdue après 3 s sans nouvelle, et la partie se met en pause des deux côtés.
-- Reconnexion: l'invité se reconnecte au même salon et à la même partie, l'hôte renvoie un instantané complet, la partie reprend quand les deux sont prêts. Si l'application de l'hôte s'est arrêtée, l'état en mémoire est perdu: reprise au dernier point de sauvegarde (voir F06 en section 14).
-- Sécurité: connexion refusée si l'adresse source n'est pas privée, si la requête porte un en-tête `Origin` (page web d'un navigateur du réseau) ou si la poignée de main échoue; débit et taille des messages plafonnés; l'invité n'envoie que des intentions, jamais d'état.
-- Hôte en arrière-plan: `backgroundThrottling` désactivé pour la vue jeu (les images restent dessinées, selon la documentation d'Electron 45) et blocage de la suspension (`prevent-app-suspension`) pendant une partie. À valider quand la fenêtre de l'hôte est réduite (App Nap sous macOS, occultation sous Windows).
+Décision: ADR 0009.
 
-## 8. Données: profils, réglages, sauvegardes, historique, scores
+### 8.1 Arborescence
 
-### 8.1 Emplacement
-
-Dossier de données de l'application (`app.getPath('userData')`): `~/Library/Application Support/Duo` sous macOS, `%APPDATA%\Duo` sous Windows. Tous les chemins sont construits avec `path.join`; aucun nom de fichier ne vient d'une saisie libre (identifiants validés: minuscules, chiffres, traits d'union), ce qui évite les soucis d'accents, d'espaces et de casse.
-
-### 8.2 Arborescence
+Dossier de données de l'application (`~/Library/Application Support/Duo` sous macOS, `%APPDATA%\Duo` sous Windows). Chemins construits avec `path.join`; aucun nom de fichier ne vient d'une saisie libre.
 
 ```text
 <userData>/
-  machine.json                  identifiant stable de la machine
-  profile.json                  F01: pseudo, couleur (propre à la machine)
-  settings.json                 F10: volumes, affichage, taille de l'interface, touches par jeu (propre à la machine)
-  duo/<duoId>/                  données du duo, répliquées sur les deux machines
-    duo.json                    les deux machines et leurs profils
-    saves/<jeu>/<emplacement>.json, et .json.bak
-    saves/<jeu>/backup/<emplacement>-<date>.json      copies perdantes d'un conflit
-    history/<année>/<partieId>.json                   une partie terminée, immuable
-    outbox.json                 écritures pas encore confirmées par l'autre machine
-  games/<jeu>/<version>/        paquet extrait, servi par duo-game://
-  games/<jeu>/<version>.zip     archive signée gardée pour la copie vers l'autre machine
-  logs/                         journaux tournants, rapports de plantage locaux
+  format.json                   format du dossier
+  machine.json                  identifiant de cette machine
+  profile.json                  pseudo et couleur de cette machine (F01)
+  settings.json                 réglages de cette machine (F10)
+  duos/<duoId>/                 données d'un duo, répliquées sur ses deux machines
+    duo.json                    membres (identifiant de membre, machine, dernier profil connu), rattachements
+    saves/<jeu>/<emplacement>/
+      head.json                 tête: révision, chaîne, libellé, progression, copies de secours
+      <sha256>.json             révisions immuables (données du jeu)
+    history/<AAAA-MM>/<partieId>.json   une entrée par partie ou séance, immuable
+    live/<partieId>.json        partie en cours, chez l'hôte
+  games/                        paquets installés et archives gardées pour la copie
+  logs/                         journal et rapports de plantage locaux
+  backups/                      copies faites avant une migration du format
 ```
 
-`duoId` dérive des identifiants des deux machines, triés: il est identique des deux côtés.
+### 8.2 Identités
 
-### 8.3 Formats
+- Machine: identifiant UUID tiré au premier lancement, gardé par la désinstallation (H-27).
+- Profil: pseudo de 1 à 16 graphèmes en alphabet latin (accents, chiffres, espaces intérieures, trait d'union, apostrophes; ni émoji ni symbole), couleur parmi six, chacune liée à son symbole.
+- Duo: identifiant tiré au hasard à la première rencontre, deux membres; historique, scores et sauvegardes se rattachent au duo et aux membres, affichés avec les pseudos actuels. Si deux couleurs se rencontrent égales, la machine au plus grand identifiant prend la suivante et l'annonce.
 
-Trois options de stockage comparées:
+### 8.3 Sauvegardes et écriture sûre
 
-| Option | Pour | Contre |
-|---|---|---|
-| Fichiers JSON, un par sauvegarde et par partie (recommandé) | lisibles par un humain (diagnostic à distance), réplication fichier par fichier, aucune dépendance, volume faible (quelques Mo) | écriture sûre et index à écrire soi-même |
-| SQLite par `node:sqlite` (disponible dans le Node d'Electron 45, SQLite 3.53.4, vérifié) | transactions, requêtes | base à répliquer par enregistrements plutôt que par fichiers, illisible sans outil, module récent de Node |
-| Stockage du navigateur (IndexedDB) dans une vue | rien à installer | données liées à une vue en bac à sable, hors de portée du principal qui réplique: exclu |
+- Une révision est un fichier immuable: les octets JSON écrits par le jeu, nommés par leur SHA-256; au plus 32 Mio par emplacement.
+- La tête (`head.json`) donne la révision courante (compteur), sa parente, ses 64 derniers ancêtres, le libellé et la progression du jeu, et les copies de secours: les trois révisions précédentes (F07), plus les cinq dernières copies remplacées, supprimées ou perdantes d'un conflit.
+- Écriture sûre des petits fichiers: `x.tmp` puis `fsync`, copie de `x` en `x.bak`, renommage atomique; une révision n'est jamais réécrite. Reprises d'une seconde au plus sur `EPERM`, `EBUSY` et `EACCES` sous Windows; une file d'écriture par fichier.
+- Lecture: validation par schéma, empreinte vérifiée; en cas de fichier abîmé, `.bak`, puis la copie de l'autre machine, puis la révision précédente, avec M-20; le fichier abîmé est gardé à part.
 
-- JSON UTF-8 avec un champ `schema` (version du format), validé par schéma à chaque lecture; migration explicite d'une version à la suivante.
-- Une sauvegarde porte `game`, `slot`, `revision` (compteur), `parent` (empreinte de la révision précédente), `updatedAt`, `writtenBy`, `gameVersion`, `dataSchema` (version du format propre au jeu), `checksum` (SHA-256 des données) et `data`.
-- Une partie de l'historique porte son identifiant, le jeu et sa version, les dates de début et de fin, la durée, l'issue (`win` avec le vainqueur, `draw`, `coop` avec la progression, `aborted`) et les scores par joueur.
+### 8.4 Réplication et conflits
 
-### 8.4 Écriture sûre
+- Chaque écriture part aussitôt vers l'autre machine (révision, puis tête, puis accusé). À chaque connexion et reconnexion, avant que le salon ne propose les sauvegardes, les deux machines comparent leurs index et s'envoient ce qui manque. Ce seul mécanisme rattrape coupures, arrêts brutaux, machines restaurées ou rattachées: pas de file d'attente.
+- Une seule source par donnée: sauvegardes et historique, la plateforme de l'hôte de la partie; profil, sa machine; membres du duo, la machine qui reste lors d'un rattachement.
+- Conflits (section 4 du cahier): une copie en retard est remplacée par la plus avancée, sans message; une vraie divergence se départage par le plus grand numéro de révision (à égalité, la plus petite empreinte), la perdante devient une copie de secours et M-21 s'affiche sur les deux machines. Aucune horloge n'intervient.
 
-1. Écrire `x.json.tmp` dans le même dossier, puis `fsync`.
-2. Copier l'actuel `x.json` vers `x.json.bak`, s'il existe.
-3. Renommer `x.json.tmp` en `x.json` (remplacement atomique sur un même volume).
+### 8.5 Historique et parties interrompues
 
-Sous Windows, un antivirus ou l'indexeur peut retenir un fichier un instant: reprises courtes sur `EPERM`, `EBUSY` et `EACCES`, pendant une seconde au plus. À la lecture: fichier absent ou invalide, puis `.bak`, puis `.tmp` s'il est valide; la plateforme signale toute récupération. Toutes les écritures passent par une file unique dans le principal: jamais deux écritures concurrentes du même fichier.
+- Une entrée par partie ou séance, écrite une fois par l'hôte: jeu et version, début (ISO 8601 avec décalage), durée hors pauses et hors attentes de reconnexion, joueurs, issue. Les deux copies se fusionnent par union des identifiants.
+- Issues: `versus` (vainqueur ou égalité), `coop` (réussite ou échec), `session`, `interrupted` (arrêt par un joueur, plantage ou blocage, fermeture de Duo), avec scores, statistiques et progression quand le jeu les fournit. Un échec du chargement n'inscrit rien.
+- Marqueur `live/<partieId>.json` chez l'hôte, mis à jour aux changements d'état et toutes les 30 s: s'il reste au démarrage, Duo s'est arrêté chez l'hôte; la partie est inscrite interrompue et l'accueil des deux machines propose de reprendre depuis la dernière sauvegarde (M-19). Pas d'instantané complet de la partie en version 1.
+- Un invité relancé retrouve la partie en cours, que l'hôte a gardée en mémoire.
 
-### 8.5 Réplication
+### 8.6 Rattachement d'une machine réinstallée
 
-- Seule l'instance de l'hôte écrit sauvegardes et résultats. La plateforme de l'hôte écrit en local, puis transmet l'écriture à l'autre machine, qui l'écrit à son tour et accuse réception.
-- Sans accusé de réception (coupure), l'écriture reste dans `outbox.json`.
-- À chaque connexion, avant le salon, les deux machines comparent leurs index (emplacement, révision, empreinte; liste des parties) et échangent ce qui manque. Le salon n'affiche les sauvegardes qu'après cette synchronisation.
-- L'historique ne peut pas entrer en conflit: chaque partie est un fichier immuable à identifiant unique, on fait l'union des deux copies.
+```mermaid
+sequenceDiagram
+  participant A as Machine A (membre du duo)
+  participant N as Machine N (réinstallée)
+  N->>A: présence et poignée de main (aucun duo commun)
+  Note over A: le duo de A a un autre membre, sur une machine absente
+  A-->>N: proposition de rattachement
+  Note over A,N: M-23 sur les deux machines: Recopier, Plus tard, ou Ce n'est pas le même duo
+  N->>A: accord du joueur de N
+  A->>A: accord du joueur de A, duo.json mis à jour (N prend la place de l'ancien membre)
+  A->>N: duo.json, puis comparaison des index
+  A->>N: révisions, têtes, entrées d'historique manquantes
+  Note over N: historique et scores suivent l'identifiant de membre, affichés avec le pseudo de N
+```
 
-### 8.6 Conflits (section 4 du cahier)
-
-- Révisions différentes dont l'une descend de l'autre (chaîne `parent`): la plus avancée remplace l'autre, sans conflit. C'est le cas normal après une coupure.
-- Révisions divergentes (aucune ne descend de l'autre, cas d'une synchronisation interrompue): la plus récente selon `updatedAt` l'emporte, l'autre est rangée dans `backup/`, et la plateforme le signale aux deux joueurs. Un écart de quelques secondes entre les horloges des deux machines est sans gravité, puisque la copie perdante est gardée.
-- Pourquoi une chaîne de révisions plutôt que la seule comparaison des dates: elle distingue la simple mise à jour en retard (aucun conflit à signaler) de la vraie divergence, et ne dépend des horloges que dans ce dernier cas.
+« Plus tard » ne change rien (pas de partie commune avant décision, la proposition revient); « Ce n'est pas le même duo » forme un nouveau duo et laisse l'ancien intact. Si l'ancienne machine revient, elle apprend qu'elle a été remplacée et garde ses données locales.
 
 ### 8.7 Scores
 
-Le score cumulé (F09) se calcule à partir de l'historique: victoires de chacun par jeu et au total pour les jeux en affrontement, progression commune pour les jeux en coopération. Aucune donnée dérivée à synchroniser, donc aucune incohérence possible. Proposition: les parties interrompues n'y comptent pas.
+Fonction pure de l'historique, recalculée à l'affichage: victoires et égalités par jeu et au total pour les jeux en affrontement; nombre de parties et dernière progression pour les jeux en coopération. Les parties interrompues ne comptent pour rien dans le score; l'historique les affiche.
 
-## 9. Distribution des jeux sans réinstaller l'application (F12)
+## 9. Distribution des jeux
 
-### 9.1 Options
+Décision: ADR 0010.
 
-| Option | Satisfait F12 | Sans Internet | Écart de versions entre les machines | Coût |
-|---|---|---|---|---|
-| A. Jeux embarqués dans l'application | non: chaque jeu impose une nouvelle installation et les alertes de sécurité qui vont avec | oui | aucun si les deux applications sont à jour | nul |
-| B. Paquets publiés sur GitHub Releases, catalogue téléchargé | oui | jeux déjà installés jouables | possible si une machine n'a pas récupéré la dernière version | moyen |
-| C. B, plus copie automatique du paquet de l'hôte vers l'invité sur le LAN | oui | l'invité n'a même pas besoin d'Internet | supprimé: l'invité joue la version de l'hôte | moyen |
-| D. Fichiers du jeu chargés directement depuis l'hôte, sans installation chez l'invité | oui | oui | supprimé | contenu distant non vérifié dans une vue, rechargé à chaque partie, CSP liée à l'adresse de l'hôte |
+- Paquet `.duogame`: zip qui contient le jeu, son manifeste, la liste de ses fichiers avec leurs SHA-256 (`duo-files.json`) et la signature Ed25519 de cette liste. La même vérification sert au téléchargement, à la copie LAN et à l'import d'un fichier: signature par une clé de confiance, chaque fichier listé et d'empreinte juste, noms d'entrée valides, 200 Mo extraits au plus.
+- Clé privée dans les secrets de GitHub Actions; clés publiques de confiance compilées dans l'application (rotation possible); clé de test versionnée, connue des seules versions de test.
+- Catalogue `catalogue.json` sur une release au tag `catalogue`, lu par son adresse directe de téléchargement (sans jeton ni API GitHub); il donne pour chaque jeu sa dernière version, sa taille, son adresse et l'empreinte de l'archive.
+- Recherche au démarrage (après l'affichage du lanceur), toutes les 6 heures et à la demande; aucun téléchargement pendant une partie; installation sans action, puis notification; trois essais espacés, puis attente de « Réessayer maintenant ».
+- Installation: archive reçue et contrôlée, extraction vérifiée dans un dossier temporaire, renommage, bascule atomique du pointeur de version; l'archive est gardée pour la copie vers l'autre machine. Jamais pendant que le jeu est au salon ou en partie, jamais vers une version plus ancienne.
+- Copie LAN: la machine qui a la version la plus récente l'envoie à l'autre, en flux, avec reprise; « Installer et rejoindre », « Mettre à jour et rejoindre », « Mettre à jour » (UX section 9). Proposé à l'UX: copier depuis la bibliothèque un jeu que seule l'autre machine possède.
+- Jeu témoin: paquet signé comme les autres, embarqué dans l'application et installé au premier lancement.
+- Dépôt passé en privé: second dépôt public de distribution alimenté par la CI, ou import manuel.
 
-Recommandation: **C**, avec deux compléments: « Installer un jeu depuis un fichier » (recours sans Internet, ou si le dépôt devient privé) et le jeu témoin intégré à l'application (premier essai possible sans rien télécharger).
+## 10. Compatibilité des versions
 
-### 9.2 Fonctionnement proposé
-
-- Publication par GitHub Actions, sur un tag `jeu-<id>-v<version>`: construction, tests, archive zip, manifeste, empreinte SHA-256, signature Ed25519 (clé privée dans les secrets GitHub, clé publique compilée dans l'application; Node vérifie Ed25519 sans dépendance), release, puis mise à jour du catalogue.
-- Catalogue: `catalogue.json` attaché à une release de référence, lu par son adresse directe (`https://github.com/Haeev/duo/releases/download/<tag>/catalogue.json`). Les adresses directes de téléchargement d'un dépôt public répondent par une redirection vers le fichier (vérifié avec `releases/latest/download/...`); c'est ainsi que `@electron/get` télécharge Electron, sans jeton. Elles ne consomment pas le quota de l'API GitHub (60 requêtes par heure sans jeton): l'application n'utilise jamais l'API.
-- Installation: téléchargement en flux, vérification de l'empreinte et de la signature, extraction protégée (chemins normalisés, aucune sortie du dossier, taille totale plafonnée), puis bascule atomique vers la nouvelle version. L'ancienne version reste en place tant qu'une partie l'utilise.
-- Copie LAN: dans le salon, si l'invité n'a pas le jeu choisi (identifiant, version, empreinte), il le reçoit de l'hôte par la connexion de session, vérifie la signature et l'installe; la progression s'affiche chez les deux joueurs.
-- Un paquet n'est jamais exécuté avec les droits de Node: il est servi par `duo-game://` dans une vue en bac à sable. La signature protège surtout la copie LAN (un appareil du réseau qui se ferait passer pour l'hôte). Option plus simple écartée: se fier à la seule empreinte publiée dans le catalogue, qui ne protège pas un invité hors ligne recevant le paquet de l'hôte.
-
-### 9.3 Si le dépôt passe en privé
-
-- Les fichiers de release d'un dépôt privé exigent une authentification: l'application ne peut plus les télécharger, et embarquer un jeton dans l'application est exclu (ce serait un secret diffusé).
-- Parades: un second dépôt public réservé aux fichiers publiés (par exemple `Haeev/duo-jeux`), alimenté par la CI du dépôt privé grâce à un jeton rangé dans ses secrets (recommandé); ou l'import manuel des paquets, téléchargés depuis GitHub par une personne connectée.
-- Autres effets: sur un dépôt privé, les minutes de CI sont comptées (2 000 par mois sur le plan gratuit, macOS compté dix fois et Windows deux fois, soit environ 200 minutes de construction macOS par mois); les avis de nouvelle version de Duo doivent eux aussi pointer vers le dépôt public de distribution.
-
-## 10. Compatibilité des versions (F13)
-
-Deux options: exiger des versions identiques de l'application (simple à expliquer, mais une mise à jour faite sur une seule machine bloque la soirée) ou vérifier la compatibilité par numéros de protocole (recommandé, détaillé ci-dessous).
+Décision: ADR 0006.
 
 | Numéro | Porté par | Règle |
 |---|---|---|
-| Version de l'application (SemVer) | l'application | affichée; ne bloque pas à elle seule |
-| Version du protocole de session (entier, incrémenté seulement en cas de changement incompatible) | l'application | identique sur les deux machines, sinon blocage |
-| Version de l'API du pont (`majeure.mineure`) | l'application | doit couvrir la version `sdk` exigée par le jeu |
-| Version du jeu (SemVer) et empreinte du paquet | le paquet | identiques, sinon copie depuis l'hôte (section 9) |
-| Version d'Electron | l'application | identique pour les jeux en lockstep |
+| Version de Duo (SemVer) | l'application | désigne la machine à mettre à jour; ne bloque pas à elle seule |
+| Protocole de la liaison (entier) | l'application | identique, sinon la machine au Duo le plus ancien doit être mise à jour (M-27) |
+| Versions du pont (`majeure.mineure`) | l'application | doivent couvrir le `sdk` de la version du jeu qu'on va jouer, sur chaque machine (sinon M-13) |
+| Format des données (entier) | le dossier de données | plus récent que connu: rien n'est modifié (M-29) |
+| Version du jeu et empreinte | le paquet | identiques au départ, après copie de la plus récente dans un sens ou dans l'autre (M-28) |
+| Version d'Electron | l'application | identique pour un jeu en lockstep seulement |
 
-- Poignée de main (premier message de l'invité): signature de l'application, versions ci-dessus, système et architecture, profil, jeux installés (identifiant, version, empreinte). L'hôte répond accepté ou refusé, avec une raison typée.
-- Messages au joueur: « Duo doit être mis à jour sur <machine> » avec la version visée et la marche à suivre, ou « Copie du jeu depuis <hôte> » avec la progression. Le message désigne toujours la machine à mettre à jour, jamais un code d'erreur.
-- Comme le protocole ne change qu'en cas d'incompatibilité, deux versions proches de l'application jouent ensemble: une mise à jour de Duo sur une seule machine ne bloque pas la soirée.
+- Comparaison dès que les machines se voient: une incompatibilité de Duo s'affiche sur l'accueil des deux, avant toute invitation; un écart de version d'un jeu s'affiche sur l'invitation et dans le salon.
+- La règle est une fonction pure, testée sur toutes les combinaisons (CA-PF-107), qui rend `ok`, `copy`, `app-too-old`, `engine-mismatch` ou `save-too-new`.
+- Jamais de retour en arrière d'un jeu. Une sauvegarde écrite par une version plus récente du jeu n'est ni lue ni écrite par une plus ancienne (M-34).
+- Le protocole ne change qu'en cas d'incompatibilité: une addition mineure doit fonctionner face à un pair qui l'ignore (champs inconnus retirés par Valibot, messages inconnus ignorés). Deux versions proches de Duo jouent donc ensemble: une mise à jour faite sur une seule machine ne bloque pas la soirée.
+- Les messages nomment toujours la machine à mettre à jour par le pseudo de son joueur et disent « trop ancienne », jamais un code d'erreur.
 
 ## 11. Installation et mises à jour de l'application
 
-### 11.1 Fabrication
+ADR 0011 (ingenieur-build) fait foi. Faits relevés en phase 1, versés à cet ADR:
 
-electron-builder sur les runners GitHub Actions du système visé (`macos-latest`, `windows-latest`), sur tag `v*`:
+- electron-builder 26 sur les runners GitHub Actions du système visé. Sans `mac.identity`, aucune signature (pas de repli ad hoc automatique, vérifié dans son schéma); `"-"` pour l'ad hoc, avec `hardenedRuntime: false`. Windows: NSIS par utilisateur, non signé; `deleteAppDataOnUninstall` vaut `false` par défaut (vérifié): la désinstallation garde les données du duo.
+- macOS 15 et suivants: plus de contournement par clic droit et « Ouvrir »; passage par Réglages Système > Confidentialité et sécurité > « Ouvrir quand même ». Windows: SmartScreen; Smart App Control, s'il est actif, bloque les applications non signées sans exception possible.
+- Depuis Electron 42, macOS n'affiche les notifications natives que pour une application signée: Duo signale l'invitation dans sa fenêtre, par le Dock et par la barre des tâches.
+- electron-updater passe par Squirrel.Mac sous macOS (signature Developer ID exigée); sous Windows il accepte un NSIS non signé tant que `publisherName` est absent. Le cahier retient pour la version 1 l'avis de nouvelle version et le téléchargement manuel.
+- Poids attendu: de 90 à 130 Mo par installateur (l'archive officielle d'Electron 45.2.0 pour macOS arm64 pèse 121 Mo).
 
-- macOS arm64: dmg et zip, signature ad hoc explicite (`mac.identity: "-"`). Sans identité, electron-builder 26 ne signe pas du tout: il n'y a pas de repli ad hoc automatique (vérifié dans son schéma de configuration). `hardenedRuntime: false`, sinon la validation des bibliothèques rejette les cadres Electron déjà signés (même source). `NSLocalNetworkUsageDescription` dans `Info.plist`.
-- Windows x64: NSIS par utilisateur, sans droits d'administrateur, non signé. Variante à étudier dans l'ADR 0011 avec dev-reseau: une installation par machine demande les droits d'administrateur une fois, mais peut créer la règle du pare-feu dès l'installation (plus d'alerte au premier salon, plus de risque de clic sur « Annuler »), au prix de droits d'administrateur à chaque mise à jour.
-- Poids attendu: de 90 à 130 Mo par installateur (l'archive zip officielle d'Electron 45.2.0 pour macOS arm64 pèse à elle seule 121 Mo, vérifié; NSIS compresse davantage).
+## 12. Journal et rapport de diagnostic (F14)
 
-### 11.2 Premier lancement
+Décision: ADR 0015.
 
-- macOS 15 et suivants: le contournement par clic droit puis « Ouvrir » a disparu. Il faut tenter d'ouvrir Duo, puis aller dans Réglages Système > Confidentialité et sécurité > « Ouvrir quand même », et saisir son mot de passe (sources secondaires concordantes). Variantes pour le guide: retirer l'attribut de quarantaine (`xattr -dr com.apple.quarantine /Applications/Duo.app`) ou télécharger avec `curl`, qui n'en pose pas.
-- Windows: SmartScreen (« Informations complémentaires », puis « Exécuter quand même »). Si Smart App Control est actif, il bloque les applications non signées, sans exception possible par application: il faudrait le désactiver (Sécurité Windows > Contrôle des applications et du navigateur). Selon des sources secondaires, il se réactive sans réinstaller Windows depuis les mises à jour d'avril 2026, mais la mise à jour d'octobre 2026 (KB5127648) peut l'en empêcher. À vérifier sur le PC.
-- Notifications système: depuis Electron 42, macOS n'affiche les notifications natives que pour une application signée. Duo signale donc l'invitation dans sa fenêtre, par le rebond de l'icône du Dock et par le clignotement de la barre des tâches.
+- Journal en JSON Lines écrit par le principal seul (les vues lui envoient leurs entrées), avec horodatage ISO et horloge monotone: événements de session (présence, salon, départ, pause, coupure, reprise, sauvegarde, copie, plantage) et erreurs. Il fournit les délais et le temps machine mesurés à la recette. Rotation: 7 fichiers de 5 Mo au plus.
+- Nettoyage dès l'écriture: dossier personnel remplacé par `~`; ni nom d'ordinateur, ni nom du compte, ni adresse matérielle, ni nom du Wi-Fi, ni adresse IPv6; identifiants de machine et de duo remplacés par une empreinte courte, identique dans les rapports des deux machines.
+- Rapport texte en six sections (versions, machine, rendu, réseau, duo, événements récents), 2 Mo au plus, montré dans un aperçu avant « Enregistrer dans Téléchargements » ou « Copier ». Les rapports de plantage natifs restent locaux et n'y entrent jamais (mémoire du processus); seules leurs raisons y figurent.
 
-### 11.3 Mises à jour
+## 13. Stratégie de test
 
-| Option | macOS | Windows | Coût |
-|---|---|---|---|
-| Avis de nouvelle version et téléchargement manuel | oui, alerte Gatekeeper à chaque version | oui, SmartScreen possible | faible |
-| electron-updater (installation automatique) | non: il passe par Squirrel.Mac (vérifié dans le code de `MacUpdater`), qui exige une signature Developer ID | oui avec un NSIS non signé: la signature n'est vérifiée que si `publisherName` est renseigné (vérifié dans le code de `NsisUpdater`) | faible |
-| Mise à jour maison sous macOS (téléchargement par l'application, remplacement du paquet, relance) | possible sans quarantaine, à prototyper | sans objet | moyen, risqué |
-| Signature payante (compte Apple Developer, certificat Windows) | tout fonctionne, autorisations stables | plus d'alerte | exclue par le client |
-
-Recommandation v1: avis de nouvelle version (au démarrage, si Internet est là, l'application lit le fichier de version de la dernière release) et téléchargement manuel. La mise à jour automatique sous Windows par electron-updater peut venir tôt, pour un coût faible; macOS reste manuel. Comme les jeux se mettent à jour sans l'application, les versions de Duo resteront rares. À tester chez le client: une nouvelle version ad hoc redemande-t-elle l'autorisation Réseau local?
-
-Leviers pour plus tard, si la friction gêne: SignPath Foundation offre une signature Windows gratuite aux projets libres (licence approuvée par l'OSI, dépôt public, aucune partie propriétaire: conditions à vérifier pour Duo); côté Apple, seul le programme payant règle Gatekeeper et l'autorisation Réseau local.
-
-## 12. Stratégie de test
+Décision: ADR 0013. Modes de vérification des critères: U, P2, E, EL, CI, D, M (`criteres-acceptation.md`, section 1.2).
 
 | Niveau | Outil | Cible | Quand |
 |---|---|---|---|
-| Unitaire | Vitest dans Node | simulations des jeux (graine fixe), protocole et schémas, stockage (écriture sûre, conflits, réplication), règles de compatibilité, catalogue et paquets | chaque push |
-| Intégration réseau | Vitest dans Node | deux sessions (hôte et invité) dans un même processus, sur localhost, avec latence, gigue et pertes injectées (par exemple 80 ms, 20 ms, 2 %) | chaque push |
-| Jeu à deux | Playwright Chromium, deux contextes | un jeu dans le faux hôte, deux joueurs ou deux bots, captures examinées | chaque push |
-| Application | Playwright `_electron` sous `xvfb-run`, deux instances (dossiers de données et ports distincts) | parcours complets: héberger, rejoindre, jouer, pause, déconnexion, fin, historique | chaque push, ou chaque nuit si c'est trop long |
-| Endurance | deux bots | dix parties d'affilée, mémoire suivie, désynchronisations | avant chaque jalon |
-| Installateurs | GitHub Actions macOS et Windows | fabrication, puis démarrage minimal de l'application fabriquée | sur tag |
-| Performance et réseau réel | banc de mesure, check-list de recette | images par seconde, temps de chargement, pare-feu, autorisations | chez le client, à chaque jalon |
+| Unitaire (U) | Vitest dans Node | simulations à graine fixe, schémas, compatibilité, fusion des données, machines à états, textes | chaque push |
+| Intégration réseau | Vitest, deux sessions sur la boucle locale | liaison, reconnexion, réplication, avec latence, gigue et pertes injectées | chaque push |
+| Deux contextes (P2) | Playwright Chromium | lanceur avec faux pont; jeux dans le faux hôte, avec robots | chaque push |
+| Application (E) | Playwright `_electron` sous `xvfb-run`, deux instances | parcours complets | rapide à chaque push, complet à chaque fusion |
+| Réseau virtuel (EL) | E dans deux espaces de noms reliés par un pont, passerelle piège, nftables, Toxiproxy | découverte, coupures, absence d'Internet, réseau dégradé, endurance | chaque fusion; endurance chaque nuit |
+| Systèmes réels (CI) | runners macOS et Windows | chemins, fichiers, installateurs, compte au nom accentué | chaque fusion, et sur tag |
+| Mesure | banc de mesure, affichage des performances | images par seconde, mémoire, chargements | chez le client, à chaque jalon |
 
-Pièges vérifiés pour l'environnement cloud et la CI:
+Prérequis de testabilité de qa-testeur, tous retenus (détail dans l'ADR 0013): deux instances sur une machine (dossier de données et ports en ligne de commande, verrou pris ensuite); `data-testid` et `data-message`; mode test compilé seulement dans les versions de test, absent des versions publiées (contrôlé sur chaque binaire publié); jeux d'essai signés avec la clé de test; journal local; affichage des performances dans toutes les versions; banc réseau virtuel.
 
-- Electron refuse de tourner en root sans `--no-sandbox`; l'environnement cloud tourne en root, donc le bac à sable de Chromium n'y est pas éprouvé.
-- WebGL2 en rendu logiciel exige `--enable-unsafe-swiftshader`; un rendu logiciel vaut pour l'image, pas pour mesurer les performances.
-- L'application doit accepter en ligne de commande son dossier de données et ses ports, pour faire tourner deux instances sur une même machine.
-- À vérifier en CI: le bac à sable de Chromium sur les runners Ubuntu récents (restriction AppArmor des espaces de noms utilisateur).
+Pièges vérifiés pour l'environnement cloud: Electron refuse de tourner en root sans `--no-sandbox` (le bac à sable de Chromium n'y est donc pas éprouvé); WebGL2 en rendu logiciel exige `--enable-unsafe-swiftshader` et ne mesure aucune performance; le noyau n'a pas netem (latence par un mandataire); les variables de mandataire HTTP de l'environnement doivent être retirées des tests hors ligne.
 
-## 13. Budgets de performance
+## 14. Budgets de performance
 
-### 13.1 Machine de référence
+### 14.1 Machine de référence
 
-PC Windows 11, hypothèse prudente: Intel Core i3 de 8e génération (2 cœurs, 4 fils, de 2,2 à 3,4 GHz), Intel UHD 620 (24 unités d'exécution, mémoire partagée), 4 à 8 Go de mémoire, disque SSD ou disque dur, écran 1366x768 ou 1920x1080 avec une mise à l'échelle de 100, 125 ou 150 %. Le Mac M1 est environ deux fois plus rapide sur un cœur et bien plus puissant en graphisme: les budgets se calent sur le PC, y compris quand c'est lui qui héberge (il simule alors en plus d'afficher).
+PC Windows 11, hypothèse prudente: Intel Core i3 de 8e génération (2 cœurs, 4 fils, de 2,2 à 3,4 GHz), Intel UHD 620 (mémoire partagée), 4 à 8 Go de mémoire, disque SSD ou disque dur, écran 1366x768 ou 1920x1080 à 100, 125 ou 150 %. Le Mac M1 est bien plus puissant: les budgets se calent sur le PC, y compris quand c'est lui qui héberge.
 
-### 13.2 Budgets
+### 14.2 Budgets
 
 | Poste | Budget sur le PC de référence | Mesure |
 |---|---|---|
-| Images par seconde | 60 stables dans la scène la plus chargée: 99 % des images sous 16,7 ms, aucune au-delà de 33 ms en régime établi | compteur du SDK, banc de mesure |
-| Simulation chez l'hôte | 2 ms au plus par pas à 60 Hz, sérialisation réseau comprise | banc de simulation sous Vitest (cible de 1 ms en CI, soit une marge de 2), puis chez le client |
-| Fil principal du jeu | 8 ms au plus par image (simulation, mise à jour de la scène, commandes de dessin) | profileur de Chromium |
+| Images par seconde | sur 60 s par scénario: moyenne d'au moins 58, au moins 99 % des intervalles à 20 ms ou moins, aucun au-delà de 34 ms après les 5 premières secondes (définition des critères, H-30) | affichage des performances, banc de mesure |
+| Simulation chez l'hôte | 2 ms au plus par pas à 60 Hz, sérialisation réseau comprise | banc de simulation sous Vitest (cible de 1 ms en CI), puis chez le client |
+| Fil principal du jeu | 8 ms au plus par image; aucun calcul de plus de 5 s d'affilée (sinon le jeu est déclaré figé) | profileur de Chromium |
 | Appels de dessin en 3D | 150 au plus par image, toutes passes comprises | `renderer.info.render.calls` |
-| Triangles en 3D | 250 000 au plus par image, toutes passes, dont 100 000 au plus pour l'ombre | `renderer.info.render.triangles` |
-| Lumières et effets en 3D | une lumière directionnelle avec ombre (carte de 1024, 2048 au plus), une lumière hémisphérique, 4 lumières ponctuelles sans ombre au plus; une seule passe plein écran à pleine résolution; bloom à demi-résolution au plus; ni occlusion ambiante, ni réflexions, ni profondeur de champ | revue technique |
-| Programmes de shader | 12 au plus par scène, tous compilés pendant le chargement (`compileAsync`): sous Windows, la compilation par ANGLE coûte cher si elle survient en pleine partie | `renderer.info.programs` |
-| Résolution de rendu en 3D | 1920x1080 pixels physiques au plus sur le PC (rapport de pixels plafonné), rapport de 2 au plus sur le Mac; résolution dynamique jusqu'à 0,75 si le temps d'image dépasse | SDK |
-| Rendu 2D | 50 lots de dessin au plus par image, 5 000 sprites visibles, 2 000 particules, 2 filtres plein écran | outils de PixiJS ou de Phaser |
-| Mémoire de textures | 256 Mo au plus par jeu, mipmaps comprises (une texture RGBA de 2048x2048 en occupe environ 22 Mo); 2048 pixels de côté au plus, 4096 pour un atlas | inventaire au chargement |
-| Mémoire de l'application au repos | 350 Mo au plus, tous processus (mémoire privée; Electron presque vide en occupe déjà de 140 à 165 Mo sous Linux) | `app.getAppMetrics()` (`privateBytes` sous Windows) |
-| Mémoire de l'application en partie | 1 Go au plus, tous processus; dont tas JavaScript du jeu 200 Mo au plus et audio décodé 64 Mo au plus (environ 3 minutes de stéréo: les musiques sont lues en flux) | idem, et `performance.memory` |
+| Triangles en 3D | 250 000 au plus par image, dont 100 000 au plus pour l'ombre | `renderer.info.render.triangles` |
+| Lumières et effets en 3D | une lumière directionnelle avec ombre (carte de 1024, 2048 au plus), une hémisphérique, 4 ponctuelles sans ombre au plus; une seule passe plein écran à pleine résolution; bloom à demi-résolution au plus; ni occlusion ambiante, ni réflexions, ni profondeur de champ | revue technique |
+| Programmes de shader | 12 au plus par scène, tous compilés pendant le chargement (`compileAsync`) | `renderer.info.programs` |
+| Résolution de rendu en 3D | 1920x1080 pixels physiques au plus sur le PC, rapport de 2 au plus sur le Mac; résolution dynamique jusqu'à 0,75 si le temps d'image dépasse | SDK |
+| Rendu 2D | 50 lots de dessin, 5 000 sprites visibles, 2 000 particules, 2 filtres plein écran au plus | outils de PixiJS ou de Phaser |
+| Mémoire de textures | 256 Mo au plus par jeu, mipmaps comprises; 2048 pixels de côté au plus, 4096 pour un atlas | inventaire au chargement |
+| Mémoire de Duo au repos | 350 Mo au plus, tous processus (mémoire privée) | `app.getAppMetrics()` |
+| Mémoire de Duo en partie | 1 Go au plus, tous processus; tas JavaScript du jeu 200 Mo au plus, audio décodé 64 Mo au plus | idem, et `performance.memory` |
 | Fuites | après dix parties successives, la vue plateforme ne grossit pas de plus de 10 % | test d'endurance |
-| Démarrage à froid | 3 s au plus jusqu'au lanceur utilisable (6 s sur disque dur) | chronomètre du diagnostic |
-| Chargement d'une partie | 5 s au plus du départ au jeu jouable, sur les deux machines | idem |
-| Découverte | hôte visible chez l'invité en 3 s au plus après l'ouverture du salon | test d'intégration, puis chez le client |
-| Parcours complet | 15 s au plus de temps machine, de l'ouverture de Duo au début de la partie; le reste de la minute du pilier 1 revient aux joueurs | recette |
-| Paquet d'un jeu | 50 Mo conseillés, 100 Mo au plus (moteur: de 155 à 360 Ko gzip; les musiques dominent, environ 1 Mo par minute en OGG) | contrôle en CI |
+| Démarrage à froid | 3 s au plus jusqu'au lanceur utilisable (6 s sur disque dur) | journal |
+| Chargement d'une partie | 5 s au plus du départ au jeu jouable, sur les deux machines | journal |
+| Découverte | l'autre ordinateur visible en 3 s au plus | journal, banc EL |
+| Parcours complet | 15 s au plus de temps machine, de l'ouverture de Duo au début de la partie | recette |
+| Retour au salon | moins de 2 s après un plantage, moins de 7 s après un blocage | banc E |
+| Sauvegarde | 20 Mo copiés sur l'autre machine en moins de 10 s (compression en transit) | banc EL |
+| Paquet d'un jeu | 50 Mo conseillés, 100 Mo au plus par défaut (200 Mo extraits, plafond de la plateforme) | contrôle en CI |
 | Installateur | 150 Mo au plus | CI |
 | Réseau | instantanés de 20 à 30 par seconde, 2 Ko au plus chacun, 100 Ko/s au plus; jouable à 100 ms d'aller-retour avec 20 ms de gigue et 2 % de pertes; perte de l'autre machine détectée en 3 s au plus | banc d'injection |
 
-### 13.3 Conséquences sur les styles de jeux
+### 14.3 Conséquences sur les styles de jeux
 
-- 3D: low poly en aplats ou toon, couleurs de sommets ou petite texture palette (un seul matériau), répétitions instanciées, décor statique fusionné, lumière précalculée dans Blender, ombres factices sous les personnages, arènes et niveaux compacts. À écarter: rendu réaliste à textures multiples, végétation dense, grands mondes à longue distance de vue, post-traitements empilés, nombreuses lumières dynamiques.
-- 2D: pixel art à basse résolution interne agrandie (le moins coûteux), ou vectoriel en atlas. À écarter: shaders plein écran à pleine résolution, fonds géants non compressés, sprites hors atlas.
-- Isométrique: en sprites 2D (le moins coûteux) ou en 3D orthographique, avec les budgets 3D.
-- Simulation: quelques centaines d'entités dynamiques à 60 Hz avec l'hôte qui fait autorité; au-delà, pas de 30 Hz, intérêt limité aux objets proches ou lockstep.
-- Jeux de réflexes à l'image près (combat très exigeant): ils demanderaient une resynchronisation par retour arrière, hors de la v1.
-- Les budgets se vérifient tôt: un banc de mesure (scènes de charge 3D et 2D) part chez le client dès le prototype pour recaler ces chiffres sur le vrai PC.
+- 3D: low poly en aplats ou toon, couleurs de sommets ou petite texture palette, répétitions instanciées, décor statique fusionné, lumière précalculée, ombres factices, niveaux compacts. À écarter: rendu réaliste à textures multiples, végétation dense, grands mondes à longue distance de vue, post-traitements empilés.
+- 2D: pixel art à basse résolution interne agrandie, ou vectoriel en atlas. À écarter: shaders plein écran à pleine résolution, fonds géants non compressés, sprites hors atlas.
+- Isométrique: en sprites 2D ou en 3D orthographique, avec les budgets 3D.
+- Simulation: quelques centaines d'entités dynamiques à 60 Hz avec l'hôte qui fait autorité; au-delà, pas de 30 Hz, intérêt limité aux objets proches, ou lockstep.
+- Jeux de réflexes à l'image près: ils demanderaient une resynchronisation par retour arrière, hors de la version 1.
+- Un banc de mesure part chez le client dès le prototype pour recaler ces chiffres sur le vrai PC.
 
-## 14. Faisabilité des fonctions F01 à F13
+## 15. Faisabilité des fonctions F01 à F14
 
 | # | Réponse technique | Faisabilité | Risque nommé |
 |---|---|---|---|
-| F01 Profil | `profile.json` local, identifiant stable, pseudo et couleur | sûre | deux joueurs de même couleur: règle à fixer par l'UX |
-| F02 Découverte et connexion | requête et réponse UDP, WebSocket, saisie d'adresse IP, diagnostic (profil réseau Windows, règles de blocage, autorisation macOS, absence d'adresse privée) | sûre pour la connexion, partielle pour le diagnostic | l'isolation des clients Wi-Fi et un pare-feu qui jette les paquets donnent le même symptôme (délai dépassé): le diagnostic propose des causes probables et des étapes, sans toujours nommer la cause; autorisation Réseau local peu fiable avec une signature ad hoc |
-| F03 Salon | état de session tenu par le principal de l'hôte et reflété chez l'invité; départ quand les deux sont prêts, versions compatibles et paquets identiques | sûre | aucun notable |
-| F04 Bibliothèque | manifestes des jeux installés et du catalogue (vignette, description, mode, durée), sauvegardes du duo | sûre | aucun notable |
-| F05 Cycle de vie | vue jeu dédiée, pont versionné, battement de cœur, `render-process-gone`, destruction de la vue | sûre (vérifiée par l'essai) | un blocage se détecte en 3 s environ, pas instantanément; un plantage d'un côté ramène les deux joueurs au salon |
-| F06 Déconnexion | battements (perte détectée en 3 s), pause des deux côtés, reconnexion, instantané complet renvoyé par l'hôte | sûre tant que l'application de l'hôte reste ouverte | si l'hôte plante ou s'éteint, l'état en mémoire est perdu: reprise au dernier point de sauvegarde (formulation à corriger) |
-| F07 Sauvegardes | emplacements JSON par jeu, écriture sûre, réplication, synchronisation avant le salon | sûre | conflit rare après une synchronisation interrompue, traité par la règle de la section 8.6 |
-| F08 Historique | un fichier immuable par partie, union des deux copies | sûre | sort des parties interrompues à décider |
-| F09 Score cumulé | calculé à partir de l'historique | sûre | chaque jeu doit déclarer ce qui compte (vainqueur, score, progression) |
-| F10 Réglages | `settings.json` local; volumes reliés aux bus du SDK; zoom de la vue plateforme; liaisons de touches tirées des actions du manifeste | sûre | la taille de l'interface ne s'applique au HUD d'un jeu que si ce jeu lit le facteur fourni par le SDK |
-| F11 Installation | electron-builder: dmg et zip ad hoc pour arm64, NSIS par utilisateur pour x64; guide de premier lancement | faisable | Gatekeeper à chaque version sous macOS, SmartScreen, et surtout Smart App Control qui bloque sans recours tant qu'il est actif |
-| F12 Nouveaux jeux | paquets signés sur GitHub Releases, catalogue, copie LAN de l'hôte vers l'invité, import par fichier | sûre si le dépôt reste public | dépôt privé: second dépôt public ou import manuel |
-| F13 Compatibilité | poignée de main versionnée: protocole identique, API du pont suffisante, jeu identique grâce à la copie | sûre | formulation à corriger: les versions doivent être compatibles, pas toutes identiques |
+| F01 Profil | `profile.json` local, pseudo validé (graphèmes, alphabet latin), six couleurs liées à un symbole, règle déterministe si les couleurs se rencontrent égales | sûre | aucun notable |
+| F02 Découverte et connexion | présence UDP, liaison WebSocket, saisie d'adresse IP, diagnostic (ADR 0008) | sûre pour la connexion, partielle pour le diagnostic | l'isolation des clients Wi-Fi et un pare-feu qui jette les paquets donnent le même symptôme; autorisation Réseau local peu fiable avec une signature ad hoc |
+| F03 Salon | état tenu par le principal de l'hôte, reflété chez l'invité | sûre | aucun notable |
+| F04 Bibliothèque | manifestes des jeux installés et du catalogue, sauvegardes du duo | sûre | aucun notable |
+| F05 Cycle de vie | vue jeu dédiée, pont versionné, battement de cœur, Échap intercepté, destruction de la vue | sûre (vérifiée par l'essai) | superposition et focus à vérifier sous macOS et Windows |
+| F06 Déconnexion | pause des deux côtés, reconnexion, l'hôte garde l'état; marqueur de partie en cours et reprise à la dernière sauvegarde si Duo s'arrête chez l'hôte | sûre | ce qui suit la dernière sauvegarde est perdu si l'hôte s'arrête: la sauvegarde automatique du jeu le borne |
+| F07 Sauvegardes | révisions immuables et tête, écriture sûre, réplication, chaîne de révisions, copies de secours | sûre | place disque des grosses sauvegardes (jusqu'à 80 Mo pour 20 Mo et trois versions précédentes) |
+| F08 Historique | une entrée immuable par partie, écrite par l'hôte, union des deux copies; parties interrompues inscrites | sûre | 2 000 fichiers à lire sous Windows avec antivirus: mesure en CI, cache si besoin |
+| F09 Score cumulé | fonction pure de l'historique, parties interrompues exclues | sûre | aucun notable |
+| F10 Réglages | `settings.json` local; volumes reliés aux bus du SDK; taille de l'interface en `rem`; liaisons de touches tirées du manifeste | sûre | le HUD d'un jeu ne suit la taille de l'interface que s'il lit la valeur du SDK |
+| F11 Installation | electron-builder, ad hoc pour arm64, NSIS par utilisateur pour x64 (ADR 0011) | faisable | Gatekeeper à chaque version sous macOS, SmartScreen, Smart App Control bloquant |
+| F12 Nouveaux jeux | paquets signés sur GitHub Releases, catalogue, copie LAN dans les deux sens, import par fichier | sûre si le dépôt reste public | dépôt privé: second dépôt public ou import manuel |
+| F13 Compatibilité | enveloppes figées, protocole, pont, version la plus récente du jeu copiée en une action | sûre | une machine dont Duo est trop ancien et sans Internet ne peut pas se mettre à jour par le LAN en version 1 |
+| F14 Rapport de diagnostic | rapport texte nettoyé, aperçu, Téléchargements ou presse-papiers | sûre | une donnée personnelle qui passerait le nettoyage: fonction unique, testée par des marqueurs |
 
-Fonctions à reformuler dans le cahier (propositions):
+Incidences du premier jeu (« La Petite Ligne », simulation de vie en coopération d'une centaine d'heures, envisagée en 3D low poly isométrique) sur la plateforme:
 
-- F06: « Pause automatique, attente de reconnexion, reprise là où la partie en était tant que l'application de l'hôte reste ouverte; sinon reprise au dernier point de sauvegarde (sauvegarde automatique périodique pour les jeux longs). »
-- F13: « Les deux machines vérifient que leurs versions sont compatibles; le jeu de l'hôte est copié automatiquement chez l'invité s'il lui manque ou diffère; si l'application d'une machine est trop ancienne, message clair et marche à suivre. »
-- F02: « Diagnostic qui nomme la cause quand elle est détectable (réseau Public sous Windows, autorisation refusée, aucune connexion au réseau local) et guide pas à pas sinon. »
-- F08: préciser le sort des parties interrompues (recommandation: inscrites comme interrompues, sans effet sur le score cumulé).
-- Section 6: « 60 images par seconde » sous réserve du respect des budgets de la section 13 et d'un rendu matériel (pilote graphique à jour), à confirmer par le banc de mesure dès le prototype.
-- Ajout proposé: un rapport de diagnostic exportable en un clic (journaux, configuration, état réseau et graphique), parce que les machines du client ne sont pas accessibles depuis le studio.
+- Sauvegardes: un monde persistant pèse plusieurs mégaoctets en JSON; le plafond de 32 Mio par emplacement et l'écriture asynchrone y suffisent; transport compressé (rapport de 8,7 mesuré sur un monde simulé de 8 Mo).
+- Sauvegarde automatique (période du manifeste, et à chaque pause): c'est elle qui rend acceptable la reprise au dernier point de sauvegarde quand l'hôte s'arrête (F06).
+- Séances (`play: session`): chaque séance s'inscrit à l'historique avec sa progression.
+- Migrations: un jeu qui évolue pendant des mois relit ses anciennes sauvegardes (`dataSchema` et migrations testées en CI).
+- Réseau: un grand monde ne s'envoie pas en instantanés complets 30 fois par seconde; instantanés différentiels, par zone, ou synchronisation par événements, à trancher avec dev-reseau dans le cahier du jeu.
+- Rendu en 3D isométrique: caméra orthographique, monde découpé en zones, instanciation et lumière précalculée obligatoires pour tenir les budgets d'un village peuplé sur le PC; l'essai de style mesuré le confirmera.
+- Poids: musiques et modèles d'un grand jeu peuvent dépasser 100 Mo; le budget du paquet sera revu dans le cahier du jeu (plafond de la plateforme: 200 Mo extraits). Pas de mise à jour différentielle en version 1.
 
-Incidences de l'idée du premier jeu (simulation de vie en coopération d'une centaine d'heures, cadrage en cours) sur la plateforme:
-
-- Sauvegardes: un monde persistant (village, ferme, maisons, personnages, quêtes) pèse plusieurs mégaoctets en JSON. Le plafond absolu par emplacement se fixe dans l'ADR 0009 (de l'ordre de quelques dizaines de Mo); l'écriture reste asynchrone et peut être compressée.
-- Sauvegarde automatique périodique (par exemple toutes les 5 minutes et à chaque pause), offerte par le SDK: c'est elle qui rend acceptable la reprise au dernier point de sauvegarde quand l'hôte s'arrête (F06).
-- Migrations: un jeu qui évolue pendant des mois doit relire ses anciennes sauvegardes (`dataSchema` et migrations testées en CI).
-- Réseau: un grand monde ne s'envoie pas en instantanés complets 30 fois par seconde; il faudra des instantanés différentiels ou par zone, ou une synchronisation par événements, à trancher avec dev-reseau dans le cahier du jeu.
-- Rendu: une vue 2D ou isométrique en sprites tient bien plus facilement les budgets d'un village peuplé qu'une vue 3D; en 3D, découpage du monde en zones et instanciation deviennent obligatoires.
-- Poids: musiques et sprites d'un grand jeu peuvent dépasser 100 Mo; le budget du paquet sera revu dans le cahier du jeu. Les mises à jour différentielles ne sont pas prévues en v1 (paquet complet à chaque version).
-
-## 15. Risques et parades
+## 16. Risques et parades
 
 | Risque | Probabilité | Impact | Parade | Responsable |
 |---|---|---|---|---|
 | PC plus faible que l'hypothèse (4 Go, disque dur, pilote ancien) | moyenne | fort | relevé de configuration (Q4) avant le prototype; banc de mesure; budgets recalés | manager, tech-artist |
-| WebGL indisponible ou en rendu logiciel sur le PC (pilote écarté par Chromium, qui ne bascule plus seul sur SwiftShader) | faible | fort | détection au démarrage, message « mettre à jour le pilote graphique », rapport de diagnostic | dev-plateforme |
-| Smart App Control actif sur le PC | moyenne | bloquant | vérifier son état avec Q4; guide pour le désactiver; plus tard, signature Windows gratuite si Duo devient un projet libre | ingenieur-build |
-| Autorisation Réseau local instable sous macOS (signature ad hoc, UUID de l'exécutable Electron partagé) | moyenne | fort | essai dès le prototype sur le Mac; réécriture de l'UUID avant la signature ad hoc à étudier; guide pour réactiver l'autorisation; recours: le Mac héberge et le PC se connecte par adresse IP (accepter une connexion TCP ne demande pas l'autorisation) | ingenieur-build, dev-reseau |
-| Pare-feu Windows: « Annuler » crée des règles de blocage silencieuses; réseau classé Public | moyenne | fort | écran d'explication avant l'alerte, diagnostic des règles et du profil réseau, guide; ou installation par machine qui crée la règle (ADR 0011) | dev-reseau, ux-ui-designer |
-| Gigue du Wi-Fi (balayages, économie d'énergie, AWDL sous macOS) | moyenne | moyen | tampon d'interpolation, mesures au banc d'injection, conseils (même réseau, PC branché sur secteur) | dev-reseau |
-| Simulation de l'hôte ralentie quand sa fenêtre est réduite ou masquée | moyenne | moyen | boucle du SDK indépendante de `requestAnimationFrame` chez l'hôte, `backgroundThrottling` désactivé, blocage de la suspension; sinon pause automatique | dev-plateforme |
-| Désynchronisation en lockstep entre arm64 et x64 | faible, et seulement pour ces jeux | fort | fonctions mathématiques maison, somme de contrôle, versions identiques | dev-reseau, devs gameplay |
-| Corruption ou perte de données (coupure, antivirus) | faible | fort | écriture sûre, `.bak`, reprises, réplication, tests de coupure | dev-plateforme |
-| Montées de version d'Electron (chaque majeure maintenue environ 6 mois) | certaine | moyen | version figée par ADR, montée planifiée deux fois par an, tests de bout en bout avant chaque montée | architecte-technique, ingenieur-build |
-| Pile très récente (Vite 8, TypeScript 6 et 7, Phaser 4) mal connue des agents | moyenne | moyen | vérifier les API dans `node_modules` avant usage (règle de l'équipe), exemples dans le gabarit | toute l'équipe |
-| Superposition transparente et focus clavier entre vues non vérifiés sous macOS et Windows | faible | moyen | essai dès le lot L2; repli sur une image figée du jeu derrière les écrans de la plateforme | dev-plateforme |
+| WebGL indisponible ou en rendu logiciel sur le PC | faible | fort | détection au démarrage, message « mettre à jour le pilote graphique », rapport de diagnostic | dev-plateforme |
+| Smart App Control actif sur le PC | moyenne | bloquant | vérifier son état avec Q4; guide pour le désactiver | ingenieur-build |
+| Autorisation Réseau local instable sous macOS (signature ad hoc, UUID partagé) | moyenne | fort | essai dès le prototype sur le Mac; guide pour réactiver l'autorisation; recours: le Mac héberge et le PC se connecte par adresse IP | ingenieur-build, dev-reseau |
+| Pare-feu Windows: règles de blocage silencieuses; réseau classé Public | moyenne | fort | écran d'explication avant l'alerte, diagnostic, guide (ADR 0008, 0011) | dev-reseau, ux-ui-designer |
+| Gigue du Wi-Fi | moyenne | moyen | tampon d'interpolation, banc d'injection, conseils | dev-reseau |
+| Simulation de l'hôte ralentie fenêtre réduite (App Nap, occultation) | moyenne | moyen | minuteurs, `backgroundThrottling` désactivé, blocage de la veille; sinon pause automatique | dev-plateforme |
+| Désynchronisation en lockstep entre arm64 et x64 | faible, et seulement pour ces jeux | fort | fonctions mathématiques maison, empreinte de l'état, versions identiques | dev-reseau, devs gameplay |
+| Corruption ou perte de données (coupure, antivirus) | faible | fort | révisions immuables, écriture sûre, `.bak`, reprises, réplication, tests d'arrêt brutal | dev-plateforme |
+| Rattachement accepté à tort (une machine de passage prend la place de l'autre) | faible | moyen | accord exigé sur les deux machines; l'ancienne machine garde ses données et peut se rattacher à nouveau | dev-plateforme |
+| Duo trop ancien sur une machine sans Internet | faible | moyen | message et guide; installateur sur une clé; copie de Duo par le LAN envisageable plus tard | ingenieur-build |
+| Faux positif du battement de cœur pendant un chargement lourd sur le PC | faible | moyen | 10 s de tolérance au chargement, travaux asynchrones; mesure au banc | dev-plateforme |
+| Preact 11 jeune (sorti le 2026-09-30) | faible | faible | repli sur Preact 10.29.8, API identique pour notre usage | dev-plateforme |
+| Montées de version d'Electron (chaque majeure maintenue environ 6 mois) | certaine | moyen | version figée, montée planifiée deux fois par an, tests sur trois systèmes | architecte-technique, ingenieur-build |
+| Pile très récente (Vite 8, TypeScript 6 et 7, Preact 11, Phaser 4) mal connue des agents | moyenne | moyen | lire les API dans `node_modules` avant usage (règle de l'ADR 0001), exemples dans le gabarit | toute l'équipe |
+| Superposition transparente et focus entre vues non vérifiés sous macOS et Windows | faible | moyen | essai dès le lot L2; repli sur une image figée | dev-plateforme |
 | Dépôt passé en privé | faible | moyen | second dépôt public de distribution, import manuel | ingenieur-build |
 
-## 16. ADR à rédiger après validation du cahier
+## 17. Décisions (ADR)
 
-Dans cet ordre, qui suit les dépendances de la phase 2.
+Index tenu dans `decisions/README.md`. État au 2026-10-30:
 
-| # | Titre | Question tranchée | Rédacteur (avec) |
+| # | Titre | Statut | Rédacteur |
 |---|---|---|---|
-| 0001 | Pile technique et versions figées | Electron, Node d'outillage, TypeScript 6.0, Vite 8 et electron-vite, Vitest, Playwright, Valibot ou Zod; politique de montée de version | architecte-technique |
-| 0002 | Monorepo et outillage | pnpm ou npm; arborescence; scripts communs; lint, formatage, contrôle typographique | architecte-technique (ingenieur-build) |
-| 0003 | Processus Electron et sécurité | répartition entre principal, preloads et vues; IPC validé; protocoles personnalisés; CSP; fusibles; autorisations | architecte-technique (dev-plateforme) |
-| 0004 | Isolation et hébergement des jeux | import dynamique, iframe, vue dédiée ou fenêtre; écrans superposés; battement de cœur et délais | architecte-technique (dev-plateforme) |
-| 0005 | Contrat des jeux et SDK | manifeste, cycle de vie, pont par `MessagePort`, API du SDK; SDK compilé dans le jeu ou fourni à l'exécution | architecte-technique |
-| 0006 | Versions et compatibilité | numéros portés, règles, poignée de main, messages au joueur | architecte-technique (dev-reseau, ingenieur-build) |
-| 0007 | Modèle réseau et transport | relais par les principaux; WebSocket, WebRTC ou UDP; lieu de la simulation de l'hôte; modèle par défaut et variantes | dev-reseau (architecte-technique) |
-| 0008 | Découverte et pare-feu | diffusion UDP ou mDNS; ports; déclenchement des autorisations; diagnostic | dev-reseau |
-| 0009 | Données du duo | formats, emplacement, écriture sûre, réplication, conflits, scores dérivés | architecte-technique (dev-plateforme, dev-reseau) |
-| 0010 | Distribution des jeux | embarqués, Releases, copie LAN ou chargement distant; format de paquet, signature, catalogue; cas du dépôt privé | architecte-technique (ingenieur-build) |
-| 0011 | Installateurs, signature et mises à jour de l'application | cibles, signature ad hoc, NSIS par utilisateur, avis de version ou mise à jour automatique | ingenieur-build |
-| 0012 | Interface du lanceur | Preact, TypeScript seul ou Svelte; état de l'interface; intégration des jetons du design system | architecte-technique (dev-plateforme, ux-ui-designer) |
-| 0013 | Stratégie de test et CI | niveaux de test, faux hôte, Electron sous `xvfb-run`, bots, banc de mesure, déclencheurs de CI | architecte-technique (qa-testeur, ingenieur-build) |
-| 0014 | Moteur 2D par défaut | PixiJS ou Phaser 4 | architecte-technique (dev-gameplay-2d), au premier jeu 2D |
+| 0001 | Pile technique et versions figées | proposée | architecte-technique |
+| 0002 | Monorepo et outillage | proposée | architecte-technique |
+| 0003 | Processus Electron et sécurité | proposée | architecte-technique |
+| 0004 | Isolation et hébergement des jeux | proposée | architecte-technique |
+| 0005 | Contrat des jeux et SDK | proposée | architecte-technique |
+| 0006 | Versions et compatibilité | proposée | architecte-technique |
+| 0007 | Modèle réseau et transport | en rédaction | dev-reseau |
+| 0008 | Découverte et pare-feu | en rédaction | dev-reseau |
+| 0009 | Données du duo | proposée | architecte-technique |
+| 0010 | Distribution des jeux | proposée | architecte-technique |
+| 0011 | Installateurs, signature et mises à jour de l'application | en rédaction | ingenieur-build |
+| 0012 | Interface du lanceur | proposée | architecte-technique |
+| 0013 | Stratégie de test et CI | proposée | architecte-technique |
+| 0014 | Moteur 2D par défaut | différée au premier jeu 2D | architecte-technique |
+| 0015 | Journal et rapport de diagnostic (F14) | proposée | architecte-technique |
 
-## 17. Découpage de la phase 2
+## 18. Découpage de la phase 2
 
 | Lot | Contenu | Responsable | Dépend de | Jalon |
 |---|---|---|---|---|
-| L1 Socle du dépôt | monorepo pnpm, TypeScript strict partagé, ESLint, Prettier, Vitest, Playwright, scripts multiplateformes, contrôle typographique, CI Linux à chaque push | ingenieur-build (revue: architecte-technique) | ADR 0001, 0002 | prototype |
-| L2 Squelette de l'application | principal, preloads, vue plateforme, protocoles, CSP, test de fumée Electron sous `xvfb-run`, essai de superposition et de focus sur les runners macOS et Windows de la CI (captures examinées) | architecte-technique (squelette), puis dev-plateforme | L1, ADR 0003 | prototype |
-| L3 SDK v0 et gabarit de jeu | `@duo/protocol`, `@duo/sdk` (pont, cycle de vie, boucle à pas fixe, aléa à graine, entrées, audio minimal, sauvegardes, résultats), `@duo/sdk-dev` (faux hôte), gabarit et script de création d'un jeu | architecte-technique (squelette), puis dev-plateforme | L1, ADR 0005, 0006 | prototype |
-| L4 Hébergement des jeux | vue jeu dédiée, protocole `duo-game://` (requêtes partielles comprises), chargement, écrans superposés de pause et d'erreur, battement de cœur, plantage puis retour au salon, dix lancements sans fuite | dev-plateforme | L2, L3, ADR 0004 | prototype |
-| L5 Réseau de session | découverte UDP, saisie d'adresse IP, serveur WebSocket, poignée de main versionnée, salon minimal, relais des messages de jeu, battements, pause sur déconnexion, banc d'injection de latence | dev-reseau | L2, ADR 0006, 0007, 0008 | prototype (reconnexion complète en alpha) |
-| L6 Jeu témoin | mini-jeu à deux en Three.js (vue de dessus orthographique, formes simples), mode bot, une sauvegarde, un résultat, trois sons; règles en une page par game-designer | dev-gameplay-3d (game-designer, sound-designer) | L3 (développement dans le faux hôte), puis L4 et L5 | prototype |
-| L7 Installateurs de prototype | electron-builder: macOS arm64 ad hoc (dmg et zip, `Info.plist` réseau local), Windows x64 NSIS par utilisateur, fusibles; fabrication sur tag; guide minimal de premier lancement | ingenieur-build | L2, ADR 0011 | prototype |
-| L8 Banc de mesure | scènes de charge 3D (Three.js) et 2D (PixiJS) aux limites des budgets, relevé des temps d'image, détection du rendu logiciel, rapport exportable | tech-artist (dev-plateforme) | L3, L4 | prototype |
-| L9 Données du duo | profil, réglages, écriture sûre, sauvegardes, historique, scores, réplication, conflits | dev-plateforme (dev-reseau pour le transport) | L2, L5, ADR 0009 | alpha |
-| L10 Interface du lanceur | écrans des maquettes UX: accueil, profil, bibliothèque, salon, historique et scores, réglages (volumes, affichage, touches), erreurs, premier lancement et autorisations; version réduite dès le prototype | dev-plateforme (spécifications de ux-ui-designer) | L2, maquettes UX, ADR 0012 | alpha |
-| L11 Distribution des jeux | format de paquet, signature, catalogue, publication en CI, téléchargement, installation, mise à jour, copie LAN, import par fichier, avis de nouvelle version de Duo | ingenieur-build (publication, signature), dev-plateforme (installation), dev-reseau (copie LAN) | L3, L4, L5, ADR 0010 | alpha |
-| L12 Diagnostics et reconnexion | profil réseau et règles du pare-feu sous Windows, autorisation Réseau local sous macOS, reprise après coupure, guide de dépannage | dev-reseau | L5 | alpha |
-| L13 Tests de bout en bout et recette | plans tracés depuis les critères d'acceptation, Playwright à deux contextes, Electron sous `xvfb-run`, endurance, check-list chez le client | qa-testeur | L4 à L12, au fil de l'eau | de l'alpha à la 1.0 |
-| L14 Habillage | identité visuelle et sonore appliquées, guide d'installation complet, installateurs finalisés | dev-plateforme (directeur-artistique, sound-designer, ingenieur-build) | L10, identités validées | bêta |
+| L1 Socle du dépôt | monorepo pnpm, TypeScript strict partagé, ESLint, Prettier, Vitest, Playwright, scripts multiplateformes, `pnpm controler`, CI Linux à chaque push | ingenieur-build (revue: architecte-technique) | ADR 0001, 0002 | prototype |
+| L2 Squelette de l'application | principal, preloads, vue plateforme, protocoles, CSP, ligne de commande des tests, verrou d'instance après le dossier de données, journal (ADR 0015, partie journal), constante `DUO_TEST`, test de fumée Electron sous `xvfb-run`, essai de superposition et de focus sur les runners macOS et Windows (captures examinées) | architecte-technique (squelette), puis dev-plateforme | L1, ADR 0003, 0013 | prototype |
+| L3 SDK v0 et gabarit de jeu | `@duo/protocol` (schémas, règle de compatibilité), `@duo/sdk` (pont, cycle de vie, boucle, aléa, entrées, audio minimal, sauvegardes, résultats, `perf`, `log`), `@duo/sdk-dev`, gabarit et `pnpm nouveau-jeu` | architecte-technique (squelette), puis dev-plateforme | L1, ADR 0005, 0006 | prototype |
+| L4 Hébergement des jeux | vue jeu dédiée, `duo-game://` (requêtes partielles), chargement, écrans superposés, battement de cœur, plantage puis retour au salon, Échap intercepté, veille bloquée, dix lancements sans fuite | dev-plateforme | L2, L3, ADR 0004 | prototype |
+| L5 Réseau de session | présence et découverte, saisie d'adresse IP, liaison, poignée de main à enveloppe figée, salon minimal, relais des messages de jeu, battements, pause sur déconnexion, banc d'injection | dev-reseau | L2, ADR 0006, 0007, 0008 | prototype (reconnexion complète en alpha) |
+| L6 Jeu témoin | mini-jeu à deux, formes simples, robot, une sauvegarde, un résultat, trois sons, `hash` de la simulation | dev-gameplay-3d (game-designer, sound-designer) | L3 (faux hôte), puis L4 et L5 | prototype |
+| L7 Installateurs de prototype | macOS arm64 ad hoc (`Info.plist` réseau local), Windows x64 NSIS par utilisateur, fusibles, fabrication sur tag, guide minimal | ingenieur-build | L2, ADR 0011 | prototype |
+| L8 Banc de mesure | scènes de charge 3D et 2D aux limites des budgets, affichage des performances, détection du rendu logiciel | tech-artist (dev-plateforme) | L3, L4 | prototype |
+| L9 Données du duo | profil, réglages, formation du duo, révisions et têtes, écriture sûre, réplication, conflits, historique et parties interrompues, marqueur de partie en cours, scores, rattachement d'une machine, migrations du format | dev-plateforme (dev-reseau pour le transport) | L2, L5, ADR 0009 | alpha |
+| L10 Interface du lanceur | écrans des maquettes UX en Preact, textes, jetons de l'identité, focus et clavier, faux pont pour les tests P2; version réduite dès le prototype | dev-plateforme (spécifications de ux-ui-designer) | L2, maquettes UX, ADR 0012 | alpha |
+| L11 Distribution des jeux | format `.duogame`, signature, catalogue, publication en CI, téléchargement, installation, mise à jour, copie LAN dans les deux sens, import par fichier, jeu témoin embarqué | ingenieur-build (publication, signature), dev-plateforme (installation), dev-reseau (copie LAN) | L3, L4, L5, ADR 0010 | alpha |
+| L12 Diagnostics réseau et reconnexion | profil réseau et pare-feu sous Windows, Réseau local sous macOS, reprise après coupure, guide de dépannage | dev-reseau | L5 | alpha |
+| L13 Tests de bout en bout et recette | plans tracés depuis les critères, banc réseau virtuel, jeux d'essai, Playwright à deux contextes, endurance, check-list chez le client | qa-testeur | L4 à L12, au fil de l'eau | de l'alpha à la 1.0 |
+| L14 Habillage | identités visuelle et sonore appliquées, guide d'installation complet, installateurs finalisés | dev-plateforme (directeur-artistique, sound-designer, ingenieur-build) | L10, identités validées | bêta |
+| L15 Rapport de diagnostic | assemblage du rapport, nettoyage testé par marqueurs, aperçu, enregistrement et copie (F14) | dev-plateforme (dev-reseau pour l'état du réseau) | L2, L10, L12, ADR 0015 | alpha |
 
 ```mermaid
 flowchart LR
@@ -725,30 +656,39 @@ flowchart LR
   L2 --> L10["L10 Interface du lanceur"]
   L4 --> L11["L11 Distribution des jeux"]
   L5 --> L11
-  L5 --> L12["L12 Diagnostics et reconnexion"]
+  L5 --> L12["L12 Diagnostics réseau"]
+  L10 --> L15["L15 Rapport de diagnostic"]
+  L12 --> L15
   L6 --> L13["L13 Tests et recette"]
   L9 --> L13
   L10 --> L13
   L11 --> L13
   L12 --> L13
+  L15 --> L13
   L10 --> L14["L14 Habillage"]
 ```
 
-Parallélisme: après L1, les lots L2 et L3 avancent en parallèle (worktrees séparés); puis L4, L5 et L7; L6 démarre dans le faux hôte dès que L3 existe. Le prototype rassemble L1 à L8 (L5 sans la reconnexion complète, L10 réduit au strict nécessaire); l'alpha ajoute L9 à L12; la bêta ajoute L14; la 1.0 conclut la recette L13 chez le client.
+Parallélisme: après L1, les lots L2 et L3 avancent en parallèle (worktrees séparés); puis L4, L5 et L7; L6 démarre dans le faux hôte dès que L3 existe. Le prototype rassemble L1 à L8 (L5 sans la reconnexion complète, L10 réduit au strict nécessaire); l'alpha ajoute L9 à L12 et L15; la bêta ajoute L14; la 1.0 conclut la recette L13 chez le client.
 
-## 18. Points restant à vérifier
+## 19. Points restant à vérifier
 
 - Superposition transparente et passage du focus clavier entre les vues, sous macOS et Windows (lot L2).
 - Autorisation Réseau local d'une application signée ad hoc, après une mise à jour; effet de l'UUID partagé de l'exécutable Electron (sur le Mac).
-- Pare-feu Windows: réponse unicast à une diffusion, alerte éventuelle à l'ouverture d'un socket UDP éphémère (sur le PC).
-- État de Smart App Control sur le PC.
-- Bac à sable de Chromium sur les runners Ubuntu de GitHub Actions.
-- Validation d'intégrité de l'archive de l'application (`enableEmbeddedAsarIntegrityValidation`) sur les deux systèmes.
-- Simulation de l'hôte quand sa fenêtre est réduite (App Nap sous macOS, occultation sous Windows).
-- Requêtes partielles du protocole `duo-game://` pour la lecture en flux des musiques.
+- Pare-feu Windows: réponse unicast à une diffusion, alerte éventuelle à l'ouverture d'un socket UDP éphémère (sur le PC; ADR 0008).
+- État de Smart App Control sur le PC (Q4).
+- Bac à sable de Chromium, espaces de noms réseau et nftables sur les runners Ubuntu de GitHub Actions (lot L1, ADR 0013).
+- Validation d'intégrité de l'archive (`enableEmbeddedAsarIntegrityValidation`) sur les deux systèmes (lot L7).
+- Simulation de l'hôte fenêtre réduite (App Nap sous macOS, occultation sous Windows).
+- Requêtes partielles du protocole `duo-game://` pour la lecture en flux des musiques (lot L4).
+- Lecture de 2 000 entrées d'historique sous Windows avec antivirus actif, en moins d'1 s (lot L9).
+- Reprises sur `EPERM` et `EBUSY` face à Microsoft Defender (CI Windows, puis chez le client).
+- Absence de faux positif du battement de cœur pendant un chargement lourd sur le PC (lot L8).
+- Débit et reprise de la copie LAN d'un paquet de 50 Mo en Wi-Fi (chez le client).
+- Contenu de `app.getGPUInfo('basic')` sur l'Intel UHD 620 et sur le M1, pour le rapport de diagnostic.
 
-## 19. Historique
+## 20. Historique
 
 | Date | Version | Changement | Auteur |
 |---|---|---|---|
 | 2026-10-30 | 0.1 | Proposition initiale | architecte-technique |
+| 2026-10-30 | 0.2 | Accord avec le cahier 1.0 et renvoi aux ADR 0001 à 0015: version la plus récente d'un jeu copiée dans un sens ou dans l'autre (F13); duo à identifiant propre et rattachement d'une machine réinstallée; sauvegardes en révisions immuables, chaîne de révisions sans horloge, rattrapage silencieux; parties interrompues inscrites sans effet sur le score, marqueur de partie en cours; rapport de diagnostic (F14, ADR 0015); présence et liaison dès que les machines se voient (exigences pour dev-reseau); Preact retenu; prérequis de testabilité; budgets d'images par seconde alignés sur les critères; lot L15 | architecte-technique |

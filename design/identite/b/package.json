@@ -1,0 +1,24 @@
+{
+  "name": "duo-identite-b",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Identité visuelle de Duo (piste B, Étoile double): jetons, symboles des joueurs, logo, icônes d'application et planches, tous générés par script",
+  "license": "UNLICENSED",
+  "scripts": {
+    "jetons": "node outils/generer-jetons.cjs",
+    "formes": "node outils/generer-formes.cjs",
+    "icones-app": "node outils/generer-icones-app.cjs",
+    "controler": "node outils/controler.cjs",
+    "planches": "node outils/rendre-planches.cjs",
+    "tout": "npm run jetons && npm run formes && npm run icones-app && npm run controler && npm run planches"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource-variable/jost": "5.3.0"
+  },
+  "devDependencies": {
+    "@fontsource/jost": "5.3.0",
+    "fontkit": "2.0.4",
+    "polygon-clipping": "0.15.7"
+  }
+}

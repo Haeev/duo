@@ -1,0 +1,195 @@
+{
+  "meta": {
+    "nom": "Duo, identité visuelle, piste B « Étoile double »",
+    "version": "1.0.0",
+    "source": "design/identite/b/source/jetons.cjs",
+    "regle": "chaque chemin donne le nom de la variable CSS: couleur.surface-haute vaut --couleur-surface-haute"
+  },
+  "jetons": {
+    "couleur": {
+      "fond": "#0E1126",
+      "fond-lueur": "#1A1F48",
+      "surface": "#1A1F3D",
+      "surface-haute": "#252B52",
+      "filet": "#2A3060",
+      "trait": "#3B4380",
+      "contour": "#7178BB",
+      "texte": "#F3F1FA",
+      "texte-2": "#A7ABD6",
+      "texte-inactif": "#6F74A3",
+      "accent": "#FFC857",
+      "accent-survol": "#FFD47A",
+      "accent-presse": "#F0B440",
+      "sur-accent": "#0E1126",
+      "succes": "#6BD69A",
+      "erreur": "#FF6B81",
+      "focus": "#F3F1FA",
+      "voile": "#0E1126B8",
+      "ombre-1": "#090B1B",
+      "ombre-2": "#070915",
+      "ombre-3": "#05060F"
+    },
+    "joueur": {
+      "astre": "#5CE1E6",
+      "croissant": "#8D6CFF",
+      "etoile": "#D4F27A",
+      "soleil": "#FC663F",
+      "planete": "#E787B1",
+      "comete": "#22B07D",
+      "sur": "#0E1126",
+      "halo-opacite": "0.45"
+    },
+    "police": {
+      "titre": "'Jost Variable', 'Jost', system-ui, sans-serif",
+      "texte": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif"
+    },
+    "type": {
+      "affiche": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "56px",
+        "interligne": "60px",
+        "graisse": "300",
+        "approche": "-0.01em"
+      },
+      "titre-1": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "40px",
+        "interligne": "48px",
+        "graisse": "300",
+        "approche": "0"
+      },
+      "titre-2": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "30px",
+        "interligne": "36px",
+        "graisse": "400",
+        "approche": "0"
+      },
+      "titre-3": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "22px",
+        "interligne": "28px",
+        "graisse": "500",
+        "approche": "0.01em"
+      },
+      "surtitre": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "14px",
+        "interligne": "18px",
+        "graisse": "500",
+        "approche": "0.24em"
+      },
+      "corps-grand": {
+        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "taille": "18px",
+        "interligne": "28px",
+        "graisse": "400",
+        "approche": "0"
+      },
+      "corps": {
+        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "taille": "16px",
+        "interligne": "24px",
+        "graisse": "400",
+        "approche": "0"
+      },
+      "libelle": {
+        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "taille": "16px",
+        "interligne": "20px",
+        "graisse": "600",
+        "approche": "0"
+      },
+      "petit": {
+        "police": "'DM Sans Variable', 'DM Sans', system-ui, sans-serif",
+        "taille": "14px",
+        "interligne": "20px",
+        "graisse": "500",
+        "approche": "0.01em"
+      },
+      "chiffre": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "56px",
+        "interligne": "56px",
+        "graisse": "300",
+        "approche": "0.02em"
+      },
+      "decompte": {
+        "police": "'Jost Variable', 'Jost', system-ui, sans-serif",
+        "taille": "160px",
+        "interligne": "160px",
+        "graisse": "300",
+        "approche": "0"
+      }
+    },
+    "espace": {
+      "1": "4px",
+      "2": "8px",
+      "3": "12px",
+      "4": "16px",
+      "5": "20px",
+      "6": "24px",
+      "8": "32px",
+      "10": "40px",
+      "12": "48px",
+      "16": "64px",
+      "20": "80px"
+    },
+    "rayon": {
+      "petit": "8px",
+      "moyen": "14px",
+      "grand": "22px",
+      "capsule": "999px"
+    },
+    "trait": {
+      "filet": "1px",
+      "composant": "1.5px",
+      "focus": "3px",
+      "focus-decalage": "3px"
+    },
+    "elevation": {
+      "1": "0 0 0 1px #2A3060, 0 2px 0 0 #090B1B",
+      "2": "0 0 0 1px #3B4380, 0 4px 0 0 #070915",
+      "3": "0 0 0 1px #3B4380, 0 8px 0 0 #05060F"
+    },
+    "icone": {
+      "taille": "24px",
+      "taille-grande": "32px",
+      "taille-petite": "20px",
+      "trait": "1.75",
+      "trait-petite": "1.8"
+    },
+    "duree": {
+      "rapide": "150ms",
+      "moyenne": "300ms",
+      "lente": "600ms",
+      "orbite": "4000ms",
+      "scintillement": "3600ms"
+    },
+    "courbe": {
+      "standard": "cubic-bezier(0.45, 0, 0.25, 1)",
+      "entree": "cubic-bezier(0.2, 0, 0.2, 1)",
+      "sortie": "cubic-bezier(0.45, 0, 0.85, 0.5)"
+    },
+    "boucles": {
+      "etat": "running"
+    }
+  },
+  "variantes": {
+    "mouvement-reduit": {
+      "selecteur": ":root[data-mouvement=\"reduit\"]",
+      "jetons": {
+        "duree": {
+          "rapide": "0ms",
+          "moyenne": "0ms",
+          "lente": "0ms",
+          "orbite": "0ms",
+          "scintillement": "0ms"
+        },
+        "boucles": {
+          "etat": "paused"
+        }
+      }
+    }
+  }
+}

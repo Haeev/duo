@@ -1,0 +1,503 @@
+{
+  "description": "Sons de la plateforme Duo (identité « Étoile double »). Généré par sources/generer.py, ne pas modifier à la main. Voir docs/plateforme/identite-sonore.md.",
+  "version": 1,
+  "sampleRate": 48000,
+  "buses": [
+    "music",
+    "effects",
+    "ui"
+  ],
+  "sounds": {
+    "focus": {
+      "event": "Déplacement du focus (Tab, flèches, survol)",
+      "bus": "ui",
+      "priority": 4,
+      "files": [
+        "ogg/focus-1.ogg",
+        "ogg/focus-2.ogg",
+        "ogg/focus-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.5,
+      "minIntervalMs": 45,
+      "retrigger": true,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -28.0,
+      "durationMs": [
+        553,
+        580,
+        553
+      ]
+    },
+    "confirm": {
+      "event": "Validation (Entrée, Espace, clic sur un bouton)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/confirm-1.ogg",
+        "ogg/confirm-2.ogg",
+        "ogg/confirm-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.015,
+      "gainVariationDb": 1.0,
+      "minIntervalMs": 80,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "toi",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        1075,
+        980,
+        1011
+      ]
+    },
+    "back": {
+      "event": "Retour (Échap, Retour, fermeture d'un panneau)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/back-1.ogg",
+        "ogg/back-2.ogg",
+        "ogg/back-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.015,
+      "gainVariationDb": 1.0,
+      "minIntervalMs": 80,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "toi",
+      "loudnessMomentaryMaxLufs": -19.0,
+      "durationMs": [
+        1033,
+        1025,
+        1042
+      ]
+    },
+    "error": {
+      "event": "Erreur douce (caractère refusé, champ vide, action impossible)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/error-1.ogg",
+        "ogg/error-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.01,
+      "gainVariationDb": 1.0,
+      "minIntervalMs": 250,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -19.0,
+      "durationMs": [
+        1134,
+        1177
+      ]
+    },
+    "notify": {
+      "event": "Notification (a rejoint, a quitté, nouveau choix, copie de sauvegarde)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/notify-1.ogg",
+        "ogg/notify-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.01,
+      "gainVariationDb": 1.0,
+      "minIntervalMs": 400,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -19.0,
+      "durationMs": [
+        1090,
+        1085
+      ]
+    },
+    "volume-test": {
+      "event": "Essai de volume (curseurs de Réglages > Son)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/volume-test.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 60,
+      "retrigger": true,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        992
+      ]
+    },
+    "peer-here": {
+      "event": "L'autre joueur est là (l'autre ordinateur apparaît)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/peer-here.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 5000,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -16.0,
+      "durationMs": [
+        2695
+      ]
+    },
+    "invite": {
+      "event": "Invitation reçue (bandeau d'invitation)",
+      "bus": "ui",
+      "priority": 1,
+      "files": [
+        "ogg/invite.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 3000,
+      "retrigger": false,
+      "duckMusicDb": -8.0,
+      "stereo": "autre",
+      "loudnessMomentaryMaxLufs": -15.0,
+      "durationMs": [
+        2334
+      ]
+    },
+    "ready-self": {
+      "event": "« C'est parti ! » chez toi (aussi « Veut reprendre », « Veut rejouer »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/ready-self.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 300,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "toi",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        1310
+      ]
+    },
+    "ready-peer": {
+      "event": "« C'est parti ! » chez l'autre, ou l'autre rejoint le salon (aussi ses « Veut reprendre », « Veut rejouer »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/ready-peer.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 300,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "autre",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        1305
+      ]
+    },
+    "not-ready-peer": {
+      "event": "L'autre repasse à « Pas encore » ou quitte le salon",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "ogg/not-ready-peer.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 300,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "autre",
+      "loudnessMomentaryMaxLufs": -19.0,
+      "durationMs": [
+        1215
+      ]
+    },
+    "countdown-tick": {
+      "event": "Décompte 3, 2, 1 (départ et « Reprise dans 3 »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/countdown-tick.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 500,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        982
+      ]
+    },
+    "countdown-go": {
+      "event": "Départ de la partie (fin du décompte)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/countdown-go.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 1000,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -16.0,
+      "durationMs": [
+        2350
+      ]
+    },
+    "countdown-cancel": {
+      "event": "Décompte annulé (« Pas encore » ou Échap, d'un côté ou de l'autre)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/countdown-cancel.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 500,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -19.0,
+      "durationMs": [
+        1085
+      ]
+    },
+    "pause": {
+      "event": "Pause (Échap en partie, chez l'un ou l'autre)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/pause.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 500,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        1238
+      ]
+    },
+    "resume": {
+      "event": "Reprise (fin du décompte « Reprise dans 3 »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/resume.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 500,
+      "retrigger": false,
+      "duckMusicDb": 0.0,
+      "stereo": "centre",
+      "loudnessMomentaryMaxLufs": -18.0,
+      "durationMs": [
+        1330
+      ]
+    },
+    "connection-lost": {
+      "event": "Connexion perdue (superposition E12, cartes du salon)",
+      "bus": "ui",
+      "priority": 1,
+      "files": [
+        "ogg/connection-lost.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 5000,
+      "retrigger": false,
+      "duckMusicDb": -8.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -15.0,
+      "durationMs": [
+        2315
+      ]
+    },
+    "connection-back": {
+      "event": "Connexion retrouvée (« Sacha est de retour »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/connection-back.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 5000,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -16.0,
+      "durationMs": [
+        2673
+      ]
+    },
+    "end-win": {
+      "event": "Fin de partie: « Tu as gagné ! »",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/end-win.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 0,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "toi",
+      "loudnessMomentaryMaxLufs": -15.0,
+      "durationMs": [
+        2992
+      ]
+    },
+    "end-peer-win": {
+      "event": "Fin de partie: « Sacha a gagné »",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/end-peer-win.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 0,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "autre",
+      "loudnessMomentaryMaxLufs": -17.0,
+      "durationMs": [
+        2913
+      ]
+    },
+    "end-draw": {
+      "event": "Fin de partie: « Égalité ! »",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/end-draw.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 0,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -16.0,
+      "durationMs": [
+        2661
+      ]
+    },
+    "end-success": {
+      "event": "Fin de partie: « Vous avez réussi ! » (coopération)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/end-success.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 0,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -15.0,
+      "durationMs": [
+        3638
+      ]
+    },
+    "end-fail": {
+      "event": "Fin de partie: « Pas cette fois » (coopération)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/end-fail.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 0,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -17.0,
+      "durationMs": [
+        3478
+      ]
+    },
+    "new-game": {
+      "event": "Nouveau jeu disponible (notification « Nouveau jeu »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "ogg/new-game.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "minIntervalMs": 3000,
+      "retrigger": false,
+      "duckMusicDb": -6.0,
+      "stereo": "large",
+      "loudnessMomentaryMaxLufs": -16.0,
+      "durationMs": [
+        2281
+      ]
+    }
+  },
+  "music": {
+    "lounge": {
+      "event": "Ambiance des écrans hors partie (accueil, bibliothèque, salon, réglages)",
+      "bus": "music",
+      "file": "ogg/lounge.ogg",
+      "loop": {
+        "startSeconds": 1.0,
+        "endSeconds": 65.0,
+        "startSample": 48000,
+        "endSample": 3120000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 1.0,
+      "decodeWhole": true,
+      "fadeInMs": 3000,
+      "fadeOutMs": 1500,
+      "integratedLufs": -20.0
+    }
+  }
+}
