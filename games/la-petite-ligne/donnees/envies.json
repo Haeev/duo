@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "envies": [
+    { "id": "eat_radishes", "kind": "personal", "text": "Croquer des radis tout frais.", "availableWhen": [{ "type": "day_at_least", "day": 4 }], "fulfilledWhen": [{ "type": "ate", "item": "crunchy_radishes", "count": 1 }] },
+    { "id": "real_bed", "kind": "personal", "text": "Dormir dans un vrai lit.", "availableWhen": [{ "type": "quest_done", "quest": "planks" }], "fulfilledWhen": [{ "type": "went_to_bed", "item": "double_bed" }] },
+    { "id": "meet_jeanne", "kind": "personal", "text": "Faire la connaissance de Jeanne.", "availableWhen": [{ "type": "day_at_least", "day": 3 }, { "type": "not", "condition": { "type": "talked_to", "villager": "jeanne", "since": "game_start", "who": "actor" } }], "fulfilledWhen": [{ "type": "talked_to", "villager": "jeanne", "count": 1, "who": "actor" }] },
+    { "id": "decorate", "kind": "personal", "text": "Rendre la maison un peu plus jolie.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "placed", "count": 1, "who": "actor" }] },
+    { "id": "chop_wood", "kind": "personal", "text": "Fendre du bois.", "availableWhen": [{ "type": "quest_active", "quest": "planks" }], "fulfilledWhen": [{ "type": "chopped", "count": 1, "who": "actor" }] },
+    { "id": "fine_harvest", "kind": "personal", "text": "Récolter quelque chose de beau.", "availableWhen": [{ "type": "day_at_least", "day": 4 }], "fulfilledWhen": [{ "type": "harvested", "quality": "fine", "count": 1, "who": "actor" }] },
+    { "id": "cook_soup", "kind": "personal", "text": "Cuisiner une soupe.", "availableWhen": [{ "type": "recipe_known", "recipe": "cook_vegetable_soup" }], "fulfilledWhen": [{ "type": "crafted", "recipe": "cook_vegetable_soup", "count": 1, "who": "actor" }] },
+    { "id": "help_odette", "kind": "personal", "text": "Rendre service à Mme Ferrand.", "availableWhen": [{ "type": "any", "conditions": [{ "type": "quest_active", "quest": "hens" }, { "type": "quest_active", "quest": "welcome_supper" }] }], "fulfilledWhen": [{ "type": "any", "conditions": [{ "type": "given", "villager": "odette", "count": 1, "who": "actor" }, { "type": "quest_step_done", "quest": "hens", "step": "repair_coop" }] }] },
+    { "id": "watch_river", "kind": "personal", "text": "Regarder passer la rivière.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "riverbank", "seconds": 10, "who": "actor" }] },
+    { "id": "see_train", "kind": "personal", "text": "Voir arriver le train.", "availableWhen": [{ "type": "day_is", "days": [8] }], "fulfilledWhen": [{ "type": "witnessed", "event": "train_arrival", "who": "actor" }] },
+    { "id": "watch_river_together", "kind": "shared", "text": "Regarder la rivière ensemble.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "riverbank", "seconds": 10, "who": "both" }] },
+    { "id": "tidy_together", "kind": "shared", "text": "Ranger la maison à deux.", "availableWhen": [], "fulfilledWhen": [{ "type": "placed", "count": 1, "who": "both" }] },
+    { "id": "supper_same_table", "kind": "shared", "text": "Souper à la même table.", "availableWhen": [], "fulfilledWhen": [{ "type": "ate_together", "atFurniture": "table" }] }
+  ],
+  "sharedSchedule": [
+    { "day": 2, "envie": "watch_river_together" },
+    { "day": 5, "envie": "tidy_together" },
+    { "day": 7, "envie": "supper_same_table" }
+  ]
+}

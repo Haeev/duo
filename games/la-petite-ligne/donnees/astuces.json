@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "hints": [
+    { "id": "hint_move", "text": "{move} pour marcher, ou un clic sur le sol.", "trigger": { "on": "spawned" }, "tier": "P0" },
+    { "id": "hint_act", "text": "{act} ou un clic pour agir sur ce qui est devant toi.", "trigger": { "on": "near_interactable" }, "tier": "P0" },
+    { "id": "hint_toolbar", "text": "La molette change d'outil.", "trigger": { "on": "tool_used" }, "tier": "P0" },
+    { "id": "hint_beam", "text": "Une poutre se porte à deux: approchez-vous et maintenez {act} ensemble.", "trigger": { "on": "near_point", "point": "beam_pickup" }, "tier": "P0" },
+    { "id": "hint_ghost", "text": "Maintiens {act} sur un élément transparent pour le construire. À deux, ça va deux fois plus vite.", "trigger": { "on": "near_construction" }, "tier": "P0" },
+    { "id": "hint_seeds_shop", "text": "Les graines s'achètent au comptoir d'Odette, sur la place.", "trigger": { "on": "quest_started", "quest": "first_sprouts" }, "tier": "P0" },
+    { "id": "hint_till", "text": "Un clic sur l'herbe pour bêcher.", "trigger": { "on": "aim_cell", "cellState": "grass", "tool": "hoe" }, "tier": "P0" },
+    { "id": "hint_sow", "text": "Sème sur la terre bêchée.", "trigger": { "on": "aim_cell", "cellState": "tilled", "holding": "seed" }, "tier": "P0" },
+    { "id": "hint_water", "text": "Arrose chaque jour: une culture ne pousse que si elle a bu la veille.", "trigger": { "on": "sowed" }, "tier": "P0" },
+    { "id": "hint_refill", "text": "Le puits de la place ou le tonneau de la maison remplissent l'arrosoir.", "trigger": { "on": "tool_empty", "item": "watering_can" }, "tier": "P0" },
+    { "id": "hint_harvest", "text": "Elle est prête: un clic pour récolter.", "trigger": { "on": "crop_ripe_in_view" }, "tier": "P0" },
+    { "id": "hint_evening", "text": "Rentrez tous les deux à la maison: la veillée arrête l'horloge.", "trigger": { "on": "time_reached", "time": "19:00" }, "tier": "P0" },
+    { "id": "hint_veillee", "text": "Cuisinez au réchaud, mangez ensemble, puis allez au lit.", "trigger": { "on": "veillee_started" }, "tier": "P0" },
+    { "id": "hint_workbench", "text": "À l'établi, un rondin donne quatre planches, et un plan devient un meuble.", "trigger": { "on": "near_point", "point": "sawmill_workbench" }, "tier": "P0" },
+    { "id": "hint_furniture", "text": "La molette tourne le meuble, {act} le pose, {examine} le reprend.", "trigger": { "on": "holding_furniture" }, "tier": "P0" },
+    { "id": "hint_crate", "text": "Dépose ici les produits de la commande. Ils partent samedi à 16 h.", "trigger": { "on": "near_point", "point": "coop_crate" }, "tier": "P0" },
+    { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} sous, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
+    { "id": "hint_notebook", "text": "{notebook} ouvre le carnet: quêtes, courrier, sac.", "trigger": { "on": "letter_received" }, "tier": "P0" }
+  ]
+}

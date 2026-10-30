@@ -134,7 +134,7 @@ def palette_material(name, base_path, mr_path=None, emit_path=None, emit_strengt
         e.interpolation = "Closest"
         nt.links.new(e.outputs["Color"], bsdf.inputs["Emission Color"])
         bsdf.inputs["Emission Strength"].default_value = emit_strength
-    bsdf.inputs["Specular IOR Level"].default_value = 0.3
+    mat.use_backface_culling = True
     return mat
 
 

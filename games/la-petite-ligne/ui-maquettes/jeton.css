@@ -1,0 +1,151 @@
+/*
+ * La Petite Ligne: jetons de l'interface en jeu (démo), version 0.1.
+ *
+ * Style du jeu: papier, bois, encre et tampons de la poste et du chemin de fer.
+ * Les couleurs reprennent la palette du décor de l'artiste 3D
+ * (games/la-petite-ligne/assets-src/modeles/palette.py: paper, paper_dark,
+ * wood, wood_dark, loco_green, loco_red, brass, firmin.top, paint_yellow).
+ * Contrastes calculés (WCAG 2.1) en commentaire de chaque couleur de texte.
+ *
+ * Polices sous licence OFL, à importer par le code avant ce fichier:
+ *   import '@fontsource-variable/fraunces/soft.css';
+ *   import '@fontsource-variable/nunito-sans/wght.css';
+ *
+ * Le code fournit trois réglages venus du SDK (module ui):
+ *   --lpl-ui-scale sur :root (1, 1.25 ou 1.5), taille de l'interface;
+ *   data-motion="reduced" sur <html> quand « Réduire les animations » est actif;
+ *   --lpl-player-self, --lpl-player-other: couleurs des profils Duo des deux joueurs.
+ * Tout le reste est en rem: la taille de l'interface agrandit tout l'habillage.
+ */
+
+:root {
+  /* Taille de l'interface (SDK ui: 1, 1.25 ou 1.5). */
+  --lpl-ui-scale: 1;
+
+  /* Papier: fond des panneaux, des cartouches du HUD et des écrans. */
+  --lpl-color-paper: #f3ebd4;
+  --lpl-color-paper-raised: #fbf6e9;
+  --lpl-color-paper-sunken: #e6dabd;
+  --lpl-color-paper-shade: #d9ccab;
+
+  /* Encre: textes et traits. */
+  --lpl-color-ink: #2a2522; /* 12,7:1 sur papier, 9,5:1 sur papier ombré */
+  --lpl-color-ink-muted: #5b4d40; /* 6,8:1 sur papier, 5,1:1 sur papier ombré */
+  --lpl-color-ink-disabled: #8c7b66; /* 3,4:1 sur papier: désactivé seulement */
+  --lpl-color-line: #8a6a43; /* bordures des commandes: 4,2:1 sur papier */
+  --lpl-color-hairline: #d9ccab; /* filets décoratifs, sans rôle de contraste */
+
+  /* Bois: cadres, barre d'outils, en-têtes. */
+  --lpl-color-wood: #765130;
+  --lpl-color-wood-deep: #5c3d24;
+  --lpl-color-wood-light: #a97749;
+  --lpl-color-wood-new: #d3a66d;
+  --lpl-color-on-wood: #fbf6e9; /* 9,1:1 sur bois profond, 6,5:1 sur bois */
+  --lpl-color-brass: #e8c77a; /* sélection sur bois profond: 6,0:1 */
+
+  /* Rôles. */
+  --lpl-color-primary: #3f6453; /* vert de la locomotive: action principale */
+  --lpl-color-primary-hover: #4b735f;
+  --lpl-color-primary-pressed: #34574a;
+  --lpl-color-on-primary: #fbf6e9; /* 6,2:1 */
+  --lpl-color-stamp: #a4463b; /* rouge des tampons: 5,0:1 sur papier */
+  --lpl-color-success: #3f6453; /* ligne cochée, « D'accord »: même vert, toujours avec une coche */
+  --lpl-color-error: #a4463b; /* « Il manque 40 sous. »: toujours avec une icône */
+  --lpl-color-waiting: #d9b65b; /* fond des puces d'attente, encre dessus: 7,8:1 */
+  --lpl-color-night: #2f3f5c; /* veillée, nuit, courrier: papier dessus 8,9:1 */
+  --lpl-color-on-night: #f3ebd4;
+  --lpl-color-scrim: rgb(42 37 34 / 0.55); /* voile sous une fenêtre du jeu */
+
+  /* Focus: double anneau, clair contre le bois et la nuit, bleu d'encre contre le papier. */
+  --lpl-color-focus: #24408e; /* 8,0:1 sur papier */
+  --lpl-color-focus-halo: #fbf6e9; /* 6,5:1 sur bois, 8,9:1 sur nuit */
+  --lpl-focus-width: 0.1875rem;
+
+  /* Joueurs: valeurs par défaut, remplacées par le code (profil Duo). Jamais en texte. */
+  --lpl-player-self: #5ce1e6;
+  --lpl-player-other: #8d6cff;
+  --lpl-player-on: #0e1126; /* symbole posé sur une couleur de joueur: 5,1:1 au moins */
+
+  /* Polices. */
+  --lpl-font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --lpl-font-text: 'Nunito Sans Variable', 'Nunito Sans', system-ui, sans-serif;
+  --lpl-display-soft: 'SOFT' 100;
+
+  /* Tailles (rem: suivent la taille de l'interface). */
+  --lpl-text-xs: 0.8125rem; /* 13 px à 100 %: compteurs, touches */
+  --lpl-text-sm: 0.875rem;
+  --lpl-text-md: 1rem;
+  --lpl-text-lg: 1.125rem; /* répliques des habitants */
+  --lpl-text-xl: 1.375rem;
+  --lpl-text-2xl: 1.75rem;
+  --lpl-text-3xl: 2.375rem;
+  --lpl-text-4xl: 3.5rem; /* titre du jeu */
+  --lpl-leading-tight: 1.2;
+  --lpl-leading-normal: 1.45;
+  --lpl-weight-regular: 500;
+  --lpl-weight-bold: 750;
+  --lpl-weight-display: 600;
+
+  /* Espacements. */
+  --lpl-space-1: 0.25rem;
+  --lpl-space-2: 0.5rem;
+  --lpl-space-3: 0.75rem;
+  --lpl-space-4: 1rem;
+  --lpl-space-5: 1.5rem;
+  --lpl-space-6: 2rem;
+  --lpl-space-7: 3rem;
+  --lpl-hud-margin: 0.75rem; /* marge du HUD au bord de la fenêtre */
+
+  /* Rayons. */
+  --lpl-radius-s: 0.25rem;
+  --lpl-radius-m: 0.5rem;
+  --lpl-radius-l: 0.875rem;
+  --lpl-radius-round: 50%;
+  --lpl-radius-pill: 62.5rem;
+
+  /* Traits. */
+  --lpl-border: 0.125rem;
+  --lpl-border-thick: 0.1875rem;
+
+  /* Ombres sans flou, comme un papier posé sur une table. */
+  --lpl-shadow-1: 0 0.125rem 0 0 rgb(42 37 34 / 0.3);
+  --lpl-shadow-2: 0.1875rem 0.25rem 0 0 rgb(42 37 34 / 0.32);
+  --lpl-shadow-3: 0.3125rem 0.4375rem 0 0 rgb(42 37 34 / 0.36);
+  --lpl-shadow-inset: inset 0 0.125rem 0 0 rgb(42 37 34 / 0.18);
+
+  /* Tailles des éléments du HUD. */
+  --lpl-slot-size: 3.25rem;
+  --lpl-portrait-size: 4rem;
+  --lpl-token-size: 1.5rem;
+
+  /* Durées. */
+  --lpl-duration-fast: 120ms;
+  --lpl-duration-base: 200ms;
+  --lpl-duration-slow: 320ms;
+  --lpl-duration-toast: 6s; /* notifications et astuces */
+  --lpl-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+  /* Couches. */
+  --lpl-layer-hud: 10;
+  --lpl-layer-toast: 20;
+  --lpl-layer-panel: 30;
+  --lpl-layer-proposal: 40;
+  --lpl-layer-modal: 50;
+
+  font-size: calc(100% * var(--lpl-ui-scale));
+}
+
+/* Réduire les animations: réglage de Duo, ou de l'ordinateur tant que Duo ne le fixe pas. */
+:root[data-motion='reduced'] {
+  --lpl-duration-fast: 0ms;
+  --lpl-duration-base: 0ms;
+  --lpl-duration-slow: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion='full']) {
+    --lpl-duration-fast: 0ms;
+    --lpl-duration-base: 0ms;
+    --lpl-duration-slow: 0ms;
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "version": 1,
+  "quests": [
+    {
+      "id": "first_train",
+      "kind": "main",
+      "tier": "P0",
+      "title": "Le premier train",
+      "giver": "firmin",
+      "start": { "when": [] },
+      "steps": [
+        {
+          "id": "meet_firmin",
+          "objective": "Parler à Firmin sur le quai.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "firmin_arrival" }],
+          "effects": [
+            { "type": "send_letter", "letter": "coop_welcome" },
+            { "type": "set_flag", "flag": "house_keys" },
+            { "type": "start_quest", "quest": "roof" },
+            { "type": "start_quest", "quest": "meet_village" },
+            { "type": "start_quest", "quest": "saturday_order" }
+          ]
+        }
+      ],
+      "completionText": "Les clés de la maisonnette sont à vous."
+    },
+    {
+      "id": "roof",
+      "kind": "main",
+      "tier": "P0",
+      "title": "Un toit sur nos têtes",
+      "giver": "basile",
+      "start": { "byEffect": true },
+      "steps": [
+        {
+          "id": "carry_beam",
+          "objective": "Porter la poutre à deux jusqu'à la maisonnette.",
+          "conditions": [{ "type": "built", "construction": "house_beam" }]
+        },
+        {
+          "id": "build",
+          "objective": "Construire le toit et la porte.",
+          "conditions": [
+            { "type": "built", "construction": "house_roof", "label": "Le toit" },
+            { "type": "built", "construction": "house_door", "label": "La porte" }
+          ],
+          "effects": [
+            { "type": "spawn_object", "item": "iron_box", "point": "house_attic" },
+            { "type": "show_text", "text": "roof_attic_glint" }
+          ]
+        },
+        {
+          "id": "sleep",
+          "objective": "Dormir une première nuit sous votre toit.",
+          "conditions": [{ "type": "nights_passed", "count": 1 }]
+        }
+      ],
+      "completionText": "Un toit ! Et quelque chose brille au grenier."
+    },
+    {
+      "id": "first_sprouts",
+      "kind": "main",
+      "tier": "P0",
+      "title": "Premières pousses",
+      "giver": "odette",
+      "start": { "when": [{ "type": "any", "conditions": [{ "type": "quest_done", "quest": "roof" }, { "type": "day_at_least", "day": 2 }] }] },
+      "steps": [
+        {
+          "id": "sow",
+          "objective": "Bêcher et semer au potager. Les graines s'achètent au comptoir d'Odette.",
+          "conditions": [{ "type": "sowed", "count": 1 }]
+        },
+        {
+          "id": "water",
+          "objective": "Arroser ce qui est semé.",
+          "conditions": [{ "type": "watered", "count": 1 }]
+        },
+        {
+          "id": "harvest",
+          "objective": "Récolter une culture mûre.",
+          "conditions": [{ "type": "harvested", "count": 1 }]
+        }
+      ],
+      "completionEffects": [{ "type": "set_flag", "flag": "grocer_buys" }],
+      "completionText": "Les premiers radis d'Aubrune depuis vingt ans. Odette achète désormais vos récoltes."
+    },
+    {
+      "id": "meet_village",
+      "kind": "main",
+      "tier": "P0",
+      "title": "Les gens du bourg",
+      "giver": "firmin",
+      "start": { "byEffect": true },
+      "steps": [
+        {
+          "id": "meet_all",
+          "objective": "Faire connaissance avec Firmin, Odette, Basile et Jeanne.",
+          "conditions": [
+            { "type": "talked_to", "villager": "firmin", "label": "Firmin", "since": "game_start" },
+            { "type": "talked_to", "villager": "odette", "label": "Odette", "since": "game_start" },
+            { "type": "talked_to", "villager": "basile", "label": "Basile", "since": "game_start" },
+            { "type": "talked_to", "villager": "jeanne", "label": "Jeanne", "since": "game_start" }
+          ]
+        }
+      ],
+      "completionText": "Vous êtes d'ici, maintenant."
+    },
+    {
+      "id": "saturday_order",
+      "kind": "main",
+      "tier": "P0",
+      "title": "La commande du samedi",
+      "giver": "firmin",
+      "start": { "byEffect": true },
+      "steps": [
+        {
+          "id": "fill_crate",
+          "objective": "Déposer dans la caisse du quai avant samedi 16 h: {order}.",
+          "conditions": [{ "type": "order_complete" }],
+          "resolve": "at_deadline",
+          "deadline": { "day": 8, "time": "16:00" },
+          "onDeadline": [
+            { "type": "pay_order" },
+            { "type": "gather_players", "point": "quay_bell" },
+            {
+              "type": "if",
+              "condition": { "type": "order_complete" },
+              "then": [{ "type": "play_dialogue", "dialogue": "firmin_end_full" }],
+              "else": [{ "type": "play_dialogue", "dialogue": "firmin_end_partial" }]
+            },
+            { "type": "play_dialogue", "dialogue": "firmin_end_vergers" },
+            {
+              "type": "if",
+              "condition": { "type": "quest_done", "quest": "emile_riddle" },
+              "then": [
+                { "type": "play_dialogue", "dialogue": "firmin_end_key" },
+                { "type": "set_world_state", "key": "handcar_shed", "value": "open" }
+              ],
+              "else": []
+            },
+            { "type": "send_letter", "letter": "coop_recap" },
+            { "type": "send_letter", "letter": "coop_vergers" },
+            { "type": "end_demo" }
+          ]
+        }
+      ],
+      "completionText": "Le train est parti avec votre commande."
+    },
+    {
+      "id": "hens",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les poules de Mme Ferrand",
+      "giver": "odette",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "odette_hens_ask" }] },
+      "steps": [
+        {
+          "id": "repair_coop",
+          "objective": "Réparer le poulailler: 8 planches, 2 clous.",
+          "conditions": [{ "type": "built", "construction": "chicken_coop" }]
+        },
+        {
+          "id": "tell_odette",
+          "objective": "Prévenir Odette que le poulailler est prêt.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "odette_hens_done" }]
+        }
+      ],
+      "completionEffects": [
+        { "type": "spawn_animals", "animal": "hen", "count": 3, "names": ["Bichette", "Cocotte", "la Duchesse"], "point": "chicken_coop" },
+        { "type": "set_flag", "flag": "eggs_enabled" }
+      ],
+      "completionText": "Trois poules, et des œufs chaque matin."
+    },
+    {
+      "id": "planks",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les planches de Basile",
+      "giver": "basile",
+      "start": {
+        "when": [{ "type": "dialogue_done", "dialogue": "basile_planks_ask" }],
+        "effects": [{ "type": "give_item", "item": "axe", "count": 1, "to": "each" }]
+      },
+      "steps": [
+        {
+          "id": "chop",
+          "objective": "Couper un arbre à la lisière du bois.",
+          "conditions": [{ "type": "chopped", "count": 1 }]
+        },
+        {
+          "id": "saw",
+          "objective": "Scier des planches à l'établi de Basile.",
+          "conditions": [{ "type": "crafted", "recipe": "saw_plank", "count": 1 }]
+        },
+        {
+          "id": "tell_basile",
+          "objective": "Montrer les planches à Basile.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "basile_planks_done" }]
+        }
+      ],
+      "completionEffects": [
+        { "type": "unlock_recipe", "recipe": "craft_table" },
+        { "type": "unlock_recipe", "recipe": "craft_chair" },
+        { "type": "unlock_recipe", "recipe": "craft_shelf" },
+        { "type": "unlock_recipe", "recipe": "craft_double_bed" }
+      ],
+      "completionText": "Les plans des meubles sont dans ton carnet."
+    },
+    {
+      "id": "welcome_supper",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le souper de bienvenue",
+      "giver": "odette",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "odette_supper_ask" }] },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Apporter 3 radis et 2 laitues à Odette.",
+          "conditions": [
+            { "type": "given", "villager": "odette", "item": "radish", "count": 3, "label": "3 radis" },
+            { "type": "given", "villager": "odette", "item": "lettuce", "count": 2, "label": "2 laitues" }
+          ]
+        },
+        {
+          "id": "supper",
+          "objective": "Venir à deux sous la tonnelle d'Odette, à partir de mercredi, entre 19 h et 21 h.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "odette_supper_scene" }]
+        }
+      ],
+      "completionEffects": [
+        { "type": "set_need", "need": "belly", "value": 100, "who": "both" },
+        { "type": "unlock_recipe", "recipe": "cook_vegetable_soup" }
+      ],
+      "completionText": "La recette de la soupe de légumes."
+    },
+    {
+      "id": "emile_riddle",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La première énigme d'Émile",
+      "giver": "firmin",
+      "start": {
+        "when": [{ "type": "item_owned", "item": "iron_box" }],
+        "effects": [{ "type": "give_item", "item": "riddle_card", "count": 1, "to": "each" }]
+      },
+      "steps": [
+        {
+          "id": "dig",
+          "objective": "Quand l'ombre de la cloche touche le banc...",
+          "conditions": [
+            { "type": "used_tool_at", "tool": "hoe", "point": "bell_shadow_spot", "radius": 1.5 },
+            { "type": "time_is", "from": "17:00", "to": "17:30" },
+            { "type": "weather_is", "weather": "sunny" }
+          ],
+          "failText": "riddle_not_yet",
+          "effects": [
+            { "type": "give_item", "item": "shed_key", "count": 1, "to": "actor" },
+            { "type": "give_item", "item": "old_photo", "count": 1, "to": "actor" },
+            { "type": "show_text", "text": "riddle_found" }
+          ]
+        }
+      ],
+      "completionText": "La clé de la remise."
+    },
+    {
+      "id": "jeanne_bet",
+      "kind": "side",
+      "tier": "P1",
+      "title": "Le pari de Jeanne",
+      "giver": "jeanne",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "jeanne_bet_ask" }] },
+      "steps": [
+        {
+          "id": "catch",
+          "objective": "Pêcher une truite au gué.",
+          "conditions": [{ "type": "caught", "item": "trout", "count": 1 }]
+        },
+        {
+          "id": "show_jeanne",
+          "objective": "Montrer la truite à Jeanne.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "jeanne_bet_done" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_item", "item": "jay_feather", "count": 1, "to": "cellar" }],
+      "completionText": "La plume de geai de Jeanne."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "letters": [
+    {
+      "id": "coop_welcome",
+      "from": "coop",
+      "title": "Bienvenue à la Halte d'Aubrune",
+      "delivery": { "byEffect": true },
+      "text": "Chers nouveaux gardiens de la Halte d'Aubrune, la coopérative de la ligne vous souhaite la bienvenue. Voici {startPurse} sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: {order}. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine !"
+    },
+    {
+      "id": "basile_workbench",
+      "from": "basile",
+      "title": "Un mot de Basile",
+      "delivery": { "day": 3, "time": "06:00" },
+      "text": "L'établi de la scierie est ouvert. La hache est accrochée à côté. B."
+    },
+    {
+      "id": "coop_catalogue_reminder",
+      "from": "coop",
+      "title": "Rappel de la coopérative",
+      "delivery": { "day": 6, "time": "06:00" },
+      "text": "Rappel: le catalogue ferme vendredi à minuit. Les rideaux font fureur à la ville, paraît-il."
+    },
+    {
+      "id": "coop_recap",
+      "from": "coop",
+      "title": "La commande est partie",
+      "delivery": { "byEffect": true },
+      "variants": [
+        { "when": [{ "type": "order_complete" }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! Les radis d'Aubrune ont fait sensation à la ville." },
+        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci, et à samedi prochain !" }
+      ]
+    },
+    {
+      "id": "coop_vergers",
+      "from": "coop",
+      "title": "La suite de la ligne",
+      "delivery": { "byEffect": true },
+      "text": "Si la voie des Vergers est dégagée, le train montera jusque là-haut. Il paraît que les cerisiers attendent quelqu'un."
+    }
+  ],
+  "senders": [
+    { "id": "coop", "label": "La coopérative de la ligne" },
+    { "id": "basile", "label": "Basile" }
+  ]
+}

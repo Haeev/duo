@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "profile": "demo",
+  "clock": {
+    "secondsPerGameMinute": 0.35,
+    "dayStart": "06:00",
+    "dayEnd": "24:00",
+    "veilleeFrom": "19:00",
+    "firstDay": { "day": 1, "start": "10:00" },
+    "lastDay": { "day": 8, "end": "16:00" },
+    "weekdayOfDay1": "saturday",
+    "stopWhenBothInMenu": true
+  },
+  "train": { "days": [1, 8], "arrival": "10:00", "departure": "16:00" },
+  "weatherByDay": ["sunny", "sunny", "sunny", "rain", "sunny", "cloudy", "sunny", "sunny"],
+  "spawn": { "point": "train_stop" },
+  "economy": {
+    "startPurse": 200,
+    "currency": { "singular": "sou", "plural": "sous" },
+    "bigPurchaseThreshold": 100,
+    "grocer": { "buyRate": 0.8, "dailyCap": 300, "buysAfterFlag": "grocer_buys" },
+    "catalogue": { "orderDeadline": { "day": 7, "time": "24:00" }, "delivery": { "day": 8, "time": "10:00" } }
+  },
+  "order": {
+    "lines": [
+      { "item": "radish", "count": 12 },
+      { "item": "lettuce", "count": 3 },
+      { "item": "egg", "count": 6 },
+      { "item": "plank", "count": 10 }
+    ],
+    "linePremium": 1.5,
+    "fullBonus": 0.25,
+    "crateAcceptsAnyItem": true,
+    "extraItemsRate": 1.0
+  },
+  "garden": { "cells": 12, "layout": { "w": 4, "d": 3 }, "zone": "garden", "startState": "grass" },
+  "quality": { "fineIfWateredEveryDay": true },
+  "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": false },
+  "hens": { "eggsPerHenPerDay": 1, "feedRequired": true, "feedFree": true },
+  "endurance": {
+    "base": 80,
+    "perFormPoint": 0.4,
+    "costMultiplier": 0.5,
+    "atZeroDurationMultiplier": 2,
+    "costs": { "till": 2, "sow": 1, "water": 1, "harvest": 0, "chop": 3, "saw_plank": 2, "build_per_second": 1, "craft_furniture": 0, "cook": 0, "pick": 0, "fish_cast": 1, "talk": 0, "carry": 0 }
+  },
+  "snacks": { "bread": 10, "simple": 20, "stew": 35 },
+  "needs": {
+    "belly": { "none": 30, "bread": 50, "simple": 60, "stew": 80, "stewPlusDish": 100 },
+    "sleep": { "fromBed": true, "midnightPenalty": -30 },
+    "heart": { "base": 40, "envie": 15, "sharedEnvie": 25, "ateTogether": 5, "gestureTogether": 10, "max": 100 },
+    "formWeights": { "belly": 0.35, "sleep": 0.35, "heart": 0.30 },
+    "formLevels": [
+      { "level": "low", "below": 40 },
+      { "level": "okay", "below": 60 },
+      { "level": "good", "below": 80 },
+      { "level": "great", "below": 95 },
+      { "level": "radiant", "below": 101 }
+    ]
+  },
+  "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true },
+  "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
+  "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0 },
+  "building": { "twoPlayersSpeedMultiplier": 2 },
+  "hints": { "durationSeconds": 6, "oncePerPlayer": true, "maxVisible": 1 },
+  "absence": { "tier": "P1", "minutes": 3 },
+  "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
+  "fishing": { "tier": "P1", "castRange": 6, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" }
+}

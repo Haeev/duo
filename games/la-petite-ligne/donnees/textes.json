@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "form": [
+    { "level": "low", "name": "Petite forme", "text": "La nuit a été courte et le ventre crie. Un bon souper, ce soir ?" },
+    { "level": "okay", "name": "Ça va", "text": "Ça va. La paillasse pique un peu." },
+    { "level": "good", "name": "En forme", "text": "Bien dormi, bien mangé: en forme." },
+    { "level": "great", "name": "Pleine forme", "text": "Pleine forme ! Le lit neuf y est pour beaucoup." },
+    { "level": "radiant", "name": "Forme rayonnante", "text": "Tout sourit ce matin: forme rayonnante." }
+  ],
+  "messages": {
+    "already_taken": "Déjà pris par {partner}.",
+    "not_enough_money": "Il manque {missing} sous.",
+    "big_purchase_proposal": "{partner} propose d'acheter {item} pour {price} sous. D'accord ?",
+    "big_purchase_accepted": "D'accord ! {item} est à vous.",
+    "big_purchase_declined": "Pas cette fois.",
+    "big_purchase_cancelled": "La proposition est retirée.",
+    "train_arrived": "Le train de samedi est en gare !",
+    "train_leaves_soon": "Le train part dans une heure.",
+    "train_left": "Le train est parti.",
+    "midnight_return": "Il se fait tard, tu rentres par le sentier.",
+    "no_energy": "Plus d'énergie: tout prend deux fois plus de temps. Un en-cas ?",
+    "clock_waits": "L'horloge attend {partner}.",
+    "bag_full": "Ton sac est plein: c'est posé à tes pieds.",
+    "grocer_not_buying": "Odette n'achète pas encore. Fais d'abord pousser quelque chose.",
+    "grocer_daily_cap": "Odette a assez acheté pour aujourd'hui. Reviens demain, ou garde-le pour le train.",
+    "catalogue_ordered": "Commandé ! Ça arrive au train de samedi.",
+    "catalogue_closed": "Le catalogue est fermé: le train arrive bientôt.",
+    "crate_deposited": "Dans la caisse: {count} {item}.",
+    "recipe_unlocked": "Nouvelle recette: {recipe}.",
+    "plan_unlocked": "Nouveau plan: {recipe}.",
+    "nothing_here": "Rien ici.",
+    "needs_both": "Ça se fait à deux. Appelle {partner} !",
+    "partner_waits_scene": "{partner} t'attend pour la suite.",
+    "scene_waits": "Cette scène se joue à deux: elle vous attend ici.",
+    "envie_done": "Envie réalisée: {envie}",
+    "quest_started": "Nouvelle quête: {quest}",
+    "quest_step_done": "{quest}: étape terminée.",
+    "quest_done": "Quête terminée: {quest}",
+    "letter_received": "Du courrier: {title}",
+    "built": "{construction}: c'est construit !",
+    "hens_arrived": "Les poules sont arrivées au poulailler.",
+    "eggs_found": "{count} œufs ce matin.",
+    "fine_quality": "Une belle récolte !",
+    "roof_attic_glint": "Le toit tient. Au grenier, quelque chose brille.",
+    "riddle_card_text": "Quand l'ombre de la cloche touche le banc, ce que je cherchais dort à ses pieds. É. L.",
+    "riddle_found": "Sous la terre, une clé rouillée et une vieille photo de la halte.",
+    "riddle_not_yet": "Rien ici... pour l'instant."
+  },
+  "orderFormat": {
+    "line": "{count} {item}",
+    "separator": ", ",
+    "lastSeparator": ", "
+  },
+  "ui": {
+    "notebookTabs": { "quests": "Quêtes", "mail": "Courrier", "bag": "Sac" },
+    "questKinds": { "main": "La semaine", "side": "Coups de main" },
+    "questDone": "Terminée",
+    "hud": { "purse": "{amount} sous", "day": "{weekday}, jour {day}", "time": "{hours} h {minutes}", "nextGoal": "Prochain objectif" },
+    "shop": { "title": "Le comptoir d'Odette", "buy": "Acheter", "sell": "Vendre", "price": "{price} sous", "close": "Fermer" },
+    "catalogue": { "title": "Catalogue de la coopérative", "subtitle": "Commandé avant vendredi minuit, livré samedi par le train.", "order": "Commander" },
+    "crate": { "title": "Caisse de la coopérative", "subtitle": "Départ samedi à 16 h.", "deposit": "Déposer", "takeBack": "Reprendre" },
+    "workbench": { "title": "L'établi de Basile", "craft": "Fabriquer", "missing": "Il manque: {missing}" },
+    "stove": { "title": "Le réchaud", "cook": "Cuisiner", "eat": "Manger", "eatTogether": "Manger ensemble" },
+    "give": "Donner {count} {item}",
+    "proposal": { "accept": "D'accord", "decline": "Pas maintenant", "withdraw": "Retirer" },
+    "breakfast": { "title": "Bonjour !", "envie": "Ton envie du jour", "sharedEnvie": "Votre envie à deux", "weather": "Le temps aujourd'hui", "start": "Commencer la journée" },
+    "creation": {
+      "title": "Ton personnage",
+      "name": "Prénom",
+      "hair": "Coiffure",
+      "outfit": "Couleur de la tenue",
+      "ready": "C'est prêt",
+      "waiting": "{partner} prépare son personnage..."
+    }
+  },
+  "weekdays": ["samedi", "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi"],
+  "weather": { "sunny": "Soleil", "cloudy": "Nuages", "rain": "Pluie" },
+  "nightScreen": {
+    "title": "Bonne nuit",
+    "text": "La nuit tombe sur la Halte d'Aubrune.",
+    "continue": "Continuer",
+    "finish": "Finir la séance",
+    "partnerContinue": "{partner} veut continuer.",
+    "partnerFinish": "{partner} veut finir la séance."
+  },
+  "endScreen": {
+    "title": "Fin de la démo",
+    "subtitle": "Une semaine à la Halte d'Aubrune.",
+    "text": "La suite de la ligne arrive bientôt.",
+    "stats": {
+      "days": "Journées vécues: {days}",
+      "order": "Commande: {linesDone} lignes sur {linesTotal}",
+      "furniture": "Meubles posés: {furniture}"
+    }
+  }
+}
