@@ -34,14 +34,14 @@ PACINGS: list[Pacing] = [
     # B: matinée 5 min, après-midi 5 min, service 6 min en moyenne, veillée 1,5 min.
     Pacing("B Le Puits aux Étoiles", 5.0 + 5.0 + 6.0 + 1.5, 20),
     # C: nuit de 12 min en moyenne (9 en été, 15 en hiver), aube 1,5 min, terrier 3 min.
-    Pacing("C Les Discrets", 12.0 + 1.5 + 3.0, 24),
+    Pacing("C Les Nuits de Brumecombe", 12.0 + 1.5 + 3.0, 24),
 ]
 
 
 def report_pacing() -> None:
     print("1. Rythme: ce que représentent 100 heures")
     header = (
-        f"{'Piste':<24}{'min/jour':>9}{'h/saison':>10}{'h/année':>9}"
+        f"{'Piste':<27}{'min/jour':>9}{'h/saison':>10}{'h/année':>9}"
         f"{'années':>8}{'jours':>7}{'séances 30 min':>16}{'séances 40 min':>16}{'jours/séance 40':>17}"
     )
     print(header)
@@ -51,7 +51,7 @@ def report_pacing() -> None:
         years = TARGET_HOURS / year_h
         days = TARGET_HOURS * 60.0 / p.minutes_per_day
         print(
-            f"{p.name:<24}{p.minutes_per_day:>9.1f}{season_h:>10.1f}{year_h:>9.1f}"
+            f"{p.name:<27}{p.minutes_per_day:>9.1f}{season_h:>10.1f}{year_h:>9.1f}"
             f"{years:>8.1f}{days:>7.0f}{TARGET_HOURS / 0.5:>16.0f}{TARGET_HOURS / (40 / 60):>16.0f}"
             f"{40 / p.minutes_per_day:>17.1f}"
         )

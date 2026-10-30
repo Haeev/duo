@@ -27,7 +27,7 @@ L'idée du client: une vie de village paisible, une ferme, une maison qu'on cons
 | Originalité | bonne (le train comme colonne vertébrale) | bonne (le genre « auberge » existe déjà) | très forte |
 | Coût de production | gros | moyen | moyen à gros, risque technique le plus haut |
 
-Recommandation: **la piste A**, argumentée en section 5. Les questions pour le client sont en section 6.
+Recommandation: **la piste A**, argumentée en section 6. Les questions pour le client sont en section 7, les simulations en section 5.
 
 ## 1. Socle commun aux trois pistes
 
@@ -54,7 +54,7 @@ Chaque piste précise en plus ce qui la distingue (sections A6, B6, C6). Les nom
 
 - **Deux joueurs, deux écrans**: chacun a son personnage (apparence, prénom, deux traits de caractère), lié à son profil Duo. Chaque écran suit son propre personnage: les deux peuvent être à deux endroits différents du monde.
 - **Pas de punition**: rien ne se perd définitivement par erreur ou par absence. Une culture oubliée attend, un habitant déçu se rattrape, une soirée ratée rapporte moins mais ne retire rien.
-- **Le temps n'avance que quand vous jouez à deux**: le monde est figé entre les séances (voir la question 2 de la section 6).
+- **Le temps n'avance que quand vous jouez à deux**: le monde est figé entre les séances (voir la question Q2 de la section 7).
 - **Rythme des séances**: une journée de jeu dure environ 17 minutes réelles, veillée comprise. Une séance de 40 minutes fait donc deux à trois journées, et une séance de 10 minutes reste possible car on peut quitter à tout moment sans rien perdre.
 - **Sauvegarde du duo**: un monde par duo (trois emplacements, pour avoir plusieurs mondes). Sauvegarde automatique au début de chaque journée (A et B) ou à chaque aube (C), à la fin de chaque chapitre, et en quittant, avec l'état exact du moment. Chaque personnage est rattaché au profil de son joueur, pas au rôle d'hôte ou d'invité: que la partie soit hébergée par le Mac ou par le PC, chacun retrouve son personnage. Les épisodes s'ajoutent à un monde existant sans recommencer la partie (format de sauvegarde versionné, à confirmer par l'architecte).
 - **Déconnexion**: la plateforme met la partie en pause; à la reprise, chacun retrouve son personnage là où il était.
@@ -87,7 +87,7 @@ Chaque piste précise en plus ce qui la distingue (sections A6, B6, C6). Les nom
   3. **Les gestes à deux**: porter une poutre, lever une charpente, pomper la draisine, danser au bal. Ils demandent les deux personnages côte à côte, sans aucune adresse (maintenir une touche ensemble).
   4. **Les gros achats**: ils demandent l'accord des deux.
 - **Si les niveaux diffèrent**: les métiers n'ont pas la même exigence. Pêche, cueillette et élevage sont contemplatifs; maraîchage (sols, rotations, semences) et charpente (plans) récompensent l'optimisation. Chacun règle ses propres aides (endurance, arrosage assisté, plans tout faits) sans que l'autre le voie. Rien ne compare les joueurs: tout va au pot commun, et le samedi célèbre le duo.
-- **Le temps**: une horloge partagée. La journée va de 6 h à minuit et dure 14 minutes réelles. Elle s'arrête quand les deux joueurs sont dans un menu ou une conversation, ou quand l'un demande la pause. Quand l'un parle à un habitant et que l'autre bêche, l'horloge tourne pour les deux, comme dans la vraie vie. Les scènes d'histoire ne s'imposent jamais à un joueur occupé: elles attendent au point de rendez-vous que les deux y soient. **La veillée**: dès 19 h, quand les deux sont chez eux, l'horloge s'arrête. On cuisine le souper, on décore, on dessine les plans, on fabrique, on lit le courrier, sans compter. La journée se termine quand les deux se couchent. À minuit, qui est encore dehors rentre tout seul (« Il se fait tard, tu rentres par le sentier ») et dort moins bien.
+- **Le temps**: une horloge partagée. La journée va de 6 h à minuit et dure 14 minutes réelles. Elle s'arrête quand les deux joueurs sont dans un menu ou une conversation, ou quand l'un demande la pause. Quand l'un parle à un habitant et que l'autre bêche, l'horloge tourne pour les deux, comme dans la vraie vie. Les scènes d'histoire ne s'imposent jamais à un joueur occupé: elles attendent au point de rendez-vous que les deux y soient. **La veillée**: dès 19 h, quand les deux sont chez eux, l'horloge s'arrête. On cuisine le souper, on décore, on dessine les plans, on fabrique, on lit le courrier, sans compter. La journée se termine quand les deux se couchent; celui qui s'est couché le premier peut se relever à tout moment. À minuit, qui est encore dehors rentre tout seul (« Il se fait tard, tu rentres par le sentier ») et dort moins bien.
 
 ### A3. Boucles
 
@@ -117,7 +117,7 @@ Chaque piste précise en plus ce qui la distingue (sections A6, B6, C6). Les nom
 **Métiers**
 - Contenu: Maraîchage, Élevage, Bois et charpente, Cuisine et conserverie, Pêche et cueillette, Artisanat (poterie, tissage), puis Cheminot à partir du chapitre 2 (voie, signaux, wagons).
 - Profondeur: cinq rangs par métier; aux rangs 3 et 5, une spécialité à choisir entre deux (le maraîcher devient semencier ou serriste).
-- Renouvellement: changer de métier principal à chaque saison; quatorze spécialités à combiner entre les deux joueurs.
+- Renouvellement: changer de métier principal à chaque saison; deux spécialités par métier, que les deux joueurs peuvent se répartir pour se compléter.
 
 **Habitants**
 - Contenu: trente habitants écrits à la main (cinq par gare), chacun avec son emploi du temps, ses goûts et une histoire en cinq étapes; des visiteurs du samedi tirés au hasard (randonneuse, colporteur, cousin de passage).
@@ -141,9 +141,9 @@ Chaque piste précise en plus ce qui la distingue (sections A6, B6, C6). Les nom
 |---|---|---|
 | Version 1: gares 1 et 2, une année de jeu | 22 | installation, maison, six métiers aux rangs 1 à 3, dix habitants, quatre fêtes |
 | Gares 3 à 6, une par épisode | 60 | chaque gare: un terroir, cinq habitants, un chantier collectif, une fête, des rangs de métier |
-| Après l'histoire | 18 | wagons, conservatoire complet, grand concours de la vallée, maison idéale |
+| Long terme, réparti sur les épisodes et après la fin | 18 | wagons, conservatoire complet, grand concours de la vallée, maison idéale |
 
-Simulation (annexe): 100 heures font environ 4,2 années de jeu et 150 séances de 40 minutes. Parade contre la répétition:
+Simulation (section 5): 100 heures font environ 4,2 années de jeu et 150 séances de 40 minutes. Parade contre la répétition:
 
 - chaque année, les saisons reviennent avec une nouvelle gare: jamais deux fois le même printemps;
 - les gestes répétitifs s'automatisent avec la progression (arroseurs, apprentis, chèvre de levage): on passe du geste au plan;
@@ -181,7 +181,7 @@ Simulation (annexe): 100 heures font environ 4,2 années de jeu et 150 séances 
   - performances de la 3D sur le PC: une gare chargée à la fois, instanciation, pas d'effets lourds.
 - **Prototype** (formes simples, une à deux heures de jeu): la halte et la maisonnette, trois planches, trois cultures, des poules, une habitante, l'horloge partagée et la veillée, le chantier d'une pièce, un geste à deux (porter une poutre), une commande du samedi simplifiée. Question à trancher: la journée à deux est-elle agréable et bien rythmée ?
 - **Version 1** (22 heures, une année de jeu): gares 1 et 2, six métiers aux rangs 1 à 3, Cheminot, dix habitants, trente cultures, six types de pièces, quatre fêtes, commande du samedi complète, vingt-quatre oiseaux au carnet.
-- **Épisodes** (15 heures chacun): 2. Lac-Clair (barque, pêche au lac, lavoir); 3. La Tourbière (herboristerie, brumes, wagon-serre); 4. Les Hauts (estives, fromagerie, transhumance à deux, rangs 4 et 5); 5. Le Terminus oublié (fin de l'histoire, wagons, concours de la vallée, après-histoire). Total: environ 100 heures.
+- **Épisodes** (15 heures chacun): 2. Lac-Clair (barque, pêche au lac, lavoir); 3. La Tourbière (herboristerie, brumes, wagon-serre); 4. Les Hauts (estives, fromagerie, transhumance à deux, rangs 4 et 5); 5. Le Terminus oublié (fin de l'histoire, wagons, concours de la vallée). Total: 22 heures de version 1, 60 heures d'épisodes et 18 heures de long terme réparties sur les épisodes (section A5), soit environ 100 heures.
 
 ## 3. Piste B: Le Puits aux Étoiles
 
@@ -257,12 +257,12 @@ Simulation (annexe): 100 heures font environ 4,2 années de jeu et 150 séances 
 
 | Bloc | Heures | Contenu |
 |---|---|---|
-| Version 1: chapitres 1 et 2, une année | 20 | la halte rouverte, trois peuples, trente recettes, premiers employés |
-| Épisodes 2 à 4 (Vents, Observatoire, Source) | 45 | excursions, ciel, nouvelles ailes, deux peuples par épisode, fin de l'histoire |
-| Épisode 5: Les Grandes Caravanes | 15 | réputation légendaire, banquets, hameau complet |
+| Version 1: chapitres 1 et 2, une année | 20 | la halte rouverte, quatre peuples (le quatrième arrive par la route des Salines), trente recettes, premiers employés |
+| Épisodes 2 à 4 (Vents, Observatoire, Source) | 45 | excursions, ciel, nouvelles ailes, un peuple de plus par épisode, fin de l'histoire |
+| Épisode 5: Les Grandes Caravanes | 15 | le huitième peuple, réputation légendaire, banquets, hameau complet |
 | Activités transversales | 20 | livre d'or, constellations, histoires des habitués, aménagement |
 
-Simulation (annexe): 100 heures font environ 4,3 années de jeu et 150 séances de 40 minutes. Parade contre la répétition:
+Simulation (section 5): 100 heures font environ 4,3 années de jeu et 150 séances de 40 minutes. Parade contre la répétition:
 
 - le service change de nature avec la croissance: de trois à douze voyageurs, de deux postes à cinq, de l'exécution à l'organisation;
 - les voyageurs sont composés au hasard, les habitués écrits, les événements de saison (caravane royale, tempête) bousculent la routine;
@@ -295,8 +295,8 @@ Simulation (annexe): 100 heures font environ 4,3 années de jeu et 150 séances 
   - un rôle paraît moins riche que l'autre: chacun a ses découvertes (coutumes et contes pour l'Accueil, recettes et épices pour les Fourneaux) et l'on échange chaque soir;
   - représentation des peuples: tous inventés, relus par la direction artistique.
 - **Prototype** (une à deux heures): la cour, deux chambres, la cuisine, quatre planches irriguées, un service par jour, trois voyageurs de deux peuples, six recettes, rôles Accueil et Fourneaux avec information séparée. Question à trancher: le service à deux est-il drôle, bavard et sans stress ?
-- **Version 1** (20 heures, une année): chapitres 1 et 2, trois peuples, trente recettes, six types de pièces, hammam, huit habitués, quatre habitants, premiers employés.
-- **Épisodes** (15 heures chacun): 2. La Saison des vents (excursions, sauvetage); 3. L'Observatoire (ciel, constellations); 4. La Source (fin de l'histoire); 5. Les Grandes Caravanes (après-histoire). Total: environ 100 heures.
+- **Version 1** (20 heures, une année): chapitres 1 et 2, quatre peuples, trente recettes, six types de pièces, hammam, huit habitués, quatre habitants, premiers employés.
+- **Épisodes** (15 heures chacun): 2. La Saison des vents (excursions, sauvetage); 3. L'Observatoire (ciel, constellations); 4. La Source (fin de l'histoire); 5. Les Grandes Caravanes (après-histoire). Total: 20 heures de version 1, 60 heures d'épisodes et 20 heures d'activités transversales réparties sur les épisodes (section B5), soit environ 100 heures.
 
 ## 4. Piste C: Les Nuits de Brumecombe
 
@@ -349,8 +349,8 @@ Simulation (annexe): 100 heures font environ 4,3 années de jeu et 150 séances 
 - Renouvellement: les besoins changent avec la saison et la vie de chacun.
 
 **Métiers**
-- Contenu: les arts des dons: Jardinier de nuit, Rebouteux (remèdes), Bricoleur (ouvrages), Tisseur de rêves, Messager (amitié avec le chat, la chouette, le chien). Et les métiers des villageois (boulanger, meunière, forgeron, bergère, maîtresse d'école), dont la carrière progresse grâce à vous: un apprenti devient maître.
-- Renouvellement: quatre dons à combiner entre deux joueurs, carrières qui évoluent.
+- Contenu: cinq arts que chacun apprend en pratiquant, quel que soit son don: Jardinier de nuit, Rebouteux (remèdes), Bricoleur (ouvrages), Tisseur de rêves, Messager (amitié avec le chat, la chouette, le chien). Et les métiers des villageois (boulanger, meunière, forgeron, bergère, maîtresse d'école), dont la carrière progresse grâce à vous: un apprenti devient maître.
+- Renouvellement: quatre dons et cinq arts à répartir entre les deux joueurs, carrières des villageois qui évoluent.
 
 **Habitants**
 - Contenu: vingt villageois en huit foyers au départ, écrits à la main (caractère, histoire, emploi du temps), puis des nouveaux venus; les bêtes, qui ne parlent pas et se comprennent par gestes.
@@ -378,7 +378,7 @@ Simulation (annexe): 100 heures font environ 4,3 années de jeu et 150 séances 
 | Épisode 5: Le Pacte | 15 | fin de l'histoire, nouvelle génération du village |
 | Activités transversales | 20 | trouvailles, grimoire, aménagement du terrier, vies des villageois |
 
-Simulation (annexe): 100 heures font environ 3,8 années de jeu: les enfants du début sont apprentis à la fin. Parade contre la répétition:
+Simulation (section 5): 100 heures font environ 3,8 années de jeu: les enfants du début sont apprentis à la fin. Parade contre la répétition:
 
 - la lune et les saisons changent chaque nuit les conditions de la tournée;
 - le village ne reste jamais le même: prospérité, nouvelles familles, carrières, mariages;
@@ -414,30 +414,9 @@ Simulation (annexe): 100 heures font environ 3,8 années de jeu: les enfants du 
   - tristesse du temps qui passe: pas de mort à l'écran, des départs racontés avec douceur.
 - **Prototype** (une à deux heures): une rue, trois maisons, deux foyers, le terrier, une nuit suivie de son matin, la discrétion (sommeil, bruit, lumière, un chien), trois tours à deux, deux dons (Oreille fine, Œil de chat), six sortes de vœux. Question à trancher: la tournée de nuit est-elle drôle, bavarde et sans frustration ?
 - **Version 1** (20 heures, une année): le village de base (huit foyers, vingt habitants), chapitres 1 et 2, lune et saisons, quatre dons, cinq sortes de rêves, terrier en six salles.
-- **Épisodes** (15 heures chacun): 2. L'Hiver long; 3. Le Grand Bal; 4. La Forêt profonde; 5. Le Pacte. Total: environ 100 heures.
+- **Épisodes** (15 heures chacun): 2. L'Hiver long; 3. Le Grand Bal; 4. La Forêt profonde; 5. Le Pacte. Total: 20 heures de version 1, 60 heures d'épisodes et 20 heures d'activités transversales réparties sur les épisodes (section C5), soit environ 100 heures.
 
-## 5. Recommandation
-
-**Je recommande la piste A, La Petite Ligne.**
-
-1. **Elle tient toutes les promesses de l'idée**: sa ferme, sa maison bâtie de ses mains, ses propres besoins, ses métiers, un village et une histoire. Les pistes B et C déplacent une partie de ces promesses (les besoins vers les hôtes, la vie à soi vers les autres), ce qui est séduisant mais s'éloigne de ce que le client a décrit.
-2. **Sa coopération convient à 100 heures et à deux niveaux différents**: chacun garde sa liberté et son rythme, et le jeu crée des rendez-vous qui donnent envie d'être ensemble (commande du samedi, gestes à deux, veillée) au lieu d'imposer une coordination de tous les instants, épuisante sur la durée.
-3. **Sa structure est faite pour une sortie par épisodes**: chaque épisode ajoute une gare, donc un terroir, des habitants et un chapitre. La plateforme accepte l'ajout de contenu sans réinstaller, et la sauvegarde suit le duo d'épisode en épisode.
-4. **Son coût est le plus élevé, mais il se découpe**: la version 1 à deux gares est raisonnable, et chaque épisode se finance seul.
-
-Deux idées des autres pistes se greffent sans dénaturer A: les visiteurs composés au hasard de B, qui descendent du train du samedi, et les tours à deux de C, déjà présents sous forme de gestes à deux. Si le client préfère être surpris plutôt que servi, la piste C est la plus forte, au prix du plus grand risque. Si le coût de production devient la priorité, la piste B est la plus économique.
-
-## 6. Questions pour le client
-
-| # | Question | Options | Recommandation |
-|---|---|---|---|
-| Q1 | Quelle piste ? | A, B, C, ou une piste avec un seul élément greffé d'une autre | A, pour les raisons de la section 5 |
-| Q2 | Le monde avance-t-il quand vous ne jouez pas ? | seulement quand vous jouez à deux; selon l'heure et le calendrier réels | seulement quand vous jouez à deux: aucune pression entre les séances, rien de perdu pendant une semaine sans jouer, et c'est une vraie différence avec le jeu de référence |
-| Q3 | Vos deux personnages vivent-ils ensemble ? | une maison commune; deux maisons voisines | une maison commune avec un coin à soi pour chacun (atelier, recoin à décorer), et pas de romance avec les habitants: le couple, c'est vous |
-| Q4 | Quelle part de défi ? | aucune; légère; réelle (dangers, combats) | légère: exploration, petites énigmes, aléas annoncés la veille, jamais de combat ni de perte définitive |
-| Q5 | Quel style visuel vous attire ? | 3D aux formes simples; 2D illustrée ou pixel art | 3D aux formes simples pour A et B, la plus adaptée à nos moyens de production et au PC; la décision finale revient au directeur artistique et à l'architecte, votre goût les guidera |
-
-## Annexe: simulations
+## 5. Simulations: rythme et collections
 
 Script: `docs/jeux/jeu-1/simulations/rythme_et_collections.py` (bibliothèque standard de Python, graine fixe, 16 secondes). Commande: `python3 docs/jeux/jeu-1/simulations/rythme_et_collections.py`.
 
@@ -473,3 +452,24 @@ Conclusions pour le cahier des charges:
 - toute collection tirée au hasard aura un coup de pouce vers les entrées manquantes, réglable dans les tables d'équilibrage;
 - son achèvement visé se place juste après le dernier contenu débloqué, pas au-delà de 100 heures;
 - dans la piste C, le coup de pouce rend les trouvailles trop rapides au début (90 % en 30 heures): il faudra plus d'objets rares ou un rythme de découverte plus lent, à régler dans le cahier des charges si C est choisie.
+
+## 6. Recommandation
+
+**Je recommande la piste A, La Petite Ligne.**
+
+1. **Elle tient toutes les promesses de l'idée**: sa ferme, sa maison bâtie de ses mains, ses propres besoins, ses métiers, un village et une histoire. Les pistes B et C déplacent une partie de ces promesses (les besoins vers les hôtes, la vie à soi vers les autres), ce qui est séduisant mais s'éloigne de ce que le client a décrit.
+2. **Sa coopération convient à 100 heures et à deux niveaux différents**: chacun garde sa liberté et son rythme, et le jeu crée des rendez-vous qui donnent envie d'être ensemble (commande du samedi, gestes à deux, veillée) au lieu d'imposer une coordination de tous les instants, épuisante sur la durée.
+3. **Sa structure est faite pour une sortie par épisodes**: chaque épisode ajoute une gare, donc un terroir, des habitants et un chapitre. La plateforme prévoit la mise à jour d'un jeu sans réinstaller l'application, et la sauvegarde suit le duo d'épisode en épisode.
+4. **Son coût est le plus élevé, mais il se découpe**: la version 1 à deux gares est raisonnable, et chaque épisode se finance seul.
+
+Deux idées des autres pistes se greffent sans dénaturer A: les visiteurs composés au hasard de B, qui descendent du train du samedi, et les tours à deux de C, déjà présents sous forme de gestes à deux. Si le client préfère être surpris plutôt que servi, la piste C est la plus forte, au prix du plus grand risque. Si le coût de production devient la priorité, la piste B est la plus économique.
+
+## 7. Questions pour le client
+
+| # | Question | Options | Recommandation |
+|---|---|---|---|
+| Q1 | Quelle piste ? | A, B, C, ou une piste avec un seul élément greffé d'une autre | A, pour les raisons de la section 6 |
+| Q2 | Le monde avance-t-il quand vous ne jouez pas ? | seulement quand vous jouez à deux; selon l'heure et le calendrier réels | seulement quand vous jouez à deux: aucune pression entre les séances, rien de perdu pendant une semaine sans jouer, et c'est une vraie différence avec le jeu de référence « île paisible » |
+| Q3 | Vos deux personnages vivent-ils ensemble ? | une maison commune; deux maisons voisines | une maison commune avec un coin à soi pour chacun (atelier, recoin à décorer), et pas de romance avec les habitants: le couple, c'est vous |
+| Q4 | Quelle part de défi ? | aucune; légère; réelle (dangers, combats) | légère: exploration, petites énigmes, aléas annoncés la veille, jamais de combat ni de perte définitive |
+| Q5 | Quel style visuel vous attire ? | 3D aux formes simples; 2D illustrée ou pixel art | 3D aux formes simples pour A et B, la plus adaptée à nos moyens de production et au PC; la décision finale revient au directeur artistique et à l'architecte, votre goût les guidera |
