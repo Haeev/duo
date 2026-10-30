@@ -1,154 +1,158 @@
 'use strict';
 // Source unique des jetons de l'identité visuelle de Duo (piste B, Étoile double).
 // `npm run jetons` en tire jetons.css et jetons.json (mêmes noms, mêmes valeurs), puis les compare.
-// Règle de nommage: le chemin dans cet objet donne le nom de la variable CSS
-// (couleur.surface-haute devient --couleur-surface-haute). Valeurs écrites telles qu'en CSS,
-// sans var(): un jeu qui lit le JSON n'a aucune référence à résoudre.
+// Nommage: le chemin dans cet objet donne le nom de la variable CSS (color.surface-raised devient
+// --color-surface-raised). Identifiants en anglais (règle du studio), rôles expliqués en français
+// dans docs/plateforme/identite-visuelle.md. Valeurs écrites telles qu'en CSS, sans var():
+// un jeu qui lit le JSON n'a aucune référence à résoudre.
+// Tailles en rem (ADR 0012: la taille de l'interface agit sur la police de la racine);
+// 1rem vaut 16 px à 100 %. Seul le filet reste en px: il reste fin à toutes les tailles.
 // Contrastes, écarts entre joueurs et simulations du daltonisme: `npm run controler`.
 
-const TITRE = "'Jost Variable', 'Jost', system-ui, sans-serif";
-const TEXTE = "'DM Sans Variable', 'DM Sans', system-ui, sans-serif";
+const DISPLAY = "'Jost Variable', 'Jost', system-ui, sans-serif";
+const TEXT = "'DM Sans Variable', 'DM Sans', system-ui, sans-serif";
 
-const jetons = {
-  couleur: {
+const tokens = {
+  color: {
     // fonds et surfaces, du plus profond au plus haut
-    fond: '#0E1126',
-    'fond-lueur': '#1A1F48',
+    bg: '#0E1126',
+    'bg-glow': '#1A1F48',
     surface: '#1A1F3D',
-    'surface-haute': '#252B52',
-    // lignes: le filet et le trait décorent, le contour délimite un composant (3:1 au moins)
-    filet: '#2A3060',
-    trait: '#3B4380',
-    contour: '#7178BB',
+    'surface-raised': '#252B52',
+    // lignes: le filet et le trait décorent; le contour délimite un composant (3:1 au moins)
+    hairline: '#2A3060',
+    line: '#3B4380',
+    outline: '#7178BB',
     // textes
-    texte: '#F3F1FA',
-    'texte-2': '#A7ABD6',
-    'texte-inactif': '#6F74A3',
+    text: '#F3F1FA',
+    'text-muted': '#A7ABD6',
+    'text-disabled': '#6F74A3',
     // action principale
     accent: '#FFC857',
-    'accent-survol': '#FFD47A',
-    'accent-presse': '#F0B440',
-    'sur-accent': '#0E1126',
+    'accent-hover': '#FFD47A',
+    'accent-pressed': '#F0B440',
+    'on-accent': '#0E1126',
     // états, toujours accompagnés d'une icône et d'un texte
-    succes: '#6BD69A',
-    erreur: '#FF6B81',
+    success: '#6BD69A',
+    error: '#FF6B81',
     // focus clavier
     focus: '#F3F1FA',
     // superpositions sur un jeu: voile sur le jeu figé, panneau opaque par-dessus
-    voile: '#0E1126B8',
-    'ombre-1': '#090B1B',
-    'ombre-2': '#070915',
-    'ombre-3': '#05060F',
+    scrim: '#0E1126B8',
+    'shadow-1': '#090B1B',
+    'shadow-2': '#070915',
+    'shadow-3': '#05060F',
   },
-  // six couleurs de joueur, chacune liée à un symbole (identifiant = nom du symbole)
-  joueur: {
-    astre: '#5CE1E6',
-    croissant: '#8D6CFF',
-    etoile: '#D4F27A',
-    soleil: '#FC663F',
-    planete: '#E787B1',
-    comete: '#22B07D',
+  // six couleurs de joueur, chacune liée à un symbole (identifiant = symbole)
+  player: {
+    orb: '#5CE1E6',
+    crescent: '#8D6CFF',
+    star: '#D4F27A',
+    sun: '#FC663F',
+    planet: '#E787B1',
+    comet: '#22B07D',
     // texte ou symbole posé sur une couleur de joueur
-    sur: '#0E1126',
-    'halo-opacite': '0.45',
+    on: '#0E1126',
+    'halo-opacity': '0.45',
   },
-  police: {
-    titre: TITRE,
-    texte: TEXTE,
+  font: {
+    display: DISPLAY,
+    text: TEXT,
   },
-  // échelle typographique, en pixels CSS à la taille d'interface 100 %
+  // échelle typographique (équivalent à 100 %: taille / interligne)
   type: {
-    affiche: { police: TITRE, taille: '56px', interligne: '60px', graisse: '300', approche: '-0.01em' },
-    'titre-1': { police: TITRE, taille: '40px', interligne: '48px', graisse: '300', approche: '0' },
-    'titre-2': { police: TITRE, taille: '30px', interligne: '36px', graisse: '400', approche: '0' },
-    'titre-3': { police: TITRE, taille: '22px', interligne: '28px', graisse: '500', approche: '0.01em' },
-    surtitre: { police: TITRE, taille: '14px', interligne: '18px', graisse: '500', approche: '0.24em' },
-    'corps-grand': { police: TEXTE, taille: '18px', interligne: '28px', graisse: '400', approche: '0' },
-    corps: { police: TEXTE, taille: '16px', interligne: '24px', graisse: '400', approche: '0' },
-    libelle: { police: TEXTE, taille: '16px', interligne: '20px', graisse: '600', approche: '0' },
-    petit: { police: TEXTE, taille: '14px', interligne: '20px', graisse: '500', approche: '0.01em' },
-    chiffre: { police: TITRE, taille: '56px', interligne: '56px', graisse: '300', approche: '0.02em' },
-    decompte: { police: TITRE, taille: '160px', interligne: '160px', graisse: '300', approche: '0' },
+    display: { family: DISPLAY, size: '3.5rem', 'line-height': '3.75rem', weight: '300', tracking: '-0.01em' }, // 56/60
+    'title-1': { family: DISPLAY, size: '2.5rem', 'line-height': '3rem', weight: '300', tracking: '0' }, // 40/48
+    'title-2': { family: DISPLAY, size: '1.875rem', 'line-height': '2.25rem', weight: '400', tracking: '0' }, // 30/36
+    'title-3': { family: DISPLAY, size: '1.375rem', 'line-height': '1.75rem', weight: '500', tracking: '0.01em' }, // 22/28
+    overline: { family: DISPLAY, size: '0.875rem', 'line-height': '1.125rem', weight: '500', tracking: '0.24em' }, // 14/18
+    'body-large': { family: TEXT, size: '1.125rem', 'line-height': '1.75rem', weight: '400', tracking: '0' }, // 18/28
+    body: { family: TEXT, size: '1rem', 'line-height': '1.5rem', weight: '400', tracking: '0' }, // 16/24
+    label: { family: TEXT, size: '1rem', 'line-height': '1.25rem', weight: '600', tracking: '0' }, // 16/20
+    small: { family: TEXT, size: '0.875rem', 'line-height': '1.25rem', weight: '500', tracking: '0.01em' }, // 14/20
+    figure: { family: DISPLAY, size: '3.5rem', 'line-height': '3.5rem', weight: '300', tracking: '0.02em' }, // 56/56
+    countdown: { family: DISPLAY, size: '10rem', 'line-height': '10rem', weight: '300', tracking: '0' }, // 160/160
   },
-  // espacements: le numéro vaut des multiples de 4 px
-  espace: {
-    1: '4px',
-    2: '8px',
-    3: '12px',
-    4: '16px',
-    5: '20px',
-    6: '24px',
-    8: '32px',
-    10: '40px',
-    12: '48px',
-    16: '64px',
-    20: '80px',
+  // espacements: le numéro compte des pas de 4 px
+  space: {
+    1: '0.25rem',
+    2: '0.5rem',
+    3: '0.75rem',
+    4: '1rem',
+    5: '1.25rem',
+    6: '1.5rem',
+    8: '2rem',
+    10: '2.5rem',
+    12: '3rem',
+    16: '4rem',
+    20: '5rem',
   },
-  rayon: {
-    petit: '8px',
-    moyen: '14px',
-    grand: '22px',
-    capsule: '999px',
+  radius: {
+    small: '0.5rem', // 8
+    medium: '0.875rem', // 14
+    large: '1.375rem', // 22
+    pill: '999px',
   },
-  trait: {
-    filet: '1px',
-    composant: '1.5px',
-    focus: '3px',
-    'focus-decalage': '3px',
+  stroke: {
+    hairline: '1px',
+    // 2 px et non 1,5: Chromium arrondit les bordures au pixel inférieur (1,5 px deviendrait 1 px à 100 %)
+    component: '0.125rem',
+    focus: '0.1875rem', // 3
+    'focus-offset': '0.1875rem', // 3
   },
-  // élévations sans flou: une surface plus claire, un liseré, une ombre pleine décalée
+  // élévations sans flou: surface plus claire, liseré, ombre pleine décalée
   elevation: {
-    1: '0 0 0 1px #2A3060, 0 2px 0 0 #090B1B',
-    2: '0 0 0 1px #3B4380, 0 4px 0 0 #070915',
-    3: '0 0 0 1px #3B4380, 0 8px 0 0 #05060F',
+    1: '0 0 0 1px #2A3060, 0 0.125rem 0 0 #090B1B',
+    2: '0 0 0 1px #3B4380, 0 0.25rem 0 0 #070915',
+    3: '0 0 0 1px #3B4380, 0 0.5rem 0 0 #05060F',
   },
-  icone: {
-    taille: '24px',
-    'taille-grande': '32px',
-    'taille-petite': '20px',
-    // épaisseur en unités de la grille de 24: 1,75 à 24 et 32 px, 1,8 à 20 px (1,5 px affiché)
-    trait: '1.75',
-    'trait-petite': '1.8',
+  icon: {
+    size: '1.5rem', // 24
+    'size-large': '2rem', // 32
+    'size-small': '1.25rem', // 20
+    // épaisseur en unités de la grille de 24: 1,75 à 24 et 32 px; 1,8 à 20 px (1,5 px affichés)
+    stroke: '1.75',
+    'stroke-small': '1.8',
   },
-  duree: {
-    rapide: '150ms',
-    moyenne: '300ms',
-    lente: '600ms',
-    orbite: '4000ms',
-    scintillement: '3600ms',
+  duration: {
+    fast: '150ms',
+    medium: '300ms',
+    slow: '600ms',
+    orbit: '4000ms',
+    twinkle: '3600ms',
   },
-  courbe: {
+  easing: {
     standard: 'cubic-bezier(0.45, 0, 0.25, 1)',
-    entree: 'cubic-bezier(0.2, 0, 0.2, 1)',
-    sortie: 'cubic-bezier(0.45, 0, 0.85, 0.5)',
+    enter: 'cubic-bezier(0.2, 0, 0.2, 1)',
+    exit: 'cubic-bezier(0.45, 0, 0.85, 0.5)',
   },
   // boucles décoratives (orbite d'attente, scintillement): figées quand on réduit les animations
-  boucles: {
-    etat: 'running',
+  loops: {
+    state: 'running',
   },
 };
 
-// Variante appliquée par l'application quand la case « Réduire les animations » est cochée
+// Variante posée par l'application quand la case « Réduire les animations » est cochée
 // (au premier démarrage, la case suit le réglage du système, lu par prefers-reduced-motion).
-const variantes = {
-  'mouvement-reduit': {
-    selecteur: ':root[data-mouvement="reduit"]',
-    jetons: {
-      duree: { rapide: '0ms', moyenne: '0ms', lente: '0ms', orbite: '0ms', scintillement: '0ms' },
-      boucles: { etat: 'paused' },
+const variants = {
+  'reduced-motion': {
+    selector: ':root[data-motion="reduced"]',
+    tokens: {
+      duration: { fast: '0ms', medium: '0ms', slow: '0ms', orbit: '0ms', twinkle: '0ms' },
+      loops: { state: 'paused' },
     },
   },
 };
 
-// Profils de joueur: ordre du choix de couleur (E02, Réglages > Profil) et noms affichés.
-// « tu passes en <symbole> », « Comète jade » pour les lecteurs d'écran.
-const joueurs = [
-  { id: 'astre', symbole: 'astre', nomSymbole: 'astre', nomCouleur: 'aqua', clarte: 'claire' },
-  { id: 'croissant', symbole: 'croissant', nomSymbole: 'croissant', nomCouleur: 'mauve', clarte: 'soutenue' },
-  { id: 'etoile', symbole: 'etoile', nomSymbole: 'étoile', nomCouleur: 'anis', clarte: 'claire' },
-  { id: 'soleil', symbole: 'soleil', nomSymbole: 'soleil', nomCouleur: 'corail', clarte: 'moyenne' },
-  { id: 'planete', symbole: 'planete', nomSymbole: 'planète', nomCouleur: 'rose', clarte: 'moyenne' },
-  { id: 'comete', symbole: 'comete', nomSymbole: 'comète', nomCouleur: 'jade', clarte: 'moyenne' },
+// Profils de joueur, dans l'ordre du choix de couleur (E02, Réglages > Profil).
+// symbolName sert aux phrases (« tu passes en comète »), label aux lecteurs d'écran (« Comète jade »).
+const players = [
+  { id: 'orb', symbolName: 'astre', colorName: 'aqua', lightness: 'claire' },
+  { id: 'crescent', symbolName: 'croissant', colorName: 'mauve', lightness: 'soutenue' },
+  { id: 'star', symbolName: 'étoile', colorName: 'anis', lightness: 'claire' },
+  { id: 'sun', symbolName: 'soleil', colorName: 'corail', lightness: 'moyenne' },
+  { id: 'planet', symbolName: 'planète', colorName: 'rose', lightness: 'moyenne' },
+  { id: 'comet', symbolName: 'comète', colorName: 'jade', lightness: 'moyenne' },
 ];
 
-module.exports = { jetons, variantes, joueurs };
+module.exports = { tokens, variants, players };
