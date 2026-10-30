@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.browser.json",
+  "compilerOptions": {
+    "types": ["node"],
+    // Le serveur se lance par Node sans construction (types effacés): imports relatifs en .ts, syntaxe effaçable seulement.
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": ["src", "tests", "*.ts"]
+}

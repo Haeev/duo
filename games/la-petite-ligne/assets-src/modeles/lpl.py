@@ -278,12 +278,13 @@ class Geo:
         front = [self.bm.verts.new((x, y0, z)) for x, z in pts]
         back = [self.bm.verts.new((x, y0 + depth, z)) for x, z in pts]
         n = len(pts)
-        self.bm.faces.new(list(reversed(front)) if _area(pts) > 0 else front)
-        self.bm.faces.new(back if _area(pts) > 0 else list(reversed(back)))
+        ccw = _area(pts) > 0
+        self.bm.faces.new(front if ccw else list(reversed(front)))
+        self.bm.faces.new(list(reversed(back)) if ccw else back)
         for i in range(n):
             j = (i + 1) % n
             q = [front[i], front[j], back[j], back[i]]
-            self.bm.faces.new(q if _area(pts) > 0 else list(reversed(q)))
+            self.bm.faces.new(list(reversed(q)) if ccw else q)
         verts = front + back
         M = Matrix.Translation(Vector(loc)) @ _rot(rot)
         return self._finish(verts, color, bone, weights, smooth, M)

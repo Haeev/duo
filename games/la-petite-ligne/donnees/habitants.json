@@ -89,7 +89,7 @@
           "point": "quay_bell",
           "once": "duo",
           "priority": 100,
-          "when": [{ "type": "order_complete" }],
+          "when": [],
           "lines": [{ "speaker": "firmin", "text": "Quatre lignes sur quatre ! Je n'ai jamais vu ça. Bon, je n'ai pas vu grand-chose depuis vingt ans." }]
         },
         {
@@ -99,7 +99,7 @@
           "point": "quay_bell",
           "once": "duo",
           "priority": 100,
-          "when": [{ "type": "not", "condition": { "type": "order_complete" } }],
+          "when": [],
           "lines": [{ "speaker": "firmin", "text": "La coopérative est contente, et moi aussi. La semaine prochaine, on fera encore mieux." }]
         },
         {
@@ -119,7 +119,7 @@
           "point": "quay_bell",
           "once": "duo",
           "priority": 80,
-          "when": [{ "type": "quest_done", "quest": "emile_riddle" }],
+          "when": [],
           "lines": [{ "speaker": "firmin", "text": "Vous avez la clé de la remise ? Alors c'est vous qu'Émile attendait." }]
         }
       ]

@@ -60,7 +60,7 @@
   },
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
-  "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0 },
+  "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0, "eatTogether": 3.0, "stayAt": 4.0 },
   "building": { "twoPlayersSpeedMultiplier": 2 },
   "hints": { "durationSeconds": 6, "oncePerPlayer": true, "maxVisible": 1 },
   "absence": { "tier": "P1", "minutes": 3 },

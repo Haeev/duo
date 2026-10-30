@@ -1,0 +1,35 @@
+{
+  "name": "@duo/sdk-dev",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Faux hôte des jeux Duo: deux vues locales reliées par un relais, et serveur de démo sur le réseau local (ADR 0005, point 7).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "servir": "vite build && node src/serveur/servir.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@duo/protocol": "workspace:*",
+    "@duo/sdk": "workspace:*",
+    "valibot": "catalog:",
+    "ws": "catalog:"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@playwright/test": "catalog:",
+    "@types/node": "catalog:",
+    "@types/ws": "8.18.2",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

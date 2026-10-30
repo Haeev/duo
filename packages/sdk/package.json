@@ -1,0 +1,27 @@
+{
+  "name": "@duo/sdk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "SDK des jeux Duo: cycle de vie, boucle à pas fixe, aléa, entrées, réseau, sauvegardes, résultats, audio (ADR 0005).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sim": "./src/sim.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@duo/protocol": "workspace:*",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

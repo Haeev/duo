@@ -25,7 +25,7 @@ Le jour 1 et le jour 8 sont des samedis, jours du train. Chaque journée apporte
 
 | Jour | Ce qui arrive | Ce que font les deux joueurs | Rendez-vous à deux |
 |---|---|---|---|
-| 1, samedi (dès 10 h) | création des personnages, le premier train, Firmin et les clés, la maisonnette en ruine, le courrier de la coopérative et la commande au tableau | porter la poutre, poser les planches du toit et de la porte, découvrir la boîte en fer au grenier, rencontrer Odette (graines et pain) | porter la poutre; première veillée et premier souper (le pain d'Odette) sur les deux paillasses |
+| 1, samedi (dès 10 h) | création des personnages, le premier train, Firmin et les clés, la maisonnette en ruine, le courrier de la coopérative et la commande au tableau | porter la poutre, poser les planches du toit et de la porte, découvrir la boîte en fer au grenier, rencontrer Odette (le pain est offert, les graines s'achètent à son comptoir) | porter la poutre; première veillée et premier souper (le pain d'Odette) sur les deux paillasses |
 | 2, dimanche | premier petit-déjeuner: forme, envie du jour | bêcher, semer, arroser les 12 cases; Odette propose les poules (quête S1), Basile ses planches (S2) | se répartir le potager et le bois |
 | 3, lundi | Jeanne arrive, curieuse de la boîte en fer (S4); un mot de Basile | couper un arbre, scier à l'établi, réparer le poulailler; Odette prévient: « Demain il pleut, mon genou me l'a dit. » | |
 | 4, mardi | la pluie (on n'arrose pas); les premiers radis; les trois poules arrivent le soir | récolter, vendre à l'épicerie, fabriquer la table et les chaises; Odette demande des radis et des laitues (S3) | premier souper à table |

@@ -448,24 +448,22 @@ def limiter_circulaire(x: np.ndarray, plafond_dbtp: float = -1.5, release_ms: fl
     milieu: l'état du limiteur au début de la boucle est celui de sa fin, le raccord reste juste."""
     if crete_vraie_db(x) <= plafond_dbtp:
         return x
-    n = len(x)
-    trois = np.concatenate([x, x, x])
-    lin = 10 ** ((plafond_dbtp - 0.3) / 20.0)
-    crete = np.max(np.abs(stereo(trois)), axis=1)
-    # Gain requis par échantillon, puis minimum glissant (anticipation de 2 ms) et relâchement lissé.
-    requis = np.minimum(1.0, lin / (crete + 1e-12))
-    anticip = n_ech(0.002)
     from scipy.ndimage import minimum_filter1d
-    requis = minimum_filter1d(requis, size=2 * anticip + 1)
-    alpha = np.exp(-1.0 / (release_ms * 1e-3 * SR))
-    g = np.empty_like(requis)
-    courant = 1.0
-    for i in range(len(requis)):
-        r = requis[i]
-        courant = r if r < courant else alpha * courant + (1 - alpha) * r
-        g[i] = courant
-    g = signal.filtfilt(*signal.butter(1, 200.0, fs=SR), g)
-    y = stereo(trois) * g[:, None] if trois.ndim == 2 else trois * g
+
+    n = len(x)
+    y = np.concatenate([x, x, x])
+    for _ in range(4):
+        lin = 10 ** ((plafond_dbtp - 0.2) / 20.0)
+        crete = np.max(np.abs(stereo(y)), axis=1)
+        requis = np.minimum(1.0, lin / (crete + 1e-12))
+        # Maintien du minimum sur une fenêtre centrée (anticipation de la moitié), puis lissage à
+        # phase nulle: le gain descend avant la crête et remonte en douceur.
+        maintien = minimum_filter1d(requis, size=2 * n_ech(release_ms * 1e-3 / 4) + 1)
+        lisse = signal.filtfilt(*signal.butter(2, 12.0, fs=SR), maintien)
+        g = np.minimum(lisse, minimum_filter1d(requis, size=2 * n_ech(0.002) + 1))
+        y = y * g[:, None] if y.ndim == 2 else y * g
+        if crete_vraie_db(y[n:2 * n]) <= plafond_dbtp:
+            break
     return y[n:2 * n]
 
 

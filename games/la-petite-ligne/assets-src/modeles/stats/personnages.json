@@ -1,0 +1,121 @@
+{
+ "meshes": {
+  "player_base": 488,
+  "player_outfit_work": 1184,
+  "player_outfit_smock": 1216,
+  "player_outfit_overalls": 1232,
+  "player_hair_short": 372,
+  "player_hair_bob": 372,
+  "player_hair_bun": 420,
+  "player_scarf_orb": 148,
+  "player_scarf_crescent": 192,
+  "player_scarf_star": 140,
+  "player_scarf_sun": 212,
+  "player_scarf_planet": 160,
+  "player_scarf_comet": 156,
+  "npc_firmin": 2160,
+  "npc_odette": 2156,
+  "npc_basile": 2324,
+  "npc_jeanne": 2588,
+  "npc_lucie": 2292
+ },
+ "animations": [
+  {
+   "name": "idle",
+   "seconds": 3.0,
+   "loop": true
+  },
+  {
+   "name": "walk",
+   "seconds": 0.533,
+   "loop": true
+  },
+  {
+   "name": "carry_two",
+   "seconds": 0.8,
+   "loop": true
+  },
+  {
+   "name": "hoe",
+   "seconds": 1.0,
+   "loop": true
+  },
+  {
+   "name": "sow",
+   "seconds": 1.0,
+   "loop": true
+  },
+  {
+   "name": "water",
+   "seconds": 1.333,
+   "loop": true
+  },
+  {
+   "name": "harvest",
+   "seconds": 1.2,
+   "loop": true
+  },
+  {
+   "name": "chop",
+   "seconds": 1.067,
+   "loop": true
+  },
+  {
+   "name": "saw",
+   "seconds": 0.6,
+   "loop": true
+  },
+  {
+   "name": "hammer",
+   "seconds": 0.667,
+   "loop": true
+  },
+  {
+   "name": "talk",
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "give",
+   "seconds": 1.067,
+   "loop": false
+  },
+  {
+   "name": "sit",
+   "seconds": 2.667,
+   "loop": true
+  },
+  {
+   "name": "eat",
+   "seconds": 1.133,
+   "loop": true
+  },
+  {
+   "name": "sit_eat",
+   "seconds": 1.133,
+   "loop": true
+  },
+  {
+   "name": "sleep",
+   "seconds": 3.333,
+   "loop": true
+  },
+  {
+   "name": "wave",
+   "seconds": 1.067,
+   "loop": true
+  },
+  {
+   "name": "pet",
+   "seconds": 0.8,
+   "loop": true
+  },
+  {
+   "name": "high_five",
+   "seconds": 0.8,
+   "loop": false
+  }
+ ],
+ "file_bytes": 2289244,
+ "player_example_tris": 2192
+}

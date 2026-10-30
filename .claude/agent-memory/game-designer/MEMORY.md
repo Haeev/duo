@@ -63,3 +63,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Une démo d'une heure qui couvre une semaine de jeu demande une horloge accélérée (0,35 s par minute de jeu pour 8 journées en 63 min, script `docs/jeux/jeu-1/simulations/demo_rythme.py`). Avec une horloge rapide, la marche mange la journée: carte compacte (64x48 m) et distances données en secondes.
 - Pour une démo, fixer la commande et la météo (déroulé identique pour tous), et caler chaque quête sur un jour précis pour qu'il y ait une nouveauté par journée.
 - Un objet livré au dernier jour (catalogue au train final) n'a pas d'effet jouable: mettre ce qui change la forme (le lit) en fabrication au milieu de la semaine.
+
+## Données de jeu chargées par le code (La Petite Ligne, 2026-10-30)
+
+- Conventions retenues: identifiants anglais en `snake_case`, clés en `camelCase` (comme `duo-game.json`), `tier` P0 ou P1 pour la priorité de production (ne pas l'appeler `priority`, déjà pris par la priorité numérique des dialogues). Schéma et vocabulaire des conditions et effets: `games/la-petite-ligne/donnees/README.md`; validateur: `games/la-petite-ligne/outils/valider_donnees.py`.
+- Une valeur à un seul endroit: la commande vit dans `reglages.json` et les textes la citent par `{order}`; ne pas redire dans les réglages des conditions de quête.
+- Piège: dans le contenu passé à l'outil d'écriture de fichiers, `"\u2014"` peut arriver comme un vrai tiret cadratin. Dans du code, écrire `chr(0x2014)`, puis relancer le contrôle typographique de CLAUDE.md.
+- Après un effet qui vide un état (paiement de la commande), toute condition évaluée ensuite doit garder la valeur d'avant: le préciser dans le schéma.

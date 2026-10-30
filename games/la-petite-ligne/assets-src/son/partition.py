@@ -324,6 +324,7 @@ class Morceau:
     aigus_ir: float = 0.45
     predelai: float = 0.018
     sonie_cible: float = -18.0
+    presence_db: float = -19.0  # niveau visé de l'octave de 4 kHz, relatif à l'énergie totale
     graine: int = 0
 
     @property
@@ -353,6 +354,24 @@ def _expression(notes: list[Note], tempo: float) -> list[tuple[float, int]]:
     return points
 
 
+def _canaux(m: Morceau) -> dict[str, int]:
+    """Canal 10 (index 9) pour les percussions, canaux imposés respectés, les autres pistes sur
+    les canaux restants (deux pistes qui partagent un canal doivent avoir le même programme)."""
+    imposes = {p.canal for p in m.pistes if p.canal >= 0}
+    libres = [c for c in range(16) if c != 9 and c not in imposes]
+    sortie = {}
+    for p in m.pistes:
+        if p.percussions:
+            sortie[p.nom] = 9
+        elif p.canal >= 0:
+            sortie[p.nom] = p.canal
+        else:
+            if not libres:
+                raise ValueError(f"{m.id}: plus de canal MIDI libre")
+            sortie[p.nom] = libres.pop(0)
+    return sortie
+
+
 def ecrire_midi(m: Morceau, chemin: Path, seulement: str | None = None) -> None:
     """Écrit le fichier MIDI du morceau (ou d'une seule piste, pour le rendu séparé). Un dernier
     événement neutre à la fin de la queue force FluidSynth à rendre la queue."""
@@ -364,9 +383,9 @@ def ecrire_midi(m: Morceau, chemin: Path, seulement: str | None = None) -> None:
     meta.append(mido.MetaMessage("time_signature", numerator=m.signature[0], denominator=m.signature[1], time=0))
     fin_tics = int(round((m.duree_temps + m.queue_s * m.tempo / 60.0) * TPB))
     meta.append(mido.MetaMessage("end_of_track", time=fin_tics))
-    canaux_libres = [c for c in range(16) if c != 9]
-    for i, piste in enumerate(m.pistes):
-        canal = 9 if piste.percussions else (piste.canal if piste.canal >= 0 else canaux_libres[i % 15])
+    canaux = _canaux(m)
+    for piste in m.pistes:
+        canal = canaux[piste.nom]
         if seulement is not None and piste.nom != seulement:
             continue
         evts: list[tuple[int, int, mido.Message]] = []
@@ -447,7 +466,18 @@ def mixer(m: Morceau, stems: dict[str, np.ndarray]) -> tuple[np.ndarray, dict[st
     mix[:n_total] += sec
     mix[:len(humide)] += humide
     mix = dsp.ph(mix, 32.0, 2)
-    mix = dsp.etagere_aigus(mix, 9000.0, -1.5)  # aigus adoucis: confort sur une longue soirée
+    mix = dsp.cloche_eq(mix, 200.0, -2.5, 0.8)  # moins de boue dans le bas-médium
+    # Les échantillons de FluidR3 sont sombres au-dessus de 3 kHz (hautbois à -26 dB dans l'octave
+    # de 4 kHz, mesuré): une étagère calculée ramène cette octave vers m.presence_db, sans dépasser
+    # +9 dB, pour une clarté homogène d'un morceau à l'autre.
+    total = 0.0
+    for _ in range(2):  # l'étagère ne relève qu'en partie l'octave visée: deux passes
+        g = float(np.clip(m.presence_db - octave_relative(mix, 4000.0), 0.0, 10.0 - total))
+        if g < 0.3:
+            break
+        mix = dsp.etagere_aigus(mix, 3000.0, g)
+        total += g
+    gains["_presence_db"] = round(total, 2)
     n_boucle = dsp.n_ech(m.duree_s)
     if m.boucle:
         boucle = mix[:n_boucle].copy()
@@ -490,6 +520,13 @@ def produire(m: Morceau, dossier_midi: Path) -> tuple[np.ndarray, dict]:
         y = dsp.fondu(_couper_silence_final(y), 0.0, 0.5)
     resume = {"gains_db": gains, "duree_s": round(len(y) / dsp.SR, 3)}
     return y, resume
+
+
+def octave_relative(x: np.ndarray, centre: float) -> float:
+    """Énergie de l'octave centrée sur `centre`, en dB relatifs à l'énergie totale."""
+    fr, p = signal.welch(dsp.mono(x), dsp.SR, nperseg=8192)
+    bande = (fr >= centre / np.sqrt(2)) & (fr < centre * np.sqrt(2))
+    return float(10 * np.log10(np.sum(p[bande]) / (np.sum(p) + 1e-20) + 1e-20))
 
 
 def _couper_silence_final(x: np.ndarray, seuil_db: float = -70.0) -> np.ndarray:
