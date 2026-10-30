@@ -78,6 +78,7 @@ La plateforme suit le même processus. Son cahier des charges est le premier, é
 ### Langue et typographie
 
 - Français pour la documentation, l'interface, les textes des jeux, les commits, les comptes rendus et les messages au client. Anglais pour les identifiants du code.
+- L'interface et les jeux tutoient les joueurs (décision du client, 2026-10-30).
 - **Interdits absolus, partout** (documents, interface, textes des jeux, commentaires, commits, messages): le tiret cadratin (U+2014) et le tiret demi-cadratin (U+2013). Les remplacer par deux-points, parenthèses, virgule ou une nouvelle phrase. Le trait d'union (-) reste permis.
 - Contrôle mécanique avant chaque rendu, qui ne doit rien afficher:
   `grep -rnI -e $'\xe2\x80\x94' -e $'\xe2\x80\x93' --exclude-dir=.git --exclude-dir=node_modules .`

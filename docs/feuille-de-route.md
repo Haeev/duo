@@ -32,13 +32,18 @@ Objectif: tout décider et documenter avant de coder la plateforme.
 
 Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta, 1.0.
 
+### Premier jeu (cadrage en cours, en parallèle de la phase 1)
+
+- Idée du client (2026-10-30): une simulation de vie en coopération qui mêle vie de village, ferme, construction de maison, besoins des personnages et métiers, avec progression, histoire principale et quêtes secondaires, pour une centaine d'heures de jeu sans ennui.
+- On garde le genre et l'intention, avec un univers, des règles et un nom originaux (règle de création originale).
+- Étape en cours: pistes de concept par game-designer dans `docs/jeux/jeu-1/pistes-concept.md`.
+
 ## En attente du client
 
 - Valider le cahier des charges de la plateforme et choisir une piste d'identité visuelle.
-- Dire si le dépôt reste public (recommandé) ou passe en privé.
 - Relever la configuration réelle du PC dès que possible (hypothèse retenue en attendant: i3 de 2018).
 - Basculer la branche par défaut du dépôt sur `main` dans les réglages GitHub.
-- L'idée du premier jeu, qui aura besoin de sauvegardes.
+- Choisir un concept pour le premier jeu parmi les pistes du game designer.
 - Facultatif: coller `outils/installer-outils.sh` dans le « Setup script » de l'environnement cloud, pour que les outils soient prêts au démarrage de chaque session.
 - Facultatif: autoriser le connecteur SpriteCook dans les réglages claude.ai (sprites générés par IA, consomme des crédits SpriteCook).
 - Les idées de jeux, le moment venu.

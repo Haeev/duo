@@ -106,8 +106,8 @@ Le jeu témoin est un mini-jeu à deux, très simple, qui éprouve toute la cha�
 | # | Question | Options | Recommandation | Décision du client | Date |
 |---|---|---|---|---|---|
 | Q1 | Piste d'identité visuelle | A, B, C | voir les planches du directeur artistique | | |
-| Q2 | Ton de l'interface | tutoiement, vouvoiement | tutoiement, plus chaleureux pour un usage à deux | | |
-| Q3 | Visibilité du dépôt GitHub | public, privé | public: compilation automatique et téléchargement des jeux plus simples | | |
+| Q2 | Ton de l'interface | tutoiement, vouvoiement | tutoiement, plus chaleureux pour un usage à deux | tutoiement | 2026-10-30 |
+| Q3 | Visibilité du dépôt GitHub | public, privé | public: compilation automatique et téléchargement des jeux plus simples | public | 2026-10-30 |
 | Q4 | Configuration réelle du PC | à relever dans le Gestionnaire des tâches | la vérifier avant le prototype | | |
 
 ## 10. Historique
@@ -115,3 +115,4 @@ Le jeu témoin est un mini-jeu à deux, très simple, qui éprouve toute la cha�
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-10-30 | 0.1 | Première version, à partir des réponses du client | manager |
+| 2026-10-30 | 0.1 | Décisions Q2 (tutoiement) et Q3 (dépôt public) | client |
