@@ -95,7 +95,7 @@ const tokens = {
   },
   stroke: {
     hairline: '1px',
-    // 2 px et non 1,5: Chromium arrondit les bordures au pixel inférieur (1,5 px deviendrait 1 px à 100 %)
+    // 2 px et non 1,5: Chromium arrondit les épaisseurs de bordure à l'entier inférieur (1,5 px s'affiche à 1 px)
     component: '0.125rem',
     focus: '0.1875rem', // 3
     'focus-offset': '0.1875rem', // 3

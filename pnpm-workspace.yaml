@@ -39,4 +39,7 @@ catalog:
   pixi.js: 8.22.0
 
 # Versions exactes à l'ajout d'une dépendance (pnpm add), sans ^ ni ~.
+minimumReleaseAgeExclude:
+  - eslint@10.14.0
+
 saveExact: true

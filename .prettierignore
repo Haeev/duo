@@ -1,0 +1,12 @@
+# Prettier ne formate que le code et la configuration du dépôt.
+# Documents et productions des autres membres: mis en forme à la main.
+docs/
+design/
+.claude/
+**/*.md
+**/assets-src/
+pnpm-lock.yaml
+**/node_modules/
+**/dist/
+**/out/
+**/coverage/

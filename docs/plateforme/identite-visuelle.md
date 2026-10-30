@@ -257,7 +257,7 @@ Repères de mise en page (recommandations pour ux-ui-designer): marges latérale
 | `--stroke-focus` | 3 px | anneau de focus |
 | `--stroke-focus-offset` | 3 px | décalage de l'anneau |
 
-- Pourquoi 2 px et non 1,5: Chromium arrondit les épaisseurs de bordure au pixel physique inférieur. Une bordure de 1,5 px s'afficherait à 1 px sur l'écran du PC (100 %, un pixel physique par pixel CSS). Les traits d'icônes SVG, eux, ne sont pas arrondis.
+- Pourquoi 2 px et non 1,5: Chromium arrondit les épaisseurs de bordure à l'entier inférieur. Une bordure de 1,5 px s'affiche à 1 px (mesuré par `getComputedStyle` à 100, 125, 150 et 200 %); 2 px et 3 px restent intacts. Les traits d'icônes SVG, eux, ne sont pas arrondis.
 - **Anneau de focus** (UX 0.5, CA-PF-112): `outline: var(--stroke-focus) solid var(--color-focus); outline-offset: var(--stroke-focus-offset);`, affiché par `:focus-visible`. Blanc lunaire sur la nuit, la surface ou la surface haute: 12,14:1 au pire. Sur un bouton doré, l'anneau passe autour, sur le fond: il reste blanc. Dans un conteneur qui coupe ce qui déborde (liste qui défile, grille de vignettes), prévoir 6 px de marge intérieure ou un anneau intérieur (`outline-offset: calc(-1 * var(--stroke-focus))`), pour qu'il ne soit jamais caché.
 - Traits d'information (orbite d'attente, jauge, séparation porteuse de sens): 1,5 px au moins, couleur `--color-outline` ou plus claire.
 
