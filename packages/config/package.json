@@ -9,15 +9,15 @@
     "./tsconfig.node.json": "./tsconfig.node.json",
     "./tsconfig.browser.json": "./tsconfig.browser.json",
     "./eslint": {
-      "types": "./eslint.d.ts",
+      "types": "./types/eslint.d.ts",
       "default": "./eslint.js"
     },
     "./vitest": {
-      "types": "./vitest.d.ts",
+      "types": "./types/vitest.d.ts",
       "default": "./vitest.js"
     },
     "./prettier": {
-      "types": "./prettier.d.ts",
+      "types": "./types/prettier.d.ts",
       "default": "./prettier.js"
     }
   },

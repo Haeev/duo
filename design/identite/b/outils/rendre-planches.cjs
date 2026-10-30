@@ -99,7 +99,7 @@ const simulate = (src, vision, dst) => {
     differing = (e.stderr || '').toString();
   }
   const inked = execFileSync('convert', [tText, '-threshold', '50%', '-format', '%[fx:(1-mean)*w*h]', 'info:']).toString();
-  execFileSync('convert', [tText, tPath, '-compose', 'difference', '-composite', '-negate', path.join(OUT, 'logo-fidelite.png')]);
+  execFileSync('convert', [tText, tPath, '-compose', 'difference', '-composite', '-negate', '-strip', path.join(OUT, 'logo-fidelite.png')]);
   fs.rmSync(tText);
   fs.rmSync(tPath);
   const diff = Number(differing.trim().split(/\s/)[0]);

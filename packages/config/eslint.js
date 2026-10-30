@@ -6,7 +6,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-/** Fichiers de test (Vitest et Playwright). La console y est permise par ESLint; `console.log` et `debugger` restent refusés par `pnpm verifier`. */
+/** Fichiers de test (Vitest et Playwright). La console y est permise par ESLint; l'affichage de débogage et les points d'arrêt restent refusés par `pnpm verifier`. */
 export const testFiles = [
   '**/*.test.{ts,tsx,mts,cts,js,mjs,cjs}',
   '**/*.spec.{ts,tsx,mts,cts,js,mjs,cjs}',
@@ -83,6 +83,13 @@ export function createEslintConfig({ tsconfigRootDir, environment = 'node', igno
         'no-console': 'error',
         'no-debugger': 'error',
         eqeqeq: ['error', 'always'],
+      },
+    },
+    {
+      // JavaScript: les types viennent du JSDoc, vérifié par `checkJs`, que cette règle ne lit pas.
+      files: ['**/*.{js,mjs,cjs}'],
+      rules: {
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
       },
     },
     {

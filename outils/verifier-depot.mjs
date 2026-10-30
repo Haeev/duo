@@ -254,7 +254,7 @@ function readWorkspacePackages(root) {
   const packages = [];
   for (const pattern of parseWorkspacePatterns(readFileSync(workspaceFile, 'utf8'))) {
     /** @type {string[]} */
-    let dirs = [];
+    let dirs;
     if (pattern.endsWith('/*')) {
       const parent = pattern.slice(0, -2);
       const parentPath = path.join(root, ...parent.split('/'));
