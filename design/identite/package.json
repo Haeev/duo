@@ -1,0 +1,19 @@
+{
+  "name": "duo-identite-pistes",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Planches des trois pistes d'identité visuelle de Duo: polices embarquées et scripts de rendu",
+  "license": "UNLICENSED",
+  "scripts": {
+    "rendre": "node rendre.cjs",
+    "controler": "node controler.cjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "5.3.0",
+    "@fontsource-variable/bricolage-grotesque": "5.3.0",
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource-variable/fraunces": "5.3.0",
+    "@fontsource-variable/jost": "5.3.0",
+    "@fontsource-variable/nunito": "5.3.0"
+  }
+}
