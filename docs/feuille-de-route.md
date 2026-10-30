@@ -15,7 +15,9 @@ Tenue par le manager. Dernière mise à jour: 2026-10-30.
 
 Objectif: tout décider et documenter avant de coder la plateforme.
 
-- Cahier des charges de la plateforme, écrit avec le client: `docs/plateforme/cahier-des-charges.md` (version 0.1 en cours de complément par l'équipe).
+- Fait: cahier des charges de la plateforme v0.3, soumis au client (`docs/plateforme/cahier-des-charges.md`).
+- Fait: parcours et wireframes (`docs/plateforme/ux/parcours.md`, `design/maquettes/plateforme-wireframes/`), trois pistes d'identité visuelle (`docs/plateforme/identite-visuelle-pistes.md`, `design/identite/`), architecture proposée (`docs/plateforme/architecture.md`), 132 critères d'acceptation (`docs/plateforme/criteres-acceptation.md`).
+- Après validation du cahier: ADR (liste en section 16 de `architecture.md`), identité visuelle détaillée et design system, identité sonore, maquettes haute fidélité.
 - ADR de stack et d'architecture, contrat des jeux (architecte-technique).
 - Modèle réseau, découverte LAN, pare-feu (dev-reseau).
 - Distribution, mises à jour, signature des installateurs (ingenieur-build).
@@ -36,14 +38,14 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 
 - Idée du client (2026-10-30): une simulation de vie en coopération qui mêle vie de village, ferme, construction de maison, besoins des personnages et métiers, avec progression, histoire principale et quêtes secondaires, pour une centaine d'heures de jeu sans ennui.
 - On garde le genre et l'intention, avec un univers, des règles et un nom originaux (règle de création originale).
-- Étape en cours: pistes de concept par game-designer dans `docs/jeux/jeu-1/pistes-concept.md`.
+- Fait: trois pistes de concept dans `docs/jeux/jeu-1/pistes-concept.md` (A La Petite Ligne, recommandée; B Le Puits aux Étoiles; C Les Nuits de Brumecombe).
+- Ensuite: choix du client, puis cahier des charges du jeu. Point à trancher par directeur-artistique et architecte-technique: 3D aux formes simples (préférence du game designer) ou 2D et isométrique en sprites (préférence de l'architecte pour un monde peuplé sur le PC).
 
 ## En attente du client
 
-- Valider le cahier des charges de la plateforme et choisir une piste d'identité visuelle.
-- Relever la configuration réelle du PC dès que possible (hypothèse retenue en attendant: i3 de 2018).
+- Valider le cahier des charges de la plateforme v0.3 et répondre à Q1 (identité visuelle), Q5 (parties interrompues), Q6 (rapport de diagnostic).
+- Relevé des machines (Q4) avant le prototype, dont l'état de Smart App Control sur le PC (hypothèse retenue en attendant: i3 de 2018).
 - Basculer la branche par défaut du dépôt sur `main` dans les réglages GitHub.
-- Choisir un concept pour le premier jeu parmi les pistes du game designer.
+- Premier jeu: choisir une piste de concept et répondre aux quatre autres questions de la section 7 de `docs/jeux/jeu-1/pistes-concept.md`.
 - Facultatif: coller `outils/installer-outils.sh` dans le « Setup script » de l'environnement cloud, pour que les outils soient prêts au démarrage de chaque session.
 - Facultatif: autoriser le connecteur SpriteCook dans les réglages claude.ai (sprites générés par IA, consomme des crédits SpriteCook).
-- Les idées de jeux, le moment venu.
