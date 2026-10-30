@@ -24,8 +24,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
  */
 
 const FORBIDDEN_CHARACTERS = [
-  { character: '—', label: 'tiret cadratin (U+2014)' },
-  { character: '–', label: 'tiret demi-cadratin (U+2013)' },
+  { character: String.fromCharCode(0x2014), label: 'tiret cadratin (U+2014)' },
+  { character: String.fromCharCode(0x2013), label: 'tiret demi-cadratin (U+2013)' },
 ];
 
 /** Dossiers jamais parcourus (équivalents des exclusions du grep de CLAUDE.md, plus les produits de construction). */
