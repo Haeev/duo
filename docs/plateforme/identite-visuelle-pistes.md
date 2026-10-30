@@ -30,7 +30,7 @@ Chaque maquette d'accueil est dessinée en 1366x768 (le PC peut être un portabl
   - deutéranopie: `convert piste-a.png -colorspace RGB -color-matrix "0.367322 0.860646 -0.227968 0.280085 0.672501 0.047413 -0.011820 0.042940 0.968881" -colorspace sRGB piste-a-deuteranopie.png`
   - protanopie: même commande avec `0.152286 1.052583 -0.204868 0.114503 0.786281 0.099216 -0.003882 -0.048116 1.051998`
 - **Niveaux de gris**: `convert piste-a.png -colorspace Gray piste-a-gris.png`.
-- **Reproduire**: `cd design/identite && npm install && node rendre.cjs && node controler.cjs`. `rendre.cjs` signale toute requête hors du disque et liste les polices réellement chargées; `controler.cjs` lit les couleurs dans le bloc `palette` de chaque planche, la planche et ce document ne peuvent donc pas diverger.
+- **Reproduire**: `cd design/identite && npm install && node rendre.cjs && node controler.cjs`. `rendre.cjs` signale toute requête hors du disque et liste les polices réellement chargées; `controler.cjs` relit les couleurs dans le bloc `palette` de chaque planche et produit les tableaux de ce document: après toute retouche de palette, le relancer et reporter ses tableaux ici (la légende des planches, elle, se recalcule seule).
 
 ## Fichiers
 
