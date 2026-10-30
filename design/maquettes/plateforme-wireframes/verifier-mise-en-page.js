@@ -182,6 +182,9 @@ function analyser(sansDefilementVertical) {
   // Test d'effort: police environ 10 % plus large que Segoe UI et SF Pro.
   passes.push({ l: 1366, h: 768, v: true, libelle: 'police large (DejaVu Sans), 1366x768', police: 'DejaVu Sans' });
   passes.push({ l: 1280, h: 720, v: true, libelle: 'police large (DejaVu Sans), 1280x720', police: 'DejaVu Sans' });
+  // Test d'effort: pseudos de 16 caractères, la longueur maximale proposée.
+  passes.push({ l: 1366, h: 768, v: true, libelle: 'pseudos de 16 caractères, 1366x768', police: null, pseudos: true });
+  passes.push({ l: 1280, h: 720, v: true, libelle: 'pseudos de 16 caractères, 1280x720', police: null, pseudos: true });
 
   for (const passe of passes) {
     const contexte = await navigateur.newContext({ viewport: { width: passe.l, height: passe.h } });
@@ -191,6 +194,16 @@ function analyser(sansDefilementVertical) {
       const [fichier, etat] = cible.split('#');
       await page.goto('file://' + path.join(ICI, fichier) + (etat ? '#' + etat : ''));
       if (passe.police) await page.addStyleTag({ content: `* { font-family: "${passe.police}", sans-serif !important; }` });
+      if (passe.pseudos) {
+        await page.evaluate(() => {
+          const LONGS = { Camille: 'Maximilien-Louis', Sacha: 'Gwendoline-Aimée' };
+          const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
+            n.textContent = n.textContent.replace(/Camille|Sacha/g, (m) => LONGS[m]);
+          }
+          document.querySelectorAll('input[type="text"]').forEach((i) => { i.value = i.value.replace(/Camille|Sacha/g, (m) => LONGS[m]); });
+        });
+      }
       await page.waitForTimeout(passe.police ? 250 : 120);
       const r = await page.evaluate(analyser, passe.v);
       verifications += 1;
