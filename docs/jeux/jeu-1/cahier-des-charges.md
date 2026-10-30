@@ -375,7 +375,7 @@ L'hôte fait autorité (architecture, section 7): il reçoit les intentions des 
 | Portée d'un geste à deux | 2 m du point du geste | |
 | Lancer de pêche | 6 m au plus | |
 | Jumelles | 18 m de portée, cercle de visée de 2 m | |
-| Zones de la version 1 | Halte 120x90 m, Vergers 110x80 m, voie 400 m de long | à préciser par level-designer dans ces enveloppes |
+| Zones de la version 1 | Halte 120x90 m, Vergers 110x80 m, voie 400 m de long | enveloppes dans lesquelles level-designer dessine les cartes (section 6.1) |
 | Caméra | orthographique, quatre orientations, trois zooms (16, 24 et 36 m de largeur de vue) | à confirmer par l'essai de style |
 
 ### 4.16 Tables d'équilibrage
@@ -460,11 +460,12 @@ Cible: environ 70 points d'expérience de base pour une journée consacrée à s
 | Récupération | +1 par jour vide, engrais +25 | vigueur | | |
 | Seuils de qualité | belle 75, superbe 110 | score de soin | | aucun hasard: le résultat suit les soins |
 | Prix selon la qualité | x1, x1,5, x2 | | | |
-| Valeur nette d'une case | 2,95 en moyenne (2,10 à 3,71) | sous par jour | | calcul de la partie 4 de `economie_et_chapitres.py`; légumineuses plus basses, elles soignent le sol |
+| Valeur nette d'une case | 2,95 en moyenne, de 2,10 à 3,71 (fraisier: 1,43 la première année, 3,81 ensuite) | sous par jour | | calcul de la partie 4 de `economie_et_chapitres.py`; légumineuses plus basses, elles soignent le sol |
 | Poule, chèvre, ruche | 150, 600, 12 planches et 20 sous | sous | | |
 | Grain, foin | 2 par poule, 4 par chèvre en hiver | sous par jour | | entretien sensible, jamais ruineux |
 | Seuils d'amitié des bêtes | belle 300, superbe 700 | amitié | | un mois de soins pour le superbe |
 | Probabilités des aléas | grêle 25 %, coup de sec 25 %, gel 20 %, brouillard 20 % | par saison | 0 à 50 % | un aléa par saison en moyenne |
+| Protections | cloche de verre 8 sous, réutilisable; une botte de paille par récolte de blé, qui paille 3 cases | | | se protéger des aléas sans grosse dépense |
 
 **Économie et commande**
 
@@ -569,7 +570,7 @@ Lectures:
 
 **Commande du samedi** (2000 années, 22 000 commandes): aucun produit trois semaines de suite, aucune commande à moins de trois métiers, aucune commande plus courte que prévu; 16,8 produits différents en moyenne sur quatre samedis pour 22,4 lignes (au moins 9).
 
-**Collections** (2000 parties, arrivée aux Vergers tirée partie par partie de la simulation du duo médian, 8,4 h en médiane; heures de jeu, médiane et, entre parenthèses, 9 parties sur 10 en dessous):
+**Collections** (2000 parties, arrivée aux Vergers tirée partie par partie de la simulation du duo médian, de 8,2 à 8,4 h en médiane selon le tirage; heures de jeu, médiane et, entre parenthèses, 9 parties sur 10 en dessous):
 
 | Collection | Tirage | 50 % | 90 % | 100 % | Finie dans l'année 1 |
 |---|---|---|---|---|---|

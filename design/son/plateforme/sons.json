@@ -7,6 +7,27 @@
     "effects",
     "ui"
   ],
+  "mix": {
+    "volumeCurve": "square",
+    "masterLimiter": {
+      "thresholdDb": -3.0,
+      "kneeDb": 0.0,
+      "ratio": 20.0,
+      "attackMs": 3.0,
+      "releaseMs": 250.0
+    },
+    "duck": {
+      "attackMs": 80,
+      "releaseMs": 700
+    },
+    "pausedGame": {
+      "musicDb": -10.0,
+      "musicLowpassHz": 1200,
+      "rampMs": 300
+    },
+    "maxUiVoices": 6,
+    "programmaticFocusIsSilent": true
+  },
   "sounds": {
     "focus": {
       "event": "Déplacement du focus (Tab, flèches, survol)",
@@ -23,7 +44,7 @@
       "minIntervalMs": 45,
       "retrigger": true,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -28.0,
       "durationMs": [
         507,
@@ -46,7 +67,7 @@
       "minIntervalMs": 80,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "toi",
+      "stereo": "self",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         933,
@@ -69,7 +90,7 @@
       "minIntervalMs": 80,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "toi",
+      "stereo": "self",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
         899,
@@ -91,7 +112,7 @@
       "minIntervalMs": 250,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
         1062,
@@ -112,7 +133,7 @@
       "minIntervalMs": 400,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
         1054,
@@ -132,7 +153,7 @@
       "minIntervalMs": 60,
       "retrigger": true,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         905
@@ -151,7 +172,7 @@
       "minIntervalMs": 5000,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
         2670
@@ -170,7 +191,7 @@
       "minIntervalMs": 3000,
       "retrigger": false,
       "duckMusicDb": -8.0,
-      "stereo": "autre",
+      "stereo": "peer",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
         2252
@@ -189,7 +210,7 @@
       "minIntervalMs": 300,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "toi",
+      "stereo": "self",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         1224
@@ -208,7 +229,7 @@
       "minIntervalMs": 300,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "autre",
+      "stereo": "peer",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         1243
@@ -227,7 +248,7 @@
       "minIntervalMs": 300,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "autre",
+      "stereo": "peer",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
         1121
@@ -246,7 +267,7 @@
       "minIntervalMs": 500,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         847
@@ -265,7 +286,7 @@
       "minIntervalMs": 1000,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
         2314
@@ -284,7 +305,7 @@
       "minIntervalMs": 500,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -19.0,
       "durationMs": [
         984
@@ -303,7 +324,7 @@
       "minIntervalMs": 500,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         1127
@@ -322,7 +343,7 @@
       "minIntervalMs": 500,
       "retrigger": false,
       "duckMusicDb": 0.0,
-      "stereo": "centre",
+      "stereo": "center",
       "loudnessMomentaryMaxLufs": -18.0,
       "durationMs": [
         1153
@@ -341,7 +362,7 @@
       "minIntervalMs": 5000,
       "retrigger": false,
       "duckMusicDb": -8.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
         2203
@@ -360,7 +381,7 @@
       "minIntervalMs": 5000,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
         2608
@@ -379,7 +400,7 @@
       "minIntervalMs": 0,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "toi",
+      "stereo": "self",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
         2866
@@ -398,7 +419,7 @@
       "minIntervalMs": 0,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "autre",
+      "stereo": "peer",
       "loudnessMomentaryMaxLufs": -17.0,
       "durationMs": [
         2848
@@ -417,7 +438,7 @@
       "minIntervalMs": 0,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
         2516
@@ -436,7 +457,7 @@
       "minIntervalMs": 0,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -15.0,
       "durationMs": [
         3568
@@ -455,7 +476,7 @@
       "minIntervalMs": 0,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -17.0,
       "durationMs": [
         3255
@@ -474,7 +495,7 @@
       "minIntervalMs": 3000,
       "retrigger": false,
       "duckMusicDb": -6.0,
-      "stereo": "large",
+      "stereo": "wide",
       "loudnessMomentaryMaxLufs": -16.0,
       "durationMs": [
         2025
@@ -497,7 +518,7 @@
       "decodeWhole": true,
       "fadeInMs": 3000,
       "fadeOutMs": 1500,
-      "integratedLufs": -20.0
+      "integratedLufs": -21.0
     }
   }
 }

@@ -25,6 +25,15 @@ Objectif: tout décider et documenter avant de coder la plateforme.
 - Parcours et maquettes du lanceur (ux-ui-designer), identité visuelle de Duo (directeur-artistique), identité sonore (sound-designer).
 - Socle du dépôt: monorepo, lint, typecheck, tests, CI avec contrôle typographique (ingenieur-build).
 
+## Nuit du 2026-10-30 au 2026-10-31: objectif du client
+
+Le client veut au réveil « au moins un jeu jouable et testable, avec un sens du détail développé, quasi une version finie ». Décisions du manager:
+
+- Jeu de la nuit: **Deux Astres** (titre de travail), puzzle coopératif en 3D low poly isométrique, 25 niveaux; règles dans `docs/jeux/deux-astres/regles.md`. Il tient lieu de jeu témoin enrichi et éprouve la chaîne 3D prévue pour La Petite Ligne.
+- Plateforme: prototype Duo (lots L1 à L5, L7, L10 réduit) pour faire tourner le jeu à deux en réseau local; installateurs macOS et Windows fabriqués par GitHub Actions et publiés en préversion.
+- Ordre: L1 (socle) puis, en parallèle, L2 et L3 (application et SDK, architecte), jeu (dev-gameplay-3d), L5 (réseau, dev-reseau); puis L4 et L10 (dev-plateforme), L7 (ingenieur-build), effets et lumière (tech-artist), recette (qa-testeur). Conception, niveaux, modèles et sons démarrent tout de suite.
+- Repli si le PC refuse Duo (Smart App Control): à étudier, l'hôte servant le jeu à un navigateur.
+
 ## Phase 2: plateforme v1 et jeu témoin
 
 - Lanceur, profils, réglages; héberger et rejoindre en LAN; chargement et cycle de vie d'un jeu; installateurs macOS et Windows.

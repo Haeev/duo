@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duo · identité visuelle · Étoile double</title>
+<link rel="stylesheet" href="node_modules/@fontsource-variable/jost/wght.css">
+<link rel="stylesheet" href="node_modules/@fontsource-variable/dm-sans/standard.css">
+<link rel="stylesheet" href="jetons.css">
+<style>
+/* Planche récapitulative: uniquement les jetons, les sprites et les fichiers livrés du dossier. */
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1920px; }
+body {
+  background: radial-gradient(1500px 900px at 80% 8%, var(--color-bg-glow) 0%, var(--color-bg) 60%);
+  color: var(--color-text); font-family: var(--font-text); font-size: var(--type-body-size); line-height: var(--type-body-line-height);
+  position: relative;
+}
+.ciel { position: absolute; inset: 0 0 auto 0; height: 1080px; pointer-events: none; }
+.ciel svg { width: 100%; height: 100%; display: block; }
+.planche { position: relative; padding: 40px 56px 30px; display: grid; grid-template-columns: 560px 1fr 520px; gap: 22px 28px; }
+.sprites { display: none; }
+.carte { background: var(--color-surface); box-shadow: var(--elevation-1); border-radius: var(--radius-large); padding: 18px 22px; }
+.etiquette { font: var(--type-overline-weight) var(--type-overline-size)/var(--type-overline-line-height) var(--font-display); letter-spacing: var(--type-overline-tracking); text-transform: uppercase; color: var(--color-text-muted); margin: 0 0 12px; }
+.ico { width: var(--icon-size); height: var(--icon-size); stroke-width: var(--icon-stroke); flex: none; }
+code, .hex { font: 500 13px var(--font-text); color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+
+/* en-tête */
+header { grid-column: 1 / 4; display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 6px; }
+h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 0; }
+.intention { width: 860px; }
+.intention p { font: 400 23px/1.45 var(--font-text); margin: 0 0 16px; }
+.piliers { display: flex; gap: 12px; }
+.piliers span { font: 400 20px var(--font-display); letter-spacing: .04em; border: var(--stroke-component) solid var(--color-line); border-radius: var(--radius-pill); padding: 5px 20px 6px 16px; display: flex; align-items: center; gap: 10px; }
+.piliers span::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 4px #FFC8572E; }
+
+/* logo et icônes */
+.logo-carte { grid-column: 1; display: flex; flex-direction: column; gap: 14px; }
+.logo-carte .grand { width: 330px; display: block; margin: 6px 0 4px 6px; }
+.apps { display: flex; align-items: flex-end; gap: 18px; }
+.apps figure { margin: 0; text-align: center; font-size: 12px; color: var(--color-text-muted); font-weight: 600; }
+.apps img { display: block; margin: 0 auto 6px; }
+.apps img.px { image-rendering: pixelated; }
+
+/* palette */
+.palette { grid-column: 2; }
+.nuancier { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.nuance { border-radius: var(--radius-medium); overflow: hidden; background: var(--color-surface-raised); }
+.nuance i { display: block; height: 40px; }
+.nuance div { padding: 6px 10px 8px; line-height: 1.25; }
+.nuance b { display: block; font-size: 14px; }
+.nuance small { display: block; font-size: 12px; color: var(--color-text-muted); }
+
+/* joueurs */
+.joueurs { grid-column: 3; grid-row: 2 / 4; }
+.liste-joueurs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.joueur { display: flex; align-items: center; gap: 12px; background: var(--color-surface-raised); border-radius: var(--radius-medium); padding: 8px 12px; }
+.joueur b { display: block; font-size: 15px; }
+.joueur .petits { display: flex; gap: 6px; align-items: center; margin-top: 3px; }
+.cvd { margin-top: 14px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cvd div { border: 1px solid var(--color-hairline); border-radius: var(--radius-small); padding: 6px 10px; font-size: 12.5px; color: var(--color-text-muted); line-height: 1.35; }
+.cvd b { display: block; color: var(--color-text); font: 300 26px/1.1 var(--font-display); font-variant-numeric: tabular-nums; }
+.regle { margin: 12px 0 0; font-size: 14px; color: var(--color-text-muted); }
+
+/* typographie */
+.typo { grid-column: 1; }
+.echelle { display: grid; gap: 4px; }
+.echelle div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--color-hairline); padding-bottom: 4px; }
+.echelle span:last-child { font: 500 12px var(--font-text); color: var(--color-text-muted); white-space: nowrap; }
+
+/* espaces, rayons, élévations, icônes */
+.systeme { grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.reglet { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 14px; }
+.reglet div { background: var(--color-line); border-radius: 2px; }
+.reglet figure { margin: 0; text-align: center; font-size: 11px; color: var(--color-text-muted); }
+.rayons { display: flex; gap: 12px; margin-bottom: 14px; }
+.rayons div { width: 70px; height: 52px; border: var(--stroke-component) solid var(--color-outline); display: grid; place-items: center; font-size: 11px; color: var(--color-text-muted); }
+.elevations { display: flex; gap: 14px; }
+.elevations div { width: 92px; height: 58px; border-radius: var(--radius-medium); display: grid; place-items: center; font-size: 12px; color: var(--color-text-muted); }
+.grille-icones { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px 4px; }
+.grille-icones figure { margin: 0; text-align: center; font-size: 10.5px; color: var(--color-text-muted); line-height: 1.2; }
+.grille-icones svg { display: block; margin: 0 auto 4px; color: var(--color-text); }
+
+/* composants */
+.composants { grid-column: 1 / 3; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.rangee { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 24px 0 18px; border-radius: var(--radius-pill); font: var(--type-label-weight) var(--type-label-size)/var(--type-label-line-height) var(--font-text); }
+.btn-p { background: var(--color-accent); color: var(--color-on-accent); }
+.btn-p.survol { background: var(--color-accent-hover); }
+.btn-p.presse { background: var(--color-accent-pressed); }
+.btn-s { border: var(--stroke-component) solid var(--color-outline); color: var(--color-text); }
+.btn-s.survol { background: var(--color-surface-raised); border-color: var(--color-text-muted); }
+.btn.inactif { background: none; border: var(--stroke-component) dashed var(--color-text-disabled); color: var(--color-text-disabled); }
+.focus { outline: var(--stroke-focus) solid var(--color-focus); outline-offset: var(--stroke-focus-offset); }
+.etat { font-size: 11.5px; color: var(--color-text-muted); text-align: center; display: block; margin-top: 6px; }
+.puce { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 8px; border-radius: var(--radius-pill); font: var(--type-small-weight) var(--type-small-size)/1 var(--font-text); background: var(--color-surface-raised); }
+.puce .ico { width: 18px; height: 18px; stroke-width: 1.9; }
+.carte-joueur { display: flex; align-items: center; gap: 12px; background: var(--color-surface-raised); border-radius: var(--radius-large); padding: 12px 16px; min-width: 300px; }
+.carte-joueur .nom { font: 500 20px var(--font-display); }
+.carte-joueur small { display: block; color: var(--color-text-muted); font-size: 14px; }
+.notif { display: flex; gap: 12px; align-items: center; background: var(--color-surface-raised); box-shadow: var(--elevation-2); border-radius: var(--radius-medium); padding: 12px 18px 12px 14px; }
+.champ { display: flex; flex-direction: column; gap: 6px; }
+.champ label { font: var(--type-small-weight) var(--type-small-size) var(--font-text); color: var(--color-text-muted); }
+.champ span { height: 44px; width: 240px; border: var(--stroke-component) solid var(--color-outline); border-radius: var(--radius-small); display: flex; align-items: center; padding: 0 12px; background: var(--color-bg); }
+.choix-couleur { display: flex; gap: 10px; }
+.choix-couleur div { width: 74px; text-align: center; font-size: 12px; color: var(--color-text-muted); padding: 8px 0 6px; border-radius: var(--radius-medium); border: var(--stroke-component) solid transparent; position: relative; }
+.choix-couleur div.choisi { border-color: var(--color-text); color: var(--color-text); }
+.choix-couleur div.pris { opacity: .5; }
+.choix-couleur div svg { display: block; margin: 0 auto 4px; }
+
+/* superposition de pause */
+.pause { position: relative; height: 330px; border-radius: var(--radius-medium); overflow: hidden; box-shadow: 0 0 0 1px var(--color-line); }
+.pause > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pause .voile { position: absolute; inset: 0; background: var(--color-scrim); }
+.pause .panneau { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 380px; background: var(--color-surface); box-shadow: var(--elevation-3); border-radius: var(--radius-large); padding: 18px 22px; }
+.pause h3 { font: var(--type-title-3-weight) var(--type-title-3-size)/var(--type-title-3-line-height) var(--font-display); margin: 0 0 2px; display: flex; gap: 8px; align-items: center; }
+.pause p { margin: 0 0 12px; font-size: 14px; color: var(--color-text-muted); }
+.pause .ligne { height: 40px; border-radius: var(--radius-pill); display: flex; align-items: center; padding: 0 16px; margin-bottom: 8px; font-weight: 600; font-size: 15px; border: var(--stroke-component) solid var(--color-outline); }
+.pause .ligne.p { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
+.pause .indice { position: absolute; left: 14px; bottom: 12px; background: var(--color-surface); border-radius: var(--radius-pill); padding: 4px 12px; font-size: 13px; color: var(--color-text-muted); box-shadow: 0 0 0 1px var(--color-hairline); }
+
+/* jeux et mouvement */
+.cote { grid-column: 3; display: flex; flex-direction: column; gap: 22px; }
+.vignettes { display: flex; gap: 14px; }
+.vignettes figure { margin: 0; width: 148px; font-size: 13px; font-weight: 600; }
+.vignettes svg { display: block; width: 148px; height: 83px; border-radius: var(--radius-medium); box-shadow: 0 0 0 1px var(--color-line); margin-bottom: 6px; }
+.vignettes figure.focus svg { outline: var(--stroke-focus) solid var(--color-focus); outline-offset: var(--stroke-focus-offset); }
+.temps { display: flex; gap: 6px; align-items: flex-end; }
+.temps figure { margin: 0; text-align: center; font-size: 12px; color: var(--color-text-muted); }
+.mouvement p { margin: 8px 0 0; font-size: 14px; line-height: 1.45; color: var(--color-text-muted); }
+.mouvement p b { color: var(--color-text); font-weight: 600; }
+.pied { grid-column: 1 / 4; font-size: 12px; color: var(--color-text-muted); text-align: right; margin: 0; }
+</style>
+</head>
+<body>
+<div class="ciel" id="ciel" aria-hidden="true"></div>
+<div class="sprites" id="sprites"></div>
+<div class="planche">
+  <header>
+    <div>
+      <p class="etiquette">Duo · identité visuelle · version 1.0</p>
+      <h1>Étoile double</h1>
+    </div>
+    <div class="intention">
+      <p>Deux astres qui se trouvent dans la nuit et tournent ensemble&nbsp;: une interface calme et sombre, qui s’efface pour laisser briller les jeux.</p>
+      <div class="piliers"><span>calme</span><span>nocturne</span><span>complice</span></div>
+    </div>
+  </header>
+
+  <section class="carte logo-carte">
+    <p class="etiquette" style="margin:0">Logo vectorisé · icônes d’application</p>
+    <img class="grand" src="logo/logo.svg" alt="Logo Duo">
+    <div class="apps">
+      <figure><img src="icone-app/png/macos-128.png" width="112" height="112" alt="">macOS</figure>
+      <figure><img src="icone-app/png/windows-64.png" width="64" height="64" alt="">Windows 64</figure>
+      <figure><img class="px" src="icone-app/png/windows-32.png" width="32" height="32" alt="">32</figure>
+      <figure><img class="px" src="icone-app/png/windows-24.png" width="24" height="24" alt="">24</figure>
+      <figure><img class="px" src="icone-app/png/windows-16.png" width="16" height="16" alt="">16</figure>
+      <figure><img src="logo/marque.svg" width="64" height="64" alt="">marque</figure>
+    </div>
+  </section>
+
+  <section class="carte palette">
+    <p class="etiquette">Palette de l’interface · rôle et contraste</p>
+    <div class="nuancier" id="nuancier"></div>
+  </section>
+
+  <section class="carte joueurs">
+    <p class="etiquette">Joueurs · six couleurs, six symboles</p>
+    <div class="liste-joueurs" id="joueurs"></div>
+    <div class="cvd" id="cvd"></div>
+    <p class="regle">Toute paire reste distincte sous les quatre visions (CA-PF-109). Le symbole et le pseudo accompagnent toujours la couleur&nbsp;: en niveaux de gris, la forme suffit.</p>
+    <p class="etiquette" style="margin:18px 0 10px">Choix de la couleur (E02)</p>
+    <div class="choix-couleur" id="choix"></div>
+    <p class="etiquette" style="margin:18px 0 10px">Carte de joueur</p>
+    <div class="carte-joueur" id="carte-joueur"></div>
+  </section>
+
+  <section class="carte typo">
+    <p class="etiquette">Typographies · Jost (titres) et DM Sans (texte)</p>
+    <div class="echelle" id="echelle"></div>
+  </section>
+
+  <section class="systeme">
+    <div class="carte">
+      <p class="etiquette">Espaces · rayons · élévations sans flou</p>
+      <div class="reglet" id="reglet"></div>
+      <div class="rayons">
+        <div style="border-radius:var(--radius-small)">8</div><div style="border-radius:var(--radius-medium)">14</div><div style="border-radius:var(--radius-large)">22</div><div style="border-radius:var(--radius-pill)">capsule</div>
+      </div>
+      <div class="elevations">
+        <div style="background:var(--color-surface);box-shadow:var(--elevation-1)">niveau 1</div>
+        <div style="background:var(--color-surface-raised);box-shadow:var(--elevation-2)">niveau 2</div>
+        <div style="background:var(--color-surface);box-shadow:var(--elevation-3)">niveau 3</div>
+      </div>
+    </div>
+    <div class="carte">
+      <p class="etiquette">Icônes · grille de 24, trait de 1,75</p>
+      <div class="grille-icones" id="icones"></div>
+    </div>
+  </section>
+
+  <section class="composants">
+    <div class="carte">
+      <p class="etiquette">Boutons · repos, survol, focus clavier, pressé, inactif</p>
+      <div class="rangee">
+        <div><span class="btn btn-p"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">repos</span></div>
+        <div><span class="btn btn-p survol"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">survol</span></div>
+        <div><span class="btn btn-p focus"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">focus</span></div>
+        <div><span class="btn btn-p presse"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">pressé</span></div>
+      </div>
+      <div class="rangee">
+        <div><span class="btn btn-s"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">repos</span></div>
+        <div><span class="btn btn-s survol"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">survol</span></div>
+        <div><span class="btn btn-s focus"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">focus</span></div>
+        <div><span class="btn inactif"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">inactif</span></div>
+      </div>
+      <div class="rangee">
+        <span class="puce"><svg class="ico" style="color:var(--color-success)"><use href="#icon-ready"/></svg>C’est parti</span>
+        <span class="puce"><svg class="ico" style="color:var(--color-text-muted)"><use href="#icon-not-yet"/></svg>Pas encore</span>
+        <span class="puce"><svg class="ico" style="color:var(--color-error)"><use href="#icon-warning"/></svg>Connexion perdue</span>
+        <div class="champ"><label>Pseudo</label><span class="focus">Camille</span></div>
+      </div>
+      <div class="notif"><svg class="ico" style="color:var(--color-success)"><use href="#icon-success"/></svg><span><b>Sacha est là.</b> Vous pouvez jouer ensemble.</span></div>
+    </div>
+    <div>
+      <div class="pause">
+        <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg>
+        <div class="voile"></div>
+        <div class="panneau">
+          <h3><svg class="ico"><use href="#icon-pause"/></svg>Pause</h3>
+          <p>Camille a mis la partie en pause.</p>
+          <div class="ligne p focus">Reprendre</div>
+          <div class="ligne">Commandes</div>
+          <div class="ligne">Retour au salon</div>
+        </div>
+        <span class="indice">Échap&nbsp;: pause</span>
+      </div>
+      <p class="etiquette" style="margin:10px 0 0">Superposition en partie · voile sur le jeu figé, panneau opaque, aucun flou</p>
+    </div>
+  </section>
+
+  <section class="cote">
+    <div class="carte">
+      <p class="etiquette">Encadrer les jeux</p>
+      <div class="vignettes">
+        <figure class="focus"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-2d"/></svg>Jeu en 2D</figure>
+        <figure><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg>Jeu en 3D</figure>
+        <figure><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-iso"/></svg>Isométrique</figure>
+      </div>
+    </div>
+    <div class="carte mouvement">
+      <p class="etiquette">Mouvement · se trouver, puis graviter</p>
+      <div class="temps" id="temps"></div>
+      <p><b>150 ms</b> fondus et survols · <b>300 ms</b> panneaux · <b>600 ms</b> rapprochement des astres · <b>4 s</b> un tour d’orbite. Courbe douce, jamais de rebond, seulement <code>transform</code> et <code>opacity</code>. Avec «&nbsp;Réduire les animations&nbsp;»&nbsp;: tout reste fixe.</p>
+    </div>
+  </section>
+
+  <p class="pied">Planche générée par outils/rendre-planches.cjs depuis jetons.css, joueurs.json, les sprites et les fichiers d’icônes du dossier design/identite/b · polices OFL embarquées · 2026-10-30</p>
+</div>
+<script src="planches/commun.js"></script>
+<script>
+(async () => {
+  const sprites = document.getElementById('sprites');
+  await Duo.inclure('icones/icones.svg', sprites);
+  await Duo.inclure('planches/vignettes.svg', sprites);
+  await Duo.inclure('ciel.svg', document.getElementById('ciel'));
+  const { tokens } = await Duo.json('jetons.json');
+  const { players } = await Duo.json('joueurs.json');
+  const mesures = await Duo.json('controles/mesures.json');
+  const C = tokens.color;
+  const ratio = (fg, bg) => {
+    const m = mesures.contrasts.find((k) => k.fg === fg && k.bg === bg);
+    return m ? Duo.fr(m.ratio, 1) + ':1' : '';
+  };
+  const nuances = [
+    ['bg', 'Nuit', 'fond des écrans'], ['surface', 'Surface', 'cartes, panneaux'], ['surface-raised', 'Surface haute', 'survol, menus'],
+    ['line', 'Trait', 'orbites, décor'], ['outline', 'Contour', `composants, ${ratio(C.outline, C['surface-raised'])} au pire`], ['hairline', 'Filet', 'séparations'],
+    ['text', 'Texte', `${ratio(C.text, C.bg)} sur la nuit`], ['text-muted', 'Texte second', `${ratio(C['text-muted'], C['surface-raised'])} au pire`], ['accent', 'Accent or', `action principale, ${ratio(C['on-accent'], C.accent)}`],
+    ['success', 'Succès', `avec icône, ${ratio(C.success, C['surface-raised'])}`], ['error', 'Erreur', `avec icône, ${ratio(C.error, C['surface-raised'])}`], ['text-disabled', 'Inactif', 'élément désactivé'],
+  ];
+  document.getElementById('nuancier').innerHTML = nuances.map(([k, n, r]) => `<div class="nuance"><i style="background:var(--color-${k});${k === 'bg' ? 'box-shadow:inset 0 0 0 1px var(--color-line)' : ''}"></i><div><b>${n}</b><span class="hex">${C[k]}</span><small>${r}</small></div></div>`).join('');
+
+  document.getElementById('joueurs').innerHTML = players.map((p) => `<div class="joueur">${Duo.jeton(p, 56)}<div><b>${p.label}</b><span class="hex">${p.color}</span><div class="petits">${Duo.jeton(p, 24)}${Duo.jeton(p, 16)}</div></div></div>`).join('');
+  const w = mesures.players.worst;
+  const noms = { normale: 'normale', protanopie: 'protanopie', deuteranopie: 'deutéranopie', tritanopie: 'tritanopie' };
+  document.getElementById('cvd').innerHTML = Object.entries(noms).map(([k, n]) => `<div><b>${Duo.fr(w[k].value)}</b>${n}, pire paire (seuil ${w[k].threshold})</div>`).join('');
+  document.getElementById('choix').innerHTML = players.map((p, i) => `<div class="${i === 2 ? 'choisi' : ''}${i === 0 ? ' pris' : ''}">${Duo.jeton(p, 32, { halo: false })}${i === 0 ? 'Prise' : p.symbolName}</div>`).join('');
+  const etoile = players.find((p) => p.id === 'star');
+  document.getElementById('carte-joueur').innerHTML = `${Duo.jeton(etoile, 48)}<div style="flex:1"><span class="nom">Camille</span> <span style="color:var(--color-text-muted)">(toi)</span><small>héberge</small></div><span class="puce"><svg class="ico" style="color:var(--color-success)"><use href="#icon-ready"/></svg>C’est parti</span>`;
+
+  const T = tokens.type;
+  const px = (rem) => Math.round(parseFloat(rem) * 16);
+  const niveaux = [
+    ['display', 'Bonsoir, Camille'], ['title-1', 'Historique et scores'], ['title-2', 'Salon d’Exemple coop'], ['title-3', 'Héberger une partie'],
+    ['overline', 'Ce soir'], ['body-large', 'Sacha est là. On lance une partie&#8239;?'], ['body', 'Tu choisis le jeu, Sacha te rejoint d’une touche.'], ['label', 'Rejoindre'], ['small', 'Dernière partie&nbsp;: hier, 21 h 40'], ['figure', '12 · 14'],
+  ];
+  document.getElementById('echelle').innerHTML = niveaux.map(([k, s]) => {
+    const t = T[k];
+    const style = `font-family:${t.family};font-size:${t.size};line-height:${t['line-height']};font-weight:${t.weight};letter-spacing:${t.tracking};${k === 'overline' ? 'text-transform:uppercase;color:var(--color-text-muted);' : ''}${k === 'figure' ? 'font-variant-numeric:tabular-nums;' : ''}`;
+    return `<div><span style="${style}">${s}</span><span>${k} · ${px(t.size)}/${px(t['line-height'])} · ${t.weight}</span></div>`;
+  }).join('');
+
+  document.getElementById('reglet').innerHTML = Object.entries(tokens.space).map(([k, v]) => `<figure><div style="width:${v};height:${v}"></div>${px(v)}</figure>`).join('');
+  const icones = [['host', 'Héberger'], ['join', 'Rejoindre'], ['library', 'Jeux'], ['history', 'Historique'], ['settings', 'Réglages'], ['score', 'Score'], ['profile', 'Profil'],
+    ['ready', 'Prêt'], ['not-yet', 'Pas encore'], ['warning', 'Alerte'], ['error', 'Erreur'], ['info', 'Info'], ['pause', 'Pause'], ['resume', 'Reprendre'],
+    ['save', 'Enregistrer'], ['backup', 'Secours'], ['coop', 'Coopération'], ['versus', 'Affrontement'], ['network', 'Réseau'], ['download', 'Mise à jour'], ['key-cmd', 'Touche ⌘']];
+  document.getElementById('icones').innerHTML = icones.map(([id, n]) => `<figure><svg class="ico"><use href="#icon-${id}"/></svg>${n}</figure>`).join('');
+
+  const a = players[0];
+  const b = players[1];
+  const etape = (x1, y1, x2, y2, t) => `<figure><svg width="118" height="84" viewBox="0 0 118 84"><ellipse cx="59" cy="42" rx="44" ry="18" fill="none" stroke="var(--color-line)" stroke-width="1.5" stroke-dasharray="2 5" stroke-linecap="round"/><g transform="translate(${x1} ${y1})">${Duo.jeton(a, 24, { halo: false })}</g><g transform="translate(${x2} ${y2})">${Duo.jeton(b, 24, { halo: false })}</g></svg>${t}</figure>`;
+  document.getElementById('temps').innerHTML = etape(3, 30, 91, 30, '0 ms') + etape(24, 13, 70, 47, '300 ms') + etape(33, 22, 61, 38, '600 ms') + etape(47, 6, 47, 54, 'orbite, 4 s');
+  window.planchePrete = true;
+})();
+</script>
+</body>
+</html>
