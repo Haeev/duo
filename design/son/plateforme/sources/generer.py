@@ -31,6 +31,7 @@ from scipy.io import wavfile
 ICI = Path(__file__).resolve().parent
 RACINE = ICI.parent
 sys.path.insert(0, str(ICI))
+sys.dont_write_bytecode = True  # pas de __pycache__ dans le dossier versionné
 
 import interface  # noqa: E402
 import salon  # noqa: E402

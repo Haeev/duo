@@ -1,10 +1,10 @@
 'use strict';
 // Icônes d'application de Duo, générées depuis des SVG sources eux-mêmes calculés à partir de la marque
 // (logo/marque.json, produite par generer-formes.cjs):
-//   icone-app/icone-macos.svg   plaque de nuit sur la grille macOS (824 sur 1024), version détaillée
-//   icone-app/icone-windows.svg plaque presque pleine page, version détaillée
-//   icone-app/icone-moyenne.svg anneau et astres sans étoiles (32 à 64 px)
-//   icone-app/icone-petite.svg  disque et croissant seuls, sans anneau, calés sur la grille de 16 px
+//   icone-app/icone-macos.svg, icone-windows.svg: version détaillée (128 px et plus); plaque sur la grille
+//     d'Apple (824 sur 1024) pour macOS, presque pleine page pour Windows
+//   icone-app/icone-<plateforme>-moyenne.svg: anneau et astres sans étoiles (32 à 64 px)
+//   icone-app/icone-<plateforme>-petite.svg: disque et croissant seuls, sans anneau (16 à 24 px)
 // puis les PNG par taille (rsvg-convert), duo.icns (16 à 1024 px) et duo.ico (16 à 256 px), relus à la fin.
 // Outils requis: rsvg-convert, ImageMagick (pixels des entrées BMP de l'ICO).
 // Usage: node outils/generer-icones-app.cjs  (ou npm run icones-app)
@@ -49,26 +49,33 @@ const stars = (x, y, side) => STARS.map(([u, v, r]) => `<circle cx="${(x + u * s
 
 const svg = (size, body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">\n  ${body}\n</svg>\n`;
 
+// Dessin moyen (32 à 64 px): sans étoiles, marque agrandie. Dessin petit (16 à 24 px): disque aqua et
+// croissant mauve seuls, sans anneau, calés sur la grille de 16 px.
+const medium = plate(1, 1, 62, 14, 1.5) + placeMark(32, 32, 44);
+const small = `<rect x="0" y="0" width="16" height="16" rx="3.5" fill="${C.bg}"/>
+  <rect x="0.5" y="0.5" width="15" height="15" rx="3" fill="none" stroke="${C.line}" stroke-width="1"/>
+  <circle cx="5" cy="5.9" r="2.9" fill="${P.orb}"/>
+  <path fill="${P.crescent}" d="${g.crescent(10.8, 10.2, 3.7, 2.95, 1.9, -1.9, 3)}"/>`;
+// macOS: la plaque garde sa marge à toutes les tailles (grille d'Apple), réduite au plus petit pour rester lisible
+const inset = (size, factor, body) => `<g transform="translate(${size / 2} ${size / 2}) scale(${factor}) translate(${-size / 2} ${-size / 2})">${body}</g>`;
+
 const SOURCES = {
   // macOS: plaque de 824 sur une toile de 1024 (marges de la grille d'Apple), rayon 185
   'icone-macos': svg(1024, plate(100, 100, 824, 185, 6) + stars(100, 100, 824) + placeMark(512, 512, 470)),
+  'icone-macos-moyenne': svg(64, inset(64, 52 / 62, medium)),
+  'icone-macos-petite': svg(16, inset(16, 14 / 16, small)),
   // Windows: plaque presque pleine page (marge de 1/64), rayon de 22 %
   'icone-windows': svg(256, plate(4, 4, 248, 56, 2) + stars(4, 4, 248) + placeMark(128, 128, 146)),
-  // moyenne (32 à 64 px): sans étoiles, marque agrandie
-  'icone-moyenne': svg(64, plate(1, 1, 62, 14, 1.5) + placeMark(32, 32, 44)),
-  // petite (16 à 24 px): disque aqua et croissant mauve agrandis, sans anneau
-  'icone-petite': svg(16, `<rect x="0" y="0" width="16" height="16" rx="3.5" fill="${C.bg}"/>
-  <rect x="0.5" y="0.5" width="15" height="15" rx="3" fill="none" stroke="${C.line}" stroke-width="1"/>
-  <circle cx="5" cy="5.9" r="2.9" fill="${P.orb}"/>
-  <path fill="${P.crescent}" d="${g.crescent(11, 10.4, 3.9, 3.1, 2, -2, 3)}"/>`),
+  'icone-windows-moyenne': svg(64, medium),
+  'icone-windows-petite': svg(16, small),
 };
 for (const [name, content] of Object.entries(SOURCES)) fs.writeFileSync(path.join(DIR, `${name}.svg`), content);
 
 // quelle source pour quelle taille (en points)
 const sourceFor = (platform, points) => {
-  if (points <= 24) return 'icone-petite';
-  if (points <= 64) return 'icone-moyenne';
-  return platform === 'macos' ? 'icone-macos' : 'icone-windows';
+  if (points <= 24) return `icone-${platform}-petite`;
+  if (points <= 64) return `icone-${platform}-moyenne`;
+  return `icone-${platform}`;
 };
 function render(source, pixels, file) {
   const out = path.join(PNG_DIR, file);

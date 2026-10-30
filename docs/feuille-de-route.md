@@ -27,12 +27,12 @@ Objectif: tout décider et documenter avant de coder la plateforme.
 
 ## Nuit du 2026-10-30 au 2026-10-31: objectif du client
 
-Le client veut au réveil « au moins un jeu jouable et testable, avec un sens du détail développé, quasi une version finie ». Décisions du manager:
+Le client veut au réveil une **démo d'environ une heure de La Petite Ligne**, jouable à deux, comme preuve de concept; l'objectif long terme des 100 heures reste. Il confirme que le premier jeu est la simulation de vie paisible en coopération (2026-10-30, 23 h 30).
 
-- Jeu de la nuit: **Deux Astres** (titre de travail), puzzle coopératif en 3D low poly isométrique, 25 niveaux; règles dans `docs/jeux/deux-astres/regles.md`. Il tient lieu de jeu témoin enrichi et éprouve la chaîne 3D prévue pour La Petite Ligne.
-- Plateforme: prototype Duo (lots L1 à L5, L7, L10 réduit) pour faire tourner le jeu à deux en réseau local; installateurs macOS et Windows fabriqués par GitHub Actions et publiés en préversion.
-- Ordre: L1 (socle) puis, en parallèle, L2 et L3 (application et SDK, architecte), jeu (dev-gameplay-3d), L5 (réseau, dev-reseau); puis L4 et L10 (dev-plateforme), L7 (ingenieur-build), effets et lumière (tech-artist), recette (qa-testeur). Conception, niveaux, modèles et sons démarrent tout de suite.
-- Repli si le PC refuse Duo (Smart App Control): à étudier, l'hôte servant le jeu à un navigateur.
+- Jeu: La Petite Ligne, démo au bourg de La Halte d'Aubrune, première semaine jusqu'au premier train du samedi. Périmètre: `docs/jeux/jeu-1/demo.md` (game-designer). Code dans `games/la-petite-ligne/`.
+- Plateforme: prototype Duo (lots L1 à L5, L7, L10 réduit) pour faire tourner la démo à deux en réseau local; installateurs macOS et Windows fabriqués par GitHub Actions et publiés en préversion. Repli si le PC refuse Duo (Smart App Control): l'hôte sert le jeu à un navigateur.
+- Ordre: L1 (socle) puis, en parallèle, L2 et L3 (application et SDK, architecte), jeu (dev-gameplay-3d), L5 (réseau, dev-reseau); puis L4 et L10 (dev-plateforme), L7 (ingenieur-build), lumière et effets (tech-artist), interface du jeu (ux-ui-designer), recette (qa-testeur). Modèles, sons et carte du bourg ont démarré.
+- Deux Astres (puzzle coopératif) est mis en pause: ses règles restent dans `docs/jeux/deux-astres/regles.md` pour un futur petit jeu.
 
 ## Phase 2: plateforme v1 et jeu témoin
 

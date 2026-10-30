@@ -30,7 +30,7 @@
   },
   "sounds": {
     "focus": {
-      "event": "Déplacement du focus (Tab, flèches, survol)",
+      "event": "Déplacement du focus au clavier (Tab, flèches)",
       "bus": "ui",
       "priority": 4,
       "files": [

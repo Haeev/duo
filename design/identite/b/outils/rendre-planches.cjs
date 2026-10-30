@@ -22,7 +22,7 @@ const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 
 const virtualPages = {};
 const outside = [];
 
-async function openPage(browser, rel, width, height = 800) {
+async function openPage(browser, rel, width, height = 300) {
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
   const page = await context.newPage();
   await page.route('**/*', async (route) => {
@@ -44,8 +44,12 @@ async function openPage(browser, rel, width, height = 800) {
   return { page, context, fonts: [...new Set(fonts)] };
 }
 
+const overflows = [];
 async function shoot(browser, rel, width, out) {
   const { page, context, fonts } = await openPage(browser, rel, width);
+  // une planche qui déborde en largeur cache un défaut de mise en page: on le signale
+  const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+  if (scrollWidth > width) overflows.push(`${rel}: ${scrollWidth} px pour ${width}`);
   await page.screenshot({ path: out, fullPage: true });
   await context.close();
   return fonts;
@@ -126,5 +130,6 @@ const simulate = (src, vision, dst) => {
   await browser.close();
   for (const [name, fonts] of report) console.log(`${name}: polices chargées ${fonts.join(', ') || 'aucune'}`);
   console.log(outside.length ? `REQUÊTES HORS DISQUE REFUSÉES: ${outside.join(', ')}` : 'aucune requête hors du disque');
-  if (outside.length) process.exit(1);
+  console.log(overflows.length ? `DÉBORDEMENTS: ${overflows.join(' ; ')}` : 'aucun débordement horizontal');
+  if (outside.length || overflows.length) process.exit(1);
 })();

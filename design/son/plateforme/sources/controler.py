@@ -29,6 +29,7 @@ import numpy as np
 ICI = Path(__file__).resolve().parent
 RACINE = ICI.parent
 sys.path.insert(0, str(ICI))
+sys.dont_write_bytecode = True  # pas de __pycache__ dans le dossier versionné
 
 from salon import ECHANTILLONS_AMORCE, ECHANTILLONS_BOUCLE  # noqa: E402
 

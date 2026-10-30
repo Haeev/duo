@@ -34,7 +34,7 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .piliers span::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--color-accent); box-shadow: 0 0 0 4px #FFC8572E; }
 
 /* logo et icônes */
-.logo-carte { grid-column: 1; display: flex; flex-direction: column; gap: 14px; }
+.logo-carte { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; gap: 14px; }
 .logo-carte .grand { width: 330px; display: block; margin: 6px 0 4px 6px; }
 .apps { display: flex; align-items: flex-end; gap: 18px; }
 .apps figure { margin: 0; text-align: center; font-size: 12px; color: var(--color-text-muted); font-weight: 600; }
@@ -42,7 +42,7 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .apps img.px { image-rendering: pixelated; }
 
 /* palette */
-.palette { grid-column: 2; }
+.palette { grid-column: 2; grid-row: 2; }
 .nuancier { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
 .nuance { border-radius: var(--radius-medium); overflow: hidden; background: var(--color-surface-raised); }
 .nuance i { display: block; height: 40px; }
@@ -52,6 +52,9 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 
 /* joueurs */
 .joueurs { grid-column: 3; grid-row: 2 / 4; }
+.valeurs { display: flex; margin-top: 14px; border-radius: var(--radius-small); overflow: hidden; }
+.valeurs i { flex: 1; height: 34px; display: flex; align-items: flex-end; justify-content: center; font: 600 10.5px var(--font-text); font-style: normal; padding-bottom: 3px; }
+.palette .note { margin: 8px 0 0; font-size: 13px; color: var(--color-text-muted); }
 .liste-joueurs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
 .joueur { display: flex; align-items: center; gap: 12px; background: var(--color-surface-raised); border-radius: var(--radius-medium); padding: 8px 12px; }
 .joueur b { display: block; font-size: 15px; }
@@ -62,28 +65,35 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .regle { margin: 12px 0 0; font-size: 14px; color: var(--color-text-muted); }
 
 /* typographie */
-.typo { grid-column: 1; }
+.typo { grid-column: 1; grid-row: 3; }
 .echelle { display: grid; gap: 4px; }
 .echelle div { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--color-hairline); padding-bottom: 4px; }
 .echelle span:last-child { font: 500 12px var(--font-text); color: var(--color-text-muted); white-space: nowrap; }
 
-/* espaces, rayons, élévations, icônes */
-.systeme { grid-column: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-.reglet { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 14px; }
+/* espaces, rayons, traits, élévations, icônes */
+.icones-carte { grid-column: 2; grid-row: 3; }
+.systeme { grid-column: 1 / 3; grid-row: 4; display: grid; grid-template-columns: auto auto auto auto; justify-content: space-between; align-items: end; gap: 24px; }
+.systeme .etiquette { grid-column: 1 / 5; margin: 0; }
+.systeme h4 { font: 600 13px var(--font-text); color: var(--color-text-muted); margin: 0 0 10px; }
+.traits { display: flex; gap: 16px; align-items: flex-end; }
+.traits figure { margin: 0; text-align: center; font-size: 11px; color: var(--color-text-muted); }
+.traits figure div { width: 52px; height: 40px; border-radius: var(--radius-small); margin: 0 auto 6px; }
+.reglet { display: flex; align-items: flex-end; gap: 6px; }
 .reglet div { background: var(--color-line); border-radius: 2px; }
 .reglet figure { margin: 0; text-align: center; font-size: 11px; color: var(--color-text-muted); }
-.rayons { display: flex; gap: 12px; margin-bottom: 14px; }
-.rayons div { width: 70px; height: 52px; border: var(--stroke-component) solid var(--color-outline); display: grid; place-items: center; font-size: 11px; color: var(--color-text-muted); }
+.rayons { display: flex; gap: 12px; }
+.rayons div { width: 56px; height: 46px; border: var(--stroke-component) solid var(--color-outline); display: grid; place-items: center; font-size: 11px; color: var(--color-text-muted); }
 .elevations { display: flex; gap: 14px; }
-.elevations div { width: 92px; height: 58px; border-radius: var(--radius-medium); display: grid; place-items: center; font-size: 12px; color: var(--color-text-muted); }
-.grille-icones { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px 4px; }
+.elevations div { width: 76px; height: 50px; border-radius: var(--radius-medium); display: grid; place-items: center; font-size: 12px; color: var(--color-text-muted); }
+.grille-icones { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px 4px; }
 .grille-icones figure { margin: 0; text-align: center; font-size: 10.5px; color: var(--color-text-muted); line-height: 1.2; }
 .grille-icones svg { display: block; margin: 0 auto 4px; color: var(--color-text); }
 
 /* composants */
-.composants { grid-column: 1 / 3; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.boutons { grid-column: 1; grid-row: 5; }
+.pause-bloc { grid-column: 2; grid-row: 5; }
 .rangee { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
-.btn { display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 24px 0 18px; border-radius: var(--radius-pill); font: var(--type-label-weight) var(--type-label-size)/var(--type-label-line-height) var(--font-text); }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px 0 14px; border-radius: var(--radius-pill); font: var(--type-label-weight) var(--type-label-size)/var(--type-label-line-height) var(--font-text); }
 .btn-p { background: var(--color-accent); color: var(--color-on-accent); }
 .btn-p.survol { background: var(--color-accent-hover); }
 .btn-p.presse { background: var(--color-accent-pressed); }
@@ -91,7 +101,8 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .btn-s.survol { background: var(--color-surface-raised); border-color: var(--color-text-muted); }
 .btn.inactif { background: none; border: var(--stroke-component) dashed var(--color-text-disabled); color: var(--color-text-disabled); }
 .focus { outline: var(--stroke-focus) solid var(--color-focus); outline-offset: var(--stroke-focus-offset); }
-.etat { font-size: 11.5px; color: var(--color-text-muted); text-align: center; display: block; margin-top: 6px; }
+.etats { display: grid; grid-template-columns: 64px auto auto; gap: 12px 14px; align-items: center; justify-content: start; }
+.etats > span:nth-child(3n+1) { font-size: 13px; color: var(--color-text-muted); }
 .puce { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px 0 8px; border-radius: var(--radius-pill); font: var(--type-small-weight) var(--type-small-size)/1 var(--font-text); background: var(--color-surface-raised); }
 .puce .ico { width: 18px; height: 18px; stroke-width: 1.9; }
 .carte-joueur { display: flex; align-items: center; gap: 12px; background: var(--color-surface-raised); border-radius: var(--radius-large); padding: 12px 16px; min-width: 300px; }
@@ -108,7 +119,7 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .choix-couleur div svg { display: block; margin: 0 auto 4px; }
 
 /* superposition de pause */
-.pause { position: relative; height: 330px; border-radius: var(--radius-medium); overflow: hidden; box-shadow: 0 0 0 1px var(--color-line); }
+.pause { position: relative; height: 352px; border-radius: var(--radius-medium); overflow: hidden; box-shadow: 0 0 0 1px var(--color-line); }
 .pause > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .pause .voile { position: absolute; inset: 0; background: var(--color-scrim); }
 .pause .panneau { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 380px; background: var(--color-surface); box-shadow: var(--elevation-3); border-radius: var(--radius-large); padding: 18px 22px; }
@@ -119,7 +130,8 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .pause .indice { position: absolute; left: 14px; bottom: 12px; background: var(--color-surface); border-radius: var(--radius-pill); padding: 4px 12px; font-size: 13px; color: var(--color-text-muted); box-shadow: 0 0 0 1px var(--color-hairline); }
 
 /* jeux et mouvement */
-.cote { grid-column: 3; display: flex; flex-direction: column; gap: 22px; }
+.encadrer { grid-column: 3; grid-row: 4; }
+.mouvement { grid-column: 3; grid-row: 5; }
 .vignettes { display: flex; gap: 14px; }
 .vignettes figure { margin: 0; width: 148px; font-size: 13px; font-weight: 600; }
 .vignettes svg { display: block; width: 148px; height: 83px; border-radius: var(--radius-medium); box-shadow: 0 0 0 1px var(--color-line); margin-bottom: 6px; }
@@ -128,7 +140,7 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 .temps figure { margin: 0; text-align: center; font-size: 12px; color: var(--color-text-muted); }
 .mouvement p { margin: 8px 0 0; font-size: 14px; line-height: 1.45; color: var(--color-text-muted); }
 .mouvement p b { color: var(--color-text); font-weight: 600; }
-.pied { grid-column: 1 / 4; font-size: 12px; color: var(--color-text-muted); text-align: right; margin: 0; }
+.pied { grid-column: 1 / 4; grid-row: 6; font-size: 12px; color: var(--color-text-muted); text-align: right; margin: 0; }
 </style>
 </head>
 <body>
@@ -162,6 +174,8 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
   <section class="carte palette">
     <p class="etiquette">Palette de l’interface · rôle et contraste</p>
     <div class="nuancier" id="nuancier"></div>
+    <div class="valeurs" id="valeurs"></div>
+    <p class="note">Structure des valeurs (luminance, comme en niveaux de gris)&nbsp;: la nuit et ses surfaces restent sombres, le texte, l’accent et les couleurs des joueurs ressortent.</p>
   </section>
 
   <section class="carte joueurs">
@@ -180,49 +194,44 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
     <div class="echelle" id="echelle"></div>
   </section>
 
-  <section class="systeme">
-    <div class="carte">
-      <p class="etiquette">Espaces · rayons · élévations sans flou</p>
-      <div class="reglet" id="reglet"></div>
-      <div class="rayons">
-        <div style="border-radius:var(--radius-small)">8</div><div style="border-radius:var(--radius-medium)">14</div><div style="border-radius:var(--radius-large)">22</div><div style="border-radius:var(--radius-pill)">capsule</div>
-      </div>
-      <div class="elevations">
-        <div style="background:var(--color-surface);box-shadow:var(--elevation-1)">niveau 1</div>
-        <div style="background:var(--color-surface-raised);box-shadow:var(--elevation-2)">niveau 2</div>
-        <div style="background:var(--color-surface);box-shadow:var(--elevation-3)">niveau 3</div>
-      </div>
-    </div>
-    <div class="carte">
-      <p class="etiquette">Icônes · grille de 24, trait de 1,75</p>
-      <div class="grille-icones" id="icones"></div>
-    </div>
+  <section class="carte icones-carte">
+    <p class="etiquette">Icônes · grille de 24, trait de 1,75, un point plein en signature</p>
+    <div class="grille-icones" id="icones"></div>
   </section>
 
-  <section class="composants">
-    <div class="carte">
-      <p class="etiquette">Boutons · repos, survol, focus clavier, pressé, inactif</p>
-      <div class="rangee">
-        <div><span class="btn btn-p"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">repos</span></div>
-        <div><span class="btn btn-p survol"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">survol</span></div>
-        <div><span class="btn btn-p focus"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">focus</span></div>
-        <div><span class="btn btn-p presse"><svg class="ico"><use href="#icon-host"/></svg>Héberger</span><span class="etat">pressé</span></div>
-      </div>
-      <div class="rangee">
-        <div><span class="btn btn-s"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">repos</span></div>
-        <div><span class="btn btn-s survol"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">survol</span></div>
-        <div><span class="btn btn-s focus"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">focus</span></div>
-        <div><span class="btn inactif"><svg class="ico"><use href="#icon-join"/></svg>Rejoindre</span><span class="etat">inactif</span></div>
-      </div>
-      <div class="rangee">
+  <section class="carte systeme">
+    <p class="etiquette">Espaces · rayons · traits · élévations sans flou</p>
+    <div><h4>Espaces, pas de 4 px</h4><div class="reglet" id="reglet"></div></div>
+    <div><h4>Rayons</h4><div class="rayons">
+      <div style="border-radius:var(--radius-small)">8</div><div style="border-radius:var(--radius-medium)">14</div><div style="border-radius:var(--radius-large)">22</div><div style="border-radius:var(--radius-pill)">capsule</div>
+    </div></div>
+    <div><h4>Traits</h4><div class="traits">
+      <figure><div style="box-shadow:inset 0 0 0 var(--stroke-hairline) var(--color-hairline)"></div>filet 1</figure>
+      <figure><div style="border:var(--stroke-component) solid var(--color-outline)"></div>contour 2</figure>
+      <figure><div style="background:var(--color-surface-raised);outline:var(--stroke-focus) solid var(--color-focus);outline-offset:var(--stroke-focus-offset)"></div>focus 3</figure>
+    </div></div>
+    <div><h4>Élévations</h4><div class="elevations">
+      <div style="background:var(--color-surface);box-shadow:var(--elevation-1)">niveau 1</div>
+      <div style="background:var(--color-surface-raised);box-shadow:var(--elevation-2)">niveau 2</div>
+      <div style="background:var(--color-surface);box-shadow:var(--elevation-3)">niveau 3</div>
+    </div></div>
+  </section>
+
+  <section class="carte boutons">
+      <p class="etiquette">Boutons, puces, champ, notification</p>
+      <div class="etats" id="etats"></div>
+      <div class="rangee" style="margin-top:14px">
         <span class="puce"><svg class="ico" style="color:var(--color-success)"><use href="#icon-ready"/></svg>C’est parti</span>
         <span class="puce"><svg class="ico" style="color:var(--color-text-muted)"><use href="#icon-not-yet"/></svg>Pas encore</span>
         <span class="puce"><svg class="ico" style="color:var(--color-error)"><use href="#icon-warning"/></svg>Connexion perdue</span>
+      </div>
+      <div class="rangee">
         <div class="champ"><label>Pseudo</label><span class="focus">Camille</span></div>
       </div>
       <div class="notif"><svg class="ico" style="color:var(--color-success)"><use href="#icon-success"/></svg><span><b>Sacha est là.</b> Vous pouvez jouer ensemble.</span></div>
-    </div>
-    <div>
+  </section>
+
+  <section class="pause-bloc">
       <div class="pause">
         <svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg>
         <div class="voile"></div>
@@ -236,23 +245,21 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
         <span class="indice">Échap&nbsp;: pause</span>
       </div>
       <p class="etiquette" style="margin:10px 0 0">Superposition en partie · voile sur le jeu figé, panneau opaque, aucun flou</p>
-    </div>
   </section>
 
-  <section class="cote">
-    <div class="carte">
-      <p class="etiquette">Encadrer les jeux</p>
+  <section class="carte encadrer">
+      <p class="etiquette">Encadrer les jeux · 16:9, liseré fin, focus hors de l’image</p>
       <div class="vignettes">
         <figure class="focus"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-2d"/></svg>Jeu en 2D</figure>
         <figure><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-3d"/></svg>Jeu en 3D</figure>
         <figure><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><use href="#v-iso"/></svg>Isométrique</figure>
       </div>
-    </div>
-    <div class="carte mouvement">
+  </section>
+
+  <section class="carte mouvement">
       <p class="etiquette">Mouvement · se trouver, puis graviter</p>
       <div class="temps" id="temps"></div>
       <p><b>150 ms</b> fondus et survols · <b>300 ms</b> panneaux · <b>600 ms</b> rapprochement des astres · <b>4 s</b> un tour d’orbite. Courbe douce, jamais de rebond, seulement <code>transform</code> et <code>opacity</code>. Avec «&nbsp;Réduire les animations&nbsp;»&nbsp;: tout reste fixe.</p>
-    </div>
   </section>
 
   <p class="pied">Planche générée par outils/rendre-planches.cjs depuis jetons.css, joueurs.json, les sprites et les fichiers d’icônes du dossier design/identite/b · polices OFL embarquées · 2026-10-30</p>
@@ -280,6 +287,16 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
   ];
   document.getElementById('nuancier').innerHTML = nuances.map(([k, n, r]) => `<div class="nuance"><i style="background:var(--color-${k});${k === 'bg' ? 'box-shadow:inset 0 0 0 1px var(--color-line)' : ''}"></i><div><b>${n}</b><span class="hex">${C[k]}</span><small>${r}</small></div></div>`).join('');
 
+  const lin = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const enc = (v) => (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+  const gris = (hex) => {
+    const [r, g, b] = [1, 3, 5].map((i) => lin(parseInt(hex.slice(i, i + 2), 16) / 255));
+    const y = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return { hex: '#' + Math.round(enc(y) * 255).toString(16).padStart(2, '0').repeat(3), clair: y > 0.18 };
+  };
+  const valeurs = [['bg', C.bg], ['surface', C.surface], ['surf. haute', C['surface-raised']], ['trait', C.line], ['contour', C.outline], ['texte 2', C['text-muted']], ['texte', C.text], ['accent', C.accent], ...players.map((p) => [p.symbolName, p.color])];
+  document.getElementById('valeurs').innerHTML = valeurs.map(([n, h]) => { const g = gris(h); return `<i style="background:${g.hex};color:${g.clair ? '#0E1126' : '#F3F1FA'}">${n}</i>`; }).join('');
+
   document.getElementById('joueurs').innerHTML = players.map((p) => `<div class="joueur">${Duo.jeton(p, 56)}<div><b>${p.label}</b><span class="hex">${p.color}</span><div class="petits">${Duo.jeton(p, 24)}${Duo.jeton(p, 16)}</div></div></div>`).join('');
   const w = mesures.players.worst;
   const noms = { normale: 'normale', protanopie: 'protanopie', deuteranopie: 'deutéranopie', tritanopie: 'tritanopie' };
@@ -302,9 +319,15 @@ h1 { font: 300 104px/0.95 var(--font-display); letter-spacing: -0.01em; margin: 
 
   document.getElementById('reglet').innerHTML = Object.entries(tokens.space).map(([k, v]) => `<figure><div style="width:${v};height:${v}"></div>${px(v)}</figure>`).join('');
   const icones = [['host', 'Héberger'], ['join', 'Rejoindre'], ['library', 'Jeux'], ['history', 'Historique'], ['settings', 'Réglages'], ['score', 'Score'], ['profile', 'Profil'],
-    ['ready', 'Prêt'], ['not-yet', 'Pas encore'], ['warning', 'Alerte'], ['error', 'Erreur'], ['info', 'Info'], ['pause', 'Pause'], ['resume', 'Reprendre'],
-    ['save', 'Enregistrer'], ['backup', 'Secours'], ['coop', 'Coopération'], ['versus', 'Affrontement'], ['network', 'Réseau'], ['download', 'Mise à jour'], ['key-cmd', 'Touche ⌘']];
+    ['ready', 'Prêt'], ['not-yet', 'Pas encore'], ['warning', 'Alerte'], ['error', 'Erreur'], ['info', 'Info'], ['success', 'Succès'], ['new', 'Nouveau'],
+    ['pause', 'Pause'], ['resume', 'Reprendre'], ['save', 'Enregistrer'], ['backup', 'Secours'], ['delete', 'Supprimer'], ['coop', 'Coopération'], ['versus', 'Affrontement'],
+    ['back', 'Retour'], ['close', 'Fermer'], ['fullscreen', 'Plein écran'], ['download', 'Mise à jour'], ['network', 'Réseau'], ['computer', 'Ordinateur'], ['display', 'Affichage'],
+    ['sound', 'Son'], ['keyboard', 'Clavier'], ['key-cmd', 'Touche ⌘'], ['arrow-left', 'Gauche'], ['arrow-right', 'Droite'], ['arrow-up', 'Haut'], ['arrow-down', 'Bas']];
   document.getElementById('icones').innerHTML = icones.map(([id, n]) => `<figure><svg class="ico"><use href="#icon-${id}"/></svg>${n}</figure>`).join('');
+
+  const btn = (cls, icone, texte) => `<span class="btn ${cls}"><svg class="ico"><use href="#icon-${icone}"/></svg>${texte}</span>`;
+  document.getElementById('etats').innerHTML = [['repos', '', ''], ['survol', 'survol', 'survol'], ['focus', 'focus', 'focus'], ['pressé, inactif', 'presse', 'inactif']]
+    .map(([n, p, sec]) => `<span>${n}</span>${btn('btn-p ' + p, 'host', 'Héberger')}${btn(sec === 'inactif' ? 'inactif' : 'btn-s ' + sec, 'join', 'Rejoindre')}`).join('');
 
   const a = players[0];
   const b = players[1];

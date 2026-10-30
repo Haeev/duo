@@ -349,7 +349,7 @@ def _annonce(priorite=2, **kw):
 
 
 SONS: list[Son] = [
-    Son("focus", "focus", "Déplacement du focus (Tab, flèches, survol)", focus, 3, -28.0,
+    Son("focus", "focus", "Déplacement du focus au clavier (Tab, flèches)", focus, 3, -28.0,
         "discret", REVERBE_DISCRET, _discret(hauteur=0.03, gain_db=1.5, intervalle_ms=45, relance=True), NAV),
     Son("confirm", "valider", "Validation (Entrée, Espace, clic sur un bouton)", confirm, 3, -18.0,
         "reponse", REVERBE_REPONSE, _reponse(hauteur=0.015, gain_db=1.0, intervalle_ms=80, stereo="self"), NAV),
