@@ -1,0 +1,136 @@
+{
+  "version": 1,
+  "items": [
+    { "id": "radish_seed", "name": "sachet de graines de radis", "plural": "sachets de graines de radis", "category": "seed", "stack": 99, "buyPrice": 6, "sellPrice": null, "shop": "grocery", "model": "seed_packet_radish", "plants": "radish", "tier": "P0" },
+    { "id": "lettuce_seed", "name": "sachet de graines de laitue", "plural": "sachets de graines de laitue", "category": "seed", "stack": 99, "buyPrice": 8, "sellPrice": null, "shop": "grocery", "model": "seed_packet_lettuce", "plants": "lettuce", "tier": "P0" },
+    { "id": "carrot_seed", "name": "sachet de graines de carotte", "plural": "sachets de graines de carotte", "category": "seed", "stack": 99, "buyPrice": 12, "sellPrice": null, "shop": "grocery", "model": "seed_packet_carrot", "plants": "carrot", "tier": "P0" },
+
+    { "id": "radish", "name": "radis", "plural": "radis", "category": "crop", "stack": 99, "buyPrice": null, "sellPrice": 7, "shop": null, "model": "radish", "qualities": ["ordinary", "fine"], "tier": "P0" },
+    { "id": "lettuce", "name": "laitue", "plural": "laitues", "category": "crop", "stack": 99, "buyPrice": null, "sellPrice": 32, "shop": null, "model": "lettuce", "qualities": ["ordinary", "fine"], "tier": "P0" },
+    { "id": "carrot", "name": "carotte", "plural": "carottes", "category": "crop", "stack": 99, "buyPrice": null, "sellPrice": 16, "shop": null, "model": "carrot", "qualities": ["ordinary", "fine"], "tier": "P0" },
+    { "id": "dandelion", "name": "pissenlit", "plural": "pissenlits", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 4, "shop": null, "model": "dandelion", "tier": "P0" },
+    { "id": "egg", "name": "œuf", "plural": "œufs", "category": "animal_product", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "egg", "tier": "P0" },
+
+    { "id": "log", "name": "rondin", "plural": "rondins", "category": "material", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "log", "tier": "P0" },
+    { "id": "plank", "name": "planche", "plural": "planches", "category": "material", "stack": 99, "buyPrice": null, "sellPrice": 6, "shop": null, "model": "plank", "tier": "P0" },
+    { "id": "nail", "name": "clou", "plural": "clous", "category": "material", "stack": 99, "buyPrice": 2, "sellPrice": null, "shop": "grocery", "model": "nail_box", "tier": "P0" },
+    { "id": "mattress", "name": "matelas", "plural": "matelas", "category": "material", "stack": 1, "buyPrice": 120, "sellPrice": null, "shop": "grocery", "model": "mattress", "tier": "P0" },
+    { "id": "beam", "name": "poutre", "plural": "poutres", "category": "carried", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "beam", "carriedByTwo": true, "tier": "P0" },
+
+    { "id": "hoe", "name": "houe", "plural": "houes", "category": "tool", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "hoe", "tier": "P0" },
+    { "id": "watering_can", "name": "arrosoir", "plural": "arrosoirs", "category": "tool", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "watering_can", "capacity": 10, "tier": "P0" },
+    { "id": "axe", "name": "hache", "plural": "haches", "category": "tool", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "axe", "tier": "P0" },
+    { "id": "fishing_rod", "name": "canne à pêche", "plural": "cannes à pêche", "category": "tool", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "fishing_rod", "tier": "P1" },
+
+    { "id": "bread", "name": "pain", "plural": "pains", "category": "food", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "bread", "dish": "bread", "tier": "P0" },
+    { "id": "crunchy_radishes", "name": "radis à la croque-au-sel", "plural": "radis à la croque-au-sel", "category": "food", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "dish_radishes", "dish": "simple", "tier": "P0" },
+    { "id": "omelette", "name": "omelette", "plural": "omelettes", "category": "food", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "dish_omelette", "dish": "simple", "tier": "P0" },
+    { "id": "vegetable_soup", "name": "soupe de légumes", "plural": "soupes de légumes", "category": "food", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "dish_soup", "dish": "stew", "tier": "P0" },
+
+    { "id": "iron_box", "name": "boîte en fer", "plural": "boîtes en fer", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "iron_box", "tier": "P0" },
+    { "id": "riddle_card", "name": "carte d'Émile", "plural": "cartes d'Émile", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "riddle_card", "readText": "riddle_card_text", "tier": "P0" },
+    { "id": "shed_key", "name": "clé de la remise", "plural": "clés de la remise", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "shed_key", "tier": "P0" },
+    { "id": "old_photo", "name": "vieille photo de la halte", "plural": "vieilles photos de la halte", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "old_photo", "tier": "P0" },
+
+    { "id": "gudgeon", "name": "goujon", "plural": "goujons", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "fish_gudgeon", "tier": "P1" },
+    { "id": "chub", "name": "chevesne", "plural": "chevesnes", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 15, "shop": null, "model": "fish_chub", "tier": "P1" },
+    { "id": "trout", "name": "truite", "plural": "truites", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 30, "shop": null, "model": "fish_trout", "tier": "P1" },
+    { "id": "jay_feather", "name": "plume de geai", "plural": "plumes de geai", "category": "decoration", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "jay_feather", "footprint": { "w": 1, "d": 1 }, "comfort": 0, "beauty": 2, "tier": "P1" },
+
+    { "id": "straw_mattress", "name": "paillasse", "plural": "paillasses", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "straw_mattress", "footprint": { "w": 1, "d": 2 }, "comfort": 1, "beauty": 0, "bed": { "sleep": 50, "sleepers": 1 }, "tier": "P0" },
+    { "id": "double_bed", "name": "lit double", "plural": "lits doubles", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "double_bed", "footprint": { "w": 2, "d": 2 }, "comfort": 4, "beauty": 2, "bed": { "sleep": 85, "sleepers": 2 }, "tier": "P0" },
+    { "id": "table", "name": "table", "plural": "tables", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "table", "footprint": { "w": 2, "d": 1 }, "comfort": 2, "beauty": 1, "dining": true, "tier": "P0" },
+    { "id": "chair", "name": "chaise", "plural": "chaises", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "chair", "footprint": { "w": 1, "d": 1 }, "comfort": 1, "beauty": 1, "seat": true, "tier": "P0" },
+    { "id": "chest", "name": "coffre", "plural": "coffres", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "chest", "footprint": { "w": 1, "d": 1 }, "comfort": 0, "beauty": 1, "storage": "cellar", "tier": "P0" },
+    { "id": "shelf", "name": "étagère", "plural": "étagères", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "shelf", "footprint": { "w": 2, "d": 1 }, "comfort": 1, "beauty": 2, "tier": "P0" },
+    { "id": "stove", "name": "réchaud", "plural": "réchauds", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "stove", "footprint": { "w": 1, "d": 1 }, "comfort": 1, "beauty": 0, "station": "stove", "tier": "P0" },
+    { "id": "flower_pot", "name": "pot de fleurs", "plural": "pots de fleurs", "category": "furniture", "stack": 1, "buyPrice": 15, "sellPrice": null, "shop": "grocery", "model": "flower_pot", "footprint": { "w": 1, "d": 1 }, "comfort": 0, "beauty": 2, "tier": "P0" },
+    { "id": "oil_lamp", "name": "lampe à pétrole", "plural": "lampes à pétrole", "category": "furniture", "stack": 1, "buyPrice": 40, "sellPrice": null, "shop": "catalogue", "model": "oil_lamp", "footprint": { "w": 1, "d": 1 }, "comfort": 1, "beauty": 2, "light": true, "tier": "P0" },
+    { "id": "rug", "name": "tapis", "plural": "tapis", "category": "furniture", "stack": 1, "buyPrice": 60, "sellPrice": null, "shop": "catalogue", "model": "rug", "footprint": { "w": 2, "d": 2 }, "comfort": 2, "beauty": 2, "floor": true, "tier": "P0" },
+    { "id": "curtains", "name": "rideaux", "plural": "rideaux", "category": "furniture", "stack": 1, "buyPrice": 30, "sellPrice": null, "shop": "catalogue", "model": "curtains", "footprint": { "w": 1, "d": 1 }, "comfort": 1, "beauty": 2, "wall": true, "tier": "P0" },
+    { "id": "crystal_radio", "name": "poste à galène", "plural": "postes à galène", "category": "furniture", "stack": 1, "buyPrice": 120, "sellPrice": null, "shop": "catalogue", "model": "crystal_radio", "footprint": { "w": 1, "d": 1 }, "comfort": 1, "beauty": 2, "tier": "P0" }
+  ],
+  "recipes": [
+    { "id": "saw_plank", "name": "Scier des planches", "station": "workbench", "inputs": [{ "item": "log", "count": 1 }], "output": { "item": "plank", "count": 4 }, "seconds": 8, "requiresUnlock": false },
+    { "id": "craft_table", "name": "Table", "station": "workbench", "inputs": [{ "item": "plank", "count": 8 }], "output": { "item": "table", "count": 1 }, "seconds": 10, "requiresUnlock": true },
+    { "id": "craft_chair", "name": "Chaise", "station": "workbench", "inputs": [{ "item": "plank", "count": 4 }], "output": { "item": "chair", "count": 1 }, "seconds": 6, "requiresUnlock": true },
+    { "id": "craft_shelf", "name": "Étagère", "station": "workbench", "inputs": [{ "item": "plank", "count": 6 }], "output": { "item": "shelf", "count": 1 }, "seconds": 8, "requiresUnlock": true },
+    { "id": "craft_double_bed", "name": "Lit double", "station": "workbench", "inputs": [{ "item": "plank", "count": 16 }, { "item": "mattress", "count": 1 }], "output": { "item": "double_bed", "count": 1 }, "seconds": 16, "requiresUnlock": true },
+    { "id": "cook_crunchy_radishes", "name": "Radis à la croque-au-sel", "station": "stove", "inputs": [{ "item": "radish", "count": 3 }], "output": { "item": "crunchy_radishes", "count": 2 }, "seconds": 3, "requiresUnlock": false },
+    { "id": "cook_omelette", "name": "Omelette", "station": "stove", "inputs": [{ "item": "egg", "count": 3 }], "output": { "item": "omelette", "count": 2 }, "seconds": 3, "requiresUnlock": false },
+    { "id": "cook_vegetable_soup", "name": "Soupe de légumes", "station": "stove", "inputs": [{ "item": "carrot", "count": 2 }, { "item": "radish", "count": 2 }, { "item": "lettuce", "count": 1 }], "output": { "item": "vegetable_soup", "count": 2 }, "seconds": 3, "requiresUnlock": true }
+  ],
+  "constructions": [
+    {
+      "id": "house_beam",
+      "name": "Poutre du toit",
+      "point": "house_beam_spot",
+      "kind": "carry",
+      "carry": { "item": "beam", "from": "beam_pickup" },
+      "elements": [],
+      "tier": "P0"
+    },
+    {
+      "id": "house_roof",
+      "name": "Toit de la maisonnette",
+      "point": "house_door",
+      "kind": "guided",
+      "requires": ["house_beam"],
+      "elements": [
+        { "id": "roof_1", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_2", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_3", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_4", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_5", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_6", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_7", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_8", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_9", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 },
+        { "id": "roof_10", "inputs": [{ "item": "plank", "count": 1 }], "seconds": 2 }
+      ],
+      "tier": "P0"
+    },
+    {
+      "id": "house_door",
+      "name": "Porte de la maisonnette",
+      "point": "house_door",
+      "kind": "guided",
+      "requires": [],
+      "elements": [
+        { "id": "door", "inputs": [{ "item": "plank", "count": 2 }], "seconds": 8 }
+      ],
+      "tier": "P0"
+    },
+    {
+      "id": "chicken_coop",
+      "name": "Poulailler",
+      "point": "chicken_coop",
+      "kind": "guided",
+      "requires": [],
+      "elements": [
+        { "id": "coop_floor", "inputs": [{ "item": "plank", "count": 2 }], "seconds": 4 },
+        { "id": "coop_wall_left", "inputs": [{ "item": "plank", "count": 2 }], "seconds": 4 },
+        { "id": "coop_wall_right", "inputs": [{ "item": "plank", "count": 2 }], "seconds": 4 },
+        { "id": "coop_roof", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 2 }], "seconds": 6 }
+      ],
+      "tier": "P0"
+    }
+  ],
+  "startingInventory": {
+    "cellar": [
+      { "item": "plank", "count": 12 }
+    ],
+    "eachPlayer": [
+      { "item": "hoe", "count": 1 },
+      { "item": "watering_can", "count": 1 }
+    ],
+    "houseFurniture": [
+      { "item": "straw_mattress", "count": 2 },
+      { "item": "chest", "count": 1 },
+      { "item": "stove", "count": 1 }
+    ]
+  },
+  "animals": [
+    { "id": "hen", "name": "poule", "plural": "poules", "model": "hen", "variants": ["hen_white", "hen_red", "hen_black"], "produces": { "item": "egg", "count": 1, "per": "day", "requires": "fed" }, "tier": "P0" }
+  ]
+}

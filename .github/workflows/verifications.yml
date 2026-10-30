@@ -1,0 +1,72 @@
+# Vérifications à chaque push (ADR 0011, section CI, et ADR 0013, point 5).
+# Linux seulement: les jobs macOS et Windows (systemes.yml) et la fabrication
+# des installateurs (publication.yml) viennent au lot L7.
+name: Vérifications
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verifications-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    name: Linux (contrôles, lint, types, tests, construction)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Corepack télécharge pnpm sans poser de question.
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Node de .nvmrc: son corepack (0.36) sait lancer pnpm 12, pas celui de Node 22.22.
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version du champ packageManager, par corepack)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Dossier du magasin pnpm
+        id: magasin
+        run: echo "dossier=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache du magasin pnpm
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.magasin.outputs.dossier }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Contrôle du dépôt (tirets, débogage, marqueurs, dépendances)
+        run: pnpm verifier
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Types
+        run: pnpm typecheck
+
+      - name: Tests unitaires
+        run: pnpm test
+
+      - name: Construction
+        run: pnpm build

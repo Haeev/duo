@@ -31,3 +31,21 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Une release devient « Latest » automatiquement (date et version) sauf `gh release create --latest=false`. `releases/latest/download/<fichier>` donne un lien direct stable.
 - Releases immuables: plus aucun fichier modifiable après publication (les brouillons restent modifiables).
 - `macos-latest` = macOS 26 arm64; `windows-latest` = Windows Server 2025 x64, pas Windows 11 (langue non documentée dans le README de l'image); `windows-11-arm` est arm64. Runners standard gratuits pour un dépôt public.
+
+## pnpm 12 et corepack (vérifié le 2026-10-30)
+
+- pnpm 12 est un binaire natif (Rust): le paquet npm `pnpm` porte `bin/pnpm.mjs` et récupère le binaire `@pnpm/exe.<os>-<arch>` au premier lancement.
+- corepack 0.34.x (Node 22.22.0 de l'environnement cloud) cherche `bin/pnpm.cjs`: `MODULE_NOT_FOUND` avec pnpm 12. corepack 0.36.0 (livré avec Node 22.23.4) sait le lancer: d'où `.nvmrc` à 22.23.4 et `corepack enable` en CI. Dans l'environnement cloud, ne pas activer corepack: le pnpm 10.28 global lit `packageManager` et bascule seul sur 12.16.1.
+- pnpm 11 et plus: réglages dans `pnpm-workspace.yaml` (`.npmrc` ne sert plus qu'à l'authentification et au registre); `allowBuilds` remplace `onlyBuiltDependencies`; pnpm 12 refuse une clé inconnue (`ERR_PNPM_UNRECOGNIZED_WORKSPACE_SETTINGS`).
+- Délai de publication par défaut d'un jour: une version plus jeune est admise, et pnpm l'inscrit tout seul dans `minimumReleaseAgeExclude` de `pnpm-workspace.yaml`.
+- `catalog:` fonctionne aussi dans `peerDependencies`. `pnpm --recursive` n'inclut pas la racine: la racine peut orchestrer sans boucle.
+
+## Outillage du dépôt
+
+- Outil d'écriture de fichiers: un échappement Unicode (barre oblique inverse, `u`, puis les quatre chiffres hexadécimaux) écrit dans le contenu devient le caractère réel. Pour les tirets interdits, écrire `String.fromCharCode(0x2014)`; `\0` et `\\` restent intacts. Relancer le grep de CLAUDE.md après chaque écriture.
+- TypeScript écarte `x.js` du programme quand `x.d.ts` est à côté: lint typé en échec (« not found by the project service »). Ranger les déclarations dans `types/`.
+- `explicit-module-boundary-types` ne lit pas le JSDoc: la couper pour les fichiers JavaScript vérifiés par `checkJs`.
+- ESLint 10 cherche la configuration depuis le dossier de chaque fichier: un `eslint.config.js` par paquet.
+- Vitest 5: `vite` est une dépendance pair obligatoire; `vitest run` sans aucun fichier de test sort en code 1.
+- Actions (relevé sur raw.githubusercontent.com): `actions/checkout@v7`, `actions/setup-node@v7` (cache pnpm seulement si pnpm est déjà installé), `actions/cache@v6`, `pnpm/action-setup@v6`; toutes en `node24`. actionlint 1.7.12 et shellcheck 0.11.0 se téléchargent depuis leurs releases GitHub (empreintes publiées).
+- Simuler la CI: Node de `.nvmrc` depuis nodejs.org (SHASUMS256), `corepack enable` dans son dossier, copie propre du dépôt, `pnpm install --frozen-lockfile`.

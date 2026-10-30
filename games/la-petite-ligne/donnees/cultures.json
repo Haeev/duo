@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "rules": {
+    "growth": "Chaque matin à 6 h, une culture avance d'un jour si elle a été arrosée la veille (arrosoir ou pluie). Sinon elle attend, sans dépérir.",
+    "quality": "Une culture arrosée chaque jour de sa pousse donne la qualité fine (« belle »); sinon la qualité ordinary.",
+    "harvest": "Une culture mûre se récolte d'un clic; la case redevient terre bêchée, prête à être resemée.",
+    "removal": "Arracher une culture non mûre rend son sachet de graines."
+  },
+  "qualities": [
+    { "id": "ordinary", "name": "ordinaire", "priceMultiplier": 1.0 },
+    { "id": "fine", "name": "belle", "priceMultiplier": 1.5 }
+  ],
+  "cellStates": [
+    { "id": "grass", "name": "herbe", "model": "garden_cell_grass" },
+    { "id": "tilled", "name": "terre bêchée", "model": "garden_cell_tilled" },
+    { "id": "tilled_wet", "name": "terre bêchée et arrosée", "model": "garden_cell_tilled_wet" }
+  ],
+  "crops": [
+    {
+      "id": "radish",
+      "name": "radis",
+      "seed": "radish_seed",
+      "harvest": "radish",
+      "growthDays": 2,
+      "yieldPerCell": 3,
+      "regrows": false,
+      "needsWaterDaily": true,
+      "seasons": ["spring"],
+      "stagesByDay": ["seed", "sprout", "ripe"],
+      "models": { "seed": "radish_stage_seed", "sprout": "radish_stage_sprout", "young": "radish_stage_young", "ripe": "radish_stage_ripe" },
+      "tier": "P0"
+    },
+    {
+      "id": "lettuce",
+      "name": "laitue",
+      "seed": "lettuce_seed",
+      "harvest": "lettuce",
+      "growthDays": 3,
+      "yieldPerCell": 1,
+      "regrows": false,
+      "needsWaterDaily": true,
+      "seasons": ["spring"],
+      "stagesByDay": ["seed", "sprout", "young", "ripe"],
+      "models": { "seed": "lettuce_stage_seed", "sprout": "lettuce_stage_sprout", "young": "lettuce_stage_young", "ripe": "lettuce_stage_ripe" },
+      "tier": "P0"
+    },
+    {
+      "id": "carrot",
+      "name": "carotte",
+      "seed": "carrot_seed",
+      "harvest": "carrot",
+      "growthDays": 4,
+      "yieldPerCell": 3,
+      "regrows": false,
+      "needsWaterDaily": true,
+      "seasons": ["spring"],
+      "stagesByDay": ["seed", "sprout", "young", "young", "ripe"],
+      "models": { "seed": "carrot_stage_seed", "sprout": "carrot_stage_sprout", "young": "carrot_stage_young", "ripe": "carrot_stage_ripe" },
+      "tier": "P0"
+    }
+  ]
+}
