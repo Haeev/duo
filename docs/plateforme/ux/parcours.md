@@ -8,6 +8,7 @@
 | Rédigé par | ux-ui-designer |
 | Source | `docs/plateforme/cahier-des-charges.md` (brouillon v0.1), sections 1 à 5 |
 | Wireframes | `design/maquettes/plateforme-wireframes/` (un fichier HTML par écran clé, captures dans `captures/`, planche `planche.png`) |
+| Vérifications | `node design/maquettes/plateforme-wireframes/capturer.js` (captures et planche), `verifier-mise-en-page.js` (débordements et contrastes), `verifier-clavier.js` (clavier seul et comptage des actions) |
 
 Ce document décrit les sept parcours de la section 2 du cahier des charges: étapes, écrans traversés, transitions, touches, états et textes exacts. La liste des écrans et la couverture des fonctions F01 à F13 sont en sections 10 et 11.
 
@@ -46,7 +47,7 @@ Le genre des joueurs n'est pas connu et ne sera pas demandé. Aucun texte ne s'a
 ### 0.3 Typographie de l'interface
 
 - Espace insécable (U+00A0) avant « : » et à l'intérieur des guillemets « »; espace fine insécable (U+202F) avant « ; », « ! », « ? » et « % ». Les textes de ce document sont écrits avec des espaces ordinaires pour rester lisibles; les wireframes HTML portent les vraies espaces insécables. Proposition pour ingenieur-build: un test qui refuse une espace ordinaire devant ces signes dans le fichier de textes.
-- Points de suspension en un seul caractère (…). Apostrophe typographique (’) dans l'interface.
+- Points de suspension en un seul caractère (…). Apostrophe typographique (’) dans l'interface. « Wi-Fi » s'écrit avec un trait d'union insécable (U+2011) pour ne jamais être coupé en fin de ligne.
 - Heures « 21 h 40 », dates « mardi 28 octobre », durées « 6 min », « 1 h 12 », « 3 min 12 s ». Plages « 20 à 40 min », jamais avec un tiret.
 - Jamais de tiret cadratin ni demi-cadratin: deux-points, parenthèses, virgule, point médian (·) entre des informations courtes, ou nouvelle phrase.
 - Majuscule seulement au début d'un libellé: « Héberger une partie ».
@@ -94,7 +95,7 @@ Règles:
 |---|---|
 | Barre du haut | « Duo », onglets Accueil, Bibliothèque, Historique, Réglages; à droite, la présence de l'autre (« Sacha est là ») et ton symbole avec ton pseudo. Masquée dans le salon et en partie |
 | Carte de joueur | symbole, pseudo, « (toi) », rôle (« héberge »), puce d'état. La puce a une icône et un texte, jamais une couleur seule |
-| Puces d'état | « C'est parti » (coche), « Pas encore » (sablier), « En attente… », « Veut reprendre », « Veut rejouer », « Connexion perdue » (triangle d'alerte) |
+| Puces d'état | « C'est parti » (coche), « Pas encore » (sablier), « En attente… », « En pause », « Veut reprendre », « Dans les réglages », « Veut rejouer » (ou « Veut continuer » quand le jeu renomme le bouton en « Niveau suivant »: la puce reprend toujours le libellé du bouton), « Attend dans le salon », « Connexion perdue » (triangle d'alerte) |
 | Bandeau d'invitation | en haut au centre, par-dessus tout écran hors partie. Prend le focus sur « Rejoindre », sauf si un champ de texte est en cours de saisie: il attend que le champ soit quitté. Entrée rejoint, Échap met de côté (l'invitation reste dans l'accueil). Signal sonore discret (sound-designer) |
 | Notification | en haut à droite, 6 s, ne prend pas le focus, annoncée aux lecteurs d'écran (`aria-live`). Celles qui proposent une action restent jusqu'à ce qu'on les ferme |
 | Fenêtre de confirmation | titre en question, conséquence en une phrase, deux boutons: l'action (verbe précis, jamais « OK ») et le retour (« Rester », « Continuer à jouer »). Échap choisit le retour |
@@ -103,6 +104,8 @@ Règles:
 | Indicateur d'enregistrement | « Progression enregistrée », 2 s, coin bas droit, pendant la partie, quand le jeu enregistre |
 
 Transitions entre écrans: fondu de 150 ms; aucune avec « Réduire les animations ».
+
+Images décoratives (vignettes des jeux, symboles à côté d'un pseudo déjà écrit): masquées aux lecteurs d'écran (`aria-hidden`), pour que le nom d'une carte de jeu se lise « Exemple coop, Coopération, 20 à 40 min, 2 sauvegardes ».
 
 ### 0.7 Les états à prévoir sur chaque écran
 
@@ -278,7 +281,7 @@ Raccourci « Reprendre » sur l'accueil (dernier jeu et dernière sauvegarde): E
 | E05 Accueil | Tab, Entrée | sans effet |
 | E06 Invitation | Entrée: rejoindre. Tab: Plus tard | Plus tard (l'invitation reste dans l'accueil, bloc Rejoindre) |
 | E07 Bibliothèque | flèches dans la grille, Entrée sur un jeu: héberger. Tab: fiche du jeu | retour à l'accueil |
-| E08 Salon hôte | Entrée sur « C'est parti ! » (bascule avec « Pas encore »). Tab: Changer de jeu, Sauvegarde (flèches), Commandes | « Fermer le salon ? » si Sacha est dans le salon, sinon fermeture directe |
+| E08 Salon hôte | Entrée sur « C'est parti ! » (bascule avec « Pas encore »). Tab: Changer de jeu, Sauvegarde (flèches haut et bas), Fermer le salon. Le bloc Commandes est une information, sans arrêt de tabulation | « Fermer le salon ? » si Sacha est dans le salon, sinon fermeture directe |
 | E08 Salon invité | Entrée sur « Pas encore » ou « C'est parti ! » (bascule) | « Quitter le salon ? » |
 | compte à rebours | Entrée ou Échap sur « Pas encore »: annule | annule |
 | E09 Chargement | aucune; « Revenir au salon » apparaît si le chargement est long | sans effet |
@@ -358,6 +361,7 @@ Deux salons ouverts en même temps: chacun reçoit l'invitation de l'autre. Le p
 | E08 | sans sauvegarde | Ce jeu ne garde pas de sauvegarde : chaque partie repart de zéro. |
 | E08 | bouton hôte | Changer de jeu |
 | E08 | bloc | Commandes |
+| E08 hôte | notification après un changement de sauvegarde | Nouveau choix envoyé à Sacha. |
 | E08 | notifications | Sacha a rejoint le salon. · Sacha a quitté le salon. · Camille a fermé le salon. · Camille a choisi une autre sauvegarde. · Camille a choisi un autre jeu : Exemple duel. · Sacha a demandé d'attendre. · Sacha est de retour. |
 | E08 | connexion perdue | Connexion perdue avec Sacha. Duo réessaie tout seul… |
 | E08 | compte à rebours | La partie commence dans 3 |
@@ -513,6 +517,7 @@ Tab ou flèches entre « Rejouer » et « Retour au salon », Entrée. Échap: �
 | premier score | Premier point au score cumulé ! |
 | coopération, bloc | Progression commune · Exemple coop |
 | coopération, ligne | Niveau 4 sur 10 débloqué · 12 parties ensemble |
+| puce coopération | Veut continuer |
 | confirmations | Partie enregistrée dans votre historique. · Progression enregistrée. |
 | copie en attente | Résultats enregistrés sur cet ordinateur. Ils seront copiés chez Sacha à votre prochaine connexion. |
 | disque plein | Impossible d'enregistrer la partie : le disque est plein. Libère de la place ; Duo garde les résultats et réessaie. |
@@ -559,7 +564,7 @@ Tab: filtre, tableau des jeux, liste des parties, « Afficher plus ». Flèches 
 | aide | Jeux en affrontement, toutes parties confondues |
 | égalités | 3 égalités |
 | colonnes | Jeu · Type · Camille · Sacha · Égalités · Dernière partie |
-| ligne coopération | Progression : niveau 4 sur 10 · 12 parties |
+| ligne coopération | Niveau 4 sur 10 · 12 parties |
 | bloc | Dernières parties |
 | exemple de ligne | Aujourd'hui à 21 h 40 · Jeu témoin · 3 min · Sacha a gagné 12 à 9 |
 | bouton | Afficher 20 parties de plus |
@@ -640,6 +645,7 @@ Contenu des onglets:
 | Touches | colonnes | Action · Touche |
 | Touches | bouton | Modifier |
 | Touches | capture | Appuie sur la nouvelle touche pour « Avancer ». Échap : annuler. |
+| Touches | bouton pendant la capture | Annuler |
 | Touches | touche prise | Z sert déjà à « Avancer ». Échanger les deux touches ? · Échanger · Annuler |
 | Touches | touche réservée | Échap sert à mettre en pause dans tous les jeux. Choisis une autre touche. |
 | Touches | ligne réservée | Pause · Échap (réservée) |
@@ -701,7 +707,8 @@ Notification: elle ne prend pas le focus. Tab l'atteint en dernier; Entrée sur 
 | notification | Nouveau jeu : Exemple duel est dans la bibliothèque. · Voir |
 | notification de mise à jour | Jeu témoin a été mis à jour (version 1.1). · Voir |
 | badges | Nouveau · Mis à jour · Pas encore jouable |
-| téléchargement | Téléchargement : 45 % |
+| téléchargement, carte | Pas encore jouable · 45 % (avec une barre de progression) |
+| téléchargement, fiche | Téléchargement : 45 %. Duo l'installe tout seul, et Sacha le reçoit de son côté. |
 | échec | Téléchargement interrompu : Exemple duel. Duo réessaiera tout seul. · Réessayer maintenant |
 | fichier abîmé | Le fichier téléchargé était abîmé. Duo recommence le téléchargement. |
 | disque plein | Il manque 120 Mo sur le disque pour installer Exemple duel. Libère de la place, puis réessaie. · Réessayer |
@@ -777,7 +784,7 @@ Tab: vérifications et leurs boutons, puis « Relancer les vérifications », pu
 | boutons | Ouvrir les paramètres réseau · Ouvrir le pare-feu · Ouvrir les Réglages Système · Relancer les vérifications |
 | bloc | Se connecter avec une adresse |
 | aide | L'adresse s'affiche sur l'autre ordinateur, dans Réglages > Réseau, et dans son salon. |
-| champ | Adresse de l'autre ordinateur (exemple : 192.168.1.42) |
+| champ | Adresse de l'autre ordinateur (exemple : 192.168.1.42). L'exemple montre toujours une adresse de l'autre ordinateur, jamais celle de l'ordinateur où l'on tape |
 | bouton | Se connecter |
 | adresse de cet ordinateur | Adresse de cet ordinateur : 192.168.1.23 |
 | mal écrite | Ce n'est pas une adresse valide. Exemple : 192.168.1.42 |
@@ -823,7 +830,7 @@ Les deux ordinateurs comparent leurs versions dès qu'ils se voient (et pas seul
 | E14 | Fin de partie | résultat, scores, score cumulé, rejouer ou revenir au salon | F05, F08, F09, F07 | Rejouer | `fin-de-partie.html` (état `#cooperation`) |
 | E15 | Historique et scores | score cumulé, scores par jeu, dernières parties | F08, F09 | filtre Jeu | `historique.html` |
 | E16 | Réglages | profil, son, affichage, touches, réseau, à propos | F01, F10, F02 | onglet Profil | `reglages.html` (état `#touches`) |
-| E17 | Diagnostic et connexion avec une adresse | dire pourquoi l'autre n'apparaît pas et comment corriger | F02, F13 | Relancer les vérifications | `diagnostic.html` (état `#macos`) |
+| E17 | Diagnostic et connexion avec une adresse | dire pourquoi l'autre n'apparaît pas et comment corriger | F02, F13 | le bouton du premier problème trouvé, sinon Relancer les vérifications | `diagnostic.html` (état `#macos`) |
 | E18 | Messages de versions | dire qui doit mettre à jour quoi, et le faire en un bouton | F13 | le bouton de mise à jour | dans `accueil.html#versions` et la section 9 |
 | E19 | Nouveau jeu (notification et cartes) | annoncer et montrer les jeux reçus | F12 | Voir | cartes de `bibliotheque.html` |
 
@@ -855,7 +862,7 @@ Une action est un appui sur Entrée ou un clic qui fait avancer le parcours. Se 
 | Hôte | accueil, bloc Reprendre | 1. Héberger cette partie · 2. C'est parti ! | 2 |
 | Invité | n'importe quel écran hors partie | 1. Rejoindre (focus par défaut dans le bandeau) | 1 |
 
-La partie démarre après le compte à rebours de 3 s, sans autre action. Preuve: `node design/maquettes/plateforme-wireframes/verifier-clavier.js` rejoue ces séquences au clavier seul sur les wireframes.
+La partie démarre après le compte à rebours de 3 s, sans autre action. Preuve: `node design/maquettes/plateforme-wireframes/verifier-clavier.js` rejoue ces séquences au clavier seul sur les wireframes (fenêtre 1280x720), avec l'ordre de tabulation, la visibilité du focus, Échap et l'anti-double-appui. Résultat du 2026-10-30: 38 vérifications, 0 échec.
 
 ## 13. Dépendances et points à trancher avec l'équipe
 

@@ -17,7 +17,7 @@ const ECRANS = [
   ['premier-lancement-profil', 'premier-lancement.html#profil', 'E02 Profil'],
   ['premier-lancement-reseau-macos', 'premier-lancement.html#reseau-macos', 'E03 Autorisation réseau, macOS'],
   ['premier-lancement-reseau-windows', 'premier-lancement.html#reseau-windows', 'E03 Autorisation réseau, Windows'],
-  ['premier-lancement-recherche', 'premier-lancement.html#recherche', 'E04 Recherche de l’autre ordinateur'],
+  ['premier-lancement-recherche', 'premier-lancement.html#recherche', 'E04 Recherche, après 30 s sans réponse'],
   ['premier-lancement-trouve', 'premier-lancement.html#trouve', 'E04 L’autre ordinateur est trouvé'],
   ['accueil', 'accueil.html#normal', 'E05 Accueil (vu par Camille)'],
   ['accueil-invitation', 'accueil.html#invitation', 'E06 Invitation reçue (vu par Sacha)'],

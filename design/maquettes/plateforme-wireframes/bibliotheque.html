@@ -27,7 +27,7 @@
     position: absolute; top: 18px; left: 18px;
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--encre); color: #fff;
-    border-radius: 999px; padding: 2px 10px 2px 6px;
+    border-radius: 999px; padding: 2px 10px;
     font-size: 14px; font-weight: 700;
     z-index: 2;
   }
@@ -71,27 +71,27 @@
       <div class="biblio">
         <div class="grille-jeux" id="grille" role="group" aria-label="Jeux installés">
           <button class="carte-jeu choisie" data-cellule data-jeu="coop" data-aller="salon-hote.html#attente" data-focus tabindex="0">
-            <span class="vignette"><span>Vignette</span></span>
+            <span class="vignette" aria-hidden="true"><span>Vignette</span></span>
             <span class="nom-jeu">Exemple coop</span>
             <span class="meta">Coopération · 20 à 40 min</span>
             <span class="meta">2 sauvegardes</span>
           </button>
           <button class="carte-jeu" data-cellule data-jeu="temoin" data-aller="salon-hote.html#attente" tabindex="-1">
             <span class="badge clair">Mis à jour</span>
-            <span class="vignette"><span>Vignette</span></span>
+            <span class="vignette" aria-hidden="true"><span>Vignette</span></span>
             <span class="nom-jeu">Jeu témoin</span>
             <span class="meta">Affrontement · 3 min</span>
             <span class="meta">Pas de sauvegarde</span>
           </button>
           <button class="carte-jeu" data-cellule data-jeu="duel" data-aller="salon-hote.html#attente" tabindex="-1">
-            <span class="badge"><span class="icone" data-icone="nouveau"></span>Nouveau</span>
-            <span class="vignette"><span>Vignette</span></span>
+            <span class="badge">Nouveau</span>
+            <span class="vignette" aria-hidden="true"><span>Vignette</span></span>
             <span class="nom-jeu">Exemple duel</span>
             <span class="meta">Affrontement · 5 à 10 min</span>
             <span class="meta">Pas de sauvegarde</span>
           </button>
           <button class="carte-jeu" data-cellule data-jeu="iso" aria-disabled="true" tabindex="-1">
-            <span class="vignette"><span>Vignette</span></span>
+            <span class="vignette" aria-hidden="true"><span>Vignette</span></span>
             <span class="nom-jeu">Exemple iso</span>
             <span class="meta">Pas encore jouable · 45 %</span>
             <span class="progression" aria-hidden="true"><span style="width: 45%"></span></span>
@@ -100,7 +100,7 @@
 
         <aside aria-label="Fiche du jeu">
           <section class="fiche" data-fiche="coop">
-            <div class="vignette"><span>Grande vignette</span></div>
+            <div class="vignette" aria-hidden="true"><span>Grande vignette</span></div>
             <h2>Exemple coop</h2>
             <p class="meta">Coopération · 2 joueurs · 20 à 40 min</p>
             <p>Description fournie par le jeu, en deux phrases au plus. Ce qu’on y fait ensemble et ce qui le rend amusant.</p>
@@ -115,7 +115,7 @@
             <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
           </section>
           <section class="fiche" data-fiche="temoin" hidden>
-            <div class="vignette"><span>Grande vignette</span></div>
+            <div class="vignette" aria-hidden="true"><span>Grande vignette</span></div>
             <h2>Jeu témoin</h2>
             <p class="meta">Affrontement · 2 joueurs · 3 min</p>
             <p>Le mini-jeu qui vérifie que tout marche : réseau, touches, son et historique.</p>
@@ -126,7 +126,7 @@
             <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
           </section>
           <section class="fiche" data-fiche="duel" hidden>
-            <div class="vignette"><span>Grande vignette</span></div>
+            <div class="vignette" aria-hidden="true"><span>Grande vignette</span></div>
             <h2>Exemple duel</h2>
             <p class="meta">Affrontement · 2 joueurs · 5 à 10 min</p>
             <p>Description fournie par le jeu, en deux phrases au plus.</p>
@@ -134,7 +134,7 @@
             <button class="bouton principal grand" data-aller="salon-hote.html#attente">Héberger ce jeu</button>
           </section>
           <section class="fiche" data-fiche="iso" hidden>
-            <div class="vignette"><span>Grande vignette</span></div>
+            <div class="vignette" aria-hidden="true"><span>Grande vignette</span></div>
             <h2>Exemple iso</h2>
             <p class="meta">Coopération · 2 joueurs · 30 min</p>
             <p class="fort">Pas encore jouable</p>
