@@ -14,7 +14,15 @@
 // lui-même.
 
 import { execFileSync } from 'node:child_process';
-import { existsSync, openSync, readFileSync, readSync, closeSync, readdirSync, statSync } from 'node:fs';
+import {
+  existsSync,
+  openSync,
+  readFileSync,
+  readSync,
+  closeSync,
+  readdirSync,
+  statSync,
+} from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -182,14 +190,18 @@ export function checkDependencyRules(packages) {
     for (const dependency of Object.keys(all)) {
       if (workspacePackage.dir.startsWith('games/')) {
         if (games.has(dependency) && dependency !== workspacePackage.name) {
-          report(`un jeu ne dépend pas d'un autre jeu (${dependency}): le code partagé monte dans un paquet`);
+          report(
+            `un jeu ne dépend pas d'un autre jeu (${dependency}): le code partagé monte dans un paquet`,
+          );
         }
         if (apps.has(dependency)) {
           report(`un jeu ne dépend pas de l'application (${dependency})`);
         }
       }
       if (workspacePackage.dir.startsWith('apps/') && games.has(dependency)) {
-        report(`l'application ne dépend d'aucun jeu (${dependency}): il est copié comme paquet signé (ADR 0010)`);
+        report(
+          `l'application ne dépend d'aucun jeu (${dependency}): il est copié comme paquet signé (ADR 0010)`,
+        );
       }
     }
     if (workspacePackage.name === '@duo/protocol') {
@@ -275,7 +287,9 @@ function readWorkspacePackages(root) {
       packages.push({
         dir,
         name,
-        dependencies: asDependencyMap('dependencies' in manifest ? manifest.dependencies : undefined),
+        dependencies: asDependencyMap(
+          'dependencies' in manifest ? manifest.dependencies : undefined,
+        ),
         devDependencies: asDependencyMap(
           'devDependencies' in manifest ? manifest.devDependencies : undefined,
         ),
@@ -296,7 +310,12 @@ export function listRepositoryFiles(root) {
     const output = execFileSync(
       'git',
       ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
-      { cwd: root, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] },
+      {
+        cwd: root,
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      },
     );
     const files = new Set(output.split('\0').filter((file) => file !== ''));
     return [...files].filter(
@@ -374,7 +393,9 @@ function main() {
     return;
   }
   for (const issue of issues) {
-    process.stderr.write(`${issue.file}:${issue.line}:${issue.column} [${issue.rule}] ${issue.message}\n`);
+    process.stderr.write(
+      `${issue.file}:${issue.line}:${issue.column} [${issue.rule}] ${issue.message}\n`,
+    );
   }
   process.stderr.write(
     `Contrôle du dépôt: ${issues.length} problème${issues.length > 1 ? 's' : ''} dans ${fileCount} fichiers texte lus.\n`,

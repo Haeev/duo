@@ -9,13 +9,7 @@ import { defineConfig, mergeConfig } from 'vitest/config';
 const baseConfig = defineConfig({
   test: {
     include: ['**/*.test.{ts,tsx,mts,cts,js,mjs,cjs}'],
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/out/**',
-      '**/assets-src/**',
-      '**/e2e/**',
-    ],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/out/**', '**/assets-src/**', '**/e2e/**'],
     environment: 'node',
     // Un test qui échoue n'est jamais relancé automatiquement (ADR 0013, point 6).
     retry: 0,

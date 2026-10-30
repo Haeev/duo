@@ -37,7 +37,10 @@ describe('checkText', () => {
   });
 
   it('signale affichage de débogage et point d’arrêt dans le code', () => {
-    const issues = checkText('apps/duo/src/a.ts', `const a = 1;\n${DEBUG_PRINT}\n  ${BREAKPOINT}\n`);
+    const issues = checkText(
+      'apps/duo/src/a.ts',
+      `const a = 1;\n${DEBUG_PRINT}\n  ${BREAKPOINT}\n`,
+    );
     expect(issues.map(({ rule, line }) => ({ rule, line }))).toEqual([
       { rule: 'debogage', line: 2 },
       { rule: 'debogage', line: 3 },
@@ -49,7 +52,10 @@ describe('checkText', () => {
   });
 
   it('exige une référence de ticket sur les marqueurs de tâche', () => {
-    const issues = checkText('packages/sdk/src/a.ts', `// ${MARKER} finir\n// ${MARKER}(#12) finir\n`);
+    const issues = checkText(
+      'packages/sdk/src/a.ts',
+      `// ${MARKER} finir\n// ${MARKER}(#12) finir\n`,
+    );
     expect(issues).toHaveLength(1);
     expect(issues[0]).toMatchObject({ rule: 'marqueurs', line: 1, column: 4 });
   });
@@ -69,7 +75,16 @@ describe('checkText', () => {
 
 describe('isBinaryPath', () => {
   it('reconnaît les binaires déclarés dans .gitattributes', () => {
-    for (const file of ['a.png', 'b.GLB', 'c.ogg', 'd.m4a', 'e.wav', 'f.woff2', 'g.icns', 'h.ico']) {
+    for (const file of [
+      'a.png',
+      'b.GLB',
+      'c.ogg',
+      'd.m4a',
+      'e.wav',
+      'f.woff2',
+      'g.icns',
+      'h.ico',
+    ]) {
       expect(isBinaryPath(file)).toBe(true);
     }
     expect(isBinaryPath('a.ts')).toBe(false);
@@ -82,10 +97,18 @@ describe('checkDependencyRules', () => {
   it('refuse un jeu qui dépend d’un autre jeu ou de l’application', () => {
     const issues = checkDependencyRules([
       { ...base, dir: 'apps/duo', name: 'duo' },
-      { ...base, dir: 'games/a', name: '@duo-jeux/a', dependencies: { '@duo-jeux/b': 'workspace:*' } },
+      {
+        ...base,
+        dir: 'games/a',
+        name: '@duo-jeux/a',
+        dependencies: { '@duo-jeux/b': 'workspace:*' },
+      },
       { ...base, dir: 'games/b', name: '@duo-jeux/b', devDependencies: { duo: 'workspace:*' } },
     ]);
-    expect(issues.map((issue) => issue.file)).toEqual(['games/a/package.json', 'games/b/package.json']);
+    expect(issues.map((issue) => issue.file)).toEqual([
+      'games/a/package.json',
+      'games/b/package.json',
+    ]);
   });
 
   it('refuse une application qui dépend d’un jeu', () => {
@@ -97,7 +120,12 @@ describe('checkDependencyRules', () => {
   });
 
   it('limite @duo/protocol à valibot', () => {
-    const ok = { ...base, dir: 'packages/protocol', name: '@duo/protocol', dependencies: { valibot: '1.5.0' } };
+    const ok = {
+      ...base,
+      dir: 'packages/protocol',
+      name: '@duo/protocol',
+      dependencies: { valibot: '1.5.0' },
+    };
     expect(checkDependencyRules([ok])).toEqual([]);
     expect(
       checkDependencyRules([{ ...ok, dependencies: { valibot: '1.5.0', ws: '8.22.0' } }]),
@@ -108,7 +136,12 @@ describe('checkDependencyRules', () => {
     expect(
       checkDependencyRules([
         { ...base, dir: 'packages/sdk', name: '@duo/sdk' },
-        { ...base, dir: 'games/a', name: '@duo-jeux/a', dependencies: { '@duo/sdk': 'workspace:*' } },
+        {
+          ...base,
+          dir: 'games/a',
+          name: '@duo-jeux/a',
+          dependencies: { '@duo/sdk': 'workspace:*' },
+        },
       ]),
     ).toEqual([]);
   });
@@ -116,7 +149,8 @@ describe('checkDependencyRules', () => {
 
 describe('parseWorkspacePatterns', () => {
   it('lit la liste packages et s’arrête à la clé suivante', () => {
-    const yaml = "# x\npackages:\n  - apps/*\n  - 'games/_essais/*' # essais\n  - outils\ncatalog:\n  vite: 8.3.5\n";
+    const yaml =
+      "# x\npackages:\n  - apps/*\n  - 'games/_essais/*' # essais\n  - outils\ncatalog:\n  vite: 8.3.5\n";
     expect(parseWorkspacePatterns(yaml)).toEqual(['apps/*', 'games/_essais/*', 'outils']);
   });
 });
