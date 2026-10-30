@@ -6,8 +6,8 @@ Question: quand un duo remplit-il chaque collection, avec et sans « coup de pou
 vers les entrées jamais vues, et quelle part des duos la termine avant la fin de
 l'année 1 (fin du contenu de la version 1) ?
 
-Les entrées (nom, lieu, saisons, rareté) sont celles du cahier, section 6.5: ce fichier
-en est la source, toute modification se reporte dans le cahier. L'arrivée aux Vergers,
+Les entrées (nom, lieu, saisons, rareté) sont celles du cahier, section 6.5: le cahier
+et ce fichier sont tenus identiques, toute modification de l'un se reporte dans l'autre. L'arrivée aux Vergers,
 qui débloque la moitié des entrées, est tirée partie par partie de la simulation
 économique (duo médian, avec le coup de main du village), et la durée d'une journée
 vient de la même simulation.

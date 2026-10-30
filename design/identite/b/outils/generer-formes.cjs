@@ -29,7 +29,8 @@ const profiles = [];
 players.forEach((p, i) => {
   const d = SYMBOLS[p.id]();
   write(`symboles/${p.id}.svg`, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="${d}"/></svg>\n`);
-  sprite.push(`  <symbol id="player-${p.id}" viewBox="0 0 24 24"><path d="${d}"/></symbol>`);
+  // fill sur le <symbol> lui-même: un <use> n'hérite pas des attributs de la racine du sprite
+  sprite.push(`  <symbol id="player-${p.id}" viewBox="0 0 24 24" fill="currentColor"><path d="${d}"/></symbol>`);
   const symbolLabel = p.symbolName.charAt(0).toUpperCase() + p.symbolName.slice(1);
   profiles.push({
     id: p.id,
@@ -45,7 +46,7 @@ players.forEach((p, i) => {
     path: d,
   });
 });
-write('symboles/symboles.svg', `<svg xmlns="http://www.w3.org/2000/svg" style="display:none" fill="currentColor">\n${sprite.join('\n')}\n</svg>\n`);
+write('symboles/symboles.svg', `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n${sprite.join('\n')}\n</svg>\n`);
 write('joueurs.json', JSON.stringify({
   meta: {
     source: 'design/identite/b/source/jetons.cjs (couleurs, noms) et source/formes.cjs (chemins)',
@@ -61,9 +62,11 @@ const iconSprite = [];
 for (const [id, parts] of Object.entries(ICONS)) {
   const inner = toSvg(parts);
   write(`icones/${id}.svg`, `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${inner}</svg>\n`);
-  iconSprite.push(`  <symbol id="icon-${id}" viewBox="0 0 24 24">${inner}</symbol>`);
+  // attributs portés par chaque <symbol>: un <use> n'hérite pas de la racine du sprite. L'épaisseur, elle,
+  // n'y figure pas: elle vient de l'élément qui affiche l'icône (stroke-width: var(--icon-stroke)).
+  iconSprite.push(`  <symbol id="icon-${id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">${inner}</symbol>`);
 }
-write('icones/icones.svg', `<svg xmlns="http://www.w3.org/2000/svg" style="display:none" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">\n${iconSprite.join('\n')}\n</svg>\n`);
+write('icones/icones.svg', `<svg xmlns="http://www.w3.org/2000/svg" style="display:none">\n${iconSprite.join('\n')}\n</svg>\n`);
 
 // ---------- logo ----------
 // « du » en Jost Light (instance statique 300, même dessin que la police variable embarquée), puis

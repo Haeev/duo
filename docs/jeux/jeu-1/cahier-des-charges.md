@@ -35,14 +35,14 @@
 
 ### 1.1 Titre et vérification d'homonymie
 
-Recherche web du 2026-10-30, en français et en anglais (boutiques de jeux Steam et itch.io, films, livres, séries, marques, associations ferroviaires):
+Recherche web du 2026-10-30, requêtes en français et en anglais (jeux vidéo, dont des requêtes ciblant Steam et itch.io; films, livres, séries; marques et commerces; associations et trains touristiques):
 
 - aucun jeu, film, livre, série ni marque connus sous le titre « La Petite Ligne »;
 - titres voisins sans conflit: un podcast ferroviaire « Monsieur Petites Lignes », la Petite Ceinture de Paris, de nombreux « petits trains » touristiques;
 - « petites lignes » est une expression courante (les lignes ferroviaires de campagne, sujet politique récurrent): le titre est libre, mais peu distinctif dans un moteur de recherche;
 - un résumé automatique de recherche a évoqué, « de mémoire » et sans source, un petit jeu de casse-tête ferroviaire nommé « Petite Ligne »: aucune page de boutique ne l'a confirmé. À revérifier avant le titre définitif.
 
-Titres de rechange, vérifiés de la même façon (aucun résultat): « Samedi, le train », « Les Saisons d'Aubrune », « Le Train d'Aubrune ». « Aubrune » seul ne renvoie à aucune œuvre ni à aucun lieu connu (les rivières Aube, Aubette et Aubance sont proches, sans confusion possible). Décision: question Q1.
+Titres de rechange, vérifiés par une recherche web du même jour (aucun résultat): « Samedi, le train », « Les Saisons d'Aubrune », « Le Train d'Aubrune ». « Aubrune » seul ne renvoie à aucune œuvre ni à aucun lieu connu (les rivières Aube, Aubette et Aubance sont proches, sans confusion possible). Décision: question Q1.
 
 ### 1.2 Ce qui le distingue des jeux de référence
 
@@ -802,7 +802,7 @@ Chaque habitant a une fiche (caractère, emploi du temps par jour de semaine et 
 | Cèpe | A | r | 45 | | | | |
 | Cynorhodon | A, H | pc | 5 | | | | |
 
-Ces tables sont la source de `collections_v1.py`: toute modification se reporte dans le script et se resimule.
+Ces tables et `collections_v1.py` sont tenus identiques: toute modification de l'un se reporte dans l'autre et se resimule.
 
 ### 6.6 Recettes (30)
 
@@ -1010,7 +1010,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Jalon | Contenu attendu | Date visée | Validé le |
 |---|---|---|---|
-| Prototype | jouable à deux en réseau, formes simples, une à deux heures de jeu: la Halte réduite, la maisonnette et le chantier d'une pièce, trois cultures (radis, laitue, carotte), les poules, deux habitantes (Mme Ferrand, et Firmin pour le train), l'horloge partagée, la veillée, le souper et la forme, la commande du samedi (trois lignes), le regard de deux métiers (Maraîchage, Cuisine), le geste « porter une poutre », l'absence, la sauvegarde et la reprise en changeant d'hôte, la séance à l'historique. Questions à trancher: la journée à deux est-elle agréable et bien rythmée ? passe-t-on assez de temps ensemble ? le regard du métier fait-il parler ? Mesures pour recaler l'économie (CA-J1-035, CA-J1-036) | | |
+| Prototype | jouable à deux en réseau, formes simples, une à deux heures de jeu: la Halte réduite, la maisonnette et le chantier d'une pièce, trois cultures (radis, laitue, carotte), les poules, deux habitants (Mme Ferrand, et Firmin pour le train), l'horloge partagée, la veillée, le souper et la forme, la commande du samedi (trois lignes), le regard de deux métiers (Maraîchage, Cuisine), le geste « porter une poutre », l'absence, la sauvegarde et la reprise en changeant d'hôte, la séance à l'historique. Questions à trancher: la journée à deux est-elle agréable et bien rythmée ? passe-t-on assez de temps ensemble ? le regard du métier fait-il parler ? Mesures pour recaler l'économie (CA-J1-035, CA-J1-036) | | |
 | Alpha | toutes les fonctions et tout le contenu de la version 1 (section 11), assets provisoires, tous les textes en premier jet, cartes de level-designer, simulations relancées sur les tables du jeu | | |
 | Bêta | assets définitifs, son et musiques, textes relus, finitions, budgets tenus sur le PC, aucun bug bloquant; une année complète jouable; migration éprouvée avec un épisode de test | | |
 | 1.0 | recette réussie sur les deux machines, jeu publié dans Duo | | |
