@@ -39,7 +39,9 @@ catalog:
   pixi.js: 8.22.0
 
 # Versions exactes à l'ajout d'une dépendance (pnpm add), sans ^ ni ~.
+saveExact: true
+
+# pnpm refuse par défaut une version publiée depuis moins d'un jour: les
+# versions figées par l'ADR 0001 et plus jeunes que cela sont admises ici.
 minimumReleaseAgeExclude:
   - eslint@10.14.0
-
-saveExact: true

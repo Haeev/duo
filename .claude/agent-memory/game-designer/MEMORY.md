@@ -57,3 +57,9 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Tenir les tables du cahier et les données des scripts identiques, et le prouver par un contrôle croisé automatique (analyse des tableaux Markdown contre les données du script).
 - Un rattrapage proportionnel à ce qui reste (15 % des matériaux restants chaque samedi) ne change presque rien pour un duo médian et resserre la queue des duos lents: c'est le bon profil.
 - `python3 script.py | head` lève BrokenPipeError: c'est le tube, pas le script.
+
+## Démos courtes
+
+- Une démo d'une heure qui couvre une semaine de jeu demande une horloge accélérée (0,35 s par minute de jeu pour 8 journées en 63 min, script `docs/jeux/jeu-1/simulations/demo_rythme.py`). Avec une horloge rapide, la marche mange la journée: carte compacte (64x48 m) et distances données en secondes.
+- Pour une démo, fixer la commande et la météo (déroulé identique pour tous), et caler chaque quête sur un jour précis pour qu'il y ait une nouveauté par journée.
+- Un objet livré au dernier jour (catalogue au train final) n'a pas d'effet jouable: mettre ce qui change la forme (le lit) en fabrication au milieu de la semaine.

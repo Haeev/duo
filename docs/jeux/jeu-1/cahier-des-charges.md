@@ -19,6 +19,7 @@
 - **Sans punition**: rien ne meurt, rien ne se perd, rien ne compare les deux joueurs; le monde ne bouge que quand vous jouez à deux.
 - **Changements par rapport à la piste A** (question Q3): Artisanat et Cheminot passent aux épisodes, 24 plantes au lieu de 30, croisement des semences reporté. Raison: une version 1 réaliste pour un studio qui produit tout par le code, avec moins de systèmes mais chacun complet.
 - **Titre**: aucun jeu, film, livre ni marque connus sous « La Petite Ligne » (section 1.1). Quatre questions pour le client (section 14).
+- **Démo d'une heure, livrée en premier** (priorité du client): la première semaine, du train du samedi au train du samedi suivant, décrite dans `docs/jeux/jeu-1/demo.md`.
 
 ## 1. Résumé (game-designer)
 
@@ -1010,6 +1011,7 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 
 | Jalon | Contenu attendu | Date visée | Validé le |
 |---|---|---|---|
+| Démo d'une heure (avant le prototype) | la première semaine, du train du jour 1 au train du jour 8, avec quatre habitants, trois cultures, douze meubles, la commande du samedi en point d'orgue; périmètre, textes, assets et réglages dans `docs/jeux/jeu-1/demo.md` | | |
 | Prototype | jouable à deux en réseau, formes simples, une à deux heures de jeu: la Halte réduite, la maisonnette et le chantier d'une pièce, trois cultures (radis, laitue, carotte), les poules, deux habitants (Mme Ferrand, et Firmin pour le train), l'horloge partagée, la veillée, le souper et la forme, la commande du samedi (trois lignes), le regard de deux métiers (Maraîchage, Cuisine), le geste « porter une poutre », l'absence, la sauvegarde et la reprise en changeant d'hôte, la séance à l'historique. Questions à trancher: la journée à deux est-elle agréable et bien rythmée ? passe-t-on assez de temps ensemble ? le regard du métier fait-il parler ? Mesures pour recaler l'économie (CA-J1-035, CA-J1-036) | | |
 | Alpha | toutes les fonctions et tout le contenu de la version 1 (section 11), assets provisoires, tous les textes en premier jet, cartes de level-designer, simulations relancées sur les tables du jeu | | |
 | Bêta | assets définitifs, son et musiques, textes relus, finitions, budgets tenus sur le PC, aucun bug bloquant; une année complète jouable; migration éprouvée avec un épisode de test | | |
@@ -1029,3 +1031,4 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-10-30 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, proposition de la 12), simulations jointes, quatre questions | game-designer, sur brief du manager |
+| 2026-10-30 | 0.1 | Ajout du jalon « Démo d'une heure », détaillé dans `demo.md` | client, via le manager |

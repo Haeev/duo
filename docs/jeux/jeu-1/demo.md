@@ -70,7 +70,7 @@ Radis, laitue, carotte. Leurs pousses sont accélérées pour la démo (section 
 | Objet | Comment on l'obtient | Effet |
 |---|---|---|
 | Paillasse (deux) | déjà là | Sommeil 50 |
-| Lit double | fabriqué à l'établi (16 planches) avec un matelas acheté chez Odette (120 sous, accord des deux) | Sommeil 85 pour les deux; un lit à soi dans la maison à soi |
+| Lit double | fabriqué à l'établi (16 planches) avec un matelas acheté chez Odette (120 sous, accord des deux) | Sommeil 85 pour les deux: fini, les paillasses qui piquent |
 | Table | fabriquée (8 planches) | le souper à table compte comme souper partagé (Cœur +5) |
 | Chaise (jusqu'à deux) | fabriquée (4 planches chacune) | confort |
 | Coffre | déjà là, réparé au jour 1 | le cellier commun |
@@ -214,7 +214,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 - S1, la demande: « Mes trois poules s'ennuient dans ma cour. Réparez le vieux poulailler du garde-barrière, et elles sont à vous. Huit planches, deux clous et un peu d'huile de coude. »
 - S1, la fin: « Les voilà: Bichette, Cocotte et la Duchesse. La Duchesse pond quand elle veut, ne le prenez pas pour vous. »
 - S3, la demande: « Vos premiers radis ! Apportez-m'en trois, et deux laitues, et je vous fais à souper demain soir. Chez moi, à sept heures. »
-- S3, la scène à deux: « Vous deux, vous avez remis de la vie dans ma rue. Tenez, ma recette de soupe. Ne la donnez à personne. » Choix: « Promis. » (Odette: « Je savais que je pouvais compter sur vous. ») ou « Même pas à Firmin ? » (Odette: « Surtout pas à Firmin. Il la saleraít trop. »)
+- S3, la scène à deux: « Vous deux, vous avez remis de la vie dans ma rue. Tenez, ma recette de soupe. Ne la donnez à personne. » Choix: « Promis. » (Odette: « Je savais que je pouvais compter sur vous. ») ou « Même pas à Firmin ? » (Odette: « Surtout pas à Firmin. Il la salerait trop. »)
 - Jour 8: « Le train ! Allez, allez, je garde la boutique. »
 
 **Basile**
@@ -339,7 +339,7 @@ Valeurs propres à la démo, dans le même fichier de configuration typé que le
 | Laitue | 3 jours, 1 par case, graine 8, prix 32 | 6 jours | deux récoltes (jours 5, 8) |
 | Carotte | 4 jours, 3 par case, graine 12, prix 16 | 8 jours | une récolte (jour 6), pour la soupe |
 | Qualité | « belle » (prix x1,5) si arrosée chaque jour de sa pousse | score de soin | une seule règle à comprendre |
-| Arbre | 3 coups de hache, 2 rondins; un rondin donne 4 planches à l'établi | | 56 planches dans la semaine: 7 rondins, 4 arbres |
+| Arbre | 3 coups de hache, 2 rondins; un rondin donne 4 planches à l'établi | | 56 planches dans la semaine: 14 rondins, 7 des 12 arbres de la lisière |
 | Planches nécessaires | toit 12 (offertes), poulailler 8, table 8, chaises 8, étagère 6, lit double 16, commande 10 | | |
 | Poules | 3, un œuf par jour si la mangeoire est remplie (sac de grain offert) | grain payant | |
 | Endurance | 80 + 0,4 x forme; coûts du cahier divisés par 2 | coûts du cahier | une journée courte ne doit pas buter sur la fatigue |
