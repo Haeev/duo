@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.node.json",
+  "compilerOptions": {
+    // Les scripts restent en JavaScript (lancés par Node sans étape de construction), vérifiés par TypeScript.
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["*.mjs", "*.ts", "tests"]
+}

@@ -213,7 +213,7 @@ def main() -> int:
         "sounds": manifeste_sons,
         "music": {
             "lounge": {
-                "event": "Ambiance des écrans hors partie (accueil, bibliothèque, salon, réglages)",
+                "event": "Ambiance des écrans hors partie (accueil, bibliothèque, historique, réglages, salon)",
                 "bus": "music",
                 "file": "ogg/lounge.ogg",
                 "loop": {

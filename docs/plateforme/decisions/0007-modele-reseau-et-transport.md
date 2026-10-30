@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | dev-reseau |
 | À relire par | architecte-technique (topologie, contrat `net` du SDK), dev-plateforme (modules `session` et `transfer`, réplication), qa-testeur (seuils et banc) |
@@ -46,7 +46,7 @@ Essais jetables du 2026-10-30 (`reseau.md`, section 20): deux espaces de noms r�
 | Option | Pour | Contre |
 |---|---|---|
 | A. Une seule connexion pour le contrôle, le jeu, la réplication et les paquets | une seule chose à établir et à surveiller | un message de jeu attend derrière les tranches déjà confiées au tampon d'envoi de TCP, que l'application ne peut pas doubler: mesuré, 240 ms de retard médian sur les instantanés pendant un transfert de 20 Mo |
-| B. Deux connexions WebSocket sur le même port: liaison (contrôle et jeu) et transfert (contenus de plus de 64 Kio), le transfert régulé pendant une partie | mesuré: 7 ms de retard médian sur une connexion à part, et 6 ms au 95e centile une fois le transfert régulé à 2 Mio/s | une seconde connexion à authentifier et à surveiller |
+| B. Deux connexions WebSocket sur le même port: liaison (contrôle et jeu) et transfert (contenus de plus de 64 Kio), le transfert régulé d'après l'aller-retour de la liaison | mesuré: 7 ms de retard médian sur une connexion à part, et 6 ms au 95e centile une fois le transfert régulé à 2 Mio/s | une seconde connexion à authentifier et à surveiller |
 
 ### 4. Vivacité et coupures
 
@@ -112,7 +112,7 @@ Essais jetables du 2026-10-30 (`reseau.md`, section 20): deux espaces de noms r�
 ### 5. Transfert
 
 - Contenus de plus de 64 Kio (révisions de sauvegarde compressées, gros index, historique en lot, paquets de jeux, état complet d'une partie) par la connexion de transfert, en tranches de 256 Kio, 1 Mio en vol, reprise à la position atteinte, empreinte de l'ensemble vérifiée avant remise au module `data` ou `packages`.
-- Pendant une partie, l'émetteur régule son débit: départ à 2 Mio/s, plafond de 4 Mio/s, plancher de 256 Kio/s, division par deux dès que l'aller-retour médian de la liaison dépasse de 15 ms son minimum récent.
+- L'émetteur régule son débit: division par deux dès que l'aller-retour médian de la liaison dépasse de 15 ms son minimum récent (plancher de 256 Kio/s), hausse de 256 Kio/s sinon; pendant une partie, départ à 2 Mio/s et plafond de 4 Mio/s; hors partie, sans plafond.
 - Copie d'un jeu de la machine qui a la version la plus récente vers l'autre, dans un sens ou dans l'autre (ADR 0006, 0010).
 
 ### 6. Modèles de synchronisation offerts aux jeux

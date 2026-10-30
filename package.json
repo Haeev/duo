@@ -1,0 +1,26 @@
+{
+  "name": "duo-monorepo",
+  "private": true,
+  "type": "module",
+  "description": "Duo: plateforme de jeux à deux en réseau local (macOS et Windows).",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=22.12.0 <23"
+  },
+  "scripts": {
+    "dev": "pnpm --recursive --parallel --if-present run dev",
+    "build": "pnpm --recursive --if-present run build",
+    "lint": "pnpm --recursive --if-present run lint",
+    "typecheck": "pnpm --recursive --if-present run typecheck",
+    "test": "pnpm --recursive --if-present run test",
+    "verifier": "node outils/verifier-depot.mjs",
+    "controler": "node outils/verifier-depot.mjs",
+    "format": "prettier --write .",
+    "format:verifier": "prettier --check ."
+  },
+  "prettier": "@duo/config/prettier",
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "prettier": "catalog:"
+  }
+}

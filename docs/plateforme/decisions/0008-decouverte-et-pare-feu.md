@@ -2,7 +2,7 @@
 
 | Champ | Valeur |
 |---|---|
-| Statut | proposée |
+| Statut | acceptée (manager, 2026-10-30) |
 | Date | 2026-10-30 |
 | Rédacteur | dev-reseau |
 | À relire par | architecte-technique (cohérence avec les ADR 0003, 0006, 0009), ingenieur-build (`Info.plist`, pare-feu et installation, ADR 0011), ux-ui-designer (E03, E04, E17, textes proposés), qa-testeur (critères F02) |

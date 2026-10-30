@@ -19,8 +19,8 @@ Chaque décision structurante de la plateforme a son ADR: contexte, au moins deu
 | 0004 | Isolation et hébergement des jeux | acceptée | architecte-technique (avec dev-plateforme) | [0004-isolation-hebergement-jeux.md](0004-isolation-hebergement-jeux.md) |
 | 0005 | Contrat des jeux et SDK | acceptée | architecte-technique | [0005-contrat-jeux-sdk.md](0005-contrat-jeux-sdk.md) |
 | 0006 | Versions et compatibilité | acceptée | architecte-technique (avec dev-reseau, ingenieur-build) | [0006-versions-compatibilite.md](0006-versions-compatibilite.md) |
-| 0007 | Modèle réseau et transport | en rédaction | dev-reseau (avec architecte-technique) | à venir |
-| 0008 | Découverte et pare-feu | en rédaction | dev-reseau | à venir |
+| 0007 | Modèle réseau et transport | acceptée | dev-reseau (avec architecte-technique) | [0007-modele-reseau-et-transport.md](0007-modele-reseau-et-transport.md) |
+| 0008 | Découverte et pare-feu | acceptée | dev-reseau | [0008-decouverte-et-pare-feu.md](0008-decouverte-et-pare-feu.md) |
 | 0009 | Données du duo | acceptée | architecte-technique (avec dev-plateforme, dev-reseau) | [0009-donnees-du-duo.md](0009-donnees-du-duo.md) |
 | 0010 | Distribution des jeux | acceptée | architecte-technique (avec ingenieur-build) | [0010-distribution-jeux.md](0010-distribution-jeux.md) |
 | 0011 | Installateurs, signature et mises à jour de l'application | acceptée | ingenieur-build | [0011-installateurs-signature-mises-a-jour.md](0011-installateurs-signature-mises-a-jour.md) |

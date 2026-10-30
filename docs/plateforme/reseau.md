@@ -15,7 +15,7 @@
 1. Seuls les deux processus principaux se parlent. Un jeu ne voit que des messages relayés par le SDK.
 2. Chaque Duo ouvert s'annonce sur le réseau local par diffusion UDP (port 39420), après l'accord du premier lancement, salon ouvert ou non. Les deux applications se relient dès qu'elles se voient: c'est la **liaison**, permanente tant que les deux Duo sont ouverts.
 3. La liaison ne dépend pas des rôles. L'une ou l'autre machine peut l'établir (chacune écoute en TCP sur le port 39420): elle passe dans le sens que les pare-feu et les autorisations laissent passer. Hôte et invité ne sont que des rôles d'un salon.
-4. Transport: WebSocket (`ws`) sur TCP, en deux connexions. La connexion **liaison** porte le contrôle, le salon et les messages de jeu; la connexion **transfert** porte les gros contenus (sauvegardes, historique, paquets de jeux), régulée pendant une partie. Mesuré: un transfert de 20 Mo sur la même connexion retarde les instantanés de 240 ms en médiane, contre 7 ms sur une connexion à part, et moins de 8 ms quand le transfert est régulé.
+4. Transport: WebSocket (`ws`) sur TCP, en deux connexions. La connexion **liaison** porte le contrôle, le salon et les messages de jeu; la connexion **transfert** porte les gros contenus (sauvegardes, historique, paquets de jeux), à un débit régulé pour ne jamais retarder la liaison. Mesuré: un transfert de 20 Mo sur la même connexion retarde les instantanés de 240 ms en médiane, contre 7 ms sur une connexion à part, et moins de 8 ms quand le transfert est régulé.
 5. Vivacité: un battement toutes les 500 ms en salon et en partie; une reconnexion anticipée dès 1 s de silence; la liaison est déclarée perdue à 2 s de silence, ce qui met la partie en pause des deux côtés en 2,1 s au plus (mesuré: 1 995 à 2 047 ms). Aucune pause pour une coupure de 500 ms, ni même d'1 s (mesuré).
 6. Une coupure ne perd rien: la liaison est une session logique numérotée qui survit au changement de connexion TCP. Les messages fiables non acquittés sont réémis à la reprise.
 7. Par défaut, l'instance du jeu qui tourne chez l'hôte fait autorité; l'invité envoie des intentions, jamais d'état. Le lockstep déterministe et le tour par tour sont offerts aux jeux qui s'y prêtent.
@@ -88,7 +88,7 @@ Ligne de commande (ADR 0003, point 9; présente aussi dans les versions publiée
 
 - Rien avant la validation de l'écran E03 au premier lancement (CA-PF-079, ADR 0003 point 10). Les vérifications locales qui précèdent (profil réseau de Windows) n'ouvrent aucune socket.
 - Ensuite, tant que Duo est ouvert: écoute TCP sur `0.0.0.0:39420` et socket UDP sur `0.0.0.0:39420` (`reuseAddr`, diffusion activée). L'écoute est permanente parce que la présence (H-34), la comparaison des versions avant toute invitation (F13), la comparaison des index avant le salon (CA-PF-055) et les profils (CA-PF-005) en ont besoin, et parce que la liaison doit pouvoir s'établir dans le sens qui passe.
-- Ordre au démarrage: écoute TCP d'abord (c'est elle qui déclenche l'alerte du pare-feu de Windows), puis socket UDP, puis première requête (qui déclenche l'alerte « Réseau local » de macOS).
+- Ordre au démarrage: écoute TCP d'abord (c'est elle qui déclenche l'alerte du pare-feu de Windows), puis socket UDP, puis, sous macOS, une socket UDP connectée à l'adresse de diffusion locale (elle déclenche l'alerte « Réseau local » sans rien émettre, section 16.2), puis la première requête.
 
 ### 4.3 Interfaces retenues et adresses
 
@@ -336,7 +336,7 @@ Tous ces délais tiennent sous les 10 s de CA-PF-011.
 | Ce que voient les joueurs à la perte | la présence passe à « n'est plus visible » | partie: pause des deux côtés (E12); salon: « Connexion perdue »; décompte annulé |
 | Relance après la perte | toutes les 250 ms pendant 10 s, puis toutes les secondes, sans fin tant que Duo est ouvert | idem |
 
-Le régime actif commence pour les deux machines dès l'ouverture d'un salon (le message `salon.open` le déclenche aussi chez l'autre) et s'arrête au retour à l'accueil. Le repos économise le Wi-Fi des portables et tolère une application endormie par macOS (section 8.6).
+Le régime actif commence pour les deux machines dès l'ouverture d'un salon (le message `salon.open` le déclenche aussi chez l'autre) et s'arrête au retour à l'accueil. Le repos économise le Wi-Fi des portables et tolère une application endormie par macOS (section 8.5).
 
 Justification des valeurs actives, d'après l'essai de la section 20:
 
@@ -386,10 +386,10 @@ stateDiagram-v2
   Appel --> Absente: échec
   Poignee --> Etablie: ready
   Poignee --> Absente: refus ou délai
-  Etablie --> Anticipee: silence de 1 s en régime actif
+  Etablie --> Anticipee: silence de 1 s en régime actif, ou connexion fermée sans bye
   Anticipee --> Etablie: reprise sur une nouvelle connexion, ou trafic revenu
-  Anticipee --> Perdue: silence de 2 s
-  Etablie --> Perdue: silence de 2 s, 6 s au repos, ou connexion fermée sans bye
+  Anticipee --> Perdue: silence de 2 s, 6 s au repos
+  Etablie --> Perdue: silence de 6 s au repos
   Perdue --> Etablie: reprise logique
   Perdue --> Absente: autre instance, reprise impossible
   Etablie --> Fermee: bye reçu ou envoyé
@@ -398,7 +398,7 @@ stateDiagram-v2
 
 ### 8.4 Effets d'une perte, selon le moment
 
-| Moment | Effet de la perte (2 s) | Au retour |
+| Moment | Effet de la perte (2 s de silence en régime actif, 6 s au repos) | Au retour |
 |---|---|---|
 | Repos | rien avant 6 s, puis présence « n'est plus visible » | présence rétablie, comparaison des index |
 | Salon | cartes « Connexion perdue », décompte annulé, les deux joueurs repassent à « Pas encore » | « Sacha est de retour. », puces à « Pas encore » (UX E08) |
@@ -575,7 +575,7 @@ La simulation de vie du premier jeu (village, ferme, maisons, personnages) ne s'
 
 ### 12.5 Quand faudrait-il un canal non fiable?
 
-Mesuré (section 20): avec 2 % de pertes réelles, TCP retarde un instantané à 30 Hz de 60 ms au 99e centile, et de 600 ms au pire, une dizaine de fois par minute; sans pertes, rien. Sur un Wi-Fi domestique, le Wi-Fi réémet lui-même les trames perdues: les pertes vues par TCP y sont bien plus rares, au prix de pics de latence.
+Mesuré (section 20): avec 2 % de pertes réelles, TCP retarde un instantané à 30 Hz de 60 ms au 99e centile et de 625 ms au pire; 16 instantanés par minute dépassent 100 ms de retard; sans pertes, aucun. Sur un Wi-Fi domestique, le Wi-Fi réémet lui-même les trames perdues: les pertes vues par TCP y sont bien plus rares, au prix de pics de latence.
 
 Un canal non fiable (datagrammes UDP entre les principaux, sur le même port, sans WebRTC: inutile sans traversée de NAT) ne sera ajouté que si un jeu d'action le justifie, sur mesure chez le client: plus d'un à-coup de plus de 150 ms par minute sur les instantanés, relevé par le journal au prototype. Il se placerait derrière le mode `latest`, sans changer l'API des jeux.
 
@@ -640,10 +640,11 @@ Pourquoi une connexion à part (mesuré, section 20): sur la même connexion que
 
 ### 14.2 Régulation pendant une partie
 
-Hors partie, le transfert va aussi vite que le réseau le permet. Pendant une partie, l'émetteur régule son débit pour que la file du point d'accès Wi-Fi reste courte:
+L'émetteur régule son débit pour que la file du point d'accès Wi-Fi reste courte et que les battements de la liaison ne prennent jamais de retard:
 
-- débit de départ 2 Mio/s, plafond 4 Mio/s, plancher 256 Kio/s;
-- toutes les 500 ms, si l'aller-retour médian de la liaison sur la dernière seconde dépasse de plus de 15 ms le minimum des 30 dernières secondes, le débit est divisé par deux; sinon il augmente de 256 Kio/s.
+- toutes les 500 ms, si l'aller-retour médian de la liaison sur la dernière seconde dépasse de plus de 15 ms le minimum des 30 dernières secondes, le débit est divisé par deux (plancher 256 Kio/s); sinon il augmente de 256 Kio/s;
+- pendant une partie: débit de départ 2 Mio/s, plafond 4 Mio/s;
+- hors partie (salon, repos): départ à 4 Mio/s, sans plafond; la même règle de recul s'applique, car une box à file profonde pourrait sinon retarder les battements du salon de plus d'une seconde.
 
 Mesuré: à 2 Mio/s sur un lien de 40 Mbit/s à file de 100 ms, les instantanés gardent un retard de 6 ms au 95e centile (8 ms au pire). Avec la compression des sauvegardes (gzip niveau 1, rapport de 8,7 mesuré par l'architecte sur une sauvegarde JSON, ADR 0009), une sauvegarde de 20 Mo pèse environ 2,3 Mo à transporter: un peu plus d'une seconde même régulée, sous les 10 s de CA-PF-051.
 
@@ -1009,7 +1010,7 @@ Vérifié aussi: X25519, HKDF et `monitorEventLoopDelay` présents dans `node:cr
 1. **Écoute permanente** au lieu de « le serveur n'écoute que pendant qu'un salon est ouvert »: présence, versions, profils et index en ont besoin (la section 7.1 actuelle de l'architecture l'exige déjà), et l'alerte du pare-feu de Windows tombe ainsi à l'écran E03, comme l'UX le prévoit, et non au premier salon (l'ADR 0011 est à ajuster sur ce point).
 2. **Deux connexions** (liaison et transfert) au lieu d'une seule: mesuré, section 20.
 3. **Liaison indépendante des rôles**, dans un sens ou dans l'autre, au lieu de « l'invité interroge, l'hôte répond »; chaque Duo s'annonce et répond aux requêtes.
-4. **Seuils**: battement de 500 ms (au lieu d'1 s) et perte à 2 s (au lieu de 3 s) en régime actif, plus la reconnexion anticipée; la section 13.2 de l'architecture (« perte détectée en 3 s au plus ») tient toujours.
+4. **Seuils**: battement de 500 ms (au lieu d'1 s) et perte à 2 s (au lieu de 3 s) en régime actif, plus la reconnexion anticipée; la section 14.2 de l'architecture (budget réseau: « perte de l'autre machine détectée en 3 s au plus ») tient toujours.
 5. **Reprise logique** avec réémission, au lieu d'une simple reconnexion suivie d'un instantané complet; l'instantané complet reste pour l'invité relancé.
 6. **Clé du duo** et authentification mutuelle, absentes de l'architecture.
 

@@ -1,0 +1,58 @@
+# Fins de ligne LF partout, y compris sous Windows (ADR 0002).
+* text=auto eol=lf
+
+# Scripts lancés par cmd.exe: CRLF obligatoire.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Fichiers binaires: ni conversion des fins de ligne ni fusion textuelle.
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.avif binary
+*.psd binary
+*.kra binary
+*.aseprite binary
+*.ase binary
+*.icns binary
+*.ico binary
+*.hdr binary
+*.exr binary
+*.ktx2 binary
+*.basis binary
+# 3D
+*.glb binary
+*.bin binary
+*.blend binary
+*.fbx binary
+# Son
+*.ogg binary
+*.opus binary
+*.m4a binary
+*.mp3 binary
+*.wav binary
+*.flac binary
+*.aiff binary
+*.mid binary
+*.midi binary
+*.sf2 binary
+# Polices
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+# Archives et paquets
+*.zip binary
+*.gz binary
+*.tgz binary
+*.7z binary
+*.duogame binary
+*.dmg binary
+*.exe binary
+*.pdf binary
+
+# Fichier de verrouillage: replié dans les revues de GitHub (pnpm install résout ses conflits).
+pnpm-lock.yaml linguist-generated=true

@@ -1,0 +1,42 @@
+# Espace de travail pnpm (ADR 0002). Un nouveau paquet sous ces dossiers est
+# pris en compte sans toucher à ce fichier.
+packages:
+  - apps/*
+  - packages/*
+  - games/*
+  - games/_essais/*
+  - outils
+
+# Versions figées de l'ADR 0001. Un paquet les reprend avec "catalog:"
+# (exemple: "typescript": "catalog:"). Un jeu publié peut figer sa propre
+# version de moteur à la place, pour garder celle de ses tests.
+catalog:
+  # Outillage
+  '@eslint-community/eslint-plugin-eslint-comments': 4.8.1
+  '@eslint/js': 10.0.1
+  '@playwright/test': 1.64.1
+  '@types/node': 22.20.5
+  eslint: 10.14.0
+  globals: 17.13.0
+  playwright: 1.64.1
+  prettier: 3.9.10
+  typescript: 6.0.3
+  typescript-eslint: 8.72.1
+  vite: 8.3.5
+  vitest: 5.0.5
+  # Application
+  '@preact/signals': 2.11.4
+  electron: 45.2.0
+  electron-builder: 26.18.0
+  electron-vite: 6.0.0
+  preact: 11.1.0
+  valibot: 1.5.0
+  ws: 8.22.0
+  yauzl: 3.4.0
+  yazl: 3.3.1
+  # Moteurs des jeux
+  three: 0.187.0
+  pixi.js: 8.22.0
+
+# Versions exactes à l'ajout d'une dépendance (pnpm add), sans ^ ni ~.
+saveExact: true

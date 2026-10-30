@@ -2,8 +2,8 @@
 // Rend les planches de l'identité B avec Chromium (Playwright), sans aucun accès réseau:
 // les pages sont servies depuis le disque sous une adresse fictive (http://duo.local/), toute autre requête
 // est refusée et signalée. Produit:
-//   controles/joueurs.png et controles/joueurs-controles.png (vision normale, protanopie, deutéranopie,
-//     tritanopie, niveaux de gris: matrices de Machado 2009 appliquées par ImageMagick en RGB linéaire);
+//   controles/joueurs.png et controles/joueurs-controles.png (montage: vision normale, protanopie,
+//     deutéranopie, tritanopie, niveaux de gris; matrices de Machado 2009 appliquées par ImageMagick en RGB linéaire);
 //   controles/icones-app-petites-tailles.png;
 //   controles/logo-fidelite.png (lettres vectorisées contre le texte en Jost Light, écart compté en pixels);
 //   planche-identite.png;
@@ -75,6 +75,8 @@ const simulate = (src, vision, dst) => {
     .g{display:grid;grid-template-columns:1fr 1fr;gap:14px} figure{margin:0} img{width:100%;display:block;border-radius:8px} figcaption{padding:6px 2px 0}
   </style></head><body><div class="g">${views.map(([v, t]) => `<figure><img src="${v === 'normale' ? 'joueurs.png' : `joueurs-${v}.png`}"><figcaption>${t}</figcaption></figure>`).join('')}</div><script>Promise.all([...document.images].map(i=>i.decode())).then(()=>{window.planchePrete=true})</script></body></html>`;
   report.push(['montage', await shoot(browser, 'controles/montage-joueurs.html', 1640, path.join(OUT, 'joueurs-controles.png'))]);
+  // les vues simulées séparées ne servent qu'au montage
+  for (const [v] of views.slice(1)) fs.rmSync(path.join(OUT, `joueurs-${v}.png`));
 
   // 2. icône d'application en petites tailles
   report.push(['planches/icones-app.html', await shoot(browser, 'planches/icones-app.html', 1280, path.join(OUT, 'icones-app-petites-tailles.png'))]);

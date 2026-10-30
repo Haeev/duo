@@ -1,0 +1,34 @@
+{
+  // Base stricte de tout le dépôt (ADR 0002, point 4). Un paquet étend
+  // tsconfig.node.json ou tsconfig.browser.json et fixe son "include".
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    // ES2024: tout ce que Node 22 (outillage et tests) et Chromium 156 (Electron 45) savent exécuter.
+    "target": "ES2024",
+    "lib": ["ES2024"],
+    "module": "ESNext",
+    // Tout le code livré passe par Vite ou electron-vite.
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowUnreachableCode": false,
+    "useUnknownInCatchVariables": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // Aucun type global implicite: chaque variante ajoute les siens.
+    "types": [],
+    "skipLibCheck": true
+  }
+}
