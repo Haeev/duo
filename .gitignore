@@ -13,3 +13,4 @@ Thumbs.db
 .claude/settings.local.json
 .claude/agent-memory-local/
 __pycache__/
+.claude/worktrees/
