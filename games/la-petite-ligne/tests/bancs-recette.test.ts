@@ -1,6 +1,5 @@
-// Recette de l'assise (qa-testeur, gauntlet tour 5): cas trouvés en exploration. Les bugs ouverts
-// sont en `it.fails` avec leur référence: la CI reste verte, et le test échoue dès la correction
-// (le passer alors en `it`, il devient le test de non-régression).
+// Recette de l'assise (qa-testeur, gauntlet tour 5): cas trouvés en exploration. Les bugs y gardent
+// leur référence; corrigés, leurs tests sont devenus des tests de non-régression.
 import { describe, expect, it } from 'vitest';
 import type { AuthoredIntent, ControlFrame } from '../src/etat/actions';
 import { benchById, seatPlace } from '../src/etat/bancs';
@@ -91,8 +90,8 @@ describe('assise: cas de recette', () => {
     expect(c.inHouse).toBe(true);
   });
 
-  // B-T5-07: le point `quay_bench` est au milieu de l'emprise du banc; Jeanne y apparaît à 8 h et en sort à pied.
-  it.fails('B-T5-07 Jeanne n’apparaît pas dans l’emprise du banc du quai à son arrivée du matin', () => {
+  // B-T5-07 (corrigé): le point `quay_bench` est au milieu de l'emprise du banc; Jeanne y apparaissait à 8 h et en sortait à pied.
+  it('B-T5-07 Jeanne n’apparaît pas dans l’emprise du banc du quai à son arrivée du matin', () => {
     const sim = at(3, 7 * 60 + 55);
     let inside = 0;
     while (sim.world.clock.minutes < 8 * 60 + 10) {
@@ -103,9 +102,9 @@ describe('assise: cas de recette', () => {
     expect(inside).toBe(0);
   });
 
-  // B-T5-08: un objet non outil en main, devant la place libre à côté du partenaire assis, Espace donne au lieu d'asseoir.
+  // B-T5-08 (corrigé): un objet non outil en main, devant la place libre à côté du partenaire assis, Espace donnait au lieu d'asseoir.
   for (const item of ['radish', 'plank'] as ItemId[]) {
-    it.fails(`B-T5-08 partenaire assis, ${item} en main devant la place libre: Espace assoit (ne donne pas)`, () => {
+    it(`B-T5-08 partenaire assis, ${item} en main devant la place libre: Espace assoit (ne donne pas)`, () => {
       const sim = at(4, 14 * 60);
       hideJeanne(sim);
       standBefore(sim, 'p1', 0);
@@ -122,8 +121,8 @@ describe('assise: cas de recette', () => {
     });
   }
 
-  // B-T5-09: après la fin de la démo, Espace devant un banc assoit puis relève au même pas, et laisse le corps dans le banc.
-  it.fails('B-T5-09 écran de fin: Espace devant un banc ne pose personne dans le banc', () => {
+  // B-T5-09 (corrigé): après la fin de la démo, Espace devant un banc assoyait puis relevait au même pas, et laissait le corps dans le banc.
+  it('B-T5-09 écran de fin: Espace devant un banc ne pose personne dans le banc', () => {
     const sim = at(15, 15 * 60 + 40);
     for (let n = 0; sim.world.phase !== 'ended' && n < SIM_HZ * 60 * 60; n++) {
       tick(sim);

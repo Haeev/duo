@@ -104,9 +104,11 @@ export interface SeatCharacter {
 }
 
 /**
- * Ce qu'il faut savoir d'un habitant: arrêté, visible, et rendu au point de
- * son emploi du temps qui est un banc (Jeanne au quai le matin), il s'y
- * assoit. Celui qui passe ou attend à côté (Firmin près de la cloche) reste debout.
+ * Ce qu'il faut savoir d'un habitant: arrêté, visible, son point de l'emploi
+ * du temps sur un banc (Jeanne au quai le matin), et rendu là où l'on se pose
+ * pour une place (`standPlace`, où le mène la simulation), il s'y assoit.
+ * Celui qui passe, attend à côté (Firmin près de la cloche) ou s'arrête en
+ * chemin pour parler reste debout.
  */
 export interface SeatVillager {
   pos: { x: number; y: number };
@@ -119,6 +121,36 @@ export interface SeatVillager {
 /** Le point `target` désigne-t-il ce banc (dans son emprise, à un demi-mètre près) ? */
 function targetsBench(prop: MapProp, at: { x: number; y: number } | undefined): boolean {
   return at !== undefined && Math.hypot(at.x - prop.pos.x, at.y - prop.pos.y) <= halfLength(prop) + 0.5;
+}
+
+/** Le banc que désigne un point de l'emploi du temps (Jeanne au quai le matin), ou `null`. */
+export function benchForPoint(benches: readonly MapProp[], at: { x: number; y: number } | undefined): MapProp | null {
+  for (const prop of benches) if (targetsBench(prop, at)) return prop;
+  return null;
+}
+
+/**
+ * Écart (m) toléré entre un habitant et le point où il se pose devant (ou
+ * derrière) une place: il y arrive exactement par son dernier pas. Plus large,
+ * un habitant arrêté pour parler juste avant d'arriver se dessinerait assis,
+ * puis debout en repartant (clignotement).
+ */
+const RESTING_GAP = 0.01;
+const restScratch: BenchPlace = { x: 0, y: 0, facing: 0 };
+
+/** L'habitant est-il arrêté là où l'on se pose pour une place du banc (devant, sinon derrière) ? */
+function restsAt(prop: MapProp, s: BenchSettings, x: number, y: number): boolean {
+  const out = restScratch;
+  const a = yaw(prop);
+  for (let slot = 0; slot < s.slots.length; slot++) {
+    standPlace(prop, slot, s, out);
+    if (Math.abs(out.x - x) <= RESTING_GAP && Math.abs(out.y - y) <= RESTING_GAP) return true;
+    // Derrière: symétrique de l'avant par rapport à l'assise.
+    const bx = out.x - 2 * Math.sin(a) * s.standForward;
+    const by = out.y - 2 * Math.cos(a) * s.standForward;
+    if (Math.abs(bx - x) <= RESTING_GAP && Math.abs(by - y) <= RESTING_GAP) return true;
+  }
+  return false;
 }
 
 /**
@@ -150,6 +182,7 @@ export class BenchSeating {
       if (villager === undefined || !villager.visible || villager.speed > 0) continue;
       for (const prop of benches) {
         if (!targetsBench(prop, points[villager.target])) continue;
+        if (!restsAt(prop, s, villager.pos.x, villager.pos.y)) continue;
         const slot = villagerSlot(prop, s, villager.pos.x, villager.pos.y, this.takenMask(prop, characters, v));
         if (slot >= 0) {
           this.bench[v] = prop;

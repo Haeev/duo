@@ -225,7 +225,7 @@ Décor: lampadaires, bancs de la place et de la berge, tonneaux, boîte aux lett
 |---|---|---|
 | `train_stop` | 38,5 ; 17,5 | porte de la voiture: Firmin attend le train, rendez-vous du samedi |
 | `spawn_1`, `spawn_2` | 37,5 et 39,5 ; 15,5 | apparition des deux joueurs en descendant du train |
-| `quay_bell` | 29,5 ; 17,5 | Firmin au nord de la cloche (cloche en x 29,5, hors de la marquise, gauntlet tour 5); rassemblement de la fin |
+| `quay_bell` | 27,5 ; 18,5 | Firmin à l'ouest de la cloche, à 1,5 m du poteau (cloche en x 29,5, hors de la marquise, gauntlet tour 5): son ombre du soir passe sous la cloche, loin du banc pendant l'énigme; rassemblement de la fin |
 | `quay_bench` | 33,0 ; 18,5 | le banc du quai (entre deux poteaux de la marquise, 3,5 m à l'est de la cloche), Jeanne le matin |
 | `bell_shadow_spot` | 34,7 ; 19,8 | derrière le bout est du banc, dans l'herbe: on y bêche pour l'énigme |
 | `coop_crate` | 35,5 ; 18,5 | la caisse de la coopérative, sous la marquise |

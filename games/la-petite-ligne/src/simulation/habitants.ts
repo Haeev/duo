@@ -2,13 +2,14 @@
  * Habitants: emploi du temps (`habitants.json`, première entrée vraie) et
  * trajets à pied d'un point à l'autre. Ils traversent les personnages (PE-09).
  */
-import type { VillagerState } from '../etat/types';
+import type { Vec2, VillagerState } from '../etat/types';
 import type { VillagerDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT } from './conditions';
 import { MINUTES_PER_DAY, SCHEDULE_PERIOD_TICKS } from './constantes';
 import { type Sim, distance, point } from './contexte';
+import { villagerRestSpot } from './bancs';
 import { refreshBlockers } from './deplacement';
-import { findPath } from './grille';
+import { bodyCollides, findPath } from './grille';
 import { POINT } from './ids';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
@@ -31,13 +32,33 @@ function teleport(v: VillagerState, x: number, y: number): void {
   v.prev.y = y;
 }
 
+/**
+ * Où l'habitant se rend pour le point `pointId`: le point lui-même, ou, quand
+ * c'est un banc, l'endroit d'où il s'y assoit (jamais dans l'emprise du banc).
+ */
+function goalOf(sim: Sim, v: VillagerState, pointId: string): Vec2 | undefined {
+  const at = sim.map.points[pointId];
+  if (at === undefined) return undefined;
+  const spot = { x: at.x, y: at.y };
+  villagerRestSpot(sim, v, pointId, spot);
+  return spot;
+}
+
+function routeTo(sim: Sim, v: VillagerState, pointId: string): void {
+  const goal = goalOf(sim, v, pointId);
+  // Déjà rendu (apparu à sa place): aucun pas, sinon il se dessinerait un instant debout.
+  const there = goal !== undefined && distance(v.pos, goal) < 1e-6;
+  const path = goal === undefined || there ? null : findPath(refreshBlockers(sim), v.pos, goal);
+  sim.runtime.villagerPaths[v.id] = { target: pointId, path: path ?? [] };
+}
+
 /** Place tous les habitants à leur point de l'emploi du temps (début de partie, matin, chargement). */
 export function placeVillagers(sim: Sim): void {
   for (const def of sim.content.villagers) {
     const v = sim.world.villagers.find((x) => x.id === def.id);
     if (v === undefined) continue;
     const entry = currentEntry(sim, def);
-    const at = sim.map.points[entry.point] ?? point(sim, POINT.offstage);
+    const at = goalOf(sim, v, entry.point) ?? point(sim, POINT.offstage);
     teleport(v, at.x, at.y);
     v.target = entry.point;
     v.activity = entry.activity;
@@ -68,15 +89,22 @@ export function updateVillagers(sim: Sim, dt: number): void {
           continue;
         }
         if (!v.visible) {
-          // Il sort de chez lui: il apparaît à son point de départ.
-          const at = sim.map.points[entry.point];
+          // Il arrive d'en dehors du bourg: il apparaît directement là où il va (sur un banc,
+          // devant sa place, donc assis), jamais au milieu d'une emprise d'où il ressortirait.
+          const at = goalOf(sim, v, entry.point);
           if (at !== undefined && v.pos.x < 0) teleport(v, at.x, at.y);
           v.visible = true;
         }
-        const target = sim.map.points[entry.point];
-        const path = target === undefined ? null : findPath(refreshBlockers(sim), v.pos, target);
-        sim.runtime.villagerPaths[v.id] = { target: entry.point, path: path ?? [] };
+        routeTo(sim, v, entry.point);
       }
+    }
+    // Reprise d'une sauvegarde: les trajets ne sont pas sauvegardés, il repart vers son point
+    // (un corps resté dans un obstacle, comme une ancienne sauvegarde au milieu d'un banc, y est posé).
+    if (sim.runtime.villagerPaths[v.id] === undefined && v.visible) {
+      const goal = goalOf(sim, v, v.target);
+      const stuck = bodyCollides(refreshBlockers(sim), v.pos.x, v.pos.y);
+      if (goal !== undefined && stuck) teleport(v, goal.x, goal.y);
+      routeTo(sim, v, v.target);
     }
     // En conversation: il attend.
     if (v.talkingWith.length > 0) continue;

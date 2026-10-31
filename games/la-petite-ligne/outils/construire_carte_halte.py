@@ -400,8 +400,10 @@ POINTS = [
       rotation=2, rayon=2.5, important=True),
     p("spawn_1", 37.5, 15.5, "apparition du premier joueur, en descendant du train", rotation=0, vu_par_defaut=True),
     p("spawn_2", 39.5, 15.5, "apparition du second joueur, en descendant du train", rotation=0, vu_par_defaut=True),
-    # Firmin se tient au nord de la cloche: à côté d'elle, son ombre du soir ne passe pas sur le banc.
-    p("quay_bell", 29.5, 17.5, "Firmin, à côté de la cloche du quai; rassemblement de la fin", rotation=0,
+    # Firmin se tient à l'ouest de la cloche, au bord sud du quai, à 1,5 m du poteau: le soleil du
+    # soir (à l'ouest) porte son ombre sous la cloche, loin du banc avant 17 h 45 (fin de l'énigme);
+    # au nord, son ombre longeait celle de la cloche et s'y mêlait vue de l'orientation 0.
+    p("quay_bell", 27.5, 18.5, "Firmin, à côté de la cloche du quai; rassemblement de la fin", rotation=0,
       rayon=2.5, important=True),
     p("quay_bench", 33.0, 18.5, "le banc du quai (Jeanne le matin), 3,5 m à l'est de la cloche",
       objet="quay_bench", portee=1.5, important=True),
@@ -502,10 +504,10 @@ MOBILIER_DEPART = [
 
 TRAJETS = [
     {"id": "firmin_home_to_bell", "habitant": "firmin", "de": "firmin_house", "a": "quay_bell",
-     "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [29.5, 17.5]],
-     "note": "par la traversée de service, libre même quand le train est à quai"},
+     "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [28.5, 17.5], [27.5, 18.5]],
+     "note": "par la traversée de service, libre même quand le train est à quai; contourne la cloche par le nord"},
     {"id": "firmin_bell_to_home", "habitant": "firmin", "de": "quay_bell", "a": "firmin_house",
-     "par": [[29.5, 17.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
+     "par": [[27.5, 18.5], [28.5, 17.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
     {"id": "firmin_home_to_train", "habitant": "firmin", "de": "firmin_house", "a": "train_stop",
      "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [38.5, 17.5]]},
     {"id": "odette_door_to_counter", "habitant": "odette", "de": "grocery_door", "a": "grocery_counter",

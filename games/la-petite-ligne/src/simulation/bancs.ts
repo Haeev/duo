@@ -5,10 +5,10 @@
  * places par banc, jamais deux corps sur la même (un habitant arrêté sur le
  * banc en tient une, comme le dessine le rendu).
  */
-import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, seatPlace, standPlace } from '../etat/bancs';
+import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, benchForPoint, seatPlace, standPlace } from '../etat/bancs';
 import type { GameMap, MapProp } from '../etat/carte';
 import type { BenchSettings } from '../donnees/types';
-import type { Character, Vec2 } from '../etat/types';
+import type { Character, VillagerState, Vec2 } from '../etat/types';
 import { SIM_HZ } from './constantes';
 import { type Sim, distance, emit } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
@@ -75,7 +75,8 @@ export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
 /** S'assoit à la place `slot` du banc (libre: vérifié par l'appelant ou ici). Vrai si c'est fait. */
 export function sitDown(sim: Sim, c: Character, benchId: string, slot: number): boolean {
   const prop = benchById(sim.map, benchId);
-  if (prop === null || c.seat !== null || c.inHouse || slotTaken(sim, prop, slot)) return false;
+  // Hors de la journée de jeu (nuit, écran de fin), `updateSeats` relèverait au même pas.
+  if (sim.world.phase !== 'day' || prop === null || c.seat !== null || c.inHouse || slotTaken(sim, prop, slot)) return false;
   const place = seatPlace(prop, slot, sim.content.settings.benches, scratch);
   stopPath(sim, c);
   c.pos.x = place.x;
@@ -164,6 +165,17 @@ export function updateSeats(sim: Sim): void {
     const away = place === null || Math.abs(place.x - c.pos.x) > 1e-6 || Math.abs(place.y - c.pos.y) > 1e-6;
     const asleep = c.status === 'sleeping' || c.status === 'night' || c.status === 'breakfast';
     if (away || asleep || c.inHouse || sim.world.phase !== 'day') {
+      // Encore sur sa place (la nuit tombe, la démo finit): reposé devant, sur une case libre,
+      // jamais laissé dans l'emprise du banc. Déplacé par un effet, il reste où l'effet l'a mis.
+      if (!away) {
+        const spot = { x: c.pos.x, y: c.pos.y };
+        standingSpot(sim, c, spot);
+        stopPath(sim, c);
+        c.pos.x = spot.x;
+        c.pos.y = spot.y;
+        c.prev.x = spot.x;
+        c.prev.y = spot.y;
+      }
       c.seat = null;
       if (c.action.kind === 'sit' && !c.absent) c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
       sim.runtime.changed = true;
@@ -203,4 +215,55 @@ export function villagerSeated(sim: Sim, villagerId: string): boolean {
   seating.update(benchesOf(sim.map), sim.content.settings.benches, sim.map.points, world.characters, world.villagers);
   const index = world.villagers.findIndex((v) => v.id === villagerId);
   return index >= 0 && (seating.bench[index] ?? null) !== null;
+}
+
+/**
+ * Où va un habitant dont le point de l'emploi du temps est un banc (le point
+ * est au milieu de l'emprise, infranchissable): devant la place libre la plus
+ * proche de lui, sinon derrière, comme un joueur qui se relève. Arrêté là, il
+ * est tenu pour assis (`BenchSeating`). Écrit dans `out`; faux si le point
+ * n'est pas un banc. Sans place libre, il attend devant la plus proche.
+ */
+export function villagerRestSpot(sim: Sim, v: VillagerState, pointId: string, out: Vec2): boolean {
+  const prop = benchForPoint(benchesOf(sim.map), sim.map.points[pointId]);
+  if (prop === null) return false;
+  const s = sim.content.settings.benches;
+  const { world } = sim;
+  seating.update(benchesOf(sim.map), s, sim.map.points, world.characters, world.villagers);
+  const self = world.villagers.indexOf(v);
+  let best = -1;
+  let bestFree = false;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (let slot = 0; slot < s.slots.length; slot++) {
+    let free = !world.characters.some((c) => c.seat?.bench === prop.id && c.seat.slot === slot);
+    for (let i = 0; i < world.villagers.length && free; i++) {
+      if (i !== self && seating.bench[i] === prop && seating.slot[i] === slot) free = false;
+    }
+    const d = distance(v.pos, standPlace(prop, slot, s, scratch));
+    if ((free && !bestFree) || (free === bestFree && d < bestD)) {
+      best = slot;
+      bestFree = free;
+      bestD = d;
+    }
+  }
+  if (best < 0) return false;
+  const b = refreshBlockers(sim);
+  const front = standPlace(prop, best, s, scratch);
+  if (!bodyCollides(b, front.x, front.y)) {
+    out.x = front.x;
+    out.y = front.y;
+    return true;
+  }
+  const fx = front.x;
+  const fy = front.y;
+  const back = standPlace(prop, best, { ...s, standForward: -s.standForward }, scratch);
+  if (!bodyCollides(b, back.x, back.y)) {
+    out.x = back.x;
+    out.y = back.y;
+    return true;
+  }
+  const free = nearestFreeCell(b, { x: fx, y: fy });
+  out.x = free?.x ?? fx;
+  out.y = free?.y ?? fy;
+  return true;
 }

@@ -449,7 +449,7 @@
     {"id": "train_stop", "x": 38.5, "y": 17.5, "role": "porte de la voiture: Firmin y attend le train, les joueurs y apparaissent", "rotation": 2, "rayon": 2.5, "important": true},
     {"id": "spawn_1", "x": 37.5, "y": 15.5, "role": "apparition du premier joueur, en descendant du train", "rotation": 0, "vu_par_defaut": true},
     {"id": "spawn_2", "x": 39.5, "y": 15.5, "role": "apparition du second joueur, en descendant du train", "rotation": 0, "vu_par_defaut": true},
-    {"id": "quay_bell", "x": 29.5, "y": 17.5, "role": "Firmin, à côté de la cloche du quai; rassemblement de la fin", "rotation": 0, "rayon": 2.5, "important": true},
+    {"id": "quay_bell", "x": 27.5, "y": 18.5, "role": "Firmin, à côté de la cloche du quai; rassemblement de la fin", "rotation": 0, "rayon": 2.5, "important": true},
     {"id": "quay_bench", "x": 33.0, "y": 18.5, "role": "le banc du quai (Jeanne le matin), 3,5 m à l'est de la cloche", "objet": "quay_bench", "portee": 1.5, "important": true},
     {"id": "bell_shadow_spot", "x": 34.7, "y": 19.8, "role": "derrière le bout est du banc, dans l'herbe: on y bêche quand l'ombre de la cloche touche le banc (17 h à 17 h 45, par soleil)", "rayon": 1.5, "hauteur_vue": 0.2, "important": true},
     {"id": "coop_crate", "x": 35.5, "y": 18.5, "role": "la caisse de la coopérative", "objet": "coop_crate", "portee": 1.5, "important": true},
@@ -558,8 +558,8 @@
     }
   },
   "trajets": [
-    {"id": "firmin_home_to_bell", "habitant": "firmin", "de": "firmin_house", "a": "quay_bell", "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [29.5, 17.5]], "note": "par la traversée de service, libre même quand le train est à quai"},
-    {"id": "firmin_bell_to_home", "habitant": "firmin", "de": "quay_bell", "a": "firmin_house", "par": [[29.5, 17.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
+    {"id": "firmin_home_to_bell", "habitant": "firmin", "de": "firmin_house", "a": "quay_bell", "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [28.5, 17.5], [27.5, 18.5]], "note": "par la traversée de service, libre même quand le train est à quai; contourne la cloche par le nord"},
+    {"id": "firmin_bell_to_home", "habitant": "firmin", "de": "quay_bell", "a": "firmin_house", "par": [[27.5, 18.5], [28.5, 17.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
     {"id": "firmin_home_to_train", "habitant": "firmin", "de": "firmin_house", "a": "train_stop", "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [38.5, 17.5]]},
     {"id": "odette_door_to_counter", "habitant": "odette", "de": "grocery_door", "a": "grocery_counter", "par": [[31.5, 30.5], [31.5, 26.5], [30.5, 26.5]]},
     {"id": "odette_counter_to_door", "habitant": "odette", "de": "grocery_counter", "a": "grocery_door", "par": [[30.5, 26.5], [31.5, 26.5], [31.5, 30.5]]},

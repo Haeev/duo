@@ -3,7 +3,7 @@
 // tient une); les envies du banc et la quête des oies demandent d'être assis.
 import { describe, expect, it } from 'vitest';
 import type { AuthoredIntent, ControlFrame } from '../src/etat/actions';
-import { benchById, seatPlace } from '../src/etat/bancs';
+import { benchById, seatPlace, standPlace } from '../src/etat/bancs';
 import type { CharacterId, Vec2, WorldEvent } from '../src/etat/types';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { evaluateAll, NO_CONTEXT } from '../src/simulation/conditions';
@@ -32,17 +32,20 @@ function readySim(keepJeanne = false): Sim {
 }
 
 /**
- * Jeanne arrêtée juste derrière la place 0 du banc du quai, le banc pour point de son
- * emploi du temps (comme le matin), posée juste avant le pas: elle y est assise.
+ * Jeanne arrêtée devant la place 0 du banc du quai (là où l'y mène son trajet, lu du banc
+ * de la carte), le banc pour point de son emploi du temps (comme le matin), posée juste
+ * avant le pas: elle y est assise.
  */
 function seatJeanne(sim: Sim): void {
   const jeanne = sim.world.villagers.find((v) => v.id === 'jeanne');
-  if (jeanne === undefined) throw new Error('Jeanne absente');
+  const prop = benchById(sim.map, BENCH);
+  if (jeanne === undefined || prop === null) throw new Error('Jeanne ou le banc du quai absent');
+  const at = standPlace(prop, 0, sim.content.settings.benches, { x: 0, y: 0, facing: 0 });
   jeanne.visible = true;
   jeanne.target = BENCH;
   jeanne.speed = 0;
-  jeanne.pos = { x: 33.5, y: 19.5 };
-  jeanne.prev = { x: 33.5, y: 19.5 };
+  jeanne.pos = { x: at.x, y: at.y };
+  jeanne.prev = { x: at.x, y: at.y };
   sim.runtime.villagerPaths.jeanne = { target: BENCH, path: [] };
 }
 
@@ -127,7 +130,7 @@ describe('bancs: s’asseoir par choix', () => {
     press(sim, 'p1');
     const first = character(sim, 'p1').seat;
     expect(first).not.toBeNull();
-    // Jeanne (derrière la place 0, à x = 33,5) garde la sienne: Camille est sur l'autre.
+    // Jeanne (devant la place 0) garde la sienne: Camille est sur l'autre.
     expect(first?.slot).toBe(1);
     // Sacha devant le banc plein: il ne s'assoit pas (Espace parle à Jeanne), personne ne se superpose.
     standBefore(sim, 'p2', 0);
@@ -170,9 +173,12 @@ describe('bancs: s’asseoir par choix', () => {
     tick(sim, [{ by: 'p1', intent: { type: 'move_to', target: { kind: 'ground', x: at.x, y: at.y }, act: true } }]);
     play(sim, { decide: () => ({ controls: {}, intents: [] }), job: () => '' }, (s) => character(s, 'p1').seat !== null, SIM_HZ * 30);
     expect(character(sim, 'p1').seat).toMatchObject({ bench: BENCH, slot: 1 });
-    // Bêche en main, tournée vers le sol à côté du banc: Espace bêche (énigme d'Émile), on ne s'assoit pas.
+    // Bêche en main, au coin de l'ombre de la cloche (point de la carte, au pied du banc), tournée
+    // vers le sol à côté du banc: Espace bêche (énigme d'Émile), on ne s'assoit pas.
     const c = character(sim, 'p2');
-    placeCharacter(sim, c, { x: 42.3, y: 17.6 });
+    const spot = sim.map.points.bell_shadow_spot;
+    if (spot === undefined) throw new Error('point bell_shadow_spot absent');
+    placeCharacter(sim, c, { x: spot.x, y: spot.y });
     c.facing = 0;
     const hoe = c.bag.findIndex((s) => s?.item === 'hoe');
     if (hoe >= 0) c.selected = hoe;

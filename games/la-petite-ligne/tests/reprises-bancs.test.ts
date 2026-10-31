@@ -25,8 +25,6 @@ const CHECK_EVERY = 3;
 const EDGE = 0.05;
 /** Deux corps assis plus proches que cela (m) se dessinent l'un dans l'autre. */
 const OVERLAP = 0.5;
-/** Fenêtre (minutes) de l'arrivée de Jeanne au banc du quai, exclue tant que le bug B-T5-07 est ouvert. */
-const JEANNE_ARRIVAL = { from: 8 * 60, to: 8 * 60 + 6 };
 /** Trace gardée par catégorie: assez pour diagnostiquer, sans noyer le rapport. */
 const MAX_TRACE = 20;
 
@@ -108,14 +106,11 @@ function checkBenches(sim: Sim, seating: BenchSeating, report: Report): void {
     seatPlace(prop, slot, s, place);
     bodies.push({ id: v.id, x: place.x, y: place.y, seated: true });
   });
-  const minutes = w.clock.minutes;
   for (const b of bodies) {
     if (b.seated) continue;
     for (const prop of benches) {
       const r = prop.rect;
       if (r === null || b.x <= r.x + EDGE || b.x >= r.x + r.w - EDGE || b.y <= r.y + EDGE || b.y >= r.y + r.h - EDGE) continue;
-      // Bug B-T5-07 (ouvert): Jeanne apparaît au milieu du banc du quai à 8 h et en sort.
-      if (b.id === 'jeanne' && prop.id === 'quay_bench' && minutes >= JEANNE_ARRIVAL.from && minutes < JEANNE_ARRIVAL.to) continue;
       if (report.benchCrossers.length < MAX_TRACE) report.benchCrossers.push(`${clockLabel(sim)} ${b.id} dans ${prop.id} (${b.x.toFixed(2)}, ${b.y.toFixed(2)})`);
     }
   }

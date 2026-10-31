@@ -105,7 +105,9 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return 'place';
     case 'bench': {
       const prop = benchById(sim.map, t.bench);
-      return c.seat === null && !c.inHouse && prop !== null && !slotTaken(sim, prop, t.slot) ? 'sit' : null;
+      // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
+      const free = sim.world.phase === 'day' && c.seat === null && !c.inHouse && prop !== null && !slotTaken(sim, prop, t.slot);
+      return free ? 'sit' : null;
     }
     case 'cell': {
       const g = gardenCellAt(sim, t.cell);
@@ -156,8 +158,16 @@ const GARDEN_TIER = TIER.partner;
  */
 const SEATED_VILLAGER_TIER = TIER.bench + 1;
 
-function tierOf(sim: Sim, t: Target): number {
+/**
+ * De même, le partenaire assis passe après la place libre à côté de lui (B-T5-08): Espace devant
+ * elle assoit, même un objet en main. On lui donne debout face à lui hors d'une place libre visée,
+ * assis à côté de lui (assis, on ne vise plus de place), ou d'un clic sur lui.
+ */
+const SEATED_PARTNER_TIER = TIER.bench + 1;
+
+function tierOf(sim: Sim, c: Character, t: Target): number {
   if (t.kind === 'villager' && villagerSeated(sim, t.id)) return SEATED_VILLAGER_TIER;
+  if (t.kind === 'partner' && character(sim, partnerOf(c.id)).seat !== null) return SEATED_PARTNER_TIER;
   return t.kind === 'cell' && gardenCellAt(sim, t.cell) !== null ? GARDEN_TIER : TIER[t.kind];
 }
 
@@ -241,7 +251,7 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
     if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
-    const tier = verb === null ? 99 : tierOf(sim, t);
+    const tier = verb === null ? 99 : tierOf(sim, c, t);
     const d = distance(front, t.pos);
     if (best === null || tier < best.tier || (tier === best.tier && d < best.d)) best = { target: t, verb, tier, d };
   }
