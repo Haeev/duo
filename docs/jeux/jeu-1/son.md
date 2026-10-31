@@ -111,7 +111,7 @@ Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), 
 | Semer | `sow` | -26 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Arroser une case | `water` | -25 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Arrosoir vide | `water-empty` | -24 | 2 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
-| Remplir l'arrosoir au puits ou au tonneau | `water-fill` | -24 | 3 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Remplir l'arrosoir au puits ou au tonneau | `water-fill` | -24 | 3 | 2 variantes, hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Récolter (« pop ») | `harvest` | -21 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Récolte de qualité « belle » (un tintement, joué avec le « pop ») | `quality-fine` | -21 | 2 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Récolte de qualité « superbe » (deux tintements) | `quality-superb` | -19,5 | 2 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
@@ -128,8 +128,8 @@ Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), 
 | Ranger au sac, donner à l'autre | `bag` | -26 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Ouvrir la porte (elle grince) | `door-open` | -22 | 3 | 2 variantes, hauteur ±3 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
 | Fermer la porte | `door-close` | -21 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
-| Ouvrir le coffre | `chest-open` | -23 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
-| Fermer le coffre | `chest-close` | -22 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Ouvrir le coffre | `chest-open` | -23 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Fermer le coffre | `chest-close` | -22 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Déposer un produit dans la caisse de la coopérative | `crate-deposit` | -23 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Faire signe (G): ton repère | `ping-self` | -16 | 1 | aucune | effets | placé, réf. 6 m, jamais sous -10 dB | -6 dB |
 | Repère posé par l'autre joueur | `ping-peer` | -16 | 1 | aucune | effets | placé, réf. 6 m, jamais sous -10 dB | -6 dB |
@@ -148,9 +148,19 @@ Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), 
 
 ### 4.3 Interface et airs courts
 
+Les menus du jeu ont leur propre famille, « papier et bois » (le carnet, le crayon, la table de la maisonnette), distincte du verre de la plateforme: tic de crayon pour le focus (`ui-focus`, le plus discret, -31 LUFS), ongle sur le papier pour la réplique suivante (`ui-next`), coin de page pour l'onglet (`ui-tab`), « tok » de bois rond pour valider (`ui-confirm`), feuille qui glisse et « tok » plus mat pour revenir (`ui-back`), feuille qu'on déplie ou replie pour un panneau (`ui-panel-open`, `ui-panel-close`). Le refus (`ui-refusal`) est un double « toc-toc » feutré à la même hauteur, sans mélodie: rien de punitif, et rien de commun avec le carillon de marimba qui monte (`notify`, réservé aux bonnes nouvelles) ni avec l'erreur de Duo (coups de feutre qui descendent). Mesuré: centroïde spectral vers 410 Hz contre 1 050 Hz pour `notify`, deux coups brefs contre un arpège de 280 ms, 88 à 93 % de l'énergie au-dessus de 300 Hz pour rester audible sur des haut-parleurs de portable.
+
 | Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
 |---|---|---|---|---|---|---|---|
-| Coup de tampon: une ligne de la commande se coche | `order-stamp` | -22,5 | 2 | hauteur ±3 %, niveau ±0,5 dB | interface | non placé |  |
+| Interface du jeu: le focus se déplace (Tab, flèches) | `ui-focus` | -31 | 4 | 3 variantes, hauteur ±3 %, niveau ±1,5 dB | interface | non placé |  |
+| Interface du jeu: réplique suivante (Espace, « Suite ») | `ui-next` | -28 | 4 | 3 variantes, hauteur ±4 %, niveau ±1 dB | interface | non placé |  |
+| Interface du jeu: changer d'onglet (carnet, panneaux, A et E) | `ui-tab` | -26 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | interface | non placé |  |
+| Interface du jeu: valider (Entrée, Espace, clic sur un bouton) | `ui-confirm` | -23 | 3 | 3 variantes, hauteur ±2 %, niveau ±1 dB | interface | non placé |  |
+| Interface du jeu: revenir ou fermer (Retour arrière, « Fermer ») | `ui-back` | -24 | 3 | 2 variantes, hauteur ±2 %, niveau ±1 dB | interface | non placé |  |
+| Interface du jeu: un panneau s'ouvre (caisse, comptoir, catalogue, coffre, plan) | `ui-panel-open` | -25 | 3 | 2 variantes, hauteur ±3 %, niveau ±1 dB | interface | non placé |  |
+| Interface du jeu: un panneau se ferme | `ui-panel-close` | -26 | 3 | 2 variantes, hauteur ±3 %, niveau ±1 dB | interface | non placé |  |
+| Refus doux: action impossible, bouton désactivé, pose refusée, notification d'erreur | `ui-refusal` | -24 | 2 | 2 variantes, hauteur ±2 %, niveau ±1 dB | interface | non placé |  |
+| Coup de tampon: une ligne de la commande se coche | `order-stamp` | -22,5 | 2 | 3 variantes, hauteur ±3 %, niveau ±0,5 dB | interface | non placé |  |
 | Monnaie (vendre, acheter, paiement de la coopérative) | `coins` | -21 | 2 | 3 variantes, hauteur ±4 %, niveau ±1 dB | interface | non placé |  |
 | Notification douce (ligne de notifications du HUD) | `notify` | -21 | 2 | 2 variantes, niveau ±1 dB | interface | non placé | -3 dB |
 | Ouvrir le carnet, tourner une page | `journal-open` | -25 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | interface | non placé |  |
@@ -190,7 +200,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 ## 6. Intégration technique
 
-- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 10,9 Mo (budget visé: 20 Mo).
+- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 11,1 Mo (budget visé: 20 Mo).
 - **Boucles**: chaque fichier de boucle porte une amorce de chaque côté (la fin de la boucle avant, son début après: 1 s pour les musiques, 0,4 à 0,5 s pour les autres). Jouer avec `AudioBufferSourceNode`: `loop = true`, `loopStart` et `loopEnd` lus dans `loop.startSeconds` et `loop.endSeconds`, départ à `playFromSeconds` (pour une musique, le premier temps, 0,12 s après le début de la boucle: le raccord tombe entre deux notes).
 - **Pas de lecture en flux pour les boucles**: mesuré dans Chromium, `<audio loop>` insère 128 à 256 échantillons de silence (2,7 à 5,3 ms) à chaque tour, un clic audible sur une musique. Les boucles doivent être décodées (`decodeAudioData`).
 - **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
@@ -201,7 +211,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 ## 7. Contrôles (sans écouter)
 
 - `duo-python games/la-petite-ligne/assets-src/son/generer.py` régénère tout (environ 6 minutes) puis lance `controler.py`: sonie et crête vraie de chaque fichier par le filtre `ebur128` de ffmpeg après décodage (aucune crête au-dessus de -1,5 dBTP, aucun échantillon écrêté), silence en tête des effets (2,6 ms au plus), longueur exacte et raccord de chaque boucle (saut et seconde différence comparés à leur distribution dans le fichier, niveau au raccord comparé aux variations internes), poids du jeu.
-- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 131 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
+- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 156 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
 - Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
@@ -230,3 +240,4 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 |---|---|
 | 2026-10-31 | Première livraison pour la démo: 9 musiques, 71 sons (121 fichiers), document sonore |
 | 2026-10-31 | Pêche jouable dans la démo: cinq sons (`fishing-cast`, `fishing-splash`, `fishing-bite`, `fishing-catch`, `fishing-escape`, 10 fichiers); note du vent rattachée à la zone `forest_edge` de la carte |
+| 2026-10-31 | Gauntlet, tour 2 (défauts S1 à S3): famille d'interface « papier et bois » (`ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`), refus doux `ui-refusal`, variantes du tampon (3), du remplissage de l'arrosoir (2) et du coffre (2 et 2); 84 sons, 156 fichiers |

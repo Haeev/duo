@@ -353,9 +353,10 @@ function benchWalk(conditions: Conditions, seed: number, walkFrames: number, sto
   }
   const clock = { now: 0 };
   const now = (): number => clock.now;
-  const link = createVirtualLink(conditions, createRandom(seed).next, now);
+  const random = createRandom(seed);
+  const link = createVirtualLink(conditions, () => random.next(), now);
   const host = createHost(sim, link.host, 'p1', 'p2');
-  const guest = createGuest(content, map, link.guest, character(sim, 'p2').playerId ?? '', now);
+  const guest = createGuest(content, map, link.guest, character(sim, 'p2').playerId, now);
   host.sendWorld();
   const stepper = createFixedStepper(SIM_HZ);
   let seq = 0;

@@ -98,9 +98,18 @@ Tenue par le dev interface (`src/interface/`). Les demandes 1 à 7 sont faites p
 11. Fait côté interface (les quatre textes `placement_*` sont dans `textes.json`): la barre d'aménagement montre la raison donnée par la simulation dans `PlacementPreview.blocked` (texte tout fait, ou clé `placement_*` traduite par `textes.json`); sans texte, le message général de l'interface (`build.blocked`). Vérifié en capture: « Il y a déjà un meuble à cet endroit. ». Remarque pour la simulation: `blocked` n'est recalculé que si la case, la rotation ou `valid` changent; si la raison change sans que `valid` change, l'ancienne reste affichée.
 12. Fait côté interface: la carte de proposition prend `indefinite` de l'objet (`objets.json`) dès que le contenu le porte, lu à l'exécution, puis l'article de `textes-interface.json` (`proposal.indefinite`), puis le nom seul. Reste côté données et simulation: le champ dans le schéma du contenu et le message de la simulation (`big_purchase_proposal`, notification non affichée par l'interface, la carte la remplace).
 
+13. Simulation (facultatif, aucune urgence): donner la sorte `refusal` aux notifications de refus (`GameNotification.kind`). L'interface et l'audio l'acceptent déjà; la liste de clés de `src/interface/refus.ts` deviendrait inutile. En attendant: la liste de clés.
+14. `etat/vue.ts` (tour suivant, voir le point 7 des demandes de l'audio): une option `sound?: (kind: string) => void` dans `InterfaceOptions` pour les sons de menus. En attendant: menus muets.
+
 ## Interface
 
 Point d'avancement du dev interface (`src/interface/`), du plus récent au plus ancien.
+
+### 2026-10-31, gauntlet tour 2 (pilier 5): aménagement et refus
+
+- I1: tant qu'un meuble est en main, `.lpl-hud` porte `data-state="build"` (`hudState` dans `modele.ts`, appelé par `interface.ts`); le portrait, l'endurance et les boutons de caméra et du carnet s'effacent (`visibility: hidden`, la place reste), l'astuce aussi (la barre montre déjà les touches). Captures à 1366x768 (100, 125, 150 %) et à 1280x720 en échelle 1,5: plus aucun recouvrement.
+- S2 (part de l'interface): `src/interface/refus.ts` classe les refus; le toast prend `data-kind="refusal"` et le style erreur (`toastVisual`); l'audio ne joue plus `notify` pour un refus (point 7 des demandes de l'audio).
+- Tests: `tests/refus.test.ts` (clés, préfixe `placement_`, « Il manque … », sorte `refusal`, bonnes nouvelles inchangées, style erreur, aucun `notify` pour `already_taken` mais un pour une lettre, `hudState`).
 
 ### 2026-10-31, caméra du HUD, focus au pointeur, textes d'achat
 
@@ -190,6 +199,17 @@ Tenue par le dev audio (`src/audio/`). Chaque point dit ce que le son fait en at
 3. Sound designer (par le manager): la pêche (P1) n'a pas de sons à elle (son.md 8). En attendant, substituts: lancer `water`, touche `pickup` au bouchon, prise `harvest` et `quality-fine`, poisson échappé `water-empty`. La note du vent dans `sons.json` (« plus fort près de la lisière, x 50 à 64, y 36 à 48 ») reprend les coordonnées de l'ancienne carte: le son utilise la zone `forest_edge` de la carte du level designer.
 4. Architecte (par le manager): le SDK n'a pas de limiteur sur le bus principal ni de quatrième bus « Ambiance » (son.md 3.1, S2). En attendant: un limiteur sur les effets (ambiance comprise) et un sur l'interface, avant les bus du SDK; l'ambiance est un sous-bus des effets (réglée par le volume « Effets »).
 5. Rien d'autre à demander à la simulation: chaque événement utile existe (dont `pin`, `absence`, `cast`, `bite`, `caught`, `escaped`, arrivés pendant la nuit). Ce qui se lit dans l'état (pas selon le sol, marteau, scie, réchaud, poutre portée, menus, outil, clic au sol, notifications, lignes de la commande, poules) est dérivé d'une image à l'autre (`src/audio/declencheurs.ts`). Un nouvel événement dans `WorldEvent` fait échouer `pnpm lint` dans `declencheurs.ts` (switch exhaustif, voulu): ajouter son `case`, même muet.
+
+6. Pour le dev audio, de la part du sound-designer (gauntlet, tour 2, défauts S1 à S3; sons livrés dans `sons.json`, rien de branché): aujourd'hui les menus du jeu sont muets et un refus joue `notify`.
+   - Interface (bus interface, non placés, déclenchés par l'interface via une option du genre `sound?: (kind) => void` d'`InterfaceOptions`, branchée par `main.ts` sur `createAudio`): `ui-focus` à chaque déplacement du focus au clavier, jamais pour un focus posé par le programme; `ui-next` à chaque réplique suivante (Espace, « Suite »); `ui-tab` au changement d'onglet; `ui-confirm` sur chaque bouton validé (« Commencer la semaine », « C'est parti ! », « Continuer », achats); `ui-back` pour revenir (Retour arrière); `ui-panel-open` et `ui-panel-close` à l'ouverture et à la fermeture d'un panneau (caisse, comptoir, catalogue, coffre, plan), sauf le carnet qui garde `journal-open`. Intervalles minimaux et voix maximales dans `sons.json` (`minIntervalMs`: 45 ms pour le focus, 80 ms pour valider et revenir).
+   - Refus: `ui-refusal` pour une notification d'erreur (« Déjà pris par Sacha », sac plein, sous ou matériaux manquants: `already_taken`, `bag_full`, les `message` en variante `error`), une pose refusée et un bouton désactivé; `notify` reste aux bonnes nouvelles (lettre, quête). 600 ms au moins entre deux refus.
+   - Variantes: `order-stamp` (3), `water-fill` (2), `chest-open` (2), `chest-close` (2); les fichiers à variante unique ont disparu, la liste `files` de `sons.json` fait foi (aucun code à changer si le tirage lit déjà `files`).
+   - Fait: `src/audio/catalogue.test.ts` attend maintenant 84 sons (tous les tests du jeu passent: 255 sur 255).
+
+7. De la part du dev interface (gauntlet, tour 2, S2; branchement au tour suivant): le sound designer prépare (ou finit) le son de refus et les sons d'interface du point 6 (`ui-refusal`, `ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`); les fichiers sont déjà dans `sons.json`, rien n'est branché.
+   - Fait côté interface: un refus est reconnu par `isRefusal` de `src/interface/refus.ts` (module pur, sans DOM): clés `already_taken`, `bag_full`, `not_enough_money`, `grocer_not_buying`, `grocer_daily_cap`, `catalogue_closed`, `needs_both`, `nothing_here`, `riddle_not_yet`, `corner_*` de refus, `placement_*`, le « Il manque {missing}. » de l'établi, et toute notification de sorte `refusal` si la simulation en donne un jour. Le toast porte `data-kind="refusal"` et le style erreur.
+   - Fait côté audio (modification minimale par le dev interface, avec l'accord du manager): `declencheurs.ts` ne joue plus `notify` pour un refus; en attendant le branchement, un refus est muet.
+   - À faire au tour suivant: jouer `ui-refusal` là où `notify` est sauté (même boucle de `StateWatcher.update`, 600 ms au moins entre deux refus); pour les sons de menus, une option `sound?: (kind) => void` dans `InterfaceOptions` (`etat/vue.ts`, à décider par le dev gameplay) branchée par `main.ts` sur l'audio: l'interface l'appellera aux moments listés au point 6. Si l'architecte préfère que l'audio n'importe rien de `src/interface/`, `refus.ts` peut passer dans `etat/` tel quel.
 
 ## Audio
 
