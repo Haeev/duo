@@ -23,6 +23,7 @@ export type GameAction =
   | 'left'
   | 'right'
   | 'act'
+  | 'click'
   | 'examine'
   | 'notebook'
   | 'back'
@@ -227,11 +228,11 @@ export function createSession(options: SessionOptions): Session {
     },
     beforeFrame(loopAlpha) {
       alpha = loopAlpha;
-      if (guest !== null) guestWorld = guest.render(options.now());
+      if (guest !== null) guestWorld = guest.render(options.now(), loopAlpha);
     },
     ready() {
       if (guest === null) return true;
-      guestWorld ??= guest.render(options.now());
+      guestWorld ??= guest.render(options.now(), alpha);
       return guestWorld !== null;
     },
     hostSim() {

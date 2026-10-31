@@ -55,10 +55,16 @@
       "label": "Agir",
       "keys": [
         "Space"
-      ],
+      ]
+    },
+    {
+      "id": "click",
+      "label": "Aller là et agir (clic)",
+      "keys": [],
       "mouse": [
         "left"
-      ]
+      ],
+      "rebindable": false
     },
     {
       "id": "examine",

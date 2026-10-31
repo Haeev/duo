@@ -56,8 +56,12 @@ export interface Guest {
   queueIntent(intent: Intent): void;
   /** Un pas local: envoie les commandes et prédit son déplacement. */
   step(frame: ControlFrame): void;
-  /** Prépare l'état à afficher pour l'heure `nowMs` (positions interpolées et prédites). */
-  render(nowMs: number): WorldState | null;
+  /**
+   * Prépare l'état à afficher pour l'heure `nowMs` (positions interpolées et prédites).
+   * `alpha` (0 à 1) est l'avancement de la boucle vers le pas suivant: la prédiction est
+   * interpolée entre ses deux derniers pas, comme l'hôte le fait pour les siens.
+   */
+  render(nowMs: number, alpha: number): WorldState | null;
   onEvent(listener: (event: WorldEvent) => void): () => void;
   /** Tick de l'hôte le plus récent reçu. */
   hostTick(): number;
@@ -96,10 +100,13 @@ export function createGuest(
   const pendingFrames: ControlFrame[] = [];
   const outbox: Intent[] = [];
   const listeners = new Set<(event: WorldEvent) => void>();
+  // Prédiction de son propre personnage: position avant et après le dernier pas local, et
+  // vitesse de ce pas (celle que l'hôte calcule de la même façon), lue par l'animation et le son.
   let predicted: Vec2 | null = null;
+  const predictedPrev: Vec2 = { x: 0, y: 0 };
+  let predictedSpeed = 0;
   const correction: Vec2 = { x: 0, y: 0 };
   let lastRender = 0;
-  let lastDisplay: Vec2 | null = null;
   let predictedFacing: number | null = null;
   let latestTick = 0;
   let ack = -1;
@@ -141,10 +148,15 @@ export function createGuest(
       predictedFacing = null;
       return;
     }
-    const before = { x: predicted.x + correction.x, y: predicted.y + correction.y };
     const next = replay(auth);
-    correction.x = before.x - next.x;
-    correction.y = before.y - next.y;
+    // Le dernier pas garde sa longueur: avant et après se décalent ensemble, et la correction
+    // reprend l'écart, résorbé ensuite en douceur dans `render`. L'image ne saute pas.
+    const shiftX = next.x - predicted.x;
+    const shiftY = next.y - predicted.y;
+    predictedPrev.x += shiftX;
+    predictedPrev.y += shiftY;
+    correction.x -= shiftX;
+    correction.y -= shiftY;
     if (Math.hypot(correction.x, correction.y) > SNAP_DISTANCE) {
       correction.x = 0;
       correction.y = 0;
@@ -187,12 +199,18 @@ export function createGuest(
       }
       if (predicted === null) {
         if (!moving) return;
+        // On repart de la position affichée: aucun reste d'une correction interrompue.
         predicted = { x: c.pos.x, y: c.pos.y };
+        correction.x = 0;
+        correction.y = 0;
       }
+      predictedPrev.x = predicted.x;
+      predictedPrev.y = predicted.y;
       const facing = walkStep(refreshBlockers(sim), predicted, frame.moveX, frame.moveY, content.settings.movement.walkSpeed, SIM_DT);
       if (facing !== null) predictedFacing = facing;
+      predictedSpeed = Math.hypot(predicted.x - predictedPrev.x, predicted.y - predictedPrev.y) / SIM_DT;
     },
-    render(nowMs) {
+    render(nowMs, alpha) {
       if (sim === null) return null;
       const world = sim.world;
       const dtSeconds = lastRender === 0 ? 0 : (nowMs - lastRender) / 1000;
@@ -243,20 +261,18 @@ export function createGuest(
         world.train.prevProgress = world.train.progress;
         world.clock.minutes = lerp(a.snap.minutes, b.snap.minutes);
       }
-      // Son propre personnage: la prédiction, corrigée en douceur.
+      // Son propre personnage: la prédiction interpolée entre ses deux derniers pas, corrigée en
+      // douceur. La vitesse est celle du pas, pas celle de l'image: à 60 images par seconde pour
+      // 30 pas, une vitesse par image vaudrait 0 une image sur deux (pas muets, marche hachée).
       const mine = world.characters.find((c) => c.id === localId);
       if (mine !== undefined && predicted !== null) {
         const decay = Math.exp(-CORRECTION_DECAY * dtSeconds);
         correction.x *= decay;
         correction.y *= decay;
-        const x = predicted.x + correction.x;
-        const y = predicted.y + correction.y;
-        const moved = lastDisplay === null ? 0 : Math.hypot(x - lastDisplay.x, y - lastDisplay.y);
-        const speed = dtSeconds > 0 ? Math.min(content.settings.movement.walkSpeed, moved / dtSeconds) : 0;
-        setMover(mine, x, y, predictedFacing ?? mine.facing, speed);
-        lastDisplay = { x, y };
-      } else {
-        lastDisplay = null;
+        const t = Math.max(0, Math.min(1, alpha));
+        const x = predictedPrev.x + (predicted.x - predictedPrev.x) * t + correction.x;
+        const y = predictedPrev.y + (predicted.y - predictedPrev.y) * t + correction.y;
+        setMover(mine, x, y, predictedFacing ?? mine.facing, Math.min(content.settings.movement.walkSpeed, predictedSpeed));
       }
       return world;
     },

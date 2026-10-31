@@ -76,7 +76,6 @@ function toTarget(pick: PickResult): ClickTarget {
 export function createControls(options: ControlsOptions): Controls {
   const { input } = options;
   let seq = 0;
-  let leftWasDown = false;
   let rightWasDown = false;
 
   return {
@@ -119,11 +118,12 @@ export function createControls(options: ControlsOptions): Controls {
         }
       }
 
-      // Clic gauche: aller là et agir; Espace: agir devant soi.
+      // Clic gauche: aller là et agir; Espace: agir devant soi. Le clic est une action du
+      // manifeste (`click`), mémorisée par le SDK jusqu'au pas: une tape de pavé tactile
+      // plus courte qu'un pas compte aussi.
       const pointer = input.pointer;
-      const leftPressed = pointer.left && !leftWasDown;
+      const leftPressed = input.wasPressed('click');
       const rightPressed = pointer.right && !rightWasDown;
-      leftWasDown = pointer.left;
       rightWasDown = pointer.right;
       let clicked = false;
       if (leftPressed && pointer.inside && renderer !== null && !captured) {
@@ -135,7 +135,7 @@ export function createControls(options: ControlsOptions): Controls {
           else view.send({ type: 'move_to', target: toTarget(pick), act: true });
         }
       }
-      if (!clicked && !leftPressed && input.wasPressed('act') && !captured) view.send({ type: 'act' });
+      if (!clicked && input.wasPressed('act') && !captured) view.send({ type: 'act' });
       if ((input.wasPressed('examine') && !rightPressed) || (rightPressed && pointer.inside && !captured)) view.send({ type: 'examine' });
 
       // Molette: le meuble en main tourne, sinon l'outil change. T tourne aussi le meuble.
@@ -164,7 +164,8 @@ export function createControls(options: ControlsOptions): Controls {
         if (input.wasPressed(`slot-${i}`)) view.send({ type: 'select_slot', slot: i - 1 });
       }
 
-      const actHeld = !captured && input.isDown('act');
+      // Espace ou clic gauche tenus: porter la poutre, bâtir.
+      const actHeld = !captured && (input.isDown('act') || input.isDown('click'));
       return { seq, moveX: mx, moveY: my, actHeld };
     },
   };
