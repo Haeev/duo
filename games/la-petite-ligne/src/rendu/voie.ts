@@ -36,10 +36,12 @@ const TRAIN_FILE = 'train.glb';
 /** Rayon des roues des modèles de l'artiste (m): vitesse de rotation des roues. */
 const WHEEL_RADIUS = 0.49;
 const GATE_MODEL = 'level_crossing_gate';
-const GATE_ARM = 'level_crossing_arm';
+/** Nœud du bras dans `bourg.glb` (enfant de `level_crossing_gate`), tourné autour de Z. */
+export const GATE_ARM = 'level_crossing_gate_arm';
 const GATE_HALF_LIFE = 0.35;
-const GATE_CLOSED = 0;
-const GATE_OPEN = Math.PI / 2;
+/** Bras baissé (en travers de la route) et levé, en radians autour de Z. */
+export const GATE_CLOSED = 0;
+export const GATE_OPEN = Math.PI / 2;
 const SHED_MODEL = 'handcar_shed';
 const SHED_DOOR_ANGLE = (100 * Math.PI) / 180;
 const SHED_HALF_LIFE = 0.5;
@@ -54,6 +56,22 @@ const MINUTES_PER_DIAL = 720;
  * (le train ralentit jusqu'au quai), au départ il va de 1 à 0 (le train
  * accélère en s'éloignant du même côté, sans saut). `NaN` quand il est parti.
  */
+/** Les lisses barrent la route pendant que le train roule (arrivée et départ), pas à quai ni absent. */
+export function gateClosed(phase: TrainPhase): boolean {
+  return phase === 'arriving' || phase === 'departing';
+}
+
+/** Angle du bras après une image: il rejoint sa cible selon la demi-vie (immédiat si mouvement réduit). */
+export function gateAngleStep(
+  angle: number,
+  phase: TrainPhase,
+  dt: number,
+  reducedMotion: boolean,
+): number {
+  const target = gateClosed(phase) ? GATE_CLOSED : GATE_OPEN;
+  return angle + (target - angle) * smoothFactor(dt, reducedMotion ? 0 : GATE_HALF_LIFE);
+}
+
 export function trainOffset(phase: TrainPhase, progress: number): number {
   const p = Math.min(1, Math.max(0, progress));
   const away = TRAIN.slideDistance * TRAIN.sideDirection;
@@ -362,10 +380,8 @@ export class RailwayPart implements EventfulPart {
       this.trainX = Number.NaN;
     }
 
-    const closed = moving;
-    const gateFactor = smoothFactor(context.dt, context.reducedMotion ? 0 : GATE_HALF_LIFE);
     for (const gate of this.gates) {
-      gate.angle += ((closed ? GATE_CLOSED : GATE_OPEN) - gate.angle) * gateFactor;
+      gate.angle = gateAngleStep(gate.angle, state.phase, context.dt, context.reducedMotion);
       if (gate.arm !== null) {
         gate.arm.rotation.z = gate.angle;
       }
