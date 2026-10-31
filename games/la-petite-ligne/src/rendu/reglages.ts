@@ -92,11 +92,12 @@ export const RENDER_SETTINGS = {
     outerTreeStart: 2,
     pebbleDensity: 0.12,
     /**
-     * Décor de la carte hors de la passe d'ombre: sols et objets de cette
-     * hauteur ou moins (m: rochers, tonneaux, barrières, bancs). Leur ombre se voit
-     * à peine, et la passe d'ombre redessine chaque triangle qui la porte.
+     * Décor de la carte hors de la passe d'ombre: objets de cette hauteur ou
+     * moins (m). La passe d'ombre redessine chaque triangle qui la porte. À 1 m,
+     * bancs, barrières, rochers et tonneaux perdaient une ombre bien visible de
+     * près, et le quai son liseré: on s'en tient aux tout petits accessoires.
      */
-    shadowlessBelow: 1.0,
+    shadowlessBelow: 0.3,
   },
 
   /**

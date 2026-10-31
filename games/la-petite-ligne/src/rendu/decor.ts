@@ -99,9 +99,9 @@ export class StaticDecor {
       const floor = prop.category === 'sol' || FLOOR_MODELS.has(prop.model);
       const ground = floor ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);
       propMatrix(prop, ground, placement);
-      // Sols et petits objets: hors de la passe d'ombre (morceaux à part, même découpage).
-      const small = prop.height > 0 && prop.height <= RENDER_SETTINGS.terrain.shadowlessBelow;
-      const caster = !floor && !small;
+      // Tout petits objets: hors de la passe d'ombre (morceaux à part, même découpage).
+      // Les sols gardent la leur: le liseré d'ombre au bord du quai se voit de près.
+      const caster = !(prop.height > 0 && prop.height <= RENDER_SETTINGS.terrain.shadowlessBelow);
       const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}${caster ? '' : SHADOWLESS}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
         const bucketKey = `${key}|${part.material.uuid}`;
