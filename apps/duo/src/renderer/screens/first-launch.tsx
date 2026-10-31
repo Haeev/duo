@@ -203,19 +203,8 @@ function NetworkStep({ state }: { state: AppState }): JSX.Element {
           {t.reseau.continuer}
         </button>
       </div>
-      <p class="lien-aide">
-        <button
-          type="button"
-          class="lien"
-          data-testid="reseau-passer"
-          onClick={() => {
-            void send('setup:complete', null);
-          }}
-        >
-          {t.reseau.passer}
-        </button>
-        <span class="petit texte-second">{t.reseau.passerConsequence}</span>
-      </p>
+      {/* « Passer cette étape » (E03) reviendra avec Réglages > Réseau: sans cet écran, ne
+          pas donner l'accord laisserait Duo sans connexion, sans moyen de le donner plus tard. */}
     </section>
   );
 }
