@@ -106,11 +106,15 @@ Tenue par le dev interface (`src/interface/`). Les demandes 1 à 7 sont faites p
 12. Fait côté interface: la carte de proposition prend `indefinite` de l'objet (`objets.json`) dès que le contenu le porte, lu à l'exécution, puis l'article de `textes-interface.json` (`proposal.indefinite`), puis le nom seul. Reste côté données et simulation: le champ dans le schéma du contenu et le message de la simulation (`big_purchase_proposal`, notification non affichée par l'interface, la carte la remplace).
 
 13. Simulation (facultatif, aucune urgence): donner la sorte `refusal` aux notifications de refus (`GameNotification.kind`). L'interface et l'audio l'acceptent déjà; la liste de clés de `src/interface/refus.ts` deviendrait inutile. En attendant: la liste de clés.
-14. `etat/vue.ts` (tour suivant, voir le point 7 des demandes de l'audio): une option `sound?: (kind: string) => void` dans `InterfaceOptions` pour les sons de menus. En attendant: menus muets.
+14. Fait: `InterfaceOptions.sound` et `GameAudio.ui` (point 7 des demandes de l'audio).
 
 ## Interface
 
 Point d'avancement du dev interface (`src/interface/`), du plus récent au plus ancien.
+
+### 2026-10-31, gauntlet tour 2: sons de l'interface
+
+- Sons des menus et du refus branchés (détail: point 7 des demandes de l'audio). Tests: `tests/sons.test.ts` (sons présents dans `sons.json` sur le bus interface, son de chaque bouton, panneaux ouverts et fermés, aucune rafale: flèche tenue, double clic, refus répétés, parcours du comptoir au clavier) et `tests/refus.test.ts` (`ui-refusal` au lieu de `notify`). Vérifié dans Chromium sur la page de démonstration (journal `lplInterface.log.sounds`): comptoir survolé à la souris puis flèche, E, A, Entrée, Retour arrière donne `ui-focus`, `ui-tab`, `ui-tab`, `ui-confirm`, `ui-panel-close` (rien au survol); scène: Espace donne `ui-next`.
 
 ### 2026-10-31, gauntlet tour 2 (pilier 5): aménagement et refus
 
@@ -231,10 +235,10 @@ Tenue par le dev audio (`src/audio/`). Chaque point dit ce que le son fait en at
    - Variantes: `order-stamp` (3), `water-fill` (2), `chest-open` (2), `chest-close` (2); les fichiers à variante unique ont disparu, la liste `files` de `sons.json` fait foi (aucun code à changer si le tirage lit déjà `files`).
    - Fait: `src/audio/catalogue.test.ts` attend maintenant 84 sons (tous les tests du jeu passent: 255 sur 255).
 
-7. De la part du dev interface (gauntlet, tour 2, S2; branchement au tour suivant): le sound designer prépare (ou finit) le son de refus et les sons d'interface du point 6 (`ui-refusal`, `ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`); les fichiers sont déjà dans `sons.json`, rien n'est branché.
-   - Fait côté interface: un refus est reconnu par `isRefusal` de `src/interface/refus.ts` (module pur, sans DOM): clés `already_taken`, `bag_full`, `not_enough_money`, `grocer_not_buying`, `grocer_daily_cap`, `catalogue_closed`, `needs_both`, `nothing_here`, `riddle_not_yet`, `corner_*` de refus, `placement_*`, le « Il manque {missing}. » de l'établi, et toute notification de sorte `refusal` si la simulation en donne un jour. Le toast porte `data-kind="refusal"` et le style erreur.
-   - Fait côté audio (modification minimale par le dev interface, à la demande du manager): `declencheurs.ts` ne joue plus `notify` pour un refus; en attendant le branchement, un refus est muet.
-   - À faire au tour suivant: jouer `ui-refusal` là où `notify` est sauté (même boucle de `StateWatcher.update`, 600 ms au moins entre deux refus); pour les sons de menus, une option `sound?: (kind) => void` dans `InterfaceOptions` (`etat/vue.ts`, à décider par le dev gameplay) branchée par `main.ts` sur l'audio: l'interface l'appellera aux moments listés au point 6. Si l'architecte préfère que l'audio n'importe rien de `src/interface/`, `refus.ts` peut passer dans `etat/` tel quel.
+7. Fait (dev interface, gauntlet tour 2): sons d'interface et refus branchés.
+   - `InterfaceOptions.sound?: (id) => void` (`etat/vue.ts`), rempli par `main.ts` avec `GameAudio.ui?(id)`, ajouté au contrat et à `createAudio` (`src/audio/index.ts`): le son part à l'image suivante, bus interface, non placé, au plus `AUDIO_SETTINGS.interface.maxQueued` (4) par image, ignoré pendant la pause et s'il n'est pas dans `sons.json`.
+   - L'interface (`src/interface/sons.ts`, portillon `UiSoundGate`, délais `UI_SETTINGS.soundMinMs`, en plus de `minIntervalMs`): `ui-confirm` au clic ou à Entrée sur un bouton d'une couche (`data-sound` le change: `ui-next` pour « Suite », `none` pour « Fermer » et les onglets), `ui-refusal` sur un bouton `aria-disabled` (« Suite » quand on attend l'autre), `ui-tab` au changement d'onglet (A, E ou clic), `ui-focus` seulement quand les flèches, Z Q S D ou Tab déplacent le focus, `ui-back` pour Retour arrière hors panneau, `ui-panel-open` et `ui-panel-close` au montage et au démontage d'un panneau. Le carnet et la lettre gardent `journal-open` à l'ouverture, le coffre ses sons de couvercle. Rien au survol, rien pour un focus posé par le programme, rien pour le HUD (outils: `tool-switch` de l'audio) ni pour la proposition (`purchase-accept`, `purchase-decline`).
+   - Refus: `declencheurs.ts` joue `ui-refusal` (chez soi) à la place du `notify` sauté; 600 ms au moins entre deux (`minIntervalMs` de `sons.json` et `soundMinMs`).
 
 ## Audio
 
