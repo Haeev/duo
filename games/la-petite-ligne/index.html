@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #1b1d2e;
+        color: #f4efe6;
+        font-family: system-ui, sans-serif;
+      }
+      #jeu,
+      #interface {
+        position: absolute;
+        inset: 0;
+      }
+      #interface {
+        pointer-events: none;
+      }
+      #statut {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="jeu"></div>
+    <div id="interface"></div>
+    <p id="statut">La Petite Ligne…</p>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

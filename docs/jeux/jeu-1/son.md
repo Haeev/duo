@@ -83,7 +83,91 @@ Pour que le train soit au quai à 10 h pile, la séquence d'arrivée démarre 14
 
 Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), mesurée dans `assets-src/son/controles/mesures.csv`. Écoute: modèle « inverse » du `PannerNode` (distance de référence, facteur 0,5 à 1,3 selon le son); « coupé au-delà » veut dire qu'on ne lance pas le son, « jamais sous » qu'on garantit un niveau plancher où que soit la source.
 
-TABLEAUX_EFFETS
+### 4.1 Train
+
+| Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
+|---|---|---|---|---|---|---|---|
+| Sifflet du train, de près (samedi 10 h et 16 h) | `train-whistle` | -14 | 1 | aucune | effets | placé, réf. 15 m, jamais sous -14 dB | -9 dB |
+| Sifflet du train, de loin (partout ailleurs dans le bourg et au-delà) | `train-whistle-far` | -19 | 1 | aucune | effets | non placé | -6 dB |
+| Le train approche (14 s, de loin jusqu'à l'entrée en gare) | `train-approach` | -17 | 1 | aucune | effets | placé, réf. 15 m, jamais sous -14 dB | -4 dB |
+| Freinage et arrêt (6 s) | `train-brake` | -19 | 1 | aucune | effets | placé, réf. 15 m, jamais sous -14 dB | -4 dB |
+| Grand jet de vapeur à l'arrêt | `train-steam` | -19 | 1 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 15 m, jamais sous -14 dB | -4 dB |
+| Locomotive à l'arrêt, de 10 h à 16 h (boucle) | `train-idle-loop` (boucle) | -30 LUFS int. | 3 | aucune | effets | placé, réf. 8 m, coupé au-delà de 160 m |  |
+| Départ du train (16 s, s'éloigne) | `train-depart` | -17 | 1 | aucune | effets | placé, réf. 15 m, jamais sous -14 dB | -4 dB |
+| Cloche du quai (trois coups, arrivée et départ) | `station-bell` | -17 | 1 | aucune | effets | placé, réf. 8 m, coupé au-delà de 160 m | -4 dB |
+| Sifflet à roulette de Firmin avant le départ | `guard-whistle` | -21 | 2 | hauteur ±2 % | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+
+### 4.2 Monde (effets placés)
+
+| Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
+|---|---|---|---|---|---|---|---|
+| Pas sur l'herbe | `step-grass` | -29 | 3 | 4 variantes, hauteur ±6 %, niveau ±1,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Pas sur la terre et le chemin | `step-path` | -28,5 | 3 | 4 variantes, hauteur ±6 %, niveau ±1,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Pas sur le bois (quai, plancher) | `step-wood` | -27,5 | 3 | 4 variantes, hauteur ±5 %, niveau ±1,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Pas sur la pierre (place, puits) | `step-stone` | -28,5 | 3 | 4 variantes, hauteur ±5 %, niveau ±1,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Bêcher une case | `hoe` | -23 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Semer | `sow` | -26 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Arroser une case | `water` | -25 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Arrosoir vide | `water-empty` | -24 | 2 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Remplir l'arrosoir au puits ou au tonneau | `water-fill` | -24 | 3 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Récolter (« pop ») | `harvest` | -21 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Récolte de qualité « belle » (un tintement, joué avec le « pop ») | `quality-fine` | -21 | 2 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Récolte de qualité « superbe » (deux tintements) | `quality-superb` | -19,5 | 2 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Coup de hache | `axe-chop` | -21,5 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| L'arbre craque avant de tomber | `tree-crack` | -21 | 2 | hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Chute de l'arbre | `tree-fall` | -18 | 2 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 8 m, coupé au-delà de 160 m |  |
+| Scier à l'établi (boucle tant que l'action dure) | `saw-loop` (boucle) | -25 LUFS int. | 3 | hauteur ±2 % | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Planches sciées qui tombent sur l'établi | `saw-end` | -22 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Coup de marteau sur un élément fantôme | `hammer` | -22 | 3 | 3 variantes, hauteur ±6 %, niveau ±1,5 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Élément terminé (« tchonk ») | `build-done` | -19 | 2 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Poser un meuble | `furniture-place` | -22 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Tourner un meuble dans le plan | `furniture-rotate` | -27 | 3 | hauteur ±8 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Ramasser un objet (il saute au sac) | `pickup` | -24 | 3 | 3 variantes, hauteur ±6 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Ranger au sac, donner à l'autre | `bag` | -26 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Ouvrir la porte (elle grince) | `door-open` | -22 | 3 | 2 variantes, hauteur ±3 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Fermer la porte | `door-close` | -21 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Ouvrir le coffre | `chest-open` | -23 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Fermer le coffre | `chest-close` | -22 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Déposer un produit dans la caisse de la coopérative | `crate-deposit` | -23 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Faire signe (G): ton repère | `ping-self` | -16 | 1 | aucune | effets | placé, réf. 6 m, jamais sous -10 dB | -6 dB |
+| Repère posé par l'autre joueur | `ping-peer` | -16 | 1 | aucune | effets | placé, réf. 6 m, jamais sous -10 dB | -6 dB |
+| Geste à deux: on soulève ensemble (« hop ») | `duo-hop` | -20 | 2 | hauteur ±2 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Geste à deux: la poutre portée (boucle) | `duo-carry-loop` (boucle) | -28 LUFS int. | 3 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Allumer le réchaud | `stove-light` | -23 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Le réchaud qui mijote (boucle) | `stove-loop` (boucle) | -30 LUFS int. | 4 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Manger (« croque ») | `eat` | -24 | 3 | 2 variantes, hauteur ±6 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Gloussements des poules | `hen` | -24 | 3 | 3 variantes, hauteur ±8 %, niveau ±2 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| Le coq du bourg, au réveil | `wake-rooster` | -22 | 3 | hauteur ±3 % | effets | non placé |  |
+
+### 4.3 Interface et airs courts
+
+| Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
+|---|---|---|---|---|---|---|---|
+| Coup de tampon: une ligne de la commande se coche | `order-stamp` | -22,5 | 2 | hauteur ±3 %, niveau ±0,5 dB | interface | non placé |  |
+| Monnaie (vendre, acheter, paiement de la coopérative) | `coins` | -21 | 2 | 3 variantes, hauteur ±4 %, niveau ±1 dB | interface | non placé |  |
+| Notification douce (ligne de notifications du HUD) | `notify` | -21 | 2 | 2 variantes, niveau ±1 dB | interface | non placé | -3 dB |
+| Ouvrir le carnet, tourner une page | `journal-open` | -25 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | interface | non placé |  |
+| Proposition de gros achat (chez celui qui doit répondre) | `purchase-proposal` | -17 | 1 | aucune | interface | non placé | -6 dB |
+| Gros achat accepté (tampon « D'accord ») | `purchase-accept` | -19 | 2 | aucune | interface | non placé |  |
+| Gros achat refusé (la carte se replie) | `purchase-decline` | -24 | 2 | aucune | interface | non placé |  |
+| Clic sur le sol (repère de destination) | `ui-click` | -28 | 4 | 2 variantes, hauteur ±5 %, niveau ±1 dB | interface | non placé |  |
+| Changer d'outil | `tool-switch` | -27 | 4 | 2 variantes, hauteur ±6 %, niveau ±1 dB | interface | non placé |  |
+| Nouvelle page du carnet, nouvelle quête, quête réussie (court air) | `journal-new` | -18 | 2 | 3 variantes | interface | non placé | -6 dB |
+| Geste à deux réussi (petit air « à deux ») | `duo-done` | -18,5 | 2 | aucune | interface | non placé | -6 dB |
+| Se coucher (endormissement) | `sleep` | -21 | 3 | aucune | interface | non placé | -10 dB |
+| Réveil (air du matin, avant le petit-déjeuner) | `wake` | -20 | 3 | aucune | interface | non placé |  |
+
+### 4.4 Ambiances (boucles mono)
+
+| Événement | Son | Durée de boucle | Sonie intégrée | Bus |
+|---|---|---|---|---|
+| Rivière Aubrune (le long du bord sud) | `river` | 24 s | -26 LUFS | ambiance |
+| Vent léger dans les arbres | `wind` | 24 s | -30 LUFS | ambiance |
+| Oiseaux du matin (6 h à 12 h, plus rares l'après-midi) | `birds-morning` | 36 s | -28 LUFS | ambiance |
+| Grillons du soir (dès 19 h, et la nuit) | `crickets` | 20 s | -31 LUFS | ambiance |
+| Petit bruit du bourg (8 h à 19 h) | `village` | 40 s | -32 LUFS | ambiance |
+| Pluie dehors (jour 4) | `rain` | 16 s | -27 LUFS | ambiance |
+| Pluie sur le toit, à l'intérieur de la maisonnette | `rain-roof` | 16 s | -29 LUFS | ambiance |
 
 ## 5. Les habitants
 
