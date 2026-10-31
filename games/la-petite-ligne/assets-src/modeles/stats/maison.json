@@ -36,7 +36,7 @@
     1
    ],
    "top_height": 0.78,
-   "tris": 268
+   "tris": 332
   },
   "chair": {
    "footprint": [
@@ -44,7 +44,7 @@
     1
    ],
    "seat_height": 0.47,
-   "tris": 452
+   "tris": 404
   },
   "chest": {
    "footprint": [
@@ -67,7 +67,7 @@
     1
    ],
    "station": "stove",
-   "tris": 372
+   "tris": 484
   },
   "flower_pot": {
    "footprint": [
@@ -98,7 +98,7 @@
     1
    ],
    "wall": true,
-   "tris": 504
+   "tris": 488
   },
   "crystal_radio": {
    "footprint": [
@@ -113,7 +113,7 @@
     1
    ],
    "tier": "P1",
-   "tris": 240
+   "tris": 380
   },
   "picture_frame": {
    "footprint": [
@@ -122,7 +122,7 @@
    ],
    "wall": true,
    "tier": "P1",
-   "tris": 124
+   "tris": 116
   },
   "bread": {
    "kind": "item",
@@ -209,5 +209,5 @@
    "tris": 24
   }
  },
- "file_bytes": 549824
+ "file_bytes": 563796
 }

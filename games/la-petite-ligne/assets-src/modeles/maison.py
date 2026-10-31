@@ -65,7 +65,10 @@ def table(A):
     for x in (-0.7, 0.7):
         for y in (-0.33, 0.33):
             g.box((0.07, 0.07, 0.64), loc=(x, y, 0), color="wood", base=True, taper=(1.0, 1.0))
-    g.box((1.3, 0.05, 0.05), loc=(0, 0, 0.15), color="wood")
+    # entretoise en H qui relie vraiment les pieds: deux traverses de côté et une barre au milieu
+    for x in (-0.7, 0.7):
+        g.box((0.05, 0.6, 0.05), loc=(x, 0, 0.15), color="wood")
+    g.box((1.36, 0.05, 0.05), loc=(0, 0, 0.15), color="wood")
     return g
 
 
@@ -119,6 +122,15 @@ def shelf(A):
     return g
 
 
+def pipe_up(g, x, y, z0, z1, wall_y=0.5):
+    """Tuyau de poêle: vertical de z0 à z1, coude, puis horizontal jusqu'au mur du fond, collerette au mur."""
+    g.cyl(0.07, z1 - z0, loc=(x, y, z0), color="black", segs=8, base=True)
+    g.sphere(0.072, loc=(x, y, z1), color="black", segs=8, rings=4)
+    g.cyl(0.07, wall_y - y, loc=(x, (y + wall_y) / 2, z1), color="black", segs=8, rot=(90, 0, 0))
+    g.cyl(0.12, 0.02, loc=(x, wall_y - 0.01, z1), color="iron_light", segs=10, rot=(90, 0, 0))
+    g.cyl(0.09, 0.05, loc=(x, y, (z0 + z1) / 2), color="iron_light", segs=8)
+
+
 def stove(A):
     """Réchaud de fonte avec son tuyau (déjà dans la maisonnette)."""
     g = A.geo()
@@ -132,8 +144,8 @@ def stove(A):
     g.box((0.3, 0.03, 0.18), loc=(0, -0.21, 0.42), color="black", base=True)
     g.box((0.22, 0.035, 0.08), loc=(0, -0.215, 0.47), color="ember", base=True)
     g.box((0.12, 0.04, 0.03), loc=(0, -0.23, 0.63), color="brass")
-    g.cyl(0.07, 1.6, loc=(0.18, 0.22, 0.77), color="black", segs=8, base=True)
-    g.cyl(0.09, 0.05, loc=(0.18, 0.22, 1.5), color="iron_light", segs=8)
+    # tuyau: monte, coude vers le mur du fond (+Y, bord arrière de la case) et y entre par une collerette
+    pipe_up(g, 0.18, 0.22, 0.77, 1.85)
     g.lathe([(0.11, 0.0), (0.12, 0.13), (0.125, 0.14)], loc=(-0.15, 0.0, 0.78), colors="iron_light", segs=8)
     g.box((0.14, 0.03, 0.02), loc=(-0.31, 0.0, 0.88), color="black")
     return g
@@ -149,7 +161,7 @@ def wood_stove(A):
         g.box((0.04, 0.04, 0.12), loc=(0.18 * math.cos(a), 0.05 + 0.18 * math.sin(a), 0.0), color="iron", base=True)
     g.box((0.2, 0.04, 0.2), loc=(0, -0.2, 0.35), color="ember", base=True)
     g.box((0.24, 0.035, 0.24), loc=(0, -0.21, 0.33), color="iron", base=True)
-    g.cyl(0.07, 1.4, loc=(0, 0.05, 0.95), color="black", segs=8, base=True)
+    pipe_up(g, 0.0, 0.05, 0.95, 1.85)
     g.cyl(0.25, 0.02, loc=(0, 0.05, 0.6), color="brass", segs=10)
     return g
 
@@ -202,9 +214,10 @@ def curtains(A):
     for s in (1, -1):
         g.sphere(0.03, loc=(s * 0.64, y, 2.05), color="brass", segs=6, rings=4)
         for k in range(4):
-            g.box((0.11, 0.05, 1.1), loc=(s * (0.3 + k * 0.1), y - 0.02 * (k % 2), 1.48), color="fabric_rose" if k % 2 else "fabric_cream",
+            # rideaux qui pendent sous la tringle (et non plus coupés par elle)
+            g.box((0.11, 0.05, 1.1), loc=(s * (0.3 + k * 0.1), y - 0.02 * (k % 2), 2.03 - 1.1), color="fabric_rose" if k % 2 else "fabric_cream",
                   base=True)
-        g.box((0.45, 0.07, 0.06), loc=(s * 0.45, y - 0.02, 1.4), color="fabric_red")
+        g.box((0.45, 0.07, 0.04), loc=(s * 0.45, y - 0.02, 1.3), color="fabric_red")
     g.box((1.2, 0.04, 0.14), loc=(0, y - 0.03, 1.92), color="fabric_rose", base=True)
     return g
 
@@ -241,8 +254,11 @@ def picture_frame(A):
 def bread(A):
     g = A.geo()
     g.sphere(0.13, loc=(0, 0, 0.06), color="bread", segs=10, rings=6, scale=(1, 1, 0.55))
+    # grignes en léger relief (6 mm), à l'intérieur du contour de la miche
     for k in range(3):
-        g.box((0.14, 0.02, 0.02), loc=(0, -0.06 + k * 0.06, 0.13), color="bread_crust", rot=(0, 0, 30))
+        y = -0.05 + k * 0.05
+        g.box((0.09, 0.016, 0.012), loc=(0, y, 0.06 + 0.0715 * (1 - (y / 0.13) ** 2) ** 0.5 - 0.002),
+              color="bread_crust", rot=(0, 0, 30))
     return g
 
 
@@ -281,7 +297,8 @@ def dish_soup(A):
     for k in range(4):
         a = math.radians(k * 90 + 20)
         g.box((0.02, 0.02, 0.006), loc=(0.05 * math.cos(a), 0.05 * math.sin(a), 0.073), color="carrot" if k % 2 else "leaf_crop")
-    g.box((0.012, 0.16, 0.008), loc=(0.07, 0.04, 0.09), color="tin", rot=(12, 0, 30))
+    # cuillère posée dans le bol, le manche appuyé sur le bord (il ne le traverse plus)
+    g.box((0.012, 0.15, 0.008), loc=(0.04, 0.03, 0.088), color="tin", rot=(14, 0, 30))
     return g
 
 

@@ -16,7 +16,7 @@
    "walk_height": 0.4,
    "track_side": "-z",
    "note": "bord côté voie vers -Z (arrière); marquise centrée sur 10 m",
-   "tris": 3204
+   "tris": 3288
   },
   "gatekeeper_house": {
    "footprint": [
@@ -157,7 +157,7 @@
     1
    ],
    "note": "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée",
-   "tris": 504
+   "tris": 540
   },
   "bell_post": {
    "footprint": [
@@ -248,14 +248,14 @@
     3,
     2
    ],
-   "tris": 428
+   "tris": 452
   },
   "bicycle": {
    "footprint": [
     2,
     1
    ],
-   "tris": 520
+   "tris": 820
   },
   "ground_grass": {
    "footprint": [
@@ -507,7 +507,7 @@
     3
    ],
    "walk_height": 0.5,
-   "tris": 640
+   "tris": 652
   },
   "tree_oak": {
    "alias_of": "tree_oak_large",
@@ -534,5 +534,5 @@
    "tris": 888
   }
  },
- "file_bytes": 3581060
+ "file_bytes": 3611648
 }

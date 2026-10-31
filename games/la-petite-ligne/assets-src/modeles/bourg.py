@@ -564,10 +564,27 @@ def platform(A):
     A.add("platform_base", g, parent=root)
     c = A.geo()
     zc = 3.3
+
+    def under(y):
+        """Dessous de la tôle (elle monte de -1,8 vers +1,7)."""
+        return zc - 0.25 + 0.25 * (y + 1.8) / 3.5 - 0.08 / math.cos(math.atan(0.25 / 3.5))
+
+    # poutre longitudinale en tête des poteaux, sous la tôle; poteaux arrêtés sous la poutre;
+    # consoles (aisseliers) de part et d'autre qui portent la tôle en porte-à-faux
+    yp, hbeam = -0.9, 0.16
+    zbeam = under(yp) - hbeam / 2 + 0.004
+    c.box((10.0, 0.12, hbeam), loc=(0, yp, zbeam), color="iron")
+    zpost = zbeam - hbeam / 2
     for x in (-4.5, -1.5, 1.5, 4.5):
-        c.cyl(0.07, zc - H, loc=(x, -0.9, H), color="iron", segs=8, base=True)
-        c.cyl(0.13, 0.12, loc=(x, -0.9, H), color="iron", segs=8, base=True)
-        c.box((0.06, 1.6, 0.06), loc=(x, -0.3, zc - 0.35), color="iron", rot=(-20, 0, 0))
+        c.cyl(0.07, zpost - H + 0.005, loc=(x, yp, H), color="iron", segs=8, base=True)
+        c.cyl(0.13, 0.12, loc=(x, yp, H), color="iron", segs=8, base=True)
+        for yt in (-1.7, 1.55):
+            za = zpost - 0.55
+            zt = under(yt) + 0.004
+            d = math.hypot(yt - yp, zt - za)
+            a2 = math.degrees(math.atan2(zt - za, yt - yp))
+            c.box((0.05, d, 0.06), loc=(x, (yp + yt) / 2, (za + zt) / 2), color="iron", rot=(a2 if yt > yp else a2 - 180, 0, 0),
+                  no_round=True)
     slab(c, [(-5.0, -1.8, zc - 0.25), (5.0, -1.8, zc - 0.25), (5.0, 1.7, zc), (-5.0, 1.7, zc)], 0.08,
          by_normal("lauze_light", "paint_cream", "paint_cream", thr=0.3))
     for k in range(40):
@@ -576,9 +593,11 @@ def platform(A):
         c.cyl(0.1, 0.03, loc=(x, -1.82, zc - 0.47), color="paint_cream", segs=6, rot=(90, 0, 0))
     c.box((10.1, 0.06, 0.08), loc=(0, -1.82, zc - 0.23), color="paint_red")
     for x in (-3.0, 0.0, 3.0):
-        c.cyl(0.012, 0.4, loc=(x, -0.9, zc - 0.55), color="iron", segs=4)
-        c.cyl(0.09, 0.2, loc=(x, -0.9, zc - 0.85), color="glass_lamp", segs=6)
-        c.cyl(0.11, 0.06, loc=(x, -0.9, zc - 0.72), color="iron", segs=6, r2=0.04)
+        # lanternes pendues sous la poutre
+        zr0 = zpost
+        c.cyl(0.012, 0.4, loc=(x, yp, zr0 - 0.2), color="iron", segs=5)
+        c.cyl(0.09, 0.2, loc=(x, yp, zr0 - 0.5), color="glass_lamp", segs=6)
+        c.cyl(0.11, 0.06, loc=(x, yp, zr0 - 0.37), color="iron", segs=6, r2=0.04)
     A.add("platform_canopy", c, parent=root)
     return root
 
@@ -1069,9 +1088,11 @@ def level_crossing(A):
     A.add("level_crossing_gate_post", g, parent=root)
     a = A.geo()
     a.box((0.25, 0.25, 0.25), loc=(-0.3, 0, 0), color="iron")
+    a.box((0.3, 0.06, 0.06), loc=(-0.1, 0, 0), color="iron")  # bras qui relie le contrepoids à la lisse
     for k in range(10):
         a.box((0.4, 0.07, 0.07), loc=(0.2 + k * 0.4, 0, 0), color="paint_red" if k % 2 else "white_paint")
-    a.cyl(0.03, 0.7, loc=(4.1, 0, -0.35), color="iron", segs=5)
+    # tige pendante courte, clairement suspendue au bout de la lisse
+    a.cyl(0.025, 0.35, loc=(4.1, 0, -0.2), color="iron", segs=5)
     A.add("level_crossing_gate_arm", a, parent=root, loc=(0, 0, 1.0))
     return root
 
@@ -1263,6 +1284,9 @@ def cart(A):
             g.box((0.04, 0.03, 0.78), loc=(0.1, s * 0.6, 0.42), color="wood", rot=(0, k * 30, 0))
         g.box((1.2, 0.06, 0.06), loc=(1.2, s * 0.3, 0.55), color="wood_dark", rot=(0, 10, 0))
     g.box((0.04, 0.6, 0.04), loc=(1.75, 0, 0.45), color="wood_dark")
+    # béquille sous l'avant: la charrette tient à l'horizontale sans basculer
+    for s in (1, -1):
+        g.box((0.05, 0.05, 0.55), loc=(0.62, s * 0.3, 0.0), color="wood_dark", base=True)
     for k in range(4):
         g.box((0.6, 0.15, 0.03), loc=(-0.2 + (k % 2) * 0.1, -0.2 + k * 0.13, 0.64 + k * 0.03), color="wood_new", rot=(0, 0, 8 * k))
     return g
@@ -1284,9 +1308,39 @@ def bicycle(A):
         g.box((L, 0.03, 0.03), loc=(mx, 0, mz), color="paint_blue", rot=(0, -a, 0))
     g.box((0.22, 0.09, 0.04), loc=(-0.12, 0, 0.9), color="leather")
     g.box((0.05, 0.5, 0.03), loc=(0.48, 0, 0.95), color="iron")
+    # tige de selle, potence, porte-bagages sous chaque caisse, pédalier, chaîne et béquille:
+    # chaque pièce porte ou est portée
+    rod(g, (-0.1, 0, 0.84), (-0.12, 0, 0.885), 0.012, "iron")
+    rod(g, (0.45, 0, 0.79), (0.48, 0, 0.94), 0.014, "iron")
+    g.box((0.3, 0.3, 0.02), loc=(0.7, 0, 0.71), color="iron")
+    for yy in (-0.12, 0.12):
+        rod(g, (0.62, yy, 0.71), (0.55, yy * 0.4, 0.35), 0.008, "iron")
+    rod(g, (0.56, 0, 0.71), (0.46, 0, 0.76), 0.008, "iron")
     g.box((0.32, 0.36, 0.2), loc=(0.7, 0, 0.82), color="leather", bevel=0.02)
+    g.box((0.3, 0.3, 0.02), loc=(-0.55, 0, 0.69), color="iron")
+    for yy in (-0.12, 0.12):
+        rod(g, (-0.6, yy, 0.69), (-0.55, yy * 0.4, 0.35), 0.008, "iron")
+    rod(g, (-0.41, 0, 0.69), (-0.1, 0, 0.8), 0.008, "iron")
     g.box((0.3, 0.3, 0.16), loc=(-0.55, 0.0, 0.78), color="leather", bevel=0.02)
+    g.cyl(0.09, 0.012, loc=(0, 0.04, 0.38), color="iron", segs=12, rot=(90, 0, 0))
+    for sg in (1, -1):
+        cx, cz = 0.16 * sg * math.cos(math.radians(60)), -0.16 * sg * math.sin(math.radians(60))
+        yy = 0.06 * sg
+        rod(g, (0, yy, 0.38), (cx, yy, 0.38 + cz), 0.012, "iron")
+        g.box((0.08, 0.05, 0.02), loc=(cx, yy + 0.04 * sg, 0.38 + cz), color="black")
+    for dz in (0.085, -0.085):
+        rod(g, (0.0, 0.045, 0.38 + dz), (-0.55, 0.045, 0.35 + dz * 0.45), 0.005, "black")
+    rod(g, (-0.06, 0.03, 0.37), (-0.16, 0.18, 0.0), 0.01, "iron")
     return g
+
+
+def rod(g, p, q, r, color, segs=5):
+    """Tige cylindrique de p à q (repère du modèle)."""
+    p, q = Vector(p), Vector(q)
+    d = q - p
+    rot = d.to_track_quat("Z", "Y").to_euler()
+    g.cyl(r, d.length, loc=tuple((p + q) / 2), color=color, segs=segs,
+          rot=tuple(math.degrees(a) for a in rot))
 
 
 # Sols, chemins, clôtures ------------------------------------------------------------
@@ -1610,14 +1664,22 @@ def pontoon(A):
               bevel=0.005)
     for x in (-0.85, 0.85):
         for y in (-1.3, 0.0, 1.3):
-            g.cyl(0.08, 1.8, loc=(x, y, -1.3), color="wood_dark", segs=6, base=True)
+            # pieux arrêtés sous le platelage, sur les longerons (ils ne le percent plus)
+            g.cyl(0.08, 1.62, loc=(x, y, -1.3), color="wood_dark", segs=6, base=True)
         g.box((0.1, 3.0, 0.12), loc=(x, 0, 0.32), color="wood_dark", base=True)
     for y in (-1.3, 1.3):
         g.box((1.8, 0.1, 0.1), loc=(0, y, 0.33), color="wood_dark", base=True)
     g.cyl(0.06, 0.35, loc=(0.85, -1.3, 0.5), color="wood_dark", segs=6, base=True)
     g.cyl(0.08, 0.05, loc=(0.85, -1.3, 0.7), color="rope", segs=6)
-    for k in range(3):
-        g.box((1.2, 0.3, 0.05), loc=(0, 1.75 + k * 0.3, 0.33 - k * 0.11), color="wood_old", base=True)
+    # escalier vers la berge (+Y): deux limons posés sur le pont et au sol, deux marches de 30 cm
+    # logées entre eux, contremarches de 17 cm (0,5 m en trois hauteurs)
+    y0, y1, ztop = 1.5, 2.15, 0.44
+    ang = math.degrees(math.atan2(ztop, y1 - y0))
+    Ls = math.hypot(y1 - y0, ztop) + 0.06
+    for x in (-0.52, 0.52):
+        g.box((0.06, Ls, 0.14), loc=(x, (y0 + y1) / 2, ztop / 2), color="wood_dark", rot=(-ang, 0, 0))
+    for k, zt in enumerate((0.333, 0.167)):
+        g.box((0.98, 0.3, 0.05), loc=(0, y0 + 0.15 + k * 0.3, zt - 0.05), color="wood_old", base=True)
     return g
 
 
