@@ -2,7 +2,7 @@
 // hôte, comme le Mac (hôte) et le PC (invité) sur le réseau local. Création des deux personnages,
 // scène d'arrivée, déplacement au clavier, bêchage d'une case du potager, pause par Échap et reprise.
 import { expect, test, type Locator } from '@playwright/test';
-import { characterOf, eastKeys, holdKeys, longTasks, newWalker, positionOf, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
+import { characterOf, holdKeys, longTasks, newWalker, northKeys, positionOf, settledPosition, southKeys, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
@@ -69,50 +69,6 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     const after = await settledPosition(guest, probe, guestId);
     expect((before?.x ?? 0) - (after?.x ?? 0), 'l’invité avance vers l’ouest').toBeGreaterThan(1);
 
-    // Potager, chez l'hôte: par la rangée y = 17,5 (libre d'un bout à l'autre), la colonne x = 13,5,
-    // puis à l'est de la case (10, 29), loin de la porte en chantier que la visée préférerait.
-    await press(hostGame.getByRole('region', { name: 'Prochain objectif' }));
-    const walker = newWalker();
-    // Points de passage larges (les couloirs font trois cases), le dernier plus serré.
-    await walkAlong(
-      host,
-      probe,
-      hostId,
-      [
-        { x: 34.5, y: 17.0, tolerance: 1.5 },
-        { x: 13.8, y: 17.0, tolerance: 1.5 },
-        { x: 13.8, y: 29.5, tolerance: 0.8 },
-      ],
-      0.8,
-      480_000,
-      walker,
-    );
-    // Au potager (cases x = 7 à 10, rangée y = 29): un pas de 200 ms vers le potager, puis Espace
-    // quand la case devant le personnage en fait partie (il regarde dans le sens de son dernier pas).
-    // En rendu logiciel, un appui bref fait déjà plusieurs mètres: on corrige pas à pas.
-    let lastStep: 'west' | 'east' | null = null;
-    for (let attempt = 0; attempt < 6; attempt++) {
-      const at = await settledPosition(host, probe, hostId);
-      const x = at?.x ?? 0;
-      const facesGarden = (lastStep === 'west' && x >= 8 && x < 11.5) || (lastStep === 'east' && x >= 6 && x < 10);
-      if (facesGarden) {
-        await holdKeys(host, ['Space'], 900);
-        await settledPosition(host, probe, hostId);
-        if (probe.world()?.garden.some((g) => g.soil !== 'grass') === true) break;
-      }
-      lastStep = x > 9.5 ? 'west' : 'east';
-      const keys = lastStep === 'west' ? westKeys(walker.yaw) : eastKeys(walker.yaw);
-      await holdKeys(host, keys, 200);
-    }
-    if (probe.world()?.garden.every((g) => g.soil === 'grass') === true) {
-      const at = positionOf(probe, hostId);
-      const recent = probe.events.slice(-10).map((e) => e.type);
-      throw new Error(`Aucune case bêchée: hôte en (${at?.x.toFixed(2)}, ${at?.y.toFixed(2)}), derniers événements ${recent.join(', ')}`);
-    }
-    w = await probe.until('une case du potager bêchée', (s) => s.garden.some((g) => g.soil !== 'grass'), 60_000);
-    expect(probe.events.some((e) => e.type === 'tilled')).toBe(true);
-    await shot('2-potager');
-
     // Pause par Échap chez l'invité: les deux en pause, l'horloge ne bouge plus; reprise à deux.
     await guestGame.locator('body').press('Escape');
     await expect(guest.locator('.vue')).toHaveAttribute('data-statut', 'paused');
@@ -125,6 +81,51 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     await expect(host.locator('.vue')).toHaveAttribute('data-statut', 'running');
     await expect(guest.locator('.vue')).toHaveAttribute('data-statut', 'running');
     await expect.poll(() => probe.fast()?.tick ?? -1, { timeout: 20_000 }).toBeGreaterThan(pausedTick);
+
+    // Potager, chez l'hôte (cases x = 7 à 10, y = 28 à 30). Accès par l'ouest puis le sud: au nord,
+    // la porte en chantier, à l'est, le poulailler en chantier, sont visés avant les cases (constaté).
+    await press(hostGame.getByRole('region', { name: 'Prochain objectif' }));
+    const walker = newWalker();
+    await walkAlong(
+      host,
+      probe,
+      hostId,
+      [
+        { x: 34.5, y: 17.0, tolerance: 1.5 },
+        { x: 3.6, y: 17.0, tolerance: 1.0 },
+        { x: 3.6, y: 31.6, tolerance: 1.0 },
+        { x: 9.0, y: 31.6, tolerance: 0.9 },
+      ],
+      0.9,
+      480_000,
+      walker,
+    );
+    // Vrai clic sur le HUD (pas un clic DOM): le cadre du jeu reprend le focus clavier après la pause.
+    await hostGame.getByRole('region', { name: 'Prochain objectif' }).click({ noWaitAfter: true, timeout: 60_000 });
+    // Un pas vers le nord, puis Espace quand la case devant (au nord) est du potager.
+    // En rendu logiciel, un appui bref fait déjà plusieurs mètres: on corrige pas à pas.
+    let lastStep: 'north' | 'south' | null = null;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const at = await settledPosition(host, probe, hostId);
+      const x = at?.x ?? 0;
+      const y = at?.y ?? 0;
+      if (lastStep === 'north' && x >= 7 && x < 11 && y >= 28.6 && y < 32) {
+        // Appui long: une image peut durer plus d'une seconde, un appui plus bref passe inaperçu.
+        await holdKeys(host, ['Space'], 2000);
+        await settledPosition(host, probe, hostId);
+        if (probe.world()?.garden.some((g) => g.soil !== 'grass') === true) break;
+      }
+      lastStep = y > 30 || lastStep === null ? 'north' : 'south';
+      await holdKeys(host, lastStep === 'north' ? northKeys(walker.yaw) : southKeys(walker.yaw), 900);
+    }
+    if (probe.world()?.garden.every((g) => g.soil === 'grass') === true) {
+      const at = positionOf(probe, hostId);
+      const recent = probe.events.slice(-10).map((e) => e.type);
+      throw new Error(`Aucune case bêchée: hôte en (${at?.x.toFixed(2)}, ${at?.y.toFixed(2)}), derniers événements ${recent.join(', ')}`);
+    }
+    w = await probe.until('une case du potager bêchée', (s) => s.garden.some((g) => g.soil !== 'grass'), 60_000);
+    expect(probe.events.some((e) => e.type === 'tilled')).toBe(true);
+    await shot('2-potager');
 
     // Ni erreur de page, ni ressource manquante, et l'état tient dans 64 Kio (ADR 0007).
     expect(probe.maxWorldBytes()).toBeLessThan(64 * 1024);

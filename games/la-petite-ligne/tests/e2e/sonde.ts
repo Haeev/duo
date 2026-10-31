@@ -246,6 +246,16 @@ export function westKeys(yaw: number): readonly string[] {
   return keysToward(yaw, Math.PI);
 }
 
+/** Touches qui mènent vers le nord (y décroissant). */
+export function northKeys(yaw: number): readonly string[] {
+  return keysToward(yaw, -Math.PI / 2);
+}
+
+/** Touches qui mènent vers le sud (y croissant). */
+export function southKeys(yaw: number): readonly string[] {
+  return keysToward(yaw, Math.PI / 2);
+}
+
 /** Touches qui mènent vers l'est (x croissant). */
 export function eastKeys(yaw: number): readonly string[] {
   return keysToward(yaw, 0);

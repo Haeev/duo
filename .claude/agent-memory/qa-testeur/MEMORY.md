@@ -35,3 +35,4 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Ne jamais `pkill` Chromium par motif: d'autres membres en font tourner sur la même machine; arrêter ses propres tâches de fond (TaskStop).
 - Bug connu sans correctif: test `it.fails` avec la référence du bug, la CI reste verte et le test échoue dès la correction (à passer en `it`).
 - Robots de La Petite Ligne: la graine ne change pas leur parcours (8 graines, durées et résultats identiques); la variété vient des options du robot.
+- Pilote clavier en rendu logiciel: ne pas supposer l'orientation de la caméra, la réestimer d'après le déplacement observé; lire la position une fois le personnage arrêté (les instantanés de l'hôte ont 1 à 2 s de retard); un appui de 200 ms peut faire plusieurs mètres ou rien du tout selon la durée des images. Jouer les étapes fragiles (pause) avant les longues marches: l'horloge tourne pendant la marche, et minuit ramène tout le monde à la maison.

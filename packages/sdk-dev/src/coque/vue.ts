@@ -78,7 +78,7 @@ export function mountGameView(options: GameViewOptions): GameView {
   const players = (): string => {
     const list = platform.players();
     if (list === null) return '';
-    return list.map((p) => `${p.name} (${p.role === 'host' ? 'hôte' : 'invité'})`).join(' et ');
+    return list.map((p) => `${p.name} (${p.role === 'host' ? 'héberge' : 'a rejoint'})`).join(' et ');
   };
 
   const nameOf = (id: string | null): string =>
@@ -95,7 +95,7 @@ export function mountGameView(options: GameViewOptions): GameView {
         panel.append(element('p', { text: `Chargement ${Math.round(current.progress * 100)} %` }));
         break;
       case 'waiting-start':
-        panel.append(element('p', { text: 'Prêt. On attend l’autre joueur.' }));
+        panel.append(element('p', { text: 'C’est bon. On attend l’autre ordinateur.' }));
         break;
       case 'running':
         overlay.hidden = true;
