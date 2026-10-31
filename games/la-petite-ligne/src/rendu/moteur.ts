@@ -39,6 +39,7 @@ import { CharactersPart } from './personnages';
 import { HousePart } from './maison';
 import { GardenPart } from './potager';
 import { FarmLifePart } from './vie';
+import { EffectsPart } from './effets';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;
@@ -189,6 +190,9 @@ export class RenderEngine implements Renderer {
     world.add(house);
     world.add(garden);
     world.add(farm);
+    const effects = new EffectsPart(map, content, library, materials, terrain, this.resources, characters, house, this.rig);
+    this.scene.add(effects.group);
+    world.add(effects);
     onProgress(LOAD_BUILD_SHARE);
 
     const local = this.localCharacter(this.view.world());

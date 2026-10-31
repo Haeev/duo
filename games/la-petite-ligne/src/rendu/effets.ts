@@ -62,6 +62,12 @@ const BELL_FIRST_MINUTE = 17 * 60;
 const BELL_LAST_MINUTE = 17 * 60 + 30;
 const BELL_SPARKLE_EVERY = 0.6;
 const BELL_RING_OPACITY = 0.35;
+/** Générateur de Park et Miller (décor seulement). */
+const PM_MULTIPLIER = 16807;
+const PM_MODULUS = 2147483647;
+const HASH_X = 12.9898;
+const HASH_SALT = 78.233;
+const HASH_SCALE = 43758.5453;
 
 /** Recette d'une gerbe de particules. */
 interface Burst {
@@ -130,8 +136,8 @@ class ParticlePool {
 
   /** Suite pseudo-aléatoire locale (décor seulement, jamais dans la simulation). */
   private random(): number {
-    this.seed = (this.seed * 16807) % 2147483647;
-    return (this.seed - 1) / 2147483646;
+    this.seed = (this.seed * PM_MULTIPLIER) % PM_MODULUS;
+    return (this.seed - 1) / (PM_MODULUS - 1);
   }
 
   emit(kind: BurstKind, x: number, y: number, z: number, countScale = 1): void {
@@ -547,6 +553,6 @@ export class EffectsPart implements EventfulPart {
 
 /** Valeur stable dans [0, 1[ pour l'index d'une goutte de pluie. */
 function hashUnit(index: number, salt: number): number {
-  const s = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
+  const s = Math.sin(index * HASH_X + salt * HASH_SALT) * HASH_SCALE;
   return s - Math.floor(s);
 }
