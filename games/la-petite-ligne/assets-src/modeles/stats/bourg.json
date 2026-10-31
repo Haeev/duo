@@ -164,7 +164,7 @@
     1,
     1
    ],
-   "tris": 214
+   "tris": 202
   },
   "bench": {
    "footprint": [
@@ -537,5 +537,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3465016
+ "file_bytes": 3464160
 }

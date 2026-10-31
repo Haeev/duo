@@ -1164,16 +1164,27 @@ def level_crossing(A):
 # Mobilier du bourg --------------------------------------------------------------------
 
 def bell_post(A):
+    """Cloche du quai sous la marquise: pas de toit propre (elle est abritée), potence tenue par une équerre.
+
+    Tout le modèle reste sous 2,51 m (2,91 m posé sur le quai), à plus de 5 cm du dessous de la tôle
+    (2,97 m au plus bas sur son emprise). La cloche, sa chape et sa corde ne bougent pas: l'énigme de
+    l'ombre sur le banc en dépend (src/rendu/lumiere.test.ts). Rien de neuf au-dessus de x 0,35 sous
+    2,4 m, zone que ce test prend pour la cloche.
+    """
     g = A.geo()
     g.box((0.4, 0.4, 0.15), color="stone", base=True)
-    g.box((0.16, 0.16, 2.6), loc=(0, 0, 0.15), color="paint_red", base=True)
-    g.box((0.7, 0.12, 0.12), loc=(0.25, 0, 2.55), color="paint_red")
-    g.box((0.1, 0.1, 0.4), loc=(0.48, 0, 2.38), color="iron")
+    # poteau arrêté sous le bras, bras posé en tête du poteau (sur toute sa largeur)
+    g.box((0.16, 0.16, 2.26), loc=(0, 0, 0.15), color="paint_red", base=True)
+    g.box((0.72, 0.1, 0.1), loc=(0.26, 0, 2.41), color="paint_red", base=True)
+    # équerre: jambe de force du flanc du poteau au dessous du bras, arrêtée avant la chape
+    dx, dz = 0.22, 0.36
+    g.box((0.05, 0.04, math.hypot(dx, dz)), loc=(0.08 + dx / 2, 0, 2.05 + dz / 2), color="iron",
+          rot=(0, math.degrees(math.atan2(dx, dz)), 0))
+    # chape de la cloche, prise dans le bras
+    g.box((0.1, 0.1, 0.24), loc=(0.48, 0, 2.30), color="iron")
     g.lathe([(0.2, 0.0), (0.18, 0.05), (0.12, 0.2), (0.09, 0.3), (0.0, 0.33)], loc=(0.55, 0, 1.95), colors="brass", segs=10)
     g.sphere(0.035, loc=(0.55, 0, 1.94), color="iron", segs=6, rings=4)
     g.box((0.01, 0.01, 0.6), loc=(0.55, 0.0, 1.62), color="rope")
-    slab(g, [(-0.2, -0.35, 2.75), (0.9, -0.35, 2.75), (0.9, 0.0, 2.95), (-0.2, 0.0, 2.95)], 0.04, "paint_red")
-    slab(g, [(0.9, 0.35, 2.75), (-0.2, 0.35, 2.75), (-0.2, 0.0, 2.95), (0.9, 0.0, 2.95)], 0.04, "paint_red")
     return g
 
 
