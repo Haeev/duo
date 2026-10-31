@@ -16,6 +16,7 @@ import type {
   WebGLRenderer,
 } from 'three';
 import type { GameMap } from '../etat/carte';
+import type { WorldEvent } from '../etat/types';
 import type { FrameContext, RenderPart } from './contexte';
 import { createAmbiance } from './ambiance';
 import type { DaylightRig } from './lumiere';
@@ -49,6 +50,8 @@ export interface RenderHooks {
 /** Une partie ajoutée par une extension. */
 export interface ExtensionPart extends RenderPart {
   update(context: FrameContext): void;
+  /** Événements ponctuels du monde (arrosage, bêche, sifflet...), avant la mise à jour de l'image. */
+  handleEvent?(event: WorldEvent, context: FrameContext): void;
   dispose?(): void;
 }
 

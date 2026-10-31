@@ -311,7 +311,6 @@ export class RenderEngine implements Renderer {
       materials,
       terrain,
       this.resources,
-      effects,
       decor.clockHands,
     );
     this.scene.add(railway.group);

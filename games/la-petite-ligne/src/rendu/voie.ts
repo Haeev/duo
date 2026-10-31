@@ -6,13 +6,12 @@
  * halte, à l'heure du jeu.
  */
 import type { Object3D } from 'three';
-import { AnimationMixer, Group, Matrix4, Vector3 } from 'three';
+import { AnimationMixer, Group, Matrix4 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
-import type { TrainPhase, WorldEvent } from '../etat/types';
+import type { TrainPhase } from '../etat/types';
 import { smoothFactor } from './camera';
 import type { FrameContext } from './contexte';
 import { propHints, propMatrix, type ClockHand } from './decor';
-import type { EffectsPart } from './effets';
 import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -32,8 +31,6 @@ const CARS = [
   { model: 'coach', length: 9 },
   { model: 'locomotive', length: 7.4 },
 ] as const;
-/** Cheminée de la locomotive, dans son repère, si le modèle n'a pas de point `smoke_anchor`. */
-const CHIMNEY = new Vector3(2.95, 3.4, 0);
 const TRAIN_FILE = 'train.glb';
 /** Rayon des roues des modèles de l'artiste (m): vitesse de rotation des roues. */
 const WHEEL_RADIUS = 0.49;
@@ -49,7 +46,6 @@ const HANDCAR_MODEL = 'handcar';
 const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DIAL = 12;
 const MINUTES_PER_DIAL = 720;
-const WHISTLE_PUFFS = 6;
 
 /**
  * Décalage du train le long de la voie (m) depuis son arrêt au quai, selon la
@@ -95,9 +91,7 @@ export class RailwayPart implements EventfulPart {
     handcar: Object3D | null;
     amount: number;
   } | null = null;
-  private smokeTimer = 0;
   private trainX = Number.NaN;
-  private readonly chimney = new Vector3();
   private readonly mixers: { mixer: AnimationMixer; duration: number }[] = [];
   private smokeAnchor: Object3D | null = null;
 
@@ -119,7 +113,6 @@ export class RailwayPart implements EventfulPart {
     materials: SharedMaterials,
     private readonly terrain: Terrain,
     resources: ResourceTracker,
-    private readonly effects: EffectsPart,
     private readonly clockHands: readonly ClockHand[],
   ) {
     this.group.name = 'voie';
@@ -234,28 +227,6 @@ export class RailwayPart implements EventfulPart {
     this.rails.end();
   }
 
-  handleEvent(event: WorldEvent): void {
-    if (event.type === 'train_whistle' && this.train.visible) {
-      this.puff(WHISTLE_PUFFS);
-    }
-  }
-
-  private puff(count: number): void {
-    const locomotive = this.cars[this.cars.length - 1];
-    if (locomotive === undefined) {
-      return;
-    }
-    if (this.smokeAnchor !== null) {
-      this.smokeAnchor.getWorldPosition(this.chimney);
-    } else {
-      this.chimney.copy(CHIMNEY);
-      locomotive.localToWorld(this.chimney);
-    }
-    for (let i = 0; i < count; i += 1) {
-      this.effects.particles.emit('smoke', this.chimney.x, this.chimney.y, this.chimney.z);
-    }
-  }
-
   update(context: FrameContext): void {
     const state = context.world.train;
     const progress = state.prevProgress + (state.progress - state.prevProgress) * context.alpha;
@@ -279,11 +250,6 @@ export class RailwayPart implements EventfulPart {
       // Roues qui tournent au rythme du glissement (une révolution par clip).
       for (const entry of this.mixers) {
         entry.mixer.update((speed * context.dt * entry.duration) / (2 * Math.PI * WHEEL_RADIUS));
-      }
-      this.smokeTimer -= context.dt;
-      if (moving && speed > 0 && this.smokeTimer <= 0 && !context.reducedMotion) {
-        this.smokeTimer = 1 / RENDER_SETTINGS.effects.smokePuffsPerSecond;
-        this.puff(1);
       }
     } else {
       this.trainX = Number.NaN;

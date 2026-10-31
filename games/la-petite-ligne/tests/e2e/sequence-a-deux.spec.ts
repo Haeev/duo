@@ -2,7 +2,7 @@
 // hôte, comme le Mac (hôte) et le PC (invité) sur le réseau local. Création des deux personnages,
 // scène d'arrivée, déplacement au clavier, bêchage d'une case du potager, pause par Échap et reprise.
 import { expect, test, type Locator } from '@playwright/test';
-import { characterOf, holdKeys, longTasks, newWalker, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
+import { characterOf, holdKeys, longTasks, newWalker, positionOf, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
@@ -43,8 +43,8 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     expect(characterOf(w, GUEST).name).toBe(GUEST);
 
     // Arrivée: scène à deux avec Firmin, l'horloge arrêtée tant qu'elle dure.
-    w = await probe.until('scène d’arrivée', (s) => s.scene?.dialogue === 'firmin_arrival');
-    expect(w.clock.running).toBe(false);
+    // Le premier état de la scène peut précéder d'un pas l'arrêt de l'horloge: on attend l'arrêt.
+    w = await probe.until('scène d’arrivée, horloge arrêtée', (s) => s.scene?.dialogue === 'firmin_arrival' && !s.clock.running, 30_000);
     await expect(hostGame.getByRole('region', { name: 'Firmin Lacombe' })).toBeVisible();
     await expect(guestGame.getByRole('region', { name: 'Firmin Lacombe' })).toBeVisible();
     await shot('1-arrivee');
@@ -82,19 +82,24 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
         { x: 34.5, y: 17.0, tolerance: 1.5 },
         { x: 13.8, y: 17.0, tolerance: 1.5 },
         { x: 13.8, y: 29.5, tolerance: 1.2 },
-        { x: 11.6, y: 29.5, tolerance: 0.8 },
+        { x: 11.5, y: 29.5, tolerance: 0.5 },
       ],
       0.8,
       480_000,
       walker,
     );
-    // Se tourner vers l'ouest (la case du potager), houe en main (case 1), Espace tenu; jusqu'à
-    // trois essais, un pas vers l'ouest entre deux (la visée peut tomber sur une case voisine).
+    // Arrivé par l'est, l'hôte regarde vers l'ouest, la case (10, 29) du potager devant lui: houe en
+    // main (case 1), Espace tenu. Jusqu'à trois essais, avec un tout petit pas vers l'ouest entre deux.
     for (let attempt = 0; attempt < 3; attempt++) {
-      await holdKeys(host, westKeys(walker.yaw), Math.min(walker.holdMs, 500));
+      if (attempt > 0) await holdKeys(host, westKeys(walker.yaw), 200);
       await holdKeys(host, ['Space'], 900);
       await settledPosition(host, probe, hostId);
       if (probe.world()?.garden.some((g) => g.soil !== 'grass') === true) break;
+    }
+    if (probe.world()?.garden.every((g) => g.soil === 'grass') === true) {
+      const at = positionOf(probe, hostId);
+      const recent = probe.events.slice(-10).map((e) => e.type);
+      throw new Error(`Aucune case bêchée: hôte en (${at?.x.toFixed(2)}, ${at?.y.toFixed(2)}), derniers événements ${recent.join(', ')}`);
     }
     w = await probe.until('une case du potager bêchée', (s) => s.garden.some((g) => g.soil !== 'grass'), 60_000);
     expect(probe.events.some((e) => e.type === 'tilled')).toBe(true);

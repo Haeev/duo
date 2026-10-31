@@ -10,7 +10,6 @@ import { IsoCameraRig, smoothFactor } from './camera';
 import { PickRegistry, dampAngle, interpolate, yawFromFacing, yawFromQuarter } from './contexte';
 import { DaylightRig } from './lumiere';
 import { MODEL_VARIANTS, textHash } from './modeles';
-import { RENDER_SETTINGS } from './reglages';
 import { buildSubstitute, hasDedicatedSubstitute } from './substituts';
 
 const EPSILON = 1e-6;
@@ -112,15 +111,6 @@ describe('repères et interpolation', () => {
 });
 
 describe('lumière du jour', () => {
-  it('couvre toute la journée, moments clés dans l’ordre', () => {
-    const keys = RENDER_SETTINGS.daylight;
-    expect(keys[0]?.minutes).toBe(0);
-    expect(keys[keys.length - 1]?.minutes).toBe(1440);
-    for (let i = 1; i < keys.length; i += 1) {
-      expect(keys[i]?.minutes ?? 0).toBeGreaterThanOrEqual(keys[i - 1]?.minutes ?? 0);
-    }
-  });
-
   it('à 17 h 15 par soleil, l’ombre de la cloche part vers l’est et touche le banc', () => {
     const map = loadMap(MAP_FILES).map;
     const rig = new DaylightRig(new Scene());

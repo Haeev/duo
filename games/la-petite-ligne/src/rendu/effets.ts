@@ -3,7 +3,7 @@
  * terre, graines, gouttes, copeaux, poussière de chantier, grain, étincelles
  * de la qualité « belle »), objet récolté qui saute au sac, case visée
  * surlignée (grisée si l'action est impossible), repère de destination d'un
- * clic, pluie, et le reflet discret au pied du banc quand l'ombre de la cloche
+ * clic, et le reflet discret au pied du banc quand l'ombre de la cloche
  * le touche (énigme d'Émile, de 17 h à 17 h 30 par soleil).
  */
 import {
@@ -25,7 +25,7 @@ import type { Content } from '../donnees/types';
 import type { IsoCameraRig } from './camera';
 import type { FrameContext } from './contexte';
 import { ShapeBuilder, paintGeometry } from './geometrie';
-import { createInstanced, finishInstances } from './instances';
+import { createInstanced } from './instances';
 import type { HousePart } from './maison';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -56,12 +56,10 @@ const JUMP_START_SCALE = 1.25;
 const JUMP_END_SCALE = 0.3;
 const CHOP_TRAUMA = 0.18;
 const FELL_TRAUMA = 0.5;
-const RAIN_TILT = 0.12;
-const RAIN_COLOR = '#c5d7e0';
 const BELL_FIRST_MINUTE = 17 * 60;
 const BELL_LAST_MINUTE = 17 * 60 + 30;
-const BELL_SPARKLE_EVERY = 0.6;
-const BELL_RING_OPACITY = 0.35;
+const BELL_SPARKLE_EVERY = 0.45;
+const BELL_RING_OPACITY = 0.5;
 const RIPPLE_POOL = 8;
 const RIPPLE_START = 0.6;
 const RIPPLE_GROWTH = 2.4;
@@ -69,9 +67,6 @@ const RIPPLE_OPACITY = 0.8;
 /** Générateur de Park et Miller (décor seulement). */
 const PM_MULTIPLIER = 16807;
 const PM_MODULUS = 2147483647;
-const HASH_X = 12.9898;
-const HASH_SALT = 78.233;
-const HASH_SCALE = 43758.5453;
 
 /** Recette d'une gerbe de particules. */
 interface Burst {
@@ -176,16 +171,6 @@ const BURSTS = {
     gravity: -0.1,
     drag: 0.8,
   },
-  smoke: {
-    cell: 'white_paint',
-    count: 1,
-    speed: 0.3,
-    up: 1.2,
-    life: FX.smokeSeconds,
-    size: 0.5,
-    gravity: -0.05,
-    drag: 0.4,
-  },
 } satisfies Record<string, Burst>;
 
 export type BurstKind = keyof typeof BURSTS;
@@ -265,7 +250,7 @@ class ParticlePool {
       this.size[i] = burst.size * (HALF_CELL + this.random());
       this.gravity[i] = burst.gravity;
       this.drag[i] = burst.drag;
-      this.grows[i] = kind === 'dust' || kind === 'smoke' ? 1 : 0;
+      this.grows[i] = kind === 'dust' ? 1 : 0;
       this.mesh.setColorAt(i, this.color);
     }
   }
@@ -349,15 +334,9 @@ export class EffectsPart implements EventfulPart {
   private readonly bellRing: Mesh;
   private bellSparkle = 0;
   private readonly jumps: Jump[] = [];
-  private readonly rain: InstancedMesh;
-  private readonly rainOffsets: Float32Array;
   private readonly gardenCells: Set<string>;
   private readonly tmp = new Vector3();
   private readonly target = new Vector3();
-  private readonly matrix = new Matrix4();
-  private readonly rainTilt = new Quaternion().setFromEuler(new Euler(RAIN_TILT, 0, RAIN_TILT));
-  private readonly rainScale = new Vector3(1, 1, 1);
-  private readonly rainDrops: number;
   private time = 0;
 
   constructor(
@@ -374,7 +353,6 @@ export class EffectsPart implements EventfulPart {
     share = 1,
   ) {
     this.group.name = 'effets';
-    this.rainDrops = Math.max(1, Math.round(FX.rainDrops * share));
     this.particles = new ParticlePool(
       materials,
       resources,
@@ -439,24 +417,7 @@ export class EffectsPart implements EventfulPart {
     this.bellRing.name = 'reflet de la cloche';
     this.bellRing.visible = false;
 
-    const drop = new ShapeBuilder().box([0.02, 0.5, 0.02], [0, 0, 0], 'white_paint').build();
-    this.rain = createInstanced('pluie', resources.track(drop), materials.palette, this.rainDrops);
-    this.rain.castShadow = false;
-    this.rain.receiveShadow = false;
-    this.rain.frustumCulled = false;
-    const rainColor = new Color(RAIN_COLOR);
-    this.rainOffsets = new Float32Array(this.rainDrops * 3);
-    for (let i = 0; i < this.rainDrops; i += 1) {
-      this.rainOffsets[i * 3] = hashUnit(i, 1);
-      this.rainOffsets[i * 3 + 1] = hashUnit(i, 2);
-      this.rainOffsets[i * 3 + 2] = hashUnit(i, 3);
-      this.rain.setColorAt(i, rainColor);
-    }
-    this.rain.count = this.rainDrops;
-    finishInstances(this.rain);
-    this.rain.visible = false;
-
-    this.group.add(this.highlight, this.marker, this.bellRing, this.rain);
+    this.group.add(this.highlight, this.marker, this.bellRing);
     // Ronds dans l'eau et ondes au sol: une petite réserve d'anneaux réutilisés.
     for (let i = 0; i < RIPPLE_POOL; i += 1) {
       const material = resources.track(
@@ -621,7 +582,6 @@ export class EffectsPart implements EventfulPart {
     this.updateHighlight(context);
     this.updateMarker(context);
     this.updateBell(context);
-    this.updateRain(context);
     this.particles.update(context.dt);
   }
 
@@ -727,31 +687,6 @@ export class EffectsPart implements EventfulPart {
     }
   }
 
-  private updateRain(context: FrameContext): void {
-    const raining = context.world.weather === 'rain';
-    this.rain.visible = raining;
-    if (!raining) {
-      return;
-    }
-    const focus = this.rig.focus;
-    const radius = this.rig.viewRadius() + FX.rainAreaPadding;
-    const fall = (context.time * FX.rainSpeed) / FX.rainHeight;
-    const position = this.tmp;
-    for (let i = 0; i < this.rainDrops; i += 1) {
-      const ox = this.rainOffsets[i * 3] ?? 0;
-      const oy = this.rainOffsets[i * 3 + 1] ?? 0;
-      const oz = this.rainOffsets[i * 3 + 2] ?? 0;
-      const height = (((oy - fall) % 1) + 1) % 1;
-      position.set(
-        focus.x + (ox * 2 - 1) * radius,
-        height * FX.rainHeight,
-        focus.z + (oz * 2 - 1) * radius,
-      );
-      this.rain.setMatrixAt(i, this.matrix.compose(position, this.rainTilt, this.rainScale));
-    }
-    this.rain.instanceMatrix.needsUpdate = true;
-  }
-
   dispose(): void {
     for (const jump of this.jumps) {
       jump.object.removeFromParent();
@@ -759,10 +694,4 @@ export class EffectsPart implements EventfulPart {
     this.jumps.length = 0;
     this.group.removeFromParent();
   }
-}
-
-/** Valeur stable dans [0, 1[ pour l'index d'une goutte de pluie. */
-function hashUnit(index: number, salt: number): number {
-  const s = Math.sin(index * HASH_X + salt * HASH_SALT) * HASH_SCALE;
-  return s - Math.floor(s);
 }
