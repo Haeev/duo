@@ -870,6 +870,24 @@ input {
   gap: var(--space-2);
 }
 
+/* Beaucoup de commandes (plus de 8): deux colonnes, pour tenir sans défiler. */
+.commandes:has(> .commande:nth-child(9)) {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--space-6);
+}
+
+.commandes:has(> .commande:nth-child(9)) .commande {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.commandes:has(> .commande:nth-child(9)) dt {
+  font-size: var(--type-small-size);
+}
+
+.salon-gauche > .carte {
+  width: 100%;
+}
+
 /* Voile, superpositions, fenêtres ------------------------------------------ */
 
 .voile {

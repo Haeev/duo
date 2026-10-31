@@ -15,8 +15,10 @@ export const LAUNCHER_CSP =
   "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: duo-game:; " +
   "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'";
 
+// connect-src admet blob: et data: en plus de l'ADR 0004: le GLTFLoader de Three.js lit
+// les textures intégrées aux fichiers .glb par fetch(blob:...). Écart à faire valider.
 export const GAME_CSP =
-  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; " +
+  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' blob: data:; " +
   "img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; " +
   "object-src 'none'; base-uri 'none'; form-action 'none'";
 

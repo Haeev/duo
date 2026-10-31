@@ -84,9 +84,9 @@ describe('typographie du fichier de textes (UX 0.3)', () => {
 
 describe('durées et dates (UX 0.3)', () => {
   it('écrit les plages sans tiret', () => {
-    expect(durationRange([20, 40])).toBe('20 à 40 min');
-    expect(durationRange([45, 90])).toBe('45 min à 1 h 30');
-    expect(durationRange([60, 60])).toBe('1 h');
+    expect(durationRange([20, 40])).toBe(`20 à 40${NBSP}min`);
+    expect(durationRange([45, 90])).toBe(`45${NBSP}min à 1${NBSP}h${NBSP}30`);
+    expect(durationRange([60, 60])).toBe(`1${NBSP}h`);
   });
 
   it('écrit les durées jouées et le compteur de coupure', () => {

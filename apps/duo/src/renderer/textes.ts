@@ -34,17 +34,20 @@ export function de(name: string): string {
   return /^[aeiouyhàâäéèêëîïôöùûüœæ]/i.test(name) ? `d’${name}` : `de ${name}`;
 }
 
+// Espace insécable entre un nombre et son unité: « 1 h 15 » ne se coupe jamais.
 function minutes(value: number): string {
-  if (value < 60) return `${value} min`;
+  if (value < 60) return `${value}${NBSP}min`;
   const hours = Math.floor(value / 60);
   const rest = value % 60;
-  return rest === 0 ? `${hours} h` : `${hours} h ${String(rest).padStart(2, '0')}`;
+  return rest === 0
+    ? `${hours}${NBSP}h`
+    : `${hours}${NBSP}h${NBSP}${String(rest).padStart(2, '0')}`;
 }
 
 /** « 20 à 40 min », « 45 min à 1 h 30 » (UX 0.3: jamais de tiret). */
 export function durationRange([min, max]: readonly [number, number]): string {
   if (min === max) return minutes(min);
-  if (max < 60) return `${min} à ${max} min`;
+  if (max < 60) return `${min} à ${max}${NBSP}min`;
   return `${minutes(min)} à ${minutes(max)}`;
 }
 
