@@ -16,7 +16,7 @@ L'interface est une couche HTML et CSS posée sur la scène Three.js, dans la fe
 |---|---|---|
 | `jeton.css` | jetons: couleurs, polices, tailles, espacements, rayons, ombres sans flou, durées, couches | à importer |
 | `composants.css` | composants et leurs états, préfixe `lpl-` | à importer |
-| `icones.svg` | sprite de 70 symboles (objets, meubles, météo, interface, symboles des six profils Duo) | à importer avec `?raw` et à insérer une fois dans le DOM |
+| `icones.svg` | sprite de 74 symboles (objets, meubles, météo, interface, symboles des six profils Duo) | à importer avec `?raw` et à insérer une fois dans le DOM |
 | `titre.html`, `creation.html`, `petit-dejeuner.html`, `hud.html`, `dialogue.html`, `carnet.html`, `caisse.html`, `catalogue.html`, `achat.html`, `amenagement.html`, `nuit.html`, `fin.html` | une page par écran; l'état se choisit par l'ancre (`hud.html#veillee`) | référence |
 | `support/` | ce qui ne sert qu'aux maquettes: comportements de référence (`maquette.js`), portraits provisoires (`portraits.js`), injecteur du sprite (`icones.js`, généré), polices locales (`polices.css`), scènes provisoires (`scene-*.svg`, générées) | non |
 | `polices/` | copies des fichiers woff2 des deux polices et leurs licences OFL | non: le jeu prend les paquets npm |
