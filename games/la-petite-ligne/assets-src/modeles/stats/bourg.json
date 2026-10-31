@@ -57,7 +57,7 @@
     6
    ],
    "door_cell": 3,
-   "tris": 2264
+   "tris": 4556
   },
   "sawmill": {
    "footprint": [
@@ -332,7 +332,7 @@
     1
    ],
    "choppable": true,
-   "tris": 204
+   "tris": 438
   },
   "tree_oak_large": {
    "footprint": [
@@ -340,7 +340,7 @@
     2
    ],
    "choppable": true,
-   "tris": 204
+   "tris": 438
   },
   "tree_fir_small": {
    "footprint": [
@@ -386,7 +386,7 @@
     1,
     1
    ],
-   "tris": 80
+   "tris": 160
   },
   "bush_bramble": {
    "footprint": [
@@ -511,7 +511,7 @@
   },
   "tree_oak": {
    "alias_of": "tree_oak_large",
-   "tris": 204
+   "tris": 438
   },
   "tree_fir": {
    "alias_of": "tree_fir_large",
@@ -519,7 +519,7 @@
   },
   "bush": {
    "alias_of": "bush_round",
-   "tris": 80
+   "tris": 160
   },
   "rock": {
    "alias_of": "rock_medium",
@@ -534,5 +534,5 @@
    "tris": 888
   }
  },
- "file_bytes": 2959400
+ "file_bytes": 3157444
 }

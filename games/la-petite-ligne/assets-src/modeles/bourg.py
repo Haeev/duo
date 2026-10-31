@@ -44,13 +44,15 @@ class Face:
 
 
 def window(g, f, u, z0, w=0.8, h=1.0, shutter="paint_green", frame="stone_light", ruin=False, mullion=True,
-           box_flowers=False):
-    f.box(g, (w + 0.18, 0.06, h + 0.18), u, 0.02, z0 + h / 2, frame)
+           box_flowers=False, rb=0.0):
+    """rb > 0: low poly arrondi (chanfrein des menuiseries, en mètres)."""
+    kb = {"bevel": rb} if rb else {}
+    f.box(g, (w + 0.18, 0.06, h + 0.18), u, 0.02, z0 + h / 2, frame, **kb)
     f.box(g, (w, 0.02, h), u, 0.055, z0 + h / 2, "shadow" if ruin else "glass")
     if mullion and not ruin:
         f.box(g, (0.04, 0.02, h), u, 0.07, z0 + h / 2, frame)
         f.box(g, (w, 0.02, 0.04), u, 0.07, z0 + h * 0.62, frame)
-    f.box(g, (w + 0.26, 0.16, 0.06), u, 0.08, z0 - 0.04, frame)
+    f.box(g, (w + 0.26, 0.16, 0.06), u, 0.08, z0 - 0.04, frame, **kb)
     if shutter:
         for s in (1, -1):
             if ruin and s == 1:
@@ -58,13 +60,13 @@ def window(g, f, u, z0, w=0.8, h=1.0, shutter="paint_green", frame="stone_light"
                       rot=(0, 18, 25))
                 continue
             col = "wood_old" if ruin else shutter
-            f.box(g, (w / 2, 0.04, h), u + s * (w * 0.75 + 0.1), 0.04, z0 + h / 2, col)
+            f.box(g, (w / 2, 0.04, h), u + s * (w * 0.75 + 0.1), 0.04, z0 + h / 2, col, **kb)
             f.box(g, (w / 2 + 0.01, 0.05, 0.05), u + s * (w * 0.75 + 0.1), 0.045, z0 + h * 0.25,
                   "wood_old_dark" if ruin else "wood_dark")
             f.box(g, (w / 2 + 0.01, 0.05, 0.05), u + s * (w * 0.75 + 0.1), 0.045, z0 + h * 0.75,
                   "wood_old_dark" if ruin else "wood_dark")
     if box_flowers and not ruin:
-        f.box(g, (w + 0.1, 0.2, 0.16), u, 0.16, z0 + 0.02, "wood")
+        f.box(g, (w + 0.1, 0.2, 0.16), u, 0.16, z0 + 0.02, "wood", **kb)
         for k in range(5):
             c = ["flower_red", "flower_pink", "flower_white", "flower_red", "flower_yellow"][k]
             f.box(g, (0.12, 0.12, 0.1), u - w / 2 + 0.1 + k * (w - 0.2) / 4, 0.16, z0 + 0.14, c, rot=(0, 0, 20 * k))
@@ -72,11 +74,12 @@ def window(g, f, u, z0, w=0.8, h=1.0, shutter="paint_green", frame="stone_light"
 
 
 def door(g, f, u, w=0.95, h=2.05, color="paint_red", frame="stone_light", absent=False, step=True, leaf=True,
-         glass=False):
-    f.box(g, (w + 0.2, 0.06, h + 0.12), u, 0.02, (h + 0.12) / 2, frame)
+         glass=False, rb=0.0):
+    kb = {"bevel": rb} if rb else {}
+    f.box(g, (w + 0.2, 0.06, h + 0.12), u, 0.02, (h + 0.12) / 2, frame, **kb)
     f.box(g, (w, 0.03, h), u, 0.045, h / 2, "shadow")
     if not absent and leaf:
-        f.box(g, (w - 0.04, 0.05, h - 0.03), u, 0.06, (h - 0.03) / 2, color)
+        f.box(g, (w - 0.04, 0.05, h - 0.03), u, 0.06, (h - 0.03) / 2, color, **kb)
         for z in (0.45, 1.5):
             f.box(g, (w - 0.2, 0.06, 0.5 if z > 1 else 0.6), u, 0.065, z, "wood_dark" if color.startswith("wood") else color,
                   bevel=0.01)
@@ -84,7 +87,8 @@ def door(g, f, u, w=0.95, h=2.05, color="paint_red", frame="stone_light", absent
             f.box(g, (w - 0.3, 0.07, 0.5), u, 0.068, 1.55, "glass")
         f.box(g, (0.05, 0.05, 0.05), u + w / 2 - 0.12, 0.1, 1.0, "brass")
     if step:
-        f.box(g, (w + 0.4, 0.4, 0.12), u, 0.2, 0.06, "stone_dark", bevel=0.02)
+        f.box(g, (w + 0.4, 0.4, 0.12), u, 0.2, 0.06, "stone_dark", bevel=0.02, bseg=2 if rb else 1,
+              bedges=_not_ground if rb else None)
 
 
 def slab(g, top, thick, color):
@@ -173,6 +177,123 @@ def quoins(g, hx, hy, z1, color="stone_light", step=0.32, sxs=(1, -1)):
                       color=color)
                 z += h
                 i += 1
+
+
+# Low poly arrondi (décision du client du 2026-10-31, bible section 8) --------------------
+# Facettes gardées (une normale par face), angles droits cassés: chanfreins en 2 segments au plus,
+# largeur selon la taille de l'objet, arêtes au sol vives.
+
+def _not_ground(a, b):
+    return not (abs(a.z) < 1e-4 and abs(b.z) < 1e-4)
+
+
+def _vertical(a, b):
+    return abs(a.x - b.x) < 1e-4 and abs(a.y - b.y) < 1e-4
+
+
+def _along_y(a, b):
+    return abs(a.x - b.x) < 1e-4 and abs(a.z - b.z) < 1e-4
+
+
+def _key(p):
+    return (round(p.x, 4), round(p.y, 4), round(p.z, 4))
+
+
+def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32):
+    """Chaînes d'angle en blocs qui enveloppent le coin arrondi du mur (2 cm de saillie)."""
+    for sx in (1, -1):
+        for sy in (1, -1):
+            z, i = 0.0, 0
+            while z < z1 - 0.05:
+                h = min(step, z1 - z)
+                big = i % 2 == 0
+                w, d = (0.44, 0.28) if big else (0.28, 0.44)
+                g.box((w, d, h - 0.03), loc=(sx * (hx + 0.02 - w / 2), sy * (hy + 0.02 - d / 2), z + 0.015),
+                      color=color, base=True, bevel=0.1, bseg=2, bedges=_vertical)
+                z += h
+                i += 1
+
+
+def round_stone_texture(g, f, length, height, color="stone_dark", n=10, seed=1, d=0.012):
+    """Moellons à coins abattus irréguliers (1 à 3 cm)."""
+    rnd = random.Random(seed)
+    for _ in range(n):
+        u = rnd.uniform(-length / 2 + 0.5, length / 2 - 0.5)
+        z = rnd.uniform(0.5, height - 0.25)
+        # seuls les coins du moellon sont abattus (arêtes dans l'épaisseur), pas ses bords de 3 cm
+        f.box(g, (rnd.uniform(0.22, 0.4), 0.03, rnd.uniform(0.14, 0.22)), u, d, z, color,
+              bevel=rnd.uniform(0.01, 0.03), rot=(0, rnd.uniform(-4, 4), 0), bedges=_along_y)
+
+
+def round_chimney(g, x, y, z0, z1, color="stone", cap="stone_dark"):
+    """Cheminée chanfreinée à 4 cm (2 segments), chapeau débordant de 5 cm."""
+    g.box((0.55, 0.55, z1 - z0), loc=(x, y, z0), color=color, base=True, bevel=0.04, bseg=2)
+    g.box((0.65, 0.65, 0.1), loc=(x, y, z1), color=cap, base=True, bevel=0.035, bseg=2)
+    g.box((0.3, 0.3, 0.12), loc=(x, y, z1 + 0.1), color="shadow", base=True, bevel=0.015)
+
+
+def round_gable_roof(g, x0, x1, y0, y1, ze, zr, color, edge, ridge_color, over_x=0.36, over_y=0.3,
+                     thick=0.14, sag=0.04, bulge=0.03, rb=0.06):
+    """Toit à deux pans arrondi: rive épaisse chanfreinée (2 segments), faîtage fléchi au milieu,
+    pans un peu bombés (rangée intermédiaire relevée), rangs de tuiles qui suivent la surface."""
+    import bmesh
+    ym = (y0 + y1) / 2
+    slope = (zr - ze) / (ym - y0)
+    zl = ze - over_y * slope
+    xa, xb = x0 - over_x, x1 + over_x
+    xs = [xa, (xa + xb) / 2, xb]
+    col = by_normal(color, edge, edge, thr=0.3)
+
+    def surf(side, t, x):
+        """Point du dessus du pan: t de l'égout (0) au faîtage (1)."""
+        e = y0 - over_y if side < 0 else y1 + over_y
+        yy = e + (ym - e) * t
+        u = (x - xa) / (xb - xa)
+        dz = bulge * math.sin(math.pi * t) - sag * t * math.sin(math.pi * u)
+        return Vector((x, yy, zl + (zr - zl) * t + dz))
+
+    bm = g.bm
+    for side in (-1, 1):
+        n = Vector((0, side * slope, 1)).normalized()
+        top = [[surf(side, t, x) for x in xs] for t in (0.0, 0.5, 1.0)]
+        T = [[bm.verts.new(p) for p in row] for row in top]
+        B = [[bm.verts.new(p - n * thick) for p in row] for row in top]
+        faces = []
+        for i in range(2):
+            for j in range(2):
+                faces.append(bm.faces.new([T[i][j], T[i][j + 1], T[i + 1][j + 1], T[i + 1][j]]))
+                faces.append(bm.faces.new([B[i][j], B[i + 1][j], B[i + 1][j + 1], B[i][j + 1]]))
+            faces.append(bm.faces.new([T[0][i], B[0][i], B[0][i + 1], T[0][i + 1]]))
+            faces.append(bm.faces.new([T[2][i + 1], B[2][i + 1], B[2][i], T[2][i]]))
+            faces.append(bm.faces.new([T[i + 1][0], B[i + 1][0], B[i][0], T[i][0]]))
+            faces.append(bm.faces.new([T[i][2], B[i][2], B[i + 1][2], T[i + 1][2]]))
+        bmesh.ops.recalc_face_normals(bm, faces=faces)
+        # arêtes du dessus à chanfreiner: égout et pignons (pas le faîtage, caché sous le boudin)
+        rim = set()
+        for j in range(2):
+            rim.add(frozenset((_key(T[0][j].co), _key(T[0][j + 1].co))))
+        for i in range(2):
+            for c in (0, 2):
+                rim.add(frozenset((_key(T[i][c].co), _key(T[i + 1][c].co))))
+        verts = [v for row in T + B for v in row]
+        g._finish(verts, col)
+        g.bevel(verts, rb, 2, col, edges_pred=lambda a, b, rim=rim: frozenset((_key(a), _key(b))) in rim)
+        # rangs de tuiles: une petite marche tous les 42 cm, en deux morceaux pour suivre la flèche
+        L = math.hypot(ym - y0 + over_y, zr - zl)
+        nr = int(L / 0.42)
+        ang = math.degrees(math.atan(slope)) * (-side)
+        for jr in range(1, nr):
+            t = jr / nr
+            for k in range(2):
+                p = surf(side, t, xa + (xb - xa) * (0.25 + 0.5 * k))
+                g.box(((xb - xa) / 2 - 0.03, 0.05, 0.035), loc=(p.x, p.y, p.z + 0.012), color=edge, rot=(ang, 0, 0))
+    # faîtage: deux demi-boudins à 8 pans qui suivent la flèche
+    for k in range(2):
+        pa, pb = surf(-1, 1.0, xs[k]), surf(-1, 1.0, xs[k + 1])
+        mid = (pa + pb) / 2
+        tilt = math.degrees(math.atan2(pb.z - pa.z, pb.x - pa.x))
+        g.cyl(0.12, (pb - pa).length + 0.04, loc=(mid.x, mid.y, mid.z + 0.01), color=ridge_color, segs=8,
+              rot=(0, 90 - tilt, 0))
 
 
 def chimney(g, x, y, z0, z1, color="stone", cap="stone_dark"):
@@ -470,35 +591,41 @@ def ferrand_shop(A):
 # Maison de Firmin (7 x 6) -----------------------------------------------------------
 
 def firmin_house(A):
+    """Témoin du low poly arrondi: angles des murs adoucis, chaînes d'angle enveloppantes, toit fléchi."""
     hx, hy, ze, zr = 2.8, 2.2, 2.6, 4.4
     root = A.group("firmin_house", {"footprint": [7, 6], "door_cell": 3})
     g = A.geo()
-    g.box((2 * hx, 2 * hy, ze), color="stone", base=True)
-    g.box((2 * hx + 0.05, 2 * hy + 0.05, 0.35), color="stone_dark", base=True)
-    quoins(g, hx, hy, ze)
-    for x, s in ((-hx, 1), (hx, -1)):
-        g.prism([(-hy, ze), (hy, ze), (0, zr)], 0.3, loc=(x + s * 0.15, 0, 0), color="stone", rot=(0, 0, 90))
+    # murs et pignons d'un seul tenant (pentagone extrudé), angles verticaux chanfreinés à 10 cm;
+    # le haut suit le dessous du toit (épaisseur et flèche du faîtage) pour ne pas le traverser
+    pts = [(-hy, 0.0), (hy, 0.0), (hy, ze - 0.18), (0.0, zr - 0.25), (-hy, ze - 0.18)]
+    body = g.prism(pts, 2 * hx, color="stone", rot=(0, 0, 90))
+    g.bevel(body, 0.1, 2, "stone", edges_pred=lambda a, b: _vertical(a, b) and abs(a.z - b.z) > 1.0)
+    g.box((2 * hx + 0.05, 2 * hy + 0.05, 0.35), color="stone_dark", base=True, bevel=0.035, bseg=2,
+          bedges=_not_ground)
+    round_quoins(g, hx, hy, ze - 0.2)
     f = Face("front", hx, hy)
-    stone_texture(g, f, 2 * hx, ze, n=12, seed=4)
-    door(g, f, 0.0, color="paint_blue")
-    window(g, f, -1.65, 1.0, 0.75, 0.95, shutter="paint_blue", box_flowers=True)
-    window(g, f, 1.75, 1.0, 0.6, 0.8, shutter="paint_blue")
-    f.box(g, (0.5, 0.1, 0.06), 0.0, 0.06, 2.3, "stone_light")
+    round_stone_texture(g, f, 2 * hx, ze, n=12, seed=4)
+    door(g, f, 0.0, color="paint_blue", rb=0.015)
+    window(g, f, -1.65, 1.0, 0.75, 0.95, shutter="paint_blue", box_flowers=True, rb=0.015)
+    window(g, f, 1.75, 1.0, 0.6, 0.8, shutter="paint_blue", rb=0.015)
+    f.box(g, (0.5, 0.1, 0.06), 0.0, 0.06, 2.3, "stone_light", bevel=0.015)
     fb = Face("back", hx, hy)
-    stone_texture(g, fb, 2 * hx, ze, n=10, seed=5)
-    window(g, fb, 0.8, 1.0, 0.8, 0.95, shutter="paint_blue")
+    round_stone_texture(g, fb, 2 * hx, ze, n=10, seed=5)
+    window(g, fb, 0.8, 1.0, 0.8, 0.95, shutter="paint_blue", rb=0.015)
     for side in ("left", "right"):
         fs = Face(side, hx, hy)
-        window(g, fs, 0.0, 2.9, 0.5, 0.6, shutter=None)
-    # banc et pots devant
+        window(g, fs, 0.0, 2.9, 0.5, 0.6, shutter=None, rb=0.015)
+    # pots devant
     for x in (-0.85, 0.85):
-        g.lathe([(0.12, 0), (0.17, 0.25), (0.18, 0.28)], loc=(x, -hy - 0.35, 0), colors="tile", segs=8)
-        g.sphere(0.16, loc=(x, -hy - 0.35, 0.33), color="leaf_bush", segs=6, rings=4, scale=(1, 1, 0.8))
-        g.box((0.1, 0.1, 0.08), loc=(x + 0.05, -hy - 0.42, 0.45), color="flower_red")
+        g.lathe([(0.12, 0), (0.17, 0.25), (0.18, 0.28)], loc=(x, -hy - 0.35, 0), colors="tile", segs=8,
+                close_bottom=False)
+        g.sphere(0.17, loc=(x, -hy - 0.35, 0.33), color="leaf_bush", ico=1, jitter=0.08, seed=3,
+                 scale=(1, 1, 0.8))
+        g.sphere(0.05, loc=(x + 0.05, -hy - 0.47, 0.42), color="flower_red", segs=6, rings=4)
     A.add("firmin_house_body", g, parent=root)
     r = A.geo()
-    gable_roof(r, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", over=0.4, ridge_color="tile_dark")
-    chimney(r, -1.8, 0.8, 3.2, 5.0)
+    round_gable_roof(r, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", ridge_color="tile_dark")
+    round_chimney(r, -1.8, 0.8, 3.2, 5.0)
     A.add("firmin_house_roof", r, parent=root)
     return root
 
@@ -1126,20 +1253,25 @@ def fence(A, kind):
 # Nature -------------------------------------------------------------------------
 
 def tree_oak(A, large, seed):
+    """Low poly arrondi: tronc à 8 pans évasé au pied, 3 racines, 4 boules facettées (80 faces) qui se chevauchent."""
     g = A.geo()
     rnd = random.Random(seed)
     s = 1.45 if large else 1.0
-    g.cyl(0.2 * s, 2.0 * s, loc=(0, 0, 0), color="bark", segs=7, base=True, r2=0.14 * s)
-    g.cyl(0.08 * s, 1.0 * s, loc=(0.25 * s, 0, 1.6 * s), color="bark", segs=5, rot=(0, 40, 0))
-    g.cyl(0.08 * s, 0.9 * s, loc=(-0.22 * s, 0.1, 1.7 * s), color="bark", segs=5, rot=(10, -38, 0))
-    for (x, y, z, r, c) in ((0, 0, 2.9, 1.25, "leaf_oak"), (0.85, 0.2, 2.6, 0.85, "leaf_oak"),
-                            (-0.8, -0.2, 2.65, 0.9, "leaf_oak"), (0.2, -0.5, 3.5, 0.85, "leaf_oak_light"),
-                            (-0.3, 0.55, 3.3, 0.8, "leaf_oak_light")):
-        g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=1, jitter=0.12, seed=rnd.randint(0, 999))
-    for k in range(4):
-        a = math.radians(k * 90 + 20)
-        g.box((0.35 * s, 0.12 * s, 0.1 * s), loc=(0.22 * s * math.cos(a), 0.22 * s * math.sin(a), 0.03), color="bark_dark",
-              rot=(0, 0, k * 90 + 20))
+    g.lathe([(0.30 * s, 0.0), (0.2 * s, 0.28 * s), (0.17 * s, 1.2 * s), (0.14 * s, 2.1 * s)], colors="bark",
+            segs=8, close_bottom=False, close_top=False, phase=10)
+    g.cyl(0.075 * s, 0.95 * s, loc=(0.27 * s, 0, 1.65 * s), color="bark", segs=6, rot=(0, 40, 0), r2=0.05 * s)
+    g.cyl(0.07 * s, 0.85 * s, loc=(-0.24 * s, 0.1, 1.75 * s), color="bark", segs=6, rot=(10, -38, 0), r2=0.05 * s)
+    for k in range(3):
+        a = k * 120 + 25
+        ar = math.radians(a)
+        g.cyl(0.09 * s, 0.5 * s, loc=(0.36 * s * math.cos(ar), 0.36 * s * math.sin(ar), 0.03 * s), color="bark_dark",
+              segs=5, r2=0.03 * s, cap=False, rot=(0, 100, a))
+    for (x, y, z, r, c, sc) in ((0, 0, 2.95, 1.3, "leaf_oak", (1.1, 1.0, 0.85)),
+                                (0.9, 0.25, 2.55, 0.85, "leaf_oak", (1.0, 1.1, 0.88)),
+                                (-0.85, -0.2, 2.6, 0.9, "leaf_oak_light", (1.05, 0.95, 0.9)),
+                                (0.05, -0.15, 3.6, 0.85, "leaf_oak_light", (1.0, 1.0, 0.85))):
+        g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=2, jitter=0.07, seed=rnd.randint(0, 999),
+                 scale=sc, rot=(0, 0, rnd.uniform(0, 360)))
     return g
 
 
@@ -1186,8 +1318,10 @@ def bush(A, kind, seed):
     g = A.geo()
     rnd = random.Random(seed)
     if kind == "round":
-        for (x, y, z, r) in ((0, 0, 0.35, 0.5), (0.35, 0.1, 0.25, 0.35), (-0.3, -0.1, 0.28, 0.38), (0.05, 0.2, 0.6, 0.32)):
-            g.sphere(r, loc=(x, y, z), color="leaf_bush" if r > 0.4 else "leaf_oak", ico=1, jitter=0.12, seed=rnd.randint(0, 99))
+        # low poly arrondi: deux boules facettées aplaties (80 faces chacune), sans pied
+        for (x, y, z, r, c) in ((-0.08, 0.02, 0.36, 0.52, "leaf_bush"), (0.3, -0.06, 0.27, 0.36, "leaf_oak")):
+            g.sphere(r, loc=(x, y, z), color=c, ico=2, jitter=0.06, seed=rnd.randint(0, 99), scale=(1.1, 1.0, 0.78),
+                     rot=(0, 0, rnd.uniform(0, 360)))
     elif kind == "bramble":
         for (x, y, z, r) in ((0, 0, 0.3, 0.45), (0.4, 0.05, 0.25, 0.32), (-0.35, 0.1, 0.22, 0.3)):
             g.sphere(r, loc=(x, y, z), color="leaf_bush", ico=1, jitter=0.2, seed=rnd.randint(0, 99), scale=(1.1, 1, 0.8))

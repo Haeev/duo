@@ -218,11 +218,16 @@ class Geo:
                         v[self.dl][self.bone_index(b)] = w
         return verts
 
-    def _bevel(self, verts, bevel, bseg):
+    def _bevel(self, verts, bevel, bseg, edges_pred=None):
         faces0 = list({f for v in verts for f in v.link_faces})
         # ordre déterministe (sinon l'ordre des sommets change d'une construction à l'autre)
         self.bm.edges.index_update()
         edges = sorted({e for v in verts for e in v.link_edges}, key=lambda e: e.index)
+        if edges_pred is not None:
+            # chanfrein sélectif (arêtes vues seulement): edges_pred(a, b) sur les coordonnées locales
+            edges = [e for e in edges if edges_pred(e.verts[0].co, e.verts[1].co)]
+            if not edges:
+                return verts
         r = bmesh.ops.bevel(self.bm, geom=edges, offset=bevel, segments=bseg, profile=0.5,
                             affect="EDGES", clamp_overlap=True)
         faces = [f for f in faces0 if f.is_valid] + list(r["faces"])
@@ -231,7 +236,7 @@ class Geo:
 
     # primitives
     def box(self, size, loc=(0, 0, 0), color="stone", rot=(0, 0, 0), bevel=0.0, bseg=1,
-            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False):
+            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False, bedges=None):
         sx, sy, sz = size
         verts = bmesh.ops.create_cube(self.bm, size=1.0)["verts"]
         for v in verts:
@@ -246,9 +251,14 @@ class Geo:
                 z += sz / 2
             v.co = Vector((x, y, z))
         if bevel > 0:
-            verts = self._bevel(verts, bevel, bseg)
+            verts = self._bevel(verts, bevel, bseg, bedges)
         M = Matrix.Translation(Vector(loc)) @ _rot(rot)
         return self._finish(verts, color, bone, weights, smooth, M)
+
+    def bevel(self, verts, offset, segs, color, edges_pred=None):
+        """Chanfreine après coup des pièces déjà posées (coordonnées finales), puis recolore."""
+        verts = self._bevel([v for v in verts if v.is_valid], offset, segs, edges_pred)
+        return self._finish(verts, color)
 
     def cyl(self, r, h, loc=(0, 0, 0), color="wood", segs=8, r2=None, rot=(0, 0, 0), cap=True,
             base=False, bone=None, weights=None, smooth=None, scale=(1, 1, 1), bevel=0.0):
@@ -294,13 +304,13 @@ class Geo:
         return self._finish(verts, color, bone, weights, smooth, M)
 
     def lathe(self, profile, loc=(0, 0, 0), colors="wood", segs=8, rot=(0, 0, 0), bone=None,
-              weights=None, smooth=None, scale=(1, 1, 1), close_top=True, close_bottom=True):
+              weights=None, smooth=None, scale=(1, 1, 1), close_top=True, close_bottom=True, phase=0.0):
         """Profil [(rayon, z), ...] de bas en haut, tourné autour de Z. colors: une couleur ou une par bande."""
         rings = []
         for (r, z) in profile:
             ring = []
             for k in range(segs):
-                a = 2 * math.pi * k / segs
+                a = 2 * math.pi * k / segs + math.radians(phase)
                 ring.append(self.bm.verts.new((r * math.cos(a) * scale[0], r * math.sin(a) * scale[1], z * scale[2])))
             rings.append(ring)
         band_faces = []

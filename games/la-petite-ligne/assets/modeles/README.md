@@ -25,6 +25,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 - Un seul matériau par fichier: `lpl_palette` (décor) ou `lpl_characters` (personnages). Filtrage au plus proche, faces à une seule face (pas de double face).
 - Émission de nuit: le matériau `lpl_palette` est exporté avec l'émission à 1 (vitres, lanternes, flammes, braises, cadran du poste). Le jeu met `material.emissiveIntensity` à 0 le jour et à 1 la nuit.
 - Saisons: remplacer `material.map` par la texture de la saison (même disposition, `flipY = false`, `colorSpace = SRGBColorSpace`, `NearestFilter`).
+- Low poly arrondi (décision du client du 2026-10-31, bible artistique section 8): facettes gardées (une normale par face), angles droits cassés par des chanfreins de 2 segments au plus, arêtes au sol vives. Témoins déjà refaits: `firmin_house` (angles des murs, chaînes d'angle enveloppantes, rives de toit épaisses chanfreinées, faîtage fléchi, pans bombés), `tree_oak_small`, `tree_oak_large` (tronc à 8 pans évasé, 3 racines, boules facettées de 80 faces), `bush_round` (deux boules aplaties) et toutes les pièces des joueurs (tête à 1/5 de la hauteur, torse en tonneau octogonal, membres à 6 pans renflés, moufles, chaussures en galets, foulard agrandi d'un tiers avec un pan qui dépasse). Les habitants et les autres bâtiments restent pour l'instant à angles droits. Planche: `docs/jeux/jeu-1/gauntlet/captures/tour-05/arrondi-planche.png` (`assets-src/modeles/planche_arrondi.py` puis `planche_arrondi.sh`).
 - Optimisation: `bourg`, `ferme`, `train`, `maison` passent par gltf-transform (dédoublonnage, soudure, élagage). Ni quantification ni compression: aucune extension requise, aucun décodeur à brancher, et l'on peut poser `position`, `rotation` et `scale` sur un nœud cloné sans risque (la quantification range sa déquantification dans la transformation des nœuds: à éviter, ou alors envelopper chaque nœud dans un groupe). Total des cinq fichiers: environ 6,5 Mo. Si le poids devient un sujet, la compression Meshopt (avec `MeshoptDecoder`, livré avec Three.js) le divise par trois ou quatre.
 
 ## Personnages
@@ -79,30 +80,31 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 ## Budgets (PC de référence, `docs/plateforme/architecture.md` section 14)
 
-- Toute la carte de la démo (`donnees/cartes/halte.json`: 196 objets, dont 79 buissons et 51 arbres): environ 43 000 triangles de décor, plus 16 modules de voie (4 700), le potager (environ 4 000 avec ses cultures) et six personnages (environ 14 000): moins de 70 000 triangles, pour un plafond de 250 000.
-- Personnages: 2 160 à 2 590 triangles par habitant, 2 190 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
+- Toute la carte de la démo (`donnees/cartes/halte.json`: 196 objets, dont 79 buissons et 51 arbres): environ 43 000 triangles de décor avant le low poly arrondi (les 30 chênes et 79 buissons arrondis en ajoutent environ 13 000, la maison de Firmin 2 300), plus 16 modules de voie (4 700), le potager (environ 4 000 avec ses cultures) et six personnages (environ 14 000): moins de 70 000 triangles, pour un plafond de 250 000.
+- Personnages: 2 160 à 2 590 triangles par habitant, 1 940 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
 - Appels de dessin: un matériau par fichier; décor statique à fusionner ou à instancier par le jeu (arbres, buissons, clôtures, cultures et cases du potager se prêtent à `InstancedMesh`).
 - Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 64: moins de 100 Ko de mémoire.
 
 ## Fiche par modèle
 
-### `personnages.glb` (2291 Ko)
+
+### `personnages.glb` (2255 Ko)
 
 | Nœud | Triangles |
 |---|---|
-| `player_base` | 488 |
-| `player_outfit_work` | 1184 |
-| `player_outfit_smock` | 1216 |
-| `player_outfit_overalls` | 1232 |
-| `player_hair_short` | 372 |
-| `player_hair_bob` | 372 |
-| `player_hair_bun` | 420 |
-| `player_scarf_orb` | 148 |
-| `player_scarf_crescent` | 192 |
-| `player_scarf_star` | 140 |
-| `player_scarf_sun` | 212 |
-| `player_scarf_planet` | 160 |
-| `player_scarf_comet` | 156 |
+| `player_base` | 400 |
+| `player_outfit_work` | 890 |
+| `player_outfit_smock` | 882 |
+| `player_outfit_overalls` | 890 |
+| `player_hair_short` | 436 |
+| `player_hair_bob` | 436 |
+| `player_hair_bun` | 484 |
+| `player_scarf_orb` | 212 |
+| `player_scarf_crescent` | 256 |
+| `player_scarf_star` | 204 |
+| `player_scarf_sun` | 276 |
+| `player_scarf_planet` | 224 |
+| `player_scarf_comet` | 220 |
 | `villager_firmin` | 2160 |
 | `villager_odette` | 2156 |
 | `villager_basile` | 2324 |
@@ -183,7 +185,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (2846 Ko)
+### `bourg.glb` (3040 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -191,7 +193,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `platform` | 30 x 4 | 3160 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
 | `gatekeeper_house` | 7 x 6 | 6500 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
 | `ferrand_shop` | 10 x 8 | 3664 | door_cell: 2, counter_cell: 6 |
-| `firmin_house` | 7 x 6 | 2264 | door_cell: 3 |
+| `firmin_house` | 7 x 6 | 4556 | door_cell: 3 |
 | `sawmill` | 10 x 8 | 1356 | door_cell: 5 |
 | `handcar_shed` | 6 x 5 | 1132 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
 | `handcar` | 2 x 2 | 476 | on_rails: true, note: "balancier handcar_lever: pivot sur l'axe X, +-20 degrés" |
@@ -227,14 +229,14 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `fence_broken` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
 | `fence_gate` | 1 x 1 | 108 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
 | `fence_post` | 1 x 1 | 12 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `tree_oak_small` | 1 x 1 | 204 | choppable: true |
-| `tree_oak_large` | 2 x 2 | 204 | choppable: true |
+| `tree_oak_small` | 1 x 1 | 438 | choppable: true |
+| `tree_oak_large` | 2 x 2 | 438 | choppable: true |
 | `tree_fir_small` | 1 x 1 | 68 | choppable: true |
 | `tree_fir_large` | 2 x 2 | 68 | choppable: true |
 | `tree_birch_small` | 1 x 1 | 184 | choppable: false |
 | `tree_birch_large` | 2 x 2 | 184 | choppable: false |
 | `tree_stump` | 1 x 1 | 144 |  |
-| `bush_round` | 1 x 1 | 80 |  |
+| `bush_round` | 1 x 1 | 160 |  |
 | `bush_bramble` | 1 x 1 | 180 |  |
 | `bush_hazel` | 1 x 1 | 140 |  |
 | `rock_small` | 1 x 1 | 20 |  |
@@ -251,9 +253,9 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
 | `pontoon` | 2 x 3 | 640 | walk_height: 0.5 |
-| `tree_oak` |  | 204 | alias_of: "tree_oak_large" |
+| `tree_oak` |  | 438 | alias_of: "tree_oak_large" |
 | `tree_fir` |  | 68 | alias_of: "tree_fir_large" |
-| `bush` |  | 80 | alias_of: "bush_round" |
+| `bush` |  | 160 | alias_of: "bush_round" |
 | `rock` |  | 40 | alias_of: "rock_medium" |
 | `fence` |  | 36 | alias_of: "fence_wood" |
 | `log_pile` |  | 888 | alias_of: "woodpile" |
