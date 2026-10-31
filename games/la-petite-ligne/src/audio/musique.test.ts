@@ -109,7 +109,7 @@ describe('directeur de la musique', () => {
     expect(second.c.fadeIn).toBe(2.5);
     expect(second.c.offset).toBeCloseTo(1.12);
     // Décodage demandé avant la fin du repos.
-    expect(log.some((e) => e.c.kind === 'prefetch' && e.t < (second.t ?? 0))).toBe(true);
+    expect(log.some((e) => e.c.kind === 'prefetch' && e.t < second.t)).toBe(true);
   });
 
   it('passe du matin à l après-midi à la même position de lecture', () => {

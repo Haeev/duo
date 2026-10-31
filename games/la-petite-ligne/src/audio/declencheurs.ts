@@ -253,6 +253,24 @@ export function soundsForEvent(
     case 'demo_ended':
       signals.demoEnded = true;
       break;
+    // Pêche (P1): pas encore de sons à elle (son.md 8); substituts en attendant le sound designer.
+    case 'cast':
+      emit.world('water', { x: event.at.x, y: event.at.y }, event.by);
+      break;
+    case 'bite': {
+      const bobber = world.characters.find((c) => c.id === event.by)?.fishing?.bobber;
+      emit.world('pickup', bobber === undefined ? characterAt(world, event.by) : { x: bobber.x, y: bobber.y }, event.by);
+      break;
+    }
+    case 'caught': {
+      const at = characterAt(world, event.by);
+      emit.world('harvest', at, event.by);
+      emit.world('quality-fine', at, event.by, d.qualitySeconds);
+      break;
+    }
+    case 'escaped':
+      emit.world('water-empty', characterAt(world, event.by), event.by);
+      break;
     case 'pin':
       // Le repère: le sien, ou celui de l'autre (plus grave, trois notes), placé à l'épingle.
       emit.world(event.by === local ? 'ping-self' : 'ping-peer', { x: event.pos.x, y: event.pos.y }, null);

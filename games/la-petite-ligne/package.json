@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@duo/sdk": "workspace:*",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@duo/config": "workspace:*",
     "@duo/sdk-dev": "workspace:*",
+    "@playwright/test": "catalog:",
     "@types/node": "catalog:",
     "@types/three": "0.187.0",
     "eslint": "catalog:",

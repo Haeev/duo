@@ -135,7 +135,7 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
     },
 
     stats() {
-      const base: EngineStats = engine?.stats() ?? { decodedMB: 0, peakMB: 0, files: 0, voices: 0, musicTracks: 0, ambienceBeds: 0, refused: 0 };
+      const base: EngineStats = engine?.stats() ?? { decodedMB: 0, peakMB: 0, files: 0, voices: 0, musicTracks: 0, ambienceBeds: 0, refused: 0, pending: 0 };
       const director = brain?.musicDirector() ?? null;
       return { ...base, music: director?.current() ?? null, resting: director?.resting() ?? false, paused: platformPaused || stalledFor > stallLimit };
     },

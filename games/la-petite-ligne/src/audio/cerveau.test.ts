@@ -208,7 +208,6 @@ describe('le son de toute la démo, joué par le robot', () => {
     const missing = expected.filter((id) => shots(id).length === 0);
     expect(missing).toEqual([]);
     const loops = new Set(run.log.filter((e) => e.kind === 'loop').map((e) => e.id));
-    expect(loops).toEqual(expect.objectContaining({}));
     for (const id of ['saw-loop', 'duo-carry-loop', 'train-idle-loop']) expect(loops.has(id), id).toBe(true);
     // Au moins un motif d'habitant à l'ouverture d'une conversation.
     expect(run.log.some((e) => e.kind === 'shot' && e.id.startsWith('talk-'))).toBe(true);

@@ -53,6 +53,8 @@ export interface EngineStats {
   musicTracks: number;
   ambienceBeds: number;
   refused: number;
+  /** Décodages en cours. */
+  pending: number;
 }
 
 interface Voice {
@@ -308,6 +310,7 @@ export class AudioEngine {
       musicTracks: this.tracks.length,
       ambienceBeds: this.beds.size,
       refused: c.refused,
+      pending: c.pending,
     };
   }
 

@@ -67,6 +67,7 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Interface: `main.ts` monte `createInterface` de `src/interface/` (vérifié: écran titre affiché dans les deux vues). Demandes 3 à 6 faites (écran titre et écran de fin synchronisés, raison d'un refus de pose, clé des notifications).
 - Son: pas encore de `src/audio/index.ts`; `main.ts` le montera dès qu'il exportera `createAudio`. Événements nouveaux pour le son: `pin`, `absence`, `cast`, `bite`, `caught`, `escaped` (tableau de `src/README.md`).
 - Quêtes corrigées par le game designer: robots relancés, démo finie, clé trouvée au plus tôt le jour 3.
+- Vérifié dans Chromium (faux hôte, `deux-vues.html?rendu=leger`): canevas de 316x217 par vue au lieu du double, interface prête en 5 s au lieu de 20, 3 à 4 images par seconde par vue en rendu logiciel; écran titre synchronisé (« C'est parti » de l'un visible chez l'autre, création ouverte chez les deux quand les deux sont prêts).
 - P1 faits: repère (G ou clic molette, 15 s, une épingle par joueur), absence (3 minutes sans entrée en journée: l'horloge attend, le personnage s'assoit, « L'horloge attend Camille. » chez l'autre), pêche (canne dans le sac de chacun, lancer à 6 m sur l'eau, touche après 3 à 15 s, 1,5 s pour ferrer; poissons tirés selon `feel.fishWeights`, 6, 3 et 1 par défaut; pari de Jeanne jouable). La plume de geai (décoration) se pose comme un meuble.
 
 ## Demandes de l'audio
