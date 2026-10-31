@@ -197,7 +197,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3366 Ko)
+### `bourg.glb` (3365 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -218,7 +218,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `rail_curve_90` | 13 x 13 | 2676 | radius: 12.0, rail_top: 0.32 |
 | `buffer_stop` | 1 x 2 | 240 |  |
 | `level_crossing_gate` | 1 x 1 | 252 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
-| `bell_post` | 1 x 1 | 214 |  |
+| `bell_post` | 1 x 1 | 202 |  |
 | `bench` | 2 x 1 | 316 |  |
 | `lamp_post` | 1 x 1 | 248 |  |
 | `coop_crate` | 1 x 1 | 168 |  |
