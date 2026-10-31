@@ -491,8 +491,9 @@ export class RenderEngine implements Renderer {
 
   /**
    * Applique une décision de `qualite.ts`, à chaud: ni contexte recréé, ni page
-   * rechargée. Les programmes sans ombre se compilent une fois, à la première
-   * bascule; Three.js les garde par matériau, le retour ne recompile rien.
+   * rechargée. Les programmes sans ombre se compilent à la première bascule
+   * (Three.js les garde par matériau); le retour en compile encore quelques-uns
+   * (11, 16 puis 20 programmes mesurés dans `rendu.html`).
    */
   private applyQuality(change: QualityChange): void {
     if (change.kind !== 'step') {
