@@ -97,6 +97,7 @@ jobs:
         working-directory: apps/duo
         run: |
           montage="$RUNNER_TEMP/duo-dmg"
+          mkdir -p "$montage"
           hdiutil attach dist/Duo-macOS.dmg -nobrowse -readonly -mountpoint "$montage"
           ls -la "$montage"
           if [ ! -L "$montage/Applications" ]; then
@@ -105,7 +106,7 @@ jobs:
           codesign --verify --deep --strict "$montage/Duo.app"
           rm -rf /Applications/Duo.app
           ditto "$montage/Duo.app" /Applications/Duo.app
-          hdiutil detach "$montage"
+          hdiutil detach "$montage" || hdiutil detach -force "$montage"
           codesign --verify --deep --strict /Applications/Duo.app
           node scripts/verifier-paquet.mjs --plateforme mac --app /Applications/Duo.app
           extrait="$RUNNER_TEMP/duo-zip"
