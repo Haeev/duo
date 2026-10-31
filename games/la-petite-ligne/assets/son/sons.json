@@ -2361,6 +2361,734 @@
       ],
       "momentaryMaxLufs": -22.0,
       "note": "non placé (il est au bout du bourg); joué juste avant wake"
+    },
+    "heron-wade": {
+      "event": "Héron: pas dans l'eau basse du gué (en attente, toutes les 6 à 12 s)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/heron-wade-1.ogg",
+        "moments/heron-wade-2.ogg",
+        "moments/heron-wade-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.06,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 2000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.5,
+        "rolloffFactor": 1.2,
+        "maxDistance": 15.0,
+        "cullBeyondM": 15.0
+      },
+      "durationMs": [
+        256,
+        273,
+        282
+      ],
+      "momentaryMaxLufs": -29.0,
+      "momentSound": "heron_wade",
+      "moment": "heron"
+    },
+    "heron-strike": {
+      "event": "Héron: coup de bec dans l'eau (clip heron_strike)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/heron-strike-1.ogg",
+        "moments/heron-strike-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 2000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.5,
+        "rolloffFactor": 1.2,
+        "maxDistance": 15.0,
+        "cullBeyondM": 15.0
+      },
+      "durationMs": [
+        259,
+        252
+      ],
+      "momentaryMaxLufs": -26.0,
+      "momentSound": "heron_strike",
+      "moment": "heron"
+    },
+    "heron-croak": {
+      "event": "Héron: cri rauque « kraak » à l'envol (apogée, t = 1,2 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/heron-croak-1.ogg",
+        "moments/heron-croak-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 4.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 25.0,
+        "cullBeyondM": 25.0
+      },
+      "durationMs": [
+        468,
+        408
+      ],
+      "momentaryMaxLufs": -21.0,
+      "momentSound": "heron_croak",
+      "moment": "heron"
+    },
+    "heron-wings": {
+      "event": "Héron: trois battements lourds à l'envol (apogée, t = 1,0 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/heron-wings.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        1249
+      ],
+      "momentaryMaxLufs": -22.0,
+      "momentSound": "heron_wings",
+      "moment": "heron"
+    },
+    "heron-land": {
+      "event": "Héron: il freine et se pose sur la grève (apogée, t = 4,4 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/heron-land.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        484
+      ],
+      "momentaryMaxLufs": -24.0,
+      "momentSound": "heron_land",
+      "moment": "heron"
+    },
+    "geese-rest": {
+      "event": "Oies posées sur l'Aubrune: murmures du groupe (boucle, en attente)",
+      "bus": "ambience",
+      "priority": 3,
+      "files": [
+        "moments/geese-rest.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        6000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 6.5,
+        "startSample": 24000,
+        "endSample": 312000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "placé à geese_rest; c'est ce qui attire le passant: audible à 20 m",
+      "momentSound": "geese_rest",
+      "moment": "geese"
+    },
+    "geese-alarm": {
+      "event": "Oies: les cous se dressent, cris montants (apogée, t = 0)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/geese-alarm.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        1080
+      ],
+      "momentaryMaxLufs": -21.0,
+      "momentSound": "geese_alarm",
+      "moment": "geese"
+    },
+    "geese-takeoff": {
+      "event": "Oies: course sur l'eau, ailes et pattes, cris (apogée, t = 1 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/geese-takeoff.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        2909
+      ],
+      "momentaryMaxLufs": -19.5,
+      "momentSound": "geese_takeoff",
+      "moment": "geese"
+    },
+    "geese-flight": {
+      "event": "Oies: la volée qui s'éloigne, chœur de neuf voix (apogée, t = 3 s, et départ sans apogée)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/geese-flight-1.ogg",
+        "moments/geese-flight-2.ogg",
+        "moments/geese-flight-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        7979,
+        7953,
+        7977
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "placé à l'oie de tête et déplacé avec elle (le PannerNode fait la distance et le panoramique)",
+      "momentSound": "geese_flight",
+      "moment": "geese"
+    },
+    "ladder-lean": {
+      "event": "Échelle posée contre le chêne (début de la quête basile_lost)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/ladder-lean.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.5,
+        "rolloffFactor": 1.2,
+        "maxDistance": 15.0,
+        "cullBeyondM": 15.0
+      },
+      "durationMs": [
+        176
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "seulement si un joueur est à moins de 15 m",
+      "momentSound": "ladder_lean",
+      "moment": "ladder"
+    },
+    "ladder-grip": {
+      "event": "Échelle: on prend une place, le montant craque",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/ladder-grip-1.ogg",
+        "moments/ladder-grip-2.ogg",
+        "moments/ladder-grip-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        359,
+        358,
+        360
+      ],
+      "momentaryMaxLufs": -27.0,
+      "momentSound": "ladder_grip",
+      "moment": "ladder"
+    },
+    "ladder-step": {
+      "event": "Échelle: un barreau sous le pied de Basile (montée et descente)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/ladder-step-1.ogg",
+        "moments/ladder-step-2.ogg",
+        "moments/ladder-step-3.ogg",
+        "moments/ladder-step-4.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 200,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        135,
+        148,
+        161,
+        167
+      ],
+      "momentaryMaxLufs": -27.0,
+      "momentSound": "ladder_step",
+      "moment": "ladder"
+    },
+    "nest-box-turn": {
+      "event": "Le nichoir pivote sur son clou et se redresse (apogée, t = 3 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/nest-box-turn.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        549
+      ],
+      "momentaryMaxLufs": -26.0,
+      "momentSound": "nest_box_turn",
+      "moment": "ladder"
+    },
+    "hammer-tap": {
+      "event": "Petit marteau de Basile sur le clou du nichoir (trois coups)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/hammer-tap-1.ogg",
+        "moments/hammer-tap-2.ogg",
+        "moments/hammer-tap-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 200,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        104,
+        106,
+        107
+      ],
+      "momentaryMaxLufs": -25.0,
+      "momentSound": "hammer_tap",
+      "moment": "ladder"
+    },
+    "tit-call": {
+      "event": "Mésange bleue: « tsi-tsi-tsi » (fin de l'échelle, t = 9 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/tit-call-1.ogg",
+        "moments/tit-call-2.ogg",
+        "moments/tit-call-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 600,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        386,
+        382,
+        533
+      ],
+      "momentaryMaxLufs": -26.0,
+      "momentSound": "tit_call",
+      "moment": "ladder"
+    },
+    "tit-song": {
+      "event": "Mésange bleue: chant « tsi-tsi-tsuhuhuhu » (attente toutes les 8 s, apogée)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/tit-song-1.ogg",
+        "moments/tit-song-2.ogg",
+        "moments/tit-song-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 2500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        1310,
+        1496,
+        1247
+      ],
+      "momentaryMaxLufs": -25.0,
+      "momentSound": "tit_song",
+      "moment": "tits"
+    },
+    "tit-wings": {
+      "event": "Mésange: froissement d'ailes à l'envol ou au posé",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "moments/tit-wings-1.ogg",
+        "moments/tit-wings-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.08,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 300,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        200,
+        200
+      ],
+      "momentaryMaxLufs": -31.0,
+      "momentSound": "tit_wings",
+      "moment": "tits"
+    },
+    "fox-pounce": {
+      "event": "Renard: il retombe à pieds joints dans l'herbe (mulotage, en attente)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/fox-pounce-1.ogg",
+        "moments/fox-pounce-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        410,
+        439
+      ],
+      "momentaryMaxLufs": -27.0,
+      "momentSound": "fox_pounce",
+      "moment": "fox"
+    },
+    "fox-bark": {
+      "event": "Renard: deux jappements rauques (apogée, t = 1 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/fox-bark-1.ogg",
+        "moments/fox-bark-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 4.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 25.0,
+        "cullBeyondM": 25.0
+      },
+      "durationMs": [
+        736,
+        670
+      ],
+      "momentaryMaxLufs": -21.0,
+      "momentSound": "fox_bark",
+      "moment": "fox"
+    },
+    "hens-alarm": {
+      "event": "Poules inquiètes dans le poulailler (apogée du renard, t = 1,2 s, si elles y sont)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/hens-alarm.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        1286
+      ],
+      "momentaryMaxLufs": -23.0,
+      "momentSound": "hens_alarm",
+      "moment": "fox"
+    },
+    "crickets-night": {
+      "event": "Grillons champêtres du pré (boucle placée à meadow_glow)",
+      "bus": "ambience",
+      "priority": 3,
+      "files": [
+        "moments/crickets-night.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        8000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 8.5,
+        "startSample": 24000,
+        "endSample": 408000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -29.0,
+      "note": "en attente à -6 dB (waitingDb), à pleine force pendant l'apogée en 4 s (climaxRampMs)",
+      "momentSound": "crickets_night",
+      "moment": "glowworms",
+      "waitingDb": -6.0,
+      "climaxRampMs": 4000
+    },
+    "glow-shimmer": {
+      "event": "Vers luisants: quatre notes de célesta quand le pré s'allume (apogée, t = 0,5 s)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "moments/glow-shimmer-1.ogg",
+        "moments/glow-shimmer-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3116,
+        3097
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: bus interface, non placé, sans variation de hauteur (notes justes en sol majeur)",
+      "momentSound": "glow_shimmer",
+      "moment": "glowworms"
+    },
+    "bench-sit": {
+      "event": "S'asseoir sur un banc de bois (événement sat_down)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "effets/bench-sit-1.ogg",
+        "effets/bench-sit-2.ogg",
+        "effets/bench-sit-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        348,
+        360,
+        339
+      ],
+      "momentaryMaxLufs": -26.0
     }
   },
   "music": {

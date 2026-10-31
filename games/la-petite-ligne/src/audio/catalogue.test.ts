@@ -5,8 +5,8 @@ import { CatalogueError, parseCatalogue, sequenceOf, stepTime, stopTime } from '
 describe('catalogue (sons.json)', () => {
   const catalogue = parseCatalogue(soundsFile);
 
-  it('lit les 84 sons et les 9 musiques du sound designer', () => {
-    expect(catalogue.sounds.size).toBe(84);
+  it('lit les 107 sons et les 9 musiques du sound designer', () => {
+    expect(catalogue.sounds.size).toBe(107);
     expect(catalogue.music.size).toBe(9);
     expect(catalogue.mix.maxEffectVoices).toBe(24);
     expect(catalogue.peerDb).toBe(-3);
@@ -44,6 +44,27 @@ describe('catalogue (sons.json)', () => {
     expect(stepTime(departure, 'train-depart')).toBeCloseTo(4.6);
     expect(stopTime(departure, 'samedi')).toEqual({ at: 6, fade: 4 });
     expect(stopTime(departure, 'train-idle-loop')).toEqual({ at: 4.6, fade: 0.8 });
+  });
+
+  it('place les sons des moments rares avec les distances d audition des fiches (tour 6)', () => {
+    const audible: Record<string, number> = {
+      'heron-wade': 15,
+      'geese-rest': 20,
+      'tit-song': 12,
+      'fox-bark': 25,
+      'crickets-night': 20,
+    };
+    for (const [id, metres] of Object.entries(audible)) {
+      expect(catalogue.sounds.get(id)?.spatial?.cullBeyond, id).toBe(metres);
+    }
+    expect(catalogue.sounds.get('geese-rest')?.loop).not.toBeNull();
+    expect(catalogue.sounds.get('crickets-night')?.loop).not.toBeNull();
+    expect(catalogue.sounds.get('ladder-step')?.files).toHaveLength(4);
+    // Le scintillement des vers luisants reste juste: aucune variation de hauteur.
+    expect(catalogue.sounds.get('glow-shimmer')?.pitchVariation).toBe(0);
+    const sit = catalogue.sounds.get('bench-sit');
+    expect(sit?.files).toHaveLength(3);
+    expect(sit?.spatial).not.toBeNull();
   });
 
   it('refuse un fichier abîmé en citant le champ', () => {
