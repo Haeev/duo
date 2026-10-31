@@ -12,7 +12,7 @@ import type { Content } from './donnees/types';
 import { createHost, openHostChannels, type Host } from './reseau/hote';
 import { createGuest, openGuestChannels, type Guest } from './reseau/invite';
 import { decodeSave, progressOf, restoreWorld, snapshotOf } from './sauvegarde/sauvegarde';
-import { type Sim, format, wrapWorld } from './simulation/contexte';
+import { type Sim, format, sayIfWritten, wrapWorld } from './simulation/contexte';
 import { createWorld, type PlayerInfo } from './simulation/monde';
 import type { Robot } from './simulation/robot';
 
@@ -131,24 +131,36 @@ export function createSession(options: SessionOptions): Session {
     const players = playerInfos(duo);
     const loaded = duo.saves.loaded;
     let world: Sim | null = null;
+    // Sauvegarde refusée: elle reste intacte sur le disque. Cette séance n'écrit plus rien (ni
+    // automatique, ni à l'aube, ni en quittant), sinon elle l'écraserait puis la ferait sortir
+    // des copies de secours de la plateforme (gauntlet, tour 2, risque B).
+    let saveRefused = false;
     if (loaded !== null) {
       try {
         world = restoreWorld(content, map, decodeSave(loaded.data), loaded.dataSchema, players);
       } catch (error) {
-        duo.log.error('sauvegarde illisible: nouvelle partie', { message: error instanceof Error ? error.message : String(error) });
+        saveRefused = true;
+        duo.log.error('sauvegarde refusée: gardée intacte, aucune écriture pendant cette séance, partie provisoire', {
+          message: error instanceof Error ? error.message : String(error),
+          slot: duo.saves.slot,
+          dataSchema: loaded.dataSchema,
+        });
       }
     }
     const hostSim = world ?? createWorld(content, map, duo.seed, players);
+    if (saveRefused) sayIfWritten(hostSim, 'both', 'save_refused');
     sim = hostSim;
     local = hostSim.world.characters.find((c) => c.playerId === duo.localPlayer.id)?.id ?? 'p1';
     const remote: CharacterId = local === 'p1' ? 'p2' : 'p1';
     const h = createHost(hostSim, openHostChannels(duo.net), local, remote);
     host = h;
-    duo.saves.provide(() => toSaveSnapshot(hostSim));
+    duo.saves.provide(() => (saveRefused ? null : toSaveSnapshot(hostSim)));
     const results = duo.results;
     const saves = duo.saves;
     const writeNow = (): Promise<void> =>
-      saves.write('manual', toSaveSnapshot(hostSim)).then(
+      saveRefused
+        ? Promise.resolve()
+        : saves.write('manual', toSaveSnapshot(hostSim)).then(
         (status) => {
           if (status !== 'ok') duo.log.warn('sauvegarde non écrite', { status });
         },
