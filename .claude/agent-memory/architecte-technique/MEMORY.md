@@ -55,3 +55,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Playwright: écrire chaque résultat au fil de l'eau; un seul `console.log` final se perd si la page ou le navigateur tombe en fin de script. Sous SwiftShader et machine chargée, une scène de `rendu.html` demande environ 1,5 min.
 - SDK: `NetChannel.send` lève une `RangeError` au-delà de 64 Kio et la boucle (`loop.ts`, `stepper.ts`) n'attrape rien: l'exception devient `fatal` et arrête la partie des deux côtés. Un jeu qui réplique son état complet doit surveiller sa taille.
 - Three.js 0.187 gère la perte du contexte WebGL (`preventDefault` dans `onContextLost`, réinitialisation dans `onContextRestore`); essai possible par `renderer.forceContextLoss()`.
+
+## Notes du tour 2 du gauntlet (2026-10-31)
+
+- Three.js 0.187 garde les programmes par matériau: couper les ombres à chaud en compile de nouveaux (11, 16 puis 20 programmes mesurés).
+- Durée d'image moyenne: temps cumulé divisé par le nombre d'images, pas une moyenne pondérée par le temps (elle surévalue les images en retard).
+- Vitest 5 n'a pas d'option `--include`: configuration à part avec `defineConfig` (`mergeConfig` concatène les `include`).
+- Prettier lit sa configuration selon l'emplacement du fichier: une copie dans `/tmp` est jugée avec les réglages par défaut.
+- Dans une copie isolée (worktree), `git -C` et `NODE_PATH=... node` peuvent être refusés; Playwright se charge alors par `require('/opt/node22/lib/node_modules/playwright')`.
