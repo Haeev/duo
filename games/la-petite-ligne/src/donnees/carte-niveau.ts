@@ -12,6 +12,12 @@ const TREE_TYPES: Readonly<Record<string, MapTree['kind']>> = { tree_oak: 'oak',
 /** Fichier de la carte du bourg dans `donnees/cartes/`. */
 export const LEVEL_MAP_FILE = 'halte.json';
 
+/** La valeur, ou une erreur qui cite le champ. */
+function need<T>(value: T | undefined, r: Reader, message: string): T {
+  if (value === undefined) return r.fail(message);
+  return value;
+}
+
 function rect(r: Reader): Rect {
   return { x: r.at('x').integer(), y: r.at('y').integer(), w: r.at('w').integer(1), h: r.at('h').integer(1) };
 }
@@ -37,9 +43,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     const text = line.string();
     if (text.length !== width) line.fail(`${width} cases attendues`);
     for (const code of text) {
-      const kind = legend.get(code);
-      if (kind === undefined) line.fail(`code de terrain inconnu « ${code} »`);
-      ground.push(kind);
+      ground.push(need(legend.get(code), line, `code de terrain inconnu « ${code} »`));
     }
   });
 
@@ -88,12 +92,10 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   // La maisonnette.
   const house = r.at('maison');
   const roomId = house.at('piece').string();
-  const room = zones[roomId];
-  if (room === undefined) house.at('piece').fail(`zone « ${roomId} » absente`);
+  const room = need(zones[roomId], house.at('piece'), `zone « ${roomId} » absente`);
   const door: Cell = { cx: house.at('porte').at('cx').integer(0, width - 1), cy: house.at('porte').at('cy').integer(0, height - 1) };
   const spawnId = house.at('retour_de_minuit').string();
-  const spawn = points[spawnId];
-  if (spawn === undefined) house.at('retour_de_minuit').fail(`point « ${spawnId} » absent`);
+  const spawn = need(points[spawnId], house.at('retour_de_minuit'), `point « ${spawnId} » absent`);
   const startFurniture = house
     .at('mobilier_depart')
     .items()
@@ -104,8 +106,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     }));
 
   // Le potager: les cases de la zone, ligne par ligne, d'ouest en est.
-  const gardenZone = zones.garden;
-  if (gardenZone === undefined) r.at('zones').fail('zone « garden » absente');
+  const gardenZone = need(zones.garden, r.at('zones'), 'zone « garden » absente');
   const garden: Cell[] = [];
   for (let cy = gardenZone.y; cy < gardenZone.y + gardenZone.h; cy++) {
     for (let cx = gardenZone.x; cx < gardenZone.x + gardenZone.w; cx++) garden.push({ cx, cy });
