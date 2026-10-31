@@ -1,0 +1,30 @@
+{
+  "name": "@duo/liaison",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Réseau local de Duo (lot L5): découverte, liaison WebSocket, salon et relais des messages de jeu. Node seul, sans Electron.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./sim": "./src/sim/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "demo": "node demo/deux-instances.ts"
+  },
+  "dependencies": {
+    "valibot": "catalog:",
+    "ws": "catalog:"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/ws": "8.18.2",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
