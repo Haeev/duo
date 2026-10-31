@@ -40,6 +40,11 @@ function counterValue(sim: Sim, scope: Scope, key: string, since: Since, ctx: Co
   }
 }
 
+/** Ce qu'il manque à un compteur d'une étape de quête (même lecture que la condition). */
+export function counterRemaining(sim: Sim, baselines: Record<string, number>, key: string, count: number, since: Since): number {
+  return count - counterValue(sim, 'duo', key, since, { ...NO_CONTEXT, baselines });
+}
+
 function byWho(who: Who, ctx: ConditionContext, test: (scope: Scope) => boolean): boolean {
   switch (who) {
     case 'either':
@@ -154,7 +159,39 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     }
     case 'stayed_at':
       return byCharacter(condition.who, ctx, (id) => (character(sim, id).stays[condition.point] ?? 0) >= condition.seconds);
+    case 'variant':
+      return variantOf(sim.world.seed, condition.group, condition.of) === condition.value;
+    case 'looked_at': {
+      const at = sim.map.points[condition.point];
+      if (at === undefined) return false;
+      return byCharacter(condition.who, ctx, (id) => {
+        const c = character(sim, id);
+        const d = Math.hypot(at.x - c.pos.x, at.y - c.pos.y);
+        if (d > condition.distance) return false;
+        if (d < 0.5) return true;
+        let diff = Math.abs(Math.atan2(at.y - c.pos.y, at.x - c.pos.x) - c.facing) % (2 * Math.PI);
+        if (diff > Math.PI) diff = 2 * Math.PI - diff;
+        return diff <= LOOK_CONE;
+      });
+    }
   }
+}
+
+/** Écart maximal du regard pour `looked_at`. */
+const LOOK_CONE = Math.PI / 6;
+
+/**
+ * Variante d'un groupe pour cette partie: empreinte (FNV-1a) de la graine et du nom du groupe.
+ * Ne consomme pas le générateur (le reste de la partie ne change pas) et se relit à l'identique.
+ */
+export function variantOf(seed: number, group: string, of: number): number {
+  let h = 0x811c9dc5;
+  const text = `${String(seed)}:${group}`;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h % of;
 }
 
 export function evaluateAll(sim: Sim, conditions: readonly Condition[], ctx: ConditionContext): boolean {

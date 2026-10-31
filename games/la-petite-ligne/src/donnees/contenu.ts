@@ -250,6 +250,14 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
         point: r.at('point').string(),
         radius: r.at('radius').number(),
       };
+    case 'variant': {
+      const of = r.at('of').integer(2, 99);
+      return { type, group: r.at('group').string(), value: r.at('value').integer(0, of - 1), of };
+    }
+    case 'looked_at': {
+      const who = r.opt('who');
+      return { type, point: r.at('point').string(), distance: r.at('distance').number(), who: who === null ? 'either' : who.oneOf(WHO) };
+    }
     case 'stayed_at': {
       const who = r.opt('who');
       return {

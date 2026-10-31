@@ -55,6 +55,8 @@
     "handcar_pushed": "La draisine a roulé jusqu'au bout ! Basile vous attend devant la remise.",
     "parcel_needs_both": "Ce colis pèse son poids. Appelle {partner}: il se porte à deux.",
     "parcel_delivered": "Livré à la maisonnette: {item}, rangé dans le coffre.",
+    "heron_seen": "Sur une pierre du gué, le héron replie une patte, vous regarde, puis s'envole sans un bruit.",
+    "geese_seen": "Un grand V d'oies sauvages passe au-dessus du quai en criant. Puis le silence revient.",
     "shed_forced": "Basile fait sauter le cadenas. Sous une bâche, la draisine d'Émile.",
     "shed_opened": "Le cadenas de la remise cède. Sous une bâche, la draisine d'Émile.",
     "riddle2_card_found": "Dans le coffre à outils de la draisine, une deuxième carte d'Émile !",

@@ -234,6 +234,28 @@
           "lines": [{ "speaker": "firmin", "text": "La coopérative écrit que la voie des Vergers sera la prochaine. Les cerisiers vous attendent. Moi aussi, un peu." }]
         },
         {
+          "id": "firmin_basile_lost",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
+          "lines": [{ "speaker": "firmin", "text": "Basile est passé tout à l'heure, une échelle sur l'épaule, du côté de la lisière." }]
+        },
+        {
+          "id": "firmin_geese_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "wild_geese", "step": "watch" }],
+          "lines": [{ "speaker": "firmin", "text": "Entre cinq heures et six heures et demie, les oies sauvages passent au-dessus du quai. Asseyez-vous à deux sur le banc, et levez les yeux." }]
+        },
+        {
+          "id": "firmin_geese_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "wild_geese" }],
+          "lines": [{ "speaker": "firmin", "text": "Vous les avez vues ? Elles passent chaque année. Cette année, il y avait quelqu'un pour les regarder." }]
+        },
+        {
           "id": "firmin_parcel_thanks",
           "kind": "daily",
           "priority": 1,
@@ -542,6 +564,13 @@
           "lines": [{ "speaker": "odette", "text": "Quatre goujons ! Ça sent déjà la friture. Tenez, pour la peine, et du pain tout chaud." }]
         },
         {
+          "id": "odette_basile_lost",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
+          "lines": [{ "speaker": "odette", "text": "Basile ? Je l'ai vu partir vers le bois avec une échelle sur l'épaule. À son âge !" }]
+        },
+        {
           "id": "odette_dandelions_ask",
           "kind": "quest",
           "priority": 23,
@@ -694,6 +723,7 @@
       "schedule": [
         { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "beam_pickup", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "quest_active", "quest": "basile_lost" }], "from": "12:00", "to": "18:00", "point": "forage_edge_03", "activity": "work" },
         { "when": [{ "type": "quest_active", "quest": "handcar" }], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work" },
         { "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home" },
         { "from": "08:00", "to": "18:00", "point": "sawmill_workbench", "activity": "work" },
@@ -869,6 +899,29 @@
           "shared": true,
           "point": "quay_bell",
           "lines": [{ "speaker": "basile", "text": "La draisine est prête. Il ne lui manque qu'une voie dégagée et quatre bras. Je connais quatre bras." }]
+        },
+        {
+          "id": "basile_lost_found",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
+          "lines": [{ "speaker": "basile", "text": "Ah, vous voilà. Un nichoir s'est mis de travers, là-haut. Tenez-moi l'échelle, à deux, que je le remette droit." }]
+        },
+        {
+          "id": "basile_lost_help",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }],
+          "lines": [{ "speaker": "basile", "text": "Un de chaque côté de l'échelle. Ne bougez plus, je monte." }]
+        },
+        {
+          "id": "basile_lost_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "basile_lost" }],
+          "lines": [{ "speaker": "basile", "text": "Le nichoir est droit. Les mésanges vous diront merci au printemps. Moi, je le dis tout de suite: merci." }]
         },
         {
           "id": "basile_parcel_thanks",
@@ -1134,6 +1187,36 @@
           "priority": 45,
           "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
           "lines": [{ "speaker": "jeanne", "text": "Il a dit merci ? Trois fois ? Ma tante va devenir rouge comme une tomate. Tenez, c'est mon argent de poche." }]
+        },
+        {
+          "id": "jeanne_heron_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "heron_watch", "step": "watch" }],
+          "lines": [{ "speaker": "jeanne", "text": "Le héron est revenu au gué ! Il vient l'après-midi. Si on parle, il s'envole. Allez-y à deux, et regardez-le sans bouger." }]
+        },
+        {
+          "id": "jeanne_heron_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "heron_watch" }],
+          "lines": [{ "speaker": "jeanne", "text": "Vous l'avez vu ? Gris, avec ses grandes pattes ? C'est mon héron. Enfin, il est à tout le monde." }]
+        },
+        {
+          "id": "jeanne_challenge_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "jeanne_challenge", "step": "fish" }],
+          "lines": [{ "speaker": "jeanne", "text": "Défi ! Trois goujons avant cinq heures du soir. En retard, je compte quand même demain, mais c'est moins drôle." }]
+        },
+        {
+          "id": "jeanne_challenge_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "jeanne_challenge" }],
+          "lines": [{ "speaker": "jeanne", "text": "Trois goujons ! Tu pêches plus vite que mon oncle. Bon, il n'a jamais pêché, mais quand même." }]
         },
         {
           "id": "jeanne_notebook_ask",

@@ -95,6 +95,8 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "caught": ({"item"}, {"count", "who", "since"}),
     "used_tool_at": ({"tool", "point"}, {"radius", "who"}),
     "stayed_at": ({"point", "seconds"}, {"who"}),
+    "looked_at": ({"point"}, {"distance", "who"}),
+    "variant": ({"group", "value", "of"}, set()),
     "witnessed": ({"event"}, {"who"}),
     "nights_passed": ({"count"}, set()),
     "recipe_known": ({"recipe"}, set()),
@@ -171,6 +173,7 @@ class Registry:
         self.quests_started_by_effect: set[str] = set()
         self.order_days: set[int] = set()
         self.order_days_used: dict[int, str] = {}
+        self.variants: dict[str, list[tuple[Any, Any, str]]] = {}
 
 
 def load(folder: Path, report: Report) -> dict[str, Any]:
@@ -283,6 +286,12 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
             report.error(w, f"jours hors de la démo {cond['days']!r}")
     if ctype == "day_at_least" and cond.get("day") not in DEMO_DAYS:
         report.error(w, f"jour hors de la démo {cond.get('day')!r}")
+    if ctype == "variant":
+        of, value = cond.get("of"), cond.get("value")
+        if not isinstance(of, int) or of < 2 or not isinstance(value, int) or not 0 <= value < of:
+            report.error(w, f"variant: « of » entier au moins 2 et « value » de 0 à of-1 attendus ({value!r} sur {of!r})")
+        elif check_id(cond.get("group"), w, report):
+            reg.variants.setdefault(cond["group"], []).append((of, value, w))
     if ctype == "order_complete" and "day" in cond:
         if cond["day"] not in DEMO_DAYS:
             report.error(w, f"jour hors de la démo {cond['day']!r}")
@@ -804,6 +813,16 @@ def main() -> int:
         for point, where in sorted(used.items()):
             if point not in points:
                 report.error(where, f"point {point!r} absent de la carte")
+    # Variantes tirées par la graine (condition `variant`): même `of` partout pour un groupe, chaque valeur utilisée.
+    for group, uses in sorted(reg.variants.items()):
+        sizes = {of for of, _, _ in uses}
+        if len(sizes) != 1:
+            report.error(uses[0][2], f"variant {group!r}: « of » différents {sorted(sizes)}")
+            continue
+        size = sizes.pop()
+        missing = set(range(size)) - {value for _, value, _ in uses}
+        if missing:
+            report.warn(uses[0][2], f"variant {group!r}: valeurs jamais utilisées {sorted(missing)}")
     for warning in report.warnings:
         print(f"avertissement: {warning}")
     for error in report.errors:

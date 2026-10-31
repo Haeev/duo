@@ -46,6 +46,10 @@ export type Condition = { label?: string } & (
   | { type: 'counter'; key: string; count: number; since: Since; who: Who }
   | { type: 'used_tool_at'; tool: string; point: string; radius: number }
   | { type: 'stayed_at'; point: string; seconds: number; who: Who }
+  /** Variante tirée par la graine pour ce groupe (de 0 à `of` - 1): buts d'après-midi, aléa par partie. */
+  | { type: 'variant'; group: string; value: number; of: number }
+  /** Observer: à moins de `distance` m du point et tourné vers lui. */
+  | { type: 'looked_at'; point: string; distance: number; who: Who }
 );
 
 export type Effect =

@@ -17,6 +17,8 @@ import { shopOpen } from './economie';
 import { canPlace } from './amenagement';
 import { catalogueWindow, currentOrder } from '../donnees/commandes';
 import { holdsRod, waterAhead } from './peche';
+import { counterRemaining } from './conditions';
+import type { Condition } from '../donnees/types';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -321,7 +323,8 @@ function wood(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     m.job = 'scier';
     return true;
   }
-  if (planks + logs * 4 >= planksWanted(sim) && questStep(sim, 'planks') !== 'chop') return false;
+  const questChop = openCounters(sim).some((o) => o.key === 'chopped');
+  if (planks + logs * 4 >= planksWanted(sim) && questStep(sim, 'planks') !== 'chop' && !questChop) return false;
   const tree = sim.world.trees
     .filter((t) => !t.felled && (m.skip[`arbre:${t.id}`] ?? 0) <= sim.world.tick)
     .sort((a, b) => distance(c.pos, a.pos) - distance(c.pos, b.pos))[0];
@@ -541,7 +544,10 @@ function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean
 /** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
   const wanted =
-    orderNeed(sim, 'trout') > inBags(sim, 'trout') || reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') || reserved(sim, 'chub') > inBags(sim, 'chub');
+    orderNeed(sim, 'trout') > inBags(sim, 'trout') ||
+    reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') ||
+    reserved(sim, 'chub') > inBags(sim, 'chub') ||
+    questWantsFish(sim);
   if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   if (countInBag(c, ITEM.fishingRod) === 0) return false;
   const ford = pt(sim, 'river_ford');
@@ -565,6 +571,86 @@ function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: nu
   out.push({ type: 'act' });
   m.waitUntil = sim.world.tick + 2;
   return true;
+}
+
+/** Compteur d'une étape active, et ce qu'il lui manque (conditions `counter` des données). */
+interface OpenCounter {
+  key: string;
+  remaining: number;
+}
+
+/** Les compteurs encore ouverts des étapes actives (et de leurs sous-conditions `all`). */
+function openCounters(sim: Sim): OpenCounter[] {
+  const out: OpenCounter[] = [];
+  const walk = (conditions: readonly Condition[], baselines: Record<string, number>): void => {
+    for (const cond of conditions) {
+      if (cond.type === 'all') walk(cond.conditions, baselines);
+      if (cond.type !== 'counter') continue;
+      const remaining = counterRemaining(sim, baselines, cond.key, cond.count, cond.since);
+      if (remaining > 0) out.push({ key: cond.key, remaining });
+    }
+  };
+  for (const q of sim.world.quests) {
+    if (q.status !== 'active') continue;
+    const step = sim.content.quests.find((x) => x.id === q.id)?.steps[q.step];
+    if (step !== undefined) walk(step.conditions, q.baselines);
+  }
+  return out;
+}
+
+/** Rendez-vous des étapes actives: `stayed_at`, avec la plage horaire `time_is` de la même étape. */
+function openStays(sim: Sim): { point: string; seconds: number }[] {
+  const out: { point: string; seconds: number }[] = [];
+  const minutes = sim.world.clock.minutes;
+  for (const q of sim.world.quests) {
+    if (q.status !== 'active') continue;
+    const step = sim.content.quests.find((x) => x.id === q.id)?.steps[q.step];
+    if (step === undefined) continue;
+    const window = step.conditions.find((c) => c.type === 'time_is');
+    if (window?.type === 'time_is' && (minutes < window.from || minutes >= window.to)) continue;
+    for (const c of step.conditions) if (c.type === 'stayed_at') out.push({ point: c.point, seconds: c.seconds });
+  }
+  return out;
+}
+
+/**
+ * Buts d'après-midi et quêtes sans recette propre au robot: aller au rendez-vous (les deux),
+ * ramasser ce qu'une quête a posé au sol, apporter ce qu'un habitant attend, parler à qui il faut.
+ * Les objets que `QUEST_NEEDS` répartit entre les deux robots sont laissés à `weekTwoQuests`.
+ */
+function genericQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const stay = openStays(sim)[0];
+  const at = stay === undefined ? undefined : sim.map.points[stay.point];
+  if (at !== undefined) {
+    if (goTo(sim, c, m, `rendez-vous:${stay?.point ?? ''}`, at, 1.5, out)) return true;
+    m.job = 'attendre au rendez-vous';
+    return distance(c.pos, at) <= sim.content.settings.ranges.stayAt;
+  }
+  const managed = new Set(QUEST_NEEDS.map((q) => q.item));
+  for (const open of openCounters(sim)) {
+    const [kind, villager, item] = open.key.split(':');
+    if (kind === 'talked' && villager !== undefined && item === undefined) {
+      const v = sim.world.villagers.find((x) => x.id === villager);
+      if (c.id === 'p1' && v?.visible === true) {
+        return goAct(sim, c, m, `parler:${villager}`, { kind: 'villager', villager }, v.pos, sim.content.settings.ranges.talk - 0.5, out);
+      }
+      continue;
+    }
+    if (kind !== 'given' || villager === undefined || item === undefined || managed.has(item)) continue;
+    const have = countInBag(c, item) - reserved(sim, item);
+    if (have > 0) {
+      if (giveVillager(sim, c, m, villager, [{ item, count: Math.min(have, open.remaining) }], out)) return true;
+      continue;
+    }
+    const lying = c.id === 'p1' ? sim.world.groundItems.find((g) => g.item === item) : undefined;
+    if (lying !== undefined) return goAct(sim, c, m, `ramasser:${lying.id}`, { kind: 'ground_item', groundItem: lying.id }, lying.pos, 1.2, out);
+  }
+  return false;
+}
+
+/** Un compteur ouvert attend-il ce poisson (`caught:<poisson>`, ou `caught` seul) ? */
+function questWantsFish(sim: Sim): boolean {
+  return openCounters(sim).some((o) => o.key === 'caught' || o.key.startsWith('caught:'));
 }
 
 /** Donne à un habitant (intention `give`), en allant jusqu'à lui. */
@@ -819,6 +905,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       order(sim, c, m, out) ||
       cookForOrder(sim, c, m, out) ||
       weekTwoQuests(sim, c, m, out) ||
+      genericQuests(sim, c, m, out) ||
       orderHeavy(sim, c, m, out) ||
       (c.id === 'p1' ? garden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
       (c.id === 'p2'

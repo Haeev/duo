@@ -307,7 +307,7 @@
       "title": "Une salade de pissenlits",
       "giver": "odette",
       "start": {
-        "when": [{ "type": "day_at_least", "day": 6 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "when": [{ "type": "day_at_least", "day": 6 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d6", "value": 0, "of": 2 }],
         "effects": [
           { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_01" },
           { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_02" },
@@ -333,7 +333,7 @@
       "title": "Les colis d'Odette",
       "giver": "odette",
       "start": {
-        "when": [{ "type": "day_at_least", "day": 10 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "when": [{ "type": "day_at_least", "day": 10 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d10", "value": 0, "of": 2 }],
         "effects": [{ "type": "give_item", "item": "odette_parcel", "count": 1, "to": "each" }]
       },
       "steps": [
@@ -355,7 +355,7 @@
       "tier": "P0",
       "title": "Un chevesne pour Firmin",
       "giver": "firmin",
-      "start": { "when": [{ "type": "day_at_least", "day": 11 }, { "type": "time_is", "from": "12:00", "to": "24:00" }] },
+      "start": { "when": [{ "type": "day_at_least", "day": 11 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d11", "value": 0, "of": 2 }] },
       "steps": [
         {
           "id": "bring",
@@ -373,7 +373,7 @@
       "title": "Le carnet perdu de Jeanne",
       "giver": "jeanne",
       "start": {
-        "when": [{ "type": "day_at_least", "day": 13 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "when": [{ "type": "day_at_least", "day": 13 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d13", "value": 0, "of": 2 }],
         "effects": [{ "type": "spawn_object", "item": "jeanne_notebook", "point": "fishing_pontoon" }]
       },
       "steps": [
@@ -385,6 +385,81 @@
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
       "completionText": "Jeanne a retrouvé ses quarante galets. 20 sous."
+    },
+    {
+      "id": "heron_watch",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le héron du gué",
+      "giver": "jeanne",
+      "start": { "when": [{ "type": "day_at_least", "day": 6 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d6", "value": 1, "of": 2 }] },
+      "steps": [
+        {
+          "id": "watch",
+          "objective": "Regarder à deux le héron du gué, sans bruit, l'après-midi entre 14 h et 19 h.",
+          "conditions": [{ "type": "looked_at", "point": "river_ford", "distance": 8, "who": "both" }, { "type": "time_is", "from": "14:00", "to": "19:00" }],
+          "effects": [{ "type": "show_text", "text": "heron_seen" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 20 }],
+      "completionText": "Le héron vous a vus. 20 sous de Jeanne, pour le spectacle."
+    },
+    {
+      "id": "basile_lost",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Où est passé Basile ?",
+      "giver": "basile",
+      "start": { "when": [{ "type": "day_at_least", "day": 10 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d10", "value": 1, "of": 2 }] },
+      "steps": [
+        {
+          "id": "find",
+          "objective": "Basile n'est pas à la scierie cet après-midi. Le trouver.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "basile_lost_found" }]
+        },
+        {
+          "id": "help",
+          "objective": "Tenir l'échelle de Basile à deux, au bord du bois.",
+          "conditions": [{ "type": "stayed_at", "point": "forage_edge_03", "seconds": 8, "who": "both" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 30 }],
+      "completionText": "Le nichoir est droit. 30 sous de Basile."
+    },
+    {
+      "id": "wild_geese",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les oies sauvages",
+      "giver": "firmin",
+      "start": { "when": [{ "type": "day_at_least", "day": 11 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d11", "value": 1, "of": 2 }] },
+      "steps": [
+        {
+          "id": "watch",
+          "objective": "S'asseoir à deux sur le banc du quai entre 17 h et 18 h 30, et lever les yeux.",
+          "conditions": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "both" }, { "type": "time_is", "from": "17:00", "to": "18:30" }],
+          "effects": [{ "type": "show_text", "text": "geese_seen" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 20 }],
+      "completionText": "Les oies sont passées. 20 sous de Firmin, pour la compagnie."
+    },
+    {
+      "id": "jeanne_challenge",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le défi de Jeanne",
+      "giver": "jeanne",
+      "start": { "when": [{ "type": "day_at_least", "day": 13 }, { "type": "time_is", "from": "12:00", "to": "24:00" }, { "type": "variant", "group": "afternoon_d13", "value": 1, "of": 2 }] },
+      "steps": [
+        {
+          "id": "fish",
+          "objective": "Pêcher 3 goujons, de préférence avant 17 h. En retard ? Jeanne compte quand même le lendemain après-midi.",
+          "conditions": [{ "type": "caught", "item": "gudgeon", "count": 3, "label": "3 goujons" }, { "type": "time_is", "from": "12:00", "to": "17:00" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 20 }],
+      "completionText": "Défi relevé. 20 sous de Jeanne."
     },
     {
       "id": "second_order",
