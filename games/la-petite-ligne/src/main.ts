@@ -9,7 +9,7 @@ import { loadContent } from './donnees/contenu';
 import { loadMap } from './donnees/carte';
 import { MAP_FILES } from './donnees/cartes-fichiers';
 import { CONTENT_FILES } from './donnees/fichiers';
-import type { CreateAudio, CreateInterface, GameAudio, GameInterface, Renderer } from './etat/vue';
+import type { CreateAudio, CreateInterface, GameAudio, GameInterface, Renderer, RenderQuality } from './etat/vue';
 import { createControls } from './entrees/commandes';
 import { createFallbackInterface } from './plateforme/interface-secours';
 import { createRenderer } from './rendu/index';
@@ -39,6 +39,22 @@ async function pickInterface(): Promise<CreateInterface> {
     if (typeof create === 'function') return create as CreateInterface;
   }
   return createFallbackInterface;
+}
+
+/**
+ * Mode de rendu léger (`?rendu=leger`), pour jouer dans un Chromium en rendu
+ * logiciel. Lu dans l'adresse du jeu, ou dans celle de la page du faux hôte
+ * (`deux-vues.html?rendu=leger`) quand elle est de la même origine.
+ */
+function renderQuality(): RenderQuality {
+  const light = (search: string): boolean => new URLSearchParams(search).get('rendu') === 'leger';
+  if (light(window.location.search)) return 'light';
+  try {
+    if (window.top !== null && window.top !== window && light(window.top.location.search)) return 'light';
+  } catch {
+    // Page parente d'une autre origine (l'application Duo): pas de mode léger.
+  }
+  return 'normal';
 }
 
 /** Le son (`src/audio/`), s'il est livré. */
@@ -81,7 +97,7 @@ async function main(): Promise<void> {
   });
 
   const setup = async (): Promise<void> => {
-    const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion });
+    const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion, quality: renderQuality() });
     await r.load((ratio) => {
       duo.reportLoading(1 - RENDER_LOAD_SHARE + ratio * RENDER_LOAD_SHARE);
     });

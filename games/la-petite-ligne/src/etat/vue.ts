@@ -48,12 +48,21 @@ export type PickResult =
   | { kind: 'ground_item'; groundItem: string }
   | { kind: 'tree'; tree: string };
 
+/**
+ * Qualité du rendu. `light`: mode léger pour les essais en rendu logiciel
+ * (Chromium du cloud, SwiftShader): petite résolution interne, ombres coupées,
+ * moins de particules et de végétation. Activé par `?rendu=leger`.
+ */
+export type RenderQuality = 'normal' | 'light';
+
 export interface RendererOptions {
   view: GameView;
   /** Élément qui reçoit le canevas (il occupe tout l'élément). */
   container: HTMLElement;
   /** Réduction des animations (réglage de la plateforme). */
   reducedMotion: boolean;
+  /** Qualité demandée (`normal` si absent). */
+  quality?: RenderQuality;
 }
 
 export interface Renderer {

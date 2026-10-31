@@ -68,12 +68,12 @@
         {
           "id": "sow",
           "objective": "Bêcher et semer au potager. Les graines s'achètent au comptoir d'Odette.",
-          "conditions": [{ "type": "sowed", "count": 1 }]
+          "conditions": [{ "type": "sowed", "count": 1, "since": "game_start" }]
         },
         {
           "id": "water",
           "objective": "Arroser ce qui est semé.",
-          "conditions": [{ "type": "watered", "count": 1 }]
+          "conditions": [{ "type": "watered", "count": 1, "since": "game_start" }]
         },
         {
           "id": "harvest",
@@ -251,7 +251,8 @@
           "conditions": [
             { "type": "used_tool_at", "tool": "hoe", "point": "bell_shadow_spot", "radius": 1.5 },
             { "type": "time_is", "from": "17:00", "to": "17:30" },
-            { "type": "weather_is", "weather": "sunny" }
+            { "type": "weather_is", "weather": "sunny" },
+            { "type": "day_at_least", "day": 3 }
           ],
           "failText": "riddle_not_yet",
           "effects": [

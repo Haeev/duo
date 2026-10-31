@@ -92,7 +92,7 @@ Les plans des meubles fabriqués viennent de Basile (quête S2). On pose, dépla
 |---|---|---|---|
 | T1 | Le premier train | jour 1, scène à deux sur le quai | les clés, le courrier de bienvenue, 200 sous |
 | T2 | Un toit sur nos têtes | porter la poutre à deux, construire les 12 éléments fantômes (toit et porte), dormir | la boîte en fer et sa carte d'énigme |
-| T3 | Premières pousses | bêcher, semer, arroser, puis une première récolte | la confiance d'Odette (elle achète vos légumes) |
+| T3 | Premières pousses | bêcher, semer, arroser, puis une première récolte (ce qui a été semé et arrosé dès le jour 1 compte) | la confiance d'Odette (elle achète vos légumes) |
 | T4 | Les gens du bourg | avoir parlé à Firmin, Odette, Basile et Jeanne | Firmin: « Vous êtes d'ici, maintenant. » |
 | T5 | La commande du samedi | déposer avant samedi 16 h: 12 radis, 3 laitues, 6 œufs, 10 planches | paiement x1,5, +25 % si elle est complète, scène finale |
 
@@ -103,7 +103,7 @@ Les plans des meubles fabriqués viennent de Basile (quête S2). On pose, dépla
 | S1 | Les poules de Mme Ferrand | Odette, jour 2 | réparer le poulailler (8 planches, 2 clous) | trois poules (Bichette, Cocotte et la Duchesse), des œufs chaque matin dès le jour 5 | P0 |
 | S2 | Les planches de Basile | Basile, jour 2 | couper un arbre, scier 4 planches à son établi | les plans de la table, de la chaise, de l'étagère et du lit double | P0 |
 | S3 | Le souper de bienvenue | Odette, jour 4, après les premiers radis | lui apporter 3 radis et 2 laitues avant le jour 5 à 19 h, puis venir à deux | scène à deux, Ventre 100 pour les deux, la recette de la soupe de légumes | P0 |
-| S4 | La première énigme d'Émile | la carte de la boîte en fer (jour 1); Jeanne aide dès le jour 3, Firmin donne l'indice le jour 7 | un jour de soleil, entre 17 h et 17 h 30, l'ombre de la cloche touche le banc: bêcher à cet endroit | la clé de la remise et une vieille photo de la halte; à la fin, la remise s'ouvre sur la draisine | P0 |
+| S4 | La première énigme d'Émile | la carte de la boîte en fer (jour 1); Jeanne aide dès le jour 3, Firmin donne l'indice le jour 7 | à partir du jour 3 (l'arrivée de Jeanne), un jour de soleil, entre 17 h et 17 h 30, l'ombre de la cloche touche le banc: bêcher à cet endroit (jours 3, 5 ou 7) | la clé de la remise et une vieille photo de la halte; à la fin, la remise s'ouvre sur la draisine | P0 |
 | S5 | Le pari de Jeanne | Jeanne, jour 3 | pêcher une truite au gué | sa plume de geai (décoration) | P1 |
 
 ## 2. Systèmes de la démo

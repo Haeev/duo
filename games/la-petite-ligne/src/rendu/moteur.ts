@@ -255,6 +255,28 @@ export class RenderEngine implements Renderer {
     );
     this.scene.add(railway.group);
     world.add(railway);
+    // Points d'accroche du technical artist (`extensions.ts`): eau, panache, ciel...
+    const hooks: RenderHooks = {
+      renderer: this.renderer,
+      scene: this.scene,
+      camera: this.rig.camera,
+      map,
+      materials,
+      characterMaterial: library.sharedCharacterMaterial(),
+      library,
+      terrain,
+      water: terrain.water,
+      daylight: this.daylight,
+      smokeEmitter: () => railway.smokeEmitter(),
+      trainState: () => railway.trainState(),
+      resources: this.resources,
+    };
+    for (const extension of RENDER_EXTENSIONS) {
+      const part = extension(hooks);
+      if (part !== null) {
+        world.add(part);
+      }
+    }
     onProgress(LOAD_BUILD_SHARE);
 
     const local = this.localCharacter(this.view.world());
