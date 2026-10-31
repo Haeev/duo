@@ -77,8 +77,9 @@ export const DEFAULT_SETTINGS: GameSettings = {
 
 const PING_INTERVAL_MS = 500;
 const START_DELAY_MS = 300;
-const LOADING_HEARTBEAT_TIMEOUT_MS = 10_000;
-const RUNNING_HEARTBEAT_TIMEOUT_MS = 5_000;
+// Mêmes seuils que Duo (ADR 0004, amendé le 2026-10-31).
+const LOADING_HEARTBEAT_TIMEOUT_MS = 30_000;
+const RUNNING_HEARTBEAT_TIMEOUT_MS = 8_000;
 const EXIT_SAVE_WAIT_MS = 2_000;
 
 const clock = (): number => performance.timeOrigin + performance.now();

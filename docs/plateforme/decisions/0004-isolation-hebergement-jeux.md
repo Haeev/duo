@@ -45,7 +45,7 @@ Superposition des écrans de la plateforme, deux options:
 | Chargement trop long | 30 s sans message `ready` | échec du chargement: les deux machines reviennent au salon (CA-PF-034) |
 | Plantage du processus du jeu | `render-process-gone` | immédiat |
 | Erreur non rattrapée ou promesse rejetée non gérée dans le jeu | gestionnaires `error` et `unhandledrejection` posés par le SDK, qui envoie `fatal` | immédiat: dans une version publiée, toute erreur non rattrapée est fatale, car l'état de la simulation n'est plus sûr |
-| Jeu figé | battement de cœur du SDK chaque seconde; 5 s sans battement pendant la partie, 10 s pendant le chargement | `forcefullyCrashRenderer()`, puis comme un plantage |
+| Jeu figé | battement de cœur du SDK chaque seconde; 8 s sans battement pendant la partie, 30 s pendant le chargement (amendement du 2026-10-31) | `forcefullyCrashRenderer()`, puis comme un plantage |
 | Sauvegarde de sortie | message `stop` avec demande de sauvegarde | 2 s laissées au jeu pour écrire, puis destruction de la vue |
 
    Budget de F05: un plantage ramène au salon en moins de 2 s (détection immédiate, avis à l'autre machine, affichage); un blocage en moins de 7 s (5 s de détection, puis le même chemin), sous les 10 s exigées.
@@ -58,10 +58,14 @@ Superposition des écrans de la plateforme, deux options:
 - Chaque partie démarre dans un processus neuf: une fuite de mémoire d'un jeu ne survit pas à la partie.
 - Le chargement d'un jeu coûte la création d'un processus de rendu (de l'ordre de 100 ms), compris dans le budget de 5 s du chargement.
 - Le contrat des jeux impose de ne rien stocker hors du SDK: `localStorage` et IndexedDB sont vidés à chaque partie.
-- Un jeu qui calcule longtemps sur son fil principal (plus de 5 s) est déclaré figé: c'est voulu, les compilations de shaders et le décodage des assets se font pendant le chargement, de façon asynchrone (budgets de `architecture.md`, section 14).
+- Un jeu qui calcule longtemps sur son fil principal (plus de 8 s) est déclaré figé: c'est voulu, les compilations de shaders et le décodage des assets se font pendant le chargement, de façon asynchrone (budgets de `architecture.md`, section 14).
 
 ### À vérifier
 
 - Superposition transparente et passage du focus entre les vues sous macOS et Windows, sur les runners de la CI, captures examinées (lot L2).
 - Rythme de la simulation de l'hôte fenêtre réduite: App Nap sous macOS, occultation sous Windows (CA-PF-041, chez le client).
 - Absence de faux positif du battement de cœur sur le PC de référence pendant un chargement lourd (banc de mesure, lot L8).
+
+## Amendement du 2026-10-31
+
+Seuils du chien de garde relâchés: 8 s sans battement en partie (au lieu de 5 s, le plus large que permet F05: retour au salon en 10 s au plus), 30 s au chargement (au lieu de 10 s), 90 s pour recevoir `ready` (au lieu de 30 s). Raison: pendant la préparation de la démo de La Petite Ligne, le premier affichage a bloqué le fil principal plus de 5 s en rendu logiciel, et le PC de référence (graphique intégré, compilateur de shaders de Direct3D) peut connaître des blocages du même ordre. Fermer une partie saine coûte bien plus cher au duo qu'attendre quelques secondes de plus devant un jeu réellement figé; pour aller au-delà de 8 s en partie, il faudrait modifier F05 avec l'accord du client. Les seuils seront resserrés après le banc de mesure du lot L8 sur les vraies machines.

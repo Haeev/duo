@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { bridgeCodec } from '../../src/main/game-host/bridge';
-import { Watchdog } from '../../src/main/game-host/watchdog';
+import { WATCHDOG_LIMITS, Watchdog } from '../../src/main/game-host/watchdog';
 import { createSanitizer } from '../../src/main/journal';
 
 describe('battement de cœur (ADR 0004, point 6)', () => {
@@ -11,37 +11,44 @@ describe('battement de cœur (ADR 0004, point 6)', () => {
     vi.useRealTimers();
   });
 
-  it('déclare figé un jeu silencieux 10 s au chargement', () => {
+  it('déclare figé un jeu silencieux 30 s au chargement', () => {
+    expect(WATCHDOG_LIMITS.loadingSilenceMs).toBe(30_000);
     const expired = vi.fn();
     const watchdog = new Watchdog(expired);
     watchdog.start();
-    vi.advanceTimersByTime(9_000);
+    vi.advanceTimersByTime(29_000);
     watchdog.heartbeat();
-    vi.advanceTimersByTime(9_999);
+    vi.advanceTimersByTime(29_999);
     expect(expired).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
     expect(expired).toHaveBeenCalledWith('hung');
   });
 
-  it('passe à 5 s en partie, et signale une seule fois', () => {
+  it('passe à 8 s en partie (F05: salon en 10 s au plus), et signale une seule fois', () => {
+    expect(WATCHDOG_LIMITS.runningSilenceMs).toBe(8_000);
     const expired = vi.fn();
     const watchdog = new Watchdog(expired);
     watchdog.start();
     watchdog.ready();
-    vi.advanceTimersByTime(5_000);
+    vi.advanceTimersByTime(7_999);
+    expect(expired).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1);
     vi.advanceTimersByTime(30_000);
     expect(expired).toHaveBeenCalledTimes(1);
     expect(expired).toHaveBeenCalledWith('hung');
   });
 
-  it('échoue le chargement sans ready en 30 s, même avec des battements', () => {
+  it('échoue le chargement sans ready en 90 s, même avec des battements', () => {
+    expect(WATCHDOG_LIMITS.readyMs).toBe(90_000);
     const expired = vi.fn();
     const watchdog = new Watchdog(expired);
     watchdog.start();
-    for (let second = 0; second < 30; second += 1) {
+    for (let second = 0; second < 89; second += 1) {
       vi.advanceTimersByTime(1000);
       watchdog.heartbeat();
     }
+    expect(expired).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(1000);
     expect(expired).toHaveBeenCalledWith('load-timeout');
   });
 
@@ -50,7 +57,7 @@ describe('battement de cœur (ADR 0004, point 6)', () => {
     const watchdog = new Watchdog(expired);
     watchdog.start();
     watchdog.stop();
-    vi.advanceTimersByTime(60_000);
+    vi.advanceTimersByTime(120_000);
     expect(expired).not.toHaveBeenCalled();
   });
 });

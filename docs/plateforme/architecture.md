@@ -158,8 +158,8 @@ Quatre options d'isolation ont été comparées (import dynamique, iframe, vue d
 |---|---|---|
 | Plantage du processus du jeu | `render-process-gone` | moins de 2 s |
 | Erreur non rattrapée, promesse rejetée non gérée | gestionnaires du SDK, message `fatal` | moins de 2 s |
-| Jeu figé | 5 s sans battement de cœur en partie (10 s au chargement) | moins de 7 s (F05: 10 s) |
-| Chargement trop long | 30 s sans `ready` | échec du chargement, rien n'est inscrit |
+| Jeu figé | 8 s sans battement de cœur en partie (30 s au chargement), ADR 0004 amendé le 2026-10-31 | moins de 10 s (F05: 10 s) |
+| Chargement trop long | 90 s sans `ready` | échec du chargement, rien n'est inscrit |
 
 Autres règles: Échap et F11 interceptés par `before-input-event` et jamais transmis au jeu; aucune pause à la perte du focus ni fenêtre réduite (touches relâchées, simulation de l'hôte cadencée par des minuteurs, `backgroundThrottling` désactivé); `powerSaveBlocker` en `prevent-display-sleep` pendant toute la partie; fermeture de Duo en partie interceptée, avec confirmation, sauvegarde de sortie et avis à l'autre machine.
 
@@ -519,7 +519,7 @@ PC Windows 11, hypothèse prudente: Intel Core i3 de 8e génération (2 cœurs, 
 |---|---|---|
 | Images par seconde | sur 60 s par scénario: moyenne d'au moins 58, au moins 99 % des intervalles à 20 ms ou moins, aucun au-delà de 34 ms après les 5 premières secondes (définition des critères, H-30) | affichage des performances, banc de mesure |
 | Simulation chez l'hôte | 2 ms au plus par pas à 60 Hz, sérialisation réseau comprise | banc de simulation sous Vitest (cible de 1 ms en CI), puis chez le client |
-| Fil principal du jeu | 8 ms au plus par image; aucun calcul de plus de 5 s d'affilée (sinon le jeu est déclaré figé) | profileur de Chromium |
+| Fil principal du jeu | 8 ms au plus par image; aucun calcul de plus de 8 s d'affilée (sinon le jeu est déclaré figé) | profileur de Chromium |
 | Appels de dessin en 3D | 150 au plus par image, toutes passes comprises | `renderer.info.render.calls` |
 | Triangles en 3D | 250 000 au plus par image, dont 100 000 au plus pour l'ombre | `renderer.info.render.triangles` |
 | Lumières et effets en 3D | une lumière directionnelle avec ombre (carte de 1024, 2048 au plus), une hémisphérique, 4 ponctuelles sans ombre au plus; une seule passe plein écran à pleine résolution; bloom à demi-résolution au plus; ni occlusion ambiante, ni réflexions, ni profondeur de champ | revue technique |
@@ -593,7 +593,7 @@ Incidences du premier jeu (« La Petite Ligne », simulation de vie en coopérat
 | Corruption ou perte de données (coupure, antivirus) | faible | fort | révisions immuables, écriture sûre, `.bak`, reprises, réplication, tests d'arrêt brutal | dev-plateforme |
 | Rattachement accepté à tort (une machine de passage prend la place de l'autre) | faible | moyen | accord exigé sur les deux machines; l'ancienne machine garde ses données et peut se rattacher à nouveau | dev-plateforme |
 | Duo trop ancien sur une machine sans Internet | faible | moyen | message et guide; installateur sur une clé; copie de Duo par le LAN envisageable plus tard | ingenieur-build |
-| Faux positif du battement de cœur pendant un chargement lourd sur le PC | faible | moyen | 10 s de tolérance au chargement, travaux asynchrones; mesure au banc | dev-plateforme |
+| Faux positif du battement de cœur pendant un chargement lourd sur le PC | faible | moyen | 30 s de tolérance au chargement, 8 s en partie, travaux asynchrones; mesure au banc | dev-plateforme |
 | Preact 11 jeune (sorti le 2026-09-30) | faible | faible | repli sur Preact 10.29.8, API identique pour notre usage | dev-plateforme |
 | Montées de version d'Electron (chaque majeure maintenue environ 6 mois) | certaine | moyen | version figée, montée planifiée deux fois par an, tests sur trois systèmes | architecte-technique, ingenieur-build |
 | Pile très récente (Vite 8, TypeScript 6 et 7, Preact 11, Phaser 4) mal connue des agents | moyenne | moyen | lire les API dans `node_modules` avant usage (règle de l'ADR 0001), exemples dans le gabarit | toute l'équipe |

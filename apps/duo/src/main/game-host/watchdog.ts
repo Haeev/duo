@@ -1,11 +1,12 @@
-// Surveillance d'un jeu (ADR 0004, point 6): battement de cœur du SDK chaque
-// seconde; 10 s sans battement au chargement, 5 s en partie: jeu figé.
-// 30 s sans `ready`: échec du chargement.
+// Surveillance d'un jeu (ADR 0004, point 6, amendé le 2026-10-31): battement de
+// cœur du SDK chaque seconde; 30 s sans battement au chargement, 8 s en partie
+// (F05: retour au salon en 10 s au plus): jeu figé. 90 s sans `ready`: échec du chargement. Seuils larges, car une
+// compilation de shaders sur un graphique intégré peut bloquer plusieurs secondes.
 
 export const WATCHDOG_LIMITS = {
-  loadingSilenceMs: 10_000,
-  runningSilenceMs: 5_000,
-  readyMs: 30_000,
+  loadingSilenceMs: 30_000,
+  runningSilenceMs: 8_000,
+  readyMs: 90_000,
 } as const;
 
 export type WatchdogExpiry = 'hung' | 'load-timeout';
