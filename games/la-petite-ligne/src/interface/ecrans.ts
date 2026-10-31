@@ -3,13 +3,14 @@
  * nuit, fin de séance et fin de la démo (maquettes `titre.html`,
  * `creation.html`, `petit-dejeuner.html`, `nuit.html`, `fin.html`).
  */
+import { currentOrder } from '../donnees/commandes';
 import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { Layer, UiHost } from './composant';
 import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
-import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines } from './modele';
+import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, outfitTakenByPartner } from './modele';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -172,6 +173,9 @@ export class CreationScreen implements Layer {
   private readonly hairPortraits: HTMLSpanElement[] = [];
   private readonly hairInputs: HTMLInputElement[] = [];
   private readonly outfitInputs: HTMLInputElement[] = [];
+  /** Marque « Déjà portée par Sacha » sur la tenue que l'autre a choisie (déconseillée, pas interdite). */
+  private readonly outfitTaken: HTMLSpanElement[] = [];
+  private readonly outfitTakenText: HTMLSpanElement[] = [];
   private readonly letter: HTMLDivElement;
   private readonly submit: HTMLButtonElement;
   private readonly edit: HTMLButtonElement;
@@ -247,8 +251,12 @@ export class CreationScreen implements Layer {
         this.refreshPreview();
       });
       this.outfitInputs.push(input);
+      const takenText = el('span');
+      const taken = el('span', { class: 'lpl-option__taken', hidden: true }, [token('other', host.symbol('other'), 'small'), takenText]);
+      this.outfitTaken.push(taken);
+      this.outfitTakenText.push(takenText);
       outfitOptions.append(
-        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${o.top}` }), x.outfits[i] ?? '']),
+        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${o.top}` }), x.outfits[i] ?? '', taken]),
       );
     });
     outfitGroup.append(outfitOptions);
@@ -381,6 +389,12 @@ export class CreationScreen implements Layer {
     }
     const partnerName = nameOf(world, ctx.partner);
     setText(this.waiting.lastChild ?? this.waiting, ctx.t(x.common.waitingFor, { partner: partnerName }));
+    // Deux tenues pareilles: seul le foulard distinguerait les personnages. On le dit, sans l'interdire.
+    const takenOutfit = outfitTakenByPartner(world, ctx);
+    this.outfitTaken.forEach((mark, i) => {
+      setHidden(mark, i !== takenOutfit);
+      setText(this.outfitTakenText[i] ?? mark, ctx.t(x.creation.outfitTaken, { partner: partnerName }));
+    });
     if (other !== null) {
       setPortrait(this.otherPortrait, portraitSvg(playerColors(other.id, other.appearance), 'good', ''));
       setText(this.otherName, other.name);
@@ -590,8 +604,7 @@ export class NightScreen implements Layer {
     this.overline.append(icon('ui-moon'), ` ${ctx.t(x.overline, { weekday: weekdayOf(world.clock.day, ctx.texts.weekdays), day: world.clock.day })}`);
 
     clear(this.list);
-    const lastDay = ctx.content.settings.clock.lastDay.day;
-    const daysLeft = lastDay - world.clock.day;
+    const daysLeft = currentOrder(ctx.content.settings, world).day - world.clock.day;
     if (world.orderResult === null && daysLeft >= 1) {
       const lines = orderLines(world, ctx);
       const done = lines.filter((l) => l.done).length;
@@ -769,8 +782,8 @@ export class EndScreen implements Layer {
     const e = ctx.texts.game.endScreen;
     const ending = world.ending;
     const days = ending?.days ?? world.clock.day;
-    const linesDone = ending?.linesDone ?? world.orderResult?.linesDone ?? 0;
-    const linesTotal = ending?.linesTotal ?? ctx.content.settings.order.lines.length;
+    const linesDone = ending?.linesDone ?? world.orderHistory.reduce((n, o) => n + o.linesDone, 0);
+    const linesTotal = ending?.linesTotal ?? ctx.content.settings.order.trains.reduce((n, o) => n + o.lines.length, 0);
     const furniture = ending?.furniturePlaced ?? world.furniture.filter((f) => f.placedBy !== null).length;
     const time = hourLabel(ctx.content.settings.clock.lastDay.end, ctx.texts.game.ui.hud.time);
     clear(this.ticket);

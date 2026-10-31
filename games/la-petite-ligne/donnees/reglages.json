@@ -7,26 +7,46 @@
     "dayEnd": "24:00",
     "veilleeFrom": "19:00",
     "firstDay": { "day": 1, "start": "10:00" },
-    "lastDay": { "day": 8, "end": "16:00" },
+    "lastDay": { "day": 15, "end": "16:00" },
     "weekdayOfDay1": "saturday",
     "stopWhenBothInMenu": true
   },
-  "train": { "days": [1, 8], "arrival": "10:00", "departure": "16:00" },
-  "weatherByDay": ["sunny", "sunny", "sunny", "rain", "sunny", "cloudy", "sunny", "sunny"],
+  "train": { "days": [1, 8, 15], "arrival": "10:00", "departure": "16:00" },
+  "weatherByDay": ["sunny", "sunny", "sunny", "rain", "sunny", "cloudy", "sunny", "sunny", "sunny", "cloudy", "sunny", "rain", "sunny", "sunny", "sunny"],
   "spawn": { "point": "train_stop" },
   "economy": {
     "startPurse": 200,
     "currency": { "singular": "sou", "plural": "sous" },
     "bigPurchaseThreshold": 100,
     "grocer": { "buyRate": 0.8, "dailyCap": 300, "buysAfterFlag": "grocer_buys" },
-    "catalogue": { "orderDeadline": { "day": 7, "time": "24:00" }, "delivery": { "day": 8, "time": "10:00" } }
+    "catalogue": {
+      "windows": [
+        { "orderDeadline": { "day": 7, "time": "24:00" }, "delivery": { "day": 8, "time": "10:00" } },
+        { "orderDeadline": { "day": 14, "time": "24:00" }, "delivery": { "day": 15, "time": "10:00" } }
+      ]
+    }
   },
   "order": {
-    "lines": [
-      { "item": "radish", "count": 12 },
-      { "item": "lettuce", "count": 3 },
-      { "item": "egg", "count": 6 },
-      { "item": "plank", "count": 10 }
+    "trains": [
+      {
+        "day": 8,
+        "lines": [
+          { "item": "radish", "count": 12 },
+          { "item": "lettuce", "count": 3 },
+          { "item": "egg", "count": 6 },
+          { "item": "plank", "count": 10 }
+        ]
+      },
+      {
+        "day": 15,
+        "lines": [
+          { "item": "carrot", "count": 15 },
+          { "item": "lettuce", "count": 4 },
+          { "item": "egg", "count": 8 },
+          { "item": "omelette", "count": 4 },
+          { "item": "trout", "count": 2 }
+        ]
+      }
     ],
     "linePremium": 1.5,
     "fullBonus": 0.25,

@@ -2,6 +2,7 @@
  * Modèles des panneaux (comptoir, catalogue, établi, réchaud, coffre, sac):
  * fonctions pures sur l'état, testées dans Node.
  */
+import { catalogueWindow, onSale } from '../donnees/commandes';
 import type { ItemDef } from '../donnees/types';
 import type { ItemStack, Quality, ReadonlyWorld } from '../etat/types';
 import { UI_SETTINGS } from './config';
@@ -41,13 +42,13 @@ export interface ProductModel {
 }
 
 export function catalogueOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
-  const deadline = ctx.content.settings.economy.catalogue.orderDeadline;
+  const deadline = catalogueWindow(ctx.content.settings, world.clock.day).orderDeadline;
   const { day, minutes } = world.clock;
   return day < deadline.day || (day === deadline.day && minutes < deadline.time);
 }
 
 export function catalogueDelivered(world: ReadonlyWorld, ctx: UiContext): boolean {
-  const d = ctx.content.settings.economy.catalogue.delivery;
+  const d = catalogueWindow(ctx.content.settings, world.clock.day).delivery;
   const { day, minutes } = world.clock;
   return world.catalogueOrders.length === 0 && (day > d.day || (day === d.day && minutes >= d.time));
 }
@@ -61,7 +62,7 @@ export function catalogueProducts(world: ReadonlyWorld, ctx: UiContext): Product
   const delivered = catalogueDelivered(world, ctx);
   const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
   return Object.values(ctx.content.items)
-    .filter((def) => def.shop === 'catalogue' && def.buyPrice !== null)
+    .filter((def) => def.shop === 'catalogue' && def.buyPrice !== null && onSale(def, world.clock.day))
     .map((def) => {
       const price = def.buyPrice ?? 0;
       const ordered = world.catalogueOrders.includes(def.id);
@@ -115,7 +116,7 @@ export function shopIsOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
 export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext): BuyEntry[] {
   const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
   return Object.values(ctx.content.items)
-    .filter((def) => def.shop === 'grocery' && def.buyPrice !== null)
+    .filter((def) => def.shop === 'grocery' && def.buyPrice !== null && onSale(def, world.clock.day))
     .map((def) => {
       const price = def.buyPrice ?? 0;
       const crop = def.plants === null ? undefined : ctx.content.crops[def.plants];

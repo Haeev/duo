@@ -142,8 +142,12 @@ export interface WorldState {
   scripts: ScriptState[];
   /** Prochain identifiant unique (meubles, objets au sol, propositions, notifications). */
   nextId: number;
-  /** Résultat de la commande, une fois payée au départ du train. */
+  /** Commande en cours: index dans `reglages.order.trains` (elle passe à la suivante au lever du jour qui suit le paiement). */
+  orderIndex: number;
+  /** Résultat de la commande en cours, une fois payée au départ du train (jusqu'au matin suivant). */
   orderResult: OrderResult | null;
+  /** Résultats des commandes payées, dans l'ordre des trains. */
+  orderHistory: OrderResult[];
   /** Récapitulatif de fin, une fois la démo finie. */
   ending: EndingSummary | null;
   /** Statistiques de la séance pour l'historique de la plateforme. */
@@ -161,7 +165,7 @@ export interface WorldState {
 export type Phase = 'creation' | 'day' | 'night' | 'breakfast' | 'ended';
 
 export interface ClockState {
-  /** Jour de la démo, de 1 (samedi) à 8 (samedi suivant). */
+  /** Jour de la démo, de 1 (samedi) à `reglages.clock.lastDay.day` (15, le troisième samedi). */
   day: number;
   /** Minutes depuis minuit, réel (6 h = 360, 24 h = 1440). */
   minutes: number;
@@ -667,8 +671,11 @@ export interface Counters {
 
 export interface EndingSummary {
   days: number;
+  /** Lignes remplies et lignes demandées, toutes commandes confondues. */
   linesDone: number;
   linesTotal: number;
+  /** Le détail, commande par commande. */
+  orders: { linesDone: number; linesTotal: number }[];
   furniturePlaced: number;
   keyFound: boolean;
 }

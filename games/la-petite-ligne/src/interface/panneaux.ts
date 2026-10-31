@@ -4,6 +4,7 @@
  * maison (maquettes `caisse.html`, `catalogue.html`; les trois derniers
  * reprennent les mêmes composants, README des maquettes, section 5).
  */
+import { catalogueWindow, currentOrder } from '../donnees/commandes';
 import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
@@ -57,7 +58,7 @@ export class CratePanel extends Panel {
     super(host, {
       icon: 'parcel',
       title: ctx.t(ctx.texts.game.ui.crate.title),
-      subtitle: ctx.t(ctx.texts.extra.crate.board, { day: ctx.content.settings.clock.lastDay.day, time }),
+      subtitle: ctx.t(ctx.texts.extra.crate.board, { day: ctx.content.settings.order.trains[0]?.day ?? 0, time }),
       narrow: true,
       width: '46rem',
       closeKeyLabel: ctx.key('Backspace'),
@@ -100,15 +101,16 @@ export class CratePanel extends Panel {
     const c = ctx.texts.extra.crate;
     const lines = orderLines(world, ctx);
     const result = world.orderResult;
+    const orderDay = currentOrder(ctx.content.settings, world).day;
+    this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
     const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));
     const sig = JSON.stringify([lines, result, world.clock.day, recap?.id]);
     this.renderBody(sig, () => {
       const done = lines.filter((l) => l.done).length;
       const total = lines.length;
-      const amount = orderFullAmount(ctx);
+      const amount = orderFullAmount(ctx, world);
       const time = hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time);
-      const lastDay = ctx.content.settings.clock.lastDay.day;
-      const daysLeft = lastDay - world.clock.day;
+      const daysLeft = orderDay - world.clock.day;
       let summary: HTMLElement;
       if (result !== null) {
         summary = el('div', { class: 'lpl-order__summary' }, [
@@ -239,7 +241,7 @@ export class CataloguePanel extends Panel {
           el('span', { text: ctx.t(k.deliveredText) }),
         ]);
       } else if (!open) {
-        const time = hourLabel(ctx.content.settings.economy.catalogue.delivery.time, ctx.texts.game.ui.hud.time);
+        const time = hourLabel(catalogueWindow(ctx.content.settings, world.clock.day).delivery.time, ctx.texts.game.ui.hud.time);
         summary = el('div', { class: 'lpl-order__summary' }, [
           el('strong', {}, [icon('ui-lock'), ' ', ctx.t(k.closed)]),
           el('span', { text: ctx.t(k.closedText, { time }) }),

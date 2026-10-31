@@ -2,6 +2,7 @@
  * Mise en forme des textes affichés: gabarits `{nom}`, heures, jours,
  * quantités, noms d'objets, touches. Fonctions pures, testées dans Node.
  */
+import { currentOrder } from '../donnees/commandes';
 import type { Content, ItemDef } from '../donnees/types';
 import type { ItemStack, Quality } from '../etat/types';
 import { PROFILE_SYMBOLS, UI_SETTINGS } from './config';
@@ -88,16 +89,18 @@ export function countedList(
 /** Variables communes des textes du courrier et des quêtes (comme la simulation). */
 export function contentVars(
   content: Content,
-  orderResult: { linesDone: number; linesTotal: number; amount: number } | null,
+  world: { orderIndex: number; orderResult: { linesDone: number; linesTotal: number; amount: number } | null } | null,
   format: { line: string; separator: string; lastSeparator: string },
 ): Record<string, string | number> {
   const s = content.settings;
+  const lines = currentOrder(s, world ?? { orderIndex: 0 }).lines;
+  const orderResult = world?.orderResult ?? null;
   return {
     startPurse: s.economy.startPurse,
     bigPurchase: s.economy.bigPurchaseThreshold,
-    order: countedList(content, s.order.lines, format),
+    order: countedList(content, lines, format),
     linesDone: orderResult?.linesDone ?? 0,
-    linesTotal: orderResult?.linesTotal ?? s.order.lines.length,
+    linesTotal: orderResult?.linesTotal ?? lines.length,
     amount: orderResult?.amount ?? 0,
   };
 }

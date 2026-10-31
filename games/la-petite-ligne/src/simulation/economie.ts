@@ -3,6 +3,7 @@
  * EC-03), catalogue de la coopérative, gros achats à deux (EC-04), caisse et
  * commande du samedi (EC-05, EC-08).
  */
+import { catalogueWindow, currentOrder, onSale } from '../donnees/commandes';
 import type { Character, CharacterId, ItemStack, PurchaseRequest, Quality } from '../etat/types';
 import { orderSatisfied } from './conditions';
 import { type Sim, character, distance, emit, itemName, itemWithArticle, newId, notifyKey, partnerOf, point, say } from './contexte';
@@ -36,7 +37,7 @@ function canUseCrate(sim: Sim, c: Character): boolean {
 
 function catalogueOpen(sim: Sim): boolean {
   const { day, minutes } = sim.world.clock;
-  const deadline = sim.content.settings.economy.catalogue.orderDeadline;
+  const deadline = catalogueWindow(sim.content.settings, day).orderDeadline;
   return day < deadline.day || (day === deadline.day && minutes < deadline.time);
 }
 
@@ -59,6 +60,7 @@ export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void
   const def = sim.content.items[request.item];
   if (def === undefined) return;
   if (def.buyPrice === null || def.shop !== request.source || request.count < 1) return;
+  if (!onSale(def, sim.world.clock.day)) return;
   if (request.source === 'grocery' && (!canShop(sim, c) || !shopOpen(sim))) return;
   if (request.source === 'catalogue') {
     if (!canUseCatalogue(sim, c)) return;
@@ -213,7 +215,8 @@ export function chestMove(sim: Sim, c: Character, item: string, quality: Quality
 export function payOrder(sim: Sim): void {
   const { world } = sim;
   if (world.orderResult !== null) return;
-  const o = sim.content.settings.order;
+  const o = currentOrder(sim.content.settings, world);
+  const rate = sim.content.settings.order.extraItemsRate;
   const complete = orderSatisfied(sim);
   let linesDone = 0;
   let linesPay = 0;
@@ -230,14 +233,28 @@ export function payOrder(sim: Sim): void {
       // Rien n'est perdu: ce que la coopérative n'achète pas revient au cellier.
       addStack(world.cellar, stack.item, stack.quality, stack.count);
     } else {
-      extras += stack.count * price * o.extraItemsRate;
+      extras += stack.count * price * rate;
     }
   }
   world.crate = [];
   const amount = Math.round(linesPay * (complete ? 1 + o.fullBonus : 1) + extras);
   world.purse += amount;
   world.orderResult = { linesDone, linesTotal: o.lines.length, complete, amount };
+  world.orderHistory.push({ ...world.orderResult });
+  // `{order}` et la quête suivante citent déjà le prochain train; la caisse rouvre au matin (`reopenCrate`).
+  if (world.orderIndex + 1 < sim.content.settings.order.trains.length) world.orderIndex += 1;
   emit(sim, { type: 'order_paid', amount, linesDone });
+}
+
+/**
+ * Au lever du jour qui suit un paiement, la caisse (vidée au paiement) rouvre
+ * pour la commande suivante. Après la dernière, elle reste « expédiée ».
+ */
+export function reopenCrate(sim: Sim): void {
+  const { world } = sim;
+  if (world.orderResult === null || world.orderHistory.length >= sim.content.settings.order.trains.length) return;
+  world.orderResult = null;
+  sim.runtime.changed = true;
 }
 
 /** Les colis du catalogue arrivent par le train, dans le cellier (EC-03). */

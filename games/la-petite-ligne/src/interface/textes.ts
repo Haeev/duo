@@ -76,6 +76,7 @@ const SupplementSchema = v.object({
     edit: str,
     trainArriving: str,
     partnerChoosing: str,
+    outfitTaken: str,
     together: str,
     letterWaiting: str,
     letterStamp: str,

@@ -15,6 +15,8 @@ import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
 import { canPlace } from './amenagement';
+import { currentOrder } from '../donnees/commandes';
+import { holdsRod, waterAhead } from './peche';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -41,8 +43,10 @@ const HOUR = MINUTES_PER_HOUR;
 const GO_HOME_AT = 19 * HOUR;
 /** Le robot donne signe de vie au moins toutes les N pas (une minute). */
 const PRESENCE_TICKS = SECONDS_PER_MINUTE * SIM_HZ;
-/** Planches à garder pour la commande. */
-const PLANKS_FOR_ORDER = 10;
+/** Planches à garder pour la commande en cours (la ligne de planches, s'il y en a une). */
+function planksForOrder(sim: Sim): number {
+  return currentOrder(sim.content.settings, sim.world).lines.find((l) => l.item === 'plank')?.count ?? 0;
+}
 
 function frame(m: Memory, moveX = 0, moveY = 0, actHeld = false): ControlFrame {
   m.seq += 1;
@@ -153,7 +157,7 @@ function buy(sim: Sim, c: Character, m: Memory, wants: { item: string; count: nu
 
 function sellExtra(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   if (!sim.world.flags.includes(sim.content.settings.economy.grocer.buysAfterFlag) || !shopOpen(sim)) return false;
-  const carrots = countInBag(c, 'carrot') - 2;
+  const carrots = countInBag(c, 'carrot') - Math.max(2, orderNeed(sim, 'carrot'));
   if (carrots < 3 || sim.world.grocerSoldToday > 0) return false;
   const counter = pt(sim, POINT.groceryCounter);
   if (c.menu !== 'shop') return goAct(sim, c, m, 'vendre', ground(counter), counter, 1.2, out);
@@ -164,15 +168,27 @@ function sellExtra(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   return true;
 }
 
-/** Ce qu'il est encore utile de semer ce jour-là (mûr avant le train du jour 8). */
+/** Ce qu'il est encore utile de semer ce jour-là (mûr avant le train de la commande en cours). */
 function seedPlan(sim: Sim): string[] {
   const { day } = sim.world.clock;
-  const last = sim.content.settings.clock.lastDay.day;
+  const last = currentOrder(sim.content.settings, sim.world).day;
+  if (sim.world.orderIndex > 0) return orderSeedPlan(sim, day, last);
   const plan: string[] = [];
   const order = ['radish', 'lettuce', 'carrot'];
   for (const crop of order) {
     const def = sim.content.crops[crop];
     if (def !== undefined && day + def.growthDays <= last) plan.push(crop);
+  }
+  return plan;
+}
+
+/** Après la première commande: les cultures que la commande demande encore, mûres à temps. */
+function orderSeedPlan(sim: Sim, day: number, last: number): string[] {
+  const plan: string[] = [];
+  for (const crop of Object.values(sim.content.crops)) {
+    if (day + crop.growthDays > last) continue;
+    const growing = sim.world.garden.filter((g) => g.crop?.crop === crop.id).length * crop.yieldPerCell;
+    if (orderNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
   }
   return plan;
 }
@@ -240,13 +256,25 @@ function hens(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   return false;
 }
 
+/** Ce que la commande en cours demande encore de cet objet (caisse déduite), 0 si elle n'en veut pas. */
+function orderNeed(sim: Sim, item: string): number {
+  if (sim.world.orderResult !== null) return 0;
+  const line = currentOrder(sim.content.settings, sim.world).lines.find((l) => l.item === item);
+  return line === undefined ? 0 : Math.max(0, line.count - countInStacks(sim.world.crate, item));
+}
+
+/** Les deux sacs ensemble. */
+function inBags(sim: Sim, item: string): number {
+  return countInBag(character(sim, 'p1'), item) + countInBag(character(sim, 'p2'), item);
+}
+
 function planksOwned(sim: Sim): number {
   return countInBag(character(sim, 'p1'), 'plank') + countInBag(character(sim, 'p2'), 'plank') + countInStacks(sim.world.cellar, 'plank');
 }
 
 /** Planches qui restent à trouver: poulailler, meubles, commande. */
 function planksWanted(sim: Sim): number {
-  let wanted = PLANKS_FOR_ORDER - countInStacks(sim.world.crate, 'plank');
+  let wanted = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank');
   if (!built(sim, 'chicken_coop')) wanted += 8;
   for (const r of ['craft_table', 'craft_chair', 'craft_shelf', 'craft_double_bed']) {
     const recipe = sim.content.recipes[r];
@@ -323,7 +351,7 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     return false;
   }
   if (!questDone(sim, 'planks')) return false;
-  const reserve = PLANKS_FOR_ORDER - countInStacks(sim.world.crate, 'plank') + (built(sim, 'chicken_coop') ? 0 : 8);
+  const reserve = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank') + (built(sim, 'chicken_coop') ? 0 : 8);
   const plan: { recipe: string; item: string; needsMattress?: boolean }[] = [
     { recipe: 'craft_table', item: 'table' },
     { recipe: 'craft_chair', item: 'chair' },
@@ -355,11 +383,10 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 function order(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   if (sim.world.orderResult !== null) return false;
   const { day, minutes } = sim.world.clock;
-  const last = sim.content.settings.clock.lastDay;
-  const urgent = day === last.day;
+  const urgent = day === currentOrder(sim.content.settings, sim.world).day;
   const supperPending = questStep(sim, 'welcome_supper') === 'bring' || !sim.world.quests.some((q) => q.id === 'welcome_supper');
   const deposits: { item: string; count: number }[] = [];
-  for (const line of sim.content.settings.order.lines) {
+  for (const line of currentOrder(sim.content.settings, sim.world).lines) {
     const inCrate = countInStacks(sim.world.crate, line.item);
     const need = line.count - inCrate;
     if (need <= 0) continue;
@@ -430,7 +457,9 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     return true;
   }
   if (c.supper.bread + c.supper.simple + c.supper.stew === 0) {
-    const food = c.bag.find((s) => s !== null && sim.content.items[s.item]?.dish !== null && sim.content.items[s.item] !== undefined);
+    const food = c.bag.find(
+      (s) => s !== null && sim.content.items[s.item]?.dish !== null && sim.content.items[s.item] !== undefined && orderNeed(sim, s.item) === 0,
+    );
     if (food !== null && food !== undefined) {
       out.push({ type: 'eat', item: food.item });
       m.waitUntil = sim.world.tick + 70;
@@ -440,7 +469,7 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     const cookable = ['cook_vegetable_soup', 'cook_omelette', 'cook_crunchy_radishes'].find((r) => {
       const recipe = sim.content.recipes[r];
       if (recipe === undefined || !sim.world.unlockedRecipes.includes(r)) return false;
-      const reserveEggs = r === 'cook_omelette' ? 6 - countInStacks(sim.world.crate, ITEM.egg) : 0;
+      const reserveEggs = r === 'cook_omelette' ? orderNeed(sim, ITEM.egg) : 0;
       const reserveRadish = r !== 'cook_omelette' ? 12 - countInStacks(sim.world.crate, 'radish') : 0;
       return recipe.inputs.every((i) => {
         const reserve = i.item === ITEM.egg ? reserveEggs : i.item === 'radish' ? Math.max(0, reserveRadish - 3) : 0;
@@ -464,6 +493,64 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     return goAct(sim, c, m, `lit:${bed.id}`, { kind: 'furniture', furniture: bed.id }, { x: bed.cell.cx + 0.5, y: bed.cell.cy + 0.5 }, 1.2, out);
   }
   return true;
+}
+
+/** Omelettes de la commande: au réchaud, une fois les œufs de la commande dans la caisse. */
+function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const recipe = sim.content.recipes.cook_omelette;
+  if (recipe === undefined || orderNeed(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) return false;
+  const eggs = recipe.inputs.find((i) => i.item === ITEM.egg)?.count ?? 0;
+  if (orderNeed(sim, ITEM.egg) > 0 || countInBag(c, ITEM.egg) < eggs) return false;
+  if (sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  if (!c.inHouse) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
+  out.push({ type: 'craft', recipe: recipe.id });
+  m.waitUntil = sim.world.tick + 3;
+  m.job = 'cuisiner pour la commande';
+  return true;
+}
+
+/** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
+function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
+  if (orderNeed(sim, 'trout') <= inBags(sim, 'trout') || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  if (countInBag(c, ITEM.fishingRod) === 0) return false;
+  const ford = pt(sim, 'river_ford');
+  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, 'gue', ford, 0.4, out) || true;
+  if (!holdsRod(c)) return selectItem(c, ITEM.fishingRod, out) || true;
+  m.job = 'pêcher';
+  if (c.fishing?.phase === 'bite') {
+    out.push({ type: 'act' });
+    return true;
+  }
+  if (c.fishing !== null) return true;
+  if (waterAhead(sim, c) === null) {
+    // Un pas vers l'eau la plus proche suffit à se tourner vers elle.
+    const water = nearestWater(sim, c.pos);
+    if (water === null) return false;
+    const d = Math.hypot(water.x - c.pos.x, water.y - c.pos.y);
+    f.mx = (water.x - c.pos.x) / d;
+    f.my = (water.y - c.pos.y) / d;
+    return true;
+  }
+  out.push({ type: 'act' });
+  m.waitUntil = sim.world.tick + 2;
+  return true;
+}
+
+function nearestWater(sim: Sim, from: Vec2): Vec2 | null {
+  const { map } = sim;
+  let best: Vec2 | null = null;
+  let bestD = Infinity;
+  for (let cy = Math.max(0, Math.floor(from.y) - 5); cy <= Math.min(map.height - 1, Math.floor(from.y) + 5); cy++) {
+    for (let cx = Math.max(0, Math.floor(from.x) - 5); cx <= Math.min(map.width - 1, Math.floor(from.x) + 5); cx++) {
+      if (map.ground[cy * map.width + cx] !== 'water') continue;
+      const d = Math.hypot(cx + 0.5 - from.x, cy + 0.5 - from.y);
+      if (d < bestD) {
+        bestD = d;
+        best = { x: cx + 0.5, y: cy + 0.5 };
+      }
+    }
+  }
+  return best;
 }
 
 function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number; my: number }, out: Intent[]): boolean {
@@ -509,8 +596,8 @@ function ironBox(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 }
 
 function lastDay(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
-  const last = sim.content.settings.clock.lastDay;
-  if (sim.world.clock.day !== last.day) return false;
+  const train = currentOrder(sim.content.settings, sim.world).day;
+  if (sim.world.clock.day !== train || sim.world.orderResult !== null) return false;
   if (order(sim, c, m, out)) return true;
   const quay = pt(sim, POINT.trainStop);
   return goTo(sim, c, m, 'quai', quay, 2, out) || true;
@@ -594,9 +681,15 @@ export function createRobot(options: RobotOptions = {}): Robot {
       social(sim, c, m, out) ||
       giveOdette(sim, c, m, out) ||
       order(sim, c, m, out) ||
+      cookForOrder(sim, c, m, out) ||
       (c.id === 'p1' ? garden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
       (c.id === 'p2'
-        ? coop(sim, c, m, f, out) || wood(sim, c, m, out) || furniture(sim, c, m, out) || hens(sim, c, m, out) || garden(sim, c, m, out)
+        ? coop(sim, c, m, f, out) ||
+          fishForOrder(sim, c, m, f, out) ||
+          wood(sim, c, m, out) ||
+          furniture(sim, c, m, out) ||
+          hens(sim, c, m, out) ||
+          garden(sim, c, m, out)
         : false);
     if (!done) m.job = 'flâner';
     return frame(m, f.mx, f.my, f.held);

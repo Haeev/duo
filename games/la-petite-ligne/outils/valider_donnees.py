@@ -25,6 +25,7 @@ ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 TIME_RE = re.compile(r"^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$")
 PLACEHOLDER_RE = re.compile(r"\{([A-Za-z]+)\}")
 FORBIDDEN_DASHES = (chr(0x2014), chr(0x2013))  # tirets cadratin et demi-cadratin, écrits par leur code
+# Jours de la démo, de 1 à `reglages.clock.lastDay.day` (fixé au chargement dans main()).
 DEMO_DAYS = range(1, 9)
 
 ITEM_CATEGORIES = {"seed", "crop", "forage", "animal_product", "material", "carried", "tool", "food", "quest", "fish",
@@ -96,7 +97,7 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "witnessed": ({"event"}, {"who"}),
     "nights_passed": ({"count"}, set()),
     "recipe_known": ({"recipe"}, set()),
-    "order_complete": (set(), set()),
+    "order_complete": (set(), {"day"}),
 }
 COMMON_CONDITION_KEYS = {"type", "label"}
 
@@ -167,6 +168,8 @@ class Registry:
         self.flags_set: set[str] = set()
         self.flags_read: dict[str, str] = {}
         self.quests_started_by_effect: set[str] = set()
+        self.order_days: set[int] = set()
+        self.order_days_used: dict[int, str] = {}
 
 
 def load(folder: Path, report: Report) -> dict[str, Any]:
@@ -279,6 +282,11 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
             report.error(w, f"jours hors de la démo {cond['days']!r}")
     if ctype == "day_at_least" and cond.get("day") not in DEMO_DAYS:
         report.error(w, f"jour hors de la démo {cond.get('day')!r}")
+    if ctype == "order_complete" and "day" in cond:
+        if cond["day"] not in DEMO_DAYS:
+            report.error(w, f"jour hors de la démo {cond['day']!r}")
+        else:
+            reg.order_days_used.setdefault(cond["day"], w)
     if ctype == "time_is":
         check_time(cond.get("from"), w, report)
         check_time(cond.get("to"), w, report)
@@ -435,6 +443,8 @@ def check_objets(data: dict[str, Any], reg: Registry, report: Report) -> None:
                 report.error(w, "vendu en boutique sans prix d'achat")
         if item.get("tier") not in TIERS:
             report.error(w, f"tier inconnu {item.get('tier')!r}")
+        if "availableFromDay" in item and item["availableFromDay"] not in DEMO_DAYS:
+            report.error(w, f"« availableFromDay » hors de la démo {item['availableFromDay']!r}")
         if item.get("category") == "seed" and item.get("plants") not in reg.crops:
             report.error(w, f"« plants » ne désigne pas une culture: {item.get('plants')!r}")
         if item.get("category") == "food" and item.get("dish") not in DISHES:
@@ -687,10 +697,26 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
         report.error("reglages.clock", "« secondsPerGameMinute » positif attendu")
     weather = settings.get("weatherByDay", [])
     if len(weather) != len(DEMO_DAYS) or not set(weather) <= WEATHERS:
-        report.error("reglages.weatherByDay", "huit météos connues attendues")
-    for line in settings.get("order", {}).get("lines", []):
-        ref("item", line.get("item"), "reglages.order.lines", reg, report)
-        check_count(line.get("count"), "reglages.order.lines", report)
+        report.error("reglages.weatherByDay", f"{len(DEMO_DAYS)} météos connues attendues, une par jour de la démo")
+    order = settings.get("order", {})
+    # Une commande par train (`trains`), ou l'ancienne forme à une seule commande (`lines`).
+    trains = order.get("trains") if isinstance(order.get("trains"), list) else [{"day": None, "lines": order.get("lines", [])}]
+    train_days = set(settings.get("train", {}).get("days", []))
+    for i, train in enumerate(trains):
+        w = f"reglages.order.trains[{i}]"
+        if train.get("day") is not None and train.get("day") not in train_days:
+            report.error(w, f"jour {train.get('day')!r} sans train (reglages.train.days)")
+        for line in train.get("lines", []):
+            ref("item", line.get("item"), f"{w}.lines", reg, report)
+            check_count(line.get("count"), f"{w}.lines", report)
+            item = reg.items.get(line.get("item"))
+            if item is not None and item.get("sellPrice") is None:
+                report.error(f"{w}.lines", f"{line.get('item')!r} sans prix de vente: la ligne ne rapporterait rien")
+    reg.order_days = {t.get("day") for t in trains if isinstance(t.get("day"), int)}
+    if reg.order_days:
+        for day, where in sorted(reg.order_days_used.items()):
+            if day not in reg.order_days:
+                report.error(where, f"order_complete: aucune commande pour le train du jour {day}")
     ref("point", settings.get("spawn", {}).get("point"), "reglages.spawn", reg, report)
     ref("point", settings.get("garden", {}).get("zone"), "reglages.garden", reg, report)
     ref("point", settings.get("trees", {}).get("zone"), "reglages.trees", reg, report)
@@ -744,6 +770,10 @@ def main() -> int:
     folder = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent / "donnees"
     report = Report()
     data = load(folder, report)
+    global DEMO_DAYS
+    last_day = data.get("reglages", {}).get("clock", {}).get("lastDay", {}).get("day")
+    if isinstance(last_day, int) and last_day >= 1:
+        DEMO_DAYS = range(1, last_day + 1)
     reg = Registry()
     collect(data, reg, report)
     check_objets(data, reg, report)

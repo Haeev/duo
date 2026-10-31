@@ -24,6 +24,8 @@ import type {
   HintTrigger,
   ItemCategory,
   ItemDef,
+  OrderDef,
+  CatalogueWindow,
   LetterDef,
   QualityDef,
   QuestDef,
@@ -89,6 +91,41 @@ function optText(r: Reader, key: string): string | null {
   const value = optString(r, key);
   if (value !== null && value.trim() === '') r.at(key).fail('texte non vide attendu');
   return value;
+}
+
+/**
+ * Les commandes des trains (`order.trains`), chacune avec ses lignes; prime de
+ * ligne et bonus pris à la commande, sinon au niveau de `order`. L'ancien
+ * format (`order.lines`, une commande) vaut une commande au dernier train.
+ */
+function trainOrders(order: Reader, trainDays: number[]): OrderDef[] {
+  const premium = order.opt('linePremium');
+  const bonus = order.opt('fullBonus');
+  const read = (o: Reader, day: number): OrderDef => {
+    // Absente ici comme dans « order »: `at` signale le champ manquant.
+    const p = o.opt('linePremium') ?? premium ?? o.at('linePremium');
+    const b = o.opt('fullBonus') ?? bonus ?? o.at('fullBonus');
+    return { day, lines: stackList(o.at('lines')), linePremium: p.number(), fullBonus: b.number() };
+  };
+  if (!order.has('trains')) return [read(order, trainDays[trainDays.length - 1] ?? 1)];
+  let previous = 0;
+  return order.at('trains').items().map((o) => {
+    const day = o.at('day').integer(1);
+    if (!trainDays.includes(day)) o.at('day').fail(`aucun train le jour ${day} (train.days)`);
+    if (day <= previous) o.at('day').fail('commandes attendues dans l\'ordre des jours');
+    previous = day;
+    return read(o, day);
+  });
+}
+
+function stackList(r: Reader): { item: string; count: number }[] {
+  return r.items().map((s) => ({ item: s.at('item').string(), count: s.at('count').integer(1) }));
+}
+
+/** Fenêtres du catalogue (`windows`), ou l'ancienne fenêtre unique. */
+function catalogueWindows(catalogue: Reader, dayTime: (x: Reader) => { day: number; time: number }): CatalogueWindow[] {
+  const list = catalogue.has('windows') ? catalogue.at('windows').items() : [catalogue];
+  return list.map((w) => ({ orderDeadline: dayTime(w.at('orderDeadline')), delivery: dayTime(w.at('delivery')) }));
 }
 
 function optNumber(r: Reader, key: string, fallback: number): number {
@@ -181,8 +218,10 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return { type, construction: r.at('construction').string() };
     case 'recipe_known':
       return { type, recipe: r.at('recipe').string() };
-    case 'order_complete':
-      return { type };
+    case 'order_complete': {
+      const day = r.opt('day');
+      return { type, day: day === null ? null : day.integer(1) };
+    }
     case 'used_tool_at':
       return {
         type,
@@ -330,6 +369,7 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       name: it.at('name').string(),
       plural: it.at('plural').string(),
       indefinite: optText(it, 'indefinite'),
+      availableFromDay: it.has('availableFromDay') ? it.at('availableFromDay').integer(1) : null,
       category: it.at('category').oneOf(CATEGORIES),
       stack: it.at('stack').integer(1, 999),
       buyPrice: buy === null || buy.isNull() ? null : buy.integer(0),
@@ -770,6 +810,7 @@ function parseSettings(r: Reader): Settings {
   if (weatherByDay.length < lastDay.at('day').integer(1)) {
     r.at('weatherByDay').fail('une météo par jour de la démo attendue');
   }
+  const trainDays = r.at('train').at('days').numberList();
   return {
     profile: r.at('profile').string(),
     clock: {
@@ -782,7 +823,7 @@ function parseSettings(r: Reader): Settings {
       stopWhenBothInMenu: clock.at('stopWhenBothInMenu').boolean(),
     },
     train: {
-      days: r.at('train').at('days').numberList(),
+      days: trainDays,
       arrival: r.at('train').at('arrival').time(),
       departure: r.at('train').at('departure').time(),
     },
@@ -796,12 +837,10 @@ function parseSettings(r: Reader): Settings {
         dailyCap: grocer.at('dailyCap').integer(0),
         buysAfterFlag: grocer.at('buysAfterFlag').string(),
       },
-      catalogue: { orderDeadline: dayTime(catalogue.at('orderDeadline')), delivery: dayTime(catalogue.at('delivery')) },
+      catalogue: { windows: catalogueWindows(catalogue, dayTime) },
     },
     order: {
-      lines: stacks(order.at('lines')),
-      linePremium: order.at('linePremium').number(),
-      fullBonus: order.at('fullBonus').number(),
+      trains: trainOrders(order, trainDays),
       extraItemsRate: order.at('extraItemsRate').number(),
     },
     trees: { chopsPerTree: r.at('trees').at('chopsPerTree').integer(1), logsPerTree: r.at('trees').at('logsPerTree').integer(1) },
@@ -882,7 +921,9 @@ function checkReferences(content: Content): void {
     item(crop.seed, `cultures.json: ${crop.id}`);
     item(crop.harvest, `cultures.json: ${crop.id}`);
   }
-  for (const line of content.settings.order.lines) item(line.item, 'reglages.json: order.lines');
+  content.settings.order.trains.forEach((o, i) => {
+    for (const line of o.lines) item(line.item, `reglages.json: order.trains[${i}].lines`);
+  });
   const questIds = new Set(content.quests.map((q) => q.id));
   const walkEffects = (list: Effect[], where: string): void => {
     for (const e of list) {

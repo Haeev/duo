@@ -58,7 +58,7 @@ describe('heures et jours', () => {
 describe('objets et commande', () => {
   it('écrit la commande avec les noms au pluriel', () => {
     const { content } = contentAndMap();
-    expect(countedList(content, content.settings.order.lines, content.texts.orderFormat)).toBe('12 radis, 3 laitues, 6 œufs, 10 planches');
+    expect(countedList(content, content.settings.order.trains[0]?.lines ?? [], content.texts.orderFormat)).toBe('12 radis, 3 laitues, 6 œufs, 10 planches');
   });
 
   it('compte un objet dans des piles, toutes qualités ou une seule', () => {

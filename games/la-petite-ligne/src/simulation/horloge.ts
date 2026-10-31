@@ -2,6 +2,7 @@
  * Horloge partagée et cycle de la journée (TE-01 à TE-08, démo): journée,
  * veillée qui arrête le temps, coucher à deux, nuit, petit-déjeuner, minuit.
  */
+import { reopenCrate } from './economie';
 import type { CharacterStatus, ClockStop } from '../etat/types';
 import { SECONDS_PER_MINUTE, SIM_HZ } from './constantes';
 import { type Sim, character, emit, partnerOf, say } from './contexte';
@@ -162,6 +163,7 @@ export function morning(sim: Sim): void {
   world.weatherTomorrow = s.weatherByDay[world.clock.day] ?? world.weather;
   morningGrowth(sim);
   morningEggs(sim);
+  reopenCrate(sim);
   world.grocerSoldToday = 0;
   for (const c of world.characters) {
     const bed = world.furniture.find((f) => f.id === c.bedId);

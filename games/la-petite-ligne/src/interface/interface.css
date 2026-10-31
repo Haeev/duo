@@ -175,3 +175,21 @@
 .lpl-panel__body {
   scroll-padding-block: var(--lpl-space-4);
 }
+
+/* Création: la tenue déjà portée par l'autre, signalée sous son nom (déconseillée, pas interdite). */
+.lpl-option__taken {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 7rem;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Le jeton garde sa taille: `.lpl-option svg` agrandit tous les dessins d'une option. */
+.lpl-option .lpl-option__taken .lpl-token svg {
+  width: 72%;
+  height: 72%;
+}

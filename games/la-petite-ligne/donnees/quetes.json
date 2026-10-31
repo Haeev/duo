@@ -116,15 +116,16 @@
         {
           "id": "fill_crate",
           "objective": "Déposer dans la caisse du quai avant samedi 16 h: {order}.",
-          "conditions": [{ "type": "order_complete" }],
+          "conditions": [{ "type": "order_complete", "day": 8 }],
           "resolve": "at_deadline",
           "deadline": { "day": 8, "time": "16:00" },
           "onDeadline": [
             { "type": "pay_order" },
+            { "type": "set_flag", "flag": "week1_over" },
             { "type": "gather_players", "point": "quay_bell" },
             {
               "type": "if",
-              "condition": { "type": "order_complete" },
+              "condition": { "type": "order_complete", "day": 8 },
               "then": [{ "type": "play_dialogue", "dialogue": "firmin_end_full" }],
               "else": [{ "type": "play_dialogue", "dialogue": "firmin_end_partial" }]
             },
@@ -134,13 +135,14 @@
               "condition": { "type": "quest_done", "quest": "emile_riddle" },
               "then": [
                 { "type": "play_dialogue", "dialogue": "firmin_end_key" },
-                { "type": "set_world_state", "key": "handcar_shed", "value": "open" }
+                { "type": "set_world_state", "key": "handcar_shed", "value": "open" },
+                { "type": "set_flag", "flag": "shed_open" }
               ],
               "else": []
             },
             { "type": "send_letter", "letter": "coop_recap" },
             { "type": "send_letter", "letter": "coop_vergers" },
-            { "type": "end_demo" }
+            { "type": "start_quest", "quest": "second_order" }
           ]
         }
       ],
@@ -262,6 +264,18 @@
           ]
         }
       ],
+      "completionEffects": [
+        {
+          "type": "if",
+          "condition": { "type": "flag", "flag": "week1_over" },
+          "then": [
+            { "type": "set_world_state", "key": "handcar_shed", "value": "open" },
+            { "type": "set_flag", "flag": "shed_open" },
+            { "type": "show_text", "text": "shed_opened" }
+          ],
+          "else": []
+        }
+      ],
       "completionText": "La clé de la remise."
     },
     {
@@ -285,6 +299,197 @@
       ],
       "completionEffects": [{ "type": "give_item", "item": "jay_feather", "count": 1, "to": "cellar" }],
       "completionText": "La plume de geai de Jeanne."
+    },
+    {
+      "id": "second_order",
+      "kind": "main",
+      "tier": "P0",
+      "title": "La commande du samedi 15",
+      "giver": "firmin",
+      "start": { "byEffect": true },
+      "steps": [
+        {
+          "id": "fill_crate",
+          "objective": "Déposer dans la caisse du quai avant samedi 15 à 16 h: {order}.",
+          "conditions": [{ "type": "order_complete", "day": 15 }],
+          "resolve": "at_deadline",
+          "deadline": { "day": 15, "time": "16:00" },
+          "onDeadline": [
+            { "type": "pay_order" },
+            { "type": "gather_players", "point": "quay_bell" },
+            {
+              "type": "if",
+              "condition": { "type": "order_complete", "day": 15 },
+              "then": [{ "type": "play_dialogue", "dialogue": "firmin_end2_full" }],
+              "else": [{ "type": "play_dialogue", "dialogue": "firmin_end2_partial" }]
+            },
+            {
+              "type": "if",
+              "condition": { "type": "flag", "flag": "handcar_ready" },
+              "then": [{ "type": "play_dialogue", "dialogue": "basile_end2_handcar" }],
+              "else": []
+            },
+            {
+              "type": "if",
+              "condition": { "type": "item_owned", "item": "emile_logbook", "count": 1 },
+              "then": [{ "type": "play_dialogue", "dialogue": "firmin_end2_logbook" }],
+              "else": []
+            },
+            {
+              "type": "if",
+              "condition": { "type": "quest_done", "quest": "lucie_note" },
+              "then": [{ "type": "play_dialogue", "dialogue": "firmin_end2_lucie" }],
+              "else": []
+            },
+            { "type": "play_dialogue", "dialogue": "firmin_end2_vergers" },
+            { "type": "send_letter", "letter": "coop_recap_2" },
+            { "type": "end_demo" }
+          ]
+        }
+      ],
+      "completionText": "Le train est parti avec la deuxième commande."
+    },
+    {
+      "id": "handcar",
+      "kind": "main",
+      "tier": "P0",
+      "title": "La draisine d'Émile",
+      "giver": "basile",
+      "start": { "when": [{ "type": "flag", "flag": "shed_open" }, { "type": "day_at_least", "day": 9 }] },
+      "steps": [
+        {
+          "id": "show_basile",
+          "objective": "Montrer la draisine à Basile, devant la remise.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "basile_handcar_look" }]
+        },
+        {
+          "id": "bring",
+          "objective": "Apporter à Basile 8 planches et 4 clous pour les bancs de la draisine.",
+          "conditions": [
+            { "type": "given", "villager": "basile", "item": "plank", "count": 8, "label": "8 planches" },
+            { "type": "given", "villager": "basile", "item": "nail", "count": 4, "label": "4 clous" }
+          ]
+        },
+        {
+          "id": "repair",
+          "objective": "Laisser Basile travailler une nuit.",
+          "conditions": [{ "type": "nights_passed", "count": 1 }]
+        },
+        {
+          "id": "try",
+          "objective": "Essayer la draisine à deux, devant la remise, entre 8 h et 18 h.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "basile_handcar_scene" }]
+        }
+      ],
+      "completionEffects": [{ "type": "set_flag", "flag": "handcar_ready" }],
+      "completionText": "La draisine roule. Les Vergers ne sont plus si loin."
+    },
+    {
+      "id": "emile_riddle_2",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La deuxième énigme d'Émile",
+      "giver": "firmin",
+      "start": {
+        "when": [{ "type": "flag", "flag": "shed_open" }, { "type": "day_at_least", "day": 9 }],
+        "effects": [
+          { "type": "give_item", "item": "riddle_card_2", "count": 1, "to": "each" },
+          { "type": "show_text", "text": "riddle2_card_found" }
+        ]
+      },
+      "steps": [
+        {
+          "id": "dig",
+          "objective": "Quand le train approchait, la barrière...",
+          "conditions": [
+            { "type": "used_tool_at", "tool": "hoe", "point": "level_crossing", "radius": 2 },
+            { "type": "time_is", "from": "09:00", "to": "10:00" },
+            { "type": "day_at_least", "day": 9 }
+          ],
+          "failText": "riddle_not_yet",
+          "effects": [
+            { "type": "give_item", "item": "emile_logbook", "count": 1, "to": "actor" },
+            { "type": "show_text", "text": "riddle2_found" }
+          ]
+        }
+      ],
+      "completionText": "Le carnet de route d'Émile."
+    },
+    {
+      "id": "odette_fry",
+      "kind": "side",
+      "tier": "P0",
+      "title": "La friture d'Odette",
+      "giver": "odette",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "odette_fry_ask" }] },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Apporter 4 goujons à Odette.",
+          "conditions": [{ "type": "given", "villager": "odette", "item": "gudgeon", "count": 4, "label": "4 goujons" }]
+        }
+      ],
+      "completionEffects": [
+        { "type": "give_money", "amount": 40 },
+        { "type": "give_item", "item": "bread", "count": 1, "to": "each" }
+      ],
+      "completionText": "40 sous et du pain frais."
+    },
+    {
+      "id": "basile_omelette",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Un repas chaud pour Basile",
+      "giver": "basile",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "basile_omelette_ask" }] },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Cuisiner une omelette au réchaud et l'apporter à Basile.",
+          "conditions": [{ "type": "given", "villager": "basile", "item": "omelette", "count": 1, "label": "1 omelette" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 30 }],
+      "completionText": "Basile a mangé chaud. 30 sous."
+    },
+    {
+      "id": "lucie_note",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le mot de Lucie",
+      "giver": "jeanne",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "jeanne_lucie_ask" }] },
+      "steps": [
+        {
+          "id": "give",
+          "objective": "Porter la lettre de Lucie à Firmin.",
+          "conditions": [{ "type": "given", "villager": "firmin", "item": "lucie_letter", "count": 1 }]
+        },
+        {
+          "id": "tell_jeanne",
+          "objective": "Raconter à Jeanne comment Firmin l'a prise.",
+          "conditions": [{ "type": "dialogue_done", "dialogue": "jeanne_lucie_done" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 20 }],
+      "completionText": "L'argent de poche de Jeanne: 20 sous."
+    },
+    {
+      "id": "firmin_flowers",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le quai en fête",
+      "giver": "firmin",
+      "start": { "when": [{ "type": "dialogue_done", "dialogue": "firmin_flowers_ask" }] },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Apporter 2 pots de fleurs à Firmin, avant le train du samedi. Odette en vend.",
+          "conditions": [{ "type": "given", "villager": "firmin", "item": "flower_pot", "count": 2, "label": "2 pots de fleurs" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 50 }],
+      "completionText": "Le quai est fleuri. 50 sous."
     }
   ]
 }

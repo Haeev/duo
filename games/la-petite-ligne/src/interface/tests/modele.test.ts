@@ -7,6 +7,7 @@ import {
   absenceMinutes,
   clockModel,
   endActions,
+  outfitTakenByPartner,
   dayLabel,
   formModel,
   letterModels,
@@ -174,7 +175,7 @@ describe('commande et quêtes', () => {
       ['plank', 0, 10, false],
     ]);
     expect(lines[2]?.inBag).toBe(2);
-    expect(orderFullAmount(ctx)).toBe(540);
+    expect(orderFullAmount(ctx, sim.world)).toBe(540);
   });
 
   it('propose comme prochain objectif la trame, puis la commande à l’approche du train', () => {
@@ -266,6 +267,17 @@ describe('pause de l’autre joueur (PA-04)', () => {
     expect(other.absent).toBe(true);
     expect(sim.world.clock.stoppedBy).toBe('absence');
     expect(absenceMinutes(sim.world, other)).toBe(ctx.content.settings.absence.minutes);
+  });
+});
+
+describe('création', () => {
+  it("signale la tenue que l'autre a confirmée, pas sa tenue par défaut", () => {
+    const sim = newSim();
+    const ctx = uiContext();
+    expect(outfitTakenByPartner(sim.world, ctx)).toBeNull();
+    apply(sim, 'p2', { type: 'title_ready', ready: true }, { type: 'create_character', name: 'Sacha', hair: 1, outfit: 2 });
+    expect(outfitTakenByPartner(sim.world, ctx)).toBe(2);
+    expect(outfitTakenByPartner(sim.world, uiContext('p2'))).toBeNull();
   });
 });
 

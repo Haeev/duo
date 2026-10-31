@@ -28,7 +28,7 @@
       "title": "La commande est partie",
       "delivery": { "byEffect": true },
       "variants": [
-        { "when": [{ "type": "order_complete" }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! Les radis d'Aubrune ont fait sensation à la ville." },
+        { "when": [{ "type": "order_complete", "day": 8 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! Les radis d'Aubrune ont fait sensation à la ville." },
         { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci, et à samedi prochain !" }
       ]
     },
@@ -38,6 +38,40 @@
       "title": "La suite de la ligne",
       "delivery": { "byEffect": true },
       "text": "Si la voie des Vergers est dégagée, le train montera jusque là-haut. Il paraît que les cerisiers attendent quelqu'un."
+    },
+    {
+      "id": "coop_order_2",
+      "from": "coop",
+      "title": "La commande du samedi 15",
+      "delivery": { "day": 8, "time": "18:00" },
+      "text": "Merci pour ce premier train ! La coopérative passe déjà sa deuxième commande, à déposer dans la caisse du quai avant samedi 15 à 16 h: {order}. Les carottes demandent quatre jours de pousse: ne tardez pas trop. Au catalogue, une nouveauté pour les soirées fraîches: le poêle à bois."
+    },
+    {
+      "id": "basile_handcar",
+      "from": "basile",
+      "title": "Basile et la draisine",
+      "delivery": { "day": 9, "time": "06:00" },
+      "variants": [
+        { "when": [{ "type": "flag", "flag": "shed_open" }], "text": "La remise est ouverte. Passez me voir devant, j'ai deux mots à dire à cette draisine. B." },
+        { "when": [], "text": "La remise est toujours fermée ? Émile avait plus d'une ruse. Cherchez la clé: la draisine attend dessous, et moi aussi. B." }
+      ]
+    },
+    {
+      "id": "coop_catalogue_reminder_2",
+      "from": "coop",
+      "title": "Rappel de la coopérative",
+      "delivery": { "day": 13, "time": "06:00" },
+      "text": "Rappel: le catalogue ferme vendredi à minuit. Le poêle à bois chauffe une pièce entière, paraît-il. Et les rideaux font toujours fureur."
+    },
+    {
+      "id": "coop_recap_2",
+      "from": "coop",
+      "title": "La deuxième commande est partie",
+      "delivery": { "byEffect": true },
+      "variants": [
+        { "when": [{ "type": "order_complete", "day": 15 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Les omelettes d'Aubrune sont arrivées encore tièdes. Merci, et à bientôt pour les Vergers !" },
+        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! La ligne vous doit déjà beaucoup." }
+      ]
     }
   ],
   "senders": [

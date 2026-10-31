@@ -2,6 +2,7 @@
  * Évaluation des conditions des données (quêtes, dialogues, envies, emplois du
  * temps, courrier). README des données, section 3.
  */
+import { currentOrder } from '../donnees/commandes';
 import type { CharacterId, Vec2 } from '../etat/types';
 import type { Condition, Since, Who } from '../donnees/types';
 import { MINUTES_PER_DAY } from './constantes';
@@ -67,10 +68,24 @@ function stepIndex(sim: Sim, quest: string, step: string): number {
   return def === undefined ? -1 : def.steps.findIndex((s) => s.id === step);
 }
 
-export function orderSatisfied(sim: Sim): boolean {
+/**
+ * La commande est-elle complète ? Celle du train du jour `day` si on le donne
+ * (payée: son résultat; en cours: la caisse), sinon celle de la caisse, ou la
+ * dernière payée tant que la caisse ne s'est pas rouverte (jusqu'au matin).
+ */
+export function orderSatisfied(sim: Sim, day: number | null = null): boolean {
   const { world } = sim;
-  if (world.orderResult !== null) return world.orderResult.complete;
-  return sim.content.settings.order.lines.every((line) => countInStacks(world.crate, line.item) >= line.count);
+  const trains = sim.content.settings.order.trains;
+  if (day !== null) {
+    const index = trains.findIndex((o) => o.day === day);
+    const paid = world.orderHistory[index];
+    if (index < 0) return false;
+    if (paid !== undefined) return paid.complete;
+    if (index !== world.orderIndex || world.orderResult !== null) return false;
+  } else if (world.orderResult !== null) {
+    return world.orderResult.complete;
+  }
+  return currentOrder(sim.content.settings, world).lines.every((line) => countInStacks(world.crate, line.item) >= line.count);
 }
 
 export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext): boolean {
@@ -124,7 +139,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     case 'recipe_known':
       return world.unlockedRecipes.includes(condition.recipe);
     case 'order_complete':
-      return orderSatisfied(sim);
+      return orderSatisfied(sim, condition.day);
     case 'counter':
       return byWho(
         condition.who,

@@ -2,6 +2,7 @@
  * Le train du samedi (TE-05): arrivée à 10 h, départ à 16 h, glissement
  * d'entrée et de sortie; colis du catalogue et témoins de l'arrivée.
  */
+import { catalogueWindow } from '../donnees/commandes';
 import { type Sim, bump, distance, emit, say } from './contexte';
 import { deliverCatalogue } from './economie';
 import { POINT } from './ids';
@@ -34,7 +35,7 @@ export function trainClock(sim: Sim, before: number, after: number): void {
     say(sim, 'both', 'train_arrived');
     witnesses(sim, 'train_arrival');
   }
-  const delivery = s.economy.catalogue.delivery;
+  const delivery = catalogueWindow(s, day).delivery;
   if (day === delivery.day && crossed(before, after, delivery.time)) deliverCatalogue(sim);
   if (day !== s.clock.firstDay.day && crossed(before, after, s.train.departure - s.feel.trainWarningMinutes)) {
     say(sim, 'both', 'train_leaves_soon');

@@ -80,8 +80,8 @@ function endStats(sim: Sim): { label: string; value: string }[] {
   const ending = w.ending;
   const vars = {
     days: ending?.days ?? w.clock.day - w.session.firstDay + 1,
-    linesDone: ending?.linesDone ?? w.orderResult?.linesDone ?? 0,
-    linesTotal: ending?.linesTotal ?? sim.content.settings.order.lines.length,
+    linesDone: ending?.linesDone ?? w.orderHistory.reduce((n, o) => n + o.linesDone, 0),
+    linesTotal: ending?.linesTotal ?? sim.content.settings.order.trains.reduce((n, o) => n + o.lines.length, 0),
     furniture: ending?.furniturePlaced ?? w.furniture.filter((f) => f.placedBy !== null).length,
   };
   const out: { label: string; value: string }[] = [];

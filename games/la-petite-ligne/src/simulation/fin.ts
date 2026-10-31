@@ -10,12 +10,18 @@ const HIGHLIGHT_MAX = 60;
 export function finishDemo(sim: Sim): void {
   const { world } = sim;
   if (world.phase === 'ended') return;
-  const result = world.orderResult;
+  // La démo ne finit qu'au dernier train: un `end_demo` resté dans la semaine 1 ne fait rien.
+  if (world.clock.day < sim.content.settings.clock.lastDay.day) return;
   const keyFound = world.quests.some((q) => q.id === QUEST.riddle && q.status === 'done');
+  const orders = sim.content.settings.order.trains.map((o, i) => {
+    const paid = world.orderHistory[i];
+    return { linesDone: paid?.linesDone ?? 0, linesTotal: paid?.linesTotal ?? o.lines.length };
+  });
   world.ending = {
     days: world.clock.day,
-    linesDone: result?.linesDone ?? 0,
-    linesTotal: result?.linesTotal ?? sim.content.settings.order.lines.length,
+    linesDone: orders.reduce((n, o) => n + o.linesDone, 0),
+    linesTotal: orders.reduce((n, o) => n + o.linesTotal, 0),
+    orders,
     furniturePlaced: world.furniture.filter((f) => f.placedBy !== null).length,
     keyFound,
   };

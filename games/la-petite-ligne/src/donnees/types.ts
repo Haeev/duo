@@ -41,7 +41,8 @@ export type Condition = { label?: string } & (
   | { type: 'item_in_bag'; item: string; count: number; who: Who }
   | { type: 'built'; construction: string }
   | { type: 'recipe_known'; recipe: string }
-  | { type: 'order_complete' }
+  /** La commande du train de ce jour (`day`), sinon la commande en cours. */
+  | { type: 'order_complete'; day: number | null }
   | { type: 'counter'; key: string; count: number; since: Since; who: Who }
   | { type: 'used_tool_at'; tool: string; point: string; radius: number }
   | { type: 'stayed_at'; point: string; seconds: number; who: Who }
@@ -91,6 +92,8 @@ export interface ItemDef {
   plural: string;
   /** Avec l'article indéfini (« un matelas », « des rideaux »), pour les messages; `null`: le nom seul. */
   indefinite: string | null;
+  /** Pas en vente (épicerie ou catalogue) avant ce jour; `null`: dès le début. */
+  availableFromDay: number | null;
   category: ItemCategory;
   stack: number;
   buyPrice: number | null;
@@ -310,6 +313,20 @@ export interface Texts {
 // ---------------------------------------------------------------------------
 // Réglages (`reglages.json`, profil « démo »)
 
+export interface CatalogueWindow {
+  orderDeadline: { day: number; time: number };
+  delivery: { day: number; time: number };
+}
+
+/** La commande d'un train (EC-08): lignes, et prix de la ligne remplie et de la commande complète. */
+export interface OrderDef {
+  /** Jour du train qui l'emporte (départ à `train.departure`). */
+  day: number;
+  lines: { item: string; count: number }[];
+  linePremium: number;
+  fullBonus: number;
+}
+
 export interface Settings {
   profile: string;
   clock: {
@@ -328,12 +345,12 @@ export interface Settings {
     startPurse: number;
     bigPurchaseThreshold: number;
     grocer: { buyRate: number; dailyCap: number; buysAfterFlag: string };
-    catalogue: { orderDeadline: { day: number; time: number }; delivery: { day: number; time: number } };
+    /** Une fenêtre de commande par semaine, dans l'ordre (la livraison arrive par le train). */
+    catalogue: { windows: CatalogueWindow[] };
   };
   order: {
-    lines: { item: string; count: number }[];
-    linePremium: number;
-    fullBonus: number;
+    /** Une commande par train du samedi qui emporte la caisse, dans l'ordre des jours. */
+    trains: OrderDef[];
     extraItemsRate: number;
   };
   trees: { chopsPerTree: number; logsPerTree: number };

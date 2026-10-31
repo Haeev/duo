@@ -96,7 +96,7 @@ describe('règles', () => {
 
   it('commande complète: 540 sous au départ du train (EC-08)', () => {
     const sim = started();
-    for (const line of sim.content.settings.order.lines) addStack(sim.world.crate, line.item, 'ordinary', line.count);
+    for (const line of sim.content.settings.order.trains[0]?.lines ?? []) addStack(sim.world.crate, line.item, 'ordinary', line.count);
     addStack(sim.world.crate, 'carrot', 'ordinary', 2);
     payOrder(sim);
     expect(sim.world.orderResult).toEqual({ linesDone: 4, linesTotal: 4, complete: true, amount: 540 + 2 * 16 });

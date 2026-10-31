@@ -2,6 +2,7 @@
  * Courrier (`courrier.json`): lettres envoyées par un effet ou arrivées à
  * leur jour et leur heure, chez les deux joueurs.
  */
+import { currentOrder } from '../donnees/commandes';
 import { evaluateAll, NO_CONTEXT } from './conditions';
 import { type Sim, emit, format, itemName, notifyKey } from './contexte';
 import { queueHint } from './astuces';
@@ -9,7 +10,7 @@ import { queueHint } from './astuces';
 /** « 12 radis, 3 laitues, 6 œufs, 10 planches » (`textes.orderFormat`). */
 export function orderText(sim: Sim): string {
   const f = sim.content.texts.orderFormat;
-  const parts = sim.content.settings.order.lines.map((line) =>
+  const parts = currentOrder(sim.content.settings, sim.world).lines.map((line) =>
     format(f.line, { count: line.count, item: itemName(sim, line.item, line.count) }),
   );
   if (parts.length <= 1) return parts.join('');
@@ -25,7 +26,7 @@ export function textVars(sim: Sim): Record<string, string | number> {
     bigPurchase: s.economy.bigPurchaseThreshold,
     order: orderText(sim),
     linesDone: r?.linesDone ?? 0,
-    linesTotal: r?.linesTotal ?? s.order.lines.length,
+    linesTotal: r?.linesTotal ?? currentOrder(s, sim.world).lines.length,
     amount: r?.amount ?? 0,
   };
 }

@@ -9,6 +9,7 @@
  * l'autre joueur sont joués plus bas (`peerDb`). Les sons d'interface de
  * l'autre ne s'entendent pas chez soi, sauf la proposition d'achat.
  */
+import { currentOrder } from '../donnees/commandes';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
 import type { GameMap } from '../etat/carte';
@@ -490,7 +491,7 @@ export class StateWatcher {
     totals.clear();
     for (const stack of world.crate) totals.set(stack.item, (totals.get(stack.item) ?? 0) + stack.count);
     let done = 0;
-    for (const line of content.settings.order.lines) if ((totals.get(line.item) ?? 0) >= line.count) done += 1;
+    for (const line of currentOrder(content.settings, world).lines) if ((totals.get(line.item) ?? 0) >= line.count) done += 1;
     return done;
   }
 

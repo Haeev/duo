@@ -3,6 +3,7 @@
  * DOM), testées dans Node. Les composants comparent ces modèles d'une image à
  * l'autre et ne touchent le DOM que s'ils changent.
  */
+import { currentOrder } from '../donnees/commandes';
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
@@ -88,8 +89,8 @@ function trainNotice(world: ReadonlyWorld, ctx: UiContext): string | null {
   if (minutes < s.arrival && s.arrival - minutes <= window && world.train.phase === 'away') {
     return ctx.t(ctx.texts.extra.hud.trainArrives, { time: time(s.arrival) });
   }
-  const lastDay = ctx.content.settings.clock.lastDay;
-  if (day === lastDay.day && minutes < s.departure && s.departure - minutes <= window && world.orderResult === null) {
+  const orderDay = currentOrder(ctx.content.settings, world).day;
+  if (day === orderDay && minutes < s.departure && s.departure - minutes <= window && world.orderResult === null) {
     return ctx.t(ctx.texts.extra.hud.trainLeaves, { time: time(s.departure) });
   }
   return null;
@@ -336,8 +337,11 @@ export function toolbarModel(ctx: UiContext, c: ReadonlyCharacter): ToolbarModel
 // Commande du samedi
 
 /** La quête de la commande: celle dont une étape se résout à l'échéance. */
-export function orderQuest(ctx: UiContext): QuestDef | null {
-  return ctx.content.quests.find((q) => q.steps.some((s) => s.resolve === 'at_deadline')) ?? null;
+/** La quête de la commande en cours: échéance au jour de son train (sinon la première à échéance). */
+export function orderQuest(ctx: UiContext, world: ReadonlyWorld): QuestDef | null {
+  const day = currentOrder(ctx.content.settings, world).day;
+  const atDeadline = ctx.content.quests.filter((q) => q.steps.some((s) => s.resolve === 'at_deadline'));
+  return atDeadline.find((q) => q.steps.some((s) => s.deadline?.day === day)) ?? atDeadline[0] ?? null;
 }
 
 export interface OrderLineModel {
@@ -352,7 +356,7 @@ export interface OrderLineModel {
 
 export function orderLines(world: ReadonlyWorld, ctx: UiContext): OrderLineModel[] {
   const me = characterOf(world, ctx.me);
-  return ctx.content.settings.order.lines.map((line) => {
+  return currentOrder(ctx.content.settings, world).lines.map((line) => {
     const def = ctx.content.items[line.item];
     const inCrate = countIn(world.crate, line.item);
     return {
@@ -368,8 +372,8 @@ export function orderLines(world: ReadonlyWorld, ctx: UiContext): OrderLineModel
 }
 
 /** Somme versée si la commande part complète (prime de ligne et bonus). */
-export function orderFullAmount(ctx: UiContext): number {
-  const o = ctx.content.settings.order;
+export function orderFullAmount(ctx: UiContext, world: ReadonlyWorld): number {
+  const o = currentOrder(ctx.content.settings, world);
   const base = o.lines.reduce((sum, l) => sum + l.count * (ctx.content.items[l.item]?.sellPrice ?? 0) * o.linePremium, 0);
   return Math.round(base * (1 + o.fullBonus));
 }
@@ -403,13 +407,13 @@ export interface QuestModel {
 }
 
 function questText(world: ReadonlyWorld, ctx: UiContext, def: QuestDef, step: number, done: boolean): string {
-  const vars = contentVars(ctx.content, world.orderResult, ctx.texts.orderFormat);
+  const vars = contentVars(ctx.content, world, ctx.texts.orderFormat);
   const s = def.steps[step];
   return ctx.t(done || s === undefined ? def.completionText : s.objective, vars);
 }
 
 export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] {
-  const order = orderQuest(ctx);
+  const order = orderQuest(ctx, world);
   const out: QuestModel[] = [];
   for (const state of world.quests) {
     const def = ctx.content.quests.find((q) => q.id === state.id);
@@ -455,8 +459,8 @@ export function nextObjective(world: ReadonlyWorld, ctx: UiContext): QuestModel 
   const open = questModels(world, ctx).filter((q) => !q.done);
   if (open.length === 0) return null;
   const quests = [...open.filter((q) => !q.optional), ...open.filter((q) => q.optional)];
-  const order = orderQuest(ctx);
-  const lastDay = ctx.content.settings.clock.lastDay.day;
+  const order = orderQuest(ctx, world);
+  const lastDay = currentOrder(ctx.content.settings, world).day;
   const isOrder = (q: QuestModel): boolean => q.id === order?.id;
   if (world.clock.day >= lastDay - 1) {
     const o = quests.find(isOrder);
@@ -496,6 +500,19 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
       text: ctx.t(l.text),
       unread: !l.read.includes(ctx.me),
     }));
+}
+
+// ---------------------------------------------------------------------------
+// Création
+
+/**
+ * La tenue que l'autre joueur a confirmée à la création, ou `null` s'il n'a
+ * pas encore confirmé (sa tenue par défaut n'est pas un choix). Déconseillée
+ * à la création, jamais interdite (remarque du directeur artistique).
+ */
+export function outfitTakenByPartner(world: ReadonlyWorld, ctx: UiContext): number | null {
+  const other = characterOf(world, ctx.partner);
+  return other?.created === true ? other.appearance.outfit : null;
 }
 
 // ---------------------------------------------------------------------------

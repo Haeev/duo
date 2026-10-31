@@ -49,7 +49,12 @@
     "placement_wall": "Ça s'accroche au mur: rapproche-toi d'un mur.",
     "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
-    "fish_escaped": "Il s'est échappé."
+    "fish_escaped": "Il s'est échappé.",
+    "shed_opened": "Le cadenas de la remise cède. Sous une bâche, la draisine d'Émile.",
+    "riddle2_card_found": "Dans le coffre à outils de la draisine, une deuxième carte d'Émile !",
+    "riddle_card_2_text": "Chaque matin, quand le train approchait, je baissais la barrière et j'attendais à son pied. Ce que je gardais pour la suite de la ligne y dort encore. É. L.",
+    "riddle2_found": "Au pied de la barrière, une boîte à biscuits rouillée: le carnet de route d'Émile.",
+    "emile_logbook_text": "Voie des Vergers: six kilomètres, trois ponts, un tunnel. Pour la draisine: deux bras devant, deux bras derrière, et de la patience. Le jour où quelqu'un lira ceci, la ligne aura de nouveau du monde. É. L."
   },
   "orderFormat": {
     "line": "{count} {item}",
@@ -90,11 +95,11 @@
   },
   "endScreen": {
     "title": "Fin de la démo",
-    "subtitle": "Une semaine à la Halte d'Aubrune.",
-    "text": "La suite de la ligne arrive bientôt.",
+    "subtitle": "Deux semaines à la Halte d'Aubrune.",
+    "text": "La suite de la ligne monte vers les Vergers. Elle arrive bientôt.",
     "stats": {
       "days": "Journées vécues: {days}",
-      "order": "Commande: {linesDone} lignes sur {linesTotal}",
+      "order": "Commandes: {linesDone} lignes sur {linesTotal}",
       "furniture": "Meubles posés: {furniture}"
     }
   }

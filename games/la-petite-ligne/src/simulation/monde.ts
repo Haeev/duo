@@ -187,7 +187,9 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     countersAtDawn: emptyCounters(),
     scripts: [],
     nextId,
+    orderIndex: 0,
     orderResult: null,
+    orderHistory: [],
     ending: null,
     session: { firstDay: s.clock.firstDay.day, togetherMoments: 0, highlights: [] },
   };
