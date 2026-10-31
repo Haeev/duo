@@ -21,6 +21,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Noms de traits épicènes qui marchent: Bonne fourchette, Craint le froid, Lève-tôt, Couche-tard, Langue bien pendue, Tête dans les nuages, Nid douillet, Nez au vent. Niveaux de forme: Petite forme, Ça va, En forme, Pleine forme, Forme rayonnante. Liens: Connaissance, Voisinage, Amitié, Grande amitié, Comme la famille.
 - « Plus d'énergie » plutôt que « épuisé », « La fatigue se fait sentir » plutôt que « tu es fatigué ».
 - Relire aussi les textes de conception: « deux habitantes » pour un homme et une femme est passé une fois.
+- Pièges passés en recette (LPL-R04) et tournures neutres qui les remplacent: « les nouveaux » (de nouvelles têtes, les gens de la maisonnette), « tous les deux » (à deux, Retrouvez-vous à la maison), « des débutants » (pour un premier toit), « Chers nouveaux gardiens » (Bonjour à la nouvelle équipe), « Vous êtes les premiers voyageurs » (Personne n'était descendu ici). « Personne » et « quelqu'un » s'accordent comme pronoms, pas au joueur: permis.
+- Le validateur des données de La Petite Ligne avertit de ces tournures et lit aussi le README: ne pas y citer de mauvais exemples, sinon il avertit sur le README lui-même.
+
+## Libellés d'interface dans les données
+
+- Avant de changer un libellé de `textes.json`, chercher dans `tests/e2e/` (Playwright clique par `getByRole(..., { name })`) et dans le code qui le réutilise: `ui.hud.day` sert aussi au libellé de la sauvegarde dans la bibliothèque de Duo (« samedi, jour 1, 14 h 20 »), où « jour N » distingue l'heure du jeu de la date réelle.
+- Un brief peut demander un texte qui existe déjà (passe précédente non reportée dans ETAT.md): regarder `git log -S` avant d'écrire, puis améliorer et donner l'avant/après.
+- Le manager peut committer pendant la mission: vérifier `git diff HEAD` avant le compte rendu pour dire ce qui reste à committer.
 
 ## Repères de rythme (script `docs/jeux/jeu-1/simulations/rythme_et_collections.py`)
 

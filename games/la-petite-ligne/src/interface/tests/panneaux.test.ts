@@ -120,7 +120,7 @@ describe('établi, réchaud, coffre, sac', () => {
     const ctx = uiContext('p2');
     sim.world.proposals.push({ id: 'o1', by: 'p1', purchase: { source: 'grocery', item: 'mattress', count: 1 }, price: 120 });
     expect(proposalModels(sim.world, ctx)).toMatchObject([{ mine: false, itemText: 'un matelas', byName: 'Camille', price: 120 }]);
-    expect(indefiniteItem(ctx, 'plank')).toBe('planche');
+    expect(indefiniteItem(ctx, 'plank')).toBe('une planche');
   });
 
   it('prend l’article de objets.json quand il existe (demande 12), sinon celui de l’interface', () => {
