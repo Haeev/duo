@@ -117,10 +117,12 @@ export async function startDuo(
   for (const [who, page] of [['hôte', host], ['invité', guest]] as const) {
     page.on('pageerror', (e) => errors.push(`${who}: ${e.message}`));
     page.on('response', (r) => {
-      if (r.status() >= 400) errors.push(`${who} HTTP ${r.status()}: ${r.url()}`);
+      // Le navigateur demande de lui-même une icône que ni le faux hôte ni le jeu ne fournissent.
+      if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) errors.push(`${who} HTTP ${r.status()}: ${r.url()}`);
     });
     page.on('console', (m) => {
-      if (m.type() === 'error') errors.push(`${who} console: ${m.text()}`);
+      // Les ressources en échec sont relevées avec leur adresse par l'écouteur `response`.
+      if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`${who} console: ${m.text()}`);
     });
   }
   const probe = probeGuest(guest);
