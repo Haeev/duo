@@ -1163,12 +1163,13 @@ def level_crossing(A):
 
 # Mobilier du bourg --------------------------------------------------------------------
 
-def bell_post(A):
+def bell_post(A, k=0.55 / 0.40, kz=0.95, bx=0.55):
     """Cloche du quai sous la marquise: pas de toit propre (elle est abritée), potence tenue par une équerre.
 
     Tout le modèle reste sous 2,51 m (2,91 m posé sur le quai), à plus de 5 cm du dessous de la tôle
-    (2,97 m au plus bas sur son emprise). La cloche, sa chape et sa corde ne bougent pas: l'énigme de
-    l'ombre sur le banc en dépend (src/rendu/lumiere.test.ts). Rien de neuf au-dessus de x 0,35 sous
+    (2,97 m au plus bas sur son emprise). Cloche de 0,55 m de large depuis le tour 6 (bas inchangé à 1,95 m,
+    centre inchangé à x 0,55, bord est à x 0,825 soit 30,33 posé, hors de la marquise qui commence à x 31): l'énigme
+    de l'ombre sur le banc en dépend (src/rendu/lumiere.test.ts). Rien d'autre au-dessus de x 0,35 sous
     2,4 m, zone que ce test prend pour la cloche.
     """
     g = A.geo()
@@ -1180,11 +1181,15 @@ def bell_post(A):
     dx, dz = 0.22, 0.36
     g.box((0.05, 0.04, math.hypot(dx, dz)), loc=(0.08 + dx / 2, 0, 2.05 + dz / 2), color="iron",
           rot=(0, math.degrees(math.atan2(dx, dz)), 0))
-    # chape de la cloche, prise dans le bras
-    g.box((0.1, 0.1, 0.24), loc=(0.48, 0, 2.30), color="iron")
-    g.lathe([(0.2, 0.0), (0.18, 0.05), (0.12, 0.2), (0.09, 0.3), (0.0, 0.33)], loc=(0.55, 0, 1.95), colors="brass", segs=10)
-    g.sphere(0.035, loc=(0.55, 0, 1.94), color="iron", segs=6, rings=4)
-    g.box((0.01, 0.01, 0.6), loc=(0.55, 0.0, 1.62), color="rope")
+    # cloche agrandie (tour 6): 0,55 m de large au lieu de 0,40 (k), bas toujours à 1,95 m, 0,31 m de haut (kz):
+    # plus haute ou plus à l'est, son ombre toucherait le banc avant 16 h 30 (fenêtre de l'énigme: 17 h à 17 h 45;
+    # essais par le calcul de lumiere.test.ts). Chape prise dans le bras, du haut de la cloche au bras.
+    ztop = 1.95 + 0.33 * kz - 0.02
+    g.box((0.1, 0.1, 2.43 - ztop), loc=(bx, 0, (2.43 + ztop) / 2), color="iron")
+    g.lathe([(0.2 * k, 0.0), (0.18 * k, 0.05 * kz), (0.12 * k, 0.2 * kz), (0.09 * k, 0.3 * kz), (0.0, 0.33 * kz)],
+            loc=(bx, 0, 1.95), colors="brass", segs=10)
+    g.sphere(0.045, loc=(bx, 0, 1.94), color="iron", segs=6, rings=4)
+    g.box((0.01, 0.01, 0.6), loc=(bx, 0.0, 1.62), color="rope")
     return g
 
 

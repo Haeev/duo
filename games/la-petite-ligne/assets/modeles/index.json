@@ -96,7 +96,11 @@
    "fish_wait",
    "fish_cast",
    "fish_strike",
-   "sit_ground"
+   "sit_ground",
+   "climb_ladder",
+   "reach_up",
+   "hammer_tap",
+   "hold_ladder"
   ]
  },
  "garden_cell_grass": {
@@ -1096,5 +1100,68 @@
    1,
    1
   ]
+ },
+ "heron": {
+  "file": "faune.glb",
+  "tris": 706,
+  "animations": [
+   "heron_idle",
+   "heron_strike",
+   "heron_alert",
+   "heron_shy_step",
+   "heron_takeoff",
+   "heron_fly",
+   "heron_land",
+   "heron_rest"
+  ]
+ },
+ "goose": {
+  "file": "faune.glb",
+  "tris": 388,
+  "animations": [
+   "goose_swim",
+   "goose_alert",
+   "goose_run",
+   "goose_fly"
+  ]
+ },
+ "blue_tit": {
+  "file": "faune.glb",
+  "tris": 244,
+  "animations": [
+   "tit_perch",
+   "tit_fly",
+   "tit_sing",
+   "tit_enter",
+   "tit_exit"
+  ]
+ },
+ "fox": {
+  "file": "faune.glb",
+  "tris": 786,
+  "animations": [
+   "fox_trot",
+   "fox_listen",
+   "fox_pounce",
+   "fox_sniff",
+   "fox_look",
+   "fox_bark"
+  ]
+ },
+ "ladder_wood": {
+  "file": "faune.glb",
+  "tris": 176
+ },
+ "nest_box": {
+  "file": "faune.glb",
+  "tris": 156
+ },
+ "oak_branch_stub": {
+  "file": "faune.glb",
+  "tris": 60
+ },
+ "moss_tuft": {
+  "file": "faune.glb",
+  "tris": 96
  }
 }

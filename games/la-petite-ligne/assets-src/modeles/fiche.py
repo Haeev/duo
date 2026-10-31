@@ -16,7 +16,7 @@ def ko(n):
 def index():
     """Écrit assets/modeles/index.json: nœud racine -> fichier, emprise, triangles."""
     out = {}
-    for f in ("personnages", "ferme", "bourg", "train", "maison"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         if f == "personnages":
             for k, v in st["meshes"].items():
@@ -30,6 +30,8 @@ def index():
             for kk in ("alias_of", "states", "variants"):
                 if kk in v:
                     e[kk] = v[kk]
+            if f == "faune" and k in st["animations"]:
+                e["animations"] = [a["name"] for a in st["animations"][k]]
             out[k] = e
     with open(os.path.join(SORTIE, "index.json"), "w", encoding="utf-8") as fh:
         json.dump(out, fh, ensure_ascii=False, indent=1)
@@ -37,7 +39,7 @@ def index():
 
 
 def main():
-    for f in ("personnages", "ferme", "bourg", "train", "maison"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         taille = os.path.getsize(os.path.join(SORTIE, f + ".glb"))
         print(f"\n### `{f}.glb` ({ko(taille)})\n")
@@ -56,7 +58,12 @@ def main():
             extra = {kk: vv for kk, vv in v.items() if kk not in ("footprint", "tris")}
             ex = ", ".join(f"{kk}: {json.dumps(vv, ensure_ascii=False)}" for kk, vv in extra.items())
             print(f"| `{k}` | {fp} | {v['tris']} | {ex} |")
-        if st.get("animations"):
+        if f == "faune":
+            print("\n| Bête | Animation | Durée (s) | Boucle |\n|---|---|---|---|")
+            for beast, clips in st["animations"].items():
+                for a in clips:
+                    print(f"| `{beast}` | `{a['name']}` | {a['seconds']} | {'oui' if a['loop'] else 'non (jouer une fois)'} |")
+        elif st.get("animations"):
             print("\nAnimations: " + ", ".join(f"`{a}`" for a in st["animations"]))
 
 

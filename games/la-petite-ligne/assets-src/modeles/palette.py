@@ -167,6 +167,24 @@ WORLD = [
     ("mattress", "#E4DCC8", 0.95, 0.0, None),
     ("mattress_stripe", "#8FA5BF", 0.95, 0.0, None),
     ("ivy", "#4E7A3F", 0.9, 0.0, None),
+    # Faune des moments rares (tour 6): héron cendré, oie cendrée, mésange bleue, renard roux, nichoir
+    ("heron_grey", "#9BA2A6", 0.9, 0.0, None),
+    ("heron_grey_dark", "#5F676D", 0.9, 0.0, None),
+    ("feather_white", "#EEECE4", 0.9, 0.0, None),
+    ("heron_leg", "#B3A26E", 0.8, 0.0, None),
+    ("goose_grey", "#8F887C", 0.9, 0.0, None),
+    ("goose_grey_dark", "#625B52", 0.9, 0.0, None),
+    ("goose_belly", "#D0C8B9", 0.9, 0.0, None),
+    ("goose_bill", "#E68A3A", 0.6, 0.0, None),
+    ("goose_leg", "#E3A08E", 0.7, 0.0, None),
+    ("tit_blue", "#3D7CC6", 0.8, 0.0, None),
+    ("tit_yellow", "#EFCB45", 0.85, 0.0, None),
+    ("tit_green", "#93A25C", 0.85, 0.0, None),
+    ("fox_red", "#C7652F", 0.9, 0.0, None),
+    ("fox_red_dark", "#9C4A24", 0.9, 0.0, None),
+    ("fox_white", "#F0E7D8", 0.9, 0.0, None),
+    ("fox_black", "#2E2521", 0.9, 0.0, None),
+    ("tar", "#3C3835", 0.7, 0.0, None),
 ]
 
 # Variantes de saison: seules les cases citées changent (même disposition).

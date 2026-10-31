@@ -1,0 +1,204 @@
+{
+ "nodes": {
+  "heron": {
+   "kind": "animal",
+   "origin": "sol sous les pattes",
+   "height": 0.95,
+   "length": 0.9,
+   "wingspan": 1.7,
+   "collision_radius": 0.3,
+   "tris": 706
+  },
+  "goose": {
+   "kind": "animal",
+   "origin": "ligne de flottaison",
+   "length": 0.8,
+   "wingspan": 1.6,
+   "note": "neuf instances d'un seul maillage (SkeletonUtils.clone)",
+   "tris": 388
+  },
+  "blue_tit": {
+   "kind": "animal",
+   "origin": "pattes sur le perchoir",
+   "display_scale": 1.5,
+   "length": 0.18,
+   "beak_socket": "socket_blue_tit_beak",
+   "tris": 244
+  },
+  "fox": {
+   "kind": "animal",
+   "origin": "sol entre les pattes",
+   "withers": 0.4,
+   "length": 0.65,
+   "tail": 0.4,
+   "tris": 786
+  },
+  "ladder_wood": {
+   "kind": "prop",
+   "lean_deg": 75.0,
+   "length": 3.0,
+   "rung_step": 0.28,
+   "rungs": 10,
+   "top": [
+    0.0,
+    2.898,
+    0.776
+   ],
+   "note": "penchée vers +Z: la poser avec la rotation de celui qui grimpe",
+   "tris": 176
+  },
+  "nest_box": {
+   "kind": "prop",
+   "pivot": "clou",
+   "tilt_deg": 25,
+   "entrance": [
+    0.0,
+    -0.13,
+    0.181
+   ],
+   "roof_perch": [
+    0.0,
+    -0.048,
+    0.12
+   ],
+   "note": "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)",
+   "tris": 156
+  },
+  "oak_branch_stub": {
+   "kind": "prop",
+   "pivot": "bout du chicot (perchoir)",
+   "tris": 60
+  },
+  "moss_tuft": {
+   "kind": "item",
+   "socket": "socket_blue_tit_beak",
+   "tris": 96
+  }
+ },
+ "animations": {
+  "heron": [
+   {
+    "name": "heron_idle",
+    "seconds": 4.0,
+    "loop": true
+   },
+   {
+    "name": "heron_strike",
+    "seconds": 0.8,
+    "loop": false
+   },
+   {
+    "name": "heron_alert",
+    "seconds": 1.0,
+    "loop": false
+   },
+   {
+    "name": "heron_shy_step",
+    "seconds": 0.8,
+    "loop": false
+   },
+   {
+    "name": "heron_takeoff",
+    "seconds": 1.4,
+    "loop": false
+   },
+   {
+    "name": "heron_fly",
+    "seconds": 1.0,
+    "loop": true
+   },
+   {
+    "name": "heron_land",
+    "seconds": 0.8,
+    "loop": false
+   },
+   {
+    "name": "heron_rest",
+    "seconds": 4.0,
+    "loop": true
+   }
+  ],
+  "goose": [
+   {
+    "name": "goose_swim",
+    "seconds": 3.0,
+    "loop": true
+   },
+   {
+    "name": "goose_alert",
+    "seconds": 1.0,
+    "loop": false
+   },
+   {
+    "name": "goose_run",
+    "seconds": 0.4,
+    "loop": true
+   },
+   {
+    "name": "goose_fly",
+    "seconds": 1.0,
+    "loop": true
+   }
+  ],
+  "blue_tit": [
+   {
+    "name": "tit_perch",
+    "seconds": 2.0,
+    "loop": true
+   },
+   {
+    "name": "tit_fly",
+    "seconds": 0.2,
+    "loop": true
+   },
+   {
+    "name": "tit_sing",
+    "seconds": 1.5,
+    "loop": false
+   },
+   {
+    "name": "tit_enter",
+    "seconds": 0.3,
+    "loop": false
+   },
+   {
+    "name": "tit_exit",
+    "seconds": 0.3,
+    "loop": false
+   }
+  ],
+  "fox": [
+   {
+    "name": "fox_trot",
+    "seconds": 0.6,
+    "loop": true
+   },
+   {
+    "name": "fox_listen",
+    "seconds": 2.5,
+    "loop": false
+   },
+   {
+    "name": "fox_pounce",
+    "seconds": 1.2,
+    "loop": false
+   },
+   {
+    "name": "fox_sniff",
+    "seconds": 2.0,
+    "loop": false
+   },
+   {
+    "name": "fox_look",
+    "seconds": 1.0,
+    "loop": false
+   },
+   {
+    "name": "fox_bark",
+    "seconds": 1.2,
+    "loop": false
+   }
+  ]
+ },
+ "file_bytes": 542576
+}

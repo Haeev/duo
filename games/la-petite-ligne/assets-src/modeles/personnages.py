@@ -1327,6 +1327,126 @@ def anims():
               "forearm_l": (40, 0, 0), "forearm_r": (40, 0, 0), "hand_l": (10, 0, 0), "hand_r": (10, 0, 0)}
     ground_b = merge(ground, {"chest": (2, 0, 0), "head": (-8, 8, 0), "hips_loc": (0, -0.736, 0.0)})
     A["sit_ground"] = (True, {0: ground, 45: ground_b, 90: ground})
+    A.update(ladder_anims())
+    return A
+
+
+# Échelle de Basile (tour 6, docs/jeux/jeu-1/tour-06-conception.md section 1.4.3) ----------------------
+# Poses calculées par une cinématique inverse plane: pieds sur les barreaux, mains sur les montants de
+# ladder_wood (faune.glb: 75 degrés, barreaux tous les 0,28 m de hauteur, montants à x +-0,20).
+# Repère du personnage: f vers l'avant, z vers le haut depuis la racine, x vers sa gauche.
+
+LAD_TAN = math.tan(math.radians(15))   # avance du plan de l'échelle par mètre de hauteur
+RUNG = 0.28
+L_THIGH, L_SHIN, L_UP, L_FORE = 0.41, 0.395, 0.2658, 0.235
+
+
+def _ik2(df, dz, l1, l2):
+    """(direction de la cible depuis la verticale basse, vers l'avant; écart du premier os; flexion), en radians."""
+    d = max(min(math.hypot(df, dz), (l1 + l2) * 0.999), abs(l1 - l2) + 1e-3)
+    phi = math.atan2(df, -dz)
+    a = math.acos((l1 * l1 + d * d - l2 * l2) / (2 * l1 * d))
+    g = math.acos((l1 * l1 + l2 * l2 - d * d) / (2 * l1 * l2))
+    return phi, a, math.pi - g
+
+
+def _body(u, w, sg, c):
+    """Positions (f, z) de la hanche et des épaules pour hips_loc (0, u, w), buste penché de sg puis c degrés."""
+    s1, s2 = math.radians(sg), math.radians(sg + c)
+    hip = (w, 0.89 + u)
+    sh = (w + 0.16 * math.sin(s1) + 0.17 * math.sin(s2), 0.90 + u + 0.10 + 0.16 * math.cos(s1) + 0.17 * math.cos(s2))
+    return hip, sh
+
+
+def _leg(side, hip, ankle):
+    phi, a, bend = _ik2(ankle[0] - hip[0], ankle[1] - hip[1], L_THIGH, L_SHIN)
+    t = phi + a
+    return {"thigh_" + side: (math.degrees(t), 0, 0), "shin_" + side: (-math.degrees(bend), 0, 0),
+            "foot_" + side: (-math.degrees(t - bend), 0, 0)}
+
+
+def _arm(side, sh, lean, target, l2=L_FORE + 0.045, hand=None):
+    """Bras vers target (f, x, z), épaule à x +-0,205; lean = inclinaison du buste (degrés)."""
+    xs = 0.205 if side == "l" else -0.205
+    df, dx, dz = target[0] - sh[0], target[1] - xs, target[2] - sh[1]
+    phi, a, bend = _ik2(math.hypot(df, dx), dz, L_UP, l2)
+    up = phi - a
+    yaw = math.degrees(math.atan2(dx, df))
+    out = {"upper_arm_" + side: (math.degrees(up) + lean, -yaw, 0), "forearm_" + side: (math.degrees(bend), 0, 0)}
+    out["hand_" + side] = hand(math.degrees(up + bend)) if hand else (0, 0, 0)
+    return out
+
+
+def _plane(z):
+    return LAD_TAN * z
+
+
+CLIMB = {"u": -0.17, "w": -0.16, "sg": 14, "c": 4}
+
+
+def climb_pose(p):
+    """Pose de montée à la phase p (0 à 1 = deux barreaux, 1,2 s); la racine monte de 0,56 m par cycle."""
+    hip, sh = _body(CLIMB["u"], CLIMB["w"], CLIMB["sg"], CLIMB["c"])
+    pose = {"hips_loc": (0, CLIMB["u"], CLIMB["w"]), "spine": (CLIMB["sg"], 0, 0), "chest": (CLIMB["c"], 0, 0),
+            "head": (-16, 0, 0), "neck": (-4, 0, 0)}
+    lean = CLIMB["sg"] + CLIMB["c"]
+
+    def limb(q, hi, back):
+        q %= 1.0
+        if q < 0.75:
+            return hi - 2 * RUNG * q, 0.0
+        t = (q - 0.75) / 0.25
+        sm = t * t * (3 - 2 * t)
+        return hi - 1.5 * RUNG + 1.5 * RUNG * sm, back * math.sin(math.pi * t)
+    for side, q in (("l", p), ("r", p + 0.5)):
+        z, back = limb(q, RUNG, 0.13)
+        pose.update(_leg(side, hip, (_plane(z) - 0.08 - back, z + 0.102)))
+    # main droite avec le pied gauche, main gauche avec le pied droit
+    for side, q in (("r", p), ("l", p + 0.5)):
+        z, back = limb(q, 1.48, 0.09)
+        pose.update(_arm(side, sh, lean, (_plane(z) - 0.04 - back, 0.2 if side == "l" else -0.2, z)))
+    return pose
+
+
+def ladder_anims():
+    A = {}
+    A["climb_ladder"] = (True, {f: climb_pose(f / 36) for f in range(0, 37, 3)})
+    start = climb_pose(0.5)
+    # Basile en haut: pied gauche sur le barreau, pied droit un barreau plus haut, main gauche au montant.
+    # Nichoir penché (le bas vers l'est) à sa droite: il prend le coin bas côté échelle et le ramène.
+    feet = {k: v for k, v in start.items() if k.startswith(("thigh", "shin", "foot"))}
+
+    def lean_pose(sg, c, rh, hand=None, head=(-10, 0, -14)):
+        hip, sh = _body(CLIMB["u"], CLIMB["w"], sg, c)
+        pose = dict(feet, hips_loc=(0, CLIMB["u"], CLIMB["w"]), spine=(sg, 0, 0), chest=(c, 0, 0), head=head)
+        pose.update(_arm("l", sh, sg + c, (_plane(1.48) - 0.04, 0.2, 1.48)))
+        pose.update(_arm("r", sh, sg + c, rh, l2=L_FORE + (0.0 if hand else 0.045), hand=hand))
+        return pose
+    tilted, straight = (0.42, -0.31, 0.894), (0.333, -0.223, 0.90)
+    A["reach_up"] = (False, {0: start, 9: lean_pose(22, 8, tilted), 15: lean_pose(22, 8, tilted),
+                             24: lean_pose(20, 6, straight)})
+    # Marteau (ferme.glb, sous socket_hand_r): manche à l'horizontale vers l'avant, main retournée (tête de
+    # frappe vers le bas); il tape le haut du nichoir, côté échelle. Choc à 0,25 s.
+    head_pt = (0.443, -0.134, 1.16)
+
+    def tap(raise_deg):
+        wrist = (head_pt[0] - 0.31 - 0.045, head_pt[1], head_pt[2] + 0.09)
+
+        def hand(abs_deg):
+            return (-(90 + raise_deg - abs_deg), 180, 0)
+        return lean_pose(20, 6, wrist, hand=hand, head=(-4, 0, -16))
+    A["hammer_tap"] = (True, {0: tap(28), 5: tap(22), 7.5: tap(0), 10: tap(8), 18: tap(28)})
+
+    # Joueurs: tenir l'échelle, face au montant (0,35 m devant), mains à 0,9 et 1,2 m, pieds écartés.
+    def hold(sg, head):
+        hip, sh = _body(-0.01, 0.02, sg, 4)
+        pose = {"hips_loc": (0, -0.01, 0.02), "spine": (sg, 0, 0), "chest": (4, 0, 0), "head": head,
+                "thigh_l": (-4, 0, 7), "thigh_r": (4, 0, -7), "shin_l": (-6, 0, 0), "shin_r": (-6, 0, 0),
+                "foot_l": (8, 0, -4), "foot_r": (2, 0, 4)}
+        pose.update(_arm("r", sh, sg + 4, (0.31, -0.02, 1.2)))
+        pose.update(_arm("l", sh, sg + 4, (0.31, 0.02, 0.9)))
+        return pose
+    A["hold_ladder"] = (True, {0: hold(9, (-22, 0, 0)), 30: hold(11, (-24, 4, 0)), 60: hold(9, (-22, 0, 0))})
     return A
 
 
