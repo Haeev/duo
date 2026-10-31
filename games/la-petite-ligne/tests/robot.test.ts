@@ -77,6 +77,8 @@ describe('robot', () => {
     expect(sim.world.ending?.keyFound).toBe(false);
     // La remise s'ouvre quand même au jour 12 (rattrapage de la semaine 2), mais sans la scène de la clé.
     expect(sim.world.worldStates.handcar_shed).toBe('open');
+    expect(sim.world.quests.find((q) => q.id === 'handcar')?.status).toBe('done');
+    expect(sim.world.dialoguesDone).toEqual(expect.arrayContaining(['basile_force_lock', 'basile_handcar_scene']));
     expect(sim.world.dialoguesDone).toEqual(expect.arrayContaining(['firmin_end_vergers']));
     expect(sim.world.dialoguesDone).not.toContain('firmin_end_key');
   });

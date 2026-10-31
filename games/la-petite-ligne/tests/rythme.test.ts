@@ -14,7 +14,7 @@ import { createRobot, newSim } from './aides';
  * en ajoute); la règle, elle, se prouve par les redites évitables (une réplique redite alors qu'une
  * autre, possible, n'avait jamais été entendue), qui doivent être nulles.
  */
-const MAX_REPEAT_SHARE = 0.6;
+const MAX_REPEAT_SHARE = 0.1;
 /** Entrées et sorties de la maison par jour et par robot (la recette en relevait 900). */
 const MAX_DOOR_CROSSINGS = 60;
 

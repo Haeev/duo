@@ -115,7 +115,11 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   const status = (id: string): string => w.quests.find((q) => q.id === id)?.status ?? 'pas commencée';
   for (const id of [...WEEK_TWO_SIDE, ...(keyExpected ? WEEK_TWO_SHED : [])]) expect(status(id), `quête ${id} terminée`).toBe('done');
   // Sans l'énigme 1, Basile ouvre la remise lui-même au jour 12 (rattrapage du game designer): la draisine se joue quand même.
-  if (!keyExpected) expect(status('handcar'), 'draisine après le rattrapage du jour 12').toBe('done');
+  if (!keyExpected) {
+    expect(status('handcar'), 'draisine après le rattrapage du jour 12').toBe('done');
+    expect(w.dialoguesDone, 'scène de la draisine').toContain('basile_handcar_scene');
+    expect(w.dialoguesDone, 'Basile force la serrure').toContain('basile_force_lock');
+  }
   expect(w.phase, 'la démo se termine').toBe('ended');
   expect(run.ticks).toBeLessThan(MAX_TICKS);
   const { content } = contentAndMap();
