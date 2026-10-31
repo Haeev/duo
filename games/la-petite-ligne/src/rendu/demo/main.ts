@@ -114,8 +114,10 @@ async function main(): Promise<void> {
           : 'none',
     absent: params.get('absent') === '1',
     scene:
-      params.get('scene') === 'rencontre' || params.get('scene') === 'repas'
-        ? (params.get('scene') as 'rencontre' | 'repas')
+      params.get('scene') === 'rencontre' ||
+      params.get('scene') === 'place' ||
+      params.get('scene') === 'repas'
+        ? (params.get('scene') as 'rencontre' | 'place' | 'repas')
         : undefined,
     corners: params.get('coins') === '1',
   };

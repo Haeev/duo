@@ -12,13 +12,7 @@ import { Quaternion, Vector3, type Object3D } from 'three';
 import { textHash } from './modeles';
 
 export type RigBone =
-  | 'chest'
-  | 'neck'
-  | 'head'
-  | 'upper_arm_l'
-  | 'upper_arm_r'
-  | 'forearm_l'
-  | 'forearm_r';
+  'chest' | 'neck' | 'head' | 'upper_arm_l' | 'upper_arm_r' | 'forearm_l' | 'forearm_r';
 
 const RIG_BONES: readonly RigBone[] = [
   'chest',

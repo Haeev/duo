@@ -69,9 +69,10 @@ export interface DemoOptions {
   corners?: boolean;
   /**
    * Petites scènes de la vie au repos: Camille s'approche de Firmin par le
-   * côté et s'arrête (`rencontre`), ou mange assise à la table (`repas`).
+   * côté et s'arrête (`rencontre`), Firmin seul sur la place (`place`), ou
+   * Camille mange assise à la table (`repas`).
    */
-  scene?: 'rencontre' | 'repas' | undefined;
+  scene?: 'rencontre' | 'place' | 'repas' | undefined;
 }
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */
@@ -243,7 +244,7 @@ export function createExampleWorld(
       placedBy: 'p2',
     },
   ];
-  if (options.scene === 'rencontre') {
+  if (options.scene === 'rencontre' || options.scene === 'place') {
     // Firmin sur la place, face à la caméra de départ, pour voir le regard et le salut.
     const firmin = villagers.find((villager) => villager.id === 'firmin');
     const square = point(map, 'village_square', 40, 28);
@@ -254,12 +255,13 @@ export function createExampleWorld(
     }
   }
   if (options.scene === 'repas') {
-    const chair = { cx: room.x + 1, cy: room.y + 2 };
-    world.furniture.push({ id: 'f9', item: 'chair', cell: chair, rotation: 1, placedBy: 'p1' });
+    // Chaise au sud de la table, tournée vers elle (vers le nord: rotation 2).
+    const chair = { cx: room.x + 2, cy: room.y + 3 };
+    furniture.push({ id: 'f9', item: 'chair', cell: chair, rotation: 2, placedBy: 'p1' });
     p1.inHouse = true;
     p1.pos = { x: chair.cx + 0.5, y: chair.cy + 0.5 };
     p1.prev = { ...p1.pos };
-    p1.facing = 0;
+    p1.facing = -Math.PI / 2;
     p1.aim = null;
     p1.action = { kind: 'eat', since: 0, duration: 0, target: null };
   } else if (options.inside) {
@@ -428,9 +430,7 @@ export function animateExampleWorld(
     };
     p1.facing = Math.atan2(MEET_TO.y - MEET_FROM.y, MEET_TO.x - MEET_FROM.x);
     p1.speed =
-      u < 1
-        ? Math.hypot(MEET_TO.x - MEET_FROM.x, MEET_TO.y - MEET_FROM.y) / MEET_SECONDS
-        : 0;
+      u < 1 ? Math.hypot(MEET_TO.x - MEET_FROM.x, MEET_TO.y - MEET_FROM.y) / MEET_SECONDS : 0;
     p1.action = { kind: u < 1 ? 'walk' : 'idle', since: 0, duration: 0, target: null };
   } else if (p1 !== undefined && walking && !p1.inHouse && options?.scene === undefined) {
     const stroll = strollPosition(

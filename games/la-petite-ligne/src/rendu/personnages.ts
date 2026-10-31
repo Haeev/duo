@@ -348,7 +348,10 @@ class CharacterFigure {
       const cos = Math.cos(this.facing);
       const sin = Math.sin(this.facing);
       const limit = SETTINGS.lookMaxDegrees * DEGREE;
-      wanted = Math.max(-limit, Math.min(limit, Math.atan2(cos * dx - sin * dz, sin * dx + cos * dz)));
+      wanted = Math.max(
+        -limit,
+        Math.min(limit, Math.atan2(cos * dx - sin * dz, sin * dx + cos * dz)),
+      );
     }
     this.lookYaw += (wanted - this.lookYaw) * smoothFactor(dt, SETTINGS.lookHalfLife);
     if (Math.abs(this.lookYaw) > 1e-3) {
