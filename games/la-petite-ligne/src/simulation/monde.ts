@@ -92,6 +92,8 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     pin: null,
     seat: null,
     fishing: null,
+    momentHint: null,
+    holding: null,
   };
 }
 
@@ -209,6 +211,8 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     orderHistory: [],
     ending: null,
     session: { firstDay: s.clock.firstDay.day, togetherMoments: 0, highlights: [] },
+    moments: { today: null, history: [], hintTurn: s.moments.firstHint },
+    secrets: { turn: s.secrets.firstInformed, entries: [] },
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

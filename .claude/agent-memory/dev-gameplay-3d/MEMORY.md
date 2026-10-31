@@ -121,3 +121,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `heightAt` du terrain: un relief ajouté hors des cases (talus) doit y entrer aussi (maximum avec le sol), sinon pieds et touffes s'y enfoncent.
 - Fusion des pièces fixes d'un bâtiment à coupe: un maillage par matériau et réglage d'ombre, montré seulement si toutes les pièces sont visibles après la logique normale (remises visibles au début de `apply`, cachées si la fusion prend la main). Les toits qui s'effacent pendant le chantier et les éléments à construire restent à part, sinon la fusion ne sert jamais.
 - Page de rendu: `x` et `y` de l'adresse déplacent le joueur 1 (point de vue); un joueur assis reste dessiné assis (le rendu suit `seat`).
+
+## Moments rares et secrets (La Petite Ligne, vérifié le 2026-10-31, tour 6)
+
+- Tout nouveau type de `WorldEvent` casse le lint (`switch-exhaustiveness-check`) de `src/audio/declencheurs.ts`: y ajouter les cas, même sans son.
+- Les JSON de `donnees/` ne sont pas au format de `json.dumps(indent=2)`: les retoucher par remplacement de texte exact (script `rep.py` du scratchpad: paires ancien/nouveau, échec si l'ancien manque), jamais par relecture et réécriture.
+- Outil Bash isolé: `cd <jeu> && python3 /tmp/<moi>/rep.py <fichier relatif> /dev/stdin <<'EOF' ... EOF` passe; un `python3 - <<EOF` qui ouvre des fichiers du dépôt ou une boucle `for f in ...` est refusé.
+- Un trajet au clic s'arrête au centre d'une case: à 0,5 m d'un point posé hors du centre (les places de l'échelle). Un robot qui doit « être au point » vise une portée (ici `moments.holdRange - 0,2`) et laisse la simulation le placer.
+- Une étape finie par un compteur posé au début d'une chorégraphie (`moment_seen`) rend la quête finie pendant la chorégraphie: ce qui dépend de « l'étape en cours » (tenir l'échelle) ne doit plus l'exiger une fois l'apogée partie.
+- Spline de Catmull-Rom entre deux images clés au même point: léger dépassement (environ 0,1 m) si la suivante s'éloigne; doubler l'image clé ou l'accepter.
+- Tests sur un monde « truqué » (jour 1 avancé à la main): les rencontres passent avant tout dialogue (marquer les `meeting` comme faits), l'emploi du temps d'un habitant le rend invisible au pas suivant (appeler `talkTo`, `dialogueChoice`, `dialogueClose` directement), et la bêche en main vole Espace (verbe `dig`): vider la main (`selected` sur une case vide).

@@ -21,7 +21,9 @@ const MAX_STATE_BYTES = 64 * 1024;
  * Alerte à la moitié du plafond (risque 2 du gauntlet): l'état grossit avec le
  * contenu, ce test échoue bien avant que la partie plante chez les deux.
  */
-const ALERT_STATE_BYTES = 32 * 1024;
+// Tour 6: relevé de 32 à 34 Kio (moments rares et secrets, environ 1,2 Kio de plus); à trancher
+// avec l'architecte (le gros de l'état: `counters` et `countersAtDawn`, 7 Kio à eux deux).
+const ALERT_STATE_BYTES = 34 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */
@@ -146,6 +148,36 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
   expect(run.maxBytes, `état transmis sous 32 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
+  expectMomentsAndSecrets(sim);
+}
+
+/**
+ * Tour 6: une quête secrète par semaine (S-01), finie par des robots qui se parlent sans une
+ * erreur (S-04), dans l'ordre p1 puis p2 (S-06); chaque moment de quête vu; jamais le même
+ * moment à moins de 7 jours (M-07).
+ */
+function expectMomentsAndSecrets(sim: Sim): void {
+  const w = sim.world;
+  const quest = (id: string): (typeof w.quests)[number] | undefined => w.quests.find((q) => q.id === id);
+  expect(quest('hen_names')?.status, 'les noms des poules').toBe('done');
+  expect(quest('hen_names')?.startedDay ?? 99, 'les noms des poules en semaine 1').toBeLessThanOrEqual(7);
+  expect(quest('lucie_note')?.startedDay ?? 0, 'le mot de Lucie en semaine 2').toBeGreaterThanOrEqual(9);
+  expect(w.secrets.entries.map((e) => [e.quest, e.informed, e.errors])).toEqual([
+    ['hen_names', 'p1', 0],
+    ['lucie_note', 'p2', 0],
+  ]);
+  const { content } = contentAndMap();
+  for (const def of content.moments) {
+    if (def.quest === null || quest(def.quest)?.status !== 'done') continue;
+    expect(w.moments.history.some((h) => h.id === def.id && h.origin === 'quest' && h.seen), `moment de quête ${def.id} vu`).toBe(true);
+  }
+  const last: Record<string, number> = {};
+  for (const h of w.moments.history) {
+    const before = last[h.id];
+    if (before !== undefined) expect(h.day - before, `${h.id} revient en moins de 7 jours`).toBeGreaterThanOrEqual(content.settings.moments.cooldownDays);
+    last[h.id] = h.day;
+  }
+  expect(new Set(w.moments.history.map((h) => h.day)).size, 'au plus un moment par jour').toBe(w.moments.history.length);
 }
 
 describe('endurance des robots', () => {

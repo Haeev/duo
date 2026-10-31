@@ -2,7 +2,7 @@
  * Contenu du game designer (`donnees/*.json`), une fois lu et contrôlé par
  * `donnees/contenu.ts`. Les noms de champs suivent les fichiers JSON.
  */
-import type { CropStage, Quality, Weather } from '../etat/types';
+import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -13,8 +13,13 @@ import type { CropStage, Quality, Weather } from '../etat/types';
  * envie, `game_start` ailleurs (dialogues, emplois du temps, courrier).
  */
 export type Since = 'step_start' | 'day_start' | 'game_start';
-/** Qui doit l'avoir fait: l'un ou l'autre (cumulé), le joueur concerné, ou chacun des deux. */
-export type Who = 'either' | 'actor' | 'both';
+/**
+ * Qui doit l'avoir fait: l'un ou l'autre (cumulé), le joueur concerné, ou chacun des deux;
+ * dans une quête à secret (R16), l'informé (`informed`) ou l'autre (`doer`).
+ */
+export type Who = 'either' | 'actor' | 'both' | 'informed' | 'doer';
+/** Rôle d'un joueur dans une quête à secret (R16). */
+export type SecretRole = 'informed' | 'doer';
 
 /**
  * Condition, après lecture. Les conditions qui comptent des actions des
@@ -49,12 +54,21 @@ export type Condition = { label?: string } & (
   | { type: 'stayed_at'; point: string; seconds: number; who: Who; seated: boolean }
   /** Variante tirée par la graine pour ce groupe (de 0 à `of` - 1): buts d'après-midi, aléa par partie. */
   | { type: 'variant'; group: string; value: number; of: number }
-  /** Observer: à moins de `distance` m du point et tourné vers lui. */
-  | { type: 'looked_at'; point: string; distance: number; who: Who }
+  /** Observer: entre `minDistance` et `distance` m du point, tourné vers lui (immobile si `still`). */
+  | { type: 'looked_at'; point: string; distance: number; minDistance: number; still: boolean; who: Who }
+  /** Le joueur concerné a ce rôle dans le secret de cette quête (dialogues réservés à un rôle). */
+  | { type: 'secret_role'; quest: string; role: SecretRole }
+  /** Poules différentes appelées par leur bon nom (par l'autre, en général). */
+  | { type: 'hens_named'; count: number; who: Who }
+  /**
+   * Un choix fait dans un dialogue personnel: compteur `choice:<dialogue>` (n'importe lequel),
+   * `choice:<dialogue>:<choix>` ou `choice:<dialogue>:correct` (un choix juste).
+   */
+  | { type: 'choice_made'; key: string; count: number; since: Since; who: Who }
 );
 
 export type Effect =
-  | { type: 'give_item'; item: string; count: number; to: 'each' | 'actor' | 'cellar' }
+  | { type: 'give_item'; item: string; count: number; to: 'each' | 'actor' | 'cellar' | SecretRole }
   | { type: 'take_item'; item: string; count: number; from: 'actor' | 'either' | 'cellar' }
   | { type: 'give_money'; amount: number }
   | { type: 'set_flag'; flag: string }
@@ -62,7 +76,10 @@ export type Effect =
   | { type: 'send_letter'; letter: string }
   | { type: 'unlock_recipe'; recipe: string }
   | { type: 'spawn_object'; item: string; point: string }
-  | { type: 'spawn_animals'; animal: string; count: number; names: string[]; point: string }
+  /** `shuffleVariantsBy`: les variantes suivent la permutation tirée pour ce groupe (les noms des poules). */
+  | { type: 'spawn_animals'; animal: string; count: number; names: string[]; point: string; shuffleVariantsBy: string | null }
+  /** Le secret de la quête devient visible des deux joueurs (fin d'une quête secrète). */
+  | { type: 'reveal_secret'; quest: string }
   | { type: 'set_need'; need: 'belly' | 'sleep' | 'heart'; value: number; who: 'both' | 'actor' }
   | { type: 'play_dialogue'; dialogue: string }
   | { type: 'gather_players'; point: string }
@@ -202,6 +219,13 @@ export interface DialogueChoiceDef {
   id: string;
   text: string;
   reply: DialogueLineDef[];
+  /** Choix juste si cette condition est vraie (`null`: pas de bonne ou de mauvaise réponse). */
+  correct: Condition | null;
+  /** Réponse de l'habitant à un choix faux (`correct` faux). */
+  replyWrong: DialogueLineDef[];
+  /** Effets du choix (juste, ou sans `correct`), puis du choix faux. */
+  effects: Effect[];
+  effectsWrong: Effect[];
 }
 
 export type DialogueKind = 'scene' | 'meeting' | 'quest' | 'daily' | 'hint' | 'ending';
@@ -240,6 +264,8 @@ export interface VillagerDef {
 export interface QuestStepDef {
   id: string;
   objective: string;
+  /** Objectif vu par chaque rôle d'une quête à secret (`objective` reste le texte par défaut). */
+  objectiveByRole: { informed: string; doer: string } | null;
   conditions: Condition[];
   effects: Effect[];
   /** `at_deadline`: l'étape se résout à l'échéance, pas avant (la commande). */
@@ -260,6 +286,112 @@ export interface QuestDef {
   steps: QuestStepDef[];
   completionEffects: Effect[];
   completionText: string;
+  /** Information propre à un seul joueur (R16), ou `null`. */
+  secret: QuestSecretDef | null;
+}
+
+/**
+ * Secret d'une quête (R16): au démarrage, un seul joueur (l'informé) le reçoit, l'autre agit.
+ * `card.lines`: une liste de textes, ou une liste par variante (`of` > 1). `{secret}` et
+ * `{henColor1}`... sont permis dans les lignes.
+ */
+export interface QuestSecretDef {
+  id: string;
+  /** `turn`: le joueur dont c'est le tour (`world.secrets.turn`). */
+  informed: 'turn' | CharacterId;
+  variantGroup: string;
+  of: number;
+  card: { title: string; lines: string[] | string[][] };
+  /** La fiche apparaît chez l'informé quand cette condition devient vraie (`null`: dès le démarrage). */
+  revealOn: Condition | null;
+  /** Coup de coude chez l'informé après `secrets.nudgeAfterErrors` erreurs (clé de `textes.messages`). */
+  nudge: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Moments rares (`moments.json`, tour 6)
+
+/** Image clé d'une chorégraphie: `[t, x, y, z, clip]`; `null` en x ou y: la position courante. */
+export type MomentKeyframe = [number, number | null, number | null, number, string | null];
+
+/** Conditions de l'apogée: deux joueurs dans le rayon de la cible, dans la pose demandée. */
+export interface MomentWatch {
+  radius: number;
+  minRadius: number;
+  holdSeconds: number;
+  still: boolean;
+  facing: boolean;
+  seated: boolean;
+  /** Banc où s'asseoir (`seated`), objet de la carte, ou `null`. */
+  bench: string | null;
+  /** Places à tenir (geste « tenir »), points de la carte, ou `null`. */
+  hold: string[] | null;
+  /** `anchor` (le point du moment) ou l'identifiant d'un acteur qui bouge. */
+  target: string;
+}
+
+/** Une chorégraphie en images clés (apogée, départ, arrivée). */
+export interface MomentChoreography {
+  seconds: number;
+  keyframes: Record<string, MomentKeyframe[]>;
+  fadeLastSeconds: number;
+  sounds: [number, string][];
+  /** Habitants qui tournent la tête vers la cible. */
+  lookers: string[];
+  /** L'échelle: la chorégraphie se fige si un joueur lâche, avant `pauseBefore` s. */
+  pauseWhenReleased: boolean;
+  pauseBefore: number;
+  /** Formation en V des oies (section 1.4.2), lue par le rendu; `null` sinon. */
+  formation: { fromSeconds: number; toSeconds: number; spacing: number; armAngleDeg: number } | null;
+}
+
+export interface MomentActorDef {
+  id: string;
+  model: string;
+  count: number;
+  /** Point de l'attente. */
+  at: string;
+  /** Décalages `[dx, dy]` des membres d'un groupe (`count` > 1). */
+  offsets: [number, number][];
+  facing: number;
+  idle: string;
+  idleExtra: { clip: string; everySeconds: [number, number] } | null;
+  arrive: MomentChoreography | null;
+  collisionRadius: number;
+  shy: { distance: number; clip: string; stepTo: [number, number] | null; stepClip: string | null; returnAfterSeconds: number } | null;
+  /** Habitant joué par cet acteur pendant le moment (Basile sur l'échelle), ou `null`. */
+  villager: string | null;
+}
+
+export interface MomentDef {
+  id: string;
+  tier: 'P0' | 'P1';
+  name: string;
+  mode: 'quest' | 'ambient' | 'both';
+  quest: string | null;
+  /** Étape de la quête pendant laquelle l'apogée peut partir (`null`: toute la quête). */
+  questStep: string | null;
+  anchor: string;
+  weight: number;
+  maxPerSeason: number | null;
+  availableWhen: Condition[];
+  present: { from: number; to: number };
+  window: { from: number; to: number };
+  watch: MomentWatch;
+  questWatch: MomentWatch | null;
+  actors: MomentActorDef[];
+  climax: MomentChoreography;
+  /** État d'après l'apogée: où se tient chaque acteur et ce qu'il joue (`null`: l'attente reprend). */
+  after: { actors: Record<string, { at: string | null; idle: string | null }> } | null;
+  leave: MomentChoreography | null;
+  sounds: { idle: { id: string; everySeconds: [number, number]; range: number }[] };
+  texts: { hint: string | null; climax: string; memory: string };
+  hintFrom: string | null;
+  reward: { heart: number; money: number };
+  /** Effets à l'apogée (le drapeau du nichoir redressé). */
+  effects: Effect[];
+  /** Valeurs propres au rendu (lumières des vers luisants...), lues telles quelles par le rendu. */
+  render: Record<string, unknown>;
 }
 
 // ---------------------------------------------------------------------------
@@ -421,8 +553,44 @@ export interface Settings {
     /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */
     flag: string;
   } | null;
+  /** Moments rares (`reglages.moments`, tour 6). */
+  moments: MomentSettings;
+  /** Informations propres à un seul joueur (`reglages.secrets`, R16). */
+  secrets: SecretSettings;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
+}
+
+export interface MomentSettings {
+  dailyChance: number;
+  maxPerDay: number;
+  cooldownDays: number;
+  firstAmbientDay: number;
+  noAmbientOnTrainDays: boolean;
+  /** Vitesse au sol sous laquelle on est « immobile » (m/s). */
+  stillSpeed: number;
+  noticeRadius: number;
+  heartBonus: number;
+  musicDuckDb: number;
+  musicDuckInSeconds: number;
+  musicDuckOutSeconds: number;
+  firstHint: CharacterId;
+  maxSyncGapSeconds: number;
+  /** Agir à moins de tant d'une place libre de l'échelle la prend (m). */
+  holdRange: number;
+  /** Niveaux de moments tirés au matin (`["P0"]`: les P1 ne sortent pas). */
+  tiers: ('P0' | 'P1')[];
+}
+
+export interface SecretSettings {
+  firstInformed: CharacterId;
+  nudgeAfterErrors: number;
+  firstTryHeart: number;
+  henChoiceRange: number;
+  henChoiceKeepOpen: number;
+  hideFromGuestSnapshot: boolean;
+  /** Drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms: la quête des noms ne démarre pas. */
+  knownHensFlag: string;
 }
 
 /** S'asseoir sur un banc de la carte (modèle `bench`). */
@@ -499,4 +667,6 @@ export interface Content {
   envies: EnvieDef[];
   sharedEnvieSchedule: { day: number; envie: string }[];
   texts: Texts;
+  /** Moments rares (`moments.json`), vide si le fichier manque. */
+  moments: MomentDef[];
 }

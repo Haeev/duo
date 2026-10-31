@@ -15,6 +15,8 @@ import { spawnHens } from './poules';
 import { startQuest } from './quetes';
 import { addStack, dropAt, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
 import { gatherAt } from './deplacement';
+import { revealToBoth } from './secrets';
+import { secretEntry } from './conditions';
 
 /** Ajoute une suite d'effets et l'exécute tant qu'aucune scène ne l'arrête. */
 export function runEffects(sim: Sim, effects: readonly Effect[], actor: CharacterId | null): void {
@@ -63,7 +65,9 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       if (effect.to === 'cellar') {
         addStack(world.cellar, effect.item, 'ordinary', effect.count);
       } else {
-        const who: CharacterId[] = effect.to === 'each' ? ['p1', 'p2'] : targets(actor);
+        const entry = effect.to === 'informed' || effect.to === 'doer' ? secretEntry(sim, null) : null;
+        const who: CharacterId[] =
+          effect.to === 'each' ? ['p1', 'p2'] : effect.to === 'informed' || effect.to === 'doer' ? (entry === null ? targets(actor) : [entry[effect.to]]) : targets(actor);
         for (const id of who) giveToCharacter(sim, character(sim, id), effect.item, 'ordinary', effect.count);
       }
       return;
@@ -110,7 +114,10 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       return;
     }
     case 'spawn_animals':
-      spawnHens(sim, effect.animal, effect.count, effect.names, effect.point);
+      spawnHens(sim, effect.animal, effect.count, effect.names, effect.point, effect.shuffleVariantsBy);
+      return;
+    case 'reveal_secret':
+      revealToBoth(sim, effect.quest);
       return;
     case 'set_need':
       for (const id of effect.who === 'both' ? (['p1', 'p2'] as const) : targets(actor)) {

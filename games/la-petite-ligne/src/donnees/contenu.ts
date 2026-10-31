@@ -5,7 +5,7 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
-import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_RANGES } from './defauts';
+import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_MOMENTS, DEFAULT_RANGES, DEFAULT_SECRETS } from './defauts';
 import { ContentError, Reader } from './lecteur';
 import type {
   AnimalDef,
@@ -27,7 +27,12 @@ import type {
   OrderDef,
   CatalogueWindow,
   LetterDef,
+  MomentChoreography,
+  MomentDef,
+  MomentKeyframe,
+  MomentWatch,
   QualityDef,
+  QuestSecretDef,
   QuestDef,
   QuestStepDef,
   RecipeDef,
@@ -50,13 +55,16 @@ export interface RawContentFiles {
   envies: unknown;
   textes: unknown;
   reglages: unknown;
+  /** Moments rares (tour 6); absent: aucun moment (le reste de la partie ne change pas, M-11). */
+  moments?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
 const QUALITIES: readonly Quality[] = ['ordinary', 'fine'];
 const STAGES: readonly CropStage[] = ['seed', 'sprout', 'young', 'ripe'];
 const WEEKDAYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
-const WHO: readonly Who[] = ['either', 'actor', 'both'];
+const WHO: readonly Who[] = ['either', 'actor', 'both', 'informed', 'doer'];
+const CHARACTERS = ['p1', 'p2'] as const;
 const SINCE: readonly Since[] = ['step_start', 'day_start', 'game_start'];
 const CATEGORIES: readonly ItemCategory[] = [
   'seed',
@@ -277,8 +285,32 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     }
     case 'looked_at': {
       const who = r.opt('who');
-      return { type, point: r.at('point').string(), distance: r.at('distance').number(), who: who === null ? 'either' : who.oneOf(WHO) };
+      return {
+        type,
+        point: r.at('point').string(),
+        distance: r.at('distance').number(),
+        minDistance: optNumber(r, 'minDistance', 0),
+        still: optBoolean(r, 'still', false),
+        who: who === null ? 'either' : who.oneOf(WHO),
+      };
     }
+    case 'secret_role':
+      return { type, quest: r.at('quest').string(), role: r.at('role').oneOf(['informed', 'doer'] as const) };
+    case 'hens_named': {
+      const who = r.opt('who');
+      return { type, count: optNumber(r, 'count', 1), who: who === null ? 'either' : who.oneOf(WHO) };
+    }
+    case 'choice_made': {
+      const dialogue = r.at('dialogue').string();
+      const choice = optString(r, 'choice');
+      const correct = r.opt('correct');
+      if (correct !== null && !correct.boolean()) r.at('correct').fail('seul « true » est permis (un choix juste)');
+      const key = choice !== null ? `choice:${dialogue}:${choice}` : correct !== null ? `choice:${dialogue}:correct` : `choice:${dialogue}`;
+      const cond = counter(r, key, since);
+      return cond.type === 'counter' ? { type, key, count: cond.count, since: cond.since, who: cond.who } : cond;
+    }
+    case 'moment_seen':
+      return counter(r, `moment_seen:${r.at('moment').string()}`, since);
     case 'stayed_at': {
       const who = r.opt('who');
       return {
@@ -338,7 +370,7 @@ export function parseEffect(r: Reader): Effect {
         type,
         item: r.at('item').string(),
         count: optNumber(r, 'count', 1),
-        to: r.at('to').oneOf(['each', 'actor', 'cellar'] as const),
+        to: r.at('to').oneOf(['each', 'actor', 'cellar', 'informed', 'doer'] as const),
       };
     case 'take_item':
       return {
@@ -366,7 +398,10 @@ export function parseEffect(r: Reader): Effect {
         count: r.at('count').integer(1),
         names: r.at('names').stringList(),
         point: r.at('point').string(),
+        shuffleVariantsBy: optString(r, 'shuffleVariantsBy'),
       };
+    case 'reveal_secret':
+      return { type, quest: r.at('quest').string() };
     case 'set_need':
       return {
         type,
@@ -567,7 +602,19 @@ function parseDialogue(r: Reader, villager: string): DialogueDef {
       choices = line
         .at('choices')
         .items()
-        .map((c) => ({ id: c.at('id').string(), text: c.at('text').string(), reply: parseLines(c.at('reply')) }));
+        .map((c) => {
+          const correct = c.opt('correct');
+          const wrong = c.opt('replyWrong');
+          return {
+            id: c.at('id').string(),
+            text: c.at('text').string(),
+            reply: parseLines(c.at('reply')),
+            correct: correct === null ? null : parseCondition(correct, 'game_start'),
+            replyWrong: wrong === null ? [] : parseLines(wrong),
+            effects: effects(c.opt('effects')),
+            effectsWrong: effects(c.opt('effectsWrong')),
+          };
+        });
     } else {
       lines.push({ speaker: line.at('speaker').string(), text: line.at('text').string() });
     }
@@ -636,9 +683,11 @@ function parseVillagers(r: Reader): { villagers: VillagerDef[]; dialogues: Recor
 function parseStep(r: Reader): QuestStepDef {
   const resolve = r.opt('resolve');
   const deadline = r.opt('deadline');
+  const byRole = r.opt('objectiveByRole');
   return {
     id: r.at('id').string(),
     objective: r.at('objective').string(),
+    objectiveByRole: byRole === null ? null : { informed: byRole.at('informed').string(), doer: byRole.at('doer').string() },
     conditions: conditions(r.opt('conditions'), 'step_start'),
     effects: effects(r.opt('effects')),
     resolve: resolve === null ? 'on_conditions' : resolve.oneOf(['at_deadline'] as const),
@@ -669,7 +718,219 @@ function parseQuests(r: Reader): QuestDef[] {
         steps: q.at('steps').items().map(parseStep),
         completionEffects: effects(q.opt('completionEffects')),
         completionText: q.at('completionText').string(),
+        secret: parseSecret(q.opt('secret')),
       };
+    });
+}
+
+function parseSecret(r: Reader | null): QuestSecretDef | null {
+  if (r === null) return null;
+  const of = r.at('of').integer(1, 99);
+  const card = r.at('card');
+  const raw = card.at('lines').items();
+  const nested = raw.length > 0 && raw.every((l) => Array.isArray(l.value));
+  const lines: string[] | string[][] = nested ? raw.map((l) => l.stringList()) : raw.map((l) => l.string());
+  if (nested && lines.length !== of) card.at('lines').fail(`une liste de lignes par variante attendue (${of})`);
+  const reveal = r.opt('revealOn');
+  return {
+    id: r.at('id').string(),
+    informed: r.at('informed').oneOf(['turn', ...CHARACTERS] as const),
+    variantGroup: r.at('variantGroup').string(),
+    of,
+    card: { title: card.at('title').string(), lines },
+    revealOn: reveal === null ? null : parseCondition(reveal, 'game_start'),
+    nudge: optString(r, 'nudge'),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Moments rares (`moments.json`)
+
+function pair(r: Reader): [number, number] {
+  const list = r.numberList();
+  const [a, b] = list;
+  if (list.length !== 2 || a === undefined || b === undefined) return r.fail('deux nombres attendus');
+  return [a, b];
+}
+
+function keyframe(r: Reader): MomentKeyframe {
+  const [t, x, y, z, clip, ...rest] = r.items();
+  if (t === undefined || x === undefined || y === undefined || z === undefined || clip === undefined || rest.length > 0) {
+    return r.fail('image clé [t, x, y, z, clip] attendue');
+  }
+  return [t.number(), x.isNull() ? null : x.number(), y.isNull() ? null : y.number(), z.number(), clip.isNull() ? null : clip.string()];
+}
+
+function choreography(r: Reader | null): MomentChoreography | null {
+  if (r === null || r.isNull()) return null;
+  const keyframes: Record<string, MomentKeyframe[]> = {};
+  for (const [actor, list] of r.at('keyframes').entries()) {
+    const frames = list.items().map(keyframe);
+    frames.forEach((f, i) => {
+      const before = frames[i - 1];
+      if (before !== undefined && f[0] < before[0]) list.fail("images clés attendues dans l'ordre du temps");
+    });
+    keyframes[actor] = frames;
+  }
+  const sounds = r.opt('sounds');
+  const formation = r.opt('formation');
+  return {
+    seconds: r.at('seconds').number(),
+    keyframes,
+    fadeLastSeconds: optNumber(r, 'fadeLastSeconds', 0),
+    sounds:
+      sounds === null
+        ? []
+        : sounds.items().map((s): [number, string] => {
+            const [t, id] = s.items();
+            if (t === undefined || id === undefined) return s.fail('[t, son] attendu');
+            return [t.number(), id.string()];
+          }),
+    lookers: r.opt('lookers')?.stringList() ?? [],
+    pauseWhenReleased: optBoolean(r, 'pauseWhenReleased', false),
+    pauseBefore: optNumber(r, 'pauseBefore', 0),
+    formation:
+      formation === null || formation.isNull()
+        ? null
+        : {
+            fromSeconds: formation.at('fromSeconds').number(),
+            toSeconds: formation.at('toSeconds').number(),
+            spacing: formation.at('spacing').number(),
+            armAngleDeg: formation.at('armAngleDeg').number(),
+          },
+  };
+}
+
+function watch(r: Reader): MomentWatch {
+  const bench = r.opt('bench');
+  const hold = r.opt('hold');
+  const w: MomentWatch = {
+    radius: r.at('radius').number(),
+    minRadius: optNumber(r, 'minRadius', 0),
+    holdSeconds: r.at('holdSeconds').number(),
+    still: optBoolean(r, 'still', false),
+    facing: optBoolean(r, 'facing', false),
+    seated: optBoolean(r, 'seated', false),
+    bench: bench === null || bench.isNull() ? null : bench.string(),
+    hold: hold === null || hold.isNull() ? null : hold.stringList(),
+    target: optString(r, 'target') ?? 'anchor',
+  };
+  if (w.minRadius > w.radius) r.at('minRadius').fail('minRadius au plus égal à radius');
+  if (w.seated && w.bench === null) r.at('bench').fail('banc attendu quand « seated » est vrai');
+  return w;
+}
+
+function span(r: Reader): { from: number; to: number } {
+  const from = r.at('from').time();
+  const to = r.at('to').time();
+  if (to <= from) r.at('to').fail('« to » après « from » attendu');
+  return { from, to };
+}
+
+function parseActor(a: Reader): MomentDef['actors'][number] {
+  const shy = a.opt('shy');
+  const extra = a.opt('idleExtra');
+  const offsets = a.opt('offsets');
+  const count = a.has('count') ? a.at('count').integer(1) : 1;
+  const list = offsets === null || offsets.isNull() ? [] : offsets.items().map(pair);
+  if (count > 1 && list.length !== count) a.at('offsets').fail(`un décalage par membre du groupe attendu (${count})`);
+  return {
+    id: a.at('id').string(),
+    model: a.at('model').string(),
+    count,
+    at: a.at('at').string(),
+    offsets: list,
+    facing: optNumber(a, 'facing', 0),
+    idle: a.at('idle').string(),
+    idleExtra: extra === null || extra.isNull() ? null : { clip: extra.at('clip').string(), everySeconds: pair(extra.at('everySeconds')) },
+    arrive: choreography(a.opt('arrive')),
+    collisionRadius: optNumber(a, 'collisionRadius', 0),
+    shy:
+      shy === null || shy.isNull()
+        ? null
+        : {
+            distance: shy.at('distance').number(),
+            clip: shy.at('clip').string(),
+            stepTo: shy.has('stepTo') && !shy.at('stepTo').isNull() ? pair(shy.at('stepTo')) : null,
+            stepClip: optString(shy, 'stepClip'),
+            returnAfterSeconds: shy.at('returnAfterSeconds').number(),
+          },
+    villager: optString(a, 'villager'),
+  };
+}
+
+function parseMoment(m: Reader): MomentDef {
+  const mode = m.at('mode').oneOf(['quest', 'ambient', 'both'] as const);
+  const quest = optString(m, 'quest');
+  if (mode !== 'ambient' && quest === null) m.at('quest').fail('quête attendue pour un moment « quest » ou « both »');
+  const present = span(m.at('present'));
+  const window = span(m.at('window'));
+  if (window.from < present.from || window.to > present.to) m.at('window').fail('fenêtre incluse dans « present » attendue');
+  const questWatch = m.opt('questWatch');
+  const after = m.opt('after');
+  const texts = m.at('texts');
+  const reward = m.at('reward');
+  const max = m.opt('maxPerSeason');
+  const climax = choreography(m.at('climax'));
+  if (climax === null) return m.at('climax').fail('apogée attendue');
+  const actors = m.at('actors').items().map(parseActor);
+  const def: MomentDef = {
+    id: m.at('id').string(),
+    tier: tier(m),
+    name: m.at('name').string(),
+    mode,
+    quest,
+    questStep: optString(m, 'questStep'),
+    anchor: m.at('anchor').string(),
+    weight: m.at('weight').integer(0),
+    maxPerSeason: max === null || max.isNull() ? null : max.integer(1),
+    availableWhen: conditions(m.opt('availableWhen'), 'game_start'),
+    present,
+    window,
+    watch: watch(m.at('watch')),
+    questWatch: questWatch === null || questWatch.isNull() ? null : watch(questWatch),
+    actors,
+    climax,
+    after:
+      after === null || after.isNull()
+        ? null
+        : {
+            actors: Object.fromEntries(
+              (after.opt('actors')?.entries() ?? []).map(([k, v]) => [k, { at: optString(v, 'at'), idle: optString(v, 'idle') }]),
+            ),
+          },
+    leave: choreography(m.opt('leave')),
+    sounds: {
+      idle: (m.opt('sounds')?.opt('idle')?.items() ?? []).map((s) => ({
+        id: s.at('id').string(),
+        everySeconds: pair(s.at('everySeconds')),
+        range: s.at('range').number(),
+      })),
+    },
+    texts: { hint: optString(texts, 'hint'), climax: texts.at('climax').string(), memory: texts.at('memory').string() },
+    hintFrom: optString(m, 'hintFrom'),
+    reward: { heart: optNumber(reward, 'heart', 0), money: optNumber(reward, 'money', 0) },
+    effects: effects(m.opt('effects')),
+    render: m.has('render') && m.at('render').isObject() ? (m.at('render').value as Record<string, unknown>) : {},
+  };
+  for (const w of [def.watch, def.questWatch]) {
+    if (w !== null && w.target !== 'anchor' && !actors.some((a) => a.id === w.target)) {
+      m.at('watch').fail(`cible « ${w.target} »: ni « anchor » ni un acteur du moment`);
+    }
+  }
+  return def;
+}
+
+function parseMoments(r: Reader): MomentDef[] {
+  const seen = new Set<string>();
+  return r
+    .at('moments')
+    .items()
+    .map((m) => {
+      const def = parseMoment(m);
+      if (seen.has(def.id)) m.at('id').fail(`moment en double « ${def.id} »`);
+      seen.add(def.id);
+      return def;
     });
 }
 
@@ -842,6 +1103,49 @@ function parseBenches(r: Reader | null): Settings['benches'] {
   };
 }
 
+/** Moments rares (`reglages.moments`): chaque clé absente garde sa valeur de `defauts.ts`. */
+function parseMomentSettings(r: Reader | null): Settings['moments'] {
+  const d = DEFAULT_MOMENTS;
+  if (r === null) return { ...d, tiers: [...d.tiers] };
+  const first = r.opt('firstHint');
+  const tiers = r.opt('tiers');
+  const chance = optNumber(r, 'dailyChance', d.dailyChance);
+  if (chance < 0 || chance > 1) r.at('dailyChance').fail('probabilité de 0 à 1 attendue');
+  return {
+    dailyChance: chance,
+    maxPerDay: r.has('maxPerDay') ? r.at('maxPerDay').integer(0, 1) : d.maxPerDay,
+    cooldownDays: r.has('cooldownDays') ? r.at('cooldownDays').integer(1) : d.cooldownDays,
+    firstAmbientDay: r.has('firstAmbientDay') ? r.at('firstAmbientDay').integer(1) : d.firstAmbientDay,
+    noAmbientOnTrainDays: optBoolean(r, 'noAmbientOnTrainDays', d.noAmbientOnTrainDays),
+    stillSpeed: optNumber(r, 'stillSpeed', d.stillSpeed),
+    noticeRadius: optNumber(r, 'noticeRadius', d.noticeRadius),
+    heartBonus: optNumber(r, 'heartBonus', d.heartBonus),
+    musicDuckDb: optNumber(r, 'musicDuckDb', d.musicDuckDb),
+    musicDuckInSeconds: optNumber(r, 'musicDuckInSeconds', d.musicDuckInSeconds),
+    musicDuckOutSeconds: optNumber(r, 'musicDuckOutSeconds', d.musicDuckOutSeconds),
+    firstHint: first === null ? d.firstHint : first.oneOf(CHARACTERS),
+    maxSyncGapSeconds: optNumber(r, 'maxSyncGapSeconds', d.maxSyncGapSeconds),
+    holdRange: optNumber(r, 'holdRange', d.holdRange),
+    tiers: tiers === null ? [...d.tiers] : tiers.items().map((t) => t.oneOf(TIERS)),
+  };
+}
+
+/** Informations propres (`reglages.secrets`): chaque clé absente garde sa valeur de `defauts.ts`. */
+function parseSecretSettings(r: Reader | null): Settings['secrets'] {
+  const d = DEFAULT_SECRETS;
+  if (r === null) return { ...d };
+  const first = r.opt('firstInformed');
+  return {
+    firstInformed: first === null ? d.firstInformed : first.oneOf(CHARACTERS),
+    nudgeAfterErrors: r.has('nudgeAfterErrors') ? r.at('nudgeAfterErrors').integer(1) : d.nudgeAfterErrors,
+    firstTryHeart: optNumber(r, 'firstTryHeart', d.firstTryHeart),
+    henChoiceRange: optNumber(r, 'henChoiceRange', d.henChoiceRange),
+    henChoiceKeepOpen: optNumber(r, 'henChoiceKeepOpen', d.henChoiceKeepOpen),
+    hideFromGuestSnapshot: optBoolean(r, 'hideFromGuestSnapshot', d.hideFromGuestSnapshot),
+    knownHensFlag: optString(r, 'knownHensFlag') ?? d.knownHensFlag,
+  };
+}
+
 function parseFishing(r: Reader | null): Settings['fishing'] {
   if (r === null) return null;
   const wait = r.at('biteWaitSeconds').numberList();
@@ -972,6 +1276,8 @@ function parseSettings(r: Reader): Settings {
     envies: { noRepeatWindowDays: r.has('envies') && r.at('envies').has('noRepeatWindowDays') ? r.at('envies').at('noRepeatWindowDays').integer(1) : 7 },
     fishing: parseFishing(r.opt('fishing')),
     benches: parseBenches(r.opt('benches')),
+    moments: parseMomentSettings(r.opt('moments')),
+    secrets: parseSecretSettings(r.opt('secrets')),
     feel: parseFeel(r.opt('feel')),
   };
 }
@@ -1030,6 +1336,9 @@ function checkReferences(content: Content): void {
         case 'spawn_animals':
           if (!(e.animal in content.animals)) fail(`${where}: bête inconnue « ${e.animal} »`);
           break;
+        case 'reveal_secret':
+          if ((content.quests.find((q) => q.id === e.quest)?.secret ?? null) === null) fail(`${where}: quête sans secret « ${e.quest} »`);
+          break;
         case 'give_money':
         case 'set_flag':
         case 'set_need':
@@ -1051,6 +1360,25 @@ function checkReferences(content: Content): void {
   }
   for (const dialogue of Object.values(content.dialogues)) {
     walkEffects(dialogue.effects, `habitants.json: ${dialogue.id}`);
+    for (const choice of dialogue.choices) {
+      walkEffects(choice.effects, `habitants.json: ${dialogue.id}.${choice.id}`);
+      walkEffects(choice.effectsWrong, `habitants.json: ${dialogue.id}.${choice.id}`);
+    }
+  }
+  for (const quest of content.quests) {
+    const nudge = quest.secret?.nudge ?? null;
+    if (nudge !== null && !(nudge in content.texts.messages)) fail(`quetes.json: ${quest.id}: message inconnu « ${nudge} »`);
+  }
+  for (const m of content.moments) {
+    const where = `moments.json: ${m.id}`;
+    if (m.quest !== null && !questIds.has(m.quest)) fail(`${where}: quête inconnue « ${m.quest} »`);
+    const steps = content.quests.find((q) => q.id === m.quest)?.steps ?? [];
+    if (m.questStep !== null && !steps.some((s) => s.id === m.questStep)) fail(`${where}: étape inconnue « ${m.questStep} »`);
+    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory]) {
+      if (key !== null && !(key in content.texts.messages)) fail(`${where}: message inconnu « ${key} »`);
+    }
+    if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);
+    walkEffects(m.effects, where);
   }
 }
 
@@ -1093,6 +1421,7 @@ export function loadContent(files: RawContentFiles): Content {
     envies: envieData.envies,
     sharedEnvieSchedule: envieData.schedule,
     texts: parseTexts(textes),
+    moments: files.moments === undefined ? [] : parseMoments(root('moments.json', files.moments)),
   };
   checkReferences(content);
   return content;

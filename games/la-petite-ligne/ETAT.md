@@ -174,6 +174,43 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-10-31, gauntlet tour 6: moments rares et informations propres (R16), simulation (dev gameplay 3D)
+
+Conception: `docs/jeux/jeu-1/tour-06-conception.md`, sections 1 à 4, P0. Côté simulation et données seulement; rendu des chorégraphies et écrans au tour suivant.
+
+- Données: `donnees/moments.json` (héron, oies, échelle de Basile, mésanges, renard, vers luisants; chorégraphies en images clés `[t, x, y, z, clip]`), blocs `reglages.moments` et `reglages.secrets` (valeurs par défaut dans `src/donnees/defauts.ts`), quête nouvelle `hen_names`, `lucie_note` refaite (`receive`, `give`, `tell_jeanne`), `heron_watch`, `wild_geese` et `basile_lost` finies par `moment_seen`, Basile au point `nest_oak_basile`, dialogues et textes de la section 3. README des données: sections 2.10 et 4.1, conditions et effets nouveaux.
+- Simulation: `src/simulation/moments.ts` (tirage du matin par empreinte de la graine et du jour, sans le générateur; règle des 7 jours; phases `absent`, `waiting`, `climax`, `after`, `left`, `gone`; apogée quand les deux remplissent `watch` d'affilée; geste « tenir »; confidence du matin à un seul joueur en alternance; timidité et collision des bêtes), `src/simulation/secrets.ts` (rôles informé et autre, révélation, coup de coude, premier coup, appel des poules). Géométrie et lecture partagées avec le rendu et l'interface: `src/etat/moments.ts` (pose d'un acteur à chaque instant, Catmull-Rom), `src/etat/secrets.ts` (fiche secrète, objectif selon le rôle, étiquette d'une poule pour un joueur).
+- Conditions: `moment_seen`, `secret_role`, `hens_named`, `choice_made`, `looked_at` étendu (`minDistance`, `still`), `who` à `informed` et `doer`. Effets: `reveal_secret`, `give_item` vers un rôle, `spawn_animals` avec `shuffleVariantsBy`. Choix de dialogue à bonne et mauvaise réponse (`correct`, `replyWrong`, `effects`, `effectsWrong`), rejouables aussitôt.
+- État (`DATA_SCHEMA` 3, migration testée): `world.moments` (`today`, `history`, `hintTurn`), `world.secrets` (`turn`, `entries`), `characters[i].momentHint`, `characters[i].holding`, `hens[i].nameKnownBy` et `namedBy`, `heartToday.moment` et `firstTry`. Une sauvegarde du format 2 garde les noms des poules visibles chez les deux (drapeau `hen_names_known`: la quête des noms ne démarre pas pour elles), et « Le mot de Lucie » en cours garde son avancement (l'étape gagne un cran, l'informé est celui qui a la lettre). Références `format-3-*.json` ajoutées.
+- Carte: points et accroches de la section 1.6 par `outils/construire_carte_halte.py` (le nichoir, le chicot et le pieu sont dans `accroches`, sans emprise au sol, pour ne pas devenir des substituts posés par terre).
+- Interface, affichage minimal: objectif selon le rôle et fiche secrète au carnet (`QuestModel.secret`), seulement chez celui qui peut la lire; la confidence du matin et les messages de l'apogée arrivent en notification chez leur destinataire. L'appel d'une poule ouvre une conversation à choix (`dialogue: 'hen_call'`, sans habitant) que l'écran de dialogue existant affiche déjà.
+- Robots: ils vont voir chaque moment (places de spectateurs calculées dans l'anneau, pose demandée, attente dehors pour les moments du soir), tiennent l'échelle, transmettent les secrets en lisant leur propre écran (`secrets: 'voice'`) ou devinent (`secrets: 'deaf'`). Les 8 graines de l'endurance finissent la démo, moments de quête et quêtes secrètes compris, sans une erreur; les tirages rejouent exactement l'annexe A du script.
+
+### Demandes au rendu (tour suivant)
+
+1. Lecteur de chorégraphies: `world.moments.today` (`id`, `phase`, `elapsed` en secondes de simulation, `startTick`, `paused`, `shyUntil`) et `actorPose(map, def, today, actorId)` de `src/etat/moments.ts` (position, `clip`, `clipSince`, `opacity`); définitions dans `content.moments` (`actors`, `climax`, `after`, `leave`, `formation` des oies, `render` des vers luisants). Pendant l'apogée de l'échelle, l'acteur `basile` remplace le dessin de l'habitant Basile; `lookers` tournent la tête.
+2. Modèles attendus (artiste 3D, `faune.glb`): `heron`, `goose`, `ladder_wood`, `nest_box`, `oak_branch_stub`, `blue_tit`, `moss_tuft`, `fox`; le nichoir est penché de 25° tant que le drapeau `nest_box_straight` n'est pas posé; accroches dans `map` (section `accroches` de `halte.json`, pas encore lue par `carte-niveau.ts`).
+3. Geste « tenir »: `characters[i].holding` (point de la carte), clip `hold_ladder`; événements `hold_started`, `hold_released`.
+4. Étiquettes des poules: `henLabel(world, content, hen, local)` et `henNameVisible` de `src/etat/secrets.ts` (l'informé les voit dès sa fiche, l'autre seulement après un bon nom).
+
+### Demandes à l'interface (tour suivant)
+
+1. Ligne d'observation et anneau sous l'horloge: `today.watching[local]`, l'autre, `today.watchTicks / (watch.holdSeconds x 30)` (`activeWatch(def, today)` de `src/etat/moments.ts`), `today.early` (`geese_not_yet`); textes `moment_watch_self`, `moment_watch_partner`.
+2. Confidence au petit-déjeuner et au carnet (ligne « Aujourd'hui », `ui.momentHint`): `characters[local].momentHint`.
+3. Fiche secrète (`ui.secretCard`, « Rien que pour toi »): `QuestModel.secret` est déjà rempli; l'affichage actuel est une simple liste sous l'objectif.
+4. Onglet Souvenirs (P1): `world.moments.history` et `texts.memory`.
+
+### Demandes au son
+
+Événements `moment_waiting`, `moment_climax`, `moment_paused`, `moment_resumed`, `moment_left`, `hold_started`, `hen_called` (`correct`), `dialogue_choice`; sons datés de chaque chorégraphie dans `content.moments[i].climax.sounds` et sons d'attente dans `sounds.idle`. Les cas sont déjà listés sans son dans `src/audio/declencheurs.ts`.
+
+### Connu, à trancher
+
+- M-02 (« 3 s à moins de `watch.radius` des deux, depuis les positions extrêmes »): mesuré sur chaque case libre de l'anneau, le héron et les oies ne restent que 1,1 s depuis le bord opposé à leur envol, le renard 2,3 s depuis le sud de la maisonnette (`tests/moments.test.ts`, `M02_GAPS`). Depuis la berge nord, le héron reste 3,05 s chez les deux. Question au game designer: rayon plus petit, place de vue imposée, ou chorégraphie plus lente au départ.
+- L'instantané de l'invité contient encore `world.secrets` (variante comprise): la conception l'accepte pour la démo (`secrets.hideFromGuestSnapshot`, P1, pas lu).
+- Taille de l'état: le plus gros état transmis passe d'environ 32 à 33,3 Kio (8 graines); l'alerte de `tests/endurance.test.ts` est relevée de 32 à 34 Kio (plafond dur de 64 Kio inchangé). Les compteurs de choix ne sont tenus que pour les clés que les données lisent. Piste pour l'architecte: `countersAtDawn` recopie tous les compteurs (3,5 Kio).
+- `testTimeout` du jeu passé de 120 à 300 s: sous charge (machine partagée), une démo entière dépassait 120 s (14 à 25 s seule).
+
 ## 2026-10-31, gauntlet tour 6: s'asseoir sur les bancs par choix (dev gameplay 3D)
 
 - Simulation (`src/simulation/bancs.ts`, géométrie commune avec le rendu dans `src/etat/bancs.ts`): Espace près d'une place libre (`reglages.benches.sitRange`, 1,4 m) assoit, au pas même, au milieu de l'assise, tourné comme le banc; toute direction relève devant la place (`standForward`, 0,85 m, case libre vérifiée) puis marche au même pas. État: `characters[i].seat` (`bench`, `slot`, `since`), absent des sauvegardes d'avant (repris debout, aucune migration: `DATA_SCHEMA` inchangé). Deux places par banc (`benches.slots`); un habitant arrêté au banc de son emploi du temps (Jeanne au quai le matin) tient la place libre la plus proche, après les joueurs (`BenchSeating`): même calcul pour la simulation et le rendu, jamais deux corps sur une place.

@@ -89,6 +89,32 @@
   "hints": { "durationSeconds": 6, "oncePerPlayer": true, "maxVisible": 1 },
   "absence": { "tier": "P1", "minutes": 3 },
   "benches": { "slots": [-0.5, 0.5], "seatForward": 0, "standForward": 0.85, "sitRange": 1.4, "villagerReach": 0.8 },
+  "moments": {
+    "dailyChance": 0.5,
+    "maxPerDay": 1,
+    "cooldownDays": 7,
+    "firstAmbientDay": 2,
+    "noAmbientOnTrainDays": true,
+    "stillSpeed": 0.05,
+    "noticeRadius": 12,
+    "heartBonus": 10,
+    "musicDuckDb": -6,
+    "musicDuckInSeconds": 0.5,
+    "musicDuckOutSeconds": 2.0,
+    "firstHint": "p2",
+    "maxSyncGapSeconds": 0.5,
+    "holdRange": 1.2,
+    "tiers": ["P0"]
+  },
+  "secrets": {
+    "firstInformed": "p1",
+    "nudgeAfterErrors": 2,
+    "firstTryHeart": 5,
+    "henChoiceRange": 1.5,
+    "henChoiceKeepOpen": 3.0,
+    "hideFromGuestSnapshot": false,
+    "knownHensFlag": "hen_names_known"
+  },
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": { "tier": "P1", "castRange": 6, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
   "feel": { "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 } }

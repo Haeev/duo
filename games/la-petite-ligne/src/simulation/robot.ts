@@ -19,7 +19,13 @@ import { catalogueWindow, currentOrder } from '../donnees/commandes';
 import { holdsRod, waterAhead } from './peche';
 import { counterRemaining } from './conditions';
 import { freeSeatsNear, seatedSeconds } from './bancs';
-import type { Condition } from '../donnees/types';
+import type { Condition, MomentWatch } from '../donnees/types';
+import { benchById } from '../etat/bancs';
+import { momentDef, watchTarget } from '../etat/moments';
+import { HEN_NAMES_QUEST, henLabel, secretCards } from '../etat/secrets';
+import { LOOK_CONE } from './conditions';
+import { activeWatch } from '../etat/moments';
+import { HEN_CALL_DIALOGUE } from './secrets';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -674,6 +680,16 @@ function sitAt(sim: Sim, c: Character, m: Memory, pointId: string, at: Vec2, out
   return goAct(sim, c, m, `banc:${pointId}`, ground(seat.pos), seat.pos, sim.content.settings.benches.sitRange - 0.1, out);
 }
 
+/** Assis pour un moment du jour (les oies de la quête, sur le banc de la berge) ? */
+function momentSeat(sim: Sim, c: Character): boolean {
+  const today = sim.world.moments.today;
+  const def = today === null ? null : momentDef(sim.content, today.id);
+  if (today === null || def === null || c.seat === null) return false;
+  if (today.phase !== 'waiting' && today.phase !== 'absent' && today.phase !== 'climax') return false;
+  const w = activeWatch(def, today);
+  return w.seated && c.seat.bench === w.bench;
+}
+
 /** Un rendez-vous assis est-il ouvert pour ce point de banc ? (sinon le robot assis par hasard se relève) */
 function wantsSeat(sim: Sim, c: Character): boolean {
   const seat = c.seat;
@@ -862,10 +878,213 @@ function lastDay(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 export interface RobotOptions {
   /** Résoudre l'énigme d'Émile (faux: vérifier qu'elle ne bloque jamais la fin, D-08). */
   riddle?: boolean;
+  /**
+   * Quêtes à secret (R16): `voice` (par défaut), l'informé lit son propre écran (fiche secrète,
+   * étiquettes des poules) et le « dit » à l'autre; `deaf`, ils ne se parlent pas: l'autre devine.
+   */
+  secrets?: 'voice' | 'deaf';
+  /** Aller voir les moments d'ambiance (les moments de quête, toujours). */
+  ambientMoments?: boolean;
+}
+
+/** Ce que l'informé a « dit » à l'autre (robot à voix): le nom de chaque poule, la réponse de Firmin. */
+interface Told {
+  hens: Record<string, string>;
+  lucie: number | null;
+}
+
+/** Ce que l'autre a déjà essayé (robot sourd): noms par poule, réponses à Jeanne. */
+interface Tried {
+  hens: Record<string, string[]>;
+  lucie: string[];
+}
+
+/** Les moments de la journée que le robot va voir: heure d'arrivée avant la fenêtre (minutes de jeu). */
+const MOMENT_LEAD_MINUTES = 30;
+const LUCIE_QUEST = 'lucie_note';
+const LUCIE_QUIZ = 'jeanne_lucie_quiz';
+
+function angleTo(c: Character, at: Vec2): number {
+  let diff = Math.abs(Math.atan2(at.y - c.pos.y, at.x - c.pos.x) - c.facing) % (2 * Math.PI);
+  if (diff > Math.PI) diff = 2 * Math.PI - diff;
+  return diff;
+}
+
+/** Deux places de spectateurs (cases libres atteignables) dans l'anneau du moment, l'une près de l'autre. */
+function watchSpots(sim: Sim, w: MomentWatch, target: Vec2, from: Vec2): { p1: Vec2; p2: Vec2 } | null {
+  const b = refreshBlockers(sim);
+  const lo = w.minRadius + 0.4;
+  const hi = Math.max(lo, w.radius - 0.8);
+  const cells: Vec2[] = [];
+  const r = Math.ceil(w.radius);
+  for (let cy = Math.floor(target.y) - r; cy <= Math.floor(target.y) + r; cy++) {
+    for (let cx = Math.floor(target.x) - r; cx <= Math.floor(target.x) + r; cx++) {
+      const centre = { x: cx + 0.5, y: cy + 0.5 };
+      const d = distance(centre, target);
+      if (d < lo || d > hi || isBlockedCell(b, cx, cy)) continue;
+      if (sim.map.house.room.x <= cx && cx < sim.map.house.room.x + sim.map.house.room.w && sim.map.house.room.y <= cy && cy < sim.map.house.room.y + sim.map.house.room.h) continue;
+      cells.push(centre);
+    }
+  }
+  cells.sort((a, c) => distance(a, from) - distance(c, from));
+  for (const first of cells) {
+    if (findPath(b, from, first) === null) continue;
+    const second = cells
+      .filter((x) => distance(x, first) >= 1 && findPath(b, first, x) !== null)
+      .sort((a, c) => distance(a, first) - distance(c, first))[0];
+    if (second !== undefined) return { p1: first, p2: second };
+  }
+  return null;
 }
 
 export function createRobot(options: RobotOptions = {}): Robot {
   const solveRiddle = options.riddle ?? true;
+  const voice = (options.secrets ?? 'voice') === 'voice';
+  const ambient = options.ambientMoments ?? true;
+  const told: Told = { hens: {}, lucie: null };
+  const tried: Tried = { hens: {}, lucie: [] };
+  const spots: Record<string, { p1: Vec2; p2: Vec2 } | null> = {};
+
+  /** L'informé lit son écran (étiquettes des poules, fiche secrète) et le dit à l'autre. */
+  function speak(sim: Sim): void {
+    if (!voice) return;
+    for (const entry of sim.world.secrets.entries) {
+      const me = entry.informed;
+      if (!entry.revealed || sim.world.quests.some((q) => q.id === entry.quest && q.status === 'done')) continue;
+      if (entry.quest === HEN_NAMES_QUEST) {
+        for (const hen of sim.world.hens) told.hens[hen.id] = henLabel(sim.world, sim.content, hen, me);
+      }
+      if (entry.quest === LUCIE_QUEST && told.lucie === null) {
+        const card = secretCards(sim.world, sim.content, me).find((k) => k.quest === LUCIE_QUEST);
+        const lines = sim.content.quests.find((q) => q.id === LUCIE_QUEST)?.secret?.card.lines ?? [];
+        const index = card === undefined ? -1 : lines.findIndex((l) => (Array.isArray(l) ? l.join(' ') : l) === card.lines.join(' '));
+        if (index >= 0) told.lucie = index;
+      }
+    }
+  }
+
+  /**
+   * Aller voir le moment du jour et prendre la pose demandée (immobile et tourné, assis sur le
+   * banc, ou tenant l'échelle), puis ne plus bouger jusqu'à l'apogée et pendant elle.
+   */
+  function watchMoment(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
+    const today = sim.world.moments.today;
+    if (today === null) return false;
+    const def = momentDef(sim.content, today.id);
+    if (def === null) return false;
+    if (today.origin === 'ambient' && !ambient) return false;
+    const minutes = sim.world.clock.minutes;
+    if (today.phase === 'climax') {
+      m.job = `apogée: ${def.id}`;
+      return c.holding !== null || c.seat !== null || distance(c.pos, watchTarget(sim.map, def, 'anchor', today)) <= def.watch.radius + 2;
+    }
+    // Un moment du soir (vers luisants): on reste dehors au lieu de rentrer à 19 h.
+    const lead = def.present.from >= GO_HOME_AT ? Math.max(MOMENT_LEAD_MINUTES, def.window.from - GO_HOME_AT) : MOMENT_LEAD_MINUTES;
+    const soon = today.phase === 'waiting' || (today.phase === 'absent' && minutes >= def.present.from - lead && minutes < def.present.to);
+    if (!soon || minutes < def.window.from - lead || minutes >= def.window.to) return false;
+    if (today.origin === 'quest') {
+      const state = sim.world.quests.find((q) => q.id === def.quest);
+      if (state?.status !== 'active') return false;
+      const step = sim.content.quests.find((q) => q.id === def.quest)?.steps[state.step]?.id;
+      if (def.questStep !== null && step !== def.questStep) return false;
+    }
+    const w = activeWatch(def, today);
+    m.job = `moment: ${def.id}`;
+    if (w.hold !== null) {
+      const place = w.hold[c.id === 'p1' ? 0 : 1] ?? w.hold[0];
+      const at = place === undefined ? undefined : sim.map.points[place];
+      if (place === undefined || at === undefined) return false;
+      if (c.holding === place) return true;
+      // La place se prend à portée (`moments.holdRange`): le trajet s'arrête au centre d'une case voisine.
+      if (distance(c.pos, at) > sim.content.settings.moments.holdRange - 0.2) return goTo(sim, c, m, `tenir:${place}`, at, 0.3, out) || true;
+      out.push({ type: 'act' });
+      m.waitUntil = sim.world.tick + 2;
+      return true;
+    }
+    if (w.seated && w.bench !== null) {
+      if (c.seat?.bench === w.bench) return true;
+      const prop = benchById(sim.map, w.bench);
+      if (prop === null) return false;
+      const seat = freeSeatsNear(sim, prop.pos, 1.5).find((s) => s.bench === w.bench);
+      if (seat === undefined) return goTo(sim, c, m, `banc:${w.bench}`, prop.pos, 2, out) || true;
+      return goAct(sim, c, m, `banc:${w.bench}`, ground(seat.pos), seat.pos, sim.content.settings.benches.sitRange - 0.1, out) || true;
+    }
+    const target = watchTarget(sim.map, def, w.target, today);
+    const key = `${def.id}:${String(today.day)}`;
+    if (!(key in spots)) spots[key] = watchSpots(sim, w, target, character(sim, 'p1').pos);
+    const spot = spots[key]?.[c.id];
+    if (spot === undefined) return false;
+    if (distance(c.pos, spot) > 0.35) return goTo(sim, c, m, `regarder:${def.id}`, spot, 0.3, out) || true;
+    if (w.facing && angleTo(c, target) > LOOK_CONE * 0.8) {
+      // Un pas minuscule vers la bête suffit à se tourner vers elle.
+      const d = Math.max(1e-6, distance(c.pos, target));
+      f.mx = ((target.x - c.pos.x) / d) * 0.2;
+      f.my = ((target.y - c.pos.y) / d) * 0.2;
+    }
+    return true;
+  }
+
+  /** Les noms des poules: l'autre appelle chaque poule; « Le mot de Lucie »: l'autre répond à Jeanne. */
+  function secretQuests(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
+    for (const entry of sim.world.secrets.entries) {
+      if (entry.doer !== c.id) continue;
+      if (entry.quest === HEN_NAMES_QUEST && questStep(sim, HEN_NAMES_QUEST) === 'call') {
+        const hen = sim.world.hens.filter((h) => h.namedBy === null).sort((a, b) => distance(c.pos, a.pos) - distance(c.pos, b.pos))[0];
+        if (hen === undefined) return false;
+        if (voice && told.hens[hen.id] === undefined) {
+          m.job = 'attendre les noms des poules';
+          return false;
+        }
+        m.job = 'appeler une poule';
+        if (distance(c.pos, hen.pos) > 1.0) return goTo(sim, c, m, `poule:${hen.id}`, hen.pos, 0.8, out) || true;
+        if (angleTo(c, hen.pos) > Math.PI / 4) {
+          const d = Math.max(1e-6, distance(c.pos, hen.pos));
+          f.mx = ((hen.pos.x - c.pos.x) / d) * 0.2;
+          f.my = ((hen.pos.y - c.pos.y) / d) * 0.2;
+          return true;
+        }
+        out.push({ type: 'act' });
+        m.waitUntil = sim.world.tick + 3;
+        return true;
+      }
+      if (entry.quest === LUCIE_QUEST && questStep(sim, LUCIE_QUEST) === 'tell_jeanne') {
+        if (voice && told.lucie === null) {
+          m.job = 'attendre la réponse de Firmin';
+          return false;
+        }
+        const jeanne = sim.world.villagers.find((v) => v.id === 'jeanne');
+        if (!jeanne?.visible) return false;
+        m.job = 'raconter à Jeanne';
+        return goAct(sim, c, m, 'parler:jeanne:lucie', { kind: 'villager', villager: 'jeanne' }, jeanne.pos, sim.content.settings.ranges.talk - 0.5, out);
+      }
+    }
+    return false;
+  }
+
+  /** Le choix d'un robot dans un dialogue à secret: ce qu'on lui a dit, sinon ce qu'il n'a pas encore essayé. */
+  function secretChoice(sim: Sim, c: Character): string | null {
+    const d = c.dialogue;
+    if (d === null) return null;
+    if (d.dialogue === HEN_CALL_DIALOGUE) {
+      const name = told.hens[d.villager];
+      const known = name === undefined ? undefined : d.choices.find((ch) => ch.text === name);
+      if (known !== undefined) return known.id;
+      const used = new Set(sim.world.hens.filter((h) => h.namedBy !== null).map((h) => h.name));
+      const tries = (tried.hens[d.villager] ??= []);
+      const guess = d.choices.find((ch) => ch.id.startsWith('name:') && !used.has(ch.text) && !tries.includes(ch.id));
+      if (guess === undefined) return null;
+      tries.push(guess.id);
+      return guess.id;
+    }
+    if (d.dialogue === LUCIE_QUIZ) {
+      if (told.lucie !== null) return `reply_${String(told.lucie)}`;
+      const guess = d.choices.find((ch) => !tried.lucie.includes(ch.id));
+      if (guess === undefined) return null;
+      tried.lucie.push(guess.id);
+      return guess.id;
+    }
+    return null;
+  }
   const memory: Record<CharacterId, Memory> = {
     p1: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '', lastIntent: 0 },
     p2: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '', lastIntent: 0 },
@@ -905,7 +1124,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       const d = c.dialogue;
       if (d !== null && d.line >= d.lines.length - 1 && d.choices.length > 0) {
         const give = d.choices.find((ch) => ch.id.startsWith('give:'));
-        out.push({ type: 'dialogue_choice', choice: (give ?? d.choices[0])?.id ?? '' });
+        out.push({ type: 'dialogue_choice', choice: secretChoice(sim, c) ?? (give ?? d.choices[0])?.id ?? '' });
       } else {
         out.push({ type: 'dialogue_next' });
       }
@@ -922,7 +1141,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
     }
     if (busy(sim, c) || w.tick < m.waitUntil) return frame(m);
     // Assis sans rendez-vous assis (Espace près d'un banc pour autre chose): un pas le relève.
-    if (c.seat !== null && !wantsSeat(sim, c)) {
+    if (c.seat !== null && !wantsSeat(sim, c) && !momentSeat(sim, c)) {
       m.job = 'se lever du banc';
       return frame(m, 0, 1);
     }
@@ -938,7 +1157,9 @@ export function createRobot(options: RobotOptions = {}): Robot {
       (solveRiddle && riddle(sim, c, m, out)) ||
       (solveRiddle && riddle2(sim, c, m, out)) ||
       handcarTry(sim, c, m, out) ||
+      watchMoment(sim, c, m, f, out) ||
       evening(sim, c, m, out) ||
+      secretQuests(sim, c, m, f, out) ||
       social(sim, c, m, out) ||
       giveOdette(sim, c, m, out) ||
       order(sim, c, m, out) ||
@@ -963,6 +1184,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
     decide(sim) {
       const controls: Partial<Record<CharacterId, ControlFrame>> = {};
       const intents: AuthoredIntent[] = [];
+      speak(sim);
       for (const c of sim.world.characters) {
         const out: Intent[] = [];
         controls[c.id] = decideOne(sim, c, out);

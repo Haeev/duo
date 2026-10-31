@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { restoreWorld, SaveError, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { hashState as hash } from '@duo/sdk/sim';
-import { SIM_HZ } from '../src/simulation/constantes';
+import { DATA_SCHEMA, SIM_HZ } from '../src/simulation/constantes';
 import { contentAndMap, createRobot, newSim, play } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
@@ -98,7 +98,7 @@ describe('sauvegarde', () => {
     play(restored, createRobot(), (s) => s.world.phase === 'ended', MAX_TICKS);
     expect(w.clock.day).toBe(15);
     expect(w.orderHistory.map((o) => o.complete)).toEqual([true, true]);
-    expect(snapshotOf(restored).dataSchema).toBe(2);
+    expect(snapshotOf(restored).dataSchema).toBe(DATA_SCHEMA);
   });
 
   it('reprend une sauvegarde de l’ancienne version en cours de semaine 1, et la fin vient au jour 15', () => {

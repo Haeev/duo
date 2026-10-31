@@ -77,6 +77,9 @@ Ce que le rendu trouve dans l'état:
 | Heure, jour, météo, lumière | `clock.day/minutes`, `weather` |
 | Ombre de la cloche (énigme) | `clock.minutes` entre 17 h et 17 h 30 et `weather === 'sunny'` |
 | Remise ouverte | `worldStates.handcar_shed === 'open'` |
+| Moment rare du jour (tour 6) | `moments.today` (`id`, `phase`, `elapsed`, `paused`, `shyUntil`); pose de chaque bête: `actorPose(map, def, today, acteur)` de `etat/moments.ts`, définitions dans `content.moments` |
+| Geste « tenir » (l'échelle) | `characters[i].holding` (point de la carte) |
+| Noms des poules (R16) | `hens[i].nameKnownBy`; ce que lit un joueur: `henLabel(world, content, hen, local)` de `etat/secrets.ts` (jamais le nom chez l'autre avant le bon appel) |
 
 ## Agir (interface, rendu)
 
@@ -109,6 +112,8 @@ Un seul flux, le même chez l'hôte et chez l'invité: `view.onEvent((event) => 
 | repère (carillon chez les deux) | `pin` (`by`, `pos`); l'épingle est dans `characters[i].pin` |
 | absence | `absence` (`who`, `absent`); `characters[i].absent`, `clock.stoppedBy === 'absence'` |
 | pêche | `cast` (lancer, « plouf »), `bite` (touche, « ploc »), `caught` (`item`), `escaped`; la ligne est dans `characters[i].fishing` |
+| moments rares (tour 6) | `moment_waiting`, `moment_climax` (`startTick`: chaque machine joue la chorégraphie depuis ce pas), `moment_paused`, `moment_resumed`, `moment_left`; sons datés dans `content.moments[i].climax.sounds` |
+| échelle, poules, choix justes | `hold_started`, `hold_released`, `hen_called` (`correct`), `dialogue_choice` (`correct`), `secret_revealed` |
 
 Musique et ambiance se lisent dans l'état: `clock.minutes`, `clock.veillee`, `phase`, `weather`, `characters[local].inHouse`.
 

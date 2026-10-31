@@ -14,6 +14,8 @@ Règles:
 | `format-1-fin-de-la-demo.json` | 1 | démo finie, jour 8 à 16 h | 42 | version d'une semaine (`1e38cea`) |
 | `format-2-fin-semaine-1.json` | 2 | jour 8 à 16 h, commande 1 payée, train parti | 42 | `generer.ts` (`d64237e`) |
 | `format-2-milieu-semaine-2.json` | 2 | mardi, jour 11, midi | 7 | `generer.ts` (`d64237e`) |
+| `format-3-fin-semaine-1.json` | 3 | jour 8 à 16 h, commande 1 payée; moments rares et secrets (tour 6) | 42 | `generer.ts` (tour 6) |
+| `format-3-milieu-semaine-2.json` | 3 | mardi, jour 11, midi; « Le mot de Lucie » fini, les oies à venir | 7 | `generer.ts` (tour 6) |
 
 ## Format en cours
 

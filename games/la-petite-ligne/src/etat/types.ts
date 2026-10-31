@@ -167,6 +167,10 @@ export interface WorldState {
   ending: EndingSummary | null;
   /** Statistiques de la séance pour l'historique de la plateforme. */
   session: SessionStats;
+  /** Moments rares (tour 6): le moment du jour, l'historique, le tour des confidences. */
+  moments: MomentsState;
+  /** Informations propres à un seul joueur (R16): les secrets des quêtes et le tour de l'informé. */
+  secrets: SecretsState;
 }
 
 /**
@@ -283,7 +287,16 @@ export interface Character {
   /** Besoins fixés par un effet pour la prochaine nuit (souper d'Odette), ou `null`. */
   needsSet: { belly: number | null; sleep: number | null; heart: number | null };
   /** Ce qui compte au Cœur aujourd'hui. */
-  heartToday: { envie: boolean; sharedEnvie: boolean; ateTogether: boolean; gesture: boolean };
+  heartToday: {
+    envie: boolean;
+    sharedEnvie: boolean;
+    ateTogether: boolean;
+    gesture: boolean;
+    /** Apogée d'un moment rare vue aujourd'hui (une fois par jour). Absent des sauvegardes d'avant. */
+    moment?: boolean;
+    /** Quête secrète réussie du premier coup aujourd'hui. Absent des sauvegardes d'avant. */
+    firstTry?: boolean;
+  };
   /** Astuces en attente (une seule à la fois à l'écran). */
   hintQueue: HintId[];
   /** Tick de la dernière astuce montrée. */
@@ -311,6 +324,13 @@ export interface Character {
   seat: BenchSeat | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
   fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
+  /**
+   * Confidence du matin (moments rares): où et quand voir le moment du jour, pour ce joueur seul.
+   * Affichée au petit-déjeuner et au carnet jusqu'à l'apogée ou au départ du moment.
+   */
+  momentHint: { moment: string; text: string } | null;
+  /** Geste « tenir » (l'échelle de Basile): la place tenue (point de la carte), ou `null`. Toute direction lâche. */
+  holding: PointId | null;
 }
 
 export type CharacterStatus =
@@ -414,7 +434,11 @@ export type AimVerb =
   | 'give'
   | 'dig'
   /** S'asseoir sur la place libre d'un banc. */
-  | 'sit';
+  | 'sit'
+  /** Tenir l'échelle de Basile (geste « tenir », moment rare). */
+  | 'hold'
+  /** Appeler une poule par son nom (R16, « Les noms des poules »). */
+  | 'call';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -535,6 +559,97 @@ export interface Hen {
   facing: number;
   /** Vers où elle picore (marche lente). */
   wander: Vec2;
+  /** Ceux qui voient son nom au-dessus d'elle (R16, « Les noms des poules »). */
+  nameKnownBy: CharacterId[];
+  /** Qui l'a appelée par son bon nom, ou `null`. */
+  namedBy: CharacterId | null;
+}
+
+// ---------------------------------------------------------------------------
+// Moments rares (tour 6, `moments.json`)
+
+/**
+ * Phases d'un moment: `absent` (rien à l'écran, avant `present.from`), `waiting` (l'animal joue
+ * son attente), `climax` (la chorégraphie de l'apogée, identique chez les deux), `after` (l'état
+ * d'après, jusqu'à `present.to`), `left` (départ discret sans apogée), puis `gone` (fini pour
+ * aujourd'hui).
+ */
+export type MomentPhase = 'absent' | 'waiting' | 'climax' | 'after' | 'left' | 'gone';
+
+export interface MomentToday {
+  id: string;
+  /** Vient d'une quête (il revient chaque jour tant qu'on ne l'a pas vu) ou du tirage du matin. */
+  origin: 'quest' | 'ambient';
+  day: number;
+  phase: MomentPhase;
+  /** Tick d'entrée dans la phase (arrivée, apogée, départ). */
+  phaseTick: number;
+  /** Tick de début de l'apogée (`moment_climax`), ou `null`. */
+  startTick: number | null;
+  /**
+   * Secondes de simulation écoulées dans la chorégraphie en cours (apogée ou départ): le rendu
+   * l'échantillonne avec `etat/moments.ts`. Figée pendant une pause (l'échelle lâchée).
+   */
+  elapsed: number;
+  paused: boolean;
+  /** Pas d'affilée où les conditions de l'apogée tiennent (anneau du HUD: `watchTicks / holdSeconds`). */
+  watchTicks: number;
+  /** Ce joueur remplit sa part (dans le rayon, dans la pose demandée): ligne `moment_watch_*` du HUD. */
+  watching: { p1: boolean; p2: boolean };
+  /** Les deux sont prêts, mais avant la fenêtre de l'apogée (les oies avant 16 h 30). */
+  early: boolean;
+  /** Joueurs qui ont déjà vu `moment_notice` pour ce moment. */
+  noticed: CharacterId[];
+  /** Destinataire de la confidence du matin, ou `null`. */
+  hintTo: CharacterId | null;
+  /** Timidité: l'animal se redresse jusqu'à ce tick (un joueur trop près), 0 au calme. */
+  shyUntil: number;
+}
+
+export interface MomentMemory {
+  id: string;
+  /** Jour de l'occurrence (dernier jour pour une occurrence de quête, jour de l'apogée). */
+  day: number;
+  /** Jour de la semaine (index de `textes.weekdays`), pour le souvenir. */
+  weekday: number;
+  origin: 'quest' | 'ambient';
+  seen: boolean;
+}
+
+export interface MomentsState {
+  today: MomentToday | null;
+  history: MomentMemory[];
+  /** Destinataire de la prochaine confidence du matin. */
+  hintTurn: CharacterId;
+}
+
+// ---------------------------------------------------------------------------
+// Informations propres (R16)
+
+export interface SecretEntry {
+  /** Identifiant du secret (`quetes.json`, `secret.id`). */
+  id: string;
+  quest: QuestId;
+  /** Celui qui sait. */
+  informed: CharacterId;
+  /** Celui qui agit. */
+  doer: CharacterId;
+  /** Variante tirée par la graine (de 0 à `of` - 1). */
+  variant: number;
+  /** Mauvaises réponses de l'autre (jamais affichées, jamais punies). */
+  errors: number;
+  /** La fiche secrète est visible chez l'informé (après `revealOn`). */
+  revealed: boolean;
+  /** Le secret est visible des deux (`reveal_secret`, fin de la quête). */
+  shared: boolean;
+  /** Le coup de coude a été donné à l'informé. */
+  nudged: boolean;
+}
+
+export interface SecretsState {
+  /** Prochain informé. */
+  turn: CharacterId;
+  entries: SecretEntry[];
 }
 
 // ---------------------------------------------------------------------------
@@ -811,4 +926,17 @@ export type WorldEvent =
   | { type: 'bite'; by: CharacterId }
   | { type: 'caught'; by: CharacterId; item: ItemId }
   | { type: 'escaped'; by: CharacterId }
-  | { type: 'absence'; who: CharacterId; absent: boolean };
+  | { type: 'absence'; who: CharacterId; absent: boolean }
+  // Moments rares (tour 6)
+  | { type: 'moment_waiting'; moment: string }
+  /** Apogée: chaque machine joue la chorégraphie depuis `startTick`, dans son temps de simulation. */
+  | { type: 'moment_climax'; moment: string; startTick: number }
+  | { type: 'moment_paused'; moment: string }
+  | { type: 'moment_resumed'; moment: string }
+  | { type: 'moment_left'; moment: string }
+  | { type: 'hold_started'; by: CharacterId; point: PointId }
+  | { type: 'hold_released'; by: CharacterId; point: PointId }
+  // Informations propres (R16)
+  | { type: 'hen_called'; hen: string; name: string; correct: boolean; by: CharacterId }
+  | { type: 'dialogue_choice'; dialogue: DialogueId; choice: string; correct: boolean | null; by: CharacterId }
+  | { type: 'secret_revealed'; quest: QuestId; to: CharacterId | 'both' };

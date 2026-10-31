@@ -3,7 +3,37 @@
  * `feel` dans `reglages.json` remplace chaque valeur une à une; `ranges`
  * complète de même les portées absentes. À reprendre par le game designer.
  */
-import type { BenchSettings, FeelSettings } from './types';
+import type { BenchSettings, FeelSettings, MomentSettings, SecretSettings } from './types';
+
+/** Moments rares (tour 6): valeurs de la conception, section 3.2; `reglages.moments` les remplace. */
+export const DEFAULT_MOMENTS: MomentSettings = {
+  dailyChance: 0.5,
+  maxPerDay: 1,
+  cooldownDays: 7,
+  firstAmbientDay: 2,
+  noAmbientOnTrainDays: true,
+  stillSpeed: 0.05,
+  noticeRadius: 12,
+  heartBonus: 10,
+  musicDuckDb: -6,
+  musicDuckInSeconds: 0.5,
+  musicDuckOutSeconds: 2,
+  firstHint: 'p2',
+  maxSyncGapSeconds: 0.5,
+  holdRange: 1.2,
+  tiers: ['P0'],
+};
+
+/** Informations propres (R16): valeurs de la conception, section 3.2; `reglages.secrets` les remplace. */
+export const DEFAULT_SECRETS: SecretSettings = {
+  firstInformed: 'p1',
+  nudgeAfterErrors: 2,
+  firstTryHeart: 5,
+  henChoiceRange: 1.5,
+  henChoiceKeepOpen: 3,
+  hideFromGuestSnapshot: false,
+  knownHensFlag: 'hen_names_known',
+};
 
 export const DEFAULT_FEEL: FeelSettings = {
   // Durées des gestes simples (s), avant le doublement à endurance nulle.

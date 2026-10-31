@@ -7,6 +7,7 @@ import { currentOrder } from '../donnees/commandes';
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
+import { objectiveTemplate, secretCards, secretVars, type SecretCard } from '../etat/secrets';
 import {
   ACTION_ICONS,
   CATEGORY_ICONS,
@@ -405,16 +406,20 @@ export interface QuestModel {
   /** Progression affichée en puce (« 2 lignes sur 4 », « 3 sur 4 »), ou vide. */
   progress: string;
   lines: ObjectiveLine[];
+  /** Fiche secrète de cette quête (R16), seulement chez celui qui peut la lire; sinon `null`. */
+  secret: SecretCard | null;
 }
 
 function questText(world: ReadonlyWorld, ctx: UiContext, def: QuestDef, step: number, done: boolean): string {
-  const vars = contentVars(ctx.content, world, ctx.texts.orderFormat);
+  // Objectif selon le rôle dans une quête à secret; `{secret}` n'est rempli que chez l'informé.
+  const vars = { ...contentVars(ctx.content, world, ctx.texts.orderFormat), ...secretVars(world, ctx.content, def, ctx.me) };
   const s = def.steps[step];
-  return ctx.t(done || s === undefined ? def.completionText : s.objective, vars);
+  return ctx.t(done || s === undefined ? def.completionText : objectiveTemplate(world, ctx.content, def.id, step, ctx.me), vars);
 }
 
 export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] {
   const order = orderQuest(ctx, world);
+  const cards = secretCards(world, ctx.content, ctx.me);
   const out: QuestModel[] = [];
   for (const state of world.quests) {
     const def = ctx.content.quests.find((q) => q.id === state.id);
@@ -446,6 +451,7 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
       done,
       progress,
       lines,
+      secret: cards.find((k) => k.quest === def.id) ?? null,
     });
   }
   return out;

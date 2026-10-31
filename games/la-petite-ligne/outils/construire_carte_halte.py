@@ -456,6 +456,40 @@ POINTS = [
     p("fishing_ford_north", 21.5, 37.5, "pêche: berge nord, à l'est du gué", peche=True, important=True),
     p("fishing_ford_south", 15.5, 43.5, "pêche: rive sud, à l'ouest du gué", peche=True, important=True),
     p("fishing_pontoon", 45.0, 39.5, "pêche: au bout du ponton", peche=True, important=True),
+    # Moments rares (gauntlet, tour 6, docs/jeux/jeu-1/tour-06-conception.md, section 1.6). Chaque case
+    # citée a été vérifiée sur le terrain; aucun de ces points n'est sur un trajet d'habitant, sauf le banc
+    # de la berge (le carnet perdu, P1), où passe Jeanne: c'est voulu.
+    p("heron_stand", 20.6, 39.6, "moment du héron: il pêche au bord aval du gué, dans la lame d'eau (case `g`), "
+      "là où l'eau basse plonge vers l'eau profonde", moment="heron"),
+    p("heron_rest_far", 29.5, 42.3, "moment du héron: il se pose sur la grève de sable d'en face, à l'écart du "
+      "chemin", moment="heron"),
+    p("geese_rest", 25.5, 40.0, "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de "
+      "lui; on la regarde depuis la berge", moment="geese", portee=4.5),
+    p("nest_box", 52.5, 5.84, "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas "
+      "(`tree_oak_01`), trou à 2,45 m", moment="tits", z=2.40),
+    p("ladder_foot", 51.47, 5.5, "pied de l'échelle de Basile contre la face ouest du chêne", moment="ladder"),
+    p("ladder_hold_north", 51.25, 4.95, "tenir l'échelle, côté nord (tourné vers le sud)", moment="ladder"),
+    p("ladder_hold_south", 51.25, 6.05, "tenir l'échelle, côté sud (tourné vers le nord)", moment="ladder"),
+    p("nest_oak_basile", 51.0, 5.5, "Basile au pied de son échelle, pendant « Où est passé Basile ? »",
+      rotation=1),
+    p("fox_track_west", 0.2, 13.5, "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast",
+      moment="fox", portee=4.0),
+    p("fox_mousing", 7.5, 17.0, "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la "
+      "maisonnette, à 4 m de son mur nord", moment="fox"),
+    p("meadow_glow", 56.5, 29.5, "moment des vers luisants: herbes hautes du pré, à plus de 9 m des lampadaires",
+      moment="glowworms"),
+    p("roe_deer_edge", 49.8, 1.6, "moment de la chevrette (P1): là où le bois descend jusqu'au bourg",
+      moment="roe_deer"),
+    p("roe_deer_graze", 50.0, 5.5, "moment de la chevrette (P1): herbe entre la maison de Firmin et la remise",
+      moment="roe_deer"),
+    p("kingfisher_post", 46.1, 39.9, "moment du martin-pêcheur (P1): pieu d'amarrage au coin est du bout du "
+      "ponton", moment="kingfisher"),
+    p("notebook_spot_pontoon", 43.8, 37.6, "carnet perdu de Jeanne (P1): sous les planches du ponton, côté "
+      "amont"),
+    p("notebook_spot_bench", 28.0, 36.5, "carnet perdu de Jeanne (P1): sous le banc de la berge",
+      objet="riverbank_bench"),
+    p("notebook_spot_rock", 38.5, 37.2, "carnet perdu de Jeanne (P1): derrière le gros rocher de la berge, côté "
+      "rivière"),
     # Cueillette au bord du bois
     p("forage_edge_01", 19.5, 9.5, "cueillette (pissenlits) au bord du bois", cueillette=True, important=True),
     p("forage_edge_02", 25.5, 9.5, "cueillette au bord du bois", cueillette=True, important=True),
@@ -492,6 +526,20 @@ ZONES = [
     {"id": "garden_extension_reserved", "rect": {"x": 2, "y": 28, "w": 12, "h": 8},
      "role": "réserve pour le potager du jeu complet (96 cases, FE-01), qui contient celui de la démo; "
              "pas utilisée par la démo"},
+]
+
+# Petits objets accrochés à un objet de la carte (moments rares, tour 6): ils n'ont pas d'emprise au sol, ne
+# bloquent rien et ne se dessinent pas en substitut; le rendu les pose sur leur support, à la hauteur z.
+# x, y, z: point d'attache en mètres (le clou du nichoir, le bout du chicot, le haut du pieu).
+ACCROCHES = [
+    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.84, "z": 2.40,
+     "regarde": "sud", "penche_degres": 25,
+     "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par "
+             "le moment de l'échelle (drapeau `nest_box_straight`)"},
+    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.75,
+     "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier: perchoir des mésanges"},
+    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95,
+     "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"},
 ]
 
 # Meubles déjà posés dans la maisonnette (objets.json, startingInventory.houseFurniture).
@@ -640,6 +688,7 @@ def main() -> int:
             "mobilier_depart": MOBILIER_DEPART,
             "note": "cx, cy d'un meuble: case nord-ouest de son emprise (objets.json, footprint w x d)",
         },
+        "accroches": ACCROCHES,
         "habitants": HABITANTS,
         "trajets": TRAJETS,
         "trajets_cles": {"vitesse": 3.5, "max_secondes": 25, "paires": TRAJETS_CLES},

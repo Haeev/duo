@@ -480,6 +480,23 @@
     {"id": "fishing_ford_north", "x": 21.5, "y": 37.5, "role": "pêche: berge nord, à l'est du gué", "peche": true, "important": true},
     {"id": "fishing_ford_south", "x": 15.5, "y": 43.5, "role": "pêche: rive sud, à l'ouest du gué", "peche": true, "important": true},
     {"id": "fishing_pontoon", "x": 45.0, "y": 39.5, "role": "pêche: au bout du ponton", "peche": true, "important": true},
+    {"id": "heron_stand", "x": 20.6, "y": 39.6, "role": "moment du héron: il pêche au bord aval du gué, dans la lame d'eau (case `g`), là où l'eau basse plonge vers l'eau profonde", "moment": "heron"},
+    {"id": "heron_rest_far", "x": 29.5, "y": 42.3, "role": "moment du héron: il se pose sur la grève de sable d'en face, à l'écart du chemin", "moment": "heron"},
+    {"id": "geese_rest", "x": 25.5, "y": 40.0, "role": "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de lui; on la regarde depuis la berge", "moment": "geese", "portee": 4.5},
+    {"id": "nest_box", "x": 52.5, "y": 5.84, "role": "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas (`tree_oak_01`), trou à 2,45 m", "moment": "tits", "z": 2.4},
+    {"id": "ladder_foot", "x": 51.47, "y": 5.5, "role": "pied de l'échelle de Basile contre la face ouest du chêne", "moment": "ladder"},
+    {"id": "ladder_hold_north", "x": 51.25, "y": 4.95, "role": "tenir l'échelle, côté nord (tourné vers le sud)", "moment": "ladder"},
+    {"id": "ladder_hold_south", "x": 51.25, "y": 6.05, "role": "tenir l'échelle, côté sud (tourné vers le nord)", "moment": "ladder"},
+    {"id": "nest_oak_basile", "x": 51.0, "y": 5.5, "role": "Basile au pied de son échelle, pendant « Où est passé Basile ? »", "rotation": 1},
+    {"id": "fox_track_west", "x": 0.2, "y": 13.5, "role": "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast", "moment": "fox", "portee": 4.0},
+    {"id": "fox_mousing", "x": 7.5, "y": 17.0, "role": "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la maisonnette, à 4 m de son mur nord", "moment": "fox"},
+    {"id": "meadow_glow", "x": 56.5, "y": 29.5, "role": "moment des vers luisants: herbes hautes du pré, à plus de 9 m des lampadaires", "moment": "glowworms"},
+    {"id": "roe_deer_edge", "x": 49.8, "y": 1.6, "role": "moment de la chevrette (P1): là où le bois descend jusqu'au bourg", "moment": "roe_deer"},
+    {"id": "roe_deer_graze", "x": 50.0, "y": 5.5, "role": "moment de la chevrette (P1): herbe entre la maison de Firmin et la remise", "moment": "roe_deer"},
+    {"id": "kingfisher_post", "x": 46.1, "y": 39.9, "role": "moment du martin-pêcheur (P1): pieu d'amarrage au coin est du bout du ponton", "moment": "kingfisher"},
+    {"id": "notebook_spot_pontoon", "x": 43.8, "y": 37.6, "role": "carnet perdu de Jeanne (P1): sous les planches du ponton, côté amont"},
+    {"id": "notebook_spot_bench", "x": 28.0, "y": 36.5, "role": "carnet perdu de Jeanne (P1): sous le banc de la berge", "objet": "riverbank_bench"},
+    {"id": "notebook_spot_rock", "x": 38.5, "y": 37.2, "role": "carnet perdu de Jeanne (P1): derrière le gros rocher de la berge, côté rivière"},
     {"id": "forage_edge_01", "x": 19.5, "y": 9.5, "role": "cueillette (pissenlits) au bord du bois", "cueillette": true, "important": true},
     {"id": "forage_edge_02", "x": 25.5, "y": 9.5, "role": "cueillette au bord du bois", "cueillette": true, "important": true},
     {"id": "forage_edge_03", "x": 30.5, "y": 9.5, "role": "cueillette au bord du bois", "cueillette": true, "important": true},
@@ -515,6 +532,11 @@
     ],
     "note": "cx, cy d'un meuble: case nord-ouest de son emprise (objets.json, footprint w x d)"
   },
+  "accroches": [
+    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.84, "z": 2.4, "regarde": "sud", "penche_degres": 25, "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par le moment de l'échelle (drapeau `nest_box_straight`)"},
+    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.75, "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier: perchoir des mésanges"},
+    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95, "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"}
+  ],
   "habitants": {
     "source": "games/la-petite-ligne/donnees/habitants.json fait foi pour les heures; ce résumé dit où",
     "firmin": {

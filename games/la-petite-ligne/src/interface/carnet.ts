@@ -232,8 +232,20 @@ export class NotebookPanel extends Panel {
         'data-state': q.done ? 'done' : current ? 'current' : null,
         'data-autofocus': autofocus,
       },
-      [lead, el('span', { class: 'lpl-quest__title', text: q.title }), side, el('span', { class: 'lpl-quest__text', text: q.text })],
+      [lead, el('span', { class: 'lpl-quest__title', text: q.title }), side, el('span', { class: 'lpl-quest__text', text: q.text }), ...this.secretCard(q)],
     );
+  }
+
+  /** Fiche secrète (R16), chez celui seul qui peut la lire: affichage minimal en attendant l'écran du tour suivant. */
+  private secretCard(q: QuestModel): HTMLElement[] {
+    if (q.secret === null) return [];
+    const { ctx } = this.host;
+    return [
+      el('span', { class: 'lpl-quest__text lpl-quest__secret' }, [
+        el('strong', { text: `${ctx.t(ctx.texts.game.ui.secretCard)}: ${q.secret.title}` }),
+        ...q.secret.lines.map((line) => el('span', { class: 'lpl-quest__secret-line', text: line })),
+      ]),
+    ];
   }
 
   private renderMail(letters: ReturnType<typeof letterModels>): void {

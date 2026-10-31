@@ -3,7 +3,7 @@
  * temps, courrier). README des données, section 3.
  */
 import { currentOrder } from '../donnees/commandes';
-import type { CharacterId, Vec2 } from '../etat/types';
+import type { CharacterId, SecretEntry, Vec2 } from '../etat/types';
 import type { Condition, Since, Who } from '../donnees/types';
 import { MINUTES_PER_DAY } from './constantes';
 import { type Sim, character, distance, point } from './contexte';
@@ -23,6 +23,8 @@ export interface ConditionContext {
   baselines: Record<string, number> | null;
   /** Événement d'outil en cours (`used_tool_at`). */
   toolEvent: ToolEvent | null;
+  /** Quête dont on évalue l'étape (rôles `informed` et `doer` d'une quête à secret). */
+  quest?: string | null;
 }
 
 export const NO_CONTEXT: ConditionContext = { actor: null, baselines: null, toolEvent: null };
@@ -46,8 +48,19 @@ export function counterRemaining(sim: Sim, baselines: Record<string, number>, ke
   return count - counterValue(sim, 'duo', key, since, { ...NO_CONTEXT, baselines });
 }
 
-function byWho(who: Who, ctx: ConditionContext, test: (scope: Scope) => boolean): boolean {
+/** Le personnage qui tient ce rôle dans le secret de la quête en cours (ou du dernier secret actif). */
+function roleHolder(sim: Sim, ctx: ConditionContext, role: 'informed' | 'doer'): CharacterId | null {
+  const entry = secretEntry(sim, ctx.quest ?? null);
+  return entry === null ? null : entry[role];
+}
+
+function byWho(sim: Sim, who: Who, ctx: ConditionContext, test: (scope: Scope) => boolean): boolean {
   switch (who) {
+    case 'informed':
+    case 'doer': {
+      const id = roleHolder(sim, ctx, who);
+      return id !== null && test(id);
+    }
     case 'either':
       return test('duo');
     case 'actor':
@@ -57,8 +70,13 @@ function byWho(who: Who, ctx: ConditionContext, test: (scope: Scope) => boolean)
   }
 }
 
-function byCharacter(who: Who, ctx: ConditionContext, test: (id: CharacterId) => boolean): boolean {
+function byCharacter(sim: Sim, who: Who, ctx: ConditionContext, test: (id: CharacterId) => boolean): boolean {
   switch (who) {
+    case 'informed':
+    case 'doer': {
+      const id = roleHolder(sim, ctx, who);
+      return id !== null && test(id);
+    }
     case 'either':
       return test('p1') || test('p2');
     case 'actor':
@@ -139,7 +157,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       if (condition.who === 'either') {
         return countInBag(character(sim, 'p1'), condition.item) + countInBag(character(sim, 'p2'), condition.item) >= condition.count;
       }
-      return byCharacter(condition.who, ctx, (id) => countInBag(character(sim, id), condition.item) >= condition.count);
+      return byCharacter(sim, condition.who, ctx, (id) => countInBag(character(sim, id), condition.item) >= condition.count);
     case 'built':
       return world.constructions.some((c) => c.id === condition.construction && c.status === 'done');
     case 'recipe_known':
@@ -147,7 +165,9 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     case 'order_complete':
       return orderSatisfied(sim, condition.day);
     case 'counter':
+    case 'choice_made':
       return byWho(
+        sim,
         condition.who,
         ctx,
         (scope) => counterValue(sim, scope, condition.key, condition.since, ctx) >= condition.count,
@@ -159,7 +179,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return target !== undefined && distance(ev.pos, target) <= condition.radius;
     }
     case 'stayed_at':
-      return byCharacter(condition.who, ctx, (id) => {
+      return byCharacter(sim, condition.who, ctx, (id) => {
         const c = character(sim, id);
         return (condition.seated ? seatedSeconds(sim, c, condition.point) : (c.stays[condition.point] ?? 0)) >= condition.seconds;
       });
@@ -168,21 +188,42 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     case 'looked_at': {
       const at = sim.map.points[condition.point];
       if (at === undefined) return false;
-      return byCharacter(condition.who, ctx, (id) => {
+      return byCharacter(sim, condition.who, ctx, (id) => {
         const c = character(sim, id);
         const d = Math.hypot(at.x - c.pos.x, at.y - c.pos.y);
-        if (d > condition.distance) return false;
+        if (d > condition.distance || d < condition.minDistance) return false;
+        if (condition.still && c.speed >= sim.content.settings.moments.stillSpeed) return false;
         if (d < 0.5) return true;
         let diff = Math.abs(Math.atan2(at.y - c.pos.y, at.x - c.pos.x) - c.facing) % (2 * Math.PI);
         if (diff > Math.PI) diff = 2 * Math.PI - diff;
         return diff <= LOOK_CONE;
       });
     }
+    case 'secret_role': {
+      const entry = secretEntry(sim, condition.quest);
+      return entry !== null && ctx.actor !== null && entry[condition.role] === ctx.actor;
+    }
+    case 'hens_named': {
+      if (condition.who === 'either') return world.hens.filter((h) => h.namedBy !== null).length >= condition.count;
+      return byCharacter(sim, condition.who, ctx, (id) => world.hens.filter((h) => h.namedBy === id).length >= condition.count);
+    }
   }
 }
 
-/** Écart maximal du regard pour `looked_at`. */
-const LOOK_CONE = Math.PI / 6;
+/** Le secret de cette quête (`null`: le dernier secret d'une quête active), ou `null`. */
+export function secretEntry(sim: Sim, quest: string | null): SecretEntry | null {
+  const entries = sim.world.secrets.entries;
+  if (quest !== null) return entries.find((e) => e.quest === quest) ?? null;
+  for (let i = entries.length - 1; i >= 0; i--) {
+    const e = entries[i];
+    if (e !== undefined && sim.world.quests.some((q) => q.id === e.quest && q.status === 'active')) return e;
+  }
+  return null;
+}
+
+/** Écart maximal du regard pour `looked_at` et les moments qui demandent de regarder. */
+export const LOOK_CONE = Math.PI / 6;
+
 
 /**
  * Variante d'un groupe pour cette partie: empreinte (FNV-1a) de la graine et du nom du groupe.
@@ -218,7 +259,7 @@ export function captureBaselines(sim: Sim, conditions: readonly Condition[]): Re
   const visit = (c: Condition): void => {
     if (c.type === 'all' || c.type === 'any') c.conditions.forEach(visit);
     else if (c.type === 'not') visit(c.condition);
-    else if (c.type === 'counter' && c.since === 'step_start') {
+    else if ((c.type === 'counter' || c.type === 'choice_made') && c.since === 'step_start') {
       for (const scope of ['duo', 'p1', 'p2'] as const) {
         out[`${scope}:${c.key}`] = sim.world.counters[scope][c.key] ?? 0;
       }

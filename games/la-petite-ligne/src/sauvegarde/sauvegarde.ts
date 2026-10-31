@@ -12,6 +12,7 @@ import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
+import { variantOf } from '../simulation/conditions';
 import type { PlayerInfo } from '../simulation/monde';
 import { type StepInput, step } from '../simulation/pas';
 
@@ -129,10 +130,67 @@ function migrateToTwoWeeks(world: Record<string, unknown>, content: Content): vo
   }
 }
 
+/** Quête refaite au tour 6 (R16): `receive` a été ajoutée devant `give` et `tell_jeanne`. */
+const LUCIE_QUEST = 'lucie_note';
+const LUCIE_LETTER = 'lucie_letter';
+
+function holdsItem(c: unknown, item: string): boolean {
+  if (!isRecord(c) || !Array.isArray(c.bag)) return false;
+  return c.bag.some((s) => isRecord(s) && s.item === item);
+}
+
+/**
+ * Format 2 vers 3 (tour 6: moments rares et informations propres). Aucun moment n'a encore eu
+ * lieu; les poules déjà là gardent leurs noms visibles chez les deux (la quête des noms ne
+ * démarre pas pour elles); « Le mot de Lucie » en cours garde son avancement (l'étape gagne un
+ * cran) et son informé est celui qui a la lettre, sinon le premier joueur.
+ */
+function migrateToMoments(world: Record<string, unknown>, content: Content): void {
+  const s = content.settings;
+  world.moments = { today: null, history: [], hintTurn: s.moments.firstHint };
+  const secrets: { turn: CharacterId; entries: unknown[] } = { turn: s.secrets.firstInformed, entries: [] };
+  world.secrets = secrets;
+  const hens = Array.isArray(world.hens) ? world.hens : [];
+  for (const hen of hens) {
+    if (!isRecord(hen)) continue;
+    hen.nameKnownBy = ['p1', 'p2'];
+    hen.namedBy = null;
+  }
+  const flags = Array.isArray(world.flags) ? (world.flags as unknown[]) : [];
+  if (hens.length > 0 && !flags.includes(s.secrets.knownHensFlag)) flags.push(s.secrets.knownHensFlag);
+  const characters = Array.isArray(world.characters) ? world.characters : [];
+  for (const c of characters) {
+    if (!isRecord(c)) continue;
+    c.momentHint = null;
+    c.holding = null;
+  }
+  const quests = Array.isArray(world.quests) ? world.quests : [];
+  const lucie = quests.find((q): q is Record<string, unknown> => isRecord(q) && q.id === LUCIE_QUEST);
+  const def = content.quests.find((q) => q.id === LUCIE_QUEST);
+  if (lucie === undefined || def === undefined || def.secret === null || typeof lucie.step !== 'number') return;
+  lucie.step = lucie.status === 'done' ? def.steps.length : Math.min(lucie.step + 1, def.steps.length - 1);
+  const holder: unknown = characters.find((c) => holdsItem(c, LUCIE_LETTER));
+  const informed: CharacterId = isRecord(holder) && (holder.id === 'p1' || holder.id === 'p2') ? holder.id : secrets.turn;
+  const doer: CharacterId = informed === 'p1' ? 'p2' : 'p1';
+  secrets.entries.push({
+    id: def.secret.id,
+    quest: LUCIE_QUEST,
+    informed,
+    doer,
+    variant: variantOf(typeof world.seed === 'number' ? world.seed : 0, def.secret.variantGroup, def.secret.of),
+    errors: 0,
+    revealed: false,
+    shared: false,
+    nudged: false,
+  });
+  secrets.turn = doer;
+}
+
 /** Migrations d'un format au suivant. */
 function migrate(data: unknown, dataSchema: number, content: Content): unknown {
   if (dataSchema > DATA_SCHEMA) throw new SaveError(`sauvegarde d'une version plus récente (format ${dataSchema})`);
   if (dataSchema < 2 && isRecord(data)) migrateToTwoWeeks(data, content);
+  if (dataSchema < 3 && isRecord(data)) migrateToMoments(data, content);
   return data;
 }
 
@@ -256,12 +314,21 @@ function resume(
     c.placement = null;
     c.aim = null;
     c.corner = sanitizeCorner(map, c.corner);
+    // L'échelle se reprend à la main; la confidence du matin reste.
+    c.holding = null;
     // Assis sur un banc (après le tour 5): absent des sauvegardes d'avant, comme debout.
     c.seat = sanitizeSeat(map, content.settings.benches, c);
     if (c.seat === null && c.action.kind === 'sit') c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
   for (const v of world.villagers) v.talkingWith = [];
+  // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état d'après.
+  const today = world.moments.today;
+  if (today?.phase === 'climax') {
+    today.phase = 'after';
+    today.elapsed = 0;
+    today.paused = false;
+  }
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
