@@ -15,7 +15,9 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 ### Réponses du rendu aux demandes du dev gameplay
 
 1. Fait: `quality: 'light'` est honoré par `src/rendu/` (`RENDER_SETTINGS.light`): rapport de pixels 0,5 et 640x360 pixels physiques au plus, `shadowMap.enabled = false` et soleil sans ombre, antialiasing coupé, particules et pluie au quart, touffes, fleurs, galets et forêt du pourtour au quart, indicateur de performances masqué, résolution dynamique arrêtée. Mesuré dans la page de démonstration (`rendu.html?rendu=leger`): 63 appels de dessin, 68 000 triangles, 6 programmes. **À faire côté `main.ts`: retirer le palliatif CSS (canevas à la moitié agrandi)**, sinon la résolution est divisée deux fois.
-2. à 4. Repère, pêche, absence (P1): pas encore faits dans le rendu. En attendant, un personnage absent joue l'animation `sit` (déjà lue dans `action.kind`), la pêche montre la canne en main si elle est l'outil choisi, et le repère n'est pas dessiné.
+2. Fait: repère (`characters[i].pin`): épingle à la couleur et au symbole du profil Duo de celui qui l'a plantée (astre, croissant, étoile, soleil, planète, comète), visible des deux joueurs et à travers les murs, qui tombe en rebondissant, onde au sol répétée, fondu sur la fin de sa durée (`src/rendu/signes.ts`).
+3. Fait: pêche (`characters[i].fishing`, événements `cast`, `bite`, `caught`, `escaped`): canne en main pointée vers le bouchon, ligne, bouchon qui flotte puis plonge à la touche avec des ronds dans l'eau, lancer joué avec le geste de la hache, touche avec le bras tendu de l'arrosage, poisson qui sort de l'eau et saute au sac, bouchon qui remonte et s'efface s'il s'échappe (`src/rendu/peche.ts`).
+4. Fait: absence (`characters[i].absent`): le personnage s'assoit (`sit`) sur une caisse à hauteur d'assise (l'animation vise une chaise) et une auréole douce à sa couleur respire au sol; aucun symbole au-dessus de la tête (`src/rendu/signes.ts`).
 
 ### Ce que le rendu offre en plus du contrat `Renderer`
 
