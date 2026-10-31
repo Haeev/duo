@@ -670,10 +670,11 @@ def skirt(g, z_top=0.99, z_bot=0.42, r_top=0.19, r_bot=0.31, color="bottom", seg
              (r_top, z_top)], colors=[hem or color, color, color], segs=segs, weights=w, scale=(1.0, 0.85, 1.0))
 
 
-def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra_a", bib_to=None, front_r=0.2):
+def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra_a", bib_to=None, front_r=0.2,
+          rings=None):
     """Tablier: panneau devant la jupe (ou le pantalon), mélangé bassin/cuisses."""
     if ROUND:
-        return apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r)
+        return apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r, rings)
     wfn = skirt_weights(z_top, z_bot, 0.2)
     yb = -front_r - 0.02
     pts = [(-w_bot / 2, yb - 0.04, z_bot), (w_bot / 2, yb - 0.04, z_bot), (w_top / 2, yb + 0.06, z_top),
@@ -692,7 +693,7 @@ def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra
     g.box((0.32, 0.225, 0.03), loc=(0, 0, z_top - 0.005), color=color, bone="hips")
 
 
-def apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r):
+def apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r, rings=None):
     """Tablier courbé sur 5 colonnes et 3 rangs: il épouse la jupe ou le ventre, coins du bas
     arrondis, ourlet ondulé; bavette courbée sur le torse."""
     wfn = skirt_weights(z_top, z_bot, 0.2)
@@ -735,7 +736,7 @@ def apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r):
     panel([(z_bot, w_bot / 2, rs * 1.6, rs * 1.05, wave), ((z_bot + z_top) / 2, (w_bot + w_top) / 4, rs * 1.5, rs * 0.98, None),
            (z_top, w_top / 2, rs * 1.3, rs * 0.86, None)], weights=wfn)
     if bib_to:
-        rings = torso_rings()
+        rings = rings or torso_rings()
         za, zb = z_top, bib_to
         ya, yb = -torso_front_y(za + 0.02, rings), -torso_front_y((za + zb) / 2, rings)
         yc = -torso_front_y(zb - 0.02, rings)
@@ -996,7 +997,8 @@ def build_npc_round(g, who, expr):
         torso_round(g, w_top=0.39, w_bot=0.35, d=0.23, belly=0.06)
         collar(g, color="top_trim", w=0.19)
         skirt(g, z_top=1.0, z_bot=0.40, r_top=0.21, r_bot=0.34, hem="top_trim", segs=12)
-        apron(g, z_top=1.0, z_bot=0.46, w_top=0.26, w_bot=0.36, color="extra_a", bib_to=1.27, front_r=0.23)
+        apron(g, z_top=1.0, z_bot=0.46, w_top=0.26, w_bot=0.36, color="extra_a", bib_to=1.27, front_r=0.23,
+              rings=torso_rings(0.39, 0.35, 0.23, belly=0.06))
         for side in ("l", "r"):
             arm_round(g, side, sleeve="rolled", top="top", trim="top_trim", puff=1.08)
             leg_round(g, side, thigh="extra_b", shin="extra_b", r=0.08)
@@ -1011,7 +1013,8 @@ def build_npc_round(g, who, expr):
         torso_round(g, w_top=0.42, w_bot=0.33, d=0.22)
         pelvis_round(g, w=0.32, d=0.22)
         collar(g, color="top_trim")
-        apron(g, z_top=0.99, z_bot=0.40, w_top=0.28, w_bot=0.34, color="extra_a", bib_to=1.30, front_r=0.22)
+        apron(g, z_top=0.99, z_bot=0.40, w_top=0.28, w_bot=0.34, color="extra_a", bib_to=1.30, front_r=0.22,
+              rings=torso_rings(0.42, 0.33, 0.22))
         g.box((0.11, 0.012, 0.08), loc=(0.05, -0.155, 0.86), color="extra_b", bevel=0.01, bone="hips")
         g.box((0.012, 0.01, 0.07), loc=(0.07, -0.162, 0.90), color="eye", rot=(0, 10, 0), bone="hips")
         for side in ("l", "r"):

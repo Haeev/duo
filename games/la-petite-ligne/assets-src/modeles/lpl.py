@@ -190,9 +190,12 @@ def auto_bevel(size, base):
     w = min(w, dmin * 0.35)
     # deux segments pour les gros volumes seulement (murs, socles): le coût reste raisonnable
     seg = 2 if dmax >= 2.0 and dmin >= 0.25 else 1
-    pred = (lambda a, b: not (abs(a.z) < 1e-4 and abs(b.z) < 1e-4)) if base else None
-    if dmax >= 2.0 and size[2] >= 1.5:
-        # mur ou corps de bâtiment: seuls les angles verticaux se voient (le haut est sous le toit)
+    # arêtes du dessous jamais chanfreinées (posées au sol ou invisibles d'en haut)
+    zb = 0.0 if base else -size[2] / 2
+    pred = lambda a, b: not (abs(a.z - zb) < 1e-4 and abs(b.z - zb) < 1e-4)  # noqa: E731
+    if dmax >= 2.0 and (size[2] >= 1.5 or base):
+        # mur, corps de bâtiment ou soubassement: seuls les angles verticaux sont chanfreinés (le haut est
+        # sous le toit ou porte un mur, un bardage: un chanfrein y laisserait les pièces posées en l'air)
         pred = lambda a, b: abs(a.x - b.x) < 1e-4 and abs(a.y - b.y) < 1e-4  # noqa: E731
     return w, seg, pred
 

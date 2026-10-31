@@ -735,28 +735,64 @@ def sawmill(A):
 
 
 def workbench(A):
-    """Établi de Basile sous son auvent (emprise 2 x 2, l'établi contre le fond)."""
+    """Établi de Basile sous son auvent (emprise 2 x 2, l'établi contre le fond).
+
+    Structure lisible: quatre poteaux, deux sablières en tête (devant et au fond), trois chevrons dans
+    la pente, la tôle posée dessus; bardage du fond du sol à la sablière; rien ne traverse."""
     g = A.geo()
-    for x in (-0.95, 0.95):
-        g.cyl(0.06, 2.55, loc=(x, -0.9, 0), color="wood_dark", segs=6, base=True)
-        g.box((0.1, 0.1, 2.95), loc=(x, 0.92, 0), color="wood_dark", base=True)
-        g.box((0.06, 1.9, 0.1), loc=(x, 0.0, 2.6), color="wood_dark", rot=(-12, 0, 0))
-    slab(g, [(-1.1, -1.15, 2.5), (1.1, -1.15, 2.5), (1.1, 1.05, 3.0), (-1.1, 1.05, 3.0)], 0.08,
+    yf, yb = -1.15, 1.05            # bords bas et haut de la tôle
+    zf, zb_ = 2.5, 3.0              # dessus de la tôle aux deux bords
+    th = 0.06                       # épaisseur de la tôle
+    ang = math.degrees(math.atan((zb_ - zf) / (yb - yf)))
+    cosa = math.cos(math.radians(ang))
+
+    def top(y):
+        return zf + (zb_ - zf) * (y - yf) / (yb - yf)
+
+    def under(y):
+        return top(y) - th / cosa
+
+    # tôle et couvre-joints posés dessus (coupés 2 cm en retrait des rives)
+    slab(g, [(-1.1, yf, zf), (1.1, yf, zf), (1.1, yb, zb_), (-1.1, yb, zb_)], th,
          by_normal("wood_old", "wood_old_dark", "wood_old_dark", thr=0.3))
     for j in range(1, 5):
-        t = j / 5
-        g.box((2.2, 0.04, 0.03), loc=(0, -1.15 + 2.2 * t, 2.5 + 0.5 * t + 0.05), color="wood_old_dark", rot=(-12.8, 0, 0))
-    g.box((1.9, 0.04, 1.6), loc=(0, 0.95, 0.9), color="wood", base=True)
-    for k, (x, c) in enumerate(((-0.6, "iron"), (-0.35, "wood_dark"), (0.5, "iron_light"))):
-        g.box((0.05, 0.03, 0.4), loc=(x, 0.92, 1.6), color=c, base=True)
-    g.box((0.25, 0.03, 0.06), loc=(0.2, 0.92, 1.95), color="iron")
+        y = yf + (yb - yf) * j / 5
+        g.box((2.16, 0.04, 0.03), loc=(0, y, top(y) + 0.015 / cosa + 0.003), color="wood_old_dark", rot=(ang, 0, 0),
+              no_round=True)
+    # chevrons sous la tôle, dans la pente
+    hc = 0.08
+    for x in (-0.9, 0.0, 0.9):
+        ym = (yf + 0.1 + yb - 0.05) / 2
+        L = (yb - 0.05 - (yf + 0.1)) / cosa
+        # 3 mm engagés sous la tôle: elle porte sur eux
+        g.box((0.06, L, hc), loc=(x, ym, under(ym) - hc / 2 / cosa + 0.003), color="wood_dark", rot=(ang, 0, 0))
+    # sablières (8 x 10 cm) qui relient les poteaux en tête, sous les chevrons
+    hs = 0.10
+    tops = {}
+    for y in (-0.9, 0.92):
+        zt = under(y) - hc / cosa + 0.006          # dessus de la sablière engagé de 3 mm sous les chevrons
+        g.box((2.0, 0.08, hs), loc=(0, y, zt - hs / 2), color="wood_dark")
+        tops[y] = zt - hs                           # tête des poteaux = dessous de la sablière
+    for x in (-0.95, 0.95):
+        g.cyl(0.06, tops[-0.9], loc=(x, -0.9, 0), color="wood_dark", segs=6, base=True)
+        g.box((0.1, 0.1, tops[0.92]), loc=(x, 0.92, 0), color="wood_dark", base=True)
+    # bardage du fond: planches verticales du sol à la sablière, entre les poteaux, derrière l'établi
+    hb = tops[0.92]
+    for k in range(6):
+        x = -0.75 + k * 0.3
+        g.box((0.29, 0.03, hb), loc=(x, 0.955, 0), color="wood" if k % 2 else "wood_new", base=True)
+    # outils pendus au bardage (contre sa face avant)
+    for x, c in ((-0.6, "iron"), (-0.35, "wood_dark"), (0.5, "iron_light")):
+        g.box((0.05, 0.03, 0.4), loc=(x, 0.925, 1.6), color=c, base=True)
+    g.box((0.25, 0.03, 0.06), loc=(0.2, 0.925, 1.95), color="iron")
+    # établi: plateau sur quatre pieds, tablette basse entre les pieds (2 cm devant le bardage)
     g.box((1.9, 0.75, 0.1), loc=(0, 0.45, 0.82), color="wood_new", base=True, bevel=0.01)
     for x in (-0.8, 0.8):
         for y in (0.17, 0.73):
             g.box((0.1, 0.1, 0.82), loc=(x, y, 0), color="wood", base=True)
-    g.box((1.7, 0.6, 0.04), loc=(0, 0.45, 0.25), color="wood", base=True)
-    g.box((0.25, 0.2, 0.18), loc=(-0.75, 0.15, 0.92), color="wood_dark", base=True)
-    g.cyl(0.02, 0.3, loc=(-0.75, 0.03, 1.0), color="iron", segs=5, rot=(90, 0, 0))
+    g.box((1.5, 0.46, 0.04), loc=(0, 0.45, 0.25), color="wood", base=True)
+    g.box((0.25, 0.2, 0.18), loc=(-0.75, 0.18, 0.92), color="wood_dark", base=True)
+    g.cyl(0.02, 0.3, loc=(-0.75, 0.06, 1.0), color="iron", segs=5, rot=(90, 0, 0))
     g.box((1.0, 0.2, 0.03), loc=(0.25, 0.55, 0.92), color="wood_new", base=True, rot=(0, 0, 4))
     for k in range(4):
         g.box((0.25, 0.06, 0.06), loc=(0.2 + k * 0.12, 0.2, 0.92), color="wood_new", base=True, rot=(0, 0, 30 * k))
@@ -1599,8 +1635,10 @@ def main():
     gk = A.group("gatekeeper_house", {"footprint": [7, 6], "door_cell": 3, "cut_walls": True,
                                       "interior": {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": GH["floor"]},
                                       "states": ["gatekeeper_house_ruin", "gatekeeper_house_repaired"]})
+    lpl.AUTO_ROUND = False  # budget (bible 8.8): seuls toit, cheminée et chaînes d'angle s'arrondissent
     gatekeeper_house(A, True, gk)
     gatekeeper_house(A, False, gk)
+    lpl.AUTO_ROUND = True
     buildings.append(gk)
     buildings.append(ferrand_shop(A))
     lpl.AUTO_ROUND = False  # témoin réglé à la main
@@ -1614,6 +1652,7 @@ def main():
     henhouse(A, True, hh)
     henhouse(A, False, hh)
     buildings.append(hh)
+    lpl.AUTO_ROUND = False  # établi et tas de bois: pièces nombreuses, plafonds (bible 8.8)
     extra = [A.add("workbench", workbench(A), {"footprint": [2, 2]}),
              A.add("woodpile", woodpile(A), {"footprint": [2, 1]}),
              A.add("plank_stack", plank_stack(A), {"footprint": [2, 1]})]
@@ -1633,7 +1672,8 @@ def main():
                          ("crate_stack", crate_stack, [2, 1]), ("sacks", sacks, [1, 1]), ("cart", cart, [3, 2]),
                          ("bicycle", bicycle, [2, 1])):
         # charrette et tonnelle: beaucoup de pièces, gardées au seuil des bâtiments (plafond de 900)
-        lpl.AUTO_MIN = (0.6, 0.08) if name in ("cart", "arbor") else (0.3, 0.03)
+        lpl.AUTO_MIN = (0.6, 0.08)
+        lpl.AUTO_ROUND = name not in ("arbor",)  # tonnelle: plafond de 900, gardée vive
         props.append(A.add(name, fn(A), {"footprint": fp}))
     lpl.AUTO_MIN = (0.6, 0.08)
     lpl.AUTO_ROUND = False  # sols et bordures: dalles qui se raccordent
@@ -1642,7 +1682,6 @@ def main():
         grounds.append(A.add("ground_" + k, ground_tile(A, k), {"footprint": [1, 1]}))
     grounds.append(A.add("path_border", path_border(A), {"footprint": [1, 1], "note": "bordure de 1 m le long de X"}))
     lpl.AUTO_ROUND = True
-    lpl.AUTO_MIN = (0.3, 0.03)
     for k in ("wood", "picket", "broken", "gate", "post"):
         grounds.append(A.add("fence_" + k, fence(A, k), {"footprint": [1, 1], "note": "segment de 1 m le long de X, poteau à x=-0,5"}))
     lpl.AUTO_MIN = (0.6, 0.08)
@@ -1659,7 +1698,9 @@ def main():
     nature.append(A.add("grass_tall", grass_tall(A, 40), {"footprint": [1, 1]}))
     for c in ("red", "yellow", "white", "blue"):
         nature.append(A.add("flowers_" + c, flowers(A, "flower_" + c, 50 + len(c)), {"footprint": [1, 1]}))
+    lpl.AUTO_ROUND = False  # massif de fleurs: plafond de 900, gardé vif
     nature.append(A.add("flower_bed", flower_bed(A), {"footprint": [2, 1]}))
+    lpl.AUTO_ROUND = True
     nature.append(A.add("reeds", reeds(A, 60), {"footprint": [1, 1]}))
     lpl.AUTO_ROUND = False
     water = [river_straight(A), river_straight(A, ford=True), river_curve(A),
