@@ -70,9 +70,10 @@ export interface DemoOptions {
   /**
    * Petites scènes de la vie au repos: Camille s'approche de Firmin par le
    * côté et s'arrête (`rencontre`), Firmin seul sur la place (`place`), ou
-   * Camille mange assise à la table (`repas`).
+   * Camille mange assise à la table (`repas`), ou s'assoit sur le banc de la
+   * place (`banc`: arrêtée devant lui, action « assis »).
    */
-  scene?: 'rencontre' | 'place' | 'repas' | undefined;
+  scene?: 'rencontre' | 'place' | 'repas' | 'banc' | undefined;
   /** Draisine poussée, posée au bout de la voie (`world.handcarAt`), remise ouverte. */
   handcarParked?: boolean;
 }
@@ -255,6 +256,14 @@ export function createExampleWorld(
       firmin.prev = { ...firmin.pos };
       firmin.facing = Math.PI / 4;
     }
+  }
+  if (options.scene === 'banc') {
+    const bench = point(map, 'village_square', 38.5, 30.5);
+    p1.pos = { x: bench.x - 2.2, y: bench.y + 1.6 };
+    p1.prev = { ...p1.pos };
+    p1.facing = -Math.PI / 2;
+    p1.aim = null;
+    p1.action = { kind: 'sit', since: 0, duration: 0, target: null };
   }
   if (options.scene === 'repas') {
     // Chaise au sud de la table, tournée vers elle (vers le nord: rotation 2).

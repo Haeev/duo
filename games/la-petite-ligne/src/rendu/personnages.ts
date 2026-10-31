@@ -35,6 +35,7 @@ import type {
 import { SIM_HZ } from '../etat/types';
 import { BoneOffsets, poseEnvelope, stableUnit, termAngle } from './attentes';
 import type { Content } from '../donnees/types';
+import type { MapProp } from '../etat/carte';
 import {
   BODY_COLORS,
   HAIR_MESHES,
@@ -48,6 +49,7 @@ import { smoothFactor } from './camera';
 import {
   dampAngle,
   interpolate,
+  yawFromQuarter,
   setStandingBox,
   yawFromFacing,
   type FrameContext,
@@ -624,6 +626,8 @@ export class CharactersPart implements EventfulPart {
     private readonly resources: ResourceTracker,
     private readonly picks: PickRegistry,
     private readonly content: Content,
+    /** Bancs de la carte (assises des habitants et des joueurs arrêtés dessus). */
+    private readonly benches: readonly MapProp[] = [],
   ) {
     this.group.name = 'personnages';
     for (const clip of library.animations(CHARACTERS_FILE)) {
@@ -776,6 +780,46 @@ export class CharactersPart implements EventfulPart {
    * l'animation `sit`; ailleurs, assis par terre, posé sur le dessus d'une
    * paillasse ou d'un lit (`sleep_height`) s'il y en a un sous le personnage.
    */
+  /** Place assise trouvée par `benchSeat` (réutilisée: lue tout de suite par l'appelant). */
+  private readonly benchPlace = { x: 0, y: 0, facing: 0 };
+
+  /**
+   * Banc de la carte sous ou tout près de (x, y): écrit dans `benchPlace` la
+   * place la plus proche (milieu de l'assise), tournée comme le banc, dos au
+   * dossier. Faux s'il n'y a pas de banc à portée.
+   */
+  private benchSeat(x: number, y: number): boolean {
+    const bench = SETTINGS.bench;
+    for (const prop of this.benches) {
+      const yaw = yawFromQuarter(prop.rotation);
+      // Axes du banc dans la carte: le long (X du modèle) et vers l'avant (Z du modèle).
+      const alongX = Math.cos(yaw);
+      const alongY = -Math.sin(yaw);
+      const frontX = Math.sin(yaw);
+      const frontY = Math.cos(yaw);
+      const dx = x - prop.pos.x;
+      const dy = y - prop.pos.y;
+      const along = dx * alongX + dy * alongY;
+      const front = dx * frontX + dy * frontY;
+      const halfLength = (prop.rect === null ? 2 : Math.max(prop.rect.w, prop.rect.h)) / 2;
+      if (Math.abs(along) > halfLength + bench.reach || Math.abs(front) > 0.5 + bench.reach) {
+        continue;
+      }
+      let slot: number = bench.slots[0];
+      for (const candidate of bench.slots) {
+        if (Math.abs(candidate - along) < Math.abs(slot - along)) {
+          slot = candidate;
+        }
+      }
+      this.benchPlace.x = prop.pos.x + alongX * slot + frontX * bench.seatForward;
+      this.benchPlace.y = prop.pos.y + alongY * slot + frontY * bench.seatForward;
+      // Même convention que la carte: quart 0 tourné vers le sud (+y).
+      this.benchPlace.facing = Math.PI / 2 - yaw;
+      return true;
+    }
+    return false;
+  }
+
   private seatAt(world: ReadonlyWorld, x: number, y: number): { clip: string; lift: number } {
     for (const piece of world.furniture) {
       const size = this.content.items[piece.item]?.footprint ?? { w: 1, d: 1 };
@@ -796,6 +840,9 @@ export class CharactersPart implements EventfulPart {
       if (typeof extras.sleep_height === 'number') {
         return { clip: SIT_GROUND, lift: extras.sleep_height };
       }
+    }
+    if (this.benchSeat(x, y)) {
+      return { clip: SIT_CHAIR, lift: SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight };
     }
     return { clip: SIT_GROUND, lift: 0 };
   }
@@ -938,6 +985,13 @@ export class CharactersPart implements EventfulPart {
       const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
       const fishing = character.fishing !== null || (shotActive && FISH_CLIPS.has(shot.clip));
       const seat = kind === 'sit' ? this.seatAt(world, character.pos.x, character.pos.y) : null;
+      // Assis ou mangeant sur un banc de la carte: posé à sa place, tourné comme lui (`benchPlace`).
+      const onBench =
+        (kind === 'sit' || kind === 'eat') &&
+        !moving &&
+        !character.inHouse &&
+        this.benchSeat(character.pos.x, character.pos.y);
+      const benchLift = SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight;
       const walkScale = Math.min(
         WALK_SCALE_MAX,
         Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
@@ -967,18 +1021,19 @@ export class CharactersPart implements EventfulPart {
         shotActive && shot.clip === HIGH_FIVE
           ? world.characters.find((other) => other.id !== character.id)
           : undefined;
-      const facing =
-        partner === undefined
+      const facing = onBench
+        ? this.benchPlace.facing
+        : partner === undefined
           ? character.facing
           : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
       entry.figure.update(
         context,
         this.terrain,
-        character.prev,
-        character.pos,
+        onBench ? this.benchPlace : character.prev,
+        onBench ? this.benchPlace : character.pos,
         facing,
         request,
-        seat?.lift ?? 0,
+        onBench ? benchLift : (seat?.lift ?? 0),
         this.henInFront(character, world) ? PLAYER_VARIANTS_HEN : PLAYER_VARIANTS,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
@@ -1006,7 +1061,12 @@ export class CharactersPart implements EventfulPart {
       if (!villager.visible) {
         continue;
       }
-      const clip = villagerClip(villager);
+      // Arrêté sur un banc (Jeanne au quai le matin): assis, à sa place, dos au dossier.
+      const onBench =
+        villager.speed <= SETTINGS.walkThreshold &&
+        villager.talkingWith.length === 0 &&
+        this.benchSeat(villager.pos.x, villager.pos.y);
+      const clip = onBench ? SIT_CHAIR : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
       const timeScale =
         clip === 'walk'
@@ -1018,11 +1078,11 @@ export class CharactersPart implements EventfulPart {
       figure.update(
         context,
         this.terrain,
-        villager.prev,
-        villager.pos,
-        villager.facing,
+        onBench ? this.benchPlace : villager.prev,
+        onBench ? this.benchPlace : villager.pos,
+        onBench ? this.benchPlace.facing : villager.facing,
         { name: clip, timeScale },
-        0,
+        onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : 0,
         SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
       );
       figure.updateFace(

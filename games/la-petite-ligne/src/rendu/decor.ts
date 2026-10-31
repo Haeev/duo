@@ -28,6 +28,8 @@ export const DYNAMIC_PROP_MODELS: ReadonlySet<string> = new Set([
 ]);
 
 /** Sols posés: leur base est au niveau du terrain, pas sur le sol surélevé qu'ils créent. */
+/** Suffixe des morceaux de décor hors de la passe d'ombre. */
+const SHADOWLESS = ':sans-ombre';
 const FLOOR_MODELS: ReadonlySet<string> = new Set(Object.keys(RENDER_SETTINGS.floorProps));
 
 const KEPT_ATTRIBUTES = ['position', 'normal', 'uv'] as const;
@@ -94,12 +96,13 @@ export class StaticDecor {
       if (DYNAMIC_PROP_MODELS.has(prop.model)) {
         continue;
       }
-      const ground =
-        prop.category === 'sol' || FLOOR_MODELS.has(prop.model)
-          ? 0
-          : terrain.heightAt(prop.pos.x, prop.pos.y);
+      const floor = prop.category === 'sol' || FLOOR_MODELS.has(prop.model);
+      const ground = floor ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);
       propMatrix(prop, ground, placement);
-      const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}`;
+      // Sols et petits objets: hors de la passe d'ombre (morceaux à part, même découpage).
+      const small = prop.height > 0 && prop.height <= RENDER_SETTINGS.terrain.shadowlessBelow;
+      const caster = !floor && !small;
+      const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}${caster ? '' : SHADOWLESS}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
         const bucketKey = `${key}|${part.material.uuid}`;
         let bucket = buckets.get(bucketKey);
@@ -135,7 +138,7 @@ export class StaticDecor {
       merged.computeBoundingSphere();
       const mesh = new Mesh(resources.track(merged), bucket.material);
       mesh.name = `decor ${key}`;
-      mesh.castShadow = true;
+      mesh.castShadow = !key.includes(SHADOWLESS);
       mesh.receiveShadow = true;
       mesh.matrixAutoUpdate = false;
       this.group.add(mesh);

@@ -64,10 +64,12 @@ interface DemoHandle {
   ready: boolean;
   stats(): ReturnType<RenderEngine['detailedStats']>;
   missing(): string[];
-  breakdown(): Record<string, number>;
+  breakdown(detail?: boolean): Record<string, number>;
   programs(): string[];
   /** Programmes utilisés par la scène dans l'état courant (hors variantes en cache). */
   programsInUse(): number;
+  /** Triangles d'une image, passe d'ombre à part. */
+  triangleSplit(): { total: number; shadow: number; drawCalls: number };
   /** Qualité en vigueur et palier de résolution (essai du repli automatique, `adaptatif=1`). */
   quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
@@ -116,8 +118,9 @@ async function main(): Promise<void> {
     scene:
       params.get('scene') === 'rencontre' ||
       params.get('scene') === 'place' ||
-      params.get('scene') === 'repas'
-        ? (params.get('scene') as 'rencontre' | 'place' | 'repas')
+      params.get('scene') === 'repas' ||
+      params.get('scene') === 'banc'
+        ? (params.get('scene') as 'rencontre' | 'place' | 'repas' | 'banc')
         : undefined,
     corners: params.get('coins') === '1',
     handcarParked: params.get('draisine') === 'posee',
@@ -178,9 +181,10 @@ async function main(): Promise<void> {
     ready: false,
     stats: () => engine.detailedStats(),
     missing: () => [],
-    breakdown: () => engine.breakdown(),
+    breakdown: (detail?: boolean) => engine.breakdown(detail === true),
     programs: () => engine.programList(),
     programsInUse: () => engine.programsInUse(),
+    triangleSplit: () => engine.triangleSplit(),
     quality: () => ({
       mode: engine.renderQuality(),
       scale: engine.resolutionScale(),

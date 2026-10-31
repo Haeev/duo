@@ -260,6 +260,7 @@ export class RenderEngine implements Renderer {
       this.resources,
       this.picks,
       content,
+      map.props.filter((prop) => prop.model === 'bench'),
     );
     const house = new HousePart(
       map,
@@ -653,8 +654,30 @@ export class RenderEngine implements Renderer {
     return used.size;
   }
 
+  /**
+   * Triangles d'une image, passe d'ombre à part (diagnostic des budgets): rend
+   * une image en mesurant ce que dessine la carte d'ombre.
+   */
+  triangleSplit(): { total: number; shadow: number; drawCalls: number } {
+    const shadowMap = this.renderer.shadowMap;
+    const info = this.renderer.info.render;
+    const original = shadowMap.render.bind(shadowMap);
+    let shadow = 0;
+    shadowMap.render = (...args: Parameters<typeof original>): void => {
+      const before = info.triangles;
+      original(...args);
+      shadow += info.triangles - before;
+    };
+    try {
+      this.renderer.render(this.scene, this.rig.camera);
+    } finally {
+      shadowMap.render = original;
+    }
+    return { total: info.triangles, shadow, drawCalls: info.calls };
+  }
+
   /** Triangles par partie de la scène (diagnostic des budgets, page de démonstration). */
-  breakdown(): Record<string, number> {
+  breakdown(detail = false): Record<string, number> {
     const totals: Record<string, number> = {};
     for (const child of this.scene.children) {
       let sum = 0;
@@ -663,10 +686,18 @@ export class RenderEngine implements Renderer {
           const geometry = object.geometry as BufferGeometry;
           const vertices = geometry.index?.count ?? geometry.getAttribute('position').count;
           const instances = object instanceof InstancedMesh ? object.count : 1;
-          sum += (vertices / 3) * instances;
+          const triangles = (vertices / 3) * instances;
+          sum += triangles;
+          if (detail) {
+            // Détail par maillage, `*` pour ceux de la passe d'ombre.
+            const key = `${child.name || child.type}/${object.name}${object.castShadow ? ' *' : ''}`;
+            totals[key] = Math.round((totals[key] ?? 0) + triangles);
+          }
         }
       });
-      totals[child.name || child.type] = Math.round(sum);
+      if (!detail) {
+        totals[child.name || child.type] = Math.round(sum);
+      }
     }
     return totals;
   }

@@ -54,6 +54,8 @@ const JITTER = 0.7;
 /** Bord infranchissable de la carte (`bord` du level designer), en cases. */
 const PLAYABLE_BORDER = 2;
 const STRIPS = 4;
+/** Tronçons par côté au plus (côté prolongé divisé par `chunkSize`, large marge). */
+const FOREST_SEGMENTS_MAX = 16;
 
 function pick<T>(items: readonly T[], value: number): T {
   const item = items[Math.min(items.length - 1, Math.floor(value * items.length))];
@@ -213,8 +215,11 @@ export class Vegetation {
         if (hash2(cx, cy, SEED_TREE) >= density * this.share) {
           continue;
         }
-        const strip = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;
-        cells.push({ cx, cy, strip });
+        const side = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;
+        // Chaque côté coupé en tronçons: ceux hors du cadre sont éliminés (ni triangles ni appel).
+        const along = side < 2 ? cx : cy;
+        const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.chunkSize);
+        cells.push({ cx, cy, strip: side * FOREST_SEGMENTS_MAX + segment });
       }
     }
     const color = new Color();
@@ -223,8 +228,11 @@ export class Vegetation {
     const rotation = new Quaternion();
     const euler = new Euler();
     const scale = new Vector3();
-    for (let strip = 0; strip < STRIPS; strip += 1) {
+    for (let strip = 0; strip < STRIPS * FOREST_SEGMENTS_MAX; strip += 1) {
       const inStrip = cells.filter((cell) => cell.strip === strip);
+      if (inStrip.length === 0) {
+        continue;
+      }
       const firs = createInstanced(
         `foret sapins ${strip}`,
         firGeometry,

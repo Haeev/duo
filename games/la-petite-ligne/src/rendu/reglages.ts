@@ -91,6 +91,12 @@ export const RENDER_SETTINGS = {
     outerTreeDensity: 0.22,
     outerTreeStart: 2,
     pebbleDensity: 0.12,
+    /**
+     * Décor de la carte hors de la passe d'ombre: sols et objets de cette
+     * hauteur ou moins (m: rochers, tonneaux, barrières, bancs). Leur ombre se voit
+     * à peine, et la passe d'ombre redessine chaque triangle qui la porte.
+     */
+    shadowlessBelow: 1.0,
   },
 
   /**
@@ -156,6 +162,15 @@ export const RENDER_SETTINGS = {
     lookShares: { chest: 0.2, neck: 0.3, head: 0.5 },
     /** Salut (clip `wave`) au premier croisement de la journée, à cette distance (m). */
     greetRange: 2.6,
+    /**
+     * Bancs de la carte (modèle `bench`, sans `seat_height` dans le GLB): hauteur
+     * de l'assise, décalage du milieu de l'assise vers l'avant depuis l'origine
+     * du modèle, places le long du banc (m), et distance à laquelle un
+     * personnage arrêté est considéré comme assis dessus.
+     */
+    bench: { seatHeight: 0.45, seatForward: 0, slots: [-0.5, 0.5], reach: 0.8 },
+    /** Hauteur d'assise de l'animation `sit` (m): le bassin y est posé quand la racine est au sol. */
+    sitClipSeatHeight: 0.47,
     /** Tape dans la main (clip `high_five`) à une réussite à deux, si les joueurs sont à moins de (m). */
     highFiveRange: 1.8,
   },
