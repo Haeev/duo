@@ -8,7 +8,15 @@ Deux façons. Prends la première si elle marche, sinon la seconde.
 
 ### Avec Duo (les installateurs)
 
-Suis le guide [Installer Duo](installer-duo.md) sur le Mac et sur le PC. Si le lien de téléchargement du guide ne mène à rien, passe à la seconde façon et préviens le manager.
+Suis le guide [Installer Duo](installer-duo.md) sur le Mac et sur le PC.
+
+Si le lien de téléchargement du guide ne mène à rien (préversion pas encore publiée), les mêmes installateurs t'attendent sur GitHub, connecté à ton compte:
+
+1. Ouvre <https://github.com/Haeev/duo/actions/workflows/systemes.yml?query=branch%3Amain> et clique sur le passage le plus récent (coche verte).
+2. En bas de la page, dans « Artifacts », télécharge **duo-macos** sur le Mac et **duo-windows** sur le PC.
+3. Ce sont des fichiers zip: ouvre-les pour trouver `Duo-macOS.dmg` et `Duo-Windows.exe`, puis reprends le guide d'installation à l'étape 2.
+
+Si rien de tout ça ne marche, passe à la seconde façon et préviens le manager.
 
 ### Sans Duo: le Mac sert la démo, le PC l'ouvre dans son navigateur
 

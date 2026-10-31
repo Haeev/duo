@@ -54,6 +54,7 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 
 ## En attente du client
 
+- Publier la préversion v0.1.0 de Duo (page publique de téléchargement avec les installateurs). Recommandation: oui. En attendant, les installateurs se téléchargent depuis la page du workflow « Systèmes » de `main` (compte GitHub connecté).
 - Relevé des machines (Q4) avant le prototype, dont l'état de Smart App Control sur le PC (hypothèse retenue en attendant: i3 de 2018).
 - Basculer la branche par défaut du dépôt sur `main` dans les réglages GitHub.
 - Facultatif: coller `outils/installer-outils.sh` dans le « Setup script » de l'environnement cloud, pour que les outils soient prêts au démarrage de chaque session.
