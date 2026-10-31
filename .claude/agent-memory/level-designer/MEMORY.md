@@ -30,3 +30,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `sim.events` est vidé au début de chaque `step`: le lire juste après. Les gestes et la poutre n'ont pas de champ `by`.
 - Pour les répliques, reproduire la règle de `pickDialogue` (priorité stricte, puis tirage parmi les ex aequo) avec `evaluateAll` au lieu de l'appeler: elle consomme le générateur et changerait la partie.
 - Les robots ne bavardent pas et ne posent que trois meubles: leurs temps creux disent ce que la structure exige, pas ce que ferait un duo humain. Deux robots immobiles au même endroit faussent toute mesure de proximité.
+
+## Audit de cohérence d'une carte (G9, vérifié le 2026-10-31)
+
+- Raconter d'abord la carte comme un habitant (d'où vient la route, où va le bois, où est l'eau, où s'arrêtent les charrettes), puis passer chaque élément: raison d'être, place, sens, taille. Classer par visibilité.
+- Le rendu réel est indispensable: les rotations de la carte ne disent rien sans le modèle. Les lisses du passage à niveau en rotation 1 et 3 étaient parallèles à la route nord-sud; en 0 et 2, elles la barrent.
+- Captures: `npx vite --port <libre> --strictPort` dans `games/la-petite-ligne`, puis Playwright sur `rendu.html?stats=0&rendu=leger&vie=0&x=..&y=..&zoom=0|2&orientation=0..3&heure=11`, attente de `window.lplRendu.ready` puis 2,5 s. La première page après le démarrage de Vite reste parfois sur « Chargement »: faire une capture de chauffe.
+- Un changement « juste » peut casser une règle: tourner le banc du quai déplace son dossier et fait échouer le test d'ombre de l'énigme (`src/rendu/lumiere.test.ts`). Toujours relancer toute la suite du jeu, pas seulement `valider_carte.py`.
+- Le constructeur reproduit le JSON à l'octet près: le relancer avant de modifier pour que le diff ne contienne que ses propres changements.

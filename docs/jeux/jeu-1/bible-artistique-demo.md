@@ -4,7 +4,7 @@
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (démo d'une heure, printemps à la Halte d'Aubrune) |
 | Statut | proposition de l'artiste 3D, à relire par le directeur artistique |
-| Version | 0.3, 2026-10-31 (formes: low poly arrondi, section 8, réglée sur les témoins) |
+| Version | 0.4, 2026-10-31 (formes: low poly arrondi, section 8; liste de contrôle des détails de construction, 8.10) |
 | Sources des couleurs | `games/la-petite-ligne/assets-src/modeles/palette.py` (seule source; ce document en est l'extrait) |
 | Planches | `games/la-petite-ligne/assets-src/modeles/planches/` (scène assemblée de jour et de nuit, personnages, poses, bâtiments, ferme, train, maison) |
 
@@ -103,7 +103,7 @@ Une lumière directionnelle avec ombre, une hémisphérique, quatre ponctuelles 
 
 Décision du client (2026-10-31): le jeu est trop « angle droit », il demande de la courbure. Le style devient un **low poly arrondi**: les mêmes facettes visibles, mais plus aucune arête vive ni aucun coin à 90° là où l'œil s'arrête. On arrondit par des chanfreins à facettes et des volumes gonflés, jamais par un lissage des normales.
 
-État au 2026-10-31: la règle s'applique aux trois modèles témoins (`firmin_house`, joueur avec `outfit_work` et `hair_short`, `tree_oak_large` et `bush_round`). Rien n'est appliqué au reste du bourg avant l'accord du client.
+État au 2026-10-31: le client a validé vers 13 h l'application de la règle à tout le bourg, après les trois modèles témoins.
 
 ### 8.1 Ce qu'on garde
 
@@ -205,6 +205,23 @@ Plafond de la plateforme: 250 000 triangles et 150 appels de dessin à l'écran.
 - À faire: arrondir là où la lumière accroche (bords de toits, angles de murs, dessus des meubles); exagérer un peu les volumes (toits gonflés, troncs évasés, têtes rondes); casser les symétries parfaites de quelques centimètres.
 - À éviter: le lissage des normales (on perdrait le style à facettes), les biseaux de plus de 2 segments, les sphères parfaites lisses, les arêtes vives au premier plan, et toute forme qui imite un jeu existant.
 
+### 8.10 Liste de contrôle « détails de construction » (chaque modèle livré)
+
+Ajoutée le 2026-10-31 après la remarque du client sur l'établi (« des poutres qui dépassent, des escaliers qui ne ressemblent pas à des escaliers »). À cocher pour chaque modèle, sur des rendus de près sous quatre angles (vue de jeu, vue opposée, vue basse de côté, vue rapprochée), avant toute livraison. Un seul « non », et le modèle n'est pas livré.
+
+1. **Rien ne flotte**: chaque pièce touche ce qui la porte (sol, mur, poutre, plateau). Pieds, roues, poteaux et socles posent au sol; pas de jour entre une jambe et ce qu'elle soutient. Contrôle par script: aucune île de géométrie au-dessus du sol qui ne touche aucune autre pièce (tolérance 1 cm).
+2. **Rien ne traverse**: aucune pièce ne passe au travers d'une autre (store à travers un mur, établi à travers un panneau, cuillère à travers un bol, poteau qui perce un toit). Une pièce s'arrête sur ce qui la porte.
+3. **Rien ne dépasse sans raison**: lattes, couvre-joints, chevrons et planches coupés à la bonne longueur; un débord se justifie (toit, rive, about de poutre de 5 à 15 cm au plus).
+4. **Structure lisible**: un toit repose sur des poutres, des sablières ou des consoles visibles; un porte-à-faux a ses aisseliers; un poteau porte quelque chose; une étagère, une table et un banc ont des assemblages qui tiendraient (traverses, entretoises reliées aux pieds).
+5. **Escaliers crédibles**: marches de 15 à 20 cm de haut et de 25 à 30 cm de profondeur, toutes égales; marches posées sur des limons ou sur un massif; marche et contremarche lisibles par deux tons ou un nez de marche; pas de dalles qui flottent en escalier.
+6. **Échelle humaine**: portes de 2 à 2,10 m de haut et 0,8 à 0,9 m de large; poignées vers 1 m; fenêtres avec appui vers 0,9 m; plateaux de table vers 0,75 m; assises vers 0,45 m; marches comme au point 5. Comparer à un personnage de 1,74 m posé à côté.
+7. **Objets qui tiennent debout**: un vélo a sa béquille ou s'appuie contre un mur, une charrette à deux roues a sa béquille ou ses brancards au sol, un objet empilé repose à plat.
+8. **Surfaces propres**: aucune face manquante, inversée ou en double (traits fins, papillotement, triangles sombres sur une surface plane); rien d'intérieur qui affleure à travers un mur.
+9. **Rien de provisoire**: pas de texte remplacé par des carrés, pas de pavé à la place d'une forme (queue de poule, grignes de pain), pas de doublon inutile entre deux modèles.
+10. **Au bon endroit, dans le bon sens, à la bonne taille, et pourquoi** (règle du studio « Cohérence du monde et sens du détail »): une barrière de passage à niveau barre la route, une enseigne fait face à la rue ou au quai, une porte donne sur un chemin, un banc regarde ce qu'on contemple, un tuyau de poêle rejoint un conduit, des rails mènent quelque part. Ce qui relève du modèle (orientation de son axe, pièces qui le relient au reste) est à l'artiste 3D; ce qui relève de la carte (position, rotation) est au level designer.
+
+Outils: le script de rendu d'audit (quatre vues par nœud racine dans Blender, contrôle des îles qui flottent) décrit dans `docs/jeux/jeu-1/gauntlet/revues/audit-modeles.md`.
+
 ## 9. Historique
 
 | Date | Version | Changement | Par |
@@ -212,3 +229,4 @@ Plafond de la plateforme: 250 000 triangles et 150 appels de dessin à l'écran.
 | 2026-10-31 | 0.1 | Première version (palette, matériaux, lumière, lisibilité, personnages) | artiste 3D |
 | 2026-10-31 | 0.2 | Section 8 « Formes: low poly arrondi » (décision du client: plus de courbure), budgets du PC de référence; section 9 | directeur artistique |
 | 2026-10-31 | 0.3 | Réglages après la planche des témoins de l'artiste 3D: flèche du faîtage de 6 à 10 cm et bombé des pans de 4 à 6 cm (3 à 5 et 2 à 4 cm invisibles à 24 m), pierres d'angle irrégulières, tête de 10 à 12 pans, coiffures en lobes, torse bombé, clips à vérifier, budget du joueur à employer. Style appliqué aux seuls témoins jusqu'à l'accord du client | directeur artistique |
+| 2026-10-31 | 0.4 | Le client valide l'arrondi pour tout le bourg (vers 13 h); section 8.10, liste de contrôle « détails de construction » après sa remarque sur l'établi, avec la question « au bon endroit, dans le bon sens, à la bonne taille » | directeur artistique |

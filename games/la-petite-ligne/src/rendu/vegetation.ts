@@ -26,6 +26,7 @@ const SEED_JITTER_Y = 16;
 const SEED_SCALE = 17;
 const SEED_KIND = 18;
 const SEED_ANGLE = 19;
+const SEED_ORDER = 23;
 const TUFT_CELLS: readonly PaletteCell[] = [
   'grass_light',
   'grass_dark',
@@ -67,6 +68,9 @@ function pick<T>(items: readonly T[], value: number): T {
 
 export class Vegetation {
   readonly group = new Group();
+  /** Semis (touffes, fleurs, galets) et leur nombre complet d'instances. */
+  private readonly scattered: { mesh: InstancedMesh; full: number }[] = [];
+  private detail = 1;
 
   constructor(
     map: GameMap,
@@ -146,7 +150,11 @@ export class Vegetation {
         list.length,
       );
       mesh.castShadow = shadows;
-      for (const { cx, cy } of list) {
+      // Ordre mêlé (stable): les premières instances couvrent toute la carte, `setDetail` n'en garde qu'une part.
+      const shuffled = [...list].sort(
+        (a, b) => hash2(a.cx, a.cy, SEED_ORDER + seed) - hash2(b.cx, b.cy, SEED_ORDER + seed),
+      );
+      for (const { cx, cy } of shuffled) {
         const x = cx + 0.5 + (hash2(cx, cy, SEED_JITTER_X + seed) - 0.5) * JITTER;
         const y = cy + 0.5 + (hash2(cx, cy, SEED_JITTER_Y + seed) - 0.5) * JITTER;
         const size = TREE_SCALE_MIN + hash2(cx, cy, SEED_SCALE + seed) * TREE_SCALE_SPREAD;
@@ -161,12 +169,27 @@ export class Vegetation {
         mesh.count += 1;
       }
       finishInstances(mesh);
+      this.scattered.push({ mesh, full: mesh.count });
       this.group.add(mesh);
     };
     scatter('touffes', tuft, tufts, TUFT_CELLS, SEED_TUFT, false);
     scatter('fleurs', flower, flowers, FLOWER_CELLS, SEED_FLOWER, false);
     scatter('galets', pebble, pebbles, PEBBLE_CELLS, SEED_PEBBLE, false);
     this.plantOuterForest(map, terrain, materials, resources);
+  }
+
+  /**
+   * Part des semis dessinée (1: tous). Au zoom large, touffes, fleurs et
+   * galets ne sont que des points: on en dessine moins, sans rien changer de près.
+   */
+  setDetail(share: number): void {
+    if (share === this.detail) {
+      return;
+    }
+    this.detail = share;
+    for (const { mesh, full } of this.scattered) {
+      mesh.count = Math.round(full * share);
+    }
   }
 
   /** Forêt du pourtour: hors du bord jouable, de plus en plus dense en s'éloignant. */

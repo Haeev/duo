@@ -69,6 +69,27 @@ class GeometryWriter {
     }
   }
 
+  /** Triangle a, b, c, orienté vers `normal`. */
+  triangle(
+    p0: readonly [number, number, number],
+    p1: readonly [number, number, number],
+    p2: readonly [number, number, number],
+    normal: readonly [number, number, number],
+    cell: PaletteCell,
+  ): void {
+    this.a.set(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]);
+    this.b.set(p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]);
+    this.n.crossVectors(this.a, this.b);
+    const facing = this.n.x * normal[0] + this.n.y * normal[1] + this.n.z * normal[2];
+    const order = facing >= 0 ? [p0, p1, p2] : [p0, p2, p1];
+    const uv = paletteUv(cell);
+    for (const p of order) {
+      this.positions.push(p[0], p[1], p[2]);
+      this.normals.push(normal[0], normal[1], normal[2]);
+      this.uvs.push(uv.u, uv.v);
+    }
+  }
+
   build(): BufferGeometry {
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(this.positions), 3));
@@ -79,6 +100,24 @@ class GeometryWriter {
     return geometry;
   }
 }
+
+/**
+ * Sols dont les coins s'arrondissent entre eux: herbe, chemins, pavés de la
+ * place, gravier (écart de hauteur d'au plus `cornerMaxStep`).
+ */
+const ROUNDED_KINDS: ReadonlySet<GroundKind> = new Set<GroundKind>([
+  'grass',
+  'path',
+  'stone',
+  'gravel',
+]);
+/** Coins d'une case, dans l'ordre du pourtour: direction (sx, sy) vers le coin. */
+const CORNERS = [
+  [-1, -1],
+  [1, -1],
+  [1, 1],
+  [-1, 1],
+] as const;
 
 /** Sol prolongé au-delà du bord: on garde ce qui continue (eau, voie, chemin), le reste devient herbe. */
 function extendedKind(kind: GroundKind): GroundKind {
@@ -246,6 +285,113 @@ export class Terrain {
     );
   }
 
+  /**
+   * Coin (sx, sy) de la case à arrondir: ses trois voisines de ce coin sont
+   * d'un même autre sol arrondissable, à la même hauteur (bout ou angle
+   * intérieur d'un chemin). Renvoie la teinte du coin rogné, ou `null`.
+   */
+  private cornerFill(
+    cx: number,
+    cy: number,
+    look: CellLook,
+    sx: number,
+    sy: number,
+  ): PaletteCell | null {
+    if (!ROUNDED_KINDS.has(look.kind)) {
+      return null;
+    }
+    const neighbours: [number, number][] = [
+      [cx + sx, cy],
+      [cx, cy + sy],
+      [cx + sx, cy + sy],
+    ];
+    let kind: GroundKind | null = null;
+    for (const [nx, ny] of neighbours) {
+      if (!this.insideBand(nx, ny)) {
+        return null;
+      }
+      const other = this.look(nx, ny);
+      if (
+        other.kind === look.kind ||
+        Math.abs(other.height - look.height) > SETTINGS.cornerMaxStep ||
+        !ROUNDED_KINDS.has(other.kind)
+      ) {
+        return null;
+      }
+      if (kind !== null && other.kind !== kind) {
+        return null;
+      }
+      kind = other.kind;
+    }
+    return this.topCell(this.look(cx + sx, cy), cx + sx, cy);
+  }
+
+  /** Coins rognés d'une case (teinte par coin, `null` s'il reste droit); `null` si aucun. */
+  private roundedCorners(cx: number, cy: number, look: CellLook): (PaletteCell | null)[] | null {
+    const fills = CORNERS.map(([sx, sy]) => this.cornerFill(cx, cy, look, sx, sy));
+    return fills.some((fill) => fill !== null) ? fills : null;
+  }
+
+  /**
+   * Dessus d'une case aux coins arrondis (bible, 8.7: plus d'escalier de
+   * cases): un éventail depuis le centre, et pour chaque coin rogné un petit
+   * éventail à la teinte du sol voisin. La grille de la simulation ne change pas.
+   */
+  private roundedTop(
+    writer: GeometryWriter,
+    cx: number,
+    cy: number,
+    height: number,
+    cell: PaletteCell,
+    fills: readonly (PaletteCell | null)[],
+  ): void {
+    const up = [0, 1, 0] as const;
+    const radius = SETTINGS.cornerRadius;
+    const segments = SETTINGS.cornerSegments;
+    const centre: [number, number, number] = [cx + 0.5, height, cy + 0.5];
+    const outline: [number, number, number][] = [];
+    CORNERS.forEach(([sx, sy], index) => {
+      const corner: [number, number, number] = [
+        cx + (sx > 0 ? 1 : 0),
+        height,
+        cy + (sy > 0 ? 1 : 0),
+      ];
+      const fill = fills[index] ?? null;
+      if (fill === null) {
+        outline.push(corner);
+        return;
+      }
+      // Quart de cercle de centre `pivot`, du bord vertical au bord horizontal de la case.
+      const pivotX = corner[0] - sx * radius;
+      const pivotZ = corner[2] - sy * radius;
+      const arc: [number, number, number][] = [];
+      for (let i = 0; i <= segments; i += 1) {
+        const angle = (i / segments) * (Math.PI / 2);
+        arc.push([
+          pivotX + sx * radius * Math.cos(angle),
+          height,
+          pivotZ + sy * radius * Math.sin(angle),
+        ]);
+      }
+      for (let i = 0; i < segments; i += 1) {
+        const a = arc[i];
+        const b = arc[i + 1];
+        if (a !== undefined && b !== undefined) {
+          writer.triangle(corner, a, b, up, fill);
+        }
+      }
+      // Dans l'ordre du pourtour: les coins impairs parcourent l'arc à l'envers.
+      outline.push(...(sx * sy > 0 ? arc : arc.reverse()));
+    });
+    for (let i = 0; i < outline.length; i += 1) {
+      const a = outline[i];
+      const b = outline[(i + 1) % outline.length];
+      if (a !== undefined && b !== undefined) {
+        writer.triangle(centre, a, b, up, cell);
+      }
+    }
+  }
+
   private buildGround(): BufferGeometry {
     const writer = new GeometryWriter();
     const up = [0, 1, 0] as const;
@@ -259,7 +405,11 @@ export class Terrain {
         const atEnd = cx === this.map.width + this.ext;
         const look = atEnd ? null : this.look(cx, cy);
         const cell = look === null ? null : this.topCell(look, cx, cy);
-        if (runCell !== null && (look === null || cell !== runCell || look.height !== runHeight)) {
+        const fills = look === null ? null : this.roundedCorners(cx, cy, look);
+        if (
+          runCell !== null &&
+          (look === null || fills !== null || cell !== runCell || look.height !== runHeight)
+        ) {
           writer.quad(
             [
               [runStart, runHeight, cy],
@@ -271,6 +421,10 @@ export class Terrain {
             runCell,
           );
           runCell = null;
+        }
+        if (look !== null && cell !== null && fills !== null) {
+          this.roundedTop(writer, cx, cy, look.height, cell, fills);
+          continue;
         }
         if (look !== null && cell !== null && runCell === null) {
           runStart = cx;

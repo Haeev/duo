@@ -194,8 +194,11 @@ def construire_terrain() -> None:
     # Route du passage à niveau au gué, chemin devant la maisonnette, sentier vers la voie.
     peindre(":", 17, 15, 3, 23)
     peindre(":", 3, 27, 14, 1)
-    peindre(":", 13, 15, 1, 12)
-    peindre(":", 13, 10, 1, 2)
+    peindre(":", 13, 16, 1, 11)
+    # Le sentier du jardin rejoint le passage à niveau au lieu de traverser les rails à 4 m de lui.
+    peindre(":", 13, 15, 4, 1)
+    # Firmin sort de chez lui sur le sentier de la voie.
+    peindre(":", 44, 8, 1, 2)
 
     # Promenade de l'Aubrune.
     peindre(":", 17, 34, 45, 2)
@@ -262,8 +265,9 @@ def construire_objets() -> None:
     objet("bush", 46, 20)
     objet("bush", 47, 20)
     objet("bush", 49, 19)
-    objet("level_crossing_gate", 16, 11, rotation=1, ident="level_crossing_gate_north")
-    objet("level_crossing_gate", 20, 15, rotation=3, ident="level_crossing_gate_south")
+    # Les lisses barrent la route (nord-sud), pas le bas-côté: poteau à droite de qui arrive, lisse en travers.
+    objet("level_crossing_gate", 16, 11, rotation=0, ident="level_crossing_gate_north")
+    objet("level_crossing_gate", 20, 15, rotation=2, ident="level_crossing_gate_south")
     objet("lamp_post", 20, 20, ident="lamp_level_crossing")
 
     # La maisonnette du garde-barrière et son terrain

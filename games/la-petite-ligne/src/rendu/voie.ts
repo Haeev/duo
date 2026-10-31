@@ -78,7 +78,8 @@ function easeIn(t: number): number {
 
 export class RailwayPart implements EventfulPart {
   readonly group = new Group();
-  private readonly rails: InstancedBatches;
+  /** Rails par tronçons de `chunkSize`: ceux hors du cadre sont éliminés. */
+  private readonly rails: InstancedBatches[] = [];
   private readonly train = new Group();
   private readonly cars: Object3D[] = [];
   private readonly trackY: number;
@@ -137,10 +138,8 @@ export class RailwayPart implements EventfulPart {
     const top = library.extras(RAIL_MODEL).rail_top;
     this.railTop = typeof top === 'number' ? top : DEFAULT_RAIL_TOP;
 
-    this.rails = new InstancedBatches('rails', library, materials, resources, RAIL_CAPACITY, false);
-    this.group.add(this.rails.group);
     if (railRows.length > 0) {
-      this.layRails();
+      this.layRails(materials, resources);
     }
 
     this.train.name = 'train';
@@ -239,15 +238,33 @@ export class RailwayPart implements EventfulPart {
     return bind(object);
   }
 
-  private layRails(): void {
+  private layRails(materials: SharedMaterials, resources: ResourceTracker): void {
     const ext = RENDER_SETTINGS.terrain.extension;
+    const chunk = RENDER_SETTINGS.terrain.chunkSize;
     const matrix = new Matrix4();
     const ground = this.terrain.heightAt(this.map.width / 2, this.trackY);
-    this.rails.begin();
+    let segment: InstancedBatches | null = null;
+    let segmentIndex = -1;
     for (let x = -ext + RAIL_MODULE_LENGTH / 2; x < this.map.width + ext; x += RAIL_MODULE_LENGTH) {
-      this.rails.add(RAIL_MODEL, matrix.makeTranslation(x, ground, this.trackY));
+      const index = Math.floor((x + ext) / chunk);
+      if (segment === null || index !== segmentIndex) {
+        segment?.end();
+        segment = new InstancedBatches(
+          'rails',
+          this.library,
+          materials,
+          resources,
+          RAIL_CAPACITY,
+          false,
+        );
+        segmentIndex = index;
+        this.rails.push(segment);
+        this.group.add(segment.group);
+        segment.begin();
+      }
+      segment.add(RAIL_MODEL, matrix.makeTranslation(x, ground, this.trackY));
     }
-    this.rails.end();
+    segment?.end();
   }
 
   update(context: FrameContext): void {

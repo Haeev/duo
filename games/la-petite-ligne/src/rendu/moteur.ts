@@ -125,6 +125,7 @@ export class RenderEngine implements Renderer {
   /** Qualité adaptative (`qualite.ts`); `null` en mode léger demandé ou sans adaptation. */
   private readonly quality: AdaptiveQuality | null;
   private readonly log: RendererOptions['log'];
+  private vegetation: Vegetation | null = null;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -231,7 +232,8 @@ export class RenderEngine implements Renderer {
     if (await this.interrupted()) {
       return;
     }
-    this.scene.add(new Vegetation(map, terrain, materials, this.resources, share).group);
+    this.vegetation = new Vegetation(map, terrain, materials, this.resources, share);
+    this.scene.add(this.vegetation.group);
     if (await this.interrupted()) {
       return;
     }
@@ -437,6 +439,10 @@ export class RenderEngine implements Renderer {
     context.local = this.view.localCharacter();
     context.quarter = this.rig.quarter();
     context.shownYaw = this.rig.shownYaw();
+    const scatter = RENDER_SETTINGS.terrain;
+    this.vegetation?.setDetail(
+      this.rig.viewWidth() >= scatter.scatterFarViewWidth ? scatter.scatterFarShare : 1,
+    );
     context.night = this.daylight.night;
     context.reducedMotion = this.reducedMotion;
     if (this.world !== null) {

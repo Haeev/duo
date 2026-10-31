@@ -78,6 +78,21 @@ export const RENDER_SETTINGS = {
     waveAmplitude: 0.025,
     waveSpeed: 1.3,
     waveLength: 3.2,
+    /**
+     * Coins des chemins arrondis (bible, 8.7): rayon (m) et segments du quart
+     * de cercle (un tous les 25 cm environ). Entre sols dont la hauteur diffère
+     * d'au plus `cornerMaxStep` (m): le coin rogné prend la hauteur de la case,
+     * la marche de quelques centimètres reste droite au bord.
+     */
+    cornerRadius: 0.5,
+    cornerSegments: 3,
+    cornerMaxStep: 0.05,
+    /**
+     * Semis au zoom large: à partir de cette largeur de vue (m; zooms de 16, 24
+     * et 36 m), seule cette part des touffes, fleurs et galets est dessinée.
+     */
+    scatterFarViewWidth: 30,
+    scatterFarShare: 0.5,
     /** Taille des morceaux de décor fusionnés (découpage pour l'élimination hors champ). */
     chunkSize: 24,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
