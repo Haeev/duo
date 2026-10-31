@@ -35,6 +35,9 @@ import { Terrain } from './terrain';
 import { Vegetation } from './vegetation';
 import { WorldParts } from './monde';
 import { CharactersPart } from './personnages';
+import { HousePart } from './maison';
+import { GardenPart } from './potager';
+import { FarmLifePart } from './vie';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;
@@ -167,9 +170,16 @@ export class RenderEngine implements Renderer {
     });
     this.world = world;
     this.parts.push(world);
-    const characters = new CharactersPart(library, materials, terrain, this.resources, this.picks, this.view.content);
-    this.scene.add(characters.group);
+    const content = this.view.content;
+    const characters = new CharactersPart(library, materials, terrain, this.resources, this.picks, content);
+    const house = new HousePart(map, content, library, materials, terrain, this.resources, this.picks);
+    const garden = new GardenPart(library, materials, terrain, this.resources, this.picks);
+    const farm = new FarmLifePart(library, materials, terrain, this.resources, this.picks, content);
+    this.scene.add(characters.group, house.group, garden.batches.group, garden.trees.group, farm.group);
     world.add(characters);
+    world.add(house);
+    world.add(garden);
+    world.add(farm);
     onProgress(LOAD_BUILD_SHARE);
 
     const local = this.localCharacter(this.view.world());
