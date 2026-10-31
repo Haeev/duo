@@ -373,7 +373,7 @@
       "hold": "Tiens un côté de l'échelle ({act})."
     },
     "partnerReady": "{partner} est déjà en place.",
-    "partnerNotSettled": "{partner} est là, pas encore en place.",
+    "partnerNotSettled": "{partner} est là, mais pas encore en place.",
     "partnerLetGo": "{partner} a lâché l'échelle.",
     "hintOverline": "Une confidence",
     "hintChip": "Rien que pour toi",

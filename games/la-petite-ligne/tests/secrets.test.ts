@@ -172,7 +172,7 @@ describe('secrets: rien du secret chez l’autre (S-02)', () => {
     // L'informé lit sa fiche et voit les noms au-dessus des poules; l'autre, rien.
     const card = secretCards(sim.world, content, 'p1');
     expect(card).toHaveLength(1);
-    expect(card[0]?.title).toBe("Les poules d'Odette");
+    expect(card[0]?.title).toBe("La confidence d'Odette");
     expect(card[0]?.lines.join(' ')).toContain(colors[sim.world.hens[0]?.variant ?? ''] ?? '?');
     expect(sim.world.hens.map((h) => henLabel(sim.world, content, h, 'p1'))).toEqual(NAMES);
     expect(leaks('p2')).toEqual([]);

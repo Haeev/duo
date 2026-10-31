@@ -236,10 +236,12 @@ describe('moments: l’apogée n’attend que les deux (M-05)', () => {
     expect(climaxes(events)).toEqual([{ type: 'moment_climax', moment: 'heron', startTick: today.startTick }]);
     expect(today.phase).toBe('climax');
     expect(sim.world.characters.every((c) => c.heartToday.moment === true)).toBe(true);
-    expect(sim.world.characters.every((c) => c.notifications.some((n) => n.key === 'heron_seen'))).toBe(true);
+    // Le texte attend la fin du spectacle pour ne pas détourner les yeux de la bête.
+    expect(sim.world.characters.some((c) => c.notifications.some((n) => n.key === 'heron_seen'))).toBe(false);
     // La chorégraphie dure 7,4 s (alerte tenue avant l'envol, M-02), identique chez les deux, puis l'état d'après; aucun sou ajouté.
     wait(sim, 7.5);
     expect(today.phase).toBe('after');
+    expect(sim.world.characters.every((c) => c.notifications.some((n) => n.key === 'heron_seen'))).toBe(true);
     expect(climaxes(wait(sim, 3))).toEqual([]);
     expect(sim.world.purse).toBe(purse);
     expect(sim.world.moments.history.at(-1)).toMatchObject({ id: 'heron', origin: 'ambient', seen: true });

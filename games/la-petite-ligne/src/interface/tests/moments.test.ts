@@ -94,7 +94,7 @@ describe("ligne d'observation et anneau", () => {
     expect(watchModel(sim.world, uiContext('p2'))).toBeNull();
     // L'autre arrive près du gué sans être en place: il n'est pas dit absent.
     placeAt(sim, 'p2', 4, true);
-    expect(line(sim, 'p1')).toBe('Sacha est là, pas encore en place.');
+    expect(line(sim, 'p1')).toBe('Sacha est là, mais pas encore en place.');
   });
 
   it('dit la pose demandée (immobile et tourné vers lui), et que l’autre est déjà là', () => {

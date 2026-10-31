@@ -117,3 +117,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - `p1` est `players[0]` de `createWorld`, pas forcément l'hôte: écrire « premier joueur de la liste », jamais « l'hôte ».
 - Un choix à N réponses permet au plus N - 1 erreurs: régler le coup de coude en dessous, sinon il ne sort jamais.
 - Un nom propre qui commence par une minuscule (« la Duchesse ») ne doit jamais ouvrir une phrase par un espace réservé.
+
+## Revues de textes (vérifié au tour 6)
+
+- Accord caché au genre des joueurs: un participe après « vous » (« Le héron vous a vus ») s'accorde aux joueurs. Réécrire avec « avoir » et un objet (« Vous avez vu le héron »).
+- Un texte qui dit où est un habitant (« Firmin est sur le quai ») doit tenir sur toute la plage horaire de la condition: comparer avec l'emploi du temps dans `habitants.json`.
+- Des tests vérifient des phrases exactes (`src/interface/tests/moments.test.ts`, `tests/secrets.test.ts`): grep la phrase dans `tests/` et `src/**/tests/` avant de la changer; sinon la proposer au manager avec la ligne du test.
+- Un texte d'apogée ou de récompense doit partir quand la chose est vue, pas quand elle commence: vérifier où le code émet la notification (`startClimax` l'envoyait au tick 0 au tour 6).

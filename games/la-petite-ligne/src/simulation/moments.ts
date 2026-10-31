@@ -255,7 +255,6 @@ function startClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
     world.purse += def.reward.money;
     emit(sim, { type: 'money', amount: def.reward.money });
   }
-  notifyKey(sim, 'both', 'message', def.texts.climax);
   const own = world.moments.history.find((h) => h.id === def.id && h.day === today.day && h.origin === today.origin && !h.seen);
   if (own !== undefined) own.seen = true;
   else {
@@ -295,6 +294,8 @@ function updateClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
   today.elapsed += SIM_DT;
   sim.runtime.changed = true;
   if (today.elapsed < choreo.seconds) return;
+  // Le texte arrive à la fin du spectacle: au début, il détournait les yeux de la bête.
+  notifyKey(sim, 'both', 'message', def.texts.climax);
   releaseAll(sim);
   // L'heure de départ passée pendant l'apogée: l'état d'après se termine aussitôt.
   enter(sim, today, minutes(sim) >= def.present.to ? 'gone' : 'after');
