@@ -20,7 +20,7 @@
       "from": "coop",
       "title": "Rappel de la coopérative",
       "delivery": { "day": 6, "time": "06:00" },
-      "text": "Rappel: le catalogue ferme vendredi à minuit. Les rideaux font fureur à la ville, paraît-il."
+      "text": "Rappel: le catalogue ferme vendredi à minuit. Les rideaux font fureur à la ville, paraît-il. Le poste à galène voyage en gros colis: prévoyez quatre bras pour le porter du quai à la maisonnette."
     },
     {
       "id": "coop_recap",
@@ -71,7 +71,7 @@
       "from": "coop",
       "title": "Rappel de la coopérative",
       "delivery": { "day": 13, "time": "06:00" },
-      "text": "Rappel: le catalogue ferme vendredi à minuit. Le poêle à bois chauffe une pièce entière, paraît-il. Et les rideaux font toujours fureur."
+      "text": "Rappel: le catalogue ferme vendredi à minuit. Le poêle à bois chauffe une pièce entière, paraît-il. Il voyage en gros colis, comme le poste à galène: à porter à deux, du quai à la maisonnette."
     },
     {
       "id": "coop_recap_2",

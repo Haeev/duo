@@ -234,6 +234,35 @@
           "lines": [{ "speaker": "firmin", "text": "La coopérative écrit que la voie des Vergers sera la prochaine. Les cerisiers vous attendent. Moi aussi, un peu." }]
         },
         {
+          "id": "firmin_parcel_thanks",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "given", "villager": "firmin", "item": "odette_parcel", "since": "game_start" }],
+          "lines": [{ "speaker": "firmin", "text": "Un colis d'Odette ? Des chaussettes. Encore. Je vais finir par en avoir une paire par traverse." }]
+        },
+        {
+          "id": "firmin_chub_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "firmin_chub", "step": "bring" }],
+          "lines": [{ "speaker": "firmin", "text": "Un chevesne pour mon souper, ce serait un luxe. Ça se pêche au gué, ou au bout du ponton. Je vous paie en sous, pas en chaussettes." }]
+        },
+        {
+          "id": "firmin_chub_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "firmin_chub" }],
+          "lines": [{ "speaker": "firmin", "text": "Un beau chevesne ! Ce soir, je dîne comme un chef de gare. Bon, de halte. Merci." }]
+        },
+        {
+          "id": "firmin_eve_announce",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "day_is", "days": [13] }],
+          "lines": [{ "speaker": "firmin", "text": "Demain après-midi, passez me voir près de la cloche, à deux. J'ai une question qui ne se pose pas deux fois." }]
+        },
+        {
           "id": "firmin_morning",
           "kind": "daily",
           "priority": 1,
@@ -338,9 +367,9 @@
           "point": "quay_bell",
           "once": "duo",
           "priority": 80,
-          "when": [{ "type": "day_is", "days": [14] }, { "type": "time_is", "from": "15:00", "to": "18:00" }],
+          "when": [{ "type": "day_at_least", "day": 14 }, { "type": "any", "conditions": [{ "type": "day_is", "days": [15] }, { "type": "time_is", "from": "12:00", "to": "24:00" }] }],
           "lines": [
-            { "speaker": "firmin", "text": "Vous voilà à deux, ça tombe bien. Demain, c'est le train. J'ai une question." },
+            { "speaker": "firmin", "text": "Vous voilà à deux, ça tombe bien. Le train arrive bientôt, et j'ai une question." },
             { "speaker": "firmin", "text": "Quand la ligne ira jusqu'aux Vergers, vous resterez à la halte ? Elle a besoin de monde. Et moi, j'ai pris l'habitude de vous voir passer." },
             {
               "choices": [
@@ -511,6 +540,36 @@
           "priority": 46,
           "when": [{ "type": "quest_done", "quest": "odette_fry" }],
           "lines": [{ "speaker": "odette", "text": "Quatre goujons ! Ça sent déjà la friture. Tenez, pour la peine, et du pain tout chaud." }]
+        },
+        {
+          "id": "odette_dandelions_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "odette_dandelions", "step": "bring" }],
+          "lines": [{ "speaker": "odette", "text": "Une salade de pissenlits, ça vous dit ? Il en pousse au bord du bois, le long de la lisière. Rapportez-m'en trois, je fais la vinaigrette." }]
+        },
+        {
+          "id": "odette_dandelions_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "odette_dandelions" }],
+          "lines": [{ "speaker": "odette", "text": "De beaux pissenlits ! Les dents-de-lion, disait ma mère. Ce soir, salade. Tenez, pour la cueillette." }]
+        },
+        {
+          "id": "odette_parcels_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "odette_parcels", "step": "deliver" }],
+          "lines": [{ "speaker": "odette", "text": "Deux colis à livrer: un pour Firmin, un pour Basile. Chacun le sien, et je ne vous dis pas ce qu'il y a dedans. Des chaussettes." }]
+        },
+        {
+          "id": "odette_parcels_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "odette_parcels" }],
+          "lines": [{ "speaker": "odette", "text": "Les deux colis sont arrivés ? Plus rapide que la poste ! Ne le répétez pas à Lucie." }]
         },
         {
           "id": "odette_morning",
@@ -742,7 +801,14 @@
           "kind": "quest",
           "priority": 21,
           "when": [{ "type": "step_active", "quest": "handcar", "step": "repair" }],
-          "lines": [{ "speaker": "basile", "text": "Laissez-moi la nuit. Une draisine, ça ne se répare pas devant tout le monde." }]
+          "lines": [{ "speaker": "basile", "text": "Laissez-moi la nuit. Une draisine, ça ne se répare pas devant tout le monde. Demain, il faudra vos quatre bras pour la pousser." }]
+        },
+        {
+          "id": "basile_handcar_push",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "handcar", "step": "push" }],
+          "lines": [{ "speaker": "basile", "text": "Elle est sur les rails, devant la remise. Un de chaque côté, et on pousse ensemble. Seul, on ne fait que la fatiguer." }]
         },
         {
           "id": "basile_handcar_scene",
@@ -753,8 +819,7 @@
           "priority": 90,
           "when": [{ "type": "step_active", "quest": "handcar", "step": "try" }, { "type": "time_is", "from": "08:00", "to": "18:00" }],
           "lines": [
-            { "speaker": "basile", "text": "Bon. À deux, on pousse. Doucement: elle a vingt ans de sommeil dans les essieux." },
-            { "speaker": "narrator", "text": "La draisine grince, hésite, puis roule de quelques mètres sur les rails." },
+            { "speaker": "basile", "text": "Vous l'avez entendue grincer ? Vingt ans de sommeil dans les essieux, et pourtant elle a roulé." },
             { "speaker": "basile", "text": "Elle roule ! Émile serait content. Pour les Vergers, il faudra une voie dégagée. Mais elle, elle est prête." },
             {
               "choices": [
@@ -804,6 +869,13 @@
           "shared": true,
           "point": "quay_bell",
           "lines": [{ "speaker": "basile", "text": "La draisine est prête. Il ne lui manque qu'une voie dégagée et quatre bras. Je connais quatre bras." }]
+        },
+        {
+          "id": "basile_parcel_thanks",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "given", "villager": "basile", "item": "odette_parcel", "since": "game_start" }],
+          "lines": [{ "speaker": "basile", "text": "Un colis d'Odette. Des chaussettes, je parie. Elle croit que j'ai froid aux pieds. Elle a raison." }]
         },
         {
           "id": "basile_morning",
@@ -1062,6 +1134,21 @@
           "priority": 45,
           "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
           "lines": [{ "speaker": "jeanne", "text": "Il a dit merci ? Trois fois ? Ma tante va devenir rouge comme une tomate. Tenez, c'est mon argent de poche." }]
+        },
+        {
+          "id": "jeanne_notebook_ask",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "jeanne_notebook", "step": "find" }],
+          "lines": [{ "speaker": "jeanne", "text": "J'ai perdu mon carnet de galets ! Quarante galets dedans. Je l'avais près de l'eau, peut-être au ponton. Tu m'aides à le retrouver ?" }]
+        },
+        {
+          "id": "jeanne_notebook_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "jeanne_notebook" }],
+          "lines": [{ "speaker": "jeanne", "text": "Mon carnet ! Tous mes galets sont là. Tu es la meilleure équipe du monde. Enfin, vous. Tenez, mon argent de poche." }]
         },
         {
           "id": "jeanne_morning",

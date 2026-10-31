@@ -22,7 +22,22 @@ import {
   type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
+import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
+
+/**
+ * Cases du sol dont la teinte devient continue, dans l'ordre des couleurs de
+ * `uGroundColors`: trois verts, puis pavés (clair, sombre) et chemins (clair, sombre).
+ */
+export const GROUND_CELLS = [
+  'grass_dark',
+  'grass',
+  'grass_light',
+  'cobble',
+  'cobble_dark',
+  'path',
+  'path_dark',
+] as const satisfies readonly PaletteCell[];
 
 /** Nombre de lumières de sol que le shader sait lire (le plus grand des deux niveaux de détail). */
 export const GLOW_SLOTS = AMBIANCE_SETTINGS.glow.slots;
@@ -52,6 +67,9 @@ export interface SurfaceUniforms {
   uWindStrength: { value: number };
   uWindParams: { value: Vector4 };
   uWindCloth: { value: Vector3 };
+  /** Sol continu: couleurs (linéaires) des verts, des pavés et des chemins, et réglages. */
+  uGroundColors: { value: Color[] };
+  uGroundParams: { value: Vector4 };
 }
 
 export function createSurfaceUniforms(noise: Texture, windMask: Texture): SurfaceUniforms {
@@ -84,12 +102,17 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
     uWindStrength: { value: 0 },
     uWindParams: { value: new Vector4(w.swaySpeed, w.gustSpeed, 1 / w.gustSize, w.phaseScale) },
     uWindCloth: { value: new Vector3(w.cloth, w.clothSpeed, w.maxHeight) },
+    uGroundColors: { value: GROUND_CELLS.map(() => new Color()) },
+    uGroundParams: {
+      value: new Vector4(1 / s.groundPatch, s.groundDetail, s.stoneVariation, s.groundMaxHeight),
+    },
   };
 }
 
 /** Déclarations communes (vertex): position dans le monde, vent. */
 const VERTEX_PARS = /* glsl */ `
 varying vec3 vAmbWorld;
+varying float vAmbNormalY;
 #ifdef AMB_WIND
 uniform float uAmbTime;
 uniform sampler2D uWindMask;
@@ -148,11 +171,19 @@ vec4 ambWorld = vec4(transformed, 1.0);
 ambWorld = instanceMatrix * ambWorld;
 #endif
 vAmbWorld = (modelMatrix * ambWorld).xyz;
+vec3 ambNormalLocal = objectNormal;
+#ifdef USE_INSTANCING
+ambNormalLocal = mat3(instanceMatrix) * ambNormalLocal;
+#endif
+vAmbNormalY = normalize(mat3(modelMatrix) * ambNormalLocal).y;
 `;
 
 /** Déclarations communes (fragment). */
 export const SURFACE_FRAGMENT_PARS = /* glsl */ `
 varying vec3 vAmbWorld;
+varying float vAmbNormalY;
+uniform vec3 uGroundColors[${GROUND_CELLS.length}];
+uniform vec4 uGroundParams; // 1 / taille des taches, part du bruit fin, variation des pavés, hauteur max du sol
 uniform float uAmbTime;
 uniform sampler2D uAmbNoise;
 uniform float uCloudCover;
@@ -202,6 +233,38 @@ vec3 ambGlowLight(vec3 p, vec3 n) {
 }
 `;
 
+const cellIndex = (cell: PaletteCell): number => PALETTE_CELLS.indexOf(cell);
+
+/**
+ * Après `color_fragment` (décor et terrain): l'herbe, les pavés et les chemins
+ * du sol prennent une teinte continue en coordonnées du monde. Chaque face
+ * garde sa couleur unie à l'échelle d'un mètre près (style en aplats), mais
+ * les grandes cases d'un mètre à bords francs disparaissent.
+ */
+const FRAGMENT_GROUND = /* glsl */ `
+#if defined(AMB_GROUND) && defined(USE_MAP)
+{
+  ivec2 groundCell = ivec2(clamp(floor(vMapUv * ${PALETTE_GRID}.0), 0.0, ${PALETTE_GRID - 1}.0));
+  int groundIndex = groundCell.y * ${PALETTE_GRID} + groundCell.x;
+  bool groundFace = vAmbWorld.y < uGroundParams.w && abs(vAmbNormalY) > 0.9;
+  if (groundFace) {
+    vec2 groundUv = vAmbWorld.xz * uGroundParams.x;
+    float patchNoise = texture(uAmbNoise, groundUv).r * (1.0 - uGroundParams.y)
+      + texture(uAmbNoise, groundUv * 3.7 + 0.21).r * uGroundParams.y;
+    if (groundIndex == ${cellIndex('grass_dark')} || groundIndex == ${cellIndex('grass')} || groundIndex == ${cellIndex('grass_light')}) {
+      float g = smoothstep(0.25, 0.75, patchNoise);
+      vec3 lowGreen = mix(uGroundColors[0], uGroundColors[1], smoothstep(0.0, 0.5, g));
+      diffuseColor.rgb = mix(lowGreen, uGroundColors[2], smoothstep(0.5, 1.0, g));
+    } else if (groundIndex == ${cellIndex('cobble')} || groundIndex == ${cellIndex('cobble_dark')}) {
+      diffuseColor.rgb = mix(uGroundColors[3], uGroundColors[4], patchNoise * uGroundParams.z);
+    } else if (groundIndex == ${cellIndex('path')} || groundIndex == ${cellIndex('path_dark')}) {
+      diffuseColor.rgb = mix(uGroundColors[5], uGroundColors[6], smoothstep(0.3, 0.8, patchNoise) * uGroundParams.z * 2.0);
+    }
+  }
+}
+#endif
+`;
+
 /** Après `normal_fragment_maps`: sol mouillé et flaques (couleur et rugosité, avant l'éclairage). */
 const FRAGMENT_WET = /* glsl */ `
 vec3 ambNormal = transformNormalByInverseViewMatrix(normal, viewMatrix);
@@ -237,6 +300,8 @@ export interface SurfacePatchOptions {
   puddles: boolean;
   /** Vent sur le feuillage, les herbes et les tissus (décor seulement). */
   wind: boolean;
+  /** Teinte continue du sol (décor et terrain seulement). */
+  ground: boolean;
   /** Suffixe de la clé de programme (un programme par variante). */
   key: string;
 }
@@ -297,11 +362,19 @@ export function patchSurface(
       VERTEX_MAIN,
       label,
     );
-    const defines = options.puddles ? '#define AMB_PUDDLES\n' : '';
+    const defines =
+      (options.puddles ? '#define AMB_PUDDLES\n' : '') +
+      (options.ground ? '#define AMB_GROUND\n' : '');
     shader.fragmentShader = injectAfter(
       shader.fragmentShader,
       '#include <common>',
       defines + SURFACE_FRAGMENT_PARS,
+      label,
+    );
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <color_fragment>',
+      FRAGMENT_GROUND,
       label,
     );
     shader.fragmentShader = injectAfter(

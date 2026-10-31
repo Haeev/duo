@@ -67,7 +67,17 @@ export interface DemoOptions {
   absent: boolean;
   /** Coin à soi de chacun dans la pièce (P1), Sacha à l'intérieur dans le sien. */
   corners?: boolean;
+  /**
+   * Petites scènes de la vie au repos: Camille s'approche de Firmin par le
+   * côté et s'arrête (`rencontre`), ou mange assise à la table (`repas`).
+   */
+  scene?: 'rencontre' | 'repas' | undefined;
 }
+
+/** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */
+const MEET_FROM = { x: 6, y: 1.2 };
+const MEET_TO = { x: 1.8, y: 1.2 };
+const MEET_SECONDS = 1.6;
 
 /** Durée d'un repère à 30 pas par seconde (15 s, comme la simulation). */
 const PIN_TICKS = 450;
@@ -233,7 +243,16 @@ export function createExampleWorld(
       placedBy: 'p2',
     },
   ];
-  if (options.inside) {
+  if (options.scene === 'repas') {
+    const chair = { cx: room.x + 1, cy: room.y + 2 };
+    world.furniture.push({ id: 'f9', item: 'chair', cell: chair, rotation: 1, placedBy: 'p1' });
+    p1.inHouse = true;
+    p1.pos = { x: chair.cx + 0.5, y: chair.cy + 0.5 };
+    p1.prev = { ...p1.pos };
+    p1.facing = 0;
+    p1.aim = null;
+    p1.action = { kind: 'eat', since: 0, duration: 0, target: null };
+  } else if (options.inside) {
     p1.placement = {
       item: 'chair',
       cell: { cx: room.x + 3, cy: room.y + 1 },
@@ -383,12 +402,24 @@ export function animateExampleWorld(
   map: GameMap,
   seconds: number,
   walking: boolean,
+  options?: Pick<DemoOptions, 'scene'>,
 ): WorldEvent[] {
   const events: WorldEvent[] = [];
   world.tick = Math.floor(seconds * SIM_HZ);
   const door = point(map, 'house_door', map.house.door.cx + 0.5, map.house.door.cy + 0.5);
   const p1 = world.characters[0];
-  if (p1 !== undefined && walking && !p1.inHouse) {
+  const firmin = world.villagers.find((villager) => villager.id === 'firmin');
+  if (p1 !== undefined && firmin !== undefined && walking && options?.scene === 'rencontre') {
+    const u = Math.min(1, seconds / MEET_SECONDS);
+    p1.prev = { ...p1.pos };
+    p1.pos = {
+      x: firmin.pos.x + MEET_FROM.x + (MEET_TO.x - MEET_FROM.x) * u,
+      y: firmin.pos.y + MEET_FROM.y + (MEET_TO.y - MEET_FROM.y) * u,
+    };
+    p1.facing = Math.PI;
+    p1.speed = u < 1 ? (MEET_FROM.x - MEET_TO.x) / MEET_SECONDS : 0;
+    p1.action = { kind: u < 1 ? 'walk' : 'idle', since: 0, duration: 0, target: null };
+  } else if (p1 !== undefined && walking && !p1.inHouse && options?.scene === undefined) {
     const stroll = strollPosition(
       {
         points: [

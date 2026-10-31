@@ -301,6 +301,92 @@
       "completionText": "La plume de geai de Jeanne."
     },
     {
+      "id": "odette_dandelions",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Une salade de pissenlits",
+      "giver": "odette",
+      "start": {
+        "when": [{ "type": "day_at_least", "day": 6 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "effects": [
+          { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_01" },
+          { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_02" },
+          { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_03" },
+          { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_04" },
+          { "type": "spawn_object", "item": "dandelion", "point": "forage_edge_05" }
+        ]
+      },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Cueillir des pissenlits au bord du bois et en apporter 3 à Odette.",
+          "conditions": [{ "type": "given", "villager": "odette", "item": "dandelion", "count": 3, "label": "3 pissenlits" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 25 }],
+      "completionText": "Une salade pour Odette. 25 sous."
+    },
+    {
+      "id": "odette_parcels",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les colis d'Odette",
+      "giver": "odette",
+      "start": {
+        "when": [{ "type": "day_at_least", "day": 10 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "effects": [{ "type": "give_item", "item": "odette_parcel", "count": 1, "to": "each" }]
+      },
+      "steps": [
+        {
+          "id": "deliver",
+          "objective": "Livrer un colis d'Odette à Firmin sur le quai et l'autre à Basile à la scierie. À deux, chacun son chemin, ça va plus vite.",
+          "conditions": [
+            { "type": "given", "villager": "firmin", "item": "odette_parcel", "count": 1, "label": "Firmin" },
+            { "type": "given", "villager": "basile", "item": "odette_parcel", "count": 1, "label": "Basile" }
+          ]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 30 }],
+      "completionText": "Colis livrés. 30 sous de la part d'Odette."
+    },
+    {
+      "id": "firmin_chub",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Un chevesne pour Firmin",
+      "giver": "firmin",
+      "start": { "when": [{ "type": "day_at_least", "day": 11 }, { "type": "time_is", "from": "12:00", "to": "24:00" }] },
+      "steps": [
+        {
+          "id": "bring",
+          "objective": "Pêcher un chevesne et l'apporter à Firmin, sur le quai.",
+          "conditions": [{ "type": "given", "villager": "firmin", "item": "chub", "count": 1, "label": "1 chevesne" }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 30 }],
+      "completionText": "Firmin a son souper. 30 sous."
+    },
+    {
+      "id": "jeanne_notebook",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Le carnet perdu de Jeanne",
+      "giver": "jeanne",
+      "start": {
+        "when": [{ "type": "day_at_least", "day": 13 }, { "type": "time_is", "from": "12:00", "to": "24:00" }],
+        "effects": [{ "type": "spawn_object", "item": "jeanne_notebook", "point": "fishing_pontoon" }]
+      },
+      "steps": [
+        {
+          "id": "find",
+          "objective": "Retrouver le carnet de galets de Jeanne, quelque part au bord de l'eau, et le lui rendre.",
+          "conditions": [{ "type": "given", "villager": "jeanne", "item": "jeanne_notebook", "count": 1 }]
+        }
+      ],
+      "completionEffects": [{ "type": "give_money", "amount": 20 }],
+      "completionText": "Jeanne a retrouvé ses quarante galets. 20 sous."
+    },
+    {
       "id": "second_order",
       "kind": "main",
       "tier": "P0",
@@ -376,8 +462,13 @@
           "conditions": [{ "type": "nights_passed", "count": 1 }]
         },
         {
+          "id": "push",
+          "objective": "Pousser la draisine à deux sur les rails, devant la remise.",
+          "conditions": [{ "type": "flag", "flag": "handcar_pushed" }]
+        },
+        {
           "id": "try",
-          "objective": "Essayer la draisine à deux, devant la remise, entre 8 h et 18 h.",
+          "objective": "Retrouver Basile devant la remise, à deux, entre 8 h et 18 h.",
           "conditions": [{ "type": "dialogue_done", "dialogue": "basile_handcar_scene" }]
         }
       ],

@@ -124,6 +124,8 @@ export interface WorldState {
   crate: ItemStack[];
   /** Commandes au catalogue, livrées par le train du jour 8. */
   catalogueOrders: ItemId[];
+  /** Colis lourds livrés par le train, en attente d'être portés à deux (objets `carriedByTwo` du catalogue). */
+  heavyDeliveries: ItemId[];
   /** Ventes du jour à l'épicerie (plafond quotidien). */
   grocerSoldToday: number;
   proposals: Proposal[];
@@ -486,7 +488,19 @@ export interface Tree {
   lastHitTick: number;
 }
 
+/** Ce qu'on porte à deux: la poutre, la draisine poussée, le colis lourd du train. */
+export type LoadPurpose = 'construction' | 'handcar' | 'parcel';
+
 export interface Beam {
+  /** Objet porté (modèle de `objets.json`): `beam`, `handcar`, `heavy_parcel`. */
+  item: ItemId;
+  purpose: LoadPurpose;
+  /** Construction achevée à l'arrivée (`purpose: construction`). */
+  construction: string | null;
+  /** Objet contenu, rangé au cellier à l'arrivée (`purpose: parcel`). */
+  contents: ItemId | null;
+  /** Où le poser. */
+  to: Vec2;
   pos: Vec2;
   prev: Vec2;
   /** Orientation de la poutre (radians). */

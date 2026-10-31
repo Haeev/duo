@@ -267,7 +267,7 @@ export class DaylightRig {
     this.fog.far = cameraDistance + fog.farBeyondCamera * look.fogFactor * pull;
 
     this.sun.shadow.intensity =
-      shadows.intensity * clamp01(curves.shadow.at(m)) * look.shadowFactor;
+      Math.min(1, shadows.intensity * Math.max(0, curves.shadow.at(m))) * look.shadowFactor;
     this.sun.shadow.radius = curves.shadowRadius.at(m);
     this.setShadowMapSize(
       m >= shadows.detailFrom && m <= shadows.detailTo ? shadows.detailMapSize : shadows.mapSize,

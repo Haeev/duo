@@ -259,7 +259,11 @@ export function reopenCrate(sim: Sim): void {
 
 /** Les colis du catalogue arrivent par le train, dans le cellier (EC-03). */
 export function deliverCatalogue(sim: Sim): void {
-  for (const item of sim.world.catalogueOrders) addStack(sim.world.cellar, item, 'ordinary', 1);
+  // Un objet lourd arrive en colis sur le quai, à porter à deux (`portages.ts`); le reste au cellier.
+  for (const item of sim.world.catalogueOrders) {
+    if (sim.content.items[item]?.carriedByTwo === true && sim.content.settings.carry.parcel !== null) sim.world.heavyDeliveries.push(item);
+    else addStack(sim.world.cellar, item, 'ordinary', 1);
+  }
   sim.world.catalogueOrders = [];
 }
 

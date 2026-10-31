@@ -15,7 +15,7 @@ import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
 import { canPlace } from './amenagement';
-import { currentOrder } from '../donnees/commandes';
+import { catalogueWindow, currentOrder } from '../donnees/commandes';
 import { holdsRod, waterAhead } from './peche';
 
 interface Memory {
@@ -598,6 +598,31 @@ function weekTwoQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolea
   return false;
 }
 
+/**
+ * Semaine 2: commander au catalogue un objet lourd (livré en colis, à porter à deux), si la
+ * bourse le permet et qu'aucun n'est déjà commandé, livré ou en route.
+ */
+function orderHeavy(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const w = sim.world;
+  if (c.id !== 'p1' || w.orderIndex === 0 || sim.content.settings.carry.parcel === null) return false;
+  const heavy = Object.values(sim.content.items).find((d) => d.carriedByTwo && d.shop === 'catalogue' && d.buyPrice !== null);
+  if (heavy === undefined || heavy.buyPrice === null) return false;
+  const window = catalogueWindow(sim.content.settings, w.clock.day).orderDeadline;
+  if (w.clock.day > window.day || w.purse < heavy.buyPrice + HEAVY_RESERVE) return false;
+  if (w.catalogueOrders.includes(heavy.id) || w.heavyDeliveries.includes(heavy.id) || countInStacks(w.cellar, heavy.id) > 0) return false;
+  if (w.furniture.some((f) => f.item === heavy.id) || inBags(sim, heavy.id) > 0) return false;
+  const board = pt(sim, POINT.noticeBoard);
+  if (c.menu !== 'catalogue') return goAct(sim, c, m, 'catalogue', ground(board), board, 1.2, out);
+  out.push({ type: 'catalogue_order', item: heavy.id });
+  out.push({ type: 'menu', menu: null });
+  m.waitUntil = sim.world.tick + 2;
+  m.job = 'commander au catalogue';
+  return true;
+}
+
+/** Sous à garder en bourse après une commande au catalogue. */
+const HEAVY_RESERVE = 60;
+
 /** Essai de la draisine (scène à deux devant la remise, de 8 h à 18 h). */
 function handcarTry(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const { minutes } = sim.world.clock;
@@ -658,9 +683,7 @@ function nearestWater(sim: Sim, from: Vec2): Vec2 | null {
 function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number; my: number }, out: Intent[]): boolean {
   const b = sim.world.beam;
   if (b === null) return false;
-  const def = sim.content.constructions.find((k) => k.kind === 'carry');
-  const spot = def === undefined ? undefined : sim.map.points[def.point];
-  if (spot === undefined) return false;
+  const spot = b.to;
   if (!b.carried) {
     if (distance(c.pos, b.pos) > sim.content.settings.feel.beamGrabRange - 0.4) {
       return goTo(sim, c, m, 'poutre', b.pos, 0.5, out) || true;
@@ -787,6 +810,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       order(sim, c, m, out) ||
       cookForOrder(sim, c, m, out) ||
       weekTwoQuests(sim, c, m, out) ||
+      orderHeavy(sim, c, m, out) ||
       (c.id === 'p1' ? garden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
       (c.id === 'p2'
         ? coop(sim, c, m, f, out) ||

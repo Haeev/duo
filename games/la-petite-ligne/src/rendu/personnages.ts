@@ -33,6 +33,7 @@ import type {
   VillagerState,
 } from '../etat/types';
 import { SIM_HZ } from '../etat/types';
+import { BoneOffsets, poseEnvelope, stableUnit, termAngle } from './attentes';
 import type { Content } from '../donnees/types';
 import {
   BODY_COLORS,
@@ -56,7 +57,7 @@ import {
 import { preparePaletteTexture, type SharedMaterials } from './materiaux';
 import { CHARACTERS_FILE, textHash, type ModelLibrary } from './modeles';
 import { PALETTE_CELL_PIXELS, characterSlotColumn, type CharacterSlot } from './palette';
-import { RENDER_SETTINGS } from './reglages';
+import { IDLE_POSES, RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 import type { EventfulPart } from './monde';
@@ -83,6 +84,17 @@ const FISH_WAIT = 'fish_wait';
 const FISH_STRIKE = 'fish_strike';
 const SIT_CHAIR = 'sit';
 const SIT_GROUND = 'sit_ground';
+const SIT_EAT = 'sit_eat';
+const GIVE = 'give';
+const HIGH_FIVE = 'high_five';
+const WAVE = 'wave';
+const PET = 'pet';
+const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE]);
+const NO_VARIANTS: readonly string[] = [];
+/** Attentes d'un joueur, et les mêmes avec la poule à caresser. */
+const PLAYER_VARIANTS = SETTINGS.idleVariants.players ?? NO_VARIANTS;
+const PLAYER_VARIANTS_HEN: readonly string[] = [...PLAYER_VARIANTS, PET];
+const DEGREE = Math.PI / 180;
 /** Fondu court entre les clips de pêche, qui partent et finissent sur la même pose. */
 const FISH_FADE = 0.1;
 /** Bornes du calage d'un geste: part de la durée prise par l'avance du contact, départ au plus tard dans le clip. */
@@ -107,7 +119,8 @@ const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
   sit: 'sit',
   eat: 'eat',
   sleep: 'sleep',
-  cook: 'saw',
+  // Cuisiner: la main tendue au-dessus du réchaud, qui va et vient (remuer, servir).
+  cook: 'give',
   feed: 'sow',
   pickup: 'harvest',
   refill: 'water',
@@ -115,6 +128,7 @@ const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
 
 /** Actions pendant lesquelles l'outil reste rangé. */
 const HANDS_FREE: ReadonlySet<ActionKind> = new Set([
+  'cook',
   'sleep',
   'sit',
   'eat',
@@ -183,6 +197,18 @@ class CharacterFigure {
   private readonly phase: number;
   readonly pick: PickTarget;
   private readonly position = { x: 0, y: 0 };
+  /** Rotations d'os ajoutées au clip (attentes procédurales, regard). */
+  private readonly offsets: BoneOffsets;
+  private idleFor = 0;
+  private idleRank = 0;
+  private idleNextAt: number;
+  /** Attente variée en cours (pose procédurale, ou clip joué une fois si `pose` est nul). */
+  private variant: { name: string; start: number; seconds: number; procedural: boolean } | null =
+    null;
+  private variantWasClip = false;
+  private readonly lookPoint = { x: 0, y: 0 };
+  private lookTarget: { x: number; y: number } | null = null;
+  private lookYaw = 0;
 
   constructor(
     readonly id: string,
@@ -213,6 +239,125 @@ class CharacterFigure {
       }
     });
     this.hand = model.getObjectByName(HAND_SOCKET) ?? null;
+    this.offsets = new BoneOffsets(model);
+    this.idleNextAt = this.idleDelay();
+  }
+
+  private idleDelay(): number {
+    const range = SETTINGS.idleAfterSeconds;
+    return range.min + (range.max - range.min) * stableUnit(this.id, this.idleRank, 'idle');
+  }
+
+  /** Regard vers ce point de la carte (habitant attentif), ou droit devant (`null`). */
+  lookAt(target: DeepReadonly<{ x: number; y: number }> | null): void {
+    if (target === null) {
+      this.lookTarget = null;
+      return;
+    }
+    this.lookPoint.x = target.x;
+    this.lookPoint.y = target.y;
+    this.lookTarget = this.lookPoint;
+  }
+
+  /** Joue `clip` une fois par-dessus l'attente (salut). Faux s'il n'existe pas ou si autre chose joue. */
+  playOnce(clip: string, time: number): boolean {
+    const duration = this.clips.get(clip)?.duration ?? 0;
+    if (duration <= 0 || this.currentName !== 'idle') {
+      return false;
+    }
+    this.variant = { name: clip, start: time, seconds: duration, procedural: false };
+    return true;
+  }
+
+  /**
+   * Attente variée: après `idleFor` d'immobilité, une attente tirée de
+   * `variants` (stable par personnage), puis retour à `idle`. Renvoie la
+   * demande à jouer à la place de `request`.
+   */
+  private idleRequest(
+    request: ClipRequest,
+    time: number,
+    dt: number,
+    variants: readonly string[],
+  ): ClipRequest {
+    if (request.name !== 'idle') {
+      this.idleFor = 0;
+      this.variant = null;
+      this.variantWasClip = false;
+      return request;
+    }
+    this.idleFor += dt;
+    if (
+      this.variant === null &&
+      variants.length > 0 &&
+      this.lookTarget === null &&
+      this.idleFor >= this.idleNextAt
+    ) {
+      const name =
+        variants[Math.floor(stableUnit(this.id, this.idleRank, 'pick') * variants.length)] ?? '';
+      const pose = IDLE_POSES[name];
+      const seconds = pose?.seconds ?? this.clips.get(name)?.duration ?? 0;
+      if (seconds > 0) {
+        this.variant = { name, start: time, seconds, procedural: pose !== undefined };
+      } else {
+        this.idleFor = 0;
+      }
+    }
+    const variant = this.variant;
+    if (variant !== null && time - variant.start >= variant.seconds) {
+      this.variant = null;
+      this.idleFor = 0;
+      this.idleRank += 1;
+      this.idleNextAt = this.idleDelay();
+    }
+    if (this.variant !== null && !this.variant.procedural) {
+      this.variantWasClip = true;
+      return {
+        name: this.variant.name,
+        timeScale: 1,
+        once: true,
+        token: this.variant.start,
+        fade: SETTINGS.idleFadeSeconds,
+      };
+    }
+    if (this.variantWasClip) {
+      this.variantWasClip = false;
+      return { ...request, fade: SETTINGS.idleFadeSeconds };
+    }
+    return request;
+  }
+
+  /** Pose procédurale et regard, ajoutés aux os après le mélangeur. */
+  private applyOffsets(time: number, dt: number): void {
+    this.offsets.begin();
+    const variant = this.variant;
+    const pose = variant?.procedural === true ? IDLE_POSES[variant.name] : undefined;
+    if (variant !== null && pose !== undefined) {
+      const t = time - variant.start;
+      const envelope = poseEnvelope(t, pose.seconds, SETTINGS.idleFadeSeconds);
+      for (const term of pose.terms) {
+        this.offsets.add(term.bone, term.axis, termAngle(term, t, pose.seconds, envelope));
+      }
+    }
+    let wanted = 0;
+    const target = this.lookTarget;
+    if (target !== null && this.facing !== null) {
+      // Direction de la cible dans le repère du personnage (devant: +Z).
+      const dx = target.x - this.root.position.x;
+      const dz = target.y - this.root.position.z;
+      const cos = Math.cos(this.facing);
+      const sin = Math.sin(this.facing);
+      const limit = SETTINGS.lookMaxDegrees * DEGREE;
+      wanted = Math.max(-limit, Math.min(limit, Math.atan2(cos * dx - sin * dz, sin * dx + cos * dz)));
+    }
+    this.lookYaw += (wanted - this.lookYaw) * smoothFactor(dt, SETTINGS.lookHalfLife);
+    if (Math.abs(this.lookYaw) > 1e-3) {
+      const shares = SETTINGS.lookShares;
+      this.offsets.add('chest', 'up', this.lookYaw * shares.chest);
+      this.offsets.add('neck', 'up', this.lookYaw * shares.neck);
+      this.offsets.add('head', 'up', this.lookYaw * shares.head);
+    }
+    this.offsets.apply(this.root);
   }
 
   private play(request: ClipRequest): void {
@@ -324,6 +469,7 @@ class CharacterFigure {
     facing: number,
     request: ClipRequest,
     lift = 0,
+    variants: readonly string[] = NO_VARIANTS,
   ): void {
     const teleport = Math.hypot(pos.x - prev.x, pos.y - prev.y) > SETTINGS.teleportDistance;
     const at = teleport ? pos : interpolate(prev, pos, context.alpha, this.position);
@@ -339,8 +485,11 @@ class CharacterFigure {
         : dampAngle(this.facing, yaw, smoothFactor(context.dt, SETTINGS.turnHalfLife));
     this.root.position.set(at.x, this.ground + lift, at.y);
     this.root.rotation.y = this.facing;
-    this.play(request);
+    this.play(this.idleRequest(request, context.time, context.dt, variants));
     this.mixer?.update(context.dt);
+    if (this.mixer !== null) {
+      this.applyOffsets(context.time, context.dt);
+    }
     setStandingBox(
       this.pick.box,
       at.x,
@@ -478,7 +627,58 @@ export class CharactersPart implements EventfulPart {
       this.startOneShot(event.by, FISH_CAST);
     } else if (event.type === 'caught' || event.type === 'escaped') {
       this.startOneShot(event.by, FISH_STRIKE);
+    } else if (event.type === 'gave') {
+      this.startOneShot(event.by, GIVE);
+    } else if (
+      (event.type === 'envie_done' && event.by === 'both') ||
+      event.type === 'quest_done'
+    ) {
+      // Réussite à deux: on se tape dans la main si l'on est côte à côte (vu à l'image suivante).
+      this.highFivePending = true;
     }
+  }
+
+  private highFivePending = false;
+  /** Habitants qui ont déjà salué un joueur ce jour-là (`habitant|joueur`). */
+  private readonly greeted = new Set<string>();
+  private greetedDay = -1;
+
+  /** Tape dans la main si les deux joueurs, debout, sont assez près l'un de l'autre. */
+  private resolveHighFive(world: ReadonlyWorld): void {
+    this.highFivePending = false;
+    const [a, b] = world.characters;
+    if (a === undefined || b?.inHouse !== a.inHouse) {
+      return;
+    }
+    const near = Math.hypot(a.pos.x - b.pos.x, a.pos.y - b.pos.y) <= SETTINGS.highFiveRange;
+    if (near && a.speed <= SETTINGS.walkThreshold && b.speed <= SETTINGS.walkThreshold) {
+      this.startOneShot(a.id, HIGH_FIVE);
+      this.startOneShot(b.id, HIGH_FIVE);
+    }
+  }
+
+  /** Une poule devant le joueur, à portée de main? */
+  private henInFront(character: DeepReadonly<Character>, world: ReadonlyWorld): boolean {
+    if (character.inHouse) {
+      return false;
+    }
+    const fx = Math.cos(character.facing);
+    const fy = Math.sin(character.facing);
+    return world.hens.some((hen) => {
+      const dx = hen.pos.x - character.pos.x;
+      const dy = hen.pos.y - character.pos.y;
+      const distance = Math.hypot(dx, dy);
+      return distance <= SETTINGS.petRange && dx * fx + dy * fy >= distance * 0.5;
+    });
+  }
+
+  /** Clip d'une action: manger sur une chaise se fait assis (`sit_eat`). */
+  private clipFor(character: DeepReadonly<Character>, world: ReadonlyWorld): string {
+    const kind = character.action.kind;
+    if (kind === 'eat' && this.seatAt(world, character.pos.x, character.pos.y).clip === SIT_CHAIR) {
+      return SIT_EAT;
+    }
+    return CLIP_FOR_ACTION[kind];
   }
 
   private startOneShot(id: CharacterId, clip: string): void {
@@ -504,7 +704,7 @@ export class CharactersPart implements EventfulPart {
     if (action.duration <= 0 || character.status === 'sleeping') {
       return null;
     }
-    const name = CLIP_FOR_ACTION[action.kind];
+    const name = this.clipFor(character, context.world);
     const clip = this.clips.get(name);
     const seconds = action.duration / SIM_HZ;
     // Déjà joué jusqu'au bout: chez l'invité, « attente » arrive avec l'état complet suivant.
@@ -705,6 +905,9 @@ export class CharactersPart implements EventfulPart {
   update(context: FrameContext): void {
     this.time = context.time;
     const world: ReadonlyWorld = context.world;
+    if (this.highFivePending) {
+      this.resolveHighFive(world);
+    }
     for (const character of world.characters) {
       let entry = this.players.get(character.id);
       if (entry === undefined) {
@@ -717,7 +920,7 @@ export class CharactersPart implements EventfulPart {
       // Pêche: lancer et ferrer joués une fois, attente en boucle, enchaînés par des fondus courts.
       const shot = this.oneShot.get(character.id);
       const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
-      const fishing = character.fishing !== null || shotActive;
+      const fishing = character.fishing !== null || (shotActive && FISH_CLIPS.has(shot.clip));
       const seat = kind === 'sit' ? this.seatAt(world, character.pos.x, character.pos.y) : null;
       const walkScale = Math.min(
         WALK_SCALE_MAX,
@@ -740,17 +943,27 @@ export class CharactersPart implements EventfulPart {
         // ou geste fini avant que l'état ne repasse à « attente »: on attend.
         request = { name: 'idle', timeScale: 1, fade: SETTINGS.walkFadeSeconds };
       } else {
-        const name = CLIP_FOR_ACTION[kind];
+        const name = kind === 'sleep' ? CLIP_FOR_ACTION.sleep : this.clipFor(character, world);
         request = { name, timeScale: kind === 'carry' ? (moving ? walkScale : 0) : 1 };
       }
+      // Tape dans la main: face à l'autre le temps du geste (rendu seul).
+      const partner =
+        shotActive && shot.clip === HIGH_FIVE
+          ? world.characters.find((other) => other.id !== character.id)
+          : undefined;
+      const facing =
+        partner === undefined
+          ? character.facing
+          : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
       entry.figure.update(
         context,
         this.terrain,
         character.prev,
         character.pos,
-        character.facing,
+        facing,
         request,
         seat?.lift ?? 0,
+        this.henInFront(character, world) ? PLAYER_VARIANTS_HEN : PLAYER_VARIANTS,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
       entry.figure.pick.enabled = true;
@@ -778,6 +991,7 @@ export class CharactersPart implements EventfulPart {
         continue;
       }
       const clip = villagerClip(villager);
+      this.villagerAttention(figure, villager, world, context.time, clip);
       const timeScale =
         clip === 'walk'
           ? Math.min(
@@ -785,16 +999,68 @@ export class CharactersPart implements EventfulPart {
               Math.max(WALK_SCALE_MIN, villager.speed / SETTINGS.walkReferenceSpeed),
             )
           : 1;
-      figure.update(context, this.terrain, villager.prev, villager.pos, villager.facing, {
-        name: clip,
-        timeScale,
-      });
+      figure.update(
+        context,
+        this.terrain,
+        villager.prev,
+        villager.pos,
+        villager.facing,
+        { name: clip, timeScale },
+        0,
+        SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
+      );
       figure.updateFace(
         context.time,
         villager.talkingWith.length > 0
           ? { target: 'happy', weight: TALK_EXPRESSION_WEIGHT }
           : null,
       );
+    }
+  }
+
+  /**
+   * Habitant attentif (rendu seul, à partir des positions): il tourne la tête
+   * vers le joueur le plus proche à portée, et le salue au premier croisement
+   * de la journée s'il est arrêté.
+   */
+  private villagerAttention(
+    figure: CharacterFigure,
+    villager: DeepReadonly<VillagerState>,
+    world: ReadonlyWorld,
+    time: number,
+    clip: string,
+  ): void {
+    if (world.clock.day !== this.greetedDay) {
+      this.greetedDay = world.clock.day;
+      this.greeted.clear();
+    }
+    let nearest: DeepReadonly<Character> | null = null;
+    let best: number = SETTINGS.lookRange;
+    for (const character of world.characters) {
+      if (character.inHouse || character.status === 'sleeping') {
+        continue;
+      }
+      const distance = Math.hypot(
+        character.pos.x - villager.pos.x,
+        character.pos.y - villager.pos.y,
+      );
+      if (distance <= best) {
+        best = distance;
+        nearest = character;
+      }
+    }
+    // En conversation, la simulation l'oriente déjà vers son interlocuteur.
+    if (nearest === null || villager.talkingWith.length > 0) {
+      figure.lookAt(null);
+      return;
+    }
+    figure.lookAt(nearest.pos);
+    if (clip !== 'idle' || best > SETTINGS.greetRange) {
+      return;
+    }
+    const key = `${villager.id}|${nearest.id}`;
+    if (!this.greeted.has(key) && figure.playOnce(WAVE, time)) {
+      this.greeted.add(key);
     }
   }
 

@@ -34,8 +34,9 @@ export interface LightKey {
   /** Ciel reflété par l'eau et les flaques. */
   reflectionColor: string;
   /**
-   * Force des ombres (0 à 1, part de `shadows.intensity`): elles s'effacent à
-   * l'aube et au crépuscule, quand la lumière change de côté.
+   * Force des ombres (part de `shadows.intensity`; au-delà de 1, l'ombre est
+   * plus dense, plafonnée à 1 en tout): elles s'effacent à l'aube et au
+   * crépuscule, quand la lumière change de côté.
    */
   shadow: number;
   /** Douceur du bord des ombres (texels), si elle diffère de `shadows.radius`. */
@@ -261,7 +262,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.4,
       fogColor: '#b8aa9c',
       reflectionColor: '#f4c79c',
-      shadow: 1,
+      shadow: 1.15,
       glow: 0,
       mist: 0,
       clouds: 0.3,
@@ -278,7 +279,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.5,
       fogColor: '#9c918e',
       reflectionColor: '#f0b088',
-      shadow: 1,
+      shadow: 1.15,
       glow: 0.3,
       mist: 0,
       clouds: 0.6,
@@ -432,6 +433,18 @@ export const AMBIANCE_SETTINGS = {
     wetSheen: 0.015,
     /** Les flaques ne se forment que sous cette hauteur (m): sols, pas les toits. */
     puddleMaxHeight: 0.5,
+    /**
+     * Sol continu (gauntlet, tour 4): l'herbe mélange ses trois verts par un
+     * bruit doux en coordonnées du monde (plus de carrés à bords francs), les
+     * pavés et les chemins varient doucement autour de leur teinte claire au
+     * lieu d'un tirage case par case. Taille des taches (m), part du bruit
+     * fin, et ampleur de la variation des pavés et des chemins (0 à 1).
+     */
+    groundPatch: 9,
+    groundDetail: 0.35,
+    stoneVariation: 0.3,
+    /** Seules les faces tournées vers le haut et plus basses que cela (m) sont du sol. */
+    groundMaxHeight: 0.6,
   },
 
   /** Lueurs de nuit: halos autour des lanternes et des fenêtres, flaques de lumière chaude au sol. */
@@ -702,10 +715,10 @@ export const AMBIANCE_SETTINGS = {
     ] as const,
     /** Après un repas cuisiné à la maisonnette, elle fume encore ce temps (s, temps réel). */
     afterCookingSeconds: 90,
-    rate: 0.55,
-    seconds: 3.6,
-    startSize: 0.2,
-    endSize: 0.75,
+    rate: 1.4,
+    seconds: 3.2,
+    startSize: 0.18,
+    endSize: 0.6,
     rise: 0.55,
     lift: 0.12,
     /** Le vent pousse la fumée (part de sa direction, m/s²). */
@@ -713,6 +726,8 @@ export const AMBIANCE_SETTINGS = {
     spread: 0.06,
     drag: 0.6,
     opacity: 0.75,
+    /** La bouffée naît un peu au-dessus de la bouche (m). */
+    birthLift: 0.15,
     color: '#dcd8d1',
     /** Une bouche de cheminée: faces de cette case, tournées vers le haut, à moins de `topBand` m du sommet. */
     openingCell: 'shadow',

@@ -160,7 +160,18 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     beam:
       beamFrom === undefined
         ? null
-        : { pos: { x: beamFrom.x, y: beamFrom.y }, prev: { x: beamFrom.x, y: beamFrom.y }, facing: 0, carried: false, holders: [] },
+        : {
+            item: beamDef?.carry?.item ?? 'beam',
+            purpose: 'construction',
+            construction: beamDef?.id ?? null,
+            contents: null,
+            to: { ...(map.points[beamDef?.point ?? ''] ?? beamFrom) },
+            pos: { x: beamFrom.x, y: beamFrom.y },
+            prev: { x: beamFrom.x, y: beamFrom.y },
+            facing: 0,
+            carried: false,
+            holders: [],
+          },
     constructions,
     furniture,
     groundItems: [],
@@ -172,6 +183,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     cellar: [],
     crate: [],
     catalogueOrders: [],
+    heavyDeliveries: [],
     grocerSoldToday: 0,
     proposals: [],
     quests: [],

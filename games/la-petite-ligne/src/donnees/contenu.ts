@@ -122,6 +122,27 @@ function stackList(r: Reader): { item: string; count: number }[] {
   return r.items().map((s) => ({ item: s.at('item').string(), count: s.at('count').integer(1) }));
 }
 
+function parseCarry(r: Reader | null): Settings['carry'] {
+  const handcar = r?.opt('handcar') ?? null;
+  const parcel = r?.opt('parcel') ?? null;
+  const offset = handcar === null ? null : handcar.at('toOffset').numberList();
+  if (handcar !== null && offset?.length !== 2) handcar?.at('toOffset').fail('deux nombres attendus (dx, dy)');
+  return {
+    handcar:
+      handcar === null
+        ? null
+        : {
+            item: handcar.at('item').string(),
+            from: handcar.at('from').string(),
+            toOffset: [offset?.[0] ?? 0, offset?.[1] ?? 0],
+            quest: handcar.at('quest').string(),
+            step: handcar.at('step').string(),
+            flag: handcar.at('flag').string(),
+          },
+    parcel: parcel === null ? null : { item: parcel.at('item').string(), from: parcel.at('from').string(), to: parcel.at('to').string() },
+  };
+}
+
 /** Fenêtres du catalogue (`windows`), ou l'ancienne fenêtre unique. */
 function catalogueWindows(catalogue: Reader, dayTime: (x: Reader) => { day: number; time: number }): CatalogueWindow[] {
   const list = catalogue.has('windows') ? catalogue.at('windows').items() : [catalogue];
@@ -899,6 +920,7 @@ function parseSettings(r: Reader): Settings {
     building: { twoPlayersSpeedMultiplier: r.at('building').at('twoPlayersSpeedMultiplier').number() },
     hints: { durationSeconds: r.at('hints').at('durationSeconds').number() },
     absence: { minutes: r.at('absence').at('minutes').number() },
+    carry: parseCarry(r.opt('carry')),
     envies: { noRepeatWindowDays: r.has('envies') && r.at('envies').has('noRepeatWindowDays') ? r.at('envies').at('noRepeatWindowDays').integer(1) : 7 },
     fishing: parseFishing(r.opt('fishing')),
     feel: parseFeel(r.opt('feel')),

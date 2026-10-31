@@ -55,6 +55,13 @@ describe('robot', () => {
     expect(w.orderHistory[0]?.amount).toBe(540);
     expect(w.orderResult?.amount).toBeGreaterThanOrEqual(fullOrderAmount(content, 1));
     expect(w.ending?.days).toBe(15);
+    // Gestes à deux de la semaine 2: la draisine poussée, le colis lourd du catalogue porté à la maison.
+    expect(w.flags).toContain('handcar_pushed');
+    const heavy = Object.values(content.items).filter((d) => d.carriedByTwo && d.shop === 'catalogue').map((d) => d.id);
+    expect(heavy.length).toBeGreaterThan(0);
+    expect(w.heavyDeliveries).toEqual([]);
+    const delivered = heavy.some((id) => w.cellar.some((st) => st.item === id) || w.furniture.some((f) => f.item === id) || w.characters.some((c) => c.bag.some((b) => b?.item === id)));
+    expect(delivered, 'un colis lourd porté à deux').toBe(true);
     expect(w.ending?.orders).toEqual(content.settings.order.trains.map((o) => ({ linesDone: o.lines.length, linesTotal: o.lines.length })));
     expect(w.ending?.linesDone).toBe(content.settings.order.trains.reduce((n, o) => n + o.lines.length, 0));
     expect(w.ending?.furniturePlaced).toBeGreaterThan(0);

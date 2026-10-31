@@ -8,6 +8,7 @@ import { RIPE_VIEW_DISTANCE, SIM_DT } from './constantes';
 import { type Sim, distance } from './contexte';
 import { updateAim } from './agir';
 import { updatePlacement } from './amenagement';
+import { loadPlaced, spawnLoads } from './portages';
 import { queueHint, pumpHints } from './astuces';
 import { updateConstructions, completeConstruction } from './construction';
 import { autoStartScenes } from './dialogues';
@@ -95,9 +96,11 @@ export function step(sim: Sim, input: StepInput): void {
   }
 
   if (world.phase === 'day') {
-    if (updateBeam(sim, input.controls, dt)) {
-      const def = sim.content.constructions.find((k) => k.kind === 'carry');
-      if (def !== undefined) completeConstruction(sim, def.id);
+    spawnLoads(sim);
+    const placed = updateBeam(sim, input.controls, dt);
+    if (placed !== null) {
+      if (placed.construction !== null) completeConstruction(sim, placed.construction);
+      loadPlaced(sim, placed);
       for (const c of world.characters) c.heartToday.gesture = true;
       world.session.togetherMoments += 1;
     }

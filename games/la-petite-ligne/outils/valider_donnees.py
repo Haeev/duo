@@ -51,6 +51,7 @@ QUEST_KINDS = {"main", "side"}
 SPEAKERS_EXTRA = {"narrator"}
 FORM_LEVELS = ["low", "okay", "good", "great", "radiant"]
 INDEFINITE_ARTICLES = {"un", "une", "des"}
+ENGINE_FLAGS = {"handcar_pushed"}
 # Tournures qui accordent au genre d'un joueur (rédaction neutre): un avertissement à relire, pas une erreur.
 GENDERED_RE = re.compile(
     r"\b(?:tu es|tu étais|tu seras|vous êtes|vous étiez|vous serez|sois|soyez) "
@@ -727,6 +728,8 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
     if fishing_flag:
         # Ce drapeau est posé par la configuration (pêche activée en P1), pas par un effet.
         reg.flags_set.add(fishing_flag)
+    # Drapeaux posés par le moteur lui-même (geste à deux de la draisine arrivé au bout).
+    reg.flags_set.update(ENGINE_FLAGS)
     for fish_id, weight in settings.get("feel", {}).get("fishWeights", {}).items():
         ref("item", fish_id, "reglages.feel.fishWeights", reg, report)
         if fish_id in reg.items and reg.items[fish_id].get("category") != "fish":

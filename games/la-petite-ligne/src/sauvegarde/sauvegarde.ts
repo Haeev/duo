@@ -223,6 +223,14 @@ function resume(
   // Champ facultatif (mémoire des répliques entendues), absent des sauvegardes plus anciennes.
   const heard = (world as Partial<WorldState>).heard;
   world.heard = { p1: heard?.p1 ?? {}, p2: heard?.p2 ?? {} };
+  // Gestes à deux (tour 4): colis en attente et charge décrite, absents des sauvegardes plus anciennes.
+  world.heavyDeliveries = (world as Partial<WorldState>).heavyDeliveries ?? [];
+  const beam = world.beam as (Partial<NonNullable<WorldState['beam']>> & NonNullable<WorldState['beam']>) | null;
+  if (beam !== null && beam.purpose === undefined) {
+    const def = content.constructions.find((k) => k.kind === 'carry');
+    const to = map.points[def?.point ?? ''] ?? beam.pos;
+    world.beam = { ...beam, item: def?.carry?.item ?? 'beam', purpose: 'construction', construction: def?.id ?? null, contents: null, to: { x: to.x, y: to.y } };
+  }
   for (const c of world.characters) {
     // Nouvelle séance: l'écran titre se repasse à deux.
     c.titleReady = false;

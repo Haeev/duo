@@ -8,6 +8,8 @@
  * degrés, durées en secondes, distances en mètres (une case = 1 m).
  */
 
+import type { IdlePose } from './attentes';
+
 export const RENDER_SETTINGS = {
   renderer: {
     /** Rapport de pixels plafonné (Retina, mise à l'échelle de Windows). */
@@ -130,6 +132,32 @@ export const RENDER_SETTINGS = {
      * plusieurs secondes) se joue en boucle à son rythme plutôt qu'étiré.
      */
     gestureLoopAbove: 1.6,
+    /**
+     * Attentes variées (rendu seul, `attentes.ts`): après une immobilité tirée
+     * entre ces bornes (s), une attente de la liste du personnage, puis
+     * l'attente ordinaire. Poses de `IDLE_POSES` ou clips de `personnages.glb`.
+     */
+    idleAfterSeconds: { min: 5, max: 8 },
+    idleFadeSeconds: 0.3,
+    idleVariants: {
+      players: ['look_around', 'stretch', 'look_down'],
+      firmin: ['watch', 'look_around'],
+      odette: ['wipe', 'look_around'],
+      jeanne: ['look_around', 'stretch'],
+      basile: ['wipe_brow', 'look_around'],
+    } as Readonly<Record<string, readonly string[]>>,
+    /** Joueur arrêté près d'une poule (m, devant lui): il la caresse parfois (clip `pet`). */
+    petRange: 1.3,
+    /** Habitants: tête et buste tournés vers le joueur le plus proche à cette distance (m). */
+    lookRange: 4,
+    lookMaxDegrees: 70,
+    lookHalfLife: 0.25,
+    /** Répartition de la rotation du regard entre le buste, le cou et la tête. */
+    lookShares: { chest: 0.2, neck: 0.3, head: 0.5 },
+    /** Salut (clip `wave`) au premier croisement de la journée, à cette distance (m). */
+    greetRange: 2.6,
+    /** Tape dans la main (clip `high_five`) à une réussite à deux, si les joueurs sont à moins de (m). */
+    highFiveRange: 1.8,
   },
 
   garden: {
@@ -260,3 +288,73 @@ export const RENDER_SETTINGS = {
 } as const;
 
 export type RenderSettings = typeof RENDER_SETTINGS;
+
+/**
+ * Attentes procédurales (`attentes.ts`): rotations d'os ajoutées au clip
+ * `idle`, en degrés autour des axes du personnage (`up`: haut, `side`: sa
+ * droite, `forward`: devant lui). `sweeps`: allers-retours sur la durée.
+ */
+export const IDLE_POSES: Readonly<Record<string, IdlePose>> = {
+  /** Regarder autour de soi: à gauche, à droite, revenir. */
+  look_around: {
+    seconds: 3.4,
+    terms: [
+      { bone: 'head', axis: 'up', degrees: 38, sweeps: 1 },
+      { bone: 'neck', axis: 'up', degrees: 18, sweeps: 1 },
+      { bone: 'chest', axis: 'up', degrees: 8, sweeps: 1 },
+    ],
+  },
+  /** S'étirer: bras levés sur les côtés, buste et tête en arrière. */
+  stretch: {
+    seconds: 2.8,
+    terms: [
+      { bone: 'upper_arm_l', axis: 'forward', degrees: -140 },
+      { bone: 'upper_arm_r', axis: 'forward', degrees: 140 },
+      { bone: 'forearm_l', axis: 'forward', degrees: -20 },
+      { bone: 'forearm_r', axis: 'forward', degrees: 20 },
+      { bone: 'chest', axis: 'side', degrees: -10 },
+      { bone: 'head', axis: 'side', degrees: -18 },
+    ],
+  },
+  /** Regarder ses pieds, en se balançant un peu. */
+  look_down: {
+    seconds: 2.6,
+    terms: [
+      { bone: 'head', axis: 'side', degrees: 28 },
+      { bone: 'neck', axis: 'side', degrees: 10 },
+      { bone: 'chest', axis: 'up', degrees: 8, sweeps: 1 },
+    ],
+  },
+  /** Firmin consulte sa montre (poignet gauche). */
+  watch: {
+    seconds: 2.6,
+    terms: [
+      { bone: 'upper_arm_l', axis: 'side', degrees: -45 },
+      { bone: 'upper_arm_l', axis: 'up', degrees: -25 },
+      { bone: 'forearm_l', axis: 'side', degrees: -80 },
+      { bone: 'head', axis: 'side', degrees: 26 },
+      { bone: 'head', axis: 'up', degrees: 15 },
+    ],
+  },
+  /** Odette essuie le comptoir, main droite en cercles. */
+  wipe: {
+    seconds: 3.2,
+    terms: [
+      { bone: 'upper_arm_r', axis: 'side', degrees: -40 },
+      { bone: 'upper_arm_r', axis: 'up', degrees: 18, sweeps: 3 },
+      { bone: 'forearm_r', axis: 'side', degrees: -25 },
+      { bone: 'chest', axis: 'side', degrees: 10 },
+      { bone: 'head', axis: 'side', degrees: 18 },
+    ],
+  },
+  /** Basile s'essuie le front du revers de la main. */
+  wipe_brow: {
+    seconds: 2.2,
+    terms: [
+      { bone: 'upper_arm_r', axis: 'side', degrees: -75 },
+      { bone: 'forearm_r', axis: 'side', degrees: -110 },
+      { bone: 'upper_arm_r', axis: 'up', degrees: 12, sweeps: 1 },
+      { bone: 'head', axis: 'side', degrees: -8 },
+    ],
+  },
+};

@@ -386,6 +386,11 @@ export interface Settings {
   hints: { durationSeconds: number };
   absence: { minutes: number };
   /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
+  /** Gestes à deux de la semaine 2 (`reglages.carry`): draisine poussée et colis lourd; `null` si absents. */
+  carry: {
+    handcar: { item: string; from: string; toOffset: [number, number]; quest: string; step: string; flag: string } | null;
+    parcel: { item: string; from: string; to: string } | null;
+  };
   /** Envies (HA-07): une envie ne revient pas pour un joueur avant ce nombre de jours. */
   envies: { noRepeatWindowDays: number };
   fishing: {

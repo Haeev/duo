@@ -38,7 +38,12 @@ import { PARTICLE_MODE, PARTICLE_SHAPE, PuffPool, createParticleMaterial } from 
 import { RainLayer } from './pluie';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
-import { createSurfaceUniforms, patchSurface, type SurfaceUniforms } from './surfaces';
+import {
+  GROUND_CELLS,
+  createSurfaceUniforms,
+  patchSurface,
+  type SurfaceUniforms,
+} from './surfaces';
 
 const HALF_CELL = 0.5;
 const MS_PER_SECOND = 1000;
@@ -142,6 +147,12 @@ export class AmbiancePart implements ExtensionPart {
     resources.track(this.field.texture);
     const windMask = resources.track(createWindMask(PALETTE_CELLS, PALETTE_GRID));
     this.surfaces = createSurfaceUniforms(noise, windMask);
+    GROUND_CELLS.forEach((cell, index) => {
+      const color = this.surfaces.uGroundColors.value[index];
+      if (color !== undefined) {
+        hooks.materials.paletteColor(cell, color);
+      }
+    });
     const room = hooks.map.house.room;
     this.hearth.set(
       room.x + room.w * HALF_CELL,
@@ -154,6 +165,7 @@ export class AmbiancePart implements ExtensionPart {
     patchSurface(hooks.materials.palette, this.surfaces, {
       puddles: true,
       wind: true,
+      ground: true,
       key: 'decor',
     });
     this.patchCharacters();
@@ -217,7 +229,7 @@ export class AmbiancePart implements ExtensionPart {
   private patchCharacters(): void {
     const shared = this.hooks.characterMaterial;
     if (shared !== null) {
-      patchSurface(shared, this.surfaces, { puddles: false, wind: false, key: 'characters' });
+      patchSurface(shared, this.surfaces, { puddles: false, wind: false, ground: false, key: 'characters' });
     }
     this.hooks.scene.traverse((object) => {
       if (!(object instanceof Mesh)) {
@@ -231,10 +243,10 @@ export class AmbiancePart implements ExtensionPart {
           continue;
         }
         if (material.name.includes(CHARACTER_MATERIAL)) {
-          patchSurface(material, this.surfaces, { puddles: false, wind: false, key: 'characters' });
+          patchSurface(material, this.surfaces, { puddles: false, wind: false, ground: false, key: 'characters' });
         } else if (material.name.startsWith(PALETTE_MATERIAL)) {
           // Copie de la palette (foulard, substitut): mêmes ajouts que le décor, sans flaques.
-          patchSurface(material, this.surfaces, { puddles: false, wind: false, key: 'decor_copy' });
+          patchSurface(material, this.surfaces, { puddles: false, wind: false, ground: false, key: 'decor_copy' });
         }
       }
     });
@@ -630,7 +642,7 @@ export class AmbiancePart implements ExtensionPart {
     p.emit(
       {
         x: at.x + jitter() * s.spread,
-        y: at.y,
+        y: at.y + s.birthLift,
         z: at.z + jitter() * s.spread,
         vx: jitter() * s.spread,
         vy: s.rise * (STEAM_RISE_MIN + p.random() * (1 - STEAM_RISE_MIN)),
@@ -642,7 +654,7 @@ export class AmbiancePart implements ExtensionPart {
         life: s.seconds * (STEAM_LIFE_MIN + p.random() * (1 - STEAM_LIFE_MIN)),
         startSize: s.startSize,
         endSize: s.endSize,
-        shape: PARTICLE_SHAPE.facetedPuff,
+        shape: PARTICLE_SHAPE.puff,
         color: this.colors.smoke,
         opacity: s.opacity,
       },

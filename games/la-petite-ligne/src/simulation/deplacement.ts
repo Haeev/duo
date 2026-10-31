@@ -4,7 +4,7 @@
  */
 import type { ControlFrame } from '../etat/actions';
 import { inRect } from '../etat/carte';
-import type { Character, CharacterId, Vec2 } from '../etat/types';
+import type { Beam, Character, CharacterId, Vec2 } from '../etat/types';
 import { ARRIVE_DISTANCE, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
@@ -233,12 +233,13 @@ function inputOf(frame: ControlFrame | undefined): Vec2 {
 }
 
 /**
- * Met à jour la poutre. Renvoie vrai si elle vient d'être posée à son emplacement.
+ * Met à jour la charge portée à deux (poutre, draisine, colis). Renvoie la charge si elle vient
+ * d'être posée à son emplacement, sinon `null`.
  * Les porteurs ne marchent pas d'eux-mêmes pendant le portage.
  */
-export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, ControlFrame>>, dt: number): boolean {
+export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, ControlFrame>>, dt: number): Beam | null {
   const beam = sim.world.beam;
-  if (beam === null) return false;
+  if (beam === null) return null;
   const s = sim.content.settings;
   const grab = s.feel.beamGrabRange;
   const holders = sim.world.characters.filter(
@@ -252,7 +253,9 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     const only = holders[0];
     if (only !== undefined && !sim.runtime.holdNotified[only.id]) {
       sim.runtime.holdNotified[only.id] = true;
-      say(sim, only.id, 'needs_both', { partner: partnerName(sim, only.id) });
+      const key = beam.purpose === 'handcar' ? 'handcar_needs_both' : beam.purpose === 'parcel' ? 'parcel_needs_both' : 'needs_both';
+      const written = Object.hasOwn(sim.content.texts.messages, key) ? key : 'needs_both';
+      say(sim, only.id, written, { partner: partnerName(sim, only.id) });
     }
   }
   if (holders.length < 2) {
@@ -266,7 +269,7 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
       }
       emit(sim, { type: 'beam_dropped' });
     }
-    return false;
+    return null;
   }
   const [a, b] = holders as [Character, Character];
   if (!beam.carried) {
@@ -296,15 +299,23 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     vy = i.y * s.movement.carrySpeedOneMoving;
   }
   const blockers = refreshBlockers(sim);
-  const nx = beam.pos.x + vx * dt;
-  const ny = beam.pos.y + vy * dt;
-  const fits = holders.every((c) => {
-    const off = sim.runtime.beamOffsets[c.id];
-    return !bodyCollides(blockers, nx + off.x, ny + off.y);
-  });
-  if ((vx !== 0 || vy !== 0) && fits) {
-    beam.pos.x = nx;
-    beam.pos.y = ny;
+  const fits = (x: number, y: number): boolean =>
+    holders.every((c) => {
+      const off = sim.runtime.beamOffsets[c.id];
+      return !bodyCollides(blockers, x + off.x, y + off.y);
+    });
+  if (vx !== 0 || vy !== 0) {
+    const nx = beam.pos.x + vx * dt;
+    const ny = beam.pos.y + vy * dt;
+    // Tout le pas, sinon un axe puis l'autre: la charge glisse le long des murs (gauntlet, tour 4).
+    if (fits(nx, ny)) {
+      beam.pos.x = nx;
+      beam.pos.y = ny;
+    } else if (vx !== 0 && fits(nx, beam.pos.y)) {
+      beam.pos.x = nx;
+    } else if (vy !== 0 && fits(beam.pos.x, ny)) {
+      beam.pos.y = ny;
+    }
   }
   for (const c of holders) {
     const off = sim.runtime.beamOffsets[c.id];
@@ -313,18 +324,16 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     c.speed = Math.hypot(vx, vy);
     if (c.speed > 0) c.facing = Math.atan2(vy, vx);
   }
-  const def = sim.content.constructions.find((k) => k.kind === 'carry');
-  const spot = def === undefined ? undefined : sim.map.points[def.point];
-  if (spot !== undefined && distance(beam.pos, spot) <= s.feel.beamDropRadius) {
+  if (distance(beam.pos, beam.to) <= s.feel.beamDropRadius) {
     sim.world.beam = null;
     for (const c of holders) {
       c.status = 'active';
       c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
     }
     emit(sim, { type: 'beam_placed' });
-    return true;
+    return beam;
   }
-  return false;
+  return null;
 }
 
 export function characterById(sim: Sim, id: CharacterId): Character {

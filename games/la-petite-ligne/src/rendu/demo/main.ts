@@ -113,6 +113,10 @@ async function main(): Promise<void> {
           ? 'waiting'
           : 'none',
     absent: params.get('absent') === '1',
+    scene:
+      params.get('scene') === 'rencontre' || params.get('scene') === 'repas'
+        ? (params.get('scene') as 'rencontre' | 'repas')
+        : undefined,
     corners: params.get('coins') === '1',
   };
   const world = createExampleWorld(map, content, options);
@@ -309,6 +313,7 @@ async function main(): Promise<void> {
       map,
       seconds,
       lifeInput?.checked !== false && !steering,
+      options,
     )) {
       emit(event);
     }
