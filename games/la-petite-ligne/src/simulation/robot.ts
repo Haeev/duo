@@ -573,6 +573,9 @@ function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: nu
   return true;
 }
 
+/** Buts d'après-midi des jours creux (variantes tirées par la graine), joués par la routine générique. */
+const AFTERNOON = new Set(['odette_dandelions', 'heron_watch', 'basile_lost', 'wild_geese', 'jeanne_challenge']);
+
 /** Compteur d'une étape active, et ce qu'il lui manque (conditions `counter` des données). */
 interface OpenCounter {
   key: string;
@@ -591,7 +594,7 @@ function openCounters(sim: Sim): OpenCounter[] {
     }
   };
   for (const q of sim.world.quests) {
-    if (q.status !== 'active') continue;
+    if (q.status !== 'active' || !AFTERNOON.has(q.id)) continue;
     const step = sim.content.quests.find((x) => x.id === q.id)?.steps[q.step];
     if (step !== undefined) walk(step.conditions, q.baselines);
   }
@@ -603,12 +606,12 @@ function openStays(sim: Sim): { point: string; seconds: number }[] {
   const out: { point: string; seconds: number }[] = [];
   const minutes = sim.world.clock.minutes;
   for (const q of sim.world.quests) {
-    if (q.status !== 'active') continue;
+    if (q.status !== 'active' || !AFTERNOON.has(q.id)) continue;
     const step = sim.content.quests.find((x) => x.id === q.id)?.steps[q.step];
     if (step === undefined) continue;
     const window = step.conditions.find((c) => c.type === 'time_is');
     if (window?.type === 'time_is' && (minutes < window.from || minutes >= window.to)) continue;
-    for (const c of step.conditions) if (c.type === 'stayed_at') out.push({ point: c.point, seconds: c.seconds });
+    for (const c of step.conditions) if (c.type === 'stayed_at' || c.type === 'looked_at') out.push({ point: c.point, seconds: 0 });
   }
   return out;
 }
