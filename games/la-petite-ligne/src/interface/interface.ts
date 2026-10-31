@@ -27,6 +27,7 @@ import { Hud } from './hud';
 import { type ScreenKind, hudState, screenOf } from './modele';
 import { CataloguePanel, ChestPanel, CratePanel, ShopPanel, StationPanel } from './panneaux';
 import { ProposalCards } from './proposition';
+import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } from './sons';
 import { loadUiTexts } from './textes';
 
 const SPRITE_ID = 'lpl-icones';
@@ -49,6 +50,7 @@ class GameUi implements GameInterface, UiHost {
   private readonly hud: Hud;
   private readonly proposals: ProposalCards;
   private readonly cameraCommand: ((command: CameraCommand) => void) | null;
+  private readonly sounds: UiSoundGate;
   private readonly cleanups: (() => void)[] = [];
   private readonly insertedSprite: HTMLElement | null;
   private mounted: Mounted | null = null;
@@ -73,6 +75,7 @@ class GameUi implements GameInterface, UiHost {
   constructor(options: InterfaceOptions) {
     this.view = options.view;
     this.cameraCommand = options.camera ?? null;
+    this.sounds = new UiSoundGate(options.sound ?? null);
     const texts = loadUiTexts(options.view.content);
     this.ctx = createUiContext(options.view.content, options.view.map, texts, options.view.localCharacter(), (code) =>
       options.view.keyLabel(code),
@@ -100,6 +103,10 @@ class GameUi implements GameInterface, UiHost {
     this.listen(this.root, 'pointerdown', (e) => {
       e.stopPropagation();
     });
+    // Valider un bouton d'une couche (clic ou Entrée, qui passe par `click()`): son selon `data-sound`.
+    this.listen(this.root, 'click', (e) => {
+      this.onClickSound(e);
+    }, true);
     this.listen(this.root, 'keyup', (e) => {
       if (e.code === 'Space' && this.blockSpaceKeyup) {
         e.preventDefault();
@@ -203,6 +210,18 @@ class GameUi implements GameInterface, UiHost {
 
   now(): number {
     return performance.now();
+  }
+
+  sound(id: UiSoundId): void {
+    this.sounds.play(id, this.now());
+  }
+
+  private onClickSound(e: MouseEvent): void {
+    const target = e.target instanceof Element ? e.target.closest('button') : null;
+    // Seulement dans une couche: le HUD (outils, caméra, carnet) et la proposition ont leurs sons ailleurs.
+    if (target === null || !this.mounted?.layer.root.contains(target)) return;
+    const id = buttonSound({ disabled: target.disabled, ariaDisabled: target.getAttribute('aria-disabled'), sound: target.getAttribute(SOUND_ATTR) });
+    if (id !== null) this.sound(id);
   }
 
   symbol(player: 'self' | 'other'): string {
@@ -388,6 +407,7 @@ class GameUi implements GameInterface, UiHost {
   private mount(key: string | null, kind: LayerKind, build: (() => Layer) | null, now: number): void {
     if ((this.mounted?.key ?? null) === key) return;
     const previous = this.mounted;
+    for (const id of layerSounds(previous, key === null || build === null ? null : { kind, key })) this.sound(id);
     const hadFocus = previous !== null && document.activeElement !== null && previous.layer.root.contains(document.activeElement);
     if (previous !== null) {
       previous.layer.dispose?.();
@@ -479,11 +499,11 @@ class GameUi implements GameInterface, UiHost {
     if (layer.key?.(code, layerInfo) === true) return true;
 
     if (layer.closeKey !== undefined && code === layer.closeKey && !info.shift) {
-      layer.close?.();
+      this.closeLayer(mounted.kind, layer);
       return true;
     }
     if (code === 'Backspace') {
-      if (layer.closable) layer.close?.();
+      if (layer.closable) this.closeLayer(mounted.kind, layer);
       return true;
     }
     if (code === 'Tab') {
@@ -550,12 +570,20 @@ class GameUi implements GameInterface, UiHost {
     }
   }
 
+  /** Retour arrière: un panneau sonne en se démontant (`ui-panel-close`), le reste fait `ui-back`. */
+  private closeLayer(kind: LayerKind, layer: Layer): void {
+    if (kind !== 'panel') this.sound('ui-back');
+    layer.close?.();
+  }
+
   private trap(layer: Layer, backwards: boolean, active: Element | null): void {
     const list = focusables(layer.root);
     if (list.length === 0) return;
     const index = active instanceof HTMLElement ? list.indexOf(active) : -1;
     const next = backwards ? (index <= 0 ? list[list.length - 1] : list[index - 1]) : index < 0 || index === list.length - 1 ? list[0] : list[index + 1];
-    next?.focus();
+    if (next === undefined || next === active) return;
+    next.focus();
+    this.sound('ui-focus');
   }
 
   private navigate(layer: Layer, kind: LayerKind, direction: ReturnType<typeof directionOf>, active: Element | null): void {
@@ -573,6 +601,7 @@ class GameUi implements GameInterface, UiHost {
     if (next !== undefined) {
       next.focus({ preventScroll: true });
       next.scrollIntoView({ block: 'nearest' });
+      this.sound('ui-focus');
     }
   }
 }

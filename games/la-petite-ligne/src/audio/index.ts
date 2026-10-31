@@ -15,6 +15,7 @@ import type { WorldEvent } from '../etat/types';
 import type { AudioOptions, CreateAudio, GameAudio } from '../etat/vue';
 import soundsFile from '../../assets/son/sons.json';
 import { AudioBrain } from './cerveau';
+import type { SoundRequest } from './declencheurs';
 import { parseCatalogue } from './catalogue';
 import { AudioEngine, type AudioHost, type EngineStats } from './moteur';
 import { AUDIO_SETTINGS } from './reglages';
@@ -73,6 +74,8 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
   let engine: AudioEngine | null = null;
   let brain: AudioBrain | null = null;
   const events: WorldEvent[] = [];
+  /** Sons demandés par l'interface depuis la dernière image (bus interface, non placés). */
+  const uiShots: SoundRequest[] = [];
   const unsubscribers: (() => void)[] = [];
   unsubscribers.push(view.onEvent((event) => events.push(event)));
 
@@ -126,6 +129,7 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
       e.setPaused(paused);
       if (paused) {
         events.length = 0;
+        uiShots.length = 0;
         return;
       }
       gameTime += dt;
@@ -140,7 +144,17 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
         yaw: options.cameraYaw?.() ?? settings.listener.defaultYaw,
       });
       events.length = 0;
+      if (uiShots.length > 0) {
+        frame.shots.push(...uiShots);
+        uiShots.length = 0;
+      }
       e.apply(frame);
+    },
+
+    ui(id) {
+      // Un son inconnu du catalogue est ignoré: l'interface ne doit jamais casser le son.
+      if (!catalogue.sounds.has(id) || uiShots.length >= settings.interface.maxQueued) return;
+      uiShots.push({ sound: id, at: null, gainDb: 0, delay: 0, offset: 0, tag: null });
     },
 
     stats() {

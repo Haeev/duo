@@ -6,6 +6,7 @@ import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld } from '../etat/types';
 import type { CameraCommand } from '../etat/vue';
 import type { UiContext } from './contexte';
+import type { UiSoundId } from './sons';
 
 /** Onglet ou partie d'un panneau à montrer à l'ouverture. */
 export type PanelTab = 'quests' | 'mail' | 'bag' | 'buy' | 'sell';
@@ -28,6 +29,8 @@ export interface UiHost {
   read(item: string): void;
   /** Horloge réelle (ms). */
   now(): number;
+  /** Son d'interface, filtré contre les rafales (rien si `main.ts` n'a pas donné l'audio). */
+  sound(id: UiSoundId): void;
   /** Symboles des profils Duo des deux joueurs (`orb`, `crescent`...). */
   symbol(player: 'self' | 'other'): string;
 }

@@ -117,6 +117,10 @@ async function main(): Promise<void> {
       camera: (command) => {
         r.camera(command);
       },
+      // Sons des menus (demande 14 de l'interface): l'audio est créé juste après, `sound` le trouve alors.
+      sound: (id) => {
+        sound?.ui?.(id);
+      },
     });
     const createAudio = await pickAudio();
     if (createAudio !== null) {

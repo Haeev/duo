@@ -132,6 +132,8 @@ export interface AudioSettings {
   loopFadeSeconds: number;
   /** Habitants dont le motif existe (`talk-<id>` dans `sons.json`). */
   villagerMotifPrefix: string;
+  /** Sons demandés par l'interface (`GameAudio.ui`): au plus tant par image, le reste est perdu. */
+  interface: { maxQueued: number };
 }
 
 export const AUDIO_SETTINGS: AudioSettings = {
@@ -225,6 +227,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
   },
   loopFadeSeconds: 0.2,
   villagerMotifPrefix: 'talk-',
+  interface: { maxQueued: 4 },
 };
 
 /** Décibels vers gain linéaire. */

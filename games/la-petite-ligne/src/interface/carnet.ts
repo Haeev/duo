@@ -12,6 +12,7 @@ import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, questModels, slotModel, type QuestModel } from './modele';
 import { Panel } from './panneau';
+import { SOUND_ATTR } from './sons';
 
 type NotebookTab = 'quests' | 'mail' | 'bag';
 const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag'];
@@ -49,7 +50,7 @@ export class NotebookPanel extends Panel {
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
       button([icon(iconId), label, extra], () => {
         this.select(id, true);
-      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', 'data-tab': id } });
+      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', 'data-tab': id, [SOUND_ATTR]: 'none' } });
     this.tabButtons = {
       quests: make('quests', ctx.t(g.quests), 'ui-flag', null),
       mail: make('mail', ctx.t(g.mail), 'ui-letter', this.badge),
@@ -94,6 +95,7 @@ export class NotebookPanel extends Panel {
 
   private select(tab: NotebookTab, focus: boolean): void {
     if (tab !== this.tab) {
+      this.host.sound('ui-tab');
       this.tab = tab;
       lastTab = tab;
       this.moving = null;

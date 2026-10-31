@@ -52,6 +52,20 @@ export const UI_SETTINGS = {
    * `handleKey` au pas suivant, par les actions du SDK: on l'ignore dans ce délai (ms).
    */
   claimMs: 400,
+  /**
+   * Sons de l'interface: écart minimal entre deux mêmes sons (ms), en plus de
+   * `minIntervalMs` de `sons.json`. Rien en rafale (focus tenu, double clic).
+   */
+  soundMinMs: {
+    'ui-focus': 45,
+    'ui-confirm': 80,
+    'ui-back': 80,
+    'ui-tab': 80,
+    'ui-next': 80,
+    'ui-panel-open': 120,
+    'ui-panel-close': 120,
+    'ui-refusal': 600,
+  },
 } as const;
 
 /** Zones de la carte, dans l'ordre où on les teste pour dire où est l'autre. */

@@ -34,8 +34,8 @@ declare global {
       remount(n: number): { nodes: number; layers: number; sprites: number };
       /** Durée moyenne de `frame()` de l'interface sur `n` appels (ms). */
       measure(n: number): Promise<number>;
-      /** Journal de la page: commandes de caméra reçues de l'interface, intentions du joueur local. */
-      log: { camera: string[]; intents: string[] };
+      /** Journal de la page: commandes de caméra et sons reçus de l'interface, intentions du joueur local. */
+      log: { camera: string[]; intents: string[]; sounds: string[] };
     };
   }
 }
@@ -52,7 +52,7 @@ const sim = createWorld(content, map, 20261031, [
 setupScenario(sim, params.get('scenario') ?? 'titre', me);
 
 const listeners = new Set<(event: WorldEvent) => void>();
-const log: { camera: string[]; intents: string[] } = { camera: [], intents: [] };
+const log: { camera: string[]; intents: string[]; sounds: string[] } = { camera: [], intents: [], sounds: [] };
 const queue: { by: CharacterId; intent: Intent }[] = [];
 const AZERTY: Record<string, string> = { KeyQ: 'A', KeyW: 'Z', KeyA: 'Q', KeyZ: 'W', Space: 'Espace', Enter: 'Entrée', Backspace: 'Retour arrière', Tab: 'Tab' };
 
@@ -90,6 +90,9 @@ const mountUi = (): GameInterface =>
     camera: (command) => {
       log.camera.push(command);
       renderer?.camera(command);
+    },
+    sound: (id) => {
+      log.sounds.push(id);
     },
   });
 let ui = mountUi();

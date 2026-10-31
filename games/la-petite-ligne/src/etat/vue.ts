@@ -95,6 +95,8 @@ export interface InterfaceOptions {
   reducedMotion: boolean;
   /** Boutons de caméra du HUD: transmis au rendu par `main.ts` (facultatif). */
   camera?: (command: CameraCommand) => void;
+  /** Sons de l'interface (`ui-confirm`, `ui-focus`...): joués par l'audio du jeu, bus interface, non placés (facultatif). */
+  sound?: (id: string) => void;
 }
 
 export interface GameInterface {
@@ -126,6 +128,8 @@ export interface GameAudio {
   load(onProgress: (ratio: number) => void): Promise<void>;
   /** À chaque image (ambiances, musique selon l'heure et le lieu). */
   frame(dtSeconds: number): void;
+  /** Son d'interface demandé par l'interface (`InterfaceOptions.sound`), facultatif. */
+  ui?(id: string): void;
   dispose(): void;
 }
 

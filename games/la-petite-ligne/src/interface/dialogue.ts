@@ -13,6 +13,7 @@ import { itemTitle } from './format';
 import { itemIcon } from './modele';
 import { shopIsOpen } from './modele-panneaux';
 import { portraitSvg, villagerColors } from './portrait';
+import { SOUND_ATTR } from './sons';
 
 /** Ce que montre la boîte: une conversation, la scène à deux, ou un objet lu. */
 export type DialogueSource = { kind: 'dialogue' } | { kind: 'scene' } | { kind: 'read'; item: string };
@@ -68,7 +69,7 @@ export class DialogueBox implements Layer {
     this.footerText = el('span');
     this.next = button([ctx.t(ctx.texts.extra.common.next), ' ', keycap(ctx.key('Space'))], () => {
       this.advance();
-    }, { class: 'lpl-button lpl-dialogue__next' });
+    }, { class: 'lpl-button lpl-dialogue__next', attrs: { [SOUND_ATTR]: 'ui-next' } });
     this.root = el('section', { class: 'lpl-dialogue', 'aria-labelledby': nameId }, [
       this.aside,
       el('div', { class: 'lpl-dialogue__main' }, [

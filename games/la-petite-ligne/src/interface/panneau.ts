@@ -6,6 +6,7 @@
 import type { ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, Layer, UiHost } from './composant';
 import { button, clear, el, focusElement, focusables, icon, keycap, setText } from './dom';
+import { SOUND_ATTR } from './sons';
 
 export interface PanelOptions {
   icon: string;
@@ -42,7 +43,7 @@ export abstract class Panel implements Layer {
     this.titleBlock = el('div', {}, [this.titleEl, this.subtitleEl]);
     this.closeButton = button([host.ctx.texts.extra.common.close, ' ', keycap(options.closeKeyLabel)], () => {
       this.close();
-    }, { class: 'lpl-button lpl-button--on-dark lpl-panel__close', attrs: { 'aria-label': options.closeAria } });
+    }, { class: 'lpl-button lpl-button--on-dark lpl-panel__close', attrs: { 'aria-label': options.closeAria, [SOUND_ATTR]: 'none' } });
     this.header = el('header', { class: 'lpl-panel__header' }, [icon(options.icon), this.titleBlock, this.closeButton]);
     this.body = el('div', { class: 'lpl-panel__body' });
     this.footer = el('footer', { class: 'lpl-panel__footer' });

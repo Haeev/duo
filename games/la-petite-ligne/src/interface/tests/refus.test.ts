@@ -47,7 +47,7 @@ describe('refus (revue S2)', () => {
     expect(toastVisual(note('Il manque: 2 planches', null), content.texts.messages, refusal)).toMatchObject({ variant: 'error' });
   });
 
-  it('ne joue plus le carillon `notify` pour un refus, toujours pour une lettre', () => {
+  it('joue `ui-refusal` au lieu du carillon `notify` pour un refus, `notify` pour une lettre', () => {
     const { content, map } = contentAndMap();
     const sim = started();
     const watcher = new StateWatcher(AUDIO_SETTINGS, createRandom(7));
@@ -60,9 +60,13 @@ describe('refus (revue S2)', () => {
     frame();
     const me = character(sim, 'p1');
     me.notifications.push(note('Déjà pris par Sacha.', 'already_taken', 'message', 900_001));
-    expect(frame().some((r) => r.sound === 'notify')).toBe(false);
+    const refused = frame().map((r) => r.sound);
+    expect(refused).not.toContain('notify');
+    expect(refused).toContain('ui-refusal');
     me.notifications.push(note('Du courrier: Un mot', 'letter_received', 'letter', 900_002));
-    expect(frame().some((r) => r.sound === 'notify')).toBe(true);
+    const letter = frame().map((r) => r.sound);
+    expect(letter).toContain('notify');
+    expect(letter).not.toContain('ui-refusal');
   });
 });
 

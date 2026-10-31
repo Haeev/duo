@@ -28,6 +28,7 @@ import {
   stackEntries,
 } from './modele-panneaux';
 import { Panel } from './panneau';
+import { SOUND_ATTR } from './sons';
 
 function purseBadge(host: UiHost, world: ReadonlyWorld): HTMLSpanElement {
   const { ctx } = host;
@@ -366,7 +367,7 @@ export class ShopPanel extends Panel {
     const make = (id: 'buy' | 'sell', label: string, iconId: string): HTMLButtonElement =>
       button([icon(iconId), label], () => {
         this.select(id);
-      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1' } });
+      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', [SOUND_ATTR]: 'none' } });
     this.tabButtons = { buy: make('buy', ctx.t(s.buy), 'seed-radish'), sell: make('sell', ctx.t(s.sell), 'ui-coin') };
     this.tabs = el('div', { class: 'lpl-tabs', role: 'tablist' }, [
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyQ') }),
@@ -396,6 +397,7 @@ export class ShopPanel extends Panel {
 
   private select(tab: 'buy' | 'sell'): void {
     if (tab === this.tab) return;
+    this.host.sound('ui-tab');
     this.tab = tab;
     this.markTabs();
     this.host.invalidate();

@@ -440,13 +440,17 @@ export class StateWatcher {
       this.lastDestination = dest === null ? null : { x: dest.x, y: dest.y };
       let newest = this.lastNotification;
       let notify = false;
+      let refused = false;
       for (const n of me.notifications) {
         if (n.id > this.lastNotification) {
           newest = Math.max(newest, n.id);
-          // Un refus (« Déjà pris », sac plein, « Il manque 40 sous ») n'a pas le carillon des bonnes nouvelles (revue S2).
-          if (NOTIFY_KINDS.has(n.kind) && !isRefusal(n, refusal)) notify = true;
+          // Un refus (« Déjà pris », sac plein, « Il manque 40 sous ») n'a pas le carillon des bonnes nouvelles (revue S2):
+          // il a son son à lui, feutré, 600 ms au moins entre deux (`minIntervalMs` de `sons.json`).
+          if (isRefusal(n, refusal)) refused = true;
+          else if (NOTIFY_KINDS.has(n.kind)) notify = true;
         }
       }
+      if (refused && !first) emit.ui('ui-refusal', local);
       if (notify && !first && !out.some((r) => COVERING_UI.has(r.sound) || r.sound.startsWith(s.villagerMotifPrefix))) emit.ui('notify', local);
       this.lastNotification = newest;
       // Une ligne de la commande se coche: le tampon, chez qui est à la caisse.
