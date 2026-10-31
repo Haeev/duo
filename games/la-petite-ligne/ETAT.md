@@ -71,6 +71,14 @@ Tenue par le technical artist. Ce que l'ambiance fait en attendant est dit à ch
 
 ## Technical artist
 
+### 2026-10-31, gauntlet tour 3: soir, foyer de la maisonnette, fumées
+
+- Soir (`reglages-ambiance.ts`, clés de 17 h 45 et 19 h): ciel froid bleu-violet pâle (ombres froides, soleil chaud), sol de l'hémisphérique plus sombre, brume moins orangée, ombres pleines et nettes jusqu'à 19 h. Place à 18 h 30: gris moyen 80 vers 81, écart 19 vers 22 (cible 25 pas atteinte: au-delà, la soirée s'assombrit ou le test de continuité de la lumière casse). Fenêtre de l'énigme (17 h à 17 h 30) et son test inchangés.
+- Foyer de la maisonnette (`ambiance.ts`, lumière `hearth` de `glow.kinds`): une lumière de sol chaude au centre de la pièce, prioritaire sur les autres, dès que le toit est réparé et que la lueur de nuit monte. Aucune lumière ponctuelle en plus (lumières de sol de `surfaces.ts`). Pièce à 21 h: gris moyen 62 vers 101, écart 35 vers 55.
+- Fumées des cheminées: opacité 0,5 vers 0,75, bouffées en hexagones à facettes à deux tons (forme `facetedPuff` de `particules.ts`), distinctes de la vapeur ronde du train.
+- Budgets inchangés: soir 92 appels, 205 716 triangles, 11 programmes; intérieur 96, 162 912, 11; cheminées 123, 197 066, 11.
+- Captures avant et après: `docs/jeux/jeu-1/gauntlet/captures/tour-03/ta-01-soir-18h30-avant-apres.png`, `ta-02-interieur-21h-avant-apres.png`, `ta-03-cheminees-19h15-avant-apres.png`.
+
 ### 2026-10-31, gauntlet tour 2: vent et fumées de cheminée (pilier 2, défaut 1)
 
 - Vent (`surfaces.ts`, réglages `wind` de `reglages-ambiance.ts`): dans le nuanceur de sommets de `lpl_palette` (même programme), le feuillage, les herbes, les cultures, les fleurs et le lierre (première rangée de la palette, cases `flower_*` et `ivy`, lues par l'UV dans une carte de 16 x 16, `createWindMask` de `champs.ts`) se balancent d'autant plus qu'ils sont haut au-dessus de leur pied; les plantes basses plient plus que les arbres; balancement et rafales lentes qui traversent le bourg; le store de l'épicerie frissonne. Plus fort par nuages (x 1,4) et par pluie (x 1,9); arrêté en version légère et si les animations sont réduites. La carte d'ombre n'est pas déformée: les ombres restent immobiles (aucun tremblement).
