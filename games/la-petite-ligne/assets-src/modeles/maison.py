@@ -378,6 +378,9 @@ def main():
     tex = lpl.build_world_textures()
     mat = lpl.palette_material("lpl_palette", tex["palette"], tex["palette-mr"], tex["palette-emission"])
     A = lpl.Assets(mat)
+    # low poly arrondi (bible section 8.2): meubles et objets vus de près, dans la pièce
+    lpl.AUTO_ROUND = True
+    lpl.AUTO_MIN = (0.3, 0.03)
     furn = []
     furn.append(A.add("straw_mattress", straw_mattress(A), {"footprint": [1, 2], "sleep_height": 0.15}))
     furn.append(A.add("double_bed", double_bed(A), {"footprint": [2, 2], "sleep_height": 0.5,
@@ -400,6 +403,7 @@ def main():
                      ("dish_soup", dish_soup), ("parcel", parcel), ("iron_box", iron_box), ("riddle_card", riddle_card),
                      ("shed_key", shed_key), ("old_photo", old_photo), ("jay_feather", jay_feather)):
         items.append(A.add(name, fn(A), {"kind": "item"}))
+    lpl.AUTO_ROUND = False  # modules de murs et de sol: ils se raccordent bord à bord
     kit = []
     for name, args in (("kit_wall_stone", ("stone", None)), ("kit_wall_wood", ("wood", None)),
                        ("kit_door", ("stone", "door")), ("kit_window", ("stone", "window"))):

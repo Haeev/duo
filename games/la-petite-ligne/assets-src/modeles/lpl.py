@@ -176,6 +176,7 @@ def by_height(levels):
 # Low poly arrondi automatique (bible section 8.2): quand AUTO_ROUND est vrai, toute boîte sans
 # chanfrein explicite en reçoit un selon sa taille (arêtes au sol vives pour les boîtes posées).
 AUTO_ROUND = False
+AUTO_MIN = (0.6, 0.08)   # plus grande et plus petite dimensions en dessous desquelles une boîte reste vive
 
 
 def auto_bevel(size, base):
@@ -183,13 +184,16 @@ def auto_bevel(size, base):
     dmax, dmin = max(size), min(size)
     # petits détails (moins de 60 cm) et planches et plaques (moins de 8 cm): peu visibles à 16 à 36 m de champ,
     # laissés vifs pour tenir le budget de triangles
-    if dmax < 0.6 or dmin < 0.08:
+    if dmax < AUTO_MIN[0] or dmin < AUTO_MIN[1]:
         return None
     w = 0.02 if dmax < 0.5 else 0.035 if dmax < 2.0 else 0.07 if dmax < 6.0 else 0.1
     w = min(w, dmin * 0.35)
     # deux segments pour les gros volumes seulement (murs, socles): le coût reste raisonnable
     seg = 2 if dmax >= 2.0 and dmin >= 0.25 else 1
     pred = (lambda a, b: not (abs(a.z) < 1e-4 and abs(b.z) < 1e-4)) if base else None
+    if dmax >= 2.0 and size[2] >= 1.5:
+        # mur ou corps de bâtiment: seuls les angles verticaux se voient (le haut est sous le toit)
+        pred = lambda a, b: abs(a.x - b.x) < 1e-4 and abs(a.y - b.y) < 1e-4  # noqa: E731
     return w, seg, pred
 
 

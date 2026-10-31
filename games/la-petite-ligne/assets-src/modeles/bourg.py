@@ -188,7 +188,8 @@ def gable_roof(geos, x0, x1, y0, y1, ze, zr, color, edge=None, over=0.35, thick=
                 pa, pb = surf(-1, 1.0, px[i]), surf(-1, 1.0, px[i + 1])
                 mid = (pa + pb) / 2
                 tilt = math.degrees(math.atan2(pb.z - pa.z, pb.x - pa.x))
-                gi.cyl(0.12, (pb - pa).length + 0.03, loc=(mid.x, mid.y, mid.z + 0.01), color=ridge_color or edge,
+                gi.cyl(min(0.12, 0.05 * span), (pb - pa).length + 0.03, loc=(mid.x, mid.y, mid.z + 0.01),
+                       color=ridge_color or edge,
                        segs=8, rot=(0, 90 - tilt, 0))
         k += 1
     if rafters:
@@ -1314,7 +1315,7 @@ def fence(A, kind):
 # Nature -------------------------------------------------------------------------
 
 def tree_oak(A, large, seed):
-    """Low poly arrondi: tronc à 8 pans évasé au pied, 3 racines, 4 boules facettées (80 faces) qui se chevauchent."""
+    """Low poly arrondi: tronc à 8 pans évasé au pied, 3 racines, 3 boules facettées (80 faces) qui se chevauchent."""
     g = A.geo()
     rnd = random.Random(seed)
     s = 1.45 if large else 1.0
@@ -1327,10 +1328,10 @@ def tree_oak(A, large, seed):
         ar = math.radians(a)
         g.cyl(0.09 * s, 0.5 * s, loc=(0.36 * s * math.cos(ar), 0.36 * s * math.sin(ar), 0.03 * s), color="bark_dark",
               segs=5, r2=0.03 * s, cap=False, rot=(0, 100, a))
-    for (x, y, z, r, c, sc) in ((0, 0, 2.95, 1.3, "leaf_oak", (1.1, 1.0, 0.85)),
-                                (0.9, 0.25, 2.55, 0.85, "leaf_oak", (1.0, 1.1, 0.88)),
-                                (-0.85, -0.2, 2.6, 0.9, "leaf_oak_light", (1.05, 0.95, 0.9)),
-                                (0.32, -0.3, 3.55, 0.85, "leaf_oak_light", (1.0, 1.0, 0.85))):
+    # trois boules (budget de la scène: 30 chênes, ombres comprises)
+    for (x, y, z, r, c, sc) in ((-0.15, 0, 2.95, 1.38, "leaf_oak", (1.12, 1.0, 0.85)),
+                                (0.95, 0.25, 2.55, 0.9, "leaf_oak", (1.0, 1.1, 0.88)),
+                                (0.32, -0.3, 3.55, 0.88, "leaf_oak_light", (1.0, 1.0, 0.85))):
         g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=2, jitter=0.07, seed=rnd.randint(0, 999),
                  scale=sc, rot=(0, 0, rnd.uniform(0, 360)))
     return g
@@ -1382,9 +1383,10 @@ def bush(A, kind, seed):
     g = A.geo()
     rnd = random.Random(seed)
     if kind == "round":
-        # low poly arrondi: deux boules facettées aplaties (80 faces chacune), sans pied
-        for (x, y, z, r, c) in ((-0.08, 0.02, 0.36, 0.52, "leaf_bush"), (0.3, -0.06, 0.27, 0.36, "leaf_oak")):
-            g.sphere(r, loc=(x, y, z), color=c, ico=2, jitter=0.06, seed=rnd.randint(0, 99), scale=(1.1, 1.0, 0.78),
+        # low poly arrondi: une boule facettée de 80 faces et une petite de 20, aplaties, sans pied
+        # (79 buissons sur la carte: le budget de la scène compte)
+        for (x, y, z, r, c, ico) in ((-0.08, 0.02, 0.36, 0.53, "leaf_bush", 2), (0.32, -0.06, 0.25, 0.32, "leaf_oak", 1)):
+            g.sphere(r, loc=(x, y, z), color=c, ico=ico, jitter=0.06, seed=rnd.randint(0, 99), scale=(1.1, 1.0, 0.78),
                      rot=(0, 0, rnd.uniform(0, 360)))
     elif kind == "bramble":
         for (x, y, z, r) in ((-0.05, 0, 0.3, 0.48), (0.38, 0.05, 0.24, 0.33)):

@@ -6,7 +6,7 @@
     6
    ],
    "door_cell": 4,
-   "tris": 4036
+   "tris": 4004
   },
   "platform": {
    "footprint": [
@@ -40,7 +40,7 @@
     "gatekeeper_house_ruin",
     "gatekeeper_house_repaired"
    ],
-   "tris": 10548
+   "tris": 10036
   },
   "ferrand_shop": {
    "footprint": [
@@ -49,7 +49,7 @@
    ],
    "door_cell": 2,
    "counter_cell": 6,
-   "tris": 4804
+   "tris": 4740
   },
   "firmin_house": {
    "footprint": [
@@ -65,7 +65,7 @@
     8
    ],
    "door_cell": 5,
-   "tris": 2152
+   "tris": 2088
   },
   "handcar_shed": {
    "footprint": [
@@ -74,7 +74,7 @@
    ],
    "door_cell": 2,
    "note": "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y",
-   "tris": 1544
+   "tris": 1512
   },
   "handcar": {
    "footprint": [
@@ -110,7 +110,7 @@
     2,
     2
    ],
-   "tris": 544
+   "tris": 528
   },
   "woodpile": {
    "footprint": [
@@ -164,7 +164,7 @@
     1,
     1
    ],
-   "tris": 254
+   "tris": 246
   },
   "bench": {
    "footprint": [
@@ -192,21 +192,21 @@
     1,
     1
    ],
-   "tris": 380
+   "tris": 364
   },
   "station_sign": {
    "footprint": [
     2,
     1
    ],
-   "tris": 308
+   "tris": 292
   },
   "arbor": {
    "footprint": [
     3,
     2
    ],
-   "tris": 1304
+   "tris": 1272
   },
   "mailbox": {
    "footprint": [
@@ -332,7 +332,7 @@
     1
    ],
    "choppable": true,
-   "tris": 438
+   "tris": 358
   },
   "tree_oak_large": {
    "footprint": [
@@ -340,7 +340,7 @@
     2
    ],
    "choppable": true,
-   "tris": 438
+   "tris": 358
   },
   "tree_fir_small": {
    "footprint": [
@@ -386,7 +386,7 @@
     1,
     1
    ],
-   "tris": 160
+   "tris": 100
   },
   "bush_bramble": {
    "footprint": [
@@ -511,7 +511,7 @@
   },
   "tree_oak": {
    "alias_of": "tree_oak_large",
-   "tris": 438
+   "tris": 358
   },
   "tree_fir": {
    "alias_of": "tree_fir_large",
@@ -519,7 +519,7 @@
   },
   "bush": {
    "alias_of": "bush_round",
-   "tris": 160
+   "tris": 100
   },
   "rock": {
    "alias_of": "rock_medium",
@@ -534,5 +534,5 @@
    "tris": 936
   }
  },
- "file_bytes": 3871768
+ "file_bytes": 3782740
 }

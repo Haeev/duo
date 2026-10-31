@@ -24,7 +24,7 @@
      0.0
     ]
    ],
-   "tris": 540
+   "tris": 708
   },
   "mattress": {
    "kind": "item",
@@ -36,7 +36,7 @@
     1
    ],
    "top_height": 0.78,
-   "tris": 116
+   "tris": 268
   },
   "chair": {
    "footprint": [
@@ -44,14 +44,14 @@
     1
    ],
    "seat_height": 0.47,
-   "tris": 164
+   "tris": 452
   },
   "chest": {
    "footprint": [
     1,
     1
    ],
-   "tris": 128
+   "tris": 176
   },
   "shelf": {
    "footprint": [
@@ -59,7 +59,7 @@
     1
    ],
    "wall": true,
-   "tris": 512
+   "tris": 656
   },
   "stove": {
    "footprint": [
@@ -67,7 +67,7 @@
     1
    ],
    "station": "stove",
-   "tris": 324
+   "tris": 372
   },
   "flower_pot": {
    "footprint": [
@@ -98,14 +98,14 @@
     1
    ],
    "wall": true,
-   "tris": 224
+   "tris": 504
   },
   "crystal_radio": {
    "footprint": [
     1,
     1
    ],
-   "tris": 364
+   "tris": 368
   },
   "wood_stove": {
    "footprint": [
@@ -122,7 +122,7 @@
    ],
    "wall": true,
    "tier": "P1",
-   "tris": 92
+   "tris": 124
   },
   "bread": {
    "kind": "item",
@@ -142,7 +142,7 @@
   },
   "parcel": {
    "kind": "item",
-   "tris": 92
+   "tris": 140
   },
   "iron_box": {
    "kind": "item",
@@ -162,7 +162,7 @@
   },
   "jay_feather": {
    "kind": "item",
-   "tris": 172
+   "tris": 176
   },
   "kit_wall_stone": {
    "footprint": [
@@ -209,5 +209,5 @@
    "tris": 24
   }
  },
- "file_bytes": 462244
+ "file_bytes": 549824
 }
