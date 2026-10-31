@@ -5,7 +5,7 @@
 Options: --seulement musiques|sons|planche (plusieurs possibles), --sans-controle.
 
 Produit:
-- games/la-petite-ligne/assets/son/: musique/, ambiance/, effets/, train/, interface/, habitants/
+- games/la-petite-ligne/assets/son/: musique/, ambiance/, effets/, train/, interface/, habitants/, moments/
   (Ogg Vorbis, 48 kHz) et sons.json (définitions lues par le moteur);
 - games/la-petite-ligne/assets-src/son/midi/: les partitions MIDI (sources de vérité des musiques);
 - design/son/la-petite-ligne/: copies M4A des musiques et planche d'écoute ecoute.m4a, pour le client;
@@ -40,6 +40,7 @@ import ambiances  # noqa: E402
 import dsp  # noqa: E402
 import effets  # noqa: E402
 import habitants  # noqa: E402
+import moments  # noqa: E402
 import musiques  # noqa: E402
 import partition  # noqa: E402
 import train  # noqa: E402
@@ -221,7 +222,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 
 def tous_les_sons() -> list[Son]:
-    return effets.sons() + train.sons() + ambiances.sons() + habitants.sons()
+    return effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons()
 
 
 PLAN = {
@@ -386,13 +387,19 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["duo-hop", "duo-carry-loop", "duo-done", "stove-light", "stove-loop", "eat", "hen", "sleep", "wake-rooster",
          "wake"],
         ["talk-odette", "talk-firmin", "talk-lucie", "talk-basile", "talk-jeanne"],
+        ["bench-sit"],
+        ["heron-wade", "heron-strike", "heron-croak", "heron-wings", "heron-land"],
+        ["geese-rest", "geese-alarm", "geese-takeoff", "geese-flight"],
+        ["ladder-lean", "ladder-grip", "ladder-step", "nest-box-turn", "hammer-tap", "tit-call"],
+        ["tit-song", "tit-wings", "fox-pounce", "fox-bark", "hens-alarm"],
+        ["crickets-night", "glow-shimmer"],
     ]
     for groupe in groupes:
         for nom in groupe:
             k = 0
             while f"{nom}/{k}" in apercus:
                 x = apercus[f"{nom}/{k}"]
-                if nom.endswith("loop"):
+                if nom.endswith("loop") or nom in ("geese-rest", "crickets-night"):
                     x = np.concatenate([x, x])[: dsp.n_ech(min(5.0, 2 * len(x) / dsp.SR))]
                     x = dsp.fondu(x, 0.01, 0.3)
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]

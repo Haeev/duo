@@ -25,6 +25,16 @@ SPATIAL = {
     # Le bouchon est à 6 m du pêcheur: référence à 6 m, pour que la touche s'entende nettement.
     "bouchon": {"distanceModel": "inverse", "refDistance": 6.0, "rolloffFactor": 1.0, "maxDistance": 40.0,
                 "cullBeyondM": 40.0},
+    # Bêtes des moments rares: « audible à N m » (fiches du tour 6) = coupé au-delà de N m, où le
+    # gain est déjà vers -17 dB: le son n'apparaît ni ne disparaît d'un coup au bord.
+    "faune-12": {"distanceModel": "inverse", "refDistance": 2.0, "rolloffFactor": 1.3, "maxDistance": 12.0,
+                 "cullBeyondM": 12.0},
+    "faune-15": {"distanceModel": "inverse", "refDistance": 2.5, "rolloffFactor": 1.2, "maxDistance": 15.0,
+                 "cullBeyondM": 15.0},
+    "faune-20": {"distanceModel": "inverse", "refDistance": 3.0, "rolloffFactor": 1.2, "maxDistance": 20.0,
+                 "cullBeyondM": 20.0},
+    "faune-25": {"distanceModel": "inverse", "refDistance": 4.0, "rolloffFactor": 1.0, "maxDistance": 25.0,
+                 "cullBeyondM": 25.0},
     # Le repère de l'autre: placé à l'épingle, jamais sous -10 dB, où qu'elle soit.
     "repere": {"distanceModel": "inverse", "refDistance": 6.0, "rolloffFactor": 0.6, "maxDistance": 80.0,
                "cullBeyondM": 100000.0, "minGainDb": -10.0},

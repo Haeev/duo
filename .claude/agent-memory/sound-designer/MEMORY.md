@@ -55,3 +55,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Un carnet existe déjà dans le dépôt: le lire avant d'écrire, et n'y ajouter que des sections.
 - Un signal qui doit s'entendre (refus, touche de pêche): fondamentale au-dessus de 300 Hz et la plus grande part de l'énergie au-dessus (mesurée), car le PC de référence a peut-être des haut-parleurs de portable. Prouver qu'un son se distingue d'un autre par la mesure (centroïde spectral, durée utile), pas seulement par l'intention.
 - Passer un son d'une à plusieurs variantes change ses noms de fichiers (`x.ogg` devient `x-1.ogg`...): supprimer l'ancien fichier, sinon `controler.py` le signale comme orphelin.
+
+## La Petite Ligne: ajouts de sons (vérifié le 2026-10-31, tour 6)
+
+- Un nouveau module de sons (`assets-src/son/moments.py`) s'ajoute à `tous_les_sons()` et aux groupes de la planche de `generer.py`; `--seulement sons planche` régénère sans toucher aux musiques, et les fichiers existants ressortent identiques à l'octet (`git status` le prouve).
+- Dossier non résident: tout sous-dossier absent de `residentFolders` (`src/audio/reglages.ts`) se décode à la demande. Y mettre les sons rares (moments: 13 Mo décodés); `memoire.test.ts` exige moins de 30 Mo de sons résidents.
+- Le schéma de `sons.json` (`src/audio/catalogue.ts`, Valibot) n'accepte pour un son que les bus `effects`, `ui`, `ambience`; les champs en plus (`extra`) sont ignorés sans erreur.
+- `ebur128` de ffmpeg mesure un fichier mono environ 3 dB sous la cible de `dsp.amener_momentanee`: écart constant dans tout le jeu, comparer les sons entre eux avec la même mesure.
+- Bois frappé (banc, barreau, échelle): avec `ins.bois` à fondamentale sous 150 Hz, plus de 85 % de l'énergie tombe sous 300 Hz (inaudible sur un portable). Monter la fondamentale vers 150 à 250 Hz, baisser son amplitude au profit des partiels et du craquement, puis vérifier la part sous 300 Hz (viser moins de 60 %).
+- Le robot de `cerveau.test.ts` ne s'assoit sur aucun banc: un son de `sat_down` ne peut pas figurer dans la liste des sons attendus de ce test.
+- Dans un worktree isolé, l'outil refuse les commandes qui mêlent `cd`, heredoc et `duo-python` avec `$PWD`, ou qui contiennent le mot git dans un motif: appeler `duo-python` avec des chemins absolus, une commande à la fois, et éditer avec Edit.

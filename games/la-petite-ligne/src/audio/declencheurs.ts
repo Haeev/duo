@@ -191,8 +191,8 @@ export function soundsForEvent(
       break;
     }
     case 'sat_down':
-      // Le bois du banc sous le poids (son du meuble posé, en attendant un son propre: ETAT.md).
-      emit.world('furniture-place', characterAt(world, event.by), event.by);
+      // Le bois du banc qui craque sous le poids, et l'étoffe sur la planche.
+      emit.world('bench-sit', characterAt(world, event.by), event.by);
       break;
     case 'furniture_taken':
     case 'picked_up':

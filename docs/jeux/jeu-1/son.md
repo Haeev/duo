@@ -144,6 +144,7 @@ Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), 
 | Pêche: le poisson sort de l'eau (éclaboussure, frétillement; événement caught) | `fishing-catch` | -20 | 2 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
 | Pêche: le poisson s'échappe (« flop », événement escaped) | `fishing-escape` | -25 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
 | Gloussements des poules | `hen` | -24 | 3 | 3 variantes, hauteur ±8 %, niveau ±2 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+| S'asseoir sur un banc de bois (événement `sat_down`) | `bench-sit` | -26 | 3 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Le coq du bourg, au réveil | `wake-rooster` | -22 | 3 | hauteur ±3 % | effets | non placé |  |
 
 ### 4.3 Interface et airs courts
@@ -186,6 +187,40 @@ Les menus du jeu ont leur propre famille, « papier et bois » (le carnet, le cr
 | Pluie dehors (jour 4) | `rain` | 16 s | -27 LUFS | ambiance |
 | Pluie sur le toit, à l'intérieur de la maisonnette | `rain-roof` | 16 s | -29 LUFS | ambiance |
 
+### 4.5 Moments rares (tour 6)
+
+Sons des fiches de `docs/jeux/jeu-1/tour-06-conception.md` (section 1.4), dans `assets/son/moments/`. Ce dossier n'est pas décodé au lancement (`residentFolders` de `src/audio/reglages.ts`): 13,2 Mo décodés pour l'ensemble, à charger quand le moment du jour passe en `waiting` (au plus un moment par jour, donc 1 à 4 Mo). Chaque entrée de `sons.json` porte `moment` (identifiant du moment) et `momentSound` (nom de la fiche). « Audible à N m » dans une fiche devient « coupé au-delà de N m », avec un gain d'environ -17 dB au bord: le son n'apparaît ni ne disparaît d'un coup.
+
+| Moment | Fiche | Son | Quand | Niveau | Priorité | Variations | Bus | Écoute |
+|---|---|---|---|---|---|---|---|---|
+| héron | `heron_wade` | `heron-wade` | attente, toutes les 6 à 12 s | -29 | 3 | 3 variantes, hauteur ±6 %, niveau ±1,5 dB, 2 s au moins entre deux | effets | réf. 2,5 m, coupé au-delà de 15 m |
+| héron | `heron_strike` | `heron-strike` | clip `heron_strike` | -26 | 3 | 2 variantes, hauteur ±5 % | effets | coupé au-delà de 15 m |
+| héron | `heron_croak` | `heron-croak` | apogée, t = 1,2 s | -21 | 2 | 2 variantes, hauteur ±3 % | effets | réf. 4 m, coupé au-delà de 25 m |
+| héron | `heron_wings` | `heron-wings` | apogée, t = 1,0 s | -22 | 2 | hauteur ±4 % | effets | réf. 3 m, coupé au-delà de 20 m |
+| héron | `heron_land` | `heron-land` | apogée, t = 4,4 s, à `heron_rest_far` | -24 | 2 | hauteur ±4 % | effets | coupé au-delà de 20 m |
+| oies | `geese_rest` | `geese-rest` (boucle de 6 s) | attente, placé à `geese_rest` | -30 LUFS int. | 3 | aucune | ambiance | réf. 3 m, coupé au-delà de 20 m |
+| oies | `geese_alarm` | `geese-alarm` | apogée, t = 0 | -21 | 2 | hauteur ±3 % | effets | réf. 3 m, coupé au-delà de 45 m |
+| oies | `geese_takeoff` | `geese-takeoff` | apogée, t = 1 s | -19,5 | 2 | hauteur ±3 % | effets | coupé au-delà de 45 m |
+| oies | `geese_flight` | `geese-flight` | apogée, t = 3 s (et départ sans apogée) | -21 | 2 | 3 variantes, hauteur ±2 % | effets | placé à l'oie de tête et déplacé avec elle, réf. 8 m, coupé au-delà de 160 m |
+| échelle | `ladder_lean` | `ladder-lean` | début de `basile_lost`, si un joueur est à moins de 15 m | -23 | 3 | hauteur ±4 % | effets | coupé au-delà de 15 m |
+| échelle | `ladder_grip` | `ladder-grip` | on prend une place | -27 | 3 | 3 variantes, hauteur ±5 % | effets | réf. 2 m, coupé au-delà de 28 m |
+| échelle | `ladder_step` | `ladder-step` | chaque barreau de Basile | -27 | 2 | 4 variantes, hauteur ±5 %, niveau ±1,5 dB | effets | coupé au-delà de 28 m |
+| échelle | `nest_box_turn` | `nest-box-turn` | apogée, t = 3 s | -26 | 2 | hauteur ±3 % | effets | coupé au-delà de 28 m |
+| échelle | `hammer_tap` | `hammer-tap` | apogée, 4,05, 4,65 et 5,25 s | -25 | 2 | 3 variantes, hauteur ±4 % | effets | réf. 3 m, coupé au-delà de 45 m |
+| échelle | `tit_call` | `tit-call` | apogée, t = 9,0 s | -26 | 2 | 3 variantes, hauteur ±3 % | effets | réf. 2 m, coupé au-delà de 12 m |
+| mésanges | `tit_song` | `tit-song` | attente toutes les 8 s, apogée de 1,5 à 4 s | -25 | 3 | 3 variantes, hauteur ±3 % | effets | coupé au-delà de 12 m |
+| mésanges | `tit_wings` | `tit-wings` | envol et posé | -31 | 4 | 2 variantes, hauteur ±8 % | effets | coupé au-delà de 12 m |
+| renard | `fox_pounce` | `fox-pounce` | clip `fox_pounce` (attente) | -27 | 3 | 2 variantes, hauteur ±5 % | effets | coupé au-delà de 12 m |
+| renard | `fox_bark` | `fox-bark` | apogée, t = 1,0 s | -21 | 2 | 2 variantes, hauteur ±3 % | effets | réf. 4 m, coupé au-delà de 25 m |
+| renard | `hens_alarm` | `hens-alarm` | apogée, t = 1,2 s, au poulailler, si les poules y sont | -23 | 3 | hauteur ±4 % | effets | réf. 3 m, coupé au-delà de 45 m |
+| vers luisants | `crickets_night` | `crickets-night` (boucle de 8 s) | placé à `meadow_glow`; attente à -6 dB, pleine force en 4 s à l'apogée (`waitingDb`, `climaxRampMs`) | -29 LUFS int. | 3 | aucune | ambiance | coupé au-delà de 20 m |
+| vers luisants | `glow_shimmer` | `glow-shimmer` | apogée, t = 0,5 s | -22 | 2 | 2 variantes, aucune variation de hauteur (sol pentatonique) | interface | non placé |
+
+- **Descente de la musique pendant l'apogée** (fiche 1.2, `moments.musicDuckDb`): -6 dB en 0,5 s au début, retour en 2 s après la fin, chez les deux. Elle se règle dans le moteur, pas dans `sons.json` (aucun son des moments n'a de `duckMusicDb`, pour ne pas cumuler deux atténuations).
+- **`glow-shimmer` sur le bus interface**: la fiche demande le bus musique, mais `sons.json` n'accepte pour les sons que `effects`, `ui` et `ambience` (schéma de `src/audio/catalogue.ts`). Bus interface en attendant (question S3).
+- **Ne pas confondre**: `crickets-night` (grillons champêtres du pré, placé, net) n'est pas l'ambiance générale `crickets` (non placée, lointaine). Le premier s'ajoute au second pendant le moment.
+- **Les cris** suivent l'espèce sans imiter d'enregistrement: héron « kraak » grave et rauque (fondamentale vers 300 Hz qui retombe, voix rugueuse), oies nasales (330 à 495 Hz, neuf hauteurs distinctes dans la volée), mésange bleue fine (notes vers 6 kHz, trille vers 4 kHz), renard en deux jappements brefs. Tout est filtré au-dessus de 4 à 8 kHz et plus bas que les actions du joueur.
+
 ## 5. Les habitants
 
 Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez celui qui parle (musique à -8 dB, 4 s au moins entre deux motifs du même habitant). Tous en sol majeur, comme le thème qu'ils interrompent.
@@ -200,7 +235,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 ## 6. Intégration technique
 
-- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 11,1 Mo (budget visé: 20 Mo).
+- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 11,6 Mo (budget visé: 20 Mo).
 - **Boucles**: chaque fichier de boucle porte une amorce de chaque côté (la fin de la boucle avant, son début après: 1 s pour les musiques, 0,4 à 0,5 s pour les autres). Jouer avec `AudioBufferSourceNode`: `loop = true`, `loopStart` et `loopEnd` lus dans `loop.startSeconds` et `loop.endSeconds`, départ à `playFromSeconds` (pour une musique, le premier temps, 0,12 s après le début de la boucle: le raccord tombe entre deux notes).
 - **Pas de lecture en flux pour les boucles**: mesuré dans Chromium, `<audio loop>` insère 128 à 256 échantillons de silence (2,7 à 5,3 ms) à chaque tour, un clic audible sur une musique. Les boucles doivent être décodées (`decodeAudioData`).
 - **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
@@ -211,7 +246,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 ## 7. Contrôles (sans écouter)
 
 - `duo-python games/la-petite-ligne/assets-src/son/generer.py` régénère tout (environ 6 minutes) puis lance `controler.py`: sonie et crête vraie de chaque fichier par le filtre `ebur128` de ffmpeg après décodage (aucune crête au-dessus de -1,5 dBTP, aucun échantillon écrêté), silence en tête des effets (2,6 ms au plus), longueur exacte et raccord de chaque boucle (saut et seconde différence comparés à leur distribution dans le fichier, niveau au raccord comparé aux variations internes), poids du jeu.
-- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 156 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
+- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 202 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
 - Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
@@ -224,7 +259,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 - **Qualité « superbe »**: livrée (`quality-superb`) bien qu'absente de la démo.
 - **Lucie**: son motif est livré, bien qu'elle soit seulement citée dans la démo.
 - **Oiseaux**: génériques (trille, « tsip », phrase flûtée, « ti-tu », coucou et pigeon ramier au loin). Les chants des 24 espèces du carnet restent à faire pour le jeu complet; aucun n'est imité ici.
-- **Pas absents de la démo**: pluie qui tombe sur l'eau, bêtes autres que les poules, plan de la maison (crayon, gomme), fêtes, rang atteint.
+- **Pas absents de la démo**: pluie qui tombe sur l'eau, bêtes autres que les poules et celles des moments rares (section 4.5), plan de la maison (crayon, gomme), fêtes, rang atteint.
 - **Banque FluidR3_GM**: ses échantillons sont sombres au-dessus de 3 kHz; une correction calculée par la mesure ramène chaque musique vers la même clarté (octave de 4 kHz vers -19 dB).
 
 ## 9. Questions ouvertes
@@ -233,6 +268,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 |---|---|---|
 | S1 | Mémoire: un samedi en journée demande environ 94 Mo d'audio décodé pour des boucles sans clic, contre 64 Mo prévus (`docs/plateforme/architecture.md`). | Porter le plafond d'audio décodé à 128 Mo pour ce jeu, dans le budget de 1 Go de Duo; sinon, lecture des musiques par segments décodés à la suite (travail du SDK, architecte-technique). |
 | S2 | Bus ambiance: le SDK n'en prévoit que trois. | Un quatrième réglage « Ambiance » dans les réglages de Duo; en attendant, un sous-bus des effets. |
+| S3 | `glow-shimmer` (vers luisants) est musical: la fiche le veut sur le bus musique, que `sons.json` refuse pour un son. | Accepter `music` comme bus d'un son dans `catalogue.ts` (dev audio), puis le déplacer; en attendant, bus interface. |
 
 ## 10. Historique
 
@@ -241,3 +277,4 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 | 2026-10-31 | Première livraison pour la démo: 9 musiques, 71 sons (121 fichiers), document sonore |
 | 2026-10-31 | Pêche jouable dans la démo: cinq sons (`fishing-cast`, `fishing-splash`, `fishing-bite`, `fishing-catch`, `fishing-escape`, 10 fichiers); note du vent rattachée à la zone `forest_edge` de la carte |
 | 2026-10-31 | Gauntlet, tour 2 (défauts S1 à S3): famille d'interface « papier et bois » (`ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`), refus doux `ui-refusal`, variantes du tampon (3), du remplissage de l'arrosoir (2) et du coffre (2 et 2); 84 sons, 156 fichiers |
+| 2026-10-31 | Gauntlet, tour 6: sons des six moments rares P0 (22 sons, 43 fichiers dans `moments/`, section 4.5) et `bench-sit` (s'asseoir sur un banc, 3 variantes), branché sur `sat_down` à la place de `furniture-place`; 107 sons, 202 fichiers |
