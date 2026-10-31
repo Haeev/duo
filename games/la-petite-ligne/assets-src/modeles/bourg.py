@@ -663,8 +663,14 @@ def ferrand_shop(A):
         w = (2 * hx - 0.2) / 12
         slab(g, [(x0, y0 - 1.5, 2.55), (x0 + w, y0 - 1.5, 2.55), (x0 + w, y0 - 0.02, 3.1), (x0, y0 - 0.02, 3.1)], 0.03,
              "awning_red" if k % 2 == 0 else "awning_cream")
-        f.box(g, (w, 0.03, 0.22), x0 + w / 2, 1.52, 2.45,
+        # lambrequin festonné: bandes alternées longues et courtes (bord libre ondulé)
+        hv = 0.22 if k % 2 == 0 else 0.15
+        f.box(g, (w, 0.03, hv), x0 + w / 2, 1.52, 2.56 - hv / 2,
               "awning_red" if k % 2 == 0 else "awning_cream")
+    # bras du store fixés au mur, sous la toile
+    for xa in (-hx + 0.4, 0.0, hx - 0.4):
+        rod(g, (xa, y0 - 0.02, 2.62), (xa, y0 - 1.42, 2.5), 0.02, "iron")
+        g.box((0.08, 0.04, 0.12), loc=(xa, y0 - 0.02, 2.62), color="iron")
     # enseigne
     f.box(g, (4.0, 0.08, 0.45), 0, 0.06, 3.45, "paint_cream", bevel=0.02)
     for k in range(9):

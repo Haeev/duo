@@ -197,14 +197,14 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3335 Ko)
+### `bourg.glb` (3341 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
 | `station` | 10 x 6 | 4016 | door_cell: 4 |
 | `platform` | 30 x 4 | 3328 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
 | `gatekeeper_house` | 7 x 6 | 7108 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
-| `ferrand_shop` | 10 x 8 | 4580 | door_cell: 2, counter_cell: 6 |
+| `ferrand_shop` | 10 x 8 | 4664 | door_cell: 2, counter_cell: 6 |
 | `firmin_house` | 7 x 6 | 4524 | door_cell: 3 |
 | `sawmill` | 10 x 8 | 1944 | door_cell: 5 |
 | `handcar_shed` | 6 x 5 | 1480 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |

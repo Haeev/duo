@@ -49,7 +49,7 @@
    ],
    "door_cell": 2,
    "counter_cell": 6,
-   "tris": 4580
+   "tris": 4664
   },
   "firmin_house": {
    "footprint": [
@@ -537,5 +537,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3461360
+ "file_bytes": 3467048
 }
