@@ -20,8 +20,8 @@ interface HostBench {
   sim: Sim;
   /** Remet un message de l'invité à l'hôte (le réseau, sans délai). */
   deliver(frames: ControlFrame[], intents?: Intent[]): void;
-  /** Un pas de l'hôte (son joueur immobile); renvoie les événements du pas. */
-  step(): readonly WorldEvent[];
+  /** Un pas de l'hôte (son joueur immobile, Espace tenu si `hostHeld`); renvoie les événements du pas. */
+  step(hostHeld?: boolean): readonly WorldEvent[];
 }
 
 /** Jour 1, scène finie, le robot arrêté; l'invité joue `p2`. */
@@ -46,8 +46,8 @@ function hostAtDay(): HostBench {
     deliver(frames, intents = []) {
       listener?.({ frames, intents });
     },
-    step() {
-      return host.step({ seq: 0, moveX: 0, moveY: 0, actHeld: false });
+    step(hostHeld = false) {
+      return host.step({ seq: 0, moveX: 0, moveY: 0, actHeld: hostHeld });
     },
   };
 }
@@ -109,7 +109,7 @@ describe("hôte: commande de l'invité devinée quand elle manque", () => {
     expect(extra).toEqual([]);
   });
 
-  it('la poutre portée à deux ne tombe pas quand une commande de l’invité manque', () => {
+  it("la poutre portée à deux ne tombe pas quand une commande de l'invité manque", () => {
     const bench = hostAtDay();
     const { sim } = bench;
     const beam = sim.world.beam;
@@ -119,13 +119,19 @@ describe("hôte: commande de l'invité devinée quand elle manque", () => {
     placeCharacter(sim, character(sim, 'p2'), side(1));
     for (const id of ['p1', 'p2'] as const) character(sim, id).action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
     const events: WorldEvent[] = [];
-    // L'hôte tient Espace à chaque pas; l'invité aussi, mais ses commandes 6 à 8 manquent.
-    const hostStep = (): void => {
-      // Le pas de l'hôte passe par `createHost`: on rejoue la boucle à la main pour tenir Espace chez lui.
-      events.push(...bench.step());
-    };
-    void hostStep;
-    expect(beam).toBeDefined();
-    void events;
+    // Les deux tiennent Espace; les commandes 10 à 12 de l'invité manquent, puis arrivent d'un coup.
+    const held: ControlFrame[] = [];
+    for (let seq = 1; seq <= SIM_HZ; seq++) {
+      const f: ControlFrame = { seq, moveX: 0, moveY: 0, actHeld: true };
+      if (seq >= 10 && seq <= 12) held.push(f);
+      else {
+        if (held.length > 0) bench.deliver(held.splice(0, held.length));
+        bench.deliver([f]);
+      }
+      events.push(...bench.step(true));
+      if (seq === 5) expect(beam.carried).toBe(true);
+    }
+    expect(beam.carried).toBe(true);
+    expect(events.filter((e) => e.type === 'beam_dropped')).toEqual([]);
   });
 });

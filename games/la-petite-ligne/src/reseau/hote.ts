@@ -90,8 +90,12 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
     // Commande en retard (gigue, réémission): on rejoue la dernière à sa place, et elle compte
     // pour le numéro suivant. Sinon l'invité ferait un pas de trop à chaque retard (la devinée,
     // puis la vraie), corrigé chez lui par un à-coup. Les numéros se suivent (`commandes.ts`).
+    // Seul le déplacement se devine: Espace tenu deviné après un relâchement pourrait lancer un
+    // geste de trop (répétition d'Espace tenu), alors qu'un geste lancé un pas plus tard ne se
+    // voit pas. Exception: la poutre déjà tenue, qu'un pas relâché ferait tomber.
     ack += 1;
-    return { ...lastGuest, seq: ack };
+    const holdingBeam = sim.world.beam?.holders.includes(remote) === true;
+    return { seq: ack, moveX: lastGuest.moveX, moveY: lastGuest.moveY, actHeld: lastGuest.actHeld && holdingBeam };
   }
 
   function fastSnapshot(): FastSnapshot {
