@@ -63,7 +63,7 @@
   },
   "ui": {
     "notebookTabs": { "quests": "Quêtes", "mail": "Courrier", "bag": "Sac" },
-    "questKinds": { "main": "Une semaine à la Halte", "side": "Coups de main" },
+    "questKinds": { "main": "Deux semaines à la Halte", "side": "Coups de main" },
     "questDone": "Terminée",
     "hud": { "purse": "{amount} sous", "day": "{weekday}, jour {day}", "time": "{hours} h {minutes}", "nextGoal": "Prochain objectif" },
     "shop": { "title": "Le comptoir d'Odette", "buy": "Acheter", "sell": "Vendre", "price": "{price} sous", "close": "Fermer" },
