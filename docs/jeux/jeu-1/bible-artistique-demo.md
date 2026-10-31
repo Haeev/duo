@@ -4,7 +4,7 @@
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (démo d'une heure, printemps à la Halte d'Aubrune) |
 | Statut | proposition de l'artiste 3D, à relire par le directeur artistique |
-| Version | 0.1, 2026-10-31 |
+| Version | 0.2, 2026-10-31 (formes: low poly arrondi, section 8) |
 | Sources des couleurs | `games/la-petite-ligne/assets-src/modeles/palette.py` (seule source; ce document en est l'extrait) |
 | Planches | `games/la-petite-ligne/assets-src/modeles/planches/` (scène assemblée de jour et de nuit, personnages, poses, bâtiments, ferme, train, maison) |
 
@@ -98,3 +98,114 @@ Une lumière directionnelle avec ombre, une hémisphérique, quatre ponctuelles 
 ## 7. Conventions de production
 
 1 unité = 1 m, Y en haut, façade et regard vers +Z, origine au centre de l'emprise au sol, emprises en mètres entiers, noms anglais en `snake_case`. Les noms de nœuds suivent les données du jeu (`games/la-petite-ligne/donnees/`) et la carte (`donnees/cartes/halte.json`). Détail par modèle: `games/la-petite-ligne/assets/modeles/README.md`.
+
+## 8. Formes: low poly arrondi
+
+Décision du client (2026-10-31): le jeu est trop « angle droit », il demande de la courbure. Le style devient un **low poly arrondi**: les mêmes facettes visibles, mais plus aucune arête vive ni aucun coin à 90° là où l'œil s'arrête. On arrondit par des chanfreins à facettes et des volumes gonflés, jamais par un lissage des normales.
+
+### 8.1 Ce qu'on garde
+
+- Les facettes visibles: une normale par face (ombrage en aplats), pas de lissage, pas de normales moyennées sur les chanfreins. Un chanfrein se voit comme une ou deux bandes de lumière, c'est voulu.
+- La palette (section 2, `palette.py`), le matériau unique `lpl_palette` et `lpl_characters`, les textures de 64 x 64, les lueurs de nuit.
+- La lumière (section 4 et réglages du technical artist), l'échelle (1 unité = 1 m), les emprises en mètres entiers, les noms de nœuds, les douilles (`socket_*`) et les hauteurs utiles (`walk_height`, `seat_height`, `sleep_height`).
+- Le squelette commun de 18 os et tous les clips: les personnages changent de peau, pas d'os.
+- La règle des 10 cm: tout détail utile au jeu reste d'au moins 10 cm.
+
+### 8.2 Chanfreins (biseaux à facettes)
+
+| Taille de l'objet (plus grande dimension) | Largeur du chanfrein | Segments | Exemples |
+|---|---|---|---|
+| Moins de 0,5 m | 1,5 à 2 cm | 1 | outils, pots, gamelles, œufs, cadre |
+| 0,5 à 2 m | 3 à 4 cm | 2 | meubles, caisses, bancs, tonneaux, puits, tableau |
+| 2 à 6 m | 6 à 8 cm | 2 | remise, poulailler, marquise, wagons |
+| Plus de 6 m | 8 à 12 cm | 2 | murs et angles des bâtiments, quai |
+
+- Chanfreiner les arêtes vues par la caméra (angles verticaux des murs, bords des toits, dessus des meubles et des marches). Les arêtes posées au sol ou cachées restent vives.
+- Pas plus de 2 segments: au-delà, la facette disparaît et le coût monte sans gain lisible à 16 à 36 m de champ.
+- Pierres et moellons: coins abattus irréguliers (pas de cube parfait), décalés de 1 à 3 cm d'un bloc à l'autre.
+
+### 8.3 Toits
+
+- Débords: 30 à 40 cm au pignon, 25 à 35 cm à l'égout; rive épaisse de 12 à 15 cm, chanfreinée (2 segments).
+- Faîtage légèrement fléchi (3 à 5 cm au milieu) et pans un peu bombés (une rangée de sommets intermédiaire décalée de 2 à 4 cm): le toit doit paraître posé et mou, pas tiré à la règle.
+- Lauzes et tuiles: rangs suggérés par des bandes de facettes, pas par des tuiles modélisées une à une. Cheminées chanfreinées, chapeau débordant de 5 cm.
+- Auvents, store et marquise: bord libre ondulé ou arrondi, jamais une dalle plate.
+
+### 8.4 Cylindres: nombre de pans
+
+| Objet | Diamètre | Pans |
+|---|---|---|
+| Troncs de chêne et de bouleau | 25 à 45 cm | 8 (tronc légèrement évasé au pied, 3 racines) |
+| Troncs de sapin | 15 à 30 cm | 7 |
+| Poteaux de clôture, pieds de banc, poteau de la cloche | 8 à 15 cm | 6 |
+| Lampadaires (fût) | 10 à 12 cm | 6, socle et lanterne chanfreinés |
+| Tonneaux, seaux, puits (margelle) | 40 cm à 1,2 m | 10 à 12 |
+| Tiges, manches d'outils, cannes | moins de 5 cm | 5 |
+| Roues du train | 60 cm à 1,2 m | 14 à 16 |
+
+Jamais moins de 5 pans pour une pièce ronde vue, jamais plus de 16.
+
+### 8.5 Personnages
+
+- Hauteur inchangée (1,74 m avec les cheveux, Jeanne à 0,75), positions des os inchangées, clips inchangés.
+- Tête plus grosse: un cinquième de la hauteur (environ 34 cm, contre un sixième), plus large que haute de 5 %, menton arrondi; nez et oreilles en petites formes à 1 segment.
+- Torse en tonneau: section octogonale, épaules arrondies (pas de carré d'épaule), taille à peine marquée, épaisseur du corps +15 %; silhouette gonflée, douce, sans coin.
+- Membres: cylindres de 6 pans effilés et un peu renflés au milieu, coudes et genoux sans pointe; mains en moufles arrondies (pouce seul détaché), pieds et chaussures en galets arrondis.
+- Cheveux et coiffes en masses arrondies (casquette de Firmin, béret de Basile, chignon d'Odette, tresses de Jeanne): les silhouettes distinctes restent, en plus rondes.
+- Le foulard des joueurs grossit d'un tiers, avec un pan qui dépasse de la silhouette: c'est le signe du profil Duo, il doit se lire de loin.
+- Repeindre la rangée du personnage (`personnages.png`) doit continuer de marcher: mêmes cases de palette, mêmes rôles (section 2).
+- Poids de peau recalculés pour le volume gonflé; vérifier chaque clip (pas de bras qui traverse le torse plus gros: écarter l'épaule de 1 à 2 cm si besoin, sans bouger l'os).
+
+### 8.6 Feuillages
+
+- Chênes, bouleaux, noisetiers: houppier en 2 à 4 boules facettées (icosphère subdivisée une fois, 80 faces, déformée de 10 à 20 % pour casser la symétrie), qui se chevauchent; deux tons de la palette par arbre.
+- Sapins: 3 ou 4 cônes empilés de 7 pans, bords inférieurs arrondis (1 segment de chanfrein), pointe un peu molle.
+- Buissons: 1 à 3 boules aplaties (icosphère de 20 à 80 faces), posées au sol, sans pied visible.
+- Le vent (section 4, technical artist) agit déjà sur ces cases de palette: garder les feuillages sur les cases `leaf_*` pour qu'ils bougent.
+
+### 8.7 Sol et terrain
+
+La grille de la simulation (cases d'un mètre franchissables ou non) ne change pas; seule sa forme visible change.
+
+- Chemins: bords en courbes (rayon d'au moins 0,75 m, un segment tous les 25 cm environ), coins arrondis d'au moins 0,5 m de rayon, plus aucun escalier de cases.
+- Herbe: teinte continue (mélange des trois verts par un bruit doux en coordonnées du monde), plus de carrés à bords francs.
+- Berges de la rivière: contour courbe et irrégulier, deux niveaux de pierres arrondies, quelques roseaux; plus de canal rectangulaire ni d'angle droit.
+- Place du bourg: pavés en appareillage (rangs décalés ou éventails), joints plus sombres, écart de gris entre pavés de 8 niveaux au plus (contre environ 30 aujourd'hui); le dallage au hasard case par case est retiré.
+- Gué: pierres plates irrégulières de 5 à 7 côtés, de 30 à 60 cm, espacées de 10 à 20 cm, avec l'eau qui passe entre elles; plus de dalle continue.
+- Quai et ballast: bords chanfreinés, rives du ballast en talus arrondi.
+
+### 8.8 Budgets pour le PC de référence (Intel UHD 620)
+
+Plafond de la plateforme: 250 000 triangles et 150 appels de dessin à l'écran. Mesure du tour 1 du gauntlet: 130 000 à 207 000 triangles selon le plan, dont environ 70 000 pour les modèles de la carte et le reste pour le terrain et la végétation semée par le rendu. La marge est donc mince: le low poly arrondi doit tenir **225 000 triangles au plus dans le plan le plus chargé** (10 % de réserve).
+
+| Élément | Aujourd'hui | Plafond arrondi |
+|---|---|---|
+| Bâtiment principal (épicerie, halte, maison de Firmin) | 2 000 à 3 300 | 5 000 |
+| Petit bâtiment (maisonnette, remise, scierie, poulailler) | 1 000 à 2 000 | 3 000 |
+| Marquise du quai | 1 730 | 2 500 |
+| Meuble ou accessoire | 40 à 650 | 900 |
+| Chêne, bouleau (instancié, 51 arbres sur la carte) | variable | 450 |
+| Sapin | variable | 300 |
+| Buisson (instancié, 79 sur la carte) | variable | 160 |
+| Joueur complet (base, tenue, coiffure, foulard) | 2 190 | 3 200 |
+| Habitant | 2 160 à 2 590 | 3 600 |
+| Poule | 450 | 500 |
+| Corps de locomotive, de voiture, de fourgon | 1 130 à 1 650 | 2 400 |
+| Décor de toute la carte (modèles, sans terrain ni semis) | environ 43 000 | 65 000 |
+| Terrain et végétation semée par le rendu | environ 130 000 | pas plus qu'aujourd'hui (les courbes du sol se paient en réduisant les touffes si besoin) |
+
+- Aucun nouveau matériau, aucune nouvelle texture: le budget de programmes (12) ne bouge pas.
+- `index.json` donne les triangles de chaque nœud: tout dépassement de plafond est signalé dans le README des modèles avec sa raison.
+- Contrôle de réception: le plan le plus chargé (place à 19 h, train à quai) mesuré par `detailedStats()` sous 225 000 triangles et 150 appels.
+
+### 8.9 À faire et à éviter
+
+- À faire: arrondir là où la lumière accroche (bords de toits, angles de murs, dessus des meubles); exagérer un peu les volumes (toits gonflés, troncs évasés, têtes rondes); casser les symétries parfaites de quelques centimètres.
+- À éviter: le lissage des normales (on perdrait le style à facettes), les biseaux de plus de 2 segments, les sphères parfaites lisses, les arêtes vives au premier plan, et toute forme qui imite un jeu existant.
+
+## 9. Historique
+
+| Date | Version | Changement | Par |
+|---|---|---|---|
+| 2026-10-31 | 0.1 | Première version (palette, matériaux, lumière, lisibilité, personnages) | artiste 3D |
+| 2026-10-31 | 0.2 | Section 8 « Formes: low poly arrondi » (décision du client: plus de courbure), budgets du PC de référence; section 9 | directeur artistique |
