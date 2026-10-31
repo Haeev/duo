@@ -197,7 +197,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3369 Ko)
+### `bourg.glb` (3366 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -223,8 +223,8 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `lamp_post` | 1 x 1 | 248 |  |
 | `coop_crate` | 1 x 1 | 168 |  |
 | `notice_board` | 1 x 1 | 364 |  |
-| `station_sign` | 2 x 1 | 432 |  |
-| `arbor` | 3 x 2 | 848 |  |
+| `station_sign` | 2 x 1 | 424 |  |
+| `arbor` | 3 x 2 | 876 |  |
 | `mailbox` | 1 x 1 | 104 |  |
 | `barrel` | 1 x 1 | 276 |  |
 | `crate` | 1 x 1 | 92 |  |
@@ -282,7 +282,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (551 Ko)
+### `maison.glb` (547 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -301,7 +301,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `crystal_radio` | 1 x 1 | 368 |  |
 | `wood_stove` | 1 x 1 | 380 | tier: "P1" |
 | `picture_frame` | 1 x 1 | 116 | wall: true, tier: "P1" |
-| `bread` |  | 172 | kind: "item" |
+| `bread` |  | 136 | kind: "item" |
 | `dish_radishes` |  | 464 | kind: "item" |
 | `dish_omelette` |  | 276 | kind: "item" |
 | `dish_soup` |  | 244 | kind: "item" |

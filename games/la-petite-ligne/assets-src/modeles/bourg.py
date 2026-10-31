@@ -1246,10 +1246,11 @@ def station_sign(A):
     g.box((1.9, 0.08, 0.5), loc=(0, 0, 1.95), color="white_paint", base=True, bevel=0.02)
     g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
     # lettres AUBRUNE en relief (police de 3 x 5 pavés), sur les deux faces (lisibles de chaque côté)
-    glyphs = {"A": ("0110", "1001", "1111", "1001", "1001"), "U": ("1001", "1001", "1001", "1001", "0110"),
-              "B": ("1110", "1001", "1110", "1001", "1110"), "R": ("1110", "1001", "1110", "1010", "1001"),
-              "N": ("1001", "1101", "1011", "1001", "1001"), "E": ("1111", "1000", "1110", "1000", "1111")}
-    px, word, gw = 0.05, "AUBRUNE", 4
+    # police grasse de 4 x 5 pavés: B à deux panses, N à diagonale épaisse, lignes jointives
+    glyphs = {"A": ("0110", "1101", "1111", "1101", "1101"), "U": ("1101", "1101", "1101", "1101", "0110"),
+              "B": ("1110", "1101", "1110", "1101", "1110"), "R": ("1110", "1101", "1110", "1110", "1101"),
+              "N": ("1001", "1101", "1111", "1011", "1001"), "E": ("1111", "1100", "1110", "1100", "1111")}
+    px, word, gw = 0.052, "AUBRUNE", 4
     x0 = -(len(word) * (gw + 1) - 1) * px / 2
     for face, yy in ((1, -0.0415), (-1, 0.0515)):
         for i, ch in enumerate(word):
@@ -1264,8 +1265,8 @@ def station_sign(A):
                         xb = x0 + (i * (gw + 1) + c2 + 1) * px
                         xc = (xa + xb) / 2 * face  # au dos, le mot se lit dans l'autre sens: miroir
                         # lettres en aplat (2 triangles par pavé): face avant bleue sur blanc, dos blanc sur bleu
-                        hw, z = (xb - xa - 0.003) / 2, 2.07 + (2 - r) * px
-                        za, zb = z - (px - 0.003) / 2, z + (px - 0.003) / 2
+                        hw, z = (xb - xa) / 2, 2.07 + (2 - r) * px
+                        za, zb = z - px / 2, z + px / 2
                         quad = [(xc - hw, yy, za), (xc + hw, yy, za), (xc + hw, yy, zb), (xc - hw, yy, zb)]
                         g.quad(quad if face > 0 else list(reversed(quad)), "paint_blue" if face > 0 else "white_paint")
                         c = c2 + 1
@@ -1294,22 +1295,23 @@ def arbor(A):
     # vigne des poteaux: une tige en spirale (4 segments autour du poteau), trois touffes accrochées
     for px, py in ((-1.35, -0.85), (1.35, 0.85), (1.35, -0.85)):
         pts = []
-        for k in range(5):
-            a = math.radians(k * 120 + 30)
-            pts.append((px + 0.075 * math.cos(a), py + 0.075 * math.sin(a), 0.05 + k * 0.58))
+        # tige brune de 4 cm qui spirale à l'extérieur du poteau (bien visible), feuilles collées à la tige
+        for k in range(6):
+            a = math.radians(k * 100 + 30)
+            pts.append((px + 0.088 * math.cos(a), py + 0.088 * math.sin(a), 0.03 + k * 0.45))
         for p, q in zip(pts, pts[1:]):
-            rod(g, p, q, 0.018, "wood_dark")
-        for k, p in enumerate(pts[1:4:2]):
-            a = math.radians((k + 1) * 120 + 30)
-            g.sphere(0.14, loc=(p[0] + 0.07 * math.cos(a), p[1] + 0.07 * math.sin(a), p[2]), color="ivy", ico=1,
+            rod(g, p, q, 0.02, "bark")
+        for k in (2, 4):
+            p = pts[k]
+            a = math.radians(k * 100 + 30)
+            g.sphere(0.12, loc=(p[0] + 0.1 * math.cos(a), p[1] + 0.1 * math.sin(a), p[2]), color="ivy", ico=1,
                      jitter=0.15, seed=20 + k, scale=(0.9, 0.9, 1.2))
     # feuillage du dessus: posé sur les lattes (2 cm engagés), deux touffes qui retombent sur les bords
     for k, (x, y, r) in enumerate(((-0.9, -0.3, 0.42), (0.0, 0.25, 0.46), (0.85, -0.2, 0.42), (-0.35, 0.5, 0.36),
                                    (0.5, 0.6, 0.34))):
         g.sphere(r, loc=(x, y, 2.55 + r * 0.45 * 0.6 - 0.02), color="ivy" if k % 3 else "leaf_oak", ico=1,
                  jitter=0.12, seed=k, scale=(1.25, 1.0, 0.45), rot=(0, 0, rnd.uniform(0, 360)))
-    for x, y in ((-1.35, 0.9), (1.2, -0.9)):
-        g.sphere(0.3, loc=(x, y, 2.38), color="ivy", ico=1, jitter=0.12, seed=31, scale=(1.0, 0.6, 0.9))
+    g.sphere(0.3, loc=(-1.2, 0.9, 2.42), color="ivy", ico=1, jitter=0.12, seed=31, scale=(1.0, 0.6, 0.9))  # retombe
     # table et bancs
     g.box((1.6, 0.8, 0.05), loc=(0, 0, 0.72), color="wood_new", base=True, bevel=0.01)
     g.box((1.62, 0.82, 0.02), loc=(0, 0, 0.77), color="fabric_red", base=True)

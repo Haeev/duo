@@ -199,14 +199,14 @@
     2,
     1
    ],
-   "tris": 432
+   "tris": 424
   },
   "arbor": {
    "footprint": [
     3,
     2
    ],
-   "tris": 848
+   "tris": 876
   },
   "mailbox": {
    "footprint": [
@@ -537,5 +537,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3464444
+ "file_bytes": 3465016
 }
