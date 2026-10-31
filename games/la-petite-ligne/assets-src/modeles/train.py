@@ -263,6 +263,7 @@ def main():
     lpl.ground_plane(200, lpl.hex_lin("#A7B98A"), z=-0.002)
     for r, off in zip(roots, (x - 3.7, x - 3.7 - 7.4 / 2 - 4.5 - 0.1, x - 3.7 - 3.7 - 9.0 - 3.5 - 0.2)):
         r.location = (off - 4.0, 0, 0)
+    lpl.set_emission(mat, 0.0)
     bpy.context.scene.frame_set(7)
     lpl.persp_camera((6.0, -15.0, 6.5), (-3.0, 0, 1.4), lens=38)
     lpl.render(os.path.join(lpl.BOARDS, "train.png"))
