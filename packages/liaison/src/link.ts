@@ -128,9 +128,11 @@ export class Link {
   private pingId = 0;
   private samples: ClockSample[] = [];
   private closedValue = false;
-  private readonly stopHeartbeat: CancelTimer;
+  private stopHeartbeat: CancelTimer = () => undefined;
   private readonly stopSilenceCheck: CancelTimer;
   private invalidAt: number[] = [];
+  /** Début du régime actif: l'autre a un battement pour répondre avant qu'on compte son silence. */
+  private activeSince = 0;
 
   constructor(options: LinkOptions) {
     this.id = options.id;
@@ -139,13 +141,7 @@ export class Link {
     this.clock = options.clock;
     this.callbacks = options.callbacks;
     this.lastReceivedAt = this.clock.now();
-    this.stopHeartbeat = every(
-      this.clock,
-      () => (this.isActive() ? this.config.heartbeatActiveMs : this.config.heartbeatIdleMs),
-      () => {
-        this.sendPing();
-      },
-    );
+    this.armHeartbeat();
     this.stopSilenceCheck = every(
       this.clock,
       () => this.config.silenceCheckMs,
@@ -192,9 +188,29 @@ export class Link {
     if (this.localActive === active) return;
     const before = this.isActive();
     this.localActive = active;
-    if (before !== this.isActive()) this.callbacks.onActivityChange();
-    // L'autre apprend le changement de régime au prochain battement: on l'envoie tout de suite.
+    // L'autre apprend le changement de régime par un battement envoyé tout de suite.
     this.sendPing();
+    this.afterActivityChange(before);
+  }
+
+  /** Le battement suit le régime tout de suite, sans attendre le tour en cours (2 s au repos). */
+  private armHeartbeat(): void {
+    this.stopHeartbeat();
+    this.stopHeartbeat = every(
+      this.clock,
+      () => (this.isActive() ? this.config.heartbeatActiveMs : this.config.heartbeatIdleMs),
+      () => {
+        this.sendPing();
+      },
+    );
+  }
+
+  private afterActivityChange(before: boolean): void {
+    const now = this.isActive();
+    if (before === now || this.closedValue) return;
+    if (now) this.activeSince = this.clock.now();
+    this.armHeartbeat();
+    this.callbacks.onActivityChange();
   }
 
   /**
@@ -371,14 +387,17 @@ export class Link {
 
   private checkSilence(): void {
     if (this.closedValue) return;
-    const silence = this.silenceMs();
-    const lostAfter = this.isActive() ? this.config.lostActiveMs : this.config.lostIdleMs;
+    const active = this.isActive();
+    const silence = active
+      ? this.clock.now() - Math.max(this.lastReceivedAt, this.activeSince)
+      : this.silenceMs();
+    const lostAfter = active ? this.config.lostActiveMs : this.config.lostIdleMs;
     if (silence >= lostAfter) {
       this.setHealth('lost');
       // Au repos aussi, une liaison perdue se relance sans fin.
       this.signalTrouble('silent');
     }
-    if (this.isActive() && silence >= this.config.earlyReconnectMs) {
+    if (active && silence >= this.config.earlyReconnectMs) {
       this.signalTrouble('silent');
     }
   }
@@ -502,7 +521,7 @@ export class Link {
     if (this.peerActive === active) return;
     const before = this.isActive();
     this.peerActive = active;
-    if (before !== this.isActive()) this.callbacks.onActivityChange();
+    this.afterActivityChange(before);
   }
 }
 

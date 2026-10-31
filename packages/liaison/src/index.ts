@@ -44,3 +44,5 @@ export type { NetworkConfig } from './config.ts';
 export { createFileStore, createMemoryStore } from './store.ts';
 export type { LinkMemory, LinkStore, PairingRecord, RetainedAddress } from './store.ts';
 export { createNodeDriver } from './node-driver.ts';
+export { parseNetworkCommandLine } from './command-line.ts';
+export type { NetworkCommandLine } from './command-line.ts';
