@@ -5,10 +5,10 @@
 import type { ControlFrame } from '../etat/actions';
 import { inRect } from '../etat/carte';
 import type { Beam, Character, CharacterId, Vec2 } from '../etat/types';
-import { ARRIVE_DISTANCE, MOVE_DEADZONE } from './constantes';
+import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
-import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody } from './grille';
+import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { ZONE } from './ids';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
@@ -26,6 +26,7 @@ export function refreshBlockers(sim: Sim): Blockers {
         for (let cx = platform.x; cx < platform.x + platform.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
       }
     }
+    for (const cell of handcarCells(sim)) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
       if (def?.footprint === null || def === undefined || def.floor || def.bed !== null) continue;
@@ -38,6 +39,60 @@ export function refreshBlockers(sim: Sim): Blockers {
     rt.dynamicDirty = false;
   }
   return { map: sim.map, dynamic: rt.dynamicBlocked };
+}
+
+/**
+ * Cases sous la draisine posée sur la voie (`world.handcarAt`): elle bloque le
+ * passage comme un meuble. Emprise de `reglages.carry.handcar.size`, tournée
+ * selon son axe (quarts de tour: elle est toujours dans l'axe d'une voie).
+ */
+export function handcarCells(sim: Sim): { cx: number; cy: number }[] {
+  const at = sim.world.handcarAt;
+  const size = sim.content.settings.carry.handcar?.size;
+  if (at === null || size === undefined) return [];
+  const [length, width] = size;
+  const alongX = Math.abs(Math.cos(at.facing)) >= Math.abs(Math.sin(at.facing));
+  const halfX = (alongX ? length : width) / 2;
+  const halfY = (alongX ? width : length) / 2;
+  const out: { cx: number; cy: number }[] = [];
+  const { map } = sim;
+  // Un rien de marge: une emprise qui finit pile sur un bord de case ne prend pas la case voisine.
+  const edge = 1e-6;
+  for (let cy = Math.floor(at.pos.y - halfY + edge); cy <= Math.floor(at.pos.y + halfY - edge); cy++) {
+    for (let cx = Math.floor(at.pos.x - halfX + edge); cx <= Math.floor(at.pos.x + halfX - edge); cx++) {
+      if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) out.push({ cx, cy });
+    }
+  }
+  return out;
+}
+
+/** Le corps (disque de `BODY_RADIUS`) touche-t-il cette case ? */
+export function touchesCell(pos: Vec2, cell: { cx: number; cy: number }): boolean {
+  const nx = Math.max(cell.cx, Math.min(pos.x, cell.cx + 1));
+  const ny = Math.max(cell.cy, Math.min(pos.y, cell.cy + 1));
+  return (pos.x - nx) ** 2 + (pos.y - ny) ** 2 < BODY_RADIUS * BODY_RADIUS;
+}
+
+/**
+ * La draisine vient d'être posée: qui se trouve sous elle (les porteurs,
+ * souvent) glisse à la case libre la plus proche, sinon il y resterait pris.
+ */
+export function clearHandcarSpot(sim: Sim): void {
+  sim.runtime.dynamicDirty = true;
+  const b = refreshBlockers(sim);
+  const cells = handcarCells(sim);
+  const bodies: { pos: Vec2 }[] = [...sim.world.characters, ...sim.world.villagers];
+  for (const body of bodies) {
+    // Seulement qui touche la draisine: un habitant assis sur un banc reste où il est.
+    if (!cells.some((cell) => touchesCell(body.pos, cell))) continue;
+    const free = nearestFreeCell(b, body.pos);
+    if (free === null) continue;
+    body.pos.x = free.x;
+    body.pos.y = free.y;
+  }
+  for (const c of sim.world.characters) {
+    if (c.destination !== null) stopPath(sim, c);
+  }
 }
 
 /** Dimensions d'une empreinte une fois tournée (quarts de tour). */

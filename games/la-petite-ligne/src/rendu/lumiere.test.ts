@@ -108,6 +108,12 @@ function placement(map: GameMap, prop: MapProp): Matrix4 {
 const BELL_MIN_X = 0.35;
 const BELL_MIN_Y = 1.85;
 const BELL_MAX_Y = 2.4;
+/** Tôle et lambrequin de la marquise: tout ce qui est au-dessus de cette hauteur (m) dans son nœud. */
+const CANOPY_ROOF_MIN_Y = 2.5;
+/** Part de l'ombre de la cloche sur le banc qui peut tomber dans l'ombre de la marquise (où elle ne se voit plus). */
+const BELL_SHADOW_HIDDEN_MAX = 0.05;
+/** Petit décalage vers le soleil avant de lancer le rayon d'ombre (m): le point ne se cache pas lui-même. */
+const LIFT = 0.01;
 /** Assise du banc (0,42 à 0,45 m) et dossier (au-dessus de 0,5 m). */
 const SEAT_MIN_Y = 0.38;
 const BACK_MIN_Y = 0.5;
@@ -245,6 +251,53 @@ describe('ombre de la cloche (énigme S4)', () => {
   it('touche le banc de 17 h à 17 h 45', () => {
     for (let minutes = 17 * HOUR; minutes <= 17 * HOUR + 45; minutes += 5) {
       expect(shadowOnBench(minutes), `à ${minutes} minutes`).toBeGreaterThanOrEqual(0.5);
+    }
+  });
+
+  // La marquise du quai: sa tôle et son lambrequin (au-dessus de 2,5 m; les poteaux ne comptent pas).
+  const platformProp = map.props.find((prop) => prop.model === 'platform');
+  if (platformProp === undefined) {
+    throw new Error('Le quai doit être sur la carte.');
+  }
+  const canopy = new Box3().setFromPoints(
+    nodePositions('bourg.glb', 'platform_canopy')
+      .filter((p) => p.y > CANOPY_ROOF_MIN_Y)
+      .map((p) => p.applyMatrix4(placement(map, platformProp))),
+  );
+
+  it('pend hors de la marquise (sinon son ombre se perd dans la sienne)', () => {
+    const bellBox = new Box3().setFromPoints(bell);
+    const apart =
+      bellBox.max.x < canopy.min.x ||
+      bellBox.min.x > canopy.max.x ||
+      bellBox.max.z < canopy.min.z ||
+      bellBox.min.z > canopy.max.z;
+    expect(apart).toBe(true);
+  });
+
+  it('fait tomber l’ombre de la cloche sur une part du banc au soleil, hors de l’ombre de la marquise', () => {
+    const rig = new DaylightRig(new Scene());
+    const hit = new Vector3();
+    for (let minutes = 17 * HOUR; minutes <= 17 * HOUR + 45; minutes += 5) {
+      rig.update(minutes, 'sunny', FOCUS, VIEW_RADIUS, CAMERA_DISTANCE);
+      const towardSun = rig.direction.clone();
+      const towardGround = towardSun.clone().negate();
+      let onBench = 0;
+      let shaded = 0;
+      for (const point of bell) {
+        const ray = new Ray(point, towardGround);
+        const at = ray.intersectBox(seat, hit) ?? ray.intersectBox(back, hit);
+        if (at === null) {
+          continue;
+        }
+        onBench += 1;
+        // Ce point du banc est-il déjà à l'ombre de la marquise ? Alors l'ombre de la cloche ne s'y voit pas.
+        if (new Ray(at.clone().addScaledVector(towardSun, LIFT), towardSun).intersectsBox(canopy)) {
+          shaded += 1;
+        }
+      }
+      expect(onBench, `à ${minutes} minutes`).toBeGreaterThan(0);
+      expect(shaded / onBench, `à ${minutes} minutes`).toBeLessThanOrEqual(BELL_SHADOW_HIDDEN_MAX);
     }
   });
 

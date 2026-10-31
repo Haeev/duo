@@ -14,7 +14,7 @@ import { updateConstructions, completeConstruction } from './construction';
 import { autoStartScenes } from './dialogues';
 import { pumpScripts } from './effets';
 import { envieStayPoints, updateEnvies, updateStays } from './envies';
-import { moveCharacter, refreshBlockers, updateBeam, updateInside } from './deplacement';
+import { clearHandcarSpot, moveCharacter, refreshBlockers, updateBeam, updateInside } from './deplacement';
 import { updateVillagers } from './habitants';
 import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
@@ -101,6 +101,7 @@ export function step(sim: Sim, input: StepInput): void {
     if (placed !== null) {
       if (placed.construction !== null) completeConstruction(sim, placed.construction);
       loadPlaced(sim, placed);
+      if (placed.purpose === 'handcar') clearHandcarSpot(sim);
       for (const c of world.characters) c.heartToday.gesture = true;
       world.session.togetherMoments += 1;
     }

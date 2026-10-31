@@ -42,6 +42,26 @@ const SIDES = [
   { dx: 0, dy: -1 },
 ] as const;
 
+const CROSSING = SETTINGS.crossing;
+
+/**
+ * Une traversée en planches de la voie (cases `wood` voisines): repère local
+ * `u` le long des rails, `v` en travers depuis l'axe de la voie. `alongX`: les
+ * rails vont d'ouest en est (`u` = x, `v` = y - axe), sinon du nord au sud.
+ */
+interface Crossing {
+  alongX: boolean;
+  /** Axe de la voie, en x ou en y selon le sens. */
+  axis: number;
+  /** Étendue le long des rails (bords des cases): la largeur de la route. */
+  u0: number;
+  u1: number;
+  /** Bord du platelage de chaque côté (v < 0, puis v > 0), en valeur absolue. */
+  deck: [number, number];
+  /** Rampe de chaque côté: hauteur de la route au pied, ou `null` (pas de rampe: voisin plus haut, le quai). */
+  rampFoot: [number | null, number | null];
+}
+
 /** Ce que le rendu sait d'une case (y compris dans la bande prolongée). */
 interface CellLook {
   kind: GroundKind;
@@ -158,6 +178,7 @@ export class Terrain {
   private readonly ext = SETTINGS.extension;
   private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] =
     [];
+  private readonly crossings: Crossing[] = [];
 
   /**
    * `floorHeight`: hauteur de marche d'un sol posé (quai, ponton), lue dans les
@@ -184,6 +205,7 @@ export class Terrain {
         this.floorRects.push({ ...prop.rect, height });
       }
     }
+    this.findCrossings();
     const ground = new Mesh(resources.track(this.buildGround()), materials.palette);
     ground.name = 'sol';
     ground.receiveShadow = true;
@@ -296,6 +318,12 @@ export class Terrain {
     for (const rect of this.floorRects) {
       if (inRect(rect, x, y)) {
         return rect.height;
+      }
+    }
+    for (const crossing of this.crossings) {
+      const h = crossingHeight(crossing, x, y);
+      if (h !== null) {
+        return h;
       }
     }
     const look = this.look(Math.floor(x), Math.floor(y));
@@ -521,7 +549,9 @@ export class Terrain {
       let runHeight = 0;
       for (let cx = -this.ext; cx <= this.map.width + this.ext; cx += 1) {
         const atEnd = cx === this.map.width + this.ext;
-        const look = atEnd ? null : this.look(cx, cy);
+        const raw = atEnd ? null : this.look(cx, cy);
+        // Les traversées en planches sont dessinées à part (`buildCrossing`).
+        const look = raw !== null && raw.kind === 'wood' ? null : raw;
         const cell = look === null ? null : this.topCell(look, cx, cy);
         const fills = look === null ? null : this.roundedCorners(cx, cy, look);
         if (
@@ -544,7 +574,10 @@ export class Terrain {
           this.roundedTop(writer, cx, cy, look.height, cell, fills);
           continue;
         }
-        if (look !== null && cell !== null && runCell === null) {
+        if (look === null) {
+          continue;
+        }
+        if (cell !== null && runCell === null) {
           runStart = cx;
           runCell = cell;
           runHeight = look.height;
@@ -553,6 +586,9 @@ export class Terrain {
       // Côtés: une marche là où le voisin est plus bas; au bord de la bande, on ferme vers le pourtour.
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
+        if (look.kind === 'wood') {
+          continue;
+        }
         this.bankCorners(writer, cx, cy, look);
         const h = look.height;
         for (const side of SIDES) {
@@ -560,7 +596,11 @@ export class Terrain {
           const neighbourHeight = outside
             ? ringHeight
             : this.look(cx + side.dx, cy + side.dy).height;
-          if (neighbourHeight === h || (!outside && neighbourHeight > h)) {
+          if (
+            neighbourHeight === h ||
+            (!outside && neighbourHeight > h) ||
+            (!outside && this.look(cx + side.dx, cy + side.dy).kind === 'wood')
+          ) {
             continue;
           }
           const low = Math.min(h, neighbourHeight);
@@ -593,7 +633,80 @@ export class Terrain {
         }
       }
     }
+    for (const crossing of this.crossings) {
+      buildCrossing(writer, crossing);
+    }
     return writer.build();
+  }
+
+  /**
+   * Traversées: rectangles des cases `wood` d'un seul tenant, dans le sens
+   * de la voie qui les borde (cases de voie à leurs deux bouts).
+   */
+  private findCrossings(): void {
+    const map = this.map;
+    const seen = new Set<number>();
+    const isWood = (cx: number, cy: number): boolean =>
+      cx >= 0 &&
+      cy >= 0 &&
+      cx < map.width &&
+      cy < map.height &&
+      map.ground[cellIndex(map, cx, cy)] === 'wood';
+    for (let cy = 0; cy < map.height; cy += 1) {
+      for (let cx = 0; cx < map.width; cx += 1) {
+        if (!isWood(cx, cy) || seen.has(cellIndex(map, cx, cy))) {
+          continue;
+        }
+        let x1 = cx;
+        while (isWood(x1 + 1, cy)) {
+          x1 += 1;
+        }
+        let y1 = cy;
+        while (isWood(cx, y1 + 1)) {
+          y1 += 1;
+        }
+        for (let y = cy; y <= y1; y += 1) {
+          for (let x = cx; x <= x1; x += 1) {
+            seen.add(cellIndex(map, x, y));
+          }
+        }
+        const railAt = (x: number, y: number): boolean => this.look(x, y).kind === 'rail';
+        const alongX = railAt(cx - 1, cy) || railAt(x1 + 1, cy);
+        const [u0, u1, v0, v1] = alongX ? [cx, x1 + 1, cy, y1 + 1] : [cy, y1 + 1, cx, x1 + 1];
+        const axis = (v0 + v1) / 2;
+        const half = (v1 - v0) / 2;
+        const deckHalf = Math.min(
+          half,
+          CROSSING.railOffset +
+            CROSSING.railHeadWidth / 2 +
+            CROSSING.outerClearance +
+            CROSSING.outerBand,
+        );
+        const top = SETTINGS.heights.wood;
+        // Route au pied de la rampe: la case au milieu de la traversée, juste au-delà de chaque bord.
+        const mid = Math.floor((u0 + u1) / 2);
+        const beyond = (v: number): number => {
+          const look = alongX ? this.look(mid, v) : this.look(v, mid);
+          const floor = this.floorRects.find((rect) =>
+            alongX ? inRect(rect, mid + 0.5, v + 0.5) : inRect(rect, v + 0.5, mid + 0.5),
+          );
+          return floor?.height ?? look.height;
+        };
+        const feet = [beyond(v0 - 1), beyond(v1)].map((h) => (h < top ? h : null));
+        const deck: [number, number] = [
+          feet[0] === null ? half : deckHalf,
+          feet[1] === null ? half : deckHalf,
+        ];
+        this.crossings.push({
+          alongX,
+          axis,
+          u0,
+          u1,
+          deck,
+          rampFoot: [feet[0] ?? null, feet[1] ?? null],
+        });
+      }
+    }
   }
 
   private buildWater(): BufferGeometry {
@@ -661,4 +774,233 @@ export class Terrain {
     }
     return writer.build();
   }
+}
+
+type Point3 = [number, number, number];
+
+/** Point du repère d'une traversée (u le long des rails, v en travers) vers le monde (x, hauteur, z). */
+function crossingPoint(c: Crossing, u: number, v: number, h: number): Point3 {
+  return c.alongX ? [u, h, c.axis + v] : [c.axis + v, h, u];
+}
+
+function crossingNormal(c: Crossing, nu: number, nv: number, ny: number): [number, number, number] {
+  const length = Math.hypot(nu, nv, ny);
+  return c.alongX
+    ? [nu / length, ny / length, nv / length]
+    : [nv / length, ny / length, nu / length];
+}
+
+/** Dessus du platelage côté route, au bord d'une lame chanfreinée: là où la rampe s'y raccorde. */
+function rampTop(): number {
+  return SETTINGS.heights.wood - CROSSING.chamfer;
+}
+
+/** Hauteur du sol sur une traversée ou sa rampe, ou `null` hors d'elles. */
+function crossingHeight(c: Crossing, x: number, y: number): number | null {
+  const u = c.alongX ? x : y;
+  const v = (c.alongX ? y : x) - c.axis;
+  if (u < c.u0 || u >= c.u1) {
+    return null;
+  }
+  const side = v < 0 ? 0 : 1;
+  const edge = c.deck[side];
+  const distance = Math.abs(v);
+  if (distance <= edge) {
+    return SETTINGS.heights.wood;
+  }
+  const foot = c.rampFoot[side];
+  if (foot === null || distance > edge + CROSSING.rampLength) {
+    return null;
+  }
+  const t = (distance - edge) / CROSSING.rampLength;
+  return rampTop() + (foot - rampTop()) * t;
+}
+
+/**
+ * Une lame posée dans le sens des rails, de `u0` à `u1`, de `va` à `vb` en
+ * travers: dessus chanfreiné sur ses quatre arêtes, bouts jusqu'au fond.
+ */
+function plank(
+  writer: GeometryWriter,
+  c: Crossing,
+  va: number,
+  vb: number,
+  tone: PaletteCell,
+): void {
+  const top = SETTINGS.heights.wood;
+  const ch = CROSSING.chamfer;
+  const low = top - ch;
+  const base = top - CROSSING.plankThickness;
+  const { u0, u1 } = c;
+  const p = (u: number, v: number, h: number): Point3 => crossingPoint(c, u, v, h);
+  writer.quad(
+    [
+      p(u0 + ch, va + ch, top),
+      p(u1 - ch, va + ch, top),
+      p(u1 - ch, vb - ch, top),
+      p(u0 + ch, vb - ch, top),
+    ],
+    [0, 1, 0],
+    tone,
+  );
+  // Chanfreins: le long des rails (côtés v), puis aux bouts (côtés u).
+  writer.quad(
+    [p(u0 + ch, va + ch, top), p(u1 - ch, va + ch, top), p(u1, va, low), p(u0, va, low)],
+    crossingNormal(c, 0, -1, 1),
+    tone,
+  );
+  writer.quad(
+    [p(u0 + ch, vb - ch, top), p(u1 - ch, vb - ch, top), p(u1, vb, low), p(u0, vb, low)],
+    crossingNormal(c, 0, 1, 1),
+    tone,
+  );
+  writer.quad(
+    [p(u0 + ch, va + ch, top), p(u0 + ch, vb - ch, top), p(u0, vb, low), p(u0, va, low)],
+    crossingNormal(c, -1, 0, 1),
+    tone,
+  );
+  writer.quad(
+    [p(u1 - ch, va + ch, top), p(u1 - ch, vb - ch, top), p(u1, vb, low), p(u1, va, low)],
+    crossingNormal(c, 1, 0, 1),
+    tone,
+  );
+  // Bouts et flancs, du chanfrein au fond (les flancs ne se voient qu'aux fentes, on les garde simples).
+  writer.quad(
+    [p(u0, va, low), p(u0, vb, low), p(u0, vb, base), p(u0, va, base)],
+    crossingNormal(c, -1, 0, 0),
+    tone,
+  );
+  writer.quad(
+    [p(u1, va, low), p(u1, vb, low), p(u1, vb, base), p(u1, va, base)],
+    crossingNormal(c, 1, 0, 0),
+    tone,
+  );
+  writer.quad(
+    [p(u0, va, low), p(u1, va, low), p(u1, va, base), p(u0, va, base)],
+    crossingNormal(c, 0, -1, 0),
+    tone,
+  );
+  writer.quad(
+    [p(u0, vb, low), p(u1, vb, low), p(u1, vb, base), p(u0, vb, base)],
+    crossingNormal(c, 0, 1, 0),
+    tone,
+  );
+}
+
+/** Lames qui remplissent une bande de `va` à `vb`, au plus près de la largeur visée. */
+function plankBand(
+  writer: GeometryWriter,
+  c: Crossing,
+  va: number,
+  vb: number,
+  next: () => PaletteCell,
+): void {
+  const width = vb - va;
+  if (width <= CROSSING.chamfer * 2) {
+    return;
+  }
+  const count = Math.max(1, Math.round(width / CROSSING.plankWidth));
+  const step = width / count;
+  for (let i = 0; i < count; i += 1) {
+    plank(writer, c, va + i * step, va + (i + 1) * step, next());
+  }
+}
+
+/**
+ * Platelage d'une traversée (revue du directeur artistique, tour 5): fond
+ * sombre des ornières, lames dans le sens des rails (dessus 1,5 cm sous le
+ * champignon), bouts fermés jusqu'au ballast, rampes de terre côté route.
+ */
+function buildCrossing(writer: GeometryWriter, c: Crossing): void {
+  const top = SETTINGS.heights.wood;
+  const base = top - CROSSING.plankThickness;
+  const railGround = SETTINGS.heights.rail;
+  const [north, south] = c.deck;
+  const { u0, u1 } = c;
+  const p = (u: number, v: number, h: number): Point3 => crossingPoint(c, u, v, h);
+  // Fond des ornières (au-dessus des traverses, à 0,28 m: elles ne percent pas).
+  writer.quad(
+    [p(u0, -north, base), p(u1, -north, base), p(u1, south, base), p(u0, south, base)],
+    [0, 1, 0],
+    CROSSING.grooveTone,
+  );
+  // Bouts côté voie: une joue de la hauteur du ballast au fond des lames.
+  writer.quad(
+    [p(u0, -north, railGround), p(u0, south, railGround), p(u0, south, base), p(u0, -north, base)],
+    crossingNormal(c, -1, 0, 0),
+    CROSSING.endTone,
+  );
+  writer.quad(
+    [p(u1, -north, railGround), p(u1, south, railGround), p(u1, south, base), p(u1, -north, base)],
+    crossingNormal(c, 1, 0, 0),
+    CROSSING.endTone,
+  );
+  // Lames: bande extérieure, entre les rails (ornières de chaque côté), bande extérieure.
+  const tones = CROSSING.plankTones;
+  // Départ du motif selon la place de la traversée: deux traversées ne se ressemblent pas.
+  let index = Math.abs(Math.floor(c.u0));
+  const next = (): PaletteCell => {
+    const tone = tones[index % tones.length] ?? 'wood';
+    index += 1;
+    return tone;
+  };
+  const rail = CROSSING.railOffset;
+  const head = CROSSING.railHeadWidth / 2;
+  const outer = rail + head + CROSSING.outerClearance;
+  const inner = rail - head - CROSSING.flangeway;
+  plankBand(writer, c, -north, -outer, next);
+  plankBand(writer, c, -inner, inner, next);
+  plankBand(writer, c, outer, south, next);
+  // Rampes de terre: la route monte doucement jusqu'au bord des lames.
+  const sides: [number, number][] = [
+    [-1, north],
+    [1, south],
+  ];
+  sides.forEach(([sign, edge], side) => {
+    const foot = c.rampFoot[side];
+    if (foot === null || foot === undefined) {
+      return;
+    }
+    const far = edge + CROSSING.rampLength;
+    const high = rampTop();
+    const normal = crossingNormal(c, 0, sign * (high - foot), CROSSING.rampLength);
+    writer.quad(
+      [
+        p(u0, sign * edge, high),
+        p(u1, sign * edge, high),
+        p(u1, sign * far, foot),
+        p(u0, sign * far, foot),
+      ],
+      normal,
+      CROSSING.rampTone,
+    );
+    // Joues de la rampe aux deux bords de la route (descendent sous le ballast et la route).
+    const bottom = Math.min(foot, 0);
+    for (const [u, nu] of [
+      [u0, -1],
+      [u1, 1],
+    ] as const) {
+      // Triangle sous la pente (un quadrilatère au pied nul serait dégénéré et mal orienté).
+      const normal = crossingNormal(c, nu, 0, 0);
+      writer.triangle(
+        p(u, sign * edge, high),
+        p(u, sign * far, foot),
+        p(u, sign * edge, foot),
+        normal,
+        CROSSING.rampSideTone,
+      );
+      if (foot > bottom) {
+        writer.quad(
+          [
+            p(u, sign * edge, foot),
+            p(u, sign * far, foot),
+            p(u, sign * far, bottom),
+            p(u, sign * edge, bottom),
+          ],
+          normal,
+          CROSSING.rampSideTone,
+        );
+      }
+    }
+  });
 }

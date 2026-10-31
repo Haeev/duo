@@ -1338,7 +1338,7 @@
           "priority": 30,
           "when": [{ "type": "day_is", "days": [12] }, { "type": "weather_is", "weather": "rain" }],
           "lines": [
-            { "speaker": "jeanne", "text": "Je m'abrite sous la marquise, comme les voyageurs d'avant. Ma tante m'a raconté." },
+            { "speaker": "jeanne", "text": "Quand il pleut, je quitte le banc pour la marquise, comme les voyageurs d'avant. Ma tante m'a raconté." },
             { "speaker": "jeanne", "text": "Il y avait un train chaque matin. Les gens descendaient avec des valises, des poules, une fois même un piano." },
             {
               "choices": [

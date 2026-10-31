@@ -122,6 +122,15 @@ function stackList(r: Reader): { item: string; count: number }[] {
   return r.items().map((s) => ({ item: s.at('item').string(), count: s.at('count').integer(1) }));
 }
 
+function handcarSize(r: Reader): [number, number] {
+  const size = r.numberList();
+  const [length, width] = size;
+  if (size.length !== 2 || length === undefined || width === undefined || length <= 0 || width <= 0) {
+    r.fail('deux longueurs positives attendues (le long de la voie, en travers)');
+  }
+  return [length, width];
+}
+
 function parseCarry(r: Reader | null): Settings['carry'] {
   const handcar = r?.opt('handcar') ?? null;
   const parcel = r?.opt('parcel') ?? null;
@@ -146,6 +155,7 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             from: handcar.at('from').string(),
             path,
             toOffset: path[path.length - 1] ?? [0, 0],
+            size: handcarSize(handcar.at('size')),
             quest: handcar.at('quest').string(),
             step: handcar.at('step').string(),
             flag: handcar.at('flag').string(),

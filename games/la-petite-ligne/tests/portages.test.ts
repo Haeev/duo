@@ -7,9 +7,9 @@ import type { CharacterId, WorldEvent } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
 import { character, distance } from '../src/simulation/contexte';
 import { SIM_HZ } from '../src/simulation/constantes';
-import { placeCharacter, refreshBlockers } from '../src/simulation/deplacement';
+import { handcarCells, placeCharacter, refreshBlockers, touchesCell } from '../src/simulation/deplacement';
 import { deliverCatalogue } from '../src/simulation/economie';
-import { findPath } from '../src/simulation/grille';
+import { bodyCollides, findPath, isBlockedCell } from '../src/simulation/grille';
 import { step } from '../src/simulation/pas';
 import { startQuest } from '../src/simulation/quetes';
 import { countInStacks } from '../src/simulation/sac';
@@ -125,7 +125,7 @@ describe('draisine poussée à deux', () => {
   it('relâchée en chemin: posée là, intacte, et on la reprend', () => {
     const sim = withHandcar();
     grab(sim, ['p1', 'p2']);
-    // Trajet sur rails: la voie de garage (3 m vers le sud), puis 5 m vers l'ouest sur la ligne.
+    // Trajet sur rails: la voie de garage (4 m vers le sud, jusqu'à l'axe de la ligne), puis 2,5 m vers l'ouest.
     const route = sim.world.beam?.route ?? [];
     expect(route.length).toBeGreaterThanOrEqual(2);
     carry(sim, ['p1', 'p2'], SIM_HZ * 3);
@@ -141,6 +141,87 @@ describe('draisine poussée à deux', () => {
     grab(sim, ['p1', 'p2']);
     carry(sim, ['p1', 'p2'], SIM_HZ * 30);
     expect(sim.world.flags).toContain('handcar_pushed');
+  });
+});
+
+/** Axe de la ligne (m): milieu des rangées de voie, comme le rendu (`voie.ts`). */
+function trackAxis(sim: Sim): number {
+  const rows: number[] = [];
+  for (let cy = 0; cy < sim.map.height; cy++) {
+    let rails = 0;
+    for (let cx = 0; cx < sim.map.width; cx++) if (sim.map.ground[cy * sim.map.width + cx] === 'rail') rails++;
+    if (rails > sim.map.width / 2) rows.push(cy);
+  }
+  return ((rows[0] ?? 0) + (rows[rows.length - 1] ?? 0) + 1) / 2;
+}
+
+function pushedHandcar(): Sim {
+  const sim = withHandcar();
+  grab(sim, ['p1', 'p2']);
+  carry(sim, ['p1', 'p2'], SIM_HZ * 30);
+  if (sim.world.handcarAt === null) throw new Error('draisine pas posée');
+  return sim;
+}
+
+describe('draisine posée sur la voie', () => {
+  it('roule et s’arrête sur l’axe des rails, à plus de 2 m de la traversée de service et hors du train à quai', () => {
+    const sim = withHandcar();
+    const axis = trackAxis(sim);
+    const shed = sim.map.points.handcar_shed ?? { x: -9, y: -9 };
+    const route = sim.world.beam?.route ?? [];
+    // La voie de garage descend dans la colonne de la remise, puis tout le reste roule sur l'axe de la ligne.
+    expect(route[0]?.x).toBeCloseTo(shed.x, 6);
+    for (const w of route) expect(w.y).toBeCloseTo(axis, 6);
+    const sim2 = pushedHandcar();
+    const at = sim2.world.handcarAt;
+    const length = sim2.content.settings.carry.handcar?.size[0] ?? 0;
+    expect(at?.pos.y).toBeCloseTo(axis, 6);
+    const westEnd = (at?.pos.x ?? 0) - length / 2;
+    // Traversée de service: la colonne de planches de la voie la plus à l'est.
+    let service = -1;
+    for (let cx = 0; cx < sim2.map.width; cx++) {
+      if (sim2.map.ground[Math.floor(axis) * sim2.map.width + cx] === 'wood') service = cx;
+    }
+    expect(service).toBeGreaterThan(0);
+    expect(westEnd - (service + 1), 'à plus de 2 m de la traversée de service').toBeGreaterThan(2);
+    const train = sim2.map.zones.train_at_platform;
+    expect(train).toBeDefined();
+    expect(westEnd).toBeGreaterThan((train?.x ?? 0) + (train?.w ?? 0) + 2);
+  });
+
+  it('bloque le passage comme un meuble, sans enfermer personne ni couper la voie', () => {
+    const sim = pushedHandcar();
+    const cells = handcarCells(sim);
+    expect(cells.length).toBeGreaterThan(0);
+    const b = refreshBlockers(sim);
+    for (const cell of cells) expect(isBlockedCell(b, cell.cx, cell.cy)).toBe(true);
+    // Les porteurs, posés à côté d'elle, n'y restent pas pris.
+    for (const c of sim.world.characters) expect(bodyCollides(b, c.pos.x, c.pos.y), c.id).toBe(false);
+    for (const v of sim.world.villagers) expect(cells.some((cell) => touchesCell(v.pos, cell)), v.id).toBe(false);
+    // On ne la traverse plus: marcher droit dessus s'arrête devant elle.
+    const at = sim.world.handcarAt ?? { pos: { x: 0, y: 0 }, facing: 0 };
+    const p1 = character(sim, 'p1');
+    placeCharacter(sim, p1, { x: at.pos.x, y: at.pos.y - 2 });
+    for (let i = 0; i < SIM_HZ * 3; i++) {
+      step(sim, { controls: { p1: { seq: i + 1, moveX: 0, moveY: 1, actHeld: false } }, intents: [] });
+    }
+    expect(p1.pos.y).toBeLessThan(at.pos.y - 0.5);
+    // On la contourne: la voie se traverse toujours à côté, et la remise reste joignable.
+    const around = findPath(refreshBlockers(sim), { x: at.pos.x, y: at.pos.y - 2 }, { x: at.pos.x, y: at.pos.y + 2 });
+    expect(around).not.toBeNull();
+    const shed = sim.map.points.handcar_shed ?? { x: -9, y: -9 };
+    expect(findPath(refreshBlockers(sim), sim.map.points.train_stop ?? { x: 0, y: 0 }, shed)).not.toBeNull();
+  });
+
+  it('bloque encore après une sauvegarde rechargée', () => {
+    const sim = pushedHandcar();
+    const { content, map } = contentAndMap();
+    const snap = snapshotOf(sim);
+    const restored = restoreWorld(content, map, JSON.parse(JSON.stringify(snap.data)) as unknown, snap.dataSchema, [A, B]);
+    const b = refreshBlockers(restored);
+    const cells = handcarCells(restored);
+    expect(cells.length).toBeGreaterThan(0);
+    for (const cell of cells) expect(isBlockedCell(b, cell.cx, cell.cy)).toBe(true);
   });
 });
 

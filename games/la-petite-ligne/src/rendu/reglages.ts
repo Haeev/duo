@@ -60,16 +60,55 @@ export const RENDER_SETTINGS = {
       path: 0,
       dirt: 0,
       gravel: 0.03,
-      // Platelage du passage à niveau: il couvre le dessus des traverses (0,28 m: voie posée à 0,06 m,
-      // traverses de 22 cm) et laisse dépasser le champignon du rail (0,37 m). À 0,27, les traverses
-      // perçaient les planches.
-      wood: 0.3,
+      // Dessus du platelage des traversées (passage à niveau, traversée de service): 1,5 cm sous le
+      // champignon du rail (0,38 m: voie posée à 0,06 m, `rail_top` de 0,32 m). Les personnages y
+      // marchent à cette hauteur; la rampe de terre (`crossing.rampLength`) rattrape la route.
+      wood: 0.365,
       floor: 0.12,
       water: -0.42,
       rail: 0.06,
       stone: 0.04,
     },
     waterSurface: -0.16,
+    /**
+     * Platelage des traversées (revue du directeur artistique, tour 5): lames
+     * dans le sens des rails, posées sur les traverses, sur toute la largeur de
+     * la route; ornière sombre le long de la face intérieure de chaque rail;
+     * rampe de terre de chaque côté où la route est plus basse. Distances en
+     * mètres, en travers de la voie depuis son axe sauf mention contraire.
+     */
+    crossing: {
+      /** Rails à cette distance de l'axe de la voie (voie métrique du modèle `rail_straight`). */
+      railOffset: 0.5,
+      /** Largeur du champignon du rail. */
+      railHeadWidth: 0.06,
+      /** Ornière: fente le long de la face intérieure du rail (passage du boudin des roues). */
+      flangeway: 0.07,
+      /** Jeu entre la face extérieure du rail et la première lame. */
+      outerClearance: 0.01,
+      /** Bande de planches à l'extérieur de chaque rail. */
+      outerBand: 0.45,
+      /** Largeur visée d'une lame (pas des lames, chanfreins compris): 20 à 25 cm. */
+      plankWidth: 0.22,
+      /** Épaisseur visible des lames au-dessus du fond de l'ornière (au-dessus des traverses, à 0,28 m). */
+      plankThickness: 0.035,
+      /** Chanfrein des arêtes du dessus des lames, bouts compris (un segment). */
+      chamfer: 0.015,
+      /** Rampe de terre de la route jusqu'au dessus des planches. */
+      rampLength: 1.25,
+      /**
+       * Tons des lames, de l'une à la suivante (repris en boucle, décalé d'une
+       * traversée à l'autre): `wood_old` est plus clair de 8 niveaux de gris
+       * que `wood` (128,7 contre 136,7); une lame sur trois ou quatre.
+       */
+      plankTones: ['wood', 'wood', 'wood_old', 'wood', 'wood', 'wood', 'wood_old'] as const,
+      /** Fond des ornières et des fentes autour du rail. */
+      grooveTone: 'shadow' as const,
+      /** Bouts du platelage côté voie (sous les lames, jusqu'au ballast). */
+      endTone: 'wood_dark' as const,
+      rampTone: 'path' as const,
+      rampSideTone: 'bank' as const,
+    },
     /** Taille des taches d'herbe (bruit lisse), en mètres. */
     grassPatchScale: 5.5,
     /** Sol au-delà de la carte, pour ne jamais voir le vide. */

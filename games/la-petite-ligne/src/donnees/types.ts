@@ -401,6 +401,8 @@ export interface Settings {
       path: [number, number][];
       /** Le point d'arrêt (dernier de `path`), pour le rendu de démonstration. */
       toOffset: [number, number];
+      /** Emprise de la draisine posée (m): longueur dans l'axe de la voie, largeur en travers. Elle bloque ces cases. */
+      size: [number, number];
       quest: string;
       step: string;
       flag: string;
