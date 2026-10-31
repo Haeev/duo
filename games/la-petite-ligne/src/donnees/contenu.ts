@@ -693,13 +693,18 @@ function parseTexts(r: Reader): Texts {
 }
 
 function parseFeel(r: Reader | null): FeelSettings {
-  const feel: FeelSettings = { ...DEFAULT_FEEL, actionSeconds: { ...DEFAULT_FEEL.actionSeconds } };
+  const feel: FeelSettings = { ...DEFAULT_FEEL, actionSeconds: { ...DEFAULT_FEEL.actionSeconds }, fishWeights: { ...DEFAULT_FEEL.fishWeights } };
   if (r === null) return feel;
   const actions = r.opt('actionSeconds');
   if (actions !== null) {
     for (const [key, value] of actions.entries()) feel.actionSeconds[key] = value.number();
   }
-  const numeric: (keyof Omit<FeelSettings, 'actionSeconds'>)[] = [
+  const fish = r.opt('fishWeights');
+  if (fish !== null) {
+    feel.fishWeights = {};
+    for (const [key, value] of fish.entries()) feel.fishWeights[key] = value.number();
+  }
+  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights'>)[] = [
     'trainSlideSeconds',
     'pointRadius',
     'beamGrabRange',
@@ -715,6 +720,20 @@ function parseFeel(r: Reader | null): FeelSettings {
     feel[key] = optNumber(r, key, feel[key]);
   }
   return feel;
+}
+
+function parseFishing(r: Reader | null): Settings['fishing'] {
+  if (r === null) return null;
+  const wait = r.at('biteWaitSeconds').numberList();
+  const min = wait[0];
+  const max = wait[1];
+  if (wait.length !== 2 || min === undefined || max === undefined || min > max) return r.at('biteWaitSeconds').fail('[min, max] attendu');
+  return {
+    castRange: r.at('castRange').number(),
+    biteWaitSeconds: [min, max],
+    hookWindowSeconds: r.at('hookWindowSeconds').number(),
+    flag: r.at('flag').string(),
+  };
 }
 
 function parseSettings(r: Reader): Settings {
@@ -830,6 +849,7 @@ function parseSettings(r: Reader): Settings {
     building: { twoPlayersSpeedMultiplier: r.at('building').at('twoPlayersSpeedMultiplier').number() },
     hints: { durationSeconds: r.at('hints').at('durationSeconds').number() },
     absence: { minutes: r.at('absence').at('minutes').number() },
+    fishing: parseFishing(r.opt('fishing')),
     feel: parseFeel(r.opt('feel')),
   };
 }

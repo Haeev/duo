@@ -14,6 +14,7 @@ import { nearPoint, shopOpen } from './economie';
 import { isBlockedCell } from './grille';
 import { refreshBlockers } from './deplacement';
 import { ITEM, POINT } from './ids';
+import { fishAct, holdsRod, waterAhead } from './peche';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { placeFurniture } from './amenagement';
@@ -200,7 +201,10 @@ export function updateAim(sim: Sim, c: Character): void {
   }
   const best = bestTarget(sim, c);
   let aim: AimInfo | null = null;
-  if (best !== null) {
+  const water = holdsRod(c) ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
+  if (water !== null) {
+    aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
+  } else if (best !== null) {
     const pos = best.target.kind === 'cell' ? { x: best.target.cell.cx + 0.5, y: best.target.cell.cy + 0.5 } : best.target.pos;
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: best.verb, blocked: null };
     if (best.verb !== null) queueHint(sim, c.id, { on: 'near_interactable' });
@@ -330,6 +334,9 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'dig':
       if (t.kind === 'cell') dig(sim, c, t.pos);
       return;
+    case 'fish':
+      fishAct(sim, c);
+      return;
     case 'till':
     case 'sow':
     case 'water':
@@ -348,6 +355,10 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
 
 /** Espace: agir sur ce qui est devant soi. */
 export function actFront(sim: Sim, c: Character): void {
+  if (holdsRod(c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
+    fishAct(sim, c);
+    return;
+  }
   const best = bestTarget(sim, c);
   if (best === null) return;
   if (best.verb === null) {

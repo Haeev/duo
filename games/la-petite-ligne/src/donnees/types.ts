@@ -366,6 +366,14 @@ export interface Settings {
   building: { twoPlayersSpeedMultiplier: number };
   hints: { durationSeconds: number };
   absence: { minutes: number };
+  /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
+  fishing: {
+    castRange: number;
+    biteWaitSeconds: [number, number];
+    hookWindowSeconds: number;
+    /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */
+    flag: string;
+  } | null;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
 }
@@ -397,6 +405,8 @@ export interface FeelSettings {
   trainWarningMinutes: number;
   /** Durée d'un repère planté (GE-07: 15 s). */
   pinSeconds: number;
+  /** Poids de tirage des poissons (CN-04: commun 6, peu commun 3, rare 1). */
+  fishWeights: Record<string, number>;
 }
 
 export interface Content {

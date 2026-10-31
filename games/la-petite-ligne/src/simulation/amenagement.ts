@@ -4,6 +4,7 @@
  */
 import { inRect } from '../etat/carte';
 import type { Cell, Character, PlacementPreview } from '../etat/types';
+import type { ItemDef } from '../donnees/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, emit, newId } from './contexte';
 import { queueHint } from './astuces';
@@ -22,6 +23,11 @@ const DIRS: readonly [number, number][] = [
   [-1, 0],
   [0, -1],
 ];
+
+/** Meubles et décorations (la plume de geai) se posent dans la pièce. */
+function isPlaceable(def: ItemDef | undefined): def is ItemDef {
+  return def !== undefined && def.footprint !== null && (def.category === 'furniture' || def.category === 'decoration');
+}
 
 /** Coin nord-ouest d'une empreinte posée juste devant le personnage. */
 export function previewCell(c: Character, size: { w: number; d: number }): Cell {
@@ -84,7 +90,7 @@ export function placementProblem(sim: Sim, item: string, cell: Cell, rotation: n
 export function updatePlacement(sim: Sim, c: Character): void {
   const item = heldItem(c);
   const def = item === null ? undefined : sim.content.items[item];
-  if (item === null || def?.category !== 'furniture' || def.footprint === null || !c.inHouse || c.status !== 'active') {
+  if (item === null || !isPlaceable(def) || def.footprint === null || !c.inHouse || c.status !== 'active') {
     if (c.placement !== null) {
       c.placement = null;
       sim.runtime.changed = true;
@@ -119,7 +125,7 @@ export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotati
   const item = heldItem(c);
   if (item === null || !c.inHouse) return false;
   const def = sim.content.items[item];
-  if (def?.category !== 'furniture' || def.footprint === null) return false;
+  if (!isPlaceable(def) || def.footprint === null) return false;
   const r = rotation ?? c.placement?.rotation ?? 0;
   const at = cell ?? c.placement?.cell ?? null;
   if (at === null || !canPlace(sim, item, at, r)) return false;

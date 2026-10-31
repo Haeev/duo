@@ -279,6 +279,8 @@ export interface Character {
   crafting: { recipe: RecipeId; endsAt: number } | null;
   /** Repère planté par ce joueur (GE-07), visible chez les deux jusqu'au tick `until`, ou `null`. */
   pin: { pos: Vec2; since: number; until: number } | null;
+  /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
+  fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
 }
 
 export type CharacterStatus =
@@ -364,6 +366,7 @@ export interface AimInfo {
 }
 
 export type AimVerb =
+  | 'fish'
   | 'till'
   | 'sow'
   | 'water'
@@ -750,4 +753,8 @@ export type WorldEvent =
   | { type: 'save_point'; reason: 'dawn' | 'quest' }
   | { type: 'session_finish' }
   | { type: 'pin'; by: CharacterId; pos: Vec2 }
+  | { type: 'cast'; by: CharacterId; at: Vec2 }
+  | { type: 'bite'; by: CharacterId }
+  | { type: 'caught'; by: CharacterId; item: ItemId }
+  | { type: 'escaped'; by: CharacterId }
   | { type: 'absence'; who: CharacterId; absent: boolean };

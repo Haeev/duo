@@ -32,6 +32,8 @@ export const DEFAULT_FEEL: FeelSettings = {
   trainWarningMinutes: 60,
   // GE-07: l'épingle reste 15 s.
   pinSeconds: 15,
+  // CN-04: goujon commun, chevesne peu commun, truite rare.
+  fishWeights: { gudgeon: 6, chub: 3, trout: 1 },
 };
 
 export const DEFAULT_RANGES = {

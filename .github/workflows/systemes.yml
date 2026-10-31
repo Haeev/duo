@@ -10,7 +10,9 @@ name: Systèmes
 
 on:
   push:
-    branches: [main, 'claude/**']
+    # Seulement main: les instantanés fréquents des branches de session annuleraient
+    # sans cesse une fabrication de 15 minutes. Sur une branche, lancer à la main.
+    branches: [main]
     # Un push qui ne touche que la documentation ne refabrique rien.
     paths-ignore:
       - 'docs/**'

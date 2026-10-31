@@ -399,7 +399,7 @@ class GameUi implements GameInterface, UiHost {
   }
 
   private mount(key: string | null, kind: LayerKind, build: (() => Layer) | null, now: number): void {
-    if (this.mounted?.key === key) return;
+    if ((this.mounted?.key ?? null) === key) return;
     const previous = this.mounted;
     const hadFocus = previous !== null && document.activeElement !== null && previous.layer.root.contains(document.activeElement);
     if (previous !== null) {

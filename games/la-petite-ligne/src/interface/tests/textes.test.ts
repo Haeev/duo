@@ -27,7 +27,7 @@ describe('textes de l’interface', () => {
 
   it("n'écrit ni tiret cadratin ni tiret demi-cadratin", () => {
     const file = readFileSync(fileURLToPath(new URL('../textes-interface.json', import.meta.url)), 'utf8');
-    expect(file).not.toMatch(/[–—]/);
+    expect(file).not.toMatch(/[\u2013\u2014]/);
   });
 
   it('tutoie le joueur (pas de « vous » adressé à un seul joueur dans les libellés personnels)', () => {

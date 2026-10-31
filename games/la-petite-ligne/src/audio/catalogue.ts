@@ -231,11 +231,8 @@ export function parseCatalogue(raw: unknown): Catalogue {
   const sounds = new Map<string, SoundDef>();
   for (const [id, s] of Object.entries(data.sounds)) {
     const loop = loopOf(s.loop);
-    const durations = s.files.map((_, i) => {
-      const ms = s.durationMs[i];
-      if (ms !== undefined && ms > 0) return ms / 1000;
-      return loop === null ? 0 : loopFileSeconds(loop);
-    });
+    // Pour une boucle, `durationMs` donne la longueur de la boucle: le fichier a en plus ses amorces.
+    const durations = s.files.map((_, i) => (loop === null ? (s.durationMs[i] ?? 0) / 1000 : loopFileSeconds(loop)));
     sounds.set(id, {
       id,
       bus: s.bus,

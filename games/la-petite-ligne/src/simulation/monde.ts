@@ -16,7 +16,7 @@ import type {
 import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { type Sim, wrapWorld } from './contexte';
-import { SPAWN_POINTS } from './ids';
+import { ITEM, SPAWN_POINTS } from './ids';
 import { addToBag, addStack } from './sac';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
@@ -90,6 +90,7 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     envieHistory: [],
     crafting: null,
     pin: null,
+    fishing: null,
   };
 }
 
@@ -191,10 +192,13 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     session: { firstDay: s.clock.firstDay.day, togetherMoments: 0, highlights: [] },
   };
 
+  // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.
+  if (s.fishing !== null) world.flags.push(s.fishing.flag);
   const sim = wrapWorld(content, map, world);
   for (const stack of content.startingInventory.cellar) addStack(world.cellar, stack.item, 'ordinary', stack.count);
   for (const c of characters) {
     for (const stack of content.startingInventory.eachPlayer) addToBag(sim, c, stack.item, 'ordinary', stack.count);
+    if (s.fishing !== null && content.items[ITEM.fishingRod] !== undefined) addToBag(sim, c, ITEM.fishingRod, 'ordinary', 1);
     const can = Object.values(content.items).find((i) => i.capacity !== null);
     c.water = can?.capacity ?? 0;
   }

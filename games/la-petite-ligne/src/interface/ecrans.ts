@@ -402,9 +402,10 @@ export class CreationScreen implements Layer {
     return this.mode === 'edit' ? this.input : this.mode === 'done' ? this.edit : null;
   }
 
-  /** Entrée dans le champ: valider. */
+  /** Entrée dans le formulaire (prénom, coiffure, tenue): valider. */
   key(code: string): boolean {
-    if ((code === 'Enter' || code === 'NumpadEnter') && document.activeElement === this.input) {
+    const active = document.activeElement;
+    if ((code === 'Enter' || code === 'NumpadEnter') && active instanceof HTMLInputElement && this.root.contains(active)) {
       this.confirm();
       return true;
     }

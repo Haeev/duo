@@ -30,7 +30,7 @@ function doneFor(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
 }
 
 function isAvailable(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
-  if (def.tier === 'P1') return false;
+  // Les dialogues P1 (pêche) sont gardés par leurs propres conditions (drapeau `fishing_enabled`).
   if (doneFor(sim, def, who)) return false;
   const ctx: ConditionContext = { ...NO_CONTEXT, actor: who };
   return evaluateAll(sim, def.when, ctx);
@@ -250,7 +250,7 @@ export function autoStartScenes(sim: Sim): void {
   if (!free) return;
   const range = sim.content.settings.ranges.talk;
   for (const def of Object.values(sim.content.dialogues)) {
-    if (!def.shared || def.kind !== 'scene' || def.point === null || def.tier === 'P1') continue;
+    if (!def.shared || def.kind !== 'scene' || def.point === null) continue;
     if (def.once === 'duo' && world.dialoguesDone.includes(def.id)) continue;
     const at = point(sim, def.point);
     if (!world.characters.every((c) => distance(c.pos, at) <= range)) continue;

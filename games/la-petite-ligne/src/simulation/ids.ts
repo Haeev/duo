@@ -9,6 +9,7 @@ export const ITEM = {
   wateringCan: 'watering_can',
   log: 'log',
   egg: 'egg',
+  fishingRod: 'fishing_rod',
 } as const;
 
 export const POINT = {
