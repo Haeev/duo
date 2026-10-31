@@ -93,6 +93,8 @@ export interface Duo {
   readonly guestGame: FrameLocator;
   readonly probe: Probe;
   readonly errors: string[];
+  /** Avertissements de la console des deux côtés (préfixés par le côté). */
+  readonly warnings: string[];
   close(): Promise<void>;
 }
 
@@ -104,16 +106,28 @@ async function profile(page: Page, name: string): Promise<void> {
 /** L'un héberge (le Mac), l'autre rejoint (le PC); renvoie quand les deux jeux tournent. */
 export async function startDuo(
   browser: Browser,
-  opts: { hostName?: string; guestName?: string; hostButton?: string } = {},
+  opts: { hostName?: string; guestName?: string; hostButton?: string; gameQuery?: string } = {},
 ): Promise<Duo> {
   const mac = await browser.newContext();
   const pc = await browser.newContext();
   // Tâches longues du fil principal, dans chaque cadre (le jeu est dans une iframe): le chien de
   // garde de la plateforme arrête la partie après 5 s sans battement de cœur (ADR 0004).
   for (const ctx of [mac, pc]) await ctx.addInitScript(LONG_TASKS_SCRIPT);
+  // Paramètres du jeu (`?robot=1`...): la page du faux hôte ouvre toujours `/jeu/` sans paramètre;
+  // une redirection donne au cadre du jeu l'adresse voulue, sans toucher au faux hôte.
+  const query = opts.gameQuery;
+  if (query !== undefined) {
+    for (const ctx of [mac, pc]) {
+      await ctx.route(
+        (url) => url.pathname === '/jeu/' && url.search === '',
+        (route) => route.fulfill({ status: 302, headers: { location: `/jeu/?${query}` } }),
+      );
+    }
+  }
   const host = await mac.newPage();
   const guest = await pc.newPage();
   const errors: string[] = [];
+  const warnings: string[] = [];
   for (const [who, page] of [['hôte', host], ['invité', guest]] as const) {
     page.on('pageerror', (e) => errors.push(`${who}: ${e.message}`));
     page.on('response', (r) => {
@@ -123,6 +137,7 @@ export async function startDuo(
     page.on('console', (m) => {
       // Les ressources en échec sont relevées avec leur adresse par l'écouteur `response`.
       if (m.type() === 'error' && !m.text().startsWith('Failed to load resource')) errors.push(`${who} console: ${m.text()}`);
+      if (m.type() === 'warning') warnings.push(`${who}: ${m.text()}`);
     });
   }
   const probe = probeGuest(guest);
@@ -132,12 +147,16 @@ export async function startDuo(
   await guest.getByRole('button', { name: 'Rejoindre' }).click();
   await expect(host.locator('.vue')).toHaveAttribute('data-statut', 'running', { timeout: 60_000 });
   await expect(guest.locator('.vue')).toHaveAttribute('data-statut', 'running', { timeout: 60_000 });
-  // Le chien de garde de la plateforme peut arrêter la partie (« Le jeu ne répond plus »): le dire.
+  // Le chien de garde de la plateforme peut arrêter la partie (« Le jeu ne répond plus »): le dire,
+  // sauf pendant la fermeture du test (fermer l'hôte arrête la partie chez l'invité).
+  let closing = false;
   for (const page of [host, guest]) {
     void page
       .locator('.vue[data-statut="stopped"], .vue[data-statut="error"]')
       .waitFor({ timeout: 0 })
-      .then(() => errors.push(`partie arrêtée: ${page === host ? 'hôte' : 'invité'}`))
+      .then(() => {
+        if (!closing) errors.push(`partie arrêtée: ${page === host ? 'hôte' : 'invité'}`);
+      })
       .catch(() => undefined);
   }
   return {
@@ -149,7 +168,9 @@ export async function startDuo(
     guestGame: guest.frameLocator('iframe'),
     probe,
     errors,
+    warnings,
     async close() {
+      closing = true;
       await mac.close();
       await pc.close();
     },
@@ -164,6 +185,16 @@ const LONG_TASKS_SCRIPT = `
     }).observe({ type: 'longtask', buffered: true });
   } catch (e) {}
 `;
+
+/** Tas JavaScript utilisé par la page du jeu (Chromium, `performance.memory`), en octets. */
+export async function heapUsed(page: Page): Promise<number | null> {
+  const frame = page.frames().find((f) => f.url().includes('/jeu/'));
+  if (frame === undefined) return null;
+  return frame.evaluate(() => {
+    const memory = (performance as unknown as { memory?: { usedJSHeapSize: number } }).memory;
+    return memory === undefined ? null : memory.usedJSHeapSize;
+  });
+}
 
 /** Tâches longues relevées dans le jeu d'une page: [début, durée] en ms. */
 export async function longTasks(page: Page): Promise<[number, number][]> {

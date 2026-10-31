@@ -33,8 +33,13 @@ export interface LightKey {
   fogColor: string;
   /** Ciel reflété par l'eau et les flaques. */
   reflectionColor: string;
-  /** Force des ombres (0 à 1): elles s'effacent à l'aube et au crépuscule, quand la lumière change de côté. */
+  /**
+   * Force des ombres (0 à 1, part de `shadows.intensity`): elles s'effacent à
+   * l'aube et au crépuscule, quand la lumière change de côté.
+   */
   shadow: number;
+  /** Douceur du bord des ombres (texels), si elle diffère de `shadows.radius`. */
+  shadowRadius?: number;
   /** Lueur des fenêtres, lanternes et lampadaires (émission et flaques de lumière): 0 le jour, 1 la nuit. */
   glow: number;
   /** Brume au ras du sol (rosée du matin), de 0 à 1. */
@@ -77,7 +82,7 @@ const NIGHT = {
   hemiIntensity: 1.0,
   fogColor: '#1f2a47',
   reflectionColor: '#2c3d68',
-  shadow: 0.55,
+  shadow: 0.47,
   glow: 1,
   mist: 0,
   clouds: 0.5,
@@ -103,7 +108,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 0.9,
       fogColor: '#8a86ad',
       reflectionColor: '#9a92bb',
-      shadow: 0.1,
+      shadow: 0.085,
       glow: 0.75,
       mist: 0.75,
       clouds: 0.4,
@@ -119,7 +124,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 0.95,
       fogColor: '#efcab6',
       reflectionColor: '#f3cdb8',
-      shadow: 0.55,
+      shadow: 0.47,
       glow: 0.2,
       mist: 1,
       clouds: 0.4,
@@ -135,7 +140,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.05,
       fogColor: '#e4e2da',
       reflectionColor: '#d8e6f0',
-      shadow: 0.85,
+      shadow: 0.72,
       glow: 0,
       mist: 0.75,
       clouds: 0.8,
@@ -151,7 +156,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.1,
       fogColor: '#d6e5ee',
       reflectionColor: '#cfe2f0',
-      shadow: 1,
+      shadow: 0.85,
       glow: 0,
       mist: 0.12,
       clouds: 1,
@@ -167,7 +172,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.12,
       fogColor: '#cfe2ee',
       reflectionColor: '#c8e0f0',
-      shadow: 1,
+      shadow: 0.85,
       glow: 0,
       mist: 0,
       clouds: 1,
@@ -183,7 +188,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.15,
       fogColor: '#cde1ee',
       reflectionColor: '#c6dff0',
-      shadow: 1,
+      shadow: 0.85,
       glow: 0,
       mist: 0,
       clouds: 1,
@@ -199,13 +204,15 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.1,
       fogColor: '#d6dfe4',
       reflectionColor: '#cddce8',
-      shadow: 1,
+      shadow: 0.85,
       glow: 0,
       mist: 0,
       clouds: 1,
     },
     // Énigme de la cloche: le soleil descend plus vite autour de 17 h, plein ouest, pour que
     // l'ombre de la cloche arrive sur le banc vers 17 h et le quitte vers 17 h 40.
+    // De 16 h 45 à 17 h 45: ombres pleines, bord net (le poteau est fin) et ciel moins fort,
+    // pour que l'ombre se lise sur le sol et sur le banc.
     {
       minutes: 1005,
       azimuthDeg: 176,
@@ -214,29 +221,31 @@ export const AMBIANCE_SETTINGS = {
       sunIntensity: 2.55,
       skyColor: '#e8dccb',
       groundColor: '#988e6c',
-      hemiIntensity: 1.05,
+      hemiIntensity: 0.8,
       fogColor: '#e3d6c3',
       reflectionColor: '#e2d6c6',
       shadow: 1,
       glow: 0,
       mist: 0,
       clouds: 0,
+      shadowRadius: 1.5,
     },
     {
       minutes: 1035,
       azimuthDeg: 180,
       elevationDeg: 30.5,
       sunColor: '#ffc98a',
-      sunIntensity: 2.4,
+      sunIntensity: 2.6,
       skyColor: '#f0d0ac',
       groundColor: '#928a6a',
-      hemiIntensity: 1.0,
+      hemiIntensity: 0.8,
       fogColor: '#ecd0b0',
       reflectionColor: '#efcfac',
       shadow: 1,
       glow: 0,
       mist: 0,
       clouds: 0,
+      shadowRadius: 1.5,
     },
     // Soirée (revue du directeur artistique): ciel plus clair et plus fort, pour une soirée dorée
     // et lisible (au moins 75 de gris moyen et 25 d'écart à 18 h et 19 h).
@@ -251,10 +260,11 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.2,
       fogColor: '#e8d0b6',
       reflectionColor: '#f4c79c',
-      shadow: 1,
+      shadow: 0.92,
       glow: 0,
       mist: 0,
       clouds: 0.3,
+      shadowRadius: 1.5,
     },
     {
       minutes: 1140,
@@ -267,7 +277,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.24,
       fogColor: '#e2c2ab',
       reflectionColor: '#f0b088',
-      shadow: 0.9,
+      shadow: 0.76,
       glow: 0.3,
       mist: 0,
       clouds: 0.6,
@@ -283,7 +293,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 1.2,
       fogColor: '#a99aae',
       reflectionColor: '#c792a2',
-      shadow: 0.35,
+      shadow: 0.3,
       glow: 0.55,
       mist: 0.1,
       clouds: 0.6,
@@ -299,7 +309,7 @@ export const AMBIANCE_SETTINGS = {
       hemiIntensity: 0.97,
       fogColor: '#3c4a74',
       reflectionColor: '#4c5d8f',
-      shadow: 0.15,
+      shadow: 0.13,
       glow: 0.9,
       mist: 0.05,
       clouds: 0.5,
@@ -356,10 +366,18 @@ export const AMBIANCE_SETTINGS = {
   shadows: {
     /** Carte d'ombre (budget: 1024, 2048 au plus). */
     mapSize: 1024,
+    /**
+     * Fin d'après-midi de l'énigme (minutes): carte de 2048, pour que l'ombre
+     * fine du poteau et de la cloche se lise sur l'herbe et le banc. Le reste
+     * du temps, 1024 (moins de remplissage pour l'UHD 620).
+     */
+    detailMapSize: 2048,
+    detailFrom: 990,
+    detailTo: 1080,
     /** Douceur du bord (en texels de la carte d'ombre). */
     radius: 2.5,
     /** Opacité de l'ombre à pleine force (le sol ne devient jamais noir). */
-    intensity: 0.72,
+    intensity: 0.85,
     /** Biais de profondeur, et biais selon la normale en texels (suit le zoom): pas d'acné d'ombre. */
     bias: -0.0004,
     normalBiasTexels: 1.4,

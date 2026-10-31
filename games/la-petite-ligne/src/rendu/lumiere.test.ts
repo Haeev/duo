@@ -311,6 +311,20 @@ describe('ombre portée', () => {
     }
   });
 
+  it('affine la carte d’ombre à l’heure de l’énigme, et seulement alors', () => {
+    const rig = new DaylightRig(new Scene());
+    rig.update(17 * HOUR + 15, 'sunny', FOCUS, VIEW_RADIUS, CAMERA_DISTANCE);
+    expect(rig.sun.shadow.mapSize.x).toBe(AMBIANCE_SETTINGS.shadows.detailMapSize);
+    // Ombres plus pleines et plus nettes en fin d'après-midi qu'à midi.
+    const evening = { intensity: rig.sun.shadow.intensity, radius: rig.sun.shadow.radius };
+    rig.update(12 * HOUR, 'sunny', FOCUS, VIEW_RADIUS, CAMERA_DISTANCE);
+    expect(rig.sun.shadow.mapSize.x).toBe(AMBIANCE_SETTINGS.shadows.mapSize);
+    expect(evening.intensity).toBeGreaterThan(rig.sun.shadow.intensity);
+    expect(evening.radius).toBeLessThan(rig.sun.shadow.radius);
+    // Budget de la plateforme: 2048 au plus.
+    expect(AMBIANCE_SETTINGS.shadows.detailMapSize).toBeLessThanOrEqual(2048);
+  });
+
   it('ne garde qu’une lumière directionnelle avec ombre', () => {
     const scene = new Scene();
     new DaylightRig(scene);

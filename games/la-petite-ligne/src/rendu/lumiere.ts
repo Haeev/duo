@@ -89,6 +89,7 @@ class DayCurves {
   readonly sunIntensity: CyclicCurve;
   readonly hemiIntensity: CyclicCurve;
   readonly shadow: CyclicCurve;
+  readonly shadowRadius: CyclicCurve;
   readonly glow: CyclicCurve;
   readonly mist: CyclicCurve;
   readonly clouds: CyclicCurve;
@@ -107,6 +108,7 @@ class DayCurves {
     this.sunIntensity = scalar((key) => key.sunIntensity);
     this.hemiIntensity = scalar((key) => key.hemiIntensity);
     this.shadow = scalar((key) => key.shadow);
+    this.shadowRadius = scalar((key) => key.shadowRadius ?? AMBIANCE_SETTINGS.shadows.radius);
     this.glow = scalar((key) => key.glow);
     this.mist = scalar((key) => key.mist);
     this.clouds = scalar((key) => key.clouds);
@@ -266,7 +268,22 @@ export class DaylightRig {
 
     this.sun.shadow.intensity =
       shadows.intensity * clamp01(curves.shadow.at(m)) * look.shadowFactor;
+    this.sun.shadow.radius = curves.shadowRadius.at(m);
+    this.setShadowMapSize(
+      m >= shadows.detailFrom && m <= shadows.detailTo ? shadows.detailMapSize : shadows.mapSize,
+    );
     this.fitShadow(focus, viewRadius);
+  }
+
+  /** Change la taille de la carte d'ombre (le moteur la recrée à la prochaine image). */
+  private setShadowMapSize(size: number): void {
+    const shadow = this.sun.shadow;
+    if (shadow.mapSize.x === size) {
+      return;
+    }
+    shadow.mapSize.set(size, size);
+    shadow.map?.dispose();
+    shadow.map = null;
   }
 
   /** Repère de la lumière: deux axes perpendiculaires à sa direction (ceux de sa caméra d'ombre). */
@@ -334,8 +351,9 @@ export class DaylightRig {
     const shadows = AMBIANCE_SETTINGS.shadows;
     this.lightFrame();
     const bounds = this.viewBounds(focus, viewRadius);
-    const texelU = (2 * bounds.halfU) / shadows.mapSize;
-    const texelV = (2 * bounds.halfV) / shadows.mapSize;
+    const mapSize = this.sun.shadow.mapSize.x;
+    const texelU = (2 * bounds.halfU) / mapSize;
+    const texelV = (2 * bounds.halfV) / mapSize;
     // Centre calé sur la grille des texels, dans le repère de la lumière.
     const u = Math.round(bounds.u / texelU) * texelU;
     const v = Math.round(bounds.v / texelV) * texelV;
@@ -364,8 +382,7 @@ export class DaylightRig {
   shadowTexel(): number {
     const camera = this.sun.shadow.camera;
     return (
-      Math.max(camera.right - camera.left, camera.top - camera.bottom) /
-      AMBIANCE_SETTINGS.shadows.mapSize
+      Math.max(camera.right - camera.left, camera.top - camera.bottom) / this.sun.shadow.mapSize.x
     );
   }
 
