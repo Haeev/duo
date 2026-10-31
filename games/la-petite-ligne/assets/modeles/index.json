@@ -522,7 +522,7 @@
  },
  "station_sign": {
   "file": "bourg.glb",
-  "tris": 432,
+  "tris": 424,
   "footprint": [
    2,
    1
@@ -530,7 +530,7 @@
  },
  "arbor": {
   "file": "bourg.glb",
-  "tris": 848,
+  "tris": 876,
   "footprint": [
    3,
    2
@@ -1019,7 +1019,7 @@
  },
  "bread": {
   "file": "maison.glb",
-  "tris": 172
+  "tris": 136
  },
  "dish_radishes": {
   "file": "maison.glb",

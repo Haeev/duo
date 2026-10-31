@@ -253,13 +253,31 @@ def picture_frame(A):
 
 def bread(A):
     g = A.geo()
-    g.sphere(0.13, loc=(0, 0, 0.06), color="bread", segs=10, rings=6, scale=(1, 1, 0.55))
-    # grignes presque à fleur (moins de 5 mm au-dessus des facettes), à l'intérieur du contour de la miche
+    crust = g.sphere(0.13, loc=(0, 0, 0.06), color="bread", segs=10, rings=6, scale=(1, 1, 0.55))
+    # grignes à fleur: trois bandes fines plaquées sur les facettes du dessus (lancer de rayons sur la
+    # miche, 1,5 mm au-dessus), découpées en 6 tronçons pour suivre les arêtes sans y plonger
+    from mathutils import Vector
+    from mathutils.bvhtree import BVHTree
+    vs = [v for v in crust if v.is_valid]
+    idx = {v: i for i, v in enumerate(vs)}
+    polys = [[idx[v] for v in f.verts] for f in {f for v in vs for f in v.link_faces}]
+    tree = BVHTree.FromPolygons([v.co.copy() for v in vs], polys)
+
+    def on_crust(x, y):
+        hit = tree.ray_cast(Vector((x, y, 1.0)), Vector((0, 0, -1)))
+        return (x, y, (hit[0].z if hit[0] is not None else 0.13) + 0.0015)
+    ca, sa = math.cos(math.radians(30)), math.sin(math.radians(30))
+    n = 6
     for k in range(3):
-        y = -0.05 + k * 0.05
-        # fuseau aplati enfoncé dans la croûte: seule une fente de quelques millimètres affleure
-        g.sphere(1.0, loc=(0, y, 0.06 + 0.0715 * (1 - (y / 0.13) ** 2) ** 0.5 - 0.008), color="bread_crust", segs=6,
-                 rings=3, scale=(0.045, 0.01, 0.008), rot=(0, 0, 30))
+        cy = -0.04 + k * 0.04
+        pts, faces = [], []
+        for i in range(n + 1):
+            u = -0.035 + 0.07 * i / n
+            for v in (-0.006, 0.006):
+                pts.append(on_crust(u * ca - v * sa, u * sa + v * ca + cy))
+        for i in range(n):
+            faces.append((2 * i, 2 * i + 2, 2 * i + 3, 2 * i + 1))
+        g.mesh(pts, faces, "bread_crust")
     return g
 
 
