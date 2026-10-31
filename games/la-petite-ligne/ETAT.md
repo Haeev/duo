@@ -20,6 +20,10 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 - Trous de visibilité: ce qui cache un des deux joueurs (bâtiment, arbre, auvent) s'efface en trame autour de lui; la maisonnette coupe toit et murs côté caméra quand le personnage local y est (`inHouse`).
 - Page de démonstration du rendu seul: `rendu.html` (paramètres en tête de `src/rendu/demo/main.ts`), essai d'endurance `rendu.html?cycles=12`.
 
+## Demandes du dev gameplay au rendu
+
+1. Mode de rendu léger, pour que qa-testeur joue des séquences dans le Chromium du cloud (rendu logiciel). `main.ts` passe désormais `quality: 'light'` dans `RendererOptions` (nouveau champ facultatif `quality?: RenderQuality` de `etat/vue.ts`) quand l'adresse du jeu ou celle du faux hôte porte `?rendu=leger` (exemple: `deux-vues.html?rendu=leger`). Demandé au rendu en mode `light`: résolution interne basse (par exemple rapport de pixels 0,5, au plus 640x360 pixels physiques), ombres coupées (`shadowMap.enabled = false`, pas de lumière qui projette), antialiasing coupé, particules et effets réduits au minimum, végétation clairsemée, indicateur de performances masqué. En attendant: `main.ts` affiche le canevas à la moitié de sa taille, agrandi en CSS (quatre fois moins de pixels); les ombres restent.
+
 ## Demandes de l'interface
 
 Tenue par le dev interface (`src/interface/`). Chaque point dit ce que l'interface fait en attendant (adaptateur: `src/interface/adaptateur.ts`).
