@@ -1,0 +1,25 @@
+{
+ "nodes": {
+  "locomotive": {
+   "length_over_buffers": 7.4,
+   "front": "+x",
+   "smoke_anchor": "locomotive_smoke",
+   "tris": 3392
+  },
+  "coach": {
+   "length_over_buffers": 9.0,
+   "tris": 2060
+  },
+  "van": {
+   "length_over_buffers": 7.0,
+   "door": "porte coulissante au milieu, côté -Z et +Z",
+   "tris": 2004
+  }
+ },
+ "animations": [
+  "locomotive_roll",
+  "coach_roll",
+  "van_roll"
+ ],
+ "file_bytes": 471828
+}

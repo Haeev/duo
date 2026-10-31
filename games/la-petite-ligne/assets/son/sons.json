@@ -2024,9 +2024,10 @@
         "startSample": 48000,
         "endSample": 4656000,
         "sampleRate": 48000,
-        "bars": 48
+        "bars": 48,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2046,9 +2047,10 @@
         "startSample": 48000,
         "endSample": 4656000,
         "sampleRate": 48000,
-        "bars": 48
+        "bars": 48,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2068,9 +2070,10 @@
         "startSample": 48000,
         "endSample": 4848000,
         "sampleRate": 48000,
-        "bars": 40
+        "bars": 40,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2090,9 +2093,10 @@
         "startSample": 48000,
         "endSample": 3408000,
         "sampleRate": 48000,
-        "bars": 28
+        "bars": 28,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2112,9 +2116,10 @@
         "startSample": 48000,
         "endSample": 4080000,
         "sampleRate": 48000,
-        "bars": 28
+        "bars": 28,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2134,9 +2139,10 @@
         "startSample": 48000,
         "endSample": 3888000,
         "sampleRate": 48000,
-        "bars": 40
+        "bars": 40,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },
@@ -2156,9 +2162,10 @@
         "startSample": 48000,
         "endSample": 3504000,
         "sampleRate": 48000,
-        "bars": 30
+        "bars": 30,
+        "firstDownbeatSeconds": 1.12
       },
-      "playFromSeconds": 1.0,
+      "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
     },

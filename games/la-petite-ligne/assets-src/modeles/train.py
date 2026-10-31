@@ -19,6 +19,7 @@ from bpy_extras import anim_utils
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
+from bourg import rail_straight, slab  # noqa: E402
 
 RAIL_TOP = 0.32
 WR = 0.45
@@ -126,11 +127,7 @@ def locomotive(A):
     for y in (-0.55, 0.55):
         g.cyl(0.2, 0.05, loc=(-1.29, y, 2.55), color="brass", segs=10, rot=(0, 90, 0))
         g.cyl(0.16, 0.06, loc=(-1.29, y, 2.55), color="glass", segs=10, rot=(0, 90, 0))
-    lpl_slab = __import__("bourg").slab
-    for s in (1, -1):
-        lpl_slab(g, [(-3.35, 0.0, 3.32), (-1.15, 0.0, 3.32), (-1.15, s * 1.25, 3.12), (-3.35, s * 1.25, 3.12)][::(1 if s > 0 else -1)]
-                 if s > 0 else [(-1.15, 0.0, 3.32), (-3.35, 0.0, 3.32), (-3.35, -1.25, 3.12), (-1.15, -1.25, 3.12)],
-                 0.06, by_normal("black", "black"))
+    roof_curved(g, -3.35, -1.15, 2.5, 3.12, 0.22, "black", "black")
     g.box((0.9, 1.9, 0.8), loc=(-3.0, 0, 1.24), color="loco_green", base=True)
     g.box((0.8, 1.7, 0.2), loc=(-3.0, 0, 2.02), color="black", base=True)
     # lanternes, sifflet, plaque
@@ -159,10 +156,8 @@ def locomotive(A):
 def roof_curved(g, x0, x1, w, z, rise, color, edge):
     """Toit bombé en trois pans."""
     pts = [(-w / 2, z), (-w / 4, z + rise * 0.75), (w / 4, z + rise * 0.75), (w / 2, z)]
-    slab = __import__("bourg").slab
     for (ya, za), (yb, zb) in zip(pts[:-1], pts[1:]):
-        slab(g, [(x0, ya, za), (x1, ya, za), (x1, yb, zb), (x0, yb, zb)][::-1] if False else
-             [(x1, ya, za), (x0, ya, za), (x0, yb, zb), (x1, yb, zb)][::-1], 0.06, by_normal(color, edge, edge, thr=0.3))
+        slab(g, [(x1, yb, zb), (x0, yb, zb), (x0, ya, za), (x1, ya, za)], 0.06, by_normal(color, edge, edge, thr=0.3))
 
 
 def coach(A):
@@ -204,9 +199,6 @@ def coach(A):
         g.cyl(0.1, 0.18, loc=(x, 0, 3.32), color="black", segs=6, base=True)
     A.add("coach_body", g, parent=root)
     wheels = [wheelset(A, f"coach_wheels_{i + 1}", root, x, spokes=False, color="black") for i, x in enumerate((-2.4, 2.4))]
-    for x in (-2.4, 2.4):
-        for s in (1, -1):
-            g2 = None
     roll_animation(wheels, [], "coach_roll")
     return root
 
@@ -256,8 +248,7 @@ def main():
     lpl.write_stats("train", {"nodes": st, "animations": ["locomotive_roll", "coach_roll", "van_roll"], "file_bytes": size})
     print("TRAIN", size, {k: v["tris"] for k, v in st.items()})
     # planche: le train sur sa voie, de trois quarts
-    import bourg
-    rail = bourg.rail_straight(A).to_object("rail_tmp", mat)
+    rail = rail_straight(A).to_object("rail_tmp", mat)
     rails = []
     for k in range(8):
         r = rail.copy()
