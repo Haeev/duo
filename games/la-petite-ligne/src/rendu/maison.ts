@@ -10,13 +10,20 @@ import {
   Group,
   Mesh,
   MeshBasicMaterial,
+  PointLight,
   Vector3,
   type BufferGeometry,
   type Material,
   type Object3D,
 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
-import type { CharacterId, ConstructionState, DeepReadonly, PlacedFurniture, PlacementPreview } from '../etat/types';
+import type {
+  CharacterId,
+  ConstructionState,
+  DeepReadonly,
+  PlacedFurniture,
+  PlacementPreview,
+} from '../etat/types';
 import type { Content } from '../donnees/types';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
@@ -109,8 +116,13 @@ class StagedBuilding {
     this.group.name = prop.model;
     propMatrix(prop, ground, this.group.matrix);
     this.group.matrix.decompose(this.group.position, this.group.quaternion, this.group.scale);
-    this.ruin = library.instantiate(library.has(names.ruin) ? names.ruin : prop.model, propHints(prop));
-    this.repaired = library.has(names.repaired) ? library.instantiate(names.repaired, propHints(prop)) : this.ruin;
+    this.ruin = library.instantiate(
+      library.has(names.ruin) ? names.ruin : prop.model,
+      propHints(prop),
+    );
+    this.repaired = library.has(names.repaired)
+      ? library.instantiate(names.repaired, propHints(prop))
+      : this.ruin;
     for (const model of new Set([this.ruin, this.repaired])) {
       model.traverse((object) => {
         object.castShadow = true;
@@ -155,7 +167,9 @@ class StagedBuilding {
     const elementNodes = new Set(this.elements.map((element) => element.node));
     const facingOf = (object: Object3D): Vector3 => {
       box.setFromObject(object).getCenter(centre).sub(origin).applyQuaternion(inverse);
-      return Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
+      return Math.abs(centre.x) > Math.abs(centre.z)
+        ? new Vector3(Math.sign(centre.x), 0, 0)
+        : new Vector3(0, 0, Math.sign(centre.z));
     };
     for (const element of this.elements) {
       element.facing = element.roof ? null : facingOf(element.node);
@@ -220,12 +234,16 @@ class StagedBuilding {
       node.visible = state.repaired;
     }
     for (const part of this.parts) {
-      const base = part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
+      const base =
+        part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
       part.node.visible = base && !this.cutAway(part, state);
     }
-    const pulse = Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
+    const pulse =
+      Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
     for (const part of this.elements) {
-      const construction = state.constructions.find((candidate) => candidate.id === part.construction);
+      const construction = state.constructions.find(
+        (candidate) => candidate.id === part.construction,
+      );
       const element = construction?.elements.find((candidate) => candidate.id === part.element);
       const status = construction?.status ?? 'locked';
       const solid = status === 'done' || element?.done === true;
@@ -236,7 +254,8 @@ class StagedBuilding {
         mesh.visible = ghost && !hidden;
       }
       if (ghost) {
-        part.material.opacity = GHOST_BASE_OPACITY + GHOST_PROGRESS_OPACITY * (element?.progress ?? 0) + pulse;
+        part.material.opacity =
+          GHOST_BASE_OPACITY + GHOST_PROGRESS_OPACITY * (element?.progress ?? 0) + pulse;
       }
     }
   }
@@ -262,8 +281,18 @@ export class HousePart implements EventfulPart {
   private house: StagedBuilding | null = null;
   private coop: StagedBuilding | null = null;
   private readonly furniture = new Map<string, FurnitureView>();
-  private readonly ghosts = new Map<CharacterId, { item: string; object: Object3D; material: MeshBasicMaterial }>();
+  private readonly ghosts = new Map<
+    CharacterId,
+    { item: string; object: Object3D; material: MeshBasicMaterial }
+  >();
   private readonly toCamera = new Vector3();
+  /** Toujours présente (intensité nulle le jour): le nombre de lumières ne change jamais, donc aucun programme recompilé. */
+  readonly lamp = new PointLight(
+    RENDER_SETTINGS.house.lampColor,
+    0,
+    RENDER_SETTINGS.house.lampDistance,
+    2,
+  );
   private readonly tmp = new Vector3();
 
   constructor(
@@ -276,6 +305,13 @@ export class HousePart implements EventfulPart {
     private readonly picks: PickRegistry,
   ) {
     this.group.name = 'maisonnette';
+    const room = map.house.room;
+    this.lamp.position.set(
+      room.x + room.w / 2,
+      RENDER_SETTINGS.house.lampHeight,
+      room.y + room.h / 2,
+    );
+    this.group.add(this.lamp);
     const houseProp = map.props.find((prop) => prop.model === HOUSE_PROP);
     if (houseProp !== undefined) {
       const house = new StagedBuilding(
@@ -290,10 +326,20 @@ export class HousePart implements EventfulPart {
       const roof = content.constructions.find((construction) => construction.id === 'house_roof');
       const roofNode = `${HOUSE_PROP}_repaired_roof_part_`;
       roof?.elements.forEach((element, index) => {
-        house.bindElement('house_roof', element.id, `${roofNode}${String(index + 1).padStart(2, '0')}`, true);
+        house.bindElement(
+          'house_roof',
+          element.id,
+          `${roofNode}${String(index + 1).padStart(2, '0')}`,
+          true,
+        );
       });
       // La poutre portée à deux devient le faîtage, la pièce qui suit les éléments du toit.
-      house.bindElement('house_beam', 'house_beam', `${roofNode}${String((roof?.elements.length ?? 0) + 1).padStart(2, '0')}`, true);
+      house.bindElement(
+        'house_beam',
+        'house_beam',
+        `${roofNode}${String((roof?.elements.length ?? 0) + 1).padStart(2, '0')}`,
+        true,
+      );
       const door = content.constructions.find((construction) => construction.id === 'house_door');
       for (const element of door?.elements ?? []) {
         house.bindElement('house_door', element.id, `${HOUSE_PROP}_repaired_door`, false);
@@ -344,6 +390,9 @@ export class HousePart implements EventfulPart {
       world.constructions.find((construction) => construction.id === id);
 
     const done = (id: string): boolean => find(id)?.status === 'done';
+    const lit =
+      !RENDER_SETTINGS.house.lampNeedsRepair || (done('house_roof') && done('house_door'));
+    this.lamp.intensity = lit ? context.night * RENDER_SETTINGS.house.lampIntensity : 0;
     this.house?.apply({
       repaired: done('house_roof') && done('house_door'),
       hideRuinRoof: find('house_roof')?.status !== 'locked',
@@ -386,7 +435,10 @@ export class HousePart implements EventfulPart {
   private modelFor(item: string): Object3D {
     const definition = this.content.items[item];
     const size = definition?.footprint ?? { w: 1, d: 1 };
-    const object = this.library.instantiate(definition?.model ?? item, { width: size.w, depth: size.d });
+    const object = this.library.instantiate(definition?.model ?? item, {
+      width: size.w,
+      depth: size.d,
+    });
     object.traverse((child) => {
       child.castShadow = true;
       child.receiveShadow = true;
@@ -404,7 +456,11 @@ export class HousePart implements EventfulPart {
           view.object.removeFromParent();
           this.picks.remove(view.pick);
         }
-        view = { item: piece.item, object: this.modelFor(piece.item), pick: this.picks.add({ kind: 'furniture', furniture: piece.id }) };
+        view = {
+          item: piece.item,
+          object: this.modelFor(piece.item),
+          pick: this.picks.add({ kind: 'furniture', furniture: piece.id }),
+        };
         this.group.add(view.object);
         this.furniture.set(piece.id, view);
       }
@@ -412,8 +468,16 @@ export class HousePart implements EventfulPart {
       view.object.visible = !hidden;
       const size = this.footprint(piece.item, piece.rotation);
       const ground = view.object.position.y;
-      view.pick.box.min.set(piece.cell.cx + FURNITURE_PICK_INSET, ground, piece.cell.cy + FURNITURE_PICK_INSET);
-      view.pick.box.max.set(piece.cell.cx + size.w - FURNITURE_PICK_INSET, ground + FURNITURE_PICK_HEIGHT, piece.cell.cy + size.d - FURNITURE_PICK_INSET);
+      view.pick.box.min.set(
+        piece.cell.cx + FURNITURE_PICK_INSET,
+        ground,
+        piece.cell.cy + FURNITURE_PICK_INSET,
+      );
+      view.pick.box.max.set(
+        piece.cell.cx + size.w - FURNITURE_PICK_INSET,
+        ground + FURNITURE_PICK_HEIGHT,
+        piece.cell.cy + size.d - FURNITURE_PICK_INSET,
+      );
       view.pick.enabled = true;
     }
     for (const [id, view] of this.furniture) {
@@ -441,7 +505,12 @@ export class HousePart implements EventfulPart {
         const material =
           ghost?.material ??
           this.resources.track(
-            new MeshBasicMaterial({ map: this.materials.paletteTexture, transparent: true, opacity: PLACEMENT_OPACITY, depthWrite: false }),
+            new MeshBasicMaterial({
+              map: this.materials.paletteTexture,
+              transparent: true,
+              opacity: PLACEMENT_OPACITY,
+              depthWrite: false,
+            }),
           );
         const object = this.modelFor(preview.item);
         object.traverse((child) => {
@@ -456,8 +525,13 @@ export class HousePart implements EventfulPart {
         this.ghosts.set(character.id, ghost);
       }
       ghost.object.visible = true;
-      ghost.material.color.set(preview.valid ? safeColor(character.appearance.scarf) : INVALID_TINT);
-      ghost.material.opacity = PLACEMENT_OPACITY + Math.sin(context.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
+      ghost.material.color.set(
+        preview.valid ? safeColor(character.appearance.scarf) : INVALID_TINT,
+      );
+      ghost.material.opacity =
+        PLACEMENT_OPACITY +
+        Math.sin(context.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) *
+          GHOST_PULSE;
       this.place(ghost.object, preview.item, preview.cell.cx, preview.cell.cy, preview.rotation);
     }
   }

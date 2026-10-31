@@ -42,7 +42,14 @@ function mound(b: ShapeBuilder, soil: PaletteCell, ridge: PaletteCell): void {
   }
 }
 
-function leaves(b: ShapeBuilder, count: number, length: number, cell: PaletteCell, tilt: number, lift = 0): void {
+function leaves(
+  b: ShapeBuilder,
+  count: number,
+  length: number,
+  cell: PaletteCell,
+  tilt: number,
+  lift = 0,
+): void {
   for (let i = 0; i < count; i += 1) {
     const angle = (360 / count) * i + 17;
     const rad = (angle * Math.PI) / 180;
@@ -65,13 +72,19 @@ const CROPS: Record<string, Builder> = {
       b.box([0.04, 0.03, 0.04], [x, 0.05, z], 'seed', { base: true });
     }
   },
-  radish_stage_sprout: (b) => leaves(b, 2, 0.12, 'sprout', 25),
-  radish_stage_young: (b) => leaves(b, 4, 0.2, 'leaf_crop', 30),
+  radish_stage_sprout: (b) => {
+    leaves(b, 2, 0.12, 'sprout', 25);
+  },
+  radish_stage_young: (b) => {
+    leaves(b, 4, 0.2, 'leaf_crop', 30);
+  },
   radish_stage_ripe: (b) => {
     b.ball(0.09, [0, 0.05, 0], 'radish', { scale: [1, 0.9, 1] });
     leaves(b, 6, 0.26, 'leaf_crop', 32, 0.08);
   },
-  lettuce_stage_sprout: (b) => leaves(b, 3, 0.1, 'sprout', 40),
+  lettuce_stage_sprout: (b) => {
+    leaves(b, 3, 0.1, 'sprout', 40);
+  },
   lettuce_stage_young: (b) => {
     b.blob(0.13, [0, 0.1, 0], 'lettuce', { scale: [1, 0.7, 1] });
   },
@@ -79,8 +92,12 @@ const CROPS: Record<string, Builder> = {
     b.blob(0.22, [0, 0.15, 0], 'lettuce', { scale: [1, 0.72, 1] });
     b.blob(0.14, [0, 0.25, 0], 'lettuce_light', { scale: [1, 0.7, 1], rotation: [0, 30, 0] });
   },
-  carrot_stage_sprout: (b) => leaves(b, 3, 0.14, 'leaf_carrot', 15),
-  carrot_stage_young: (b) => leaves(b, 5, 0.26, 'leaf_carrot', 18),
+  carrot_stage_sprout: (b) => {
+    leaves(b, 3, 0.14, 'leaf_carrot', 15);
+  },
+  carrot_stage_young: (b) => {
+    leaves(b, 5, 0.26, 'leaf_carrot', 18);
+  },
   carrot_stage_ripe: (b) => {
     b.cylinder(0.06, 0.05, 0.05, [0, 0, 0], 'carrot', { base: true });
     leaves(b, 7, 0.36, 'leaf_carrot', 20, 0.04);
@@ -101,11 +118,22 @@ const TREES: Record<string, Builder> = {
   fir: (b) => {
     b.cylinder(0.12, 0.18, 0.9, [0, 0, 0], 'bark_dark', { base: true, segments: 6 });
     b.cone(0.95, 1.4, [0, 0.7, 0], 'leaf_fir', { base: true, segments: 7 });
-    b.cone(0.75, 1.25, [0, 1.45, 0], 'leaf_fir_light', { base: true, segments: 7, rotation: [0, 25, 0] });
+    b.cone(0.75, 1.25, [0, 1.45, 0], 'leaf_fir_light', {
+      base: true,
+      segments: 7,
+      rotation: [0, 25, 0],
+    });
     b.cone(0.5, 1.1, [0, 2.2, 0], 'leaf_fir', { base: true, segments: 7, rotation: [0, 50, 0] });
   },
   stump: (b) => {
-    b.cylinder(0.22, 0.27, 0.32, [0, 0, 0], { top: 'log_end', side: 'bark' }, { base: true, segments: 7 });
+    b.cylinder(
+      0.22,
+      0.27,
+      0.32,
+      [0, 0, 0],
+      { top: 'log_end', side: 'bark' },
+      { base: true, segments: 7 },
+    );
   },
   bush: (b) => {
     b.blob(0.42, [0, 0.32, 0], 'leaf_bush');
@@ -131,9 +159,18 @@ const ITEMS: Record<string, Builder> = {
     b.ball(0.05, [0, 0.2, 0], 'flower_yellow');
   },
   egg: (b) => b.ball(0.045, [0, 0.055, 0], 'egg', { scale: [0.85, 1.1, 0.85], detail: 1 }),
-  log: (b) => b.cylinder(0.13, 0.13, 0.8, [0, 0.13, 0], { top: 'log_end', side: 'bark' }, { rotation: [0, 0, 90], segments: 7 }),
+  log: (b) =>
+    b.cylinder(
+      0.13,
+      0.13,
+      0.8,
+      [0, 0.13, 0],
+      { top: 'log_end', side: 'bark' },
+      { rotation: [0, 0, 90], segments: 7 },
+    ),
   plank: (b) => b.box([0.9, 0.04, 0.18], [0, 0, 0], 'wood_new', { base: true }),
-  beam: (b) => b.box([4.2, 0.2, 0.22], [0, 0, 0], { top: 'wood', side: 'wood_dark' }, { base: true }),
+  beam: (b) =>
+    b.box([4.2, 0.2, 0.22], [0, 0, 0], { top: 'wood', side: 'wood_dark' }, { base: true }),
   nail_box: (b) => b.box([0.16, 0.08, 0.1], [0, 0, 0], 'tin_paint', { base: true }),
   mattress: (b) => b.box([0.9, 0.12, 1.8], [0, 0, 0], 'fabric_cream', { base: true }),
   hoe: (b) => {
@@ -149,8 +186,10 @@ const ITEMS: Record<string, Builder> = {
     b.cylinder(0.02, 0.02, 0.8, [0, 0, 0], 'wood', { base: true, segments: 5 });
     b.box([0.04, 0.12, 0.16], [0, 0.74, 0.06], 'iron_light', {});
   },
-  fishing_rod: (b) => b.cylinder(0.01, 0.02, 1.6, [0, 0, 0], 'wood_new', { base: true, segments: 4 }),
-  bread: (b) => b.ball(0.12, [0, 0.08, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.7, 1] }),
+  fishing_rod: (b) =>
+    b.cylinder(0.01, 0.02, 1.6, [0, 0, 0], 'wood_new', { base: true, segments: 4 }),
+  bread: (b) =>
+    b.ball(0.12, [0, 0.08, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.7, 1] }),
   dish_radishes: (b) => {
     b.cylinder(0.14, 0.1, 0.04, [0, 0, 0], 'ceramic', { base: true, segments: 10 });
     b.ball(0.04, [0.04, 0.06, 0], 'radish');
@@ -164,7 +203,8 @@ const ITEMS: Record<string, Builder> = {
     b.cylinder(0.12, 0.08, 0.09, [0, 0, 0], 'ceramic_blue', { base: true, segments: 10 });
     b.cylinder(0.105, 0.105, 0.01, [0, 0.085, 0], 'soup', { base: true, segments: 10 });
   },
-  iron_box: (b) => b.box([0.3, 0.16, 0.2], [0, 0, 0], { top: 'rust', side: 'iron' }, { base: true }),
+  iron_box: (b) =>
+    b.box([0.3, 0.16, 0.2], [0, 0, 0], { top: 'rust', side: 'iron' }, { base: true }),
   riddle_card: (b) => b.box([0.16, 0.01, 0.11], [0, 0, 0], 'paper', { base: true }),
   shed_key: (b) => {
     b.box([0.12, 0.015, 0.025], [0, 0, 0], 'brass', { base: true });
@@ -192,7 +232,12 @@ ITEMS.seed_packet_carrot = seedPacket('carrot');
 
 const FURNITURE: Record<string, Builder> = {
   straw_mattress: (b, w, d) => {
-    b.box([w * 0.85, 0.16, d * 0.9], [0, 0, 0], { top: 'straw', side: 'straw_dark' }, { base: true });
+    b.box(
+      [w * 0.85, 0.16, d * 0.9],
+      [0, 0, 0],
+      { top: 'straw', side: 'straw_dark' },
+      { base: true },
+    );
     b.box([w * 0.6, 0.1, 0.3], [0, 0.16, -d * 0.32], 'fabric_cream', { base: true });
   },
   double_bed: (b, w, d) => {
@@ -262,7 +307,10 @@ const FURNITURE: Record<string, Builder> = {
   },
   crystal_radio: (b) => {
     b.box([0.4, 0.26, 0.25], [0, 0, 0], { top: 'wood_dark', side: 'wood' }, { base: true });
-    b.cylinder(0.05, 0.05, 0.03, [-0.1, 0.13, 0.13], 'brass', { rotation: [90, 0, 0], segments: 8 });
+    b.cylinder(0.05, 0.05, 0.03, [-0.1, 0.13, 0.13], 'brass', {
+      rotation: [90, 0, 0],
+      segments: 8,
+    });
     b.cylinder(0.01, 0.01, 0.3, [0.12, 0.26, -0.05], 'iron', { base: true, segments: 4 });
   },
 };
@@ -316,7 +364,12 @@ const TRAIN: Record<string, Builder> = {
   },
   coach: (b) => {
     b.box([8, 0.35, 2.2], [0, 0.6, 0], 'black', { base: true });
-    b.box([7.8, 2.0, 2.3], [0, 0.95, 0], { top: 'coach_cream', side: 'coach_brown' }, { base: true });
+    b.box(
+      [7.8, 2.0, 2.3],
+      [0, 0.95, 0],
+      { top: 'coach_cream', side: 'coach_brown' },
+      { base: true },
+    );
     b.box([8.0, 0.2, 2.5], [0, 2.95, 0], 'lauze_dark', { base: true });
     for (let i = 0; i < 5; i += 1) {
       const x = -3 + i * 1.5;
@@ -357,16 +410,23 @@ function cottage(wall: PaletteCell, roof: PaletteCell, trim: PaletteCell): Build
     const slope = (Math.atan2(roofRise, (d * 0.85) / 2) * 180) / Math.PI;
     const run = Math.hypot(roofRise, (d * 0.85) / 2) + 0.35;
     for (const side of [-1, 1]) {
-      b.box([w * 0.98 + 0.3, 0.14, run], [0, height + roofRise / 2, side * (d * 0.85) * 0.25], roof, {
-        rotation: [side * slope, 0, 0],
-      });
+      b.box(
+        [w * 0.98 + 0.3, 0.14, run],
+        [0, height + roofRise / 2, side * (d * 0.85) * 0.25],
+        roof,
+        {
+          rotation: [side * slope, 0, 0],
+        },
+      );
     }
     b.box([0.9, 1.7, 0.08], [0, 0, (d * 0.85) / 2 + 0.03], trim, { base: true });
     for (const x of [-w * 0.28, w * 0.28]) {
       b.box([0.75, 0.8, 0.06], [x, 1.25, (d * 0.85) / 2 + 0.03], 'glass', {});
       b.box([0.85, 0.08, 0.1], [x, 0.82, (d * 0.85) / 2 + 0.05], trim, {});
     }
-    b.box([0.45, 0.9, 0.45], [w * 0.3, height + roofRise * 0.4, -d * 0.15], 'brick', { base: true });
+    b.box([0.45, 0.9, 0.45], [w * 0.3, height + roofRise * 0.4, -d * 0.15], 'brick', {
+      base: true,
+    });
   };
 }
 
@@ -384,7 +444,14 @@ const DECOR: Record<string, Builder> = {
     b.cylinder(0.08, 0.17, 0.28, [0.4, 1.83, 0], 'brass', { base: true, segments: 9 });
   },
   well: (b) => {
-    b.cylinder(0.7, 0.75, 0.75, [0, 0, 0], { top: 'water_deep', side: 'stone' }, { base: true, segments: 10 });
+    b.cylinder(
+      0.7,
+      0.75,
+      0.75,
+      [0, 0, 0],
+      { top: 'water_deep', side: 'stone' },
+      { base: true, segments: 10 },
+    );
     b.cylinder(0.72, 0.72, 0.1, [0, 0.75, 0], 'stone_light', { base: true, segments: 10 });
     for (const x of [-0.62, 0.62]) {
       b.box([0.1, 1.5, 0.1], [x, 0.75, 0], 'wood_dark', { base: true });
@@ -409,7 +476,14 @@ const DECOR: Record<string, Builder> = {
     b.box([1.8, 0.1, 0.3], [0, 2.0, 0], 'tile_dark', { base: true });
   },
   barrel: (b) => {
-    b.cylinder(0.3, 0.34, 0.9, [0, 0, 0], { top: 'water', side: 'wood' }, { base: true, segments: 9 });
+    b.cylinder(
+      0.3,
+      0.34,
+      0.9,
+      [0, 0, 0],
+      { top: 'water', side: 'wood' },
+      { base: true, segments: 9 },
+    );
     b.cylinder(0.35, 0.35, 0.05, [0, 0.2, 0], 'iron', { base: true, segments: 9 });
     b.cylinder(0.33, 0.33, 0.05, [0, 0.72, 0], 'iron', { base: true, segments: 9 });
   },
@@ -433,10 +507,17 @@ const DECOR: Record<string, Builder> = {
     const length = Math.max(1.5, w * 0.8);
     for (let row = 0; row < 3; row += 1) {
       for (let i = 0; i < 4 - row; i += 1) {
-        b.cylinder(0.14, 0.14, length, [(-1.5 + row * 0.5 + i) * 0.3, 0.14 + row * 0.25, 0], { top: 'log_end', side: 'bark' }, {
-          rotation: [0, 0, 90],
-          segments: 7,
-        });
+        b.cylinder(
+          0.14,
+          0.14,
+          length,
+          [(-1.5 + row * 0.5 + i) * 0.3, 0.14 + row * 0.25, 0],
+          { top: 'log_end', side: 'bark' },
+          {
+            rotation: [0, 0, 90],
+            segments: 7,
+          },
+        );
       }
     }
   },
@@ -444,7 +525,13 @@ const DECOR: Record<string, Builder> = {
     b.ball(0.45, [0, 0.2, 0], { top: 'rock_light', side: 'rock' }, { scale: [1.2, 0.7, 1] });
   },
   flowers: (b) => {
-    const cells: PaletteCell[] = ['flower_red', 'flower_yellow', 'flower_white', 'flower_blue', 'flower_pink'];
+    const cells: PaletteCell[] = [
+      'flower_red',
+      'flower_yellow',
+      'flower_white',
+      'flower_blue',
+      'flower_pink',
+    ];
     b.blob(0.32, [0, 0.12, 0], 'leaf_bush', { scale: [1.3, 0.55, 1.3] });
     cells.forEach((cell, i) => {
       const angle = (i / cells.length) * Math.PI * 2;
@@ -462,7 +549,10 @@ const DECOR: Record<string, Builder> = {
   sawmill: cottage('wood_old', 'lauze_dark', 'wood_dark'),
   shed: (b, w, d) => {
     b.box([w * 0.92, 2.4, d * 0.85], [0, 0, 0], 'wood_old_dark', { base: true });
-    b.box([w * 0.98, 0.15, d * 0.95], [0, 2.4, 0], 'lauze_dark', { base: true, rotation: [0, 0, 4] });
+    b.box([w * 0.98, 0.15, d * 0.95], [0, 2.4, 0], 'lauze_dark', {
+      base: true,
+      rotation: [0, 0, 4],
+    });
     b.box([w * 0.5, 2.0, 0.06], [0, 0, (d * 0.85) / 2 + 0.03], 'wood_dark', { base: true });
   },
   awning: (b, w, d) => {
@@ -502,7 +592,9 @@ const DECOR: Record<string, Builder> = {
       }
     }
     for (let i = 0; i < 5; i += 1) {
-      b.box([0.08, 0.08, d * 0.95], [-w * 0.45 + (i * w * 0.9) / 4, 2.3, 0], 'wood', { base: true });
+      b.box([0.08, 0.08, d * 0.95], [-w * 0.45 + (i * w * 0.9) / 4, 2.3, 0], 'wood', {
+        base: true,
+      });
     }
     b.blob(0.5, [-w * 0.3, 2.45, 0.2], 'leaf_bush', { scale: [1.4, 0.5, 1.3] });
     b.blob(0.45, [w * 0.25, 2.45, -0.2], 'leaf_hazel', { scale: [1.5, 0.5, 1.2] });
@@ -514,7 +606,12 @@ const DECOR: Record<string, Builder> = {
     }
   },
   pontoon: (b, w, d) => {
-    b.box([w * 0.95, 0.1, d * 0.95], [0, 0.4, 0], { top: 'wood_old', side: 'wood_old_dark' }, { base: true });
+    b.box(
+      [w * 0.95, 0.1, d * 0.95],
+      [0, 0.4, 0],
+      { top: 'wood_old', side: 'wood_old_dark' },
+      { base: true },
+    );
     for (const x of [-w * 0.4, w * 0.4]) {
       for (const z of [-d * 0.4, 0, d * 0.4]) {
         b.cylinder(0.08, 0.08, 1.0, [x, -0.5, z], 'wood_old_dark', { base: true, segments: 5 });
@@ -538,8 +635,12 @@ const EXACT: Record<string, Builder> = {
   ...ANIMALS,
   ...TRAIN,
   ...DECOR,
-  garden_cell_tilled: (b) => mound(b, 'soil_tilled', 'soil_tilled_light'),
-  garden_cell_tilled_wet: (b) => mound(b, 'soil_wet', 'soil_wet_light'),
+  garden_cell_tilled: (b) => {
+    mound(b, 'soil_tilled', 'soil_tilled_light');
+  },
+  garden_cell_tilled_wet: (b) => {
+    mound(b, 'soil_wet', 'soil_wet_light');
+  },
 };
 
 /** Mots-clés reconnus dans un nom inconnu (le premier qui correspond l'emporte). */
@@ -586,14 +687,18 @@ function unknownBuilder(b: ShapeBuilder, w: number, d: number): void {
 }
 
 function sizeOf(name: string, hints: SubstituteHints): { w: number; d: number } {
-  const building = /house|maison|station|halte|grocery|epicerie|sawmill|scierie|shed|remise|awning|platform|quai/.test(name);
+  const building =
+    /house|maison|station|halte|grocery|epicerie|sawmill|scierie|shed|remise|awning|platform|quai/.test(
+      name,
+    );
   const fallback = building ? DEFAULT_BUILDING_SIZE : DEFAULT_PROP_SIZE;
   return { w: hints.width ?? fallback, d: hints.depth ?? fallback };
 }
 
 /** Pièces du substitut d'un modèle (une seule pièce, sauf exceptions). */
 export function buildSubstitute(name: string, hints: SubstituteHints = {}): SubstitutePart[] {
-  const builder = EXACT[name] ?? KEYWORDS.find(([pattern]) => pattern.test(name))?.[1] ?? unknownBuilder;
+  const builder =
+    EXACT[name] ?? KEYWORDS.find(([pattern]) => pattern.test(name))?.[1] ?? unknownBuilder;
   const { w, d } = sizeOf(name, hints);
   const shapes = new ShapeBuilder();
   builder(shapes, w, d);

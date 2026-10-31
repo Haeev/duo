@@ -55,5 +55,9 @@ export class ResourceTracker {
 }
 
 function isTexture(value: unknown): value is Texture {
-  return typeof value === 'object' && value !== null && (value as { isTexture?: unknown }).isTexture === true;
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value as { isTexture?: unknown }).isTexture === true
+  );
 }

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Vérification des modèles</title>
+<style>html,body{margin:0;background:#dce6ee}canvas{display:block}</style>
+<script type="importmap">
+{"imports": {"three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/"}}
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+const params = new URLSearchParams(location.search);
+const file = params.get('f');
+const W = 1600, H = 900;
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#dce6ee');
+scene.add(new THREE.HemisphereLight(0xeaf2ff, 0x8a9a6a, 1.3));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.2);
+sun.position.set(30, 50, 20);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: '#a7b98a' }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.01;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const report = { file, errors: [], nodes: 0, meshes: 0, skinned: 0, triangles: 0, materials: new Set(), animations: [], roots: [] };
+window.addEventListener('error', (e) => report.errors.push(String(e.message)));
+
+const mixers = [];
+const placed = new THREE.Group();
+scene.add(placed);
+
+function fitCamera() {
+  const box = new THREE.Box3().setFromObject(placed);
+  const size = box.getSize(new THREE.Vector3());
+  const c = box.getCenter(new THREE.Vector3());
+  const span = Math.max(size.x, size.z) * 1.0 + size.y * 0.5;
+  const cam = new THREE.OrthographicCamera(-span / 2 * W / H, span / 2 * W / H, span / 2, -span / 2, 0.1, 1000);
+  cam.position.set(c.x + 60, c.y + 50, c.z + 60);
+  cam.lookAt(c);
+  cam.zoom = 1.15;
+  cam.updateProjectionMatrix();
+  sun.shadow.camera.left = -span; sun.shadow.camera.right = span;
+  sun.shadow.camera.top = span; sun.shadow.camera.bottom = -span;
+  sun.shadow.camera.far = 400;
+  sun.target.position.copy(c);
+  sun.position.set(c.x + 30, 50, c.z + 20);
+  scene.add(sun.target);
+  return cam;
+}
+
+function layoutRow(objs, gap, maxW) {
+  let x = 0, z = 0, rowDepth = 0;
+  for (const o of objs) {
+    const b = new THREE.Box3().setFromObject(o);
+    const s = b.getSize(new THREE.Vector3());
+    if (x + s.x > maxW) { x = 0; z += rowDepth + gap; rowDepth = 0; }
+    o.position.x += x - b.min.x;
+    o.position.z += z - b.min.z;
+    if (b.min.y < 0) o.position.y -= b.min.y;
+    x += s.x + gap;
+    rowDepth = Math.max(rowDepth, s.z);
+    placed.add(o);
+  }
+}
+
+function count(root) {
+  root.traverse((o) => {
+    report.nodes++;
+    if (o.isMesh) {
+      report.meshes++;
+      if (o.isSkinnedMesh) report.skinned++;
+      const g = o.geometry;
+      report.triangles += (g.index ? g.index.count : g.attributes.position.count) / 3;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats) { report.materials.add(m.name); m.emissiveIntensity = 0; }
+      o.castShadow = true; o.receiveShadow = true;
+    }
+  });
+}
+
+const gltf = await new GLTFLoader().loadAsync('/modeles/' + file);
+report.animations = gltf.animations.map((a) => `${a.name} (${a.duration.toFixed(2)} s, ${a.tracks.length} pistes)`);
+count(gltf.scene);
+report.roots = gltf.scene.children.map((c) => c.name);
+
+const clip = (n) => gltf.animations.find((a) => a.name === n);
+if (file === 'personnages.glb') {
+  const combos = [
+    ['player_base', 'player_outfit_work', 'player_hair_short', 'player_scarf_orb', 'walk'],
+    ['player_base', 'player_outfit_smock', 'player_hair_bun', 'player_scarf_crescent', 'water'],
+    ['player_base', 'player_outfit_overalls', 'player_hair_bob', 'player_scarf_sun', 'hoe'],
+    ['villager_firmin', 'talk'], ['villager_odette', 'idle'], ['villager_basile', 'saw'],
+    ['villager_jeanne', 'wave'], ['villager_lucie', 'give'],
+  ];
+  const objs = [];
+  for (const c of combos) {
+    const anim = c[c.length - 1];
+    const parts = c.slice(0, -1);
+    const inst = SkeletonUtils.clone(gltf.scene);
+    inst.traverse((o) => { if (o.isMesh) o.visible = parts.includes(o.name); });
+    if (parts[0] === 'villager_jeanne') inst.scale.setScalar(0.75);
+    const face = inst.getObjectByName(parts[0]);
+    if (face && face.morphTargetDictionary && 'happy' in face.morphTargetDictionary) {
+      face.morphTargetInfluences[face.morphTargetDictionary.happy] = 1;
+    }
+    const m = new THREE.AnimationMixer(inst);
+    m.clipAction(clip(anim)).play();
+    m.update(0.37);
+    mixers.push(m);
+    objs.push(inst);
+  }
+  let x = 0;
+  for (const o of objs) { o.position.x = x; x += 1.1; placed.add(o); }
+} else {
+  const objs = [];
+  for (const child of [...gltf.scene.children]) {
+    if (child.userData && child.userData.alias_of) continue;
+    let inst;
+    if (child.name === 'hen') {
+      for (const v of ['hen_white', 'hen_red', 'hen_black']) {
+        const h = SkeletonUtils.clone(child);
+        h.traverse((o) => { if (o.isMesh) o.visible = o.name === v; });
+        const m = new THREE.AnimationMixer(h);
+        m.clipAction(clip(v === 'hen_red' ? 'hen_peck' : 'hen_walk')).play();
+        m.update(0.3);
+        mixers.push(m);
+        objs.push(h);
+      }
+      continue;
+    }
+    if (child.name === 'gatekeeper_house' || child.name === 'henhouse') {
+      for (const st of child.children) {
+        const s = st.clone();
+        s.position.set(0, 0, 0);
+        objs.push(s);
+      }
+      continue;
+    }
+    inst = child.clone();
+    inst.position.set(0, 0, 0);
+    const roll = clip(child.name + '_roll');
+    if (roll) {
+      const m = new THREE.AnimationMixer(inst);
+      m.clipAction(roll).play();
+      m.update(0.2);
+      mixers.push(m);
+    }
+    objs.push(inst);
+  }
+  const widths = { 'bourg.glb': 70, 'ferme.glb': 8, 'maison.glb': 9, 'train.glb': 40 };
+  layoutRow(objs, file === 'bourg.glb' ? 1.5 : 0.5, widths[file] || 20);
+}
+const cam = fitCamera();
+renderer.render(scene, cam);
+report.materials = [...report.materials];
+report.renderCalls = renderer.info.render.calls;
+report.renderTriangles = renderer.info.render.triangles;
+report.programs = renderer.info.programs.length;
+window.__report = report;
+</script>
+</body>
+</html>

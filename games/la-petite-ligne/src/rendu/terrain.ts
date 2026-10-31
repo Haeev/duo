@@ -47,7 +47,11 @@ class GeometryWriter {
   private readonly n = new Vector3();
 
   /** Quadrilatère a, b, c, d (dans l'ordre du pourtour), orienté vers `normal`. */
-  quad(points: readonly (readonly [number, number, number])[], normal: readonly [number, number, number], cell: PaletteCell): void {
+  quad(
+    points: readonly (readonly [number, number, number])[],
+    normal: readonly [number, number, number],
+    cell: PaletteCell,
+  ): void {
     const [p0, p1, p2, p3] = points;
     if (p0 === undefined || p1 === undefined || p2 === undefined || p3 === undefined) {
       return;
@@ -96,7 +100,8 @@ function extendedKind(kind: GroundKind): GroundKind {
 export class Terrain {
   readonly group = new Group();
   private readonly ext = SETTINGS.extension;
-  private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] = [];
+  private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] =
+    [];
 
   /**
    * `floorHeight`: hauteur de marche d'un sol posé (quai, ponton), lue dans les
@@ -106,7 +111,8 @@ export class Terrain {
     private readonly map: GameMap,
     materials: SharedMaterials,
     resources: ResourceTracker,
-    floorHeight: (prop: MapProp) => number | undefined = (prop) => RENDER_SETTINGS.floorProps[prop.model],
+    floorHeight: (prop: MapProp) => number | undefined = (prop) =>
+      RENDER_SETTINGS.floorProps[prop.model],
   ) {
     this.group.name = 'terrain';
     for (const prop of map.props) {
@@ -140,7 +146,12 @@ export class Terrain {
     const raw = this.map.ground[index] ?? 'grass';
     const kind = inside ? raw : extendedKind(raw);
     const ford = kind === 'water' && this.map.blocked[index] === false;
-    const height = kind === 'water' ? (ford ? SETTINGS.fordBed : SETTINGS.heights.water) : SETTINGS.heights[kind];
+    const height =
+      kind === 'water'
+        ? ford
+          ? SETTINGS.fordBed
+          : SETTINGS.heights.water
+        : SETTINGS.heights[kind];
     return { kind, ford, height };
   }
 
@@ -167,10 +178,16 @@ export class Terrain {
     switch (look.kind) {
       case 'grass': {
         const n = valueNoise(cx, cy, SETTINGS.grassPatchScale, NOISE_SEED_GRASS);
-        return n < DARK_GRASS_BELOW ? 'grass_dark' : n > LIGHT_GRASS_ABOVE ? 'grass_light' : 'grass';
+        return n < DARK_GRASS_BELOW
+          ? 'grass_dark'
+          : n > LIGHT_GRASS_ABOVE
+            ? 'grass_light'
+            : 'grass';
       }
       case 'path':
-        return valueNoise(cx, cy, SETTINGS.grassPatchScale / 2, NOISE_SEED_PATH) > PATH_DARK_ABOVE ? 'path_dark' : 'path';
+        return valueNoise(cx, cy, SETTINGS.grassPatchScale / 2, NOISE_SEED_PATH) > PATH_DARK_ABOVE
+          ? 'path_dark'
+          : 'path';
       case 'dirt':
         return 'soil';
       case 'gravel':
@@ -209,7 +226,12 @@ export class Terrain {
   }
 
   private insideBand(cx: number, cy: number): boolean {
-    return cx >= -this.ext && cy >= -this.ext && cx < this.map.width + this.ext && cy < this.map.height + this.ext;
+    return (
+      cx >= -this.ext &&
+      cy >= -this.ext &&
+      cx < this.map.width + this.ext &&
+      cy < this.map.height + this.ext
+    );
   }
 
   private buildGround(): BufferGeometry {
@@ -250,7 +272,9 @@ export class Terrain {
         const h = look.height;
         for (const side of SIDES) {
           const outside = !this.insideBand(cx + side.dx, cy + side.dy);
-          const neighbourHeight = outside ? ringHeight : this.look(cx + side.dx, cy + side.dy).height;
+          const neighbourHeight = outside
+            ? ringHeight
+            : this.look(cx + side.dx, cy + side.dy).height;
           if (neighbourHeight === h || (!outside && neighbourHeight > h)) {
             continue;
           }

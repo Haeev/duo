@@ -114,7 +114,11 @@ export class IsoCameraRig {
   }
 
   private zoom(direction: number): void {
-    const next = MathUtils.clamp(this.zoomIndex + direction, 0, this.settings.viewWidths.length - 1);
+    const next = MathUtils.clamp(
+      this.zoomIndex + direction,
+      0,
+      this.settings.viewWidths.length - 1,
+    );
     if (next === this.zoomIndex) {
       return;
     }
@@ -173,7 +177,14 @@ export class IsoCameraRig {
    * Avance d'une image: transitions, suivi doux de `(x, y)` avec une légère
    * anticipation dans le sens de la marche, tremblement, puis place la caméra.
    */
-  update(dt: number, x: number, y: number, velocityX: number, velocityY: number, bounds: Bounds | null): void {
+  update(
+    dt: number,
+    x: number,
+    y: number,
+    velocityX: number,
+    velocityY: number,
+    bounds: Bounds | null,
+  ): void {
     this.time += dt;
     if (!this.hasFocus) {
       this.snapTo(x, y);
@@ -190,7 +201,10 @@ export class IsoCameraRig {
     }
 
     const speed = Math.hypot(velocityX, velocityY);
-    const leadAmount = speed > 0 ? (this.settings.lookAhead * Math.min(1, speed / this.settings.lookAheadSpeed)) / speed : 0;
+    const leadAmount =
+      speed > 0
+        ? (this.settings.lookAhead * Math.min(1, speed / this.settings.lookAheadSpeed)) / speed
+        : 0;
     this.tmpLead.set(velocityX * leadAmount, 0, velocityY * leadAmount);
     this.lead.lerp(this.tmpLead, smoothFactor(dt, this.settings.lookAheadHalfLife));
     this.tmpGoal.set(x, 0, y).add(this.lead);
@@ -207,7 +221,11 @@ export class IsoCameraRig {
     const elevation = this.settings.elevationDeg * DEG;
     const distance = this.settings.distance;
     const horizontal = Math.cos(elevation) * distance;
-    this.offset.set(-Math.cos(this.yawShown) * horizontal, Math.sin(elevation) * distance, -Math.sin(this.yawShown) * horizontal);
+    this.offset.set(
+      -Math.cos(this.yawShown) * horizontal,
+      Math.sin(elevation) * distance,
+      -Math.sin(this.yawShown) * horizontal,
+    );
     this.camera.position.copy(this.focus).add(this.offset);
     this.camera.lookAt(this.focus);
 
@@ -218,7 +236,9 @@ export class IsoCameraRig {
       this.up.setFromMatrixColumn(this.camera.matrix, 1);
       const dx = Math.sin(phase) * Math.cos(phase * SHAKE_SECONDARY);
       const dy = Math.sin(phase * SHAKE_TERTIARY + 1);
-      this.camera.position.addScaledVector(this.right, dx * shake).addScaledVector(this.up, dy * shake);
+      this.camera.position
+        .addScaledVector(this.right, dx * shake)
+        .addScaledVector(this.up, dy * shake);
       this.trauma = Math.max(0, this.trauma - this.settings.shakeDecay * dt);
     }
     this.camera.updateMatrixWorld();
@@ -244,7 +264,6 @@ export class IsoCameraRig {
   /** Point du sol (hauteur `height`) sous un point de l'écran, ou `null`. */
   groundAt(ndcX: number, ndcY: number, height = 0): Vector3 | null {
     this.groundPlane.constant = -height;
-    const hit = this.ray(ndcX, ndcY).ray.intersectPlane(this.groundPlane, this.hit);
-    return hit === null ? null : hit;
+    return this.ray(ndcX, ndcY).ray.intersectPlane(this.groundPlane, this.hit);
   }
 }

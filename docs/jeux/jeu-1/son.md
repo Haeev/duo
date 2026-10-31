@@ -175,11 +175,11 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 | Habitant | Motif | Ce qu'il dit du caractère |
 |---|---|---|
-| Odette Ferrand, épicière | accordéon qui sautille, pizzicati, et un petit rire en trille à la fin | gourmande, bavarde, rieuse |
-| Firmin Lacombe, chef de halte | la pendule de la halte (tic-tac), deux notes bougonnes du basson, puis un accord tendre du cor | bourru, ponctuel, tendre |
-| Basile Cornu, menuisier | trois notes de marimba (du bois), lentes, sur un violoncelle | taiseux, patient |
-| Jeanne Ribot, dix ans | la flûte à bec qui monte et reste en l'air sur la sixte, comme une question, et un trille d'oiseau | intrépide, mille questions, les oiseaux |
-| Lucie Arnaud, factrice (seulement citée dans la démo) | la flûte qui file en gamme, et la sonnette de son vélo | curieuse, pressée |
+| Odette Ferrand, épicière (`talk-odette`) | accordéon qui sautille, pizzicati, et un petit rire en trille à la fin | gourmande, bavarde, rieuse |
+| Firmin Lacombe, chef de halte (`talk-firmin`) | la pendule de la halte (tic-tac), deux notes bougonnes du basson, puis un accord tendre du cor | bourru, ponctuel, tendre |
+| Basile Cornu, menuisier (`talk-basile`) | trois notes de marimba (du bois), lentes, sur un violoncelle | taiseux, patient |
+| Jeanne Ribot, dix ans (`talk-jeanne`) | la flûte à bec qui monte et reste en l'air sur la sixte, comme une question, et un trille d'oiseau | intrépide, mille questions, les oiseaux |
+| Lucie Arnaud, factrice, seulement citée dans la démo (`talk-lucie`) | la flûte qui file en gamme, et la sonnette de son vélo | curieuse, pressée |
 
 ## 6. Intégration technique
 
@@ -197,6 +197,9 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 - `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 121 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
+- Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
+
+**Pour l'écoute du client** (`design/son/la-petite-ligne/`, AAC à 96 kbit/s, lisible directement sur Mac): `ecoute.m4a` (9 min) enchaîne les musiques (pour chaque boucle, 14 s avant le raccord et 10 s après: on entend le passage de la fin au début), la séquence du train (arrivée, attente, départ), le sifflet lointain, chaque effet avec toutes ses variantes, les motifs des habitants et les ambiances; `musiques/` contient une boucle complète de chaque musique. Les niveaux relatifs sont ceux du jeu, sauf les musiques, jouées 4 dB plus fort que dans le jeu.
 
 ## 8. Écarts et limites
 

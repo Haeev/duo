@@ -186,7 +186,11 @@ export class ModelLibrary {
       return this.resources.trackMaterial(material);
     }
     const textureName = material.map?.name ?? '';
-    if (textureName.startsWith('palette') || material.name.includes('palette') || material.name.includes('world')) {
+    if (
+      textureName.startsWith('palette') ||
+      material.name.includes('palette') ||
+      material.name.includes('world')
+    ) {
       material.map?.dispose();
       material.dispose();
       return this.materials.palette;

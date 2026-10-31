@@ -122,7 +122,7 @@ def coq(rng: np.random.Generator) -> np.ndarray:
     puis descente de hauteur, voix éraillée."""
     syllabes = [(0.00, 0.13, 520, 560, "o"), (0.17, 0.13, 600, 640, "o"), (0.34, 0.20, 760, 820, "e"),
                 (0.58, 0.95, 840, 620, "o")]
-    total = toile = np.zeros(dsp.n_ech(1.7))
+    toile = np.zeros(dsp.n_ech(1.7))
     for (t0, d, fa, fb, v) in syllabes:
         n = dsp.n_ech(d)
         t = np.arange(n) / SR
@@ -136,4 +136,4 @@ def coq(rng: np.random.Generator) -> np.ndarray:
         y = sum(dsp.resonateur(source + souffle, fc, q) * g for (fc, q), g in zip(form, (1.0, 0.6, 0.3)))
         y *= dsp.env_ar(n, 0.012, min(0.08, d * 0.4)) * (1.0 if d < 0.5 else dsp.env_points(n, [(0, 1), (d * 0.7, 0.9), (d, 0.5)]))
         dsp.poser(toile, y, t0)
-    return total
+    return toile

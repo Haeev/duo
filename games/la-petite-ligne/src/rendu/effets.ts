@@ -82,16 +82,106 @@ interface Burst {
 }
 
 const BURSTS = {
-  soil: { cell: 'soil_tilled', count: 10, speed: 1.6, up: 2.6, life: 0.6, size: 0.08, gravity: 1, drag: 0.5 },
-  seed: { cell: 'seed', count: 8, speed: 0.6, up: 0.6, life: 0.5, size: 0.04, gravity: 1, drag: 0.5 },
-  water: { cell: 'water_foam', count: 16, speed: 1.2, up: 1.8, life: 0.55, size: 0.05, gravity: 1, drag: 0.3 },
-  leaf: { cell: 'leaf_crop_light', count: 8, speed: 1.4, up: 2.2, life: 0.6, size: 0.06, gravity: 0.6, drag: 1.2 },
-  chips: { cell: 'wood_new', count: 9, speed: 2.4, up: 2.0, life: 0.6, size: 0.07, gravity: 1, drag: 0.6 },
-  dust: { cell: 'stone_light', count: 26, speed: 1.3, up: 0.7, life: 1.1, size: 0.18, gravity: -0.05, drag: 2.2 },
-  grain: { cell: 'grain', count: 14, speed: 1.0, up: 1.4, life: 0.7, size: 0.035, gravity: 1, drag: 0.4 },
-  sparkle: { cell: 'flame', count: 10, speed: 1.1, up: 1.6, life: 0.8, size: 0.06, gravity: -0.15, drag: 1.5 },
-  bell: { cell: 'flame', count: 2, speed: 0.15, up: 0.5, life: 1.2, size: 0.045, gravity: -0.1, drag: 0.8 },
-  smoke: { cell: 'white_paint', count: 1, speed: 0.3, up: 1.2, life: FX.smokeSeconds, size: 0.5, gravity: -0.05, drag: 0.4 },
+  soil: {
+    cell: 'soil_tilled',
+    count: 10,
+    speed: 1.6,
+    up: 2.6,
+    life: 0.6,
+    size: 0.08,
+    gravity: 1,
+    drag: 0.5,
+  },
+  seed: {
+    cell: 'seed',
+    count: 8,
+    speed: 0.6,
+    up: 0.6,
+    life: 0.5,
+    size: 0.04,
+    gravity: 1,
+    drag: 0.5,
+  },
+  water: {
+    cell: 'water_foam',
+    count: 16,
+    speed: 1.2,
+    up: 1.8,
+    life: 0.55,
+    size: 0.05,
+    gravity: 1,
+    drag: 0.3,
+  },
+  leaf: {
+    cell: 'leaf_crop_light',
+    count: 8,
+    speed: 1.4,
+    up: 2.2,
+    life: 0.6,
+    size: 0.06,
+    gravity: 0.6,
+    drag: 1.2,
+  },
+  chips: {
+    cell: 'wood_new',
+    count: 9,
+    speed: 2.4,
+    up: 2.0,
+    life: 0.6,
+    size: 0.07,
+    gravity: 1,
+    drag: 0.6,
+  },
+  dust: {
+    cell: 'stone_light',
+    count: 26,
+    speed: 1.3,
+    up: 0.7,
+    life: 1.1,
+    size: 0.18,
+    gravity: -0.05,
+    drag: 2.2,
+  },
+  grain: {
+    cell: 'grain',
+    count: 14,
+    speed: 1.0,
+    up: 1.4,
+    life: 0.7,
+    size: 0.035,
+    gravity: 1,
+    drag: 0.4,
+  },
+  sparkle: {
+    cell: 'flame',
+    count: 10,
+    speed: 1.1,
+    up: 1.6,
+    life: 0.8,
+    size: 0.06,
+    gravity: -0.15,
+    drag: 1.5,
+  },
+  bell: {
+    cell: 'flame',
+    count: 2,
+    speed: 0.15,
+    up: 0.5,
+    life: 1.2,
+    size: 0.045,
+    gravity: -0.1,
+    drag: 0.8,
+  },
+  smoke: {
+    cell: 'white_paint',
+    count: 1,
+    speed: 0.3,
+    up: 1.2,
+    life: FX.smokeSeconds,
+    size: 0.5,
+    gravity: -0.05,
+    drag: 0.4,
+  },
 } satisfies Record<string, Burst>;
 
 export type BurstKind = keyof typeof BURSTS;
@@ -117,10 +207,19 @@ class ParticlePool {
   private readonly color = new Color();
   private seed = 1;
 
-  constructor(materials: SharedMaterials, resources: ResourceTracker, private readonly paint: SharedMaterials['paletteColor']) {
+  constructor(
+    materials: SharedMaterials,
+    resources: ResourceTracker,
+    private readonly paint: SharedMaterials['paletteColor'],
+  ) {
     this.capacity = FX.maxParticles;
     const cube = new ShapeBuilder().box([1, 1, 1], [0, 0, 0], 'white_paint').build();
-    this.mesh = createInstanced('particules', resources.track(cube), materials.palette, this.capacity);
+    this.mesh = createInstanced(
+      'particules',
+      resources.track(cube),
+      materials.palette,
+      this.capacity,
+    );
     this.mesh.castShadow = false;
     this.mesh.receiveShadow = false;
     this.mesh.frustumCulled = false;
@@ -176,7 +275,8 @@ class ParticlePool {
       this.life[i] = remaining;
       const drag = Math.max(0, 1 - (this.drag[i] ?? 0) * dt);
       const vx = (this.velocity[i * 3] ?? 0) * drag;
-      const vy = ((this.velocity[i * 3 + 1] ?? 0) - (this.gravity[i] ?? 0) * FX.gravity * dt) * drag;
+      const vy =
+        ((this.velocity[i * 3 + 1] ?? 0) - (this.gravity[i] ?? 0) * FX.gravity * dt) * drag;
       const vz = (this.velocity[i * 3 + 2] ?? 0) * drag;
       this.velocity[i * 3] = vx;
       this.velocity[i * 3 + 1] = vy;
@@ -192,7 +292,10 @@ class ParticlePool {
       }
       const t = remaining / (this.maxLife[i] ?? 1);
       const base = this.size[i] ?? 0;
-      const size = this.grows[i] === 1 ? base * (1 + (1 - t) * 2) * Math.min(1, t * 3) : base * Math.min(1, t * 2);
+      const size =
+        this.grows[i] === 1
+          ? base * (1 + (1 - t) * 2) * Math.min(1, t * 3)
+          : base * Math.min(1, t * 2);
       this.at.set(px, py, pz);
       this.spin.setFromEuler(this.euler.set(t * 7 + i, t * 5, 0));
       this.scale.setScalar(size);
@@ -270,7 +373,12 @@ export class EffectsPart implements EventfulPart {
       frame.box([w, HIGHLIGHT_HEIGHT, d], [x, 0, z], 'white_paint');
     }
     this.highlightMaterial = resources.track(
-      new MeshBasicMaterial({ map: materials.paletteTexture, transparent: true, opacity: HIGHLIGHT_OPACITY, depthWrite: false }),
+      new MeshBasicMaterial({
+        map: materials.paletteTexture,
+        transparent: true,
+        opacity: HIGHLIGHT_OPACITY,
+        depthWrite: false,
+      }),
     );
     this.highlight = new Mesh(resources.track(frame.build()), this.highlightMaterial);
     this.highlight.name = 'case visee';
@@ -283,7 +391,12 @@ export class EffectsPart implements EventfulPart {
     paintGeometry(ring, 'white_paint');
     resources.track(ring);
     this.markerMaterial = resources.track(
-      new MeshBasicMaterial({ map: materials.paletteTexture, color: new Color(HIGHLIGHT_READY), transparent: true, depthWrite: false }),
+      new MeshBasicMaterial({
+        map: materials.paletteTexture,
+        color: new Color(HIGHLIGHT_READY),
+        transparent: true,
+        depthWrite: false,
+      }),
     );
     this.marker = new Mesh(ring, this.markerMaterial);
     this.marker.name = 'destination';
@@ -326,10 +439,21 @@ export class EffectsPart implements EventfulPart {
   private cellCenter(cell: { cx: number; cy: number }, out: Vector3): Vector3 {
     const x = cell.cx + HALF_CELL;
     const y = cell.cy + HALF_CELL;
-    return out.set(x, this.terrain.heightAt(x, y) + (this.gardenCells.has(`${cell.cx}:${cell.cy}`) ? RENDER_SETTINGS.garden.tilledHeight : 0), y);
+    return out.set(
+      x,
+      this.terrain.heightAt(x, y) +
+        (this.gardenCells.has(`${cell.cx}:${cell.cy}`) ? RENDER_SETTINGS.garden.tilledHeight : 0),
+      y,
+    );
   }
 
-  private jump(item: string, from: Vector3, to: CharacterId, sparkle: boolean, reducedMotion: boolean): void {
+  private jump(
+    item: string,
+    from: Vector3,
+    to: CharacterId,
+    sparkle: boolean,
+    reducedMotion: boolean,
+  ): void {
     if (reducedMotion) {
       return;
     }
@@ -347,97 +471,80 @@ export class EffectsPart implements EventfulPart {
   handleEvent(event: WorldEvent, context: FrameContext): void {
     const p = this.particles;
     const at = this.tmp;
-    switch (event.type) {
-      case 'tilled':
-        this.cellCenter(event.cell, at);
-        p.emit('soil', at.x, at.y + HIGHLIGHT_LIFT, at.z);
-        break;
-      case 'dig':
-        this.cellCenter(event.cell, at);
-        p.emit('soil', at.x, at.y, at.z);
-        if (event.found) {
-          p.emit('sparkle', at.x, at.y + HALF_CELL, at.z);
-        }
-        break;
-      case 'sowed':
-        this.cellCenter(event.cell, at);
-        p.emit('seed', at.x, at.y + HALF_CELL, at.z);
-        break;
-      case 'watered':
-        this.cellCenter(event.cell, at);
-        p.emit('water', at.x, at.y + HALF_CELL, at.z);
-        break;
-      case 'harvested':
-        this.cellCenter(event.cell, at);
-        p.emit('leaf', at.x, at.y + HIGHLIGHT_GARDEN_LIFT, at.z);
-        this.jump(event.item, at, event.by, event.quality === 'fine', context.reducedMotion);
-        break;
-      case 'picked_up': {
-        const who = this.characters.playerPosition(event.by);
-        if (who !== null) {
-          at.copy(who.position);
-          this.jump(event.item, at, event.by, false, context.reducedMotion);
-        }
-        break;
+    // Une chaîne de tests plutôt qu'un aiguillage: les événements sans effet visuel (sons, interface) passent sans bruit.
+    if (event.type === 'tilled') {
+      this.cellCenter(event.cell, at);
+      p.emit('soil', at.x, at.y + HIGHLIGHT_LIFT, at.z);
+    } else if (event.type === 'dig') {
+      this.cellCenter(event.cell, at);
+      p.emit('soil', at.x, at.y, at.z);
+      if (event.found) {
+        p.emit('sparkle', at.x, at.y + HALF_CELL, at.z);
       }
-      case 'chop': {
-        const tree = context.world.trees.find((candidate) => candidate.id === event.tree);
-        if (tree !== undefined) {
-          p.emit('chips', tree.pos.x, this.terrain.heightAt(tree.pos.x, tree.pos.y) + 1, tree.pos.y);
-          if (event.felled) {
-            p.emit('leaf', tree.pos.x, this.terrain.heightAt(tree.pos.x, tree.pos.y) + 2, tree.pos.y, 3);
-          }
-        }
-        if (event.by === context.local) {
-          this.rig.addTrauma(event.felled ? FELL_TRAUMA : CHOP_TRAUMA);
-        }
-        break;
+    } else if (event.type === 'sowed') {
+      this.cellCenter(event.cell, at);
+      p.emit('seed', at.x, at.y + HALF_CELL, at.z);
+    } else if (event.type === 'watered') {
+      this.cellCenter(event.cell, at);
+      p.emit('water', at.x, at.y + HALF_CELL, at.z);
+    } else if (event.type === 'harvested') {
+      this.cellCenter(event.cell, at);
+      p.emit('leaf', at.x, at.y + HIGHLIGHT_GARDEN_LIFT, at.z);
+      this.jump(event.item, at, event.by, event.quality === 'fine', context.reducedMotion);
+    } else if (event.type === 'picked_up') {
+      const who = this.characters.playerPosition(event.by);
+      if (who !== null) {
+        at.copy(who.position);
+        this.jump(event.item, at, event.by, false, context.reducedMotion);
       }
-      case 'element_built': {
-        const centre = this.house.elementCenter(event.construction, event.element, at);
-        if (centre !== null) {
-          p.emit('dust', centre.x, centre.y, centre.z);
+    } else if (event.type === 'chop') {
+      const tree = context.world.trees.find((candidate) => candidate.id === event.tree);
+      if (tree !== undefined) {
+        p.emit('chips', tree.pos.x, this.terrain.heightAt(tree.pos.x, tree.pos.y) + 1, tree.pos.y);
+        if (event.felled) {
+          p.emit(
+            'leaf',
+            tree.pos.x,
+            this.terrain.heightAt(tree.pos.x, tree.pos.y) + 2,
+            tree.pos.y,
+            3,
+          );
         }
-        break;
       }
-      case 'construction_done': {
-        const centre = this.house.elementCenter(event.construction, '', at);
-        if (centre !== null) {
-          p.emit('dust', centre.x, centre.y, centre.z, 3);
-        }
-        break;
+      if (event.by === context.local) {
+        this.rig.addTrauma(event.felled ? FELL_TRAUMA : CHOP_TRAUMA);
       }
-      case 'beam_placed': {
-        const spot = this.map.points.house_beam_spot;
-        if (spot !== undefined) {
-          p.emit('dust', spot.x, this.terrain.heightAt(spot.x, spot.y) + 1, spot.y, 2);
-        }
-        break;
+    } else if (event.type === 'element_built') {
+      const centre = this.house.elementCenter(event.construction, event.element, at);
+      if (centre !== null) {
+        p.emit('dust', centre.x, centre.y, centre.z);
       }
-      case 'furniture_placed': {
-        const piece = context.world.furniture.find((candidate) => candidate.id === event.furniture);
-        if (piece !== undefined) {
-          this.cellCenter(piece.cell, at);
-          p.emit('dust', at.x, at.y, at.z);
-        }
-        break;
+    } else if (event.type === 'construction_done') {
+      const centre = this.house.elementCenter(event.construction, '', at);
+      if (centre !== null) {
+        p.emit('dust', centre.x, centre.y, centre.z, 3);
       }
-      case 'fed_hens': {
-        const feeder = this.map.points.hen_feeder ?? this.map.points.chicken_coop;
-        if (feeder !== undefined) {
-          p.emit('grain', feeder.x, this.terrain.heightAt(feeder.x, feeder.y) + HALF_CELL, feeder.y);
-        }
-        break;
+    } else if (event.type === 'beam_placed') {
+      const spot = this.map.points.house_beam_spot;
+      if (spot !== undefined) {
+        p.emit('dust', spot.x, this.terrain.heightAt(spot.x, spot.y) + 1, spot.y, 2);
       }
-      case 'refilled': {
-        const point = this.map.points[event.at];
-        if (point !== undefined) {
-          p.emit('water', point.x, this.terrain.heightAt(point.x, point.y) + 1, point.y);
-        }
-        break;
+    } else if (event.type === 'furniture_placed') {
+      const piece = context.world.furniture.find((candidate) => candidate.id === event.furniture);
+      if (piece !== undefined) {
+        this.cellCenter(piece.cell, at);
+        p.emit('dust', at.x, at.y, at.z);
       }
-      default:
-        break;
+    } else if (event.type === 'fed_hens') {
+      const feeder = this.map.points.hen_feeder ?? this.map.points.chicken_coop;
+      if (feeder !== undefined) {
+        p.emit('grain', feeder.x, this.terrain.heightAt(feeder.x, feeder.y) + HALF_CELL, feeder.y);
+      }
+    } else if (event.type === 'refilled') {
+      const point = this.map.points[event.at];
+      if (point !== undefined) {
+        p.emit('water', point.x, this.terrain.heightAt(point.x, point.y) + 1, point.y);
+      }
     }
   }
 
@@ -461,7 +568,12 @@ export class EffectsPart implements EventfulPart {
       const holder = this.characters.playerPosition(jump.to);
       if (t >= 1 || holder === null) {
         if (jump.sparkle && holder !== null) {
-          this.particles.emit('sparkle', holder.position.x, holder.position.y + FX.bagHeight, holder.position.z);
+          this.particles.emit(
+            'sparkle',
+            holder.position.x,
+            holder.position.y + FX.bagHeight,
+            holder.position.z,
+          );
         }
         jump.object.removeFromParent();
         this.jumps.splice(i, 1);
@@ -472,36 +584,49 @@ export class EffectsPart implements EventfulPart {
       jump.object.position.lerpVectors(jump.from, this.target, t);
       jump.object.position.y += Math.sin(t * Math.PI) * FX.jumpHeight;
       jump.object.rotation.y = t * Math.PI * 2;
-      jump.object.scale.setScalar(FX.itemScale * (JUMP_START_SCALE + (JUMP_END_SCALE - JUMP_START_SCALE) * t));
+      jump.object.scale.setScalar(
+        FX.itemScale * (JUMP_START_SCALE + (JUMP_END_SCALE - JUMP_START_SCALE) * t),
+      );
     }
   }
 
   private updateHighlight(context: FrameContext): void {
     const local = context.world.characters.find((character) => character.id === context.local);
     const aim = local?.aim ?? null;
-    if (aim === null || aim.verb === null) {
+    if (!aim?.verb) {
       this.highlight.visible = false;
       return;
     }
     const garden = this.gardenCells.has(`${aim.cell.cx}:${aim.cell.cy}`);
     this.cellCenter(aim.cell, this.tmp);
-    this.highlight.position.set(this.tmp.x, this.tmp.y + (garden ? HIGHLIGHT_LIFT : HIGHLIGHT_LIFT / 2), this.tmp.z);
+    this.highlight.position.set(
+      this.tmp.x,
+      this.tmp.y + (garden ? HIGHLIGHT_LIFT : HIGHLIGHT_LIFT / 2),
+      this.tmp.z,
+    );
     this.highlight.visible = true;
     const blocked = aim.blocked !== null;
     this.highlightMaterial.color.set(blocked ? HIGHLIGHT_BLOCKED : HIGHLIGHT_READY);
-    const pulse = context.reducedMotion ? 0 : Math.sin(context.time * Math.PI * 2 * FX.highlightPulseHz) * HIGHLIGHT_PULSE;
+    const pulse = context.reducedMotion
+      ? 0
+      : Math.sin(context.time * Math.PI * 2 * FX.highlightPulseHz) * HIGHLIGHT_PULSE;
     this.highlightMaterial.opacity = HIGHLIGHT_OPACITY + (blocked ? 0 : pulse);
   }
 
   private updateMarker(context: FrameContext): void {
     const local = context.world.characters.find((character) => character.id === context.local);
     const destination = local?.destination ?? null;
-    const key = destination === null ? '' : `${destination.x.toFixed(2)}:${destination.y.toFixed(2)}`;
+    const key =
+      destination === null ? '' : `${destination.x.toFixed(2)}:${destination.y.toFixed(2)}`;
     if (key !== this.markerKey) {
       this.markerKey = key;
       this.markerStart = destination === null ? Number.NEGATIVE_INFINITY : context.time;
       if (destination !== null) {
-        this.marker.position.set(destination.x, this.terrain.heightAt(destination.x, destination.y) + HIGHLIGHT_LIFT, destination.y);
+        this.marker.position.set(
+          destination.x,
+          this.terrain.heightAt(destination.x, destination.y) + HIGHLIGHT_LIFT,
+          destination.y,
+        );
       }
     }
     const t = (context.time - this.markerStart) / FX.destinationSeconds;
@@ -515,7 +640,11 @@ export class EffectsPart implements EventfulPart {
   private updateBell(context: FrameContext): void {
     const minutes = context.world.clock.minutes;
     const spot = this.map.points.bell_shadow_spot;
-    const active = spot !== undefined && context.world.weather === 'sunny' && minutes >= BELL_FIRST_MINUTE && minutes <= BELL_LAST_MINUTE;
+    const active =
+      spot !== undefined &&
+      context.world.weather === 'sunny' &&
+      minutes >= BELL_FIRST_MINUTE &&
+      minutes <= BELL_LAST_MINUTE;
     this.bellRing.visible = active;
     if (!active) {
       return;
@@ -546,7 +675,11 @@ export class EffectsPart implements EventfulPart {
       const oy = this.rainOffsets[i * 3 + 1] ?? 0;
       const oz = this.rainOffsets[i * 3 + 2] ?? 0;
       const height = (((oy - fall) % 1) + 1) % 1;
-      position.set(focus.x + (ox * 2 - 1) * radius, height * FX.rainHeight, focus.z + (oz * 2 - 1) * radius);
+      position.set(
+        focus.x + (ox * 2 - 1) * radius,
+        height * FX.rainHeight,
+        focus.z + (oz * 2 - 1) * radius,
+      );
       this.rain.setMatrixAt(i, this.matrix.compose(position, this.rainTilt, this.rainScale));
     }
     this.rain.instanceMatrix.needsUpdate = true;

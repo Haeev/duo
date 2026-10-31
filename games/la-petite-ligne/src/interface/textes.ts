@@ -50,6 +50,7 @@ const SupplementSchema = v.object({
     next: str,
     sous: str,
     countOf: str,
+    outOf: str,
     itemCountOf: str,
     linesOf: str,
     lineOf: str,
@@ -62,7 +63,7 @@ const SupplementSchema = v.object({
     emptySlot: str,
     orientation: v.tuple([str, str, str, str]),
   }),
-  keys: v.object({ arrows: v.tuple([str, str, str, str]), wheel: str, or: str, click: str, rightClick: str }),
+  keys: v.object({ arrows: v.tuple([str, str, str, str]), escape: str, wheel: str, or: str, click: str, rightClick: str }),
   title: strings(['ticket', 'name', 'lead', 'start', 'resume', 'helpSynced', 'helpLocal', 'resumeHelp', 'pause'] as const),
   creation: v.object({
     overline: str,

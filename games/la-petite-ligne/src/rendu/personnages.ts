@@ -11,19 +11,34 @@ import {
   Float32BufferAttribute,
   Group,
   Mesh,
-  MeshStandardMaterial,
-  Object3D,
   SkinnedMesh,
   Sphere,
   Vector3,
   type AnimationAction,
   type AnimationClip,
   type BufferGeometry,
+  type Object3D,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import type { ActionKind, Character, CharacterId, DeepReadonly, FormLevel, ReadonlyWorld, VillagerState } from '../etat/types';
+import type {
+  ActionKind,
+  Character,
+  CharacterId,
+  DeepReadonly,
+  FormLevel,
+  ReadonlyWorld,
+  VillagerState,
+} from '../etat/types';
 import type { Content } from '../donnees/types';
-import { BODY_COLORS, HAIR_MESHES, OUTFITS, SCARF_MARK, SCARF_SYMBOLS, safeColor, scarfMeshFor } from './apparence';
+import {
+  BODY_COLORS,
+  HAIR_MESHES,
+  OUTFITS,
+  SCARF_MARK,
+  SCARF_SYMBOLS,
+  safeColor,
+  scarfMeshFor,
+} from './apparence';
 import { smoothFactor } from './camera';
 import {
   dampAngle,
@@ -80,7 +95,14 @@ const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
 };
 
 /** Actions pendant lesquelles l'outil reste rangé. */
-const HANDS_FREE: ReadonlySet<ActionKind> = new Set(['sleep', 'sit', 'eat', 'talk', 'carry', 'pickup']);
+const HANDS_FREE: ReadonlySet<ActionKind> = new Set([
+  'sleep',
+  'sit',
+  'eat',
+  'talk',
+  'carry',
+  'pickup',
+]);
 
 /** Expression du visage (cibles de morphose de l'artiste) selon la forme du joueur. */
 const FORM_EXPRESSION: Readonly<Record<FormLevel, { target: string; weight: number } | null>> = {
@@ -152,7 +174,7 @@ class CharacterFigure {
         if (object.morphTargetInfluences !== undefined) {
           // Les poids par défaut du GLB valent 1: on part d'un visage neutre.
           object.morphTargetInfluences.fill(0);
-          this.faces.push(object);
+          this.faces.push(object as Mesh);
         }
       }
     });
@@ -237,12 +259,22 @@ class CharacterFigure {
         ? targetGround
         : this.ground + (targetGround - this.ground) * smoothFactor(context.dt, GROUND_HALF_LIFE);
     const yaw = yawFromFacing(facing);
-    this.facing = this.facing === null || teleport ? yaw : dampAngle(this.facing, yaw, smoothFactor(context.dt, SETTINGS.turnHalfLife));
+    this.facing =
+      this.facing === null || teleport
+        ? yaw
+        : dampAngle(this.facing, yaw, smoothFactor(context.dt, SETTINGS.turnHalfLife));
     this.root.position.set(at.x, this.ground, at.y);
     this.root.rotation.y = this.facing;
     this.play(clip, timeScale);
     this.mixer?.update(context.dt);
-    setStandingBox(this.pick.box, at.x, this.ground, at.y, PICK_RADIUS * this.root.scale.x, PICK_HEIGHT * this.root.scale.y);
+    setStandingBox(
+      this.pick.box,
+      at.x,
+      this.ground,
+      at.y,
+      PICK_RADIUS * this.root.scale.x,
+      PICK_HEIGHT * this.root.scale.y,
+    );
   }
 
   dispose(): void {
@@ -283,7 +315,12 @@ class PlayerTexture {
     };
     for (const [slot, color] of Object.entries(colors) as [CharacterSlot, string][]) {
       context.fillStyle = color;
-      context.fillRect(characterSlotColumn(slot) * PALETTE_CELL_PIXELS, PLAYER_ROW * PALETTE_CELL_PIXELS, PALETTE_CELL_PIXELS, PALETTE_CELL_PIXELS);
+      context.fillRect(
+        characterSlotColumn(slot) * PALETTE_CELL_PIXELS,
+        PLAYER_ROW * PALETTE_CELL_PIXELS,
+        PALETTE_CELL_PIXELS,
+        PALETTE_CELL_PIXELS,
+      );
     }
     this.texture.needsUpdate = true;
   }
@@ -305,13 +342,18 @@ interface PlayerEntry {
  * personnages. Les pièces sans cibles de morphose en reçoivent des nulles,
  * pour avoir les mêmes attributs que le corps. `null` si c'est impossible.
  */
-function mergeOutfit(base: BufferGeometry, parts: readonly BufferGeometry[]): BufferGeometry | null {
+function mergeOutfit(
+  base: BufferGeometry,
+  parts: readonly BufferGeometry[],
+): BufferGeometry | null {
   const morphs = base.morphAttributes.position ?? [];
   const prepared = parts.map((part) => {
     const copy = part.clone();
     const count = copy.getAttribute('position').count;
     if (copy.morphAttributes.position === undefined && morphs.length > 0) {
-      copy.morphAttributes.position = morphs.map(() => new Float32BufferAttribute(new Float32Array(count * VECTOR_SIZE), VECTOR_SIZE));
+      copy.morphAttributes.position = morphs.map(
+        () => new Float32BufferAttribute(new Float32Array(count * VECTOR_SIZE), VECTOR_SIZE),
+      );
     }
     copy.morphTargetsRelative = base.morphTargetsRelative;
     return copy;
@@ -362,8 +404,8 @@ export class CharactersPart implements EventfulPart {
       .ball(0.17, [0, 1.55, 0], 'plaster_cream', { detail: 1 })
       .cylinder(0.17, 0.2, 0.1, [0, 1.36, 0], 'white_paint', { base: true });
     const mesh = new Mesh(this.resources.track(shapes.build()), this.materials.palette.clone());
-    (mesh.material as MeshStandardMaterial).color.set(safeColor(scarf));
-    this.resources.trackMaterial(mesh.material as MeshStandardMaterial);
+    mesh.material.color.set(safeColor(scarf));
+    this.resources.trackMaterial(mesh.material);
     const group = new Group();
     group.add(mesh);
     return group;
@@ -376,7 +418,9 @@ export class CharactersPart implements EventfulPart {
     let texture: PlayerTexture | null = null;
     const shared = this.library.sharedCharacterMaterial();
     if (model !== null && shared?.map?.image !== undefined) {
-      texture = new PlayerTexture(shared.map.image as CanvasImageSource & { width: number; height: number });
+      texture = new PlayerTexture(
+        shared.map.image as CanvasImageSource & { width: number; height: number },
+      );
       this.resources.track(texture.texture);
       const material = this.resources.trackMaterial(shared.clone());
       material.map = texture.texture;
@@ -387,7 +431,13 @@ export class CharactersPart implements EventfulPart {
         }
       });
     }
-    const figure = new CharacterFigure(character.id, model ?? this.substituteModel(character.appearance.scarf), this.clips, pick, 1);
+    const figure = new CharacterFigure(
+      character.id,
+      model ?? this.substituteModel(character.appearance.scarf),
+      this.clips,
+      pick,
+      1,
+    );
     this.group.add(figure.root);
     const base = meshes.get('player_base');
     const baseGeometry = base instanceof SkinnedMesh ? (base.geometry as BufferGeometry) : null;
@@ -420,8 +470,11 @@ export class CharactersPart implements EventfulPart {
       .filter((name) => name !== 'player_base')
       .map((name) => entry.meshes.get(name))
       .filter((mesh): mesh is SkinnedMesh => mesh instanceof SkinnedMesh)
-      .map((mesh) => mesh.geometry as BufferGeometry);
-    const merged = base instanceof SkinnedMesh && entry.baseGeometry !== null ? mergeOutfit(entry.baseGeometry, parts) : null;
+      .map((mesh) => mesh.geometry);
+    const merged =
+      base instanceof SkinnedMesh && entry.baseGeometry !== null
+        ? mergeOutfit(entry.baseGeometry, parts)
+        : null;
     if (merged !== null && base instanceof SkinnedMesh) {
       entry.merged?.dispose();
       entry.merged = merged;
@@ -446,7 +499,13 @@ export class CharactersPart implements EventfulPart {
     const node = this.library.source(modelName)?.node ?? modelName;
     const model = this.library.cloneRig(RIG_NODE, [node]) ?? this.library.instantiate(modelName);
     const pick = this.picks.add({ kind: 'villager', villager: villager.id });
-    const figure = new CharacterFigure(villager.id, model, this.clips, pick, definition?.scale ?? 1);
+    const figure = new CharacterFigure(
+      villager.id,
+      model,
+      this.clips,
+      pick,
+      definition?.scale ?? 1,
+    );
     this.group.add(figure.root);
     return figure;
   }
@@ -465,9 +524,20 @@ export class CharactersPart implements EventfulPart {
       const clip = moving && kind !== 'carry' ? 'walk' : CLIP_FOR_ACTION[kind];
       const timeScale =
         clip === 'walk' || clip === 'carry_two'
-          ? Math.min(WALK_SCALE_MAX, Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed))
+          ? Math.min(
+              WALK_SCALE_MAX,
+              Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
+            )
           : 1;
-      entry.figure.update(context, this.terrain, character.prev, character.pos, character.facing, clip, kind === 'carry' && !moving ? 0 : timeScale);
+      entry.figure.update(
+        context,
+        this.terrain,
+        character.prev,
+        character.pos,
+        character.facing,
+        clip,
+        kind === 'carry' && !moving ? 0 : timeScale,
+      );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
       entry.figure.pick.enabled = true;
       const held = character.bag[character.selected] ?? null;
@@ -491,9 +561,27 @@ export class CharactersPart implements EventfulPart {
       }
       const clip = villagerClip(villager);
       const timeScale =
-        clip === 'walk' ? Math.min(WALK_SCALE_MAX, Math.max(WALK_SCALE_MIN, villager.speed / SETTINGS.walkReferenceSpeed)) : 1;
-      figure.update(context, this.terrain, villager.prev, villager.pos, villager.facing, clip, timeScale);
-      figure.updateFace(context.time, villager.talkingWith.length > 0 ? { target: 'happy', weight: TALK_EXPRESSION_WEIGHT } : null);
+        clip === 'walk'
+          ? Math.min(
+              WALK_SCALE_MAX,
+              Math.max(WALK_SCALE_MIN, villager.speed / SETTINGS.walkReferenceSpeed),
+            )
+          : 1;
+      figure.update(
+        context,
+        this.terrain,
+        villager.prev,
+        villager.pos,
+        villager.facing,
+        clip,
+        timeScale,
+      );
+      figure.updateFace(
+        context.time,
+        villager.talkingWith.length > 0
+          ? { target: 'happy', weight: TALK_EXPRESSION_WEIGHT }
+          : null,
+      );
     }
   }
 

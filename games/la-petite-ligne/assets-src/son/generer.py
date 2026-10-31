@@ -329,20 +329,20 @@ def _st(x: np.ndarray) -> np.ndarray:
     return dsp.stereo(x)
 
 
-def planche(audio_musique: dict[str, np.ndarray], apercus: dict[str, np.ndarray], tmp: Path) -> None:
+def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
     """Extraits des musiques (autour du raccord pour les boucles), le train, puis les effets, les
     ambiances et les motifs. Chaque élément est séparé par un court silence."""
     morceaux = []
     blanc = lambda s: np.zeros((dsp.n_ech(s), 2))  # noqa: E731
     ordre_musique = ["halte-matin", "halte-apres-midi", "veillee", "petit-dejeuner", "nuit", "samedi", "titre",
                      "fanfare-train", "fin"]
+    defs_musique = json.loads((SORTIE / "sons.json").read_text(encoding="utf-8"))["music"]
     for id_ in ordre_musique:
-        y = audio_musique.get(id_)
-        if y is None:
-            y = dsp.decoder(SORTIE / "musique" / f"{id_}.ogg")
-            d = json.loads((SORTIE / "sons.json").read_text(encoding="utf-8"))["music"][id_]
-            if d.get("loop"):
-                y = y[d["loop"]["startSample"]:d["loop"]["endSample"]]
+        # Toujours à partir des fichiers livrés: le client entend exactement ce que joue le jeu.
+        y = dsp.decoder(SORTIE / "musique" / f"{id_}.ogg")
+        d = defs_musique[id_]
+        if d.get("loop"):
+            y = y[d["loop"]["startSample"]:d["loop"]["endSample"]]
         if id_ in ("fanfare-train", "fin"):
             extrait = y
         else:
@@ -423,13 +423,12 @@ def main() -> int:
     DESIGN.mkdir(parents=True, exist_ok=True)
     defs_sons: dict = {}
     defs_musique: dict = {}
-    audio_musique: dict = {}
     apercus: dict = {}
     with tempfile.TemporaryDirectory() as dossier:
         tmp = Path(dossier)
         if "musiques" in parties:
             print("Musiques:", flush=True)
-            defs_musique, audio_musique = produire_musiques(tmp, args.musiques)
+            defs_musique, _ = produire_musiques(tmp, args.musiques)
             if args.musiques:
                 ancien = json.loads((SORTIE / "sons.json").read_text(encoding="utf-8")).get("music", {})
                 defs_musique = {**ancien, **defs_musique}
@@ -442,7 +441,7 @@ def main() -> int:
         ecrire_json(defs_sons, defs_musique)
         if "planche" in parties:
             print("Planche d'écoute:", flush=True)
-            planche(audio_musique, apercus, tmp)
+            planche(apercus, tmp)
     if not args.sans_controle:
         return subprocess.run([sys.executable, str(ICI / "controler.py")]).returncode
     return 0

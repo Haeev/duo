@@ -60,17 +60,33 @@ export class ShapeBuilder {
     paint: Paint,
     options: PartOptions & { segments?: number } = {},
   ): this {
-    const geometry = new CylinderGeometry(radiusTop, radiusBottom, height, options.segments ?? DEFAULT_SEGMENTS);
+    const geometry = new CylinderGeometry(
+      radiusTop,
+      radiusBottom,
+      height,
+      options.segments ?? DEFAULT_SEGMENTS,
+    );
     return this.add(geometry, paint, at, options, height);
   }
 
-  cone(radius: number, height: number, at: Triple, paint: Paint, options: PartOptions & { segments?: number } = {}): this {
+  cone(
+    radius: number,
+    height: number,
+    at: Triple,
+    paint: Paint,
+    options: PartOptions & { segments?: number } = {},
+  ): this {
     const geometry = new ConeGeometry(radius, height, options.segments ?? DEFAULT_SEGMENTS);
     return this.add(geometry, paint, at, options, height);
   }
 
   /** Boule à facettes (icosaèdre), pour les feuillages et les têtes. */
-  ball(radius: number, at: Triple, paint: Paint, options: PartOptions & { detail?: number } = {}): this {
+  ball(
+    radius: number,
+    at: Triple,
+    paint: Paint,
+    options: PartOptions & { detail?: number } = {},
+  ): this {
     const geometry = new IcosahedronGeometry(radius, options.detail ?? 0);
     return this.add(geometry, paint, at, options, 2 * radius);
   }
@@ -82,7 +98,13 @@ export class ShapeBuilder {
   }
 
   /** Ajoute une géométrie quelconque (elle est absorbée et libérée à la fusion). */
-  add(geometry: BufferGeometry, paint: Paint, at: Triple, options: PartOptions = {}, height = 0): this {
+  add(
+    geometry: BufferGeometry,
+    paint: Paint,
+    at: Triple,
+    options: PartOptions = {},
+    height = 0,
+  ): this {
     const flat = geometry.index === null ? geometry : geometry.toNonIndexed();
     if (flat !== geometry) {
       geometry.dispose();
@@ -134,7 +156,12 @@ export function paintGeometry(geometry: BufferGeometry, paint: Paint): void {
     let uv = single;
     if (uv === null && typeof paint !== 'string') {
       const ny = normals.getY(vertex);
-      const cell = ny > FACE_UP_THRESHOLD ? paint.top : ny < -FACE_UP_THRESHOLD ? (paint.bottom ?? paint.side) : paint.side;
+      const cell =
+        ny > FACE_UP_THRESHOLD
+          ? paint.top
+          : ny < -FACE_UP_THRESHOLD
+            ? (paint.bottom ?? paint.side)
+            : paint.side;
       uv = paletteUv(cell);
     }
     if (uv === null) {

@@ -94,7 +94,10 @@ export class PerfMonitor {
     }
     const budgets = RENDER_SETTINGS.budgets;
     const s = this.current;
-    const over = this.maxCalls > budgets.drawCalls || s.triangles > budgets.triangles || s.programs > budgets.programs;
+    const over =
+      this.maxCalls > budgets.drawCalls ||
+      s.triangles > budgets.triangles ||
+      s.programs > budgets.programs;
     this.overlay.style.color = over ? OVER_BUDGET_COLOR : WITHIN_BUDGET_COLOR;
     const lines = [
       `${s.fps.toFixed(0)} i/s  ${s.frameMs.toFixed(1)} ms`,

@@ -25,6 +25,8 @@ const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
 const DEMO_MINUTES_PER_SECOND = 12;
 const MINUTES_PER_DAY = 1440;
 const WALK_SPEED = 3.5;
+const ENDURANCE_FRAMES = 30;
+const ENDURANCE_FPS = 60;
 const KEY_TO_COMMAND: Record<string, CameraCommand> = {
   KeyQ: 'rotate_left',
   KeyE: 'rotate_right',
@@ -80,7 +82,9 @@ async function main(): Promise<void> {
     inside: params.get('interieur') === '1',
     repaired: params.get('repare') === '1',
     train:
-      params.get('train') === 'away' || params.get('train') === 'arriving' || params.get('train') === 'departing'
+      params.get('train') === 'away' ||
+      params.get('train') === 'arriving' ||
+      params.get('train') === 'departing'
         ? (params.get('train') as 'away' | 'arriving' | 'departing')
         : 'stopped',
   };
@@ -88,7 +92,13 @@ async function main(): Promise<void> {
   const focusX = Number(params.get('x'));
   const focusY = Number(params.get('y'));
   const p1 = world.characters[0];
-  if (p1 !== undefined && params.has('x') && params.has('y') && Number.isFinite(focusX) && Number.isFinite(focusY)) {
+  if (
+    p1 !== undefined &&
+    params.has('x') &&
+    params.has('y') &&
+    Number.isFinite(focusX) &&
+    Number.isFinite(focusY)
+  ) {
     p1.pos = { x: focusX, y: focusY };
     p1.prev = { x: focusX, y: focusY };
   }
@@ -114,8 +124,22 @@ async function main(): Promise<void> {
     }
   };
 
-  const engine = new RenderEngine({ view, container, reducedMotion: false, showStats: params.get('stats') !== '0' });
-  const handle: DemoHandle = { ready: false, stats: () => engine.detailedStats(),
+  const cycles = Number(params.get('cycles') ?? '0');
+  if (cycles > 0) {
+    await endurance(cycles, view, container);
+    loading?.remove();
+    return;
+  }
+
+  const engine = new RenderEngine({
+    view,
+    container,
+    reducedMotion: false,
+    showStats: params.get('stats') !== '0',
+  });
+  const handle: DemoHandle = {
+    ready: false,
+    stats: () => engine.detailedStats(),
     missing: () => [],
     breakdown: () => engine.breakdown(),
     programs: () => engine.programList(),
@@ -214,10 +238,19 @@ async function main(): Promise<void> {
       }
     }
     const me = world.characters[0];
-    const moveUp = (held.has('KeyW') || held.has('ArrowUp') ? 1 : 0) - (held.has('KeyS') || held.has('ArrowDown') ? 1 : 0);
-    const moveRight = (held.has('KeyD') || held.has('ArrowRight') ? 1 : 0) - (held.has('KeyA') || held.has('ArrowLeft') ? 1 : 0);
+    const moveUp =
+      (held.has('KeyW') || held.has('ArrowUp') ? 1 : 0) -
+      (held.has('KeyS') || held.has('ArrowDown') ? 1 : 0);
+    const moveRight =
+      (held.has('KeyD') || held.has('ArrowRight') ? 1 : 0) -
+      (held.has('KeyA') || held.has('ArrowLeft') ? 1 : 0);
     const steering = moveUp !== 0 || moveRight !== 0;
-    for (const event of animateExampleWorld(world, map, seconds, lifeInput?.checked !== false && !steering)) {
+    for (const event of animateExampleWorld(
+      world,
+      map,
+      seconds,
+      lifeInput?.checked !== false && !steering,
+    )) {
       emit(event);
     }
     if (me !== undefined && steering) {
@@ -227,11 +260,14 @@ async function main(): Promise<void> {
       const dy = Math.sin(yaw) * moveUp + Math.sin(yaw + Math.PI / 2) * moveRight;
       const length = Math.hypot(dx, dy);
       me.prev = { ...me.pos };
-      me.pos = { x: me.pos.x + (dx / length) * WALK_SPEED * dt, y: me.pos.y + (dy / length) * WALK_SPEED * dt };
+      me.pos = {
+        x: me.pos.x + (dx / length) * WALK_SPEED * dt,
+        y: me.pos.y + (dy / length) * WALK_SPEED * dt,
+      };
       me.facing = Math.atan2(dy, dx);
       me.speed = WALK_SPEED;
       me.action = { kind: 'walk', since: 0, duration: 0, target: null };
-    } else if (me !== undefined && me.action.kind === 'walk' && lifeInput?.checked === false) {
+    } else if (me?.action.kind === 'walk' && lifeInput?.checked === false) {
       me.speed = 0;
       me.action = { kind: 'idle', since: 0, duration: 0, target: null };
     }
@@ -241,6 +277,45 @@ async function main(): Promise<void> {
   };
   handle.ready = true;
   window.requestAnimationFrame(tick);
+}
+
+/** Mémoire du tas JavaScript (Chromium seulement), en octets. */
+function heapBytes(): number {
+  const memory = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory;
+  return memory?.usedJSHeapSize ?? 0;
+}
+
+/** Résultat de l'essai d'endurance (`?cycles=N`), lu par Playwright. */
+interface EnduranceReport {
+  cycles: number;
+  geometries: number[];
+  textures: number[];
+  heap: number[];
+  canvases: number;
+}
+
+/**
+ * Essai d'endurance: crée le rendu, dessine, le libère, `cycles` fois de
+ * suite. Chaque tour doit retrouver les mêmes nombres de géométries et de
+ * textures, et ne laisser aucun canevas derrière lui.
+ */
+async function endurance(cycles: number, view: GameView, container: HTMLElement): Promise<void> {
+  const report: EnduranceReport = { cycles: 0, geometries: [], textures: [], heap: [], canvases: 0 };
+  (window as Window & { lplEndurance?: EnduranceReport }).lplEndurance = report;
+  for (let i = 0; i < cycles; i += 1) {
+    const engine = new RenderEngine({ view, container, reducedMotion: false, showStats: false });
+    await engine.load(() => undefined);
+    for (let frame = 0; frame < ENDURANCE_FRAMES; frame += 1) {
+      engine.frame(1 / ENDURANCE_FPS);
+    }
+    const stats = engine.detailedStats();
+    report.geometries.push(stats.geometries);
+    report.textures.push(stats.textures);
+    engine.dispose();
+    report.heap.push(heapBytes());
+    report.cycles = i + 1;
+  }
+  report.canvases = container.querySelectorAll('canvas').length;
 }
 
 void main();

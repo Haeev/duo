@@ -29,7 +29,12 @@ export interface RenderPart {
 }
 
 /** Position interpolée d'un mobile (`prev` vers `pos`), écrite dans `out` (x, y du sol). */
-export function interpolate(prev: Readonly<Vec2>, pos: Readonly<Vec2>, alpha: number, out: Vec2): Vec2 {
+export function interpolate(
+  prev: Readonly<Vec2>,
+  pos: Readonly<Vec2>,
+  alpha: number,
+  out: Vec2,
+): Vec2 {
   out.x = prev.x + (pos.x - prev.x) * alpha;
   out.y = prev.y + (pos.y - prev.y) * alpha;
   return out;
@@ -96,7 +101,14 @@ export class PickRegistry {
 }
 
 /** Boîte d'un objet debout posé en (x, sol, y), de rayon `radius` et de hauteur `height`. */
-export function setStandingBox(box: Box3, x: number, ground: number, y: number, radius: number, height: number): void {
+export function setStandingBox(
+  box: Box3,
+  x: number,
+  ground: number,
+  y: number,
+  radius: number,
+  height: number,
+): void {
   box.min.set(x - radius, ground, y - radius);
   box.max.set(x + radius, ground + height, y + radius);
 }

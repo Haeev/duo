@@ -65,8 +65,21 @@ export class GardenPart implements EventfulPart {
     private readonly picks: PickRegistry,
   ) {
     // Cultures et mottes restent basses: leur ombre ne se verrait pas, on l'économise.
-    this.batches = new InstancedBatches('potager', library, materials, resources, GARDEN_CAPACITY, false);
-    this.trees = new InstancedBatches('arbres de la lisiere', library, materials, resources, TREE_CAPACITY);
+    this.batches = new InstancedBatches(
+      'potager',
+      library,
+      materials,
+      resources,
+      GARDEN_CAPACITY,
+      false,
+    );
+    this.trees = new InstancedBatches(
+      'arbres de la lisiere',
+      library,
+      materials,
+      resources,
+      TREE_CAPACITY,
+    );
     this.library = library;
   }
 
@@ -81,7 +94,9 @@ export class GardenPart implements EventfulPart {
       const tree = context.world.trees.find((candidate) => candidate.id === event.tree);
       const chopper = context.world.characters.find((character) => character.id === event.by);
       const direction =
-        tree !== undefined && chopper !== undefined ? Math.atan2(tree.pos.y - chopper.pos.y, tree.pos.x - chopper.pos.x) : 0;
+        tree !== undefined && chopper !== undefined
+          ? Math.atan2(tree.pos.y - chopper.pos.y, tree.pos.x - chopper.pos.x)
+          : 0;
       this.fallStart.set(event.tree, { time: this.time, direction });
     }
   }
@@ -98,7 +113,12 @@ export class GardenPart implements EventfulPart {
       const x = cell.cell.cx + 0.5;
       const y = cell.cell.cy + 0.5;
       const ground = this.terrain.heightAt(x, y);
-      const soil = cell.soil === 'grass' ? 'garden_cell_grass' : cell.wet ? 'garden_cell_tilled_wet' : 'garden_cell_tilled';
+      const soil =
+        cell.soil === 'grass'
+          ? 'garden_cell_grass'
+          : cell.wet
+            ? 'garden_cell_tilled_wet'
+            : 'garden_cell_tilled';
       this.matrix.makeTranslation(x, ground, y);
       this.batches.add(soil, this.matrix);
       const key = cellKey(cell.cell);
@@ -114,8 +134,12 @@ export class GardenPart implements EventfulPart {
         return;
       }
       const popAt = this.popStart.get(key);
-      const t = popAt === undefined ? 1 : Math.min(1, (context.time - popAt) / SETTINGS.growPopSeconds);
-      const size = t >= 1 ? 1 : POP_START_SCALE + (1 - POP_START_SCALE) * easeOutBack(t, SETTINGS.growPopOvershoot);
+      const t =
+        popAt === undefined ? 1 : Math.min(1, (context.time - popAt) / SETTINGS.growPopSeconds);
+      const size =
+        t >= 1
+          ? 1
+          : POP_START_SCALE + (1 - POP_START_SCALE) * easeOutBack(t, SETTINGS.growPopOvershoot);
       const sway = crop.ripe ? Math.sin(context.time * RIPE_SWAY_SPEED + index) * RIPE_SWAY : 0;
       this.position.set(x, ground, y);
       this.rotation.setFromEuler(this.euler.set(sway, (index * Math.PI) / 2, sway / 2));
@@ -136,13 +160,21 @@ export class GardenPart implements EventfulPart {
         this.treePicks.set(tree.id, pick);
       }
       const fall = this.fallStart.get(tree.id);
-      const fallT = fall === undefined ? (tree.felled ? 1 : 0) : (context.time - fall.time) / FALL_SECONDS;
+      const fallT =
+        fall === undefined ? (tree.felled ? 1 : 0) : (context.time - fall.time) / FALL_SECONDS;
       if (tree.felled) {
         this.matrix.makeTranslation(tree.pos.x, ground, tree.pos.y);
         this.trees.add('stump', this.matrix);
         pick.enabled = false;
       } else {
-        setStandingBox(pick.box, tree.pos.x, ground, tree.pos.y, TREE_PICK_RADIUS, TREE_PICK_HEIGHT);
+        setStandingBox(
+          pick.box,
+          tree.pos.x,
+          ground,
+          tree.pos.y,
+          TREE_PICK_RADIUS,
+          TREE_PICK_HEIGHT,
+        );
         pick.enabled = true;
       }
       const sinkT = fallT - 1;

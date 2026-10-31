@@ -19,6 +19,7 @@ import {
   Vector2,
   Vector3,
   WebGLRenderer,
+  type Object3D,
   type ToneMapping,
 } from 'three';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
@@ -101,7 +102,11 @@ export class RenderEngine implements Renderer {
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
     const settings = RENDER_SETTINGS.renderer;
-    this.renderer = new WebGLRenderer({ antialias: settings.antialias, powerPreference: 'high-performance', stencil: false });
+    this.renderer = new WebGLRenderer({
+      antialias: settings.antialias,
+      powerPreference: 'high-performance',
+      stencil: false,
+    });
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = toneMapping(settings.toneMapping);
     this.renderer.toneMappingExposure = settings.exposure;
@@ -167,7 +172,9 @@ export class RenderEngine implements Renderer {
       if (typeof walk === 'number') {
         return walk;
       }
-      return prop.category === 'sol' && prop.height > 0 ? prop.height : RENDER_SETTINGS.floorProps[prop.model];
+      return prop.category === 'sol' && prop.height > 0
+        ? prop.height
+        : RENDER_SETTINGS.floorProps[prop.model];
     });
     this.terrain = terrain;
     this.scene.add(terrain.group);
@@ -187,19 +194,58 @@ export class RenderEngine implements Renderer {
     this.world = world;
     this.parts.push(world);
     const content = this.view.content;
-    const characters = new CharactersPart(library, materials, terrain, this.resources, this.picks, content);
-    const house = new HousePart(map, content, library, materials, terrain, this.resources, this.picks);
+    const characters = new CharactersPart(
+      library,
+      materials,
+      terrain,
+      this.resources,
+      this.picks,
+      content,
+    );
+    const house = new HousePart(
+      map,
+      content,
+      library,
+      materials,
+      terrain,
+      this.resources,
+      this.picks,
+    );
     const garden = new GardenPart(library, materials, terrain, this.resources, this.picks);
     const farm = new FarmLifePart(library, materials, terrain, this.resources, this.picks, content);
-    this.scene.add(characters.group, house.group, garden.batches.group, garden.trees.group, farm.group);
+    this.scene.add(
+      characters.group,
+      house.group,
+      garden.batches.group,
+      garden.trees.group,
+      farm.group,
+    );
     world.add(characters);
     world.add(house);
     world.add(garden);
     world.add(farm);
-    const effects = new EffectsPart(map, content, library, materials, terrain, this.resources, characters, house, this.rig);
+    const effects = new EffectsPart(
+      map,
+      content,
+      library,
+      materials,
+      terrain,
+      this.resources,
+      characters,
+      house,
+      this.rig,
+    );
     this.scene.add(effects.group);
     world.add(effects);
-    const railway = new RailwayPart(map, library, materials, terrain, this.resources, effects, decor.clockHands);
+    const railway = new RailwayPart(
+      map,
+      library,
+      materials,
+      terrain,
+      this.resources,
+      effects,
+      decor.clockHands,
+    );
     this.scene.add(railway.group);
     world.add(railway);
     onProgress(LOAD_BUILD_SHARE);
@@ -218,7 +264,7 @@ export class RenderEngine implements Renderer {
 
   /** Compile tous les programmes pendant le chargement (aucun à-coup à la première apparition d'un objet). */
   private async warmUp(): Promise<void> {
-    const hidden: { visible: boolean; object: import('three').Object3D }[] = [];
+    const hidden: { visible: boolean; object: Object3D }[] = [];
     this.scene.traverse((object) => {
       if (!object.visible) {
         hidden.push({ visible: false, object });
@@ -249,13 +295,24 @@ export class RenderEngine implements Renderer {
       const y = local.prev.y + (local.pos.y - local.prev.y) * alpha;
       const vx = Math.cos(local.facing) * local.speed;
       const vy = Math.sin(local.facing) * local.speed;
-      this.rig.update(dt, x, y, vx, vy, { minX: 0, minY: 0, maxX: this.view.map.width, maxY: this.view.map.height });
+      this.rig.update(dt, x, y, vx, vy, {
+        minX: 0,
+        minY: 0,
+        maxX: this.view.map.width,
+        maxY: this.view.map.height,
+      });
     } else {
       this.rig.update(dt, this.rig.focus.x, this.rig.focus.z, 0, 0, null);
     }
     this.focus.copy(this.rig.focus);
     this.updateSeeThrough(world, alpha);
-    this.daylight.update(world.clock.minutes, world.weather, this.focus, this.rig.viewRadius(), RENDER_SETTINGS.camera.distance);
+    this.daylight.update(
+      world.clock.minutes,
+      world.weather,
+      this.focus,
+      this.rig.viewRadius(),
+      RENDER_SETTINGS.camera.distance,
+    );
     this.materials?.setNight(this.daylight.night);
     this.materials?.setTime(this.time);
 
@@ -349,7 +406,8 @@ export class RenderEngine implements Renderer {
     if (ground !== null) {
       ground = this.rig.groundAt(ndcX, ndcY, this.terrain.heightAt(ground.x, ground.z));
     }
-    const groundDistance = ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
+    const groundDistance =
+      ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
     if (entity !== null && entity.distance <= groundDistance) {
       return entity.result;
     }
@@ -374,7 +432,9 @@ export class RenderEngine implements Renderer {
 
   /** Programmes de shader compilés (nom et type de matériau), pour tenir le budget de 12. */
   programList(): string[] {
-    return (this.renderer.info.programs ?? []).map((program) => `${program.name} ${program.cacheKey.slice(0, 60)}`);
+    return (this.renderer.info.programs ?? []).map(
+      (program) => `${program.name} ${program.cacheKey.slice(0, 60)}`,
+    );
   }
 
   /** Triangles par partie de la scène (diagnostic des budgets, page de démonstration). */

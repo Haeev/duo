@@ -5,7 +5,8 @@
  * remise de la draisine (portes qui s'ouvrent à la fin) et l'horloge de la
  * halte, à l'heure du jeu.
  */
-import { AnimationMixer, Group, Matrix4, Object3D, Vector3 } from 'three';
+import type { Object3D } from 'three';
+import { AnimationMixer, Group, Matrix4, Vector3 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
 import type { WorldEvent } from '../etat/types';
 import { smoothFactor } from './camera';
@@ -67,7 +68,12 @@ export class RailwayPart implements EventfulPart {
   private readonly stopX: number;
   private readonly railTop: number;
   private readonly gates: { arm: Object3D | null; angle: number }[] = [];
-  private shed: { left: Object3D | null; right: Object3D | null; handcar: Object3D | null; amount: number } | null = null;
+  private shed: {
+    left: Object3D | null;
+    right: Object3D | null;
+    handcar: Object3D | null;
+    amount: number;
+  } | null = null;
   private smokeTimer = 0;
   private trainX = Number.NaN;
   private readonly chimney = new Vector3();
@@ -147,7 +153,12 @@ export class RailwayPart implements EventfulPart {
     this.group.add(this.train);
 
     for (const prop of map.props.filter((candidate) => candidate.model === GATE_MODEL)) {
-      this.gates.push(this.placeProp(prop, (object) => ({ arm: object.getObjectByName(GATE_ARM) ?? null, angle: GATE_OPEN })));
+      this.gates.push(
+        this.placeProp(prop, (object) => ({
+          arm: object.getObjectByName(GATE_ARM) ?? null,
+          angle: GATE_OPEN,
+        })),
+      );
     }
     const shedProp = map.props.find((candidate) => candidate.model === SHED_MODEL);
     if (shedProp !== undefined) {
@@ -235,9 +246,15 @@ export class RailwayPart implements EventfulPart {
     const moving = visible && state.phase !== 'stopped';
     if (visible) {
       const x = this.stopX + offset;
-      this.train.position.set(x, this.terrain.heightAt(this.stopX, this.trackY) + this.railTop - DEFAULT_RAIL_TOP, this.trackY);
+      this.train.position.set(
+        x,
+        this.terrain.heightAt(this.stopX, this.trackY) + this.railTop - DEFAULT_RAIL_TOP,
+        this.trackY,
+      );
       this.train.updateMatrixWorld(true);
-      const speed = Number.isNaN(this.trainX) ? 0 : Math.abs(x - this.trainX) / Math.max(context.dt, Number.EPSILON);
+      const speed = Number.isNaN(this.trainX)
+        ? 0
+        : Math.abs(x - this.trainX) / Math.max(context.dt, Number.EPSILON);
       this.trainX = x;
       // Roues qui tournent au rythme du glissement (une révolution par clip).
       for (const entry of this.mixers) {
@@ -263,7 +280,9 @@ export class RailwayPart implements EventfulPart {
 
     if (this.shed !== null) {
       const open = context.world.worldStates.handcar_shed === 'open';
-      this.shed.amount += ((open ? 1 : 0) - this.shed.amount) * smoothFactor(context.dt, context.reducedMotion ? 0 : SHED_HALF_LIFE);
+      this.shed.amount +=
+        ((open ? 1 : 0) - this.shed.amount) *
+        smoothFactor(context.dt, context.reducedMotion ? 0 : SHED_HALF_LIFE);
       if (this.shed.left !== null) {
         this.shed.left.rotation.y = -SHED_DOOR_ANGLE * this.shed.amount;
       }
@@ -277,8 +296,13 @@ export class RailwayPart implements EventfulPart {
 
     const minutes = context.world.clock.minutes;
     for (const hand of this.clockHands) {
-      const turns = hand.kind === 'hour' ? (minutes % MINUTES_PER_DIAL) / MINUTES_PER_DIAL : (minutes % MINUTES_PER_HOUR) / MINUTES_PER_HOUR;
-      hand.mesh.matrix.copy(hand.base).multiply(this.handRotation.makeRotationZ(-turns * Math.PI * 2));
+      const turns =
+        hand.kind === 'hour'
+          ? (minutes % MINUTES_PER_DIAL) / MINUTES_PER_DIAL
+          : (minutes % MINUTES_PER_HOUR) / MINUTES_PER_HOUR;
+      hand.mesh.matrix
+        .copy(hand.base)
+        .multiply(this.handRotation.makeRotationZ(-turns * Math.PI * 2));
     }
   }
 

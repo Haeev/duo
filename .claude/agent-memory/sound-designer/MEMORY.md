@@ -48,6 +48,8 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 ## Outils
 
 - Un `grep` en fin de tube dans une commande en arrière-plan retient toute la sortie jusqu'à la fin: ne pas compter dessus pour suivre l'avancement (lister les fichiers produits).
+- Attendre la fin d'un script avec `until ! pgrep -f "nom-du-script"` ne finit jamais: la boucle d'attente contient le motif dans sa propre ligne de commande. Attendre plutôt une ligne finale dans le journal (`until grep -q "Contrôle réussi" journal`).
+- Une planche d'écoute doit partir des fichiers livrés (décodés), pas du rendu en mémoire: elle reste identique quelles que soient les options de génération.
 - Sons très percussifs (hache, marteau, tampon): la crête vraie limite avant la sonie momentanée visée; fixer des cibles réalistes (2 à 3 dB plus bas) plutôt que d'écraser l'attaque.
 - Conventions de la plateforme à garder dans les jeux: identifiants de sons en anglais, bus `music`, `effects`, `ui` (plus `ambience` dans les jeux), sonie des effets en momentanée maximale, des musiques en intégrée, plafond -1 dBTP mesuré par `ebur128` après décodage. Pour La Petite Ligne, le manager a demandé -18 LUFS intégrés pour les musiques (et non -16).
 - Un carnet existe déjà dans le dépôt: le lire avant d'écrire, et n'y ajouter que des sections.

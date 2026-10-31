@@ -8,7 +8,8 @@
  * Les objets qui changent (maisonnette, poulailler, remise, barrières du
  * passage à niveau) sont laissés aux parties qui les animent.
  */
-import { BufferAttribute, BufferGeometry, Group, Matrix4, Mesh, Quaternion, Vector3, type Material } from 'three';
+import type { BufferGeometry } from 'three';
+import { BufferAttribute, Group, Matrix4, Mesh, Quaternion, Vector3, type Material } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { GameMap, MapProp } from '../etat/carte';
 import { yawFromQuarter } from './contexte';
@@ -56,7 +57,10 @@ export function bakeGeometry(source: BufferGeometry, matrix: Matrix4): BufferGeo
     }
   }
   if (!flat.hasAttribute('uv')) {
-    flat.setAttribute('uv', new BufferAttribute(new Float32Array(flat.getAttribute('position').count * 2), 2));
+    flat.setAttribute(
+      'uv',
+      new BufferAttribute(new Float32Array(flat.getAttribute('position').count * 2), 2),
+    );
   }
   if (!flat.hasAttribute('normal')) {
     flat.computeVertexNormals();
@@ -90,7 +94,10 @@ export class StaticDecor {
       if (DYNAMIC_PROP_MODELS.has(prop.model)) {
         continue;
       }
-      const ground = prop.category === 'sol' || FLOOR_MODELS.has(prop.model) ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);
+      const ground =
+        prop.category === 'sol' || FLOOR_MODELS.has(prop.model)
+          ? 0
+          : terrain.heightAt(prop.pos.x, prop.pos.y);
       propMatrix(prop, ground, placement);
       const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
@@ -107,7 +114,11 @@ export class StaticDecor {
           mesh.matrixAutoUpdate = false;
           mesh.matrix.copy(world);
           this.group.add(mesh);
-          this.clockHands.push({ mesh, base: world.clone(), kind: hand[1] === 'hour' ? 'hour' : 'minute' });
+          this.clockHands.push({
+            mesh,
+            base: world.clone(),
+            kind: hand[1] === 'hour' ? 'hour' : 'minute',
+          });
           continue;
         }
         bucket.geometries.push(bakeGeometry(part.geometry, world));
@@ -120,9 +131,6 @@ export class StaticDecor {
       const merged = mergeGeometries(bucket.geometries, false);
       for (const geometry of bucket.geometries) {
         geometry.dispose();
-      }
-      if (merged === null) {
-        continue;
       }
       merged.computeBoundingSphere();
       const mesh = new Mesh(resources.track(merged), bucket.material);

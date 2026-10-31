@@ -17,7 +17,15 @@ import {
 } from 'three';
 import type { Content } from '../donnees/types';
 import { smoothFactor } from './camera';
-import { dampAngle, interpolate, setStandingBox, yawFromFacing, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
+import {
+  dampAngle,
+  interpolate,
+  setStandingBox,
+  yawFromFacing,
+  type FrameContext,
+  type PickRegistry,
+  type PickTarget,
+} from './contexte';
 import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
 import { textHash, type ModelLibrary } from './modeles';
@@ -76,7 +84,13 @@ export class FarmLifePart implements EventfulPart {
     for (const clip of library.animations(FARM_FILE)) {
       this.clips.set(clip.name, clip);
     }
-    this.items = new InstancedBatches('objets au sol', library, materials, resources, GROUND_ITEM_CAPACITY);
+    this.items = new InstancedBatches(
+      'objets au sol',
+      library,
+      materials,
+      resources,
+      GROUND_ITEM_CAPACITY,
+    );
     this.group.add(this.items.group);
   }
 
@@ -92,7 +106,14 @@ export class FarmLifePart implements EventfulPart {
     root.add(model);
     this.group.add(root);
     const mixer = this.clips.size > 0 ? new AnimationMixer(model) : null;
-    return { root, mixer, actions: new Map(), current: '', facing: null, phase: (textHash(id) % 100) / 100 };
+    return {
+      root,
+      mixer,
+      actions: new Map(),
+      current: '',
+      facing: null,
+      phase: (textHash(id) % 100) / 100,
+    };
   }
 
   private play(hen: HenView, name: string): void {
@@ -121,9 +142,13 @@ export class FarmLifePart implements EventfulPart {
       const at = interpolate(hen.prev, hen.pos, context.alpha, this.point);
       view.root.position.set(at.x, this.terrain.heightAt(at.x, at.y), at.y);
       const yaw = yawFromFacing(hen.facing);
-      view.facing = view.facing === null ? yaw : dampAngle(view.facing, yaw, smoothFactor(context.dt, HEN_TURN_HALF_LIFE));
+      view.facing =
+        view.facing === null
+          ? yaw
+          : dampAngle(view.facing, yaw, smoothFactor(context.dt, HEN_TURN_HALF_LIFE));
       view.root.rotation.y = view.facing;
-      const moving = Math.hypot(hen.pos.x - hen.prev.x, hen.pos.y - hen.prev.y) > HEN_MOVING * context.dt;
+      const moving =
+        Math.hypot(hen.pos.x - hen.prev.x, hen.pos.y - hen.prev.y) > HEN_MOVING * context.dt;
       const cycle = (context.time / HEN_PECK_EVERY + view.phase) % 1;
       this.play(view, moving ? 'hen_walk' : cycle < HEN_PECK_SHARE ? 'hen_peck' : 'hen_idle');
       view.mixer?.update(context.dt);
@@ -135,7 +160,9 @@ export class FarmLifePart implements EventfulPart {
       seen.add(item.id);
       const model = this.content.items[item.item]?.model ?? item.item;
       const ground = this.terrain.heightAt(item.pos.x, item.pos.y);
-      const bob = context.reducedMotion ? 0 : (Math.sin(context.time * ITEM_BOB_SPEED + textHash(item.id)) + 1) * ITEM_BOB;
+      const bob = context.reducedMotion
+        ? 0
+        : (Math.sin(context.time * ITEM_BOB_SPEED + textHash(item.id)) + 1) * ITEM_BOB;
       this.quaternion.setFromAxisAngle(this.up, textHash(item.id));
       this.position.set(item.pos.x, ground + bob, item.pos.y);
       this.items.add(model, this.matrix.compose(this.position, this.quaternion, this.unit));
@@ -171,7 +198,11 @@ export class FarmLifePart implements EventfulPart {
     }
     const carryHeight = this.library.extras('beam').carry_height;
     const at = interpolate(beam.prev, beam.pos, context.alpha, this.point);
-    const lift = beam.carried ? (typeof carryHeight === 'number' ? carryHeight : DEFAULT_CARRY_HEIGHT) : BEAM_GROUND_HEIGHT;
+    const lift = beam.carried
+      ? typeof carryHeight === 'number'
+        ? carryHeight
+        : DEFAULT_CARRY_HEIGHT
+      : BEAM_GROUND_HEIGHT;
     this.beam.visible = true;
     this.beam.position.set(at.x, this.terrain.heightAt(at.x, at.y) + lift, at.y);
     this.beam.rotation.y = yawFromFacing(beam.facing);

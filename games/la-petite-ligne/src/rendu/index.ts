@@ -4,7 +4,8 @@
 import type { CreateRenderer, Renderer, RendererOptions } from '../etat/vue';
 import { RenderEngine } from './moteur';
 
-export const createRenderer: CreateRenderer = (options: RendererOptions): Renderer => new RenderEngine(options);
+export const createRenderer: CreateRenderer = (options: RendererOptions): Renderer =>
+  new RenderEngine(options);
 
 export { RenderEngine } from './moteur';
 export { RENDER_SETTINGS } from './reglages';

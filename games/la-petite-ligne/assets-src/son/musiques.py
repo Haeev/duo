@@ -71,7 +71,7 @@ def _debut(section: str) -> float:
     raise KeyError(section)
 
 
-def _grille_halte(transpo_txt=None) -> list:
+def _grille_halte() -> list:
     acc = []
     for nom, txt in (("intro", G_INTRO), ("A", G_A), ("A2", G_A), ("B", G_B), ("A3", G_A), ("C", G_C),
                      ("outro", G_OUTRO)):

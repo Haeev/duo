@@ -61,7 +61,11 @@ function blackTexture(): DataTexture {
   return texture;
 }
 
-async function loadTexture(loader: TextureLoader, fileName: string, fallback: () => Texture): Promise<Texture> {
+async function loadTexture(
+  loader: TextureLoader,
+  fileName: string,
+  fallback: () => Texture,
+): Promise<Texture> {
   const url = textureUrl(fileName);
   if (url === null) {
     return fallback();
@@ -116,9 +120,15 @@ const BYTE = 255;
 const RGBA = 4;
 
 /** Lit les pixels de la texture palette (une fois, au chargement). */
-function readPixels(texture: Texture): { data: Uint8ClampedArray; width: number; height: number } | null {
-  const image = texture.image as unknown;
-  if (!(image instanceof HTMLImageElement || image instanceof ImageBitmap || image instanceof HTMLCanvasElement)) {
+function readPixels(
+  texture: Texture,
+): { data: Uint8ClampedArray; width: number; height: number } | null {
+  const image = texture.image;
+  if (!(
+    image instanceof HTMLImageElement ||
+    image instanceof ImageBitmap ||
+    image instanceof HTMLCanvasElement
+  )) {
     return null;
   }
   const canvas = document.createElement('canvas');
@@ -129,7 +139,11 @@ function readPixels(texture: Texture): { data: Uint8ClampedArray; width: number;
     return null;
   }
   context.drawImage(image, 0, 0);
-  return { data: context.getImageData(0, 0, canvas.width, canvas.height).data, width: canvas.width, height: canvas.height };
+  return {
+    data: context.getImageData(0, 0, canvas.width, canvas.height).data,
+    width: canvas.width,
+    height: canvas.height,
+  };
 }
 
 /** Charge les textures palette et crée les matériaux partagés. */

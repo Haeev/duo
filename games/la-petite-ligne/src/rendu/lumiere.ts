@@ -8,7 +8,15 @@
  * sur la grille des texels pour ne pas scintiller quand la caméra glisse, et
  * son biais suit la taille d'un texel (pas d'acné d'ombre à aucun zoom).
  */
-import { Color, DirectionalLight, Fog, HemisphereLight, MathUtils, Vector3, type Scene } from 'three';
+import {
+  Color,
+  DirectionalLight,
+  Fog,
+  HemisphereLight,
+  MathUtils,
+  Vector3,
+  type Scene,
+} from 'three';
 import type { Weather } from '../etat/types';
 import { RENDER_SETTINGS, type DaylightKey, type WeatherLook } from './reglages';
 
@@ -94,10 +102,19 @@ export class DaylightRig {
    * Met la lumière à l'heure (`minutes` depuis minuit) et à la météo, et cale
    * l'ombre autour de `focus` sur un rayon `viewRadius`.
    */
-  update(minutes: number, weather: Weather, focus: Vector3, viewRadius: number, cameraDistance: number): void {
+  update(
+    minutes: number,
+    weather: Weather,
+    focus: Vector3,
+    viewRadius: number,
+    cameraDistance: number,
+  ): void {
     const m = MathUtils.euclideanModulo(minutes, MINUTES_PER_DAY);
     let index = 0;
-    while (index < this.keys.length - 2 && (this.keys[index + 1]?.minutes ?? MINUTES_PER_DAY) <= m) {
+    while (
+      index < this.keys.length - 2 &&
+      (this.keys[index + 1]?.minutes ?? MINUTES_PER_DAY) <= m
+    ) {
       index += 1;
     }
     const a = this.keys[index];
@@ -123,7 +140,11 @@ export class DaylightRig {
 
     const azimuth = lerpAngle(a.azimuth, b.azimuth, t);
     const elevation = MathUtils.lerp(a.elevation, b.elevation, t);
-    this.direction.set(Math.cos(azimuth) * Math.cos(elevation), Math.sin(elevation), Math.sin(azimuth) * Math.cos(elevation));
+    this.direction.set(
+      Math.cos(azimuth) * Math.cos(elevation),
+      Math.sin(elevation),
+      Math.sin(azimuth) * Math.cos(elevation),
+    );
 
     const fog = RENDER_SETTINGS.fog;
     this.fog.color.copy(this.background);

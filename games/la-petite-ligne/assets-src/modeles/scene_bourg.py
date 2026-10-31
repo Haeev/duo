@@ -127,9 +127,9 @@ def build():
         put(cell, x, y)
         if crop:
             put(crop, x, y)
-    for k in range(5):
-        put("fence_picket", -6.0 + k, -7.15)
-    put("fence_post", -1.5, -7.15)
+    for k in range(3):
+        put("fence_picket", -6.2, -4.5 - k, 90)
+    put("fence_post", -6.2, -7.0)
     put("henhouse_repaired", 3.5, -5.5)
     for v, (x, y, rz) in zip(("hen_white", "hen_red", "hen_black"), ((2.6, -6.4, 30), (3.9, -6.6, -60), (4.3, -5.9, 160))):
         h = SRC["hen"].copy()
@@ -165,7 +165,7 @@ def build():
     put("tree_birch_large", 7.5, 1.0, 0)
     put("tree_fir_large", -8.5, 8.5, 10)
     put("tree_fir_small", 6.5, 8.0, 40)
-    put("tree_oak_small", 8.0, -7.0, 70)
+    put("tree_oak_small", 9.5, -3.5, 70)
     put("bush_round", -4.0, 3.3, 0)
     put("bush_hazel", 5.5, -1.0, 0)
     put("bush_bramble", -8.0, -8.0, 30)
@@ -183,14 +183,14 @@ def build():
     base_mat = bpy.data.materials["lpl_characters"]
     character(["player_base", "player_outfit_work", "player_hair_short", "player_scarf_orb"], -1.6, -6.5, -90, "hoe", 16,
               expr="happy", tool="hoe")
-    character(["player_base", "player_outfit_smock", "player_hair_bun", "player_scarf_crescent"], -3.5, -8.0, 180, "water",
-              20, mat=row_material(base_mat, "player_b"), tool="watering_can")
+    character(["player_base", "player_outfit_smock", "player_hair_bun", "player_scarf_crescent"], -3.5, -7.7, 180, "water",
+              20, mat=row_material(base_mat, "player_b"), tool="watering_can", expr="neutral")
     character(["villager_jeanne"], 2.0, -7.8, -150, "talk", 10, expr="delighted", scale=0.75)
     bpy.context.scene.frame_set(300)
 
 
 def render_views():
-    sc = lpl.setup_render((1800, 1000), 48)
+    sc = lpl.setup_render((1800, 1000), 32)
     lpl.ground_plane(400, lpl.hex_lin(P.WORLD[0][1]), z=-0.001)
     pal = [m for m in bpy.data.materials if m.name.startswith("lpl_palette")]
     # jour: matin de printemps (soleil bas à l'est, ciel doux)

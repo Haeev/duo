@@ -8,7 +8,12 @@ import { Color, InstancedMesh, Matrix4, type BufferGeometry, type Material } fro
 const WHITE = new Color(1, 1, 1);
 const HIDDEN = new Matrix4().makeScale(0, 0, 0);
 
-export function createInstanced(name: string, geometry: BufferGeometry, material: Material, capacity: number): InstancedMesh {
+export function createInstanced(
+  name: string,
+  geometry: BufferGeometry,
+  material: Material,
+  capacity: number,
+): InstancedMesh {
   const mesh = new InstancedMesh(geometry, material, Math.max(1, capacity));
   mesh.name = name;
   for (let i = 0; i < mesh.count; i += 1) {

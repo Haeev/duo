@@ -647,7 +647,7 @@ def make_mesh(name, row, builder, mat, arm, with_face):
             assert moved < 120, (name, expr, moved)
             sk.data.foreach_set("co", co)
             sk.value = 0.0
-    ob.parent = arm
+    # maillage à la racine (recommandation glTF pour les maillages à peau), lié au squelette par le modificateur
     mod = ob.modifiers.new("rig", "ARMATURE")
     mod.object = arm
     return ob, tris

@@ -29,7 +29,15 @@ const SCARF_P2 = '#8d6cff';
 const SIM_HZ = 30;
 const SEED = 7;
 
-function dress(c: Character, name: string, x: number, y: number, scarf: string, hair: number, outfit: number): Character {
+function dress(
+  c: Character,
+  name: string,
+  x: number,
+  y: number,
+  scarf: string,
+  hair: number,
+  outfit: number,
+): Character {
   c.name = name;
   c.created = true;
   c.appearance = { hair, outfit, scarf };
@@ -53,7 +61,12 @@ export interface DemoOptions {
   train: WorldState['train']['phase'];
 }
 
-function point(map: GameMap, id: string, fallbackX: number, fallbackY: number): { x: number; y: number } {
+function point(
+  map: GameMap,
+  id: string,
+  fallbackX: number,
+  fallbackY: number,
+): { x: number; y: number } {
   const p = map.points[id];
   return p === undefined ? { x: fallbackX, y: fallbackY } : { x: p.x, y: p.y };
 }
@@ -61,7 +74,11 @@ function point(map: GameMap, id: string, fallbackX: number, fallbackY: number): 
 const STAGES: readonly (CropStage | null)[] = [null, 'seed', 'sprout', 'young', 'ripe'];
 const CROPS = ['radish', 'lettuce', 'carrot'] as const;
 
-export function createExampleWorld(map: GameMap, content: Content, options: DemoOptions): WorldState {
+export function createExampleWorld(
+  map: GameMap,
+  content: Content,
+  options: DemoOptions,
+): WorldState {
   const sim = createWorld(content, map, SEED, [
     { id: 'joueur-1', name: 'Camille', color: SCARF_P1 },
     { id: 'joueur-2', name: 'Sacha', color: SCARF_P2 },
@@ -78,6 +95,11 @@ export function createExampleWorld(map: GameMap, content: Content, options: Demo
     : dress(first, 'Camille', door.x + 0.5, door.y + 2.2, SCARF_P1, 0, 0);
   const p2 = dress(second, 'Sacha', door.x - 1.5, door.y + 3.5, SCARF_P2, 1, 2);
   p1.inHouse = options.inside;
+  // Case visée (surlignage): une culture mûre du potager.
+  const aimed = map.garden[4];
+  if (aimed !== undefined && !options.inside) {
+    p1.aim = { cell: { ...aimed }, verb: 'harvest', blocked: null };
+  }
   p1.bag[0] = { item: 'hoe', quality: 'ordinary', count: 1 };
   p1.selected = 0;
   p2.bag[0] = { item: 'watering_can', quality: 'ordinary', count: 1 };
@@ -95,7 +117,15 @@ export function createExampleWorld(map: GameMap, content: Content, options: Demo
       crop:
         stage === null
           ? null
-          : { crop, days: 0, stage, ripe: stage === 'ripe', wateredEveryDay: true, sownDay: 1, sownBy: 'p1' },
+          : {
+              crop,
+              days: 0,
+              stage,
+              ripe: stage === 'ripe',
+              wateredEveryDay: true,
+              sownDay: 1,
+              sownBy: 'p1',
+            },
       lastHarvest: null,
     };
   });
@@ -120,24 +150,77 @@ export function createExampleWorld(map: GameMap, content: Content, options: Demo
   const pen = map.zones.hen_pen ?? { x: 13, y: 31, w: 4, h: 4 };
   const hens: Hen[] = ['hen_white', 'hen_red', 'hen_black'].map((variant, index) => {
     const at = { x: pen.x + 0.8 + index * 1.2, y: pen.y + pen.h - 1 };
-    return { id: `hen_${index}`, name: variant, variant, pos: { ...at }, prev: { ...at }, facing: index, wander: { ...at } };
+    return {
+      id: `hen_${index}`,
+      name: variant,
+      variant,
+      pos: { ...at },
+      prev: { ...at },
+      facing: index,
+      wander: { ...at },
+    };
   });
 
   const furniture: PlacedFurniture[] = [
-    { id: 'f1', item: 'straw_mattress', cell: { cx: room.x, cy: room.y }, rotation: 0, placedBy: null },
-    { id: 'f2', item: 'straw_mattress', cell: { cx: room.x + 1, cy: room.y }, rotation: 0, placedBy: null },
-    { id: 'f3', item: 'stove', cell: { cx: room.x + room.w - 1, cy: room.y }, rotation: 0, placedBy: null },
-    { id: 'f4', item: 'chest', cell: { cx: room.x, cy: room.y + room.h - 1 }, rotation: 0, placedBy: null },
-    { id: 'f5', item: 'table', cell: { cx: room.x + 2, cy: room.y + 2 }, rotation: 0, placedBy: 'p2' },
-    { id: 'f6', item: 'flower_pot', cell: { cx: room.x + room.w - 1, cy: room.y + room.h - 1 }, rotation: 0, placedBy: 'p1' },
+    {
+      id: 'f1',
+      item: 'straw_mattress',
+      cell: { cx: room.x, cy: room.y },
+      rotation: 0,
+      placedBy: null,
+    },
+    {
+      id: 'f2',
+      item: 'straw_mattress',
+      cell: { cx: room.x + 1, cy: room.y },
+      rotation: 0,
+      placedBy: null,
+    },
+    {
+      id: 'f3',
+      item: 'stove',
+      cell: { cx: room.x + room.w - 1, cy: room.y },
+      rotation: 0,
+      placedBy: null,
+    },
+    {
+      id: 'f4',
+      item: 'chest',
+      cell: { cx: room.x, cy: room.y + room.h - 1 },
+      rotation: 0,
+      placedBy: null,
+    },
+    {
+      id: 'f5',
+      item: 'table',
+      cell: { cx: room.x + 2, cy: room.y + 2 },
+      rotation: 0,
+      placedBy: 'p2',
+    },
+    {
+      id: 'f6',
+      item: 'flower_pot',
+      cell: { cx: room.x + room.w - 1, cy: room.y + room.h - 1 },
+      rotation: 0,
+      placedBy: 'p1',
+    },
   ];
   if (options.inside) {
-    p1.placement = { item: 'chair', cell: { cx: room.x + 3, cy: room.y + 1 }, rotation: 1, valid: true };
+    p1.placement = {
+      item: 'chair',
+      cell: { cx: room.x + 3, cy: room.y + 1 },
+      rotation: 1,
+      valid: true,
+    };
   }
 
   const constructions = content.constructions.map((definition) => ({
     id: definition.id,
-    status: options.repaired ? ('done' as const) : definition.id === 'house_beam' ? ('done' as const) : ('ghost' as const),
+    status: options.repaired
+      ? ('done' as const)
+      : definition.id === 'house_beam'
+        ? ('done' as const)
+        : ('ghost' as const),
     elements: definition.elements.map((element, index) => ({
       id: element.id,
       progress: options.repaired ? 1 : index < 3 ? 1 : index === 3 ? 0.5 : 0,
@@ -148,7 +231,14 @@ export function createExampleWorld(map: GameMap, content: Content, options: Demo
   }));
 
   world.phase = 'day';
-  world.clock = { ...world.clock, day: 2, minutes: options.minutes, running: true, stoppedBy: null, veillee: false };
+  world.clock = {
+    ...world.clock,
+    day: 2,
+    minutes: options.minutes,
+    running: true,
+    stoppedBy: null,
+    veillee: false,
+  };
   world.weather = options.weather;
   world.garden = garden;
   world.trees = map.trees.map((tree, index) => ({
@@ -163,7 +253,13 @@ export function createExampleWorld(map: GameMap, content: Content, options: Demo
   world.constructions = constructions;
   world.furniture = furniture;
   world.groundItems = [
-    { id: 'g1', item: 'egg', quality: 'ordinary', count: 1, pos: { x: pen.x + 1.5, y: pen.y + 0.8 } },
+    {
+      id: 'g1',
+      item: 'egg',
+      quality: 'ordinary',
+      count: 1,
+      pos: { x: pen.x + 1.5, y: pen.y + 0.8 },
+    },
     { id: 'g2', item: 'log', quality: 'ordinary', count: 2, pos: { x: door.x + 3, y: door.y + 1 } },
   ];
   world.villagers = villagers;
@@ -182,8 +278,15 @@ interface Stroll {
   speed: number;
 }
 
-function strollPosition(stroll: Stroll, seconds: number): { x: number; y: number; facing: number; moving: boolean } {
-  const segments: { from: { x: number; y: number }; to: { x: number; y: number }; length: number }[] = [];
+function strollPosition(
+  stroll: Stroll,
+  seconds: number,
+): { x: number; y: number; facing: number; moving: boolean } {
+  const segments: {
+    from: { x: number; y: number };
+    to: { x: number; y: number };
+    length: number;
+  }[] = [];
   let total = 0;
   for (let i = 0; i < stroll.points.length; i += 1) {
     const from = stroll.points[i];
@@ -217,7 +320,12 @@ function strollPosition(stroll: Stroll, seconds: number): { x: number; y: number
  * place. `seconds`: temps de la page. Renvoie les événements du pas, comme le
  * ferait la simulation.
  */
-export function animateExampleWorld(world: WorldState, map: GameMap, seconds: number, walking: boolean): WorldEvent[] {
+export function animateExampleWorld(
+  world: WorldState,
+  map: GameMap,
+  seconds: number,
+  walking: boolean,
+): WorldEvent[] {
   const events: WorldEvent[] = [];
   world.tick = Math.floor(seconds * SIM_HZ);
   const door = point(map, 'house_door', map.house.door.cx + 0.5, map.house.door.cy + 0.5);

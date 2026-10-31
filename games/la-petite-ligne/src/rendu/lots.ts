@@ -34,14 +34,22 @@ export class InstancedBatches {
       return mesh;
     }
     const identity = new Matrix4();
-    const parts = this.library.parts(model, hints).map((part) => bakeGeometry(part.geometry, identity.copy(part.matrix)));
-    const merged = parts.length === 0 ? null : parts.length === 1 ? parts[0] : mergeGeometries(parts, false);
+    const parts = this.library
+      .parts(model, hints)
+      .map((part) => bakeGeometry(part.geometry, identity.copy(part.matrix)));
+    const merged =
+      parts.length === 0 ? null : parts.length === 1 ? parts[0] : mergeGeometries(parts, false);
     for (const part of parts) {
       if (part !== merged) {
         part.dispose();
       }
     }
-    mesh = createInstanced(model, this.resources.track(merged ?? emptyGeometry()), this.materials.palette, this.capacity);
+    mesh = createInstanced(
+      model,
+      this.resources.track(merged ?? emptyGeometry()),
+      this.materials.palette,
+      this.capacity,
+    );
     mesh.castShadow = this.shadows;
     this.group.add(mesh);
     this.batches.set(model, mesh);

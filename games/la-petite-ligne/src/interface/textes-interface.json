@@ -9,6 +9,7 @@
     "next": "Suite",
     "sous": "{amount} sous",
     "countOf": "{have} sur {need}",
+    "outOf": "sur {total}",
     "itemCountOf": "{item} {have} sur {need}",
     "linesOf": "{done} lignes sur {total}",
     "lineOf": "{done} ligne sur {total}",
@@ -23,6 +24,7 @@
   },
   "keys": {
     "arrows": ["↑", "↓", "←", "→"],
+    "escape": "Échap",
     "wheel": "Molette",
     "or": "ou",
     "click": "clic",
