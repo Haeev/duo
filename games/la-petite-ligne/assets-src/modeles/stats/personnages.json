@@ -2,11 +2,11 @@
  "meshes": {
   "player_base": 436,
   "player_outfit_work": 1042,
-  "player_outfit_smock": 1034,
+  "player_outfit_smock": 1098,
   "player_outfit_overalls": 1042,
-  "player_hair_short": 388,
+  "player_hair_short": 316,
   "player_hair_bob": 352,
-  "player_hair_bun": 416,
+  "player_hair_bun": 380,
   "player_scarf_orb": 212,
   "player_scarf_crescent": 256,
   "player_scarf_star": 204,
@@ -14,9 +14,9 @@
   "player_scarf_planet": 224,
   "player_scarf_comet": 220,
   "villager_firmin": 1806,
-  "villager_odette": 1826,
-  "villager_basile": 2054,
-  "villager_jeanne": 2162,
+  "villager_odette": 1950,
+  "villager_basile": 2166,
+  "villager_jeanne": 2054,
   "villager_lucie": 1986
  },
  "animations": [
@@ -136,6 +136,6 @@
    "loop": true
   }
  ],
- "file_bytes": 2219796,
- "player_example_tris": 2078
+ "file_bytes": 2221740,
+ "player_example_tris": 2006
 }

@@ -320,10 +320,10 @@ def torso_rings(w_top=0.38, w_bot=0.31, d=0.21, z0=0.97, z1=1.385, belly=0.0):
     h = z1 - z0
     # bas de chemise un peu évasé (rangée décalée de 1,5 cm) qui retombe sur la ceinture
     b = belly * 0.6
-    return [(0.162 * kx_b, 0.124 * ky + b * 0.5, z0 - 0.012), (0.166 * kx_b, 0.13 * ky + b, z0 + 0.05),
-            (0.170 * kx_b, 0.134 * ky + b, z0 + 0.27 * h),
-            (0.180 * kx_t, 0.132 * ky + b * 0.5, z0 + 0.55 * h), (0.180 * kx_t, 0.126 * ky, z0 + 0.77 * h),
-            (0.158 * kx_t, 0.112 * ky, z0 + 0.92 * h), (0.098 * kx_t, 0.078 * ky, z1 + 0.012)]
+    return [(0.162 * kx_b, 0.124 * ky + b * 0.5, z0 - 0.012), (0.168 * kx_b, 0.134 * ky + b, z0 + 0.05),
+            (0.178 * kx_b, 0.142 * ky + b, z0 + 0.27 * h),
+            (0.186 * kx_t, 0.138 * ky + b * 0.5, z0 + 0.55 * h), (0.178 * kx_t, 0.128 * ky, z0 + 0.77 * h),
+            (0.152 * kx_t, 0.11 * ky, z0 + 0.92 * h), (0.094 * kx_t, 0.076 * ky, z1 + 0.012)]
 
 
 def torso_front_y(z, rings=None):
@@ -358,13 +358,13 @@ def head_round(g, s=1.0):
     visage, bande de facettes centrée sur les yeux); sommet fixe. Renvoie (hc, largeur, profondeur, hauteur)."""
     rx, ry, rz = (a * s for a in PHEAD)
     hc = PHC + PHEAD[2] - rz
-    lats = [-90, -62, -38, -13, 13, 38, 62, 90]
+    lats = [-90, -58, -30, -6, 20, 44, 66, 90]
     prof = [(math.cos(math.radians(a)), math.sin(math.radians(a))) for a in lats]
     g.head_verts = g.lathe(prof, loc=(0, 0, hc), colors="skin", segs=12, scale=(rx, ry, rz), bone="head")
     for sx in (1, -1):
         g.sphere(1.0, loc=(sx * (rx - 0.004), 0.01, hc - 0.01), color="skin_shade", segs=6, rings=4,
                  scale=(0.016 * s, 0.032 * s, 0.042 * s), bone="head")
-    g.sphere(1.0, loc=(0, -ry - 0.002, hc - 0.017 * s), color="skin", segs=6, rings=4,
+    g.sphere(1.0, loc=(0, -ry * 0.985, hc + 0.008 * s), color="skin", segs=6, rings=4,
              scale=(0.024 * s, 0.016 * s, 0.024 * s), bone="head")
     return hc, 2 * rx, 2 * ry, 2 * rz
 
@@ -404,8 +404,6 @@ def hair_round(g, style, hc, s=1.0):
     lobe((0, 0.04, 0.06), (rx + 0.014, ry + 0.016, 0.13), segs=12, rings=7)
     if style == "braids":  # Jeanne: tresses en perles de lobes
         lobe((0, 0.085, -0.02), (0.15, 0.1, 0.1))
-        for x, z, k2 in ((-0.07, 0.14, 0.9), (0.0, 0.148, 1.0), (0.07, 0.142, 0.85)):
-            lobe((x, -0.105, z), (0.066 * k2, 0.035, 0.044 * k2), segs=6, rings=4, rot=(20, 0, x * 200))
         for sx in (1, -1):
             for i in range(4):
                 lobe((sx * 0.19, 0.03, -0.03 - i * 0.055), (0.035 * (1 - i * 0.06), 0.035, 0.04), segs=6, rings=4)
@@ -418,20 +416,18 @@ def hair_round(g, style, hc, s=1.0):
         return
     if style == "short":
         lobe((0, 0.085, -0.03), (0.15, 0.1, 0.1))
-        for x, z, s in ((-0.075, 0.143, 0.9), (0.0, 0.15, 1.0), (0.075, 0.145, 0.85)):
-            lobe((x, -0.11, z), (0.068 * s, 0.035, 0.045 * s), segs=6, rings=4, rot=(20, 0, x * 200))
+        lobe((0.03, -0.1, 0.16), (0.09, 0.035, 0.04), segs=6, rings=4, rot=(20, 0, 8))
         for sx in (1, -1):
             lobe((sx * 0.168, 0.03, 0.075), (0.035, 0.08, 0.06), segs=6, rings=4)
     elif style == "bob":
         lobe((0, 0.08, -0.06), (0.19, 0.11, 0.13))
-        lobe((0, -0.105, 0.143), (0.15, 0.038, 0.048), segs=8, rings=4, rot=(15, 0, 0))
+        lobe((0, -0.1, 0.162), (0.14, 0.034, 0.04), segs=8, rings=4, rot=(15, 0, 0))
         for sx in (1, -1):
             lobe((sx * 0.172, 0.0, -0.035), (0.05, 0.115, 0.115), segs=6, rings=5)
     else:  # bun
         lobe((0, 0.09, -0.01), (0.15, 0.1, 0.09))
         lobe((0, 0.15, 0.14), (0.085, 0.08, 0.08), segs=8, rings=5)
-        for x in (-0.05, 0.05):
-            lobe((x, -0.105, 0.145), (0.075, 0.035, 0.042), segs=6, rings=4, rot=(20, 0, x * 300))
+        lobe((-0.03, -0.1, 0.162), (0.085, 0.034, 0.038), segs=6, rings=4, rot=(20, 0, -8))
         for sx in (1, -1):
             lobe((sx * 0.168, 0.03, 0.075), (0.035, 0.08, 0.06), segs=6, rings=4)
 
@@ -663,12 +659,21 @@ def beard(g, hc, k=1.0):
 
 def skirt(g, z_top=0.99, z_bot=0.42, r_top=0.19, r_bot=0.31, color="bottom", segs=10, hem=None):
     w = skirt_weights(z_top, z_bot, r_bot)
+    if ROUND:
+        # robe évasée, ourlet arrondi (le bord rentre sous la cloche)
+        rb = r_bot * 1.06
+        g.lathe([(rb * 0.9, z_bot), (rb, z_bot + 0.03), (rb * 0.98, z_bot + 0.07), ((r_top + rb) / 2 * 0.93, (z_top + z_bot) / 2),
+                 (r_top * 1.02, z_top - 0.08), (r_top, z_top)], colors=[hem or color, hem or color, color, color, color],
+                segs=12, weights=w, scale=(1.0, 0.88, 1.0))
+        return
     g.lathe([(r_bot, z_bot), (r_bot * 0.96, z_bot + 0.03), ((r_top + r_bot) / 2 * 0.95, (z_top + z_bot) / 2),
              (r_top, z_top)], colors=[hem or color, color, color], segs=segs, weights=w, scale=(1.0, 0.85, 1.0))
 
 
 def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra_a", bib_to=None, front_r=0.2):
     """Tablier: panneau devant la jupe (ou le pantalon), mélangé bassin/cuisses."""
+    if ROUND:
+        return apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r)
     wfn = skirt_weights(z_top, z_bot, 0.2)
     yb = -front_r - 0.02
     pts = [(-w_bot / 2, yb - 0.04, z_bot), (w_bot / 2, yb - 0.04, z_bot), (w_top / 2, yb + 0.06, z_top),
@@ -685,6 +690,60 @@ def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra
         for s in (1, -1):
             g.box((0.025, 0.24, 0.02), loc=(s * 0.1, 0.0, bib_to - 0.005), color=color, bone="chest")
     g.box((0.32, 0.225, 0.03), loc=(0, 0, z_top - 0.005), color=color, bone="hips")
+
+
+def apron_round(g, z_top, z_bot, w_top, w_bot, color, bib_to, front_r):
+    """Tablier courbé sur 5 colonnes et 3 rangs: il épouse la jupe ou le ventre, coins du bas
+    arrondis, ourlet ondulé; bavette courbée sur le torse."""
+    wfn = skirt_weights(z_top, z_bot, 0.2)
+    nc, t = 5, 0.014
+
+    def panel(rows, weights=None, bone=None):
+        # rows: [(z, demi-largeur, rayon x, rayon y, décalage du bas)] du bas vers le haut
+        pts, faces = [], []
+        for z, hw, rx, ry, wave in rows:
+            for c in range(nc):
+                u = -1 + 2 * c / (nc - 1)
+                x = u * hw
+                yy = -ry * math.sqrt(max(0.05, 1 - (x / rx) ** 2)) - 0.012
+                dz = wave(u) if wave else 0.0
+                pts.append((x, yy, z + dz))
+        n = len(pts)
+        for p in list(pts):
+            pts.append((p[0], p[1] + t, p[2]))
+        R = len(rows)
+        for r in range(R - 1):
+            for c in range(nc - 1):
+                i = r * nc + c
+                faces.append((i, i + 1, i + nc + 1, i + nc))
+                faces.append((n + i, n + i + nc, n + i + nc + 1, n + i + 1))
+        for r in range(R - 1):
+            for c in (0, nc - 1):
+                i, j = r * nc + c, (r + 1) * nc + c
+                faces.append((i, j, n + j, n + i) if c == 0 else (j, i, n + i, n + j))
+        for c in range(nc - 1):
+            faces.append((c + 1, c, n + c, n + c + 1))
+            top = (R - 1) * nc
+            faces.append((top + c, top + c + 1, n + top + c + 1, n + top + c))
+        return g.mesh(pts, faces, color, weights=weights, bone=bone)
+
+    def wave(u):
+        # ourlet ondulé, coins relevés (arrondis)
+        return 0.012 * math.cos(u * math.pi * 2) + 0.03 * u ** 4
+
+    rs = front_r + 0.03
+    panel([(z_bot, w_bot / 2, rs * 1.6, rs * 1.05, wave), ((z_bot + z_top) / 2, (w_bot + w_top) / 4, rs * 1.5, rs * 0.98, None),
+           (z_top, w_top / 2, rs * 1.3, rs * 0.86, None)], weights=wfn)
+    if bib_to:
+        rings = torso_rings()
+        za, zb = z_top, bib_to
+        ya, yb = -torso_front_y(za + 0.02, rings), -torso_front_y((za + zb) / 2, rings)
+        yc = -torso_front_y(zb - 0.02, rings)
+        panel([(za, 0.1, 0.2, ya + 0.004, None), ((za + zb) / 2, 0.1, 0.2, yb + 0.004, None),
+               (zb, 0.095, 0.2, yc + 0.004, lambda u: -0.01 * u * u)], weights=torso_weights)
+        for sx in (1, -1):
+            g.box((0.025, 0.25, 0.02), loc=(sx * 0.1, 0.0, bib_to - 0.005), color=color, bone="chest")
+    g.lathe([(0.2, z_top - 0.02), (0.2, z_top + 0.012)], colors=color, segs=10, scale=(1.0, 0.72, 1.0), bone="hips")
 
 
 def overall_bib(g, color="bottom", z0=1.0, z1=1.27, straps="bottom", buttons_c="metal"):
@@ -849,7 +908,7 @@ def head_round_face(g, expr, s=1.0, **face_kw):
     mouth_dy = face_kw.pop("mouth_dy", None)
     if mouth_dy is not None:
         face_kw["mouth_y"] = -hy / 2 + mouth_dy
-    face_features(g, hc + 0.004 * s, hy, expr, k=s, eye_k=0.8 * face_kw.pop("eye_k", 1.0), eye_x=0.048, **face_kw)
+    face_features(g, hc + 0.03 * s, hy, expr, k=s, eye_k=0.8 * face_kw.pop("eye_k", 1.0), eye_x=0.048, **face_kw)
     project_on_head(g, start, hx, hy, hz, hc)
     return hc
 
@@ -865,8 +924,9 @@ def cap_rail_round(g, hc, s=1.0):
             bone="head")
     g.lathe([(0.17 * s, top + 0.045 * s), (0.19 * s, top + 0.1 * s), (0.17 * s, top + 0.125 * s),
              (0.0, top + 0.13 * s)], loc=(0, 0.01, 0), colors="extra_a", segs=12, close_bottom=False, bone="head")
-    vs = g.sphere(1.0, loc=(0, -0.175 * s, top + 0.0), color="eye", segs=10, rings=4, scale=(0.11 * s, 0.07 * s, 0.014 * s),
-                  rot=(-18, 0, 0), bone="head")
+    # visière courte et relevée: on voit les yeux et la moustache en vue isométrique
+    vs = g.sphere(1.0, loc=(0, -0.168 * s, top + 0.012 * s), color="eye", segs=10, rings=4,
+                  scale=(0.1 * s, 0.05 * s, 0.013 * s), rot=(-30, 0, 0), bone="head")
     g.box((0.04 * s, 0.012 * s, 0.032 * s), loc=(0, -0.172 * s, top + 0.06 * s), color="metal", bevel=0.006,
           bone="head")
     return vs
@@ -993,8 +1053,9 @@ def build_player_base(g, expr):
         hc, hx, hy, hz = head_round(g)
         start = set(g.bm.verts)
         # traits à la taille d'origine, yeux réduits et rapprochés: chaque trait tient sur une facette
-        # (arête verticale au milieu du visage, bande de facettes centrée sur les yeux)
-        face_features(g, hc + 0.004, hy, expr, k=1.0, eye_k=0.8, eye_x=0.048, lid=0.0065)
+        # (arête verticale au milieu du visage, bande de facettes centrée sur les yeux), ligne des yeux
+        # un peu au-dessus de l'équateur: en vue isométrique, le bas de la boule fuit
+        face_features(g, hc + 0.03, hy, expr, k=1.0, eye_k=0.8, eye_x=0.048, lid=0.0065)
         project_on_head(g, start, hx, hy, hz, hc)
         neck(g)
         hands_round(g)
