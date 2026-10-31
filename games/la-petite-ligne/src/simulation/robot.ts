@@ -132,7 +132,7 @@ function social(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     if (!v.visible || v.talkingWith.length > 0) continue;
     const d = pickDialogue(sim, v.id, c.id);
     if (d === null || d.kind === 'daily') continue;
-    if (d.kind === 'quest' && d.once === null) continue;
+    if ((d.kind === 'quest' || d.kind === 'hint') && d.once === null) continue;
     if (goAct(sim, c, m, `parler:${v.id}`, { kind: 'villager', villager: v.id }, v.pos, sim.content.settings.ranges.talk - 0.5, out)) return true;
   }
   return false;

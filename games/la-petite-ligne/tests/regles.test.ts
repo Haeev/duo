@@ -180,4 +180,36 @@ describe('règles', () => {
     for (let i = 0; i < sim.content.settings.feel.pinSeconds * 30 + 2; i++) step(sim, { controls: {}, intents: [] });
     expect(character(sim, 'p1').pin).toBeNull();
   });
+
+  it('pêche: lancer sur l’eau, ferrer pendant la touche, le poisson va au sac (CN-05)', () => {
+    const sim = started();
+    const c = character(sim, 'p1');
+    const ford = sim.map.points.river_ford;
+    if (ford === undefined) throw new Error('gué absent');
+    // Une case d'eau à portée de lancer depuis un point libre près du gué.
+    let water: { x: number; y: number } | null = null;
+    for (let cy = 0; cy < sim.map.height && water === null; cy++) {
+      for (let cx = 0; cx < sim.map.width && water === null; cx++) {
+        const d = Math.hypot(cx + 0.5 - ford.x, cy + 0.5 - ford.y);
+        if (sim.map.ground[cy * sim.map.width + cx] === 'water' && d < 4) water = { x: cx + 0.5, y: cy + 0.5 };
+      }
+    }
+    if (water === null) throw new Error('pas d’eau près du gué');
+    placeCharacter(sim, c, ford);
+    c.facing = Math.atan2(water.y - ford.y, water.x - ford.x);
+    const rodSlot = c.bag.findIndex((s) => s?.item === 'fishing_rod');
+    expect(rodSlot).toBeGreaterThanOrEqual(0);
+    act(sim, 'p1', { type: 'select_slot', slot: rodSlot });
+    act(sim, 'p1', { type: 'act' });
+    expect(c.fishing?.phase).toBe('waiting');
+    for (let i = 0; i < 30 * 16 && c.fishing?.phase !== 'bite'; i++) step(sim, { controls: {}, intents: [] });
+    expect(c.fishing?.phase).toBe('bite');
+    act(sim, 'p1', { type: 'act' });
+    expect(c.fishing).toBeNull();
+    expect(['gudgeon', 'chub', 'trout'].reduce((n, fish) => n + countInBag(c, fish), 0)).toBe(1);
+    // Trop tard: le poisson s'échappe.
+    act(sim, 'p1', { type: 'act' });
+    for (let i = 0; i < 30 * 20 && c.fishing !== null; i++) step(sim, { controls: {}, intents: [] });
+    expect(c.fishing).toBeNull();
+  });
 });
