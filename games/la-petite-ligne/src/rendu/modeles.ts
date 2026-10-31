@@ -273,6 +273,21 @@ export class ModelLibrary {
     return copy;
   }
 
+  /**
+   * Copie d'un nœud animé seul (une bête de `faune.glb`: son squelette et son maillage enfant),
+   * sans le reste du fichier. `null` si le nœud n'existe pas.
+   */
+  cloneAnimal(name: string): Object3D | null {
+    const node = this.node(name);
+    if (node === null) {
+      return null;
+    }
+    const copy = cloneSkinned(node);
+    copy.position.set(0, 0, 0);
+    copy.rotation.set(0, 0, 0);
+    return copy;
+  }
+
   /** Source d'un modèle, pour le diagnostic. */
   source(name: string): ModelSource | null {
     return this.table.get(name) ?? null;

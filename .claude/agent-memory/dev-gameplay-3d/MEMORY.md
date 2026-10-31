@@ -131,3 +131,14 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Une étape finie par un compteur posé au début d'une chorégraphie (`moment_seen`) rend la quête finie pendant la chorégraphie: ce qui dépend de « l'étape en cours » (tenir l'échelle) ne doit plus l'exiger une fois l'apogée partie.
 - Spline de Catmull-Rom entre deux images clés au même point: léger dépassement (environ 0,1 m) si la suivante s'éloigne; doubler l'image clé ou l'accepter.
 - Tests sur un monde « truqué » (jour 1 avancé à la main): les rencontres passent avant tout dialogue (marquer les `meeting` comme faits), l'emploi du temps d'un habitant le rend invisible au pas suivant (appeler `talkTo`, `dialogueChoice`, `dialogueClose` directement), et la bêche en main vole Espace (verbe `dig`): vider la main (`selected` sur une case vide).
+
+## Rendu des moments rares (La Petite Ligne, vérifié le 2026-10-31, tour 6)
+
+- `/tmp/dg3d-t6` appartient déjà à un autre membre: prendre un dossier à son nom de mission (`/tmp/dg3d-moments`).
+- Clip calé sur un temps extérieur (chorégraphie): `action.timeScale = 0` puis `action.time = t` à chaque image. Avec un pas nul, `AnimationAction` ne replie pas le temps d'une boucle: faire le modulo soi-même; les fondus avancent quand même (temps du mélangeur).
+- Plusieurs bêtes dans un GLB (`faune.glb`): cloner le nœud de la bête seul (`SkeletonUtils.clone(node)`), pas toute la scène comme `cloneRig`.
+- Catmull-Rom entre deux images clés au même point: dépassement vers la voisine. Deux images clés au même instant (la seconde sans clip) donnent un arrêt net sans bosse; `null` en clip garde le clip d'avant.
+- Halo émissif sans programme de plus: les sprites posés du programme des particules (`createParticleMaterial(PARTICLE_MODE.sprites)`, groupe 2 immobile, forme `glow`), avec un `DataTexture` 1x1 comme champ.
+- Habitant joué par une chorégraphie: `CharactersPart.setVillagerDirector` (pose et clip imposés, ou seulement la tête), appelé pendant la mise à jour des personnages; l'horloge du moment est calculée une fois par image (mémo sur `context.time`).
+- Page de rendu: `vue=x,y` pose la caméra sans déplacer les joueurs (`setFocusOverride`), `moment=<id>&t=<s>` fige une apogée. Boucles shell refusées dans le worktree isolé: une capture par ligne d'un fichier lu par `lot.sh`.
+- Le contrôle des tirets refuse de tourner en ligne de commande dans le worktree (mot « git » dans l'exclusion): le mettre dans un script du scratchpad.

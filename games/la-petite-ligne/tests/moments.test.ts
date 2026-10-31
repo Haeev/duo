@@ -237,8 +237,8 @@ describe('moments: l’apogée n’attend que les deux (M-05)', () => {
     expect(today.phase).toBe('climax');
     expect(sim.world.characters.every((c) => c.heartToday.moment === true)).toBe(true);
     expect(sim.world.characters.every((c) => c.notifications.some((n) => n.key === 'heron_seen'))).toBe(true);
-    // La chorégraphie dure 5,2 s, identique chez les deux, puis l'état d'après; aucun sou ajouté.
-    wait(sim, 5.3);
+    // La chorégraphie dure 7,4 s (alerte tenue avant l'envol, M-02), identique chez les deux, puis l'état d'après; aucun sou ajouté.
+    wait(sim, 7.5);
     expect(today.phase).toBe('after');
     expect(climaxes(wait(sim, 3))).toEqual([]);
     expect(sim.world.purse).toBe(purse);
@@ -340,24 +340,26 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
   }
 
   function holdBoth(sim: Sim): void {
-    place(sim, 'p1', { x: 50.6, y: 4.6 });
-    place(sim, 'p2', { x: 50.6, y: 6.4 });
+    place(sim, 'p1', { x: 51.2, y: 5.3 });
+    place(sim, 'p2', { x: 52.6, y: 6.8 });
     press(sim, 'p1');
     press(sim, 'p2');
   }
 
   it('Agir près d’une place libre la prend, face à l’échelle; la place de l’autre ne se prend pas', () => {
     const { sim } = ladderSim();
-    place(sim, 'p1', { x: 50.6, y: 4.6 });
+    place(sim, 'p1', { x: 51.2, y: 5.3 });
     step(sim, { controls: {}, intents: [] });
     expect(character(sim, 'p1').aim?.verb).toBe('hold');
     const events = press(sim, 'p1');
     const c = character(sim, 'p1');
-    expect(c.holding).toBe('ladder_hold_north');
-    expect(c.pos).toEqual(sim.map.points.ladder_hold_north);
-    expect(events).toContainEqual({ type: 'hold_started', by: 'p1', point: 'ladder_hold_north' });
+    expect(c.holding).toBe('ladder_hold_west');
+    expect(c.pos).toEqual(sim.map.points.ladder_hold_west);
+    // Face au montant: la place de l'ouest regarde le sud-est (cap de la carte).
+    expect(c.facing).toBeCloseTo(Math.PI / 4, 6);
+    expect(events).toContainEqual({ type: 'hold_started', by: 'p1', point: 'ladder_hold_west' });
     // L'autre arrive du même côté: on lui dit de prendre l'autre côté.
-    place(sim, 'p2', { x: 50.9, y: 4.2 });
+    place(sim, 'p2', { x: 51.0, y: 5.9 });
     // Mains libres (sinon la bêche qu'on tient bêcherait la case devant soi, comme ailleurs).
     const p2 = character(sim, 'p2');
     p2.selected = p2.bag.findIndex((s, i) => s === null && i < 10);
@@ -387,7 +389,7 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
     expect(sim.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('done');
     // Il revient à sa place: Basile reprend où il en était.
     const back = press(sim, 'p2');
-    expect(character(sim, 'p2').holding).toBe('ladder_hold_south');
+    expect(character(sim, 'p2').holding).toBe('ladder_hold_east');
     expect([...back, ...wait(sim, 0.1)].some((e) => e.type === 'moment_resumed')).toBe(true);
     expect(today.elapsed).toBeGreaterThan(frozen);
     expect(today.elapsed).toBeLessThan(frozen + 0.2);
@@ -479,12 +481,12 @@ describe('moments: la confidence du matin (M-10)', () => {
 
 describe('moments: chorégraphies et temps à l’écran (M-02)', () => {
   /**
-   * Écarts mesurés au critère M-02 (« 3 s à moins de watch.radius des deux, depuis les positions
-   * extrêmes »): depuis le bord de l'anneau du côté où la bête s'en va, elle sort du rayon plus
-   * tôt. Question posée au game designer (compte rendu du tour 6); ces valeurs sont surveillées
-   * pour qu'un changement des données se voie.
+   * M-02, décision du manager (tour 6): rayon de 6 m gardé, et chaque apogée reste au moins 3,4 s
+   * à moins de `watch.radius` depuis toute case libre de l'anneau, y compris le bord opposé à
+   * l'envol (le héron et les oies tiennent leur pose d'alerte avant de partir, le renard regarde
+   * encore après ses jappements). Aucun écart toléré.
    */
-  const M02_GAPS: Record<string, number> = { heron: 1.1, geese: 1.1, fox: 2.3 };
+  const M02_MIN_SECONDS = 3.4;
 
   it('mesure, pour chaque moment, le pire temps où une bête reste dans le rayon de chaque case libre de l’anneau', () => {
     const sim = newSim(1);
@@ -515,9 +517,7 @@ describe('moments: chorégraphies et temps à l’écran (M-02)', () => {
           }
         }
         expect(worst, `${def.id}: au moins une case de l'anneau`).toBeLessThan(Infinity);
-        const gap = M02_GAPS[def.id];
-        if (gap === undefined) expect(worst, `${def.id}: 3 s au moins`).toBeGreaterThanOrEqual(3);
-        else expect(worst, `${def.id}: écart connu`).toBeCloseTo(gap, 1);
+        expect(worst, `${def.id}: ${String(M02_MIN_SECONDS)} s au moins`).toBeGreaterThanOrEqual(M02_MIN_SECONDS);
       }
     }
   });

@@ -465,13 +465,19 @@ POINTS = [
       "chemin", moment="heron"),
     p("geese_rest", 25.5, 40.0, "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de "
       "lui; on la regarde depuis la berge", moment="geese", portee=4.5),
-    p("nest_box", 52.5, 5.84, "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas "
-      "(`tree_oak_01`), trou à 2,45 m", moment="tits", z=2.40),
-    p("ladder_foot", 51.47, 5.5, "pied de l'échelle de Basile contre la face ouest du chêne", moment="ladder"),
-    p("ladder_hold_north", 51.25, 4.95, "tenir l'échelle, côté nord (tourné vers le sud)", moment="ladder"),
-    p("ladder_hold_south", 51.25, 6.05, "tenir l'échelle, côté sud (tourné vers le nord)", moment="ladder"),
-    p("nest_oak_basile", 51.0, 5.5, "Basile au pied de son échelle, pendant « Où est passé Basile ? »",
-      rotation=1),
+    # L'échelle et le nichoir (décision du manager, tour 6): l'échelle au sud-ouest du tronc, où aucune
+    # branche ne passe (à l'ouest, la branche basse du chêne traversait l'échelle et Basile); tout est
+    # abaissé de 0,56 m sous le houppier (dessous vers 2,6 m), qui cachait le nichoir et le grimpeur.
+    p("nest_box", 52.5, 5.80, "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas "
+      "(`tree_oak_01`): centre de la caisse à 1,84 m, trou à 1,89 m", moment="tits", z=1.84),
+    p("ladder_foot", 51.77, 6.23, "pied de l'échelle de Basile, au sud-ouest du chêne, tête contre le tronc "
+      "en (52,32 ; 5,68) à 2,90 m", moment="ladder", cap_degres=45),
+    p("ladder_hold_east", 52.36, 6.42, "tenir l'échelle, côté est, mains au montant (tourné vers le nord-ouest)",
+      moment="ladder", cap_degres=315),
+    p("ladder_hold_west", 51.58, 5.64, "tenir l'échelle, côté ouest, mains au montant (tourné vers le sud-est)",
+      moment="ladder", cap_degres=135),
+    p("nest_oak_basile", 51.42, 6.58, "Basile derrière le pied de son échelle, pendant « Où est passé Basile ? »; "
+      "il en part et y revient", cap_degres=45),
     p("fox_track_west", 0.2, 13.5, "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast",
       moment="fox", portee=4.0),
     p("fox_mousing", 7.5, 17.0, "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la "
@@ -532,12 +538,14 @@ ZONES = [
 # bloquent rien et ne se dessinent pas en substitut; le rendu les pose sur leur support, à la hauteur z.
 # x, y, z: point d'attache en mètres (le clou du nichoir, le bout du chicot, le haut du pieu).
 ACCROCHES = [
-    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.84, "z": 2.40,
+    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.71, "z": 2.015,
      "regarde": "sud", "penche_degres": 25,
      "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par "
-             "le moment de l'échelle (drapeau `nest_box_straight`)"},
-    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.75,
-     "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier: perchoir des mésanges"},
+             "le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce; le centre "
+             "de la caisse est 0,09 m devant (y 5,80) et 0,175 m dessous (1,84 m)"},
+    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.19,
+     "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier, à hauteur du nichoir: perchoir des "
+             "mésanges"},
     {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95,
      "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"},
 ]
@@ -663,7 +671,9 @@ def main() -> int:
                          "franchissables; sinon toute l'emprise est infranchissable",
             "points": "x, y en mètres; `objet`: l'objet auquel le point appartient; `portee`: le point est dans "
                       "une case pleine et se joue depuis une case libre à cette distance; `rayon`: tolérance "
-                      "d'arrivée; `rotation`: où regarde un habitant posté là",
+                      "d'arrivée; `rotation`: où regarde un habitant posté là; `cap_degres`: où regarde celui "
+                      "qui s'y tient, en degrés de boussole (0 nord, 90 est), pour les directions en biais "
+                      "(places de l'échelle)",
         },
         "camera": {
             "orientation_par_defaut": "sud-est (regard vers le nord-ouest), comme le rendu (yaw = -3 PI/4)",

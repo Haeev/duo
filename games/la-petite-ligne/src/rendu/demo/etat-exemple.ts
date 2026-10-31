@@ -14,6 +14,7 @@ import type { GameMap } from '../../etat/carte';
 import { createWorld } from '../../simulation/monde';
 import { sitDown } from '../../simulation/bancs';
 import { placeVillagers } from '../../simulation/habitants';
+import { newToday } from '../../simulation/moments';
 import type {
   ActionKind,
   Character,
@@ -91,7 +92,32 @@ export interface DemoOptions {
   scene?: DemoScene | undefined;
   /** Draisine poussée, posée au bout de la voie (`world.handcarAt`), remise ouverte. */
   handcarParked?: boolean;
+  /**
+   * Moment rare du jour (`moment=<id>`): en attente, à l'instant `t` de l'apogée (`t=<s>`), ou
+   * après; les deux joueurs à leurs places de spectateurs (tenant l'échelle pour `ladder`).
+   */
+  moment?: DemoMoment | undefined;
 }
+
+export interface DemoMoment {
+  id: string;
+  phase: 'waiting' | 'climax' | 'after';
+  /** Secondes depuis le début de l'apogée (ou de la phase). */
+  t: number;
+}
+
+/**
+ * Places des deux spectateurs de chaque moment (cases libres, à moins de 6 m de la cible), et
+ * le point qu'ils regardent. L'échelle: les deux places à tenir.
+ */
+const MOMENT_SPOTS: Readonly<Record<string, readonly [number, number, number, number]>> = {
+  heron: [22.5, 35.5, 21.0, 35.5],
+  geese: [24.5, 37.5, 26.5, 37.5],
+  ladder: [52.36, 6.42, 51.58, 5.64],
+  tits: [50.6, 8.2, 51.4, 7.4],
+  fox: [10.5, 17.5, 11.5, 16.5],
+  glowworms: [53.5, 32.5, 54.5, 31.5],
+};
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */
 const MEET_FROM = { x: 5, y: -2.5 };
@@ -392,6 +418,9 @@ export function createExampleWorld(
     world.handcarAt = { pos: { x: shed.x + offset[0], y: shed.y + offset[1] }, facing: Math.PI };
     world.worldStates.handcar_shed = 'open';
   }
+  if (options.moment !== undefined) {
+    placeMoment(sim, map, content, options.moment, p1, p2);
+  }
   world.train = {
     phase: options.train,
     progress: options.train === 'stopped' ? 1 : 0.5,
@@ -529,3 +558,72 @@ export const DEMO_ACTIONS: readonly ActionKind[] = [
   'hammer',
   'eat',
 ];
+
+/** Pose le moment du jour de la démonstration et ses deux spectateurs. */
+function placeMoment(
+  sim: ReturnType<typeof createWorld>,
+  map: GameMap,
+  content: Content,
+  moment: DemoMoment,
+  p1: Character,
+  p2: Character,
+): void {
+  const def = content.moments.find((m) => m.id === moment.id);
+  if (def === undefined) {
+    return;
+  }
+  const world = sim.world;
+  const today = newToday(sim, def, def.mode === 'ambient' ? 'ambient' : 'quest');
+  today.phase = moment.phase;
+  today.phaseTick = world.tick - Math.round(moment.t * SIM_HZ);
+  today.startTick = moment.phase === 'waiting' ? null : today.phaseTick;
+  today.elapsed = moment.phase === 'climax' ? moment.t : 0;
+  // Démonstration figée: l'instant demandé reste à l'écran (la page ne fait pas tourner la simulation).
+  today.paused = true;
+  world.moments.today = today;
+  if (moment.id === 'ladder' && moment.phase !== 'waiting') {
+    world.flags = world.flags.filter((flag) => flag !== 'nest_box_straight');
+  }
+  if (moment.id === 'tits' || (moment.id === 'ladder' && moment.phase === 'after')) {
+    world.flags = [...world.flags, 'nest_box_straight'];
+  }
+  const spots = MOMENT_SPOTS[moment.id];
+  const anchor = map.points[def.anchor] ?? { x: 0, y: 0 };
+  if (spots !== undefined) {
+    const [x1, y1, x2, y2] = spots;
+    for (const [c, x, y] of [
+      [p1, x1, y1],
+      [p2, x2, y2],
+    ] as const) {
+      c.pos = { x, y };
+      c.prev = { x, y };
+      c.inHouse = false;
+      c.aim = null;
+      c.action = { kind: 'idle', since: 0, duration: 0, target: null };
+      c.facing = Math.atan2(anchor.y - y, anchor.x - x);
+    }
+  }
+  const hold = def.watch.hold;
+  if (hold !== null && moment.phase !== 'after') {
+    // L'échelle: chacun tient sa place, face au montant (comme `takeHold`).
+    [p1, p2].forEach((c, index) => {
+      const place = hold[index];
+      if (place === undefined) return;
+      c.holding = place;
+      c.facing = map.pointFacings[place] ?? c.facing;
+      c.bag[c.selected] = null;
+    });
+  }
+  // L'habitant du moment (Basile) à son point, arrêté.
+  for (const actor of def.actors) {
+    const villager = world.villagers.find((v) => v.id === actor.villager);
+    const at = map.points[actor.at];
+    if (villager === undefined || at === undefined) continue;
+    villager.pos = { x: at.x, y: at.y };
+    villager.prev = { x: at.x, y: at.y };
+    villager.target = actor.at;
+    villager.speed = 0;
+    villager.visible = true;
+    villager.activity = 'stand';
+  }
+}

@@ -13,6 +13,7 @@ import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones }
 import { type Catalogue, type SequenceStep, sequenceOf, stepTime, stopTime } from './catalogue';
 import { type EventSignals, type LoopWish, type SoundRequest, StateWatcher, type TriggerContext, noSignals, soundsForEvent } from './declencheurs';
 import { distanceBetween, distanceToRect, earPosition } from './espace';
+import { MomentSounds } from './moments';
 import { type BedWish, MUSIC, type MomentRules, type MusicCommand, MusicDirector, type MusicMoment, chooseBed } from './musique';
 import type { AudioSettings } from './reglages';
 import { type SequenceCatalogue, type SequenceShot, SequenceRun } from './sequences';
@@ -76,6 +77,10 @@ export interface BrainFrame {
   syncs: SyncState[];
   /** Sons du train à garder décodés (jours de train). */
   trainDay: boolean;
+  /** Fichiers du moment rare du jour à garder décodés. */
+  momentFiles: ReadonlySet<string>;
+  /** Musique atténuée pendant l'apogée d'un moment (dB, 0 sinon), et ses temps de descente et de remontée (s). */
+  momentDuck: { db: number; attackSeconds: number; releaseSeconds: number };
   /** Diagnostic. */
   bed: string | null;
   timeline: TrainTimeline;
@@ -92,6 +97,7 @@ interface ActiveSync {
 
 export class AudioBrain {
   private readonly watcher: StateWatcher;
+  private readonly moments: MomentSounds;
   private readonly director: MusicDirector;
   private readonly tracker: TrainTracker;
   private readonly rules: MomentRules;
@@ -136,6 +142,7 @@ export class AudioBrain {
     const { catalogue, settings, content, map, random } = options;
     const clock = content.settings.clock;
     this.watcher = new StateWatcher(settings, random);
+    this.moments = new MomentSounds(catalogue, settings, content, map, random);
     this.director = new MusicDirector({
       music: catalogue.music,
       restLoops: catalogue.rest.playLoops,
@@ -213,6 +220,12 @@ export class AudioBrain {
       ambienceNeeded: new Set(),
       syncs: [],
       trainDay: false,
+      momentFiles: this.moments.files(),
+      momentDuck: {
+        db: 0,
+        attackSeconds: content.settings.moments.musicDuckInSeconds,
+        releaseSeconds: content.settings.moments.musicDuckOutSeconds,
+      },
       bed: null,
       timeline: { arrival: null, departure: null },
     };
@@ -259,6 +272,8 @@ export class AudioBrain {
     }
     if (signals.hensFed) this.watcher.excite(input.gameTime);
     this.watcher.update(ctx, input.dt, input.gameTime, f.shots, f.loops);
+    this.moments.update(world, input.gameTime, f.shots, f.loops, f.syncs);
+    f.momentDuck.db = this.moments.duckDb();
 
     // Réveil et coucher.
     // La musique qui suit est connue d'avance: on la décode pendant le coq ou l'endormissement.

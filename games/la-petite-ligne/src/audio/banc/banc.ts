@@ -150,6 +150,8 @@ function emptyFrame(): BrainFrame {
     ambienceNeeded: new Set(),
     syncs: [],
     trainDay: false,
+    momentFiles: new Set(),
+    momentDuck: { db: 0, attackSeconds: 0.5, releaseSeconds: 2 },
     bed: null,
     timeline: { arrival: null, departure: null },
   };

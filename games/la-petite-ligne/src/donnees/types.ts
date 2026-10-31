@@ -361,6 +361,11 @@ export interface MomentActorDef {
   shy: { distance: number; clip: string; stepTo: [number, number] | null; stepClip: string | null; returnAfterSeconds: number } | null;
   /** Habitant joué par cet acteur pendant le moment (Basile sur l'échelle), ou `null`. */
   villager: string | null;
+  /**
+   * Garde son `facing` pendant les chorégraphies au lieu de se tourner dans le sens du mouvement
+   * (Basile face à l'échelle, qui en descend et recule sans se retourner).
+   */
+  keepFacing: boolean;
 }
 
 export interface MomentDef {

@@ -147,6 +147,8 @@ export function buildFallbackMap(): GameMap {
       river_ford: p(30.5, 43.5),
       offstage: p(-20, -20),
     },
+    pointFacings: {},
+    hooks: [],
     zones: {
       garden: { x: 4, y: 16, w: 4, h: 3 },
       forest_edge: { x: 50, y: 36, w: 14, h: 8 },
