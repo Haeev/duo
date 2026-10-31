@@ -6,7 +6,15 @@ import { useState } from 'preact/hooks';
 import type { AppState, MatchView, Profile } from '../../shared/state';
 import { send } from '../bridge';
 import { clock, percent, t } from '../textes';
-import { ActionList, Chip, Dialog, Icon, PlayerSymbol, useCountdown, useNow } from '../ui/components';
+import {
+  ActionList,
+  Chip,
+  Dialog,
+  Icon,
+  PlayerSymbol,
+  useCountdown,
+  useNow,
+} from '../ui/components';
 import { useEscape, useInitialFocus } from '../ui/keyboard';
 
 function peerProfile(state: AppState): Profile | null {
@@ -18,22 +26,26 @@ function Loading({ state, match }: { state: AppState; match: MatchView }): JSX.E
   const peer = peerProfile(state);
   const long = now - match.loadingSince > 20_000;
   return (
-    <main class="scene scene-opaque ecran-centre" data-testid="ecran-chargement" aria-live="polite">
-      <h1 class="titre-1">{t.chargement.titre(match.game.name)}</h1>
-      <div class="attente-orbite">
-        <span class="orbite" aria-hidden="true">
-          <span class="orbite-astre" />
-        </span>
-        <span>
-          {t.chargement.toi(percent(match.selfLoading))}
-          {peer !== null && match.peerLoading !== null && ` · ${t.chargement.autre(peer.pseudo, percent(match.peerLoading))}`}
-        </span>
-      </div>
-      {long && peer !== null && <p class="texte-second">{t.chargement.long(peer.pseudo)}</p>}
-      <div class="carte">
-        <h2 class="surtitre">{t.salon.commandes}</h2>
-        <ActionList actions={match.game.actions} />
-      </div>
+    <main class="scene scene-opaque">
+      <section class="ecran-centre" data-testid="ecran-chargement" aria-live="polite">
+        <h1 class="titre-1">{t.chargement.titre(match.game.name)}</h1>
+        <div class="attente-orbite">
+          <span class="orbite" aria-hidden="true">
+            <span class="orbite-astre" />
+          </span>
+          <span>
+            {t.chargement.toi(percent(match.selfLoading))}
+            {peer !== null &&
+              match.peerLoading !== null &&
+              ` · ${t.chargement.autre(peer.pseudo, percent(match.peerLoading))}`}
+          </span>
+        </div>
+        {long && peer !== null && <p class="texte-second">{t.chargement.long(peer.pseudo)}</p>}
+        <div class="carte">
+          <h2 class="surtitre">{t.salon.commandes}</h2>
+          <ActionList actions={match.game.actions} />
+        </div>
+      </section>
     </main>
   );
 }
@@ -49,7 +61,15 @@ function Hint(): JSX.Element {
   );
 }
 
-function StopDialog({ match, onBack, waiting }: { match: MatchView; onBack: () => void; waiting: boolean }): JSX.Element {
+function StopDialog({
+  match,
+  onBack,
+  waiting,
+}: {
+  match: MatchView;
+  onBack: () => void;
+  waiting: boolean;
+}): JSX.Element {
   const text = match.game.saves?.help ?? t.arret.texteParDefaut;
   return (
     <Dialog
@@ -62,7 +82,11 @@ function StopDialog({ match, onBack, waiting }: { match: MatchView; onBack: () =
           void send('match:stop', null);
         },
       }}
-      back={{ label: waiting ? t.arret.continuerAttendre : t.arret.continuer, testId: 'arret-retour', onClick: onBack }}
+      back={{
+        label: waiting ? t.arret.continuerAttendre : t.arret.continuer,
+        testId: 'arret-retour',
+        onClick: onBack,
+      }}
       focusBack
     >
       <p>{text}</p>
@@ -70,7 +94,15 @@ function StopDialog({ match, onBack, waiting }: { match: MatchView; onBack: () =
   );
 }
 
-function PauseOverlay({ state, match, profile }: { state: AppState; match: MatchView; profile: Profile }): JSX.Element {
+function PauseOverlay({
+  state,
+  match,
+  profile,
+}: {
+  state: AppState;
+  match: MatchView;
+  profile: Profile;
+}): JSX.Element {
   const peer = peerProfile(state);
   const [panel, setPanel] = useState<'menu' | 'commands'>('menu');
   const [confirmStop, setConfirmStop] = useState(false);
@@ -94,18 +126,23 @@ function PauseOverlay({ state, match, profile }: { state: AppState; match: Match
             },
   );
 
-  const subtitle = match.peerBack && peer !== null
-    ? t.pause.retourAutre(peer.pseudo)
-    : match.pausedBy.self && match.pausedBy.peer && peer !== null
-      ? t.pause.parDeux(profile.pseudo, peer.pseudo)
-      : match.pausedBy.peer && peer !== null
-        ? t.pause.parAutre(peer.pseudo)
-        : match.pausedBy.self
-          ? t.pause.parToi
-          : '';
+  const subtitle =
+    match.peerBack && peer !== null
+      ? t.pause.retourAutre(peer.pseudo)
+      : match.pausedBy.self && match.pausedBy.peer && peer !== null
+        ? t.pause.parDeux(profile.pseudo, peer.pseudo)
+        : match.pausedBy.peer && peer !== null
+          ? t.pause.parAutre(peer.pseudo)
+          : match.pausedBy.self
+            ? t.pause.parToi
+            : '';
 
   const chip = (wants: boolean): JSX.Element =>
-    wants ? <Chip kind="wants-resume" label={t.pause.puces.veutReprendre} /> : <Chip kind="paused" label={t.pause.puces.enPause} />;
+    wants ? (
+      <Chip kind="wants-resume" label={t.pause.puces.veutReprendre} />
+    ) : (
+      <Chip kind="paused" label={t.pause.puces.enPause} />
+    );
 
   return (
     <div class="voile superposition" data-testid="superposition-pause">
@@ -158,7 +195,8 @@ function PauseOverlay({ state, match, profile }: { state: AppState; match: Match
             )}
             <div class="paire-puces">
               <span class="joueur-puce">
-                <PlayerSymbol color={profile.color} /> {profile.pseudo} {chip(match.resumeReady.self)}
+                <PlayerSymbol color={profile.color} /> {profile.pseudo}{' '}
+                {chip(match.resumeReady.self)}
               </span>
               {peer !== null && (
                 <span class="joueur-puce">
@@ -220,7 +258,9 @@ function LinkLostOverlay({ state, match }: { state: AppState; match: MatchView }
           {t.coupure.statut(clock(elapsed))}
         </p>
         {elapsed >= 30_000 && <p class="texte-second">{t.coupure.apres30s(name)}</p>}
-        {elapsed >= 60_000 && (match.game.saves?.help ?? null) !== null && <p class="texte-second">{match.game.saves?.help}</p>}
+        {elapsed >= 60_000 && (match.game.saves?.help ?? null) !== null && (
+          <p class="texte-second">{match.game.saves?.help}</p>
+        )}
         <button
           type="button"
           class="bouton bouton-secondaire"
@@ -246,7 +286,15 @@ function LinkLostOverlay({ state, match }: { state: AppState; match: MatchView }
   );
 }
 
-export function MatchLayer({ state, match, profile }: { state: AppState; match: MatchView; profile: Profile }): JSX.Element | null {
+export function MatchLayer({
+  state,
+  match,
+  profile,
+}: {
+  state: AppState;
+  match: MatchView;
+  profile: Profile;
+}): JSX.Element | null {
   const now = useNow(match.hintUntil !== null);
   switch (match.phase) {
     case 'loading':

@@ -11,7 +11,9 @@ export type ManifestCheck =
 
 export function checkManifest(raw: unknown): ManifestCheck {
   const result = parseManifest(raw);
-  return result.ok ? { ok: true, manifest: result.manifest } : { ok: false, problems: result.issues };
+  return result.ok
+    ? { ok: true, manifest: result.manifest }
+    : { ok: false, problems: result.issues };
 }
 
 /** Vrai si l'application couvre la version du pont exigée par le jeu (ADR 0005, point 6). */

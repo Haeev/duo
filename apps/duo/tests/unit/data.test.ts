@@ -27,7 +27,9 @@ describe('écriture sûre (ADR 0009, point 4)', () => {
   it('sérialise les écritures concurrentes du même fichier', async () => {
     const dir = await tempDir();
     const file = path.join(dir, 'x.json');
-    await Promise.all(Array.from({ length: 20 }, (_, index) => writeJsonSafe(file, { schema: 1, valeur: index })));
+    await Promise.all(
+      Array.from({ length: 20 }, (_, index) => writeJsonSafe(file, { schema: 1, valeur: index })),
+    );
     const read = await readJsonSafe(file, Schema);
     expect(read).toMatchObject({ status: 'ok', value: { valeur: 19 } });
   });
@@ -74,14 +76,26 @@ describe('sauvegardes du prototype', () => {
     const dir = await tempDir();
     const saves = new LocalSaves(dir);
     const data = new TextEncoder().encode(JSON.stringify({ jour: 3 }));
-    await saves.write('la-petite-ligne', { label: 'Jour 3', progress: 0.3, dataSchema: 1, gameVersion: '0.1.0', data });
+    await saves.write('la-petite-ligne', {
+      label: 'Jour 3',
+      progress: 0.3,
+      dataSchema: 1,
+      gameVersion: '0.1.0',
+      data,
+    });
     const read = await saves.read('la-petite-ligne');
     expect(read?.summary.label).toBe('Jour 3');
     expect(read?.progress).toBe(0.3);
     expect(new TextDecoder().decode(read?.data)).toBe('{"jour":3}');
     const head = await saves.readHead('la-petite-ligne');
     expect(head?.revision).toBe(1);
-    await saves.write('la-petite-ligne', { label: 'Jour 4', progress: null, dataSchema: 1, gameVersion: '0.1.0', data: new TextEncoder().encode('{"jour":4}') });
+    await saves.write('la-petite-ligne', {
+      label: 'Jour 4',
+      progress: null,
+      dataSchema: 1,
+      gameVersion: '0.1.0',
+      data: new TextEncoder().encode('{"jour":4}'),
+    });
     expect((await saves.readHead('la-petite-ligne'))?.previous).toEqual([head?.sha256]);
   });
 });

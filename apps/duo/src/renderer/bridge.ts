@@ -25,7 +25,10 @@ export function connectBridge(): void {
   });
 }
 
-export function send<C extends IntentChannel>(channel: C, arg: IntentArgs[C]): Promise<IntentResult> {
+export function send<C extends IntentChannel>(
+  channel: C,
+  arg: IntentArgs[C],
+): Promise<IntentResult> {
   if (api === null) return Promise.resolve({ ok: false, error: 'pont absent' });
   return api.invoke(channel, arg);
 }

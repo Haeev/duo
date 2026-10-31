@@ -97,8 +97,7 @@ export class LocalSaves {
       gameVersion: save.gameVersion,
       size: save.data.byteLength,
       writtenAt: now.toISOString(),
-      previous:
-        previous === null ? [] : [previous.sha256, ...previous.previous].slice(0, 3),
+      previous: previous === null ? [] : [previous.sha256, ...previous.previous].slice(0, 3),
     };
     await writeJsonSafe(path.join(dir, 'head.json'), head);
   }

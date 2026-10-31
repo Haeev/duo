@@ -26,7 +26,11 @@ body {
   font-size: var(--type-body-size);
   line-height: var(--type-body-line-height);
   font-weight: var(--type-body-weight);
-  background: radial-gradient(1400px 900px at 78% 18%, var(--color-bg-glow) 0%, var(--color-bg) 62%);
+  background: radial-gradient(
+    1400px 900px at 78% 18%,
+    var(--color-bg-glow) 0%,
+    var(--color-bg) 62%
+  );
   -webkit-font-smoothing: antialiased;
   user-select: none;
 }
@@ -202,7 +206,11 @@ input {
 }
 
 .scene-opaque {
-  background: radial-gradient(1400px 900px at 78% 18%, var(--color-bg-glow) 0%, var(--color-bg) 62%);
+  background: radial-gradient(
+    1400px 900px at 78% 18%,
+    var(--color-bg-glow) 0%,
+    var(--color-bg) 62%
+  );
 }
 
 .ciel {
@@ -230,7 +238,8 @@ input {
   animation-delay: -2400ms;
 }
 
-.scene > *:not(.ciel) {
+/* Contenu des scènes au-dessus du ciel; voiles et bandeau restent en position fixe. */
+.scene > :is(header, main, section) {
   position: relative;
   z-index: 1;
 }

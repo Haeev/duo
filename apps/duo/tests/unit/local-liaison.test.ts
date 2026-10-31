@@ -61,15 +61,30 @@ describe('liaison provisoire entre deux instances', () => {
     const camille = probe(basePort);
     const sacha = probe(basePort);
     started.push(camille.liaison, sacha.liaison);
-    await camille.liaison.start({ machineId: randomUUID(), appVersion: '0.1.0', profile: { pseudo: 'Camille', color: 'orb' } });
-    await sacha.liaison.start({ machineId: randomUUID(), appVersion: '0.1.0', profile: { pseudo: 'Sacha', color: 'crescent' } });
+    await camille.liaison.start({
+      machineId: randomUUID(),
+      appVersion: '0.1.0',
+      profile: { pseudo: 'Camille', color: 'orb' },
+    });
+    await sacha.liaison.start({
+      machineId: randomUUID(),
+      appVersion: '0.1.0',
+      profile: { pseudo: 'Sacha', color: 'crescent' },
+    });
 
     await waitFor(() => camille.peer !== null && sacha.peer !== null);
     expect(camille.peer?.profile.pseudo).toBe('Sacha');
     expect(sacha.peer?.profile.pseudo).toBe('Camille');
 
-    camille.liaison.openSalon({ id: 'essai-pont', version: '1.0.0', saveChoice: 'new', save: null });
-    await waitFor(() => sacha.sessions?.peer?.salon !== null && sacha.sessions?.peer?.salon !== undefined);
+    camille.liaison.openSalon({
+      id: 'essai-pont',
+      version: '1.0.0',
+      saveChoice: 'new',
+      save: null,
+    });
+    await waitFor(
+      () => sacha.sessions?.peer?.salon !== null && sacha.sessions?.peer?.salon !== undefined,
+    );
 
     sacha.liaison.joinSalon();
     await waitFor(() => camille.sessions?.own.salon?.guestJoined === true);

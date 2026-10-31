@@ -13,7 +13,10 @@ import {
 const tools = { newMatchId: () => 'partie-1', newSeed: () => 42 };
 const game = { id: 'essai-pont', version: '1.0.0', saveChoice: 'new' as const, save: null };
 
-function run(inputs: readonly [SessionInput, number][], start: HostSession = EMPTY_SESSION): HostSession {
+function run(
+  inputs: readonly [SessionInput, number][],
+  start: HostSession = EMPTY_SESSION,
+): HostSession {
   return inputs.reduce((state, [input, now]) => reduceSession(state, input, now, tools), start);
 }
 
@@ -43,7 +46,10 @@ describe('salon (F03)', () => {
     const state = run([
       [{ type: 'open', game }, 0],
       [{ type: 'join' }, 0],
-      [{ type: 'select-save', saveChoice: 'continue', save: { label: 'Jour 2', writtenAt: 5 } }, 10],
+      [
+        { type: 'select-save', saveChoice: 'continue', save: { label: 'Jour 2', writtenAt: 5 } },
+        10,
+      ],
     ]);
     expect(state.salon?.ready).toEqual({ host: false, guest: false });
     expect(state.salon?.game.save?.label).toBe('Jour 2');
@@ -81,24 +87,37 @@ describe('partie (F05, F06)', () => {
   it('pause par l’un, reprise quand les deux l’ont demandée, après 3 s', () => {
     const paused = run([[{ type: 'pause', seat: 'guest' }, 6000]], loaded);
     expect(paused.match).toMatchObject({ phase: 'paused', pausedBy: { host: false, guest: true } });
-    const both = run([
-      [{ type: 'pause', seat: 'host' }, 6100],
-      [{ type: 'resume', seat: 'host' }, 7000],
-    ], paused);
-    expect(both.match).toMatchObject({ phase: 'paused', pausedBy: { host: true, guest: true }, resumeReady: { host: true, guest: false } });
+    const both = run(
+      [
+        [{ type: 'pause', seat: 'host' }, 6100],
+        [{ type: 'resume', seat: 'host' }, 7000],
+      ],
+      paused,
+    );
+    expect(both.match).toMatchObject({
+      phase: 'paused',
+      pausedBy: { host: true, guest: true },
+      resumeReady: { host: true, guest: false },
+    });
     const resuming = run([[{ type: 'resume', seat: 'guest' }, 8000]], both);
     expect(resuming.match).toMatchObject({ phase: 'resuming', resumeEndsAt: 8000 + COUNTDOWN_MS });
     const playing = run([[{ type: 'tick' }, 8000 + COUNTDOWN_MS]], resuming);
-    expect(playing.match).toMatchObject({ phase: 'playing', pausedBy: { host: false, guest: false } });
+    expect(playing.match).toMatchObject({
+      phase: 'playing',
+      pausedBy: { host: false, guest: false },
+    });
   });
 
   it('Échap pendant la reprise revient à la pause', () => {
-    const state = run([
-      [{ type: 'pause', seat: 'host' }, 6000],
-      [{ type: 'resume', seat: 'host' }, 6100],
-      [{ type: 'resume', seat: 'guest' }, 6200],
-      [{ type: 'pause', seat: 'guest' }, 7000],
-    ], loaded);
+    const state = run(
+      [
+        [{ type: 'pause', seat: 'host' }, 6000],
+        [{ type: 'resume', seat: 'host' }, 6100],
+        [{ type: 'resume', seat: 'guest' }, 6200],
+        [{ type: 'pause', seat: 'guest' }, 7000],
+      ],
+      loaded,
+    );
     expect(state.match?.phase).toBe('paused');
     expect(state.match?.resumeEndsAt).toBeNull();
   });
@@ -106,16 +125,21 @@ describe('partie (F05, F06)', () => {
   it('une coupure met en pause, la reprise attend les deux après le retour', () => {
     const lost = run([[{ type: 'link', up: false }, 6000]], loaded);
     expect(lost.match).toMatchObject({ phase: 'paused', linkLost: true });
-    expect(run([[{ type: 'resume', seat: 'host' }, 6500]], lost).match?.resumeReady.host).toBe(false);
+    expect(run([[{ type: 'resume', seat: 'host' }, 6500]], lost).match?.resumeReady.host).toBe(
+      false,
+    );
     const back = run([[{ type: 'link', up: true }, 9000]], lost);
     expect(back.match).toMatchObject({ phase: 'paused', linkLost: false });
   });
 
   it('compte le temps joué hors pauses et inscrit la fin', () => {
-    const stopped = run([
-      [{ type: 'pause', seat: 'host' }, 65_000],
-      [{ type: 'stop', seat: 'host', reason: 'stopped' }, 400_000],
-    ], loaded);
+    const stopped = run(
+      [
+        [{ type: 'pause', seat: 'host' }, 65_000],
+        [{ type: 'stop', seat: 'host', reason: 'stopped' }, 400_000],
+      ],
+      loaded,
+    );
     expect(stopped.match).toBeNull();
     expect(stopped.lastEnd).toMatchObject({ reason: 'stopped', by: 'host', durationMs: 60_000 });
     expect(stopped.salon?.guestJoined).toBe(true);
@@ -143,6 +167,8 @@ describe('transport des heures', () => {
 
   it('renvoie le même état quand rien ne change', () => {
     const state = run([[{ type: 'open', game }, 0]]);
-    expect(reduceSession(state, { type: 'ready', seat: 'guest', ready: true }, 1, tools)).toBe(state);
+    expect(reduceSession(state, { type: 'ready', seat: 'guest', ready: true }, 1, tools)).toBe(
+      state,
+    );
   });
 });

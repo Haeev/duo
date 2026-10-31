@@ -161,7 +161,10 @@ export class GameHost {
     journal.write('info', 'game-host', 'game-loading', { game: gameId });
     contents.loadURL(entryUrl).catch((error: unknown) => {
       if (this.view !== view) return;
-      this.fail({ reason: 'load-failed', detail: error instanceof Error ? error.message : String(error) });
+      this.fail({
+        reason: 'load-failed',
+        detail: error instanceof Error ? error.message : String(error),
+      });
     });
   }
 
@@ -240,9 +243,15 @@ export class GameHost {
     if (message === null) {
       this.deps.journal.write('warn', 'game-host', 'bridge-invalid-message', {
         game: gameId,
-        type: typeof data === 'object' && data !== null && 'type' in data ? String(data.type) : typeof data,
+        type:
+          typeof data === 'object' && data !== null && 'type' in data
+            ? String(data.type)
+            : typeof data,
         keys: typeof data === 'object' && data !== null ? Object.keys(data).join(',') : '',
-        detail: typeof data === 'object' && data !== null && 'data' in data ? Object.prototype.toString.call(data.data) : '',
+        detail:
+          typeof data === 'object' && data !== null && 'data' in data
+            ? Object.prototype.toString.call(data.data)
+            : '',
       });
       return;
     }
@@ -251,10 +260,17 @@ export class GameHost {
       case 'hello':
         this.watchdog.heartbeat();
         if (!this.deps.codec.accepts(message.bridge)) {
-          this.fail({ reason: 'fatal', detail: `pont ${message.bridge} du jeu incompatible avec ${this.deps.codec.version}` });
+          this.fail({
+            reason: 'fatal',
+            detail: `pont ${message.bridge} du jeu incompatible avec ${this.deps.codec.version}`,
+          });
           return;
         }
-        this.deps.journal.write('info', 'game-host', 'bridge-hello', { game: gameId, bridge: message.bridge, sdk: message.sdk });
+        this.deps.journal.write('info', 'game-host', 'bridge-hello', {
+          game: gameId,
+          bridge: message.bridge,
+          sdk: message.sdk,
+        });
         if (this.init !== null) this.send(this.init);
         return;
       case 'loading':
@@ -303,7 +319,10 @@ export class GameHost {
         this.fail({ reason: 'fatal', detail: message.message.slice(0, 500) });
         return;
       case 'log':
-        this.deps.journal.write(message.level, 'game', 'log', { game: gameId, message: message.message });
+        this.deps.journal.write(message.level, 'game', 'log', {
+          game: gameId,
+          message: message.message,
+        });
         return;
       case 'net':
         events.net(message.channel, message.mode, message.data);

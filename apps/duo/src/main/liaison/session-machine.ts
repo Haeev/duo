@@ -64,7 +64,11 @@ export interface HostSession {
 export type SessionInput =
   | { readonly type: 'open'; readonly game: SalonGame }
   | { readonly type: 'close' }
-  | { readonly type: 'select-save'; readonly saveChoice: SalonGame['saveChoice']; readonly save: SalonGame['save'] }
+  | {
+      readonly type: 'select-save';
+      readonly saveChoice: SalonGame['saveChoice'];
+      readonly save: SalonGame['save'];
+    }
   | { readonly type: 'join' }
   | { readonly type: 'leave' }
   | { readonly type: 'ready'; readonly seat: Seat; readonly ready: boolean }
@@ -132,7 +136,12 @@ function endMatch(
 }
 
 /** Applique une entrée; renvoie le même objet si rien ne change. */
-function apply(state: HostSession, input: SessionInput, now: number, tools: SessionTools): HostSession {
+function apply(
+  state: HostSession,
+  input: SessionInput,
+  now: number,
+  tools: SessionTools,
+): HostSession {
   const { salon, match } = state;
   switch (input.type) {
     case 'open':
@@ -173,7 +182,11 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
       return {
         ...state,
         lastEnd: null,
-        salon: withSalonReady({ ...salon, guestJoined: true }, { host: salon.ready.host, guest: true }, now),
+        salon: withSalonReady(
+          { ...salon, guestJoined: true },
+          { host: salon.ready.host, guest: true },
+          now,
+        ),
       };
     case 'leave':
       if (!salon?.guestJoined) return state;
@@ -183,12 +196,18 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
           salon: { ...salon, guestJoined: false, ready: BOTH_FALSE, countdownEndsAt: null },
         };
       }
-      return { ...state, salon: { ...salon, guestJoined: false, ready: BOTH_FALSE, countdownEndsAt: null } };
+      return {
+        ...state,
+        salon: { ...salon, guestJoined: false, ready: BOTH_FALSE, countdownEndsAt: null },
+      };
     case 'ready': {
       if (salon === null || match !== null) return state;
       if (input.seat === 'guest' && !salon.guestJoined) return state;
       if (salon.ready[input.seat] === input.ready) return state;
-      return { ...state, salon: withSalonReady(salon, { ...salon.ready, [input.seat]: input.ready }, now) };
+      return {
+        ...state,
+        salon: withSalonReady(salon, { ...salon.ready, [input.seat]: input.ready }, now),
+      };
     }
     case 'loaded': {
       if (match?.phase !== 'loading' || match.loaded[input.seat]) return state;
@@ -212,14 +231,18 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
         match: {
           ...freeze(match, now),
           phase: 'paused',
-          pausedBy: { ...(match.phase === 'playing' ? BOTH_FALSE : match.pausedBy), [input.seat]: true },
+          pausedBy: {
+            ...(match.phase === 'playing' ? BOTH_FALSE : match.pausedBy),
+            [input.seat]: true,
+          },
           resumeReady: { ...match.resumeReady, [input.seat]: false },
           resumeEndsAt: null,
         },
       };
     }
     case 'resume': {
-      if (match?.phase !== 'paused' || match.linkLost || match.resumeReady[input.seat]) return state;
+      if (match?.phase !== 'paused' || match.linkLost || match.resumeReady[input.seat])
+        return state;
       const resumeReady = { ...match.resumeReady, [input.seat]: true };
       const both = resumeReady.host && resumeReady.guest;
       return {
@@ -240,7 +263,9 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
       };
     case 'link':
       if (input.up) {
-        return match?.linkLost === true ? { ...state, match: { ...match, linkLost: false } } : state;
+        return match?.linkLost === true
+          ? { ...state, match: { ...match, linkLost: false } }
+          : state;
       }
       if (match !== null) {
         if (match.phase === 'loading') {
@@ -266,8 +291,11 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
       return state;
     case 'guest-gone': {
       const left =
-        salon === null ? null : { ...salon, guestJoined: false, ready: BOTH_FALSE, countdownEndsAt: null };
-      if (match !== null) return { ...endMatch(state, match, 'guest-gone', 'guest', now), salon: left };
+        salon === null
+          ? null
+          : { ...salon, guestJoined: false, ready: BOTH_FALSE, countdownEndsAt: null };
+      if (match !== null)
+        return { ...endMatch(state, match, 'guest-gone', 'guest', now), salon: left };
       return left === salon ? state : { ...state, salon: left };
     }
     case 'tick':
@@ -335,7 +363,10 @@ export function toWire(state: HostSession, now: number): HostSession {
   const shift = (at: number | null): number | null => (at === null ? null : at - now);
   return {
     ...state,
-    salon: state.salon === null ? null : { ...state.salon, countdownEndsAt: shift(state.salon.countdownEndsAt) },
+    salon:
+      state.salon === null
+        ? null
+        : { ...state.salon, countdownEndsAt: shift(state.salon.countdownEndsAt) },
     match:
       state.match === null
         ? null
@@ -349,10 +380,14 @@ export function toWire(state: HostSession, now: number): HostSession {
 
 /** Inverse de `toWire`, avec l'horloge de la machine qui reçoit. */
 export function fromWire(state: HostSession, now: number): HostSession {
-  const shift = (remaining: number | null): number | null => (remaining === null ? null : now + remaining);
+  const shift = (remaining: number | null): number | null =>
+    remaining === null ? null : now + remaining;
   return {
     ...state,
-    salon: state.salon === null ? null : { ...state.salon, countdownEndsAt: shift(state.salon.countdownEndsAt) },
+    salon:
+      state.salon === null
+        ? null
+        : { ...state.salon, countdownEndsAt: shift(state.salon.countdownEndsAt) },
     match:
       state.match === null
         ? null

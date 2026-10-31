@@ -74,11 +74,22 @@ const MATCH: MatchView = {
 function scenarioState(name: string | null): AppState {
   switch (name) {
     case 'premier-lancement':
-      return { ...BASE, profile: null, setup: { networkAccepted: false, done: false }, peer: { status: 'unknown' } };
+      return {
+        ...BASE,
+        profile: null,
+        setup: { networkAccepted: false, done: false },
+        peer: { status: 'unknown' },
+      };
     case 'accueil-absent':
-      return { ...BASE, peer: { status: 'absent', profile: { pseudo: 'Sacha', color: 'crescent' } } };
+      return {
+        ...BASE,
+        peer: { status: 'absent', profile: { pseudo: 'Sacha', color: 'crescent' } },
+      };
     case 'invitation':
-      return { ...BASE, invitation: { from: { pseudo: 'Sacha', color: 'crescent' }, game: GAME, save: null } };
+      return {
+        ...BASE,
+        invitation: { from: { pseudo: 'Sacha', color: 'crescent' }, game: GAME, save: null },
+      };
     case 'salon-hote':
       return { ...BASE, salon: SALON };
     case 'salon-attente':
@@ -88,13 +99,25 @@ function scenarioState(name: string | null): AppState {
     case 'decompte':
       return { ...BASE, salon: { ...SALON, selfReady: true, countdownEndsAt: Date.now() + 2500 } };
     case 'chargement':
-      return { ...BASE, match: { ...MATCH, phase: 'loading', selfLoading: 0.8, peerLoading: null } };
+      return {
+        ...BASE,
+        match: { ...MATCH, phase: 'loading', selfLoading: 0.8, peerLoading: null },
+      };
     case 'pause':
-      return { ...BASE, match: { ...MATCH, phase: 'paused', pausedBy: { self: false, peer: true } } };
+      return {
+        ...BASE,
+        match: { ...MATCH, phase: 'paused', pausedBy: { self: false, peer: true } },
+      };
     case 'coupure':
-      return { ...BASE, match: { ...MATCH, phase: 'link-lost', linkLostSince: Date.now() - 42_000 } };
+      return {
+        ...BASE,
+        match: { ...MATCH, phase: 'link-lost', linkLostSince: Date.now() - 42_000 },
+      };
     case 'fin':
-      return { ...BASE, salon: SALON, end: {
+      return {
+        ...BASE,
+        salon: SALON,
+        end: {
           game: GAME,
           kind: 'session',
           durationMs: 4_320_000,
@@ -109,9 +132,17 @@ function scenarioState(name: string | null): AppState {
         },
       };
     case 'arret':
-      return { ...BASE, salon: SALON, notice: { kind: 'game-crashed', gameName: GAME.name, where: 'peer', hadSave: true } };
+      return {
+        ...BASE,
+        salon: SALON,
+        notice: { kind: 'game-crashed', gameName: GAME.name, where: 'peer', hadSave: true },
+      };
     case 'quitter':
-      return { ...BASE, match: { ...MATCH, phase: 'paused', pausedBy: { self: true, peer: false } }, quitConfirm: true };
+      return {
+        ...BASE,
+        match: { ...MATCH, phase: 'paused', pausedBy: { self: true, peer: false } },
+        quitConfirm: true,
+      };
     case null:
     default:
       return BASE;
@@ -146,10 +177,18 @@ export function createFakeBridge(scenario: string | null): DuoApi {
           update({ ...state, salon: null });
           break;
         case 'salon:join':
-          update({ ...state, invitation: null, salon: { ...SALON, role: 'guest', selfReady: true, peerReady: false } });
+          update({
+            ...state,
+            invitation: null,
+            salon: { ...SALON, role: 'guest', selfReady: true, peerReady: false },
+          });
           break;
         case 'salon:ready':
-          if (state.salon !== null) update({ ...state, salon: { ...state.salon, selfReady: (arg as { ready: boolean }).ready } });
+          if (state.salon !== null)
+            update({
+              ...state,
+              salon: { ...state.salon, selfReady: (arg as { ready: boolean }).ready },
+            });
           break;
         case 'end:dismiss':
           update({ ...state, end: null });

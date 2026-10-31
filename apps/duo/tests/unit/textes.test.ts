@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { clock, de, durationRange, fr, keyLabel, playedDuration, t, toastText, typo, when } from '../../src/renderer/textes';
+import {
+  clock,
+  de,
+  durationRange,
+  fr,
+  keyLabel,
+  playedDuration,
+  t,
+  toastText,
+  typo,
+  when,
+} from '../../src/renderer/textes';
 import type { ToastKind } from '../../src/shared/state';
 
 const NBSP = String.fromCharCode(0xa0);
@@ -19,7 +30,16 @@ function allTexts(): string[] {
     else if (typeof value === 'object' && value !== null) Object.values(value).forEach(visit);
   };
   visit(t);
-  const kinds: ToastKind[] = ['joined', 'left-salon', 'closed-salon', 'asked-wait', 'other-save', 'back', 'stopped-match', 'quit-duo'];
+  const kinds: ToastKind[] = [
+    'joined',
+    'left-salon',
+    'closed-salon',
+    'asked-wait',
+    'other-save',
+    'back',
+    'stopped-match',
+    'quit-duo',
+  ];
   for (const kind of kinds) out.push(toastText(kind, 'Sacha'));
   return out;
 }
@@ -49,7 +69,9 @@ describe('typographie du fichier de textes (UX 0.3)', () => {
   });
 
   it('ne retouche pas les pseudos', () => {
-    expect(fr`${"L'Ami"} a rejoint le salon : ${'oui'} !`).toBe(`L'Ami a rejoint le salon${NBSP}: oui${NNBSP}!`);
+    expect(fr`${"L'Ami"} a rejoint le salon : ${'oui'} !`).toBe(
+      `L'Ami a rejoint le salon${NBSP}: oui${NNBSP}!`,
+    );
   });
 
   it('élide « de » devant une voyelle ou un h', () => {

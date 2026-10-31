@@ -84,7 +84,8 @@ const MONTHS = [
 export function when(timestamp: number, now: number = Date.now()): string {
   const date = new Date(timestamp);
   const time = `${date.getHours()} h ${String(date.getMinutes()).padStart(2, '0')}`;
-  const startOfDay = (value: Date): number => new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+  const startOfDay = (value: Date): number =>
+    new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
   const days = Math.round((startOfDay(new Date(now)) - startOfDay(date)) / 86_400_000);
   if (days === 0) return typo(`aujourd'hui à ${time}`);
   if (days === 1) return `hier à ${time}`;
@@ -220,18 +221,21 @@ export const t = {
       connexionPerdue: 'Connexion perdue',
     },
     aide: fr`La partie commence dès que vous avez dit « C'est parti » sur les deux ordinateurs.`,
-    aideInvite: (host: string): string => fr`Tu as dit « C'est parti » en rejoignant. On attend ${host}.`,
+    aideInvite: (host: string): string =>
+      fr`Tu as dit « C'est parti » en rejoignant. On attend ${host}.`,
     attente: (name: string): string => `Invitation envoyée à ${name}.`,
     attenteSansNom: fr`Invitation prête : elle partira dès que l'autre ordinateur sera là.`,
     sauvegarde: 'Sauvegarde',
     continuer: (label: string, at: string): string => fr`Continuer : ${label} (${at})`,
     nouvellePartie: 'Nouvelle partie',
-    choisiePar: (host: string, detail: string): string => fr`Sauvegarde choisie par ${host} : ${detail}`,
+    choisiePar: (host: string, detail: string): string =>
+      fr`Sauvegarde choisie par ${host} : ${detail}`,
     sansSauvegarde: fr`Ce jeu ne garde pas de sauvegarde : chaque partie repart de zéro.`,
     commandes: 'Commandes',
     pause: 'Pause',
     decompte: (seconds: number): string => `La partie commence dans ${seconds}`,
-    connexionPerdue: (name: string): string => fr`Connexion perdue avec ${name}. Duo réessaie tout seul...`,
+    connexionPerdue: (name: string): string =>
+      fr`Connexion perdue avec ${name}. Duo réessaie tout seul...`,
     fenetreFermer: {
       titre: fr`Fermer le salon ?`,
       texte: (name: string): string => fr`${name} reviendra à l'accueil.`,
@@ -240,7 +244,8 @@ export const t = {
     },
     fenetreQuitter: {
       titre: fr`Quitter le salon ?`,
-      texte: (host: string): string => fr`${host} restera dans le salon et pourra t'inviter à nouveau.`,
+      texte: (host: string): string =>
+        fr`${host} restera dans le salon et pourra t'inviter à nouveau.`,
       action: 'Quitter le salon',
       retour: 'Rester',
     },

@@ -37,7 +37,9 @@ function essai(page: Page): Promise<EssaiState> {
 
 /** Capture de l'écran virtuel entier: la fenêtre au premier plan, vues composées. */
 async function captureScreen(name: string): Promise<void> {
-  await promisify(execFile)('import', ['-window', 'root', path.join(SCREENSHOTS, name)]).catch(() => undefined);
+  await promisify(execFile)('import', ['-window', 'root', path.join(SCREENSHOTS, name)]).catch(
+    () => undefined,
+  );
 }
 
 async function startPair(port: number): Promise<[DuoInstance, DuoInstance]> {
@@ -45,7 +47,11 @@ async function startPair(port: number): Promise<[DuoInstance, DuoInstance]> {
   const sachaDir = await tempDataDir('Sacha');
   await seedProfile(camilleDir, 'Camille', 'orb');
   await seedProfile(sachaDir, 'Sacha', 'crescent');
-  const camille = await launchDuo({ dataDir: camilleDir, liaisonPort: port, gamesDir: FIXTURE_GAMES });
+  const camille = await launchDuo({
+    dataDir: camilleDir,
+    liaisonPort: port,
+    gamesDir: FIXTURE_GAMES,
+  });
   const sacha = await launchDuo({ dataDir: sachaDir, liaisonPort: port, gamesDir: FIXTURE_GAMES });
   return [camille, sacha];
 }
@@ -67,7 +73,9 @@ async function openSalonAndStart(camille: DuoInstance, sacha: DuoInstance): Prom
 test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sauvegarde', async () => {
   const [camille, sacha] = await startPair(41310);
   try {
-    await expect(camille.platform.getByTestId('presence-barre')).toContainText('Sacha est là', { timeout: 10_000 });
+    await expect(camille.platform.getByTestId('presence-barre')).toContainText('Sacha est là', {
+      timeout: 10_000,
+    });
     await expect(sacha.platform.getByTestId('presence-barre')).toContainText('Camille est là');
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-accueil.png') });
 
@@ -76,7 +84,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-bibliotheque.png') });
     await camille.platform.getByTestId('jeu-essai-pont').click();
     await expect(camille.platform.getByTestId('ecran-salon-hote')).toBeVisible();
-    await expect(camille.platform.getByTestId('salon-attente')).toContainText('Invitation envoyée à Sacha.');
+    await expect(camille.platform.getByTestId('salon-attente')).toContainText(
+      'Invitation envoyée à Sacha.',
+    );
 
     await expect(sacha.platform.getByTestId('invitation')).toBeVisible();
     await expect(sacha.platform.getByTestId('invitation-rejoindre')).toBeFocused();
@@ -85,7 +95,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await sacha.platform.waitForTimeout(350);
     await sacha.platform.keyboard.press('Enter');
     await expect(sacha.platform.getByTestId('ecran-salon-invite')).toBeVisible();
-    await expect(camille.platform.getByTestId('notification')).toContainText('Sacha a rejoint le salon.');
+    await expect(camille.platform.getByTestId('notification')).toContainText(
+      'Sacha a rejoint le salon.',
+    );
     await expect(camille.platform.getByTestId('salon-carte-autre')).toContainText('C’est parti');
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-salon-hote.png') });
     await sacha.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-salon-invite.png') });
@@ -96,7 +108,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-decompte.png') });
 
     const [gameCamille, gameSacha] = await Promise.all([gamePage(camille), gamePage(sacha)]);
-    await expect.poll(async () => (await essai(gameCamille)).started, { timeout: 15_000 }).toBe(true);
+    await expect
+      .poll(async () => (await essai(gameCamille)).started, { timeout: 15_000 })
+      .toBe(true);
     await expect.poll(async () => (await essai(gameSacha)).started, { timeout: 15_000 }).toBe(true);
     const [stateCamille, stateSacha] = await Promise.all([essai(gameCamille), essai(gameSacha)]);
     expect(stateCamille.role).toBe('host');
@@ -119,12 +133,16 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await pressNativeKey(camille, 'Escape');
     await expect(camille.platform.getByTestId('superposition-pause')).toBeVisible();
     await expect(sacha.platform.getByTestId('superposition-pause')).toBeVisible();
-    await expect(sacha.platform.getByTestId('superposition-pause')).toContainText('Pause demandée par Camille.');
+    await expect(sacha.platform.getByTestId('superposition-pause')).toContainText(
+      'Pause demandée par Camille.',
+    );
     await expect.poll(async () => (await essai(gameSacha)).paused).toBe(true);
     expect((await essai(gameCamille)).paused).toBe(true);
     // Le jeu sait qui a demandé la pause: l'identifiant de joueur de Camille.
     expect((await essai(gameSacha)).pausedBy).toBe(stateCamille.players[0]?.id);
-    await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-pause-vue-plateforme.png') });
+    await camille.platform.screenshot({
+      path: path.join(SCREENSHOTS, 'deux-pause-vue-plateforme.png'),
+    });
     await captureScreen('deux-pause-ecran.png');
 
     // Reprise quand les deux l'ont demandée, après « Reprise dans 3 ».
@@ -143,11 +161,16 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await camille.platform.getByTestId('arret-confirmer').click();
     await expect(camille.platform.getByTestId('ecran-fin')).toBeVisible({ timeout: 10_000 });
     await expect(sacha.platform.getByTestId('ecran-fin')).toBeVisible({ timeout: 10_000 });
-    await expect(camille.platform.getByTestId('ecran-fin')).toContainText('Progression enregistrée.');
+    await expect(camille.platform.getByTestId('ecran-fin')).toContainText(
+      'Progression enregistrée.',
+    );
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'deux-fin-seance.png') });
 
     const head = JSON.parse(
-      await readFile(path.join(camille.dataDir, 'sauvegardes-locales', 'essai-pont', '1', 'head.json'), 'utf8'),
+      await readFile(
+        path.join(camille.dataDir, 'sauvegardes-locales', 'essai-pont', '1', 'head.json'),
+        'utf8',
+      ),
     ) as { label: string };
     expect(head.label).toBe('Compteur 1');
     expect((await essai(gameCamille).catch(() => null))?.saveResults ?? ['ok']).toContain('ok');
@@ -155,7 +178,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await camille.platform.getByTestId('fin-retour-salon').click();
     await sacha.platform.getByTestId('fin-retour-salon').click();
     await expect(camille.platform.getByTestId('ecran-salon-hote')).toBeVisible();
-    expect(camille.app.windows().filter((page) => page.url().startsWith('duo-game://'))).toHaveLength(0);
+    expect(
+      camille.app.windows().filter((page) => page.url().startsWith('duo-game://')),
+    ).toHaveLength(0);
 
     // Le salon propose de continuer la sauvegarde écrite; l'invité voit le choix de l'hôte.
     await expect(camille.platform.getByTestId('sauvegarde-continue')).toBeChecked();
@@ -166,7 +191,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
     await camille.platform.getByTestId('salon-pret').click();
     await sacha.platform.getByTestId('salon-pret').click();
     const [repriseCamille] = await Promise.all([gamePage(camille), gamePage(sacha)]);
-    await expect.poll(async () => (await essai(repriseCamille)).started, { timeout: 15_000 }).toBe(true);
+    await expect
+      .poll(async () => (await essai(repriseCamille)).started, { timeout: 15_000 })
+      .toBe(true);
     expect((await essai(repriseCamille)).count).toBe(1);
   } finally {
     await closeDuo(sacha);
@@ -177,7 +204,9 @@ test('une séance à deux: invitation, salon, partie, pause, reprise, fin et sau
 test('un jeu qui plante ou se fige ramène les deux joueurs au salon (F05)', async () => {
   const [camille, sacha] = await startPair(41320);
   try {
-    await expect(camille.platform.getByTestId('presence-barre')).toContainText('Sacha est là', { timeout: 10_000 });
+    await expect(camille.platform.getByTestId('presence-barre')).toContainText('Sacha est là', {
+      timeout: 10_000,
+    });
 
     // Fin de démo voulue par le jeu de l'hôte (sessionEnd finished): fin de séance chez les deux, avec ses chiffres.
     let [gameCamille, gameSacha] = await openSalonAndStart(camille, sacha);
@@ -197,12 +226,16 @@ test('un jeu qui plante ou se fige ramène les deux joueurs au salon (F05)', asy
     await camille.platform.getByTestId('salon-pret').click();
     await sacha.platform.getByTestId('salon-pret').click();
     [gameCamille, gameSacha] = await Promise.all([gamePage(camille), gamePage(sacha)]);
-    await expect.poll(async () => (await essai(gameCamille)).started, { timeout: 15_000 }).toBe(true);
+    await expect
+      .poll(async () => (await essai(gameCamille)).started, { timeout: 15_000 })
+      .toBe(true);
     // La vue du jeu disparaît pendant l'appui: Playwright peut le signaler, c'est attendu.
     await gameCamille.keyboard.press('KeyL').catch(() => undefined);
     await expect(camille.platform.locator('[data-message="M-14"]')).toBeVisible({ timeout: 5000 });
     await expect(sacha.platform.locator('[data-message="M-14"]')).toBeVisible({ timeout: 5000 });
-    await expect(sacha.platform.locator('[data-message="M-14"]')).toContainText('Essai du pont a rencontré un problème');
+    await expect(sacha.platform.locator('[data-message="M-14"]')).toContainText(
+      'Essai du pont a rencontré un problème',
+    );
     await expect(camille.platform.getByTestId('ecran-salon-hote')).toBeVisible();
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'plantage-salon.png') });
     await camille.platform.getByTestId('arret-jeu-compris').click();
@@ -220,7 +253,11 @@ test('un jeu qui plante ou se fige ramène les deux joueurs au salon (F05)', asy
     await expect(camille.platform.locator('[data-message="M-14"]')).toBeVisible({ timeout: 5000 });
     expect(Date.now() - frozenAt).toBeLessThan(10_000);
     await camille.platform.screenshot({ path: path.join(SCREENSHOTS, 'jeu-fige-salon.png') });
-    await expect.poll(() => camille.app.windows().filter((page) => page.url().startsWith('duo-game://')).length).toBe(0);
+    await expect
+      .poll(
+        () => camille.app.windows().filter((page) => page.url().startsWith('duo-game://')).length,
+      )
+      .toBe(0);
   } finally {
     await closeDuo(sacha);
     await closeDuo(camille);

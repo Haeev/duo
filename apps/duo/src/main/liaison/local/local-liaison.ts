@@ -236,7 +236,12 @@ export class LocalLiaison implements Liaison {
   }
 
   sendGame(message: GameRelayMessage): void {
-    this.link?.send({ t: 'game', channel: message.channel, mode: message.mode, data: message.data });
+    this.link?.send({
+      t: 'game',
+      channel: message.channel,
+      mode: message.mode,
+      data: message.data,
+    });
   }
 
   private joinedPeer(): boolean {
@@ -332,11 +337,18 @@ export class LocalLiaison implements Liaison {
       return;
     }
     this.remember(socket);
-    this.track(new Link(socket, false, (link, message) => {
-      this.onMessage(link, message);
-    }, (link) => {
-      this.onClosed(link);
-    }));
+    this.track(
+      new Link(
+        socket,
+        false,
+        (link, message) => {
+          this.onMessage(link, message);
+        },
+        (link) => {
+          this.onClosed(link);
+        },
+      ),
+    );
   }
 
   private track(link: Link): void {
@@ -366,11 +378,18 @@ export class LocalLiaison implements Liaison {
     socket.once('connect', () => {
       clearTimeout(timeout);
       this.dialing.delete(key);
-      this.track(new Link(socket, true, (link, message) => {
-        this.onMessage(link, message);
-      }, (link) => {
-        this.onClosed(link);
-      }));
+      this.track(
+        new Link(
+          socket,
+          true,
+          (link, message) => {
+            this.onMessage(link, message);
+          },
+          (link) => {
+            this.onClosed(link);
+          },
+        ),
+      );
     });
     socket.once('error', () => {
       clearTimeout(timeout);
@@ -388,7 +407,9 @@ export class LocalLiaison implements Liaison {
         for (const target of this.targets()) this.dial(target);
       }
       const reference = this.lostSince ?? this.startedAt;
-      this.scheduleRetry(Date.now() - reference < RETRY_FAST_WINDOW_MS ? RETRY_FAST_MS : RETRY_SLOW_MS);
+      this.scheduleRetry(
+        Date.now() - reference < RETRY_FAST_WINDOW_MS ? RETRY_FAST_MS : RETRY_SLOW_MS,
+      );
     }, delayMs);
   }
 
@@ -426,7 +447,10 @@ export class LocalLiaison implements Liaison {
         this.applyOwn(this.guestInput(message.intent));
         return;
       case 'game':
-        this.emit({ type: 'game', message: { channel: message.channel, mode: message.mode, data: message.data } });
+        this.emit({
+          type: 'game',
+          message: { channel: message.channel, mode: message.mode, data: message.data },
+        });
         return;
       case 'bye':
         this.onBye();

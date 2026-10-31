@@ -15,7 +15,7 @@ const queues = new Map<string, Promise<unknown>>();
 
 function errorCode(error: unknown): string | undefined {
   if (typeof error === 'object' && error !== null && 'code' in error) {
-    const code = (error).code;
+    const code = error.code;
     return typeof code === 'string' ? code : undefined;
   }
   return undefined;

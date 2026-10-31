@@ -63,7 +63,10 @@ export interface MachineData {
   readonly recovered: readonly string[];
 }
 
-export interface DataProblem { readonly kind: 'format-too-new'; readonly format: number }
+export interface DataProblem {
+  readonly kind: 'format-too-new';
+  readonly format: number;
+}
 
 export class MachineStore {
   constructor(private readonly dir: string) {}

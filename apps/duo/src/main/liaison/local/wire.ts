@@ -10,9 +10,7 @@ const SalonGameSchema = v.object({
   id: v.pipe(v.string(), v.regex(/^[a-z][a-z0-9-]{1,31}$/)),
   version: v.pipe(v.string(), v.maxLength(32)),
   saveChoice: v.picklist(['continue', 'new']),
-  save: v.nullable(
-    v.object({ label: v.pipe(v.string(), v.maxLength(80)), writtenAt: v.number() }),
-  ),
+  save: v.nullable(v.object({ label: v.pipe(v.string(), v.maxLength(80)), writtenAt: v.number() })),
 });
 
 export const HostSessionSchema = v.object({
@@ -51,7 +49,12 @@ export const HostSessionSchema = v.object({
         v.object({
           outcome: v.nullable(v.picklist(['success', 'failure', 'draw', 'win-host', 'win-guest'])),
           stats: v.pipe(
-            v.array(v.object({ label: v.pipe(v.string(), v.maxLength(32)), value: v.pipe(v.string(), v.maxLength(16)) })),
+            v.array(
+              v.object({
+                label: v.pipe(v.string(), v.maxLength(32)),
+                value: v.pipe(v.string(), v.maxLength(16)),
+              }),
+            ),
             v.maxLength(3),
             v.readonly(),
           ),
@@ -68,7 +71,10 @@ export const GuestIntentSchema = v.variant('type', [
   v.object({ type: v.literal('loaded') }),
   v.object({ type: v.literal('pause') }),
   v.object({ type: v.literal('resume') }),
-  v.object({ type: v.literal('stop'), reason: v.picklist(['stopped', 'crash', 'load-failed', 'end']) }),
+  v.object({
+    type: v.literal('stop'),
+    reason: v.picklist(['stopped', 'crash', 'load-failed', 'end']),
+  }),
 ]);
 
 export type GuestIntent = v.InferOutput<typeof GuestIntentSchema>;

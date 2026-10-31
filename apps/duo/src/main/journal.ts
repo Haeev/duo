@@ -47,8 +47,12 @@ export function createSanitizer(context: SanitizerContext): (text: string) => st
   replacements.push([/\b(?:[0-9a-f]{2}[:-]){5}[0-9a-f]{2}\b/gi, '<adresse-materielle>']);
   // IPv6 complète, ou abrégée par « :: » (une heure « 21:40:05 » ne doit pas être masquée).
   replacements.push([/\b(?:[0-9a-f]{1,4}:){7}[0-9a-f]{1,4}\b/gi, '<ipv6>']);
-  replacements.push([/(?:[0-9a-f]{1,4}:)*[0-9a-f]{0,4}::(?:[0-9a-f]{1,4}:)*[0-9a-f]{1,4}\b/gi, '<ipv6>']);
-  return (text) => replacements.reduce((current, [pattern, mask]) => current.replace(pattern, mask), text);
+  replacements.push([
+    /(?:[0-9a-f]{1,4}:)*[0-9a-f]{0,4}::(?:[0-9a-f]{1,4}:)*[0-9a-f]{1,4}\b/gi,
+    '<ipv6>',
+  ]);
+  return (text) =>
+    replacements.reduce((current, [pattern, mask]) => current.replace(pattern, mask), text);
 }
 
 function dayStamp(date: Date): string {
@@ -97,7 +101,9 @@ export function createJournal(dir: string, sanitize: (text: string) => string): 
 }
 
 async function pruneOldFiles(dir: string): Promise<void> {
-  const files = (await readdir(dir)).filter((name) => /^duo-\d{4}-\d{2}-\d{2}\.jsonl$/.test(name)).sort();
+  const files = (await readdir(dir))
+    .filter((name) => /^duo-\d{4}-\d{2}-\d{2}\.jsonl$/.test(name))
+    .sort();
   const excess = files.slice(0, Math.max(0, files.length - MAX_FILES));
   await Promise.all(excess.map((name) => rm(path.join(dir, name), { force: true })));
 }

@@ -42,7 +42,14 @@
       pendingSaves[requestId] = resolve;
       // Tampon transféré, comme le fait @duo/sdk: preload-game le recopie vers le principal.
       send(
-        { type: 'saveWrite', requestId: requestId, moment: moment, label: 'Compteur ' + state.count, dataSchema: 1, data: bytes.buffer },
+        {
+          type: 'saveWrite',
+          requestId: requestId,
+          moment: moment,
+          label: 'Compteur ' + state.count,
+          dataSchema: 1,
+          data: bytes.buffer,
+        },
         [bytes.buffer],
       );
     });
@@ -70,7 +77,11 @@
     context.fillText('Essai du pont (' + (state.role || '?') + ')', 40, 60);
     context.font = '20px sans-serif';
     context.fillText('Ici : ' + state.count + ' · Autre : ' + state.peerCount, 40, 100);
-    context.fillText(state.started ? (state.paused ? 'En pause' : 'En jeu') : 'Chargement', 40, 132);
+    context.fillText(
+      state.started ? (state.paused ? 'En pause' : 'En jeu') : 'Chargement',
+      40,
+      132,
+    );
     requestAnimationFrame(draw);
   }
 
@@ -141,7 +152,13 @@
 
   window.addEventListener('message', function (event) {
     var data = event.data;
-    if (event.source !== window || data === null || typeof data !== 'object' || data.type !== 'duo:bridge-port') return;
+    if (
+      event.source !== window ||
+      data === null ||
+      typeof data !== 'object' ||
+      data.type !== 'duo:bridge-port'
+    )
+      return;
     if (state.port !== null || event.ports.length === 0) return;
     state.port = event.ports[0];
     state.port.onmessage = onMessage;
@@ -165,7 +182,12 @@
     if (!state.started || state.paused) return;
     if (event.code === 'Space') {
       state.count += 1;
-      send({ type: 'net', channel: 0, mode: 'reliable', data: JSON.stringify({ count: state.count }) });
+      send({
+        type: 'net',
+        channel: 0,
+        mode: 'reliable',
+        data: JSON.stringify({ count: state.count }),
+      });
     } else if (event.code === 'KeyF' && state.role === 'host') {
       send({
         type: 'sessionEnd',

@@ -9,7 +9,11 @@ import { ActionList, Chip, Dialog, Icon, PlayerCard, Sky, useCountdown } from '.
 import { useEscape, useInitialFocus } from '../ui/keyboard';
 
 function readyChip(ready: boolean): JSX.Element {
-  return ready ? <Chip kind="ready" label={t.salon.puces.cestParti} /> : <Chip kind="not-yet" label={t.salon.puces.pasEncore} />;
+  return ready ? (
+    <Chip kind="ready" label={t.salon.puces.cestParti} />
+  ) : (
+    <Chip kind="not-yet" label={t.salon.puces.pasEncore} />
+  );
 }
 
 function peerChip(salon: SalonView): JSX.Element {
@@ -30,11 +34,15 @@ function SaveBlock({ salon, hostName }: { salon: SalonView; hostName: string }):
   }
   const save = salon.save;
   if (salon.role === 'guest') {
-    const detail = salon.saveChoice === 'continue' && save !== null ? `${save.label}, ${when(save.writtenAt)}` : t.salon.nouvellePartie;
+    const detail =
+      salon.saveChoice === 'continue' && save !== null
+        ? `${save.label}, ${when(save.writtenAt)}`
+        : t.salon.nouvellePartie;
     return <p data-testid="salon-sauvegarde-invite">{t.salon.choisiePar(hostName, detail)}</p>;
   }
   const options: { value: 'continue' | 'new'; label: string }[] = [];
-  if (save !== null) options.push({ value: 'continue', label: t.salon.continuer(save.label, when(save.writtenAt)) });
+  if (save !== null)
+    options.push({ value: 'continue', label: t.salon.continuer(save.label, when(save.writtenAt)) });
   options.push({ value: 'new', label: t.salon.nouvellePartie });
   return (
     <div class="choix-sauvegarde" role="radiogroup" aria-label={t.salon.sauvegarde}>
@@ -58,13 +66,23 @@ function SaveBlock({ salon, hostName }: { salon: SalonView; hostName: string }):
   );
 }
 
-export function Salon({ state, salon, profile }: { state: AppState; salon: SalonView; profile: Profile }): JSX.Element {
+export function Salon({
+  state,
+  salon,
+  profile,
+}: {
+  state: AppState;
+  salon: SalonView;
+  profile: Profile;
+}): JSX.Element {
   const peer = state.peer.status === 'unknown' ? null : state.peer.profile;
   const peerName = peer?.pseudo ?? '';
   const host = salon.role === 'host';
   const [confirmLeave, setConfirmLeave] = useState(false);
   const seconds = useCountdown(salon.countdownEndsAt);
-  const main = useInitialFocus<HTMLButtonElement>(`${salon.game.id}:${seconds === null ? 'salon' : 'decompte'}`);
+  const main = useInitialFocus<HTMLButtonElement>(
+    `${salon.game.id}:${seconds === null ? 'salon' : 'decompte'}`,
+  );
 
   const leave = (): void => {
     if (host) void send('salon:close', null);
@@ -98,7 +116,13 @@ export function Salon({ state, salon, profile }: { state: AppState; salon: Salon
       <PlayerCard
         profile={peer}
         self={false}
-        role={host ? (salon.peerSeat === 'joined' ? t.joueurs.aRejointSalon : undefined) : t.joueurs.heberge}
+        role={
+          host
+            ? salon.peerSeat === 'joined'
+              ? t.joueurs.aRejointSalon
+              : undefined
+            : t.joueurs.heberge
+        }
         chip={peerChip(salon)}
         testId="salon-carte-autre"
       />
@@ -108,7 +132,12 @@ export function Salon({ state, salon, profile }: { state: AppState; salon: Salon
     <div class="scene scene-ciel">
       <Sky />
       <header class="barre-haut barre-salon">
-        <button type="button" class="bouton bouton-secondaire" data-testid="salon-sortir" onClick={askLeave}>
+        <button
+          type="button"
+          class="bouton bouton-secondaire"
+          data-testid="salon-sortir"
+          onClick={askLeave}
+        >
           <Icon name="back" />
           {host ? t.salon.fermer : t.salon.quitter}
           <kbd class="touche">{t.salon.echap}</kbd>
@@ -143,7 +172,9 @@ export function Salon({ state, salon, profile }: { state: AppState; salon: Salon
           >
             {salon.selfReady ? t.salon.pasEncore : t.salon.cestParti}
           </button>
-          <p class="texte-second">{host || !salon.selfReady ? t.salon.aide : t.salon.aideInvite(peerName)}</p>
+          <p class="texte-second">
+            {host || !salon.selfReady ? t.salon.aide : t.salon.aideInvite(peerName)}
+          </p>
           <div class="carte">
             <h2 class="surtitre">{t.salon.commandes}</h2>
             <ActionList actions={salon.game.actions} />
@@ -204,7 +235,9 @@ export function Salon({ state, salon, profile }: { state: AppState; salon: Salon
           }}
           focusBack
         >
-          <p>{host ? t.salon.fenetreFermer.texte(peerName) : t.salon.fenetreQuitter.texte(peerName)}</p>
+          <p>
+            {host ? t.salon.fenetreFermer.texte(peerName) : t.salon.fenetreQuitter.texte(peerName)}
+          </p>
         </Dialog>
       )}
     </div>

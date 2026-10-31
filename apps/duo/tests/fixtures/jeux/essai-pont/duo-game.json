@@ -18,6 +18,11 @@
     { "id": "agir", "label": "Agir", "keys": ["Space"], "mouse": ["left"] },
     { "id": "avancer", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] }
   ],
-  "saves": { "slots": 1, "maxBytes": 1048576, "moments": ["exit"], "help": "Le jeu enregistre en quittant." },
+  "saves": {
+    "slots": 1,
+    "maxBytes": 1048576,
+    "moments": ["exit"],
+    "help": "Le jeu enregistre en quittant."
+  },
   "credits": null
 }

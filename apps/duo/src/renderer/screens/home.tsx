@@ -91,7 +91,9 @@ function PresenceCard({ state, profile }: { state: AppState; profile: Profile })
                 ? t.presence.absent(peer.profile.pseudo)
                 : t.presence.personne}
           </strong>
-          {peer.status === 'present' && <span class="texte-second"> {t.presence.jouerEnsemble}</span>}
+          {peer.status === 'present' && (
+            <span class="texte-second"> {t.presence.jouerEnsemble}</span>
+          )}
         </span>
       </span>
     </div>
@@ -101,7 +103,9 @@ function PresenceCard({ state, profile }: { state: AppState; profile: Profile })
 function Home({ state, profile }: { state: AppState; profile: Profile }): JSX.Element {
   const invitation = state.invitation;
   // Focus par défaut: Héberger, ou Rejoindre si une invitation attend (UX 10).
-  const hostButton = useInitialFocus<HTMLButtonElement>(invitation === null ? 'heberger' : 'rejoindre');
+  const hostButton = useInitialFocus<HTMLButtonElement>(
+    invitation === null ? 'heberger' : 'rejoindre',
+  );
   const name = peerName(state);
   return (
     <section class="accueil" data-testid="ecran-accueil">
@@ -139,7 +143,8 @@ function Home({ state, profile }: { state: AppState; profile: Profile }): JSX.El
                 <strong>{t.accueil.salonTrouve(invitation.from.pseudo)}</strong>
                 <span class="texte-second">
                   {' · '}
-                  {invitation.game.name} · {invitation.save === null ? t.invitation.nouvellePartie : invitation.save.label}
+                  {invitation.game.name} ·{' '}
+                  {invitation.save === null ? t.invitation.nouvellePartie : invitation.save.label}
                 </span>
               </p>
               <button
@@ -170,12 +175,19 @@ function Library({ state }: { state: AppState }): JSX.Element {
   });
   const name = peerName(state);
   const subtitle =
-    state.peer.status === 'absent' ? t.bibliotheque.sousTitreAbsent(state.peer.profile.pseudo) : t.bibliotheque.sousTitre(name);
+    state.peer.status === 'absent'
+      ? t.bibliotheque.sousTitreAbsent(state.peer.profile.pseudo)
+      : t.bibliotheque.sousTitre(name);
   const onArrow = (event: KeyboardEvent): void => {
     const items = Array.from(grid.current?.querySelectorAll<HTMLButtonElement>('.vignette') ?? []);
     const index = items.indexOf(document.activeElement as HTMLButtonElement);
     if (index === -1) return;
-    const delta = event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
+    const delta =
+      event.key === 'ArrowRight' || event.key === 'ArrowDown'
+        ? 1
+        : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+          ? -1
+          : 0;
     if (delta === 0) return;
     event.preventDefault();
     items[(index + delta + items.length) % items.length]?.focus();
@@ -214,7 +226,11 @@ function Library({ state }: { state: AppState }): JSX.Element {
   );
 }
 
-export function InvitationBanner({ invitation }: { invitation: InvitationView }): JSX.Element | null {
+export function InvitationBanner({
+  invitation,
+}: {
+  invitation: InvitationView;
+}): JSX.Element | null {
   const key = invitationKey(invitation);
   const join = useInitialFocus<HTMLButtonElement>(key);
   useEscape(
@@ -230,7 +246,12 @@ export function InvitationBanner({ invitation }: { invitation: InvitationView })
       ? t.invitation.nouvellePartie
       : `${invitation.save.label}, ${when(invitation.save.writtenAt)}`;
   return (
-    <div class="bandeau-invitation panneau" role="dialog" aria-labelledby="invitation-titre" data-testid="invitation">
+    <div
+      class="bandeau-invitation panneau"
+      role="dialog"
+      aria-labelledby="invitation-titre"
+      data-testid="invitation"
+    >
       <PlayerSymbol color={invitation.from.color} size={48} />
       <div class="bandeau-texte">
         <h2 id="invitation-titre" class="titre-3">
@@ -273,7 +294,13 @@ export function Launcher({ state, profile }: { state: AppState; profile: Profile
     <div class="scene scene-ciel">
       <Sky />
       <TopBar state={state} profile={profile} />
-      <main class="contenu">{tab.value === 'home' ? <Home state={state} profile={profile} /> : <Library state={state} />}</main>
+      <main class="contenu">
+        {tab.value === 'home' ? (
+          <Home state={state} profile={profile} />
+        ) : (
+          <Library state={state} />
+        )}
+      </main>
       {state.invitation !== null && <InvitationBanner invitation={state.invitation} />}
     </div>
   );

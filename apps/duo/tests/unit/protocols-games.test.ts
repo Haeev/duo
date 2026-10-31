@@ -15,11 +15,21 @@ describe('chemins servis par les protocoles', () => {
 
   it('résout un chemin dans le dossier du jeu', () => {
     expect(resolveInside(root, '/index.html')).toBe(path.join(root, 'index.html'));
-    expect(resolveInside(root, '/assets/mod%C3%A8le%20un.glb')).toBe(path.join(root, 'assets', 'modèle un.glb'));
+    expect(resolveInside(root, '/assets/mod%C3%A8le%20un.glb')).toBe(
+      path.join(root, 'assets', 'modèle un.glb'),
+    );
   });
 
   it('refuse toute sortie du dossier et les chemins suspects', () => {
-    for (const attempt of ['/../secret', '/a/../../b', '/%2e%2e/x', '/a%5Cb', '/x%00y', '/C:/Windows', '/%E0%A4%A']) {
+    for (const attempt of [
+      '/../secret',
+      '/a/../../b',
+      '/%2e%2e/x',
+      '/a%5Cb',
+      '/x%00y',
+      '/C:/Windows',
+      '/%E0%A4%A',
+    ]) {
       expect(resolveInside(root, attempt)).toBeNull();
     }
   });
@@ -69,12 +79,17 @@ describe('manifeste duo-game.json (ADR 0005, point 2)', () => {
   });
 
   it('refuse Échap, un identifiant invalide, un chemin qui sort du paquet', () => {
-    const escape = checkManifest({ ...valid, actions: [{ id: 'pause', label: 'Pause', keys: ['Escape'] }] });
+    const escape = checkManifest({
+      ...valid,
+      actions: [{ id: 'pause', label: 'Pause', keys: ['Escape'] }],
+    });
     expect(escape.ok).toBe(false);
     expect(checkManifest({ ...valid, id: 'Essai' }).ok).toBe(false);
     expect(checkManifest({ ...valid, inconnu: 1 }).ok).toBe(false);
     expect(checkManifest({ ...valid, durationMinutes: [60, 20] }).ok).toBe(false);
-    expect(checkManifest({ ...valid, saves: { slots: 1, maxBytes: 1024, moments: ['auto'] } }).ok).toBe(false);
+    expect(
+      checkManifest({ ...valid, saves: { slots: 1, maxBytes: 1024, moments: ['auto'] } }).ok,
+    ).toBe(false);
   });
 
   it('compare la version du pont exigée à celle de l’application', () => {
@@ -99,8 +114,13 @@ describe('catalogue des jeux', () => {
 
   it('lit un paquet du dépôt: duo-game.json à la racine, site construit dans dist/', async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'duo-depot-'));
-    await cp(path.join(FIXTURES, 'essai-pont'), path.join(dir, 'essai-pont', 'dist'), { recursive: true });
-    await rename(path.join(dir, 'essai-pont', 'dist', 'duo-game.json'), path.join(dir, 'essai-pont', 'duo-game.json'));
+    await cp(path.join(FIXTURES, 'essai-pont'), path.join(dir, 'essai-pont', 'dist'), {
+      recursive: true,
+    });
+    await rename(
+      path.join(dir, 'essai-pont', 'dist', 'duo-game.json'),
+      path.join(dir, 'essai-pont', 'duo-game.json'),
+    );
     const catalog = await scanGames([{ source: 'dev', dir }]);
     expect(catalog.games[0]?.root).toBe(path.join(dir, 'essai-pont', 'dist'));
   });
@@ -108,8 +128,13 @@ describe('catalogue des jeux', () => {
   it('refuse une page d’entrée qui sort du paquet', async () => {
     const dir = await mkdtemp(path.join(tmpdir(), 'duo-sortie-'));
     await cp(path.join(FIXTURES, 'essai-pont'), path.join(dir, 'essai-pont'), { recursive: true });
-    const manifest = JSON.parse(await readFile(path.join(dir, 'essai-pont', 'duo-game.json'), 'utf8')) as Record<string, unknown>;
-    await writeFile(path.join(dir, 'essai-pont', 'duo-game.json'), JSON.stringify({ ...manifest, entry: '../../secret.html' }));
+    const manifest = JSON.parse(
+      await readFile(path.join(dir, 'essai-pont', 'duo-game.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    await writeFile(
+      path.join(dir, 'essai-pont', 'duo-game.json'),
+      JSON.stringify({ ...manifest, entry: '../../secret.html' }),
+    );
     const catalog = await scanGames([{ source: 'extra', dir }]);
     expect(catalog.games).toEqual([]);
     expect(catalog.problems).toHaveLength(1);

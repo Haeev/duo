@@ -21,11 +21,27 @@ import type {
 import type { LocalSaves } from './data/local-saves';
 import { publicSettings, type MachineStore, type SettingsFile } from './data/store';
 import type { GameEntry } from './games/catalog';
-import { BRIDGE_VERSION, type GameSettings, type LoadedSave, type PlayerInfo, type Role } from './game-host/bridge';
-import type { GameFailure, GameHost, GameHostEvents, SaveWriteRequest } from './game-host/game-host';
+import {
+  BRIDGE_VERSION,
+  type GameSettings,
+  type LoadedSave,
+  type PlayerInfo,
+  type Role,
+} from './game-host/bridge';
+import type {
+  GameFailure,
+  GameHost,
+  GameHostEvents,
+  SaveWriteRequest,
+} from './game-host/game-host';
 import type { Journal } from './journal';
 import type { LiaisonEvent, Liaison, PeerInfo, SessionsView } from './liaison/liaison';
-import { EMPTY_SESSION, type HostSession, type MatchEnd, type SalonGame } from './liaison/session-machine';
+import {
+  EMPTY_SESSION,
+  type HostSession,
+  type MatchEnd,
+  type SalonGame,
+} from './liaison/session-machine';
 import type { SaveStatus } from './protocol';
 import { PLAYER_APPEARANCES } from '../shared/players';
 import type { AppWindow, PlatformLayer } from './window';
@@ -114,7 +130,9 @@ export class Platform {
     ready: () => {
       if (this.running === null) return;
       this.running.selfLoading = 1;
-      this.deps.journal.write('info', 'platform', 'game-ready', { game: this.running.game.manifest.id });
+      this.deps.journal.write('info', 'platform', 'game-ready', {
+        game: this.running.game.manifest.id,
+      });
       this.deps.liaison.reportLoaded();
       this.publish();
     },
@@ -229,13 +247,19 @@ export class Platform {
     };
   }
 
-  async handleIntent<C extends IntentChannel>(channel: C, arg: IntentArgs[C]): Promise<IntentResult> {
+  async handleIntent<C extends IntentChannel>(
+    channel: C,
+    arg: IntentArgs[C],
+  ): Promise<IntentResult> {
     const result = await this.dispatch(channel, arg);
     this.publish();
     return result;
   }
 
-  private async dispatch<C extends IntentChannel>(channel: C, rawArg: IntentArgs[C]): Promise<IntentResult> {
+  private async dispatch<C extends IntentChannel>(
+    channel: C,
+    rawArg: IntentArgs[C],
+  ): Promise<IntentResult> {
     const { liaison } = this.deps;
     // Le type de l'argument suit le canal; le `switch` le précise pour chaque cas.
     const arg = rawArg;
@@ -469,7 +493,11 @@ export class Platform {
         break;
       case 'game':
         if (this.running !== null) {
-          this.gameHost?.send({ type: 'net', channel: event.message.channel, data: event.message.data });
+          this.gameHost?.send({
+            type: 'net',
+            channel: event.message.channel,
+            data: event.message.data,
+          });
         }
         break;
     }
@@ -483,12 +511,27 @@ export class Platform {
   private announceSalonChanges(before: SessionsView, after: SessionsView): void {
     const ownBefore = before.own.salon;
     const ownAfter = after.own.salon;
-    if (ownBefore !== null && ownAfter !== null && after.own.match === null && before.own.match === null) {
+    if (
+      ownBefore !== null &&
+      ownAfter !== null &&
+      after.own.match === null &&
+      before.own.match === null
+    ) {
       if (!ownBefore.guestJoined && ownAfter.guestJoined) this.toast('joined');
-      if (ownBefore.guestJoined && !ownAfter.guestJoined && after.own.lastEnd === before.own.lastEnd) {
+      if (
+        ownBefore.guestJoined &&
+        !ownAfter.guestJoined &&
+        after.own.lastEnd === before.own.lastEnd
+      ) {
         this.toast('left-salon');
       }
-      if (ownBefore.countdownEndsAt !== null && ownAfter.countdownEndsAt === null && ownBefore.ready.guest && !ownAfter.ready.guest && ownAfter.guestJoined) {
+      if (
+        ownBefore.countdownEndsAt !== null &&
+        ownAfter.countdownEndsAt === null &&
+        ownBefore.ready.guest &&
+        !ownAfter.ready.guest &&
+        ownAfter.guestJoined
+      ) {
         this.toast('asked-wait');
       }
     }
@@ -543,7 +586,9 @@ export class Platform {
       // Heure de session: Date.now() de cette machine (écart d'horloge 0 dans `init`).
       // La liaison de dev-reseau fournira l'heure commune et l'écart réel (ADR 0007, point 4).
       this.gameHost.send({ type: 'start', atSessionMs: Date.now() });
-      this.deps.journal.write('info', 'platform', 'match-start', { game: current.game.manifest.id });
+      this.deps.journal.write('info', 'platform', 'match-start', {
+        game: current.game.manifest.id,
+      });
       this.armHintTimer();
       this.armAutosave(current);
     }
@@ -585,7 +630,8 @@ export class Platform {
     if (this.autosaveTimer !== null) clearInterval(this.autosaveTimer);
     this.autosaveTimer = null;
     const seconds = running.game.manifest.saves?.autosaveSeconds;
-    if (running.role !== 'host' || seconds === undefined || !this.declares(running.game, 'auto')) return;
+    if (running.role !== 'host' || seconds === undefined || !this.declares(running.game, 'auto'))
+      return;
     this.autosaveTimer = setInterval(() => {
       if (this.running === running && !running.paused) {
         this.gameHost?.send({ type: 'saveRequest', moment: 'auto' });
@@ -616,7 +662,8 @@ export class Platform {
       peerBack: false,
       savedDuringStop: false,
     };
-    const peerProfile: Profile = this.peer?.profile ?? this.lastPeerProfile ?? { pseudo: '?', color: 'crescent' };
+    const peerProfile: Profile = this.peer?.profile ??
+      this.lastPeerProfile ?? { pseudo: '?', color: 'crescent' };
     const other: Role = role === 'host' ? 'guest' : 'host';
     const self: PlayerInfo = {
       id: this.playerId(role, role),
@@ -659,8 +706,13 @@ export class Platform {
     });
   }
 
-  private async loadSave(role: Role, game: GameEntry, salonGame: SalonGame): Promise<LoadedSave | null> {
-    if (role !== 'host' || game.manifest.saves === null || salonGame.saveChoice !== 'continue') return null;
+  private async loadSave(
+    role: Role,
+    game: GameEntry,
+    salonGame: SalonGame,
+  ): Promise<LoadedSave | null> {
+    if (role !== 'host' || game.manifest.saves === null || salonGame.saveChoice !== 'continue')
+      return null;
     const stored = await this.deps.saves.read(game.manifest.id);
     if (stored === null || stored.dataSchema < 1) return null;
     const data = new ArrayBuffer(stored.data.byteLength);
@@ -763,8 +815,10 @@ export class Platform {
       reason: end?.reason ?? 'vanished',
     });
     if (host === null) return;
-    const saveOnStop = running.role === 'host' && running.game.manifest.saves !== null && end?.reason !== 'crash';
-    const reason = end?.reason === 'crash' ? 'peer-crash' : end?.reason === 'end' ? 'end' : 'stopped';
+    const saveOnStop =
+      running.role === 'host' && running.game.manifest.saves !== null && end?.reason !== 'crash';
+    const reason =
+      end?.reason === 'crash' ? 'peer-crash' : end?.reason === 'end' ? 'end' : 'stopped';
     this.stopping = running;
     void host.stop(reason, saveOnStop).then(() => {
       if (this.stopping === running) this.stopping = null;
@@ -796,7 +850,9 @@ export class Platform {
             hadSave: this.saveSummaries.has(running.game.manifest.id),
           }
         : { kind: 'load-failed', gameName: running.game.manifest.name, where: 'self' };
-    this.deps.journal.write('error', 'platform', 'game-stopped-by-failure', { reason: failure.reason });
+    this.deps.journal.write('error', 'platform', 'game-stopped-by-failure', {
+      reason: failure.reason,
+    });
     this.running = null;
     this.gameHost?.destroy();
     this.deps.liaison.stopMatch(reason);
@@ -806,9 +862,10 @@ export class Platform {
   private async onSaveWrite(request: SaveWriteRequest): Promise<SaveStatus> {
     const running = this.running ?? this.stopping;
     const saves = running?.game.manifest.saves ?? null;
-    if (running === null || running.role !== 'host') return 'refused';
-    if (saves === null || !saves.moments.includes(request.moment)) return 'moment-not-declared';
-    if (request.data.byteLength > Math.min(saves.maxBytes, PLATFORM_MAX_SAVE_BYTES)) return 'too-large';
+    if (running?.role !== 'host') return 'refused';
+    if (!saves?.moments.includes(request.moment)) return 'moment-not-declared';
+    if (request.data.byteLength > Math.min(saves.maxBytes, PLATFORM_MAX_SAVE_BYTES))
+      return 'too-large';
     const game = running.game;
     try {
       await this.deps.saves.write(game.manifest.id, {

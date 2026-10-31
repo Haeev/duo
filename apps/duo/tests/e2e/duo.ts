@@ -41,7 +41,11 @@ export async function seedProfile(dataDir: string, pseudo: string, color: string
   );
 }
 
-async function waitForPage(app: ElectronApplication, prefix: string, timeoutMs = 30_000): Promise<Page> {
+async function waitForPage(
+  app: ElectronApplication,
+  prefix: string,
+  timeoutMs = 30_000,
+): Promise<Page> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     const page = app.windows().find((candidate) => candidate.url().startsWith(prefix));
@@ -98,7 +102,11 @@ function within(promise: Promise<unknown>, ms: number): Promise<boolean> {
       () => true,
       () => true,
     ),
-    new Promise<boolean>((resolve) => setTimeout(() => resolve(false), ms)),
+    new Promise<boolean>((resolve) =>
+      setTimeout(() => {
+        resolve(false);
+      }, ms),
+    ),
   ]);
 }
 

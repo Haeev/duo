@@ -53,7 +53,10 @@ function Welcome(): JSX.Element {
 function ProfileStep({ state }: { state: AppState }): JSX.Element {
   const [pseudo, setPseudo] = useState(state.profile?.pseudo ?? '');
   const [color, setColor] = useState<PlayerColor>(
-    () => state.profile?.color ?? PLAYER_COLORS[Math.floor(Math.random() * PLAYER_COLORS.length)] ?? 'orb',
+    () =>
+      state.profile?.color ??
+      PLAYER_COLORS[Math.floor(Math.random() * PLAYER_COLORS.length)] ??
+      'orb',
   );
   const [error, setError] = useState<'empty' | 'character' | null>(null);
   const input = useInitialFocus<HTMLInputElement>();
@@ -102,7 +105,8 @@ function ProfileStep({ state }: { state: AppState }): JSX.Element {
             data-testid="profil-pseudo"
             onInput={(event) => {
               const filtered = filterPseudoInput(event.currentTarget.value);
-              if (filtered.value !== event.currentTarget.value) event.currentTarget.value = filtered.value;
+              if (filtered.value !== event.currentTarget.value)
+                event.currentTarget.value = filtered.value;
               setPseudo(filtered.value);
               setError(filtered.rejected ? 'character' : null);
             }}
@@ -125,7 +129,8 @@ function ProfileStep({ state }: { state: AppState }): JSX.Element {
           <span class="petit texte-second">{t.profil.aideCouleur}</span>
         </div>
         <p class="apercu">
-          {t.profil.apercu} <PlayerSymbol color={color} /> <strong>{pseudo.trim() === '' ? '…' : pseudo.trim()}</strong>
+          {t.profil.apercu} <PlayerSymbol color={color} />{' '}
+          <strong>{pseudo.trim() === '' ? '…' : pseudo.trim()}</strong>
         </p>
         <div class="actions">
           <button
@@ -188,7 +193,13 @@ function NetworkStep({ state }: { state: AppState }): JSX.Element {
         >
           {t.reseau.retour}
         </button>
-        <button type="button" class="bouton bouton-principal" ref={button} data-testid="reseau-continuer" onClick={accept}>
+        <button
+          type="button"
+          class="bouton bouton-principal"
+          ref={button}
+          data-testid="reseau-continuer"
+          onClick={accept}
+        >
           {t.reseau.continuer}
         </button>
       </div>
@@ -244,7 +255,13 @@ function PeerStep({ state, profile }: { state: AppState; profile: Profile }): JS
           </p>
         )}
         <p class="lien-aide">
-          <button type="button" class="lien" ref={finish} data-testid="recherche-terminer-sans" onClick={complete}>
+          <button
+            type="button"
+            class="lien"
+            ref={finish}
+            data-testid="recherche-terminer-sans"
+            onClick={complete}
+          >
             {t.recherche.terminerSans}
           </button>
           <span class="petit texte-second">{t.recherche.aideTerminerSans}</span>
@@ -306,7 +323,11 @@ export function FirstLaunch({ state }: { state: AppState }): JSX.Element {
       break;
     case 'peer':
       content =
-        state.profile === null ? <ProfileStep state={state} /> : <PeerStep state={state} profile={state.profile} />;
+        state.profile === null ? (
+          <ProfileStep state={state} />
+        ) : (
+          <PeerStep state={state} profile={state.profile} />
+        );
       break;
   }
   return (

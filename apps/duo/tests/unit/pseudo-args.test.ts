@@ -62,7 +62,15 @@ describe('ligne de commande (ADR 0003, point 9)', () => {
   });
 
   it('ignore les valeurs invalides', () => {
-    const options = parseCommandLine(['--duo-liaison-port=80', '--duo-peer-address=pas une adresse'], '/');
-    expect(options).toEqual({ dataDir: null, gamesDir: null, liaisonPort: null, peerAddress: null });
+    const options = parseCommandLine(
+      ['--duo-liaison-port=80', '--duo-peer-address=pas une adresse'],
+      '/',
+    );
+    expect(options).toEqual({
+      dataDir: null,
+      gamesDir: null,
+      liaisonPort: null,
+      peerAddress: null,
+    });
   });
 });

@@ -75,7 +75,10 @@ export function resolveInside(root: string, urlPath: string): string | null {
   return target;
 }
 
-export interface ByteRange { readonly start: number; readonly end: number }
+export interface ByteRange {
+  readonly start: number;
+  readonly end: number;
+}
 
 /** Lit un en-tête `Range: bytes=...` (une seule plage). `null`: pas de plage; `'invalid'`: 416. */
 export function parseRange(header: string | null, size: number): ByteRange | null | 'invalid' {
@@ -125,10 +128,16 @@ export async function serveFile(file: string, request: Request, csp: string): Pr
   };
   const range = parseRange(request.headers.get('range'), size);
   if (range === 'invalid') {
-    return new Response(null, { status: 416, headers: { ...headers, 'content-range': `bytes */${size}` } });
+    return new Response(null, {
+      status: 416,
+      headers: { ...headers, 'content-range': `bytes */${size}` },
+    });
   }
   if (request.method === 'HEAD') {
-    return new Response(null, { status: 200, headers: { ...headers, 'content-length': String(size) } });
+    return new Response(null, {
+      status: 200,
+      headers: { ...headers, 'content-length': String(size) },
+    });
   }
   const start = range?.start ?? 0;
   const end = range?.end ?? size - 1;
@@ -137,7 +146,10 @@ export async function serveFile(file: string, request: Request, csp: string): Pr
       ? null
       : (Readable.toWeb(createReadStream(file, { start, end })) as ReadableStream<Uint8Array>);
   if (range === null) {
-    return new Response(body, { status: 200, headers: { ...headers, 'content-length': String(size) } });
+    return new Response(body, {
+      status: 200,
+      headers: { ...headers, 'content-length': String(size) },
+    });
   }
   return new Response(body, {
     status: 206,

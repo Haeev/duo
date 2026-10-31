@@ -4,7 +4,10 @@ import type { Session } from 'electron';
 
 const GAME_PERMISSIONS = new Set(['fullscreen', 'pointerLock']);
 
-export function hardenSession(target: Session, options: { readonly allowGamePermissions: boolean }): void {
+export function hardenSession(
+  target: Session,
+  options: { readonly allowGamePermissions: boolean },
+): void {
   const allowed = (permission: string): boolean =>
     options.allowGamePermissions && GAME_PERMISSIONS.has(permission);
   target.setPermissionRequestHandler((_contents, permission, callback) => {

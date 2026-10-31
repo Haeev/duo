@@ -30,7 +30,15 @@ function endTitle(end: EndView): string {
   }
 }
 
-function EndScreen({ end, state, profile }: { end: EndView; state: AppState; profile: Profile }): JSX.Element {
+function EndScreen({
+  end,
+  state,
+  profile,
+}: {
+  end: EndView;
+  state: AppState;
+  profile: Profile;
+}): JSX.Element {
   const button = useInitialFocus<HTMLButtonElement>('fin');
   const dismiss = (): void => {
     void send('end:dismiss', null);
@@ -38,28 +46,38 @@ function EndScreen({ end, state, profile }: { end: EndView; state: AppState; pro
   useEscape(dismiss);
   const peer = state.peer.status === 'unknown' ? null : state.peer.profile;
   return (
-    <main class="scene scene-ciel ecran-centre" data-testid="ecran-fin">
+    <main class="scene scene-ciel">
       <Sky />
-      <h1 class="display">{endTitle(end)}</h1>
-      <p class="corps-grand texte-second">{t.fin.sousTitre(end.game.name, playedDuration(end.durationMs))}</p>
-      <div class="paire-joueurs">
-        <PlayerCard profile={profile} self testId="fin-carte-toi" />
-        {peer !== null && <PlayerCard profile={peer} self={false} testId="fin-carte-autre" />}
-      </div>
-      {end.stats.length > 0 && (
-        <dl class="statistiques" data-testid="fin-statistiques">
-          {end.stats.map((stat) => (
-            <div class="statistique" key={stat.label}>
-              <dt class="petit texte-second">{stat.label}</dt>
-              <dd class="chiffre">{stat.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-      {end.saved && <p class="texte-succes">{t.fin.progression}</p>}
-      <button type="button" class="bouton bouton-principal bouton-grand" ref={button} data-testid="fin-retour-salon" onClick={dismiss}>
-        {t.fin.retourSalon}
-      </button>
+      <section class="ecran-centre" data-testid="ecran-fin">
+        <h1 class="display">{endTitle(end)}</h1>
+        <p class="corps-grand texte-second">
+          {t.fin.sousTitre(end.game.name, playedDuration(end.durationMs))}
+        </p>
+        <div class="paire-joueurs">
+          <PlayerCard profile={profile} self testId="fin-carte-toi" />
+          {peer !== null && <PlayerCard profile={peer} self={false} testId="fin-carte-autre" />}
+        </div>
+        {end.stats.length > 0 && (
+          <dl class="statistiques" data-testid="fin-statistiques">
+            {end.stats.map((stat) => (
+              <div class="statistique" key={stat.label}>
+                <dt class="petit texte-second">{stat.label}</dt>
+                <dd class="chiffre">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        {end.saved && <p class="texte-succes">{t.fin.progression}</p>}
+        <button
+          type="button"
+          class="bouton bouton-principal bouton-grand"
+          ref={button}
+          data-testid="fin-retour-salon"
+          onClick={dismiss}
+        >
+          {t.fin.retourSalon}
+        </button>
+      </section>
     </main>
   );
 }
@@ -81,7 +99,9 @@ function NoticeDialog({ notice, state }: { notice: NoticeView; state: AppState }
           {notice.hadSave && <p class="texte-second">{t.arretJeu.sauvegardeIntacte}</p>}
         </>
       ) : (
-        <p>{t.arretJeu.echecChargement(notice.gameName, notice.where === 'peer' ? peerName : null)}</p>
+        <p>
+          {t.arretJeu.echecChargement(notice.gameName, notice.where === 'peer' ? peerName : null)}
+        </p>
       )}
     </Dialog>
   );
@@ -116,7 +136,8 @@ function QuitDialog(): JSX.Element {
 function Scene({ state }: { state: AppState }): JSX.Element | null {
   const profile = state.profile;
   if (profile === null || !state.setup.done) return <FirstLaunch state={state} />;
-  if (state.match !== null) return <MatchLayer state={state} match={state.match} profile={profile} />;
+  if (state.match !== null)
+    return <MatchLayer state={state} match={state.match} profile={profile} />;
   if (state.end !== null) return <EndScreen end={state.end} state={state} profile={profile} />;
   if (state.salon !== null) return <Salon state={state} salon={state.salon} profile={profile} />;
   return <Launcher state={state} profile={profile} />;
@@ -129,7 +150,8 @@ function useRootAttributes(state: AppState | null): void {
     const reduced = state?.settings.reducedMotion ?? systemReduced;
     root.dataset.motion = reduced ? 'reduced' : 'normal';
     root.style.fontSize = `${16 * (state?.settings.uiScale ?? 1)}px`;
-    const inMatch = state?.match !== null && state?.match !== undefined && state.match.phase !== 'loading';
+    const inMatch =
+      state?.match !== null && state?.match !== undefined && state.match.phase !== 'loading';
     root.dataset.scene = inMatch ? 'partie' : 'lanceur';
     root.dataset.platform = state?.platform ?? 'linux';
   }, [state]);

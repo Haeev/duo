@@ -57,7 +57,13 @@ export function Sky(): JSX.Element {
 }
 
 /** Symbole d'un joueur; à partir de 32 px, en jeton avec son anneau de halo (identité, 4.3). */
-export function PlayerSymbol({ color, size = 24 }: { color: PlayerColor; size?: number }): JSX.Element {
+export function PlayerSymbol({
+  color,
+  size = 24,
+}: {
+  color: PlayerColor;
+  size?: number;
+}): JSX.Element {
   const appearance = PLAYER_APPEARANCES[color];
   const token = size >= 32;
   // Halo: anneau de rayon 0,47 fois la taille, trait de 3 % de la taille (1,5 px au moins).
@@ -72,7 +78,15 @@ export function PlayerSymbol({ color, size = 24 }: { color: PlayerColor; size?: 
       style={{ color: `var(--player-${color})` }}
     >
       {token && (
-        <circle class="halo" cx="12" cy="12" r={11.28} fill="none" stroke="currentColor" stroke-width={strokeUnits} />
+        <circle
+          class="halo"
+          cx="12"
+          cy="12"
+          r={11.28}
+          fill="none"
+          stroke="currentColor"
+          stroke-width={strokeUnits}
+        />
       )}
       <path
         d={appearance.path}
@@ -262,7 +276,11 @@ export function ColorPicker(props: {
   const available = PLAYER_COLORS.filter((color) => color !== props.taken?.color);
   const move = (event: KeyboardEvent, current: PlayerColor): void => {
     const step =
-      event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : event.key === 'ArrowLeft' || event.key === 'ArrowUp' ? -1 : 0;
+      event.key === 'ArrowRight' || event.key === 'ArrowDown'
+        ? 1
+        : event.key === 'ArrowLeft' || event.key === 'ArrowUp'
+          ? -1
+          : 0;
     if (step === 0) return;
     event.preventDefault();
     const index = available.indexOf(current);
@@ -285,7 +303,11 @@ export function ColorPicker(props: {
             role="radio"
             class="choix-couleur-option"
             aria-checked={checked}
-            aria-label={taken ? `${appearance.label}, ${t.profil.prisePar(props.taken?.by ?? '')}` : appearance.label}
+            aria-label={
+              taken
+                ? `${appearance.label}, ${t.profil.prisePar(props.taken?.by ?? '')}`
+                : appearance.label
+            }
             disabled={taken}
             tabIndex={checked ? 0 : -1}
             data-testid={`couleur-${color}`}
@@ -301,7 +323,9 @@ export function ColorPicker(props: {
             }}
           >
             <PlayerSymbol color={color} size={32} />
-            <span class="petit">{taken ? t.profil.prisePar(props.taken?.by ?? '') : appearance.symbolName}</span>
+            <span class="petit">
+              {taken ? t.profil.prisePar(props.taken?.by ?? '') : appearance.symbolName}
+            </span>
           </button>
         );
       })}
@@ -311,31 +335,32 @@ export function ColorPicker(props: {
 
 /** Secondes restantes d'un décompte, mises à jour quatre fois par seconde. */
 export function useCountdown(endsAt: number | null): number | null {
-  const [now, setNow] = useState(() => Date.now());
+  const [, setTick] = useState(0);
   useEffect(() => {
     if (endsAt === null) return undefined;
     const timer = setInterval(() => {
-      setNow(Date.now());
+      setTick((tick) => tick + 1);
     }, 250);
     return () => {
       clearInterval(timer);
     };
   }, [endsAt]);
   if (endsAt === null) return null;
-  return Math.max(1, Math.ceil((endsAt - now) / 1000));
+  // Heure lue à chaque rendu: une valeur gardée depuis le montage fausserait le premier chiffre.
+  return Math.min(3, Math.max(1, Math.ceil((endsAt - Date.now()) / 1000)));
 }
 
 /** Heure courante, rafraîchie chaque seconde (durées affichées). */
 export function useNow(active: boolean): number {
-  const [now, setNow] = useState(() => Date.now());
+  const [, setTick] = useState(0);
   useEffect(() => {
     if (!active) return undefined;
     const timer = setInterval(() => {
-      setNow(Date.now());
+      setTick((tick) => tick + 1);
     }, 1000);
     return () => {
       clearInterval(timer);
     };
   }, [active]);
-  return now;
+  return Date.now();
 }

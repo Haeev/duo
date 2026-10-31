@@ -2,8 +2,21 @@
 // données (`--duo-data-dir`), puis verrou d'instance unique (pris dans ce
 // dossier), puis protocoles privilégiés, puis tout le reste après `ready`.
 import path from 'node:path';
-import { BaseWindow, Menu, app, crashReporter, ipcMain, session, type IpcMainInvokeEvent } from 'electron';
-import { IPC_GET_STATE, IPC_INTENT_PREFIX, INTENT_CHANNELS, type IntentChannel } from '../shared/ipc';
+import {
+  BaseWindow,
+  Menu,
+  app,
+  crashReporter,
+  ipcMain,
+  session,
+  type IpcMainInvokeEvent,
+} from 'electron';
+import {
+  IPC_GET_STATE,
+  IPC_INTENT_PREFIX,
+  INTENT_CHANNELS,
+  type IntentChannel,
+} from '../shared/ipc';
 import { parseCommandLine } from './args';
 import { LocalSaves } from './data/local-saves';
 import { MachineStore } from './data/store';
@@ -56,7 +69,11 @@ function platformName(): 'darwin' | 'win32' | 'linux' {
   return process.platform === 'darwin' || process.platform === 'win32' ? process.platform : 'linux';
 }
 
-function registerIpc(platform: Platform, journal: Journal, isPlatformSender: (event: IpcMainInvokeEvent) => boolean): void {
+function registerIpc(
+  platform: Platform,
+  journal: Journal,
+  isPlatformSender: (event: IpcMainInvokeEvent) => boolean,
+): void {
   ipcMain.handle(IPC_GET_STATE, (event) => {
     if (!isPlatformSender(event)) throw new Error('émetteur refusé');
     return platform.snapshot();
@@ -72,7 +89,12 @@ function registerIpc(platform: Platform, journal: Journal, isPlatformSender: (ev
   }
 }
 
-async function handle(platform: Platform, journal: Journal, channel: IntentChannel, raw: unknown): Promise<unknown> {
+async function handle(
+  platform: Platform,
+  journal: Journal,
+  channel: IntentChannel,
+  raw: unknown,
+): Promise<unknown> {
   const check = checkIntent(channel, raw);
   if (!check.ok) {
     journal.write('warn', 'ipc', 'invalid-argument', { channel, error: check.error });
@@ -115,10 +137,15 @@ async function start(): Promise<void> {
 
   const catalog = await scanGames(gameRoots());
   for (const problem of catalog.problems) {
-    journal.write('warn', 'games', 'manifest-invalid', { folder: problem.folder, problems: problem.problems });
+    journal.write('warn', 'games', 'manifest-invalid', {
+      folder: problem.folder,
+      problems: problem.problems,
+    });
   }
   journal.write('info', 'games', 'catalog', {
-    games: catalog.games.map((game: GameEntry) => `${game.manifest.id}@${game.manifest.version} (${game.source})`),
+    games: catalog.games.map(
+      (game: GameEntry) => `${game.manifest.id}@${game.manifest.version} (${game.source})`,
+    ),
   });
   const gameRootById = new Map(catalog.games.map((game) => [game.manifest.id, game.root]));
 
@@ -158,12 +185,17 @@ async function start(): Promise<void> {
 
   let appWindow: AppWindow | null = null;
   const devServer = process.env.ELECTRON_RENDERER_URL;
-  const launcherUrl = !app.isPackaged && devServer !== undefined ? devServer : `${APP_ORIGIN}/index.html`;
+  const launcherUrl =
+    !app.isPackaged && devServer !== undefined ? devServer : `${APP_ORIGIN}/index.html`;
 
   const isPlatformSender = (event: IpcMainInvokeEvent): boolean => {
     const frameUrl = event.senderFrame?.url ?? '';
     const expected = appWindow?.platformView.webContents;
-    return expected !== undefined && event.sender === expected && frameUrl.startsWith(launcherUrl.replace(/index\.html$/, ''));
+    return (
+      expected !== undefined &&
+      event.sender === expected &&
+      frameUrl.startsWith(launcherUrl.replace(/index\.html$/, ''))
+    );
   };
   registerIpc(platform, journal, isPlatformSender);
 

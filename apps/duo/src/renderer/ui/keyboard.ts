@@ -56,7 +56,11 @@ export function useEscape(handler: (() => void) | null): void {
   const enabled = handler !== null;
   useEffect(() => {
     if (!enabled) return undefined;
-    const entry = { current: () => { ref.current(); } };
+    const entry = {
+      current: () => {
+        ref.current();
+      },
+    };
     escapeStack.push(entry);
     return () => {
       const index = escapeStack.indexOf(entry);
@@ -82,7 +86,9 @@ export function useFocusTrap(container: RefObject<HTMLElement | null>): void {
     const onKey = (event: KeyboardEvent): void => {
       if (event.key !== 'Tab' || container.current === null) return;
       const focusable = Array.from(
-        container.current.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled])'),
+        container.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled])',
+        ),
       );
       const first = focusable.at(0);
       const last = focusable.at(-1);
@@ -105,9 +111,11 @@ export function useFocusTrap(container: RefObject<HTMLElement | null>): void {
 
 /** Disposition réelle du clavier, pour les libellés des touches (AZERTY). */
 export async function readKeyboardLayout(): Promise<ReadonlyMap<string, string> | null> {
-  const keyboard = (navigator as Navigator & {
-    keyboard?: { getLayoutMap?: () => Promise<ReadonlyMap<string, string>> };
-  }).keyboard;
+  const keyboard = (
+    navigator as Navigator & {
+      keyboard?: { getLayoutMap?: () => Promise<ReadonlyMap<string, string>> };
+    }
+  ).keyboard;
   if (keyboard?.getLayoutMap === undefined) return null;
   try {
     return await keyboard.getLayoutMap();

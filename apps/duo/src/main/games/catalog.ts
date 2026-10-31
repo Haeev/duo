@@ -49,7 +49,10 @@ async function listFolders(dir: string): Promise<string[]> {
   try {
     const entries = await readdir(dir, { withFileTypes: true });
     return entries
-      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('_') && !entry.name.startsWith('.'))
+      .filter(
+        (entry) =>
+          entry.isDirectory() && !entry.name.startsWith('_') && !entry.name.startsWith('.'),
+      )
       .map((entry) => entry.name)
       .sort();
   } catch {
@@ -81,7 +84,12 @@ async function locate(
 /** Chemin relatif au paquet, sans sortie du dossier servi. */
 function insidePackage(relative: string): boolean {
   const segments = relative.split('/');
-  return !relative.startsWith('/') && !relative.includes('\\') && !segments.includes('..') && !/^[A-Za-z]:/.test(relative);
+  return (
+    !relative.startsWith('/') &&
+    !relative.includes('\\') &&
+    !segments.includes('..') &&
+    !/^[A-Za-z]:/.test(relative)
+  );
 }
 
 async function readEntry(
@@ -101,13 +109,22 @@ async function readEntry(
   if (!check.ok) return { folder: label, problems: check.problems };
   const { manifest } = check;
   if (manifest.id !== folder) {
-    return { folder: label, problems: [`id « ${manifest.id} » différent du dossier « ${folder} »`] };
+    return {
+      folder: label,
+      problems: [`id « ${manifest.id} » différent du dossier « ${folder} »`],
+    };
   }
   if (!insidePackage(manifest.entry) || !insidePackage(manifest.thumbnail)) {
-    return { folder: label, problems: ['entry et thumbnail: chemins relatifs au paquet, sans « .. »'] };
+    return {
+      folder: label,
+      problems: ['entry et thumbnail: chemins relatifs au paquet, sans « .. »'],
+    };
   }
   if (!(await isFile(path.join(located.served, ...manifest.entry.split('/'))))) {
-    return { folder: label, problems: [`page d'entrée absente: ${manifest.entry} (jeu construit ?)`] };
+    return {
+      folder: label,
+      problems: [`page d'entrée absente: ${manifest.entry} (jeu construit ?)`],
+    };
   }
   return {
     manifest,

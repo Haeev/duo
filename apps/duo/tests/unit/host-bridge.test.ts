@@ -57,12 +57,23 @@ describe('battement de cœur (ADR 0004, point 6)', () => {
 
 describe('pont 1.0, côté plateforme (messages de @duo/protocol)', () => {
   it('valide les messages du jeu et jette les autres', () => {
-    expect(bridgeCodec.decode({ type: 'hello', bridge: '1.0', sdk: '1.0.0' })).toEqual({ type: 'hello', bridge: '1.0', sdk: '1.0.0' });
+    expect(bridgeCodec.decode({ type: 'hello', bridge: '1.0', sdk: '1.0.0' })).toEqual({
+      type: 'hello',
+      bridge: '1.0',
+      sdk: '1.0.0',
+    });
     expect(bridgeCodec.decode({ type: 'ready' })).toEqual({ type: 'ready' });
-    expect(bridgeCodec.decode({ type: 'loading', progress: 0.4 })).toEqual({ type: 'loading', progress: 0.4 });
+    expect(bridgeCodec.decode({ type: 'loading', progress: 0.4 })).toEqual({
+      type: 'loading',
+      progress: 0.4,
+    });
     expect(bridgeCodec.decode({ type: 'loading', progress: 2 })).toBeNull();
-    expect(bridgeCodec.decode({ type: 'net', channel: 16, mode: 'reliable', data: '{}' })).toBeNull();
-    expect(bridgeCodec.decode({ type: 'net', channel: 2, mode: 'latest', data: { pas: 'du texte' } })).toBeNull();
+    expect(
+      bridgeCodec.decode({ type: 'net', channel: 16, mode: 'reliable', data: '{}' }),
+    ).toBeNull();
+    expect(
+      bridgeCodec.decode({ type: 'net', channel: 2, mode: 'latest', data: { pas: 'du texte' } }),
+    ).toBeNull();
     expect(bridgeCodec.decode({ type: 'ready', champ: 'en trop' })).toBeNull();
     expect(bridgeCodec.decode({ type: 'inconnu' })).toBeNull();
     expect(bridgeCodec.decode('texte')).toBeNull();
