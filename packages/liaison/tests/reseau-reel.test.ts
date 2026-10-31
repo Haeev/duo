@@ -34,7 +34,8 @@ function create(port: number, peerPort: number, machine: string, pseudo: string)
 async function waitFor(condition: () => boolean, maxMs: number): Promise<number> {
   const start = performance.now();
   while (!condition()) {
-    if (performance.now() - start > maxMs) throw new Error(`condition non atteinte en ${String(maxMs)} ms`);
+    if (performance.now() - start > maxMs)
+      throw new Error(`condition non atteinte en ${String(maxMs)} ms`);
     await sleep(5);
   }
   return performance.now() - start;
@@ -67,7 +68,10 @@ describe('vrais sockets sur la boucle locale', () => {
     const [reportA, reportB] = await Promise.all([a.start(), b.start()]);
     expect(reportA.tcpPort).toBe(BASE);
     expect(reportB.udpPort).toBe(BASE + 5);
-    const found = await waitFor(() => a.partner().kind === 'present' && b.partner().kind === 'present', 3000);
+    const found = await waitFor(
+      () => a.partner().kind === 'present' && b.partner().kind === 'present',
+      3000,
+    );
     expect(found).toBeLessThan(3000);
 
     a.lobby.open({ id: 'la-petite-ligne', version: '0.1.0', save: null });
@@ -101,10 +105,25 @@ describe('vrais sockets sur la boucle locale', () => {
   it('le serveur refuse une page web (Origin), un autre chemin, un autre sous-protocole', async () => {
     const a = create(BASE + 20, BASE + 25, 'aaaaaaaa-2222-4000-8000-000000000001', 'Camille');
     await a.start();
-    const upgrade = { Connection: 'Upgrade', Upgrade: 'websocket', 'Sec-WebSocket-Version': '13', 'Sec-WebSocket-Key': 'dGhlIHNhbXBsZSBub25jZQ==' };
-    expect(await request(BASE + 20, '/duo/liaison', { ...upgrade, 'Sec-WebSocket-Protocol': 'duo', Origin: 'http://192.168.1.50' })).toBe(403);
-    expect(await request(BASE + 20, '/autre', { ...upgrade, 'Sec-WebSocket-Protocol': 'duo' })).toBe(404);
-    expect(await request(BASE + 20, '/duo/liaison', { ...upgrade, 'Sec-WebSocket-Protocol': 'chat' })).toBe(404);
+    const upgrade = {
+      Connection: 'Upgrade',
+      Upgrade: 'websocket',
+      'Sec-WebSocket-Version': '13',
+      'Sec-WebSocket-Key': 'dGhlIHNhbXBsZSBub25jZQ==',
+    };
+    expect(
+      await request(BASE + 20, '/duo/liaison', {
+        ...upgrade,
+        'Sec-WebSocket-Protocol': 'duo',
+        Origin: 'http://192.168.1.50',
+      }),
+    ).toBe(403);
+    expect(
+      await request(BASE + 20, '/autre', { ...upgrade, 'Sec-WebSocket-Protocol': 'duo' }),
+    ).toBe(404);
+    expect(
+      await request(BASE + 20, '/duo/liaison', { ...upgrade, 'Sec-WebSocket-Protocol': 'chat' }),
+    ).toBe(404);
     expect(await request(BASE + 20, '/', {})).toBe(404);
     // Un client WebSocket qui n'est pas Duo: accepté au niveau HTTP, puis fermé faute de `hello`.
     const stranger = new WebSocket(`ws://127.0.0.1:${String(BASE + 20)}/duo/liaison`, 'duo');

@@ -123,7 +123,9 @@ export class Discovery {
     this.timers.push(
       every(
         clock,
-        () => config.beaconIntervalMs + randomInt(random, -config.beaconJitterMs, config.beaconJitterMs),
+        () =>
+          config.beaconIntervalMs +
+          randomInt(random, -config.beaconJitterMs, config.beaconJitterMs),
         () => {
           this.sendAll('announce');
         },
@@ -132,7 +134,8 @@ export class Discovery {
     this.timers.push(
       every(
         clock,
-        () => (this.options.isLinked() ? config.interfacesRefreshMs : config.interfacesRefreshUnlinkedMs),
+        () =>
+          this.options.isLinked() ? config.interfacesRefreshMs : config.interfacesRefreshUnlinkedMs,
         () => {
           this.refreshInterfaces(true);
         },
@@ -286,7 +289,9 @@ export class Discovery {
     window.count += 1;
     this.total.count += 1;
     if (this.perSource.size > 256) this.perSource.clear();
-    return window.count <= datagramsPerSecondPerSource && this.total.count <= datagramsPerSecondTotal;
+    return (
+      window.count <= datagramsPerSecondPerSource && this.total.count <= datagramsPerSecondTotal
+    );
   }
 
   private expire(): void {
@@ -341,7 +346,9 @@ export class Discovery {
       computer: content.computer.slice(0, 32),
       setup: content.setup,
       duos: content.duos.slice(0, 8),
-      addresses: this.retainedValue.slice(0, 8).map((entry) => ({ ip: entry.address, prefix: entry.prefix })),
+      addresses: this.retainedValue
+        .slice(0, 8)
+        .map((entry) => ({ ip: entry.address, prefix: entry.prefix })),
     };
     return encoder.encode(JSON.stringify(datagram));
   }

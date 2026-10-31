@@ -69,8 +69,12 @@ export function createPair(
   clocks: { readonly mac?: number; readonly pc?: number } = {},
 ): Pair {
   const net = new SimNetwork({ profile, seed });
-  const mac = createMachine(net, MAC, MAC_ID, 'Camille', {}, undefined, { clockOffsetMs: clocks.mac ?? 0 });
-  const pc = createMachine(net, PC, PC_ID, 'Sacha', {}, undefined, { clockOffsetMs: clocks.pc ?? 0 });
+  const mac = createMachine(net, MAC, MAC_ID, 'Camille', {}, undefined, {
+    clockOffsetMs: clocks.mac ?? 0,
+  });
+  const pc = createMachine(net, PC, PC_ID, 'Sacha', {}, undefined, {
+    clockOffsetMs: clocks.pc ?? 0,
+  });
   return { net, mac, pc };
 }
 
@@ -92,7 +96,12 @@ export function isPresent(machine: Machine): boolean {
 }
 
 /** Avance le temps par petits pas jusqu'à ce que la condition tienne; rend le temps écoulé. */
-export function advanceUntil(net: SimNetwork, condition: () => boolean, maxMs: number, stepMs = 5): number {
+export function advanceUntil(
+  net: SimNetwork,
+  condition: () => boolean,
+  maxMs: number,
+  stepMs = 5,
+): number {
   const start = net.clock.now();
   while (!condition()) {
     if (net.clock.now() - start >= maxMs) {

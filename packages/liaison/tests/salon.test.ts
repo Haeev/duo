@@ -16,7 +16,12 @@ describe('salon', () => {
     const pair = createPair();
     await startPair(pair);
     pair.mac.liaison.lobby.open(GAME);
-    const shown = advanceUntil(pair.net, () => pair.pc.liaison.session().invitation !== null, 1000, 1);
+    const shown = advanceUntil(
+      pair.net,
+      () => pair.pc.liaison.session().invitation !== null,
+      1000,
+      1,
+    );
     expect(shown).toBeLessThan(10);
     expect(pair.pc.liaison.session().invitation?.game.id).toBe('la-petite-ligne');
     pair.pc.liaison.lobby.join();
@@ -40,7 +45,11 @@ describe('salon', () => {
     pair.net.clock.advance(500);
     expect(pair.mac.liaison.session().lobby?.match?.phase).toBe('loading');
     pair.mac.liaison.match.reportLoaded();
-    advanceUntil(pair.net, () => pair.pc.liaison.session().lobby?.match?.phase === 'starting', 1000);
+    advanceUntil(
+      pair.net,
+      () => pair.pc.liaison.session().lobby?.match?.phase === 'starting',
+      1000,
+    );
     const macStart = (pair.mac.liaison.session().localTimes.startsAt ?? 0) - 123_456;
     const pcStart = (pair.pc.liaison.session().localTimes.startsAt ?? 0) + 9_999;
     expect(Math.abs(macStart - pcStart)).toBeLessThan(5);
@@ -94,7 +103,9 @@ describe('salon', () => {
     pair.pc.liaison.lobby.open(GAME);
     advanceUntil(
       pair.net,
-      () => pair.pc.liaison.session().invitation !== null && pair.mac.liaison.session().invitation !== null,
+      () =>
+        pair.pc.liaison.session().invitation !== null &&
+        pair.mac.liaison.session().invitation !== null,
       1000,
     );
     pair.mac.liaison.lobby.join();
@@ -131,10 +142,18 @@ describe('partie: pause, reprise, fin', () => {
     await startPair(pair);
     playMatch(pair);
     pair.pc.liaison.match.pause();
-    advanceUntil(pair.net, () => pair.mac.liaison.session().lobby?.match?.phase === 'paused', 500, 1);
+    advanceUntil(
+      pair.net,
+      () => pair.mac.liaison.session().lobby?.match?.phase === 'paused',
+      500,
+      1,
+    );
     pair.mac.liaison.match.pause();
     pair.net.clock.advance(50);
-    expect(pair.pc.liaison.session().lobby?.match?.pause).toEqual({ reason: 'player', by: ['guest', 'host'] });
+    expect(pair.pc.liaison.session().lobby?.match?.pause).toEqual({
+      reason: 'player',
+      by: ['guest', 'host'],
+    });
     pair.mac.liaison.match.resume();
     pair.net.clock.advance(100);
     expect(pair.mac.liaison.session().lobby?.match?.phase).toBe('paused');
@@ -166,19 +185,27 @@ describe('partie: pause, reprise, fin', () => {
     playMatch(pair);
     pair.pc.liaison.lobby.leave();
     advanceUntil(pair.net, () => pair.mac.liaison.session().lobby?.match === null, 500);
-    expect(pair.mac.events.notice).toContainEqual({ kind: 'match-ended', reason: 'peer-left', result: null });
+    expect(pair.mac.events.notice).toContainEqual({
+      kind: 'match-ended',
+      reason: 'peer-left',
+      result: null,
+    });
     expect(pair.mac.liaison.session().lobby?.guestJoined).toBe(false);
     expect(pair.pc.liaison.session().invitation?.id).toBe(pair.mac.liaison.session().lobby?.id);
   });
 });
 
 describe('relais des messages de jeu', () => {
-  it("relaie JSON et binaire dans les deux sens, sur le bon canal", async () => {
+  it('relaie JSON et binaire dans les deux sens, sur le bon canal', async () => {
     const pair = createPair();
     await startPair(pair);
     playMatch(pair);
-    expect(pair.mac.liaison.match.send(3, { action: 'porter-la-poutre' }, 'reliable')).toEqual({ ok: true });
-    expect(pair.pc.liaison.match.send(4, new Uint8Array([1, 2, 3, 250]), 'reliable')).toEqual({ ok: true });
+    expect(pair.mac.liaison.match.send(3, { action: 'porter-la-poutre' }, 'reliable')).toEqual({
+      ok: true,
+    });
+    expect(pair.pc.liaison.match.send(4, new Uint8Array([1, 2, 3, 250]), 'reliable')).toEqual({
+      ok: true,
+    });
     pair.net.clock.advance(20);
     expect(pair.pc.events.game).toEqual([{ channel: 3, payload: { action: 'porter-la-poutre' } }]);
     expect(pair.mac.events.game).toEqual([{ channel: 4, payload: new Uint8Array([1, 2, 3, 250]) }]);
@@ -187,17 +214,28 @@ describe('relais des messages de jeu', () => {
   it('refuse un envoi hors partie, sur un canal invalide, trop gros, ou au-delà du débit permis', async () => {
     const pair = createPair();
     await startPair(pair);
-    expect(pair.mac.liaison.match.send(0, { a: 1 }, 'reliable')).toEqual({ ok: false, reason: 'no-match' });
+    expect(pair.mac.liaison.match.send(0, { a: 1 }, 'reliable')).toEqual({
+      ok: false,
+      reason: 'no-match',
+    });
     playMatch(pair);
-    expect(pair.mac.liaison.match.send(16, { a: 1 }, 'reliable')).toEqual({ ok: false, reason: 'bad-channel' });
+    expect(pair.mac.liaison.match.send(16, { a: 1 }, 'reliable')).toEqual({
+      ok: false,
+      reason: 'bad-channel',
+    });
     expect(pair.mac.liaison.match.send(0, { a: 'x'.repeat(70_000) }, 'reliable')).toEqual({
       ok: false,
       reason: 'too-big',
     });
     const circular: Record<string, unknown> = {};
     circular.self = circular;
-    expect(pair.mac.liaison.match.send(0, circular, 'reliable')).toEqual({ ok: false, reason: 'invalid' });
-    const results = Array.from({ length: 400 }, (_, index) => pair.mac.liaison.match.send(0, { index }, 'latest'));
+    expect(pair.mac.liaison.match.send(0, circular, 'reliable')).toEqual({
+      ok: false,
+      reason: 'invalid',
+    });
+    const results = Array.from({ length: 400 }, (_, index) =>
+      pair.mac.liaison.match.send(0, { index }, 'latest'),
+    );
     expect(results.filter((result) => !result.ok)).not.toHaveLength(0);
   });
 });

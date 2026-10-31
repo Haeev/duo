@@ -16,7 +16,13 @@ const portA = 39_520;
 const portB = 39_530;
 const origin = Date.now();
 
-function launch(pseudo: string, role: string, port: number, peer: number, machine: string): Promise<number> {
+function launch(
+  pseudo: string,
+  role: string,
+  port: number,
+  peer: number,
+  machine: string,
+): Promise<number> {
   const child = spawn(
     process.execPath,
     [
@@ -38,11 +44,15 @@ function launch(pseudo: string, role: string, port: number, peer: number, machin
   });
 }
 
-process.stdout.write('Deux instances de Duo sur cette machine (ports 39520 et 39530, boucle locale)\n\n');
+process.stdout.write(
+  'Deux instances de Duo sur cette machine (ports 39520 et 39530, boucle locale)\n\n',
+);
 const codes = await Promise.all([
   launch('Camille', 'hote', portA, portB, 'aaaaaaaa-dddd-4000-8000-000000000001'),
   launch('Sacha', 'invite', portB, portA, 'bbbbbbbb-dddd-4000-8000-000000000002'),
 ]);
 const ok = codes.every((code) => code === 0);
-process.stdout.write(ok ? '\nDémonstration réussie.\n' : `\nÉchec (codes de sortie: ${codes.join(', ')}).\n`);
+process.stdout.write(
+  ok ? '\nDémonstration réussie.\n' : `\nÉchec (codes de sortie: ${codes.join(', ')}).\n`,
+);
 process.exit(ok ? 0 : 1);

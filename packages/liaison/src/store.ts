@@ -43,7 +43,9 @@ export interface LinkStore {
   save(memory: LinkMemory): Promise<void>;
 }
 
-export function createMemoryStore(initial: LinkMemory = EMPTY_MEMORY): LinkStore & { current(): LinkMemory } {
+export function createMemoryStore(
+  initial: LinkMemory = EMPTY_MEMORY,
+): LinkStore & { current(): LinkMemory } {
   let memory = initial;
   return {
     load: () => Promise.resolve(memory),

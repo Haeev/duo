@@ -73,7 +73,13 @@ interface Target {
   readonly onResult: (result: HandshakeResult<Link>, failures: readonly DialFailure[]) => void;
 }
 
-const FAILURE_RANK: Record<DialFailure, number> = { refused: 4, 'not-duo': 3, unreachable: 2, timeout: 1, error: 0 };
+const FAILURE_RANK: Record<DialFailure, number> = {
+  refused: 4,
+  'not-duo': 3,
+  unreachable: 2,
+  timeout: 1,
+  error: 0,
+};
 
 /**
  * Tient la liaison avec le partenaire: appels sur les adresses connues, poignées
@@ -120,7 +126,8 @@ export class LinkManager {
     // Une seule poignée de main à la fois: deux liaisons établies en parallèle se remplaceraient.
     if (this.attempts.size > 0 || this.incoming.size > 0) return;
     const now = this.options.clock.now();
-    if (now - (this.lastDialAt.get(machine) ?? -Infinity) < this.options.config.dialCooldownMs) return;
+    if (now - (this.lastDialAt.get(machine) ?? -Infinity) < this.options.config.dialCooldownMs)
+      return;
     this.lastDialAt.set(machine, now);
     this.dialTarget({
       machine,
@@ -154,7 +161,8 @@ export class LinkManager {
     if (link?.health === 'connected') return Promise.resolve({ ok: true, already: true });
     const { basePort, tcpFallbacks, manualDialTimeoutMs } = this.options.config;
     const endpoints: Endpoint[] = [];
-    for (let offset = 0; offset <= tcpFallbacks; offset += 1) endpoints.push({ host, port: basePort + offset });
+    for (let offset = 0; offset <= tcpFallbacks; offset += 1)
+      endpoints.push({ host, port: basePort + offset });
     return new Promise((resolve) => {
       this.dialTarget({
         machine: null,
@@ -260,7 +268,10 @@ export class LinkManager {
 
   private endpointsFor(machine: string): Endpoint[] {
     const link = this.linkValue;
-    const fromLink = link !== null && link.peer.machine === machine && link.endpoint !== null ? [link.endpoint] : [];
+    const fromLink =
+      link !== null && link.peer.machine === machine && link.endpoint !== null
+        ? [link.endpoint]
+        : [];
     const retained = this.options
       .memory()
       .addresses.filter((address) => address.partner === machine)
@@ -286,7 +297,10 @@ export class LinkManager {
     this.options.log('duo-forme', { duo: duo.slice(0, 8) });
   }
 
-  private knownKey(machine: string, fingerprints: readonly string[]): { key: Uint8Array; duo: string } | null {
+  private knownKey(
+    machine: string,
+    fingerprints: readonly string[],
+  ): { key: Uint8Array; duo: string } | null {
     for (const pairing of this.options.memory().pairings) {
       if (pairing.partner === machine && fingerprints.includes(duoFingerprint(pairing.duo))) {
         return { key: fromBase64Url(pairing.key), duo: pairing.duo };
@@ -334,13 +348,21 @@ export class LinkManager {
     if (sameSession) {
       return { kind: 'accept', link: link.id, resumed: true, received: link.received, key };
     }
-    return { kind: 'accept', link: randomId(this.options.random), resumed: false, received: 0, key };
+    return {
+      kind: 'accept',
+      link: randomId(this.options.random),
+      resumed: false,
+      received: 0,
+      key,
+    };
   }
 
   private decideKeyAsCaller(welcome: Welcome): CallerKeyDecision {
     const known = this.knownKey(welcome.machine, welcome.duos);
     if (welcome.pairing === undefined) {
-      return known === null ? { kind: 'refuse', reason: 'not-paired' } : { kind: 'existing', ...known };
+      return known === null
+        ? { kind: 'refuse', reason: 'not-paired' }
+        : { kind: 'existing', ...known };
     }
     if (known !== null || this.mayPairOrKnows(welcome.machine)) return { kind: 'new-duo-allowed' };
     return { kind: 'refuse', reason: 'not-paired' };
@@ -399,11 +421,16 @@ export class LinkManager {
                 }
                 opened = true;
                 attempt.handshaking = true;
-                this.runOutgoing(connection, endpoint, (result) => {
-                  finish(result);
-                }, (abort) => {
-                  abortHandshake = abort;
-                });
+                this.runOutgoing(
+                  connection,
+                  endpoint,
+                  (result) => {
+                    finish(result);
+                  },
+                  (abort) => {
+                    abortHandshake = abort;
+                  },
+                );
               },
             }),
           );
@@ -420,7 +447,9 @@ export class LinkManager {
   ): void {
     const current = this.linkValue;
     const resume =
-      current === null || current.closed ? undefined : { link: current.id, received: current.received };
+      current === null || current.closed
+        ? undefined
+        : { link: current.id, received: current.received };
     const abort = runCallerHandshake({
       connection,
       clock: this.options.clock,
@@ -589,7 +618,8 @@ export class LinkManager {
       });
     }
     const elapsed = clock.now() - this.reconnectStartedAt;
-    const period = elapsed < config.redialFastDurationMs ? config.redialFastMs : config.redialSlowMs;
+    const period =
+      elapsed < config.redialFastDurationMs ? config.redialFastMs : config.redialSlowMs;
     this.reconnectTimer = clock.setTimeout(() => {
       this.reconnectTick(link);
     }, period);

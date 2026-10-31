@@ -27,7 +27,9 @@ const network = parseNetworkCommandLine(args);
 const origin = Number(option('t0', String(Date.now())));
 
 function say(text: string): void {
-  const seconds = ((performance.timeOrigin + performance.now() - origin) / 1000).toFixed(3).padStart(7, ' ');
+  const seconds = ((performance.timeOrigin + performance.now() - origin) / 1000)
+    .toFixed(3)
+    .padStart(7, ' ');
   process.stdout.write(`${seconds} s [${pseudo}] ${text}\n`);
 }
 
@@ -72,7 +74,9 @@ liaison.on('partner', (state) => {
 });
 
 liaison.on('incompatible', (info) => {
-  say(`Duo incompatible en face (protocole ${String(info.protocol)}), à mettre à jour: ${info.update}`);
+  say(
+    `Duo incompatible en face (protocole ${String(info.protocol)}), à mettre à jour: ${info.update}`,
+  );
 });
 
 let lastPhase = '';
@@ -91,12 +95,20 @@ liaison.on('session', (view) => {
   if (phase === lastPhase) return;
   lastPhase = phase;
   if (lobby === null) return;
-  if (role === 'hote' && lobby.phase === 'open' && lobby.guestJoined && !lobby.ready.host && lobby.lastResult === null) {
+  if (
+    role === 'hote' &&
+    lobby.phase === 'open' &&
+    lobby.guestJoined &&
+    !lobby.ready.host &&
+    lobby.lastResult === null
+  ) {
     say("l'invitée a rejoint: je suis prête");
     liaison.lobby.setReady(true);
   }
   if (lobby.phase === 'countdown' && view.localTimes.countdownEndsAt !== null) {
-    say(`décompte: départ du chargement dans ${String(Math.round(view.localTimes.countdownEndsAt - liaison.now()))} ms`);
+    say(
+      `décompte: départ du chargement dans ${String(Math.round(view.localTimes.countdownEndsAt - liaison.now()))} ms`,
+    );
   }
   const match = lobby.match;
   if (match?.phase === 'loading') {
@@ -110,7 +122,11 @@ liaison.on('session', (view) => {
     say(`départ commun dans ${String(Math.round(delay))} ms`);
     setTimeout(startPlaying, delay);
   }
-  if (lobby.phase === 'open' && lobby.lastResult !== null && lobby.lastResult.match !== endedMatch) {
+  if (
+    lobby.phase === 'open' &&
+    lobby.lastResult !== null &&
+    lobby.lastResult.match !== endedMatch
+  ) {
     endedMatch = lobby.lastResult.match;
     say(`fin de partie: ${JSON.stringify(lobby.lastResult.result)}`);
     if (role === 'hote') setTimeout(() => void finish(0), 300);
@@ -126,12 +142,17 @@ liaison.on('game', ({ channel, payload }) => {
 });
 
 function startPlaying(): void {
-  say(role === 'hote' ? 'partie lancée: instantanés à 30 par seconde' : 'partie lancée: entrées à 60 par seconde');
+  say(
+    role === 'hote'
+      ? 'partie lancée: instantanés à 30 par seconde'
+      : 'partie lancée: entrées à 60 par seconde',
+  );
   let count = 0;
   const timer = setInterval(
     () => {
       count += 1;
-      if (role === 'hote') liaison.match.send(0, { tick: count, positions: [[count % 64, 12]] }, 'latest');
+      if (role === 'hote')
+        liaison.match.send(0, { tick: count, positions: [[count % 64, 12]] }, 'latest');
       else liaison.match.send(1, { n: count, keys: ['KeyW'] }, 'reliable');
     },
     role === 'hote' ? 33 : 16,

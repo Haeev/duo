@@ -101,7 +101,11 @@ export class ManualClock implements Clock {
   private earliest(): ManualTimer | undefined {
     let best: ManualTimer | undefined;
     for (const timer of this.timers) {
-      if (best === undefined || timer.at < best.at || (timer.at === best.at && timer.id < best.id)) {
+      if (
+        best === undefined ||
+        timer.at < best.at ||
+        (timer.at === best.at && timer.id < best.id)
+      ) {
         best = timer;
       }
     }

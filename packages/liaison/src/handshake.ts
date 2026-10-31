@@ -79,7 +79,12 @@ interface Steps {
   readonly timers: CancelTimer[];
 }
 
-function guard(connection: Connection, clock: Clock, timeoutMs: number, onTimeout: () => void): Steps {
+function guard(
+  connection: Connection,
+  clock: Clock,
+  timeoutMs: number,
+  onTimeout: () => void,
+): Steps {
   const timers: CancelTimer[] = [];
   timers.push(clock.setTimeout(onTimeout, timeoutMs));
   return {
@@ -214,7 +219,9 @@ export function runCallerHandshake(options: CallerHandshakeOptions): () => void 
         }
         pending = { welcome: welcome.output, key, duo, newDuo };
         stage = 'ready';
-        connection.send(JSON.stringify({ type: 'auth', proof: computeProof(key, 'appelant', context) }));
+        connection.send(
+          JSON.stringify({ type: 'auth', proof: computeProof(key, 'appelant', context) }),
+        );
         return;
       }
       if (stage === 'ready') {

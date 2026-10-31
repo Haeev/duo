@@ -31,9 +31,16 @@ export function generatePairKey(): PairKey {
 const KEY_INFO = 'duo/cle-liaison/1';
 
 /** Clé du duo: HKDF-SHA256 du secret X25519, sel égal à l'identifiant du duo. `null` si la clé de l'autre est invalide. */
-export function deriveDuoKey(privateKey: KeyObject, peerPublicKey: string, duoId: string): Uint8Array | null {
+export function deriveDuoKey(
+  privateKey: KeyObject,
+  peerPublicKey: string,
+  duoId: string,
+): Uint8Array | null {
   try {
-    const peer = createPublicKey({ key: { kty: 'OKP', crv: 'X25519', x: peerPublicKey }, format: 'jwk' });
+    const peer = createPublicKey({
+      key: { kty: 'OKP', crv: 'X25519', x: peerPublicKey },
+      format: 'jwk',
+    });
     const secret = diffieHellman({ privateKey, publicKey: peer });
     return new Uint8Array(hkdfSync('sha256', secret, Buffer.from(duoId, 'utf8'), KEY_INFO, 32));
   } catch {
@@ -68,7 +75,12 @@ export function computeProof(key: Uint8Array, role: ProofRole, context: ProofCon
 }
 
 /** Comparaison en temps constant. */
-export function verifyProof(key: Uint8Array, role: ProofRole, context: ProofContext, proof: string): boolean {
+export function verifyProof(
+  key: Uint8Array,
+  role: ProofRole,
+  context: ProofContext,
+  proof: string,
+): boolean {
   const expected = fromBase64Url(computeProof(key, role, context));
   const received = fromBase64Url(proof);
   return expected.byteLength === received.byteLength && timingSafeEqual(expected, received);

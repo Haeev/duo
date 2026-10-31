@@ -34,7 +34,11 @@ function toFrame(data: RawData, isBinary: boolean): Frame {
 }
 
 /** Une connexion `ws` vue comme `Connection`; les trames arrivées avant les gestionnaires attendent. */
-function wrapSocket(socket: WebSocket, remote: Endpoint, direction: 'outgoing' | 'incoming'): Connection {
+function wrapSocket(
+  socket: WebSocket,
+  remote: Endpoint,
+  direction: 'outgoing' | 'incoming',
+): Connection {
   let handlers: ConnectionHandlers | null = null;
   const pending: ((current: ConnectionHandlers) => void)[] = [];
   const deliver = (run: (current: ConnectionHandlers) => void): void => {
@@ -69,7 +73,8 @@ function wrapSocket(socket: WebSocket, remote: Endpoint, direction: 'outgoing' |
     },
     close: (code, reason) => {
       if (socket.readyState === WebSocket.CLOSED || socket.readyState === WebSocket.CLOSING) return;
-      const valid = (code >= 1000 && code <= 1003) || (code >= 3000 && code <= 4999) || code === 1013;
+      const valid =
+        (code >= 1000 && code <= 1003) || (code >= 3000 && code <= 4999) || code === 1013;
       socket.close(valid ? code : 1000, reason.slice(0, 120));
       // Sans réponse de l'autre côté, la fermeture propre de `ws` attendrait 30 s.
       setTimeout(() => {
@@ -80,7 +85,8 @@ function wrapSocket(socket: WebSocket, remote: Endpoint, direction: 'outgoing' |
 }
 
 function failureFromError(error: unknown): DialFailure {
-  const code = typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
+  const code =
+    typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
   switch (code) {
     case 'ECONNREFUSED':
       return 'refused';
@@ -122,7 +128,8 @@ export function createNodeDriver(options: NodeDriverOptions): NetworkDriver {
         noServer: true,
         perMessageDeflate: false,
         maxPayload: config.maxFrameBytes,
-        handleProtocols: (protocols) => (protocols.has(config.subprotocol) ? config.subprotocol : false),
+        handleProtocols: (protocols) =>
+          protocols.has(config.subprotocol) ? config.subprotocol : false,
       });
       const recent = new Map<string, number[]>();
       server.on('upgrade', (request: IncomingMessage, socket: Duplex, head: Buffer) => {
@@ -155,7 +162,9 @@ export function createNodeDriver(options: NodeDriverOptions): NetworkDriver {
           return;
         }
         wss.handleUpgrade(request, socket, head, (ws) => {
-          onConnection(wrapSocket(ws, { host: remote, port: request.socket.remotePort ?? 0 }, 'incoming'));
+          onConnection(
+            wrapSocket(ws, { host: remote, port: request.socket.remotePort ?? 0 }, 'incoming'),
+          );
         });
       });
       server.once('error', reject);
@@ -181,7 +190,10 @@ export function createNodeDriver(options: NodeDriverOptions): NetworkDriver {
     new Promise<DatagramSocket>((resolve, reject) => {
       const socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
       socket.on('message', (message, info) => {
-        onMessage(new Uint8Array(message), { host: normalizeAddress(info.address), port: info.port });
+        onMessage(new Uint8Array(message), {
+          host: normalizeAddress(info.address),
+          port: info.port,
+        });
       });
       socket.once('error', reject);
       socket.bind(port, listenHost, () => {

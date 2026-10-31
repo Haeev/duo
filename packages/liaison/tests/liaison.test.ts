@@ -37,14 +37,28 @@ describe('poignée de main et identification', () => {
     const net = new SimNetwork();
     const duo = 'c0ffee00c0ffee00c0ffee00c0ffee00';
     const createdAt = '2026-10-30T22:00:00.000Z';
-    const mac = createMachine(net, MAC, MAC_ID, 'Camille', {}, {
-      pairings: [{ duo, partner: PC_ID, key: 'A'.repeat(43), createdAt }],
-      addresses: [],
-    });
-    const pc = createMachine(net, PC, PC_ID, 'Sacha', {}, {
-      pairings: [{ duo, partner: MAC_ID, key: 'B'.repeat(43), createdAt }],
-      addresses: [],
-    });
+    const mac = createMachine(
+      net,
+      MAC,
+      MAC_ID,
+      'Camille',
+      {},
+      {
+        pairings: [{ duo, partner: PC_ID, key: 'A'.repeat(43), createdAt }],
+        addresses: [],
+      },
+    );
+    const pc = createMachine(
+      net,
+      PC,
+      PC_ID,
+      'Sacha',
+      {},
+      {
+        pairings: [{ duo, partner: MAC_ID, key: 'B'.repeat(43), createdAt }],
+        addresses: [],
+      },
+    );
     await Promise.all([mac.liaison.start(), pc.liaison.start()]);
     net.clock.advance(5000);
     expect(isPresent(mac)).toBe(false);
@@ -54,17 +68,24 @@ describe('poignée de main et identification', () => {
 
   it("refuse de former un duo avec une inconnue quand la politique l'interdit et qu'un duo existe", async () => {
     const net = new SimNetwork();
-    const mac = createMachine(net, MAC, MAC_ID, 'Camille', { pairingPolicy: 'first-partner-only' }, {
-      pairings: [
-        {
-          duo: 'c0ffee00c0ffee00c0ffee00c0ffee00',
-          partner: 'cccccccc-0000-4000-8000-000000000003',
-          key: 'A'.repeat(43),
-          createdAt: '2026-10-30T22:00:00.000Z',
-        },
-      ],
-      addresses: [],
-    });
+    const mac = createMachine(
+      net,
+      MAC,
+      MAC_ID,
+      'Camille',
+      { pairingPolicy: 'first-partner-only' },
+      {
+        pairings: [
+          {
+            duo: 'c0ffee00c0ffee00c0ffee00c0ffee00',
+            partner: 'cccccccc-0000-4000-8000-000000000003',
+            key: 'A'.repeat(43),
+            createdAt: '2026-10-30T22:00:00.000Z',
+          },
+        ],
+        addresses: [],
+      },
+    );
     const pc = createMachine(net, PC, PC_ID, 'Sacha', { pairingPolicy: 'first-partner-only' });
     await Promise.all([mac.liaison.start(), pc.liaison.start()]);
     net.clock.advance(5000);
@@ -153,7 +174,8 @@ describe('vivacité, coupures et reprise', () => {
     pair.net.restore(MAC, PC);
     const back = advanceUntil(
       pair.net,
-      () => linkStates(pair.mac).at(-1) === 'connected' && linkStates(pair.pc).at(-1) === 'connected',
+      () =>
+        linkStates(pair.mac).at(-1) === 'connected' && linkStates(pair.pc).at(-1) === 'connected',
       5000,
       1,
     );
@@ -163,7 +185,11 @@ describe('vivacité, coupures et reprise', () => {
     expect(pair.pc.liaison.session().pausedByConnection).toBe(false);
     pair.mac.liaison.match.resume();
     pair.pc.liaison.match.resume();
-    advanceUntil(pair.net, () => pair.pc.liaison.session().lobby?.match?.phase === 'resuming', 1000);
+    advanceUntil(
+      pair.net,
+      () => pair.pc.liaison.session().lobby?.match?.phase === 'resuming',
+      1000,
+    );
     const resumeAt = pair.pc.liaison.session().localTimes.resumeAt ?? 0;
     expect(resumeAt - pair.net.clock.now()).toBeGreaterThan(2500);
     advanceUntil(pair.net, () => pair.pc.liaison.session().lobby?.match?.phase === 'playing', 4000);
@@ -186,12 +212,14 @@ describe('vivacité, coupures et reprise', () => {
     traffic.stop();
     pair.net.clock.advance(1000);
     expect(linkStates(pair.mac)).not.toContain('lost');
-    expect(pair.mac.logs.filter((event) => event === 'liaison-reprise').length).toBeGreaterThanOrEqual(5);
+    expect(
+      pair.mac.logs.filter((event) => event === 'liaison-reprise').length,
+    ).toBeGreaterThanOrEqual(5);
     expect(isExactSequence(traffic.inputsAtHost, traffic.sentInputs())).toBe(true);
     expect(pair.net.openConnections(MAC)).toBe(1);
   });
 
-  it("canal `latest`: à la reprise, seul le dernier instantané est réémis; les messages fiables, tous", async () => {
+  it('canal `latest`: à la reprise, seul le dernier instantané est réémis; les messages fiables, tous', async () => {
     const pair = createPair();
     await startPair(pair);
     playMatch(pair);
@@ -256,7 +284,11 @@ describe('vivacité, coupures et reprise', () => {
     await again.liaison.start();
     advanceUntil(pair.net, () => isPresent(again), 5000);
     pair.net.clock.advance(500);
-    expect(pair.mac.events.notice).toContainEqual({ kind: 'match-ended', reason: 'peer-restarted', result: null });
+    expect(pair.mac.events.notice).toContainEqual({
+      kind: 'match-ended',
+      reason: 'peer-restarted',
+      result: null,
+    });
     expect(pair.mac.liaison.session().lobby?.guestJoined).toBe(false);
     // Le salon de l'hôte reste ouvert: l'invité relancé le voit comme une invitation.
     advanceUntil(pair.net, () => again.liaison.session().invitation !== null, 1000);

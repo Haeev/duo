@@ -217,7 +217,12 @@ export class Link {
    * Confie la liaison à une connexion neuve (établissement ou reprise). L'ancienne
    * est fermée; tout ce que l'autre n'a pas reçu (`peerReceived`) est réémis.
    */
-  attach(connection: Connection, role: ConnectionRole, peerReceived: number, endpoint: Endpoint | null): void {
+  attach(
+    connection: Connection,
+    role: ConnectionRole,
+    peerReceived: number,
+    endpoint: Endpoint | null,
+  ): void {
     if (this.closedValue) {
       connection.close(4000, 'closed');
       return;
@@ -276,7 +281,12 @@ export class Link {
       }
       this.buffer = kept;
     }
-    this.enqueue({ seq, frame, bytes: frameBytes(frame), latestChannel: mode === 'latest' ? channel : null });
+    this.enqueue({
+      seq,
+      frame,
+      bytes: frameBytes(frame),
+      latestChannel: mode === 'latest' ? channel : null,
+    });
   }
 
   /** Ferme la liaison pour de bon (`bye` si la connexion est là). */
@@ -316,14 +326,16 @@ export class Link {
       for (let index = 1; index < recent.length; index += 1) {
         const current = recent[index];
         const previous = recent[index - 1];
-        if (current !== undefined && previous !== undefined) total += Math.abs(current.rtt - previous.rtt);
+        if (current !== undefined && previous !== undefined)
+          total += Math.abs(current.rtt - previous.rtt);
       }
       jitter = total / (recent.length - 1);
     }
     const silence = this.silenceMs();
     const unstable =
       this.healthValue !== 'connected' ||
-      silence > Math.max(this.config.unstableAfterMs, this.heartbeatMs() + this.config.unstableAfterMs) ||
+      silence >
+        Math.max(this.config.unstableAfterMs, this.heartbeatMs() + this.config.unstableAfterMs) ||
       (jitter !== null && jitter > this.config.unstableJitterMs);
     return {
       rttMs: percentile(rtts, 0.5),
@@ -421,6 +433,11 @@ export class Link {
     this.invalidAt = this.invalidAt.filter((at) => now - at < 60_000);
     this.invalidAt.push(now);
     this.callbacks.log('message-invalide', { link: this.id, reason });
+    if (this.invalidAt.length >= this.config.invalidMessagesPerMinute) {
+      // Trop de messages invalides: la connexion est fermée, la liaison se reprend sur une neuve.
+      this.invalidAt = [];
+      this.dropConnection();
+    }
   }
 
   private handleFrame(frame: Frame): void {

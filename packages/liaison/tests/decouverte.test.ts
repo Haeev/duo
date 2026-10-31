@@ -17,7 +17,12 @@ describe('découverte et présence', () => {
   it("les deux Duo se trouvent et se relient en quelques millisecondes (l'autre est là)", async () => {
     const pair = createPair();
     await Promise.all([pair.mac.liaison.start(), pair.pc.liaison.start()]);
-    const elapsed = advanceUntil(pair.net, () => isPresent(pair.mac) && isPresent(pair.pc), 3000, 1);
+    const elapsed = advanceUntil(
+      pair.net,
+      () => isPresent(pair.mac) && isPresent(pair.pc),
+      3000,
+      1,
+    );
     expect(elapsed).toBeLessThan(50);
     const seenByMac = pair.mac.liaison.partner();
     expect(seenByMac.kind === 'present' && seenByMac.partner.pseudo).toBe('Sacha');
@@ -73,7 +78,14 @@ describe('découverte et présence', () => {
     const mac = createMachine(net, MAC, MAC_ID, 'Camille');
     await mac.liaison.start();
     expect(mac.liaison.interfaces()).toEqual([
-      { name: 'en0', address: MAC, netmask: '255.255.255.0', prefix: 24, broadcast: '192.168.1.255', kind: 'physical' },
+      {
+        name: 'en0',
+        address: MAC,
+        netmask: '255.255.255.0',
+        prefix: 24,
+        broadcast: '192.168.1.255',
+        kind: 'physical',
+      },
     ]);
     // Le PC démarre plus tard: les balises du Mac et les requêtes du PC le font apparaître.
     net.clock.advance(5000);
@@ -102,7 +114,11 @@ describe('découverte et présence', () => {
     const mac = createMachine(net, MAC, MAC_ID, 'Camille');
     await mac.liaison.start();
     const intrus = net.addHost('192.168.1.66');
-    const socket = await intrus.bindDatagram({ port: 39420, onMessage: () => undefined, onError: () => undefined });
+    const socket = await intrus.bindDatagram({
+      port: 39420,
+      onMessage: () => undefined,
+      onError: () => undefined,
+    });
     const encoder = new TextEncoder();
     socket.send(encoder.encode('{"app":"autre","type":"announce"}'), { host: MAC, port: 39420 });
     socket.send(encoder.encode('pas du json'), { host: MAC, port: 39420 });
@@ -119,9 +135,25 @@ describe('découverte et présence', () => {
     // La version de Duo du PC est la plus récente: c'est le Mac qui doit se mettre à jour.
     await Promise.all([mac.liaison.start(), pc.liaison.start()]);
     net.clock.advance(2000);
-    expect(mac.events.incompatible[0]).toMatchObject({ machine: PC_ID, protocol: 2, update: 'both' });
+    expect(mac.events.incompatible[0]).toMatchObject({
+      machine: PC_ID,
+      protocol: 2,
+      update: 'both',
+    });
     expect(pc.events.incompatible[0]).toMatchObject({ machine: MAC_ID, protocol: 1 });
     expect(isPresent(mac)).toBe(false);
     expect(isPresent(pc)).toBe(false);
+  });
+  it("un changement de pseudo ou de jeux arrive chez l'autre par la liaison établie", async () => {
+    const pair = createPair();
+    await startPair(pair);
+    pair.pc.liaison.updateProfile({ pseudo: 'Sacha B.', color: 'triangle' });
+    pair.pc.liaison.updateGames([{ id: 'la-petite-ligne', version: '0.2.0' }]);
+    pair.net.clock.advance(20);
+    const seen = pair.mac.liaison.partner();
+    expect(seen.kind === 'present' && seen.partner.pseudo).toBe('Sacha B.');
+    expect(seen.kind === 'present' && seen.partner.games).toEqual([
+      { id: 'la-petite-ligne', version: '0.2.0' },
+    ]);
   });
 });

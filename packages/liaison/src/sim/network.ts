@@ -33,7 +33,12 @@ export interface LinkProfile {
 
 export const PROFILE_R0: LinkProfile = { latencyMs: 0.5, jitterMs: 0, loss: 0, retransmitMs: 200 };
 /** Profil R1 des critères: 100 ms d'aller-retour, 20 ms de gigue, 2 % de pertes. */
-export const PROFILE_R1: LinkProfile = { latencyMs: 50, jitterMs: 20, loss: 0.02, retransmitMs: 200 };
+export const PROFILE_R1: LinkProfile = {
+  latencyMs: 50,
+  jitterMs: 20,
+  loss: 0.02,
+  retransmitMs: 200,
+};
 
 interface SimInterface {
   readonly name: string;
@@ -129,7 +134,12 @@ class SimConnection implements Connection {
   private readonly network: SimNetwork;
   readonly localHost: string;
 
-  constructor(network: SimNetwork, localHost: string, remote: Endpoint, direction: 'outgoing' | 'incoming') {
+  constructor(
+    network: SimNetwork,
+    localHost: string,
+    remote: Endpoint,
+    direction: 'outgoing' | 'incoming',
+  ) {
     this.network = network;
     this.localHost = localHost;
     this.remote = remote;
@@ -275,9 +285,17 @@ export class SimNetwork {
 
   /** Ajoute une machine et rend son pilote réseau. */
   addHost(address: string, options: AddHostOptions = {}): NetworkDriver {
-    const host = new SimHost(address, options.netmask ?? '255.255.255.0', options.interfaceName ?? 'en0');
+    const host = new SimHost(
+      address,
+      options.netmask ?? '255.255.255.0',
+      options.interfaceName ?? 'en0',
+    );
     this.hosts.set(address, host);
-    return this.createDriver(host, createSeededRandom(options.seed ?? hashText(address)), options.clockOffsetMs ?? 0);
+    return this.createDriver(
+      host,
+      createSeededRandom(options.seed ?? hashText(address)),
+      options.clockOffsetMs ?? 0,
+    );
   }
 
   /**
@@ -332,7 +350,8 @@ export class SimNetwork {
   breakConnections(a: string, b: string): void {
     for (const host of [this.hosts.get(a), this.hosts.get(b)]) {
       for (const connection of [...(host?.connections ?? [])]) {
-        if (connection.remote.host === a || connection.remote.host === b) connection.breakConnection();
+        if (connection.remote.host === a || connection.remote.host === b)
+          connection.breakConnection();
       }
     }
   }
@@ -370,7 +389,8 @@ export class SimNetwork {
         ? this.clock
         : {
             now: () => this.clock.now() + clockOffsetMs,
-            setTimeout: (callback: () => void, delayMs: number) => this.clock.setTimeout(callback, delayMs),
+            setTimeout: (callback: () => void, delayMs: number) =>
+              this.clock.setTimeout(callback, delayMs),
           };
     return {
       clock,
@@ -442,7 +462,12 @@ export class SimNetwork {
     }
   }
 
-  private dial(host: SimHost, endpoint: Endpoint, timeoutMs: number, callbacks: DialCallbacks): CancelTimer {
+  private dial(
+    host: SimHost,
+    endpoint: Endpoint,
+    timeoutMs: number,
+    callbacks: DialCallbacks,
+  ): CancelTimer {
     if (host.dead) return () => undefined;
     let settled = false;
     const timers: CancelTimer[] = [];
@@ -463,11 +488,14 @@ export class SimNetwork {
     const oneWay = this.profile.latencyMs;
     if (target === undefined) {
       timers.push(
-        this.clock.setTimeout(() => {
-          settle(() => {
-            callbacks.onFail('unreachable');
-          });
-        }, Math.min(3000, timeoutMs - 1)),
+        this.clock.setTimeout(
+          () => {
+            settle(() => {
+              callbacks.onFail('unreachable');
+            });
+          },
+          Math.min(3000, timeoutMs - 1),
+        ),
       );
     } else if (!this.isCut(host.address, target.address)) {
       timers.push(
@@ -484,7 +512,12 @@ export class SimNetwork {
           }
           const localPort = host.nextEphemeral++;
           const outgoing = new SimConnection(this, host.address, endpoint, 'outgoing');
-          const incoming = new SimConnection(this, target.address, { host: host.address, port: localPort }, 'incoming');
+          const incoming = new SimConnection(
+            this,
+            target.address,
+            { host: host.address, port: localPort },
+            'incoming',
+          );
           outgoing.peer = incoming;
           incoming.peer = outgoing;
           outgoing.outgoing = this.createPipe(host.address, target.address);
@@ -535,7 +568,10 @@ function hashText(text: string): number {
 }
 
 function toRawInterfaces(interfaces: readonly SimInterface[]): RawInterfaces {
-  const raw: Record<string, { address: string; netmask: string; family: string; internal: boolean }[]> = {
+  const raw: Record<
+    string,
+    { address: string; netmask: string; family: string; internal: boolean }[]
+  > = {
     lo: [{ address: '127.0.0.1', netmask: '255.0.0.0', family: 'IPv4', internal: true }],
   };
   for (const entry of interfaces) {

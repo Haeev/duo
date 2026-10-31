@@ -9,7 +9,11 @@ import * as v from 'valibot';
  */
 
 const machineId = v.pipe(v.string(), v.regex(/^[A-Za-z0-9-]{8,64}$/));
-const semver = v.pipe(v.string(), v.maxLength(32), v.regex(/^\d{1,5}\.\d{1,5}\.\d{1,5}[0-9A-Za-z.+-]*$/));
+const semver = v.pipe(
+  v.string(),
+  v.maxLength(32),
+  v.regex(/^\d{1,5}\.\d{1,5}\.\d{1,5}[0-9A-Za-z.+-]*$/),
+);
 const protocolNumber = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(1_000_000));
 const port = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(65_535));
 const seq = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(0xffff_ffff));
@@ -59,7 +63,12 @@ export const DatagramSchema = v.object({
   setup: v.picklist(['done', 'in-progress']),
   duos: v.pipe(v.array(fingerprint), v.maxLength(8)),
   addresses: v.pipe(
-    v.array(v.object({ ip: ipv4, prefix: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(32)) })),
+    v.array(
+      v.object({
+        ip: ipv4,
+        prefix: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(32)),
+      }),
+    ),
     v.maxLength(8),
   ),
 });
@@ -72,6 +81,12 @@ const gameEntry = v.object({
   hash: v.optional(text(128)),
 });
 export type InstalledGame = v.InferOutput<typeof gameEntry>;
+
+/** Changements portés par la liaison établie (messages fiables). */
+export const ProfileUpdateSchema = profile;
+export const GamesUpdateSchema = v.object({
+  games: v.pipe(v.array(gameEntry), v.maxLength(256)),
+});
 
 const identityFields = {
   app: v.literal('duo'),
@@ -172,7 +187,16 @@ export const GameFrameSchema = v.object({
 });
 
 /** Types de la liaison elle-même; tout autre type porte un `seq` et va aux couches du dessus. */
-export const LINK_LEVEL_TYPES = new Set(['hello', 'welcome', 'reject', 'auth', 'ready', 'ping', 'pong', 'bye']);
+export const LINK_LEVEL_TYPES = new Set([
+  'hello',
+  'welcome',
+  'reject',
+  'auth',
+  'ready',
+  'ping',
+  'pong',
+  'bye',
+]);
 
 /** JSON d'une trame texte, ou `undefined` s'il est illisible. */
 export function parseJson(text: string): unknown {
@@ -187,7 +211,11 @@ export function parseJson(text: string): unknown {
 export const BINARY_GAME_TYPE = 0x01;
 export const BINARY_HEADER_BYTES = 8;
 
-export function encodeBinaryGameFrame(channel: number, sequence: number, payload: Uint8Array): Uint8Array {
+export function encodeBinaryGameFrame(
+  channel: number,
+  sequence: number,
+  payload: Uint8Array,
+): Uint8Array {
   const frame = new Uint8Array(BINARY_HEADER_BYTES + payload.byteLength);
   const view = new DataView(frame.buffer);
   view.setUint8(0, BINARY_GAME_TYPE);

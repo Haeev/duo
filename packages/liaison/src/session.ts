@@ -52,7 +52,11 @@ export interface LobbyState {
   readonly ready: { readonly host: boolean; readonly guest: boolean };
   readonly countdownEndsAt: number | null;
   readonly match: MatchState | null;
-  readonly lastResult: { readonly match: string; readonly result: unknown; readonly reason: MatchEndReason } | null;
+  readonly lastResult: {
+    readonly match: string;
+    readonly result: unknown;
+    readonly reason: MatchEndReason;
+  } | null;
 }
 
 export type MatchEndReason = 'finished' | 'stopped' | 'peer-left' | 'peer-restarted' | 'crashed';
@@ -78,7 +82,10 @@ export interface SessionView {
 
 export type SessionNotice =
   | { readonly kind: 'lobby-closed'; readonly by: 'peer' }
-  | { readonly kind: 'peer-left'; readonly reason: 'bye' | 'refused' | 'overflow' | 'reset' | 'stopped' }
+  | {
+      readonly kind: 'peer-left';
+      readonly reason: 'bye' | 'refused' | 'overflow' | 'reset' | 'stopped';
+    }
   | { readonly kind: 'match-ended'; readonly reason: MatchEndReason; readonly result: unknown }
   | { readonly kind: 'join-refused' };
 
@@ -90,7 +97,10 @@ export interface SessionEvents {
 
 export type ActionResult =
   | { readonly ok: true }
-  | { readonly ok: false; readonly reason: 'no-partner' | 'no-lobby' | 'not-host' | 'not-guest' | 'bad-phase' };
+  | {
+      readonly ok: false;
+      readonly reason: 'no-partner' | 'no-lobby' | 'not-host' | 'not-guest' | 'bad-phase';
+    };
 
 export type SendResult =
   | { readonly ok: true }
@@ -183,14 +193,22 @@ export class SessionController {
     const { config } = options;
     const now = options.clock.now();
     const receiveSeconds = config.gameReceiveBurstMs / 1000;
-    this.sendMessages = new TokenBucket(config.gameMessagesPerSecond, config.gameBurstMessages, now);
+    this.sendMessages = new TokenBucket(
+      config.gameMessagesPerSecond,
+      config.gameBurstMessages,
+      now,
+    );
     this.sendBytes = new TokenBucket(config.gameBytesPerSecond, config.gameBurstBytes, now);
     this.receiveMessages = new TokenBucket(
       config.gameMessagesPerSecond,
       config.gameMessagesPerSecond * receiveSeconds,
       now,
     );
-    this.receiveBytes = new TokenBucket(config.gameBytesPerSecond, config.retransmitBufferBytes, now);
+    this.receiveBytes = new TokenBucket(
+      config.gameBytesPerSecond,
+      config.retransmitBufferBytes,
+      now,
+    );
     this.events = new Emitter((error) => {
       options.log('erreur-ecouteur', { error: String(error) });
     });
@@ -248,7 +266,9 @@ export class SessionController {
 
   /** Heure de session: horloge de l'hôte du salon où l'on est (la nôtre si l'on est hôte ou seul). */
   sessionTime(): number {
-    return this.view().role === 'guest' ? this.toHostTime(this.options.clock.now()) : this.options.clock.now();
+    return this.view().role === 'guest'
+      ? this.toHostTime(this.options.clock.now())
+      : this.options.clock.now();
   }
 
   /** Ouvre son salon (on en devient l'hôte). Un salon déjà ouvert change de jeu. */
@@ -278,7 +298,13 @@ export class SessionController {
     if (local === null) return { ok: false, reason: 'not-host' };
     if (local.phase === 'match') return { ok: false, reason: 'bad-phase' };
     this.clearHostTimers();
-    this.setLocal({ ...local, game, phase: 'open', ready: { host: false, guest: false }, countdownEndsAt: null });
+    this.setLocal({
+      ...local,
+      game,
+      phase: 'open',
+      ready: { host: false, guest: false },
+      countdownEndsAt: null,
+    });
     this.broadcast();
     return { ok: true };
   }
@@ -567,7 +593,10 @@ export class SessionController {
       if (match.pause.by.includes(by) && match.pause.reason === reason) return;
       const nextReason: PauseReason = match.pause.reason === 'connection' ? 'connection' : reason;
       this.updateMatch({
-        pause: { reason: nextReason, by: match.pause.by.includes(by) ? match.pause.by : [...match.pause.by, by] },
+        pause: {
+          reason: nextReason,
+          by: match.pause.by.includes(by) ? match.pause.by : [...match.pause.by, by],
+        },
       });
       return;
     }
@@ -738,7 +767,11 @@ export class SessionController {
       case 'match.resume': {
         const parsed = v.safeParse(MatchRef, message.body);
         const local = this.local;
-        if (!parsed.success || local?.id !== parsed.output.lobby || local.match?.id !== parsed.output.match) {
+        if (
+          !parsed.success ||
+          local?.id !== parsed.output.lobby ||
+          local.match?.id !== parsed.output.match
+        ) {
           return;
         }
         if (message.type === 'match.loaded') {
@@ -751,6 +784,10 @@ export class SessionController {
         }
         return;
       }
+      case 'profile.update':
+      case 'games.update':
+        // Présence et versions: traitées par la façade.
+        return;
       default:
         this.options.log('message-inconnu', { type: message.type.slice(0, 32) });
     }
@@ -763,7 +800,8 @@ export class SessionController {
     // Garde-fou contre une rafale anormale; la rafale permise couvre une reprise entière.
     if (!this.receiveMessages.take(1, now) || !this.receiveBytes.take(bytes, now)) {
       this.droppedGameValue += 1;
-      if (this.droppedGameValue % 100 === 1) this.options.log('jeu-debit-depasse', { dropped: this.droppedGameValue });
+      if (this.droppedGameValue % 100 === 1)
+        this.options.log('jeu-debit-depasse', { dropped: this.droppedGameValue });
       return;
     }
     this.events.emit('game', { channel, payload });
@@ -793,7 +831,12 @@ export class SessionController {
       const local = this.local;
       if (local?.phase === 'countdown') {
         this.clearHostTimers();
-        this.setLocal({ ...local, phase: 'open', countdownEndsAt: null, ready: { host: false, guest: false } });
+        this.setLocal({
+          ...local,
+          phase: 'open',
+          countdownEndsAt: null,
+          ready: { host: false, guest: false },
+        });
       }
       const match = this.local?.match ?? null;
       if (match !== null && match.phase !== 'loading') {

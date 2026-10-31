@@ -1,3 +1,4 @@
+import * as v from 'valibot';
 import { parseEndpoint, parseManualAddress } from './addresses.ts';
 import type { Endpoint, RetainedInterface } from './addresses.ts';
 import type { CancelTimer } from './clock.ts';
@@ -14,10 +15,18 @@ import type { ChannelMode, GamePayload, LinkHealth, LinkQuality, PeerInfo } from
 import { LinkManager } from './link-manager.ts';
 import type { ManualConnectResult, PairingPolicy } from './link-manager.ts';
 import { createNodeDriver } from './node-driver.ts';
+import { GamesUpdateSchema, ProfileUpdateSchema } from './protocol.ts';
 import type { FrozenEnvelope, InstalledGame } from './protocol.ts';
 import { randomId } from './random.ts';
 import { SessionController } from './session.ts';
-import type { ActionResult, LobbyGame, MatchEndReason, SendResult, SessionNotice, SessionView } from './session.ts';
+import type {
+  ActionResult,
+  LobbyGame,
+  MatchEndReason,
+  SendResult,
+  SessionNotice,
+  SessionView,
+} from './session.ts';
 import { EMPTY_MEMORY, createMemoryStore } from './store.ts';
 import type { LinkMemory, LinkStore } from './store.ts';
 import type { DatagramSocket, NetworkDriver, StreamServer } from './transport.ts';
@@ -139,7 +148,10 @@ export interface Liaison {
   start(): Promise<StartReport>;
   /** Fermeture propre: `bye` sur la liaison et trois adieux UDP (CA-PF-009). */
   stop(): Promise<void>;
-  on<K extends keyof LiaisonEvents>(event: K, listener: (payload: LiaisonEvents[K]) => void): Unsubscribe;
+  on<K extends keyof LiaisonEvents>(
+    event: K,
+    listener: (payload: LiaisonEvents[K]) => void,
+  ): Unsubscribe;
   partner(): PartnerState;
   session(): SessionView;
   quality(): LinkQuality | null;
@@ -173,7 +185,10 @@ function compareSemver(a: string, b: string): number {
 
 /** Crée le réseau de Duo pour le processus principal. Rien n'écoute avant `start()` (CA-PF-079). */
 export function createLiaison(options: LiaisonOptions): Liaison {
-  const config = createConfig({ ...options.config, ...(options.port === undefined ? {} : { basePort: options.port }) });
+  const config = createConfig({
+    ...options.config,
+    ...(options.port === undefined ? {} : { basePort: options.port }),
+  });
   const allowLoopback = options.allowLoopback ?? false;
   const driver =
     options.driver ??
@@ -328,6 +343,19 @@ export function createLiaison(options: LiaisonOptions): Liaison {
   links.events.on('incompatible', ({ peer }) => {
     onIncompatible(peer);
   });
+  links.events.on('message', ({ link, message }) => {
+    if (message.type === 'profile.update') {
+      const parsed = v.safeParse(ProfileUpdateSchema, message.body);
+      if (!parsed.success) return;
+      link.peer = { ...link.peer, pseudo: parsed.output.pseudo, color: parsed.output.color };
+      refreshPartner();
+    } else if (message.type === 'games.update') {
+      const parsed = v.safeParse(GamesUpdateSchema, message.body);
+      if (!parsed.success) return;
+      link.peer = { ...link.peer, games: parsed.output.games };
+      refreshPartner();
+    }
+  });
   session.events.on('view', (view) => {
     events.emit('session', view);
   });
@@ -411,7 +439,8 @@ export function createLiaison(options: LiaisonOptions): Liaison {
           () => config.retainedProbeMs,
           () => {
             if (links.link !== null) return;
-            for (const address of memory.addresses) links.probe({ host: address.host, port: address.port });
+            for (const address of memory.addresses)
+              links.probe({ host: address.host, port: address.port });
           },
         ),
       );
@@ -450,9 +479,14 @@ export function createLiaison(options: LiaisonOptions): Liaison {
     },
     updateProfile: (next) => {
       profile = next;
+      links.link?.sendReliable('profile.update', {
+        pseudo: next.pseudo.slice(0, 32),
+        color: next.color.slice(0, 16),
+      });
     },
     updateGames: (next) => {
       games = next;
+      links.link?.sendReliable('games.update', { games: next });
     },
     lobby: {
       open: (game) => session.open(game),
