@@ -5,7 +5,7 @@
 import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
 import type { DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
-import { type Sim, bump, character, distance, emit, format, itemName, notify, message, partnerName, partnerOf, point } from './contexte';
+import { type Sim, bump, character, distance, emit, format, itemName, notify, message, partnerName, partnerOf, point , notifyKey } from './contexte';
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';
@@ -209,7 +209,7 @@ function sceneNext(sim: Sim, c: Character): void {
   if (scene === null || scene.choices.length > 0) return;
   if (!scene.ready.includes(c.id)) {
     scene.ready.push(c.id);
-    if (scene.ready.length === 1) notify(sim, partnerOf(c.id), 'message', message(sim, 'partner_waits_scene', { partner: c.name }));
+    if (scene.ready.length === 1) notifyKey(sim, partnerOf(c.id), 'message', 'partner_waits_scene', { partner: c.name });
   }
   if (scene.ready.length < 2) return;
   scene.ready = [];

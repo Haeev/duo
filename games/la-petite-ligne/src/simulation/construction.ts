@@ -6,7 +6,7 @@
 import type { ControlFrame } from '../etat/actions';
 import type { Character, CharacterId, ConstructionState } from '../etat/types';
 import type { ConstructionDef } from '../donnees/types';
-import { type Sim, distance, emit, format, itemName, message, notify, point } from './contexte';
+import { type Sim, distance, emit, format, itemName, message, notify, point , notifyKey } from './contexte';
 import { spend, durationMultiplier } from './besoins';
 import { payMaterials } from './sac';
 
@@ -39,7 +39,7 @@ export function completeConstruction(sim: Sim, id: string): void {
     e.progress = 1;
     e.workers = [];
   }
-  notify(sim, 'both', 'message', message(sim, 'built', { construction: def.name }));
+  notifyKey(sim, 'both', 'message', 'built', { construction: def.name });
   emit(sim, { type: 'construction_done', construction: id });
   for (const other of sim.world.constructions) {
     if (other.status !== 'locked') continue;

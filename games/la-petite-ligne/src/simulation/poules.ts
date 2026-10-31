@@ -3,7 +3,7 @@
  * un œuf par poule nourrie et par jour.
  */
 import type { Character } from '../etat/types';
-import { type Sim, bump, distance, emit, message, newId, notify, point } from './contexte';
+import { type Sim, bump, distance, emit, message, newId, notify, point , notifyKey } from './contexte';
 import { gesture } from './potager';
 import { ITEM, POINT, ZONE } from './ids';
 import { dropAt } from './sac';
@@ -24,7 +24,7 @@ export function spawnHens(sim: Sim, animal: string, count: number, names: string
       wander: { ...pos },
     });
   }
-  notify(sim, 'both', 'message', message(sim, 'hens_arrived'));
+  notifyKey(sim, 'both', 'message', 'hens_arrived');
   emit(sim, { type: 'hens_arrived' });
 }
 
@@ -45,7 +45,7 @@ export function morningEggs(sim: Sim): void {
     const at = point(sim, POINT.chickenCoop);
     if (count > 0) {
       dropAt(sim, at.x + 0.5, at.y - 0.6, ITEM.egg, 'ordinary', count);
-      notify(sim, 'both', 'message', message(sim, 'eggs_found', { count }));
+      notifyKey(sim, 'both', 'message', 'eggs_found', { count });
       emit(sim, { type: 'eggs_laid', count });
     }
   }

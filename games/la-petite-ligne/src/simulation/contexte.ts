@@ -121,7 +121,7 @@ export function notify(
   who: CharacterId | 'both',
   kind: NotificationKind,
   text: string,
-  extra: { hint?: string; proposal?: string } = {},
+  extra: { hint?: string; proposal?: string; key?: string } = {},
 ): void {
   const targets: CharacterId[] = who === 'both' ? ['p1', 'p2'] : [who];
   for (const id of targets) {
@@ -133,6 +133,7 @@ export function notify(
       text,
       hint: extra.hint ?? null,
       proposal: extra.proposal ?? null,
+      key: extra.key ?? extra.hint ?? null,
       tick: sim.world.tick,
     };
     c.notifications.push(notification);
@@ -142,13 +143,25 @@ export function notify(
   sim.runtime.changed = true;
 }
 
+/** Notification d'un message de `textes.json` (sa clé suit, pour l'interface et le son). */
+export function notifyKey(
+  sim: Sim,
+  who: CharacterId | 'both',
+  kind: NotificationKind,
+  key: string,
+  vars: Record<string, string | number> = {},
+  extra: { proposal?: string } = {},
+): void {
+  notify(sim, who, kind, message(sim, key, vars), { ...extra, key });
+}
+
 export function say(
   sim: Sim,
   who: CharacterId | 'both',
   key: string,
   vars: Record<string, string | number> = {},
 ): void {
-  notify(sim, who, 'message', message(sim, key, vars));
+  notifyKey(sim, who, 'message', key, vars);
 }
 
 /** Prénom de l'autre joueur, pour `{partner}`. */

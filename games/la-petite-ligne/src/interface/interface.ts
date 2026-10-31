@@ -71,6 +71,8 @@ class GameUi implements GameInterface, UiHost {
   private guardUntil = 0;
   private blockSpaceKeyup = false;
   private readonly keysDown = new Set<string>();
+  /** Touches déjà traitées par l'écouteur de l'interface, que `handleKey` ignorera (code, instant). */
+  private readonly claimed = new Map<string, number>();
   private pendingMenu: { menu: MenuKind | null; at: number; tab: PanelTab | undefined } | null = null;
   private panelTab: PanelTab | undefined;
   private reading: string | null = null;
@@ -107,6 +109,10 @@ class GameUi implements GameInterface, UiHost {
 
     this.listen(this.root, 'keydown', (e) => {
       this.onKeyDown(e);
+    });
+    // Un clic sur l'interface n'est pas un clic dans la scène (le SDK écoute la fenêtre).
+    this.listen(this.root, 'pointerdown', (e) => {
+      e.stopPropagation();
     });
     this.listen(this.root, 'keyup', (e) => {
       if (e.code === 'Space' && this.blockSpaceKeyup) {
@@ -235,6 +241,11 @@ class GameUi implements GameInterface, UiHost {
   }
 
   handleKey(code: string): boolean {
+    const claimedAt = this.claimed.get(code);
+    if (claimedAt !== undefined) {
+      this.claimed.delete(code);
+      if (this.now() - claimedAt < UI_SETTINGS.claimMs) return true;
+    }
     const repeat = this.keysDown.has(code);
     this.keysDown.add(code);
     const active = document.activeElement;
@@ -374,11 +385,11 @@ class GameUi implements GameInterface, UiHost {
       this.proposals.update(world);
     }
 
-    const active = document.activeElement;
-    const focusWasInside = this.mounted !== null && active !== null && this.mounted.layer.root.contains(active);
     this.mounted?.layer.update(world);
-    // Un élément focalisé a disparu pendant la mise à jour: le focus revient à l'élément par défaut.
-    if (this.mounted !== null && focusWasInside && (document.activeElement === document.body || document.activeElement === null)) {
+    // Tant qu'une couche est ouverte, le focus y reste (élément disparu, clic sur un fond):
+    // le clavier lui arrive sans passer par le personnage.
+    const active = document.activeElement;
+    if (this.mounted !== null && (active === null || active === document.body) && !this.proposals.contains(active)) {
       focusElement(this.mounted.layer.defaultFocus());
     }
   }
@@ -467,6 +478,7 @@ class GameUi implements GameInterface, UiHost {
     if (handled) {
       e.preventDefault();
       e.stopPropagation();
+      this.claimed.set(e.code, this.now());
       if (e.code === 'Space') this.blockSpaceKeyup = true;
     } else if (this.mounted !== null && !CAMERA_KEYS.has(e.code)) {
       // Une couche capte le clavier: rien n'atteint le personnage.
@@ -522,9 +534,17 @@ class GameUi implements GameInterface, UiHost {
       return true;
     }
     if (ACTIVATION.has(code)) {
-      // Activation native du bouton focalisé (Entrée au clavier, Espace au relâché).
-      if (active instanceof HTMLElement && active.tagName === 'LI' && active.tabIndex >= 0) return true;
-      return false;
+      // Le SDK empêche l'action par défaut des touches du jeu: on active nous-mêmes le bouton focalisé.
+      if (active instanceof HTMLButtonElement) {
+        active.click();
+        return true;
+      }
+      if (active instanceof HTMLInputElement && active.type === 'radio') {
+        active.checked = true;
+        active.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+      }
+      return active instanceof HTMLElement && active.tabIndex >= 0;
     }
     return false;
   }

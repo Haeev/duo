@@ -6,7 +6,7 @@
 import type { CharacterId } from '../etat/types';
 import type { Effect } from '../donnees/types';
 import { evaluate, NO_CONTEXT } from './conditions';
-import { type Sim, character, emit, message, notify, point } from './contexte';
+import { type Sim, character, emit, message, notify, point , notifyKey } from './contexte';
 import { sendLetter } from './courrier';
 import { startScene } from './dialogues';
 import { payOrder } from './economie';
@@ -99,7 +99,7 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       const recipe = sim.content.recipes[effect.recipe];
       if (recipe !== undefined) {
         const key = recipe.station === 'workbench' ? 'plan_unlocked' : 'recipe_unlocked';
-        notify(sim, 'both', 'message', message(sim, key, { recipe: recipe.name }));
+        notifyKey(sim, 'both', 'message', key, { recipe: recipe.name });
       }
       emit(sim, { type: 'unlocked', recipe: effect.recipe });
       return;
@@ -121,7 +121,7 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       gatherAt(sim, effect.point);
       return;
     case 'show_text':
-      notify(sim, 'both', 'message', message(sim, effect.text));
+      notifyKey(sim, 'both', 'message', effect.text);
       return;
     case 'set_world_state':
       world.worldStates[effect.key] = effect.value;

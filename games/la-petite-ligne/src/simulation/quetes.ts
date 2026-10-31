@@ -13,7 +13,7 @@ import {
   type ConditionContext,
   type ToolEvent,
 } from './conditions';
-import { type Sim, emit, format, message, notify, say } from './contexte';
+import { type Sim, emit, format, message, notify, say , notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { textVars } from './courrier';
 import { runEffects } from './effets';
@@ -36,7 +36,7 @@ export function startQuest(sim: Sim, id: string): void {
     startedDay: world.clock.day,
   };
   world.quests.push(state);
-  notify(sim, 'both', 'quest', message(sim, 'quest_started', { quest: quest.title }));
+  notifyKey(sim, 'both', 'quest', 'quest_started', { quest: quest.title });
   queueHint(sim, 'p1', { on: 'quest_started', quest: id });
   queueHint(sim, 'p2', { on: 'quest_started', quest: id });
   emit(sim, { type: 'quest_started', quest: id });
@@ -84,7 +84,7 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
     return;
   }
   state.baselines = captureBaselines(sim, next.conditions);
-  notify(sim, 'both', 'quest', message(sim, 'quest_step_done', { quest: quest.title }));
+  notifyKey(sim, 'both', 'quest', 'quest_step_done', { quest: quest.title });
 }
 
 function deadlineReached(sim: Sim, deadline: { day: number; time: number }): boolean {

@@ -20,6 +20,16 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 - Trous de visibilité: ce qui cache un des deux joueurs (bâtiment, arbre, auvent) s'efface en trame autour de lui; la maisonnette coupe toit et murs côté caméra quand le personnage local y est (`inHouse`).
 - Page de démonstration du rendu seul: `rendu.html` (paramètres en tête de `src/rendu/demo/main.ts`), essai d'endurance `rendu.html?cycles=12`.
 
+### Points d'accroche pour le technical artist
+
+`src/rendu/lumiere.ts` est à lui désormais; le dev rendu ne le modifie plus.
+
+- Extensions: `src/rendu/extensions.ts`. Inscrire une fonction dans `RENDER_EXTENSIONS`; elle reçoit `RenderHooks` une fois la scène construite et renvoie une partie (`update(context)` à chaque image après celles du rendu, `dispose()` à la sortie) ou `null`. `context` (`contexte.ts`): état du monde, `alpha`, `dt`, temps, personnage local, orientation de la caméra, `night`, réduction des animations.
+- `RenderHooks`: `renderer`, `scene`, `camera`, `map`, `materials` (`palette` = `lpl_palette`, partagé par tout le décor, le terrain et les objets; `water`; `ghost`; `paletteColor(case)`), `characterMaterial` (`lpl_characters` des habitants; chaque joueur en a une copie à sa texture), `library` (`node(nom)`, `extras(nom)`), `terrain` et `water` (surface de la rivière, un seul maillage), `daylight` (l'instance de `DaylightRig`), `smokeEmitter()` (nœud `locomotive_smoke`), `trainState()` (visible, en mouvement), `resources` (suivi pour la libération).
+- Ce que le moteur appelle à chaque image, à garder ou à changer avec le dev rendu: `daylight.update(minutes, météo, point suivi, rayon de vue, distance de la caméra)`, puis `materials.setNight(daylight.night)` (émission de `lpl_palette` = `night x RENDER_SETTINGS.nightGlow`, 1,6 aujourd'hui; le README des modèles conseille 1 la nuit) et `materials.setTime(t)` (eau).
+- Le panache actuel du train (particules `smoke` de `effets.ts`, au nœud `locomotive_smoke`) s'arrête en mettant `effects.smokePuffsPerSecond` à 0 dans `reglages.ts` (à demander au dev rendu) si `panache.ts` le remplace.
+- Programmes de shader: 10 sur 12 aujourd'hui (`lpl_palette` normal, instancié et animé, `lpl_characters`, `lpl_water`, fantômes, et 4 variantes d'ombre). Un nouveau matériau en ajoute au moins un: à surveiller avec `programList()`. `lpl_palette` porte déjà un `onBeforeCompile` (trous de visibilité autour des joueurs, `materiaux.ts`): l'enchaîner plutôt que le remplacer.
+
 ## Demandes du dev gameplay au rendu
 
 1. Mode de rendu léger, pour que qa-testeur joue des séquences dans le Chromium du cloud (rendu logiciel). `main.ts` passe désormais `quality: 'light'` dans `RendererOptions` (nouveau champ facultatif `quality?: RenderQuality` de `etat/vue.ts`) quand l'adresse du jeu ou celle du faux hôte porte `?rendu=leger` (exemple: `deux-vues.html?rendu=leger`). Demandé au rendu en mode `light`: résolution interne basse (par exemple rapport de pixels 0,5, au plus 640x360 pixels physiques), ombres coupées (`shadowMap.enabled = false`, pas de lumière qui projette), antialiasing coupé, particules et effets réduits au minimum, végétation clairsemée, indicateur de performances masqué. En attendant: `main.ts` affiche le canevas à la moitié de sa taille, agrandi en CSS (quatre fois moins de pixels); les ombres restent.

@@ -2,11 +2,11 @@
  * Réglages de l'interface (durées, seuils, correspondances d'icônes et
  * couleurs des portraits). Les valeurs de jeu restent dans `donnees/`.
  */
-import type { ActionKind, CharacterId, FormLevel, ItemId } from '../etat/types';
+import { type ActionKind, type CharacterId, type FormLevel, type ItemId, TOOLBAR_SLOTS } from '../etat/types';
 
 export const UI_SETTINGS = {
-  /** Cases de la barre d'outils (les premières places du sac). */
-  toolbarSlots: 10,
+  /** Cases de la barre d'outils (les premières places du sac), comme la simulation. */
+  toolbarSlots: TOOLBAR_SLOTS,
   /** Colonnes de la grille du sac dans le carnet. */
   bagColumns: 7,
   /** Notifications visibles à la fois. */
@@ -42,6 +42,11 @@ export const UI_SETTINGS = {
   clockStepMinutes: 10,
   /** Longueur maximale du prénom (comme la simulation). */
   nameMaxLength: 16,
+  /**
+   * Une touche traitée par l'interface (focus dans l'interface) arrive aussi à
+   * `handleKey` au pas suivant, par les actions du SDK: on l'ignore dans ce délai (ms).
+   */
+  claimMs: 400,
 } as const;
 
 /** Zones de la carte, dans l'ordre où on les teste pour dire où est l'autre. */

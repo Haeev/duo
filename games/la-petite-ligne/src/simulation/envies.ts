@@ -3,7 +3,7 @@
  * fois la même, et une envie à deux les jours prévus.
  */
 import { evaluateAll, NO_CONTEXT, stayPoints } from './conditions';
-import { type Sim, character, distance, emit, message, notify } from './contexte';
+import { type Sim, character, distance, emit, message, notify , notifyKey } from './contexte';
 
 export function pickEnvies(sim: Sim): void {
   const { day } = sim.world.clock;
@@ -53,7 +53,7 @@ export function updateEnvies(sim: Sim): void {
       if (def !== undefined && evaluateAll(sim, def.fulfilledWhen, ctx)) {
         own.done = true;
         c.heartToday.envie = true;
-        notify(sim, c.id, 'envie', message(sim, 'envie_done', { envie: def.text }));
+        notifyKey(sim, c.id, 'envie', 'envie_done', { envie: def.text });
         emit(sim, { type: 'envie_done', by: c.id, envie: def.id });
       }
     }
@@ -67,7 +67,7 @@ export function updateEnvies(sim: Sim): void {
         c.heartToday.sharedEnvie = true;
       }
       sim.world.session.togetherMoments += 1;
-      notify(sim, 'both', 'envie', message(sim, 'envie_done', { envie: def.text }));
+      notifyKey(sim, 'both', 'envie', 'envie_done', { envie: def.text });
       emit(sim, { type: 'envie_done', by: 'both', envie: def.id });
     }
   }

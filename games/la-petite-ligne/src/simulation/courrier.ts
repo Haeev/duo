@@ -3,7 +3,7 @@
  * leur jour et leur heure, chez les deux joueurs.
  */
 import { evaluateAll, NO_CONTEXT } from './conditions';
-import { type Sim, emit, format, itemName, message, notify } from './contexte';
+import { type Sim, emit, format, itemName, message, notify , notifyKey } from './contexte';
 import { queueHint } from './astuces';
 
 /** « 12 radis, 3 laitues, 6 œufs, 10 planches » (`textes.orderFormat`). */
@@ -43,7 +43,7 @@ export function sendLetter(sim: Sim, id: string): void {
     text,
     read: [],
   });
-  notify(sim, 'both', 'letter', message(sim, 'letter_received', { title: def.title }));
+  notifyKey(sim, 'both', 'letter', 'letter_received', { title: def.title });
   queueHint(sim, 'p1', { on: 'letter_received' });
   queueHint(sim, 'p2', { on: 'letter_received' });
   emit(sim, { type: 'letter', letter: id });
