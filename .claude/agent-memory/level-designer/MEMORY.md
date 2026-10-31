@@ -23,3 +23,10 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `games/la-petite-ligne/outils/valider_donnees.py` cherche les points et zones des données sous toute clé `points` ou `zones` des JSON de `donnees/cartes/`: ne pas employer ces noms de clé pour autre chose. Liste attendue: `donnees/README.md`, section 5 (`offstage` est hors carte).
 - Contrat du code (`src/etat/carte.ts`): zones à un seul rectangle, potager en 12 cases ordonnées, `house` (pièce, case de la porte, retour de minuit), arbres `oak` ou `fir` seulement, `props` avec `model`, `pos`, `rotation`, `rect`. Les meubles de départ (`startingInventory.houseFurniture`) sont placés par la carte.
 - `demo.md` fait foi pour le périmètre de la démo (potager de 12 cases, puits au lieu de fontaine); les réserves du jeu complet (maison 14x12, potager de 96 cases) se gardent en zones vides.
+
+## Mesurer le contenu par les robots (vérifié le 2026-10-31)
+
+- Un script jetable hors du dépôt se lance avec la configuration du jeu: `npx vitest run --root games/la-petite-ligne --dir /tmp/<dossier>` (chemins d'import absolus vers `tests/aides.ts` et `src/simulation/`). Une partie complète de 15 jours prend 20 à 45 s.
+- `sim.events` est vidé au début de chaque `step`: le lire juste après. Les gestes et la poutre n'ont pas de champ `by`.
+- Pour les répliques, reproduire la règle de `pickDialogue` (priorité stricte, puis tirage parmi les ex aequo) avec `evaluateAll` au lieu de l'appeler: elle consomme le générateur et changerait la partie.
+- Les robots ne bavardent pas et ne posent que trois meubles: leurs temps creux disent ce que la structure exige, pas ce que ferait un duo humain. Deux robots immobiles au même endroit faussent toute mesure de proximité.
