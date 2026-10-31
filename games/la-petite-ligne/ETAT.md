@@ -168,6 +168,12 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-10-31, cohérence du monde: meubles à tuyau dos au mur (dev gameplay)
+
+- Champ d'objet `backToWall` (poêle à bois et réchaud, posé par le game designer): la pose demande que le dos du meuble touche un mur (rotation 0, tourné vers le sud: mur nord; 1: mur ouest; 2: mur sud; 3: mur est). Sinon refus `back_wall`, texte `placement_back_wall` (repli `placement_wall`). Les autres meubles ne changent pas.
+- Sauvegardes: un poêle déjà posé au milieu de la pièce reste en place (rien n'est revérifié au chargement); on peut le reprendre et le reposer contre un mur.
+- Tests: `tests/pose-murale.test.ts` (milieu refusé dans les quatre rotations, dos au mur accepté sur les quatre murs, tourné vers le mur refusé, table inchangée, sauvegarde avec un poêle au milieu relue).
+
 ## 2026-10-31, gauntlet tour 5: variantes d'après-midi et jour 6 (dev gameplay)
 
 - Condition `variant` (`{ group, value, of }`): vraie si la variante tirée pour ce groupe vaut `value`. Tirage par empreinte (FNV-1a) de la graine du monde et du nom du groupe (`variantOf`, `conditions.ts`): il ne consomme pas le générateur (le reste de la partie ne change pas) et se relit à l'identique après une reprise. Utilisable partout (débuts et étapes de quêtes, `if`, dialogues, emplois du temps). Groupes du game designer: `afternoon_d6`, `afternoon_d10`, `afternoon_d11`, `afternoon_d13`, deux variantes chacun.
@@ -179,7 +185,7 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 ## 2026-10-31, gauntlet tour 4: deux gestes à deux (D2, dev gameplay)
 
 - Mécanique de la poutre généralisée: `world.beam` décrit la charge portée à deux (`item`, `purpose`: `construction`, `handcar` ou `parcel`, `construction`, `contents`, `to`), une à la fois. `updateBeam` renvoie la charge posée; la charge glisse maintenant le long des murs (tout le pas, sinon un axe puis l'autre). Module `simulation/portages.ts` (apparition et arrivée).
-- Draisine: à l'étape `push` de `handcar`, la draisine (`handcar`) apparaît devant la remise et se pousse à deux sur la voie jusqu'au point `handcar_shed` + `toOffset` (-6, 4: le rail de la remise puis la voie principale, vers l'ouest); à l'arrivée, drapeau `handcar_pushed` (condition de l'étape) et message `handcar_pushed`; ensuite l'étape `try` et la scène. Réglages: `reglages.carry.handcar`.
+- Draisine: à l'étape `push` de `handcar`, la draisine (`handcar`) apparaît devant la remise et se pousse à deux sur la voie jusqu'au point `handcar_shed` + `toOffset` (0, 3 depuis le réglage du game designer: la voie de garage tout droit jusqu'à la ligne); à l'arrivée, drapeau `handcar_pushed` (condition de l'étape) et message `handcar_pushed`; ensuite l'étape `try` et la scène. Réglages: `reglages.carry.handcar`.
 - Colis: un objet du catalogue `carriedByTwo` (poêle à bois, poste à galène) n'arrive pas au cellier: il attend dans `world.heavyDeliveries` et apparaît en `heavy_parcel` sur le quai (`train_stop`), à porter à deux jusqu'à `house_door`; à l'arrivée, l'objet va au cellier, message `parcel_delivered`. Réglages: `reglages.carry.parcel`.
 - Seul: la charge ne bouge pas, message `handcar_needs_both` ou `parcel_needs_both` (sinon `needs_both`). Relâchée: posée là (`beam_dropped`), reprise ensuite.
 - Sauvegardes: une charge sans description (sauvegarde plus ancienne) redevient la poutre de la maison; `heavyDeliveries` vide par défaut.

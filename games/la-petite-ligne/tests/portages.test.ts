@@ -121,7 +121,8 @@ describe('draisine poussée à deux', () => {
   it('relâchée en chemin: posée là, intacte, et on la reprend', () => {
     const sim = withHandcar();
     grab(sim, ['p1', 'p2']);
-    carry(sim, ['p1', 'p2'], SIM_HZ);
+    // Quelques pas seulement: la voie de garage est courte.
+    carry(sim, ['p1', 'p2'], 6);
     const events = carry(sim, [], 2);
     expect(events.some((e) => e.type === 'beam_dropped')).toBe(true);
     expect(sim.world.beam?.carried).toBe(false);

@@ -8,7 +8,7 @@
  * intensités de lumière sont celles de Three.js (tone mapping neutre).
  *
  * Consignes suivies: bible artistique de la démo (section 4) et énigme de la
- * cloche (`demo.md`, S4): entre 17 h et 17 h 30, par soleil, le soleil vient de
+ * cloche (`demo.md`, S4): entre 17 h et 17 h 45, par soleil, le soleil vient de
  * l'ouest et l'ombre de la cloche touche le banc posé 3,5 m à l'est.
  */
 

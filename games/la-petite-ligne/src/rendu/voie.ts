@@ -265,6 +265,75 @@ export class RailwayPart implements EventfulPart {
       segment.add(RAIL_MODEL, matrix.makeTranslation(x, ground, this.trackY));
     }
     segment?.end();
+    this.laySidings(materials, resources, ground);
+  }
+
+  /**
+   * Voies de garage (remise de la draisine): colonnes de cases de voie au
+   * nord ou au sud de la ligne, rails posés dans l'axe nord-sud jusqu'à elle.
+   * Les bouts de rails du modèle de la remise restent sous ses portes.
+   */
+  private laySidings(materials: SharedMaterials, resources: ResourceTracker, ground: number): void {
+    const map = this.map;
+    const rows = new Set<number>();
+    for (let cy = Math.floor(this.trackY - 1.5); cy <= Math.ceil(this.trackY + 0.5); cy += 1) {
+      rows.add(cy);
+    }
+    const isRail = (cx: number, cy: number): boolean =>
+      cx >= 0 &&
+      cy >= 0 &&
+      cx < map.width &&
+      cy < map.height &&
+      map.ground[cy * map.width + cx] === 'rail';
+    const batch = new InstancedBatches(
+      'voies de garage',
+      this.library,
+      materials,
+      resources,
+      RAIL_CAPACITY,
+      false,
+    );
+    const matrix = new Matrix4();
+    const turn = new Matrix4().makeRotationY(Math.PI / 2);
+    let any = false;
+    batch.begin();
+    for (let cx = 0; cx < map.width; cx += 1) {
+      for (let cy = 0; cy < map.height; cy += 1) {
+        // Début d'une colonne de voie hors de la ligne (ni case voisine de voie à l'ouest ni à l'est).
+        if (
+          rows.has(cy) ||
+          !isRail(cx, cy) ||
+          isRail(cx, cy - 1) ||
+          isRail(cx - 1, cy) ||
+          isRail(cx + 1, cy)
+        ) {
+          continue;
+        }
+        let end = cy;
+        while (isRail(cx, end + 1) && !rows.has(end + 1)) {
+          end += 1;
+        }
+        // Jusqu'au bord de la ligne; un module plus long que la colonne déborde sous la remise.
+        const from = cy;
+        const to = end + 1;
+        for (
+          let z = from + RAIL_MODULE_LENGTH / 2;
+          z - RAIL_MODULE_LENGTH / 2 < to - 1e-3;
+          z += RAIL_MODULE_LENGTH
+        ) {
+          const centre = Math.min(z, to - RAIL_MODULE_LENGTH / 2);
+          matrix.makeTranslation(cx + 0.5, ground, centre).multiply(turn);
+          batch.add(RAIL_MODEL, matrix);
+          any = true;
+        }
+        cy = end;
+      }
+    }
+    batch.end();
+    if (any) {
+      this.rails.push(batch);
+      this.group.add(batch.group);
+    }
   }
 
   update(context: FrameContext): void {

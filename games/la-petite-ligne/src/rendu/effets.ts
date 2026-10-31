@@ -4,7 +4,7 @@
  * de la qualité « belle »), objet récolté qui saute au sac, case visée
  * surlignée (grisée si l'action est impossible), repère de destination d'un
  * clic, et le reflet discret au pied du banc quand l'ombre de la cloche
- * le touche (énigme d'Émile, de 17 h à 17 h 30 par soleil).
+ * le touche (énigme d'Émile, de 17 h à 17 h 45 par soleil).
  */
 import {
   Color,
@@ -57,7 +57,7 @@ const JUMP_END_SCALE = 0.3;
 const CHOP_TRAUMA = 0.18;
 const FELL_TRAUMA = 0.5;
 const BELL_FIRST_MINUTE = 17 * 60;
-const BELL_LAST_MINUTE = 17 * 60 + 30;
+const BELL_LAST_MINUTE = 17 * 60 + 45;
 const BELL_SPARKLE_EVERY = 0.45;
 const BELL_RING_OPACITY = 0.5;
 const RIPPLE_POOL = 8;

@@ -97,8 +97,26 @@ export const RENDER_SETTINGS = {
     chunkSize: 24,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
+    /** Berges de la rivière: la pente descend sous l'eau sur cette largeur (m), dans la case d'eau. */
+    bankSlope: 0.6,
     /** Fond du gué (eau basse franchissable). */
     fordBed: -0.12,
+    /**
+     * Pierres plates du gué: côtés (un modèle par nombre), épaisseur (posées sur
+     * le fond, elles affleurent la lame d'eau), taille (m), places dans la case
+     * (décalage depuis son coin) et désordre.
+     */
+    fordStones: {
+      sides: [5, 6, 7],
+      thickness: 0.22,
+      minSize: 0.3,
+      maxSize: 0.6,
+      perCell: [
+        [0.28, 0.3],
+        [0.72, 0.7],
+      ] as readonly (readonly [number, number])[],
+      jitter: 0.12,
+    },
     /** Touffes d'herbe et fleurs semées sur l'herbe (part des cases). */
     tuftDensity: 0.32,
     flowerDensity: 0.07,

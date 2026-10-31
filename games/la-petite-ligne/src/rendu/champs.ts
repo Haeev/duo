@@ -112,7 +112,7 @@ export interface TerrainField {
  * gravier est du gué si l'eau la borde à l'est et à l'ouest sur sa rangée, et
  * si sa colonne n'a pas d'eau tout près (ce qui écarte les berges en avancée).
  */
-function isFord(map: GameMap, cx: number, cy: number): boolean {
+export function isFord(map: GameMap, cx: number, cy: number): boolean {
   const kind = (x: number, y: number): string =>
     x >= 0 && y >= 0 && x < map.width && y < map.height
       ? (map.ground[cellIndex(map, x, y)] ?? 'grass')

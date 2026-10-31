@@ -242,15 +242,15 @@ describe('ombre de la cloche (énigme S4)', () => {
     expect(back.max.y).toBeGreaterThan(seat.max.y);
   });
 
-  it('touche le banc de 17 h à 17 h 30', () => {
-    for (let minutes = 17 * HOUR; minutes <= 17 * HOUR + 30; minutes += 5) {
+  it('touche le banc de 17 h à 17 h 45', () => {
+    for (let minutes = 17 * HOUR; minutes <= 17 * HOUR + 45; minutes += 5) {
       expect(shadowOnBench(minutes), `à ${minutes} minutes`).toBeGreaterThanOrEqual(0.5);
     }
   });
 
-  it('ne le touche pas à 16 h 30 ni à 18 h', () => {
+  it('ne le touche pas à 16 h 30 ni à 18 h 15', () => {
     expect(shadowOnBench(16 * HOUR + 30)).toBe(0);
-    expect(shadowOnBench(18 * HOUR)).toBe(0);
+    expect(shadowOnBench(18 * HOUR + 15)).toBe(0);
   });
 });
 

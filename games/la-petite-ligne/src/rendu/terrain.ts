@@ -6,10 +6,22 @@
  * (la rivière, la voie et les chemins continuent; la forêt du pourtour pousse
  * dans `vegetation.ts`).
  */
-import { BufferAttribute, BufferGeometry, Group, Mesh, Vector3 } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Euler,
+  Group,
+  Matrix4,
+  Mesh,
+  Quaternion,
+  Vector3,
+} from 'three';
 import type { GameMap, GroundKind, MapProp } from '../etat/carte';
 import { cellIndex, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
+import { isFord } from './champs';
+import { ShapeBuilder } from './geometrie';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { SharedMaterials } from './materiaux';
 import { paletteUv, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
@@ -111,6 +123,9 @@ const ROUNDED_KINDS: ReadonlySet<GroundKind> = new Set<GroundKind>([
   'stone',
   'gravel',
 ]);
+/** Normale (approchée) d'une berge en pente: vers l'eau et vers le ciel. */
+const BANK_NORMAL_SIDE = 0.6;
+const BANK_NORMAL_UP = 0.8;
 /** Coins d'une case, dans l'ordre du pourtour: direction (sx, sy) vers le coin. */
 const CORNERS = [
   [-1, -1],
@@ -156,6 +171,13 @@ export class Terrain {
       RENDER_SETTINGS.floorProps[prop.model],
   ) {
     this.group.name = 'terrain';
+    for (let cy = 0; cy < map.height; cy += 1) {
+      for (let cx = 0; cx < map.width; cx += 1) {
+        if (isFord(map, cx, cy)) {
+          this.fords.add(cellIndex(map, cx, cy));
+        }
+      }
+    }
     for (const prop of map.props) {
       const height = floorHeight(prop);
       if (height !== undefined && prop.rect !== null) {
@@ -177,6 +199,63 @@ export class Terrain {
     outer.receiveShadow = true;
     outer.matrixAutoUpdate = false;
     this.group.add(ground, water, outer);
+    this.placeFordStones(materials, resources);
+  }
+
+  /** Cases du gué (gravier entre deux bras d'eau): fond bas, sous la lame d'eau. */
+  private readonly fords = new Set<number>();
+
+  /**
+   * Pierres plates du gué, espacées, dont le dessus affleure la lame d'eau
+   * (l'eau passe entre elles): de 5 à 7 côtés, de 30 à 60 cm.
+   */
+  private placeFordStones(materials: SharedMaterials, resources: ResourceTracker): void {
+    if (this.fords.size === 0) {
+      return;
+    }
+    const stones = SETTINGS.fordStones;
+    const shapes = stones.sides.map((sides) =>
+      new ShapeBuilder()
+        .cylinder(0.5, 0.5, stones.thickness, [0, 0, 0], 'cobble', { base: true, segments: sides })
+        .build(),
+    );
+    const matrix = new Matrix4();
+    const position = new Vector3();
+    const rotation = new Quaternion();
+    const euler = new Euler();
+    const scale = new Vector3();
+    const parts: BufferGeometry[] = [];
+    for (const index of this.fords) {
+      const cx = index % this.map.width;
+      const cy = Math.floor(index / this.map.width);
+      stones.perCell.forEach(([ox, oy], slot) => {
+        const shape = shapes[Math.floor(hash2(cx, cy, 71 + slot) * shapes.length)];
+        if (shape === undefined) {
+          return;
+        }
+        const size = stones.minSize + hash2(cx, cy, 81 + slot) * (stones.maxSize - stones.minSize);
+        const x = cx + ox + (hash2(cx, cy, 91 + slot) - 0.5) * stones.jitter;
+        const y = cy + oy + (hash2(cx, cy, 101 + slot) - 0.5) * stones.jitter;
+        position.set(x, SETTINGS.fordBed, y);
+        rotation.setFromEuler(euler.set(0, hash2(cx, cy, 111 + slot) * Math.PI * 2, 0));
+        scale.set(size, 1, size * (0.75 + hash2(cx, cy, 121 + slot) * 0.25));
+        parts.push(shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+      });
+    }
+    // Une seule géométrie fusionnée: un appel de dessin pour toutes les pierres.
+    const merged = parts.length > 0 ? mergeGeometries(parts, false) : null;
+    for (const geometry of [...parts, ...shapes]) {
+      geometry.dispose();
+    }
+    if (merged === null) {
+      return;
+    }
+    merged.computeBoundingSphere();
+    const mesh = new Mesh(resources.track(merged), materials.palette);
+    mesh.name = 'pierres du gue';
+    mesh.receiveShadow = true;
+    mesh.matrixAutoUpdate = false;
+    this.group.add(mesh);
   }
 
   /** Case de la carte ou de la bande prolongée (coordonnées rabattues sur le bord). */
@@ -187,12 +266,13 @@ export class Terrain {
     const index = cellIndex(this.map, x, y);
     const raw = this.map.ground[index] ?? 'grass';
     const kind = inside ? raw : extendedKind(raw);
-    const ford = kind === 'water' && this.map.blocked[index] === false;
-    const height =
-      kind === 'water'
-        ? ford
-          ? SETTINGS.fordBed
-          : SETTINGS.heights.water
+    const ford =
+      (kind === 'water' && this.map.blocked[index] === false) ||
+      (inside && kind === 'gravel' && this.fords.has(index));
+    const height = ford
+      ? SETTINGS.fordBed
+      : kind === 'water'
+        ? SETTINGS.heights.water
         : SETTINGS.heights[kind];
     return { kind, ford, height };
   }
@@ -242,6 +322,10 @@ export class Terrain {
       case 'dirt':
         return 'soil';
       case 'gravel':
+        // Gué: fond de sable et de galets sombres sous l'eau, plus de chaussée pavée.
+        if (look.ford) {
+          return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'rock_dark' : 'sand';
+        }
         return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'ballast' : 'sand';
       case 'wood':
         return cx % 2 === 0 ? 'wood' : 'wood_dark';
@@ -392,6 +476,35 @@ export class Terrain {
     }
   }
 
+  /** Le côté vers (nx, ny) est une berge en pente: case sèche au-dessus d'une eau profonde. */
+  private bankSlopes(look: CellLook, nx: number, ny: number): boolean {
+    if (look.kind === 'water' || !this.insideBand(nx, ny)) {
+      return false;
+    }
+    const other = this.look(nx, ny);
+    return other.kind === 'water' && !other.ford;
+  }
+
+  /** Coin saillant d'une berge (eau sur deux côtés voisins): on bouche l'angle entre les deux pentes. */
+  private bankCorners(writer: GeometryWriter, cx: number, cy: number, look: CellLook): void {
+    const slope = SETTINGS.bankSlope;
+    const low = SETTINGS.heights.water;
+    for (const [sx, sy] of CORNERS) {
+      if (!this.bankSlopes(look, cx + sx, cy) || !this.bankSlopes(look, cx, cy + sy)) {
+        continue;
+      }
+      const px = cx + (sx > 0 ? 1 : 0);
+      const pz = cy + (sy > 0 ? 1 : 0);
+      const top: [number, number, number] = [px, look.height, pz];
+      const a: [number, number, number] = [px + sx * slope, low, pz];
+      const b: [number, number, number] = [px, low, pz + sy * slope];
+      const d: [number, number, number] = [px + sx * slope, low, pz + sy * slope];
+      const normal = [sx * BANK_NORMAL_SIDE, BANK_NORMAL_UP, sy * BANK_NORMAL_SIDE] as const;
+      writer.triangle(top, a, d, normal, 'bank');
+      writer.triangle(top, d, b, normal, 'bank');
+    }
+  }
+
   private buildGround(): BufferGeometry {
     const writer = new GeometryWriter();
     const up = [0, 1, 0] as const;
@@ -435,6 +548,7 @@ export class Terrain {
       // Côtés: une marche là où le voisin est plus bas; au bord de la bande, on ferme vers le pourtour.
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
+        this.bankCorners(writer, cx, cy, look);
         const h = look.height;
         for (const side of SIDES) {
           const outside = !this.insideBand(cx + side.dx, cy + side.dy);
@@ -452,15 +566,24 @@ export class Terrain {
           const alongX = side.dx === 0;
           const x1 = alongX ? x0 + 1 : x0;
           const z1 = alongX ? z0 : z0 + 1;
+          // Berge de rivière: une pente douce qui descend sous l'eau, plus de quai droit.
+          const slope =
+            !outside && this.bankSlopes(look, cx + side.dx, cy + side.dy) ? SETTINGS.bankSlope : 0;
+          const sx = side.dx * slope;
+          const sz = side.dy * slope;
           writer.quad(
             [
-              [x0, low, z0],
-              [x1, low, z1],
+              [x0 + sx, low, z0 + sz],
+              [x1 + sx, low, z1 + sz],
               [x1, high, z1],
               [x0, high, z0],
             ],
-            facesOut ? [side.dx, 0, side.dy] : [-side.dx, 0, -side.dy],
-            this.sideCell(look.kind),
+            slope > 0
+              ? [side.dx * BANK_NORMAL_SIDE, BANK_NORMAL_UP, side.dy * BANK_NORMAL_SIDE]
+              : facesOut
+                ? [side.dx, 0, side.dy]
+                : [-side.dx, 0, -side.dy],
+            slope > 0 ? 'bank' : this.sideCell(look.kind),
           );
         }
       }
