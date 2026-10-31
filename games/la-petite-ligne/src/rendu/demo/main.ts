@@ -66,6 +66,8 @@ interface DemoHandle {
   missing(): string[];
   breakdown(): Record<string, number>;
   programs(): string[];
+  /** Qualité en vigueur et palier de résolution (essai du repli automatique, `adaptatif=1`). */
+  quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
   advance(dt: number): void;
   pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
@@ -160,6 +162,8 @@ async function main(): Promise<void> {
     reducedMotion: false,
     showStats: params.get('stats') !== '0',
     quality: params.get('rendu') === 'leger' ? 'light' : 'normal',
+    // Captures reproductibles: qualité fixe, sauf `adaptatif=1` (essai du repli automatique).
+    adaptive: params.get('adaptatif') === '1',
   });
   const handle: DemoHandle = {
     ready: false,
@@ -167,6 +171,11 @@ async function main(): Promise<void> {
     missing: () => [],
     breakdown: () => engine.breakdown(),
     programs: () => engine.programList(),
+    quality: () => ({
+      mode: engine.renderQuality(),
+      scale: engine.resolutionScale(),
+      pixelRatio: engine.pixelRatio(),
+    }),
     advance: () => undefined,
     pick: (x: number, y: number) => engine.pick(x, y),
     destination: () => world.characters[0]?.destination ?? null,

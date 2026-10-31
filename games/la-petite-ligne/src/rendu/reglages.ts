@@ -203,16 +203,59 @@ export const RENDER_SETTINGS = {
    * Résolution dynamique (budget de la plateforme: jusqu'à 0,75): si les
    * images durent trop longtemps en moyenne, la résolution de rendu baisse
    * par paliers, sans jamais remonter pendant la partie (pas de va-et-vient).
+   * Logique dans `qualite.ts`.
    */
   dynamicResolution: {
     steps: [1, 0.9, 0.8, 0.75] as const,
-    /** Moyenne glissante des images au-delà de laquelle on descend d'un palier (ms). */
-    slowFrameMs: 20,
+    /**
+     * Moyenne glissante des images au-delà de laquelle on descend d'un palier
+     * (ms, environ 55 images par seconde), relevée sur un écran plus lent que
+     * 60 Hz (voir `slowRatio`).
+     */
+    slowFrameMs: 18,
     /** Durée de lissage de la moyenne et attente entre deux paliers (s). */
     averageSeconds: 1.5,
     cooldownSeconds: 3,
     /** Premières secondes ignorées (compilation, chargement des textures). */
     warmupSeconds: 5,
+    /**
+     * Image ignorée au-delà de cette durée (ms): onglet caché, pause,
+     * compilation d'un shader. En deçà elle compte, même très lente.
+     */
+    ignoreFrameMs: 250,
+    /**
+     * Période de l'écran: plancher des durées d'image, qui remonte lentement
+     * (s pour suivre une hausse), bornée pour qu'un jeu à 30 images par
+     * seconde ne passe jamais pour un écran à 30 Hz (ms).
+     */
+    refreshRiseSeconds: 30,
+    minRefreshMs: 4,
+    maxRefreshMs: 21,
+    /**
+     * Lent: moyenne au-delà de cette part de la période de l'écran (écrans à
+     * 48 ou 50 Hz), et jamais sous `slowFrameMs`.
+     */
+    slowRatio: 1.08,
+  },
+
+  /**
+   * Repli automatique vers le mode léger (risque 1 du gauntlet): quand le
+   * dernier palier de la résolution dynamique ne suffit plus, à chaud, sans
+   * recréer le contexte WebGL (ombres coupées, résolution du mode léger;
+   * l'antialiasing, la végétation et les effets restent ceux du départ).
+   * Un seul retour par séance: s'il faut se replier de nouveau, c'est définitif.
+   */
+  autoLight: {
+    /** Au dernier palier, durée de lenteur continue avant le repli (s). */
+    slowSeconds: 8,
+    /**
+     * Retour à la qualité normale (au dernier palier) si la moyenne reste
+     * sous cette part de la période de l'écran pendant `returnSeconds`.
+     * Plus petit que `slowRatio`: le seuil de retour reste sous celui du repli.
+     */
+    comfortRatio: 1.03,
+    returnSeconds: 60,
+    maxReturns: 1,
   },
 } as const;
 

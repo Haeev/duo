@@ -12,6 +12,7 @@ import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import type { PlayerInfo } from '../simulation/monde';
+import { type StepInput, step } from '../simulation/pas';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -22,6 +23,13 @@ export interface WorldSnapshot {
 }
 
 const LABEL_MAX = 40;
+/**
+ * Pas joués sur une copie avant d'accepter une sauvegarde (un peu plus de 3 s
+ * de jeu, quelques millisecondes): garde-fou contre une sauvegarde abîmée en
+ * profondeur, en attendant un schéma complet de l'état (risque 3 du gauntlet).
+ */
+export const TRIAL_STEPS = 100;
+const IDLE: StepInput = { controls: {}, intents: [] };
 
 /** « samedi, jour 1, 14 h 20 » (libellé de la fiche du jeu, 40 caractères au plus). */
 export function saveLabel(sim: Sim): string {
@@ -171,6 +179,9 @@ export function bindPlayers(world: WorldState, players: readonly [PlayerInfo, Pl
 /**
  * Reprend un monde sauvegardé. Ce qui ne se sauvegarde pas (SV-02) est remis
  * à zéro: menus fermés, conversations closes, scène reprise à son début.
+ * Avant d'être acceptée, la sauvegarde est rejouée `TRIAL_STEPS` pas sur une
+ * copie: une erreur devient une `SaveError`, jamais un plantage au premier pas
+ * de la partie, chez les deux joueurs et à chaque relance.
  */
 export function restoreWorld(
   content: Content,
@@ -180,6 +191,34 @@ export function restoreWorld(
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
   const world = checkWorld(migrate(data, dataSchema, content));
+  trialRun(content, map, structuredClone(world), dataSchema, players);
+  return resume(content, map, world, dataSchema, players);
+}
+
+function trialRun(
+  content: Content,
+  map: GameMap,
+  world: WorldState,
+  dataSchema: number,
+  players: readonly [PlayerInfo, PlayerInfo],
+): void {
+  try {
+    const trial = resume(content, map, world, dataSchema, players);
+    for (let i = 0; i < TRIAL_STEPS; i++) step(trial, IDLE);
+  } catch (error) {
+    if (error instanceof SaveError) throw error;
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new SaveError(`sauvegarde: la partie ne se rejoue pas (${reason})`, { cause: error });
+  }
+}
+
+function resume(
+  content: Content,
+  map: GameMap,
+  world: WorldState,
+  dataSchema: number,
+  players: readonly [PlayerInfo, PlayerInfo],
+): Sim {
   bindPlayers(world, players);
   for (const c of world.characters) {
     // Nouvelle séance: l'écran titre se repasse à deux.

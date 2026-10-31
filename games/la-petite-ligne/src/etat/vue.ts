@@ -63,6 +63,8 @@ export interface RendererOptions {
   reducedMotion: boolean;
   /** Qualité demandée (`normal` si absent). */
   quality?: RenderQuality;
+  /** Journal de la plateforme (repli automatique vers le mode léger). */
+  log?: { info(message: string, data?: unknown): void };
 }
 
 export interface Renderer {

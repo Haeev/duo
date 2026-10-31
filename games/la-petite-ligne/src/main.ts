@@ -102,7 +102,7 @@ async function main(): Promise<void> {
   const quality = renderQuality();
 
   const setup = async (): Promise<void> => {
-    const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion, quality });
+    const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion, quality, log: duo.log });
     await r.load((ratio) => {
       duo.reportLoading(1 - RENDER_LOAD_SHARE + ratio * RENDER_LOAD_SHARE);
     });
