@@ -657,6 +657,8 @@ export const AMBIANCE_SETTINGS = {
     /** Déplacement par mètre de hauteur (m), plafonné à `maxHeight`. */
     strength: 0.018,
     maxHeight: 6,
+    /** Les plantes basses (moins de 1,6 m) plient jusqu'à autant de fois plus (herbes, fleurs). */
+    smallPlants: 4,
     /** Balancement (rad/s), rafales lentes (rad/s) et taille des rafales (m par onde). */
     swaySpeed: 1.6,
     gustSpeed: 0.33,
@@ -693,14 +695,14 @@ export const AMBIANCE_SETTINGS = {
     rate: 0.55,
     seconds: 3.6,
     startSize: 0.16,
-    endSize: 0.85,
+    endSize: 1,
     rise: 0.55,
     lift: 0.12,
     /** Le vent pousse la fumée (part de sa direction, m/s²). */
     drift: 0.22,
     spread: 0.06,
     drag: 0.6,
-    opacity: 0.4,
+    opacity: 0.5,
     color: '#dcd8d1',
     /** Une bouche de cheminée: faces de cette case, tournées vers le haut, à moins de `topBand` m du sommet. */
     openingCell: 'shadow',

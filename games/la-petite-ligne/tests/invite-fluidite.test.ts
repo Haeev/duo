@@ -386,7 +386,7 @@ function benchWalk(conditions: Conditions, seed: number, walkFrames: number, sto
 }
 
 describe("invité: réconciliation douce sous un LAN chargé", () => {
-  it('80 ms, 20 ms de gigue, 2 % de pertes: ni saut ni arrêt pendant la marche, arrivée chez l’hôte à l’arrêt', () => {
+  it("80 ms, 20 ms de gigue, 2 % de pertes: ni saut ni arrêt pendant la marche, arrivée chez l'hôte à l'arrêt", () => {
     const { content } = contentAndMap();
     const perFrame = content.settings.movement.walkSpeed / FRAME_HZ;
     const conditions: Conditions = { latencyMs: 80, jitterMs: 20, lossPercent: 2 };

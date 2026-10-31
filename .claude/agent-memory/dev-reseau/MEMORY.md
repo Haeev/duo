@@ -47,6 +47,14 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Electron 45: binaire par `node node_modules/electron/install.js` (aucun script d'installation). Vite regroupe `ws`: ses dépendances natives facultatives deviennent des modules qui lèvent une erreur dans ses `try`, sans conséquence.
 - La Petite Ligne en rendu normal fige sa page plus de 5 s au premier affichage dans le cloud (4 cœurs, deux rendus SwiftShader): le chien de garde de la plateforme clôt la partie. Tests à deux instances: `DUO_TEST_GAME_QUERY=rendu=leger` (version de test). Mesuré: départ donné aux deux à 1 à 3 ms d'écart, messages de jeu reçus en nombre exact des deux côtés.
 
+## Netcode de La Petite Ligne (vérifié le 2026-10-31)
+
+- Pas à 30 Hz, images à 60: tout ce qui est prédit chez l'invité s'affiche entre ses deux derniers pas avec l'`alpha` de la boucle (sinon `0 117 0 117` mm par image). Une vitesse calculée par image vaut alors 0 une image sur deux: le son (`StateWatcher`) remet la phase des pas à zéro et n'en joue aucun, l'animation alterne marche et attente. Toujours dériver vitesse et cadence du pas de simulation.
+- Hôte qui fait autorité et commandes en retard: la commande devinée (la dernière rejouée) doit compter pour le numéro suivant, et la vraie être écartée à son arrivée. Sinon chaque retard donne un pas de trop chez l'hôte, rattrapé par un à-coup chez l'invité. Mesuré à 80 ms, 20 ms de gigue, 2 % de pertes: images corrigées 264 sur 1 050 contre 29, recul à l'arrêt 5 cm contre 0.
+- Correction de prédiction: décaler avant et après du même écart au rejeu (image continue), puis la résorber au plus à 30 % de la vitesse de marche pendant la marche; à l'arrêt, décroissance exponentielle seule.
+- Banc déterministe réutilisable: `createVirtualLink` de `games/la-petite-ligne/tests/invite-fluidite.test.ts` (canaux virtuels sur horloge simulée, JSON et schéma Valibot à l'arrivée, latence, gigue, réémissions de 200 ms dans l'ordre) branché sur `createHost` et `createGuest`; 10 graines de 3,5 s en moins de 2 s.
+- Mesures avant et après: le manager prend des instantanés `wip` pendant les missions. Comparer avec le commit de départ (`git show <départ>:chemin`), jamais avec HEAD. Copie de mesure hors dépôt: imports en chemins absolus, `node_modules` relié à celui du jeu, `vitest run --root <dossier>`.
+
 ## Systèmes (faits lus, à confirmer sur les machines du client)
 
 - macOS, TN3179: autorisation « Réseau local » exigée pour TCP sortant vers le LAN, tout envoi UDP, la connexion d'une socket UDP, la réception de diffusion; pas pour écouter et accepter en TCP ni recevoir de l'UDP unicast. Interfaces VPN hors du « réseau local ». Aucune API pour lire l'état; première opération parfois refusée avant la réponse; connecter une socket UDP à une adresse locale déclenche l'alerte sans trafic. Ne jamais supposer `en0` = Wi-Fi.

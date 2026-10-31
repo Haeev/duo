@@ -231,3 +231,98 @@
 .lpl-hud[data-state='build'] .lpl-tip {
   display: none;
 }
+
+/* Revue I3 (panneaux à 150 %). La hauteur de la fenêtre se lit en rem de l'interface, échelle comprise (requêtes de conteneur). */
+.lpl-ui {
+  container: lpl-ui / size;
+  --lpl-panel-top-band: 4.75rem;
+}
+
+/* Un panneau monte jusque sous l'horloge (une ligne de plus quand elle s'arrête ou quand le train approche). La proposition garde la bande
+   d'origine: à 150 %, la bourse et sa somme réservée passent sous l'horloge et doivent rester lisibles. */
+.lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])),
+.lpl-ui:has(.lpl-clock[data-train='soon']) {
+  --lpl-panel-top-band: 6.5rem;
+}
+
+.lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])[data-train='soon']) {
+  --lpl-panel-top-band: 8.25rem;
+}
+
+.lpl-ui .lpl-panel {
+  container: lpl-panel / inline-size;
+  top: calc(var(--lpl-hud-margin) + var(--lpl-panel-top-band));
+  max-height: calc(100vh - var(--lpl-panel-top-band) - 2 * var(--lpl-hud-margin));
+}
+
+/* À 125 et 150 %, la carte de proposition recouvre le haut de l'objectif: il s'efface le temps de répondre. */
+.lpl-ui:has(.lpl-proposal) .lpl-objective {
+  visibility: hidden;
+}
+
+/* L'en-tête passe à la ligne plutôt que de pousser « Fermer » hors du panneau; dans un panneau étroit, les onglets descendent sous le titre. */
+.lpl-ui .lpl-panel__header {
+  flex-wrap: wrap;
+  row-gap: var(--lpl-space-1);
+}
+
+@container lpl-panel (max-width: 50rem) {
+  .lpl-panel__header > .lpl-tabs {
+    order: 1;
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+}
+
+/* Fenêtre basse (150 %): lignes resserrées, « Reprendre » à côté du bouton, pour voir les quatre lignes de la caisse; nuit et fin resserrées. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-panel__header {
+    padding-block: var(--lpl-space-1);
+  }
+
+  .lpl-panel__body {
+    padding-block: var(--lpl-space-2);
+  }
+
+  .lpl-panel__footer {
+    padding-block: var(--lpl-space-1);
+  }
+
+  .lpl-order__summary {
+    padding-block: var(--lpl-space-1);
+  }
+
+  .lpl-order__action {
+    grid-auto-flow: column;
+    align-items: center;
+    gap: var(--lpl-space-2);
+  }
+
+  .lpl-order__line {
+    min-height: 2.5rem;
+    padding-block: 0.25rem;
+  }
+
+  .lpl-ui .lpl-screen .lpl-sheet {
+    gap: var(--lpl-space-2);
+  }
+
+  .lpl-counter {
+    padding: var(--lpl-space-2);
+  }
+}
+
+/* Écrans plein cadre: centrés quand ils tiennent, lus depuis le haut quand ils débordent (place-items: center coupait le haut). */
+.lpl-ui .lpl-screen {
+  align-items: start;
+  padding: clamp(var(--lpl-space-2), 3vh, var(--lpl-space-5));
+}
+
+.lpl-ui .lpl-screen > * {
+  margin-block: auto;
+}
+
+.lpl-ui .lpl-sheet {
+  gap: clamp(var(--lpl-space-2), 2.5vh, var(--lpl-space-4));
+  padding-block: clamp(var(--lpl-space-3), 4vh, var(--lpl-space-5));
+}

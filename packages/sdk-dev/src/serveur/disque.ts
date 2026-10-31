@@ -28,7 +28,21 @@ async function retry<T>(action: () => Promise<T>): Promise<T> {
   }
 }
 
-async function writeAtomic(path: string, content: string): Promise<void> {
+// Les écritures d'un même fichier passent l'une après l'autre: deux sauvegardes simultanées
+// partageaient le même fichier temporaire (bug LPL-R07), comme `safe-write.ts` de Duo l'évite.
+const writeQueues = new Map<string, Promise<void>>();
+
+function writeAtomic(path: string, content: string): Promise<void> {
+  const previous = writeQueues.get(path) ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(() => writeAtomicNow(path, content));
+  writeQueues.set(path, next);
+  void next.finally(() => {
+    if (writeQueues.get(path) === next) writeQueues.delete(path);
+  }).catch(() => undefined);
+  return next;
+}
+
+async function writeAtomicNow(path: string, content: string): Promise<void> {
   const temporary = `${path}.tmp`;
   const handle = await open(temporary, 'w');
   try {

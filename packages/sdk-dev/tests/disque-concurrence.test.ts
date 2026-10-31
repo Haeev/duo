@@ -2,8 +2,7 @@
 // pendant l'endurance à deux navigateurs, `servir` a journalisé « Erreur sur PUT /api/sauvegardes/1:
 // ENOENT ... rename emplacement-1.json.tmp -> emplacement-1.json ». Deux écritures du même emplacement
 // partagent le même fichier temporaire: la seconde le tronque pendant que la première le renomme, puis
-// ne le trouve plus. `it.fails` garde la CI verte tant que le bug est ouvert: une fois corrigé, ce test
-// échoue, remplacer `it.fails` par `it`.
+// ne le trouve plus. Corrigé par une file d'écriture par fichier dans `disque.ts`.
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -17,7 +16,7 @@ afterEach(async () => {
 });
 
 describe('sauvegardes simultanées', () => {
-  it.fails('deux écritures du même emplacement en même temps réussissent, l’une des deux dernières reste', async () => {
+  it('deux écritures du même emplacement en même temps réussissent, l’une des deux dernières reste', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'duo-sdk-dev-concurrence-'));
     dirs.push(dir);
     const store = createDiskStore(dir);

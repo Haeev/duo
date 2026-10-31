@@ -146,7 +146,7 @@ export interface WorldState {
   scripts: ScriptState[];
   /** Prochain identifiant unique (meubles, objets au sol, propositions, notifications). */
   nextId: number;
-  /** Commande en cours: index dans `reglages.order.trains` (elle passe à la suivante au lever du jour qui suit le paiement). */
+  /** Commande en cours: index dans `reglages.order.trains` (elle passe à la suivante dès le paiement, au départ du train; la caisse rouvre au matin suivant). */
   orderIndex: number;
   /** Résultat de la commande en cours, une fois payée au départ du train (jusqu'au matin suivant). */
   orderResult: OrderResult | null;

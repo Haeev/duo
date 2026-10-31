@@ -127,7 +127,9 @@ if (uWindStrength > 0.0) {
     if (windKind > 0.75) {
       float sway = sin(uAmbTime * uWindParams.x + windPhase) + 0.35 * sin(uAmbTime * uWindParams.x * 2.3 + windPhase * 1.7);
       float height = clamp(windWorld.y - windFoot, 0.0, uWindCloth.z);
-      vec2 push = uWindDir * (0.6 + 0.4 * sway) * gust * height * uWindStrength;
+      // Les petites plantes (herbes, fleurs, buissons bas) plient plus que les arbres.
+      float bend = 1.0 + ${AMBIANCE_SETTINGS.wind.smallPlants.toFixed(2)} * (1.0 - smoothstep(0.4, 1.6, height));
+      vec2 push = uWindDir * (0.6 + 0.4 * sway) * gust * height * bend * uWindStrength;
       windPush = vec3(push.x, 0.0, push.y);
     } else {
       float flutter = sin(uAmbTime * uWindCloth.y + windWorld.x * 3.1 + windWorld.z * 2.3);
