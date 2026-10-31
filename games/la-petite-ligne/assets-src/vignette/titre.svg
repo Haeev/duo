@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+  <!--
+    Titre de la vignette de La Petite Ligne, posé sur la capture par composer.cjs.
+    Billet de train en papier (jetons de l'interface: papier #fbf6e9, bois profond #5c3d24,
+    filet #b89a6e, encre #2a2522), titre en Fraunces, axe SOFT à 100, graisse 700, comme
+    l'écran titre du jeu. La police est chargée par la page de composition
+    (@fontsource-variable/fraunces/soft.css): ouvert seul, ce fichier retombe sur Georgia.
+    Repère de 640 x 360, la taille de public/vignette.png.
+  -->
+  <g id="billet" transform="translate(24 266)">
+    <path
+      d="M6,0 H382 A6,6 0 0 1 388,6 V28 A8,8 0 0 0 388,44 V66 A6,6 0 0 1 382,72 H6 A6,6 0 0 1 0,66 V44 A8,8 0 0 0 0,28 V6 A6,6 0 0 1 6,0 Z"
+      transform="translate(0 3)"
+      fill="#2a2522"
+      fill-opacity="0.5"
+    />
+    <path
+      d="M6,0 H382 A6,6 0 0 1 388,6 V28 A8,8 0 0 0 388,44 V66 A6,6 0 0 1 382,72 H6 A6,6 0 0 1 0,66 V44 A8,8 0 0 0 0,28 V6 A6,6 0 0 1 6,0 Z"
+      fill="#fbf6e9"
+      stroke="#5c3d24"
+      stroke-width="2.5"
+    />
+    <path
+      d="M8,5 H380 A3,3 0 0 1 383,8 V24 A13,13 0 0 0 383,48 V64 A3,3 0 0 1 380,67 H8 A3,3 0 0 1 5,64 V48 A13,13 0 0 0 5,24 V8 A3,3 0 0 1 8,5 Z"
+      fill="none"
+      stroke="#b89a6e"
+      stroke-width="1.25"
+    />
+    <text
+      x="194"
+      y="50"
+      text-anchor="middle"
+      fill="#2a2522"
+      font-family="'Fraunces Variable', Fraunces, Georgia, serif"
+      font-size="44"
+      font-weight="700"
+      style="font-variation-settings: 'SOFT' 100"
+    >La Petite Ligne</text>
+  </g>
+</svg>

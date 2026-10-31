@@ -50,6 +50,13 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
 /** Pourquoi un meuble ne tient pas là (clé `placement_<raison>` de `textes.json`), ou `null` s'il tient. */
 export type PlacementProblem = 'outside' | 'wall' | 'overlap' | 'occupied';
 
+const PROBLEM_KEYS: Record<PlacementProblem, string> = {
+  outside: 'placement_outside',
+  wall: 'placement_wall',
+  overlap: 'placement_overlap',
+  occupied: 'placement_occupied',
+};
+
 /** Le meuble tient-il là ? Dans la pièce, sans chevaucher un autre meuble (sauf tapis) ni un personnage. */
 export function canPlace(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null): boolean {
   return placementProblem(sim, item, cell, rotation, ignore) === null;
@@ -101,11 +108,17 @@ export function updatePlacement(sim: Sim, c: Character): void {
   const cell = previewCell(c, rotatedSize(def.footprint, rotation));
   const problem = placementProblem(sim, item, cell, rotation);
   const valid = problem === null;
+  // Sans texte dans `textes.json`, l'interface montre son message général.
+  const blocked = problem === null ? null : (sim.content.texts.messages[PROBLEM_KEYS[problem]] ?? null);
   const before = c.placement;
-  if (before?.item !== item || before.cell.cx !== cell.cx || before.cell.cy !== cell.cy || before.rotation !== rotation || before.valid !== valid) {
-    const key = problem === null ? null : `placement_${problem}`;
-    // Sans texte dans `textes.json`, l'interface montre son message général.
-    const blocked = key === null ? null : (sim.content.texts.messages[key] ?? null);
+  if (
+    before?.item !== item ||
+    before.cell.cx !== cell.cx ||
+    before.cell.cy !== cell.cy ||
+    before.rotation !== rotation ||
+    before.valid !== valid ||
+    before.blocked !== blocked
+  ) {
     c.placement = { item, cell, rotation, valid, blocked };
     sim.runtime.changed = true;
     if (before === null) queueHint(sim, c.id, { on: 'holding_furniture' });

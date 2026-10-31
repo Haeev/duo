@@ -91,7 +91,7 @@ Un seul flux, le même chez l'hôte et chez l'invité: `view.onEvent((event) => 
 |---|---|
 | pas selon le sol | pas d'événement: `characters[i].speed > 0` et `map.ground[cy * map.width + cx]` sous `characters[i].pos` |
 | bêcher, semer, arroser, arrosoir vide, remplir | `tilled`, `sowed`, `watered`, `can_empty`, `refilled` |
-| récolte, qualité « belle », déjà pris | `harvested` (`quality`), `already_taken` |
+| récolte, qualité « belle », déjà pris | `harvested` (`quality`), `already_taken` (case récoltée ou objet ramassé par l'autre à l'instant, à la touche comme au clic) |
 | hache, arbre qui tombe, bêche de l'énigme | `chop` (`felled`), `dig` (`found`) |
 | marteau, élément fini, construction finie | `build_progress` (début du travail; le marteau dure tant que `action.kind === 'hammer'`), `element_built`, `construction_done` |
 | poutre | `beam_lifted`, `beam_dropped`, `beam_placed` |

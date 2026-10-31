@@ -19,8 +19,9 @@ export function contentAndMap(): { content: Content; map: GameMap } {
   return cached;
 }
 
-export function newSim(seed = SEED): Sim {
-  const { content, map } = contentAndMap();
+/** Monde neuf; `content` remplace le contenu du jeu (variante d'un fichier pour un test). */
+export function newSim(seed = SEED, content: Content = contentAndMap().content): Sim {
+  const { map } = contentAndMap();
   return createWorld(content, map, seed, [
     { id: 'membre-a', name: 'Camille', color: '#e07a5f' },
     { id: 'membre-b', name: 'Sacha', color: '#3d85c6' },
