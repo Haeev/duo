@@ -126,7 +126,10 @@ def main() -> int:
     for orphelin in sorted(presents - attendus):
         erreurs.append(f"{orphelin}: présent mais absent de sons.json")
 
-    fichiers = sorted(SORTIE.rglob("*.ogg")) + sorted(DESIGN.rglob("*.m4a"))
+    # Seulement les copies produites par generer.py (d'autres membres déposent leurs enregistrements
+    # dans d'autres sous-dossiers de design/son/la-petite-ligne/).
+    copies = [DESIGN / "ecoute.m4a"] + sorted((DESIGN / "musiques").glob("*.m4a"))
+    fichiers = sorted(SORTIE.rglob("*.ogg")) + copies
     lignes = []
     for f in fichiers:
         mesure = mesurer_ebur128(f)
@@ -168,7 +171,7 @@ def main() -> int:
         ecrivain.writerows(lignes)
 
     poids_jeu = sum(f.stat().st_size for f in SORTIE.rglob("*") if f.is_file())
-    poids_design = sum(f.stat().st_size for f in DESIGN.rglob("*") if f.is_file())
+    poids_design = sum(f.stat().st_size for f in copies)
     print(f"\n{len(lignes)} fichiers mesurés, détail dans {sortie.relative_to(RACINE_DEPOT)}")
     print(f"Poids du jeu (assets/son): {poids_jeu / 1024 / 1024:.2f} Mo; copies pour le client: "
           f"{poids_design / 1024 / 1024:.2f} Mo")

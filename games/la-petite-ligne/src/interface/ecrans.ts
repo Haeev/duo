@@ -652,6 +652,7 @@ export class SessionEndScreen implements Layer {
   readonly closable = false;
   readonly letterNavigation = false;
   private readonly host: UiHost;
+  private readonly overline: HTMLParagraphElement;
   private readonly lead: HTMLParagraphElement;
   private readonly self: PlayerCard;
   private readonly other: PlayerCard;
@@ -661,6 +662,7 @@ export class SessionEndScreen implements Layer {
     const { ctx } = host;
     const x = ctx.texts.extra.night;
     const titleId = uid('fin-seance');
+    this.overline = el('p', { class: 'lpl-overline' });
     this.lead = el('p', { class: 'lpl-sheet__lead' });
     this.self = new PlayerCard(host, 'self', false);
     this.other = new PlayerCard(host, 'other', false);
@@ -668,7 +670,7 @@ export class SessionEndScreen implements Layer {
       'night',
       titleId,
       sheet('44rem', [
-        el('div', {}, [el('p', { class: 'lpl-overline' }, [icon('ui-moon')]), el('h1', { class: 'lpl-sheet__title', id: titleId, text: ctx.t(x.sessionOver) })]),
+        el('div', {}, [this.overline, el('h1', { class: 'lpl-sheet__title', id: titleId, text: ctx.t(x.sessionOver) })]),
         this.lead,
         el('div', { class: 'lpl-players', 'aria-label': x.choicesLabel }, [this.self.root, this.other.root]),
         el('p', { role: 'status' }, [icon('ui-check'), ` ${ctx.t(x.saved)}`]),
@@ -680,6 +682,13 @@ export class SessionEndScreen implements Layer {
     const { ctx } = this.host;
     const x = ctx.texts.extra.night;
     const time = hourLabel(ctx.content.settings.clock.dayStart, ctx.texts.game.ui.hud.time);
+    // Le matin est déjà venu dans la simulation: la séance finit sur la veille.
+    const ended = Math.max(1, world.clock.day - 1);
+    if (this.overline.dataset.day !== String(ended)) {
+      this.overline.dataset.day = String(ended);
+      clear(this.overline);
+      this.overline.append(icon('ui-moon'), ` ${ctx.t(x.overline, { weekday: weekdayOf(ended, ctx.texts.weekdays), day: ended })}`);
+    }
     setText(this.lead, ctx.t(x.over, { weekday: weekdayOf(world.clock.day, ctx.texts.weekdays), day: world.clock.day, time }));
     const done = (): HTMLElement => chip(ctx.t(x.chipFinish), 'ready', 'ui-check');
     this.self.set(nameOf(world, ctx.me), ctx.texts.extra.common.you, done());

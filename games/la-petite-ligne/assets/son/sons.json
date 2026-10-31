@@ -1285,6 +1285,156 @@
       ],
       "momentaryMaxLufs": -24.0
     },
+    "fishing-cast": {
+      "event": "Pêche: lancer la ligne (événement cast)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "effets/fishing-cast-1.ogg",
+        "effets/fishing-cast-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        885,
+        884
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "joué au pêcheur; fishing-splash suit 0,55 s plus tard, au bouchon (event.at)"
+    },
+    "fishing-splash": {
+      "event": "Pêche: le bouchon se pose sur l'eau (« plouf »)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "effets/fishing-splash-1.ogg",
+        "effets/fishing-splash-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 6.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 40.0,
+        "cullBeyondM": 40.0
+      },
+      "durationMs": [
+        264,
+        264
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "au bouchon, 0,55 s après fishing-cast"
+    },
+    "fishing-bite": {
+      "event": "Pêche: touche, le bouchon plonge (« ploc », événement bite)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/fishing-bite-1.ogg",
+        "effets/fishing-bite-2.ogg",
+        "effets/fishing-bite-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 6.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 40.0,
+        "cullBeyondM": 40.0
+      },
+      "durationMs": [
+        118,
+        118,
+        118
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "au bouchon; signal qu'il faut ferrer, priorité 2"
+    },
+    "fishing-catch": {
+      "event": "Pêche: le poisson sort de l'eau (éclaboussure, frétillement; événement caught)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/fishing-catch-1.ogg",
+        "effets/fishing-catch-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 6.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 40.0,
+        "cullBeyondM": 40.0
+      },
+      "durationMs": [
+        1164,
+        1141
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "au bouchon (ou au bord de l'eau devant le pêcheur); remplace harvest et quality-fine"
+    },
+    "fishing-escape": {
+      "event": "Pêche: le poisson s'échappe (« flop », événement escaped)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "effets/fishing-escape.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 6.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 40.0,
+        "cullBeyondM": 40.0
+      },
+      "durationMs": [
+        603
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "au bouchon; doux, jamais une sanction"
+    },
     "hen": {
       "event": "Gloussements des poules",
       "bus": "effects",
@@ -1636,7 +1786,7 @@
       },
       "playFromSeconds": 0.5,
       "integratedLufs": -30.0,
-      "note": "non placé; plus fort près de la lisière (x 50 à 64, y 36 à 48)"
+      "note": "non placé; plus fort près de la lisière: zone forest_edge de donnees/cartes/halte.json"
     },
     "birds-morning": {
       "event": "Oiseaux du matin (6 h à 12 h, plus rares l'après-midi)",

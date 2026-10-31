@@ -523,6 +523,88 @@ def _poule(v: int, rng: np.random.Generator) -> np.ndarray:
     return y
 
 
+# --- Pêche au gué ----------------------------------------------------------------------------
+
+def _lancer(v: int, rng: np.random.Generator) -> np.ndarray:
+    """La canne fouette l'air, la ligne siffle, le moulinet se dévide."""
+    duree = 0.95
+    y = dsp.toile(duree)
+    n = dsp.n_ech(0.4)
+    centre = (lambda u: 700 + 2600 * np.sin(np.pi * min(u / 0.4, 1.0)) ** 1.5) if v == 0 else \
+        (lambda u: 900 + 2200 * np.sin(np.pi * min(u / 0.36, 1.0)) ** 1.2)
+    fouet = dsp.pb_variable(rng.standard_normal(n), centre, type_="band", q_bande=1.6)
+    fouet *= dsp.env_points(n, [(0, 0), (0.12, 0.5), (0.2, 1.0), (0.4, 0)])
+    dsp.poser(y, fouet * 0.8, 0.0)
+    m = dsp.n_ech(0.35)
+    t = np.arange(m) / SR
+    fil = dsp.sinus_glisse(np.linspace(3300, 2600, m) * rng.uniform(0.97, 1.03)) * dsp.env_ar(m, 0.05, 0.2)
+    dsp.poser(y, fil * 0.06, 0.12)
+    # Moulinet: cliquetis qui ralentit pendant que la ligne file.
+    t_clic = 0.16
+    cadence = 46.0
+    while t_clic < duree - 0.05:
+        dsp.poser(y, ins.metal(rng, rng.uniform(4200, 5200), 0.02, t60=0.012, rapports=(1.0, 1.6), amps=(1.0, 0.4))
+                  * 0.07 * (1 - t_clic / duree), t_clic)
+        t_clic += 1.0 / cadence
+        cadence *= 0.965
+    return y
+
+
+def _plouf(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le bouchon se pose sur l'eau: petit choc, une bulle ronde, deux gouttes qui retombent."""
+    y = dsp.toile(0.6)
+    dsp.poser(y, ins.bruit_bref(rng, 0.05, 300, 3000, 0.012, 0.001) * 0.5, 0.0)
+    dsp.poser(y, dsp.bulle(rng, (460, 540)[v % 2] * rng.uniform(0.97, 1.03), 0.045, 1.0) * 1.0, 0.004)
+    for t in (0.09 + rng.uniform(0, 0.04), 0.17 + rng.uniform(0, 0.06)):
+        dsp.poser(y, dsp.bulle(rng, rng.uniform(1500, 2600), rng.uniform(0.004, 0.008)) * 0.3, t)
+    return y
+
+
+def _touche(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le bouchon plonge: un « ploc » bref et rond, signal qu'il faut ferrer."""
+    y = dsp.toile(0.3)
+    f0 = (900, 1060, 1200)[v % 3]
+    dsp.poser(y, dsp.bulle(rng, f0, 0.018, 0.9), 0.0)
+    dsp.poser(y, ins.bruit_bref(rng, 0.03, 600, 3500, 0.006, 0.0008) * 0.25, 0.0)
+    dsp.poser(y, dsp.bulle(rng, f0 * 1.9, 0.005) * 0.15, 0.06)
+    return y
+
+
+def _prise(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le poisson sort de l'eau: éclaboussure, pluie de gouttes, puis il frétille."""
+    duree = 1.5
+    y = dsp.toile(duree)
+    n = dsp.n_ech(0.25)
+    eclab = dsp.pbande(rng.standard_normal(n), 250, 5000) * dsp.env_exp(n, 0.06, 0.004)
+    dsp.poser(y, eclab * 0.7, 0.0)
+    dsp.poser(y, dsp.grains(0.15, 400, lambda r: dsp.bulle(r, r.uniform(400, 2500), r.uniform(0.003, 0.012)) *
+                            r.uniform(0.2, 0.7), rng, enveloppe=lambda u: np.exp(-u / 0.06)), 0.0)
+    dsp.poser(y, dsp.grains(0.5, 120, lambda r: dsp.bulle(r, r.uniform(1200, 3500), r.uniform(0.003, 0.007)) *
+                            r.uniform(0.1, 0.35), rng, enveloppe=lambda u: np.exp(-u / 0.2)), 0.12)
+    # Frétillement: petites claques mouillées, de plus en plus faibles.
+    t = 0.45
+    k = 0
+    while t < duree - 0.1 and k < 9:
+        claque = ins.bruit_bref(rng, 0.03, 500, 4500, 0.006, 0.0005) * 0.5 + \
+            np.pad(ins.bruit_bref(rng, 0.02, 120, 400, 0.008) * 0.4, (0, dsp.n_ech(0.01)))
+        dsp.poser(y, claque * (1 - k / 11) * rng.uniform(0.7, 1.0), t)
+        t += rng.uniform(0.055, 0.085) * (1 + 0.06 * k)
+        k += 1
+    return y
+
+
+def _echappe(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le poisson s'échappe: la ligne se détend, le bouchon remonte (« blup »), quelques rides."""
+    y = dsp.toile(0.8)
+    n = dsp.n_ech(0.22)
+    detente = dsp.pb_variable(rng.standard_normal(n), lambda u: 2500 - 6000 * u, type_="band", q_bande=1.2)
+    dsp.poser(y, detente * dsp.env_points(n, [(0, 0), (0.04, 1.0), (0.22, 0)]) * 0.3, 0.0)
+    dsp.poser(y, dsp.bulle(rng, 620, 0.03, 1.4) * 0.8, 0.16)
+    for t in (0.3, 0.42, 0.55):
+        dsp.poser(y, dsp.bulle(rng, rng.uniform(1300, 2000), 0.006) * 0.18, t + rng.uniform(0, 0.03))
+    return y
+
+
 # --- Catalogue -----------------------------------------------------------------------------
 
 def sons() -> list[Son]:
@@ -608,6 +690,17 @@ def sons() -> list[Son]:
         Son("stove-loop", "Le réchaud qui mijote (boucle)", "effets", "effects", _rechaud_boucle, 1, -30.0, 4, 0.0,
             0.0, "pres", boucle=True),
         Son("eat", "Manger (« croque »)", "effets", "effects", _manger, 2, -24.0, 3, 0.06, 1.0, "pres"),
+        Son("fishing-cast", "Pêche: lancer la ligne (événement cast)", "effets", "effects", _lancer, 2, -24.0, 3, 0.05,
+            1.0, "pres", note="joué au pêcheur; fishing-splash suit 0,55 s plus tard, au bouchon (event.at)"),
+        Son("fishing-splash", "Pêche: le bouchon se pose sur l'eau (« plouf »)", "effets", "effects", _plouf, 2, -23.0, 3,
+            0.05, 1.0, "bouchon", note="au bouchon, 0,55 s après fishing-cast"),
+        Son("fishing-bite", "Pêche: touche, le bouchon plonge (« ploc », événement bite)", "effets", "effects", _touche, 3,
+            -21.0, 2, 0.03, 0.5, "bouchon", note="au bouchon; signal qu'il faut ferrer, priorité 2"),
+        Son("fishing-catch", "Pêche: le poisson sort de l'eau (éclaboussure, frétillement; événement caught)", "effets",
+            "effects", _prise, 2, -20.0, 2, 0.04, 1.0, "bouchon",
+            note="au bouchon (ou au bord de l'eau devant le pêcheur); remplace harvest et quality-fine"),
+        Son("fishing-escape", "Pêche: le poisson s'échappe (« flop », événement escaped)", "effets", "effects", _echappe, 1,
+            -25.0, 3, 0.04, 0.5, "bouchon", note="au bouchon; doux, jamais une sanction"),
         Son("hen", "Gloussements des poules", "effets", "effects", _poule, 3, -24.0, 3, 0.08, 2.0, "moyen",
             note="tirer au hasard toutes les 4 à 15 s par poule, plus souvent quand on les nourrit", passe_haut=120),
     ]

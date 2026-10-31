@@ -404,9 +404,11 @@ export const AMBIANCE_SETTINGS = {
     wetWalls: 0.35,
     /** Flaques: taille du motif (m), seuil du bruit (plus haut, moins de flaques), assombrissement, reflet du ciel. */
     puddleSize: 7,
-    puddleThreshold: 0.6,
-    puddleDarken: 0.55,
-    puddleReflection: 0.55,
+    puddleThreshold: 0.63,
+    puddleDarken: 0.6,
+    puddleReflection: 0.1,
+    /** Léger reflet du ciel sur tout ce qui est mouillé. */
+    wetSheen: 0.015,
     /** Les flaques ne se forment que sous cette hauteur (m): sols, pas les toits. */
     puddleMaxHeight: 0.5,
   },
@@ -478,9 +480,11 @@ export const AMBIANCE_SETTINGS = {
     foamSpeed: 0.9,
     foamBands: 9,
     foamAmount: 0.75,
-    /** Étincelles du soleil (seuil du bruit et force), et la part de la lune la nuit. */
-    glintThreshold: 0.82,
-    glintStrength: 2.2,
+    /** Étincelles du soleil: finesse du motif (fois les rides), vitesse, seuil du bruit, force; et la part de la lune la nuit. */
+    glintScale: 3.5,
+    glintSpeed: 2.5,
+    glintThreshold: 0.8,
+    glintStrength: 2.4,
     moonGlint: 0.35,
     /** Vaguelettes de la surface (m) et leur vitesse. */
     waveAmplitude: 0.02,
@@ -488,7 +492,8 @@ export const AMBIANCE_SETTINGS = {
     waveLength: 3.2,
     /** Lame d'eau sur les galets du gué: hauteur au-dessus du gravier et opacité. */
     fordLift: 0.05,
-    fordOpacity: 0.45,
+    fordOpacity: 0.4,
+    fordFoam: 0.3,
     /** Rugosité de la surface (reflet du soleil). */
     roughness: 0.14,
   },

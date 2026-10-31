@@ -6,7 +6,7 @@ import { characterOf, longTasks, positionOf, startDuo, walkAlong } from './sonde
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
-  await target.waitFor();
+  await target.waitFor({ timeout: 90_000 });
   await target.evaluate((node) => {
     (node as HTMLElement).click();
   });

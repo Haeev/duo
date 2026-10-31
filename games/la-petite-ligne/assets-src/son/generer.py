@@ -380,6 +380,7 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
          "coins"],
         ["ping-self", "ping-peer", "notify", "journal-open", "journal-new", "purchase-proposal", "purchase-accept",
          "purchase-decline", "ui-click", "tool-switch"],
+        ["fishing-cast", "fishing-splash", "fishing-bite", "fishing-catch", "fishing-escape"],
         ["duo-hop", "duo-carry-loop", "duo-done", "stove-light", "stove-loop", "eat", "hen", "sleep", "wake-rooster",
          "wake"],
         ["talk-odette", "talk-firmin", "talk-lucie", "talk-basile", "talk-jeanne"],

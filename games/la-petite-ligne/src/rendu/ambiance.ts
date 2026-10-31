@@ -127,12 +127,22 @@ export class AmbiancePart implements ExtensionPart {
     this.patchCharacters();
 
     const waterSettings = AMBIANCE_SETTINGS.water;
-    const river = createWaterMaterial(this.field, this.surfaces, waterSettings.opacityDeep);
+    const river = createWaterMaterial(
+      this.field,
+      this.surfaces,
+      waterSettings.opacityDeep,
+      waterSettings.foamAmount,
+    );
     resources.track(river.material);
     hooks.water.material = river.material;
     this.water.push(river.uniforms);
     if (this.field.fordCells.length > 0) {
-      const ford = createWaterMaterial(this.field, this.surfaces, waterSettings.fordOpacity);
+      const ford = createWaterMaterial(
+        this.field,
+        this.surfaces,
+        waterSettings.fordOpacity,
+        waterSettings.fordFoam,
+      );
       resources.track(ford.material);
       const gravel = RENDER_SETTINGS.terrain.heights.gravel;
       const mesh = new Mesh(

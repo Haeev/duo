@@ -16,6 +16,7 @@ import {
   MeshStandardMaterial,
   Vector2,
   Vector3,
+  Vector4,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
 import type { TerrainField } from './champs';
@@ -30,10 +31,11 @@ export interface WaterUniforms {
   uDeep: { value: Color };
   uFoam: { value: Color };
   uFlow: { value: Vector2 };
-  uWaterParams: { value: [number, number, number, number] };
-  uFoamParams: { value: [number, number, number, number] };
+  uWaterParams: { value: Vector4 };
+  uFoamParams: { value: Vector4 };
   uGlintColor: { value: Color };
   uGlintLevel: { value: number };
+  uGlintParams: { value: Vector3 };
   uWave: { value: Vector3 };
 }
 
@@ -63,6 +65,7 @@ uniform vec4 uWaterParams; // 1 / taille des rides, reflet, reflet selon les rid
 uniform vec4 uFoamParams;  // largeur, vitesse, nombre de vaguelettes, force
 uniform vec3 uGlintColor;
 uniform float uGlintLevel;
+uniform vec3 uGlintParams; // finesse, vitesse, seuil
 `;
 
 /** Après `color_fragment`: couleur de l'eau, reflet, écume, transparence. */
@@ -83,7 +86,11 @@ float foam = nearBank * smoothstep(0.35, 0.75, beat * 0.6 + ripple2 * 0.6) * uFo
 diffuseColor.rgb = mix(diffuseColor.rgb, uFoam, foam);
 diffuseColor.a = mix(uWaterParams.w, diffuseColor.a, smoothstep(0.0, 0.6, waterDepth));
 diffuseColor.a = max(diffuseColor.a, foam);
-float waterGlint = smoothstep(${AMBIANCE_SETTINGS.water.glintThreshold.toFixed(3)}, 1.0, ripple1 * ripple2 * 1.9) * uGlintLevel;
+// Étincelles: deux motifs fins qui se croisent vite; leur produit ne dépasse le seuil qu'en petits points fugaces.
+vec2 glintUv = rippleUv * uGlintParams.x;
+float glintA = texture(uAmbNoise, glintUv + uFlow * uAmbTime * uGlintParams.y).r;
+float glintB = texture(uAmbNoise, glintUv.yx * 1.31 - uFlow * uAmbTime * uGlintParams.y + 0.53).r;
+float waterGlint = smoothstep(uGlintParams.z, 1.0, glintA * glintB * 1.8) * uGlintLevel * (1.0 - foam);
 `;
 
 /** Après `lights_fragment_end`: ombres des nuages, lumières de sol, étincelles. */
@@ -100,8 +107,11 @@ export function createWaterMaterial(
   field: TerrainField,
   surfaces: SurfaceUniforms,
   opacity: number,
+  foamAmount: number,
 ): { material: MeshStandardMaterial; uniforms: WaterUniforms } {
   const w = AMBIANCE_SETTINGS.water;
+  // Transparence du bord à l'échelle de celle du large (lame d'eau du gué plus claire).
+  const shallowOpacity = w.opacityShallow * (opacity / w.opacityDeep);
   const uniforms: WaterUniforms = {
     uField: { value: field.texture },
     uFieldRect: { value: field.rect },
@@ -109,10 +119,13 @@ export function createWaterMaterial(
     uDeep: { value: new Color(w.deep) },
     uFoam: { value: new Color(w.foam) },
     uFlow: { value: new Vector2(w.flow[0] / w.rippleSize, w.flow[1] / w.rippleSize) },
-    uWaterParams: { value: [1 / w.rippleSize, w.reflection, w.reflectionRipple, w.opacityShallow] },
-    uFoamParams: { value: [w.foamWidth, w.foamSpeed, w.foamBands, w.foamAmount] },
+    uWaterParams: {
+      value: new Vector4(1 / w.rippleSize, w.reflection, w.reflectionRipple, shallowOpacity),
+    },
+    uFoamParams: { value: new Vector4(w.foamWidth, w.foamSpeed, w.foamBands, foamAmount) },
     uGlintColor: { value: new Color() },
     uGlintLevel: { value: 0 },
+    uGlintParams: { value: new Vector3(w.glintScale, w.glintSpeed, w.glintThreshold) },
     uWave: { value: new Vector3(w.waveAmplitude, w.waveSpeed, w.waveLength) },
   };
   const material = new MeshStandardMaterial({

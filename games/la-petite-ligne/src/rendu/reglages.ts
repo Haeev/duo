@@ -369,6 +369,12 @@ export const RENDER_SETTINGS = {
   train: {
     /** Distance parcourue pendant l'entrée et le départ (m). */
     slideDistance: 70,
+    /**
+     * Côté de la voie par où le train arrive et repart: -1 l'ouest (la carte:
+     * « le train arrive et repart par là »), comme `departureDirection` du son
+     * (`src/audio/reglages.ts`).
+     */
+    sideDirection: -1 as -1 | 1,
     wheelRadius: 0.42,
     /** Voie: rangée de la carte et décalage des voitures depuis `train_stop`. */
     carSpacing: 0.25,

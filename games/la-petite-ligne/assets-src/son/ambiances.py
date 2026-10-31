@@ -236,7 +236,7 @@ def sons() -> list[Son]:
             note="plusieurs sources réparties le long de la rivière (une tous les 15 m), chacune à son propre "
                  "décalage de départ"),
         Son("wind", "Vent léger dans les arbres", "ambiance", "ambience", _vent, 1, -30.0, 4, 0.0, 0.0, None, boucle=True,
-            passe_haut=80, note="non placé; plus fort près de la lisière (x 50 à 64, y 36 à 48)"),
+            passe_haut=80, note="non placé; plus fort près de la lisière: zone forest_edge de donnees/cartes/halte.json"),
         Son("birds-morning", "Oiseaux du matin (6 h à 12 h, plus rares l'après-midi)", "ambiance", "ambience",
             _oiseaux, 1, -28.0, 4, 0.0, 0.0, None, boucle=True, passe_haut=500,
             note="se tait par temps de pluie et à partir de 19 h"),

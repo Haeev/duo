@@ -130,6 +130,14 @@ export async function startDuo(
   await guest.getByRole('button', { name: 'Rejoindre' }).click();
   await expect(host.locator('.vue')).toHaveAttribute('data-statut', 'running', { timeout: 60_000 });
   await expect(guest.locator('.vue')).toHaveAttribute('data-statut', 'running', { timeout: 60_000 });
+  // Le chien de garde de la plateforme peut arrêter la partie (« Le jeu ne répond plus »): le dire.
+  for (const page of [host, guest]) {
+    void page
+      .locator('.vue[data-statut="stopped"], .vue[data-statut="error"]')
+      .waitFor({ timeout: 0 })
+      .then(() => errors.push(`partie arrêtée: ${page === host ? 'hôte' : 'invité'}`))
+      .catch(() => undefined);
+  }
   return {
     mac,
     pc,

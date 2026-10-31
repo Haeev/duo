@@ -39,6 +39,7 @@ export interface SurfaceUniforms {
   uLightDir: { value: Vector3 };
   uWet: { value: number };
   uWetParams: { value: Vector4 };
+  uWetSheen: { value: number };
   uPuddleParams: { value: Vector4 };
   uReflection: { value: Color };
   uGlow: { value: number };
@@ -59,7 +60,8 @@ export function createSurfaceUniforms(noise: Texture): SurfaceUniforms {
     uCloudSoft: { value: s.cloudSoftness },
     uLightDir: { value: new Vector3(0, 1, 0) },
     uWet: { value: 0 },
-    uWetParams: { value: new Vector4(s.wetDarken, s.wetRoughness, s.wetWalls, 0) },
+    uWetParams: { value: new Vector4(s.wetDarken, s.wetRoughness, s.wetWalls, s.puddleReflection) },
+    uWetSheen: { value: s.wetSheen },
     uPuddleParams: {
       value: new Vector4(1 / s.puddleSize, s.puddleThreshold, s.puddleDarken, s.puddleMaxHeight),
     },
@@ -97,7 +99,8 @@ uniform float uCloudShadow;
 uniform float uCloudSoft;
 uniform vec3 uLightDir;
 uniform float uWet;
-uniform vec4 uWetParams;
+uniform vec4 uWetParams;   // assombrissement, rugosité, part des murs, reflet des flaques
+uniform float uWetSheen;
 uniform vec4 uPuddleParams;
 uniform vec3 uReflection;
 uniform float uGlow;
@@ -162,7 +165,7 @@ const FRAGMENT_LIGHT = /* glsl */ `
 float ambCloud = ambCloudLight(vAmbWorld);
 reflectedLight.directDiffuse *= ambCloud;
 reflectedLight.directSpecular *= ambCloud;
-reflectedLight.indirectSpecular += uReflection * (ambPuddle * uPuddleParams.z + ambWet * 0.04);
+reflectedLight.indirectSpecular += uReflection * (ambPuddle * uWetParams.w + ambWet * uWetSheen);
 reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, ambNormal) * material.diffuseContribution;
 `;
 

@@ -183,6 +183,7 @@ export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry
   }
   const out = [...seen.values()];
   for (const e of out) {
+    e.name = itemTitle(ctx.content.items[e.item], e.count, e.item);
     e.unit = grocerPrice(ctx, e.item, e.quality, 1);
     e.total = grocerPrice(ctx, e.item, e.quality, e.count);
   }
@@ -311,9 +312,11 @@ export function stackEntries(ctx: UiContext, stacks: readonly (Readonly<ItemStac
     const key = `${s.item}:${s.quality}`;
     const e = out.get(key);
     if (e !== undefined) e.count += s.count;
-    else out.set(key, { item: s.item, quality: s.quality, icon: itemIcon(ctx, s.item), name: itemTitle(def, 2, s.item), count: s.count });
+    else out.set(key, { item: s.item, quality: s.quality, icon: itemIcon(ctx, s.item), name: '', count: s.count });
   }
-  return [...out.values()];
+  const list = [...out.values()];
+  for (const e of list) e.name = itemTitle(ctx.content.items[e.item], e.count, e.item);
+  return list;
 }
 
 export type ItemAction = 'eat' | 'hold' | 'read';

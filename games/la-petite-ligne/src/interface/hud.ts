@@ -431,6 +431,11 @@ export class Hud {
       }
     }
     this.firstSight = false;
+    // La simulation ne garde que les dernières notifications: on oublie les autres (séance d'une heure).
+    if (this.seenAt.size > list.length * 2) {
+      const ids = new Set(list.map((n) => n.id));
+      for (const id of this.seenAt.keys()) if (!ids.has(id)) this.seenAt.delete(id);
+    }
     // Astuce: la plus récente encore fraîche, en bas au centre.
     const hints = visibleToasts(
       list.filter((n) => n.kind === 'hint'),

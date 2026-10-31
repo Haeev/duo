@@ -18,6 +18,7 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 2. Fait: repère (`characters[i].pin`): épingle à la couleur et au symbole du profil Duo de celui qui l'a plantée (astre, croissant, étoile, soleil, planète, comète), visible des deux joueurs et à travers les murs, qui tombe en rebondissant, onde au sol répétée, fondu sur la fin de sa durée (`src/rendu/signes.ts`).
 3. Fait: pêche (`characters[i].fishing`, événements `cast`, `bite`, `caught`, `escaped`): canne en main pointée vers le bouchon, ligne, bouchon qui flotte puis plonge à la touche avec des ronds dans l'eau, lancer joué avec le geste de la hache, touche avec le bras tendu de l'arrosage, poisson qui sort de l'eau et saute au sac, bouchon qui remonte et s'efface s'il s'échappe (`src/rendu/peche.ts`).
 4. Fait: absence (`characters[i].absent`): le personnage s'assoit (`sit`) sur une caisse à hauteur d'assise (l'animation vise une chaise) et une auréole douce à sa couleur respire au sol; aucun symbole au-dessus de la tête (`src/rendu/signes.ts`).
+5. Corrigé (signalé par le son): au départ, le train partait d'un saut de 70 m puis revenait. `trainOffset` (`src/rendu/voie.ts`) suit maintenant `progress` de 1 à 0 au départ, sans saut, et le train arrive et repart par l'ouest (`RENDER_SETTINGS.train.sideDirection = -1`, comme `departureDirection` du son); test `voie.test.ts` (position monotone à l'arrivée et au départ).
 
 ### Ce que le rendu offre en plus du contrat `Renderer`
 
@@ -66,7 +67,9 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Styles: `ui-maquettes/jeton.css` et `composants.css` importés tels quels, `icones.svg` inséré une fois; compléments dans `src/interface/interface.css` (dont un correctif: `.lpl-stamina__fill` est un `span` sans largeur dans `composants.css`, la jauge d'endurance restait vide, aussi dans les maquettes).
 - Textes: `donnees/textes.json` d'abord (`ui`, `nightScreen`, `endScreen`, `form`, `messages`, `weather`, `weekdays`), libellés des maquettes en complément dans `src/interface/textes-interface.json`; tous contrôlés au montage (Valibot), typographie française appliquée à l'affichage.
 - Page de démonstration (outil, pas le jeu): `src/interface/demo/index.html?scenario=jour` (vraie simulation, vrai rendu, robot pour l'autre; scénarios dans `demo/scenarios.ts`).
-- Tests: `src/interface/tests/` (Vitest, 60 tests): typographie, formats, focus et navigation, textes, modèles du HUD et des panneaux, notifications, portraits.
+- Tests: `src/interface/tests/` (Vitest, 61 tests): typographie, formats, focus et navigation, textes, modèles du HUD et des panneaux, notifications, portraits.
+- Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
+- Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
 ## 2026-10-31, étape 4: mode léger, interface, son, P1
 

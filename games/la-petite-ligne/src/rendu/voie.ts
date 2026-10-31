@@ -8,7 +8,7 @@
 import type { Object3D } from 'three';
 import { AnimationMixer, Group, Matrix4, Vector3 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
-import type { WorldEvent } from '../etat/types';
+import type { TrainPhase, WorldEvent } from '../etat/types';
 import { smoothFactor } from './camera';
 import type { FrameContext } from './contexte';
 import { propHints, propMatrix, type ClockHand } from './decor';
@@ -50,6 +50,27 @@ const MINUTES_PER_HOUR = 60;
 const HOURS_PER_DIAL = 12;
 const MINUTES_PER_DIAL = 720;
 const WHISTLE_PUFFS = 6;
+
+/**
+ * Décalage du train le long de la voie (m) depuis son arrêt au quai, selon la
+ * phase et `progress` de la simulation: à l'arrivée `progress` va de 0 à 1
+ * (le train ralentit jusqu'au quai), au départ il va de 1 à 0 (le train
+ * accélère en s'éloignant du même côté, sans saut). `NaN` quand il est parti.
+ */
+export function trainOffset(phase: TrainPhase, progress: number): number {
+  const p = Math.min(1, Math.max(0, progress));
+  const away = TRAIN.slideDistance * TRAIN.sideDirection;
+  switch (phase) {
+    case 'away':
+      return Number.NaN;
+    case 'arriving':
+      return away * (1 - easeOut(p));
+    case 'stopped':
+      return 0;
+    case 'departing':
+      return away * easeIn(1 - p);
+  }
+}
 
 function easeOut(t: number): number {
   return 1 - (1 - t) * (1 - t) * (1 - t);
@@ -238,21 +259,7 @@ export class RailwayPart implements EventfulPart {
   update(context: FrameContext): void {
     const state = context.world.train;
     const progress = state.prevProgress + (state.progress - state.prevProgress) * context.alpha;
-    let offset = 0;
-    switch (state.phase) {
-      case 'away':
-        offset = Number.NaN;
-        break;
-      case 'arriving':
-        offset = -TRAIN.slideDistance * (1 - easeOut(Math.min(1, Math.max(0, progress))));
-        break;
-      case 'stopped':
-        offset = 0;
-        break;
-      case 'departing':
-        offset = -TRAIN.slideDistance * easeIn(Math.min(1, Math.max(0, progress)));
-        break;
-    }
+    const offset = trainOffset(state.phase, progress);
     const visible = !Number.isNaN(offset);
     this.train.visible = visible;
     const moving = visible && state.phase !== 'stopped';
