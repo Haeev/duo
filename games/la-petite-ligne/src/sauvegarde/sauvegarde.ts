@@ -220,6 +220,9 @@ function resume(
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
   bindPlayers(world, players);
+  // Champ facultatif (mémoire des répliques entendues), absent des sauvegardes plus anciennes.
+  const heard = (world as Partial<WorldState>).heard;
+  world.heard = { p1: heard?.p1 ?? {}, p2: heard?.p2 ?? {} };
   for (const c of world.characters) {
     // Nouvelle séance: l'écran titre se repasse à deux.
     c.titleReady = false;

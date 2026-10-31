@@ -17,6 +17,22 @@
     { "id": "visit_basile", "kind": "personal", "text": "Passer voir Basile.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "talked_to", "villager": "basile", "count": 1, "who": "actor" }] },
     { "id": "fine_carrots", "kind": "personal", "text": "Récolter de belles carottes.", "availableWhen": [{ "type": "day_at_least", "day": 13 }], "fulfilledWhen": [{ "type": "harvested", "item": "carrot", "quality": "fine", "count": 1, "who": "actor" }] },
     { "id": "more_wood", "kind": "personal", "text": "Rapporter du bois de la lisière.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "chopped", "count": 1, "who": "actor" }] },
+    { "id": "bench_moment", "kind": "personal", "text": "S'asseoir un moment sur le banc du quai.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "actor" }] },
+    { "id": "visit_hens", "kind": "personal", "text": "Passer un moment avec les poules.", "availableWhen": [{ "type": "flag", "flag": "eggs_enabled" }], "fulfilledWhen": [{ "type": "stayed_at", "point": "chicken_coop", "seconds": 8, "who": "actor" }] },
+    { "id": "talk_firmin", "kind": "personal", "text": "Écouter Firmin parler de la ligne.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "talked_to", "villager": "firmin", "count": 1, "who": "actor" }] },
+    { "id": "news_odette", "kind": "personal", "text": "Prendre des nouvelles d'Odette.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "talked_to", "villager": "odette", "count": 1, "who": "actor" }] },
+    { "id": "water_all", "kind": "personal", "text": "Arroser six cases du potager.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "watered", "count": 6, "who": "actor" }] },
+    { "id": "sow_more", "kind": "personal", "text": "Semer quelque chose de nouveau.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "sowed", "count": 2, "who": "actor" }] },
+    { "id": "saw_planks", "kind": "personal", "text": "Scier des planches à l'établi.", "availableWhen": [{ "type": "day_at_least", "day": 3 }], "fulfilledWhen": [{ "type": "crafted", "recipe": "saw_plank", "count": 1, "who": "actor" }] },
+    { "id": "meal_shared", "kind": "personal", "text": "Partager un repas à deux.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "ate_together" }] },
+    { "id": "catch_trout", "kind": "personal", "text": "Pêcher une truite.", "availableWhen": [{ "type": "day_at_least", "day": 3 }, { "type": "flag", "flag": "fishing_enabled" }], "fulfilledWhen": [{ "type": "caught", "item": "trout", "count": 1, "who": "actor" }] },
+    { "id": "fresh_bread", "kind": "personal", "text": "Croquer un morceau de pain.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "ate", "item": "bread", "count": 1, "who": "actor" }] },
+    { "id": "crunchy_cook", "kind": "personal", "text": "Préparer des radis à la croque-au-sel.", "availableWhen": [{ "type": "harvested", "item": "radish", "count": 1, "since": "game_start" }], "fulfilledWhen": [{ "type": "crafted", "recipe": "cook_crunchy_radishes", "count": 1, "who": "actor" }] },
+    { "id": "see_handcar", "kind": "personal", "text": "Aller voir la draisine.", "availableWhen": [{ "type": "flag", "flag": "shed_open" }], "fulfilledWhen": [{ "type": "stayed_at", "point": "handcar_shed", "seconds": 5, "who": "actor" }] },
+    { "id": "pontoon_sit", "kind": "personal", "text": "Rêvasser au bout du ponton.", "availableWhen": [{ "type": "day_at_least", "day": 2 }], "fulfilledWhen": [{ "type": "stayed_at", "point": "fishing_pontoon", "seconds": 10, "who": "actor" }] },
+    { "id": "level_crossing_walk", "kind": "personal", "text": "Faire un détour par le passage à niveau.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "stayed_at", "point": "level_crossing", "seconds": 5, "who": "actor" }] },
+    { "id": "meet_jeanne_square", "kind": "personal", "text": "Passer dire bonjour à Jeanne.", "availableWhen": [{ "type": "day_at_least", "day": 4 }, { "type": "talked_to", "villager": "jeanne", "since": "game_start" }], "fulfilledWhen": [{ "type": "talked_to", "villager": "jeanne", "count": 1, "who": "actor" }] },
+    { "id": "bench_together", "kind": "shared", "text": "Se retrouver sur le banc du quai.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "both" }] },
     { "id": "watch_river_together", "kind": "shared", "text": "Regarder la rivière ensemble.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "riverbank", "seconds": 10, "who": "both" }] },
     { "id": "tidy_together", "kind": "shared", "text": "Ranger la maison à deux.", "availableWhen": [], "fulfilledWhen": [{ "type": "placed", "count": 1, "who": "both" }] },
     { "id": "supper_same_table", "kind": "shared", "text": "Souper à la même table.", "availableWhen": [], "fulfilledWhen": [{ "type": "ate_together", "atFurniture": "table" }] },
@@ -29,6 +45,8 @@
     { "day": 7, "envie": "supper_same_table" },
     { "day": 9, "envie": "fish_together" },
     { "day": 11, "envie": "omelettes_together" },
-    { "day": 13, "envie": "supper_same_table" }
+    { "day": 4, "envie": "bench_together" },
+    { "day": 13, "envie": "supper_same_table" },
+    { "day": 14, "envie": "bench_together" }
   ]
 }

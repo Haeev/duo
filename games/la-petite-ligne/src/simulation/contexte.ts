@@ -44,8 +44,6 @@ export interface Runtime {
   /** Derniers objets ramassés au sol, pour « Déjà pris » (SI-01). */
   recentPickups: RecentPickup[];
   villagerPaths: Record<string, { target: string; path: Vec2[] }>;
-  /** Dernière réplique quotidienne entendue, par joueur et par habitant. */
-  lastDaily: Record<string, string>;
   /** Le monde a changé de façon discrète à ce pas. */
   changed: boolean;
   /** Une suite d'effets est en cours d'exécution (pas de réentrance). */
@@ -79,7 +77,6 @@ export function createRuntime(map: GameMap): Runtime {
     pendingAct: { p1: null, p2: null },
     recentPickups: [],
     villagerPaths: {},
-    lastDaily: {},
     changed: true,
     pumping: false,
     beamOffsets: { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } },

@@ -1,6 +1,7 @@
 /**
- * Envies du jour (HA-07): une personnelle par joueur et par matin, jamais deux
- * fois la même, et une envie à deux les jours prévus.
+ * Envies du jour (HA-07): une personnelle par joueur et par matin, jamais la
+ * même deux fois en `envies.noRepeatWindowDays` jours (réserve vide: la moins
+ * récente des possibles), et une envie à deux les jours prévus.
  */
 import { evaluateAll, NO_CONTEXT, stayPoints } from './conditions';
 import { type Sim, character, distance, emit, notifyKey } from './contexte';
@@ -9,9 +10,14 @@ export function pickEnvies(sim: Sim): void {
   const { day } = sim.world.clock;
   for (const c of sim.world.characters) {
     const ctx = { ...NO_CONTEXT, actor: c.id };
-    const candidates = sim.content.envies.filter(
-      (e) => e.kind === 'personal' && !c.envieHistory.includes(e.id) && evaluateAll(sim, e.availableWhen, ctx),
-    );
+    const possible = sim.content.envies.filter((e) => e.kind === 'personal' && evaluateAll(sim, e.availableWhen, ctx));
+    const recent = c.envieHistory.slice(-sim.content.settings.envies.noRepeatWindowDays);
+    let candidates = possible.filter((e) => !recent.includes(e.id));
+    if (candidates.length === 0 && possible.length > 0) {
+      const last = (id: string): number => c.envieHistory.lastIndexOf(id);
+      const oldest = Math.min(...possible.map((e) => last(e.id)));
+      candidates = possible.filter((e) => last(e.id) === oldest);
+    }
     if (candidates.length === 0) {
       c.envie = null;
     } else {

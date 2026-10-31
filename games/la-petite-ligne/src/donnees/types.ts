@@ -386,6 +386,8 @@ export interface Settings {
   hints: { durationSeconds: number };
   absence: { minutes: number };
   /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
+  /** Envies (HA-07): une envie ne revient pas pour un joueur avant ce nombre de jours. */
+  envies: { noRepeatWindowDays: number };
   fishing: {
     castRange: number;
     biteWaitSeconds: [number, number];
@@ -418,6 +420,8 @@ export interface FeelSettings {
   henSpeed: number;
   /** Fenêtre de « Déjà pris par... » après une récolte (s). */
   alreadyTakenSeconds: number;
+  /** Répliques quotidiennes de priorité au moins égale: datées (jour du train, pluie), dites d'abord, une fois par jour. */
+  dailyStoryPriority: number;
   /** Mémoire d'un appui (Espace, clic à portée) reçu pendant un geste: joué à la fin du geste s'il a moins de tant (s). */
   inputBufferSeconds: number;
   /** Espace tenu sur le potager: pause minimale entre la fin d'un geste et le geste sur la case suivante (s). */

@@ -187,6 +187,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     countersAtDawn: emptyCounters(),
     scripts: [],
     nextId,
+    heard: { p1: {}, p2: {} },
     orderIndex: 0,
     orderResult: null,
     orderHistory: [],

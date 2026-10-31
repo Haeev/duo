@@ -69,13 +69,14 @@ describe('robot', () => {
     expect(JSON.stringify(w).length).toBeLessThan(64 * 1024);
   });
 
-  it("ne bloque jamais la fin sans l'énigme d'Émile: la scène finale a lieu, la remise reste fermée (D-08)", () => {
+  it("ne bloque jamais la fin sans l'énigme d'Émile: la scène finale a lieu, sans la clé (D-08)", () => {
     const sim = newSim(99);
     const robot = createRobot({ riddle: false });
     play(sim, robot, (s) => s.world.phase === 'ended', MAX_TICKS);
     expect(sim.world.phase).toBe('ended');
     expect(sim.world.ending?.keyFound).toBe(false);
-    expect(sim.world.worldStates.handcar_shed).toBe('closed');
+    // La remise s'ouvre quand même au jour 12 (rattrapage de la semaine 2), mais sans la scène de la clé.
+    expect(sim.world.worldStates.handcar_shed).toBe('open');
     expect(sim.world.dialoguesDone).toEqual(expect.arrayContaining(['firmin_end_vergers']));
     expect(sim.world.dialoguesDone).not.toContain('firmin_end_key');
   });

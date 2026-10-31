@@ -9,6 +9,7 @@ import { type Sim, bump, character, distance, emit, format, itemName, partnerNam
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';
+import { MINUTES_PER_DAY } from './constantes';
 
 const GIVE_PREFIX = 'give:';
 
@@ -40,20 +41,48 @@ function isAvailable(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
 export function pickDialogue(sim: Sim, villager: string, who: CharacterId): DialogueDef | null {
   const v = sim.content.villagers.find((x) => x.id === villager);
   if (v === undefined) return null;
+  const heard = sim.world.heard[who];
+  const today = sim.world.clock.day;
+  const heardToday = (d: DialogueDef): boolean => {
+    const at = heard[d.id];
+    return at !== undefined && Math.floor(at / MINUTES_PER_DAY) === today;
+  };
   let best: DialogueDef | null = null;
   for (const d of v.dialogues) {
     if (d.kind === 'daily' || d.kind === 'ending' || (d.kind === 'scene' && d.shared)) continue;
     if (!isAvailable(sim, d, who)) continue;
+    // Un rappel répétable déjà entendu aujourd'hui laisse la place au quotidien.
+    if (d.once === null && heardToday(d)) continue;
     if (best === null || d.priority > best.priority) best = d;
   }
   if (best !== null) return best;
-  const daily = v.dialogues.filter((d) => d.kind === 'daily' && isAvailable(sim, d, who));
+  const daily = eligibleDailies(sim, villager, who);
   if (daily.length === 0) return null;
-  const top = Math.max(...daily.map((d) => d.priority));
-  const tied = daily.filter((d) => d.priority === top);
-  const last = sim.runtime.lastDaily[`${who}:${villager}`];
-  const fresh = tied.length > 1 ? tied.filter((d) => d.id !== last) : tied;
-  return sim.rng.pick(fresh);
+  // Répliques datées (jour du train, pluie): la plus prioritaire, une fois par jour.
+  const story = sim.content.settings.feel.dailyStoryPriority;
+  let dated: DialogueDef | null = null;
+  for (const d of daily) {
+    if (d.priority >= story && !heardToday(d) && (dated === null || d.priority > dated.priority)) dated = d;
+  }
+  if (dated !== null) return dated;
+  // Sinon la moins récemment entendue par ce joueur (jamais entendue d'abord), au hasard à égalité.
+  const ordinary = daily.filter((d) => d.priority < story);
+  const pool = ordinary.length > 0 ? ordinary : daily;
+  let oldest = Infinity;
+  for (const d of pool) oldest = Math.min(oldest, heard[d.id] ?? -1);
+  return sim.rng.pick(pool.filter((d) => (heard[d.id] ?? -1) === oldest));
+}
+
+/** Répliques du quotidien que cet habitant peut dire à ce joueur maintenant (conditions remplies). */
+export function eligibleDailies(sim: Sim, villager: string, who: CharacterId): DialogueDef[] {
+  const v = sim.content.villagers.find((x) => x.id === villager);
+  return v === undefined ? [] : v.dialogues.filter((d) => d.kind === 'daily' && isAvailable(sim, d, who));
+}
+
+/** Ce joueur vient d'entendre ce dialogue (mémoire du tirage « la moins récente »). */
+export function hearDialogue(sim: Sim, who: CharacterId, def: DialogueDef): void {
+  if (def.kind !== 'daily' && def.once !== null) return;
+  sim.world.heard[who][def.id] = sim.world.clock.day * MINUTES_PER_DAY + Math.floor(sim.world.clock.minutes);
 }
 
 /** Choix « Donner » quand une étape active attend un objet pour cet habitant. */
@@ -122,7 +151,7 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
   const done = sim.world.dialoguesDone;
   if (!done.includes(def.id)) done.push(def.id);
   if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
-  if (def.kind === 'daily') sim.runtime.lastDaily[`${c.id}:${d.villager}`] = def.id;
+  hearDialogue(sim, c.id, def);
   runEffects(sim, def.effects, c.id);
 }
 

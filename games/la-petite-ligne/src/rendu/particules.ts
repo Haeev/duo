@@ -46,6 +46,8 @@ export const PARTICLE_SHAPE = {
   glow: 4,
   /** Gouttelette ronde et nette (arrosage). */
   droplet: 5,
+  /** Bouffée à facettes, deux tons nets (fumée de cheminée, dans le style du décor). */
+  facetedPuff: 6,
 } as const;
 
 export const PARTICLE_MODE = { puffs: 0, rain: 1, sprites: 2 } as const;
@@ -217,6 +219,7 @@ const FRAGMENT_SHADER = /* glsl */ `
 #include <fog_pars_fragment>
 
 uniform vec3 uLitColor;   // lumière directe (soleil ou lune), intensité comprise
+uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra (facettes)
 uniform vec3 uShadeColor; // lumière du ciel (hémisphérique)
 
 varying vec2 vCorner;
@@ -249,6 +252,18 @@ void main() {
   } else if (vShape == 4) {
     alpha = exp(-r * r * 4.0) * (1.0 - smoothstep(0.7, 1.0, r));
     additive = 1.0;
+  } else if (vShape == 6) {
+    // Hexagone à facettes: une face du dessus et six pans, chacun d'un ton selon la lumière.
+    float angle = atan(vCorner.y, vCorner.x);
+    float sector = 6.2831853 / 6.0;
+    float facetAngle = floor(angle / sector + 0.5) * sector;
+    float hexR = r * cos(angle - facetAngle);
+    alpha = 1.0 - smoothstep(0.8, 0.86, hexR);
+    vec3 facetNormal = hexR < 0.42
+      ? vec3(0.0, 0.0, 1.0)
+      : normalize(vec3(cos(facetAngle) * 0.75, sin(facetAngle) * 0.75, 0.66));
+    float facetLight = dot(facetNormal, uLightView) * 0.5 + 0.5;
+    color *= uShadeColor + uLitColor * facetLight;
   } else {
     alpha = smoothstep(1.0, 0.7, r);
     color *= uShadeColor + uLitColor * 0.8;

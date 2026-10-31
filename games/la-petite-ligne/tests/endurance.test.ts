@@ -31,6 +31,8 @@ const SEEDS = [1, 7, 42, 99, 2026, 31_337, 123_456, 20_261_031];
 interface Run {
   ticks: number;
   maxBytes: number;
+  /** Jours de journée où un joueur n'avait aucune envie (D5 de la revue du contenu). */
+  daysWithoutEnvie: string[];
   longestStall: number;
 }
 
@@ -67,6 +69,8 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
   let lastProgressTick = 0;
   let longestStall = 0;
   let day = sim.world.clock.day;
+  const daysWithoutEnvie: string[] = [];
+  let envieDay = 0;
   while (sim.world.phase !== 'ended' && ticks < MAX_TICKS) {
     step(sim, robot.decide(sim));
     ticks++;
@@ -86,6 +90,10 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
     }
     if (ticks % CHECK_EVERY === 0) {
       maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
+      if (sim.world.phase === 'day' && sim.world.clock.day !== envieDay && sim.world.clock.day > 1) {
+        envieDay = sim.world.clock.day;
+        for (const c of sim.world.characters) if (c.envie === null) daysWithoutEnvie.push(`${c.id} jour ${envieDay}`);
+      }
       checkCoherent(sim.world);
     }
     if (onDawn !== undefined && sim.world.clock.day !== day && sim.world.phase === 'breakfast') {
@@ -95,7 +103,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
     }
   }
   maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
-  return { sim, run: { ticks, maxBytes, longestStall } };
+  return { sim, run: { ticks, maxBytes, longestStall, daysWithoutEnvie } };
 }
 
 /** Quêtes de la semaine 2: les secondaires toujours; la draisine et l'énigme 2 si la remise est ouverte (énigme 1). */
@@ -106,7 +114,8 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   const w = sim.world;
   const status = (id: string): string => w.quests.find((q) => q.id === id)?.status ?? 'pas commencée';
   for (const id of [...WEEK_TWO_SIDE, ...(keyExpected ? WEEK_TWO_SHED : [])]) expect(status(id), `quête ${id} terminée`).toBe('done');
-  if (!keyExpected) for (const id of WEEK_TWO_SHED) expect(status(id), `${id}: la remise reste fermée`).toBe('pas commencée');
+  // Sans l'énigme 1, Basile ouvre la remise lui-même au jour 12 (rattrapage du game designer): la draisine se joue quand même.
+  if (!keyExpected) expect(status('handcar'), 'draisine après le rattrapage du jour 12').toBe('done');
   expect(w.phase, 'la démo se termine').toBe('ended');
   expect(run.ticks).toBeLessThan(MAX_TICKS);
   const { content } = contentAndMap();
@@ -123,6 +132,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.ending?.keyFound).toBe(keyExpected);
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
+  expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
   expect(run.maxBytes, `état transmis sous 32 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
 }
@@ -139,7 +149,7 @@ describe('endurance des robots', () => {
     it(`graine ${seed}, sans l’énigme d’Émile: la démo se termine quand même (D-08)`, () => {
       const { sim, run } = playToEnd(newSim(seed), false);
       expectDemoFinished(sim, run, false);
-      expect(sim.world.worldStates.handcar_shed).toBe('closed');
+      expect(sim.world.worldStates.handcar_shed, 'ouverte par Basile au jour 12').toBe('open');
     });
   }
 

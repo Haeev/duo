@@ -103,6 +103,9 @@ export class AmbiancePart implements ExtensionPart {
   private readonly chimneys: { chimney: Chimney; clock: number }[];
   private readonly windDir = new Vector3();
   private lastCooked = Number.NEGATIVE_INFINITY;
+  /** Foyer de la maisonnette: centre de la pièce, et s'il brûle à cette image (toit réparé, soir ou nuit). */
+  private readonly hearth = new Vector3();
+  private hearthLit = false;
   private readonly meshes: Mesh[] = [];
   private readonly lit = new Color();
   private readonly shade = new Color();
@@ -139,6 +142,12 @@ export class AmbiancePart implements ExtensionPart {
     resources.track(this.field.texture);
     const windMask = resources.track(createWindMask(PALETTE_CELLS, PALETTE_GRID));
     this.surfaces = createSurfaceUniforms(noise, windMask);
+    const room = hooks.map.house.room;
+    this.hearth.set(
+      room.x + room.w * HALF_CELL,
+      RENDER_SETTINGS.terrain.heights.floor + AMBIANCE_SETTINGS.chimneys.hearthHeight,
+      room.y + room.h * HALF_CELL,
+    );
     const wind = AMBIANCE_SETTINGS.wind.direction;
     this.windDir.set(wind[0], 0, wind[1]).normalize();
 
@@ -458,6 +467,13 @@ export class AmbiancePart implements ExtensionPart {
     const slots = this.light ? settings.slotsLight : settings.slots;
     const reach = viewRadius + settings.fadeBeyondView;
     let count = 0;
+    if (this.hearthLit) {
+      // Le foyer de la maisonnette passe avant les autres lumières: c'est le chez-soi des joueurs.
+      const hearth = settings.kinds.hearth;
+      u.uLamps.value[0]?.set(this.hearth.x, this.hearth.y, this.hearth.z, hearth.radius);
+      u.uLampColors.value[0]?.set(hearth.color).multiplyScalar(hearth.intensity);
+      count = 1;
+    }
     for (const index of this.order) {
       if (count >= slots) {
         break;
@@ -592,6 +608,7 @@ export class AmbiancePart implements ExtensionPart {
     );
     const cooking = this.time - this.lastCooked < settings.afterCookingSeconds;
     const house = repaired && (cooking || AmbiancePart.within(minutes, settings.houseHours));
+    this.hearthLit = repaired && this.daylight.night > 0;
     const rate = settings.rate * (this.light ? HALF_CELL : 1);
     const weather = AMBIANCE_SETTINGS.wind.weather[world.weather];
     for (const entry of this.chimneys) {
@@ -625,7 +642,7 @@ export class AmbiancePart implements ExtensionPart {
         life: s.seconds * (STEAM_LIFE_MIN + p.random() * (1 - STEAM_LIFE_MIN)),
         startSize: s.startSize,
         endSize: s.endSize,
-        shape: PARTICLE_SHAPE.puff,
+        shape: PARTICLE_SHAPE.facetedPuff,
         color: this.colors.smoke,
         opacity: s.opacity,
       },

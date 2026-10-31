@@ -134,6 +134,12 @@ export interface WorldState {
   /** États nommés du monde (`handcar_shed: open`). */
   worldStates: Record<string, string>;
   unlockedRecipes: RecipeId[];
+  /**
+   * Ce que chaque joueur a entendu, et quand (heure de jeu absolue: jour x 1440 + minutes), pour
+   * les répliques du quotidien et les rappels répétables (tirage « la moins récente », R4).
+   * Absent des sauvegardes d'avant: rempli à vide à la reprise.
+   */
+  heard: Record<CharacterId, Record<string, number>>;
   /** Dialogues déjà vus: `once: duo` (clé = id) et `once: player` (clé = `id@p1`). */
   dialoguesDone: string[];
   /** Scène à deux en cours (dialogue partagé), ou `null`. */

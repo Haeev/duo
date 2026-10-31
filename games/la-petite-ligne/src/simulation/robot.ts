@@ -43,6 +43,9 @@ const HOUR = MINUTES_PER_HOUR;
 const GO_HOME_AT = 19 * HOUR;
 /** Le robot donne signe de vie au moins toutes les N pas (une minute). */
 const PRESENCE_TICKS = SECONDS_PER_MINUTE * SIM_HZ;
+/** Un meuble sans place se réessaie après dix minutes réelles. */
+const NO_ROOM_RETRY_TICKS = SIM_HZ * 600;
+
 /** Planches à garder pour la commande en cours (la ligne de planches, s'il y en a une). */
 function planksForOrder(sim: Sim): number {
   return currentOrder(sim.content.settings, sim.world).lines.find((l) => l.item === 'plank')?.count ?? 0;
@@ -338,7 +341,10 @@ function coop(sim: Sim, c: Character, m: Memory, frameOut: { held: boolean }, ou
 
 function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   // Poser un meuble du sac.
-  const toPlace = c.bag.find((s) => s !== null && sim.content.items[s.item]?.category === 'furniture');
+  // Un meuble qui ne trouve pas de place attend (sinon aller-retour sans fin entre la maison et le dehors).
+  const toPlace = c.bag.find(
+    (s) => s !== null && sim.content.items[s.item]?.category === 'furniture' && (m.skip[`poser:${s.item}`] ?? 0) <= sim.world.tick,
+  );
   if (toPlace !== null && toPlace !== undefined) {
     const room = sim.map.house.room;
     if (!c.inHouse) return goTo(sim, c, m, 'maison', sim.map.house.spawn, 0.3, out);
@@ -364,6 +370,7 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
         }
       }
     }
+    m.skip[`poser:${toPlace.item}`] = sim.world.tick + NO_ROOM_RETRY_TICKS;
     return false;
   }
   if (!questDone(sim, 'planks')) return false;

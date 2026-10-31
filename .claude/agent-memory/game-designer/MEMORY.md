@@ -96,3 +96,8 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Piège mesuré par la revue du tour 1: le moteur de dialogues de la démo ne tire que parmi les répliques de plus haute priorité, d'où 55 % de redites; vérifier que la règle de tirage a changé avant d'en déduire un besoin d'écriture.
 - Avant de nommer une quête, lister les titres de `quetes.json`: « Le quai en fête » et « Les gens du bourg » sont déjà pris par des quêtes de la démo.
 - Constructions de la démo: format `elements` (`inputs`, `seconds`), deux joueurs vont deux fois plus vite; une bûche donne quatre planches à l'établi. Exprimer les chantiers dans ces unités, pas en « points de travail ».
+
+## Mesurer les redites du quotidien (2026-10-31, tour 3)
+
+- Script jetable `/tmp/lpl-gd/redites.test.ts` (lancé par `npx vitest run --root games/la-petite-ligne --dir /tmp/lpl-gd`): robots de `tests/aides.ts`, un joueur parle à chaque habitant visible à 13 h (ou 9, 13 et 17 h), règle ancienne et règle R4. Repère: 55 % de redites avant, 0 % après 14 répliques nouvelles par habitant avec R4.
+- Avec R4, seules les répliques datées (jour du train, pluie, veille de pluie) restent en priorité 5 et plus; tout le quotidien en priorité 1. Une réplique quotidienne sans condition ne doit pas dire « ce matin » sans `time_is`.

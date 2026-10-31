@@ -760,6 +760,7 @@ function parseFeel(r: Reader | null): FeelSettings {
     'villagerSpeed',
     'henSpeed',
     'alreadyTakenSeconds',
+    'dailyStoryPriority',
     'inputBufferSeconds',
     'heldRepeatSeconds',
     'notificationsKept',
@@ -898,6 +899,7 @@ function parseSettings(r: Reader): Settings {
     building: { twoPlayersSpeedMultiplier: r.at('building').at('twoPlayersSpeedMultiplier').number() },
     hints: { durationSeconds: r.at('hints').at('durationSeconds').number() },
     absence: { minutes: r.at('absence').at('minutes').number() },
+    envies: { noRepeatWindowDays: r.has('envies') && r.at('envies').has('noRepeatWindowDays') ? r.at('envies').at('noRepeatWindowDays').integer(1) : 7 },
     fishing: parseFishing(r.opt('fishing')),
     feel: parseFeel(r.opt('feel')),
   };

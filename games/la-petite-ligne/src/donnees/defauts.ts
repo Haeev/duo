@@ -30,6 +30,8 @@ export const DEFAULT_FEEL: FeelSettings = {
   alreadyTakenSeconds: 1.5,
   // Gauntlet, ressenti (tour 2): un appui pendant un geste n'est pas perdu; Espace tenu bêche la rangée.
   inputBufferSeconds: 0.3,
+  // Gauntlet, contenu (tour 3): les répliques quotidiennes de priorité 5 et plus sont datées.
+  dailyStoryPriority: 5,
   heldRepeatSeconds: 0.1,
   notificationsKept: 12,
   trainWarningMinutes: 60,

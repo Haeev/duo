@@ -43,7 +43,7 @@
           "id": "firmin_day8_morning",
           "kind": "daily",
           "priority": 7,
-          "when": [{ "type": "day_is", "days": [8, 15] }],
+          "when": [{ "type": "day_is", "days": [8] }],
           "lines": [{ "speaker": "firmin", "text": "Le train arrive à 10 h et repart à 16 h. Ce qui est dans la caisse part avec lui." }]
         },
         {
@@ -125,14 +125,14 @@
         {
           "id": "firmin_daily_week2",
           "kind": "daily",
-          "priority": 2,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 9 }],
           "lines": [{ "speaker": "firmin", "text": "Une deuxième commande ! Je l'ai lue trois fois. Les omelettes, ça voyage bien, vous croyez ?" }]
         },
         {
           "id": "firmin_day15",
           "kind": "daily",
-          "priority": 6,
+          "priority": 7,
           "when": [{ "type": "day_is", "days": [15] }],
           "lines": [{ "speaker": "firmin", "text": "Le train de dix heures ! Cette fois, je n'ai repassé mon uniforme qu'une fois. Je progresse." }]
         },
@@ -157,7 +157,7 @@
           "kind": "quest",
           "once": "duo",
           "priority": 39,
-          "when": [{ "type": "day_at_least", "day": 10 }],
+          "when": [{ "type": "day_at_least", "day": 12 }],
           "lines": [{ "speaker": "firmin", "text": "Samedi, le train revient, et je voudrais un quai qui fasse envie. Deux pots de fleurs, chez Odette, ça ferait l'affaire. Je les arroserai moi-même." }]
         },
         {
@@ -232,6 +232,123 @@
           "shared": true,
           "point": "quay_bell",
           "lines": [{ "speaker": "firmin", "text": "La coopérative écrit que la voie des Vergers sera la prochaine. Les cerisiers vous attendent. Moi aussi, un peu." }]
+        },
+        {
+          "id": "firmin_morning",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "08:00", "to": "11:00" }],
+          "lines": [{ "speaker": "firmin", "text": "Le matin, le quai sent la rosée et le charbon froid. Je ne m'en lasse pas." }]
+        },
+        {
+          "id": "firmin_evening",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "15:00", "to": "18:00" }],
+          "lines": [{ "speaker": "firmin", "text": "En fin d'après-midi, je compte les traverses. Il en manque une. Il en manque toujours une." }]
+        },
+        {
+          "id": "firmin_cloudy",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "cloudy" }],
+          "lines": [{ "speaker": "firmin", "text": "Temps gris. Les trains aimaient ce temps-là: ils fumaient plus droit." }]
+        },
+        {
+          "id": "firmin_noon_sun",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "sunny" }, { "type": "time_is", "from": "11:00", "to": "15:00" }],
+          "lines": [{ "speaker": "firmin", "text": "Midi au soleil sur un quai, c'est le meilleur endroit du monde. Ne le répétez pas à Odette." }]
+        },
+        {
+          "id": "firmin_emile",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 3 }],
+          "lines": [{ "speaker": "firmin", "text": "Émile, mon oncle, connaissait chaque horaire par cœur. Il me les récitait pour m'endormir. Ça marchait." }]
+        },
+        {
+          "id": "firmin_roof_seen",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "built", "construction": "house_roof" }],
+          "lines": [{ "speaker": "firmin", "text": "On voit votre toit depuis le quai. Une cheminée qui fume là-bas, après tant d'années: ça fait drôle, et ça fait du bien." }]
+        },
+        {
+          "id": "firmin_hens",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "eggs_enabled" }],
+          "lines": [{ "speaker": "firmin", "text": "Il paraît que la Duchesse vous suit partout. Chez les poules, c'est un honneur." }]
+        },
+        {
+          "id": "firmin_bed",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "double_bed", "since": "game_start" }],
+          "lines": [{ "speaker": "firmin", "text": "Odette dit que vous avez un vrai lit, maintenant. Ici, les nouvelles vont plus vite que le train." }]
+        },
+        {
+          "id": "firmin_trout",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "caught", "item": "trout", "since": "game_start" }],
+          "lines": [{ "speaker": "firmin", "text": "Une truite, à ce qu'on raconte ? Mon oncle n'en a jamais pris une. Il disait que c'était par politesse." }]
+        },
+        {
+          "id": "firmin_soup",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "crafted", "recipe": "cook_vegetable_soup", "since": "game_start" }],
+          "lines": [{ "speaker": "firmin", "text": "Certains soirs, ça sent la soupe de légumes jusqu'ici. Ne me donnez pas la recette: Odette me le reprocherait." }]
+        },
+        {
+          "id": "firmin_mid_week2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 11 }],
+          "lines": [{ "speaker": "firmin", "text": "Mardi, mercredi, jeudi... La semaine passe plus vite quand on attend un train." }]
+        },
+        {
+          "id": "firmin_handcar_ready",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "handcar_ready" }],
+          "lines": [{ "speaker": "firmin", "text": "La draisine qui roule de nouveau ! J'ai entendu ses roues depuis chez moi. J'ai cru rêver." }]
+        },
+        {
+          "id": "firmin_crate_full",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "order_complete", "day": 15 }, { "type": "day_at_least", "day": 9 }],
+          "lines": [{ "speaker": "firmin", "text": "La caisse est pleine ! Je l'ai soupesée. Doucement: elle appartient à la coopérative." }]
+        },
+        {
+          "id": "firmin_flowers_after",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "quest_done", "quest": "firmin_flowers" }],
+          "lines": [{ "speaker": "firmin", "text": "Mes pots de fleurs tiennent bon. Je leur parle un peu. Ils ne répondent pas, c'est reposant." }]
+        },
+        {
+          "id": "firmin_eve_scene",
+          "kind": "scene",
+          "shared": true,
+          "point": "quay_bell",
+          "once": "duo",
+          "priority": 80,
+          "when": [{ "type": "day_is", "days": [14] }, { "type": "time_is", "from": "15:00", "to": "18:00" }],
+          "lines": [
+            { "speaker": "firmin", "text": "Vous voilà à deux, ça tombe bien. Demain, c'est le train. J'ai une question." },
+            { "speaker": "firmin", "text": "Quand la ligne ira jusqu'aux Vergers, vous resterez à la halte ? Elle a besoin de monde. Et moi, j'ai pris l'habitude de vous voir passer." },
+            {
+              "choices": [
+                { "id": "stay", "text": "On reste, bien sûr.", "reply": [{ "speaker": "firmin", "text": "Bon. Je vais repasser mon uniforme. Une fois, pas deux." }] },
+                { "id": "see", "text": "On verra bien où va la ligne.", "reply": [{ "speaker": "firmin", "text": "Sage réponse. Émile disait la même chose. Il n'est jamais parti." }] }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -247,6 +364,7 @@
       "schedule": [
         { "when": [{ "type": "step_active", "quest": "welcome_supper", "step": "supper" }, { "type": "day_at_least", "day": 5 }], "from": "19:00", "to": "21:00", "point": "grocery_terrace", "activity": "host" },
         { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "grocery_counter", "activity": "serve" },
+        { "when": [{ "type": "day_is", "days": [13] }], "from": "08:00", "to": "12:00", "point": "village_square", "activity": "serve" },
         { "from": "06:00", "to": "07:00", "point": "grocery_door", "activity": "home" },
         { "from": "07:00", "to": "20:00", "point": "grocery_counter", "activity": "serve" },
         { "from": "20:00", "to": "24:00", "point": "grocery_door", "activity": "home" }
@@ -326,7 +444,7 @@
           "id": "odette_daily_rain_tomorrow",
           "kind": "daily",
           "priority": 6,
-          "when": [{ "type": "day_is", "days": [3] }],
+          "when": [{ "type": "day_is", "days": [3, 11] }],
           "lines": [{ "speaker": "odette", "text": "Demain il pleut, mon genou me l'a dit." }]
         },
         {
@@ -339,14 +457,14 @@
         {
           "id": "odette_daily_bed",
           "kind": "daily",
-          "priority": 3,
-          "when": [{ "type": "not", "condition": { "type": "placed", "item": "double_bed" } }, { "type": "day_at_least", "day": 2 }],
+          "priority": 1,
+          "when": [{ "type": "not", "condition": { "type": "placed", "item": "double_bed", "since": "game_start" } }, { "type": "day_at_least", "day": 2 }, { "type": "time_is", "from": "06:00", "to": "11:00" }],
           "lines": [{ "speaker": "odette", "text": "Petite mine, ce matin. Un vrai lit, ça change une vie. J'ai des matelas." }]
         },
         {
           "id": "odette_daily_jeanne",
           "kind": "daily",
-          "priority": 2,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 3 }],
           "lines": [{ "speaker": "odette", "text": "Jeanne est encore passée me poser cent questions. Cent une, en fait." }]
         },
@@ -360,7 +478,7 @@
         {
           "id": "odette_daily_week2",
           "kind": "daily",
-          "priority": 2,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 9 }],
           "lines": [{ "speaker": "odette", "text": "J'ai reçu des cadres de la ville. Pour une photo de famille. Ou une vieille photo de la halte, tiens." }]
         },
@@ -393,6 +511,115 @@
           "priority": 46,
           "when": [{ "type": "quest_done", "quest": "odette_fry" }],
           "lines": [{ "speaker": "odette", "text": "Quatre goujons ! Ça sent déjà la friture. Tenez, pour la peine, et du pain tout chaud." }]
+        },
+        {
+          "id": "odette_morning",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "07:00", "to": "11:00" }],
+          "lines": [{ "speaker": "odette", "text": "Le matin, je range les bocaux par couleur. L'après-midi, par taille. Le soir, je ne range plus rien." }]
+        },
+        {
+          "id": "odette_evening",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "16:00", "to": "20:00" }],
+          "lines": [{ "speaker": "odette", "text": "Fin de journée. Mes pieds me parlent, et ils ne sont pas aimables." }]
+        },
+        {
+          "id": "odette_rain",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "odette", "text": "Avec cette pluie, personne ne passe. Sauf vous: ça, c'est du courage." }]
+        },
+        {
+          "id": "odette_cloudy",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "cloudy" }],
+          "lines": [{ "speaker": "odette", "text": "Un temps à faire des confitures. Je n'en fais jamais, mais c'est le temps qu'il faut." }]
+        },
+        {
+          "id": "odette_radishes_sold",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "grocer_buys" }],
+          "lines": [{ "speaker": "odette", "text": "Vos radis partent bien. Je les mets en vitrine, ça fait venir le monde. Enfin, Firmin." }]
+        },
+        {
+          "id": "odette_eggs",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "eggs_enabled" }],
+          "lines": [{ "speaker": "odette", "text": "Mes poules pondent mieux chez vous que chez moi. Je ne suis pas jalouse. Un peu." }]
+        },
+        {
+          "id": "odette_bed_done",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "double_bed", "since": "game_start" }],
+          "lines": [{ "speaker": "odette", "text": "Un vrai lit ! Ça se voit sur vos têtes: les cernes, c'est fini." }]
+        },
+        {
+          "id": "odette_soup",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "quest_done", "quest": "welcome_supper" }],
+          "lines": [{ "speaker": "odette", "text": "Vous la faites, ma soupe ? Pas trop de sel, surtout. Je dis ça pour Firmin." }]
+        },
+        {
+          "id": "odette_lettuce",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "harvested", "item": "lettuce", "since": "game_start" }],
+          "lines": [{ "speaker": "odette", "text": "Vos laitues sont fermes comme il faut. Ça ne trompe pas, une laitue." }]
+        },
+        {
+          "id": "odette_fish",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "caught", "item": "gudgeon", "since": "game_start" }],
+          "lines": [{ "speaker": "odette", "text": "On pêche, à la maisonnette ? Mon père m'emmenait au gué. Je n'attrapais rien, et j'adorais ça." }]
+        },
+        {
+          "id": "odette_gossip_basile",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 5 }],
+          "lines": [{ "speaker": "odette", "text": "Basile a souri, hier. Si, si, quelqu'un l'a vu. Bon, c'était moi." }]
+        },
+        {
+          "id": "odette_curtains",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "curtains", "since": "game_start" }],
+          "lines": [{ "speaker": "odette", "text": "Des rideaux à la maisonnette ! À la ville, on en fait tout un plat. Moi aussi, du coup." }]
+        },
+        {
+          "id": "odette_omelette",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "crafted", "recipe": "cook_omelette", "since": "game_start" }],
+          "lines": [{ "speaker": "odette", "text": "Des omelettes, maintenant ? Un peu de beurre, et c'est un repas de fête. J'en ai au comptoir, je dis ça." }]
+        },
+        {
+          "id": "odette_mid_week2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 11 }],
+          "lines": [{ "speaker": "odette", "text": "Plus que quelques jours avant le train. Je l'entends déjà siffler. C'est peut-être la bouilloire." }]
+        },
+        {
+          "id": "odette_market",
+          "kind": "scene",
+          "once": "player",
+          "priority": 30,
+          "when": [{ "type": "day_is", "days": [13] }],
+          "lines": [
+            { "speaker": "odette", "text": "Jour de marché ! Bon, marché... Moi, sur la place, avec mes bocaux et mes clous. Mais ça change de mon comptoir." },
+            { "speaker": "odette", "text": "Autrefois, le jeudi, toute la vallée montait ici. Avec le train, ils reviendront. Je garde une place pour vos carottes." }
+          ]
         }
       ]
     },
@@ -477,7 +704,7 @@
         {
           "id": "basile_daily_week2",
           "kind": "daily",
-          "priority": 2,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 9 }],
           "lines": [{ "speaker": "basile", "text": "Il reste quelques arbres à la lisière. Après, il faudra attendre qu'ils repoussent. Trente ans, à peu près." }]
         },
@@ -491,7 +718,7 @@
         {
           "id": "basile_shed_closed",
           "kind": "daily",
-          "priority": 3,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }],
           "lines": [{ "speaker": "basile", "text": "La draisine d'Émile dort dans la remise. Sans la clé, je ne peux rien pour elle." }]
         },
@@ -577,6 +804,117 @@
           "shared": true,
           "point": "quay_bell",
           "lines": [{ "speaker": "basile", "text": "La draisine est prête. Il ne lui manque qu'une voie dégagée et quatre bras. Je connais quatre bras." }]
+        },
+        {
+          "id": "basile_morning",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "08:00", "to": "11:00" }],
+          "lines": [{ "speaker": "basile", "text": "Le bois du matin est encore froid. Il se laisse scier plus doucement." }]
+        },
+        {
+          "id": "basile_evening",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "15:00", "to": "18:00" }],
+          "lines": [{ "speaker": "basile", "text": "Je range mes outils à six heures. Depuis quarante ans. La scie ne me le pardonnerait pas." }]
+        },
+        {
+          "id": "basile_rain",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "basile", "text": "Il pleut. Le bois boit. Moi, je reste au sec." }]
+        },
+        {
+          "id": "basile_cloudy",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "cloudy" }],
+          "lines": [{ "speaker": "basile", "text": "Temps gris, sciure grise. On ne voit plus la différence." }]
+        },
+        {
+          "id": "basile_sunny",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "sunny" }, { "type": "time_is", "from": "11:00", "to": "15:00" }],
+          "lines": [{ "speaker": "basile", "text": "Le soleil sur la scierie, ça sent la résine. Si on me demande, c'est mon parfum." }]
+        },
+        {
+          "id": "basile_roof_held",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "built", "construction": "house_roof" }, { "type": "day_at_least", "day": 5 }],
+          "lines": [{ "speaker": "basile", "text": "Votre toit a tenu la première pluie ? Alors il tiendra les suivantes. C'est la règle." }]
+        },
+        {
+          "id": "basile_table",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "table", "since": "game_start" }],
+          "lines": [{ "speaker": "basile", "text": "Une table, c'est le premier meuble d'une maison. Le reste, c'est de la décoration. Même le lit." }]
+        },
+        {
+          "id": "basile_bed",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "double_bed", "since": "game_start" }],
+          "lines": [{ "speaker": "basile", "text": "Seize planches pour un lit. On dort sur son propre travail: c'est le meilleur oreiller." }]
+        },
+        {
+          "id": "basile_stumps",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "chopped", "count": 3, "since": "game_start" }],
+          "lines": [{ "speaker": "basile", "text": "Vous coupez propre. Les souches sont nettes. Ça dit beaucoup de quelqu'un, une souche." }]
+        },
+        {
+          "id": "basile_emile",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 3 }],
+          "lines": [{ "speaker": "basile", "text": "Émile ? Il passait à la scierie pour l'odeur. Il ne m'achetait jamais rien. On s'entendait bien." }]
+        },
+        {
+          "id": "basile_coop",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "built", "construction": "chicken_coop" }],
+          "lines": [{ "speaker": "basile", "text": "Le poulailler tient ? J'ai vu vos clous. Ils sont droits. Presque." }]
+        },
+        {
+          "id": "basile_mid_week2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 11 }],
+          "lines": [{ "speaker": "basile", "text": "Les rails de la ligne sont plus vieux que moi. Ça me rassure: il y a plus vieux que moi." }]
+        },
+        {
+          "id": "basile_handcar_ready",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "handcar_ready" }],
+          "lines": [{ "speaker": "basile", "text": "Je repense à la draisine qui roule. Pousser quelque chose à plusieurs, je n'avais pas fait ça depuis longtemps." }]
+        },
+        {
+          "id": "basile_omelette_after",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "quest_done", "quest": "basile_omelette" }],
+          "lines": [{ "speaker": "basile", "text": "J'ai encore le goût de votre omelette. Bon, je ne vous en redemande pas. Pas aujourd'hui." }]
+        },
+        {
+          "id": "basile_force_lock",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 48,
+          "when": [{ "type": "day_at_least", "day": 12 }, { "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }],
+          "effects": [
+            { "type": "set_world_state", "key": "handcar_shed", "value": "open" },
+            { "type": "set_flag", "flag": "shed_open" },
+            { "type": "show_text", "text": "shed_forced" }
+          ],
+          "lines": [{ "speaker": "basile", "text": "Toujours pas de clé ? Tant pis pour le mystère: un pied-de-biche, et la remise est à vous. Émile ne m'en voudra pas." }]
         }
       ]
     },
@@ -592,6 +930,7 @@
       "schedule": [
         { "when": [{ "type": "not", "condition": { "type": "day_at_least", "day": 3 } }], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent" },
         { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "day_is", "days": [12] }, { "type": "weather_is", "weather": "rain" }], "from": "08:00", "to": "18:00", "point": "quay_bench", "activity": "play" },
         { "from": "06:00", "to": "08:00", "point": "offstage", "activity": "home" },
         { "from": "08:00", "to": "12:00", "point": "quay_bench", "activity": "play" },
         { "from": "12:00", "to": "18:00", "point": "riverbank", "activity": "play" },
@@ -644,6 +983,7 @@
         {
           "id": "jeanne_hint_rain",
           "kind": "hint",
+          "once": "player",
           "priority": 9,
           "when": [{ "type": "quest_active", "quest": "emile_riddle" }, { "type": "weather_is", "weather": "rain" }],
           "lines": [{ "speaker": "jeanne", "text": "Pas d'ombre quand il pleut. Ça, je le sais." }]
@@ -651,6 +991,7 @@
         {
           "id": "jeanne_hint_shadow",
           "kind": "hint",
+          "once": "player",
           "priority": 8,
           "when": [{ "type": "quest_active", "quest": "emile_riddle" }],
           "lines": [{ "speaker": "jeanne", "text": "La cloche, c'est celle du quai. Le banc est juste à côté. Mais une ombre, ça bouge tout le temps..." }]
@@ -679,7 +1020,7 @@
         {
           "id": "jeanne_daily_week2",
           "kind": "daily",
-          "priority": 2,
+          "priority": 1,
           "when": [{ "type": "day_at_least", "day": 9 }],
           "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie dit que Firmin est le seul à dire bonjour au train. C'est vrai, je l'ai vu." }]
         },
@@ -703,7 +1044,7 @@
           "kind": "quest",
           "once": "duo",
           "priority": 43,
-          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "dialogue_done", "dialogue": "jeanne_meeting" }],
+          "when": [{ "type": "day_at_least", "day": 11 }, { "type": "dialogue_done", "dialogue": "jeanne_meeting" }],
           "effects": [{ "type": "give_item", "item": "lucie_letter", "count": 1, "to": "actor" }],
           "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie a écrit une lettre à Firmin. Elle n'ose pas la lui donner. Moi non plus. Vous, vous osez ?" }]
         },
@@ -721,6 +1062,121 @@
           "priority": 45,
           "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
           "lines": [{ "speaker": "jeanne", "text": "Il a dit merci ? Trois fois ? Ma tante va devenir rouge comme une tomate. Tenez, c'est mon argent de poche." }]
+        },
+        {
+          "id": "jeanne_morning",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "08:00", "to": "12:00" }],
+          "lines": [{ "speaker": "jeanne", "text": "Le matin, je surveille le quai. Si un train arrive en avance, je veux être la première à le voir." }]
+        },
+        {
+          "id": "jeanne_pebbles",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "12:00", "to": "18:00" }],
+          "lines": [{ "speaker": "jeanne", "text": "Les galets de la rivière ont tous une forme différente. J'en ai déjà classé quarante. Il en reste beaucoup." }]
+        },
+        {
+          "id": "jeanne_evening",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "time_is", "from": "18:00", "to": "20:00" }],
+          "lines": [{ "speaker": "jeanne", "text": "Le soir, le puits fait un écho. Dis ton prénom dedans, il te le rend. Mais pas trop fort." }]
+        },
+        {
+          "id": "jeanne_rain",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "jeanne", "text": "Il pleut ! Ma tante dit que les escargots font la fête. Moi aussi, je fais la fête." }]
+        },
+        {
+          "id": "jeanne_cloudy",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "cloudy" }],
+          "lines": [{ "speaker": "jeanne", "text": "Le nuage, là, on dirait une locomotive. Si, regarde bien. Une petite." }]
+        },
+        {
+          "id": "jeanne_sunny",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "weather_is", "weather": "sunny" }, { "type": "time_is", "from": "14:00", "to": "18:00" }],
+          "lines": [{ "speaker": "jeanne", "text": "Au soleil, la rivière fait des étincelles. Je les compte aussi." }]
+        },
+        {
+          "id": "jeanne_duchesse",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "eggs_enabled" }],
+          "lines": [{ "speaker": "jeanne", "text": "La Duchesse m'a regardée de travers. Je crois qu'elle me respecte." }]
+        },
+        {
+          "id": "jeanne_feather",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "quest_done", "quest": "jeanne_bet" }],
+          "lines": [{ "speaker": "jeanne", "text": "Tu prends soin de ma plume ? Je demande, c'est tout. Pas tous les jours. Bon, un peu tous les jours." }]
+        },
+        {
+          "id": "jeanne_shed",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "shed_open" }],
+          "lines": [{ "speaker": "jeanne", "text": "La remise est ouverte ! Je n'ai pas le droit d'entrer. Mais je regarde par la fente, et ça, ça ne compte pas." }]
+        },
+        {
+          "id": "jeanne_summer",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 5 }],
+          "lines": [{ "speaker": "jeanne", "text": "L'école est fermée pour l'été. Alors j'apprends toute seule: les trains, les poules, et Firmin." }]
+        },
+        {
+          "id": "jeanne_mid_week2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 11 }],
+          "lines": [{ "speaker": "jeanne", "text": "Je compte les jours jusqu'au train. Il en reste... attends... je recompte." }]
+        },
+        {
+          "id": "jeanne_handcar",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "flag", "flag": "handcar_ready" }],
+          "lines": [{ "speaker": "jeanne", "text": "La draisine roule ? Un jour, vous m'emmènerez aux Vergers. Je n'ai pas entendu non, alors c'est promis." }]
+        },
+        {
+          "id": "jeanne_bed",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "placed", "item": "double_bed", "since": "game_start" }],
+          "lines": [{ "speaker": "jeanne", "text": "Odette dit que vous avez un lit pour deux, maintenant. C'est grand, un lit pour deux ?" }]
+        },
+        {
+          "id": "jeanne_carrots",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "harvested", "item": "carrot", "since": "game_start" }],
+          "lines": [{ "speaker": "jeanne", "text": "Une carotte, ça pousse la tête en bas. J'ai vérifié. C'est bizarre." }]
+        },
+        {
+          "id": "jeanne_rain_story",
+          "kind": "scene",
+          "once": "player",
+          "priority": 30,
+          "when": [{ "type": "day_is", "days": [12] }, { "type": "weather_is", "weather": "rain" }],
+          "lines": [
+            { "speaker": "jeanne", "text": "Je m'abrite sous la marquise, comme les voyageurs d'avant. Ma tante m'a raconté." },
+            { "speaker": "jeanne", "text": "Il y avait un train chaque matin. Les gens descendaient avec des valises, des poules, une fois même un piano." },
+            {
+              "choices": [
+                { "id": "piano", "text": "Un piano ?", "reply": [{ "speaker": "jeanne", "text": "Un piano ! Il est resté trois jours sur le quai. Firmin dit qu'il en joue encore la nuit. Je crois qu'il plaisante." }] },
+                { "id": "again", "text": "Ça reviendra.", "reply": [{ "speaker": "jeanne", "text": "Je sais. C'est vous qui le faites revenir." }] }
+              ]
+            }
+          ]
         }
       ]
     }

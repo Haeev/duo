@@ -267,7 +267,7 @@
       "completionEffects": [
         {
           "type": "if",
-          "condition": { "type": "flag", "flag": "week1_over" },
+          "condition": { "type": "all", "conditions": [{ "type": "flag", "flag": "week1_over" }, { "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }] },
           "then": [
             { "type": "set_world_state", "key": "handcar_shed", "value": "open" },
             { "type": "set_flag", "flag": "shed_open" },
