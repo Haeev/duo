@@ -66,6 +66,8 @@ interface DemoHandle {
   missing(): string[];
   breakdown(): Record<string, number>;
   programs(): string[];
+  /** Programmes utilisés par la scène dans l'état courant (hors variantes en cache). */
+  programsInUse(): number;
   /** Qualité en vigueur et palier de résolution (essai du repli automatique, `adaptatif=1`). */
   quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
@@ -171,6 +173,7 @@ async function main(): Promise<void> {
     missing: () => [],
     breakdown: () => engine.breakdown(),
     programs: () => engine.programList(),
+    programsInUse: () => engine.programsInUse(),
     quality: () => ({
       mode: engine.renderQuality(),
       scale: engine.resolutionScale(),

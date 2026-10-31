@@ -376,6 +376,16 @@ export class RenderEngine implements Renderer {
     this.updateFrame(0);
     await this.renderer.compileAsync(this.scene, this.rig.camera);
     this.renderer.render(this.scene, this.rig.camera);
+    if (this.quality !== null && !this.disposed) {
+      // Repli automatique possible: ses variantes sans ombre se compilent aussi
+      // maintenant. Three.js garde les deux programmes par matériau, la bascule
+      // (dans un sens ou dans l'autre) n'en compile alors aucun en pleine partie.
+      this.setShadows(false);
+      await this.renderer.compileAsync(this.scene, this.rig.camera);
+      this.renderer.render(this.scene, this.rig.camera);
+      this.setShadows(true);
+      this.renderer.render(this.scene, this.rig.camera);
+    }
     for (const entry of hidden) {
       entry.object.visible = entry.visible;
     }
@@ -497,9 +507,7 @@ export class RenderEngine implements Renderer {
    */
   private applyQuality(change: QualityChange): void {
     if (change.kind !== 'step') {
-      const shadows = change.kind === 'normal';
-      this.renderer.shadowMap.enabled = shadows;
-      this.daylight.sun.castShadow = shadows;
+      this.setShadows(change.kind === 'normal');
     }
     this.resize();
     this.perf.setResolutionScale(this.resolutionScale());
@@ -517,6 +525,24 @@ export class RenderEngine implements Renderer {
         pixelRatio: this.renderer.getPixelRatio(),
       },
     );
+  }
+
+  /**
+   * Ombres du soleil allumées ou coupées. Coupées, la carte d'ombre est libérée
+   * (une texture de profondeur pleine taille de moins en mémoire graphique);
+   * Three.js la recrée seul au rendu suivant quand elles reviennent.
+   */
+  private setShadows(enabled: boolean): void {
+    this.renderer.shadowMap.enabled = enabled;
+    const sun = this.daylight.sun;
+    sun.castShadow = enabled;
+    const map = sun.shadow.map;
+    if (!enabled && map !== null) {
+      map.depthTexture?.dispose();
+      map.depthTexture = null;
+      map.dispose();
+      sun.shadow.map = null;
+    }
   }
 
   /** Palier de résolution dynamique courant (1 = pleine résolution). */
@@ -595,6 +621,32 @@ export class RenderEngine implements Renderer {
     return (this.renderer.info.programs ?? []).map(
       (program) => `${program.name} ${program.cacheKey.slice(0, 60)}`,
     );
+  }
+
+  /**
+   * Programmes réellement utilisés par les matériaux de la scène dans l'état
+   * courant (diagnostic du budget). `programList()` compte aussi les variantes
+   * en cache, compilées d'avance mais inutilisées dans cet état; les passes
+   * d'ombre (matériaux de profondeur internes) n'y figurent pas.
+   */
+  programsInUse(): number {
+    const used = new Set<unknown>();
+    this.scene.traverse((object) => {
+      if (!(object instanceof Mesh)) {
+        return;
+      }
+      const materials: unknown[] = Array.isArray(object.material)
+        ? object.material
+        : [object.material];
+      for (const material of materials) {
+        const properties = this.renderer.properties.get(material);
+        if (typeof properties === 'object' && properties !== null && 'currentProgram' in properties) {
+          used.add(properties.currentProgram);
+        }
+      }
+    });
+    used.delete(undefined);
+    return used.size;
   }
 
   /** Triangles par partie de la scène (diagnostic des budgets, page de démonstration). */

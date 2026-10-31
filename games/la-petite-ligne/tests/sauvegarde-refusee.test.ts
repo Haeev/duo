@@ -34,7 +34,7 @@ describe('sauvegarde refusée au chargement', () => {
     try {
       await duo.start();
       const writes: string[] = [];
-      let provider: (() => SaveSnapshot | null) | null = null;
+      const box: { provider: (() => SaveSnapshot | null) | null } = { provider: null };
       const errors: string[] = [];
       const real = duo.hostGame;
       // Le contexte réel de l'hôte, avec une sauvegarde abîmée chargée et des écritures espionnées.
@@ -44,7 +44,7 @@ describe('sauvegarde refusée au chargement', () => {
           slot: 1,
           loaded: { slot: 1, label: 'abîmée', dataSchema: DATA_SCHEMA, data: damagedSave() },
           provide: (p: () => SaveSnapshot | null) => {
-            provider = p;
+            box.provider = p;
           },
           write: (moment: string) => {
             writes.push(moment);
@@ -71,7 +71,7 @@ describe('sauvegarde refusée au chargement', () => {
         clock.now += SIM_DT * 1000;
         session.beforeFrame(1);
         guest.beforeFrame(1);
-        if (i % (30 * 60) === 0 && provider !== null) autosaves.push((provider as () => SaveSnapshot | null)());
+        if (i % (30 * 60) === 0 && box.provider !== null) autosaves.push(box.provider());
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
       await new Promise((resolve) => setTimeout(resolve, 0));
