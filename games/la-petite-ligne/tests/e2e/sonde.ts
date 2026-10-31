@@ -245,56 +245,67 @@ export function westKeys(yaw: number): readonly string[] {
 export interface Walker {
   /** Orientation de la caméra estimée d'après les déplacements observés. */
   yaw: number;
+  /** Durée d'appui courante, adaptée au pas observé (une image peut durer une seconde). */
+  holdMs: number;
+}
+
+export function newWalker(): Walker {
+  return { yaw: START_YAW, holdMs: 600 };
 }
 
 /**
  * Marche au clavier de point de passage en point de passage. Le pilote ne suppose pas
  * l'orientation de la caméra: il la réestime à chaque pas d'après le déplacement observé
- * chez l'hôte (une caméra tournée ne le perd pas). Touches tenues au moins 700 ms: en rendu
- * logiciel, une image dure près d'une seconde et une touche plus brève peut passer inaperçue.
+ * chez l'hôte (une caméra tournée ne le perd pas). La durée d'appui s'adapte: plus longue si
+ * rien ne bouge (en rendu logiciel, une touche brève peut passer entre deux images), plus
+ * courte si le pas dépasse le but. `tolerance`: rayon d'arrivée de chaque point de passage.
  */
 export async function walkAlong(
   page: Page,
   probe: Probe,
   id: string,
-  waypoints: readonly { x: number; y: number }[],
+  waypoints: readonly { x: number; y: number; tolerance?: number }[],
   tolerance = 0.6,
   timeoutMs = 240_000,
-  walker: Walker = { yaw: START_YAW },
+  walker: Walker = newWalker(),
 ): Promise<{ x: number; y: number }> {
   const start = Date.now();
   let stuck = 0;
   for (const target of waypoints) {
+    const radius = target.tolerance ?? tolerance;
     for (;;) {
       const pos = positionOf(probe, id);
       if (pos === null) throw new Error('aucune position reçue');
       const ex = target.x - pos.x;
       const ey = target.y - pos.y;
       const dist = Math.hypot(ex, ey);
-      if (dist <= tolerance) break;
+      if (dist <= radius) break;
       if (Date.now() - start > timeoutMs) {
         throw new Error(
-          `Marche trop longue vers (${target.x}, ${target.y}): arrêté en (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), caméra estimée ${walker.yaw.toFixed(2)} rad`,
+          `Marche trop longue vers (${target.x}, ${target.y}): arrêté en (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), caméra estimée ${walker.yaw.toFixed(2)} rad, appui ${walker.holdMs} ms`,
         );
       }
       const wanted = Math.atan2(ey, ex);
       // Bloqué contre un obstacle: un pas de côté, à angle droit.
-      const aim = stuck >= 2 ? wanted + (stuck % 2 === 0 ? Math.PI / 2 : -Math.PI / 2) : wanted;
+      const aim = stuck >= 3 ? wanted + (stuck % 2 === 0 ? Math.PI / 2 : -Math.PI / 2) : wanted;
       let best = KEY_DIRECTIONS[0];
       for (const d of KEY_DIRECTIONS) {
         if (best === undefined || angleGap(walker.yaw + d.screen, aim) < angleGap(walker.yaw + best.screen, aim)) best = d;
       }
       if (best === undefined) break;
-      await holdKeys(page, best.codes, Math.max(700, Math.min(1800, dist * 300)));
+      await holdKeys(page, best.codes, walker.holdMs);
       const after = await settledPosition(page, probe, id);
       if (after === null) continue;
       const dx = after.x - pos.x;
       const dy = after.y - pos.y;
-      if (Math.hypot(dx, dy) < 0.15) {
+      const step = Math.hypot(dx, dy);
+      if (step < 0.15) {
         stuck++;
+        walker.holdMs = Math.min(2000, Math.round(walker.holdMs * 1.5));
         continue;
       }
       stuck = 0;
+      if (step > dist * 1.2) walker.holdMs = Math.max(200, Math.round(walker.holdMs * 0.6));
       // Réestimation de la caméra, amortie (un glissement le long d'un mur fausse un peu la mesure).
       const observed = Math.atan2(dy, dx) - best.screen;
       walker.yaw = Math.atan2(

@@ -245,7 +245,7 @@ export const AMBIANCE_SETTINGS = {
       azimuthDeg: 184,
       elevationDeg: 19,
       sunColor: '#ffb577',
-      sunIntensity: 2.6,
+      sunIntensity: 2.85,
       skyColor: '#f2d2b0',
       groundColor: '#968f70',
       hemiIntensity: 1.2,
@@ -261,7 +261,7 @@ export const AMBIANCE_SETTINGS = {
       azimuthDeg: 197,
       elevationDeg: 10,
       sunColor: '#ffa468',
-      sunIntensity: 2.3,
+      sunIntensity: 2.5,
       skyColor: '#eec7a8',
       groundColor: '#8f8a6a',
       hemiIntensity: 1.24,
@@ -359,7 +359,7 @@ export const AMBIANCE_SETTINGS = {
     /** Douceur du bord (en texels de la carte d'ombre). */
     radius: 2.5,
     /** Opacité de l'ombre à pleine force (le sol ne devient jamais noir). */
-    intensity: 0.66,
+    intensity: 0.72,
     /** Biais de profondeur, et biais selon la normale en texels (suit le zoom): pas d'acné d'ombre. */
     bias: -0.0004,
     normalBiasTexels: 1.4,
