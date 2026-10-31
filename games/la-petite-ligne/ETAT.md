@@ -28,7 +28,7 @@ Branché par le rendu (2026-10-31): `fish_cast` une fois sur `cast`, `fish_wait`
 - `RenderEngine` (exporté par `src/rendu/index.ts`): `setReducedMotion(bool)` (réglage qui change en cours de partie), `detailedStats()` (appels, triangles, programmes, géométries, textures, images par seconde), `programList()`, `resolutionScale()`.
 - `pick()` renvoie la cible la plus proche (personnage, habitant, meuble, objet au sol, arbre debout) avant le sol; le sol tient compte de la hauteur du terrain (quai, berges) et vaut `null` hors de la carte.
 - Indicateur de performances en haut à gauche en mode développement (`import.meta.env.DEV`), rouge au-delà des budgets (150 appels, 250 000 triangles, 12 programmes); résolution dynamique qui descend par paliers jusqu'à 0,75 si les images dépassent 20 ms en moyenne.
-- Trous de visibilité: ce qui cache un des deux joueurs (bâtiment, arbre, auvent) s'efface en trame autour de lui; la maisonnette coupe toit et murs côté caméra quand le personnage local y est (`inHouse`).
+- Trous de visibilité (revus après la revue du directeur artistique): seul ce qui cache vraiment le corps d'un des deux joueurs (plus près de la caméra que lui au même endroit de l'écran) s'efface, dans une ellipse ajustée à sa silhouette (0,55 m de demi-largeur, 1,05 m de demi-hauteur), bord étroit en trame ordonnée de Bayer 4x4; la maisonnette coupe toit et murs côté caméra quand le personnage local y est (`inHouse`).
 - Page de démonstration du rendu seul: `rendu.html` (paramètres en tête de `src/rendu/demo/main.ts`), essai d'endurance `rendu.html?cycles=12`.
 
 ### Points d'accroche pour le technical artist
