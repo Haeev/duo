@@ -222,7 +222,9 @@ export function ActionList({ actions }: { actions: readonly GameAction[] }): JSX
             {action.keys.map((code) => (
               <KeyCap key={code} label={keyLabel(code, layout)} />
             ))}
-            {action.mouse !== null && <KeyCap label={MOUSE_NAMES[action.mouse]} />}
+            {action.mouse.map((input) => (
+              <KeyCap key={input} label={MOUSE_NAMES[input]} />
+            ))}
           </dd>
         </div>
       ))}

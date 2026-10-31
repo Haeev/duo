@@ -75,7 +75,7 @@ export function resolveInside(root: string, urlPath: string): string | null {
   return target;
 }
 
-export type ByteRange = { readonly start: number; readonly end: number };
+export interface ByteRange { readonly start: number; readonly end: number }
 
 /** Lit un en-tête `Range: bytes=...` (une seule plage). `null`: pas de plage; `'invalid'`: 416. */
 export function parseRange(header: string | null, size: number): ByteRange | null | 'invalid' {

@@ -20,9 +20,9 @@ const GAME: GameSummary = {
   description: 'Un petit jeu à deux pour éprouver toute la chaîne.',
   thumbnailUrl: THUMBNAIL,
   actions: [
-    { id: 'move-up', label: 'Avancer', keys: ['KeyW'], mouse: null },
-    { id: 'move-left', label: 'Aller à gauche', keys: ['KeyA'], mouse: null },
-    { id: 'act', label: 'Agir', keys: ['Space'], mouse: 'left' },
+    { id: 'move-up', label: 'Avancer', keys: ['KeyW'], mouse: [] },
+    { id: 'move-left', label: 'Aller à gauche', keys: ['KeyA'], mouse: [] },
+    { id: 'act', label: 'Agir', keys: ['Space'], mouse: ['left'] },
   ],
   saves: { help: 'Le jeu enregistre à l’aube et en quittant.', onExit: true },
   lastSave: { label: 'Jour 3', writtenAt: Date.now() - 86_400_000 },
@@ -94,11 +94,25 @@ function scenarioState(name: string | null): AppState {
     case 'coupure':
       return { ...BASE, match: { ...MATCH, phase: 'link-lost', linkLostSince: Date.now() - 42_000 } };
     case 'fin':
-      return { ...BASE, salon: SALON, end: { game: GAME, kind: 'session', durationMs: 4_320_000, saved: true } };
+      return { ...BASE, salon: SALON, end: {
+          game: GAME,
+          kind: 'session',
+          durationMs: 4_320_000,
+          saved: true,
+          outcome: null,
+          winner: null,
+          stats: [
+            { label: 'Journées vécues', value: '8' },
+            { label: 'Commande remplie', value: '4 sur 4' },
+            { label: 'Meubles posés', value: '9' },
+          ],
+        },
+      };
     case 'arret':
       return { ...BASE, salon: SALON, notice: { kind: 'game-crashed', gameName: GAME.name, where: 'peer', hadSave: true } };
     case 'quitter':
       return { ...BASE, match: { ...MATCH, phase: 'paused', pausedBy: { self: true, peer: false } }, quitConfirm: true };
+    case null:
     default:
       return BASE;
   }

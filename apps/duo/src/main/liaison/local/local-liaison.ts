@@ -22,6 +22,7 @@ import {
   nextDeadline,
   reduceSession,
   toWire,
+  type EndSummary,
   type HostSession,
   type SalonGame,
   type SessionInput,
@@ -112,6 +113,7 @@ export class LocalLiaison implements Liaison {
   private listenPort: number | null = null;
   private link: Link | null = null;
   private readonly dialing = new Set<string>();
+  private readonly sockets = new Set<net.Socket>();
   private peer: PeerInfo | null = null;
   private lastPeerInstance: string | null = null;
   private own: HostSession = EMPTY_SESSION;
@@ -155,14 +157,24 @@ export class LocalLiaison implements Liaison {
       });
       link.close();
     }
-    await new Promise<void>((resolve) => {
-      if (this.server === null) {
-        resolve();
-        return;
-      }
-      this.server.close(() => {
-        resolve();
+    for (const socket of this.sockets) socket.destroy();
+    this.sockets.clear();
+    const server = this.server;
+    this.server = null;
+    if (server !== null) {
+      await new Promise<void>((resolve) => {
+        server.close(() => {
+          resolve();
+        });
+        setTimeout(resolve, 300);
       });
+    }
+  }
+
+  private remember(socket: net.Socket): void {
+    this.sockets.add(socket);
+    socket.once('close', () => {
+      this.sockets.delete(socket);
     });
   }
 
@@ -187,8 +199,8 @@ export class LocalLiaison implements Liaison {
     this.applyOwn({ type: 'close' });
   }
 
-  selectSave(choice: SalonGame['saveChoice']): void {
-    this.applyOwn({ type: 'select-save', saveChoice: choice });
+  selectSave(choice: SalonGame['saveChoice'], save: SalonGame['save']): void {
+    this.applyOwn({ type: 'select-save', saveChoice: choice, save });
   }
 
   joinSalon(): void {
@@ -219,8 +231,8 @@ export class LocalLiaison implements Liaison {
     this.route({ type: 'resume', seat: 'host' }, { type: 'resume' });
   }
 
-  stopMatch(reason: StopReason): void {
-    this.route({ type: 'stop', seat: 'host', reason }, { type: 'stop', reason });
+  stopMatch(reason: StopReason, summary?: EndSummary): void {
+    this.route({ type: 'stop', seat: 'host', reason, summary }, { type: 'stop', reason });
   }
 
   sendGame(message: GameRelayMessage): void {
@@ -319,6 +331,7 @@ export class LocalLiaison implements Liaison {
       socket.destroy();
       return;
     }
+    this.remember(socket);
     this.track(new Link(socket, false, (link, message) => {
       this.onMessage(link, message);
     }, (link) => {
@@ -348,6 +361,7 @@ export class LocalLiaison implements Liaison {
     if (this.dialing.has(key)) return;
     this.dialing.add(key);
     const socket = net.connect({ host: target.host, port: target.port });
+    this.remember(socket);
     const timeout = setTimeout(() => socket.destroy(), 2000);
     socket.once('connect', () => {
       clearTimeout(timeout);

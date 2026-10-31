@@ -12,12 +12,14 @@ export interface Profile {
 export type GameMode = 'coop' | 'versus';
 export type GamePlay = 'match' | 'session';
 
+export type MouseInput = 'left' | 'middle' | 'right' | 'wheel-up' | 'wheel-down';
+
 export interface GameAction {
   readonly id: string;
   readonly label: string;
   /** Touches par position physique (`KeyboardEvent.code`). */
   readonly keys: readonly string[];
-  readonly mouse: 'left' | 'right' | 'middle' | null;
+  readonly mouse: readonly MouseInput[];
 }
 
 export interface SaveSummary {
@@ -94,6 +96,12 @@ export interface EndView {
   readonly kind: 'session' | 'match';
   readonly durationMs: number;
   readonly saved: boolean;
+  /** Issue vue de cette machine (`null` pour une séance ou un arrêt). */
+  readonly outcome: 'won' | 'lost' | 'draw' | 'success' | 'failure' | null;
+  /** Pseudo du vainqueur quand l'autre a gagné. */
+  readonly winner: string | null;
+  /** Jusqu'à trois statistiques fournies par le jeu. */
+  readonly stats: readonly { readonly label: string; readonly value: string }[];
 }
 
 export type NoticeView =

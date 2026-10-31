@@ -1,8 +1,10 @@
 // Aides des tests Electron: lancer Duo sur un dossier de données jetable,
 // retrouver la vue plateforme et la vue jeu parmi les pages de Playwright.
+import { execFile } from 'node:child_process';
 import { mkdir, mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
+import { promisify } from 'node:util';
 import { _electron as electron, type ElectronApplication, type Page } from '@playwright/test';
 
 export const APP_DIR = path.resolve(import.meta.dirname, '..', '..');
@@ -70,10 +72,45 @@ export async function launchDuo(options: {
   return { app, platform, dataDir: options.dataDir };
 }
 
+/**
+ * Vraie touche du clavier système (X11, `xdotool`), envoyée à la vue jeu après lui avoir
+ * donné le focus: seul ce chemin passe par `before-input-event`, où le principal
+ * intercepte Échap. Les touches simulées par Playwright arrivent directement à la page.
+ */
+export async function pressNativeKey(instance: DuoInstance, key: string): Promise<void> {
+  await instance.app.evaluate(({ BaseWindow, webContents }) => {
+    BaseWindow.getAllWindows()[0]?.focus();
+    webContents
+      .getAllWebContents()
+      .find((contents) => contents.getURL().startsWith('duo-game://'))
+      ?.focus();
+  });
+  await promisify(execFile)('xdotool', ['key', key]);
+}
+
 export function gamePage(instance: DuoInstance): Promise<Page> {
   return waitForPage(instance.app, 'duo-game://');
 }
 
+function within(promise: Promise<unknown>, ms: number): Promise<boolean> {
+  return Promise.race([
+    promise.then(
+      () => true,
+      () => true,
+    ),
+    new Promise<boolean>((resolve) => setTimeout(() => resolve(false), ms)),
+  ]);
+}
+
+/**
+ * Ferme Duo. Pendant une partie, quitter demande confirmation (M-15): on confirme.
+ * En dernier recours, le processus est tué pour ne pas bloquer la suite des tests.
+ */
 export async function closeDuo(instance: DuoInstance): Promise<void> {
-  await instance.app.close().catch(() => undefined);
+  const closing = instance.app.close();
+  if (await within(closing, 4000)) return;
+  const confirm = instance.platform.getByTestId('quitter-confirmer');
+  if (await confirm.isVisible().catch(() => false)) await confirm.click().catch(() => undefined);
+  if (await within(closing, 6000)) return;
+  instance.app.process().kill('SIGKILL');
 }

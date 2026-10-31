@@ -103,7 +103,7 @@ async function pruneOldFiles(dir: string): Promise<void> {
 }
 
 export function systemSanitizer(): (text: string) => string {
-  let userName = '';
+  let userName: string;
   try {
     userName = os.userInfo().username;
   } catch {

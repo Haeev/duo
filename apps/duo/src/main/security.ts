@@ -14,4 +14,6 @@ export function hardenSession(target: Session, options: { readonly allowGamePerm
   target.on('will-download', (event) => {
     event.preventDefault();
   });
+  // Hors ligne: le correcteur orthographique téléchargerait ses dictionnaires sur Internet.
+  target.setSpellCheckerEnabled(false);
 }

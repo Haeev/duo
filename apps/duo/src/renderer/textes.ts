@@ -298,6 +298,11 @@ export const t = {
     // Texte à valider par ux-ui-designer: la spécification n'a pas encore d'écran de fin de séance.
     titreSeance: 'Séance terminée',
     titrePartie: 'Partie terminée',
+    gagne: fr`Tu as gagné !`,
+    gagnePar: (name: string): string => `${name} a gagné`,
+    egalite: fr`Égalité !`,
+    reussite: fr`Vous avez réussi !`,
+    echec: 'Pas cette fois',
     sousTitre: (game: string, duration: string): string => `${game} · ${duration}`,
     progression: 'Progression enregistrée.',
     retourSalon: 'Retour au salon',
@@ -359,6 +364,8 @@ export const MOUSE_NAMES = {
   left: 'Clic gauche',
   right: 'Clic droit',
   middle: 'Clic molette',
+  'wheel-up': 'Molette vers le haut',
+  'wheel-down': 'Molette vers le bas',
 } as const;
 
 /**

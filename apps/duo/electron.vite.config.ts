@@ -1,15 +1,14 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'electron-vite';
 
-// Version de test (ADR 0013, point 1): DUO_TEST=1 au moment de la construction
-// compile les crochets de test; sinon ils disparaissent par élimination du code mort.
-const testBuild = process.env.DUO_TEST === '1';
 const root = import.meta.dirname;
 
-export default defineConfig({
+// Version de test (ADR 0013, point 1): `electron-vite build --mode test` compile
+// les crochets de test; sinon ils disparaissent par élimination du code mort.
+export default defineConfig(({ mode }) => ({
   main: {
     define: {
-      DUO_TEST: JSON.stringify(testBuild),
+      DUO_TEST: JSON.stringify(mode === 'test'),
     },
     build: {
       // Principal empaqueté avec ses dépendances: aucun node_modules dans l'archive.
@@ -49,4 +48,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

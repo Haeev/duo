@@ -1,7 +1,8 @@
 // Hébergement d'un jeu (ADR 0004): une WebContentsView par partie, sous la vue
-// plateforme, dans une session non persistante; pont par MessagePort; battement
-// de cœur; plantage, blocage et échec du chargement signalés une seule fois;
-// Échap intercepté; mise en veille de l'écran bloquée tant que la vue existe.
+// plateforme, dans une session non persistante; pont par MessagePort (le jeu dit
+// `hello`, la plateforme répond `init`); battement de cœur; plantage, blocage et
+// échec du chargement signalés une seule fois; Échap interceptée; mise en veille
+// de l'écran bloquée tant que la vue existe.
 import {
   MessageChannelMain,
   WebContentsView,
@@ -12,7 +13,15 @@ import {
   type Session,
 } from 'electron';
 import type { Journal } from '../journal';
-import type { BridgeCodec, GameToPlatform, PlatformToGame, SaveMoment } from './bridge';
+import type {
+  BridgeCodec,
+  GameMessage,
+  InitMessage,
+  PlatformMessage,
+  SaveMoment,
+  SaveStatus,
+  StopReason,
+} from './bridge';
 import { Watchdog, type WatchdogExpiry } from './watchdog';
 
 export type GameFailureReason = 'crashed' | 'hung' | 'load-timeout' | 'load-failed' | 'fatal';
@@ -22,18 +31,29 @@ export interface GameFailure {
   readonly detail: string;
 }
 
-export type SaveOutcome = 'ok' | 'too-large' | 'moment' | 'write';
+export interface SaveWriteRequest {
+  readonly moment: SaveMoment;
+  readonly label: string;
+  readonly progress: number | null;
+  readonly dataSchema: number;
+  readonly data: Uint8Array;
+}
+
+export type MatchEndMessage = Extract<GameMessage, { type: 'matchEnd' }>;
+export type SessionEndMessage = Extract<GameMessage, { type: 'sessionEnd' }>;
 
 export interface GameHostEvents {
   loading(progress: number): void;
   ready(): void;
   failure(failure: GameFailure): void;
+  /** Échap interceptée par le principal (ou `pauseRequest` du SDK, par sûreté). */
   escape(): void;
   toggleFullscreen(): void;
-  net(channel: number, mode: 'reliable' | 'latest', data: unknown): void;
-  saveWrite(moment: SaveMoment, label: string, dataSchema: number, data: Uint8Array): Promise<SaveOutcome>;
-  matchEnd(result: unknown): void;
-  sessionEnd(progress: unknown): void;
+  /** Message pour l'instance du jeu sur l'autre machine: texte JSON relayé tel quel. */
+  net(channel: number, mode: 'reliable' | 'latest', data: string): void;
+  saveWrite(request: SaveWriteRequest): Promise<SaveStatus>;
+  matchEnd(message: MatchEndMessage): void;
+  sessionEnd(message: SessionEndMessage): void;
 }
 
 export interface GameHostDeps {
@@ -47,14 +67,13 @@ export interface GameHostDeps {
   readonly devTools: boolean;
 }
 
-export type InitMessage = Extract<PlatformToGame, { type: 'init' }>;
-
 const STOP_SAVE_GRACE_MS = 2000;
 export const BRIDGE_PORT_CHANNEL = 'duo:bridge-port';
 
 export class GameHost {
   private view: WebContentsView | null = null;
   private port: MessagePortMain | null = null;
+  private init: InitMessage | null = null;
   private blocker: number | null = null;
   private failed = false;
   private stopWaiter: (() => void) | null = null;
@@ -74,6 +93,7 @@ export class GameHost {
   launch(gameId: string, entryUrl: string, init: InitMessage, bounds: Rectangle): void {
     this.destroy();
     this.failed = false;
+    this.init = init;
     const { journal } = this.deps;
     const view = new WebContentsView({
       webPreferences: {
@@ -133,9 +153,7 @@ export class GameHost {
     });
     port1.start();
     contents.once('dom-ready', () => {
-      if (this.view !== view) return;
-      contents.postMessage(BRIDGE_PORT_CHANNEL, null, [port2]);
-      this.send(init);
+      if (this.view === view) contents.postMessage(BRIDGE_PORT_CHANNEL, null, [port2]);
     });
 
     this.watchdog.start();
@@ -147,7 +165,7 @@ export class GameHost {
     });
   }
 
-  send(message: PlatformToGame): void {
+  send(message: PlatformMessage): void {
     this.port?.postMessage(this.deps.codec.encode(message));
   }
 
@@ -160,10 +178,7 @@ export class GameHost {
   }
 
   /** Arrête le jeu; avec `save`, lui laisse 2 s pour écrire avant de détruire la vue. */
-  async stop(
-    reason: Extract<PlatformToGame, { type: 'stop' }>['reason'],
-    save: boolean,
-  ): Promise<void> {
+  async stop(reason: StopReason, save: boolean): Promise<void> {
     if (this.view === null) return;
     if (!this.failed) {
       this.send({ type: 'stop', reason, save });
@@ -185,6 +200,7 @@ export class GameHost {
   destroy(): void {
     this.watchdog.stop();
     this.stopWaiter = null;
+    this.init = null;
     const view = this.view;
     this.view = null;
     this.port?.close();
@@ -220,13 +236,27 @@ export class GameHost {
   }
 
   private onMessage(gameId: string, data: unknown): void {
-    const message: GameToPlatform | null = this.deps.codec.decode(data);
+    const message = this.deps.codec.decode(data);
     if (message === null) {
-      this.deps.journal.write('warn', 'game-host', 'bridge-invalid-message', { game: gameId });
+      this.deps.journal.write('warn', 'game-host', 'bridge-invalid-message', {
+        game: gameId,
+        type: typeof data === 'object' && data !== null && 'type' in data ? String(data.type) : typeof data,
+        keys: typeof data === 'object' && data !== null ? Object.keys(data).join(',') : '',
+        detail: typeof data === 'object' && data !== null && 'data' in data ? Object.prototype.toString.call(data.data) : '',
+      });
       return;
     }
     const { events } = this.deps;
     switch (message.type) {
+      case 'hello':
+        this.watchdog.heartbeat();
+        if (!this.deps.codec.accepts(message.bridge)) {
+          this.fail({ reason: 'fatal', detail: `pont ${message.bridge} du jeu incompatible avec ${this.deps.codec.version}` });
+          return;
+        }
+        this.deps.journal.write('info', 'game-host', 'bridge-hello', { game: gameId, bridge: message.bridge, sdk: message.sdk });
+        if (this.init !== null) this.send(this.init);
+        return;
       case 'loading':
         this.watchdog.heartbeat();
         events.loading(message.progress);
@@ -240,23 +270,33 @@ export class GameHost {
         return;
       case 'perf':
         return;
+      case 'pauseRequest':
+        events.escape();
+        return;
       case 'saveWrite':
         this.pendingSaves += 1;
         void events
-          .saveWrite(message.moment, message.label, message.dataSchema, message.data)
-          .then((outcome) => {
-            this.send({ type: 'saveResult', ok: outcome === 'ok', error: outcome === 'ok' ? null : outcome });
+          .saveWrite({
+            moment: message.moment,
+            label: message.label,
+            progress: message.progress ?? null,
+            dataSchema: message.dataSchema,
+            data: new Uint8Array(message.data),
+          })
+          .then((status) => {
+            this.send({ type: 'saveResult', requestId: message.requestId, status });
           })
           .finally(() => {
             this.pendingSaves -= 1;
+            // Sauvegarde de sortie écrite: le jeu n'a plus rien à dire avant sa destruction.
             if (message.moment === 'exit' && this.pendingSaves === 0) this.stopWaiter?.();
           });
         return;
       case 'matchEnd':
-        events.matchEnd(message.result);
+        events.matchEnd(message);
         return;
       case 'sessionEnd':
-        events.sessionEnd(message.progress);
+        events.sessionEnd(message);
         if (this.pendingSaves === 0) this.stopWaiter?.();
         return;
       case 'fatal':

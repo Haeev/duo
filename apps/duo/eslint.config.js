@@ -15,7 +15,12 @@ export default [
     languageOptions: {
       parserOptions: {
         projectService: false,
-        project: ['./tsconfig.node.json', './tsconfig.web.json', './tsconfig.preload.json'],
+        project: [
+          './tsconfig.node.json',
+          './tsconfig.web.json',
+          './tsconfig.preload.json',
+          './tsconfig.e2e.json',
+        ],
         tsconfigRootDir: import.meta.dirname,
       },
     },

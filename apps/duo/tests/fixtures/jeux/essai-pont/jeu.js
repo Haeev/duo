@@ -1,30 +1,51 @@
-// Jeu d'essai des tests de l'application (jamais publié): il parle le pont 1.0
-// de l'ADR 0005 sans le SDK, pour éprouver l'hébergement des jeux.
-// Touches: Espace compte et envoie à l'autre machine; K fige le jeu (boucle
-// infinie); L lève une erreur non rattrapée.
+// Jeu d'essai des tests de l'application (jamais publié): il parle le pont 1.0 de
+// @duo/protocol sans le SDK, comme le ferait @duo/sdk, pour éprouver l'hébergement.
+// Touches: Espace compte et envoie à l'autre machine; F termine la séance (fin de
+// démo); K fige le jeu (boucle infinie); L lève une erreur non rattrapée.
 'use strict';
 
 (function () {
   var state = {
     port: null,
+    init: null,
     role: null,
-    players: [],
     seed: null,
+    players: [],
     save: null,
+    saveSlot: null,
     started: false,
     paused: false,
+    pausedBy: null,
     stopped: null,
     count: 0,
     peerCount: 0,
     netReceived: 0,
+    saveResults: [],
   };
   window.__essai = state;
 
   var canvas = document.getElementById('scene');
   var context = canvas.getContext('2d');
+  var nextRequestId = 1;
+  var pendingSaves = {};
 
-  function send(message) {
-    if (state.port !== null) state.port.postMessage(message);
+  function send(message, transfer) {
+    if (state.port === null) return;
+    if (transfer) state.port.postMessage(message, transfer);
+    else state.port.postMessage(message);
+  }
+
+  function writeSave(moment) {
+    var bytes = new TextEncoder().encode(JSON.stringify({ count: state.count }));
+    var requestId = nextRequestId++;
+    return new Promise(function (resolve) {
+      pendingSaves[requestId] = resolve;
+      // Tampon transféré, comme le fait @duo/sdk: preload-game le recopie vers le principal.
+      send(
+        { type: 'saveWrite', requestId: requestId, moment: moment, label: 'Compteur ' + state.count, dataSchema: 1, data: bytes.buffer },
+        [bytes.buffer],
+      );
+    });
   }
 
   function draw() {
@@ -58,11 +79,13 @@
     if (message === null || typeof message !== 'object') return;
     switch (message.type) {
       case 'init':
+        state.init = message;
         state.role = message.role;
-        state.players = message.players;
         state.seed = message.seed;
-        state.save = message.save === null ? null : new TextDecoder().decode(new Uint8Array(message.save.data));
-        if (state.save !== null) {
+        state.players = message.players;
+        state.saveSlot = message.saveSlot;
+        if (message.save !== null) {
+          state.save = new TextDecoder().decode(new Uint8Array(message.save.data));
           try {
             state.count = JSON.parse(state.save).count || 0;
           } catch (error) {
@@ -79,35 +102,53 @@
         break;
       case 'pause':
         state.paused = true;
+        state.pausedBy = message.by;
         break;
       case 'resume':
         state.paused = false;
         break;
       case 'net':
         state.netReceived += 1;
-        if (message.data && typeof message.data.count === 'number') state.peerCount = message.data.count;
+        try {
+          var data = JSON.parse(message.data);
+          if (typeof data.count === 'number') state.peerCount = data.count;
+        } catch (error) {
+          state.netReceived -= 1;
+        }
         break;
       case 'saveRequest':
+        if (state.role === 'host') void writeSave(message.moment);
         break;
-      case 'stop':
-        state.stopped = message.reason;
-        if (message.save) {
-          var bytes = new TextEncoder().encode(JSON.stringify({ count: state.count }));
-          send({ type: 'saveWrite', moment: 'exit', label: 'Compteur ' + state.count, dataSchema: 1, data: bytes.buffer }, [bytes.buffer]);
+      case 'saveResult':
+        state.saveResults.push(message.status);
+        if (pendingSaves[message.requestId]) {
+          pendingSaves[message.requestId](message.status);
+          delete pendingSaves[message.requestId];
         }
-        send({ type: 'sessionEnd', progress: { count: state.count } });
         break;
+      case 'stop': {
+        state.stopped = message.reason;
+        var exit = state.role === 'host' && message.save ? writeSave('exit') : Promise.resolve();
+        exit.then(function () {
+          if (state.role === 'host') send({ type: 'sessionEnd', stats: [], finished: false });
+        });
+        break;
+      }
       default:
         break;
     }
   }
 
   window.addEventListener('message', function (event) {
-    if (event.source !== window || event.data !== 'duo:bridge' || event.ports.length === 0) return;
+    var data = event.data;
+    if (event.source !== window || data === null || typeof data !== 'object' || data.type !== 'duo:bridge-port') return;
+    if (state.port !== null || event.ports.length === 0) return;
     state.port = event.ports[0];
     state.port.onmessage = onMessage;
+    send({ type: 'hello', bridge: '1.0', sdk: 'essai' });
     setInterval(function () {
       send({ type: 'heartbeat' });
+      send({ type: 'perf', fps: 60, frameMs: 16.7, stepHz: 60 });
     }, 1000);
   });
 
@@ -116,10 +157,24 @@
   });
 
   window.addEventListener('keydown', function (event) {
+    // Comme le SDK: Échap vue par le jeu devient une demande de pause (dans Duo, le principal l'intercepte avant).
+    if (event.code === 'Escape') {
+      send({ type: 'pauseRequest' });
+      return;
+    }
     if (!state.started || state.paused) return;
     if (event.code === 'Space') {
       state.count += 1;
-      send({ type: 'net', channel: 0, mode: 'reliable', data: { count: state.count } });
+      send({ type: 'net', channel: 0, mode: 'reliable', data: JSON.stringify({ count: state.count }) });
+    } else if (event.code === 'KeyF' && state.role === 'host') {
+      send({
+        type: 'sessionEnd',
+        stats: [
+          { label: 'Appuis ici', value: String(state.count) },
+          { label: 'Appuis là-bas', value: String(state.peerCount) },
+        ],
+        finished: true,
+      });
     } else if (event.code === 'KeyK') {
       for (;;) {
         state.count += 1;

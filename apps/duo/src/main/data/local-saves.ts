@@ -16,8 +16,9 @@ const HeadSchema = v.object({
   schema: v.literal(1),
   revision: v.pipe(v.number(), v.integer(), v.minValue(1)),
   sha256: v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/)),
-  label: v.pipe(v.string(), v.maxLength(80)),
-  dataSchema: v.pipe(v.number(), v.integer(), v.minValue(0)),
+  label: v.pipe(v.string(), v.maxLength(40)),
+  progress: v.nullable(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
+  dataSchema: v.pipe(v.number(), v.integer(), v.minValue(1)),
   gameVersion: v.string(),
   size: v.pipe(v.number(), v.integer(), v.minValue(0)),
   writtenAt: v.string(),
@@ -28,12 +29,15 @@ type Head = v.InferOutput<typeof HeadSchema>;
 
 export interface StoredSave {
   readonly summary: SaveSummary;
+  readonly progress: number | null;
+  readonly gameVersion: string;
   readonly dataSchema: number;
   readonly data: Uint8Array;
 }
 
 export interface SaveWrite {
   readonly label: string;
+  readonly progress: number | null;
   readonly dataSchema: number;
   readonly gameVersion: string;
   readonly data: Uint8Array;
@@ -70,6 +74,8 @@ export class LocalSaves {
     if (sha256 !== head.sha256) return null;
     return {
       summary: { label: head.label, writtenAt: Date.parse(head.writtenAt) },
+      progress: head.progress,
+      gameVersion: head.gameVersion,
       dataSchema: head.dataSchema,
       data: new Uint8Array(data),
     };
@@ -85,7 +91,8 @@ export class LocalSaves {
       schema: 1,
       revision: (previous?.revision ?? 0) + 1,
       sha256,
-      label: save.label,
+      label: save.label.slice(0, 40),
+      progress: save.progress,
       dataSchema: save.dataSchema,
       gameVersion: save.gameVersion,
       size: save.data.byteLength,

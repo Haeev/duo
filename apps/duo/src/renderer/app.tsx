@@ -13,6 +13,23 @@ import { installKeyboardGuards, useEscape, useInitialFocus } from './ui/keyboard
 
 installKeyboardGuards();
 
+function endTitle(end: EndView): string {
+  switch (end.outcome) {
+    case 'won':
+      return t.fin.gagne;
+    case 'lost':
+      return end.winner === null ? t.fin.titrePartie : t.fin.gagnePar(end.winner);
+    case 'draw':
+      return t.fin.egalite;
+    case 'success':
+      return t.fin.reussite;
+    case 'failure':
+      return t.fin.echec;
+    case null:
+      return end.kind === 'session' ? t.fin.titreSeance : t.fin.titrePartie;
+  }
+}
+
 function EndScreen({ end, state, profile }: { end: EndView; state: AppState; profile: Profile }): JSX.Element {
   const button = useInitialFocus<HTMLButtonElement>('fin');
   const dismiss = (): void => {
@@ -23,12 +40,22 @@ function EndScreen({ end, state, profile }: { end: EndView; state: AppState; pro
   return (
     <main class="scene scene-ciel ecran-centre" data-testid="ecran-fin">
       <Sky />
-      <h1 class="display">{end.kind === 'session' ? t.fin.titreSeance : t.fin.titrePartie}</h1>
+      <h1 class="display">{endTitle(end)}</h1>
       <p class="corps-grand texte-second">{t.fin.sousTitre(end.game.name, playedDuration(end.durationMs))}</p>
       <div class="paire-joueurs">
         <PlayerCard profile={profile} self testId="fin-carte-toi" />
         {peer !== null && <PlayerCard profile={peer} self={false} testId="fin-carte-autre" />}
       </div>
+      {end.stats.length > 0 && (
+        <dl class="statistiques" data-testid="fin-statistiques">
+          {end.stats.map((stat) => (
+            <div class="statistique" key={stat.label}>
+              <dt class="petit texte-second">{stat.label}</dt>
+              <dd class="chiffre">{stat.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {end.saved && <p class="texte-succes">{t.fin.progression}</p>}
       <button type="button" class="bouton bouton-principal bouton-grand" ref={button} data-testid="fin-retour-salon" onClick={dismiss}>
         {t.fin.retourSalon}

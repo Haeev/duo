@@ -21,11 +21,13 @@ import type {
 import type { LocalSaves } from './data/local-saves';
 import { publicSettings, type MachineStore, type SettingsFile } from './data/store';
 import type { GameEntry } from './games/catalog';
-import type { BridgeSettings, Role } from './game-host/bridge';
-import type { GameFailure, GameHost, GameHostEvents, SaveOutcome } from './game-host/game-host';
+import { BRIDGE_VERSION, type GameSettings, type LoadedSave, type PlayerInfo, type Role } from './game-host/bridge';
+import type { GameFailure, GameHost, GameHostEvents, SaveWriteRequest } from './game-host/game-host';
 import type { Journal } from './journal';
 import type { LiaisonEvent, Liaison, PeerInfo, SessionsView } from './liaison/liaison';
 import { EMPTY_SESSION, type HostSession, type MatchEnd, type SalonGame } from './liaison/session-machine';
+import type { SaveStatus } from './protocol';
+import { PLAYER_APPEARANCES } from '../shared/players';
 import type { AppWindow, PlatformLayer } from './window';
 
 const TOAST_MS = 6000;
@@ -73,6 +75,8 @@ export class Platform {
   private linkUp = true;
   private linkLostSince: number | null = null;
   private running: RunningMatch | null = null;
+  /** Partie en cours d'arrêt: sa sauvegarde de sortie est encore acceptée (ADR 0004, 2 s). */
+  private stopping: RunningMatch | null = null;
   private readonly handledMatches = new Set<string>();
   private readonly handledEnds = new Set<string>();
   private pendingStop: { matchId: string; reason: 'crash' | 'load-failed' } | null = null;
@@ -89,6 +93,7 @@ export class Platform {
   private gameHost: GameHost | null = null;
   private publishQueued = false;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
+  private autosaveTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private readonly deps: PlatformDeps) {
     this.profile = deps.profile;
@@ -125,12 +130,27 @@ export class Platform {
     net: (channel, mode, data) => {
       this.deps.liaison.sendGame({ channel, mode, data });
     },
-    saveWrite: (moment, label, dataSchema, data) => this.onSaveWrite(moment, label, dataSchema, data),
-    matchEnd: () => {
-      if (this.running?.role === 'host') this.deps.liaison.stopMatch('end');
+    saveWrite: (request) => this.onSaveWrite(request),
+    matchEnd: (message) => {
+      const running = this.running;
+      if (running?.role !== 'host') return;
+      const outcome = message.outcome;
+      this.deps.liaison.stopMatch('end', {
+        outcome:
+          outcome.kind === 'win'
+            ? outcome.winner === this.deps.machineId
+              ? 'win-host'
+              : 'win-guest'
+            : outcome.kind,
+        stats: message.stats,
+      });
     },
-    sessionEnd: () => {
-      this.deps.journal.write('info', 'platform', 'session-end');
+    sessionEnd: (message) => {
+      this.deps.journal.write('info', 'platform', 'session-end', { finished: message.finished });
+      // Le jeu termine la séance de lui-même (fin de la démo): fin pour les deux machines.
+      if (message.finished && this.running?.role === 'host') {
+        this.deps.liaison.stopMatch('end', { outcome: null, stats: message.stats });
+      }
     },
   };
 
@@ -218,7 +238,7 @@ export class Platform {
   private async dispatch<C extends IntentChannel>(channel: C, rawArg: IntentArgs[C]): Promise<IntentResult> {
     const { liaison } = this.deps;
     // Le type de l'argument suit le canal; le `switch` le précise pour chaque cas.
-    const arg = rawArg as IntentArgs[IntentChannel];
+    const arg = rawArg;
     switch (channel) {
       case 'profile:save': {
         const profile = arg as IntentArgs['profile:save'];
@@ -247,9 +267,13 @@ export class Platform {
       case 'salon:close':
         liaison.closeSalon();
         return { ok: true };
-      case 'salon:save-choice':
-        liaison.selectSave((arg as IntentArgs['salon:save-choice']).choice);
+      case 'salon:save-choice': {
+        const gameId = this.sessions.own.salon?.game.id;
+        const save = gameId === undefined ? null : (this.saveSummaries.get(gameId) ?? null);
+        const choice = (arg as IntentArgs['salon:save-choice']).choice;
+        liaison.selectSave(save === null ? 'new' : choice, save);
         return { ok: true };
+      }
       case 'salon:join':
         liaison.joinSalon();
         return { ok: true };
@@ -301,8 +325,14 @@ export class Platform {
     this.publishQueued = true;
     queueMicrotask(() => {
       this.publishQueued = false;
-      this.window?.publish(this.snapshot());
-      this.applyLayer();
+      try {
+        this.window?.publish(this.snapshot());
+        this.applyLayer();
+      } catch (error) {
+        this.deps.journal.write('error', 'platform', 'publish-failed', {
+          message: error instanceof Error ? (error.stack ?? error.message) : String(error),
+        });
+      }
     });
   }
 
@@ -332,7 +362,7 @@ export class Platform {
         id: action.id,
         label: action.label,
         keys: action.keys,
-        mouse: action.mouse ?? null,
+        mouse: action.mouse ?? [],
       })),
       saves:
         manifest.saves === null
@@ -426,6 +456,13 @@ export class Platform {
         this.reconcileMatch();
         break;
       case 'sessions':
+        this.deps.journal.write('debug', 'platform', 'sessions', {
+          own: `${event.sessions.own.rev}:${event.sessions.own.match?.phase ?? (event.sessions.own.salon === null ? 'aucun' : 'salon')}`,
+          peer:
+            event.sessions.peer === null
+              ? 'aucun'
+              : `${event.sessions.peer.rev}:${event.sessions.peer.match?.phase ?? (event.sessions.peer.salon === null ? 'aucun' : 'salon')}`,
+        });
         this.announceSalonChanges(this.sessions, event.sessions);
         this.sessions = event.sessions;
         this.reconcileMatch();
@@ -461,7 +498,7 @@ export class Platform {
     if (peerBefore !== null && peerAfter === null && !peerMatchActive && this.peer !== null) {
       this.toast('closed-salon');
     }
-    if (peerBefore !== null && peerAfter !== null && peerAfter.guestJoined) {
+    if (peerBefore !== null && peerAfter?.guestJoined === true) {
       if (peerBefore.game.saveChoice !== peerAfter.game.saveChoice) {
         this.toast('other-save');
       }
@@ -503,30 +540,64 @@ export class Platform {
     if (match.phase !== 'loading' && !current.started) {
       current.started = true;
       current.hintUntil = Date.now() + HINT_MS;
-      this.gameHost.send({ type: 'start' });
+      // Heure de session: Date.now() de cette machine (écart d'horloge 0 dans `init`).
+      // La liaison de dev-reseau fournira l'heure commune et l'écart réel (ADR 0007, point 4).
+      this.gameHost.send({ type: 'start', atSessionMs: Date.now() });
       this.deps.journal.write('info', 'platform', 'match-start', { game: current.game.manifest.id });
       this.armHintTimer();
+      this.armAutosave(current);
     }
     if (current.started) {
       const shouldPause = match.phase !== 'playing' || !this.linkUp;
       if (shouldPause !== current.paused) {
         current.paused = shouldPause;
-        this.gameHost.send(
-          shouldPause ? { type: 'pause', reason: this.linkUp ? 'player' : 'disconnect' } : { type: 'resume' },
-        );
-        if (shouldPause && current.role === 'host' && current.game.manifest.saves !== null) {
-          this.gameHost.send({ type: 'saveRequest', reason: 'pause' });
+        if (shouldPause) {
+          const by = match.pausedBy.host ? 'host' : match.pausedBy.guest ? 'guest' : null;
+          this.gameHost.send({
+            type: 'pause',
+            reason: this.linkUp ? 'request' : 'disconnect',
+            by: by === null || !this.linkUp ? null : this.playerId(by, current.role),
+          });
+          // Sauvegarde automatique à chaque pause, si le jeu la déclare (ADR 0005, saveRequest).
+          if (current.role === 'host' && this.declares(current.game, 'auto')) {
+            this.gameHost.send({ type: 'saveRequest', moment: 'auto' });
+          }
+        } else {
+          this.gameHost.send({ type: 'resume' });
+          current.peerBack = false;
         }
-        if (!shouldPause) current.peerBack = false;
         this.deps.journal.write('info', 'platform', shouldPause ? 'match-paused' : 'match-resumed');
       }
     }
   }
 
+  /** Identifiant de membre du joueur assis à `seat` (prototype: l'identifiant de sa machine). */
+  private playerId(seat: Role, selfRole: Role): string {
+    return seat === selfRole ? this.deps.machineId : (this.peer?.machineId ?? 'autre-ordinateur');
+  }
+
+  private declares(game: GameEntry, moment: 'auto' | 'exit' | 'level-end' | 'manual'): boolean {
+    return game.manifest.saves?.moments.includes(moment) === true;
+  }
+
+  /** Sauvegarde automatique à la période du manifeste, chez l'hôte, pendant le jeu. */
+  private armAutosave(running: RunningMatch): void {
+    if (this.autosaveTimer !== null) clearInterval(this.autosaveTimer);
+    this.autosaveTimer = null;
+    const seconds = running.game.manifest.saves?.autosaveSeconds;
+    if (running.role !== 'host' || seconds === undefined || !this.declares(running.game, 'auto')) return;
+    this.autosaveTimer = setInterval(() => {
+      if (this.running === running && !running.paused) {
+        this.gameHost?.send({ type: 'saveRequest', moment: 'auto' });
+      }
+    }, seconds * 1000);
+  }
+
   private launch(role: Role, matchId: string, seed: number, salonGame: SalonGame): void {
     const game = this.games.get(salonGame.id);
     const window = this.window;
-    if (game === undefined || window === null || this.gameHost === null || this.profile === null) {
+    const profile = this.profile;
+    if (game === undefined || window === null || this.gameHost === null || profile === null) {
       this.deps.liaison.stopMatch('load-failed');
       return;
     }
@@ -545,14 +616,25 @@ export class Platform {
       peerBack: false,
       savedDuringStop: false,
     };
-    const peerProfile = this.peer?.profile ?? this.lastPeerProfile;
-    const self = { memberId: this.deps.machineId, ...this.profile, local: true };
-    const other = {
-      memberId: this.peer?.machineId ?? 'autre',
-      pseudo: peerProfile?.pseudo ?? '',
-      color: peerProfile?.color ?? 'crescent',
+    const peerProfile: Profile = this.peer?.profile ?? this.lastPeerProfile ?? { pseudo: '?', color: 'crescent' };
+    const other: Role = role === 'host' ? 'guest' : 'host';
+    const self: PlayerInfo = {
+      id: this.playerId(role, role),
+      role,
+      name: profile.pseudo,
+      color: profile.color,
+      colorHex: PLAYER_APPEARANCES[profile.color].color,
+      local: true,
+    };
+    const peer: PlayerInfo = {
+      id: this.playerId(other, role),
+      role: other,
+      name: peerProfile.pseudo,
+      color: peerProfile.color,
+      colorHex: PLAYER_APPEARANCES[peerProfile.color].color,
       local: false,
     };
+    const saveSlot = game.manifest.saves === null ? null : 1;
     void this.loadSave(role, game, salonGame).then((save) => {
       if (this.running?.matchId !== matchId || this.gameHost === null) return;
       this.gameHost.launch(
@@ -560,35 +642,78 @@ export class Platform {
         `duo-game://${game.manifest.id}/${game.manifest.entry}`,
         {
           type: 'init',
+          bridge: BRIDGE_VERSION,
+          matchId,
           role,
-          players: role === 'host' ? [self, other] : [other, self],
+          localPlayerId: self.id,
+          players: role === 'host' ? [self, peer] : [peer, self],
           seed,
-          gameVersion: game.manifest.version,
-          settings: this.bridgeSettings(game),
+          game: { id: game.manifest.id, version: game.manifest.version },
+          settings: this.gameSettings(),
+          saveSlot: role === 'host' ? saveSlot : null,
           save,
+          clockOffsetMs: 0,
         },
         window.contentBounds(),
       );
     });
   }
 
-  private async loadSave(role: Role, game: GameEntry, salonGame: SalonGame): Promise<{ label: string; dataSchema: number; data: ArrayBuffer } | null> {
+  private async loadSave(role: Role, game: GameEntry, salonGame: SalonGame): Promise<LoadedSave | null> {
     if (role !== 'host' || game.manifest.saves === null || salonGame.saveChoice !== 'continue') return null;
     const stored = await this.deps.saves.read(game.manifest.id);
-    if (stored === null) return null;
+    if (stored === null || stored.dataSchema < 1) return null;
     const data = new ArrayBuffer(stored.data.byteLength);
     new Uint8Array(data).set(stored.data);
-    return { label: stored.summary.label, dataSchema: stored.dataSchema, data };
+    return {
+      slot: 1,
+      label: stored.summary.label.slice(0, 40),
+      ...(stored.progress === null ? {} : { progress: stored.progress }),
+      dataSchema: stored.dataSchema,
+      gameVersion: stored.gameVersion,
+      data,
+    };
   }
 
-  private bridgeSettings(game: GameEntry): BridgeSettings {
-    const keys: Record<string, readonly string[]> = {};
-    for (const action of game.manifest.actions) keys[action.id] = action.keys;
+  /** Réglages de cette machine remis au jeu (pas encore d'écran de réglages: valeurs par défaut). */
+  private gameSettings(): GameSettings {
     return {
-      volumes: { master: 1, music: 1, effects: 1, ui: 1 },
+      volumes: { master: 1, music: 1, effects: 1, interface: 1 },
       uiScale: this.settings.uiScale,
       reducedMotion: this.settings.reducedMotion ?? false,
-      keys,
+      bindings: {},
+    };
+  }
+
+  /** Écran de fin vu de cette machine: « Tu as gagné ! » ou « Sacha a gagné » (UX 4.3). */
+  private endView(running: RunningMatch, end: MatchEnd): EndView {
+    const outcome = end.summary?.outcome ?? null;
+    let view: EndView['outcome'] = null;
+    let winner: string | null = null;
+    switch (outcome) {
+      case 'win-host':
+      case 'win-guest': {
+        const winnerSeat: Role = outcome === 'win-host' ? 'host' : 'guest';
+        view = winnerSeat === running.role ? 'won' : 'lost';
+        winner = view === 'lost' ? this.peerName() : null;
+        break;
+      }
+      case 'draw':
+      case 'success':
+      case 'failure':
+        view = outcome;
+        break;
+      case null:
+        break;
+    }
+    return {
+      game: this.summary(running.game),
+      kind: running.game.manifest.play === 'session' ? 'session' : 'match',
+      durationMs: end.durationMs,
+      saved: false,
+      outcome: view,
+      winner,
+      stats: end.summary?.stats ?? [],
     };
   }
 
@@ -607,17 +732,11 @@ export class Platform {
       switch (end.reason) {
         case 'stopped':
           if (byPeer) this.toast('stopped-match');
-          if (isSession) {
-            this.end = { game: this.summary(running.game), kind: 'session', durationMs: end.durationMs, saved: false };
-          }
+          // Une séance se termine normalement par « Retour au salon »; une partie arrêtée n'a pas d'écran de fin (UX 4.1).
+          if (isSession) this.end = this.endView(running, end);
           break;
         case 'end':
-          this.end = {
-            game: this.summary(running.game),
-            kind: isSession ? 'session' : 'match',
-            durationMs: end.durationMs,
-            saved: false,
-          };
+          this.end = this.endView(running, end);
           break;
         case 'crash':
           this.notice = {
@@ -646,9 +765,17 @@ export class Platform {
     if (host === null) return;
     const saveOnStop = running.role === 'host' && running.game.manifest.saves !== null && end?.reason !== 'crash';
     const reason = end?.reason === 'crash' ? 'peer-crash' : end?.reason === 'end' ? 'end' : 'stopped';
+    this.stopping = running;
     void host.stop(reason, saveOnStop).then(() => {
+      if (this.stopping === running) this.stopping = null;
       if (this.end !== null && running.savedDuringStop) this.end = { ...this.end, saved: true };
       void this.refreshSaveSummaries().then(() => {
+        // Retour au salon après une séance: l'hôte propose de continuer la sauvegarde écrite.
+        const salon = this.sessions.own.salon;
+        const save = salon === null ? undefined : this.saveSummaries.get(salon.game.id);
+        if (running.role === 'host' && salon !== null && save !== undefined) {
+          this.deps.liaison.selectSave('continue', save);
+        }
         this.publish();
       });
     });
@@ -676,33 +803,40 @@ export class Platform {
     this.publish();
   }
 
-  private async onSaveWrite(moment: string, label: string, dataSchema: number, data: Uint8Array): Promise<SaveOutcome> {
-    const running = this.running ?? null;
-    const game = running?.game;
-    const saves = game?.manifest.saves ?? null;
-    if (running === null || game === undefined || saves === null || running.role !== 'host') return 'moment';
-    if (!saves.moments.some((declared) => declared === moment)) return 'moment';
-    if (data.byteLength > Math.min(saves.maxBytes, PLATFORM_MAX_SAVE_BYTES)) return 'too-large';
+  private async onSaveWrite(request: SaveWriteRequest): Promise<SaveStatus> {
+    const running = this.running ?? this.stopping;
+    const saves = running?.game.manifest.saves ?? null;
+    if (running === null || running.role !== 'host') return 'refused';
+    if (saves === null || !saves.moments.includes(request.moment)) return 'moment-not-declared';
+    if (request.data.byteLength > Math.min(saves.maxBytes, PLATFORM_MAX_SAVE_BYTES)) return 'too-large';
+    const game = running.game;
     try {
       await this.deps.saves.write(game.manifest.id, {
-        label,
-        dataSchema,
+        label: request.label,
+        progress: request.progress,
+        dataSchema: request.dataSchema,
         gameVersion: game.manifest.version,
-        data,
+        data: request.data,
       });
       running.savedDuringStop = true;
-      this.saveSummaries.set(game.manifest.id, { label, writtenAt: Date.now() });
-      this.deps.journal.write('info', 'platform', 'save-written', { game: game.manifest.id, bytes: data.byteLength, moment });
+      this.saveSummaries.set(game.manifest.id, { label: request.label, writtenAt: Date.now() });
+      this.deps.journal.write('info', 'platform', 'save-written', {
+        game: game.manifest.id,
+        bytes: request.data.byteLength,
+        moment: request.moment,
+      });
       return 'ok';
     } catch (error) {
-      this.deps.journal.write('error', 'platform', 'save-failed', { message: error instanceof Error ? error.message : String(error) });
-      return 'write';
+      this.deps.journal.write('error', 'platform', 'save-failed', {
+        message: error instanceof Error ? error.message : String(error),
+      });
+      return 'write-error';
     }
   }
 
   private openSalon(gameId: string): IntentResult {
     const game = this.games.get(gameId);
-    if (game === undefined || !game.compatible) return { ok: false, error: 'jeu indisponible' };
+    if (!game?.compatible) return { ok: false, error: 'jeu indisponible' };
     const save = game.manifest.saves === null ? null : (this.saveSummaries.get(gameId) ?? null);
     this.end = null;
     this.deps.liaison.openSalon({
@@ -745,7 +879,7 @@ export class Platform {
   /** Vue plateforme: pleine, bandeau d'indication ou masquée, selon la partie. */
   private applyLayer(): void {
     const window = this.window;
-    if (window === null || !window.alive) return;
+    if (!window?.alive) return;
     const running = this.running;
     let layer: PlatformLayer;
     if (running === null || this.end !== null || this.notice !== null || this.quitConfirm) {
@@ -758,6 +892,9 @@ export class Platform {
       layer = { kind: 'hidden' };
     }
     window.setLayer(layer);
+    if (layer.kind !== this.lastLayer) {
+      this.deps.journal.write('debug', 'platform', 'layer', { layer: layer.kind });
+    }
     if (layer.kind !== 'full' && this.lastLayer === 'full') this.gameHost?.focus();
     this.lastLayer = layer.kind;
   }

@@ -3,7 +3,7 @@
 // dépend que de cette interface; `LocalLiaison` en est une implémentation
 // provisoire pour deux instances (sur la même machine, ou à une adresse donnée).
 import type { Profile } from '../../shared/state';
-import type { HostSession, SalonGame } from './session-machine';
+import type { EndSummary, HostSession, SalonGame } from './session-machine';
 
 export interface LocalIdentity {
   readonly machineId: string;
@@ -28,11 +28,11 @@ export interface SessionsView {
   readonly peer: HostSession | null;
 }
 
-/** Message de jeu relayé sans décodage (ADR 0007, point 2). */
+/** Message de jeu relayé sans décodage (ADR 0007, point 2): texte JSON du SDK. */
 export interface GameRelayMessage {
   readonly channel: number;
   readonly mode: 'reliable' | 'latest';
-  readonly data: unknown;
+  readonly data: string;
 }
 
 export type LiaisonEvent =
@@ -57,7 +57,8 @@ export interface Liaison {
   /** Ouvre un salon hébergé ici; l'invitation part aussitôt chez l'autre. */
   openSalon(game: SalonGame): void;
   closeSalon(): void;
-  selectSave(choice: SalonGame['saveChoice']): void;
+  /** Choix de la sauvegarde au salon, avec le résumé de celle que l'hôte reprendrait. */
+  selectSave(choice: SalonGame['saveChoice'], save: SalonGame['save']): void;
   /** Rejoint le salon de l'autre (vaut « C'est parti »). */
   joinSalon(): void;
   leaveSalon(): void;
@@ -67,7 +68,8 @@ export interface Liaison {
   reportLoaded(): void;
   requestPause(): void;
   requestResume(): void;
-  stopMatch(reason: StopReason): void;
+  /** Arrête la partie; `summary`: résumé du jeu de l'hôte (fin de partie ou de séance). */
+  stopMatch(reason: StopReason, summary?: EndSummary): void;
   /** Relaie un message du jeu vers l'instance de l'autre machine. */
   sendGame(message: GameRelayMessage): void;
 

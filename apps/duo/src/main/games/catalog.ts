@@ -8,11 +8,14 @@ import { bridgeCovers, checkManifest, type GameManifest } from './manifest';
 
 export type GameSource = 'extra' | 'dev' | 'installed' | 'bundled';
 
+/**
+ * Dossier qui contient un sous-dossier par jeu, nommé par son identifiant: paquet
+ * installé (`<id>/duo-game.json` et le site à côté) ou paquet du dépôt
+ * (`<id>/duo-game.json` à la racine du paquet, site construit dans `<id>/dist/`).
+ */
 export interface GameRoot {
   readonly source: GameSource;
   readonly dir: string;
-  /** `flat`: `<dir>/<id>/duo-game.json`; `workspace`: `<dir>/<id>/dist/` (dépôt). */
-  readonly layout: 'flat' | 'workspace';
 }
 
 export interface GameEntry {
@@ -54,20 +57,31 @@ async function listFolders(dir: string): Promise<string[]> {
   }
 }
 
+async function isDirectory(dir: string): Promise<boolean> {
+  try {
+    return (await stat(dir)).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 async function locate(
   root: GameRoot,
   folder: string,
 ): Promise<{ manifestFile: string; served: string } | null> {
   const base = path.join(root.dir, folder);
-  if (root.layout === 'flat') {
-    const manifestFile = path.join(base, 'duo-game.json');
-    return (await isFile(manifestFile)) ? { manifestFile, served: base } : null;
-  }
   const dist = path.join(base, 'dist');
-  for (const manifestFile of [path.join(dist, 'duo-game.json'), path.join(base, 'duo-game.json')]) {
-    if (await isFile(manifestFile)) return { manifestFile, served: dist };
-  }
-  return null;
+  const distManifest = path.join(dist, 'duo-game.json');
+  if (await isFile(distManifest)) return { manifestFile: distManifest, served: dist };
+  const manifestFile = path.join(base, 'duo-game.json');
+  if (!(await isFile(manifestFile))) return null;
+  return { manifestFile, served: (await isDirectory(dist)) ? dist : base };
+}
+
+/** Chemin relatif au paquet, sans sortie du dossier servi. */
+function insidePackage(relative: string): boolean {
+  const segments = relative.split('/');
+  return !relative.startsWith('/') && !relative.includes('\\') && !segments.includes('..') && !/^[A-Za-z]:/.test(relative);
 }
 
 async function readEntry(
@@ -88,6 +102,9 @@ async function readEntry(
   const { manifest } = check;
   if (manifest.id !== folder) {
     return { folder: label, problems: [`id « ${manifest.id} » différent du dossier « ${folder} »`] };
+  }
+  if (!insidePackage(manifest.entry) || !insidePackage(manifest.thumbnail)) {
+    return { folder: label, problems: ['entry et thumbnail: chemins relatifs au paquet, sans « .. »'] };
   }
   if (!(await isFile(path.join(located.served, ...manifest.entry.split('/'))))) {
     return { folder: label, problems: [`page d'entrée absente: ${manifest.entry} (jeu construit ?)`] };

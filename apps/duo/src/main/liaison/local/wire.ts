@@ -47,6 +47,16 @@ export const HostSessionSchema = v.object({
       reason: v.picklist(['stopped', 'crash', 'load-failed', 'end', 'guest-gone']),
       by: v.nullable(v.picklist(['host', 'guest'])),
       durationMs: v.pipe(v.number(), v.minValue(0)),
+      summary: v.nullable(
+        v.object({
+          outcome: v.nullable(v.picklist(['success', 'failure', 'draw', 'win-host', 'win-guest'])),
+          stats: v.pipe(
+            v.array(v.object({ label: v.pipe(v.string(), v.maxLength(32)), value: v.pipe(v.string(), v.maxLength(16)) })),
+            v.maxLength(3),
+            v.readonly(),
+          ),
+        }),
+      ),
     }),
   ),
 });
@@ -81,7 +91,8 @@ export const WireSchema = v.variant('t', [
     t: v.literal('game'),
     channel: v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(15)),
     mode: v.picklist(['reliable', 'latest']),
-    data: v.unknown(),
+    // Texte JSON produit par le SDK de l'émetteur, relayé sans être décodé (64 Kio au plus).
+    data: v.pipe(v.string(), v.maxLength(65_536)),
   }),
   v.object({ t: v.literal('bye') }),
 ]);

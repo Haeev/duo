@@ -9,11 +9,12 @@
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
+    "build:test": "electron-vite build --mode test",
     "start": "electron-vite preview",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.preload.json",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.preload.json && tsc --noEmit -p tsconfig.e2e.json",
     "test": "vitest run",
-    "test:e2e": "electron-vite build && playwright test"
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@duo/config": "workspace:*",

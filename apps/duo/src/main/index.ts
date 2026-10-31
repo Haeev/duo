@@ -2,13 +2,13 @@
 // données (`--duo-data-dir`), puis verrou d'instance unique (pris dans ce
 // dossier), puis protocoles privilégiés, puis tout le reste après `ready`.
 import path from 'node:path';
-import { Menu, app, crashReporter, ipcMain, session, type IpcMainInvokeEvent } from 'electron';
+import { BaseWindow, Menu, app, crashReporter, ipcMain, session, type IpcMainInvokeEvent } from 'electron';
 import { IPC_GET_STATE, IPC_INTENT_PREFIX, INTENT_CHANNELS, type IntentChannel } from '../shared/ipc';
 import { parseCommandLine } from './args';
 import { LocalSaves } from './data/local-saves';
 import { MachineStore } from './data/store';
 import { scanGames, type GameEntry, type GameRoot } from './games/catalog';
-import { bridgeCodecV1 } from './game-host/bridge';
+import { bridgeCodec } from './game-host/bridge';
 import { GameHost } from './game-host/game-host';
 import { checkIntent } from './ipc-schemas';
 import { createJournal, systemSanitizer, type Journal } from './journal';
@@ -42,13 +42,13 @@ const outDir = path.resolve(import.meta.dirname, '..');
 
 function gameRoots(): GameRoot[] {
   const roots: GameRoot[] = [];
-  if (options.gamesDir !== null) roots.push({ source: 'extra', dir: options.gamesDir, layout: 'flat' });
+  if (options.gamesDir !== null) roots.push({ source: 'extra', dir: options.gamesDir });
   if (!app.isPackaged) {
     // Développement: jeux construits du dépôt (apps/duo/out/main vers la racine).
-    roots.push({ source: 'dev', dir: path.resolve(outDir, '../../../games'), layout: 'workspace' });
+    roots.push({ source: 'dev', dir: path.resolve(outDir, '../../../games') });
   }
-  roots.push({ source: 'installed', dir: path.join(app.getPath('userData'), 'games'), layout: 'flat' });
-  roots.push({ source: 'bundled', dir: path.join(process.resourcesPath, 'games'), layout: 'flat' });
+  roots.push({ source: 'installed', dir: path.join(app.getPath('userData'), 'games') });
+  roots.push({ source: 'bundled', dir: path.join(process.resourcesPath, 'games') });
   return roots;
 }
 
@@ -201,7 +201,7 @@ async function start(): Promise<void> {
       window: created.window,
       session: gameSession,
       preload: path.join(outDir, 'preload', 'game.cjs'),
-      codec: bridgeCodecV1,
+      codec: bridgeCodec,
       journal,
       events: platform.gameEvents,
       isMac,
@@ -242,6 +242,11 @@ async function start(): Promise<void> {
     (globalThis as { __duoTest?: unknown }).__duoTest = {
       state: () => platform.snapshot(),
       dataDir: userData,
+      platformView: () => ({
+        visible: appWindow?.platformView.getVisible() ?? null,
+        bounds: appWindow?.platformView.getBounds() ?? null,
+        windows: BaseWindow.getAllWindows().length,
+      }),
     };
   }
 }

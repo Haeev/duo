@@ -56,7 +56,7 @@ export function useEscape(handler: (() => void) | null): void {
   const enabled = handler !== null;
   useEffect(() => {
     if (!enabled) return undefined;
-    const entry = { current: () => ref.current() };
+    const entry = { current: () => { ref.current(); } };
     escapeStack.push(entry);
     return () => {
       const index = escapeStack.indexOf(entry);

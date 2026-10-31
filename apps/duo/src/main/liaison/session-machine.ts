@@ -38,12 +38,20 @@ export interface MatchState {
 
 export type EndReason = 'stopped' | 'crash' | 'load-failed' | 'end' | 'guest-gone';
 
+/** Résumé fourni par le jeu de l'hôte à la fin (ADR 0005: `matchEnd`, `sessionEnd`). */
+export interface EndSummary {
+  readonly outcome: 'success' | 'failure' | 'draw' | 'win-host' | 'win-guest' | null;
+  /** Jusqu'à trois statistiques, textes du jeu. */
+  readonly stats: readonly { readonly label: string; readonly value: string }[];
+}
+
 export interface MatchEnd {
   readonly matchId: string;
   readonly game: SalonGame;
   readonly reason: EndReason;
   readonly by: Seat | null;
   readonly durationMs: number;
+  readonly summary: EndSummary | null;
 }
 
 export interface HostSession {
@@ -56,14 +64,19 @@ export interface HostSession {
 export type SessionInput =
   | { readonly type: 'open'; readonly game: SalonGame }
   | { readonly type: 'close' }
-  | { readonly type: 'select-save'; readonly saveChoice: SalonGame['saveChoice'] }
+  | { readonly type: 'select-save'; readonly saveChoice: SalonGame['saveChoice']; readonly save: SalonGame['save'] }
   | { readonly type: 'join' }
   | { readonly type: 'leave' }
   | { readonly type: 'ready'; readonly seat: Seat; readonly ready: boolean }
   | { readonly type: 'loaded'; readonly seat: Seat }
   | { readonly type: 'pause'; readonly seat: Seat }
   | { readonly type: 'resume'; readonly seat: Seat }
-  | { readonly type: 'stop'; readonly seat: Seat; readonly reason: Exclude<EndReason, 'guest-gone'> }
+  | {
+      readonly type: 'stop';
+      readonly seat: Seat;
+      readonly reason: Exclude<EndReason, 'guest-gone'>;
+      readonly summary?: EndSummary | undefined;
+    }
   | { readonly type: 'link'; readonly up: boolean }
   | { readonly type: 'guest-gone' }
   | { readonly type: 'tick' };
@@ -102,6 +115,7 @@ function endMatch(
   reason: EndReason,
   by: Seat | null,
   now: number,
+  summary: EndSummary | null = null,
 ): HostSession {
   return {
     ...state,
@@ -112,6 +126,7 @@ function endMatch(
       reason,
       by,
       durationMs: playedUntil(match, now),
+      summary,
     },
   };
 }
@@ -133,11 +148,24 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
         ? { ...state, salon: null }
         : { ...endMatch(state, match, 'stopped', 'host', now), salon: null };
     case 'select-save':
-      if (salon === null || match !== null || salon.game.saveChoice === input.saveChoice) return state;
+      if (
+        salon === null ||
+        match !== null ||
+        (salon.game.saveChoice === input.saveChoice &&
+          salon.game.save?.label === input.save?.label &&
+          salon.game.save?.writtenAt === input.save?.writtenAt)
+      ) {
+        return state;
+      }
       // Un nouveau choix remet les deux joueurs à « Pas encore » (UX 2.2).
       return {
         ...state,
-        salon: { ...salon, game: { ...salon.game, saveChoice: input.saveChoice }, ready: BOTH_FALSE, countdownEndsAt: null },
+        salon: {
+          ...salon,
+          game: { ...salon.game, saveChoice: input.saveChoice, save: input.save },
+          ready: BOTH_FALSE,
+          countdownEndsAt: null,
+        },
       };
     case 'join':
       if (salon === null || salon.guestJoined) return state;
@@ -148,7 +176,7 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
         salon: withSalonReady({ ...salon, guestJoined: true }, { host: salon.ready.host, guest: true }, now),
       };
     case 'leave':
-      if (salon === null || !salon.guestJoined) return state;
+      if (!salon?.guestJoined) return state;
       if (match !== null) {
         return {
           ...endMatch(state, match, 'stopped', 'guest', now),
@@ -207,7 +235,7 @@ function apply(state: HostSession, input: SessionInput, now: number, tools: Sess
     case 'stop':
       if (match === null) return state;
       return {
-        ...endMatch(state, match, input.reason, input.seat, now),
+        ...endMatch(state, match, input.reason, input.seat, now, input.summary ?? null),
         salon: salon === null ? null : { ...salon, ready: BOTH_FALSE, countdownEndsAt: null },
       };
     case 'link':
