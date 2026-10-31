@@ -41,8 +41,8 @@ function seatJeanne(sim: Sim): void {
   jeanne.visible = true;
   jeanne.target = BENCH;
   jeanne.speed = 0;
-  jeanne.pos = { x: 40.5, y: 19.5 };
-  jeanne.prev = { x: 40.5, y: 19.5 };
+  jeanne.pos = { x: 33.5, y: 19.5 };
+  jeanne.prev = { x: 33.5, y: 19.5 };
   sim.runtime.villagerPaths.jeanne = { target: BENCH, path: [] };
 }
 
@@ -127,7 +127,7 @@ describe('bancs: s’asseoir par choix', () => {
     press(sim, 'p1');
     const first = character(sim, 'p1').seat;
     expect(first).not.toBeNull();
-    // Jeanne (derrière la place 0, à x = 40,5) garde la sienne: Camille est sur l'autre.
+    // Jeanne (derrière la place 0, à x = 33,5) garde la sienne: Camille est sur l'autre.
     expect(first?.slot).toBe(1);
     // Sacha devant le banc plein: il ne s'assoit pas (Espace parle à Jeanne), personne ne se superpose.
     standBefore(sim, 'p2', 0);
