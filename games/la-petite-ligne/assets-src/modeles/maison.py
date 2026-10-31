@@ -254,11 +254,12 @@ def picture_frame(A):
 def bread(A):
     g = A.geo()
     g.sphere(0.13, loc=(0, 0, 0.06), color="bread", segs=10, rings=6, scale=(1, 1, 0.55))
-    # grignes en léger relief (6 mm), à l'intérieur du contour de la miche
+    # grignes presque à fleur (moins de 5 mm au-dessus des facettes), à l'intérieur du contour de la miche
     for k in range(3):
         y = -0.05 + k * 0.05
-        g.box((0.09, 0.016, 0.012), loc=(0, y, 0.06 + 0.0715 * (1 - (y / 0.13) ** 2) ** 0.5 - 0.002),
-              color="bread_crust", rot=(0, 0, 30))
+        # fuseau aplati enfoncé dans la croûte: seule une fente de quelques millimètres affleure
+        g.sphere(1.0, loc=(0, y, 0.06 + 0.0715 * (1 - (y / 0.13) ** 2) ** 0.5 - 0.008), color="bread_crust", segs=6,
+                 rings=3, scale=(0.045, 0.01, 0.008), rot=(0, 0, 30))
     return g
 
 

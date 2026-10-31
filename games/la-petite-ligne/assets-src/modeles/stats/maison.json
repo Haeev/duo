@@ -126,7 +126,7 @@
   },
   "bread": {
    "kind": "item",
-   "tris": 136
+   "tris": 172
   },
   "dish_radishes": {
    "kind": "item",
@@ -209,5 +209,5 @@
    "tris": 24
   }
  },
- "file_bytes": 563796
+ "file_bytes": 567472
 }

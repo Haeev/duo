@@ -783,7 +783,7 @@ def workbench(A):
          by_normal("wood_old", "wood_old_dark", "wood_old_dark", thr=0.3))
     for j in range(1, 5):
         y = yf + (yb - yf) * j / 5
-        g.box((2.16, 0.04, 0.03), loc=(0, y, top(y) + 0.015 / cosa + 0.003), color="wood_old_dark", rot=(ang, 0, 0),
+        g.box((2.16, 0.04, 0.03), loc=(0, y, top(y) + 0.015 / cosa), color="wood_old_dark", rot=(ang, 0, 0),
               no_round=True)
     # chevrons sous la tôle, dans la pente
     hc = 0.08
@@ -1190,7 +1190,7 @@ def station_sign(A):
     g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
     # lettres AUBRUNE en relief (police de 3 x 5 pavés), sur les deux faces (lisibles de chaque côté)
     glyphs = {"A": ("010", "101", "111", "101", "101"), "U": ("101", "101", "101", "101", "111"),
-              "B": ("110", "101", "110", "101", "110"), "R": ("110", "101", "110", "101", "101"),
+              "B": ("111", "101", "110", "101", "111"), "R": ("111", "101", "110", "101", "101"),
               "N": ("101", "111", "111", "101", "101"), "E": ("111", "100", "110", "100", "111")}
     px, word = 0.058, "AUBRUNE"
     x0 = -(len(word) * 4 - 1) * px / 2
@@ -1206,8 +1206,9 @@ def station_sign(A):
                         xa = x0 + (i * 4 + c) * px
                         xb = x0 + (i * 4 + c2 + 1) * px
                         xc = (xa + xb) / 2 * face  # au dos, le mot se lit dans l'autre sens: miroir
-                        g.box((xb - xa - 0.006, 0.012, px - 0.006), loc=(xc, yy, 2.05 + (2 - r) * px), color="paint_blue",
-                              no_round=True)
+                        # face avant: lettres bleues sur fond blanc; dos (bordure bleue): lettres blanches
+                        g.box((xb - xa - 0.006, 0.012, px - 0.006), loc=(xc, yy, 2.05 + (2 - r) * px),
+                              color="paint_blue" if face > 0 else "white_paint", no_round=True)
                         c = c2 + 1
                     else:
                         c += 1

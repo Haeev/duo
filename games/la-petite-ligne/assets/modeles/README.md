@@ -282,7 +282,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (547 Ko)
+### `maison.glb` (551 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -301,7 +301,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `crystal_radio` | 1 x 1 | 368 |  |
 | `wood_stove` | 1 x 1 | 380 | tier: "P1" |
 | `picture_frame` | 1 x 1 | 116 | wall: true, tier: "P1" |
-| `bread` |  | 136 | kind: "item" |
+| `bread` |  | 172 | kind: "item" |
 | `dish_radishes` |  | 464 | kind: "item" |
 | `dish_omelette` |  | 276 | kind: "item" |
 | `dish_soup` |  | 244 | kind: "item" |
