@@ -96,7 +96,11 @@ async function main(): Promise<void> {
         : 'stopped',
     pin: params.get('repere') === '1',
     fishing:
-      params.get('peche') === 'touche' ? 'bite' : params.get('peche') === 'attente' ? 'waiting' : 'none',
+      params.get('peche') === 'touche'
+        ? 'bite'
+        : params.get('peche') === 'attente'
+          ? 'waiting'
+          : 'none',
     absent: params.get('absent') === '1',
   };
   const world = createExampleWorld(map, content, options);

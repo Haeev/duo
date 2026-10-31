@@ -85,9 +85,14 @@ function symbolGeometry(mesh: string): BufferGeometry {
       b.cylinder(0.1, 0.1, 0.05, [0, 0, 0], 'white_paint', { rotation: [90, 0, 0], segments: 12 });
       for (let i = 0; i < SUN_RAYS; i += 1) {
         const angle = (i / SUN_RAYS) * Math.PI * 2;
-        b.box([0.03, 0.06, 0.03], [Math.sin(angle) * SUN_RAY_REACH, Math.cos(angle) * SUN_RAY_REACH, 0], 'white_paint', {
-          rotation: [0, 0, (-angle * 180) / Math.PI],
-        });
+        b.box(
+          [0.03, 0.06, 0.03],
+          [Math.sin(angle) * SUN_RAY_REACH, Math.cos(angle) * SUN_RAY_REACH, 0],
+          'white_paint',
+          {
+            rotation: [0, 0, (-angle * 180) / Math.PI],
+          },
+        );
       }
       break;
     case 'player_scarf_planet': {
@@ -199,7 +204,16 @@ export class SignsPart implements EventfulPart {
     wave.renderOrder = 3;
     group.add(pole, head, wave);
     this.group.add(group);
-    const view: PinView = { group, head, material, wave, waveMaterial, symbol, since: -1, shownAt: 0 };
+    const view: PinView = {
+      group,
+      head,
+      material,
+      wave,
+      waveMaterial,
+      symbol,
+      since: -1,
+      shownAt: 0,
+    };
     this.pins.set(character.id, view);
     return view;
   }

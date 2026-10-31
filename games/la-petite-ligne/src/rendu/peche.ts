@@ -4,7 +4,15 @@
  * saute au sac, ou bouchon qui remonte et s'en va s'il s'échappe. La pose du
  * pêcheur (lancer, attente, touche) est composée dans `personnages.ts`.
  */
-import { Color, Group, Mesh, MeshBasicMaterial, Quaternion, Vector3, type BufferGeometry } from 'three';
+import {
+  Color,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  Quaternion,
+  Vector3,
+  type BufferGeometry,
+} from 'three';
 import type { CharacterId, WorldEvent } from '../etat/types';
 import type { FrameContext } from './contexte';
 import type { EffectsPart } from './effets';
@@ -64,12 +72,17 @@ export class FishingPart implements EventfulPart {
     this.bobberGeometry = resources.track(
       new ShapeBuilder()
         .ball(BOBBER_RADIUS, [0, 0, 0], { top: 'paint_red', side: 'white_paint' }, { detail: 1 })
-        .cylinder(0.008, 0.008, 0.08, [0, BOBBER_RADIUS, 0], 'paint_red', { base: true, segments: 4 })
+        .cylinder(0.008, 0.008, 0.08, [0, BOBBER_RADIUS, 0], 'paint_red', {
+          base: true,
+          segments: 4,
+        })
         .build(),
     );
     // Ligne: une baguette d'un mètre étirée entre les deux bouts, sans nouveau programme de shader.
     this.lineGeometry = resources.track(
-      new ShapeBuilder().box([LINE_THICKNESS, 1, LINE_THICKNESS], [0, 0.5, 0], 'white_paint').build(),
+      new ShapeBuilder()
+        .box([LINE_THICKNESS, 1, LINE_THICKNESS], [0, 0.5, 0], 'white_paint')
+        .build(),
     );
     this.lineMaterial = resources.track(
       new MeshBasicMaterial({
@@ -121,7 +134,13 @@ export class FishingPart implements EventfulPart {
     } else if (event.type === 'escaped') {
       const angler = this.angler(event.by);
       angler.escapeAt = this.time;
-      this.effects.ripple(angler.last.x, angler.last.y, angler.last.z, RIPPLE_COLOR, BITE_RIPPLE_SECONDS);
+      this.effects.ripple(
+        angler.last.x,
+        angler.last.y,
+        angler.last.z,
+        RIPPLE_COLOR,
+        BITE_RIPPLE_SECONDS,
+      );
     }
   }
 
@@ -129,7 +148,8 @@ export class FishingPart implements EventfulPart {
     this.time = context.time;
     for (const character of context.world.characters) {
       const line = character.fishing;
-      const angler = line === null && !this.anglers.has(character.id) ? null : this.angler(character.id);
+      const angler =
+        line === null && !this.anglers.has(character.id) ? null : this.angler(character.id);
       if (angler === null) {
         continue;
       }
@@ -144,7 +164,13 @@ export class FishingPart implements EventfulPart {
         angler.escapeAt = Number.NEGATIVE_INFINITY;
         if (bite && context.time >= angler.nextBiteRipple) {
           angler.nextBiteRipple = context.time + BITE_RIPPLE_EVERY;
-          this.effects.ripple(line.bobber.x, level, line.bobber.y, RIPPLE_COLOR, BITE_RIPPLE_SECONDS);
+          this.effects.ripple(
+            line.bobber.x,
+            level,
+            line.bobber.y,
+            RIPPLE_COLOR,
+            BITE_RIPPLE_SECONDS,
+          );
         }
       } else {
         // Le poisson s'est échappé: le bouchon remonte et s'efface; sinon il disparaît avec la ligne.

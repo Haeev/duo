@@ -50,6 +50,8 @@ export interface BancResult {
   seam: { beforeError: number; afterError: number; afterCorrelation: number } | null;
   /** Mélange stéréo 16 bits (base64), pour l'écoute. */
   mixBase64: string | null;
+  /** Temps de calcul d'une image du son (cerveau et moteur), en ms. */
+  frameMs: { mean: number; max: number; p95: number };
 }
 
 declare global {
@@ -167,6 +169,13 @@ function rmsDb(data: Float32Array[], from: number, to: number): number {
   return rms <= 1e-9 ? -120 : 20 * Math.log10(rms);
 }
 
+function summarize(values: number[]): BancResult['frameMs'] {
+  if (values.length === 0) return { mean: 0, max: 0, p95: 0 };
+  const sorted = [...values].sort((a, b) => a - b);
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  return { mean, max: sorted[sorted.length - 1] ?? 0, p95: sorted[Math.floor(sorted.length * 0.95)] ?? 0 };
+}
+
 function toBase64Mix(buffer: AudioBuffer): string {
   const length = buffer.length;
   const pcm = new Int16Array(length * 2);
@@ -233,13 +242,16 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
   const frames = Math.floor(setup.seconds / SIM_DT) - 1;
   let gameTime = 0;
   let lastFrame: BrainFrame = emptyFrame();
+  const timings: number[] = [];
   const frameAt = async (index: number): Promise<void> => {
     let frame: BrainFrame;
+    let began = performance.now();
     if (sim === null) {
       frame = emptyFrame();
       setup.synthetic?.(frame, index, engine);
     } else {
       if (index > 0) step(sim, decide(sim, gameTime));
+      began = performance.now();
       frame = brain.update({
         world: sim.world,
         local: 'p1',
@@ -251,10 +263,13 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
         yaw: AUDIO_SETTINGS.listener.defaultYaw,
       });
     }
+    const computed = performance.now() - began;
     const t = ctx.currentTime;
     for (const s of frame.shots) shots.push({ t, sound: s.sound, placed: s.at !== null });
     for (const c of frame.music) music.push({ t, kind: c.kind, id: c.id });
+    const applyStart = performance.now();
     engine.apply(frame);
+    timings.push(computed + performance.now() - applyStart);
     lastFrame = frame;
     gameTime += SIM_DT;
     // Le décodage prend du temps réel: le rendu attend, comme si le tampon était prêt à temps.
@@ -296,6 +311,7 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
     listener: { x: lastFrame.listener.at.x, y: lastFrame.listener.at.y, inHouse: lastFrame.listener.inHouse },
     seam,
     mixBase64,
+    frameMs: summarize(timings.slice(1)),
   };
 }
 

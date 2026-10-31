@@ -1,14 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import {
-  Box3,
-  Matrix4,
-  OrthographicCamera,
-  Quaternion,
-  Ray,
-  Scene,
-  Vector3,
-} from 'three';
+import { Box3, Matrix4, OrthographicCamera, Quaternion, Ray, Scene, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
@@ -34,7 +26,13 @@ const FLOAT_BYTES = 4;
 const VEC3 = 3;
 
 interface GltfJson {
-  nodes: { name?: string; mesh?: number; translation?: number[]; rotation?: number[]; scale?: number[] }[];
+  nodes: {
+    name?: string;
+    mesh?: number;
+    translation?: number[];
+    rotation?: number[];
+    scale?: number[];
+  }[];
   meshes: { primitives: { attributes: { POSITION: number } }[] }[];
   accessors: { bufferView: number; byteOffset?: number; count: number }[];
   bufferViews: { byteOffset?: number; byteStride?: number }[];
@@ -45,7 +43,9 @@ function nodePositions(file: string, nodeName: string): Vector3[] {
   const data = readFileSync(path);
   const jsonLength = data.readUInt32LE(GLB_HEADER);
   const json = JSON.parse(
-    data.subarray(GLB_HEADER + CHUNK_HEADER, GLB_HEADER + CHUNK_HEADER + jsonLength).toString('utf8'),
+    data
+      .subarray(GLB_HEADER + CHUNK_HEADER, GLB_HEADER + CHUNK_HEADER + jsonLength)
+      .toString('utf8'),
   ) as GltfJson;
   const binary = GLB_HEADER + CHUNK_HEADER + jsonLength + CHUNK_HEADER;
   const node = json.nodes.find((candidate) => candidate.name === nodeName);
@@ -316,7 +316,10 @@ describe('ombre portée', () => {
     new DaylightRig(scene);
     let casting = 0;
     scene.traverse((object) => {
-      if ((object as { isDirectionalLight?: boolean }).isDirectionalLight === true && object.castShadow) {
+      if (
+        (object as { isDirectionalLight?: boolean }).isDirectionalLight === true &&
+        object.castShadow
+      ) {
         casting += 1;
       }
     });

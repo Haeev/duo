@@ -561,8 +561,13 @@ export class CharactersPart implements EventfulPart {
       const castAt = this.castAt.get(character.id);
       const casting = castAt !== undefined && context.time - castAt < CAST_SECONDS;
       const fishing = character.fishing !== null || casting;
-      const fishingClip = casting ? CAST_CLIP : character.fishing?.phase === 'bite' ? BITE_CLIP : 'idle';
-      const clip = moving && kind !== 'carry' ? 'walk' : fishing ? fishingClip : CLIP_FOR_ACTION[kind];
+      const fishingClip = casting
+        ? CAST_CLIP
+        : character.fishing?.phase === 'bite'
+          ? BITE_CLIP
+          : 'idle';
+      const clip =
+        moving && kind !== 'carry' ? 'walk' : fishing ? fishingClip : CLIP_FOR_ACTION[kind];
       const timeScale =
         clip === 'walk' || clip === 'carry_two'
           ? Math.min(
@@ -588,7 +593,10 @@ export class CharactersPart implements EventfulPart {
         !HANDS_FREE.has(kind) &&
         (definition.category === 'tool' || (definition.category === 'seed' && kind === 'sow'));
       const rod = this.content.items[ROD_ITEM]?.model ?? ROD_ITEM;
-      entry.figure.setTool(this.library, fishing && !moving ? rod : showTool ? definition.model : null);
+      entry.figure.setTool(
+        this.library,
+        fishing && !moving ? rod : showTool ? definition.model : null,
+      );
     }
     for (const villager of world.villagers) {
       let figure = this.villagers.get(villager.id);

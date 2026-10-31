@@ -336,7 +336,12 @@ export class EffectsPart implements EventfulPart {
   private readonly highlightMaterial: MeshBasicMaterial;
   private readonly marker: Mesh;
   private readonly markerMaterial: MeshBasicMaterial;
-  private readonly ripples: { mesh: Mesh; material: MeshBasicMaterial; start: number; seconds: number }[] = [];
+  private readonly ripples: {
+    mesh: Mesh;
+    material: MeshBasicMaterial;
+    start: number;
+    seconds: number;
+  }[] = [];
   private nextRipple = 0;
   private markerStart = Number.NEGATIVE_INFINITY;
   private markerKey = '';
