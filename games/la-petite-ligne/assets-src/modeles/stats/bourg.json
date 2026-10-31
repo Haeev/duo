@@ -6,7 +6,7 @@
     6
    ],
    "door_cell": 4,
-   "tris": 3956
+   "tris": 4016
   },
   "platform": {
    "footprint": [
@@ -40,7 +40,7 @@
     "gatekeeper_house_ruin",
     "gatekeeper_house_repaired"
    ],
-   "tris": 7684
+   "tris": 7900
   },
   "ferrand_shop": {
    "footprint": [
@@ -199,7 +199,7 @@
     2,
     1
    ],
-   "tris": 292
+   "tris": 1504
   },
   "arbor": {
    "footprint": [
@@ -213,7 +213,7 @@
     1,
     1
    ],
-   "tris": 116
+   "tris": 128
   },
   "barrel": {
    "footprint": [
@@ -534,5 +534,5 @@
    "tris": 888
   }
  },
- "file_bytes": 3611648
+ "file_bytes": 3716632
 }

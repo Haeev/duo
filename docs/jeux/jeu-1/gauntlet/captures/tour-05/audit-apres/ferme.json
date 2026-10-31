@@ -1,0 +1,548 @@
+{
+ "axe": {
+  "min_z": -0.665,
+  "taille": [
+   0.04,
+   0.16,
+   0.75
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "beam": {
+  "min_z": 0.0,
+  "taille": [
+   0.16,
+   4.51,
+   0.16
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "carrot": {
+  "min_z": 0.0,
+  "taille": [
+   0.35,
+   0.1,
+   0.08
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "carrot_stage_ripe": {
+  "min_z": 0.088,
+  "taille": [
+   0.8,
+   0.83,
+   0.25
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 24,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "carrot_stage_seed": {
+  "min_z": 0.0,
+  "taille": [
+   0.72,
+   0.73,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 15,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "carrot_stage_sprout": {
+  "min_z": 0.0,
+  "taille": [
+   0.7,
+   0.74,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 15,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "carrot_stage_young": {
+  "min_z": 0.096,
+  "taille": [
+   0.64,
+   0.71,
+   0.13
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 15,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "dandelion": {
+  "min_z": -0.0,
+  "taille": [
+   0.26,
+   0.27,
+   0.19
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "egg": {
+  "min_z": -0.001,
+  "taille": [
+   0.07,
+   0.07,
+   0.09
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 1,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fish_chub": {
+  "min_z": 0.001,
+  "taille": [
+   0.05,
+   0.35,
+   0.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fish_gudgeon": {
+  "min_z": 0.003,
+  "taille": [
+   0.03,
+   0.16,
+   0.05
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 17,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fish_trout": {
+  "min_z": 0.001,
+  "taille": [
+   0.05,
+   0.37,
+   0.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 17,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fishing_float": {
+  "min_z": -0.027,
+  "taille": [
+   0.06,
+   0.06,
+   0.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fishing_rod": {
+  "min_z": -0.088,
+  "taille": [
+   0.06,
+   1.59,
+   1.44
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "garden_cell_grass": {
+  "min_z": 0.0,
+  "taille": [
+   0.98,
+   0.98,
+   0.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 16,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "garden_cell_tilled": {
+  "min_z": 0.0,
+  "taille": [
+   0.92,
+   0.92,
+   0.1
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "garden_cell_tilled_wet": {
+  "min_z": 0.0,
+  "taille": [
+   0.92,
+   0.92,
+   0.1
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 10,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "grain_sack": {
+  "min_z": 0.0,
+  "taille": [
+   0.39,
+   0.34,
+   0.53
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "hammer": {
+  "min_z": -0.334,
+  "taille": [
+   0.05,
+   0.14,
+   0.38
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "hen": {
+  "min_z": -0.0,
+  "taille": [
+   0.25,
+   0.41,
+   0.42
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 57,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "hen_feeder": {
+  "min_z": 0.0,
+  "taille": [
+   0.66,
+   0.28,
+   0.33
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "hoe": {
+  "min_z": -1.002,
+  "taille": [
+   0.17,
+   0.19,
+   1.25
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lettuce": {
+  "min_z": 0.005,
+  "taille": [
+   0.2,
+   0.19,
+   0.17
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 8,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lettuce_stage_ripe": {
+  "min_z": 0.068,
+  "taille": [
+   0.44,
+   0.44,
+   0.21
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 16,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lettuce_stage_seed": {
+  "min_z": 0.0,
+  "taille": [
+   0.46,
+   0.44,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lettuce_stage_sprout": {
+  "min_z": 0.0,
+  "taille": [
+   0.46,
+   0.42,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lettuce_stage_young": {
+  "min_z": 0.082,
+  "taille": [
+   0.21,
+   0.22,
+   0.08
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "log": {
+  "min_z": 0.004,
+  "taille": [
+   0.82,
+   0.27,
+   0.27
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "nail_box": {
+  "min_z": 0.0,
+  "taille": [
+   0.14,
+   0.09,
+   0.08
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 21,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "plank": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   0.18,
+   0.03
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "radish": {
+  "min_z": -0.03,
+  "taille": [
+   0.12,
+   0.12,
+   0.23
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "radish_stage_ripe": {
+  "min_z": 0.072,
+  "taille": [
+   0.77,
+   0.83,
+   0.18
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 21,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "radish_stage_seed": {
+  "min_z": 0.0,
+  "taille": [
+   0.72,
+   0.73,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 15,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "radish_stage_sprout": {
+  "min_z": 0.0,
+  "taille": [
+   0.72,
+   0.74,
+   0.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 12,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "radish_stage_young": {
+  "min_z": 0.095,
+  "taille": [
+   0.7,
+   0.76,
+   0.07
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 12,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "saw": {
+  "min_z": -0.6,
+  "taille": [
+   0.03,
+   0.13,
+   0.65
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 12,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "seed_packet_carrot": {
+  "min_z": 0.0,
+  "taille": [
+   0.11,
+   0.02,
+   0.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "seed_packet_lettuce": {
+  "min_z": 0.0,
+  "taille": [
+   0.11,
+   0.02,
+   0.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "seed_packet_radish": {
+  "min_z": 0.0,
+  "taille": [
+   0.11,
+   0.02,
+   0.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "water_barrel": {
+  "min_z": 0.0,
+  "taille": [
+   0.65,
+   0.65,
+   0.8
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "watering_can": {
+  "min_z": -0.329,
+  "taille": [
+   0.21,
+   0.45,
+   0.34
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "Icosphere": {
+  "min_z": -1.0,
+  "taille": [
+   1.9,
+   2.0,
+   2.0
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 1,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ }
+}

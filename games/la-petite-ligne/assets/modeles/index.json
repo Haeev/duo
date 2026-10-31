@@ -338,7 +338,7 @@
  },
  "station": {
   "file": "bourg.glb",
-  "tris": 3956,
+  "tris": 4016,
   "footprint": [
    10,
    6
@@ -346,7 +346,7 @@
  },
  "platform": {
   "file": "bourg.glb",
-  "tris": 3204,
+  "tris": 3288,
   "footprint": [
    30,
    4
@@ -354,7 +354,7 @@
  },
  "gatekeeper_house": {
   "file": "bourg.glb",
-  "tris": 7684,
+  "tris": 7900,
   "footprint": [
    7,
    6
@@ -474,7 +474,7 @@
  },
  "level_crossing_gate": {
   "file": "bourg.glb",
-  "tris": 504,
+  "tris": 540,
   "footprint": [
    1,
    1
@@ -522,7 +522,7 @@
  },
  "station_sign": {
   "file": "bourg.glb",
-  "tris": 292,
+  "tris": 1504,
   "footprint": [
    2,
    1
@@ -538,7 +538,7 @@
  },
  "mailbox": {
   "file": "bourg.glb",
-  "tris": 116,
+  "tris": 128,
   "footprint": [
    1,
    1
@@ -578,7 +578,7 @@
  },
  "cart": {
   "file": "bourg.glb",
-  "tris": 428,
+  "tris": 452,
   "footprint": [
    3,
    2
@@ -586,7 +586,7 @@
  },
  "bicycle": {
   "file": "bourg.glb",
-  "tris": 520,
+  "tris": 820,
   "footprint": [
    2,
    1
@@ -850,7 +850,7 @@
  },
  "pontoon": {
   "file": "bourg.glb",
-  "tris": 640,
+  "tris": 652,
   "footprint": [
    2,
    3
@@ -920,7 +920,7 @@
  },
  "table": {
   "file": "maison.glb",
-  "tris": 268,
+  "tris": 332,
   "footprint": [
    2,
    1
@@ -928,7 +928,7 @@
  },
  "chair": {
   "file": "maison.glb",
-  "tris": 452,
+  "tris": 404,
   "footprint": [
    1,
    1
@@ -952,7 +952,7 @@
  },
  "stove": {
   "file": "maison.glb",
-  "tris": 372,
+  "tris": 484,
   "footprint": [
    1,
    1
@@ -984,7 +984,7 @@
  },
  "curtains": {
   "file": "maison.glb",
-  "tris": 504,
+  "tris": 488,
   "footprint": [
    1,
    1
@@ -1000,7 +1000,7 @@
  },
  "wood_stove": {
   "file": "maison.glb",
-  "tris": 240,
+  "tris": 380,
   "footprint": [
    1,
    1
@@ -1008,7 +1008,7 @@
  },
  "picture_frame": {
   "file": "maison.glb",
-  "tris": 124,
+  "tris": 116,
   "footprint": [
    1,
    1

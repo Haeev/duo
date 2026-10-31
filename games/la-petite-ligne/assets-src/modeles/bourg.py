@@ -427,6 +427,9 @@ def gatekeeper_house(A, ruin, parent):
             window(g, f, -1.0, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin)
         elif side == "left":
             window(g, f, 0.3, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin)
+        elif side == "right":
+            # côté voie: le garde-barrière surveille les trains
+            window(g, f, 0.0, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin)
         if side in ("left", "right"):
             col_g = wall_color(color_out, color_in, inward)
             x = -hx + t / 2 if side == "left" else hx - t / 2
@@ -514,7 +517,11 @@ def station(A):
         f.box(g, (0.1 if k % 4 else 0.13, 0.09, 0.18), 1.9 - 1.05 + k * 0.162, 0.07, 2.62, "paint_red")
     for side in ("left", "right"):
         ff = Face(side, hx, hy)
-        window(g, ff, 0.0, 1.0, 0.75, 1.2, shutter="paint_red")
+        if side == "left":
+            # pignon ouest, côté quai: une porte qui donne sur le quai
+            door(g, ff, 0.0, w=1.1, h=2.3, color="paint_red", glass=True)
+        else:
+            window(g, ff, 0.0, 1.0, 0.75, 1.2, shutter="paint_red")
         ff.box(g, (0.62, 0.06, 0.62), 0.0, 0.06, 3.55, "stone_light")
         ff.box(g, (0.44, 0.07, 0.44), 0.0, 0.08, 3.55, "glass", rot=(0, 45, 0))
     A.add("station_body", g, parent=root)
@@ -1181,8 +1188,29 @@ def station_sign(A):
         g.box((0.2, 0.2, 0.1), loc=(x, 0, 0), color="stone", base=True)
     g.box((1.9, 0.08, 0.5), loc=(0, 0, 1.95), color="white_paint", base=True, bevel=0.02)
     g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
-    for k in range(7):
-        g.box((0.14 if k % 3 else 0.18, 0.09, 0.26), loc=(-0.66 + k * 0.22, -0.005, 2.07), color="paint_blue", base=True)
+    # lettres AUBRUNE en relief (police de 3 x 5 pavés), sur les deux faces (lisibles de chaque côté)
+    glyphs = {"A": ("010", "101", "111", "101", "101"), "U": ("101", "101", "101", "101", "111"),
+              "B": ("110", "101", "110", "101", "110"), "R": ("110", "101", "110", "101", "101"),
+              "N": ("101", "111", "111", "101", "101"), "E": ("111", "100", "110", "100", "111")}
+    px, word = 0.058, "AUBRUNE"
+    x0 = -(len(word) * 4 - 1) * px / 2
+    for face, yy in ((1, -0.045), (-1, 0.055)):
+        for i, ch in enumerate(word):
+            for r, row in enumerate(glyphs[ch]):
+                c = 0
+                while c < 3:
+                    if row[c] == "1":
+                        c2 = c
+                        while c2 + 1 < 3 and row[c2 + 1] == "1":
+                            c2 += 1
+                        xa = x0 + (i * 4 + c) * px
+                        xb = x0 + (i * 4 + c2 + 1) * px
+                        xc = (xa + xb) / 2 * face  # au dos, le mot se lit dans l'autre sens: miroir
+                        g.box((xb - xa - 0.006, 0.012, px - 0.006), loc=(xc, yy, 2.05 + (2 - r) * px), color="paint_blue",
+                              no_round=True)
+                        c = c2 + 1
+                    else:
+                        c += 1
     for x in (-0.85, 0.85):
         g.sphere(0.06, loc=(x, 0, 2.33), color="iron", segs=6, rings=4)
     return g
@@ -1228,7 +1256,8 @@ def mailbox(A):
     g.box((0.1, 0.1, 1.05), color="wood_dark", base=True)
     g.box((0.4, 0.28, 0.32), loc=(0, -0.02, 1.0), color="paint_yellow", base=True, bevel=0.02)
     g.box((0.42, 0.3, 0.06), loc=(0, -0.02, 1.32), color="paint_yellow", base=True, rot=(0, 0, 0))
-    g.box((0.22, 0.02, 0.03), loc=(0, -0.165, 1.22), color="shadow")
+    g.box((0.28, 0.025, 0.07), loc=(0, -0.165, 1.22), color="iron")
+    g.box((0.24, 0.03, 0.035), loc=(0, -0.168, 1.22), color="shadow")  # fente, encadrée de fer
     g.box((0.12, 0.02, 0.06), loc=(0, -0.168, 1.08), color="paint_blue")
     return g
 
@@ -1671,15 +1700,16 @@ def pontoon(A):
         g.box((1.8, 0.1, 0.1), loc=(0, y, 0.33), color="wood_dark", base=True)
     g.cyl(0.06, 0.35, loc=(0.85, -1.3, 0.5), color="wood_dark", segs=6, base=True)
     g.cyl(0.08, 0.05, loc=(0.85, -1.3, 0.7), color="rope", segs=6)
-    # escalier vers la berge (+Y): deux limons posés sur le pont et au sol, deux marches de 30 cm
+    # escalier côté sud, vers l'eau (-Y ici, +Z glTF): deux limons posés sur le pont et en bas, deux
+    # marches de 30 cm
     # logées entre eux, contremarches de 17 cm (0,5 m en trois hauteurs)
-    y0, y1, ztop = 1.5, 2.15, 0.44
-    ang = math.degrees(math.atan2(ztop, y1 - y0))
+    y0, y1, ztop = -1.5, -2.15, 0.44
+    ang = math.degrees(math.atan2(ztop, y0 - y1))
     Ls = math.hypot(y1 - y0, ztop) + 0.06
-    for x in (-0.52, 0.52):
-        g.box((0.06, Ls, 0.14), loc=(x, (y0 + y1) / 2, ztop / 2), color="wood_dark", rot=(-ang, 0, 0))
+    for x in (-0.45, 0.45):
+        g.box((0.06, Ls, 0.14), loc=(x, (y0 + y1) / 2, ztop / 2), color="wood_dark", rot=(ang, 0, 0))
     for k, zt in enumerate((0.333, 0.167)):
-        g.box((0.98, 0.3, 0.05), loc=(0, y0 + 0.15 + k * 0.3, zt - 0.05), color="wood_old", base=True)
+        g.box((0.84, 0.3, 0.05), loc=(0, y0 - 0.15 - k * 0.3, zt - 0.05), color="wood_old", base=True)
     return g
 
 

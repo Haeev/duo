@@ -17,6 +17,18 @@ Tout reconstruire (environ 6 minutes, planches comprises): `bash games/la-petite
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
 
+## Contrôles avant livraison
+
+À lancer sur tous les GLB avant chaque livraison (depuis `games/la-petite-ligne/assets-src/modeles/`), et joindre les planches de 4 vues à la planche avant et après:
+
+- `duo-python verifier/rendre_audit.py <sortie> [bourg ferme ...]`: audit du directeur artistique. Pour chaque nœud racine, quatre vues de près (iso avant, iso arrière, profil rasant, perspective plongeante) en Workbench avec cavités, planche `<fichier>__<nœud>.png`, et rapport `<fichier>.json`: îlots isolés qui ne touchent aucune autre pièce (pièces qui flottent), faces inversées (indicatif: les surfaces ouvertes comme l'eau sortent en faux positifs), arêtes ouvertes.
+- `duo-python verifier/controle_geometrie.py [fichier.glb ...]`: pièces qui flottent sans appui, faces inversées des volumes fermés, pièce longue (poutre, poteau) qui traverse une plaque (toit, auvent) de part en part. Rapport indicatif, chaque cas se vérifie à l'œil.
+- `duo-python verifier/quatre_angles.py <fichier.glb> <nœud> <image.png>`: rendu Cycles d'un nœud sous quatre azimuts, pour un contrôle de près.
+- `node verifier/verifier.cjs` (depuis la racine du dépôt): chargement dans Three.js 0.187 sous Chromium, animations comprises.
+- Validateur glTF (`gltf-validator`, `validateBytes` en Node): aucune erreur.
+
+Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse, chaque pièce s'arrête sur ce qui la porte, un toit repose sur une structure lisible, marches de 15 à 20 cm de haut et 25 à 30 cm de profond sur des limons ou un massif, portes de 2 m à 2,10 m; au bon endroit, dans le bon sens, à la bonne taille.
+
 ## Conventions
 
 - 1 unité = 1 m, Y en haut. Façade (porte) et regard vers +Z. Origine au centre de l'emprise, au niveau du sol. Emprises en cases entières (champ `footprint` des extras, `[largeur le long de la façade, profondeur]`).
@@ -185,13 +197,13 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3442 Ko)
+### `bourg.glb` (3575 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
-| `station` | 10 x 6 | 3956 | door_cell: 4 |
-| `platform` | 30 x 4 | 3204 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
-| `gatekeeper_house` | 7 x 6 | 7684 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
+| `station` | 10 x 6 | 4016 | door_cell: 4 |
+| `platform` | 30 x 4 | 3288 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
+| `gatekeeper_house` | 7 x 6 | 7900 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
 | `ferrand_shop` | 10 x 8 | 4676 | door_cell: 2, counter_cell: 6 |
 | `firmin_house` | 7 x 6 | 4524 | door_cell: 3 |
 | `sawmill` | 10 x 8 | 1968 | door_cell: 5 |
@@ -205,21 +217,21 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `rail_straight` | 4 x 2 | 294 | rail_top: 0.32, gauge: 1.0 |
 | `rail_curve_90` | 13 x 13 | 2676 | radius: 12.0, rail_top: 0.32 |
 | `buffer_stop` | 1 x 2 | 152 |  |
-| `level_crossing_gate` | 1 x 1 | 504 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
+| `level_crossing_gate` | 1 x 1 | 540 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
 | `bell_post` | 1 x 1 | 238 |  |
 | `bench` | 2 x 1 | 316 |  |
 | `lamp_post` | 1 x 1 | 248 |  |
 | `coop_crate` | 1 x 1 | 240 |  |
 | `notice_board` | 1 x 1 | 364 |  |
-| `station_sign` | 2 x 1 | 292 |  |
+| `station_sign` | 2 x 1 | 1504 |  |
 | `arbor` | 3 x 2 | 944 |  |
-| `mailbox` | 1 x 1 | 116 |  |
+| `mailbox` | 1 x 1 | 128 |  |
 | `barrel` | 1 x 1 | 276 |  |
 | `crate` | 1 x 1 | 92 |  |
 | `crate_stack` | 2 x 1 | 252 |  |
 | `sacks` | 1 x 1 | 228 |  |
-| `cart` | 3 x 2 | 428 |  |
-| `bicycle` | 2 x 1 | 520 |  |
+| `cart` | 3 x 2 | 452 |  |
+| `bicycle` | 2 x 1 | 820 |  |
 | `ground_grass` | 1 x 1 | 24 |  |
 | `ground_dirt` | 1 x 1 | 48 |  |
 | `ground_cobble` | 1 x 1 | 716 |  |
@@ -252,7 +264,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `river_straight` | 4 x 8 | 220 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
-| `pontoon` | 2 x 3 | 640 | walk_height: 0.5 |
+| `pontoon` | 2 x 3 | 652 | walk_height: 0.5 |
 | `tree_oak` |  | 358 | alias_of: "tree_oak_large" |
 | `tree_fir` |  | 174 | alias_of: "tree_fir_large" |
 | `bush` |  | 100 | alias_of: "bush_round" |
@@ -270,25 +282,25 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (533 Ko)
+### `maison.glb` (547 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
 | `straw_mattress` | 1 x 2 | 320 | sleep_height: 0.15 |
 | `double_bed` | 2 x 2 | 708 | sleep_height: 0.5, sleep_spots: [[-0.36, 0.0], [0.36, 0.0]] |
 | `mattress` |  | 324 | kind: "item" |
-| `table` | 2 x 1 | 268 | top_height: 0.78 |
-| `chair` | 1 x 1 | 452 | seat_height: 0.47 |
+| `table` | 2 x 1 | 332 | top_height: 0.78 |
+| `chair` | 1 x 1 | 404 | seat_height: 0.47 |
 | `chest` | 1 x 1 | 176 |  |
 | `shelf` | 2 x 1 | 656 | wall: true |
-| `stove` | 1 x 1 | 372 | station: "stove" |
+| `stove` | 1 x 1 | 484 | station: "stove" |
 | `flower_pot` | 1 x 1 | 352 |  |
 | `oil_lamp` | 1 x 1 | 232 | light_anchor: "oil_lamp_light" |
 | `rug` | 2 x 2 | 296 | floor: true |
-| `curtains` | 1 x 1 | 504 | wall: true |
+| `curtains` | 1 x 1 | 488 | wall: true |
 | `crystal_radio` | 1 x 1 | 368 |  |
-| `wood_stove` | 1 x 1 | 240 | tier: "P1" |
-| `picture_frame` | 1 x 1 | 124 | wall: true, tier: "P1" |
+| `wood_stove` | 1 x 1 | 380 | tier: "P1" |
+| `picture_frame` | 1 x 1 | 116 | wall: true, tier: "P1" |
 | `bread` |  | 136 | kind: "item" |
 | `dish_radishes` |  | 464 | kind: "item" |
 | `dish_omelette` |  | 276 | kind: "item" |
