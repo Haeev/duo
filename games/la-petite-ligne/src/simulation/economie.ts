@@ -5,7 +5,7 @@
  */
 import type { Character, CharacterId, ItemStack, PurchaseRequest, Quality } from '../etat/types';
 import { orderSatisfied } from './conditions';
-import { type Sim, character, distance, emit, itemName, newId, notifyKey, partnerOf, point, say } from './contexte';
+import { type Sim, character, distance, emit, itemName, itemWithArticle, newId, notifyKey, partnerOf, point, say } from './contexte';
 import { queueHint } from './astuces';
 import { addStack, countInBag, countInStacks, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
 
@@ -87,7 +87,8 @@ function propose(sim: Sim, c: Character, request: PurchaseRequest, price: number
   sim.world.purse -= price;
   sim.world.proposals.push({ id, by: c.id, purchase: request, price });
   const other = partnerOf(c.id);
-  notifyKey(sim, other, 'proposal', 'big_purchase_proposal', { partner: c.name, item: itemName(sim, request.item, request.count), price }, { proposal: id });
+  const item = itemWithArticle(sim, request.item, request.count);
+  notifyKey(sim, other, 'proposal', 'big_purchase_proposal', { partner: c.name, item, price }, { proposal: id });
   emit(sim, { type: 'proposal', by: c.id, proposal: id });
 }
 
@@ -110,7 +111,7 @@ export function answerProposal(sim: Sim, c: Character, id: string, accept: boole
   const buyer = character(sim, proposal.by);
   if (accept) {
     deliver(sim, buyer, proposal.purchase, proposal.price);
-    say(sim, 'both', 'big_purchase_accepted', { item: itemName(sim, proposal.purchase.item, proposal.purchase.count) });
+    say(sim, 'both', 'big_purchase_accepted', { item: itemWithArticle(sim, proposal.purchase.item, proposal.purchase.count) });
   } else {
     sim.world.purse += proposal.price;
     say(sim, 'both', 'big_purchase_declined');

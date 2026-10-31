@@ -79,7 +79,8 @@ export class SkyLayer {
       const cx = (hash2(cloud, 0, SEED_CLOUD) * 2 - 1) * sky.cloudArea;
       const cz = (hash2(cloud, 1, SEED_CLOUD) * 2 - 1) * sky.cloudArea;
       for (let puff = 0; puff < sky.cloudPuffs; puff += 1) {
-        const jitter = (salt: number): number => hash2(cloud * sky.cloudPuffs + puff, salt, SEED_CLOUD) * 2 - 1;
+        const jitter = (salt: number): number =>
+          hash2(cloud * sky.cloudPuffs + puff, salt, SEED_CLOUD) * 2 - 1;
         const size = sky.cloudPuffSize * (1 + jitter(2) * CLOUD_SIZE_JITTER);
         b.origin.setXYZW(
           index,

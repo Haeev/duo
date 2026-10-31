@@ -19,6 +19,7 @@ import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { placeFurniture } from './amenagement';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
+import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 
 /** Ce sur quoi on peut agir. */
 export type Target =
@@ -273,6 +274,7 @@ function pickUp(sim: Sim, c: Character, id: string): void {
   sim.world.groundItems.splice(index, 1);
   const left = addToBag(sim, c, g.item, g.quality, g.count);
   if (left > 0) dropAt(sim, g.pos.x, g.pos.y, g.item, g.quality, left);
+  if (left < g.count) rememberPickup(sim, c, g.id, g.pos);
   gesture(sim, c, 'pickup', sim.content.settings.feel.actionSeconds.pickup ?? 0, { x: g.pos.x, y: g.pos.y });
   bump(sim, `picked:${g.item}`, c.id, g.count - left);
   emit(sim, { type: 'picked_up', by: c.id, item: g.item, count: g.count - left });
@@ -360,16 +362,35 @@ export function actFront(sim: Sim, c: Character): void {
     return;
   }
   const best = bestTarget(sim, c);
-  if (best === null) return;
-  if (best.verb === null) {
-    // SI-01: une case déjà récoltée par l'autre à l'instant.
-    if (best.target.kind === 'cell') {
-      const g = gardenCellAt(sim, best.target.cell);
-      if (g !== null) harvest(sim, c, g);
-    }
+  if (best !== null && best.verb !== null) {
+    perform(sim, c, best.target, best.verb);
     return;
   }
-  perform(sim, c, best.target, best.verb);
+  if (best !== null && takenByPartner(sim, c, best.target, sim.world.tick)) return;
+  const reach = sim.content.settings.ranges.action;
+  pickupTakenNear(sim, c, (pos) => distance(c.pos, pos) <= reach && inCone(c, pos));
+}
+
+/** Rien à faire sur la cible visée au pas `since`: l'autre vient-il de la récolter (SI-01) ? Vrai si c'est dit. */
+function takenByPartner(sim: Sim, c: Character, t: Target, since: number): boolean {
+  if (t.kind !== 'cell') return false;
+  const g = gardenCellAt(sim, t.cell);
+  return g !== null && harvestTaken(sim, c, g, since);
+}
+
+/**
+ * Agir sur la cible d'un clic (`target`, déjà résolue; `null` si elle n'est
+ * plus là), comme le ferait la touche. `since`: pas du clic, même pour un
+ * clic lointain qui agit à l'arrivée (« Déjà pris » compte depuis le clic).
+ */
+export function actOnClick(sim: Sim, c: Character, click: ClickTarget, target: Target | null, since: number): void {
+  if (target === null) {
+    if (click.kind === 'ground_item') pickupTaken(sim, c, click.groundItem, since);
+    return;
+  }
+  const verb = verbOf(sim, c, target);
+  if (verb !== null) perform(sim, c, target, verb);
+  else takenByPartner(sim, c, target, since);
 }
 
 /** Cible d'un clic, traduite en cible de la simulation (avec sa position). */

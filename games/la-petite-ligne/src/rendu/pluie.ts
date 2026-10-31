@@ -51,16 +51,15 @@ export class RainLayer {
         // Graine: la densité garde les gouttes dont la graine est sous elle.
         hash2(i, SALT_KEEP),
       );
-      b.color.setXYZW(
-        i,
-        color.r,
-        color.g,
-        color.b,
-        splash ? rain.splashOpacity : rain.opacity,
-      );
+      b.color.setXYZW(i, color.r, color.g, color.b, splash ? rain.splashOpacity : rain.opacity);
     }
     const u = this.uniforms;
-    u.uRainShape.value.set(rain.streakLength, rain.streakWidth, rain.splashRadius, rain.rippleRadius);
+    u.uRainShape.value.set(
+      rain.streakLength,
+      rain.streakWidth,
+      rain.splashRadius,
+      rain.rippleRadius,
+    );
     const fall = u.uFall.value;
     fall.set(rain.wind[0], -rain.speed, rain.wind[1]);
     this.mesh.visible = false;

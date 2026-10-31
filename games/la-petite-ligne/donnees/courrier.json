@@ -6,7 +6,7 @@
       "from": "coop",
       "title": "Bienvenue à la Halte d'Aubrune",
       "delivery": { "byEffect": true },
-      "text": "Chers nouveaux gardiens de la Halte d'Aubrune, la coopérative de la ligne vous souhaite la bienvenue. Voici {startPurse} sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: {order}. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine !"
+      "text": "Bonjour à la nouvelle équipe de la Halte d'Aubrune ! La coopérative de la ligne vous souhaite la bienvenue. Voici {startPurse} sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: {order}. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine !"
     },
     {
       "id": "basile_workbench",

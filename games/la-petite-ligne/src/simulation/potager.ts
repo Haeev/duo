@@ -3,7 +3,7 @@
  * tonneau) et bêche libre (énigme d'Émile).
  */
 import type { Cell, Character, GardenCell, Quality, Tree } from '../etat/types';
-import { type Sim, bump, emit, partnerName, partnerOf, say, secondsToTicks, notifyKey } from './contexte';
+import { type Sim, bump, emit, secondsToTicks, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { durationMultiplier, spend } from './besoins';
 import { giveToCharacter, heldStack, takeFromBag } from './sac';
@@ -86,15 +86,8 @@ export function water(sim: Sim, c: Character, g: GardenCell): void {
 
 export function harvest(sim: Sim, c: Character, g: GardenCell): void {
   const crop = g.crop;
-  if (!crop?.ripe) {
-    const last = g.lastHarvest;
-    const window = secondsToTicks(sim.content.settings.feel.alreadyTakenSeconds);
-    if (crop === null && last !== null && last.by !== c.id && sim.world.tick - last.tick <= window) {
-      say(sim, c.id, 'already_taken', { partner: partnerName(sim, c.id) });
-      emit(sim, { type: 'already_taken', by: c.id, other: partnerOf(c.id), cell: { ...g.cell } });
-    }
-    return;
-  }
+  // Case déjà récoltée par l'autre: `harvestTaken` (simultane.ts).
+  if (!crop?.ripe) return;
   const def = sim.content.crops[crop.crop];
   if (def === undefined) return;
   const quality: Quality = crop.wateredEveryDay ? 'fine' : 'ordinary';

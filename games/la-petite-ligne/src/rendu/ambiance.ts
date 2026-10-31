@@ -415,7 +415,10 @@ export class AmbiancePart implements ExtensionPart {
       u.uLampCount.value = 0;
       return;
     }
-    if (Number.isNaN(this.lastSort.x) || this.lastSort.distanceTo(focus) > settings.resortDistance) {
+    if (
+      Number.isNaN(this.lastSort.x) ||
+      this.lastSort.distanceTo(focus) > settings.resortDistance
+    ) {
       this.lastSort.copy(focus);
       this.order.length = 0;
       this.lights.forEach((_, index) => this.order.push(index));
@@ -442,9 +445,15 @@ export class AmbiancePart implements ExtensionPart {
       const kind = settings.kinds[light.kind];
       const flicker =
         light.kind === 'flame'
-          ? 1 + Math.sin(this.time * settings.flickerHz * Math.PI * 2 + light.phase) * settings.flicker
+          ? 1 +
+            Math.sin(this.time * settings.flickerHz * Math.PI * 2 + light.phase) * settings.flicker
           : 1;
-      u.uLamps.value[count]?.set(light.position.x, light.position.y, light.position.z, light.radius);
+      u.uLamps.value[count]?.set(
+        light.position.x,
+        light.position.y,
+        light.position.z,
+        light.radius,
+      );
       u.uLampColors.value[count]?.set(kind.color).multiplyScalar(kind.intensity * fade * flicker);
       count += 1;
     }

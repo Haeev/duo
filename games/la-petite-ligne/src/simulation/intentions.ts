@@ -6,7 +6,7 @@ import type { Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
-import { actFront, getUp, openMenu, perform, resolveClick, verbOf } from './agir';
+import { actFront, actOnClick, getUp, openMenu, resolveClick } from './agir';
 import { placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
 import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
@@ -136,16 +136,19 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
     case 'move_to': {
       if (!c.created || (c.status !== 'active' && c.status !== 'menu') || c.crafting !== null) return;
       const target = resolveClick(sim, c, intent.target);
-      if (target === null) return;
+      if (target === null) {
+        // L'objet cliqué n'est plus là: l'autre vient peut-être de le ramasser (SI-01).
+        if (intent.act && canAct(c, sim)) actOnClick(sim, c, intent.target, null, sim.world.tick);
+        return;
+      }
       if (c.status === 'menu') openMenu(sim, c, null);
       const reach = target.kind === 'villager' ? sim.content.settings.ranges.talk - 0.3 : sim.content.settings.ranges.action - 0.2;
       if (intent.act && distance(c.pos, target.pos) <= reach) {
         stopPath(sim, c);
-        const verb = verbOf(sim, c, target);
-        if (verb !== null && canAct(c, sim)) perform(sim, c, target, verb);
+        if (canAct(c, sim)) actOnClick(sim, c, intent.target, target, sim.world.tick);
         return;
       }
-      if (goTo(sim, c, target.pos)) sim.runtime.pendingAct[c.id] = intent.act ? intent.target : null;
+      if (goTo(sim, c, target.pos)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
       return;
     }
     case 'act':
@@ -277,10 +280,7 @@ export function arrive(sim: Sim, c: Character): void {
   const pending = sim.runtime.pendingAct[c.id];
   sim.runtime.pendingAct[c.id] = null;
   if (pending === null || !canAct(c, sim)) return;
-  const target = resolveClick(sim, c, pending);
-  if (target === null) return;
-  const verb = verbOf(sim, c, target);
-  if (verb !== null) perform(sim, c, target, verb);
+  actOnClick(sim, c, pending.target, resolveClick(sim, c, pending.target), pending.since);
 }
 
 export function otherOf(id: CharacterId): CharacterId {

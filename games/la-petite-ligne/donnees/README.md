@@ -16,7 +16,7 @@ Code de sortie 0 si aucune erreur. Tant que `cartes/` est vide, le validateur av
 - Identifiants (`id` et toute référence): anglais, `snake_case` (`^[a-z][a-z0-9_]*$`), uniques dans leur famille. Les identifiants de dialogue sont uniques pour tout le jeu.
 - Clés des champs en `camelCase`, comme le manifeste `duo-game.json`.
 - Heures de jeu en texte `"HH:MM"`, de `"00:00"` à `"24:00"`. Jours de la démo: entiers de 1 à 8 (le jour 1 est un samedi). Jours de la semaine: `saturday` à `friday`.
-- Textes affichés: en français, tutoiement de chaque joueur, « vous » quand on parle aux deux, rédaction neutre (jamais d'accord au genre d'un joueur), aucun tiret cadratin ni demi-cadratin. Le validateur refuse les tirets longs.
+- Textes affichés: en français, tutoiement de chaque joueur, « vous » quand on parle aux deux, rédaction neutre (jamais d'accord au genre d'un joueur: « Personne n'était descendu ici depuis vingt ans », « Venez à deux », « de nouvelles têtes »), aucun tiret cadratin ni demi-cadratin. Le validateur refuse les tirets longs et avertit des tournures genrées les plus courantes (à relire, il ne les voit pas toutes).
 - `tier`: `"P0"` (indispensable à la démo) ou `"P1"` (si le temps le permet). Un élément P1 peut rester absent du jeu sans rien casser: les données qui en dépendent sont aussi en P1, ou gardées par un drapeau (`fishing_enabled`).
 - Modèles 3D: le champ `model` donne le nom du fichier attendu de l'artiste (`radish` correspond à `radish.glb`). Les stades des cultures s'appellent `<culture>_stage_<stade>`, les habitants `villager_<id>`.
 
@@ -57,6 +57,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 |---|---|---|
 | `id` | identifiant | |
 | `name`, `plural` | texte | nom au singulier et au pluriel, sans article (« laitue », « laitues ») |
+| `indefinite` | texte | le nom au singulier avec son article indéfini (« une laitue », « un œuf », « des rideaux »), pour les phrases du type « Sacha propose d'acheter un matelas »; le validateur demande « un », « une » ou « des » suivi exactement de `name` |
 | `category` | texte | `seed`, `crop`, `forage`, `animal_product`, `material`, `carried`, `tool`, `food`, `quest`, `fish`, `decoration`, `furniture` |
 | `stack` | entier ≥ 1 | taille d'une pile dans le sac (1 pour les outils et les meubles) |
 | `buyPrice` | entier ou `null` | prix d'achat en boutique, en sous; `null` si l'objet ne s'achète pas |
@@ -308,8 +309,9 @@ Les données renvoient à ces points et zones nommés. Le level designer les cr�
 | `sawmill_yard` | point | la cour de la scierie, quand Basile est chez lui |
 | `forest_edge` | zone | la lisière et ses 12 arbres |
 | `riverbank` | point | la berge, Jeanne l'après-midi, les envies de la rivière |
+| `river_ford` | point | le gué: pêche (P1) et astuce de la pêche |
 
-Points aussi nécessaires au code, sans renvoi dans ces données: `well` (puits, remplir l'arrosoir), `water_barrel` (tonneau de la maisonnette), `notice_board` (tableau: commande, catalogue, courrier), `handcar_shed` (remise de la draisine), `house_interior` (zone: la pièce, pour la veillée et l'aménagement), `river_ford` (le gué, pêche en P1).
+Points aussi nécessaires au code, sans renvoi dans ces données: `well` (puits, remplir l'arrosoir), `water_barrel` (tonneau de la maisonnette), `notice_board` (tableau: commande, catalogue, courrier), `handcar_shed` (remise de la draisine), `house_interior` (zone: la pièce, pour la veillée et l'aménagement).
 
 ## 6. Ce que le code doit savoir
 

@@ -17,6 +17,21 @@ import type {
 import type { Content } from '../donnees/types';
 import { SIM_DT } from './constantes';
 
+/** Clic sur une cible encore loin: on agira en arrivant. */
+export interface PendingAct {
+  target: ClickTarget;
+  /** Pas du clic. */
+  since: number;
+}
+
+/** Objet ramassé au sol (il n'existe plus dans le monde). */
+export interface RecentPickup {
+  id: string;
+  by: CharacterId;
+  tick: number;
+  pos: Vec2;
+}
+
 /** Caches recalculables, jamais sauvegardés ni transmis. */
 export interface Runtime {
   /** Cases bloquées par les arbres debout et les meubles (0 ou 1). */
@@ -24,8 +39,10 @@ export interface Runtime {
   dynamicDirty: boolean;
   /** Trajet restant d'un clic au sol. */
   charPaths: Record<CharacterId, Vec2[]>;
-  /** Ce qu'il faudra faire en arrivant (clic sur une cible). */
-  pendingAct: Record<CharacterId, ClickTarget | null>;
+  /** Ce qu'il faudra faire en arrivant (clic sur une cible), et le pas du clic. */
+  pendingAct: Record<CharacterId, PendingAct | null>;
+  /** Derniers objets ramassés au sol, pour « Déjà pris » (SI-01). */
+  recentPickups: RecentPickup[];
   villagerPaths: Record<string, { target: string; path: Vec2[] }>;
   /** Dernière réplique quotidienne entendue, par joueur et par habitant. */
   lastDaily: Record<string, string>;
@@ -54,6 +71,7 @@ export function createRuntime(map: GameMap): Runtime {
     dynamicDirty: true,
     charPaths: { p1: [], p2: [] },
     pendingAct: { p1: null, p2: null },
+    recentPickups: [],
     villagerPaths: {},
     lastDaily: {},
     changed: true,
@@ -116,6 +134,13 @@ export function itemName(sim: Sim, item: string, count: number): string {
   return count > 1 ? def.plural : def.name;
 }
 
+/** L'objet dans une phrase: « un matelas » (champ `indefinite`, sinon le nom seul), « 4 planches ». */
+export function itemWithArticle(sim: Sim, item: string, count: number): string {
+  const def = sim.content.items[item];
+  if (def === undefined) return item;
+  return count > 1 ? `${count} ${def.plural}` : (def.indefinite ?? def.name);
+}
+
 export function notify(
   sim: Sim,
   who: CharacterId | 'both',
@@ -162,6 +187,16 @@ export function say(
   vars: Record<string, string | number> = {},
 ): void {
   notifyKey(sim, who, 'message', key, vars);
+}
+
+/** Comme `say`, mais rien si le texte manque dans `textes.json` (message facultatif). */
+export function sayIfWritten(
+  sim: Sim,
+  who: CharacterId | 'both',
+  key: string,
+  vars: Record<string, string | number> = {},
+): void {
+  if (Object.hasOwn(sim.content.texts.messages, key)) say(sim, who, key, vars);
 }
 
 /** Prénom de l'autre joueur, pour `{partner}`. */

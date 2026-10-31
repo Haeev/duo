@@ -3,7 +3,7 @@
  * ferrer pendant la fenêtre; manqué, le poisson repart et l'on relance.
  */
 import type { Character, Vec2 } from '../etat/types';
-import { type Sim, bump, emit, say, secondsToTicks } from './contexte';
+import { type Sim, bump, emit, sayIfWritten, secondsToTicks } from './contexte';
 import { spend } from './besoins';
 import { ITEM } from './ids';
 import { giveToCharacter, heldItem } from './sac';
@@ -90,7 +90,7 @@ export function updateFishing(sim: Sim, c: Character): void {
     emit(sim, { type: 'bite', by: c.id });
   } else if (line.phase === 'bite' && tick > line.until) {
     c.fishing = null;
-    say(sim, c.id, 'fish_escaped');
+    sayIfWritten(sim, c.id, 'fish_escaped');
     emit(sim, { type: 'escaped', by: c.id });
   }
 }

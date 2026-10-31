@@ -201,7 +201,9 @@ export function groundLights(sources: readonly GlowSource[]): GroundLight[] {
   }
   const window = settings.kinds.window;
   for (const facade of facades) {
-    const position = facade.sum.divideScalar(facade.count).addScaledVector(facade.normal, window.push);
+    const position = facade.sum
+      .divideScalar(facade.count)
+      .addScaledVector(facade.normal, window.push);
     position.y += settings.windowDrop;
     lights.push({ position, radius: window.radius, kind: 'window', phase: lights.length });
   }

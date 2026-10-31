@@ -230,9 +230,13 @@ class CharacterFigure {
     const fade = request.fade ?? SETTINGS.crossFadeSeconds;
     const sameAction = action === this.current;
     action.reset();
-    action.setLoop(request.once === true ? LoopOnce : LoopRepeat, request.once === true ? 1 : Infinity);
+    action.setLoop(
+      request.once === true ? LoopOnce : LoopRepeat,
+      request.once === true ? 1 : Infinity,
+    );
     action.clampWhenFinished = request.once === true;
-    action.time = request.once === true || request.fromStart === true ? 0 : this.phase * clip.duration;
+    action.time =
+      request.once === true || request.fromStart === true ? 0 : this.phase * clip.duration;
     if (sameAction) {
       // Le même geste relancé (deux lancers de suite): pas de fondu sur soi-même.
       action.play();
@@ -453,7 +457,10 @@ export class CharactersPart implements EventfulPart {
   }
 
   /** Geste de pêche joué une fois par joueur (lancer, ferrer), avec son début. */
-  private readonly oneShot = new Map<CharacterId, { clip: string; start: number; duration: number }>();
+  private readonly oneShot = new Map<
+    CharacterId,
+    { clip: string; start: number; duration: number }
+  >();
   private time = 0;
 
   handleEvent(event: WorldEvent): void {
@@ -486,7 +493,12 @@ export class CharactersPart implements EventfulPart {
       const size = this.content.items[piece.item]?.footprint ?? { w: 1, d: 1 };
       const w = piece.rotation % 2 === 0 ? size.w : size.d;
       const d = piece.rotation % 2 === 0 ? size.d : size.w;
-      if (x < piece.cell.cx || y < piece.cell.cy || x >= piece.cell.cx + w || y >= piece.cell.cy + d) {
+      if (
+        x < piece.cell.cx ||
+        y < piece.cell.cy ||
+        x >= piece.cell.cx + w ||
+        y >= piece.cell.cy + d
+      ) {
         continue;
       }
       const extras = this.library.extras(this.content.items[piece.item]?.model ?? piece.item);
@@ -694,14 +706,10 @@ export class CharactersPart implements EventfulPart {
               Math.max(WALK_SCALE_MIN, villager.speed / SETTINGS.walkReferenceSpeed),
             )
           : 1;
-      figure.update(
-        context,
-        this.terrain,
-        villager.prev,
-        villager.pos,
-        villager.facing,
-        { name: clip, timeScale },
-      );
+      figure.update(context, this.terrain, villager.prev, villager.pos, villager.facing, {
+        name: clip,
+        timeScale,
+      });
       figure.updateFace(
         context.time,
         villager.talkingWith.length > 0

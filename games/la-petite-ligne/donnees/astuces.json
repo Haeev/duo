@@ -12,12 +12,13 @@
     { "id": "hint_water", "text": "Arrose chaque jour: une culture ne pousse que si elle a bu la veille.", "trigger": { "on": "sowed" }, "tier": "P0" },
     { "id": "hint_refill", "text": "Le puits de la place ou le tonneau de la maison remplissent l'arrosoir.", "trigger": { "on": "tool_empty", "item": "watering_can" }, "tier": "P0" },
     { "id": "hint_harvest", "text": "Elle est prête: un clic pour récolter.", "trigger": { "on": "crop_ripe_in_view" }, "tier": "P0" },
-    { "id": "hint_evening", "text": "Rentrez tous les deux à la maison: la veillée arrête l'horloge.", "trigger": { "on": "time_reached", "time": "19:00" }, "tier": "P0" },
+    { "id": "hint_evening", "text": "Retrouvez-vous à la maison: la veillée arrête l'horloge.", "trigger": { "on": "time_reached", "time": "19:00" }, "tier": "P0" },
     { "id": "hint_veillee", "text": "Cuisinez au réchaud, mangez ensemble, puis allez au lit.", "trigger": { "on": "veillee_started" }, "tier": "P0" },
     { "id": "hint_workbench", "text": "À l'établi, un rondin donne quatre planches, et un plan devient un meuble.", "trigger": { "on": "near_point", "point": "sawmill_workbench" }, "tier": "P0" },
     { "id": "hint_furniture", "text": "La molette tourne le meuble, {act} le pose, {examine} le reprend.", "trigger": { "on": "holding_furniture" }, "tier": "P0" },
     { "id": "hint_crate", "text": "Dépose ici les produits de la commande. Ils partent samedi à 16 h.", "trigger": { "on": "near_point", "point": "coop_crate" }, "tier": "P0" },
     { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} sous, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
-    { "id": "hint_notebook", "text": "{notebook} ouvre le carnet: quêtes, courrier, sac.", "trigger": { "on": "letter_received" }, "tier": "P0" }
+    { "id": "hint_notebook", "text": "{notebook} ouvre le carnet: quêtes, courrier, sac.", "trigger": { "on": "letter_received" }, "tier": "P0" },
+    { "id": "hint_fishing", "text": "Canne en main et face à l'eau, {act} lance la ligne. Le bouchon plonge ? {act}, vite !", "trigger": { "on": "near_point", "point": "river_ford" }, "tier": "P1" }
   ]
 }

@@ -49,6 +49,16 @@ STAGES = {"seed", "sprout", "young", "ripe"}
 QUEST_KINDS = {"main", "side"}
 SPEAKERS_EXTRA = {"narrator"}
 FORM_LEVELS = ["low", "okay", "good", "great", "radiant"]
+INDEFINITE_ARTICLES = {"un", "une", "des"}
+# Tournures qui accordent au genre d'un joueur (rédaction neutre): un avertissement à relire, pas une erreur.
+GENDERED_RE = re.compile(
+    r"\b(?:tu es|tu étais|tu seras|vous êtes|vous étiez|vous serez|sois|soyez) "
+    r"(?:fatigu|prêt|content|épuis|ravi|arrivé|parti|seul|occupé|installé|venu|perdu|les premi|les derni|tous|toutes"
+    r"|nouveaux|nouvelles)"
+    r"|\b(?:tous|toutes) les deux\b(?! (?:jours|nuits|heures|minutes|semaines|mois|ans)\b)"
+    r"|\bles nouveaux\b|\bdes débutant|^(?:cher|chère|chers|chères) ",
+    re.IGNORECASE,
+)
 
 # Paramètres de chaque condition: obligatoires, facultatifs. Le type de chaque référence est vérifié plus bas.
 CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
@@ -210,8 +220,9 @@ def walk_strings(node: Any, where: str, report: Report) -> None:
                 report.error(where, f"espace réservé inconnu {{{name}}}")
         if "TODO" in node:
             report.error(where, "« TODO » dans un texte")
-        if re.search(r"\btu es (fatigu|prêt|content|épuis|ravi|arrivé|parti)", node, re.IGNORECASE):
-            report.warn(where, f"accord au genre possible: {node[:60]!r} (rédaction neutre)")
+        found = GENDERED_RE.search(node)
+        if found:
+            report.warn(where, f"accord au genre possible « {found.group(0)} » dans {node[:60]!r} (rédaction neutre)")
     elif isinstance(node, dict):
         for key, value in node.items():
             walk_strings(value, f"{where}.{key}", report)
@@ -403,6 +414,13 @@ def check_objets(data: dict[str, Any], reg: Registry, report: Report) -> None:
         for key in ("name", "plural", "category", "stack", "model", "tier"):
             if key not in item:
                 report.error(w, f"champ « {key} » manquant")
+        indefinite, name = item.get("indefinite"), item.get("name")
+        if not isinstance(indefinite, str):
+            report.error(w, "champ « indefinite » manquant (le nom avec son article indéfini: « un matelas »)")
+        elif isinstance(name, str) and not (
+            indefinite.split(" ", 1)[0] in INDEFINITE_ARTICLES and indefinite.endswith(" " + name)
+        ):
+            report.error(w, f"« indefinite » attendu: « un », « une » ou « des » suivi du nom {name!r}, trouvé {indefinite!r}")
         if item.get("category") not in ITEM_CATEGORIES:
             report.error(w, f"catégorie inconnue {item.get('category')!r}")
         check_count(item.get("stack"), f"{w}.stack", report)

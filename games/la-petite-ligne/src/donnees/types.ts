@@ -89,6 +89,8 @@ export interface ItemDef {
   id: string;
   name: string;
   plural: string;
+  /** Avec l'article indéfini (« un matelas », « des rideaux »), pour les messages; `null`: le nom seul. */
+  indefinite: string | null;
   category: ItemCategory;
   stack: number;
   buyPrice: number | null;

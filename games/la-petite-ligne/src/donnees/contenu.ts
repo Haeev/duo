@@ -84,6 +84,13 @@ function optString(r: Reader, key: string): string | null {
   return child === null || child.isNull() ? null : child.string();
 }
 
+/** Texte facultatif, non vide s'il est donné. */
+function optText(r: Reader, key: string): string | null {
+  const value = optString(r, key);
+  if (value !== null && value.trim() === '') r.at(key).fail('texte non vide attendu');
+  return value;
+}
+
 function optNumber(r: Reader, key: string, fallback: number): number {
   const child = r.opt(key);
   return child === null || child.isNull() ? fallback : child.number();
@@ -322,6 +329,7 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       id,
       name: it.at('name').string(),
       plural: it.at('plural').string(),
+      indefinite: optText(it, 'indefinite'),
       category: it.at('category').oneOf(CATEGORIES),
       stack: it.at('stack').integer(1, 999),
       buyPrice: buy === null || buy.isNull() ? null : buy.integer(0),

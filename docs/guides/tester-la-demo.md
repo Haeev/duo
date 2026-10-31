@@ -12,13 +12,16 @@ Suis le guide [Installer Duo](installer-duo.md) sur le Mac et sur le PC. Si le l
 
 ### Sans Duo: le Mac sert la démo, le PC l'ouvre dans son navigateur
 
-Sur le Mac, il faut Node 22 et pnpm (si `pnpm` est inconnu: `corepack enable`). Dans un terminal, depuis le dossier du dépôt:
+Sur le Mac, il faut Node 22 (installateur sur nodejs.org) et pnpm (si `pnpm` est inconnu: `corepack enable`, ou `sudo corepack enable` s'il refuse). Dans le Terminal, la première fois:
 
 ```sh
-git pull
+git clone -b main https://github.com/Haeev/duo.git
+cd duo
 pnpm install
 pnpm --filter @duo/sdk-dev servir la-petite-ligne --construire
 ```
+
+Les fois suivantes, depuis le dossier `duo`: `git pull`, `pnpm install`, puis la dernière commande.
 
 1. Le terminal affiche deux adresses. Sur le Mac, ouvre `http://localhost:8080/` dans Chrome. Sur le PC, ouvre l'autre adresse (`http://192.168.x.y:8080/`) dans Edge ou Chrome.
 2. Si le Mac demande d'autoriser `node` à recevoir des connexions: accepte.

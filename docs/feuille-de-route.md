@@ -1,6 +1,6 @@
 # Feuille de route
 
-Tenue par le manager. Dernière mise à jour: 2026-10-30.
+Tenue par le manager. Dernière mise à jour: 2026-10-31.
 
 ## Phase 0: constitution du studio (terminée)
 
@@ -11,19 +11,11 @@ Tenue par le manager. Dernière mise à jour: 2026-10-30.
 - Boîte à outils de production testée de bout en bout (Blender, FluidSynth, pedalboard, rsvg-convert): `outils/installer-outils.sh`.
 - Branche de référence `main` créée.
 
-## Phase 1: cadrage de la plateforme (en cours)
+## Phase 1: cadrage de la plateforme (terminée)
 
-Objectif: tout décider et documenter avant de coder la plateforme.
-
-- Fait: cahier des charges de la plateforme v1.0, validé par le client le 2026-10-30 (`docs/plateforme/cahier-des-charges.md`). Identité visuelle retenue: piste B « Étoile double ».
-- Fait: parcours et wireframes (`docs/plateforme/ux/parcours.md`, `design/maquettes/plateforme-wireframes/`), trois pistes d'identité visuelle (`docs/plateforme/identite-visuelle-pistes.md`, `design/identite/`), architecture proposée (`docs/plateforme/architecture.md`), 132 critères d'acceptation (`docs/plateforme/criteres-acceptation.md`).
-- En cours: ADR 0001 à 0013 (architecte-technique, dev-reseau pour 0007 et 0008, ingenieur-build pour 0011), identité visuelle détaillée de la piste B (directeur-artistique), identité sonore (sound-designer).
-- Ensuite: maquettes haute fidélité (ux-ui-designer), critères d'acceptation de F14 (qa-testeur), puis phase 2 en commençant par le lot L1 (socle du dépôt).
-- ADR de stack et d'architecture, contrat des jeux (architecte-technique).
-- Modèle réseau, découverte LAN, pare-feu (dev-reseau).
-- Distribution, mises à jour, signature des installateurs (ingenieur-build).
-- Parcours et maquettes du lanceur (ux-ui-designer), identité visuelle de Duo (directeur-artistique), identité sonore (sound-designer).
-- Socle du dépôt: monorepo, lint, typecheck, tests, CI avec contrôle typographique (ingenieur-build).
+- Cahier des charges de la plateforme v1.0, validé par le client le 2026-10-30 (`docs/plateforme/cahier-des-charges.md`). Identité visuelle retenue: piste B « Étoile double ».
+- Parcours et wireframes (`docs/plateforme/ux/parcours.md`), identité visuelle et sonore (`docs/plateforme/identite-visuelle.md`, `identite-sonore.md`), architecture (`docs/plateforme/architecture.md`), critères d'acceptation (`docs/plateforme/criteres-acceptation.md`).
+- Décisions techniques ADR 0001 à 0013 et 0015, acceptées (`docs/plateforme/decisions/`). L'ADR 0004 est amendé le 2026-10-31 (seuils du chien de garde).
 
 ## Nuit du 2026-10-30 au 2026-10-31: objectif du client
 
@@ -33,6 +25,13 @@ Le client veut au réveil une **démo d'environ une heure de La Petite Ligne**, 
 - Plateforme: prototype Duo (lots L1 à L5, L7, L10 réduit) pour faire tourner la démo à deux en réseau local; installateurs macOS et Windows fabriqués par GitHub Actions et publiés en préversion. Repli si le PC refuse Duo (Smart App Control): l'hôte sert le jeu à un navigateur.
 - Ordre: L1 (socle) puis, en parallèle, L2 et L3 (application et SDK, architecte), jeu (dev-gameplay-3d), L5 (réseau, dev-reseau); puis L4 et L10 (dev-plateforme), L7 (ingenieur-build), lumière et effets (tech-artist), interface du jeu (ux-ui-designer), recette (qa-testeur). Modèles, sons et carte du bourg ont démarré.
 - Deux Astres (puzzle coopératif) est mis en pause: ses règles restent dans `docs/jeux/deux-astres/regles.md` pour un futur petit jeu.
+
+État au matin du 2026-10-31:
+
+- Fait: prototype de Duo (lanceur, profils, salon, découverte sur le réseau local, liaison authentifiée, cycle de vie d'un jeu, chien de garde, sauvegardes, historique), installateurs macOS et Windows fabriqués et testés par GitHub Actions, faux hôte de secours (`servir`).
+- Fait: démo de La Petite Ligne jouable à deux de bout en bout (8 journées, 4 habitants, trame principale et quêtes secondaires, potager, construction et aménagement, pêche, commande du samedi), avec rendu 3D, interface complète, musiques et sons. Vérifié par les robots de test (démo finie sur 8 graines) et par deux instances de Duo jusqu'à la scène d'arrivée.
+- Recette: `docs/jeux/jeu-1/recette/2026-10-31-demo.md`. Guide de test pour le client: `docs/guides/tester-la-demo.md`.
+- Reste à vérifier sur les vraies machines: installation, pare-feu, fluidité sur le PC, son, durée réelle de la démo.
 
 ## Phase 2: plateforme v1 et jeu témoin
 
@@ -50,7 +49,8 @@ Un jeu à la fois: cadrage, cahier des charges validé, prototype, alpha, bêta,
 - On garde le genre et l'intention, avec un univers, des règles et un nom originaux (règle de création originale).
 - Fait: trois pistes de concept dans `docs/jeux/jeu-1/pistes-concept.md` (A La Petite Ligne, recommandée; B Le Puits aux Étoiles; C Les Nuits de Brumecombe).
 - Décisions du client (2026-10-30): piste A « La Petite Ligne », monde figé entre les séances, maison commune avec un coin à soi, défi léger sans combat. Vue: 3D low poly en isométrique, à confirmer par un essai de style mesuré.
-- En cours: cahier des charges du jeu (game-designer), dans `docs/jeux/jeu-1/cahier-des-charges.md`. Ensuite: direction artistique et essai de style, direction sonore, interface, technique et critères d'acceptation du jeu.
+- Fait: cahier des charges complet en brouillon (`docs/jeux/jeu-1/cahier-des-charges.md`, version 0.1), périmètre de la démo (`demo.md`), bible artistique, direction sonore, carte du bourg. La démo de la nuit du 2026-10-31 sert de prototype: le plaisir de jeu se valide dessus.
+- Ensuite: retours du client sur la démo, puis validation du cahier des charges complet (objectif de 100 heures) avant l'alpha.
 
 ## En attente du client
 

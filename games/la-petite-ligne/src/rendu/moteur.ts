@@ -46,6 +46,17 @@ import { FishingPart } from './peche';
 import { SignsPart } from './signes';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
+/**
+ * Rend la main au navigateur entre deux étapes lourdes de la construction de
+ * la scène: aucune tâche longue d'affilée (chien de garde de Duo, invité dont
+ * la scène se construit après `ready`).
+ */
+function nextTask(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
+
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;
 /** Parts du chargement: modèles d'abord, puis construction de la scène et compilation. */
@@ -206,8 +217,17 @@ export class RenderEngine implements Renderer {
     this.terrain = terrain;
     this.scene.add(terrain.group);
     const share = this.light ? RENDER_SETTINGS.light.vegetationShare : 1;
+    if (await this.interrupted()) {
+      return;
+    }
     this.scene.add(new Vegetation(map, terrain, materials, this.resources, share).group);
+    if (await this.interrupted()) {
+      return;
+    }
     const decor = new StaticDecor(map, library, terrain, this.resources);
+    if (await this.interrupted()) {
+      return;
+    }
     this.scene.add(decor.group);
     const world = new WorldParts({
       scene: this.scene,
@@ -252,6 +272,9 @@ export class RenderEngine implements Renderer {
     world.add(house);
     world.add(garden);
     world.add(farm);
+    if (await this.interrupted()) {
+      return;
+    }
     const effects = new EffectsPart(
       map,
       content,
@@ -266,8 +289,15 @@ export class RenderEngine implements Renderer {
     );
     this.scene.add(effects.group);
     world.add(effects);
-    const fishing = new FishingPart(materials, terrain, this.resources, characters, effects);
-    const signs = new SignsPart(materials, terrain, this.resources, library);
+    const fishing = new FishingPart(
+      materials,
+      terrain,
+      this.resources,
+      characters,
+      effects,
+      library,
+    );
+    const signs = new SignsPart(materials, terrain, this.resources);
     this.scene.add(fishing.group, signs.group);
     world.add(fishing);
     world.add(signs);
@@ -316,6 +346,12 @@ export class RenderEngine implements Renderer {
     await this.warmUp();
     this.loaded = true;
     onProgress(1);
+  }
+
+  /** Rend la main au navigateur; vrai si le rendu a été libéré entre-temps (chargement abandonné). */
+  private async interrupted(): Promise<boolean> {
+    await nextTask();
+    return this.disposed;
   }
 
   /** Compile tous les programmes pendant le chargement (aucun à-coup à la première apparition d'un objet). */

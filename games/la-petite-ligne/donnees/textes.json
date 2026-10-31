@@ -11,7 +11,7 @@
     "already_taken": "Déjà pris par {partner}.",
     "not_enough_money": "Il manque {missing} sous.",
     "big_purchase_proposal": "{partner} propose d'acheter {item} pour {price} sous. D'accord ?",
-    "big_purchase_accepted": "D'accord ! {item} est à vous.",
+    "big_purchase_accepted": "Marché conclu: {item} !",
     "big_purchase_declined": "Pas cette fois.",
     "big_purchase_cancelled": "La proposition est retirée.",
     "train_arrived": "Le train de samedi est en gare !",
@@ -45,9 +45,9 @@
     "riddle_card_text": "Quand l'ombre de la cloche touche le banc, ce que je cherchais dort à ses pieds. É. L.",
     "riddle_found": "Sous la terre, une clé rouillée et une vieille photo de la halte.",
     "riddle_not_yet": "Rien ici... pour l'instant.",
-    "placement_outside": "Ça ne rentre pas ici: les meubles restent à l'intérieur de la pièce.",
-    "placement_wall": "Celui-ci se pose contre un mur.",
-    "placement_overlap": "Il y a déjà un meuble à cet endroit.",
+    "placement_outside": "Ça dépasse de la pièce: rapproche-toi du milieu, ou tourne le meuble.",
+    "placement_wall": "Ça s'accroche au mur: rapproche-toi d'un mur.",
+    "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
     "fish_escaped": "Il s'est échappé."
   },
@@ -58,7 +58,7 @@
   },
   "ui": {
     "notebookTabs": { "quests": "Quêtes", "mail": "Courrier", "bag": "Sac" },
-    "questKinds": { "main": "La semaine", "side": "Coups de main" },
+    "questKinds": { "main": "Une semaine à la Halte", "side": "Coups de main" },
     "questDone": "Terminée",
     "hud": { "purse": "{amount} sous", "day": "{weekday}, jour {day}", "time": "{hours} h {minutes}", "nextGoal": "Prochain objectif" },
     "shop": { "title": "Le comptoir d'Odette", "buy": "Acheter", "sell": "Vendre", "price": "{price} sous", "close": "Fermer" },
@@ -68,13 +68,13 @@
     "stove": { "title": "Le réchaud", "cook": "Cuisiner", "eat": "Manger", "eatTogether": "Manger ensemble" },
     "give": "Donner {count} {item}",
     "proposal": { "accept": "D'accord", "decline": "Pas maintenant", "withdraw": "Retirer" },
-    "breakfast": { "title": "Bonjour !", "envie": "Ton envie du jour", "sharedEnvie": "Votre envie à deux", "weather": "Le temps aujourd'hui", "start": "Commencer la journée" },
+    "breakfast": { "title": "Bonjour !", "envie": "Ton envie du jour", "sharedEnvie": "Votre envie à deux", "weather": "Le temps aujourd'hui", "start": "Commencer ma journée" },
     "creation": {
-      "title": "Ton personnage",
+      "title": "Qui descend du train ?",
       "name": "Prénom",
       "hair": "Coiffure",
       "outfit": "Couleur de la tenue",
-      "ready": "C'est prêt",
+      "ready": "C'est parti !",
       "waiting": "{partner} prépare son personnage..."
     }
   },

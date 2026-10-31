@@ -12,6 +12,7 @@ import {
   Quaternion,
   Vector3,
   type BufferGeometry,
+  type Object3D,
 } from 'three';
 import type { CharacterId, WorldEvent } from '../etat/types';
 import type { FrameContext } from './contexte';
@@ -19,6 +20,7 @@ import type { EffectsPart } from './effets';
 import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { EventfulPart } from './monde';
+import type { ModelLibrary } from './modeles';
 import type { CharactersPart } from './personnages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -39,11 +41,12 @@ const ESCAPE_SECONDS = 0.7;
 const ESCAPE_RISE = 0.35;
 const SPLASH_SHARE = 0.6;
 const HALF = 0.5;
+const FLOAT_MODEL = 'fishing_float';
 const FISH_JUMP_SIZE = 3.5;
 const Y_AXIS = new Vector3(0, 1, 0);
 
 interface Angler {
-  bobber: Mesh;
+  bobber: Object3D;
   line: Mesh;
   /** Dernière position du bouchon (le poisson en sort, il remonte de là). */
   last: Vector3;
@@ -68,6 +71,7 @@ export class FishingPart implements EventfulPart {
     resources: ResourceTracker,
     private readonly characters: CharactersPart,
     private readonly effects: EffectsPart,
+    private readonly library: ModelLibrary,
   ) {
     this.group.name = 'peche';
     this.bobberGeometry = resources.track(
@@ -99,7 +103,10 @@ export class FishingPart implements EventfulPart {
   private angler(id: CharacterId): Angler {
     let angler = this.anglers.get(id);
     if (angler === undefined) {
-      const bobber = new Mesh(this.bobberGeometry, this.materials.palette);
+      // Bouchon de l'artiste (`fishing_float`, origine au niveau de l'eau), sinon le nôtre.
+      const bobber = this.library.has(FLOAT_MODEL)
+        ? this.library.instantiate(FLOAT_MODEL)
+        : new Mesh(this.bobberGeometry, this.materials.palette);
       bobber.name = 'bouchon';
       const line = new Mesh(this.lineGeometry, this.lineMaterial);
       line.name = 'ligne';

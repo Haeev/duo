@@ -4,12 +4,12 @@
  *   Duo de celui qui l'a plantée, visible des deux et à travers les murs, qui
  *   tombe du ciel en rebondissant, avec une onde au sol qui se répète, et
  *   s'efface à la fin de ses 15 secondes;
- * - l'absence: le personnage s'assoit (animation `sit` de la simulation) et
- *   une auréole douce, à sa couleur, respire lentement au sol autour de lui.
+ * - l'absence: le personnage s'assoit par terre (`sit_ground`, choisi dans
+ *   `personnages.ts`) et une auréole douce, à sa couleur, respire lentement au
+ *   sol autour de lui.
  *   Aucun symbole au-dessus de la tête.
  */
 import {
-  Box3,
   Color,
   ExtrudeGeometry,
   Group,
@@ -19,12 +19,10 @@ import {
   Shape,
   TorusGeometry,
   type BufferGeometry,
-  type Object3D,
 } from 'three';
 import type { CharacterId, DeepReadonly, Character } from '../etat/types';
 import { SCARF_SYMBOLS, safeColor, scarfMeshFor } from './apparence';
-import { interpolate, yawFromFacing, type FrameContext } from './contexte';
-import type { ModelLibrary } from './modeles';
+import { interpolate, type FrameContext } from './contexte';
 import { ShapeBuilder, paintGeometry } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { EventfulPart } from './monde';
@@ -56,10 +54,6 @@ const STAR_INNER = 0.075;
 const EXTRUDE_DEPTH = 0.05;
 const HALF = 0.5;
 const HEAD_SCALE = 1.5;
-/** Siège de l'absent (caisse de l'artiste, ramenée à la hauteur d'assise de l'animation `sit`). */
-const SEAT_MODEL = 'crate';
-const SEAT_HEIGHT = 0.47;
-const SEAT_BACK = 0.14;
 const SUN_RAYS = 8;
 const SUN_RAY_REACH = 0.15;
 
@@ -135,7 +129,6 @@ interface PinView {
 interface HaloView {
   mesh: Mesh;
   material: MeshBasicMaterial;
-  seat: Object3D;
 }
 
 export class SignsPart implements EventfulPart {
@@ -152,7 +145,6 @@ export class SignsPart implements EventfulPart {
     private readonly materials: SharedMaterials,
     private readonly terrain: Terrain,
     private readonly resources: ResourceTracker,
-    private readonly library: ModelLibrary,
   ) {
     this.group.name = 'signes';
     this.pole = resources.track(
@@ -276,7 +268,6 @@ export class SignsPart implements EventfulPart {
     if (!character.absent) {
       if (halo !== undefined) {
         halo.mesh.visible = false;
-        halo.seat.visible = false;
       }
       return;
     }
@@ -285,29 +276,13 @@ export class SignsPart implements EventfulPart {
       const mesh = new Mesh(this.halo, material);
       mesh.name = `absence ${character.id}`;
       mesh.renderOrder = 3;
-      // L'animation « s'asseoir » vise une chaise: une caisse à la bonne hauteur évite de s'asseoir dans le vide.
-      const seat = this.library.instantiate(SEAT_MODEL);
-      const seatTop = new Box3().setFromObject(seat).max.y;
-      seat.scale.set(1, seatTop > 0 ? SEAT_HEIGHT / seatTop : 1, 1);
-      seat.traverse((object) => {
-        object.castShadow = true;
-        object.receiveShadow = true;
-      });
-      this.group.add(mesh, seat);
-      halo = { mesh, material, seat };
+      this.group.add(mesh);
+      halo = { mesh, material };
       this.halos.set(character.id, halo);
     }
     const at = interpolate(character.prev, character.pos, context.alpha, this.point);
     halo.mesh.visible = true;
-    const ground = this.terrain.heightAt(at.x, at.y);
-    halo.mesh.position.set(at.x, ground + GROUND_LIFT, at.y);
-    halo.seat.visible = true;
-    halo.seat.position.set(
-      at.x - Math.cos(character.facing) * SEAT_BACK,
-      ground,
-      at.y - Math.sin(character.facing) * SEAT_BACK,
-    );
-    halo.seat.rotation.y = yawFromFacing(character.facing);
+    halo.mesh.position.set(at.x, this.terrain.heightAt(at.x, at.y) + GROUND_LIFT, at.y);
     halo.material.color.set(safeColor(character.appearance.scarf));
     const breath = context.reducedMotion ? HALF : (Math.sin(context.time * HALO_SPEED) + 1) * HALF;
     halo.material.opacity = HALO_MIN + HALO_RANGE * breath;

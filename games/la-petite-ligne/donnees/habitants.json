@@ -27,7 +27,7 @@
           "priority": 100,
           "when": [{ "type": "day_is", "days": [1] }],
           "lines": [
-            { "speaker": "firmin", "text": "Bienvenue à la Halte d'Aubrune ! Vous êtes les premiers voyageurs depuis vingt ans." },
+            { "speaker": "firmin", "text": "Bienvenue à la Halte d'Aubrune ! Personne n'était descendu ici depuis vingt ans." },
             { "speaker": "firmin", "text": "La ligne rouvre. Un train par semaine, le samedi. La coopérative vous confie la maisonnette du garde-barrière, là-bas, au passage à niveau." },
             { "speaker": "firmin", "text": "Elle a besoin d'un toit, je ne vous mens pas. Basile vous a laissé des planches." },
             { "speaker": "firmin", "text": "Faites revivre la halte, et le train ira plus loin. Samedi prochain, on compte sur vous: la commande est au tableau." },
@@ -148,7 +148,7 @@
           "priority": 50,
           "when": [],
           "lines": [
-            { "speaker": "odette", "text": "Ah, les nouveaux ! Ici, on vend de tout et on sait tout. Surtout on sait tout." },
+            { "speaker": "odette", "text": "Ah, de nouvelles têtes ! Ici, on vend de tout et on sait tout. Surtout on sait tout." },
             { "speaker": "odette", "text": "Pour commencer: radis, laitues, carottes. Les radis sont pressés, les carottes prennent leur temps. Comme les gens." },
             { "speaker": "odette", "text": "Et prenez ce pain pour ce soir. Personne ne dort le ventre vide dans ma rue." }
           ],
@@ -190,7 +190,7 @@
           "kind": "quest",
           "priority": 21,
           "when": [{ "type": "step_active", "quest": "welcome_supper", "step": "supper" }],
-          "lines": [{ "speaker": "odette", "text": "Ce soir, sept heures, sous ma tonnelle. Venez tous les deux, sinon la soupe refroidit." }]
+          "lines": [{ "speaker": "odette", "text": "Ce soir, sept heures, sous ma tonnelle. Venez à deux, sinon la soupe refroidit." }]
         },
         {
           "id": "odette_supper_scene",
@@ -279,7 +279,7 @@
           "once": "duo",
           "priority": 45,
           "when": [{ "type": "built", "construction": "house_roof" }, { "type": "built", "construction": "house_door" }],
-          "lines": [{ "speaker": "basile", "text": "Pas mal, pour des débutants. Le toit tiendra. La porte grince, mais une porte qui grince, c'est une porte qui parle." }]
+          "lines": [{ "speaker": "basile", "text": "Pas mal, pour un premier toit. Il tiendra. La porte grince, mais une porte qui grince, c'est une porte qui parle." }]
         },
         {
           "id": "basile_planks_ask",
@@ -352,7 +352,7 @@
           "once": "player",
           "priority": 50,
           "when": [],
-          "lines": [{ "speaker": "jeanne", "text": "C'est vous, les nouveaux ? Moi, c'est Jeanne. Dix ans et demi. Vous avez trouvé un trésor dans la maisonnette ? Tout le monde dit qu'il y en a un." }]
+          "lines": [{ "speaker": "jeanne", "text": "C'est vous, les gens de la maisonnette ? Moi, c'est Jeanne. Dix ans et demi. Vous avez trouvé un trésor, là-dedans ? Tout le monde dit qu'il y en a un." }]
         },
         {
           "id": "jeanne_riddle_done",
