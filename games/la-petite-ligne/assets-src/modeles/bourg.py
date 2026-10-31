@@ -444,7 +444,13 @@ def gatekeeper_house(A, ruin, parent):
         walls[side] = A.add(name + "_wall_" + side, g, parent=root)
     # toit: 5 bandes par pan + faîtage = 11 éléments (chantier guidé: 11 + la porte = 12)
     roof = lpl.empty(name + "_roof", parent=root)
-    parts = [A.geo() for _ in range(11)]
+    # ruine: un seul maillage pour tout le toit (aucune pièce n'y est construite: moins d'appels de dessin);
+    # réparée: 11 pièces, liées une à une au chantier par src/rendu/maison.ts
+    if ruin:
+        one = A.geo()
+        parts = [one] * 11
+    else:
+        parts = [A.geo() for _ in range(11)]
     holes = (1, 3, 6, 10) if ruin else ()
     gable_roof(parts, -hx, hx, -hy, hy, ze, zr, "lauze", edge="lauze_dark", strips=5, holes=holes,
                rafters=ruin, ridge_color="lauze_dark")
@@ -454,7 +460,9 @@ def gatekeeper_house(A, ruin, parent):
         chimney(parts[9], 1.9, 1.0, 2.8, 4.3)
         for x in (-1.6, 0.9):
             parts[0].box((0.6, 0.5, 0.05), loc=(x, -2.9, 0.03), color="lauze", rot=(0, 0, 30 * x))
-    for i, gp in enumerate(parts):
+    if ruin:
+        A.add(f"{name}_roof_tiles", parts[0], parent=roof)
+    for i, gp in enumerate(parts if not ruin else []):
         if gp.tri_count() == 0:
             gp.bm.free()
             continue

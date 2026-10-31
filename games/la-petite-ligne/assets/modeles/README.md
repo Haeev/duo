@@ -197,7 +197,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3341 Ko)
+### `bourg.glb` (3369 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
