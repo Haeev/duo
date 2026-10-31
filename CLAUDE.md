@@ -87,6 +87,12 @@ La plateforme suit le même processus. Son cahier des charges est le premier, é
 
 Jeux originaux uniquement. S'inspirer d'un genre ou d'une mécanique est normal; reproduire un jeu existant (nom, univers, personnages, niveaux, identité visuelle ou sonore, combinaison de règles reconnaissable) est exclu, même renommé. Si une demande ressemble à un jeu existant, on en garde le genre et l'intention, et on propose une version originale.
 
+### Cohérence du monde et sens du détail (demande du client, 2026-10-31)
+
+- Chaque membre, surtout au design, à l'animation, au level design, à l'art et au rendu, se pose pour chaque élément qu'il pose ou modifie: « est-ce que cet élément précis est au bon endroit, dans le bon sens, à la bonne taille ? Pourquoi ? ». Un chemin relie des lieux où l'on va vraiment; un bâtiment est placé là où il servirait dans un vrai bourg; une barrière de passage à niveau barre la route et non la voie, dans le bon sens; une poutre porte quelque chose; un escalier a des marches à taille humaine.
+- La réponse au « pourquoi » s'écrit quand elle n'est pas évidente (carte, bible artistique, compte rendu). Un élément sans raison d'être est déplacé, corrigé ou retiré.
+- Chaque livrable visuel est regardé de près, pas seulement à distance de jeu: rien qui dépasse, flotte ou se traverse.
+
 ### Ressources et licences
 
 - Sources admises: créations du studio (code, SVG, scripts de génération, modèles Blender scriptés, synthèse sonore), génération par IA avec les outils fournis par le client, ressources externes sous CC0 ou CC-BY, polices sous OFL, code tiers sous licence permissive (MIT, BSD, ISC, Apache-2.0). GPL et licences non commerciales exclues.

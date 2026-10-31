@@ -658,22 +658,42 @@ export class RenderEngine implements Renderer {
    * Triangles d'une image, passe d'ombre à part (diagnostic des budgets): rend
    * une image en mesurant ce que dessine la carte d'ombre.
    */
-  triangleSplit(): { total: number; shadow: number; drawCalls: number } {
-    const shadowMap = this.renderer.shadowMap;
-    const info = this.renderer.info.render;
+  triangleSplit(): {
+    total: number;
+    shadow: number;
+    drawCalls: number;
+    /** Triangles dessinés par maillage, passe principale et passe d'ombre (`nom`, `nom (ombre)`). */
+    meshes: Record<string, number>;
+  } {
+    const renderer = this.renderer;
+    const shadowMap = renderer.shadowMap;
+    const info = renderer.info.render;
     const original = shadowMap.render.bind(shadowMap);
+    const draw = renderer.renderBufferDirect.bind(renderer);
+    const meshes: Record<string, number> = {};
+    let inShadow = false;
     let shadow = 0;
     shadowMap.render = (...args: Parameters<typeof original>): void => {
       const before = info.triangles;
+      inShadow = true;
       original(...args);
+      inShadow = false;
       shadow += info.triangles - before;
     };
+    renderer.renderBufferDirect = (...args: Parameters<typeof draw>): void => {
+      const before = info.triangles;
+      draw(...args);
+      const object = args[4];
+      const key = `${object.parent?.name ?? ''}/${object.name}${inShadow ? ' (ombre)' : ''}`;
+      meshes[key] = (meshes[key] ?? 0) + info.triangles - before;
+    };
     try {
-      this.renderer.render(this.scene, this.rig.camera);
+      renderer.render(this.scene, this.rig.camera);
     } finally {
       shadowMap.render = original;
+      renderer.renderBufferDirect = draw;
     }
-    return { total: info.triangles, shadow, drawCalls: info.calls };
+    return { total: info.triangles, shadow, drawCalls: info.calls, meshes };
   }
 
   /** Triangles par partie de la scène (diagnostic des budgets, page de démonstration). */

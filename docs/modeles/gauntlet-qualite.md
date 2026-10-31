@@ -36,6 +36,7 @@ Tiens la grille dans `docs/jeux/jeu-1/gauntlet/grille.md`: note, preuves et date
    - G6 revue adverse: le directeur artistique (visuel), le game designer (plaisir) et la QA (bugs) disent chacun « mieux qu'avant », preuve à l'appui; un seul non, et on corrige ou on annule;
    - G7 originalité: rien de reconnaissable d'un jeu existant.
    - G8 détails de construction: chaque modèle livré ou modifié est regardé de près sous quatre angles (rien qui dépasse, flotte ou se traverse, escaliers et assemblages crédibles, échelle humaine respectée), selon la liste de contrôle de la bible artistique; un seul défaut visible, et on corrige.
+   - G9 cohérence du monde: pour chaque élément posé, déplacé ou modifié, la question « est-il au bon endroit, dans le bon sens, à la bonne taille, et pourquoi ? » a une réponse crédible (chemins qui mènent quelque part, bâtiments placés comme dans un vrai bourg, signalisation et barrières orientées correctement, assemblages qui tiennent); le level designer et le directeur artistique la vérifient sur la carte.
 5. **Décision**: épreuve ratée, on corrige ou on annule (retour en arrière). Jamais de test désactivé, d'épreuve sautée ni de note gonflée.
 6. **Trace**: mets à jour la grille (notes avant et après) et ajoute au journal ce qui a changé, les preuves (chemins des captures), et ce qui vient au tour suivant. Notes durables dans les carnets des membres.
 7. **Livraison**: commit sur la branche de session à chaque tour. Report sur `main` seulement quand tout le gauntlet est vert: `main` reste toujours jouable par le client.

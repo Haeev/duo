@@ -69,7 +69,7 @@ interface DemoHandle {
   /** Programmes utilisés par la scène dans l'état courant (hors variantes en cache). */
   programsInUse(): number;
   /** Triangles d'une image, passe d'ombre à part. */
-  triangleSplit(): { total: number; shadow: number; drawCalls: number };
+  triangleSplit(): ReturnType<RenderEngine['triangleSplit']>;
   /** Qualité en vigueur et palier de résolution (essai du repli automatique, `adaptatif=1`). */
   quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
