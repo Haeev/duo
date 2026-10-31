@@ -1,19 +1,19 @@
 {
  "player_base": {
   "file": "personnages.glb",
-  "tris": 460
+  "tris": 436
  },
  "player_outfit_work": {
   "file": "personnages.glb",
-  "tris": 962
+  "tris": 1042
  },
  "player_outfit_smock": {
   "file": "personnages.glb",
-  "tris": 954
+  "tris": 1034
  },
  "player_outfit_overalls": {
   "file": "personnages.glb",
-  "tris": 962
+  "tris": 1042
  },
  "player_hair_short": {
   "file": "personnages.glb",

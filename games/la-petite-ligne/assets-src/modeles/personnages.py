@@ -126,7 +126,7 @@ def _oct(cx, cz, y, fn, n=8):
     return pts, faces
 
 
-def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1.0, eye_k=1.0):
+def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1.0, eye_k=1.0, eye_x=0.055):
     y = -hy / 2 - 0.004
     rx, rz = 0.016 * k * eye_k, 0.024 * k * eye_k
 
@@ -150,7 +150,7 @@ def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1
         return (x, rz * s)
 
     for sx in (1, -1):
-        pts, fs = _oct(sx * 0.055 * k, hc + 0.005 * k, y, eye_shape)
+        pts, fs = _oct(sx * eye_x * k, hc + 0.005 * k, y, eye_shape)
         g.mesh(pts, fs, "eye", bone="head")
 
     # sourcils: quad (intérieur, extérieur)
@@ -317,7 +317,9 @@ def torso_rings(w_top=0.38, w_bot=0.31, d=0.21, z0=0.97, z1=1.385):
     """Anneaux (demi-largeur, demi-profondeur, z) du torse: ventre et dos bombés, épaules arrondies."""
     kx_b, kx_t, ky = w_bot / 0.31, w_top / 0.38, d / 0.21
     h = z1 - z0
-    return [(0.155 * kx_b, 0.116 * ky, z0), (0.170 * kx_b, 0.134 * ky, z0 + 0.27 * h),
+    # bas de chemise un peu évasé (rangée décalée de 1,5 cm) qui retombe sur la ceinture
+    return [(0.162 * kx_b, 0.124 * ky, z0 - 0.012), (0.166 * kx_b, 0.13 * ky, z0 + 0.05),
+            (0.170 * kx_b, 0.134 * ky, z0 + 0.27 * h),
             (0.180 * kx_t, 0.132 * ky, z0 + 0.55 * h), (0.180 * kx_t, 0.126 * ky, z0 + 0.77 * h),
             (0.158 * kx_t, 0.112 * ky, z0 + 0.92 * h), (0.098 * kx_t, 0.078 * ky, z1 + 0.012)]
 
@@ -353,7 +355,7 @@ def head_round(g):
     """Tête en boule facettée à 12 pans; renvoie (hc, largeur, profondeur, hauteur)."""
     rx, ry, rz = PHEAD
     hc = PHC
-    g.head_verts = g.sphere(1.0, loc=(0, 0, hc), color="skin", segs=12, rings=8, scale=(rx, ry, rz), rot=(0, 0, 15),
+    g.head_verts = g.sphere(1.0, loc=(0, 0, hc), color="skin", segs=12, rings=7, scale=(rx, ry, rz),
                             bone="head")
     for s in (1, -1):
         g.sphere(1.0, loc=(s * (rx - 0.004), 0.01, hc - 0.01), color="skin_shade", segs=6, rings=4,
@@ -375,7 +377,9 @@ def project_on_head(g, start, hx, hy, hz, hc):
     for v in g.bm.verts[start:]:
         hit = tree.ray_cast(Vector((v.co.x, -1.0, v.co.z)), Vector((0, 1, 0)))
         if hit[0] is not None:
-            v.co.y = hit[0].y + (v.co.y + hy / 2)
+            off = v.co.y + hy / 2
+            # 4 mm de plus devant: une corde entre deux facettes passe sous la surface
+            v.co.y = hit[0].y + (off - 0.004 if off < 0 else off)
 
 
 def hair_round(g, style, hc):
@@ -439,13 +443,16 @@ def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.0
     th, sh, ft = "thigh_" + side, "shin_" + side, "foot_" + side
     shin = shin or thigh
     x = s * 0.092
-    g.lathe([(r * 0.88, 0.47), (r * 1.12, 0.67), (r * 1.05, 0.89)], loc=(x, 0, 0), colors=thigh, segs=6, bone=th,
+    g.lathe([(r * 0.86, 0.47), (r * 1.1, 0.64), (r * 1.08, 0.80), (r * 0.98, 0.89)], loc=(x, 0, 0), colors=thigh,
+            segs=6, bone=th,
             close_bottom=False, close_top=False)
     g.sphere(r * 0.92, loc=(x, 0, 0.48), color=shin, segs=6, rings=4, bone=sh)
-    g.lathe([(r * 0.7, 0.10), (r * 0.9, 0.29), (r * 0.84, 0.48)], loc=(x, 0, 0), colors=shin, segs=6, bone=sh,
+    # mollet renflé, jambe effilée vers la cheville
+    g.lathe([(r * 0.56, 0.10), (r * 0.72, 0.2), (r * 0.9, 0.32), (r * 0.84, 0.48)], loc=(x, 0, 0), colors=shin,
+            segs=6, bone=sh,
             close_top=False)
     if cuff:
-        g.lathe([(r * 0.86, 0.105), (r * 0.86, 0.16)], loc=(x, 0, 0), colors=cuff, segs=6, bone=sh)
+        g.lathe([(r * 0.66, 0.105), (r * 0.7, 0.155)], loc=(x, 0, 0), colors=cuff, segs=6, bone=sh)
     # chaussure en galet, semelle à plat (arête au sol vive)
     vs = g.sphere(1.0, loc=(x, -0.045, 0.055), color=lpl.by_normal(shoe, shoe, "hair_dark" if shoe == "shoes" else shoe),
                   segs=8, rings=5, scale=(0.064, 0.135, 0.062), bone=ft)
@@ -460,7 +467,9 @@ def torso_round(g, w_top=0.38, w_bot=0.30, d=0.22, z0=0.97, z1=1.385, color="top
 
 def pelvis_round(g, w=0.31, d=0.21, color="bottom", z0=0.80, z1=1.0):
     hw, hd = w / 2, d * 1.15 / 2
-    loft8(g, [(hw * 0.88, hd * 0.86, z0), (hw * 1.03, hd * 1.02, z0 + 0.08), (hw, hd * 0.98, z1)], color, bone="hips")
+    # hanches arrondies: bas resserré, renflement à mi-hauteur
+    loft8(g, [(hw * 0.84, hd * 0.82, z0), (hw * 1.0, hd * 0.97, z0 + 0.05), (hw * 1.06, hd * 1.03, z0 + 0.12),
+              (hw * 0.99, hd * 0.98, z1)], color, bone="hips")
 
 
 def belt_round(g, w=0.315, d=0.215, color="extra_a", buckle="metal", z=0.985):
@@ -805,7 +814,9 @@ def build_player_base(g, expr):
         hc, hx, hy, hz = head_round(g)
         g.bm.verts.ensure_lookup_table()
         start = len(g.bm.verts)
-        face_features(g, hc + 0.015, hy, expr, k=PK)  # un peu plus haut: le bas de la boule fuit en vue isométrique
+        # traits à la taille d'origine, yeux réduits et rapprochés: chaque trait tient sur une facette
+        # (arête verticale au milieu du visage, bande de facettes centrée sur les yeux)
+        face_features(g, hc + 0.004, hy, expr, k=1.0, eye_k=0.8, eye_x=0.048)
         project_on_head(g, start, hx, hy, hz, hc)
         neck(g)
         hands_round(g)

@@ -104,6 +104,7 @@ def main():
         r["tree_oak_large"].location = (5.6, 1.5, 0)
         r["bush_round"].location = (4.2, -0.9, 0)
         r["rig"].location = (1.6, -3.9, 0)
+        r["rig"].rotation_mode = "XYZ"  # l'import glTF pose des quaternions: sans cela la rotation est ignorée
         r["rig"].rotation_euler = (0, 0, math.radians(20))
     mannequin((2.4, -3.9))
     # vue de jour: vitres et lanternes éteintes (le jeu met l'émission à 0 le jour)
@@ -120,12 +121,30 @@ def main():
         rig = sets[tag]["rig"]
         k = tag[0].lower()
         pose(rig, tag, "idle", 1)
-        shot(f"jeu24_{k}", (0.8, -0.5, 1.2), 24, (1200, 675))
-        shot(f"maison_{k}", (0, 0, 2.2), 9.5, (900, 700))
-        shot(f"nature_{k}", (5.0, 0.4, 1.7), 8.0, (900, 700))
-        for clip, frame in (("idle", 1), ("walk", 5), ("hoe", 9), ("water", 15), ("carry_two", 6)):
+        if os.environ.get("LPL_VISAGES_SEULS"):
+            clips_shots = False
+        else:
+            clips_shots = True
+        if clips_shots:
+            shot(f"jeu24_{k}", (0.8, -0.5, 1.2), 24, (1200, 675))
+            shot(f"maison_{k}", (0, 0, 2.2), 9.5, (900, 700))
+            shot(f"nature_{k}", (5.0, 0.4, 1.7), 8.0, (900, 700))
+        for clip, frame in (() if not clips_shots else (("idle", 1), ("walk", 5), ("hoe", 9), ("water", 15), ("carry_two", 6))):
             pose(rig, tag, clip, frame)
             shot(f"perso_{clip}_{k}", (1.6, -3.9, 0.9), 2.3, (500, 650))
+        # gros plans du visage, tourné vers la caméra isométrique, dans chaque expression
+        # 45 degrés: le visage (vers -Y) regarde la caméra isométrique placée au sud-est
+        rig.rotation_euler = (0, 0, math.radians(45))
+        pose(rig, tag, "idle", 1)
+        base = bpy.data.objects[tag + "player_base"]
+        keys = base.data.shape_keys.key_blocks
+        for expr in ("neutral", "happy", "delighted", "tired", "hungry", "blink"):
+            for kb in keys:
+                kb.value = 1.0 if kb.name == expr else 0.0
+            shot(f"visage_{expr}_{k}", (1.6, -3.9, 1.56), 0.62, (400, 400))
+        for kb in keys:
+            kb.value = 0.0
+        rig.rotation_euler = (0, 0, math.radians(20))
 
 
 main()

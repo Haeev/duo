@@ -81,21 +81,21 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 ## Budgets (PC de référence, `docs/plateforme/architecture.md` section 14)
 
 - Toute la carte de la démo (`donnees/cartes/halte.json`: 196 objets, dont 79 buissons et 51 arbres): environ 43 000 triangles de décor avant le low poly arrondi (les 30 chênes et 79 buissons arrondis en ajoutent environ 13 000, la maison de Firmin 2 300), plus 16 modules de voie (4 700), le potager (environ 4 000 avec ses cultures) et six personnages (environ 14 000): moins de 70 000 triangles, pour un plafond de 250 000.
-- Personnages: 2 160 à 2 590 triangles par habitant, 2 020 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
+- Personnages: 2 160 à 2 590 triangles par habitant, 2 078 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
 - Appels de dessin: un matériau par fichier; décor statique à fusionner ou à instancier par le jeu (arbres, buissons, clôtures, cultures et cases du potager se prêtent à `InstancedMesh`).
 - Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 64: moins de 100 Ko de mémoire.
 
 ## Fiche par modèle
 
 
-### `personnages.glb` (2282 Ko)
+### `personnages.glb` (2299 Ko)
 
 | Nœud | Triangles |
 |---|---|
-| `player_base` | 460 |
-| `player_outfit_work` | 962 |
-| `player_outfit_smock` | 954 |
-| `player_outfit_overalls` | 962 |
+| `player_base` | 436 |
+| `player_outfit_work` | 1042 |
+| `player_outfit_smock` | 1034 |
+| `player_outfit_overalls` | 1042 |
 | `player_hair_short` | 388 |
 | `player_hair_bob` | 352 |
 | `player_hair_bun` | 416 |

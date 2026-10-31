@@ -32,8 +32,15 @@ clips="idle walk hoe water carry_two"
 convert $(for c in $clips; do echo "$r/perso_${c}_a.png"; done) -resize 480x624 +append "$t/pa.png"
 convert $(for c in $clips; do echo "$r/perso_${c}_b.png"; done) -resize 480x624 +append "$t/pb.png"
 convert "$t/pa.png" "$t/pb.png" -append "$t/r4.png"
+titre "Visage tourné vers la caméra isométrique, avant en haut, après en bas: neutre, contente, ravie, fatiguée, affamée, clignement" 60 26 h5.png
+exprs="neutral happy delighted tired hungry blink"
+convert $(for e in $exprs; do echo "$r/visage_${e}_a.png"; done) +append "$t/va.png"
+convert $(for e in $exprs; do echo "$r/visage_${e}_b.png"; done) +append "$t/vb.png"
+convert "$t/va.png" "$t/vb.png" -append "$t/r5.png"
 convert "$t/h0.png" "$t/h1.png" "$t/r1.png" "$t/h2.png" "$t/r2.png" "$t/h3.png" "$t/r3.png" "$t/h4.png" "$t/r4.png" \
-  -append "$out"
+  "$t/h5.png" "$t/r5.png" -append "$out"
+# bande du joueur seule (relecture du personnage)
+convert "$t/h4.png" "$t/r4.png" "$t/h5.png" "$t/r5.png" -append "${out%.png}-joueur.png"
 convert "$out" -colorspace Gray "${out%.png}-gris.png"
 rm -rf "$t"
 echo "$out"
