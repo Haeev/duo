@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Écran titre · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="accueil attente reprise">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true"><img src="support/scene-jour.svg" alt="" /></div>
+    <div class="lpl-ui">
+      <main class="lpl-screen lpl-screen--scene" aria-labelledby="titre-jeu">
+        <div class="lpl-sheet" style="--lpl-sheet-width: 40rem" data-trap>
+          <div class="lpl-title">
+            <span class="lpl-title__ticket"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>Démo · Une
+              semaine à la Halte d’Aubrune</span
+            >
+            <h1 class="lpl-title__name" id="titre-jeu">La Petite Ligne</h1>
+            <p class="lpl-sheet__lead">
+              La ligne rouvre. Faites revivre la halte, et le train ira plus loin.
+            </p>
+          </div>
+
+          <div class="lpl-players" aria-label="Les deux joueurs">
+            <div class="lpl-player-card">
+              <span class="lpl-token lpl-token--large" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg
+              ></span>
+              <span class="lpl-player-card__name">Camille <small>(toi)</small></span>
+              <span class="lpl-chip" data-when="accueil reprise"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="attente"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>C’est
+                parti</span
+              >
+            </div>
+            <div class="lpl-player-card">
+              <span class="lpl-token lpl-token--large" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+              <span class="lpl-player-card__name">Sacha</span>
+              <span class="lpl-chip" data-when="accueil attente reprise"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+            </div>
+          </div>
+
+          <div class="lpl-sheet__actions" style="justify-content: center" data-nav="row">
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="button"
+              data-nav-item
+              data-when="accueil"
+              data-goto="attente"
+              data-autofocus
+            >
+              Commencer la semaine
+            </button>
+            <button
+              class="lpl-button lpl-button--large"
+              type="button"
+              data-nav-item
+              data-when="attente"
+              data-goto="accueil"
+              data-autofocus
+            >
+              Pas encore
+            </button>
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="button"
+              data-nav-item
+              data-when="reprise"
+              data-autofocus
+            >
+              Reprendre : jeudi 6, 6 h
+            </button>
+            <button
+              class="lpl-button lpl-button--large"
+              type="button"
+              data-nav-item
+              data-when="reprise"
+            >
+              Recommencer la semaine
+            </button>
+          </div>
+          <p style="text-align: center" data-when="accueil">
+            La semaine commence quand vous avez choisi « Commencer la semaine » sur les deux
+            ordinateurs.
+          </p>
+          <p style="text-align: center" data-when="attente">
+            <span class="lpl-chip lpl-chip--waiting"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En attente
+              de Sacha…</span
+            >
+          </p>
+          <p style="text-align: center" data-when="reprise">
+            Votre semaine est enregistrée au petit-déjeuner du jeudi 6.
+          </p>
+          <p class="lpl-keys" style="justify-content: center; color: var(--lpl-color-ink-muted)">
+            <span><span class="lpl-key">Échap</span> pause et réglages de Duo</span>
+          </p>
+        </div>
+      </main>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

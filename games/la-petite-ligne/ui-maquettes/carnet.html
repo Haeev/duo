@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carnet · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="sac sac-plein sac-vide quetes courrier">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true"><img src="support/scene-jour.svg" alt="" /></div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud lpl-pass-through">
+        <div class="lpl-hud__top-left">
+          <div class="lpl-clock">
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true"><use href="#weather-sun" /></svg
+            ></span>
+            <span class="lpl-clock__day">Mercredi 5 · Soleil</span>
+            <span class="lpl-clock__time">9 h 30</span>
+          </div>
+          <div class="lpl-purse">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+            ><span class="lpl-purse__amount">214</span><span class="lpl-purse__unit">sous</span>
+          </div>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="great"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+            ></span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#axe" /></svg>Coupe du bois à la
+              lisière</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <section class="lpl-panel" aria-labelledby="titre-carnet" data-panel-key="Tab" data-trap>
+        <header class="lpl-panel__header">
+          <svg class="lpl-icon" aria-hidden="true"><use href="#ui-notebook" /></svg>
+          <h2 class="lpl-panel__title" id="titre-carnet">Carnet</h2>
+          <div class="lpl-tabs" role="tablist" aria-label="Pages du carnet" data-tab-keys>
+            <span class="lpl-key lpl-tabs__key" aria-hidden="true">A</span>
+            <button
+              class="lpl-tab"
+              type="button"
+              role="tab"
+              id="onglet-quetes"
+              aria-controls="page-quetes"
+              aria-selected="false"
+              tabindex="-1"
+              data-on-quetes="aria-selected=true;tabindex=0"
+            >
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>Quêtes
+            </button>
+            <button
+              class="lpl-tab"
+              type="button"
+              role="tab"
+              id="onglet-courrier"
+              aria-controls="page-courrier"
+              aria-selected="false"
+              tabindex="-1"
+              data-on-courrier="aria-selected=true;tabindex=0"
+            >
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-letter" /></svg>Courrier
+              <span class="lpl-tab__badge" aria-label="1 nouveau">1</span>
+            </button>
+            <button
+              class="lpl-tab"
+              type="button"
+              role="tab"
+              id="onglet-sac"
+              aria-controls="page-sac"
+              aria-selected="true"
+              tabindex="0"
+              data-on-quetes="aria-selected=false;tabindex=-1"
+              data-on-courrier="aria-selected=false;tabindex=-1"
+            >
+              <svg class="lpl-icon" aria-hidden="true"><use href="#grain-sack" /></svg>Sac
+            </button>
+            <span class="lpl-key lpl-tabs__key" aria-hidden="true">E</span>
+          </div>
+          <button
+            class="lpl-button lpl-button--on-dark lpl-panel__close"
+            type="button"
+            data-close
+            aria-label="Fermer le carnet (Tab ou Retour arrière)"
+          >
+            Fermer <span class="lpl-key">Tab</span>
+          </button>
+        </header>
+
+        <div class="lpl-panel__body">
+          <!-- Sac -->
+          <div
+            id="page-sac"
+            role="tabpanel"
+            aria-labelledby="onglet-sac"
+            data-on-quetes="hidden="
+            data-on-courrier="hidden="
+          >
+            <div class="lpl-bag" data-when="sac">
+              <div class="lpl-bag__slots" data-nav="grid" data-game-panel>
+                <p class="lpl-overline">Barre d’outils · molette ou 1 à 0</p>
+                <div
+                  class="lpl-inventory lpl-inventory--toolbar"
+                  aria-label="Barre d’outils, 10 places"
+                >
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Houe"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#hoe" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Arrosoir, 7 arrosages sur 10"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#watering-can" /></svg
+                    ><span
+                      class="lpl-slot__gauge"
+                      style="--lpl-value: 70%"
+                      aria-hidden="true"
+                    ></span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Hache"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#axe" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de radis, 8"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-radish" /></svg
+                    ><span class="lpl-slot__count">8</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de laitue, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-lettuce" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Radis, belle qualité, 6"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                    ><span class="lpl-slot__count">6</span
+                    ><svg class="lpl-slot__quality" aria-hidden="true"><use href="#ui-star" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Planches, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#plank" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Œufs, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#egg" /></svg
+                    ><span class="lpl-slot__count">3</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Pain, 1"
+                    aria-checked="true"
+                    data-autofocus
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#bread" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                </div>
+                <p class="lpl-overline">Sac · 14 places</p>
+                <div class="lpl-inventory" aria-label="Sac, 14 places" style="--lpl-columns: 7">
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Radis, 5"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                    ><span class="lpl-slot__count">5</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Carottes, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#carrot" /></svg
+                    ><span class="lpl-slot__count">3</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de carotte, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-carrot" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Clous, 2"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#nail" /></svg
+                    ><span class="lpl-slot__count">2</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Rondin, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#log" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Sac de grain, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#grain-sack" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Pissenlits, 2"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#dandelion" /></svg
+                    ><span class="lpl-slot__count">2</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Boîte en fer, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#tin-box" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                </div>
+              </div>
+              <aside class="lpl-item-detail" aria-label="Objet choisi">
+                <div class="lpl-item-detail__head">
+                  <svg aria-hidden="true"><use href="#bread" /></svg>
+                  <div>
+                    <p class="lpl-item-detail__name" data-item-name>Pain, 1</p>
+                    <p class="lpl-item-detail__meta">En-cas · cadeau d’Odette</p>
+                  </div>
+                </div>
+                <p>Manger un en-cas rend de l’endurance, sans compter pour le souper.</p>
+                <div class="lpl-item-detail__actions">
+                  <button class="lpl-button lpl-button--primary" type="button">
+                    Manger : +10 d’endurance <span class="lpl-key">Entrée</span>
+                  </button>
+                  <button class="lpl-button" type="button">
+                    Déplacer <span class="lpl-key">Espace</span>
+                  </button>
+                </div>
+              </aside>
+            </div>
+            <div class="lpl-bag" data-when="sac-plein">
+              <div class="lpl-bag__slots" data-nav="grid" data-game-panel>
+                <p class="lpl-overline">Barre d’outils · molette ou 1 à 0</p>
+                <div
+                  class="lpl-inventory lpl-inventory--toolbar"
+                  aria-label="Barre d’outils, 10 places"
+                >
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Houe"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#hoe" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Arrosoir, 7 arrosages sur 10"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#watering-can" /></svg
+                    ><span
+                      class="lpl-slot__gauge"
+                      style="--lpl-value: 70%"
+                      aria-hidden="true"
+                    ></span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Hache"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#axe" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de radis, 8"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-radish" /></svg
+                    ><span class="lpl-slot__count">8</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de laitue, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-lettuce" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Radis, belle qualité, 6"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                    ><span class="lpl-slot__count">6</span
+                    ><svg class="lpl-slot__quality" aria-hidden="true"><use href="#ui-star" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Planches, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#plank" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Œufs, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#egg" /></svg
+                    ><span class="lpl-slot__count">3</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Pain, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#bread" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Laitues, belle qualité, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#lettuce" /></svg
+                    ><span class="lpl-slot__count">3</span
+                    ><svg class="lpl-slot__quality" aria-hidden="true"><use href="#ui-star" /></svg>
+                  </button>
+                </div>
+                <p class="lpl-overline">Sac · 14 places</p>
+                <div class="lpl-inventory" aria-label="Sac, 14 places" style="--lpl-columns: 7">
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Radis, 5"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                    ><span class="lpl-slot__count">5</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Carottes, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#carrot" /></svg
+                    ><span class="lpl-slot__count">3</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Graines de carotte, 4"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-carrot" /></svg
+                    ><span class="lpl-slot__count">4</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Clous, 2"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#nail" /></svg
+                    ><span class="lpl-slot__count">2</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Rondins, 3"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#log" /></svg
+                    ><span class="lpl-slot__count">3</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Sac de grain, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#grain-sack" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Pissenlits, 6"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#dandelion" /></svg
+                    ><span class="lpl-slot__count">6</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Boîte en fer, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#tin-box" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Laitues, 2"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#lettuce" /></svg
+                    ><span class="lpl-slot__count">2</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Radis, belle qualité, 9"
+                    aria-checked="true"
+                    data-autofocus
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                    ><span class="lpl-slot__count">9</span
+                    ><svg class="lpl-slot__quality" aria-hidden="true"><use href="#ui-star" /></svg>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Bol de soupe, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#soup" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Clé de la remise, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#key" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Vieille photo de la halte, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#photo" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                  <button
+                    class="lpl-slot"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Carte d’énigme, 1"
+                    aria-checked="false"
+                  >
+                    <svg class="lpl-slot__icon" aria-hidden="true"><use href="#riddle-card" /></svg
+                    ><span class="lpl-slot__count">1</span>
+                  </button>
+                </div>
+              </div>
+              <aside class="lpl-item-detail" aria-label="Objet choisi">
+                <div class="lpl-item-detail__head">
+                  <svg aria-hidden="true"><use href="#radish" /></svg>
+                  <div>
+                    <p class="lpl-item-detail__name" data-item-name>Radis, belle qualité, 9</p>
+                    <p class="lpl-item-detail__meta">
+                      <svg class="lpl-icon" aria-hidden="true"><use href="#ui-star" /></svg> Belle :
+                      arrosée chaque jour de sa pousse
+                    </p>
+                  </div>
+                </div>
+                <p>Vaut 1,5 fois le prix : 10 sous pièce à la coopérative.</p>
+                <div class="lpl-item-detail__actions">
+                  <button class="lpl-button" type="button">
+                    Déplacer <span class="lpl-key">Espace</span>
+                  </button>
+                </div>
+              </aside>
+            </div>
+            <div data-when="sac-plein" style="margin-top: 0.75rem">
+              <p class="lpl-toast lpl-toast--error" style="animation: none">
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-warning" /></svg>Ton sac est
+                plein : ce que tu ramasses tombe à tes pieds. Vends, dépose dans la caisse ou range
+                dans le coffre.
+              </p>
+            </div>
+            <div class="lpl-bag" data-when="sac-vide">
+              <div class="lpl-bag__slots" data-nav="grid" data-game-panel>
+                <p class="lpl-overline">Barre d’outils · molette ou 1 à 0</p>
+                <div
+                  class="lpl-inventory lpl-inventory--toolbar"
+                  aria-label="Barre d’outils, 10 places"
+                >
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="true"
+                    data-autofocus
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                </div>
+                <p class="lpl-overline">Sac · 14 places</p>
+                <div class="lpl-inventory" aria-label="Sac, 14 places" style="--lpl-columns: 7">
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                  <button
+                    class="lpl-slot lpl-slot--empty"
+                    type="button"
+                    data-nav-item
+                    data-bag-slot
+                    aria-label="Case vide"
+                    aria-checked="false"
+                  ></button>
+                </div>
+              </div>
+              <div class="lpl-empty" style="flex: 1 1 14rem">
+                <svg class="lpl-icon" style="width: 2.5rem; height: 2.5rem" aria-hidden="true">
+                  <use href="#grain-sack" />
+                </svg>
+                Ton sac est vide. Ce que tu récoltes, achètes ou fabriques arrive ici.
+              </div>
+            </div>
+          </div>
+
+          <!-- Quêtes -->
+          <div
+            id="page-quetes"
+            role="tabpanel"
+            aria-labelledby="onglet-quetes"
+            hidden
+            data-on-quetes="hidden=!"
+          >
+            <h3 class="lpl-section-title">Une semaine à la Halte</h3>
+            <ul class="lpl-quests" data-nav="list" data-game-panel>
+              <li class="lpl-quest" data-state="current" tabindex="0" data-nav-item data-autofocus>
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>
+                <span class="lpl-quest__title">La commande du samedi</span>
+                <span class="lpl-chip">2 lignes sur 4</span>
+                <span class="lpl-quest__text"
+                  >Déposer dans la caisse du quai avant samedi 16 h : 12 radis, 3 laitues, 6 œufs,
+                  10 planches.</span
+                >
+              </li>
+              <li class="lpl-quest" tabindex="0" data-nav-item>
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>
+                <span class="lpl-quest__title">Les gens du bourg</span>
+                <span class="lpl-chip">3 sur 4</span>
+                <span class="lpl-quest__text"
+                  >Faire connaissance avec Firmin, Odette, Basile et Jeanne.</span
+                >
+              </li>
+              <li class="lpl-quest" data-state="done" tabindex="0" data-nav-item>
+                <svg class="lpl-icon" aria-hidden="true" style="color: var(--lpl-color-primary)">
+                  <use href="#ui-check" />
+                </svg>
+                <span class="lpl-quest__title">Premières pousses</span>
+                <span class="lpl-chip lpl-chip--ready"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+                  >Faite</span
+                >
+                <span class="lpl-quest__text">Les premiers radis d’Aubrune depuis vingt ans.</span>
+              </li>
+            </ul>
+            <h3 class="lpl-section-title" style="margin-top: 1rem">Pour les gens du bourg</h3>
+            <ul class="lpl-quests" data-nav="list" data-game-panel>
+              <li class="lpl-quest" data-state="current" tabindex="0" data-nav-item>
+                <svg class="lpl-icon" aria-hidden="true"><use href="#soup" /></svg>
+                <span class="lpl-quest__title">Le souper de bienvenue</span>
+                <span class="lpl-chip lpl-chip--waiting"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Ce
+                  soir, 19 h</span
+                >
+                <span class="lpl-quest__text"
+                  >Apporter 3 radis et 2 laitues à Odette, puis venir à deux mercredi à 19 h.</span
+                >
+              </li>
+              <li class="lpl-quest" tabindex="0" data-nav-item>
+                <svg class="lpl-icon" aria-hidden="true"><use href="#riddle-card" /></svg>
+                <span class="lpl-quest__title">La première énigme d’Émile</span>
+                <span class="lpl-chip">Avec Jeanne</span>
+                <span class="lpl-quest__text">Quand l’ombre de la cloche touche le banc…</span>
+              </li>
+              <li class="lpl-quest" data-state="done" tabindex="0" data-nav-item>
+                <svg class="lpl-icon" aria-hidden="true" style="color: var(--lpl-color-primary)">
+                  <use href="#ui-check" />
+                </svg>
+                <span class="lpl-quest__title">Les planches de Basile</span>
+                <span class="lpl-chip lpl-chip--ready"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+                  >Faite</span
+                >
+                <span class="lpl-quest__text">Les plans des meubles sont dans ton carnet.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Courrier -->
+          <div
+            id="page-courrier"
+            role="tabpanel"
+            aria-labelledby="onglet-courrier"
+            hidden
+            data-on-courrier="hidden=!"
+          >
+            <div
+              style="
+                display: grid;
+                grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+                gap: 1.25rem;
+                align-items: start;
+              "
+            >
+              <ul
+                class="lpl-letter-list"
+                data-nav="list"
+                data-game-panel
+                aria-label="Lettres reçues"
+              >
+                <li>
+                  <button
+                    class="lpl-letter-item"
+                    type="button"
+                    data-nav-item
+                    data-state="unread"
+                    aria-current="false"
+                  >
+                    <svg class="lpl-icon" aria-hidden="true"><use href="#ui-letter" /></svg
+                    ><strong>Basile</strong><small>Lundi 3</small>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="lpl-letter-item"
+                    type="button"
+                    data-nav-item
+                    aria-current="true"
+                    data-autofocus
+                  >
+                    <svg class="lpl-icon" aria-hidden="true"><use href="#ui-letter" /></svg
+                    ><strong>La coopérative</strong><small>Samedi 1</small>
+                  </button>
+                </li>
+              </ul>
+              <article class="lpl-letter" aria-label="Lettre de la coopérative">
+                <span class="lpl-stamp">Coopérative de la ligne</span>
+                <p class="lpl-letter__from">La coopérative</p>
+                <p>
+                  « Chers nouveaux gardiens de la Halte d’Aubrune, la coopérative de la ligne vous
+                  souhaite la bienvenue. Voici 200 sous pour vos premiers pas, et notre première
+                  commande, à déposer dans la caisse du quai avant le départ du train, samedi
+                  prochain à 16 h : 12 radis, 3 laitues, 6 œufs, 10 planches. Ce que vous commandez
+                  au catalogue avant vendredi minuit arrive par le train. Bonne semaine ! »
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <footer class="lpl-panel__footer">
+          <span class="lpl-keys">
+            <span><span class="lpl-key">A</span><span class="lpl-key">E</span> pages</span>
+            <span
+              ><span class="lpl-key">↑</span><span class="lpl-key">↓</span
+              ><span class="lpl-key">←</span><span class="lpl-key">→</span> ou
+              <span class="lpl-key">Z</span><span class="lpl-key">Q</span
+              ><span class="lpl-key">S</span><span class="lpl-key">D</span> choisir</span
+            >
+            <span><span class="lpl-key">Retour arrière</span> fermer</span>
+          </span>
+          <span>Le jeu continue pendant que tu lis.</span>
+        </footer>
+      </section>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

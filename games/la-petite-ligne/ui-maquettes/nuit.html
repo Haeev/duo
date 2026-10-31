@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Écran de nuit · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="choix attente desaccord fin">
+    <script src="support/icones.js"></script>
+    <div class="lpl-ui">
+      <main class="lpl-screen lpl-screen--night" aria-labelledby="titre-nuit">
+        <div class="lpl-sheet" style="--lpl-sheet-width: 44rem" data-trap>
+          <div>
+            <p class="lpl-overline">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-moon" /></svg> Fin du mardi 4
+            </p>
+            <h1 class="lpl-sheet__title" id="titre-nuit">
+              <span data-when="choix attente desaccord">Bonne nuit</span>
+              <span data-when="fin">À la prochaine séance</span>
+            </h1>
+          </div>
+
+          <ul class="lpl-quests" data-when="choix attente desaccord" aria-label="Demain">
+            <li class="lpl-quest">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#soup" /></svg>
+              <span class="lpl-quest__title">Demain, mercredi 5 : le souper chez Odette</span>
+              <span></span>
+              <span class="lpl-quest__text"
+                >Chez elle, à 19 h, tous les deux. Pensez aux 3 radis et aux 2 laitues.</span
+              >
+            </li>
+            <li class="lpl-quest">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>
+              <span class="lpl-quest__title">La commande du samedi : 2 lignes sur 4</span>
+              <span></span>
+              <span class="lpl-quest__text">Le train part samedi à 16 h, dans 4 jours.</span>
+            </li>
+          </ul>
+          <p class="lpl-sheet__lead" data-when="fin">
+            La séance est finie. Le monde vous attend tel quel : mercredi 5, 6 h, au petit-déjeuner.
+          </p>
+
+          <div class="lpl-players" aria-label="Choix des deux joueurs">
+            <div class="lpl-player-card">
+              <span class="lpl-token lpl-token--large" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg
+              ></span>
+              <span class="lpl-player-card__name">Camille <small>(toi)</small></span>
+              <span class="lpl-chip" data-when="choix"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="attente desaccord"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>Veut
+                continuer</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="fin"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>Veut finir
+                la séance</span
+              >
+            </div>
+            <div class="lpl-player-card">
+              <span class="lpl-token lpl-token--large" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+              <span class="lpl-player-card__name">Sacha</span>
+              <span class="lpl-chip" data-when="choix attente"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="desaccord fin"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>Veut finir
+                la séance</span
+              >
+            </div>
+          </div>
+
+          <p data-when="choix">
+            Vous continuez quand vous avez choisi « Continuer » sur les deux ordinateurs. Tu peux
+            changer d’avis tant que Sacha n’a pas choisi.
+          </p>
+          <p data-when="attente">
+            <span class="lpl-chip lpl-chip--waiting"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En attente
+              du choix de Sacha…</span
+            >
+          </p>
+          <p data-when="desaccord" role="status">
+            <strong>Sacha veut finir la séance.</strong> La séance finit quand vous avez choisi
+            « Finir la séance » sur les deux ordinateurs. Parlez-en, puis choisissez.
+          </p>
+          <p data-when="fin" role="status">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg> Progression
+            enregistrée. Retour au salon de Duo…
+          </p>
+
+          <div class="lpl-sheet__actions" data-when="choix attente desaccord" data-nav="row">
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="button"
+              data-nav-item
+              data-toggle-group="nuit"
+              data-goto="attente"
+              aria-pressed="false"
+              data-autofocus
+              data-on-attente="aria-pressed=true"
+              data-on-desaccord="aria-pressed=true"
+            >
+              Continuer
+            </button>
+            <button
+              class="lpl-button lpl-button--large"
+              type="button"
+              data-nav-item
+              data-toggle-group="nuit"
+              data-goto="fin"
+              aria-pressed="false"
+            >
+              Finir la séance
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

@@ -1,0 +1,246 @@
+{
+ "nodes": {
+  "garden_cell_grass": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 134
+  },
+  "garden_cell_tilled": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 116
+  },
+  "garden_cell_tilled_wet": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 200
+  },
+  "radish_stage_seed": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 216
+  },
+  "radish_stage_sprout": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 144
+  },
+  "radish_stage_young": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 144
+  },
+  "radish_stage_ripe": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 408
+  },
+  "lettuce_stage_seed": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 96
+  },
+  "lettuce_stage_sprout": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 72
+  },
+  "lettuce_stage_young": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 96
+  },
+  "lettuce_stage_ripe": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 270
+  },
+  "carrot_stage_seed": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 216
+  },
+  "carrot_stage_sprout": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 180
+  },
+  "carrot_stage_young": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 180
+  },
+  "carrot_stage_ripe": {
+   "footprint": [
+    1,
+    1
+   ],
+   "on": "garden_cell_tilled",
+   "tris": 336
+  },
+  "radish": {
+   "kind": "item",
+   "tris": 132
+  },
+  "carrot": {
+   "kind": "item",
+   "tris": 76
+  },
+  "lettuce": {
+   "kind": "item",
+   "tris": 174
+  },
+  "egg": {
+   "kind": "item",
+   "tris": 80
+  },
+  "dandelion": {
+   "kind": "item",
+   "tris": 200
+  },
+  "seed_packet_radish": {
+   "kind": "item",
+   "tris": 116
+  },
+  "seed_packet_lettuce": {
+   "kind": "item",
+   "tris": 116
+  },
+  "seed_packet_carrot": {
+   "kind": "item",
+   "tris": 116
+  },
+  "hoe": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 96
+  },
+  "watering_can": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 216
+  },
+  "axe": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 88
+  },
+  "saw": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 176
+  },
+  "hammer": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 92
+  },
+  "fishing_rod": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tris": 132
+  },
+  "log": {
+   "kind": "item",
+   "tris": 216
+  },
+  "plank": {
+   "kind": "item",
+   "tris": 68
+  },
+  "beam": {
+   "kind": "carried",
+   "length_axis": "z",
+   "carry_height": 1.78,
+   "tris": 104
+  },
+  "nail_box": {
+   "kind": "item",
+   "tris": 356
+  },
+  "fish_gudgeon": {
+   "kind": "item",
+   "tris": 284
+  },
+  "fish_chub": {
+   "kind": "item",
+   "tris": 140
+  },
+  "fish_trout": {
+   "kind": "item",
+   "tris": 284
+  },
+  "hen_feeder": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 84
+  },
+  "grain_sack": {
+   "kind": "item",
+   "tris": 144
+  },
+  "water_barrel": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 356
+  },
+  "hen": {
+   "variants": [
+    "hen_white",
+    "hen_red",
+    "hen_black"
+   ],
+   "tris": 1350,
+   "tris_each_variant": 450
+  }
+ },
+ "animations": [
+  "hen_idle",
+  "hen_walk",
+  "hen_peck"
+ ],
+ "file_bytes": 663416
+}

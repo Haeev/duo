@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Proposition d’un gros achat · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="recue envoyee acceptee refusee manque">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true">
+      <img src="support/scene-pluie.svg" alt="" />
+    </div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud">
+        <div class="lpl-hud__top-left">
+          <div class="lpl-clock">
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true"><use href="#weather-rain" /></svg
+            ></span>
+            <span class="lpl-clock__day">Mardi 4 · Pluie</span>
+            <span class="lpl-clock__time">14 h 10</span>
+          </div>
+          <div class="lpl-purse">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>
+            <span class="lpl-purse__amount" data-when="recue envoyee refusee">214</span>
+            <span class="lpl-purse__amount" data-when="acceptee">94</span>
+            <span class="lpl-purse__amount" data-when="manque">80</span>
+            <span class="lpl-purse__unit">sous</span>
+            <span class="lpl-purse__note" data-when="recue envoyee">dont 120 réservés</span>
+          </div>
+          <ul class="lpl-toasts" aria-live="polite" aria-label="Notifications">
+            <li class="lpl-toast lpl-toast--error" data-when="manque">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-warning" /></svg>Il manque
+              40 sous.
+            </li>
+            <li class="lpl-toast" data-when="refusee">
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Proposition refusée : rien n’a été dépensé.
+            </li>
+          </ul>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="ok"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+            ></span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity" data-when="recue acceptee refusee"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-pin" /></svg>Au comptoir
+              d’Odette</span
+            >
+            <span class="lpl-partner__activity" data-when="envoyee manque"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#axe" /></svg>Coupe du bois à la
+              lisière</span
+            >
+          </div>
+        </div>
+        <div class="lpl-hud__bottom-left">
+          <div class="lpl-self" aria-label="Camille, toi">
+            <span class="lpl-portrait" data-portrait="camille" data-expression="ok"
+              ><span class="lpl-token" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg></span
+            ></span>
+            <span class="lpl-self__text">
+              <span class="lpl-self__name">Camille</span>
+              <span class="lpl-self__mood">Ça va</span>
+              <span
+                class="lpl-stamina"
+                style="--lpl-value: 55%"
+                role="meter"
+                aria-label="Endurance"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="55"
+              >
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-stamina" /></svg>
+                <span class="lpl-stamina__bar"><span class="lpl-stamina__fill"></span></span>
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="lpl-hud__bottom">
+          <p class="lpl-tip" role="status" data-when="recue">
+            <span class="lpl-key">Entrée</span> pour répondre, ou un clic sur la proposition. Tu
+            peux continuer à jouer.
+          </p>
+          <p class="lpl-tip" role="status" data-when="envoyee">
+            À partir de 100 sous, l’achat attend l’accord de l’autre.
+          </p>
+        </div>
+      </div>
+
+      <!-- Chez celui qui reçoit la proposition -->
+      <section
+        class="lpl-proposal"
+        data-when="recue acceptee refusee"
+        data-on-refusee="data-state=folding"
+        aria-labelledby="texte-proposition"
+        role="region"
+      >
+        <span class="lpl-proposal__icon"
+          ><svg aria-hidden="true"><use href="#mattress" /></svg
+        ></span>
+        <p class="lpl-proposal__from lpl-overline">
+          <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+            ><svg><use href="#player-crescent" /></svg></span
+          >Proposition de Sacha
+        </p>
+        <p class="lpl-proposal__text" id="texte-proposition">
+          Sacha propose d’acheter un matelas pour 120 sous. D’accord ?
+        </p>
+        <p class="lpl-proposal__note" data-when="recue">
+          La somme est réservée en attendant ta réponse. Sans réponse, la proposition s’annule à la
+          nuit.
+        </p>
+        <p class="lpl-proposal__note" data-when="acceptee">
+          Le matelas est dans le sac de Sacha. 120 sous dépensés.
+        </p>
+        <div class="lpl-proposal__actions" data-when="recue">
+          <button
+            class="lpl-button lpl-button--primary"
+            type="button"
+            data-proposal-default
+            data-goto="acceptee"
+          >
+            D’accord
+          </button>
+          <button class="lpl-button" type="button" data-goto="refusee">Pas maintenant</button>
+        </div>
+        <span class="lpl-stamp lpl-stamp--green lpl-stamp--large" data-when="acceptee"
+          >D’accord</span
+        >
+      </section>
+
+      <!-- Chez celui qui propose -->
+      <section
+        class="lpl-proposal"
+        data-when="envoyee"
+        aria-labelledby="texte-envoyee"
+        role="region"
+      >
+        <span class="lpl-proposal__icon"
+          ><svg aria-hidden="true"><use href="#crystal-radio" /></svg
+        ></span>
+        <p class="lpl-proposal__from lpl-overline">
+          <span class="lpl-token lpl-token--small" data-player="self" aria-hidden="true"
+            ><svg><use href="#player-orb" /></svg></span
+          >Ta proposition
+        </p>
+        <p class="lpl-proposal__text" id="texte-envoyee">
+          Tu proposes d’acheter un poste à galène pour 120 sous.
+        </p>
+        <p class="lpl-proposal__note">
+          <span class="lpl-chip lpl-chip--waiting"
+            ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En attente
+            de l’accord de Sacha…</span
+          >
+        </p>
+        <div class="lpl-proposal__actions">
+          <button class="lpl-button" type="button" data-proposal-default>
+            Retirer ma proposition
+          </button>
+        </div>
+      </section>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

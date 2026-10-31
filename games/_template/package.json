@@ -1,0 +1,25 @@
+{
+  "name": "@duo/modele-de-jeu",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Gabarit d'un jeu Duo: manifeste, simulation pure avec empreinte, hôte qui fait autorité, rendu minimal, tests.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@duo/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@duo/sdk-dev": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

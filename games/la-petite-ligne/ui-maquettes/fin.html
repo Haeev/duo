@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fin de la démo · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="complete partielle attente">
+    <script src="support/icones.js"></script>
+    <div class="lpl-ui">
+      <main class="lpl-screen" aria-labelledby="titre-fin">
+        <div class="lpl-sheet" style="--lpl-sheet-width: 46rem" data-trap>
+          <div class="lpl-title">
+            <span class="lpl-title__ticket"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>Samedi 8, 16 h
+              · le train est reparti</span
+            >
+            <h1 class="lpl-title__name" id="titre-fin" style="font-size: var(--lpl-text-3xl)">
+              Fin de la démo.
+            </h1>
+            <p class="lpl-sheet__lead">Une semaine à la Halte d’Aubrune.</p>
+          </div>
+
+          <div class="lpl-counters">
+            <div class="lpl-counter">
+              <span class="lpl-counter__value">8</span
+              ><span class="lpl-counter__label">journées vécues</span>
+            </div>
+            <div class="lpl-counter">
+              <span class="lpl-counter__value"
+                ><span data-when="complete attente">4</span><span data-when="partielle">3</span>
+                <small style="font-size: var(--lpl-text-lg)">sur 4</small></span
+              >
+              <span class="lpl-counter__label">lignes de la commande remplies</span>
+            </div>
+            <div class="lpl-counter">
+              <span class="lpl-counter__value"
+                ><span data-when="complete attente">9</span
+                ><span data-when="partielle">6</span></span
+              ><span class="lpl-counter__label">meubles posés</span>
+            </div>
+          </div>
+
+          <div class="lpl-players" aria-label="Les deux joueurs">
+            <div class="lpl-player-card">
+              <span
+                class="lpl-portrait lpl-portrait--small"
+                data-portrait="camille"
+                data-expression="radiant"
+                ><span class="lpl-token lpl-token--small" data-player="self" aria-hidden="true"
+                  ><svg><use href="#player-orb" /></svg></span
+              ></span>
+              <span class="lpl-player-card__name">Camille <small>(toi)</small></span>
+              <span class="lpl-chip" data-when="complete partielle"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="attente"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>Veut
+                continuer</span
+              >
+            </div>
+            <div class="lpl-player-card">
+              <span
+                class="lpl-portrait lpl-portrait--small"
+                data-portrait="sacha"
+                data-expression="great"
+                ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                  ><svg><use href="#player-crescent" /></svg></span
+              ></span>
+              <span class="lpl-player-card__name">Sacha</span>
+              <span class="lpl-chip"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Pas
+                encore</span
+              >
+            </div>
+          </div>
+
+          <p class="lpl-sheet__lead" style="text-align: center">
+            <strong>La suite de la ligne arrive bientôt.</strong>
+          </p>
+
+          <div class="lpl-sheet__actions" style="justify-content: center">
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="button"
+              data-when="complete partielle"
+              data-goto="attente"
+              data-autofocus
+            >
+              Continuer
+            </button>
+            <span class="lpl-chip lpl-chip--waiting" data-when="attente"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En attente
+              de Sacha…</span
+            >
+            <button
+              class="lpl-button"
+              type="button"
+              data-when="attente"
+              data-goto="complete"
+              data-autofocus
+            >
+              Pas encore
+            </button>
+          </div>
+          <p style="text-align: center; color: var(--lpl-color-ink-muted)">
+            Ensuite : l’écran de fin de Duo, et la séance dans votre historique.
+          </p>
+        </div>
+      </main>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

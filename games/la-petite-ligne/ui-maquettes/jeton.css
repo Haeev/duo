@@ -95,6 +95,7 @@
   --lpl-space-6: 2rem;
   --lpl-space-7: 3rem;
   --lpl-hud-margin: 0.75rem; /* marge du HUD au bord de la fenêtre */
+  --lpl-hud-top-band: 7.5rem; /* hauteur réservée à l'horloge: les panneaux commencent dessous */
 
   /* Rayons. */
   --lpl-radius-s: 0.25rem;
@@ -127,9 +128,9 @@
 
   /* Couches. */
   --lpl-layer-hud: 10;
-  --lpl-layer-toast: 20;
   --lpl-layer-panel: 30;
   --lpl-layer-proposal: 40;
+  --lpl-layer-toast: 45; /* une notification reste lisible par-dessus un panneau */
   --lpl-layer-modal: 50;
 
   font-size: calc(100% * var(--lpl-ui-scale));

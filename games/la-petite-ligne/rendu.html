@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Petite Ligne: démonstration du rendu</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #1a2340;
+        font: 13px/1.4 system-ui, sans-serif;
+      }
+      #scene {
+        position: absolute;
+        inset: 0;
+      }
+      #panneau {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        background: rgba(14, 17, 38, 0.78);
+        color: #eaf2e3;
+        display: grid;
+        gap: 4px;
+        min-width: 220px;
+      }
+      #panneau label {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+      }
+      #panneau[hidden] {
+        display: none;
+      }
+      #chargement {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: #eaf2e3;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="scene"></div>
+    <div id="chargement">Chargement du rendu...</div>
+    <form id="panneau" hidden>
+      <label>Heure <input id="heure" type="range" min="0" max="1440" step="5" /></label>
+      <label
+        >Météo
+        <select id="meteo">
+          <option value="sunny">soleil</option>
+          <option value="cloudy">nuages</option>
+          <option value="rain">pluie</option>
+        </select>
+      </label>
+      <label>Le temps passe <input id="auto" type="checkbox" /></label>
+      <label>Promenade <input id="vie" type="checkbox" checked /></label>
+      <div>A et E: tourner, R et F: zoom, Z Q S D: marcher</div>
+      <div>H: récolte, B: bêche, T: hache, C: construction</div>
+    </form>
+    <script type="module" src="./src/rendu/demo/main.ts"></script>
+  </body>
+</html>

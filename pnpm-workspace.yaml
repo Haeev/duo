@@ -45,3 +45,5 @@ saveExact: true
 # versions figées par l'ADR 0001 et plus jeunes que cela sont admises ici.
 minimumReleaseAgeExclude:
   - eslint@10.14.0
+  - '@types/three@0.187.0'
+  - three@0.187.0

@@ -1,0 +1,25 @@
+{
+  "name": "@duo/essai-echo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Jeu d'essai du faux hôte: un message de l'invité à l'hôte, et la réponse en retour.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@duo/sdk": "workspace:*"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@duo/sdk-dev": "workspace:*",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

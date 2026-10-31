@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Caisse et commande du samedi · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="caisse caisse-vide complete tableau parti">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true"><img src="support/scene-jour.svg" alt="" /></div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud lpl-pass-through">
+        <div class="lpl-hud__top-left">
+          <div class="lpl-clock" data-on-complete="data-train=soon" data-on-parti="data-train=!">
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true"><use href="#weather-sun" /></svg
+            ></span>
+            <span class="lpl-clock__day" data-when="caisse tableau">Jeudi 6 · Soleil</span>
+            <span class="lpl-clock__day" data-when="caisse-vide">Samedi 1 · Soleil</span>
+            <span class="lpl-clock__day" data-when="complete parti">Samedi 8 · Soleil</span>
+            <span class="lpl-clock__time" data-when="caisse tableau">11 h 10</span>
+            <span class="lpl-clock__time" data-when="caisse-vide">12 h 30</span>
+            <span class="lpl-clock__time" data-when="complete">15 h 00</span>
+            <span class="lpl-clock__time" data-when="parti">16 h 00</span>
+            <span class="lpl-clock__train" data-when="complete"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>Départ du
+              train à 16 h</span
+            >
+          </div>
+          <div class="lpl-purse">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>
+            <span class="lpl-purse__amount" data-when="caisse tableau">238</span>
+            <span class="lpl-purse__amount" data-when="caisse-vide">200</span>
+            <span class="lpl-purse__amount" data-when="complete">357</span>
+            <span class="lpl-purse__amount" data-when="parti">897</span>
+            <span class="lpl-purse__unit">sous</span>
+            <span class="lpl-purse__delta" data-when="parti">+540</span>
+          </div>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="great"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+            ></span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-pin" /></svg>Sur le
+              quai</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <section
+        class="lpl-panel lpl-panel--narrow"
+        style="--lpl-panel-width: 46rem"
+        aria-labelledby="titre-caisse"
+        data-trap
+      >
+        <header class="lpl-panel__header">
+          <svg class="lpl-icon" aria-hidden="true" data-when="caisse caisse-vide complete parti">
+            <use href="#parcel" />
+          </svg>
+          <svg class="lpl-icon" aria-hidden="true" data-when="tableau">
+            <use href="#ui-notebook" />
+          </svg>
+          <div>
+            <h2 class="lpl-panel__title" id="titre-caisse">
+              <span data-when="caisse caisse-vide complete parti">Caisse de la coopérative</span
+              ><span data-when="tableau">Tableau de la halte · Commande</span>
+            </h2>
+            <p class="lpl-panel__subtitle">Commande du samedi 8, départ du train à 16 h</p>
+          </div>
+          <button
+            class="lpl-button lpl-button--on-dark lpl-panel__close"
+            type="button"
+            data-close
+            aria-label="Fermer (Retour arrière)"
+          >
+            Fermer <span class="lpl-key">Retour arrière</span>
+          </button>
+        </header>
+
+        <div class="lpl-panel__body">
+          <div class="lpl-order__summary" data-when="caisse tableau">
+            <strong>2 lignes sur 4</strong>
+            <span>Le train part dans 2 jours. Complète, la commande rapporte 540 sous.</span>
+          </div>
+          <div class="lpl-order__summary" data-when="caisse-vide">
+            <strong>0 ligne sur 4</strong>
+            <span>Dépose ici les produits de la commande. Ils partent samedi à 16 h.</span>
+          </div>
+          <div class="lpl-order__summary" data-when="complete">
+            <strong>4 lignes sur 4</strong>
+            <span class="lpl-stamp lpl-stamp--green">Commande complète</span>
+            <span>540 sous au départ du train, à 16 h.</span>
+          </div>
+          <div class="lpl-order__summary" data-when="parti">
+            <strong>Le train est parti</strong>
+            <span class="lpl-stamp">Expédiée</span>
+            <span
+              >« La coopérative a reçu 4 lignes sur 4 : 540 sous. Merci ! Les radis d’Aubrune ont
+              fait sensation à la ville. »</span
+            >
+          </div>
+
+          <ul class="lpl-order" data-nav="list" data-game-panel aria-label="Lignes de la commande">
+            <!-- Radis -->
+            <li class="lpl-order__line" data-state="done" data-on-caisse-vide="data-state=!">
+              <span
+                class="lpl-order__box"
+                role="img"
+                aria-label="Ligne remplie"
+                data-on-caisse-vide="aria-label=Ligne à remplir"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+              ></span>
+              <svg class="lpl-order__icon" aria-hidden="true"><use href="#radish" /></svg>
+              <span class="lpl-order__name"
+                >Radis<small data-when="caisse complete">11 dans ton sac</small
+                ><small data-when="caisse-vide">Aucun dans ton sac</small
+                ><small data-when="tableau">Livrés</small></span
+              >
+              <span class="lpl-order__progress">
+                <span class="lpl-order__count"
+                  ><span data-when="caisse-vide">0</span
+                  ><span data-when="caisse complete tableau parti">12</span>
+                  <small>sur 12</small></span
+                >
+                <span class="lpl-order__bar"
+                  ><span
+                    style="--lpl-value: 100%"
+                    data-on-caisse-vide="style=--lpl-value: 0%"
+                  ></span
+                ></span>
+              </span>
+              <span class="lpl-order__action" data-when="caisse complete"
+                ><span class="lpl-stamp lpl-stamp--green">Livré</span></span
+              >
+              <span class="lpl-order__action" data-when="caisse-vide"
+                ><button
+                  class="lpl-button lpl-button--wide"
+                  type="button"
+                  aria-disabled="true"
+                  data-nav-item
+                  data-autofocus
+                >
+                  Rien à déposer
+                </button></span
+              >
+              <span class="lpl-order__action" data-when="tableau parti"></span>
+            </li>
+            <!-- Laitues -->
+            <li
+              class="lpl-order__line"
+              data-on-complete="data-state=done"
+              data-on-parti="data-state=done"
+            >
+              <span class="lpl-order__box" role="img" aria-label="Ligne à remplir"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+              ></span>
+              <svg class="lpl-order__icon" aria-hidden="true"><use href="#lettuce" /></svg>
+              <span class="lpl-order__name"
+                >Laitues<small data-when="caisse caisse-vide">Aucune dans ton sac</small
+                ><small data-when="complete">Livrées</small
+                ><small data-when="tableau">Il en manque 3</small></span
+              >
+              <span class="lpl-order__progress">
+                <span class="lpl-order__count"
+                  ><span data-when="caisse caisse-vide tableau">0</span
+                  ><span data-when="complete parti">3</span> <small>sur 3</small></span
+                >
+                <span class="lpl-order__bar"
+                  ><span
+                    style="--lpl-value: 0%"
+                    data-on-complete="style=--lpl-value: 100%"
+                    data-on-parti="style=--lpl-value: 100%"
+                  ></span
+                ></span>
+              </span>
+              <span class="lpl-order__action" data-when="caisse caisse-vide"
+                ><button
+                  class="lpl-button lpl-button--wide"
+                  type="button"
+                  aria-disabled="true"
+                  data-nav-item
+                >
+                  Rien à déposer
+                </button></span
+              >
+              <span class="lpl-order__action" data-when="complete"
+                ><span class="lpl-stamp lpl-stamp--green">Livré</span></span
+              >
+              <span class="lpl-order__action" data-when="tableau parti"></span>
+            </li>
+            <!-- Œufs -->
+            <li
+              class="lpl-order__line"
+              data-on-complete="data-state=done"
+              data-on-parti="data-state=done"
+            >
+              <span class="lpl-order__box" role="img" aria-label="Ligne à remplir"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+              ></span>
+              <svg class="lpl-order__icon" aria-hidden="true"><use href="#egg" /></svg>
+              <span class="lpl-order__name"
+                >Œufs<small data-when="caisse">3 dans ton sac</small
+                ><small data-when="caisse-vide">Aucun dans ton sac</small
+                ><small data-when="complete">Livrés</small
+                ><small data-when="tableau">Il en manque 3</small></span
+              >
+              <span class="lpl-order__progress">
+                <span class="lpl-order__count"
+                  ><span data-when="caisse tableau">3</span><span data-when="caisse-vide">0</span
+                  ><span data-when="complete parti">6</span> <small>sur 6</small></span
+                >
+                <span class="lpl-order__bar"
+                  ><span
+                    style="--lpl-value: 50%"
+                    data-on-caisse-vide="style=--lpl-value: 0%"
+                    data-on-complete="style=--lpl-value: 100%"
+                    data-on-parti="style=--lpl-value: 100%"
+                  ></span
+                ></span>
+              </span>
+              <span class="lpl-order__action" data-when="caisse"
+                ><button
+                  class="lpl-button lpl-button--primary lpl-button--wide"
+                  type="button"
+                  data-nav-item
+                  data-autofocus
+                >
+                  Déposer 3 œufs
+                </button></span
+              >
+              <span class="lpl-order__action" data-when="caisse-vide"
+                ><button
+                  class="lpl-button lpl-button--wide"
+                  type="button"
+                  aria-disabled="true"
+                  data-nav-item
+                >
+                  Rien à déposer
+                </button></span
+              >
+              <span class="lpl-order__action" data-when="complete"
+                ><span class="lpl-stamp lpl-stamp--green">Livré</span></span
+              >
+              <span class="lpl-order__action" data-when="tableau parti"></span>
+            </li>
+            <!-- Planches -->
+            <li class="lpl-order__line" data-state="done" data-on-caisse-vide="data-state=!">
+              <span
+                class="lpl-order__box"
+                role="img"
+                aria-label="Ligne remplie"
+                data-on-caisse-vide="aria-label=Ligne à remplir"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg
+              ></span>
+              <svg class="lpl-order__icon" aria-hidden="true"><use href="#plank" /></svg>
+              <span class="lpl-order__name"
+                >Planches<small data-when="caisse complete">4 dans ton sac</small
+                ><small data-when="caisse-vide">Aucune dans ton sac</small
+                ><small data-when="tableau">Livrées</small></span
+              >
+              <span class="lpl-order__progress">
+                <span class="lpl-order__count"
+                  ><span data-when="caisse-vide">0</span
+                  ><span data-when="caisse complete tableau parti">10</span>
+                  <small>sur 10</small></span
+                >
+                <span class="lpl-order__bar"
+                  ><span
+                    style="--lpl-value: 100%"
+                    data-on-caisse-vide="style=--lpl-value: 0%"
+                  ></span
+                ></span>
+              </span>
+              <span class="lpl-order__action" data-when="caisse complete"
+                ><span class="lpl-stamp lpl-stamp--green">Livré</span></span
+              >
+              <span class="lpl-order__action" data-when="caisse-vide"
+                ><button
+                  class="lpl-button lpl-button--wide"
+                  type="button"
+                  aria-disabled="true"
+                  data-nav-item
+                >
+                  Rien à déposer
+                </button></span
+              >
+              <span class="lpl-order__action" data-when="tableau parti"></span>
+            </li>
+          </ul>
+          <div class="lpl-sheet__actions" data-when="tableau" style="margin-top: 0.75rem">
+            <button class="lpl-button" type="button" data-autofocus>
+              Voir le catalogue <span class="lpl-key">E</span>
+            </button>
+          </div>
+          <div class="lpl-sheet__actions" data-when="complete" style="margin-top: 0.75rem">
+            <button class="lpl-button lpl-button--quiet" type="button" data-autofocus>
+              Reprendre un produit
+            </button>
+          </div>
+          <div class="lpl-sheet__actions" data-when="parti" style="margin-top: 0.75rem">
+            <button class="lpl-button lpl-button--primary" type="button" data-autofocus data-close>
+              Fermer
+            </button>
+          </div>
+        </div>
+
+        <footer class="lpl-panel__footer">
+          <span class="lpl-keys">
+            <span><span class="lpl-key">↑</span><span class="lpl-key">↓</span> choisir</span>
+            <span><span class="lpl-key">Entrée</span> déposer</span>
+            <span><span class="lpl-key">Retour arrière</span> fermer</span>
+          </span>
+          <span data-when="caisse caisse-vide complete"
+            >On peut reprendre un produit jusqu’au départ.</span
+          >
+          <span data-when="tableau">Les lignes se cochent quand vous déposez à la caisse.</span>
+        </footer>
+      </section>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

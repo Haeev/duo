@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dialogue · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="scene choix-autre attente reponses odette basile carte">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true"><img src="support/scene-jour.svg" alt="" /></div>
+
+    <div class="lpl-ui">
+      <!-- Le haut du HUD reste visible pendant une conversation -->
+      <div class="lpl-hud" data-state="dialogue">
+        <div class="lpl-hud__top-left">
+          <div
+            class="lpl-clock"
+            data-state="stopped"
+            data-on-odette="data-state=!"
+            data-on-basile="data-state=!"
+            data-on-carte="data-state=!"
+          >
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true"><use href="#weather-sun" /></svg
+            ></span>
+            <span class="lpl-clock__day" data-when="scene choix-autre attente reponses"
+              >Samedi 1 · Soleil</span
+            >
+            <span class="lpl-clock__day" data-when="odette basile carte">Dimanche 2 · Soleil</span>
+            <span class="lpl-clock__time" data-when="scene choix-autre attente reponses"
+              >10 h 00</span
+            >
+            <span class="lpl-clock__time" data-when="odette basile carte">11 h 30</span>
+            <span class="lpl-clock__status"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-pause" /></svg>Scène à deux ·
+              l’horloge est arrêtée</span
+            >
+          </div>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="good"
+            >
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+            </span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity" data-when="scene choix-autre attente reponses"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-pin" /></svg>Dans la scène,
+              sur le quai</span
+            >
+            <span class="lpl-partner__activity" data-when="odette basile carte"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#hoe" /></svg>Bêche au
+              potager</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Boîte de dialogue -->
+      <section
+        class="lpl-dialogue"
+        data-speaker="firmin"
+        data-on-odette="data-speaker=odette;data-closable="
+        data-on-basile="data-speaker=basile;data-closable="
+        data-on-carte="data-speaker=letter;data-closable="
+        aria-labelledby="nom-habitant"
+        data-trap
+      >
+        <div class="lpl-dialogue__aside">
+          <span
+            class="lpl-portrait lpl-portrait--large"
+            data-portrait="firmin"
+            data-expression="great"
+            data-when="scene choix-autre attente reponses"
+          ></span>
+          <span
+            class="lpl-portrait lpl-portrait--large"
+            data-portrait="odette"
+            data-expression="good"
+            data-when="odette"
+          ></span>
+          <span
+            class="lpl-portrait lpl-portrait--large"
+            data-portrait="basile"
+            data-expression="ok"
+            data-when="basile"
+          ></span>
+          <span
+            class="lpl-portrait lpl-portrait--large"
+            data-when="carte"
+            style="display: grid; place-items: center"
+            ><svg style="width: 70%; height: 70%" aria-hidden="true">
+              <use href="#riddle-card" /></svg
+          ></span>
+        </div>
+
+        <div class="lpl-dialogue__main">
+          <header class="lpl-dialogue__header">
+            <h2 class="lpl-dialogue__name" id="nom-habitant">
+              <span data-when="scene choix-autre attente reponses">Firmin Lacombe</span>
+              <span data-when="odette">Odette Ferrand</span>
+              <span data-when="basile">Basile Cornu</span>
+              <span data-when="carte">La carte de la boîte en fer</span>
+            </h2>
+            <span class="lpl-dialogue__role" data-when="scene choix-autre attente reponses"
+              >chef de halte bénévole</span
+            >
+            <span class="lpl-dialogue__role" data-when="odette">épicière</span>
+            <span class="lpl-dialogue__role" data-when="basile">menuisier retraité</span>
+            <span
+              class="lpl-chip lpl-dialogue__scene"
+              data-when="scene choix-autre attente reponses"
+              ><span class="lpl-token lpl-token--small" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg></span
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Scène à deux</span
+            >
+          </header>
+
+          <!-- Réplique de l'habitant -->
+          <p class="lpl-dialogue__text" data-when="scene choix-autre attente">
+            « Faites revivre la halte, et le train ira plus loin. Samedi prochain, on compte sur
+            vous : la commande est au tableau. »
+          </p>
+          <p class="lpl-dialogue__text" data-when="odette">
+            « Je vous achète vos légumes, mais à mon prix. La coopérative paie mieux, le samedi. »
+          </p>
+          <p class="lpl-dialogue__text" data-when="basile">
+            « Du bois, il y en a plein la lisière. Coupez un arbre, sciez quatre planches à mon
+            établi, et je vous montre comment on fait une table. »
+          </p>
+          <p class="lpl-dialogue__text" data-when="carte">
+            « Quand l’ombre de la cloche touche le banc, ce que je cherchais dort à ses pieds. É.
+            L. »
+          </p>
+
+          <!-- Réponses aux deux choix, l'une après l'autre (HA-08) -->
+          <div data-when="reponses">
+            <p class="lpl-dialogue__text--player">
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Sacha : « Vingt ans, vraiment ? »
+            </p>
+            <p class="lpl-dialogue__text">
+              « Vingt ans. La dernière fois, j’avais encore mes cheveux. »
+            </p>
+          </div>
+
+          <!-- Choix des répliques -->
+          <ul
+            class="lpl-choices"
+            data-nav="list"
+            data-when="scene choix-autre attente"
+            aria-label="Ta réplique"
+          >
+            <li>
+              <button
+                class="lpl-choice"
+                type="button"
+                data-nav-item
+                data-toggle-group="firmin"
+                data-goto="attente"
+                aria-pressed="false"
+                data-autofocus
+                data-on-attente="aria-pressed=true;aria-disabled=true"
+              >
+                « On s’y met tout de suite ! »
+              </button>
+            </li>
+            <li>
+              <button
+                class="lpl-choice"
+                type="button"
+                data-nav-item
+                data-toggle-group="firmin"
+                aria-pressed="false"
+                data-on-attente="aria-disabled=true"
+              >
+                « Vingt ans, vraiment ? »
+                <span class="lpl-choice__partner" data-when="choix-autre"
+                  ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                    ><svg><use href="#player-crescent" /></svg></span
+                  >Choix de Sacha</span
+                >
+              </button>
+            </li>
+          </ul>
+
+          <ul class="lpl-choices" data-nav="list" data-when="odette" aria-label="Que faire ?">
+            <li>
+              <button class="lpl-choice" type="button" data-nav-item data-autofocus>
+                Acheter des graines et des clous
+              </button>
+            </li>
+            <li>
+              <button class="lpl-choice" type="button" data-nav-item>Vendre des récoltes</button>
+            </li>
+            <li>
+              <button class="lpl-choice" type="button" data-nav-item data-close>Au revoir</button>
+            </li>
+          </ul>
+
+          <footer class="lpl-dialogue__footer">
+            <span data-when="scene">Chacun choisit sa réplique. Sacha verra la tienne.</span>
+            <span class="lpl-chip lpl-chip--waiting" data-when="attente"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Sacha
+              choisit sa réplique…</span
+            >
+            <span data-when="choix-autre">Sacha a choisi. À toi.</span>
+            <span data-when="reponses">Firmin répond à Camille, puis à Sacha.</span>
+            <span class="lpl-keys" data-when="odette"
+              ><span><span class="lpl-key">Retour arrière</span> au revoir</span></span
+            >
+            <button
+              class="lpl-button lpl-dialogue__next"
+              type="button"
+              data-when="reponses basile carte"
+              data-autofocus
+            >
+              Suite <span class="lpl-key">Espace</span>
+            </button>
+          </footer>
+        </div>
+      </section>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

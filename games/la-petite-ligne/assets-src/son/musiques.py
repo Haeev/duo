@@ -126,7 +126,7 @@ def halte_matin() -> Morceau:
     cordes = nappe(_filtrer(acc, 20, 28) + _filtrer(acc, 36, 44), vel=52, nb=4, bas=50, haut=71)
     flute_contre = contrechant(_filtrer(acc, 28, 36), 71, 83, vel=50, eviter=melo["A3"])
     return Morceau(
-        id="halte-matin", titre="La Halte, le matin", tempo=tempo, signature=(6, 8), mesures=48,
+        accords=acc, id="halte-matin", titre="La Halte, le matin", tempo=tempo, signature=(6, 8), mesures=48,
         temps_par_mesure=M68, graine=1, rt60=1.6,
         pistes=[
             Piste("guitare", GUITARE_NYLON, guitare, sonie_lu=-5.0, pan=58, reverbe=0.22, passe_haut=70),
@@ -156,7 +156,7 @@ def halte_apres_midi() -> Morceau:
     basse = ligne_basse(_filtrer(acc, 12, 48), [0.0, 1.5], vel=72, bas=36, haut=50, duree=1.2)
     contre = contrechant(_filtrer(acc, 20, 28), 55, 67, vel=56, eviter=melo["B"])
     return Morceau(
-        id="halte-apres-midi", titre="La Halte, l'après-midi", tempo=tempo, signature=(6, 8), mesures=48,
+        accords=acc, id="halte-apres-midi", titre="La Halte, l'après-midi", tempo=tempo, signature=(6, 8), mesures=48,
         temps_par_mesure=M68, graine=2, rt60=1.5, aigus_ir=0.4,
         pistes=[
             Piste("guitare", GUITARE_NYLON, guitare, sonie_lu=-5.0, pan=70, reverbe=0.22, passe_haut=70),
@@ -191,14 +191,14 @@ def titre() -> Morceau:
     a = mel(HALTE_A + " " + HALTE_FIN_A, debut_a, 80, M68, transpo=t)
     b = mel(HALTE_B, debut_b, 78, M68, transpo=t - 12)
     a2 = mel(HALTE_A + " " + HALTE_FIN_A, debut_a2, 84, M68, transpo=t)
-    hautbois = tierce_dessous(a2, RE_MAJEUR, 2, dv=-10)
+    hautbois = tierce_dessous(a2, RE_MAJEUR, 2, dv=-10, accords=acc)
     piano = humaniser(arpege(acc, ARPEGE_68, vel=56, bas=38, haut_v=(57, 74)), rng, tempo=tempo)
     cordes = nappe(acc[2:], vel=54, nb=4, bas=50, haut=74)
     violoncelle = ligne_basse([x for x in acc if x.t >= debut_a], [0.0], vel=64, bas=38, haut=52, duree=2.9,
                               quintes=False)
     harpe = _harpe_roulee([x for x in acc if debut_a2 <= x.t < debut_outro], vel=48, bas=69, haut=88)
     return Morceau(
-        id="titre", titre="La Petite Ligne", tempo=tempo, signature=(6, 8), mesures=30, temps_par_mesure=M68,
+        accords=acc, id="titre", titre="La Petite Ligne", tempo=tempo, signature=(6, 8), mesures=30, temps_par_mesure=M68,
         graine=3, rt60=2.0, aigus_ir=0.5,
         pistes=[
             Piste("piano", PIANO, piano, sonie_lu=-5.0, pan=60, reverbe=0.30),
@@ -248,7 +248,7 @@ def veillee() -> Morceau:
     violoncelle = ligne_basse([x for x in acc if T["A2"] <= x.t < T["outro"]], [0.0], vel=58, bas=38, haut=52,
                               duree=2.9, quintes=False)
     return Morceau(
-        id="veillee", titre="La veillée", tempo=tempo, signature=(3, 4), mesures=40, temps_par_mesure=M34,
+        accords=acc, id="veillee", titre="La veillée", tempo=tempo, signature=(3, 4), mesures=40, temps_par_mesure=M34,
         graine=4, rt60=1.1, aigus_ir=0.38, predelai=0.010,
         pistes=[
             Piste("guitare", GUITARE_NYLON, guitare, sonie_lu=-4.0, pan=64, reverbe=0.20, passe_haut=60),
@@ -294,7 +294,7 @@ def petit_dejeuner() -> Morceau:
     piano_main_d = accords_frappes(acc, [1.0, 3.0], vel=52, nb=3, bas=57, haut=72, duree=0.4)
     pizz = ligne_basse([x for x in acc if x.t >= T["A2"]], [0.0, 2.0], vel=62, bas=36, haut=50, duree=0.5)
     return Morceau(
-        id="petit-dejeuner", titre="Le petit-déjeuner", tempo=tempo, signature=(4, 4), mesures=28,
+        accords=acc, id="petit-dejeuner", titre="Le petit-déjeuner", tempo=tempo, signature=(4, 4), mesures=28,
         temps_par_mesure=M44, graine=5, rt60=0.9, aigus_ir=0.45, predelai=0.008,
         pistes=[
             Piste("piano_basse", PIANO, humaniser(piano_basse, rng, tempo=tempo), sonie_lu=-6.0, pan=58,
@@ -328,7 +328,7 @@ def nuit() -> Morceau:
                                    (2.5, 1, 0.5)], vel=48, bas=41, haut_v=(57, 72)), rng, 0.01, 4, tempo)
     cordes = nappe([x for x in acc if x.t >= T["A"]], vel=44, nb=4, bas=53, haut=72)
     return Morceau(
-        id="nuit", titre="La nuit", tempo=tempo, signature=(3, 4), mesures=28, temps_par_mesure=M34,
+        accords=acc, id="nuit", titre="La nuit", tempo=tempo, signature=(3, 4), mesures=28, temps_par_mesure=M34,
         graine=6, rt60=2.2, aigus_ir=0.35, sonie_cible=-18.0,
         pistes=[
             Piste("harpe", HARPE, harpe, sonie_lu=-3.0, pan=60, reverbe=0.35),
@@ -369,7 +369,7 @@ def samedi() -> Morceau:
     tambourin = [Note(t, 0.2, 54, 50 + (8 if (t % 2) > 0.5 else 0))
                  for t in np.arange(T["A2"], 40 * M44, 1.0) if (t % 2) > 0.5]
     return Morceau(
-        id="samedi", titre="Samedi, jour du train", tempo=tempo, signature=(4, 4), mesures=40,
+        accords=acc, id="samedi", titre="Samedi, jour du train", tempo=tempo, signature=(4, 4), mesures=40,
         temps_par_mesure=M44, graine=7, rt60=1.2, aigus_ir=0.5,
         pistes=[
             Piste("accordeon", ACCORDEON, humaniser(accordeon, rng, 0.006, 4, tempo), sonie_lu=0.0, pan=56,
@@ -393,7 +393,7 @@ def fanfare_train() -> Morceau:
     acc = grille("C | F G | C/E F | G7 | C", 0.0, M44)
     tromp = mel("G4:.5 C5:.5 E5:.5 G5:.5 E5:1 C5:1 | A4:1 C5:.5 F5:.5 D5:1 B4:1 | E5:1 G5:1 F5:1 A5:1 | "
                 "G5:1 F5:.5 D5:.5 B4:1 D5:1 | C5:4 |", 0.0, 86, M44, legato=0.9)
-    cor = tierce_dessous(tromp, [0, 2, 4, 5, 7, 9, 11], 2, dv=-12)
+    cor = tierce_dessous(tromp, [0, 2, 4, 5, 7, 9, 11], 2, dv=-12, accords=acc)
     cor = decaler(cor, transpo=-12)
     accordeon = accords_frappes(acc[:-1], [0.0, 1.0, 2.0, 3.0], vel=56, nb=3, bas=55, haut=70, duree=0.45)
     accordeon += nappe(acc[-1:], vel=60, nb=4, bas=55, haut=76)
@@ -401,7 +401,7 @@ def fanfare_train() -> Morceau:
     glock = mel("r:16 | C6:.5 E6:.5 G6:.5 C7:2.5 |", 0.0, 60, M44)
     caisse = [Note(0.0 + k * 0.125, 0.1, 38, 30 + k * 3) for k in range(8)] + [Note(16.0, 0.5, 49, 62)]
     return Morceau(
-        id="fanfare-train", titre="Le train arrive", tempo=tempo, signature=(4, 4), mesures=5,
+        accords=acc, id="fanfare-train", titre="Le train arrive", tempo=tempo, signature=(4, 4), mesures=5,
         temps_par_mesure=M44, boucle=False, queue_s=3.5, graine=8, rt60=1.4, sonie_cible=-17.0,
         pistes=[
             Piste("trompette", TROMPETTE, tromp, sonie_lu=0.0, pan=58, reverbe=0.25, souffle=True),
@@ -428,7 +428,7 @@ def fin() -> Morceau:
         mel("E5:1.5 D5:.5 C5:.5 D5:.5 | D5:1.5 B4:1.5 | C5:1 B4:.5 A4:1 B4:.5 | G4:1.5 B4:.5 A4:.5 G4:.5 |",
             T_b, 80, M68) + \
         mel("A4:1 G4:.5 A4:1 C5:.5 | C5:1 D5:.5 E5:1.5 | C5:1 B4:.5 A4:1 F#4:.5 | G4:3 | r:3 |", T_c, 80, M68)
-    clarinette = tierce_dessous(flute, SOL_MAJEUR, 2, dv=-10)
+    clarinette = tierce_dessous(flute, SOL_MAJEUR, 2, dv=-10, accords=acc)
     guitare = humaniser(arpege(acc[:-1], ARPEGE_68, vel=72, bas=40, haut_v=(52, 67)), rng, tempo=tempo)
     guitare += [Note(acc[-1].t, 3.0, p, 56) for p in (43, 50, 55, 59, 62)]
     cordes = nappe(acc[2:], vel=54, nb=4, bas=50, haut=74)
@@ -437,7 +437,7 @@ def fin() -> Morceau:
                  enumerate([55, 59, 62, 67, 71, 74, 79, 83, 86])]
     cor = mel("r:3 | r:3 | r:3 | D4:1.5 B3:1.5 | B3:3 |", T_c, 66, M68)
     return Morceau(
-        id="fin", titre="Une semaine à la Halte", tempo=tempo, signature=(6, 8), mesures=19,
+        accords=acc, id="fin", titre="Une semaine à la Halte", tempo=tempo, signature=(6, 8), mesures=19,
         temps_par_mesure=M68, boucle=False, queue_s=5.0, graine=9, rt60=1.8, sonie_cible=-18.0,
         pistes=[
             Piste("guitare", GUITARE_NYLON, guitare, sonie_lu=-5.0, pan=60, reverbe=0.24, passe_haut=70),

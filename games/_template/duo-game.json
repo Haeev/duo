@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "modele-de-jeu",
+  "name": "Modèle de jeu",
+  "version": "0.1.0",
+  "sdk": "1.0",
+  "view": "2d",
+  "engine": "none",
+  "mode": "coop",
+  "play": "session",
+  "durationMinutes": [1, 10],
+  "network": "host-authority",
+  "entry": "index.html",
+  "thumbnail": "vignette.png",
+  "description": "Gabarit: chaque joueur promène son astre, l'hôte fait autorité.",
+  "whatsNew": "",
+  "actions": [
+    { "id": "up", "label": "Monter", "keys": ["KeyW", "ArrowUp"] },
+    { "id": "down", "label": "Descendre", "keys": ["KeyS", "ArrowDown"] },
+    { "id": "left", "label": "Gauche", "keys": ["KeyA", "ArrowLeft"] },
+    { "id": "right", "label": "Droite", "keys": ["KeyD", "ArrowRight"] }
+  ],
+  "saves": {
+    "slots": 1,
+    "maxBytes": 4096,
+    "moments": ["exit"],
+    "help": "Le jeu enregistre en quittant."
+  },
+  "credits": null
+}

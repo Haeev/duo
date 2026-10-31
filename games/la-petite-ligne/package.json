@@ -1,0 +1,30 @@
+{
+  "name": "@duo/la-petite-ligne",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "La Petite Ligne: démo d'une heure, jeu coopératif 3D à deux (jeu 1 de Duo).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@duo/sdk": "workspace:*",
+    "three": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@duo/sdk-dev": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/three": "0.187.0",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

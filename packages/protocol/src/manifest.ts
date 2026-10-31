@@ -42,7 +42,9 @@ export const ManifestSavesSchema = v.pipe(
     slots: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(10)),
     maxBytes: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(MAX_SAVE_BYTES)),
     moments: v.pipe(v.array(v.picklist(SAVE_MOMENTS)), v.minLength(1)),
-    autosaveSeconds: v.exactOptional(v.pipe(v.number(), v.integer(), v.minValue(60), v.maxValue(1800))),
+    autosaveSeconds: v.exactOptional(
+      v.pipe(v.number(), v.integer(), v.minValue(60), v.maxValue(1800)),
+    ),
     help: v.exactOptional(v.pipe(v.string(), v.maxLength(120))),
   }),
   v.check(
@@ -79,7 +81,10 @@ export const ManifestSchema = v.pipe(
       v.array(ManifestActionSchema),
       v.minLength(1),
       v.maxLength(32),
-      v.check((actions) => new Set(actions.map((a) => a.id)).size === actions.length, 'actions: identifiants en double'),
+      v.check(
+        (actions) => new Set(actions.map((a) => a.id)).size === actions.length,
+        'actions: identifiants en double',
+      ),
     ),
     saves: v.nullable(ManifestSavesSchema),
     credits: v.nullable(v.string()),

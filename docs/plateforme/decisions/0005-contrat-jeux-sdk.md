@@ -136,3 +136,14 @@ Le pont porte une version `majeure.mineure`. Une mineure n'ajoute que des messag
 
 - `navigator.keyboard.getLayoutMap()` donne les bons libellés AZERTY sur le Mac et le PC (vérifié disponible dans `duo-game://` sous Linux; disposition réelle chez le client).
 - Coût d'une écriture de 20 Mo depuis le jeu (sérialisation JSON sur le fil du jeu, transfert du tampon) sur le PC de référence, au banc de mesure.
+
+## Précisions de l'implémentation (lot L3, 2026-10-31)
+
+Le pont 1.0 est implémenté par `packages/protocol` (schémas Valibot, source de vérité des messages), `packages/sdk` (côté jeu) et `packages/sdk-dev` (faux hôte). Précisions apportées au tableau du point 3, toutes compatibles avec la décision; à relire par dev-plateforme pour le côté Electron:
+
+- **Remise du port**: `window.postMessage({ type: 'duo:bridge-port', bridge: '1.0' }, '*', [port])` dans la page du jeu (par `preload-game`); le SDK écoute dès son import. Dans un cadre (faux hôte), le SDK demande le port au parent par `{ type: 'duo:bridge-request' }`.
+- **Ouverture**: le jeu envoie d'abord `hello { bridge, sdk }`, la plateforme répond `init`. `init` porte aussi `saveSlot` (emplacement ouvert à l'écriture, même pour une nouvelle partie) et `clockOffsetMs` (heure de session = `performance.timeOrigin + performance.now()` de la page + cet écart).
+- **Réseau**: le contenu d'un message `net` est le texte JSON produit par le SDK émetteur (64 Kio au plus), relayé tel quel et relu par le SDK destinataire, qui le valide par le schéma du canal. Le binaire de `reseau.md` (section 11.3) est reporté jusqu'à ce qu'une mesure le justifie. Un message `link { rttMs, jitterMs, state, clockOffsetMs }` de la plateforme met à jour `net.quality()` et l'horloge de session.
+- **Fin d'une séance**: `sessionEnd` porte `finished`; `true` quand le jeu termine la séance de lui-même (fin de la démo de La Petite Ligne), `false` en réponse à `stop`.
+- **`pauseRequest`**: Échap vue par le SDK. N'arrive jamais dans Duo, où Échap est interceptée par le principal; sert au faux hôte.
+- **Sauvegarde**: `saveRequest` porte le moment demandé (`auto` ou `exit`); la sauvegarde de sortie est écrite avant que le jeu ne reçoive l'événement `stop`.

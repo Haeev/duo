@@ -67,22 +67,26 @@ def decaler(notes: list[Note], dt: float = 0.0, transpo: int = 0, dv: int = 0) -
     return [Note(n.t + dt, n.d, n.p + transpo, max(1, min(127, n.v + dv))) for n in notes]
 
 
-def tierce_dessous(notes: list[Note], gamme: list[int], intervalle: int = 2, dv: int = -8) -> list[Note]:
-    """Voix parallèle à une tierce (intervalle=2 degrés) ou une sixte (5) diatonique en dessous."""
+def tierce_dessous(notes: list[Note], gamme: list[int], intervalle: int = 2, dv: int = -8,
+                   accords: list | None = None) -> list[Note]:
+    """Voix parallèle à une tierce (intervalle=2 degrés) ou une sixte (5) diatonique en dessous.
+    Avec la grille, une note tenue (une noire ou plus) qui tomberait hors de l'accord est remplacée
+    par la note de l'accord la plus proche, entre une sixte et une tierce mineure sous la mélodie."""
     sortie = []
     for n in notes:
-        pc = n.p % 12
-        if pc not in gamme:
-            sortie.append(Note(n.t, n.d, n.p - 3, n.v + dv))
-            continue
-        i = gamme.index(pc)
-        j = i - intervalle
-        octave = 0
-        while j < 0:
-            j += len(gamme)
-            octave -= 12
-        cible = n.p - pc + gamme[j] + octave
-        sortie.append(Note(n.t, n.d, cible, max(1, n.v + dv)))
+        p = n.p
+        k = 0
+        while k < intervalle:
+            p -= 1
+            if p % 12 in gamme:
+                k += 1
+        if accords and n.d >= 0.7:
+            acc = next((a for a in accords if a.t - 1e-6 <= n.t < a.t + a.d - 1e-6), None)
+            if acc is not None and p % 12 not in acc.pcs:
+                candidats = [q for q in range(n.p - 9, n.p - 2) if q % 12 in acc.pcs]
+                if candidats:
+                    p = min(candidats, key=lambda q: (abs(q - p), q))
+        sortie.append(Note(n.t, n.d, p, max(1, n.v + dv)))
     return sortie
 
 
@@ -216,7 +220,7 @@ def arpege(accords: list[Accord], motif: list[tuple[float, int, float]], vel: in
                     continue
                 p = b if voix == 0 else quinte_de(acc, b) if voix == -1 else v[min(voix, nb) - 1]
                 accentue = accent if abs(dt) < 1e-6 else 0
-                notes.append(Note(t, min(duree, acc.t + acc.d - t + 0.5), p, vel + accentue))
+                notes.append(Note(t, min(duree, acc.t + acc.d - t + 0.2), p, vel + accentue))
             debut += per
     return notes
 
@@ -326,6 +330,7 @@ class Morceau:
     sonie_cible: float = -18.0
     presence_db: float = -19.0  # niveau visé de l'octave de 4 kHz, relatif à l'énergie totale
     graine: int = 0
+    accords: list = field(default_factory=list)  # grille, pour le contrôle des frottements
 
     @property
     def duree_temps(self) -> float:
@@ -472,8 +477,8 @@ def mixer(m: Morceau, stems: dict[str, np.ndarray]) -> tuple[np.ndarray, dict[st
     # +9 dB, pour une clarté homogène d'un morceau à l'autre.
     total = 0.0
     for _ in range(2):  # l'étagère ne relève qu'en partie l'octave visée: deux passes
-        g = float(np.clip(m.presence_db - octave_relative(mix, 4000.0), 0.0, 10.0 - total))
-        if g < 0.3:
+        g = float(np.clip(m.presence_db - octave_relative(mix, 4000.0), -4.0 - total, 10.0 - total))
+        if abs(g) < 0.3:
             break
         mix = dsp.etagere_aigus(mix, 3000.0, g)
         total += g
@@ -533,3 +538,42 @@ def _couper_silence_final(x: np.ndarray, seuil_db: float = -70.0) -> np.ndarray:
     crete = np.max(np.abs(x)) + 1e-12
     actif = np.where(np.max(np.abs(x), axis=1) > crete * 10 ** (seuil_db / 20.0))[0]
     return x[: (actif[-1] + dsp.n_ech(0.05)) if len(actif) else len(x)]
+
+
+# --- Contrôle de l'écriture (on ne peut pas écouter: on vérifie) -------------------------
+
+def frottements(m: Morceau, duree_min: float = 0.75) -> list[str]:
+    """Paires de notes simultanées de deux pistes différentes formant une seconde mineure, une
+    septième majeure ou un triton, tenues ensemble au moins duree_min temps, dont l'une au moins
+    n'appartient pas à l'accord du moment. Ce sont les seuls endroits où une fausse note pourrait
+    s'entendre; la liste doit être vide ou ne contenir que des notes de passage voulues."""
+    def accord_a(t: float) -> Accord | None:
+        for a in m.accords:
+            if a.t - 1e-6 <= t < a.t + a.d - 1e-6:
+                return a
+        return None
+
+    notes = [(p.nom, n) for p in m.pistes if not p.percussions for n in p.notes]
+    rapports = []
+    for i in range(len(notes)):
+        nom_a, a = notes[i]
+        for j in range(i + 1, len(notes)):
+            nom_b, b = notes[j]
+            if nom_a == nom_b:
+                continue
+            debut = max(a.t, b.t)
+            fin = min(a.t + a.d, b.t + b.d)
+            if fin - debut < duree_min:
+                continue
+            ic = abs(a.p - b.p) % 12
+            if ic not in (1, 11, 6):
+                continue
+            acc = accord_a(debut)
+            if acc is None:
+                continue
+            if a.p % 12 in acc.pcs and b.p % 12 in acc.pcs:
+                continue
+            mesure = int(debut // m.temps_par_mesure) + 1
+            rapports.append(f"mesure {mesure} ({acc.symbole}): {nom_a} {a.p} / {nom_b} {b.p}, "
+                            f"{fin - debut:.2f} temps")
+    return rapports

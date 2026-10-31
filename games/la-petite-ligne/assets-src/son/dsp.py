@@ -507,3 +507,13 @@ def decoder(fichier: Path, canaux: int = 2) -> np.ndarray:
                           capture_output=True, check=True)
     x = np.frombuffer(proc.stdout, dtype=np.float32).astype(np.float64)
     return x.reshape(-1, canaux) if canaux > 1 else x
+
+
+def somme(*sons: np.ndarray) -> np.ndarray:
+    """Additionne des sons de longueurs différentes (les plus courts sont complétés de silence)."""
+    n = max(len(s) for s in sons)
+    stereo_ = any(s.ndim == 2 for s in sons)
+    sortie = np.zeros((n, 2)) if stereo_ else np.zeros(n)
+    for s in sons:
+        poser(sortie, s, 0.0)
+    return sortie

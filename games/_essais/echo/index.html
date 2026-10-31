@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Essai écho</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #0e1126;
+        color: #eef0ff;
+        padding: 16px;
+      }
+      button {
+        font: inherit;
+        padding: 8px 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="role">Connexion…</h1>
+    <p id="joueurs"></p>
+    <p id="pas">Pas: 0</p>
+    <button id="envoyer" type="button" hidden>Envoyer un message à l’hôte</button>
+    <p id="recu"></p>
+    <p id="reponse"></p>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

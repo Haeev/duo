@@ -13,11 +13,11 @@
   "player_scarf_sun": 212,
   "player_scarf_planet": 160,
   "player_scarf_comet": 156,
-  "npc_firmin": 2160,
-  "npc_odette": 2156,
-  "npc_basile": 2324,
-  "npc_jeanne": 2588,
-  "npc_lucie": 2292
+  "villager_firmin": 2160,
+  "villager_odette": 2156,
+  "villager_basile": 2324,
+  "villager_jeanne": 2588,
+  "villager_lucie": 2292
  },
  "animations": [
   {
@@ -116,6 +116,6 @@
    "loop": false
   }
  ],
- "file_bytes": 2289244,
+ "file_bytes": 2289332,
  "player_example_tris": 2192
 }

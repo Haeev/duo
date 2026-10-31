@@ -71,6 +71,13 @@ export const LoadedSaveSchema = v.strictObject({
 });
 export type LoadedSave = v.InferOutput<typeof LoadedSaveSchema>;
 
+export const NetChannelIdSchema = v.pipe(Int, v.minValue(0), v.maxValue(NET_CHANNEL_COUNT - 1));
+/**
+ * Contenu d'un message de jeu: le texte JSON produit par le SDK de l'émetteur. La plateforme le
+ * relaie tel quel sans le décoder; le SDK du destinataire le relit et le valide par le schéma du canal.
+ */
+export const NetPayloadSchema = v.pipe(v.string(), v.maxLength(MAX_NET_MESSAGE_BYTES));
+
 export const LinkStateSchema = v.picklist(['good', 'unstable']);
 
 // Plateforme vers jeu.
@@ -98,26 +105,38 @@ export type InitMessage = v.InferOutput<typeof InitMessageSchema>;
 export const PauseReasonSchema = v.picklist(['request', 'disconnect', 'system']);
 export type PauseReason = v.InferOutput<typeof PauseReasonSchema>;
 
-export const StopReasonSchema = v.picklist(['end', 'stopped', 'quit', 'peer-crash', 'disconnect-stop']);
+export const StopReasonSchema = v.picklist([
+  'end',
+  'stopped',
+  'quit',
+  'peer-crash',
+  'disconnect-stop',
+]);
 export type StopReason = v.InferOutput<typeof StopReasonSchema>;
 
-export const SaveStatusSchema = v.picklist(['ok', 'too-large', 'moment-not-declared', 'write-error', 'refused']);
+export const SaveStatusSchema = v.picklist([
+  'ok',
+  'too-large',
+  'moment-not-declared',
+  'write-error',
+  'refused',
+]);
 export type SaveStatus = v.InferOutput<typeof SaveStatusSchema>;
 
 export const PlatformMessageSchema = v.variant('type', [
   InitMessageSchema,
   v.strictObject({ type: v.literal('start'), atSessionMs: Finite }),
-  v.strictObject({ type: v.literal('pause'), reason: PauseReasonSchema, by: v.nullable(PlayerIdSchema) }),
+  v.strictObject({
+    type: v.literal('pause'),
+    reason: PauseReasonSchema,
+    by: v.nullable(PlayerIdSchema),
+  }),
   v.strictObject({ type: v.literal('resume') }),
   v.strictObject({ type: v.literal('settings'), settings: GameSettingsSchema }),
   v.strictObject({ type: v.literal('saveRequest'), moment: v.picklist(['auto', 'exit']) }),
   v.strictObject({ type: v.literal('saveResult'), requestId: Int, status: SaveStatusSchema }),
   v.strictObject({ type: v.literal('stop'), reason: StopReasonSchema, save: v.boolean() }),
-  v.strictObject({
-    type: v.literal('net'),
-    channel: v.pipe(Int, v.minValue(0), v.maxValue(NET_CHANNEL_COUNT - 1)),
-    data: v.unknown(),
-  }),
+  v.strictObject({ type: v.literal('net'), channel: NetChannelIdSchema, data: NetPayloadSchema }),
   v.strictObject({
     type: v.literal('link'),
     rttMs: Finite,
@@ -177,11 +196,15 @@ export const GameMessageSchema = v.variant('type', [
   }),
   v.strictObject({
     type: v.literal('net'),
-    channel: v.pipe(Int, v.minValue(0), v.maxValue(NET_CHANNEL_COUNT - 1)),
+    channel: NetChannelIdSchema,
     mode: v.picklist(['reliable', 'latest']),
-    data: v.unknown(),
+    data: NetPayloadSchema,
   }),
-  v.strictObject({ type: v.literal('fatal'), message: ShortText(2000), stack: v.exactOptional(ShortText(8000)) }),
+  v.strictObject({
+    type: v.literal('fatal'),
+    message: ShortText(2000),
+    stack: v.exactOptional(ShortText(8000)),
+  }),
   v.strictObject({
     type: v.literal('log'),
     level: v.picklist(['info', 'warn', 'error']),

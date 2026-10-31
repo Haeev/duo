@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Petit-déjeuner · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="matin petite-forme parti">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true">
+      <img src="support/scene-veillee.svg" alt="" />
+    </div>
+    <div class="lpl-ui">
+      <main class="lpl-screen lpl-screen--scene" aria-labelledby="titre-matin">
+        <div class="lpl-sheet" style="--lpl-sheet-width: 42rem" data-trap>
+          <div style="display: flex; align-items: center; gap: 1.25rem">
+            <span
+              class="lpl-portrait lpl-portrait--large"
+              data-portrait="camille"
+              data-expression="good"
+              data-on-petite-forme="data-expression=low"
+              ><span class="lpl-token" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg></span
+            ></span>
+            <div>
+              <p class="lpl-overline">
+                Mercredi 5 · 6 h 00 ·
+                <svg class="lpl-icon" aria-hidden="true"><use href="#weather-sun" /></svg> Soleil
+              </p>
+              <h1 class="lpl-sheet__title" id="titre-matin">
+                <span data-when="matin parti">En forme</span
+                ><span data-when="petite-forme">Petite forme</span>
+              </h1>
+              <p class="lpl-sheet__lead" data-when="matin parti">
+                « Bien dormi, bien mangé : en forme. »
+              </p>
+              <p class="lpl-sheet__lead" data-when="petite-forme">
+                « La nuit a été courte et le ventre crie. Un bon souper, ce soir ? »
+              </p>
+            </div>
+          </div>
+
+          <ul class="lpl-quests">
+            <li class="lpl-quest">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-heart" /></svg>
+              <span class="lpl-quest__title"
+                >Ton envie du jour : récolter quelque chose de beau.</span
+              >
+              <span class="lpl-chip">Rien que pour toi</span>
+              <span class="lpl-quest__text">Sacha ne la voit pas. Demande-lui la sienne !</span>
+            </li>
+            <li class="lpl-quest">
+              <span
+                class="lpl-token lpl-token--small"
+                data-player="other"
+                aria-hidden="true"
+                style="grid-row: span 2"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+              <span class="lpl-quest__title">Envie à deux : souper à la même table.</span>
+              <span class="lpl-chip">Chez les deux</span>
+              <span class="lpl-quest__text">À réaliser ensemble aujourd’hui.</span>
+            </li>
+            <li class="lpl-quest">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-letter" /></svg>
+              <span class="lpl-quest__title">Courrier : rien de neuf ce matin.</span>
+              <span></span>
+              <span class="lpl-quest__text">Les poules ont pondu : 3 œufs dans la mangeoire.</span>
+            </li>
+          </ul>
+
+          <div class="lpl-sheet__actions">
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="button"
+              data-autofocus
+            >
+              Commencer ma journée
+            </button>
+            <span class="lpl-player-name" data-when="matin petite-forme"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Sacha prend son petit-déjeuner…</span
+            >
+            <span class="lpl-player-name" data-when="parti"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Sacha a commencé sa journée : l’horloge tourne.</span
+            >
+          </div>
+          <p class="lpl-field__help" data-when="matin petite-forme">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-pause" /></svg> L’horloge reste
+            à 6 h jusqu’à ce que l’un de vous commence sa journée.
+          </p>
+        </div>
+      </main>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

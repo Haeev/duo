@@ -8,7 +8,9 @@ export const PLAYER_COLOR_IDS = ['orb', 'crescent', 'star', 'sun', 'planet', 'co
 export type PlayerColorId = (typeof PLAYER_COLOR_IDS)[number];
 
 /** Couleur et nom de chaque profil, repris de `design/identite/b/joueurs.json`. */
-export const PLAYER_COLORS: Readonly<Record<PlayerColorId, { readonly hex: string; readonly label: string }>> = {
+export const PLAYER_COLORS: Readonly<
+  Record<PlayerColorId, { readonly hex: string; readonly label: string }>
+> = {
   orb: { hex: '#5CE1E6', label: 'Astre aqua' },
   crescent: { hex: '#8D6CFF', label: 'Croissant mauve' },
   star: { hex: '#D4F27A', label: 'Étoile anis' },

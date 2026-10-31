@@ -1,0 +1,180 @@
+/**
+ * Contexte de la simulation: l'état du monde, le contenu, la carte, le
+ * générateur, les événements du pas et des caches qui ne se sauvegardent pas.
+ */
+import { createRandom, type RandomSource } from '@duo/sdk/sim';
+import type { ClickTarget } from '../etat/actions';
+import type { GameMap } from '../etat/carte';
+import type {
+  Character,
+  CharacterId,
+  GameNotification,
+  NotificationKind,
+  Vec2,
+  WorldEvent,
+  WorldState,
+} from '../etat/types';
+import type { Content } from '../donnees/types';
+import { SIM_DT } from './constantes';
+
+/** Caches recalculables, jamais sauvegardés ni transmis. */
+export interface Runtime {
+  /** Cases bloquées par les arbres debout et les meubles (0 ou 1). */
+  dynamicBlocked: Uint8Array;
+  dynamicDirty: boolean;
+  /** Trajet restant d'un clic au sol. */
+  charPaths: Record<CharacterId, Vec2[]>;
+  /** Ce qu'il faudra faire en arrivant (clic sur une cible). */
+  pendingAct: Record<CharacterId, ClickTarget | null>;
+  villagerPaths: Record<string, { target: string; path: Vec2[] }>;
+  /** Dernière réplique quotidienne entendue, par joueur et par habitant. */
+  lastDaily: Record<string, string>;
+  /** Le monde a changé de façon discrète à ce pas. */
+  changed: boolean;
+  /** Une suite d'effets est en cours d'exécution (pas de réentrance). */
+  pumping: boolean;
+  /** Décalage de chaque porteur par rapport à la poutre. */
+  beamOffsets: Record<CharacterId, Vec2>;
+  /** « Il manque... » déjà dit pendant ce maintien de l'action. */
+  holdNotified: Record<CharacterId, boolean>;
+}
+
+export interface Sim {
+  readonly content: Content;
+  readonly map: GameMap;
+  world: WorldState;
+  rng: RandomSource;
+  events: WorldEvent[];
+  runtime: Runtime;
+}
+
+export function createRuntime(map: GameMap): Runtime {
+  return {
+    dynamicBlocked: new Uint8Array(map.width * map.height),
+    dynamicDirty: true,
+    charPaths: { p1: [], p2: [] },
+    pendingAct: { p1: null, p2: null },
+    villagerPaths: {},
+    lastDaily: {},
+    changed: true,
+    pumping: false,
+    beamOffsets: { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } },
+    holdNotified: { p1: false, p2: false },
+  };
+}
+
+/** Crée le contexte autour d'un état (nouveau ou rechargé). */
+export function wrapWorld(content: Content, map: GameMap, world: WorldState): Sim {
+  return { content, map, world, rng: createRandom(world.rng), events: [], runtime: createRuntime(map) };
+}
+
+export function dt(): number {
+  return SIM_DT;
+}
+
+export function character(sim: Sim, id: CharacterId): Character {
+  const found = sim.world.characters.find((c) => c.id === id);
+  if (found === undefined) throw new Error(`personnage inconnu: ${id}`);
+  return found;
+}
+
+export function partnerOf(id: CharacterId): CharacterId {
+  return id === 'p1' ? 'p2' : 'p1';
+}
+
+export function emit(sim: Sim, event: WorldEvent): void {
+  sim.events.push(event);
+  sim.runtime.changed = true;
+}
+
+export function changed(sim: Sim): void {
+  sim.runtime.changed = true;
+}
+
+export function newId(sim: Sim, prefix: string): string {
+  sim.world.nextId += 1;
+  return `${prefix}${sim.world.nextId}`;
+}
+
+/** Remplace `{nom}` dans un texte. Un nom absent reste tel quel (jetons de touches). */
+export function format(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+    const value = vars[name];
+    return value === undefined ? whole : String(value);
+  });
+}
+
+export function message(sim: Sim, key: string, vars: Record<string, string | number> = {}): string {
+  const template = sim.content.texts.messages[key];
+  return template === undefined ? key : format(template, vars);
+}
+
+/** Nom d'un objet au singulier ou au pluriel. */
+export function itemName(sim: Sim, item: string, count: number): string {
+  const def = sim.content.items[item];
+  if (def === undefined) return item;
+  return count > 1 ? def.plural : def.name;
+}
+
+export function notify(
+  sim: Sim,
+  who: CharacterId | 'both',
+  kind: NotificationKind,
+  text: string,
+  extra: { hint?: string; proposal?: string } = {},
+): void {
+  const targets: CharacterId[] = who === 'both' ? ['p1', 'p2'] : [who];
+  for (const id of targets) {
+    const c = character(sim, id);
+    sim.world.nextId += 1;
+    const notification: GameNotification = {
+      id: sim.world.nextId,
+      kind,
+      text,
+      hint: extra.hint ?? null,
+      proposal: extra.proposal ?? null,
+      tick: sim.world.tick,
+    };
+    c.notifications.push(notification);
+    const kept = sim.content.settings.feel.notificationsKept;
+    if (c.notifications.length > kept) c.notifications.splice(0, c.notifications.length - kept);
+  }
+  sim.runtime.changed = true;
+}
+
+export function say(
+  sim: Sim,
+  who: CharacterId | 'both',
+  key: string,
+  vars: Record<string, string | number> = {},
+): void {
+  notify(sim, who, 'message', message(sim, key, vars));
+}
+
+/** Prénom de l'autre joueur, pour `{partner}`. */
+export function partnerName(sim: Sim, id: CharacterId): string {
+  return character(sim, partnerOf(id)).name;
+}
+
+/** Ajoute à un compteur, pour le duo et pour le personnage s'il est donné. */
+export function bump(sim: Sim, key: string, by: CharacterId | null, amount = 1): void {
+  const counters = sim.world.counters;
+  counters.duo[key] = (counters.duo[key] ?? 0) + amount;
+  if (by !== null) counters[by][key] = (counters[by][key] ?? 0) + amount;
+  sim.runtime.changed = true;
+}
+
+export function distance(a: Vec2, b: Vec2): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+export function point(sim: Sim, id: string): Vec2 {
+  const found = sim.map.points[id];
+  if (found === undefined) throw new Error(`point de carte inconnu: ${id}`);
+  return found;
+}
+
+/** Secondes de simulation en pas. */
+export function secondsToTicks(seconds: number): number {
+  return Math.max(1, Math.round(seconds / SIM_DT));
+}

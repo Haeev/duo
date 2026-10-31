@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Création des personnages · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+    <style>
+      /* Disposition propre à cet écran: formulaire, aperçu, l'autre joueur. */
+      .creation {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+        gap: var(--lpl-space-5);
+        width: min(64rem, 100%);
+        align-items: start;
+      }
+      .creation__apercu {
+        display: grid;
+        justify-items: center;
+        gap: var(--lpl-space-3);
+      }
+      .creation__apercu > .lpl-portrait {
+        --lpl-portrait-size: clamp(6rem, 22vh, 10rem);
+      }
+      .creation__autre {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        align-items: center;
+        gap: var(--lpl-space-1) var(--lpl-space-3);
+        width: 100%;
+      }
+      .creation__autre .lpl-portrait {
+        --lpl-portrait-size: 4.5rem;
+        grid-row: span 2;
+      }
+    </style>
+  </head>
+  <body data-states="edition erreur fini prets">
+    <script src="support/icones.js"></script>
+    <div class="lpl-ui">
+      <main class="lpl-screen" aria-labelledby="titre-creation">
+        <div class="creation" data-trap>
+          <!-- Formulaire -->
+          <form
+            class="lpl-sheet"
+            id="formulaire-perso"
+            style="--lpl-sheet-width: 100%"
+            onsubmit="
+              event.preventDefault();
+              location.hash = 'fini';
+            "
+          >
+            <div>
+              <p class="lpl-overline">Samedi 1, 9 h 50 · le train approche d’Aubrune</p>
+              <h1 class="lpl-sheet__title" id="titre-creation">Qui descend du train ?</h1>
+            </div>
+
+            <div class="lpl-field" data-when="edition erreur">
+              <label class="lpl-field__label" for="prenom">Prénom</label>
+              <input
+                class="lpl-field__input"
+                id="prenom"
+                type="text"
+                maxlength="16"
+                value="Camille"
+                autocomplete="off"
+                spellcheck="false"
+                aria-describedby="aide-prenom erreur-prenom"
+                data-autofocus
+                data-on-erreur="value=;aria-invalid=true"
+              />
+              <span class="lpl-field__help" id="aide-prenom"
+                >Ton pseudo Duo, à changer si tu veux. 16 caractères au plus.</span
+              >
+              <span class="lpl-field__error" id="erreur-prenom" role="alert"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-warning" /></svg>Il faut un
+                prénom, même court.</span
+              >
+            </div>
+
+            <fieldset class="lpl-choice-group" data-when="edition erreur">
+              <legend>Coiffure</legend>
+              <div class="lpl-choice-group__options">
+                <label class="lpl-option"
+                  ><input type="radio" name="coiffure" value="short" checked /><span
+                    class="lpl-portrait lpl-portrait--small"
+                    data-portrait="camille"
+                    data-expression="good"
+                    data-hair="short"
+                  ></span
+                  >Courte</label
+                >
+                <label class="lpl-option"
+                  ><input type="radio" name="coiffure" value="messy" /><span
+                    class="lpl-portrait lpl-portrait--small"
+                    data-portrait="camille"
+                    data-expression="good"
+                    data-hair="messy"
+                  ></span
+                  >En bataille</label
+                >
+                <label class="lpl-option"
+                  ><input type="radio" name="coiffure" value="tied" /><span
+                    class="lpl-portrait lpl-portrait--small"
+                    data-portrait="camille"
+                    data-expression="good"
+                    data-hair="tied"
+                  ></span
+                  >Nouée</label
+                >
+              </div>
+            </fieldset>
+
+            <fieldset class="lpl-choice-group" data-when="edition erreur">
+              <legend>Tenue</legend>
+              <div class="lpl-choice-group__options">
+                <label class="lpl-option"
+                  ><input type="radio" name="tenue" value="bleu_de_travail" checked /><span
+                    class="lpl-option__swatch"
+                    style="--lpl-swatch: #5c7fa6"
+                  ></span
+                  >Bleu de travail</label
+                >
+                <label class="lpl-option"
+                  ><input type="radio" name="tenue" value="rouille" /><span
+                    class="lpl-option__swatch"
+                    style="--lpl-swatch: #b5663f"
+                  ></span
+                  >Rouille</label
+                >
+                <label class="lpl-option"
+                  ><input type="radio" name="tenue" value="sauge" /><span
+                    class="lpl-option__swatch"
+                    style="--lpl-swatch: #8ba37b"
+                  ></span
+                  >Sauge</label
+                >
+                <label class="lpl-option"
+                  ><input type="radio" name="tenue" value="moutarde" /><span
+                    class="lpl-option__swatch"
+                    style="--lpl-swatch: #d4a746"
+                  ></span
+                  >Moutarde</label
+                >
+              </div>
+            </fieldset>
+
+            <p
+              class="lpl-field__help"
+              data-when="edition erreur"
+              style="display: flex; align-items: center; gap: 0.5rem"
+            >
+              <span class="lpl-token" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg
+              ></span>
+              Ton foulard porte la couleur et le symbole de ton profil Duo : astre aqua.
+            </p>
+
+            <!-- Fini le premier: la lettre de la coopérative en attendant l'autre -->
+            <div class="lpl-letter" data-when="fini prets" style="font-size: var(--lpl-text-md)">
+              <span class="lpl-stamp">Coopérative de la ligne</span>
+              <p class="lpl-letter__from">Une lettre t’attend</p>
+              <p>
+                « Chers nouveaux gardiens de la Halte d’Aubrune, la coopérative de la ligne vous
+                souhaite la bienvenue. Voici 200 sous pour vos premiers pas, et notre première
+                commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain
+                à 16 h : 12 radis, 3 laitues, 6 œufs, 10 planches. Ce que vous commandez au
+                catalogue avant vendredi minuit arrive par le train. Bonne semaine ! »
+              </p>
+            </div>
+
+            <div class="lpl-sheet__actions">
+              <button
+                class="lpl-button"
+                type="button"
+                data-when="fini"
+                data-goto="edition"
+                data-autofocus
+              >
+                Modifier mon personnage
+              </button>
+              <span class="lpl-chip lpl-chip--waiting" data-when="fini"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En
+                attente de Sacha…</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="prets" role="status"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>Le train
+                entre en gare…</span
+              >
+            </div>
+          </form>
+
+          <!-- Aperçu et l'autre joueur -->
+          <div class="creation__apercu">
+            <span class="lpl-portrait" data-portrait="camille" data-expression="great"
+              ><span class="lpl-token lpl-token--large" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg></span
+            ></span>
+            <p class="lpl-display" style="font-size: var(--lpl-text-xl)">
+              <span data-when="edition fini prets">Camille</span
+              ><span data-when="erreur" style="color: var(--lpl-color-ink-muted)">Sans prénom</span>
+            </p>
+            <button
+              class="lpl-button lpl-button--primary lpl-button--large"
+              type="submit"
+              form="formulaire-perso"
+              data-when="edition erreur"
+            >
+              C’est parti !
+            </button>
+            <div class="lpl-player-card creation__autre" aria-label="Sacha">
+              <span class="lpl-portrait" data-portrait="sacha" data-expression="good"
+                ><span class="lpl-token" data-player="other" aria-hidden="true"
+                  ><svg><use href="#player-crescent" /></svg></span
+              ></span>
+              <span class="lpl-player-card__name">Sacha</span>
+              <span class="lpl-chip" data-when="edition erreur fini"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Choisit
+                sa tenue…</span
+              >
+              <span class="lpl-chip lpl-chip--ready" data-when="prets"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>C’est
+                parti</span
+              >
+            </div>
+            <p class="lpl-field__help" style="text-align: center">
+              Chacun crée son personnage sur son ordinateur, en même temps.
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

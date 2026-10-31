@@ -24,6 +24,7 @@
  * - Tout l'état est du JSON pur (ni Map, ni Set, ni classe): il se sauvegarde
  *   et se transmet tel quel.
  */
+import type { Effect } from '../donnees/types';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -85,9 +86,9 @@ export interface WorldState {
   tick: number;
   /** Augmente à chaque changement discret (hors déplacements): sert au réseau. */
   revision: number;
-  /** Graine de la session et état du générateur (jamais `Math.random`). */
+  /** Graine de la session et état du générateur (sfc32 du SDK, jamais `Math.random`). */
   seed: number;
-  rng: number;
+  rng: [number, number, number, number];
   phase: Phase;
   clock: ClockState;
   weather: Weather;
@@ -129,10 +130,14 @@ export interface WorldState {
   dialoguesDone: string[];
   /** Scène à deux en cours (dialogue partagé), ou `null`. */
   scene: SceneState | null;
-  /** Scènes à deux en attente (fin de la démo), jouées l'une après l'autre. */
-  sceneQueue: DialogueId[];
   /** Compteurs d'actions, par personnage et pour le duo (conditions des quêtes). */
   counters: Counters;
+  /** Les mêmes compteurs au début de la journée (conditions « depuis ce matin » des envies). */
+  countersAtDawn: Counters;
+  /** Suites d'effets en cours (une scène les suspend jusqu'à sa fin). */
+  scripts: ScriptState[];
+  /** Prochain identifiant unique (meubles, objets au sol, propositions, notifications). */
+  nextId: number;
   /** Résultat de la commande, une fois payée au départ du train. */
   orderResult: OrderResult | null;
   /** Récapitulatif de fin, une fois la démo finie. */
@@ -245,6 +250,22 @@ export interface Character {
   midnightReturn: boolean;
   /** Pas d'entrée depuis ce tick (absence, P1). */
   lastInputTick: number;
+  /** Besoins fixés par un effet pour la prochaine nuit (souper d'Odette), ou `null`. */
+  needsSet: { belly: number | null; sleep: number | null; heart: number | null };
+  /** Ce qui compte au Cœur aujourd'hui. */
+  heartToday: { envie: boolean; sharedEnvie: boolean; ateTogether: boolean; gesture: boolean };
+  /** Astuces en attente (une seule à la fois à l'écran). */
+  hintQueue: HintId[];
+  /** Tick de la dernière astuce montrée. */
+  lastHintTick: number;
+  /** Secondes passées d'affilée près de chaque point suivi (envies « rester à »). */
+  stays: Record<PointId, number>;
+  /** Dernier plat mangé ce soir (repas pris ensemble). */
+  lastMeal: { item: ItemId; tick: number } | null;
+  /** Envies déjà tirées pour ce joueur (jamais deux fois la même). */
+  envieHistory: EnvieId[];
+  /** Fabrication en cours à l'établi ou au réchaud, ou `null`. */
+  crafting: { recipe: RecipeId; endsAt: number } | null;
 }
 
 export type CharacterStatus =
@@ -640,6 +661,12 @@ export interface SessionStats {
   highlights: string[];
 }
 
+/** Suite d'effets des données, exécutée dans l'ordre; `actor`: le joueur concerné. */
+export interface ScriptState {
+  effects: Effect[];
+  actor: CharacterId | null;
+}
+
 // ---------------------------------------------------------------------------
 // Événements ponctuels (sons, effets), hors de l'état
 
@@ -671,6 +698,8 @@ export type WorldEvent =
   | { type: 'bought'; by: CharacterId; item: ItemId; count: number; price: number }
   | { type: 'sold'; by: CharacterId; item: ItemId; count: number; price: number }
   | { type: 'deposited'; by: CharacterId; item: ItemId; count: number }
+  | { type: 'money'; amount: number }
+  | { type: 'order_paid'; amount: number; linesDone: number }
   | { type: 'proposal'; by: CharacterId; proposal: string }
   | { type: 'proposal_resolved'; proposal: string; accepted: boolean }
   | { type: 'gave'; by: CharacterId; to: VillagerId | CharacterId; item: ItemId; count: number }

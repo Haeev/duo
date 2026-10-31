@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "vite build && pnpm --dir ../../games/_essais/echo run build && playwright test"
   },
   "dependencies": {
     "@duo/protocol": "workspace:*",

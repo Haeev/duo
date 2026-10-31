@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "id": "essai-echo",
+  "name": "Essai écho",
+  "version": "0.1.0",
+  "sdk": "1.0",
+  "view": "2d",
+  "engine": "none",
+  "mode": "coop",
+  "play": "session",
+  "durationMinutes": [1, 5],
+  "network": "host-authority",
+  "entry": "index.html",
+  "thumbnail": "vignette.png",
+  "description": "Jeu d'essai du faux hôte: l'invité envoie un message, l'hôte répond.",
+  "whatsNew": "",
+  "actions": [{ "id": "envoyer", "label": "Envoyer", "keys": ["Space"], "mouse": [] }],
+  "saves": { "slots": 1, "maxBytes": 4096, "moments": ["level-end", "exit"] },
+  "credits": null
+}

@@ -1,0 +1,170 @@
+/**
+ * Potager (FE-02 à FE-04, FE-06 simplifié), bois (hache), eau (puits et
+ * tonneau) et bêche libre (énigme d'Émile).
+ */
+import type { Cell, Character, GardenCell, Quality, Tree } from '../etat/types';
+import { type Sim, bump, emit, message, notify, partnerName, partnerOf, say, secondsToTicks } from './contexte';
+import { queueHint } from './astuces';
+import { durationMultiplier, spend } from './besoins';
+import { giveToCharacter, heldStack, takeFromBag } from './sac';
+import { ITEM } from './ids';
+import { updateQuests } from './quetes';
+
+export function gardenCellAt(sim: Sim, cell: Cell): GardenCell | null {
+  return sim.world.garden.find((g) => g.cell.cx === cell.cx && g.cell.cy === cell.cy) ?? null;
+}
+
+/** Lance l'animation d'un geste simple et bloque la marche pendant sa durée. */
+export function gesture(sim: Sim, c: Character, kind: Character['action']['kind'], seconds: number, target: { x: number; y: number } | null): void {
+  c.action = { kind, since: sim.world.tick, duration: secondsToTicks(seconds * durationMultiplier(sim, c)), target };
+}
+
+function actionSeconds(sim: Sim, key: string): number {
+  return sim.content.settings.feel.actionSeconds[key] ?? 0.4;
+}
+
+function centre(cell: Cell): { x: number; y: number } {
+  return { x: cell.cx + 0.5, y: cell.cy + 0.5 };
+}
+
+function toolUsed(sim: Sim, c: Character): void {
+  queueHint(sim, c.id, { on: 'tool_used' });
+}
+
+export function till(sim: Sim, c: Character, g: GardenCell): void {
+  if (g.soil !== 'grass') return;
+  g.soil = 'tilled';
+  spend(sim, c, 'till');
+  gesture(sim, c, 'till', actionSeconds(sim, 'till'), centre(g.cell));
+  bump(sim, 'tilled', c.id);
+  emit(sim, { type: 'tilled', by: c.id, cell: { ...g.cell } });
+  toolUsed(sim, c);
+}
+
+export function sow(sim: Sim, c: Character, g: GardenCell, seedItem: string): void {
+  const seed = sim.content.items[seedItem];
+  const cropId = seed?.plants ?? null;
+  const crop = cropId === null ? undefined : sim.content.crops[cropId];
+  if (g.soil !== 'tilled' || g.crop !== null || crop === undefined || cropId === null) return;
+  if (takeFromBag(c, seedItem, 1).length === 0) return;
+  g.crop = {
+    crop: cropId,
+    days: 0,
+    stage: crop.stagesByDay[0] ?? 'seed',
+    ripe: false,
+    wateredEveryDay: true,
+    sownDay: sim.world.clock.day,
+    sownBy: c.id,
+  };
+  spend(sim, c, 'sow');
+  gesture(sim, c, 'sow', actionSeconds(sim, 'sow'), centre(g.cell));
+  bump(sim, 'sowed', c.id);
+  bump(sim, `sowed:${cropId}`, c.id);
+  emit(sim, { type: 'sowed', by: c.id, cell: { ...g.cell }, crop: cropId });
+  queueHint(sim, c.id, { on: 'sowed' });
+}
+
+export function water(sim: Sim, c: Character, g: GardenCell): void {
+  if (g.soil !== 'tilled') return;
+  if (c.water <= 0) {
+    emit(sim, { type: 'can_empty', by: c.id });
+    queueHint(sim, c.id, { on: 'tool_empty', item: heldStack(c)?.item ?? '' });
+    return;
+  }
+  c.water -= 1;
+  g.wet = true;
+  spend(sim, c, 'water');
+  gesture(sim, c, 'water', actionSeconds(sim, 'water'), centre(g.cell));
+  bump(sim, 'watered', c.id);
+  emit(sim, { type: 'watered', by: c.id, cell: { ...g.cell } });
+  toolUsed(sim, c);
+  if (c.water === 0) {
+    emit(sim, { type: 'can_empty', by: c.id });
+    queueHint(sim, c.id, { on: 'tool_empty', item: heldStack(c)?.item ?? '' });
+  }
+}
+
+export function harvest(sim: Sim, c: Character, g: GardenCell): void {
+  const crop = g.crop;
+  if (crop === null || !crop.ripe) {
+    const last = g.lastHarvest;
+    const window = secondsToTicks(sim.content.settings.feel.alreadyTakenSeconds);
+    if (crop === null && last !== null && last.by !== c.id && sim.world.tick - last.tick <= window) {
+      say(sim, c.id, 'already_taken', { partner: partnerName(sim, c.id) });
+      emit(sim, { type: 'already_taken', by: c.id, other: partnerOf(c.id), cell: { ...g.cell } });
+    }
+    return;
+  }
+  const def = sim.content.crops[crop.crop];
+  if (def === undefined) return;
+  const quality: Quality = crop.wateredEveryDay ? 'fine' : 'ordinary';
+  const count = def.yieldPerCell;
+  g.crop = null;
+  g.lastHarvest = { by: c.id, tick: sim.world.tick };
+  giveToCharacter(sim, c, def.harvest, quality, count);
+  spend(sim, c, 'harvest');
+  gesture(sim, c, 'harvest', actionSeconds(sim, 'harvest'), centre(g.cell));
+  for (const key of ['harvested', `harvested:${def.harvest}`, `harvested:q:${quality}`, `harvested:${def.harvest}:q:${quality}`]) {
+    bump(sim, key, c.id, count);
+  }
+  emit(sim, { type: 'harvested', by: c.id, cell: { ...g.cell }, item: def.harvest, quality, count });
+  if (quality === 'fine') notify(sim, c.id, 'message', message(sim, 'fine_quality'));
+}
+
+/** Chaque matin: pousse si arrosée la veille, sinon attente (et la qualité « belle » est perdue). */
+export function morningGrowth(sim: Sim): void {
+  const rain = sim.world.weather === 'rain';
+  for (const g of sim.world.garden) {
+    const crop = g.crop;
+    if (crop !== null && !crop.ripe) {
+      const def = sim.content.crops[crop.crop];
+      if (g.wet && def !== undefined) {
+        crop.days += 1;
+        crop.stage = def.stagesByDay[Math.min(crop.days, def.growthDays)] ?? 'ripe';
+        crop.ripe = crop.days >= def.growthDays;
+      } else {
+        crop.wateredEveryDay = false;
+      }
+    }
+    g.wet = rain && g.soil === 'tilled';
+  }
+}
+
+/** La pluie du jour arrose tout le potager (FE-02). */
+export function rainWaters(sim: Sim): void {
+  if (sim.world.weather !== 'rain') return;
+  for (const g of sim.world.garden) if (g.soil === 'tilled') g.wet = true;
+}
+
+export function refill(sim: Sim, c: Character, at: string): void {
+  const capacity = Object.values(sim.content.items).find((i) => i.capacity !== null)?.capacity ?? 0;
+  c.water = capacity;
+  gesture(sim, c, 'refill', actionSeconds(sim, 'refill'), null);
+  emit(sim, { type: 'refilled', by: c.id, at });
+}
+
+export function chop(sim: Sim, c: Character, tree: Tree): void {
+  if (tree.felled) return;
+  const s = sim.content.settings.trees;
+  tree.hits += 1;
+  tree.lastHitTick = sim.world.tick;
+  spend(sim, c, 'chop');
+  gesture(sim, c, 'chop', actionSeconds(sim, 'chop'), { x: tree.pos.x, y: tree.pos.y });
+  toolUsed(sim, c);
+  const felled = tree.hits >= s.chopsPerTree;
+  if (felled) {
+    tree.felled = true;
+    sim.runtime.dynamicDirty = true;
+    giveToCharacter(sim, c, ITEM.log, 'ordinary', s.logsPerTree);
+    bump(sim, 'chopped', c.id);
+  }
+  emit(sim, { type: 'chop', by: c.id, tree: tree.id, felled });
+}
+
+/** Bêcher hors du potager: rien ne pousse, mais l'énigme d'Émile écoute. */
+export function dig(sim: Sim, c: Character, at: { x: number; y: number }): void {
+  spend(sim, c, 'till');
+  gesture(sim, c, 'till', actionSeconds(sim, 'dig'), at);
+  const found = updateQuests(sim, { tool: ITEM.hoe, pos: at, by: c.id });
+  emit(sim, { type: 'dig', by: c.id, cell: { cx: Math.floor(at.x), cy: Math.floor(at.y) }, found });
+}

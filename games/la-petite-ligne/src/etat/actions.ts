@@ -9,8 +9,8 @@
  */
 import type { Cell, CharacterId, ItemId, MenuKind, Quality, RecipeId, VillagerId } from './types';
 
-/** Entrées continues d'un pas (déplacement et action maintenue). */
-export interface InputFrame {
+/** Commandes continues d'un pas (déplacement et action maintenue), après traduction des touches. */
+export interface ControlFrame {
   /** Numéro croissant chez le joueur (réconciliation de la prédiction). */
   seq: number;
   /** Direction voulue dans le repère du sol, déjà tournée selon la caméra (-1 à 1). */

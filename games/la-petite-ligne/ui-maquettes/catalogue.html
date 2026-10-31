@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Catalogue de la coopérative · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="catalogue attente trop-cher ferme livre">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true"><img src="support/scene-jour.svg" alt="" /></div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud lpl-pass-through">
+        <div class="lpl-hud__top-left">
+          <div class="lpl-clock">
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true" data-when="catalogue attente trop-cher ferme livre">
+                <use href="#weather-sun" /></svg
+            ></span>
+            <span class="lpl-clock__day" data-when="catalogue attente trop-cher"
+              >Jeudi 6 · Nuages</span
+            >
+            <span class="lpl-clock__day" data-when="ferme">Samedi 8 · Soleil</span>
+            <span class="lpl-clock__day" data-when="livre">Samedi 8 · Soleil</span>
+            <span class="lpl-clock__time" data-when="catalogue attente trop-cher">13 h 40</span>
+            <span class="lpl-clock__time" data-when="ferme">8 h 10</span>
+            <span class="lpl-clock__time" data-when="livre">10 h 20</span>
+          </div>
+          <div class="lpl-purse">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>
+            <span class="lpl-purse__amount" data-when="catalogue ferme livre">198</span>
+            <span class="lpl-purse__amount" data-when="attente">198</span>
+            <span class="lpl-purse__amount" data-when="trop-cher">25</span>
+            <span class="lpl-purse__unit">sous</span>
+            <span class="lpl-purse__note" data-when="attente">dont 120 réservés</span>
+          </div>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="good"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+            ></span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#hoe" /></svg>Bêche au
+              potager</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <section class="lpl-panel" aria-labelledby="titre-catalogue" data-trap>
+        <header class="lpl-panel__header">
+          <svg class="lpl-icon" aria-hidden="true"><use href="#ui-notebook" /></svg>
+          <div>
+            <h2 class="lpl-panel__title" id="titre-catalogue">Catalogue de la coopérative</h2>
+            <p class="lpl-panel__subtitle" data-when="catalogue attente trop-cher">
+              Commande avant vendredi minuit, livraison par le train de samedi, 10 h
+            </p>
+            <p class="lpl-panel__subtitle" data-when="ferme">
+              Les commandes sont parties avec la poste
+            </p>
+            <p class="lpl-panel__subtitle" data-when="livre">
+              Le train de samedi a apporté vos colis
+            </p>
+          </div>
+          <span class="lpl-purse lpl-panel__close" aria-label="Bourse commune"
+            ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+            ><span class="lpl-purse__amount" data-when="catalogue attente ferme livre">198</span
+            ><span class="lpl-purse__amount" data-when="trop-cher">25</span
+            ><span class="lpl-purse__unit">sous</span></span
+          >
+          <button
+            class="lpl-button lpl-button--on-dark"
+            type="button"
+            data-close
+            aria-label="Fermer (Retour arrière)"
+          >
+            Fermer <span class="lpl-key">Retour arrière</span>
+          </button>
+        </header>
+
+        <div class="lpl-panel__body">
+          <div class="lpl-order__summary" data-when="catalogue attente trop-cher">
+            <strong>Déjà commandé : lampe à pétrole, 40 sous</strong>
+            <span>À partir de 100 sous, l’achat attend l’accord de l’autre.</span>
+          </div>
+          <div class="lpl-order__summary" data-when="ferme">
+            <strong
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-lock" /></svg> Le catalogue
+              est fermé.</strong
+            >
+            <span>Ce que vous avez commandé arrive à 10 h par le train.</span>
+          </div>
+          <div class="lpl-order__summary" data-when="livre">
+            <strong
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#parcel" /></svg> 2 colis dans le
+              coffre de la maison</strong
+            >
+            <span>Prends un colis dans le coffre pour poser le meuble.</span>
+          </div>
+
+          <div class="lpl-catalog" data-nav="grid" data-game-panel>
+            <!-- Lampe: déjà commandée -->
+            <button
+              class="lpl-product"
+              type="button"
+              data-nav-item
+              aria-pressed="true"
+              data-on-livre="aria-pressed=false"
+            >
+              <svg class="lpl-product__icon" aria-hidden="true"><use href="#oil-lamp" /></svg>
+              <span class="lpl-product__name">Lampe à pétrole</span>
+              <span class="lpl-product__effect">Lumière chaude · beauté</span>
+              <span class="lpl-product__status" data-when="catalogue attente trop-cher ferme"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >40 sous</span
+                >
+                · arrive samedi</span
+              >
+              <span class="lpl-product__status" data-when="livre">Dans le coffre</span>
+              <span class="lpl-stamp lpl-stamp--green" data-when="catalogue attente trop-cher ferme"
+                >Commandé</span
+              >
+              <span class="lpl-stamp" data-when="livre">Livré</span>
+            </button>
+            <!-- Tapis -->
+            <button
+              class="lpl-product"
+              type="button"
+              data-nav-item
+              aria-pressed="false"
+              data-autofocus
+              data-on-trop-cher="aria-disabled=true"
+              data-on-ferme="aria-disabled=true"
+              data-on-livre="aria-disabled=true"
+            >
+              <svg class="lpl-product__icon" aria-hidden="true"><use href="#rug" /></svg>
+              <span class="lpl-product__name">Tapis</span>
+              <span class="lpl-product__effect">Confort</span>
+              <span class="lpl-product__status" data-when="catalogue attente"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >60 sous</span
+                >
+                · Entrée pour commander</span
+              >
+              <span class="lpl-product__status" data-when="trop-cher"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >60 sous</span
+                ><br /><span style="color: var(--lpl-color-stamp)">Il manque 35 sous.</span></span
+              >
+              <span class="lpl-product__status" data-when="ferme livre"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >60 sous</span
+                >
+                · fermé</span
+              >
+            </button>
+            <!-- Rideaux -->
+            <button
+              class="lpl-product"
+              type="button"
+              data-nav-item
+              aria-pressed="false"
+              data-on-ferme="aria-disabled=true"
+              data-on-trop-cher="aria-pressed=!"
+              data-on-livre="aria-pressed=false"
+            >
+              <svg class="lpl-product__icon" aria-hidden="true"><use href="#curtains" /></svg>
+              <span class="lpl-product__name">Rideaux</span>
+              <span class="lpl-product__effect">Beauté · « font fureur à la ville »</span>
+              <span class="lpl-product__status" data-when="catalogue attente trop-cher"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >30 sous</span
+                ><span data-when="trop-cher"
+                  ><br /><span style="color: var(--lpl-color-stamp)">Il manque 5 sous.</span></span
+                ><span data-when="catalogue attente"> · Entrée pour commander</span></span
+              >
+              <span class="lpl-product__status" data-when="ferme"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >30 sous</span
+                >
+                · fermé</span
+              >
+              <span class="lpl-product__status" data-when="livre">Dans le coffre</span>
+              <span class="lpl-stamp" data-when="livre">Livré</span>
+            </button>
+            <!-- Poste à galène: gros achat -->
+            <button
+              class="lpl-product"
+              type="button"
+              data-nav-item
+              aria-pressed="false"
+              data-on-attente="data-state=waiting"
+              data-on-trop-cher="aria-disabled=true"
+              data-on-ferme="aria-disabled=true"
+              data-on-livre="aria-disabled=true"
+            >
+              <svg class="lpl-product__icon" aria-hidden="true"><use href="#crystal-radio" /></svg>
+              <span class="lpl-product__name">Poste à galène</span>
+              <span class="lpl-product__effect">Il annoncera le temps du lendemain</span>
+              <span class="lpl-product__status" data-when="catalogue"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >120 sous</span
+                ><br /><span class="lpl-chip" style="margin-top: 0.25rem"
+                  ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                    ><svg><use href="#player-crescent" /></svg></span
+                  >Demande l’accord de Sacha</span
+                ></span
+              >
+              <span class="lpl-product__status" data-when="attente"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>120 sous
+                  réservés</span
+                ><br /><span class="lpl-chip lpl-chip--waiting" style="margin-top: 0.25rem"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>En
+                  attente de l’accord de Sacha…</span
+                ></span
+              >
+              <span class="lpl-product__status" data-when="trop-cher"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >120 sous</span
+                ><br /><span style="color: var(--lpl-color-stamp)">Il manque 95 sous.</span></span
+              >
+              <span class="lpl-product__status" data-when="ferme livre"
+                ><span class="lpl-product__price"
+                  ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg
+                  >120 sous</span
+                >
+                · fermé</span
+              >
+            </button>
+          </div>
+          <div class="lpl-sheet__actions" data-when="attente" style="margin-top: 0.75rem">
+            <button class="lpl-button" type="button">Retirer ma proposition</button>
+          </div>
+        </div>
+
+        <footer class="lpl-panel__footer">
+          <span class="lpl-keys">
+            <span><span class="lpl-key">←</span><span class="lpl-key">→</span> choisir</span>
+            <span><span class="lpl-key">Entrée</span> commander</span>
+            <span><span class="lpl-key">Retour arrière</span> fermer</span>
+          </span>
+          <span data-when="catalogue attente trop-cher">Sacha voit ce que tu commandes.</span>
+        </footer>
+      </section>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

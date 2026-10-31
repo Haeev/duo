@@ -110,7 +110,7 @@ def head_block(g, k=1.0):
     for s in (1, -1):
         g.box((0.025 * k, 0.05 * k, 0.065 * k), loc=(s * (hx / 2 + 0.008 * k), 0.005, hc - 0.005 * k),
               color="skin_shade", bevel=0.008, bone="head")
-    g.box((0.03 * k, 0.022 * k, 0.036 * k), loc=(0, -hy / 2 - 0.009 * k, hc - 0.026 * k), color="skin_shade",
+    g.box((0.032 * k, 0.024 * k, 0.038 * k), loc=(0, -hy / 2 - 0.01 * k, hc - 0.026 * k), color="skin",
           bevel=0.007, bone="head")
     return hc, hx, hy, hz
 
@@ -206,33 +206,33 @@ def neck(g, color="skin"):
 def hands(g, color="skin"):
     for s, side in ((1, "l"), (-1, "r")):
         b = "hand_" + side
-        g.box((0.045, 0.072, 0.085), loc=(s * 0.238, 0, 0.785), color=color, bevel=0.014, bone=b)
-        g.box((0.022, 0.026, 0.045), loc=(s * 0.226, -0.04, 0.80), color=color, rot=(-20, 0, 0), bevel=0.006,
+        g.box((0.054, 0.08, 0.094), loc=(s * 0.24, 0, 0.785), color=color, bevel=0.016, bone=b)
+        g.box((0.026, 0.03, 0.05), loc=(s * 0.226, -0.045, 0.80), color=color, rot=(-20, 0, 0), bevel=0.007,
               bone=b)
 
 
-def arm(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", r_up=0.052, puff=1.0):
+def arm(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", r_up=0.059, puff=1.0):
     s = 1 if side == "l" else -1
     up, fo = "upper_arm_" + side, "forearm_" + side
     # épaule ronde
-    g.sphere(0.064 * puff, loc=(s * 0.205, 0, 1.315), color=top, segs=8, rings=5, bone=up)
+    g.sphere(0.07 * puff, loc=(s * 0.205, 0, 1.315), color=top, segs=8, rings=5, bone=up)
     if sleeve == "short":
         g.cyl(r_up * 1.12 * puff, 0.11, loc=(s * 0.210, 0, 1.255), color=top, segs=8, bone=up)
         g.cyl(r_up * 0.85, 0.20, loc=(s * 0.217, 0, 1.15), color=skin, segs=7, bone=up)
     else:
         g.cyl(r_up * puff, 0.27, loc=(s * 0.215, 0, 1.197), color=top, segs=8, r2=r_up * 0.92 * puff, bone=up)
     lower = top if sleeve == "long" else skin
-    g.sphere(0.047 * (puff if sleeve == "long" else 1.0), loc=(s * 0.225, 0, 1.065), color=lower, segs=7,
+    g.sphere(0.054 * (puff if sleeve == "long" else 1.0), loc=(s * 0.225, 0, 1.065), color=lower, segs=7,
              rings=5, bone=fo)
-    g.cyl(0.046 * (puff if sleeve == "long" else 0.95), 0.24, loc=(s * 0.23, 0, 0.947), color=lower, segs=7,
-          r2=0.039, bone=fo)
+    g.cyl(0.053 * (puff if sleeve == "long" else 0.95), 0.24, loc=(s * 0.23, 0, 0.947), color=lower, segs=7,
+          r2=0.045, bone=fo)
     if sleeve == "long":
-        g.cyl(0.047, 0.035, loc=(s * 0.234, 0, 0.845), color=trim, segs=7, bone=fo)
+        g.cyl(0.054, 0.035, loc=(s * 0.234, 0, 0.845), color=trim, segs=7, bone=fo)
     elif sleeve == "rolled":
-        g.cyl(0.056, 0.05, loc=(s * 0.224, 0, 1.06), color=trim, segs=8, bone=up)
+        g.cyl(0.064, 0.05, loc=(s * 0.224, 0, 1.06), color=trim, segs=8, bone=up)
 
 
-def leg(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.074, boots=False):
+def leg(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.084, boots=False):
     s = 1 if side == "l" else -1
     th, sh, ft = "thigh_" + side, "shin_" + side, "foot_" + side
     shin = shin or thigh
@@ -248,7 +248,7 @@ def leg(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.074, bo
           bone=ft)
 
 
-def torso(g, w_top=0.38, w_bot=0.30, d=0.21, z0=0.97, z1=1.385, color="top", belly=0.0):
+def torso(g, w_top=0.38, w_bot=0.30, d=0.22, z0=0.97, z1=1.385, color="top", belly=0.0):
     h = z1 - z0
     g.box((w_bot, d, h), loc=(0, 0, z0), color=color, taper=(w_top / w_bot, 1.0), bevel=0.035, bseg=2,
           weights=torso_weights, base=True)
@@ -521,7 +521,7 @@ def build_npc(g, who, expr):
         g.box((0.006, 0.01, 0.06), loc=(0.07, -0.124, 1.05), color="metal", rot=(0, 30, 0), bone="spine")
         for s, side in ((1, "l"), (-1, "r")):
             arm(g, side, sleeve="long", puff=1.05)
-            leg(g, side, thigh="bottom", cuff="bottom", r=0.077)
+            leg(g, side, thigh="bottom", cuff="bottom", r=0.088)
         hands(g)
     elif who == "odette":
         hc, hx, hy, hz = head_block(g)
@@ -534,7 +534,7 @@ def build_npc(g, who, expr):
         apron(g, z_top=1.0, z_bot=0.46, w_top=0.26, w_bot=0.36, color="extra_a", bib_to=1.27, front_r=0.21)
         for s, side in ((1, "l"), (-1, "r")):
             arm(g, side, sleeve="rolled", top="top", trim="top_trim", puff=1.08)
-            leg(g, side, thigh="extra_b", shin="extra_b", r=0.07)
+            leg(g, side, thigh="extra_b", shin="extra_b", r=0.08)
         hands(g)
     elif who == "basile":
         hc, hx, hy, hz = head_block(g)
@@ -552,7 +552,7 @@ def build_npc(g, who, expr):
         g.box((0.012, 0.01, 0.07), loc=(0.07, -0.142, 0.90), color="eye", rot=(0, 10, 0), bone="hips")
         for s, side in ((1, "l"), (-1, "r")):
             arm(g, side, sleeve="rolled", puff=1.1)
-            leg(g, side, thigh="bottom", cuff="bottom", r=0.078, boots=True)
+            leg(g, side, thigh="bottom", cuff="bottom", r=0.09, boots=True)
         hands(g)
     elif who == "jeanne":
         k = 1.18
@@ -565,8 +565,8 @@ def build_npc(g, who, expr):
         overall_bib(g, color="bottom", z0=1.0, z1=1.25, straps="bottom")
         collar(g, color="top_trim", w=0.16)
         for s, side in ((1, "l"), (-1, "r")):
-            arm(g, side, sleeve="short", r_up=0.05)
-            leg(g, side, thigh="bottom", cuff="top_trim", r=0.072)
+            arm(g, side, sleeve="short", r_up=0.058)
+            leg(g, side, thigh="bottom", cuff="top_trim", r=0.085)
         hands(g)
         g.box((0.07, 0.012, 0.06), loc=(0.0, -0.126, 1.13), color="extra_b", bevel=0.005, bone="spine")
     elif who == "lucie":
@@ -642,7 +642,11 @@ def make_mesh(name, row, builder, mat, arm, with_face):
             g2.bm.free()
             sk = ob.shape_key_add(name=expr, from_mix=False)
             assert len(co) == len(sk.data) * 3, (name, expr)
+            base = [c for v in ob.data.vertices for c in v.co]
+            moved = sum(1 for i in range(0, len(co), 3) if abs(co[i] - base[i]) + abs(co[i + 1] - base[i + 1]) + abs(co[i + 2] - base[i + 2]) > 1e-6)
+            assert moved < 120, (name, expr, moved)
             sk.data.foreach_set("co", co)
+            sk.value = 0.0
     ob.parent = arm
     mod = ob.modifiers.new("rig", "ARMATURE")
     mod.object = arm
@@ -883,7 +887,7 @@ def main():
     for s in SYMBOLS:
         add("player_scarf_" + s, "player_a", lambda g, e, s=s: scarf(g, s), False)
     for n in NPCS:
-        ob = add("npc_" + n, n, lambda g, e, n=n: build_npc(g, n, e), True)
+        ob = add("villager_" + n, n, lambda g, e, n=n: build_npc(g, n, e), True)
         if n == "jeanne":
             ob["scale"] = 0.75
 

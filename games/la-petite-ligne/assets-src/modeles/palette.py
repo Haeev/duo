@@ -150,6 +150,23 @@ WORLD = [
     ("strawberry", "#D93F3F", 0.5, 0.0, None),
     ("seed", "#D9C69B", 0.9, 0.0, None),
     ("sprout", "#A7D569", 0.8, 0.0, None),
+    # Ajouts (toujours en fin de liste: les cases existantes ne bougent pas)
+    ("fish_back", "#6E807B", 0.35, 0.1, None),
+    ("fish_silver", "#BAC4C7", 0.3, 0.3, None),
+    ("fish_belly", "#EAE6D7", 0.4, 0.1, None),
+    ("fish_olive", "#7E8553", 0.4, 0.1, None),
+    ("trout_spot", "#C3473D", 0.5, 0.0, None),
+    ("jay_blue", "#4F80CA", 0.7, 0.0, None),
+    ("jay_stripe", "#1F2B45", 0.7, 0.0, None),
+    ("feather_brown", "#B0927A", 0.9, 0.0, None),
+    ("sepia", "#B59C79", 0.8, 0.0, None),
+    ("sepia_dark", "#6F5B45", 0.8, 0.0, None),
+    ("lamp_shade", "#F3E9CF", 0.6, 0.0, "#FFD89A"),
+    ("radio_dial", "#E9DDB8", 0.4, 0.0, "#FFCF7A"),
+    ("ember", "#C9572F", 0.8, 0.0, "#FF7A2E"),
+    ("mattress", "#E4DCC8", 0.95, 0.0, None),
+    ("mattress_stripe", "#8FA5BF", 0.95, 0.0, None),
+    ("ivy", "#4E7A3F", 0.9, 0.0, None),
 ]
 
 # Variantes de saison: seules les cases citées changent (même disposition).

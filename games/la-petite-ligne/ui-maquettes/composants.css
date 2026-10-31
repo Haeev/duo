@@ -48,6 +48,11 @@
   pointer-events: auto;
 }
 
+/* Un élément masqué l'est vraiment, quel que soit le display de son composant. */
+.lpl-ui [hidden] {
+  display: none !important;
+}
+
 .lpl-ui :where(h1, h2, h3, h4, p, ul, ol, dl, dd, figure) {
   margin: 0;
 }
@@ -441,21 +446,21 @@
 /* HUD: disposition                                                    */
 /* ------------------------------------------------------------------ */
 
+/* Cinq régions ancrées aux coins et au bas de la fenêtre, indépendantes: une région haute qui
+   grandit (notifications, objectif) ne pousse jamais la barre d'outils hors de l'écran. */
 .lpl-hud {
-  display: grid;
-  grid-template-areas:
-    'top-left . top-right'
-    'left . right'
-    'bottom-left bottom bottom-right';
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  grid-template-rows: auto 1fr auto;
-  gap: var(--lpl-space-3);
-  height: 100%;
-  padding: var(--lpl-hud-margin);
+  /* Sous 150 % sur un écran de 1366 px, les cases rétrécissent juste assez pour tenir. */
+  --lpl-slot-size: min(3.25rem, calc((100vw - 26rem) / 11));
+  --lpl-toolbar-width: calc(10 * var(--lpl-slot-size) + 3.25rem);
+
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
 .lpl-hud > * {
+  position: absolute;
+  display: flex;
   min-width: 0;
   pointer-events: none;
 }
@@ -465,57 +470,91 @@
 }
 
 .lpl-hud__top-left {
-  display: flex;
-  grid-area: top-left;
-  flex-direction: column;
+  top: var(--lpl-hud-margin);
+  left: var(--lpl-hud-margin);
+  flex-wrap: wrap;
   align-items: flex-start;
+  align-content: flex-start;
   gap: var(--lpl-space-2);
+  max-width: calc(50% - 2 * var(--lpl-hud-margin));
+}
+
+/* Les notifications passent sous l'horloge et la bourse, et devant les panneaux du jeu. */
+.lpl-hud__top-left > .lpl-toasts {
+  position: relative;
+  z-index: var(--lpl-layer-toast);
+  flex-basis: 100%;
 }
 
 .lpl-hud__top-right {
-  display: flex;
-  grid-area: top-right;
+  top: var(--lpl-hud-margin);
+  right: var(--lpl-hud-margin);
   flex-direction: column;
   align-items: flex-end;
   gap: var(--lpl-space-2);
-}
-
-.lpl-hud__left {
-  display: flex;
-  grid-area: left;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--lpl-space-2);
+  width: min(19rem, calc(50% - 2 * var(--lpl-hud-margin)));
 }
 
 .lpl-hud__bottom-left {
-  display: flex;
-  grid-area: bottom-left;
+  bottom: var(--lpl-hud-margin);
+  left: var(--lpl-hud-margin);
   align-items: flex-end;
+  max-width: calc(
+    (100% - var(--lpl-toolbar-width)) / 2 - var(--lpl-hud-margin) - var(--lpl-space-3)
+  );
 }
 
 .lpl-hud__bottom {
-  display: flex;
-  grid-area: bottom;
+  bottom: var(--lpl-hud-margin);
+  left: 50%;
   flex-direction: column;
   align-items: center;
   gap: var(--lpl-space-2);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--lpl-hud-margin));
+  transform: translateX(-50%);
 }
 
 .lpl-hud__bottom-right {
-  display: flex;
-  grid-area: bottom-right;
+  right: var(--lpl-hud-margin);
+  bottom: var(--lpl-hud-margin);
   align-items: flex-end;
   justify-content: flex-end;
   gap: var(--lpl-space-2);
+  max-width: calc(
+    (100% - var(--lpl-toolbar-width)) / 2 - var(--lpl-hud-margin) - var(--lpl-space-3)
+  );
 }
 
 /* Pendant une conversation, le bas du HUD s'efface derrière la boîte de dialogue. */
 .lpl-hud[data-state='dialogue'] .lpl-hud__bottom,
 .lpl-hud[data-state='dialogue'] .lpl-hud__bottom-left,
-.lpl-hud[data-state='dialogue'] .lpl-hud__bottom-right,
-.lpl-hud[data-state='dialogue'] .lpl-hud__left {
+.lpl-hud[data-state='dialogue'] .lpl-hud__bottom-right {
   visibility: hidden;
+}
+
+/* Tout composant à fond papier fixe sa couleur d'encre: il reste lisible posé dans un en-tête en bois. */
+.lpl-purse,
+.lpl-toast,
+.lpl-partner,
+.lpl-objective,
+.lpl-self,
+.lpl-toolbar__label,
+.lpl-product,
+.lpl-panel,
+.lpl-quest,
+.lpl-letter,
+.lpl-item-detail,
+.lpl-order__summary,
+.lpl-counter,
+.lpl-field__input,
+.lpl-option,
+.lpl-proposal,
+.lpl-dialogue,
+.lpl-build-bar,
+.lpl-player-card,
+.lpl-cartouche {
+  color: var(--lpl-color-ink);
 }
 
 /* Cartouche: support papier commun aux éléments posés sur la scène. */
@@ -532,7 +571,7 @@
 
 .lpl-clock {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 0 var(--lpl-space-3);
   padding: var(--lpl-space-2) var(--lpl-space-4) var(--lpl-space-2) var(--lpl-space-2);
@@ -585,7 +624,7 @@
   margin: var(--lpl-space-2) calc(-1 * var(--lpl-space-2)) 0 0;
   font-size: var(--lpl-text-sm);
   font-weight: var(--lpl-weight-bold);
-  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .lpl-clock[data-state='stopped'] .lpl-clock__status,
@@ -675,12 +714,18 @@
 /* ------------------------------------------------------------------ */
 
 .lpl-self {
+  /* Le portrait rétrécit un peu quand la place manque (150 % sur 1366 px). */
+  --lpl-portrait-size: clamp(3rem, 5vw, 4rem);
+
   display: flex;
+  max-width: 100%;
+  min-width: 0;
   align-items: center;
   gap: var(--lpl-space-3);
   padding: var(--lpl-space-2) var(--lpl-space-4) var(--lpl-space-2) var(--lpl-space-2);
   border: var(--lpl-border) solid var(--lpl-color-ink);
-  border-radius: var(--lpl-radius-pill) var(--lpl-radius-l) var(--lpl-radius-l) var(--lpl-radius-pill);
+  border-radius: var(--lpl-radius-pill) var(--lpl-radius-l) var(--lpl-radius-l)
+    var(--lpl-radius-pill);
   background: var(--lpl-color-paper);
   box-shadow: var(--lpl-shadow-2);
 }
@@ -688,7 +733,8 @@
 .lpl-self__text {
   display: grid;
   gap: 0.25rem;
-  min-width: 7.5rem;
+  width: 9rem;
+  min-width: 0;
 }
 
 .lpl-self__name {
@@ -702,6 +748,7 @@
   color: var(--lpl-color-ink-muted);
   font-size: var(--lpl-text-sm);
   font-weight: var(--lpl-weight-bold);
+  line-height: 1.25;
 }
 
 .lpl-stamina {
@@ -786,9 +833,6 @@
 }
 
 .lpl-toolbar__slots {
-  /* Sous 150 % sur un écran de 1366 px, les cases rétrécissent juste assez pour tenir. */
-  --lpl-slot-size: min(3.25rem, calc((100vw - 26rem) / 11));
-
   display: flex;
   gap: 0.25rem;
   padding: 0.375rem;
@@ -920,7 +964,8 @@
   width: min(19rem, 100%);
   padding: var(--lpl-space-2) var(--lpl-space-3) var(--lpl-space-2) var(--lpl-space-2);
   border: var(--lpl-border) solid var(--lpl-color-ink);
-  border-radius: var(--lpl-radius-pill) var(--lpl-radius-l) var(--lpl-radius-l) var(--lpl-radius-pill);
+  border-radius: var(--lpl-radius-pill) var(--lpl-radius-l) var(--lpl-radius-l)
+    var(--lpl-radius-pill);
   background: var(--lpl-color-paper);
   box-shadow: var(--lpl-shadow-2);
 }
@@ -998,7 +1043,7 @@
 
 .lpl-objective__lines {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
   gap: 0.125rem var(--lpl-space-3);
   margin-top: 0.25rem;
   font-size: var(--lpl-text-sm);
@@ -1117,13 +1162,13 @@
 
 .lpl-panel {
   position: absolute;
-  top: calc(var(--lpl-hud-margin) + 5.25rem);
+  top: calc(var(--lpl-hud-margin) + var(--lpl-hud-top-band));
   left: 50%;
   z-index: var(--lpl-layer-panel);
   display: flex;
   flex-direction: column;
   width: min(var(--lpl-panel-width, 58rem), calc(100vw - 2 * var(--lpl-hud-margin)));
-  max-height: calc(100vh - 5.25rem - 2 * var(--lpl-hud-margin));
+  max-height: calc(100vh - var(--lpl-hud-top-band) - 2 * var(--lpl-hud-margin));
   border: var(--lpl-border-thick) solid var(--lpl-color-wood-deep);
   border-radius: var(--lpl-radius-l);
   background: var(--lpl-color-paper);
@@ -1264,10 +1309,19 @@
 /* ------------------------------------------------------------------ */
 
 .lpl-bag {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--lpl-space-4) var(--lpl-space-5);
+}
+
+.lpl-bag__slots {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 16rem;
-  gap: var(--lpl-space-5);
-  align-items: start;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-bag > .lpl-item-detail {
+  flex: 1 1 14rem;
 }
 
 .lpl-inventory {
@@ -1405,9 +1459,8 @@
 }
 
 .lpl-letter > .lpl-stamp {
-  position: absolute;
-  top: var(--lpl-space-3);
-  right: var(--lpl-space-4);
+  float: right;
+  margin: 0 0 var(--lpl-space-2) var(--lpl-space-3);
 }
 
 .lpl-letter-list {
@@ -1615,7 +1668,7 @@
   position: relative;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
-  justify-items: start;
+  justify-items: stretch;
   gap: 0.25rem;
   min-height: 12.5rem;
   padding: var(--lpl-space-3);
@@ -1669,6 +1722,10 @@
   line-height: 1.3;
 }
 
+.lpl-product .lpl-chip {
+  white-space: normal;
+}
+
 .lpl-product > .lpl-stamp {
   position: absolute;
   top: var(--lpl-space-3);
@@ -1695,13 +1752,17 @@
   background: var(--lpl-color-waiting);
 }
 
+.lpl-product[data-state='waiting'] .lpl-product__effect {
+  color: var(--lpl-color-ink);
+}
+
 /* ------------------------------------------------------------------ */
 /* Proposition d'un gros achat                                         */
 /* ------------------------------------------------------------------ */
 
 .lpl-proposal {
   position: absolute;
-  top: calc(var(--lpl-hud-margin) + 5.25rem);
+  top: calc(var(--lpl-hud-margin) + var(--lpl-hud-top-band));
   left: 50%;
   z-index: var(--lpl-layer-proposal);
   display: grid;
@@ -1717,9 +1778,13 @@
   animation: lpl-panel-in var(--lpl-duration-base) var(--lpl-ease);
 }
 
+.lpl-proposal > :not(.lpl-proposal__icon, .lpl-stamp) {
+  grid-column: 2;
+}
+
 .lpl-proposal__icon {
   display: grid;
-  grid-row: span 3;
+  grid-row: 1 / span 3;
   place-items: center;
   width: 4rem;
   height: 4rem;
@@ -1823,7 +1888,11 @@
 
 [data-speaker='odette'] {
   --lpl-motif:
-    repeating-linear-gradient(90deg, rgb(156 79 103 / 0.55) 0 0.625rem, transparent 0.625rem 1.25rem),
+    repeating-linear-gradient(
+      90deg,
+      rgb(156 79 103 / 0.55) 0 0.625rem,
+      transparent 0.625rem 1.25rem
+    ),
     repeating-linear-gradient(0deg, rgb(156 79 103 / 0.55) 0 0.625rem, #f2ebdd 0.625rem 1.25rem);
 }
 
@@ -2306,7 +2375,8 @@
   border: var(--lpl-border) solid var(--lpl-color-ink);
   border-radius: var(--lpl-radius-round);
   background:
-    no-repeat center / 70% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5l5 5L19.5 7' fill='none' stroke='%23fbf6e9' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
+    no-repeat center / 70%
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 12.5l5 5L19.5 7' fill='none' stroke='%23fbf6e9' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"),
     var(--lpl-color-primary);
 }
 

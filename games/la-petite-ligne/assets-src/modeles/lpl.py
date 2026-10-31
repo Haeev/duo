@@ -97,6 +97,7 @@ def char_cells(row_name):
 
 def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.context.preferences.filepaths.save_version = 0
     sc = bpy.context.scene
     sc.unit_settings.system = "METRIC"
     sc.render.fps = 30
@@ -219,11 +220,14 @@ class Geo:
 
     def _bevel(self, verts, bevel, bseg):
         faces0 = list({f for v in verts for f in v.link_faces})
-        edges = list({e for v in verts for e in v.link_edges})
+        # ordre déterministe (sinon l'ordre des sommets change d'une construction à l'autre)
+        self.bm.edges.index_update()
+        edges = sorted({e for v in verts for e in v.link_edges}, key=lambda e: e.index)
         r = bmesh.ops.bevel(self.bm, geom=edges, offset=bevel, segments=bseg, profile=0.5,
                             affect="EDGES", clamp_overlap=True)
         faces = [f for f in faces0 if f.is_valid] + list(r["faces"])
-        return list({v for f in faces for v in f.verts})
+        self.bm.verts.index_update()
+        return sorted({v for f in faces for v in f.verts}, key=lambda v: v.index)
 
     # primitives
     def box(self, size, loc=(0, 0, 0), color="stone", rot=(0, 0, 0), bevel=0.0, bseg=1,
@@ -555,3 +559,156 @@ def srgb_to_lin(c):
 
 def hex_lin(h):
     return tuple(srgb_to_lin(v / 255) for v in P.hex_to_rgb(h))
+
+
+# Registre d'assets et planches -------------------------------------------------
+
+class Assets:
+    """Rassemble les nœuds racines d'un GLB, leurs triangles et leurs données (extras)."""
+
+    def __init__(self, mat, cells=None):
+        self.mat = mat
+        self.cells = cells or world_cells()
+        self.roots = []
+        self.info = {}
+
+    def geo(self):
+        return Geo(self.cells)
+
+    def add(self, name, g, extras=None, parent=None, loc=(0, 0, 0)):
+        ob = g.to_object(name, self.mat, parent=parent, loc=loc)
+        if parent is None:
+            self._register(ob, extras)
+        elif extras:
+            for k, v in extras.items():
+                ob[k] = v
+        return ob
+
+    def group(self, name, extras=None):
+        ob = empty(name)
+        self._register(ob, extras)
+        return ob
+
+    def _register(self, ob, extras):
+        self.roots.append(ob)
+        if extras:
+            for k, v in extras.items():
+                ob[k] = v
+        self.info[ob.name] = dict(extras or {})
+
+    def all_objects(self):
+        out = []
+
+        def walk(o):
+            out.append(o)
+            for c in o.children:
+                walk(c)
+        for r in self.roots:
+            walk(r)
+        return out
+
+    def stats(self):
+        return {r.name: dict(self.info[r.name], tris=tree_tris(r)) for r in self.roots}
+
+
+def duplicate_tree(ob, parent=None):
+    o = ob.copy()
+    bpy.context.scene.collection.objects.link(o)
+    o.parent = parent
+    if parent is None:
+        o.matrix_world = ob.matrix_world.copy()
+    for c in ob.children:
+        duplicate_tree(c, o)
+    return o
+
+
+def board(roots, path, cols=6, cell=2.0, res=(1600, 900), ortho=None, azimuth=45, elevation=35.264,
+          label_size=0.16, spacing=None, samples=20, emission=0.0, mannequin=False, names=None):
+    """Planche: copie chaque nœud racine sur une grille, avec son nom, en vue isométrique."""
+    setup_render(res, samples)
+    world(hex_lin("#DCE6EE"), 0.9)
+    sun((50, 0, 140), 3.0)
+    gp = ground_plane(400, hex_lin("#A7B98A"), z=-0.002)
+    placed = []
+    import math as _m
+    R = Vector((1, 1, 0)) / _m.sqrt(2)     # droite de l'écran (azimut 45)
+    D = Vector((1, -1, 0)) / _m.sqrt(2)    # bas de l'écran (vers la caméra)
+    u = v = 0.0
+    row_h = 0.0
+    col = 0
+    for r in roots:
+        w = spacing(r) if spacing else cell
+        if col >= cols:
+            col = 0
+            u = 0.0
+            v += row_h + label_size * 2.5
+            row_h = 0.0
+        d = duplicate_tree(r)
+        c = R * (u + w / 2) + D * (v + w / 2)
+        d.location = (c.x, c.y, 0)
+        bpy.context.view_layer.update()
+        zmin = min(((o.matrix_world @ Vector(cc)).z for o in [d] + list(d.children_recursive)
+                    if o.type == "MESH" for cc in o.bound_box), default=0.0)
+        if zmin < -0.01:
+            d.location.z -= zmin
+        lp = R * (u + w / 2) + D * (v + w + label_size * 1.2)
+        label((names or {}).get(r.name, r.name), (lp.x, lp.y, 0.01), size=label_size, rot=(0, 0, 45))
+        placed.append(d)
+        u += w
+        row_h = max(row_h, w)
+        col += 1
+    keep = {gp.name}
+    for d in placed:
+        keep.add(d.name)
+        keep.update(c.name for c in d.children_recursive)
+    hidden = []
+    for o in bpy.context.scene.objects:
+        if o.name not in keep and o.type in ("MESH", "ARMATURE", "EMPTY") and not o.hide_render:
+            o.hide_render = True
+            hidden.append(o)
+    for d in placed:
+        d.hide_render = False
+        for c in d.children_recursive:
+            c.hide_render = False
+    if mannequin:
+        g = Geo(world_cells())
+        g.box((0.3, 0.05, 1.8), color="paper_dark", base=True)
+        for h in range(1, 18):
+            g.box((0.34 if h % 5 == 0 else 0.32, 0.055, 0.008), loc=(0, 0, h * 0.1), color="shadow")
+        mats = [m for m in bpy.data.materials if m.name.startswith("lpl_palette")]
+        mob = g.to_object("mannequin_180", mats[0])
+        mob.location = (-0.6, -0.5, 0)
+    # cadrage: boîte englobante des copies
+    from mathutils import Vector as V
+    pts = []
+    for d in placed:
+        for o in [d] + list(d.children_recursive):
+            if o.type == "MESH":
+                for c in o.bound_box:
+                    pts.append(o.matrix_world @ V(c))
+    cam = iso_camera((0, 0, 0), 10, azimuth, elevation)
+    bpy.context.view_layer.update()
+    mw = cam.matrix_world
+    cr, cu, cf = mw.col[0].xyz, mw.col[1].xyz, mw.col[2].xyz
+    sx = [p.dot(cr) for p in pts]
+    sy = [p.dot(cu) for p in pts]
+    aspect = res[0] / res[1]
+    w = max(sx) - min(sx)
+    h = max(sy) - min(sy)
+    cx, cy = (max(sx) + min(sx)) / 2, (max(sy) + min(sy)) / 2
+    center = cr * cx + cu * cy
+    cam.location = center + cf * 80
+    cam.data.ortho_scale = ortho or max(w, h * aspect) * 1.06
+    for m in bpy.data.materials:
+        if m.name.startswith("lpl_palette"):
+            set_emission(m, emission)
+    render(path)
+    for d in placed:
+        for o in [d] + list(d.children_recursive):
+            bpy.data.objects.remove(o, do_unlink=True)
+    for o in hidden:
+        o.hide_render = False
+    for o in list(bpy.data.objects):
+        if o.name.startswith(("etiquette_", "mannequin_180")):
+            bpy.data.objects.remove(o, do_unlink=True)
+    bpy.data.objects.remove(gp, do_unlink=True)

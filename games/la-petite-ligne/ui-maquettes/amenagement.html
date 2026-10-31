@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mode aménagement · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="pose bloque deja-pris">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true">
+      <img
+        src="support/scene-amenagement.svg"
+        alt=""
+        data-on-bloque="src=support/scene-amenagement-bloque.svg"
+      />
+    </div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud">
+        <div class="lpl-hud__top-left">
+          <div class="lpl-clock" data-state="evening">
+            <span class="lpl-clock__weather"
+              ><svg aria-hidden="true"><use href="#weather-rain" /></svg
+            ></span>
+            <span class="lpl-clock__day">Mardi 4 · Pluie</span>
+            <span class="lpl-clock__time">19 h 50</span>
+            <span class="lpl-clock__status"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-moon" /></svg>Veillée ·
+              l’horloge est arrêtée</span
+            >
+          </div>
+          <ul class="lpl-toasts" aria-live="polite" aria-label="Notifications">
+            <li class="lpl-toast" data-when="deja-pris">
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+              >Sacha déplace ce meuble.
+            </li>
+          </ul>
+        </div>
+        <div class="lpl-hud__top-right">
+          <div class="lpl-partner" aria-label="Sacha">
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="great"
+              ><span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg></span
+            ></span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#chair" /></svg>Place une
+              chaise</span
+            >
+          </div>
+        </div>
+        <div class="lpl-hud__bottom">
+          <div class="lpl-build-bar" role="status" aria-live="polite">
+            <span class="lpl-build-bar__item">
+              <svg aria-hidden="true" data-when="pose bloque"><use href="#table" /></svg>
+              <svg aria-hidden="true" data-when="deja-pris"><use href="#chair" /></svg>
+              <span>
+                <span class="lpl-build-bar__name" data-when="pose bloque">Table</span>
+                <span class="lpl-build-bar__name" data-when="deja-pris">Chaise</span>
+                <span class="lpl-overline" style="display: block">En main</span>
+              </span>
+            </span>
+            <span data-when="pose"
+              ><span class="lpl-chip lpl-chip--ready"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-check" /></svg>Peut se
+                poser ici</span
+              ></span
+            >
+            <span data-when="bloque"
+              ><span class="lpl-chip lpl-chip--alert"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-warning" /></svg>Ça ne
+                passe pas : la porte doit rester libre.</span
+              ></span
+            >
+            <span data-when="deja-pris"
+              ><span class="lpl-chip lpl-chip--waiting"
+                ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Sacha la
+                tient : attends qu’elle soit posée.</span
+              ></span
+            >
+            <span class="lpl-chip" data-when="pose bloque">Vers le nord</span>
+            <span class="lpl-keys lpl-build-bar__keys">
+              <span
+                ><span class="lpl-key">Molette</span> ou
+                <span class="lpl-key">W</span> tourner</span
+              >
+              <span
+                ><span class="lpl-key">Z</span><span class="lpl-key">Q</span
+                ><span class="lpl-key">S</span><span class="lpl-key">D</span> ou clic déplacer</span
+              >
+              <span><span class="lpl-key">Espace</span> ou clic poser</span>
+              <span><span class="lpl-key">X</span> ou clic droit reprendre</span>
+              <span><span class="lpl-key">Retour arrière</span> ranger au sac</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

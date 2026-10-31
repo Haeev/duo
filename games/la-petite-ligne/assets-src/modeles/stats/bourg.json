@@ -1,0 +1,557 @@
+{
+ "nodes": {
+  "station": {
+   "footprint": [
+    10,
+    6
+   ],
+   "doors": [
+    [
+     0.0,
+     2.3
+    ],
+    [
+     0.0,
+     -2.3
+    ]
+   ],
+   "tris": 3516
+  },
+  "platform": {
+   "footprint": [
+    30,
+    4
+   ],
+   "walk_height": 0.25,
+   "track_side": "-z",
+   "note": "bord côté voie vers -Z (arrière); marquise centrée sur 10 m",
+   "tris": 3160
+  },
+  "gatekeeper_house_ruin": {
+   "footprint": [
+    7,
+    6
+   ],
+   "interior": {
+    "x": [
+     -2.5,
+     2.5
+    ],
+    "z": [
+     -2.0,
+     2.0
+    ],
+    "floor_y": 0.12
+   },
+   "door": [
+    -1.0,
+    2.3
+   ],
+   "cut_walls": true,
+   "tris": 3052
+  },
+  "gatekeeper_house_repaired": {
+   "footprint": [
+    7,
+    6
+   ],
+   "interior": {
+    "x": [
+     -2.5,
+     2.5
+    ],
+    "z": [
+     -2.0,
+     2.0
+    ],
+    "floor_y": 0.12
+   },
+   "door": [
+    -1.0,
+    2.3
+   ],
+   "cut_walls": true,
+   "tris": 3232
+  },
+  "ferrand_shop": {
+   "footprint": [
+    10,
+    8
+   ],
+   "counter": [
+    0.0,
+    3.6
+   ],
+   "door": [
+    2.6,
+    2.6
+   ],
+   "tris": 3664
+  },
+  "firmin_house": {
+   "footprint": [
+    7,
+    6
+   ],
+   "door": [
+    0.6,
+    2.2
+   ],
+   "tris": 2264
+  },
+  "sawmill": {
+   "footprint": [
+    10,
+    8
+   ],
+   "workbench_spot": [
+    3.9,
+    1.5
+   ],
+   "note": "l'établi (workbench) se pose sous l'auvent, côté +X",
+   "tris": 1408
+  },
+  "handcar_shed": {
+   "footprint": [
+    6,
+    5
+   ],
+   "door": [
+    0.0,
+    2.2
+   ],
+   "note": "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y",
+   "tris": 1132
+  },
+  "handcar": {
+   "footprint": [
+    2,
+    2
+   ],
+   "on_rails": true,
+   "note": "balancier handcar_lever: pivot sur l'axe X, +-20 degrés",
+   "tris": 476
+  },
+  "well": {
+   "footprint": [
+    2,
+    2
+   ],
+   "water_point": true,
+   "tris": 442
+  },
+  "henhouse_ruin": {
+   "footprint": [
+    3,
+    3
+   ],
+   "door": [
+    -0.6,
+    1.5
+   ],
+   "tris": 880
+  },
+  "henhouse_repaired": {
+   "footprint": [
+    3,
+    3
+   ],
+   "door": [
+    -0.6,
+    1.5
+   ],
+   "tris": 1204
+  },
+  "workbench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 240
+  },
+  "woodpile": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 888
+  },
+  "plank_stack": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 132
+  },
+  "rail_straight": {
+   "footprint": [
+    4,
+    2
+   ],
+   "rail_top": 0.32,
+   "gauge": 1.0,
+   "tris": 294
+  },
+  "rail_curve_90": {
+   "footprint": [
+    13,
+    13
+   ],
+   "radius": 12.0,
+   "rail_top": 0.32,
+   "tris": 2676
+  },
+  "buffer_stop": {
+   "footprint": [
+    1,
+    2
+   ],
+   "tris": 152
+  },
+  "level_crossing": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "barrière level_crossing_arm: pivot sur Z (glTF), 0 ouverte à 90 fermée",
+   "tris": 228
+  },
+  "bell_post": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 198
+  },
+  "bench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 316
+  },
+  "lamp_post": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 248
+  },
+  "coop_crate": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 168
+  },
+  "notice_board": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 332
+  },
+  "mailbox": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 92
+  },
+  "barrel": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 276
+  },
+  "crate": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 92
+  },
+  "crate_stack": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 180
+  },
+  "sacks": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 228
+  },
+  "cart": {
+   "footprint": [
+    3,
+    2
+   ],
+   "tris": 404
+  },
+  "bicycle": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 472
+  },
+  "ground_grass": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 24
+  },
+  "ground_dirt": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 48
+  },
+  "ground_cobble": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 716
+  },
+  "path_border": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "bordure de 1 m le long de X",
+   "tris": 176
+  },
+  "fence_wood": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "segment de 1 m le long de X, poteau à x=-0,5",
+   "tris": 36
+  },
+  "fence_picket": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "segment de 1 m le long de X, poteau à x=-0,5",
+   "tris": 156
+  },
+  "fence_broken": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "segment de 1 m le long de X, poteau à x=-0,5",
+   "tris": 36
+  },
+  "fence_gate": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "segment de 1 m le long de X, poteau à x=-0,5",
+   "tris": 108
+  },
+  "fence_post": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "segment de 1 m le long de X, poteau à x=-0,5",
+   "tris": 12
+  },
+  "tree_oak_small": {
+   "footprint": [
+    1,
+    1
+   ],
+   "choppable": true,
+   "tris": 204
+  },
+  "tree_oak_large": {
+   "footprint": [
+    2,
+    2
+   ],
+   "choppable": true,
+   "tris": 204
+  },
+  "tree_fir_small": {
+   "footprint": [
+    1,
+    1
+   ],
+   "choppable": true,
+   "tris": 68
+  },
+  "tree_fir_large": {
+   "footprint": [
+    2,
+    2
+   ],
+   "choppable": true,
+   "tris": 68
+  },
+  "tree_birch_small": {
+   "footprint": [
+    1,
+    1
+   ],
+   "choppable": false,
+   "tris": 184
+  },
+  "tree_birch_large": {
+   "footprint": [
+    2,
+    2
+   ],
+   "choppable": false,
+   "tris": 184
+  },
+  "tree_stump": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 144
+  },
+  "bush_round": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 80
+  },
+  "bush_bramble": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 180
+  },
+  "bush_hazel": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 140
+  },
+  "rock_small": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 20
+  },
+  "rock_medium": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 40
+  },
+  "rock_large": {
+   "footprint": [
+    2,
+    2
+   ],
+   "tris": 52
+  },
+  "grass_tall": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 36
+  },
+  "flowers_red": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 316
+  },
+  "flowers_yellow": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 316
+  },
+  "flowers_white": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 316
+  },
+  "flowers_blue": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 316
+  },
+  "flower_bed": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 1148
+  },
+  "reeds": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 144
+  },
+  "river_straight": {
+   "footprint": [
+    4,
+    8
+   ],
+   "flow_axis": "x",
+   "water_y": -0.3,
+   "note": "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)",
+   "tris": 220
+  },
+  "river_ford": {
+   "footprint": [
+    4,
+    8
+   ],
+   "flow_axis": "x",
+   "water_y": -0.3,
+   "note": "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)",
+   "tris": 340
+  },
+  "river_curve": {
+   "footprint": [
+    8,
+    8
+   ],
+   "water_y": -0.3,
+   "note": "entre par le bord -X (axe en z=0 glTF... voir README), sort par le bord -Y Blender",
+   "tris": 160
+  },
+  "pontoon": {
+   "footprint": [
+    1,
+    3
+   ],
+   "note": "posé sur la berge, avance au-dessus de l'eau",
+   "tris": 580
+  }
+ },
+ "file_bytes": 2845880
+}

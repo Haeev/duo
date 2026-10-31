@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HUD · La Petite Ligne (maquette)</title>
+    <link rel="stylesheet" href="support/polices.css" />
+    <link rel="stylesheet" href="jeton.css" />
+    <link rel="stylesheet" href="composants.css" />
+    <link rel="stylesheet" href="support/maquette.css" />
+  </head>
+  <body data-states="jour vide pluie veillee attente fatigue train notifications">
+    <script src="support/icones.js"></script>
+    <div class="scene-maquette" aria-hidden="true">
+      <img
+        src="support/scene-jour.svg"
+        alt=""
+        data-on-pluie="src=support/scene-pluie.svg"
+        data-on-veillee="src=support/scene-veillee.svg"
+        data-on-attente="src=support/scene-jour.svg"
+      />
+    </div>
+
+    <div class="lpl-ui">
+      <div class="lpl-hud">
+        <!-- Haut gauche: le temps et l'argent communs, puis les notifications -->
+        <div class="lpl-hud__top-left">
+          <div
+            class="lpl-clock"
+            data-on-veillee="data-state=evening"
+            data-on-attente="data-state=waiting"
+            data-on-train="data-train=soon"
+            aria-label="Horloge"
+          >
+            <span class="lpl-clock__weather">
+              <svg
+                aria-hidden="true"
+                data-when="jour attente fatigue train notifications veillee vide"
+              >
+                <use href="#weather-sun" />
+              </svg>
+              <svg aria-hidden="true" data-when="pluie"><use href="#weather-rain" /></svg>
+            </span>
+            <span class="lpl-clock__day">
+              <span data-when="jour attente fatigue notifications">Mercredi 5 · Soleil</span>
+              <span data-when="vide">Samedi 1 · Soleil</span>
+              <span data-when="pluie">Mardi 4 · Pluie</span>
+              <span data-when="veillee">Mercredi 5 · Soleil</span>
+              <span data-when="train">Samedi 8 · Soleil</span>
+            </span>
+            <span class="lpl-clock__time">
+              <span data-when="jour notifications">9 h 20</span>
+              <span data-when="vide">10 h 20</span>
+              <span data-when="pluie">14 h 10</span>
+              <span data-when="veillee">19 h 40</span>
+              <span data-when="attente">16 h 50</span>
+              <span data-when="fatigue">17 h 30</span>
+              <span data-when="train">15 h 00</span>
+            </span>
+            <span class="lpl-clock__status" data-when="veillee"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-moon" /></svg>Veillée ·
+              l’horloge est arrêtée</span
+            >
+            <span class="lpl-clock__status" data-when="attente"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>L’horloge
+              attend Sacha.</span
+            >
+            <span class="lpl-clock__train" data-when="train"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>Départ du
+              train à 16 h</span
+            >
+          </div>
+
+          <div class="lpl-purse" aria-label="Bourse commune">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>
+            <span
+              class="lpl-purse__amount"
+              data-when="jour pluie veillee attente fatigue notifications"
+              >214</span
+            >
+            <span class="lpl-purse__amount" data-when="vide">200</span>
+            <span class="lpl-purse__amount" data-when="train">357</span>
+            <span class="lpl-purse__unit">sous</span>
+            <span class="lpl-purse__delta" data-when="notifications">+50</span>
+          </div>
+
+          <ul class="lpl-toasts" aria-live="polite" aria-label="Notifications">
+            <li class="lpl-toast" data-when="jour">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#egg" /></svg>
+              Bichette, Cocotte et la Duchesse ont pondu : 3 œufs.
+            </li>
+            <li class="lpl-toast" data-when="pluie">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#weather-rain" /></svg>
+              Il pleut : tout le potager a bu pour aujourd’hui.
+            </li>
+            <li class="lpl-toast lpl-toast--error" data-when="fatigue">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-stamina" /></svg>
+              Plus d’énergie : tout prend deux fois plus de temps. Un en-cas ?
+            </li>
+            <li class="lpl-toast lpl-toast--event" data-when="train">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>
+              Le train part dans une heure.
+            </li>
+            <li class="lpl-toast lpl-toast--event" data-when="notifications">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-train" /></svg>
+              Le train de samedi est en gare !
+            </li>
+            <li class="lpl-toast" data-when="notifications">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-coin" /></svg>
+              Odette t’a acheté 9 radis : +50 sous.
+            </li>
+            <li class="lpl-toast" data-when="notifications">
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+              Déjà pris par Sacha.
+            </li>
+            <li class="lpl-toast lpl-toast--error" data-when="notifications">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-warning" /></svg>
+              Il manque 40 sous.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Haut droite: l'autre joueur, puis le prochain objectif -->
+        <div class="lpl-hud__top-right">
+          <div
+            class="lpl-partner"
+            data-on-attente="data-state=away"
+            data-on-veillee="data-state=evening"
+            aria-label="Sacha"
+          >
+            <span
+              class="lpl-portrait lpl-portrait--small"
+              data-portrait="sacha"
+              data-expression="great"
+              data-on-pluie="data-expression=ok"
+              data-on-attente="data-expression=good"
+            >
+              <span class="lpl-token lpl-token--small" data-player="other" aria-hidden="true"
+                ><svg><use href="#player-crescent" /></svg
+              ></span>
+            </span>
+            <span class="lpl-partner__name">Sacha</span>
+            <span class="lpl-partner__activity" data-when="jour notifications fatigue"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#axe" /></svg>Coupe du bois à la
+              lisière</span
+            >
+            <span class="lpl-partner__activity" data-when="vide"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-pin" /></svg>Sur le
+              quai</span
+            >
+            <span class="lpl-partner__activity" data-when="pluie"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-notebook" /></svg>Regarde le
+              catalogue</span
+            >
+            <span class="lpl-partner__activity" data-when="veillee"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#soup" /></svg>Cuisine au
+              réchaud</span
+            >
+            <span class="lpl-partner__activity" data-when="attente"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#ui-hourglass" /></svg>Fait une
+              pause depuis 3 min</span
+            >
+            <span class="lpl-partner__activity" data-when="train"
+              ><svg class="lpl-icon" aria-hidden="true"><use href="#parcel" /></svg>Dépose des œufs
+              dans la caisse</span
+            >
+          </div>
+
+          <section
+            class="lpl-objective"
+            aria-label="Prochain objectif"
+            data-when="jour pluie attente fatigue notifications train"
+          >
+            <p class="lpl-objective__label lpl-overline">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>Prochain
+              objectif
+            </p>
+            <h2 class="lpl-objective__title">La commande du samedi</h2>
+            <p class="lpl-objective__text">Déposer dans la caisse du quai avant samedi 16 h.</p>
+            <ul class="lpl-objective__lines">
+              <li data-on-train="data-state=done">
+                <svg class="lpl-icon" aria-hidden="true"><use href="#radish" /></svg
+                ><span data-when="jour pluie attente fatigue notifications">Radis 6 sur 12</span
+                ><span data-when="train">Radis 12 sur 12</span>
+              </li>
+              <li data-on-train="data-state=done">
+                <svg class="lpl-icon" aria-hidden="true"><use href="#lettuce" /></svg
+                ><span data-when="jour pluie attente fatigue notifications">Laitues 0 sur 3</span
+                ><span data-when="train">Laitues 3 sur 3</span>
+              </li>
+              <li>
+                <svg class="lpl-icon" aria-hidden="true"><use href="#egg" /></svg
+                ><span data-when="jour pluie attente fatigue notifications">Œufs 3 sur 6</span
+                ><span data-when="train">Œufs 4 sur 6</span>
+              </li>
+              <li data-on-train="data-state=done">
+                <svg class="lpl-icon" aria-hidden="true"><use href="#plank" /></svg
+                ><span data-when="jour pluie attente fatigue notifications">Planches 4 sur 10</span
+                ><span data-when="train">Planches 10 sur 10</span>
+              </li>
+            </ul>
+          </section>
+          <section class="lpl-objective" aria-label="Prochain objectif" data-when="vide">
+            <p class="lpl-objective__label lpl-overline">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>Prochain
+              objectif
+            </p>
+            <h2 class="lpl-objective__title">Le premier train</h2>
+            <p class="lpl-objective__text">Parler à Firmin sur le quai.</p>
+          </section>
+          <section class="lpl-objective" aria-label="Prochain objectif" data-when="veillee">
+            <p class="lpl-objective__label lpl-overline">
+              <svg class="lpl-icon" aria-hidden="true"><use href="#ui-flag" /></svg>Prochain
+              objectif
+            </p>
+            <h2 class="lpl-objective__title">Le souper de bienvenue</h2>
+            <p class="lpl-objective__text">
+              Apporter 3 radis et 2 laitues à Odette, puis venir à deux mercredi à 19 h.
+            </p>
+          </section>
+        </div>
+
+        <!-- Bas gauche: soi -->
+        <div class="lpl-hud__bottom-left">
+          <div class="lpl-self" aria-label="Camille, toi">
+            <span
+              class="lpl-portrait"
+              data-portrait="camille"
+              data-expression="good"
+              data-on-vide="data-expression=ok"
+              data-on-fatigue="data-expression=low"
+              data-on-veillee="data-expression=great"
+              data-on-train="data-expression=radiant"
+            >
+              <span class="lpl-token" data-player="self" aria-hidden="true"
+                ><svg><use href="#player-orb" /></svg
+              ></span>
+            </span>
+            <span class="lpl-self__text">
+              <span class="lpl-self__name">Camille</span>
+              <span class="lpl-self__mood" data-when="jour pluie attente notifications"
+                >En forme</span
+              >
+              <span class="lpl-self__mood" data-when="vide">Ça va</span>
+              <span class="lpl-self__mood" data-when="fatigue">Petite forme</span>
+              <span class="lpl-self__mood" data-when="veillee">Pleine forme</span>
+              <span class="lpl-self__mood" data-when="train">Forme rayonnante</span>
+              <span
+                class="lpl-stamina"
+                style="--lpl-value: 72%"
+                data-on-vide="style=--lpl-value: 100%"
+                data-on-fatigue="data-level=empty;style=--lpl-value: 0%"
+                data-on-pluie="data-level=low;style=--lpl-value: 18%"
+                data-on-veillee="style=--lpl-value: 35%"
+                data-on-train="style=--lpl-value: 60%"
+                role="meter"
+                aria-label="Endurance"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="72"
+              >
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-stamina" /></svg>
+                <span class="lpl-stamina__bar"><span class="lpl-stamina__fill"></span></span>
+                <span class="lpl-stamina__label" data-when="pluie">Fatigue</span>
+                <span class="lpl-stamina__label" data-when="fatigue">Plus d’énergie</span>
+              </span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Bas centre: astuce, outil en main, barre d'outils -->
+        <div class="lpl-hud__bottom">
+          <p class="lpl-tip" role="status" data-when="jour">
+            <svg class="lpl-icon" aria-hidden="true"><use href="#watering-can" /></svg>
+            Arrose chaque jour : une culture ne pousse que si elle a bu la veille.
+          </p>
+          <p class="lpl-tip" role="status" data-when="vide">
+            Z Q S D pour marcher, ou un clic sur le sol.
+          </p>
+          <p class="lpl-tip" role="status" data-when="veillee">
+            Cuisinez au réchaud, mangez ensemble, puis allez au lit.
+          </p>
+
+          <div class="lpl-toolbar">
+            <p class="lpl-toolbar__label">
+              <span data-label data-when="jour pluie attente fatigue notifications train veillee"
+                >Arrosoir</span
+              >
+              <small data-when="jour pluie attente fatigue notifications train veillee"
+                >7 arrosages sur 10</small
+              >
+              <span data-when="vide">Main libre</span>
+            </p>
+            <div class="lpl-toolbar__slots" aria-label="Barre d’outils">
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Houe"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">1</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#hoe" /></svg>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Arrosoir"
+                aria-selected="true"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">2</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#watering-can" /></svg>
+                <span class="lpl-slot__gauge" style="--lpl-value: 70%" aria-hidden="true"></span>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Hache"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">3</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#axe" /></svg>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Graines de radis, 8"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">4</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-radish" /></svg
+                ><span class="lpl-slot__count">8</span>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Graines de laitue, 4"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">5</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#seed-lettuce" /></svg
+                ><span class="lpl-slot__count">4</span>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Radis, belle qualité, 6"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">6</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#radish" /></svg
+                ><span class="lpl-slot__count">6</span>
+                <svg class="lpl-slot__quality" aria-hidden="true"><use href="#ui-star" /></svg>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Planches, 4"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">7</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#plank" /></svg
+                ><span class="lpl-slot__count">4</span>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Œufs, 3"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">8</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#egg" /></svg
+                ><span class="lpl-slot__count">3</span>
+              </button>
+              <button
+                class="lpl-slot"
+                type="button"
+                aria-label="Pain, 1"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">9</span
+                ><svg class="lpl-slot__icon" aria-hidden="true"><use href="#bread" /></svg
+                ><span class="lpl-slot__count">1</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="jour pluie attente fatigue notifications train veillee"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">0</span>
+              </button>
+              <!-- État vide: le premier jour, rien en main -->
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">1</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">2</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">3</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">4</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">5</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">6</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">7</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">8</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">9</span>
+              </button>
+              <button
+                class="lpl-slot lpl-slot--empty"
+                type="button"
+                aria-label="Case vide"
+                aria-selected="false"
+                data-when="vide"
+              >
+                <span class="lpl-slot__key" aria-hidden="true">0</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bas droite: caméra et carnet à la souris, avec leurs touches -->
+        <div class="lpl-hud__bottom-right">
+          <div class="lpl-shortcuts">
+            <span class="lpl-shortcut">
+              <button
+                class="lpl-icon-button"
+                type="button"
+                aria-label="Tourner la caméra à gauche (A)"
+              >
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-rotate-left" /></svg>
+              </button>
+              <span class="lpl-key" aria-hidden="true">A</span>
+            </span>
+            <span class="lpl-shortcut">
+              <button
+                class="lpl-icon-button"
+                type="button"
+                aria-label="Tourner la caméra à droite (E)"
+              >
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-rotate-right" /></svg>
+              </button>
+              <span class="lpl-key" aria-hidden="true">E</span>
+            </span>
+            <span class="lpl-shortcut">
+              <button class="lpl-icon-button" type="button" aria-label="Ouvrir le carnet (Tab)">
+                <svg class="lpl-icon" aria-hidden="true"><use href="#ui-notebook" /></svg>
+              </button>
+              <span class="lpl-key" aria-hidden="true">Tab</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="support/portraits.js"></script>
+    <script src="support/maquette.js"></script>
+  </body>
+</html>

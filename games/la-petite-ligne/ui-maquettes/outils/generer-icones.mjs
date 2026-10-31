@@ -23,10 +23,20 @@ const symbolesJoueurs = joueurs.players
   .join('\n');
 
 const sprite = source
-  .replace(/<!--[\s\S]*?-->\n?/, '<!-- Fichier généré par outils/generer-icones.mjs: modifier outils/icones-source.svg. -->\n')
+  .replace(
+    /<!--[\s\S]*?-->\n?/,
+    '<!-- Fichier généré par outils/generer-icones.mjs: modifier outils/icones-source.svg. -->\n',
+  )
   .replace('</svg>', `  <!-- Symboles des profils Duo -->\n${symbolesJoueurs}\n</svg>`);
 
 writeFileSync(path.join(racineMaquettes, 'icones.svg'), sprite, 'utf8');
+
+// Chaîne entre apostrophes, échappée comme le fait Prettier: le fichier produit passe le contrôle de format.
+const litteral = `'${sprite
+  .replace(/<svg /, '<svg width="0" height="0" ')
+  .replace(/\\/g, '\\\\')
+  .replace(/'/g, "\\'")
+  .replace(/\n/g, '\\n')}'`;
 
 const injecteur = `// Fichier généré par outils/generer-icones.mjs: ne pas modifier.
 // Maquettes seulement: insère le sprite des icônes dans la page (un <use href="icones.svg#id">
@@ -35,7 +45,8 @@ const injecteur = `// Fichier généré par outils/generer-icones.mjs: ne pas mo
   const conteneur = document.createElement('div');
   conteneur.hidden = true;
   conteneur.setAttribute('aria-hidden', 'true');
-  conteneur.innerHTML = ${JSON.stringify(sprite.replace(/<svg /, '<svg width="0" height="0" '))};
+  conteneur.innerHTML =
+    ${litteral};
   document.body.prepend(conteneur);
 })();
 `;
