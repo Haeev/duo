@@ -305,6 +305,17 @@ const FURNITURE: Record<string, Builder> = {
     b.box([0.38, 1.1, 0.03], [-0.25, 0.75, -0.42], 'fabric_rose', { base: true });
     b.box([0.38, 1.1, 0.03], [0.25, 0.75, -0.42], 'fabric_rose', { base: true });
   },
+  // Cadre au mur: comme le modèle de l'artiste, accroché au bord arrière de la case (-Z), à hauteur d'yeux.
+  picture_frame: (b) => {
+    b.box([0.6, 0.45, 0.04], [0, 1.23, -0.47], 'wood_dark', { base: true });
+    b.box([0.48, 0.33, 0.01], [0, 1.29, -0.445], 'sepia', { base: true });
+  },
+  wood_stove: (b) => {
+    b.cylinder(0.24, 0.26, 0.75, [0, 0, -0.03], 'black', { base: true, segments: 10 });
+    b.cylinder(0.27, 0.27, 0.04, [0, 0.75, -0.03], 'iron_light', { base: true, segments: 10 });
+    b.box([0.2, 0.16, 0.02], [0, 0.25, 0.23], 'ember', { base: true });
+    b.cylinder(0.06, 0.06, 1.56, [0, 0.79, -0.12], 'black', { base: true, segments: 6 });
+  },
   crystal_radio: (b) => {
     b.box([0.4, 0.26, 0.25], [0, 0, 0], { top: 'wood_dark', side: 'wood' }, { base: true });
     b.cylinder(0.05, 0.05, 0.03, [-0.1, 0.13, 0.13], 'brass', {

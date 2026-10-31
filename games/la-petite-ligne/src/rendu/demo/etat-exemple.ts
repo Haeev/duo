@@ -215,6 +215,21 @@ export function createExampleWorld(
       rotation: 0,
       placedBy: 'p1',
     },
+    // Semaine 2: le cadre au mur du fond (rotation 0, il s'accroche au bord nord de la case) et le poêle.
+    {
+      id: 'f7',
+      item: 'picture_frame',
+      cell: { cx: room.x + 2, cy: room.y },
+      rotation: 0,
+      placedBy: 'p1',
+    },
+    {
+      id: 'f8',
+      item: 'wood_stove',
+      cell: { cx: room.x + room.w - 1, cy: room.y + 2 },
+      rotation: 3,
+      placedBy: 'p2',
+    },
   ];
   if (options.inside) {
     p1.placement = {
