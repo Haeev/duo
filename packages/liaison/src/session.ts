@@ -4,6 +4,7 @@ import type { NetworkConfig } from './config.ts';
 import { Emitter } from './emitter.ts';
 import type { Link, ChannelMode, GamePayload, ReliableMessage } from './link.ts';
 import type { LinkManager } from './link-manager.ts';
+import { TokenBucket } from './rate.ts';
 import { randomId } from './random.ts';
 import type { RandomSource } from './random.ts';
 
@@ -93,7 +94,10 @@ export type ActionResult =
 
 export type SendResult =
   | { readonly ok: true }
-  | { readonly ok: false; readonly reason: 'no-match' | 'no-link' | 'bad-channel' | 'too-big' | 'invalid' };
+  | {
+      readonly ok: false;
+      readonly reason: 'no-match' | 'no-link' | 'bad-channel' | 'too-big' | 'invalid' | 'rate';
+    };
 
 const id32 = v.pipe(v.string(), v.regex(/^[0-9a-f]{32}$/));
 const machine = v.pipe(v.string(), v.regex(/^[A-Za-z0-9-]{8,64}$/));
@@ -168,11 +172,25 @@ export class SessionController {
   private remote: LobbyState | null = null;
   private joinState: 'none' | 'pending' | 'joined' = 'none';
   private hostTimers: CancelTimer[] = [];
-  private incomingGame = { start: 0, count: 0, bytes: 0 };
   private droppedGameValue = 0;
+  private readonly sendMessages: TokenBucket;
+  private readonly sendBytes: TokenBucket;
+  private readonly receiveMessages: TokenBucket;
+  private readonly receiveBytes: TokenBucket;
 
   constructor(options: SessionControllerOptions) {
     this.options = options;
+    const { config } = options;
+    const now = options.clock.now();
+    const receiveSeconds = config.gameReceiveBurstMs / 1000;
+    this.sendMessages = new TokenBucket(config.gameMessagesPerSecond, config.gameBurstMessages, now);
+    this.sendBytes = new TokenBucket(config.gameBytesPerSecond, config.gameBurstBytes, now);
+    this.receiveMessages = new TokenBucket(
+      config.gameMessagesPerSecond,
+      config.gameMessagesPerSecond * receiveSeconds,
+      now,
+    );
+    this.receiveBytes = new TokenBucket(config.gameBytesPerSecond, config.retransmitBufferBytes, now);
     this.events = new Emitter((error) => {
       options.log('erreur-ecouteur', { error: String(error) });
     });
@@ -260,7 +278,7 @@ export class SessionController {
     if (local === null) return { ok: false, reason: 'not-host' };
     if (local.phase === 'match') return { ok: false, reason: 'bad-phase' };
     this.clearHostTimers();
-    this.local = { ...local, game, phase: 'open', ready: { host: false, guest: false }, countdownEndsAt: null };
+    this.setLocal({ ...local, game, phase: 'open', ready: { host: false, guest: false }, countdownEndsAt: null });
     this.broadcast();
     return { ok: true };
   }
@@ -393,6 +411,10 @@ export class SessionController {
       }
     }
     if (bytes > config.maxGameMessageBytes) return { ok: false, reason: 'too-big' };
+    const now = this.options.clock.now();
+    if (!this.sendMessages.take(1, now) || !this.sendBytes.take(bytes, now)) {
+      return { ok: false, reason: 'rate' };
+    }
     link.sendGame(channel, payload, mode);
     return { ok: true };
   }
@@ -737,17 +759,11 @@ export class SessionController {
   private onGame(channel: number, payload: GamePayload): void {
     if ((this.currentLobby()?.match ?? null) === null) return;
     const now = this.options.clock.now();
-    const window = this.incomingGame;
-    if (now - window.start >= 1000) {
-      window.start = now;
-      window.count = 0;
-      window.bytes = 0;
-    }
-    window.count += 1;
-    window.bytes += payload instanceof Uint8Array ? payload.byteLength : 0;
-    const { gameMessagesPerSecond, gameBytesPerSecond } = this.options.config;
-    if (window.count > gameMessagesPerSecond || window.bytes > gameBytesPerSecond) {
+    const bytes = payload instanceof Uint8Array ? payload.byteLength : 0;
+    // Garde-fou contre une rafale anormale; la rafale permise couvre une reprise entière.
+    if (!this.receiveMessages.take(1, now) || !this.receiveBytes.take(bytes, now)) {
       this.droppedGameValue += 1;
+      if (this.droppedGameValue % 100 === 1) this.options.log('jeu-debit-depasse', { dropped: this.droppedGameValue });
       return;
     }
     this.events.emit('game', { channel, payload });

@@ -65,6 +65,11 @@ export interface NetworkConfig {
   readonly gameChannels: number;
   readonly gameMessagesPerSecond: number;
   readonly gameBytesPerSecond: number;
+  /** Rafales permises à l'envoi (au-delà, l'envoi est refusé au jeu). */
+  readonly gameBurstMessages: number;
+  readonly gameBurstBytes: number;
+  /** À la réception, rafale permise: tout ce qu'une reprise peut réémettre d'un coup. */
+  readonly gameReceiveBurstMs: number;
   readonly controlMessagesPerSecond: number;
   readonly invalidMessagesPerMinute: number;
 
@@ -141,6 +146,9 @@ export const DEFAULT_CONFIG: NetworkConfig = {
   gameChannels: 16,
   gameMessagesPerSecond: 120,
   gameBytesPerSecond: 512 * 1024,
+  gameBurstMessages: 240,
+  gameBurstBytes: 1024 * 1024,
+  gameReceiveBurstMs: 30_000,
   controlMessagesPerSecond: 200,
   invalidMessagesPerMinute: 10,
 

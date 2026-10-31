@@ -248,6 +248,8 @@ export interface AddHostOptions {
   readonly netmask?: string;
   readonly interfaceName?: string;
   readonly seed?: number;
+  /** Décalage de l'horloge de cette machine: chaque machine a sa propre origine de temps. */
+  readonly clockOffsetMs?: number;
 }
 
 /**
@@ -275,7 +277,7 @@ export class SimNetwork {
   addHost(address: string, options: AddHostOptions = {}): NetworkDriver {
     const host = new SimHost(address, options.netmask ?? '255.255.255.0', options.interfaceName ?? 'en0');
     this.hosts.set(address, host);
-    return this.createDriver(host, createSeededRandom(options.seed ?? hashText(address)));
+    return this.createDriver(host, createSeededRandom(options.seed ?? hashText(address)), options.clockOffsetMs ?? 0);
   }
 
   /**
@@ -362,9 +364,16 @@ export class SimNetwork {
     this.hosts.get(connection.localHost)?.connections.delete(connection);
   }
 
-  private createDriver(host: SimHost, random: RandomSource): NetworkDriver {
+  private createDriver(host: SimHost, random: RandomSource, clockOffsetMs: number): NetworkDriver {
+    const clock =
+      clockOffsetMs === 0
+        ? this.clock
+        : {
+            now: () => this.clock.now() + clockOffsetMs,
+            setTimeout: (callback: () => void, delayMs: number) => this.clock.setTimeout(callback, delayMs),
+          };
     return {
-      clock: this.clock,
+      clock,
       random,
       dialer: {
         dial: (endpoint, timeoutMs, callbacks) => this.dial(host, endpoint, timeoutMs, callbacks),
