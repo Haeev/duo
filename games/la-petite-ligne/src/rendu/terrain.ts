@@ -330,7 +330,11 @@ export class Terrain {
     if (look.kind === 'water') {
       return look.ford ? SETTINGS.fordBed : SETTINGS.waterSurface;
     }
-    return look.height;
+    let ground = look.height;
+    for (const crossing of this.crossings) {
+      ground = Math.max(ground, talusHeight(crossing, x, y));
+    }
+    return ground;
   }
 
   /** Vrai si l'herbe pousse là (touffes, fleurs, arbres du pourtour). */
@@ -817,6 +821,36 @@ function crossingHeight(c: Crossing, x: number, y: number): number | null {
 }
 
 /**
+ * Hauteur des talus d'une traversée sous un point hors de la route (même
+ * géométrie que `buildCrossing`), ou `-Infinity` hors d'eux.
+ */
+function talusHeight(c: Crossing, x: number, y: number): number {
+  const u = c.alongX ? x : y;
+  const v = (c.alongX ? y : x) - c.axis;
+  const out = u < c.u0 ? c.u0 - u : u > c.u1 ? u - c.u1 : 0;
+  if (out <= 0) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  const side = v < 0 ? 0 : 1;
+  const foot = c.rampFoot[side];
+  if (foot === null) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  const edge = c.deck[side];
+  const distance = Math.abs(v);
+  const run = CROSSING.talusRun;
+  if (distance <= edge) {
+    // Coin contre le bout du platelage.
+    return rampTop() - (out + edge - distance) / run;
+  }
+  if (distance > edge + CROSSING.rampLength) {
+    return Number.NEGATIVE_INFINITY;
+  }
+  const t = (distance - edge) / CROSSING.rampLength;
+  return rampTop() + (foot - rampTop()) * t - out / run;
+}
+
+/**
  * Une lame posée dans le sens des rails, de `u0` à `u1`, de `va` à `vb` en
  * travers: dessus chanfreiné sur ses quatre arêtes, bouts jusqu'au fond.
  */
@@ -887,13 +921,18 @@ function plank(
   );
 }
 
-/** Lames qui remplissent une bande de `va` à `vb`, au plus près de la largeur visée. */
+/**
+ * Lames qui remplissent une bande de `va` à `vb`, au plus près de la largeur
+ * visée. `railAt`: bouts de la bande qui longent un rail (début, fin), où la
+ * lame prend `railSideTone`.
+ */
 function plankBand(
   writer: GeometryWriter,
   c: Crossing,
   va: number,
   vb: number,
   next: () => PaletteCell,
+  railAt: readonly [boolean, boolean],
 ): void {
   const width = vb - va;
   if (width <= CROSSING.chamfer * 2) {
@@ -902,7 +941,9 @@ function plankBand(
   const count = Math.max(1, Math.round(width / CROSSING.plankWidth));
   const step = width / count;
   for (let i = 0; i < count; i += 1) {
-    plank(writer, c, va + i * step, va + (i + 1) * step, next());
+    const tone = next();
+    const alongRail = (i === 0 && railAt[0]) || (i === count - 1 && railAt[1]);
+    plank(writer, c, va + i * step, va + (i + 1) * step, alongRail ? CROSSING.railSideTone : tone);
   }
 }
 
@@ -948,9 +989,9 @@ function buildCrossing(writer: GeometryWriter, c: Crossing): void {
   const head = CROSSING.railHeadWidth / 2;
   const outer = rail + head + CROSSING.outerClearance;
   const inner = rail - head - CROSSING.flangeway;
-  plankBand(writer, c, -north, -outer, next);
-  plankBand(writer, c, -inner, inner, next);
-  plankBand(writer, c, outer, south, next);
+  plankBand(writer, c, -north, -outer, next, [false, true]);
+  plankBand(writer, c, -inner, inner, next, [true, true]);
+  plankBand(writer, c, outer, south, next, [true, false]);
   // Rampes de terre: la route monte doucement jusqu'au bord des lames.
   const sides: [number, number][] = [
     [-1, north],
@@ -959,6 +1000,18 @@ function buildCrossing(writer: GeometryWriter, c: Crossing): void {
   sides.forEach(([sign, edge], side) => {
     const foot = c.rampFoot[side];
     if (foot === null || foot === undefined) {
+      // Côté sans rampe (contre le quai): flanc fermé jusque sous le sol. Sans lui, là où le
+      // modèle du quai s'abaisse (rampe du bout est), on voyait le ciel sous le platelage.
+      writer.quad(
+        [
+          p(u0, sign * edge, base),
+          p(u1, sign * edge, base),
+          p(u1, sign * edge, Math.min(railGround, 0)),
+          p(u0, sign * edge, Math.min(railGround, 0)),
+        ],
+        crossingNormal(c, 0, sign, 0),
+        CROSSING.endTone,
+      );
       return;
     }
     const far = edge + CROSSING.rampLength;
@@ -974,33 +1027,69 @@ function buildCrossing(writer: GeometryWriter, c: Crossing): void {
       normal,
       CROSSING.rampTone,
     );
-    // Joues de la rampe aux deux bords de la route (descendent sous le ballast et la route).
+    // Talus de terre aux deux bords de la route (revue du directeur artistique,
+    // tour 5): la rampe retombe en pente douce vers le ballast et les bas-côtés,
+    // jusque sous le sol, au lieu d'une joue verticale qui pointait comme une lame.
     const bottom = Math.min(foot, 0);
+    const run = CROSSING.talusRun;
+    const nearDrop = (high - bottom) * run;
+    const farDrop = (foot - bottom) * run;
     for (const [u, nu] of [
       [u0, -1],
       [u1, 1],
     ] as const) {
-      // Triangle sous la pente (un quadrilatère au pied nul serait dégénéré et mal orienté).
-      const normal = crossingNormal(c, nu, 0, 0);
-      writer.triangle(
-        p(u, sign * edge, high),
-        p(u, sign * far, foot),
-        p(u, sign * edge, foot),
-        normal,
-        CROSSING.rampSideTone,
-      );
-      if (foot > bottom) {
+      const crest = p(u, sign * edge, high);
+      const low = p(u, sign * far, foot);
+      const nearFoot = p(u + nu * nearDrop, sign * edge, bottom);
+      if (farDrop > TALUS_EPSILON) {
+        const farFoot = p(u + nu * farDrop, sign * far, bottom);
         writer.quad(
-          [
-            p(u, sign * edge, foot),
-            p(u, sign * far, foot),
-            p(u, sign * far, bottom),
-            p(u, sign * edge, bottom),
-          ],
-          normal,
+          [crest, low, farFoot, nearFoot],
+          upwardNormal(crest, low, nearFoot),
+          CROSSING.rampSideTone,
+        );
+      } else {
+        // Pied de rampe au niveau du bas: triangle (un quadrilatère dégénéré serait mal orienté).
+        writer.triangle(
+          crest,
+          low,
+          nearFoot,
+          upwardNormal(crest, low, nearFoot),
           CROSSING.rampSideTone,
         );
       }
+      // Coin contre le bout du platelage: la même pente tourne vers la voie.
+      const cornerFoot = p(u, sign * (edge - nearDrop), bottom);
+      writer.triangle(
+        crest,
+        nearFoot,
+        cornerFoot,
+        upwardNormal(crest, nearFoot, cornerFoot),
+        CROSSING.rampSideTone,
+      );
     }
   });
+}
+
+/** Écart (m) sous lequel le pied du talus est confondu avec le bas de la rampe. */
+const TALUS_EPSILON = 1e-4;
+
+/** Normale unitaire du plan a, b, c, tournée vers le ciel. */
+function upwardNormal(a: Point3, b: Point3, c: Point3): [number, number, number] {
+  const ux = b[0] - a[0];
+  const uy = b[1] - a[1];
+  const uz = b[2] - a[2];
+  const vx = c[0] - a[0];
+  const vy = c[1] - a[1];
+  const vz = c[2] - a[2];
+  let nx = uy * vz - uz * vy;
+  let ny = uz * vx - ux * vz;
+  let nz = ux * vy - uy * vx;
+  if (ny < 0) {
+    nx = -nx;
+    ny = -ny;
+    nz = -nz;
+  }
+  const length = Math.hypot(nx, ny, nz) || 1;
+  return [nx / length, ny / length, nz / length];
 }

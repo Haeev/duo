@@ -5,12 +5,15 @@
  * une petite mise en scène fait bouger tout le monde sans la simulation.
  *
  * Le monde de départ vient de `createWorld` (tous les champs de l'état, à
- * jour des types); la scène est ensuite écrite à la main: aucune règle du jeu
- * ne tourne ici.
+ * jour des types); la scène est ensuite écrite à la main. Seules deux règles
+ * du jeu y tournent, pour ne pas tromper les relecteurs: les habitants posés
+ * à leur place de l'emploi du temps (`placeVillagers`, assis sur un banc
+ * quand le jeu les y assoit) et l'assise des joueurs (`sitDown`).
  */
 import type { GameMap } from '../../etat/carte';
 import { createWorld } from '../../simulation/monde';
 import { sitDown } from '../../simulation/bancs';
+import { placeVillagers } from '../../simulation/habitants';
 import type {
   ActionKind,
   Character,
@@ -18,7 +21,6 @@ import type {
   GardenCell,
   Hen,
   PlacedFurniture,
-  VillagerState,
   WorldEvent,
   WorldState,
 } from '../../etat/types';
@@ -29,6 +31,13 @@ const SCARF_P1 = '#5ce1e6';
 const SCARF_P2 = '#8d6cff';
 const SIM_HZ = 30;
 const SEED = 7;
+/** Jour de l'exemple: le premier où Jeanne est au bourg (`habitants.json`). */
+const DEMO_DAY = 3;
+/**
+ * Jeanne dans `banc-quai`: elle laisse le banc aux deux joueurs et les regarde,
+ * debout sur le quai entre la cloche et le banc, hors de la marquise.
+ */
+const QUAY_WATCH = { x: 30.5, y: 17.5 };
 
 function dress(
   c: Character,
@@ -76,7 +85,7 @@ export interface DemoOptions {
    * côté et s'arrête (`rencontre`), Firmin seul sur la place (`place`), ou
    * Camille mange assise à la table (`repas`), ou s'assoit sur le banc de la
    * place (`banc`), ou les deux joueurs côte à côte sur le banc du quai
-   * (`banc-quai`, Jeanne partie à la cloche). L'assise passe par la règle de
+   * (`banc-quai`, Jeanne debout sur le quai). L'assise passe par la règle de
    * la simulation (`sitDown`): places réservées, comme en jeu.
    */
   scene?: DemoScene | undefined;
@@ -163,23 +172,6 @@ export function createExampleWorld(
     };
   });
 
-  const villagers: VillagerState[] = content.villagers.map((villager, index) => {
-    const spots = ['quay_bell', 'grocery_counter', 'sawmill_workbench', 'quay_bench'];
-    const at = point(map, spots[index % spots.length] ?? 'village_square', 30, 25);
-    return {
-      id: villager.id,
-      pos: { ...at },
-      prev: { ...at },
-      facing: Math.PI / 2,
-      speed: 0,
-      visible: true,
-      target: spots[index % spots.length] ?? 'village_square',
-      activity: villager.id === 'basile' ? 'work' : 'stand',
-      talkingWith: [],
-      met: true,
-    };
-  });
-
   const pen = map.zones.hen_pen ?? { x: 13, y: 31, w: 4, h: 4 };
   const hens: Hen[] = ['hen_white', 'hen_red', 'hen_black'].map((variant, index) => {
     const at = { x: pen.x + 0.8 + index * 1.2, y: pen.y + pen.h - 1 };
@@ -253,16 +245,6 @@ export function createExampleWorld(
       placedBy: 'p2',
     },
   ];
-  if (options.scene === 'rencontre' || options.scene === 'place') {
-    // Firmin sur la place, face à la caméra de départ, pour voir le regard et le salut.
-    const firmin = villagers.find((villager) => villager.id === 'firmin');
-    const square = point(map, 'village_square', 40, 28);
-    if (firmin !== undefined) {
-      firmin.pos = { x: square.x - 6, y: square.y };
-      firmin.prev = { ...firmin.pos };
-      firmin.facing = Math.PI / 4;
-    }
-  }
   if (options.scene === 'repas') {
     // Chaise au sud de la table, tournée vers elle (vers le nord: rotation 2).
     const chair = { cx: room.x + 2, cy: room.y + 3 };
@@ -301,7 +283,7 @@ export function createExampleWorld(
   world.phase = 'day';
   world.clock = {
     ...world.clock,
-    day: 2,
+    day: DEMO_DAY,
     minutes: options.minutes,
     running: true,
     stoppedBy: null,
@@ -330,17 +312,39 @@ export function createExampleWorld(
     },
     { id: 'g2', item: 'log', quality: 'ordinary', count: 2, pos: { x: door.x + 3, y: door.y + 1 } },
   ];
-  world.villagers = villagers;
   world.hens = hens;
+  // Habitants à leur place de l'emploi du temps, comme le jeu les pose (au
+  // matin, au chargement): sur un banc, devant sa place, donc dessinés assis.
+  for (const villager of world.villagers) {
+    villager.met = true;
+  }
+  placeVillagers(sim);
+  const villagers = world.villagers;
+  if (options.scene === 'rencontre' || options.scene === 'place') {
+    // Firmin sur la place, face à la caméra de départ, pour voir le regard et le salut.
+    const firmin = villagers.find((villager) => villager.id === 'firmin');
+    const square = point(map, 'village_square', 40, 28);
+    if (firmin !== undefined) {
+      firmin.pos = { x: square.x - 6, y: square.y };
+      firmin.prev = { ...firmin.pos };
+      firmin.facing = Math.PI / 4;
+      firmin.target = 'village_square';
+      firmin.visible = true;
+    }
+  }
   if (options.scene === 'banc' || options.scene === 'banc-quai') {
     const both = options.scene === 'banc-quai';
     const jeanne = villagers.find((villager) => villager.id === 'jeanne');
     if (both && jeanne !== undefined) {
-      // Jeanne laisse le banc du quai aux deux joueurs: elle attend près de la cloche.
-      const bell = point(map, 'quay_bell', 36.5, 18.5);
-      jeanne.pos = { x: bell.x + 1.6, y: bell.y + 0.6 };
-      jeanne.prev = { ...jeanne.pos };
+      // Point fixe hors du banc (aucun banc pour point: elle reste debout), tournée vers les joueurs.
+      jeanne.pos = { ...QUAY_WATCH };
+      jeanne.prev = { ...QUAY_WATCH };
       jeanne.target = 'quay_bell';
+      jeanne.activity = 'stand';
+      jeanne.visible = true;
+      jeanne.speed = 0;
+      const bench = point(map, 'quay_bench', 33, 18.5);
+      jeanne.facing = Math.atan2(bench.y - QUAY_WATCH.y, bench.x - QUAY_WATCH.x);
     }
     p1.aim = null;
     p2.action = { kind: 'idle', since: 0, duration: 0, target: null };
@@ -439,7 +443,7 @@ function strollPosition(
 
 /**
  * Fait vivre l'exemple: Sacha arrose, Camille se promène, Jeanne joue sur la
- * place. `seconds`: temps de la page. Renvoie les événements du pas, comme le
+ * place à ses heures. `seconds`: temps de la page. Renvoie les événements du pas, comme le
  * ferait la simulation.
  */
 export function animateExampleWorld(
@@ -486,7 +490,8 @@ export function animateExampleWorld(
   }
   const jeanne = world.villagers.find((villager) => villager.id === 'jeanne');
   const square = point(map, 'village_square', 40, 28);
-  if (jeanne !== undefined && walking) {
+  // Jeanne ne joue sur la place qu'aux heures où l'emploi du temps l'y envoie.
+  if (jeanne !== undefined && walking && jeanne.visible && jeanne.target === 'village_square') {
     const stroll = strollPosition(
       {
         points: [

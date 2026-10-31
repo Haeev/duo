@@ -9,14 +9,18 @@ import {
   Box3,
   Color,
   Group,
+  InstancedMesh,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   PointLight,
+  SkinnedMesh,
   Vector3,
   type BufferGeometry,
   type Material,
   type Object3D,
 } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { GameMap, MapProp } from '../etat/carte';
 import {
   CORNER_SIZE,
@@ -29,7 +33,7 @@ import {
 import type { Content } from '../donnees/types';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
-import { propHints, propMatrix } from './decor';
+import { bakeGeometry, propHints, propMatrix } from './decor';
 import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -82,6 +86,87 @@ interface ElementPart {
   facing: Vector3 | null;
 }
 
+/**
+ * Pièces fixes d'un modèle (murs, gravats, sol) fusionnées en un maillage par
+ * matériau et par réglage d'ombre: dessinées d'un seul appel tant qu'elles
+ * sont toutes visibles; dès que l'une est coupée (personnage dedans), on
+ * revient aux pièces séparées. Les éléments à construire et les toits qui
+ * s'effacent pendant le chantier restent à part.
+ */
+interface FixedMerge {
+  model: Object3D;
+  /** Enfants directs du modèle couverts par la fusion. */
+  pieces: Object3D[];
+  meshes: Mesh[];
+}
+
+/** Fusionne les maillages sous `pieces` (repère du modèle), ou `null` si leurs attributs diffèrent. */
+function mergePieces(
+  model: Object3D,
+  pieces: readonly Object3D[],
+  resources: ResourceTracker,
+): Mesh[] | null {
+  model.updateMatrixWorld(true);
+  const toModel = new Matrix4().copy(model.matrixWorld).invert();
+  const local = new Matrix4();
+  const buckets = new Map<
+    string,
+    { material: Material; cast: boolean; receive: boolean; geometries: BufferGeometry[] }
+  >();
+  let invalid = false;
+  for (const piece of pieces) {
+    piece.traverse((object) => {
+      if (!(object instanceof Mesh) || object instanceof InstancedMesh || invalid) {
+        return;
+      }
+      if (Array.isArray(object.material) || object instanceof SkinnedMesh) {
+        invalid = true;
+        return;
+      }
+      const material = object.material as Material;
+      const key = `${material.uuid}|${String(object.castShadow)}|${String(object.receiveShadow)}`;
+      let bucket = buckets.get(key);
+      if (bucket === undefined) {
+        bucket = {
+          material,
+          cast: object.castShadow,
+          receive: object.receiveShadow,
+          geometries: [],
+        };
+        buckets.set(key, bucket);
+      }
+      local.multiplyMatrices(toModel, object.matrixWorld);
+      bucket.geometries.push(bakeGeometry(object.geometry as BufferGeometry, local));
+    });
+  }
+  const meshes: Mesh[] = [];
+  for (const bucket of buckets.values()) {
+    const merged = invalid ? null : mergeGeometries(bucket.geometries, false);
+    for (const geometry of bucket.geometries) {
+      geometry.dispose();
+    }
+    if (merged === null) {
+      invalid = true;
+      continue;
+    }
+    merged.computeBoundingBox();
+    merged.computeBoundingSphere();
+    const mesh = new Mesh(resources.track(merged), bucket.material);
+    mesh.name = `${model.name} (pièces fixes)`;
+    mesh.castShadow = bucket.cast;
+    mesh.receiveShadow = bucket.receive;
+    mesh.visible = false;
+    meshes.push(mesh);
+  }
+  if (invalid) {
+    for (const mesh of meshes) {
+      mesh.geometry.dispose();
+    }
+    return null;
+  }
+  return meshes;
+}
+
 export interface StagedState {
   repaired: boolean;
   /** La construction a commencé: les restes du vieux toit laissent place aux fantômes. */
@@ -115,6 +200,7 @@ class StagedBuilding {
   private readonly elements: ElementPart[] = [];
   private readonly parts: BuildPart[] = [];
   private readonly fixed: Object3D[] = [];
+  private readonly merges: FixedMerge[] = [];
   private readonly centre = new Vector3();
   private readonly worldFacing = new Vector3();
 
@@ -209,6 +295,16 @@ class StagedBuilding {
           this.parts.push({ node: child, owner, facing: facingOf(child), roof: false });
         }
       }
+      const pieces = model.children.filter(
+        (child) => !roofPattern.test(child.name) && !containsElement(child),
+      );
+      const meshes = pieces.length > 1 ? mergePieces(model, pieces, this.resources) : null;
+      if (meshes !== null) {
+        for (const mesh of meshes) {
+          model.add(mesh);
+        }
+        this.merges.push({ model, pieces, meshes });
+      }
     }
   }
 
@@ -239,6 +335,30 @@ class StagedBuilding {
   }
 
   apply(state: StagedState): void {
+    // Pièces fixes visibles par défaut; la fusion ne reprend la main qu'à la fin, si rien n'est coupé.
+    for (const merge of this.merges) {
+      for (const piece of merge.pieces) {
+        piece.visible = true;
+      }
+    }
+    this.applyParts(state);
+    for (const merge of this.merges) {
+      let whole = true;
+      for (const piece of merge.pieces) {
+        whole &&= piece.visible;
+      }
+      if (whole) {
+        for (const piece of merge.pieces) {
+          piece.visible = false;
+        }
+      }
+      for (const mesh of merge.meshes) {
+        mesh.visible = whole;
+      }
+    }
+  }
+
+  private applyParts(state: StagedState): void {
     const separate = this.repaired !== this.ruin;
     this.ruin.visible = !separate || !state.repaired;
     for (const node of this.fixed) {

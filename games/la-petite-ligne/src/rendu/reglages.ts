@@ -107,7 +107,17 @@ export const RENDER_SETTINGS = {
       /** Bouts du platelage côté voie (sous les lames, jusqu'au ballast). */
       endTone: 'wood_dark' as const,
       rampTone: 'path' as const,
+      /** Talus des bords de la rampe (vers le ballast et les bas-côtés). */
       rampSideTone: 'bank' as const,
+      /** Pente des talus: mètres à l'horizontale par mètre de hauteur (1 pour 1). */
+      talusRun: 1,
+      /**
+       * Lame qui borde un rail (le long de l'ornière): toujours ce ton. `wood_old`
+       * est gris (#908879): contre le rail, il se lisait comme une bande de
+       * ballast de 20 cm au lieu de la fente sombre (revue du directeur
+       * artistique, tour 5).
+       */
+      railSideTone: 'wood' as const,
     },
     /** Taille des taches d'herbe (bruit lisse), en mètres. */
     grassPatchScale: 5.5,
