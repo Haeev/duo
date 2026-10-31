@@ -123,6 +123,12 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   vegetable_soup: 'soup',
   iron_box: 'tin-box',
   riddle_card: 'riddle-card',
+  riddle_card_2: 'riddle-card',
+  emile_logbook: 'ui-notebook',
+  lucie_letter: 'ui-letter',
+  gudgeon: 'fish',
+  trout: 'fish',
+  fishing_rod: 'fishing-rod',
   shed_key: 'key',
   old_photo: 'photo',
   straw_mattress: 'straw-bed',
@@ -137,6 +143,8 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   rug: 'rug',
   curtains: 'curtains',
   crystal_radio: 'crystal-radio',
+  wood_stove: 'wood-stove',
+  picture_frame: 'picture-frame',
 };
 
 /** Icône de secours par catégorie (objet sans dessin propre). */
@@ -150,7 +158,7 @@ export const CATEGORY_ICONS: Readonly<Record<string, string>> = {
   tool: 'hoe',
   food: 'bread',
   quest: 'tin-box',
-  fish: 'parcel',
+  fish: 'fish',
   decoration: 'flower-pot',
   furniture: 'parcel',
 };

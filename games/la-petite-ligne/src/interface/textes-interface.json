@@ -289,7 +289,9 @@
       "crystal_radio": "Il annoncera le temps du lendemain",
       "mattress": "Pour le lit double, à fabriquer à l'établi",
       "flower_pot": "Beauté",
-      "nail": "Pour réparer le poulailler"
+      "nail": "Pour réparer le poulailler, puis la draisine",
+      "wood_stove": "Confort · une chaleur douce pour les soirées",
+      "picture_frame": "Beauté · s'accroche au mur"
     }
   },
   "shop": {
