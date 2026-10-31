@@ -501,9 +501,9 @@ export class RenderEngine implements Renderer {
 
   /**
    * Applique une décision de `qualite.ts`, à chaud: ni contexte recréé, ni page
-   * rechargée. Les programmes sans ombre se compilent à la première bascule
-   * (Three.js les garde par matériau); le retour en compile encore quelques-uns
-   * (11, 16 puis 20 programmes mesurés dans `rendu.html`).
+   * rechargée, ni programme compilé: `warmUp()` a préparé les deux variantes
+   * (22 programmes en cache dans `rendu.html?adaptatif=1`, 11 sans adaptation;
+   * 6 ou 7 utilisés par les matériaux de la scène dans chaque état).
    */
   private applyQuality(change: QualityChange): void {
     if (change.kind !== 'step') {
@@ -640,7 +640,11 @@ export class RenderEngine implements Renderer {
         : [object.material];
       for (const material of materials) {
         const properties = this.renderer.properties.get(material);
-        if (typeof properties === 'object' && properties !== null && 'currentProgram' in properties) {
+        if (
+          typeof properties === 'object' &&
+          properties !== null &&
+          'currentProgram' in properties
+        ) {
           used.add(properties.currentProgram);
         }
       }
