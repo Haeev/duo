@@ -1,0 +1,9 @@
+{
+  // Tests Playwright: Node pour le pilote, DOM pour le code évalué dans les pages.
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.browser.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["tests/e2e"]
+}

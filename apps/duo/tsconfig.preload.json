@@ -1,0 +1,9 @@
+{
+  // Preloads en bac à sable: API web, plus le module `electron` (ses types s'appuient sur ceux de Node).
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.browser.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["src/preload", "src/shared"]
+}
