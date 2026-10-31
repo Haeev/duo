@@ -65,6 +65,7 @@ export class FarmLifePart implements EventfulPart {
   private readonly items: InstancedBatches;
   private readonly itemPicks = new Map<string, PickTarget>();
   private beam: Object3D | null = null;
+  private beamModel = '';
   private readonly matrix = new Matrix4();
   private readonly quaternion = new Quaternion();
   private readonly up = new Vector3(0, 1, 0);
@@ -189,20 +190,28 @@ export class FarmLifePart implements EventfulPart {
       }
       return;
     }
-    if (this.beam === null) {
-      this.beam = this.library.instantiate(this.content.items.beam?.model ?? 'beam');
+    // Ce qu'on porte à deux: la poutre, la draisine, le gros colis (`beam.item`, un modèle chacun).
+    const model = this.content.items[beam.item]?.model ?? beam.item;
+    if (this.beam === null || this.beamModel !== model) {
+      this.beam?.removeFromParent();
+      this.beam = this.library.instantiate(model);
+      this.beamModel = model;
       this.beam.traverse((object) => {
         object.castShadow = true;
       });
       this.group.add(this.beam);
     }
-    const carryHeight = this.library.extras('beam').carry_height;
+    const carryHeight = this.library.extras(model).carry_height;
     const at = interpolate(beam.prev, beam.pos, context.alpha, this.point);
-    const lift = beam.carried
-      ? typeof carryHeight === 'number'
-        ? carryHeight
-        : DEFAULT_CARRY_HEIGHT
-      : BEAM_GROUND_HEIGHT;
+    // La draisine roule sur ses rails: elle reste au sol, portée ou non.
+    const lift =
+      beam.purpose === 'handcar'
+        ? 0
+        : beam.carried
+          ? typeof carryHeight === 'number'
+            ? carryHeight
+            : DEFAULT_CARRY_HEIGHT
+          : BEAM_GROUND_HEIGHT;
     this.beam.visible = true;
     this.beam.position.set(at.x, this.terrain.heightAt(at.x, at.y) + lift, at.y);
     this.beam.rotation.y = yawFromFacing(beam.facing);

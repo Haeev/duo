@@ -88,11 +88,33 @@ const tmpDelta = new Quaternion();
 export class BoneOffsets {
   private readonly bones: (Object3D | null)[];
   private readonly angles: number[];
+  /** Rotation laissée par le mélangeur, rendue avant sa mise à jour suivante. */
+  private readonly base: Quaternion[];
+  private applied = false;
   private any = false;
 
   constructor(model: Object3D) {
     this.bones = RIG_BONES.map((name) => model.getObjectByName(name) ?? null);
     this.angles = new Array<number>(RIG_BONES.length * 3).fill(0);
+    this.base = RIG_BONES.map(() => new Quaternion());
+  }
+
+  /**
+   * À appeler avant le mélangeur: il n'écrit un os que si sa valeur change
+   * (`PropertyMixer`), une pose ajoutée resterait donc collée sans ce retour.
+   */
+  restore(): void {
+    if (!this.applied) {
+      return;
+    }
+    for (let b = 0; b < this.bones.length; b += 1) {
+      const bone = this.bones[b];
+      const base = this.base[b];
+      if (bone !== null && bone !== undefined && base !== undefined) {
+        bone.quaternion.copy(base);
+      }
+    }
+    this.applied = false;
   }
 
   begin(): void {
@@ -117,6 +139,13 @@ export class BoneOffsets {
       return;
     }
     root.getWorldQuaternion(tmpRoot);
+    for (let b = 0; b < this.bones.length; b += 1) {
+      const bone = this.bones[b];
+      if (bone !== null && bone !== undefined) {
+        this.base[b]?.copy(bone.quaternion);
+      }
+    }
+    this.applied = true;
     for (let b = 0; b < this.bones.length; b += 1) {
       const bone = this.bones[b];
       const parent = bone?.parent ?? null;

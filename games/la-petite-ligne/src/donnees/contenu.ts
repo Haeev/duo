@@ -126,7 +126,7 @@ function parseCarry(r: Reader | null): Settings['carry'] {
   const handcar = r?.opt('handcar') ?? null;
   const parcel = r?.opt('parcel') ?? null;
   const offset = handcar === null ? null : handcar.at('toOffset').numberList();
-  if (handcar !== null && offset?.length !== 2) handcar?.at('toOffset').fail('deux nombres attendus (dx, dy)');
+  if (handcar !== null && offset?.length !== 2) handcar.at('toOffset').fail('deux nombres attendus (dx, dy)');
   return {
     handcar:
       handcar === null

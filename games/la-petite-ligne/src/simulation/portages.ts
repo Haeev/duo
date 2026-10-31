@@ -19,7 +19,8 @@ function load(sim: Sim, item: string, purpose: Beam['purpose'], from: string, to
     to: { x: to.x, y: to.y },
     pos: { x: at.x, y: at.y },
     prev: { x: at.x, y: at.y },
-    facing: 0,
+    // Tournée vers la destination (la draisine dans l'axe de sa voie).
+    facing: Math.atan2(to.y - at.y, to.x - at.x),
     carried: false,
     holders: [],
   };

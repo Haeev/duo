@@ -317,6 +317,8 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
       beam.pos.y = ny;
     }
   }
+  // La draisine roule: elle regarde dans le sens de la marche (axe de la voie), le rendu la pose sur les rails.
+  if (beam.purpose === 'handcar' && (vx !== 0 || vy !== 0)) beam.facing = Math.atan2(vy, vx);
   for (const c of holders) {
     const off = sim.runtime.beamOffsets[c.id];
     c.pos.x = beam.pos.x + off.x;

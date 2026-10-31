@@ -273,7 +273,12 @@ function reserved(sim: Sim, item: string): number {
 }
 
 /** Objets demandés par les quêtes de la semaine 2 (`quetes.json`), à l'étape où on les apporte. */
-const QUEST_NEEDS: readonly { quest: string; step: string; villager: string; item: string; count: number }[] = [
+const QUEST_NEEDS: readonly { quest: string; step: string; villager: string; item: string; count: number; by?: CharacterId }[] = [
+  // Après-midi de la semaine 2: chacun son colis, son chemin.
+  { quest: 'odette_parcels', step: 'deliver', villager: 'firmin', item: 'odette_parcel', count: 1, by: 'p1' },
+  { quest: 'odette_parcels', step: 'deliver', villager: 'basile', item: 'odette_parcel', count: 1, by: 'p2' },
+  { quest: 'firmin_chub', step: 'bring', villager: 'firmin', item: 'chub', count: 1 },
+  { quest: 'jeanne_notebook', step: 'find', villager: 'jeanne', item: 'jeanne_notebook', count: 1 },
   { quest: 'handcar', step: 'bring', villager: 'basile', item: 'plank', count: 8 },
   { quest: 'handcar', step: 'bring', villager: 'basile', item: 'nail', count: 4 },
   { quest: 'odette_fry', step: 'bring', villager: 'odette', item: 'gudgeon', count: 4 },
@@ -535,7 +540,8 @@ function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean
 
 /** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
-  const wanted = orderNeed(sim, 'trout') > inBags(sim, 'trout') || reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon');
+  const wanted =
+    orderNeed(sim, 'trout') > inBags(sim, 'trout') || reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') || reserved(sim, 'chub') > inBags(sim, 'chub');
   if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   if (countInBag(c, ITEM.fishingRod) === 0) return false;
   const ford = pt(sim, 'river_ford');
@@ -581,9 +587,12 @@ function weekTwoQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolea
   if (c.id === 'p2' && questStep(sim, 'handcar') === 'bring' && countInBag(c, 'nail') < 4) {
     if (buy(sim, c, m, [{ item: 'nail', count: 4 }], out)) return true;
   }
+  // Ramasser ce qu'une quête a posé sur la carte (le carnet de Jeanne au ponton).
+  const lost = c.id === 'p1' && questStep(sim, 'jeanne_notebook') === 'find' ? sim.world.groundItems.find((g) => g.item === 'jeanne_notebook') : undefined;
+  if (lost !== undefined) return goAct(sim, c, m, 'carnet', { kind: 'ground_item', groundItem: lost.id }, lost.pos, 1.2, out);
   const byVillager = new Map<string, { item: string; count: number }[]>();
   for (const q of QUEST_NEEDS) {
-    if (questStep(sim, q.quest) !== q.step) continue;
+    if (questStep(sim, q.quest) !== q.step || (q.by !== undefined && q.by !== c.id)) continue;
     // Ce que la commande attend passe d'abord (omelettes).
     if (countInBag(c, q.item) - orderNeed(sim, q.item) < q.count) continue;
     const list = byVillager.get(q.villager) ?? [];

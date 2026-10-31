@@ -276,7 +276,8 @@ export class RailwayPart implements EventfulPart {
         this.shed.right.rotation.y = SHED_DOOR_ANGLE * this.shed.amount;
       }
       if (this.shed.handcar !== null) {
-        this.shed.handcar.visible = open;
+        // Sortie de la remise, la draisine est dessinée comme une charge à deux (`vie.ts`).
+        this.shed.handcar.visible = open && context.world.beam?.purpose !== 'handcar';
       }
     }
 

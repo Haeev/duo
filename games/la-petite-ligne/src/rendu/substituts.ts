@@ -471,6 +471,25 @@ const DECOR: Record<string, Builder> = {
     b.box([1.6, 0.08, 1.0], [0, 2.4, 0], 'tile', { base: true, rotation: [0, 0, 0] });
     b.cylinder(0.12, 0.1, 0.18, [0.1, 1.4, 0], 'wood', { base: true, segments: 6 });
   },
+  // Draisine (portée ou poussée à deux): plateau sur quatre roues, levier à balancier.
+  handcar: (b) => {
+    b.box([1.5, 0.12, 1.1], [0, 0.32, 0], { top: 'wood_new', side: 'wood_dark' }, { base: true });
+    for (const x of [-0.55, 0.55]) {
+      for (const z of [-0.5, 0.5]) {
+        b.cylinder(0.22, 0.22, 0.06, [x, 0.22, z], 'iron', { rotation: [90, 0, 0], segments: 8 });
+      }
+    }
+    b.box([0.12, 0.8, 0.12], [0, 0.44, 0], 'iron', { base: true });
+    b.box([1.1, 0.06, 0.08], [0, 1.24, 0], 'wood', { rotation: [0, 0, 12] });
+  },
+  // Gros colis du train, porté à deux: caisse cerclée avec étiquette.
+  parcel: (b) => {
+    b.box([1.1, 0.6, 0.75], [0, 0, 0], { top: 'wood_new', side: 'wood' }, { base: true });
+    for (const x of [-0.4, 0.4]) {
+      b.box([0.05, 0.62, 0.77], [x, 0, 0], 'iron', { base: true });
+    }
+    b.box([0.3, 0.2, 0.01], [0, 0.25, 0.38], 'paper', {});
+  },
   crate: (b, w, d) => {
     b.box([w * 0.85, 0.7, d * 0.75], [0, 0, 0], { top: 'wood_new', side: 'wood' }, { base: true });
     b.box([w * 0.87, 0.08, d * 0.77], [0, 0.55, 0], 'wood_dark', { base: true });

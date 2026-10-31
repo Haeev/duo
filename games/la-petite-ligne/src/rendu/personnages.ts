@@ -486,6 +486,7 @@ class CharacterFigure {
     this.root.position.set(at.x, this.ground + lift, at.y);
     this.root.rotation.y = this.facing;
     this.play(this.idleRequest(request, context.time, context.dt, variants));
+    this.offsets.restore();
     this.mixer?.update(context.dt);
     if (this.mixer !== null) {
       this.applyOffsets(context.time, context.dt);

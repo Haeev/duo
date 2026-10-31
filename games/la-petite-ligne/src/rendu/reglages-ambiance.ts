@@ -440,9 +440,9 @@ export const AMBIANCE_SETTINGS = {
      * lieu d'un tirage case par case. Taille des taches (m), part du bruit
      * fin, et ampleur de la variation des pavés et des chemins (0 à 1).
      */
-    groundPatch: 9,
-    groundDetail: 0.35,
-    stoneVariation: 0.3,
+    groundPatch: 16,
+    groundDetail: 0.1,
+    stoneVariation: 0.5,
     /** Seules les faces tournées vers le haut et plus basses que cela (m) sont du sol. */
     groundMaxHeight: 0.6,
   },
@@ -718,14 +718,14 @@ export const AMBIANCE_SETTINGS = {
     rate: 1.4,
     seconds: 3.2,
     startSize: 0.18,
-    endSize: 0.6,
+    endSize: 0.85,
     rise: 0.55,
     lift: 0.12,
     /** Le vent pousse la fumée (part de sa direction, m/s²). */
     drift: 0.22,
     spread: 0.06,
     drag: 0.6,
-    opacity: 0.75,
+    opacity: 0.95,
     /** La bouffée naît un peu au-dessus de la bouche (m). */
     birthLift: 0.15,
     color: '#dcd8d1',

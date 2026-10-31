@@ -25,7 +25,9 @@ function dayOne(): Sim {
 function grab(sim: Sim, who: CharacterId[]): void {
   const b = sim.world.beam;
   if (b === null) throw new Error('aucune charge');
-  who.forEach((id, i) => placeCharacter(sim, character(sim, id), { x: b.pos.x + (i === 0 ? -0.7 : 0.7), y: b.pos.y }));
+  who.forEach((id, i) => {
+    placeCharacter(sim, character(sim, id), { x: b.pos.x + (i === 0 ? -0.7 : 0.7), y: b.pos.y });
+  });
 }
 
 /** `ticks` pas, action tenue par `who`, déplacement vers la destination (chemin de la grille). */

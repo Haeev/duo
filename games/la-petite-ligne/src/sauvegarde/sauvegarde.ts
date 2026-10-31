@@ -225,7 +225,8 @@ function resume(
   world.heard = { p1: heard?.p1 ?? {}, p2: heard?.p2 ?? {} };
   // Gestes à deux (tour 4): colis en attente et charge décrite, absents des sauvegardes plus anciennes.
   world.heavyDeliveries = (world as Partial<WorldState>).heavyDeliveries ?? [];
-  const beam = world.beam as (Partial<NonNullable<WorldState['beam']>> & NonNullable<WorldState['beam']>) | null;
+  // Lue telle qu'écrite: une sauvegarde d'avant n'a pas `purpose`.
+  const beam: (Omit<NonNullable<WorldState['beam']>, 'purpose'> & { purpose?: string }) | null = world.beam;
   if (beam !== null && beam.purpose === undefined) {
     const def = content.constructions.find((k) => k.kind === 'carry');
     const to = map.points[def?.point ?? ''] ?? beam.pos;
