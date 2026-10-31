@@ -16,6 +16,11 @@ const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
 const MAX_TICKS = SIM_HZ * 60 * 120;
 /** Taille maximale de l'état transmis à l'invité (ADR 0007). */
 const MAX_STATE_BYTES = 64 * 1024;
+/**
+ * Alerte à la moitié du plafond (risque 2 du gauntlet): l'état grossit avec le
+ * contenu, ce test échoue bien avant que la partie plante chez les deux.
+ */
+const ALERT_STATE_BYTES = 32 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */
@@ -27,6 +32,11 @@ interface Run {
   ticks: number;
   maxBytes: number;
   longestStall: number;
+}
+
+/** Octets du message d'état complet de l'hôte (`hote.ts`, `sendWorld`), comptés comme le SDK (UTF-8). */
+function stateMessageBytes(world: WorldState): number {
+  return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world }), 'utf8');
 }
 
 /** Heure de jeu absolue, en minutes depuis le jour 1 à minuit. */
@@ -75,7 +85,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
       );
     }
     if (ticks % CHECK_EVERY === 0) {
-      maxBytes = Math.max(maxBytes, JSON.stringify(sim.world).length);
+      maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
       checkCoherent(sim.world);
     }
     if (onDawn !== undefined && sim.world.clock.day !== day && sim.world.phase === 'breakfast') {
@@ -84,7 +94,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
       robot = createRobot({ riddle });
     }
   }
-  maxBytes = Math.max(maxBytes, JSON.stringify(sim.world).length);
+  maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
   return { sim, run: { ticks, maxBytes, longestStall } };
 }
 
@@ -113,6 +123,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.ending?.keyFound).toBe(keyExpected);
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
+  expect(run.maxBytes, `état transmis sous 32 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
 }
 

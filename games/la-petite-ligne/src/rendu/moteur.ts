@@ -31,6 +31,7 @@ import { DaylightRig } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
 import { PerfMonitor } from './perf';
+import { AdaptiveQuality, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
 import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
@@ -70,7 +71,6 @@ const SEE_THROUGH_HALF_WIDTH = 0.55;
 const SEE_THROUGH_HALF_HEIGHT = 1.05;
 const SEE_THROUGH_CENTER = 0.9;
 const HALF = 0.5;
-const MS_PER_SECOND = 1000;
 
 function toneMapping(name: (typeof RENDER_SETTINGS.renderer)['toneMapping']): ToneMapping {
   switch (name) {
@@ -86,6 +86,11 @@ function toneMapping(name: (typeof RENDER_SETTINGS.renderer)['toneMapping']): To
 export interface EngineOptions extends RendererOptions {
   /** Indicateur de performances (par défaut: en mode développement). */
   showStats?: boolean;
+  /**
+   * Résolution dynamique et repli automatique vers le mode léger (par défaut:
+   * oui). Non pour des captures reproductibles en rendu logiciel.
+   */
+  adaptive?: boolean;
 }
 
 export class RenderEngine implements Renderer {
@@ -115,17 +120,19 @@ export class RenderEngine implements Renderer {
   private readonly viewPoint = new Vector3();
   private readonly bufferSize = new Vector2();
   private readonly holes: SeeThroughHole[] = [];
-  private resolutionStep = 0;
-  /** Mode léger demandé (`RendererOptions.quality`). */
+  /** Mode léger demandé (`RendererOptions.quality`), pour toute la séance. */
   private readonly light: boolean;
-  private frameAverageMs = 0;
-  private sinceResolutionChange = 0;
+  /** Qualité adaptative (`qualite.ts`); `null` en mode léger demandé ou sans adaptation. */
+  private readonly quality: AdaptiveQuality | null;
+  private readonly log: RendererOptions['log'];
 
   constructor(options: EngineOptions) {
     this.view = options.view;
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
     this.light = options.quality === 'light';
+    this.quality = this.light || options.adaptive === false ? null : new AdaptiveQuality();
+    this.log = options.log;
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
       antialias: settings.antialias && !this.light,
@@ -180,7 +187,7 @@ export class RenderEngine implements Renderer {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
     const settings = RENDER_SETTINGS.renderer;
-    if (this.light) {
+    if (this.light || this.quality?.isLight() === true) {
       const light = RENDER_SETTINGS.light;
       const lightBudget = Math.sqrt(light.maxPhysicalPixels / (width * height));
       this.renderer.setPixelRatio(Math.min(light.pixelRatio, lightBudget));
@@ -189,7 +196,7 @@ export class RenderEngine implements Renderer {
       return;
     }
     const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
-    const scale = RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
+    const scale = this.resolutionScale();
     const ratio =
       Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
     this.renderer.setPixelRatio(ratio);
@@ -476,39 +483,56 @@ export class RenderEngine implements Renderer {
     this.updateFrame(dtSeconds);
     this.renderer.render(this.scene, this.rig.camera);
     this.perf.record(this.renderer, Math.min(MAX_FRAME_SECONDS, Math.max(0, dtSeconds)));
-    this.adaptResolution(dtSeconds);
+    const change = this.quality?.sample(dtSeconds) ?? null;
+    if (change !== null) {
+      this.applyQuality(change);
+    }
   }
 
-  /** Résolution dynamique: un palier de moins si les images restent trop lentes (voir `reglages.ts`). */
-  private adaptResolution(dtSeconds: number): void {
-    const settings = RENDER_SETTINGS.dynamicResolution;
-    if (this.light || dtSeconds <= 0 || dtSeconds > MAX_FRAME_SECONDS) {
+  /**
+   * Applique une décision de `qualite.ts`, à chaud: ni contexte recréé, ni page
+   * rechargée. Les programmes sans ombre se compilent à la première bascule
+   * (Three.js les garde par matériau); le retour en compile encore quelques-uns
+   * (11, 16 puis 20 programmes mesurés dans `rendu.html`).
+   */
+  private applyQuality(change: QualityChange): void {
+    if (change.kind !== 'step') {
+      const shadows = change.kind === 'normal';
+      this.renderer.shadowMap.enabled = shadows;
+      this.daylight.sun.castShadow = shadows;
+    }
+    this.resize();
+    this.perf.setResolutionScale(this.resolutionScale());
+    if (change.kind === 'step') {
       return;
     }
-    this.frameAverageMs +=
-      (dtSeconds * MS_PER_SECOND - this.frameAverageMs) *
-      Math.min(1, dtSeconds / settings.averageSeconds);
-    this.sinceResolutionChange += dtSeconds;
-    if (
-      this.time < settings.warmupSeconds ||
-      this.sinceResolutionChange < settings.cooldownSeconds
-    ) {
-      return;
-    }
-    if (
-      this.frameAverageMs > settings.slowFrameMs &&
-      this.resolutionStep < settings.steps.length - 1
-    ) {
-      this.resolutionStep += 1;
-      this.sinceResolutionChange = 0;
-      this.resize();
-      this.perf.setResolutionScale(this.resolutionScale());
-    }
+    this.log?.info(
+      change.kind === 'light'
+        ? 'rendu: mode léger automatique'
+        : 'rendu: retour à la qualité normale',
+      {
+        final: change.kind === 'light' && change.final,
+        averageFrameMs: Math.round(this.quality?.averageFrameMs() ?? 0),
+        refreshMs: Math.round(this.quality?.refreshMs() ?? 0),
+        pixelRatio: this.renderer.getPixelRatio(),
+      },
+    );
   }
 
   /** Palier de résolution dynamique courant (1 = pleine résolution). */
   resolutionScale(): number {
-    return RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
+    const step = this.quality?.resolutionStep() ?? 0;
+    return RENDER_SETTINGS.dynamicResolution.steps[step] ?? 1;
+  }
+
+  /** Rapport de pixels du rendu (résolution interne), pour les tests. */
+  pixelRatio(): number {
+    return this.renderer.getPixelRatio();
+  }
+
+  /** Qualité en vigueur: mode léger demandé ou automatique, sinon normale. */
+  renderQuality(): 'normal' | 'light' {
+    return this.light || this.quality?.isLight() === true ? 'light' : 'normal';
   }
 
   cameraYaw(): number {
