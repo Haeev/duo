@@ -393,6 +393,12 @@ export const AMBIANCE_SETTINGS = {
     extentStep: 1,
     /** Hauteur des plus hauts objets qui portent une ombre (m), et recul de la lumière. */
     casterHeight: 14,
+    /**
+     * Distance maximale (m, le long du rayon de lumière) d'un objet qui porte
+     * ombre dans la vue: au-delà, il ne passe plus dans la carte d'ombre
+     * (soleil bas surtout). Coupe la passe d'ombre sans perdre les ombres de près.
+     */
+    casterReach: 11,
     lightDistance: 60,
     /** Sans caméra fournie: rayon de vue majoré de cette marge (ancien calage en cercle). */
     fallbackMargin: 5,

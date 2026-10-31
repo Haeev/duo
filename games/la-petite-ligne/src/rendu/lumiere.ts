@@ -373,7 +373,14 @@ export class DaylightRig {
     camera.right = bounds.halfU;
     camera.top = bounds.halfV;
     camera.bottom = -bounds.halfV;
-    camera.far = shadows.lightDistance + bounds.depth + shadows.casterHeight;
+    // Profondeur serrée: devant les receveurs, seulement la distance (le long du rayon) d'où un
+    // objet de `casterHeight` peut encore porter son ombre dans la vue, plafonnée à `casterReach`
+    // (soleil bas: les grands arbres lointains ne portent plus que des pointes d'ombre pâles);
+    // derrière, rien (un objet plus loin que les receveurs n'ombre rien de visible).
+    const elevation = Math.max(Math.asin(this.direction.y), shadows.minElevationDeg * DEG);
+    const reach = Math.min(shadows.casterHeight / Math.sin(elevation), shadows.casterReach);
+    camera.near = Math.max(SHADOW_NEAR, shadows.lightDistance - bounds.depth - reach);
+    camera.far = shadows.lightDistance + bounds.depth;
     camera.updateProjectionMatrix();
     this.sun.shadow.normalBias = Math.max(texelU, texelV) * shadows.normalBiasTexels;
   }
