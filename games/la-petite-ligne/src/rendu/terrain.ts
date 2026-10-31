@@ -99,6 +99,8 @@ function extendedKind(kind: GroundKind): GroundKind {
 
 export class Terrain {
   readonly group = new Group();
+  /** Surface de la rivière (point d'accroche du technical artist: matériau d'eau). */
+  readonly water: Mesh;
   private readonly ext = SETTINGS.extension;
   private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] =
     [];
@@ -126,6 +128,7 @@ export class Terrain {
     ground.receiveShadow = true;
     ground.matrixAutoUpdate = false;
     const water = new Mesh(resources.track(this.buildWater()), materials.water);
+    this.water = water;
     water.name = 'eau';
     water.receiveShadow = true;
     water.matrixAutoUpdate = false;

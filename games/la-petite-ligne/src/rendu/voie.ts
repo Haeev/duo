@@ -80,6 +80,18 @@ export class RailwayPart implements EventfulPart {
   private readonly mixers: { mixer: AnimationMixer; duration: number }[] = [];
   private smokeAnchor: Object3D | null = null;
 
+  /** Point d'émission du panache de la locomotive (nœud `locomotive_smoke`), ou `null`. */
+  smokeEmitter(): Object3D | null {
+    return this.smokeAnchor;
+  }
+
+  /** Le train est-il visible (et en mouvement) à cette image ? */
+  trainState(): { visible: boolean; moving: boolean } {
+    return { visible: this.train.visible, moving: this.moving };
+  }
+
+  private moving = false;
+
   constructor(
     private readonly map: GameMap,
     private readonly library: ModelLibrary,
@@ -244,6 +256,7 @@ export class RailwayPart implements EventfulPart {
     const visible = !Number.isNaN(offset);
     this.train.visible = visible;
     const moving = visible && state.phase !== 'stopped';
+    this.moving = moving;
     if (visible) {
       const x = this.stopX + offset;
       this.train.position.set(

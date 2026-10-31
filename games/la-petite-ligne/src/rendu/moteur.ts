@@ -42,6 +42,7 @@ import { GardenPart } from './potager';
 import { FarmLifePart } from './vie';
 import { EffectsPart } from './effets';
 import { RailwayPart } from './voie';
+import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;

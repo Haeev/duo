@@ -222,14 +222,12 @@ export class ModelLibrary {
    * une de ses variantes présentes (choisie par `key`), sinon lui-même (substitut).
    */
   resolve(name: string, key = ''): string {
-    if (this.table.has(name)) {
-      return name;
-    }
+    // Les variantes passent d'abord (l'artiste garde aussi le nom générique, qui n'en montre qu'une).
     const present = (MODEL_VARIANTS[name] ?? []).filter((variant) => this.table.has(variant));
-    if (present.length === 0) {
-      return name;
+    if (present.length > 0) {
+      return present[textHash(key) % present.length] ?? name;
     }
-    return present[textHash(key) % present.length] ?? name;
+    return name;
   }
 
   /** Données de l'artiste attachées au nœud (`extras` du GLB: emprise, hauteur de marche...). */
