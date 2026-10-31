@@ -80,3 +80,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Pendant que le game designer écrit les données, `loadContent(CONTENT_FILES)` peut échouer (référence à un dialogue pas encore écrit): pour une sonde, charger ses fichiers par `git show HEAD:…` et la carte par `loadMap(MAP_FILES)` (pas `contentAndMap()`, qui charge tout le contenu).
 - Ce qui change le format de `WorldState` demande une version de `DATA_SCHEMA` et une migration dans `sauvegarde.ts`, testée en fabriquant une « ancienne » sauvegarde depuis un monde joué (champs retirés, phase remise comme l'ancienne version l'écrivait).
 
+
+## Budget de rendu (La Petite Ligne, vérifié le 2026-10-31)
+
+- La caméra d'ombre de Three.js trie par son cadre (frustum): un cadre droit dans le repère de la lumière autour de l'empreinte de la vue déborde jusqu'au double de sa surface. Tri plus fin possible sans toucher la lumière: avant `renderer.render`, `castShadow = false` sur ce dont la boîte, projetée dans le plan de la lumière, ne touche pas l'enveloppe convexe de l'empreinte (test des axes séparateurs), puis remis après le rendu. Test robuste: rayons tirés des coins des objets retirés, aucun ne doit tomber à l'écran.
+- `WebGLShadowMap` trie aussi par calques: si `shadow.camera.layers` a un calque autre que 0, la passe d'ombre suit ses calques. Permet des maillages « ombre seule » (calque 1) si un jour il faut découper ombre et vue différemment.
+- Plus petits morceaux de décor fusionnés: moins de triangles, mais plus d'appels; regrouper les cases légères par bloc (seuil de triangles) garde les deux sous contrôle. Le vrai consommateur d'appels au zoom large: les objets en pièces séparées (maisonnette, ruine, barrières, potager), chacun dessiné deux fois avec l'ombre.
+- Mesure reproductible: `triangleSplit()` au même cadrage, quatre orientations, avant et après dans le même serveur; ne jamais remettre d'anciens fichiers dans l'arbre partagé pour mesurer « avant » (`git checkout <commit> -- fichier` change aussi l'index, et un instantané « wip » du manager peut capturer cet état): copier l'ancienne version dans un dossier à part ou comparer à des chiffres déjà relevés.
+- Une ombre retirée se juge à midi, pas seulement au soir: les poules sans ombre flottaient à midi alors que rien ne se voyait à 19 h.
+- ImageMagick: `-gravity` posé dans une parenthèse s'applique aussi au `-crop` des parenthèses suivantes: recadrer dans des commandes séparées.
