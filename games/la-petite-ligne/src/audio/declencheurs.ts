@@ -190,6 +190,10 @@ export function soundsForEvent(
       emit.world('furniture-place', f === undefined ? characterAt(world, event.by) : cellCenter(f.cell), event.by);
       break;
     }
+    case 'sat_down':
+      // Le bois du banc sous le poids (son du meuble posé, en attendant un son propre: ETAT.md).
+      emit.world('furniture-place', characterAt(world, event.by), event.by);
+      break;
     case 'furniture_taken':
     case 'picked_up':
       emit.world('pickup', characterAt(world, event.by), event.by);
@@ -286,6 +290,7 @@ export function soundsForEvent(
     case 'scene_ended':
     case 'cooked':
     case 'got_up':
+    case 'stood_up':
     case 'hens_arrived':
     case 'train_whistle':
     case 'train_arriving':

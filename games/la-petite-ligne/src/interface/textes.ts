@@ -130,6 +130,7 @@ const SupplementSchema = v.object({
     building: str,
     crafting: str,
     cooking: str,
+    seated: str,
     menus: v.record(str, str),
     actions: v.record(str, str),
     places: v.record(str, str),

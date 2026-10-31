@@ -8,7 +8,8 @@ import type { ControlFrame, Intent } from '../etat/actions';
 import type { GameMap } from '../etat/carte';
 import type { Character, CharacterId, Vec2, WorldEvent, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
-import { SIM_DT } from '../simulation/constantes';
+import { MOVE_DEADZONE, SIM_DT } from '../simulation/constantes';
+import { standingSpot } from '../simulation/bancs';
 import { type Sim, wrapWorld } from '../simulation/contexte';
 import { refreshBlockers, walkStep } from '../simulation/deplacement';
 import {
@@ -87,7 +88,7 @@ function lerpAngle(a: number, b: number, t: number): number {
 
 /** Le personnage marche librement (ce que la prédiction sait reproduire). */
 function freeWalking(c: Character, tick: number): boolean {
-  if (!c.created || c.crafting !== null || c.destination !== null) return false;
+  if (!c.created || c.crafting !== null || c.destination !== null || c.seat !== null) return false;
   if (c.status !== 'active' && c.status !== 'menu') return false;
   return !(c.action.duration > 0 && tick < c.action.since + c.action.duration);
 }
@@ -115,6 +116,38 @@ export function createGuest(
   let predictedFacing: number | null = null;
   let latestTick = 0;
   let ack = -1;
+  // Relevé d'un banc par la prédiction (commande `seq`), en attendant que l'hôte l'ait appliqué:
+  // les états et positions plus anciens le montrent encore assis.
+  let stoodAtSeq: number | null = null;
+  const standSpot: Vec2 = { x: 0, y: 0 };
+
+  /** Ce que l'hôte fait au même pas: assis, une direction relève devant la place (`standingSpot`). */
+  function predictStandUp(c: Character, frame: ControlFrame): boolean {
+    if (sim === null || c.seat === null || sim.world.phase !== 'day' || (c.status !== 'active' && c.status !== 'menu')) return false;
+    if (Math.hypot(frame.moveX, frame.moveY) < MOVE_DEADZONE || !standingSpot(sim, c, standSpot)) return false;
+    c.seat = null;
+    if (c.action.kind === 'sit') c.action = { kind: 'idle', since: c.action.since, duration: 0, target: null };
+    c.pos.x = standSpot.x;
+    c.pos.y = standSpot.y;
+    predicted = { x: standSpot.x, y: standSpot.y };
+    correction.x = 0;
+    correction.y = 0;
+    stoodAtSeq = frame.seq;
+    return true;
+  }
+
+  /** État reçu d'avant le lever prédit: on y garde le personnage debout. */
+  function keepStanding(world: WorldState, acked: number): void {
+    if (stoodAtSeq === null) return;
+    if (acked >= stoodAtSeq) {
+      stoodAtSeq = null;
+      return;
+    }
+    const mine = world.characters.find((c) => c.id === localId);
+    if (mine === undefined) return;
+    mine.seat = null;
+    if (mine.action.kind === 'sit') mine.action = { kind: 'idle', since: mine.action.since, duration: 0, target: null };
+  }
 
   function localChar(): Character | null {
     return sim?.world.characters.find((c) => c.id === localId) ?? null;
@@ -132,6 +165,7 @@ export function createGuest(
     const world = message.world;
     const mine = world.characters.find((c) => c.playerId === playerId);
     if (mine !== undefined) localId = mine.id;
+    keepStanding(world, message.ack);
     if (sim === null) sim = wrapWorld(content, map, world);
     else {
       sim.world = world;
@@ -148,6 +182,8 @@ export function createGuest(
     const c = localChar();
     const auth = snap.characters.find((x) => x.id === localId);
     if (c === null || auth === undefined) return;
+    // L'hôte ne l'a pas encore relevé: sa position est encore sur le banc, la prédiction garde la sienne.
+    if (stoodAtSeq !== null && snap.ack < stoodAtSeq) return;
     if (!freeWalking(c, snap.tick) || predicted === null) {
       predicted = null;
       predictedFacing = null;
@@ -198,6 +234,7 @@ export function createGuest(
       const c = localChar();
       if (sim === null || c === null) return;
       const moving = Math.hypot(frame.moveX, frame.moveY) > 0;
+      predictStandUp(c, frame);
       if (!freeWalking(c, latestTick)) {
         predicted = null;
         return;

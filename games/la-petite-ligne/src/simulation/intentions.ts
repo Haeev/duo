@@ -7,6 +7,7 @@ import type { Character, CharacterId, Quality } from '../etat/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, resolveClick } from './agir';
+import { standUp } from './bancs';
 import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
 import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
@@ -197,14 +198,25 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
         return;
       }
       if (c.status === 'menu') openMenu(sim, c, null);
-      const reach = target.kind === 'villager' ? sim.content.settings.ranges.talk - 0.3 : sim.content.settings.ranges.action - 0.2;
+      const reach =
+        target.kind === 'villager'
+          ? sim.content.settings.ranges.talk - 0.3
+          : target.kind === 'bench'
+            ? sim.content.settings.benches.sitRange
+            : sim.content.settings.ranges.action - 0.2;
+      const near = distance(c.pos, target.pos) <= reach;
+      // Assis: un clic sur qui est à portée (parler, donner) se fait sans se lever; ailleurs, on se lève.
+      const seatedAct = near && intent.act && (target.kind === 'villager' || target.kind === 'partner');
+      if (c.seat !== null && !seatedAct) standUp(sim, c);
       if (intent.act && distance(c.pos, target.pos) <= reach) {
         stopPath(sim, c);
         if (canAct(c, sim)) actOnClick(sim, c, intent.target, target, sim.world.tick);
         else bufferAct(sim, c, intent);
         return;
       }
-      if (goTo(sim, c, target.pos)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
+      // Un banc: on va devant la place (l'assise est sur une case du banc, infranchissable).
+      const goal = target.kind === 'bench' ? target.stand : target.pos;
+      if (goTo(sim, c, goal)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
       return;
     }
     case 'act':

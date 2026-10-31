@@ -437,7 +437,7 @@
         {
           "id": "watch",
           "objective": "S'asseoir à deux sur le banc du quai entre 17 h et 18 h 30, et lever les yeux.",
-          "conditions": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "both" }, { "type": "time_is", "from": "17:00", "to": "18:30" }],
+          "conditions": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "both", "seated": true }, { "type": "time_is", "from": "17:00", "to": "18:30" }],
           "effects": [{ "type": "show_text", "text": "geese_seen" }]
         }
       ],

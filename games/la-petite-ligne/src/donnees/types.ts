@@ -45,7 +45,8 @@ export type Condition = { label?: string } & (
   | { type: 'order_complete'; day: number | null }
   | { type: 'counter'; key: string; count: number; since: Since; who: Who }
   | { type: 'used_tool_at'; tool: string; point: string; radius: number }
-  | { type: 'stayed_at'; point: string; seconds: number; who: Who }
+  /** Rester près d'un point; `seated`: assis sur un banc à portée du point (`ranges.stayAt`), pendant `seconds`. */
+  | { type: 'stayed_at'; point: string; seconds: number; who: Who; seated: boolean }
   /** Variante tirée par la graine pour ce groupe (de 0 à `of` - 1): buts d'après-midi, aléa par partie. */
   | { type: 'variant'; group: string; value: number; of: number }
   /** Observer: à moins de `distance` m du point et tourné vers lui. */
@@ -411,6 +412,8 @@ export interface Settings {
   };
   /** Envies (HA-07): une envie ne revient pas pour un joueur avant ce nombre de jours. */
   envies: { noRepeatWindowDays: number };
+  /** Bancs de la carte: places, assise et lever (`reglages.benches`, défauts dans `defauts.ts`). */
+  benches: BenchSettings;
   fishing: {
     castRange: number;
     biteWaitSeconds: [number, number];
@@ -420,6 +423,20 @@ export interface Settings {
   } | null;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
+}
+
+/** S'asseoir sur un banc de la carte (modèle `bench`). */
+export interface BenchSettings {
+  /** Places le long du banc, en mètres depuis son milieu (deux places: jamais deux corps sur la même). */
+  slots: number[];
+  /** Décalage du milieu de l'assise vers l'avant depuis l'origine du modèle (m). */
+  seatForward: number;
+  /** On se relève devant sa place, à cette distance de l'assise (m), sur une case libre. */
+  standForward: number;
+  /** Espace près d'une place libre, à moins de cette distance (m), fait s'asseoir. */
+  sitRange: number;
+  /** Un habitant arrêté à cette distance du banc (m, au-delà de son emprise) y est assis. */
+  villagerReach: number;
 }
 
 /**

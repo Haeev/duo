@@ -5,7 +5,7 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
-import { DEFAULT_FEEL, DEFAULT_RANGES } from './defauts';
+import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_RANGES } from './defauts';
 import { ContentError, Reader } from './lecteur';
 import type {
   AnimalDef,
@@ -286,6 +286,7 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
         point: r.at('point').string(),
         seconds: r.at('seconds').number(),
         who: who === null ? 'either' : who.oneOf(WHO),
+        seated: optBoolean(r, 'seated', false),
       };
     }
     // Conditions qui comptent: une clé de compteur.
@@ -824,6 +825,23 @@ function parseFeel(r: Reader | null): FeelSettings {
   return feel;
 }
 
+/** Bancs (`reglages.benches`): chaque clé absente garde sa valeur de `defauts.ts`. */
+function parseBenches(r: Reader | null): Settings['benches'] {
+  const d = DEFAULT_BENCHES;
+  if (r === null) return { ...d, slots: [...d.slots] };
+  const slotsReader = r.opt('slots');
+  const slots = slotsReader === null ? [...d.slots] : slotsReader.numberList();
+  // Une place par bit dans le masque des places prises (`etat/bancs.ts`).
+  if (slots.length < 1 || slots.length > 8) return r.at('slots').fail('de 1 à 8 places attendues');
+  return {
+    slots,
+    seatForward: optNumber(r, 'seatForward', d.seatForward),
+    standForward: optNumber(r, 'standForward', d.standForward),
+    sitRange: optNumber(r, 'sitRange', d.sitRange),
+    villagerReach: optNumber(r, 'villagerReach', d.villagerReach),
+  };
+}
+
 function parseFishing(r: Reader | null): Settings['fishing'] {
   if (r === null) return null;
   const wait = r.at('biteWaitSeconds').numberList();
@@ -953,6 +971,7 @@ function parseSettings(r: Reader): Settings {
     carry: parseCarry(r.opt('carry')),
     envies: { noRepeatWindowDays: r.has('envies') && r.at('envies').has('noRepeatWindowDays') ? r.at('envies').at('noRepeatWindowDays').integer(1) : 7 },
     fishing: parseFishing(r.opt('fishing')),
+    benches: parseBenches(r.opt('benches')),
     feel: parseFeel(r.opt('feel')),
   };
 }

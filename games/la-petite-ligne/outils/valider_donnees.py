@@ -94,7 +94,7 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "went_to_bed": (set(), {"item", "who"}),
     "caught": ({"item"}, {"count", "who", "since"}),
     "used_tool_at": ({"tool", "point"}, {"radius", "who"}),
-    "stayed_at": ({"point", "seconds"}, {"who"}),
+    "stayed_at": ({"point", "seconds"}, {"who", "seated"}),
     "looked_at": ({"point"}, {"distance", "who"}),
     "variant": ({"group", "value", "of"}, set()),
     "witnessed": ({"event"}, {"who"}),

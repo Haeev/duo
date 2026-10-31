@@ -5,7 +5,7 @@
 import type { ClickTarget } from '../etat/actions';
 import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Vec2 } from '../etat/types';
 import { AIM_CONE, AIM_DISTANCE } from './constantes';
-import { type Sim, bump, character, distance, emit, partnerOf, point } from './contexte';
+import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
 import { ghostNear } from './construction';
 import { footprintCells } from './deplacement';
@@ -14,6 +14,8 @@ import { nearPoint, shopOpen } from './economie';
 import { isBlockedCell } from './grille';
 import { refreshBlockers } from './deplacement';
 import { ITEM, POINT } from './ids';
+import { freeSeatsNear, fullBenchNear, sitDown, slotTaken, villagerSeated } from './bancs';
+import { benchById, standPlace } from '../etat/bancs';
 import { fishAct, holdsRod, waterAhead } from './peche';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
@@ -33,7 +35,9 @@ export type Target =
   | { kind: 'cell'; cell: Cell; pos: Vec2 }
   | { kind: 'tree'; id: string; pos: Vec2 }
   | { kind: 'partner'; pos: Vec2 }
-  | { kind: 'place'; pos: Vec2 };
+  | { kind: 'place'; pos: Vec2 }
+  /** Place libre d'un banc: `pos` au milieu de l'assise, `stand` devant (où l'on va avant de s'asseoir). */
+  | { kind: 'bench'; bench: string; slot: number; pos: Vec2; stand: Vec2 };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
@@ -42,6 +46,8 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
   [POINT.coopCrate]: 'crate',
   [POINT.workbench]: 'workbench',
 };
+/** Un clic au sol à moins de tant d'une place libre (m) vise le banc. */
+const BENCH_CLICK_RADIUS = 1.2;
 const ACT_POINTS = [POINT.well, POINT.waterBarrel, POINT.groceryCounter, POINT.noticeBoard, POINT.coopCrate, POINT.workbench, POINT.henFeeder];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
@@ -97,6 +103,10 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return held !== null && heldDef?.category !== 'tool' ? 'give' : null;
     case 'place':
       return 'place';
+    case 'bench': {
+      const prop = benchById(sim.map, t.bench);
+      return c.seat === null && !c.inHouse && prop !== null && !slotTaken(sim, prop, t.slot) ? 'sit' : null;
+    }
     case 'cell': {
       const g = gardenCellAt(sim, t.cell);
       if (g !== null) return gardenVerb(sim, g, held?.item ?? null);
@@ -122,6 +132,9 @@ const TIER: Record<Target['kind'], number> = {
   beam: 2,
   place: 3,
   bed: 4,
+  // Après tout geste possible: on bêche au pied du banc (énigme d'Émile) en visant le sol à côté;
+  // tourné vers le banc, la case visée est la sienne (infranchissable, sans geste) et l'on s'assoit.
+  bench: 9,
   station: 4,
   point: 4,
   partner: 5,
@@ -137,7 +150,14 @@ const TIER: Record<Target['kind'], number> = {
  */
 const GARDEN_TIER = TIER.partner;
 
+/**
+ * Un habitant assis sur un banc passe après la place libre à côté de lui: Espace devant le banc
+ * assoit près de lui, puis, assis, parle avec lui (un clic sur lui lui parle tout de suite).
+ */
+const SEATED_VILLAGER_TIER = TIER.bench + 1;
+
 function tierOf(sim: Sim, t: Target): number {
+  if (t.kind === 'villager' && villagerSeated(sim, t.id)) return SEATED_VILLAGER_TIER;
   return t.kind === 'cell' && gardenCellAt(sim, t.cell) !== null ? GARDEN_TIER : TIER[t.kind];
 }
 
@@ -150,11 +170,32 @@ function inCone(c: Character, pos: Vec2): boolean {
   return diff <= AIM_CONE;
 }
 
+/** Une place libre de banc, en cible (avec le point où se lever, devant elle). */
+function benchTarget(sim: Sim, seat: { bench: string; slot: number; pos: Vec2 }): Target | null {
+  const prop = benchById(sim.map, seat.bench);
+  if (prop === null) return null;
+  const stand = standPlace(prop, seat.slot, sim.content.settings.benches, { x: 0, y: 0, facing: 0 });
+  return { kind: 'bench', bench: seat.bench, slot: seat.slot, pos: seat.pos, stand: { x: stand.x, y: stand.y } };
+}
+
+/** Assis, Espace ne sert qu'à parler ou à donner (on ne bêche pas depuis un banc). */
+const SEATED_VERBS: ReadonlySet<AimVerb> = new Set<AimVerb>(['talk', 'give']);
+
 /** Toutes les cibles à portée de ce personnage (et la case devant lui). */
 export function candidates(sim: Sim, c: Character): Target[] {
   const s = sim.content.settings;
   const out: Target[] = [];
   const reach = s.ranges.action;
+  if (c.seat === null && !c.inHouse) {
+    // La place libre la plus proche de chaque banc à portée.
+    const seen = new Set<string>();
+    for (const seat of freeSeatsNear(sim, c.pos, s.benches.sitRange)) {
+      if (seen.has(seat.bench)) continue;
+      seen.add(seat.bench);
+      const t = benchTarget(sim, seat);
+      if (t !== null) out.push(t);
+    }
+  }
   for (const v of sim.world.villagers) {
     if (v.visible && distance(c.pos, v.pos) <= s.ranges.talk) out.push({ kind: 'villager', id: v.id, pos: v.pos });
   }
@@ -199,6 +240,7 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
     if (t.kind !== 'cell' && t.kind !== 'place' && !inCone(c, t.pos)) continue;
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
+    if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
     const tier = verb === null ? 99 : tierOf(sim, t);
     const d = distance(front, t.pos);
     if (best === null || tier < best.tier || (tier === best.tier && d < best.d)) best = { target: t, verb, tier, d };
@@ -214,7 +256,7 @@ export function updateAim(sim: Sim, c: Character): void {
   }
   const best = bestTarget(sim, c);
   let aim: AimInfo | null = null;
-  const water = holdsRod(c) ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
+  const water = holdsRod(c) && c.seat === null ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
   if (water !== null) {
     aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
   } else if (best !== null) {
@@ -337,6 +379,10 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'place':
       placeFurniture(sim, c, null, null);
       return;
+    case 'sit':
+      // Assis, on regarde comme le banc (`sitDown` remplace l'orientation vers la cible).
+      if (t.kind === 'bench') sitDown(sim, c, t.bench, t.slot);
+      return;
     case 'give':
       giveHeld(sim, c);
       return;
@@ -369,13 +415,18 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
 
 /** Espace: agir sur ce qui est devant soi. */
 export function actFront(sim: Sim, c: Character): void {
-  if (holdsRod(c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
+  if (c.seat === null && holdsRod(c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
     fishAct(sim, c);
     return;
   }
   const best = bestTarget(sim, c);
   if (best !== null && best.verb !== null) {
     perform(sim, c, best.target, best.verb);
+    return;
+  }
+  // Près d'un banc plein, Espace dit pourquoi on ne s'assoit pas (aucune touche morte).
+  if (c.seat === null && !c.inHouse && fullBenchNear(sim, c) !== null) {
+    sayIfWritten(sim, c.id, 'bench_full');
     return;
   }
   if (best !== null && takenByPartner(sim, c, best.target, sim.world.tick)) return;
@@ -441,7 +492,12 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
       }
       const cell = { cx: Math.floor(click.x), cy: Math.floor(click.y) };
-      return { kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } };
+      const cellTarget: Target = { kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } };
+      // Un clic sur un banc (le sol juste sous ou derrière lui): sa place libre la plus proche,
+      // sauf si la case cliquée a son geste (bêcher au pied du banc, comme à la touche).
+      if (verbOf(sim, c, cellTarget) !== null) return cellTarget;
+      const seat = c.inHouse ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
+      return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }
   }
 }
@@ -449,6 +505,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
 /** Portée à laquelle on agit sur une cible. */
 export function reachFor(sim: Sim, t: Target): number {
   const r = sim.content.settings.ranges;
+  if (t.kind === 'bench') return sim.content.settings.benches.sitRange;
   return t.kind === 'villager' ? r.talk - 0.3 : t.kind === 'beam' ? sim.content.settings.feel.beamGrabRange - 0.3 : r.action;
 }
 

@@ -118,6 +118,7 @@
     "building": "Construit à la maisonnette",
     "crafting": "Travaille à l'établi",
     "cooking": "Cuisine au réchaud",
+    "seated": "Se repose sur un banc",
     "menus": {
       "notebook": "Lit son carnet",
       "shop": "Au comptoir d'Odette",

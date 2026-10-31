@@ -8,7 +8,8 @@
  * `train` (away, arriving, stopped, departing), `vie` (0 fige la promenade),
  * `panneau` (1 montre les réglages), `x` et `y` (point de vue), `rendu=leger`
  * (mode léger, comme le jeu), `cycles` (essai d'endurance), `repere=1`,
- * `peche=attente|touche`, `absent=1` (signes P1), `coins=1` (coin à soi des
+ * `peche=attente|touche`, `absent=1` (signes P1),
+ * `scene=rencontre|place|repas|banc|banc-quai` (petites scènes, dont les deux joueurs assis au quai), `coins=1` (coin à soi des
  * deux joueurs, avec `interieur=1`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
@@ -21,7 +22,12 @@ import type { GameMap } from '../../etat/carte';
 import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameView } from '../../etat/vue';
 import { RenderEngine } from '../moteur';
-import { animateExampleWorld, createExampleWorld, type DemoOptions } from './etat-exemple';
+import {
+  DEMO_SCENES,
+  animateExampleWorld,
+  createExampleWorld,
+  type DemoOptions,
+} from './etat-exemple';
 
 const MINUTES_PER_HOUR = 60;
 const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
@@ -115,13 +121,7 @@ async function main(): Promise<void> {
           ? 'waiting'
           : 'none',
     absent: params.get('absent') === '1',
-    scene:
-      params.get('scene') === 'rencontre' ||
-      params.get('scene') === 'place' ||
-      params.get('scene') === 'repas' ||
-      params.get('scene') === 'banc'
-        ? (params.get('scene') as 'rencontre' | 'place' | 'repas' | 'banc')
-        : undefined,
+    scene: DEMO_SCENES.find((scene) => scene === params.get('scene')),
     corners: params.get('coins') === '1',
     handcarParked: params.get('draisine') === 'posee',
   };

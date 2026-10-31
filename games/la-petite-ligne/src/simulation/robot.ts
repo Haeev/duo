@@ -18,6 +18,7 @@ import { canPlace } from './amenagement';
 import { catalogueWindow, currentOrder } from '../donnees/commandes';
 import { holdsRod, waterAhead } from './peche';
 import { counterRemaining } from './conditions';
+import { freeSeatsNear, seatedSeconds } from './bancs';
 import type { Condition } from '../donnees/types';
 
 interface Memory {
@@ -601,9 +602,9 @@ function openCounters(sim: Sim): OpenCounter[] {
   return out;
 }
 
-/** Rendez-vous des étapes actives: `stayed_at`, avec la plage horaire `time_is` de la même étape. */
-function openStays(sim: Sim): { point: string; seconds: number }[] {
-  const out: { point: string; seconds: number }[] = [];
+/** Rendez-vous des étapes actives: `stayed_at`, avec la plage horaire `time_is` de la même étape; `seated`: assis sur le banc. */
+function openStays(sim: Sim): { point: string; seconds: number; seated: boolean }[] {
+  const out: { point: string; seconds: number; seated: boolean }[] = [];
   const minutes = sim.world.clock.minutes;
   for (const q of sim.world.quests) {
     if (q.status !== 'active' || !AFTERNOON.has(q.id)) continue;
@@ -611,7 +612,9 @@ function openStays(sim: Sim): { point: string; seconds: number }[] {
     if (step === undefined) continue;
     const window = step.conditions.find((c) => c.type === 'time_is');
     if (window?.type === 'time_is' && (minutes < window.from || minutes >= window.to)) continue;
-    for (const c of step.conditions) if (c.type === 'stayed_at' || c.type === 'looked_at') out.push({ point: c.point, seconds: 0 });
+    for (const c of step.conditions) {
+      if (c.type === 'stayed_at' || c.type === 'looked_at') out.push({ point: c.point, seconds: 0, seated: c.type === 'stayed_at' && c.seated });
+    }
   }
   return out;
 }
@@ -624,6 +627,7 @@ function openStays(sim: Sim): { point: string; seconds: number }[] {
 function genericQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const stay = openStays(sim)[0];
   const at = stay === undefined ? undefined : sim.map.points[stay.point];
+  if (stay?.seated === true && at !== undefined) return sitAt(sim, c, m, stay.point, at, out);
   if (at !== undefined) {
     if (goTo(sim, c, m, `rendez-vous:${stay?.point ?? ''}`, at, 1.5, out)) return true;
     m.job = 'attendre au rendez-vous';
@@ -649,6 +653,32 @@ function genericQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolea
     if (lying !== undefined) return goAct(sim, c, m, `ramasser:${lying.id}`, { kind: 'ground_item', groundItem: lying.id }, lying.pos, 1.2, out);
   }
   return false;
+}
+
+/**
+ * Rendez-vous assis: va à la place libre la plus proche du point et s'y
+ * assoit, comme un clic sur le banc; sans place libre (un habitant et
+ * l'autre déjà assis), attend tout près.
+ */
+function sitAt(sim: Sim, c: Character, m: Memory, pointId: string, at: Vec2, out: Intent[]): boolean {
+  if (c.seat !== null && seatedSeconds(sim, c, pointId) > 0) {
+    m.job = 'assis au rendez-vous';
+    return true;
+  }
+  const seat = freeSeatsNear(sim, at, sim.content.settings.ranges.stayAt)[0];
+  if (seat === undefined) {
+    if (goTo(sim, c, m, `rendez-vous:${pointId}`, at, 2, out)) return true;
+    m.job = 'attendre une place sur le banc';
+    return true;
+  }
+  return goAct(sim, c, m, `banc:${pointId}`, ground(seat.pos), seat.pos, sim.content.settings.benches.sitRange - 0.1, out);
+}
+
+/** Un rendez-vous assis est-il ouvert pour ce point de banc ? (sinon le robot assis par hasard se relève) */
+function wantsSeat(sim: Sim, c: Character): boolean {
+  const seat = c.seat;
+  if (seat === null) return false;
+  return openStays(sim).some((st) => st.seated && seatedSeconds(sim, c, st.point) > 0);
 }
 
 /** Un compteur ouvert attend-il ce poisson (`caught:<poisson>`, ou `caught` seul) ? */
@@ -891,6 +921,11 @@ export function createRobot(options: RobotOptions = {}): Robot {
       if (p.by !== c.id) out.push({ type: 'proposal_answer', proposal: p.id, accept: true });
     }
     if (busy(sim, c) || w.tick < m.waitUntil) return frame(m);
+    // Assis sans rendez-vous assis (Espace près d'un banc pour autre chose): un pas le relève.
+    if (c.seat !== null && !wantsSeat(sim, c)) {
+      m.job = 'se lever du banc';
+      return frame(m, 0, 1);
+    }
     if (c.menu !== null && c.menu !== 'shop' && c.menu !== 'crate') out.push({ type: 'menu', menu: null });
 
     const f = { held: false, mx: 0, my: 0 };

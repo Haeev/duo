@@ -211,6 +211,7 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
 | `envies`, `movement`, `ranges`, `building`, `hints` | une envie par joueur et par jour; vitesses en m/s; portées en mètres; vitesse à deux; astuces |
 | `absence`, `autosave`, `fishing` | P1: horloge arrêtée en cas d'absence, sauvegarde, pêche (le drapeau `fishing_enabled` est posé quand la pêche est activée) |
+| `benches` | bancs de la carte: places le long du banc (`slots`, m depuis son milieu, deux par banc: jamais deux corps sur la même), avancée de l'assise (`seatForward`), lever devant la place (`standForward`), Espace à moins de `sitRange` m d'une place libre fait s'asseoir, un habitant arrêté à `villagerReach` m du banc y tient une place; valeurs par défaut dans `src/donnees/defauts.ts` |
 | `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
 
 Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 sous, la commande 2 990 sous.
@@ -254,7 +255,7 @@ Paramètres communs des conditions qui comptent:
 | `went_to_bed` | `item` facultatif, `who` | le joueur s'est couché, dans ce lit s'il est précisé |
 | `caught` | `item`, comptage | poissons pêchés (P1) |
 | `used_tool_at` | `tool`, `point`, `radius` (m) | événement: le joueur se sert de l'outil à moins de `radius` du point |
-| `stayed_at` | `point`, `seconds`, `who` | le joueur (ou chacun des deux, ensemble) est resté à moins de `ranges.stayAt` du point pendant ce temps d'affilée |
+| `stayed_at` | `point`, `seconds`, `who`, `seated` (facultatif) | le joueur (ou chacun des deux, ensemble) est resté à moins de `ranges.stayAt` du point pendant ce temps d'affilée; avec `"seated": true`, assis sur un banc à cette portée du point (Espace près d'une place libre), pendant ce temps d'affilée |
 | `witnessed` | `event` (`train_arrival`, `train_departure`), `who` | le joueur était à moins de `ranges.witness` du train à ce moment-là |
 | `nights_passed` | `count` | nuits passées depuis le démarrage de l'étape |
 | `recipe_known` | `recipe` | la recette est débloquée |

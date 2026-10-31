@@ -10,6 +10,7 @@
  */
 import type { GameMap } from '../../etat/carte';
 import { createWorld } from '../../simulation/monde';
+import { sitDown } from '../../simulation/bancs';
 import type {
   ActionKind,
   Character,
@@ -50,6 +51,9 @@ function dress(
   return c;
 }
 
+export const DEMO_SCENES = ['rencontre', 'place', 'repas', 'banc', 'banc-quai'] as const;
+export type DemoScene = (typeof DEMO_SCENES)[number];
+
 export interface DemoOptions {
   /** Heure de jeu, en minutes depuis minuit. */
   minutes: number;
@@ -71,9 +75,11 @@ export interface DemoOptions {
    * Petites scènes de la vie au repos: Camille s'approche de Firmin par le
    * côté et s'arrête (`rencontre`), Firmin seul sur la place (`place`), ou
    * Camille mange assise à la table (`repas`), ou s'assoit sur le banc de la
-   * place (`banc`: arrêtée devant lui, action « assis »).
+   * place (`banc`), ou les deux joueurs côte à côte sur le banc du quai
+   * (`banc-quai`, Jeanne partie à la cloche). L'assise passe par la règle de
+   * la simulation (`sitDown`): places réservées, comme en jeu.
    */
-  scene?: 'rencontre' | 'place' | 'repas' | 'banc' | undefined;
+  scene?: DemoScene | undefined;
   /** Draisine poussée, posée au bout de la voie (`world.handcarAt`), remise ouverte. */
   handcarParked?: boolean;
 }
@@ -257,14 +263,6 @@ export function createExampleWorld(
       firmin.facing = Math.PI / 4;
     }
   }
-  if (options.scene === 'banc') {
-    const bench = point(map, 'village_square', 38.5, 30.5);
-    p1.pos = { x: bench.x - 2.2, y: bench.y + 1.6 };
-    p1.prev = { ...p1.pos };
-    p1.facing = -Math.PI / 2;
-    p1.aim = null;
-    p1.action = { kind: 'sit', since: 0, duration: 0, target: null };
-  }
   if (options.scene === 'repas') {
     // Chaise au sud de la table, tournée vers elle (vers le nord: rotation 2).
     const chair = { cx: room.x + 2, cy: room.y + 3 };
@@ -334,6 +332,23 @@ export function createExampleWorld(
   ];
   world.villagers = villagers;
   world.hens = hens;
+  if (options.scene === 'banc' || options.scene === 'banc-quai') {
+    const both = options.scene === 'banc-quai';
+    const jeanne = villagers.find((villager) => villager.id === 'jeanne');
+    if (both && jeanne !== undefined) {
+      // Jeanne laisse le banc du quai aux deux joueurs: elle attend près de la cloche.
+      const bell = point(map, 'quay_bell', 36.5, 18.5);
+      jeanne.pos = { x: bell.x + 1.6, y: bell.y + 0.6 };
+      jeanne.prev = { ...jeanne.pos };
+      jeanne.target = 'quay_bell';
+    }
+    p1.aim = null;
+    p2.action = { kind: 'idle', since: 0, duration: 0, target: null };
+    sitDown(sim, p1, both ? 'quay_bench' : 'square_bench', 0);
+    if (both) {
+      sitDown(sim, p2, 'quay_bench', 1);
+    }
+  }
   if (options.corners === true) {
     p1.corner = { cx: room.x + room.w - 2, cy: room.y };
     p2.corner = { cx: room.x, cy: room.y + room.h - 2 };

@@ -3,7 +3,7 @@
  * `feel` dans `reglages.json` remplace chaque valeur une à une; `ranges`
  * complète de même les portées absentes. À reprendre par le game designer.
  */
-import type { FeelSettings } from './types';
+import type { BenchSettings, FeelSettings } from './types';
 
 export const DEFAULT_FEEL: FeelSettings = {
   // Durées des gestes simples (s), avant le doublement à endurance nulle.
@@ -39,6 +39,15 @@ export const DEFAULT_FEEL: FeelSettings = {
   pinSeconds: 15,
   // CN-04: goujon commun, chevesne peu commun, truite rare.
   fishWeights: { gudgeon: 6, chub: 3, trout: 1 },
+};
+
+/** Bancs: deux places à 0,5 m du milieu, lever à 0,85 m devant l'assise (hors de l'emprise de 1 m). */
+export const DEFAULT_BENCHES: BenchSettings = {
+  slots: [-0.5, 0.5],
+  seatForward: 0,
+  standForward: 0.85,
+  sitRange: 1.4,
+  villagerReach: 0.8,
 };
 
 export const DEFAULT_RANGES = {

@@ -276,11 +276,12 @@ export const RENDER_SETTINGS = {
     greetRange: 2.6,
     /**
      * Bancs de la carte (modèle `bench`, sans `seat_height` dans le GLB): hauteur
-     * de l'assise, décalage du milieu de l'assise vers l'avant depuis l'origine
-     * du modèle, places le long du banc (m), et distance à laquelle un
-     * personnage arrêté est considéré comme assis dessus.
+     * de l'assise (m). Places, avancée de l'assise et portée des habitants:
+     * `reglages.benches` (partagés avec la simulation, qui réserve les places).
+     * `glideSeconds`: le corps glisse de sa place debout à l'assise (et retour)
+     * pendant le fondu, au lieu d'y sauter.
      */
-    bench: { seatHeight: 0.45, seatForward: 0, slots: [-0.5, 0.5], reach: 0.8 },
+    bench: { seatHeight: 0.45, glideSeconds: 0.22 },
     /** Hauteur d'assise de l'animation `sit` (m): le bassin y est posé quand la racine est au sol. */
     sitClipSeatHeight: 0.47,
     /** Tape dans la main (clip `high_five`) à une réussite à deux, si les joueurs sont à moins de (m). */

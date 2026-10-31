@@ -8,6 +8,7 @@ import type { Condition, Since, Who } from '../donnees/types';
 import { MINUTES_PER_DAY } from './constantes';
 import { type Sim, character, distance, point } from './contexte';
 import { countInBag, countInStacks, duoOwns } from './sac';
+import { seatedSeconds } from './bancs';
 
 export interface ToolEvent {
   tool: string;
@@ -158,7 +159,10 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return target !== undefined && distance(ev.pos, target) <= condition.radius;
     }
     case 'stayed_at':
-      return byCharacter(condition.who, ctx, (id) => (character(sim, id).stays[condition.point] ?? 0) >= condition.seconds);
+      return byCharacter(condition.who, ctx, (id) => {
+        const c = character(sim, id);
+        return (condition.seated ? seatedSeconds(sim, c, condition.point) : (c.stays[condition.point] ?? 0)) >= condition.seconds;
+      });
     case 'variant':
       return variantOf(sim.world.seed, condition.group, condition.of) === condition.value;
     case 'looked_at': {

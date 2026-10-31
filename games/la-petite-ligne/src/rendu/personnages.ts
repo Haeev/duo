@@ -36,6 +36,7 @@ import { SIM_HZ } from '../etat/types';
 import { BoneOffsets, poseEnvelope, stableUnit, termAngle } from './attentes';
 import type { Content } from '../donnees/types';
 import type { MapProp } from '../etat/carte';
+import { BenchSeating, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
 import {
   BODY_COLORS,
   HAIR_MESHES,
@@ -49,7 +50,6 @@ import { smoothFactor } from './camera';
 import {
   dampAngle,
   interpolate,
-  yawFromQuarter,
   setStandingBox,
   yawFromFacing,
   type FrameContext,
@@ -99,6 +99,11 @@ const PLAYER_VARIANTS_HEN: readonly string[] = [...PLAYER_VARIANTS, PET];
 const DEGREE = Math.PI / 180;
 /** Fondu court entre les clips de pêche, qui partent et finissent sur la même pose. */
 const FISH_FADE = 0.1;
+/** Un événement d'assise est suivi ce temps (s), le temps que l'état complet le rattrape (5 par seconde). */
+const SEAT_EVENT_SECONDS = 0.6;
+/** Boîte de clic d'une place de banc (m): une moitié d'assise et le dossier. */
+const BENCH_PICK_RADIUS = 0.45;
+const BENCH_PICK_HEIGHT = 0.9;
 /** Bornes du calage d'un geste: part de la durée prise par l'avance du contact, départ au plus tard dans le clip. */
 const GESTURE_LEAD_SHARE_MAX = 0.5;
 const GESTURE_START_MAX = 0.9;
@@ -569,6 +574,10 @@ class PlayerTexture {
 
 interface PlayerEntry {
   figure: CharacterFigure;
+  /** Assis au dernier rendu (place affichée), pour le glissement d'entrée et de sortie. */
+  seated: boolean;
+  /** Écart restant à résorber entre la position affichée et la cible (m), et son départ. */
+  glide: { x: number; y: number; start: number };
   texture: PlayerTexture | null;
   meshes: Map<string, Object3D>;
   look: string;
@@ -626,12 +635,32 @@ export class CharactersPart implements EventfulPart {
     private readonly resources: ResourceTracker,
     private readonly picks: PickRegistry,
     private readonly content: Content,
-    /** Bancs de la carte (assises des habitants et des joueurs arrêtés dessus). */
+    /** Bancs de la carte (places des joueurs assis par choix et des habitants arrêtés dessus). */
     private readonly benches: readonly MapProp[] = [],
+    /** Points de la carte: un habitant s'assoit sur le banc qui est le point de son emploi du temps. */
+    private readonly points: Readonly<Record<string, { x: number; y: number }>> = {},
   ) {
     this.group.name = 'personnages';
     for (const clip of library.animations(CHARACTERS_FILE)) {
       this.clips.set(clip.name, clip);
+    }
+    // Un clic sur une moitié de banc vise sa place (sol au milieu de l'assise): la simulation y
+    // mène et y assoit. Sans cette boîte, le rayon touchait le sol derrière le banc.
+    const place: BenchPlace = { x: 0, y: 0, facing: 0 };
+    for (const prop of benches) {
+      for (let slot = 0; slot < content.settings.benches.slots.length; slot += 1) {
+        seatPlace(prop, slot, content.settings.benches, place);
+        const target = picks.add({ kind: 'ground', x: place.x, y: place.y });
+        setStandingBox(
+          target.box,
+          place.x,
+          terrain.heightAt(place.x, place.y),
+          place.y,
+          BENCH_PICK_RADIUS,
+          BENCH_PICK_HEIGHT,
+        );
+        target.enabled = true;
+      }
     }
   }
 
@@ -649,6 +678,13 @@ export class CharactersPart implements EventfulPart {
       this.startOneShot(event.by, FISH_STRIKE);
     } else if (event.type === 'gave') {
       this.startOneShot(event.by, GIVE);
+    } else if (event.type === 'sat_down') {
+      this.seatEvents.set(event.by, {
+        seat: { bench: event.bench, slot: event.slot, since: 0 },
+        at: this.time,
+      });
+    } else if (event.type === 'stood_up') {
+      this.seatEvents.set(event.by, { seat: null, at: this.time });
     } else if (
       (event.type === 'envie_done' && event.by === 'both') ||
       event.type === 'quest_done'
@@ -780,44 +816,36 @@ export class CharactersPart implements EventfulPart {
    * l'animation `sit`; ailleurs, assis par terre, posé sur le dessus d'une
    * paillasse ou d'un lit (`sleep_height`) s'il y en a un sous le personnage.
    */
-  /** Place assise trouvée par `benchSeat` (réutilisée: lue tout de suite par l'appelant). */
-  private readonly benchPlace = { x: 0, y: 0, facing: 0 };
-
+  /** Place assise lue par l'appelant tout de suite (réutilisée, aucune allocation). */
+  private readonly benchPlace: BenchPlace = { x: 0, y: 0, facing: 0 };
+  /** Places des habitants sur les bancs, d'après les joueurs assis (comme la simulation). */
+  private readonly seating = new BenchSeating();
+  /** Place affichée de chaque joueur (état, ou événement plus récent que lui), lue par `seating`. */
+  private readonly shownSeats: { seat: BenchSeat | null }[] = [{ seat: null }, { seat: null }];
   /**
-   * Banc de la carte sous ou tout près de (x, y): écrit dans `benchPlace` la
-   * place la plus proche (milieu de l'assise), tournée comme le banc, dos au
-   * dossier. Faux s'il n'y a pas de banc à portée.
+   * Dernier `sat_down` ou `stood_up` reçu, par joueur, et son instant: chez l'invité,
+   * l'événement arrive avant l'état complet (au plus 5 par seconde); on le suit
+   * `SEAT_EVENT_SECONDS`, le temps que l'état le rattrape.
    */
-  private benchSeat(x: number, y: number): boolean {
-    const bench = SETTINGS.bench;
-    for (const prop of this.benches) {
-      const yaw = yawFromQuarter(prop.rotation);
-      // Axes du banc dans la carte: le long (X du modèle) et vers l'avant (Z du modèle).
-      const alongX = Math.cos(yaw);
-      const alongY = -Math.sin(yaw);
-      const frontX = Math.sin(yaw);
-      const frontY = Math.cos(yaw);
-      const dx = x - prop.pos.x;
-      const dy = y - prop.pos.y;
-      const along = dx * alongX + dy * alongY;
-      const front = dx * frontX + dy * frontY;
-      const halfLength = (prop.rect === null ? 2 : Math.max(prop.rect.w, prop.rect.h)) / 2;
-      if (Math.abs(along) > halfLength + bench.reach || Math.abs(front) > 0.5 + bench.reach) {
-        continue;
-      }
-      let slot: number = bench.slots[0];
-      for (const candidate of bench.slots) {
-        if (Math.abs(candidate - along) < Math.abs(slot - along)) {
-          slot = candidate;
-        }
-      }
-      this.benchPlace.x = prop.pos.x + alongX * slot + frontX * bench.seatForward;
-      this.benchPlace.y = prop.pos.y + alongY * slot + frontY * bench.seatForward;
-      // Même convention que la carte: quart 0 tourné vers le sud (+y).
-      this.benchPlace.facing = Math.PI / 2 - yaw;
-      return true;
+  private readonly seatEvents = new Map<CharacterId, { seat: BenchSeat | null; at: number }>();
+
+  /** Place affichée d'un joueur: l'événement récent, sinon l'état. */
+  private seatOf(character: DeepReadonly<Character>): DeepReadonly<BenchSeat> | null {
+    const event = this.seatEvents.get(character.id);
+    if (event !== undefined && this.time - event.at < SEAT_EVENT_SECONDS) {
+      return event.seat;
     }
-    return false;
+    return character.seat;
+  }
+
+  /** Écrit dans `benchPlace` la place `slot` du banc `id`; faux si le banc n'existe pas. */
+  private benchSeat(id: string, slot: number): boolean {
+    const prop = this.benches.find((bench) => bench.id === id);
+    if (prop === undefined) {
+      return false;
+    }
+    seatPlace(prop, slot, this.content.settings.benches, this.benchPlace);
+    return true;
   }
 
   private seatAt(world: ReadonlyWorld, x: number, y: number): { clip: string; lift: number } {
@@ -841,10 +869,39 @@ export class CharactersPart implements EventfulPart {
         return { clip: SIT_GROUND, lift: extras.sleep_height };
       }
     }
-    if (this.benchSeat(x, y)) {
-      return { clip: SIT_CHAIR, lift: SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight };
-    }
     return { clip: SIT_GROUND, lift: 0 };
+  }
+
+  /** Position affichée pendant le glissement vers l'assise ou depuis elle, ou `null` hors glissement. */
+  private readonly glidePoint = { x: 0, y: 0 };
+
+  private glide(
+    entry: PlayerEntry,
+    onBench: boolean,
+    target: { x: number; y: number },
+    context: FrameContext,
+  ): { x: number; y: number } | null {
+    if (onBench !== entry.seated) {
+      // Écart entre ce qu'on voyait et la nouvelle cible, résorbé en `glideSeconds`.
+      const root = entry.figure.root.position;
+      entry.glide.x = root.x - target.x;
+      entry.glide.y = root.z - target.y;
+      entry.glide.start = context.time;
+      entry.seated = onBench;
+      if (Math.hypot(entry.glide.x, entry.glide.y) > SETTINGS.teleportDistance) {
+        entry.glide.x = 0;
+        entry.glide.y = 0;
+      }
+    }
+    const t = (context.time - entry.glide.start) / SETTINGS.bench.glideSeconds;
+    if (t >= 1 || (entry.glide.x === 0 && entry.glide.y === 0)) {
+      return null;
+    }
+    // Départ vif, arrivée douce.
+    const keep = (1 - t) * (1 - t);
+    this.glidePoint.x = target.x + entry.glide.x * keep;
+    this.glidePoint.y = target.y + entry.glide.y * keep;
+    return this.glidePoint;
   }
 
   /** Position affichée d'un joueur (pour les effets: objet qui saute au sac). */
@@ -904,7 +961,16 @@ export class CharactersPart implements EventfulPart {
         }
       }
     }
-    return { figure, texture, meshes, look: '', baseGeometry, merged: null };
+    return {
+      figure,
+      texture,
+      meshes,
+      look: '',
+      baseGeometry,
+      merged: null,
+      seated: false,
+      glide: { x: 0, y: 0, start: 0 },
+    };
   }
 
   private dress(entry: PlayerEntry, character: DeepReadonly<Character>): void {
@@ -984,13 +1050,17 @@ export class CharactersPart implements EventfulPart {
       const shot = this.oneShot.get(character.id);
       const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
       const fishing = character.fishing !== null || (shotActive && FISH_CLIPS.has(shot.clip));
-      const seat = kind === 'sit' ? this.seatAt(world, character.pos.x, character.pos.y) : null;
-      // Assis ou mangeant sur un banc de la carte: posé à sa place, tourné comme lui (`benchPlace`).
+      // Assis sur un banc par choix (place réservée par la simulation): posé à sa place, tourné
+      // comme le banc, dos au dossier (`benchPlace`). Il y mange aussi (`sit_eat`).
+      const benchSeat = this.seatOf(character);
       const onBench =
-        (kind === 'sit' || kind === 'eat') &&
-        !moving &&
-        !character.inHouse &&
-        this.benchSeat(character.pos.x, character.pos.y);
+        benchSeat !== null && !character.inHouse && this.benchSeat(benchSeat.bench, benchSeat.slot);
+      const shown = this.shownSeats[character.id === 'p1' ? 0 : 1];
+      if (shown !== undefined) {
+        shown.seat = onBench ? benchSeat : null;
+      }
+      const seat =
+        kind === 'sit' && !onBench ? this.seatAt(world, character.pos.x, character.pos.y) : null;
       const benchLift = SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight;
       const walkScale = Math.min(
         WALK_SCALE_MAX,
@@ -998,7 +1068,9 @@ export class CharactersPart implements EventfulPart {
       );
       const gesture = this.gestureRequest(character, context);
       let request: ClipRequest;
-      if (moving && kind !== 'carry') {
+      if (onBench) {
+        request = { name: kind === 'eat' ? SIT_EAT : SIT_CHAIR, timeScale: 1 };
+      } else if (moving && kind !== 'carry') {
         request = { name: 'walk', timeScale: walkScale, fade: SETTINGS.walkFadeSeconds };
       } else if (shotActive) {
         request = { name: shot.clip, timeScale: 1, once: true, token: shot.start, fade: FISH_FADE };
@@ -1026,11 +1098,12 @@ export class CharactersPart implements EventfulPart {
         : partner === undefined
           ? character.facing
           : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
+      const glided = this.glide(entry, onBench, onBench ? this.benchPlace : character.pos, context);
       entry.figure.update(
         context,
         this.terrain,
-        onBench ? this.benchPlace : character.prev,
-        onBench ? this.benchPlace : character.pos,
+        glided ?? (onBench ? this.benchPlace : character.prev),
+        glided ?? (onBench ? this.benchPlace : character.pos),
         facing,
         request,
         onBench ? benchLift : (seat?.lift ?? 0),
@@ -1050,7 +1123,19 @@ export class CharactersPart implements EventfulPart {
         fishing && !moving ? rod : showTool ? definition.model : null,
       );
     }
-    for (const villager of world.villagers) {
+    // Habitants sur les bancs: la place libre la plus proche, après les joueurs assis.
+    this.seating.update(
+      this.benches,
+      this.content.settings.benches,
+      this.points,
+      this.shownSeats,
+      world.villagers,
+    );
+    for (let index = 0; index < world.villagers.length; index += 1) {
+      const villager = world.villagers[index];
+      if (villager === undefined) {
+        continue;
+      }
       let figure = this.villagers.get(villager.id);
       if (figure === undefined) {
         figure = this.createVillager(villager);
@@ -1062,10 +1147,11 @@ export class CharactersPart implements EventfulPart {
         continue;
       }
       // Arrêté sur un banc (Jeanne au quai le matin): assis, à sa place, dos au dossier.
+      const benchProp = this.seating.bench[index] ?? null;
       const onBench =
-        villager.speed <= SETTINGS.walkThreshold &&
+        benchProp !== null &&
         villager.talkingWith.length === 0 &&
-        this.benchSeat(villager.pos.x, villager.pos.y);
+        this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0);
       const clip = onBench ? SIT_CHAIR : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
       const timeScale =
