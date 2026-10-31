@@ -156,7 +156,7 @@ describe('aménagement: raison du refus', () => {
     placeCharacter(sim, character(sim, 'p2'), { x: first.cx + 0.5, y: first.cy + 0.5 });
     step(sim, { controls: {}, intents: [] });
     expect(c.placement?.blocked).toBe(texts.placement_occupied);
-    sim.world.furniture.push({ id: 'f-essai', item: 'table', cell: { ...first }, rotation: 0 });
+    sim.world.furniture.push({ id: 'f-essai', item: 'table', cell: { ...first }, rotation: 0, placedBy: null });
     sim.runtime.dynamicDirty = true;
     step(sim, { controls: {}, intents: [] });
     expect(c.placement?.cell).toEqual(preview.cell);
