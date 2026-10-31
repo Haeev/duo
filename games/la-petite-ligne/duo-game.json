@@ -15,8 +15,8 @@
   "network": "host-authority",
   "entry": "index.html",
   "thumbnail": "vignette.png",
-  "description": "Une semaine à la Halte d'Aubrune: réparez la maisonnette, faites pousser le potager et remplissez ensemble la commande du train du samedi.",
-  "whatsNew": "Démo d'une heure: la première semaine à la Halte d'Aubrune.",
+  "description": "Deux semaines à la Halte d'Aubrune: réparez la maisonnette, faites pousser le potager, remplissez ensemble les commandes du train du samedi et remettez en route la draisine d'Émile.",
+  "whatsNew": "Démo de deux heures, une semaine par séance: deux semaines à la Halte d'Aubrune, et un coin à soi dans la maisonnette.",
   "actions": [
     {
       "id": "up",
