@@ -130,22 +130,25 @@ Tailles: réelles. Exception proposée au directeur artistique pour les oiseaux 
 | Timidité | un joueur à moins de 2,5 m: `heron_alert` (cou tendu, 1 s), puis deux pas vers le sud jusqu'à (20,6 ; 40,3) (`heron_shy_step`, 0,8 s); retour à `heron_stand` 5 s après le départ du dernier joueur proche. Le chemin du gué (x 17 à 19) passe à 1,6 à 3,6 m: le héron se redresse au passage, c'est un retour visible, pas un échec |
 | Collision | rayon 0,3 m |
 
-Apogée (5,2 s), puis `after`:
+Apogée (7,4 s, version jouée depuis le tour 6: l'alerte tenue 2,6 s au lieu de 1 s pour tenir M-02), puis `after`:
 
 | t (s) | x | y | z | Clip | Ce qui se voit |
 |---|---|---|---|---|---|
-| 0,0 | 20,6 | 39,6 | 0 | `heron_alert` | cou dressé, tête tournée vers le joueur le plus proche |
-| 1,0 | 20,6 | 39,6 | 0 | `heron_takeoff` | il s'accroupit, crie à 1,2 s, trois battements lourds |
-| 2,4 | 22,0 | 39,8 | 1,0 | `heron_fly` | il quitte l'eau, pattes pendantes |
-| 3,4 | 26,0 | 40,8 | 2,0 | `heron_fly` | vol au ras de l'eau vers l'aval, cou replié en S, pattes tendues derrière |
-| 4,4 | 28,8 | 41,9 | 1,0 | `heron_land` | freinage, pattes en avant |
-| 5,2 | 29,5 | 42,3 | 0 | `heron_rest` | posé sur la grève d'en face (anse de sable, `b`, x 23 à 31, y 42), point `heron_rest_far` |
+| 0,0 | 20,6 | 39,6 | 0 | `heron_alert` | cou dressé, tête tournée vers le joueur le plus proche, tenu 2,6 s |
+| 2,6 | 20,6 | 39,6 | 0 | `heron_takeoff` | il s'accroupit, trois battements lourds, crie à 3,8 s |
+| 3,5 | 20,6 | 39,6 | 0,15 | | les pattes quittent l'eau sur place |
+| 4,6 | 22,0 | 39,8 | 1,0 | `heron_fly` | il prend son vol, pattes pendantes |
+| 5,6 | 26,0 | 40,8 | 2,0 | `heron_fly` | vol au ras de l'eau vers l'aval, cou replié en S, pattes tendues derrière |
+| 6,6 | 28,8 | 41,9 | 1,0 | `heron_land` | freinage, pattes en avant |
+| 7,4 | 29,5 | 42,3 | 0 | `heron_rest` | posé sur la grève d'en face (anse de sable, `b`, x 23 à 31, y 42), point `heron_rest_far` |
 
-Temps à l'écran: de 0 à 3,4 s, le héron reste à moins de 6 m de ses spectateurs (3,4 s sur les deux écrans à tous les zooms); il se pose à 7 à 9 m, à l'écran au zoom moyen. État `after`: `heron_rest` en boucle à `heron_rest_far` jusqu'à 19 h. Départ (`leave`, et fin de `after`): il s'envole vers le sud-est, (29,5 ; 42,3 ; 0) vers (40 ; 47,5 ; 4) en 2 s, fondu sur la dernière demi-seconde (le bord sud est un décor infranchissable).
+Sons datés (données): `heron_wings` à 2,6 s, `heron_croak` à 3,8 s, `heron_land` à 6,6 s.
+
+Temps à l'écran: depuis la berge nord (places de la conception et des robots), le héron reste 3,4 s à moins de 6 m des deux (test `tests/moments.test.ts`); au pire, depuis une case libre de l'anneau, 3,6 s. Il se pose à 7 à 9 m, à l'écran au zoom moyen. État `after`: `heron_rest` en boucle à `heron_rest_far` jusqu'à 19 h. Départ (`leave`, et fin de `after`): il s'envole vers le sud-est, (29,5 ; 42,3 ; 0) vers (40 ; 47,5 ; 4) en 2 s, fondu sur la dernière demi-seconde (le bord sud est un décor infranchissable).
 
 Modèle `heron` (héron cendré): hauteur debout 0,95 m (cou tendu 1,0 m), longueur 0,90 m, envergure 1,70 m, pattes 0,35 m; dos gris, cou blanc, bandeau noir au-dessus de l'œil, bec jaune de 0,12 m. Clips: `heron_idle` (boucle de 4 s: tête qui pivote, cou qui rentre; un `heron_strike` tous les 10 à 20 s, tirés par la graine du moment), `heron_strike` (0,8 s, cou lancé vers l'eau), `heron_alert` (1 s), `heron_shy_step` (0,8 s), `heron_takeoff` (1,4 s), `heron_fly` (boucle de 1 s, deux battements), `heron_land` (0,8 s), `heron_rest` (boucle de 4 s, cou rentré dans les épaules). Détail qui fait vrai: en vol, cou replié en S (et non tendu comme une cigogne).
 
-Sons: `heron_wade` (pas dans l'eau peu profonde, 0,3 s, 3 variantes, un toutes les 6 à 12 s en attente, audible à 15 m); `heron_strike` (plouf court du bec, 0,4 s, 2 variantes); `heron_croak` (cri rauque « kraak », 0,6 s, 2 variantes, à t = 1,2 s); `heron_wings` (trois battements lourds, 1,4 s, à t = 1,0 s); `heron_land` (froissement d'ailes, 0,6 s, à t = 4,4 s).
+Sons: `heron_wade` (pas dans l'eau peu profonde, 0,3 s, 3 variantes, un toutes les 6 à 12 s en attente, audible à 15 m); `heron_strike` (plouf court du bec, 0,4 s, 2 variantes); `heron_croak` (cri rauque « kraak », 0,6 s, 2 variantes, à t = 3,8 s); `heron_wings` (trois battements lourds, 1,4 s, à t = 2,6 s); `heron_land` (froissement d'ailes, 0,6 s, à t = 6,6 s).
 
 Textes: confidence `moment_heron_hint`, apogée `heron_seen` (remplace le texte actuel, qui disait « sans un bruit »), souvenir `moment_heron_memory` (section 3.4).
 
@@ -166,26 +169,29 @@ Récompense: Cœur +10 chacun; en quête, 20 sous de Jeanne (inchangé).
 | Déclenchement, ambiance | les deux à moins de 6 m de `geese_rest`, dehors, 3 s (assis ou debout) |
 | Avant 16 h 30 | assis sur le banc, rien ne part; ligne `geese_not_yet` dans le HUD des deux |
 
-Apogée (14 s; positions de l'oie de tête, les autres suivent):
+Apogée (16,8 s, version jouée depuis le tour 6: l'alerte tenue 2,8 s au lieu de 1 s pour tenir M-02; positions de l'oie de tête, les autres suivent):
 
 | t (s) | x | y | z | Clip | Ce qui se voit |
 |---|---|---|---|---|---|
-| 0,0 | 25,5 | 40,0 | 0 | `goose_alert` | les neuf cous se dressent, premiers cris |
-| 1,0 | 25,8 | 40,0 | 0 | `goose_run` | course sur l'eau vers l'est, ailes battantes, pattes qui frappent l'eau, gerbes d'eau |
-| 3,0 | 31,0 | 39,9 | 0,4 | `goose_fly` | elles quittent l'eau |
-| 4,0 | 35,0 | 38,0 | 2,0 | `goose_fly` | virage à gauche au-dessus de la langue de sable (x 27 à 34, y 38) |
-| 5,0 | 37,6 | 34,4 | 3,6 | `goose_fly` | au-dessus du chemin de la berge |
-| 6,0 | 39,4 | 30,6 | 5,0 | `goose_fly` | au-dessus de la place |
-| 7,0 | 41,0 | 26,6 | 6,4 | `goose_fly` | au-dessus du puits (2,6 m de haut) |
-| 8,0 | 42,5 | 22,6 | 7,8 | `goose_fly` | |
-| 9,0 | 44,0 | 18,6 | 9,2 | `goose_fly` | au-dessus du quai, à côté du panneau « Aubrune » |
-| 10,0 | 45,5 | 14,6 | 10,6 | `goose_fly` | au-dessus de la voie |
-| 12,0 | 48,5 | 6,6 | 13,4 | `goose_fly` | à l'est de la maison de Firmin (6 m de haut) |
-| 14,0 | 51,5 | -1,4 | 16,2 | `goose_fly` | hors de la carte, fondu de 13 à 14 s |
+| 0,0 | 25,5 | 40,0 | 0 | `goose_alert` | les neuf cous se dressent, premiers cris, tenu 2,8 s |
+| 2,8 | 25,5 | 40,0 | 0 | `goose_run` | course sur l'eau vers l'est, ailes battantes, pattes qui frappent l'eau, gerbes d'eau |
+| 3,8 | 26,1 | 40,0 | 0 | | la course prend de la vitesse |
+| 5,8 | 31,0 | 39,9 | 0,4 | `goose_fly` | elles quittent l'eau |
+| 6,8 | 35,0 | 38,0 | 2,0 | `goose_fly` | virage à gauche au-dessus de la langue de sable (x 27 à 34, y 38) |
+| 7,8 | 37,6 | 34,4 | 3,6 | `goose_fly` | au-dessus du chemin de la berge |
+| 8,8 | 39,4 | 30,6 | 5,0 | `goose_fly` | au-dessus de la place |
+| 9,8 | 41,0 | 26,6 | 6,4 | `goose_fly` | au-dessus du puits (2,6 m de haut) |
+| 10,8 | 42,5 | 22,6 | 7,8 | `goose_fly` | le V est formé |
+| 11,8 | 44,0 | 18,6 | 9,2 | `goose_fly` | au-dessus du quai, à côté du panneau « Aubrune » |
+| 12,8 | 45,5 | 14,6 | 10,6 | `goose_fly` | au-dessus de la voie |
+| 14,8 | 48,5 | 6,6 | 13,4 | `goose_fly` | à l'est de la maison de Firmin (6 m de haut) |
+| 16,8 | 51,5 | -1,4 | 16,2 | `goose_fly` | hors de la carte, fondu sur la dernière seconde |
 
-Cap: nord-nord-est, celui d'une migration de printemps. Vitesse au sol en vol: environ 4,5 m/s, volontairement ralentie (une vraie oie va à 15 m/s et traverserait la vue en une seconde); le battement d'ailes garde son rythme réel (3 par seconde), si bien que l'œil lit un vol et non un ralenti. Formation: de t = 3 à t = 8 s, chaque oie glisse (lissage en S) de sa place dans la grappe vers sa place dans le V: l'oie i (1 à 8) va sur le bras gauche si i est impair, droit si i est pair, au rang k = arrondi supérieur de i/2, à k x 2,2 m de l'oie de tête dans la direction du cap tournée de 145° (bras gauche) ou de -145° (bras droit). Passage à au moins 3 m au-dessus de tout obstacle de la trajectoire (puits, lampadaires, panneau, maison de Firmin, chêne de la remise: vérifié sur la liste des objets de la carte).
+Sons datés (données): `geese_alarm` à 0 s, `geese_takeoff` à 2,8 s, `geese_flight` à 5,8 s. Le départ sans apogée (`leave`, ambiance) garde l'ancien rythme de 14 s (alerte de 1 s): personne ne le regarde de près.
 
-Temps à l'écran: de 0 à 3,6 s, la volée reste à moins de 6 m du banc (3,6 s chez les deux à tous les zooms); au zoom moyen, on la suit jusqu'à environ 7 s au-dessus de la place.
+Cap: nord-nord-est, celui d'une migration de printemps. Vitesse au sol en vol: environ 4,5 m/s, volontairement ralentie (une vraie oie va à 15 m/s et traverserait la vue en une seconde); le battement d'ailes garde son rythme réel (3 par seconde), si bien que l'œil lit un vol et non un ralenti. Formation: de t = 5,8 à t = 10,8 s (de 3 à 8 s pour le départ sans apogée), chaque oie glisse (lissage en S) de sa place dans la grappe vers sa place dans le V: l'oie i (1 à 8) va sur le bras gauche si i est impair, droit si i est pair, au rang k = arrondi supérieur de i/2, à k x 2,2 m de l'oie de tête dans la direction du cap tournée de 145° (bras gauche) ou de -145° (bras droit). Passage à au moins 3 m au-dessus de tout obstacle de la trajectoire (puits, lampadaires, panneau, maison de Firmin, chêne de la remise: vérifié sur la liste des objets de la carte).
+
+Temps à l'écran: la volée reste au moins 3,75 s à moins de 6 m de chaque case libre de l'anneau (test `tests/moments.test.ts`); au zoom moyen, on la suit jusqu'à environ 10 s au-dessus de la place.
 
 Si l'apogée n'a pas eu lieu à 18 h 30: en ambiance, départ `leave` (même trajet, sans texte, les cris s'entendent de loin); en quête, elles restent (on ne les voit plus de 18 h 30 à 14 h le lendemain) et reviendront.
 
@@ -204,28 +210,33 @@ Récompense: Cœur +10 chacun; en quête, 20 sous de Firmin (inchangé).
 | Élément | Valeur |
 |---|---|
 | Déclencheur | quête `basile_lost` (variante 1 de `afternoon_d10`, jour 10, nuageux), étape `help` |
-| Objets permanents | `nest_box` sur la face sud du tronc: centre (52,50 ; 5,84 ; 2,40), entrée au sud, penché de 25° autour de l'axe nord-sud (il pend de son clou haut) |
-| Objets de quête | `ladder_wood` posée contre la face ouest du tronc, du début de la quête jusqu'à la fin de l'apogée: pied (51,47 ; 5,50), haut (52,24 ; 5,50 ; 2,90), soit 3,0 m de long à 75° du sol |
-| Basile | point d'emploi du temps `nest_oak_basile` (51,0 ; 5,5), au pied de l'échelle, tourné vers l'est (remplace `forage_edge_03`) |
-| Places à tenir | `ladder_hold_north` (51,25 ; 4,95), tourné vers le sud; `ladder_hold_south` (51,25 ; 6,05), tourné vers le nord (de part et d'autre de l'échelle, mains sur les montants) |
-| Geste « tenir » | Agir à moins de 1,2 m d'une place libre: le personnage s'y place en 0,2 s, face à l'échelle, et joue `hold_ladder`; toute touche de déplacement le fait lâcher. Une place prise par l'autre ne se prend pas (`bench_full` adapté: `ladder_hold_taken`) |
+| Objets permanents | `nest_box` sur la face sud du tronc: clou (52,50 ; 5,71 ; 2,015) sur l'écorce, centre de la caisse (52,50 ; 5,80 ; 1,84), trou à 1,89 m, entrée au sud, penché de 25° autour de l'axe nord-sud (il pend de son clou haut). Chicot `oak_branch_stub`: bout à (52,85 ; 5,95 ; 2,19) |
+| Objets de quête | `ladder_wood` posée au **sud-ouest** du tronc, du début de la quête jusqu'à la fin de l'apogée: pied `ladder_foot` (51,77 ; 6,23), tête contre le tronc en (52,32 ; 5,68) à 2,90 m, soit 3,0 m de long à 75° du sol, axe sud-ouest vers nord-est |
+| Basile | point d'emploi du temps `nest_oak_basile` (51,42 ; 6,58), derrière le pied de l'échelle, tourné vers le nord-est (cap 45°) |
+| Places à tenir | `ladder_hold_east` (52,36 ; 6,42), cap 315° (tourné vers le nord-ouest); `ladder_hold_west` (51,58 ; 5,64), cap 135° (tourné vers le sud-est). Les deux sont à 0,55 m de l'axe, de part et d'autre, et à 0,28 m du pied vers le tronc: mains sur les montants |
+| Geste « tenir » | Agir à moins de 1,2 m d'une place libre: le personnage s'y place en 0,2 s, face à l'échelle, et joue `hold_ladder`; toute touche de déplacement le fait lâcher. Une place prise par l'autre ne se prend pas (`ladder_hold_taken`) |
 | Déclenchement | les deux tiennent pendant 0,5 s |
 
-Apogée (9,4 s):
+**Pourquoi cette hauteur et ce côté (décision du manager au tour 6, relue ici).** Le nichoir a été abaissé de 0,56 m (centre de 2,40 à 1,84 m) et l'échelle déplacée de la face ouest au sud-ouest. Contrôle de cohérence: le clou est à 2,02 m, hors de portée confortable d'un homme qui doit taper au marteau (on cloue à hauteur de poitrine, pas bras tendus au-dessus de la tête); sur le troisième barreau (pieds à 0,84 m), la poitrine de Basile arrive vers 2,05 m, juste à hauteur du clou. Trois barreaux suffisent donc, et l'échelle de 3 m dépasse le point de travail d'un mètre, comme on la pose vraiment. Le nichoir est à 0,63 m à sa droite, à portée de bras. Réserve: 1,84 m est bas pour un nichoir à mésange (on les pose plutôt à 2 m et plus, à l'abri des chats); acceptable ici, le chêne est loin des maisons.
+
+Apogée (8,2 s, version jouée):
 
 | t (s) | Basile | Ce qui se voit et s'entend |
 |---|---|---|
-| 0,0 à 3,0 | `climb_ladder`, 5 barreaux (0,6 s chacun), pieds de 0 à 1,40 m, le long de l'échelle de (51,47 ; 5,50) vers (51,84 ; 5,50) | `ladder_step` à chaque barreau; l'échelle vibre de 1 cm |
-| 3,0 à 3,8 | `reach_up` vers le nichoir (à 0,35 m à sa droite) | le nichoir pivote de 25° à 0° (douceur en S), `nest_box_turn` |
-| 3,8 à 5,6 | `hammer_tap` trois fois (0,6 s, impact à 0,25 s) | `hammer_tap` à 4,05, 4,65 et 5,25 s |
-| 5,6 à 8,6 | `climb_ladder` à l'envers, 5 barreaux | `ladder_step` |
-| 8,6 à 9,4 | recule vers (50,6 ; 6,6), lève la tête | une mésange bleue se pose sur le toit du nichoir à 8,8 s, regarde dans le trou à 9,2 s, `tit_call` à 9,0 s |
+| 0,0 à 0,5 | `walk` de (51,42 ; 6,58) au pied (51,77 ; 6,23) | |
+| 0,5 à 2,3 | `climb_ladder`, 3 barreaux (0,6 s chacun), pieds de 0 à 0,84 m, le long de l'échelle vers (51,93 ; 6,07) | `ladder_step` à 0,5, 1,1 et 1,7 s; l'échelle vibre de 1 cm |
+| 2,3 à 3,1 | `reach_up` vers le nichoir | le nichoir pivote de 25° à 0° (douceur en S), `nest_box_turn` à 2,3 s |
+| 3,1 à 4,9 | `hammer_tap` trois fois | `hammer_tap` à 3,35, 3,95 et 4,55 s |
+| 4,9 à 7,4 | `climb_ladder` à l'envers, 3 barreaux (0,83 s chacun) | `ladder_step` à 4,9, 5,73 et 6,57 s |
+| 7,4 à 8,2 | recule jusqu'à (51,42 ; 6,58) sans se retourner (marche jouée à l'envers) | une mésange bleue arrive du houppier à 7,3 s, se pose sur le toit du nichoir de 7,6 à 8,0 s, `tit_call` à 7,8 s, repart à 8,0 s |
 
-**Lâcher l'échelle n'est jamais un échec.** Si un joueur lâche pendant les 8,6 premières secondes, Basile s'arrête (clip figé), dit `ladder_hold_on` (« Tenez bon, là en bas ! », bulle chez les deux), et reprend au même instant quand les deux tiennent de nouveau. Après 8,6 s, on peut lâcher. L'étape `help` est finie par `moment_seen: ladder`. L'échelle disparaît à la fin de l'apogée; Basile reste au chêne jusqu'à 18 h.
+**Lâcher l'échelle n'est jamais un échec.** Si un joueur lâche pendant les 7,4 premières secondes (`pauseBefore`), Basile s'arrête (clip figé), dit `ladder_hold_on` (« Tenez bon, là en bas ! », bulle chez les deux), et reprend au même instant quand les deux tiennent de nouveau. Après 7,4 s, Basile est au sol: on peut lâcher. L'étape `help` est finie par `moment_seen: ladder`. L'échelle disparaît à la fin de l'apogée; Basile reste au chêne jusqu'à 18 h.
+
+Réserve de lisibilité (captures `moment-ladder.png`, `faune-echelle-sequence.png`): la mésange ne reste que 0,4 s sur le toit, au moment où Basile recule; c'est le « merci » de la scène, il passe presque inaperçu. Dans l'orientation de caméra par défaut, le joueur à `ladder_hold_east` est entre la caméra et l'échelle et cache le haut du corps de Basile pendant la montée. Propositions au tour 7: mésange posée 1,2 s (fin d'apogée à 9 s, sans toucher au reste), et silhouette ou léger fondu du personnage qui masque l'acteur principal d'un moment (rendu), plutôt que de déplacer les places.
 
 Effets de fin: drapeau `nest_box_straight` (le nichoir reste droit pour toujours; il ouvre le moment des mésanges).
 
-Modèles: `ladder_wood` (3,0 m, 0,45 m de large, 10 barreaux espacés de 0,28 m, le premier à 0,28 m; montants de 0,05 x 0,07 m; origine au milieu du pied); `nest_box` (0,15 m de large, 0,25 m de haut, 0,18 m de profondeur, toit débordant de 0,04 m, trou de 28 mm, le diamètre d'un nichoir à mésange bleue, à 0,17 m du bas; bois grisé, toit de planche goudronnée; origine sur le clou, en haut au milieu du dos, pour la rotation); `blue_tit` (mésange bleue, 0,12 m, calotte bleue, ventre jaune). Clips de Basile, sur le squelette commun: `climb_ladder` (0,6 s par barreau, en place: le rendu déplace la racine le long de l'échelle), `reach_up` (0,8 s), `hammer_tap` (0,6 s). Clip des joueurs: `hold_ladder` (boucle de 2 s, mains sur un montant à 0,9 et 1,2 m, pieds écartés, léger appui). Clips de la mésange: `tit_perch` (boucle de 2 s, sautille, tourne la tête), `tit_fly` (boucle de 0,2 s), `tit_sing` (1,5 s), `tit_enter` (0,3 s), `tit_exit` (0,3 s). Le personnage de Basile porte déjà un marteau (geste `hammer` de la construction).
+Modèles: `ladder_wood` (3,0 m, 0,45 m de large, 10 barreaux espacés de 0,28 m, le premier à 0,28 m; montants de 0,05 x 0,07 m; origine au milieu du pied); `nest_box` (0,15 m de large, 0,25 m de haut, 0,18 m de profondeur, toit débordant de 0,04 m, trou de 28 mm, le diamètre d'un nichoir à mésange bleue, à 0,17 m du bas; bois grisé, toit de planche goudronnée; origine sur le clou, en haut au milieu du dos, pour la rotation); `blue_tit` (mésange bleue, 0,12 m, calotte bleue, ventre jaune). Clips de Basile, sur le squelette commun: `climb_ladder` (0,6 s par barreau à la montée, 0,83 s à la descente, en place: le rendu déplace la racine le long de l'échelle), `reach_up` (0,8 s), `hammer_tap` (0,6 s). Clip des joueurs: `hold_ladder` (boucle de 2 s, mains sur un montant à 0,9 et 1,2 m, pieds écartés, léger appui). Clips de la mésange: `tit_perch` (boucle de 2 s, sautille, tourne la tête), `tit_fly` (boucle de 0,2 s), `tit_sing` (1,5 s), `tit_enter` (0,3 s), `tit_exit` (0,3 s). Le personnage de Basile porte déjà un marteau (geste `hammer` de la construction).
 
 Sons: `ladder_lean` (choc sourd du bois contre l'écorce, 0,4 s, au démarrage de la quête quand un joueur est à moins de 15 m), `ladder_grip` (craquement des montants, 0,5 s, 3 variantes, quand on prend une place), `ladder_step` (barreau qui craque, 0,25 s, 4 variantes), `nest_box_turn` (couinement de bois sur le clou, 0,6 s), `hammer_tap` (petit marteau sur un clou, 0,2 s, 3 variantes), `tit_call` (« tsi-tsi-tsi », 0,8 s, 3 variantes).
 
@@ -241,12 +252,12 @@ Récompense: Cœur +10 chacun et 30 sous de Basile (inchangé).
 |---|---|
 | Déclencheur | ambiance; drapeau `nest_box_straight`; jour 4 au moins; soleil ou nuages; poids 3 |
 | Présence | 8 h à 11 h (63 s réelles) |
-| Point `nest_box` | (52,50 ; 5,84), hauteur du trou 2,45 m |
-| Perchoirs | toit du nichoir (52,50 ; 5,93 ; 2,53); chicot `oak_branch_stub` (branche morte de 0,6 m ajoutée sur la face sud du chêne, sous le houppier): bout à (52,85 ; 5,95 ; 2,75) |
+| Point `nest_box` | (52,50 ; 5,80), centre de la caisse à 1,84 m, trou à 1,89 m |
+| Perchoirs | toit du nichoir (52,50 ; 5,835 ; 1,97); chicot `oak_branch_stub` (branche morte de 0,6 m sur la face sud du chêne, sous le houppier, à hauteur du nichoir): bout à (52,85 ; 5,95 ; 2,19) |
 | Attente | une mésange va et vient entre le chicot et le toit du nichoir toutes les 2 s (`tit_perch`, `tit_fly`), `tit_song` toutes les 8 s |
 | Déclenchement | les deux à moins de 6 m de `nest_box`, dehors, 2 s |
 
-Apogée (4,6 s): t = 0, mésange A au chicot, un brin de mousse au bec (`moss_tuft`, 0,04 m, attaché au bec); 0,6 s, elle se pose sur le toit du nichoir; 0,6 à 1,8 s, elle regarde autour; 1,5 à 4,0 s, mésange B chante au chicot (`tit_sing`); 1,8 s, A descend devant le trou (52,50 ; 5,94 ; 2,45); 2,1 s, elle entre (`tit_enter`, puis cachée); 4,0 s, elle ressort sans la mousse (`tit_exit`); 4,3 s, A et B s'envolent vers le houppier (fondu à 4,6 s, cachées par le feuillage). Après: l'attente reprend jusqu'à 11 h.
+Apogée (4,6 s): t = 0, mésange A au chicot, un brin de mousse au bec (`moss_tuft`, 0,04 m, attaché au bec); 0,6 s, elle se pose sur le toit du nichoir; 0,6 à 1,8 s, elle regarde autour; 1,5 à 4,0 s, mésange B chante au chicot (`tit_sing`); 1,8 s, A descend devant le trou (52,50 ; 5,93 ; 1,85, pattes au bord sous le trou); 2,1 s, elle entre (`tit_enter`, puis cachée); 4,0 s, elle ressort sans la mousse (`tit_exit`); 4,3 s, A et B s'envolent vers le houppier (fondu à 4,6 s, cachées par le feuillage). Après: l'attente reprend jusqu'à 11 h.
 
 Modèles: `blue_tit` (deux instances), `moss_tuft`, `oak_branch_stub`. Sons: `tit_song` (« tsi-tsi-tsuhuhuhu », 1,8 s, 3 variantes, audible à 12 m), `tit_wings` (froissement, 0,2 s).
 
@@ -269,7 +280,7 @@ Note: les parties où le jour 10 tire la variante 0 n'ont pas ce moment dans la 
 
 Pourquoi « dehors »: vue de l'intérieur, la caméra regarde du sud-est et le mur nord de la maisonnette (environ 3 m) cache le sol sur 4 m derrière lui; un renard derrière ce mur ne se verrait pas.
 
-Apogée (5,6 s): 0 à 1,0 s, il s'arrête et regarde le joueur le plus proche (`fox_look`); 1,0 à 2,2 s, deux jappements (`fox_bark`); 2,2 à 5,6 s, demi-tour au trot à 3 m/s par (7,0 ; 16,0), (5,5 ; 13,5), puis vers l'ouest le long de la voie jusqu'à (0,2 ; 13,5), fondu sur la dernière demi-seconde. À l'écran chez les deux: de 0 à environ 3,5 s à moins de 6 m. Départ sans apogée (21 h 30): même trajet, sans jappement.
+Apogée (6,9 s, version jouée depuis le tour 6: il regarde encore 1,3 s après ses jappements, pour tenir M-02): 0 à 1,0 s, il s'arrête et regarde le joueur le plus proche (`fox_look`); 1,0 à 2,2 s, deux jappements (`fox_bark`, son à 1,0 s; `hens_alarm` à 1,2 s si les poules sont là); 2,2 à 3,5 s, il regarde encore (`fox_look`); 3,5 à 6,9 s, demi-tour au trot à 3 m/s par (7,0 ; 16,0), (5,5 ; 13,5), puis vers l'ouest le long de la voie jusqu'à (0,2 ; 13,5), fondu sur la dernière demi-seconde. À l'écran chez les deux: au moins 3,6 s à moins de 6 m depuis toute case libre de l'anneau. Départ sans apogée (21 h 30): même trajet, sans jappement.
 
 Modèle `fox` (renard roux): 0,40 m au garrot, corps de 0,65 m, queue de 0,40 m; roux, gorge et bout de queue blancs, pattes noires. Clips: `fox_trot` (boucle de 0,6 s), `fox_listen` (2,5 s), `fox_pounce` (1,2 s, en place: le rendu suit l'arc), `fox_sniff` (2 s), `fox_look` (1 s), `fox_bark` (1,2 s). Sons: `fox_pounce` (froissement d'herbe, 0,5 s, 2 variantes), `fox_bark` (deux jappements rauques, 1,2 s, 2 variantes, audible à 25 m); si les poules sont là, `hens_alarm` (caquètement inquiet, 1,5 s) depuis le poulailler à t = 1,2 s.
 
@@ -346,24 +357,24 @@ Les dialogues de ces quêtes sont réécrits section 3.5 pour dire vrai (lieux, 
 
 ### 1.6 Points et objets de carte à ajouter (level designer)
 
-À ajouter par `outils/construire_carte_halte.py` (la carte ne se retouche pas à la main). Chaque case citée a été vérifiée sur `terrain.lignes`.
+Ajoutés par `outils/construire_carte_halte.py` (la carte ne se retouche pas à la main). Valeurs mises à jour d'après la carte jouée au tour 6 (`cartes/halte.json`); le nichoir, le chicot et le pieu sont des `accroches` sans emprise au sol.
 
 | Identifiant | Nature | x ; y | Case et sol | Pourquoi là |
 |---|---|---|---|---|
 | `heron_stand` | point | 20,6 ; 39,6 | (20, 39), `g` | bord aval du gué, eau basse au-dessus d'une eau profonde |
 | `heron_rest_far` | point | 29,5 ; 42,3 | (29, 42), `b` | grève de sable de l'anse sud, en face, à l'écart du chemin |
 | `geese_rest` | point | 25,5 ; 40,0 | (25, 40), `~` | eau profonde et calme devant le banc de la berge, à 4,3 m de lui |
-| `nest_box` | objet `nest_box` et point | 52,50 ; 5,84 (z 2,40) | sur `tree_oak_01` | face sud du seul vieux chêne qu'on ne coupe pas |
-| `oak_branch_stub` | objet | bout à 52,85 ; 5,95 (z 2,75) | sur `tree_oak_01` | perchoir visible sous le houppier |
-| `ladder_foot` | point | 51,47 ; 5,50 | (51, 5), `,` | pied de l'échelle contre la face ouest du tronc |
-| `ladder_hold_north`, `ladder_hold_south` | points | 51,25 ; 4,95 et 51,25 ; 6,05 | (51, 4) `,` et (51, 6) `.` | de part et d'autre du pied de l'échelle |
-| `nest_oak_basile` | point | 51,0 ; 5,5 | (51, 5) | Basile au pied de son échelle |
+| `nest_box` | accroche `nest_box` et point | clou 52,50 ; 5,71 (z 2,015); point et centre de la caisse 52,50 ; 5,80 (z 1,84) | sur `tree_oak_01` | face sud du seul vieux chêne qu'on ne coupe pas |
+| `oak_branch_stub` | accroche | bout à 52,85 ; 5,95 (z 2,19) | sur `tree_oak_01` | perchoir visible sous le houppier, à hauteur du nichoir |
+| `ladder_foot` | point | 51,77 ; 6,23 | (51, 6) | pied de l'échelle, au sud-ouest du tronc (cap 45°) |
+| `ladder_hold_east`, `ladder_hold_west` | points | 52,36 ; 6,42 (cap 315°) et 51,58 ; 5,64 (cap 135°) | (52, 6) et (51, 5) | de part et d'autre du pied de l'échelle, face à elle |
+| `nest_oak_basile` | point | 51,42 ; 6,58 (cap 45°) | (51, 6) | Basile derrière le pied de son échelle |
 | `fox_track_west` | point | 0,2 ; 13,5 | (0, 13), `=` | bout ouest de la voie, d'où vient le renard |
 | `fox_mousing` | point | 7,5 ; 17,0 | (7, 17), `.` | herbe non fauchée entre la voie et la maisonnette |
 | `meadow_glow` | point | 56,5 ; 29,5 | (56, 29), `,` | herbes hautes du pré, à plus de 9 m des lampadaires |
 | `roe_deer_edge` | point | 49,8 ; 1,6 | bord du bois (`X`) | là où le bois descend jusqu'au bourg |
 | `roe_deer_graze` | point | 50,0 ; 5,5 | (50, 5), `.` | herbe entre la maison de Firmin et la remise |
-| `kingfisher_post` | objet `mooring_post` et point | 46,10 ; 39,90 | (46, 39), `~` | pieu d'amarrage au coin est du bout du ponton |
+| `kingfisher_post` | accroche `mooring_post` et point | 46,10 ; 39,90 | (46, 39), `~` | pieu d'amarrage au coin est du bout du ponton |
 | `notebook_spot_pontoon`, `notebook_spot_bench`, `notebook_spot_rock` | points (P1, section 2.4) | 43,8 ; 37,6 / 28,0 ; 36,5 / 38,5 ; 37,2 | (43, 37) `b` / banc / (38, 37) `b` | lieux où Jeanne joue l'après-midi |
 
 Tous ces points sont hors des chemins parcourus par les habitants (`trajets` de la carte), sauf `notebook_spot_bench` (le banc de la berge, où passe Jeanne: c'est voulu).
@@ -759,7 +770,7 @@ Messages (`textes.messages`):
 | `heron_seen` | Le héron se redresse, vous regarde, pousse un cri rauque et s'envole au ras de l'eau. Il se pose sur la grève d'en face. |
 | `moment_heron_hint` | Hier soir, au bord de l'eau, tu as vu un grand oiseau gris remonter la rivière vers le gué. Les hérons pêchent l'après-midi. |
 | `moment_heron_memory` | Le héron du gué, un {weekday} après-midi. |
-| `geese_not_yet` | Les oies se reposent encore. Elles repartent en fin d'après-midi, vers quatre heures et demie. |
+| `geese_not_yet` | Les oies se reposent encore. Elles repartent en fin d'après-midi, à partir de 16 h 30. |
 | `geese_seen` | Les oies courent sur l'eau, s'élèvent en criant et passent juste au-dessus de vous. Au-dessus du quai, elles forment un grand V. |
 | `moment_geese_hint` | Cette nuit, tu as entendu des oies se poser sur l'Aubrune, pas loin du banc de la berge. |
 | `moment_geese_memory` | Le V des oies, cap au nord, un {weekday} soir. |
@@ -808,7 +819,7 @@ Objectifs de `lucie_note`:
 
 | id | Habitant | `when` (en plus de l'étape active) | Texte |
 |---|---|---|---|
-| `odette_hen_names_tell` | Odette | `step_active hen_names listen`, `secret_role informed` | « Approche, que je te présente tes poules. Bichette, c'est {henColor1}: elle pond la première. Cocotte, c'est {henColor2}: elle se dispute avec tout le monde. Et la Duchesse, c'est {henColor3}: elle se prend pour une reine. » puis « Mais c'est {partner} qui les appellera. Une poule, ça apprend une voix à la fois. Tu lui diras ? » |
+| `odette_hen_names_tell` | Odette | `step_active hen_names listen`, `secret_role informed` | « Approche, que je te présente vos poules. Bichette, c'est {henColor1}: elle pond la première. Cocotte, c'est {henColor2}: elle se dispute avec tout le monde. Et la Duchesse, c'est {henColor3}: elle se prend pour une reine. » puis « Mais c'est {partner} qui les appellera. Une poule, ça apprend une voix à la fois. Tu lui diras ? » |
 | `odette_hen_names_redirect` | Odette | `step_active hen_names listen`, `secret_role doer` | « J'ai une confidence pour les oreilles de {partner}. Envoie-moi {partner}, et ensuite, c'est toi qui joueras. » |
 | `jeanne_lucie_ask` (réécrit) | Jeanne | `step_active lucie_note receive`, `secret_role informed`; effet `give_item lucie_letter to informed` | « Ma tante Lucie a écrit une lettre à Firmin. Elle n'ose pas la lui donner. Moi non plus. Toi, tu oses ? » puis « Et après, ne me raconte rien, tu vas rougir. C'est {partner} qui me dira ce qu'il a répondu. » |
 | `jeanne_lucie_redirect` | Jeanne | `step_active lucie_note receive`, `secret_role doer` | « C'est un secret pour {partner}. Toi, tu auras ton tour après. Va me chercher {partner} ! » |
@@ -817,7 +828,7 @@ Objectifs de `lucie_note`:
 | `firmin_lucie_already_told` | Firmin | `step_active lucie_note tell_jeanne`, `secret_role doer` | « J'ai tout dit à {partner}. Je ne vais pas le répéter: j'ai déjà rougi une fois. » |
 | `jeanne_lucie_quiz` (remplace `jeanne_lucie_done`) | Jeanne | `step_active lucie_note tell_jeanne`, `secret_role doer` | « Alors ? Qu'est-ce qu'il a dit ? » Choix: les trois réponses du tableau 2.3, chacune avec `correct: { "type": "variant", "group": "lucie_reply", "value": k, "of": 3 }`. `reply`: « Ça, c'est Firmin tout craché ! Ma tante va devenir rouge comme une tomate. Tenez, mon argent de poche. » `replyWrong`: « Hmm... Ça ne ressemble pas à Firmin. Va redemander à {partner} ! » |
 | `jeanne_lucie_not_you` | Jeanne | `step_active lucie_note tell_jeanne`, `secret_role informed` | « Non, pas toi: tu vas rougir ! Je veux l'entendre de {partner}. » |
-| `jeanne_lucie_reminder` (inchangé, réservé à l'informé) | Jeanne | `step_active lucie_note give`, `secret_role informed` | inchangé |
+| `jeanne_lucie_reminder` (réservé à l'informé, passé au tutoiement) | Jeanne | `step_active lucie_note give`, `secret_role informed` | « Tu l'as donnée ? Non ? Firmin passe ses journées sur le quai, près de la cloche. Il ne mord pas. Enfin, je crois. » |
 | `jeanne_heron_ask` (réécrit) | Jeanne | inchangé | « Le héron est revenu au gué ! Il pêche l'après-midi, au bord, là où l'eau devient profonde. Allez-y à deux, et regardez-le sans bouger. » |
 | `firmin_geese_ask` (réécrit) | Firmin | inchangé | « Des oies sauvages se sont posées sur l'Aubrune, devant le banc de la berge. En fin d'après-midi, elles repartent vers le nord. Asseyez-vous à deux sur ce banc, et regardez-les partir. » |
 | `firmin_basile_lost` (réécrit) | Firmin | inchangé | « Basile est passé tout à l'heure, une échelle sur l'épaule. Il allait vers le grand chêne, près de la remise. » |
@@ -842,7 +853,7 @@ Objectifs de `lucie_note`:
 | M-06 | Le texte d'apogée ne décrit rien qui ne se voie ni ne s'entende | relecture croisée texte contre chorégraphie et liste des sons (une ligne par affirmation du texte) |
 | M-07 | Aucun moment ne revient en moins de 7 jours | robot sur 8 graines, démo entière: `history` ne contient jamais deux fois le même moment à moins de 7 jours; et 20 000 graines par le script de simulation |
 | M-08 | Les quêtes `heron_watch`, `wild_geese` et `basile_lost` se finissent sur toutes les graines où elles sortent | robots: les deux robots vont au point, prennent la pose demandée (immobiles et tournés, assis, ou tenant) et attendent l'apogée |
-| M-09 | Lâcher l'échelle met Basile en pause sans faire échouer | test: un robot lâche à t = 4 s, Basile s'arrête, `ladder_hold_on` affiché; il reprend au même instant quand les deux tiennent |
+| M-09 | Lâcher l'échelle met Basile en pause sans faire échouer | test: un robot lâche à t = 4 s, Basile s'arrête, `ladder_hold_on` affiché; il reprend au même instant quand les deux tiennent; après 7,4 s (Basile au sol), lâcher ne l'arrête plus |
 | M-10 | La confidence du matin ne s'affiche que chez son destinataire et alterne | test unitaire du modèle d'interface des deux personnages sur 8 graines |
 | M-11 | Le tirage ne change rien au reste de la partie | test: même graine, avec et sans `moments.json`, mêmes envies, mêmes variantes, même météo |
 | M-12 | Budget tenu | captures de performance au moment le plus chargé (oies en vol au-dessus de la place, vers luisants): appels de dessin et triangles sous les budgets du rendu (150 appels, 250 000 triangles) |
@@ -926,3 +937,4 @@ Limites: le script suppose que les robots voient chaque moment de quête le jour
 | Date | Version | Changement |
 |---|---|---|
 | 2026-10-31 | 1 | Première version (tour 6 du gauntlet) |
+| 2026-10-31 | 2 | Fiches 1.4 et table 1.6 alignées sur ce qui est joué: apogées du héron (7,4 s), des oies (16,8 s) et du renard (6,9 s) allongées pour M-02 (alerte tenue plus longtemps); échelle au sud-ouest du chêne, places renommées `ladder_hold_east` et `ladder_hold_west`, nichoir abaissé à 1,84 m, chicot à 2,19 m, 3 barreaux, apogée de 8,2 s, lâcher permis après 7,4 s (décision du manager); raison de la hauteur écrite; réserves de lisibilité de l'échelle notées. Textes corrigés à la revue: fin de `heron_watch` (accord au genre retiré), `geese_not_yet` (heure de l'horloge), `moment_ladder_climax` (la mésange se pose sur le toit), `odette_hen_names_tell` (« vos poules »), `jeanne_lucie_reminder` (Firmin n'est au quai que le jour) |

@@ -508,7 +508,7 @@
           "priority": 46,
           "when": [{ "type": "step_active", "quest": "hen_names", "step": "listen" }, { "type": "secret_role", "quest": "hen_names", "role": "informed" }],
           "lines": [
-            { "speaker": "odette", "text": "Approche, que je te présente tes poules. Bichette, c'est {henColor1}: elle pond la première. Cocotte, c'est {henColor2}: elle se dispute avec tout le monde. Et la Duchesse, c'est {henColor3}: elle se prend pour une reine." },
+            { "speaker": "odette", "text": "Approche, que je te présente vos poules. Bichette, c'est {henColor1}: elle pond la première. Cocotte, c'est {henColor2}: elle se dispute avec tout le monde. Et la Duchesse, c'est {henColor3}: elle se prend pour une reine." },
             { "speaker": "odette", "text": "Mais c'est {partner} qui les appellera. Une poule, ça apprend une voix à la fois. Tu lui diras ?" }
           ]
         },
@@ -1252,7 +1252,7 @@
           "kind": "quest",
           "priority": 20,
           "when": [{ "type": "step_active", "quest": "lucie_note", "step": "give" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }],
-          "lines": [{ "speaker": "jeanne", "text": "Tu l'as donnée ? Non ? Firmin est sur le quai. Il ne mord pas. Enfin, je crois." }]
+          "lines": [{ "speaker": "jeanne", "text": "Tu l'as donnée ? Non ? Firmin passe ses journées sur le quai, près de la cloche. Il ne mord pas. Enfin, je crois." }]
         },
         {
           "id": "jeanne_lucie_quiz",

@@ -174,7 +174,7 @@ describe("ligne d'observation et anneau", () => {
     for (const me of ['p1', 'p2'] as const) expect(watchModel(sim.world, uiContext(me))).toMatchObject({ tone: 'climax', ring: 1, line: null });
     sim.world.moments.today = { ...t, id: 'ladder', origin: 'quest', paused: true };
     character(sim, 'p1').holding = null;
-    character(sim, 'p2').holding = 'ladder_hold_south';
+    character(sim, 'p2').holding = 'ladder_hold_west';
     expect(line(sim, 'p1')).toBe("Tiens un côté de l'échelle (Espace).");
     expect(line(sim, 'p2')).toBe("Camille a lâché l'échelle.");
     for (const phase of ['after', 'left', 'gone', 'absent'] as const) {

@@ -457,7 +457,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "Le héron vous a vus. 20 sous de Jeanne, pour le spectacle."
+      "completionText": "Vous avez vu le héron s'envoler. 20 sous de Jeanne, pour le spectacle."
     },
     {
       "id": "basile_lost",

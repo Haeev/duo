@@ -327,7 +327,7 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       near(sim, 'p1', 'nest_oak_basile', -2.2, 0.4);
       near(sim, 'p2', 'nest_oak_basile', 1.2, 0.4);
       character(sim, 'p1').holding = null;
-      character(sim, 'p2').holding = 'ladder_hold_south';
+      character(sim, 'p2').holding = 'ladder_hold_west';
       return;
     }
     case 'confidence':
