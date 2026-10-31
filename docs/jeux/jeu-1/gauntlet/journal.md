@@ -8,6 +8,15 @@ Un bloc par tour, du plus récent au plus ancien: pilier visé, changements, not
 - Plan des 100 heures: `docs/jeux/jeu-1/plan-100-heures.md` (8 arcs, règles anti-répétition R1 à R16, jalons J1 à J9, décisions D1 à D9 pour le client).
 - Références visuelles du client (vidéo YouTube, galerie du wiki) non consultables: domaines bloqués par la politique réseau de l'environnement.
 
+## Tour 5 (2026-10-31): low poly arrondi, détails de construction, cohérence du monde, s'asseoir
+
+- Changements: tout le bourg en low poly arrondi (bible, section 8), audit de détail des modèles (établi, ponton, puits, tonnelle, pain, panneau AUBRUNE, cloche sans toit), sol à coins arrondis, berges, gué et rails de la voie de garage; barrières du passage à niveau en travers de la route et qui se lèvent enfin, platelage en long avec ornières et rampes; draisine sur l'axe des rails, garée à l'écart du train et qu'on ne traverse plus; cloche et banc au bout ouest du quai pour que l'ombre de l'énigme tombe au soleil, Firmin à l'ouest de la cloche; habitants et joueurs assis sur les bancs (deux places par banc, envies de banc et passage des oies assis); budget du PC tenu (tri de la passe d'ombre, décor en morceaux de 12 m).
+- Deux nouvelles épreuves, demandées par le client: G8 (détails de construction) et G9 (cohérence du monde).
+- Épreuves: G1 (lint, types, 355 tests du jeu, contrôles du dépôt), G2 (13 parties jusqu'au jour 15 avec reprises à chaque aube, vraies sauvegardes du format 1, invariants des bancs), G3 (18 tests de bout en bout, essai long à deux instances sans erreur), G4 (place à 19 h: 143 800 et 182 500 triangles, 65 et 110 appels, 11 programmes), G5 (`captures/tour-05/place-avant-apres.png` et planches du dossier), G6 (directeur artistique, game designer et QA: mieux qu'avant, après deux séries de correctifs), G7, G8 et G9 (contrôle après correctifs, `revues/tour-05-directeur-artistique.md`). Reporté sur `main`.
+- Notes: direction artistique 7,5 (7), contenu 7,5 (7), les autres inchangées; moyenne 7,3 (7,1).
+- Restes non bloquants: ombre de la cloche à peine lisible (cloche à agrandir), flancs des rampes en lame, ornières trop claires, page de rendu qui place mal Jeanne; vues de la maisonnette et du passage à niveau au zoom large au-dessus de 150 appels.
+- Tour 6 prévu: moments rares visibles et sonores (héron, oies, échelle, nichoir), une information que seul l'un des deux voit, petite faune; pavés de la place et berges courbes.
+
 ## Tour 4 (2026-10-31): gestes à deux, jours creux, vie du monde, sol
 
 - Changements: draisine poussée à deux et colis lourd du catalogue porté à deux, quatre buts d'après-midi (jours 6, 10, 11, 13), rendez-vous du jour 14 qui ne se perd plus; attentes variées, habitants qui suivent du regard et saluent, clips sit_eat, give, pet et high_five branchés; herbe en teinte continue, place sans damier, fumées qui naissent petites. Correctifs exigés en revue: draisine dessinée au bout de la voie, plus d'outil brandi pendant les attentes.
