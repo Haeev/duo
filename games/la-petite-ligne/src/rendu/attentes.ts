@@ -30,7 +30,7 @@ const RIG_BONES: readonly RigBone[] = [
   'forearm_r',
 ];
 
-/** Axes du repère du personnage: haut (Y), sa droite (X), devant lui (Z). */
+/** Axes du repère du personnage: haut (Y), de sa droite vers sa gauche (X), devant lui (Z). */
 export type PoseAxis = 'up' | 'side' | 'forward';
 
 export interface PoseTerm {

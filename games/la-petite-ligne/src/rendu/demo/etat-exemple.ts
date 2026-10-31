@@ -75,8 +75,8 @@ export interface DemoOptions {
 }
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */
-const MEET_FROM = { x: 6, y: 1.2 };
-const MEET_TO = { x: 1.8, y: 1.2 };
+const MEET_FROM = { x: 5, y: -2.5 };
+const MEET_TO = { x: 1.9, y: -0.6 };
 const MEET_SECONDS = 1.6;
 
 /** Durée d'un repère à 30 pas par seconde (15 s, comme la simulation). */
@@ -243,6 +243,16 @@ export function createExampleWorld(
       placedBy: 'p2',
     },
   ];
+  if (options.scene === 'rencontre') {
+    // Firmin sur la place, face à la caméra de départ, pour voir le regard et le salut.
+    const firmin = villagers.find((villager) => villager.id === 'firmin');
+    const square = point(map, 'village_square', 40, 28);
+    if (firmin !== undefined) {
+      firmin.pos = { x: square.x - 6, y: square.y };
+      firmin.prev = { ...firmin.pos };
+      firmin.facing = Math.PI / 4;
+    }
+  }
   if (options.scene === 'repas') {
     const chair = { cx: room.x + 1, cy: room.y + 2 };
     world.furniture.push({ id: 'f9', item: 'chair', cell: chair, rotation: 1, placedBy: 'p1' });
@@ -416,8 +426,11 @@ export function animateExampleWorld(
       x: firmin.pos.x + MEET_FROM.x + (MEET_TO.x - MEET_FROM.x) * u,
       y: firmin.pos.y + MEET_FROM.y + (MEET_TO.y - MEET_FROM.y) * u,
     };
-    p1.facing = Math.PI;
-    p1.speed = u < 1 ? (MEET_FROM.x - MEET_TO.x) / MEET_SECONDS : 0;
+    p1.facing = Math.atan2(MEET_TO.y - MEET_FROM.y, MEET_TO.x - MEET_FROM.x);
+    p1.speed =
+      u < 1
+        ? Math.hypot(MEET_TO.x - MEET_FROM.x, MEET_TO.y - MEET_FROM.y) / MEET_SECONDS
+        : 0;
     p1.action = { kind: u < 1 ? 'walk' : 'idle', since: 0, duration: 0, target: null };
   } else if (p1 !== undefined && walking && !p1.inHouse && options?.scene === undefined) {
     const stroll = strollPosition(

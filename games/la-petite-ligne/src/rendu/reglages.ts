@@ -291,8 +291,10 @@ export type RenderSettings = typeof RENDER_SETTINGS;
 
 /**
  * Attentes procédurales (`attentes.ts`): rotations d'os ajoutées au clip
- * `idle`, en degrés autour des axes du personnage (`up`: haut, `side`: sa
- * droite, `forward`: devant lui). `sweeps`: allers-retours sur la durée.
+ * `idle`, en degrés autour des axes du personnage. `up` (vertical): positif
+ * vers sa gauche. `side` (de sa droite à sa gauche): positif penche en avant,
+ * négatif lève un bras devant soi. `forward` (devant lui): positif écarte et
+ * lève le bras gauche, négatif le droit. `sweeps`: allers-retours sur la durée.
  */
 export const IDLE_POSES: Readonly<Record<string, IdlePose>> = {
   /** Regarder autour de soi: à gauche, à droite, revenir. */
@@ -308,10 +310,10 @@ export const IDLE_POSES: Readonly<Record<string, IdlePose>> = {
   stretch: {
     seconds: 2.8,
     terms: [
-      { bone: 'upper_arm_l', axis: 'forward', degrees: -140 },
-      { bone: 'upper_arm_r', axis: 'forward', degrees: 140 },
-      { bone: 'forearm_l', axis: 'forward', degrees: -20 },
-      { bone: 'forearm_r', axis: 'forward', degrees: 20 },
+      { bone: 'upper_arm_l', axis: 'forward', degrees: 140 },
+      { bone: 'upper_arm_r', axis: 'forward', degrees: -140 },
+      { bone: 'forearm_l', axis: 'forward', degrees: 20 },
+      { bone: 'forearm_r', axis: 'forward', degrees: -20 },
       { bone: 'chest', axis: 'side', degrees: -10 },
       { bone: 'head', axis: 'side', degrees: -18 },
     ],

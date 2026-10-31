@@ -71,6 +71,14 @@ Tenue par le technical artist. Ce que l'ambiance fait en attendant est dit à ch
 
 ## Technical artist
 
+### 2026-10-31, gauntlet tour 4: fumées, sol continu
+
+- Fumées des cheminées: même bouffée ronde et douce que la vapeur du train (fin des hexagones); elle naît à 15 cm au-dessus de la bouche, petite (0,18 m, 20 % de sa taille finale) et transparente, devient la plus dense vers le milieu de sa vie, grandit et s'éclaircit en montant; bouffées plus petites et plus nombreuses (1,4 par seconde). La vapeur du train suit la même loi de naissance (fondu sur 40 % de la vie au lieu de 8 %).
+- Sol continu (`surfaces.ts`, réglages `groundPatch`, `groundDetail`, `stoneVariation` de `reglages-ambiance.ts`), sans toucher à `terrain.ts`: sur les faces du sol, l'herbe mélange ses trois verts par un bruit doux en coordonnées du monde (taches de 16 m), les pavés de la place et les chemins varient doucement autour de leur teinte au lieu du tirage case par case. Plus de damier ni de carrés à bords francs. Pas fait: coins adoucis des chemins et des berges (géométrie de `terrain.ts`, au dev rendu).
+- Soir: ombres de 17 h 45 à 19 h un peu plus denses (une clé peut dépasser `shadows.intensity`, plafonné à 1). Écart des gris à 18 h 30 toujours à 22: le gain ne se mesure pas.
+- Budgets inchangés (place 78 appels, 197 484 triangles; potager 94, 138 574; cheminées 123, 197 066; soir 92, 205 716; 11 programmes partout).
+- Captures avant et après: `docs/jeux/jeu-1/gauntlet/captures/tour-04/ta-01-place-8h15-avant-apres.png`, `ta-02-potager-10h30-avant-apres.png`, `ta-03-fumee-19h15-avant-apres.png`.
+
 ### 2026-10-31, gauntlet tour 3: soir, foyer de la maisonnette, fumées
 
 - Soir (`reglages-ambiance.ts`, clés de 17 h 45 et 19 h): ciel froid bleu-violet pâle (ombres froides, soleil chaud), sol de l'hémisphérique plus sombre, brume moins orangée, ombres pleines et nettes jusqu'à 19 h. Place à 18 h 30: gris moyen 80 vers 81, écart 19 vers 22 (cible 25 pas atteinte: au-delà, la soirée s'assombrit ou le test de continuité de la lumière casse). Fenêtre de l'énigme (17 h à 17 h 30) et son test inchangés.
