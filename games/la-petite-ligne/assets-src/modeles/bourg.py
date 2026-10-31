@@ -103,15 +103,38 @@ def slab(g, top, thick, color):
 
 def gable_roof(geos, x0, x1, y0, y1, ze, zr, color, edge=None, over=0.35, thick=0.14, strips=1, holes=(),
                ridge=True, ridge_color=None, rafters=False):
-    """Toit à deux pans, faîtage selon X. geos: liste de Geo (une par bande) ou un Geo.
-
-    Renvoie le nombre de bandes posées. holes: indices de bandes manquantes (ruine)."""
+    """Toit à deux pans, faîtage selon X, en low poly arrondi (bible section 8.3): rives chanfreinées en
+    2 segments, faîtage fléchi et pans bombés, rangs de tuiles qui suivent la surface, faîtage en boudin.
+    Le toit est relevé de 3 cm pour que les pignons et le haut des murs ne le percent pas.
+    geos: liste de Geo (une par bande) ou un Geo. Renvoie le nombre de bandes posées.
+    holes: indices de bandes manquantes (ruine)."""
+    import bmesh
+    lift = 0.03
     ym = (y0 + y1) / 2
     slope = (zr - ze) / (ym - y0)
-    zl = ze - over * slope
-    xs = [x0 - over + (x1 - x0 + 2 * over) * i / strips for i in range(strips + 1)]
+    zl = ze - over * slope + lift
+    zrr = zr + lift
+    xa, xb = x0 - over, x1 + over
+    span = x1 - x0
+    sag = min(0.08, 0.015 * span + 0.01)
+    bulge = min(0.06, 0.012 * span + 0.01)
+    rb = min(0.06, thick * 0.42)
+    edge = edge or color
+    col = by_normal(color, edge, edge, thr=0.3)
+    xs = [xa + (xb - xa) * i / strips for i in range(strips + 1)]
+
+    def surf(side, t, x):
+        e = y0 - over if side < 0 else y1 + over
+        u = (x - xa) / (xb - xa)
+        dz = bulge * math.sin(math.pi * t) - sag * t * math.sin(math.pi * u)
+        return Vector((x, e + (ym - e) * t, zl + (zrr - zl) * t + dz))
+
+    def key(p):
+        return (round(p.x, 4), round(p.y, 4), round(p.z, 4))
+
     k = 0
     for side in (-1, 1):
+        n = Vector((0, side * slope, 1)).normalized()
         for i in range(strips):
             gi = geos[k] if isinstance(geos, list) else geos
             idx = k
@@ -119,33 +142,63 @@ def gable_roof(geos, x0, x1, y0, y1, ze, zr, color, edge=None, over=0.35, thick=
             if idx in holes:
                 continue
             a, b = xs[i], xs[i + 1]
-            if side < 0:
-                top = [(a, y0 - over, zl), (b, y0 - over, zl), (b, ym, zr), (a, ym, zr)]
-            else:
-                top = [(b, y1 + over, zl), (a, y1 + over, zl), (a, ym, zr), (b, ym, zr)]
-            slab(gi, top, thick, by_normal(color, edge or color, edge or color, thr=0.3))
-            # rangs de lauzes ou de tuiles: une petite marche tous les 40 cm
-            n = int(math.hypot(ym - y0 + over, zr - zl) / 0.42)
-            for j in range(1, n):
-                t = j / n
-                yy = (y0 - over) + (ym - (y0 - over)) * t if side < 0 else (y1 + over) + (ym - (y1 + over)) * t
-                zz = zl + (zr - zl) * t
-                gi.box((b - a - 0.02, 0.05, 0.03), loc=((a + b) / 2, yy, zz + 0.012), color=edge or color,
-                       rot=(math.degrees(math.atan(slope)) * (-side), 0, 0))
+            cols = [a, (a + b) / 2, b]
+            bm = gi.bm
+            T = [[bm.verts.new(surf(side, t, x)) for x in cols] for t in (0.0, 0.5, 1.0)]
+            B = [[bm.verts.new(surf(side, t, x) - n * thick) for x in cols] for t in (0.0, 0.5, 1.0)]
+            faces = []
+            for r in range(2):
+                for c in range(2):
+                    faces.append(bm.faces.new([T[r][c], T[r][c + 1], T[r + 1][c + 1], T[r + 1][c]]))
+                    faces.append(bm.faces.new([B[r][c], B[r + 1][c], B[r + 1][c + 1], B[r][c + 1]]))
+                faces.append(bm.faces.new([T[0][r], B[0][r], B[0][r + 1], T[0][r + 1]]))
+                faces.append(bm.faces.new([T[2][r + 1], B[2][r + 1], B[2][r], T[2][r]]))
+                faces.append(bm.faces.new([T[r + 1][0], B[r + 1][0], B[r][0], T[r][0]]))
+                faces.append(bm.faces.new([T[r][2], B[r][2], B[r + 1][2], T[r + 1][2]]))
+            bmesh.ops.recalc_face_normals(bm, faces=faces)
+            rim = set()
+            for c in range(2):
+                rim.add(frozenset((key(T[0][c].co), key(T[0][c + 1].co))))
+            for c in ([0] if i == 0 else []) + ([2] if i == strips - 1 else []):
+                for r in range(2):
+                    rim.add(frozenset((key(T[r][c].co), key(T[r + 1][c].co))))
+            verts = [v for row in T + B for v in row]
+            gi._finish(verts, col)
+            if rim:
+                gi.bevel(verts, rb, 2, col, edges_pred=lambda p, q, rim=rim: frozenset((key(p), key(q))) in rim)
+            # rangs de tuiles ou de lauzes: une petite marche simple tous les 42 cm, qui suit la surface
+            L = math.hypot(ym - y0 + over, zr - ze + over * slope)
+            nr = int(L / 0.42)
+            ang = math.degrees(math.atan(slope)) * (-side)
+            pieces = 2 if strips == 1 else 1
+            for jr in range(1, nr):
+                t = jr / nr
+                for m in range(pieces):
+                    xc = a + (b - a) * (m + 0.5) / pieces
+                    p = surf(side, t, xc)
+                    gi.box(((b - a) / pieces - 0.02, 0.05, 0.03), loc=(p.x, p.y, p.z + 0.012), color=edge,
+                           rot=(ang, 0, 0), no_round=True)
     if ridge:
         gi = geos[k] if isinstance(geos, list) else geos
         if k not in holes:
-            gi.box((x1 - x0 + 2 * over + 0.04, 0.24, 0.24), loc=((x0 + x1) / 2, ym, zr + 0.02),
-                   color=ridge_color or edge or color, rot=(45, 0, 0))
+            # faîtage en boudin à 8 pans, par morceaux qui suivent la flèche
+            nseg = max(2, strips)
+            px = [xa + (xb - xa) * i / nseg for i in range(nseg + 1)]
+            for i in range(nseg):
+                pa, pb = surf(-1, 1.0, px[i]), surf(-1, 1.0, px[i + 1])
+                mid = (pa + pb) / 2
+                tilt = math.degrees(math.atan2(pb.z - pa.z, pb.x - pa.x))
+                gi.cyl(0.12, (pb - pa).length + 0.03, loc=(mid.x, mid.y, mid.z + 0.01), color=ridge_color or edge,
+                       segs=8, rot=(0, 90 - tilt, 0))
         k += 1
     if rafters:
         gi = geos[-1] if isinstance(geos, list) else geos
         ang = math.degrees(math.atan(slope))
-        L = math.hypot(ym - y0 + over, zr - zl)
+        L = math.hypot(ym - y0 + over, zr - ze + over * slope)
         for x in [x0 + 0.2 + i * 0.7 for i in range(int((x1 - x0) / 0.7) + 1)]:
             for side in (-1, 1):
                 yc = (y0 - over + ym) / 2 if side < 0 else (y1 + over + ym) / 2
-                gi.box((0.1, L, 0.12), loc=(x, yc, (zl + zr) / 2 - 0.14), color="wood_old", rot=(ang * (-side), 0, 0))
+                gi.box((0.1, L, 0.12), loc=(x, yc, (zl + zrr) / 2 - 0.14), color="wood_old", rot=(ang * (-side), 0, 0))
     return k
 
 
@@ -164,6 +217,9 @@ def gable_walls(g, x0, x1, y0, y1, ze, zr, color, t=0.3, inner=None):
 
 
 def quoins(g, hx, hy, z1, color="stone_light", step=0.32, sxs=(1, -1)):
+    if lpl.AUTO_ROUND:
+        # version légère (angles verticaux seuls abattus) pour tenir le budget des petits bâtiments
+        return round_quoins(g, hx, hy, z1 - 0.1, color, step, sxs=sxs, light=True)
     for sx in sxs:
         for sy in (1, -1):
             z = 0.0
@@ -199,11 +255,11 @@ def _key(p):
     return (round(p.x, 4), round(p.y, 4), round(p.z, 4))
 
 
-def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32, seed=7):
+def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32, seed=7, sxs=(1, -1), light=False):
     """Chaînes d'angle en blocs aux coins abattus irréguliers (1 à 3 cm de décalage), qui enveloppent
     le coin arrondi du mur (saillie de 1,5 à 3 cm)."""
     rnd = random.Random(seed)
-    for sx in (1, -1):
+    for sx in sxs:
         for sy in (1, -1):
             z, i = 0.0, 0
             while z < z1 - 0.05:
@@ -214,7 +270,8 @@ def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32, seed=7):
                 d += rnd.uniform(-0.03, 0.03)
                 out = rnd.uniform(0.015, 0.03)
                 g.box((w, d, h - 0.03), loc=(sx * (hx + out - w / 2), sy * (hy + out - d / 2), z + 0.015),
-                      color=color, base=True, bevel=rnd.uniform(0.02, 0.035), bseg=1, bedges=_not_ground if z < 0.01 else None,
+                      color=color, base=True, bevel=rnd.uniform(0.02, 0.035), bseg=1,
+                      bedges=_vertical if light else (_not_ground if z < 0.01 else None),
                       rot=(0, 0, rnd.uniform(-1.5, 1.5)))
                 z += h
                 i += 1
@@ -303,9 +360,7 @@ def round_gable_roof(g, x0, x1, y0, y1, ze, zr, color, edge, ridge_color, over_x
 
 
 def chimney(g, x, y, z0, z1, color="stone", cap="stone_dark"):
-    g.box((0.55, 0.55, z1 - z0), loc=(x, y, z0), color=color, base=True)
-    g.box((0.65, 0.65, 0.1), loc=(x, y, z1), color=cap, base=True)
-    g.box((0.3, 0.3, 0.12), loc=(x, y, z1 + 0.1), color="shadow", base=True)
+    round_chimney(g, x, y, z0, z1, color, cap)
 
 
 def wall_color(outer, inner, inward):
@@ -1284,11 +1339,13 @@ def tree_oak(A, large, seed):
 def tree_fir(A, large, seed):
     g = A.geo()
     s = 1.5 if large else 1.0
-    g.cyl(0.14 * s, 1.0 * s, color="bark_dark", segs=6, base=True)
+    g.cyl(0.14 * s, 1.0 * s, color="bark_dark", segs=7, base=True, r2=0.12 * s, cap=False)
     tiers = [(0.6, 1.55, 1.6), (1.4, 1.25, 1.4), (2.15, 0.95, 1.25), (2.85, 0.65, 1.1)]
     for i, (z, r, h) in enumerate(tiers):
-        g.cyl(r * s, h * s, loc=(0, 0, z * s), color=by_normal("leaf_fir_light", "leaf_fir", "leaf_fir", thr=0.3),
-              segs=7, r2=0.0, base=True, rot=(0, 0, i * 25))
+        # bord inférieur arrondi (un segment), pointe molle
+        g.lathe([(r * s * 0.9, 0.0), (r * s, 0.08 * s), (r * s * 0.12, h * s * 0.9), (0.0, h * s)],
+                loc=(0, 0, z * s), colors=by_normal("leaf_fir_light", "leaf_fir", "leaf_fir", thr=0.3), segs=7,
+                rot=(0, 0, i * 25 + 7 * (i % 2)))
     return g
 
 
@@ -1296,15 +1353,16 @@ def tree_birch(A, large, seed):
     g = A.geo()
     rnd = random.Random(seed)
     s = 1.4 if large else 1.0
-    g.cyl(0.11 * s, 3.2 * s, color="birch_bark", segs=6, base=True, r2=0.07 * s, rot=(0, 3, 0))
+    g.lathe([(0.16 * s, 0.0), (0.11 * s, 0.25 * s), (0.08 * s, 3.2 * s)], colors="birch_bark", segs=8,
+            close_bottom=False, rot=(0, 3, 0))
     for k in range(6):
         g.box((0.12 * s, 0.03, 0.05), loc=(0.07 * s * (1 if k % 2 else -1), -0.08 * s, (0.4 + k * 0.45) * s),
               color="birch_mark", rot=(0, 0, 40 * k))
-    g.cyl(0.04 * s, 0.9 * s, loc=(0.25 * s, 0, 2.2 * s), color="birch_bark", segs=4, rot=(0, 35, 0))
-    for (x, y, z, r, c) in ((0, 0, 3.4, 0.85, "leaf_birch"), (0.45, 0.15, 2.8, 0.6, "leaf_birch_light"),
-                            (-0.4, -0.1, 2.9, 0.62, "leaf_birch"), (0.05, 0.1, 4.0, 0.55, "leaf_birch_light")):
-        g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=1, jitter=0.15, seed=rnd.randint(0, 999),
-                 scale=(0.9, 0.9, 1.25))
+    g.cyl(0.04 * s, 0.9 * s, loc=(0.25 * s, 0, 2.2 * s), color="birch_bark", segs=5, rot=(0, 35, 0))
+    for (x, y, z, r, c) in ((0.05, 0, 3.45, 0.88, "leaf_birch"), (0.45, 0.15, 2.8, 0.62, "leaf_birch_light"),
+                            (-0.38, -0.12, 2.95, 0.64, "leaf_birch")):
+        g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=2, jitter=0.07, seed=rnd.randint(0, 999),
+                 scale=(0.9, 0.9, 1.22), rot=(0, 0, rnd.uniform(0, 360)))
     return g
 
 
@@ -1329,20 +1387,20 @@ def bush(A, kind, seed):
             g.sphere(r, loc=(x, y, z), color=c, ico=2, jitter=0.06, seed=rnd.randint(0, 99), scale=(1.1, 1.0, 0.78),
                      rot=(0, 0, rnd.uniform(0, 360)))
     elif kind == "bramble":
-        for (x, y, z, r) in ((0, 0, 0.3, 0.45), (0.4, 0.05, 0.25, 0.32), (-0.35, 0.1, 0.22, 0.3)):
-            g.sphere(r, loc=(x, y, z), color="leaf_bush", ico=1, jitter=0.2, seed=rnd.randint(0, 99), scale=(1.1, 1, 0.8))
+        for (x, y, z, r) in ((-0.05, 0, 0.3, 0.48), (0.38, 0.05, 0.24, 0.33)):
+            g.sphere(r, loc=(x, y, z), color="leaf_bush", ico=2, jitter=0.07, seed=rnd.randint(0, 99), scale=(1.1, 1, 0.78))
         for k in range(10):
             a = rnd.uniform(0, 6.28)
             rr = rnd.uniform(0.25, 0.5)
             g.box((0.05, 0.05, 0.05), loc=(rr * math.cos(a), rr * math.sin(a) - 0.05, rnd.uniform(0.25, 0.6)),
                   color="flower_white", rot=(0, 0, 45))
     else:  # hazel
-        for k in range(5):
-            a = math.radians(k * 72)
-            g.cyl(0.035, 1.6, loc=(0.1 * math.cos(a), 0.1 * math.sin(a), 0), color="bark", segs=4, base=True,
+        for k in range(3):
+            a = math.radians(k * 120)
+            g.cyl(0.035, 1.3, loc=(0.1 * math.cos(a), 0.1 * math.sin(a), 0), color="bark", segs=5, base=True,
                   rot=(12 * math.sin(a), -12 * math.cos(a), 0))
-        for (x, y, z, r) in ((0, 0, 1.4, 0.55), (0.4, 0.1, 1.1, 0.45), (-0.4, -0.1, 1.15, 0.45), (0.0, 0.3, 1.0, 0.4)):
-            g.sphere(r, loc=(x, y, z), color="leaf_hazel", ico=1, jitter=0.15, seed=rnd.randint(0, 99))
+        g.sphere(0.72, loc=(0.0, 0.05, 1.25), color="leaf_hazel", ico=2, jitter=0.08, seed=rnd.randint(0, 99),
+                 scale=(1.1, 1.0, 0.85))
     return g
 
 
@@ -1532,6 +1590,7 @@ def main():
     tex = lpl.build_world_textures()
     mat = lpl.palette_material("lpl_palette", tex["palette"], tex["palette-mr"], tex["palette-emission"])
     A = lpl.Assets(mat)
+    lpl.AUTO_ROUND = True
     buildings = []
     buildings.append(station(A))
     buildings.append(platform(A))
@@ -1542,7 +1601,9 @@ def main():
     gatekeeper_house(A, False, gk)
     buildings.append(gk)
     buildings.append(ferrand_shop(A))
+    lpl.AUTO_ROUND = False  # témoin réglé à la main
     buildings.append(firmin_house(A))
+    lpl.AUTO_ROUND = True
     buildings.append(sawmill(A))
     buildings.append(handcar_shed(A))
     buildings.append(handcar(A))
@@ -1554,9 +1615,11 @@ def main():
     extra = [A.add("workbench", workbench(A), {"footprint": [2, 2]}),
              A.add("woodpile", woodpile(A), {"footprint": [2, 1]}),
              A.add("plank_stack", plank_stack(A), {"footprint": [2, 1]})]
+    lpl.AUTO_ROUND = False  # voie: profils de rail exacts (raccords entre modules)
     track = [A.add("rail_straight", rail_straight(A), {"footprint": [4, 2], "rail_top": RAIL_TOP, "gauge": RAIL_GAUGE}),
              A.add("rail_curve_90", rail_curve(A), {"footprint": [13, 13], "radius": 12.0, "rail_top": RAIL_TOP}),
              A.add("buffer_stop", buffer_stop(A), {"footprint": [1, 2]})]
+    lpl.AUTO_ROUND = True
     track.append(level_crossing(A))
     props = []
     for name, fn, fp in (("bell_post", bell_post, [1, 1]), ("bench", bench, [2, 1]), ("lamp_post", lamp_post, [1, 1]),
@@ -1566,10 +1629,12 @@ def main():
                          ("crate_stack", crate_stack, [2, 1]), ("sacks", sacks, [1, 1]), ("cart", cart, [3, 2]),
                          ("bicycle", bicycle, [2, 1])):
         props.append(A.add(name, fn(A), {"footprint": fp}))
+    lpl.AUTO_ROUND = False  # sols et bordures: dalles qui se raccordent
     grounds = []
     for k in ("grass", "dirt", "cobble"):
         grounds.append(A.add("ground_" + k, ground_tile(A, k), {"footprint": [1, 1]}))
     grounds.append(A.add("path_border", path_border(A), {"footprint": [1, 1], "note": "bordure de 1 m le long de X"}))
+    lpl.AUTO_ROUND = True
     for k in ("wood", "picket", "broken", "gate", "post"):
         grounds.append(A.add("fence_" + k, fence(A, k), {"footprint": [1, 1], "note": "segment de 1 m le long de X, poteau à x=-0,5"}))
     nature = []
@@ -1587,8 +1652,10 @@ def main():
         nature.append(A.add("flowers_" + c, flowers(A, "flower_" + c, 50 + len(c)), {"footprint": [1, 1]}))
     nature.append(A.add("flower_bed", flower_bed(A), {"footprint": [2, 1]}))
     nature.append(A.add("reeds", reeds(A, 60), {"footprint": [1, 1]}))
+    lpl.AUTO_ROUND = False
     water = [river_straight(A), river_straight(A, ford=True), river_curve(A),
              A.add("pontoon", pontoon(A), {"footprint": [2, 3], "walk_height": 0.5})]
+    lpl.AUTO_ROUND = False
     # noms génériques de la carte (donnees/cartes/halte.json): nœuds qui partagent le maillage d'une variante
     O = bpy.data.objects
     aliases = [A.alias("tree_oak", O["tree_oak_large"]), A.alias("tree_fir", O["tree_fir_large"]),

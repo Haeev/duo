@@ -173,6 +173,26 @@ def by_height(levels):
     return f
 
 
+# Low poly arrondi automatique (bible section 8.2): quand AUTO_ROUND est vrai, toute boîte sans
+# chanfrein explicite en reçoit un selon sa taille (arêtes au sol vives pour les boîtes posées).
+AUTO_ROUND = False
+
+
+def auto_bevel(size, base):
+    """(largeur, segments, prédicat) du chanfrein automatique, ou None pour une boîte trop fine ou minuscule."""
+    dmax, dmin = max(size), min(size)
+    # petits détails (moins de 60 cm) et planches et plaques (moins de 8 cm): peu visibles à 16 à 36 m de champ,
+    # laissés vifs pour tenir le budget de triangles
+    if dmax < 0.6 or dmin < 0.08:
+        return None
+    w = 0.02 if dmax < 0.5 else 0.035 if dmax < 2.0 else 0.07 if dmax < 6.0 else 0.1
+    w = min(w, dmin * 0.35)
+    # deux segments pour les gros volumes seulement (murs, socles): le coût reste raisonnable
+    seg = 2 if dmax >= 2.0 and dmin >= 0.25 else 1
+    pred = (lambda a, b: not (abs(a.z) < 1e-4 and abs(b.z) < 1e-4)) if base else None
+    return w, seg, pred
+
+
 class Geo:
     """Accumule des pièces dans un bmesh unique; UV sur la palette, poids d'os facultatifs."""
 
@@ -236,8 +256,12 @@ class Geo:
 
     # primitives
     def box(self, size, loc=(0, 0, 0), color="stone", rot=(0, 0, 0), bevel=0.0, bseg=1,
-            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False, bedges=None):
+            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False, bedges=None, no_round=False):
         sx, sy, sz = size
+        if AUTO_ROUND and bevel == 0 and not no_round:
+            ab = auto_bevel(size, base)
+            if ab:
+                bevel, bseg, bedges = ab
         verts = bmesh.ops.create_cube(self.bm, size=1.0)["verts"]
         for v in verts:
             x, y, z = v.co.x * sx, v.co.y * sy, v.co.z * sz
@@ -262,6 +286,8 @@ class Geo:
 
     def cyl(self, r, h, loc=(0, 0, 0), color="wood", segs=8, r2=None, rot=(0, 0, 0), cap=True,
             base=False, bone=None, weights=None, smooth=None, scale=(1, 1, 1), bevel=0.0):
+        if AUTO_ROUND and segs < 5:
+            segs = 5 if r < 0.025 else 6  # bible 8.4: jamais moins de 5 pans
         verts = bmesh.ops.create_cone(self.bm, cap_ends=cap, cap_tris=False, segments=segs,
                                       radius1=r, radius2=r if r2 is None else r2, depth=h)["verts"]
         for v in verts:
