@@ -6,12 +6,12 @@ Repères: 10 = à ce niveau de soin, aucune différence visible avec les référ
 
 | Pilier | Note | Relecteur | Date | Preuves |
 |---|---|---|---|---|
-| 1. Ressenti des commandes | à noter | | | |
-| 2. Vie du monde et animation | à noter | | | |
-| 3. Direction artistique | à noter | | | |
-| 4. Son et musique | à noter | | | |
-| 5. Interface et lisibilité | à noter | | | |
-| 6. Contenu et rythme | à noter | | | |
-| 7. Coopération | à noter | | | |
+| 1. Ressenti des commandes | 4,5 | dev-gameplay-2d | 2026-10-31 | `revues/tour-01-ressenti.md` |
+| 2. Vie du monde et animation | 5 | directeur-artistique | 2026-10-31 | `revues/tour-01-da.md`, `captures/tour-01/da-*.png` |
+| 3. Direction artistique | 6 | directeur-artistique | 2026-10-31 | `revues/tour-01-da.md` |
+| 4. Son et musique | 7 (sur dossier, sans écoute) | ux-ui-designer | 2026-10-31 | `revues/tour-01-interface-son.md` |
+| 5. Interface et lisibilité | 6,5 | ux-ui-designer | 2026-10-31 | `revues/tour-01-interface-son.md`, `captures/tour-01/ux-*.png` |
+| 6. Contenu et rythme | 5 | level-designer | 2026-10-31 | `revues/tour-01-contenu-coop.md` |
+| 7. Coopération | 6 | level-designer | 2026-10-31 | `revues/tour-01-contenu-coop.md` |
 | 8. Robustesse et performance | à noter | | | |
 | Moyenne | | | | |

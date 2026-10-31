@@ -3,8 +3,10 @@
  * sont dans `donnees/reglages.json`).
  */
 
-/** Pas de simulation par seconde. 30 suffit à un jeu sans réflexe et tient sous le plafond de messages du réseau. */
-export const SIM_HZ = 30;
+import { SIM_HZ } from '../etat/types';
+
+/** Pas de simulation par seconde (défini avec l'état, lu aussi par le rendu). 30 suffit à un jeu sans réflexe et tient sous le plafond de messages du réseau. */
+export { SIM_HZ };
 export const SIM_DT = 1 / SIM_HZ;
 
 /** Rayon de collision d'un personnage (m). */

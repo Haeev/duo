@@ -58,6 +58,8 @@ export type CharacterId = 'p1' | 'p2';
 export const CHARACTER_IDS: readonly CharacterId[] = ['p1', 'p2'];
 
 /** Taille du sac (PE-10) et de la barre d'outils (ses premières cases). */
+/** Pas de simulation par seconde (cadence des ticks: `action.since`, `action.duration`, `pin.until`). */
+export const SIM_HZ = 30;
 export const BAG_SLOTS = 24;
 export const TOOLBAR_SLOTS = 10;
 /** Côté du coin à soi (MA-06 de la démo), en cases. */
