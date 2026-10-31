@@ -27,6 +27,16 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Erreurs de `net.connect` sous Linux: personne à l'adresse, `EHOSTUNREACH` en 3 s; port fermé, `ECONNREFUSED` en 1 ms; paquets jetés, aucune réponse. Envoi UDP sur interface désactivée: `ENETUNREACH`, socket intacte.
 - `ws` appelle `setNoDelay()` sur chaque socket. `node:crypto` a X25519 (`diffieHellman`), `hkdfSync`; `node:perf_hooks` a `monitorEventLoopDelay`; `dgram` accepte `reusePort` sous Node 22.
 
+## Paquet `@duo/liaison` (vérifié le 2026-10-31)
+
+- Node 22.22 exécute le TypeScript tel quel si les imports portent `.ts`: `allowImportingTsExtensions` et `erasableSyntaxOnly` dans le tsconfig (ni propriétés de paramètres de constructeur, ni `enum`). Un script `.mjs` du dossier temporaire peut importer `packages/liaison/src/x.ts` par son chemin: les dépendances se résolvent depuis le paquet. Le paquet doit être regroupé par electron-vite (`externalizeDepsPlugin({ exclude: ['@duo/liaison'] })`), `ws` restant externe.
+- `ws` 8.22: codes de fermeture admis 1000 à 1003, 1007 à 1014 et 3000 à 4999; la fermeture propre attend 30 s une réponse, d'où `terminate()` après 1 s. Le client n'envoie pas d'`Origin` sans option. Une socket sans écouteur `message` perd ses trames: abonner dès l'ouverture et garder une file jusqu'aux gestionnaires.
+- Piège: un plafond de débit compté à l'arrivée jette la rafale légitime d'une reprise (entrées perdues). Plafond strict à l'envoi, seau à jetons à grande rafale (30 s) à la réception.
+- Piège: au passage en régime actif, réarmer tout de suite le battement (sinon la cadence de repos de 2 s court jusqu'au tour suivant, silence d'1 s, reconnexion anticipée inutile) et compter le silence depuis le début du régime actif.
+- Banc simulé: un processus « tué » doit se taire (ses minuteurs tournent encore sur l'horloge commune) et laisser une machine sans écoute (refus net). `stop()` attend les adieux UDP espacés de 50 ms: en temps simulé, avancer l'horloge avant d'attendre la promesse.
+- Mesures du banc simulé: pause demandée par l'invité en R1, médiane 56 ms, 95e centile 90 ms, maximum 285 ms (200 essais); coupure franche en partie, pause des deux côtés 2 045 ms après; découverte en R1, 278 à 514 ms. Deux processus sur la boucle locale: découverte une vingtaine de millisecondes après le second démarrage, décompte et départ alignés à 1 ms.
+- Copie isolée (worktree): l'outil Bash refuse les commandes composées qui mentionnent git, `--exclude-dir=.git` ou un `cd` hors de la copie. Une commande git par appel; pour les tirets, `pnpm verifier` ou un grep sur les dossiers voulus.
+
 ## Systèmes (faits lus, à confirmer sur les machines du client)
 
 - macOS, TN3179: autorisation « Réseau local » exigée pour TCP sortant vers le LAN, tout envoi UDP, la connexion d'une socket UDP, la réception de diffusion; pas pour écouter et accepter en TCP ni recevoir de l'UDP unicast. Interfaces VPN hors du « réseau local ». Aucune API pour lire l'état; première opération parfois refusée avant la réponse; connecter une socket UDP à une adresse locale déclenche l'alerte sans trafic. Ne jamais supposer `en0` = Wi-Fi.
