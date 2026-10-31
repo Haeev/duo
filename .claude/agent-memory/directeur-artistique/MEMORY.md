@@ -55,3 +55,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 
 - Sous charge (rendu logiciel, plusieurs relecteurs en parallèle), le délai par défaut de 30 s de `page.screenshot` ne suffit pas: passer `timeout` explicitement.
 - Réduire les couleurs d'une capture sans tramage crée de faux anneaux sur les halos de nuit: utiliser `-dither FloydSteinberg` avec ImageMagick.
+
+## Contrôles géométriques en jeu (La Petite Ligne, 2026-10-31)
+
+- Les lisses du passage à niveau partent levées et se baissent avec une demi-vie de 0,35 s: en rendu logiciel, une capture à 1,5 s les montre en mouvement. Attendre 12 s avant la capture.
+- Une lisse baissée est parallèle aux rails (elle barre la route). En vue 0, la lisse sud se projette sur le ballast et semble suivre la voie: vérifier avec une autre vue ou des mesures avant de conclure.
+- La page de rendu ne place pas les habitants selon l'heure (Firmin à `quay_bell`, Jeanne au point `quay_bench`, au centre du banc, quelle que soit l'heure). Masquer un personnage: `scene.traverse` et `visible = false` sur le maillage `villager_<id>` (masquer le groupe `personnage <id>` ne marche pas, le rendu le réaffiche).
+- Avec la config Vite du dev (`window.dgEngine` exposé), on retrouve la scène et la caméra orthographique en parcourant l'objet; `vecteur.project(camera)` donne la position à l'écran d'un point du monde (marquer une ombre calculée sur une capture). Dans `page.evaluate`, `await import('/src/rendu/lumiere.ts')` charge un module du jeu par Vite (soleil de `DaylightRig` à une heure donnée).
+- Le décor est fusionné en morceaux (`decor x:y`): impossible de masquer un objet seul. La géométrie d'un modèle se lit dans le JSON de `bourg.glb` (nœuds, `min`/`max` des accesseurs).
