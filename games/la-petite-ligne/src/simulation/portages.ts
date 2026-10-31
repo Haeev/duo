@@ -53,6 +53,8 @@ export function loadPlaced(sim: Sim, beam: Beam): void {
   if (beam.purpose === 'handcar') {
     const flag = sim.content.settings.carry.handcar?.flag;
     if (flag !== undefined && !world.flags.includes(flag)) world.flags.push(flag);
+    // Elle reste là où on l'a poussée (le rendu la dessine à cette place, plus dans la remise).
+    world.handcarAt = { pos: { x: beam.pos.x, y: beam.pos.y }, facing: beam.facing };
     sayIfWritten(sim, 'both', 'handcar_pushed');
   } else if (beam.purpose === 'parcel' && beam.contents !== null) {
     const index = world.heavyDeliveries.indexOf(beam.contents);

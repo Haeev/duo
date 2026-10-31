@@ -124,6 +124,8 @@ export interface WorldState {
   crate: ItemStack[];
   /** Commandes au catalogue, livrées par le train du jour 8. */
   catalogueOrders: ItemId[];
+  /** Draisine sortie de la remise et posée au bout de la voie (position, orientation); `null`: dans la remise. */
+  handcarAt: { pos: Vec2; facing: number } | null;
   /** Colis lourds livrés par le train, en attente d'être portés à deux (objets `carriedByTwo` du catalogue). */
   heavyDeliveries: ItemId[];
   /** Ventes du jour à l'épicerie (plafond quotidien). */

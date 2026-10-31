@@ -13,7 +13,11 @@ import { findPath } from '../src/simulation/grille';
 import { step } from '../src/simulation/pas';
 import { startQuest } from '../src/simulation/quetes';
 import { countInStacks } from '../src/simulation/sac';
-import { createRobot, newSim, play } from './aides';
+import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
+import { contentAndMap, createRobot, newSim, play } from './aides';
+
+const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
+const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
 
 function dayOne(): Sim {
   const sim = newSim(5);
@@ -90,6 +94,28 @@ describe('draisine poussée à deux', () => {
     expect(sim.world.beam).toBeNull();
     expect(sim.world.flags).toContain('handcar_pushed');
     expect(sim.world.characters.every((c) => c.status === 'active')).toBe(true);
+  });
+
+  it('au bout de la voie, elle y reste, même après une sauvegarde rechargée', () => {
+    const sim = withHandcar();
+    const to = { ...(sim.world.beam?.to ?? { x: 0, y: 0 }) };
+    expect(sim.world.handcarAt).toBeNull();
+    grab(sim, ['p1', 'p2']);
+    carry(sim, ['p1', 'p2'], SIM_HZ * 30);
+    const at = sim.world.handcarAt;
+    expect(at).not.toBeNull();
+    expect(distance(at?.pos ?? { x: 0, y: 0 }, to)).toBeLessThanOrEqual(sim.content.settings.feel.beamDropRadius);
+    for (let i = 0; i < SIM_HZ * 5; i++) step(sim, { controls: {}, intents: [] });
+    expect(sim.world.handcarAt).toEqual(at);
+    expect(sim.world.beam).toBeNull();
+    const { content, map } = contentAndMap();
+    const snap = snapshotOf(sim);
+    const restored = restoreWorld(content, map, JSON.parse(JSON.stringify(snap.data)) as unknown, snap.dataSchema, [A, B]);
+    expect(restored.world.handcarAt).toEqual(at);
+    // Une sauvegarde plus ancienne, sans le champ: la draisine est dans la remise.
+    const old = JSON.parse(JSON.stringify(snap.data)) as Record<string, unknown>;
+    delete old.handcarAt;
+    expect(restoreWorld(content, map, old, snap.dataSchema, [A, B]).world.handcarAt).toBeNull();
   });
 
   it('relâchée en chemin: posée là, intacte, et on la reprend', () => {

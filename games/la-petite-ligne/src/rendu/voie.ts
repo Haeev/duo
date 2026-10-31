@@ -10,7 +10,7 @@ import { AnimationMixer, Group, Matrix4 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
 import type { TrainPhase } from '../etat/types';
 import { smoothFactor } from './camera';
-import type { FrameContext } from './contexte';
+import { yawFromFacing, type FrameContext } from './contexte';
 import { propHints, propMatrix, type ClockHand } from './decor';
 import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
@@ -91,6 +91,8 @@ export class RailwayPart implements EventfulPart {
     handcar: Object3D | null;
     amount: number;
   } | null = null;
+  /** Draisine poussée au bout de la voie (`world.handcarAt`), créée à sa première sortie. */
+  private parked: Object3D | null = null;
   private trainX = Number.NaN;
   private readonly mixers: { mixer: AnimationMixer; duration: number }[] = [];
   private smokeAnchor: Object3D | null = null;
@@ -204,6 +206,27 @@ export class RailwayPart implements EventfulPart {
     }
   }
 
+  /** Draisine posée au bout de la voie: lue dans l'état (donc aussi après une sauvegarde rechargée). */
+  private updateParked(context: FrameContext): void {
+    const at = context.world.handcarAt;
+    if (at === null || context.world.beam?.purpose === 'handcar') {
+      if (this.parked !== null) {
+        this.parked.visible = false;
+      }
+      return;
+    }
+    if (this.parked === null) {
+      this.parked = this.library.instantiate(HANDCAR_MODEL);
+      this.parked.traverse((object) => {
+        object.castShadow = true;
+      });
+      this.group.add(this.parked);
+    }
+    this.parked.visible = true;
+    this.parked.position.set(at.pos.x, this.terrain.heightAt(at.pos.x, at.pos.y), at.pos.y);
+    this.parked.rotation.y = yawFromFacing(at.facing);
+  }
+
   private placeProp<T>(prop: MapProp, bind: (object: Object3D) => T): T {
     const object = this.library.instantiate(prop.model, propHints(prop), prop.id);
     const matrix = propMatrix(prop, this.terrain.heightAt(prop.pos.x, prop.pos.y), new Matrix4());
@@ -276,10 +299,13 @@ export class RailwayPart implements EventfulPart {
         this.shed.right.rotation.y = SHED_DOOR_ANGLE * this.shed.amount;
       }
       if (this.shed.handcar !== null) {
-        // Sortie de la remise, la draisine est dessinée comme une charge à deux (`vie.ts`).
-        this.shed.handcar.visible = open && context.world.beam?.purpose !== 'handcar';
+        // Sortie de la remise, la draisine est une charge à deux (`vie.ts`), puis posée au bout de la voie.
+        this.shed.handcar.visible =
+          open && context.world.beam?.purpose !== 'handcar' && context.world.handcarAt === null;
       }
     }
+
+    this.updateParked(context);
 
     const minutes = context.world.clock.minutes;
     for (const hand of this.clockHands) {

@@ -184,6 +184,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     crate: [],
     catalogueOrders: [],
     heavyDeliveries: [],
+    handcarAt: null,
     grocerSoldToday: 0,
     proposals: [],
     quests: [],

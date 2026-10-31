@@ -120,6 +120,7 @@ async function main(): Promise<void> {
         ? (params.get('scene') as 'rencontre' | 'place' | 'repas')
         : undefined,
     corners: params.get('coins') === '1',
+    handcarParked: params.get('draisine') === 'posee',
   };
   const world = createExampleWorld(map, content, options);
   const focusX = Number(params.get('x'));

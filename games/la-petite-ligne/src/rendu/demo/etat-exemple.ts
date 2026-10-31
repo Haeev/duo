@@ -73,6 +73,8 @@ export interface DemoOptions {
    * Camille mange assise à la table (`repas`).
    */
   scene?: 'rencontre' | 'place' | 'repas' | undefined;
+  /** Draisine poussée, posée au bout de la voie (`world.handcarAt`), remise ouverte. */
+  handcarParked?: boolean;
 }
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */
@@ -352,6 +354,13 @@ export function createExampleWorld(
       p2.absent = true;
       p2.action = { kind: 'sit', since: 0, duration: 0, target: null };
     }
+  }
+  if (options.handcarParked === true) {
+    // Même arrivée que la simulation: point de la remise décalé de `carry.handcar.toOffset`.
+    const shed = point(map, 'handcar_shed', 30, 20);
+    const offset = content.settings.carry.handcar?.toOffset ?? [-6, 4];
+    world.handcarAt = { pos: { x: shed.x + offset[0], y: shed.y + offset[1] }, facing: Math.PI };
+    world.worldStates.handcar_shed = 'open';
   }
   world.train = {
     phase: options.train,
