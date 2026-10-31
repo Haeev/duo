@@ -300,7 +300,13 @@ interface EnduranceReport {
  * textures, et ne laisser aucun canevas derrière lui.
  */
 async function endurance(cycles: number, view: GameView, container: HTMLElement): Promise<void> {
-  const report: EnduranceReport = { cycles: 0, geometries: [], textures: [], heap: [], canvases: 0 };
+  const report: EnduranceReport = {
+    cycles: 0,
+    geometries: [],
+    textures: [],
+    heap: [],
+    canvases: 0,
+  };
   (window as Window & { lplEndurance?: EnduranceReport }).lplEndurance = report;
   for (let i = 0; i < cycles; i += 1) {
     const engine = new RenderEngine({ view, container, reducedMotion: false, showStats: false });

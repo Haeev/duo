@@ -7,7 +7,14 @@
  * Pour en ajouter une: écrire son fichier dans `src/rendu/` et l'inscrire dans
  * `RENDER_EXTENSIONS` ci-dessous.
  */
-import type { Mesh, MeshStandardMaterial, Object3D, OrthographicCamera, Scene, WebGLRenderer } from 'three';
+import type {
+  Mesh,
+  MeshStandardMaterial,
+  Object3D,
+  OrthographicCamera,
+  Scene,
+  WebGLRenderer,
+} from 'three';
 import type { GameMap } from '../etat/carte';
 import type { FrameContext, RenderPart } from './contexte';
 import type { DaylightRig } from './lumiere';

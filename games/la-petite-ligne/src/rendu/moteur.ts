@@ -155,7 +155,8 @@ export class RenderEngine implements Renderer {
     const settings = RENDER_SETTINGS.renderer;
     const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
     const scale = RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
-    const ratio = Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
+    const ratio =
+      Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
     this.rig.setAspect(width / height);
@@ -388,12 +389,20 @@ export class RenderEngine implements Renderer {
     if (dtSeconds <= 0 || dtSeconds > MAX_FRAME_SECONDS) {
       return;
     }
-    this.frameAverageMs += (dtSeconds * MS_PER_SECOND - this.frameAverageMs) * Math.min(1, dtSeconds / settings.averageSeconds);
+    this.frameAverageMs +=
+      (dtSeconds * MS_PER_SECOND - this.frameAverageMs) *
+      Math.min(1, dtSeconds / settings.averageSeconds);
     this.sinceResolutionChange += dtSeconds;
-    if (this.time < settings.warmupSeconds || this.sinceResolutionChange < settings.cooldownSeconds) {
+    if (
+      this.time < settings.warmupSeconds ||
+      this.sinceResolutionChange < settings.cooldownSeconds
+    ) {
       return;
     }
-    if (this.frameAverageMs > settings.slowFrameMs && this.resolutionStep < settings.steps.length - 1) {
+    if (
+      this.frameAverageMs > settings.slowFrameMs &&
+      this.resolutionStep < settings.steps.length - 1
+    ) {
       this.resolutionStep += 1;
       this.sinceResolutionChange = 0;
       this.resize();
