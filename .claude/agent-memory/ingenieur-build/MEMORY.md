@@ -18,7 +18,14 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Lire les fusibles: chercher la sentinelle `dL7pKGdnNz796PbbjQWNKmHXBZaB9tsX`, puis un octet de version, un octet de longueur et autant de caractères `0`, `1` ou `r`. Sous macOS, le câblage est dans le binaire du cadre Electron.
 - Fusible `nodeCliInspect` coupé: Playwright `_electron` ne peut plus piloter l'application (il passe `--inspect=0` et attend « Debugger listening »). Tester l'application non empaquetée, et l'empaquetée par un test de lancement sans Playwright.
 - `latest.yml` et `latest-mac.yml` sont écrits dès qu'une configuration `publish` existe, même avec `--publish never`.
-- L'exécutable principal d'Electron arm64 a le même UUID pour toutes les applications d'une version (45.2.0: `4c4c446b-5555-3144-a1a1-136b14fc37ac`); la commande `LC_UUID` se réécrit en quelques lignes de Node (Mach-O mince, `0xfeedfacf`, commande `0x1b`).
+- L'exécutable principal d'Electron arm64 a le même UUID pour toutes les applications d'une version (45.2.0: `4c4c446b-5555-3144-a1a1-136b14fc37ac`); la commande `LC_UUID` se réécrit en quelques lignes de Node (Mach-O mince, `0xfeedfacf`, commande `0x1b`). `llvm-dwarfdump --uuid` (présent dans l'environnement cloud) la relit, même sortie que `dwarfdump` d'Apple.
+- La découverte automatique ne cherche que `electron-builder.{yml,yaml,json,json5,toml,js,cjs,ts}`: un `electron-builder.config.mjs` exige `--config`. Le `.mjs` est chargé par `require()` (Node 22.12 et plus), puis `import()` d'une URL `file://`: chemins Windows sans souci. Dans un `.mjs`, `afterPack` peut être la fonction importée.
+- Sous Linux, `--mac dir --arm64` et `--win dir --x64` se fabriquent (sans signature, sans dmg ni NSIS): crochet `afterPack`, fusibles, `Info.plist`, ressources de l'exécutable et `ELECTRONASAR` s'y vérifient. Archives d'Electron téléchargées depuis GitHub, empreintes conformes aux SHASUMS256 officiels.
+- NSIS: sans `installerLanguages`, ou avec `multiLanguageInstaller: false`, l'installateur est en anglais; `installerLanguages: ['fr_FR']` le met en français seul. `/S` n'ouvre pas l'application (seul `--force-run` le fait).
+- Sans `author` dans le package.json, `CompanyName` de l'exécutable Windows reste « GitHub, Inc. » (celui d'Electron): `extraMetadata.author.name` dans la configuration le remplace.
+- `extraResources` sont copiés en parallèle (`Promise.all`): ne jamais écrire deux fois le même fichier (exclure du dossier ce qu'une autre entrée copie). Une source absente ne fait qu'un avertissement: contrôler soi-même.
+- `electronLanguages: ['fr', 'en']` garde `fr`, `en-US`, `en-GB` (et `fr.lproj`, `en.lproj` sous macOS). Electron fixe déjà `NSRequiresAquaSystemAppearance` à `false`.
+- `publish: null` dans la configuration: aucun `latest.yml` ni `app-update.yml`; garder `--publish never` contre la publication implicite sur tag ou en CI.
 
 ## electron-updater 6.8
 
@@ -39,6 +46,8 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - pnpm 11 et plus: réglages dans `pnpm-workspace.yaml` (`.npmrc` ne sert plus qu'à l'authentification et au registre); `allowBuilds` remplace `onlyBuiltDependencies`; pnpm 12 refuse une clé inconnue (`ERR_PNPM_UNRECOGNIZED_WORKSPACE_SETTINGS`).
 - Délai de publication par défaut d'un jour: une version plus jeune est admise, et pnpm l'inscrit tout seul dans `minimumReleaseAgeExclude` de `pnpm-workspace.yaml`.
 - `catalog:` fonctionne aussi dans `peerDependencies`. `pnpm --recursive` n'inclut pas la racine: la racine peut orchestrer sans boucle.
+- `strictDepBuilds` vaut `true`: un script d'installation non tranché dans `allowBuilds` fait échouer `pnpm install` (`ERR_PNPM_IGNORED_BUILDS`). electron-builder 26 amène `electron-winstaller` (Squirrel): `allowBuilds: { electron-winstaller: false }`. Electron 45 n'a plus de script d'installation (binaire téléchargé à la demande). Une entrée pour un paquet absent du graphe est acceptée.
+- `pnpm --filter <paquet>... run build` construit le paquet et ses dépendances dans l'ordre, en sautant ceux sans script.
 
 ## Outillage du dépôt
 
@@ -49,3 +58,8 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Vitest 5: `vite` est une dépendance pair obligatoire; `vitest run` sans aucun fichier de test sort en code 1.
 - Actions (relevé sur raw.githubusercontent.com): `actions/checkout@v7`, `actions/setup-node@v7` (cache pnpm seulement si pnpm est déjà installé), `actions/cache@v6`, `pnpm/action-setup@v6`; toutes en `node24`. actionlint 1.7.12 et shellcheck 0.11.0 se téléchargent depuis leurs releases GitHub (empreintes publiées).
 - Simuler la CI: Node de `.nvmrc` depuis nodejs.org (SHASUMS256), `corepack enable` dans son dossier, copie propre du dépôt, `pnpm install --frozen-lockfile`.
+- `actions/upload-artifact@v7` (option `archive: false` pour un fichier seul) et `actions/download-artifact@v8` (`pattern`, `merge-multiple`). actionlint connaît leurs entrées et passe les scripts bash à shellcheck avec `-shellcheck <binaire>`.
+- Expressions GitHub: sur un push, `inputs.x` vaut `null`, et `null != false` est faux (les deux deviennent 0). Écrire `github.event_name != 'workflow_dispatch' || inputs.x`.
+- Logique bash d'un workflow: l'extraire du YAML (PyYAML est installé) et la jouer avec un faux `gh` qui journalise ses arguments.
+- typescript-eslint strict sur du JavaScript vérifié: un `import()` dynamique est `any`, le typer `unknown` puis valider; une variable `let` affectée dans un rappel reste vue `null` (la ranger dans un objet).
+- Copie isolée (worktree): elle peut partir d'un vieux commit; avancer d'abord sa branche (`git merge --ff-only`) sur la pointe de la branche de session. Le garde-fou de l'isolation refuse les commandes trop composées ou qui citent `.git`: les découper, écrire les scripts avec l'outil d'écriture.
