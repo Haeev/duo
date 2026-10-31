@@ -28,6 +28,7 @@ export function trainClock(sim: Sim, before: number, after: number): void {
   if (day !== s.clock.firstDay.day && crossed(before, after, s.train.arrival)) {
     train.phase = 'arriving';
     train.progress = 0;
+    sim.runtime.dynamicDirty = true;
     emit(sim, { type: 'train_whistle' });
     emit(sim, { type: 'train_arriving' });
     say(sim, 'both', 'train_arrived');
@@ -57,7 +58,10 @@ export function updateTrain(sim: Sim, dt: number): void {
     sim.runtime.changed = true;
   } else if (train.phase === 'departing') {
     train.progress = Math.max(0, train.progress - rate);
-    if (train.progress <= 0) train.phase = 'away';
+    if (train.progress <= 0) {
+      train.phase = 'away';
+      sim.runtime.dynamicDirty = true;
+    }
     sim.runtime.changed = true;
   }
 }

@@ -13,6 +13,8 @@ import {
   MeshStandardMaterial,
   Object3D,
   SkinnedMesh,
+  Sphere,
+  Vector3,
   type AnimationAction,
   type AnimationClip,
 } from 'three';
@@ -48,6 +50,8 @@ const GROUND_HALF_LIFE = 0.06;
 const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
 const PLAYER_ROW = 0;
+const BODY_CENTER = 0.9;
+const BODY_RADIUS = 1.3;
 
 /** Animation jouée pour chaque action de la simulation. */
 const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
@@ -137,7 +141,10 @@ class CharacterFigure {
       if (object instanceof Mesh) {
         object.castShadow = true;
         object.receiveShadow = true;
-        object.frustumCulled = false;
+        if (object instanceof SkinnedMesh) {
+          // Sphère fixe autour du corps: l'élimination hors champ reste juste quelle que soit l'animation.
+          object.boundingSphere = new Sphere(new Vector3(0, BODY_CENTER, 0), BODY_RADIUS);
+        }
         if (object.morphTargetInfluences !== undefined) {
           // Les poids par défaut du GLB valent 1: on part d'un visage neutre.
           object.morphTargetInfluences.fill(0);

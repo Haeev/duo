@@ -16,6 +16,7 @@ import {
   PCFShadowMap,
   Scene,
   SRGBColorSpace,
+  Vector2,
   Vector3,
   WebGLRenderer,
   type ToneMapping,
@@ -26,7 +27,7 @@ import { IsoCameraRig, type CameraCommand } from './camera';
 import { PickRegistry, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
 import { DaylightRig } from './lumiere';
-import { createSharedMaterials, type SharedMaterials } from './materiaux';
+import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
 import { PerfMonitor } from './perf';
 import { RENDER_SETTINGS } from './reglages';
@@ -44,6 +45,10 @@ const MAX_FRAME_SECONDS = 0.1;
 /** Parts du chargement: modèles d'abord, puis construction de la scène et compilation. */
 const LOAD_MODELS_SHARE = 0.7;
 const LOAD_BUILD_SHARE = 0.9;
+/** Rayon du trou de visibilité autour d'un personnage (m) et hauteur de son centre. */
+const SEE_THROUGH_RADIUS = 1.7;
+const SEE_THROUGH_CHEST = 1.0;
+const HALF = 0.5;
 
 function toneMapping(name: (typeof RENDER_SETTINGS.renderer)['toneMapping']): ToneMapping {
   switch (name) {
@@ -84,6 +89,10 @@ export class RenderEngine implements Renderer {
   private disposed = false;
   private readonly context: FrameContext;
   private readonly focus = new Vector3();
+  private readonly probe = new Vector3();
+  private readonly viewPoint = new Vector3();
+  private readonly bufferSize = new Vector2();
+  private readonly holes: SeeThroughHole[] = [];
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -232,6 +241,7 @@ export class RenderEngine implements Renderer {
       this.rig.update(dt, this.rig.focus.x, this.rig.focus.z, 0, 0, null);
     }
     this.focus.copy(this.rig.focus);
+    this.updateSeeThrough(world, alpha);
     this.daylight.update(world.clock.minutes, world.weather, this.focus, this.rig.viewRadius(), RENDER_SETTINGS.camera.distance);
     this.materials?.setNight(this.daylight.night);
     this.materials?.setTime(this.time);
@@ -255,6 +265,35 @@ export class RenderEngine implements Renderer {
     for (const part of this.parts) {
       part.update(context);
     }
+  }
+
+  /** Trous de visibilité autour des deux joueurs (ce qui les cache s'efface, voir `materiaux.ts`). */
+  private updateSeeThrough(world: ReadonlyWorld, alpha: number): void {
+    const materials = this.materials;
+    const terrain = this.terrain;
+    if (materials === null || terrain === null) {
+      return;
+    }
+    this.renderer.getDrawingBufferSize(this.bufferSize);
+    const camera = this.rig.camera;
+    const radius = (SEE_THROUGH_RADIUS / this.rig.viewWidth()) * this.bufferSize.x;
+    this.holes.length = 0;
+    for (const character of world.characters) {
+      const x = character.prev.x + (character.pos.x - character.prev.x) * alpha;
+      const y = character.prev.y + (character.pos.y - character.prev.y) * alpha;
+      const ground = terrain.heightAt(x, y);
+      this.probe.set(x, ground + SEE_THROUGH_CHEST, y);
+      this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
+      this.probe.project(camera);
+      this.holes.push({
+        x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
+        y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
+        radius,
+        depth: -this.viewPoint.z,
+        ground,
+      });
+    }
+    materials.setSeeThrough(this.holes);
   }
 
   frame(dtSeconds: number): void {

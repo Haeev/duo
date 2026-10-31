@@ -9,6 +9,7 @@ import { ARRIVE_DISTANCE, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
 import { type Blockers, bodyCollides, findPath, moveBody } from './grille';
+import { ZONE } from './ids';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
@@ -18,6 +19,12 @@ export function refreshBlockers(sim: Sim): Blockers {
     rt.dynamicBlocked.fill(0);
     for (const t of sim.world.trees) {
       if (!t.felled) rt.dynamicBlocked[Math.floor(t.pos.y) * map.width + Math.floor(t.pos.x)] = 1;
+    }
+    const platform = map.zones[ZONE.trainAtPlatform];
+    if (platform !== undefined && sim.world.train.phase !== 'away') {
+      for (let cy = platform.y; cy < platform.y + platform.h; cy++) {
+        for (let cx = platform.x; cx < platform.x + platform.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
+      }
     }
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];

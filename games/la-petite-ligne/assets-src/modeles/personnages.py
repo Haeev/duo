@@ -436,7 +436,7 @@ def apron(g, z_top=1.0, z_bot=0.47, w_top=0.24, w_bot=0.33, y=-0.0, color="extra
 
 def overall_bib(g, color="bottom", z0=1.0, z1=1.27, straps="bottom", buttons_c="metal"):
     g.box((0.24, 0.02, z1 - z0), loc=(0, -0.113, z0), color=color, base=True, weights=torso_weights)
-    g.box((0.08, 0.008, 0.06), loc=(0, -0.125, z0 + 0.12), color="hair_dark" if False else color, bone="chest")
+    g.box((0.08, 0.008, 0.06), loc=(0, -0.125, z0 + 0.12), color=color, bone="chest")
     for s in (1, -1):
         g.box((0.035, 0.245, 0.02), loc=(s * 0.095, 0.0, z1 + 0.11), color=straps, rot=(0, 0, 0), bone="chest")
         g.box((0.035, 0.015, 0.13), loc=(s * 0.095, -0.115, z1 + 0.045), color=straps, bone="chest")

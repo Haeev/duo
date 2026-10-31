@@ -177,6 +177,9 @@ export class Vegetation {
         mesh.setColorAt(mesh.count, color.setRGB(tint, tint, tint));
         mesh.count += 1;
       }
+      // Hors du terrain jouable, l'ombre de la forêt n'apporterait rien: autant d'appels de dessin en moins.
+      firs.castShadow = false;
+      oaks.castShadow = false;
       finishInstances(firs);
       finishInstances(oaks);
       strips.push([firs, oaks]);

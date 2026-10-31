@@ -165,7 +165,12 @@ export function startScene(sim: Sim, dialogueId: string): void {
     c.action = { kind: 'talk', since: sim.world.tick, duration: 0, target: null };
   }
   const v = sim.world.villagers.find((x) => x.id === def.villager);
-  if (v !== undefined) v.talkingWith = ['p1', 'p2'];
+  if (v !== undefined) {
+    v.talkingWith = ['p1', 'p2'];
+    v.met = true;
+  }
+  // Une scène avec un habitant compte comme une conversation, pour chacun des deux.
+  for (const c of sim.world.characters) bump(sim, `talked:${def.villager}`, c.id);
   emit(sim, { type: 'scene_started', dialogue: def.id, villager: def.villager });
   if (def.lines.length === 0) showSceneChoicesOrEnd(sim);
 }

@@ -64,7 +64,8 @@ export class GardenPart implements EventfulPart {
     resources: ResourceTracker,
     private readonly picks: PickRegistry,
   ) {
-    this.batches = new InstancedBatches('potager', library, materials, resources, GARDEN_CAPACITY);
+    // Cultures et mottes restent basses: leur ombre ne se verrait pas, on l'économise.
+    this.batches = new InstancedBatches('potager', library, materials, resources, GARDEN_CAPACITY, false);
     this.trees = new InstancedBatches('arbres de la lisiere', library, materials, resources, TREE_CAPACITY);
     this.library = library;
   }

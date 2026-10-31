@@ -11,3 +11,17 @@ describe('contenu', () => {
     expect(Object.keys(content.dialogues).length).toBeGreaterThan(20);
   });
 });
+
+describe('carte', () => {
+  it('lit la carte du level designer, avec tous les points attendus', async () => {
+    const { loadMap } = await import('../src/donnees/carte');
+    const { MAP_FILES } = await import('../src/donnees/cartes-fichiers');
+    const result = loadMap(MAP_FILES);
+    expect(result.warning).toBeNull();
+    expect(result.source).toBe('level');
+    expect(result.map.width).toBe(64);
+    expect(result.map.garden).toHaveLength(12);
+    expect(result.map.trees).toHaveLength(12);
+    expect(result.map.startFurniture.length).toBeGreaterThanOrEqual(4);
+  });
+});

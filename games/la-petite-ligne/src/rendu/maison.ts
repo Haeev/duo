@@ -364,7 +364,9 @@ export class HousePart implements EventfulPart {
       // Pendant le chantier du poulailler, la ruine s'efface derrière les fantômes.
       this.coop.ruin.visible = find('chicken_coop')?.status === 'locked';
     }
-    this.updateFurniture(world.furniture);
+    // Sous le toit réparé, les meubles ne se voient que de l'intérieur: inutile de les dessiner.
+    const roofed = done('house_roof') && !inside;
+    this.updateFurniture(world.furniture, roofed);
     this.updateGhosts(context);
   }
 
@@ -392,7 +394,7 @@ export class HousePart implements EventfulPart {
     return object;
   }
 
-  private updateFurniture(placed: readonly DeepReadonly<PlacedFurniture>[]): void {
+  private updateFurniture(placed: readonly DeepReadonly<PlacedFurniture>[], hidden: boolean): void {
     const seen = new Set<string>();
     for (const piece of placed) {
       seen.add(piece.id);
@@ -407,6 +409,7 @@ export class HousePart implements EventfulPart {
         this.furniture.set(piece.id, view);
       }
       this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, piece.rotation);
+      view.object.visible = !hidden;
       const size = this.footprint(piece.item, piece.rotation);
       const ground = view.object.position.y;
       view.pick.box.min.set(piece.cell.cx + FURNITURE_PICK_INSET, ground, piece.cell.cy + FURNITURE_PICK_INSET);

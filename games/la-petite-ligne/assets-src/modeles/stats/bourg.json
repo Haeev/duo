@@ -298,7 +298,7 @@
     2,
     1
    ],
-   "tris": 472
+   "tris": 520
   },
   "ground_grass": {
    "footprint": [
@@ -537,11 +537,11 @@
   },
   "river_curve": {
    "footprint": [
-    8,
-    8
+    10,
+    10
    ],
    "water_y": -0.3,
-   "note": "entre par le bord -X (axe en z=0 glTF... voir README), sort par le bord -Y Blender",
+   "radius": 6.0,
    "tris": 160
   },
   "pontoon": {
@@ -553,5 +553,5 @@
    "tris": 580
   }
  },
- "file_bytes": 2845880
+ "file_bytes": 2845320
 }

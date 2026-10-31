@@ -16,6 +16,7 @@ import type {
 import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { type Sim, wrapWorld } from './contexte';
+import { SPAWN_POINTS } from './ids';
 import { addToBag, addStack } from './sac';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
@@ -30,8 +31,9 @@ export function emptyCounters(): Counters {
 }
 
 function newCharacter(content: Content, map: GameMap, id: CharacterId, player: PlayerInfo, offset: number): Character {
+  const own = map.points[SPAWN_POINTS[id]];
   const spawn = map.points[content.settings.spawn.point] ?? map.house.spawn;
-  const pos = { x: spawn.x + offset, y: spawn.y };
+  const pos = own === undefined ? { x: spawn.x + offset, y: spawn.y } : { x: own.x, y: own.y };
   // Première nuit: on part du lit de départ (la paillasse).
   const startBed = map.startFurniture
     .map((f) => content.items[f.item]?.bed?.sleep)

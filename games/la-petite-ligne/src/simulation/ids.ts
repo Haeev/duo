@@ -24,8 +24,13 @@ export const POINT = {
   offstage: 'offstage',
 } as const;
 
+/** Points d'apparition de chaque personnage à la descente du train (sinon le point de `reglages.spawn`). */
+export const SPAWN_POINTS = { p1: 'spawn_1', p2: 'spawn_2' } as const;
+
 export const ZONE = {
   henPen: 'hen_pen',
+  /** Cases occupées par le train à quai, infranchissables tant qu'il est là. */
+  trainAtPlatform: 'train_at_platform',
 } as const;
 
 /** États nommés du monde. */

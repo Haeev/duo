@@ -8,6 +8,8 @@ import {
   Group,
   Matrix4,
   Quaternion,
+  SkinnedMesh,
+  Sphere,
   Vector3,
   type AnimationAction,
   type AnimationClip,
@@ -37,6 +39,7 @@ const ITEM_PICK_RADIUS = 0.35;
 const ITEM_PICK_HEIGHT = 0.5;
 const BEAM_GROUND_HEIGHT = 0.12;
 const DEFAULT_CARRY_HEIGHT = 1.6;
+const HEN_RADIUS = 0.3;
 
 interface HenView {
   root: Group;
@@ -82,7 +85,9 @@ export class FarmLifePart implements EventfulPart {
     const model = this.library.cloneRig(HEN_RIG, [variant]) ?? this.library.instantiate(variant);
     model.traverse((object) => {
       object.castShadow = true;
-      object.frustumCulled = false;
+      if (object instanceof SkinnedMesh) {
+        object.boundingSphere = new Sphere(new Vector3(0, HEN_RADIUS, 0), HEN_RADIUS * 2);
+      }
     });
     root.add(model);
     this.group.add(root);

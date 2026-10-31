@@ -1,0 +1,213 @@
+{
+ "nodes": {
+  "straw_mattress": {
+   "footprint": [
+    1,
+    2
+   ],
+   "sleep_height": 0.15,
+   "tris": 320
+  },
+  "double_bed": {
+   "footprint": [
+    2,
+    2
+   ],
+   "sleep_height": 0.5,
+   "sleep_spots": [
+    [
+     -0.36,
+     0.0
+    ],
+    [
+     0.36,
+     0.0
+    ]
+   ],
+   "tris": 540
+  },
+  "mattress": {
+   "kind": "item",
+   "tris": 324
+  },
+  "table": {
+   "footprint": [
+    2,
+    1
+   ],
+   "top_height": 0.78,
+   "tris": 116
+  },
+  "chair": {
+   "footprint": [
+    1,
+    1
+   ],
+   "seat_height": 0.47,
+   "tris": 164
+  },
+  "chest": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 128
+  },
+  "shelf": {
+   "footprint": [
+    2,
+    1
+   ],
+   "wall": true,
+   "tris": 512
+  },
+  "stove": {
+   "footprint": [
+    1,
+    1
+   ],
+   "station": "stove",
+   "tris": 324
+  },
+  "flower_pot": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 352
+  },
+  "oil_lamp": {
+   "footprint": [
+    1,
+    1
+   ],
+   "light_anchor": "oil_lamp_light",
+   "tris": 232
+  },
+  "rug": {
+   "footprint": [
+    2,
+    2
+   ],
+   "floor": true,
+   "tris": 296
+  },
+  "curtains": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tris": 224
+  },
+  "crystal_radio": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 364
+  },
+  "wood_stove": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "tris": 240
+  },
+  "picture_frame": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tier": "P1",
+   "tris": 92
+  },
+  "bread": {
+   "kind": "item",
+   "tris": 136
+  },
+  "dish_radishes": {
+   "kind": "item",
+   "tris": 464
+  },
+  "dish_omelette": {
+   "kind": "item",
+   "tris": 276
+  },
+  "dish_soup": {
+   "kind": "item",
+   "tris": 244
+  },
+  "parcel": {
+   "kind": "item",
+   "tris": 92
+  },
+  "iron_box": {
+   "kind": "item",
+   "tris": 136
+  },
+  "riddle_card": {
+   "kind": "item",
+   "tris": 72
+  },
+  "shed_key": {
+   "kind": "item",
+   "tris": 112
+  },
+  "old_photo": {
+   "kind": "item",
+   "tris": 60
+  },
+  "jay_feather": {
+   "kind": "item",
+   "tris": 172
+  },
+  "kit_wall_stone": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "note": "mur sur le bord arrière de la case (-Z glTF), 2,4 m",
+   "tris": 12
+  },
+  "kit_wall_wood": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "note": "mur sur le bord arrière de la case (-Z glTF), 2,4 m",
+   "tris": 108
+  },
+  "kit_door": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "note": "mur sur le bord arrière de la case (-Z glTF), 2,4 m",
+   "tris": 148
+  },
+  "kit_window": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "note": "mur sur le bord arrière de la case (-Z glTF), 2,4 m",
+   "tris": 72
+  },
+  "kit_floor_wood": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tier": "P1",
+   "tris": 24
+  }
+ },
+ "file_bytes": 462244
+}

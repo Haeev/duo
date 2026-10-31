@@ -14,6 +14,7 @@ import {
   RGBAFormat,
   SRGBColorSpace,
   TextureLoader,
+  Vector4,
   type Texture,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
@@ -88,7 +89,28 @@ export interface SharedMaterials {
   setNight(night: number): void;
   /** Couleur (linéaire) d'une case de la palette, lue dans la texture chargée. */
   paletteColor(cell: PaletteCell, out: Color): Color;
+  /**
+   * Trous de visibilité autour des personnages: ce qui est devant eux (plus
+   * près de la caméra) et au-dessus du sol s'efface dans un disque tramé.
+   */
+  setSeeThrough(holes: readonly SeeThroughHole[]): void;
 }
+
+/** Un trou de visibilité: centre et rayon en pixels du tampon, profondeur et sol du personnage. */
+export interface SeeThroughHole {
+  x: number;
+  y: number;
+  radius: number;
+  depth: number;
+  ground: number;
+}
+
+/** Nombre de trous (les deux joueurs). */
+export const SEE_THROUGH_SLOTS = 2;
+/** Marge de profondeur: seul ce qui est nettement devant le personnage s'efface. */
+const SEE_THROUGH_DEPTH_MARGIN = 0.6;
+/** Ce qui est plus bas que cela au-dessus du sol du personnage ne s'efface jamais (le sol, les mottes). */
+const SEE_THROUGH_MIN_HEIGHT = 0.45;
 
 const BYTE = 255;
 const RGBA = 4;
@@ -210,6 +232,52 @@ diffuseColor.a = mix(diffuseColor.a, 1.0, glint * 0.5);`,
 
   const pixels = readPixels(base);
 
+  // Trous de visibilité: un personnage caché derrière un bâtiment ou un arbre reste visible.
+  const cutUniforms = {
+    uCutHoles: { value: Array.from({ length: SEE_THROUGH_SLOTS }, () => new Vector4(0, 0, 0, 0)) },
+    uCutGround: { value: new Array<number>(SEE_THROUGH_SLOTS).fill(0) },
+    uCutCount: { value: 0 },
+  };
+  palette.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms): void => {
+    shader.uniforms.uCutHoles = cutUniforms.uCutHoles;
+    shader.uniforms.uCutGround = cutUniforms.uCutGround;
+    shader.uniforms.uCutCount = cutUniforms.uCutCount;
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vCutY;')
+      .replace(
+        '#include <project_vertex>',
+        `#include <project_vertex>
+vec4 cutWorld = vec4(transformed, 1.0);
+#ifdef USE_INSTANCING
+cutWorld = instanceMatrix * cutWorld;
+#endif
+vCutY = (modelMatrix * cutWorld).y;`,
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>
+varying float vCutY;
+uniform vec4 uCutHoles[${SEE_THROUGH_SLOTS}];
+uniform float uCutGround[${SEE_THROUGH_SLOTS}];
+uniform int uCutCount;`,
+      )
+      .replace(
+        '#include <clipping_planes_fragment>',
+        `#include <clipping_planes_fragment>
+for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
+  if (i >= uCutCount) break;
+  vec4 hole = uCutHoles[i];
+  float reach = length(gl_FragCoord.xy - hole.xy) / max(hole.z, 1.0);
+  if (reach < 1.0 && vViewPosition.z < hole.w - ${SEE_THROUGH_DEPTH_MARGIN.toFixed(2)} && vCutY > uCutGround[i] + ${SEE_THROUGH_MIN_HEIGHT.toFixed(2)}) {
+    float dither = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+    if (dither < smoothstep(1.0, 0.6, reach)) discard;
+  }
+}`,
+      );
+  };
+  palette.customProgramCacheKey = (): string => 'lpl_palette_cut';
+
   return {
     palette,
     ghost,
@@ -221,6 +289,17 @@ diffuseColor.a = mix(diffuseColor.a, 1.0, glint * 0.5);`,
     },
     setNight(night: number): void {
       palette.emissiveIntensity = night * RENDER_SETTINGS.nightGlow;
+    },
+    setSeeThrough(holes: readonly SeeThroughHole[]): void {
+      const count = Math.min(SEE_THROUGH_SLOTS, holes.length);
+      for (let i = 0; i < count; i += 1) {
+        const hole = holes[i];
+        if (hole !== undefined) {
+          cutUniforms.uCutHoles.value[i]?.set(hole.x, hole.y, hole.radius, hole.depth);
+          cutUniforms.uCutGround.value[i] = hole.ground;
+        }
+      }
+      cutUniforms.uCutCount.value = count;
     },
     paletteColor(cell: PaletteCell, out: Color): Color {
       if (pixels === null) {

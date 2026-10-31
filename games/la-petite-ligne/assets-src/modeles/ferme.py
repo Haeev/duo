@@ -217,8 +217,6 @@ def tool_saw(A):
             color="tin", rot=(0, 0, 90))
     for k in range(9):
         z = -0.1 - k * 0.055
-        g.prism([(0, 0), (0.012, -0.012), (0, -0.024)], 0.004, loc=(0, 0.0, 0), color="tin",
-                rot=(0, 0, 90)) if False else None
         g.box((0.004, 0.012, 0.012), loc=(0, -0.066 + k * 0.003, z), color="iron", rot=(45, 0, 0))
     return g
 
