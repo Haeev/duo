@@ -119,6 +119,8 @@ export interface ItemDef {
   floor: boolean;
   /** Se pose contre un mur (rideaux). */
   wall: boolean;
+  /** Meuble à tuyau (poêle): se pose dos à un mur, tourné vers la pièce. */
+  backToWall: boolean;
   /** Table: le souper pris ensemble à côté compte comme souper partagé. */
   dining: boolean;
   seat: boolean;

@@ -49,6 +49,7 @@
     "placement_outside": "Ça dépasse de la pièce: rapproche-toi du milieu, ou tourne le meuble.",
     "placement_wall": "Ça s'accroche au mur: rapproche-toi d'un mur.",
     "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
+    "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
     "fish_escaped": "Il s'est échappé.",
     "handcar_needs_both": "La draisine ne bouge pas d'un pouce. Appelle {partner}: elle se pousse à deux.",

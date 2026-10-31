@@ -50,11 +50,30 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
 }
 
 /** Pourquoi un meuble ne tient pas là (clé `placement_<raison>` de `textes.json`), ou `null` s'il tient. */
-export type PlacementProblem = 'outside' | 'wall' | 'not_yours' | 'overlap' | 'occupied';
+/**
+ * Dos au mur (convention de la carte: rotation 0 tournée vers le sud, 1 l'est, 2 le nord,
+ * 3 l'ouest): toutes les cases du dos touchent le mur opposé à la face.
+ */
+function backAgainstWall(room: { x: number; y: number; w: number; h: number }, cells: readonly Cell[], rotation: number): boolean {
+  const r = ((rotation % 4) + 4) % 4;
+  if (r === 0) return cells.some((k) => k.cy === room.y);
+  if (r === 1) return cells.some((k) => k.cx === room.x);
+  if (r === 2) return cells.some((k) => k.cy === room.y + room.h - 1);
+  return cells.some((k) => k.cx === room.x + room.w - 1);
+}
+
+/** Texte de la raison: le plus précis s'il est écrit (`placement_back_wall`), sinon `placement_wall`. */
+function problemKey(sim: Sim, problem: PlacementProblem): string {
+  const key = PROBLEM_KEYS[problem];
+  return problem === 'back_wall' && !Object.hasOwn(sim.content.texts.messages, key) ? PROBLEM_KEYS.wall : key;
+}
+
+export type PlacementProblem = 'outside' | 'wall' | 'back_wall' | 'not_yours' | 'overlap' | 'occupied';
 
 const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   outside: 'placement_outside',
   wall: 'placement_wall',
+  back_wall: 'placement_back_wall',
   not_yours: 'placement_not_yours',
   overlap: 'placement_overlap',
   occupied: 'placement_occupied',
@@ -88,6 +107,7 @@ export function placementProblem(
     );
     if (!onEdge) return 'wall';
   }
+  if (def.backToWall && !backAgainstWall(room, cells, rotation)) return 'back_wall';
   if (cornerOwnerOf(sim, cells, by) !== null) return 'not_yours';
   for (const f of sim.world.furniture) {
     if (f.id === ignore) continue;
@@ -124,7 +144,7 @@ export function updatePlacement(sim: Sim, c: Character): void {
   const problem = placementProblem(sim, item, cell, rotation, null, c.id);
   const valid = problem === null;
   // Sans texte dans `textes.json`, la clé: l'interface la traduit, sinon montre son message général.
-  const blocked = problem === null ? null : message(sim, PROBLEM_KEYS[problem], { partner: partnerName(sim, c.id) });
+  const blocked = problem === null ? null : message(sim, problemKey(sim, problem), { partner: partnerName(sim, c.id) });
   const before = c.placement;
   if (
     before?.item !== item ||

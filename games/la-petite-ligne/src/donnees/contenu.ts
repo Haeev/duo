@@ -424,6 +424,7 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       storage: optString(it, 'storage'),
       floor: optBoolean(it, 'floor', false),
       wall: optBoolean(it, 'wall', false),
+      backToWall: optBoolean(it, 'backToWall', false),
       dining: optBoolean(it, 'dining', false),
       seat: optBoolean(it, 'seat', false),
       light: optBoolean(it, 'light', false),

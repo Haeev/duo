@@ -62,7 +62,7 @@
       "title": "Un mot de Jeanne",
       "delivery": { "day": 11, "time": "06:00" },
       "variants": [
-        { "when": [{ "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }], "text": "J'ai trouvé ! L'ombre de la cloche touche le banc du quai à cinq heures du soir, quand il fait soleil. Il faut bêcher juste au pied du banc, entre cinq heures et cinq heures et demie. Allez-y à deux, je garde le secret. Et si ça rate, Basile a un pied-de-biche. J." },
+        { "when": [{ "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }], "text": "J'ai trouvé ! L'ombre de la cloche touche le banc du quai à cinq heures du soir, quand il fait soleil. Il faut bêcher juste au pied du banc, entre cinq heures et six heures moins le quart. Allez-y à deux, je garde le secret. Et si ça rate, Basile a un pied-de-biche. J." },
         { "when": [], "text": "Je compte déjà les wagons pour samedi. Si vous voyez Firmin, dites-lui que son uniforme est très bien. Il a besoin qu'on le lui dise. J." }
       ]
     },

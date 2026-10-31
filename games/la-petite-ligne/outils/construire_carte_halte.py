@@ -253,8 +253,9 @@ def construire_objets() -> None:
     objet("station", 51, 15, ident="station")
     objet("notice_board", 29, 18, ident="notice_board")
     objet("coop_crate", 32, 18, ident="coop_crate")
-    objet("bell_post", 36, 19, ident="quay_bell_post")
-    objet("bench", 39, 19, ident="quay_bench")
+    # Cloche et banc sur le quai, le banc face à la voie (audit de cohérence; ombre mesurée par le game designer).
+    objet("bell_post", 36, 18, ident="quay_bell_post")
+    objet("bench", 39, 18, rotation=2, ident="quay_bench")
     objet("station_sign", 45, 18, ident="station_sign")
     objet("lamp_post", 24, 18, ident="lamp_quay_west")
     objet("lamp_post", 47, 18, ident="lamp_quay_east")
@@ -389,12 +390,12 @@ POINTS = [
       rotation=2, rayon=2.5, important=True),
     p("spawn_1", 37.5, 15.5, "apparition du premier joueur, en descendant du train", rotation=0, vu_par_defaut=True),
     p("spawn_2", 39.5, 15.5, "apparition du second joueur, en descendant du train", rotation=0, vu_par_defaut=True),
-    p("quay_bell", 36.5, 18.5, "Firmin, à côté de la cloche du quai; rassemblement de la fin", rotation=0,
+    p("quay_bell", 35.5, 18.5, "Firmin, à côté de la cloche du quai; rassemblement de la fin", rotation=0,
       rayon=2.5, important=True),
-    p("quay_bench", 40.0, 19.5, "le banc du quai (Jeanne le matin), 3,5 m à l'est de la cloche",
+    p("quay_bench", 40.0, 18.5, "le banc du quai (Jeanne le matin), 3,5 m à l'est de la cloche",
       objet="quay_bench", portee=1.5, important=True),
-    p("bell_shadow_spot", 40.0, 20.5, "au pied du banc, dans l'herbe: on y bêche quand l'ombre de la cloche "
-      "touche le banc (17 h à 17 h 30, par soleil)", rayon=1.5, hauteur_vue=0.2, important=True),
+    p("bell_shadow_spot", 40.0, 19.5, "derrière le banc, dans l'herbe: on y bêche quand l'ombre de la cloche "
+      "touche le banc (17 h à 17 h 45, par soleil)", rayon=1.5, hauteur_vue=0.2, important=True),
     p("coop_crate", 32.5, 18.5, "la caisse de la coopérative", objet="coop_crate", portee=1.5, important=True),
     p("notice_board", 29.5, 18.5, "le tableau: commande, catalogue, courrier", objet="notice_board",
       portee=1.5, important=True),
@@ -489,10 +490,10 @@ MOBILIER_DEPART = [
 
 TRAJETS = [
     {"id": "firmin_home_to_bell", "habitant": "firmin", "de": "firmin_house", "a": "quay_bell",
-     "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [36.5, 18.5]],
+     "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [35.5, 17.5], [35.5, 18.5]],
      "note": "par la traversée de service, libre même quand le train est à quai"},
     {"id": "firmin_bell_to_home", "habitant": "firmin", "de": "quay_bell", "a": "firmin_house",
-     "par": [[36.5, 18.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
+     "par": [[35.5, 18.5], [35.5, 17.5], [37.5, 17.5], [50.5, 17.5], [50.5, 10.5], [45.5, 10.5], [44.5, 8.5]]},
     {"id": "firmin_home_to_train", "habitant": "firmin", "de": "firmin_house", "a": "train_stop",
      "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [38.5, 17.5]]},
     {"id": "odette_door_to_counter", "habitant": "odette", "de": "grocery_door", "a": "grocery_counter",
@@ -511,9 +512,9 @@ TRAJETS = [
      "par": [[9.5, 10.5], [18.5, 10.5], [18.5, 16.5], [21.5, 16.5], [38.5, 17.5]],
      "note": "jour 8, par le passage à niveau puis le quai"},
     {"id": "jeanne_exit_to_bench", "habitant": "jeanne", "de": "village_exit", "a": "quay_bench",
-     "par": [[61.5, 34.5], [49.5, 34.5], [49.5, 21.5], [41.5, 21.5], [40.5, 20.5]]},
+     "par": [[61.5, 34.5], [49.5, 34.5], [49.5, 21.5], [41.5, 21.5], [40.5, 19.5]]},
     {"id": "jeanne_bench_to_riverbank", "habitant": "jeanne", "de": "quay_bench", "a": "riverbank",
-     "par": [[40.5, 20.5], [37.5, 21.5], [37.5, 34.5], [29.5, 34.5], [29.0, 37.5], [28.0, 37.5]]},
+     "par": [[40.5, 19.5], [40.5, 20.5], [37.5, 21.5], [37.5, 34.5], [29.5, 34.5], [29.0, 37.5], [28.0, 37.5]]},
     {"id": "jeanne_riverbank_to_square", "habitant": "jeanne", "de": "riverbank", "a": "village_square",
      "par": [[28.0, 37.5], [29.0, 37.5], [29.5, 34.5], [37.5, 34.5], [38.5, 30.5]]},
     {"id": "jeanne_square_to_exit", "habitant": "jeanne", "de": "village_square", "a": "village_exit",

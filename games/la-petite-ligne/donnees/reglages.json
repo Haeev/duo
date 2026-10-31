@@ -79,7 +79,7 @@
     ]
   },
   "carry": {
-    "handcar": { "item": "handcar", "from": "handcar_shed", "toOffset": [-6, 4], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
+    "handcar": { "item": "handcar", "from": "handcar_shed", "toOffset": [0, 3], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
     "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" }
   },
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7 },
