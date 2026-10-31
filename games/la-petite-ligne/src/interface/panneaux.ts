@@ -52,6 +52,8 @@ function backKeys(host: UiHost, extra: readonly { keys: readonly string[]; text:
 // Caisse de la coopérative
 
 export class CratePanel extends Panel {
+  private readonly takeBackHint: HTMLSpanElement;
+
   constructor(host: UiHost) {
     const { ctx } = host;
     const time = hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time);
@@ -70,8 +72,10 @@ export class CratePanel extends Panel {
         { keys: [a[0], a[1]], text: ctx.texts.extra.notebook.keysChoose },
         { keys: [ctx.key('Enter')], text: ctx.texts.extra.crate.keysDeposit },
       ]),
-      el('span', { text: ctx.t(ctx.texts.extra.crate.canTakeBack) }),
+      null,
     ]);
+    this.takeBackHint = el('span', { text: ctx.t(ctx.texts.extra.crate.canTakeBack) });
+    this.footer.append(this.takeBackHint);
   }
 
   private deposit(world: ReadonlyWorld, item: string, count: number): void {
@@ -106,6 +110,7 @@ export class CratePanel extends Panel {
     const shipped = shippedIndex < 0 ? undefined : ctx.content.settings.order.trains[shippedIndex];
     const nextComing = shippedIndex >= 0 && shippedIndex + 1 < ctx.content.settings.order.trains.length;
     const orderDay = (shipped ?? currentOrder(ctx.content.settings, world)).day;
+    this.takeBackHint.toggleAttribute('hidden', result !== null);
     this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
     const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));
     const sig = JSON.stringify([lines, result, world.clock.day, recap?.id]);

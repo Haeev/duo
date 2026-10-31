@@ -221,7 +221,7 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
       apply(sim, me, [{ type: 'menu', menu: 'catalogue' }]);
       return;
     case 'carnet2':
-      playUntil(sim, (s) => at(s, 11, 9 * HOUR));
+      playUntil(sim, (s) => s.world.phase === 'day' && s.world.scene === null && s.world.quests.some((q) => q.id === 'handcar' && q.status === 'active'));
       apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
       return;
     case 'nuit2':

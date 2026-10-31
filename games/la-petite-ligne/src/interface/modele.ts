@@ -528,6 +528,20 @@ export interface EndActions {
   done: boolean;
 }
 
+/**
+ * Détail des commandes sous le total de l'écran de fin, quand il y en a eu
+ * plusieurs: « samedi 8 : 4 sur 4 · samedi 15 : 5 sur 5 ». Vide pour une seule.
+ */
+export function ordersDetail(ctx: UiContext, orders: readonly { linesDone: number; linesTotal: number }[]): string {
+  if (orders.length < 2) return '';
+  return orders
+    .map((o, i) => {
+      const day = ctx.content.settings.order.trains[i]?.day ?? 0;
+      return ctx.t(ctx.texts.extra.end.perOrder, { weekday: weekdayOf(day, ctx.texts.weekdays), day, done: o.linesDone, total: o.linesTotal });
+    })
+    .join(' · ');
+}
+
 export function endActions(meReady: boolean, otherReady: boolean): EndActions {
   return { cont: !meReady, waiting: meReady && !otherReady, done: meReady && otherReady };
 }

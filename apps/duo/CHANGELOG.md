@@ -13,5 +13,5 @@ Première préversion de Duo, pour jouer à deux à la démo de La Petite Ligne 
 ### Ajouté
 
 - Duo pour le Mac (puce Apple) et pour le PC Windows, avec un installateur pour chacun.
-- La démo de La Petite Ligne, incluse dans Duo: la première semaine au bourg d'Aubrune, du train de l'arrivée au train du samedi suivant, en environ une heure.
+- La démo de La Petite Ligne, incluse dans Duo: deux semaines au bourg d'Aubrune, du train de l'arrivée à celui du deuxième samedi, en environ deux heures (une heure par semaine), avec la sauvegarde pour la jouer en plusieurs séances.
 - Un ordinateur héberge la partie, l'autre la rejoint, sur le réseau de la maison.

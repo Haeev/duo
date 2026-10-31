@@ -10,7 +10,7 @@ import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICO
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
-import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, outfitTakenByPartner } from './modele';
+import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, ordersDetail, outfitTakenByPartner } from './modele';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -727,6 +727,7 @@ export class EndScreen implements Layer {
   private readonly ticket: HTMLSpanElement;
   private readonly days: HTMLSpanElement;
   private readonly lines: HTMLSpanElement;
+  private readonly linesDetail: HTMLSpanElement;
   private readonly furniture: HTMLSpanElement;
   private readonly counters: HTMLDivElement;
   private readonly self: PlayerCard;
@@ -748,7 +749,10 @@ export class EndScreen implements Layer {
     this.furniture = el('span', { class: 'lpl-counter__value' });
     const counter = (value: HTMLElement, label: string): HTMLDivElement =>
       el('div', { class: 'lpl-counter' }, [value, el('span', { class: 'lpl-counter__label', text: ctx.t(label) })]);
-    this.counters = el('div', { class: 'lpl-counters' }, [counter(this.days, x.days), counter(this.lines, x.lines), counter(this.furniture, x.furniture)]);
+    this.linesDetail = el('span', { class: 'lpl-counter__detail', hidden: true });
+    const linesCounter = counter(this.lines, x.lines);
+    linesCounter.append(this.linesDetail);
+    this.counters = el('div', { class: 'lpl-counters' }, [counter(this.days, x.days), linesCounter, counter(this.furniture, x.furniture)]);
     this.self = new PlayerCard(host, 'self', true);
     this.other = new PlayerCard(host, 'other', true);
     this.cont = button(ctx.t(x.continue), () => {
@@ -794,6 +798,17 @@ export class EndScreen implements Layer {
     setText(this.days, String(days));
     clear(this.lines);
     this.lines.append(String(linesDone), ' ', el('small', { style: 'font-size: var(--lpl-text-lg)', text: ctx.t(x.linesOf, { total: linesTotal }) }));
+    const detail = ordersDetail(ctx, ending?.orders ?? world.orderHistory);
+    if (this.linesDetail.dataset.text !== detail) {
+      // Une commande par morceau insécable: la ligne ne se coupe qu'entre deux commandes.
+      this.linesDetail.dataset.text = detail;
+      clear(this.linesDetail);
+      detail.split(' · ').forEach((part, i) => {
+        if (i > 0) this.linesDetail.append(' · ');
+        this.linesDetail.append(el('span', { class: 'lpl-nowrap', text: part }));
+      });
+    }
+    setHidden(this.linesDetail, detail === '');
     setText(this.furniture, String(furniture));
     // Le récapitulatif de `textes.json` sert de nom accessible aux chiffres.
     setAttr(this.counters, 'aria-label', [

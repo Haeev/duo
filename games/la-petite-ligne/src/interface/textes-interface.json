@@ -391,6 +391,7 @@
     "days": "journées vécues",
     "lines": "lignes des commandes remplies",
     "linesOf": "sur {total}",
+    "perOrder": "{weekday} {day} : {done} sur {total}",
     "furniture": "meubles posés",
     "continue": "Continuer",
     "after": "Ensuite : l'écran de fin de Duo, et la séance dans votre historique.",

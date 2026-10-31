@@ -210,3 +210,14 @@
   min-height: 3rem;
   padding-block: 0.375rem;
 }
+
+/* Écran de fin: le détail des commandes sous le total des lignes. */
+.lpl-counter__detail {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-nowrap {
+  white-space: nowrap;
+}

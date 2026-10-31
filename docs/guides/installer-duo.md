@@ -81,7 +81,7 @@ Si quelqu'un a cliqué sur « Annuler », ou si l'autre ordinateur n'apparaît p
 1. Ouvre Duo sur les deux ordinateurs. La première fois, chacun choisit son pseudo et suit les écrans d'accueil.
 2. Sur un des deux ordinateurs, choisis **La Petite Ligne**, puis clique sur **Héberger une partie**. C'est cet ordinateur qui fait tourner la partie.
 3. Sur l'autre ordinateur, clique sur **Rejoindre** quand l'invitation apparaît.
-4. La démo dure environ une heure: la première semaine au bourg d'Aubrune, jusqu'au train du samedi.
+4. La démo dure environ deux heures: deux semaines au bourg d'Aubrune, jusqu'au train du deuxième samedi. La partie se sauvegarde: vous pouvez jouer une semaine par séance.
 
 Si l'autre ordinateur n'apparaît pas au bout d'une minute: le bouton « Que faire ? » dans Duo, puis [Dépannage du réseau](depannage-reseau.md).
 
