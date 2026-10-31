@@ -4,11 +4,14 @@
  * deux. La poutre (`kind: carry`) est dans `deplacement.ts`.
  */
 import type { ControlFrame } from '../etat/actions';
-import type { Character, CharacterId, ConstructionState } from '../etat/types';
+import type { AimVerb, Character, CharacterId, ConstructionState } from '../etat/types';
 import type { ConstructionDef } from '../donnees/types';
 import { type Sim, distance, emit, format, itemName, notify, point, notifyKey } from './contexte';
 import { spend, durationMultiplier } from './besoins';
 import { payMaterials } from './sac';
+
+/** Gestes d'outil visés devant soi: tant qu'on vise l'un d'eux, l'action tenue ne bâtit pas. */
+const TOOL_VERBS: ReadonlySet<AimVerb> = new Set<AimVerb>(['till', 'sow', 'water', 'harvest', 'dig', 'chop', 'fish']);
 
 function defOf(sim: Sim, id: string): ConstructionDef | undefined {
   return sim.content.constructions.find((c) => c.id === id);
@@ -73,11 +76,17 @@ export function updateConstructions(sim: Sim, frames: Partial<Record<CharacterId
     const holding = frames[c.id]?.actHeld === true && c.status === 'active' && c.crafting === null;
     if (!holding) {
       sim.runtime.holdNotified[c.id] = false;
+      sim.runtime.holdForTool[c.id] = false;
       if (c.action.kind === 'hammer' && c.action.duration === 0) c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
       continue;
     }
     const target = ghostNear(sim, c);
     if (target === null) continue;
+    // Espace tenu pour un geste d'outil (case du potager, arbre, eau) ne lance pas le chantier voisin,
+    // même quand la case bêchée n'a plus rien à faire et que la visée passe au chantier.
+    const aimed = c.aim?.verb ?? null;
+    if (aimed !== null && TOOL_VERBS.has(aimed)) sim.runtime.holdForTool[c.id] = true;
+    if (sim.runtime.holdForTool[c.id]) continue;
     const element = target.state.elements[target.element];
     const elementDef = target.def.elements[target.element];
     if (element === undefined || elementDef === undefined) continue;

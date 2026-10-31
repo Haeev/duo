@@ -135,6 +135,8 @@ describe('règles', () => {
       s.world.constructions = s.world.constructions.filter((k) => k.id !== 'house_roof');
       placeCharacter(s, character(s, 'p1'), door);
       placeCharacter(s, character(s, 'p2'), door);
+      // Face à la porte: dos au potager, où la bêche en main viserait une case à bêcher.
+      for (const c of s.world.characters) c.facing = -Math.PI / 2;
     }
     const held = { seq: 1, moveX: 0, moveY: 0, actHeld: true };
     const idle = { seq: 1, moveX: 0, moveY: 0, actHeld: false };

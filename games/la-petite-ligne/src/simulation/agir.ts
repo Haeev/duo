@@ -130,6 +130,17 @@ const TIER: Record<Target['kind'], number> = {
   cell: 8,
 };
 
+/**
+ * Une case du potager où l'on a quelque chose à faire (bêcher, semer, arroser,
+ * récolter) passe avant les chantiers et les arbres voisins: la porte touche
+ * le potager au nord, le poulailler est juste à l'est.
+ */
+const GARDEN_TIER = TIER.partner;
+
+function tierOf(sim: Sim, t: Target): number {
+  return t.kind === 'cell' && gardenCellAt(sim, t.cell) !== null ? GARDEN_TIER : TIER[t.kind];
+}
+
 function inCone(c: Character, pos: Vec2): boolean {
   const d = distance(c.pos, pos);
   if (d < 0.6) return true;
@@ -184,10 +195,11 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
   const front = frontPoint(c, { x: 0, y: 0 });
   let best: { target: Target; verb: AimVerb | null; tier: number; d: number } | null = null;
   for (const t of candidates(sim, c)) {
-    if (t.kind !== 'cell' && t.kind !== 'construction' && t.kind !== 'place' && !inCone(c, t.pos)) continue;
+    // Un chantier se vise comme le reste, dans le regard (son point peut être derrière soi).
+    if (t.kind !== 'cell' && t.kind !== 'place' && !inCone(c, t.pos)) continue;
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
-    const tier = verb === null ? 99 : TIER[t.kind];
+    const tier = verb === null ? 99 : tierOf(sim, t);
     const d = distance(front, t.pos);
     if (best === null || tier < best.tier || (tier === best.tier && d < best.d)) best = { target: t, verb, tier, d };
   }

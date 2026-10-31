@@ -54,6 +54,8 @@ export interface Runtime {
   beamOffsets: Record<CharacterId, Vec2>;
   /** « Il manque... » déjà dit pendant ce maintien de l'action. */
   holdNotified: Record<CharacterId, boolean>;
+  /** Ce maintien de l'action a servi à un geste d'outil: il ne bâtit pas avant d'être relâché. */
+  holdForTool: Record<CharacterId, boolean>;
 }
 
 export interface Sim {
@@ -78,6 +80,7 @@ export function createRuntime(map: GameMap): Runtime {
     pumping: false,
     beamOffsets: { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } },
     holdNotified: { p1: false, p2: false },
+    holdForTool: { p1: false, p2: false },
   };
 }
 
