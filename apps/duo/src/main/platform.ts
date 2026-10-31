@@ -500,6 +500,10 @@ export class Platform {
           });
         }
         break;
+      case 'quality':
+        // Qualité du lien et heure de session pour le jeu (`duo.net.quality()`, `sessionTimeMs()`).
+        if (this.running !== null) this.gameHost?.send({ type: 'link', ...event.quality });
+        return;
     }
     this.publish();
   }
@@ -583,9 +587,13 @@ export class Platform {
     if (match.phase !== 'loading' && !current.started) {
       current.started = true;
       current.hintUntil = Date.now() + HINT_MS;
-      // Heure de session: Date.now() de cette machine (écart d'horloge 0 dans `init`).
-      // La liaison de dev-reseau fournira l'heure commune et l'écart réel (ADR 0007, point 4).
-      this.gameHost.send({ type: 'start', atSessionMs: Date.now() });
+      // Départ tout de suite, en heure de session: celle de l'hôte, par l'écart que mesure
+      // la liaison (ADR 0007, point 4), sur la même base que le SDK de la page.
+      this.gameHost.send({
+        type: 'start',
+        atSessionMs:
+          performance.timeOrigin + performance.now() + this.deps.liaison.sessionOffsetMs(),
+      });
       this.deps.journal.write('info', 'platform', 'match-start', {
         game: current.game.manifest.id,
       });
@@ -682,11 +690,15 @@ export class Platform {
       local: false,
     };
     const saveSlot = game.manifest.saves === null ? null : 1;
+    // Version de test seulement (ADR 0013): paramètres ajoutés à l'adresse du jeu, par
+    // exemple le rendu léger de La Petite Ligne dans le Chromium logiciel du cloud.
+    const testQuery = DUO_TEST ? (process.env.DUO_TEST_GAME_QUERY ?? '') : '';
+    const entryUrl = `duo-game://${game.manifest.id}/${game.manifest.entry}`;
     void this.loadSave(role, game, salonGame).then((save) => {
       if (this.running?.matchId !== matchId || this.gameHost === null) return;
       this.gameHost.launch(
         game.manifest.id,
-        `duo-game://${game.manifest.id}/${game.manifest.entry}`,
+        testQuery === '' ? entryUrl : `${entryUrl}?${testQuery}`,
         {
           type: 'init',
           bridge: BRIDGE_VERSION,
@@ -699,7 +711,9 @@ export class Platform {
           settings: this.gameSettings(),
           saveSlot: role === 'host' ? saveSlot : null,
           save,
-          clockOffsetMs: 0,
+          // Heure de session = horloge de la page + cet écart (0 chez l'hôte); tenu à jour
+          // ensuite par les messages `link`.
+          clockOffsetMs: this.deps.liaison.sessionOffsetMs(),
         },
         window.contentBounds(),
       );

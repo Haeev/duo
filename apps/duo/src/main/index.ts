@@ -1,6 +1,7 @@
 // Point d'entrée du processus principal (ADR 0003). Ordre imposé: dossier de
 // données (`--duo-data-dir`), puis verrou d'instance unique (pris dans ce
 // dossier), puis protocoles privilégiés, puis tout le reste après `ready`.
+import os from 'node:os';
 import path from 'node:path';
 import {
   BaseWindow,
@@ -25,7 +26,7 @@ import { bridgeCodec } from './game-host/bridge';
 import { GameHost } from './game-host/game-host';
 import { checkIntent } from './ipc-schemas';
 import { createJournal, systemSanitizer, type Journal } from './journal';
-import { DEFAULT_LIAISON_PORT, LocalLiaison } from './liaison/local/local-liaison';
+import { NetworkLiaison } from './liaison/network-liaison';
 import { buildApplicationMenu } from './menu';
 import { Platform } from './platform';
 import { APP_ORIGIN, handleAppProtocol, handleGameProtocol, registerSchemes } from './protocols';
@@ -160,10 +161,19 @@ async function start(): Promise<void> {
   handleGameProtocol(defaultSession, (id) => gameRootById.get(id) ?? null);
   handleGameProtocol(gameSession, (id) => gameRootById.get(id) ?? null);
 
-  const liaison = new LocalLiaison({
-    basePort: options.liaisonPort ?? DEFAULT_LIAISON_PORT,
-    peerAddress: options.peerAddress,
+  for (const option of options.network.invalid) {
+    journal.write('warn', 'app', 'option-invalide', { option: option.split('=')[0] });
+  }
+  // Réseau local de dev-reseau (ADR 0007 et 0008). Rien n'écoute avant l'accord de E03:
+  // `start()` est appelé par `startLiaisonIfAllowed`.
+  const liaison = new NetworkLiaison({
     journal,
+    network: options.network,
+    storePath: path.join(userData, 'reseau.json'),
+    computerName: os.hostname(),
+    electron: process.versions.electron,
+    os: process.platform,
+    arch: process.arch,
   });
 
   const platform = new Platform({
@@ -273,6 +283,7 @@ async function start(): Promise<void> {
     // Crochets de test (ADR 0013): absents des versions publiées.
     (globalThis as { __duoTest?: unknown }).__duoTest = {
       state: () => platform.snapshot(),
+      liaison: () => liaison.stats(),
       dataDir: userData,
       platformView: () => ({
         visible: appWindow?.platformView.getVisible() ?? null,

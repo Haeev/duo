@@ -35,6 +35,15 @@ export interface GameRelayMessage {
   readonly data: string;
 }
 
+/** Qualité du lien, telle que le jeu la reçoit (message `link` du pont, ADR 0005). */
+export interface LinkQualityView {
+  readonly rttMs: number;
+  readonly jitterMs: number;
+  readonly state: 'good' | 'unstable';
+  /** Heure de session = `performance.timeOrigin + performance.now()` locale + cet écart. */
+  readonly clockOffsetMs: number;
+}
+
 export type LiaisonEvent =
   /** Présence: `null` quand l'autre n'est pas visible. */
   | { readonly type: 'peer'; readonly peer: PeerInfo | null }
@@ -43,11 +52,19 @@ export type LiaisonEvent =
   /** État des salons et de la partie, à chaque changement. */
   | { readonly type: 'sessions'; readonly sessions: SessionsView }
   /** Message du jeu de l'autre machine. */
-  | { readonly type: 'game'; readonly message: GameRelayMessage };
+  | { readonly type: 'game'; readonly message: GameRelayMessage }
+  /** Mesure du lien, chaque seconde tant que l'autre est là, et à chaque perte ou retour. */
+  | { readonly type: 'quality'; readonly quality: LinkQualityView };
 
 export type StopReason = 'stopped' | 'crash' | 'load-failed' | 'end';
 
 export interface Liaison {
+  /**
+   * Écart à ajouter à `performance.timeOrigin + performance.now()` de cette machine pour
+   * obtenir l'heure de session: l'horloge de l'hôte du salon ou de la partie en cours
+   * (0 chez l'hôte, l'écart d'horloge mesuré par la liaison chez l'invité).
+   */
+  sessionOffsetMs(): number;
   /** Démarre l'écoute et la recherche de l'autre ordinateur (après l'accord réseau de E03). */
   start(identity: LocalIdentity): Promise<void>;
   /** Prévient l'autre (fermeture propre), puis ferme tout. */

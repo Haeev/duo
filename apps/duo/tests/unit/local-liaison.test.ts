@@ -36,6 +36,9 @@ function probe(basePort: number): Probe {
       case 'game':
         state.games.push(event.message.data);
         break;
+      case 'quality':
+        // La liaison provisoire ne mesure pas le lien.
+        break;
     }
   });
   return state;

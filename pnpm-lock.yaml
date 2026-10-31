@@ -238,6 +238,9 @@ importers:
       '@duo/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@duo/liaison':
+        specifier: workspace:*
+        version: link:../../packages/liaison
       '@duo/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol

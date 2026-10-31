@@ -41,36 +41,45 @@ describe('profils de joueur', () => {
 });
 
 describe('ligne de commande (ADR 0003, point 9)', () => {
-  it('lit le dossier de données, les jeux, le port et l’adresse', () => {
+  it('lit le dossier de données, les jeux, le port, les destinations et la boucle locale', () => {
     const options = parseCommandLine(
       [
         'electron',
         '.',
         '--duo-data-dir=données/Hélène D',
         '--duo-games-dir=/jeux',
-        '--duo-liaison-port=41000',
-        '--duo-peer-address=192.168.1.42:39430',
+        '--duo-port=41000',
+        '--duo-peer=192.168.1.42:39420',
+        '--duo-peer=127.0.0.1:41010',
+        '--duo-allow-loopback',
       ],
       '/base',
     );
     expect(options).toEqual({
       dataDir: path.resolve('/base', 'données/Hélène D'),
       gamesDir: path.resolve('/jeux'),
-      liaisonPort: 41000,
-      peerAddress: { host: '192.168.1.42', port: 39430 },
+      network: {
+        port: 41000,
+        peers: [
+          { host: '192.168.1.42', port: 39420 },
+          { host: '127.0.0.1', port: 41010 },
+        ],
+        allowLoopback: true,
+        invalid: [],
+      },
     });
   });
 
-  it('ignore les valeurs invalides', () => {
-    const options = parseCommandLine(
-      ['--duo-liaison-port=80', '--duo-peer-address=pas une adresse'],
-      '/',
-    );
+  it('ignore les valeurs invalides et les signale', () => {
+    const options = parseCommandLine(['--duo-port=80', '--duo-peer=pas une adresse'], '/');
     expect(options).toEqual({
       dataDir: null,
       gamesDir: null,
-      liaisonPort: null,
-      peerAddress: null,
+      network: {
+        peers: [],
+        allowLoopback: false,
+        invalid: ['--duo-port=80', '--duo-peer=pas une adresse'],
+      },
     });
   });
 });

@@ -183,6 +183,11 @@ export class LocalLiaison implements Liaison {
     this.link?.send({ t: 'profile', profile });
   }
 
+  /** Liaison provisoire: chaque machine garde son horloge (écart nul). */
+  sessionOffsetMs(): number {
+    return 0;
+  }
+
   subscribe(listener: (event: LiaisonEvent) => void): () => void {
     this.listeners.add(listener);
     return () => {

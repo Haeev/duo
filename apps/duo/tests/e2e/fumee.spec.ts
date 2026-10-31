@@ -13,7 +13,7 @@ function localDay(): string {
 
 test('Duo démarre, le premier lancement mène à l’accueil', async () => {
   const dataDir = await tempDataDir('fumée');
-  const duo = await launchDuo({ dataDir, liaisonPort: 41230 });
+  const duo = await launchDuo({ dataDir, port: 41230 });
   try {
     const { platform } = duo;
     await expect(platform.getByTestId('ecran-bienvenue')).toBeVisible();
