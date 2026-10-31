@@ -50,3 +50,8 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Les écrans superposés au jeu vivent dans une vue web séparée: un `backdrop-filter` n'y verrait pas le jeu. Retenu: voile `--color-scrim` (72 %) sur le jeu figé, panneau opaque.
 - Profils de joueur de l'identité B: astre aqua, croissant mauve, étoile anis, soleil corail, planète rose, comète jade (identifiants `orb`, `crescent`, `star`, `sun`, `planet`, `comet`). Le cahier (F01) citait encore « rond, carré, triangle, losange, étoile, hexagone » au 2026-10-30.
 - Vignettes de jeux fictives (2D en pixels, 3D en facettes, isométrique): `design/identite/b/planches/vignettes.svg`, identiques aux planches des pistes.
+
+## Captures sous charge (gauntlet, 2026-10-31)
+
+- Sous charge (rendu logiciel, plusieurs relecteurs en parallèle), le délai par défaut de 30 s de `page.screenshot` ne suffit pas: passer `timeout` explicitement.
+- Réduire les couleurs d'une capture sans tramage crée de faux anneaux sur les halos de nuit: utiliser `-dither FloydSteinberg` avec ImageMagick.
