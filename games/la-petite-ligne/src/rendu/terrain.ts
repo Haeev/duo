@@ -159,6 +159,15 @@ export class Terrain {
   }
 
   /** Hauteur du sol sous un point (pour poser personnages, objets et décor). */
+  /** Hauteur de la surface de l'eau dessinée sous un point, ou `null` hors de l'eau (bouchon, ronds dans l'eau). */
+  waterLevelAt(x: number, y: number): number | null {
+    const look = this.look(Math.floor(x), Math.floor(y));
+    if (look.kind !== 'water') {
+      return null;
+    }
+    return look.ford ? SETTINGS.fordBed + SETTINGS.waveAmplitude * 2 : SETTINGS.waterSurface;
+  }
+
   heightAt(x: number, y: number): number {
     for (const rect of this.floorRects) {
       if (inRect(rect, x, y)) {

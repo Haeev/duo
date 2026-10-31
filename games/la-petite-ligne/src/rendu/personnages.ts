@@ -21,6 +21,7 @@ import {
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type {
+  WorldEvent,
   ActionKind,
   Character,
   CharacterId,
@@ -69,6 +70,14 @@ const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
 const PLAYER_ROW = 0;
 const VECTOR_SIZE = 3;
+/** Bout de la canne à pêche de l'artiste, dans le repère de la prise (main droite). */
+const ROD_TIP = new Vector3(0.01, 1.34, 1.51);
+/** Le lancer reprend le geste de la hache (bras au-dessus de la tête), le temps d'un geste. */
+const CAST_CLIP = 'chop';
+const CAST_SECONDS = 0.9;
+/** Touche: le bras tendu de l'arrosage, comme une canne qui tire. */
+const BITE_CLIP = 'water';
+const ROD_ITEM = 'fishing_rod';
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
@@ -204,6 +213,17 @@ class CharacterFigure {
     this.current?.fadeOut(SETTINGS.crossFadeSeconds);
     this.current = action;
     this.currentName = clip.name;
+  }
+
+  /** Position (monde) d'un point de l'outil tenu, dans le repère de l'outil; `false` sans outil. */
+  toolPoint(local: Vector3, out: Vector3): boolean {
+    if (this.tool === null) {
+      return false;
+    }
+    this.tool.updateWorldMatrix(true, false);
+    out.copy(local);
+    this.tool.localToWorld(out);
+    return true;
   }
 
   setTool(library: ModelLibrary, model: string | null): void {
@@ -392,6 +412,21 @@ export class CharactersPart implements EventfulPart {
     }
   }
 
+  /** Moment du dernier lancer de chaque joueur (pose de pêche composée avec les animations existantes). */
+  private readonly castAt = new Map<CharacterId, number>();
+  private time = 0;
+
+  handleEvent(event: WorldEvent): void {
+    if (event.type === 'cast') {
+      this.castAt.set(event.by, this.time);
+    }
+  }
+
+  /** Bout de la canne d'un joueur (pour la ligne), `false` s'il ne tient rien. */
+  rodTip(id: CharacterId, out: Vector3): boolean {
+    return this.players.get(id)?.figure.toolPoint(ROD_TIP, out) ?? false;
+  }
+
   /** Position affichée d'un joueur (pour les effets: objet qui saute au sac). */
   playerPosition(id: CharacterId): Object3D | null {
     return this.players.get(id)?.figure.root ?? null;
@@ -511,6 +546,7 @@ export class CharactersPart implements EventfulPart {
   }
 
   update(context: FrameContext): void {
+    this.time = context.time;
     const world: ReadonlyWorld = context.world;
     for (const character of world.characters) {
       let entry = this.players.get(character.id);
@@ -521,7 +557,12 @@ export class CharactersPart implements EventfulPart {
       this.dress(entry, character);
       const moving = character.speed > SETTINGS.walkThreshold;
       const kind: ActionKind = character.status === 'sleeping' ? 'sleep' : character.action.kind;
-      const clip = moving && kind !== 'carry' ? 'walk' : CLIP_FOR_ACTION[kind];
+      // Pêche: pas d'animation dédiée chez l'artiste, on compose (lancer, attente, touche).
+      const castAt = this.castAt.get(character.id);
+      const casting = castAt !== undefined && context.time - castAt < CAST_SECONDS;
+      const fishing = character.fishing !== null || casting;
+      const fishingClip = casting ? CAST_CLIP : character.fishing?.phase === 'bite' ? BITE_CLIP : 'idle';
+      const clip = moving && kind !== 'carry' ? 'walk' : fishing ? fishingClip : CLIP_FOR_ACTION[kind];
       const timeScale =
         clip === 'walk' || clip === 'carry_two'
           ? Math.min(
@@ -546,7 +587,8 @@ export class CharactersPart implements EventfulPart {
         definition !== undefined &&
         !HANDS_FREE.has(kind) &&
         (definition.category === 'tool' || (definition.category === 'seed' && kind === 'sow'));
-      entry.figure.setTool(this.library, showTool ? definition.model : null);
+      const rod = this.content.items[ROD_ITEM]?.model ?? ROD_ITEM;
+      entry.figure.setTool(this.library, fishing && !moving ? rod : showTool ? definition.model : null);
     }
     for (const villager of world.villagers) {
       let figure = this.villagers.get(villager.id);

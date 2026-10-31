@@ -7,7 +7,9 @@
  * rain), `orientation` (0 à 3), `zoom` (0 à 2), `interieur` (1), `repare` (1),
  * `train` (away, arriving, stopped, departing), `vie` (0 fige la promenade),
  * `panneau` (1 montre les réglages), `x` et `y` (point de vue), `rendu=leger`
- * (mode léger, comme le jeu), `cycles` (essai d'endurance).
+ * (mode léger, comme le jeu), `cycles` (essai d'endurance), `repere=1`,
+ * `peche=attente|touche`, `absent=1` (signes P1). Touches: G repère, J lancer,
+ * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
 import { loadContent } from '../../donnees/contenu';
@@ -27,6 +29,8 @@ const DEMO_MINUTES_PER_SECOND = 12;
 const MINUTES_PER_DAY = 1440;
 const WALK_SPEED = 3.5;
 const ENDURANCE_FRAMES = 30;
+/** Durée d'un repère (15 s) à 30 pas par seconde. */
+const PIN_TICKS = 450;
 const ENDURANCE_FPS = 60;
 const KEY_TO_COMMAND: Record<string, CameraCommand> = {
   KeyQ: 'rotate_left',
@@ -90,6 +94,10 @@ async function main(): Promise<void> {
       params.get('train') === 'departing'
         ? (params.get('train') as 'away' | 'arriving' | 'departing')
         : 'stopped',
+    pin: params.get('repere') === '1',
+    fishing:
+      params.get('peche') === 'touche' ? 'bite' : params.get('peche') === 'attente' ? 'waiting' : 'none',
+    absent: params.get('absent') === '1',
   };
   const world = createExampleWorld(map, content, options);
   const focusX = Number(params.get('x'));
@@ -212,6 +220,24 @@ async function main(): Promise<void> {
         tree.lastHitTick = world.tick;
         tree.felled = tree.hits >= 3;
         emit({ type: 'chop', by: 'p1', tree: tree.id, felled: tree.felled });
+      }
+    } else if (event.code === 'KeyG') {
+      const pos = { x: me.pos.x + Math.cos(me.facing) * 2, y: me.pos.y + Math.sin(me.facing) * 2 };
+      me.pin = { pos, since: world.tick, until: world.tick + PIN_TICKS };
+      emit({ type: 'pin', by: 'p1', pos });
+    } else if (event.code === 'KeyJ' || event.code === 'KeyK' || event.code === 'KeyL') {
+      const angler = world.characters[1];
+      const line = angler?.fishing ?? null;
+      if (angler !== undefined && line !== null) {
+        if (event.code === 'KeyJ') {
+          emit({ type: 'cast', by: 'p2', at: { ...line.bobber } });
+        } else if (event.code === 'KeyK') {
+          angler.fishing = null;
+          emit({ type: 'caught', by: 'p2', item: 'trout' });
+        } else {
+          angler.fishing = null;
+          emit({ type: 'escaped', by: 'p2' });
+        }
       }
     } else if (event.code === 'KeyC') {
       emit({ type: 'element_built', construction: 'house_roof', element: 'roof_4' });

@@ -116,6 +116,9 @@ export async function startDuo(
   const errors: string[] = [];
   for (const [who, page] of [['hôte', host], ['invité', guest]] as const) {
     page.on('pageerror', (e) => errors.push(`${who}: ${e.message}`));
+    page.on('response', (r) => {
+      if (r.status() >= 400) errors.push(`${who} HTTP ${r.status()}: ${r.url()}`);
+    });
     page.on('console', (m) => {
       if (m.type() === 'error') errors.push(`${who} console: ${m.text()}`);
     });

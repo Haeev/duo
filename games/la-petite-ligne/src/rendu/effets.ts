@@ -62,6 +62,10 @@ const BELL_FIRST_MINUTE = 17 * 60;
 const BELL_LAST_MINUTE = 17 * 60 + 30;
 const BELL_SPARKLE_EVERY = 0.6;
 const BELL_RING_OPACITY = 0.35;
+const RIPPLE_POOL = 8;
+const RIPPLE_START = 0.6;
+const RIPPLE_GROWTH = 2.4;
+const RIPPLE_OPACITY = 0.8;
 /** Générateur de Park et Miller (décor seulement). */
 const PM_MULTIPLIER = 16807;
 const PM_MODULUS = 2147483647;
@@ -332,6 +336,8 @@ export class EffectsPart implements EventfulPart {
   private readonly highlightMaterial: MeshBasicMaterial;
   private readonly marker: Mesh;
   private readonly markerMaterial: MeshBasicMaterial;
+  private readonly ripples: { mesh: Mesh; material: MeshBasicMaterial; start: number; seconds: number }[] = [];
+  private nextRipple = 0;
   private markerStart = Number.NEGATIVE_INFINITY;
   private markerKey = '';
   private readonly bellRing: Mesh;
@@ -445,6 +451,23 @@ export class EffectsPart implements EventfulPart {
     this.rain.visible = false;
 
     this.group.add(this.highlight, this.marker, this.bellRing, this.rain);
+    // Ronds dans l'eau et ondes au sol: une petite réserve d'anneaux réutilisés.
+    for (let i = 0; i < RIPPLE_POOL; i += 1) {
+      const material = resources.track(
+        new MeshBasicMaterial({
+          map: materials.paletteTexture,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+        }),
+      );
+      const mesh = new Mesh(ring, material);
+      mesh.name = 'rond';
+      mesh.visible = false;
+      mesh.renderOrder = 3;
+      this.ripples.push({ mesh, material, start: Number.NEGATIVE_INFINITY, seconds: 1 });
+      this.group.add(mesh);
+    }
   }
 
   private cellCenter(cell: { cx: number; cy: number }, out: Vector3): Vector3 {
@@ -458,7 +481,7 @@ export class EffectsPart implements EventfulPart {
     );
   }
 
-  private jump(
+  jump(
     item: string,
     from: Vector3,
     to: CharacterId,
@@ -559,8 +582,33 @@ export class EffectsPart implements EventfulPart {
     }
   }
 
+  /** Rond qui s'élargit et s'efface (eau qui reçoit le bouchon, touche, poisson qui s'échappe). */
+  ripple(x: number, y: number, z: number, color: string, seconds: number): void {
+    const ripple = this.ripples[this.nextRipple];
+    this.nextRipple = (this.nextRipple + 1) % this.ripples.length;
+    if (ripple === undefined) {
+      return;
+    }
+    ripple.mesh.position.set(x, y, z);
+    ripple.material.color.set(color);
+    ripple.start = this.time;
+    ripple.seconds = seconds;
+  }
+
+  private updateRipples(): void {
+    for (const ripple of this.ripples) {
+      const t = (this.time - ripple.start) / ripple.seconds;
+      ripple.mesh.visible = t >= 0 && t < 1;
+      if (ripple.mesh.visible) {
+        ripple.mesh.scale.setScalar(RIPPLE_START + t * RIPPLE_GROWTH);
+        ripple.material.opacity = (1 - t) * RIPPLE_OPACITY;
+      }
+    }
+  }
+
   update(context: FrameContext): void {
     this.time = context.time;
+    this.updateRipples();
     this.updateJumps(context);
     this.updateHighlight(context);
     this.updateMarker(context);

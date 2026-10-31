@@ -42,6 +42,8 @@ import { GardenPart } from './potager';
 import { FarmLifePart } from './vie';
 import { EffectsPart } from './effets';
 import { RailwayPart } from './voie';
+import { FishingPart } from './peche';
+import { SignsPart } from './signes';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
@@ -264,6 +266,11 @@ export class RenderEngine implements Renderer {
     );
     this.scene.add(effects.group);
     world.add(effects);
+    const fishing = new FishingPart(materials, terrain, this.resources, characters, effects);
+    const signs = new SignsPart(materials, terrain, this.resources);
+    this.scene.add(fishing.group, signs.group);
+    world.add(fishing);
+    world.add(signs);
     const railway = new RailwayPart(
       map,
       library,

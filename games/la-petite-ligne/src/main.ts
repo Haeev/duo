@@ -21,8 +21,6 @@ import type { Robot } from './simulation/robot';
 /** Attente maximale du premier état chez l'invité avant de se déclarer prêt (ms). */
 const GUEST_WORLD_WAIT_MS = 5000;
 const POLL_MS = 50;
-/** Mode léger: taille du canevas, en pourcentage de la fenêtre. */
-const LIGHT_SCALE_PERCENT = 50;
 /** Part du chargement réservée au rendu (le reste: contenu et séance). */
 const RENDER_LOAD_SHARE = 0.9;
 
@@ -102,14 +100,6 @@ async function main(): Promise<void> {
   });
 
   const quality = renderQuality();
-  if (quality === 'light') {
-    // En attendant le mode léger du rendu: canevas à la moitié de la taille, agrandi en CSS
-    // (quatre fois moins de pixels à calculer). `pick` suit, le rendu lisant la taille affichée.
-    container.style.width = `${LIGHT_SCALE_PERCENT}%`;
-    container.style.height = `${LIGHT_SCALE_PERCENT}%`;
-    container.style.transformOrigin = '0 0';
-    container.style.transform = `scale(${100 / LIGHT_SCALE_PERCENT})`;
-  }
 
   const setup = async (): Promise<void> => {
     const r = createRenderer({ view, container, reducedMotion: duo.ui.reducedMotion, quality });

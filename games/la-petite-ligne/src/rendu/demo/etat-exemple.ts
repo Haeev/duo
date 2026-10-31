@@ -59,7 +59,18 @@ export interface DemoOptions {
   /** Toit et porte construits, poulailler réparé. */
   repaired: boolean;
   train: WorldState['train']['phase'];
+  /** Repère planté par Camille (P1). */
+  pin: boolean;
+  /** Sacha pêche au gué (P1): rien, en attente, ou une touche. */
+  fishing: 'none' | 'waiting' | 'bite';
+  /** Sacha est absent (P1): assis, auréole douce. */
+  absent: boolean;
 }
+
+/** Durée d'un repère à 30 pas par seconde (15 s, comme la simulation). */
+const PIN_TICKS = 450;
+/** Le bouchon se pose à cette distance devant le pêcheur (m). */
+const CAST_DISTANCE = 3;
 
 function point(
   map: GameMap,
@@ -264,6 +275,29 @@ export function createExampleWorld(
   ];
   world.villagers = villagers;
   world.hens = hens;
+  if (options.pin) {
+    p1.pin = { pos: { x: door.x + 3.5, y: door.y + 4.5 }, since: 0, until: PIN_TICKS };
+  }
+  if (options.fishing !== 'none' || options.absent) {
+    const bank = point(map, 'fishing_ford_north', 21.5, 37.5);
+    p2.pos = { ...bank };
+    p2.prev = { ...bank };
+    p2.facing = Math.PI / 2;
+    p2.bag[0] = { item: 'fishing_rod', quality: 'ordinary', count: 1 };
+    p2.action = { kind: 'idle', since: 0, duration: 0, target: null };
+    if (options.fishing !== 'none') {
+      p2.fishing = {
+        phase: options.fishing,
+        bobber: { x: bank.x, y: bank.y + CAST_DISTANCE },
+        biteAt: 0,
+        until: PIN_TICKS,
+      };
+    }
+    if (options.absent) {
+      p2.absent = true;
+      p2.action = { kind: 'sit', since: 0, duration: 0, target: null };
+    }
+  }
   world.train = {
     phase: options.train,
     progress: options.train === 'stopped' ? 1 : 0.5,

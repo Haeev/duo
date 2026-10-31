@@ -136,6 +136,8 @@ class GameUi implements GameInterface, UiHost {
       this.onEvent(event);
     });
     this.cleanups.push(off);
+    // Premier dessin tout de suite: aucun HUD vide pendant le chargement de la plateforme.
+    this.frame();
   }
 
   private listen<K extends keyof HTMLElementEventMap>(
