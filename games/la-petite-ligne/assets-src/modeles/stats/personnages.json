@@ -114,8 +114,28 @@
    "name": "high_five",
    "seconds": 0.8,
    "loop": false
+  },
+  {
+   "name": "fish_wait",
+   "seconds": 3.0,
+   "loop": true
+  },
+  {
+   "name": "fish_cast",
+   "seconds": 1.0,
+   "loop": false
+  },
+  {
+   "name": "fish_strike",
+   "seconds": 1.6,
+   "loop": false
+  },
+  {
+   "name": "sit_ground",
+   "seconds": 3.0,
+   "loop": true
   }
  ],
- "file_bytes": 2293444,
+ "file_bytes": 2345640,
  "player_example_tris": 2192
 }

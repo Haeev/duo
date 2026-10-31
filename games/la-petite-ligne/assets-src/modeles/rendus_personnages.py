@@ -164,13 +164,18 @@ def expressions():
 
 TOOLS = {"hoe": "hoe", "water": "watering_can", "chop": "axe", "saw": "saw", "hammer": "hammer",
          "sow": "seed_packet_radish", "eat": "bread", "sit_eat": "dish_soup", "harvest": "radish",
-         "give": "egg", "talk": None, "pet": None}
+         "give": "egg", "talk": None, "pet": None, "fish_wait": "fishing_rod", "fish_cast": "fishing_rod",
+         "fish_strike": "fishing_rod"}
 POSE_FRAMES = {"idle": 30, "walk": 0, "carry_two": 6, "hoe": 16, "sow": 12, "water": 20, "harvest": 15,
                "chop": 12, "saw": 9, "hammer": 0, "talk": 15, "give": 15, "sit": 0, "eat": 12, "sit_eat": 12,
-               "sleep": 0, "wave": 8, "pet": 0, "high_five": 10}
+               "sleep": 0, "wave": 8, "pet": 0, "high_five": 10, "fish_wait": 0, "fish_cast": 10,
+               "fish_strike": 5, "sit_ground": 0}
+# planche de la pêche et de l'absence: plusieurs images par animation
+PECHE = [("fish_wait", 0), ("fish_cast", 10), ("fish_cast", 14), ("fish_cast", 18), ("fish_strike", 5),
+         ("fish_strike", 21), ("sit_ground", 0), ("sit_ground", 45)]
 
 
-def poses():
+def poses(liste=None, sortie="personnages-poses.png", cols=7):
     """Une vignette par animation (image clé caractéristique), outil en main, assemblées en planche."""
     from PIL import Image, ImageDraw, ImageFont
     base_scene()
@@ -186,8 +191,9 @@ def poses():
         for ob in set(bpy.data.objects) - before:
             ob.hide_render = True
             tools[ob.name] = ob
-    acts = [a for a in bpy.data.actions if a.name in POSE_FRAMES]
-    acts.sort(key=lambda a: list(POSE_FRAMES).index(a.name))
+    if liste is None:
+        liste = list(POSE_FRAMES.items())
+    acts = [(bpy.data.actions[n], f) for n, f in liste]
     parts = ["player_base", "player_outfit_work", "player_hair_short", "player_scarf_orb"]
     objs = clone_character(parts, (0, 0, 0), 0)
     r2 = objs[0]
@@ -195,7 +201,7 @@ def poses():
     sock = bpy.data.objects["socket_hand_r"]
     lpl.persp_camera((2.3, -3.3, 1.75), (0, 0, 0.82), lens=34)
     tiles = []
-    for act in acts:
+    for act, frame in acts:
         held = []
         tname = TOOLS.get(act.name)
         if act.name == "carry_two":
@@ -221,13 +227,12 @@ def poses():
             held.append(t)
         ad.action = act
         ad.action_slot = act.slots[0]
-        sc.frame_set(POSE_FRAMES[act.name])
-        out = os.path.join(lpl.BOARDS, "_pose_" + act.name + ".png")
+        sc.frame_set(frame)
+        out = os.path.join(lpl.BOARDS, f"_pose_{act.name}_{frame}.png")
         lpl.render(out)
-        tiles.append((act.name, out))
+        tiles.append((act.name if liste is None or len({n for n, _ in liste}) == len(liste) else f"{act.name} {frame}", out))
         for t in held:
             bpy.data.objects.remove(t, do_unlink=True)
-    cols = 7
     tw, th = 420, 460
     rows = (len(tiles) + cols - 1) // cols
     sheet = Image.new("RGB", (cols * tw, rows * th), (230, 236, 240))
@@ -242,7 +247,7 @@ def poses():
         sheet.paste(im, (x, y))
         dr.text((x + 12, y + 10), name, fill=(30, 30, 36), font=font)
         os.remove(path)
-    sheet.save(os.path.join(lpl.BOARDS, "personnages-poses.png"))
+    sheet.save(os.path.join(lpl.BOARDS, sortie))
 
 
 if __name__ == "__main__":
@@ -253,3 +258,5 @@ if __name__ == "__main__":
         expressions()
     if what in ("poses", "tout"):
         poses()
+    if what in ("peche", "tout"):
+        poses(PECHE, "personnages-peche.png", cols=4)

@@ -338,7 +338,7 @@ export const AMBIANCE_SETTINGS = {
       // Bible: soleil voilé à 0,4, ciel gris doux #B9C4CC, sol arrosé partout.
       sunFactor: 0.4,
       shadowFactor: 0.22,
-      hemiFactor: 1.04,
+      hemiFactor: 1.2,
       tint: '#b9c4cc',
       tintAmount: 0.55,
       desaturate: 0.4,
@@ -481,9 +481,9 @@ export const AMBIANCE_SETTINGS = {
     foamBands: 9,
     foamAmount: 0.75,
     /** Étincelles du soleil: finesse du motif (fois les rides), vitesse, seuil du bruit, force; et la part de la lune la nuit. */
-    glintScale: 3.5,
+    glintScale: 5,
     glintSpeed: 2.5,
-    glintThreshold: 0.8,
+    glintThreshold: 0.93,
     glintStrength: 2.4,
     moonGlint: 0.35,
     /** Vaguelettes de la surface (m) et leur vitesse. */
@@ -492,8 +492,8 @@ export const AMBIANCE_SETTINGS = {
     waveLength: 3.2,
     /** Lame d'eau sur les galets du gué: hauteur au-dessus du gravier et opacité. */
     fordLift: 0.05,
-    fordOpacity: 0.4,
-    fordFoam: 0.3,
+    fordOpacity: 0.3,
+    fordFoam: 0.2,
     /** Rugosité de la surface (reflet du soleil). */
     roughness: 0.14,
   },
@@ -544,13 +544,17 @@ export const AMBIANCE_SETTINGS = {
     },
     /** Arrosage: gouttes qui tombent du bec, éclaboussure sur la terre. */
     water: {
-      count: 12,
+      count: 14,
       seconds: 0.6,
-      size: 0.05,
+      size: 0.07,
       speed: 1.2,
       up: 1.4,
-      color: '#cfe8f0',
-      opacity: 0.85,
+      color: '#bfe3f2',
+      opacity: 0.9,
+      /** Rond d'eau qui s'étale sur la terre (rayon final en m, durée en s). */
+      ringRadius: 0.45,
+      ringSeconds: 0.55,
+      ringOpacity: 0.55,
     },
     /** Bêche: petit nuage de poussière de terre. */
     dust: {

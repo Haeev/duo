@@ -14,7 +14,7 @@
     "linesOf": "{done} lignes sur {total}",
     "lineOf": "{done} ligne sur {total}",
     "missingMoney": "Il manque {missing} sous.",
-    "playersLabel": "Les deux joueurs",
+    "playersLabel": "Vous deux",
     "inBag": "{count} dans ton sac",
     "noneInBag": "Aucun dans ton sac",
     "fine": "belle",
@@ -51,7 +51,7 @@
     "edit": "Modifier mon personnage",
     "trainArriving": "Le train entre en gare…",
     "partnerChoosing": "Choisit sa tenue…",
-    "together": "Chacun crée son personnage sur son ordinateur, en même temps.",
+    "together": "Vous créez vos personnages en même temps, sur les deux ordinateurs.",
     "letterWaiting": "Une lettre t'attend",
     "letterStamp": "Coopérative de la ligne",
     "profiles": {
@@ -95,7 +95,7 @@
     "stopped": {
       "scene": "Scène à deux · l'horloge est arrêtée",
       "veillee": "Veillée · l'horloge est arrêtée",
-      "both_busy": "Vous êtes tous les deux occupés · l'horloge attend",
+      "both_busy": "Menus ouverts des deux côtés · l'horloge attend",
       "midnight": "Minuit · l'horloge attend que vous dormiez",
       "absence": "L'horloge attend {partner}."
     },
@@ -169,7 +169,7 @@
   "dialogue": {
     "sceneChip": "Scène à deux",
     "partnerChoice": "Choix de {partner}",
-    "sceneHelp": "Chacun choisit sa réplique. {partner} verra la tienne.",
+    "sceneHelp": "Choisis ta réplique. {partner} verra la tienne.",
     "partnerChose": "{partner} a choisi. À toi.",
     "partnerChoosing": "{partner} choisit sa réplique…",
     "replies": "{villager} répond à {first}, puis à {second}.",
@@ -320,7 +320,7 @@
   },
   "chest": {
     "title": "Le coffre de la maison",
-    "subtitle": "Le cellier commun : ce que l'un range, l'autre peut le prendre.",
+    "subtitle": "Le cellier commun : ce qui y est rangé sert à vous deux.",
     "inChest": "Dans le coffre",
     "inBag": "Dans ton sac",
     "take": "Prendre",
@@ -373,7 +373,7 @@
     "partnerContinueHelp": "Choisis « Continuer » à ton tour pour passer au matin.",
     "over": "La séance est finie. Le monde vous attend tel quel : {weekday} {day}, {time}, au petit-déjeuner.",
     "saved": "Progression enregistrée. Retour au salon de Duo…",
-    "choicesLabel": "Choix des deux joueurs"
+    "choicesLabel": "Vos deux choix"
   },
   "end": {
     "ticket": "Samedi {day}, {time} · le train est reparti",

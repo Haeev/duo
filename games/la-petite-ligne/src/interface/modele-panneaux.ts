@@ -405,7 +405,15 @@ export interface ProposalModel {
   byName: string;
 }
 
+/**
+ * « un matelas »: le champ `indefinite` de l'objet dans `objets.json`
+ * (demande 12), sinon l'article des textes de l'interface, sinon le nom seul.
+ */
 export function indefiniteItem(ctx: UiContext, item: string): string {
+  const def: unknown = ctx.content.items[item];
+  // Lu à l'exécution: le champ arrive dans le schéma du contenu en même temps que dans les données.
+  const fromData = typeof def === 'object' && def !== null ? (def as Readonly<Record<string, unknown>>).indefinite : undefined;
+  if (typeof fromData === 'string' && fromData.trim() !== '') return fromData;
   return ctx.texts.extra.proposal.indefinite[item] ?? itemName(ctx.content.items[item], 1, item);
 }
 

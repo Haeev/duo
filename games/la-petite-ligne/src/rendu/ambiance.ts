@@ -53,6 +53,8 @@ const DUST_LIFT = 0.15;
 const STAR_LIFT = 0.25;
 const STAR_SPREAD = 0.35;
 const WHISTLE_RISE = 1.6;
+/** Le rond d'eau flotte juste au-dessus des billons de la case bêchée. */
+const RING_LIFT = 0.08;
 
 /** Lame d'eau posée sur les cases du gué. */
 function buildFord(cells: readonly { cx: number; cy: number }[], height: number): BufferGeometry {
@@ -212,6 +214,7 @@ export class AmbiancePart implements ExtensionPart {
     } else if (event.type === 'watered') {
       this.cellCentre(event.cell);
       this.waterDrops();
+      this.waterRing();
     } else if (event.type === 'tilled' || event.type === 'dig') {
       this.cellCentre(event.cell);
       this.dust();
@@ -255,6 +258,32 @@ export class AmbiancePart implements ExtensionPart {
         this.time,
       );
     }
+  }
+
+  /** Rond d'eau qui s'étale sur la case arrosée. */
+  private waterRing(): void {
+    const w = AMBIANCE_SETTINGS.puffs.water;
+    this.puffs.emit(
+      {
+        x: this.at.x,
+        y: this.at.y + RING_LIFT,
+        z: this.at.z,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        ax: 0,
+        ay: 0,
+        az: 0,
+        drag: 0,
+        life: w.ringSeconds,
+        startSize: w.ringRadius,
+        endSize: w.ringRadius,
+        shape: PARTICLE_SHAPE.ring,
+        color: this.colors.water,
+        opacity: w.ringOpacity,
+      },
+      this.time,
+    );
   }
 
   private dust(): void {

@@ -6,11 +6,6 @@
  * d'opacité seulement.
  */
 
-/* Correctif de composants.css: le remplissage de l'endurance est un span en ligne, sans largeur. */
-.lpl-stamina__fill {
-  display: block;
-}
-
 /* Pendant un panneau du jeu, le HUD ne garde que le haut gauche (horloge, bourse, notifications) et l'autre joueur (carnet.html). */
 .lpl-hud[data-state='panel'] .lpl-objective,
 .lpl-hud[data-state='panel'] .lpl-hud__bottom,

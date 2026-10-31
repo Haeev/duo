@@ -8,7 +8,7 @@ Tout reconstruire (environ 6 minutes, planches comprises): `bash games/la-petite
 
 | Fichier | Contenu | Animations |
 |---|---|---|
-| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 19 clips sur le squelette |
+| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 23 clips sur le squelette |
 | `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature, rivière | aucune (pièces mobiles en nœuds à part) |
 | `ferme.glb` | cases du potager, cultures (4 stades), récoltes, sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
@@ -42,6 +42,8 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
   - `sleep`: allongé sur le dos, dos à 0,5 m (lit double); tête vers -Z, pieds vers +Z, comme le lit. Paillasse (`sleep_height` 0,15): abaisser le personnage de 0,35 m. Mettre `blink` à 1.
   - `give` et `high_five` se jouent une fois (`LoopOnce`, `clampWhenFinished`); les autres bouclent.
   - P1 de la démo déjà faits: `pet` (caresser une poule, accroupi), `high_five`, `sit` sur le banc (assise du banc 0,45 m).
+  - Pêche, canne `fishing_rod` sous `socket_hand_r`: `fish_cast` (lancer en 1 s, une fois: armé derrière la tête à 0,33 s, canne verticale à 0,47 s, lâcher vers l'avant à 0,6 s, retour à l'attente), `fish_wait` (attente en boucle, canne devant à environ 40 degrés), `fish_strike` (ferrer puis mouliner, 1,6 s, une fois, finit sur la pose d'attente). Les trois commencent et finissent sur la même pose: on enchaîne sans saut.
+  - `sit_ground`: assis par terre en boucle, bassin au sol, genoux levés, bras autour des jambes (absence, veillée sur la paillasse: poser le personnage sur le dessus de la paillasse, 0,15 m).
 
 ## Bâtiments et pièces mobiles
 
@@ -63,6 +65,11 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 - Longueurs hors tampons (extra `length_over_buffers`): locomotive 7,4 m, voiture 9,0 m, fourgon 7,0 m.
 - `locomotive_smoke`: nœud vide au sommet de la cheminée, point d'émission du panache (technical artist).
 
+## Pêche (`ferme.glb`)
+
+- `fishing_rod`: origine à la prise; la canne monte à 42 degrés devant la main (bout à x 0, y 1,34, z 1,49 dans le repère de la prise), nœud vide `fishing_rod_tip` au bout pour accrocher la ligne. Ligne et bouchon ne font pas partie du modèle: le jeu dessine la ligne jusqu'au bouchon `fishing_float` (origine au niveau de l'eau).
+- Poissons `fish_gudgeon`, `fish_chub`, `fish_trout` pour la prise qui saute au sac.
+
 ## Maison
 
 - Meubles muraux (`shelf`, `curtains`, `picture_frame`): dos contre le bord arrière de leur case (-Z).
@@ -79,7 +86,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 ## Fiche par modèle
 
-### `personnages.glb` (2240 Ko)
+### `personnages.glb` (2291 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -123,8 +130,12 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 | `wave` | 1.067 | oui |
 | `pet` | 0.8 | oui |
 | `high_five` | 0.8 | non (jouer une fois) |
+| `fish_wait` | 3.0 | oui |
+| `fish_cast` | 1.0 | non (jouer une fois) |
+| `fish_strike` | 1.6 | non (jouer une fois) |
+| `sit_ground` | 3.0 | oui |
 
-### `ferme.glb` (653 Ko)
+### `ferme.glb` (657 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -156,7 +167,8 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 | `axe` |  | 88 | kind: "tool", socket: "socket_hand_r" |
 | `saw` |  | 176 | kind: "tool", socket: "socket_hand_r" |
 | `hammer` |  | 92 | kind: "tool", socket: "socket_hand_r" |
-| `fishing_rod` |  | 132 | kind: "tool", socket: "socket_hand_r" |
+| `fishing_rod` |  | 80 | kind: "tool", socket: "socket_hand_r" |
+| `fishing_float` |  | 104 | kind: "item", note: "bouchon: origine au niveau de l'eau" |
 | `log` |  | 216 | kind: "item" |
 | `plank` |  | 68 | kind: "item" |
 | `beam` |  | 104 | kind: "carried", length_axis: "z", carry_height: 1.78 |

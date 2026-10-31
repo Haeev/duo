@@ -17,6 +17,7 @@ import {
   minutesSince,
   nextObjective,
   partnerModel,
+  placementReason,
   purseModel,
   splitAmount,
   staminaModel,
@@ -406,7 +407,7 @@ export class Hud {
 
   private updateBuild(placement: NonNullable<NonNullable<ReturnType<typeof characterOf>>['placement']>): void {
     const { ctx } = this.host;
-    const reason = placement.blocked ?? null;
+    const reason = placementReason(placement.blocked, ctx.texts.messages);
     const sig = `${placement.item}|${placement.valid}|${placement.rotation}|${reason ?? ''}`;
     if (sig === this.buildSig) return;
     this.buildSig = sig;

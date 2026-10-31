@@ -122,4 +122,14 @@ describe('établi, réchaud, coffre, sac', () => {
     expect(proposalModels(sim.world, ctx)).toMatchObject([{ mine: false, itemText: 'un matelas', byName: 'Camille', price: 120 }]);
     expect(indefiniteItem(ctx, 'plank')).toBe('planche');
   });
+
+  it('prend l’article de objets.json quand il existe (demande 12), sinon celui de l’interface', () => {
+    const ctx = uiContext();
+    const mattress = ctx.content.items.mattress;
+    if (mattress === undefined) throw new Error('matelas');
+    const withArticle = { ...ctx, content: { ...ctx.content, items: { ...ctx.content.items, mattress: { ...mattress, indefinite: 'un matelas de laine' } } } };
+    expect(indefiniteItem(withArticle, 'mattress')).toBe('un matelas de laine');
+    const empty = { ...ctx, content: { ...ctx.content, items: { ...ctx.content.items, mattress: { ...mattress, indefinite: '' } } } };
+    expect(indefiniteItem(empty, 'mattress')).toBe('un matelas');
+  });
 });

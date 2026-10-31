@@ -92,8 +92,9 @@ export function createControls(options: ControlsOptions): Controls {
         }
       }
       if (renderer !== null) {
-        if (input.wasPressed('camera-left')) renderer.camera('rotate_left');
-        if (input.wasPressed('camera-right')) renderer.camera('rotate_right');
+        // A et E servent aussi aux onglets (carnet, comptoir): l'interface les prend d'abord.
+        if (input.wasPressed('camera-left') && !(ui?.handleKey('KeyQ') ?? false)) renderer.camera('rotate_left');
+        if (input.wasPressed('camera-right') && !(ui?.handleKey('KeyE') ?? false)) renderer.camera('rotate_right');
         if (input.wasPressed('zoom-in')) renderer.camera('zoom_in');
         if (input.wasPressed('zoom-out')) renderer.camera('zoom_out');
       }

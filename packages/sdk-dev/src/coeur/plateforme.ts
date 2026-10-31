@@ -423,7 +423,7 @@ export function createFakePlatform(options: FakePlatformOptions): FakePlatform {
         toPeer({ t: 'net', channel: message.channel, data: message.data });
         return;
       case 'fatal':
-        fail(`le jeu a planté: ${message.message}`, true);
+        fail(`Le jeu s’est arrêté sur une erreur (${message.message}).`, true);
         return;
       case 'log':
         log(message.level, `[jeu] ${message.message}`, message.data);
@@ -527,7 +527,7 @@ export function createFakePlatform(options: FakePlatformOptions): FakePlatform {
         setStatus({ kind: 'ended', summary: 'Séance terminée' });
         return;
       case 'crash':
-        fail(`le jeu a planté chez l’autre joueur: ${message.message}`, false);
+        fail(`Partie arrêtée chez l’autre joueur. ${message.message}`, false);
         return;
       case 'net':
         toGame({ type: 'net', channel: message.channel, data: message.data });

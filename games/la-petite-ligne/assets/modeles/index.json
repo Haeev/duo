@@ -92,7 +92,11 @@
    "sleep",
    "wave",
    "pet",
-   "high_five"
+   "high_five",
+   "fish_wait",
+   "fish_cast",
+   "fish_strike",
+   "sit_ground"
   ]
  },
  "garden_cell_grass": {
@@ -269,7 +273,11 @@
  },
  "fishing_rod": {
   "file": "ferme.glb",
-  "tris": 132
+  "tris": 80
+ },
+ "fishing_float": {
+  "file": "ferme.glb",
+  "tris": 104
  },
  "log": {
   "file": "ferme.glb",

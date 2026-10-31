@@ -817,6 +817,39 @@ def anims():
                            "chest": (-4, 0, 0)})
     A["high_five"] = (False, {0: ARMS_DOWN, 8: hf, 12: merge(hf, {"upper_arm_r": (140, 0, -6), "spine": (6, 0, 0)}),
                               24: ARMS_DOWN})
+    # Pêche (canne de ferme.glb dans socket_hand_r: au repos elle monte à 42 degrés devant la main;
+    # la pente de la canne vaut 42 degrés + la somme des flexions bras, avant-bras, main et buste)
+    wait = {"upper_arm_r": (18, 0, -6), "forearm_r": (24, 0, 0), "hand_r": (-45, 0, 0),
+            "upper_arm_l": (16, 0, 10), "forearm_l": (34, 0, 0), "hand_l": (0, 0, 0),
+            "spine": (-2, 0, 0), "head": (8, 0, 0), "hips": (0, 0, 2), "thigh_l": (4, 0, 0), "thigh_r": (-2, 0, -3)}
+    wait_b = merge(wait, {"hand_r": (-41, 0, 0), "chest": (-2, 0, 0), "head": (6, 4, 0), "hips_loc": (0, 0.004, 0)})
+    A["fish_wait"] = (True, {0: wait, 45: wait_b, 90: wait})
+    wind = merge(wait, {"upper_arm_r": (150, 0, -10), "forearm_r": (30, 0, 0), "hand_r": (-40, 0, 0),
+                        "chest": (-4, 16, 0), "spine": (-6, 6, 0), "head": (-4, -10, 0),
+                        "upper_arm_l": (30, 0, 14), "forearm_l": (50, 0, 0), "thigh_r": (-10, 0, -3), "thigh_l": (10, 0, 0)})
+    snap = merge(wait, {"upper_arm_r": (78, 0, -6), "forearm_r": (10, 0, 0), "hand_r": (-28, 0, 0),
+                        "chest": (6, -10, 0), "spine": (6, -4, 0), "head": (4, 4, 0), "thigh_l": (16, 0, 0),
+                        "shin_l": (-10, 0, 0), "hips_loc": (0, -0.02, 0)})
+    release = merge(wait, {"upper_arm_r": (32, 0, -6), "forearm_r": (10, 0, 0), "hand_r": (-46, 0, 0),
+                           "chest": (6, -4, 0), "spine": (8, 0, 0), "head": (8, 0, 0), "thigh_l": (12, 0, 0),
+                           "shin_l": (-8, 0, 0), "hips_loc": (0, -0.015, 0)})
+    A["fish_cast"] = (False, {0: wait, 10: wind, 14: snap, 18: release, 30: wait})
+    lift = merge(wait, {"upper_arm_r": (62, 0, -6), "forearm_r": (56, 0, 0), "hand_r": (-30, 0, 0),
+                        "upper_arm_l": (42, 0, 20), "forearm_l": (70, 0, 0), "spine": (-10, 0, 0), "chest": (-6, 0, 0),
+                        "head": (-4, 0, 0), "thigh_l": (14, 0, 0), "shin_l": (-10, 0, 0), "thigh_r": (-8, 0, -3),
+                        "hips_loc": (0, -0.02, 0)})
+    reel_a = merge(lift, {"upper_arm_r": (50, 0, -6), "forearm_r": (40, 0, 0), "upper_arm_l": (40, 0, 22),
+                          "forearm_l": (58, 0, 0), "hand_l": (20, 0, 0), "spine": (-4, 0, 0)})
+    reel_b = merge(reel_a, {"forearm_l": (88, 0, 0), "hand_l": (-15, 0, 0), "upper_arm_l": (46, 0, 18)})
+    A["fish_strike"] = (False, {0: wait, 5: lift, 10: merge(lift, {"spine": (-12, 0, 0)}), 16: reel_a, 21: reel_b,
+                                26: reel_a, 31: reel_b, 36: reel_a, 48: wait})
+    # Assis par terre (absence, veillée sur la paillasse): bassin au sol, genoux levés, bras autour des jambes
+    ground = {"hips_loc": (0, -0.74, 0.0), "spine": (12, 0, 0), "chest": (4, 0, 0), "head": (-6, 0, 0),
+              "thigh_l": (128, 0, 8), "thigh_r": (128, 0, -8), "shin_l": (-108, 0, 0), "shin_r": (-108, 0, 0),
+              "foot_l": (-20, 0, 0), "foot_r": (-20, 0, 0), "upper_arm_l": (30, 0, -6), "upper_arm_r": (30, 0, 6),
+              "forearm_l": (40, 0, 0), "forearm_r": (40, 0, 0), "hand_l": (10, 0, 0), "hand_r": (10, 0, 0)}
+    ground_b = merge(ground, {"chest": (2, 0, 0), "head": (-8, 8, 0), "hips_loc": (0, -0.736, 0.0)})
+    A["sit_ground"] = (True, {0: ground, 45: ground_b, 90: ground})
     return A
 
 

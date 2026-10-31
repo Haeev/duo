@@ -10,8 +10,22 @@ describe('typographier', () => {
     expect(typographier('D accord ?')).toBe(`D accord${NNBSP}?`);
   });
 
-  it("ne crée pas d'espace là où le texte n'en a pas (style de textes.json)", () => {
-    expect(typographier('Bien dormi, bien mangé: en forme.')).toBe('Bien dormi, bien mangé: en forme.');
+  it('pose une espace insécable avant les deux-points et les signes doubles, même sans espace dans le texte (LPL-R05)', () => {
+    expect(typographier('Bien dormi, bien mangé: en forme.')).toBe(`Bien dormi, bien mangé${NBSP}: en forme.`);
+    expect(typographier('avant samedi 16 h: 12 radis')).toBe(`avant samedi 16${NBSP}h${NBSP}: 12${NBSP}radis`);
+    expect(typographier('Reprendre : jeudi 6')).toBe(`Reprendre${NBSP}: jeudi 6`);
+    expect(typographier('Bonjour!')).toBe(`Bonjour${NNBSP}!`);
+    expect(typographier('Quoi?! Vraiment;')).toBe(`Quoi${NNBSP}?! Vraiment${NNBSP};`);
+    expect(typographier('« Vingt ans, vraiment? »')).toBe(`«${NBSP}Vingt ans, vraiment${NNBSP}?${NBSP}»`);
+  });
+
+  it('les deux formes du deux-points donnent le même texte (lettre et phrase du foulard côte à côte)', () => {
+    expect(typographier('samedi prochain à 16 h: 12 radis')).toBe(typographier('samedi prochain à 16 h : 12 radis'));
+  });
+
+  it("ne touche ni aux heures (12:30) ni aux adresses", () => {
+    expect(typographier('Départ à 12:30 précises')).toBe('Départ à 12:30 précises');
+    expect(typographier('https://duo.local/aide')).toBe('https://duo.local/aide');
   });
 
   it('lie les nombres à leur unité et à ce qu’ils comptent', () => {
@@ -26,7 +40,7 @@ describe('typographier', () => {
   });
 
   it('est idempotente', () => {
-    const once = typographier("« C'est l'heure ! » 9 h 20 : 3 œufs...");
+    const once = typographier("« C'est l'heure! » 9 h 20: 3 œufs... Quoi?! 12:30");
     expect(typographier(once)).toBe(once);
   });
 });

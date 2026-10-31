@@ -79,7 +79,7 @@ attribute vec4 aColor;    // couleur (linéaire), opacité
 
 varying vec2 vCorner;
 varying vec4 vColor;
-varying float vShape;
+flat varying int vShape;
 varying float vAge;
 varying float vLight;
 
@@ -107,7 +107,8 @@ void hideInstance() {
 
 void main() {
   vCorner = position.xy;
-  vShape = aSize.z;
+  int shape = int(aSize.z + 0.5);
+  vShape = shape;
   vColor = aColor;
   vAge = 0.0;
   vLight = 1.0;
@@ -125,14 +126,15 @@ void main() {
     size = mix(aSize.x, aSize.y, sqrt(t));
     vColor.a *= smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(0.55, 1.0, t));
     vAge = t;
-    if (aSize.z == 5.0) {
+    onGround = shape == 2;
+    if (shape == 5) {
       // Gouttelette: étirée le long de sa vitesse du moment.
       axis = normalize(aVelocity.xyz * exp(-drag * age) + aAccel.xyz * age + vec3(0.0, 0.0001, 0.0));
     }
   } else if (uMode == 1) {
     if (aSize.w > uRain.z) { hideInstance(); return; }
     float h = uRain.x;
-    if (aSize.z == 1.0) {
+    if (shape == 1) {
       // Goutte: fixe dans le monde, enroulée autour de la vue, tombe en boucle.
       float fallTime = uRain.y / length(uFall);
       float phase = fract(aOrigin.y + uTime / fallTime);
@@ -176,7 +178,7 @@ void main() {
     float groupAlpha = group == 0 ? uGroupAlpha.x : (group == 1 ? uGroupAlpha.y : uGroupAlpha.z);
     if (groupAlpha <= 0.0) { hideInstance(); return; }
     vColor.a *= groupAlpha;
-    if (aSize.z == 4.0) {
+    if (shape == 4) {
       // Flamme: léger scintillement.
       vColor.a *= 0.88 + 0.12 * sin(uTime * 7.0 + aOrigin.w * 40.0);
     }
@@ -190,7 +192,7 @@ void main() {
     world = centre + vec3(position.x, 0.0, position.y) * size;
   } else if (dot(axis, axis) > 0.0) {
     vec3 side = normalize(cross(axis, forward));
-    float streak = aSize.z == 1.0 ? uRainShape.x : size * 2.5;
+    float streak = shape == 1 ? uRainShape.x : size * 2.5;
     world = centre + side * position.x * size + axis * position.y * streak * 0.5;
   } else {
     world = centre + (right * position.x + up * position.y) * size;
@@ -217,7 +219,7 @@ uniform vec3 uShadeColor; // lumière du ciel (hémisphérique)
 
 varying vec2 vCorner;
 varying vec4 vColor;
-varying float vShape;
+flat varying int vShape;
 varying float vAge;
 varying float vLight;
 
@@ -226,23 +228,23 @@ void main() {
   float alpha = 0.0;
   float additive = 0.0;
   vec3 color = vColor.rgb;
-  if (vShape == 0.0) {
+  if (vShape == 0) {
     alpha = smoothstep(1.0, 0.25, r);
     color *= uShadeColor + uLitColor * vLight;
-  } else if (vShape == 1.0) {
+  } else if (vShape == 1) {
     alpha = (1.0 - abs(vCorner.x)) * smoothstep(1.0, 0.3, abs(vCorner.y)) * (0.6 + 0.4 * vCorner.y);
     color *= uShadeColor + uLitColor * 0.5;
-  } else if (vShape == 2.0) {
+  } else if (vShape == 2) {
     float ring = vAge * 0.85 + 0.1;
     alpha = 1.0 - smoothstep(0.0, 0.16, abs(r - ring));
     color *= uShadeColor + uLitColor * 0.6;
-  } else if (vShape == 3.0) {
+  } else if (vShape == 3) {
     float arms = max(0.0, 1.0 - abs(vCorner.x) * 7.0) * (1.0 - abs(vCorner.y))
       + max(0.0, 1.0 - abs(vCorner.y) * 7.0) * (1.0 - abs(vCorner.x));
     float core = smoothstep(0.45, 0.0, r);
     alpha = clamp(arms + core, 0.0, 1.0) * (0.65 + 0.35 * sin(vAge * 40.0));
     additive = 1.0;
-  } else if (vShape == 4.0) {
+  } else if (vShape == 4) {
     alpha = exp(-r * r * 4.0) * (1.0 - smoothstep(0.7, 1.0, r));
     additive = 1.0;
   } else {

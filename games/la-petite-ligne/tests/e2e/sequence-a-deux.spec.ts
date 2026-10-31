@@ -71,9 +71,10 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
 
     // Potager, chez l'hôte: marcher jusqu'au nord de la case (9, 28), face au sud, houe en main, Espace.
     await press(hostGame.getByRole('region', { name: 'Prochain objectif' }));
+    // Par la rangée y = 17,5, libre d'un bout à l'autre (la rangée 16 frôle le passage à niveau).
     await walkAlong(host, probe, hostId, [
-      { x: 30.5, y: 16.5 },
-      { x: 13.5, y: 16.5 },
+      { x: 30.5, y: 17.5 },
+      { x: 13.5, y: 17.5 },
       { x: 13.5, y: 27.4 },
       { x: 9.5, y: 27.4 },
     ]);

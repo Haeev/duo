@@ -5,8 +5,8 @@ import { CatalogueError, parseCatalogue, sequenceOf, stepTime, stopTime } from '
 describe('catalogue (sons.json)', () => {
   const catalogue = parseCatalogue(soundsFile);
 
-  it('lit les 71 sons et les 9 musiques du sound designer', () => {
-    expect(catalogue.sounds.size).toBe(71);
+  it('lit les 76 sons et les 9 musiques du sound designer', () => {
+    expect(catalogue.sounds.size).toBe(76);
     expect(catalogue.music.size).toBe(9);
     expect(catalogue.mix.maxEffectVoices).toBe(24);
     expect(catalogue.peerDb).toBe(-3);

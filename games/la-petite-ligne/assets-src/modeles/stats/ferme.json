@@ -177,7 +177,12 @@
   "fishing_rod": {
    "kind": "tool",
    "socket": "socket_hand_r",
-   "tris": 132
+   "tris": 80
+  },
+  "fishing_float": {
+   "kind": "item",
+   "note": "bouchon: origine au niveau de l'eau",
+   "tris": 104
   },
   "log": {
    "kind": "item",
@@ -242,5 +247,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 663416
+ "file_bytes": 667996
 }

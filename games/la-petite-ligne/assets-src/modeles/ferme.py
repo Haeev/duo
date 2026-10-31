@@ -234,14 +234,21 @@ def tool_fishing_rod(A):
     a = math.radians(42)
     L = 2.0
     d = Vector((0, -math.cos(a), math.sin(a)))
-    g.cyl(0.02, 0.32, loc=tuple(d * 0.05), color="cobble_dark", segs=6, rot=(-(90 - 42), 0, 0))
+    g.cyl(0.02, 0.32, loc=tuple(d * 0.05), color="cobble_dark", segs=6, rot=(90 - 42, 0, 0))
     mid = d * (L / 2)
-    g.cyl(0.012, L, loc=tuple(mid), color="wood_new", segs=5, r2=0.004, rot=(-(90 - 42), 0, 0))
+    g.cyl(0.012, L, loc=tuple(mid), color="wood_new", segs=5, r2=0.004, rot=(90 - 42, 0, 0))
     g.cyl(0.03, 0.025, loc=(0.03, -0.06, -0.02), color="iron", segs=8, rot=(0, 90, 0))
     tip = d * L
-    g.box((0.003, 0.003, 0.9), loc=(tip.x, tip.y, tip.z - 0.45), color="white_paint")
-    g.sphere(0.022, loc=(tip.x, tip.y, tip.z - 0.92), color="flower_red", segs=6, rings=4)
-    g.cyl(0.02, 0.012, loc=(tip.x, tip.y, tip.z - 0.905), color="white_paint", segs=6)
+    g.cyl(0.008, 0.03, loc=tuple(tip), color="iron", segs=5)
+    # la ligne et le bouchon sont dessinés par le jeu (du nœud fishing_rod_tip au bouchon fishing_float)
+    return g
+
+
+def fishing_float(A):
+    g = A.geo()
+    g.sphere(0.03, loc=(0, 0, 0.0), color="flower_red", segs=8, rings=5, scale=(1, 1, 0.9))
+    g.cyl(0.031, 0.012, loc=(0, 0, 0.006), color="white_paint", segs=8)
+    g.cyl(0.004, 0.06, loc=(0, 0, 0.02), color="white_paint", segs=4, base=True)
     return g
 
 
@@ -458,7 +465,11 @@ def main():
         A.add("seed_packet_" + crop, seed_packet(A, crop), {"kind": "item"})
     for name, fn in (("hoe", tool_hoe), ("watering_can", tool_watering_can), ("axe", tool_axe), ("saw", tool_saw),
                      ("hammer", tool_hammer), ("fishing_rod", tool_fishing_rod)):
-        A.add(name, fn(A), {"kind": "tool", "socket": "socket_hand_r"})
+        ob = A.add(name, fn(A), {"kind": "tool", "socket": "socket_hand_r"})
+        if name == "fishing_rod":
+            a = math.radians(42)
+            lpl.empty("fishing_rod_tip", parent=ob, loc=(0, -2.0 * math.cos(a), 2.0 * math.sin(a)))
+    A.add("fishing_float", fishing_float(A), {"kind": "item", "note": "bouchon: origine au niveau de l'eau"})
     A.add("log", item_log(A), {"kind": "item"})
     A.add("plank", item_plank(A), {"kind": "item"})
     A.add("beam", item_beam(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78})

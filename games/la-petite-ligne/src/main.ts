@@ -108,7 +108,16 @@ async function main(): Promise<void> {
     });
     renderer = r;
     const createInterface = await pickInterface();
-    ui = createInterface({ view, overlay, uiScale: duo.ui.scale, reducedMotion: duo.ui.reducedMotion });
+    ui = createInterface({
+      view,
+      overlay,
+      uiScale: duo.ui.scale,
+      reducedMotion: duo.ui.reducedMotion,
+      // Boutons de caméra du HUD (demande 9 de l'interface).
+      camera: (command) => {
+        r.camera(command);
+      },
+    });
     const createAudio = await pickAudio();
     if (createAudio !== null) {
       const a = createAudio({

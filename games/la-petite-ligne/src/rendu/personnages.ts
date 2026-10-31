@@ -7,11 +7,12 @@
  */
 import {
   AnimationMixer,
+  LoopOnce,
+  LoopRepeat,
   CanvasTexture,
   Float32BufferAttribute,
   Group,
   Mesh,
-  Quaternion,
   SkinnedMesh,
   Sphere,
   Vector3,
@@ -71,17 +72,18 @@ const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
 const PLAYER_ROW = 0;
 const VECTOR_SIZE = 3;
-/** Bout de la canne à pêche de l'artiste, dans le repère de la prise (main droite). */
-const ROD_TIP = new Vector3(0.01, 1.34, 1.51);
-/** Le lancer reprend le geste de la hache (bras au-dessus de la tête), le temps d'un geste. */
-const CAST_CLIP = 'chop';
-const CAST_SECONDS = 0.9;
-/** Touche: le bras tendu de l'arrosage, comme une canne qui tire. */
-const BITE_CLIP = 'water';
+/** Bout de la canne à pêche de l'artiste: nœud vide, et sa place dans le repère de la prise s'il manque. */
+const ROD_TIP_NODE = 'fishing_rod_tip';
+const ROD_TIP = new Vector3(0, 1.34, 1.49);
 const ROD_ITEM = 'fishing_rod';
-/** Axe de la canne (de la prise au bout), et sa pente au-dessus de l'eau pendant la pêche. */
-const ROD_AXIS = ROD_TIP.clone().normalize();
-const ROD_TILT = (35 * Math.PI) / 180;
+/** Animations de pêche et d'assise par terre de l'artiste (mêmes poses de départ et d'arrivée). */
+const FISH_CAST = 'fish_cast';
+const FISH_WAIT = 'fish_wait';
+const FISH_STRIKE = 'fish_strike';
+const SIT_CHAIR = 'sit';
+const SIT_GROUND = 'sit_ground';
+/** Fondu court entre les clips de pêche, qui partent et finissent sur la même pose. */
+const FISH_FADE = 0.1;
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
@@ -147,6 +149,19 @@ function villagerClip(villager: DeepReadonly<VillagerState>): string {
   }
 }
 
+/** Ce que le personnage doit jouer à cette image. */
+interface ClipRequest {
+  name: string;
+  timeScale: number;
+  /** Joué une fois, figé sur sa dernière pose. */
+  once?: boolean;
+  /** Change à chaque nouvelle demande d'un clip joué une fois (le relance même s'il joue déjà). */
+  token?: number;
+  /** Partir du début (pose commune des clips de pêche) plutôt que d'une phase propre au personnage. */
+  fromStart?: boolean;
+  fade?: number;
+}
+
 class CharacterFigure {
   readonly root = new Group();
   private readonly mixer: AnimationMixer | null;
@@ -194,11 +209,11 @@ class CharacterFigure {
     this.hand = model.getObjectByName(HAND_SOCKET) ?? null;
   }
 
-  private play(name: string, timeScale: number): void {
+  private play(request: ClipRequest): void {
     if (this.mixer === null) {
       return;
     }
-    const clip = this.clips.get(name) ?? this.clips.get('idle');
+    const clip = this.clips.get(request.name) ?? this.clips.get('idle');
     if (clip === undefined) {
       return;
     }
@@ -207,49 +222,49 @@ class CharacterFigure {
       action = this.mixer.clipAction(clip);
       this.actions.set(clip.name, action);
     }
-    action.timeScale = timeScale;
-    if (clip.name === this.currentName) {
+    action.timeScale = request.timeScale;
+    const restart = request.token !== undefined && request.token !== this.currentToken;
+    if (clip.name === this.currentName && !restart) {
       return;
     }
+    const fade = request.fade ?? SETTINGS.crossFadeSeconds;
+    const sameAction = action === this.current;
     action.reset();
-    action.time = this.phase * clip.duration;
-    action.fadeIn(SETTINGS.crossFadeSeconds).play();
-    this.current?.fadeOut(SETTINGS.crossFadeSeconds);
+    action.setLoop(request.once === true ? LoopOnce : LoopRepeat, request.once === true ? 1 : Infinity);
+    action.clampWhenFinished = request.once === true;
+    action.time = request.once === true || request.fromStart === true ? 0 : this.phase * clip.duration;
+    if (sameAction) {
+      // Le même geste relancé (deux lancers de suite): pas de fondu sur soi-même.
+      action.play();
+    } else {
+      action.fadeIn(fade).play();
+      this.current?.fadeOut(fade);
+    }
     this.current = action;
     this.currentName = clip.name;
+    this.currentToken = request.token;
   }
 
-  /** Position (monde) d'un point de l'outil tenu, dans le repère de l'outil; `false` sans outil. */
-  toolPoint(local: Vector3, out: Vector3): boolean {
+  private currentToken: number | undefined;
+
+  /**
+   * Position (monde) d'un point de l'outil tenu: le nœud `node` du modèle
+   * s'il existe, sinon le point `local` du repère de l'outil; `false` sans outil.
+   */
+  toolPoint(node: string, local: Vector3, out: Vector3): boolean {
     if (this.tool === null) {
       return false;
+    }
+    const anchor = this.tool.getObjectByName(node);
+    if (anchor !== undefined) {
+      anchor.getWorldPosition(out);
+      return true;
     }
     this.tool.updateWorldMatrix(true, false);
     out.copy(local);
     this.tool.localToWorld(out);
     return true;
   }
-
-  /**
-   * Oriente l'outil tenu dans une direction du monde (la canne vers le
-   * bouchon), quelle que soit la pose de la main; `null` rend la tenue de
-   * l'artiste. À appeler après l'animation de l'image.
-   */
-  aimTool(axis: Vector3, direction: Vector3 | null): void {
-    if (this.tool === null || this.hand === null) {
-      return;
-    }
-    if (direction === null) {
-      this.tool.quaternion.identity();
-      return;
-    }
-    this.hand.getWorldQuaternion(this.handQuaternion);
-    this.aimQuaternion.setFromUnitVectors(axis, direction);
-    this.tool.quaternion.copy(this.handQuaternion.invert().multiply(this.aimQuaternion));
-  }
-
-  private readonly handQuaternion = new Quaternion();
-  private readonly aimQuaternion = new Quaternion();
 
   setTool(library: ModelLibrary, model: string | null): void {
     const name = model ?? '';
@@ -293,8 +308,8 @@ class CharacterFigure {
     prev: { x: number; y: number },
     pos: { x: number; y: number },
     facing: number,
-    clip: string,
-    timeScale: number,
+    request: ClipRequest,
+    lift = 0,
   ): void {
     const teleport = Math.hypot(pos.x - prev.x, pos.y - prev.y) > SETTINGS.teleportDistance;
     const at = teleport ? pos : interpolate(prev, pos, context.alpha, this.position);
@@ -308,9 +323,9 @@ class CharacterFigure {
       this.facing === null || teleport
         ? yaw
         : dampAngle(this.facing, yaw, smoothFactor(context.dt, SETTINGS.turnHalfLife));
-    this.root.position.set(at.x, this.ground, at.y);
+    this.root.position.set(at.x, this.ground + lift, at.y);
     this.root.rotation.y = this.facing;
-    this.play(clip, timeScale);
+    this.play(request);
     this.mixer?.update(context.dt);
     setStandingBox(
       this.pick.box,
@@ -437,20 +452,52 @@ export class CharactersPart implements EventfulPart {
     }
   }
 
-  /** Moment du dernier lancer de chaque joueur (pose de pêche composée avec les animations existantes). */
-  private readonly castAt = new Map<CharacterId, number>();
-  private readonly aim = new Vector3();
+  /** Geste de pêche joué une fois par joueur (lancer, ferrer), avec son début. */
+  private readonly oneShot = new Map<CharacterId, { clip: string; start: number; duration: number }>();
   private time = 0;
 
   handleEvent(event: WorldEvent): void {
     if (event.type === 'cast') {
-      this.castAt.set(event.by, this.time);
+      this.startOneShot(event.by, FISH_CAST);
+    } else if (event.type === 'caught' || event.type === 'escaped') {
+      this.startOneShot(event.by, FISH_STRIKE);
     }
   }
 
-  /** Bout de la canne d'un joueur (pour la ligne), `false` s'il ne tient rien. */
+  private startOneShot(id: CharacterId, clip: string): void {
+    const duration = this.clips.get(clip)?.duration ?? 0;
+    if (duration > 0) {
+      this.oneShot.set(id, { clip, start: this.time, duration });
+    }
+  }
+
+  /** Bout de la canne d'un joueur (nœud `fishing_rod_tip`, pour la ligne), `false` s'il ne tient rien. */
   rodTip(id: CharacterId, out: Vector3): boolean {
-    return this.players.get(id)?.figure.toolPoint(ROD_TIP, out) ?? false;
+    return this.players.get(id)?.figure.toolPoint(ROD_TIP_NODE, ROD_TIP, out) ?? false;
+  }
+
+  /**
+   * Assise: sur une chaise (`seat_height` dans les données de l'artiste),
+   * l'animation `sit`; ailleurs, assis par terre, posé sur le dessus d'une
+   * paillasse ou d'un lit (`sleep_height`) s'il y en a un sous le personnage.
+   */
+  private seatAt(world: ReadonlyWorld, x: number, y: number): { clip: string; lift: number } {
+    for (const piece of world.furniture) {
+      const size = this.content.items[piece.item]?.footprint ?? { w: 1, d: 1 };
+      const w = piece.rotation % 2 === 0 ? size.w : size.d;
+      const d = piece.rotation % 2 === 0 ? size.d : size.w;
+      if (x < piece.cell.cx || y < piece.cell.cy || x >= piece.cell.cx + w || y >= piece.cell.cy + d) {
+        continue;
+      }
+      const extras = this.library.extras(this.content.items[piece.item]?.model ?? piece.item);
+      if (typeof extras.seat_height === 'number') {
+        return { clip: SIT_CHAIR, lift: 0 };
+      }
+      if (typeof extras.sleep_height === 'number') {
+        return { clip: SIT_GROUND, lift: extras.sleep_height };
+      }
+    }
+    return { clip: SIT_GROUND, lift: 0 };
   }
 
   /** Position affichée d'un joueur (pour les effets: objet qui saute au sac). */
@@ -583,32 +630,36 @@ export class CharactersPart implements EventfulPart {
       this.dress(entry, character);
       const moving = character.speed > SETTINGS.walkThreshold;
       const kind: ActionKind = character.status === 'sleeping' ? 'sleep' : character.action.kind;
-      // Pêche: pas d'animation dédiée chez l'artiste, on compose (lancer, attente, touche).
-      const castAt = this.castAt.get(character.id);
-      const casting = castAt !== undefined && context.time - castAt < CAST_SECONDS;
-      const fishing = character.fishing !== null || casting;
-      const fishingClip = casting
-        ? CAST_CLIP
-        : character.fishing?.phase === 'bite'
-          ? BITE_CLIP
-          : 'idle';
-      const clip =
-        moving && kind !== 'carry' ? 'walk' : fishing ? fishingClip : CLIP_FOR_ACTION[kind];
-      const timeScale =
-        clip === 'walk' || clip === 'carry_two'
-          ? Math.min(
-              WALK_SCALE_MAX,
-              Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
-            )
-          : 1;
+      // Pêche: lancer et ferrer joués une fois, attente en boucle, enchaînés par des fondus courts.
+      const shot = this.oneShot.get(character.id);
+      const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
+      const fishing = character.fishing !== null || shotActive;
+      const seat = kind === 'sit' ? this.seatAt(world, character.pos.x, character.pos.y) : null;
+      const walkScale = Math.min(
+        WALK_SCALE_MAX,
+        Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
+      );
+      let request: ClipRequest;
+      if (moving && kind !== 'carry') {
+        request = { name: 'walk', timeScale: walkScale };
+      } else if (shotActive) {
+        request = { name: shot.clip, timeScale: 1, once: true, token: shot.start, fade: FISH_FADE };
+      } else if (character.fishing !== null) {
+        request = { name: FISH_WAIT, timeScale: 1, fromStart: true, fade: FISH_FADE };
+      } else if (seat !== null) {
+        request = { name: seat.clip, timeScale: 1 };
+      } else {
+        const name = CLIP_FOR_ACTION[kind];
+        request = { name, timeScale: kind === 'carry' ? (moving ? walkScale : 0) : 1 };
+      }
       entry.figure.update(
         context,
         this.terrain,
         character.prev,
         character.pos,
         character.facing,
-        clip,
-        kind === 'carry' && !moving ? 0 : timeScale,
+        request,
+        seat?.lift ?? 0,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
       entry.figure.pick.enabled = true;
@@ -623,20 +674,6 @@ export class CharactersPart implements EventfulPart {
         this.library,
         fishing && !moving ? rod : showTool ? definition.model : null,
       );
-      const line = character.fishing;
-      if (line !== null && !moving) {
-        const dx = line.bobber.x - character.pos.x;
-        const dy = line.bobber.y - character.pos.y;
-        const reach = Math.hypot(dx, dy) || 1;
-        this.aim.set(
-          (dx / reach) * Math.cos(ROD_TILT),
-          Math.sin(ROD_TILT),
-          (dy / reach) * Math.cos(ROD_TILT),
-        );
-        entry.figure.aimTool(ROD_AXIS, this.aim);
-      } else {
-        entry.figure.aimTool(ROD_AXIS, null);
-      }
     }
     for (const villager of world.villagers) {
       let figure = this.villagers.get(villager.id);
@@ -663,8 +700,7 @@ export class CharactersPart implements EventfulPart {
         villager.prev,
         villager.pos,
         villager.facing,
-        clip,
-        timeScale,
+        { name: clip, timeScale },
       );
       figure.updateFace(
         context.time,

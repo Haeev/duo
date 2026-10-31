@@ -81,7 +81,9 @@ Pour que le train soit au quai à 10 h pile, la séquence d'arrivée démarre 14
 
 ## 4. Effets, événement par événement
 
-Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), mesurée dans `assets-src/son/controles/mesures.csv`. Écoute: modèle « inverse » du `PannerNode` (distance de référence, facteur 0,5 à 1,3 selon le son); « coupé au-delà » veut dire qu'on ne lance pas le son, « jamais sous » qu'on garantit un niveau plancher où que soit la source.
+Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), mesurée dans `assets-src/son/controles/mesures.csv`. Écoute: modèle « inverse » du `PannerNode` (distance de référence, facteur 0,5 à 1,3 selon le son); « coupé au-delà » veut dire qu'on ne lance pas le son, « jamais sous » qu'on garantit un niveau plancher où que soit la source. Les sons de pêche joués au bouchon ont une distance de référence de 6 m (la portée du lancer): la touche, signal qu'il faut ferrer, s'entend nettement chez le pêcheur.
+
+**Pêche, noms attendus par le code** (événements de la simulation): `cast` joue `fishing-cast` au pêcheur, puis `fishing-splash` au bouchon (`event.at`) 0,55 s plus tard; `bite` joue `fishing-bite` au bouchon; `caught` joue `fishing-catch` au bouchon (il remplace `harvest` et `quality-fine`); `escaped` joue `fishing-escape` au bouchon.
 
 ### 4.1 Train
 
@@ -136,6 +138,11 @@ Niveau: sonie momentanée maximale visée en LUFS (intégrée pour une boucle), 
 | Allumer le réchaud | `stove-light` | -23 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Le réchaud qui mijote (boucle) | `stove-loop` (boucle) | -30 LUFS int. | 4 | aucune | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Manger (« croque ») | `eat` | -24 | 3 | 2 variantes, hauteur ±6 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Pêche: lancer la ligne (événement cast) | `fishing-cast` | -24 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Pêche: le bouchon se pose sur l'eau (« plouf ») | `fishing-splash` | -23 | 3 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
+| Pêche: touche, le bouchon plonge (« ploc », événement bite) | `fishing-bite` | -21 | 2 | 3 variantes, hauteur ±3 %, niveau ±0,5 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
+| Pêche: le poisson sort de l'eau (éclaboussure, frétillement; événement caught) | `fishing-catch` | -20 | 2 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
+| Pêche: le poisson s'échappe (« flop », événement escaped) | `fishing-escape` | -25 | 3 | hauteur ±4 %, niveau ±0,5 dB | effets | placé, réf. 6 m, coupé au-delà de 40 m |  |
 | Gloussements des poules | `hen` | -24 | 3 | 3 variantes, hauteur ±8 %, niveau ±2 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
 | Le coq du bourg, au réveil | `wake-rooster` | -22 | 3 | hauteur ±3 % | effets | non placé |  |
 
@@ -183,7 +190,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 ## 6. Intégration technique
 
-- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 10,8 Mo (budget visé: 20 Mo).
+- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 10,9 Mo (budget visé: 20 Mo).
 - **Boucles**: chaque fichier de boucle porte une amorce de chaque côté (la fin de la boucle avant, son début après: 1 s pour les musiques, 0,4 à 0,5 s pour les autres). Jouer avec `AudioBufferSourceNode`: `loop = true`, `loopStart` et `loopEnd` lus dans `loop.startSeconds` et `loop.endSeconds`, départ à `playFromSeconds` (pour une musique, le premier temps, 0,12 s après le début de la boucle: le raccord tombe entre deux notes).
 - **Pas de lecture en flux pour les boucles**: mesuré dans Chromium, `<audio loop>` insère 128 à 256 échantillons de silence (2,7 à 5,3 ms) à chaque tour, un clic audible sur une musique. Les boucles doivent être décodées (`decodeAudioData`).
 - **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
@@ -194,7 +201,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 ## 7. Contrôles (sans écouter)
 
 - `duo-python games/la-petite-ligne/assets-src/son/generer.py` régénère tout (environ 6 minutes) puis lance `controler.py`: sonie et crête vraie de chaque fichier par le filtre `ebur128` de ffmpeg après décodage (aucune crête au-dessus de -1,5 dBTP, aucun échantillon écrêté), silence en tête des effets (2,6 ms au plus), longueur exacte et raccord de chaque boucle (saut et seconde différence comparés à leur distribution dans le fichier, niveau au raccord comparé aux variations internes), poids du jeu.
-- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 121 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
+- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 131 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
 - Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
@@ -207,7 +214,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 - **Qualité « superbe »**: livrée (`quality-superb`) bien qu'absente de la démo.
 - **Lucie**: son motif est livré, bien qu'elle soit seulement citée dans la démo.
 - **Oiseaux**: génériques (trille, « tsip », phrase flûtée, « ti-tu », coucou et pigeon ramier au loin). Les chants des 24 espèces du carnet restent à faire pour le jeu complet; aucun n'est imité ici.
-- **Pas absents de la démo**: pêche (P1), pluie qui tombe sur l'eau, bêtes autres que les poules, plan de la maison (crayon, gomme), fêtes, rang atteint.
+- **Pas absents de la démo**: pluie qui tombe sur l'eau, bêtes autres que les poules, plan de la maison (crayon, gomme), fêtes, rang atteint.
 - **Banque FluidR3_GM**: ses échantillons sont sombres au-dessus de 3 kHz; une correction calculée par la mesure ramène chaque musique vers la même clarté (octave de 4 kHz vers -19 dB).
 
 ## 9. Questions ouvertes
@@ -222,3 +229,4 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 | Date | Changement |
 |---|---|
 | 2026-10-31 | Première livraison pour la démo: 9 musiques, 71 sons (121 fichiers), document sonore |
+| 2026-10-31 | Pêche jouable dans la démo: cinq sons (`fishing-cast`, `fishing-splash`, `fishing-bite`, `fishing-catch`, `fishing-escape`, 10 fichiers); note du vent rattachée à la zone `forest_edge` de la carte |

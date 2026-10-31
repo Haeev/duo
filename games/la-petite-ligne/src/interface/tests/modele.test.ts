@@ -9,6 +9,7 @@ import {
   orderFullAmount,
   orderLines,
   partnerModel,
+  placementReason,
   purseModel,
   questModels,
   screenOf,
@@ -220,6 +221,18 @@ describe('commande et quêtes', () => {
       ['a', 'Samedi 1', false],
     ]);
     expect(letters[0]?.text).toBe(`L’établi`);
+  });
+});
+
+describe('refus de pose (demande 11)', () => {
+  it('montre le texte placement_* de textes.json, ou rien si la raison manque', () => {
+    const messages = { placement_wall: 'Celui-ci se pose contre un mur.' };
+    expect(placementReason('Celui-ci se pose contre un mur.', messages)).toBe('Celui-ci se pose contre un mur.');
+    expect(placementReason('placement_wall', messages)).toBe('Celui-ci se pose contre un mur.');
+    expect(placementReason('placement_outside', messages)).toBeNull();
+    expect(placementReason(null, messages)).toBeNull();
+    expect(placementReason(undefined, messages)).toBeNull();
+    expect(placementReason('  ', messages)).toBeNull();
   });
 });
 

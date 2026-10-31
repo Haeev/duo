@@ -12,6 +12,8 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 4. Fait: rotation des meubles selon la convention de la carte.
 5. Facultatif, toujours ouvert: cases d'« herbe haute » (`,`) pour des touffes plus denses. En attendant: bruit déterministe.
 
+Modèles (artiste 3D, 2026-10-31): dans `personnages.glb`, sur le squelette commun, les animations sur place `fish_cast` (lancer, 1 s, une fois), `fish_wait` (attente canne tenue, boucle de 3 s), `fish_strike` (ferrer et mouliner, 1,6 s, une fois) et `sit_ground` (assis par terre, boucle de 3 s) sont disponibles, à brancher à la place de `chop`, `water` et `sit` sur la caisse. Les trois clips de pêche partent et finissent sur la même pose d'attente. La canne `fishing_rod` (`socket_hand_r`) est corrigée: le scion part bien de la main, et son bout tombe là où l'attend `ROD_TIP` (0, 1,34, 1,49), avec un nœud vide `fishing_rod_tip` à cet endroit. La ligne et le bouchon intégrés au modèle sont retirés (le rendu dessine les siens), et un bouchon `fishing_float` est disponible dans `ferme.glb`. Détails: `assets/modeles/README.md`.
+
 ### Réponses du rendu aux demandes du dev gameplay
 
 1. Fait: `quality: 'light'` est honoré par `src/rendu/` (`RENDER_SETTINGS.light`): rapport de pixels 0,5 et 640x360 pixels physiques au plus, `shadowMap.enabled = false` et soleil sans ombre, antialiasing coupé, particules et pluie au quart, touffes, fleurs, galets et forêt du pourtour au quart, indicateur de performances masqué, résolution dynamique arrêtée. Mesuré dans la page de démonstration (`rendu.html?rendu=leger`): 63 appels de dessin, 68 000 triangles, 6 programmes. **À faire côté `main.ts`: retirer le palliatif CSS (canevas à la moitié agrandi)**, sinon la résolution est divisée deux fois.
@@ -94,6 +96,14 @@ Tenue par le dev audio (`src/audio/`). Chaque point dit ce que le son fait en at
 ## Audio
 
 Point d'avancement du dev audio (`src/audio/`), du plus récent au plus ancien. Mode d'emploi: `src/audio/README.md`.
+
+### 2026-10-31: sons de la pêche (sound-designer)
+
+- Livrés dans `assets/son/effets/` et déclarés dans `sons.json` (détail: `docs/jeux/jeu-1/son.md`, section 4): `fishing-cast` (au pêcheur, 2 variantes), `fishing-splash` (au bouchon, 0,55 s après le lancer, 2 variantes), `fishing-bite` (au bouchon, 3 variantes, priorité 2), `fishing-catch` (au bouchon, éclaboussure et frétillement, 2 variantes), `fishing-escape` (au bouchon).
+- À brancher dans `src/audio/declencheurs.ts` à la place des substituts: `cast` -> `fishing-cast` puis `fishing-splash` à `event.at`; `bite` -> `fishing-bite`; `caught` -> `fishing-catch` (remplace `harvest` et `quality-fine`); `escaped` -> `fishing-escape`. Les sons au bouchon ont une distance de référence de 6 m (`spatial.refDistance` dans `sons.json`).
+- Note du vent corrigée dans `sons.json`: il suit la zone `forest_edge` de `donnees/cartes/halte.json` (point 3 des demandes de l'audio).
+- À mettre à jour par le dev audio: `src/audio/catalogue.test.ts` attend 71 sons, `sons.json` en déclare maintenant 76 (vérifié: ce test échoue sur ce seul compte, les 64 autres tests de `src/audio` passent avec le nouveau fichier).
+- Contrôlé: sonie et crêtes par `ebur128` (aucune crête au-dessus de -1,5 dBTP), décodage dans Chromium des 131 fichiers. Pour information, `design/son/la-petite-ligne/en-jeu/depart.m4a` (enregistrement du banc) a une crête vraie de -0,5 dBTP.
 
 ### 2026-10-31, nuit: tout le son de la démo
 

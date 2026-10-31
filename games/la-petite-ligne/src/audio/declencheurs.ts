@@ -73,6 +73,12 @@ function characterAt(world: ReadonlyWorld, id: CharacterId): Vec2 | null {
   return c === undefined ? null : { x: c.pos.x, y: c.pos.y };
 }
 
+/** Le bouchon de ce pêcheur, ou le pêcheur lui-même si la ligne est déjà rentrée. */
+function bobberAt(world: ReadonlyWorld, id: CharacterId): Vec2 | null {
+  const bobber = world.characters.find((k) => k.id === id)?.fishing?.bobber;
+  return bobber === undefined ? characterAt(world, id) : { x: bobber.x, y: bobber.y };
+}
+
 function pointAt(map: GameMap, id: string): Vec2 | null {
   const p = map.points[id];
   return p === undefined ? null : { x: p.x, y: p.y };
@@ -252,23 +258,19 @@ export function soundsForEvent(
     case 'demo_ended':
       signals.demoEnded = true;
       break;
-    // Pêche (P1): pas encore de sons à elle (son.md 8); substituts en attendant le sound designer.
+    // Pêche (son.md 4): le lancer au pêcheur, puis le plouf, la touche et la prise au bouchon.
     case 'cast':
-      emit.world('water', { x: event.at.x, y: event.at.y }, event.by);
+      emit.world('fishing-cast', characterAt(world, event.by), event.by);
+      emit.world('fishing-splash', { x: event.at.x, y: event.at.y }, event.by, d.fishingSplashSeconds);
       break;
-    case 'bite': {
-      const bobber = world.characters.find((c) => c.id === event.by)?.fishing?.bobber;
-      emit.world('pickup', bobber === undefined ? characterAt(world, event.by) : { x: bobber.x, y: bobber.y }, event.by);
+    case 'bite':
+      emit.world('fishing-bite', bobberAt(world, event.by), event.by);
       break;
-    }
-    case 'caught': {
-      const at = characterAt(world, event.by);
-      emit.world('harvest', at, event.by);
-      emit.world('quality-fine', at, event.by, d.qualitySeconds);
+    case 'caught':
+      emit.world('fishing-catch', bobberAt(world, event.by), event.by);
       break;
-    }
     case 'escaped':
-      emit.world('water-empty', characterAt(world, event.by), event.by);
+      emit.world('fishing-escape', bobberAt(world, event.by), event.by);
       break;
     case 'pin':
       // Le repère: le sien, ou celui de l'autre (plus grave, trois notes), placé à l'épingle.

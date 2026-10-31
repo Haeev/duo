@@ -73,7 +73,7 @@ export interface Renderer {
   /** Orientation de la caméra autour de la verticale (radians), pour tourner Z Q S D. */
   cameraYaw(): number;
   /** Commandes de caméra locales (A et E, R et F, Maj et molette). */
-  camera(command: 'rotate_left' | 'rotate_right' | 'zoom_in' | 'zoom_out'): void;
+  camera(command: CameraCommand): void;
   /** Lancer de rayon depuis un point de l'écran (coordonnées client). */
   pick(clientX: number, clientY: number): PickResult | null;
   /** Statistiques de dessin pour l'indicateur de développement. */
@@ -83,6 +83,9 @@ export interface Renderer {
 
 export type CreateRenderer = (options: RendererOptions) => Renderer;
 
+/** Commandes de caméra locales, du clavier ou des boutons du HUD. */
+export type CameraCommand = 'rotate_left' | 'rotate_right' | 'zoom_in' | 'zoom_out';
+
 export interface InterfaceOptions {
   view: GameView;
   /** Couche DOM au-dessus du canevas. */
@@ -90,6 +93,8 @@ export interface InterfaceOptions {
   /** Taille de l'interface (1, 1,25 ou 1,5) et réduction des animations. */
   uiScale: number;
   reducedMotion: boolean;
+  /** Boutons de caméra du HUD: transmis au rendu par `main.ts` (facultatif). */
+  camera?: (command: CameraCommand) => void;
 }
 
 export interface GameInterface {

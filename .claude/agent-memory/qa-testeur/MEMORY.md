@@ -25,3 +25,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 ## Accessibilité
 
 - CIEDE2000 maison: contrôle sur la paire 1 de Sharma, Wu et Dalal (2005), attendu 2,0425. Simulation du daltonisme de Machado, Oliveira et Fernandes (2009), sévérité 1,0, appliquée en RVB linéaire. La palette d'Okabe et Ito donne au pire 21,7 en vision normale et 10,9 après simulation: seuils de 20 et 10 atteignables.
+
+## Jeux dans le faux hôte (vérifié le 2026-10-31, La Petite Ligne)
+
+- Sonde sans crochet: en mode `servir`, la page de l'invité reçoit par WebSocket des trames `{"t":"net","channel":N,"data":"<json>"}`; canal 1 = état complet faisant autorité (`data.world`), 2 = positions rapides, 3 = événements. `page.on('websocket')` + `framereceived` suffit (`games/la-petite-ligne/tests/e2e/sonde.ts`).
+- Rendu logiciel et machine partagée: une image par seconde environ. `locator.click()` expire en attendant les navigations: cliquer par `locator.evaluate((n) => n.click())`. Les boutons radio stylés (input masqué) bloquent `check()` sans délai: cliquer le texte du libellé, et toujours fixer `actionTimeout`.
+- Le chien de garde (Duo et faux hôte) coupe la partie après 5 s sans battement une fois le jeu prêt (10 s au chargement): mesurer les tâches longues par un `addInitScript` de contexte (il s'applique aussi à l'iframe du jeu) avec `PerformanceObserver` `longtask`.
+- Explorations jetables hors du dépôt: dossier de travail avec un lien `node_modules` vers celui du jeu et une config Playwright à part. Un `console.log` dans un fichier du dépôt fait échouer `pnpm verifier` et la CI de tout le monde.
+- Ne jamais `pkill` Chromium par motif: d'autres membres en font tourner sur la même machine; arrêter ses propres tâches de fond (TaskStop).
+- Bug connu sans correctif: test `it.fails` avec la référence du bug, la CI reste verte et le test échoue dès la correction (à passer en `it`).
+- Robots de La Petite Ligne: la graine ne change pas leur parcours (8 graines, durées et résultats identiques); la variété vient des options du robot.

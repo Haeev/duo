@@ -11,7 +11,9 @@
 import { MathUtils, OrthographicCamera, Plane, Raycaster, Vector2, Vector3 } from 'three';
 import { RENDER_SETTINGS } from './reglages';
 
-export type CameraCommand = 'rotate_left' | 'rotate_right' | 'zoom_in' | 'zoom_out';
+import type { CameraCommand } from '../etat/vue';
+
+export type { CameraCommand };
 
 const DEG = Math.PI / 180;
 const QUARTER_TURN = Math.PI / 2;

@@ -499,6 +499,21 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
 }
 
 // ---------------------------------------------------------------------------
+// Aménagement
+
+/**
+ * Raison d'un refus de pose (demande 11): le texte `placement_*` de
+ * `textes.json`, que la simulation donne tout fait, ou sa clé. `null` si la
+ * raison manque (texte absent des données): l'interface montre alors son
+ * message général.
+ */
+export function placementReason(blocked: string | null | undefined, messages: Readonly<Record<string, string>>): string | null {
+  if (blocked === null || blocked === undefined || blocked.trim() === '') return null;
+  if (/^placement_[a-z_]+$/.test(blocked)) return messages[blocked] ?? null;
+  return blocked;
+}
+
+// ---------------------------------------------------------------------------
 // Divers
 
 /** Nom d'objet en minuscules avec la quantité: « 3 œufs ». */
