@@ -9,7 +9,8 @@ import { loadContent } from './donnees/contenu';
 import { loadMap } from './donnees/carte';
 import { MAP_FILES } from './donnees/cartes-fichiers';
 import { CONTENT_FILES } from './donnees/fichiers';
-import type { CreateAudio, CreateInterface, GameAudio, GameInterface, Renderer, RenderQuality } from './etat/vue';
+import type { AudioExtras } from './audio/index';
+import type { AudioOptions, CreateInterface, GameAudio, GameInterface, Renderer, RenderQuality } from './etat/vue';
 import { createControls } from './entrees/commandes';
 import { createFallbackInterface } from './plateforme/interface-secours';
 import { createRenderer } from './rendu/index';
@@ -59,14 +60,16 @@ function renderQuality(): RenderQuality {
   return 'normal';
 }
 
-/** Le son (`src/audio/`), s'il est livré. */
-async function pickAudio(): Promise<CreateAudio | null> {
+/** Le son (`src/audio/`), avec ce qu'il accepte en plus du contrat (pause, oreilles, journal). */
+type CreateAudioWithExtras = (options: AudioOptions & AudioExtras) => GameAudio;
+
+async function pickAudio(): Promise<CreateAudioWithExtras | null> {
   const modules = import.meta.glob<Record<string, unknown>>('./audio/index.ts');
   const load = modules['./audio/index.ts'];
   if (load === undefined) return null;
   const mod = await load();
   const create = mod.createAudio;
-  return typeof create === 'function' ? (create as CreateAudio) : null;
+  return typeof create === 'function' ? (create as CreateAudioWithExtras) : null;
 }
 
 /** Robot de test (`?robot=1`), seulement en développement: absent de la version livrée. */
@@ -118,7 +121,15 @@ async function main(): Promise<void> {
     ui = createInterface({ view, overlay, uiScale: duo.ui.scale, reducedMotion: duo.ui.reducedMotion });
     const createAudio = await pickAudio();
     if (createAudio !== null) {
-      const a = createAudio({ view, audio: duo.audio, url: (path) => duo.assets.url(path), reducedMotion: duo.ui.reducedMotion });
+      const a = createAudio({
+        view,
+        audio: duo.audio,
+        url: (path) => duo.assets.url(path),
+        reducedMotion: duo.ui.reducedMotion,
+        lifecycle: duo,
+        cameraYaw: () => r.cameraYaw(),
+        log: duo.log,
+      });
       // Un son manquant ne doit jamais empêcher de jouer.
       await a.load(() => undefined).catch((error: unknown) => {
         duo.log.warn('sons non chargés', { message: error instanceof Error ? error.message : String(error) });

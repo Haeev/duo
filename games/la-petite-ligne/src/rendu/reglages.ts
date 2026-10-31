@@ -47,7 +47,7 @@ export const RENDER_SETTINGS = {
     maxPixelRatio: 2,
     /** Budget de la plateforme: 1920x1080 pixels physiques au plus sur le PC. */
     maxPhysicalPixels: 1920 * 1080,
-    antialias: true,
+    antialias: true as boolean,
     /** Tone mapping neutre (Khronos PBR Neutral): garde les teintes de la palette. */
     toneMapping: 'neutral' as 'neutral' | 'agx' | 'aces',
     exposure: 1.0,

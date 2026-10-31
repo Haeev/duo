@@ -207,9 +207,25 @@ describe('règles', () => {
     act(sim, 'p1', { type: 'act' });
     expect(c.fishing).toBeNull();
     expect(['gudgeon', 'chub', 'trout'].reduce((n, fish) => n + countInBag(c, fish), 0)).toBe(1);
-    // Trop tard: le poisson s'échappe.
+    // Trop tard: le poisson s'échappe, et on le dit.
     act(sim, 'p1', { type: 'act' });
     for (let i = 0; i < 30 * 20 && c.fishing !== null; i++) step(sim, { controls: {}, intents: [] });
     expect(c.fishing).toBeNull();
+    const last = c.notifications.at(-1);
+    expect(last?.key).toBe('fish_escaped');
+    expect(last?.text).toBe("Il s'est échappé.");
+  });
+
+  it('aménagement: le fantôme du meuble dit pourquoi il ne tient pas (texte de textes.json)', () => {
+    const sim = started();
+    const c = character(sim, 'p1');
+    addToBag(sim, c, 'table', 'ordinary', 1);
+    const room = sim.map.house.room;
+    // Contre le mur ouest, face au mur: la table sortirait de la pièce.
+    placeCharacter(sim, c, { x: room.x + 0.5, y: room.y + 1.5 });
+    c.facing = Math.PI;
+    act(sim, 'p1', { type: 'hold_furniture', item: 'table' });
+    expect(c.placement?.valid).toBe(false);
+    expect(c.placement?.blocked).toBe(sim.content.texts.messages.placement_outside);
   });
 });
