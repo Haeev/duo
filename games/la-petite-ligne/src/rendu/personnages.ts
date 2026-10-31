@@ -293,8 +293,12 @@ class CharacterFigure {
       this.lookTarget === null &&
       this.idleFor >= this.idleNextAt
     ) {
-      const name =
+      const picked =
         variants[Math.floor(stableUnit(this.id, this.idleRank, 'pick') * variants.length)] ?? '';
+      // Outil en main: pas d'attente qui lève les bras, on prend la suivante permise.
+      const name = this.allowed(picked)
+        ? picked
+        : (variants.find((candidate) => this.allowed(candidate)) ?? '');
       const pose = IDLE_POSES[name];
       const seconds = pose?.seconds ?? this.clips.get(name)?.duration ?? 0;
       if (seconds > 0) {
@@ -304,7 +308,10 @@ class CharacterFigure {
       }
     }
     const variant = this.variant;
-    if (variant !== null && time - variant.start >= variant.seconds) {
+    if (
+      variant !== null &&
+      (time - variant.start >= variant.seconds || !this.allowed(variant.name))
+    ) {
       this.variant = null;
       this.idleFor = 0;
       this.idleRank += 1;
@@ -325,6 +332,11 @@ class CharacterFigure {
       return { ...request, fade: SETTINGS.idleFadeSeconds };
     }
     return request;
+  }
+
+  /** Attente permise maintenant: celles qui lèvent les bras, seulement les mains vides. */
+  private allowed(name: string): boolean {
+    return this.tool === null || IDLE_POSES[name]?.raisesArms !== true;
   }
 
   /** Pose procédurale et regard, ajoutés aux os après le mélangeur. */

@@ -309,6 +309,7 @@ export const IDLE_POSES: Readonly<Record<string, IdlePose>> = {
   /** S'étirer: bras levés sur les côtés, buste et tête en arrière. */
   stretch: {
     seconds: 2.8,
+    raisesArms: true,
     terms: [
       { bone: 'upper_arm_l', axis: 'forward', degrees: 140 },
       { bone: 'upper_arm_r', axis: 'forward', degrees: -140 },
@@ -352,6 +353,7 @@ export const IDLE_POSES: Readonly<Record<string, IdlePose>> = {
   /** Basile s'essuie le front du revers de la main. */
   wipe_brow: {
     seconds: 2.2,
+    raisesArms: true,
     terms: [
       { bone: 'upper_arm_r', axis: 'side', degrees: -75 },
       { bone: 'forearm_r', axis: 'side', degrees: -110 },

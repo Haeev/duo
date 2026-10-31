@@ -7,11 +7,11 @@ Repères: 10 = à ce niveau de soin, aucune différence visible avec les référ
 | Pilier | Note | Relecteur | Date | Preuves |
 |---|---|---|---|---|
 | 1. Ressenti des commandes | 7 (4,5 au tour 1) | dev-gameplay-2d | 2026-10-31, tour 2 | `revues/tour-02-ressenti.md` |
-| 2. Vie du monde et animation | 6 (6) | directeur-artistique | 2026-10-31, tour 3 | `revues/tour-03-da.md` |
-| 3. Direction artistique | 6,5 (6) | directeur-artistique | 2026-10-31, tour 3 | `revues/tour-03-da.md` |
+| 2. Vie du monde et animation | 7 (6) | directeur-artistique | 2026-10-31, tour 4 | `revues/tour-04-da.md` |
+| 3. Direction artistique | 7 (6,5) | directeur-artistique | 2026-10-31, tour 4 | `revues/tour-04-da.md` |
 | 4. Son et musique | 7,5 (7), sans écoute | ux-ui-designer | 2026-10-31, tour 2 | `revues/tour-02-interface-son.md` |
 | 5. Interface et lisibilité | 7 (6,5) | ux-ui-designer | 2026-10-31, tour 2 | `revues/tour-02-interface-son.md` |
-| 6. Contenu et rythme | 6,5 (5) | level-designer | 2026-10-31, tour 3 | `revues/tour-03-contenu-coop.md` |
-| 7. Coopération | 6,5 (6) | level-designer | 2026-10-31, tour 3 | `revues/tour-03-contenu-coop.md` |
+| 6. Contenu et rythme | 7 (6,5) | level-designer | 2026-10-31, tour 4 | `revues/tour-04-contenu-coop.md` |
+| 7. Coopération | 7,5 (6,5) | level-designer | 2026-10-31, tour 4 | `revues/tour-04-contenu-coop.md` |
 | 8. Robustesse et performance | 7,5 (6,5) | architecte-technique | 2026-10-31, tour 2 | `revues/tour-02-robustesse.md` |
-| Moyenne | 6,8 (6,5) | | 2026-10-31 | tour 3 |
+| Moyenne | 7,1 (6,8) | | 2026-10-31 | tour 4 |

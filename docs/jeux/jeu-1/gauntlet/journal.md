@@ -8,6 +8,14 @@ Un bloc par tour, du plus récent au plus ancien: pilier visé, changements, not
 - Plan des 100 heures: `docs/jeux/jeu-1/plan-100-heures.md` (8 arcs, règles anti-répétition R1 à R16, jalons J1 à J9, décisions D1 à D9 pour le client).
 - Références visuelles du client (vidéo YouTube, galerie du wiki) non consultables: domaines bloqués par la politique réseau de l'environnement.
 
+## Tour 4 (2026-10-31): gestes à deux, jours creux, vie du monde, sol
+
+- Changements: draisine poussée à deux et colis lourd du catalogue porté à deux, quatre buts d'après-midi (jours 6, 10, 11, 13), rendez-vous du jour 14 qui ne se perd plus; attentes variées, habitants qui suivent du regard et saluent, clips sit_eat, give, pet et high_five branchés; herbe en teinte continue, place sans damier, fumées qui naissent petites. Correctifs exigés en revue: draisine dessinée au bout de la voie, plus d'outil brandi pendant les attentes.
+- Épreuves G1 à G7 passées (307 tests, 18 tests de bout en bout). Reporté sur `main`.
+- Notes: vie du monde 7 (6), direction artistique 7 (6,5), contenu 7 (6,5), coopération 7,5 (6,5); moyenne 7,1 (6,8).
+- Décision du client pendant le tour: passer au low poly arrondi (bible, section 8); planche de trois modèles témoins en cours, à valider par le client avant de l'appliquer au bourg.
+- Tour 5 prévu: low poly arrondi (si validé), pavés et chemins courbes, petite faune, rivière et gué; jour 6 joué par les robots, une information propre à chacun, des buts qui ne sont pas des apports.
+
 ## Tour 3 (2026-10-31): contenu et rythme, soir et foyer
 
 - Changements: 56 répliques quotidiennes et règle « la moins récemment entendue » (redites de 55 % à 7 à 9 % à une conversation par jour), quêtes de la semaine 2 étalées et un événement par jour du 11 au 14, second chemin vers la remise sans l'énigme, 15 envies de plus et pas de retour avant 7 jours, robot corrigé (porte); soir plus contrasté, foyer de la maisonnette, fumées plus visibles.

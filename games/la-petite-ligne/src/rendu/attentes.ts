@@ -37,6 +37,8 @@ export interface PoseTerm {
 
 export interface IdlePose {
   readonly seconds: number;
+  /** Lève le bras droit ou les deux: jamais outil en main (on croirait qu'il le brandit). */
+  readonly raisesArms?: boolean;
   readonly terms: readonly PoseTerm[];
 }
 
