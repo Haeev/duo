@@ -89,3 +89,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Mesure reproductible: `triangleSplit()` au même cadrage, quatre orientations, avant et après dans le même serveur; ne jamais remettre d'anciens fichiers dans l'arbre partagé pour mesurer « avant » (`git checkout <commit> -- fichier` change aussi l'index, et un instantané « wip » du manager peut capturer cet état): copier l'ancienne version dans un dossier à part ou comparer à des chiffres déjà relevés.
 - Une ombre retirée se juge à midi, pas seulement au soir: les poules sans ombre flottaient à midi alors que rien ne se voyait à 19 h.
 - ImageMagick: `-gravity` posé dans une parenthèse s'applique aussi au `-crop` des parenthèses suivantes: recadrer dans des commandes séparées.
+
+## Carte et énigmes de lumière (La Petite Ligne, vérifié le 2026-10-31)
+
+- `GeometryWriter.quad` oriente par le produit vectoriel de ses trois premiers points: un quadrilatère dégénéré (deux points confondus, par exemple une joue de rampe au pied nul) sort mal orienté et disparaît (élimination des faces arrière). Écrire un triangle.
+- Ombres du soir: le soleil vient de l'ouest, bas (38° à 17 h, 19° à 17 h 45, presque sans composante nord-sud). L'ombre d'un toit à 3 m part de 3,5 à 9 m vers l'est; sous un auvent, le bout ouest reste au soleil. Une ombre portée sur une surface déjà à l'ombre ne se voit pas: tester l'ombre visible (rayon du point touché vers le soleil, qui ne doit rien croiser), pas seulement le contact.
+- `outils/valider_carte.py` refuse un point important caché depuis la vue par défaut ou visible d'une seule orientation; l'épicerie (8,5 m) cache tout le bout ouest du quai (x < 26,5 en y 18). Sonder avec `boites_occultantes` et `cache_par` avant de déplacer un point.
+- Deux points d'interaction à moins de `ranges.talk` (2,5 m) l'un de l'autre (caisse et tableau) font boucler les robots: le menu ouvert n'est pas celui attendu.
+- Nom d'un nœud cherché par `getObjectByName`: le vérifier dans le GLB par un test (lecture du JSON du GLB dans Node, `lumiere.test.ts` et `voie.test.ts` en ont un exemple); un nom faux ne lève aucune erreur, l'objet reste figé.

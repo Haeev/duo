@@ -252,7 +252,8 @@ def construire_objets() -> None:
     objet("platform", 21, 15, ident="platform")
     objet("station", 51, 15, ident="station")
     # Tableau et caisse sous la marquise, à l'est du banc: leurs ombres du soir partent vers l'est, loin de lui.
-    objet("notice_board", 36, 18, ident="notice_board")
+    # Au moins 3 m entre eux: à portée de l'un et de l'autre, on ouvrirait l'un pour l'autre.
+    objet("notice_board", 41, 18, ident="notice_board")
     objet("coop_crate", 35, 18, ident="coop_crate")
     # Cloche et banc sur le quai, le banc face à la voie (audit de cohérence; ombre mesurée par le game designer).
     # Gauntlet, tour 5: le soir, le soleil vient de l'ouest, bas, et l'ombre de la marquise part vers l'est
@@ -408,7 +409,7 @@ POINTS = [
     p("bell_shadow_spot", 34.7, 19.8, "derrière le bout est du banc, dans l'herbe: on y bêche quand l'ombre de la cloche "
       "touche le banc (17 h à 17 h 45, par soleil)", rayon=1.5, hauteur_vue=0.2, important=True),
     p("coop_crate", 35.5, 18.5, "la caisse de la coopérative", objet="coop_crate", portee=1.5, important=True),
-    p("notice_board", 36.5, 18.5, "le tableau: commande, catalogue, courrier", objet="notice_board",
+    p("notice_board", 41.5, 18.5, "le tableau: commande, catalogue, courrier", objet="notice_board",
       portee=1.5, important=True),
     p("station_door", 55.5, 21.5, "devant la porte de la halte (fermée dans la démo)", objet="station"),
     p("level_crossing", 18.5, 13.5, "le passage à niveau du garde-barrière"),

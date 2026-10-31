@@ -225,11 +225,11 @@ Décor: lampadaires, bancs de la place et de la berge, tonneaux, boîte aux lett
 |---|---|---|
 | `train_stop` | 38,5 ; 17,5 | porte de la voiture: Firmin attend le train, rendez-vous du samedi |
 | `spawn_1`, `spawn_2` | 37,5 et 39,5 ; 15,5 | apparition des deux joueurs en descendant du train |
-| `quay_bell` | 36,5 ; 18,5 | Firmin à côté de la cloche; rassemblement de la fin |
-| `quay_bench` | 40,0 ; 19,5 | le banc du quai, Jeanne le matin |
-| `bell_shadow_spot` | 40,0 ; 20,5 | au pied du banc, dans l'herbe: on y bêche pour l'énigme |
-| `coop_crate` | 32,5 ; 18,5 | la caisse de la coopérative |
-| `notice_board` | 29,5 ; 18,5 | le tableau: commande, catalogue, courrier |
+| `quay_bell` | 29,5 ; 17,5 | Firmin au nord de la cloche (cloche en x 29,5, hors de la marquise, gauntlet tour 5); rassemblement de la fin |
+| `quay_bench` | 33,0 ; 18,5 | le banc du quai (entre deux poteaux de la marquise, 3,5 m à l'est de la cloche), Jeanne le matin |
+| `bell_shadow_spot` | 34,7 ; 19,8 | derrière le bout est du banc, dans l'herbe: on y bêche pour l'énigme |
+| `coop_crate` | 35,5 ; 18,5 | la caisse de la coopérative, sous la marquise |
+| `notice_board` | 41,5 ; 18,5 | le tableau: commande, catalogue, courrier, sous la marquise |
 | `house_door` | 8,5 ; 27,5 | devant la porte de la maisonnette: toit et porte à construire |
 | `house_spawn` | 8,5 ; 24,5 | dans la pièce: retour de minuit |
 | `house_attic` | 8,5 ; 23,0 | le grenier: la boîte en fer |
