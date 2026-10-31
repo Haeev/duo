@@ -1,12 +1,12 @@
 {
  "meshes": {
-  "player_base": 400,
-  "player_outfit_work": 890,
-  "player_outfit_smock": 882,
-  "player_outfit_overalls": 890,
-  "player_hair_short": 436,
-  "player_hair_bob": 436,
-  "player_hair_bun": 484,
+  "player_base": 460,
+  "player_outfit_work": 962,
+  "player_outfit_smock": 954,
+  "player_outfit_overalls": 962,
+  "player_hair_short": 388,
+  "player_hair_bob": 352,
+  "player_hair_bun": 416,
   "player_scarf_orb": 212,
   "player_scarf_crescent": 256,
   "player_scarf_star": 204,
@@ -136,6 +136,6 @@
    "loop": true
   }
  ],
- "file_bytes": 2309572,
- "player_example_tris": 1938
+ "file_bytes": 2336752,
+ "player_example_tris": 2022
 }

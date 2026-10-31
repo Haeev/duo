@@ -27,10 +27,11 @@ titre "Maison de Firmin (firmin_house): $fa triangles avant, $fb après" 60 28 h
 convert "$r/maison_a.png" "$r/maison_b.png" +append -background '#F4EFE6' -gravity center -extent 2400x700 "$t/r2.png"
 titre "Chêne (tree_oak_large, alias tree_oak): $oa puis $ob triangles. Buisson (bush_round, alias bush): $ba puis $bb" 60 28 h3.png
 convert "$r/nature_a.png" "$r/nature_b.png" +append -background '#F4EFE6' -gravity center -extent 2400x700 "$t/r3.png"
-titre "Joueur complet (base, tenue work, coiffure short, foulard orb): $pa puis $pb triangles. Clips idle, walk, hoe" 60 28 h4.png
-convert "$r/perso_idle_a.png" "$r/perso_walk_a.png" "$r/perso_hoe_a.png" -resize 400x520 +append "$t/pa.png"
-convert "$r/perso_idle_b.png" "$r/perso_walk_b.png" "$r/perso_hoe_b.png" -resize 400x520 +append "$t/pb.png"
-convert "$t/pa.png" "$t/pb.png" +append "$t/r4.png"
+titre "Joueur complet (base, tenue work, coiffure short, foulard orb): $pa puis $pb triangles. Avant en haut, après en bas: idle, walk, hoe, water, carry_two" 60 26 h4.png
+clips="idle walk hoe water carry_two"
+convert $(for c in $clips; do echo "$r/perso_${c}_a.png"; done) -resize 480x624 +append "$t/pa.png"
+convert $(for c in $clips; do echo "$r/perso_${c}_b.png"; done) -resize 480x624 +append "$t/pb.png"
+convert "$t/pa.png" "$t/pb.png" -append "$t/r4.png"
 convert "$t/h0.png" "$t/h1.png" "$t/r1.png" "$t/h2.png" "$t/r2.png" "$t/h3.png" "$t/r3.png" "$t/h4.png" "$t/r4.png" \
   -append "$out"
 convert "$out" -colorspace Gray "${out%.png}-gris.png"

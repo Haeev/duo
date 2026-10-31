@@ -123,7 +123,7 @@ def main():
         shot(f"jeu24_{k}", (0.8, -0.5, 1.2), 24, (1200, 675))
         shot(f"maison_{k}", (0, 0, 2.2), 9.5, (900, 700))
         shot(f"nature_{k}", (5.0, 0.4, 1.7), 8.0, (900, 700))
-        for clip, frame in (("idle", 1), ("walk", 5), ("hoe", 9)):
+        for clip, frame in (("idle", 1), ("walk", 5), ("hoe", 9), ("water", 15), ("carry_two", 6)):
             pose(rig, tag, clip, frame)
             shot(f"perso_{clip}_{k}", (1.6, -3.9, 0.9), 2.3, (500, 650))
 

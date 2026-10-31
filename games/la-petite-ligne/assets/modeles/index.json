@@ -1,31 +1,31 @@
 {
  "player_base": {
   "file": "personnages.glb",
-  "tris": 400
+  "tris": 460
  },
  "player_outfit_work": {
   "file": "personnages.glb",
-  "tris": 890
+  "tris": 962
  },
  "player_outfit_smock": {
   "file": "personnages.glb",
-  "tris": 882
+  "tris": 954
  },
  "player_outfit_overalls": {
   "file": "personnages.glb",
-  "tris": 890
+  "tris": 962
  },
  "player_hair_short": {
   "file": "personnages.glb",
-  "tris": 436
+  "tris": 388
  },
  "player_hair_bob": {
   "file": "personnages.glb",
-  "tris": 436
+  "tris": 352
  },
  "player_hair_bun": {
   "file": "personnages.glb",
-  "tris": 484
+  "tris": 416
  },
  "player_scarf_orb": {
   "file": "personnages.glb",
@@ -374,7 +374,7 @@
  },
  "firmin_house": {
   "file": "bourg.glb",
-  "tris": 4556,
+  "tris": 4524,
   "footprint": [
    7,
    6

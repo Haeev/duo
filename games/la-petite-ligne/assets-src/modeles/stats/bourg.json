@@ -57,7 +57,7 @@
     6
    ],
    "door_cell": 3,
-   "tris": 4556
+   "tris": 4524
   },
   "sawmill": {
    "footprint": [
@@ -534,5 +534,5 @@
    "tris": 888
   }
  },
- "file_bytes": 3157444
+ "file_bytes": 3178756
 }

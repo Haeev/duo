@@ -199,8 +199,10 @@ def _key(p):
     return (round(p.x, 4), round(p.y, 4), round(p.z, 4))
 
 
-def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32):
-    """Chaînes d'angle en blocs qui enveloppent le coin arrondi du mur (2 cm de saillie)."""
+def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32, seed=7):
+    """Chaînes d'angle en blocs aux coins abattus irréguliers (1 à 3 cm de décalage), qui enveloppent
+    le coin arrondi du mur (saillie de 1,5 à 3 cm)."""
+    rnd = random.Random(seed)
     for sx in (1, -1):
         for sy in (1, -1):
             z, i = 0.0, 0
@@ -208,8 +210,12 @@ def round_quoins(g, hx, hy, z1, color="stone_light", step=0.32):
                 h = min(step, z1 - z)
                 big = i % 2 == 0
                 w, d = (0.44, 0.28) if big else (0.28, 0.44)
-                g.box((w, d, h - 0.03), loc=(sx * (hx + 0.02 - w / 2), sy * (hy + 0.02 - d / 2), z + 0.015),
-                      color=color, base=True, bevel=0.1, bseg=2, bedges=_vertical)
+                w += rnd.uniform(-0.03, 0.03)
+                d += rnd.uniform(-0.03, 0.03)
+                out = rnd.uniform(0.015, 0.03)
+                g.box((w, d, h - 0.03), loc=(sx * (hx + out - w / 2), sy * (hy + out - d / 2), z + 0.015),
+                      color=color, base=True, bevel=rnd.uniform(0.02, 0.035), bseg=1, bedges=_not_ground if z < 0.01 else None,
+                      rot=(0, 0, rnd.uniform(-1.5, 1.5)))
                 z += h
                 i += 1
 
@@ -226,14 +232,14 @@ def round_stone_texture(g, f, length, height, color="stone_dark", n=10, seed=1, 
 
 
 def round_chimney(g, x, y, z0, z1, color="stone", cap="stone_dark"):
-    """Cheminée chanfreinée à 4 cm (2 segments), chapeau débordant de 5 cm."""
-    g.box((0.55, 0.55, z1 - z0), loc=(x, y, z0), color=color, base=True, bevel=0.04, bseg=2)
-    g.box((0.65, 0.65, 0.1), loc=(x, y, z1), color=cap, base=True, bevel=0.035, bseg=2)
+    """Cheminée chanfreinée à 7 cm (2 segments), chapeau chanfreiné débordant de 6 cm."""
+    g.box((0.55, 0.55, z1 - z0), loc=(x, y, z0), color=color, base=True, bevel=0.07, bseg=2)
+    g.box((0.67, 0.67, 0.12), loc=(x, y, z1), color=cap, base=True, bevel=0.045, bseg=2)
     g.box((0.3, 0.3, 0.12), loc=(x, y, z1 + 0.1), color="shadow", base=True, bevel=0.015)
 
 
 def round_gable_roof(g, x0, x1, y0, y1, ze, zr, color, edge, ridge_color, over_x=0.36, over_y=0.3,
-                     thick=0.14, sag=0.04, bulge=0.03, rb=0.06):
+                     thick=0.14, sag=0.08, bulge=0.06, rb=0.06):
     """Toit à deux pans arrondi: rive épaisse chanfreinée (2 segments), faîtage fléchi au milieu,
     pans un peu bombés (rangée intermédiaire relevée), rangs de tuiles qui suivent la surface."""
     import bmesh
@@ -597,7 +603,7 @@ def firmin_house(A):
     g = A.geo()
     # murs et pignons d'un seul tenant (pentagone extrudé), angles verticaux chanfreinés à 10 cm;
     # le haut suit le dessous du toit (épaisseur et flèche du faîtage) pour ne pas le traverser
-    pts = [(-hy, 0.0), (hy, 0.0), (hy, ze - 0.18), (0.0, zr - 0.25), (-hy, ze - 0.18)]
+    pts = [(-hy, 0.0), (hy, 0.0), (hy, ze - 0.18), (0.0, zr - 0.3), (-hy, ze - 0.18)]
     body = g.prism(pts, 2 * hx, color="stone", rot=(0, 0, 90))
     g.bevel(body, 0.1, 2, "stone", edges_pred=lambda a, b: _vertical(a, b) and abs(a.z - b.z) > 1.0)
     g.box((2 * hx + 0.05, 2 * hy + 0.05, 0.35), color="stone_dark", base=True, bevel=0.035, bseg=2,
@@ -1269,7 +1275,7 @@ def tree_oak(A, large, seed):
     for (x, y, z, r, c, sc) in ((0, 0, 2.95, 1.3, "leaf_oak", (1.1, 1.0, 0.85)),
                                 (0.9, 0.25, 2.55, 0.85, "leaf_oak", (1.0, 1.1, 0.88)),
                                 (-0.85, -0.2, 2.6, 0.9, "leaf_oak_light", (1.05, 0.95, 0.9)),
-                                (0.05, -0.15, 3.6, 0.85, "leaf_oak_light", (1.0, 1.0, 0.85))):
+                                (0.32, -0.3, 3.55, 0.85, "leaf_oak_light", (1.0, 1.0, 0.85))):
         g.sphere(r * s, loc=(x * s, y * s, z * s), color=c, ico=2, jitter=0.07, seed=rnd.randint(0, 999),
                  scale=sc, rot=(0, 0, rnd.uniform(0, 360)))
     return g
