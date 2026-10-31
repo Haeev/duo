@@ -199,6 +199,8 @@ const SupplementSchema = v.object({
     'completeText',
     'gone',
     'shipped',
+    'shippedResult',
+    'nextOrder',
     'delivered',
     'deliveredLine',
     'missing',

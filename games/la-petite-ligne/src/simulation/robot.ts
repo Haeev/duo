@@ -10,7 +10,7 @@ import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './c
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
 import { refreshBlockers } from './deplacement';
-import { findPath } from './grille';
+import { findPath, isBlockedCell } from './grille';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
@@ -263,6 +263,22 @@ function orderNeed(sim: Sim, item: string): number {
   return line === undefined ? 0 : Math.max(0, line.count - countInStacks(sim.world.crate, item));
 }
 
+/** Ce que la commande et les quêtes de la semaine 2 attendent encore de cet objet (à ne pas manger ni vendre). */
+function reserved(sim: Sim, item: string): number {
+  const quest = QUEST_NEEDS.find((q) => q.item === item && questStep(sim, q.quest) === q.step);
+  return orderNeed(sim, item) + (quest?.count ?? 0);
+}
+
+/** Objets demandés par les quêtes de la semaine 2 (`quetes.json`), à l'étape où on les apporte. */
+const QUEST_NEEDS: readonly { quest: string; step: string; villager: string; item: string; count: number }[] = [
+  { quest: 'handcar', step: 'bring', villager: 'basile', item: 'plank', count: 8 },
+  { quest: 'handcar', step: 'bring', villager: 'basile', item: 'nail', count: 4 },
+  { quest: 'odette_fry', step: 'bring', villager: 'odette', item: 'gudgeon', count: 4 },
+  { quest: 'basile_omelette', step: 'bring', villager: 'basile', item: 'omelette', count: 1 },
+  { quest: 'lucie_note', step: 'give', villager: 'firmin', item: 'lucie_letter', count: 1 },
+  { quest: 'firmin_flowers', step: 'bring', villager: 'firmin', item: 'flower_pot', count: 2 },
+];
+
 /** Les deux sacs ensemble. */
 function inBags(sim: Sim, item: string): number {
   return countInBag(character(sim, 'p1'), item) + countInBag(character(sim, 'p2'), item);
@@ -274,7 +290,7 @@ function planksOwned(sim: Sim): number {
 
 /** Planches qui restent à trouver: poulailler, meubles, commande. */
 function planksWanted(sim: Sim): number {
-  let wanted = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank');
+  let wanted = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank') + reserved(sim, 'plank') - orderNeed(sim, 'plank');
   if (!built(sim, 'chicken_coop')) wanted += 8;
   for (const r of ['craft_table', 'craft_chair', 'craft_shelf', 'craft_double_bed']) {
     const recipe = sim.content.recipes[r];
@@ -351,6 +367,7 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     return false;
   }
   if (!questDone(sim, 'planks')) return false;
+  if (questStep(sim, 'handcar') === 'bring') return false;
   const reserve = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank') + (built(sim, 'chicken_coop') ? 0 : 8);
   const plan: { recipe: string; item: string; needsMattress?: boolean }[] = [
     { recipe: 'craft_table', item: 'table' },
@@ -458,7 +475,7 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   }
   if (c.supper.bread + c.supper.simple + c.supper.stew === 0) {
     const food = c.bag.find(
-      (s) => s !== null && sim.content.items[s.item]?.dish !== null && sim.content.items[s.item] !== undefined && orderNeed(sim, s.item) === 0,
+      (s) => s !== null && sim.content.items[s.item]?.dish !== null && sim.content.items[s.item] !== undefined && reserved(sim, s.item) === 0,
     );
     if (food !== null && food !== undefined) {
       out.push({ type: 'eat', item: food.item });
@@ -498,7 +515,7 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 /** Omelettes de la commande: au réchaud, une fois les œufs de la commande dans la caisse. */
 function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const recipe = sim.content.recipes.cook_omelette;
-  if (recipe === undefined || orderNeed(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) return false;
+  if (recipe === undefined || reserved(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) return false;
   const eggs = recipe.inputs.find((i) => i.item === ITEM.egg)?.count ?? 0;
   if (orderNeed(sim, ITEM.egg) > 0 || countInBag(c, ITEM.egg) < eggs) return false;
   if (sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
@@ -511,7 +528,8 @@ function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean
 
 /** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
-  if (orderNeed(sim, 'trout') <= inBags(sim, 'trout') || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  const wanted = orderNeed(sim, 'trout') > inBags(sim, 'trout') || reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon');
+  if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   if (countInBag(c, ITEM.fishingRod) === 0) return false;
   const ford = pt(sim, 'river_ford');
   if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, 'gue', ford, 0.4, out) || true;
@@ -534,6 +552,83 @@ function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: nu
   out.push({ type: 'act' });
   m.waitUntil = sim.world.tick + 2;
   return true;
+}
+
+/** Donne à un habitant (intention `give`), en allant jusqu'à lui. */
+function giveVillager(sim: Sim, c: Character, m: Memory, villager: string, gifts: { item: string; count: number }[], out: Intent[]): boolean {
+  const v = sim.world.villagers.find((x) => x.id === villager);
+  if (!v?.visible || gifts.some((g) => countInBag(c, g.item) < g.count)) return false;
+  const reach = sim.content.settings.ranges.talk - 0.5;
+  if (distance(c.pos, v.pos) > reach) return goTo(sim, c, m, `donner:${villager}`, v.pos, reach - 0.4, out);
+  for (const g of gifts) out.push({ type: 'give', to: villager, item: g.item, quality: 'ordinary', count: g.count });
+  m.waitUntil = sim.world.tick + 2;
+  m.job = `donner à ${villager}`;
+  return true;
+}
+
+/** Quêtes de la semaine 2: acheter ce qui s'achète, puis apporter chaque objet à son habitant. */
+function weekTwoQuests(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (c.id === 'p1' && questStep(sim, 'firmin_flowers') === 'bring' && countInBag(c, 'flower_pot') < 2) {
+    if (buy(sim, c, m, [{ item: 'flower_pot', count: 2 }], out)) return true;
+  }
+  if (c.id === 'p2' && questStep(sim, 'handcar') === 'bring' && countInBag(c, 'nail') < 4) {
+    if (buy(sim, c, m, [{ item: 'nail', count: 4 }], out)) return true;
+  }
+  const byVillager = new Map<string, { item: string; count: number }[]>();
+  for (const q of QUEST_NEEDS) {
+    if (questStep(sim, q.quest) !== q.step) continue;
+    // Ce que la commande attend passe d'abord (omelettes).
+    if (countInBag(c, q.item) - orderNeed(sim, q.item) < q.count) continue;
+    const list = byVillager.get(q.villager) ?? [];
+    list.push({ item: q.item, count: q.count });
+    byVillager.set(q.villager, list);
+  }
+  for (const [villager, gifts] of byVillager) {
+    // La draisine demande planches et clous ensemble.
+    if (villager === 'basile' && questStep(sim, 'handcar') === 'bring' && gifts.length < 2 && gifts.some((g) => g.item !== 'omelette')) continue;
+    if (giveVillager(sim, c, m, villager, gifts, out)) return true;
+  }
+  return false;
+}
+
+/** Essai de la draisine (scène à deux devant la remise, de 8 h à 18 h). */
+function handcarTry(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const { minutes } = sim.world.clock;
+  if (questStep(sim, 'handcar') !== 'try' || minutes < 8 * HOUR || minutes >= 17 * HOUR + 30) return false;
+  const shed = pt(sim, 'handcar_shed');
+  if (goTo(sim, c, m, 'remise', shed, 1.2, out)) return true;
+  m.job = 'attendre devant la remise';
+  return distance(c.pos, shed) <= sim.content.settings.ranges.talk;
+}
+
+/** Deuxième énigme d'Émile: bêcher près du passage à niveau entre 9 h et 10 h. */
+function riddle2(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (c.id !== 'p1' || questStep(sim, 'emile_riddle_2') !== 'dig') return false;
+  const { minutes } = sim.world.clock;
+  if (minutes < 8 * HOUR + 30 || minutes >= 10 * HOUR) return false;
+  const spot = diggableNear(sim, pt(sim, 'level_crossing'));
+  if (spot === null) return false;
+  if (minutes < 9 * HOUR) return goTo(sim, c, m, 'enigme 2', spot, 1.0, out) || true;
+  if (!selectItem(c, ITEM.hoe, out)) return true;
+  return goAct(sim, c, m, 'enigme 2', ground(spot), spot, 1.2, out);
+}
+
+/** Case libre où la bêche a quelque chose à faire, à moins de 1,5 m du point (centre de case). */
+function diggableNear(sim: Sim, at: Vec2): Vec2 | null {
+  const b = refreshBlockers(sim);
+  let best: Vec2 | null = null;
+  let bestD = Infinity;
+  for (let cy = Math.floor(at.y) - 2; cy <= Math.floor(at.y) + 2; cy++) {
+    for (let cx = Math.floor(at.x) - 2; cx <= Math.floor(at.x) + 2; cx++) {
+      const centre = { x: cx + 0.5, y: cy + 0.5 };
+      const d = distance(centre, at);
+      if (d > 1.5 || d >= bestD || isBlockedCell(b, cx, cy)) continue;
+      if (sim.world.garden.some((g) => g.cell.cx === cx && g.cell.cy === cy)) continue;
+      best = centre;
+      bestD = d;
+    }
+  }
+  return best;
 }
 
 function nearestWater(sim: Sim, from: Vec2): Vec2 | null {
@@ -677,11 +772,14 @@ export function createRobot(options: RobotOptions = {}): Robot {
       lastDay(sim, c, m, out) ||
       supperAtOdette(sim, c, m, out) ||
       (solveRiddle && riddle(sim, c, m, out)) ||
+      (solveRiddle && riddle2(sim, c, m, out)) ||
+      handcarTry(sim, c, m, out) ||
       evening(sim, c, m, out) ||
       social(sim, c, m, out) ||
       giveOdette(sim, c, m, out) ||
       order(sim, c, m, out) ||
       cookForOrder(sim, c, m, out) ||
+      weekTwoQuests(sim, c, m, out) ||
       (c.id === 'p1' ? garden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
       (c.id === 'p2'
         ? coop(sim, c, m, f, out) ||

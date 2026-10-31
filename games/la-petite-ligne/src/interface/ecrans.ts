@@ -10,7 +10,7 @@ import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICO
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
-import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, outfitTakenByPartner } from './modele';
+import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, outfitTakenByPartner } from './modele';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -605,21 +605,24 @@ export class NightScreen implements Layer {
 
     clear(this.list);
     const daysLeft = currentOrder(ctx.content.settings, world).day - world.clock.day;
-    if (world.orderResult === null && daysLeft >= 1) {
+    const order = orderQuest(ctx, world);
+    const orderShown = world.orderResult === null && daysLeft >= 1;
+    if (orderShown) {
       const lines = orderLines(world, ctx);
       const done = lines.filter((l) => l.done).length;
       const time = hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time);
       this.list.append(
         questItem(
           icon('ui-train'),
-          ctx.t(x.orderLine, { lines: linesText(ctx, done, lines.length) }),
+          ctx.t(x.orderLine, { title: order?.title ?? ctx.texts.game.ui.crate.title, lines: linesText(ctx, done, lines.length) }),
           null,
           daysLeft === 1 ? ctx.t(x.orderTomorrow, { time }) : ctx.t(x.orderDays, { time, days: daysLeft }),
         ),
       );
     }
     const goal = nextObjective(world, ctx);
-    if (goal !== null) {
+    // La commande a déjà sa ligne: pas de doublon quand elle est aussi le prochain objectif.
+    if (goal !== null && !(orderShown && goal.id === order?.id)) {
       this.list.append(
         questItem(
           icon('ui-flag'),

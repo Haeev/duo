@@ -184,6 +184,30 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
     case 'petit-dejeuner':
       playUntil(sim, (s) => s.world.phase === 'breakfast' && s.world.clock.day >= 5);
       return;
+    case 'caisse-expediee':
+      // Samedi 8 après le départ du train: la commande 1 est payée, la caisse dit « Expédiée ».
+      playUntil(sim, (s) => s.world.clock.day === 8 && s.world.orderResult !== null && s.world.scene === null && s.world.scripts.length === 0 && s.world.phase === 'day');
+      near(sim, me, 'coop_crate');
+      apply(sim, me, [{ type: 'menu', menu: 'crate' }]);
+      return;
+    case 'caisse-commande2':
+      playUntil(sim, (s) => at(s, 9, 9 * HOUR));
+      near(sim, me, 'coop_crate');
+      apply(sim, me, [{ type: 'menu', menu: 'crate' }]);
+      return;
+    case 'catalogue2':
+      playUntil(sim, (s) => at(s, 10, 9 * HOUR));
+      sim.world.purse = Math.max(sim.world.purse, 150);
+      near(sim, me, 'notice_board');
+      apply(sim, me, [{ type: 'menu', menu: 'catalogue' }]);
+      return;
+    case 'carnet2':
+      playUntil(sim, (s) => at(s, 11, 9 * HOUR));
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return;
+    case 'nuit2':
+      playUntil(sim, (s) => s.world.phase === 'night' && s.world.clock.day >= 11);
+      return;
     case 'fin':
       playUntil(sim, (s) => s.world.phase === 'ended');
       return;

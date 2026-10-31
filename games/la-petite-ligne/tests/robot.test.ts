@@ -60,7 +60,8 @@ describe('robot', () => {
     expect(w.ending?.furniturePlaced).toBeGreaterThan(0);
     expect(w.ending?.keyFound).toBe(true);
     expect(w.worldStates.handcar_shed).toBe('open');
-    for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper', 'second_order']) {
+    const weekTwo = ['second_order', 'handcar', 'emile_riddle_2', 'odette_fry', 'basile_omelette', 'lucie_note', 'firmin_flowers'];
+    for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper', ...weekTwo]) {
       expect(w.quests.find((q) => q.id === quest)?.status, quest).toBe('done');
     }
     expect(w.letters.map((l) => l.id)).toEqual(expect.arrayContaining(['coop_welcome', 'basile_workbench', 'coop_catalogue_reminder', 'coop_recap', 'coop_vergers']));

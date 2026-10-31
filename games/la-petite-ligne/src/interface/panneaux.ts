@@ -101,7 +101,11 @@ export class CratePanel extends Panel {
     const c = ctx.texts.extra.crate;
     const lines = orderLines(world, ctx);
     const result = world.orderResult;
-    const orderDay = currentOrder(ctx.content.settings, world).day;
+    // Le soir du départ, la simulation prépare déjà la commande suivante: la caisse montre celle qui vient de partir.
+    const shippedIndex = result === null ? -1 : world.orderHistory.length - 1;
+    const shipped = shippedIndex < 0 ? undefined : ctx.content.settings.order.trains[shippedIndex];
+    const nextComing = shippedIndex >= 0 && shippedIndex + 1 < ctx.content.settings.order.trains.length;
+    const orderDay = (shipped ?? currentOrder(ctx.content.settings, world)).day;
     this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
     const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));
     const sig = JSON.stringify([lines, result, world.clock.day, recap?.id]);
@@ -113,11 +117,14 @@ export class CratePanel extends Panel {
       const daysLeft = orderDay - world.clock.day;
       let summary: HTMLElement;
       if (result !== null) {
+        // Expédiée: le détail ligne par ligne est parti avec le train; restent le résultat et la suite.
         summary = el('div', { class: 'lpl-order__summary' }, [
           el('strong', { text: ctx.t(c.gone) }),
           el('span', { class: 'lpl-stamp', text: ctx.t(c.shipped) }),
+          el('span', { text: ctx.t(c.shippedResult, { lines: linesText(ctx, result.linesDone, result.linesTotal), amount: result.amount }) }),
           recap === undefined ? null : el('span', { text: ctx.t(`« ${recap.text} »`) }),
         ]);
+        return [summary, nextComing ? el('p', { class: 'lpl-field__help', text: ctx.t(c.nextOrder) }) : null];
       } else if (done === total) {
         summary = el('div', { class: 'lpl-order__summary' }, [
           el('strong', { text: linesText(ctx, done, total) }),
@@ -134,35 +141,31 @@ export class CratePanel extends Panel {
               : ctx.t(c.daysLeft, { days: daysLeft, amount });
         summary = el('div', { class: 'lpl-order__summary' }, [el('strong', { text: linesText(ctx, done, total) }), el('span', { text })]);
       }
-      const focusIndex = defaultCrateLine(lines.map((l) => ({ canDeposit: !l.done && l.inBag > 0 && result === null })));
+      const focusIndex = defaultCrateLine(lines.map((l) => ({ canDeposit: !l.done && l.inBag > 0 })));
       const list = el('ul', { class: 'lpl-order', 'data-nav': 'list', 'aria-label': c.linesLabel });
       lines.forEach((l, i) => {
-        const filled = l.done || (result !== null && i < result.linesDone);
+        const filled = l.done;
         const remaining = Math.max(0, l.need - l.inCrate);
         const give = Math.min(remaining, l.inBag);
-        const small = result !== null
-          ? ''
-          : l.done
-            ? c.deliveredLine
-            : l.inBag > 0
-              ? ctx.t(ctx.texts.extra.common.inBag, { count: l.inBag })
-              : ctx.texts.extra.common.noneInBag;
-        let action: HTMLElement | null = null;
-        if (result === null) {
-          if (l.done) action = el('span', { class: 'lpl-stamp lpl-stamp--green', text: ctx.t(c.delivered) });
-          else if (give > 0) {
-            action = button(ctx.t(c.depositCount, { count: give, item: itemName(ctx.content.items[l.item], give, l.item) }), () => {
-              this.deposit(world, l.item, give);
-            }, { class: 'lpl-button lpl-button--primary lpl-button--wide', attrs: { 'data-nav-item': true, 'data-key': `deposit:${l.item}`, 'data-autofocus': i === focusIndex } });
-          } else {
-            action = button(ctx.t(c.nothing), () => undefined, {
-              class: 'lpl-button lpl-button--wide',
-              attrs: { 'aria-disabled': 'true', 'data-nav-item': true, 'data-key': `nothing:${l.item}`, 'data-autofocus': i === focusIndex },
-            });
-          }
+        const small = l.done
+          ? c.deliveredLine
+          : l.inBag > 0
+            ? ctx.t(ctx.texts.extra.common.inBag, { count: l.inBag })
+            : ctx.texts.extra.common.noneInBag;
+        let action: HTMLElement;
+        if (l.done) action = el('span', { class: 'lpl-stamp lpl-stamp--green', text: ctx.t(c.delivered) });
+        else if (give > 0) {
+          action = button(ctx.t(c.depositCount, { count: give, item: itemName(ctx.content.items[l.item], give, l.item) }), () => {
+            this.deposit(world, l.item, give);
+          }, { class: 'lpl-button lpl-button--primary lpl-button--wide', attrs: { 'data-nav-item': true, 'data-key': `deposit:${l.item}`, 'data-autofocus': i === focusIndex } });
+        } else {
+          action = button(ctx.t(c.nothing), () => undefined, {
+            class: 'lpl-button lpl-button--wide',
+            attrs: { 'aria-disabled': 'true', 'data-nav-item': true, 'data-key': `nothing:${l.item}`, 'data-autofocus': i === focusIndex },
+          });
         }
         const takeBack =
-          result === null && l.inCrate > 0 && !l.done
+          l.inCrate > 0 && !l.done
             ? button(ctx.t(c.takeBack), () => {
                 this.takeBack(world, l.item);
               }, { class: 'lpl-button lpl-button--quiet', attrs: { 'data-nav-item': true, 'data-key': `take:${l.item}` } })

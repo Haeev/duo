@@ -244,6 +244,8 @@
     "completeText": "{amount} sous au départ du train, à {time}.",
     "gone": "Le train est parti",
     "shipped": "Expédiée",
+    "shippedResult": "{lines} : {amount} sous.",
+    "nextOrder": "La commande suivante sera au tableau de la halte demain matin.",
     "delivered": "Livré",
     "deliveredLine": "Livrés",
     "missing": "Il en manque {count}",
@@ -354,7 +356,7 @@
   "night": {
     "overline": "Fin du {weekday} {day}",
     "sessionOver": "À la prochaine séance",
-    "orderLine": "La commande du samedi : {lines}",
+    "orderLine": "{title} : {lines}",
     "orderDays": "Le train part samedi à {time}, dans {days} jours.",
     "orderTomorrow": "Le train part demain, samedi, à {time}.",
     "tomorrowGoal": "Demain, {weekday} {day} : {title}",

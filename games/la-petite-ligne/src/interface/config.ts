@@ -118,7 +118,8 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   axe: 'axe',
   bread: 'bread',
   crunchy_radishes: 'radish',
-  omelette: 'egg',
+  // Un plat, pas l'œuf de la ligne voisine de la commande.
+  omelette: 'soup',
   vegetable_soup: 'soup',
   iron_box: 'tin-box',
   riddle_card: 'riddle-card',

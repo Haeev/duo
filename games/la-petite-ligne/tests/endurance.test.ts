@@ -88,8 +88,15 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
   return { sim, run: { ticks, maxBytes, longestStall } };
 }
 
+/** Quêtes de la semaine 2: les secondaires toujours; la draisine et l'énigme 2 si la remise est ouverte (énigme 1). */
+const WEEK_TWO_SIDE = ['odette_fry', 'basile_omelette', 'lucie_note', 'firmin_flowers'];
+const WEEK_TWO_SHED = ['handcar', 'emile_riddle_2'];
+
 function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   const w = sim.world;
+  const status = (id: string): string => w.quests.find((q) => q.id === id)?.status ?? 'pas commencée';
+  for (const id of [...WEEK_TWO_SIDE, ...(keyExpected ? WEEK_TWO_SHED : [])]) expect(status(id), `quête ${id} terminée`).toBe('done');
+  if (!keyExpected) for (const id of WEEK_TWO_SHED) expect(status(id), `${id}: la remise reste fermée`).toBe('pas commencée');
   expect(w.phase, 'la démo se termine').toBe('ended');
   expect(run.ticks).toBeLessThan(MAX_TICKS);
   const { content } = contentAndMap();
