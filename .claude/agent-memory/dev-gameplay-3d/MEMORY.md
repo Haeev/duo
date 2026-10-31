@@ -62,6 +62,9 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Arbre de travail partagé: le serveur de Vite recharge la page à chaque modification des autres membres. Les captures Playwright doivent détecter `framenavigated` et recommencer; pour le vrai jeu en deux vues, servir une construction figée (`vite build --outDir` dans le scratchpad, puis `vite preview`).
 - Rendu logiciel de l'environnement cloud: deux vues 3D dans le faux hôte affament les minuteries (trous de 1 à 7 s), et le faux hôte coupe la partie (« Le jeu ne répond plus »). Vérifier l'interface sur la page de démonstration (`rendu=0` pour les mesures), et le vrai jeu seulement sur ses premiers écrans.
 - Mesure: un rafraîchissement complet de l'interface coûte environ 0,8 ms (Chromium sans tête); limité à 11 par seconde, le reste des images ne compare qu'une chaîne (l'heure).
+- Échelle de l'interface (`--lpl-ui-scale` sur la taille de police de la racine): une requête média en `rem` ignore l'échelle (elle lit la taille initiale, 16 px), une requête de conteneur la suit. Pour « fenêtre basse à 150 % »: `container: lpl-ui / size` sur la racine fixe plein écran, puis `@container lpl-ui (max-height: 36rem)`. Dans une requête de conteneur, la règle ne gagne que par spécificité ou par ordre: une règle plus loin dans le fichier l'écrase.
+- Écran plein cadre en grille `place-items: center` avec `overflow: auto`: quand le contenu déborde, le haut est coupé et inatteignable. `align-items: start` et `margin-block: auto` sur l'enfant: centré s'il tient, lu depuis le haut sinon.
+- Captures 3D à l'échelle 1,5 (`deviceScaleFactor`): la capture dépasse les 30 s par défaut en rendu logiciel; passer `timeout` à `page.screenshot`.
 
 ## Simulation de La Petite Ligne et tests (vérifié le 2026-10-31)
 
