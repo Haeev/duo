@@ -140,6 +140,15 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-10-31, gauntlet tour 2: ressenti des commandes (dev gameplay)
+
+- Fin de geste: `action.kind` repasse à `idle` au premier pas où `tick >= since + duration` (`endGesture`, `intentions.ts`, appelé par `pas.ts`). Accord avec le rendu: chaque geste se joue une fois de `since` à `since + duration`; `SIM_HZ` est exporté par `etat/types.ts`.
+- Appui mémorisé: Espace ou clic à portée reçu pendant un geste est gardé (`runtime.bufferedAct`) et joué à la fin du geste s'il a moins de `feel.inputBufferSeconds` (0,3 s); le dernier remplace le précédent.
+- Espace tenu sur le potager: le geste (bêcher, semer, arroser, récolter) se répète sur chaque nouvelle case visée, jamais deux fois sur la même, après `feel.heldRepeatSeconds` (0,1 s) de pause.
+- Clic: action `click` (clic gauche seul, non réaffectable) dans `duo-game.json`, lue par `wasPressed` dans `commandes.ts`; `act` n'est plus lié qu'à Espace. Une tape de pavé tactile donne `move_to`. Clic gauche tenu compte toujours comme action tenue (poutre, chantier).
+- Correction de coin dans `moveBody` (`grille.ts`): bloqué sur l'axe dominant, le corps glisse de côté (décalages `CORNER_NUDGE_STEP` à `CORNER_NUDGE_MAX`, 0,05 à 0,35 m, `constantes.ts`, pour que la prédiction de l'invité calcule pareil), au plus de la longueur du pas.
+- Tests: `tests/ressenti.test.ts` (10 cas).
+
 ## 2026-10-31, matin: semaine 2, deux commandes, fin au jour 15 (dev gameplay)
 
 Cadrage du game designer: `docs/jeux/jeu-1/semaine-2.md` (section 8, besoins moteur).

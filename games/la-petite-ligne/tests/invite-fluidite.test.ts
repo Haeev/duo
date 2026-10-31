@@ -390,13 +390,13 @@ describe("invité: réconciliation douce sous un LAN chargé", () => {
     const { content } = contentAndMap();
     const perFrame = content.settings.movement.walkSpeed / FRAME_HZ;
     const conditions: Conditions = { latencyMs: 80, jitterMs: 20, lossPercent: 2 };
-    for (const seed of [1, 2, 3]) {
+    for (let seed = 1; seed <= 10; seed++) {
       const run = benchWalk(conditions, seed, 2 * FRAME_HZ, FRAME_HZ);
       // Marche: on laisse 0,25 s à la prédiction pour démarrer.
       const walk = smoothness(run.shown.slice(15, 2 * FRAME_HZ), perFrame);
       expect.soft(walk.frozen, `graine ${seed}, marche (mm): ${walk.series}`).toBe(0);
       expect.soft(walk.jumps, `graine ${seed}, marche (mm): ${walk.series}`).toBe(0);
-      expect.soft(walk.worstRelative, `graine ${seed}, marche (mm): ${walk.series}`).toBeLessThan(0.5);
+      expect.soft(walk.worstRelative, `graine ${seed}, marche (mm): ${walk.series}`).toBeLessThan(0.35);
       const stop = run.shown.slice(2 * FRAME_HZ);
       const last = stop[stop.length - 1];
       expect(last).toBeDefined();

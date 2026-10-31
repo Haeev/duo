@@ -29,6 +29,11 @@ const INTERPOLATION_DELAY_TICKS = 4;
 const SNAPSHOTS_KEPT = 32;
 /** Retour de la correction de prédiction vers zéro (par seconde). */
 const CORRECTION_DECAY = 10;
+/**
+ * Pendant la marche, la correction se résorbe au plus à cette part de la vitesse de marche:
+ * l'image avance alors entre 70 et 130 % de son pas, sans à-coup visible.
+ */
+const CORRECTION_WALK_SHARE = 0.3;
 /** Au-delà de cet écart (m), on se recale d'un coup (téléportation, fondu). */
 const SNAP_DISTANCE = 2;
 
@@ -266,13 +271,19 @@ export function createGuest(
       // 30 pas, une vitesse par image vaudrait 0 une image sur deux (pas muets, marche hachée).
       const mine = world.characters.find((c) => c.id === localId);
       if (mine !== undefined && predicted !== null) {
-        const decay = Math.exp(-CORRECTION_DECAY * dtSeconds);
-        correction.x *= decay;
-        correction.y *= decay;
+        const walkSpeed = content.settings.movement.walkSpeed;
+        const length = Math.hypot(correction.x, correction.y);
+        if (length > 0) {
+          let absorbed = length * (1 - Math.exp(-CORRECTION_DECAY * dtSeconds));
+          if (predictedSpeed > 0) absorbed = Math.min(absorbed, CORRECTION_WALK_SHARE * walkSpeed * dtSeconds);
+          const keep = 1 - absorbed / length;
+          correction.x *= keep;
+          correction.y *= keep;
+        }
         const t = Math.max(0, Math.min(1, alpha));
         const x = predictedPrev.x + (predicted.x - predictedPrev.x) * t + correction.x;
         const y = predictedPrev.y + (predicted.y - predictedPrev.y) * t + correction.y;
-        setMover(mine, x, y, predictedFacing ?? mine.facing, Math.min(content.settings.movement.walkSpeed, predictedSpeed));
+        setMover(mine, x, y, predictedFacing ?? mine.facing, Math.min(walkSpeed, predictedSpeed));
       }
       return world;
     },
