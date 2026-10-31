@@ -57,9 +57,23 @@ Visibilité: **forte** (vue dès la première minute ou à chaque journée), **m
 | faible | Scierie et établi | contre le bois, sur la route du passage à niveau | juste: le bois descend tout seul à la scie, la route sort les planches | aucune | |
 | faible | Cour de la halte | sert d'aire aux charrettes, mais rien ne le dit | une cour de gare a son abreuvoir, son anneau à cheval ou une charrette | ajouter une charrette à bras ou une brouette près du tonneau (52, 23) quand le modèle existe | artiste-3d, level-designer |
 
+## Points du directeur artistique (audit des modèles), vérifiés sur la carte
+
+| Point | Constat sur la carte et au rendu | Relève de |
+|---|---|---|
+| Barrières du passage à niveau | les rotations 1 et 3 donnaient des lisses le long de la route; corrigé en 0 et 2, lisses parallèles aux rails, poteaux de part et d'autre de la route, chacun à droite de qui arrive (`coherence-01`, `coherence-03`) | carte, **corrigé** |
+| Remise: bouts de rails sous les portes | la carte dessine une voie de garage de trois cases (x 56, y 9 à 11) jusqu'à la ligne, mais le rendu la peint en dalle grise sans rails (`coherence-04`): les rails du modèle s'arrêtent donc dans le vide | rendu (rails sur la voie de garage); garder les bouts de rails du modèle |
+| Panneau de gare | lettré côté bourg, dos nu côté voie (`coherence-08`). Le tourner (rotation 2) cacherait le nom à la caméra par défaut | modèle: panneau lettré **des deux faces**, comme un vrai panneau de quai; la carte garde la rotation 0 |
+| Ponton | part de la promenade (y 37, berge) vers le large (y 38 et 39, eau profonde): le sens est juste | modèle (escalier vers l'eau, côté sud) |
+| Établi | rotation 0: côté ouvert au sud, sur le sentier de la voie et devant la porte de la scierie (cour), fond au nord, côté bois | carte juste; le modèle doit avoir son côté ouvert au sud en rotation 0 |
+| Poêle de départ (`stove`) | posé en (10, 22), angle nord-est de la pièce, contre le mur nord; au milieu de la pièce sur une capture du soir, c'est qu'un joueur l'a déplacé | modèle (tuyau coudé vers le mur); règle de pose « contre un mur » à proposer au dev gameplay |
+| Bancs | quai: dos à la voie, à tourner avec l'énigme recalée (voir plus haut); berge: face à la rivière, juste; place: l'un face à la promenade, à tourner vers le puits; place est: face au puits, juste | carte (sauf le banc du quai, qui attend le recalage de l'énigme) |
+| Boîte aux lettres | rotation 0, face au sud, sur le chemin de la maison; la factrice arrive par la route, à l'est | carte juste si la fente est en façade sud du modèle; non vu au rendu (caché par le personnage) |
+| Charrette, vélo | non placés sur la carte | proposés pour la cour de la halte, contre le mur ou brancards au sol |
+
 ## Ce qui demande un autre membre
 
-- **artiste-3d**: planches du passage au ras du rail; porte côté quai à la halte; fenêtre côté voie et socle ajusté de la maisonnette; une charrette ou une brouette pour la cour.
+- **artiste-3d**: planches du passage au ras du rail; panneau de gare lettré des deux faces; escalier du ponton vers l'eau; porte côté quai à la halte; fenêtre côté voie et socle ajusté de la maisonnette; une charrette ou une brouette pour la cour.
 - **dev rendu et tech-artist**: rails sur la voie de garage; gué en eau peu profonde avec galets; berges de rivière en pente, sans quais de pierre; nature de sol « gravier » pour la place.
 - **tech-artist et game-designer**: banc et cloche du quai tournés vers la voie, avec l'énigme de l'ombre recalée.
 - **game-designer**: poussée de la draisine le long de la voie de garage (`carry.handcar.toOffset` à [0, 3]); accord pour remonter la cloche et le banc sur le quai en recalant l'énigme.
