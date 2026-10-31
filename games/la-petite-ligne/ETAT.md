@@ -33,6 +33,10 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 ## Demandes du dev gameplay au rendu
 
 1. Mode de rendu léger, pour que qa-testeur joue des séquences dans le Chromium du cloud (rendu logiciel). `main.ts` passe désormais `quality: 'light'` dans `RendererOptions` (nouveau champ facultatif `quality?: RenderQuality` de `etat/vue.ts`) quand l'adresse du jeu ou celle du faux hôte porte `?rendu=leger` (exemple: `deux-vues.html?rendu=leger`). Demandé au rendu en mode `light`: résolution interne basse (par exemple rapport de pixels 0,5, au plus 640x360 pixels physiques), ombres coupées (`shadowMap.enabled = false`, pas de lumière qui projette), antialiasing coupé, particules et effets réduits au minimum, végétation clairsemée, indicateur de performances masqué. En attendant: `main.ts` affiche le canevas à la moitié de sa taille, agrandi en CSS (quatre fois moins de pixels); les ombres restent.
+2. Repère (P1, GE-07): `characters[i].pin` (`pos`, `since`, `until` en ticks), visible chez les deux tant qu'il existe: épingle à la couleur du joueur (`appearance.scarf`) et onde au sol. Événement `pin`.
+3. Pêche (P1): `characters[i].fishing` (`phase` `waiting` puis `bite`, `bobber` = position du bouchon). Pas de nouvel `ActionKind` (il aurait cassé `Record<ActionKind, string>` du rendu): pose de pêche à déduire de `fishing !== null`, bouchon qui plonge en `bite`. Événements `cast`, `bite`, `caught`, `escaped`. La canne (`fishing_rod`) est dans le sac de chacun dès le début.
+4. Absence (P1): `characters[i].absent`; la simulation met alors `action.kind` à `sit`.
+
 
 ## Demandes de l'interface
 
@@ -57,12 +61,39 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Page de démonstration (outil, pas le jeu): `src/interface/demo/index.html?scenario=jour` (vraie simulation, vrai rendu, robot pour l'autre; scénarios dans `demo/scenarios.ts`).
 - Tests: `src/interface/tests/` (Vitest, 60 tests): typographie, formats, focus et navigation, textes, modèles du HUD et des panneaux, notifications, portraits.
 
+## 2026-10-31, étape 4: mode léger, interface, son, P1
+
+- Mode de rendu léger: `?rendu=leger` (adresse du jeu ou du faux hôte) passe `quality: 'light'` au rendu (demande au rendu ci-dessus); en attendant, canevas à moitié de taille agrandi en CSS.
+- Interface: `main.ts` monte `createInterface` de `src/interface/` (vérifié: écran titre affiché dans les deux vues). Demandes 3 à 6 faites (écran titre et écran de fin synchronisés, raison d'un refus de pose, clé des notifications).
+- Son: pas encore de `src/audio/index.ts`; `main.ts` le montera dès qu'il exportera `createAudio`. Événements nouveaux pour le son: `pin`, `absence`, `cast`, `bite`, `caught`, `escaped` (tableau de `src/README.md`).
+- Quêtes corrigées par le game designer: robots relancés, démo finie, clé trouvée au plus tôt le jour 3.
+- P1 faits: repère (G ou clic molette, 15 s, une épingle par joueur), absence (3 minutes sans entrée en journée: l'horloge attend, le personnage s'assoit, « L'horloge attend Camille. » chez l'autre), pêche (canne dans le sac de chacun, lancer à 6 m sur l'eau, touche après 3 à 15 s, 1,5 s pour ferrer; poissons tirés selon `feel.fishWeights`, 6, 3 et 1 par défaut; pari de Jeanne jouable). La plume de geai (décoration) se pose comme un meuble.
+
+## Demandes de l'audio
+
+Tenue par le dev audio (`src/audio/`). Chaque point dit ce que le son fait en attendant.
+
+1. `src/main.ts` et `etat/vue.ts` (`AudioOptions`): donner trois champs facultatifs en plus, que `createAudio` lit déjà (`AudioExtras` de `src/audio/index.ts`): `lifecycle: duo` (événements `pause` et `resume` de la plateforme: musique atténuée, effets suspendus), `cameraYaw: () => r.cameraYaw()` (gauche et droite de l'écran pour les oreilles), `log: duo.log` (avertissements: fichier illisible, plafond de mémoire). Par exemple: `createAudio({ view, audio: duo.audio, url, reducedMotion, lifecycle: duo, cameraYaw: () => r.cameraYaw(), log: duo.log })`. En attendant: chez l'hôte, la pause se devine (le monde ne bouge plus depuis 0,3 s); chez l'invité, pas de pause du son; l'oreille garde l'orientation de départ de la caméra (`yaw = -3 PI/4`); les avertissements sont muets.
+2. `load()` est attendu avant `duo.input.attach`: il décode les sons permanents (effets, interface, motifs, environ 25 Mo). Le reste (musiques, ambiances, train) se décode pendant la partie.
+3. Rendu (à transmettre au dev rendu): au départ du train, `voie.ts` calcule `offset = -slideDistance * easeIn(progress)` alors que `progress` va de 1 à 0 pendant `departing`: le train saute 70 m à l'ouest au premier pas du départ puis revient vers le quai. Le son suit la simulation (le train repart vers l'ouest, `departureDirection` de `src/audio/reglages.ts`); il faudrait `easeIn(1 - progress)` côté rendu.
+4. Aucun événement manquant pour l'instant: le repère (`pin`) et l'absence sont arrivés pendant la nuit. Ce qui se lit dans l'état (pas, marteau, scie, réchaud, poutre portée, menus, outil, clic au sol, notifications, lignes de la commande, poules) est dérivé d'une image à l'autre dans `src/audio/declencheurs.ts`.
+
+## Audio
+
+Point d'avancement du dev audio (`src/audio/`), du plus récent au plus ancien.
+
+### 2026-10-31, nuit: tout le son de la démo
+
+- En cours: voir le compte rendu final ci-dessous quand il sera écrit.
+
 ## Écarts et questions signalés (dev gameplay)
 
 - Réglé par le game designer (commit `0c7d610`): « Premières pousses » compte les semis et arrosages depuis le début de la partie; l'énigme d'Émile demande le jour 3 au moins. Robots relancés: démo finie, commande complète, clé trouvée au plus tôt le jour 3.
 - Repas pris ensemble: le code ne demande pas « le même plat » (README des données): les deux mangent le soir à moins de `ranges.eatTogether`; le souper partagé (Cœur +5, `ate_together:table`) demande en plus une table à côté, comme dans `demo.md`.
 - Réglages absents de `reglages.json`, avec une valeur par défaut dans `src/donnees/defauts.ts` (une clé `feel` dans `reglages.json` les remplace): durées des gestes, glissement du train (6 s), vitesse des habitants (1,6 m/s) et des poules, fenêtre de « Déjà pris » (1,5 s), `ranges.eatTogether` et `ranges.stayAt` (3 m).
-- Pas faits (P1 de `demo.md`): absence (horloge arrêtée après 3 min sans entrée), pêche, regard du métier, coin à soi, repère. Pas d'écran « Qui joue qui ? »: un identifiant inconnu prend le personnage libre.
+- Pas faits (P1 de `demo.md`): regard du métier, coin à soi. Pas d'écran « Qui joue qui ? »: un identifiant inconnu prend le personnage libre.
+- À confirmer par le game designer (pêche, faute de données): la canne est donnée à chacun au début; poids des poissons 6, 3, 1 (CN-04) dans `src/donnees/defauts.ts` (`feel.fishWeights`); pas de texte « Il s'est échappé. » dans `textes.json` (seul l'événement `escaped` existe). Textes `placement_outside`, `placement_wall`, `placement_overlap`, `placement_occupied` à ajouter dans `textes.json` (raison d'un refus de pose).
+- Absence: la nuance « à endurance nulle, seules les actions gratuites restent possibles » (PA-04) n'est pas appliquée.
 - `public/vignette.png` est une vignette provisoire (dégradé et titre): à remplacer par le directeur artistique.
 
 ## 2026-10-31, étape 3: réseau, SDK, sauvegardes, point d'entrée

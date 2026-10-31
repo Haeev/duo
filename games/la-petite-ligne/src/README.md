@@ -103,7 +103,10 @@ Un seul flux, le même chez l'hôte et chez l'invité: `view.onEvent((event) => 
 | porte, coucher, nuit, matin, minuit | `door`, `went_to_bed`, `got_up`, `night`, `morning`, `midnight`, `veillee_started` |
 | poules | `hens_arrived`, `eggs_laid`, `fed_hens` |
 | habitants, scènes | `talk` (`villager`: motif de l'habitant), `scene_started`, `scene_ended` |
-| fin | `demo_ended` |
+| fin | `demo_ended`, puis `session_finish` (les deux ont choisi « Continuer », ou « Finir la séance ») |
+| repère (carillon chez les deux) | `pin` (`by`, `pos`); l'épingle est dans `characters[i].pin` |
+| absence | `absence` (`who`, `absent`); `characters[i].absent`, `clock.stoppedBy === 'absence'` |
+| pêche | `cast` (lancer, « plouf »), `bite` (touche, « ploc »), `caught` (`item`), `escaped`; la ligne est dans `characters[i].fishing` |
 
 Musique et ambiance se lisent dans l'état: `clock.minutes`, `clock.veillee`, `phase`, `weather`, `characters[local].inHouse`.
 
