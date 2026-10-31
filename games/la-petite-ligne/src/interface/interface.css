@@ -170,3 +170,8 @@
 .lpl-panel__title {
   white-space: nowrap;
 }
+
+/* Un élément amené dans la vue au clavier garde une marge sous l'en-tête du panneau. */
+.lpl-panel__body {
+  scroll-padding-block: var(--lpl-space-4);
+}

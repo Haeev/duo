@@ -94,25 +94,35 @@ export interface SharedMaterials {
   /** Couleur (linéaire) d'une case de la palette, lue dans la texture chargée. */
   paletteColor(cell: PaletteCell, out: Color): Color;
   /**
-   * Trous de visibilité autour des personnages: ce qui est devant eux (plus
-   * près de la caméra) et au-dessus du sol s'efface dans un disque tramé.
+   * Trous de visibilité autour des personnages: ce qui cache vraiment leur
+   * corps (plus près de la caméra que lui, au même endroit de l'écran)
+   * s'efface dans une ellipse ajustée à leur silhouette, bord tramé régulier.
    */
   setSeeThrough(holes: readonly SeeThroughHole[]): void;
 }
 
-/** Un trou de visibilité: centre et rayon en pixels du tampon, profondeur et sol du personnage. */
+/**
+ * Un trou de visibilité, en pixels du tampon: centre et demi-axes de
+ * l'ellipse; profondeur du corps au centre, et sa variation par pixel vers le
+ * haut de l'écran (la tête est plus près de la caméra que les pieds); sol du
+ * personnage.
+ */
 export interface SeeThroughHole {
   x: number;
   y: number;
-  radius: number;
+  radiusX: number;
+  radiusY: number;
   depth: number;
+  depthPerPixel: number;
   ground: number;
 }
 
 /** Nombre de trous (les deux joueurs). */
 export const SEE_THROUGH_SLOTS = 2;
-/** Marge de profondeur: seul ce qui est nettement devant le personnage s'efface. */
-const SEE_THROUGH_DEPTH_MARGIN = 0.6;
+/** Marge de profondeur: seul ce qui est nettement devant le corps du personnage s'efface. */
+const SEE_THROUGH_DEPTH_MARGIN = 0.35;
+/** Largeur relative du bord tramé de l'ellipse (le reste du trou est net). */
+const SEE_THROUGH_EDGE = 0.8;
 /** Ce qui est plus bas que cela au-dessus du sol du personnage ne s'efface jamais (le sol, les mottes). */
 const SEE_THROUGH_MIN_HEIGHT = 0.45;
 
@@ -249,12 +259,12 @@ diffuseColor.a = mix(diffuseColor.a, 1.0, glint * 0.5);`,
   // Trous de visibilité: un personnage caché derrière un bâtiment ou un arbre reste visible.
   const cutUniforms = {
     uCutHoles: { value: Array.from({ length: SEE_THROUGH_SLOTS }, () => new Vector4(0, 0, 0, 0)) },
-    uCutGround: { value: new Array<number>(SEE_THROUGH_SLOTS).fill(0) },
+    uCutDepths: { value: Array.from({ length: SEE_THROUGH_SLOTS }, () => new Vector4(0, 0, 0, 0)) },
     uCutCount: { value: 0 },
   };
   palette.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms): void => {
     shader.uniforms.uCutHoles = cutUniforms.uCutHoles;
-    shader.uniforms.uCutGround = cutUniforms.uCutGround;
+    shader.uniforms.uCutDepths = cutUniforms.uCutDepths;
     shader.uniforms.uCutCount = cutUniforms.uCutCount;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', '#include <common>\nvarying float vCutY;')
@@ -273,8 +283,14 @@ vCutY = (modelMatrix * cutWorld).y;`,
         `#include <common>
 varying float vCutY;
 uniform vec4 uCutHoles[${SEE_THROUGH_SLOTS}];
-uniform float uCutGround[${SEE_THROUGH_SLOTS}];
-uniform int uCutCount;`,
+uniform vec4 uCutDepths[${SEE_THROUGH_SLOTS}];
+uniform int uCutCount;
+// Trame ordonnée de Bayer 4x4 en coordonnées écran: un bord régulier, esprit imprimé.
+float cutBayer(vec2 pixel) {
+  int i = int(mod(pixel.x, 4.0)) + 4 * int(mod(pixel.y, 4.0));
+  const float bayer[16] = float[16](0.0, 8.0, 2.0, 10.0, 12.0, 4.0, 14.0, 6.0, 3.0, 11.0, 1.0, 9.0, 15.0, 7.0, 13.0, 5.0);
+  return (bayer[i] + 0.5) / 16.0;
+}`,
       )
       .replace(
         '#include <clipping_planes_fragment>',
@@ -282,10 +298,13 @@ uniform int uCutCount;`,
 for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
   if (i >= uCutCount) break;
   vec4 hole = uCutHoles[i];
-  float reach = length(gl_FragCoord.xy - hole.xy) / max(hole.z, 1.0);
-  if (reach < 1.0 && vViewPosition.z < hole.w - ${SEE_THROUGH_DEPTH_MARGIN.toFixed(2)} && vCutY > uCutGround[i] + ${SEE_THROUGH_MIN_HEIGHT.toFixed(2)}) {
-    float dither = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
-    if (dither < smoothstep(1.0, 0.6, reach)) discard;
+  vec4 body = uCutDepths[i];
+  vec2 offset = (gl_FragCoord.xy - hole.xy) / max(hole.zw, vec2(1.0));
+  float reach = length(offset);
+  // Profondeur du corps à cette hauteur de l'écran: on ne coupe que ce qui est devant lui.
+  float bodyDepth = body.x - (gl_FragCoord.y - hole.y) * body.z;
+  if (reach < 1.0 && vViewPosition.z < bodyDepth - ${SEE_THROUGH_DEPTH_MARGIN.toFixed(2)} && vCutY > body.y + ${SEE_THROUGH_MIN_HEIGHT.toFixed(2)}) {
+    if (cutBayer(gl_FragCoord.xy) < smoothstep(1.0, ${SEE_THROUGH_EDGE.toFixed(2)}, reach)) discard;
   }
 }`,
       );
@@ -309,8 +328,8 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
       for (let i = 0; i < count; i += 1) {
         const hole = holes[i];
         if (hole !== undefined) {
-          cutUniforms.uCutHoles.value[i]?.set(hole.x, hole.y, hole.radius, hole.depth);
-          cutUniforms.uCutGround.value[i] = hole.ground;
+          cutUniforms.uCutHoles.value[i]?.set(hole.x, hole.y, hole.radiusX, hole.radiusY);
+          cutUniforms.uCutDepths.value[i]?.set(hole.depth, hole.ground, hole.depthPerPixel, 0);
         }
       }
       cutUniforms.uCutCount.value = count;

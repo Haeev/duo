@@ -572,7 +572,7 @@ class GameUi implements GameInterface, UiHost {
     const index = spatialNeighbour(box(active), items.map(box), direction);
     const next = items[index];
     if (next !== undefined) {
-      next.focus();
+      next.focus({ preventScroll: true });
       next.scrollIntoView({ block: 'nearest' });
     }
   }

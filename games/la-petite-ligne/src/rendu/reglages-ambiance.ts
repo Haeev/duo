@@ -238,16 +238,18 @@ export const AMBIANCE_SETTINGS = {
       mist: 0,
       clouds: 0,
     },
+    // Soirée (revue du directeur artistique): ciel plus clair et plus fort, pour une soirée dorée
+    // et lisible (au moins 75 de gris moyen et 25 d'écart à 18 h et 19 h).
     {
       minutes: 1065,
       azimuthDeg: 184,
       elevationDeg: 19,
       sunColor: '#ffb577',
       sunIntensity: 2.15,
-      skyColor: '#f2c9a0',
-      groundColor: '#8f8a6a',
-      hemiIntensity: 0.95,
-      fogColor: '#f1c49a',
+      skyColor: '#f2d2b0',
+      groundColor: '#968f70',
+      hemiIntensity: 1.28,
+      fogColor: '#e8d0b6',
       reflectionColor: '#f4c79c',
       shadow: 0.95,
       glow: 0,
@@ -260,10 +262,10 @@ export const AMBIANCE_SETTINGS = {
       elevationDeg: 10,
       sunColor: '#ff9f62',
       sunIntensity: 1.75,
-      skyColor: '#e9b292',
-      groundColor: '#7e6f5e',
-      hemiIntensity: 0.9,
-      fogColor: '#eeac85',
+      skyColor: '#eec7a8',
+      groundColor: '#8f8a6a',
+      hemiIntensity: 1.32,
+      fogColor: '#e2c2ab',
       reflectionColor: '#f0b088',
       shadow: 0.8,
       glow: 0.3,
@@ -276,10 +278,10 @@ export const AMBIANCE_SETTINGS = {
       elevationDeg: 5,
       sunColor: '#f2826c',
       sunIntensity: 1.05,
-      skyColor: '#a995b5',
-      groundColor: '#5b5060',
-      hemiIntensity: 0.92,
-      fogColor: '#b48aa0',
+      skyColor: '#b3a6c4',
+      groundColor: '#6f6878',
+      hemiIntensity: 1.2,
+      fogColor: '#a99aae',
       reflectionColor: '#c792a2',
       shadow: 0.35,
       glow: 0.55,
@@ -524,23 +526,42 @@ export const AMBIANCE_SETTINGS = {
   puffs: {
     capacity: 192,
     steam: {
-      /** Bouffées par seconde quand le train roule, à l'arrêt, et au coup de sifflet. */
-      movingRate: 7,
-      idleRate: 1.6,
-      whistleBurst: 10,
-      seconds: 3.2,
-      /** Taille au départ et à la fin (m), montée (m/s), poussée vers le haut (m/s²), vent (m/s²). */
-      startSize: 0.35,
-      endSize: 2.1,
-      rise: 1.7,
-      lift: 0.35,
-      drift: [0.5, 0.15] as const,
-      spread: 0.35,
-      drag: 0.9,
-      opacity: 0.62,
+      /**
+       * Train qui roule: panache qui s'étire derrière la cheminée. Taille au
+       * départ et à la fin (m), montée (m/s), poussée vers le haut (m/s²), vent
+       * (m/s²), écart (m/s), frein, part de la vitesse du train héritée.
+       */
+      moving: {
+        rate: 6,
+        seconds: 2.2,
+        startSize: 0.3,
+        endSize: 1.3,
+        rise: 1.6,
+        lift: 0.3,
+        drift: [0.5, 0.15] as const,
+        spread: 0.3,
+        drag: 0.9,
+        opacity: 0.6,
+        trail: 0.85,
+      },
+      /** À l'arrêt (revue du directeur artistique): petites bouffées nettes et rares, qui montent droit et s'effacent en 1 à 1,5 m. */
+      idle: {
+        rate: 0.8,
+        seconds: 1.1,
+        startSize: 0.18,
+        endSize: 0.5,
+        rise: 1.1,
+        lift: 0.4,
+        drift: [0.08, 0.03] as const,
+        spread: 0.05,
+        drag: 0.9,
+        opacity: 0.85,
+        trail: 0,
+      },
+      /** Coup de sifflet: quelques bouffées de l'arrêt, qui montent plus vite. */
+      whistleBurst: 5,
+      whistleRise: 1.5,
       color: '#f4f2ee',
-      /** Le train qui roule laisse son panache derrière lui (part de sa vitesse). */
-      trail: 0.85,
     },
     /** Arrosage: gouttes qui tombent du bec, éclaboussure sur la terre. */
     water: {

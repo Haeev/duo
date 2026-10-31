@@ -163,7 +163,10 @@ export function isVisible(node: Element): boolean {
 
 export function focusElement(node: HTMLElement | null | undefined): boolean {
   if (node === null || node === undefined || !isVisible(node)) return false;
-  node.focus({ preventScroll: false });
+  // Pas de défilement au centre: seulement ce qu'il faut pour voir l'élément (revue du DA,
+  // le carnet s'ouvrait défilé, la première carte coupée sous les onglets).
+  node.focus({ preventScroll: true });
+  node.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   if (node instanceof HTMLInputElement && node.type === 'text') {
     node.setSelectionRange(node.value.length, node.value.length);
   }

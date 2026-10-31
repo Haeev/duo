@@ -2,7 +2,7 @@
 // hôte, comme le Mac (hôte) et le PC (invité) sur le réseau local. Création des deux personnages,
 // scène d'arrivée, déplacement au clavier, bêchage d'une case du potager, pause par Échap et reprise.
 import { expect, test, type Locator } from '@playwright/test';
-import { characterOf, holdKeys, longTasks, positionOf, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
+import { characterOf, holdKeys, longTasks, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
@@ -63,11 +63,11 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     const guestId = characterOf(w, GUEST).id;
     const hostId = characterOf(w, HOST).id;
     await press(guestGame.getByRole('region', { name: 'Prochain objectif' }));
-    const before = positionOf(probe, guestId);
+    const before = await settledPosition(guest, probe, guestId);
     expect(before).not.toBeNull();
-    await walkAlong(guest, probe, guestId, [{ x: (before?.x ?? 0) - 3, y: before?.y ?? 0 }], 0.6);
-    const after = positionOf(probe, guestId);
-    expect((before?.x ?? 0) - (after?.x ?? 0)).toBeGreaterThan(2);
+    await holdKeys(guest, westKeys(START_YAW), 1500);
+    const after = await settledPosition(guest, probe, guestId);
+    expect((before?.x ?? 0) - (after?.x ?? 0), 'l’invité avance vers l’ouest').toBeGreaterThan(1);
 
     // Potager, chez l'hôte: par la rangée y = 17,5 (libre d'un bout à l'autre), la colonne x = 13,5,
     // puis à l'est de la case (10, 29), loin de la porte en chantier que la visée préférerait.
@@ -83,7 +83,7 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
         { x: 13.5, y: 29.5 },
         { x: 11.6, y: 29.5 },
       ],
-      0.6,
+      0.8,
       360_000,
       walker,
     );

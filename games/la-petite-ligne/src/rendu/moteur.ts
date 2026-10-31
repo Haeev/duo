@@ -62,9 +62,13 @@ const MAX_FRAME_SECONDS = 0.1;
 /** Parts du chargement: modèles d'abord, puis construction de la scène et compilation. */
 const LOAD_MODELS_SHARE = 0.7;
 const LOAD_BUILD_SHARE = 0.9;
-/** Rayon du trou de visibilité autour d'un personnage (m) et hauteur de son centre. */
-const SEE_THROUGH_RADIUS = 1.7;
-const SEE_THROUGH_CHEST = 1.0;
+/**
+ * Trou de visibilité ajusté à la silhouette d'un personnage (m): demi-largeur,
+ * demi-hauteur du corps (debout, 1,7 m) avec un peu de marge, hauteur du centre.
+ */
+const SEE_THROUGH_HALF_WIDTH = 0.55;
+const SEE_THROUGH_HALF_HEIGHT = 1.05;
+const SEE_THROUGH_CENTER = 0.9;
 const HALF = 0.5;
 const MS_PER_SECOND = 1000;
 
@@ -438,20 +442,28 @@ export class RenderEngine implements Renderer {
     }
     this.renderer.getDrawingBufferSize(this.bufferSize);
     const camera = this.rig.camera;
-    const radius = (SEE_THROUGH_RADIUS / this.rig.viewWidth()) * this.bufferSize.x;
+    // Pixels par mètre à l'écran; une hauteur se voit raccourcie par l'inclinaison de la caméra.
+    const pixelsPerMeter = this.bufferSize.x / this.rig.viewWidth();
+    const elevation = (RENDER_SETTINGS.camera.elevationDeg * Math.PI) / 180;
+    const radiusX = SEE_THROUGH_HALF_WIDTH * pixelsPerMeter;
+    const radiusY = SEE_THROUGH_HALF_HEIGHT * Math.cos(elevation) * pixelsPerMeter;
+    // Monter d'un pixel sur le corps, c'est monter de 1 / (cos e) pixel-mètres, donc se rapprocher de tan e.
+    const depthPerPixel = Math.tan(elevation) / pixelsPerMeter;
     this.holes.length = 0;
     for (const character of world.characters) {
       const x = character.prev.x + (character.pos.x - character.prev.x) * alpha;
       const y = character.prev.y + (character.pos.y - character.prev.y) * alpha;
       const ground = terrain.heightAt(x, y);
-      this.probe.set(x, ground + SEE_THROUGH_CHEST, y);
+      this.probe.set(x, ground + SEE_THROUGH_CENTER, y);
       this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
       this.probe.project(camera);
       this.holes.push({
         x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
         y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
-        radius,
+        radiusX,
+        radiusY,
         depth: -this.viewPoint.z,
+        depthPerPixel,
         ground,
       });
     }

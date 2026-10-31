@@ -197,8 +197,10 @@ export class NotebookPanel extends Panel {
     const sig = JSON.stringify(['quests', quests, current]);
     this.renderBody(sig, () => {
       const ordered = [...quests].sort((a, b) => Number(a.done) - Number(b.done));
-      const focusIndex = defaultQuest(ordered, current);
-      const focusId = ordered[focusIndex]?.id ?? null;
+      // Ordre d'affichage: la semaine puis les coups de main, les quêtes finies en bas de chacun.
+      // Le focus va à la première quête encore ouverte, en haut de la liste: le carnet s'ouvre sans défiler.
+      const shown = [...ordered.filter((q) => q.kind === 'main'), ...ordered.filter((q) => q.kind === 'side')];
+      const focusId = shown[defaultQuest(shown, null)]?.id ?? null;
       const section = (kind: 'main' | 'side'): HTMLElement[] => {
         const list = ordered.filter((q) => q.kind === kind);
         if (list.length === 0) return [];

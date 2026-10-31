@@ -209,6 +209,23 @@ export function positionOf(probe: Probe, id: string): { x: number; y: number } |
   return c === undefined ? null : { x: c.x, y: c.y };
 }
 
+/**
+ * Position une fois le personnage arrêté: l'hôte dessine lui aussi en rendu logiciel, ses
+ * instantanés arrivent avec une à deux secondes de retard sur les touches.
+ */
+export async function settledPosition(page: Page, probe: Probe, id: string): Promise<{ x: number; y: number } | null> {
+  let last = positionOf(probe, id);
+  let calm = 0;
+  for (let i = 0; i < 20 && calm < 2; i++) {
+    await page.waitForTimeout(300);
+    const now = positionOf(probe, id);
+    const moved = now === null || last === null ? 1 : Math.hypot(now.x - last.x, now.y - last.y);
+    calm = moved < 0.02 ? calm + 1 : 0;
+    last = now;
+  }
+  return last;
+}
+
 /** Maintient des touches (codes physiques) pendant `ms`. */
 export async function holdKeys(page: Page, codes: readonly string[], ms: number): Promise<void> {
   for (const code of codes) await page.keyboard.down(code);
@@ -269,8 +286,7 @@ export async function walkAlong(
       }
       if (best === undefined) break;
       await holdKeys(page, best.codes, Math.max(700, Math.min(1800, dist * 300)));
-      await page.waitForTimeout(400);
-      const after = positionOf(probe, id);
+      const after = await settledPosition(page, probe, id);
       if (after === null) continue;
       const dx = after.x - pos.x;
       const dy = after.y - pos.y;

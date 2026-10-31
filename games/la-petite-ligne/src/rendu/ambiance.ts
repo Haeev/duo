@@ -48,11 +48,15 @@ const PALETTE_MATERIAL = 'lpl_palette';
 /** Facteur des lumières de Three.js (irradiance / pi) pour éclairer les sprites comme le décor. */
 const LAMBERT = 1 / Math.PI;
 const FORD_STEPS = 2;
-const STEAM_JITTER = 0.15;
+/** Écart de la bouffée autour de la cheminée (part de sa taille), et part minimale de sa montée et de sa vie (variété). */
+const STEAM_JITTER = 0.5;
+const STEAM_RISE_MIN = 0.7;
+const STEAM_LIFE_MIN = 0.8;
+
+type SteamProfile = (typeof AMBIANCE_SETTINGS.puffs.steam)['moving' | 'idle'];
 const DUST_LIFT = 0.15;
 const STAR_LIFT = 0.25;
 const STAR_SPREAD = 0.35;
-const WHISTLE_RISE = 1.6;
 /** Le rond d'eau flotte juste au-dessus des billons de la case bêchée. */
 const RING_LIFT = 0.08;
 
@@ -344,39 +348,39 @@ export class AmbiancePart implements ExtensionPart {
     }
   }
 
-  private steamBurst(count: number, rise = WHISTLE_RISE): void {
+  private steamBurst(count: number): void {
     const emitter = this.hooks.smokeEmitter();
     if (emitter === null || !this.hooks.trainState().visible) {
       return;
     }
     emitter.getWorldPosition(this.chimney);
+    const steam = AMBIANCE_SETTINGS.puffs.steam;
     for (let i = 0; i < count; i += 1) {
-      this.steamPuff(rise);
+      this.steamPuff(steam.idle, steam.whistleRise);
     }
   }
 
-  private steamPuff(rise = 1): void {
-    const s = AMBIANCE_SETTINGS.puffs.steam;
+  private steamPuff(profile: SteamProfile, rise = 1): void {
     const p = this.puffs;
     const jitter = (): number => (p.random() - HALF_CELL) * 2;
     p.emit(
       {
-        x: this.chimney.x + jitter() * STEAM_JITTER,
+        x: this.chimney.x + jitter() * STEAM_JITTER * profile.startSize,
         y: this.chimney.y,
-        z: this.chimney.z + jitter() * STEAM_JITTER,
-        vx: this.trainVelocity.x * s.trail + jitter() * s.spread,
-        vy: s.rise * rise * (HALF_CELL + p.random()),
-        vz: this.trainVelocity.z * s.trail + jitter() * s.spread,
-        ax: s.drift[0],
-        ay: s.lift,
-        az: s.drift[1],
-        drag: s.drag,
-        life: s.seconds * (HALF_CELL + p.random()),
-        startSize: s.startSize,
-        endSize: s.endSize * (HALF_CELL + p.random()),
+        z: this.chimney.z + jitter() * STEAM_JITTER * profile.startSize,
+        vx: this.trainVelocity.x * profile.trail + jitter() * profile.spread,
+        vy: profile.rise * rise * (STEAM_RISE_MIN + p.random() * (1 - STEAM_RISE_MIN)),
+        vz: this.trainVelocity.z * profile.trail + jitter() * profile.spread,
+        ax: profile.drift[0],
+        ay: profile.lift,
+        az: profile.drift[1],
+        drag: profile.drag,
+        life: profile.seconds * (STEAM_LIFE_MIN + p.random() * (1 - STEAM_LIFE_MIN)),
+        startSize: profile.startSize,
+        endSize: profile.endSize,
         shape: PARTICLE_SHAPE.puff,
         color: this.colors.steam,
-        opacity: s.opacity,
+        opacity: profile.opacity,
       },
       this.time,
     );
@@ -397,12 +401,12 @@ export class AmbiancePart implements ExtensionPart {
     }
     this.lastChimney.copy(this.chimney);
     this.hadChimney = true;
-    const s = AMBIANCE_SETTINGS.puffs.steam;
-    const rate = (state.moving ? s.movingRate : s.idleRate) * (this.light ? HALF_CELL : 1);
-    this.steamClock += context.dt * rate;
+    const steam = AMBIANCE_SETTINGS.puffs.steam;
+    const profile = state.moving ? steam.moving : steam.idle;
+    this.steamClock += context.dt * profile.rate * (this.light ? HALF_CELL : 1);
     while (this.steamClock >= 1) {
       this.steamClock -= 1;
-      this.steamPuff();
+      this.steamPuff(profile);
     }
   }
 
