@@ -143,7 +143,7 @@ describe('traversées en planches (revue du directeur artistique, tour 5)', () =
       return rails.some((rail) => Math.abs(z - rail) < RAIL_SIDE_DISTANCE);
     });
     expect(grey).toEqual([]);
-    // Le ton plus clair reste ailleurs sur le platelage (une lame de temps en temps).
-    expect(triangles.some((triangle) => inAreas(triangle) && is(triangle, 'wood_old'))).toBe(true);
+    // Le gris `wood_old` se lisait comme une autre matière: il ne sert plus du tout au platelage.
+    expect(triangles.some((triangle) => inAreas(triangle) && is(triangle, 'wood_old'))).toBe(false);
   });
 });

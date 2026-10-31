@@ -98,10 +98,10 @@ export const RENDER_SETTINGS = {
       rampLength: 1.25,
       /**
        * Tons des lames, de l'une à la suivante (repris en boucle, décalé d'une
-       * traversée à l'autre): `wood_old` est plus clair de 8 niveaux de gris
-       * que `wood` (128,7 contre 136,7); une lame sur trois ou quatre.
+       * traversée à l'autre). Un seul ton: `wood_old`, gris, se lisait comme une
+       * autre matière au milieu du bois; les joints suffisent à marquer les lames.
        */
-      plankTones: ['wood', 'wood', 'wood_old', 'wood', 'wood', 'wood', 'wood_old'] as const,
+      plankTones: ['wood'] as const,
       /** Fond des ornières et des fentes autour du rail. */
       grooveTone: 'shadow' as const,
       /** Bouts du platelage côté voie (sous les lames, jusqu'au ballast). */
