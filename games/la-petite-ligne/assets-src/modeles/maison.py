@@ -286,7 +286,7 @@ def dish_omelette(A):
     plate(g)
     g.cyl(0.1, 0.03, loc=(0, 0, 0.03), color="flower_yellow", segs=10, scale=(1, 0.6, 1), r2=0.08)
     for k in range(3):
-        g.box((0.015, 0.015, 0.01), loc=(-0.04 + k * 0.04, 0.0, 0.065), color="leaf_crop")
+        g.box((0.015, 0.015, 0.01), loc=(-0.04 + k * 0.04, 0.0, 0.048), color="leaf_crop")  # herbes posées sur l'omelette
     return g
 
 

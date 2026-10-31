@@ -871,7 +871,7 @@ def log_pile(A):
     for layer in range(3):
         for k in range(3):
             o = -0.45 + k * 0.45
-            z = 0.13 + layer * 0.24
+            z = 0.122 + layer * 0.235  # lits légèrement engagés: chaque rondin porte sur le précédent
             if layer % 2 == 0:
                 g.cyl(0.12, 1.5, loc=(0, o * 0.8, z), color=_log_color(0), segs=7, rot=(0, 90, 0))
             else:
@@ -1142,7 +1142,7 @@ def level_crossing(A):
     for k in range(10):
         a.box((0.4, 0.07, 0.07), loc=(0.2 + k * 0.4, 0, 0), color="paint_red" if k % 2 else "white_paint")
     # tige pendante courte, clairement suspendue au bout de la lisse
-    a.cyl(0.025, 0.35, loc=(4.1, 0, -0.2), color="iron", segs=5)
+    a.cyl(0.025, 0.35, loc=(3.95, 0, -0.2), color="iron", segs=5)  # sous le bout de la lisse
     A.add("level_crossing_gate_arm", a, parent=root, loc=(0, 0, 1.0))
     return root
 

@@ -329,7 +329,7 @@
  },
  "hen": {
   "file": "ferme.glb",
-  "tris": 1350,
+  "tris": 1494,
   "variants": [
    "hen_white",
    "hen_red",
@@ -346,7 +346,7 @@
  },
  "platform": {
   "file": "bourg.glb",
-  "tris": 3288,
+  "tris": 3328,
   "footprint": [
    30,
    4
@@ -354,7 +354,7 @@
  },
  "gatekeeper_house": {
   "file": "bourg.glb",
-  "tris": 7900,
+  "tris": 7108,
   "footprint": [
    7,
    6
@@ -366,7 +366,7 @@
  },
  "ferrand_shop": {
   "file": "bourg.glb",
-  "tris": 4676,
+  "tris": 4580,
   "footprint": [
    10,
    8
@@ -382,7 +382,7 @@
  },
  "sawmill": {
   "file": "bourg.glb",
-  "tris": 1968,
+  "tris": 1944,
   "footprint": [
    10,
    8
@@ -398,7 +398,7 @@
  },
  "handcar": {
   "file": "bourg.glb",
-  "tris": 548,
+  "tris": 476,
   "footprint": [
    2,
    2
@@ -406,7 +406,7 @@
  },
  "well": {
   "file": "bourg.glb",
-  "tris": 490,
+  "tris": 686,
   "footprint": [
    2,
    2
@@ -414,7 +414,7 @@
  },
  "henhouse": {
   "file": "bourg.glb",
-  "tris": 2524,
+  "tris": 2392,
   "footprint": [
    3,
    3
@@ -434,7 +434,7 @@
  },
  "woodpile": {
   "file": "bourg.glb",
-  "tris": 888,
+  "tris": 312,
   "footprint": [
    2,
    1
@@ -466,7 +466,7 @@
  },
  "buffer_stop": {
   "file": "bourg.glb",
-  "tris": 152,
+  "tris": 240,
   "footprint": [
    1,
    2
@@ -474,7 +474,7 @@
  },
  "level_crossing_gate": {
   "file": "bourg.glb",
-  "tris": 540,
+  "tris": 252,
   "footprint": [
    1,
    1
@@ -482,7 +482,7 @@
  },
  "bell_post": {
   "file": "bourg.glb",
-  "tris": 238,
+  "tris": 214,
   "footprint": [
    1,
    1
@@ -506,7 +506,7 @@
  },
  "coop_crate": {
   "file": "bourg.glb",
-  "tris": 240,
+  "tris": 168,
   "footprint": [
    1,
    1
@@ -522,7 +522,7 @@
  },
  "station_sign": {
   "file": "bourg.glb",
-  "tris": 1504,
+  "tris": 432,
   "footprint": [
    2,
    1
@@ -530,7 +530,7 @@
  },
  "arbor": {
   "file": "bourg.glb",
-  "tris": 944,
+  "tris": 848,
   "footprint": [
    3,
    2
@@ -538,7 +538,7 @@
  },
  "mailbox": {
   "file": "bourg.glb",
-  "tris": 128,
+  "tris": 104,
   "footprint": [
    1,
    1
@@ -562,7 +562,7 @@
  },
  "crate_stack": {
   "file": "bourg.glb",
-  "tris": 252,
+  "tris": 180,
   "footprint": [
    2,
    1
@@ -578,7 +578,7 @@
  },
  "cart": {
   "file": "bourg.glb",
-  "tris": 452,
+  "tris": 428,
   "footprint": [
    3,
    2
@@ -626,7 +626,7 @@
  },
  "fence_wood": {
   "file": "bourg.glb",
-  "tris": 60,
+  "tris": 36,
   "footprint": [
    1,
    1
@@ -634,7 +634,7 @@
  },
  "fence_picket": {
   "file": "bourg.glb",
-  "tris": 180,
+  "tris": 156,
   "footprint": [
    1,
    1
@@ -642,7 +642,7 @@
  },
  "fence_broken": {
   "file": "bourg.glb",
-  "tris": 60,
+  "tris": 36,
   "footprint": [
    1,
    1
@@ -650,7 +650,7 @@
  },
  "fence_gate": {
   "file": "bourg.glb",
-  "tris": 156,
+  "tris": 108,
   "footprint": [
    1,
    1
@@ -658,7 +658,7 @@
  },
  "fence_post": {
   "file": "bourg.glb",
-  "tris": 36,
+  "tris": 12,
   "footprint": [
    1,
    1
@@ -810,7 +810,7 @@
  },
  "flower_bed": {
   "file": "bourg.glb",
-  "tris": 1148,
+  "tris": 620,
   "footprint": [
    2,
    1
@@ -878,13 +878,16 @@
  },
  "fence": {
   "file": "bourg.glb",
-  "tris": 60,
+  "tris": 36,
   "alias_of": "fence_wood"
  },
  "log_pile": {
   "file": "bourg.glb",
-  "tris": 888,
-  "alias_of": "woodpile"
+  "tris": 216,
+  "footprint": [
+   2,
+   1
+  ]
  },
  "locomotive": {
   "file": "train.glb",
@@ -892,7 +895,7 @@
  },
  "coach": {
   "file": "train.glb",
-  "tris": 2060
+  "tris": 2156
  },
  "van": {
   "file": "train.glb",
