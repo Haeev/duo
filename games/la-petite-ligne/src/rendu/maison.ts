@@ -58,6 +58,7 @@ interface ElementPart {
   ghost: Mesh[];
   material: MeshBasicMaterial;
   roof: boolean;
+  facing: Vector3 | null;
 }
 
 export interface StagedState {
@@ -141,7 +142,7 @@ class StagedBuilding {
     for (const mesh of ghost) {
       this.group.parent?.add(mesh);
     }
-    this.elements.push({ construction, element, node, ghost, material, roof });
+    this.elements.push({ construction, element, node, ghost, material, roof, facing: null });
   }
 
   /** Après les liaisons: repère les murs et le toit (coupe) et les pièces fixes du modèle réparé. */
@@ -152,6 +153,13 @@ class StagedBuilding {
     this.group.getWorldPosition(origin);
     const inverse = this.group.quaternion.clone().invert();
     const elementNodes = new Set(this.elements.map((element) => element.node));
+    const facingOf = (object: Object3D): Vector3 => {
+      box.setFromObject(object).getCenter(centre).sub(origin).applyQuaternion(inverse);
+      return Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
+    };
+    for (const element of this.elements) {
+      element.facing = element.roof ? null : facingOf(element.node);
+    }
     const containsElement = (object: Object3D): boolean => {
       let found = false;
       object.traverse((child) => {
@@ -173,10 +181,7 @@ class StagedBuilding {
         if (roofPattern.test(child.name)) {
           this.parts.push({ node: child, owner, facing: null, roof: true });
         } else if (wallPattern.test(child.name)) {
-          box.setFromObject(child).getCenter(centre).sub(origin).applyQuaternion(inverse);
-          const facing =
-            Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
-          this.parts.push({ node: child, owner, facing, roof: false });
+          this.parts.push({ node: child, owner, facing: facingOf(child), roof: false });
         }
       }
     }
@@ -225,7 +230,7 @@ class StagedBuilding {
       const status = construction?.status ?? 'locked';
       const solid = status === 'done' || element?.done === true;
       const ghost = status === 'ghost' && !solid;
-      const hidden = part.roof && state.cut;
+      const hidden = this.cutAway(part, state);
       part.node.visible = solid && !hidden;
       for (const mesh of part.ghost) {
         mesh.visible = ghost && !hidden;
