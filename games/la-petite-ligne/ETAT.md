@@ -54,6 +54,19 @@ Tenue par le technical artist. Ce que l'ambiance fait en attendant est dit à ch
 7. Trous de visibilité en mode léger: à 640x360 agrandi, la trame (`discard` tramé de `materiaux.ts`) devient un gros damier qui traverse la marquise et la voiture autour d'un joueur caché (captures du manager `zz-jeu-hote.png`, `zz-jeu-invite.png`). Ce n'est pas la vapeur. Proposition: en mode léger, une découpe nette (sans trame) ou un rayon plus petit.
 8. Copies du matériau des joueurs (`shared.clone()` dans `personnages.ts`): `clone()` ne copie pas `onBeforeCompile`. L'ambiance repasse sur la scène chaque seconde et patche les copies nouvelles (nuages, pluie, lumières de sol sur les joueurs); un joueur créé en cours de partie recompile donc son programme une fois. Plus propre: créer les copies avant les extensions, ou un rappel `onCharacterMaterial`.
 
+
+### Réponses du dev rendu au technical artist (2026-10-31, 3 h 30)
+
+1. Fait: la pluie de `effets.ts` est retirée (maillage, mise à jour et réglages `rainDrops`...); seule `pluie.ts` reste.
+2. Fait: plus de fumée en cubes dans `voie.ts` (ni au roulement, ni au sifflet); la recette `smoke` et `smokePuffsPerSecond` sont retirées. `RailwayPart` ne prend plus `effects`.
+3. Fait: `ExtensionPart.handleEvent?(event, context)` dans `extensions.ts`.
+4. Pas fait (le repli par `renderer.shadowMap.enabled` suffit pour la préversion).
+5. Fait: `daylight`, `weather`, `fog` et `shadows` retirés de `reglages.ts`, ainsi que le test « couvre toute la journée »; `nightGlow` passe à 1,3.
+6. et 8. Pas faits (après la préversion).
+7. Remplacé par la révision des trous de visibilité (ellipse ajustée au corps, trame de Bayer, profondeur du corps): plus de gros damier en mode léger (capture `quai-apres-leger.png`).
+- Énigme S4: le repère P0 de `demo.md` (ligne 301) existait déjà dans `effets.ts` (`updateBell`): anneau doré et étincelles à `bell_shadow_spot`, seulement de 17 h à 17 h 30 et par soleil (lu dans l'état et la carte, rien hors de la fenêtre). Rendu un peu plus lisible (opacité 0,5, étincelle toutes les 0,45 s).
+- Ombres du soir faibles (diagnostic, rien modifié dans les fichiers de l'ambiance): (a) contraste: à l'ombre, le sol garde toute la lumière hémisphérique (1,05 à 17 h contre 2,55 pour le soleil, qui frappe le sol à environ 40°) et l'ombre n'enlève que 72 % du soleil (`intensity`), soit un sol à l'ombre environ 44 % plus sombre seulement; (b) objets fins: le poteau de la cloche et les lampadaires font 10 à 15 cm, et le flou des bords (`radius` 2,5 texels, 8 à 12 cm au sol aux zooms 16 et 24) les dilue. Pistes: `radius` 1,5 en fin de journée, `intensity` 0,85, lumière hémisphérique vers 0,8 entre 16 h 30 et 17 h 45.
+
 ## Technical artist
 
 ### 2026-10-31, nuit: lumière et ambiance de la démo
