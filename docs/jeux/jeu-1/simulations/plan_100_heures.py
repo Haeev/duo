@@ -40,7 +40,7 @@ class Arc:
     seconds_per_minute: float
 
 
-# La démo (jours 1 à 15) est mesurée: environ 2 h, soit 8 min par journée.
+# La démo (jours 1 à 15) est estimée à environ 2 h (demo_rythme.py: 63 min pour 8 journées), soit 8 min par journée.
 DEMO_MINUTES_PER_DAY = 8.0
 
 ARCS: tuple[Arc, ...] = (
@@ -72,7 +72,7 @@ def season_label(day: int) -> str:
 def part_calendar() -> None:
     print("1. Calendrier des arcs")
     print(f"   journée: {day_minutes(0.35):.1f} min à 0,35 s, {day_minutes(0.6):.1f} min à 0,6 s, "
-          f"{day_minutes(0.8):.1f} min à 0,8 s (démo mesurée: {DEMO_MINUTES_PER_DAY:.0f} min)")
+          f"{day_minutes(0.8):.1f} min à 0,8 s (démo estimée: {DEMO_MINUTES_PER_DAY:.0f} min)")
     first = 1
     total_h = 0.0
     for arc in ARCS:

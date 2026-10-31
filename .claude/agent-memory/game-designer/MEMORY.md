@@ -86,3 +86,13 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Une valeur à un seul endroit: la commande vit dans `reglages.json` et les textes la citent par `{order}`; ne pas redire dans les réglages des conditions de quête.
 - Piège: dans le contenu passé à l'outil d'écriture de fichiers, `"\u2014"` peut arriver comme un vrai tiret cadratin. Dans du code, écrire `chr(0x2014)`, puis relancer le contrôle typographique de CLAUDE.md.
 - Après un effet qui vide un état (paiement de la commande), toute condition évaluée ensuite doit garder la valeur d'avant: le préciser dans le schéma.
+
+## Anti-répétition sur 100 heures (script `docs/jeux/jeu-1/simulations/plan_100_heures.py`, 2026-10-31)
+
+- Répliques du quotidien: le tirage « la moins récente pour ce joueur » divise par deux les redites récentes; une réserve par niveau de lien (8), par saison (10) et par temps (3), plus 40 % de souvenirs à variables, ramène les redites à moins de 28 jours à 0,7 %. Coût: environ 107 phrases par habitant, plus 20 par année vécue ensuite.
+- Envies: une réserve fixe (même 24 par saison, même avec coup de pouce) est épuisée dès l'année 2; il faut un apport par arc (6 par saison) pour garder un tiers d'envies neuves.
+- Volume d'écriture pour 100 h sans redite: environ 9 000 textes, six fois l'estimation naïve du cahier 0.1. Toujours chiffrer les réserves par habitant, pas un total global.
+- Calendrier de référence de La Petite Ligne: 0,35 s par minute de jeu jusqu'au jour 23 (démo et J1), 0,8 s ensuite: 372 journées, 4,4 années, 99,9 h. Jour 16 = fête des semailles (dimanche), jour 22 = premier jour de l'été (samedi), jour 23 = inauguration.
+- Piège mesuré par la revue du tour 1: le moteur de dialogues de la démo ne tire que parmi les répliques de plus haute priorité, d'où 55 % de redites; vérifier que la règle de tirage a changé avant d'en déduire un besoin d'écriture.
+- Avant de nommer une quête, lister les titres de `quetes.json`: « Le quai en fête » et « Les gens du bourg » sont déjà pris par des quêtes de la démo.
+- Constructions de la démo: format `elements` (`inputs`, `seconds`), deux joueurs vont deux fois plus vite; une bûche donne quatre planches à l'établi. Exprimer les chantiers dans ces unités, pas en « points de travail ».

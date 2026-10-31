@@ -7,7 +7,7 @@
 | Version du document | 0.1 |
 | Dernière mise à jour | 2026-10-30 |
 | Rédaction | game-designer (sections 1 à 6, 11, proposition de la section 12); sections 7 à 10 à compléter par leurs responsables |
-| Documents liés | piste A et décisions du client: `docs/jeux/jeu-1/pistes-concept.md`; simulations: `docs/jeux/jeu-1/simulations/`; plateforme: `docs/plateforme/cahier-des-charges.md` (F05 à F09, F13), `docs/plateforme/architecture.md` (section 14) |
+| Documents liés | piste A et décisions du client: `docs/jeux/jeu-1/pistes-concept.md`; plan des 100 heures (proposition du 2026-10-31): `docs/jeux/jeu-1/plan-100-heures.md`; simulations: `docs/jeux/jeu-1/simulations/`; plateforme: `docs/plateforme/cahier-des-charges.md` (F05 à F09, F13), `docs/plateforme/architecture.md` (section 14) |
 
 > Mode d'emploi: copier ce modèle dans `docs/jeux/<id-du-jeu>/cahier-des-charges.md`. Chaque section indique ses responsables. Le manager consolide, le client valide. Une fois validé, ce document est le contrat: toute modification passe par le manager et s'inscrit dans l'historique (section 15).
 
@@ -1032,3 +1032,6 @@ Proposition de critères de conception, que qa-testeur reprendra, rendra testabl
 |---|---|---|---|
 | 2026-10-30 | 0.1 | Première rédaction des sections de conception (1 à 6, 11, proposition de la 12), simulations jointes, quatre questions | game-designer, sur brief du manager |
 | 2026-10-30 | 0.1 | Ajout du jalon « Démo d'une heure », détaillé dans `demo.md` | client, via le manager |
+| 2026-10-31 | 0.1 | Deuxième semaine de démo (jours 9 à 15), détaillée dans `semaine-2.md` | client, via le manager |
+| 2026-10-31 | 0.1 | Le client fixe l'objectif de 100 heures de jeu, amusantes et sans répétition, et lance la boucle du gauntlet de qualité (`docs/modeles/gauntlet-qualite.md`, suivi dans `gauntlet/`) | client, via le manager |
+| 2026-10-31 | 0.1 | Plan des 100 heures proposé (`plan-100-heures.md`): huit arcs, douze règles anti-répétition, jalons J1 à J9. Écarts avec cette version listés dans sa section 8 (horloge à 0,35 s jusqu'au jour 23 puis 0,8 s, Vergers à l'automne, repousse des arbres, cultures de printemps prolongées à l'été, volume d'écriture porté à environ 9 000 textes, 535 pages du carnet); ils seront reportés ici, en version 0.2, après les décisions D1 à D9 du client | game-designer, sur brief du manager |

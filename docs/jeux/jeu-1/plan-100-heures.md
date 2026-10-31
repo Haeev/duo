@@ -15,9 +15,9 @@
 - **Point de départ**: une démo de deux semaines (environ 2 h), écrite jour par jour: chaque événement est calé sur une date. Ce calendrier écrit ne passe pas à l'échelle: à 100 h, il faudrait écrire 372 journées une par une.
 - **Le principe du plan**: deux couches qui s'empilent. Des **systèmes qui renouvellent** le quotidien (saisons, météo tirée, commande générée, annonces, répliques vivantes, envies, visiteurs, collections) et du **contenu écrit qui avance** (huit arcs, 30 habitants et leurs histoires, sept gares, quatre métiers de plus, la maison qui grandit, le mystère d'Émile).
 - **Le calendrier**: 372 journées, 4,4 années de jeu, 99,9 h, 150 séances de 40 minutes (section 2). Huit arcs de 3 à 21 heures; chaque arc ouvre un lieu, des habitants, une mécanique et un but au long cours.
-- **Anti-répétition**: douze règles chiffrées (section 4), toutes vérifiées par un robot « longue vie » qui joue cinq années simulées et par des statistiques sur les données. Exemple mesuré: avec la réserve de répliques de la démo, 41 % des conversations d'un habitant redisent une phrase entendue dans les 28 jours; avec la règle proposée, 0,7 %.
-- **Prochain jalon (J1, détaillé section 7)**: « La fête des semailles et le quai en fête », jours 15 à 23. Il pose les six premiers systèmes de renouvellement sur la carte et les modèles existants, plus dix modèles nouveaux. Environ 1 h 20 de jeu en plus.
-- **Neuf décisions pour le client** (section 9), dont la plus structurante: la journée s'allonge à l'été (0,35 s puis 0,8 s par minute de jeu), parce que le monde s'agrandit.
+- **Anti-répétition et coopération**: seize règles chiffrées (section 4), toutes vérifiées par un robot « longue vie » qui joue cinq années simulées et par des statistiques sur les données. Exemple mesuré: avec la réserve de répliques de la démo, 41 % des conversations d'un habitant redisent une phrase entendue dans les 28 jours; avec la règle proposée, 0,7 %.
+- **Prochain jalon (J1, détaillé section 7)**: « La fête des semailles et l'inauguration du quai », jours 15 à 23. Il pose huit systèmes de renouvellement (lots L1 à L8) sur la carte actuelle, avec dix modèles 3D nouveaux. Environ 1 h 20 de jeu en plus.
+- **Neuf décisions pour le client** (section 9), dont la plus structurante: la journée s'allonge au début de l'été (0,35 s puis 0,8 s par minute de jeu, de 8 à 16,6 minutes réelles), parce que le monde s'agrandit.
 
 ## 1. Point de départ: ce que contient la démo
 
@@ -26,7 +26,7 @@ Mesures du 2026-10-31 sur `games/la-petite-ligne/donnees/` et `assets/`:
 | Contenu | Démo (jours 1 à 15) | Version 1 du cahier (année 1) | Jeu complet (100 h, ce plan) |
 |---|---|---|---|
 | Habitants | 4 (Firmin, Odette, Basile, Jeanne) | 10 | 30 |
-| Répliques des habitants | 88 lignes, 77 dialogues | environ 1500 textes en tout | environ 9 000 textes (section 6) |
+| Textes (répliques, objectifs, lettres, messages) | 282, dont 88 répliques d'habitants en 77 dialogues | environ 1 500 | environ 9 000 (section 6) |
 | Quêtes | 17 (6 principales, 11 secondaires) | 14 étapes de chapitre, 50 étapes d'habitants | environ 330 (section 6) |
 | Objets | 46, dont 8 recettes | environ 250 | environ 700 |
 | Cultures | 3 | 20 et 4 arbres | 44 et 10 arbres |
@@ -43,6 +43,7 @@ Diagnostic:
 - La démo est un calendrier écrit: les quêtes partent sur `day_is` ou `day_at_least`, la météo et les commandes sont des listes par jour. C'est juste pour une démo qui doit se dérouler pareil pour tous; c'est intenable sur 372 journées.
 - Les habitants n'ont qu'une poignée de phrases du quotidien: à la troisième semaine, ils se répéteraient presque à chaque conversation (section 4.2, mesure).
 - Les ressources s'épuisent: les 12 arbres ne repoussent pas, la carte est un bourg compact de 64x48 m, trois cultures, trois poissons.
+- La revue du tour 1 (`gauntlet/revues/tour-01-contenu-coop.md`, pilier 6 à 5 sur 10, pilier 7 à 6 sur 10) le confirme par la mesure: 55 % de redites en deux semaines à une conversation par jour, parce que le tirage ne garde que les répliques de plus haute priorité; quatre jours sans nouveauté (jours 11 à 14); un seul geste à deux en quinze jours (la poutre); 8 quêtes sur 17 qui se résument à « apporter N objets »; une réserve d'envies vide au jour 15 sur une graine. Ses cinq corrections (D1 à D5) sont le lot L0 de J1 (section 7.1); les règles R4, R6, R13 à R16 ci-dessous les généralisent.
 - Ce qui est solide et se garde: le moteur de quêtes à conditions et effets (`donnees/README.md`), les scènes à deux, les robots qui jouent toute la démo sur plusieurs graines, la sauvegarde exacte, le rendu et l'interface.
 
 ## 2. Le rythme et la somme des heures
@@ -51,11 +52,11 @@ Diagnostic:
 
 | Période | Horloge | Journée réelle | Raison |
 |---|---|---|---|
-| Printemps de l'année 1 (jours 1 à 21, démo et J1) | 0,35 s par minute de jeu | 8 min mesurées (9,8 min au modèle) | bourg compact, une nouveauté par journée, apprentissage |
-| À partir de l'été de l'année 1 (jour 22) | 0,8 s (cahier, TE-01) | 16,6 min | la Halte entière (120x90 m), cinq métiers, deux gares puis plus: la marche et les activités demandent de vraies journées |
+| Printemps de l'année 1 et J1 (jours 1 à 23) | 0,35 s par minute de jeu | 8 min estimées (`demo_rythme.py`: 63 min pour 8 journées; 9,8 min au modèle du cahier) | bourg compact, une nouveauté par journée, apprentissage |
+| À partir du jour 24 (lendemain de l'inauguration du quai, début de J2) | 0,8 s (cahier, TE-01) | 16,6 min | la Halte entière (120x90 m), cinq métiers, deux gares puis plus: la marche et les activités demandent de vraies journées |
 | Réglage du duo « Rythme » | « vif » 0,6 s, « normal » 0,8 s, « paisible » 1,0 s | 13,6, 16,6 et 19,6 min | chaque duo choisit; une proposition chez l'autre, comme EC-11 |
 
-Une journée plus longue réduit aussi la répétition: à 100 h, 0,8 s donne 4,4 années de jeu; 0,6 s en donnerait 5,3, soit une saison de plus vécue cinq fois. Le changement se fait au premier jour de l'été, sans annonce technique; une phrase d'Odette le dit dans le monde (« Les jours rallongent, vous verrez: on a le temps de tout faire, l'été. »). Décision D1.
+Une journée plus longue réduit aussi la répétition: à 100 h, 0,8 s donne 4,4 années de jeu; 0,6 s en donnerait 5,3, soit une saison de plus vécue cinq fois. Le changement se fait au lendemain de l'inauguration, quand la Halte s'ouvre en entier et que l'été commence, sans annonce technique; une phrase d'Odette le dit dans le monde (« Les jours rallongent, vous verrez: on a le temps de tout faire, l'été. »). Décision D1.
 
 ### 2.2 Le calendrier des arcs
 
@@ -73,9 +74,9 @@ Résultat de `python3 simulations/plan_100_heures.py` (partie 1), saisons de 21 
 | A8 La vallée entière | 297 à 372 | automne 4 à été 5 | 76 | 21,0 | 99,9 |
 | **Total** | | 4,4 années | **372** | **99,9** | 150 séances de 40 min |
 
-Contrôle: A1 à A3 (20,2 h) forment la version 1 du cahier (une année, deux gares); A4 à A7 (58,8 h) les quatre épisodes du cahier (53 journées chacun, 6.11); A8 (21 h) le « long terme » du cahier (18,1 h dans la version 0.1), allongé de 2,9 h parce que la démo, plus rapide, raccourcit l'année 1 de 3,1 h. Le script refuse un total hors de 99 à 101,5 h.
+Contrôle: A1 à A3 (20,2 h) forment la version 1 du cahier (une année, deux gares); A4 à A7 (58,7 h) les quatre épisodes du cahier (53 journées chacun, 6.11); A8 (21 h) le « long terme » du cahier (18,1 h dans la version 0.1), allongé de 2,9 h parce que la démo, plus rapide, raccourcit l'année 1 de 3,1 h. Le script refuse un total hors de 99 à 101,5 h.
 
-À deux heures par semaine, c'est un an de soirées. Un duo optimiseur ira plus vite sur les chapitres (de 10 à 15 % selon `economie_et_chapitres.py`), mais les saisons, les fêtes et les années ne s'accélèrent pas: le jeu ne s'épuise pas plus vite qu'il ne se vit.
+À deux heures par semaine, c'est un an de soirées. Un duo optimiseur ira plus vite sur les chapitres (une semaine de moins sur le chapitre 2 selon `economie_et_chapitres.py`), mais les saisons, les fêtes et les années ne s'accélèrent pas: le jeu ne s'épuise pas plus vite qu'il ne se vit.
 
 ## 3. La structure longue
 
@@ -100,7 +101,7 @@ Les arcs avancent dans l'espace; ces fils avancent dans le temps et relient les 
 
 | Fil | Ce qui avance | Rythme | Exemple d'étape |
 |---|---|---|---|
-| **Saisons et années** | cultures, poissons, oiseaux, cueillettes, palette, musiques, emplois du temps des habitants, fêtes | une saison toutes les 21 journées (5,8 h); chaque année a son almanach (section 4.6) | année 2: la crue de printemps de l'Aubrune (un gué à rebâtir, des poissons remontés) |
+| **Saisons et années** | cultures, poissons, oiseaux, cueillettes, palette, musiques, emplois du temps des habitants, fêtes | une saison toutes les 21 journées (5,8 h); chaque année a son almanach (règle R9) | année 2: la crue de printemps de l'Aubrune (un gué à rebâtir, des poissons remontés) |
 | **Métiers** | 5 métiers aux rangs 1 à 3 (A2), Artisanat (A4), Cheminot (A5), rangs 4 et 5 (A6), une spécialité par rang 3 et 5 | un rang principal tous les 20 à 30 jours | rang 4 de Pêche et cueillette: la nasse à anguilles et la pêche de nuit |
 | **La maison qui grandit** | maisonnette (démo), puis pièces ajoutées (A2), plan libre et grenier (A3), atelier de poterie (A4), véranda (A5), étage (A6), maison idéale (A8) | une étape par arc au moins | « La chambre a enfin une fenêtre. Tu dors avec le chant du merle. » |
 | **Habitants** | 30 habitants, chacun en cinq étapes (HA-02), puis une vie après leur histoire (ils changent de métier, d'emploi du temps, de tenue, d'avis) | une étape d'habitant tous les deux à trois jours en moyenne | Jeanne grandit: dix ans à l'année 1, onze à l'année 2, d'autres questions, d'autres envies |
@@ -112,7 +113,7 @@ Les arcs avancent dans l'espace; ces fils avancent dans le temps et relient les 
 
 Pour vérifier qu'à mi-chemin le jeu reste neuf, une journée typique de l'année 3 (été, A6):
 
-- Petit-déjeuner: chacun son envie (une sur deux jamais vécue, section 4.2), la météo, une lettre d'un visiteur parti l'an dernier.
+- Petit-déjeuner: chacun son envie (une sur trois jamais vécue, section 4.3), la météo, une lettre d'un visiteur parti l'an dernier.
 - Matin: soins du potager des Vergers et des brebis des Hauts, trajet en draisine.
 - Jour: une annonce (« Livrer deux fromages aux estives »), une étape de l'histoire d'un habitant des Hauts, une page du carnet (un oiseau de montagne), la troisième étape de la transhumance.
 - Veillée: tissage d'un rideau pour le coin à soi, plan de l'étage.
@@ -121,7 +122,7 @@ Pour vérifier qu'à mi-chemin le jeu reste neuf, une journée typique de l'ann�
 
 ## 4. Principes anti-répétition
 
-### 4.1 Les douze règles
+### 4.1 Les seize règles
 
 Chaque règle a un seuil, une mesure et un outil de vérification. « Robot longue vie »: le simulateur sans affichage joue 5 années sur 8 graines avec deux profils (médian, tranquille) et écrit un journal de tout ce que voit chaque joueur (répliques, envies, annonces, commandes, visiteurs, événements, pages). « Statistiques »: un contrôle des fichiers de données, sans jouer.
 
@@ -139,6 +140,11 @@ Chaque règle a un seuil, une mesure et un outil de vérification. « Robot long
 | R10 | Collections sans traîne | coup de pouce par collection (CN-04); pour chaque collection, la dernière entrée vient au plus 10 h après la dernière entrée débloquée pour 90 % des duos | `collections_v1.py` étendu à toutes les collections |
 | R11 | Trois horizons toujours visibles | chaque matin, le carnet affiche au moins un but du jour (envie, annonce), un de la semaine (commande, fête), un au long cours (étape de chapitre, d'habitant, de maison) | robot longue vie: état du carnet à chaque aube |
 | R12 | Pas de corvée qui grossit | les soins quotidiens (arroser, nourrir, traire) prennent au plus 30 % du temps dehors; chaque arc offre une aide qui allège (arrosoir 3x3, abreuvoir, nasse, Jeanne qui nourrit les poules le dimanche) | robot longue vie: temps par activité |
+
+| R13 | Des quêtes de formes variées | au plus 35 % de quêtes « apporter N objets » par arc, jamais deux de suite chez le même habitant; au moins cinq formes par arc parmi: observer (lieu, heure, météo), retrouver, attendre le bon moment, bâtir, se coordonner à deux, accompagner, deviner (énigme), fabriquer | statistiques sur `quetes.json` (forme déclarée par quête) |
+| R14 | Des samedis qui diffèrent | chaque train a un « fait du samedi » tiré d'une réserve (visiteur à accueillir, commande à thème, colis surprise, retard du train, fanfare, habitant qui part ou revient), jamais le même deux samedis de suite, au moins 12 sortes à 100 h | robot longue vie |
+| R15 | Des gestes à deux qui se renouvellent | au moins un geste à deux exigé par semaine de jeu; au moins un geste à deux nouveau par arc (porter, lever, pousser la draisine, pomper, danser, ramer la barque, l'aiguillage et la cabine du Cheminot, la transhumance, tendre la toile du wagon-salon); aucun ne peut échouer (GE-01) | robot longue vie: gestes par semaine et par sorte |
+| R16 | Des savoirs propres à chaque joueur | au moins deux informations propres à un joueur dès J2 (envie, regard du métier), une de plus par arc (lettre adressée à un seul, indice d'énigme partagé en deux moitiés, carte du pêcheur); au moins 25 % des envies personnelles touchent l'autre joueur (offrir, montrer, rejoindre) | statistiques sur les envies et les regards; observation chez le client |
 
 Surprises (R1, R9): une réserve d'au moins 60 événements rares et uniques sur les 100 h (une volée de grues qui passe, un cerf-volant perdu dans le pommier, un arc-en-ciel double vu ensemble, le facteur remplacé un jour par sa sœur), au plus un par semaine, chacun une seule fois par monde, chacun avec sa page du carnet ou sa réplique de souvenir.
 
@@ -171,8 +177,8 @@ Lecture: une réserve fixe s'épuise dès l'année 2, coup de pouce ou non; seul
 
 ### 4.4 Vérification automatique
 
-1. **Statistiques sur les données** (à chaque `pnpm verifier`): l'extension de `outils/valider_donnees.py` compte, pour chaque habitant, chaque saison, chaque lieu et chaque arc, les réserves de R3, R6, R7 et R8, et échoue sous le seuil. Elle signale aussi les répliques jamais atteignables (conditions contradictoires).
-2. **Robot longue vie** (nouveau test, hors de la boucle rapide, lancé à chaque jalon): 5 années, 8 graines, 2 profils, en moins de 10 minutes grâce à une horloge sans affichage. Il écrit `test-results/longue-vie.json` et vérifie R1, R2, R5, R6, R7, R9, R11 et R12.
+1. **Statistiques sur les données** (à chaque `pnpm verifier`): l'extension de `outils/valider_donnees.py` compte, pour chaque habitant, chaque saison, chaque lieu et chaque arc, les réserves de R3, R6, R7, R8, R13 et R16, et échoue sous le seuil. Elle signale aussi les répliques jamais atteignables (conditions contradictoires).
+2. **Robot longue vie** (nouveau test, hors de la boucle rapide, lancé à chaque jalon): 5 années, 8 graines, 2 profils, en moins de 10 minutes grâce à une horloge sans affichage. Il écrit `test-results/longue-vie.json` et vérifie R1, R2, R5, R6, R7, R9, R11, R12, R14 et R15.
 3. **Couverture du contenu**: part des textes écrits jamais affichés en 100 h simulées, sous 5 % (un texte jamais vu est un texte perdu).
 4. **Courbes jointes au journal du gauntlet**: premières fois par journée, redites par habitant, temps par activité.
 
@@ -183,7 +189,7 @@ Effort en tours de gauntlet (60 à 90 minutes de studio, membres en parallèle):
 | # | Système | Valeur | Effort | Contenu à produire (100 h) | Jalon |
 |---|---|---|---|---|---|
 | 1 | **Saisons et météo tirée** (TE-02, FE-03, FE-09): saison courante, cultures de saison, météo tirée par la graine du monde, jours imposés (fêtes), conditions `season_is` | sans elle, rien ne change d'une semaine à l'autre | M | palettes et musiques par saison, 44 cultures | J1 |
-| 2 | **Répliques vivantes**: réserves conditionnées (lien, saison, temps, jour, lieu), tirage « la moins récente », gabarits de souvenir à variables, mémoire de qui a fait quoi (HA-03) | le monde réagit; les habitants ont une voix sur 100 h | M | environ 4 400 phrases du quotidien et 450 gabarits (section 6) | J1 |
+| 2 | **Répliques vivantes**: réserves conditionnées (lien, saison, temps, jour, lieu), tirage « la moins récente », gabarits de souvenir à variables, mémoire de qui a fait quoi (HA-03) | le monde réagit; les habitants ont une voix sur 100 h | M | environ 3 900 phrases du quotidien et 450 gabarits (section 6) | J1 |
 | 3 | **Commande du samedi générée** (EC-05 à EC-09) et confiance | le pouls hebdomadaire ne s'use pas | S | prix et lots de 120 produits | J1 |
 | 4 | **Petites annonces** (EC-10) | un but du jour neuf chaque matin | S | 100 gabarits | J1 |
 | 5 | **Carnet de la vallée** (CN-01, CN-02): pages, « ensemble », progression commune (SV-08) | le but au long cours le plus lisible | M | 535 pages | J1 |
@@ -207,15 +213,15 @@ Estimation pour les 100 h, par arc (textes: répliques et textes courts; modèle
 
 | Arc | Quêtes (étapes d'histoire, d'habitants, secondaires) | Textes | Objets | Modèles 3D | Musiques |
 |---|---|---|---|---|---|
-| Démo (fait) | 17 | 250 | 46 | 212 | 9 |
+| Démo (fait) | 17 | 280 | 46 | 212 | 9 |
 | A1 (J1) | 11, plus 12 gabarits d'annonces | 450 | 25 | 10 | 2 |
 | A2 | 35 | 1 300 | 90 | 120 | 5 |
 | A3 | 45 | 1 600 | 110 | 150 | 7 |
-| A4 à A7 (par épisode) | 45 | 1 200 | 90 | 90 | 5 |
+| A4 à A7 (par épisode) | 45 | 1 100 | 90 | 90 | 5 |
 | A8 | 40 | 1 000 | 60 | 50 | 2 |
-| **Total** | **environ 330** | **environ 9 400** | **environ 690** | **environ 900** | **environ 45** |
+| **Total** | **environ 330** | **environ 9 000** | **environ 690** | **environ 900** | **environ 45** |
 
-Détail des textes à 100 h: phrases du quotidien 4 400 (30 habitants, R3), gabarits de souvenir 450, étapes d'habitants 1 800 (150 étapes, 12 répliques), quêtes et chapitres 1 200, lettres 250, envies 240, annonces 100, visiteurs 360 (36 modèles, 10 répliques), carnet 535 notes, almanach et fêtes 300. C'est six fois le volume de la version 0.1 du cahier (1 500 textes pour la version 1), qui ne comptait pas les règles R2 à R5.
+Détail des textes à 100 h: phrases du quotidien 3 900 (30 habitants à 92 phrases, plus 20 par année vécue après la première: R3), gabarits de souvenir 450, étapes d'habitants 1 800 (150 étapes, 12 répliques), quêtes et chapitres 1 000, lettres 250, envies 240, annonces 100, visiteurs 360 (36 modèles, 10 répliques), carnet 535 notes, almanach et fêtes 300, soit environ 9 000. C'est six fois le volume de la version 0.1 du cahier (1 500 textes pour la version 1), qui ne comptait pas les règles R2 à R5.
 
 ## 7. Les jalons
 
@@ -223,43 +229,48 @@ Chaque jalon prolonge la même sauvegarde (la partie du client continue), finit 
 
 | Jalon | Contenu | Heures ajoutées | Cumul | Ce qu'on valide avec le client |
 |---|---|---|---|---|
-| **J1 La fête des semailles et le quai en fête** (jours 15 à 23) | section 7.1 | 1,3 | 3,3 | le monde qui réagit, la commande générée, la première fête |
+| **J1 La fête des semailles et l'inauguration du quai** (jours 15 à 23) | section 7.1 | 1,3 | 3,3 | le monde qui réagit, la commande générée, la première fête |
 | J2 L'été du bourg (jours 24 à 42) | la Halte entière, horloge 0,8 s, cinq métiers et rangs, liens et étapes 2 et 3 des cinq habitants, jumelles et 8 oiseaux, 7 cultures d'été, 3 visiteurs, cuisine et chambre ajoutées, la voie et ses quatre obstacles, Feux de la mi-été | 5,3 | 8,6 | la vraie journée de 16,6 min, l'asymétrie des métiers |
 | J3 Les Vergers, l'automne (jours 43 à 63) | le hameau, cinq habitants, chèvres, ruches, verger, Foire aux bêtes et aux fruits, chantier de la gare, plan libre de la maison | 5,8 | 14,4 | deux gares, la maison libre |
 | J4 L'hiver et la première année (jours 64 à 84) | neige, poêle, Veillée des contes, inauguration des Vergers, almanach de l'année 2, cadre d'épisode | 5,8 | 20,2 | une année complète: c'est la version 1 du cahier |
 | J5 à J8 Les quatre épisodes (A4 à A7) | un jalon par épisode, découpé en deux livraisons (le chapitre, puis la vie à la nouvelle gare) | 14,7 chacun | 78,8 | chaque gare |
 | J9 La vallée entière (A8) | électrification, maison idéale, wagons, almanach de l'année 5 | 21 | 99,9 | les 100 h |
 
-### 7.1 J1: la fête des semailles et le quai en fête (jours 15 à 23)
+### 7.1 J1: la fête des semailles et l'inauguration du quai (jours 15 à 23)
 
-**Intention**: la Halte devient un lieu qui vit sans vous attendre. Les habitants parlent de ce que vous avez fait, la météo n'est plus écrite, la coopérative compose sa commande, le bourg fait la fête, et vous bâtissez à deux la marquise du quai pour l'inaugurer le dimanche 23. Même carte, mêmes personnages; dix modèles nouveaux.
+**Titres**: « Le quai en fête » (étape 1.6 du cahier) est déjà le titre de la quête `firmin_flowers` de la semaine 2, et « Les gens du bourg » celui de `meet_village`: J1 prend d'autres titres.
+
+**Intention**: la Halte devient un lieu qui vit sans vous attendre. Les habitants parlent de ce que vous avez fait, la météo n'est plus écrite, la coopérative compose sa commande, le bourg fait la fête, et vous bâtissez à deux la marquise du quai pour l'inaugurer le dimanche 23. Même carte; dix modèles nouveaux, dont Lucie.
 
 **Déroulé**
 
 | Jour | Ce qui arrive | Ce que font les joueurs | Rendez-vous à deux |
 |---|---|---|---|
 | 15, samedi (après 16 h) | la commande 2 est payée; la démo ne finit plus ici. Firmin: le quai mérite une marquise avant l'inauguration. Le panneau et la caisse du chantier apparaissent sur le quai. 18 h: lettre de la coopérative, commande 3 (générée) | lire le panneau du chantier, préparer la fête | |
-| 16, dimanche | **Fête des semailles**, place du bourg, 10 h à 22 h, soleil imposé. Lucie arrive à vélo à 10 h | planter l'arbre de mai (geste « lever »), la bourse aux graines d'Odette (plants de fraisier), le bal de 20 h à 22 h | lever l'arbre de mai; danser au bal |
+| 16, dimanche | **Fête des semailles**, place du bourg, 10 h à 22 h, soleil imposé. Lucie, la factrice, rentre de sa tournée des hameaux et arrive à vélo à 10 h (la démo ne faisait que la citer) | planter l'arbre de mai (geste « lever »), la bourse aux graines d'Odette (plants de fraisier), le bal de 20 h à 22 h | lever l'arbre de mai; danser au bal |
 | 17, lundi | météo tirée dès ce jour. Lucie fait le tour du bourg; dès qu'on a parlé aux cinq habitants, Firmin ouvre le tableau des annonces | première annonce; quête de Lucie (l'appareil photo) | |
-| 18, mardi | trois annonces chaque matin; Basile montre les souches qui repoussent et vend des planches | chantier: planches, clous, travail | |
+| 18, mardi | trois annonces chaque matin; Basile montre les souches qui repoussent et confie quatre jeunes arbres (une fois plantés, il vend des planches) | chantier: planches, clous, travail | |
 | 19, mercredi | Lucie confie la première carte postale ancienne (point de vue 1) | trouver le point de vue (CN-07), remplir la page | regarder le point de vue ensemble (page « ensemble ») |
 | 20, jeudi | confiance niveau 2 (si atteinte: le catalogue gagne un rayon de meubles); Jeanne veut planter des fraisiers | lever la marquise (geste à deux), dernières planches | lever la marquise |
 | 21, vendredi | dernier jour du catalogue et du printemps | remplir la caisse de la commande 3 | |
-| 22, samedi | **premier jour de l'été**: palette d'été si prête, envies d'été, phrase d'Odette sur les jours qui rallongent (l'horloge reste à 0,35 s jusqu'au jour 23 compris, puis passe à 0,8 s en J2). 10 h: le train, le catalogue, un visiteur (l'inspecteur de la coopérative, venu pour l'inauguration). 16 h: commande 3 payée | dernières livraisons | le départ du train |
-| 23, dimanche | **Inauguration du quai** (étape 1.6 du cahier): scène à deux, Firmin ressort l'uniforme d'Émile, bal, lettre de la coopérative (« Si la voie des Vergers est dégagée, le train ira jusque là-haut. ») | la fête, la photo du duo par Lucie | la scène, le bal; écran de fin « Trois semaines à la Halte d'Aubrune » |
+| 22, samedi | **premier jour de l'été**: palette d'été (P1, directeur artistique et tech-artist), envies d'été, Odette remarque que les jours rallongent (l'horloge reste à 0,35 s jusqu'au jour 23 compris, puis passe à 0,8 s en J2). 10 h: le train, le catalogue, un visiteur (l'inspecteur de la coopérative, venu pour l'inauguration). 16 h: commande 3 payée | dernières livraisons | le départ du train |
+| 23, dimanche | **Inauguration du quai** (étape 1.6 du cahier): scène à deux, Firmin ressort l'uniforme d'Émile, bal, lettre de la coopérative (« Si la voie des Vergers est dégagée, le train ira jusque là-haut. ») | la fête, la photo du duo par Lucie | la scène, le bal (si la lettre de Lucie a été remise en semaine 2, Firmin l'invite à danser: le fil de la démo continue); écran de fin « Trois semaines à la Halte d'Aubrune » |
 
 Garde-fou du jalon: si le chantier n'est pas fini au départ du train du jour 22, Basile et Firmin le finissent dans la nuit (« On a fini la marquise à la lanterne. Elle tient, regardez-moi ça. »), pour que l'inauguration ait lieu le 23 sur toutes les graines. À partir de J2, la règle du cahier (MA-08, HI-03) reprend: le village aide, l'inauguration attend.
+
+Garde-fou de la remise: un duo qui n'a pas résolu la première énigme n'a ni la draisine ni l'accès à la remise. Si la remise est encore fermée au matin du jour 16, Basile force la serrure avant la fête (« La serrure a cédé. Elle était plus rouillée que moi. »): la casquette d'Émile (`firmin_uniform`) et la voie de J2 restent accessibles à tous; l'énigme garde sa récompense pour qui l'a trouvée.
 
 **Systèmes livrés par J1** (réutilisés jusqu'à 100 h)
 
 | Lot | Système | Règle du cahier | Détail pour J1 | Membres |
 |---|---|---|---|---|
+| L0 | Corrections de la revue du tour 1 (prérequis) | HA-07, GE-01 | D1 (tirage du quotidien hors priorité stricte, dès maintenant), D2 (pousser la draisine à deux), D3 (jours 11 à 14 garnis), D4 (rattrapage de l'énigme 1), D5 (fenêtre de sept jours pour les envies, envies qui touchent l'autre): voir `gauntlet/revues/tour-01-contenu-coop.md`. L2 prolonge D1 | dev gameplay, game-designer, level-designer |
 | L1 | Saisons et météo tirée | TE-02, FE-03, FE-09 | saison calculée (21 jours), `season_is`; météo tirée la veille avec la graine du monde selon la table FE-09, `weatherByDay` devient une liste de jours imposés (jour 16 et jour 23: soleil); radis, laitue et carotte deviennent « printemps et été » (écart, section 8) | dev gameplay, game-designer (données) |
 | L2 | Répliques vivantes | HA-03, R2 à R5 | réserves `ambient` par habitant, conditions habituelles (`season_is`, `weather_is`, `weekday_is`, `talked_to`...), tirage « la moins récente » par joueur, gabarits de souvenir à variables `{joueur}`, `{objet}`, `{nombre}`, faits retenus pendant 3 jours (récolté, offert, pêché, bâti, mangé ensemble); mémoire sauvegardée | dev gameplay, game-designer (textes) |
-| L3 | Commande générée | EC-05 à EC-07 | la commande 3 est générée au jour 15 à 16 h selon EC-07 parmi les produits déjà obtenus; garde-fou de faisabilité: chaque ligne doit pouvoir se faire en 6 jours avec ce que possède le duo (sinon la ligne est remplacée); les commandes 1 et 2 restent écrites | dev gameplay |
+| L3 | Commande générée | EC-05 à EC-07 | la commande 3 est générée au jour 15 à 16 h selon EC-07 parmi les produits déjà obtenus, jamais un produit qui s'achète tel quel (planches de Basile, pain d'Odette); garde-fou de faisabilité: chaque ligne doit pouvoir se faire en 6 jours avec ce que possède le duo (sinon la ligne est remplacée); les commandes 1 et 2 restent écrites | dev gameplay |
 | L4 | Petites annonces | EC-10 | tableau des annonces, trois au plus, renouvelées chaque matin, 12 gabarits (section ci-dessous), récompense en sous et en lien | dev gameplay, ux-ui (tableau), game-designer |
 | L5 | Carnet de la vallée | CN-01, CN-02, CN-07, SV-08 | onglet « Pages » du carnet, environ 40 pages accessibles en J1 (étapes, recettes, poissons, cueillettes, énigmes, la fête, le point de vue 1, les coins à soi), mention « ensemble » à moins de 15 m, progression envoyée à la plateforme | dev gameplay, ux-ui |
-| L6 | Chantier collectif et geste « lever » | MA-08, GE-03 | panneau et caisse sur le quai: 30 planches, 10 clous, 300 points de travail, 1 geste « lever » (la marquise, 5 s à deux); le village apporte 15 % du reste le samedi | dev gameplay, artiste 3D |
+| L6 | Chantier collectif et geste « lever » | MA-08, GE-03 | panneau et caisse sur le quai; même format que les constructions guidées de la démo (`elements`, `inputs`, `seconds`): 12 éléments (4 poteaux, 4 chevrons, 4 pans de toiture), 30 planches et 10 clous, 60 s de travail à un (30 s à deux, `twoPlayersSpeedMultiplier`), puis le geste « lever la marquise » (5 s à deux); le village apporte 15 % des matériaux restants au train du samedi | dev gameplay, artiste 3D |
 | L7 | Fête | 6.8 | cadre réutilisable: une journée, un lieu, un décor qui apparaît le matin, des activités facultatives, une musique, des horaires; première fête: les semailles | dev gameplay, artiste 3D, sound-designer |
 | L8 | Repousse des arbres | nouveau (écart) | un arbre abattu laisse une souche; jeune arbre au bout de 4 jours, à couper au bout de 8; Basile vend aussi des planches (8 sous, 20 par jour) | dev gameplay |
 | L9 | Robot longue vie, premier jet | section 4.4 | les robots jouent jusqu'au jour 23 sur 8 graines et écrivent le journal des répliques, envies, annonces et premières fois | qa-testeur |
@@ -269,20 +280,18 @@ Garde-fou du jalon: si le chantier n'est pas fini au départ du train du jour 22
 | Id | Type | Titre | Départ | Étapes | Récompense |
 |---|---|---|---|---|---|
 | `third_order` | principale | La commande du samedi 22 | jour 15, 16 h | déposer la commande 3 (générée) avant le jour 22 à 16 h | paiement, confiance |
-| `quay_canopy` | principale | Une marquise pour le quai | jour 15, 16 h | 1. lire le panneau du chantier; 2. apporter les matériaux; 3. travailler 300 points; 4. lever la marquise à deux | drapeau `quay_done` |
-| `quay_inauguration` | principale | Le quai en fête | `quay_done` (ou le garde-fou du jour 22) | rejoindre la scène du quai le dimanche 23 | page d'histoire, écran de fin |
+| `quay_canopy` | principale | Une marquise pour le quai | jour 15, 16 h | 1. lire le panneau du chantier; 2. apporter les matériaux; 3. bâtir les 12 éléments (60 s de travail à un, 30 s à deux); 4. lever la marquise à deux | drapeau `quay_done` |
+| `quay_inauguration` | principale | L'inauguration du quai | `quay_done` (ou le garde-fou du jour 22) | rejoindre la scène du quai le dimanche 23 | page d'histoire, écran de fin |
 | `seed_festival` | fête | La fête des semailles | jour 16, 10 h | au choix: lever l'arbre de mai, la bourse aux graines, danser (une activité à deux suffit pour la page « fête vécue ») | page du carnet, plants de fraisier |
-| `meet_lucie` | principale | Les gens du bourg | jour 16 | avoir parlé aux cinq habitants de la Halte | Firmin ouvre le tableau des annonces |
+| `meet_lucie` | principale | La factrice est de retour | jour 16 | avoir parlé aux cinq habitants de la Halte | Firmin ouvre le tableau des annonces |
 | `lucie_camera` | secondaire | L'appareil de Lucie | jour 17 | 1. Lucie montre le vieil appareil; 2. lui apporter 3 pissenlits et un pain (« pour le moral »); 3. une nuit | Lucie prend des photos; la photo du duo à l'inauguration |
 | `first_viewpoint` | secondaire | La carte postale du gué | jour 19 | se tenir au point de vue du gué, face au quai, entre 7 h et 19 h | page « point de vue », cadre de la carte postale |
 | `basile_saplings` | secondaire | Les jeunes arbres | jour 18 | planter 4 jeunes arbres donnés par Basile à la lisière | Basile vend des planches; page du carnet |
 | `jeanne_strawberries` | secondaire | Les fraises de Jeanne | jour 20 | planter 2 fraisiers et les arroser deux jours | Jeanne promet de vous montrer « un oiseau bleu qui pêche » (amorce de J2) |
-| `odette_lampions` | secondaire | Les lampions d'Odette | jour 21 | apporter 6 œufs et 2 omelettes pour le buffet de l'inauguration | 60 sous; le buffet a vos omelettes |
+| `odette_buffet` | secondaire | Le buffet d'Odette | jour 21 | apporter 6 œufs et 2 omelettes pour le buffet de l'inauguration | 60 sous et deux lampions pour la maison; le buffet a vos omelettes |
 | `firmin_uniform` | secondaire | L'uniforme d'Émile | jour 21 | trouver la casquette d'Émile dans la remise (près de la draisine) | Firmin la porte à l'inauguration |
 
-**Gabarits d'annonces (12)**: livrer N {légume} à Odette; porter un colis de la halte à Basile; trouver N pissenlits pour la tisane de Firmin; réparer la clôture du jardin d'Odette (planches); pêcher un {poisson} pour le souper de Jeanne; apporter du bois de chauffe à Lucie; ranger la caisse de la halte (un geste de 10 s); poser une lettre chez Basile avant midi; offrir un bouquet de bleuets (non: pas de bleuet en J1; remplacé par « trois fraises de la serre d'Odette » à partir de J2) ; aider Basile à scier (5 planches à l'établi); une soupe chaude pour Firmin; montrer le potager à l'inspecteur (jour 22). Règle: jamais le même gabarit deux fois en 10 jours (R7), récompense 40 à 120 sous et lien +50.
-
-Note: le gabarit du bouquet ci-dessus est écarté de J1; la liste de production compte donc 11 gabarits plus « porter le journal de la coopérative à Odette ».
+**Gabarits d'annonces (12)**: livrer N {légume} à Odette; porter un colis de la halte à Basile; trouver N pissenlits pour la tisane de Firmin; réparer la clôture du jardin d'Odette (planches); pêcher un {poisson} pour le souper de Jeanne; apporter des bûches à Lucie; ranger la caisse de la halte (un geste de 10 s); poser une lettre chez Basile avant midi; porter le journal de la coopérative à Odette; aider Basile à scier (5 planches à l'établi); une soupe chaude pour Firmin; montrer le potager à l'inspecteur (jour 22 seulement). Règle: jamais le même gabarit deux fois en 10 jours (R7), récompense de 40 à 120 sous et lien +50.
 
 **Textes à écrire** (game-designer, environ 450)
 
@@ -294,7 +303,7 @@ Note: le gabarit du bouquet ci-dessus est écarté de J1; la liste de production
 | Quêtes: titres, objectifs, réponses des habitants | 60 |
 | Annonces: 12 gabarits, demande, remerciement | 36 |
 | Lettres: commande 3, invitation à la fête, catalogue, récapitulatif, inauguration, lettre de l'inspecteur | 6 |
-| Envies: 10 personnelles (printemps et été), 3 à deux | 13 |
+| Envies: 10 personnelles (printemps et été, dont 3 qui touchent l'autre joueur: R16), 3 à deux | 13 |
 | Pages du carnet (notes) | 40 |
 
 Exemples, dans le ton:
@@ -319,7 +328,7 @@ Exemples, dans le ton:
 | J1-01 | Les robots finissent J1 (inauguration du jour 23) sur 8 graines, reprise des sauvegardes comprise, y compris une sauvegarde de fin de démo (jour 15) | robots |
 | J1-02 | Deux graines différentes donnent deux suites de météo différentes; les jours 16 et 23 ont du soleil sur toutes les graines | test unitaire |
 | J1-03 | La commande 3 respecte EC-07 et chaque ligne est faisable avec ce que possède le duo au jour 15 (1 000 graines) | test unitaire |
-| J1-04 | Sur les jours 15 à 23, aucun joueur n'entend deux fois la même réplique du quotidien d'un même habitant (robots, 8 graines) | robot longue vie |
+| J1-04 | Sur les jours 15 à 23, à raison de deux conversations au plus par joueur, par habitant et par jour, aucun joueur n'entend deux fois la même réplique du quotidien d'un même habitant (robots, 8 graines) | robot longue vie |
 | J1-05 | 40 % au moins des conversations du quotidien sont des souvenirs à variables, et chaque variable est remplie (aucun `{` affiché) | robot longue vie |
 | J1-06 | Chaque matin des jours 17 à 23, trois annonces au plus, aucun gabarit répété en 10 jours | robot longue vie |
 | J1-07 | Chaque journée de J1 a au moins une première fois (R1) | robot longue vie |
@@ -327,15 +336,16 @@ Exemples, dans le ton:
 | J1-09 | Le geste « lever » ne peut pas échouer; relâcher 30 s puis reprendre ne perd rien (CA-J1-032) | test à deux contextes |
 | J1-10 | Les textes nouveaux passent le contrôle d'écriture neutre et typographique (CA-J1-037) | validateur |
 | J1-11 | Les budgets de rendu tiennent avec la fête affichée (décor, habitants, lampions) sur la place | G4 |
-| J1-12 | Séance chez le client: les deux joueurs disent que le bourg « parle de ce qu'on fait » et que la fête est un moment à deux | observation |
+| J1-12 | Au moins un geste à deux exigé (lever la marquise) et deux proposés (l'arbre de mai, la danse); trois quêtes « apporter » au plus sur onze (R13) | robots, statistiques |
+| J1-13 | Séance chez le client: les deux joueurs disent que le bourg « parle de ce qu'on fait » et que la fête est un moment à deux | observation |
 
-**Hors de J1**: métiers et rangs, liens chiffrés affichés, oiseaux et jumelles, cultures d'été, visiteurs au-delà de l'inspecteur, agrandissement de la maison, nouvelle carte, horloge à 0,8 s (tout cela en J2).
+**Hors de J1**: métiers et rangs, affichage des liens (le lien est compté dès J1, sans être montré, pour que les répliques par niveau et les étapes de J2 partent du bon point), oiseaux et jumelles, cultures d'été, visiteurs au-delà de l'inspecteur, agrandissement de la maison, nouvelle carte, horloge à 0,8 s (tout cela en J2).
 
 ## 8. Écarts avec la version 0.1 du cahier des charges
 
 | Sujet | Cahier 0.1 | Ce plan | Raison |
 |---|---|---|---|
-| Horloge | 0,8 s par minute de jeu dès le jour 1 (TE-01) | 0,35 s au printemps de l'année 1, 0,8 s ensuite; réglage du duo à trois vitesses | la démo, déjà faite et appréciée par les robots, tient sur la carte compacte; la vraie journée vient avec le monde entier |
+| Horloge | 0,8 s par minute de jeu dès le jour 1 (TE-01) | 0,35 s jusqu'au jour 23, 0,8 s ensuite; réglage du duo à trois vitesses | la démo est construite sur la carte compacte et cette vitesse; la vraie journée vient avec le monde entier |
 | Heures de l'année 1 | 23,3 h | 20,2 h | printemps plus court; compensé par l'arc A8 (21 h au lieu de 18,1 h) |
 | Arrivée aux Vergers | jour 30 (été, duo médian) | jour 43 (début de l'automne) | l'été entier sert à la Halte complète, aux métiers et à la voie; à resimuler: la règle des collections (« chaque entrée des Vergers visible en automne ou en hiver ») reste vraie, mais `collections_v1.py` doit être relancé avec cette arrivée |
 | Draisine | étape 2.1: 500 sous de pièces au chapitre 2 | réparée par Basile en semaine 2 (démo) | déjà joué; la voie (étape 2.2) reste au chapitre 2 |
@@ -345,21 +355,24 @@ Exemples, dans le ton:
 | Radis, laitue, carotte | printemps seulement | printemps et été | les cultures d'été arrivent en J2; le potager ne s'arrête pas au jour 22 |
 | Seuil des gros achats | 500 sous | 100 sous dans la démo | à ramener à 500 en J2, quand la bourse grossit |
 | Habitants | 10 en version 1, 30 au total | inchangé, mais chaque habitant a une réserve de répliques chiffrée (R3) | anti-répétition |
-| Volume d'écriture | 1 500 textes en version 1 | environ 3 300 pour l'année 1, 9 400 pour 100 h | règles R2 à R5 |
+| Volume d'écriture | 1 500 textes en version 1 | environ 3 600 pour l'année 1, 9 000 pour 100 h | règles R2 à R5 |
 | Pages du carnet | 165 en version 1, 485 à 100 h (SV-05) | 165 puis 535 | 80 par épisode et 50 au long cours |
 | Fêtes | quatre, identiques chaque année | une activité neuve par fête et par année pendant 4 ans, plus une fête par gare | R9 |
 | Collections | 24 oiseaux, 12 poissons, 12 cueillettes en version 1 | inchangé en version 1; 72, 36 et 36 à 100 h | R8, R10 |
+| Gestes à deux | porter, lever, pomper, danser et gestes contemplatifs (GE-01 à GE-05) | les mêmes, plus un geste nouveau par arc et un geste exigé par semaine (R15) | la coopération ne doit pas devenir une routine |
+| Samedi | train, commande, courrier, visiteurs, chaque semaine pareil | un « fait du samedi » tiré d'une réserve, jamais le même deux samedis de suite (R14) | 53 trains en 100 h |
+| Quêtes | formes non réglées | au plus 35 % de quêtes d'apport par arc, cinq formes au moins (R13) | revue du tour 1: 8 quêtes sur 17 sont des apports |
 | Long terme | « réparti sur les épisodes » | un arc à part entière (A8) avec l'almanach de l'année 5 | rendre les 21 dernières heures aussi écrites que les autres |
 
 ## 9. Décisions pour le client
 
 | # | Décision | Options | Recommandation |
 |---|---|---|---|
-| D1 | Le rythme de la journée après la démo | garder 0,35 s (journée de 8 min, 750 journées pour 100 h); passer à 0,8 s à l'été (journée de 16,6 min); 0,6 s (13,6 min) | passer à 0,8 s au premier jour de l'été, avec un réglage « vif, normal, paisible » décidé à deux; à mesurer chez vous en J2 |
+| D1 | Le rythme de la journée après la démo | garder 0,35 s (journée de 8 min, 750 journées pour 100 h); passer à 0,8 s (journée de 16,6 min); 0,6 s (13,6 min) | passer à 0,8 s au jour 24, lendemain de l'inauguration du quai, avec un réglage « vif, normal, paisible » décidé à deux; à mesurer chez vous en J2 |
 | D2 | L'ordre de l'année 1 | Vergers dès l'été (cahier 0.1); tout l'été à la Halte, Vergers à l'automne (ce plan) | ce plan: la Halte entière, les métiers et la voie avant la deuxième gare, pour ne pas ouvrir deux lieux à moitié vides |
 | D3 | La maison qui grandit | plan libre dès J2; pièces ajoutées en J2, plan libre en J3 | pièces ajoutées d'abord (cuisine, chambre, salle commune posées par Basile), plan libre à deux en J3: on a une vraie maison plus tôt, et le plan libre arrive quand il y a de quoi la remplir |
 | D4 | La partie de la démo continue-t-elle dans J1 ? | oui, la sauvegarde du jour 15 se poursuit; ou nouvelle partie à chaque jalon | oui: rien ne se perd, migration testée (critère J1-01) |
-| D5 | Le volume d'écriture | 1 500 textes (cahier 0.1); 9 400 avec les règles anti-répétition | 9 400, écrits par jalon (450 en J1), avec des gabarits de souvenir pour que le monde réagisse; c'est ce qui fait qu'on ne s'ennuie pas à 50 h |
+| D5 | Le volume d'écriture | 1 500 textes (cahier 0.1); 9 000 avec les règles anti-répétition | 9 000, écrits par jalon (450 en J1), avec des gabarits de souvenir pour que le monde réagisse; c'est ce qui fait qu'on ne s'ennuie pas à 50 h |
 | D6 | Le garde-fou de J1 | inauguration le 23 quoi qu'il arrive (le village finit la marquise); ou inauguration le dimanche qui suit le chantier fini (règle du cahier) | garde-fou pour J1 seulement, pour que chaque jalon finisse sur sa fête; règle du cahier dès J2 |
 | D7 | La tendresse entre vos personnages (Q4 du cahier) | complices; tendres en plus; aucun geste | complices et tendres en douceur, comme au cahier; J1 n'a besoin que de la danse au bal |
 | D8 | Après le Terminus (A8) | la vallée continue sans fin (HI-04); une fin écrite après 100 h | sans fin, avec un almanach par année pour qu'on puisse y rester; une lettre de fin au jour 372 pour qui veut s'arrêter là |
