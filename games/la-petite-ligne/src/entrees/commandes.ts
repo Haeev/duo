@@ -29,6 +29,30 @@ const UI_KEYS: readonly [GameAction, string][] = [
   ['confirm', 'Enter'],
 ];
 
+/** Distance devant soi d'un repère planté au clavier, sans souris sur le jeu (m). */
+const PIN_AHEAD = 2;
+
+/** Position au sol de ce que la souris vise. */
+function pickPosition(view: GameView, pick: PickResult): { x: number; y: number } | null {
+  const w = view.world();
+  switch (pick.kind) {
+    case 'ground':
+      return { x: pick.x, y: pick.y };
+    case 'villager':
+      return w.villagers.find((v) => v.id === pick.villager)?.pos ?? null;
+    case 'character':
+      return w.characters.find((c) => c.id === pick.character)?.pos ?? null;
+    case 'ground_item':
+      return w.groundItems.find((g) => g.id === pick.groundItem)?.pos ?? null;
+    case 'tree':
+      return w.trees.find((t) => t.id === pick.tree)?.pos ?? null;
+    case 'furniture': {
+      const f = w.furniture.find((x) => x.id === pick.furniture);
+      return f === undefined ? null : { x: f.cell.cx + 0.5, y: f.cell.cy + 0.5 };
+    }
+  }
+}
+
 function toTarget(pick: PickResult): ClickTarget {
   switch (pick.kind) {
     case 'ground':
@@ -117,6 +141,17 @@ export function createControls(options: ControlsOptions): Controls {
         else view.send({ type: 'cycle_slot', delta: wheel });
       }
       if (input.wasPressed('rotate')) view.send({ type: 'rotate_furniture', delta: 1 });
+      // Repère: là où vise la souris, sinon devant soi.
+      if (input.wasPressed('pin') && me !== undefined) {
+        let at = { x: me.pos.x + Math.cos(me.facing) * PIN_AHEAD, y: me.pos.y + Math.sin(me.facing) * PIN_AHEAD };
+        if (pointer.inside && renderer !== null) {
+          const rect = options.canvasRect();
+          const pick = renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
+          const picked = pick === null ? null : pickPosition(view, pick);
+          if (picked !== null) at = picked;
+        }
+        view.send({ type: 'pin', x: at.x, y: at.y });
+      }
       for (let i = 1; i <= TOOLBAR_SLOTS; i++) {
         if (input.wasPressed(`slot-${i}`)) view.send({ type: 'select_slot', slot: i - 1 });
       }

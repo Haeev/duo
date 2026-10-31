@@ -9,7 +9,7 @@ import {
   parseGameMessage,
   type GameMessage,
   type PlatformMessage,
-} from '../protocol';
+} from '@duo/protocol';
 
 export type {
   GameMessage,
@@ -24,7 +24,7 @@ export type {
   SaveMoment,
   SaveStatus,
   StopReason,
-} from '../protocol';
+} from '@duo/protocol';
 
 export { BRIDGE_PORT_MESSAGE, BRIDGE_VERSION };
 

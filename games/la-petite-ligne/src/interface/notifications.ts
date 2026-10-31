@@ -4,7 +4,6 @@
  * Fonctions pures; le composant du HUD tient les horloges réelles.
  */
 import type { GameNotification, NotificationKind } from '../etat/types';
-import { notificationKey } from './adaptateur';
 
 export type ToastVariant = '' | 'error' | 'event';
 
@@ -96,7 +95,7 @@ export function messageKeyOf(text: string, messages: Readonly<Record<string, str
 }
 
 export function toastVisual(notification: Readonly<GameNotification>, messages: Readonly<Record<string, string>>): ToastVisual {
-  const key = notificationKey(notification) ?? messageKeyOf(notification.text, messages);
+  const key = notification.key ?? messageKeyOf(notification.text, messages);
   return (key === null ? undefined : MESSAGE_VISUALS[key]) ?? KIND_VISUALS[notification.kind];
 }
 

@@ -21,7 +21,7 @@ describe('robot', () => {
     expect(w.constructions.filter((k) => k.id.startsWith('house_')).map((k) => k.status)).toEqual(['done', 'done', 'done']);
     expect(w.characters.every((c) => c.created)).toBe(true);
     // La boîte en fer a été ramassée: l'énigme a démarré et chacun a sa carte.
-    expect(w.quests.some((q) => q.id === 'emile_riddle')).toBe(true);
+    expect(w.quests.find((q) => q.id === 'emile_riddle')?.status).toBe('active');
     expect(w.letters.some((l) => l.id === 'coop_welcome')).toBe(true);
   });
 
@@ -37,6 +37,8 @@ describe('robot', () => {
     expect(w.ending?.days).toBe(8);
     expect(w.ending?.linesDone).toBe(4);
     expect(w.ending?.furniturePlaced).toBeGreaterThan(0);
+    expect(w.ending?.keyFound).toBe(true);
+    expect(w.worldStates.handcar_shed).toBe('open');
     for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper']) {
       expect(w.quests.find((q) => q.id === quest)?.status, quest).toBe('done');
     }

@@ -260,6 +260,15 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'hint_seen':
       return;
+    case 'pin': {
+      if (!c.created || !Number.isFinite(intent.x) || !Number.isFinite(intent.y)) return;
+      const x = Math.max(0, Math.min(sim.map.width, intent.x));
+      const y = Math.max(0, Math.min(sim.map.height, intent.y));
+      // Une épingle par joueur: la nouvelle remplace l'ancienne.
+      c.pin = { pos: { x, y }, since: sim.world.tick, until: sim.world.tick + secondsToTicks(sim.content.settings.feel.pinSeconds) };
+      emit(sim, { type: 'pin', by: c.id, pos: { x, y } });
+      return;
+    }
   }
 }
 

@@ -64,7 +64,7 @@ const SupplementSchema = v.object({
     orientation: v.tuple([str, str, str, str]),
   }),
   keys: v.object({ arrows: v.tuple([str, str, str, str]), escape: str, wheel: str, or: str, click: str, rightClick: str }),
-  title: strings(['ticket', 'name', 'lead', 'start', 'resume', 'helpSynced', 'helpLocal', 'resumeHelp', 'pause'] as const),
+  title: strings(['ticket', 'name', 'lead', 'start', 'resume', 'helpSynced', 'resumeHelp', 'pause'] as const),
   creation: v.object({
     overline: str,
     nameHelp: str,

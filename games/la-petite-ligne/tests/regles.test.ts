@@ -151,4 +151,33 @@ describe('règles', () => {
     expect(duoTicks).toBeLessThan(soloTicks * 0.6);
     expect(duoTicks).toBeGreaterThan(soloTicks * 0.4);
   });
+
+  it("absence: sans entrée pendant 3 minutes, l'horloge attend le joueur; sa moindre entrée la relance (PA-04)", () => {
+    const sim = started();
+    const limit = sim.content.settings.absence.minutes * 60 * 30;
+    const moving = { seq: 1, moveX: 0, moveY: 0, actHeld: false };
+    // p1 bouge sans cesse, p2 ne touche à rien.
+    for (let i = 0; i < limit + 5; i++) step(sim, { controls: { p1: { ...moving, moveX: i % 60 < 30 ? 1 : -1 } }, intents: [] });
+    expect(character(sim, 'p2').absent).toBe(true);
+    expect(character(sim, 'p1').absent).toBe(false);
+    expect(sim.world.clock.stoppedBy).toBe('absence');
+    expect(character(sim, 'p1').notifications.at(-1)?.key).toBe('clock_waits');
+    const frozen = sim.world.clock.minutes;
+    step(sim, { controls: {}, intents: [] });
+    expect(sim.world.clock.minutes).toBe(frozen);
+    act(sim, 'p2', { type: 'cycle_slot', delta: 1 });
+    step(sim, { controls: {}, intents: [] });
+    expect(character(sim, 'p2').absent).toBe(false);
+    expect(sim.world.clock.minutes).toBeGreaterThan(frozen);
+  });
+
+  it('repère: une épingle par joueur, visible 15 s chez les deux (GE-07)', () => {
+    const sim = started();
+    act(sim, 'p1', { type: 'pin', x: 20.5, y: 20.5 });
+    expect(character(sim, 'p1').pin?.pos).toEqual({ x: 20.5, y: 20.5 });
+    act(sim, 'p1', { type: 'pin', x: 22, y: 21 });
+    expect(character(sim, 'p1').pin?.pos).toEqual({ x: 22, y: 21 });
+    for (let i = 0; i < sim.content.settings.feel.pinSeconds * 30 + 2; i++) step(sim, { controls: {}, intents: [] });
+    expect(character(sim, 'p1').pin).toBeNull();
+  });
 });

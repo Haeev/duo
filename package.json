@@ -16,7 +16,11 @@
     "verifier": "node outils/verifier-depot.mjs",
     "controler": "node outils/verifier-depot.mjs",
     "format": "prettier --write .",
-    "format:verifier": "prettier --check ."
+    "format:verifier": "prettier --check .",
+    "build:app": "pnpm --filter duo... --filter @duo/la-petite-ligne... run build",
+    "dist:mac": "pnpm build:app && pnpm --filter duo run dist:mac",
+    "dist:win": "pnpm build:app && pnpm --filter duo run dist:win",
+    "dist:linux": "pnpm build:app && pnpm --filter duo run dist:linux"
   },
   "prettier": "@duo/config/prettier",
   "devDependencies": {

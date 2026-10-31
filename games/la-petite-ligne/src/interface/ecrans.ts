@@ -4,7 +4,6 @@
  * `creation.html`, `petit-dejeuner.html`, `nuit.html`, `fin.html`).
  */
 import type { CharacterId, ReadonlyWorld } from '../etat/types';
-import { endSync, titleSync } from './adaptateur';
 import type { Layer, UiHost } from './composant';
 import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
 import { characterOf, nameOf } from './contexte';
@@ -13,14 +12,6 @@ import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts
 import { dayLabel, formModel, linesText, nextObjective, orderLines } from './modele';
 import { playerColors, portraitSvg } from './portrait';
 
-/** Ce que les écrans demandent à l'orchestrateur. */
-export interface ScreenCallbacks {
-  /** Le joueur quitte l'écran titre. */
-  titleDone(ready: boolean): void;
-  /** « Continuer » de l'écran de fin (local tant que la simulation ne le synchronise pas). */
-  endContinue(ready: boolean): void;
-  endReadyLocal(): boolean;
-}
 
 function sheet(width: string, children: readonly (Node | null)[]): HTMLDivElement {
   const div = el('div', { class: 'lpl-sheet', style: `--lpl-sheet-width: ${width}` });
@@ -84,7 +75,6 @@ export class TitleScreen implements Layer {
   readonly closable = false;
   readonly letterNavigation = false;
   private readonly host: UiHost;
-  private readonly callbacks: ScreenCallbacks;
   private readonly start: HTMLButtonElement;
   private readonly notYet: HTMLButtonElement;
   private readonly help: HTMLParagraphElement;
@@ -92,9 +82,8 @@ export class TitleScreen implements Layer {
   private readonly other: PlayerCard;
   private readonly resume: boolean;
 
-  constructor(host: UiHost, callbacks: ScreenCallbacks, world: ReadonlyWorld) {
+  constructor(host: UiHost, world: ReadonlyWorld) {
     this.host = host;
-    this.callbacks = callbacks;
     const { ctx } = host;
     const x = ctx.texts.extra;
     const titleId = uid('titre');
@@ -104,10 +93,10 @@ export class TitleScreen implements Layer {
     this.self = new PlayerCard(host, 'self', false);
     this.other = new PlayerCard(host, 'other', false);
     this.start = button(this.resume ? ctx.t(x.title.resume, resumeVars) : ctx.t(x.title.start), () => {
-      this.callbacks.titleDone(true);
+      host.send({ type: 'title_ready', ready: true });
     }, { class: 'lpl-button lpl-button--primary lpl-button--large', attrs: { 'data-nav-item': true } });
     this.notYet = button(ctx.t(x.common.notYet), () => {
-      this.callbacks.titleDone(false);
+      host.send({ type: 'title_ready', ready: false });
     }, { class: 'lpl-button lpl-button--large', attrs: { 'data-nav-item': true } });
     this.help = el('p', { style: 'text-align: center' });
     const keys = el('p', { class: 'lpl-keys', style: 'justify-content: center; color: var(--lpl-color-ink-muted)' }, [
@@ -134,19 +123,16 @@ export class TitleScreen implements Layer {
   private helpText(world: ReadonlyWorld): void {
     const { ctx } = this.host;
     const x = ctx.texts.extra;
-    const sync = titleSync(world);
     const time = hourLabel(world.clock.minutes, ctx.texts.game.ui.hud.time);
     const vars = { weekday: weekdayOf(world.clock.day, ctx.texts.weekdays), day: world.clock.day, time };
-    const text = this.resume ? x.title.resumeHelp : sync.supported ? x.title.helpSynced : x.title.helpLocal;
-    setText(this.help, ctx.t(text, vars));
+    setText(this.help, ctx.t(this.resume ? x.title.resumeHelp : x.title.helpSynced, vars));
   }
 
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
     const x = ctx.texts.extra;
-    const sync = titleSync(world);
-    const meReady = sync.ready[ctx.me];
-    const otherReady = sync.ready[ctx.partner];
+    const meReady = characterOf(world, ctx.me)?.titleReady === true;
+    const otherReady = characterOf(world, ctx.partner)?.titleReady === true;
     const notYet = chip(ctx.t(x.common.notYet), '', 'ui-hourglass');
     const ready = chip(ctx.t(x.common.ready), 'ready', 'ui-check');
     this.self.set(nameOf(world, ctx.me), x.common.you, meReady ? ready : notYet);
@@ -712,7 +698,6 @@ export class EndScreen implements Layer {
   readonly closable = false;
   readonly letterNavigation = false;
   private readonly host: UiHost;
-  private readonly callbacks: ScreenCallbacks;
   private readonly ticket: HTMLSpanElement;
   private readonly days: HTMLSpanElement;
   private readonly lines: HTMLSpanElement;
@@ -724,9 +709,8 @@ export class EndScreen implements Layer {
   private readonly notYet: HTMLButtonElement;
   private readonly waiting: HTMLSpanElement;
 
-  constructor(host: UiHost, callbacks: ScreenCallbacks) {
+  constructor(host: UiHost) {
     this.host = host;
-    this.callbacks = callbacks;
     const { ctx } = host;
     const e = ctx.texts.game.endScreen;
     const x = ctx.texts.extra.end;
@@ -741,10 +725,10 @@ export class EndScreen implements Layer {
     this.self = new PlayerCard(host, 'self', true);
     this.other = new PlayerCard(host, 'other', true);
     this.cont = button(ctx.t(x.continue), () => {
-      this.callbacks.endContinue(true);
+      host.send({ type: 'end_ready', ready: true });
     }, { class: 'lpl-button lpl-button--primary lpl-button--large' });
     this.notYet = button(ctx.t(ctx.texts.extra.common.notYet), () => {
-      this.callbacks.endContinue(false);
+      host.send({ type: 'end_ready', ready: false });
     });
     this.waiting = chip('', 'waiting', 'ui-hourglass');
     this.root = screen(
@@ -788,9 +772,8 @@ export class EndScreen implements Layer {
       ctx.t(e.stats.furniture, { furniture }),
     ].join('. '));
 
-    const sync = endSync(world);
-    const meReady = sync.supported ? sync.ready[ctx.me] : this.callbacks.endReadyLocal();
-    const otherReady = sync.ready[ctx.partner];
+    const meReady = characterOf(world, ctx.me)?.endReady === true;
+    const otherReady = characterOf(world, ctx.partner)?.endReady === true;
     const chipOf = (ready: boolean): HTMLElement =>
       ready ? chip(ctx.t(x.chipContinue), 'ready', 'ui-check') : chip(ctx.t(ctx.texts.extra.common.notYet), '', 'ui-hourglass');
     this.self.set(nameOf(world, ctx.me), ctx.texts.extra.common.you, chipOf(meReady), svgOf(world, ctx.me, 'radiant'));

@@ -79,6 +79,8 @@ export type Intent =
   | { type: 'start_day' }
   | { type: 'get_up' }
   | { type: 'night_choice'; choice: 'continue' | 'finish' }
+  // Repère (G ou clic molette): une épingle à sa couleur, visible chez les deux (GE-07)
+  | { type: 'pin'; x: number; y: number }
   // Astuce vue (l'interface l'a affichée)
   | { type: 'hint_seen'; hint: string };
 

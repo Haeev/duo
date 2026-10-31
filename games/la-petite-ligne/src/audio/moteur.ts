@@ -186,7 +186,9 @@ export class AudioEngine {
       estimate: (file) => this.estimate(file),
       load: (file) => options.decode(file),
       now: () => ctx.currentTime,
-      warn: options.warn,
+      warn: (message, data) => {
+        options.warn(message, data);
+      },
     });
     this.pool = new VoicePool(catalogue.mix.maxEffectVoices);
     this.picker = new VariantPicker(options.random);
@@ -478,9 +480,10 @@ export class AudioEngine {
         this.syncTracks.delete(sync.tag);
         continue;
       }
-      if (voice?.at != null && sync.at !== null) {
-        voice.at.x = sync.at.x;
-        voice.at.y = sync.at.y;
+      const at = voice?.at ?? null;
+      if (at !== null && sync.at !== null) {
+        at.x = sync.at.x;
+        at.y = sync.at.y;
       }
       if (voice !== undefined && !state.waiting) {
         const actual = voice.offset + Math.max(0, now - voice.startedAt) * voice.rate;
@@ -574,7 +577,9 @@ export class AudioEngine {
 
   private retryPending(now: number): void {
     const p = this.pending;
-    if (p === null || p.retryAt === null || now < p.retryAt) return;
+    if (p === null) return;
+    const retryAt = p.retryAt;
+    if (retryAt === null || now < retryAt) return;
     this.pending = null;
     this.requestTrack(p);
   }

@@ -253,6 +253,10 @@ export function soundsForEvent(
     case 'demo_ended':
       signals.demoEnded = true;
       break;
+    case 'pin':
+      // Le repère: le sien, ou celui de l'autre (plus grave, trois notes), placé à l'épingle.
+      emit.world(event.by === local ? 'ping-self' : 'ping-peer', { x: event.pos.x, y: event.pos.y }, null);
+      break;
     // Rien à jouer: un autre son les porte (train, état, notification) ou ils sont muets.
     case 'already_taken':
     case 'build_progress':
@@ -271,6 +275,7 @@ export function soundsForEvent(
     case 'letter':
     case 'save_point':
     case 'session_finish':
+    case 'absence':
       break;
   }
 }
@@ -401,7 +406,8 @@ export class StateWatcher {
       if (!first && me.selected !== this.lastSelected) emit.ui('tool-switch', local);
       this.lastSelected = me.selected;
       const dest = me.destination;
-      if (dest !== null && !first && (this.lastDestination === null || dest.x !== this.lastDestination.x || dest.y !== this.lastDestination.y)) {
+      const last = this.lastDestination;
+      if (dest !== null && !first && (last?.x !== dest.x || last.y !== dest.y)) {
         emit.ui('ui-click', local);
       }
       this.lastDestination = dest === null ? null : { x: dest.x, y: dest.y };

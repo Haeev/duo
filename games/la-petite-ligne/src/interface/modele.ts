@@ -6,7 +6,6 @@
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
-import { clockWaitsForAbsence } from './adaptateur';
 import {
   ACTION_ICONS,
   CATEGORY_ICONS,
@@ -28,18 +27,18 @@ export type ScreenKind = 'title' | 'creation' | 'breakfast' | 'night' | 'session
 
 /** Ce que l'interface retient localement pour choisir l'écran. */
 export interface ScreenFlags {
-  /** Le joueur a quitté l'écran titre (ou la simulation l'a fait pour lui). */
+  /** L'écran titre est passé (les deux joueurs prêts, ou partie déjà en cours). */
   titleDone: boolean;
-  /** Les deux ont choisi « Finir la séance » (événement `session_finish`). */
+  /** La séance est finie (événement `session_finish`, « Finir la séance » des deux à l'écran de nuit). */
   sessionFinished: boolean;
   /** « Le train entre en gare… »: l'écran de création reste un instant après les deux créations. */
   creationHold: boolean;
 }
 
-export function screenOf(world: ReadonlyWorld, me: CharacterId, flags: ScreenFlags, titlePhase: boolean): ScreenKind | null {
-  if (flags.sessionFinished) return 'session_end';
+export function screenOf(world: ReadonlyWorld, me: CharacterId, flags: ScreenFlags): ScreenKind | null {
+  // La fin de la démo garde son écran jusqu'à ce que la plateforme prenne le relais.
   if (world.phase === 'ended') return 'ended';
-  if (titlePhase) return 'title';
+  if (flags.sessionFinished) return 'session_end';
   const self = characterOf(world, me);
   if (self === null) return null;
   if (!flags.titleDone && (world.phase === 'creation' || world.phase === 'breakfast')) return 'title';
@@ -103,7 +102,7 @@ export function clockModel(world: ReadonlyWorld, ctx: UiContext): ClockModel {
   let status: string | null = null;
   let statusIcon = 'ui-pause';
   const stop = world.clock.stoppedBy;
-  if (clockWaitsForAbsence(world)) {
+  if (stop === 'absence') {
     state = 'waiting';
     status = ctx.t(hud.stopped.absence, { partner: nameOf(world, ctx.partner) });
     statusIcon = 'ui-hourglass';

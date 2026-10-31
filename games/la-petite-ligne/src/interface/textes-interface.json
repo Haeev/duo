@@ -37,7 +37,6 @@
     "start": "Commencer la semaine",
     "resume": "Reprendre : {weekday} {day}, {time}",
     "helpSynced": "La semaine commence quand vous avez choisi « Commencer la semaine » sur les deux ordinateurs.",
-    "helpLocal": "Ensuite, chacun crée son personnage sur son ordinateur, en même temps.",
     "resumeHelp": "Votre semaine vous attend : {weekday} {day}, {time}.",
     "pause": "pause et réglages de Duo"
   },

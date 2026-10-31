@@ -14,14 +14,13 @@ import spriteIcones from '../../ui-maquettes/icones.svg?raw';
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { GameInterface, GameView, InterfaceOptions } from '../etat/vue';
-import { sendPending, titleSync } from './adaptateur';
 import { NotebookPanel } from './carnet';
 import type { CameraCommand, KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type UiContext, characterOf, createUiContext } from './contexte';
 import { DialogueBox, type DialogueSource } from './dialogue';
 import { el, focusElement, focusables, isVisible, setStyleVar } from './dom';
-import { BreakfastScreen, CreationScreen, EndScreen, NightScreen, type ScreenCallbacks, SessionEndScreen, TitleScreen } from './ecrans';
+import { BreakfastScreen, CreationScreen, EndScreen, NightScreen, SessionEndScreen, TitleScreen } from './ecrans';
 import { directionOf, spatialNeighbour } from './focus';
 import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
@@ -81,7 +80,6 @@ class GameUi implements GameInterface, UiHost {
   private sessionFinished = false;
   private creationHoldUntil = 0;
   private lastScreen: ScreenKind | null = null;
-  private endReady = false;
   private symbols: { self: string; other: string } = { self: 'orb', other: 'crescent' };
 
   constructor(options: InterfaceOptions & InterfaceExtras) {
@@ -282,36 +280,19 @@ class GameUi implements GameInterface, UiHost {
     return stateMenu;
   }
 
-  private screenCallbacks(): ScreenCallbacks {
-    return {
-      titleDone: (ready) => {
-        const world = this.view.world();
-        if (!sendPending(world, (i) => { this.view.send(i); }, { type: 'title_ready', ready })) this.titleDone = ready;
-        this.dirty = true;
-      },
-      endContinue: (ready) => {
-        const world = this.view.world();
-        if (!sendPending(world, (i) => { this.view.send(i); }, { type: 'end_ready', ready })) this.endReady = ready;
-        this.dirty = true;
-      },
-      endReadyLocal: () => this.endReady,
-    };
-  }
-
   private refresh(world: ReadonlyWorld, now: number): void {
     const me = characterOf(world, this.ctx.me);
     if (me === null) return;
     this.applyPlayers(world);
 
-    // L'écran titre: synchronisé si la simulation le permet, sinon local.
-    const sync = titleSync(world);
-    if (sync.supported && sync.ready.p1 && sync.ready.p2) this.titleDone = true;
+    // L'écran titre est tenu par l'interface; la simulation partage qui est prêt (`titleReady`).
+    if (world.characters.every((c) => c.titleReady)) this.titleDone = true;
     if (world.phase !== 'creation' && world.phase !== 'breakfast') this.titleDone = true;
     if (this.lastScreen === 'creation' && world.phase !== 'creation' && this.creationHoldUntil === 0) {
       this.creationHoldUntil = now + UI_SETTINGS.creationReadyHoldMs;
     }
     const creationHold = now < this.creationHoldUntil;
-    const screen = screenOf(world, this.ctx.me, { titleDone: this.titleDone, sessionFinished: this.sessionFinished, creationHold }, sync.inTitlePhase);
+    const screen = screenOf(world, this.ctx.me, { titleDone: this.titleDone, sessionFinished: this.sessionFinished, creationHold });
     this.lastScreen = screen;
     if (this.creationHoldUntil !== 0 && !creationHold && screen !== 'creation') this.creationHoldUntil = -1;
 
@@ -327,13 +308,12 @@ class GameUi implements GameInterface, UiHost {
     let key: string | null = null;
     let kind: LayerKind = 'screen';
     let build: (() => Layer) | null = null;
-    const callbacks = this.screenCallbacks();
     if (screen !== null) {
       key = `screen:${screen}`;
       build = () => {
         switch (screen) {
           case 'title':
-            return new TitleScreen(this, callbacks, world);
+            return new TitleScreen(this, world);
           case 'creation':
             return new CreationScreen(this, world);
           case 'breakfast':
@@ -343,7 +323,7 @@ class GameUi implements GameInterface, UiHost {
           case 'session_end':
             return new SessionEndScreen(this);
           case 'ended':
-            return new EndScreen(this, callbacks);
+            return new EndScreen(this);
         }
       };
     } else {

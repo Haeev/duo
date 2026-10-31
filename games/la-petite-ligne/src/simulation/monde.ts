@@ -80,6 +80,7 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     supper: { bread: 0, simple: 0, stew: 0 },
     midnightReturn: false,
     lastInputTick: 0,
+    absent: false,
     needsSet: { belly: null, sleep: null, heart: null },
     heartToday: { envie: false, sharedEnvie: false, ateTogether: false, gesture: false },
     hintQueue: [],
@@ -88,6 +89,7 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     lastMeal: null,
     envieHistory: [],
     crafting: null,
+    pin: null,
   };
 }
 

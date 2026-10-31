@@ -22,6 +22,9 @@ export const ARRIVE_DISTANCE = 0.15;
 /** Ampleur minimale d'une direction pour bouger (zone morte). */
 export const MOVE_DEADZONE = 0.1;
 
+/** Secondes réelles par minute réelle (seuil d'absence). */
+export const SECONDS_PER_MINUTE = 60;
+
 /** Minutes par heure et par jour. */
 export const MINUTES_PER_HOUR = 60;
 export const MINUTES_PER_DAY = 1440;

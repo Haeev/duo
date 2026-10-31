@@ -42,7 +42,7 @@ import {
   type MatchEnd,
   type SalonGame,
 } from './liaison/session-machine';
-import type { SaveStatus } from './protocol';
+import type { SaveStatus } from '@duo/protocol';
 import { PLAYER_APPEARANCES } from '../shared/players';
 import type { AppWindow, PlatformLayer } from './window';
 

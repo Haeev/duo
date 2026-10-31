@@ -24,27 +24,27 @@ const plain = (s: string): string => s.replace(/[\u00a0\u202f]/g, ' ');
 describe('écran courant', () => {
   it("commence par l'écran titre, puis la création, puis le jeu", () => {
     const sim = newSim();
-    expect(screenOf(sim.world, 'p1', { ...FLAGS, titleDone: false }, false)).toBe('title');
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBe('creation');
+    expect(screenOf(sim.world, 'p1', { ...FLAGS, titleDone: false })).toBe('title');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBe('creation');
     apply(sim, 'p1', { type: 'create_character', name: 'Camille', hair: 0, outfit: 0 });
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBe('creation');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBe('creation');
     apply(sim, 'p2', { type: 'create_character', name: 'Sacha', hair: 1, outfit: 2 });
     expect(sim.world.phase).toBe('day');
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBeNull();
-    expect(screenOf(sim.world, 'p1', { ...FLAGS, creationHold: true }, false)).toBe('creation');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBeNull();
+    expect(screenOf(sim.world, 'p1', { ...FLAGS, creationHold: true })).toBe('creation');
   });
 
   it('montre la nuit, le petit-déjeuner de chacun et la fin', () => {
     const sim = started();
     playUntil(sim, (s) => s.world.phase === 'night');
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBe('night');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBe('night');
     apply(sim, 'p1', { type: 'night_choice', choice: 'continue' });
     apply(sim, 'p2', { type: 'night_choice', choice: 'continue' });
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBe('breakfast');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBe('breakfast');
     apply(sim, 'p1', { type: 'start_day' });
-    expect(screenOf(sim.world, 'p1', FLAGS, false)).toBeNull();
-    expect(screenOf(sim.world, 'p2', FLAGS, false)).toBe('breakfast');
-    expect(screenOf(sim.world, 'p1', { ...FLAGS, sessionFinished: true }, false)).toBe('session_end');
+    expect(screenOf(sim.world, 'p1', FLAGS)).toBeNull();
+    expect(screenOf(sim.world, 'p2', FLAGS)).toBe('breakfast');
+    expect(screenOf(sim.world, 'p1', { ...FLAGS, sessionFinished: true })).toBe('session_end');
   });
 });
 

@@ -1,7 +1,7 @@
 // Manifeste `duo-game.json` (ADR 0005, point 2): schéma de @duo/protocol.
 // `src/main/protocol/` est une copie à l'identique de `packages/protocol/src`
 // (arbre principal, 2026-10-31): à la fusion, ces imports passent à `@duo/protocol`.
-import { BRIDGE_VERSION, isBridgeCompatible, parseManifest, type GameManifest } from '../protocol';
+import { BRIDGE_VERSION, isBridgeCompatible, parseManifest, type GameManifest } from '@duo/protocol';
 
 export type { GameManifest };
 

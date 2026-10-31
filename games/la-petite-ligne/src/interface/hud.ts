@@ -5,7 +5,6 @@
  * Le DOM n'est touché que si une valeur affichée change.
  */
 import type { GameNotification, ReadonlyWorld } from '../etat/types';
-import { placementBlockedReason } from './adaptateur';
 import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
@@ -407,7 +406,7 @@ export class Hud {
 
   private updateBuild(placement: NonNullable<NonNullable<ReturnType<typeof characterOf>>['placement']>): void {
     const { ctx } = this.host;
-    const reason = placementBlockedReason(placement);
+    const reason = placement.blocked ?? null;
     const sig = `${placement.item}|${placement.valid}|${placement.rotation}|${reason ?? ''}`;
     if (sig === this.buildSig) return;
     this.buildSig = sig;
@@ -450,8 +449,9 @@ export class Hud {
     }
     setHidden(this.tip, now >= this.tipUntil);
 
+    // Les astuces vont en bas; une proposition d'achat a sa propre carte.
     const shown = visibleToasts(
-      list.filter((n) => n.kind !== 'hint'),
+      list.filter((n) => n.kind !== 'hint' && n.kind !== 'proposal'),
       this.seenAt,
       now,
       durationMs,

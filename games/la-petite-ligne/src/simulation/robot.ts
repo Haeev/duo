@@ -6,7 +6,7 @@
  */
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
-import { MINUTES_PER_HOUR, TOOLBAR_SLOTS } from './constantes';
+import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
 import { refreshBlockers } from './deplacement';
@@ -26,6 +26,8 @@ interface Memory {
   seq: number;
   /** Ce que le robot fait, pour les messages d'échec des tests. */
   job: string;
+  /** Dernier tick où il a envoyé une intention (présence, PA-04). */
+  lastIntent: number;
 }
 
 export interface Robot {
@@ -37,6 +39,8 @@ export interface Robot {
 const HOUR = MINUTES_PER_HOUR;
 /** Heure où le robot rentre à la maison. */
 const GO_HOME_AT = 19 * HOUR;
+/** Le robot donne signe de vie au moins toutes les N pas (une minute). */
+const PRESENCE_TICKS = SECONDS_PER_MINUTE * SIM_HZ;
 /** Planches à garder pour la commande. */
 const PLANKS_FOR_ORDER = 10;
 
@@ -522,8 +526,8 @@ export interface RobotOptions {
 export function createRobot(options: RobotOptions = {}): Robot {
   const solveRiddle = options.riddle ?? true;
   const memory: Record<CharacterId, Memory> = {
-    p1: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '' },
-    p2: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '' },
+    p1: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '', lastIntent: 0 },
+    p2: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '', lastIntent: 0 },
   };
 
   function decideOne(sim: Sim, c: Character, out: Intent[]): ControlFrame {
@@ -605,6 +609,13 @@ export function createRobot(options: RobotOptions = {}): Robot {
       for (const c of sim.world.characters) {
         const out: Intent[] = [];
         controls[c.id] = decideOne(sim, c, out);
+        // Un joueur qui flâne touche quand même son clavier de temps en temps (absence, PA-04).
+        const m = memory[c.id];
+        if (out.length > 0) m.lastIntent = sim.world.tick;
+        else if (sim.world.tick - m.lastIntent > PRESENCE_TICKS) {
+          out.push({ type: 'select_slot', slot: c.selected });
+          m.lastIntent = sim.world.tick;
+        }
         for (const intent of out) intents.push({ by: c.id, intent });
       }
       return { controls, intents };

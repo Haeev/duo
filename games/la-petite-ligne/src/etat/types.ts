@@ -257,8 +257,10 @@ export interface Character {
   supper: SupperLog;
   /** Retour forcé de minuit ce soir (Sommeil -30). */
   midnightReturn: boolean;
-  /** Pas d'entrée depuis ce tick (absence, P1). */
+  /** Dernière entrée de ce joueur (touche, clic, intention), pour l'absence (PA-04). */
   lastInputTick: number;
+  /** Absent: aucune entrée depuis `reglages.absence.minutes`; l'horloge l'attend et son personnage s'assoit. */
+  absent: boolean;
   /** Besoins fixés par un effet pour la prochaine nuit (souper d'Odette), ou `null`. */
   needsSet: { belly: number | null; sleep: number | null; heart: number | null };
   /** Ce qui compte au Cœur aujourd'hui. */
@@ -275,6 +277,8 @@ export interface Character {
   envieHistory: EnvieId[];
   /** Fabrication en cours à l'établi ou au réchaud, ou `null`. */
   crafting: { recipe: RecipeId; endsAt: number } | null;
+  /** Repère planté par ce joueur (GE-07), visible chez les deux jusqu'au tick `until`, ou `null`. */
+  pin: { pos: Vec2; since: number; until: number } | null;
 }
 
 export type CharacterStatus =
@@ -744,4 +748,6 @@ export type WorldEvent =
   | { type: 'shed_opened' }
   | { type: 'demo_ended' }
   | { type: 'save_point'; reason: 'dawn' | 'quest' }
-  | { type: 'session_finish' };
+  | { type: 'session_finish' }
+  | { type: 'pin'; by: CharacterId; pos: Vec2 }
+  | { type: 'absence'; who: CharacterId; absent: boolean };

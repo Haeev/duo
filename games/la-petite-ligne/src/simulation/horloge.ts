@@ -3,7 +3,8 @@
  * veillée qui arrête le temps, coucher à deux, nuit, petit-déjeuner, minuit.
  */
 import type { CharacterStatus, ClockStop } from '../etat/types';
-import { type Sim, emit, partnerOf, character } from './contexte';
+import { SECONDS_PER_MINUTE, SIM_HZ } from './constantes';
+import { type Sim, character, emit, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
 import { applyForm, settleNight } from './besoins';
 import { deliverScheduledLetters } from './courrier';
@@ -36,8 +37,32 @@ function stopReason(sim: Sim): ClockStop | null {
   if (world.clock.minutes >= s.dayEnd) return 'midnight';
   if (world.clock.day >= s.lastDay.day && world.clock.minutes >= s.lastDay.end) return 'ended';
   if (world.clock.veillee) return 'veillee';
+  if (world.characters.some((c) => c.absent)) return 'absence';
   if (s.stopWhenBothInMenu && world.characters.every((c) => BUSY.has(c.status))) return 'both_busy';
   return null;
+}
+
+/**
+ * Absence (PA-04): sans entrée d'un joueur pendant `reglages.absence.minutes`, en pleine
+ * journée, son personnage s'assoit et l'horloge l'attend; sa moindre entrée la relance.
+ */
+export function updateAbsence(sim: Sim): void {
+  const { world } = sim;
+  const limit = sim.content.settings.absence.minutes * SECONDS_PER_MINUTE * SIM_HZ;
+  for (const c of world.characters) {
+    const idle = world.tick - c.lastInputTick > limit;
+    const absent = world.phase === 'day' && c.status === 'active' && c.created && idle;
+    if (absent === c.absent) continue;
+    c.absent = absent;
+    sim.runtime.changed = true;
+    emit(sim, { type: 'absence', who: c.id, absent });
+    if (absent) {
+      if (c.action.kind === 'idle') c.action = { kind: 'sit', since: world.tick, duration: 0, target: null };
+      say(sim, partnerOf(c.id), 'clock_waits', { partner: c.name });
+    } else if (c.action.kind === 'sit') {
+      c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
+    }
+  }
 }
 
 /** Fait avancer l'horloge d'un pas et déclenche ce qui dépend de l'heure. */

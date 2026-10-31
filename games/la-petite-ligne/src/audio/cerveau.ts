@@ -58,6 +58,8 @@ export interface SyncState {
   sound: string;
   /** Position voulue dans le fichier (s), ou `null` quand la séquence l'a fini. */
   expected: number | null;
+  /** Où est la source (la locomotive), ou `null` pour un son non placé. */
+  at: Vec2 | null;
 }
 
 export interface BrainFrame {
@@ -83,6 +85,7 @@ interface ActiveSync {
   at: number;
   run: 'arrival' | 'departure';
   duration: number;
+  placed: boolean;
 }
 
 export class AudioBrain {
@@ -92,6 +95,7 @@ export class AudioBrain {
   private readonly rules: MomentRules;
   private readonly trainRules: TrainRules;
   private readonly geometry: TrainGeometry;
+  private readonly stopPoint: Vec2;
   private readonly zones: AmbienceZones;
   private readonly saturdayRects: Rect[];
   private readonly seq: Record<keyof typeof SEQ, readonly SequenceStep[]>;
@@ -113,6 +117,7 @@ export class AudioBrain {
   private bedRun: { start: number; run: SequenceRun } | null = null;
   private readonly syncs: ActiveSync[] = [];
   private nearSaturday = false;
+  private musicNow = 0;
 
   private readonly frame: BrainFrame;
   private readonly shotsBuffer: SequenceShot[] = [];
@@ -155,6 +160,7 @@ export class AudioBrain {
     };
     this.tracker = new TrainTracker(this.trainRules);
     const stop = map.points[settings.train.stopPoint] ?? { x: map.width / 2, y: 0 };
+    this.stopPoint = { x: stop.x, y: stop.y };
     this.geometry = {
       stop: { x: stop.x + settings.train.locomotiveOffsetM, y: trackY(map) ?? stop.y },
       slideDistance: settings.train.slideDistanceM,
@@ -212,6 +218,7 @@ export class AudioBrain {
     const { world, local } = input;
     const { catalogue, settings, content, map } = this.options;
     const f = this.frame;
+    this.musicNow = input.musicTime;
     f.shots.length = 0;
     f.loops.length = 0;
     f.syncs.length = 0;
@@ -351,11 +358,12 @@ export class AudioBrain {
       if (s === undefined) continue;
       const t = s.run === 'arrival' ? timeline.arrival : timeline.departure;
       const expected = t === null || !Number.isFinite(t) ? null : t - s.at;
+      const at = s.placed ? { x: this.loco.x, y: this.loco.y } : null;
       if (expected === null || expected >= s.duration) {
-        f.syncs.push({ tag: s.tag, sound: s.sound, expected: null });
+        f.syncs.push({ tag: s.tag, sound: s.sound, expected: null, at });
         this.syncs.splice(i, 1);
       } else {
-        f.syncs.push({ tag: s.tag, sound: s.sound, expected });
+        f.syncs.push({ tag: s.tag, sound: s.sound, expected, at });
       }
     }
 
@@ -374,11 +382,10 @@ export class AudioBrain {
     sequence.advance(t, shots);
     const f = this.frame;
     const { settings, catalogue } = this.options;
-    const stop = this.geometry.stop;
-    const far = distanceBetween(f.listener.at, stop) > settings.train.nearQuayM;
+    const far = distanceBetween(f.listener.at, this.stopPoint) > settings.train.nearQuayM;
     for (const shot of shots) {
       if (shot.music) {
-        this.director.once(shot.sound, this.moment.now);
+        this.director.once(shot.sound, this.musicNow);
         continue;
       }
       const useFar = far && shot.farVariant !== null && catalogue.sounds.has(shot.farVariant);
@@ -386,7 +393,7 @@ export class AudioBrain {
       const tag = shot.synced ? `${run}:${sound}` : null;
       f.shots.push({ sound, at: useFar ? null : { x: this.loco.x, y: this.loco.y }, gainDb: 0, delay: 0, offset: shot.offset, tag });
       if (tag !== null) {
-        this.syncs.push({ tag, sound, at: shot.at, run, duration: catalogue.sounds.get(sound)?.durations[0] ?? 0 });
+        this.syncs.push({ tag, sound, at: shot.at, run, duration: catalogue.sounds.get(sound)?.durations[0] ?? 0, placed: !useFar });
       }
     }
   }

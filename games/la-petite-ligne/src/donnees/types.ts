@@ -395,6 +395,8 @@ export interface FeelSettings {
   notificationsKept: number;
   /** Minutes avant le départ du train pour l'annonce « dans une heure ». */
   trainWarningMinutes: number;
+  /** Durée d'un repère planté (GE-07: 15 s). */
+  pinSeconds: number;
 }
 
 export interface Content {

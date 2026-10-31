@@ -143,6 +143,16 @@
       ]
     },
     {
+      "id": "pin",
+      "label": "Faire signe (repère)",
+      "keys": [
+        "KeyG"
+      ],
+      "mouse": [
+        "middle"
+      ]
+    },
+    {
       "id": "slot-1",
       "label": "Case 1 de la barre",
       "keys": [

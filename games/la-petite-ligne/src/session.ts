@@ -34,6 +34,7 @@ export type GameAction =
   | 'tool-next'
   | 'tool-previous'
   | 'rotate'
+  | 'pin'
   | `slot-${number}`;
 
 export interface SessionOptions {

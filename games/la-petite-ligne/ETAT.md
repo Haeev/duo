@@ -43,8 +43,7 @@ Tenue par le dev interface (`src/interface/`). Chaque point dit ce que l'interfa
 
 ## Écarts et questions signalés (dev gameplay)
 
-- Données, `quetes.json`, « Premières pousses »: les étapes comptent depuis leur début (`since` par défaut `step_start`). Un duo qui sème le jour 1, avant que la quête ne démarre (au matin du jour 2), doit ressemer pour valider l'étape; rien n'est bloqué (la récolte et le resemis la valident), mais c'est déroutant. Proposition au game designer: `"since": "game_start"` sur les conditions `sowed` et `watered` de cette quête.
-- Données, énigme d'Émile: rien n'empêche de la résoudre dès le jour 1 à 17 h (soleil) si l'on a trouvé la boîte; le robot le fait. Si l'on veut que Jeanne et Firmin aient le temps d'aider: ajouter `day_at_least` à l'étape.
+- Réglé par le game designer (commit `0c7d610`): « Premières pousses » compte les semis et arrosages depuis le début de la partie; l'énigme d'Émile demande le jour 3 au moins. Robots relancés: démo finie, commande complète, clé trouvée au plus tôt le jour 3.
 - Repas pris ensemble: le code ne demande pas « le même plat » (README des données): les deux mangent le soir à moins de `ranges.eatTogether`; le souper partagé (Cœur +5, `ate_together:table`) demande en plus une table à côté, comme dans `demo.md`.
 - Réglages absents de `reglages.json`, avec une valeur par défaut dans `src/donnees/defauts.ts` (une clé `feel` dans `reglages.json` les remplace): durées des gestes, glissement du train (6 s), vitesse des habitants (1,6 m/s) et des poules, fenêtre de « Déjà pris » (1,5 s), `ranges.eatTogether` et `ranges.stayAt` (3 m).
 - Pas faits (P1 de `demo.md`): absence (horloge arrêtée après 3 min sans entrée), pêche, regard du métier, coin à soi, repère. Pas d'écran « Qui joue qui ? »: un identifiant inconnu prend le personnage libre.

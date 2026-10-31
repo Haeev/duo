@@ -91,7 +91,7 @@ export function createExampleWorld(
     return world;
   }
   const p1 = options.inside
-    ? dress(first, 'Camille', room.x + 2.5, room.y + 2.5, SCARF_P1, 0, 0)
+    ? dress(first, 'Camille', room.x + 1.5, room.y + 2.5, SCARF_P1, 0, 0)
     : dress(first, 'Camille', door.x + 0.5, door.y + 2.2, SCARF_P1, 0, 0);
   const p2 = dress(second, 'Sacha', door.x - 1.5, door.y + 3.5, SCARF_P2, 1, 2);
   p1.inHouse = options.inside;

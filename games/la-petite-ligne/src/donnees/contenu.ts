@@ -709,6 +709,7 @@ function parseFeel(r: Reader | null): FeelSettings {
     'alreadyTakenSeconds',
     'notificationsKept',
     'trainWarningMinutes',
+    'pinSeconds',
   ];
   for (const key of numeric) {
     feel[key] = optNumber(r, key, feel[key]);

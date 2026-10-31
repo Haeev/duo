@@ -15,7 +15,7 @@ import { pumpScripts } from './effets';
 import { envieStayPoints, updateEnvies, updateStays } from './envies';
 import { moveCharacter, refreshBlockers, updateBeam, updateInside } from './deplacement';
 import { updateVillagers } from './habitants';
-import { checkNight, updateClock } from './horloge';
+import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, updateCrafting } from './intentions';
 import { wanderHens } from './poules';
 import { updateQuests } from './quetes';
@@ -84,6 +84,10 @@ export function step(sim: Sim, input: StepInput): void {
   }
   refreshBlockers(sim);
 
+  for (const c of world.characters) {
+    const f = input.controls[c.id];
+    if (f !== undefined && (f.actHeld || f.moveX !== 0 || f.moveY !== 0)) c.lastInputTick = world.tick;
+  }
   for (const { by, intent } of input.intents) {
     applyIntent(sim, by, intent);
     sim.runtime.changed = true;
@@ -107,6 +111,7 @@ export function step(sim: Sim, input: StepInput): void {
   updateVillagers(sim, dt);
   wanderHens(sim, dt);
   updateTrain(sim, dt);
+  updateAbsence(sim);
   updateClock(sim, dt);
 
   autoStartScenes(sim);
@@ -123,6 +128,12 @@ export function step(sim: Sim, input: StepInput): void {
   }
   pumpHints(sim);
   checkNight(sim);
+  for (const c of world.characters) {
+    if (c.pin !== null && world.tick >= c.pin.until) {
+      c.pin = null;
+      sim.runtime.changed = true;
+    }
+  }
 
   const state = sim.rng.getState();
   world.rng[0] = state[0];

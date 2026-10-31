@@ -86,15 +86,17 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
     playUntil(sim, (s) => at(s, 5, 9 * HOUR + 20));
   };
   switch (name) {
-    case 'creation':
     case 'titre':
       return;
+    case 'creation':
+      apply(sim, other, [{ type: 'title_ready', ready: true }]);
+      return;
     case 'creation-autre':
-      apply(sim, other, [{ type: 'create_character', name: 'Sacha', hair: 2, outfit: 1 }]);
+      apply(sim, other, [{ type: 'title_ready', ready: true }, { type: 'create_character', name: 'Sacha', hair: 2, outfit: 1 }]);
       return;
     case 'scene':
-      apply(sim, other, [{ type: 'create_character', name: 'Sacha', hair: 2, outfit: 1 }]);
-      apply(sim, me, [{ type: 'create_character', name: 'Camille', hair: 0, outfit: 0 }]);
+      apply(sim, other, [{ type: 'title_ready', ready: true }, { type: 'create_character', name: 'Sacha', hair: 2, outfit: 1 }]);
+      apply(sim, me, [{ type: 'title_ready', ready: true }, { type: 'create_character', name: 'Camille', hair: 0, outfit: 0 }]);
       playUntil(sim, (s) => s.world.scene !== null);
       return;
     case 'jour':

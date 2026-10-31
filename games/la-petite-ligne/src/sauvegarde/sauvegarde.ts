@@ -142,6 +142,9 @@ export function restoreWorld(
     // Nouvelle séance: l'écran titre se repasse à deux.
     c.titleReady = false;
     c.endReady = false;
+    // Personne n'est absent au début d'une séance.
+    c.lastInputTick = world.tick;
+    c.absent = false;
     c.menu = null;
     c.dialogue = null;
     c.destination = null;

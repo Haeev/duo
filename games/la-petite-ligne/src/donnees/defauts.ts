@@ -30,6 +30,8 @@ export const DEFAULT_FEEL: FeelSettings = {
   alreadyTakenSeconds: 1.5,
   notificationsKept: 12,
   trainWarningMinutes: 60,
+  // GE-07: l'épingle reste 15 s.
+  pinSeconds: 15,
 };
 
 export const DEFAULT_RANGES = {
