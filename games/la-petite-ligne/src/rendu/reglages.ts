@@ -393,6 +393,20 @@ export const RENDER_SETTINGS = {
   },
 
   /**
+   * Mode léger (`quality: 'light'`, `?rendu=leger`): pour jouer des séquences
+   * dans un Chromium en rendu logiciel (tests de qa-testeur). Résolution
+   * interne basse, ni ombres ni antialiasing, effets et végétation réduits.
+   */
+  light: {
+    pixelRatio: 0.5,
+    maxPhysicalPixels: 640 * 360,
+    /** Part gardée des touffes, fleurs, galets et arbres du pourtour. */
+    vegetationShare: 0.25,
+    /** Part gardée des particules et des gouttes de pluie. */
+    effectsShare: 0.25,
+  },
+
+  /**
    * Résolution dynamique (budget de la plateforme: jusqu'à 0,75): si les
    * images durent trop longtemps en moyenne, la résolution de rendu baisse
    * par paliers, sans jamais remonter pendant la partie (pas de va-et-vient).

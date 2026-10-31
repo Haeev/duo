@@ -32,9 +32,9 @@
     { "id": "shed_key", "name": "clé de la remise", "plural": "clés de la remise", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "shed_key", "tier": "P0" },
     { "id": "old_photo", "name": "vieille photo de la halte", "plural": "vieilles photos de la halte", "category": "quest", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "old_photo", "tier": "P0" },
 
-    { "id": "gudgeon", "name": "goujon", "plural": "goujons", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "fish_gudgeon", "tier": "P1" },
-    { "id": "chub", "name": "chevesne", "plural": "chevesnes", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 15, "shop": null, "model": "fish_chub", "tier": "P1" },
-    { "id": "trout", "name": "truite", "plural": "truites", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 30, "shop": null, "model": "fish_trout", "tier": "P1" },
+    { "id": "gudgeon", "name": "goujon", "plural": "goujons", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 2, "shop": null, "model": "fish_gudgeon", "tier": "P1" },
+    { "id": "chub", "name": "chevesne", "plural": "chevesnes", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 4, "shop": null, "model": "fish_chub", "tier": "P1" },
+    { "id": "trout", "name": "truite", "plural": "truites", "category": "fish", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "fish_trout", "tier": "P1" },
     { "id": "jay_feather", "name": "plume de geai", "plural": "plumes de geai", "category": "decoration", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "jay_feather", "footprint": { "w": 1, "d": 1 }, "comfort": 0, "beauty": 2, "tier": "P1" },
 
     { "id": "straw_mattress", "name": "paillasse", "plural": "paillasses", "category": "furniture", "stack": 1, "buyPrice": null, "sellPrice": null, "shop": null, "model": "straw_mattress", "footprint": { "w": 1, "d": 2 }, "comfort": 1, "beauty": 0, "bed": { "sleep": 50, "sleepers": 1 }, "tier": "P0" },

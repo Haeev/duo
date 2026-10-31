@@ -352,6 +352,7 @@ Valeurs propres à la démo, dans le même fichier de configuration typé que le
 | Catalogue (arrive le jour 8) | lampe 40, tapis 60, rideaux 30, poste à galène 120 | | les colis du train au point d'orgue |
 | Gros achat | 100 sous | 500 sous | le matelas et le poste à galène se décident à deux |
 | Commande | 12 radis, 3 laitues, 6 œufs, 10 planches; x1,5, +25 % si complète | tirée chaque semaine | 288 sous de valeur de base, 540 sous payés si elle est complète |
+| Pêche (P1) | canne dans le sac de chacun dès le début; poids du tirage goujon 6, chevesne 3, truite 2; prix 2, 4 et 8 sous | prix 8, 15, 30 | environ 3,6 sous par prise et 20 prises par journée de pêche: une activité tranquille qui rapporte autant que le potager, pas une mine d'or; une truite sort une fois sur 5,5 en moyenne (9 fois sur 10 en moins de 12 prises, moins de 3 minutes), le pari de Jeanne se gagne sans y passer la soirée |
 
 Simulation (`python3 docs/jeux/jeu-1/simulations/demo_rythme.py`):
 

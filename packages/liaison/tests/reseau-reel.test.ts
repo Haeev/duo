@@ -3,8 +3,11 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';
 import { parseNetworkCommandLine } from '../src/command-line.ts';
+import { createConfig } from '../src/config.ts';
 import { createLiaison } from '../src/liaison.ts';
 import type { Liaison } from '../src/liaison.ts';
+import { createNodeDriver } from '../src/node-driver.ts';
+import type { NetworkDriver } from '../src/transport.ts';
 
 /**
  * Le même code avec les vrais sockets (`ws`, `dgram`) sur la boucle locale: deux
@@ -14,7 +17,13 @@ import type { Liaison } from '../src/liaison.ts';
 const BASE = 40_000 + Math.floor(Math.random() * 2000) * 10;
 const running: Liaison[] = [];
 
-function create(port: number, peerPort: number, machine: string, pseudo: string): Liaison {
+function create(
+  port: number,
+  peerPort: number,
+  machine: string,
+  pseudo: string,
+  driver?: NetworkDriver,
+): Liaison {
   const options = parseNetworkCommandLine([
     `--duo-port=${String(port)}`,
     `--duo-peer=127.0.0.1:${String(peerPort)}`,
@@ -26,6 +35,7 @@ function create(port: number, peerPort: number, machine: string, pseudo: string)
     ...options,
     listenHost: '127.0.0.1',
     config: { countdownMs: 300 },
+    ...(driver === undefined ? {} : { driver }),
   });
   running.push(liaison);
   return liaison;
@@ -143,7 +153,25 @@ describe('vrais sockets sur la boucle locale', () => {
     const a = create(BASE + 40, BASE + 45, 'aaaaaaaa-3333-4000-8000-000000000001', 'Camille');
     await a.start();
     expect(await a.connectTo('192.168.1')).toEqual({ ok: false, failure: 'invalid-address' });
-    expect(await a.connectTo('127,0,0,2')).toEqual({ ok: false, failure: 'refused' });
     expect(await a.connectTo(' 127.0.0.1 ')).toMatchObject({ ok: false, failure: 'self' });
+
+    // Duo absent à une adresse qui répond: une instance sans écoute TCP vise 127.0.0.1, où
+    // ses trois ports sont fermés. Seule 127.0.0.1 existe sous macOS (127.0.0.2 y expire au
+    // lieu de refuser): le refus net est ainsi le même sur les trois systèmes.
+    const port = BASE + 60;
+    const real = createNodeDriver({
+      config: createConfig({ basePort: port }),
+      allowLoopback: true,
+      listenHost: '127.0.0.1',
+    });
+    const noListen: NetworkDriver = {
+      ...real,
+      listen: () => Promise.reject(new Error('écoute TCP retirée pour le test')),
+    };
+    const c = create(port, BASE + 65, 'cccccccc-3333-4000-8000-000000000003', 'Sacha', noListen);
+    const report = await c.start();
+    expect(report.tcpPort).toBeNull();
+    // Virgules du pavé numérique acceptées pour le point.
+    expect(await c.connectTo('127,0,0,1')).toEqual({ ok: false, failure: 'refused' });
   }, 20_000);
 });

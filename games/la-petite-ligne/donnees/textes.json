@@ -44,7 +44,12 @@
     "roof_attic_glint": "Le toit tient. Au grenier, quelque chose brille.",
     "riddle_card_text": "Quand l'ombre de la cloche touche le banc, ce que je cherchais dort à ses pieds. É. L.",
     "riddle_found": "Sous la terre, une clé rouillée et une vieille photo de la halte.",
-    "riddle_not_yet": "Rien ici... pour l'instant."
+    "riddle_not_yet": "Rien ici... pour l'instant.",
+    "placement_outside": "Ça ne rentre pas ici: les meubles restent à l'intérieur de la pièce.",
+    "placement_wall": "Celui-ci se pose contre un mur.",
+    "placement_overlap": "Il y a déjà un meuble à cet endroit.",
+    "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
+    "fish_escaped": "Il s'est échappé."
   },
   "orderFormat": {
     "line": "{count} {item}",

@@ -89,7 +89,8 @@ export function chooseBed(m: MusicMoment, rules: MomentRules, resting: ReadonlyS
     id = null;
     out.fadeOut = m.hold.fadeOut;
   }
-  if (m.silence !== null && m.phase === 'day' && id !== null && id !== MUSIC.veillee) {
+  // Un silence de séquence impose aussi son fondu à une musique qui s'arrête pour une autre raison (fin du dernier jour).
+  if (m.silence !== null && m.phase === 'day' && id !== MUSIC.veillee) {
     id = null;
     out.fadeOut = m.silence.fadeOut;
   }
@@ -100,10 +101,11 @@ export function chooseBed(m: MusicMoment, rules: MomentRules, resting: ReadonlyS
 
 function dayBed(m: MusicMoment, rules: MomentRules): string | null {
   if (m.localStatus === 'sleeping' || m.localStatus === 'night') return null;
+  // Le train à quai garde sa musique jusqu'à ce que la séquence de départ l'efface (16 h passées le dernier jour).
+  if (m.saturdayWindow && m.nearSaturdaySpot && !m.veillee) return MUSIC.saturday;
   if (m.day >= rules.lastDay.day && m.minutes >= rules.lastDay.end) return null;
   if (m.veillee) return MUSIC.veillee;
   if (m.minutes >= rules.veilleeFrom) return null;
-  if (m.saturdayWindow && m.nearSaturdaySpot) return MUSIC.saturday;
   return m.minutes < rules.afternoonFrom ? MUSIC.morning : MUSIC.afternoon;
 }
 

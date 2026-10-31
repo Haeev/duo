@@ -71,6 +71,8 @@ export class Vegetation {
     terrain: Terrain,
     materials: SharedMaterials,
     resources: ResourceTracker,
+    /** Part gardée (1 en mode normal, moins en mode léger). */
+    private readonly share = 1,
   ) {
     this.group.name = 'vegetation';
     const occupied = map.props.filter((prop) => prop.rect !== null).map((prop) => prop.rect);
@@ -108,15 +110,16 @@ export class Vegetation {
       }
     }
     const tufts = cells.filter(
-      ({ cx, cy }) => free(cx, cy) && hash2(cx, cy, SEED_TUFT) < SETTINGS.tuftDensity,
+      ({ cx, cy }) => free(cx, cy) && hash2(cx, cy, SEED_TUFT) < SETTINGS.tuftDensity * this.share,
     );
     const flowers = cells.filter(
-      ({ cx, cy }) => free(cx, cy) && hash2(cx, cy, SEED_FLOWER) < SETTINGS.flowerDensity,
+      ({ cx, cy }) =>
+        free(cx, cy) && hash2(cx, cy, SEED_FLOWER) < SETTINGS.flowerDensity * this.share,
     );
     const pebbles = cells.filter(
       ({ cx, cy }) =>
         terrain.look(cx, cy).kind === 'gravel' &&
-        hash2(cx, cy, SEED_PEBBLE) < SETTINGS.pebbleDensity * 3,
+        hash2(cx, cy, SEED_PEBBLE) < SETTINGS.pebbleDensity * 3 * this.share,
     );
 
     const color = new Color();
@@ -207,7 +210,7 @@ export class Vegetation {
           TREE_MAX_DENSITY,
           SETTINGS.outerTreeDensity * 0.3 + TREE_RAMP * distance,
         );
-        if (hash2(cx, cy, SEED_TREE) >= density) {
+        if (hash2(cx, cy, SEED_TREE) >= density * this.share) {
           continue;
         }
         const strip = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;

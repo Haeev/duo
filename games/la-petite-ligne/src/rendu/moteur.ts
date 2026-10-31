@@ -99,6 +99,8 @@ export class RenderEngine implements Renderer {
   private readonly bufferSize = new Vector2();
   private readonly holes: SeeThroughHole[] = [];
   private resolutionStep = 0;
+  /** Mode léger demandé (`RendererOptions.quality`). */
+  private readonly light: boolean;
   private frameAverageMs = 0;
   private sinceResolutionChange = 0;
 
@@ -106,16 +108,18 @@ export class RenderEngine implements Renderer {
     this.view = options.view;
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
+    this.light = options.quality === 'light';
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
-      antialias: settings.antialias,
+      antialias: settings.antialias && !this.light,
       powerPreference: 'high-performance',
       stencil: false,
     });
     this.renderer.outputColorSpace = SRGBColorSpace;
     this.renderer.toneMapping = toneMapping(settings.toneMapping);
     this.renderer.toneMappingExposure = settings.exposure;
-    this.renderer.shadowMap.enabled = true;
+    // Mode léger: aucune carte d'ombre (ni passe d'ombre, ni échantillonnage dans les shaders).
+    this.renderer.shadowMap.enabled = !this.light;
     this.renderer.shadowMap.type = PCFShadowMap;
     const canvas = this.renderer.domElement;
     canvas.style.display = 'block';
@@ -126,7 +130,13 @@ export class RenderEngine implements Renderer {
 
     this.rig = new IsoCameraRig(this.reducedMotion);
     this.daylight = new DaylightRig(this.scene);
-    this.perf = new PerfMonitor(this.container, options.showStats ?? import.meta.env.DEV);
+    if (this.light) {
+      this.daylight.sun.castShadow = false;
+    }
+    this.perf = new PerfMonitor(
+      this.container,
+      options.showStats ?? (import.meta.env.DEV && !this.light),
+    );
     this.resizeObserver = new ResizeObserver(() => {
       this.resize();
     });
@@ -153,6 +163,14 @@ export class RenderEngine implements Renderer {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
     const settings = RENDER_SETTINGS.renderer;
+    if (this.light) {
+      const light = RENDER_SETTINGS.light;
+      const lightBudget = Math.sqrt(light.maxPhysicalPixels / (width * height));
+      this.renderer.setPixelRatio(Math.min(light.pixelRatio, lightBudget));
+      this.renderer.setSize(width, height, false);
+      this.rig.setAspect(width / height);
+      return;
+    }
     const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
     const scale = RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
     const ratio =
@@ -185,7 +203,8 @@ export class RenderEngine implements Renderer {
     });
     this.terrain = terrain;
     this.scene.add(terrain.group);
-    this.scene.add(new Vegetation(map, terrain, materials, this.resources).group);
+    const share = this.light ? RENDER_SETTINGS.light.vegetationShare : 1;
+    this.scene.add(new Vegetation(map, terrain, materials, this.resources, share).group);
     const decor = new StaticDecor(map, library, terrain, this.resources);
     this.scene.add(decor.group);
     const world = new WorldParts({
@@ -241,6 +260,7 @@ export class RenderEngine implements Renderer {
       characters,
       house,
       this.rig,
+      this.light ? RENDER_SETTINGS.light.effectsShare : 1,
     );
     this.scene.add(effects.group);
     world.add(effects);
@@ -408,7 +428,7 @@ export class RenderEngine implements Renderer {
   /** Résolution dynamique: un palier de moins si les images restent trop lentes (voir `reglages.ts`). */
   private adaptResolution(dtSeconds: number): void {
     const settings = RENDER_SETTINGS.dynamicResolution;
-    if (dtSeconds <= 0 || dtSeconds > MAX_FRAME_SECONDS) {
+    if (this.light || dtSeconds <= 0 || dtSeconds > MAX_FRAME_SECONDS) {
       return;
     }
     this.frameAverageMs +=

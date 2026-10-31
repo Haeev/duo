@@ -189,7 +189,7 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 ### 2.8 `textes.json`
 
 - `form[]`: les cinq niveaux de forme (`level`, `name`, `text` du réveil), dans l'ordre de `reglages.needs.formLevels`.
-- `messages`: clé, texte. Les clés sont utilisées par le code (`already_taken`, `not_enough_money`...) et par les données (`show_text`, `failText`, `readText`).
+- `messages`: clé, texte. Les clés sont utilisées par le code (`already_taken`, `not_enough_money`, les refus de pose d'un meuble `placement_outside`, `placement_wall`, `placement_overlap`, `placement_occupied`, le poisson manqué `fish_escaped`...) et par les données (`show_text`, `failText`, `readText`).
 - `orderFormat`: mise en forme de `{order}`: `line` pour chaque ligne, `separator` entre les lignes, `lastSeparator` avant la dernière.
 - `ui`: libellés de l'interface propre au jeu (carnet, HUD, comptoir, catalogue, caisse, établi, réchaud, propositions, petit-déjeuner, création des personnages).
 - `weekdays` (du samedi au vendredi, index = (jour - 1) modulo 7), `weather`, `nightScreen`, `endScreen`.
@@ -209,6 +209,7 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
 | `envies`, `movement`, `ranges`, `building`, `hints` | une envie par joueur et par jour; vitesses en m/s; portées en mètres; vitesse à deux; astuces |
 | `absence`, `autosave`, `fishing` | P1: horloge arrêtée en cas d'absence, sauvegarde, pêche (le drapeau `fishing_enabled` est posé quand la pêche est activée) |
+| `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
 
 Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. Avec les valeurs actuelles, une commande complète rapporte 540 sous.
 

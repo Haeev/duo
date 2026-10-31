@@ -126,6 +126,12 @@ export class CyclicCurve {
     }
     const a = this.key(index, this.turn);
     const b = this.key(index + 1, this.turn);
+    const m0 = this.slopes[index] ?? 0;
+    const m1 = this.slopes[(index + 1) % count] ?? 0;
+    if (a.value === b.value && m0 === 0 && m1 === 0) {
+      // Palier (nuit, plein jour): la valeur exacte, sans erreur d'arrondi.
+      return a.value;
+    }
     const h = b.time - a.time;
     const s = h > 0 ? (t - a.time) / h : 0;
     const s2 = s * s;
@@ -134,8 +140,6 @@ export class CyclicCurve {
     const h10 = s3 - HERMITE_TWO * s2 + s;
     const h01 = -HERMITE_TWO * s3 + HERMITE_THREE * s2;
     const h11 = s3 - s2;
-    const m0 = this.slopes[index] ?? 0;
-    const m1 = this.slopes[(index + 1) % count] ?? 0;
     return h00 * a.value + h10 * h * m0 + h01 * b.value + h11 * h * m1;
   }
 }

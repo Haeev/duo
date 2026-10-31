@@ -64,6 +64,8 @@ export interface AudioSettings {
   };
   delays: {
     doorCloseSeconds: number;
+    /** Deux passages de porte plus proches que cela: un seul grincement (les deux joueurs sortent ensemble). */
+    doorRepeatSeconds: number;
     qualitySeconds: number;
     treeCrackSeconds: number;
     treeFallSeconds: number;
@@ -178,6 +180,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
   },
   delays: {
     doorCloseSeconds: 0.75,
+    doorRepeatSeconds: 1.2,
     qualitySeconds: 0.06,
     treeCrackSeconds: 0.15,
     treeFallSeconds: 1.3,

@@ -211,8 +211,10 @@ class ParticlePool {
     materials: SharedMaterials,
     resources: ResourceTracker,
     private readonly paint: SharedMaterials['paletteColor'],
+    /** Part gardée des particules (1 en mode normal, moins en mode léger). */
+    private readonly share = 1,
   ) {
-    this.capacity = FX.maxParticles;
+    this.capacity = Math.max(1, Math.round(FX.maxParticles * share));
     const cube = new ShapeBuilder().box([1, 1, 1], [0, 0, 0], 'white_paint').build();
     this.mesh = createInstanced(
       'particules',
@@ -242,7 +244,7 @@ class ParticlePool {
   emit(kind: BurstKind, x: number, y: number, z: number, countScale = 1): void {
     const burst: Burst = BURSTS[kind];
     this.paint(burst.cell, this.color);
-    const count = Math.max(1, Math.round(burst.count * countScale));
+    const count = Math.max(1, Math.round(burst.count * countScale * this.share));
     for (let n = 0; n < count; n += 1) {
       const i = this.next;
       this.next = (this.next + 1) % this.capacity;
@@ -343,6 +345,7 @@ export class EffectsPart implements EventfulPart {
   private readonly matrix = new Matrix4();
   private readonly rainTilt = new Quaternion().setFromEuler(new Euler(RAIN_TILT, 0, RAIN_TILT));
   private readonly rainScale = new Vector3(1, 1, 1);
+  private readonly rainDrops: number;
   private time = 0;
 
   constructor(
@@ -355,9 +358,17 @@ export class EffectsPart implements EventfulPart {
     private readonly characters: CharactersPart,
     private readonly house: HousePart,
     private readonly rig: IsoCameraRig,
+    /** Part gardée des particules et des gouttes (1 en mode normal, moins en mode léger). */
+    share = 1,
   ) {
     this.group.name = 'effets';
-    this.particles = new ParticlePool(materials, resources, materials.paletteColor.bind(materials));
+    this.rainDrops = Math.max(1, Math.round(FX.rainDrops * share));
+    this.particles = new ParticlePool(
+      materials,
+      resources,
+      materials.paletteColor.bind(materials),
+      share,
+    );
     this.group.add(this.particles.mesh);
     this.gardenCells = new Set(map.garden.map((cell) => `${cell.cx}:${cell.cy}`));
 
@@ -417,19 +428,19 @@ export class EffectsPart implements EventfulPart {
     this.bellRing.visible = false;
 
     const drop = new ShapeBuilder().box([0.02, 0.5, 0.02], [0, 0, 0], 'white_paint').build();
-    this.rain = createInstanced('pluie', resources.track(drop), materials.palette, FX.rainDrops);
+    this.rain = createInstanced('pluie', resources.track(drop), materials.palette, this.rainDrops);
     this.rain.castShadow = false;
     this.rain.receiveShadow = false;
     this.rain.frustumCulled = false;
     const rainColor = new Color(RAIN_COLOR);
-    this.rainOffsets = new Float32Array(FX.rainDrops * 3);
-    for (let i = 0; i < FX.rainDrops; i += 1) {
+    this.rainOffsets = new Float32Array(this.rainDrops * 3);
+    for (let i = 0; i < this.rainDrops; i += 1) {
       this.rainOffsets[i * 3] = hashUnit(i, 1);
       this.rainOffsets[i * 3 + 1] = hashUnit(i, 2);
       this.rainOffsets[i * 3 + 2] = hashUnit(i, 3);
       this.rain.setColorAt(i, rainColor);
     }
-    this.rain.count = FX.rainDrops;
+    this.rain.count = this.rainDrops;
     finishInstances(this.rain);
     this.rain.visible = false;
 
@@ -670,7 +681,7 @@ export class EffectsPart implements EventfulPart {
     const radius = this.rig.viewRadius() + FX.rainAreaPadding;
     const fall = (context.time * FX.rainSpeed) / FX.rainHeight;
     const position = this.tmp;
-    for (let i = 0; i < FX.rainDrops; i += 1) {
+    for (let i = 0; i < this.rainDrops; i += 1) {
       const ox = this.rainOffsets[i * 3] ?? 0;
       const oy = this.rainOffsets[i * 3 + 1] ?? 0;
       const oz = this.rainOffsets[i * 3 + 2] ?? 0;

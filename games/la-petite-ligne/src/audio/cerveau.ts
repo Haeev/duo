@@ -118,6 +118,7 @@ export class AudioBrain {
   private readonly syncs: ActiveSync[] = [];
   private nearSaturday = false;
   private musicNow = 0;
+  private lastDoorAt = Number.NEGATIVE_INFINITY;
 
   private readonly frame: BrainFrame;
   private readonly shotsBuffer: SequenceShot[] = [];
@@ -244,7 +245,13 @@ export class AudioBrain {
       hasSound: (id) => catalogue.sounds.has(id),
     };
     const signals = noSignals(this.signals);
-    for (const event of input.events) soundsForEvent(event, ctx, settings, f.shots, signals);
+    for (const event of input.events) {
+      if (event.type === 'door') {
+        if (input.gameTime - this.lastDoorAt < settings.delays.doorRepeatSeconds) continue;
+        this.lastDoorAt = input.gameTime;
+      }
+      soundsForEvent(event, ctx, settings, f.shots, signals);
+    }
     if (signals.hensFed) this.watcher.excite(input.gameTime);
     this.watcher.update(ctx, input.dt, input.gameTime, f.shots, f.loops);
 

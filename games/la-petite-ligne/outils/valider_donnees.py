@@ -683,6 +683,12 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
     if fishing_flag:
         # Ce drapeau est posé par la configuration (pêche activée en P1), pas par un effet.
         reg.flags_set.add(fishing_flag)
+    for fish_id, weight in settings.get("feel", {}).get("fishWeights", {}).items():
+        ref("item", fish_id, "reglages.feel.fishWeights", reg, report)
+        if fish_id in reg.items and reg.items[fish_id].get("category") != "fish":
+            report.error("reglages.feel.fishWeights", f"{fish_id!r} n'est pas un poisson")
+        if not isinstance(weight, (int, float)) or weight <= 0:
+            report.error("reglages.feel.fishWeights", f"poids positif attendu pour {fish_id!r}")
     levels_settings = [entry.get("level") for entry in settings.get("needs", {}).get("formLevels", [])]
     if levels_settings != FORM_LEVELS:
         report.error("reglages.needs.formLevels", f"niveaux attendus {FORM_LEVELS}")
