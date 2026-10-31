@@ -95,7 +95,7 @@ export const RENDER_SETTINGS = {
     scatterFarViewWidth: 30,
     scatterFarShare: 0.5,
     /** Taille des morceaux de décor fusionnés (découpage pour l'élimination hors champ). */
-    chunkSize: 20,
+    chunkSize: 16,
     /** Tronçons de la forêt du pourtour et des rails (m): éliminés hors du cadre. */
     stripSegment: 20,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
@@ -136,6 +136,29 @@ export const RENDER_SETTINGS = {
      * près, et le quai son liseré: on s'en tient aux tout petits accessoires.
      */
     shadowlessBelow: 0.3,
+  },
+
+  /** Passe d'ombre (budget de triangles et d'appels du PC de référence). */
+  shadowCasters: {
+    /**
+     * Tri fin (`ombre-tri.ts`): ce dont l'ombre ne peut tomber dans la vue sort
+     * de la passe d'ombre. Hauteurs (m) de l'empreinte qui reçoit l'ombre: du
+     * lit de la rivière au faîte des toits; marge (m) pour le flou du bord.
+     */
+    cull: true as boolean,
+    receiverHeights: [-0.5, 2, 6] as readonly number[],
+    margin: 0.5,
+    /**
+     * Pièces sans ombre visible, par nom de nœud: roues et bielles sous les
+     * voitures (dans l'ombre de la caisse), poules (ombre de 20 cm noyée dans
+     * l'herbe), cadre accroché au mur.
+     */
+    shadowlessParts: [
+      /_wheels(_\d+)?$/,
+      /_rod_[lr]$/,
+      /^hen_/,
+      /^picture_frame$/,
+    ] as readonly RegExp[],
   },
 
   /**
