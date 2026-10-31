@@ -1,9 +1,13 @@
 /**
  * Petites aides DOM de l'interface: création d'éléments, icônes du sprite,
- * mises à jour qui ne touchent le DOM que si la valeur change.
+ * mises à jour qui ne touchent le DOM que si la valeur change. Tout texte
+ * posé par ces aides (contenu, `aria-label`, `title`) passe par la
+ * typographie française (idempotente).
  */
+import { typographier } from './typographie';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const READ_ATTRIBUTES = new Set(['aria-label', 'title', 'placeholder', 'alt']);
 
 type Attrs = Readonly<Record<string, string | number | boolean | null | undefined>>;
 type Child = Node | string | null | undefined | false;
@@ -17,7 +21,8 @@ export function el<K extends keyof HTMLElementTagNameMap>(
   for (const [name, value] of Object.entries(attrs)) {
     if (value === null || value === undefined || value === false) continue;
     if (name === 'class') node.className = String(value);
-    else if (name === 'text') node.textContent = String(value);
+    else if (name === 'text') node.textContent = typographier(String(value));
+    else if (READ_ATTRIBUTES.has(name)) node.setAttribute(name, typographier(String(value)));
     else node.setAttribute(name, value === true ? '' : String(value));
   }
   append(node, children);
@@ -27,7 +32,7 @@ export function el<K extends keyof HTMLElementTagNameMap>(
 export function append(node: Node, children: readonly Child[]): void {
   for (const child of children) {
     if (child === null || child === undefined || child === false) continue;
-    node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    node.appendChild(typeof child === 'string' ? document.createTextNode(typographier(child)) : child);
   }
 }
 
@@ -50,15 +55,17 @@ export function setIcon(svg: SVGSVGElement, id: string): void {
 }
 
 export function setText(node: Node, text: string): void {
-  if (node.textContent !== text) node.textContent = text;
+  const value = typographier(text);
+  if (node.textContent !== value) node.textContent = value;
 }
 
 export function setAttr(node: Element, name: string, value: string | null): void {
   if (value === null) {
     if (node.hasAttribute(name)) node.removeAttribute(name);
-  } else if (node.getAttribute(name) !== value) {
-    node.setAttribute(name, value);
+    return;
   }
+  const v = READ_ATTRIBUTES.has(name) ? typographier(value) : value;
+  if (node.getAttribute(name) !== v) node.setAttribute(name, v);
 }
 
 export function setHidden(node: Element, hidden: boolean): void {
@@ -135,7 +142,7 @@ export function button(
   options: { class?: string; disabledReason?: boolean; attrs?: Attrs } = {},
 ): HTMLButtonElement {
   const b = el('button', { type: 'button', class: options.class ?? 'lpl-button', ...options.attrs });
-  if (typeof label === 'string') b.textContent = label;
+  if (typeof label === 'string') b.textContent = typographier(label);
   else append(b, label);
   b.addEventListener('click', () => {
     if (b.getAttribute('aria-disabled') === 'true' || b.disabled) return;

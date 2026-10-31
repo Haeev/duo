@@ -3,7 +3,7 @@
  * tonneau) et bêche libre (énigme d'Émile).
  */
 import type { Cell, Character, GardenCell, Quality, Tree } from '../etat/types';
-import { type Sim, bump, emit, message, notify, partnerName, partnerOf, say, secondsToTicks , notifyKey } from './contexte';
+import { type Sim, bump, emit, partnerName, partnerOf, say, secondsToTicks, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { durationMultiplier, spend } from './besoins';
 import { giveToCharacter, heldStack, takeFromBag } from './sac';

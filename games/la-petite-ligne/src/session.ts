@@ -161,7 +161,10 @@ export function createSession(options: SessionOptions): Session {
     };
     listeners.add((event) => {
       if (event.type === 'save_point') void writeNow();
-      if (event.type === 'session_finish' || event.type === 'demo_ended') endSession();
+      // Fin de la démo: on enregistre; la séance se clôt quand les deux ont choisi « Continuer »
+      // à l'écran de fin, ou « Finir la séance » à l'écran de nuit.
+      if (event.type === 'demo_ended') void writeNow();
+      if (event.type === 'session_finish') endSession();
     });
     h.sendWorld();
   } else {

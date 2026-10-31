@@ -6,7 +6,7 @@
 import type { ControlFrame } from '../etat/actions';
 import type { Character, CharacterId, ConstructionState } from '../etat/types';
 import type { ConstructionDef } from '../donnees/types';
-import { type Sim, distance, emit, format, itemName, message, notify, point , notifyKey } from './contexte';
+import { type Sim, distance, emit, format, itemName, notify, point, notifyKey } from './contexte';
 import { spend, durationMultiplier } from './besoins';
 import { payMaterials } from './sac';
 

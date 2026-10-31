@@ -478,7 +478,7 @@ export class HousePart implements EventfulPart {
         ground + FURNITURE_PICK_HEIGHT,
         piece.cell.cy + size.d - FURNITURE_PICK_INSET,
       );
-      view.pick.enabled = true;
+      view.pick.enabled = !hidden;
     }
     for (const [id, view] of this.furniture) {
       if (!seen.has(id)) {

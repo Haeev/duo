@@ -49,6 +49,8 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     name: player.name,
     appearance: { hair: 0, outfit: id === 'p1' ? 0 : 1, scarf: player.color },
     created: false,
+    titleReady: false,
+    endReady: false,
     pos,
     prev: { x: pos.x, y: pos.y },
     facing: Math.PI / 2,

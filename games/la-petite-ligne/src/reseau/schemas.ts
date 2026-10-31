@@ -50,6 +50,8 @@ const ClickTargetSchema = v.variant('kind', [
 const stack = { item: Id, quality: QualitySchema, count: Count };
 
 export const IntentSchema = v.variant('type', [
+  v.strictObject({ type: v.literal('title_ready'), ready: v.boolean() }),
+  v.strictObject({ type: v.literal('end_ready'), ready: v.boolean() }),
   v.strictObject({ type: v.literal('create_character'), name: v.pipe(v.string(), v.maxLength(64)), hair: Int, outfit: Int }),
   v.strictObject({ type: v.literal('move_to'), target: ClickTargetSchema, act: v.boolean() }),
   v.strictObject({ type: v.literal('act') }),

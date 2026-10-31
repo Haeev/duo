@@ -117,6 +117,19 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
   const c = character(sim, by);
   c.lastInputTick = sim.world.tick;
   switch (intent.type) {
+    case 'title_ready':
+      // L'écran titre est tenu par l'interface; la simulation partage seulement qui est prêt.
+      c.titleReady = intent.ready;
+      sim.runtime.changed = true;
+      return;
+    case 'end_ready': {
+      if (sim.world.phase !== 'ended') return;
+      const before = sim.world.characters.every((x) => x.endReady);
+      c.endReady = intent.ready;
+      sim.runtime.changed = true;
+      if (!before && sim.world.characters.every((x) => x.endReady)) emit(sim, { type: 'session_finish' });
+      return;
+    }
     case 'create_character':
       createCharacter(sim, c, intent.name, intent.hair, intent.outfit);
       return;

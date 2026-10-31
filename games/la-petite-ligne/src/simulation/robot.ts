@@ -530,10 +530,14 @@ export function createRobot(options: RobotOptions = {}): Robot {
     const m = memory[c.id];
     const w = sim.world;
     if (w.phase === 'creation') {
+      if (!c.titleReady) out.push({ type: 'title_ready', ready: true });
       if (!c.created) out.push({ type: 'create_character', name: c.id === 'p1' ? 'Camille' : 'Sacha', hair: 1, outfit: c.id === 'p1' ? 0 : 2 });
       return frame(m);
     }
-    if (w.phase === 'ended') return frame(m);
+    if (w.phase === 'ended') {
+      if (!c.endReady) out.push({ type: 'end_ready', ready: true });
+      return frame(m);
+    }
     if (w.phase === 'night') {
       if (c.nightChoice === null) out.push({ type: 'night_choice', choice: 'continue' });
       return frame(m);

@@ -56,6 +56,8 @@ interface DemoHandle {
   missing(): string[];
   breakdown(): Record<string, number>;
   programs(): string[];
+  pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
+  destination(): { x: number; y: number } | null;
   frames: number;
 }
 
@@ -143,6 +145,8 @@ async function main(): Promise<void> {
     missing: () => [],
     breakdown: () => engine.breakdown(),
     programs: () => engine.programList(),
+    pick: (x: number, y: number) => engine.pick(x, y),
+    destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
   };
   window.lplRendu = handle;

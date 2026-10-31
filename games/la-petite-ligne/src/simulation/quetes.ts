@@ -13,7 +13,7 @@ import {
   type ConditionContext,
   type ToolEvent,
 } from './conditions';
-import { type Sim, emit, format, message, notify, say , notifyKey } from './contexte';
+import { type Sim, emit, format, notify, say, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { textVars } from './courrier';
 import { runEffects } from './effets';
@@ -76,7 +76,7 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
   if (next === undefined) {
     state.status = 'done';
     state.checklist = [];
-    notify(sim, 'both', 'quest', format(quest.completionText, textVars(sim)));
+    notify(sim, 'both', 'quest', format(quest.completionText, textVars(sim)), { key: 'quest_done' });
     emit(sim, { type: 'quest_done', quest: quest.id });
     runEffects(sim, quest.completionEffects, actor);
     sim.world.revision += 1;

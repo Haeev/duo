@@ -3,7 +3,7 @@
  * un œuf par poule nourrie et par jour.
  */
 import type { Character } from '../etat/types';
-import { type Sim, bump, distance, emit, message, newId, notify, point , notifyKey } from './contexte';
+import { type Sim, bump, distance, emit, newId, point, notifyKey } from './contexte';
 import { gesture } from './potager';
 import { ITEM, POINT, ZONE } from './ids';
 import { dropAt } from './sac';

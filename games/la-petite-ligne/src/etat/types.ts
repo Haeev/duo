@@ -152,11 +152,11 @@ export interface WorldState {
 
 /**
  * Phases de la démo.
- * - `creation`: chacun crée son personnage;
+ * - `creation`: écran titre (chacun indique qu'il est prêt: `titleReady`), puis chacun crée son personnage;
  * - `day`: la journée (l'horloge tourne, sauf arrêts de TE-03 et veillée);
  * - `night`: les deux sont couchés, écran de nuit (continuer ou finir);
  * - `breakfast`: 6 h, petit-déjeuner, l'horloge attend que l'un commence;
- * - `ended`: écran de fin de la démo.
+ * - `ended`: écran de fin de la démo; la séance se clôt quand les deux ont choisi « Continuer » (`endReady`).
  */
 export type Phase = 'creation' | 'day' | 'night' | 'breakfast' | 'ended';
 
@@ -181,7 +181,8 @@ export type ClockStop =
   | 'midnight'
   | 'night'
   | 'breakfast'
-  | 'ended';
+  | 'ended'
+  | 'absence';
 
 // ---------------------------------------------------------------------------
 // Personnages
@@ -203,6 +204,10 @@ export interface Character {
   appearance: Appearance;
   /** Création terminée. */
   created: boolean;
+  /** Écran titre: ce joueur est prêt (remis à faux à chaque reprise de partie). */
+  titleReady: boolean;
+  /** Écran de fin: ce joueur a choisi « Continuer ». */
+  endReady: boolean;
   pos: Vec2;
   prev: Vec2;
   facing: number;
@@ -379,6 +384,8 @@ export interface PlacementPreview {
   /** Quarts de tour (0 à 3), convention de la carte: 0 face au sud, 1 à l'est, 2 au nord, 3 à l'ouest. */
   rotation: number;
   valid: boolean;
+  /** Pourquoi ce n'est pas possible (texte de `textes.json`, clés `placement_*`), ou `null`. Toujours rempli par la simulation. */
+  blocked?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -631,6 +638,8 @@ export interface GameNotification {
   hint: HintId | null;
   /** Proposition d'achat liée, pour les propositions. */
   proposal: string | null;
+  /** Clé du message dans `textes.json` (`already_taken`...) ou identifiant de l'astuce; `null` pour un texte composé. */
+  key: string | null;
   tick: number;
 }
 

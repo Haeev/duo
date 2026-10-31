@@ -65,6 +65,11 @@ Tenue par le dev interface (`src/interface/`). Chaque point dit ce que l'interfa
 
 1. Fait: `TOOLBAR_SLOTS = 10` et `BAG_SLOTS = 24`, exportés par `src/etat/types.ts`; `selected` va de 0 à 9; manifeste: touches 1 à 0.
 2. Noté (polices dans le paquet).
+3. Fait (lu dans `adaptateur.ts`): synchronisation de l'écran titre. `Character.titleReady` et l'intention `{ type: 'title_ready', ready }`. Pas de phase `title` dans la simulation (le monde neuf reste en `creation`, l'écran titre est tenu par l'interface): `titleSync().inTitlePhase` reste faux. `titleReady` repasse à faux à chaque reprise de partie (sauvegarde relue), pour repasser l'écran titre à deux.
+4. Fait: « Continuer » de l'écran de fin. `Character.endReady` et `{ type: 'end_ready', ready }` (acceptée en phase `ended`). Changement de comportement: la séance ne se clôt plus d'elle-même à la fin de la démo; elle se clôt (`results.endSession`) quand les deux ont choisi « Continuer », comme pour « Finir la séance » à l'écran de nuit. La sauvegarde, elle, est écrite dès la fin de la démo.
+5. Fait: `PlacementPreview.blocked`, texte prêt à afficher, pris dans `textes.json` sous les clés `placement_outside` (hors de la pièce), `placement_wall` (doit toucher un mur), `placement_overlap` (un autre meuble est là), `placement_occupied` (quelqu'un se tient là). Ces quatre textes n'existent pas encore: `blocked` vaut `null` tant que le game designer ne les a pas ajoutés (demande à lui transmettre).
+6. Fait: `GameNotification.key`, clé du message de `textes.json` (`already_taken`, `quest_started`, `letter_received`...), identifiant de l'astuce pour une astuce, `quest_done` pour le texte de fin d'une quête, `null` pour un texte composé (matériaux manquants).
+7. À venir avec l'absence (P1): `ClockStop` `absence` existe déjà dans le type.
 
 ## 2026-10-31, étape 2: simulation jouable de bout en bout
 

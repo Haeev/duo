@@ -61,7 +61,7 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
   function renderPanel(w: ReadonlyWorld): string {
     const me = w.characters.find((c) => c.id === view.localCharacter());
     if (me === undefined) return '';
-    if (w.phase === 'ended' && w.ending !== null) return `end:${w.ending.linesDone}`;
+    if (w.phase === 'ended' && w.ending !== null) return `end:${w.ending.linesDone}:${String(me.endReady)}`;
     if (w.phase === 'creation') return me.created ? 'creation-wait' : 'creation';
     if (me.status === 'breakfast') return `breakfast:${w.clock.day}`;
     if (w.phase === 'night') return `night:${me.nightChoice ?? ''}`;
@@ -85,6 +85,7 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
       line(format(text(view, ['endScreen', 'stats', 'order'], ''), { linesDone: w.ending.linesDone, linesTotal: w.ending.linesTotal }));
       line(format(text(view, ['endScreen', 'stats', 'furniture'], ''), { furniture: w.ending.furniturePlaced }));
       line(text(view, ['endScreen', 'text'], ''));
+      if (!me.endReady) button(panel, text(view, ['nightScreen', 'continue'], 'OK'), { type: 'end_ready', ready: true });
       return;
     }
     if (w.phase === 'creation') {

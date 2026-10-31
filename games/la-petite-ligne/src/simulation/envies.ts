@@ -3,7 +3,7 @@
  * fois la même, et une envie à deux les jours prévus.
  */
 import { evaluateAll, NO_CONTEXT, stayPoints } from './conditions';
-import { type Sim, character, distance, emit, message, notify , notifyKey } from './contexte';
+import { type Sim, character, distance, emit, notifyKey } from './contexte';
 
 export function pickEnvies(sim: Sim): void {
   const { day } = sim.world.clock;

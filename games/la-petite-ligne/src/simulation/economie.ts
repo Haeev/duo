@@ -5,7 +5,7 @@
  */
 import type { Character, CharacterId, ItemStack, PurchaseRequest, Quality } from '../etat/types';
 import { orderSatisfied } from './conditions';
-import { type Sim, character, distance, emit, itemName, message, newId, notify, partnerOf, point, say } from './contexte';
+import { type Sim, character, distance, emit, itemName, newId, notifyKey, partnerOf, point, say } from './contexte';
 import { queueHint } from './astuces';
 import { addStack, countInBag, countInStacks, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
 
@@ -87,13 +87,7 @@ function propose(sim: Sim, c: Character, request: PurchaseRequest, price: number
   sim.world.purse -= price;
   sim.world.proposals.push({ id, by: c.id, purchase: request, price });
   const other = partnerOf(c.id);
-  notify(
-    sim,
-    other,
-    'proposal',
-    message(sim, 'big_purchase_proposal', { partner: c.name, item: itemName(sim, request.item, request.count), price }),
-    { proposal: id },
-  );
+  notifyKey(sim, other, 'proposal', 'big_purchase_proposal', { partner: c.name, item: itemName(sim, request.item, request.count), price }, { proposal: id });
   emit(sim, { type: 'proposal', by: c.id, proposal: id });
 }
 

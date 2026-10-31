@@ -5,7 +5,7 @@
 import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
 import type { DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
-import { type Sim, bump, character, distance, emit, format, itemName, notify, message, partnerName, partnerOf, point , notifyKey } from './contexte';
+import { type Sim, bump, character, distance, emit, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';

@@ -3,7 +3,7 @@
  * leur jour et leur heure, chez les deux joueurs.
  */
 import { evaluateAll, NO_CONTEXT } from './conditions';
-import { type Sim, emit, format, itemName, message, notify , notifyKey } from './contexte';
+import { type Sim, emit, format, itemName, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 
 /** « 12 radis, 3 laitues, 6 œufs, 10 planches » (`textes.orderFormat`). */

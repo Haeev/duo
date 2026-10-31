@@ -139,6 +139,9 @@ export function restoreWorld(
   const world = checkWorld(migrate(data, dataSchema));
   bindPlayers(world, players);
   for (const c of world.characters) {
+    // Nouvelle séance: l'écran titre se repasse à deux.
+    c.titleReady = false;
+    c.endReady = false;
     c.menu = null;
     c.dialogue = null;
     c.destination = null;

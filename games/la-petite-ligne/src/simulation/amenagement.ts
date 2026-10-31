@@ -41,18 +41,25 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
   }
 }
 
+/** Pourquoi un meuble ne tient pas là (clé `placement_<raison>` de `textes.json`), ou `null` s'il tient. */
+export type PlacementProblem = 'outside' | 'wall' | 'overlap' | 'occupied';
+
 /** Le meuble tient-il là ? Dans la pièce, sans chevaucher un autre meuble (sauf tapis) ni un personnage. */
 export function canPlace(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null): boolean {
+  return placementProblem(sim, item, cell, rotation, ignore) === null;
+}
+
+export function placementProblem(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null): PlacementProblem | null {
   const def = sim.content.items[item];
-  if (def?.footprint === null || def === undefined) return false;
+  if (def?.footprint === null || def === undefined) return 'outside';
   const room = sim.map.house.room;
   const cells = footprintCells(def.footprint, cell, rotation);
-  if (!cells.every((k) => inRect(room, k.cx + 0.5, k.cy + 0.5))) return false;
+  if (!cells.every((k) => inRect(room, k.cx + 0.5, k.cy + 0.5))) return 'outside';
   if (def.wall) {
     const onEdge = cells.some(
       (k) => k.cx === room.x || k.cy === room.y || k.cx === room.x + room.w - 1 || k.cy === room.y + room.h - 1,
     );
-    if (!onEdge) return false;
+    if (!onEdge) return 'wall';
   }
   for (const f of sim.world.furniture) {
     if (f.id === ignore) continue;
@@ -61,16 +68,16 @@ export function canPlace(sim: Sim, item: string, cell: Cell, rotation: number, i
     // Un tapis va sous les autres meubles; deux tapis ne se chevauchent pas.
     if (other.floor !== def.floor) continue;
     const taken = footprintCells(other.footprint, f.cell, f.rotation);
-    if (taken.some((t) => cells.some((k) => k.cx === t.cx && k.cy === t.cy))) return false;
+    if (taken.some((t) => cells.some((k) => k.cx === t.cx && k.cy === t.cy))) return 'overlap';
   }
   if (!def.floor && def.bed === null) {
     for (const ch of sim.world.characters) {
       const cx = Math.floor(ch.pos.x);
       const cy = Math.floor(ch.pos.y);
-      if (cells.some((k) => k.cx === cx && k.cy === cy)) return false;
+      if (cells.some((k) => k.cx === cx && k.cy === cy)) return 'occupied';
     }
   }
-  return true;
+  return null;
 }
 
 /** Met à jour l'aperçu du meuble en main (dans la maison seulement). */
@@ -86,10 +93,14 @@ export function updatePlacement(sim: Sim, c: Character): void {
   }
   const rotation = c.placement?.item === item ? c.placement.rotation : 0;
   const cell = previewCell(c, rotatedSize(def.footprint, rotation));
-  const valid = canPlace(sim, item, cell, rotation);
+  const problem = placementProblem(sim, item, cell, rotation);
+  const valid = problem === null;
   const before = c.placement;
   if (before?.item !== item || before.cell.cx !== cell.cx || before.cell.cy !== cell.cy || before.rotation !== rotation || before.valid !== valid) {
-    c.placement = { item, cell, rotation, valid };
+    const key = problem === null ? null : `placement_${problem}`;
+    // Sans texte dans `textes.json`, l'interface montre son message général.
+    const blocked = key === null ? null : (sim.content.texts.messages[key] ?? null);
+    c.placement = { item, cell, rotation, valid, blocked };
     sim.runtime.changed = true;
     if (before === null) queueHint(sim, c.id, { on: 'holding_furniture' });
   }

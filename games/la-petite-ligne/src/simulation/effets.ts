@@ -6,7 +6,7 @@
 import type { CharacterId } from '../etat/types';
 import type { Effect } from '../donnees/types';
 import { evaluate, NO_CONTEXT } from './conditions';
-import { type Sim, character, emit, message, notify, point , notifyKey } from './contexte';
+import { type Sim, character, emit, point, notifyKey } from './contexte';
 import { sendLetter } from './courrier';
 import { startScene } from './dialogues';
 import { payOrder } from './economie';
