@@ -34,6 +34,7 @@ import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
 import { Vegetation } from './vegetation';
 import { WorldParts } from './monde';
+import { CharactersPart } from './personnages';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;
@@ -166,6 +167,9 @@ export class RenderEngine implements Renderer {
     });
     this.world = world;
     this.parts.push(world);
+    const characters = new CharactersPart(library, materials, terrain, this.resources, this.picks, this.view.content);
+    this.scene.add(characters.group);
+    world.add(characters);
     onProgress(LOAD_BUILD_SHARE);
 
     const local = this.localCharacter(this.view.world());

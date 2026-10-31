@@ -20,7 +20,7 @@ export default defineConfig({
   },
   webServer: {
     // Jeu d'essai et pages du faux hôte construits par le script test:e2e.
-    command: `node src/serveur/servir.ts _essais/echo --port ${PORT} --donnees ${join(tmpdir(), `duo-sdk-dev-e2e-${Date.now()}`)}`,
+    command: `node --experimental-strip-types src/serveur/servir.ts _essais/echo --port ${PORT} --donnees ${join(tmpdir(), `duo-sdk-dev-e2e-${Date.now()}`)}`,
     url: `http://localhost:${PORT}/api/serveur`,
     reuseExistingServer: false,
     timeout: 30_000,

@@ -186,6 +186,7 @@ async function verifierClavier(navigateur) {
     await page.evaluate(() => document.fonts.ready);
   };
   const attendre = () => page.waitForTimeout(320);
+  // Textes comparés sans les espaces insécables de la typographie (U+00A0, U+202F).
   const focus = () =>
     page.evaluate(() =>
       (
@@ -194,7 +195,7 @@ async function verifierClavier(navigateur) {
         document.activeElement?.value ||
         ''
       )
-        .replace(/[ \t\r\n]+/g, ' ')
+        .replace(/[ \t\r\n\u00a0\u202f]+/g, ' ')
         .trim(),
     );
   const focusVisible = () =>

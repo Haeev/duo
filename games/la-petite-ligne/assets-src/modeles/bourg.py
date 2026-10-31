@@ -987,12 +987,11 @@ def cart(A):
 def bicycle(A):
     g = A.geo()
     for x in (-0.55, 0.55):
-        for k in range(10):
-            a = k * 36
-            g.box((0.05, 0.03, 0.05), loc=(x + 0.33 * math.cos(math.radians(a)), 0, 0.35 + 0.33 * math.sin(math.radians(a))),
-                  color="black", rot=(0, -a, 0))
-        g.box((0.6, 0.012, 0.012), loc=(x, 0, 0.35), color="iron_light", rot=(0, 30, 0))
-        g.box((0.6, 0.012, 0.012), loc=(x, 0, 0.35), color="iron_light", rot=(0, -60, 0))
+        ring = [(0.3, -0.018), (0.345, -0.018), (0.345, 0.018), (0.3, 0.018), (0.3, -0.018)]
+        g.lathe(ring, loc=(x, 0, 0.35), colors="black", segs=14, rot=(90, 0, 0), close_top=False, close_bottom=False)
+        for a in (0, 60, 120):
+            g.box((0.6, 0.012, 0.012), loc=(x, 0, 0.35), color="iron_light", rot=(0, a, 0))
+        g.cyl(0.04, 0.05, loc=(x, 0, 0.35), color="iron", segs=6, rot=(90, 0, 0))
     for (p, q) in (((-0.55, 0.35), (0.0, 0.38)), ((0.0, 0.38), (0.45, 0.8)), ((0.0, 0.38), (-0.1, 0.85)),
                    ((-0.1, 0.85), (0.45, 0.8)), ((-0.55, 0.35), (-0.1, 0.85)), ((0.55, 0.35), (0.45, 0.8))):
         mx, mz = (p[0] + q[0]) / 2, (p[1] + q[1]) / 2
@@ -1283,12 +1282,11 @@ def river_straight(A, ford=False):
     return root
 
 
-def river_curve(A, R=4.0):
-    """Coude à 90 degrés: axe de rayon 4 m, centre de courbure au coin (+4, +4) de l'emprise 8 x 8."""
-    root = A.group("river_curve", {"footprint": [8, 8], "water_y": RIVER["z_water"],
-                                   "note": "entre par le bord -X (axe en z=0 glTF... voir README), sort par le bord -Y Blender"})
+def river_curve(A, R=6.0):
+    """Coude à 90 degrés: axe de rayon 6 m, centre de courbure au coin (+5, +5) de l'emprise 10 x 10."""
+    root = A.group("river_curve", {"footprint": [10, 10], "water_y": RIVER["z_water"], "radius": R})
     g = A.geo()
-    c = Vector((4.0, 4.0, 0))
+    c = Vector((5.0, 5.0, 0))
     pts = []
     n = 10
     for i in range(n + 1):

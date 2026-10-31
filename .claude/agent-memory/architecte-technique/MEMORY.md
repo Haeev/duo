@@ -37,3 +37,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - yauzl 3.4 applique `validateFileName` à chaque entrée (refuse chemins absolus, `..`, barres obliques inverses) tant que `decodeStrings` est vrai.
 - Node: Ed25519 natif (`crypto.sign(null, ...)`, `crypto.verify(null, ...)`); gzip niveau 1 d'un JSON de 8 Mo en 34 ms (rapport 8,7) par l'API asynchrone, sans bloquer la boucle d'événements.
 - Polices de l'identité « Étoile double »: `@fontsource-variable/jost` et `@fontsource-variable/dm-sans` 5.3.0, OFL-1.1.
+
+## SDK et faux hôte (lot L3, vérifié le 2026-10-31)
+
+- Node 22.22 efface les types sans option: un script Node en TypeScript se lance tel quel (`node src/serveur/servir.ts`) si ses imports relatifs portent `.ts` (`allowImportingTsExtensions`, `erasableSyntaxOnly`) et s'il n'importe à l'exécution aucun paquet du monorepo écrit en imports sans extension (les `import type` sont effacés, donc permis). Node refuse d'effacer les types sous `node_modules`.
+- Environnement cloud: `@playwright/test` 1.64.1 attend Chromium 1248, seul 1243 est installé (`/opt/pw-browsers/chromium`): `launchOptions.executablePath` dans `playwright.config.ts` (fait dans `packages/sdk-dev`).
+- `pkill -f motif` tue aussi le shell de la commande si le motif apparaît dans sa ligne (code 144): garder le PID du processus lancé, ou vérifier avec `ss -ltnp`.
+- Sur une adresse `http://192.168...` (contexte non sécurisé), ni `crypto.randomUUID` ni `navigator.keyboard` n'existent: `crypto.getRandomValues` reste disponible; libellés des touches en AZERTY par défaut.
+- Vite 8: `build.rolldownOptions` remplace `rollupOptions` (dépréciée).
+- typescript-eslint: `JSON.stringify` est typé `string`; pour tester `undefined` sans `no-unnecessary-condition`, passer par une fonction typée `string | undefined`. Étaler un objet à accesseurs (`{ ...base }`) fige leurs valeurs: `Object.assign(base, ...)` les garde.
+- Valibot: un schéma `v.array` sort un tableau mutable; ajouter `v.readonly()` pour accepter des `readonly T[]` du code appelant.

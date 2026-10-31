@@ -626,6 +626,9 @@ def board(roots, path, cols=6, cell=2.0, res=(1600, 900), ortho=None, azimuth=45
           label_size=0.16, spacing=None, samples=20, emission=0.0, mannequin=False, names=None):
     """Planche: copie chaque nœud racine sur une grille, avec son nom, en vue isométrique."""
     setup_render(res, samples)
+    for o in list(bpy.data.objects):
+        if o.type in ("LIGHT", "CAMERA"):
+            bpy.data.objects.remove(o, do_unlink=True)
     world(hex_lin("#DCE6EE"), 0.9)
     sun((50, 0, 140), 3.0)
     gp = ground_plane(400, hex_lin("#A7B98A"), z=-0.002)

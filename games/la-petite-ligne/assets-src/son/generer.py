@@ -51,6 +51,10 @@ QUALITE_AMBIANCE = 2  # lits de bruit mono: aucun défaut mesurable à ce débit
 DEBIT_M4A = "96k"
 PLAFOND_DBTP = -1.5  # avant encodage; le contrôle exige -1,0 dBTP après décodage
 AMORCE_MUSIQUE = 1.0  # secondes de part et d'autre de la boucle dans le fichier livré
+# Le raccord d'une boucle musicale est placé 0,12 s avant le premier temps: entre deux notes, sur un
+# son qui décroît, jamais sur une attaque (là où le codage Vorbis est le plus bruité). Aucune note ne
+# tombe à cet endroit dans les tempos utilisés (croches espacées de 0,25 s au moins).
+ROTATION_MUSIQUE = 0.12
 
 BUS_FR = {"music": "musique", "effects": "effets", "ui": "interface", "ambience": "ambiance"}
 
@@ -191,11 +195,14 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
              "tempoBpm": m.tempo, "timeSignature": f"{m.signature[0]}/{m.signature[1]}", "instruments": instruments,
              "integratedLufs": m.sonie_cible, "volumeDb": -4.0}
         if m.boucle:
-            livre, a = amorcer(y, AMORCE_MUSIQUE)
+            r = dsp.n_ech(ROTATION_MUSIQUE)
+            tournee = np.roll(y, r, axis=0)  # la boucle commence 0,12 s avant le premier temps
+            livre, a = amorcer(tournee, AMORCE_MUSIQUE)
             encoder(livre, fichier, QUALITE_MUSIQUE, tmp)
             d["loop"] = {"startSeconds": a / dsp.SR, "endSeconds": (a + len(y)) / dsp.SR, "startSample": a,
-                         "endSample": a + len(y), "sampleRate": dsp.SR, "bars": m.mesures}
-            d["playFromSeconds"] = a / dsp.SR
+                         "endSample": a + len(y), "sampleRate": dsp.SR, "bars": m.mesures,
+                         "firstDownbeatSeconds": round((a + r) / dsp.SR, 6)}
+            d["playFromSeconds"] = round((a + r) / dsp.SR, 6)
             d["fadeInMs"] = 2500
             d["fadeOutMs"] = 2500
         else:

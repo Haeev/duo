@@ -71,11 +71,17 @@ def raccord(x: np.ndarray, debut: int, fin: int) -> dict:
                      np.abs(x[debut + 1] - 2 * x[debut] + x[fin - 1]).max()))
     k = min(2048, len(x) - fin)
     continuation = float(np.abs(x[fin:fin + k] - x[debut:debut + k]).max()) if k > 0 else float("nan")
-    s = SR
-    rms_fin = 20 * np.log10(np.sqrt(np.mean(b[-s:] ** 2)) + 1e-12)
-    rms_debut = 20 * np.log10(np.sqrt(np.mean(b[:s] ** 2)) + 1e-12)
+    # Niveau par blocs de 250 ms: la variation au raccord (dernier bloc -> premier) est comparée aux
+    # variations entre blocs voisins dans toute la boucle (un oiseau qui chante juste après le
+    # raccord est normal s'il y en a ailleurs).
+    blocs = len(b) // (SR // 4)
+    niveaux = np.array([20 * np.log10(np.sqrt(np.mean(b[k * (SR // 4):(k + 1) * (SR // 4)] ** 2)) + 1e-9)
+                        for k in range(blocs)])
+    variations = np.abs(np.diff(niveaux))
+    au_raccord = abs(niveaux[0] - niveaux[-1])
     return {"saut_centile": float(100 * np.mean(sauts < saut)), "d2_centile": float(100 * np.mean(d2 < d2_r)),
-            "continuation": continuation, "ecart_niveau_db": float(rms_debut - rms_fin), "saut": saut}
+            "continuation": continuation, "ecart_niveau_db": float(niveaux[0] - niveaux[-1]),
+            "niveau_centile": float(100 * np.mean(variations < au_raccord)), "saut": saut}
 
 
 def images(fichiers: list[Path], dossier: Path) -> None:
@@ -141,11 +147,11 @@ def main() -> int:
             r = raccord(x, debut, fin)
             ligne["raccord"] = (f"saut au centile {r['saut_centile']:.1f}, seconde différence au centile "
                                 f"{r['d2_centile']:.1f}, continuation {r['continuation']:.4f}, "
-                                f"niveau début-fin {r['ecart_niveau_db']:+.1f} dB")
+                                f"niveau au raccord {r['ecart_niveau_db']:+.1f} dB (centile {r['niveau_centile']:.0f})")
             if r["saut_centile"] > 99.5 or r["d2_centile"] > 99.5:
                 erreurs.append(f"{rel}: raccord hors de la distribution interne ({ligne['raccord']})")
-            if abs(r["ecart_niveau_db"]) > 6.0 and not rel.startswith("musique/"):
-                erreurs.append(f"{rel}: écart de niveau au raccord {r['ecart_niveau_db']:+.1f} dB")
+            if r["niveau_centile"] > 99.0 and abs(r["ecart_niveau_db"]) > 3.0:
+                erreurs.append(f"{rel}: saut de niveau au raccord ({ligne['raccord']})")
         if not mesure["tp"] <= PLAFOND_DBTP:
             erreurs.append(f"{rel}: crête vraie {mesure['tp']} dBTP")
         if ecretes:

@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "servir": "vite build && node src/serveur/servir.ts",
+    "servir": "vite build && node --experimental-strip-types src/serveur/servir.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
