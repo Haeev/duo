@@ -405,10 +405,13 @@ export class AudioBrain {
     }
   }
 
+  /** Musique du samedi permise: train à quai (après la fanfare), ou qui part (jusqu'au fondu de la séquence de départ). */
   private saturdayWindow(world: ReadonlyWorld, timeline: TrainTimeline): boolean {
     const a = this.anchors;
+    const phase = world.train.phase;
+    const present = phase === 'stopped' || (timeline.departure !== null && phase !== 'arriving');
     return (
-      world.train.phase === 'stopped' &&
+      present &&
       (timeline.arrival === null || timeline.arrival >= a.saturdayFrom) &&
       (timeline.departure === null || timeline.departure < a.saturdayStop.at)
     );

@@ -209,7 +209,7 @@ export const AMBIANCE_SETTINGS = {
     {
       minutes: 1005,
       azimuthDeg: 176,
-      elevationDeg: 41,
+      elevationDeg: 43,
       sunColor: '#ffd8a2',
       sunIntensity: 2.55,
       skyColor: '#e8dccb',
@@ -241,7 +241,7 @@ export const AMBIANCE_SETTINGS = {
     {
       minutes: 1065,
       azimuthDeg: 184,
-      elevationDeg: 21,
+      elevationDeg: 19,
       sunColor: '#ffb577',
       sunIntensity: 2.15,
       skyColor: '#f2c9a0',

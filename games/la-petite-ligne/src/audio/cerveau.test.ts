@@ -90,9 +90,10 @@ function playDemo(): Run {
 
 describe('le son de toute la démo, joué par le robot', () => {
   let run: Run;
+  // Toute la démo: plusieurs secondes quand les fichiers de test tournent en parallèle.
   beforeAll(() => {
     run = playDemo();
-  });
+  }, 120_000);
 
   const shots = (id: string, day?: number): Entry[] => run.log.filter((e) => e.kind === 'shot' && e.id === id && (day === undefined || e.day === day));
   const music = (kind: Entry['kind'], id: string): Entry[] => run.log.filter((e) => e.kind === kind && e.id === id);

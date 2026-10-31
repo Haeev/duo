@@ -108,6 +108,9 @@ export async function startDuo(
 ): Promise<Duo> {
   const mac = await browser.newContext();
   const pc = await browser.newContext();
+  // Tâches longues du fil principal, dans chaque cadre (le jeu est dans une iframe): le chien de
+  // garde de la plateforme arrête la partie après 5 s sans battement de cœur (ADR 0004).
+  for (const ctx of [mac, pc]) await ctx.addInitScript(LONG_TASKS_SCRIPT);
   const host = await mac.newPage();
   const guest = await pc.newPage();
   const errors: string[] = [];
@@ -138,6 +141,22 @@ export async function startDuo(
       await pc.close();
     },
   };
+}
+
+const LONG_TASKS_SCRIPT = `
+  window.__lplLongTasks = [];
+  try {
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) window.__lplLongTasks.push([Math.round(e.startTime), Math.round(e.duration)]);
+    }).observe({ type: 'longtask', buffered: true });
+  } catch (e) {}
+`;
+
+/** Tâches longues relevées dans le jeu d'une page: [début, durée] en ms. */
+export async function longTasks(page: Page): Promise<[number, number][]> {
+  const frame = page.frames().find((f) => f.url().includes('/jeu/'));
+  if (frame === undefined) return [];
+  return frame.evaluate(() => (window as unknown as { __lplLongTasks?: [number, number][] }).__lplLongTasks ?? []);
 }
 
 /** Personnage d'un joueur dans l'état (p1 = hôte, p2 = invité, sauf reprise). */

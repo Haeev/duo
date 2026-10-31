@@ -40,9 +40,18 @@ export interface AudioExtras {
   log?: Logger;
 }
 
+export type AudioDiagnostics = EngineStats & { music: string | null; resting: boolean; paused: boolean; context: string };
+
 export interface GameAudioWithStats extends GameAudio {
   /** Diagnostic (indicateur de développement): mémoire décodée, voix, musique. */
-  stats(): EngineStats & { music: string | null; resting: boolean; paused: boolean };
+  stats(): AudioDiagnostics;
+}
+
+declare global {
+  interface Window {
+    /** En développement seulement: diagnostic du son pour les tests de qa-testeur (Playwright). */
+    lplAudio?: { stats(): AudioDiagnostics };
+  }
 }
 
 /** Adresse d'un fichier de `assets/son/` (Vite le copie avec une empreinte dans la version construite). */
@@ -83,7 +92,7 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
   }
   const stallLimit = view.role === 'host' ? settings.pause.stallSecondsHost : settings.pause.stallSecondsGuest;
 
-  return {
+  const audioObject: GameAudioWithStats = {
     async load(onProgress) {
       const ctx = host.context;
       const e = new AudioEngine({
@@ -137,7 +146,13 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
     stats() {
       const base: EngineStats = engine?.stats() ?? { decodedMB: 0, peakMB: 0, files: 0, voices: 0, musicTracks: 0, ambienceBeds: 0, refused: 0, pending: 0 };
       const director = brain?.musicDirector() ?? null;
-      return { ...base, music: director?.current() ?? null, resting: director?.resting() ?? false, paused: platformPaused || stalledFor > stallLimit };
+      return {
+        ...base,
+        music: director?.current() ?? null,
+        resting: director?.resting() ?? false,
+        paused: platformPaused || stalledFor > stallLimit,
+        context: host.context.state,
+      };
     },
 
     dispose() {
@@ -146,8 +161,11 @@ export function createAudio(options: AudioOptions & AudioExtras): GameAudioWithS
       engine?.dispose();
       engine = null;
       brain = null;
+      if (import.meta.env.DEV) delete window.lplAudio;
     },
   };
+  if (import.meta.env.DEV) window.lplAudio = { stats: () => audioObject.stats() };
+  return audioObject;
 }
 
 // Contrôle à la compilation: `createAudio` respecte le contrat de `etat/vue.ts`.

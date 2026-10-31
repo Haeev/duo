@@ -12,6 +12,11 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 4. Fait: rotation des meubles selon la convention de la carte.
 5. Facultatif, toujours ouvert: cases d'« herbe haute » (`,`) pour des touffes plus denses. En attendant: bruit déterministe.
 
+### Réponses du rendu aux demandes du dev gameplay
+
+1. Fait: `quality: 'light'` est honoré par `src/rendu/` (`RENDER_SETTINGS.light`): rapport de pixels 0,5 et 640x360 pixels physiques au plus, `shadowMap.enabled = false` et soleil sans ombre, antialiasing coupé, particules et pluie au quart, touffes, fleurs, galets et forêt du pourtour au quart, indicateur de performances masqué, résolution dynamique arrêtée. Mesuré dans la page de démonstration (`rendu.html?rendu=leger`): 63 appels de dessin, 68 000 triangles, 6 programmes. **À faire côté `main.ts`: retirer le palliatif CSS (canevas à la moitié agrandi)**, sinon la résolution est divisée deux fois.
+2. à 4. Repère, pêche, absence (P1): pas encore faits dans le rendu. En attendant, un personnage absent joue l'animation `sit` (déjà lue dans `action.kind`), la pêche montre la canne en main si elle est l'outil choisi, et le repère n'est pas dessiné.
+
 ### Ce que le rendu offre en plus du contrat `Renderer`
 
 - `RenderEngine` (exporté par `src/rendu/index.ts`): `setReducedMotion(bool)` (réglage qui change en cours de partie), `detailedStats()` (appels, triangles, programmes, géométries, textures, images par seconde), `programList()`, `resolutionScale()`.

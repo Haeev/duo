@@ -6,7 +6,8 @@
  * Paramètres de l'adresse: `heure` (10.5 ou 17:15), `meteo` (sunny, cloudy,
  * rain), `orientation` (0 à 3), `zoom` (0 à 2), `interieur` (1), `repare` (1),
  * `train` (away, arriving, stopped, departing), `vie` (0 fige la promenade),
- * `panneau` (1 montre les réglages), `x` et `y` (point de vue).
+ * `panneau` (1 montre les réglages), `x` et `y` (point de vue), `rendu=leger`
+ * (mode léger, comme le jeu), `cycles` (essai d'endurance).
  */
 import type { CameraCommand } from '../camera';
 import { loadContent } from '../../donnees/contenu';
@@ -138,6 +139,7 @@ async function main(): Promise<void> {
     container,
     reducedMotion: false,
     showStats: params.get('stats') !== '0',
+    quality: params.get('rendu') === 'leger' ? 'light' : 'normal',
   });
   const handle: DemoHandle = {
     ready: false,

@@ -108,6 +108,9 @@ function placement(map: GameMap, prop: MapProp): Matrix4 {
 const BELL_MIN_X = 0.35;
 const BELL_MIN_Y = 1.85;
 const BELL_MAX_Y = 2.4;
+/** Assise du banc (0,42 à 0,45 m) et dossier (au-dessus de 0,5 m). */
+const SEAT_MIN_Y = 0.38;
+const BACK_MIN_Y = 0.5;
 
 describe('courbes de la journée', () => {
   it('passent par chaque clé et bouclent à minuit', () => {
@@ -206,8 +209,16 @@ describe('ombre de la cloche (énigme S4)', () => {
   const bell = nodePositions('bourg.glb', 'bell_post')
     .filter((p) => p.x > BELL_MIN_X && p.y > BELL_MIN_Y && p.y < BELL_MAX_Y)
     .map((p) => p.applyMatrix4(bellMatrix));
-  const bench = new Box3().setFromPoints(
-    nodePositions('bourg.glb', 'bench').map((p) => p.applyMatrix4(placement(map, benchProp))),
+  // Le banc: son assise et son dossier (l'ombre qui passe entre les pieds ne compte pas).
+  const benchMatrix = placement(map, benchProp);
+  const benchPoints = nodePositions('bourg.glb', 'bench');
+  const seat = new Box3().setFromPoints(
+    benchPoints
+      .filter((p) => p.y > SEAT_MIN_Y && p.y < BACK_MIN_Y)
+      .map((p) => p.clone().applyMatrix4(benchMatrix)),
+  );
+  const back = new Box3().setFromPoints(
+    benchPoints.filter((p) => p.y >= BACK_MIN_Y).map((p) => p.clone().applyMatrix4(benchMatrix)),
   );
 
   /** Part des points de la cloche dont l'ombre tombe sur le banc, à l'heure dite, par soleil. */
@@ -217,7 +228,8 @@ describe('ombre de la cloche (énigme S4)', () => {
     const towardGround = rig.direction.clone().negate();
     let hits = 0;
     for (const point of bell) {
-      if (new Ray(point, towardGround).intersectsBox(bench)) {
+      const ray = new Ray(point, towardGround);
+      if (ray.intersectsBox(seat) || ray.intersectsBox(back)) {
         hits += 1;
       }
     }
@@ -226,12 +238,13 @@ describe('ombre de la cloche (énigme S4)', () => {
 
   it('trouve la cloche dans le modèle, au bout de son bras', () => {
     expect(bell.length).toBeGreaterThan(50);
-    expect(bench.min.x).toBeGreaterThan(bellProp.pos.x + 2);
+    expect(seat.min.x).toBeGreaterThan(bellProp.pos.x + 2);
+    expect(back.max.y).toBeGreaterThan(seat.max.y);
   });
 
   it('touche le banc de 17 h à 17 h 30', () => {
     for (let minutes = 17 * HOUR; minutes <= 17 * HOUR + 30; minutes += 5) {
-      expect(shadowOnBench(minutes), `à ${minutes} minutes`).toBeGreaterThan(0.2);
+      expect(shadowOnBench(minutes), `à ${minutes} minutes`).toBeGreaterThanOrEqual(0.5);
     }
   });
 
