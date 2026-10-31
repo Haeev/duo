@@ -1,8 +1,9 @@
 /**
  * La maisonnette du garde-barrière et le poulailler: en ruine, puis bâtis
  * élément par élément (fantômes transparents qui deviennent solides), les
- * meubles posés, l'aperçu fantôme d'un meuble en main (à la couleur du joueur)
- * et la coupe des murs et du toit quand le personnage local est à l'intérieur.
+ * meubles posés, l'aperçu fantôme d'un meuble en main (à la couleur du joueur),
+ * le cadre au sol du coin à soi de chacun (à sa couleur) et la coupe des murs
+ * et du toit quand le personnage local est à l'intérieur.
  */
 import {
   Box3,
@@ -17,17 +18,19 @@ import {
   type Object3D,
 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
-import type {
-  CharacterId,
-  ConstructionState,
-  DeepReadonly,
-  PlacedFurniture,
-  PlacementPreview,
+import {
+  CORNER_SIZE,
+  type CharacterId,
+  type ConstructionState,
+  type DeepReadonly,
+  type PlacedFurniture,
+  type PlacementPreview,
 } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
 import { propHints, propMatrix } from './decor';
+import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
@@ -43,6 +46,16 @@ const GHOST_PROGRESS_OPACITY = 0.5;
 const GHOST_PULSE = 0.08;
 const INVALID_TINT = '#d9584f';
 const PLACEMENT_OPACITY = 0.55;
+/** Cadre du coin à soi: baguettes fines posées au sol, en retrait du bord des cases (m). */
+const CORNER_INSET = 0.08;
+const CORNER_THICKNESS = 0.05;
+const CORNER_HEIGHT = 0.015;
+/** Au-dessus du sol et d'un tapis. */
+const CORNER_LIFT = 0.03;
+/** Piquets aux quatre angles: le coin reste lisible quand des meubles couvrent le cadre (m). */
+const CORNER_PEG_SIZE = 0.07;
+const CORNER_PEG_HEIGHT = 0.3;
+const CORNER_OPACITY = 0.5;
 /** Seuil du produit scalaire: un mur qui regarde la caméra au-delà est coupé. */
 const WALL_FACES_CAMERA = 0.25;
 const FURNITURE_PICK_HEIGHT = 1;
@@ -285,6 +298,12 @@ export class HousePart implements EventfulPart {
     CharacterId,
     { item: string; object: Object3D; material: MeshBasicMaterial }
   >();
+  /** Cadre au sol du coin de chaque joueur (une géométrie partagée, un matériau à sa couleur). */
+  private readonly corners = new Map<
+    CharacterId,
+    { mesh: Mesh; material: MeshBasicMaterial; color: string }
+  >();
+  private cornerGeometry: BufferGeometry | null = null;
   private readonly toCamera = new Vector3();
   /** Toujours présente (intensité nulle le jour): le nombre de lumières ne change jamais, donc aucun programme recompilé. */
   readonly lamp = new PointLight(
@@ -417,6 +436,72 @@ export class HousePart implements EventfulPart {
     const roofed = done('house_roof') && !inside;
     this.updateFurniture(world.furniture, roofed);
     this.updateGhosts(context);
+    this.updateCorners(context, roofed);
+  }
+
+  /** Coin à soi de chaque joueur: un cadre discret au sol, à la couleur de son foulard, chez les deux joueurs. */
+  private updateCorners(context: FrameContext, roofed: boolean): void {
+    for (const character of context.world.characters) {
+      const corner = character.corner ?? null;
+      let view = this.corners.get(character.id);
+      if (corner === null || roofed) {
+        if (view !== undefined) view.mesh.visible = false;
+        continue;
+      }
+      if (view === undefined) {
+        const material = this.resources.track(
+          new MeshBasicMaterial({
+            map: this.materials.paletteTexture,
+            transparent: true,
+            opacity: CORNER_OPACITY,
+            depthWrite: false,
+          }),
+        );
+        const mesh = new Mesh(this.cornerFrame(), material);
+        mesh.name = `coin ${character.id}`;
+        mesh.renderOrder = 1;
+        this.group.add(mesh);
+        view = { mesh, material, color: '' };
+        this.corners.set(character.id, view);
+      }
+      if (view.color !== character.appearance.scarf) {
+        view.color = character.appearance.scarf;
+        view.material.color.set(safeColor(character.appearance.scarf));
+      }
+      const x = corner.cx + CORNER_SIZE / 2;
+      const y = corner.cy + CORNER_SIZE / 2;
+      view.mesh.position.set(x, this.terrain.heightAt(x, y) + CORNER_LIFT, y);
+      view.mesh.visible = true;
+    }
+  }
+
+  private cornerFrame(): BufferGeometry {
+    if (this.cornerGeometry === null) {
+      const frame = new ShapeBuilder();
+      const side = CORNER_SIZE - 2 * CORNER_INSET;
+      const half = (side - CORNER_THICKNESS) / 2;
+      for (const [x, z, w, d] of [
+        [0, -half, side, CORNER_THICKNESS],
+        [0, half, side, CORNER_THICKNESS],
+        [-half, 0, CORNER_THICKNESS, side - 2 * CORNER_THICKNESS],
+        [half, 0, CORNER_THICKNESS, side - 2 * CORNER_THICKNESS],
+      ] as const) {
+        frame.box([w, CORNER_HEIGHT, d], [x, 0, z], 'white_paint');
+      }
+      const peg = (side - CORNER_PEG_SIZE) / 2;
+      for (const [x, z] of [
+        [-peg, -peg],
+        [peg, -peg],
+        [-peg, peg],
+        [peg, peg],
+      ] as const) {
+        frame.box([CORNER_PEG_SIZE, CORNER_PEG_HEIGHT, CORNER_PEG_SIZE], [x, 0, z], 'white_paint', {
+          base: true,
+        });
+      }
+      this.cornerGeometry = this.resources.track(frame.build());
+    }
+    return this.cornerGeometry;
   }
 
   private footprint(item: string, rotation: number): { w: number; d: number } {
@@ -549,6 +634,7 @@ export class HousePart implements EventfulPart {
     }
     this.furniture.clear();
     this.ghosts.clear();
+    this.corners.clear();
     this.group.removeFromParent();
   }
 }

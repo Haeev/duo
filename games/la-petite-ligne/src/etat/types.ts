@@ -60,6 +60,8 @@ export const CHARACTER_IDS: readonly CharacterId[] = ['p1', 'p2'];
 /** Taille du sac (PE-10) et de la barre d'outils (ses premières cases). */
 export const BAG_SLOTS = 24;
 export const TOOLBAR_SLOTS = 10;
+/** Côté du coin à soi (MA-06 de la démo), en cases. */
+export const CORNER_SIZE = 2;
 
 /** Identifiant stable du joueur fourni par la plateforme (membre du duo). */
 export type PlayerId = string;
@@ -283,6 +285,12 @@ export interface Character {
   crafting: { recipe: RecipeId; endsAt: number } | null;
   /** Repère planté par ce joueur (GE-07), visible chez les deux jusqu'au tick `until`, ou `null`. */
   pin: { pos: Vec2; since: number; until: number } | null;
+  /**
+   * Coin à soi (MA-06, P1): case nord-ouest du carré de `CORNER_SIZE` cases
+   * désigné dans la pièce; seul ce joueur y pose ou y reprend des meubles.
+   * Absent des sauvegardes d'avant le coin: comme `null`.
+   */
+  corner?: Cell | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
   fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
 }

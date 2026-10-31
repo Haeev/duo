@@ -8,7 +8,8 @@
  * `train` (away, arriving, stopped, departing), `vie` (0 fige la promenade),
  * `panneau` (1 montre les réglages), `x` et `y` (point de vue), `rendu=leger`
  * (mode léger, comme le jeu), `cycles` (essai d'endurance), `repere=1`,
- * `peche=attente|touche`, `absent=1` (signes P1). Touches: G repère, J lancer,
+ * `peche=attente|touche`, `absent=1` (signes P1), `coins=1` (coin à soi des
+ * deux joueurs, avec `interieur=1`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
@@ -102,6 +103,7 @@ async function main(): Promise<void> {
           ? 'waiting'
           : 'none',
     absent: params.get('absent') === '1',
+    corners: params.get('coins') === '1',
   };
   const world = createExampleWorld(map, content, options);
   const focusX = Number(params.get('x'));

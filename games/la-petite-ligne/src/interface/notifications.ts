@@ -4,6 +4,7 @@
  * Fonctions pures; le composant du HUD tient les horloges réelles.
  */
 import type { GameNotification, NotificationKind } from '../etat/types';
+import { fill, type TextVars } from './format';
 
 export type ToastVariant = '' | 'error' | 'event';
 
@@ -28,6 +29,15 @@ const MESSAGE_VISUALS: Readonly<Record<string, ToastVisual>> = {
   catalogue_closed: error('ui-lock'),
   no_energy: error('ui-stamina'),
   needs_both: error('ui-warning'),
+  placement_not_yours: error('ui-warning'),
+  corner_not_yours: error('ui-warning'),
+  corner_taken: error('ui-warning'),
+  corner_partner_things: error('ui-warning'),
+  corner_outside: error('ui-warning'),
+  corner_set: plain('ui-check'),
+  corner_moved: plain('ui-check'),
+  corner_removed: plain('ui-cross'),
+  corner_partner_set: { variant: '', icon: '', partnerToken: true },
   train_arrived: event('ui-train'),
   train_leaves_soon: event('ui-train'),
   train_left: event('ui-train'),
@@ -97,6 +107,15 @@ export function messageKeyOf(text: string, messages: Readonly<Record<string, str
 export function toastVisual(notification: Readonly<GameNotification>, messages: Readonly<Record<string, string>>): ToastVisual {
   const key = notification.key ?? messageKeyOf(notification.text, messages);
   return (key === null ? undefined : MESSAGE_VISUALS[key]) ?? KIND_VISUALS[notification.kind];
+}
+
+/**
+ * Texte à afficher. Sans texte dans `textes.json`, la simulation donne la clé
+ * du message (coin à soi): l'interface prend alors le sien, si elle l'a.
+ */
+export function toastText(n: Readonly<GameNotification>, messages: Readonly<Record<string, string>>, vars: TextVars): string {
+  const template = n.key !== null && n.text === n.key ? messages[n.key] : undefined;
+  return template === undefined ? n.text : fill(template, vars);
 }
 
 /** Deux notifications de même sorte et de même texte n'en font qu'une à l'écran. */

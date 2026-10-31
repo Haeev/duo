@@ -259,7 +259,10 @@ const SupplementSchema = v.object({
   stove: strings(['cookSection', 'eatSection', 'nothingToEat', 'portions'] as const),
   chest: strings(['title', 'subtitle', 'inChest', 'inBag', 'take', 'takeAll', 'store', 'emptyChest', 'emptyBag'] as const),
   proposal: strings(['from', 'mine', 'received', 'sent', 'receivedNote', 'acceptedGrocery', 'acceptedCatalogue', 'enterHint', 'you'] as const),
-  build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store'] as const),
+  build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store', 'corner'] as const),
+  corner: strings(['designate', 'move'] as const),
+  /** Messages de la simulation que `textes.json` n'a pas encore (clés de `messages`); ceux de `textes.json` priment. */
+  messages: v.record(v.string(), str),
   night: strings([
     'overline',
     'sessionOver',
@@ -316,7 +319,7 @@ export function loadUiTexts(content: Content): UiTexts {
     game: game.output,
     extra: extra.output,
     form: content.texts.form,
-    messages: content.texts.messages,
+    messages: { ...extra.output.messages, ...content.texts.messages },
     orderFormat: content.texts.orderFormat,
     weekdays: content.texts.weekdays,
     weather: content.texts.weather,

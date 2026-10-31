@@ -351,7 +351,23 @@
     "move": "déplacer",
     "place": "poser",
     "take": "reprendre",
-    "store": "ranger au sac"
+    "store": "ranger au sac",
+    "corner": "ton coin"
+  },
+  "corner": {
+    "designate": "désigner ton coin (2x2 cases rien qu'à toi)",
+    "move": "déplacer ton coin, ou le retirer en visant le même endroit"
+  },
+  "messages": {
+    "placement_not_yours": "C'est le coin de {partner} : pose plutôt à côté.",
+    "corner_set": "Voici ton coin : ici, personne d'autre ne pose ni ne reprend d'objet.",
+    "corner_moved": "Ton coin a changé de place.",
+    "corner_removed": "Tu n'as plus de coin à toi.",
+    "corner_partner_set": "{partner} a désigné son coin dans la maison.",
+    "corner_outside": "Ton coin se choisit dans la maison.",
+    "corner_taken": "Ici, c'est le coin de {partner} : vise un autre endroit de la pièce.",
+    "corner_partner_things": "{partner} a posé un meuble ici : vise un autre endroit de la pièce.",
+    "corner_not_yours": "Ce meuble est dans le coin de {partner} : c'est à {partner} de le reprendre."
   },
   "night": {
     "overline": "Fin du {weekday} {day}",

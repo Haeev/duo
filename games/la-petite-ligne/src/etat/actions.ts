@@ -51,6 +51,9 @@ export type Intent =
   | { type: 'take_furniture'; furniture: string }
   | { type: 'hold_furniture'; item: ItemId }
   | { type: 'cancel_placement' }
+  // Coin à soi (C): le carré de 2x2 cases le plus proche du point visé; au même endroit, le retire
+  | { type: 'corner'; x: number; y: number }
+  | { type: 'corner_clear' }
   // Menus du jeu (arrêt de l'horloge quand les deux y sont)
   | { type: 'menu'; menu: MenuKind | null }
   // Dialogues et scènes

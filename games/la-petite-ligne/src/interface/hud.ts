@@ -24,7 +24,7 @@ import {
   toolbarModel,
   type SlotModel,
 } from './modele';
-import { dedupeToasts, toastKey, toastVisual, visibleToasts } from './notifications';
+import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
 
@@ -91,6 +91,9 @@ export class Hud {
   private readonly toolbar: HTMLDivElement;
   private readonly toolbarHeld: HTMLSpanElement;
   private readonly toolbarDetail: HTMLElement;
+  /** Dans la maison: la touche du coin à soi. */
+  private readonly toolbarCorner: HTMLElement;
+  private readonly toolbarCornerText: HTMLSpanElement;
   private readonly slots: SlotView[] = [];
   private readonly newUntil: number[] = [];
 
@@ -178,6 +181,8 @@ export class Hud {
     this.tip = el('p', { class: 'lpl-tip', role: 'status', hidden: true });
     this.toolbarHeld = el('span');
     this.toolbarDetail = el('small');
+    this.toolbarCornerText = el('span');
+    this.toolbarCorner = el('small', { hidden: true }, [keycap(ctx.key('KeyC')), ' ', this.toolbarCornerText]);
     const slotsBox = el('div', { class: 'lpl-toolbar__slots', 'aria-label': x.hud.toolbarLabel });
     for (let i = 0; i < UI_SETTINGS.toolbarSlots; i++) {
       const view = this.makeSlot(i);
@@ -186,7 +191,7 @@ export class Hud {
       slotsBox.append(view.button);
     }
     this.toolbar = el('div', { class: 'lpl-toolbar' }, [
-      el('p', { class: 'lpl-toolbar__label' }, [this.toolbarHeld, this.toolbarDetail]),
+      el('p', { class: 'lpl-toolbar__label' }, [this.toolbarHeld, this.toolbarDetail, this.toolbarCorner]),
       slotsBox,
     ]);
 
@@ -209,6 +214,7 @@ export class Hud {
         { keys: [keyLabel('Space')], text: `${x.keys.or} ${x.keys.click} ${k.place}` },
         { keys: [keyLabel('KeyX')], text: `${x.keys.or} ${x.keys.rightClick} ${k.take}` },
         { keys: [keyLabel('Backspace')], text: k.store },
+        { keys: [keyLabel('KeyC')], text: k.corner },
       ]),
     ]);
     const buildKeys = this.build.lastElementChild;
@@ -314,7 +320,7 @@ export class Hud {
     this.lastPurse = purse.amount;
     if (now >= this.deltaUntil) setHidden(this.purseDelta, true);
 
-    this.updateToasts(me.notifications, now);
+    this.updateToasts(me.notifications, now, characterOf(world, ctx.partner)?.name ?? '');
 
     // L'autre joueur.
     const partnerChar = characterOf(world, ctx.partner);
@@ -368,7 +374,7 @@ export class Hud {
     const placing = me.placement !== null;
     setHidden(this.toolbar, placing);
     setHidden(this.build, !placing);
-    if (me.placement !== null) this.updateBuild(me.placement);
+    if (me.placement !== null) this.updateBuild(me.placement, characterOf(world, ctx.partner)?.name ?? '');
     else this.updateToolbar(me, now);
   }
 
@@ -377,6 +383,9 @@ export class Hud {
     setText(this.toolbarHeld, model.held);
     setText(this.toolbarDetail, model.detail);
     setHidden(this.toolbarDetail, model.detail === '');
+    setHidden(this.toolbarCorner, !me.inHouse);
+    const corner = this.host.ctx.texts.extra.corner;
+    setText(this.toolbarCornerText, this.host.ctx.t((me.corner ?? null) === null ? corner.designate : corner.move));
     model.slots.forEach((slot, i) => {
       const view = this.slots[i];
       if (view !== undefined) this.updateSlot(view, slot, i === model.selected, now, i);
@@ -403,10 +412,10 @@ export class Hud {
     setAttr(b, 'data-state', slot.unusable ? 'unusable' : fresh ? 'new' : null);
   }
 
-  private updateBuild(placement: NonNullable<NonNullable<ReturnType<typeof characterOf>>['placement']>): void {
+  private updateBuild(placement: NonNullable<NonNullable<ReturnType<typeof characterOf>>['placement']>, partner: string): void {
     const { ctx } = this.host;
     const reason = placementReason(placement.blocked, ctx.texts.messages);
-    const sig = `${placement.item}|${placement.valid}|${placement.rotation}|${reason ?? ''}`;
+    const sig = `${placement.item}|${placement.valid}|${placement.rotation}|${reason ?? ''}|${partner}`;
     if (sig === this.buildSig) return;
     this.buildSig = sig;
     setIcon(this.buildIcon, itemIcon(ctx, placement.item));
@@ -415,12 +424,12 @@ export class Hud {
     this.buildState.append(
       placement.valid
         ? chip(ctx.t(ctx.texts.extra.build.canPlace), 'ready', 'ui-check')
-        : chip(ctx.t(reason ?? ctx.texts.extra.build.blocked), 'alert', 'ui-warning'),
+        : chip(ctx.t(reason ?? ctx.texts.extra.build.blocked, { partner }), 'alert', 'ui-warning'),
     );
     setText(this.buildRotation, ctx.t(ctx.texts.extra.common.orientation[placement.rotation % 4] ?? ''));
   }
 
-  private updateToasts(list: readonly Readonly<GameNotification>[], now: number): void {
+  private updateToasts(list: readonly Readonly<GameNotification>[], now: number, partner: string): void {
     const { ctx } = this.host;
     const durationMs = (ctx.content.settings.hints.durationSeconds || UI_SETTINGS.toastSeconds) * 1000;
     for (const n of list) {
@@ -482,7 +491,7 @@ export class Hud {
       const visual = toastVisual(n, ctx.texts.messages);
       const li = el('li', { class: `lpl-toast${visual.variant === '' ? '' : ` lpl-toast--${visual.variant}`}` }, [
         visual.partnerToken ? token('other', this.host.symbol('other'), 'small') : icon(visual.icon === '' ? 'ui-note' : visual.icon),
-        typographier(n.text),
+        typographier(toastText(n, ctx.texts.messages, { partner })),
       ]);
       this.toastItems.set(key, li);
       this.toasts.append(li);

@@ -1,12 +1,14 @@
 /**
  * Aménagement de la pièce (MA-02 réduit): un meuble du sac en main montre son
  * fantôme devant soi; on le tourne, on le pose, on le reprend.
+ * Coin à soi (MA-06 de la démo): chacun désigne un carré de 2x2 cases de la
+ * pièce où lui seul pose et reprend des meubles.
  */
-import { inRect } from '../etat/carte';
-import type { Cell, Character, PlacementPreview } from '../etat/types';
+import { type GameMap, inRect } from '../etat/carte';
+import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacementPreview } from '../etat/types';
 import type { ItemDef } from '../donnees/types';
 import { TOOLBAR_SLOTS } from './constantes';
-import { type Sim, bump, emit, newId } from './contexte';
+import { type Sim, bump, emit, message, newId, partnerName, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
 import { footprintCells, rotatedSize } from './deplacement';
 import { giveToCharacter, heldItem, takeFromBag } from './sac';
@@ -48,21 +50,33 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
 }
 
 /** Pourquoi un meuble ne tient pas là (clé `placement_<raison>` de `textes.json`), ou `null` s'il tient. */
-export type PlacementProblem = 'outside' | 'wall' | 'overlap' | 'occupied';
+export type PlacementProblem = 'outside' | 'wall' | 'not_yours' | 'overlap' | 'occupied';
 
 const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   outside: 'placement_outside',
   wall: 'placement_wall',
+  not_yours: 'placement_not_yours',
   overlap: 'placement_overlap',
   occupied: 'placement_occupied',
 };
 
-/** Le meuble tient-il là ? Dans la pièce, sans chevaucher un autre meuble (sauf tapis) ni un personnage. */
-export function canPlace(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null): boolean {
-  return placementProblem(sim, item, cell, rotation, ignore) === null;
+/**
+ * Le meuble tient-il là ? Dans la pièce, hors du coin de l'autre, sans
+ * chevaucher un autre meuble (sauf tapis) ni un personnage. Sans `by`, tout
+ * coin compte comme celui d'un autre (recherche de place du robot).
+ */
+export function canPlace(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null, by?: CharacterId): boolean {
+  return placementProblem(sim, item, cell, rotation, ignore, by) === null;
 }
 
-export function placementProblem(sim: Sim, item: string, cell: Cell, rotation: number, ignore: string | null = null): PlacementProblem | null {
+export function placementProblem(
+  sim: Sim,
+  item: string,
+  cell: Cell,
+  rotation: number,
+  ignore: string | null = null,
+  by?: CharacterId,
+): PlacementProblem | null {
   const def = sim.content.items[item];
   if (def?.footprint === null || def === undefined) return 'outside';
   const room = sim.map.house.room;
@@ -74,6 +88,7 @@ export function placementProblem(sim: Sim, item: string, cell: Cell, rotation: n
     );
     if (!onEdge) return 'wall';
   }
+  if (cornerOwnerOf(sim, cells, by) !== null) return 'not_yours';
   for (const f of sim.world.furniture) {
     if (f.id === ignore) continue;
     const other = sim.content.items[f.item];
@@ -106,10 +121,10 @@ export function updatePlacement(sim: Sim, c: Character): void {
   }
   const rotation = c.placement?.item === item ? c.placement.rotation : 0;
   const cell = previewCell(c, rotatedSize(def.footprint, rotation));
-  const problem = placementProblem(sim, item, cell, rotation);
+  const problem = placementProblem(sim, item, cell, rotation, null, c.id);
   const valid = problem === null;
-  // Sans texte dans `textes.json`, l'interface montre son message général.
-  const blocked = problem === null ? null : (sim.content.texts.messages[PROBLEM_KEYS[problem]] ?? null);
+  // Sans texte dans `textes.json`, la clé: l'interface la traduit, sinon montre son message général.
+  const blocked = problem === null ? null : message(sim, PROBLEM_KEYS[problem], { partner: partnerName(sim, c.id) });
   const before = c.placement;
   if (
     before?.item !== item ||
@@ -141,7 +156,10 @@ export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotati
   if (!isPlaceable(def) || def.footprint === null) return false;
   const r = rotation ?? c.placement?.rotation ?? 0;
   const at = cell ?? c.placement?.cell ?? null;
-  if (at === null || !canPlace(sim, item, at, r)) return false;
+  if (at === null) return false;
+  const problem = placementProblem(sim, item, at, r, null, c.id);
+  if (problem === 'not_yours') say(sim, c.id, PROBLEM_KEYS.not_yours, { partner: partnerName(sim, c.id) });
+  if (problem !== null) return false;
   if (takeFromBag(c, item, 1).length === 0) return false;
   const id = newId(sim, 'f');
   sim.world.furniture.push({ id, item, cell: { cx: at.cx, cy: at.cy }, rotation: r, placedBy: c.id });
@@ -159,6 +177,12 @@ export function takeFurniture(sim: Sim, c: Character, furnitureId: string): bool
   const f = sim.world.furniture[index];
   if (f === undefined) return false;
   if (sim.world.characters.some((ch) => ch.bedId === f.id)) return false;
+  const def = sim.content.items[f.item];
+  const owner = def === undefined || def.footprint === null ? null : cornerOwnerOf(sim, footprintCells(def.footprint, f.cell, f.rotation), c.id);
+  if (owner !== null) {
+    say(sim, c.id, 'corner_not_yours', { partner: owner.name });
+    return false;
+  }
   sim.world.furniture.splice(index, 1);
   giveToCharacter(sim, c, f.item, 'ordinary', 1);
   // Le meuble repris passe en main, prêt à être reposé.
@@ -167,4 +191,116 @@ export function takeFurniture(sim: Sim, c: Character, furnitureId: string): bool
   sim.runtime.dynamicDirty = true;
   emit(sim, { type: 'furniture_taken', by: c.id, item: f.item });
   return true;
+}
+
+// ---------------------------------------------------------------------------
+// Coin à soi
+
+/** Pourquoi un coin ne peut pas aller là (clé `corner_<raison>`), ou `null`. */
+export type CornerProblem = 'outside' | 'taken' | 'partner_things';
+
+const CORNER_KEYS: Record<CornerProblem, string> = {
+  outside: 'corner_outside',
+  taken: 'corner_taken',
+  partner_things: 'corner_partner_things',
+};
+
+/** Les cases du coin dont `cell` est la case nord-ouest. */
+export function cornerCells(cell: Cell): Cell[] {
+  const cells: Cell[] = [];
+  for (let dy = 0; dy < CORNER_SIZE; dy++) {
+    for (let dx = 0; dx < CORNER_SIZE; dx++) cells.push({ cx: cell.cx + dx, cy: cell.cy + dy });
+  }
+  return cells;
+}
+
+function inCorner(corner: Cell, k: Cell): boolean {
+  return k.cx >= corner.cx && k.cy >= corner.cy && k.cx < corner.cx + CORNER_SIZE && k.cy < corner.cy + CORNER_SIZE;
+}
+
+/** Le propriétaire d'un coin (autre que `except`) qui touche l'une de ces cases, ou `null`. */
+export function cornerOwnerOf(sim: Sim, cells: readonly Cell[], except?: CharacterId): Character | null {
+  for (const ch of sim.world.characters) {
+    const corner = ch.id === except ? null : (ch.corner ?? null);
+    if (corner !== null && cells.some((k) => inCorner(corner, k))) return ch;
+  }
+  return null;
+}
+
+/** Le carré de la pièce dont le centre est le plus près du point (collé aux murs si besoin). */
+export function cornerAt(map: GameMap, x: number, y: number): Cell {
+  const room = map.house.room;
+  const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));
+  return {
+    cx: clamp(Math.round(x - CORNER_SIZE / 2), room.x, room.x + room.w - CORNER_SIZE),
+    cy: clamp(Math.round(y - CORNER_SIZE / 2), room.y, room.y + room.h - CORNER_SIZE),
+  };
+}
+
+function cornerFits(map: GameMap, cell: Cell): boolean {
+  const room = map.house.room;
+  return cornerCells(cell).every((k) => inRect(room, k.cx + 0.5, k.cy + 0.5));
+}
+
+/** Le coin peut-il aller là ? Dans la pièce, sans toucher le coin de l'autre ni un meuble qu'il a posé. */
+export function cornerProblem(sim: Sim, c: Character, cell: Cell): CornerProblem | null {
+  if (!cornerFits(sim.map, cell)) return 'outside';
+  const cells = cornerCells(cell);
+  const partner = sim.world.characters.find((ch) => ch.id === partnerOf(c.id));
+  const theirs = partner?.corner ?? null;
+  if (theirs !== null && cells.some((k) => inCorner(theirs, k))) return 'taken';
+  for (const f of sim.world.furniture) {
+    if (f.placedBy === null || f.placedBy === c.id) continue;
+    const def = sim.content.items[f.item];
+    if (def === undefined || def.footprint === null) continue;
+    const taken = footprintCells(def.footprint, f.cell, f.rotation);
+    if (taken.some((k) => cells.some((t) => t.cx === k.cx && t.cy === k.cy))) return 'partner_things';
+  }
+  return null;
+}
+
+/**
+ * Désigne son coin au carré le plus proche du point (x, y), ou le déplace.
+ * Au même endroit, le retire. Il faut être dans la maison.
+ */
+export function designateCorner(sim: Sim, c: Character, x: number, y: number): void {
+  if (!c.inHouse) {
+    say(sim, c.id, CORNER_KEYS.outside);
+    return;
+  }
+  const cell = cornerAt(sim.map, x, y);
+  const before = c.corner ?? null;
+  if (before !== null && before.cx === cell.cx && before.cy === cell.cy) {
+    clearCorner(sim, c);
+    return;
+  }
+  const problem = cornerProblem(sim, c, cell);
+  if (problem !== null) {
+    say(sim, c.id, CORNER_KEYS[problem], { partner: partnerName(sim, c.id) });
+    return;
+  }
+  c.corner = cell;
+  sim.runtime.changed = true;
+  say(sim, c.id, before === null ? 'corner_set' : 'corner_moved');
+  say(sim, partnerOf(c.id), 'corner_partner_set', { partner: c.name });
+}
+
+export function clearCorner(sim: Sim, c: Character): void {
+  if ((c.corner ?? null) === null) return;
+  c.corner = null;
+  sim.runtime.changed = true;
+  say(sim, c.id, 'corner_removed');
+}
+
+/**
+ * Coin relu d'une sauvegarde (données du disque): une case entière dont le
+ * carré tient dans la pièce, sinon `null` (aussi pour les sauvegardes d'avant
+ * le coin, qui n'ont pas ce champ).
+ */
+export function sanitizeCorner(map: GameMap, value: unknown): Cell | null {
+  if (typeof value !== 'object' || value === null) return null;
+  const { cx, cy } = value as { cx?: unknown; cy?: unknown };
+  if (typeof cx !== 'number' || typeof cy !== 'number' || !Number.isInteger(cx) || !Number.isInteger(cy)) return null;
+  const cell = { cx, cy };
+  return cornerFits(map, cell) ? cell : null;
 }

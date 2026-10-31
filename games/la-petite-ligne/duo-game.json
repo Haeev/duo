@@ -153,6 +153,13 @@
       ]
     },
     {
+      "id": "corner",
+      "label": "Désigner mon coin",
+      "keys": [
+        "KeyC"
+      ]
+    },
+    {
       "id": "slot-1",
       "label": "Case 1 de la barre",
       "keys": [

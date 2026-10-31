@@ -63,6 +63,8 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('place_furniture'), cell: CellSchema, rotation: Int }),
   v.strictObject({ type: v.literal('take_furniture'), furniture: Id }),
   v.strictObject({ type: v.literal('hold_furniture'), item: Id }),
+  v.strictObject({ type: v.literal('corner'), x: Finite, y: Finite }),
+  v.strictObject({ type: v.literal('corner_clear') }),
   v.strictObject({ type: v.literal('cancel_placement') }),
   v.strictObject({ type: v.literal('menu'), menu: MenuSchema }),
   v.strictObject({ type: v.literal('dialogue_next') }),
