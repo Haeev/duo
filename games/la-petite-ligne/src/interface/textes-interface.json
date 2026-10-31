@@ -375,6 +375,7 @@
     "furniture": "meubles posés",
     "continue": "Continuer",
     "after": "Ensuite : l'écran de fin de Duo, et la séance dans votre historique.",
-    "chipContinue": "Veut continuer"
+    "chipContinue": "Veut continuer",
+    "bothReady": "Vous avez choisi « Continuer » sur les deux ordinateurs."
   }
 }

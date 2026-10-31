@@ -274,7 +274,7 @@ const SupplementSchema = v.object({
     'saved',
     'choicesLabel',
   ] as const),
-  end: strings(['ticket', 'days', 'lines', 'linesOf', 'furniture', 'continue', 'after', 'chipContinue'] as const),
+  end: strings(['ticket', 'days', 'lines', 'linesOf', 'furniture', 'continue', 'after', 'chipContinue', 'bothReady'] as const),
 });
 
 export type GameUiTexts = v.InferOutput<typeof GameUiSchema>;

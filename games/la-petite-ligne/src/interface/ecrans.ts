@@ -9,7 +9,7 @@ import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICO
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
-import { dayLabel, formModel, linesText, nextObjective, orderLines } from './modele';
+import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines } from './modele';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -718,6 +718,7 @@ export class EndScreen implements Layer {
   private readonly cont: HTMLButtonElement;
   private readonly notYet: HTMLButtonElement;
   private readonly waiting: HTMLSpanElement;
+  private readonly bothReady: HTMLSpanElement;
 
   constructor(host: UiHost) {
     this.host = host;
@@ -741,6 +742,9 @@ export class EndScreen implements Layer {
       host.send({ type: 'end_ready', ready: false });
     });
     this.waiting = chip('', 'waiting', 'ui-hourglass');
+    this.bothReady = chip(ctx.t(x.bothReady), 'ready', 'ui-check');
+    this.bothReady.setAttribute('role', 'status');
+    this.bothReady.toggleAttribute('hidden', true);
     this.root = screen(
       '',
       titleId,
@@ -753,7 +757,7 @@ export class EndScreen implements Layer {
         this.counters,
         el('div', { class: 'lpl-players', 'aria-label': ctx.texts.extra.common.playersLabel }, [this.self.root, this.other.root]),
         el('p', { class: 'lpl-sheet__lead', style: 'text-align: center' }, [el('strong', { text: ctx.t(e.text) })]),
-        el('div', { class: 'lpl-sheet__actions', style: 'justify-content: center', 'data-nav': 'row' }, [this.cont, this.waiting, this.notYet]),
+        el('div', { class: 'lpl-sheet__actions', style: 'justify-content: center', 'data-nav': 'row' }, [this.cont, this.waiting, this.notYet, this.bothReady]),
         el('p', { style: 'text-align: center; color: var(--lpl-color-ink-muted)', text: ctx.t(x.after) }),
       ]),
     );
@@ -788,13 +792,17 @@ export class EndScreen implements Layer {
       ready ? chip(ctx.t(x.chipContinue), 'ready', 'ui-check') : chip(ctx.t(ctx.texts.extra.common.notYet), '', 'ui-hourglass');
     this.self.set(nameOf(world, ctx.me), ctx.texts.extra.common.you, chipOf(meReady), svgOf(world, ctx.me, 'radiant'));
     this.other.set(nameOf(world, ctx.partner), null, chipOf(otherReady), svgOf(world, ctx.partner, 'great'));
-    setHidden(this.cont, meReady);
-    setHidden(this.waiting, !meReady);
-    setHidden(this.notYet, !meReady);
+    // Quand les deux ont choisi, plus de ligne d'attente: l'état final, comme sur les cartes.
+    const actions = endActions(meReady, otherReady);
+    setHidden(this.cont, !actions.cont);
+    setHidden(this.waiting, !actions.waiting);
+    setHidden(this.notYet, !actions.waiting);
+    setHidden(this.bothReady, !actions.done);
     setText(this.waiting.lastChild ?? this.waiting, ctx.t(ctx.texts.extra.common.waitingFor, { partner: nameOf(world, ctx.partner) }));
   }
 
   defaultFocus(): HTMLElement | null {
-    return this.cont.hidden ? this.notYet : this.cont;
+    if (!this.cont.hidden) return this.cont;
+    return this.notYet.hidden ? null : this.notYet;
   }
 }

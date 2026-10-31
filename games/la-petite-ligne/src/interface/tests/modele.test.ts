@@ -6,6 +6,7 @@ import { NBSP } from '../typographie';
 import {
   absenceMinutes,
   clockModel,
+  endActions,
   dayLabel,
   formModel,
   letterModels,
@@ -265,6 +266,15 @@ describe('pause de l’autre joueur (PA-04)', () => {
     expect(other.absent).toBe(true);
     expect(sim.world.clock.stoppedBy).toBe('absence');
     expect(absenceMinutes(sim.world, other)).toBe(ctx.content.settings.absence.minutes);
+  });
+});
+
+describe('écran de fin', () => {
+  it('montre l’état final quand les deux ont choisi « Continuer »: plus d’attente ni de « Pas encore »', () => {
+    expect(endActions(false, false)).toEqual({ cont: true, waiting: false, done: false });
+    expect(endActions(false, true)).toEqual({ cont: true, waiting: false, done: false });
+    expect(endActions(true, false)).toEqual({ cont: false, waiting: true, done: false });
+    expect(endActions(true, true)).toEqual({ cont: false, waiting: false, done: true });
   });
 });
 

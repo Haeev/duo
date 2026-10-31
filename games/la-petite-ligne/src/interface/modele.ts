@@ -499,6 +499,23 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
 }
 
 // ---------------------------------------------------------------------------
+// Écran de fin
+
+/** Ce que montre le pied de l'écran de fin, selon les choix des deux (« Continuer »). */
+export interface EndActions {
+  /** Bouton « Continuer ». */
+  cont: boolean;
+  /** « En attente de Sacha… » et le bouton « Pas encore ». */
+  waiting: boolean;
+  /** Les deux ont choisi: plus d'attente, la plateforme prend le relais. */
+  done: boolean;
+}
+
+export function endActions(meReady: boolean, otherReady: boolean): EndActions {
+  return { cont: !meReady, waiting: meReady && !otherReady, done: meReady && otherReady };
+}
+
+// ---------------------------------------------------------------------------
 // Aménagement
 
 /**

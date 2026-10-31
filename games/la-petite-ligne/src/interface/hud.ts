@@ -24,7 +24,7 @@ import {
   toolbarModel,
   type SlotModel,
 } from './modele';
-import { toastVisual, visibleToasts } from './notifications';
+import { dedupeToasts, toastKey, toastVisual, visibleToasts } from './notifications';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
 
@@ -60,7 +60,8 @@ export class Hud {
   private deltaUntil = 0;
 
   private readonly toasts: HTMLUListElement;
-  private readonly toastItems = new Map<number, HTMLLIElement>();
+  /** Notifications à l'écran, par texte (`toastKey`): une répétition rafraîchit le délai sans empiler. */
+  private readonly toastItems = new Map<string, HTMLLIElement>();
   private readonly seenAt = new Map<number, number>();
   private firstSight = true;
 
@@ -455,29 +456,35 @@ export class Hud {
 
     // Les astuces vont en bas; une proposition d'achat a sa propre carte.
     const shown = visibleToasts(
-      list.filter((n) => n.kind !== 'hint' && n.kind !== 'proposal'),
+      dedupeToasts(list.filter((n) => n.kind !== 'hint' && n.kind !== 'proposal')),
       this.seenAt,
       now,
       durationMs,
       UI_SETTINGS.maxToasts,
     );
-    const keep = new Set(shown.map((n) => n.id));
-    for (const [id, li] of this.toastItems) {
-      if (keep.has(id)) continue;
-      this.toastItems.delete(id);
+    const keep = new Set(shown.map((n) => toastKey(n)));
+    for (const [key, li] of this.toastItems) {
+      if (keep.has(key)) continue;
+      this.toastItems.delete(key);
       li.setAttribute('data-state', 'leaving');
       window.setTimeout(() => {
         li.remove();
       }, UI_SETTINGS.foldMs);
     }
     for (const n of shown) {
-      if (this.toastItems.has(n.id)) continue;
+      const key = toastKey(n);
+      const known = this.toastItems.get(key);
+      if (known !== undefined) {
+        // La plus récente passe en bas, comme une nouvelle arrivée.
+        if (known !== this.toasts.lastElementChild && shown[shown.length - 1] === n) this.toasts.append(known);
+        continue;
+      }
       const visual = toastVisual(n, ctx.texts.messages);
       const li = el('li', { class: `lpl-toast${visual.variant === '' ? '' : ` lpl-toast--${visual.variant}`}` }, [
         visual.partnerToken ? token('other', this.host.symbol('other'), 'small') : icon(visual.icon === '' ? 'ui-note' : visual.icon),
         typographier(n.text),
       ]);
-      this.toastItems.set(n.id, li);
+      this.toastItems.set(key, li);
       this.toasts.append(li);
     }
   }

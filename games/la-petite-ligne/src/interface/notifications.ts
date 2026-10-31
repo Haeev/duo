@@ -99,6 +99,27 @@ export function toastVisual(notification: Readonly<GameNotification>, messages: 
   return (key === null ? undefined : MESSAGE_VISUALS[key]) ?? KIND_VISUALS[notification.kind];
 }
 
+/** Deux notifications de même sorte et de même texte n'en font qu'une à l'écran. */
+export function toastKey(n: Readonly<{ kind: string; text: string }>): string {
+  return `${n.kind}|${n.text}`;
+}
+
+/**
+ * Une seule notification par texte (la plus récente: son délai repart de
+ * zéro), dans l'ordre d'arrivée de cette dernière. La simulation peut répéter
+ * un message (« Camille t'attend pour la suite. » à chaque appui, « Rien
+ * ici… » à chaque coup de bêche): l'écran ne l'empile pas.
+ */
+export function dedupeToasts<T extends { id: number; kind: string; text: string }>(list: readonly T[]): T[] {
+  const latest = new Map<string, T>();
+  for (const n of list) {
+    const key = toastKey(n);
+    const known = latest.get(key);
+    if (known === undefined || n.id > known.id) latest.set(key, n);
+  }
+  return [...latest.values()].sort((a, b) => a.id - b.id);
+}
+
 /**
  * Notifications à montrer: les plus récentes arrivées depuis moins de
  * `durationMs` (horloge réelle), au plus `max`, la plus récente en bas.
