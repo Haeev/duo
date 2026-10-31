@@ -6,6 +6,7 @@
  * modifie jamais. `dispose` libère tout (géométries, matériaux, textures,
  * contexte WebGL).
  */
+import { benchesOf } from '../etat/bancs';
 import {
   ACESFilmicToneMapping,
   InstancedMesh,
@@ -264,7 +265,8 @@ export class RenderEngine implements Renderer {
       this.resources,
       this.picks,
       content,
-      map.props.filter((prop) => prop.model === 'bench'),
+      benchesOf(map),
+      map.points,
     );
     const house = new HousePart(
       map,

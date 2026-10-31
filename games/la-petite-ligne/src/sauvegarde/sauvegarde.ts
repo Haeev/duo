@@ -7,6 +7,7 @@ import type { GameMap } from '../etat/carte';
 import type { CharacterId, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { sanitizeCorner } from '../simulation/amenagement';
+import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
@@ -255,6 +256,9 @@ function resume(
     c.placement = null;
     c.aim = null;
     c.corner = sanitizeCorner(map, c.corner);
+    // Assis sur un banc (après le tour 5): absent des sauvegardes d'avant, comme debout.
+    c.seat = sanitizeSeat(map, content.settings.benches, c);
+    if (c.seat === null && c.action.kind === 'sit') c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
   for (const v of world.villagers) v.talkingWith = [];

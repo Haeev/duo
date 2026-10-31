@@ -89,3 +89,14 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Mesure reproductible: `triangleSplit()` au même cadrage, quatre orientations, avant et après dans le même serveur; ne jamais remettre d'anciens fichiers dans l'arbre partagé pour mesurer « avant » (`git checkout <commit> -- fichier` change aussi l'index, et un instantané « wip » du manager peut capturer cet état): copier l'ancienne version dans un dossier à part ou comparer à des chiffres déjà relevés.
 - Une ombre retirée se juge à midi, pas seulement au soir: les poules sans ombre flottaient à midi alors que rien ne se voyait à 19 h.
 - ImageMagick: `-gravity` posé dans une parenthèse s'applique aussi au `-crop` des parenthèses suivantes: recadrer dans des commandes séparées.
+
+## Bancs, worktree et mesures de pose (La Petite Ligne, vérifié le 2026-10-31)
+
+- Un worktree de membre peut partir d'un commit plus ancien que la branche demandée: comparer `git log HEAD..<branche>` au départ et avancer (`git merge --ff-only <branche>`) tant que l'arbre est propre.
+- Géométrie partagée simulation et rendu: la mettre dans `src/etat/` (pure, sans Three.js) et l'appeler des deux côtés (`etat/bancs.ts`: places, lever, places des habitants). Une règle dupliquée dans le rendu finit par diverger de la simulation.
+- Une condition « près d'un banc » trop large attrape les passants: Firmin, arrêté près de la cloche, était compté assis sur le banc du quai. Un habitant ne s'assoit que sur le banc qui est le point de son emploi du temps (`VillagerState.target`).
+- Visée: un nouveau verbe placé trop haut vole la touche à un geste existant (s'asseoir avant bêcher cassait l'énigme d'Émile, bêche au pied du banc); le mettre après tout geste possible, et un clic au sol garde le geste de la case cliquée.
+- La marquise et ses poteaux sont dans le modèle `platform` (nœud `platform_canopy` de `bourg.glb`), pas dans la carte: la simulation ne les voit pas. Un poteau à (40,5; 17,9) est à 0,6 m devant la place est du banc du quai.
+- Mesurer une pose sans écran: page de sonde servie avec la construction figée (copier `three/build` et `three/examples/jsm` dans le dossier servi, carte d'import), `AnimationMixer.setTime`, puis `SkinnedMesh.getVertexPosition` et `matrixWorld` pour chaque sommet; compter ceux qui entrent dans un volume (poteau, dossier). Les chaussures font partie des maillages de tenue (`player_outfit_*`), pas de `player_base`.
+- L'événement d'un geste part à chaque pas chez l'invité, l'état complet au plus 5 fois par seconde: pour répondre en moins de 100 ms, le rendu suit l'événement quelques centaines de ms; un lever prédit chez l'invité ignore les états et positions dont l'`ack` précède sa commande.
+- Outil Bash isolé: un heredoc ou un `python3 - <<EOF` qui écrit dans le dépôt est souvent refusé; écrire le script dans le scratchpad et le lancer avec la racine en argument.

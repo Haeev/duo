@@ -3,6 +3,7 @@
   "hints": [
     { "id": "hint_move", "text": "{move} pour marcher, ou un clic sur le sol.", "trigger": { "on": "spawned" }, "tier": "P0" },
     { "id": "hint_act", "text": "{act} ou un clic pour agir sur ce qui est devant toi.", "trigger": { "on": "near_interactable" }, "tier": "P0" },
+    { "id": "hint_bench", "text": "{act} ou un clic sur le banc pour t'asseoir. Une direction pour te lever.", "trigger": { "on": "near_point", "point": "quay_bench" }, "tier": "P0" },
     { "id": "hint_toolbar", "text": "La molette change d'outil.", "trigger": { "on": "tool_used" }, "tier": "P0" },
     { "id": "hint_beam", "text": "Une poutre se porte à deux: approchez-vous et maintenez {act} ensemble.", "trigger": { "on": "near_point", "point": "beam_pickup" }, "tier": "P0" },
     { "id": "hint_ghost", "text": "Maintiens {act} sur un élément transparent pour le construire. À deux, ça va deux fois plus vite.", "trigger": { "on": "near_construction" }, "tier": "P0" },

@@ -25,6 +25,7 @@
  *   et se transmet tel quel.
  */
 import type { Effect } from '../donnees/types';
+import type { BenchSeat } from './bancs';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -303,6 +304,11 @@ export interface Character {
    * Absent des sauvegardes d'avant le coin: comme `null`.
    */
   corner?: Cell | null;
+  /**
+   * Assis sur un banc de la carte, par choix (Espace près d'une place libre): sa place,
+   * réservée, et depuis quand. Toute direction le relève. `null` debout.
+   */
+  seat: BenchSeat | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
   fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
 }
@@ -406,7 +412,9 @@ export type AimVerb =
   | 'feed'
   | 'place'
   | 'give'
-  | 'dig';
+  | 'dig'
+  /** S'asseoir sur la place libre d'un banc. */
+  | 'sit';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -774,6 +782,9 @@ export type WorldEvent =
   | { type: 'cooked'; by: CharacterId; recipe: RecipeId }
   | { type: 'went_to_bed'; by: CharacterId }
   | { type: 'got_up'; by: CharacterId }
+  /** Assis sur un banc (place `slot`), ou relevé: le rendu et le son répondent tout de suite, avant l'état complet. */
+  | { type: 'sat_down'; by: CharacterId; bench: string; slot: number }
+  | { type: 'stood_up'; by: CharacterId; bench: string }
   | { type: 'door'; by: CharacterId; entering: boolean }
   | { type: 'fed_hens'; by: CharacterId }
   | { type: 'hens_arrived' }

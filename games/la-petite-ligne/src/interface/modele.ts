@@ -260,6 +260,7 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
   }
   if (world.beam?.holders.includes(p.id) === true) return make(txt.carrying, 'beam');
   if (world.constructions.some((k) => k.elements.some((e) => e.workers.includes(p.id)))) return make(txt.building, 'plank');
+  if (p.seat !== null) return make(txt.seated, ACTION_ICONS.sit ?? 'ui-pin');
   const kind = p.action.kind;
   const running = p.action.duration === 0 || world.tick < p.action.since + p.action.duration;
   const actionText = txt.actions[kind];

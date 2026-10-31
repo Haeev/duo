@@ -22,6 +22,7 @@
     "no_energy": "Plus d'énergie: tout prend deux fois plus de temps. Un en-cas ?",
     "clock_waits": "L'horloge attend {partner}.",
     "bag_full": "Ton sac est plein: c'est posé à tes pieds.",
+    "bench_full": "Le banc est complet: il n'y a plus de place.",
     "grocer_not_buying": "Odette n'achète pas encore. Fais d'abord pousser quelque chose.",
     "grocer_daily_cap": "Odette a assez acheté pour aujourd'hui. Reviens demain, ou garde-le pour le train.",
     "catalogue_ordered": "Commandé ! Ça arrive au train de samedi.",

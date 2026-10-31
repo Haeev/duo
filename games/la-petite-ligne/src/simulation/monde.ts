@@ -90,6 +90,7 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     envieHistory: [],
     crafting: null,
     pin: null,
+    seat: null,
     fishing: null,
   };
 }

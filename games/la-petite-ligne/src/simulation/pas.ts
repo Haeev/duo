@@ -4,9 +4,10 @@
  */
 import type { AuthoredIntent, ControlFrame } from '../etat/actions';
 import type { CharacterId } from '../etat/types';
-import { RIPE_VIEW_DISTANCE, SIM_DT } from './constantes';
+import { MOVE_DEADZONE, RIPE_VIEW_DISTANCE, SIM_DT } from './constantes';
 import { type Sim, distance } from './contexte';
 import { updateAim } from './agir';
+import { standUp, updateSeats } from './bancs';
 import { updatePlacement } from './amenagement';
 import { loadPlaced, spawnLoads } from './portages';
 import { queueHint, pumpHints } from './astuces';
@@ -61,6 +62,25 @@ function nearHints(sim: Sim): void {
   }
 }
 
+/**
+ * Commandes du pas vues par la simulation: un joueur assis qui donne une
+ * direction se relève (puis marche à ce pas); assis, l'action tenue ne compte pas.
+ */
+function seatedControls(sim: Sim, controls: StepInput['controls']): StepInput['controls'] {
+  let out = controls;
+  for (const c of sim.world.characters) {
+    const f = controls[c.id];
+    if (c.seat === null || f === undefined) continue;
+    const moving = Math.hypot(f.moveX, f.moveY) >= MOVE_DEADZONE;
+    if (moving && sim.world.phase === 'day' && (c.status === 'active' || c.status === 'menu') && standUp(sim, c)) continue;
+    if (f.actHeld) {
+      if (out === controls) out = { ...controls };
+      out[c.id] = { ...f, actHeld: false };
+    }
+  }
+  return out;
+}
+
 export function step(sim: Sim, input: StepInput): void {
   const { world } = sim;
   const dt = SIM_DT;
@@ -95,9 +115,11 @@ export function step(sim: Sim, input: StepInput): void {
     sim.runtime.changed = true;
   }
 
+  // Assis: une direction relève (avant de marcher, au même pas); Espace tenu ne porte ni ne bâtit.
+  const controls = seatedControls(sim, input.controls);
   if (world.phase === 'day') {
     spawnLoads(sim);
-    const placed = updateBeam(sim, input.controls, dt);
+    const placed = updateBeam(sim, controls, dt);
     if (placed !== null) {
       if (placed.construction !== null) completeConstruction(sim, placed.construction);
       loadPlaced(sim, placed);
@@ -106,15 +128,16 @@ export function step(sim: Sim, input: StepInput): void {
     }
     for (const c of world.characters) {
       if (c.status === 'gesture') continue;
-      if (moveCharacter(sim, c, input.controls[c.id], dt)) arrive(sim, c);
+      if (moveCharacter(sim, c, controls[c.id], dt)) arrive(sim, c);
       updateCrafting(sim, c);
       endGesture(sim, c);
-      heldRepeat(sim, c, input.controls[c.id]?.actHeld === true);
+      heldRepeat(sim, c, controls[c.id]?.actHeld === true);
       updateFishing(sim, c);
     }
-    updateConstructions(sim, input.controls, dt);
+    updateConstructions(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
+  updateSeats(sim);
   updateVillagers(sim, dt);
   wanderHens(sim, dt);
   updateTrain(sim, dt);

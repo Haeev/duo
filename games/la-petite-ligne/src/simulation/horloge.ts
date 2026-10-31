@@ -60,7 +60,8 @@ export function updateAbsence(sim: Sim): void {
     if (absent) {
       if (c.action.kind === 'idle') c.action = { kind: 'sit', since: world.tick, duration: 0, target: null };
       say(sim, partnerOf(c.id), 'clock_waits', { partner: c.name });
-    } else if (c.action.kind === 'sit') {
+    } else if (c.action.kind === 'sit' && c.seat === null) {
+      // Assis sur un banc par choix, il y reste à son retour.
       c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     }
   }
