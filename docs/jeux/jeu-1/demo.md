@@ -171,20 +171,21 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 | A8 | après le premier semis | Arrose chaque jour: une culture ne pousse que si elle a bu la veille. |
 | A9 | arrosoir vide | Le puits de la place ou le tonneau de la maison remplissent l'arrosoir. |
 | A10 | première culture mûre | Elle est prête: un clic pour récolter. |
-| A11 | 19 h | Rentrez tous les deux à la maison: la veillée arrête l'horloge. |
+| A11 | 19 h | Retrouvez-vous à la maison: la veillée arrête l'horloge. |
 | A12 | première veillée | Cuisinez au réchaud, mangez ensemble, puis allez au lit. |
 | A13 | l'établi | À l'établi, un rondin donne quatre planches, et un plan devient un meuble. |
 | A14 | meuble en main | La molette tourne le meuble, Espace le pose, X le reprend. |
 | A15 | la caisse du quai | Dépose ici les produits de la commande. Ils partent samedi à 16 h. |
 | A16 | premier achat de 100 sous ou plus | À partir de 100 sous, l'achat attend l'accord de l'autre. |
 | A17 | premier courrier | Tab ouvre le carnet: quêtes, courrier, sac. |
+| A18 | au gué (P1) | Canne en main et face à l'eau, Espace lance la ligne. Le bouchon plonge ? Espace, vite ! |
 
 ### 3.2 Dialogues
 
 **Firmin**
 
 - Arrivée (scène à deux):
-  - « Bienvenue à la Halte d'Aubrune ! Vous êtes les premiers voyageurs depuis vingt ans. »
+  - « Bienvenue à la Halte d'Aubrune ! Personne n'était descendu ici depuis vingt ans. »
   - « La ligne rouvre. Un train par semaine, le samedi. La coopérative vous confie la maisonnette du garde-barrière, là-bas, au passage à niveau. »
   - « Elle a besoin d'un toit, je ne vous mens pas. Basile vous a laissé des planches. »
   - « Faites revivre la halte, et le train ira plus loin. Samedi prochain, on compte sur vous: la commande est au tableau. »
@@ -203,7 +204,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 
 **Odette**
 
-- Rencontre: « Ah, les nouveaux ! Ici, on vend de tout et on sait tout. Surtout on sait tout. »
+- Rencontre: « Ah, de nouvelles têtes ! Ici, on vend de tout et on sait tout. Surtout on sait tout. »
 - Graines (jour 1): « Pour commencer: radis, laitues, carottes. Les radis sont pressés, les carottes prennent leur temps. Comme les gens. »
 - Le pain: « Et prenez ce pain pour ce soir. Personne ne dort le ventre vide dans ma rue. »
 - Au quotidien:
@@ -220,7 +221,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 **Basile**
 
 - Jour 1, à la maisonnette: « Basile. Menuisier. Enfin, je l'étais. Votre poutre est là. Elle se porte à deux, comme les soucis. »
-- Après le toit: « Pas mal, pour des débutants. Le toit tiendra. La porte grince, mais une porte qui grince, c'est une porte qui parle. »
+- Après le toit: « Pas mal, pour un premier toit. Il tiendra. La porte grince, mais une porte qui grince, c'est une porte qui parle. »
 - S2, la demande: « Du bois, il y en a plein la lisière. Coupez un arbre, sciez quatre planches à mon établi, et je vous montre comment on fait une table. »
 - S2, la fin: « Voilà. Une table, une chaise, une étagère, et le lit, si vous avez du courage. Tout est dans ce carnet. Le lit, c'est du travail. Mais vous dormirez mieux. »
 - Au quotidien:
@@ -230,7 +231,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 
 **Jeanne**
 
-- Rencontre (jour 3): « C'est vous, les nouveaux ? Moi, c'est Jeanne. Dix ans et demi. Vous avez trouvé un trésor dans la maisonnette ? Tout le monde dit qu'il y en a un. »
+- Rencontre (jour 3): « C'est vous, les gens de la maisonnette ? Moi, c'est Jeanne. Dix ans et demi. Vous avez trouvé un trésor, là-dedans ? Tout le monde dit qu'il y en a un. »
 - Devant la carte: « Une devinette ! Je peux aider ? Je suis très forte en devinettes. Presque. »
 - Indices: « La cloche, c'est celle du quai. Le banc est juste à côté. Mais une ombre, ça bouge tout le temps... » et (pluie) « Pas d'ombre quand il pleut. Ça, je le sais. »
 - Au quotidien:
@@ -261,7 +262,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 
 | Jour | De | Texte |
 |---|---|---|
-| 1 | la coopérative | « Chers nouveaux gardiens de la Halte d'Aubrune, la coopérative de la ligne vous souhaite la bienvenue. Voici 200 sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: 12 radis, 3 laitues, 6 œufs, 10 planches. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine ! » |
+| 1 | la coopérative | « Bonjour à la nouvelle équipe de la Halte d'Aubrune ! La coopérative de la ligne vous souhaite la bienvenue. Voici 200 sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: 12 radis, 3 laitues, 6 œufs, 10 planches. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine ! » |
 | 3 | Basile | « L'établi de la scierie est ouvert. La hache est accrochée à côté. B. » |
 | 6 | la coopérative | « Rappel: le catalogue ferme vendredi à minuit. Les rideaux font fureur à la ville, paraît-il. » |
 | 8 | la coopérative, au départ du train | « La coopérative a reçu 4 lignes sur 4: 540 sous. Merci ! Les radis d'Aubrune ont fait sensation à la ville. » (variante: « N lignes sur 4: X sous. Merci, et à samedi prochain ! ») |
