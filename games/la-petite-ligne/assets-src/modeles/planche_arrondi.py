@@ -147,4 +147,5 @@ def main():
         rig.rotation_euler = (0, 0, math.radians(20))
 
 
-main()
+if __name__ == "__main__":
+    main()

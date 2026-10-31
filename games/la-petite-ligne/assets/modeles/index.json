@@ -53,23 +53,23 @@
  },
  "villager_firmin": {
   "file": "personnages.glb",
-  "tris": 2160
+  "tris": 1806
  },
  "villager_odette": {
   "file": "personnages.glb",
-  "tris": 2156
+  "tris": 1826
  },
  "villager_basile": {
   "file": "personnages.glb",
-  "tris": 2324
+  "tris": 2054
  },
  "villager_jeanne": {
   "file": "personnages.glb",
-  "tris": 2588
+  "tris": 2162
  },
  "villager_lucie": {
   "file": "personnages.glb",
-  "tris": 2292
+  "tris": 1986
  },
  "rig": {
   "file": "personnages.glb",

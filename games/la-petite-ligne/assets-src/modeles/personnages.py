@@ -126,7 +126,8 @@ def _oct(cx, cz, y, fn, n=8):
     return pts, faces
 
 
-def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1.0, eye_k=1.0, eye_x=0.055):
+def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1.0, eye_k=1.0, eye_x=0.055,
+                  lid=0.004):
     y = -hy / 2 - 0.004
     rx, rz = 0.016 * k * eye_k, 0.024 * k * eye_k
 
@@ -144,7 +145,7 @@ def face_features(g, hc, hy, expr, k=1.0, mouth_y=None, cheek_base=0.0, brow_k=1
         if expr == "tired":
             return (x * 1.05, 0.15 * rz * s if s >= 0 else 0.8 * rz * s)
         if expr == "blink":
-            return (x * 1.1, -0.25 * rz * (1 - c * c) + (0.004 if s >= 0 else -0.004) * k)
+            return (x * 1.1, -0.25 * rz * (1 - c * c) + (lid if s >= 0 else -lid) * k)
         if expr == "hungry":
             return (x * 1.1, rz * 1.1 * s)
         return (x, rz * s)
@@ -212,7 +213,7 @@ def hands(g, color="skin"):
 
 
 def arm(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", r_up=0.059, puff=1.0):
-    if ROUND and sleeve != "short":
+    if ROUND:
         return arm_round(g, side, sleeve, top, trim, skin, puff)
     s = 1 if side == "l" else -1
     up, fo = "upper_arm_" + side, "forearm_" + side
@@ -235,8 +236,8 @@ def arm(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", r_up=0.
 
 
 def leg(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.084, boots=False):
-    if ROUND and not boots:
-        return leg_round(g, side, thigh, shin, shoe, cuff, r)
+    if ROUND:
+        return leg_round(g, side, thigh, shin, shoe, cuff, r, boots)
     s = 1 if side == "l" else -1
     th, sh, ft = "thigh_" + side, "shin_" + side, "foot_" + side
     shin = shin or thigh
@@ -282,11 +283,11 @@ def belt(g, w=0.315, d=0.215, color="extra_a", buckle="metal", z=0.985):
     g.box((0.05, 0.012, 0.035), loc=(0, -d / 2 - 0.004, z), color=buckle, bone="hips")
 
 
-def buttons(g, n=3, z0=1.05, z1=1.30, y=-0.108, color="metal", bone="chest", x=0.0):
+def buttons(g, n=3, z0=1.05, z1=1.30, y=-0.108, color="metal", bone="chest", x=0.0, rings=None):
     for i in range(n):
         z = z0 + (z1 - z0) * (i / max(1, n - 1))
         b = bone if z > 1.10 else "spine"
-        yy = torso_front_y(z) - 0.003 if ROUND else y
+        yy = torso_front_y(z, rings) - 0.003 if ROUND else y
         g.box((0.018, 0.01, 0.018), loc=(x, yy, z), color=color, bone=b)
 
 
@@ -313,14 +314,15 @@ def rounded(builder):
     return b
 
 
-def torso_rings(w_top=0.38, w_bot=0.31, d=0.21, z0=0.97, z1=1.385):
+def torso_rings(w_top=0.38, w_bot=0.31, d=0.21, z0=0.97, z1=1.385, belly=0.0):
     """Anneaux (demi-largeur, demi-profondeur, z) du torse: ventre et dos bombés, épaules arrondies."""
     kx_b, kx_t, ky = w_bot / 0.31, w_top / 0.38, d / 0.21
     h = z1 - z0
     # bas de chemise un peu évasé (rangée décalée de 1,5 cm) qui retombe sur la ceinture
-    return [(0.162 * kx_b, 0.124 * ky, z0 - 0.012), (0.166 * kx_b, 0.13 * ky, z0 + 0.05),
-            (0.170 * kx_b, 0.134 * ky, z0 + 0.27 * h),
-            (0.180 * kx_t, 0.132 * ky, z0 + 0.55 * h), (0.180 * kx_t, 0.126 * ky, z0 + 0.77 * h),
+    b = belly * 0.6
+    return [(0.162 * kx_b, 0.124 * ky + b * 0.5, z0 - 0.012), (0.166 * kx_b, 0.13 * ky + b, z0 + 0.05),
+            (0.170 * kx_b, 0.134 * ky + b, z0 + 0.27 * h),
+            (0.180 * kx_t, 0.132 * ky + b * 0.5, z0 + 0.55 * h), (0.180 * kx_t, 0.126 * ky, z0 + 0.77 * h),
             (0.158 * kx_t, 0.112 * ky, z0 + 0.92 * h), (0.098 * kx_t, 0.078 * ky, z1 + 0.012)]
 
 
@@ -351,17 +353,19 @@ def loft8(g, rings, color, bone=None, weights=None, close_bottom=True, close_top
     return g.mesh(pts, faces, color, bone=bone, weights=weights)
 
 
-def head_round(g):
-    """Tête en boule facettée à 12 pans; renvoie (hc, largeur, profondeur, hauteur)."""
-    rx, ry, rz = PHEAD
-    hc = PHC
-    g.head_verts = g.sphere(1.0, loc=(0, 0, hc), color="skin", segs=12, rings=7, scale=(rx, ry, rz),
-                            bone="head")
-    for s in (1, -1):
-        g.sphere(1.0, loc=(s * (rx - 0.004), 0.01, hc - 0.01), color="skin_shade", segs=6, rings=4,
-                 scale=(0.016, 0.032, 0.042), bone="head")
-    g.sphere(1.0, loc=(0, -ry - 0.002, hc - 0.017), color="skin", segs=6, rings=4, scale=(0.024, 0.016, 0.024),
-             bone="head")
+def head_round(g, s=1.0):
+    """Tête en boule facettée à 12 pans (tour de révolution symétrique: arête verticale au milieu du
+    visage, bande de facettes centrée sur les yeux); sommet fixe. Renvoie (hc, largeur, profondeur, hauteur)."""
+    rx, ry, rz = (a * s for a in PHEAD)
+    hc = PHC + PHEAD[2] - rz
+    lats = [-90, -62, -38, -13, 13, 38, 62, 90]
+    prof = [(math.cos(math.radians(a)), math.sin(math.radians(a))) for a in lats]
+    g.head_verts = g.lathe(prof, loc=(0, 0, hc), colors="skin", segs=12, scale=(rx, ry, rz), bone="head")
+    for sx in (1, -1):
+        g.sphere(1.0, loc=(sx * (rx - 0.004), 0.01, hc - 0.01), color="skin_shade", segs=6, rings=4,
+                 scale=(0.016 * s, 0.032 * s, 0.042 * s), bone="head")
+    g.sphere(1.0, loc=(0, -ry - 0.002, hc - 0.017 * s), color="skin", segs=6, rings=4,
+             scale=(0.024 * s, 0.016 * s, 0.024 * s), bone="head")
     return hc, 2 * rx, 2 * ry, 2 * rz
 
 
@@ -373,8 +377,9 @@ def project_on_head(g, start, hx, hy, hz, hc):
     idx = {v: i for i, v in enumerate(hv)}
     polys = [[idx[v] for v in f.verts] for f in {f for v in hv for f in v.link_faces} if all(v in idx for v in f.verts)]
     tree = BVHTree.FromPolygons([v.co.copy() for v in hv], polys)
-    g.bm.verts.ensure_lookup_table()
-    for v in g.bm.verts[start:]:
+    # start: sommets d'avant les traits (un ensemble, pas un indice: bmesh réutilise les places des
+    # sommets supprimés, l'ordre de la liste n'est donc pas chronologique)
+    for v in [v for v in g.bm.verts if v not in start]:
         hit = tree.ray_cast(Vector((v.co.x, -1.0, v.co.z)), Vector((0, 1, 0)))
         if hit[0] is not None:
             off = v.co.y + hy / 2
@@ -382,15 +387,35 @@ def project_on_head(g, start, hx, hy, hz, hc):
             v.co.y = hit[0].y + (off - 0.004 if off < 0 else off)
 
 
-def hair_round(g, style, hc):
-    """Coiffures en masses arrondies: calotte, nuque, mèches en lobes."""
+def hair_round(g, style, hc, s=1.0):
+    """Coiffures en masses arrondies: calotte, nuque, mèches en lobes (s: échelle de la tête)."""
     rx, ry, rz = PHEAD
 
-    def lobe(c, r, segs=8, rings=5, rot=(0, 0, 0)):
-        g.sphere(1.0, loc=(c[0], c[1], hc + c[2]), color="hair", segs=segs, rings=rings, scale=r, rot=rot, bone="head")
+    def lobe(c, r, segs=8, rings=5, rot=(0, 0, 0), color="hair"):
+        g.sphere(1.0, loc=(c[0] * s, c[1] * s, hc + c[2] * s), color=color, segs=segs, rings=rings,
+                 scale=tuple(a * s for a in r), rot=rot, bone="head")
 
+    if style == "sides":  # Firmin, Basile: nuque et côtés, le dessus sous la coiffe
+        lobe((0, 0.09, -0.01), (0.16, 0.1, 0.1))
+        for sx in (1, -1):
+            lobe((sx * 0.165, 0.04, 0.03), (0.04, 0.09, 0.075), segs=6, rings=4)
+        return
     # calotte: ellipsoïde décalé vers le haut et l'arrière, qui laisse front et sourcils libres
     lobe((0, 0.04, 0.06), (rx + 0.014, ry + 0.016, 0.13), segs=12, rings=7)
+    if style == "braids":  # Jeanne: tresses en perles de lobes
+        lobe((0, 0.085, -0.02), (0.15, 0.1, 0.1))
+        for x, z, k2 in ((-0.07, 0.14, 0.9), (0.0, 0.148, 1.0), (0.07, 0.142, 0.85)):
+            lobe((x, -0.105, z), (0.066 * k2, 0.035, 0.044 * k2), segs=6, rings=4, rot=(20, 0, x * 200))
+        for sx in (1, -1):
+            for i in range(4):
+                lobe((sx * 0.19, 0.03, -0.03 - i * 0.055), (0.035 * (1 - i * 0.06), 0.035, 0.04), segs=6, rings=4)
+            lobe((sx * 0.19, 0.03, -0.25), (0.03, 0.025, 0.02), segs=6, rings=3, color="extra_a")
+        return
+    if style == "ponytail":  # Lucie
+        lobe((0, 0.09, -0.02), (0.15, 0.1, 0.1))
+        lobe((0, 0.2, -0.06), (0.06, 0.06, 0.13), segs=8, rings=5, rot=(-12, 0, 0))
+        lobe((0, 0.17, 0.05), (0.035, 0.03, 0.025), segs=6, rings=3, color="extra_b")
+        return
     if style == "short":
         lobe((0, 0.085, -0.03), (0.15, 0.1, 0.1))
         for x, z, s in ((-0.075, 0.143, 0.9), (0.0, 0.15, 1.0), (0.075, 0.145, 0.85)):
@@ -425,8 +450,14 @@ def arm_round(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", p
     up, fo = "upper_arm_" + side, "forearm_" + side
     # épaule ronde qui recouvre le haut du torse
     g.sphere(0.083 * puff, loc=(s * 0.2, 0, 1.305), color=top, segs=8, rings=5, bone=up)
-    g.lathe([(0.058 * puff, 1.075), (0.07 * puff, 1.19), (0.064 * puff, 1.30)], loc=(s * 0.22, 0, 0), colors=top,
-            segs=6, bone=up, close_bottom=False, close_top=False)
+    if sleeve == "short":
+        g.lathe([(0.06 * puff, 1.2), (0.075 * puff, 1.25), (0.07 * puff, 1.31)], loc=(s * 0.215, 0, 0), colors=top,
+                segs=6, bone=up, close_top=False)
+        g.lathe([(0.05, 1.075), (0.058, 1.15), (0.056, 1.22)], loc=(s * 0.22, 0, 0), colors=skin, segs=6, bone=up,
+                close_bottom=False, close_top=False)
+    else:
+        g.lathe([(0.058 * puff, 1.075), (0.07 * puff, 1.19), (0.064 * puff, 1.30)], loc=(s * 0.22, 0, 0), colors=top,
+                segs=6, bone=up, close_bottom=False, close_top=False)
     lower = top if sleeve == "long" else skin
     q = puff if sleeve == "long" else 1.0
     g.sphere(0.058 * q, loc=(s * 0.226, 0, 1.065), color=lower, segs=6, rings=4, bone=fo)
@@ -438,7 +469,7 @@ def arm_round(g, side, sleeve="long", top="top", trim="top_trim", skin="skin", p
         g.lathe([(0.075, 1.035), (0.076, 1.09)], loc=(s * 0.223, 0, 0), colors=trim, segs=6, bone=up)
 
 
-def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.084):
+def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.084, boots=False):
     s = 1 if side == "l" else -1
     th, sh, ft = "thigh_" + side, "shin_" + side, "foot_" + side
     shin = shin or thigh
@@ -451,7 +482,9 @@ def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.0
     g.lathe([(r * 0.56, 0.10), (r * 0.72, 0.2), (r * 0.9, 0.32), (r * 0.84, 0.48)], loc=(x, 0, 0), colors=shin,
             segs=6, bone=sh,
             close_top=False)
-    if cuff:
+    if boots:
+        g.lathe([(r * 0.66, 0.06), (r * 0.8, 0.2), (r * 0.84, 0.235)], loc=(x, 0, 0), colors=shoe, segs=6, bone=sh)
+    elif cuff:
         g.lathe([(r * 0.66, 0.105), (r * 0.7, 0.155)], loc=(x, 0, 0), colors=cuff, segs=6, bone=sh)
     # chaussure en galet, semelle à plat (arête au sol vive)
     vs = g.sphere(1.0, loc=(x, -0.045, 0.055), color=lpl.by_normal(shoe, shoe, "hair_dark" if shoe == "shoes" else shoe),
@@ -461,8 +494,8 @@ def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.0
             v.co.z = 0.0
 
 
-def torso_round(g, w_top=0.38, w_bot=0.30, d=0.22, z0=0.97, z1=1.385, color="top"):
-    loft8(g, torso_rings(w_top, w_bot, d, z0, z1), color, weights=torso_weights, close_bottom=False)
+def torso_round(g, w_top=0.38, w_bot=0.30, d=0.22, z0=0.97, z1=1.385, color="top", belly=0.0):
+    loft8(g, torso_rings(w_top, w_bot, d, z0, z1, belly), color, weights=torso_weights, close_bottom=False)
 
 
 def pelvis_round(g, w=0.31, d=0.21, color="bottom", z0=0.80, z1=1.0):
@@ -532,7 +565,7 @@ def fringe(g, hc, k=1.0, color="hair", z=0.105, w=0.25, h=0.055, tilt=8, parts=1
 
 def hair_style(g, style, hc, k=1.0):
     if ROUND and style in ("short", "bob", "bun"):
-        return hair_round(g, style, hc)
+        return hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
     if style == "short":
         hair_cap(g, hc, k)
         hair_back(g, hc, k, z_bot=-0.05)
@@ -809,14 +842,159 @@ def build_npc(g, who, expr):
         hands(g)
 
 
+def head_round_face(g, expr, s=1.0, **face_kw):
+    """Tête ronde (échelle s, sommet fixe) et traits plaqués; renvoie le centre de la tête."""
+    hc, hx, hy, hz = head_round(g, s)
+    start = set(g.bm.verts)
+    mouth_dy = face_kw.pop("mouth_dy", None)
+    if mouth_dy is not None:
+        face_kw["mouth_y"] = -hy / 2 + mouth_dy
+    face_features(g, hc + 0.004 * s, hy, expr, k=s, eye_k=0.8 * face_kw.pop("eye_k", 1.0), eye_x=0.048, **face_kw)
+    project_on_head(g, start, hx, hy, hz, hc)
+    return hc
+
+
+def hat_top(hc, s=1.0, drop=0.075):
+    """Hauteur de pose d'une coiffe sur la tête ronde (elle descend sur la boule au lieu d'y flotter)."""
+    return hc + (PHEAD[2] - drop) * s
+
+
+def cap_rail_round(g, hc, s=1.0):
+    top = hat_top(hc, s)
+    g.lathe([(0.166 * s, top - 0.01 * s), (0.17 * s, top + 0.045 * s)], loc=(0, 0.005, 0), colors="extra_b", segs=12,
+            bone="head")
+    g.lathe([(0.17 * s, top + 0.045 * s), (0.19 * s, top + 0.1 * s), (0.17 * s, top + 0.125 * s),
+             (0.0, top + 0.13 * s)], loc=(0, 0.01, 0), colors="extra_a", segs=12, close_bottom=False, bone="head")
+    vs = g.sphere(1.0, loc=(0, -0.175 * s, top + 0.0), color="eye", segs=10, rings=4, scale=(0.11 * s, 0.07 * s, 0.014 * s),
+                  rot=(-18, 0, 0), bone="head")
+    g.box((0.04 * s, 0.012 * s, 0.032 * s), loc=(0, -0.172 * s, top + 0.06 * s), color="metal", bevel=0.006,
+          bone="head")
+    return vs
+
+
+def cap_post_round(g, hc, s=1.0):
+    top = hat_top(hc, s, 0.08)
+    g.lathe([(0.168 * s, top), (0.17 * s, top + 0.03 * s), (0.175 * s, top + 0.085 * s), (0.0, top + 0.1 * s)],
+            loc=(0, 0.01, 0), colors="extra_b", segs=12, close_bottom=False, bone="head")
+    g.lathe([(0.172 * s, top - 0.005 * s), (0.172 * s, top + 0.02 * s)], loc=(0, 0.01, 0), colors="top_trim", segs=12,
+            bone="head")
+    g.sphere(1.0, loc=(0, -0.172 * s, top - 0.004), color="eye", segs=10, rings=4, scale=(0.1 * s, 0.06 * s, 0.013 * s),
+             rot=(-15, 0, 0), bone="head")
+
+
+def beret_round(g, hc, s=1.0):
+    top = hat_top(hc, s, 0.05)
+    g.sphere(1.0, loc=(0.012, 0.01, top + 0.02 * s), color="extra_b", segs=12, rings=5, scale=(0.2 * s, 0.195 * s, 0.06 * s),
+             rot=(0, -8, 0), bone="head")
+    g.cyl(0.012 * s, 0.03 * s, loc=(0.01, 0.01, top + 0.08 * s), color="extra_b", segs=5, bone="head")
+
+
+def mustache_round(g, hc, s=1.0, big=False):
+    w = 0.12 if big else 0.09
+    y = -PHEAD[1] * s * 0.96
+    for sx in (1, -1):
+        g.sphere(1.0, loc=(sx * w / 4 * s, y - 0.004, hc - 0.05 * s), color="hair", segs=6, rings=4,
+                 scale=(w / 3.4 * s, 0.022 * s, 0.02 * s), rot=(0, sx * 14, 0), bone="head")
+
+
+def beard_round(g, hc, s=1.0):
+    ry = PHEAD[1] * s
+    g.sphere(1.0, loc=(0, -ry * 0.82, hc - 0.105 * s), color="hair", segs=10, rings=6, scale=(0.15 * s, 0.07 * s, 0.085 * s),
+             bone="head")
+    g.sphere(1.0, loc=(0, -ry * 0.8, hc - 0.165 * s), color="hair", segs=8, rings=5, scale=(0.09 * s, 0.06 * s, 0.05 * s),
+             bone="head")
+    for sx in (1, -1):
+        g.sphere(1.0, loc=(sx * 0.15 * s, -0.04 * s, hc - 0.06 * s), color="hair", segs=6, rings=4,
+                 scale=(0.04 * s, 0.09 * s, 0.07 * s), bone="head")
+
+
+def coat_skirt_round(g, ax, ay, z0, z1, color="top"):
+    """Bas de veste ou de vareuse arrondi (remplace la boîte sous la taille)."""
+    loft8(g, [(ax * 0.98, ay * 0.98, z0), (ax * 1.04, ay * 1.05, z0 + (z1 - z0) * 0.45), (ax, ay, z1)], color,
+          bone="hips")
+
+
+def build_npc_round(g, who, expr):
+    if who == "firmin":
+        hc = head_round_face(g, expr, brow_k=1.6)
+        hair_round(g, "sides", hc)
+        mustache_round(g, hc, big=True)
+        cap_rail_round(g, hc)
+        neck(g)
+        torso_round(g, w_top=0.40, w_bot=0.34, d=0.23, belly=0.05)
+        coat_skirt_round(g, 0.178, 0.135, 0.80, 0.97)
+        collar(g, color="top_trim")
+        buttons(g, n=4, z0=0.86, z1=1.30, y=-0.122, rings=torso_rings(0.40, 0.34, 0.23, belly=0.05))
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="long", puff=1.05)
+            leg_round(g, side, thigh="bottom", cuff="bottom", r=0.088)
+        hands_round(g)
+    elif who == "odette":
+        hc = head_round_face(g, expr, cheek_base=0.55)
+        hair_round(g, "bun", hc)
+        neck(g)
+        torso_round(g, w_top=0.39, w_bot=0.35, d=0.23, belly=0.06)
+        collar(g, color="top_trim", w=0.19)
+        skirt(g, z_top=1.0, z_bot=0.40, r_top=0.21, r_bot=0.34, hem="top_trim", segs=12)
+        apron(g, z_top=1.0, z_bot=0.46, w_top=0.26, w_bot=0.36, color="extra_a", bib_to=1.27, front_r=0.23)
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="rolled", top="top", trim="top_trim", puff=1.08)
+            leg_round(g, side, thigh="extra_b", shin="extra_b", r=0.08)
+        hands_round(g)
+    elif who == "basile":
+        hc = head_round_face(g, expr, mouth_dy=-0.04, brow_k=1.7)
+        hair_round(g, "sides", hc)
+        beard_round(g, hc)
+        mustache_round(g, hc, big=True)
+        beret_round(g, hc)
+        neck(g)
+        torso_round(g, w_top=0.42, w_bot=0.33, d=0.22)
+        pelvis_round(g, w=0.32, d=0.22)
+        collar(g, color="top_trim")
+        apron(g, z_top=0.99, z_bot=0.40, w_top=0.28, w_bot=0.34, color="extra_a", bib_to=1.30, front_r=0.22)
+        g.box((0.11, 0.012, 0.08), loc=(0.05, -0.155, 0.86), color="extra_b", bevel=0.01, bone="hips")
+        g.box((0.012, 0.01, 0.07), loc=(0.07, -0.162, 0.90), color="eye", rot=(0, 10, 0), bone="hips")
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="rolled", puff=1.1)
+            leg_round(g, side, thigh="bottom", cuff="bottom", r=0.09, boots=True)
+        hands_round(g)
+    elif who == "jeanne":
+        s = 1.08
+        hc = head_round_face(g, expr, s=s, eye_k=1.12, cheek_base=0.3)
+        hair_round(g, "braids", hc, s)
+        torso_round(g, w_top=0.33, w_bot=0.30, d=0.20)
+        pelvis_round(g, w=0.30, d=0.20)
+        overall_bib(g, color="bottom", z0=1.0, z1=1.25, straps="bottom")
+        collar(g, color="top_trim", w=0.16)
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="short")
+            leg_round(g, side, thigh="bottom", cuff="top_trim", r=0.085)
+        hands_round(g)
+        g.box((0.07, 0.012, 0.06), loc=(0.0, torso_front_y(1.13, torso_rings(0.33, 0.30, 0.20)) - 0.006, 1.13),
+              color="extra_b", bevel=0.005, bone="spine")
+    elif who == "lucie":
+        hc = head_round_face(g, expr)
+        hair_round(g, "ponytail", hc)
+        cap_post_round(g, hc)
+        neck(g)
+        torso_round(g, w_top=0.37, w_bot=0.30, d=0.21)
+        coat_skirt_round(g, 0.162, 0.122, 0.84, 0.98)
+        collar(g, color="top_trim")
+        buttons(g, n=4, z0=0.90, z1=1.30, y=-0.11, color="top_trim", rings=torso_rings(0.37, 0.30, 0.21))
+        satchel(g)
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="long", trim="top_trim")
+            leg_round(g, side, thigh="bottom", cuff="bottom")
+        hands_round(g)
+
+
 def build_player_base(g, expr):
     if ROUND:
         hc, hx, hy, hz = head_round(g)
-        g.bm.verts.ensure_lookup_table()
-        start = len(g.bm.verts)
+        start = set(g.bm.verts)
         # traits à la taille d'origine, yeux réduits et rapprochés: chaque trait tient sur une facette
         # (arête verticale au milieu du visage, bande de facettes centrée sur les yeux)
-        face_features(g, hc + 0.004, hy, expr, k=1.0, eye_k=0.8, eye_x=0.048)
+        face_features(g, hc + 0.004, hy, expr, k=1.0, eye_k=0.8, eye_x=0.048, lid=0.0065)
         project_on_head(g, start, hx, hy, hz, hc)
         neck(g)
         hands_round(g)
@@ -1154,7 +1332,7 @@ def main():
     for s in SYMBOLS:
         add("player_scarf_" + s, "player_a", rounded(lambda g, e, s=s: scarf(g, s)), False)
     for n in NPCS:
-        ob = add("villager_" + n, n, lambda g, e, n=n: build_npc(g, n, e), True)
+        ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
             ob["scale"] = 0.75
 

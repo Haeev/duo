@@ -88,7 +88,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 ## Fiche par modèle
 
 
-### `personnages.glb` (2299 Ko)
+### `personnages.glb` (2168 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -105,11 +105,11 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 | `player_scarf_sun` | 276 |
 | `player_scarf_planet` | 224 |
 | `player_scarf_comet` | 220 |
-| `villager_firmin` | 2160 |
-| `villager_odette` | 2156 |
-| `villager_basile` | 2324 |
-| `villager_jeanne` | 2588 |
-| `villager_lucie` | 2292 |
+| `villager_firmin` | 1806 |
+| `villager_odette` | 1826 |
+| `villager_basile` | 2054 |
+| `villager_jeanne` | 2162 |
+| `villager_lucie` | 1986 |
 
 | Animation | Durée (s) | Boucle |
 |---|---|---|
