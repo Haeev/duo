@@ -2,6 +2,8 @@
 // l'invité, reliés par le faux hôte, pendant de longues minutes. On relève les erreurs et les
 // avertissements de la console, les arrêts de la plateforme, les écarts entre les deux écrans
 // (jour, heure, bourse), les tâches longues, le tas JavaScript, et une capture à chaque matin.
+// Démo de deux semaines (`docs/jeux/jeu-1/semaine-2.md`): au jour 8 à 16 h, la commande 1 est payée
+// et la partie continue; caisse expédiée le soir, commande 2 et caisse rouverte au matin du jour 9.
 //
 // Le robot n'existe qu'en développement (`import.meta.env.DEV`): construire le jeu ainsi, puis
 //   NODE_ENV=development pnpm --filter @duo/la-petite-ligne exec vite build --outDir <dossier>/dist
@@ -17,6 +19,24 @@ const MINUTES = Number(process.env.LPL_E2E_ENDURANCE_MIN ?? 0);
 const SAMPLE_MS = 15_000;
 /** Intervalle entre deux mesures du tas. */
 const HEAP_EVERY_MS = 5 * 60_000;
+/** Dernier jour de la démo (départ du train du jour 15). */
+const LAST_DAY = 15;
+/** Soir du jour 8: caisse expédiée, partie qui continue. */
+const EVENING = 18 * 60;
+
+interface Checkpoint {
+  t: number;
+  phase: string;
+  day: number;
+  minutes: number;
+  orderIndex: number;
+  orderResult: unknown;
+  orderHistory: unknown;
+  secondOrder: string | null;
+  crate: unknown;
+  objectiveHost: string | null;
+  objectiveGuest: string | null;
+}
 
 interface Hud {
   day: number | null;
@@ -49,6 +69,15 @@ async function readHud(game: FrameLocator): Promise<Hud> {
   };
 }
 
+async function objective(game: FrameLocator): Promise<string | null> {
+  return game
+    .getByRole('region', { name: 'Prochain objectif' })
+    .getByRole('heading')
+    .first()
+    .textContent({ timeout: 5_000 })
+    .catch(() => null);
+}
+
 function countByText(lines: readonly string[]): Record<string, number> {
   const out: Record<string, number> = {};
   for (const line of lines) out[line.slice(0, 200)] = (out[line.slice(0, 200)] ?? 0) + 1;
@@ -66,6 +95,25 @@ test('endurance à deux navigateurs: les robots jouent chez l’hôte et chez l�
   const mornings: { t: number; day: number; minutes: number }[] = [];
   const heap: { t: number; host: number | null; guest: number | null }[] = [];
   const stops: string[] = [];
+  const checkpoints: Record<string, Checkpoint> = {};
+  const checkpoint = async (name: string): Promise<void> => {
+    const w = probe.world();
+    if (w === null) return;
+    const [objectiveHost, objectiveGuest] = await Promise.all([objective(hostGame), objective(guestGame)]);
+    checkpoints[name] = {
+      t: elapsed(),
+      phase: w.phase,
+      day: w.clock.day,
+      minutes: Math.round(w.clock.minutes),
+      orderIndex: w.orderIndex,
+      orderResult: w.orderResult,
+      orderHistory: w.orderHistory,
+      secondOrder: w.quests.find((q) => q.id === 'second_order')?.status ?? null,
+      crate: w.crate,
+      objectiveHost,
+      objectiveGuest,
+    };
+  };
   const elapsed = (): number => Math.round((Date.now() - started) / 1000);
   const measureHeap = async (): Promise<void> => {
     heap.push({ t: elapsed(), host: await heapUsed(host).catch(() => null), guest: await heapUsed(guest).catch(() => null) });
@@ -99,7 +147,18 @@ test('endurance à deux navigateurs: les robots jouent chez l’hôte et chez l�
         await host.screenshot({ path: testInfo.outputPath(`matin-jour-${w.clock.day}-hote.png`) });
         await guest.screenshot({ path: testInfo.outputPath(`matin-jour-${w.clock.day}-invite.png`) });
       }
-      if (w?.phase === 'ended') break;
+      // Passage de la semaine 1 à la semaine 2.
+      if (w !== null && w.orderHistory.length >= 1 && checkpoints.paid1 === undefined) await checkpoint('paid1');
+      if (w !== null && w.clock.day === 8 && w.clock.minutes >= EVENING && checkpoints.evening8 === undefined) {
+        await checkpoint('evening8');
+        await host.screenshot({ path: testInfo.outputPath('soir-jour-8-hote.png') });
+        await guest.screenshot({ path: testInfo.outputPath('soir-jour-8-invite.png') });
+      }
+      if (w !== null && w.clock.day === 9 && checkpoints.morning9 === undefined) await checkpoint('morning9');
+      if (w?.phase === 'ended') {
+        await checkpoint('ended');
+        break;
+      }
       if (Date.now() - lastHeap >= HEAP_EVERY_MS) {
         lastHeap = Date.now();
         await measureHeap();
@@ -132,6 +191,7 @@ test('endurance à deux navigateurs: les robots jouent chez l’hôte et chez l�
       longTasks: { host: stats(tasks.host), guest: stats(tasks.guest) },
       clockGapMinutes: { samples: clockGaps.length, max: Math.max(0, ...clockGaps), over15: clockGaps.filter((d) => d > 15).length },
       purseMismatches: purseMismatches.map((s) => ({ t: s.t, host: s.host.purse, guest: s.guest.purse })),
+      checkpoints,
       maxWorldBytes: probe.maxWorldBytes(),
       samples,
     };
@@ -145,4 +205,24 @@ test('endurance à deux navigateurs: les robots jouent chez l’hôte et chez l�
   expect(stops, 'aucun arrêt de la plateforme').toEqual([]);
   expect(duo.errors, 'aucune erreur de page').toEqual([]);
   expect(probe.maxWorldBytes()).toBeLessThan(64 * 1024);
+  // La démo ne finit pas avant le départ du train du jour 15.
+  const ended = checkpoints.ended;
+  if (ended !== undefined) expect(ended.day, 'fin de la démo au jour 15').toBe(LAST_DAY);
+  // Passage du jour 8 (si la séance a duré assez): commande 1 payée complète, partie qui continue,
+  // caisse expédiée le soir, commande 2 active et caisse rouverte au matin du jour 9.
+  const paid = checkpoints.paid1;
+  if (paid !== undefined) {
+    expect((paid.orderHistory as { complete: boolean; amount: number }[])[0]).toMatchObject({ complete: true, amount: 540 });
+  }
+  const evening = checkpoints.evening8;
+  if (evening !== undefined) {
+    expect(evening.phase, 'la partie continue après le train du jour 8').not.toBe('ended');
+    expect(evening.orderResult, 'caisse expédiée le soir du jour 8').toMatchObject({ complete: true, amount: 540 });
+  }
+  const morning = checkpoints.morning9;
+  if (morning !== undefined) {
+    expect(morning.orderIndex, 'commande 2 en cours').toBe(1);
+    expect(morning.orderResult, 'caisse rouverte').toBeNull();
+    expect(morning.secondOrder).toBe('active');
+  }
 });
