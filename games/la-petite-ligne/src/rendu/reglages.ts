@@ -60,8 +60,10 @@ export const RENDER_SETTINGS = {
       path: 0,
       dirt: 0,
       gravel: 0.03,
-      // Platelage du passage à niveau: au ras des rails (dessus des traverses couvert, le champignon du rail affleure).
-      wood: 0.27,
+      // Platelage du passage à niveau: il couvre le dessus des traverses (0,28 m: voie posée à 0,06 m,
+      // traverses de 22 cm) et laisse dépasser le champignon du rail (0,37 m). À 0,27, les traverses
+      // perçaient les planches.
+      wood: 0.3,
       floor: 0.12,
       water: -0.42,
       rail: 0.06,
@@ -94,10 +96,18 @@ export const RENDER_SETTINGS = {
      */
     scatterFarViewWidth: 30,
     scatterFarShare: 0.5,
-    /** Taille des morceaux de décor fusionnés (découpage pour l'élimination hors champ). */
-    chunkSize: 20,
+    /**
+     * Morceaux de décor fusionnés (élimination hors champ, dans la vue et dans
+     * la passe d'ombre): cases de `chunkSize` m. Une case de moins de
+     * `chunkMergeBelow` triangles rejoint les autres petites cases de son bloc
+     * de `chunkMergeBlock` x `chunkMergeBlock` cases: découpage fin autour des
+     * bâtiments, peu d'appels de dessin pour les lampadaires et les clôtures.
+     */
+    chunkSize: 12,
+    chunkMergeBlock: 2,
+    chunkMergeBelow: 3000,
     /** Tronçons de la forêt du pourtour et des rails (m): éliminés hors du cadre. */
-    stripSegment: 20,
+    stripSegment: 12,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
     /** Berges de la rivière: la pente descend sous l'eau sur cette largeur (m), dans la case d'eau. */
@@ -136,6 +146,30 @@ export const RENDER_SETTINGS = {
      * près, et le quai son liseré: on s'en tient aux tout petits accessoires.
      */
     shadowlessBelow: 0.3,
+  },
+
+  /** Passe d'ombre (budget de triangles et d'appels du PC de référence). */
+  shadowCasters: {
+    /**
+     * Tri fin (`ombre-tri.ts`): ce dont l'ombre ne peut tomber dans la vue sort
+     * de la passe d'ombre. Hauteurs (m) de l'empreinte qui reçoit l'ombre: du
+     * lit de la rivière au faîte des toits; marge (m) pour le flou du bord.
+     */
+    cull: true as boolean,
+    receiverHeights: [-0.5, 2, 6] as readonly number[],
+    margin: 0.5,
+    /**
+     * Pièces sans ombre visible, par nom de nœud: roues et bielles sous les
+     * voitures (dans l'ombre de la caisse), cadre accroché au mur, plancher de
+     * 15 cm de la maisonnette (sous ses murs). Les poules gardent la leur: à
+     * midi, sans elle, elles flottent au-dessus de l'herbe.
+     */
+    shadowlessParts: [
+      /_wheels(_\d+)?$/,
+      /_rod_[lr]$/,
+      /^picture_frame$/,
+      /^gatekeeper_house_(ruin|repaired)_floor$/,
+    ] as readonly RegExp[],
   },
 
   /**

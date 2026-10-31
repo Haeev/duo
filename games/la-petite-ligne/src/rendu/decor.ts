@@ -2,8 +2,9 @@
  * Décor statique de la carte (bâtiments, quai, arbres et buissons du décor,
  * barrières, lampadaires...): chaque objet est tiré de son modèle GLB par nom de
  * nœud (ou de son substitut), puis tout est fusionné par matériau et par
- * morceau de 16 m de côté. Quelques dizaines d'appels de dessin pour tout le
- * bourg, et l'élimination hors champ garde son effet.
+ * morceau (`RENDER_SETTINGS.terrain.chunkSize`, petits morceaux regroupés).
+ * Quelques dizaines d'appels de dessin pour tout le bourg, et l'élimination
+ * hors champ garde son effet.
  *
  * Les objets qui changent (maisonnette, poulailler, remise, barrières du
  * passage à niveau) sont laissés aux parties qui les animent.
@@ -33,6 +34,7 @@ const SHADOWLESS = ':sans-ombre';
 const FLOOR_MODELS: ReadonlySet<string> = new Set(Object.keys(RENDER_SETTINGS.floorProps));
 
 const KEPT_ATTRIBUTES = ['position', 'normal', 'uv'] as const;
+const VERTICES_PER_TRIANGLE = 3;
 const Y_AXIS = new Vector3(0, 1, 0);
 
 /** Emprise d'un objet à la rotation 0 (la carte donne le rectangle déjà tourné). */
@@ -88,8 +90,12 @@ export class StaticDecor {
 
   constructor(map: GameMap, library: ModelLibrary, terrain: Terrain, resources: ResourceTracker) {
     this.group.name = 'decor';
-    const buckets = new Map<string, { material: Material; geometries: BufferGeometry[] }>();
-    const chunk = RENDER_SETTINGS.terrain.chunkSize;
+    const settings = RENDER_SETTINGS.terrain;
+    const chunk = settings.chunkSize;
+    const block = settings.chunkMergeBlock;
+    const pieces: { cell: string; block: string; material: Material; geometry: BufferGeometry }[] =
+      [];
+    const cellTriangles = new Map<string, number>();
     const placement = new Matrix4();
     const world = new Matrix4();
     for (const prop of map.props) {
@@ -101,15 +107,13 @@ export class StaticDecor {
       propMatrix(prop, ground, placement);
       // Tout petits objets: hors de la passe d'ombre (morceaux à part, même découpage).
       // Les sols gardent la leur: le liseré d'ombre au bord du quai se voit de près.
-      const caster = !(prop.height > 0 && prop.height <= RENDER_SETTINGS.terrain.shadowlessBelow);
-      const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}${caster ? '' : SHADOWLESS}`;
+      const caster = !(prop.height > 0 && prop.height <= settings.shadowlessBelow);
+      const suffix = caster ? '' : SHADOWLESS;
+      const cx = Math.floor(prop.pos.x / chunk);
+      const cy = Math.floor(prop.pos.y / chunk);
+      const cell = `${cx}:${cy}${suffix}`;
+      const blockKey = `${Math.floor(cx / block)}:${Math.floor(cy / block)}+${suffix}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
-        const bucketKey = `${key}|${part.material.uuid}`;
-        let bucket = buckets.get(bucketKey);
-        if (bucket === undefined) {
-          bucket = { material: part.material, geometries: [] };
-          buckets.set(bucketKey, bucket);
-        }
         world.multiplyMatrices(placement, part.matrix);
         const hand = CLOCK_HAND.exec(part.name);
         if (hand !== null) {
@@ -124,8 +128,22 @@ export class StaticDecor {
           });
           continue;
         }
-        bucket.geometries.push(bakeGeometry(part.geometry, world));
+        const geometry = bakeGeometry(part.geometry, world);
+        pieces.push({ cell, block: blockKey, material: part.material, geometry });
+        const triangles = geometry.getAttribute('position').count / VERTICES_PER_TRIANGLE;
+        cellTriangles.set(cell, (cellTriangles.get(cell) ?? 0) + triangles);
       }
+    }
+    const buckets = new Map<string, { material: Material; geometries: BufferGeometry[] }>();
+    for (const piece of pieces) {
+      const heavy = (cellTriangles.get(piece.cell) ?? 0) >= settings.chunkMergeBelow;
+      const bucketKey = `${heavy ? piece.cell : piece.block}|${piece.material.uuid}`;
+      let bucket = buckets.get(bucketKey);
+      if (bucket === undefined) {
+        bucket = { material: piece.material, geometries: [] };
+        buckets.set(bucketKey, bucket);
+      }
+      bucket.geometries.push(piece.geometry);
     }
     for (const [key, bucket] of buckets) {
       if (bucket.geometries.length === 0) {

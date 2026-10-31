@@ -16,6 +16,7 @@ import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
+import { applyShadows } from './ombre-tri';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -152,10 +153,7 @@ export class RailwayPart implements EventfulPart {
       // Les voitures de l'artiste sont dans l'axe X (avant vers +X): la voie va d'ouest en est.
       const object = library.instantiate(name);
       object.position.set(x + length / 2, 0, 0);
-      object.traverse((child) => {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      });
+      applyShadows(object);
       this.train.add(object);
       this.cars.push(object);
       const roll = clips.find((clip) => clip.name === `${name}_roll`);

@@ -34,6 +34,7 @@ import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
+import { applyShadows } from './ombre-tri';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -137,10 +138,7 @@ class StagedBuilding {
       ? library.instantiate(names.repaired, propHints(prop))
       : this.ruin;
     for (const model of new Set([this.ruin, this.repaired])) {
-      model.traverse((object) => {
-        object.castShadow = true;
-        object.receiveShadow = true;
-      });
+      applyShadows(model);
       this.group.add(model);
     }
     host.add(this.group);
@@ -524,10 +522,7 @@ export class HousePart implements EventfulPart {
       width: size.w,
       depth: size.d,
     });
-    object.traverse((child) => {
-      child.castShadow = true;
-      child.receiveShadow = true;
-    });
+    applyShadows(object);
     return object;
   }
 

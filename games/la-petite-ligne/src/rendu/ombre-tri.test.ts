@@ -119,10 +119,17 @@ describe('pièces sans ombre visible', () => {
       'van_wheels_2',
       'coach_wheels',
       'locomotive_rod_l',
+      'gatekeeper_house_ruin_floor',
     ]) {
       expect(castsVisibleShadow(name), name).toBe(false);
     }
-    for (const name of ['locomotive_body', 'hen_white', 'bell_post', 'table', 'player_base']) {
+    for (const name of [
+      'locomotive_body',
+      'hen_white',
+      'bell_post',
+      'table',
+      'gatekeeper_house_ruin_wall_left',
+    ]) {
       expect(castsVisibleShadow(name), name).toBe(true);
     }
     const root = new Group();
