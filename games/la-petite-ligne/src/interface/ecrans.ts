@@ -11,6 +11,7 @@ import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
 import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, ordersDetail, outfitTakenByPartner } from './modele';
+import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -443,6 +444,7 @@ export class BreakfastScreen implements Layer {
   private readonly start: HTMLButtonElement;
   private readonly partner: HTMLSpanElement;
   private readonly help: HTMLParagraphElement;
+  private readonly confidence: HTMLDivElement;
   private sig = '';
 
   constructor(host: UiHost) {
@@ -459,11 +461,13 @@ export class BreakfastScreen implements Layer {
     }, { class: 'lpl-button lpl-button--primary lpl-button--large' });
     this.partner = el('span', { class: 'lpl-player-name' });
     this.help = el('p', { class: 'lpl-field__help' });
+    this.confidence = el('div', { class: 'lpl-confidence', role: 'note', hidden: true });
     this.root = screen(
       'scene',
       titleId,
       sheet('42rem', [
         el('div', { class: 'lpl-breakfast__head' }, [this.face, el('div', {}, [this.overline, this.title, this.lead])]),
+        this.confidence,
         this.list,
         el('div', { class: 'lpl-sheet__actions' }, [this.start, this.partner]),
         this.help,
@@ -486,7 +490,8 @@ export class BreakfastScreen implements Layer {
     const todays = world.letters.filter((l) => l.day === world.clock.day);
     const eggs = world.groundItems.filter((i) => i.item === 'egg').reduce((s, i) => s + i.count, 0);
     const partnerName = nameOf(world, ctx.partner);
-    const sig = JSON.stringify([me.form, me.appearance, world.clock.day, world.weather, envie?.id, shared?.id, todays.length, eggs, other?.breakfastDone, partnerName]);
+    const hint = momentHintModel(world, ctx);
+    const sig = JSON.stringify([me.form, me.appearance, world.clock.day, world.weather, envie?.id, shared?.id, todays.length, eggs, other?.breakfastDone, partnerName, hint]);
     if (sig === this.sig) return;
     this.sig = sig;
 
@@ -500,6 +505,7 @@ export class BreakfastScreen implements Layer {
     setText(this.title, form.name);
     setText(this.lead, ctx.t(`« ${form.text} »`));
 
+    this.renderConfidence(hint);
     clear(this.list);
     if (envie !== null && envie !== undefined) {
       this.list.append(
@@ -527,6 +533,25 @@ export class BreakfastScreen implements Layer {
       this.help.append(icon('ui-pause'), ` ${ctx.t(b.clockHelp, { time: hourLabel(ctx.content.settings.clock.dayStart, ctx.texts.game.ui.hud.time) })}`);
     }
     setHidden(this.help, other?.breakfastDone === true);
+  }
+
+  /**
+   * La confidence du matin, chez son destinataire seul: un billet plié, en tête du matin, qui
+   * dit où et quand, et rappelle que l'autre n'en sait rien (de quoi avoir envie de le lui dire).
+   */
+  private renderConfidence(hint: MomentHintModel | null): void {
+    setHidden(this.confidence, hint === null);
+    clear(this.confidence);
+    if (hint === null) return;
+    this.confidence.append(
+      el('span', { class: 'lpl-confidence__head' }, [
+        icon('ui-whisper'),
+        el('strong', { class: 'lpl-confidence__overline', text: hint.overline }),
+        el('span', { class: 'lpl-secret__chip', text: hint.chip }),
+      ]),
+      el('p', { class: 'lpl-confidence__text', text: hint.text }),
+      el('p', { class: 'lpl-confidence__help' }, [token('other', this.host.symbol('other'), 'small'), hint.help]),
+    );
   }
 
   defaultFocus(): HTMLElement | null {

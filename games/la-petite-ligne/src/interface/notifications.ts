@@ -7,18 +7,26 @@ import type { GameNotification, NotificationKind } from '../etat/types';
 import { type RefusalTexts, isRefusal } from './refus';
 import { fill, type TextVars } from './format';
 
-export type ToastVariant = '' | 'error' | 'event';
+/**
+ * `moment`: l'apogée d'un moment rare, vue à deux; `whisper`: ce qui n'est dit qu'à un seul
+ * (confidence du matin, coup de coude de R16); `hen`: une poule qui réagit à son nom.
+ */
+export type ToastVariant = '' | 'error' | 'event' | 'moment' | 'whisper' | 'hen';
 
 export interface ToastVisual {
   variant: ToastVariant;
   icon: string;
   /** Le jeton de l'autre joueur à la place de l'icône (« Déjà pris par Sacha. »). */
   partnerToken: boolean;
+  /** Réplique de la poule à ajouter (un mauvais nom: « Cot ? »). */
+  henAside?: boolean;
 }
 
 const plain = (icon: string): ToastVisual => ({ variant: '', icon, partnerToken: false });
 const error = (icon: string): ToastVisual => ({ variant: 'error', icon, partnerToken: false });
 const event = (icon: string): ToastVisual => ({ variant: 'event', icon, partnerToken: false });
+const moment = (): ToastVisual => ({ variant: 'moment', icon: 'ui-eye', partnerToken: false });
+const whisper = (): ToastVisual => ({ variant: 'whisper', icon: 'ui-whisper', partnerToken: false });
 
 /** Style de chaque message de `textes.json` (clé absente: style selon la sorte de notification). */
 const MESSAGE_VISUALS: Readonly<Record<string, ToastVisual>> = {
@@ -67,7 +75,26 @@ const MESSAGE_VISUALS: Readonly<Record<string, ToastVisual>> = {
   fine_quality: plain('ui-star'),
   riddle_not_yet: plain('ui-hourglass'),
   nothing_here: plain('ui-note'),
+  // Moments rares (tour 6): l'apogée et l'invitation à montrer, la pause de l'échelle.
+  heron_seen: moment(),
+  geese_seen: moment(),
+  moment_notice: event('ui-eye'),
+  ladder_hold_on: plain('ui-eye'),
+  ladder_hold_taken: { variant: '', icon: '', partnerToken: true },
+  // Informations propres (R16): ce qui n'est dit qu'à un seul, et les poules qui répondent.
+  secret_nudge_hens: whisper(),
+  secret_nudge_lucie: whisper(),
+  hen_names_informed_call: whisper(),
+  secret_first_try: event('ui-star'),
+  hen_named_right: { variant: 'hen', icon: 'hen', partnerToken: false },
+  hen_named_wrong: { variant: 'hen', icon: 'hen', partnerToken: false, henAside: true },
 };
+
+/** Textes des moments rares nommés par motif (`moment_<id>_climax`, `moment_<id>_hint`): un moment ajouté a son style. */
+const MOMENT_PATTERNS: readonly { pattern: RegExp; visual: ToastVisual }[] = [
+  { pattern: /^moment_[a-z_]+_climax$/, visual: moment() },
+  { pattern: /^moment_[a-z_]+_hint$/, visual: whisper() },
+];
 
 const KIND_VISUALS: Readonly<Record<NotificationKind, ToastVisual>> = {
   hint: plain('ui-note'),
@@ -111,7 +138,7 @@ export function toastVisual(
   refusal: RefusalTexts = { missingTemplate: null },
 ): ToastVisual {
   const key = notification.key ?? messageKeyOf(notification.text, messages);
-  const known = key === null ? undefined : MESSAGE_VISUALS[key];
+  const known = key === null ? undefined : (MESSAGE_VISUALS[key] ?? MOMENT_PATTERNS.find((p) => p.pattern.test(key))?.visual);
   if (known !== undefined) return known;
   // Un refus sans style propre (refus de pose, coin de l'autre, matériaux manquants): le style d'erreur.
   if (isRefusal({ kind: notification.kind, key, text: notification.text }, refusal)) return error('ui-warning');

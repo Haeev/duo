@@ -21,6 +21,8 @@ const GameUiSchema = v.object({
     questDone: str,
     /** En-tête de la fiche secrète (R16) au carnet. */
     secretCard: str,
+    /** Ligne « Aujourd'hui » du carnet: la confidence du matin (moments rares). */
+    momentHint: str,
     hud: strings(['purse', 'day', 'time', 'nextGoal'] as const),
     shop: strings(['title', 'buy', 'sell', 'price', 'close'] as const),
     catalogue: strings(['title', 'subtitle', 'order'] as const),
@@ -264,6 +266,16 @@ const SupplementSchema = v.object({
   proposal: strings(['from', 'mine', 'received', 'sent', 'receivedNote', 'acceptedGrocery', 'acceptedCatalogue', 'enterHint', 'you'] as const),
   build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store', 'corner'] as const),
   corner: strings(['designate', 'move'] as const),
+  /** Moments rares (tour 6): ligne d'observation sous l'horloge, confidence du matin. */
+  moments: v.object({
+    ...strings(['watchLabel', 'partnerReady', 'partnerNotSettled', 'partnerLetGo', 'hintOverline', 'hintChip', 'hintHelp'] as const).entries,
+    pose: strings(['close', 'tooClose', 'still', 'facing', 'stillFacing', 'seated', 'hold'] as const),
+  }),
+  /** Informations propres (R16): fiches du carnet et appel des poules. */
+  secrets: v.object({
+    ...strings(['mineHelp', 'nudge', 'sharedChip', 'askChip', 'askTitle', 'askText', 'henCallTitle', 'henFound', 'henCallHelp'] as const).entries,
+    henWrongAsides: v.pipe(v.array(str), v.minLength(1)),
+  }),
   /** Messages de la simulation que `textes.json` n'a pas encore (clés de `messages`); ceux de `textes.json` priment. */
   messages: v.record(v.string(), str),
   night: strings([

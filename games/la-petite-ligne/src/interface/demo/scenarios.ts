@@ -9,6 +9,7 @@ import type { CharacterId, ItemStack } from '../../etat/types';
 import type { Sim } from '../../simulation/contexte';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
+import { benchById, seatPlace } from '../../etat/bancs';
 
 const HOUR = 60;
 const MAX_TICKS = 400_000;
@@ -79,8 +80,63 @@ function near(sim: Sim, id: CharacterId, point: string, dx = 0.9, dy = 0.4): voi
   if (p !== undefined) teleport(sim, id, p.x + dx, p.y + dy);
 }
 
-/** Prépare la situation demandée. `me`: le personnage de cette page. */
-export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
+// ---------------------------------------------------------------------------
+// Tour 6: moments rares et informations propres. Les rôles ne dépendent pas de la page: avec la
+// graine de la démo, p1 est l'informé des poules, p2 celui du mot de Lucie; `joueur=p1` et
+// `joueur=p2` montrent les deux écrans d'une même situation.
+
+/** Quelques pas sans entrée (personne ne bouge): la simulation recalcule ce que chacun remplit. */
+function idle(sim: Sim, ticks: number): void {
+  for (let i = 0; i < ticks; i++) step(sim, { controls: {}, intents: [] });
+}
+
+/** Les robots vont voir le héron du jour 6 et regardent ensemble, l'anneau à moitié. */
+function heronTogether(sim: Sim): void {
+  playUntil(sim, (s) => s.world.moments.today?.id === 'heron' && s.world.moments.today.phase === 'waiting' && s.world.moments.today.watchTicks >= 50);
+}
+
+/** Les poules à nommer: Odette s'est confiée à l'informé (p1), personne n'a encore appelé. */
+function hensToName(sim: Sim): void {
+  playUntil(sim, (s) => {
+    const entry = s.world.secrets.entries.find((e) => e.quest === 'hen_names');
+    return entry?.revealed === true && s.world.phase === 'day' && s.world.characters.every((c) => c.dialogue === null && c.menu === null);
+  });
+}
+
+/** L'autre (p2) près de la première poule sans nom, la conversation « Comment s'appelle... ? » ouverte. */
+function callHen(sim: Sim, doer: CharacterId): boolean {
+  const hen = sim.world.hens.find((h) => h.namedBy === null);
+  if (hen === undefined) return false;
+  // Le geste précédent finit avant qu'Agir reparte (l'appui est gardé en attendant).
+  idle(sim, 15);
+  teleport(sim, doer, hen.pos.x + 0.7, hen.pos.y + 0.3);
+  // Agir vise ce qui est devant soi: on se tourne vers la poule.
+  character(sim, doer).facing = Math.atan2(-0.3, -0.7);
+  apply(sim, doer, [{ type: 'act' }]);
+  for (let i = 0; i < 30 && character(sim, doer).dialogue === null; i++) idle(sim, 1);
+  return character(sim, doer).dialogue !== null;
+}
+
+/** Un mauvais nom pour la poule appelée (le premier nom qui n'est pas le sien). */
+function answerWrong(sim: Sim, doer: CharacterId): void {
+  const d = character(sim, doer).dialogue;
+  const hen = sim.world.hens.find((h) => h.id === d?.villager);
+  const wrong = sim.world.hens.findIndex((h) => h.name !== hen?.name && h.namedBy === null);
+  apply(sim, doer, [{ type: 'dialogue_choice', choice: `name:${String(Math.max(0, wrong))}` }]);
+}
+
+function answerRight(sim: Sim, doer: CharacterId): void {
+  const d = character(sim, doer).dialogue;
+  const index = sim.world.hens.findIndex((h) => h.id === d?.villager);
+  apply(sim, doer, [{ type: 'dialogue_choice', choice: `name:${String(Math.max(0, index))}` }]);
+}
+
+/**
+ * Prépare la situation demandée. `me`: le personnage de cette page. Renvoie parfois la suite à
+ * jouer une fois l'interface montée (une notification déjà là au montage est ancienne et ne
+ * s'affiche pas): la page l'appelle juste après sa première image, les tests aussitôt.
+ */
+export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
   const day5 = (): void => {
     playUntil(sim, (s) => at(s, 5, 9 * HOUR + 20));
@@ -230,7 +286,102 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
     case 'fin':
       playUntil(sim, (s) => s.world.phase === 'ended');
       return;
-    default:
+    case 'moment-ensemble':
+      heronTogether(sim);
       return;
+    case 'moment-partenaire':
+      // p1 regarde le héron, p2 est reparti vers la place.
+      heronTogether(sim);
+      near(sim, 'p2', 'notice_board');
+      idle(sim, 2);
+      return;
+    case 'moment-pose': {
+      // p1 arrive au bord du gué en tournant le dos au héron; p2 est déjà en place.
+      heronTogether(sim);
+      const c = character(sim, 'p1');
+      c.facing += Math.PI;
+      idle(sim, 2);
+      return;
+    }
+    case 'moment-oies': {
+      // Assis à deux sur le banc de la berge avant 16 h 30: les oies se reposent encore.
+      playUntil(sim, (s) => s.world.moments.today?.id === 'geese' && s.world.moments.today.phase === 'waiting' && s.world.clock.minutes >= 15 * HOUR);
+      const bench = benchById(sim.map, 'riverbank_bench');
+      if (bench === null) return;
+      (['p1', 'p2'] as const).forEach((id, slot) => {
+        const place = seatPlace(bench, slot, sim.content.settings.benches, { x: 0, y: 0, facing: 0 });
+        teleport(sim, id, place.x, place.y);
+        const c = character(sim, id);
+        c.facing = place.facing;
+        c.seat = { bench: bench.id, slot, since: sim.world.tick };
+      });
+      idle(sim, 2);
+      return;
+    }
+    case 'moment-echelle': {
+      // Pause de l'échelle: p1 a lâché, p2 tient (situation posée à la main: la graine de la démo
+      // ne tire pas l'échelle; à regarder avec `temps=arrete`).
+      heronTogether(sim);
+      const today = sim.world.moments.today;
+      if (today !== null) sim.world.moments.today = { ...today, id: 'ladder', origin: 'quest', phase: 'climax', paused: true, elapsed: 2.5, watchTicks: 0 };
+      near(sim, 'p1', 'nest_oak_basile', -2.2, 0.4);
+      near(sim, 'p2', 'nest_oak_basile', 1.2, 0.4);
+      character(sim, 'p1').holding = null;
+      character(sim, 'p2').holding = 'ladder_hold_south';
+      return;
+    }
+    case 'confidence':
+    case 'carnet-confidence': {
+      // Une confidence du matin pour p1 seul (les mésanges de Basile); p2 n'a rien.
+      playUntil(sim, (s) => s.world.phase === 'breakfast' && s.world.clock.day >= 5);
+      const today = sim.world.moments.today;
+      const base = today ?? {
+        id: 'tits', origin: 'ambient' as const, day: sim.world.clock.day, phase: 'absent' as const, phaseTick: sim.world.tick, startTick: null,
+        elapsed: 0, paused: false, watchTicks: 0, watching: { p1: false, p2: false }, early: false, noticed: [], hintTo: null, shyUntil: 0,
+      };
+      sim.world.moments.today = { ...base, id: 'tits', origin: 'ambient', phase: 'absent', hintTo: 'p1' };
+      character(sim, 'p1').momentHint = { moment: 'tits', text: sim.content.texts.messages.moment_tits_hint ?? '' };
+      if (name === 'carnet-confidence') {
+        for (const id of ['p1', 'p2'] as const) apply(sim, id, [{ type: 'start_day' }]);
+        apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      }
+      return;
+    }
+    case 'poules-carnet':
+      hensToName(sim);
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return;
+    case 'poules-appel':
+      // p2 appelle la deuxième poule: la première est déjà nommée (son nom est grisé).
+      hensToName(sim);
+      if (callHen(sim, 'p2')) answerRight(sim, 'p2');
+      callHen(sim, 'p2');
+      return;
+    case 'poules-erreur':
+      // La conversation d'appel ouverte chez p2; le mauvais nom tombe une fois l'interface montée.
+      hensToName(sim);
+      callHen(sim, 'p2');
+      return () => {
+        answerWrong(sim, 'p2');
+      };
+    case 'poules-coup-de-coude':
+      // Un premier mauvais nom; le second (et le coup de coude chez l'informé) une fois l'interface montée.
+      hensToName(sim);
+      if (callHen(sim, 'p2')) answerWrong(sim, 'p2');
+      return () => {
+        if (callHen(sim, 'p2')) answerWrong(sim, 'p2');
+      };
+    case 'poules-coup-de-coude-carnet':
+      hensToName(sim);
+      for (let i = 0; i < 2; i++) if (callHen(sim, 'p2')) answerWrong(sim, 'p2');
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return;
+    case 'lucie-carnet':
+      // Firmin a répondu à p2 (l'informé du mot de Lucie): c'est à p1 d'aller le dire à Jeanne.
+      playUntil(sim, (s) => s.world.secrets.entries.some((e) => e.quest === 'lucie_note' && e.revealed) && s.world.characters.every((c) => c.dialogue === null && c.menu === null));
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return;
+    default:
+      return undefined;
   }
 }

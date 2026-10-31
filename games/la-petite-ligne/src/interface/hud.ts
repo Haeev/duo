@@ -8,7 +8,7 @@ import type { GameNotification, ReadonlyWorld } from '../etat/types';
 import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
-import { button, chip, clear, el, icon, keepFocusOnGame, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, token } from './dom';
+import { button, chip, clear, el, icon, keepFocusOnGame, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, svgEl, token } from './dom';
 import { clockTime, contentVars, fill, itemTitle, keyTokens } from './format';
 import {
   clockModel,
@@ -25,6 +25,8 @@ import {
   toolbarModel,
   type SlotModel,
 } from './modele';
+import { SteadyWatch, watchModel } from './modele-moments';
+import { henWrongAside } from './modele-secrets';
 import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
@@ -54,6 +56,16 @@ export class Hud {
   private readonly clockStatusText: HTMLSpanElement;
   private readonly clockTrain: HTMLSpanElement;
   private readonly clockTrainText: HTMLSpanElement;
+  /** Anneau autour de la météo de l'horloge: l'observation à deux d'un moment rare. */
+  private readonly watchRing: SVGSVGElement;
+  private readonly watchRingArc: SVGCircleElement;
+  /** Ligne d'observation sous l'horloge (pose demandée, l'autre qui manque, « Sans bouger... »). */
+  private readonly watch: HTMLDivElement;
+  private readonly watchPill: HTMLParagraphElement;
+  private readonly watchLine: HTMLSpanElement;
+  private readonly watchDetail: HTMLSpanElement;
+  private readonly steadyWatch = new SteadyWatch();
+  private watchSig = '';
 
   private readonly purseAmount: HTMLSpanElement;
   private readonly purseNote: HTMLSpanElement;
@@ -122,8 +134,12 @@ export class Hud {
     this.clockStatus = el('span', { class: 'lpl-clock__status' }, [this.clockStatusIcon, this.clockStatusText]);
     this.clockTrainText = el('span');
     this.clockTrain = el('span', { class: 'lpl-clock__train' }, [icon('ui-train'), this.clockTrainText]);
+    this.watchRingArc = svgEl('circle', { class: 'lpl-watch-ring__arc', cx: '20', cy: '20', r: '18', pathLength: '100' });
+    this.watchRing = svgEl('svg', { class: 'lpl-watch-ring', viewBox: '0 0 40 40', 'aria-hidden': 'true' });
+    this.watchRing.append(svgEl('circle', { class: 'lpl-watch-ring__track', cx: '20', cy: '20', r: '18' }), this.watchRingArc);
+    this.watchRing.toggleAttribute('hidden', true);
     this.clock = el('div', { class: 'lpl-clock', 'aria-label': x.hud.clockLabel }, [
-      el('span', { class: 'lpl-clock__weather' }, [this.clockWeather]),
+      el('span', { class: 'lpl-clock__weather' }, [this.clockWeather, this.watchRing]),
       this.clockDay,
       this.clockTime,
       this.clockStatus,
@@ -142,6 +158,15 @@ export class Hud {
       this.purseNote,
       this.purseDelta,
     ]);
+
+    this.watchLine = el('span', { class: 'lpl-watch__line' });
+    this.watchDetail = el('span', { class: 'lpl-watch__detail', hidden: true });
+    this.watchPill = el('p', { class: 'lpl-watch__pill', role: 'status', 'aria-label': x.moments.watchLabel }, [
+      icon('ui-eye'),
+      el('span', { class: 'lpl-watch__text' }, [this.watchLine, this.watchDetail]),
+    ]);
+    // Rangée à part sous l'horloge et la bourse; la pastille garde sa largeur de texte.
+    this.watch = el('div', { class: 'lpl-watch', hidden: true }, [this.watchPill]);
 
     this.toasts = el('ul', { class: 'lpl-toasts', 'aria-live': 'polite', 'aria-label': x.hud.toastsLabel });
 
@@ -252,7 +277,7 @@ export class Hud {
     ]);
 
     this.root = el('div', { class: 'lpl-hud' }, [
-      el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.toasts]),
+      el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
       el('div', { class: 'lpl-hud__bottom' }, [this.tip, this.toolbar, this.build]),
@@ -307,6 +332,7 @@ export class Hud {
     setIcon(this.clockStatusIcon, clock.statusIcon);
     setAttr(this.clock, 'data-train', clock.train === null ? null : 'soon');
     setText(this.clockTrainText, clock.train ?? '');
+    this.updateWatch(world, now);
 
     // Bourse.
     const purse = purseModel(world);
@@ -380,6 +406,24 @@ export class Hud {
     setHidden(this.build, !placing);
     if (me.placement !== null) this.updateBuild(me.placement, characterOf(world, ctx.partner)?.name ?? '');
     else this.updateToolbar(me, now);
+  }
+
+  /** Ligne d'observation et anneau: stabilisés, pour ne jamais clignoter au bord du rayon. */
+  private updateWatch(world: ReadonlyWorld, now: number): void {
+    const model = this.steadyWatch.next(watchModel(world, this.host.ctx), now);
+    const sig = model === null ? '' : JSON.stringify(model);
+    if (sig === this.watchSig) return;
+    this.watchSig = sig;
+    setHidden(this.watch, (model?.line ?? null) === null);
+    setAttr(this.watchPill, 'data-tone', model?.tone ?? null);
+    setText(this.watchLine, model?.line ?? '');
+    setText(this.watchDetail, model?.detail ?? '');
+    setHidden(this.watchDetail, (model?.detail ?? null) === null);
+    const ring = model?.ring ?? null;
+    this.watchRing.toggleAttribute('hidden', ring === null);
+    setAttr(this.watchRing, 'data-tone', model?.tone ?? null);
+    setAttr(this.clock, 'data-watch', ring === null ? null : (model?.tone ?? null));
+    setStyleVar(this.watchRing, '--lpl-value', String(Math.round((ring ?? 0) * 100)));
   }
 
   private updateToolbar(me: NonNullable<ReturnType<typeof characterOf>>, now: number): void {
@@ -496,6 +540,8 @@ export class Hud {
       const li = el('li', { class: `lpl-toast${visual.variant === '' ? '' : ` lpl-toast--${visual.variant}`}`, 'data-kind': notificationSort(n, this.refusal) }, [
         visual.partnerToken ? token('other', this.host.symbol('other'), 'small') : icon(visual.icon === '' ? 'ui-note' : visual.icon),
         typographier(toastText(n, ctx.texts.messages, { partner })),
+        // Un mauvais nom: la poule répond à sa façon, une réplique différente d'une erreur à l'autre.
+        visual.henAside === true ? el('span', { class: 'lpl-toast__aside', 'aria-hidden': 'true', text: henWrongAside(ctx, n.id) }) : null,
       ]);
       this.toastItems.set(key, li);
       this.toasts.append(li);
