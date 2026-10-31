@@ -546,7 +546,7 @@ export const AMBIANCE_SETTINGS = {
     water: {
       count: 14,
       seconds: 0.6,
-      size: 0.07,
+      size: 0.035,
       speed: 1.2,
       up: 1.4,
       color: '#bfe3f2',

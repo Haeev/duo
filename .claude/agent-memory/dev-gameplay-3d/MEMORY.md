@@ -57,3 +57,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Arbre de travail partagé: le serveur de Vite recharge la page à chaque modification des autres membres. Les captures Playwright doivent détecter `framenavigated` et recommencer; pour le vrai jeu en deux vues, servir une construction figée (`vite build --outDir` dans le scratchpad, puis `vite preview`).
 - Rendu logiciel de l'environnement cloud: deux vues 3D dans le faux hôte affament les minuteries (trous de 1 à 7 s), et le faux hôte coupe la partie (« Le jeu ne répond plus »). Vérifier l'interface sur la page de démonstration (`rendu=0` pour les mesures), et le vrai jeu seulement sur ses premiers écrans.
 - Mesure: un rafraîchissement complet de l'interface coûte environ 0,8 ms (Chromium sans tête); limité à 11 par seconde, le reste des images ne compare qu'une chaîne (l'heure).
+
+## Simulation de La Petite Ligne et tests (vérifié le 2026-10-31)
+
+- Vitest ne vérifie pas les types: un test qui passe peut casser `typecheck` (champ obligatoire oublié dans un objet du monde, comme `placedBy` d'un meuble). Relancer `typecheck` après chaque test écrit.
+- La configuration Vitest du jeu n'affiche pas `console.log`: pour un relevé jetable (carte autour d'une case), écrire dans un fichier du scratchpad.
+- Le manager fige l'arbre partagé par des commits « wip » pendant que les membres travaillent: `git diff HEAD` peut ne plus rien montrer. Relire son travail par `git diff <commit du début de la mission>`.
+- Preuve qu'un test couvre une correction: copier le fichier dans le scratchpad, retirer la correction par `sed`, lancer le test (il doit échouer), recopier l'original, vérifier par `grep` que la correction est revenue.
+- « Déjà pris » (SI-01): `simulation/simultane.ts`, commun à la touche et au clic (`actOnClick` de `agir.ts`). Un clic lointain garde le pas du clic (`runtime.pendingAct[id].since`): la fenêtre compte depuis le clic, pas depuis l'arrivée. Les objets ramassés n'existent plus: les derniers ramassages sont gardés dans `runtime.recentPickups`.
+- Message facultatif de `textes.json`: `sayIfWritten` (`message()` renvoie la clé elle-même si le texte manque, ce qui l'afficherait telle quelle).
+

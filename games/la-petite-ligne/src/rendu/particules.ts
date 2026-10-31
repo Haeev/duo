@@ -14,6 +14,7 @@ import {
   BufferAttribute,
   Color,
   CustomBlending,
+  DoubleSide,
   DynamicDrawUsage,
   InstancedBufferAttribute,
   InstancedBufferGeometry,
@@ -192,7 +193,8 @@ void main() {
     world = centre + vec3(position.x, 0.0, position.y) * size;
   } else if (dot(axis, axis) > 0.0) {
     vec3 side = normalize(cross(axis, forward));
-    float streak = shape == 1 ? uRainShape.x : size * 2.5;
+    // Trait de pluie à sa longueur réglée; gouttelette d'arrosage quatre fois plus longue que large.
+    float streak = shape == 1 ? uRainShape.x : size * 4.0;
     world = centre + side * position.x * size + axis * position.y * streak * 0.5;
   } else {
     world = centre + (right * position.x + up * position.y) * size;
@@ -315,6 +317,8 @@ export function createParticleMaterial(
     transparent: true,
     depthWrite: false,
     fog: true,
+    // Les ronds posés au sol et les gouttelettes qui remontent montrent leur dos à la caméra.
+    side: DoubleSide,
     blending: CustomBlending,
     blendSrc: OneFactor,
     blendDst: OneMinusSrcAlphaFactor,
