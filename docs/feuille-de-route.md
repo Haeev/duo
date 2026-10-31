@@ -29,7 +29,7 @@ Le client veut au réveil une **démo d'environ une heure de La Petite Ligne**, 
 État au matin du 2026-10-31:
 
 - Fait: prototype de Duo (lanceur, profils, salon, découverte sur le réseau local, liaison authentifiée, cycle de vie d'un jeu, chien de garde, sauvegardes, historique), installateurs macOS et Windows fabriqués et testés par GitHub Actions, faux hôte de secours (`servir`).
-- Fait: démo de La Petite Ligne jouable à deux de bout en bout (8 journées, 4 habitants, trame principale et quêtes secondaires, potager, construction et aménagement, pêche, commande du samedi), avec rendu 3D, interface complète, musiques et sons. Vérifié par les robots de test (démo finie sur 8 graines) et par deux instances de Duo jusqu'à la scène d'arrivée.
+- Fait: démo de La Petite Ligne jouable à deux de bout en bout (8 journées, 4 habitants, trame principale et quêtes secondaires, potager, construction et aménagement, pêche, commande du samedi), avec rendu 3D, interface complète, musiques et sons. Vérifié par les robots de test (démo finie sur 8 graines), par deux instances de Duo jusqu'à la scène d'arrivée, et par une partie entière jouée par les robots dans deux navigateurs (37 minutes, sans erreur, sans arrêt, sans écart entre les deux écrans).
 - Recette: `docs/jeux/jeu-1/recette/2026-10-31-demo.md`. Guide de test pour le client: `docs/guides/tester-la-demo.md`.
 - Reste à vérifier sur les vraies machines: installation, pare-feu, fluidité sur le PC, son, durée réelle de la démo.
 
