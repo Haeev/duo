@@ -1,0 +1,12 @@
+{
+  // Scripts de fabrication des installateurs (ADR 0011): JavaScript lancé par
+  // Node sans construction, vérifié par TypeScript. La configuration
+  // d'electron-builder y est incluse pour contrôler ses options par leurs types.
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.node.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["*.mjs", "tests", "../electron-builder.config.mjs"]
+}

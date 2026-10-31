@@ -1,0 +1,237 @@
+# Fabrication des installateurs de Duo sur les runners des systèmes visés
+# (ADR 0011, section 3.8). Workflow réutilisable, appelé par systemes.yml
+# (pushs sur main et sur les branches de session) et par publication.yml
+# (tags v*). Rien n'est publié ici: les installateurs partent en artefacts.
+name: Fabrication
+
+on:
+  workflow_call:
+    inputs:
+      conservation:
+        description: Jours de conservation des installateurs en artefacts
+        type: number
+        default: 7
+
+permissions:
+  contents: read
+
+env:
+  # Corepack télécharge pnpm sans poser de question.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+
+jobs:
+  macos:
+    name: macOS (arm64, dmg et zip)
+    runs-on: macos-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Garde (puce Apple)
+        run: test "$(uname -m)" = arm64
+
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version du champ packageManager, par corepack)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Dossier du magasin pnpm
+        id: magasin
+        run: echo "dossier=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache du magasin pnpm
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.magasin.outputs.dossier }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Cache d'Electron et des outils d'electron-builder
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: electron-${{ runner.os }}-
+
+      - name: Installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Construction des jeux embarqués et de l'application
+        run: pnpm build:app
+
+      - name: Fabrication (dmg et zip, signature ad hoc)
+        run: pnpm --filter duo run dist:mac
+
+      - name: Contrôle de l'application (fusibles, archive, jeux, Info.plist, UUID)
+        working-directory: apps/duo
+        run: node scripts/verifier-paquet.mjs --plateforme mac
+
+      - name: Signature, architecture et UUID relus par les outils d'Apple
+        working-directory: apps/duo
+        run: |
+          app=dist/mac-arm64/Duo.app
+          codesign --verify --deep --strict --verbose=2 "$app"
+          codesign -dv "$app" 2> "$RUNNER_TEMP/signature.txt"
+          cat "$RUNNER_TEMP/signature.txt"
+          grep -q '^Signature=adhoc$' "$RUNNER_TEMP/signature.txt"
+          test "$(lipo -archs "$app/Contents/MacOS/Duo")" = arm64
+          test "$(lipo -archs "$app/Contents/Frameworks/Electron Framework.framework/Electron Framework")" = arm64
+          attendu="$(node scripts/verifier-paquet.mjs --uuid-attendu)"
+          dwarfdump --uuid "$app/Contents/MacOS/Duo" | tee "$RUNNER_TEMP/uuid.txt"
+          grep -q "UUID: $attendu (arm64)" "$RUNNER_TEMP/uuid.txt"
+
+      - name: Image disque et zip (contenu signé, copie dans Applications)
+        working-directory: apps/duo
+        run: |
+          montage="$RUNNER_TEMP/duo-dmg"
+          mkdir -p "$montage"
+          hdiutil attach dist/Duo-macOS.dmg -nobrowse -readonly -mountpoint "$montage"
+          ls -la "$montage"
+          if [ ! -L "$montage/Applications" ]; then
+            echo "::warning::l'image disque n'a pas de raccourci vers Applications"
+          fi
+          codesign --verify --deep --strict "$montage/Duo.app"
+          rm -rf /Applications/Duo.app
+          ditto "$montage/Duo.app" /Applications/Duo.app
+          hdiutil detach "$montage" || hdiutil detach -force "$montage"
+          codesign --verify --deep --strict /Applications/Duo.app
+          node scripts/verifier-paquet.mjs --plateforme mac --app /Applications/Duo.app
+          extrait="$RUNNER_TEMP/duo-zip"
+          rm -rf "$extrait"
+          mkdir -p "$extrait"
+          ditto -x -k dist/Duo-macOS.zip "$extrait"
+          codesign --verify --deep --strict "$extrait/Duo.app"
+
+      - name: Test de démarrage (Duo copié depuis l'image disque)
+        working-directory: apps/duo
+        run: node scripts/test-demarrage.mjs /Applications/Duo.app/Contents/MacOS/Duo --jeux-embarques --delai 120
+
+      - name: Dépôt des installateurs
+        uses: actions/upload-artifact@v7
+        with:
+          name: duo-macos
+          path: |
+            apps/duo/dist/Duo-macOS.dmg
+            apps/duo/dist/Duo-macOS.zip
+          if-no-files-found: error
+          retention-days: ${{ inputs.conservation }}
+          # Fichiers déjà compressés.
+          compression-level: 0
+
+  windows:
+    name: Windows (x64, NSIS par utilisateur)
+    runs-on: windows-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Garde (x64)
+        run: if ($env:PROCESSOR_ARCHITECTURE -ne 'AMD64') { throw "architecture $env:PROCESSOR_ARCHITECTURE" }
+
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version du champ packageManager, par corepack)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Dossier du magasin pnpm
+        id: magasin
+        run: Add-Content -Path $env:GITHUB_OUTPUT -Value "dossier=$(pnpm store path)"
+
+      - name: Cache du magasin pnpm
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.magasin.outputs.dossier }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Cache d'Electron et des outils d'electron-builder
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/AppData/Local/electron/Cache
+            ~/AppData/Local/electron-builder/Cache
+          key: electron-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: electron-${{ runner.os }}-
+
+      - name: Installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Construction des jeux embarqués et de l'application
+        run: pnpm build:app
+
+      - name: Fabrication (NSIS x64)
+        run: pnpm --filter duo run dist:win
+
+      - name: Contrôle de l'application (fusibles, archive, jeux, exécutable, installateur)
+        working-directory: apps/duo
+        run: node scripts/verifier-paquet.mjs --plateforme win
+
+      - name: Installation silencieuse, sans droits, dans le dossier de l'utilisateur
+        working-directory: apps/duo
+        run: |
+          $installation = Start-Process -FilePath 'dist\Duo-Windows.exe' -ArgumentList '/S' -Wait -PassThru
+          if ($installation.ExitCode -ne 0) { throw "installateur: code $($installation.ExitCode)" }
+          $dossier = Join-Path $env:LOCALAPPDATA 'Programs\duo'
+          if (-not (Test-Path (Join-Path $dossier 'Duo.exe'))) { throw "Duo.exe absent de $dossier" }
+          Get-ChildItem $dossier | Format-Table Name, Length
+          $cle = 'Software\Microsoft\Windows\CurrentVersion\Uninstall'
+          $utilisateur = Get-ChildItem "HKCU:\$cle" | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like 'Duo*' }
+          if (-not $utilisateur) { throw 'entrée de désinstallation absente de HKCU' }
+          $utilisateur | Format-List DisplayName, DisplayVersion, Publisher, InstallLocation
+          $machine = Get-ChildItem "HKLM:\$cle" -ErrorAction SilentlyContinue | Get-ItemProperty -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like 'Duo*' }
+          if ($machine) { throw 'entrée de désinstallation sous HKLM: installation par machine' }
+          $raccourci = Join-Path $env:APPDATA 'Microsoft\Windows\Start Menu\Programs\Duo.lnk'
+          if (-not (Test-Path $raccourci)) { throw "raccourci absent du menu Démarrer: $raccourci" }
+          if (Test-Path (Join-Path $env:ProgramFiles 'Duo')) { throw 'Duo installé dans Program Files' }
+
+      - name: Test de démarrage (Duo installé)
+        working-directory: apps/duo
+        run: node scripts/test-demarrage.mjs "$env:LOCALAPPDATA\Programs\duo\Duo.exe" --jeux-embarques --delai 120
+
+      - name: Désinstallation silencieuse (les données restent)
+        run: |
+          $donnees = Join-Path $env:APPDATA 'Duo'
+          New-Item -ItemType Directory -Force -Path $donnees | Out-Null
+          $temoin = Join-Path $donnees 'temoin-ci.txt'
+          Set-Content -Path $temoin -Value 'données du joueur'
+          $dossier = Join-Path $env:LOCALAPPDATA 'Programs\duo'
+          Start-Process -FilePath (Join-Path $dossier 'Uninstall Duo.exe') -ArgumentList '/S' -Wait
+          # Le désinstallateur se relance depuis un dossier temporaire: on attend la fin réelle.
+          $limite = (Get-Date).AddSeconds(90)
+          while ((Test-Path (Join-Path $dossier 'Duo.exe')) -and ((Get-Date) -lt $limite)) { Start-Sleep -Seconds 1 }
+          if (Test-Path (Join-Path $dossier 'Duo.exe')) { throw 'Duo.exe toujours présent après la désinstallation' }
+          if (-not (Test-Path $temoin)) { throw "la désinstallation a effacé $donnees" }
+          Remove-Item -Recurse -Force $donnees
+
+      - name: Dépôt de l'installateur
+        uses: actions/upload-artifact@v7
+        with:
+          name: duo-windows
+          path: apps/duo/dist/Duo-Windows.exe
+          if-no-files-found: error
+          retention-days: ${{ inputs.conservation }}
+          compression-level: 0
