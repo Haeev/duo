@@ -388,6 +388,225 @@ export const AMBIANCE_SETTINGS = {
     /** Brume du matin: elle se rapproche d'autant (part de la brume au ras du sol). */
     mistPull: 0.45,
   },
+
+  /** Surfaces du décor et des personnages (shader de la palette): nuages, sol mouillé, flaques de lumière. */
+  surfaces: {
+    /** Taille des nuages (m par motif du bruit), vent (m/s, x et z), et force de leur ombre (0 à 1). */
+    cloudSize: 46,
+    cloudWind: [1.1, 0.45] as const,
+    cloudShadow: 0.45,
+    /** Douceur du bord des ombres de nuages (part du bruit). */
+    cloudSoftness: 0.14,
+    /** Sol mouillé: couleur multipliée, rugosité multipliée (plus brillant). */
+    wetDarken: 0.74,
+    wetRoughness: 0.45,
+    /** Les murs se mouillent un peu (part du mouillé des sols). */
+    wetWalls: 0.35,
+    /** Flaques: taille du motif (m), seuil du bruit (plus haut, moins de flaques), assombrissement, reflet du ciel. */
+    puddleSize: 7,
+    puddleThreshold: 0.6,
+    puddleDarken: 0.55,
+    puddleReflection: 0.55,
+    /** Les flaques ne se forment que sous cette hauteur (m): sols, pas les toits. */
+    puddleMaxHeight: 0.5,
+  },
+
+  /** Lueurs de nuit: halos autour des lanternes et des fenêtres, flaques de lumière chaude au sol. */
+  glow: {
+    /** Lumières de sol suivies à la fois (les plus proches de la vue). */
+    slots: 12,
+    slotsLight: 6,
+    /** Une lumière de plus de cette distance au point suivi (m) au-delà du rayon de vue s'éteint en douceur. */
+    fadeBeyondView: 4,
+    /** Nouveau tri des lumières quand le point suivi a bougé de plus de cela (m). */
+    resortDistance: 1,
+    /** Regroupement des faces lumineuses d'un même objet (m): une fenêtre, une lanterne. */
+    clusterRadius: 0.8,
+    /** Regroupement des fenêtres d'une façade en une seule flaque de lumière (m). */
+    facadeRadius: 3,
+    kinds: {
+      lantern: {
+        color: '#ffc070',
+        intensity: 2.6,
+        radius: 6.5,
+        halo: 1.1,
+        haloOpacity: 0.55,
+        push: 0,
+      },
+      window: {
+        color: '#ffc874',
+        intensity: 1.3,
+        radius: 4,
+        halo: 0.75,
+        haloOpacity: 0.3,
+        push: 0.7,
+      },
+      flame: {
+        color: '#ffb347',
+        intensity: 1.1,
+        radius: 2.5,
+        halo: 0.45,
+        haloOpacity: 0.45,
+        push: 0.1,
+      },
+    },
+    /** Hauteur de la lumière au-dessus du centre d'une fenêtre (la flaque s'étale devant la façade). */
+    windowDrop: -0.6,
+    /** Scintillement des flammes (Hz) et son ampleur (part de l'intensité). */
+    flickerHz: 7,
+    flicker: 0.12,
+  },
+
+  /** Rivière: couleurs, écume du bord, courant, reflets du ciel et étincelles du soleil. */
+  water: {
+    shallow: '#7fbcc0',
+    deep: '#3f7f93',
+    foam: '#e2f2ef',
+    /** Profondeur (cases depuis la berge) où l'eau devient profonde. */
+    depthCells: 3,
+    /** Opacité près de la berge et au large. */
+    opacityShallow: 0.55,
+    opacityDeep: 0.9,
+    /** Courant (m/s, vers l'est) et taille des rides (m par motif). */
+    flow: [0.35, 0.04] as const,
+    rippleSize: 3.2,
+    /** Part du ciel reflété (fond, puis selon les rides). */
+    reflection: 0.32,
+    reflectionRipple: 0.25,
+    /** Écume: largeur depuis la berge (part de `depthCells`), vitesse et nombre de vaguelettes. */
+    foamWidth: 0.35,
+    foamSpeed: 0.9,
+    foamBands: 9,
+    foamAmount: 0.75,
+    /** Étincelles du soleil (seuil du bruit et force), et la part de la lune la nuit. */
+    glintThreshold: 0.82,
+    glintStrength: 2.2,
+    moonGlint: 0.35,
+    /** Vaguelettes de la surface (m) et leur vitesse. */
+    waveAmplitude: 0.02,
+    waveSpeed: 1.3,
+    waveLength: 3.2,
+    /** Lame d'eau sur les galets du gué: hauteur au-dessus du gravier et opacité. */
+    fordLift: 0.05,
+    fordOpacity: 0.45,
+    /** Rugosité de la surface (reflet du soleil). */
+    roughness: 0.14,
+  },
+
+  /** Pluie (jour 4): gouttes en traits fins autour de la vue, éclaboussures au sol, ronds dans l'eau. */
+  rain: {
+    drops: 900,
+    dropsLight: 420,
+    splashes: 140,
+    /** Colonne de pluie: marge autour de la vue (m), hauteur (m), vitesse de chute (m/s), vent (m/s, x et z). */
+    padding: 4,
+    height: 13,
+    speed: 15,
+    wind: [1.6, 0.8] as const,
+    /** Trait d'une goutte (m) et son opacité. */
+    streakLength: 0.55,
+    streakWidth: 0.028,
+    opacity: 0.42,
+    color: '#d6e2ea',
+    /** Éclaboussure: durée (s), rayon au sol et dans l'eau (m), opacité. */
+    splashSeconds: 0.38,
+    splashRadius: 0.16,
+    rippleRadius: 0.42,
+    splashOpacity: 0.5,
+  },
+
+  /** Panache de la locomotive et petites particules du potager (GPU, une seule passe). */
+  puffs: {
+    capacity: 192,
+    steam: {
+      /** Bouffées par seconde quand le train roule, à l'arrêt, et au coup de sifflet. */
+      movingRate: 7,
+      idleRate: 1.6,
+      whistleBurst: 10,
+      seconds: 3.2,
+      /** Taille au départ et à la fin (m), montée (m/s), poussée vers le haut (m/s²), vent (m/s²). */
+      startSize: 0.35,
+      endSize: 2.1,
+      rise: 1.7,
+      lift: 0.35,
+      drift: [0.5, 0.15] as const,
+      spread: 0.35,
+      drag: 0.9,
+      opacity: 0.62,
+      color: '#f4f2ee',
+      /** Le train qui roule laisse son panache derrière lui (part de sa vitesse). */
+      trail: 0.85,
+    },
+    /** Arrosage: gouttes qui tombent du bec, éclaboussure sur la terre. */
+    water: {
+      count: 12,
+      seconds: 0.6,
+      size: 0.05,
+      speed: 1.2,
+      up: 1.4,
+      color: '#cfe8f0',
+      opacity: 0.85,
+    },
+    /** Bêche: petit nuage de poussière de terre. */
+    dust: {
+      count: 6,
+      seconds: 0.9,
+      size: 0.25,
+      endSize: 0.7,
+      speed: 0.6,
+      color: '#b89a74',
+      opacity: 0.4,
+    },
+    /** Récolte « belle »: étoiles dorées qui montent et scintillent. */
+    stars: {
+      count: 9,
+      seconds: 1.2,
+      size: 0.18,
+      speed: 0.55,
+      up: 1.1,
+      color: '#ffe08a',
+      opacity: 1,
+    },
+    /** Hauteur où naissent les gouttes d'arrosage (bec de l'arrosoir) au-dessus de la case. */
+    canHeight: 0.75,
+    gravity: 9.8,
+  },
+
+  /** Nuages bas qui passent au loin et brume du matin au ras du sol (sprites doux). */
+  sky: {
+    clouds: 7,
+    /** Bouffées par nuage, taille d'une bouffée (m), hauteur des nuages (m). */
+    cloudPuffs: 6,
+    cloudPuffSize: 4.2,
+    cloudHeight: 15,
+    /** Zone où les nuages tournent autour de la vue (demi-côté, m) et leur vitesse (m/s, x et z). */
+    cloudArea: 46,
+    cloudWind: [1.1, 0.45] as const,
+    cloudOpacity: 0.55,
+    cloudColor: '#ffffff',
+    /** Les nuages s'effacent au centre de l'écran: rayon (coordonnées normalisées) où ils sont invisibles, puis pleins. */
+    cloudClearCenter: 0.45,
+    cloudFullEdge: 0.95,
+    mist: 26,
+    mistSize: 5.5,
+    mistHeight: 0.5,
+    mistOpacity: 0.2,
+    mistColor: '#eef1f2',
+    /** Bancs de brume posés sur l'eau et dans les prés, dans cette zone autour de la vue (demi-côté, m). */
+    mistArea: 26,
+    mistDrift: 0.25,
+  },
+
+  /**
+   * Version légère des effets: le moteur la prend de lui-même si les images
+   * restent trop longues (mêmes seuils que la résolution dynamique).
+   */
+  detail: {
+    slowFrameMs: 20,
+    averageSeconds: 1.5,
+    slowSeconds: 4,
+    warmupSeconds: 6,
+  },
 } as const;
 
 export type AmbianceSettings = typeof AMBIANCE_SETTINGS;

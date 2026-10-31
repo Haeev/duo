@@ -194,6 +194,19 @@ describe('commande et quêtes', () => {
     expect(village?.lines.map((l) => l.text)).toEqual(['Firmin', 'Odette', 'Basile', 'Jeanne']);
   });
 
+  it('fait passer une quête facultative (P1) après la commande', () => {
+    const sim = started();
+    const ctx = uiContext();
+    const p1 = ctx.content.quests.find((q) => q.tier === 'P1');
+    const order = ctx.content.quests.find((q) => q.id === 'saturday_order');
+    if (p1 === undefined || order === undefined) return;
+    sim.world.quests = [
+      { id: p1.id, status: 'active', step: 0, checklist: [], baselines: {}, startedDay: 3 },
+      { id: order.id, status: 'active', step: 0, checklist: [], baselines: {}, startedDay: 1 },
+    ];
+    expect(nextObjective(sim.world, ctx)?.id).toBe(order.id);
+  });
+
   it('range le courrier du plus récent au plus ancien, avec le non-lu', () => {
     const sim = started();
     const ctx = uiContext();

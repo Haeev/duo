@@ -10,7 +10,7 @@
  */
 import type { Intent } from '../../etat/actions';
 import type { CharacterId, WorldEvent } from '../../etat/types';
-import type { GameView } from '../../etat/vue';
+import type { GameInterface, GameView } from '../../etat/vue';
 import { loadContent } from '../../donnees/contenu';
 import { CONTENT_FILES } from '../../donnees/fichiers';
 import { loadMap } from '../../donnees/carte';
@@ -25,7 +25,16 @@ import { setupScenario } from './scenarios';
 
 declare global {
   interface Window {
-    lplInterface?: { ready: boolean; tick(): number; send(intent: Intent): void; partner(intent: Intent): void };
+    lplInterface?: {
+      ready: boolean;
+      tick(): number;
+      send(intent: Intent): void;
+      partner(intent: Intent): void;
+      /** Démonte et remonte l'interface `n` fois (contrôle des fuites). */
+      remount(n: number): { nodes: number; layers: number; sprites: number };
+      /** Durée moyenne de `frame()` de l'interface sur `n` appels (ms). */
+      measure(n: number): Promise<number>;
+    };
   }
 }
 
@@ -68,13 +77,15 @@ if (container === null || overlay === null) throw new Error('page de démonstrat
 
 const withRender = params.get('rendu') !== '0';
 const renderer = withRender ? createRenderer({ view, container, reducedMotion: false }) : null;
-const ui = createInterfaceWith({
-  view,
-  overlay,
-  uiScale: [1, 1.25, 1.5].includes(scale) ? scale : 1,
-  reducedMotion: params.get('animations') === 'reduites',
-  ...(renderer === null ? {} : { camera: (command) => { renderer.camera(command); } }),
-});
+const mountUi = (): GameInterface =>
+  createInterfaceWith({
+    view,
+    overlay,
+    uiScale: [1, 1.25, 1.5].includes(scale) ? scale : 1,
+    reducedMotion: params.get('animations') === 'reduites',
+    ...(renderer === null ? {} : { camera: (command) => { renderer.camera(command); } }),
+  });
+let ui = mountUi();
 
 const robot = params.get('autre') === 'fige' ? null : createRobot();
 const held = new Set<string>();
@@ -175,6 +186,30 @@ async function start(): Promise<void> {
     },
     partner: (intent) => {
       queue.push({ by: partnerId, intent });
+    },
+    remount: (n) => {
+      for (let i = 0; i < n; i++) {
+        ui.dispose();
+        ui = mountUi();
+        ui.frame(1 / 60);
+      }
+      return {
+        nodes: document.getElementsByTagName('*').length,
+        layers: document.querySelectorAll('.lpl-ui').length,
+        sprites: document.querySelectorAll('#lpl-icones').length,
+      };
+    },
+    measure: async (n) => {
+      // Rafraîchissement complet (révision changée, délai minimal écoulé): le pire cas d'une image.
+      let total = 0;
+      for (let i = 0; i < n; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        sim.world.revision += 1;
+        const start = performance.now();
+        ui.frame(1 / 60);
+        total += performance.now() - start;
+      }
+      return total / n;
     },
   };
   requestAnimationFrame(loop);

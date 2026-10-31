@@ -51,7 +51,7 @@ export interface BancResult {
   /** Mélange stéréo 16 bits (base64), pour l'écoute. */
   mixBase64: string | null;
   /** Temps de calcul d'une image du son (cerveau et moteur), en ms. */
-  frameMs: { mean: number; max: number; p95: number };
+  frameMs: { mean: number; max: number; p95: number; slow: { t: number; ms: number }[] };
 }
 
 declare global {
@@ -169,7 +169,7 @@ function rmsDb(data: Float32Array[], from: number, to: number): number {
   return rms <= 1e-9 ? -120 : 20 * Math.log10(rms);
 }
 
-function summarize(values: number[]): BancResult['frameMs'] {
+function summarize(values: number[]): Omit<BancResult['frameMs'], 'slow'> {
   if (values.length === 0) return { mean: 0, max: 0, p95: 0 };
   const sorted = [...values].sort((a, b) => a - b);
   const mean = values.reduce((a, b) => a + b, 0) / values.length;
@@ -243,6 +243,7 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
   let gameTime = 0;
   let lastFrame: BrainFrame = emptyFrame();
   const timings: number[] = [];
+  const slow: { t: number; ms: number }[] = [];
   const frameAt = async (index: number): Promise<void> => {
     let frame: BrainFrame;
     let began = performance.now();
@@ -269,7 +270,9 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
     for (const c of frame.music) music.push({ t, kind: c.kind, id: c.id });
     const applyStart = performance.now();
     engine.apply(frame);
-    timings.push(computed + performance.now() - applyStart);
+    const ms = computed + performance.now() - applyStart;
+    timings.push(ms);
+    if (ms > 4) slow.push({ t, ms });
     lastFrame = frame;
     gameTime += SIM_DT;
     // Le décodage prend du temps réel: le rendu attend, comme si le tampon était prêt à temps.
@@ -311,7 +314,7 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
     listener: { x: lastFrame.listener.at.x, y: lastFrame.listener.at.y, inHouse: lastFrame.listener.inHouse },
     seam,
     mixBase64,
-    frameMs: summarize(timings.slice(1)),
+    frameMs: { ...summarize(timings.slice(1)), slow },
   };
 }
 

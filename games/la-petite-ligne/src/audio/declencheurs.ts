@@ -44,8 +44,7 @@ export interface TriggerContext {
   map: GameMap;
   /** Niveau des sons du monde de l'autre joueur (dB). */
   peerDb: number;
-  /** Le son existe dans `sons.json` et passe par le bus d'interface. */
-  isUiSound(sound: string): boolean;
+  /** Le son existe dans `sons.json`. */
   hasSound(sound: string): boolean;
 }
 
@@ -314,6 +313,11 @@ interface CharacterTrack {
 const COVERING_UI = new Set(['journal-new', 'duo-done', 'purchase-proposal', 'purchase-accept', 'purchase-decline']);
 const NOTIFY_KINDS = new Set(['hint', 'message', 'letter', 'envie']);
 const NOTEBOOK_MENUS = new Set(['notebook', 'letter']);
+/** Clés des boucles de chaque personnage (pas de texte fabriqué à chaque image). */
+const LOOP_KEYS: Readonly<Record<CharacterId, { saw: string; stove: string }>> = {
+  p1: { saw: 'saw:p1', stove: 'stove:p1' },
+  p2: { saw: 'saw:p2', stove: 'stove:p2' },
+};
 
 export class StateWatcher {
   private initialized = false;
@@ -391,8 +395,8 @@ export class StateWatcher {
         }
       }
       const peerDb = c.id === local ? 0 : ctx.peerDb;
-      if (kind === 'saw') loops.push({ key: `saw:${c.id}`, sound: 'saw-loop', at, gainDb: peerDb });
-      if (kind === 'cook') loops.push({ key: `stove:${c.id}`, sound: 'stove-loop', at: this.stoveAt(ctx) ?? at, gainDb: peerDb });
+      if (kind === 'saw') loops.push({ key: LOOP_KEYS[c.id].saw, sound: 'saw-loop', at, gainDb: peerDb });
+      if (kind === 'cook') loops.push({ key: LOOP_KEYS[c.id].stove, sound: 'stove-loop', at: this.stoveAt(ctx) ?? at, gainDb: peerDb });
       // Meuble tourné dans le plan.
       const placement = c.placement;
       if (placement !== null) {

@@ -9,7 +9,7 @@ import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, token } from './dom';
-import { clockTime, fill, itemTitle, keyTokens } from './format';
+import { clockTime, contentVars, fill, itemTitle, keyTokens } from './format';
 import {
   clockModel,
   formModel,
@@ -444,7 +444,8 @@ export class Hud {
       this.tipId = hint.id;
       this.tipUntil = (this.seenAt.get(hint.id) ?? now) + durationMs;
       clear(this.tip);
-      this.tip.append(typographier(fill(hint.text, keyTokens(ctx.key))));
+      const vars = { ...contentVars(ctx.content, null, ctx.texts.orderFormat), ...keyTokens(ctx.key) };
+      this.tip.append(typographier(fill(hint.text, vars)));
       if (hint.hint !== null) this.host.send({ type: 'hint_seen', hint: hint.hint });
     }
     setHidden(this.tip, now >= this.tipUntil);

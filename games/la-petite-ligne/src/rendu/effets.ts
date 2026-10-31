@@ -322,6 +322,7 @@ class ParticlePool {
 }
 
 interface Jump {
+  size: number;
   object: Object3D;
   from: Vector3;
   to: CharacterId;
@@ -492,6 +493,8 @@ export class EffectsPart implements EventfulPart {
     to: CharacterId,
     sparkle: boolean,
     reducedMotion: boolean,
+    /** Agrandissement de l'objet (un petit poisson doit se voir sauter). */
+    size = 1,
   ): void {
     if (reducedMotion) {
       return;
@@ -502,9 +505,9 @@ export class EffectsPart implements EventfulPart {
     }
     const model = this.content.items[item]?.model ?? item;
     const object = this.library.instantiate(model);
-    object.scale.setScalar(FX.itemScale);
+    object.scale.setScalar(FX.itemScale * size);
     this.group.add(object);
-    this.jumps.push({ object, from: from.clone(), to, start: this.time, sparkle });
+    this.jumps.push({ object, from: from.clone(), to, start: this.time, sparkle, size });
   }
 
   handleEvent(event: WorldEvent, context: FrameContext): void {
@@ -649,7 +652,7 @@ export class EffectsPart implements EventfulPart {
       jump.object.position.y += Math.sin(t * Math.PI) * FX.jumpHeight;
       jump.object.rotation.y = t * Math.PI * 2;
       jump.object.scale.setScalar(
-        FX.itemScale * (JUMP_START_SCALE + (JUMP_END_SCALE - JUMP_START_SCALE) * t),
+        FX.itemScale * jump.size * (JUMP_START_SCALE + (JUMP_END_SCALE - JUMP_START_SCALE) * t),
       );
     }
   }

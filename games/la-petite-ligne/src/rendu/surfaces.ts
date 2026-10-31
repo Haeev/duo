@@ -1,0 +1,242 @@
+/**
+ * Ce que l'ambiance ajoute au shader des surfaces (palette du décor, terrain,
+ * personnages, eau), par `onBeforeCompile` sans nouveau programme:
+ *
+ * - ombres des nuages qui passent (bruit qui défile, projeté selon le soleil);
+ * - sol mouillé sous la pluie: plus sombre, plus brillant, flaques sur la terre
+ *   et les pavés (pas sur l'herbe ni les toits) qui reflètent le ciel;
+ * - flaques de lumière chaude des lanternes et des fenêtres la nuit, sur le sol
+ *   et sur les personnages qui passent dessous (lumières de sol bon marché:
+ *   une atténuation et un Lambert, sans ombre, au plus `glow.slots` à la fois).
+ *
+ * Le patron s'ajoute à celui du dev rendu (trous de visibilité): on garde son
+ * `onBeforeCompile` et sa clé de programme, on y ajoute les nôtres.
+ */
+import {
+  Color,
+  Vector2,
+  Vector3,
+  Vector4,
+  type Material,
+  type Texture,
+  type WebGLProgramParametersWithUniforms,
+  type WebGLRenderer,
+} from 'three';
+import { AMBIANCE_SETTINGS } from './reglages-ambiance';
+
+/** Nombre de lumières de sol que le shader sait lire (le plus grand des deux niveaux de détail). */
+export const GLOW_SLOTS = AMBIANCE_SETTINGS.glow.slots;
+
+/** Uniformes partagés par toutes les surfaces patchées (une seule mise à jour par image). */
+export interface SurfaceUniforms {
+  uAmbTime: { value: number };
+  uAmbNoise: { value: Texture | null };
+  uCloudCover: { value: number };
+  uCloudScale: { value: number };
+  uCloudWind: { value: Vector2 };
+  uCloudShadow: { value: number };
+  uCloudSoft: { value: number };
+  uLightDir: { value: Vector3 };
+  uWet: { value: number };
+  uWetParams: { value: Vector4 };
+  uPuddleParams: { value: Vector4 };
+  uReflection: { value: Color };
+  uGlow: { value: number };
+  uLamps: { value: Vector4[] };
+  uLampColors: { value: Color[] };
+  uLampCount: { value: number };
+}
+
+export function createSurfaceUniforms(noise: Texture): SurfaceUniforms {
+  const s = AMBIANCE_SETTINGS.surfaces;
+  return {
+    uAmbTime: { value: 0 },
+    uAmbNoise: { value: noise },
+    uCloudCover: { value: 0 },
+    uCloudScale: { value: 1 / s.cloudSize },
+    uCloudWind: { value: new Vector2(s.cloudWind[0] / s.cloudSize, s.cloudWind[1] / s.cloudSize) },
+    uCloudShadow: { value: s.cloudShadow },
+    uCloudSoft: { value: s.cloudSoftness },
+    uLightDir: { value: new Vector3(0, 1, 0) },
+    uWet: { value: 0 },
+    uWetParams: { value: new Vector4(s.wetDarken, s.wetRoughness, s.wetWalls, 0) },
+    uPuddleParams: {
+      value: new Vector4(1 / s.puddleSize, s.puddleThreshold, s.puddleDarken, s.puddleMaxHeight),
+    },
+    uReflection: { value: new Color() },
+    uGlow: { value: 0 },
+    uLamps: { value: Array.from({ length: GLOW_SLOTS }, () => new Vector4()) },
+    uLampColors: { value: Array.from({ length: GLOW_SLOTS }, () => new Color()) },
+    uLampCount: { value: 0 },
+  };
+}
+
+/** Déclarations communes (vertex): position dans le monde. */
+const VERTEX_PARS = /* glsl */ `
+varying vec3 vAmbWorld;
+`;
+
+/** Après `project_vertex`: `transformed` porte déjà peau, formes et instance. */
+const VERTEX_MAIN = /* glsl */ `
+vec4 ambWorld = vec4(transformed, 1.0);
+#ifdef USE_INSTANCING
+ambWorld = instanceMatrix * ambWorld;
+#endif
+vAmbWorld = (modelMatrix * ambWorld).xyz;
+`;
+
+/** Déclarations communes (fragment). */
+export const SURFACE_FRAGMENT_PARS = /* glsl */ `
+varying vec3 vAmbWorld;
+uniform float uAmbTime;
+uniform sampler2D uAmbNoise;
+uniform float uCloudCover;
+uniform float uCloudScale;
+uniform vec2 uCloudWind;
+uniform float uCloudShadow;
+uniform float uCloudSoft;
+uniform vec3 uLightDir;
+uniform float uWet;
+uniform vec4 uWetParams;
+uniform vec4 uPuddleParams;
+uniform vec3 uReflection;
+uniform float uGlow;
+uniform vec4 uLamps[${GLOW_SLOTS}];
+uniform vec3 uLampColors[${GLOW_SLOTS}];
+uniform int uLampCount;
+
+/** Ombre des nuages au point du monde p (1: plein soleil). */
+float ambCloudLight(vec3 p) {
+  if (uCloudCover <= 0.0) return 1.0;
+  // Le nuage qui fait de l'ombre ici est dans la direction du soleil.
+  vec2 q = p.xz - uLightDir.xz / max(uLightDir.y, 0.2) * p.y;
+  vec2 uv = q * uCloudScale - uCloudWind * uAmbTime;
+  float n = texture(uAmbNoise, uv).r * 0.7 + texture(uAmbNoise, uv * 2.3 + 0.37).r * 0.3;
+  float edge = 1.0 - uCloudCover;
+  float shade = smoothstep(edge - uCloudSoft, edge + uCloudSoft, n);
+  return 1.0 - uCloudShadow * shade;
+}
+
+/** Lumières de sol (lanternes, fenêtres): éclairement diffus au point p de normale n (monde). */
+vec3 ambGlowLight(vec3 p, vec3 n) {
+  vec3 sum = vec3(0.0);
+  if (uGlow <= 0.0) return sum;
+  for (int i = 0; i < ${GLOW_SLOTS}; i++) {
+    if (i >= uLampCount) break;
+    vec4 lamp = uLamps[i];
+    vec3 toLamp = lamp.xyz - p;
+    float d2 = dot(toLamp, toLamp);
+    if (d2 >= lamp.w * lamp.w) continue;
+    float d = sqrt(d2);
+    float fall = 1.0 - d / lamp.w;
+    float facing = max(dot(n, toLamp / max(d, 0.001)), 0.0) * 0.7 + 0.3;
+    sum += uLampColors[i] * (fall * fall * facing);
+  }
+  return sum * uGlow;
+}
+`;
+
+/** Après `normal_fragment_maps`: sol mouillé et flaques (couleur et rugosité, avant l'éclairage). */
+const FRAGMENT_WET = /* glsl */ `
+vec3 ambNormal = transformNormalByInverseViewMatrix(normal, viewMatrix);
+float ambUp = smoothstep(0.55, 0.9, ambNormal.y);
+float ambWet = uWet * mix(uWetParams.z, 1.0, ambUp);
+float ambPuddle = 0.0;
+#ifdef AMB_PUDDLES
+if (uWet > 0.0) {
+  float puddleNoise = texture(uAmbNoise, vAmbWorld.xz * uPuddleParams.x).r;
+  // Terre, chemins et pavés (le rouge l'emporte sur le vert), pas l'herbe; seulement au sol.
+  float bare = step(diffuseColor.g, diffuseColor.r * 1.04);
+  float low = 1.0 - smoothstep(uPuddleParams.w * 0.5, uPuddleParams.w, vAmbWorld.y);
+  ambPuddle = uWet * ambUp * low * bare * smoothstep(uPuddleParams.y, uPuddleParams.y + 0.05, puddleNoise);
+}
+#endif
+diffuseColor.rgb *= mix(1.0, uWetParams.x, ambWet);
+diffuseColor.rgb *= mix(1.0, uPuddleParams.z, ambPuddle);
+roughnessFactor = mix(roughnessFactor, roughnessFactor * uWetParams.y, ambWet);
+roughnessFactor = mix(roughnessFactor, 0.05, ambPuddle);
+`;
+
+/** Après `lights_fragment_end`: nuages, reflet du ciel dans les flaques, lumières de sol. */
+const FRAGMENT_LIGHT = /* glsl */ `
+float ambCloud = ambCloudLight(vAmbWorld);
+reflectedLight.directDiffuse *= ambCloud;
+reflectedLight.directSpecular *= ambCloud;
+reflectedLight.indirectSpecular += uReflection * (ambPuddle * uPuddleParams.z + ambWet * 0.04);
+reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, ambNormal) * material.diffuseContribution;
+`;
+
+export interface SurfacePatchOptions {
+  /** Flaques au sol (décor et terrain), pas sur les personnages. */
+  puddles: boolean;
+  /** Suffixe de la clé de programme (un programme par variante). */
+  key: string;
+}
+
+type CompileHook = (shader: WebGLProgramParametersWithUniforms, renderer: WebGLRenderer) => void;
+
+/**
+ * Matériaux déjà patchés. Pas de drapeau dans `userData`: une copie
+ * (`material.clone()`, matériau d'un joueur) l'hériterait sans le patron.
+ */
+const PATCHED = new WeakSet<Material>();
+
+/** Vrai si le matériau porte déjà les ajouts de l'ambiance. */
+export function isSurfacePatched(material: Material): boolean {
+  return PATCHED.has(material);
+}
+
+/** Remplace un repère du shader; signale s'il manque (changement de version de Three.js). */
+export function injectAfter(source: string, anchor: string, code: string, label: string): string {
+  if (!source.includes(anchor)) {
+    throw new Error(`Ambiance: repère « ${anchor} » absent du shader (${label}).`);
+  }
+  return source.replace(anchor, `${anchor}\n${code}`);
+}
+
+/** Ajoute nuages, sol mouillé et lumières de sol au shader d'un matériau standard (sans changer le nombre de programmes). */
+export function patchSurface(
+  material: Material,
+  uniforms: SurfaceUniforms,
+  options: SurfacePatchOptions,
+): void {
+  if (PATCHED.has(material)) {
+    return;
+  }
+  PATCHED.add(material);
+  const previous: CompileHook = material.onBeforeCompile.bind(material);
+  const previousKey = material.customProgramCacheKey.bind(material);
+  material.onBeforeCompile = (shader, renderer): void => {
+    previous(shader, renderer);
+    Object.assign(shader.uniforms, uniforms);
+    const label = material.name || material.type;
+    shader.vertexShader = injectAfter(shader.vertexShader, '#include <common>', VERTEX_PARS, label);
+    shader.vertexShader = injectAfter(
+      shader.vertexShader,
+      '#include <project_vertex>',
+      VERTEX_MAIN,
+      label,
+    );
+    const defines = options.puddles ? '#define AMB_PUDDLES\n' : '';
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <common>',
+      defines + SURFACE_FRAGMENT_PARS,
+      label,
+    );
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <normal_fragment_maps>',
+      FRAGMENT_WET,
+      label,
+    );
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <lights_fragment_end>',
+      FRAGMENT_LIGHT,
+      label,
+    );
+  };
+  material.customProgramCacheKey = (): string => `${previousKey()}|amb_${options.key}`;
+  material.needsUpdate = true;
+}

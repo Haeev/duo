@@ -17,6 +17,7 @@ import type {
 } from 'three';
 import type { GameMap } from '../etat/carte';
 import type { FrameContext, RenderPart } from './contexte';
+import { createAmbiance } from './ambiance';
 import type { DaylightRig } from './lumiere';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -54,4 +55,7 @@ export interface ExtensionPart extends RenderPart {
 export type RenderExtension = (hooks: RenderHooks) => ExtensionPart | null;
 
 /** Extensions inscrites (technical artist). */
-export const RENDER_EXTENSIONS: readonly RenderExtension[] = [];
+export const RENDER_EXTENSIONS: readonly RenderExtension[] = [
+  // Lumière, eau, pluie, nuages, brume, lueurs de nuit, panache et particules du potager.
+  createAmbiance,
+];

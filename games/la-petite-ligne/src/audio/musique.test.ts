@@ -158,6 +158,16 @@ describe('directeur de la musique', () => {
     expect(director.current()).toBeNull();
   });
 
+  it('décode d avance la musique annoncée (réveil, coucher), à chaque fois', () => {
+    const director = new MusicDirector({ ...options, random: createRandom(4) });
+    director.prefetch(MUSIC.breakfast);
+    expect(director.update({ id: null, rest: false, fadeOut: null }, 0)).toEqual([{ kind: 'prefetch', id: MUSIC.breakfast }]);
+    director.update({ id: MUSIC.breakfast, rest: false, fadeOut: null }, 3.5);
+    director.update({ id: MUSIC.morning, rest: true, fadeOut: null }, 30);
+    director.prefetch(MUSIC.breakfast);
+    expect(director.update({ id: MUSIC.morning, rest: true, fadeOut: null }, 31)).toEqual([{ kind: 'prefetch', id: MUSIC.breakfast }]);
+  });
+
   it('calcule la position dans la boucle', () => {
     const def = catalogue.music.get(MUSIC.morning);
     if (def === undefined) throw new Error('halte-matin absente');

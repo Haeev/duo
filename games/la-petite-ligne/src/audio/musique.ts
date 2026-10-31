@@ -179,6 +179,13 @@ export class MusicDirector {
     return this.state.mode === 'resting';
   }
 
+  /** Décoder une musique qui va venir (une fois par musique tant qu'elle n'a pas joué). */
+  prefetch(id: string): void {
+    if (this.prefetched === id || !this.options.music.has(id)) return;
+    this.prefetched = id;
+    this.pendingOnce.push({ kind: 'prefetch', id });
+  }
+
   /** Une musique jouée une fois par-dessus (fanfare, air de fin). */
   once(id: string, now: number): void {
     if (this.options.music.has(id)) this.pendingOnce.push({ kind: 'once', id, at: now });
@@ -252,6 +259,7 @@ export class MusicDirector {
   private start(id: string, now: number, rest: boolean, fadeIn?: number): void {
     const def = this.options.music.get(id);
     if (def === undefined) return;
+    if (this.prefetched === id) this.prefetched = null;
     this.commands.push({ kind: 'start', id, offset: def.playFrom, fadeIn: fadeIn ?? def.fadeInSeconds, at: now });
     this.state = { mode: 'playing', track: { id, startedAt: now, offset: def.playFrom }, rest, sessionStart: now };
   }

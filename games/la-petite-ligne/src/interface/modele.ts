@@ -392,6 +392,8 @@ export interface ObjectiveLine {
 export interface QuestModel {
   id: string;
   kind: 'main' | 'side';
+  /** P1: peut manquer à la démo (la pêche), passe après le reste dans le prochain objectif. */
+  optional: boolean;
   title: string;
   text: string;
   done: boolean;
@@ -433,6 +435,7 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
     out.push({
       id: def.id,
       kind: def.kind,
+      optional: def.tier === 'P1',
       title: ctx.t(def.title),
       text: questText(world, ctx, def, state.step, done),
       done,
@@ -445,11 +448,13 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
 
 /**
  * Le prochain objectif du HUD: la trame d'abord (sauf la commande), puis les
- * coups de main, puis la commande; la commande passe devant à l'approche du train.
+ * coups de main, puis la commande, puis ce qui est facultatif (P1); la
+ * commande passe devant à l'approche du train.
  */
 export function nextObjective(world: ReadonlyWorld, ctx: UiContext): QuestModel | null {
-  const quests = questModels(world, ctx).filter((q) => !q.done);
-  if (quests.length === 0) return null;
+  const open = questModels(world, ctx).filter((q) => !q.done);
+  if (open.length === 0) return null;
+  const quests = [...open.filter((q) => !q.optional), ...open.filter((q) => q.optional)];
   const order = orderQuest(ctx);
   const lastDay = ctx.content.settings.clock.lastDay.day;
   const isOrder = (q: QuestModel): boolean => q.id === order?.id;
@@ -458,7 +463,11 @@ export function nextObjective(world: ReadonlyWorld, ctx: UiContext): QuestModel 
     if (o !== undefined) return o;
   }
   return (
-    quests.find((q) => q.kind === 'main' && !isOrder(q)) ?? quests.find((q) => q.kind === 'side') ?? quests.find(isOrder) ?? null
+    quests.find((q) => q.kind === 'main' && !isOrder(q) && !q.optional) ??
+    quests.find((q) => q.kind === 'side' && !q.optional) ??
+    quests.find(isOrder) ??
+    quests[0] ??
+    null
   );
 }
 

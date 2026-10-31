@@ -9,7 +9,7 @@ import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
 import type { GameMap, Rect } from '../etat/carte';
 import type { CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
-import { ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
+import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
 import { type Catalogue, type SequenceStep, sequenceOf, stepTime, stopTime } from './catalogue';
 import { type EventSignals, type LoopWish, type SoundRequest, StateWatcher, type TriggerContext, noSignals, soundsForEvent } from './declencheurs';
 import { distanceBetween, distanceToRect, earPosition } from './espace';
@@ -30,6 +30,8 @@ const TRAIN_IDLE = 'train-idle-loop';
 const AFTERNOON_FROM_MINUTES = 13 * 60;
 /** Avance du décodage d'une musique avant la fin d'un repos (s). */
 const MUSIC_PREFETCH_SECONDS = 12;
+/** Attente après la fin d'un fondu de sortie avant de décoder la musique suivante (s): la précédente est libérée. */
+const PREFETCH_AFTER_FADE_SECONDS = 1;
 
 export interface BrainOptions {
   catalogue: Catalogue;
@@ -127,6 +129,8 @@ export class AudioBrain {
   private readonly moment: MusicMoment;
   private readonly loco = { x: 0, y: 0 };
   private readonly levelsSoon = new Map<string, number>();
+  private readonly ambienceInput: AmbienceInput = { minutes: 0, weather: 'sunny', inHouse: false, at: { x: 0, y: 0 } };
+  private triggerContext: TriggerContext | null = null;
 
   constructor(private readonly options: BrainOptions) {
     const { catalogue, settings, content, map, random } = options;
@@ -235,15 +239,16 @@ export class AudioBrain {
     earPosition(f.listener.at, input.yaw, settings.listener.backOffsetM, f.listener.ear);
 
     // Événements, puis ce qui se lit dans l'état.
-    const ctx: TriggerContext = {
+    const ctx = (this.triggerContext ??= {
       world,
       local,
       content,
       map,
       peerDb: catalogue.peerDb,
-      isUiSound: (id) => catalogue.sounds.get(id)?.bus === 'ui',
       hasSound: (id) => catalogue.sounds.has(id),
-    };
+    });
+    ctx.world = world;
+    ctx.local = local;
     const signals = noSignals(this.signals);
     for (const event of input.events) {
       if (event.type === 'door') {
@@ -256,11 +261,16 @@ export class AudioBrain {
     this.watcher.update(ctx, input.dt, input.gameTime, f.shots, f.loops);
 
     // Réveil et coucher.
+    // La musique qui suit est connue d'avance: on la décode pendant le coq ou l'endormissement.
     if (signals.morning) {
       this.wakeRun = { start: input.gameTime, run: new SequenceRun(SEQ.wake, this.seq.wake, this.seqCatalogue) };
       this.bedRun = null;
+      this.director.prefetch(MUSIC.breakfast);
     }
-    if (signals.wentToBed) this.bedRun = { start: input.gameTime, run: new SequenceRun(SEQ.bed, this.seq.bed, this.seqCatalogue) };
+    if (signals.wentToBed) {
+      this.bedRun = { start: input.gameTime, run: new SequenceRun(SEQ.bed, this.seq.bed, this.seqCatalogue) };
+      this.director.prefetch(MUSIC.night);
+    }
     this.runPersonal(input.gameTime);
 
     // Train.
@@ -294,15 +304,14 @@ export class AudioBrain {
     f.bed = this.director.current();
 
     // Ambiances: maintenant et bientôt (pour décoder à l'avance).
-    const ambienceInput = { minutes: world.clock.minutes, weather: world.weather, inHouse: f.listener.inHouse, at: f.listener.at };
-    ambienceLevels(catalogue.ambienceRules, ambienceInput, this.zones, settings.ambience, f.ambience);
-    ambienceLevels(
-      catalogue.ambienceRules,
-      { ...ambienceInput, minutes: world.clock.minutes + settings.ambience.prefetchMinutes },
-      this.zones,
-      settings.ambience,
-      this.levelsSoon,
-    );
+    const amb = this.ambienceInput;
+    amb.minutes = world.clock.minutes;
+    amb.weather = world.weather;
+    amb.inHouse = f.listener.inHouse;
+    amb.at = f.listener.at;
+    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, f.ambience);
+    amb.minutes = world.clock.minutes + settings.ambience.prefetchMinutes;
+    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, this.levelsSoon);
     f.ambienceNeeded.clear();
     for (const [id, gain] of f.ambience) if (gain > 0) f.ambienceNeeded.add(id);
     for (const [id, gain] of this.levelsSoon) if (gain > 0) f.ambienceNeeded.add(id);
@@ -355,7 +364,14 @@ export class AudioBrain {
     const train = world.train;
     const departed = timeline.departure !== null && train.phase === 'away';
     locomotivePosition(this.geometry, departed ? 'departing' : train.phase, departed ? 0 : train.progress, this.loco);
-    if (this.arrivalRun !== null && timeline.arrival !== null) this.fire('arrival', this.arrivalRun.run, timeline.arrival);
+    if (this.arrivalRun !== null && timeline.arrival !== null) {
+      // Pendant la fanfare, une fois le thème du jour effacé et libéré, la musique du samedi se décode (elle part à 32 s).
+      const fanfare = this.anchors.fanfareAt;
+      if (fanfare !== null && timeline.arrival >= fanfare + PREFETCH_AFTER_FADE_SECONDS && timeline.arrival < this.anchors.saturdayFrom) {
+        this.director.prefetch(MUSIC.saturday);
+      }
+      this.fire('arrival', this.arrivalRun.run, timeline.arrival);
+    }
     if (this.departureRun !== null && timeline.departure !== null) this.fire('departure', this.departureRun.run, timeline.departure);
 
     // Recalage des longs sons sur l'horloge de leur séquence.

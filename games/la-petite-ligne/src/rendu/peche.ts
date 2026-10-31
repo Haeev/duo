@@ -39,6 +39,7 @@ const ESCAPE_SECONDS = 0.7;
 const ESCAPE_RISE = 0.35;
 const SPLASH_SHARE = 0.6;
 const HALF = 0.5;
+const FISH_JUMP_SIZE = 3.5;
 const Y_AXIS = new Vector3(0, 1, 0);
 
 interface Angler {
@@ -130,7 +131,7 @@ export class FishingPart implements EventfulPart {
       const from = angler.last;
       this.effects.particles.emit('water', from.x, from.y, from.z);
       this.effects.ripple(from.x, from.y, from.z, RIPPLE_COLOR, CAST_RIPPLE_SECONDS);
-      this.effects.jump(event.item, from, event.by, false, context.reducedMotion);
+      this.effects.jump(event.item, from, event.by, true, context.reducedMotion, FISH_JUMP_SIZE);
     } else if (event.type === 'escaped') {
       const angler = this.angler(event.by);
       angler.escapeAt = this.time;

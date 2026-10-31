@@ -1,0 +1,458 @@
+/**
+ * Particules sur le GPU: un seul programme de shader pour toute l'ambiance
+ * (panache, potager, pluie, éclaboussures, nuages, brume, halos). Chaque
+ * particule est une instance d'un carré tourné vers la caméra; sa trajectoire
+ * est calculée dans le shader à partir de sa naissance, donc le processeur
+ * n'écrit rien à chaque image (il n'écrit qu'à l'émission).
+ *
+ * Trois modes (uniforme `uMode`, même programme): bouffées émises
+ * (`PuffPool`), pluie déterministe autour de la vue (`pluie.ts`), sprites posés
+ * qui dérivent (`ciel.ts`). Le mélange est en alpha prémultiplié: une même
+ * passe fait les fumées (alpha) et les halos (addition).
+ */
+import {
+  BufferAttribute,
+  Color,
+  CustomBlending,
+  DynamicDrawUsage,
+  InstancedBufferAttribute,
+  InstancedBufferGeometry,
+  Mesh,
+  OneFactor,
+  OneMinusSrcAlphaFactor,
+  ShaderMaterial,
+  UniformsLib,
+  UniformsUtils,
+  Vector2,
+  Vector3,
+  Vector4,
+  type IUniform,
+  type Texture,
+} from 'three';
+import type { ResourceTracker } from './ressources';
+
+/** Formes dessinées par le shader de fragment. */
+export const PARTICLE_SHAPE = {
+  /** Bouffée douce, éclairée comme un petit volume (vapeur, poussière, nuage, brume). */
+  puff: 0,
+  /** Trait fin le long de la vitesse (goutte de pluie). */
+  streak: 1,
+  /** Rond qui s'élargit, posé au sol (éclaboussure, rond dans l'eau). */
+  ring: 2,
+  /** Étoile à quatre branches qui scintille (récolte « belle »). */
+  star: 3,
+  /** Halo lumineux, ajouté à l'image (lanterne, fenêtre). */
+  glow: 4,
+  /** Gouttelette ronde et nette (arrosage). */
+  droplet: 5,
+} as const;
+
+export const PARTICLE_MODE = { puffs: 0, rain: 1, sprites: 2 } as const;
+
+const QUAD_CORNERS = new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0]);
+const QUAD_INDEX = [0, 1, 2, 0, 2, 3];
+const VEC4 = 4;
+/** Les instances qui ne doivent pas paraître sont envoyées hors du volume de vue. */
+const VERTEX_SHADER = /* glsl */ `
+#include <common>
+#include <fog_pars_vertex>
+
+uniform float uTime;
+uniform int uMode;
+uniform vec3 uFocus;
+uniform vec4 uRain;       // demi-côté de la zone, hauteur de la colonne, densité (0 à 1), durée d'une éclaboussure
+uniform vec3 uFall;       // vitesse de chute (m/s), vent compris
+uniform vec4 uRainShape;  // longueur du trait, largeur, rayon d'éclaboussure au sol, rayon dans l'eau
+uniform sampler2D uField;
+uniform vec4 uFieldRect;
+uniform vec2 uFieldHeight;
+uniform vec4 uSpriteArea; // demi-côté de la zone des nuages, de la brume, vent des nuages (x, z)
+uniform vec4 uGroupAlpha; // nuages, brume, halos, réserve
+uniform vec2 uCloudFade;  // rayon (écran) où les nuages sont invisibles, puis pleins
+uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra
+
+attribute vec4 aOrigin;   // position, naissance (bouffées) ou phase
+attribute vec4 aVelocity; // vitesse, durée de vie
+attribute vec4 aAccel;    // accélération, frein (bouffées) ou groupe (sprites)
+attribute vec4 aSize;     // taille au départ, à la fin, forme, graine
+attribute vec4 aColor;    // couleur (linéaire), opacité
+
+varying vec2 vCorner;
+varying vec4 vColor;
+varying float vShape;
+varying float vAge;
+varying float vLight;
+
+uint ambHash(uint x) {
+  x ^= x >> 16u; x *= 0x7feb352du; x ^= x >> 15u; x *= 0x846ca68bu; x ^= x >> 16u;
+  return x;
+}
+float ambRandom(uint a, uint b) {
+  return float(ambHash(a * 1664525u + ambHash(b))) / 4294967295.0;
+}
+vec4 ambField(vec2 xz) {
+  return textureLod(uField, (xz - uFieldRect.xy) * uFieldRect.zw, 0.0);
+}
+float ambGround(vec4 field) {
+  return uFieldHeight.x + field.r * uFieldHeight.y;
+}
+/** Enroule x autour de c dans une fenêtre de demi-côté h (la pluie reste fixe dans le monde). */
+float ambWrap(float x, float c, float h) {
+  return c - h + mod(x - (c - h), 2.0 * h);
+}
+
+void hideInstance() {
+  gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
+}
+
+void main() {
+  vCorner = position.xy;
+  vShape = aSize.z;
+  vColor = aColor;
+  vAge = 0.0;
+  vLight = 1.0;
+  vec3 centre = aOrigin.xyz;
+  float size = aSize.x;
+  vec3 axis = vec3(0.0);
+  bool onGround = false;
+
+  if (uMode == 0) {
+    float age = uTime - aOrigin.w;
+    float t = age / aVelocity.w;
+    if (t < 0.0 || t > 1.0) { hideInstance(); return; }
+    float drag = max(aAccel.w, 0.001);
+    centre = aOrigin.xyz + aVelocity.xyz * ((1.0 - exp(-drag * age)) / drag) + 0.5 * aAccel.xyz * age * age;
+    size = mix(aSize.x, aSize.y, sqrt(t));
+    vColor.a *= smoothstep(0.0, 0.08, t) * (1.0 - smoothstep(0.55, 1.0, t));
+    vAge = t;
+    if (aSize.z == 5.0) {
+      // Gouttelette: étirée le long de sa vitesse du moment.
+      axis = normalize(aVelocity.xyz * exp(-drag * age) + aAccel.xyz * age + vec3(0.0, 0.0001, 0.0));
+    }
+  } else if (uMode == 1) {
+    if (aSize.w > uRain.z) { hideInstance(); return; }
+    float h = uRain.x;
+    if (aSize.z == 1.0) {
+      // Goutte: fixe dans le monde, enroulée autour de la vue, tombe en boucle.
+      float fallTime = uRain.y / length(uFall);
+      float phase = fract(aOrigin.y + uTime / fallTime);
+      float drop = (1.0 - phase) * uRain.y;
+      // Le vent pousse la goutte: plus haut, elle est encore en amont de son point de chute.
+      vec2 xz = aOrigin.xz * 2.0 * h + uFall.xz / uFall.y * drop;
+      xz = vec2(ambWrap(xz.x, uFocus.x, h), ambWrap(xz.y, uFocus.z, h));
+      vec4 field = ambField(xz);
+      if (field.b > 0.5) { hideInstance(); return; }
+      centre = vec3(xz.x, ambGround(field) + drop, xz.y);
+      axis = normalize(uFall);
+      size = uRainShape.y;
+      vAge = phase;
+    } else {
+      // Éclaboussure: un endroit tiré au hasard à chaque cycle, au sol ou dans l'eau.
+      float cycle = (uTime + aSize.w * uRain.w) / uRain.w;
+      uint n = uint(floor(cycle));
+      uint id = uint(gl_InstanceID);
+      vec2 xz = uFocus.xz + (vec2(ambRandom(n, id), ambRandom(n, id + 7919u)) * 2.0 - 1.0) * h;
+      vec4 field = ambField(xz);
+      if (field.b > 0.5) { hideInstance(); return; }
+      float t = fract(cycle);
+      bool water = field.a > 0.5;
+      centre = vec3(xz.x, ambGround(field) + 0.03, xz.y);
+      size = water ? uRainShape.w : uRainShape.z;
+      vAge = t;
+      vColor.a *= 1.0 - t;
+      onGround = true;
+    }
+  } else {
+    int group = int(aAccel.w + 0.5);
+    if (group == 0) {
+      vec2 xz = aOrigin.xz + uSpriteArea.zw * uTime;
+      xz = vec2(ambWrap(xz.x, uFocus.x, uSpriteArea.x), ambWrap(xz.y, uFocus.z, uSpriteArea.x));
+      centre = vec3(xz.x, aOrigin.y, xz.y);
+    } else if (group == 1) {
+      vec2 drift = vec2(sin(uTime * 0.11 + aOrigin.w * 6.0), cos(uTime * 0.09 + aOrigin.w * 4.0));
+      vec2 xz = aOrigin.xz + drift * aVelocity.x;
+      centre = vec3(xz.x, aOrigin.y, xz.y);
+    }
+    float groupAlpha = group == 0 ? uGroupAlpha.x : (group == 1 ? uGroupAlpha.y : uGroupAlpha.z);
+    if (groupAlpha <= 0.0) { hideInstance(); return; }
+    vColor.a *= groupAlpha;
+    if (aSize.z == 4.0) {
+      // Flamme: léger scintillement.
+      vColor.a *= 0.88 + 0.12 * sin(uTime * 7.0 + aOrigin.w * 40.0);
+    }
+  }
+
+  vec3 right = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
+  vec3 up = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+  vec3 forward = -vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]);
+  vec3 world;
+  if (onGround) {
+    world = centre + vec3(position.x, 0.0, position.y) * size;
+  } else if (dot(axis, axis) > 0.0) {
+    vec3 side = normalize(cross(axis, forward));
+    float streak = aSize.z == 1.0 ? uRainShape.x : size * 2.5;
+    world = centre + side * position.x * size + axis * position.y * streak * 0.5;
+  } else {
+    world = centre + (right * position.x + up * position.y) * size;
+  }
+  vec4 mvPosition = viewMatrix * vec4(world, 1.0);
+  gl_Position = projectionMatrix * mvPosition;
+  if (uMode == 2 && int(aAccel.w + 0.5) == 0) {
+    // Nuages: invisibles au centre de l'écran (on ne cache jamais les joueurs).
+    float r = length(gl_Position.xy / gl_Position.w);
+    vColor.a *= smoothstep(uCloudFade.x, uCloudFade.y, r);
+  }
+  // Volume des bouffées: le côté tourné vers la lumière est plus clair.
+  vLight = dot(normalize(vec3(position.xy, 0.8)), uLightView) * 0.5 + 0.5;
+  #include <fog_vertex>
+}
+`;
+
+const FRAGMENT_SHADER = /* glsl */ `
+#include <common>
+#include <fog_pars_fragment>
+
+uniform vec3 uLitColor;   // lumière directe (soleil ou lune), intensité comprise
+uniform vec3 uShadeColor; // lumière du ciel (hémisphérique)
+
+varying vec2 vCorner;
+varying vec4 vColor;
+varying float vShape;
+varying float vAge;
+varying float vLight;
+
+void main() {
+  float r = length(vCorner);
+  float alpha = 0.0;
+  float additive = 0.0;
+  vec3 color = vColor.rgb;
+  if (vShape == 0.0) {
+    alpha = smoothstep(1.0, 0.25, r);
+    color *= uShadeColor + uLitColor * vLight;
+  } else if (vShape == 1.0) {
+    alpha = (1.0 - abs(vCorner.x)) * smoothstep(1.0, 0.3, abs(vCorner.y)) * (0.6 + 0.4 * vCorner.y);
+    color *= uShadeColor + uLitColor * 0.5;
+  } else if (vShape == 2.0) {
+    float ring = vAge * 0.85 + 0.1;
+    alpha = 1.0 - smoothstep(0.0, 0.16, abs(r - ring));
+    color *= uShadeColor + uLitColor * 0.6;
+  } else if (vShape == 3.0) {
+    float arms = max(0.0, 1.0 - abs(vCorner.x) * 7.0) * (1.0 - abs(vCorner.y))
+      + max(0.0, 1.0 - abs(vCorner.y) * 7.0) * (1.0 - abs(vCorner.x));
+    float core = smoothstep(0.45, 0.0, r);
+    alpha = clamp(arms + core, 0.0, 1.0) * (0.65 + 0.35 * sin(vAge * 40.0));
+    additive = 1.0;
+  } else if (vShape == 4.0) {
+    alpha = exp(-r * r * 4.0) * (1.0 - smoothstep(0.7, 1.0, r));
+    additive = 1.0;
+  } else {
+    alpha = smoothstep(1.0, 0.7, r);
+    color *= uShadeColor + uLitColor * 0.8;
+  }
+  alpha *= vColor.a;
+  if (alpha < 0.004) discard;
+  gl_FragColor = vec4(color, alpha);
+  #include <tonemapping_fragment>
+  #include <colorspace_fragment>
+  #include <fog_fragment>
+  // Alpha prémultiplié: les halos s'ajoutent à l'image, les fumées la recouvrent.
+  gl_FragColor.rgb *= gl_FragColor.a;
+  gl_FragColor.a *= 1.0 - additive;
+}
+`;
+
+/** Uniformes du programme des particules (une copie par matériau, même programme). */
+export interface ParticleUniforms {
+  [name: string]: IUniform;
+  uTime: IUniform<number>;
+  uMode: IUniform<number>;
+  uFocus: IUniform<Vector3>;
+  uRain: IUniform<Vector4>;
+  uFall: IUniform<Vector3>;
+  uRainShape: IUniform<Vector4>;
+  uField: IUniform<Texture | null>;
+  uFieldRect: IUniform<Vector4>;
+  uFieldHeight: IUniform<Vector2>;
+  uSpriteArea: IUniform<Vector4>;
+  uGroupAlpha: IUniform<Vector4>;
+  uCloudFade: IUniform<Vector2>;
+  uLightView: IUniform<Vector3>;
+  uLitColor: IUniform<Color>;
+  uShadeColor: IUniform<Color>;
+}
+
+/** Matériau des particules dans un mode donné. Tous partagent le même programme. */
+export function createParticleMaterial(
+  mode: number,
+  field: { texture: Texture; rect: Vector4; height: Vector2 },
+  resources: ResourceTracker,
+): ShaderMaterial & { uniforms: ParticleUniforms } {
+  const uniforms: ParticleUniforms = {
+    ...UniformsUtils.clone(UniformsLib.fog),
+    uTime: { value: 0 },
+    uMode: { value: mode },
+    uFocus: { value: new Vector3() },
+    uRain: { value: new Vector4(1, 1, 0, 1) },
+    uFall: { value: new Vector3(0, -1, 0) },
+    uRainShape: { value: new Vector4(0.5, 0.03, 0.15, 0.4) },
+    uField: { value: field.texture },
+    uFieldRect: { value: field.rect },
+    uFieldHeight: { value: field.height },
+    uSpriteArea: { value: new Vector4(1, 1, 0, 0) },
+    uGroupAlpha: { value: new Vector4(0, 0, 0, 0) },
+    uCloudFade: { value: new Vector2(0, 1) },
+    uLightView: { value: new Vector3(0, 0, 1) },
+    uLitColor: { value: new Color(1, 1, 1) },
+    uShadeColor: { value: new Color(1, 1, 1) },
+  };
+  const material = new ShaderMaterial({
+    name: 'lpl_ambiance',
+    uniforms,
+    vertexShader: VERTEX_SHADER,
+    fragmentShader: FRAGMENT_SHADER,
+    transparent: true,
+    depthWrite: false,
+    fog: true,
+    blending: CustomBlending,
+    blendSrc: OneFactor,
+    blendDst: OneMinusSrcAlphaFactor,
+  });
+  resources.track(material);
+  return material as ShaderMaterial & { uniforms: ParticleUniforms };
+}
+
+/** Attributs d'instance des particules, à remplir par l'appelant. */
+export interface ParticleBuffers {
+  origin: InstancedBufferAttribute;
+  velocity: InstancedBufferAttribute;
+  accel: InstancedBufferAttribute;
+  size: InstancedBufferAttribute;
+  color: InstancedBufferAttribute;
+}
+
+/** Carré instancié `capacity` fois, avec ses attributs d'instance (vides). */
+export function createParticleMesh(
+  name: string,
+  capacity: number,
+  material: ShaderMaterial,
+  resources: ResourceTracker,
+  dynamic: boolean,
+): { mesh: Mesh; buffers: ParticleBuffers; geometry: InstancedBufferGeometry } {
+  const geometry = new InstancedBufferGeometry();
+  geometry.setAttribute('position', new BufferAttribute(QUAD_CORNERS, 3));
+  geometry.setIndex(QUAD_INDEX);
+  const attribute = (): InstancedBufferAttribute => {
+    const buffer = new InstancedBufferAttribute(new Float32Array(capacity * VEC4), VEC4);
+    if (dynamic) {
+      buffer.setUsage(DynamicDrawUsage);
+    }
+    return buffer;
+  };
+  const buffers: ParticleBuffers = {
+    origin: attribute(),
+    velocity: attribute(),
+    accel: attribute(),
+    size: attribute(),
+    color: attribute(),
+  };
+  geometry.setAttribute('aOrigin', buffers.origin);
+  geometry.setAttribute('aVelocity', buffers.velocity);
+  geometry.setAttribute('aAccel', buffers.accel);
+  geometry.setAttribute('aSize', buffers.size);
+  geometry.setAttribute('aColor', buffers.color);
+  geometry.instanceCount = capacity;
+  resources.track(geometry);
+  const mesh = new Mesh(geometry, material);
+  mesh.name = name;
+  mesh.frustumCulled = false;
+  mesh.castShadow = false;
+  mesh.receiveShadow = false;
+  mesh.matrixAutoUpdate = false;
+  return { mesh, buffers, geometry };
+}
+
+/** Une bouffée à émettre (unités du monde, couleur linéaire). */
+export interface PuffSpec {
+  x: number;
+  y: number;
+  z: number;
+  vx: number;
+  vy: number;
+  vz: number;
+  ax: number;
+  ay: number;
+  az: number;
+  drag: number;
+  life: number;
+  startSize: number;
+  endSize: number;
+  shape: number;
+  color: Color;
+  opacity: number;
+}
+
+/**
+ * Bouffées émises par le processeur (anneau de `capacity` places, la plus
+ * ancienne cède sa place): le GPU calcule ensuite toute leur vie.
+ */
+export class PuffPool {
+  readonly mesh: Mesh;
+  private readonly buffers: ParticleBuffers;
+  private readonly capacity: number;
+  private next = 0;
+  private dirty = false;
+  private seed = 1;
+  private lastBirth = Number.NEGATIVE_INFINITY;
+  private longestLife = 0;
+
+  constructor(
+    capacity: number,
+    readonly material: ShaderMaterial & { uniforms: ParticleUniforms },
+    resources: ResourceTracker,
+  ) {
+    this.capacity = capacity;
+    const built = createParticleMesh('panache et potager', capacity, material, resources, true);
+    this.mesh = built.mesh;
+    this.buffers = built.buffers;
+    // Toutes les places commencent mortes (nées il y a longtemps).
+    for (let i = 0; i < capacity; i += 1) {
+      this.buffers.origin.setW(i, Number.NEGATIVE_INFINITY);
+      this.buffers.velocity.setW(i, 1);
+    }
+    this.mesh.visible = false;
+  }
+
+  /** Suite pseudo-aléatoire locale (décor seulement, jamais dans la simulation). */
+  random(): number {
+    const PM_MULTIPLIER = 16807;
+    const PM_MODULUS = 2147483647;
+    this.seed = (this.seed * PM_MULTIPLIER) % PM_MODULUS;
+    return (this.seed - 1) / (PM_MODULUS - 1);
+  }
+
+  emit(spec: PuffSpec, time: number): void {
+    const i = this.next;
+    this.next = (this.next + 1) % this.capacity;
+    const b = this.buffers;
+    b.origin.setXYZW(i, spec.x, spec.y, spec.z, time);
+    b.velocity.setXYZW(i, spec.vx, spec.vy, spec.vz, spec.life);
+    b.accel.setXYZW(i, spec.ax, spec.ay, spec.az, spec.drag);
+    b.size.setXYZW(i, spec.startSize, spec.endSize, spec.shape, this.random());
+    b.color.setXYZW(i, spec.color.r, spec.color.g, spec.color.b, spec.opacity);
+    this.dirty = true;
+    this.lastBirth = time;
+    this.longestLife = Math.max(this.longestLife, spec.life);
+  }
+
+  /** Envoie les nouvelles bouffées au GPU; cache le maillage quand plus rien ne vit. */
+  update(time: number): void {
+    this.material.uniforms.uTime.value = time;
+    if (this.dirty) {
+      for (const buffer of Object.values(this.buffers) as InstancedBufferAttribute[]) {
+        buffer.needsUpdate = true;
+      }
+      this.dirty = false;
+    }
+    this.mesh.visible = time - this.lastBirth <= this.longestLife;
+  }
+}

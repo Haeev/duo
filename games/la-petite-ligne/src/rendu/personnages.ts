@@ -11,6 +11,7 @@ import {
   Float32BufferAttribute,
   Group,
   Mesh,
+  Quaternion,
   SkinnedMesh,
   Sphere,
   Vector3,
@@ -78,6 +79,9 @@ const CAST_SECONDS = 0.9;
 /** Touche: le bras tendu de l'arrosage, comme une canne qui tire. */
 const BITE_CLIP = 'water';
 const ROD_ITEM = 'fishing_rod';
+/** Axe de la canne (de la prise au bout), et sa pente au-dessus de l'eau pendant la pêche. */
+const ROD_AXIS = ROD_TIP.clone().normalize();
+const ROD_TILT = (35 * Math.PI) / 180;
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
@@ -225,6 +229,27 @@ class CharacterFigure {
     this.tool.localToWorld(out);
     return true;
   }
+
+  /**
+   * Oriente l'outil tenu dans une direction du monde (la canne vers le
+   * bouchon), quelle que soit la pose de la main; `null` rend la tenue de
+   * l'artiste. À appeler après l'animation de l'image.
+   */
+  aimTool(axis: Vector3, direction: Vector3 | null): void {
+    if (this.tool === null || this.hand === null) {
+      return;
+    }
+    if (direction === null) {
+      this.tool.quaternion.identity();
+      return;
+    }
+    this.hand.getWorldQuaternion(this.handQuaternion);
+    this.aimQuaternion.setFromUnitVectors(axis, direction);
+    this.tool.quaternion.copy(this.handQuaternion.invert().multiply(this.aimQuaternion));
+  }
+
+  private readonly handQuaternion = new Quaternion();
+  private readonly aimQuaternion = new Quaternion();
 
   setTool(library: ModelLibrary, model: string | null): void {
     const name = model ?? '';
@@ -414,6 +439,7 @@ export class CharactersPart implements EventfulPart {
 
   /** Moment du dernier lancer de chaque joueur (pose de pêche composée avec les animations existantes). */
   private readonly castAt = new Map<CharacterId, number>();
+  private readonly aim = new Vector3();
   private time = 0;
 
   handleEvent(event: WorldEvent): void {
@@ -597,6 +623,20 @@ export class CharactersPart implements EventfulPart {
         this.library,
         fishing && !moving ? rod : showTool ? definition.model : null,
       );
+      const line = character.fishing;
+      if (line !== null && !moving) {
+        const dx = line.bobber.x - character.pos.x;
+        const dy = line.bobber.y - character.pos.y;
+        const reach = Math.hypot(dx, dy) || 1;
+        this.aim.set(
+          (dx / reach) * Math.cos(ROD_TILT),
+          Math.sin(ROD_TILT),
+          (dy / reach) * Math.cos(ROD_TILT),
+        );
+        entry.figure.aimTool(ROD_AXIS, this.aim);
+      } else {
+        entry.figure.aimTool(ROD_AXIS, null);
+      }
     }
     for (const villager of world.villagers) {
       let figure = this.villagers.get(villager.id);

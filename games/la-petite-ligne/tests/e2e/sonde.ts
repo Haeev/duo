@@ -49,7 +49,7 @@ export function probeGuest(page: Page): Probe {
     ws.on('framereceived', (frame) => {
       if (typeof frame.payload !== 'string') return;
       const msg = parse(frame.payload) as NetFrame | null;
-      if (msg === null || msg.t !== 'net' || typeof msg.data !== 'string') return;
+      if (msg?.t !== 'net' || typeof msg.data !== 'string') return;
       const data = parse(msg.data) as Record<string, unknown> | null;
       if (data === null) return;
       if (msg.channel === 1 && typeof data.world === 'object') {
@@ -169,18 +169,58 @@ export function characterOf(w: WorldState, name: string): WorldState['characters
   return c;
 }
 
-/** Maintient une touche (par son code physique) pendant `ms` dans la page du jeu. */
-export async function holdKey(page: Page, code: string, ms: number): Promise<void> {
-  const key = KEY_OF_CODE[code] ?? code;
-  await page.keyboard.down(key);
-  await page.waitForTimeout(ms);
-  await page.keyboard.up(key);
+/**
+ * Codes physiques (`KeyboardEvent.code`) des déplacements, lus par le jeu: sur un clavier AZERTY,
+ * KeyW est la touche Z et KeyA la touche Q. Directions pour la caméra de départ
+ * (`yaw = -3 PI/4`): Z vers le nord-ouest, D vers le nord-est, S vers le sud-est, Q vers le sud-ouest.
+ */
+const WORLD_DIRECTIONS: readonly { dx: number; dy: number; codes: readonly string[] }[] = [
+  { dx: -1, dy: 0, codes: ['KeyW', 'KeyA'] },
+  { dx: 1, dy: 0, codes: ['KeyS', 'KeyD'] },
+  { dx: 0, dy: -1, codes: ['KeyW', 'KeyD'] },
+  { dx: 0, dy: 1, codes: ['KeyS', 'KeyA'] },
+];
+
+/** Position d'un personnage lue dans l'instantané rapide de l'hôte (fait autorité). */
+export function positionOf(probe: Probe, id: string): { x: number; y: number } | null {
+  const c = probe.fast()?.characters.find((k) => k.id === id);
+  return c === undefined ? null : { x: c.x, y: c.y };
 }
 
-const KEY_OF_CODE: Readonly<Record<string, string>> = {
-  KeyW: 'KeyW',
-  KeyA: 'KeyA',
-  KeyS: 'KeyS',
-  KeyD: 'KeyD',
-  Space: 'Space',
-};
+/**
+ * Marche au clavier d'un point de passage à l'autre, en ligne droite le long des axes
+ * (caméra de départ, non tournée). Renvoie la position finale.
+ */
+export async function walkAlong(
+  page: Page,
+  probe: Probe,
+  id: string,
+  waypoints: readonly { x: number; y: number }[],
+  tolerance = 0.4,
+  timeoutMs = 120_000,
+): Promise<{ x: number; y: number }> {
+  const start = Date.now();
+  for (const target of waypoints) {
+    for (;;) {
+      const pos = positionOf(probe, id);
+      if (pos === null) throw new Error('aucune position reçue');
+      const ex = target.x - pos.x;
+      const ey = target.y - pos.y;
+      if (Math.abs(ex) <= tolerance && Math.abs(ey) <= tolerance) break;
+      if (Date.now() - start > timeoutMs) {
+        throw new Error(`Marche trop longue vers (${target.x}, ${target.y}): bloqué en (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`);
+      }
+      const horizontal = Math.abs(ex) >= Math.abs(ey);
+      const dir = WORLD_DIRECTIONS.find((d) => (horizontal ? d.dx === Math.sign(ex) : d.dy === Math.sign(ey)));
+      if (dir === undefined) break;
+      const remaining = horizontal ? Math.abs(ex) : Math.abs(ey);
+      for (const code of dir.codes) await page.keyboard.down(code);
+      await page.waitForTimeout(Math.min(400, 60 + remaining * 120));
+      for (const code of dir.codes) await page.keyboard.up(code);
+      await page.waitForTimeout(150);
+    }
+  }
+  const end = positionOf(probe, id);
+  if (end === null) throw new Error('aucune position reçue');
+  return end;
+}

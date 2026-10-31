@@ -267,7 +267,7 @@ export class RenderEngine implements Renderer {
     this.scene.add(effects.group);
     world.add(effects);
     const fishing = new FishingPart(materials, terrain, this.resources, characters, effects);
-    const signs = new SignsPart(materials, terrain, this.resources);
+    const signs = new SignsPart(materials, terrain, this.resources, library);
     this.scene.add(fishing.group, signs.group);
     world.add(fishing);
     world.add(signs);

@@ -335,7 +335,8 @@ export function itemDetail(ctx: UiContext, stack: Readonly<ItemStack>): ItemDeta
   const fine = stack.quality === 'fine';
   const parts = [itemTitle(def, stack.count, stack.item)];
   if (fine) parts.push(ctx.texts.extra.common.fineQuality);
-  const name = ctx.t(`${parts.join(', ')}, ${stack.count}`);
+  if ((def?.stack ?? 1) > 1) parts.push(String(stack.count));
+  const name = ctx.t(parts.join(', '));
   const category = def?.category ?? 'material';
   let meta = n.categories[category] ?? '';
   let text = '';
