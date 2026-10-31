@@ -2,7 +2,7 @@
 // hôte, comme le Mac (hôte) et le PC (invité) sur le réseau local. Création des deux personnages,
 // scène d'arrivée, déplacement au clavier, bêchage d'une case du potager, pause par Échap et reprise.
 import { expect, test, type Locator } from '@playwright/test';
-import { characterOf, longTasks, positionOf, startDuo, walkAlong } from './sonde';
+import { characterOf, holdKeys, longTasks, positionOf, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
@@ -69,23 +69,29 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     const after = positionOf(probe, guestId);
     expect((before?.x ?? 0) - (after?.x ?? 0)).toBeGreaterThan(2);
 
-    // Potager, chez l'hôte: marcher jusqu'au nord de la case (9, 28), face au sud, houe en main, Espace.
+    // Potager, chez l'hôte: par la rangée y = 17,5 (libre d'un bout à l'autre), la colonne x = 13,5,
+    // puis à l'est de la case (10, 29), loin de la porte en chantier que la visée préférerait.
     await press(hostGame.getByRole('region', { name: 'Prochain objectif' }));
-    // Par la rangée y = 17,5, libre d'un bout à l'autre (la rangée 16 frôle le passage à niveau).
-    await walkAlong(host, probe, hostId, [
-      { x: 30.5, y: 17.5 },
-      { x: 13.5, y: 17.5 },
-      { x: 13.5, y: 27.4 },
-      { x: 9.5, y: 27.4 },
-    ]);
-    // Un pas vers le sud pour viser la case du potager.
-    await host.keyboard.down('KeyS');
-    await host.keyboard.down('KeyA');
-    await host.waitForTimeout(120);
-    await host.keyboard.up('KeyS');
-    await host.keyboard.up('KeyA');
-    await host.keyboard.press('Space');
-    w = await probe.until('une case du potager bêchée', (s) => s.garden.some((g) => g.soil !== 'grass'), 30_000);
+    const walker = { yaw: START_YAW };
+    await walkAlong(
+      host,
+      probe,
+      hostId,
+      [
+        { x: 37.5, y: 17.5 },
+        { x: 13.5, y: 17.5 },
+        { x: 13.5, y: 29.5 },
+        { x: 11.6, y: 29.5 },
+      ],
+      0.6,
+      360_000,
+      walker,
+    );
+    // Se tourner vers l'ouest (la case du potager), houe en main (case 1), puis Espace tenu.
+    const west = westKeys(walker.yaw);
+    await holdKeys(host, west, 700);
+    await holdKeys(host, ['Space'], 900);
+    w = await probe.until('une case du potager bêchée', (s) => s.garden.some((g) => g.soil !== 'grass'), 60_000);
     expect(probe.events.some((e) => e.type === 'tilled')).toBe(true);
     await shot('2-potager');
 

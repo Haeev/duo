@@ -181,15 +181,27 @@ export function characterOf(w: WorldState, name: string): WorldState['characters
 
 /**
  * Codes physiques (`KeyboardEvent.code`) des déplacements, lus par le jeu: sur un clavier AZERTY,
- * KeyW est la touche Z et KeyA la touche Q. Directions pour la caméra de départ
- * (`yaw = -3 PI/4`): Z vers le nord-ouest, D vers le nord-est, S vers le sud-est, Q vers le sud-ouest.
+ * KeyW est la touche Z et KeyA la touche Q. `screen`: angle de la direction par rapport à Z,
+ * dans le sens des orientations du jeu (D = Z + PI/2). La direction dans le monde vaut
+ * `yaw + screen`, où `yaw` est l'orientation de la caméra (`-3 PI/4` au départ).
  */
-const WORLD_DIRECTIONS: readonly { dx: number; dy: number; codes: readonly string[] }[] = [
-  { dx: -1, dy: 0, codes: ['KeyW', 'KeyA'] },
-  { dx: 1, dy: 0, codes: ['KeyS', 'KeyD'] },
-  { dx: 0, dy: -1, codes: ['KeyW', 'KeyD'] },
-  { dx: 0, dy: 1, codes: ['KeyS', 'KeyA'] },
+const KEY_DIRECTIONS: readonly { codes: readonly string[]; screen: number }[] = [
+  { codes: ['KeyW'], screen: 0 },
+  { codes: ['KeyW', 'KeyD'], screen: Math.PI / 4 },
+  { codes: ['KeyD'], screen: Math.PI / 2 },
+  { codes: ['KeyS', 'KeyD'], screen: (3 * Math.PI) / 4 },
+  { codes: ['KeyS'], screen: Math.PI },
+  { codes: ['KeyS', 'KeyA'], screen: (-3 * Math.PI) / 4 },
+  { codes: ['KeyA'], screen: -Math.PI / 2 },
+  { codes: ['KeyW', 'KeyA'], screen: -Math.PI / 4 },
 ];
+
+/** Orientation de la caméra au départ (`cameraYaw()` du rendu, ETAT.md). */
+export const START_YAW = (-3 * Math.PI) / 4;
+
+function angleGap(a: number, b: number): number {
+  return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
+}
 
 /** Position d'un personnage lue dans l'instantané rapide de l'hôte (fait autorité). */
 export function positionOf(probe: Probe, id: string): { x: number; y: number } | null {
@@ -197,37 +209,82 @@ export function positionOf(probe: Probe, id: string): { x: number; y: number } |
   return c === undefined ? null : { x: c.x, y: c.y };
 }
 
+/** Maintient des touches (codes physiques) pendant `ms`. */
+export async function holdKeys(page: Page, codes: readonly string[], ms: number): Promise<void> {
+  for (const code of codes) await page.keyboard.down(code);
+  await page.waitForTimeout(ms);
+  for (const code of codes) await page.keyboard.up(code);
+}
+
+/** Touches qui mènent vers l'ouest (x décroissant) pour une orientation de caméra donnée. */
+export function westKeys(yaw: number): readonly string[] {
+  let best = KEY_DIRECTIONS[0];
+  for (const d of KEY_DIRECTIONS) {
+    if (best === undefined || angleGap(yaw + d.screen, Math.PI) < angleGap(yaw + best.screen, Math.PI)) best = d;
+  }
+  return best?.codes ?? ['KeyW', 'KeyA'];
+}
+
+export interface Walker {
+  /** Orientation de la caméra estimée d'après les déplacements observés. */
+  yaw: number;
+}
+
 /**
- * Marche au clavier d'un point de passage à l'autre, en ligne droite le long des axes
- * (caméra de départ, non tournée). Renvoie la position finale.
+ * Marche au clavier de point de passage en point de passage. Le pilote ne suppose pas
+ * l'orientation de la caméra: il la réestime à chaque pas d'après le déplacement observé
+ * chez l'hôte (une caméra tournée ne le perd pas). Touches tenues au moins 700 ms: en rendu
+ * logiciel, une image dure près d'une seconde et une touche plus brève peut passer inaperçue.
  */
 export async function walkAlong(
   page: Page,
   probe: Probe,
   id: string,
   waypoints: readonly { x: number; y: number }[],
-  tolerance = 0.4,
-  timeoutMs = 120_000,
+  tolerance = 0.6,
+  timeoutMs = 240_000,
+  walker: Walker = { yaw: START_YAW },
 ): Promise<{ x: number; y: number }> {
   const start = Date.now();
+  let stuck = 0;
   for (const target of waypoints) {
     for (;;) {
       const pos = positionOf(probe, id);
       if (pos === null) throw new Error('aucune position reçue');
       const ex = target.x - pos.x;
       const ey = target.y - pos.y;
-      if (Math.abs(ex) <= tolerance && Math.abs(ey) <= tolerance) break;
+      const dist = Math.hypot(ex, ey);
+      if (dist <= tolerance) break;
       if (Date.now() - start > timeoutMs) {
-        throw new Error(`Marche trop longue vers (${target.x}, ${target.y}): bloqué en (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)})`);
+        throw new Error(
+          `Marche trop longue vers (${target.x}, ${target.y}): arrêté en (${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}), caméra estimée ${walker.yaw.toFixed(2)} rad`,
+        );
       }
-      const horizontal = Math.abs(ex) >= Math.abs(ey);
-      const dir = WORLD_DIRECTIONS.find((d) => (horizontal ? d.dx === Math.sign(ex) : d.dy === Math.sign(ey)));
-      if (dir === undefined) break;
-      const remaining = horizontal ? Math.abs(ex) : Math.abs(ey);
-      for (const code of dir.codes) await page.keyboard.down(code);
-      await page.waitForTimeout(Math.min(400, 60 + remaining * 120));
-      for (const code of dir.codes) await page.keyboard.up(code);
-      await page.waitForTimeout(150);
+      const wanted = Math.atan2(ey, ex);
+      // Bloqué contre un obstacle: un pas de côté, à angle droit.
+      const aim = stuck >= 2 ? wanted + (stuck % 2 === 0 ? Math.PI / 2 : -Math.PI / 2) : wanted;
+      let best = KEY_DIRECTIONS[0];
+      for (const d of KEY_DIRECTIONS) {
+        if (best === undefined || angleGap(walker.yaw + d.screen, aim) < angleGap(walker.yaw + best.screen, aim)) best = d;
+      }
+      if (best === undefined) break;
+      await holdKeys(page, best.codes, Math.max(700, Math.min(1800, dist * 300)));
+      await page.waitForTimeout(400);
+      const after = positionOf(probe, id);
+      if (after === null) continue;
+      const dx = after.x - pos.x;
+      const dy = after.y - pos.y;
+      if (Math.hypot(dx, dy) < 0.15) {
+        stuck++;
+        continue;
+      }
+      stuck = 0;
+      // Réestimation de la caméra, amortie (un glissement le long d'un mur fausse un peu la mesure).
+      const observed = Math.atan2(dy, dx) - best.screen;
+      walker.yaw = Math.atan2(
+        Math.sin(walker.yaw) + Math.sin(observed),
+        Math.cos(walker.yaw) + Math.cos(observed),
+      );
     }
   }
   const end = positionOf(probe, id);

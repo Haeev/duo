@@ -31,6 +31,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Pièges CSS rencontrés: une règle `.parent > * { position: relative }` écrase le `position: absolute` d'un calque décoratif; un sélecteur descendant (`.bloc svg`) attrape aussi les icônes imbriquées.
 - Typographie française dans le HTML: `&nbsp;` avant « : » et dans les guillemets, `&#8239;` avant « ! ? ; ».
 
+## Captures de La Petite Ligne (vérifié le 2026-10-31)
+
+- Scène sans interface: `rendu.html?stats=0&vie=0&heure=8:30&x=..&y=..&orientation=0..3&zoom=0..2` (vrai moteur, vraie carte; `vie=0` fige la promenade, sinon `x`/`y` sont écrasés). Avec interface et vraie simulation: `src/interface/demo/index.html?scenario=titre|scene|jour|carnet|coffre|veillee|nuit|petit-dejeuner` (attendre `window.lplInterface.ready`). Lancer son propre Vite (config avec `hmr: false`, port libre): les autres membres écrivent dans l'arbre.
+- La caméra suit le joueur 1, et tout ce qui est devant lui dans un rayon de 1,7 m s'efface en tramage (`materiaux.ts`): pour une capture propre, le poser à découvert, prendre `zoom=2` et recadrer.
+- Le moteur plafonne à 1920 x 1080 pixels physiques (`maxPhysicalPixels`): un `deviceScaleFactor` de 2 n'ajoute aucun détail, prendre une fenêtre de 1920 x 1080. La résolution dynamique n'agit qu'après 5 s de temps moteur, jamais atteintes en SwiftShader avant la capture. Compter 30 s à 2 min par capture (machine partagée).
+- Bibliothèque de Duo sans Electron: servir `apps/duo/out/renderer` par `page.route`, cliquer « Bibliothèque », remplacer le `src` des `.vignette-image`. Vignette affichée en 299 x 168 (bibliothèque, fenêtre de 1366) et 144 x 81 (salon): le titre doit se lire à 144 px.
+- `pkill -f motif` tue aussi le shell qui le lance si le motif figure dans sa propre ligne de commande (code 144): viser un PID.
+
 ## Conventions du studio qui touchent l'identité
 
 - Identifiants de code en anglais, y compris les noms de jetons (`--color-bg`, `player.orb`) et les identifiants d'icônes; commentaires, documentation et noms de fichiers en français.
