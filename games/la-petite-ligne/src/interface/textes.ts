@@ -255,20 +255,7 @@ const SupplementSchema = v.object({
   workbench: strings(['makes', 'have', 'fromCellar', 'inProgress', 'lockedPlans', 'noRecipes', 'keysCraft'] as const),
   stove: strings(['cookSection', 'eatSection', 'nothingToEat', 'portions'] as const),
   chest: strings(['title', 'subtitle', 'inChest', 'inBag', 'take', 'takeAll', 'store', 'emptyChest', 'emptyBag'] as const),
-  proposal: v.object({
-    ...strings([
-      'from',
-      'mine',
-      'received',
-      'sent',
-      'receivedNote',
-      'acceptedGrocery',
-      'acceptedCatalogue',
-      'enterHint',
-      'you',
-    ] as const).entries,
-    indefinite: v.record(str, str),
-  }),
+  proposal: strings(['from', 'mine', 'received', 'sent', 'receivedNote', 'acceptedGrocery', 'acceptedCatalogue', 'enterHint', 'you'] as const),
   build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store'] as const),
   night: strings([
     'overline',

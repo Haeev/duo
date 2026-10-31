@@ -63,6 +63,13 @@ Tenue par le dev interface (`src/interface/`). Les demandes 1 à 7 sont faites p
 
 Point d'avancement du dev interface (`src/interface/`), du plus récent au plus ancien.
 
+### 2026-10-31, caméra du HUD, focus au pointeur, textes d'achat
+
+- Demande 9 faite par le rendu: les boutons de caméra du HUD appellent `InterfaceOptions.camera`; le palliatif (touche simulée) est retiré. Sans `camera`, les deux boutons sont masqués. `createInterfaceWith` et `InterfaceExtras` sont retirés (`createInterface` suffit).
+- Focus au pointeur: un bouton du HUD (caméra, carnet, barre d'outils) et ceux de la carte de proposition ne prennent pas le focus au clic (`pointerdown` et `mousedown` sans action par défaut) et le rendent s'ils l'avaient (`blur` après une activation au pointeur); sans couche ouverte, une touche reçue par un élément du HUD lui retire le focus et va au jeu. Les panneaux et écrans plein cadre gardent leur navigation au clavier. Test dans Chromium: `src/interface/tests/pointeur.test.ts` (clic sur la caméra puis Espace: une seule commande de caméra, une intention `act`; Tab ouvre le carnet avec le focus dedans, E change d'onglet, Retour arrière ferme). Ignoré sans Chromium (la CI n'installe pas de navigateur).
+- Demande 12: `indefiniteItem` lit `ItemDef.indefinite` directement (repli: le nom seul); `proposal.indefinite` est retiré de `textes-interface.json`. `proposal.acceptedCatalogue` devient « Commandé : {item}, livraison au train de samedi. {price} sous dépensés. » et `acceptedGrocery` « Dans le sac de {buyer} : {item}. {price} sous dépensés. »: l'objet ne commande plus de verbe, plus de majuscule forcée.
+- Page de démonstration: scénario `hud` (après la scène d'arrivée, personne en conversation), journal `window.lplInterface.log` (commandes de caméra, intentions).
+
 ### 2026-10-31, recette LPL-R04 et LPL-R05, demandes 11 et 12
 
 - LPL-R04: `hud.stopped.both_busy` devient « Menus ouverts des deux côtés · l'horloge attend »; relecture de `textes-interface.json`: « Chacun crée son personnage » devient « Vous créez vos personnages en même temps, sur les deux ordinateurs. », « Chacun choisit sa réplique » devient « Choisis ta réplique. », « ce que l'un range, l'autre peut le prendre » devient « ce qui y est rangé sert à vous deux. », les noms accessibles « Les deux joueurs » et « Choix des deux joueurs » deviennent « Vous deux » et « Vos deux choix ».

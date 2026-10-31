@@ -123,13 +123,23 @@ describe('établi, réchaud, coffre, sac', () => {
     expect(indefiniteItem(ctx, 'plank')).toBe('une planche');
   });
 
-  it('prend l’article de objets.json quand il existe (demande 12), sinon celui de l’interface', () => {
+  it('prend l’article de objets.json (demande 12), sinon le nom seul', () => {
     const ctx = uiContext();
+    expect(indefiniteItem(ctx, 'curtains')).toBe('des rideaux');
     const mattress = ctx.content.items.mattress;
     if (mattress === undefined) throw new Error('matelas');
-    const withArticle = { ...ctx, content: { ...ctx.content, items: { ...ctx.content.items, mattress: { ...mattress, indefinite: 'un matelas de laine' } } } };
-    expect(indefiniteItem(withArticle, 'mattress')).toBe('un matelas de laine');
-    const empty = { ...ctx, content: { ...ctx.content, items: { ...ctx.content.items, mattress: { ...mattress, indefinite: '' } } } };
-    expect(indefiniteItem(empty, 'mattress')).toBe('un matelas');
+    const without = { ...ctx, content: { ...ctx.content, items: { ...ctx.content.items, mattress: { ...mattress, indefinite: null } } } };
+    expect(indefiniteItem(without, 'mattress')).toBe('matelas');
+  });
+
+  it('écrit l’achat accepté sans accorder un verbe avec l’objet ni forcer de majuscule', () => {
+    const ctx = uiContext();
+    const p = ctx.texts.extra.proposal;
+    expect(plain(ctx.t(p.acceptedCatalogue, { item: indefiniteItem(ctx, 'curtains'), price: 30 }))).toBe(
+      'Commandé : des rideaux, livraison au train de samedi. 30 sous dépensés.',
+    );
+    expect(plain(ctx.t(p.acceptedGrocery, { item: indefiniteItem(ctx, 'mattress'), buyer: 'Sacha', price: 120 }))).toBe(
+      'Dans le sac de Sacha : un matelas. 120 sous dépensés.',
+    );
   });
 });

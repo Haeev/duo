@@ -25,7 +25,7 @@ describe.skipIf(executable === undefined)('interface au pointeur et au clavier (
     server = await createServer({ root, logLevel: 'silent', server: { port: 0, host: '127.0.0.1', hmr: false, watch: null } });
     await server.listen();
     base = server.resolvedUrls?.local[0] ?? '';
-    browser = await chromium.launch({ executablePath: executable });
+    browser = await chromium.launch(executable === undefined ? {} : { executablePath: executable });
   }, SETUP_MS);
 
   afterAll(async () => {

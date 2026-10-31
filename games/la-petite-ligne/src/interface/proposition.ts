@@ -9,7 +9,6 @@ import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { nameOf } from './contexte';
 import { button, chip, el, icon, keepFocusOnGame, keycap, token } from './dom';
-import { capitalize } from './format';
 import { proposalModels, type ProposalModel } from './modele-panneaux';
 
 interface Ending {
@@ -107,7 +106,7 @@ export class ProposalCards {
         const buyer = model.mine ? meName : model.byName;
         const note = model.source === 'catalogue' ? p.acceptedCatalogue : p.acceptedGrocery;
         card.append(
-          el('p', { class: 'lpl-proposal__note', text: ctx.t(note, { item: capitalize(model.itemText), buyer, price: model.price }) }),
+          el('p', { class: 'lpl-proposal__note', text: ctx.t(note, { item: model.itemText, buyer, price: model.price }) }),
           el('span', { class: 'lpl-stamp lpl-stamp--green lpl-stamp--large', text: ctx.t(g.accept) }),
         );
       } else {

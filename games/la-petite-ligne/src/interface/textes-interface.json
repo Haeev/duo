@@ -335,18 +335,10 @@
     "received": "{partner} propose d'acheter {item} pour {price} sous. D'accord ?",
     "sent": "Tu proposes d'acheter {item} pour {price} sous.",
     "receivedNote": "La somme est réservée en attendant ta réponse. Sans réponse, la proposition s'annule à la nuit.",
-    "acceptedGrocery": "{item} est dans le sac de {buyer}. {price} sous dépensés.",
-    "acceptedCatalogue": "Commandé : {item} arrive au train de samedi. {price} sous dépensés.",
+    "acceptedGrocery": "Dans le sac de {buyer} : {item}. {price} sous dépensés.",
+    "acceptedCatalogue": "Commandé : {item}, livraison au train de samedi. {price} sous dépensés.",
     "enterHint": "{key} pour répondre, ou un clic sur la proposition. Tu peux continuer à jouer.",
-    "you": "toi",
-    "indefinite": {
-      "mattress": "un matelas",
-      "crystal_radio": "un poste à galène",
-      "oil_lamp": "une lampe à pétrole",
-      "rug": "un tapis",
-      "curtains": "des rideaux",
-      "flower_pot": "un pot de fleurs"
-    }
+    "you": "toi"
   },
   "build": {
     "holding": "En main",
