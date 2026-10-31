@@ -3,12 +3,15 @@
  * décrit en section 9 de `docs/jeux/jeu-1/carte-halte.md`), contrôlée à
  * l'exécution et traduite en `GameMap`.
  */
-import type { GameMap, GroundKind, MapProp, MapTree, Rect } from '../etat/carte';
+import type { GameMap, GroundKind, MapHook, MapProp, MapTree, Rect } from '../etat/carte';
 import type { Cell, Vec2 } from '../etat/types';
 import { ContentError, Reader } from './lecteur';
 
 const GROUND_KINDS: readonly GroundKind[] = ['grass', 'path', 'dirt', 'gravel', 'wood', 'floor', 'water', 'rail', 'stone'];
 const TREE_TYPES: Readonly<Record<string, MapTree['kind']>> = { tree_oak: 'oak', tree_fir: 'fir' };
+/** `regarde` d'une accroche, en quarts de tour (convention des objets: 0 tourné vers le sud). */
+const FACING_QUARTERS: Readonly<Record<string, number>> = { sud: 0, est: 1, nord: 2, ouest: 3 };
+const DEGREES = Math.PI / 180;
 /** Fichier de la carte du bourg dans `donnees/cartes/`. */
 export const LEVEL_MAP_FILE = 'halte.json';
 
@@ -61,8 +64,13 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   });
 
   const points: Record<string, Vec2> = {};
+  const pointFacings: Record<string, number> = {};
   for (const p of r.at('points').items()) {
-    points[p.at('id').string()] = { x: p.at('x').number(), y: p.at('y').number() };
+    const id = p.at('id').string();
+    points[id] = { x: p.at('x').number(), y: p.at('y').number() };
+    // Cap de boussole (0 nord, 90 est) vers le `facing` de la simulation (0 est, y vers le sud).
+    const heading = p.opt('cap_degres');
+    if (heading !== null) pointFacings[id] = (heading.number() - 90) * DEGREES;
   }
   const zones: Record<string, Rect> = {};
   for (const z of r.at('zones').items()) {
@@ -129,6 +137,16 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     for (let cx = gardenZone.x; cx < gardenZone.x + gardenZone.w; cx++) garden.push({ cx, cy });
   }
 
+  // Petits objets accrochés (nichoir, chicot, pieu): facultatifs, sans emprise.
+  const hooks: MapHook[] = (r.opt('accroches')?.items() ?? []).map((h) => ({
+    id: h.at('id').string(),
+    model: h.at('modele').string(),
+    on: h.at('sur').string(),
+    pos: { x: h.at('x').number(), y: h.at('y').number(), z: h.at('z').number() },
+    rotation: h.has('regarde') ? need(FACING_QUARTERS[h.at('regarde').string()], h.at('regarde'), 'sud, est, nord ou ouest attendu') : 0,
+    tiltDeg: h.opt('penche_degres')?.number() ?? 0,
+  }));
+
   // Hors de la carte: les habitants « chez eux » loin du bourg.
   if (!('offstage' in points)) points.offstage = { x: -20, y: -20 };
 
@@ -140,6 +158,8 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     ground,
     blocked,
     points,
+    pointFacings,
+    hooks,
     zones,
     house: { room, door, spawn },
     garden,

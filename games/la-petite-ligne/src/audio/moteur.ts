@@ -134,6 +134,8 @@ const PANNER_FAR = 10000;
 /** Écart relatif de gain de distance sous lequel on ne réécrit pas le gain d'une voix. */
 const DISTANCE_GAIN_STEP = 0.02;
 const DISTANCE_TIME_CONSTANT = 0.05;
+/** Écart relatif de niveau sous lequel une boucle garde son gain (pas de réécriture à chaque image). */
+const LOOP_LEVEL_STEP = 0.01;
 
 export class AudioEngine {
   private readonly ctx: BaseAudioContext;
@@ -164,6 +166,11 @@ export class AudioEngine {
   // Graphe.
   private readonly musicIn: GainNode;
   private readonly duck: GainNode;
+  /** Musique plus basse pendant l'apogée d'un moment rare (son propre étage: ses temps sont ceux de la fiche). */
+  private readonly momentDuck: GainNode;
+  private momentDuckDb = 0;
+  /** Fichiers du moment du jour demandés au cache. */
+  private readonly momentFiles = new Set<string>();
   private readonly musicPause: GainNode;
   private readonly effectsIn: GainNode;
   private readonly effectsLimiter: DynamicsCompressorNode;
@@ -215,8 +222,9 @@ export class AudioEngine {
     };
     this.musicIn = gain();
     this.duck = gain();
+    this.momentDuck = gain();
     this.musicPause = gain();
-    this.musicIn.connect(this.duck).connect(this.musicPause).connect(host.bus('music'));
+    this.musicIn.connect(this.duck).connect(this.momentDuck).connect(this.musicPause).connect(host.bus('music'));
     this.effectsIn = gain();
     this.effectsLimiter = limiter();
     this.effectsPause = gain();
@@ -236,6 +244,7 @@ export class AudioEngine {
     this.graph = [
       this.musicIn,
       this.duck,
+      this.momentDuck,
       this.musicPause,
       this.effectsIn,
       this.effectsLimiter,
@@ -288,6 +297,7 @@ export class AudioEngine {
     this.placeListener(frame);
     this.updateInterior(frame.listener.inHouse);
     this.updateTrainBuffers(frame.trainDay);
+    this.updateMomentBuffers(frame.momentFiles);
     for (const command of frame.music) this.music(command);
     this.retryPending(now);
     const live = this.options.live?.() ?? this.ctx.state === 'running';
@@ -297,6 +307,7 @@ export class AudioEngine {
     this.updateBeds(frame, now);
     this.updatePlaced();
     this.updateDuck(now);
+    this.updateMomentDuck(frame.momentDuck, now);
   }
 
   stats(): EngineStats {
@@ -464,6 +475,12 @@ export class AudioEngine {
       if (wish.at !== null && voice.at !== null) {
         voice.at.x = wish.at.x;
         voice.at.y = wish.at.y;
+      }
+      // Niveau voulu changé (les grillons qui montent à l'apogée): jamais pendant un fondu de sortie.
+      const level = dbToGain(voice.def.volumeDb + wish.gainDb);
+      if (!voice.stopping && Math.abs(level - voice.level) > LOOP_LEVEL_STEP * voice.level) {
+        voice.level = level;
+        voice.gain.gain.setTargetAtTime(level * voice.distanceGain, this.ctx.currentTime, DISTANCE_TIME_CONSTANT);
       }
     }
     for (const [key, voice] of this.byLoop) {
@@ -783,6 +800,27 @@ export class AudioEngine {
 
   // -------------------------------------------------------------------------
   // Divers
+
+  /** Sons du moment du jour: décodés quand il s'installe, libérés quand il s'en va. */
+  private updateMomentBuffers(wanted: ReadonlySet<string>): void {
+    for (const file of wanted) {
+      if (this.momentFiles.has(file)) continue;
+      this.momentFiles.add(file);
+      void this.cache.request(file);
+    }
+    for (const file of this.momentFiles) {
+      if (wanted.has(file)) continue;
+      this.momentFiles.delete(file);
+      this.cache.release(file);
+    }
+  }
+
+  private updateMomentDuck(duck: BrainFrame['momentDuck'], now: number): void {
+    if (duck.db === this.momentDuckDb) return;
+    const seconds = duck.db < this.momentDuckDb ? duck.attackSeconds : duck.releaseSeconds;
+    this.momentDuckDb = duck.db;
+    this.momentDuck.gain.setTargetAtTime(dbToGain(duck.db), now, Math.max(0.001, seconds / 3));
+  }
 
   private updateTrainBuffers(wanted: boolean): void {
     if (wanted === this.trainWanted) return;

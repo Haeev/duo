@@ -10,7 +10,11 @@
  * (mode léger, comme le jeu), `cycles` (essai d'endurance), `repere=1`,
  * `peche=attente|touche`, `absent=1` (signes P1),
  * `scene=rencontre|place|repas|banc|banc-quai` (petites scènes, dont les deux joueurs assis au quai), `coins=1` (coin à soi des
- * deux joueurs, avec `interieur=1`). Touches: G repère, J lancer,
+ * deux joueurs, avec `interieur=1`), `moment=<id>` (moment rare: `heron`, `geese`, `ladder`, `tits`,
+ * `fox`, `glowworms`) avec `t=<s>` (instant de l'apogée, figé), `phase=attente|apres` et `joue=1`
+ * (la chorégraphie avance depuis `t`); l'heure par défaut est alors dans la fenêtre du moment.
+ * `vue=x,y` pose la caméra sur un point sans déplacer les joueurs; `noms=1`: Camille connaît le nom
+ * des poules (étiquettes au-dessus d'elles, chez elle seule). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
@@ -43,6 +47,10 @@ const MS_PER_SECOND = 1000;
 /** Durée d'un repère (15 s) à 30 pas par seconde. */
 const PIN_TICKS = 450;
 const ENDURANCE_FPS = 60;
+/** Noms des poules d'Odette (`habitants.json`), pour les étiquettes de la démonstration. */
+const HEN_NAMES = ['Bichette', 'Cocotte', 'la Duchesse'];
+/** Moment de la démonstration: l'heure par défaut, tant de minutes après l'ouverture de sa fenêtre. */
+const MOMENT_MINUTES_IN = 20;
 const KEY_TO_COMMAND: Record<string, CameraCommand> = {
   KeyQ: 'rotate_left',
   KeyE: 'rotate_right',
@@ -102,8 +110,22 @@ async function main(): Promise<void> {
   const content = loadContent(CONTENT_FILES);
   const map = pickMap();
   const weatherParam = params.get('meteo');
+  const momentId = params.get('moment');
+  const momentDef = content.moments.find((m) => m.id === momentId);
+  const phaseParam = params.get('phase');
+  const moment: DemoOptions['moment'] =
+    momentDef === undefined
+      ? undefined
+      : {
+          id: momentDef.id,
+          phase: phaseParam === 'attente' ? 'waiting' : phaseParam === 'apres' ? 'after' : 'climax',
+          t: Math.max(0, Number(params.get('t') ?? '0') || 0),
+        };
   const options: DemoOptions = {
-    minutes: parseHour(params.get('heure')),
+    minutes:
+      momentDef !== undefined && !params.has('heure')
+        ? momentDef.window.from + MOMENT_MINUTES_IN
+        : parseHour(params.get('heure')),
     weather: weatherParam === 'rain' || weatherParam === 'cloudy' ? weatherParam : 'sunny',
     inside: params.get('interieur') === '1',
     repaired: params.get('repare') === '1',
@@ -124,8 +146,16 @@ async function main(): Promise<void> {
     scene: DEMO_SCENES.find((scene) => scene === params.get('scene')),
     corners: params.get('coins') === '1',
     handcarParked: params.get('draisine') === 'posee',
+    moment,
   };
   const world = createExampleWorld(map, content, options);
+  if (params.get('noms') === '1') {
+    // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
+    world.hens.forEach((hen, index) => {
+      hen.name = HEN_NAMES[index] ?? hen.name;
+      hen.nameKnownBy = ['p1'];
+    });
+  }
   const focusX = Number(params.get('x'));
   const focusY = Number(params.get('y'));
   const p1 = world.characters[0];
@@ -198,6 +228,11 @@ async function main(): Promise<void> {
   window.lplRendu = handle;
   await engine.load(() => undefined);
   loading?.remove();
+  const focus = /^(-?[\d.]+),(-?[\d.]+)$/.exec(params.get('vue') ?? '');
+  if (focus !== null) {
+    // `vue=x,y`: caméra posée sur ce point (gros plans), les joueurs restent où ils sont.
+    engine.setFocusOverride({ x: Number(focus[1]), y: Number(focus[2]) });
+  }
   const quarter = Number(params.get('orientation') ?? '0');
   for (let i = 0; i < quarter; i += 1) {
     engine.camera('rotate_right');
@@ -299,8 +334,17 @@ async function main(): Promise<void> {
   let last = performance.now();
   let seconds = 0;
   const guestLike = params.get('invite') === '1';
+  const playMoment = params.get('joue') === '1';
+  if (playMoment && world.moments.today !== null) {
+    world.moments.today.paused = false;
+  }
   const step = (dt: number): void => {
     seconds += dt;
+    const today = world.moments.today;
+    if (playMoment && today !== null && momentDef !== undefined && today.phase === 'climax') {
+      // `joue=1`: la chorégraphie avance comme dans la simulation (temps de jeu en secondes).
+      today.elapsed = Math.min(momentDef.climax.seconds, today.elapsed + dt);
+    }
     if (autoInput?.checked === true) {
       world.clock.minutes = (world.clock.minutes + dt * DEMO_MINUTES_PER_SECOND) % MINUTES_PER_DAY;
       if (hourInput !== null) {

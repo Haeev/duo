@@ -856,6 +856,7 @@ function parseActor(a: Reader): MomentDef['actors'][number] {
             returnAfterSeconds: shy.at('returnAfterSeconds').number(),
           },
     villager: optString(a, 'villager'),
+    keepFacing: optBoolean(a, 'keepFacing', false),
   };
 }
 

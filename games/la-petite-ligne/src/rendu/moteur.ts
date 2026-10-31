@@ -47,6 +47,8 @@ import { EffectsPart } from './effets';
 import { RailwayPart } from './voie';
 import { FishingPart } from './peche';
 import { SignsPart } from './signes';
+import { MomentsPart } from './moments';
+import { HenLabels } from './etiquettes';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /**
@@ -290,6 +292,20 @@ export class RenderEngine implements Renderer {
     world.add(house);
     world.add(garden);
     world.add(farm);
+    // Moments rares (après les personnages: Basile y est mené par la chorégraphie de l'échelle).
+    const moments = new MomentsPart(
+      map,
+      content,
+      library,
+      terrain,
+      this.resources,
+      characters,
+      this.light,
+    );
+    const henLabels = new HenLabels(terrain, this.resources, this.rig.camera);
+    this.scene.add(moments.group, henLabels.group);
+    world.add(moments);
+    world.add(henLabels);
     if (await this.interrupted()) {
       return;
     }
@@ -409,7 +425,9 @@ export class RenderEngine implements Renderer {
     const world = this.view.world();
     const alpha = this.view.alpha();
     const local = this.localCharacter(world);
-    if (local !== null) {
+    if (this.focusOverride !== null) {
+      this.rig.update(dt, this.focusOverride.x, this.focusOverride.y, 0, 0, null);
+    } else if (local !== null) {
       const x = local.prev.x + (local.pos.x - local.prev.x) * alpha;
       const y = local.prev.y + (local.pos.y - local.prev.y) * alpha;
       const vx = Math.cos(local.facing) * local.speed;
@@ -583,6 +601,16 @@ export class RenderEngine implements Renderer {
   /** Qualité en vigueur: mode léger demandé ou automatique, sinon normale. */
   renderQuality(): 'normal' | 'light' {
     return this.light || this.quality?.isLight() === true ? 'light' : 'normal';
+  }
+
+  /** Point de vue imposé (page de démonstration: gros plans des moments), ou `null`: le joueur local. */
+  private focusOverride: { x: number; y: number } | null = null;
+
+  setFocusOverride(point: { x: number; y: number } | null): void {
+    this.focusOverride = point;
+    if (point !== null) {
+      this.rig.snapTo(point.x, point.y);
+    }
   }
 
   cameraYaw(): number {

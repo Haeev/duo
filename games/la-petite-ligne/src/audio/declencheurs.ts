@@ -303,15 +303,25 @@ export function soundsForEvent(
     case 'session_finish':
     case 'absence':
       break;
-    // Moments rares et secrets (tour 6): sons à brancher avec le sound-designer (sons de `moments.json`).
+    // Moments rares (tour 6): l'échelle posée contre le chêne quand le moment s'installe, le
+    // montant qui craque quand on la prend; le reste suit l'état du moment (`moments.ts`).
     case 'moment_waiting':
+      if (event.moment === 'ladder') emit.world('ladder-lean', pointAt(map, 'ladder_foot'), null);
+      break;
+    case 'hold_started':
+      emit.world('ladder-grip', pointAt(map, event.point) ?? characterAt(world, event.by), event.by);
+      break;
+    case 'hen_called': {
+      // La bonne réponse: la poule glousse et vient (jamais de son d'échec: une erreur ne coûte rien).
+      const hen = world.hens.find((h) => h.id === event.hen);
+      if (event.correct) emit.world('hen', hen === undefined ? characterAt(world, event.by) : { x: hen.pos.x, y: hen.pos.y }, event.by);
+      break;
+    }
     case 'moment_climax':
     case 'moment_paused':
     case 'moment_resumed':
     case 'moment_left':
-    case 'hold_started':
     case 'hold_released':
-    case 'hen_called':
     case 'dialogue_choice':
     case 'secret_revealed':
       break;

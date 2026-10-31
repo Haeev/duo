@@ -134,6 +134,18 @@ export interface AudioSettings {
   villagerMotifPrefix: string;
   /** Sons demandés par l'interface (`GameAudio.ui`): au plus tant par image, le reste est perdu. */
   interface: { maxQueued: number };
+  /** Moments rares (tour 6, `moments.json`): d'où part chaque son, ce qui suit une bête. */
+  moments: {
+    /**
+     * Source d'un son de chorégraphie (nom de la fiche): un acteur du moment, ou `@point` de la
+     * carte; sinon le premier acteur dessiné qui a des images clés (la bête du moment).
+     */
+    sources: Readonly<Record<string, string>>;
+    /** Sons qui suivent leur source tout du long (la volée des oies), recalés sur la chorégraphie. */
+    followed: readonly string[];
+    /** Son joué seulement si les poules sont là. */
+    hensOnly: readonly string[];
+  };
 }
 
 export const AUDIO_SETTINGS: AudioSettings = {
@@ -228,6 +240,21 @@ export const AUDIO_SETTINGS: AudioSettings = {
   loopFadeSeconds: 0.2,
   villagerMotifPrefix: 'talk-',
   interface: { maxQueued: 4 },
+  moments: {
+    sources: {
+      ladder_step: 'basile',
+      nest_box_turn: 'nest_box',
+      hammer_tap: 'nest_box',
+      tit_call: 'blue_tit',
+      tit_song: 'tit_b',
+      tit_wings: 'tit_a',
+      hens_alarm: '@chicken_coop',
+      crickets_night: '@meadow_glow',
+      geese_rest: '@geese_rest',
+    },
+    followed: ['geese_flight'],
+    hensOnly: ['hens_alarm'],
+  },
 };
 
 /** Décibels vers gain linéaire. */

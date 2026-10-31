@@ -39,7 +39,7 @@ function catmull(p0: number, p1: number, p2: number, p3: number, u: number): num
 }
 
 /** Les positions des images clés, `null` remplacé par la position d'avant (ou `from` pour la première). */
-function resolved(frames: readonly MomentKeyframe[], from: Vec3): Vec3[] {
+export function resolveTrack(frames: readonly MomentKeyframe[], from: Vec3): Vec3[] {
   const out: Vec3[] = [];
   let last = from;
   for (const [, x, y, z] of frames) {
@@ -49,13 +49,17 @@ function resolved(frames: readonly MomentKeyframe[], from: Vec3): Vec3[] {
   return out;
 }
 
+/** Pose échantillonnée (position et clip), écrite dans un objet fourni par l'appelant. */
+export interface TrackSample extends Vec3 {
+  clip: string | null;
+  clipSince: number;
+}
+
 /**
- * Position et clip sur une piste d'images clés `[t, x, y, z, clip]` au temps `t` (s), par une
- * spline de Catmull-Rom entre les images (extrémités doublées). Avant la première image: la
- * première; après la dernière: la dernière.
+ * Comme `sampleTrack`, sur des positions déjà résolues (`resolveTrack`), sans rien allouer: le
+ * rendu échantillonne ainsi chaque acteur à chaque image.
  */
-export function sampleTrack(frames: readonly MomentKeyframe[], t: number, from: Vec3): Omit<ActorPose, 'opacity'> {
-  const points = resolved(frames, from);
+export function sampleResolved(frames: readonly MomentKeyframe[], points: readonly Vec3[], t: number, out: TrackSample): TrackSample {
   let clip: string | null = null;
   let clipSince = 0;
   for (const f of frames) {
@@ -65,33 +69,48 @@ export function sampleTrack(frames: readonly MomentKeyframe[], t: number, from: 
       clipSince = f[0];
     }
   }
+  out.clip = clip;
+  out.clipSince = clipSince;
   const first = frames[0];
   const p0 = points[0];
-  if (first === undefined || p0 === undefined) return { ...from, clip, clipSince };
-  if (t <= first[0] || frames.length === 1) return { ...p0, clip, clipSince };
+  if (first === undefined || p0 === undefined) return out;
+  const copy = (p: Vec3): TrackSample => {
+    out.x = p.x;
+    out.y = p.y;
+    out.z = p.z;
+    return out;
+  };
+  if (t <= first[0] || frames.length === 1) return copy(p0);
   let i = 0;
   while (i < frames.length - 2 && (frames[i + 1]?.[0] ?? Infinity) <= t) i++;
   const a = frames[i];
   const b = frames[i + 1];
   const pa = points[i];
   const pb = points[i + 1];
-  if (a === undefined || b === undefined || pa === undefined || pb === undefined) return { ...p0, clip, clipSince };
-  if (t >= b[0] && i === frames.length - 2) return { ...pb, clip, clipSince };
+  if (a === undefined || b === undefined || pa === undefined || pb === undefined) return copy(p0);
+  if (t >= b[0] && i === frames.length - 2) return copy(pb);
   const span = b[0] - a[0];
   const u = span <= 0 ? 1 : Math.min(1, Math.max(0, (t - a[0]) / span));
   const pPrev = points[i - 1] ?? pa;
   const pNext = points[i + 2] ?? pb;
-  return {
-    x: catmull(pPrev.x, pa.x, pb.x, pNext.x, u),
-    y: catmull(pPrev.y, pa.y, pb.y, pNext.y, u),
-    z: catmull(pPrev.z, pa.z, pb.z, pNext.z, u),
-    clip,
-    clipSince,
-  };
+  out.x = catmull(pPrev.x, pa.x, pb.x, pNext.x, u);
+  out.y = catmull(pPrev.y, pa.y, pb.y, pNext.y, u);
+  out.z = catmull(pPrev.z, pa.z, pb.z, pNext.z, u);
+  return out;
+}
+
+/**
+ * Position et clip sur une piste d'images clés `[t, x, y, z, clip]` au temps `t` (s), par une
+ * spline de Catmull-Rom entre les images (extrémités doublées). Avant la première image: la
+ * première; après la dernière: la dernière.
+ */
+export function sampleTrack(frames: readonly MomentKeyframe[], t: number, from: Vec3): Omit<ActorPose, 'opacity'> {
+  const out: TrackSample = { x: from.x, y: from.y, z: from.z, clip: null, clipSince: 0 };
+  return sampleResolved(frames, resolveTrack(frames, from), t, out);
 }
 
 /** Opacité d'une chorégraphie à sa fin (`fadeLastSeconds`). */
-function fade(choreo: MomentChoreography, t: number): number {
+export function choreographyFade(choreo: MomentChoreography, t: number): number {
   if (choreo.fadeLastSeconds <= 0) return 1;
   return Math.max(0, Math.min(1, (choreo.seconds - t) / choreo.fadeLastSeconds));
 }
@@ -132,7 +151,7 @@ export function actorPose(map: GameMap, def: MomentDef, today: DeepReadonly<Mome
     case 'climax': {
       const track = def.climax.keyframes[actor.id];
       if (track === undefined) return { ...rest, clip: actor.idle, clipSince: 0, opacity: 1 };
-      return { ...sampleTrack(track, today.elapsed, rest), opacity: fade(def.climax, today.elapsed) };
+      return { ...sampleTrack(track, today.elapsed, rest), opacity: choreographyFade(def.climax, today.elapsed) };
     }
     case 'after': {
       const after = def.after?.actors[actor.id];
@@ -144,7 +163,9 @@ export function actorPose(map: GameMap, def: MomentDef, today: DeepReadonly<Mome
       const leave = def.leave;
       const track = leave?.keyframes[actor.id];
       if (leave === null || track === undefined) return null;
-      return { ...sampleTrack(track, today.elapsed, rest), opacity: fade(leave, today.elapsed) };
+      // Départ depuis l'état d'après (l'apogée a eu lieu: le héron part de la grève d'en face), sinon de l'attente.
+      const from = today.startTick === null ? rest : afterPosition(map, def, actor);
+      return { ...sampleTrack(track, today.elapsed, from), opacity: choreographyFade(leave, today.elapsed) };
     }
   }
 }

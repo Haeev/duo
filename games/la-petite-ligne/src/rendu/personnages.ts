@@ -91,6 +91,8 @@ const GIVE = 'give';
 const HIGH_FIVE = 'high_five';
 const WAVE = 'wave';
 const PET = 'pet';
+/** Tenir l'échelle de Basile (geste « tenir » des moments rares). */
+const HOLD_LADDER = 'hold_ladder';
 const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE]);
 const NO_VARIANTS: readonly string[] = [];
 /** Attentes d'un joueur, et les mêmes avec la poule à caresser. */
@@ -187,7 +189,42 @@ interface ClipRequest {
   /** Instant de départ dans le clip (s) pour un clip joué une fois. */
   startAt?: number;
   fade?: number;
+  /**
+   * Instant imposé dans le clip à chaque image (s), le mélangeur n'avance pas: une chorégraphie
+   * cale l'animation sur son propre temps (Basile qui grimpe au rythme des barreaux).
+   */
+  exactTime?: number;
 }
+
+/**
+ * Habitant mené par une chorégraphie (moments rares, `moments.ts`): `pose` le place et l'anime
+ * à la place de son emploi du temps (Basile sur l'échelle), `look` lui fait seulement tourner la
+ * tête vers la cible (les `lookers` de l'apogée).
+ */
+export type VillagerDirection =
+  | {
+      kind: 'pose';
+      x: number;
+      y: number;
+      /** Hauteur au-dessus du sol (m). */
+      z: number;
+      facing: number;
+      clip: string;
+      /** Instant imposé dans le clip, ou `null`: le clip joue à son rythme. */
+      clipTime: number | null;
+      timeScale: number;
+      /** Outil en main (modèle), ou `null`. */
+      tool: string | null;
+      /** Regard (tête), ou `null`. */
+      look: { x: number; y: number } | null;
+    }
+  | { kind: 'look'; x: number; y: number };
+
+/** Qui mène les habitants à cette image (`null`: leur emploi du temps). */
+export type VillagerDirector = (
+  villager: DeepReadonly<VillagerState>,
+  context: FrameContext,
+) => VillagerDirection | null;
 
 class CharacterFigure {
   readonly root = new Group();
@@ -508,6 +545,9 @@ class CharacterFigure {
     this.root.position.set(at.x, this.ground + lift, at.y);
     this.root.rotation.y = this.facing;
     this.play(this.idleRequest(request, context.time, context.dt, variants));
+    if (request.exactTime !== undefined && this.current !== null) {
+      this.current.time = Math.max(0, request.exactTime);
+    }
     this.offsets.restore();
     this.mixer?.update(context.dt);
     if (this.mixer !== null) {
@@ -695,6 +735,15 @@ export class CharactersPart implements EventfulPart {
   }
 
   private highFivePending = false;
+  private director: VillagerDirector | null = null;
+  /** Position imposée par une chorégraphie (réutilisée d'une image à l'autre). */
+  private readonly directedPoint = { x: 0, y: 0 };
+
+  /** Chorégraphies des moments rares qui mènent un habitant (Basile) ou tournent sa tête. */
+  setVillagerDirector(director: VillagerDirector | null): void {
+    this.director = director;
+  }
+
   /** Habitants qui ont déjà salué un joueur ce jour-là (`habitant|joueur`). */
   private readonly greeted = new Set<string>();
   private greetedDay = -1;
@@ -1070,6 +1119,9 @@ export class CharactersPart implements EventfulPart {
       let request: ClipRequest;
       if (onBench) {
         request = { name: kind === 'eat' ? SIT_EAT : SIT_CHAIR, timeScale: 1 };
+      } else if (character.holding !== null && !moving) {
+        // Tenir l'échelle: la simulation l'a posé à sa place, face au montant.
+        request = { name: HOLD_LADDER, timeScale: 1 };
       } else if (moving && kind !== 'carry') {
         request = { name: 'walk', timeScale: walkScale, fade: SETTINGS.walkFadeSeconds };
       } else if (shotActive) {
@@ -1141,6 +1193,31 @@ export class CharactersPart implements EventfulPart {
         figure = this.createVillager(villager);
         this.villagers.set(villager.id, figure);
       }
+      const direction = this.director?.(villager, context) ?? null;
+      if (direction?.kind === 'pose') {
+        // Mené par une chorégraphie: ni banc, ni salut, ni emploi du temps.
+        figure.root.visible = true;
+        figure.pick.enabled = villager.visible;
+        figure.lookAt(direction.look);
+        const point = this.directedPoint;
+        point.x = direction.x;
+        point.y = direction.y;
+        figure.update(
+          context,
+          this.terrain,
+          point,
+          point,
+          direction.facing,
+          direction.clipTime === null
+            ? { name: direction.clip, timeScale: direction.timeScale }
+            : { name: direction.clip, timeScale: 0, exactTime: direction.clipTime, fade: SETTINGS.crossFadeSeconds },
+          direction.z,
+        );
+        figure.setTool(this.library, direction.tool);
+        figure.updateFace(context.time, null);
+        continue;
+      }
+      figure.setTool(this.library, null);
       figure.root.visible = villager.visible;
       figure.pick.enabled = villager.visible;
       if (!villager.visible) {
@@ -1154,6 +1231,9 @@ export class CharactersPart implements EventfulPart {
         this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0);
       const clip = onBench ? SIT_CHAIR : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
+      if (direction?.kind === 'look' && villager.talkingWith.length === 0) {
+        figure.lookAt(direction);
+      }
       const timeScale =
         clip === 'walk'
           ? Math.min(

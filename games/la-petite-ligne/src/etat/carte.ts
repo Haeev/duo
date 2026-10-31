@@ -46,6 +46,23 @@ export interface MapProp {
   category: string;
 }
 
+/**
+ * Petit objet accroché à un objet de la carte (`accroches` de la carte: nichoir, chicot, pieu): sans
+ * emprise ni collision, posé par le rendu sur son support.
+ */
+export interface MapHook {
+  id: string;
+  model: string;
+  /** Objet qui le porte (`tree_oak_01`, `pontoon`). */
+  on: string;
+  /** Point d'attache (m): x, y sur la carte, z au-dessus du sol. */
+  pos: { x: number; y: number; z: number };
+  /** Quarts de tour, comme les objets (0 tourné vers le sud). */
+  rotation: number;
+  /** Penché au départ (degrés), le nichoir de travers; 0 sinon. */
+  tiltDeg: number;
+}
+
 export interface GameMap {
   id: string;
   name: string;
@@ -58,6 +75,13 @@ export interface GameMap {
   blocked: boolean[];
   /** Points nommés (rendez-vous, comptoirs, emplois du temps). */
   points: Record<PointId, Vec2>;
+  /**
+   * Où regarde celui qui se tient à un point (`facing` de la simulation: radians, 0 vers l'est,
+   * sens horaire vu du dessus), pour les points qui le disent (`cap_degres`: places de l'échelle).
+   */
+  pointFacings: Record<PointId, number>;
+  /** Petits objets accrochés (nichoir, chicot, pieu), dessinés par le rendu des moments. */
+  hooks: MapHook[];
   /** Zones nommées (`garden`, `forest_edge`, `quay`, `square`, `river`...). */
   zones: Record<string, Rect>;
   house: {

@@ -40,6 +40,11 @@ const SoundSchema = v.object({
   durationMs: v.array(NonNegative),
   loop: v.optional(LoopSchema),
   playFromSeconds: v.optional(NonNegative),
+  // Moments rares (tour 6): moment et nom du son dans la fiche, niveau d'attente, montée à l'apogée.
+  moment: v.optional(v.string()),
+  momentSound: v.optional(v.string()),
+  waitingDb: v.optional(Finite),
+  climaxRampMs: v.optional(NonNegative),
 });
 
 const MusicSchema = v.object({
@@ -145,6 +150,8 @@ export interface SoundDef {
   durations: readonly number[];
   loop: LoopDef | null;
   playFrom: number;
+  /** Moment rare auquel ce son appartient (`moments.json`), et son nom dans la fiche, ou `null`. */
+  moment: { id: string; sound: string; waitingDb: number; climaxRampSeconds: number } | null;
 }
 
 export interface MusicDef {
@@ -260,6 +267,15 @@ export function parseCatalogue(raw: unknown): Catalogue {
       durations,
       loop,
       playFrom: s.playFromSeconds ?? loop?.start ?? 0,
+      moment:
+        s.moment === undefined
+          ? null
+          : {
+              id: s.moment,
+              sound: s.momentSound ?? id.replaceAll('-', '_'),
+              waitingDb: s.waitingDb ?? 0,
+              climaxRampSeconds: (s.climaxRampMs ?? 0) / 1000,
+            },
     });
   }
   const music = new Map<string, MusicDef>();

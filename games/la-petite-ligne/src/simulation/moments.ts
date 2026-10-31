@@ -488,7 +488,10 @@ export function takeHold(sim: Sim, c: Character, place: string): void {
   stopPath(sim, c);
   c.pos.x = at.x;
   c.pos.y = at.y;
-  if (face !== undefined && face !== null) c.facing = Math.atan2(face.y - at.y, face.x - at.x);
+  // Face au montant de l'échelle (cap de la place), sinon vers le point du moment.
+  const heading = sim.map.pointFacings[place];
+  if (heading !== undefined) c.facing = heading;
+  else if (face !== undefined && face !== null) c.facing = Math.atan2(face.y - at.y, face.x - at.x);
   c.holding = place;
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   sim.runtime.changed = true;

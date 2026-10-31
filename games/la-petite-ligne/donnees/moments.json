@@ -28,18 +28,19 @@
         }
       ],
       "climax": {
-        "seconds": 5.2,
+        "seconds": 7.4,
         "keyframes": {
           "heron": [
             [0.0, 20.6, 39.6, 0.0, "heron_alert"],
-            [1.0, 20.6, 39.6, 0.0, "heron_takeoff"],
-            [2.4, 22.0, 39.8, 1.0, "heron_fly"],
-            [3.4, 26.0, 40.8, 2.0, "heron_fly"],
-            [4.4, 28.8, 41.9, 1.0, "heron_land"],
-            [5.2, 29.5, 42.3, 0.0, "heron_rest"]
+            [2.6, 20.6, 39.6, 0.0, "heron_takeoff"],
+            [3.5, 20.6, 39.6, 0.15, null],
+            [4.6, 22.0, 39.8, 1.0, "heron_fly"],
+            [5.6, 26.0, 40.8, 2.0, "heron_fly"],
+            [6.6, 28.8, 41.9, 1.0, "heron_land"],
+            [7.4, 29.5, 42.3, 0.0, "heron_rest"]
           ]
         },
-        "sounds": [[1.0, "heron_wings"], [1.2, "heron_croak"], [4.4, "heron_land"]],
+        "sounds": [[2.6, "heron_wings"], [3.8, "heron_croak"], [6.6, "heron_land"]],
         "lookers": ["jeanne"]
       },
       "after": { "actors": { "heron": { "at": "heron_rest_far", "idle": "heron_rest" } } },
@@ -80,26 +81,27 @@
         }
       ],
       "climax": {
-        "seconds": 14.0,
+        "seconds": 16.8,
         "keyframes": {
           "goose": [
             [0.0, 25.5, 40.0, 0.0, "goose_alert"],
-            [1.0, 25.8, 40.0, 0.0, "goose_run"],
-            [3.0, 31.0, 39.9, 0.4, "goose_fly"],
-            [4.0, 35.0, 38.0, 2.0, "goose_fly"],
-            [5.0, 37.6, 34.4, 3.6, "goose_fly"],
-            [6.0, 39.4, 30.6, 5.0, "goose_fly"],
-            [7.0, 41.0, 26.6, 6.4, "goose_fly"],
-            [8.0, 42.5, 22.6, 7.8, "goose_fly"],
-            [9.0, 44.0, 18.6, 9.2, "goose_fly"],
-            [10.0, 45.5, 14.6, 10.6, "goose_fly"],
-            [12.0, 48.5, 6.6, 13.4, "goose_fly"],
-            [14.0, 51.5, -1.4, 16.2, "goose_fly"]
+            [2.8, 25.5, 40.0, 0.0, "goose_run"],
+            [3.8, 26.1, 40.0, 0.0, null],
+            [5.8, 31.0, 39.9, 0.4, "goose_fly"],
+            [6.8, 35.0, 38.0, 2.0, "goose_fly"],
+            [7.8, 37.6, 34.4, 3.6, "goose_fly"],
+            [8.8, 39.4, 30.6, 5.0, "goose_fly"],
+            [9.8, 41.0, 26.6, 6.4, "goose_fly"],
+            [10.8, 42.5, 22.6, 7.8, "goose_fly"],
+            [11.8, 44.0, 18.6, 9.2, "goose_fly"],
+            [12.8, 45.5, 14.6, 10.6, "goose_fly"],
+            [14.8, 48.5, 6.6, 13.4, "goose_fly"],
+            [16.8, 51.5, -1.4, 16.2, "goose_fly"]
           ]
         },
         "fadeLastSeconds": 1.0,
-        "formation": { "fromSeconds": 3, "toSeconds": 8, "spacing": 2.2, "armAngleDeg": 145 },
-        "sounds": [[0.0, "geese_alarm"], [1.0, "geese_takeoff"], [3.0, "geese_flight"]],
+        "formation": { "fromSeconds": 5.8, "toSeconds": 10.8, "spacing": 2.2, "armAngleDeg": 145 },
+        "sounds": [[0.0, "geese_alarm"], [2.8, "geese_takeoff"], [5.8, "geese_flight"]],
         "lookers": ["jeanne"]
       },
       "after": { "actors": { "goose": { "at": null, "idle": null } } },
@@ -143,44 +145,54 @@
       "availableWhen": [],
       "present": { "from": "12:00", "to": "18:00" },
       "window": { "from": "12:00", "to": "18:00" },
-      "watch": { "radius": 3, "minRadius": 0, "holdSeconds": 0.5, "still": false, "facing": false, "seated": false, "bench": null, "hold": ["ladder_hold_north", "ladder_hold_south"], "target": "anchor" },
+      "watch": { "radius": 3, "minRadius": 0, "holdSeconds": 0.5, "still": false, "facing": false, "seated": false, "bench": null, "hold": ["ladder_hold_east", "ladder_hold_west"], "target": "anchor" },
       "questWatch": null,
       "actors": [
-        { "id": "ladder_wood", "model": "ladder_wood", "count": 1, "at": "ladder_foot", "facing": 0.0, "idle": "static", "idleExtra": null, "collisionRadius": 0, "shy": null },
-        { "id": "basile", "model": "villager_basile", "villager": "basile", "count": 1, "at": "nest_oak_basile", "facing": 0.0, "idle": "idle", "idleExtra": null, "collisionRadius": 0, "shy": null },
+        { "id": "ladder_wood", "model": "ladder_wood", "count": 1, "at": "ladder_foot", "facing": -0.7854, "idle": "static", "idleExtra": null, "collisionRadius": 0, "shy": null },
+        { "id": "basile", "model": "villager_basile", "villager": "basile", "count": 1, "at": "nest_oak_basile", "facing": -0.7854, "keepFacing": true, "idle": "idle", "idleExtra": null, "collisionRadius": 0, "shy": null },
         { "id": "nest_box", "model": "nest_box", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "nest_box_crooked", "idleExtra": null, "collisionRadius": 0, "shy": null },
-        { "id": "blue_tit", "model": "blue_tit", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "tit_perch", "idleExtra": null, "collisionRadius": 0, "shy": null }
+        { "id": "blue_tit", "model": "blue_tit", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "hidden", "idleExtra": null, "collisionRadius": 0, "shy": null }
       ],
       "climax": {
-        "seconds": 9.4,
+        "seconds": 8.2,
         "pauseWhenReleased": true,
-        "pauseBefore": 8.6,
+        "pauseBefore": 7.4,
         "keyframes": {
           "basile": [
-            [0.0, 51.47, 5.5, 0.0, "climb_ladder"],
-            [3.0, 51.84, 5.5, 1.4, "reach_up"],
-            [3.8, 51.84, 5.5, 1.4, "hammer_tap"],
-            [5.6, 51.84, 5.5, 1.4, "climb_ladder"],
-            [8.6, 51.47, 5.5, 0.0, "walk"],
-            [9.4, 50.6, 6.6, 0.0, "idle"]
+            [0.0, 51.42, 6.58, 0.0, "walk"],
+            [0.5, 51.77, 6.23, 0.0, "climb_ladder"],
+            [0.5, 51.77, 6.23, 0.0, null],
+            [1.1, 51.8231, 6.1769, 0.28, null],
+            [1.7, 51.8761, 6.1239, 0.56, null],
+            [2.3, 51.9292, 6.0708, 0.84, "reach_up"],
+            [2.3, 51.9292, 6.0708, 0.84, null],
+            [3.1, 51.9292, 6.0708, 0.84, "hammer_tap"],
+            [4.9, 51.9292, 6.0708, 0.84, "climb_ladder"],
+            [4.9, 51.9292, 6.0708, 0.84, null],
+            [5.733, 51.8761, 6.1239, 0.56, null],
+            [6.567, 51.8231, 6.1769, 0.28, null],
+            [7.4, 51.77, 6.23, 0.0, "walk"],
+            [7.4, 51.77, 6.23, 0.0, null],
+            [8.2, 51.42, 6.58, 0.0, "idle"]
           ],
           "nest_box": [
-            [0.0, 52.5, 5.84, 2.4, "nest_box_crooked"],
-            [3.0, 52.5, 5.84, 2.4, "nest_box_turn"],
-            [3.8, 52.5, 5.84, 2.4, "nest_box_straight"]
+            [0.0, 52.5, 5.71, 2.015, "nest_box_crooked"],
+            [2.3, 52.5, 5.71, 2.015, "nest_box_turn"],
+            [3.1, 52.5, 5.71, 2.015, "nest_box_straight"]
           ],
           "blue_tit": [
-            [0.0, 53.4, 5.2, 4.6, null],
-            [8.6, 53.4, 5.2, 4.6, "tit_fly"],
-            [8.8, 52.5, 5.93, 2.53, "tit_perch"],
-            [9.4, 52.5, 5.93, 2.53, "tit_perch"]
+            [0.0, 53.1, 5.3, 3.4, "hidden"],
+            [7.3, 53.1, 5.3, 3.4, "tit_fly"],
+            [7.6, 52.5, 5.835, 1.967, "tit_perch"],
+            [8.0, 52.5, 5.835, 1.967, "tit_fly"],
+            [8.2, 52.75, 5.4, 3.0, "tit_fly"]
           ]
         },
         "sounds": [
-          [0.0, "ladder_step"], [0.6, "ladder_step"], [1.2, "ladder_step"], [1.8, "ladder_step"], [2.4, "ladder_step"],
-          [3.0, "nest_box_turn"], [4.05, "hammer_tap"], [4.65, "hammer_tap"], [5.25, "hammer_tap"],
-          [5.6, "ladder_step"], [6.2, "ladder_step"], [6.8, "ladder_step"], [7.4, "ladder_step"], [8.0, "ladder_step"],
-          [9.0, "tit_call"]
+          [0.5, "ladder_step"], [1.1, "ladder_step"], [1.7, "ladder_step"],
+          [2.3, "nest_box_turn"], [3.35, "hammer_tap"], [3.95, "hammer_tap"], [4.55, "hammer_tap"],
+          [4.9, "ladder_step"], [5.733, "ladder_step"], [6.567, "ladder_step"],
+          [7.8, "tit_call"]
         ],
         "lookers": []
       },
@@ -220,32 +232,33 @@
       "actors": [
         { "id": "tit_a", "model": "blue_tit", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "tit_perch", "idleExtra": { "clip": "tit_fly", "everySeconds": [2, 2] }, "collisionRadius": 0, "shy": null },
         { "id": "tit_b", "model": "blue_tit", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "tit_perch", "idleExtra": null, "collisionRadius": 0, "shy": null },
-        { "id": "moss_tuft", "model": "moss_tuft", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "static", "idleExtra": null, "collisionRadius": 0, "shy": null }
+        { "id": "moss_tuft", "model": "moss_tuft", "count": 1, "at": "nest_box", "facing": 1.5708, "idle": "hidden", "idleExtra": null, "collisionRadius": 0, "shy": null }
       ],
       "climax": {
         "seconds": 4.6,
         "keyframes": {
           "tit_a": [
-            [0.0, 52.85, 5.95, 2.75, "tit_perch"],
-            [0.6, 52.5, 5.93, 2.53, "tit_perch"],
-            [1.8, 52.5, 5.94, 2.45, "tit_perch"],
-            [2.1, 52.5, 5.94, 2.45, "tit_enter"],
-            [4.0, 52.5, 5.94, 2.45, "tit_exit"],
-            [4.3, 52.6, 5.9, 2.6, "tit_fly"],
-            [4.6, 52.7, 5.4, 4.2, "tit_fly"]
+            [0.0, 52.85, 5.95, 2.19, "tit_perch"],
+            [0.25, 52.85, 5.95, 2.19, "tit_fly"],
+            [0.6, 52.5, 5.835, 1.967, "tit_perch"],
+            [1.8, 52.5, 5.835, 1.967, "tit_fly"],
+            [1.95, 52.5, 5.93, 1.845, "tit_perch"],
+            [2.1, 52.5, 5.93, 1.845, "tit_enter"],
+            [4.0, 52.5, 5.93, 1.845, "tit_exit"],
+            [4.3, 52.6, 6.0, 2.05, "tit_fly"],
+            [4.6, 52.75, 5.45, 3.2, "tit_fly"]
           ],
           "tit_b": [
-            [0.0, 52.85, 5.95, 2.75, "tit_perch"],
-            [1.5, 52.85, 5.95, 2.75, "tit_sing"],
-            [4.0, 52.85, 5.95, 2.75, "tit_perch"],
-            [4.3, 52.9, 5.9, 2.9, "tit_fly"],
-            [4.6, 52.3, 5.3, 4.4, "tit_fly"]
+            [0.0, 52.73, 5.82, 2.17, "tit_perch"],
+            [1.5, 52.73, 5.82, 2.17, "tit_sing"],
+            [4.0, 52.73, 5.82, 2.17, "tit_perch"],
+            [4.3, 52.8, 5.85, 2.4, "tit_fly"],
+            [4.6, 52.35, 5.35, 3.3, "tit_fly"]
           ],
           "moss_tuft": [
-            [0.0, 52.85, 5.95, 2.75, "carried_by_tit_a"],
-            [0.6, 52.5, 5.93, 2.53, "carried_by_tit_a"],
-            [1.8, 52.5, 5.94, 2.45, "carried_by_tit_a"],
-            [2.1, 52.5, 5.94, 2.45, "inside_nest_box"]
+            [0.0, 52.85, 5.95, 2.19, "carried_by_tit_a"],
+            [2.1, 52.5, 5.93, 1.845, "carried_by_tit_a"],
+            [2.4, 52.5, 5.93, 1.845, "hidden"]
           ]
         },
         "fadeLastSeconds": 0.3,
@@ -289,19 +302,20 @@
         }
       ],
       "climax": {
-        "seconds": 5.6,
+        "seconds": 6.9,
         "keyframes": {
           "fox": [
             [0.0, 7.5, 17.0, 0.0, "fox_look"],
             [1.0, 7.5, 17.0, 0.0, "fox_bark"],
-            [2.2, 7.5, 17.0, 0.0, "fox_trot"],
-            [2.57, 7.0, 16.0, 0.0, "fox_trot"],
-            [3.54, 5.5, 13.5, 0.0, "fox_trot"],
-            [5.6, 0.2, 13.5, 0.0, "fox_trot"]
+            [2.2, 7.5, 17.0, 0.0, "fox_look"],
+            [3.5, 7.5, 17.0, 0.0, "fox_trot"],
+            [3.87, 7.0, 16.0, 0.0, "fox_trot"],
+            [4.84, 5.5, 13.5, 0.0, "fox_trot"],
+            [6.9, 0.2, 13.5, 0.0, "fox_trot"]
           ]
         },
         "fadeLastSeconds": 0.5,
-        "sounds": [[1.0, "fox_bark"]],
+        "sounds": [[1.0, "fox_bark"], [1.2, "hens_alarm"]],
         "lookers": []
       },
       "after": { "actors": { "fox": { "at": null, "idle": null } } },

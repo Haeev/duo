@@ -16,7 +16,7 @@
     "emprise": "[largeur le long de la façade, profondeur] à la rotation 0; largeur et profondeur s'échangent aux rotations 1 et 3; chaque objet porte aussi son rectangle `rect`",
     "portes": "décalage le long de la façade, compté depuis l'extrémité gauche vue de dehors (l'ouest pour une rotation 0)",
     "interieur": "bâtiment à pièce jouable: murs sur le pourtour (une case), intérieur et porte franchissables; sinon toute l'emprise est infranchissable",
-    "points": "x, y en mètres; `objet`: l'objet auquel le point appartient; `portee`: le point est dans une case pleine et se joue depuis une case libre à cette distance; `rayon`: tolérance d'arrivée; `rotation`: où regarde un habitant posté là"
+    "points": "x, y en mètres; `objet`: l'objet auquel le point appartient; `portee`: le point est dans une case pleine et se joue depuis une case libre à cette distance; `rayon`: tolérance d'arrivée; `rotation`: où regarde un habitant posté là; `cap_degres`: où regarde celui qui s'y tient, en degrés de boussole (0 nord, 90 est), pour les directions en biais (places de l'échelle)"
   },
   "camera": {
     "orientation_par_defaut": "sud-est (regard vers le nord-ouest), comme le rendu (yaw = -3 PI/4)",
@@ -483,11 +483,11 @@
     {"id": "heron_stand", "x": 20.6, "y": 39.6, "role": "moment du héron: il pêche au bord aval du gué, dans la lame d'eau (case `g`), là où l'eau basse plonge vers l'eau profonde", "moment": "heron"},
     {"id": "heron_rest_far", "x": 29.5, "y": 42.3, "role": "moment du héron: il se pose sur la grève de sable d'en face, à l'écart du chemin", "moment": "heron"},
     {"id": "geese_rest", "x": 25.5, "y": 40.0, "role": "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de lui; on la regarde depuis la berge", "moment": "geese", "portee": 4.5},
-    {"id": "nest_box", "x": 52.5, "y": 5.84, "role": "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas (`tree_oak_01`), trou à 2,45 m", "moment": "tits", "z": 2.4},
-    {"id": "ladder_foot", "x": 51.47, "y": 5.5, "role": "pied de l'échelle de Basile contre la face ouest du chêne", "moment": "ladder"},
-    {"id": "ladder_hold_north", "x": 51.25, "y": 4.95, "role": "tenir l'échelle, côté nord (tourné vers le sud)", "moment": "ladder"},
-    {"id": "ladder_hold_south", "x": 51.25, "y": 6.05, "role": "tenir l'échelle, côté sud (tourné vers le nord)", "moment": "ladder"},
-    {"id": "nest_oak_basile", "x": 51.0, "y": 5.5, "role": "Basile au pied de son échelle, pendant « Où est passé Basile ? »", "rotation": 1},
+    {"id": "nest_box", "x": 52.5, "y": 5.8, "role": "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas (`tree_oak_01`): centre de la caisse à 1,84 m, trou à 1,89 m", "moment": "tits", "z": 1.84},
+    {"id": "ladder_foot", "x": 51.77, "y": 6.23, "role": "pied de l'échelle de Basile, au sud-ouest du chêne, tête contre le tronc en (52,32 ; 5,68) à 2,90 m", "moment": "ladder", "cap_degres": 45},
+    {"id": "ladder_hold_east", "x": 52.36, "y": 6.42, "role": "tenir l'échelle, côté est, mains au montant (tourné vers le nord-ouest)", "moment": "ladder", "cap_degres": 315},
+    {"id": "ladder_hold_west", "x": 51.58, "y": 5.64, "role": "tenir l'échelle, côté ouest, mains au montant (tourné vers le sud-est)", "moment": "ladder", "cap_degres": 135},
+    {"id": "nest_oak_basile", "x": 51.42, "y": 6.58, "role": "Basile derrière le pied de son échelle, pendant « Où est passé Basile ? »; il en part et y revient", "cap_degres": 45},
     {"id": "fox_track_west", "x": 0.2, "y": 13.5, "role": "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast", "moment": "fox", "portee": 4.0},
     {"id": "fox_mousing", "x": 7.5, "y": 17.0, "role": "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la maisonnette, à 4 m de son mur nord", "moment": "fox"},
     {"id": "meadow_glow", "x": 56.5, "y": 29.5, "role": "moment des vers luisants: herbes hautes du pré, à plus de 9 m des lampadaires", "moment": "glowworms"},
@@ -533,8 +533,8 @@
     "note": "cx, cy d'un meuble: case nord-ouest de son emprise (objets.json, footprint w x d)"
   },
   "accroches": [
-    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.84, "z": 2.4, "regarde": "sud", "penche_degres": 25, "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par le moment de l'échelle (drapeau `nest_box_straight`)"},
-    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.75, "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier: perchoir des mésanges"},
+    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.71, "z": 2.015, "regarde": "sud", "penche_degres": 25, "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce; le centre de la caisse est 0,09 m devant (y 5,80) et 0,175 m dessous (1,84 m)"},
+    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.19, "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier, à hauteur du nichoir: perchoir des mésanges"},
     {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95, "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"}
   ],
   "habitants": {
