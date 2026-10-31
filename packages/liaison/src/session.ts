@@ -171,6 +171,11 @@ export interface SessionControllerOptions {
   readonly selfMachine: () => string;
   readonly links: LinkManager;
   readonly log: (event: string, data?: Readonly<Record<string, unknown>>) => void;
+  /**
+   * Salon tenu par l'application elle-même: les messages de jeu passent sans partie du
+   * salon intégré, et le régime actif vient de `setExternalActive`.
+   */
+  readonly externalSession?: boolean;
 }
 
 const encoder = new TextEncoder();
@@ -181,6 +186,7 @@ export class SessionController {
   private local: LobbyState | null = null;
   private remote: LobbyState | null = null;
   private joinState: 'none' | 'pending' | 'joined' = 'none';
+  private externalActive = false;
   private hostTimers: CancelTimer[] = [];
   private droppedGameValue = 0;
   private readonly sendMessages: TokenBucket;
@@ -419,7 +425,7 @@ export class SessionController {
   sendGame(channel: number, payload: GamePayload, mode: ChannelMode): SendResult {
     const { config } = this.options;
     const link = this.options.links.link;
-    if ((this.currentLobby()?.match ?? null) === null) return { ok: false, reason: 'no-match' };
+    if (!this.relayAllowed()) return { ok: false, reason: 'no-match' };
     if (link === null) return { ok: false, reason: 'no-link' };
     if (!Number.isInteger(channel) || channel < 0 || channel >= config.gameChannels) {
       return { ok: false, reason: 'bad-channel' };
@@ -463,8 +469,20 @@ export class SessionController {
     return hostTime - (this.options.links.link?.clockOffset() ?? 0);
   }
 
+  /** Régime actif décidé par l'application (salon externe ouvert, partie en cours). */
+  setExternalActive(active: boolean): void {
+    this.externalActive = active;
+    this.updateActivity();
+  }
+
   private updateActivity(): void {
-    this.options.links.link?.setLocalActive(this.local !== null || this.joinState !== 'none');
+    this.options.links.link?.setLocalActive(
+      this.externalActive || this.local !== null || this.joinState !== 'none',
+    );
+  }
+
+  private relayAllowed(): boolean {
+    return this.options.externalSession === true || (this.currentLobby()?.match ?? null) !== null;
   }
 
   private emitView(): void {
@@ -789,12 +807,14 @@ export class SessionController {
         // Présence et versions: traitées par la façade.
         return;
       default:
+        // Messages de l'application (salon externe): remis par la façade.
+        if (message.type.startsWith('app.')) return;
         this.options.log('message-inconnu', { type: message.type.slice(0, 32) });
     }
   }
 
   private onGame(channel: number, payload: GamePayload): void {
-    if ((this.currentLobby()?.match ?? null) === null) return;
+    if (!this.relayAllowed()) return;
     const now = this.options.clock.now();
     const bytes = payload instanceof Uint8Array ? payload.byteLength : 0;
     // Garde-fou contre une rafale anormale; la rafale permise couvre une reprise entière.

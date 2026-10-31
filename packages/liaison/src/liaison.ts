@@ -76,6 +76,12 @@ export interface LiaisonOptions {
   /** Pilote réseau injecté (réseau simulé des tests); Node par défaut. */
   readonly driver?: NetworkDriver;
   readonly log?: LiaisonLogger;
+  /**
+   * Salon et partie tenus par l'application (par exemple sa propre machine à états):
+   * le salon intégré reste inutilisé, les messages de jeu passent à tout moment,
+   * l'application échange ses messages par `sendApp` et règle le régime par `setActive`.
+   */
+  readonly externalSession?: boolean;
 }
 
 /** L'autre machine du duo, telle que la liaison la connaît. */
@@ -120,6 +126,8 @@ export interface LiaisonEvents {
   /** Autres ordinateurs avec Duo vus sur le réseau, hors partenaire relié (Réglages > Réseau). */
   others: readonly Sighting[];
   interfaces: readonly RetainedInterface[];
+  /** Message fiable de l'application (salon externe), type sans le préfixe `app.`. */
+  app: { readonly type: string; readonly body: Readonly<Record<string, unknown>> };
 }
 
 export interface LobbyApi {
@@ -165,6 +173,13 @@ export interface Liaison {
   connectTo(address: string): Promise<ConnectResult>;
   /** Série de requêtes immédiate (ouverture de E04 ou E17). */
   searchNow(): void;
+  /**
+   * Salon externe: message fiable vers l'autre machine (livré une fois, dans l'ordre,
+   * y compris à travers une reprise). Rend `false` sans liaison: rien n'est envoyé.
+   */
+  sendApp(type: string, body: Readonly<Record<string, unknown>>): boolean;
+  /** Salon externe: régime actif (battement de 500 ms, perte à 2 s) tant que vrai. */
+  setActive(active: boolean): void;
   updateProfile(profile: LiaisonProfile): void;
   updateGames(games: readonly InstalledGame[]): void;
   readonly lobby: LobbyApi;
@@ -263,6 +278,7 @@ export function createLiaison(options: LiaisonOptions): Liaison {
     selfMachine: () => options.identity.machine,
     links,
     log,
+    externalSession: options.externalSession ?? false,
   });
 
   const discovery = new Discovery({
@@ -355,6 +371,11 @@ export function createLiaison(options: LiaisonOptions): Liaison {
       if (!parsed.success) return;
       link.peer = { ...link.peer, games: parsed.output.games };
       refreshPartner();
+    } else if (message.type.startsWith('app.')) {
+      const body: Record<string, unknown> = { ...message.body };
+      delete body.type;
+      delete body.seq;
+      events.emit('app', { type: message.type.slice(4), body });
     }
   });
   session.events.on('view', (view) => {
@@ -487,6 +508,15 @@ export function createLiaison(options: LiaisonOptions): Liaison {
     },
     searchNow: () => {
       discovery.queryBurst();
+    },
+    sendApp: (type, body) => {
+      const link = links.link;
+      if (link === null || link.closed) return false;
+      link.sendReliable(`app.${type}`, body);
+      return true;
+    },
+    setActive: (active) => {
+      session.setExternalActive(active);
     },
     updateProfile: (next) => {
       profile = next;
