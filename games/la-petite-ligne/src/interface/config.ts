@@ -40,6 +40,11 @@ export const UI_SETTINGS = {
   shopBulk: 4,
   /** Pas de l'horloge affichée (minutes de jeu). */
   clockStepMinutes: 10,
+  /**
+   * Pas de simulation par seconde: doit valoir `SIM_HZ` de `simulation/constantes.ts`
+   * (l'interface n'importe pas la simulation; un test vérifie l'égalité).
+   */
+  simHz: 30,
   /** Longueur maximale du prénom (comme la simulation). */
   nameMaxLength: 16,
   /**

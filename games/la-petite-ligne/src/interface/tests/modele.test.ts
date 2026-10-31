@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { SIM_HZ } from '../../simulation/constantes';
+import { step } from '../../simulation/pas';
+import { UI_SETTINGS } from '../config';
 import { NBSP } from '../typographie';
 import {
+  absenceMinutes,
   clockModel,
   dayLabel,
   formModel,
@@ -221,6 +225,46 @@ describe('commande et quêtes', () => {
       ['a', 'Samedi 1', false],
     ]);
     expect(letters[0]?.text).toBe(`L’établi`);
+  });
+});
+
+describe('pause de l’autre joueur (PA-04)', () => {
+  it('suit la simulation: rien avant qu’elle déclare l’absence, puis les minutes comptées en pas de jeu', () => {
+    const sim = started();
+    const ctx = uiContext();
+    const other = character(sim, 'p2');
+    const perMinute = SIM_HZ * 60;
+    other.lastInputTick = 0;
+    sim.world.tick = 5 * perMinute;
+    other.absent = false;
+    expect(absenceMinutes(sim.world, other)).toBeNull();
+    expect(partnerModel(sim.world, ctx, absenceMinutes(sim.world, other))?.state).toBe('');
+    other.absent = true;
+    sim.world.tick = 3 * perMinute + 10;
+    expect(absenceMinutes(sim.world, other)).toBe(3);
+    const card = partnerModel(sim.world, ctx, absenceMinutes(sim.world, other));
+    expect(card?.state).toBe('away');
+    expect(plain(card?.activity ?? '')).toBe('Fait une pause depuis 3 min');
+  });
+
+  it('compte au même rythme que la simulation', () => {
+    expect(UI_SETTINGS.simHz).toBe(SIM_HZ);
+  });
+
+  it("la carte annonce la pause au pas même où la simulation arrête l'horloge", () => {
+    const sim = started();
+    const ctx = uiContext();
+    playUntil(sim, (s) => s.world.scene === null && s.world.quests.some((q) => q.id === 'first_train' && q.status === 'done'));
+    const other = character(sim, 'p2');
+    let guard = 0;
+    while (!other.absent && guard < SIM_HZ * 60 * 10) {
+      expect(absenceMinutes(sim.world, other)).toBeNull();
+      step(sim, { controls: {}, intents: [] });
+      guard++;
+    }
+    expect(other.absent).toBe(true);
+    expect(sim.world.clock.stoppedBy).toBe('absence');
+    expect(absenceMinutes(sim.world, other)).toBe(ctx.content.settings.absence.minutes);
   });
 });
 

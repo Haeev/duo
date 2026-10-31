@@ -521,7 +521,14 @@ export function countedItem(ctx: UiContext, item: string, count: number): string
   return `${count} ${itemName(ctx.content.items[item], count, item)}`;
 }
 
-/** Minutes réelles depuis un instant (pour « depuis 3 min »). */
-export function minutesSince(fromMs: number, nowMs: number): number {
-  return Math.max(0, Math.floor((nowMs - fromMs) / 60_000));
+/**
+ * Pause d'un joueur selon la simulation (PA-04): `null` tant qu'elle ne le
+ * déclare pas absent (`absent`), sinon les minutes de jeu sans entrée, comptées
+ * en pas comme elle le fait (`lastInputTick`), et jamais en temps réel: quand
+ * les images ralentissent, la carte n'annonce pas l'absence avant l'horloge.
+ */
+export function absenceMinutes(world: ReadonlyWorld, c: ReadonlyCharacter): number | null {
+  if (!c.absent) return null;
+  const ticksPerMinute = UI_SETTINGS.simHz * 60;
+  return Math.max(0, Math.floor((world.tick - c.lastInputTick) / ticksPerMinute));
 }

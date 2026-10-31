@@ -12,9 +12,9 @@ import { button, chip, clear, el, icon, keepFocusOnGame, keycap, keysLine, portr
 import { clockTime, contentVars, fill, itemTitle, keyTokens } from './format';
 import {
   clockModel,
+  absenceMinutes,
   formModel,
   itemIcon,
-  minutesSince,
   nextObjective,
   partnerModel,
   placementReason,
@@ -69,8 +69,6 @@ export class Hud {
   private readonly partnerName: HTMLSpanElement;
   private readonly partnerIcon: SVGSVGElement;
   private readonly partnerActivity: HTMLSpanElement;
-  private partnerInputTick = -1;
-  private partnerInputAt = 0;
 
   private readonly objective: HTMLElement;
   private readonly objectiveTitle: HTMLHeadingElement;
@@ -319,13 +317,8 @@ export class Hud {
 
     // L'autre joueur.
     const partnerChar = characterOf(world, ctx.partner);
-    if (partnerChar !== null && partnerChar.lastInputTick !== this.partnerInputTick) {
-      this.partnerInputTick = partnerChar.lastInputTick;
-      this.partnerInputAt = now;
-    }
-    const awayAfter = ctx.content.settings.absence.minutes;
-    const away = minutesSince(this.partnerInputAt, now);
-    const p = partnerModel(world, ctx, partnerChar?.status === 'active' && away >= awayAfter ? away : null);
+    // La pause de l'autre: celle que décide la simulation (même seuil que l'arrêt de l'horloge).
+    const p = partnerModel(world, ctx, partnerChar === null ? null : absenceMinutes(world, partnerChar));
     setHidden(this.partner, p === null);
     if (p !== null && partnerChar !== null) {
       setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance), p.expression, ''));
