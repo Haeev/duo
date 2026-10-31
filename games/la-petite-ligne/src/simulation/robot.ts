@@ -6,7 +6,7 @@
  */
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
-import { MINUTES_PER_HOUR } from './constantes';
+import { MINUTES_PER_HOUR, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
 import { refreshBlockers } from './deplacement';
@@ -73,9 +73,13 @@ function goAct(sim: Sim, c: Character, m: Memory, key: string, target: ClickTarg
 
 /** Va à un point sans agir. */
 function goTo(sim: Sim, c: Character, m: Memory, key: string, pos: Vec2, reach: number, out: Intent[]): boolean {
-  if (distance(c.pos, pos) <= reach) return false;
+  if (distance(c.pos, pos) <= reach || (m.skip[key] ?? 0) > sim.world.tick) return false;
   m.job = key;
   if (m.goingTo === key && c.destination !== null) return true;
+  if (findPath(refreshBlockers(sim), c.pos, pos) === null) {
+    m.skip[key] = sim.world.tick + 300;
+    return false;
+  }
   out.push({ type: 'move_to', target: { kind: 'ground', x: pos.x, y: pos.y }, act: false });
   m.goingTo = key;
   return true;
@@ -85,9 +89,9 @@ function selectItem(c: Character, item: string, out: Intent[]): boolean {
   if (heldStack(c)?.item === item) return true;
   const slot = c.bag.findIndex((s) => s?.item === item);
   if (slot < 0) return false;
-  if (slot >= 8) {
-    out.push({ type: 'swap_slots', from: slot, to: 7 });
-    out.push({ type: 'select_slot', slot: 7 });
+  if (slot >= TOOLBAR_SLOTS) {
+    out.push({ type: 'swap_slots', from: slot, to: TOOLBAR_SLOTS - 1 });
+    out.push({ type: 'select_slot', slot: TOOLBAR_SLOTS - 1 });
   } else {
     out.push({ type: 'select_slot', slot });
   }

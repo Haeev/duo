@@ -70,7 +70,7 @@
         169,
         162
       ],
-      "momentaryMaxLufs": -31.0,
+      "momentaryMaxLufs": -29.0,
       "note": "un pas par appui de pied; tirage sans répétition immédiate; choisir le sol sous le pied (terre: potager et chemins; herbe; bois: quai et plancher; pierre: place et puits)"
     },
     "step-path": {
@@ -104,7 +104,7 @@
         155,
         166
       ],
-      "momentaryMaxLufs": -30.0,
+      "momentaryMaxLufs": -28.5,
       "note": "un pas par appui de pied; tirage sans répétition immédiate; choisir le sol sous le pied (terre: potager et chemins; herbe; bois: quai et plancher; pierre: place et puits)"
     },
     "step-wood": {
@@ -138,7 +138,7 @@
         182,
         169
       ],
-      "momentaryMaxLufs": -29.0,
+      "momentaryMaxLufs": -27.5,
       "note": "un pas par appui de pied; tirage sans répétition immédiate; choisir le sol sous le pied (terre: potager et chemins; herbe; bois: quai et plancher; pierre: place et puits)"
     },
     "step-stone": {
@@ -172,7 +172,7 @@
         112,
         126
       ],
-      "momentaryMaxLufs": -30.0,
+      "momentaryMaxLufs": -28.5,
       "note": "un pas par appui de pied; tirage sans répétition immédiate; choisir le sol sous le pied (terre: potager et chemins; herbe; bois: quai et plancher; pierre: place et puits)"
     },
     "hoe": {

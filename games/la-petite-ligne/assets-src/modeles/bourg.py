@@ -203,11 +203,10 @@ def stone_texture(g, f, length, height, color="stone_dark", n=10, seed=1, d=0.01
 GH = dict(hx=2.8, hy=2.3, ze=2.4, zr=3.9, t=0.3, floor=0.12)
 
 
-def gatekeeper_house(A, ruin):
+def gatekeeper_house(A, ruin, parent):
     name = "gatekeeper_house_" + ("ruin" if ruin else "repaired")
     hx, hy, ze, zr, t, fl = GH["hx"], GH["hy"], GH["ze"], GH["zr"], GH["t"], GH["floor"]
-    root = A.group(name, {"footprint": [7, 6], "interior": {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": fl},
-                          "door": [-1.0, 2.3], "cut_walls": True})
+    root = A.subgroup(name, parent, {"state": "ruin" if ruin else "repaired"})
     # sol et seuil
     g = A.geo()
     g.box((2 * hx - 0.02, 2 * hy - 0.02, fl), color="stone_dark", base=True)
@@ -233,17 +232,18 @@ def gatekeeper_house(A, ruin):
         f.box(g, (L + 0.02, t + 0.06, 0.28), 0, -t / 2, 0.14, by_normal("stone_dark", "stone_dark"))
         stone_texture(g, f, L, ze, n=9, seed={"front": 1, "back": 2, "left": 3, "right": 4}[side])
         if side == "front":
-            door(g, f, -1.0, color="wood_new", absent=True, step=True)
-            window(g, f, 1.25, 0.95, 0.8, 0.9, shutter="paint_blue", ruin=ruin)
-            f.box(g, (1.2, 0.08, 0.16), -1.0, 0.03, 2.25, "stone_light")
+            door(g, f, 0.0, color="wood_new", absent=True, step=True)
+            window(g, f, 1.7, 0.95, 0.75, 0.9, shutter="paint_blue", ruin=ruin)
+            window(g, f, -1.7, 0.95, 0.75, 0.9, shutter="paint_blue", ruin=ruin, box_flowers=not ruin)
+            f.box(g, (1.2, 0.08, 0.16), 0.0, 0.03, 2.25, "stone_light")
             if not ruin:
-                f.box(g, (0.5, 0.04, 0.32), 0.25, 0.04, 1.75, "paint_cream")
-                f.box(g, (0.4, 0.045, 0.06), 0.25, 0.05, 1.78, "shadow")
-                f.box(g, (0.06, 0.12, 0.06), 0.25, 0.05, 1.58, "iron")
+                f.box(g, (0.06, 0.12, 0.06), 0.62, 0.05, 1.9, "iron")
+                f.box(g, (0.2, 0.2, 0.3), 0.62, 0.15, 1.72, "glass_lamp")
+                f.box(g, (0.24, 0.24, 0.05), 0.62, 0.15, 1.9, "iron")
         elif side == "back":
             window(g, f, -1.0, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin)
         elif side == "left":
-            window(g, f, 0.3, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin, box_flowers=not ruin)
+            window(g, f, 0.3, 1.0, 0.7, 0.8, shutter="paint_blue", ruin=ruin)
         if side in ("left", "right"):
             col_g = wall_color(color_out, color_in, inward)
             x = -hx + t / 2 if side == "left" else hx - t / 2
@@ -294,10 +294,10 @@ def gatekeeper_house(A, ruin):
         g.box((0.05, 0.05, 0.05), loc=(w - 0.12, -0.05, 1.0), color="brass")
         for z in (0.3, 1.7):
             g.box((0.5, 0.06, 0.05), loc=(0.25, -0.01, z), color="iron")
-        A.add(name + "_door", g, parent=root, loc=(-1.0 - w / 2 + 0.02, -hy - 0.06, 0))
+        A.add(name + "_door", g, parent=root, loc=(-w / 2 + 0.02, -hy - 0.06, 0))
     else:
         g = A.geo()
-        g.box((1.0, 0.04, 0.2), loc=(-1.0, -hy - 0.12, 0.6), color="wood_old", rot=(0, 25, 0))
+        g.box((1.0, 0.04, 0.2), loc=(0.0, -hy - 0.12, 0.6), color="wood_old", rot=(0, 25, 0))
         for x, y in [(-2.9, -1.0), (2.95, 0.4), (-0.3, -2.55), (2.0, -2.5)]:
             for k in range(3):
                 g.cyl(0.03, 0.28, loc=(x + k * 0.06, y, 0), color="grass_dark", segs=4, r2=0.0, base=True,
@@ -310,7 +310,7 @@ def gatekeeper_house(A, ruin):
 
 def station(A):
     hx, hy, ze, zr = 4.4, 2.3, 3.0, 4.7
-    root = A.group("station", {"footprint": [10, 6], "doors": [[0.0, 2.3], [0.0, -2.3]]})
+    root = A.group("station", {"footprint": [10, 6], "door_cell": 4})
     g = A.geo()
     g.box((2 * hx, 2 * hy, ze), color="plaster_cream", base=True)
     g.box((2 * hx + 0.06, 2 * hy + 0.06, 0.45), color="stone", base=True)
@@ -319,15 +319,16 @@ def station(A):
         g.prism([(-hy, ze), (hy, ze), (0, zr)], 0.3, loc=(x + s * 0.15, 0, 0), color="plaster_cream", rot=(0, 0, 90))
     for side in ("front", "back"):
         f = Face(side, hx, hy)
-        door(g, f, 0.0, w=1.1, h=2.3, color="paint_red", glass=True)
-        for u in (-2.6, -1.4, 1.4, 2.6):
-            window(g, f, u, 1.0, 0.75, 1.2, shutter="paint_red")
+        dx = -0.5 if side == "front" else 0.5
+        door(g, f, dx, w=1.1, h=2.3, color="paint_red", glass=True)
+        for u in (-2.7, 1.2, 2.9):
+            window(g, f, u if side == "front" else -u, 1.0, 0.7, 1.2, shutter="paint_red")
         f.box(g, (2 * hx + 0.1, 0.12, 0.14), 0, 0.03, ze - 0.12, "paint_red")
     f = Face("front", hx, hy)
     # enseigne et horloge
-    f.box(g, (2.6, 0.08, 0.38), 0, 0.06, 2.62, "paint_cream", bevel=0.02)
+    f.box(g, (2.6, 0.08, 0.38), 1.9, 0.06, 2.62, "paint_cream", bevel=0.02)
     for k in range(14):
-        f.box(g, (0.1 if k % 4 else 0.13, 0.09, 0.18), -1.05 + k * 0.162, 0.07, 2.62, "paint_red")
+        f.box(g, (0.1 if k % 4 else 0.13, 0.09, 0.18), 1.9 - 1.05 + k * 0.162, 0.07, 2.62, "paint_red")
     for side in ("left", "right"):
         ff = Face(side, hx, hy)
         window(g, ff, 0.0, 1.0, 0.75, 1.2, shutter="paint_red")
@@ -340,18 +341,19 @@ def station(A):
     A.add("station_roof", r, parent=root)
     # horloge de façade: aiguilles à part, pivot au centre (à tourner selon l'heure du jeu)
     c = A.geo()
-    c.cyl(0.36, 0.08, loc=(0, 0, 0), color="paint_red", segs=16, rot=(90, 0, 0))
-    c.cyl(0.3, 0.09, loc=(0, -0.01, 0), color="white_paint", segs=16, rot=(90, 0, 0))
+    c.cyl(0.29, 0.08, loc=(0, 0, 0), color="paint_red", segs=16, rot=(90, 0, 0))
+    c.cyl(0.24, 0.09, loc=(0, -0.01, 0), color="white_paint", segs=16, rot=(90, 0, 0))
+    c.box((0.06, 0.12, 0.3), loc=(0, 0.06, 0.32), color="iron")
     for k in range(12):
         a = math.radians(k * 30)
-        c.box((0.025, 0.02, 0.06 if k % 3 else 0.09), loc=(0.24 * math.sin(a), -0.06, 0.24 * math.cos(a)), color="black",
+        c.box((0.022, 0.02, 0.05 if k % 3 else 0.075), loc=(0.19 * math.sin(a), -0.06, 0.19 * math.cos(a)), color="black",
               rot=(0, k * 30, 0))
-    clock = A.add("station_clock", c, parent=root, loc=(0, -hy - 0.1, 3.35))
+    clock = A.add("station_clock", c, parent=root, loc=(-1.53, -hy - 0.1, 2.15))
     hh = A.geo()
-    hh.box((0.035, 0.015, 0.16), loc=(0, 0, 0.065), color="black")
+    hh.box((0.03, 0.015, 0.13), loc=(0, 0, 0.05), color="black")
     A.add("station_clock_hour", hh, parent=clock, loc=(0, -0.07, 0))
     mm = A.geo()
-    mm.box((0.025, 0.015, 0.24), loc=(0, 0, 0.1), color="black")
+    mm.box((0.022, 0.015, 0.19), loc=(0, 0, 0.08), color="black")
     A.add("station_clock_minute", mm, parent=clock, loc=(0, -0.085, 0))
     return root
 
@@ -359,10 +361,10 @@ def station(A):
 # Quai 30 x 4 avec marquise sur 10 m ----------------------------------------------
 
 def platform(A):
-    root = A.group("platform", {"footprint": [30, 4], "walk_height": 0.25, "track_side": "-z",
+    root = A.group("platform", {"footprint": [30, 4], "walk_height": 0.4, "track_side": "-z",
                                 "note": "bord côté voie vers -Z (arrière); marquise centrée sur 10 m"})
     g = A.geo()
-    L, D, H = 30.0, 4.0, 0.25
+    L, D, H = 30.0, 4.0, 0.4
     g.box((L - 2.0, D, H), color=by_normal("path_dark", "stone"), base=True)
     for s in (1, -1):
         # rampes douces aux deux bouts
@@ -404,7 +406,7 @@ def ferrand_shop(A):
     hx, y0, y1, ze, zr = 4.4, -2.6, 3.6, 5.4, 7.4
     hy = (y1 - y0) / 2
     yc = (y0 + y1) / 2
-    root = A.group("ferrand_shop", {"footprint": [10, 8], "counter": [0.0, 3.6], "door": [2.6, 2.6]})
+    root = A.group("ferrand_shop", {"footprint": [10, 8], "door_cell": 2, "counter_cell": 6})
     g = A.geo()
     g.box((2 * hx, 2 * hy, ze), loc=(0, yc, 0), color="plaster_ochre", base=True)
     g.box((2 * hx + 0.06, 2 * hy + 0.06, 0.5), loc=(0, yc, 0), color="stone", base=True)
@@ -414,17 +416,18 @@ def ferrand_shop(A):
     f = Face("front", hx, hy)
     f.hy = -y0
     # devanture: grande vitrine, comptoir sur la place, porte
-    f.box(g, (4.6, 0.12, 2.3), -1.2, 0.04, 1.55, "paint_green")
-    f.box(g, (4.2, 0.08, 1.5), -1.2, 0.09, 1.75, "glass")
-    for u in (-2.6, -1.2, 0.2):
+    cu = 1.5
+    f.box(g, (4.6, 0.12, 2.3), cu, 0.04, 1.55, "paint_green")
+    f.box(g, (4.2, 0.08, 1.5), cu, 0.09, 1.75, "glass")
+    for u in (cu - 1.4, cu, cu + 1.4):
         f.box(g, (0.06, 0.1, 1.5), u, 0.11, 1.75, "paint_green")
-    f.box(g, (4.4, 0.6, 0.12), -1.2, 0.35, 0.95, "wood")
-    f.box(g, (4.4, 0.5, 0.85), -1.2, 0.3, 0.45, "paint_green", bevel=0.02)
+    f.box(g, (4.4, 0.6, 0.12), cu, 0.35, 0.95, "wood")
+    f.box(g, (4.4, 0.5, 0.85), cu, 0.3, 0.45, "paint_green", bevel=0.02)
     for k in range(5):
-        f.box(g, (0.6, 0.4, 0.28), -2.9 + k * 0.85, 0.35, 1.15, "wood_new", bevel=0.01)
+        f.box(g, (0.6, 0.4, 0.28), cu - 1.7 + k * 0.85, 0.35, 1.15, "wood_new", bevel=0.01)
         col = ["radish", "lettuce", "carrot", "bread", "flower_red"][k]
-        f.box(g, (0.5, 0.3, 0.1), -2.9 + k * 0.85, 0.35, 1.32, col)
-    door(g, f, 2.6, w=1.0, h=2.3, color="paint_green", glass=True, frame="paint_green")
+        f.box(g, (0.5, 0.3, 0.1), cu - 1.7 + k * 0.85, 0.35, 1.32, col)
+    door(g, f, -2.5, w=1.0, h=2.3, color="paint_green", glass=True, frame="paint_green")
     # store rayé
     for k in range(12):
         x0 = -hx + 0.1 + k * (2 * hx - 0.2) / 12
@@ -468,7 +471,7 @@ def ferrand_shop(A):
 
 def firmin_house(A):
     hx, hy, ze, zr = 2.8, 2.2, 2.6, 4.4
-    root = A.group("firmin_house", {"footprint": [7, 6], "door": [0.6, 2.2]})
+    root = A.group("firmin_house", {"footprint": [7, 6], "door_cell": 3})
     g = A.geo()
     g.box((2 * hx, 2 * hy, ze), color="stone", base=True)
     g.box((2 * hx + 0.05, 2 * hy + 0.05, 0.35), color="stone_dark", base=True)
@@ -477,10 +480,10 @@ def firmin_house(A):
         g.prism([(-hy, ze), (hy, ze), (0, zr)], 0.3, loc=(x + s * 0.15, 0, 0), color="stone", rot=(0, 0, 90))
     f = Face("front", hx, hy)
     stone_texture(g, f, 2 * hx, ze, n=12, seed=4)
-    door(g, f, 0.6, color="paint_blue")
-    window(g, f, -1.5, 1.0, 0.8, 0.95, shutter="paint_blue", box_flowers=True)
-    window(g, f, 2.0, 1.0, 0.6, 0.8, shutter="paint_blue")
-    f.box(g, (0.5, 0.1, 0.06), 0.6, 0.06, 2.3, "stone_light")
+    door(g, f, 0.0, color="paint_blue")
+    window(g, f, -1.65, 1.0, 0.75, 0.95, shutter="paint_blue", box_flowers=True)
+    window(g, f, 1.75, 1.0, 0.6, 0.8, shutter="paint_blue")
+    f.box(g, (0.5, 0.1, 0.06), 0.0, 0.06, 2.3, "stone_light")
     fb = Face("back", hx, hy)
     stone_texture(g, fb, 2 * hx, ze, n=10, seed=5)
     window(g, fb, 0.8, 1.0, 0.8, 0.95, shutter="paint_blue")
@@ -488,7 +491,7 @@ def firmin_house(A):
         fs = Face(side, hx, hy)
         window(g, fs, 0.0, 2.9, 0.5, 0.6, shutter=None)
     # banc et pots devant
-    for x in (-0.3, 1.6):
+    for x in (-0.85, 0.85):
         g.lathe([(0.12, 0), (0.17, 0.25), (0.18, 0.28)], loc=(x, -hy - 0.35, 0), colors="tile", segs=8)
         g.sphere(0.16, loc=(x, -hy - 0.35, 0.33), color="leaf_bush", segs=6, rings=4, scale=(1, 1, 0.8))
         g.box((0.1, 0.1, 0.08), loc=(x + 0.05, -hy - 0.42, 0.45), color="flower_red")
@@ -504,8 +507,7 @@ def firmin_house(A):
 
 def sawmill(A):
     hx, hy, ze, zr = 3.2, 3.4, 3.4, 6.0
-    root = A.group("sawmill", {"footprint": [10, 8], "workbench_spot": [3.9, 1.5],
-                               "note": "l'établi (workbench) se pose sous l'auvent, côté +X"})
+    root = A.group("sawmill", {"footprint": [10, 8], "door_cell": 5})
     g = A.geo()
     # soubassement de pierre et bardage de planches
     g.box((2 * hx, 2 * hy, 0.6), color="stone", base=True)
@@ -539,30 +541,36 @@ def sawmill(A):
     # toit à deux pans, faîtage selon Y: construit selon X puis tourné d'un quart de tour
     gable_roof(r, -hy, hy, -hx, hx, ze, zr, "lauze", edge="lauze_dark", over=0.4, ridge_color="lauze_dark")
     rotate_geo(r, 90)
-    # auvent côté +X, au-dessus de l'établi
-    slab(r, [(hx + 1.8, 2.8, 2.5), (hx + 1.8, -0.6, 2.5), (hx, -0.6, 3.1), (hx, 2.8, 3.1)], 0.08,
-         by_normal("wood_old", "wood_old_dark", "wood_old_dark", thr=0.3))
-    for y in (-0.5, 2.7):
-        r.cyl(0.07, 2.45, loc=(hx + 1.65, y, 0), color="wood_dark", segs=6, base=True)
     A.add("sawmill_roof", r, parent=root)
     return root
 
 
 def workbench(A):
+    """Établi de Basile sous son auvent (emprise 2 x 2, l'établi contre le fond)."""
     g = A.geo()
-    g.box((1.9, 0.75, 0.1), loc=(0, 0, 0.82), color="wood_new", base=True, bevel=0.01)
+    for x in (-0.95, 0.95):
+        g.cyl(0.06, 2.55, loc=(x, -0.9, 0), color="wood_dark", segs=6, base=True)
+        g.box((0.1, 0.1, 2.95), loc=(x, 0.92, 0), color="wood_dark", base=True)
+        g.box((0.06, 1.9, 0.1), loc=(x, 0.0, 2.6), color="wood_dark", rot=(-12, 0, 0))
+    slab(g, [(-1.1, -1.15, 2.5), (1.1, -1.15, 2.5), (1.1, 1.05, 3.0), (-1.1, 1.05, 3.0)], 0.08,
+         by_normal("wood_old", "wood_old_dark", "wood_old_dark", thr=0.3))
+    for j in range(1, 5):
+        t = j / 5
+        g.box((2.2, 0.04, 0.03), loc=(0, -1.15 + 2.2 * t, 2.5 + 0.5 * t + 0.05), color="wood_old_dark", rot=(-12.8, 0, 0))
+    g.box((1.9, 0.04, 1.6), loc=(0, 0.95, 0.9), color="wood", base=True)
+    for k, (x, c) in enumerate(((-0.6, "iron"), (-0.35, "wood_dark"), (0.5, "iron_light"))):
+        g.box((0.05, 0.03, 0.4), loc=(x, 0.92, 1.6), color=c, base=True)
+    g.box((0.25, 0.03, 0.06), loc=(0.2, 0.92, 1.95), color="iron")
+    g.box((1.9, 0.75, 0.1), loc=(0, 0.45, 0.82), color="wood_new", base=True, bevel=0.01)
     for x in (-0.8, 0.8):
-        for y in (-0.28, 0.28):
+        for y in (0.17, 0.73):
             g.box((0.1, 0.1, 0.82), loc=(x, y, 0), color="wood", base=True)
-    g.box((1.7, 0.6, 0.04), loc=(0, 0, 0.25), color="wood", base=True)
-    g.box((0.25, 0.2, 0.18), loc=(-0.75, -0.3, 0.92), color="wood_dark", base=True)
-    g.cyl(0.02, 0.3, loc=(-0.75, -0.42, 1.0), color="iron", segs=5, rot=(90, 0, 0))
-    g.box((1.0, 0.2, 0.03), loc=(0.25, 0.1, 0.92), color="wood_new", base=True, rot=(0, 0, 4))
+    g.box((1.7, 0.6, 0.04), loc=(0, 0.45, 0.25), color="wood", base=True)
+    g.box((0.25, 0.2, 0.18), loc=(-0.75, 0.15, 0.92), color="wood_dark", base=True)
+    g.cyl(0.02, 0.3, loc=(-0.75, 0.03, 1.0), color="iron", segs=5, rot=(90, 0, 0))
+    g.box((1.0, 0.2, 0.03), loc=(0.25, 0.55, 0.92), color="wood_new", base=True, rot=(0, 0, 4))
     for k in range(4):
-        g.box((0.25, 0.06, 0.06), loc=(0.2 + k * 0.12, -0.25, 0.92), color="wood_new", base=True, rot=(0, 0, 30 * k))
-    g.box((1.4, 0.04, 0.6), loc=(0, 0.4, 0.95), color="wood_dark", base=True)
-    for x, c in ((-0.4, "iron"), (0.0, "wood"), (0.4, "iron_light")):
-        g.box((0.04, 0.03, 0.3), loc=(x, 0.37, 1.15), color=c, base=True)
+        g.box((0.25, 0.06, 0.06), loc=(0.2 + k * 0.12, 0.2, 0.92), color="wood_new", base=True, rot=(0, 0, 30 * k))
     return g
 
 
@@ -595,7 +603,7 @@ def plank_stack(A):
 
 def handcar_shed(A):
     hx, hy, ze, zr = 2.6, 2.2, 3.0, 4.4
-    root = A.group("handcar_shed", {"footprint": [6, 5], "door": [0.0, 2.2],
+    root = A.group("handcar_shed", {"footprint": [6, 5], "door_cell": 2,
                                     "note": "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y"})
     g = A.geo()
     g.box((2 * hx, 2 * hy, 0.3), color="stone", base=True)
@@ -691,9 +699,9 @@ def well(A):
     return g
 
 
-def henhouse(A, ruin):
+def henhouse(A, ruin, parent):
     name = "henhouse_" + ("ruin" if ruin else "repaired")
-    root = A.group(name, {"footprint": [3, 3], "door": [-0.6, 1.5]})
+    root = A.subgroup(name, parent, {"state": "ruin" if ruin else "repaired"})
     wood, dark = ("wood_old", "wood_old_dark") if ruin else ("wood_new", "wood")
     parts = {k: A.geo() for k in ("walls", "roof", "door", "ramp", "fence")}
     g = parts["walls"]
@@ -707,7 +715,7 @@ def henhouse(A, ruin):
         for k in range(n):
             if ruin and (side, k) in (("front", 4), ("left", 2), ("left", 3), ("back", 1)):
                 continue
-            if side == "front" and k in (1, 2):
+            if side == "front" and k == 3:
                 continue
             u = -L / 2 + L / n * (k + 0.5)
             loc = (cx + u, cy, 0.53) if rz == 0 else (cx, cy + u, 0.53)
@@ -723,29 +731,30 @@ def henhouse(A, ruin):
                edge=dark, over=0.15, thick=0.06, strips=2, holes=holes, ridge_color=dark)
     d = parts["door"]
     if ruin:
-        d.box((0.4, 0.04, 0.6), loc=(-0.5, -0.4, 0.4), color=wood, rot=(0, 30, 70))
+        d.box((0.25, 0.04, 0.6), loc=(0.1, -0.4, 0.35), color=wood, rot=(0, 30, 70))
     else:
-        d.box((0.42, 0.04, 0.62), loc=(-0.465, -0.24, 0.84), color=dark)
-        d.box((0.42, 0.045, 0.06), loc=(-0.465, -0.245, 1.0), color=wood)
+        d.box((0.24, 0.04, 0.55), loc=(0.0, -0.24, 0.81), color=dark)
+        d.box((0.24, 0.045, 0.05), loc=(0.0, -0.245, 0.95), color=wood)
     rp = parts["ramp"]
-    rp.box((0.32, 0.9, 0.04), loc=(-0.46, -0.6, 0.27), color=wood, rot=(-32, 0, 0))
+    rp.box((0.3, 0.9, 0.04), loc=(0.0, -0.6, 0.27), color=wood, rot=(-32, 0, 0))
     for k in range(4):
-        rp.box((0.3, 0.03, 0.03), loc=(-0.46, -0.95 + k * 0.22, 0.08 + k * 0.14), color=dark)
+        rp.box((0.28, 0.03, 0.03), loc=(0.0, -0.95 + k * 0.22, 0.08 + k * 0.14), color=dark)
     fe = parts["fence"]
     for i in range(13):
         a = -1.45 + i * 0.242
         for (x, y) in ((a, -1.45), (a, 1.45), (-1.45, a), (1.45, a)):
             if ruin and i % 3 == 0:
                 continue
-            if y == -1.45 and -0.8 < x < -0.2:
+            if y == -1.45 and -0.4 < x < 0.4:
                 continue
             fe.box((0.05, 0.05, 0.6 if i % 2 else 0.7), loc=(x, y, 0), color=dark, base=True)
     for (x, y, L, rz) in ((0, 1.45, 2.9, 0), (-1.45, 0, 2.9, 90), (1.45, 0, 2.9, 90)):
         if ruin and rz == 90 and x > 0:
             continue
         fe.box((L, 0.04, 0.05), loc=(x, y, 0.5), color=wood, rot=(0, 0, rz))
-    fe.box((1.0, 0.04, 0.05), loc=(-1.0, -1.45, 0.5), color=wood) if not ruin else None
-    fe.box((1.25, 0.04, 0.05), loc=(0.82, -1.45, 0.5), color=wood)
+    if not ruin:
+        fe.box((1.05, 0.04, 0.05), loc=(-0.925, -1.45, 0.5), color=wood)
+    fe.box((1.05, 0.04, 0.05), loc=(0.925, -1.45, 0.5), color=wood)
     for k, gp in parts.items():
         A.add(f"{name}_{k}", gp, parent=root)
     return root
@@ -825,20 +834,20 @@ def buffer_stop(A):
 
 
 def level_crossing(A):
-    root = A.group("level_crossing", {"footprint": [1, 1], "note": "barrière level_crossing_arm: pivot sur Z (glTF), 0 ouverte à 90 fermée"})
+    root = A.group("level_crossing_gate", {"footprint": [1, 1], "note": "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée"})
     g = A.geo()
     g.cyl(0.08, 1.1, loc=(0, 0, 0), color="white_paint", segs=8, base=True)
     g.box((0.3, 0.3, 0.12), loc=(0, 0, 0), color="stone", base=True)
     g.box((0.18, 0.14, 0.25), loc=(0, 0.1, 0.9), color="iron", base=True)
     g.cyl(0.14, 0.06, loc=(0.0, -0.1, 1.45), color="paint_red", segs=3, rot=(90, 0, 0))
     g.cyl(0.03, 0.4, loc=(0, 0, 1.1), color="iron", segs=6, base=True)
-    A.add("level_crossing_post", g, parent=root)
+    A.add("level_crossing_gate_post", g, parent=root)
     a = A.geo()
     a.box((0.25, 0.25, 0.25), loc=(-0.3, 0, 0), color="iron")
     for k in range(10):
         a.box((0.4, 0.07, 0.07), loc=(0.2 + k * 0.4, 0, 0), color="paint_red" if k % 2 else "white_paint")
     a.cyl(0.03, 0.7, loc=(4.1, 0, -0.35), color="iron", segs=5)
-    A.add("level_crossing_arm", a, parent=root, loc=(0, 0, 1.0))
+    A.add("level_crossing_gate_arm", a, parent=root, loc=(0, 0, 1.0))
     return root
 
 
@@ -903,18 +912,68 @@ def coop_crate(A):
 
 def notice_board(A):
     g = A.geo()
-    for x in (-0.85, 0.85):
-        g.box((0.1, 0.1, 2.1), loc=(x, 0, 0), color="wood_dark", base=True)
-    g.box((1.6, 0.06, 1.0), loc=(0, 0, 1.0), color="wood", base=True, bevel=0.01)
-    g.box((1.68, 0.1, 0.06), loc=(0, 0, 0.98), color="wood_dark", base=True)
-    slab(g, [(-1.0, -0.3, 2.05), (1.0, -0.3, 2.05), (1.0, 0.1, 2.2), (-1.0, 0.1, 2.2)], 0.04, "lauze")
-    papers = [(-0.5, 1.6, 0.4, 0.5, "paper"), (0.05, 1.65, 0.35, 0.3, "paper_dark"), (0.5, 1.5, 0.4, 0.55, "paper"),
-              (-0.15, 1.25, 0.3, 0.35, "paper")]
+    for x in (-0.45, 0.45):
+        g.box((0.09, 0.09, 2.1), loc=(x, 0, 0), color="wood_dark", base=True)
+    g.box((0.85, 0.06, 0.95), loc=(0, 0, 1.0), color="wood", base=True, bevel=0.01)
+    g.box((0.92, 0.1, 0.06), loc=(0, 0, 0.98), color="wood_dark", base=True)
+    slab(g, [(-0.55, -0.3, 2.05), (0.55, -0.3, 2.05), (0.55, 0.1, 2.2), (-0.55, 0.1, 2.2)], 0.04, "lauze")
+    papers = [(-0.2, 1.55, 0.3, 0.42, "paper"), (0.2, 1.62, 0.28, 0.3, "paper_dark"), (0.18, 1.2, 0.3, 0.32, "paper"),
+              (-0.2, 1.15, 0.26, 0.28, "paper")]
     for x, z, w, h, c in papers:
         g.box((w, 0.01, h), loc=(x, -0.035, z), color=c, rot=(0, (x * 10) % 6 - 3, 0))
         g.box((0.03, 0.012, 0.03), loc=(x, -0.04, z + h / 2 - 0.04), color="flower_red")
         for k in range(3):
             g.box((w * 0.7, 0.012, 0.02), loc=(x, -0.042, z + h / 4 - k * 0.07), color="sepia_dark")
+    return g
+
+
+def station_sign(A):
+    """Panneau « Aubrune » sur deux poteaux (lettres stylisées: aplats, pas de texte)."""
+    g = A.geo()
+    for x in (-0.85, 0.85):
+        g.box((0.1, 0.1, 2.3), loc=(x, 0, 0), color="iron", base=True)
+        g.box((0.2, 0.2, 0.1), loc=(x, 0, 0), color="stone", base=True)
+    g.box((1.9, 0.08, 0.5), loc=(0, 0, 1.95), color="white_paint", base=True, bevel=0.02)
+    g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
+    for k in range(7):
+        g.box((0.14 if k % 3 else 0.18, 0.09, 0.26), loc=(-0.66 + k * 0.22, -0.005, 2.07), color="paint_blue", base=True)
+    for x in (-0.85, 0.85):
+        g.sphere(0.06, loc=(x, 0, 2.33), color="iron", segs=6, rings=4)
+    return g
+
+
+def arbor(A):
+    """Tonnelle d'Odette: pergola, vigne, table et deux bancs (emprise 3 x 2)."""
+    g = A.geo()
+    for x in (-1.35, 1.35):
+        for y in (-0.85, 0.85):
+            g.box((0.12, 0.12, 2.35), loc=(x, y, 0), color="wood", base=True)
+    for y in (-0.85, 0.85):
+        g.box((3.0, 0.1, 0.12), loc=(0, y, 2.35), color="wood", base=True)
+    for k in range(7):
+        g.box((0.08, 2.0, 0.08), loc=(-1.4 + k * 0.467, 0, 2.47), color="wood_dark", base=True)
+    import random as _r
+    rnd = _r.Random(9)
+    for k in range(14):
+        x, y = rnd.uniform(-1.3, 1.3), rnd.uniform(-0.8, 0.8)
+        g.sphere(rnd.uniform(0.28, 0.42), loc=(x, y, 2.6), color="ivy" if k % 3 else "leaf_oak", ico=1, jitter=0.2,
+                 seed=k, scale=(1.2, 1.0, 0.45))
+    for x, y in ((-1.35, -0.85), (1.35, 0.85), (1.35, -0.85)):
+        for k in range(3):
+            g.sphere(0.13, loc=(x + 0.08, y - 0.08, 0.6 + k * 0.6), color="ivy", ico=1, jitter=0.2, seed=20 + k,
+                     scale=(0.8, 0.8, 1.4))
+    g.box((1.6, 0.8, 0.05), loc=(0, 0, 0.72), color="wood_new", base=True, bevel=0.01)
+    g.box((1.62, 0.82, 0.02), loc=(0, 0, 0.77), color="fabric_red", base=True)
+    for k in range(4):
+        g.box((0.2, 0.84, 0.021), loc=(-0.6 + k * 0.4, 0, 0.771), color="fabric_cream", base=True)
+    for x in (-0.65, 0.65):
+        g.box((0.08, 0.6, 0.72), loc=(x, 0, 0), color="wood", base=True)
+    for s in (1, -1):
+        g.box((1.6, 0.3, 0.05), loc=(0, s * 0.65, 0.42), color="wood_new", base=True, bevel=0.01)
+        for x in (-0.65, 0.65):
+            g.box((0.06, 0.26, 0.42), loc=(x, s * 0.65, 0), color="wood", base=True)
+    g.lathe([(0.04, 0.0), (0.05, 0.08), (0.025, 0.14), (0.03, 0.18)], loc=(0.3, 0.1, 0.79), colors="glass", segs=6)
+    g.sphere(0.04, loc=(0.3, 0.1, 0.99), color="flower_yellow", segs=5, rings=3)
     return g
 
 
@@ -1308,15 +1367,21 @@ def river_curve(A, R=6.0):
 
 
 def pontoon(A):
+    """Ponton de 2 x 3, platelage à 0,5 m (posé sur la berge, il avance au-dessus de l'eau)."""
     g = A.geo()
     for k in range(9):
-        g.box((1.2, 0.3, 0.06), loc=(0, -1.35 + k * 0.33, 0.06), color="wood" if k % 3 else "wood_old", base=True, bevel=0.005)
-    for x in (-0.55, 0.55):
+        g.box((1.8, 0.31, 0.06), loc=(0, -1.33 + k * 0.333, 0.44), color="wood" if k % 3 else "wood_old", base=True,
+              bevel=0.005)
+    for x in (-0.85, 0.85):
         for y in (-1.3, 0.0, 1.3):
-            g.cyl(0.07, 1.0, loc=(x, y, -0.85), color="wood_dark", segs=6, base=True)
-        g.box((0.08, 3.0, 0.1), loc=(x, 0, -0.04), color="wood_dark", base=True)
-    g.cyl(0.05, 0.3, loc=(0.55, -1.3, 0.12), color="wood_dark", segs=6, base=True)
-    g.cyl(0.07, 0.04, loc=(0.55, -1.3, 0.25), color="rope", segs=6)
+            g.cyl(0.08, 1.8, loc=(x, y, -1.3), color="wood_dark", segs=6, base=True)
+        g.box((0.1, 3.0, 0.12), loc=(x, 0, 0.32), color="wood_dark", base=True)
+    for y in (-1.3, 1.3):
+        g.box((1.8, 0.1, 0.1), loc=(0, y, 0.33), color="wood_dark", base=True)
+    g.cyl(0.06, 0.35, loc=(0.85, -1.3, 0.5), color="wood_dark", segs=6, base=True)
+    g.cyl(0.08, 0.05, loc=(0.85, -1.3, 0.7), color="rope", segs=6)
+    for k in range(3):
+        g.box((1.2, 0.3, 0.05), loc=(0, 1.75 + k * 0.3, 0.33 - k * 0.11), color="wood_old", base=True)
     return g
 
 
@@ -1330,17 +1395,23 @@ def main():
     buildings = []
     buildings.append(station(A))
     buildings.append(platform(A))
-    buildings.append(gatekeeper_house(A, True))
-    buildings.append(gatekeeper_house(A, False))
+    gk = A.group("gatekeeper_house", {"footprint": [7, 6], "door_cell": 3, "cut_walls": True,
+                                      "interior": {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": GH["floor"]},
+                                      "states": ["gatekeeper_house_ruin", "gatekeeper_house_repaired"]})
+    gatekeeper_house(A, True, gk)
+    gatekeeper_house(A, False, gk)
+    buildings.append(gk)
     buildings.append(ferrand_shop(A))
     buildings.append(firmin_house(A))
     buildings.append(sawmill(A))
     buildings.append(handcar_shed(A))
     buildings.append(handcar(A))
     buildings.append(A.add("well", well(A), {"footprint": [2, 2], "water_point": True}))
-    buildings.append(henhouse(A, True))
-    buildings.append(henhouse(A, False))
-    extra = [A.add("workbench", workbench(A), {"footprint": [2, 1]}),
+    hh = A.group("henhouse", {"footprint": [3, 3], "door_cell": 1, "states": ["henhouse_ruin", "henhouse_repaired"]})
+    henhouse(A, True, hh)
+    henhouse(A, False, hh)
+    buildings.append(hh)
+    extra = [A.add("workbench", workbench(A), {"footprint": [2, 2]}),
              A.add("woodpile", woodpile(A), {"footprint": [2, 1]}),
              A.add("plank_stack", plank_stack(A), {"footprint": [2, 1]})]
     track = [A.add("rail_straight", rail_straight(A), {"footprint": [4, 2], "rail_top": RAIL_TOP, "gauge": RAIL_GAUGE}),
@@ -1349,7 +1420,8 @@ def main():
     track.append(level_crossing(A))
     props = []
     for name, fn, fp in (("bell_post", bell_post, [1, 1]), ("bench", bench, [2, 1]), ("lamp_post", lamp_post, [1, 1]),
-                         ("coop_crate", coop_crate, [1, 1]), ("notice_board", notice_board, [2, 1]),
+                         ("coop_crate", coop_crate, [1, 1]), ("notice_board", notice_board, [1, 1]),
+                         ("station_sign", station_sign, [2, 1]), ("arbor", arbor, [3, 2]),
                          ("mailbox", mailbox, [1, 1]), ("barrel", barrel, [1, 1]), ("crate", crate, [1, 1]),
                          ("crate_stack", crate_stack, [2, 1]), ("sacks", sacks, [1, 1]), ("cart", cart, [3, 2]),
                          ("bicycle", bicycle, [2, 1])):
@@ -1376,7 +1448,14 @@ def main():
     nature.append(A.add("flower_bed", flower_bed(A), {"footprint": [2, 1]}))
     nature.append(A.add("reeds", reeds(A, 60), {"footprint": [1, 1]}))
     water = [river_straight(A), river_straight(A, ford=True), river_curve(A),
-             A.add("pontoon", pontoon(A), {"footprint": [1, 3], "note": "posé sur la berge, avance au-dessus de l'eau"})]
+             A.add("pontoon", pontoon(A), {"footprint": [2, 3], "walk_height": 0.5})]
+    # noms génériques de la carte (donnees/cartes/halte.json): nœuds qui partagent le maillage d'une variante
+    O = bpy.data.objects
+    aliases = [A.alias("tree_oak", O["tree_oak_large"]), A.alias("tree_fir", O["tree_fir_large"]),
+               A.alias("bush", O["bush_round"]), A.alias("rock", O["rock_medium"]), A.alias("fence", O["fence_wood"]),
+               A.alias("log_pile", O["woodpile"])]
+    for a in aliases:
+        a.hide_render = True
 
     objs = A.all_objects()
     path = os.path.join(lpl.OUT, "bourg.glb")
@@ -1389,7 +1468,17 @@ def main():
     def sp(r):
         fp = r.get("footprint", [1, 1])
         return max(fp) + 0.6
-    lpl.board(buildings, os.path.join(lpl.BOARDS, "bourg-batiments.png"), cols=4, spacing=sp, label_size=0.45,
+    O = bpy.data.objects
+    shown = []
+    for b in buildings:
+        if b.name in ("gatekeeper_house", "henhouse"):
+            shown += [O[b.name + "_ruin"], O[b.name + "_repaired"]]
+        else:
+            shown.append(b)
+    for b in shown:
+        if "footprint" not in b and b.parent is not None:
+            b["footprint"] = list(b.parent["footprint"])
+    lpl.board(shown, os.path.join(lpl.BOARDS, "bourg-batiments.png"), cols=4, spacing=sp, label_size=0.45,
               res=(2000, 1300))
     lpl.board(track + extra + props + grounds, os.path.join(lpl.BOARDS, "bourg-voie-mobilier.png"), cols=8,
               spacing=lambda r: max(r.get("footprint", [1, 1])) + 0.8, label_size=0.2, res=(2000, 1300))

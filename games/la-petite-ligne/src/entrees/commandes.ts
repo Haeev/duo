@@ -1,0 +1,128 @@
+/**
+ * Clavier et souris (par le SDK) vers commandes et intentions: Z Q S D tournés
+ * selon la caméra, Espace ou clic pour agir, molette pour l'outil ou le
+ * meuble, A et E pour la caméra, R et F pour le zoom (section 6 de `demo.md`).
+ */
+import type { Input } from '@duo/sdk';
+import type { ClickTarget, ControlFrame } from '../etat/actions';
+import { TOOLBAR_SLOTS } from '../etat/types';
+import type { GameInterface, GameView, PickResult, Renderer } from '../etat/vue';
+import type { GameAction } from '../session';
+
+export interface Controls {
+  /** Commandes du pas et intentions qui en découlent (envoyées par `view.send`). */
+  step(view: GameView): ControlFrame;
+}
+
+export interface ControlsOptions {
+  input: Input<GameAction>;
+  renderer: () => Renderer | null;
+  ui: () => GameInterface | null;
+  /** Position du canevas à l'écran (le pointeur du SDK est relatif à lui). */
+  canvasRect: () => { left: number; top: number };
+}
+
+/** Touches transmises à l'interface (elle décide si elle les consomme). */
+const UI_KEYS: readonly [GameAction, string][] = [
+  ['notebook', 'Tab'],
+  ['back', 'Backspace'],
+  ['confirm', 'Enter'],
+];
+
+function toTarget(pick: PickResult): ClickTarget {
+  switch (pick.kind) {
+    case 'ground':
+      return { kind: 'ground', x: pick.x, y: pick.y };
+    case 'villager':
+      return { kind: 'villager', villager: pick.villager };
+    case 'character':
+      return { kind: 'character', character: pick.character };
+    case 'furniture':
+      return { kind: 'furniture', furniture: pick.furniture };
+    case 'ground_item':
+      return { kind: 'ground_item', groundItem: pick.groundItem };
+    case 'tree':
+      return { kind: 'tree', tree: pick.tree };
+  }
+}
+
+export function createControls(options: ControlsOptions): Controls {
+  const { input } = options;
+  let seq = 0;
+  let leftWasDown = false;
+  let rightWasDown = false;
+
+  return {
+    step(view) {
+      seq += 1;
+      const renderer = options.renderer();
+      const ui = options.ui();
+      const world = view.world();
+      const me = world.characters.find((c) => c.id === view.localCharacter());
+
+      for (const [action, code] of UI_KEYS) {
+        if (input.wasPressed(action)) {
+          const used = ui?.handleKey(code) ?? false;
+          if (!used && action === 'notebook') view.send({ type: 'menu', menu: me?.menu === 'notebook' ? null : 'notebook' });
+          if (!used && action === 'back' && me?.menu !== null && me?.menu !== undefined) view.send({ type: 'menu', menu: null });
+        }
+      }
+      if (renderer !== null) {
+        if (input.wasPressed('camera-left')) renderer.camera('rotate_left');
+        if (input.wasPressed('camera-right')) renderer.camera('rotate_right');
+        if (input.wasPressed('zoom-in')) renderer.camera('zoom_in');
+        if (input.wasPressed('zoom-out')) renderer.camera('zoom_out');
+      }
+      const captured = ui?.capturesMovement() ?? false;
+
+      // Déplacement: haut de l'écran posé au sol selon la caméra.
+      let mx = 0;
+      let my = 0;
+      if (!captured) {
+        const forward = (input.isDown('up') ? 1 : 0) - (input.isDown('down') ? 1 : 0);
+        const side = (input.isDown('right') ? 1 : 0) - (input.isDown('left') ? 1 : 0);
+        if (forward !== 0 || side !== 0) {
+          const yaw = renderer?.cameraYaw() ?? -Math.PI / 2;
+          mx = forward * Math.cos(yaw) + side * Math.cos(yaw + Math.PI / 2);
+          my = forward * Math.sin(yaw) + side * Math.sin(yaw + Math.PI / 2);
+          const len = Math.hypot(mx, my);
+          mx /= len;
+          my /= len;
+        }
+      }
+
+      // Clic gauche: aller là et agir; Espace: agir devant soi.
+      const pointer = input.pointer;
+      const leftPressed = pointer.left && !leftWasDown;
+      const rightPressed = pointer.right && !rightWasDown;
+      leftWasDown = pointer.left;
+      rightWasDown = pointer.right;
+      let clicked = false;
+      if (leftPressed && pointer.inside && renderer !== null && !captured) {
+        const rect = options.canvasRect();
+        const pick = renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
+        if (pick !== null) {
+          clicked = true;
+          if (me?.placement !== null && me?.placement !== undefined) view.send({ type: 'act' });
+          else view.send({ type: 'move_to', target: toTarget(pick), act: true });
+        }
+      }
+      if (!clicked && !leftPressed && input.wasPressed('act') && !captured) view.send({ type: 'act' });
+      if ((input.wasPressed('examine') && !rightPressed) || (rightPressed && pointer.inside && !captured)) view.send({ type: 'examine' });
+
+      // Molette: le meuble en main tourne, sinon l'outil change. T tourne aussi le meuble.
+      const wheel = (input.wasPressed('tool-next') ? 1 : 0) - (input.wasPressed('tool-previous') ? 1 : 0);
+      if (wheel !== 0 && !captured) {
+        if (me?.placement !== null && me?.placement !== undefined) view.send({ type: 'rotate_furniture', delta: wheel });
+        else view.send({ type: 'cycle_slot', delta: wheel });
+      }
+      if (input.wasPressed('rotate')) view.send({ type: 'rotate_furniture', delta: 1 });
+      for (let i = 1; i <= TOOLBAR_SLOTS; i++) {
+        if (input.wasPressed(`slot-${i}`)) view.send({ type: 'select_slot', slot: i - 1 });
+      }
+
+      const actHeld = !captured && input.isDown('act');
+      return { seq, moveX: mx, moveY: my, actHeld };
+    },
+  };
+}

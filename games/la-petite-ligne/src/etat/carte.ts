@@ -36,10 +36,14 @@ export interface MapProp {
   /** Nom du modèle (`assets/modeles/`), libre pour le rendu. */
   model: string;
   pos: Vec2;
-  /** Quarts de tour (0 à 3). */
+  /** Quarts de tour (0 à 3): 0 façade au sud, 1 à l'est, 2 au nord, 3 à l'ouest (convention de la carte). */
   rotation: number;
   /** Emprise au sol, pour le rendu (la collision est dans `blocked`). */
   rect: Rect | null;
+  /** Hauteur du modèle en mètres (`hauteur` du type dans la carte), 0 si inconnue. */
+  height: number;
+  /** Catégorie du type (`batiment`, `sol`, `equipement`, `mobilier`, `decor`, `arbre`), `decor` si inconnue. */
+  category: string;
 }
 
 export interface GameMap {

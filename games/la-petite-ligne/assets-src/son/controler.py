@@ -150,7 +150,9 @@ def main() -> int:
                                 f"niveau au raccord {r['ecart_niveau_db']:+.1f} dB (centile {r['niveau_centile']:.0f})")
             if r["saut_centile"] > 99.5 or r["d2_centile"] > 99.5:
                 erreurs.append(f"{rel}: raccord hors de la distribution interne ({ligne['raccord']})")
-            if r["niveau_centile"] > 99.0 and abs(r["ecart_niveau_db"]) > 3.0:
+            # Statistique de niveau valable à partir de 20 blocs (5 s); en deçà, saut et seconde
+            # différence suffisent.
+            if fin - debut >= 20 * (SR // 4) and r["niveau_centile"] > 99.0 and abs(r["ecart_niveau_db"]) > 3.0:
                 erreurs.append(f"{rel}: saut de niveau au raccord ({ligne['raccord']})")
         if not mesure["tp"] <= PLAFOND_DBTP:
             erreurs.append(f"{rel}: crête vraie {mesure['tp']} dBTP")

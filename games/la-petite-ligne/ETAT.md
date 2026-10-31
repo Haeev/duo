@@ -12,6 +12,27 @@ Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait 
 4. Rotation des meubles (`PlacedFurniture.rotation`, `PlacementPreview.rotation`): le rendu applique la convention de la carte (`rotation.y = rotation x PI/2`, 0 face au sud, 1 face à l'est). À confirmer: `types.ts` dit « sens horaire vu de dessus », ce qui donnerait l'ouest pour 1.
 5. Facultatif: savoir quelles cases sont en « herbe haute » (`,` de la carte) pour y pousser des touffes plus denses. En attendant, les touffes suivent un bruit déterministe.
 
+## Demandes de l'interface
+
+Tenue par le dev interface (`src/interface/`). Chaque point dit ce que l'interface fait en attendant (adaptateur: `src/interface/adaptateur.ts`).
+
+1. Barre d'outils de 10 cases (brief du manager, maquettes): `TOOLBAR_SLOTS = 10` dans la simulation (`selected` de 0 à 9), idéalement exporté depuis `etat/` pour que l'interface le lise. En attendant: l'interface montre 10 cases; un clic sur la 9e ou la 10e est ignoré par la simulation actuelle.
+2. Polices: `@fontsource-variable/fraunces` et `@fontsource-variable/nunito-sans` 5.3.0 ajoutées au paquet du jeu (`pnpm add`, 2026-10-31, aucun autre `pnpm install` en cours à ce moment). L'interface les importe elle-même.
+
+## 2026-10-31, étape 2: simulation jouable de bout en bout
+
+- `src/simulation/`: horloge (journée, veillée, nuit, petit-déjeuner, minuit), déplacements et collisions, potager, bois, poules, poutre à deux, construction guidée, aménagement, économie (bourse, épicerie, catalogue, gros achats à deux, caisse et commande), habitants et emplois du temps, dialogues et scènes à deux, quêtes, envies, courrier, astuces, fin de la démo. Tout est piloté par `donnees/*.json`.
+- Carte: `donnees/cartes/halte.json` lue par `src/donnees/carte-niveau.ts` (contrôlée à l'exécution); la carte de secours ne sert plus qu'en cas de fichier illisible.
+- Robot: `src/simulation/robot.ts` joue toute la démo à deux sur la vraie carte: commande 4 lignes sur 4 (540 sous), clé de la remise trouvée, 0,04 ms par pas.
+
+## Réponses du dev gameplay aux demandes du rendu
+
+1. `cameraYaw()`: convention adoptée telle quelle par `src/entrees/` (Z vers `(cos yaw, sin yaw)`, D vers `(cos(yaw + PI/2), sin(yaw + PI/2))`).
+2. Fait: `MapProp.height` (mètres, 0 si inconnue) et `MapProp.category` (`decor` si inconnue), lus dans `types` de la carte. Attention: `src/rendu/demo/carte-demo.ts` doit ajouter ces deux champs (erreur de typage tant que ce n'est pas fait), ou lire la vraie carte avec `loadMap(MAP_FILES)` de `src/donnees/carte.ts`.
+3. Confirmé: `map.trees` ne contient que les 12 arbres `coupable` de la lisière; les autres arbres sont dans `map.props`.
+4. Confirmé: rotation des meubles et des objets selon la convention de la carte (0 face au sud, 1 à l'est, 2 au nord, 3 à l'ouest); commentaire de `types.ts` corrigé.
+5. Pas encore fait (facultatif).
+
 ## 2026-10-30, étape 1: contrats publiés
 
 - `src/README.md`: modules, propriétaires, flux des données, contrats du rendu et de l'interface.

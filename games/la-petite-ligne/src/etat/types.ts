@@ -57,6 +57,10 @@ export interface Cell {
 export type CharacterId = 'p1' | 'p2';
 export const CHARACTER_IDS: readonly CharacterId[] = ['p1', 'p2'];
 
+/** Taille du sac (PE-10) et de la barre d'outils (ses premières cases). */
+export const BAG_SLOTS = 24;
+export const TOOLBAR_SLOTS = 10;
+
 /** Identifiant stable du joueur fourni par la plateforme (membre du duo). */
 export type PlayerId = string;
 
@@ -214,9 +218,9 @@ export interface Character {
   menu: MenuKind | null;
   /** Conversation personnelle en cours (SI-06: chacun la sienne). */
   dialogue: DialogueState | null;
-  /** Sac de 24 cases; les 8 premières forment la barre d'outils. */
+  /** Sac de `BAG_SLOTS` cases; les `TOOLBAR_SLOTS` premières forment la barre d'outils. */
   bag: (ItemStack | null)[];
-  /** Case choisie de la barre d'outils (0 à 7). */
+  /** Case choisie de la barre d'outils (0 à `TOOLBAR_SLOTS` - 1). */
   selected: number;
   /** Eau dans l'arrosoir (0 à la capacité de `objets.json`). */
   water: number;
@@ -372,7 +376,7 @@ export interface PlacementPreview {
   item: ItemId;
   /** Case du coin nord-ouest de l'empreinte, une fois tournée. */
   cell: Cell;
-  /** Quarts de tour (0 à 3) dans le sens horaire vu de dessus. */
+  /** Quarts de tour (0 à 3), convention de la carte: 0 face au sud, 1 à l'est, 2 au nord, 3 à l'ouest. */
   rotation: number;
   valid: boolean;
 }
@@ -400,7 +404,7 @@ export interface PlacedFurniture {
   item: ItemId;
   /** Coin nord-ouest de l'empreinte tournée, en cases du monde. */
   cell: Cell;
-  /** Quarts de tour (0 à 3). */
+  /** Quarts de tour (0 à 3), convention de la carte: 0 face au sud, 1 à l'est, 2 au nord, 3 à l'ouest. */
   rotation: number;
   /** Qui l'a posé en dernier (`null` pour les meubles de départ). */
   placedBy: CharacterId | null;

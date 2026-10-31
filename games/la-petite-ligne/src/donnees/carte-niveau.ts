@@ -69,6 +69,14 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     zones[z.at('id').string()] = rect(z.at('rect'));
   }
 
+  // Catalogue des types: hauteur et catégorie pour le rendu.
+  const typeInfo = new Map<string, { height: number; category: string }>();
+  for (const [name, def] of r.at('types').entries()) {
+    const height = def.opt('hauteur');
+    const category = def.opt('categorie');
+    typeInfo.set(name, { height: height === null ? 0 : height.number(), category: category === null ? 'decor' : category.string() });
+  }
+
   // Arbres de la lisière (à couper) et décor.
   const trees: MapTree[] = [];
   const props: MapProp[] = [];
@@ -86,7 +94,16 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
       continue;
     }
     const area = o.opt('rect');
-    props.push({ id, model: type, pos, rotation, rect: area === null ? null : rect(area) });
+    const info = typeInfo.get(type);
+    props.push({
+      id,
+      model: type,
+      pos,
+      rotation,
+      rect: area === null ? null : rect(area),
+      height: info?.height ?? 0,
+      category: info?.category ?? 'decor',
+    });
   }
 
   // La maisonnette.

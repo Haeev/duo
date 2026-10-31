@@ -584,6 +584,19 @@ class Assets:
                 ob[k] = v
         return ob
 
+    def subgroup(self, name, parent, extras=None):
+        ob = empty(name, parent=parent)
+        for k, v in (extras or {}).items():
+            ob[k] = v
+        return ob
+
+    def alias(self, name, src, extras=None):
+        """Second nœud qui partage le maillage d'un autre (aucun poids en plus dans le GLB)."""
+        ob = bpy.data.objects.new(name, src.data)
+        bpy.context.scene.collection.objects.link(ob)
+        self._register(ob, dict(extras or {}, alias_of=src.name))
+        return ob
+
     def group(self, name, extras=None):
         ob = empty(name)
         self._register(ob, extras)

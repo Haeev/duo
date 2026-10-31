@@ -97,20 +97,20 @@ export function buildFallbackMap(): GameMap {
   }
 
   const props: MapProp[] = [
-    { id: 'halte', model: 'halte', pos: p(36, 7.5), rotation: 0, rect: { x: 33, y: 6, w: 6, h: 3 } },
-    { id: 'handcar_shed', model: 'handcar_shed', pos: p(47, 4.5), rotation: 0, rect: { x: 44, y: 2, w: 6, h: 5 } },
-    { id: 'house', model: 'house', pos: p(8.5, 11), rotation: 0, rect: { x: 5, y: 8, w: 7, h: 6 } },
-    { id: 'water_barrel', model: 'water_barrel', pos: p(12.5, 13.5), rotation: 0, rect: null },
-    { id: 'chicken_coop', model: 'chicken_coop', pos: p(14, 16.5), rotation: 0, rect: { x: 13, y: 16, w: 2, h: 1 } },
-    { id: 'firmin_house', model: 'firmin_house', pos: p(21, 12.5), rotation: 0, rect: { x: 18, y: 10, w: 6, h: 5 } },
-    { id: 'well', model: 'well', pos: p(33.5, 22.5), rotation: 0, rect: { x: 33, y: 22, w: 1, h: 1 } },
-    { id: 'grocery', model: 'grocery', pos: p(44, 20), rotation: 1, rect: { x: 40, y: 16, w: 8, h: 8 } },
-    { id: 'sawmill', model: 'sawmill', pos: p(57.5, 28.5), rotation: 0, rect: { x: 54, y: 26, w: 7, h: 5 } },
-    { id: 'workbench', model: 'workbench', pos: p(52.5, 29.5), rotation: 0, rect: { x: 52, y: 29, w: 1, h: 1 } },
-    { id: 'quay_bell', model: 'bell_post', pos: p(36.5, 3.5), rotation: 0, rect: null },
-    { id: 'quay_bench', model: 'bench', pos: p(39.5, 3.5), rotation: 0, rect: null },
-    { id: 'coop_crate', model: 'coop_crate', pos: p(30.5, 3.5), rotation: 0, rect: null },
-    { id: 'notice_board', model: 'notice_board', pos: p(32.5, 5.5), rotation: 0, rect: null },
+    { id: 'halte', model: 'halte', pos: p(36, 7.5), rotation: 0, rect: { x: 33, y: 6, w: 6, h: 3 }, height: 0, category: 'decor' },
+    { id: 'handcar_shed', model: 'handcar_shed', pos: p(47, 4.5), rotation: 0, rect: { x: 44, y: 2, w: 6, h: 5 }, height: 0, category: 'decor' },
+    { id: 'house', model: 'house', pos: p(8.5, 11), rotation: 0, rect: { x: 5, y: 8, w: 7, h: 6 }, height: 0, category: 'decor' },
+    { id: 'water_barrel', model: 'water_barrel', pos: p(12.5, 13.5), rotation: 0, rect: null, height: 0, category: 'decor' },
+    { id: 'chicken_coop', model: 'chicken_coop', pos: p(14, 16.5), rotation: 0, rect: { x: 13, y: 16, w: 2, h: 1 }, height: 0, category: 'decor' },
+    { id: 'firmin_house', model: 'firmin_house', pos: p(21, 12.5), rotation: 0, rect: { x: 18, y: 10, w: 6, h: 5 }, height: 0, category: 'decor' },
+    { id: 'well', model: 'well', pos: p(33.5, 22.5), rotation: 0, rect: { x: 33, y: 22, w: 1, h: 1 }, height: 0, category: 'decor' },
+    { id: 'grocery', model: 'grocery', pos: p(44, 20), rotation: 1, rect: { x: 40, y: 16, w: 8, h: 8 }, height: 0, category: 'decor' },
+    { id: 'sawmill', model: 'sawmill', pos: p(57.5, 28.5), rotation: 0, rect: { x: 54, y: 26, w: 7, h: 5 }, height: 0, category: 'decor' },
+    { id: 'workbench', model: 'workbench', pos: p(52.5, 29.5), rotation: 0, rect: { x: 52, y: 29, w: 1, h: 1 }, height: 0, category: 'decor' },
+    { id: 'quay_bell', model: 'bell_post', pos: p(36.5, 3.5), rotation: 0, rect: null, height: 0, category: 'decor' },
+    { id: 'quay_bench', model: 'bench', pos: p(39.5, 3.5), rotation: 0, rect: null, height: 0, category: 'decor' },
+    { id: 'coop_crate', model: 'coop_crate', pos: p(30.5, 3.5), rotation: 0, rect: null, height: 0, category: 'decor' },
+    { id: 'notice_board', model: 'notice_board', pos: p(32.5, 5.5), rotation: 0, rect: null, height: 0, category: 'decor' },
   ];
 
   return {

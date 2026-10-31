@@ -24,7 +24,7 @@ import type { CharacterId, WorldEvent } from '../etat/types';
 import type { Content } from '../donnees/types';
 import type { IsoCameraRig } from './camera';
 import type { FrameContext } from './contexte';
-import { ShapeBuilder } from './geometrie';
+import { ShapeBuilder, paintGeometry } from './geometrie';
 import { createInstanced, finishInstances } from './instances';
 import type { HousePart } from './maison';
 import type { SharedMaterials } from './materiaux';
@@ -277,17 +277,27 @@ export class EffectsPart implements EventfulPart {
     this.highlight.renderOrder = 3;
     this.highlight.visible = false;
 
-    const ring = new RingGeometry(MARKER_INNER, MARKER_OUTER, MARKER_SEGMENTS);
+    // Anneau peint sur la case blanche de la palette: même programme que les fantômes.
+    const ring = new RingGeometry(MARKER_INNER, MARKER_OUTER, MARKER_SEGMENTS).toNonIndexed();
     ring.rotateX(-Math.PI / 2);
+    paintGeometry(ring, 'white_paint');
     resources.track(ring);
-    this.markerMaterial = resources.track(new MeshBasicMaterial({ color: new Color(HIGHLIGHT_READY), transparent: true, depthWrite: false }));
+    this.markerMaterial = resources.track(
+      new MeshBasicMaterial({ map: materials.paletteTexture, color: new Color(HIGHLIGHT_READY), transparent: true, depthWrite: false }),
+    );
     this.marker = new Mesh(ring, this.markerMaterial);
     this.marker.name = 'destination';
     this.marker.renderOrder = 3;
     this.marker.visible = false;
 
     const bellMaterial = resources.track(
-      new MeshBasicMaterial({ color: materials.paletteColor('flame', new Color()), transparent: true, opacity: 0, depthWrite: false }),
+      new MeshBasicMaterial({
+        map: materials.paletteTexture,
+        color: materials.paletteColor('flame', new Color()),
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+      }),
     );
     this.bellRing = new Mesh(ring, bellMaterial);
     this.bellRing.name = 'reflet de la cloche';

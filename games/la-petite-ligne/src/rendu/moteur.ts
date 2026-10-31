@@ -40,6 +40,7 @@ import { HousePart } from './maison';
 import { GardenPart } from './potager';
 import { FarmLifePart } from './vie';
 import { EffectsPart } from './effets';
+import { RailwayPart } from './voie';
 
 /** Une image ne compte jamais plus que cela (onglet en arrière-plan, pause du débogueur). */
 const MAX_FRAME_SECONDS = 0.1;
@@ -160,14 +161,19 @@ export class RenderEngine implements Renderer {
       return;
     }
     const map = this.view.map;
-    const terrain = new Terrain(map, materials, this.resources, (model) => {
-      const walk = library.extras(model).walk_height;
-      return typeof walk === 'number' ? walk : RENDER_SETTINGS.floorProps[model];
+    // Sols posés (quai, ponton): la hauteur de marche du modèle de l'artiste, sinon celle de la carte.
+    const terrain = new Terrain(map, materials, this.resources, (prop) => {
+      const walk = library.extras(prop.model).walk_height;
+      if (typeof walk === 'number') {
+        return walk;
+      }
+      return prop.category === 'sol' && prop.height > 0 ? prop.height : RENDER_SETTINGS.floorProps[prop.model];
     });
     this.terrain = terrain;
     this.scene.add(terrain.group);
     this.scene.add(new Vegetation(map, terrain, materials, this.resources).group);
-    this.scene.add(new StaticDecor(map, library, terrain, this.resources).group);
+    const decor = new StaticDecor(map, library, terrain, this.resources);
+    this.scene.add(decor.group);
     const world = new WorldParts({
       scene: this.scene,
       view: this.view,
@@ -193,6 +199,9 @@ export class RenderEngine implements Renderer {
     const effects = new EffectsPart(map, content, library, materials, terrain, this.resources, characters, house, this.rig);
     this.scene.add(effects.group);
     world.add(effects);
+    const railway = new RailwayPart(map, library, materials, terrain, this.resources, effects, decor.clockHands);
+    this.scene.add(railway.group);
+    world.add(railway);
     onProgress(LOAD_BUILD_SHARE);
 
     const local = this.localCharacter(this.view.world());
@@ -361,6 +370,11 @@ export class RenderEngine implements Renderer {
   /** Statistiques complètes (programmes, textures, images par seconde), pour les tests et l'indicateur. */
   detailedStats(): Readonly<typeof this.perf.current> {
     return this.perf.current;
+  }
+
+  /** Programmes de shader compilés (nom et type de matériau), pour tenir le budget de 12. */
+  programList(): string[] {
+    return (this.renderer.info.programs ?? []).map((program) => `${program.name} ${program.cacheKey.slice(0, 60)}`);
   }
 
   /** Triangles par partie de la scène (diagnostic des budgets, page de démonstration). */

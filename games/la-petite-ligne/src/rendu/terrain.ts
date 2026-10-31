@@ -7,7 +7,7 @@
  * dans `vegetation.ts`).
  */
 import { BufferAttribute, BufferGeometry, Group, Mesh, Vector3 } from 'three';
-import type { GameMap, GroundKind } from '../etat/carte';
+import type { GameMap, GroundKind, MapProp } from '../etat/carte';
 import { cellIndex, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import type { SharedMaterials } from './materiaux';
@@ -106,11 +106,11 @@ export class Terrain {
     private readonly map: GameMap,
     materials: SharedMaterials,
     resources: ResourceTracker,
-    floorHeight: (model: string) => number | undefined = (model) => RENDER_SETTINGS.floorProps[model],
+    floorHeight: (prop: MapProp) => number | undefined = (prop) => RENDER_SETTINGS.floorProps[prop.model],
   ) {
     this.group.name = 'terrain';
     for (const prop of map.props) {
-      const height = floorHeight(prop.model);
+      const height = floorHeight(prop);
       if (height !== undefined && prop.rect !== null) {
         this.floorRects.push({ ...prop.rect, height });
       }

@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "id": "la-petite-ligne",
+  "name": "La Petite Ligne",
+  "version": "0.1.0",
+  "sdk": "1.0",
+  "view": "iso",
+  "engine": "three",
+  "mode": "coop",
+  "play": "session",
+  "durationMinutes": [
+    50,
+    75
+  ],
+  "network": "host-authority",
+  "entry": "index.html",
+  "thumbnail": "vignette.png",
+  "description": "Une semaine à la Halte d'Aubrune: réparez la maisonnette, faites pousser le potager et remplissez ensemble la commande du train du samedi.",
+  "whatsNew": "Démo d'une heure: la première semaine à la Halte d'Aubrune.",
+  "actions": [
+    {
+      "id": "up",
+      "label": "Avancer",
+      "keys": [
+        "KeyW",
+        "ArrowUp"
+      ]
+    },
+    {
+      "id": "down",
+      "label": "Reculer",
+      "keys": [
+        "KeyS",
+        "ArrowDown"
+      ]
+    },
+    {
+      "id": "left",
+      "label": "Aller à gauche",
+      "keys": [
+        "KeyA",
+        "ArrowLeft"
+      ]
+    },
+    {
+      "id": "right",
+      "label": "Aller à droite",
+      "keys": [
+        "KeyD",
+        "ArrowRight"
+      ]
+    },
+    {
+      "id": "act",
+      "label": "Agir",
+      "keys": [
+        "Space"
+      ],
+      "mouse": [
+        "left"
+      ]
+    },
+    {
+      "id": "examine",
+      "label": "Examiner, reprendre un meuble",
+      "keys": [
+        "KeyX"
+      ],
+      "mouse": [
+        "right"
+      ]
+    },
+    {
+      "id": "notebook",
+      "label": "Carnet",
+      "keys": [
+        "Tab"
+      ]
+    },
+    {
+      "id": "back",
+      "label": "Fermer un menu",
+      "keys": [
+        "Backspace"
+      ]
+    },
+    {
+      "id": "confirm",
+      "label": "Valider",
+      "keys": [
+        "Enter"
+      ]
+    },
+    {
+      "id": "camera-left",
+      "label": "Tourner la caméra à gauche",
+      "keys": [
+        "KeyQ"
+      ]
+    },
+    {
+      "id": "camera-right",
+      "label": "Tourner la caméra à droite",
+      "keys": [
+        "KeyE"
+      ]
+    },
+    {
+      "id": "zoom-in",
+      "label": "Rapprocher la caméra",
+      "keys": [
+        "KeyR"
+      ]
+    },
+    {
+      "id": "zoom-out",
+      "label": "Éloigner la caméra",
+      "keys": [
+        "KeyF"
+      ]
+    },
+    {
+      "id": "tool-next",
+      "label": "Outil suivant",
+      "keys": [],
+      "mouse": [
+        "wheel-down"
+      ]
+    },
+    {
+      "id": "tool-previous",
+      "label": "Outil précédent",
+      "keys": [],
+      "mouse": [
+        "wheel-up"
+      ]
+    },
+    {
+      "id": "rotate",
+      "label": "Tourner le meuble",
+      "keys": [
+        "KeyT"
+      ]
+    },
+    {
+      "id": "slot-1",
+      "label": "Case 1 de la barre",
+      "keys": [
+        "Digit1"
+      ]
+    },
+    {
+      "id": "slot-2",
+      "label": "Case 2 de la barre",
+      "keys": [
+        "Digit2"
+      ]
+    },
+    {
+      "id": "slot-3",
+      "label": "Case 3 de la barre",
+      "keys": [
+        "Digit3"
+      ]
+    },
+    {
+      "id": "slot-4",
+      "label": "Case 4 de la barre",
+      "keys": [
+        "Digit4"
+      ]
+    },
+    {
+      "id": "slot-5",
+      "label": "Case 5 de la barre",
+      "keys": [
+        "Digit5"
+      ]
+    },
+    {
+      "id": "slot-6",
+      "label": "Case 6 de la barre",
+      "keys": [
+        "Digit6"
+      ]
+    },
+    {
+      "id": "slot-7",
+      "label": "Case 7 de la barre",
+      "keys": [
+        "Digit7"
+      ]
+    },
+    {
+      "id": "slot-8",
+      "label": "Case 8 de la barre",
+      "keys": [
+        "Digit8"
+      ]
+    },
+    {
+      "id": "slot-9",
+      "label": "Case 9 de la barre",
+      "keys": [
+        "Digit9"
+      ]
+    },
+    {
+      "id": "slot-10",
+      "label": "Case 10 de la barre",
+      "keys": [
+        "Digit0"
+      ]
+    }
+  ],
+  "saves": {
+    "slots": 1,
+    "maxBytes": 1048576,
+    "moments": [
+      "auto",
+      "exit",
+      "manual"
+    ],
+    "autosaveSeconds": 300,
+    "help": "Le jeu enregistre à l'aube de chaque journée, toutes les 5 minutes et en quittant."
+  },
+  "credits": null
+}

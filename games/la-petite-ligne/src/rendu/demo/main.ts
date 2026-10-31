@@ -17,7 +17,6 @@ import type { GameMap } from '../../etat/carte';
 import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameView } from '../../etat/vue';
 import { RenderEngine } from '../moteur';
-import { parseDemoMap } from './carte-demo';
 import { animateExampleWorld, createExampleWorld, type DemoOptions } from './etat-exemple';
 
 const MINUTES_PER_HOUR = 60;
@@ -46,12 +45,6 @@ function parseHour(raw: string | null): number {
 }
 
 function pickMap(): GameMap {
-  for (const raw of Object.values(MAP_FILES)) {
-    const parsed = parseDemoMap(raw);
-    if (parsed !== null) {
-      return parsed;
-    }
-  }
   return loadMap(MAP_FILES).map;
 }
 
@@ -60,6 +53,7 @@ interface DemoHandle {
   stats(): ReturnType<RenderEngine['detailedStats']>;
   missing(): string[];
   breakdown(): Record<string, number>;
+  programs(): string[];
   frames: number;
 }
 
@@ -124,6 +118,7 @@ async function main(): Promise<void> {
   const handle: DemoHandle = { ready: false, stats: () => engine.detailedStats(),
     missing: () => [],
     breakdown: () => engine.breakdown(),
+    programs: () => engine.programList(),
     frames: 0,
   };
   window.lplRendu = handle;

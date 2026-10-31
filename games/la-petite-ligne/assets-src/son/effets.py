@@ -529,14 +529,14 @@ def sons() -> list[Son]:
     pas_note = ("un pas par appui de pied; tirage sans répétition immédiate; choisir le sol sous le pied "
                 "(terre: potager et chemins; herbe; bois: quai et plancher; pierre: place et puits)")
     return [
-        Son("step-grass", "Pas sur l'herbe", "effets", "effects", lambda v, r: _pas(v, r, "herbe"), 4, -31.0, 3,
+        Son("step-grass", "Pas sur l'herbe", "effets", "effects", lambda v, r: _pas(v, r, "herbe"), 4, -29.0, 3,
             0.06, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=60, note=pas_note),
-        Son("step-path", "Pas sur la terre et le chemin", "effets", "effects", lambda v, r: _pas(v, r, "terre"), 4, -30.0,
+        Son("step-path", "Pas sur la terre et le chemin", "effets", "effects", lambda v, r: _pas(v, r, "terre"), 4, -28.5,
             3, 0.06, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=50, note=pas_note),
         Son("step-wood", "Pas sur le bois (quai, plancher)", "effets", "effects", lambda v, r: _pas(v, r, "bois"), 4,
-            -29.0, 3, 0.05, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=60, note=pas_note),
+            -27.5, 3, 0.05, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=60, note=pas_note),
         Son("step-stone", "Pas sur la pierre (place, puits)", "effets", "effects", lambda v, r: _pas(v, r, "pierre"), 4,
-            -30.0, 3, 0.05, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=80, note=pas_note),
+            -28.5, 3, 0.05, 1.5, "pres", intervalle_min_ms=120, voix_max=4, passe_haut=80, note=pas_note),
         Son("hoe", "Bêcher une case", "effets", "effects", _becher, 3, -23.0, 3, 0.05, 1.0, "pres"),
         Son("sow", "Semer", "effets", "effects", _semer, 3, -26.0, 3, 0.05, 1.0, "pres"),
         Son("water", "Arroser une case", "effets", "effects", _arroser, 2, -25.0, 3, 0.04, 1.0, "pres"),

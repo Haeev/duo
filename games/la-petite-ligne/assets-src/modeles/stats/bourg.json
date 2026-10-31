@@ -5,33 +5,26 @@
     10,
     6
    ],
-   "doors": [
-    [
-     0.0,
-     2.3
-    ],
-    [
-     0.0,
-     -2.3
-    ]
-   ],
-   "tris": 3516
+   "door_cell": 4,
+   "tris": 3264
   },
   "platform": {
    "footprint": [
     30,
     4
    ],
-   "walk_height": 0.25,
+   "walk_height": 0.4,
    "track_side": "-z",
    "note": "bord côté voie vers -Z (arrière); marquise centrée sur 10 m",
    "tris": 3160
   },
-  "gatekeeper_house_ruin": {
+  "gatekeeper_house": {
    "footprint": [
     7,
     6
    ],
+   "door_cell": 3,
+   "cut_walls": true,
    "interior": {
     "x": [
      -2.5,
@@ -43,49 +36,19 @@
     ],
     "floor_y": 0.12
    },
-   "door": [
-    -1.0,
-    2.3
+   "states": [
+    "gatekeeper_house_ruin",
+    "gatekeeper_house_repaired"
    ],
-   "cut_walls": true,
-   "tris": 3052
-  },
-  "gatekeeper_house_repaired": {
-   "footprint": [
-    7,
-    6
-   ],
-   "interior": {
-    "x": [
-     -2.5,
-     2.5
-    ],
-    "z": [
-     -2.0,
-     2.0
-    ],
-    "floor_y": 0.12
-   },
-   "door": [
-    -1.0,
-    2.3
-   ],
-   "cut_walls": true,
-   "tris": 3232
+   "tris": 6500
   },
   "ferrand_shop": {
    "footprint": [
     10,
     8
    ],
-   "counter": [
-    0.0,
-    3.6
-   ],
-   "door": [
-    2.6,
-    2.6
-   ],
+   "door_cell": 2,
+   "counter_cell": 6,
    "tris": 3664
   },
   "firmin_house": {
@@ -93,10 +56,7 @@
     7,
     6
    ],
-   "door": [
-    0.6,
-    2.2
-   ],
+   "door_cell": 3,
    "tris": 2264
   },
   "sawmill": {
@@ -104,22 +64,15 @@
     10,
     8
    ],
-   "workbench_spot": [
-    3.9,
-    1.5
-   ],
-   "note": "l'établi (workbench) se pose sous l'auvent, côté +X",
-   "tris": 1408
+   "door_cell": 5,
+   "tris": 1356
   },
   "handcar_shed": {
    "footprint": [
     6,
     5
    ],
-   "door": [
-    0.0,
-    2.2
-   ],
+   "door_cell": 2,
    "note": "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y",
    "tris": 1132
   },
@@ -140,34 +93,24 @@
    "water_point": true,
    "tris": 442
   },
-  "henhouse_ruin": {
+  "henhouse": {
    "footprint": [
     3,
     3
    ],
-   "door": [
-    -0.6,
-    1.5
+   "door_cell": 1,
+   "states": [
+    "henhouse_ruin",
+    "henhouse_repaired"
    ],
-   "tris": 880
-  },
-  "henhouse_repaired": {
-   "footprint": [
-    3,
-    3
-   ],
-   "door": [
-    -0.6,
-    1.5
-   ],
-   "tris": 1204
+   "tris": 2108
   },
   "workbench": {
    "footprint": [
     2,
-    1
+    2
    ],
-   "tris": 240
+   "tris": 400
   },
   "woodpile": {
    "footprint": [
@@ -208,12 +151,12 @@
    ],
    "tris": 152
   },
-  "level_crossing": {
+  "level_crossing_gate": {
    "footprint": [
     1,
     1
    ],
-   "note": "barrière level_crossing_arm: pivot sur Z (glTF), 0 ouverte à 90 fermée",
+   "note": "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée",
    "tris": 228
   },
   "bell_post": {
@@ -246,10 +189,24 @@
   },
   "notice_board": {
    "footprint": [
-    2,
+    1,
     1
    ],
    "tris": 332
+  },
+  "station_sign": {
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 260
+  },
+  "arbor": {
+   "footprint": [
+    3,
+    2
+   ],
+   "tris": 944
   },
   "mailbox": {
    "footprint": [
@@ -546,12 +503,36 @@
   },
   "pontoon": {
    "footprint": [
-    1,
+    2,
     3
    ],
-   "note": "posé sur la berge, avance au-dessus de l'eau",
-   "tris": 580
+   "walk_height": 0.5,
+   "tris": 640
+  },
+  "tree_oak": {
+   "alias_of": "tree_oak_large",
+   "tris": 204
+  },
+  "tree_fir": {
+   "alias_of": "tree_fir_large",
+   "tris": 68
+  },
+  "bush": {
+   "alias_of": "bush_round",
+   "tris": 80
+  },
+  "rock": {
+   "alias_of": "rock_medium",
+   "tris": 40
+  },
+  "fence": {
+   "alias_of": "fence_wood",
+   "tris": 36
+  },
+  "log_pile": {
+   "alias_of": "woodpile",
+   "tris": 888
   }
  },
- "file_bytes": 2845320
+ "file_bytes": 2959400
 }

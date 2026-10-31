@@ -66,8 +66,19 @@ export function bakeGeometry(source: BufferGeometry, matrix: Matrix4): BufferGeo
   return flat;
 }
 
+/** Aiguille d'horloge tirée du décor fusionné, pour la faire tourner avec l'heure du jeu. */
+export interface ClockHand {
+  mesh: Mesh;
+  /** Pose de l'aiguille à midi (rotation appliquée par-dessus, autour de son axe Z). */
+  base: Matrix4;
+  kind: 'hour' | 'minute';
+}
+
+const CLOCK_HAND = /_clock_(hour|minute)$/;
+
 export class StaticDecor {
   readonly group = new Group();
+  readonly clockHands: ClockHand[] = [];
 
   constructor(map: GameMap, library: ModelLibrary, terrain: Terrain, resources: ResourceTracker) {
     this.group.name = 'decor';
@@ -79,7 +90,7 @@ export class StaticDecor {
       if (DYNAMIC_PROP_MODELS.has(prop.model)) {
         continue;
       }
-      const ground = FLOOR_MODELS.has(prop.model) ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);
+      const ground = prop.category === 'sol' || FLOOR_MODELS.has(prop.model) ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);
       propMatrix(prop, ground, placement);
       const key = `${Math.floor(prop.pos.x / chunk)}:${Math.floor(prop.pos.y / chunk)}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
@@ -90,10 +101,22 @@ export class StaticDecor {
           buckets.set(bucketKey, bucket);
         }
         world.multiplyMatrices(placement, part.matrix);
+        const hand = CLOCK_HAND.exec(part.name);
+        if (hand !== null) {
+          const mesh = new Mesh(part.geometry, part.material);
+          mesh.matrixAutoUpdate = false;
+          mesh.matrix.copy(world);
+          this.group.add(mesh);
+          this.clockHands.push({ mesh, base: world.clone(), kind: hand[1] === 'hour' ? 'hour' : 'minute' });
+          continue;
+        }
         bucket.geometries.push(bakeGeometry(part.geometry, world));
       }
     }
     for (const [key, bucket] of buckets) {
+      if (bucket.geometries.length === 0) {
+        continue;
+      }
       const merged = mergeGeometries(bucket.geometries, false);
       for (const geometry of bucket.geometries) {
         geometry.dispose();

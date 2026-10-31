@@ -157,7 +157,7 @@ def build():
     # la voie et le passage à niveau, derrière la maison
     for k in range(9):
         put("rail_straight", -18 + k * 4, 5.0)
-    put("level_crossing", -9.6, 3.6, 0)
+    put("level_crossing_gate", -9.6, 3.6, 0)
     for k in range(1, 6):
         put("ground_dirt", -11.0, 2.5 - k * 1.0)
     # nature

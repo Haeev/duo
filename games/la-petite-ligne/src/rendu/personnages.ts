@@ -8,6 +8,7 @@
 import {
   AnimationMixer,
   CanvasTexture,
+  Float32BufferAttribute,
   Group,
   Mesh,
   MeshStandardMaterial,
@@ -17,7 +18,9 @@ import {
   Vector3,
   type AnimationAction,
   type AnimationClip,
+  type BufferGeometry,
 } from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { ActionKind, Character, CharacterId, DeepReadonly, FormLevel, ReadonlyWorld, VillagerState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { BODY_COLORS, HAIR_MESHES, OUTFITS, SCARF_MARK, SCARF_SYMBOLS, safeColor, scarfMeshFor } from './apparence';
@@ -50,6 +53,7 @@ const GROUND_HALF_LIFE = 0.06;
 const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
 const PLAYER_ROW = 0;
+const VECTOR_SIZE = 3;
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
@@ -290,6 +294,33 @@ interface PlayerEntry {
   texture: PlayerTexture | null;
   meshes: Map<string, Object3D>;
   look: string;
+  /** Géométrie d'origine du corps (partagée avec le GLB), et la fusion courante corps et vêtements. */
+  baseGeometry: BufferGeometry | null;
+  merged: BufferGeometry | null;
+}
+
+/**
+ * Fusionne le corps et les vêtements choisis en une seule géométrie animée:
+ * un appel de dessin par joueur et un seul programme de shader pour tous les
+ * personnages. Les pièces sans cibles de morphose en reçoivent des nulles,
+ * pour avoir les mêmes attributs que le corps. `null` si c'est impossible.
+ */
+function mergeOutfit(base: BufferGeometry, parts: readonly BufferGeometry[]): BufferGeometry | null {
+  const morphs = base.morphAttributes.position ?? [];
+  const prepared = parts.map((part) => {
+    const copy = part.clone();
+    const count = copy.getAttribute('position').count;
+    if (copy.morphAttributes.position === undefined && morphs.length > 0) {
+      copy.morphAttributes.position = morphs.map(() => new Float32BufferAttribute(new Float32Array(count * VECTOR_SIZE), VECTOR_SIZE));
+    }
+    copy.morphTargetsRelative = base.morphTargetsRelative;
+    return copy;
+  });
+  const merged = mergeGeometries([base, ...prepared], false);
+  for (const copy of prepared) {
+    copy.dispose();
+  }
+  return merged;
 }
 
 const PLAYER_MESHES = [
@@ -358,7 +389,17 @@ export class CharactersPart implements EventfulPart {
     }
     const figure = new CharacterFigure(character.id, model ?? this.substituteModel(character.appearance.scarf), this.clips, pick, 1);
     this.group.add(figure.root);
-    return { figure, texture, meshes, look: '' };
+    const base = meshes.get('player_base');
+    const baseGeometry = base instanceof SkinnedMesh ? (base.geometry as BufferGeometry) : null;
+    if (baseGeometry !== null) {
+      // Les vêtements sont fusionnés dans le corps: leurs maillages sortent de la scène (ni dessin ni programme).
+      for (const [name, mesh] of meshes) {
+        if (name !== 'player_base') {
+          mesh.removeFromParent();
+        }
+      }
+    }
+    return { figure, texture, meshes, look: '', baseGeometry, merged: null };
   }
 
   private dress(entry: PlayerEntry, character: DeepReadonly<Character>): void {
@@ -374,8 +415,27 @@ export class CharactersPart implements EventfulPart {
       OUTFITS[outfit]?.mesh ?? OUTFITS[0]?.mesh ?? '',
       scarfMeshFor(scarf),
     ]);
-    for (const [name, mesh] of entry.meshes) {
-      mesh.visible = wanted.has(name);
+    const base = entry.meshes.get('player_base');
+    const parts = [...wanted]
+      .filter((name) => name !== 'player_base')
+      .map((name) => entry.meshes.get(name))
+      .filter((mesh): mesh is SkinnedMesh => mesh instanceof SkinnedMesh)
+      .map((mesh) => mesh.geometry as BufferGeometry);
+    const merged = base instanceof SkinnedMesh && entry.baseGeometry !== null ? mergeOutfit(entry.baseGeometry, parts) : null;
+    if (merged !== null && base instanceof SkinnedMesh) {
+      entry.merged?.dispose();
+      entry.merged = merged;
+      base.geometry = merged;
+      for (const [name, mesh] of entry.meshes) {
+        mesh.visible = name === 'player_base';
+      }
+    } else {
+      for (const [name, mesh] of entry.meshes) {
+        if (mesh.parent === null && base?.parent !== null && base?.parent !== undefined) {
+          base.parent.add(mesh);
+        }
+        mesh.visible = wanted.has(name);
+      }
     }
     entry.texture?.paint(character.id, outfit, scarf);
   }
@@ -440,6 +500,7 @@ export class CharactersPart implements EventfulPart {
   dispose(): void {
     for (const entry of this.players.values()) {
       entry.figure.dispose();
+      entry.merged?.dispose();
     }
     for (const figure of this.villagers.values()) {
       figure.dispose();
