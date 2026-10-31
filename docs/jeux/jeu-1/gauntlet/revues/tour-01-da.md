@@ -105,4 +105,4 @@ Dans `docs/jeux/jeu-1/gauntlet/captures/tour-01/`:
 - `da-05-soir-nuit-gris.png`: la place à 18 h 30 et à 22 h 30, même cadrage, en couleur puis en niveaux de gris.
 - `da-06-interieur-soir-pluie.png`: l'intérieur à 19 h 45 et le potager sous la pluie à 11 h.
 - `da-07-joueurs-gris-daltonisme.png`: les deux joueurs en couleur, en niveaux de gris, en deutéranopie et en protanopie.
-- `da-08-jeu-reel-hud-planche.png`: la vraie simulation avec l'interface (mercredi, jour 5, de 9 h 20 à 9 h 40), trois images: taille réelle des personnages à 1366 x 768, poules qui bougent, aucun habitant dans le cadre.
+- `da-08-jeu-reel-hud-planche.png`: la vraie simulation avec l'interface (mercredi, jour 5, à 9 h 20 et à 9 h 40), deux images: taille réelle des personnages à 1366 x 768, poules qui bougent, aucun habitant dans le cadre.

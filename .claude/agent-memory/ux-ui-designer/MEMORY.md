@@ -54,3 +54,10 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - `hashchange` est asynchrone: attendre un instant avant de lire l'état dans Playwright.
 - Après `typographier.py`, une recherche exacte de « ! » ou « ? » échoue (espace fine U+202F devant): chercher par expression régulière.
 - Fraunces et Nunito Sans (fontsource 5.3.0): ni espace fine insécable ni chiffres tabulaires (horloge à largeur fixe, mise à jour toutes les 10 minutes de jeu).
+
+## Relecture d'une interface en jeu (gauntlet)
+
+- Page de démonstration de La Petite Ligne (`src/interface/demo/index.html`, Vite du jeu): `rendu=0` donne une capture en 3 s au lieu de 35 s avec la scène 3D (fond uni); `autre=fige` fige l'autre joueur pour les parcours au clavier. Le scénario `creation` ouvre l'écran titre (Entrée pour passer à la création) et `courrier` l'onglet Quêtes.
+- Un détecteur de débordement par rapport à la fenêtre ne voit pas les collisions entre régions du HUD (barre d'aménagement sur le portrait et les boutons de caméra): tester aussi l'intersection des rectangles des régions ancrées, à 100, 125, 150 % et à 1280x720 avec `deviceScaleFactor: 1.5`.
+- Plus d'une douzaine de contextes à la suite dans le même navigateur Playwright a fini en « Target page, context or browser has been closed »: découper les balayages en lots.
+- Audit sonore d'une interface: comparer chaque interaction de l'interface du jeu aux sons 01 à 04 de `docs/plateforme/identite-sonore.md` (focus, validation, retour, erreur), et vérifier qu'un refus ne joue pas le son d'une bonne nouvelle (`say()` crée une notification `message`).

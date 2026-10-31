@@ -3,7 +3,7 @@
 | Champ | Valeur |
 |---|---|
 | Relecteur | dev-gameplay-2d (regard neuf: n'a écrit ni la simulation, ni le réseau, ni le rendu du jeu) |
-| Date | 2026-10-31, de 08 h 57 à 09 h 40 UTC |
+| Date | 2026-10-31, de 08 h 57 à 09 h 15 UTC |
 | Version relue | arbre de travail à `b2431e8`, sans aucune modification du code ni des données du jeu |
 | Méthode | lecture de `src/entrees/commandes.ts`, `src/simulation/` (`deplacement.ts`, `grille.ts`, `intentions.ts`, `agir.ts`, `construction.ts`, `pas.ts`), `src/reseau/invite.ts`, `src/session.ts`, `src/rendu/personnages.ts`, `src/rendu/reglages.ts`, `src/audio/declencheurs.ts`, du SDK (`packages/sdk/src/input.ts`, `input-state.ts`) et des durées des clips de `assets/modeles/personnages.glb`; mesures par tests Vitest jetables hors du dépôt (`/tmp/lpl-feel/*.test.ts`: vraie carte, vrai contenu, graine 5; hôte et invité reliés par `startLocalDuo`, rendu simulé à 60 images par seconde); captures Chromium de la page `src/interface/demo/index.html?scenario=hud&autre=fige` servie par Vite sur le port 5302 |
 
@@ -13,7 +13,7 @@ Les fondations sont bonnes: chez l'hôte, un appui produit l'événement, le son
 
 La note reste sous 5 parce que trois défauts se voient ou s'entendent dès la première minute, sans chercher:
 
-1. **Chaque geste d'outil tourne en boucle après la fin**: bêcher, semer, arroser, récolter, couper, ramasser. Le personnage continue de bêcher dans le vide tant que le joueur ne bouge pas (capture à 13 s du clic). Le geste part aussi d'un point quelconque du clip, deux à trois fois plus long que l'action: le coup ne tombe pas avec le son et la terre.
+1. **Chaque geste d'outil tourne en boucle après la fin**: bêcher, semer, arroser, récolter, couper, ramasser. Le personnage continue de bêcher dans le vide tant que le joueur ne bouge pas (captures de 12 à 25 s après le clic). Le geste part aussi d'un point quelconque du clip, deux à trois fois plus long que l'action: le coup ne tombe pas avec le son et la terre.
 2. **Chez l'invité, son propre personnage avance par saccades** (11,7 cm une image sur deux à 60 images par seconde) **et ses propres pas sont muets** (0 pas entendu en 2 s, contre 8 chez l'hôte). C'est la moitié des joueurs, toute la partie.
 3. **Des appuis perdus**: Espace ou un clic proche pendant un geste ne font rien, sans mémoire; une tape de pavé tactile agit devant soi au lieu d'y aller.
 
@@ -59,7 +59,7 @@ Capture: `docs/jeux/jeu-1/gauntlet/captures/tour-01-ressenti-houe-en-boucle.png`
 ### 4.1 Les gestes tournent en boucle et ne tombent pas avec le son (tous les joueurs, chaque geste)
 
 - **Constat**: après un geste d'outil, la simulation laisse `action.kind` sur le geste (seuls la marche, le marteau et quelques cas repassent à `idle`); le rendu joue `CLIP_FOR_ACTION[kind]` en boucle (`LoopRepeat`). Le personnage continue de bêcher, semer ou arroser dans le vide jusqu'à son prochain pas. En plus, le clip démarre à `phase * duration` (décalage propre au personnage, pensé pour les boucles de marche), avec un fondu de 0,22 s, et dure deux à trois fois le geste: le coup de houe tombe n'importe quand, pas avec la terre et le son émis au pas de l'appui. Deux gestes de suite du même type ne relancent pas le clip (même nom, pas de jeton).
-- **Preuve**: test jetable, `action.kind = till` 40 pas après la fin d'un geste de 15 pas; capture `tour-01-ressenti-houe-en-boucle.png` (houe en boucle 13 s après); durées lues dans le GLB (tableau de la section 2); code: `src/rendu/personnages.ts`, `play()` (`action.time = ... this.phase * clip.duration`) et `update()` (`CLIP_FOR_ACTION[kind]`, `timeScale: 1`).
+- **Preuve**: test jetable, `action.kind = till` 40 pas après la fin d'un geste de 15 pas; capture `tour-01-ressenti-houe-en-boucle.png` (houe toujours en mouvement de 12 à 25 s après le clic, personnage immobile); durées lues dans le GLB (tableau de la section 2); code: `src/rendu/personnages.ts`, `play()` (`action.time = ... this.phase * clip.duration`) et `update()` (`CLIP_FOR_ACTION[kind]`, `timeScale: 1`).
 - **Correction**:
   1. `src/simulation/pas.ts` (fin du pas) ou `deplacement.ts` (`updateInside`): tout personnage dont le geste est fini (`action.duration > 0 && tick >= since + duration`) repasse à `idle`. Même effet chez l'invité, qui reçoit l'état. Relancer les robots et les tests d'empreinte.
   2. `src/rendu/personnages.ts`: pour une action à durée (`character.action.duration > 0`), demander `{ once: true, fromStart: true, token: character.action.since, timeScale: clip.duration / (action.duration / SIM_HZ), fade: 0.06 }`. Le geste part de sa première pose, finit avec l'action, et se relance à chaque nouveau geste.
