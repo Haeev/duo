@@ -101,3 +101,19 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 
 - Script jetable `/tmp/lpl-gd/redites.test.ts` (lancé par `npx vitest run --root games/la-petite-ligne --dir /tmp/lpl-gd`): robots de `tests/aides.ts`, un joueur parle à chaque habitant visible à 13 h (ou 9, 13 et 17 h), règle ancienne et règle R4. Repère: 55 % de redites avant, 0 % après 14 répliques nouvelles par habitant avec R4.
 - Avec R4, seules les répliques datées (jour du train, pluie, veille de pluie) restent en priorité 5 et plus; tout le quotidien en priorité 1. Une réplique quotidienne sans condition ne doit pas dire « ce matin » sans `time_is`.
+
+## Ce que la caméra montre (La Petite Ligne, vérifié le 2026-10-31, tour 6)
+
+- Caméra isométrique (élévation 35,26°, vues de 16, 24 et 36 m de large): le ciel ne se voit pas. Un objet à h mètres d'altitude monte de 0,82 h à l'écran; une volée « très haut » est hors champ. Faire passer les oiseaux bas, près des joueurs.
+- Une cible à moins de 6 m de chaque joueur est à l'écran chez les deux, à tous les zooms et dans les quatre orientations (6 x 0,577 + 0,82 < 4,5 m de demi-hauteur au zoom serré). Au-delà, seulement aux zooms 2 et 3.
+- Depuis l'intérieur de la maisonnette, le mur nord (environ 3 m) cache le sol sur 4 m derrière lui: un moment « vu de la maison » doit se jouer devant, ou exiger d'être dehors.
+- L'Aubrune coule vers l'est (`flow` de l'eau +x dans `reglages-ambiance.ts`): l'amont est à l'ouest. Le gué (x 16 à 20) est la seule eau basse; une anse de sable au sud (x 23 à 31, y 42) et une langue de sable au nord (x 27 à 34, y 38).
+- Seuls les 12 arbres `tree_edge_*` se coupent; `tree_oak_01` (52,5 ; 5,5), près de la remise, est un vieux chêne de décor sûr pour y accrocher quelque chose.
+
+## Informations propres (R16)
+
+- Les deux machines sont dans la même pièce: un son n'est jamais secret. Une information propre est visuelle ou textuelle, et l'autre écran ne doit jamais l'afficher.
+- Les conversations sont déjà personnelles (SI-06): un dialogue réservé à un rôle suffit à confier un secret. L'état du monde entier part chez l'invité: le filtrage se fait dans l'interface (et peut se durcir côté hôte).
+- `p1` est `players[0]` de `createWorld`, pas forcément l'hôte: écrire « premier joueur de la liste », jamais « l'hôte ».
+- Un choix à N réponses permet au plus N - 1 erreurs: régler le coup de coude en dessous, sinon il ne sort jamais.
+- Un nom propre qui commence par une minuscule (« la Duchesse ») ne doit jamais ouvrir une phrase par un espace réservé.
