@@ -6,6 +6,7 @@
 import type { GameMap } from '../etat/carte';
 import type { CharacterId, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
+import { sanitizeCorner } from '../simulation/amenagement';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
@@ -150,6 +151,7 @@ export function restoreWorld(
     c.destination = null;
     c.placement = null;
     c.aim = null;
+    c.corner = sanitizeCorner(map, c.corner);
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
   for (const v of world.villagers) v.talkingWith = [];

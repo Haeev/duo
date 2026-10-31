@@ -178,6 +178,25 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
       c.selected = free < 0 ? 0 : free;
       return;
     }
+    case 'coin': {
+      // Coin à soi: les deux dans la pièce, chacun son coin, une chaise en main tournée vers le coin de l'autre (refus).
+      playUntil(sim, (s) => s.world.clock.day >= 4 && s.world.clock.veillee && s.world.phase === 'day');
+      const room = sim.map.house.room;
+      teleport(sim, me, room.x + 2.5, room.y + 2.5);
+      teleport(sim, other, room.x + 1.5, room.y + 3.5);
+      for (const id of [me, other]) character(sim, id).inHouse = true;
+      apply(sim, other, [{ type: 'corner', x: room.x + 1, y: room.y + 3 }]);
+      const c = character(sim, me);
+      // Le premier carré libre en partant du réchaud (les robots ont meublé la pièce).
+      for (let y = room.y + 1; y <= room.y + room.h - 1 && (c.corner ?? null) === null; y++) {
+        for (let x = room.x + room.w - 1; x >= room.x + 1 && (c.corner ?? null) === null; x--) apply(sim, me, [{ type: 'corner', x, y }]);
+      }
+      const free = c.bag.findIndex((s, i) => s === null && i < 8);
+      c.bag[free < 0 ? 0 : free] = stack('chair', 1);
+      c.selected = free < 0 ? 0 : free;
+      c.facing = Math.PI;
+      return;
+    }
     case 'nuit':
       playUntil(sim, (s) => s.world.phase === 'night' && s.world.clock.day >= 4);
       return;

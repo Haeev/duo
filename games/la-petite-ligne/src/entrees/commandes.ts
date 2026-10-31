@@ -32,6 +32,9 @@ const UI_KEYS: readonly [GameAction, string][] = [
 /** Distance devant soi d'un repère planté au clavier, sans souris sur le jeu (m). */
 const PIN_AHEAD = 2;
 
+/** Distance devant soi du centre du coin désigné au clavier, sans souris sur le jeu (m). */
+const CORNER_AHEAD = 1;
+
 /** Position au sol de ce que la souris vise. */
 function pickPosition(view: GameView, pick: PickResult): { x: number; y: number } | null {
   const w = view.world();
@@ -142,17 +145,21 @@ export function createControls(options: ControlsOptions): Controls {
         else view.send({ type: 'cycle_slot', delta: wheel });
       }
       if (input.wasPressed('rotate')) view.send({ type: 'rotate_furniture', delta: 1 });
-      // Repère: là où vise la souris, sinon devant soi.
-      if (input.wasPressed('pin') && me !== undefined) {
-        let at = { x: me.pos.x + Math.cos(me.facing) * PIN_AHEAD, y: me.pos.y + Math.sin(me.facing) * PIN_AHEAD };
+      // Repère et coin à soi: là où vise la souris, sinon devant soi.
+      const aimed = (ahead: number): { x: number; y: number } | null => {
+        if (me === undefined) return null;
         if (pointer.inside && renderer !== null) {
           const rect = options.canvasRect();
           const pick = renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
           const picked = pick === null ? null : pickPosition(view, pick);
-          if (picked !== null) at = picked;
+          if (picked !== null) return picked;
         }
-        view.send({ type: 'pin', x: at.x, y: at.y });
-      }
+        return { x: me.pos.x + Math.cos(me.facing) * ahead, y: me.pos.y + Math.sin(me.facing) * ahead };
+      };
+      const pinAt = input.wasPressed('pin') ? aimed(PIN_AHEAD) : null;
+      if (pinAt !== null) view.send({ type: 'pin', x: pinAt.x, y: pinAt.y });
+      const cornerAt = input.wasPressed('corner') && !captured ? aimed(CORNER_AHEAD) : null;
+      if (cornerAt !== null) view.send({ type: 'corner', x: cornerAt.x, y: cornerAt.y });
       for (let i = 1; i <= TOOLBAR_SLOTS; i++) {
         if (input.wasPressed(`slot-${i}`)) view.send({ type: 'select_slot', slot: i - 1 });
       }

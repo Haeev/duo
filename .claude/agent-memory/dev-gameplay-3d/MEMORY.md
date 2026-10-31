@@ -24,6 +24,7 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 
 - Ombre serrée sur la vue: rayon = rayon de vue au sol + marge, centre calé sur la grille des texels dans le repère de la lumière (aucun scintillement quand la caméra glisse), `normalBias` proportionnel à la taille d'un texel (pas d'acné à aucun zoom).
 - Personnage caché par un bâtiment ou un arbre: trou tramé dans le matériau du décor (`onBeforeCompile`), `discard` si le fragment est dans un disque autour du personnage projeté (`gl_FragCoord`), plus près de la caméra (`vViewPosition.z`) et au-dessus de son sol. L'ombre reste (le matériau d'ombre n'est pas touché).
+- Une zone marquée au sol de la pièce (cadre) disparaît sous les meubles: deux paillasses couvrent un carré de 2x2 entier. De petits piquets aux angles la gardent lisible.
 - Coupe d'une maison: retrouver l'orientation de chaque mur par le centre de sa boîte (plus sûr que les noms), cacher toit et murs dont la normale regarde la caméra.
 
 ## Environnement et outils
@@ -32,6 +33,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Le serveur de Vite recharge la page quand d'autres membres modifient le dépôt: pour des captures stables, construire la page dans un dossier temporaire (`vite build --config` avec `rollupOptions.input`) et la servir avec `python3 -m http.server`.
 - Captures WebGL2: `chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] })`; attendre un drapeau posé par la page (`window.x.ready`) plutôt qu'un délai.
 - Essai de fuite: créer et libérer le rendu dix fois de suite dans la page, comparer `renderer.info.memory` à chaque tour et le tas (`--enable-precise-memory-info`), compter les canevas restants.
+- Membre isolé dans un worktree: l'outil Bash refuse une commande qu'il ne sait pas cantonner au worktree (`..` dans un chemin, l'exclusion du dossier du dépôt dans le contrôle typographique, une boucle autour de commandes du dépôt, un heredoc qui cite le dépôt). Mettre ces commandes dans un script du scratchpad (`bash /tmp/<moi>/x.sh <racine>`), les scripts Python dans un fichier, et éditer le reste avec Edit.
+- `vite build --config` avec un fichier de configuration hors du dépôt échoue (`vite` introuvable depuis `/tmp`): copier la configuration dans le dossier du jeu, construire, puis la supprimer.
+- Prettier n'est pas appliqué partout: ne formater que les fichiers qui étaient conformes avant la mission (version d'origine passée à `prettier --check --stdin-filepath`), sinon le diff gonfle et la fusion coince.
+- Rendu logiciel: la capture Playwright d'une page 3D peut dépasser 30 s (`screenshot({ timeout })` à relever); ouvrir une page neuve par capture, la navigation suivante dans la même page attend la fin d'une image interminable.
 
 ## Son Web Audio (vérifié le 2026-10-31, La Petite Ligne)
 

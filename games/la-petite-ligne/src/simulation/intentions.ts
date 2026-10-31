@@ -7,7 +7,7 @@ import type { Character, CharacterId, Quality } from '../etat/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, resolveClick } from './agir';
-import { placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
 import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
@@ -187,6 +187,12 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (f !== undefined && canAct(c, sim) && c.inHouse) takeFurniture(sim, c, f.id);
       return;
     }
+    case 'corner':
+      if (canAct(c, sim) && Number.isFinite(intent.x) && Number.isFinite(intent.y)) designateCorner(sim, c, intent.x, intent.y);
+      return;
+    case 'corner_clear':
+      if (c.created) clearCorner(sim, c);
+      return;
     case 'hold_furniture': {
       const slot = c.bag.findIndex((s) => s?.item === intent.item);
       if (slot >= 0 && slot < TOOLBAR_SLOTS) c.selected = slot;

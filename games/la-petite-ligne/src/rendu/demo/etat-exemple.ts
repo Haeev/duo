@@ -65,6 +65,8 @@ export interface DemoOptions {
   fishing: 'none' | 'waiting' | 'bite';
   /** Sacha est absent (P1): assis, auréole douce. */
   absent: boolean;
+  /** Coin à soi de chacun dans la pièce (P1), Sacha à l'intérieur dans le sien. */
+  corners?: boolean;
 }
 
 /** Durée d'un repère à 30 pas par seconde (15 s, comme la simulation). */
@@ -275,6 +277,13 @@ export function createExampleWorld(
   ];
   world.villagers = villagers;
   world.hens = hens;
+  if (options.corners === true) {
+    p1.corner = { cx: room.x + room.w - 2, cy: room.y };
+    p2.corner = { cx: room.x, cy: room.y + room.h - 2 };
+    p2.pos = { x: room.x + 1.5, y: room.y + room.h - 0.5 };
+    p2.prev = { ...p2.pos };
+    p2.inHouse = true;
+  }
   if (options.pin) {
     p1.pin = { pos: { x: door.x + 3.5, y: door.y + 4.5 }, since: 0, until: PIN_TICKS };
   }

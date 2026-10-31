@@ -69,6 +69,7 @@ Ce que le rendu trouve dans l'état:
 | Toit, porte, poulailler | `constructions[i].status` et `elements[j].progress/done` |
 | Maison réparée | construction `house_roof` et `house_door` à `done` |
 | Meubles | `furniture[i].item/cell/rotation` (empreinte dans `content.items[item].footprint`) |
+| Coin à soi de chacun (cadre au sol à sa couleur) | `characters[i].corner` (case nord-ouest du carré de `CORNER_SIZE` cases; absent ou `null`: pas de coin) |
 | Objets au sol | `groundItems` (boîte en fer, œufs, piles tombées) |
 | Habitants | `villagers[i].pos/prev/facing/speed/visible/activity/talkingWith` |
 | Poules | `hens` |
@@ -81,6 +82,7 @@ Ce que le rendu trouve dans l'état:
 
 - Le rendu traduit un clic en `PickResult` (`renderer.pick`); `main.ts` en fait une intention `move_to` (aller là et agir).
 - L'interface envoie les intentions de menu (`menu`, `buy`, `sell`, `craft`, `eat`, `crate_deposit`, `dialogue_next`, `dialogue_choice`, `start_day`, `night_choice`, `create_character`...). Ouvrir un menu: `send({ type: 'menu', menu: 'shop' })`; le fermer: `menu: null`. L'horloge s'arrête quand les deux joueurs sont dans un menu, un dialogue ou une scène.
+- Coin à soi: `send({ type: 'corner', x, y })` (C: point visé par la souris, sinon devant soi; au même endroit, le retire), `send({ type: 'corner_clear' })`.
 - Un refus (fonds, portée, sac plein) arrive comme notification dans `characters[i].notifications`, avec le texte de `textes.json`.
 
 ## Événements (son, effets)
