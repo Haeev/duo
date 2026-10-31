@@ -1,0 +1,77 @@
+# Vérifications sur macOS et Windows (ADR 0011, section 3.8; ADR 0013, point 5):
+# fabrication des installateurs, contrôle de l'application empaquetée, test de
+# démarrage, installation et désinstallation sous Windows, puis tests unitaires
+# sur les deux systèmes. Les installateurs restent 7 jours en artefacts.
+#
+# Déclenché par les pushs sur main et sur les branches de session (claude/**),
+# et à la demande. Le dépôt est public: les minutes macOS et Windows sont
+# gratuites. Si le dépôt devenait privé, ne garder que workflow_dispatch.
+name: Systèmes
+
+on:
+  push:
+    branches: [main, 'claude/**']
+    # Un push qui ne touche que la documentation ne refabrique rien.
+    paths-ignore:
+      - 'docs/**'
+      - '.claude/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: systemes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fabrication:
+    name: Installateurs
+    uses: ./.github/workflows/fabrication.yml
+    with:
+      conservation: 7
+
+  tests:
+    name: Tests unitaires (${{ matrix.systeme }})
+    runs-on: ${{ matrix.systeme }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        systeme: [macos-latest, windows-latest]
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version du champ packageManager, par corepack)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Dossier du magasin pnpm
+        id: magasin
+        shell: bash
+        run: echo "dossier=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache du magasin pnpm
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.magasin.outputs.dossier }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Tests unitaires
+        run: pnpm test

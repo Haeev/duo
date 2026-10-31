@@ -1,6 +1,7 @@
 # Vérifications à chaque push (ADR 0011, section CI, et ADR 0013, point 5).
-# Linux seulement: les jobs macOS et Windows (systemes.yml) et la fabrication
-# des installateurs (publication.yml) viennent au lot L7.
+# Linux seulement: macOS et Windows passent par systemes.yml (installateurs et
+# tests unitaires) et publication.yml (release sur tag v*), qui partagent
+# fabrication.yml.
 name: Vérifications
 
 on:

@@ -1,0 +1,139 @@
+# Publication de l'application Duo (ADR 0011, section 3.7).
+#
+# Sur un tag vX.Y.Z (égal à la version de apps/duo/package.json): contrôle du
+# tag et du CHANGELOG, fabrication macOS et Windows (fabrication.yml), puis
+# release GitHub avec Duo-macOS.dmg, Duo-macOS.zip, Duo-Windows.exe,
+# SHA256SUMS.txt, duo-version.json et les notes de apps/duo/CHANGELOG.md.
+#
+# Par défaut, la release est une préversion publiée (pre-release): visible et
+# téléchargeable tout de suite, jamais marquée « Latest », donc jamais signalée
+# par l'avis de nouvelle version de Duo. Sans préversion (déclenchement manuel),
+# la release reste un brouillon que le manager relit, puis publie avec
+# `gh release edit vX.Y.Z --draft=false --latest`.
+#
+# Déclenchement manuel depuis une branche: fabrication seule, installateurs
+# gardés 30 jours en artefacts, sans release. Depuis un tag: comme un push du tag.
+# Le jeton fourni par GitHub suffit (contents: write pour le seul job de release).
+name: Publication
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      preversion:
+        description: Préversion (pre-release) publiée tout de suite; décoché, brouillon à publier à la main
+        type: boolean
+        default: true
+      brouillon:
+        description: Brouillon même en préversion (invisible des joueurs jusqu'à sa publication)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publication-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  controle:
+    name: Contrôle du tag et du CHANGELOG
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Tag égal à la version de l'application, section du CHANGELOG présente
+        if: github.ref_type == 'tag'
+        env:
+          TAG: ${{ github.ref_name }}
+        run: node outils/preparer-release.mjs --tag "$TAG" --controle-seul
+
+  fabrication:
+    name: Installateurs
+    needs: controle
+    uses: ./.github/workflows/fabrication.yml
+    with:
+      conservation: 30
+
+  release:
+    name: Release GitHub
+    needs: fabrication
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ github.ref_name }}
+      # Un push de tag n'a pas d'entrées (inputs.* vaut null): préversion publiée.
+      PREVERSION: ${{ github.event_name != 'workflow_dispatch' || inputs.preversion }}
+      BROUILLON: ${{ github.event_name == 'workflow_dispatch' && inputs.brouillon }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Installateurs fabriqués
+        uses: actions/download-artifact@v8
+        with:
+          pattern: duo-*
+          merge-multiple: true
+          path: livraison
+
+      - name: Notes, empreintes et duo-version.json
+        run: node outils/preparer-release.mjs --tag "$TAG" --fichiers livraison --sortie publication
+
+      - name: Empreintes relues
+        working-directory: livraison
+        run: sha256sum -c ../publication/SHA256SUMS.txt
+
+      - name: Création ou mise à jour de la release
+        run: |
+          version="${TAG#v}"
+          fichiers=(
+            livraison/Duo-macOS.dmg
+            livraison/Duo-macOS.zip
+            livraison/Duo-Windows.exe
+            publication/SHA256SUMS.txt
+            publication/duo-version.json
+          )
+          if [ "$PREVERSION" = true ]; then
+            titre="Duo $version (préversion)"
+            etat=(--prerelease --latest=false)
+            if [ "$BROUILLON" = true ]; then etat+=(--draft); fi
+          else
+            # Release destinée à l'avis de nouvelle version: brouillon relu par le manager.
+            titre="Duo $version"
+            etat=(--draft)
+          fi
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            # Relance après correction: fichiers et notes remplacés (releases non immuables, ADR 0011).
+            gh release upload "$TAG" "${fichiers[@]}" --clobber
+            gh release edit "$TAG" --title "$titre" --notes-file publication/notes.md
+          else
+            gh release create "$TAG" "${fichiers[@]}" --verify-tag --title "$titre" --notes-file publication/notes.md "${etat[@]}"
+          fi
+          gh release view "$TAG" --json name,url,isDraft,isPrerelease,assets \
+            --jq '"\(.name): \(.url) (brouillon: \(.isDraft), préversion: \(.isPrerelease))", (.assets[] | "  \(.name) \(.size) octets")'
