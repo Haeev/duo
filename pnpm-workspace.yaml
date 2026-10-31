@@ -45,3 +45,4 @@ saveExact: true
 # versions figées par l'ADR 0001 et plus jeunes que cela sont admises ici.
 minimumReleaseAgeExclude:
   - eslint@10.14.0
+  - electron@45.2.0

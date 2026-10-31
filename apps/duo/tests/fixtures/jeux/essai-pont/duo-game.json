@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "essai-pont",
+  "name": "Essai du pont",
+  "version": "1.0.0",
+  "sdk": "1.0",
+  "view": "2d",
+  "engine": "none",
+  "mode": "coop",
+  "play": "session",
+  "durationMinutes": [1, 10],
+  "network": "host-authority",
+  "entry": "index.html",
+  "thumbnail": "vignette.png",
+  "description": "Jeu d'essai des tests: pont, battement de cœur, pause, messages entre les deux machines.",
+  "whatsNew": "",
+  "actions": [
+    { "id": "agir", "label": "Agir", "keys": ["Space"], "mouse": "left" },
+    { "id": "avancer", "label": "Avancer", "keys": ["KeyW", "ArrowUp"] }
+  ],
+  "saves": { "slots": 1, "maxBytes": 1048576, "moments": ["exit"], "help": "Le jeu enregistre en quittant." },
+  "credits": null
+}

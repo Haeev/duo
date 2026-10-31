@@ -1,0 +1,11 @@
+{
+  // Interface du lanceur (vue plateforme): page web, Preact, sans Node.
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.browser.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "types": ["vite/client"]
+  },
+  "include": ["src/renderer", "src/shared"]
+}

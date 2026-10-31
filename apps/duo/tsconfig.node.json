@@ -1,0 +1,6 @@
+{
+  // Processus principal, code partagé, tests et configuration des outils: Node.
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.node.json",
+  "include": ["src/main", "src/shared", "tests", "*.config.ts"]
+}

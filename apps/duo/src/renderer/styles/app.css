@@ -1,0 +1,1026 @@
+/*
+ * Habillage du lanceur, piste « Étoile double » (docs/plateforme/identite-visuelle.md).
+ * Valeurs: jetons de design/identite/b/jetons.css, jamais recopiées. Tailles en rem
+ * (taille de l'interface, ADR 0012 point 5). Aucun flou; animations de transform
+ * et d'opacité seulement.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  font-size: 16px;
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  color: var(--color-text);
+  font-family: var(--type-body-family);
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
+  font-weight: var(--type-body-weight);
+  background: radial-gradient(1400px 900px at 78% 18%, var(--color-bg-glow) 0%, var(--color-bg) 62%);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Pendant une partie, la vue plateforme laisse voir le jeu dessous (ADR 0004). */
+html[data-scene='partie'],
+html[data-scene='partie'] body {
+  background: transparent;
+}
+
+#app {
+  height: 100%;
+}
+
+h1,
+h2,
+p,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: var(--stroke-focus) solid var(--color-focus);
+  outline-offset: var(--stroke-focus-offset);
+}
+
+.sprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.sprite svg {
+  display: none;
+}
+
+/* Typographie --------------------------------------------------------------- */
+
+.display {
+  font-family: var(--type-display-family);
+  font-size: var(--type-display-size);
+  line-height: var(--type-display-line-height);
+  font-weight: var(--type-display-weight);
+  letter-spacing: var(--type-display-tracking);
+}
+
+.titre-1 {
+  font-family: var(--type-title-1-family);
+  font-size: var(--type-title-1-size);
+  line-height: var(--type-title-1-line-height);
+  font-weight: var(--type-title-1-weight);
+}
+
+.titre-2 {
+  font-family: var(--type-title-2-family);
+  font-size: var(--type-title-2-size);
+  line-height: var(--type-title-2-line-height);
+  font-weight: var(--type-title-2-weight);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.titre-3 {
+  font-family: var(--type-title-3-family);
+  font-size: var(--type-title-3-size);
+  line-height: var(--type-title-3-line-height);
+  font-weight: var(--type-title-3-weight);
+  letter-spacing: var(--type-title-3-tracking);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.surtitre {
+  font-family: var(--type-overline-family);
+  font-size: var(--type-overline-size);
+  line-height: var(--type-overline-line-height);
+  font-weight: var(--type-overline-weight);
+  letter-spacing: var(--type-overline-tracking);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.corps-grand {
+  font-size: var(--type-body-large-size);
+  line-height: var(--type-body-large-line-height);
+}
+
+.petit {
+  font-size: var(--type-small-size);
+  line-height: var(--type-small-line-height);
+  font-weight: var(--type-small-weight);
+  letter-spacing: var(--type-small-tracking);
+}
+
+.libelle {
+  font-weight: var(--type-label-weight);
+}
+
+.texte-second {
+  color: var(--color-text-muted);
+}
+
+.texte-erreur {
+  color: var(--color-error);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.texte-succes {
+  color: var(--color-success);
+}
+
+/* Icônes et symboles ------------------------------------------------------- */
+
+.icone {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  stroke-width: var(--icon-stroke);
+  flex: none;
+}
+
+.icone-small {
+  width: var(--icon-size-small);
+  height: var(--icon-size-small);
+  stroke-width: var(--icon-stroke-small);
+}
+
+.icone-large {
+  width: var(--icon-size-large);
+  height: var(--icon-size-large);
+}
+
+.symbole {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.symbole .halo {
+  opacity: var(--player-halo-opacity);
+}
+
+.logo {
+  height: 2.25rem;
+  width: auto;
+}
+
+/* Scènes ------------------------------------------------------------------- */
+
+.scene {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fondu var(--duration-fast) var(--easing-enter);
+}
+
+.scene-opaque {
+  background: radial-gradient(1400px 900px at 78% 18%, var(--color-bg-glow) 0%, var(--color-bg) 62%);
+}
+
+.ciel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ciel svg {
+  width: 100%;
+  height: 100%;
+}
+
+.ciel .scintille {
+  animation: scintille var(--duration-twinkle) ease-in-out infinite;
+  animation-play-state: var(--loops-state);
+}
+
+.ciel .scintille:nth-of-type(2n) {
+  animation-delay: -1200ms;
+}
+
+.ciel .scintille:nth-of-type(3n) {
+  animation-delay: -2400ms;
+}
+
+.scene > *:not(.ciel) {
+  position: relative;
+  z-index: 1;
+}
+
+.ecran-centre {
+  margin: auto;
+  width: min(44rem, calc(100% - 2 * var(--space-10)));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+  padding: var(--space-10) 0;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+.ecran-formulaire {
+  gap: var(--space-5);
+}
+
+.contenu {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-10);
+}
+
+@media (min-width: 1367px) {
+  .contenu {
+    padding-inline: var(--space-12);
+  }
+}
+
+/* Barre du haut ------------------------------------------------------------ */
+
+.barre-haut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  min-height: 4.5rem;
+  padding: var(--space-3) var(--space-10);
+  border-bottom: var(--stroke-hairline) solid var(--color-hairline);
+}
+
+.barre-salon {
+  gap: var(--space-6);
+}
+
+.onglets {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.onglet {
+  position: relative;
+  background: none;
+  border: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-small);
+  font-weight: var(--type-label-weight);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.onglet:hover,
+.onglet-actif {
+  color: var(--color-text);
+}
+
+.onglet-actif::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -0.25rem;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+.barre-droite {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.presence-courte,
+.pastille-profil {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--type-small-size);
+}
+
+.pastille-profil {
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  border: var(--stroke-component) solid var(--color-outline);
+  font-weight: var(--type-label-weight);
+}
+
+/* Composants --------------------------------------------------------------- */
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 3rem;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-pill);
+  border: var(--stroke-component) solid transparent;
+  font-weight: var(--type-label-weight);
+  line-height: var(--type-label-line-height);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.bouton-grand {
+  min-height: 3.5rem;
+  padding: 0 var(--space-8);
+}
+
+.bouton-principal {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.bouton-principal:hover {
+  background: var(--color-accent-hover);
+}
+
+.bouton-principal:active {
+  background: var(--color-accent-pressed);
+}
+
+.bouton-secondaire {
+  background: transparent;
+  border-color: var(--color-outline);
+}
+
+.bouton-secondaire:hover {
+  background: var(--color-surface-raised);
+  border-color: var(--color-text-muted);
+}
+
+.bouton-secondaire:active {
+  background: var(--color-surface);
+}
+
+.bouton:disabled {
+  background: transparent;
+  border: var(--stroke-component) dashed var(--color-text-disabled);
+  color: var(--color-text-disabled);
+  cursor: default;
+}
+
+.lien {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--color-accent);
+  font-weight: var(--type-label-weight);
+  cursor: pointer;
+}
+
+.lien:hover {
+  text-decoration: underline;
+}
+
+.lien-aide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.touche {
+  display: inline-flex;
+  align-items: center;
+  min-width: 1.75rem;
+  justify-content: center;
+  padding: 0 var(--space-2);
+  border: var(--stroke-component) solid var(--color-outline);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-small);
+  font-family: var(--type-small-family);
+  font-size: var(--type-small-size);
+  font-weight: 600;
+  line-height: 1.5rem;
+  color: var(--color-text);
+}
+
+.carte {
+  background: var(--color-surface);
+  box-shadow: var(--elevation-1);
+  border-radius: var(--radius-large);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.puce {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 1.875rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  font-size: var(--type-small-size);
+  font-weight: var(--type-small-weight);
+  white-space: nowrap;
+}
+
+.puce .icone {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.puce-ready .icone,
+.puce-wants-resume .icone {
+  color: var(--color-success);
+}
+
+.puce-not-yet .icone,
+.puce-waiting .icone,
+.puce-paused .icone {
+  color: var(--color-text-muted);
+}
+
+.puce-lost .icone {
+  color: var(--color-error);
+}
+
+.carte-joueur {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-large);
+}
+
+.carte-joueur-texte {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.carte-joueur-nom {
+  font-family: var(--type-title-3-family);
+  font-size: var(--type-title-3-size);
+  line-height: var(--type-title-3-line-height);
+  font-weight: var(--type-title-3-weight);
+  overflow-wrap: anywhere;
+}
+
+.paire-joueurs {
+  display: flex;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.joueur {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.joueur-nom {
+  font-weight: var(--type-label-weight);
+}
+
+.saisie {
+  width: 100%;
+  max-width: 24rem;
+  height: 2.75rem;
+  padding: 0 var(--space-4);
+  background: var(--color-bg);
+  border: var(--stroke-component) solid var(--color-outline);
+  border-radius: var(--radius-small);
+  user-select: text;
+}
+
+.saisie:hover {
+  border-color: var(--color-text-muted);
+}
+
+.saisie-erreur {
+  border-color: var(--color-error);
+}
+
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.apercu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.choix-couleur {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.choix-couleur-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 5.5rem;
+  padding: var(--space-3) var(--space-2);
+  background: transparent;
+  border: var(--stroke-component) solid transparent;
+  border-radius: var(--radius-medium);
+  cursor: pointer;
+}
+
+.choix-couleur-option:hover {
+  background: var(--color-surface-raised);
+}
+
+.choix-couleur-option[aria-checked='true'] {
+  border-color: var(--color-text);
+}
+
+.choix-couleur-option:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.consigne ol {
+  padding-left: var(--space-6);
+}
+
+.attente-orbite {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.orbite {
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-outline);
+  animation: orbite var(--duration-orbit) linear infinite;
+  animation-play-state: var(--loops-state);
+}
+
+.orbite-astre {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  border-radius: 50%;
+  background: var(--color-accent);
+}
+
+/* Accueil et bibliothèque -------------------------------------------------- */
+
+.accueil {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.carte-presence {
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-8);
+}
+
+.presence-joueurs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.presence-etat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.presence-present .icone {
+  color: var(--color-success);
+}
+
+.presence-absent .icone,
+.presence-unknown .icone {
+  color: var(--color-text-muted);
+}
+
+.accueil-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+.carte-action {
+  align-items: flex-start;
+  min-height: 12rem;
+}
+
+.carte-action .bouton {
+  margin-top: auto;
+}
+
+.bibliotheque {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+.grille-jeux {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--space-6);
+  padding: 6px;
+  margin-top: var(--space-4);
+}
+
+.vignette {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-medium);
+}
+
+.vignette-image {
+  width: 100%;
+  max-width: 30rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-medium);
+  box-shadow: 0 0 0 1px var(--color-line);
+  background: var(--color-surface);
+  margin-bottom: var(--space-2);
+}
+
+.vignette:hover .vignette-image {
+  box-shadow: 0 0 0 1px var(--color-text-muted);
+}
+
+.vignette-nom {
+  font-weight: var(--type-label-weight);
+}
+
+.vignette-description {
+  font-weight: 400;
+}
+
+/* Bandeau d'invitation et notifications ------------------------------------ */
+
+.panneau {
+  background: var(--color-surface);
+  box-shadow: var(--elevation-3);
+  border-radius: var(--radius-large);
+  padding: var(--space-8);
+}
+
+.bandeau-invitation {
+  position: fixed;
+  top: var(--space-4);
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  width: min(52rem, calc(100% - 2 * var(--space-10)));
+  padding: var(--space-5) var(--space-6);
+  animation: descend var(--duration-medium) var(--easing-enter);
+}
+
+.bandeau-texte {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bandeau-actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.notifications {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(24rem, calc(100% - 2 * var(--space-4)));
+  pointer-events: none;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface-raised);
+  box-shadow: var(--elevation-2);
+  border-radius: var(--radius-medium);
+  animation: monte var(--duration-medium) var(--easing-enter);
+}
+
+/* Salon --------------------------------------------------------------------- */
+
+.salon {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.salon-gauche,
+.salon-droite {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+.salon-droite {
+  align-items: stretch;
+}
+
+.carte-jeu {
+  flex-direction: row;
+  align-items: center;
+}
+
+.carte-jeu .vignette-image {
+  width: 9rem;
+  margin: 0;
+}
+
+.choix-sauvegarde {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.option-sauvegarde {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--stroke-component) solid var(--color-outline);
+  border-radius: var(--radius-medium);
+  cursor: pointer;
+}
+
+.option-sauvegarde:has(input:checked) {
+  border-color: var(--color-text);
+  background: var(--color-surface-raised);
+}
+
+.option-sauvegarde input {
+  accent-color: var(--color-accent);
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+}
+
+.commandes {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.commande {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.commande dt {
+  color: var(--color-text-muted);
+}
+
+.commande dd {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Voile, superpositions, fenêtres ------------------------------------------ */
+
+.voile {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  background: var(--color-scrim);
+  animation: fondu var(--duration-fast) var(--easing-enter);
+}
+
+.voile-fenetre {
+  z-index: 35;
+}
+
+.fenetre {
+  width: min(34rem, calc(100% - 2 * var(--space-10)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: monte var(--duration-medium) var(--easing-enter);
+}
+
+.fenetre-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.decompte {
+  text-align: center;
+}
+
+.chiffre-decompte {
+  font-family: var(--type-countdown-family);
+  font-size: var(--type-countdown-size);
+  line-height: var(--type-countdown-line-height);
+  font-weight: var(--type-countdown-weight);
+  font-variant-numeric: tabular-nums;
+  animation: chiffre var(--duration-fast) var(--easing-enter);
+}
+
+.superposition {
+  z-index: 25;
+}
+
+.panneau-pause {
+  width: min(32rem, calc(100% - 2 * var(--space-10)));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  animation: monte var(--duration-medium) var(--easing-enter);
+}
+
+.menu-pause {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.menu-pause .bouton {
+  justify-content: flex-start;
+}
+
+.reprise {
+  font-family: var(--type-title-2-family);
+  font-size: var(--type-title-2-size);
+  line-height: var(--type-title-2-line-height);
+}
+
+.paire-puces {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.joueur-puce {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Indice « Échap : pause », dans la vue réduite au bandeau du haut. */
+.indice-partie {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.capsule-indice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 1px var(--color-hairline);
+  border-radius: var(--radius-pill);
+  font-size: var(--type-small-size);
+  font-weight: var(--type-small-weight);
+}
+
+/* Petits écrans: aucune colonne sous 1100 px de large. */
+@media (max-width: 1100px) {
+  .accueil-actions,
+  .salon {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mouvement ----------------------------------------------------------------- */
+
+@keyframes fondu {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes monte {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes descend {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+}
+
+@keyframes chiffre {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes orbite {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scintille {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+}

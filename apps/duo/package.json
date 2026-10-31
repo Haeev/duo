@@ -1,0 +1,34 @@
+{
+  "name": "duo",
+  "productName": "Duo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Application de bureau Duo: lanceur, salon et hébergement des jeux à deux (Electron).",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.preload.json",
+    "test": "vitest run",
+    "test:e2e": "electron-vite build && playwright test"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@fontsource-variable/dm-sans": "5.3.0",
+    "@fontsource-variable/jost": "5.3.0",
+    "@playwright/test": "catalog:",
+    "@preact/signals": "catalog:",
+    "@types/node": "catalog:",
+    "electron": "catalog:",
+    "electron-vite": "catalog:",
+    "eslint": "catalog:",
+    "preact": "catalog:",
+    "typescript": "catalog:",
+    "valibot": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
