@@ -144,6 +144,26 @@ describe('draisine poussée à deux', () => {
   });
 });
 
+describe('draisine: sauvegardes', () => {
+  it('une draisine en cours de poussée écrite sans trajet (version d’avant) reprend le trajet sur rails', () => {
+    const sim = withHandcar();
+    grab(sim, ['p1', 'p2']);
+    carry(sim, ['p1', 'p2'], 10);
+    const old = JSON.parse(JSON.stringify(snapshotOf(sim).data)) as { beam: Record<string, unknown> };
+    delete old.beam.route;
+    delete old.beam.leg;
+    const { content, map } = contentAndMap();
+    const restored = restoreWorld(content, map, old, snapshotOf(sim).dataSchema, [A, B]);
+    const beam = restored.world.beam;
+    expect(beam?.route?.length).toBeGreaterThanOrEqual(2);
+    expect(beam?.leg).toBe(0);
+    expect(distance(beam?.pos ?? { x: 0, y: 0 }, restored.map.points.handcar_shed ?? { x: -9, y: -9 })).toBeLessThan(1e-6);
+    grab(restored, ['p1', 'p2']);
+    carry(restored, ['p1', 'p2'], SIM_HZ * 30);
+    expect(restored.world.flags).toContain('handcar_pushed');
+  });
+});
+
 describe('colis lourd du train', () => {
   it('un objet lourd du catalogue arrive en colis sur le quai, pas au cellier', () => {
     const sim = withParcel();

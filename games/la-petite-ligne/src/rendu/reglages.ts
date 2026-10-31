@@ -60,7 +60,8 @@ export const RENDER_SETTINGS = {
       path: 0,
       dirt: 0,
       gravel: 0.03,
-      wood: 0.45,
+      // Platelage du passage à niveau: au ras des rails (dessus des traverses couvert, le champignon du rail affleure).
+      wood: 0.27,
       floor: 0.12,
       water: -0.42,
       rail: 0.06,

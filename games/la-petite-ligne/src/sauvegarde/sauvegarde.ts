@@ -235,7 +235,7 @@ function resume(
   }
   // Trajet sur rails (après le tour 5): une charge écrite avant n'en a pas. La draisine reprend
   // alors le trajet du réglage depuis son point de départ.
-  const current = world.beam as (NonNullable<WorldState['beam']> & { route?: unknown }) | null;
+  const current: (Omit<NonNullable<WorldState['beam']>, 'route'> & { route?: NonNullable<WorldState['beam']>['route'] }) | null = world.beam;
   if (current !== null && current.route === undefined) {
     const handcar = content.settings.carry.handcar;
     const from = handcar === null ? undefined : map.points[handcar.from];

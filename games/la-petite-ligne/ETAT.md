@@ -168,6 +168,12 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-10-31, cohérence du monde: la draisine sur ses rails (dev gameplay)
+
+- `reglages.carry.handcar.path`: points de passage sur les rails, en décalages depuis `handcar_shed`: la voie de garage (3 m vers le sud, x 56), puis la voie principale (5 m vers l'ouest, arrêt avant l'obstacle de la case x 50). `toOffset` (lu par la démonstration du rendu) vaut le dernier point.
+- Charge sur rails (`beam.route`, `beam.leg`, `railStep` dans `deplacement.ts`): l'élan des deux porteurs est projeté sur le segment en cours; elle avance dans l'axe de la voie, ne recule pas, regarde dans le sens de la voie, s'arrête exactement au dernier point (`handcarAt` garde cette position). Les robots la poussent vers le prochain point de passage.
+- Sauvegardes: une charge écrite sans trajet (version d'avant) reprend, pour la draisine, le trajet du réglage depuis la remise.
+
 ## 2026-10-31, cohérence du monde: meubles à tuyau dos au mur (dev gameplay)
 
 - Champ d'objet `backToWall` (poêle à bois et réchaud, posé par le game designer): la pose demande que le dos du meuble touche un mur (rotation 0, tourné vers le sud: mur nord; 1: mur ouest; 2: mur sud; 3: mur est). Sinon refus `back_wall`, texte `placement_back_wall` (repli `placement_wall`). Les autres meubles ne changent pas.
