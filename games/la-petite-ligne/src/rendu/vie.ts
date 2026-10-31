@@ -30,7 +30,6 @@ import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
 import { textHash, type ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
-import { castsVisibleShadow } from './ombre-tri';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -100,7 +99,7 @@ export class FarmLifePart implements EventfulPart {
     const root = new Group();
     const model = this.library.cloneRig(HEN_RIG, [variant]) ?? this.library.instantiate(variant);
     model.traverse((object) => {
-      object.castShadow = castsVisibleShadow(object.name);
+      object.castShadow = true;
       if (object instanceof SkinnedMesh) {
         object.boundingSphere = new Sphere(new Vector3(0, HEN_RADIUS, 0), HEN_RADIUS * 2);
       }

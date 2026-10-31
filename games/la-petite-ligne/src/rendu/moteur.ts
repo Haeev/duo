@@ -30,7 +30,6 @@ import { StaticDecor } from './decor';
 import { DaylightRig } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
-import { ShadowCasterCulling } from './ombre-tri';
 import { PerfMonitor } from './perf';
 import { AdaptiveQuality, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
@@ -127,7 +126,6 @@ export class RenderEngine implements Renderer {
   private readonly quality: AdaptiveQuality | null;
   private readonly log: RendererOptions['log'];
   private vegetation: Vegetation | null = null;
-  private readonly shadowCulling = new ShadowCasterCulling();
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -500,24 +498,11 @@ export class RenderEngine implements Renderer {
       return;
     }
     this.updateFrame(dtSeconds);
-    this.draw();
+    this.renderer.render(this.scene, this.rig.camera);
     this.perf.record(this.renderer, Math.min(MAX_FRAME_SECONDS, Math.max(0, dtSeconds)));
     const change = this.quality?.sample(dtSeconds) ?? null;
     if (change !== null) {
       this.applyQuality(change);
-    }
-  }
-
-  /** Une image, passe d'ombre réduite à ce qui ombre la vue (`ombre-tri.ts`). */
-  private draw(): void {
-    const shadows = this.renderer.shadowMap.enabled && this.daylight.sun.castShadow;
-    if (shadows) {
-      this.shadowCulling.begin(this.scene, this.rig.camera, this.daylight.direction);
-    }
-    try {
-      this.renderer.render(this.scene, this.rig.camera);
-    } finally {
-      this.shadowCulling.end();
     }
   }
 
@@ -709,7 +694,7 @@ export class RenderEngine implements Renderer {
       meshes[key] = (meshes[key] ?? 0) + info.triangles - before;
     };
     try {
-      this.draw();
+      renderer.render(this.scene, this.rig.camera);
     } finally {
       shadowMap.render = original;
       renderer.renderBufferDirect = draw;
