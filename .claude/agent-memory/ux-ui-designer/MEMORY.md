@@ -32,3 +32,25 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 
 - `design/maquettes/plateforme-wireframes/commun.css` et `commun.js`: états par ancre (`data-si`), focus par défaut (`data-focus`, priorité numérique), Échap (`data-retour` ou `Duo.surEchap`), anti-double-appui de 300 ms, grille à flèches, onglets, compte à rebours, piège à focus des fenêtres.
 - `capturer.js` (captures et planche), `verifier-mise-en-page.js` (débordements et contrastes WCAG), `verifier-clavier.js` (clavier seul, comptage des actions). Les trois se lancent depuis la racine du dépôt avec `node`.
+
+## Interface en jeu (couche HTML sur une scène 3D)
+
+- Modèle clavier en jeu validé pour La Petite Ligne: Échap = pause de Duo, ne ferme aucun menu du jeu; un menu se ferme par sa touche ou Retour arrière (et clic hors du menu); une carte qui demande une réponse (proposition) ne prend jamais le focus, car Espace agit dans le monde: Entrée l'amène dessus. Exemple complet: `games/la-petite-ligne/ui-maquettes/README.md`.
+- Régions du HUD ancrées aux coins (position absolue), jamais une grille à trois rangées: avec la taille d'interface à 150 % sur 1366x768, la grille repoussait la barre d'outils hors de l'écran.
+- Les media queries en `rem` ignorent la taille de police de la racine: la taille d'interface ne se détecte pas ainsi; utiliser `min()` et `clamp()` avec `vw` ou `vh`.
+- Tout composant à fond papier fixe sa propre couleur de texte: posé dans un en-tête sombre, il héritait du texte clair (contraste 1:1, trouvé par le vérificateur).
+- Couleurs de profil Duo sur fond clair: l'aqua n'a que 1,3:1 sur le papier; le jeton du joueur garde un anneau d'encre, qui porte le contraste.
+- Palette d'un jeu: celle du décor de l'artiste 3D (`games/<jeu>/assets-src/modeles/palette.py`) existe souvent avant la bible artistique.
+
+## Pièges vérifiés (suite)
+
+- Le `package.json` racine est en `"type": "module"`: un script Node qui fait `require('playwright')` doit être en `.cjs` (playwright est installé hors du dépôt, dans `/opt/node-tools`, introuvable par `import`).
+- Prettier contrôle `games/**` (pas `design/` ni `docs/`): passer `node_modules/.bin/prettier --write` sur ses fichiers, et faire produire par les générateurs un fichier déjà au format (chaîne entre apostrophes, retour à la ligne après `=`). Un `.svg` cité explicitement fait échouer `--check`; un dossier entier, non.
+- `outils/verifier-depot.mjs` contrôle aussi le code des maquettes sous `games/` (aucun `console.log`, marqueur de tâche avec `(#n)`).
+- L'attribut `hidden` perd contre le `display` d'un composant: règle `[hidden] { display: none !important }`. Les éléments SVG n'ont pas de propriété `hidden`: `toggleAttribute('hidden', …)`.
+- `<use href="sprite.svg#id">` externe est refusé par Chromium en `file://`: injecter le sprite dans la page par un script.
+- Détecter un débordement de texte par les rectangles des nœuds de texte (`Range`), pas par `scrollWidth`, gonflé par les badges en position absolue.
+- `focus()` sur un champ prérempli met le curseur au début: `setSelectionRange(fin, fin)`.
+- `hashchange` est asynchrone: attendre un instant avant de lire l'état dans Playwright.
+- Après `typographier.py`, une recherche exacte de « ! » ou « ? » échoue (espace fine U+202F devant): chercher par expression régulière.
+- Fraunces et Nunito Sans (fontsource 5.3.0): ni espace fine insécable ni chiffres tabulaires (horloge à largeur fixe, mise à jour toutes les 10 minutes de jeu).

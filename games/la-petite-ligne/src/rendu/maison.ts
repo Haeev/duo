@@ -41,14 +41,33 @@ const WALL_FACES_CAMERA = 0.25;
 const FURNITURE_PICK_HEIGHT = 1;
 const FURNITURE_PICK_INSET = 0.05;
 
-/** Une pièce de bâtiment qui peut être cachée, fantôme ou solide. */
+/** Une pièce de bâtiment: mur ou toit (coupés quand on est dedans), ou élément à construire. */
 interface BuildPart {
-  solid: Object3D;
-  ghost: Mesh[];
-  material: MeshBasicMaterial | null;
-  /** Direction (au sol) vers laquelle regarde un mur, pour la coupe; `null` pour le reste. */
+  node: Object3D;
+  /** Appartient à la ruine ou au modèle réparé. */
+  owner: 'ruin' | 'repaired';
+  /** Direction (au sol, repère du modèle) vers laquelle regarde un mur; `null` pour le reste. */
   facing: Vector3 | null;
   roof: boolean;
+}
+
+interface ElementPart {
+  construction: string;
+  element: string;
+  node: Object3D;
+  ghost: Mesh[];
+  material: MeshBasicMaterial;
+  roof: boolean;
+}
+
+export interface StagedState {
+  repaired: boolean;
+  /** La construction a commencé: les restes du vieux toit laissent place aux fantômes. */
+  hideRuinRoof: boolean;
+  constructions: readonly DeepReadonly<ConstructionState>[];
+  time: number;
+  cut: boolean;
+  toCamera: Vector3;
 }
 
 function ghostCopies(source: Object3D, material: Material): Mesh[] {
@@ -71,38 +90,42 @@ class StagedBuilding {
   readonly group = new Group();
   readonly ruin: Object3D;
   readonly repaired: Object3D;
-  private readonly elementParts = new Map<string, BuildPart>();
-  private readonly staticParts: BuildPart[] = [];
+  private readonly elements: ElementPart[] = [];
+  private readonly parts: BuildPart[] = [];
+  private readonly fixed: Object3D[] = [];
   private readonly centre = new Vector3();
+  private readonly worldFacing = new Vector3();
 
   constructor(
     prop: MapProp,
     ground: number,
-    private readonly library: ModelLibrary,
+    library: ModelLibrary,
     private readonly resources: ResourceTracker,
     private readonly materials: SharedMaterials,
     names: { ruin: string; repaired: string },
+    host: Group,
   ) {
     this.group.name = prop.model;
     propMatrix(prop, ground, this.group.matrix);
     this.group.matrix.decompose(this.group.position, this.group.quaternion, this.group.scale);
     this.ruin = library.instantiate(library.has(names.ruin) ? names.ruin : prop.model, propHints(prop));
     this.repaired = library.has(names.repaired) ? library.instantiate(names.repaired, propHints(prop)) : this.ruin;
-    for (const model of [this.ruin, this.repaired]) {
+    for (const model of new Set([this.ruin, this.repaired])) {
       model.traverse((object) => {
         object.castShadow = true;
         object.receiveShadow = true;
       });
       this.group.add(model);
     }
+    host.add(this.group);
     this.group.updateMatrixWorld(true);
     new Box3().setFromObject(this.repaired).getCenter(this.centre);
   }
 
-  /** Associe un élément de construction à un nœud du modèle réparé (ou de la ruine). */
-  bindElement(elementId: string, nodeName: string, roof: boolean): void {
-    const solid = this.repaired.getObjectByName(nodeName);
-    if (solid === undefined) {
+  /** Associe un élément de construction à un nœud du modèle réparé (un élément peut en montrer plusieurs). */
+  bindElement(construction: string, element: string, nodeName: string, roof: boolean): void {
+    const node = this.repaired.getObjectByName(nodeName);
+    if (node === undefined || this.repaired === this.ruin) {
       return;
     }
     const material = this.resources.track(
@@ -114,86 +137,107 @@ class StagedBuilding {
         depthWrite: false,
       }),
     );
-    const ghost = ghostCopies(solid, material);
+    const ghost = ghostCopies(node, material);
     for (const mesh of ghost) {
       this.group.parent?.add(mesh);
     }
-    this.elementParts.set(elementId, { solid, ghost, material, facing: null, roof });
+    this.elements.push({ construction, element, node, ghost, material, roof });
   }
 
-  /** Repère les murs (par la position de leur centre) et le toit, pour la coupe. */
-  indexCutParts(model: Object3D, roofPattern: RegExp, wallPattern: RegExp): void {
+  /** Après les liaisons: repère les murs et le toit (coupe) et les pièces fixes du modèle réparé. */
+  finish(roofPattern: RegExp, wallPattern: RegExp): void {
     const box = new Box3();
     const centre = new Vector3();
     const origin = new Vector3();
     this.group.getWorldPosition(origin);
-    model.traverse((object) => {
-      if (object.parent !== model) {
-        return;
+    const inverse = this.group.quaternion.clone().invert();
+    const elementNodes = new Set(this.elements.map((element) => element.node));
+    const containsElement = (object: Object3D): boolean => {
+      let found = false;
+      object.traverse((child) => {
+        found ||= elementNodes.has(child);
+      });
+      return found;
+    };
+    for (const [owner, model] of [
+      ['ruin', this.ruin],
+      ['repaired', this.repaired],
+    ] as const) {
+      if (owner === 'repaired' && model === this.ruin) {
+        continue;
       }
-      if (roofPattern.test(object.name)) {
-        this.staticParts.push({ solid: object, ghost: [], material: null, facing: null, roof: true });
-      } else if (wallPattern.test(object.name)) {
-        box.setFromObject(object).getCenter(centre).sub(origin);
-        centre.y = 0;
-        const facing = Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
-        this.staticParts.push({ solid: object, ghost: [], material: null, facing, roof: false });
+      for (const child of model.children) {
+        if (owner === 'repaired' && !containsElement(child)) {
+          this.fixed.push(child);
+        }
+        if (roofPattern.test(child.name)) {
+          this.parts.push({ node: child, owner, facing: null, roof: true });
+        } else if (wallPattern.test(child.name)) {
+          box.setFromObject(child).getCenter(centre).sub(origin).applyQuaternion(inverse);
+          const facing =
+            Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
+          this.parts.push({ node: child, owner, facing, roof: false });
+        }
       }
-    });
+    }
   }
 
-  /** Centre du bâtiment (effets: poussière quand un élément est fini). */
   center(): Vector3 {
     return this.centre;
   }
 
-  elementCenter(elementId: string, out: Vector3): Vector3 {
-    const part = this.elementParts.get(elementId);
+  elementCenter(element: string, out: Vector3): Vector3 {
+    const part = this.elements.find((candidate) => candidate.element === element);
     if (part === undefined) {
       return out.copy(this.centre);
     }
-    return new Box3().setFromObject(part.solid).getCenter(out);
+    return new Box3().setFromObject(part.node).getCenter(out);
   }
 
-  /**
-   * Met les éléments à l'état de la construction: caché (verrouillée), fantôme
-   * qui se remplit avec la progression, ou solide.
-   */
-  applyConstruction(construction: DeepReadonly<ConstructionState> | undefined, time: number, cut: boolean): void {
-    const pulse = Math.sin(time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
-    for (const [id, part] of this.elementParts) {
-      const element = construction?.elements.find((candidate) => candidate.id === id);
+  private cutAway(part: { roof: boolean; facing: Vector3 | null }, state: StagedState): boolean {
+    if (!state.cut) {
+      return false;
+    }
+    if (part.roof) {
+      return true;
+    }
+    if (part.facing === null) {
+      return false;
+    }
+    this.worldFacing.copy(part.facing).applyQuaternion(this.group.quaternion);
+    return this.worldFacing.dot(state.toCamera) > WALL_FACES_CAMERA;
+  }
+
+  apply(state: StagedState): void {
+    const separate = this.repaired !== this.ruin;
+    this.ruin.visible = !separate || !state.repaired;
+    for (const node of this.fixed) {
+      node.visible = state.repaired;
+    }
+    for (const part of this.parts) {
+      const base = part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
+      part.node.visible = base && !this.cutAway(part, state);
+    }
+    const pulse = Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
+    for (const part of this.elements) {
+      const construction = state.constructions.find((candidate) => candidate.id === part.construction);
+      const element = construction?.elements.find((candidate) => candidate.id === part.element);
       const status = construction?.status ?? 'locked';
       const solid = status === 'done' || element?.done === true;
       const ghost = status === 'ghost' && !solid;
-      const hiddenByCut = cut && part.roof;
-      part.solid.visible = solid && !hiddenByCut;
+      const hidden = part.roof && state.cut;
+      part.node.visible = solid && !hidden;
       for (const mesh of part.ghost) {
-        mesh.visible = ghost && !hiddenByCut;
+        mesh.visible = ghost && !hidden;
       }
-      if (ghost && part.material !== null) {
+      if (ghost) {
         part.material.opacity = GHOST_BASE_OPACITY + GHOST_PROGRESS_OPACITY * (element?.progress ?? 0) + pulse;
       }
     }
   }
 
-  /** Coupe le toit et les murs tournés vers la caméra (personnage local à l'intérieur). */
-  applyCut(cut: boolean, toCamera: Vector3): void {
-    for (const part of this.staticParts) {
-      if (part.roof) {
-        part.solid.visible = part.solid.visible && !cut;
-        continue;
-      }
-      if (part.facing === null) {
-        continue;
-      }
-      const facing = part.facing.clone().applyQuaternion(this.group.quaternion);
-      part.solid.visible = !(cut && facing.dot(toCamera) > WALL_FACES_CAMERA);
-    }
-  }
-
   dispose(): void {
-    for (const part of this.elementParts.values()) {
+    for (const part of this.elements) {
       for (const mesh of part.ghost) {
         mesh.removeFromParent();
       }
@@ -229,44 +273,51 @@ export class HousePart implements EventfulPart {
     this.group.name = 'maisonnette';
     const houseProp = map.props.find((prop) => prop.model === HOUSE_PROP);
     if (houseProp !== undefined) {
-      const house = new StagedBuilding(houseProp, 0, library, resources, materials, {
-        ruin: `${HOUSE_PROP}_ruin`,
-        repaired: `${HOUSE_PROP}_repaired`,
-      });
-      this.group.add(house.group);
+      const house = new StagedBuilding(
+        houseProp,
+        0,
+        library,
+        resources,
+        materials,
+        { ruin: `${HOUSE_PROP}_ruin`, repaired: `${HOUSE_PROP}_repaired` },
+        this.group,
+      );
       const roof = content.constructions.find((construction) => construction.id === 'house_roof');
       const roofNode = `${HOUSE_PROP}_repaired_roof_part_`;
       roof?.elements.forEach((element, index) => {
-        house.bindElement(element.id, `${roofNode}${String(index + 1).padStart(2, '0')}`, true);
+        house.bindElement('house_roof', element.id, `${roofNode}${String(index + 1).padStart(2, '0')}`, true);
       });
-      const beamIndex = (roof?.elements.length ?? 0) + 1;
-      house.bindElement('house_beam', `${roofNode}${String(beamIndex).padStart(2, '0')}`, true);
+      // La poutre portée à deux devient le faîtage, la pièce qui suit les éléments du toit.
+      house.bindElement('house_beam', 'house_beam', `${roofNode}${String((roof?.elements.length ?? 0) + 1).padStart(2, '0')}`, true);
       const door = content.constructions.find((construction) => construction.id === 'house_door');
       for (const element of door?.elements ?? []) {
-        house.bindElement(element.id, `${HOUSE_PROP}_repaired_door`, false);
+        house.bindElement('house_door', element.id, `${HOUSE_PROP}_repaired_door`, false);
       }
-      house.indexCutParts(house.ruin, /_roof$|_attic$/, /_wall_/);
-      if (house.repaired !== house.ruin) {
-        house.indexCutParts(house.repaired, /_attic$/, /_wall_/);
-      }
+      house.finish(/_roof$|_attic$/, /_wall_/);
       this.house = house;
     }
     const coopProp = map.props.find((prop) => prop.model === COOP_PROP);
     if (coopProp !== undefined) {
-      const coop = new StagedBuilding(coopProp, this.terrain.heightAt(coopProp.pos.x, coopProp.pos.y), library, resources, materials, {
-        ruin: `${COOP_PROP}_ruin`,
-        repaired: `${COOP_PROP}_repaired`,
-      });
-      this.group.add(coop.group);
-      const parts: Record<string, string> = {
-        coop_floor: `${COOP_PROP}_repaired_ramp`,
-        coop_wall_left: `${COOP_PROP}_repaired_walls`,
-        coop_wall_right: `${COOP_PROP}_repaired_door`,
-        coop_roof: `${COOP_PROP}_repaired_roof`,
-      };
-      for (const [element, node] of Object.entries(parts)) {
-        coop.bindElement(element, node, false);
+      const coop = new StagedBuilding(
+        coopProp,
+        this.terrain.heightAt(coopProp.pos.x, coopProp.pos.y),
+        library,
+        resources,
+        materials,
+        { ruin: `${COOP_PROP}_ruin`, repaired: `${COOP_PROP}_repaired` },
+        this.group,
+      );
+      const parts: readonly [string, string][] = [
+        ['coop_floor', 'ramp'],
+        ['coop_wall_left', 'walls'],
+        ['coop_wall_right', 'fence'],
+        ['coop_roof', 'roof'],
+        ['coop_roof', 'door'],
+      ];
+      for (const [element, node] of parts) {
+        coop.bindElement('chicken_coop', element, `${COOP_PROP}_repaired_${node}`, false);
       }
+      coop.finish(/^$/, /^$/);
       this.coop = coop;
     }
   }
@@ -276,12 +327,7 @@ export class HousePart implements EventfulPart {
     if (construction === 'chicken_coop') {
       return this.coop?.elementCenter(element, out) ?? null;
     }
-    return this.house?.elementCenter(construction === 'house_beam' ? 'house_beam' : element, out) ?? null;
-  }
-
-  private stagedState(building: StagedBuilding, constructions: readonly DeepReadonly<ConstructionState>[], ids: readonly string[]): boolean {
-    const all = ids.map((id) => constructions.find((construction) => construction.id === id));
-    return all.every((construction) => construction?.status === 'done');
+    return this.house?.elementCenter(element, out) ?? null;
   }
 
   update(context: FrameContext): void {
@@ -292,34 +338,26 @@ export class HousePart implements EventfulPart {
     const find = (id: string): DeepReadonly<ConstructionState> | undefined =>
       world.constructions.find((construction) => construction.id === id);
 
-    if (this.house !== null) {
-      const repaired = this.stagedState(this.house, world.constructions, ['house_roof', 'house_door']);
-      this.house.ruin.visible = !repaired || this.house.repaired === this.house.ruin;
-      this.house.repaired.visible = repaired;
-      // Pendant le chantier, les restes du vieux toit laissent place aux fantômes.
-      const roofWork = find('house_roof')?.status !== 'locked';
-      const ruinRoof = this.house.ruin.getObjectByName(`${HOUSE_PROP}_ruin_roof`);
-      if (ruinRoof !== undefined) {
-        ruinRoof.visible = !roofWork;
-      }
-      this.house.applyConstruction(find('house_roof'), context.time, inside);
-      this.house.applyConstruction(find('house_door'), context.time, inside);
-      this.house.applyConstruction(find('house_beam'), context.time, inside);
-      this.house.applyCut(inside, this.toCamera);
-    }
+    const done = (id: string): boolean => find(id)?.status === 'done';
+    this.house?.apply({
+      repaired: done('house_roof') && done('house_door'),
+      hideRuinRoof: find('house_roof')?.status !== 'locked',
+      constructions: world.constructions,
+      time: context.time,
+      cut: inside,
+      toCamera: this.toCamera,
+    });
+    this.coop?.apply({
+      repaired: done('chicken_coop'),
+      hideRuinRoof: false,
+      constructions: world.constructions,
+      time: context.time,
+      cut: false,
+      toCamera: this.toCamera,
+    });
     if (this.coop !== null) {
-      const repaired = this.stagedState(this.coop, world.constructions, ['chicken_coop']);
-      const working = find('chicken_coop')?.status === 'ghost';
-      this.coop.repaired.visible = repaired;
-      this.coop.ruin.visible = !repaired && this.coop.repaired !== this.coop.ruin;
-      if (working) {
-        this.coop.ruin.traverse((object) => {
-          if (/_(walls|roof|door)$/.test(object.name)) {
-            object.visible = false;
-          }
-        });
-      }
-      this.coop.applyConstruction(find('chicken_coop'), context.time, false);
+      // Pendant le chantier du poulailler, la ruine s'efface derrière les fantômes.
+      this.coop.ruin.visible = find('chicken_coop')?.status === 'locked';
     }
     this.updateFurniture(world.furniture);
     this.updateGhosts(context);
