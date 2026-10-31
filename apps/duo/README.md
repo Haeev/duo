@@ -23,10 +23,13 @@ Sous Linux sans écran: `xvfb-run -a -s "-screen 0 1600x1000x24" pnpm test:e2e`.
 |---|---|
 | `--duo-data-dir=<dossier>` | dossier de données, appliqué avant le verrou d'instance unique: deux instances aux dossiers distincts coexistent |
 | `--duo-games-dir=<dossier>` | dossier de jeux supplémentaire; chaque sous-dossier porte l'identifiant du jeu: paquet à plat (`<id>/duo-game.json`) ou paquet du dépôt (`<id>/duo-game.json` et le site dans `<id>/dist/`) |
-| `--duo-liaison-port=<port>` | port de base de la liaison provisoire (défaut 39430; la seconde instance prend le suivant) |
-| `--duo-peer-address=<hôte>:<port>` | liaison provisoire entre deux machines, sans découverte: chaque Duo écoute sur toutes ses interfaces et appelle l'autre |
+| `--duo-port=<n>` | port UDP et TCP de base du réseau local (39420 par défaut; replis TCP sur les deux suivants) |
+| `--duo-peer=<adresse>:<port>` | destination directe en plus des diffusions, répétable (boucle locale, réseau qui filtre la diffusion) |
+| `--duo-allow-loopback` | admet les sources 127.0.0.0/8 et n'écoute que sur la boucle locale (deux instances sur une machine) |
 
-Deux instances sur une machine: `electron . --duo-data-dir=/tmp/a` et `electron . --duo-data-dir=/tmp/b` (même port de base). Sans `--duo-games-dir`, en développement, les jeux viennent de `games/*` (manifeste à la racine du paquet, site construit dans `dist/`); dans une version empaquetée, de `resources/games/` et du dossier de données (`games/`).
+Deux instances sur une machine: `electron . --duo-data-dir=/tmp/a --duo-port=41410 --duo-peer=127.0.0.1:41415 --duo-allow-loopback` et `electron . --duo-data-dir=/tmp/b --duo-port=41415 --duo-peer=127.0.0.1:41410 --duo-allow-loopback`. Sur deux machines du même réseau: aucune option, les deux Duo se trouvent par diffusion sur le port 39420.
+
+Version de test seulement (`pnpm build:test`): la variable d'environnement `DUO_TEST_GAME_QUERY` ajoute des paramètres à l'adresse du jeu (`rendu=leger` pour La Petite Ligne dans le Chromium logiciel du cloud). Sans `--duo-games-dir`, en développement, les jeux viennent de `games/*` (manifeste à la racine du paquet, site construit dans `dist/`); dans une version empaquetée, de `resources/games/` et du dossier de données (`games/`).
 
 ## Organisation
 
@@ -40,7 +43,7 @@ src/
     window.ts    BaseWindow, vue plateforme (pleine, bandeau d'indication, masquée)
     protocols.ts duo://app/ et duo-game://<id>/ (CSP, chemins contrôlés, requêtes partielles)
     game-host/   vue jeu, pont, battement de cœur
-    liaison/     interface Liaison, machine du salon et de la partie, liaison provisoire (local/)
+    liaison/     interface Liaison, machine du salon et de la partie, adaptateur réseau (network-liaison.ts), liaison provisoire (local/, tests)
     data/        écriture sûre, machine.json, profile.json, settings.json, sauvegardes du prototype
     games/       catalogue et manifeste
     protocol/    copie à l'identique de packages/protocol/src (provisoire)
@@ -54,6 +57,6 @@ tests/
 ## Provisoire, à reprendre à la fusion
 
 - `src/main/protocol/`: copie de `packages/protocol/src`; remplacer les imports `../protocol` par `@duo/protocol` (dépendance `workspace:*`) et supprimer le dossier.
-- `src/main/liaison/local/`: liaison TCP provisoire. La plateforme ne dépend que de l'interface `Liaison` (`src/main/liaison/liaison.ts`); `packages/liaison` (dev-reseau) la remplace dans `index.ts`.
+- `src/main/liaison/local/`: liaison TCP provisoire, gardée pour ses tests unitaires. `index.ts` branche `NetworkLiaison` (`network-liaison.ts`), l'adaptateur sur `@duo/liaison` (dev-reseau): découverte, liaison authentifiée par la clé du duo (`<userData>/reseau.json`), vivacité, reprise numérotée, heure de session et relais; le salon et la partie restent ceux de `session-machine.ts`. Les schémas des messages du salon viennent encore de `local/wire.ts`.
 - Sauvegardes: un emplacement par jeu chez l'hôte, sans réplication (`data/local-saves.ts`); le lot L9 apporte celles de l'ADR 0009.
-- Heure de session: `Date.now()` de chaque machine, écart 0 dans `init`; l'heure commune vient de la liaison de dev-reseau.
+- Heure de session: celle de l'hôte, sur la base `performance.timeOrigin + performance.now()` du SDK; écart fourni par `liaison.sessionOffsetMs()` dans `init` et tenu à jour chaque seconde par les messages `link` (qualité du lien). Le départ reste « tout de suite » à la réception de la phase `playing`: un départ fixé à une heure commune un peu plus tard (reseau.md, section 10.1) est la prochaine étape.

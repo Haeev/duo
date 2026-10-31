@@ -48,12 +48,14 @@ export function createMachine(
     incompatible: [],
     others: [],
     interfaces: [],
+    app: [],
   };
   liaison.on('partner', (payload) => events.partner.push(payload));
   liaison.on('session', (payload) => events.session.push(payload));
   liaison.on('game', (payload) => events.game.push(payload));
   liaison.on('notice', (payload) => events.notice.push(payload));
   liaison.on('incompatible', (payload) => events.incompatible.push(payload));
+  liaison.on('app', (payload) => events.app.push(payload));
   return { liaison, store, logs, events };
 }
 

@@ -29,13 +29,23 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 
 ## Paquet `@duo/liaison` (vérifié le 2026-10-31)
 
-- Node 22.22 exécute le TypeScript tel quel si les imports portent `.ts`: `allowImportingTsExtensions` et `erasableSyntaxOnly` dans le tsconfig (ni propriétés de paramètres de constructeur, ni `enum`). Un script `.mjs` du dossier temporaire peut importer `packages/liaison/src/x.ts` par son chemin: les dépendances se résolvent depuis le paquet. Le paquet doit être regroupé par electron-vite (`externalizeDepsPlugin({ exclude: ['@duo/liaison'] })`), `ws` restant externe.
+- Node 22.22 exécute le TypeScript tel quel si les imports portent `.ts`: `allowImportingTsExtensions` et `erasableSyntaxOnly` dans le tsconfig (ni propriétés de paramètres de constructeur, ni `enum`). Un script `.mjs` du dossier temporaire peut importer `packages/liaison/src/x.ts` par son chemin: les dépendances se résolvent depuis le paquet. L'application le regroupe avec tout le reste (`externalizeDeps: false`, `ws` compris) et ajoute `allowImportingTsExtensions` à son tsconfig du principal.
+- Sous macOS, seule 127.0.0.1 existe sur l'interface de bouclage: un appel vers 127.0.0.2 expire au lieu d'être refusé (runner macOS de GitHub). Pour éprouver un refus net partout: 127.0.0.1 sur des ports fermés.
 - `ws` 8.22: codes de fermeture admis 1000 à 1003, 1007 à 1014 et 3000 à 4999; la fermeture propre attend 30 s une réponse, d'où `terminate()` après 1 s. Le client n'envoie pas d'`Origin` sans option. Une socket sans écouteur `message` perd ses trames: abonner dès l'ouverture et garder une file jusqu'aux gestionnaires.
 - Piège: un plafond de débit compté à l'arrivée jette la rafale légitime d'une reprise (entrées perdues). Plafond strict à l'envoi, seau à jetons à grande rafale (30 s) à la réception.
 - Piège: au passage en régime actif, réarmer tout de suite le battement (sinon la cadence de repos de 2 s court jusqu'au tour suivant, silence d'1 s, reconnexion anticipée inutile) et compter le silence depuis le début du régime actif.
 - Banc simulé: un processus « tué » doit se taire (ses minuteurs tournent encore sur l'horloge commune) et laisser une machine sans écoute (refus net). `stop()` attend les adieux UDP espacés de 50 ms: en temps simulé, avancer l'horloge avant d'attendre la promesse.
 - Mesures du banc simulé: pause demandée par l'invité en R1, médiane 56 ms, 95e centile 90 ms, maximum 285 ms (200 essais); coupure franche en partie, pause des deux côtés 2 045 ms après; découverte en R1, 278 à 514 ms. Deux processus sur la boucle locale: découverte une vingtaine de millisecondes après le second démarrage, décompte et départ alignés à 1 ms.
 - Copie isolée (worktree): l'outil Bash refuse les commandes composées qui mentionnent git, `--exclude-dir=.git` ou un `cd` hors de la copie. Une commande git par appel; pour les tirets, `pnpm verifier` ou un grep sur les dossiers voulus.
+- Copie isolée et consigne « travaille dans l'arbre principal »: Write et Edit refusent l'arbre principal. Ne pas contourner par Bash: avancer sa copie (`git merge --ff-only <branche de session>`), y travailler, et donner au manager la liste des fichiers.
+
+## Branchement dans l'application (vérifié le 2026-10-31, Electron 45, xvfb)
+
+- `apps/duo` garde sa machine du salon (`session-machine.ts`); l'adaptateur `network-liaison.ts` crée la liaison en salon externe (`externalSession`, `sendApp`, `setActive`), messages de jeu en trames binaires (texte UTF-8 du SDK, sans second encodage).
+- Piège: un minuteur de Node sonne parfois une fraction de milliseconde avant l'échéance lue sur `performance.now()`. Une échéance testée au tick doit se réarmer si rien n'a changé (décompte du salon bloqué pour toujours dans Electron). L'horloge manuelle du banc ne le montre pas: le reproduire par des minuteurs en avance.
+- Horloge système de la liaison: `performance.timeOrigin + performance.now()`, même base que `sessionTimeMs()` du SDK; écart du jeu = 0 chez l'hôte, `clockOffsetMs` chez l'invité. L'interface compte en `Date.now()`: lui rapporter les heures à l'émission.
+- Electron 45: binaire par `node node_modules/electron/install.js` (aucun script d'installation). Vite regroupe `ws`: ses dépendances natives facultatives deviennent des modules qui lèvent une erreur dans ses `try`, sans conséquence.
+- La Petite Ligne en rendu normal fige sa page plus de 5 s au premier affichage dans le cloud (4 cœurs, deux rendus SwiftShader): le chien de garde de la plateforme clôt la partie. Tests à deux instances: `DUO_TEST_GAME_QUERY=rendu=leger` (version de test). Mesuré: départ donné aux deux à 1 à 3 ms d'écart, messages de jeu reçus en nombre exact des deux côtés.
 
 ## Systèmes (faits lus, à confirmer sur les machines du client)
 

@@ -37,8 +37,8 @@ Rien n'écoute avant `start()`. `start()` ouvre l'écoute TCP d'abord (c'est ell
 
 ### Intégration dans le principal (electron-vite)
 
-- Le paquet expose ses sources TypeScript (`exports` vers `src/index.ts`, imports en `.ts`, syntaxe effaçable). Il doit être **regroupé** dans le principal: `externalizeDepsPlugin({ exclude: ['@duo/liaison'] })`. Sinon Electron chercherait à charger des fichiers `.ts` à l'exécution.
-- `ws` et `valibot` restent externes (dépendances de l'application). `ws` essaie de charger `bufferutil` et `utf-8-validate`, facultatifs et natifs: ne pas les installer, et ne pas regrouper `ws` (sa recherche facultative casserait le regroupement).
+- Le paquet expose ses sources TypeScript (`exports` vers `src/index.ts`, imports en `.ts`, syntaxe effaçable). Il doit être **regroupé** dans le principal; le tsconfig du principal porte `allowImportingTsExtensions`. L'application Duo regroupe tout (`externalizeDeps: false`).
+- `ws` se regroupe sans souci: Vite remplace ses dépendances natives facultatives (`bufferutil`, `utf-8-validate`) par des modules qui lèvent une erreur dans les `try` de `ws`, qui repasse alors sur son code JavaScript (vérifié dans Electron 45 par le test Playwright à deux instances). Ne pas installer ces deux paquets natifs.
 - Le principal ne doit rien faire de lourd sur son fil (ADR 0003): un blocage de 2 s ferait déclarer la liaison perdue par l'autre machine.
 - Pendant un salon ou une partie, `powerSaveBlocker.start('prevent-app-suspension')` sur les deux machines (App Nap de macOS espacerait les battements).
 
@@ -63,6 +63,7 @@ Rien n'écoute avant `start()`. `start()` ouvre l'écoute TCP d'abord (c'est ell
 | `config` | remplacements des valeurs de `DEFAULT_CONFIG` (cadences, seuils, plafonds) | aucun |
 | `driver` | pilote réseau injecté (réseau simulé des tests) | Node: `ws`, `dgram`, `os` |
 | `log` | `(event, data) => void`, événements courts sans pseudo ni nom d'ordinateur (ADR 0015) | aucun journal |
+| `externalSession` | salon et partie tenus par l'application (voir « Salon externe ») | non |
 
 `parseNetworkCommandLine(process.argv)` lit `--duo-port=<n>`, `--duo-peer=<adresse>:<port>` (répétable) et `--duo-allow-loopback`, et rend `{ port?, peers, allowLoopback, invalid }`: on peut l'étaler dans les options. Les options mal écrites sont dans `invalid`, à journaliser.
 
@@ -79,12 +80,14 @@ Mémoire: `createFileStore(chemin)` lit et valide un fichier JSON (illisible: m�
 | `session(): SessionView` | salon et partie, à l'instant |
 | `quality(): LinkQuality \| null` | aller-retour (médiane et 95e centile sur 10 s), gigue, écart d'horloge, silence, `good` ou `unstable` |
 | `sessionTime(): number` | heure de session: horloge de l'hôte du salon où l'on est (la nôtre si l'on est hôte ou seul) |
-| `now(): number` | horloge locale du module (`performance.now()` du principal) |
+| `now(): number` | horloge locale du module: `performance.timeOrigin + performance.now()` du principal, la base de l'heure de session du SDK |
 | `interfaces()` | interfaces retenues (nom, adresse, préfixe, diffusion, physique ou virtuelle), pour Réglages > Réseau |
 | `others()` | autres ordinateurs avec Duo vus sur le réseau, hors partenaire relié |
 | `connectTo(adresse)` | connexion par adresse saisie (recours): virgule acceptée pour le point, trois ports essayés ensemble, 5 s au plus |
 | `searchNow()` | série de requêtes immédiate (ouverture de E04 ou E17) |
 | `updateProfile(profile)`, `updateGames(games)` | envoyés tout de suite à l'autre par la liaison (`profile.update`, `games.update`), et repris dans les balises et les poignées de main suivantes |
+| `sendApp(type, body)` | salon externe: message fiable vers l'autre machine (une fois, dans l'ordre, à travers les reprises); `false` sans liaison. `body` ne porte ni `type` ni `seq` |
+| `setActive(active)` | salon externe: régime actif (battement de 500 ms, perte à 2 s) tant que vrai |
 | `lobby` | `open(game)`, `select(game)`, `join()`, `setReady(ready)`, `leave()` |
 | `match` | `reportLoaded()`, `pause()`, `resume()`, `end(result, reason?)`, `send(channel, payload, mode)` |
 
@@ -99,6 +102,7 @@ Mémoire: `createFileStore(chemin)` lit et valide un fichier JSON (illisible: m�
 | `incompatible` | `{ machine, appVersion, protocol, update: 'self' \| 'peer' \| 'both' }` | un Duo au protocole différent (M-27): `update` désigne la machine à mettre à jour, la plus ancienne |
 | `others` | liste des autres Duo vus | à chaque apparition ou disparition |
 | `interfaces` | interfaces retenues | à chaque changement (Wi-Fi, câble) |
+| `app` | `{ type, body }` | salon externe: message fiable de l'application de l'autre machine |
 
 `partner.partner` porte `machine`, `instance`, `appVersion`, `protocol`, `pseudo`, `color`, `computer`, `games` et les champs facultatifs de l'ADR 0006.
 
@@ -140,7 +144,16 @@ Règles tenues par le paquet:
 - L'autre redémarre (reprise impossible): l'hôte clôt la partie (`peer-restarted`) et garde son salon; l'invité perd le salon de l'hôte (`peer-left`, raison `reset`).
 - `bye` reçu (l'autre ferme Duo): présence retirée aussitôt, salon et partie clos.
 
-Heures: `localTimes` et `now()` sont sur l'horloge du principal. La vue jeu a sa propre origine de `performance.now()`: la plateforme lui transmet l'écart (un aller-retour sur le `MessagePort`) pour convertir `startsAt` et `resumeAt`.
+Heures: `localTimes` et `now()` sont sur l'horloge du principal, `performance.timeOrigin + performance.now()`: la même base que l'heure de session du SDK dans la vue jeu (sur une même machine, à la milliseconde près). L'écart à donner au jeu est donc 0 chez l'hôte et `quality().clockOffsetMs` chez l'invité.
+
+## Salon externe
+
+L'application Duo garde sa propre machine à états du salon et de la partie (`apps/duo/src/main/liaison/session-machine.ts`); son adaptateur (`network-liaison.ts`) crée la liaison avec `externalSession: true`:
+
+- le salon intégré reste inutilisé; `match.send` et l'événement `game` passent à tout moment;
+- l'état du salon et les intentions de l'invité voyagent par `sendApp` et l'événement `app` (types `session` et `intent`), avec les garanties de la liaison: une fois, dans l'ordre, à travers une coupure;
+- l'application règle le régime par `setActive(true)` dès qu'un salon est ouvert d'un côté ou de l'autre;
+- les heures de l'hôte se convertissent par `quality().clockOffsetMs` (horloge de l'autre moins la nôtre), juste même pour un message réémis après une coupure.
 
 ## Messages de jeu
 

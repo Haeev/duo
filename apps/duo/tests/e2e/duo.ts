@@ -55,22 +55,36 @@ async function waitForPage(
   throw new Error(`Aucune page ${prefix} après ${timeoutMs} ms`);
 }
 
+/**
+ * Lance une instance. Deux instances sur une machine (ADR 0008): chacune son port de base,
+ * et l'autre en destination directe sur la boucle locale, où la diffusion n'existe pas.
+ */
 export async function launchDuo(options: {
   dataDir: string;
-  liaisonPort: number;
+  port: number;
+  peerPort?: number;
   gamesDir?: string;
+  /** Paramètres ajoutés à l'adresse du jeu (version de test), par exemple `rendu=leger`. */
+  gameQuery?: string;
 }): Promise<DuoInstance> {
   const args = [
     APP_DIR,
     `--duo-data-dir=${options.dataDir}`,
-    `--duo-liaison-port=${options.liaisonPort}`,
+    `--duo-port=${options.port}`,
+    '--duo-allow-loopback',
     // WebGL2 en rendu logiciel dans l'environnement cloud (ADR 0013, point 8).
     '--enable-unsafe-swiftshader',
   ];
+  if (options.peerPort !== undefined) args.push(`--duo-peer=127.0.0.1:${options.peerPort}`);
   if (options.gamesDir !== undefined) args.push(`--duo-games-dir=${options.gamesDir}`);
   // Electron refuse de tourner en root sans cette option (environnement cloud seulement).
   if (process.getuid?.() === 0) args.unshift('--no-sandbox');
-  const app = await electron.launch({ args, cwd: APP_DIR });
+  const env: Record<string, string> = {};
+  for (const [key, value] of Object.entries(process.env)) {
+    if (value !== undefined) env[key] = value;
+  }
+  if (options.gameQuery !== undefined) env.DUO_TEST_GAME_QUERY = options.gameQuery;
+  const app = await electron.launch({ args, cwd: APP_DIR, env });
   const platform = await waitForPage(app, 'duo://app/');
   await platform.waitForSelector('[data-testid^="ecran-"]');
   return { app, platform, dataDir: options.dataDir };

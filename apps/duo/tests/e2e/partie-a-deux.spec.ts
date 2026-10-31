@@ -47,12 +47,19 @@ async function startPair(port: number): Promise<[DuoInstance, DuoInstance]> {
   const sachaDir = await tempDataDir('Sacha');
   await seedProfile(camilleDir, 'Camille', 'orb');
   await seedProfile(sachaDir, 'Sacha', 'crescent');
+  // Ports de base distincts (TCP de base et deux replis, UDP de base): l'un appelle l'autre.
   const camille = await launchDuo({
     dataDir: camilleDir,
-    liaisonPort: port,
+    port,
+    peerPort: port + 5,
     gamesDir: FIXTURE_GAMES,
   });
-  const sacha = await launchDuo({ dataDir: sachaDir, liaisonPort: port, gamesDir: FIXTURE_GAMES });
+  const sacha = await launchDuo({
+    dataDir: sachaDir,
+    port: port + 5,
+    peerPort: port,
+    gamesDir: FIXTURE_GAMES,
+  });
   return [camille, sacha];
 }
 
