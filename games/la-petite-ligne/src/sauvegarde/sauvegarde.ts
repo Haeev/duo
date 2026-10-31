@@ -9,6 +9,7 @@ import type { Content } from '../donnees/types';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
+import { runEffects } from '../simulation/effets';
 import type { PlayerInfo } from '../simulation/monde';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
@@ -99,10 +100,51 @@ function checkWorld(data: unknown): WorldState {
   return data as unknown as WorldState;
 }
 
-/** Migrations d'un format au suivant (aucune encore: la démo écrit le format 1). */
-function migrate(data: unknown, dataSchema: number): unknown {
+/**
+ * Format 1 vers 2 (la démo passe à deux semaines): la commande payée au jour 8
+ * entre dans l'historique et la suivante devient la commande en cours; une fin
+ * de démo au jour 8 n'en est plus une, la partie reprend le soir du jour 8.
+ */
+function migrateToTwoWeeks(world: Record<string, unknown>, content: Content): void {
+  const result = world.orderResult;
+  const paid = isRecord(result);
+  world.orderIndex = paid ? Math.min(1, content.settings.order.trains.length - 1) : 0;
+  world.orderHistory = paid ? [structuredClone(result)] : [];
+  const clock = world.clock;
+  if (world.phase === 'ended' && isRecord(clock) && typeof clock.day === 'number' && clock.day < content.settings.clock.lastDay.day) {
+    world.phase = 'day';
+    world.ending = null;
+    clock.running = true;
+    clock.stoppedBy = null;
+  }
+}
+
+/** Migrations d'un format au suivant. */
+function migrate(data: unknown, dataSchema: number, content: Content): unknown {
   if (dataSchema > DATA_SCHEMA) throw new SaveError(`sauvegarde d'une version plus récente (format ${dataSchema})`);
+  if (dataSchema < 2 && isRecord(data)) migrateToTwoWeeks(data, content);
   return data;
+}
+
+/**
+ * Une sauvegarde du format 1 dont la commande du jour 8 est payée n'a pas joué
+ * les effets durables que les données ajoutent depuis à cette échéance
+ * (drapeaux, lettres, quête suivante): on les joue, sans les scènes.
+ */
+function catchUpFirstDeadline(sim: Sim): void {
+  const first = sim.content.settings.order.trains[0];
+  if (first === undefined || sim.world.orderHistory.length === 0) return;
+  const durable = new Set(['set_flag', 'start_quest', 'send_letter']);
+  for (const quest of sim.content.quests) {
+    for (const step of quest.steps) {
+      if (step.resolve !== 'at_deadline' || step.deadline?.day !== first.day) continue;
+      runEffects(
+        sim,
+        step.onDeadline.filter((e) => durable.has(e.type)),
+        null,
+      );
+    }
+  }
 }
 
 /**
@@ -136,7 +178,7 @@ export function restoreWorld(
   dataSchema: number,
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
-  const world = checkWorld(migrate(data, dataSchema));
+  const world = checkWorld(migrate(data, dataSchema, content));
   bindPlayers(world, players);
   for (const c of world.characters) {
     // Nouvelle séance: l'écran titre se repasse à deux.
@@ -156,6 +198,7 @@ export function restoreWorld(
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
+  if (dataSchema < 2) catchUpFirstDeadline(sim);
   if (scene !== null) startScene(sim, scene.dialogue);
   return sim;
 }

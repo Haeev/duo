@@ -10,14 +10,25 @@
     { "id": "cook_soup", "kind": "personal", "text": "Cuisiner une soupe.", "availableWhen": [{ "type": "recipe_known", "recipe": "cook_vegetable_soup" }], "fulfilledWhen": [{ "type": "crafted", "recipe": "cook_vegetable_soup", "count": 1, "who": "actor" }] },
     { "id": "help_odette", "kind": "personal", "text": "Rendre service à Mme Ferrand.", "availableWhen": [{ "type": "step_active", "quest": "welcome_supper", "step": "bring" }], "fulfilledWhen": [{ "type": "given", "villager": "odette", "count": 1, "who": "actor" }] },
     { "id": "watch_river", "kind": "personal", "text": "Regarder passer la rivière.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "riverbank", "seconds": 10, "who": "actor" }] },
-    { "id": "see_train", "kind": "personal", "text": "Voir arriver le train.", "availableWhen": [{ "type": "day_is", "days": [8] }], "fulfilledWhen": [{ "type": "witnessed", "event": "train_arrival", "who": "actor" }] },
+    { "id": "see_train", "kind": "personal", "text": "Voir arriver le train.", "availableWhen": [{ "type": "day_is", "days": [8, 15] }], "fulfilledWhen": [{ "type": "witnessed", "event": "train_arrival", "who": "actor" }] },
+    { "id": "catch_gudgeon", "kind": "personal", "text": "Pêcher un goujon.", "availableWhen": [{ "type": "day_at_least", "day": 9 }, { "type": "flag", "flag": "fishing_enabled" }], "fulfilledWhen": [{ "type": "caught", "item": "gudgeon", "count": 1, "who": "actor" }] },
+    { "id": "eat_omelette", "kind": "personal", "text": "Manger une omelette bien chaude.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "ate", "item": "omelette", "count": 1, "who": "actor" }] },
+    { "id": "hang_frame", "kind": "personal", "text": "Accrocher un cadre au mur.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "placed", "item": "picture_frame", "count": 1, "who": "actor" }] },
+    { "id": "visit_basile", "kind": "personal", "text": "Passer voir Basile.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "talked_to", "villager": "basile", "count": 1, "who": "actor" }] },
+    { "id": "fine_carrots", "kind": "personal", "text": "Récolter de belles carottes.", "availableWhen": [{ "type": "day_at_least", "day": 13 }], "fulfilledWhen": [{ "type": "harvested", "item": "carrot", "quality": "fine", "count": 1, "who": "actor" }] },
+    { "id": "more_wood", "kind": "personal", "text": "Rapporter du bois de la lisière.", "availableWhen": [{ "type": "day_at_least", "day": 9 }], "fulfilledWhen": [{ "type": "chopped", "count": 1, "who": "actor" }] },
     { "id": "watch_river_together", "kind": "shared", "text": "Regarder la rivière ensemble.", "availableWhen": [], "fulfilledWhen": [{ "type": "stayed_at", "point": "riverbank", "seconds": 10, "who": "both" }] },
     { "id": "tidy_together", "kind": "shared", "text": "Ranger la maison à deux.", "availableWhen": [], "fulfilledWhen": [{ "type": "placed", "count": 1, "who": "both" }] },
-    { "id": "supper_same_table", "kind": "shared", "text": "Souper à la même table.", "availableWhen": [], "fulfilledWhen": [{ "type": "ate_together", "atFurniture": "table" }] }
+    { "id": "supper_same_table", "kind": "shared", "text": "Souper à la même table.", "availableWhen": [], "fulfilledWhen": [{ "type": "ate_together", "atFurniture": "table" }] },
+    { "id": "fish_together", "kind": "shared", "text": "Un goujon pour chaque canne.", "availableWhen": [], "fulfilledWhen": [{ "type": "caught", "item": "gudgeon", "count": 1, "who": "both" }] },
+    { "id": "omelettes_together", "kind": "shared", "text": "Cuisiner des omelettes, à tour de rôle.", "availableWhen": [], "fulfilledWhen": [{ "type": "crafted", "recipe": "cook_omelette", "count": 1, "who": "both" }] }
   ],
   "sharedSchedule": [
     { "day": 2, "envie": "watch_river_together" },
     { "day": 5, "envie": "tidy_together" },
-    { "day": 7, "envie": "supper_same_table" }
+    { "day": 7, "envie": "supper_same_table" },
+    { "day": 9, "envie": "fish_together" },
+    { "day": 11, "envie": "omelettes_together" },
+    { "day": 13, "envie": "supper_same_table" }
   ]
 }

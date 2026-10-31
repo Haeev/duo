@@ -49,7 +49,7 @@ Secondaires (`side`), une par habitant:
 
 | Id | Habitant | Titre | Demande | Récompense |
 |---|---|---|---|---|
-| `odette_fry` | Odette | La friture d'Odette | 4 goujons | 40 sous et un pain chacun |
+| `odette_fry` | Odette | La friture d'Odette | 4 goujons | 40 sous et un pain par joueur |
 | `basile_omelette` | Basile | Un repas chaud pour Basile | 1 omelette | 30 sous |
 | `lucie_letter` | Jeanne | Le mot de Lucie | porter à Firmin la lettre de sa tante, puis le dire à Jeanne | 20 sous; Firmin rougit |
 | `firmin_flowers` | Firmin | Le quai en fête | 2 pots de fleurs (épicerie, 15 sous) donnés à Firmin | 50 sous |
@@ -57,7 +57,7 @@ Secondaires (`side`), une par habitant:
 
 ## 5. La deuxième énigme d'Émile
 
-- Départ: le jour 9 au plus tôt, la remise ouverte. Chacun reçoit la deuxième carte, trouvée dans le coffre à outils de la draisine.
+- Départ: le jour 9 au plus tôt, la remise ouverte. Les deux joueurs reçoivent la deuxième carte, trouvée dans le coffre à outils de la draisine.
 - Carte: « Chaque matin, quand le train approchait, je baissais la barrière et j'attendais à son pied. Ce que je gardais pour la suite de la ligne y dort encore. É. L. »
 - Solution: bêcher à moins de 2 m du passage à niveau (point `level_crossing`, à côté de la maisonnette), entre 9 h et 10 h, n'importe quel jour à partir du 9. Ailleurs ou à une autre heure: « Rien ici... pour l'instant. »
 - Différence avec la 1: pas de météo; c'est l'heure qu'il faut retrouver, en parlant aux habitants.
@@ -80,7 +80,7 @@ Les omelettes gagnent un prix de vente (20 sous) pour entrer dans la commande.
 
 - Lettres: `coop_order_2` (jour 8, 18 h: merci et commande 2), `basile_handcar` (jour 9, 6 h; deux versions selon que la remise est ouverte), `coop_catalogue_reminder_2` (jour 13, 6 h), `coop_recap_2` (au départ du jour 15).
 - Envies personnelles nouvelles (dès le jour 9): pêcher un goujon, manger une omelette, accrocher un cadre, rendre visite à Basile, une belle récolte de carottes, rapporter du bois; « Voir arriver le train » vaut aussi le jour 15.
-- Envies à deux: jour 9 « Pêcher chacun un poisson », jour 11 « Cuisiner des omelettes à deux », jour 13 « Souper à la même table ».
+- Envies à deux: jour 9 « Un goujon pour chaque canne », jour 11 « Cuisiner des omelettes, à tour de rôle », jour 13 « Souper à la même table ».
 - Astuces: la commande 2 (« les carottes poussent en 4 jours: sème-les tôt »), l'omelette (au départ de la quête de Basile).
 - Écran de fin: « Deux semaines à la Halte d'Aubrune ».
 

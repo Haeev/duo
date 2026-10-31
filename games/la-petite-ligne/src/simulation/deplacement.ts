@@ -8,7 +8,7 @@ import type { Character, CharacterId, Vec2 } from '../etat/types';
 import { ARRIVE_DISTANCE, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
-import { type Blockers, bodyCollides, findPath, moveBody } from './grille';
+import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody } from './grille';
 import { ZONE } from './ids';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
@@ -185,12 +185,37 @@ export function gatherAt(sim: Sim, pointId: string): void {
   if (sim.world.beam?.carried === true) sim.world.beam.carried = false;
 }
 
+/**
+ * Le point de retour de la maison, ou la case libre la plus proche si un
+ * meuble y est posé (sinon le personnage resterait pris dans le meuble).
+ */
+export function houseSpawn(sim: Sim): Vec2 {
+  const at = sim.map.house.spawn;
+  const b = refreshBlockers(sim);
+  const cx = Math.floor(at.x);
+  const cy = Math.floor(at.y);
+  if (!isBlockedCell(b, cx, cy)) return at;
+  const room = sim.map.house.room;
+  for (let r = 1; r <= Math.max(room.w, room.h); r++) {
+    for (let dy = -r; dy <= r; dy++) {
+      for (let dx = -r; dx <= r; dx++) {
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+        const x = cx + dx;
+        const y = cy + dy;
+        if (x < room.x || y < room.y || x >= room.x + room.w || y >= room.y + room.h || isBlockedCell(b, x, y)) continue;
+        return { x: x + 0.5, y: y + 0.5 };
+      }
+    }
+  }
+  return at;
+}
+
 /** Minuit (TE-08): qui est dehors rentre par le sentier. */
 export function midnightReturn(sim: Sim): void {
   for (const c of sim.world.characters) {
     if (c.inHouse) continue;
     release(sim, c);
-    placeCharacter(sim, c, sim.map.house.spawn);
+    placeCharacter(sim, c, houseSpawn(sim));
     c.midnightReturn = true;
     say(sim, c.id, 'midnight_return');
   }

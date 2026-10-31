@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { hash } from '../src/simulation/empreinte';
 import { step } from '../src/simulation/pas';
 import { SIM_HZ } from '../src/simulation/constantes';
-import { createRobot, newSim, play } from './aides';
+import { contentAndMap, createRobot, fullOrderAmount, newSim, play } from './aides';
 
 /** Une démo complète dure au plus quelques heures de jeu réel: borne de sécurité. */
 const MAX_TICKS = SIM_HZ * 60 * 120;
@@ -25,21 +25,42 @@ describe('robot', () => {
     expect(w.letters.some((l) => l.id === 'coop_welcome')).toBe(true);
   });
 
-  it("joue toute la démo jusqu'au train du samedi, sans blocage (D-01)", () => {
+  it('finit la semaine 1 comme avant au départ du jour 8, puis la partie continue', () => {
+    const sim = newSim();
+    const robot = createRobot();
+    play(sim, robot, (s) => s.world.clock.day === 9 && s.world.phase === 'day', MAX_TICKS);
+    const w = sim.world;
+    expect(w.phase).toBe('day');
+    expect(w.ending).toBeNull();
+    expect(w.orderHistory).toEqual([{ linesDone: 4, linesTotal: 4, complete: true, amount: 540 }]);
+    // Au matin du jour 9, la caisse est rouverte pour la commande du train suivant.
+    expect(w.orderIndex).toBe(1);
+    expect(w.orderResult).toBeNull();
+    expect(w.crate).toEqual([]);
+    expect(w.quests.find((q) => q.id === 'saturday_order')?.status).toBe('done');
+    expect(w.quests.find((q) => q.id === 'second_order')?.status).toBe('active');
+    expect(w.letters.map((l) => l.id)).toEqual(expect.arrayContaining(['coop_recap', 'coop_order_2']));
+  });
+
+  it("joue toute la démo jusqu'au train du jour 15, les deux commandes complètes, sans blocage (D-01)", () => {
     const sim = newSim();
     const robot = createRobot();
     const ticks = play(sim, robot, (s) => s.world.phase === 'ended', MAX_TICKS);
     const w = sim.world;
+    const { content } = contentAndMap();
     expect(w.phase).toBe('ended');
     expect(ticks).toBeLessThan(MAX_TICKS);
-    expect(w.clock.day).toBe(8);
-    expect(w.orderResult).toEqual({ linesDone: 4, linesTotal: 4, complete: true, amount: 540 });
-    expect(w.ending?.days).toBe(8);
-    expect(w.ending?.linesDone).toBe(4);
+    expect(w.clock.day).toBe(15);
+    expect(w.orderHistory.map((o) => o.complete)).toEqual([true, true]);
+    expect(w.orderHistory[0]?.amount).toBe(540);
+    expect(w.orderResult?.amount).toBeGreaterThanOrEqual(fullOrderAmount(content, 1));
+    expect(w.ending?.days).toBe(15);
+    expect(w.ending?.orders).toEqual(content.settings.order.trains.map((o) => ({ linesDone: o.lines.length, linesTotal: o.lines.length })));
+    expect(w.ending?.linesDone).toBe(content.settings.order.trains.reduce((n, o) => n + o.lines.length, 0));
     expect(w.ending?.furniturePlaced).toBeGreaterThan(0);
     expect(w.ending?.keyFound).toBe(true);
     expect(w.worldStates.handcar_shed).toBe('open');
-    for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper']) {
+    for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper', 'second_order']) {
       expect(w.quests.find((q) => q.id === quest)?.status, quest).toBe('done');
     }
     expect(w.letters.map((l) => l.id)).toEqual(expect.arrayContaining(['coop_welcome', 'basile_workbench', 'coop_catalogue_reminder', 'coop_recap', 'coop_vergers']));

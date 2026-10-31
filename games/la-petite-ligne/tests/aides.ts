@@ -28,6 +28,14 @@ export function newSim(seed = SEED, content: Content = contentAndMap().content):
   ]);
 }
 
+/** Somme versée pour la commande `index` partie complète (prime de ligne et bonus, sans surplus). */
+export function fullOrderAmount(content: Content, index: number): number {
+  const o = content.settings.order.trains[index];
+  if (o === undefined) return 0;
+  const base = o.lines.reduce((sum, l) => sum + l.count * (content.items[l.item]?.sellPrice ?? 0) * o.linePremium, 0);
+  return Math.round(base * (1 + o.fullBonus));
+}
+
 /** Fait jouer le robot jusqu'à ce que `until` soit vrai ou que `maxTicks` soit atteint. */
 export function play(sim: Sim, robot: Robot, until: (s: Sim) => boolean, maxTicks: number): number {
   let ticks = 0;

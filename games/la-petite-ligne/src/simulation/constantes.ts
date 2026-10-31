@@ -29,8 +29,8 @@ export const SECONDS_PER_MINUTE = 60;
 export const MINUTES_PER_HOUR = 60;
 export const MINUTES_PER_DAY = 1440;
 
-/** Format des sauvegardes (`dataSchema`). */
-export const DATA_SCHEMA = 1;
+/** Format des sauvegardes (`dataSchema`). 2: deux semaines (commande en cours, commandes payées). */
+export const DATA_SCHEMA = 2;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';

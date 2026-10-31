@@ -7,7 +7,7 @@
 | Version du document | 0.1 |
 | Dernière mise à jour | 2026-10-30 |
 | Rédaction | game-designer |
-| Documents liés | cahier des charges: `docs/jeux/jeu-1/cahier-des-charges.md` (les règles de référence); simulation de la démo: `docs/jeux/jeu-1/simulations/demo_rythme.py` |
+| Documents liés | cahier des charges: `docs/jeux/jeu-1/cahier-des-charges.md` (les règles de référence); simulation de la démo: `docs/jeux/jeu-1/simulations/demo_rythme.py`; deuxième semaine: `docs/jeux/jeu-1/semaine-2.md` |
 
 ## En bref
 
@@ -16,6 +16,7 @@
 - **Ce qu'elle prouve**: qu'une journée à deux est agréable (chacun son activité, des rendez-vous ensemble), que la commande du samedi donne envie de s'organiser, et que la maison qu'on aménage soi-même fait plaisir.
 - **Règles**: celles du cahier des charges, réduites (section 2). Toute valeur propre à la démo est dans la section 5.
 - **Priorités**: P0, indispensable pour que la démo se joue d'un bout à l'autre; P1, à ajouter s'il reste du temps, dans l'ordre de la liste.
+- **Deuxième semaine** (ajoutée le 2026-10-31, à la demande du client): la démo ne s'arrête plus au train du samedi 8. Les jours 9 à 15 ajoutent environ une heure de jeu, avec les mêmes mécaniques, la même carte et les mêmes modèles: une commande plus exigeante (carottes, omelettes, truites), la draisine d'Émile, une deuxième énigme et une quête par habitant. La démo finit au départ du train du samedi 15 à 16 h. Détail et besoins moteur: `docs/jeux/jeu-1/semaine-2.md` (section 9 ci-dessous). Les sections 1 à 8 décrivent la semaine 1, qui ne change pas, sauf sa fin.
 
 ## 1. Périmètre de la première heure
 
@@ -274,7 +275,7 @@ Astuces en bas de l'écran, 6 s, une seule à la fois, une fois chez chaque joue
 - **Envies à deux** (jours 2, 5 et 7): « Souper à la même table. », « Regarder la rivière ensemble. », « Ranger la maison à deux. »
 - **Forme au réveil**: Petite forme: « La nuit a été courte et le ventre crie. Un bon souper, ce soir ? »; Ça va: « Ça va. La paillasse pique un peu. »; En forme: « Bien dormi, bien mangé: en forme. »; Pleine forme: « Pleine forme ! Le lit neuf y est pour beaucoup. »; Forme rayonnante: « Tout sourit ce matin: forme rayonnante. »
 - **Messages**: « Déjà pris par Sacha. »; « Il manque 40 sous. »; « Sacha propose d'acheter un matelas pour 120 sous. D'accord ? »; « Le train de samedi est en gare ! »; « Le train part dans une heure. »; « Il se fait tard, tu rentres par le sentier. »; « Plus d'énergie: tout prend deux fois plus de temps. Un en-cas ? »; « L'horloge attend Camille. » (P1).
-- **Écran de fin**: « Fin de la démo. Une semaine à la Halte d'Aubrune. La suite de la ligne arrive bientôt. » Trois chiffres: journées vécues (8), lignes de la commande remplies (sur 4), meubles posés.
+- **Écran de fin** (après la semaine 2, section 9): « Fin de la démo. Deux semaines à la Halte d'Aubrune. La suite de la ligne monte vers les Vergers. Elle arrive bientôt. » Trois chiffres: journées vécues (15), lignes remplies sur les deux commandes (sur 9), meubles posés.
 
 ## 4. Assets de la démo
 
@@ -391,3 +392,14 @@ Ceux du cahier (section 5), réduits: Z Q S D ou clic au sol pour marcher; Espac
 - La commande est fixe et le temps est écrit: l'heure doit se dérouler pareil pour tous.
 - La qualité, la cuisine et l'économie sont simplifiées; leurs règles complètes restent celles du cahier.
 - Tout ce que la démo construit (personnages, bourg, maisonnette, potager, poules, meubles, quatre habitants, commande, veillée) sert tel quel au prototype et à la version 1.
+
+## 9. La semaine 2 (jours 9 à 15)
+
+Ajoutée le 2026-10-31. Référence complète: `docs/jeux/jeu-1/semaine-2.md`.
+
+- **Fin de la semaine 1**: au départ du train du samedi 8, la commande 1 est payée et Firmin joue ses scènes (section 3.2, inchangées), puis la partie continue. À 18 h, la lettre de la coopérative annonce la commande du samedi 15.
+- **Commande 2**: 15 carottes, 4 laitues, 8 œufs, 4 omelettes, 2 truites (990 sous si elle est complète). Les omelettes gagnent un prix de vente de 20 sous.
+- **Quêtes**: « La commande du samedi 15 » et « La draisine d'Émile » (trame); « La deuxième énigme d'Émile », « La friture d'Odette », « Un repas chaud pour Basile », « Le mot de Lucie » (Jeanne), « Le quai en fête » (Firmin). La première énigme reste ouverte: résolue en semaine 2, elle ouvre la remise sur-le-champ.
+- **Deuxième énigme**: bêcher au passage à niveau entre 9 h et 10 h, à partir du jour 9; indices chez Firmin, Basile et Jeanne.
+- **Nouveautés en vente** (dès le jour 9, modèles existants): le cadre (épicerie, 25 sous, se pose au mur), le poêle à bois (catalogue, 90 sous, livré le 15).
+- **Fin**: au départ du train du samedi 15, commande 2 payée, scènes de Firmin et de Basile selon ce qui a été fait (draisine, carnet d'Émile, lettre de Lucie), puis l'écran de fin « Deux semaines à la Halte d'Aubrune ».

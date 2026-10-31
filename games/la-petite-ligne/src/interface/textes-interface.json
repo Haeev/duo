@@ -31,13 +31,13 @@
     "rightClick": "clic droit"
   },
   "title": {
-    "ticket": "Démo · Une semaine à la Halte d'Aubrune",
+    "ticket": "Démo · Deux semaines à la Halte d'Aubrune",
     "name": "La Petite Ligne",
     "lead": "La ligne rouvre. Faites revivre la halte, et le train ira plus loin.",
     "start": "Commencer la semaine",
     "resume": "Reprendre : {weekday} {day}, {time}",
     "helpSynced": "La semaine commence quand vous avez choisi « Commencer la semaine » sur les deux ordinateurs.",
-    "resumeHelp": "Votre semaine vous attend : {weekday} {day}, {time}.",
+    "resumeHelp": "La halte vous attend : {weekday} {day}, {time}.",
     "pause": "pause et réglages de Duo"
   },
   "creation": {
@@ -371,7 +371,7 @@
   "end": {
     "ticket": "Samedi {day}, {time} · le train est reparti",
     "days": "journées vécues",
-    "lines": "lignes de la commande remplies",
+    "lines": "lignes des commandes remplies",
     "linesOf": "sur {total}",
     "furniture": "meubles posés",
     "continue": "Continuer",

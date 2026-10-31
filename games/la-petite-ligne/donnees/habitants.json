@@ -12,7 +12,7 @@
       "soundMotif": "motif_firmin",
       "schedule": [
         { "when": [{ "type": "day_is", "days": [1] }], "from": "06:00", "to": "18:00", "point": "train_stop", "activity": "wait_train" },
-        { "when": [{ "type": "day_is", "days": [8] }], "from": "06:00", "to": "17:00", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "06:00", "to": "17:00", "point": "train_stop", "activity": "wait_train" },
         { "from": "06:00", "to": "08:00", "point": "firmin_house", "activity": "home" },
         { "from": "08:00", "to": "18:00", "point": "quay_bell", "activity": "stand" },
         { "from": "18:00", "to": "24:00", "point": "firmin_house", "activity": "home" }
@@ -43,7 +43,7 @@
           "id": "firmin_day8_morning",
           "kind": "daily",
           "priority": 7,
-          "when": [{ "type": "day_is", "days": [8] }],
+          "when": [{ "type": "day_is", "days": [8, 15] }],
           "lines": [{ "speaker": "firmin", "text": "Le train arrive à 10 h et repart à 16 h. Ce qui est dans la caisse part avec lui." }]
         },
         {
@@ -121,6 +121,117 @@
           "priority": 80,
           "when": [],
           "lines": [{ "speaker": "firmin", "text": "Vous avez la clé de la remise ? Alors c'est vous qu'Émile attendait." }]
+        },
+        {
+          "id": "firmin_daily_week2",
+          "kind": "daily",
+          "priority": 2,
+          "when": [{ "type": "day_at_least", "day": 9 }],
+          "lines": [{ "speaker": "firmin", "text": "Une deuxième commande ! Je l'ai lue trois fois. Les omelettes, ça voyage bien, vous croyez ?" }]
+        },
+        {
+          "id": "firmin_day15",
+          "kind": "daily",
+          "priority": 6,
+          "when": [{ "type": "day_is", "days": [15] }],
+          "lines": [{ "speaker": "firmin", "text": "Le train de dix heures ! Cette fois, je n'ai repassé mon uniforme qu'une fois. Je progresse." }]
+        },
+        {
+          "id": "firmin_hint_riddle_week2",
+          "kind": "hint",
+          "once": "duo",
+          "priority": 9,
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "quest_active", "quest": "emile_riddle" }],
+          "lines": [{ "speaker": "firmin", "text": "La remise est toujours fermée ? Mon oncle s'asseyait sur le banc du quai et, à cinq heures, il regardait ses pieds. Un jour de soleil, bien sûr." }]
+        },
+        {
+          "id": "firmin_hint_riddle2",
+          "kind": "hint",
+          "once": "duo",
+          "priority": 8,
+          "when": [{ "type": "quest_active", "quest": "emile_riddle_2" }],
+          "lines": [{ "speaker": "firmin", "text": "Mon oncle disait que la barrière, c'était sa montre. Je n'ai jamais compris. Vous, peut-être ?" }]
+        },
+        {
+          "id": "firmin_flowers_ask",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 39,
+          "when": [{ "type": "day_at_least", "day": 10 }],
+          "lines": [{ "speaker": "firmin", "text": "Samedi, le train revient, et je voudrais un quai qui fasse envie. Deux pots de fleurs, chez Odette, ça ferait l'affaire. Je les arroserai moi-même." }]
+        },
+        {
+          "id": "firmin_flowers_reminder",
+          "kind": "quest",
+          "priority": 20,
+          "when": [{ "type": "step_active", "quest": "firmin_flowers", "step": "bring" }],
+          "lines": [{ "speaker": "firmin", "text": "Deux pots de fleurs, pas plus. Un quai trop fleuri, le train ne s'y arrêterait plus." }]
+        },
+        {
+          "id": "firmin_flowers_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "firmin_flowers" }],
+          "lines": [{ "speaker": "firmin", "text": "Regardez-moi ça. Le plus beau quai de la ligne. Bon, le seul quai de la ligne. Tenez, pour la peine." }]
+        },
+        {
+          "id": "firmin_lucie_reply",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
+          "lines": [{ "speaker": "firmin", "text": "Une lettre de Lucie. Pour moi. Je la lirai ce soir, au calme. Dites-lui merci. Non, ne lui dites rien. Si, dites-lui merci." }]
+        },
+        {
+          "id": "firmin_end2_full",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 100,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "firmin", "text": "Toutes les lignes, encore ! À ce rythme, la coopérative va réclamer un train par jour." }]
+        },
+        {
+          "id": "firmin_end2_partial",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 100,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "firmin", "text": "Le train repart bien chargé. La coopérative le dit elle-même: Aubrune se réveille." }]
+        },
+        {
+          "id": "firmin_end2_logbook",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 85,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "firmin", "text": "Le carnet de route d'Émile... Six kilomètres jusqu'aux Vergers, trois ponts, un tunnel. Il avait tout noté. Il savait que quelqu'un viendrait." }]
+        },
+        {
+          "id": "firmin_end2_lucie",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 82,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "firmin", "text": "Lucie est venue voir le train. Elle m'a souri. Je n'ai rien dit. J'ai bien fait, non ?" }]
+        },
+        {
+          "id": "firmin_end2_vergers",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 80,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "firmin", "text": "La coopérative écrit que la voie des Vergers sera la prochaine. Les cerisiers vous attendent. Moi aussi, un peu." }]
         }
       ]
     },
@@ -135,7 +246,7 @@
       "soundMotif": "motif_odette",
       "schedule": [
         { "when": [{ "type": "step_active", "quest": "welcome_supper", "step": "supper" }, { "type": "day_at_least", "day": 5 }], "from": "19:00", "to": "21:00", "point": "grocery_terrace", "activity": "host" },
-        { "when": [{ "type": "day_is", "days": [8] }], "from": "09:30", "to": "16:30", "point": "grocery_counter", "activity": "serve" },
+        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "grocery_counter", "activity": "serve" },
         { "from": "06:00", "to": "07:00", "point": "grocery_door", "activity": "home" },
         { "from": "07:00", "to": "20:00", "point": "grocery_counter", "activity": "serve" },
         { "from": "20:00", "to": "24:00", "point": "grocery_door", "activity": "home" }
@@ -245,6 +356,43 @@
           "priority": 1,
           "when": [],
           "lines": [{ "speaker": "odette", "text": "Je vous achète vos légumes, mais à mon prix. La coopérative paie mieux, le samedi." }]
+        },
+        {
+          "id": "odette_daily_week2",
+          "kind": "daily",
+          "priority": 2,
+          "when": [{ "type": "day_at_least", "day": 9 }],
+          "lines": [{ "speaker": "odette", "text": "J'ai reçu des cadres de la ville. Pour une photo de famille. Ou une vieille photo de la halte, tiens." }]
+        },
+        {
+          "id": "odette_day15",
+          "kind": "daily",
+          "priority": 6,
+          "when": [{ "type": "day_is", "days": [15] }],
+          "lines": [{ "speaker": "odette", "text": "Deux trains en deux semaines ! Ma rue n'a jamais eu autant de monde." }]
+        },
+        {
+          "id": "odette_fry_ask",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 41,
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "dialogue_done", "dialogue": "odette_meeting" }],
+          "lines": [{ "speaker": "odette", "text": "Le dimanche, chez moi, c'était friture. Ça me manque. Rapportez-moi quatre goujons du gué, et je vous paie en sous et en pain frais." }]
+        },
+        {
+          "id": "odette_fry_reminder",
+          "kind": "quest",
+          "priority": 20,
+          "when": [{ "type": "step_active", "quest": "odette_fry", "step": "bring" }],
+          "lines": [{ "speaker": "odette", "text": "Quatre goujons. Les petits, ce sont les meilleurs en friture. Comme les gens, mais là je n'insiste pas." }]
+        },
+        {
+          "id": "odette_fry_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "odette_fry" }],
+          "lines": [{ "speaker": "odette", "text": "Quatre goujons ! Ça sent déjà la friture. Tenez, pour la peine, et du pain tout chaud." }]
         }
       ]
     },
@@ -259,7 +407,8 @@
       "soundMotif": "motif_basile",
       "schedule": [
         { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "beam_pickup", "activity": "stand" },
-        { "when": [{ "type": "day_is", "days": [8] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "quest_active", "quest": "handcar" }], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work" },
         { "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home" },
         { "from": "08:00", "to": "18:00", "point": "sawmill_workbench", "activity": "work" },
         { "from": "18:00", "to": "24:00", "point": "sawmill_yard", "activity": "home" }
@@ -324,6 +473,110 @@
           "priority": 1,
           "when": [{ "type": "quest_done", "quest": "planks" }],
           "lines": [{ "speaker": "basile", "text": "Mon établi est à vous. Ma scie à moi, vous n'y touchez pas." }]
+        },
+        {
+          "id": "basile_daily_week2",
+          "kind": "daily",
+          "priority": 2,
+          "when": [{ "type": "day_at_least", "day": 9 }],
+          "lines": [{ "speaker": "basile", "text": "Il reste quelques arbres à la lisière. Après, il faudra attendre qu'ils repoussent. Trente ans, à peu près." }]
+        },
+        {
+          "id": "basile_day15",
+          "kind": "daily",
+          "priority": 6,
+          "when": [{ "type": "day_is", "days": [15] }],
+          "lines": [{ "speaker": "basile", "text": "Le train repart déjà ? On s'y habitue, à ce train." }]
+        },
+        {
+          "id": "basile_shed_closed",
+          "kind": "daily",
+          "priority": 3,
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "flag", "flag": "shed_open" } }],
+          "lines": [{ "speaker": "basile", "text": "La draisine d'Émile dort dans la remise. Sans la clé, je ne peux rien pour elle." }]
+        },
+        {
+          "id": "basile_handcar_look",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "handcar", "step": "show_basile" }],
+          "lines": [{ "speaker": "basile", "text": "La voilà, la vieille. Les roues sont bonnes, les bancs sont pourris. Huit planches et quatre clous, et elle repart." }]
+        },
+        {
+          "id": "basile_handcar_reminder",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "handcar", "step": "bring" }],
+          "lines": [{ "speaker": "basile", "text": "Huit planches, quatre clous. Les clous, Odette en a au comptoir." }]
+        },
+        {
+          "id": "basile_handcar_working",
+          "kind": "quest",
+          "priority": 21,
+          "when": [{ "type": "step_active", "quest": "handcar", "step": "repair" }],
+          "lines": [{ "speaker": "basile", "text": "Laissez-moi la nuit. Une draisine, ça ne se répare pas devant tout le monde." }]
+        },
+        {
+          "id": "basile_handcar_scene",
+          "kind": "scene",
+          "shared": true,
+          "point": "handcar_shed",
+          "once": "duo",
+          "priority": 90,
+          "when": [{ "type": "step_active", "quest": "handcar", "step": "try" }, { "type": "time_is", "from": "08:00", "to": "18:00" }],
+          "lines": [
+            { "speaker": "basile", "text": "Bon. À deux, on pousse. Doucement: elle a vingt ans de sommeil dans les essieux." },
+            { "speaker": "narrator", "text": "La draisine grince, hésite, puis roule de quelques mètres sur les rails." },
+            { "speaker": "basile", "text": "Elle roule ! Émile serait content. Pour les Vergers, il faudra une voie dégagée. Mais elle, elle est prête." },
+            {
+              "choices": [
+                { "id": "ride", "text": "On monte dessus ?", "reply": [{ "speaker": "basile", "text": "Pas avant que la coopérative dise oui. Mais ça viendra." }] },
+                { "id": "thanks", "text": "Merci, Basile.", "reply": [{ "speaker": "basile", "text": "Remerciez vos bras. Moi, je n'ai fait que les bancs." }] }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "basile_hint_riddle2",
+          "kind": "hint",
+          "once": "duo",
+          "priority": 8,
+          "when": [{ "type": "quest_active", "quest": "emile_riddle_2" }],
+          "lines": [{ "speaker": "basile", "text": "De mon temps, le train passait la barrière vers dix heures. Émile la baissait bien avant: il n'aimait pas courir." }]
+        },
+        {
+          "id": "basile_omelette_ask",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 39,
+          "when": [{ "type": "day_at_least", "day": 10 }, { "type": "dialogue_done", "dialogue": "basile_meeting" }],
+          "lines": [{ "speaker": "basile", "text": "Pain et fromage, pain et fromage, depuis vingt ans. Une omelette, une vraie, chaude, ça me ferait plaisir." }]
+        },
+        {
+          "id": "basile_omelette_reminder",
+          "kind": "quest",
+          "priority": 19,
+          "when": [{ "type": "step_active", "quest": "basile_omelette", "step": "bring" }],
+          "lines": [{ "speaker": "basile", "text": "Trois œufs, un réchaud, et pas trop cuite. Je ne suis pas difficile. Si, un peu." }]
+        },
+        {
+          "id": "basile_omelette_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "quest_done", "quest": "basile_omelette" }],
+          "lines": [{ "speaker": "basile", "text": "Encore chaude. Vous, au moins, vous savez vous servir d'un réchaud. Tenez." }]
+        },
+        {
+          "id": "basile_end2_handcar",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 88,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [{ "speaker": "basile", "text": "La draisine est prête. Il ne lui manque qu'une voie dégagée et quatre bras. Je connais quatre bras." }]
         }
       ]
     },
@@ -338,7 +591,7 @@
       "soundMotif": "motif_jeanne",
       "schedule": [
         { "when": [{ "type": "not", "condition": { "type": "day_at_least", "day": 3 } }], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent" },
-        { "when": [{ "type": "day_is", "days": [8] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
         { "from": "06:00", "to": "08:00", "point": "offstage", "activity": "home" },
         { "from": "08:00", "to": "12:00", "point": "quay_bench", "activity": "play" },
         { "from": "12:00", "to": "18:00", "point": "riverbank", "activity": "play" },
@@ -422,6 +675,52 @@
           "priority": 1,
           "when": [],
           "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie dit que le train va changer la vallée. Moi, je veux juste monter dedans." }]
+        },
+        {
+          "id": "jeanne_daily_week2",
+          "kind": "daily",
+          "priority": 2,
+          "when": [{ "type": "day_at_least", "day": 9 }],
+          "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie dit que Firmin est le seul à dire bonjour au train. C'est vrai, je l'ai vu." }]
+        },
+        {
+          "id": "jeanne_day15",
+          "kind": "daily",
+          "priority": 6,
+          "when": [{ "type": "day_is", "days": [15] }],
+          "lines": [{ "speaker": "jeanne", "text": "Il revient ! Cette fois, je compte les wagons. Et les gens." }]
+        },
+        {
+          "id": "jeanne_hint_riddle2",
+          "kind": "hint",
+          "once": "duo",
+          "priority": 8,
+          "when": [{ "type": "quest_active", "quest": "emile_riddle_2" }],
+          "lines": [{ "speaker": "jeanne", "text": "Une barrière ? Il n'y en a qu'une, au passage à niveau. Juste à côté de chez vous !" }]
+        },
+        {
+          "id": "jeanne_lucie_ask",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 43,
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "dialogue_done", "dialogue": "jeanne_meeting" }],
+          "effects": [{ "type": "give_item", "item": "lucie_letter", "count": 1, "to": "actor" }],
+          "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie a écrit une lettre à Firmin. Elle n'ose pas la lui donner. Moi non plus. Vous, vous osez ?" }]
+        },
+        {
+          "id": "jeanne_lucie_reminder",
+          "kind": "quest",
+          "priority": 20,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "give" }],
+          "lines": [{ "speaker": "jeanne", "text": "Vous l'avez donnée ? Non ? Firmin est sur le quai. Il ne mord pas. Enfin, je crois." }]
+        },
+        {
+          "id": "jeanne_lucie_done",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 45,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
+          "lines": [{ "speaker": "jeanne", "text": "Il a dit merci ? Trois fois ? Ma tante va devenir rouge comme une tomate. Tenez, c'est mon argent de poche." }]
         }
       ]
     }

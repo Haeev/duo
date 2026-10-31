@@ -29,6 +29,14 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Avant de changer un libellé de `textes.json`, chercher dans `tests/e2e/` (Playwright clique par `getByRole(..., { name })`) et dans le code qui le réutilise: `ui.hud.day` sert aussi au libellé de la sauvegarde dans la bibliothèque de Duo (« samedi, jour 1, 14 h 20 »), où « jour N » distingue l'heure du jeu de la date réelle.
 - Un brief peut demander un texte qui existe déjà (passe précédente non reportée dans ETAT.md): regarder `git log -S` avant d'écrire, puis améliorer et donner l'avant/après.
 - Le manager peut committer pendant la mission: vérifier `git diff HEAD` avant le compte rendu pour dire ce qui reste à committer.
+- « Chacun » est un masculin générique: l'éviter dans les textes du jeu (« Un goujon pour chaque canne », « à tour de rôle », « un pain par joueur »).
+
+## Ajouter du contenu à La Petite Ligne (vérifié le 2026-10-31, semaine 2)
+
+- Un objet dont le modèle n'a pas de substitut dans `src/rendu/substituts.ts` fait échouer `src/rendu/rendu.test.ts`, même si le GLB existe: le signaler au dev rendu à chaque nouveau modèle d'objet.
+- Une nouvelle construction guidée ne s'affiche pas sans code de rendu dédié (`src/rendu/maison.ts`): pour du contenu « sans nouveau modèle », passer par dons (`given`), nuits (`nights_passed`) et scènes partagées.
+- Le validateur lit le nombre de jours dans `reglages.clock.lastDay.day` et accepte `order.trains` et `order_complete` avec `day`.
+- Le bois est fini (12 arbres, sans repousse, environ 7 abattus en semaine 1): ne pas remettre de planches dans une commande tardive.
 
 ## Repères de rythme (script `docs/jeux/jeu-1/simulations/rythme_et_collections.py`)
 

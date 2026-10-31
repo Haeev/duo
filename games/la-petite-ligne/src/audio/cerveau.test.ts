@@ -100,7 +100,8 @@ describe('le son de toute la démo, joué par le robot', () => {
 
   it('va jusqu au bout de la démo', () => {
     expect(run.ended).toBe(true);
-    expect(run.mornings).toHaveLength(7);
+    // Deux semaines: un matin par jour après le premier, jusqu'au train du jour 15.
+    expect(run.mornings).toHaveLength(14);
   });
 
   it('écran titre, puis les musiques de chaque moment', () => {
@@ -142,7 +143,8 @@ describe('le son de toute la démo, joué par le robot', () => {
     expect(order.every((x, i) => i === 0 || x > (order[i - 1] ?? 0))).toBe(true);
     const steam = shots('train-steam', 8)[0];
     expect(Math.abs((steam?.t ?? 0) - (stoppedAt ?? 0))).toBeLessThanOrEqual(SIM_DT * 1.5);
-    const fanfares = music('once', MUSIC.fanfare);
+    // Une fanfare par arrivée du train (jours 8 et 15): celle du jour 8 une seule fois.
+    const fanfares = music('once', MUSIC.fanfare).filter((e) => e.day === 8);
     expect(fanfares).toHaveLength(1);
     expect((fanfares[0]?.t ?? 0) - (steam?.t ?? 0)).toBeCloseTo(0.3, 1);
     // La musique de fond s'efface avant la fanfare.

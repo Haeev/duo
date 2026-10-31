@@ -11,7 +11,7 @@ import { applyForm, settleNight } from './besoins';
 import { deliverScheduledLetters } from './courrier';
 import { cancelProposalsAtNight } from './economie';
 import { pickEnvies } from './envies';
-import { midnightReturn, placeCharacter } from './deplacement';
+import { houseSpawn, midnightReturn, placeCharacter } from './deplacement';
 import { placeVillagers } from './habitants';
 import { morningEggs } from './poules';
 import { morningGrowth } from './potager';
@@ -167,7 +167,7 @@ export function morning(sim: Sim): void {
   world.grocerSoldToday = 0;
   for (const c of world.characters) {
     const bed = world.furniture.find((f) => f.id === c.bedId);
-    const at = bed === undefined ? sim.map.house.spawn : { x: bed.cell.cx + 0.5, y: bed.cell.cy + 0.5 };
+    const at = bed === undefined ? houseSpawn(sim) : { x: bed.cell.cx + 0.5, y: bed.cell.cy + 0.5 };
     placeCharacter(sim, c, at);
     c.status = 'breakfast';
     c.breakfastDone = false;

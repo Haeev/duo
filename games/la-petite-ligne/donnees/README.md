@@ -27,7 +27,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | Nom | Remplacé par |
 |---|---|
 | `{partner}` | prénom de l'autre joueur |
-| `{order}` | liste des lignes de la commande (`reglages.order.lines`, mise en forme par `textes.orderFormat`), par exemple « 12 radis, 3 laitues, 6 œufs, 10 planches » |
+| `{order}` | liste des lignes de la commande du prochain train (`reglages.order.trains`, mise en forme par `textes.orderFormat`), par exemple « 12 radis, 3 laitues, 6 œufs, 10 planches »; dès le paiement du jour 8, celle du jour 15 |
 | `{startPurse}`, `{bigPurchase}` | `reglages.economy.startPurse`, `reglages.economy.bigPurchaseThreshold` |
 | `{linesDone}`, `{linesTotal}`, `{amount}` | lignes remplies, lignes de la commande, somme payée au départ du train |
 | `{item}`, `{count}`, `{price}`, `{missing}` | nom d'objet (singulier ou pluriel selon `count`), quantité, prix, somme ou objets manquants |
@@ -62,7 +62,8 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `stack` | entier ≥ 1 | taille d'une pile dans le sac (1 pour les outils et les meubles) |
 | `buyPrice` | entier ou `null` | prix d'achat en boutique, en sous; `null` si l'objet ne s'achète pas |
 | `sellPrice` | entier ou `null` | prix de base, qualité ordinaire; `null` si l'objet ne se vend pas. Odette paie `buyRate` fois ce prix, la caisse du train ce prix exact |
-| `shop` | `"grocery"`, `"catalogue"` ou `null` | où l'acheter; le catalogue livre au train du jour 8 |
+| `shop` | `"grocery"`, `"catalogue"` ou `null` | où l'acheter; le catalogue livre au train suivant (jour 8 ou 15) |
+| `availableFromDay` | entier, facultatif | en vente à partir de ce jour seulement (les nouveautés de la semaine 2: 9) |
 | `model` | texte | modèle 3D |
 | `tier` | `"P0"` ou `"P1"` | |
 | `plants` | identifiant de culture | graines seulement |
@@ -199,12 +200,12 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 
 | Bloc | Contenu |
 |---|---|
-| `clock` | `secondsPerGameMinute` (0,35 s), début et fin de journée, début possible de la veillée, heure de départ du jour 1 (10 h), fin de la démo (jour 8, 16 h), jour de la semaine du jour 1, horloge arrêtée quand les deux sont dans un menu |
-| `train` | jours, arrivée, départ |
-| `weatherByDay` | huit valeurs, `sunny`, `cloudy` ou `rain`, du jour 1 au jour 8 |
+| `clock` | `secondsPerGameMinute` (0,35 s), début et fin de journée, début possible de la veillée, heure de départ du jour 1 (10 h), fin de la démo (jour 15, 16 h), jour de la semaine du jour 1, horloge arrêtée quand les deux sont dans un menu |
+| `train` | jours (1, 8 et 15), arrivée, départ |
+| `weatherByDay` | une valeur par jour, `sunny`, `cloudy` ou `rain`, du jour 1 au dernier jour (quinze) |
 | `spawn` | point d'apparition des deux joueurs |
-| `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (date limite, livraison) |
-| `order` | lignes de la commande, prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train) |
+| `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (`windows`: une fenêtre par semaine, date limite et livraison; celle du moment est la première dont la livraison n'est pas passée) |
+| `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train) |
 | `garden`, `quality`, `trees`, `hens` | potager (12 cases, zone de carte), qualité, arbres (nombre, zone, coups de hache, rondins), poules |
 | `endurance` | `base + perFormPoint x forme`; coûts par action, multipliés par `costMultiplier`; à 0, les actions durent `atZeroDurationMultiplier` fois plus longtemps (jamais de blocage) |
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
@@ -212,7 +213,7 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 | `absence`, `autosave`, `fishing` | P1: horloge arrêtée en cas d'absence, sauvegarde, pêche (le drapeau `fishing_enabled` est posé quand la pêche est activée) |
 | `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
 
-Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. Avec les valeurs actuelles, une commande complète rapporte 540 sous.
+Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 sous, la commande 2 990 sous.
 
 ## 3. Conditions
 
@@ -257,7 +258,7 @@ Paramètres communs des conditions qui comptent:
 | `witnessed` | `event` (`train_arrival`, `train_departure`), `who` | le joueur était à moins de `ranges.witness` du train à ce moment-là |
 | `nights_passed` | `count` | nuits passées depuis le démarrage de l'étape |
 | `recipe_known` | `recipe` | la recette est débloquée |
-| `order_complete` | | toutes les lignes de la commande sont dans la caisse; après le départ du train (`pay_order`), garde la réponse du moment du départ |
+| `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande du prochain train); après le départ de ce train (`pay_order`), garde la réponse du moment du départ. Les données écrivent toujours `day` |
 
 ## 4. Effets
 
