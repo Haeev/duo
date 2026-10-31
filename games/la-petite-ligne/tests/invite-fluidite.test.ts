@@ -1,21 +1,25 @@
 // Fluidité de son propre personnage chez l'invité (gauntlet, tour 2, défaut 4.2 de la revue du ressenti):
 // à 60 images par seconde, la marche prédite doit avancer à chaque image et ses pas doivent sonner
 // comme ceux de l'hôte. La boucle est celle du SDK (`createFixedStepper`), comme dans `main.ts`.
-import { createFixedStepper } from '@duo/sdk';
+import { createFixedStepper, type NetChannel } from '@duo/sdk';
 import { createRandom } from '@duo/sdk/sim';
 import { startLocalDuo } from '@duo/sdk-dev';
+import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import manifest from '../duo-game.json';
 import { StateWatcher, type LoopWish, type SoundRequest } from '../src/audio/declencheurs';
 import { AUDIO_SETTINGS } from '../src/audio/reglages';
 import type { ControlFrame } from '../src/etat/actions';
 import type { CharacterId, ReadonlyWorld, Vec2 } from '../src/etat/types';
+import { createHost, type HostChannels } from '../src/reseau/hote';
+import { createGuest, type GuestChannels } from '../src/reseau/invite';
+import { CHANNEL, EventsMessageSchema, FastSnapshotSchema, GuestInputSchema, WorldMessageSchema } from '../src/reseau/schemas';
 import { createSession, type GameAction, type Session, type SessionOptions } from '../src/session';
 import { SIM_HZ } from '../src/simulation/constantes';
 import { character, type Sim } from '../src/simulation/contexte';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { createRobot } from '../src/simulation/robot';
-import { contentAndMap } from './aides';
+import { contentAndMap, newSim, play } from './aides';
 
 const FRAME_HZ = 60;
 const FRAME_MS = 1000 / FRAME_HZ;
@@ -251,6 +255,156 @@ describe("invité: sa propre marche à 60 images par seconde", () => {
       }
     } finally {
       duo.dispose();
+    }
+  }, 120_000);
+});
+
+// ---------------------------------------------------------------------------
+// Banc déterministe: l'hôte et l'invité du jeu reliés par des canaux virtuels, sur une horloge
+// simulée, avec latence, gigue et pertes (réémission TCP: le message arrive en retard, l'ordre
+// est gardé, comme dans le faux hôte du SDK).
+
+interface Conditions {
+  latencyMs: number;
+  jitterMs: number;
+  lossPercent: number;
+}
+
+const RETRANSMIT_MS = 200;
+
+interface VirtualLink {
+  host: HostChannels;
+  guest: GuestChannels;
+  /** Remet les messages arrivés à l'heure `nowMs`, dans l'ordre d'arrivée. */
+  deliver(nowMs: number): void;
+}
+
+function createVirtualLink(conditions: Conditions, random: () => number, now: () => number): VirtualLink {
+  const inFlight: { at: number; order: number; run: () => void }[] = [];
+  const lastArrival = { toHost: 0, toGuest: 0 };
+  let order = 0;
+  const schedule = (direction: 'toHost' | 'toGuest', run: () => void): void => {
+    let delay = conditions.latencyMs + random() * conditions.jitterMs;
+    if (random() * 100 < conditions.lossPercent) delay += RETRANSMIT_MS;
+    const at = Math.max(now() + delay, lastArrival[direction]);
+    lastArrival[direction] = at;
+    inFlight.push({ at, order: (order += 1), run });
+  };
+  const pair = <T>(id: number, schema: v.GenericSchema<unknown, T>, from: 'host' | 'guest'): { sender: NetChannel<T>; receiver: NetChannel<T> } => {
+    const listeners = new Set<(message: T) => void>();
+    const direction = from === 'host' ? 'toGuest' : 'toHost';
+    return {
+      sender: {
+        id,
+        send(message) {
+          // Passage par JSON et par le schéma, comme sur le fil: aucun objet partagé entre les deux.
+          const json = JSON.stringify(message);
+          schedule(direction, () => {
+            const value = v.parse(schema, JSON.parse(json));
+            for (const l of listeners) l(value);
+          });
+        },
+        onMessage: () => () => undefined,
+      },
+      receiver: {
+        id,
+        send: () => undefined,
+        onMessage(listener) {
+          listeners.add(listener);
+          return () => listeners.delete(listener);
+        },
+      },
+    };
+  };
+  const input = pair(CHANNEL.guestInput, GuestInputSchema, 'guest');
+  const world = pair(CHANNEL.world, WorldMessageSchema, 'host');
+  const fast = pair(CHANNEL.fast, FastSnapshotSchema, 'host');
+  const events = pair(CHANNEL.events, EventsMessageSchema, 'host');
+  return {
+    host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender },
+    guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver },
+    deliver(nowMs) {
+      inFlight.sort((a, b) => a.at - b.at || a.order - b.order);
+      while (inFlight.length > 0 && (inFlight[0]?.at ?? Number.POSITIVE_INFINITY) <= nowMs) inFlight.shift()?.run();
+    },
+  };
+}
+
+interface BenchRun {
+  /** Position affichée du personnage de l'invité, image par image. */
+  shown: Vec2[];
+  /** Ce que l'hôte a décidé à la fin. */
+  authority: Vec2;
+}
+
+/** L'invité marche `walkFrames` images vers l'est puis s'arrête `stopFrames` images. */
+function benchWalk(conditions: Conditions, seed: number, walkFrames: number, stopFrames: number): BenchRun {
+  const { content, map } = contentAndMap();
+  const sim = newSim();
+  play(sim, createRobot(), (s) => s.world.phase === 'day' && s.world.clock.running && s.world.scene === null, SIM_HZ * 600);
+  const [laneHost, laneGuest] = twoLanes(sim);
+  for (const [id, at] of [
+    ['p1', laneHost],
+    ['p2', laneGuest],
+  ] as const) {
+    const c = character(sim, id);
+    placeCharacter(sim, c, at);
+    c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+  }
+  const clock = { now: 0 };
+  const now = (): number => clock.now;
+  const link = createVirtualLink(conditions, createRandom(seed).next, now);
+  const host = createHost(sim, link.host, 'p1', 'p2');
+  const guest = createGuest(content, map, link.guest, character(sim, 'p2').playerId ?? '', now);
+  host.sendWorld();
+  const stepper = createFixedStepper(SIM_HZ);
+  let seq = 0;
+  const shown: Vec2[] = [];
+  const frames = (count: number, moveX: number, record: boolean): void => {
+    for (let f = 0; f < count; f++) {
+      clock.now += FRAME_MS;
+      link.deliver(clock.now);
+      const steps = stepper.advance(FRAME_MS);
+      for (let i = 0; i < steps; i++) {
+        host.step({ seq: 0, moveX: 0, moveY: 0, actHeld: false });
+        guest.step({ seq: (seq += 1), moveX, moveY: 0, actHeld: false });
+      }
+      link.deliver(clock.now);
+      const world = guest.render(clock.now, stepper.alpha());
+      const mine = world?.characters.find((c) => c.id === 'p2');
+      if (record && mine !== undefined) shown.push({ x: mine.pos.x, y: mine.pos.y });
+    }
+  };
+  frames(FRAME_HZ, 0, false);
+  frames(walkFrames, 1, true);
+  frames(stopFrames, 0, true);
+  const p2 = character(sim, 'p2').pos;
+  host.dispose();
+  guest.dispose();
+  return { shown, authority: { x: p2.x, y: p2.y } };
+}
+
+describe("invité: réconciliation douce sous un LAN chargé", () => {
+  it('80 ms, 20 ms de gigue, 2 % de pertes: ni saut ni arrêt pendant la marche, arrivée chez l’hôte à l’arrêt', () => {
+    const { content } = contentAndMap();
+    const perFrame = content.settings.movement.walkSpeed / FRAME_HZ;
+    const conditions: Conditions = { latencyMs: 80, jitterMs: 20, lossPercent: 2 };
+    for (const seed of [1, 2, 3]) {
+      const run = benchWalk(conditions, seed, 2 * FRAME_HZ, FRAME_HZ);
+      // Marche: on laisse 0,25 s à la prédiction pour démarrer.
+      const walk = smoothness(run.shown.slice(15, 2 * FRAME_HZ), perFrame);
+      expect.soft(walk.frozen, `graine ${seed}, marche (mm): ${walk.series}`).toBe(0);
+      expect.soft(walk.jumps, `graine ${seed}, marche (mm): ${walk.series}`).toBe(0);
+      expect.soft(walk.worstRelative, `graine ${seed}, marche (mm): ${walk.series}`).toBeLessThan(0.5);
+      const stop = run.shown.slice(2 * FRAME_HZ);
+      const last = stop[stop.length - 1];
+      expect(last).toBeDefined();
+      if (last === undefined) continue;
+      expect.soft(Math.hypot(last.x - run.authority.x, last.y - run.authority.y), `graine ${seed}, écart final`).toBeLessThan(0.01);
+      for (let i = 1; i < stop.length; i++) {
+        const back = (stop[i]?.x ?? 0) - (stop[i - 1]?.x ?? 0);
+        expect.soft(back, `graine ${seed}, recul à l'arrêt, image ${i}`).toBeGreaterThan(-0.005);
+      }
     }
   }, 120_000);
 });

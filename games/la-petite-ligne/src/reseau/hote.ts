@@ -75,6 +75,8 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
   });
 
   function nextGuestFrame(): ControlFrame | undefined {
+    // Une commande déjà jouée d'avance (devinée, voir plus bas) est écartée à son arrivée.
+    while ((guestFrames[0]?.seq ?? Number.POSITIVE_INFINITY) <= ack) guestFrames.shift();
     if (guestFrames.length > MAX_BUFFERED_FRAMES) guestFrames.splice(0, guestFrames.length - MAX_BUFFERED_FRAMES);
     const next = guestFrames.shift();
     if (next !== undefined) {
@@ -85,6 +87,10 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
     }
     stale += 1;
     if (lastGuest === null || stale > STALE_FRAMES) return undefined;
+    // Commande en retard (gigue, réémission): on rejoue la dernière à sa place, et elle compte
+    // pour le numéro suivant. Sinon l'invité ferait un pas de trop à chaque retard (la devinée,
+    // puis la vraie), corrigé chez lui par un à-coup. Les numéros se suivent (`commandes.ts`).
+    ack += 1;
     return { ...lastGuest, seq: ack };
   }
 
