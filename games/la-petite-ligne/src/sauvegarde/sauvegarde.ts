@@ -233,6 +233,15 @@ function resume(
     const to = map.points[def?.point ?? ''] ?? beam.pos;
     world.beam = { ...beam, item: def?.carry?.item ?? 'beam', purpose: 'construction', construction: def?.id ?? null, contents: null, to: { x: to.x, y: to.y } };
   }
+  // Trajet sur rails (après le tour 5): une charge écrite avant n'en a pas. La draisine reprend
+  // alors le trajet du réglage depuis son point de départ.
+  const current = world.beam as (NonNullable<WorldState['beam']> & { route?: unknown }) | null;
+  if (current !== null && current.route === undefined) {
+    const handcar = content.settings.carry.handcar;
+    const from = handcar === null ? undefined : map.points[handcar.from];
+    const route = current.purpose === 'handcar' && handcar !== null && from !== undefined ? handcar.path.map(([dx, dy]) => ({ x: from.x + dx, y: from.y + dy })) : null;
+    world.beam = { ...current, route, leg: 0, ...(route !== null && from !== undefined ? { pos: { ...from }, prev: { ...from }, to: route[route.length - 1] ?? current.to } : {}) };
+  }
   for (const c of world.characters) {
     // Nouvelle séance: l'écran titre se repasse à deux.
     c.titleReady = false;

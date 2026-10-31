@@ -791,8 +791,9 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
     return true;
   }
   f.held = true;
-  const path = findPath(refreshBlockers(sim), b.pos, spot);
-  const next = path?.[0] ?? spot;
+  // Sur rails (la draisine), droit vers le prochain point de passage; sinon par le chemin de la grille.
+  const waypoint = b.route?.[b.leg];
+  const next = waypoint ?? findPath(refreshBlockers(sim), b.pos, spot)?.[0] ?? spot;
   const d = Math.hypot(next.x - b.pos.x, next.y - b.pos.y);
   if (d > 0.01) {
     f.mx = (next.x - b.pos.x) / d;

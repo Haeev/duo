@@ -166,6 +166,8 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
             construction: beamDef?.id ?? null,
             contents: null,
             to: { ...(map.points[beamDef?.point ?? ''] ?? beamFrom) },
+            route: null,
+            leg: 0,
             pos: { x: beamFrom.x, y: beamFrom.y },
             prev: { x: beamFrom.x, y: beamFrom.y },
             facing: 0,

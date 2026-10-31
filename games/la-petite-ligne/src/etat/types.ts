@@ -503,6 +503,10 @@ export interface Beam {
   contents: ItemId | null;
   /** Où le poser. */
   to: Vec2;
+  /** Trajet imposé (la draisine sur ses rails): points de passage, le dernier vaut `to`; `null`: trajet libre. */
+  route: Vec2[] | null;
+  /** Segment en cours du trajet imposé (vers `route[leg]`). */
+  leg: number;
   pos: Vec2;
   prev: Vec2;
   /** Orientation de la poutre (radians). */

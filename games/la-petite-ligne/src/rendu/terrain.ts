@@ -216,7 +216,10 @@ export class Terrain {
     const stones = SETTINGS.fordStones;
     const shapes = stones.sides.map((sides) =>
       new ShapeBuilder()
-        .cylinder(0.5, 0.5, stones.thickness, [0, 0, 0], 'cobble', { base: true, segments: sides })
+        .cylinder(0.5, 0.5, stones.thickness, [0, 0, 0], 'cobble_dark', {
+          base: true,
+          segments: sides,
+        })
         .build(),
     );
     const matrix = new Matrix4();
@@ -236,7 +239,7 @@ export class Terrain {
         const size = stones.minSize + hash2(cx, cy, 81 + slot) * (stones.maxSize - stones.minSize);
         const x = cx + ox + (hash2(cx, cy, 91 + slot) - 0.5) * stones.jitter;
         const y = cy + oy + (hash2(cx, cy, 101 + slot) - 0.5) * stones.jitter;
-        position.set(x, SETTINGS.fordBed, y);
+        position.set(x, stones.bed, y);
         rotation.setFromEuler(euler.set(0, hash2(cx, cy, 111 + slot) * Math.PI * 2, 0));
         scale.set(size, 1, size * (0.75 + hash2(cx, cy, 121 + slot) * 0.25));
         parts.push(shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
@@ -270,7 +273,9 @@ export class Terrain {
       (kind === 'water' && this.map.blocked[index] === false) ||
       (inside && kind === 'gravel' && this.fords.has(index));
     const height = ford
-      ? SETTINGS.fordBed
+      ? kind === 'gravel'
+        ? SETTINGS.fordStones.bed
+        : SETTINGS.fordBed
       : kind === 'water'
         ? SETTINGS.heights.water
         : SETTINGS.heights[kind];

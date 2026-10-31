@@ -125,8 +125,18 @@ function stackList(r: Reader): { item: string; count: number }[] {
 function parseCarry(r: Reader | null): Settings['carry'] {
   const handcar = r?.opt('handcar') ?? null;
   const parcel = r?.opt('parcel') ?? null;
-  const offset = handcar === null ? null : handcar.at('toOffset').numberList();
-  if (handcar !== null && offset?.length !== 2) handcar.at('toOffset').fail('deux nombres attendus (dx, dy)');
+  const path: [number, number][] =
+    handcar === null
+      ? []
+      : handcar
+          .at('path')
+          .items()
+          .map((w) => {
+            const xy = w.numberList();
+            if (xy.length !== 2) w.fail('deux nombres attendus (dx, dy)');
+            return [xy[0] ?? 0, xy[1] ?? 0];
+          });
+  if (handcar !== null && path.length === 0) handcar.at('path').fail('au moins un point de passage');
   return {
     handcar:
       handcar === null
@@ -134,7 +144,8 @@ function parseCarry(r: Reader | null): Settings['carry'] {
         : {
             item: handcar.at('item').string(),
             from: handcar.at('from').string(),
-            toOffset: [offset?.[0] ?? 0, offset?.[1] ?? 0],
+            path,
+            toOffset: path[path.length - 1] ?? [0, 0],
             quest: handcar.at('quest').string(),
             step: handcar.at('step').string(),
             flag: handcar.at('flag').string(),

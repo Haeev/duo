@@ -394,7 +394,17 @@ export interface Settings {
   /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
   /** Gestes à deux de la semaine 2 (`reglages.carry`): draisine poussée et colis lourd; `null` si absents. */
   carry: {
-    handcar: { item: string; from: string; toOffset: [number, number]; quest: string; step: string; flag: string } | null;
+    /** `path`: points de passage sur les rails, en décalages (m) depuis `from`; le dernier est l'arrêt. */
+    handcar: {
+      item: string;
+      from: string;
+      path: [number, number][];
+      /** Le point d'arrêt (dernier de `path`), pour le rendu de démonstration. */
+      toOffset: [number, number];
+      quest: string;
+      step: string;
+      flag: string;
+    } | null;
     parcel: { item: string; from: string; to: string } | null;
   };
   /** Envies (HA-07): une envie ne revient pas pour un joueur avant ce nombre de jours. */

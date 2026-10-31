@@ -107,10 +107,12 @@ export const RENDER_SETTINGS = {
      * (décalage depuis son coin) et désordre.
      */
     fordStones: {
+      /** Fond du gué de gravier: une douzaine de centimètres sous la lame d'eau. */
+      bed: -0.04,
       sides: [5, 6, 7],
-      thickness: 0.22,
+      thickness: 0.13,
       minSize: 0.3,
-      maxSize: 0.6,
+      maxSize: 0.55,
       perCell: [
         [0.28, 0.3],
         [0.72, 0.7],

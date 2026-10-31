@@ -8,7 +8,15 @@ import type { Beam } from '../etat/types';
 import { type Sim, itemWithArticle, sayIfWritten } from './contexte';
 import { addStack } from './sac';
 
-function load(sim: Sim, item: string, purpose: Beam['purpose'], from: string, to: { x: number; y: number }, contents: string | null): void {
+function load(
+  sim: Sim,
+  item: string,
+  purpose: Beam['purpose'],
+  from: string,
+  to: { x: number; y: number },
+  contents: string | null,
+  route: { x: number; y: number }[] | null = null,
+): void {
   const at = sim.map.points[from];
   if (at === undefined) return;
   sim.world.beam = {
@@ -17,10 +25,12 @@ function load(sim: Sim, item: string, purpose: Beam['purpose'], from: string, to
     construction: null,
     contents,
     to: { x: to.x, y: to.y },
+    route,
+    leg: 0,
     pos: { x: at.x, y: at.y },
     prev: { x: at.x, y: at.y },
-    // Tournée vers la destination (la draisine dans l'axe de sa voie).
-    facing: Math.atan2(to.y - at.y, to.x - at.x),
+    // Tournée vers le premier point (la draisine dans l'axe de sa voie).
+    facing: Math.atan2((route?.[0] ?? to).y - at.y, (route?.[0] ?? to).x - at.x),
     carried: false,
     holders: [],
   };
@@ -38,7 +48,9 @@ export function spawnLoads(sim: Sim): void {
     const step = q?.status === 'active' ? sim.content.quests.find((x) => x.id === handcar.quest)?.steps[q.step]?.id : undefined;
     const from = sim.map.points[handcar.from];
     if (step === handcar.step && from !== undefined) {
-      load(sim, handcar.item, 'handcar', handcar.from, { x: from.x + handcar.toOffset[0], y: from.y + handcar.toOffset[1] }, null);
+      const route = handcar.path.map(([dx, dy]) => ({ x: from.x + dx, y: from.y + dy }));
+      const end = route[route.length - 1] ?? from;
+      load(sim, handcar.item, 'handcar', handcar.from, end, null, route);
       return;
     }
   }

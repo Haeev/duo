@@ -39,7 +39,7 @@ function carry(sim: Sim, who: CharacterId[], ticks: number): WorldEvent[] {
   const events: WorldEvent[] = [];
   for (let i = 0; i < ticks && sim.world.beam !== null; i++) {
     const b = sim.world.beam;
-    const next = findPath(refreshBlockers(sim), b.pos, b.to)?.[0] ?? b.to;
+    const next = b.route?.[b.leg] ?? findPath(refreshBlockers(sim), b.pos, b.to)?.[0] ?? b.to;
     const d = Math.max(1e-6, Math.hypot(next.x - b.pos.x, next.y - b.pos.y));
     const frame: ControlFrame = { seq: i + 1, moveX: (next.x - b.pos.x) / d, moveY: (next.y - b.pos.y) / d, actHeld: true };
     const controls: Partial<Record<CharacterId, ControlFrame>> = {};
@@ -99,12 +99,16 @@ describe('draisine poussée à deux', () => {
   it('au bout de la voie, elle y reste, même après une sauvegarde rechargée', () => {
     const sim = withHandcar();
     const to = { ...(sim.world.beam?.to ?? { x: 0, y: 0 }) };
+    const start = { ...(sim.world.beam?.pos ?? { x: 0, y: 0 }) };
+    const route = sim.world.beam?.route ?? [];
+    const length = route.reduce((sum, w, i) => sum + distance(i === 0 ? start : (route[i - 1] ?? start), w), 0);
+    expect(length, 'une vraie poussée sur les rails, de plusieurs mètres').toBeGreaterThan(6);
     expect(sim.world.handcarAt).toBeNull();
     grab(sim, ['p1', 'p2']);
     carry(sim, ['p1', 'p2'], SIM_HZ * 30);
     const at = sim.world.handcarAt;
     expect(at).not.toBeNull();
-    expect(distance(at?.pos ?? { x: 0, y: 0 }, to)).toBeLessThanOrEqual(sim.content.settings.feel.beamDropRadius);
+    expect(distance(at?.pos ?? { x: 0, y: 0 }, to), 'arrêtée au bout des rails').toBeLessThan(1e-6);
     for (let i = 0; i < SIM_HZ * 5; i++) step(sim, { controls: {}, intents: [] });
     expect(sim.world.handcarAt).toEqual(at);
     expect(sim.world.beam).toBeNull();
@@ -121,8 +125,14 @@ describe('draisine poussée à deux', () => {
   it('relâchée en chemin: posée là, intacte, et on la reprend', () => {
     const sim = withHandcar();
     grab(sim, ['p1', 'p2']);
-    // Quelques pas seulement: la voie de garage est courte.
-    carry(sim, ['p1', 'p2'], 6);
+    // Trajet sur rails: la voie de garage (3 m vers le sud), puis 5 m vers l'ouest sur la ligne.
+    const route = sim.world.beam?.route ?? [];
+    expect(route.length).toBeGreaterThanOrEqual(2);
+    carry(sim, ['p1', 'p2'], SIM_HZ * 3);
+    const mid = sim.world.beam;
+    expect(mid?.leg, 'à mi-chemin, sur la voie principale').toBe(1);
+    expect(Math.abs((mid?.pos.y ?? 0) - (route[0]?.y ?? -1))).toBeLessThan(1e-6);
+    expect(Math.cos(mid?.facing ?? 0)).toBeLessThan(-0.99);
     const events = carry(sim, [], 2);
     expect(events.some((e) => e.type === 'beam_dropped')).toBe(true);
     expect(sim.world.beam?.carried).toBe(false);

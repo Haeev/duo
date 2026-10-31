@@ -304,7 +304,11 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
       const off = sim.runtime.beamOffsets[c.id];
       return !bodyCollides(blockers, x + off.x, y + off.y);
     });
-  if (vx !== 0 || vy !== 0) {
+  if (beam.route !== null) {
+    railStep(beam, vx * dt, vy * dt, fits);
+    vx = (beam.pos.x - beam.prev.x) / dt;
+    vy = (beam.pos.y - beam.prev.y) / dt;
+  } else if (vx !== 0 || vy !== 0) {
     const nx = beam.pos.x + vx * dt;
     const ny = beam.pos.y + vy * dt;
     // Tout le pas, sinon un axe puis l'autre: la charge glisse le long des murs (gauntlet, tour 4).
@@ -326,7 +330,8 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     c.speed = Math.hypot(vx, vy);
     if (c.speed > 0) c.facing = Math.atan2(vy, vx);
   }
-  if (distance(beam.pos, beam.to) <= s.feel.beamDropRadius) {
+  const arrived = beam.route !== null ? beam.leg >= beam.route.length : distance(beam.pos, beam.to) <= s.feel.beamDropRadius;
+  if (arrived) {
     sim.world.beam = null;
     for (const c of holders) {
       c.status = 'active';
@@ -336,6 +341,43 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     return beam;
   }
   return null;
+}
+
+/**
+ * Charge sur rails (la draisine): l'élan des porteurs est projeté sur le segment en cours; elle
+ * avance (ou recule) le long de la voie, passe au segment suivant au bout de celui-ci, et regarde
+ * dans l'axe de la voie. `leg` vaut la longueur du trajet une fois au bout.
+ */
+function railStep(beam: Beam, dx: number, dy: number, fits: (x: number, y: number) => boolean): void {
+  const route = beam.route;
+  if (route === null) return;
+  let budget = Math.hypot(dx, dy);
+  while (budget > 1e-9 && beam.leg < route.length) {
+    const target = route[beam.leg];
+    if (target === undefined) return;
+    const sx = target.x - beam.pos.x;
+    const sy = target.y - beam.pos.y;
+    const left = Math.hypot(sx, sy);
+    if (left < 1e-6) {
+      beam.leg += 1;
+      continue;
+    }
+    const ux = sx / left;
+    const uy = sy / left;
+    beam.facing = Math.atan2(uy, ux);
+    // Seul l'élan dans l'axe de la voie compte; pousser à rebours ne la fait pas reculer.
+    const along = ((dx * ux + dy * uy) / Math.max(1e-9, Math.hypot(dx, dy))) * budget;
+    if (along <= 0) return;
+    const step = Math.min(along, left);
+    const nx = beam.pos.x + ux * step;
+    const ny = beam.pos.y + uy * step;
+    if (!fits(nx, ny)) return;
+    beam.pos.x = nx;
+    beam.pos.y = ny;
+    budget -= step;
+    if (step >= left - 1e-9) beam.leg += 1;
+    else return;
+  }
 }
 
 export function characterById(sim: Sim, id: CharacterId): Character {
