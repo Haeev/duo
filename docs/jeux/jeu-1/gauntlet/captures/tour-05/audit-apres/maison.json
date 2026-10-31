@@ -1,0 +1,405 @@
+{
+ "bread": {
+  "min_z": -0.011,
+  "taille": [
+   0.25,
+   0.26,
+   0.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "chair": {
+  "min_z": 0.0,
+  "taille": [
+   0.44,
+   0.42,
+   0.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 11,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "chest": {
+  "min_z": 0.0,
+  "taille": [
+   0.91,
+   0.53,
+   0.52
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "crystal_radio": {
+  "min_z": 0.0,
+  "taille": [
+   0.44,
+   0.3,
+   0.34
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 15,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "curtains": {
+  "min_z": 0.93,
+  "taille": [
+   1.35,
+   0.08,
+   1.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 14,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "dish_omelette": {
+  "min_z": 0.0,
+  "taille": [
+   0.28,
+   0.28,
+   0.07
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [
+   [
+    "dish_omelette",
+    0.06
+   ],
+   [
+    "dish_omelette",
+    0.06
+   ],
+   [
+    "dish_omelette",
+    0.06
+   ]
+  ],
+  "nb_isolees": 3
+ },
+ "dish_radishes": {
+  "min_z": 0.0,
+  "taille": [
+   0.28,
+   0.28,
+   0.08
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 14,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "dish_soup": {
+  "min_z": 0.0,
+  "taille": [
+   0.23,
+   0.23,
+   0.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "double_bed": {
+  "min_z": 0.0,
+  "taille": [
+   1.59,
+   1.95,
+   1.0
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 13,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flower_pot": {
+  "min_z": 0.0,
+  "taille": [
+   0.42,
+   0.4,
+   0.66
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 14,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "iron_box": {
+  "min_z": 0.0,
+  "taille": [
+   0.31,
+   0.21,
+   0.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "jay_feather": {
+  "min_z": 0.0,
+  "taille": [
+   0.15,
+   0.12,
+   0.47
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "kit_door": {
+  "min_z": 0.0,
+  "taille": [
+   1.05,
+   0.83,
+   2.4
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "kit_floor_wood": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   0.99,
+   0.06
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "kit_wall_stone": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   0.3,
+   2.4
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 1,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "kit_wall_wood": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   0.31,
+   2.4
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "kit_window": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   0.86,
+   2.4
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "mattress": {
+  "min_z": 0.001,
+  "taille": [
+   1.31,
+   0.67,
+   0.64
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "oil_lamp": {
+  "min_z": 0.0,
+  "taille": [
+   0.22,
+   0.21,
+   0.48
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 16,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "old_photo": {
+  "min_z": 0.0,
+  "taille": [
+   0.2,
+   0.15,
+   0.01
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "parcel": {
+  "min_z": 0.0,
+  "taille": [
+   0.51,
+   0.37,
+   0.31
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "picture_frame": {
+  "min_z": 1.225,
+  "taille": [
+   0.6,
+   0.05,
+   0.45
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "riddle_card": {
+  "min_z": 0.0,
+  "taille": [
+   0.17,
+   0.13,
+   0.01
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rug": {
+  "min_z": 0.0,
+  "taille": [
+   1.8,
+   1.96,
+   0.02
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 22,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "shed_key": {
+  "min_z": -0.005,
+  "taille": [
+   0.26,
+   0.09,
+   0.02
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "shelf": {
+  "min_z": 0.0,
+  "taille": [
+   1.65,
+   0.35,
+   1.75
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 20,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "stove": {
+  "min_z": 0.0,
+  "taille": [
+   0.71,
+   0.75,
+   1.97
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 17,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "straw_mattress": {
+  "min_z": 0.0,
+  "taille": [
+   0.92,
+   1.85,
+   0.2
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 16,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "table": {
+  "min_z": 0.0,
+  "taille": [
+   1.6,
+   0.85,
+   0.78
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "wood_stove": {
+  "min_z": 0.0,
+  "taille": [
+   0.52,
+   0.73,
+   1.97
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 11,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ }
+}

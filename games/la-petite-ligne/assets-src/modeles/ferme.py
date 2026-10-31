@@ -349,8 +349,10 @@ def hen_mesh(A, body):
     g = A.geo()
     dark = {"chicken_white": "chicken_white", "chicken_russet": "bark", "chicken_black": "chicken_black"}[body]
     g.sphere(0.13, loc=(0, 0.02, 0.21), color=body, segs=9, rings=6, scale=(0.85, 1.25, 0.9), bone="hen_body")
-    g.prism([(-0.06, 0.0), (0.07, 0.0), (0.05, 0.14), (-0.02, 0.12)], 0.08, loc=(0, 0.15, 0.22), color=dark,
-            rot=(0, 0, 90), bone="hen_body")
+    # queue en éventail: trois plumes facettées un peu relevées
+    for a in (-25, 0, 25):
+        g.sphere(1.0, loc=(math.sin(math.radians(a)) * 0.03, 0.16, 0.29), color=dark, segs=5, rings=3,
+                 scale=(0.014, 0.045, 0.08), rot=(-35, a, 0), bone="hen_body")
     for s in (1, -1):
         g.sphere(0.08, loc=(s * 0.1, 0.03, 0.22), color=dark if body != "chicken_white" else "egg", segs=7, rings=4,
                  scale=(0.35, 1.2, 0.75), bone="hen_body")

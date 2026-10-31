@@ -173,6 +173,33 @@ def by_height(levels):
     return f
 
 
+# Low poly arrondi automatique (bible section 8.2): quand AUTO_ROUND est vrai, toute boîte sans
+# chanfrein explicite en reçoit un selon sa taille (arêtes au sol vives pour les boîtes posées).
+AUTO_ROUND = False
+AUTO_MIN = (0.6, 0.08)   # plus grande et plus petite dimensions en dessous desquelles une boîte reste vive
+
+
+def auto_bevel(size, base):
+    """(largeur, segments, prédicat) du chanfrein automatique, ou None pour une boîte trop fine ou minuscule."""
+    dmax, dmin = max(size), min(size)
+    # petits détails (moins de 60 cm) et planches et plaques (moins de 8 cm): peu visibles à 16 à 36 m de champ,
+    # laissés vifs pour tenir le budget de triangles
+    if dmax < AUTO_MIN[0] or dmin < AUTO_MIN[1]:
+        return None
+    w = 0.02 if dmax < 0.5 else 0.035 if dmax < 2.0 else 0.07 if dmax < 6.0 else 0.1
+    w = min(w, dmin * 0.35)
+    # deux segments pour les gros volumes seulement (murs, socles): le coût reste raisonnable
+    seg = 2 if dmax >= 2.0 and dmin >= 0.25 else 1
+    # arêtes du dessous jamais chanfreinées (posées au sol ou invisibles d'en haut)
+    zb = 0.0 if base else -size[2] / 2
+    pred = lambda a, b: not (abs(a.z - zb) < 1e-4 and abs(b.z - zb) < 1e-4)  # noqa: E731
+    if dmax >= 2.0 and (size[2] >= 1.5 or base):
+        # mur, corps de bâtiment ou soubassement: seuls les angles verticaux sont chanfreinés (le haut est
+        # sous le toit ou porte un mur, un bardage: un chanfrein y laisserait les pièces posées en l'air)
+        pred = lambda a, b: abs(a.x - b.x) < 1e-4 and abs(a.y - b.y) < 1e-4  # noqa: E731
+    return w, seg, pred
+
+
 class Geo:
     """Accumule des pièces dans un bmesh unique; UV sur la palette, poids d'os facultatifs."""
 
@@ -218,11 +245,16 @@ class Geo:
                         v[self.dl][self.bone_index(b)] = w
         return verts
 
-    def _bevel(self, verts, bevel, bseg):
+    def _bevel(self, verts, bevel, bseg, edges_pred=None):
         faces0 = list({f for v in verts for f in v.link_faces})
         # ordre déterministe (sinon l'ordre des sommets change d'une construction à l'autre)
         self.bm.edges.index_update()
         edges = sorted({e for v in verts for e in v.link_edges}, key=lambda e: e.index)
+        if edges_pred is not None:
+            # chanfrein sélectif (arêtes vues seulement): edges_pred(a, b) sur les coordonnées locales
+            edges = [e for e in edges if edges_pred(e.verts[0].co, e.verts[1].co)]
+            if not edges:
+                return verts
         r = bmesh.ops.bevel(self.bm, geom=edges, offset=bevel, segments=bseg, profile=0.5,
                             affect="EDGES", clamp_overlap=True)
         faces = [f for f in faces0 if f.is_valid] + list(r["faces"])
@@ -231,8 +263,12 @@ class Geo:
 
     # primitives
     def box(self, size, loc=(0, 0, 0), color="stone", rot=(0, 0, 0), bevel=0.0, bseg=1,
-            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False):
+            taper=None, shear=None, bone=None, weights=None, smooth=None, base=False, bedges=None, no_round=False):
         sx, sy, sz = size
+        if AUTO_ROUND and bevel == 0 and not no_round:
+            ab = auto_bevel(size, base)
+            if ab:
+                bevel, bseg, bedges = ab
         verts = bmesh.ops.create_cube(self.bm, size=1.0)["verts"]
         for v in verts:
             x, y, z = v.co.x * sx, v.co.y * sy, v.co.z * sz
@@ -246,12 +282,19 @@ class Geo:
                 z += sz / 2
             v.co = Vector((x, y, z))
         if bevel > 0:
-            verts = self._bevel(verts, bevel, bseg)
+            verts = self._bevel(verts, bevel, bseg, bedges)
         M = Matrix.Translation(Vector(loc)) @ _rot(rot)
         return self._finish(verts, color, bone, weights, smooth, M)
 
+    def bevel(self, verts, offset, segs, color, edges_pred=None):
+        """Chanfreine après coup des pièces déjà posées (coordonnées finales), puis recolore."""
+        verts = self._bevel([v for v in verts if v.is_valid], offset, segs, edges_pred)
+        return self._finish(verts, color)
+
     def cyl(self, r, h, loc=(0, 0, 0), color="wood", segs=8, r2=None, rot=(0, 0, 0), cap=True,
             base=False, bone=None, weights=None, smooth=None, scale=(1, 1, 1), bevel=0.0):
+        if AUTO_ROUND and segs < 5:
+            segs = 5 if r < 0.025 else 6  # bible 8.4: jamais moins de 5 pans
         verts = bmesh.ops.create_cone(self.bm, cap_ends=cap, cap_tris=False, segments=segs,
                                       radius1=r, radius2=r if r2 is None else r2, depth=h)["verts"]
         for v in verts:
@@ -294,13 +337,13 @@ class Geo:
         return self._finish(verts, color, bone, weights, smooth, M)
 
     def lathe(self, profile, loc=(0, 0, 0), colors="wood", segs=8, rot=(0, 0, 0), bone=None,
-              weights=None, smooth=None, scale=(1, 1, 1), close_top=True, close_bottom=True):
+              weights=None, smooth=None, scale=(1, 1, 1), close_top=True, close_bottom=True, phase=0.0):
         """Profil [(rayon, z), ...] de bas en haut, tourné autour de Z. colors: une couleur ou une par bande."""
         rings = []
         for (r, z) in profile:
             ring = []
             for k in range(segs):
-                a = 2 * math.pi * k / segs
+                a = 2 * math.pi * k / segs + math.radians(phase)
                 ring.append(self.bm.verts.new((r * math.cos(a) * scale[0], r * math.sin(a) * scale[1], z * scale[2])))
             rings.append(ring)
         band_faces = []

@@ -107,7 +107,7 @@ def locomotive(A):
     g.cyl(0.21, 0.04, loc=(2.95, 0, 3.33), color="brass", segs=10)
     g.lathe([(0.32, 0.0), (0.3, 0.2), (0.22, 0.4), (0.0, 0.48)], loc=(1.15, 0, 2.42), colors="brass", segs=10)
     g.lathe([(0.24, 0.0), (0.22, 0.15), (0.0, 0.3)], loc=(0.2, 0, 2.45), colors="loco_green", segs=8)
-    g.cyl(0.04, 0.25, loc=(-0.1, 0.25, 2.62), color="brass", segs=6, base=True)
+    g.cyl(0.04, 0.4, loc=(-0.1, 0.25, 2.47), color="brass", segs=6, base=True)  # sifflet posé sur la chaudière
     # caisses à eau latérales
     for s in (1, -1):
         g.box((2.6, 0.42, 1.05), loc=(0.85, s * 0.78, 1.25), color="loco_green", base=True, bevel=0.03)
@@ -194,6 +194,9 @@ def coach(A):
         g.box((0.07, 0.5, 0.6), loc=(s * L / 2 + s * 0.03, 0, 2.3), color="glass", base=True)
         for y in (-0.95, 0.95):
             g.box((0.25, 0.3, 0.04), loc=(x, y * 1.12, 0.95), color="iron")
+            # étriers: le marchepied est pendu sous la plateforme
+            for dx in (-0.11, 0.11):
+                g.box((0.025, 0.025, 0.33), loc=(x + dx, y * 1.12, 0.95), color="iron", base=True)
     roof_curved(g, -L / 2 - 0.85, L / 2 + 0.85, 2.5, 3.07, 0.35, "lauze_dark", "black")
     for x in (-2.0, 0.0, 2.0):
         g.cyl(0.1, 0.18, loc=(x, 0, 3.32), color="black", segs=6, base=True)

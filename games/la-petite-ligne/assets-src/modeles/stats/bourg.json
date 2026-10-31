@@ -6,7 +6,7 @@
     6
    ],
    "door_cell": 4,
-   "tris": 3264
+   "tris": 4016
   },
   "platform": {
    "footprint": [
@@ -16,7 +16,7 @@
    "walk_height": 0.4,
    "track_side": "-z",
    "note": "bord côté voie vers -Z (arrière); marquise centrée sur 10 m",
-   "tris": 3160
+   "tris": 3328
   },
   "gatekeeper_house": {
    "footprint": [
@@ -40,7 +40,7 @@
     "gatekeeper_house_ruin",
     "gatekeeper_house_repaired"
    ],
-   "tris": 6500
+   "tris": 7108
   },
   "ferrand_shop": {
    "footprint": [
@@ -49,7 +49,7 @@
    ],
    "door_cell": 2,
    "counter_cell": 6,
-   "tris": 3664
+   "tris": 4664
   },
   "firmin_house": {
    "footprint": [
@@ -57,7 +57,7 @@
     6
    ],
    "door_cell": 3,
-   "tris": 2264
+   "tris": 4524
   },
   "sawmill": {
    "footprint": [
@@ -65,7 +65,7 @@
     8
    ],
    "door_cell": 5,
-   "tris": 1356
+   "tris": 1944
   },
   "handcar_shed": {
    "footprint": [
@@ -74,7 +74,7 @@
    ],
    "door_cell": 2,
    "note": "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y",
-   "tris": 1132
+   "tris": 1480
   },
   "handcar": {
    "footprint": [
@@ -91,7 +91,7 @@
     2
    ],
    "water_point": true,
-   "tris": 442
+   "tris": 686
   },
   "henhouse": {
    "footprint": [
@@ -103,21 +103,21 @@
     "henhouse_ruin",
     "henhouse_repaired"
    ],
-   "tris": 2108
+   "tris": 2392
   },
   "workbench": {
    "footprint": [
     2,
     2
    ],
-   "tris": 400
+   "tris": 496
   },
   "woodpile": {
    "footprint": [
     2,
     1
    ],
-   "tris": 888
+   "tris": 312
   },
   "plank_stack": {
    "footprint": [
@@ -149,7 +149,7 @@
     1,
     2
    ],
-   "tris": 152
+   "tris": 240
   },
   "level_crossing_gate": {
    "footprint": [
@@ -157,14 +157,14 @@
     1
    ],
    "note": "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée",
-   "tris": 228
+   "tris": 252
   },
   "bell_post": {
    "footprint": [
     1,
     1
    ],
-   "tris": 198
+   "tris": 214
   },
   "bench": {
    "footprint": [
@@ -192,28 +192,28 @@
     1,
     1
    ],
-   "tris": 332
+   "tris": 364
   },
   "station_sign": {
    "footprint": [
     2,
     1
    ],
-   "tris": 260
+   "tris": 432
   },
   "arbor": {
    "footprint": [
     3,
     2
    ],
-   "tris": 944
+   "tris": 848
   },
   "mailbox": {
    "footprint": [
     1,
     1
    ],
-   "tris": 92
+   "tris": 104
   },
   "barrel": {
    "footprint": [
@@ -248,14 +248,14 @@
     3,
     2
    ],
-   "tris": 404
+   "tris": 428
   },
   "bicycle": {
    "footprint": [
     2,
     1
    ],
-   "tris": 520
+   "tris": 820
   },
   "ground_grass": {
    "footprint": [
@@ -332,7 +332,7 @@
     1
    ],
    "choppable": true,
-   "tris": 204
+   "tris": 358
   },
   "tree_oak_large": {
    "footprint": [
@@ -340,7 +340,7 @@
     2
    ],
    "choppable": true,
-   "tris": 204
+   "tris": 358
   },
   "tree_fir_small": {
    "footprint": [
@@ -348,7 +348,7 @@
     1
    ],
    "choppable": true,
-   "tris": 68
+   "tris": 174
   },
   "tree_fir_large": {
    "footprint": [
@@ -356,7 +356,7 @@
     2
    ],
    "choppable": true,
-   "tris": 68
+   "tris": 174
   },
   "tree_birch_small": {
    "footprint": [
@@ -364,7 +364,7 @@
     1
    ],
    "choppable": false,
-   "tris": 184
+   "tris": 366
   },
   "tree_birch_large": {
    "footprint": [
@@ -372,7 +372,7 @@
     2
    ],
    "choppable": false,
-   "tris": 184
+   "tris": 366
   },
   "tree_stump": {
    "footprint": [
@@ -386,21 +386,21 @@
     1,
     1
    ],
-   "tris": 80
+   "tris": 100
   },
   "bush_bramble": {
    "footprint": [
     1,
     1
    ],
-   "tris": 180
+   "tris": 280
   },
   "bush_hazel": {
    "footprint": [
     1,
     1
    ],
-   "tris": 140
+   "tris": 128
   },
   "rock_small": {
    "footprint": [
@@ -428,49 +428,49 @@
     1,
     1
    ],
-   "tris": 36
+   "tris": 90
   },
   "flowers_red": {
    "footprint": [
     1,
     1
    ],
-   "tris": 316
+   "tris": 400
   },
   "flowers_yellow": {
    "footprint": [
     1,
     1
    ],
-   "tris": 316
+   "tris": 400
   },
   "flowers_white": {
    "footprint": [
     1,
     1
    ],
-   "tris": 316
+   "tris": 400
   },
   "flowers_blue": {
    "footprint": [
     1,
     1
    ],
-   "tris": 316
+   "tris": 400
   },
   "flower_bed": {
    "footprint": [
     2,
     1
    ],
-   "tris": 1148
+   "tris": 620
   },
   "reeds": {
    "footprint": [
     1,
     1
    ],
-   "tris": 144
+   "tris": 224
   },
   "river_straight": {
    "footprint": [
@@ -507,19 +507,19 @@
     3
    ],
    "walk_height": 0.5,
-   "tris": 640
+   "tris": 652
   },
   "tree_oak": {
    "alias_of": "tree_oak_large",
-   "tris": 204
+   "tris": 358
   },
   "tree_fir": {
    "alias_of": "tree_fir_large",
-   "tris": 68
+   "tris": 174
   },
   "bush": {
    "alias_of": "bush_round",
-   "tris": 80
+   "tris": 100
   },
   "rock": {
    "alias_of": "rock_medium",
@@ -530,9 +530,12 @@
    "tris": 36
   },
   "log_pile": {
-   "alias_of": "woodpile",
-   "tris": 888
+   "footprint": [
+    2,
+    1
+   ],
+   "tris": 216
   }
  },
- "file_bytes": 2959400
+ "file_bytes": 3464444
 }

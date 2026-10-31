@@ -1,0 +1,926 @@
+{
+ "arbor": {
+  "min_z": 0.0,
+  "taille": [
+   3.04,
+   2.14,
+   2.78
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 52,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "barrel": {
+  "min_z": 0.0,
+  "taille": [
+   0.62,
+   0.63,
+   0.76
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bell_post": {
+  "min_z": 0.0,
+  "taille": [
+   1.1,
+   0.7,
+   2.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 8,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bench": {
+  "min_z": -0.004,
+  "taille": [
+   1.9,
+   0.56,
+   0.85
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 13,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bicycle": {
+  "min_z": -0.004,
+  "taille": [
+   1.79,
+   0.5,
+   0.97
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 38,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "buffer_stop": {
+  "min_z": 0.0,
+  "taille": [
+   1.03,
+   2.0,
+   1.11
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 10,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bush": {
+  "min_z": -0.049,
+  "taille": [
+   1.25,
+   1.18,
+   0.85
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bush_bramble": {
+  "min_z": -0.057,
+  "taille": [
+   1.32,
+   1.06,
+   0.72
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 12,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bush_hazel": {
+  "min_z": -0.007,
+  "taille": [
+   1.54,
+   1.54,
+   1.84
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "bush_round": {
+  "min_z": -0.049,
+  "taille": [
+   1.25,
+   1.18,
+   0.85
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "cart": {
+  "min_z": 0.0,
+  "taille": [
+   2.53,
+   1.3,
+   0.93
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 29,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "coop_crate": {
+  "min_z": 0.0,
+  "taille": [
+   1.14,
+   0.86,
+   0.74
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 10,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "crate": {
+  "min_z": 0.0,
+  "taille": [
+   0.62,
+   0.62,
+   0.6
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "crate_stack": {
+  "min_z": 0.0,
+  "taille": [
+   1.31,
+   0.72,
+   1.23
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 7,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fence": {
+  "min_z": 0.0,
+  "taille": [
+   1.06,
+   0.1,
+   0.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fence_broken": {
+  "min_z": -0.007,
+  "taille": [
+   1.0,
+   0.2,
+   0.8
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [
+   [
+    "fence_broken",
+    0.03
+   ]
+  ],
+  "nb_isolees": 1
+ },
+ "fence_gate": {
+  "min_z": 0.0,
+  "taille": [
+   1.1,
+   0.1,
+   1.05
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fence_picket": {
+  "min_z": 0.0,
+  "taille": [
+   1.05,
+   0.09,
+   0.95
+  ],
+  "faces_inversees": 12,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fence_post": {
+  "min_z": 0.0,
+  "taille": [
+   0.1,
+   0.1,
+   0.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 1,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "fence_wood": {
+  "min_z": 0.0,
+  "taille": [
+   1.06,
+   0.1,
+   0.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "ferrand_shop": {
+  "min_z": 0.0,
+  "taille": [
+   9.63,
+   8.14,
+   8.42
+  ],
+  "faces_inversees": 40,
+  "aretes_ouvertes": 0,
+  "iles": 266,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "firmin_house": {
+  "min_z": 0.0,
+  "taille": [
+   6.37,
+   5.21,
+   5.22
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 16,
+  "iles": 150,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flower_bed": {
+  "min_z": 0.0,
+  "taille": [
+   2.1,
+   1.1,
+   0.5
+  ],
+  "faces_inversees": 48,
+  "aretes_ouvertes": 0,
+  "iles": 57,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flowers_blue": {
+  "min_z": -0.0,
+  "taille": [
+   0.65,
+   0.33,
+   0.31
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 23,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flowers_red": {
+  "min_z": -0.0,
+  "taille": [
+   0.37,
+   0.49,
+   0.36
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 23,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flowers_white": {
+  "min_z": -0.0,
+  "taille": [
+   0.49,
+   0.5,
+   0.31
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 24,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "flowers_yellow": {
+  "min_z": -0.0,
+  "taille": [
+   0.51,
+   0.4,
+   0.36
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 23,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "gatekeeper_house": {
+  "min_z": -0.008,
+  "taille": [
+   6.34,
+   5.97,
+   4.83
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 495,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "grass_tall": {
+  "min_z": -0.009,
+  "taille": [
+   0.57,
+   0.29,
+   0.58
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "ground_cobble": {
+  "min_z": 0.0,
+  "taille": [
+   1.05,
+   1.0,
+   0.03
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 17,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "ground_dirt": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   1.0,
+   0.03
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "ground_grass": {
+  "min_z": 0.0,
+  "taille": [
+   1.0,
+   1.0,
+   0.1
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "handcar": {
+  "min_z": 0.32,
+  "taille": [
+   1.4,
+   1.86,
+   1.4
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 23,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "handcar_shed": {
+  "min_z": 0.0,
+  "taille": [
+   5.87,
+   5.37,
+   4.56
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 107,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "henhouse": {
+  "min_z": -0.03,
+  "taille": [
+   2.95,
+   2.95,
+   1.94
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 173,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "lamp_post": {
+  "min_z": -0.0,
+  "taille": [
+   0.36,
+   0.42,
+   3.19
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 13,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "level_crossing_gate": {
+  "min_z": -0.0,
+  "taille": [
+   4.55,
+   0.32,
+   1.59
+  ],
+  "faces_inversees": 18,
+  "aretes_ouvertes": 0,
+  "iles": 9,
+  "iles_isolees": [
+   [
+    "level_crossing_gate_arm",
+    0.625
+   ],
+   [
+    "level_crossing_gate_post",
+    1.31
+   ]
+  ],
+  "nb_isolees": 2
+ },
+ "log_pile": {
+  "min_z": 0.0,
+  "taille": [
+   1.98,
+   1.01,
+   0.9
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 38,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "mailbox": {
+  "min_z": 0.0,
+  "taille": [
+   0.42,
+   0.31,
+   1.38
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 6,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "notice_board": {
+  "min_z": 0.0,
+  "taille": [
+   1.1,
+   0.41,
+   2.2
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 25,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "path_border": {
+  "min_z": 0.0,
+  "taille": [
+   0.97,
+   0.15,
+   0.1
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 4,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "plank_stack": {
+  "min_z": 0.0,
+  "taille": [
+   1.9,
+   0.9,
+   0.19
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 11,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "platform": {
+  "min_z": 0.0,
+  "taille": [
+   30.0,
+   4.0,
+   3.3
+  ],
+  "faces_inversees": 16,
+  "aretes_ouvertes": 0,
+  "iles": 153,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "pontoon": {
+  "min_z": -1.3,
+  "taille": [
+   1.84,
+   3.71,
+   2.15
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 25,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rail_curve_90": {
+  "min_z": 0.0,
+  "taille": [
+   13.01,
+   13.01,
+   0.32
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 38,
+  "iles": 216,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rail_straight": {
+  "min_z": 0.0,
+  "taille": [
+   4.0,
+   2.0,
+   0.32
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 8,
+  "iles": 25,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "reeds": {
+  "min_z": -0.003,
+  "taille": [
+   0.49,
+   0.41,
+   1.09
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 14,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "river_curve": {
+  "min_z": -0.75,
+  "taille": [
+   10.0,
+   10.0,
+   0.75
+  ],
+  "faces_inversees": 160,
+  "aretes_ouvertes": 56,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "river_ford": {
+  "min_z": -0.75,
+  "taille": [
+   4.0,
+   8.0,
+   0.75
+  ],
+  "faces_inversees": 44,
+  "aretes_ouvertes": 24,
+  "iles": 18,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "river_straight": {
+  "min_z": -0.75,
+  "taille": [
+   4.0,
+   8.0,
+   0.75
+  ],
+  "faces_inversees": 44,
+  "aretes_ouvertes": 24,
+  "iles": 12,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rock": {
+  "min_z": -0.134,
+  "taille": [
+   1.31,
+   0.87,
+   0.64
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rock_large": {
+  "min_z": -0.257,
+  "taille": [
+   2.36,
+   1.48,
+   1.34
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rock_medium": {
+  "min_z": -0.134,
+  "taille": [
+   1.31,
+   0.87,
+   0.64
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 2,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "rock_small": {
+  "min_z": -0.103,
+  "taille": [
+   0.6,
+   0.41,
+   0.41
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 1,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "sacks": {
+  "min_z": 0.0,
+  "taille": [
+   0.97,
+   0.48,
+   0.79
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 3,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "sawmill": {
+  "min_z": 0.0,
+  "taille": [
+   7.15,
+   7.64,
+   6.16
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 125,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "station": {
+  "min_z": 0.0,
+  "taille": [
+   9.73,
+   5.45,
+   5.62
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 213,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "station_sign": {
+  "min_z": 0.0,
+  "taille": [
+   1.96,
+   0.2,
+   2.48
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 116,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_birch_large": {
+  "min_z": -0.012,
+  "taille": [
+   2.8,
+   2.22,
+   6.41
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 8,
+  "iles": 11,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_birch_small": {
+  "min_z": -0.008,
+  "taille": [
+   1.94,
+   1.58,
+   4.53
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 8,
+  "iles": 11,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_fir": {
+  "min_z": 0.0,
+  "taille": [
+   4.42,
+   4.53,
+   5.93
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 14,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_fir_large": {
+  "min_z": 0.0,
+  "taille": [
+   4.42,
+   4.53,
+   5.93
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 14,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_fir_small": {
+  "min_z": 0.0,
+  "taille": [
+   2.95,
+   3.02,
+   3.95
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 14,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_oak": {
+  "min_z": -0.06,
+  "taille": [
+   4.92,
+   4.49,
+   6.32
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 46,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_oak_large": {
+  "min_z": -0.06,
+  "taille": [
+   4.92,
+   4.49,
+   6.32
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 46,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_oak_small": {
+  "min_z": -0.042,
+  "taille": [
+   3.43,
+   2.92,
+   4.36
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 46,
+  "iles": 9,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "tree_stump": {
+  "min_z": -0.02,
+  "taille": [
+   0.86,
+   0.86,
+   0.49
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 5,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "well": {
+  "min_z": 0.0,
+  "taille": [
+   2.0,
+   1.9,
+   2.85
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 12,
+  "iles": 22,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "woodpile": {
+  "min_z": 0.0,
+  "taille": [
+   1.98,
+   1.01,
+   0.9
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 38,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ },
+ "workbench": {
+  "min_z": 0.0,
+  "taille": [
+   2.2,
+   2.21,
+   3.0
+  ],
+  "faces_inversees": 0,
+  "aretes_ouvertes": 0,
+  "iles": 37,
+  "iles_isolees": [],
+  "nb_isolees": 0
+ }
+}

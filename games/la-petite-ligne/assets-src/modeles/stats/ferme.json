@@ -238,8 +238,8 @@
     "hen_red",
     "hen_black"
    ],
-   "tris": 1350,
-   "tris_each_variant": 450
+   "tris": 1494,
+   "tris_each_variant": 498
   }
  },
  "animations": [
@@ -247,5 +247,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 667996
+ "file_bytes": 687956
 }
