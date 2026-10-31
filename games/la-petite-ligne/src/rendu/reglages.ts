@@ -95,7 +95,9 @@ export const RENDER_SETTINGS = {
     scatterFarViewWidth: 30,
     scatterFarShare: 0.5,
     /** Taille des morceaux de décor fusionnés (découpage pour l'élimination hors champ). */
-    chunkSize: 24,
+    chunkSize: 20,
+    /** Tronçons de la forêt du pourtour et des rails (m): éliminés hors du cadre. */
+    stripSegment: 20,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
     /** Berges de la rivière: la pente descend sous l'eau sur cette largeur (m), dans la case d'eau. */

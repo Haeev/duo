@@ -240,7 +240,7 @@ export class RailwayPart implements EventfulPart {
 
   private layRails(materials: SharedMaterials, resources: ResourceTracker): void {
     const ext = RENDER_SETTINGS.terrain.extension;
-    const chunk = RENDER_SETTINGS.terrain.chunkSize;
+    const chunk = RENDER_SETTINGS.terrain.stripSegment;
     const matrix = new Matrix4();
     const ground = this.terrain.heightAt(this.map.width / 2, this.trackY);
     let segment: InstancedBatches | null = null;

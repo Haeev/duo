@@ -55,7 +55,7 @@ const JITTER = 0.7;
 /** Bord infranchissable de la carte (`bord` du level designer), en cases. */
 const PLAYABLE_BORDER = 2;
 const STRIPS = 4;
-/** Tronçons par côté au plus (côté prolongé divisé par `chunkSize`, large marge). */
+/** Tronçons par côté au plus (côté prolongé divisé par `stripSegment`, large marge). */
 const FOREST_SEGMENTS_MAX = 16;
 
 function pick<T>(items: readonly T[], value: number): T {
@@ -241,7 +241,7 @@ export class Vegetation {
         const side = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;
         // Chaque côté coupé en tronçons: ceux hors du cadre sont éliminés (ni triangles ni appel).
         const along = side < 2 ? cx : cy;
-        const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.chunkSize);
+        const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.stripSegment);
         cells.push({ cx, cy, strip: side * FOREST_SEGMENTS_MAX + segment });
       }
     }
