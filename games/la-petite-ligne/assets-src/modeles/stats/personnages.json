@@ -134,8 +134,28 @@
    "name": "sit_ground",
    "seconds": 3.0,
    "loop": true
+  },
+  {
+   "name": "climb_ladder",
+   "seconds": 1.2,
+   "loop": true
+  },
+  {
+   "name": "reach_up",
+   "seconds": 0.8,
+   "loop": false
+  },
+  {
+   "name": "hammer_tap",
+   "seconds": 0.6,
+   "loop": true
+  },
+  {
+   "name": "hold_ladder",
+   "seconds": 2.0,
+   "loop": true
   }
  ],
- "file_bytes": 2221740,
+ "file_bytes": 2276536,
  "player_example_tris": 2006
 }

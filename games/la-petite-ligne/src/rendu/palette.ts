@@ -156,6 +156,23 @@ export const PALETTE_CELLS = [
   'mattress',
   'mattress_stripe',
   'ivy',
+  'heron_grey',
+  'heron_grey_dark',
+  'feather_white',
+  'heron_leg',
+  'goose_grey',
+  'goose_grey_dark',
+  'goose_belly',
+  'goose_bill',
+  'goose_leg',
+  'tit_blue',
+  'tit_yellow',
+  'tit_green',
+  'fox_red',
+  'fox_red_dark',
+  'fox_white',
+  'fox_black',
+  'tar',
 ] as const;
 
 export type PaletteCell = (typeof PALETTE_CELLS)[number];

@@ -55,3 +55,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Un décor plaqué sur des facettes (grignes, lettres, traits) doit suivre les facettes réelles (lancer de rayons, tronçons courts), pas la forme ronde théorique: sinon il dépasse ou disparaît. Pavés de lettres jointifs: un jour de 3 mm suffit à rendre un mot illisible à distance.
 - Ne jamais annoncer une correction sans un rendu `verifier/quatre_angles.py` du GLB exporté.
 - Capture en situation: `rendu.html?stats=0&vie=0&heure=10:00&x=44.5&y=10&orientation=0&zoom=1` (devant la maison de Firmin); sans `vie=0` la caméra reste sur la maisonnette. Triangles de la vue: `window.lplRendu.stats()` (ombres comprises). Les commandes avec `pkill` dans une chaîne coupent la suite: les lancer seules.
+
+## Faune et poses (tour 6, vérifié le 2026-10-31)
+
+- Poser un squelette en rotations du repère du squelette, relatives au parent: quaternion local = R_repos^-1 · D · R_repos (`Rig.local` de `faune.py`). Indépendant du roulis des os, lisible (x tangage, y roulis, z lacet). Garder la continuité des quaternions d'une clé à l'autre (signe).
+- Plusieurs squelettes dans un GLB: une piste NLA par clip (`strip.action_slot` posé) et export `NLA_TRACKS`; chaque animation ne vise que son squelette.
+- Aile en plaque rigide repliée le long du flanc, bord d'attaque en haut: c'est la face inférieure qui regarde dehors (chiralité). Même couleur sur les deux faces. Raccourcir une aile repliée par l'échelle de l'os (axe Y = longueur).
+- Personnages sur un objet (échelle, banc): cinématique inverse plane (`_ik2` de `personnages.py`). Squelette `rig`: cuisse, tibia, pied et bras tournent autour de -X monde; un buste penché de b recule les bras de b. Main retournée: Euler (-flexion, 180, 0).
+- Placer chaque nouvel objet dans la vraie scène avant de livrer (`scene_echelle.py`): la fiche mettait l'échelle dans une branche du chêne, et le houppier (dessous vers 2,6 m) cachait nichoir et grimpeur.
+- Toute nouvelle case de palette.py entre aussi dans `src/rendu/palette.ts` (test `palette.test.ts`).
+- Cloche du quai: toute retouche passe par la fenêtre d'ombre de lumiere.test.ts. Plus rapide que de reconstruire le bourg: extraire directions du soleil et boîtes du banc par un test jetable, puis calculer hors ligne (sommets uniques par position et normale, comme le GLB soudé).
+- Garde-fou du worktree isolé: pas de boucle shell avec variable devant npx ou duo-python; écrire un script (`verifier/quatre_faune.sh`) ou des commandes simples.
+- Temps: planches de clips de quatre bêtes (115 rendus de 300 x 260) environ 6 min; quatre angles environ 40 s par modèle.

@@ -2,17 +2,18 @@
 
 Produits par script (Blender 5.2 sans interface), aucune ressource externe. Sources, planches de contrôle et outil de vérification: `games/la-petite-ligne/assets-src/modeles/`. Direction artistique: `docs/jeux/jeu-1/bible-artistique-demo.md`.
 
-Tout reconstruire (environ 6 minutes, planches comprises): `bash games/la-petite-ligne/assets-src/modeles/construire.sh` (`--sans-planches` pour les seuls GLB).
+Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite-ligne/assets-src/modeles/construire.sh` (`--sans-planches` pour les seuls GLB).
 
 ## Fichiers
 
 | Fichier | Contenu | Animations |
 |---|---|---|
-| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 23 clips sur le squelette |
+| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 27 clips sur le squelette |
 | `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature, rivière | aucune (pièces mobiles en nœuds à part) |
 | `ferme.glb` | cases du potager, cultures (4 stades), récoltes, sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
+| `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard), échelle, nichoir, chicot du chêne, brin de mousse | 23 clips, chacun sur le squelette de sa bête |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
@@ -57,6 +58,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
   - P1 de la démo déjà faits: `pet` (caresser une poule, accroupi), `high_five`, `sit` sur le banc (assise du banc 0,45 m).
   - Pêche, canne `fishing_rod` sous `socket_hand_r`: `fish_cast` (lancer en 1 s, une fois: armé derrière la tête à 0,33 s, canne verticale à 0,47 s, lâcher vers l'avant à 0,6 s, retour à l'attente), `fish_wait` (attente en boucle, canne devant à environ 40 degrés), `fish_strike` (ferrer puis mouliner, 1,6 s, une fois, finit sur la pose d'attente). Les trois commencent et finissent sur la même pose: on enchaîne sans saut.
   - `sit_ground`: assis par terre en boucle, bassin au sol, genoux levés, bras autour des jambes (absence, veillée sur la paillasse: poser le personnage sur le dessus de la paillasse, 0,15 m).
+  - Échelle de Basile (tour 6), sur `ladder_wood` de `faune.glb`: `climb_ladder` (boucle de 1,2 s = deux barreaux, 0,6 s par barreau; la racine reste sur la ligne de l'échelle au niveau des pieds, le jeu la monte de 0,28 m par barreau, soit 0,467 m/s; le corps est 0,16 m derrière elle; pieds posés à 0 s et 0,6 s; descendre = le jouer à l'envers), `reach_up` (0,8 s, une fois: la main droite prend le coin bas du nichoir penché à sa droite, contact à 0,3 s, puis le ramène droit), `hammer_tap` (0,6 s, choc à 0,25 s, à répéter trois fois; marteau de `ferme.glb` sous `socket_hand_r`, il tape le haut du nichoir). Les trois partent de la même pose (pied gauche sur un barreau, pied droit un barreau plus haut): monter un nombre impair de barreaux. Joueurs: `hold_ladder` (boucle de 2 s, face au montant à 0,35 m, mains à 0,9 et 1,2 m, pieds écartés).
 
 ## Bâtiments et pièces mobiles
 
@@ -67,6 +69,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 - `platform` (quai 30 x 4, marchable à 0,4 m, rampes aux deux bouts): `platform_base` et `platform_canopy` (marquise de 10 m centrée, côté +Z); le bord côté voie (pierres claires) est à -Z.
 - `handcar_shed` (remise): portes `handcar_shed_door_l` et `_r`, pivots sur les gonds (tourner de -100 et +100 degrés autour de Y pour ouvrir sur la draisine). `handcar` (draisine): balancier `handcar_lever` (pivot sur son axe X local, plus ou moins 20 degrés).
 - `level_crossing_gate`: lisse `level_crossing_gate_arm` (pivot sur Z, 0 baissée, +80 degrés levée).
+- `bell_post` (cloche du quai, sous la marquise): cloche de 0,55 m de large depuis le tour 6 (0,40 avant) et 0,31 m de haut, bas toujours à 1,95 m, centre inchangé à x 0,55 (bord est à x 0,825, soit 30,33 posé en x 29,5, hors de la marquise qui commence à 31); bras inchangé (bout à x 0,62). Plus haute ou décalée vers l'est, son ombre toucherait le banc dès 16 h 20: l'énigme de l'ombre (17 h à 17 h 45, `src/rendu/lumiere.test.ts`) ne tiendrait plus.
 - `workbench`: l'établi de Basile sous son propre auvent (2 x 2), à côté de `sawmill`.
 - Rivière: modules `river_straight` et `river_ford` (4 m le long de X, 8 m de large, axe en z = 0) et `river_curve` (10 x 10, axe de rayon 6 m: entre par le bord -Z en x = -1, sort par le bord +X en z = +1). L'eau est un nœud à part `*_water` à -0,3 m (à animer ou à changer de matériau); les berges descendent sous le sol: le terrain du jeu doit laisser la place à la rivière.
 - Voie: `rail_straight` (4 m le long de X, 2 m de large, 5 traverses, raccord sans couture), `rail_curve_90` (quart de cercle de rayon 12 m, emprise 13 x 13: la voie entre par le bord -Z en x = -5,5 et sort par le bord +X en z = +5,5, centre de courbure au coin x = +6,5, z = -6,5), `buffer_stop`. Voie métrique, rails à plus ou moins 0,5 m de l'axe, dessus du rail à 0,32 m.
@@ -97,10 +100,21 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 - Appels de dessin: un matériau par fichier; décor statique à fusionner ou à instancier par le jeu (arbres, buissons, clôtures, cultures et cases du potager se prêtent à `InstancedMesh`).
 - Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 64: moins de 100 Ko de mémoire.
 
+## Faune des moments rares (tour 6, `faune.glb`)
+
+Fiches: `docs/jeux/jeu-1/tour-06-conception.md` section 1.4. Sources: `assets-src/modeles/faune.py` (modèles et clips), `planche_faune.py` (planches des clips, échelle, zoom 1), `scene_echelle.py` (scène de l'échelle avec les vrais GLB), `verifier/quatre_faune.sh` (quatre angles de chaque modèle). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-06/faune-*.png`.
+
+- Une bête = un nœud racine (son squelette: `heron`, `goose`, `blue_tit`, `fox`) avec son maillage enfant `<bête>_mesh` (peau rigide par pièce), comme la poule. Instancier par `SkeletonUtils.clone`; jouer toujours un clip (la pose de repos des oiseaux a les ailes dépliées). Les clips sont sur place: le jeu déplace et oriente la racine (chorégraphies de la fiche).
+- Tailles réelles: héron 0,95 m debout (1,0 m cou tendu, envergure 1,70 m), oie 0,80 m (envergure 1,60 m, tête à 0,40 m au-dessus de l'eau), renard 0,40 m au garrot (corps 0,65 m, queue 0,40 m). Mésange agrandie x 1,5 (0,18 m) et sa mousse avec elle (0,06 m): à taille réelle elle tient en 10 pixels au zoom 1 et sa calotte bleue ne se lit plus (planche `faune-mesange-zoom1.png`). Extra `display_scale`.
+- Origines: au sol sous les pattes (héron, renard); ligne de flottaison (oie); pattes sur le perchoir (mésange). La mousse s'accroche sous `socket_blue_tit_beak`, sans transformation.
+- `ladder_wood`: 3,0 m, penchée à 75 degrés vers +Z (la poser avec la même rotation que Basile qui y grimpe), origine au milieu du pied, montants de 0,05 x 0,07 coupés à plat au sol et contre le tronc, 10 barreaux à 0,28 m de hauteur l'un de l'autre (le premier à 0,28 m, le dernier à 2,80 m), tête à `top` [0 ; 2,898 ; 0,776].
+- `nest_box`: 0,15 x 0,25 m, 0,18 m de profondeur avec la planche de dos qui dépasse au-dessus du toit pour le clou; trou de 28 mm à 0,17 m du bas, toit goudronné débordant de 4 cm. Origine sur le clou (dos contre l'écorce): le centre de la caisse est 0,175 m sous le clou et 0,09 m devant. Penché: rotation de 25 degrés autour de Z glTF, le bas vers +X (vers l'est sur la carte, à l'opposé de l'échelle proposée). Perchoir du toit: extra `roof_perch`.
+- `oak_branch_stub`: origine au bout (dessus), là où la mésange se pose; il repart vers le tronc de `tree_oak_01` posé à rotation 0.
+- Budgets (bible 8.8, poule 500, accessoire 900): héron 706, oie 388 (neuf instances: 3 492), mésange 244, renard 786, échelle 176, nichoir 156, chicot 60, mousse 96 triangles. Aucun nouveau matériau; 17 cases ajoutées en fin de palette (`palette.py`, de `heron_grey` à `tar`).
+
 ## Fiche par modèle
 
-
-### `personnages.glb` (2170 Ko)
+### `personnages.glb` (2223 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -148,6 +162,10 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 | `fish_cast` | 1.0 | non (jouer une fois) |
 | `fish_strike` | 1.6 | non (jouer une fois) |
 | `sit_ground` | 3.0 | oui |
+| `climb_ladder` | 1.2 | oui |
+| `reach_up` | 0.8 | non (jouer une fois) |
+| `hammer_tap` | 0.6 | oui |
+| `hold_ladder` | 2.0 | oui |
 
 ### `ferme.glb` (677 Ko)
 
@@ -316,3 +334,42 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kit_door` | 1 x 1 | 148 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |
+
+### `faune.glb` (513 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `heron` |  | 706 | kind: "animal", origin: "sol sous les pattes", height: 0.95, length: 0.9, wingspan: 1.7, collision_radius: 0.3 |
+| `goose` |  | 388 | kind: "animal", origin: "ligne de flottaison", length: 0.8, wingspan: 1.6, note: "neuf instances d'un seul maillage (SkeletonUtils.clone)" |
+| `blue_tit` |  | 244 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.18, beak_socket: "socket_blue_tit_beak" |
+| `fox` |  | 786 | kind: "animal", origin: "sol entre les pattes", withers: 0.4, length: 0.65, tail: 0.4 |
+| `ladder_wood` |  | 176 | kind: "prop", lean_deg: 75.0, length: 3.0, rung_step: 0.28, rungs: 10, top: [0.0, 2.898, 0.776], note: "penchée vers +Z: la poser avec la rotation de celui qui grimpe" |
+| `nest_box` |  | 156 | kind: "prop", pivot: "clou", tilt_deg: 25, entrance: [0.0, -0.13, 0.181], roof_perch: [0.0, -0.048, 0.12], note: "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)" |
+| `oak_branch_stub` |  | 60 | kind: "prop", pivot: "bout du chicot (perchoir)" |
+| `moss_tuft` |  | 96 | kind: "item", socket: "socket_blue_tit_beak" |
+
+| Bête | Animation | Durée (s) | Boucle |
+|---|---|---|---|
+| `heron` | `heron_idle` | 4.0 | oui |
+| `heron` | `heron_strike` | 0.8 | non (jouer une fois) |
+| `heron` | `heron_alert` | 1.0 | non (jouer une fois) |
+| `heron` | `heron_shy_step` | 0.8 | non (jouer une fois) |
+| `heron` | `heron_takeoff` | 1.4 | non (jouer une fois) |
+| `heron` | `heron_fly` | 1.0 | oui |
+| `heron` | `heron_land` | 0.8 | non (jouer une fois) |
+| `heron` | `heron_rest` | 4.0 | oui |
+| `goose` | `goose_swim` | 3.0 | oui |
+| `goose` | `goose_alert` | 1.0 | non (jouer une fois) |
+| `goose` | `goose_run` | 0.4 | oui |
+| `goose` | `goose_fly` | 1.0 | oui |
+| `blue_tit` | `tit_perch` | 2.0 | oui |
+| `blue_tit` | `tit_fly` | 0.2 | oui |
+| `blue_tit` | `tit_sing` | 1.5 | non (jouer une fois) |
+| `blue_tit` | `tit_enter` | 0.3 | non (jouer une fois) |
+| `blue_tit` | `tit_exit` | 0.3 | non (jouer une fois) |
+| `fox` | `fox_trot` | 0.6 | oui |
+| `fox` | `fox_listen` | 2.5 | non (jouer une fois) |
+| `fox` | `fox_pounce` | 1.2 | non (jouer une fois) |
+| `fox` | `fox_sniff` | 2.0 | non (jouer une fois) |
+| `fox` | `fox_look` | 1.0 | non (jouer une fois) |
+| `fox` | `fox_bark` | 1.2 | non (jouer une fois) |
