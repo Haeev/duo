@@ -327,11 +327,405 @@
   padding-block: clamp(var(--lpl-space-3), 4vh, var(--lpl-space-5));
 }
 
-/* Fiche secrète (R16) au carnet, affichage minimal du tour 6: une ligne par phrase, en encre pleine. */
-.lpl-quest__secret {
+/* ------------------------------------------------------------------ */
+/* Moments rares (tour 6): anneau autour de la météo, ligne d'observation */
+/* ------------------------------------------------------------------ */
+
+.lpl-clock__weather {
+  position: relative;
+}
+
+/* Anneau fin autour du rond de la météo: il se remplit pendant que les deux regardent. */
+.lpl-clock__weather > .lpl-watch-ring {
+  position: absolute;
+  inset: -0.4375rem;
+  width: calc(100% + 0.875rem);
+  height: calc(100% + 0.875rem);
+  overflow: visible;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+
+.lpl-watch-ring__track,
+.lpl-watch-ring__arc {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.lpl-watch-ring__track {
+  stroke: rgb(251 246 233 / 0.28);
+}
+
+.lpl-watch-ring__arc {
+  stroke: var(--lpl-color-brass);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--lpl-value, 0));
+  transition: stroke-dashoffset var(--lpl-duration-fast) linear;
+}
+
+/* L'apogée: l'anneau plein reste un instant, puis s'efface sans bruit. */
+.lpl-watch-ring[data-tone='climax'] {
+  animation: lpl-watch-done 2.4s var(--lpl-ease) forwards;
+}
+
+@keyframes lpl-watch-done {
+  0%,
+  45% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.lpl-hud__top-left > .lpl-watch {
+  flex-basis: 100%;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.lpl-watch__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  max-width: min(22rem, 100%);
+  padding: 0.25rem var(--lpl-space-3) 0.25rem 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+  color: var(--lpl-color-ink);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.3;
+  pointer-events: auto;
+  animation: lpl-slide-in var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-watch__pill > .lpl-icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-watch__text {
+  display: grid;
+  min-width: 0;
+}
+
+.lpl-watch__detail {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+}
+
+/* Lui y est, l'autre manque: la couleur des attentes. */
+.lpl-watch__pill[data-tone='partner'] {
+  border-color: var(--lpl-color-ink);
+  background: var(--lpl-color-waiting);
+}
+
+/* Les deux regardent: l'encre et le laiton de l'anneau. */
+.lpl-watch__pill[data-tone='together'] {
+  border-color: var(--lpl-color-ink);
+}
+
+.lpl-watch__pill[data-tone='together'] > .lpl-icon {
+  color: var(--lpl-color-wood);
+}
+
+.lpl-watch__pill[data-tone='early'] {
+  color: var(--lpl-color-ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Notifications des moments et des secrets                            */
+/* ------------------------------------------------------------------ */
+
+/* L'apogée, vue à deux: la nuit et un liseré de laiton, comme un souvenir. */
+.lpl-toast--moment {
+  border-color: var(--lpl-color-brass);
+  background: var(--lpl-color-night);
+  color: var(--lpl-color-on-night);
+  box-shadow: 0 0 0 0.125rem var(--lpl-color-ink), var(--lpl-shadow-1);
+}
+
+/* Ce qui n'est dit qu'à toi: un billet au trait pointillé. */
+.lpl-toast--whisper {
+  border-style: dashed;
+}
+
+.lpl-toast--whisper > .lpl-icon {
+  color: var(--lpl-color-stamp);
+}
+
+.lpl-toast--hen > .lpl-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Un mauvais nom: la poule penche la tête (comme son animation en jeu) et répond. */
+.lpl-toast--hen:has(.lpl-toast__aside) > .lpl-icon {
+  transform-origin: 50% 80%;
+  animation: lpl-hen-tilt 0.8s var(--lpl-ease) both;
+}
+
+@keyframes lpl-hen-tilt {
+  0% {
+    transform: rotate(0);
+  }
+
+  40% {
+    transform: rotate(-22deg);
+  }
+
+  70% {
+    transform: rotate(-16deg);
+  }
+
+  100% {
+    transform: rotate(-18deg);
+  }
+}
+
+.lpl-toast__aside {
+  flex: none;
+  padding: 0.0625rem 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l) var(--lpl-radius-l) var(--lpl-radius-l) 0;
+  background: var(--lpl-color-paper);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-md);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ */
+/* Fiche secrète (R16) et confidence du matin                          */
+/* ------------------------------------------------------------------ */
+
+/* Billet glissé sous l'objectif de la quête, aligné sur son texte. */
+.lpl-secret {
+  display: grid;
+  grid-column: 2 / -1;
+  gap: var(--lpl-space-1);
+  margin-top: var(--lpl-space-2);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-left-width: 0.375rem;
+  border-left-color: var(--lpl-color-stamp);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper);
   color: var(--lpl-color-ink);
 }
 
-.lpl-quest__secret-line {
-  display: block;
+.lpl-secret__head,
+.lpl-confidence__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-1) var(--lpl-space-2);
+}
+
+.lpl-secret__head > .lpl-icon,
+.lpl-confidence__head > .lpl-icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--lpl-color-stamp);
+}
+
+.lpl-secret__title {
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Tampon « Rien que pour toi », « Chez les deux », « Chez Sacha ». */
+.lpl-secret__chip {
+  padding: 0 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-stamp);
+  border-radius: var(--lpl-radius-pill);
+  color: var(--lpl-color-stamp);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.lpl-secret__lines {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.lpl-secret__line {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-md);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.35;
+}
+
+.lpl-secret__help {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+}
+
+.lpl-secret__nudge {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--lpl-space-2);
+  margin-block: 0.125rem;
+  padding: 0.125rem var(--lpl-space-2);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-waiting);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-secret__nudge > .lpl-icon {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Chez l'autre: aucune ligne, un cadre en pointillés qui invite à demander. */
+.lpl-secret[data-kind='ask'] {
+  border-style: dashed;
+  border-left-style: solid;
+  border-left-color: var(--lpl-color-line);
+  background: transparent;
+}
+
+.lpl-secret[data-kind='ask'] .lpl-secret__head > .lpl-icon,
+.lpl-secret[data-kind='ask'] .lpl-secret__chip {
+  border-color: var(--lpl-color-line);
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-secret[data-kind='shared'] {
+  border-left-color: var(--lpl-color-primary);
+}
+
+.lpl-secret[data-kind='shared'] .lpl-secret__chip {
+  border-color: var(--lpl-color-primary);
+  color: var(--lpl-color-primary);
+}
+
+/* Confidence du matin: un billet plié (coin rabattu), à dire à l'autre. */
+.lpl-confidence {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-s);
+  background:
+    linear-gradient(225deg, var(--lpl-color-paper-shade) 0 0.875rem, transparent 0.875rem) no-repeat,
+    var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-2);
+  color: var(--lpl-color-ink);
+}
+
+.lpl-confidence__overline {
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lpl-confidence__text {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.4;
+}
+
+.lpl-confidence__help {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Fenêtre basse (150 %): le matin d'une confidence tient sans défiler. Le billet se resserre,
+   le portrait rapetisse, la phrase de forme et le rappel de l'horloge s'effacent. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-sheet:has(> .lpl-confidence:not([hidden])) {
+    gap: var(--lpl-space-2);
+    padding-block: var(--lpl-space-3);
+  }
+
+  .lpl-sheet:has(> .lpl-confidence:not([hidden])) .lpl-breakfast__head .lpl-portrait {
+    --lpl-portrait-size: 4rem;
+  }
+
+  .lpl-sheet:has(> .lpl-confidence:not([hidden])) .lpl-breakfast__head .lpl-sheet__lead,
+  .lpl-sheet:has(> .lpl-confidence:not([hidden])) > .lpl-field__help {
+    display: none;
+  }
+
+  .lpl-sheet > .lpl-confidence {
+    gap: var(--lpl-space-1);
+    padding: var(--lpl-space-2) var(--lpl-space-3);
+  }
+
+  .lpl-sheet > .lpl-confidence .lpl-confidence__text {
+    font-size: var(--lpl-text-md);
+    line-height: 1.3;
+  }
+
+  .lpl-sheet:has(> .lpl-confidence:not([hidden])) .lpl-quest {
+    padding-block: var(--lpl-space-1);
+  }
+}
+
+.lpl-confidence--notebook {
+  margin-bottom: var(--lpl-space-3);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Appeler une poule                                                   */
+/* ------------------------------------------------------------------ */
+
+.lpl-dialogue[data-speaker='hen'] .lpl-dialogue__aside {
+  --lpl-motif: var(--lpl-color-paper-shade);
+}
+
+.lpl-dialogue__object > .lpl-dialogue__hen {
+  width: 80%;
+  height: 80%;
+}
+
+/* Les trois noms en grand, dans l'ordre fixe; « Laisser » à part. */
+.lpl-choice--name {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-choice--name[aria-disabled='true'] {
+  border-style: dashed;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-choice--name[aria-disabled='true']::before {
+  border-color: var(--lpl-color-ink-muted);
+}
+
+.lpl-choice__note {
+  font-family: var(--lpl-font-text);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-choice--leave {
+  margin-top: var(--lpl-space-1);
+  border-color: var(--lpl-color-hairline);
+  color: var(--lpl-color-ink-muted);
 }

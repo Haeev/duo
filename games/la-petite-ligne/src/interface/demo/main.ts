@@ -6,7 +6,8 @@
  * Playwright, en attendant `src/main.ts`.
  *
  * Paramètres: `scenario` (voir `scenarios.ts`), `joueur` (p1 ou p2),
- * `taille` (100, 125, 150), `animations=reduites`, `rendu=0` (sans 3D).
+ * `taille` (100, 125, 150), `animations=reduites`, `rendu=0` (sans 3D), `temps=arrete`
+ * (la simulation ne tourne plus: la situation posée par le scénario reste telle quelle).
  */
 import type { Intent } from '../../etat/actions';
 import type { CharacterId, WorldEvent } from '../../etat/types';
@@ -49,7 +50,7 @@ const sim = createWorld(content, map, 20261031, [
   { id: 'membre-a', name: 'Camille', color: '#5CE1E6' },
   { id: 'membre-b', name: 'Sacha', color: '#8D6CFF' },
 ]);
-setupScenario(sim, params.get('scenario') ?? 'titre', me);
+const afterMount = setupScenario(sim, params.get('scenario') ?? 'titre', me);
 
 const listeners = new Set<(event: WorldEvent) => void>();
 const log: { camera: string[]; intents: string[]; sounds: string[] } = { camera: [], intents: [], sounds: [] };
@@ -98,6 +99,7 @@ const mountUi = (): GameInterface =>
 let ui = mountUi();
 
 const robot = params.get('autre') === 'fige' ? null : createRobot();
+const frozen = params.get('temps') === 'arrete';
 const held = new Set<string>();
 let seq = 0;
 
@@ -167,7 +169,7 @@ let last = performance.now();
 function loop(now: number): void {
   acc = Math.min(acc + (now - last) / 1000, 0.25);
   last = now;
-  while (acc >= SIM_DT) {
+  while (!frozen && acc >= SIM_DT) {
     acc -= SIM_DT;
     seq++;
     const intents = queue.splice(0);
@@ -224,6 +226,13 @@ async function start(): Promise<void> {
     },
   };
   requestAnimationFrame(loop);
+  // La suite du scénario, une fois l'interface montée et ses notifications d'avant vues.
+  if (afterMount !== undefined) {
+    window.setTimeout(() => {
+      afterMount();
+      sim.world.revision += 1;
+    }, 400);
+  }
 }
 
 void start();

@@ -7,7 +7,7 @@ import { currentOrder } from '../donnees/commandes';
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
-import { objectiveTemplate, secretCards, secretVars, type SecretCard } from '../etat/secrets';
+import { objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
 import {
   ACTION_ICONS,
   CATEGORY_ICONS,
@@ -20,7 +20,8 @@ import {
   WEATHER_ICONS,
 } from './config';
 import { type ReadonlyCharacter, type UiContext, characterOf, nameOf } from './contexte';
-import { capitalize, clockTime, contentVars, countIn, hourLabel, itemName, itemTitle, weekdayOf } from './format';
+import { capitalize, clockTime, contentVars, countIn, hourLabel, itemName, itemTitle, keyTokens, weekdayOf } from './format';
+import { type SecretView, secretViewOf } from './modele-secrets';
 
 // ---------------------------------------------------------------------------
 // Écran courant
@@ -406,13 +407,17 @@ export interface QuestModel {
   /** Progression affichée en puce (« 2 lignes sur 4 », « 3 sur 4 »), ou vide. */
   progress: string;
   lines: ObjectiveLine[];
-  /** Fiche secrète de cette quête (R16), seulement chez celui qui peut la lire; sinon `null`. */
-  secret: SecretCard | null;
+  /**
+   * Fiche de la quête à secret (R16): le secret chez l'informé seul, « Demande-lui » chez
+   * l'autre, le secret chez les deux à la fin; `null` pour une quête sans secret.
+   */
+  secret: SecretView | null;
 }
 
 function questText(world: ReadonlyWorld, ctx: UiContext, def: QuestDef, step: number, done: boolean): string {
   // Objectif selon le rôle dans une quête à secret; `{secret}` n'est rempli que chez l'informé.
-  const vars = { ...contentVars(ctx.content, world, ctx.texts.orderFormat), ...secretVars(world, ctx.content, def, ctx.me) };
+  // `{act}` et les autres touches: l'objectif de l'autre dit quelle touche appelle une poule.
+  const vars = { ...contentVars(ctx.content, world, ctx.texts.orderFormat), ...keyTokens(ctx.key), ...secretVars(world, ctx.content, def, ctx.me) };
   const s = def.steps[step];
   return ctx.t(done || s === undefined ? def.completionText : objectiveTemplate(world, ctx.content, def.id, step, ctx.me), vars);
 }
@@ -451,7 +456,7 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
       done,
       progress,
       lines,
-      secret: cards.find((k) => k.quest === def.id) ?? null,
+      secret: secretViewOf(world, ctx, def.id, done, cards),
     });
   }
   return out;

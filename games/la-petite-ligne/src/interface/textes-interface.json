@@ -361,6 +361,36 @@
     "designate": "désigner ton coin (2x2 cases rien qu'à toi)",
     "move": "déplacer ton coin, ou le retirer en visant le même endroit"
   },
+  "moments": {
+    "watchLabel": "Ce que vous regardez",
+    "pose": {
+      "close": "Approche-toi encore un peu.",
+      "tooClose": "Pas si près : recule d'un pas.",
+      "still": "Ne bouge plus.",
+      "facing": "Tourne-toi vers lui.",
+      "stillFacing": "Arrête-toi et tourne-toi vers lui.",
+      "seated": "Assieds-toi sur le banc ({act}).",
+      "hold": "Tiens un côté de l'échelle ({act})."
+    },
+    "partnerReady": "{partner} est déjà en place.",
+    "partnerNotSettled": "{partner} est là, pas encore en place.",
+    "partnerLetGo": "{partner} a lâché l'échelle.",
+    "hintOverline": "Une confidence",
+    "hintChip": "Rien que pour toi",
+    "hintHelp": "{partner} n'en sait rien. Dis-le-lui : ça ne se voit qu'à deux."
+  },
+  "secrets": {
+    "mineHelp": "{partner} ne voit pas cette fiche : c'est à toi de le lui dire.",
+    "nudge": "{partner} cherche encore : souffle-lui la réponse !",
+    "sharedChip": "Chez les deux",
+    "askChip": "Chez {partner}",
+    "askTitle": "Une fiche que tu ne vois pas",
+    "askText": "{partner} a la réponse : demande-lui !",
+    "henCallTitle": "Appeler une poule",
+    "henFound": "déjà trouvée : {color}",
+    "henCallHelp": "{partner} connaît leurs noms. Demande-lui !",
+    "henWrongAsides": ["Cot ?", "Cot… cot ?", "Cooot ?"]
+  },
   "messages": {
     "placement_not_yours": "C'est le coin de {partner} : pose plutôt à côté.",
     "corner_set": "Voici ton coin : ici, personne d'autre ne pose ni ne reprend d'objet.",

@@ -7,10 +7,12 @@
 import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, Layer, UiHost } from './composant';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, clear, el, icon, keycap, keysLine, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
+import { button, chip, clear, el, icon, keycap, keysLine, portrait, setAttr, setHidden, setPortrait, setStyleVar, setText, token } from './dom';
 import { defaultChoice } from './focus';
 import { itemTitle } from './format';
 import { itemIcon } from './modele';
+import { type HenCallModel, henCallModel } from './modele-secrets';
+import { HEN_COLORS } from './config';
 import { shopIsOpen } from './modele-panneaux';
 import { portraitSvg, villagerColors } from './portrait';
 import { SOUND_ATTR } from './sons';
@@ -25,6 +27,10 @@ interface ChoiceView {
   disabled: boolean;
   partner: boolean;
   action: () => void;
+  /** Précision sous le choix (« déjà trouvée : la blanche »), ou absente. */
+  note?: string | null;
+  /** Style du choix: un nom de poule, ou « Laisser » mis à part. */
+  variant?: 'name' | 'leave';
 }
 
 export class DialogueBox implements Layer {
@@ -136,6 +142,11 @@ export class DialogueBox implements Layer {
       return;
     }
     const v = ctx.content.villagers.find((x) => x.id === villagerId);
+    if (this.face.dataset.sig !== undefined) {
+      // Après un objet lu ou une poule appelée, le portrait reprend sa place.
+      delete this.face.dataset.sig;
+      this.face.classList.remove('lpl-dialogue__object');
+    }
     setAttr(this.root, 'data-speaker', villagerId);
     const colors = villagerId === null ? null : villagerColors(villagerId);
     if (colors !== null && villagerId !== null) setPortrait(this.face, portraitSvg(colors, 'good', '', villagerId));
@@ -144,7 +155,7 @@ export class DialogueBox implements Layer {
   }
 
   private renderChoices(views: readonly ChoiceView[], partnerName: string): void {
-    const sig = JSON.stringify(views.map((v) => [v.id, v.text, v.pressed, v.disabled, v.partner]));
+    const sig = JSON.stringify(views.map((v) => [v.id, v.text, v.pressed, v.disabled, v.partner, v.note ?? null, v.variant ?? null]));
     if (sig === this.choiceSig) return;
     const focusedId = this.choiceButtons.find((b) => b === document.activeElement)?.dataset.id ?? null;
     this.choiceSig = sig;
@@ -152,7 +163,7 @@ export class DialogueBox implements Layer {
     const { ctx } = this.host;
     this.choiceButtons = views.map((v) => {
       const b = button(v.text, v.action, {
-        class: 'lpl-choice',
+        class: v.variant === undefined ? 'lpl-choice' : `lpl-choice lpl-choice--${v.variant}`,
         attrs: {
           'data-nav-item': true,
           'data-id': v.id,
@@ -160,6 +171,7 @@ export class DialogueBox implements Layer {
           'aria-disabled': v.disabled ? 'true' : null,
         },
       });
+      if (v.note !== undefined && v.note !== null) b.append(el('span', { class: 'lpl-choice__note', text: v.note }));
       if (v.partner) {
         b.append(
           el('span', { class: 'lpl-choice__partner' }, [
@@ -257,6 +269,11 @@ export class DialogueBox implements Layer {
     // Conversation personnelle.
     const dlg = me.dialogue;
     if (dlg === null) return;
+    const call = henCallModel(world, ctx);
+    if (call !== null) {
+      this.renderHenCall(call, partnerName);
+      return;
+    }
     const atEnd = dlg.line >= dlg.lines.length - 1;
     const odetteShop = atEnd && dlg.choices.length === 0 && this.isShopKeeper(world, dlg.villager);
     const sig = JSON.stringify([dlg.dialogue, dlg.line, dlg.lines.length, dlg.choices, odetteShop]);
@@ -297,6 +314,51 @@ export class DialogueBox implements Layer {
     clear(this.footerText);
     this.footerText.append(keysLine([{ keys: [ctx.key('Backspace')], text: d.goodbyeKey }]));
     setHidden(this.next, views.length > 0);
+  }
+
+  /**
+   * « Comment s'appelle la poule rousse ? »: la poule en portrait, à sa couleur, les trois noms
+   * en grand dans l'ordre fixe, « Laisser » à part, et un rappel que l'autre connaît les noms.
+   * Un nom déjà trouvé (connu des deux) est grisé avec sa couleur: on ne se trompe pas deux fois.
+   */
+  private renderHenCall(call: HenCallModel, partnerName: string): void {
+    const sig = JSON.stringify(['hen_call', call, partnerName]);
+    if (sig === this.sig) return;
+    this.sig = sig;
+    setHidden(this.sceneChip, true);
+    setAttr(this.root, 'data-speaker', 'hen');
+    const faceSig = `hen:${call.variant}`;
+    if (this.face.dataset.sig !== faceSig) {
+      this.face.dataset.sig = faceSig;
+      clear(this.face);
+      delete this.face.dataset.svg;
+      this.face.classList.add('lpl-dialogue__object');
+      const hen = icon('hen', 'lpl-dialogue__hen');
+      setStyleVar(hen, '--lpl-hen', HEN_COLORS[call.variant] ?? HEN_COLORS.hen_white ?? '');
+      this.face.append(hen);
+    }
+    setText(this.name, call.title);
+    setText(this.role, call.label);
+    clear(this.text);
+    this.text.append(el('p', { class: 'lpl-dialogue__text', text: call.question }));
+    this.renderChoices(
+      call.choices.map((c) => ({
+        id: c.id,
+        text: c.text,
+        pressed: false,
+        disabled: c.found !== null,
+        partner: false,
+        note: c.found,
+        variant: c.leave ? 'leave' : 'name',
+        action: () => {
+          if (c.found === null) this.host.send({ type: 'dialogue_choice', choice: c.id });
+        },
+      })),
+      partnerName,
+    );
+    clear(this.footerText);
+    this.footerText.append(token('other', this.host.symbol('other'), 'small'), ` ${call.help}`);
+    setHidden(this.next, true);
   }
 
   private isShopKeeper(world: ReadonlyWorld, villager: string): boolean {

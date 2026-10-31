@@ -47,6 +47,13 @@ export function icon(id: string, className = 'lpl-icon'): SVGSVGElement {
   return svg;
 }
 
+/** Élément SVG simple (anneau du HUD), attributs posés tels quels. */
+export function svgEl<K extends keyof SVGElementTagNameMap>(tag: K, attrs: Readonly<Record<string, string>>): SVGElementTagNameMap[K] {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [name, value] of Object.entries(attrs)) node.setAttribute(name, value);
+  return node;
+}
+
 /** Change l'icône d'un `<svg><use>` créé par `icon`. */
 export function setIcon(svg: SVGSVGElement, id: string): void {
   const use = svg.firstElementChild;

@@ -45,6 +45,20 @@ export const UI_SETTINGS = {
    * (l'interface n'importe pas la simulation; un test vérifie l'égalité).
    */
   simHz: 30,
+  /**
+   * Moments rares: la ligne d'observation apparaît à `watch.radius` plus cette marge (m), pour
+   * dire la pose demandée à qui arrive; pas au-delà (l'invitation « Montre-le » s'en charge).
+   */
+  watchNearMargin: 2.5,
+  /** Un changement de la ligne d'observation doit tenir ce délai avant d'être affiché (ms): jamais en rafale. */
+  watchSettleMs: 450,
+  /**
+   * Cône du regard de l'apogée (rad): doit valoir `LOOK_CONE` de `simulation/conditions.ts`
+   * (un test vérifie l'égalité).
+   */
+  lookCone: Math.PI / 6,
+  /** Conversation d'appel d'une poule: `HEN_CALL_DIALOGUE` de `simulation/secrets.ts` (un test vérifie l'égalité). */
+  henCallDialogue: 'hen_call',
   /** Longueur maximale du prénom (comme la simulation). */
   nameMaxLength: 16,
   /**
@@ -237,6 +251,13 @@ export const PROFILE_SYMBOLS: readonly { id: string; color: string }[] = [
   { id: 'planet', color: '#E787B1' },
   { id: 'comet', color: '#22B07D' },
 ];
+
+/** Plumage de l'icône d'une poule, par variante (`animals.hen` de `objets.json`): blanche, rousse, noire. */
+export const HEN_COLORS: Readonly<Record<string, string>> = {
+  hen_white: '#f1ead9',
+  hen_red: '#b5652f',
+  hen_black: '#3b3430',
+};
 
 /** Icône de la météo. */
 export const WEATHER_ICONS: Readonly<Record<string, string>> = {

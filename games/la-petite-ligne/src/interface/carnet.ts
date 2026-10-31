@@ -11,6 +11,7 @@ import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setTex
 import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, questModels, slotModel, type QuestModel } from './modele';
+import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { Panel } from './panneau';
 import { SOUND_ATTR } from './sons';
 
@@ -196,7 +197,8 @@ export class NotebookPanel extends Panel {
     const { ctx } = this.host;
     const quests = questModels(world, ctx);
     const current = nextObjective(world, ctx)?.id ?? null;
-    const sig = JSON.stringify(['quests', quests, current]);
+    const hint = momentHintModel(world, ctx);
+    const sig = JSON.stringify(['quests', quests, current, hint]);
     this.renderBody(sig, () => {
       const ordered = [...quests].sort((a, b) => Number(a.done) - Number(b.done));
       // Ordre d'affichage: la semaine puis les coups de main, les quêtes finies en bas de chacun.
@@ -210,7 +212,7 @@ export class NotebookPanel extends Panel {
         for (const q of list) ul.append(this.questItem(q, q.id === current, q.id === focusId));
         return [el('h3', { class: `lpl-section-title${kind === 'side' ? ' lpl-section-gap' : ''}`, text: ctx.t(ctx.texts.game.ui.questKinds[kind]) }), ul];
       };
-      const nodes = [...section('main'), ...section('side')];
+      const nodes = [...(hint === null ? [] : [this.hintCard(hint)]), ...section('main'), ...section('side')];
       return nodes.length === 0 ? [el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.notebook.noQuests) })] : nodes;
     });
   }
@@ -236,16 +238,45 @@ export class NotebookPanel extends Panel {
     );
   }
 
-  /** Fiche secrète (R16), chez celui seul qui peut la lire: affichage minimal en attendant l'écran du tour suivant. */
+  /**
+   * Fiche de la quête à secret (R16), glissée sous l'objectif comme un billet: le secret chez
+   * l'informé (« Rien que pour toi »), une invitation à demander chez l'autre, le secret chez
+   * les deux à la fin. Le contenu vient de `secretViewOf`, qui ne le donne qu'à qui peut le lire.
+   */
   private secretCard(q: QuestModel): HTMLElement[] {
-    if (q.secret === null) return [];
+    const view = q.secret;
+    if (view === null) return [];
+    const head = el('span', { class: 'lpl-secret__head' }, [
+      icon('ui-whisper'),
+      el('strong', { class: 'lpl-secret__title', text: view.title }),
+      el('span', { class: 'lpl-secret__chip', text: view.chip }),
+    ]);
+    if (view.kind === 'ask') {
+      return [el('span', { class: 'lpl-secret', 'data-kind': 'ask' }, [head, el('span', { class: 'lpl-secret__help', text: view.text })])];
+    }
+    const lines = el(
+      'span',
+      { class: 'lpl-secret__lines' },
+      view.lines.map((line) => el('span', { class: 'lpl-secret__line', text: line })),
+    );
+    const extra: HTMLElement[] = [];
+    if (view.kind === 'mine' && view.nudge !== null) extra.push(el('span', { class: 'lpl-secret__nudge' }, [icon('ui-whisper'), view.nudge]));
+    if (view.kind === 'mine' && view.help !== '') extra.push(el('span', { class: 'lpl-secret__help', text: view.help }));
+    return [el('span', { class: 'lpl-secret', 'data-kind': view.kind }, [head, lines, ...extra])];
+  }
+
+  /** Ligne « Aujourd'hui » en tête des quêtes: la confidence du matin, chez son destinataire seul. */
+  private hintCard(hint: MomentHintModel): HTMLElement {
     const { ctx } = this.host;
-    return [
-      el('span', { class: 'lpl-quest__text lpl-quest__secret' }, [
-        el('strong', { text: `${ctx.t(ctx.texts.game.ui.secretCard)}: ${q.secret.title}` }),
-        ...q.secret.lines.map((line) => el('span', { class: 'lpl-quest__secret-line', text: line })),
+    return el('div', { class: 'lpl-confidence lpl-confidence--notebook', role: 'note' }, [
+      el('span', { class: 'lpl-confidence__head' }, [
+        icon('ui-whisper'),
+        el('strong', { class: 'lpl-confidence__overline', text: ctx.t(ctx.texts.game.ui.momentHint) }),
+        el('span', { class: 'lpl-secret__chip', text: hint.chip }),
       ]),
-    ];
+      el('p', { class: 'lpl-confidence__text', text: hint.text }),
+      el('p', { class: 'lpl-confidence__help', text: hint.help }),
+    ]);
   }
 
   private renderMail(letters: ReturnType<typeof letterModels>): void {
