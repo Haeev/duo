@@ -233,13 +233,22 @@ export async function holdKeys(page: Page, codes: readonly string[], ms: number)
   for (const code of codes) await page.keyboard.up(code);
 }
 
-/** Touches qui mènent vers l'ouest (x décroissant) pour une orientation de caméra donnée. */
-export function westKeys(yaw: number): readonly string[] {
+function keysToward(yaw: number, angle: number): readonly string[] {
   let best = KEY_DIRECTIONS[0];
   for (const d of KEY_DIRECTIONS) {
-    if (best === undefined || angleGap(yaw + d.screen, Math.PI) < angleGap(yaw + best.screen, Math.PI)) best = d;
+    if (best === undefined || angleGap(yaw + d.screen, angle) < angleGap(yaw + best.screen, angle)) best = d;
   }
-  return best?.codes ?? ['KeyW', 'KeyA'];
+  return best?.codes ?? [];
+}
+
+/** Touches qui mènent vers l'ouest (x décroissant) pour une orientation de caméra donnée. */
+export function westKeys(yaw: number): readonly string[] {
+  return keysToward(yaw, Math.PI);
+}
+
+/** Touches qui mènent vers l'est (x croissant). */
+export function eastKeys(yaw: number): readonly string[] {
+  return keysToward(yaw, 0);
 }
 
 export interface Walker {

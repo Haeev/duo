@@ -2,7 +2,7 @@
 // hôte, comme le Mac (hôte) et le PC (invité) sur le réseau local. Création des deux personnages,
 // scène d'arrivée, déplacement au clavier, bêchage d'une case du potager, pause par Échap et reprise.
 import { expect, test, type Locator } from '@playwright/test';
-import { characterOf, holdKeys, longTasks, newWalker, positionOf, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
+import { characterOf, eastKeys, holdKeys, longTasks, newWalker, positionOf, settledPosition, START_YAW, startDuo, walkAlong, westKeys } from './sonde';
 
 /** Clic DOM direct: le rendu logiciel occupe le fil principal, l'attente de navigation de Playwright expire. */
 async function press(target: Locator): Promise<void> {
@@ -81,20 +81,28 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
       [
         { x: 34.5, y: 17.0, tolerance: 1.5 },
         { x: 13.8, y: 17.0, tolerance: 1.5 },
-        { x: 13.8, y: 29.5, tolerance: 1.2 },
-        { x: 11.5, y: 29.5, tolerance: 0.5 },
+        { x: 13.8, y: 29.5, tolerance: 0.8 },
       ],
       0.8,
       480_000,
       walker,
     );
-    // Arrivé par l'est, l'hôte regarde vers l'ouest, la case (10, 29) du potager devant lui: houe en
-    // main (case 1), Espace tenu. Jusqu'à trois essais, avec un tout petit pas vers l'ouest entre deux.
-    for (let attempt = 0; attempt < 3; attempt++) {
-      if (attempt > 0) await holdKeys(host, westKeys(walker.yaw), 200);
-      await holdKeys(host, ['Space'], 900);
-      await settledPosition(host, probe, hostId);
-      if (probe.world()?.garden.some((g) => g.soil !== 'grass') === true) break;
+    // Au potager (cases x = 7 à 10, rangée y = 29): un pas de 200 ms vers le potager, puis Espace
+    // quand la case devant le personnage en fait partie (il regarde dans le sens de son dernier pas).
+    // En rendu logiciel, un appui bref fait déjà plusieurs mètres: on corrige pas à pas.
+    let lastStep: 'west' | 'east' | null = null;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const at = await settledPosition(host, probe, hostId);
+      const x = at?.x ?? 0;
+      const facesGarden = (lastStep === 'west' && x >= 8 && x < 11.5) || (lastStep === 'east' && x >= 6 && x < 10);
+      if (facesGarden) {
+        await holdKeys(host, ['Space'], 900);
+        await settledPosition(host, probe, hostId);
+        if (probe.world()?.garden.some((g) => g.soil !== 'grass') === true) break;
+      }
+      lastStep = x > 9.5 ? 'west' : 'east';
+      const keys = lastStep === 'west' ? westKeys(walker.yaw) : eastKeys(walker.yaw);
+      await holdKeys(host, keys, 200);
     }
     if (probe.world()?.garden.every((g) => g.soil === 'grass') === true) {
       const at = positionOf(probe, hostId);
