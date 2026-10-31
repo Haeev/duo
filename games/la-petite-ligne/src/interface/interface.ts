@@ -13,9 +13,9 @@ import './interface.css';
 import spriteIcones from '../../ui-maquettes/icones.svg?raw';
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
-import type { GameInterface, GameView, InterfaceOptions } from '../etat/vue';
+import type { CameraCommand, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
 import { NotebookPanel } from './carnet';
-import type { CameraCommand, KeyInfo, Layer, PanelTab, UiHost } from './composant';
+import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type UiContext, characterOf, createUiContext } from './contexte';
 import { DialogueBox, type DialogueSource } from './dialogue';
@@ -29,22 +29,10 @@ import { CataloguePanel, ChestPanel, CratePanel, ShopPanel, StationPanel } from 
 import { ProposalCards } from './proposition';
 import { loadUiTexts } from './textes';
 
-/** Options en plus du contrat de `etat/vue.ts` (demandées dans `ETAT.md`). */
-export interface InterfaceExtras {
-  /** Commandes de la caméra pour les boutons du HUD. Sans elle: touches A et E simulées. */
-  camera?: (command: CameraCommand) => void;
-}
-
 const SPRITE_ID = 'lpl-icones';
 const ACTIVATION = new Set(['Enter', 'NumpadEnter', 'Space']);
 /** Touches de la caméra laissées au jeu pendant un dialogue ou un panneau (sauf le carnet, où A et E changent d'onglet). */
 const CAMERA_KEYS = new Set(['KeyQ', 'KeyE', 'KeyR', 'KeyF']);
-const CAMERA_CODES: Readonly<Record<CameraCommand, string>> = {
-  rotate_left: 'KeyQ',
-  rotate_right: 'KeyE',
-  zoom_in: 'KeyR',
-  zoom_out: 'KeyF',
-};
 
 type LayerKind = 'screen' | 'dialogue' | 'panel';
 
@@ -82,7 +70,7 @@ class GameUi implements GameInterface, UiHost {
   private lastScreen: ScreenKind | null = null;
   private symbols: { self: string; other: string } = { self: 'orb', other: 'crescent' };
 
-  constructor(options: InterfaceOptions & InterfaceExtras) {
+  constructor(options: InterfaceOptions) {
     this.view = options.view;
     this.cameraCommand = options.camera ?? null;
     const texts = loadUiTexts(options.view.content);
@@ -200,14 +188,12 @@ class GameUi implements GameInterface, UiHost {
   }
 
   camera(command: CameraCommand): void {
-    if (this.cameraCommand !== null) {
-      this.cameraCommand(command);
-      return;
-    }
-    // Secours tant que `main.ts` ne fournit pas `camera`: la touche du clavier, simulée.
-    const code = CAMERA_CODES[command];
-    document.body.dispatchEvent(new KeyboardEvent('keydown', { code, bubbles: true }));
-    document.body.dispatchEvent(new KeyboardEvent('keyup', { code, bubbles: true }));
+    // Sans commandes de caméra (`main.ts` ne les a pas données), rien: les boutons sont masqués.
+    this.cameraCommand?.(command);
+  }
+
+  get hasCamera(): boolean {
+    return this.cameraCommand !== null;
   }
 
   read(item: string): void {
@@ -478,7 +464,11 @@ class GameUi implements GameInterface, UiHost {
     if (mounted === null || mounted.kind === 'panel') {
       if (info.inside && this.proposals.contains(active)) return this.proposals.key(code);
     }
-    if (mounted === null) return this.routeGame(code, info);
+    if (mounted === null) {
+      // Un bouton du HUD ne garde jamais le clavier: la touche va au jeu (Espace fait agir, sans réactiver le bouton).
+      if (active instanceof HTMLElement && this.hud.root.contains(active)) active.blur();
+      return this.routeGame(code, info);
+    }
 
     const layer = mounted.layer;
     const insideLayer = active !== null && layer.root.contains(active);
@@ -588,7 +578,7 @@ class GameUi implements GameInterface, UiHost {
   }
 }
 
-/** Monte l'interface (contrat `CreateInterface`), avec les options en plus si `main.ts` les donne. */
-export function createInterfaceWith(options: InterfaceOptions & InterfaceExtras): GameInterface {
+/** Monte l'interface (contrat `CreateInterface` de `etat/vue.ts`). */
+export function mountInterface(options: InterfaceOptions): GameInterface {
   return new GameUi(options);
 }

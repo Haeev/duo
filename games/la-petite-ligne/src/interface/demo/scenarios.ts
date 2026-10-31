@@ -103,6 +103,17 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): void {
       day5();
       fillBag(sim, me);
       return;
+    case 'hud':
+      // Le HUD seul: la scène d'arrivée jouée par le robot, personne en conversation ni dans un menu.
+      playUntil(
+        sim,
+        (s) =>
+          s.world.phase === 'day' &&
+          s.world.scene === null &&
+          s.world.quests.some((q) => q.id === 'first_train' && q.status === 'done') &&
+          s.world.characters.every((c) => c.status === 'active' && c.dialogue === null && c.menu === null),
+      );
+      return;
     case 'premier-jour':
       playUntil(sim, (s) => s.world.phase === 'day' && s.world.tick > 60);
       return;

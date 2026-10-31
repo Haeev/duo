@@ -28,7 +28,7 @@ const HEIGHT = 360;
 const SUPERSAMPLE = 2;
 
 // Cadrage dans scene.png (1920 x 1080): rectangle 16:9 gardé, en pixels de la capture.
-const CROP = { x: 240, y: 135, width: 1440, height: 810 };
+const CROP = { x: 330, y: 180, width: 1440, height: 810 };
 
 const TYPES = {
   '.css': 'text/css',

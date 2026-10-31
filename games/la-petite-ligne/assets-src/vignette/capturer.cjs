@@ -13,16 +13,19 @@
 const path = require('node:path');
 const { chromium } = require('playwright');
 
-// Le cadrage: matin de printemps, train à quai, le joueur 1 sur le quai entre la cloche
-// et le banc (la caméra le suit), caméra rapprochée, première orientation.
+// Le cadrage: matin de printemps (8 h 30, soleil bas à l'est), train à quai vu de face,
+// quatrième orientation de la caméra, zoom le plus large (composer.cjs recadre ensuite).
+// La caméra suit le joueur 1: il est posé sur la place, à découvert, car tout ce qui le
+// masque dans un rayon de 1,7 m s'efface en tramage (materiaux.ts), ce qui se verrait.
+// `vie: 0` fige la promenade de la page de démonstration.
 const SCENE = {
   heure: '8:30',
   meteo: 'sunny',
   train: 'stopped',
-  x: '41',
-  y: '19.5',
-  zoom: '0',
-  orientation: '0',
+  x: '41.5',
+  y: '22',
+  zoom: '2',
+  orientation: '3',
   vie: '0',
   stats: '0',
 };

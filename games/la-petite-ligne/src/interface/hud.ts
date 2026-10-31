@@ -8,7 +8,7 @@ import type { GameNotification, ReadonlyWorld } from '../etat/types';
 import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
-import { button, chip, clear, el, icon, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, token } from './dom';
+import { button, chip, clear, el, icon, keepFocusOnGame, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, token } from './dom';
 import { clockTime, contentVars, fill, itemTitle, keyTokens } from './format';
 import {
   clockModel,
@@ -227,12 +227,16 @@ export class Hud {
       return el('span', { class: 'lpl-shortcut' }, [b, cap]);
     };
     const shortcuts = el('div', { class: 'lpl-shortcuts' }, [
-      shortcut('ui-rotate-left', 'KeyQ', x.hud.rotateLeft, () => {
-        host.camera('rotate_left');
-      }),
-      shortcut('ui-rotate-right', 'KeyE', x.hud.rotateRight, () => {
-        host.camera('rotate_right');
-      }),
+      host.hasCamera
+        ? shortcut('ui-rotate-left', 'KeyQ', x.hud.rotateLeft, () => {
+            host.camera('rotate_left');
+          })
+        : null,
+      host.hasCamera
+        ? shortcut('ui-rotate-right', 'KeyE', x.hud.rotateRight, () => {
+            host.camera('rotate_right');
+          })
+        : null,
       shortcut('ui-notebook', 'Tab', x.hud.openNotebook, () => {
         host.toggleMenu('notebook');
       }),
@@ -484,11 +488,4 @@ export class Hud {
       this.toasts.append(li);
     }
   }
-}
-
-/** Un clic sur un bouton du HUD laisse le clavier au jeu (Z Q S D, Espace). */
-function keepFocusOnGame(b: HTMLButtonElement): void {
-  b.addEventListener('mousedown', (e) => {
-    e.preventDefault();
-  });
 }

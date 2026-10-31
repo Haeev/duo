@@ -4,9 +4,8 @@
  */
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld } from '../etat/types';
+import type { CameraCommand } from '../etat/vue';
 import type { UiContext } from './contexte';
-
-export type CameraCommand = 'rotate_left' | 'rotate_right' | 'zoom_in' | 'zoom_out';
 
 /** Onglet ou partie d'un panneau à montrer à l'ouverture. */
 export type PanelTab = 'quests' | 'mail' | 'bag' | 'buy' | 'sell';
@@ -21,7 +20,10 @@ export interface UiHost {
   toggleMenu(menu: MenuKind): void;
   /** Redessine au prochain `frame`. */
   invalidate(): void;
+  /** Commande de caméra des boutons du HUD (`InterfaceOptions.camera`). */
   camera(command: CameraCommand): void;
+  /** `main.ts` a donné les commandes de caméra (sinon les boutons sont masqués). */
+  readonly hasCamera: boolean;
   /** Lecture d'un objet à lire (la carte d'Émile), sans passer par la simulation. */
   read(item: string): void;
   /** Horloge réelle (ms). */

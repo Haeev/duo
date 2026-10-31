@@ -20,7 +20,7 @@ import { createWorld } from '../../simulation/monde';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { SIM_DT } from '../../simulation/constantes';
-import { createInterfaceWith } from '../interface';
+import { createInterface } from '../index';
 import { setupScenario } from './scenarios';
 
 declare global {
@@ -34,6 +34,8 @@ declare global {
       remount(n: number): { nodes: number; layers: number; sprites: number };
       /** Durée moyenne de `frame()` de l'interface sur `n` appels (ms). */
       measure(n: number): Promise<number>;
+      /** Journal de la page: commandes de caméra reçues de l'interface, intentions du joueur local. */
+      log: { camera: string[]; intents: string[] };
     };
   }
 }
@@ -50,6 +52,7 @@ const sim = createWorld(content, map, 20261031, [
 setupScenario(sim, params.get('scenario') ?? 'titre', me);
 
 const listeners = new Set<(event: WorldEvent) => void>();
+const log: { camera: string[]; intents: string[] } = { camera: [], intents: [] };
 const queue: { by: CharacterId; intent: Intent }[] = [];
 const AZERTY: Record<string, string> = { KeyQ: 'A', KeyW: 'Z', KeyA: 'Q', KeyZ: 'W', Space: 'Espace', Enter: 'Entrée', Backspace: 'Retour arrière', Tab: 'Tab' };
 
@@ -61,6 +64,7 @@ const view: GameView = {
   world: () => sim.world,
   alpha: () => 1,
   send: (intent) => {
+    log.intents.push(intent.type);
     queue.push({ by: me, intent });
   },
   onEvent: (listener) => {
@@ -78,12 +82,15 @@ if (container === null || overlay === null) throw new Error('page de démonstrat
 const withRender = params.get('rendu') !== '0';
 const renderer = withRender ? createRenderer({ view, container, reducedMotion: false }) : null;
 const mountUi = (): GameInterface =>
-  createInterfaceWith({
+  createInterface({
     view,
     overlay,
     uiScale: [1, 1.25, 1.5].includes(scale) ? scale : 1,
     reducedMotion: params.get('animations') === 'reduites',
-    ...(renderer === null ? {} : { camera: (command) => { renderer.camera(command); } }),
+    camera: (command) => {
+      log.camera.push(command);
+      renderer?.camera(command);
+    },
   });
 let ui = mountUi();
 
@@ -187,6 +194,7 @@ async function start(): Promise<void> {
     partner: (intent) => {
       queue.push({ by: partnerId, intent });
     },
+    log,
     remount: (n) => {
       for (let i = 0; i < n; i++) {
         ui.dispose();

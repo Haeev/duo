@@ -8,7 +8,7 @@ import type { ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { nameOf } from './contexte';
-import { button, chip, el, icon, keycap, token } from './dom';
+import { button, chip, el, icon, keepFocusOnGame, keycap, token } from './dom';
 import { capitalize } from './format';
 import { proposalModels, type ProposalModel } from './modele-panneaux';
 
@@ -144,6 +144,8 @@ export class ProposalCards {
       );
       this.defaultButton = accept;
     }
+    // Au pointeur, la carte ne garde pas le clavier: Espace reste au jeu.
+    for (const b of card.querySelectorAll('button')) keepFocusOnGame(b);
     this.root.append(card);
     this.card = card;
     if (hadFocus) this.defaultButton.focus();

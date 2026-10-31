@@ -169,3 +169,21 @@ export function focusElement(node: HTMLElement | null | undefined): boolean {
   }
   return true;
 }
+
+/**
+ * Un clic sur un bouton du HUD laisse le clavier au jeu (Z Q S D, Espace): le
+ * bouton ne prend pas le focus au pointeur, et le rend s'il l'avait quand
+ * même. Sinon Espace, que le SDK capte, le réactiverait (rotation de caméra
+ * parasite).
+ */
+export function keepFocusOnGame(b: HTMLButtonElement): void {
+  const noFocus = (e: Event): void => {
+    e.preventDefault();
+  };
+  b.addEventListener('pointerdown', noFocus);
+  b.addEventListener('mousedown', noFocus);
+  b.addEventListener('click', (e) => {
+    // `detail` > 0: activation au pointeur (un clic du clavier ou du code vaut 0).
+    if (e.detail > 0 && document.activeElement === b) b.blur();
+  });
+}
