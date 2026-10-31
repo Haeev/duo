@@ -168,7 +168,7 @@ def gable_roof(geos, x0, x1, y0, y1, ze, zr, color, edge=None, over=0.35, thick=
                 gi.bevel(verts, rb, 2, col, edges_pred=lambda p, q, rim=rim: frozenset((key(p), key(q))) in rim)
             # rangs de tuiles ou de lauzes: une petite marche simple tous les 42 cm, qui suit la surface
             L = math.hypot(ym - y0 + over, zr - ze + over * slope)
-            nr = int(L / 0.42)
+            nr = int(L / (0.42 if strips == 1 else 0.6))  # toits en bandes (chantier): rangs plus espacés
             ang = math.degrees(math.atan(slope)) * (-side)
             pieces = 2 if strips == 1 else 1
             for jr in range(1, nr):
@@ -413,7 +413,7 @@ def gatekeeper_house(A, ruin, parent):
         col = wall_color(color_out, color_in, inward)
         f.box(g, (L, t, ze), 0, -t / 2, ze / 2, col)
         f.box(g, (L + 0.02, t + 0.06, 0.28), 0, -t / 2, 0.14, by_normal("stone_dark", "stone_dark"))
-        stone_texture(g, f, L, ze, n=9, seed={"front": 1, "back": 2, "left": 3, "right": 4}[side])
+        stone_texture(g, f, L, ze, n=5, seed={"front": 1, "back": 2, "left": 3, "right": 4}[side])
         if side == "front":
             door(g, f, 0.0, color="wood_new", absent=True, step=True)
             window(g, f, 1.7, 0.95, 0.75, 0.9, shutter="paint_blue", ruin=ruin)
@@ -572,9 +572,13 @@ def platform(A):
     c = A.geo()
     zc = 3.3
 
+    def top(y):
+        """Dessus de la tôle bombée: monte de -1,8 vers +1,7, renflée de 7 cm au milieu."""
+        t = (y + 1.8) / 3.5
+        return zc - 0.25 + 0.25 * t + 0.07 * math.sin(math.pi * t)
+
     def under(y):
-        """Dessous de la tôle (elle monte de -1,8 vers +1,7)."""
-        return zc - 0.25 + 0.25 * (y + 1.8) / 3.5 - 0.08 / math.cos(math.atan(0.25 / 3.5))
+        return top(y) - 0.08
 
     # poutre longitudinale en tête des poteaux, sous la tôle; poteaux arrêtés sous la poutre;
     # consoles (aisseliers) de part et d'autre qui portent la tôle en porte-à-faux
@@ -592,8 +596,24 @@ def platform(A):
             a2 = math.degrees(math.atan2(zt - za, yt - yp))
             c.box((0.05, d, 0.06), loc=(x, (yp + yt) / 2, (za + zt) / 2), color="iron", rot=(a2 if yt > yp else a2 - 180, 0, 0),
                   no_round=True)
-    slab(c, [(-5.0, -1.8, zc - 0.25), (5.0, -1.8, zc - 0.25), (5.0, 1.7, zc), (-5.0, 1.7, zc)], 0.08,
-         by_normal("lauze_light", "paint_cream", "paint_cream", thr=0.3))
+    # tôle bombée: 6 rangs de sommets dans la pente, 8 cm d'épaisseur
+    ys = [-1.8 + 3.5 * i / 6 for i in range(7)]
+    pts, faces = [], []
+    for y in ys:
+        for x in (-5.0, 5.0):
+            pts.append((x, y, top(y)))
+    n = len(pts)
+    pts += [(x, y, z - 0.08) for (x, y, z) in pts]
+    for i in range(len(ys) - 1):
+        a0, a1, b0, b1 = 2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 3
+        faces.append((a0, a1, b1, b0))
+        faces.append((n + a0, n + b0, n + b1, n + a1))
+        faces.append((a0, b0, n + b0, n + a0))
+        faces.append((a1, n + a1, n + b1, b1))
+    last = 2 * (len(ys) - 1)
+    faces.append((0, n, n + 1, 1))
+    faces.append((last, last + 1, n + last + 1, n + last))
+    c.mesh(pts, faces, by_normal("lauze_light", "paint_cream", "paint_cream", thr=0.3))
     for k in range(40):
         x = -4.875 + k * 0.25
         c.box((0.2, 0.03, 0.22), loc=(x, -1.82, zc - 0.36), color="paint_cream", rot=(0, 0, 0))
@@ -790,13 +810,13 @@ def workbench(A):
     for x in (-0.9, 0.0, 0.9):
         ym = (yf + 0.1 + yb - 0.05) / 2
         L = (yb - 0.05 - (yf + 0.1)) / cosa
-        # 3 mm engagés sous la tôle: elle porte sur eux
-        g.box((0.06, L, hc), loc=(x, ym, under(ym) - hc / 2 / cosa + 0.003), color="wood_dark", rot=(ang, 0, 0))
+        # 5 mm sous la tôle: aucune face au même niveau que son dessous (papillotement en WebGL)
+        g.box((0.06, L, hc), loc=(x, ym, under(ym) - hc / 2 / cosa - 0.005), color="wood_dark", rot=(ang, 0, 0))
     # sablières (8 x 10 cm) qui relient les poteaux en tête, sous les chevrons
     hs = 0.10
     tops = {}
     for y in (-0.9, 0.92):
-        zt = under(y) - hc / cosa + 0.006          # dessus de la sablière engagé de 3 mm sous les chevrons
+        zt = under(y) - hc / cosa - 0.002          # dessus de la sablière engagé de 3 mm sous les chevrons
         g.box((2.0, 0.08, hs), loc=(0, y, zt - hs / 2), color="wood_dark")
         tops[y] = zt - hs                           # tête des poteaux = dessous de la sablière
     for x in (-0.95, 0.95):
@@ -825,18 +845,37 @@ def workbench(A):
     return g
 
 
+def _log_color(axis):
+    """Bûche: bouts (faces dans l'axe) couleur de bois coupé, le reste en écorce."""
+    def f(face):
+        return "log_end" if abs(face.normal[axis]) > 0.7 else "bark"
+    return f
+
+
 def woodpile(A):
+    """Bûches empilées en pyramide entre deux piquets (bois de la scierie)."""
     g = A.geo()
     for row in range(3):
         n = 5 - row
         for k in range(n):
-            g.cyl(0.15, 1.0, loc=(-0.62 + k * 0.31 + row * 0.155, 0, 0.15 + row * 0.26), color="bark", segs=7,
+            g.cyl(0.15, 1.0, loc=(-0.62 + k * 0.31 + row * 0.155, 0, 0.15 + row * 0.26), color=_log_color(1), segs=7,
                   rot=(90, 0, 0))
-            for s in (1, -1):
-                g.cyl(0.12, 0.012, loc=(-0.62 + k * 0.31 + row * 0.155, s * 0.5, 0.15 + row * 0.26), color="log_end",
-                      segs=7, rot=(90, 0, 0))
     for x in (-0.95, 0.95):
         g.box((0.08, 0.08, 0.9), loc=(x, 0, 0), color="wood_dark", base=True)
+    return g
+
+
+def log_pile(A):
+    """Pile de rondins croisés par lits (différente du tas de bois de la scierie)."""
+    g = A.geo()
+    for layer in range(3):
+        for k in range(3):
+            o = -0.45 + k * 0.45
+            z = 0.13 + layer * 0.24
+            if layer % 2 == 0:
+                g.cyl(0.12, 1.5, loc=(0, o * 0.8, z), color=_log_color(0), segs=7, rot=(0, 90, 0))
+            else:
+                g.cyl(0.12, 0.9, loc=(o * 1.4, 0, z), color=_log_color(1), segs=7, rot=(90, 0, 0))
     return g
 
 
@@ -935,7 +974,8 @@ def well(A):
         g.box((0.4, 0.06, 0.18), loc=(0.86 * math.cos(a), 0.86 * math.sin(a), 0.2 + (k % 2) * 0.3), color="stone_dark",
               rot=(0, 0, k * 36 + 100))
     for s in (1, -1):
-        g.box((0.12, 0.12, 1.9), loc=(s * 0.78, 0, 0.6), color="wood_dark", base=True)
+        g.box((0.12, 0.12, 2.07), loc=(s * 0.78, 0, 0.6), color="wood_dark", base=True)
+    g.box((1.9, 0.1, 0.1), loc=(0, 0, 2.67), color="wood_dark", base=True)  # panne faîtière sous le toit
     g.cyl(0.07, 1.7, loc=(0, 0, 2.05), color="wood", segs=8, rot=(0, 90, 0))
     g.cyl(0.1, 0.5, loc=(0, 0, 2.05), color="rope", segs=8, rot=(0, 90, 0))
     g.box((0.04, 0.3, 0.04), loc=(-0.88, -0.15, 2.05), color="iron")
@@ -943,10 +983,8 @@ def well(A):
     g.box((0.01, 0.01, 0.75), loc=(0.0, -0.1, 1.68), color="rope")
     g.lathe([(0.11, 0.0), (0.14, 0.24)], loc=(0.0, -0.1, 1.05), colors="wood", segs=8)
     g.cyl(0.145, 0.03, loc=(0, -0.1, 1.08), color="iron", segs=8)
-    slab(g, [(-1.0, -0.95, 2.35), (1.0, -0.95, 2.35), (1.0, 0.0, 2.85), (-1.0, 0.0, 2.85)], 0.06,
-         by_normal("tile", "tile_dark", "tile_dark", thr=0.3))
-    slab(g, [(1.0, 0.95, 2.35), (-1.0, 0.95, 2.35), (-1.0, 0.0, 2.85), (1.0, 0.0, 2.85)], 0.06,
-         by_normal("tile", "tile_dark", "tile_dark", thr=0.3))
+    gable_roof(g, -0.85, 0.85, -0.8, 0.8, 2.85 - 0.8 * 0.5 / 0.95, 2.85, "tile", edge="tile_dark", over=0.15,
+               thick=0.06, ridge_color="tile_dark")
     return g
 
 
@@ -1073,8 +1111,13 @@ def rail_curve(A, R=12.0, n=16):
 
 def buffer_stop(A):
     g = A.geo()
+    # jambes verticales de la semelle à la poutre, contrefiches de la semelle au dos de la poutre,
+    # platines au pied: chaque pièce s'arrête sur ce qui la porte
     for s in (1, -1):
-        g.box((0.12, 0.12, 0.9), loc=(0, s * 0.5, 0.2), color="rail_steel", base=True, rot=(0, -25, 0))
+        g.box((0.12, 0.12, 0.63), loc=(0.15, s * 0.5, 0.12), color="rail_steel", base=True)
+        rod(g, (0.55, s * 0.5, 0.12), (0.31, s * 0.5, 0.8), 0.04, "rail_steel", segs=6)
+        for x in (0.15, 0.55):
+            g.box((0.2, 0.2, 0.02), loc=(x, s * 0.5, 0.12), color="iron", base=True)
     g.box((0.3, 1.9, 0.35), loc=(0.15, 0, 0.75), color="paint_red", base=True)
     for k in range(4):
         g.box((0.31, 0.22, 0.36), loc=(0.15, -0.66 + k * 0.44, 0.75), color="white_paint" if k % 2 else "paint_red", base=True)
@@ -1090,7 +1133,7 @@ def level_crossing(A):
     g.cyl(0.08, 1.1, loc=(0, 0, 0), color="white_paint", segs=8, base=True)
     g.box((0.3, 0.3, 0.12), loc=(0, 0, 0), color="stone", base=True)
     g.box((0.18, 0.14, 0.25), loc=(0, 0.1, 0.9), color="iron", base=True)
-    g.cyl(0.14, 0.06, loc=(0.0, -0.1, 1.45), color="paint_red", segs=3, rot=(90, 0, 0))
+    g.cyl(0.14, 0.06, loc=(0.0, -0.06, 1.45), color="paint_red", segs=3, rot=(90, 0, 0))  # contre la tige
     g.cyl(0.03, 0.4, loc=(0, 0, 1.1), color="iron", segs=6, base=True)
     A.add("level_crossing_gate_post", g, parent=root)
     a = A.geo()
@@ -1189,26 +1232,28 @@ def station_sign(A):
     g.box((1.9, 0.08, 0.5), loc=(0, 0, 1.95), color="white_paint", base=True, bevel=0.02)
     g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
     # lettres AUBRUNE en relief (police de 3 x 5 pavés), sur les deux faces (lisibles de chaque côté)
-    glyphs = {"A": ("010", "101", "111", "101", "101"), "U": ("101", "101", "101", "101", "111"),
-              "B": ("111", "101", "110", "101", "111"), "R": ("111", "101", "110", "101", "101"),
-              "N": ("101", "111", "111", "101", "101"), "E": ("111", "100", "110", "100", "111")}
-    px, word = 0.058, "AUBRUNE"
-    x0 = -(len(word) * 4 - 1) * px / 2
-    for face, yy in ((1, -0.045), (-1, 0.055)):
+    glyphs = {"A": ("0110", "1001", "1111", "1001", "1001"), "U": ("1001", "1001", "1001", "1001", "0110"),
+              "B": ("1110", "1001", "1110", "1001", "1110"), "R": ("1110", "1001", "1110", "1010", "1001"),
+              "N": ("1001", "1101", "1011", "1001", "1001"), "E": ("1111", "1000", "1110", "1000", "1111")}
+    px, word, gw = 0.05, "AUBRUNE", 4
+    x0 = -(len(word) * (gw + 1) - 1) * px / 2
+    for face, yy in ((1, -0.0415), (-1, 0.0515)):
         for i, ch in enumerate(word):
             for r, row in enumerate(glyphs[ch]):
                 c = 0
-                while c < 3:
+                while c < gw:
                     if row[c] == "1":
                         c2 = c
-                        while c2 + 1 < 3 and row[c2 + 1] == "1":
+                        while c2 + 1 < gw and row[c2 + 1] == "1":
                             c2 += 1
-                        xa = x0 + (i * 4 + c) * px
-                        xb = x0 + (i * 4 + c2 + 1) * px
+                        xa = x0 + (i * (gw + 1) + c) * px
+                        xb = x0 + (i * (gw + 1) + c2 + 1) * px
                         xc = (xa + xb) / 2 * face  # au dos, le mot se lit dans l'autre sens: miroir
-                        # face avant: lettres bleues sur fond blanc; dos (bordure bleue): lettres blanches
-                        g.box((xb - xa - 0.006, 0.012, px - 0.006), loc=(xc, yy, 2.05 + (2 - r) * px),
-                              color="paint_blue" if face > 0 else "white_paint", no_round=True)
+                        # lettres en aplat (2 triangles par pavé): face avant bleue sur blanc, dos blanc sur bleu
+                        hw, z = (xb - xa - 0.003) / 2, 2.07 + (2 - r) * px
+                        za, zb = z - (px - 0.003) / 2, z + (px - 0.003) / 2
+                        quad = [(xc - hw, yy, za), (xc + hw, yy, za), (xc + hw, yy, zb), (xc - hw, yy, zb)]
+                        g.quad(quad if face > 0 else list(reversed(quad)), "paint_blue" if face > 0 else "white_paint")
                         c = c2 + 1
                     else:
                         c += 1
@@ -1218,7 +1263,11 @@ def station_sign(A):
 
 
 def arbor(A):
-    """Tonnelle d'Odette: pergola, vigne, table et deux bancs (emprise 3 x 2)."""
+    """Tonnelle d'Odette: pergola, vigne, table et deux bancs (emprise 3 x 2).
+
+    La vigne tient à la tonnelle: tiges qui s'enroulent autour de trois poteaux et portent leurs
+    feuilles; feuillage du dessus posé sur les lattes, qui retombe un peu sur les bords. Moins de 900
+    triangles (bible 8.8)."""
     g = A.geo()
     for x in (-1.35, 1.35):
         for y in (-0.85, 0.85):
@@ -1227,28 +1276,37 @@ def arbor(A):
         g.box((3.0, 0.1, 0.12), loc=(0, y, 2.35), color="wood", base=True)
     for k in range(7):
         g.box((0.08, 2.0, 0.08), loc=(-1.4 + k * 0.467, 0, 2.47), color="wood_dark", base=True)
-    import random as _r
-    rnd = _r.Random(9)
-    for k in range(14):
-        x, y = rnd.uniform(-1.3, 1.3), rnd.uniform(-0.8, 0.8)
-        g.sphere(rnd.uniform(0.28, 0.42), loc=(x, y, 2.6), color="ivy" if k % 3 else "leaf_oak", ico=1, jitter=0.2,
-                 seed=k, scale=(1.2, 1.0, 0.45))
-    for x, y in ((-1.35, -0.85), (1.35, 0.85), (1.35, -0.85)):
-        for k in range(3):
-            g.sphere(0.13, loc=(x + 0.08, y - 0.08, 0.6 + k * 0.6), color="ivy", ico=1, jitter=0.2, seed=20 + k,
-                     scale=(0.8, 0.8, 1.4))
+    rnd = random.Random(9)
+    # vigne des poteaux: une tige en spirale (4 segments autour du poteau), trois touffes accrochées
+    for px, py in ((-1.35, -0.85), (1.35, 0.85), (1.35, -0.85)):
+        pts = []
+        for k in range(5):
+            a = math.radians(k * 120 + 30)
+            pts.append((px + 0.075 * math.cos(a), py + 0.075 * math.sin(a), 0.05 + k * 0.58))
+        for p, q in zip(pts, pts[1:]):
+            rod(g, p, q, 0.018, "wood_dark")
+        for k, p in enumerate(pts[1:4:2]):
+            a = math.radians((k + 1) * 120 + 30)
+            g.sphere(0.14, loc=(p[0] + 0.07 * math.cos(a), p[1] + 0.07 * math.sin(a), p[2]), color="ivy", ico=1,
+                     jitter=0.15, seed=20 + k, scale=(0.9, 0.9, 1.2))
+    # feuillage du dessus: posé sur les lattes (2 cm engagés), deux touffes qui retombent sur les bords
+    for k, (x, y, r) in enumerate(((-0.9, -0.3, 0.42), (0.0, 0.25, 0.46), (0.85, -0.2, 0.42), (-0.35, 0.5, 0.36),
+                                   (0.5, 0.6, 0.34))):
+        g.sphere(r, loc=(x, y, 2.55 + r * 0.45 * 0.6 - 0.02), color="ivy" if k % 3 else "leaf_oak", ico=1,
+                 jitter=0.12, seed=k, scale=(1.25, 1.0, 0.45), rot=(0, 0, rnd.uniform(0, 360)))
+    for x, y in ((-1.35, 0.9), (1.2, -0.9)):
+        g.sphere(0.3, loc=(x, y, 2.38), color="ivy", ico=1, jitter=0.12, seed=31, scale=(1.0, 0.6, 0.9))
+    # table et bancs
     g.box((1.6, 0.8, 0.05), loc=(0, 0, 0.72), color="wood_new", base=True, bevel=0.01)
     g.box((1.62, 0.82, 0.02), loc=(0, 0, 0.77), color="fabric_red", base=True)
-    for k in range(4):
-        g.box((0.2, 0.84, 0.021), loc=(-0.6 + k * 0.4, 0, 0.771), color="fabric_cream", base=True)
+    for k in range(2):
+        g.box((0.3, 0.84, 0.021), loc=(-0.4 + k * 0.8, 0, 0.771), color="fabric_cream", base=True)
     for x in (-0.65, 0.65):
         g.box((0.08, 0.6, 0.72), loc=(x, 0, 0), color="wood", base=True)
     for s in (1, -1):
         g.box((1.6, 0.3, 0.05), loc=(0, s * 0.65, 0.42), color="wood_new", base=True, bevel=0.01)
         for x in (-0.65, 0.65):
             g.box((0.06, 0.26, 0.42), loc=(x, s * 0.65, 0), color="wood", base=True)
-    g.lathe([(0.04, 0.0), (0.05, 0.08), (0.025, 0.14), (0.03, 0.18)], loc=(0.3, 0.1, 0.79), colors="glass", segs=6)
-    g.sphere(0.04, loc=(0.3, 0.1, 0.99), color="flower_yellow", segs=5, rings=3)
     return g
 
 
@@ -1418,7 +1476,7 @@ def fence(A, kind):
     elif kind == "broken":
         g.box((0.1, 0.1, 0.8), loc=(-0.5, 0, 0), color="wood_old_dark", base=True, rot=(0, 8, 0))
         g.box((0.7, 0.05, 0.1), loc=(-0.15, 0, 0.62), color="wood_old", rot=(0, 12, 0))
-        g.box((0.6, 0.05, 0.1), loc=(0.15, 0.05, 0.08), color="wood_old", rot=(0, 0, 15))
+        g.box((0.6, 0.05, 0.1), loc=(0.15, 0.05, 0.05), color="wood_old", rot=(0, 0, 15))  # posée au sol
     elif kind == "gate":
         g.box((0.1, 0.1, 1.05), loc=(-0.5, 0, 0), color="wood_dark", base=True)
         g.box((0.1, 0.1, 1.05), loc=(0.5, 0, 0), color="wood_dark", base=True)
@@ -1571,23 +1629,24 @@ def flowers(A, color, seed):
 
 
 def flower_bed(A):
+    """Massif de fleurs bordé de pierres (2 x 1), moins de 900 triangles (bible 8.8)."""
     g = A.geo()
     g.box((2.0, 1.0, 0.12), color="soil_tilled", base=True)
-    for k in range(10):
+    # bordure: pierres de 40 cm, couleurs alternées
+    for k in range(5):
         for s in (1, -1):
-            g.box((0.2, 0.1, 0.16), loc=(-0.9 + k * 0.2, s * 0.5, 0), color="stone_light" if k % 2 else "stone", base=True)
+            g.box((0.39, 0.1, 0.16), loc=(-0.8 + k * 0.4, s * 0.5, 0), color="stone_light" if k % 2 else "stone", base=True)
     for s in (1, -1):
-        for k in range(5):
-            g.box((0.1, 0.2, 0.16), loc=(s * 1.0, -0.4 + k * 0.2, 0), color="stone", base=True)
+        g.box((0.1, 0.9, 0.16), loc=(s * 1.0, 0, 0), color="stone", base=True)
     rnd = random.Random(7)
     cols = ["flower_red", "flower_yellow", "flower_white", "flower_pink", "flower_violet", "flower_blue"]
-    for k in range(22):
-        x, y = rnd.uniform(-0.85, 0.85), rnd.uniform(-0.38, 0.38)
+    for k in range(14):
+        x, y = rnd.uniform(-0.85, 0.85), rnd.uniform(-0.36, 0.36)
         h = rnd.uniform(0.15, 0.35)
-        g.cyl(0.01, h, loc=(x, y, 0.12), color="leaf_crop", segs=3, base=True)
-        g.sphere(0.06, loc=(x, y, 0.12 + h), color=cols[k % 6], segs=5, rings=3, scale=(1, 1, 0.6))
-    for k in range(8):
-        g.sphere(0.12, loc=(rnd.uniform(-0.8, 0.8), rnd.uniform(-0.3, 0.3), 0.15), color="leaf_bush", segs=5, rings=3,
+        g.cyl(0.01, h, loc=(x, y, 0.12), color="leaf_crop", segs=3, base=True, cap=False)
+        g.sphere(0.065, loc=(x, y, 0.12 + h), color=cols[k % 6], segs=5, rings=3, scale=(1, 1, 0.6))
+    for k in range(5):
+        g.sphere(0.14, loc=(rnd.uniform(-0.8, 0.8), rnd.uniform(-0.3, 0.3), 0.15), color="leaf_bush", segs=5, rings=3,
                  scale=(1, 1, 0.6))
     return g
 
@@ -1722,6 +1781,8 @@ def main():
     mat = lpl.palette_material("lpl_palette", tex["palette"], tex["palette-mr"], tex["palette-emission"])
     A = lpl.Assets(mat)
     lpl.AUTO_ROUND = True
+    # budget de la scène (bible 8.8): pas de chanfrein automatique sur les pièces de moins de 2 m
+    lpl.AUTO_MIN = (2.0, 0.08)
     buildings = []
     buildings.append(station(A))
     buildings.append(platform(A))
@@ -1754,8 +1815,6 @@ def main():
              A.add("rail_curve_90", rail_curve(A), {"footprint": [13, 13], "radius": 12.0, "rail_top": RAIL_TOP}),
              A.add("buffer_stop", buffer_stop(A), {"footprint": [1, 2]})]
     lpl.AUTO_ROUND = True
-    # mobilier et clôtures (peu d'exemplaires, vus de près): planches et montants arrondis eux aussi
-    lpl.AUTO_MIN = (0.3, 0.03)
     track.append(level_crossing(A))
     props = []
     for name, fn, fp in (("bell_post", bell_post, [1, 1]), ("bench", bench, [2, 1]), ("lamp_post", lamp_post, [1, 1]),
@@ -1765,10 +1824,10 @@ def main():
                          ("crate_stack", crate_stack, [2, 1]), ("sacks", sacks, [1, 1]), ("cart", cart, [3, 2]),
                          ("bicycle", bicycle, [2, 1])):
         # charrette et tonnelle: beaucoup de pièces, gardées au seuil des bâtiments (plafond de 900)
-        lpl.AUTO_MIN = (0.6, 0.08)
+        lpl.AUTO_MIN = (2.0, 0.08)
         lpl.AUTO_ROUND = name not in ("arbor",)  # tonnelle: plafond de 900, gardée vive
         props.append(A.add(name, fn(A), {"footprint": fp}))
-    lpl.AUTO_MIN = (0.6, 0.08)
+    lpl.AUTO_MIN = (2.0, 0.08)
     lpl.AUTO_ROUND = False  # sols et bordures: dalles qui se raccordent
     grounds = []
     for k in ("grass", "dirt", "cobble"):
@@ -1777,7 +1836,7 @@ def main():
     lpl.AUTO_ROUND = True
     for k in ("wood", "picket", "broken", "gate", "post"):
         grounds.append(A.add("fence_" + k, fence(A, k), {"footprint": [1, 1], "note": "segment de 1 m le long de X, poteau à x=-0,5"}))
-    lpl.AUTO_MIN = (0.6, 0.08)
+    lpl.AUTO_MIN = (2.0, 0.08)
     nature = []
     for ess, fn in (("oak", tree_oak), ("fir", tree_fir), ("birch", tree_birch)):
         for i, size in enumerate(("small", "large")):
@@ -1803,7 +1862,7 @@ def main():
     O = bpy.data.objects
     aliases = [A.alias("tree_oak", O["tree_oak_large"]), A.alias("tree_fir", O["tree_fir_large"]),
                A.alias("bush", O["bush_round"]), A.alias("rock", O["rock_medium"]), A.alias("fence", O["fence_wood"]),
-               A.alias("log_pile", O["woodpile"])]
+               A.add("log_pile", log_pile(A), {"footprint": [2, 1]})]
     for a in aliases:
         a.hide_render = True
 

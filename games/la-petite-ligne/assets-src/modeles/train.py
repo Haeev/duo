@@ -194,6 +194,9 @@ def coach(A):
         g.box((0.07, 0.5, 0.6), loc=(s * L / 2 + s * 0.03, 0, 2.3), color="glass", base=True)
         for y in (-0.95, 0.95):
             g.box((0.25, 0.3, 0.04), loc=(x, y * 1.12, 0.95), color="iron")
+            # étriers: le marchepied est pendu sous la plateforme
+            for dx in (-0.11, 0.11):
+                g.box((0.025, 0.025, 0.33), loc=(x + dx, y * 1.12, 0.95), color="iron", base=True)
     roof_curved(g, -L / 2 - 0.85, L / 2 + 0.85, 2.5, 3.07, 0.35, "lauze_dark", "black")
     for x in (-2.0, 0.0, 2.0):
         g.cyl(0.1, 0.18, loc=(x, 0, 3.32), color="black", segs=6, base=True)

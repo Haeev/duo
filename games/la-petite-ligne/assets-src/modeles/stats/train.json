@@ -8,7 +8,7 @@
   },
   "coach": {
    "length_over_buffers": 9.0,
-   "tris": 2060
+   "tris": 2156
   },
   "van": {
    "length_over_buffers": 7.0,
@@ -21,5 +21,5 @@
   "coach_roll",
   "van_roll"
  ],
- "file_bytes": 471828
+ "file_bytes": 478552
 }
