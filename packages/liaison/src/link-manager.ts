@@ -113,7 +113,8 @@ export class LinkManager {
 
   /** Adresses candidates d'une machine (balises, réponses, adresses retenues). */
   setCandidates(machine: string, endpoints: readonly Endpoint[]): void {
-    this.candidates.set(machine, dedupe(endpoints));
+    // Les plus récentes en tête; une adresse abandonnée (Wi-Fi changé) finit par sortir.
+    this.candidates.set(machine, dedupe(endpoints).slice(0, 8));
   }
 
   /** Une machine Duo a été vue sur le réseau: on l'appelle si rien ne nous relie encore. */

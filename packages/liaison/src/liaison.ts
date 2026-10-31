@@ -314,6 +314,7 @@ export function createLiaison(options: LiaisonOptions): Liaison {
     return discovery.seen().filter((sighting) => sighting.machine !== partner);
   };
 
+  const udpErrors = new Map<string, { count: number; loggedAt: number }>();
   const incompatibleSeen = new Map<string, string>();
   const onIncompatible = (peer: FrozenEnvelope): void => {
     const key = `${peer.appVersion}/${String(peer.protocol)}`;
@@ -406,7 +407,17 @@ export function createLiaison(options: LiaisonOptions): Liaison {
         discovery.handleDatagram(data, from);
       },
       onError: (error: Error) => {
-        log('udp-erreur', { error: error.message });
+        // Un Mac sans l'autorisation « Réseau local » refuse chaque envoi: une entrée par cause et par minute.
+        const code = 'code' in error ? String(error.code) : error.name;
+        const now = driver.clock.now();
+        const previous = udpErrors.get(code);
+        const count = (previous?.count ?? 0) + 1;
+        if (previous === undefined || now - previous.loggedAt >= 60_000) {
+          udpErrors.set(code, { count, loggedAt: now });
+          log('udp-erreur', { code, count });
+        } else {
+          udpErrors.set(code, { count, loggedAt: previous.loggedAt });
+        }
       },
     };
     try {

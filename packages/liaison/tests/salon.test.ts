@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { MAC, PC, advanceUntil, createPair, playMatch, startPair } from './helpers.ts';
+import { PROFILE_R1 } from '../src/sim/network.ts';
 import type { Pair } from './helpers.ts';
 
 const GAME = { id: 'la-petite-ligne', version: '0.1.0', save: null };
@@ -162,6 +163,33 @@ describe('partie: pause, reprise, fin', () => {
     pair.net.clock.advance(2900);
     expect(pair.mac.liaison.session().lobby?.match?.phase).toBe('resuming');
     advanceUntil(pair.net, () => pair.pc.liaison.session().lobby?.match?.phase === 'playing', 500);
+  });
+
+  it('profil R1: la pause demandée par l’invité s’affiche chez l’hôte en moins de 500 ms (CA-PF-035)', async () => {
+    const pair = createPair(PROFILE_R1, 31);
+    await startPair(pair, 3000);
+    playMatch(pair);
+    const delays: number[] = [];
+    for (let trial = 0; trial < 40; trial += 1) {
+      pair.pc.liaison.match.pause();
+      delays.push(
+        advanceUntil(
+          pair.net,
+          () => pair.mac.liaison.session().lobby?.match?.phase === 'paused',
+          2000,
+          1,
+        ),
+      );
+      pair.mac.liaison.match.resume();
+      pair.pc.liaison.match.resume();
+      advanceUntil(
+        pair.net,
+        () => pair.mac.liaison.session().lobby?.match?.phase === 'playing',
+        5000,
+      );
+      pair.net.clock.advance(300);
+    }
+    expect(Math.max(...delays)).toBeLessThan(500);
   });
 
   it("fin de partie: l'hôte envoie le résultat, les deux reviennent au salon", async () => {
