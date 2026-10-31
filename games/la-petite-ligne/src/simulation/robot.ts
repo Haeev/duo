@@ -14,8 +14,7 @@ import { findPath } from './grille';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
-import { canPlace, previewCell } from './amenagement';
-import { rotatedSize } from './deplacement';
+import { canPlace } from './amenagement';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -108,7 +107,7 @@ function ground(p: Vec2): ClickTarget {
 
 function questStep(sim: Sim, quest: string): string | null {
   const q = sim.world.quests.find((x) => x.id === quest);
-  if (q === undefined || q.status !== 'active') return null;
+  if (q?.status !== 'active') return null;
   return sim.content.quests.find((x) => x.id === quest)?.steps[q.step]?.id ?? null;
 }
 
@@ -317,8 +316,6 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
         }
       }
     }
-    void previewCell;
-    void rotatedSize;
     return false;
   }
   if (!questDone(sim, 'planks')) return false;
@@ -406,7 +403,7 @@ function supperAtOdette(sim: Sim, c: Character, m: Memory, out: Intent[]): boole
 function giveOdette(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   if (questStep(sim, 'welcome_supper') !== 'bring') return false;
   const odette = sim.world.villagers.find((v) => v.id === 'odette');
-  if (odette === undefined || !odette.visible) return false;
+  if (!odette?.visible) return false;
   const q = sim.world.quests.find((x) => x.id === 'welcome_supper');
   const done = q?.checklist ?? [];
   const wants = [
@@ -517,7 +514,13 @@ function lastDay(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 
 // ---------------------------------------------------------------------------
 
-export function createRobot(): Robot {
+export interface RobotOptions {
+  /** Résoudre l'énigme d'Émile (faux: vérifier qu'elle ne bloque jamais la fin, D-08). */
+  riddle?: boolean;
+}
+
+export function createRobot(options: RobotOptions = {}): Robot {
+  const solveRiddle = options.riddle ?? true;
   const memory: Record<CharacterId, Memory> = {
     p1: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '' },
     p2: { waitUntil: 0, goingTo: null, skip: {}, seq: 0, job: '' },
@@ -578,7 +581,7 @@ export function createRobot(): Robot {
       ironBox(sim, c, m, out) ||
       lastDay(sim, c, m, out) ||
       supperAtOdette(sim, c, m, out) ||
-      riddle(sim, c, m, out) ||
+      (solveRiddle && riddle(sim, c, m, out)) ||
       evening(sim, c, m, out) ||
       social(sim, c, m, out) ||
       giveOdette(sim, c, m, out) ||

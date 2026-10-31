@@ -62,4 +62,60 @@ describe('réseau: hôte qui fait autorité, invité qui envoie ses intentions',
       duo.dispose();
     }
   });
+
+  it("prédit le déplacement de l'invité, puis se recale sur l'hôte", async () => {
+    const duo = await startLocalDuo<GameAction>({ manifest, conditions: { latencyMs: 40, jitterMs: 0, spikeProbability: 0 }, seed: 11 });
+    try {
+      await duo.start();
+      const { content, map } = contentAndMap();
+      const start = performance.now();
+      const now = (): number => performance.now() - start;
+      const host = createSession({ duo: duo.hostGame, content, map, now });
+      const guest = createSession({ duo: duo.guestGame, content, map, now });
+      const sim = host.hostSim();
+      if (sim === null) throw new Error('hôte sans monde');
+      let seq = 0;
+      const frame = (moveX: number): ControlFrame => ({ seq: (seq += 1), moveX, moveY: 0, actHeld: false });
+      const tick = async (guestMove = 0): Promise<void> => {
+        host.step(frame(0));
+        guest.step(frame(guestMove));
+        host.beforeFrame(1);
+        guest.beforeFrame(1);
+        await new Promise((resolve) => setTimeout(resolve, STEP_MS));
+      };
+      host.view.send({ type: 'create_character', name: 'Alex', hair: 0, outfit: 0 });
+      for (let i = 0; i < 10; i++) await tick();
+      guest.view.send({ type: 'create_character', name: 'Sacha', hair: 1, outfit: 1 });
+      for (let i = 0; i < 10; i++) await tick();
+      // Scène d'arrivée: les deux passent les répliques.
+      for (let i = 0; i < 60 && sim.world.scene !== null; i++) {
+        const scene = sim.world.scene;
+        const intent = scene.choices.length > 0 ? ({ type: 'dialogue_choice', choice: scene.choices[0]?.id ?? '' } as const) : ({ type: 'dialogue_next' } as const);
+        host.view.send(intent);
+        guest.view.send(intent);
+        for (let k = 0; k < 4; k++) await tick();
+      }
+      expect(sim.world.scene).toBeNull();
+      for (let i = 0; i < 10; i++) await tick();
+      const id = guest.view.localCharacter();
+      const before = guest.view.world().characters.find((c) => c.id === id)?.pos.x ?? 0;
+      const hostBefore = sim.world.characters.find((c) => c.id === id)?.pos.x ?? 0;
+      await tick(1);
+      await tick(1);
+      // Deux pas plus tard, l'invité a déjà bougé chez lui; l'hôte, pas encore (40 ms de latence).
+      const predicted = guest.view.world().characters.find((c) => c.id === id)?.pos.x ?? 0;
+      expect(predicted).toBeGreaterThan(before + 0.1);
+      expect(sim.world.characters.find((c) => c.id === id)?.pos.x ?? 0).toBeCloseTo(hostBefore, 5);
+      for (let i = 0; i < 10; i++) await tick(1);
+      for (let i = 0; i < 20; i++) await tick();
+      const shown = guest.view.world().characters.find((c) => c.id === id)?.pos.x ?? 0;
+      const authority = sim.world.characters.find((c) => c.id === id)?.pos.x ?? 0;
+      expect(authority).toBeGreaterThan(hostBefore + 1);
+      expect(Math.abs(shown - authority)).toBeLessThan(0.15);
+      host.dispose();
+      guest.dispose();
+    } finally {
+      duo.dispose();
+    }
+  });
 });

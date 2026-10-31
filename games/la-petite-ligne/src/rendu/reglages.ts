@@ -138,25 +138,25 @@ export const RENDER_SETTINGS = {
     {
       minutes: 390,
       azimuthDeg: -10,
-      elevationDeg: 7,
-      sunColor: '#ffb089',
-      sunIntensity: 1.4,
-      skyColor: '#c9b1c4',
-      groundColor: '#6e5b52',
-      hemiIntensity: 0.9,
-      background: '#edbfa8',
-      night: 0.3,
+      elevationDeg: 8,
+      sunColor: '#ffb48e',
+      sunIntensity: 1.8,
+      skyColor: '#d3bccb',
+      groundColor: '#7a665a',
+      hemiIntensity: 1.05,
+      background: '#efc4ad',
+      night: 0.15,
     },
     {
       minutes: 480,
       azimuthDeg: 15,
-      elevationDeg: 24,
-      sunColor: '#ffe0b5',
-      sunIntensity: 2.4,
-      skyColor: '#cfe0ee',
-      groundColor: '#8c7d5f',
-      hemiIntensity: 1.05,
-      background: '#cde2ee',
+      elevationDeg: 26,
+      sunColor: '#ffe3bb',
+      sunIntensity: 2.6,
+      skyColor: '#d3e3f0',
+      groundColor: '#908163',
+      hemiIntensity: 1.1,
+      background: '#cfe3ef',
       night: 0,
     },
     {
@@ -304,7 +304,7 @@ export const RENDER_SETTINGS = {
     waveSpeed: 1.3,
     waveLength: 3.2,
     /** Taille des morceaux de décor fusionnés (découpage pour l'élimination hors champ). */
-    chunkSize: 16,
+    chunkSize: 24,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
     /** Fond du gué (eau basse franchissable). */
@@ -357,7 +357,7 @@ export const RENDER_SETTINGS = {
     destinationSeconds: 1,
     highlightPulseHz: 1.6,
     /** Taille de l'objet d'inventaire affiché (m). */
-    itemScale: 0.9,
+    itemScale: 0.75,
     rainDrops: 700,
     rainAreaPadding: 6,
     rainHeight: 14,
@@ -390,6 +390,22 @@ export const RENDER_SETTINGS = {
     programs: 12,
     /** Fréquence de rafraîchissement de l'indicateur de performances (s). */
     statsRefreshSeconds: 0.5,
+  },
+
+  /**
+   * Résolution dynamique (budget de la plateforme: jusqu'à 0,75): si les
+   * images durent trop longtemps en moyenne, la résolution de rendu baisse
+   * par paliers, sans jamais remonter pendant la partie (pas de va-et-vient).
+   */
+  dynamicResolution: {
+    steps: [1, 0.9, 0.8, 0.75] as const,
+    /** Moyenne glissante des images au-delà de laquelle on descend d'un palier (ms). */
+    slowFrameMs: 20,
+    /** Durée de lissage de la moyenne et attente entre deux paliers (s). */
+    averageSeconds: 1.5,
+    cooldownSeconds: 3,
+    /** Premières secondes ignorées (compilation, chargement des textures). */
+    warmupSeconds: 5,
   },
 } as const;
 

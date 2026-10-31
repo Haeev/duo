@@ -1,0 +1,1089 @@
+{
+ "player_base": {
+  "file": "personnages.glb",
+  "tris": 488
+ },
+ "player_outfit_work": {
+  "file": "personnages.glb",
+  "tris": 1184
+ },
+ "player_outfit_smock": {
+  "file": "personnages.glb",
+  "tris": 1216
+ },
+ "player_outfit_overalls": {
+  "file": "personnages.glb",
+  "tris": 1232
+ },
+ "player_hair_short": {
+  "file": "personnages.glb",
+  "tris": 372
+ },
+ "player_hair_bob": {
+  "file": "personnages.glb",
+  "tris": 372
+ },
+ "player_hair_bun": {
+  "file": "personnages.glb",
+  "tris": 420
+ },
+ "player_scarf_orb": {
+  "file": "personnages.glb",
+  "tris": 148
+ },
+ "player_scarf_crescent": {
+  "file": "personnages.glb",
+  "tris": 192
+ },
+ "player_scarf_star": {
+  "file": "personnages.glb",
+  "tris": 140
+ },
+ "player_scarf_sun": {
+  "file": "personnages.glb",
+  "tris": 212
+ },
+ "player_scarf_planet": {
+  "file": "personnages.glb",
+  "tris": 160
+ },
+ "player_scarf_comet": {
+  "file": "personnages.glb",
+  "tris": 156
+ },
+ "villager_firmin": {
+  "file": "personnages.glb",
+  "tris": 2160
+ },
+ "villager_odette": {
+  "file": "personnages.glb",
+  "tris": 2156
+ },
+ "villager_basile": {
+  "file": "personnages.glb",
+  "tris": 2324
+ },
+ "villager_jeanne": {
+  "file": "personnages.glb",
+  "tris": 2588
+ },
+ "villager_lucie": {
+  "file": "personnages.glb",
+  "tris": 2292
+ },
+ "rig": {
+  "file": "personnages.glb",
+  "animations": [
+   "idle",
+   "walk",
+   "carry_two",
+   "hoe",
+   "sow",
+   "water",
+   "harvest",
+   "chop",
+   "saw",
+   "hammer",
+   "talk",
+   "give",
+   "sit",
+   "eat",
+   "sit_eat",
+   "sleep",
+   "wave",
+   "pet",
+   "high_five"
+  ]
+ },
+ "garden_cell_grass": {
+  "file": "ferme.glb",
+  "tris": 134,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "garden_cell_tilled": {
+  "file": "ferme.glb",
+  "tris": 116,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "garden_cell_tilled_wet": {
+  "file": "ferme.glb",
+  "tris": 200,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "radish_stage_seed": {
+  "file": "ferme.glb",
+  "tris": 216,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "radish_stage_sprout": {
+  "file": "ferme.glb",
+  "tris": 144,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "radish_stage_young": {
+  "file": "ferme.glb",
+  "tris": 144,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "radish_stage_ripe": {
+  "file": "ferme.glb",
+  "tris": 408,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "lettuce_stage_seed": {
+  "file": "ferme.glb",
+  "tris": 96,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "lettuce_stage_sprout": {
+  "file": "ferme.glb",
+  "tris": 72,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "lettuce_stage_young": {
+  "file": "ferme.glb",
+  "tris": 96,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "lettuce_stage_ripe": {
+  "file": "ferme.glb",
+  "tris": 270,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "carrot_stage_seed": {
+  "file": "ferme.glb",
+  "tris": 216,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "carrot_stage_sprout": {
+  "file": "ferme.glb",
+  "tris": 180,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "carrot_stage_young": {
+  "file": "ferme.glb",
+  "tris": 180,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "carrot_stage_ripe": {
+  "file": "ferme.glb",
+  "tris": 336,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "radish": {
+  "file": "ferme.glb",
+  "tris": 132
+ },
+ "carrot": {
+  "file": "ferme.glb",
+  "tris": 76
+ },
+ "lettuce": {
+  "file": "ferme.glb",
+  "tris": 174
+ },
+ "egg": {
+  "file": "ferme.glb",
+  "tris": 80
+ },
+ "dandelion": {
+  "file": "ferme.glb",
+  "tris": 200
+ },
+ "seed_packet_radish": {
+  "file": "ferme.glb",
+  "tris": 116
+ },
+ "seed_packet_lettuce": {
+  "file": "ferme.glb",
+  "tris": 116
+ },
+ "seed_packet_carrot": {
+  "file": "ferme.glb",
+  "tris": 116
+ },
+ "hoe": {
+  "file": "ferme.glb",
+  "tris": 96
+ },
+ "watering_can": {
+  "file": "ferme.glb",
+  "tris": 216
+ },
+ "axe": {
+  "file": "ferme.glb",
+  "tris": 88
+ },
+ "saw": {
+  "file": "ferme.glb",
+  "tris": 176
+ },
+ "hammer": {
+  "file": "ferme.glb",
+  "tris": 92
+ },
+ "fishing_rod": {
+  "file": "ferme.glb",
+  "tris": 132
+ },
+ "log": {
+  "file": "ferme.glb",
+  "tris": 216
+ },
+ "plank": {
+  "file": "ferme.glb",
+  "tris": 68
+ },
+ "beam": {
+  "file": "ferme.glb",
+  "tris": 104
+ },
+ "nail_box": {
+  "file": "ferme.glb",
+  "tris": 356
+ },
+ "fish_gudgeon": {
+  "file": "ferme.glb",
+  "tris": 284
+ },
+ "fish_chub": {
+  "file": "ferme.glb",
+  "tris": 140
+ },
+ "fish_trout": {
+  "file": "ferme.glb",
+  "tris": 284
+ },
+ "hen_feeder": {
+  "file": "ferme.glb",
+  "tris": 84,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "grain_sack": {
+  "file": "ferme.glb",
+  "tris": 144
+ },
+ "water_barrel": {
+  "file": "ferme.glb",
+  "tris": 356,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "hen": {
+  "file": "ferme.glb",
+  "tris": 1350,
+  "variants": [
+   "hen_white",
+   "hen_red",
+   "hen_black"
+  ]
+ },
+ "station": {
+  "file": "bourg.glb",
+  "tris": 3264,
+  "footprint": [
+   10,
+   6
+  ]
+ },
+ "platform": {
+  "file": "bourg.glb",
+  "tris": 3160,
+  "footprint": [
+   30,
+   4
+  ]
+ },
+ "gatekeeper_house": {
+  "file": "bourg.glb",
+  "tris": 6500,
+  "footprint": [
+   7,
+   6
+  ],
+  "states": [
+   "gatekeeper_house_ruin",
+   "gatekeeper_house_repaired"
+  ]
+ },
+ "ferrand_shop": {
+  "file": "bourg.glb",
+  "tris": 3664,
+  "footprint": [
+   10,
+   8
+  ]
+ },
+ "firmin_house": {
+  "file": "bourg.glb",
+  "tris": 2264,
+  "footprint": [
+   7,
+   6
+  ]
+ },
+ "sawmill": {
+  "file": "bourg.glb",
+  "tris": 1356,
+  "footprint": [
+   10,
+   8
+  ]
+ },
+ "handcar_shed": {
+  "file": "bourg.glb",
+  "tris": 1132,
+  "footprint": [
+   6,
+   5
+  ]
+ },
+ "handcar": {
+  "file": "bourg.glb",
+  "tris": 476,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "well": {
+  "file": "bourg.glb",
+  "tris": 442,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "henhouse": {
+  "file": "bourg.glb",
+  "tris": 2108,
+  "footprint": [
+   3,
+   3
+  ],
+  "states": [
+   "henhouse_ruin",
+   "henhouse_repaired"
+  ]
+ },
+ "workbench": {
+  "file": "bourg.glb",
+  "tris": 400,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "woodpile": {
+  "file": "bourg.glb",
+  "tris": 888,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "plank_stack": {
+  "file": "bourg.glb",
+  "tris": 132,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "rail_straight": {
+  "file": "bourg.glb",
+  "tris": 294,
+  "footprint": [
+   4,
+   2
+  ]
+ },
+ "rail_curve_90": {
+  "file": "bourg.glb",
+  "tris": 2676,
+  "footprint": [
+   13,
+   13
+  ]
+ },
+ "buffer_stop": {
+  "file": "bourg.glb",
+  "tris": 152,
+  "footprint": [
+   1,
+   2
+  ]
+ },
+ "level_crossing_gate": {
+  "file": "bourg.glb",
+  "tris": 228,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bell_post": {
+  "file": "bourg.glb",
+  "tris": 198,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bench": {
+  "file": "bourg.glb",
+  "tris": 316,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "lamp_post": {
+  "file": "bourg.glb",
+  "tris": 248,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "coop_crate": {
+  "file": "bourg.glb",
+  "tris": 168,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "notice_board": {
+  "file": "bourg.glb",
+  "tris": 332,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "station_sign": {
+  "file": "bourg.glb",
+  "tris": 260,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "arbor": {
+  "file": "bourg.glb",
+  "tris": 944,
+  "footprint": [
+   3,
+   2
+  ]
+ },
+ "mailbox": {
+  "file": "bourg.glb",
+  "tris": 92,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "barrel": {
+  "file": "bourg.glb",
+  "tris": 276,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "crate": {
+  "file": "bourg.glb",
+  "tris": 92,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "crate_stack": {
+  "file": "bourg.glb",
+  "tris": 180,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "sacks": {
+  "file": "bourg.glb",
+  "tris": 228,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cart": {
+  "file": "bourg.glb",
+  "tris": 404,
+  "footprint": [
+   3,
+   2
+  ]
+ },
+ "bicycle": {
+  "file": "bourg.glb",
+  "tris": 520,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "ground_grass": {
+  "file": "bourg.glb",
+  "tris": 24,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "ground_dirt": {
+  "file": "bourg.glb",
+  "tris": 48,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "ground_cobble": {
+  "file": "bourg.glb",
+  "tris": 716,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "path_border": {
+  "file": "bourg.glb",
+  "tris": 176,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fence_wood": {
+  "file": "bourg.glb",
+  "tris": 36,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fence_picket": {
+  "file": "bourg.glb",
+  "tris": 156,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fence_broken": {
+  "file": "bourg.glb",
+  "tris": 36,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fence_gate": {
+  "file": "bourg.glb",
+  "tris": 108,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fence_post": {
+  "file": "bourg.glb",
+  "tris": 12,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_oak_small": {
+  "file": "bourg.glb",
+  "tris": 204,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_oak_large": {
+  "file": "bourg.glb",
+  "tris": 204,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "tree_fir_small": {
+  "file": "bourg.glb",
+  "tris": 68,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_fir_large": {
+  "file": "bourg.glb",
+  "tris": 68,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "tree_birch_small": {
+  "file": "bourg.glb",
+  "tris": 184,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_birch_large": {
+  "file": "bourg.glb",
+  "tris": 184,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "tree_stump": {
+  "file": "bourg.glb",
+  "tris": 144,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bush_round": {
+  "file": "bourg.glb",
+  "tris": 80,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bush_bramble": {
+  "file": "bourg.glb",
+  "tris": 180,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bush_hazel": {
+  "file": "bourg.glb",
+  "tris": 140,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "rock_small": {
+  "file": "bourg.glb",
+  "tris": 20,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "rock_medium": {
+  "file": "bourg.glb",
+  "tris": 40,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "rock_large": {
+  "file": "bourg.glb",
+  "tris": 52,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "grass_tall": {
+  "file": "bourg.glb",
+  "tris": 36,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flowers_red": {
+  "file": "bourg.glb",
+  "tris": 316,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flowers_yellow": {
+  "file": "bourg.glb",
+  "tris": 316,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flowers_white": {
+  "file": "bourg.glb",
+  "tris": 316,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flowers_blue": {
+  "file": "bourg.glb",
+  "tris": 316,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flower_bed": {
+  "file": "bourg.glb",
+  "tris": 1148,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "reeds": {
+  "file": "bourg.glb",
+  "tris": 144,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "river_straight": {
+  "file": "bourg.glb",
+  "tris": 220,
+  "footprint": [
+   4,
+   8
+  ]
+ },
+ "river_ford": {
+  "file": "bourg.glb",
+  "tris": 340,
+  "footprint": [
+   4,
+   8
+  ]
+ },
+ "river_curve": {
+  "file": "bourg.glb",
+  "tris": 160,
+  "footprint": [
+   10,
+   10
+  ]
+ },
+ "pontoon": {
+  "file": "bourg.glb",
+  "tris": 640,
+  "footprint": [
+   2,
+   3
+  ]
+ },
+ "tree_oak": {
+  "file": "bourg.glb",
+  "tris": 204,
+  "alias_of": "tree_oak_large"
+ },
+ "tree_fir": {
+  "file": "bourg.glb",
+  "tris": 68,
+  "alias_of": "tree_fir_large"
+ },
+ "bush": {
+  "file": "bourg.glb",
+  "tris": 80,
+  "alias_of": "bush_round"
+ },
+ "rock": {
+  "file": "bourg.glb",
+  "tris": 40,
+  "alias_of": "rock_medium"
+ },
+ "fence": {
+  "file": "bourg.glb",
+  "tris": 36,
+  "alias_of": "fence_wood"
+ },
+ "log_pile": {
+  "file": "bourg.glb",
+  "tris": 888,
+  "alias_of": "woodpile"
+ },
+ "locomotive": {
+  "file": "train.glb",
+  "tris": 3392
+ },
+ "coach": {
+  "file": "train.glb",
+  "tris": 2060
+ },
+ "van": {
+  "file": "train.glb",
+  "tris": 2004
+ },
+ "straw_mattress": {
+  "file": "maison.glb",
+  "tris": 320,
+  "footprint": [
+   1,
+   2
+  ]
+ },
+ "double_bed": {
+  "file": "maison.glb",
+  "tris": 540,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "mattress": {
+  "file": "maison.glb",
+  "tris": 324
+ },
+ "table": {
+  "file": "maison.glb",
+  "tris": 116,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "chair": {
+  "file": "maison.glb",
+  "tris": 164,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "chest": {
+  "file": "maison.glb",
+  "tris": 128,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "shelf": {
+  "file": "maison.glb",
+  "tris": 512,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "stove": {
+  "file": "maison.glb",
+  "tris": 324,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "flower_pot": {
+  "file": "maison.glb",
+  "tris": 352,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "oil_lamp": {
+  "file": "maison.glb",
+  "tris": 232,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "rug": {
+  "file": "maison.glb",
+  "tris": 296,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "curtains": {
+  "file": "maison.glb",
+  "tris": 224,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "crystal_radio": {
+  "file": "maison.glb",
+  "tris": 364,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "wood_stove": {
+  "file": "maison.glb",
+  "tris": 240,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "picture_frame": {
+  "file": "maison.glb",
+  "tris": 92,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bread": {
+  "file": "maison.glb",
+  "tris": 136
+ },
+ "dish_radishes": {
+  "file": "maison.glb",
+  "tris": 464
+ },
+ "dish_omelette": {
+  "file": "maison.glb",
+  "tris": 276
+ },
+ "dish_soup": {
+  "file": "maison.glb",
+  "tris": 244
+ },
+ "parcel": {
+  "file": "maison.glb",
+  "tris": 92
+ },
+ "iron_box": {
+  "file": "maison.glb",
+  "tris": 136
+ },
+ "riddle_card": {
+  "file": "maison.glb",
+  "tris": 72
+ },
+ "shed_key": {
+  "file": "maison.glb",
+  "tris": 112
+ },
+ "old_photo": {
+  "file": "maison.glb",
+  "tris": 60
+ },
+ "jay_feather": {
+  "file": "maison.glb",
+  "tris": 172
+ },
+ "kit_wall_stone": {
+  "file": "maison.glb",
+  "tris": 12,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "kit_wall_wood": {
+  "file": "maison.glb",
+  "tris": 108,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "kit_door": {
+  "file": "maison.glb",
+  "tris": 148,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "kit_window": {
+  "file": "maison.glb",
+  "tris": 72,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "kit_floor_wood": {
+  "file": "maison.glb",
+  "tris": 24,
+  "footprint": [
+   1,
+   1
+  ]
+ }
+}

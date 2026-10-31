@@ -20,7 +20,7 @@ export function ghostNear(sim: Sim, c: Character): { state: ConstructionState; d
   for (const state of sim.world.constructions) {
     if (state.status !== 'ghost') continue;
     const def = defOf(sim, state.id);
-    if (def === undefined || def.kind !== 'guided') continue;
+    if (def?.kind !== 'guided') continue;
     if (distance(c.pos, point(sim, def.point)) > range) continue;
     const element = state.elements.findIndex((e) => !e.done);
     if (element >= 0) return { state, def, element };

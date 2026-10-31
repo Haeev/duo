@@ -37,7 +37,8 @@ def preview_material(base_mat, row_name):
             for dx in range(P.CELL):
                 for dy in range(P.CELL):
                     img.putpixel((c * P.CELL + dx, r * P.CELL + dy), rgb)
-    tmp = os.path.join(lpl.BOARDS, "_apercu_personnages.png")
+    import tempfile
+    tmp = os.path.join(tempfile.gettempdir(), "lpl_apercu_personnages.png")
     img.save(tmp)
     mat = base_mat.copy()
     mat.name = "apercu_" + row_name

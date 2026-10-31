@@ -12,6 +12,7 @@
  *   erreur: on ne bloque jamais sur un asset.
  */
 import {
+  Bone,
   Group,
   Mesh,
   MeshStandardMaterial,
@@ -160,7 +161,8 @@ export class ModelLibrary {
   private register(file: string, gltf: GLTF): void {
     const nodes = new Map<string, Object3D>();
     gltf.scene.traverse((object) => {
-      if (object.name !== '' && !nodes.has(object.name)) {
+      // Les os ne sont pas des modèles (un os « chest » ne doit pas masquer le coffre).
+      if (object.name !== '' && !nodes.has(object.name) && !(object instanceof Bone)) {
         nodes.set(object.name, object);
       }
       if (object instanceof Mesh) {
@@ -240,21 +242,36 @@ export class ModelLibrary {
    * les maillages nommés. `null` si le groupe n'existe pas.
    */
   cloneRig(groupName: string, keep: readonly string[]): Object3D | null {
-    const node = this.node(groupName);
-    if (node === null) {
+    const source = this.table.get(groupName);
+    const file = source === undefined ? undefined : this.files.get(source.file);
+    if (file === undefined) {
       return null;
     }
-    const copy = cloneSkinned(node);
-    copy.position.set(0, 0, 0);
+    // On copie toute la scène du fichier (squelette et maillages peuvent être frères), puis on
+    // ne garde que le squelette et les maillages demandés. Les géométries restent partagées.
+    const copy = cloneSkinned(file.gltf.scene);
     const drop: Object3D[] = [];
     copy.traverse((object) => {
-      if (object instanceof SkinnedMesh && !keep.includes(object.name)) {
+      if (object instanceof Mesh && !keep.includes(object.name)) {
         drop.push(object);
       }
     });
     for (const object of drop) {
       object.removeFromParent();
     }
+    const hasContent = (object: Object3D): boolean => {
+      let found = false;
+      object.traverse((child) => {
+        found ||= child instanceof Bone || child instanceof Mesh;
+      });
+      return found;
+    };
+    for (const child of [...copy.children]) {
+      if (!hasContent(child)) {
+        child.removeFromParent();
+      }
+    }
+    copy.position.set(0, 0, 0);
     return copy;
   }
 

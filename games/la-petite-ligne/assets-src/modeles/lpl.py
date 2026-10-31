@@ -638,6 +638,8 @@ def duplicate_tree(ob, parent=None):
 def board(roots, path, cols=6, cell=2.0, res=(1600, 900), ortho=None, azimuth=45, elevation=35.264,
           label_size=0.16, spacing=None, samples=20, emission=0.0, mannequin=False, names=None):
     """Planche: copie chaque nœud racine sur une grille, avec son nom, en vue isométrique."""
+    if os.environ.get("LPL_SANS_PLANCHES"):
+        return
     setup_render(res, samples)
     for o in list(bpy.data.objects):
         if o.type in ("LIGHT", "CAMERA"):

@@ -1,0 +1,292 @@
+# Modèles 3D de La Petite Ligne (démo)
+
+Produits par script (Blender 5.2 sans interface), aucune ressource externe. Sources, planches de contrôle et outil de vérification: `games/la-petite-ligne/assets-src/modeles/`. Direction artistique: `docs/jeux/jeu-1/bible-artistique-demo.md`.
+
+Tout reconstruire (environ 6 minutes, planches comprises): `bash games/la-petite-ligne/assets-src/modeles/construire.sh` (`--sans-planches` pour les seuls GLB).
+
+## Fichiers
+
+| Fichier | Contenu | Animations |
+|---|---|---|
+| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 19 clips sur le squelette |
+| `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature, rivière | aucune (pièces mobiles en nœuds à part) |
+| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
+| `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
+| `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
+| `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
+
+Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
+
+## Conventions
+
+- 1 unité = 1 m, Y en haut. Façade (porte) et regard vers +Z. Origine au centre de l'emprise, au niveau du sol. Emprises en cases entières (champ `footprint` des extras, `[largeur le long de la façade, profondeur]`).
+- Exception: le train est aligné sur le module de voie `rail_straight` (le long de X), l'avant de la locomotive vers +X; ses roues touchent le rail à 0,32 m, origine au sol sur l'axe de la voie.
+- Les extras glTF (`userData` dans Three.js) portent les données utiles: `footprint`, `door_cell` (case de la porte comptée depuis la gauche vue de dehors, comme dans la carte), `walk_height`, `seat_height`, `sleep_height`, `sleep_spots`, `light_anchor`, `states`, `alias_of`, notes.
+- Un seul matériau par fichier: `lpl_palette` (décor) ou `lpl_characters` (personnages). Filtrage au plus proche, faces à une seule face (pas de double face).
+- Émission de nuit: le matériau `lpl_palette` est exporté avec l'émission à 1 (vitres, lanternes, flammes, braises, cadran du poste). Le jeu met `material.emissiveIntensity` à 0 le jour et à 1 la nuit.
+- Saisons: remplacer `material.map` par la texture de la saison (même disposition, `flipY = false`, `colorSpace = SRGBColorSpace`, `NearestFilter`).
+- Optimisation: `bourg`, `ferme`, `train`, `maison` passent par gltf-transform (dédoublonnage, soudure, élagage). Ni quantification ni compression: aucune extension requise, aucun décodeur à brancher, et l'on peut poser `position`, `rotation` et `scale` sur un nœud cloné sans risque (la quantification range sa déquantification dans la transformation des nœuds: à éviter, ou alors envelopper chaque nœud dans un groupe). Total des cinq fichiers: environ 6,5 Mo. Si le poids devient un sujet, la compression Meshopt (avec `MeshoptDecoder`, livré avec Three.js) le divise par trois ou quatre.
+
+## Personnages
+
+- Un seul squelette `rig` (18 os: `root`, `hips`, `spine`, `chest`, `neck`, `head`, `upper_arm_l`, `forearm_l`, `hand_l`, idem `_r`, `thigh_l`, `shin_l`, `foot_l`, idem `_r`) et des maillages à peau liés à ce squelette, à la racine du fichier.
+- Instancier un personnage: `SkeletonUtils.clone(gltf.scene)`, puis ne garder visibles que ses pièces. Un joueur = `player_base` + une tenue `player_outfit_work | smock | overalls` + une coiffure `player_hair_short | bob | bun` + un foulard `player_scarf_<symbole>` (`orb`, `crescent`, `star`, `sun`, `planet`, `comet`, comme les profils Duo). Les quatre pièces partagent le matériau: on peut les fusionner (même squelette) pour un seul appel de dessin.
+- Couleurs d'un joueur: la texture `personnages.png` a une rangée de 16 cases (4 px) par personnage. Les pièces des joueurs lisent la rangée 0. Pour chaque joueur, cloner le matériau, peindre une CanvasTexture de 64 x 64 (copie de `personnages.png`) dont la rangée 0 reçoit ses couleurs, avec `flipY = false`, `NearestFilter`, `SRGBColorSpace`. Ordre des cases: peau, ombre de peau, cheveux, cheveux sombres, yeux, bouche, haut, liseré, bas, chaussures, foulard, symbole du foulard, accessoire A, accessoire B, métal, joues. Choix proposés (tenues, peaux, cheveux, foulards): `PLAYER_PRESETS` dans `assets-src/modeles/palette.py`.
+- Habitants: `villager_firmin`, `villager_odette`, `villager_basile`, `villager_jeanne` (et `villager_lucie`, hors démo). Jeanne se pose à l'échelle 0,75 (extra `scale`).
+- Expressions: clés de forme sur `player_base` et chaque `villager_*`: `happy` (contente), `delighted` (ravie), `tired` (fatiguée), `hungry` (affamée), `blink` (yeux fermés, pour dormir et cligner); toutes à 0 = neutre. Une seule à 1 à la fois (`morphTargetDictionary`).
+- Objets tenus: accrocher le nœud de l'objet sous `socket_hand_r` (ou `socket_hand_l`) sans transformation. Les outils de `ferme.glb` ont leur origine au point de prise et pendent comme dans une main au repos.
+- Animations sur place (la racine ne bouge pas, seul `hips` monte et descend):
+  - `walk`: deux pas en 0,533 s pour 3,5 m/s; `timeScale = vitesse / 3,5`.
+  - `carry_two`: marche à 1,8 m/s bras levés; la poutre (`beam`, extra `carry_height` 1,78) se pose au-dessus des deux porteurs, l'un derrière l'autre, sa longueur selon Z.
+  - `sit` et `sit_eat`: bassin abaissé, assise à 0,47 m (chaise `seat_height`); placer le personnage à l'origine de la chaise, même orientation.
+  - `sleep`: allongé sur le dos, dos à 0,5 m (lit double); tête vers -Z, pieds vers +Z, comme le lit. Paillasse (`sleep_height` 0,15): abaisser le personnage de 0,35 m. Mettre `blink` à 1.
+  - `give` et `high_five` se jouent une fois (`LoopOnce`, `clampWhenFinished`); les autres bouclent.
+  - P1 de la démo déjà faits: `pet` (caresser une poule, accroupi), `high_five`, `sit` sur le banc (assise du banc 0,45 m).
+
+## Bâtiments et pièces mobiles
+
+- `gatekeeper_house` (maisonnette, 7 x 6): deux états enfants `gatekeeper_house_ruin` et `gatekeeper_house_repaired`, à montrer l'un ou l'autre. Chaque état a ses nœuds `_floor`, `_wall_front`, `_wall_back`, `_wall_left`, `_wall_right`, `_attic` (grenier du fond), et un groupe `_roof`: on cache le toit, le grenier et les deux murs côté caméra quand un joueur entre. Pièce jouable de 5 x 4 cases (extra `interior`), plancher à 0,12 m, porte sur la case 3 (au milieu de la façade).
+- Chantier guidé du jour 1 (12 éléments): le toit réparé est découpé en 11 pièces `gatekeeper_house_repaired_roof_part_01` à `_11` (5 bandes par pan et le faîtage, la cheminée dans la pièce 10) plus la porte `gatekeeper_house_repaired_door` (pivot sur le gond gauche: tourner autour de Y pour l'ouvrir). Fantômes: mêmes nœuds en transparence.
+- `henhouse` (poulailler, 3 x 3): états `henhouse_ruin` et `henhouse_repaired`, chacun en `_walls`, `_roof`, `_door`, `_ramp`, `_fence` (chantier: 8 planches, 2 clous).
+- `station`: horloge `station_clock` avec ses aiguilles `station_clock_hour` et `station_clock_minute` (tourner autour de leur axe Z local selon l'heure du jeu: la pendule de Firmin). Corps et toit séparés (`station_body`, `station_roof`).
+- `platform` (quai 30 x 4, marchable à 0,4 m, rampes aux deux bouts): `platform_base` et `platform_canopy` (marquise de 10 m centrée, côté +Z); le bord côté voie (pierres claires) est à -Z.
+- `handcar_shed` (remise): portes `handcar_shed_door_l` et `_r`, pivots sur les gonds (tourner de -100 et +100 degrés autour de Y pour ouvrir sur la draisine). `handcar` (draisine): balancier `handcar_lever` (pivot sur son axe X local, plus ou moins 20 degrés).
+- `level_crossing_gate`: lisse `level_crossing_gate_arm` (pivot sur Z, 0 baissée, +80 degrés levée).
+- `workbench`: l'établi de Basile sous son propre auvent (2 x 2), à côté de `sawmill`.
+- Rivière: modules `river_straight` et `river_ford` (4 m le long de X, 8 m de large, axe en z = 0) et `river_curve` (10 x 10, axe de rayon 6 m: entre par le bord -Z en x = -1, sort par le bord +X en z = +1). L'eau est un nœud à part `*_water` à -0,3 m (à animer ou à changer de matériau); les berges descendent sous le sol: le terrain du jeu doit laisser la place à la rivière.
+- Voie: `rail_straight` (4 m le long de X, 2 m de large, 5 traverses, raccord sans couture), `rail_curve_90` (quart de cercle de rayon 12 m, emprise 13 x 13: la voie entre par le bord -Z en x = -5,5 et sort par le bord +X en z = +5,5, centre de courbure au coin x = +6,5, z = -6,5), `buffer_stop`. Voie métrique, rails à plus ou moins 0,5 m de l'axe, dessus du rail à 0,32 m.
+- Noms génériques de la carte: `tree_oak`, `tree_fir`, `bush`, `rock`, `fence`, `log_pile` sont des nœuds qui partagent le maillage d'une variante (`tree_oak_large`, `tree_fir_large`, `bush_round`, `rock_medium`, `fence_wood`, `woodpile`); les variantes restent disponibles pour varier le décor.
+
+## Train
+
+- Roues de 0,45 m de rayon partout: chaque clip `*_roll` fait un tour de roue en 1 s (2,83 m parcourus): `timeScale = vitesse / 2,83`; vitesse nulle = clip en pause. La locomotive anime aussi ses bielles (`locomotive_rod_l`, `_r`).
+- Longueurs hors tampons (extra `length_over_buffers`): locomotive 7,4 m, voiture 9,0 m, fourgon 7,0 m.
+- `locomotive_smoke`: nœud vide au sommet de la cheminée, point d'émission du panache (technical artist).
+
+## Maison
+
+- Meubles muraux (`shelf`, `curtains`, `picture_frame`): dos contre le bord arrière de leur case (-Z).
+- `oil_lamp`: nœud vide `oil_lamp_light` à la flamme pour une lumière ponctuelle chaude.
+- `double_bed`: deux places (`sleep_spots`), `table` dessus à 0,78 m, `chair` assise à 0,47 m.
+- Kit de modules P1: `kit_wall_stone`, `kit_wall_wood`, `kit_door`, `kit_window` (murs de 1 m sur le bord arrière de la case, 2,4 m de haut), `kit_floor_wood`.
+
+## Budgets (PC de référence, `docs/plateforme/architecture.md` section 14)
+
+- Toute la carte de la démo (`donnees/cartes/halte.json`: 196 objets, dont 79 buissons et 51 arbres): environ 43 000 triangles de décor, plus 16 modules de voie (4 700), le potager (environ 4 000 avec ses cultures) et six personnages (environ 14 000): moins de 70 000 triangles, pour un plafond de 250 000.
+- Personnages: 2 160 à 2 590 triangles par habitant, 2 190 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
+- Appels de dessin: un matériau par fichier; décor statique à fusionner ou à instancier par le jeu (arbres, buissons, clôtures, cultures et cases du potager se prêtent à `InstancedMesh`).
+- Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 64: moins de 100 Ko de mémoire.
+
+## Fiche par modèle
+
+### `personnages.glb` (2240 Ko)
+
+| Nœud | Triangles |
+|---|---|
+| `player_base` | 488 |
+| `player_outfit_work` | 1184 |
+| `player_outfit_smock` | 1216 |
+| `player_outfit_overalls` | 1232 |
+| `player_hair_short` | 372 |
+| `player_hair_bob` | 372 |
+| `player_hair_bun` | 420 |
+| `player_scarf_orb` | 148 |
+| `player_scarf_crescent` | 192 |
+| `player_scarf_star` | 140 |
+| `player_scarf_sun` | 212 |
+| `player_scarf_planet` | 160 |
+| `player_scarf_comet` | 156 |
+| `villager_firmin` | 2160 |
+| `villager_odette` | 2156 |
+| `villager_basile` | 2324 |
+| `villager_jeanne` | 2588 |
+| `villager_lucie` | 2292 |
+
+| Animation | Durée (s) | Boucle |
+|---|---|---|
+| `idle` | 3.0 | oui |
+| `walk` | 0.533 | oui |
+| `carry_two` | 0.8 | oui |
+| `hoe` | 1.0 | oui |
+| `sow` | 1.0 | oui |
+| `water` | 1.333 | oui |
+| `harvest` | 1.2 | oui |
+| `chop` | 1.067 | oui |
+| `saw` | 0.6 | oui |
+| `hammer` | 0.667 | oui |
+| `talk` | 2.0 | oui |
+| `give` | 1.067 | non (jouer une fois) |
+| `sit` | 2.667 | oui |
+| `eat` | 1.133 | oui |
+| `sit_eat` | 1.133 | oui |
+| `sleep` | 3.333 | oui |
+| `wave` | 1.067 | oui |
+| `pet` | 0.8 | oui |
+| `high_five` | 0.8 | non (jouer une fois) |
+
+### `ferme.glb` (653 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `garden_cell_grass` | 1 x 1 | 134 |  |
+| `garden_cell_tilled` | 1 x 1 | 116 |  |
+| `garden_cell_tilled_wet` | 1 x 1 | 200 |  |
+| `radish_stage_seed` | 1 x 1 | 216 | on: "garden_cell_tilled" |
+| `radish_stage_sprout` | 1 x 1 | 144 | on: "garden_cell_tilled" |
+| `radish_stage_young` | 1 x 1 | 144 | on: "garden_cell_tilled" |
+| `radish_stage_ripe` | 1 x 1 | 408 | on: "garden_cell_tilled" |
+| `lettuce_stage_seed` | 1 x 1 | 96 | on: "garden_cell_tilled" |
+| `lettuce_stage_sprout` | 1 x 1 | 72 | on: "garden_cell_tilled" |
+| `lettuce_stage_young` | 1 x 1 | 96 | on: "garden_cell_tilled" |
+| `lettuce_stage_ripe` | 1 x 1 | 270 | on: "garden_cell_tilled" |
+| `carrot_stage_seed` | 1 x 1 | 216 | on: "garden_cell_tilled" |
+| `carrot_stage_sprout` | 1 x 1 | 180 | on: "garden_cell_tilled" |
+| `carrot_stage_young` | 1 x 1 | 180 | on: "garden_cell_tilled" |
+| `carrot_stage_ripe` | 1 x 1 | 336 | on: "garden_cell_tilled" |
+| `radish` |  | 132 | kind: "item" |
+| `carrot` |  | 76 | kind: "item" |
+| `lettuce` |  | 174 | kind: "item" |
+| `egg` |  | 80 | kind: "item" |
+| `dandelion` |  | 200 | kind: "item" |
+| `seed_packet_radish` |  | 116 | kind: "item" |
+| `seed_packet_lettuce` |  | 116 | kind: "item" |
+| `seed_packet_carrot` |  | 116 | kind: "item" |
+| `hoe` |  | 96 | kind: "tool", socket: "socket_hand_r" |
+| `watering_can` |  | 216 | kind: "tool", socket: "socket_hand_r" |
+| `axe` |  | 88 | kind: "tool", socket: "socket_hand_r" |
+| `saw` |  | 176 | kind: "tool", socket: "socket_hand_r" |
+| `hammer` |  | 92 | kind: "tool", socket: "socket_hand_r" |
+| `fishing_rod` |  | 132 | kind: "tool", socket: "socket_hand_r" |
+| `log` |  | 216 | kind: "item" |
+| `plank` |  | 68 | kind: "item" |
+| `beam` |  | 104 | kind: "carried", length_axis: "z", carry_height: 1.78 |
+| `nail_box` |  | 356 | kind: "item" |
+| `fish_gudgeon` |  | 284 | kind: "item" |
+| `fish_chub` |  | 140 | kind: "item" |
+| `fish_trout` |  | 284 | kind: "item" |
+| `hen_feeder` | 1 x 1 | 84 |  |
+| `grain_sack` |  | 144 | kind: "item" |
+| `water_barrel` | 1 x 1 | 356 |  |
+| `hen` |  | 1350 | variants: ["hen_white", "hen_red", "hen_black"], tris_each_variant: 450 |
+
+Animations: `hen_idle`, `hen_walk`, `hen_peck`
+
+### `bourg.glb` (2846 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `station` | 10 x 6 | 3264 | door_cell: 4 |
+| `platform` | 30 x 4 | 3160 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
+| `gatekeeper_house` | 7 x 6 | 6500 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
+| `ferrand_shop` | 10 x 8 | 3664 | door_cell: 2, counter_cell: 6 |
+| `firmin_house` | 7 x 6 | 2264 | door_cell: 3 |
+| `sawmill` | 10 x 8 | 1356 | door_cell: 5 |
+| `handcar_shed` | 6 x 5 | 1132 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
+| `handcar` | 2 x 2 | 476 | on_rails: true, note: "balancier handcar_lever: pivot sur l'axe X, +-20 degrés" |
+| `well` | 2 x 2 | 442 | water_point: true |
+| `henhouse` | 3 x 3 | 2108 | door_cell: 1, states: ["henhouse_ruin", "henhouse_repaired"] |
+| `workbench` | 2 x 2 | 400 |  |
+| `woodpile` | 2 x 1 | 888 |  |
+| `plank_stack` | 2 x 1 | 132 |  |
+| `rail_straight` | 4 x 2 | 294 | rail_top: 0.32, gauge: 1.0 |
+| `rail_curve_90` | 13 x 13 | 2676 | radius: 12.0, rail_top: 0.32 |
+| `buffer_stop` | 1 x 2 | 152 |  |
+| `level_crossing_gate` | 1 x 1 | 228 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
+| `bell_post` | 1 x 1 | 198 |  |
+| `bench` | 2 x 1 | 316 |  |
+| `lamp_post` | 1 x 1 | 248 |  |
+| `coop_crate` | 1 x 1 | 168 |  |
+| `notice_board` | 1 x 1 | 332 |  |
+| `station_sign` | 2 x 1 | 260 |  |
+| `arbor` | 3 x 2 | 944 |  |
+| `mailbox` | 1 x 1 | 92 |  |
+| `barrel` | 1 x 1 | 276 |  |
+| `crate` | 1 x 1 | 92 |  |
+| `crate_stack` | 2 x 1 | 180 |  |
+| `sacks` | 1 x 1 | 228 |  |
+| `cart` | 3 x 2 | 404 |  |
+| `bicycle` | 2 x 1 | 520 |  |
+| `ground_grass` | 1 x 1 | 24 |  |
+| `ground_dirt` | 1 x 1 | 48 |  |
+| `ground_cobble` | 1 x 1 | 716 |  |
+| `path_border` | 1 x 1 | 176 | note: "bordure de 1 m le long de X" |
+| `fence_wood` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_picket` | 1 x 1 | 156 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_broken` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_gate` | 1 x 1 | 108 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_post` | 1 x 1 | 12 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `tree_oak_small` | 1 x 1 | 204 | choppable: true |
+| `tree_oak_large` | 2 x 2 | 204 | choppable: true |
+| `tree_fir_small` | 1 x 1 | 68 | choppable: true |
+| `tree_fir_large` | 2 x 2 | 68 | choppable: true |
+| `tree_birch_small` | 1 x 1 | 184 | choppable: false |
+| `tree_birch_large` | 2 x 2 | 184 | choppable: false |
+| `tree_stump` | 1 x 1 | 144 |  |
+| `bush_round` | 1 x 1 | 80 |  |
+| `bush_bramble` | 1 x 1 | 180 |  |
+| `bush_hazel` | 1 x 1 | 140 |  |
+| `rock_small` | 1 x 1 | 20 |  |
+| `rock_medium` | 1 x 1 | 40 |  |
+| `rock_large` | 2 x 2 | 52 |  |
+| `grass_tall` | 1 x 1 | 36 |  |
+| `flowers_red` | 1 x 1 | 316 |  |
+| `flowers_yellow` | 1 x 1 | 316 |  |
+| `flowers_white` | 1 x 1 | 316 |  |
+| `flowers_blue` | 1 x 1 | 316 |  |
+| `flower_bed` | 2 x 1 | 1148 |  |
+| `reeds` | 1 x 1 | 144 |  |
+| `river_straight` | 4 x 8 | 220 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
+| `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
+| `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
+| `pontoon` | 2 x 3 | 640 | walk_height: 0.5 |
+| `tree_oak` |  | 204 | alias_of: "tree_oak_large" |
+| `tree_fir` |  | 68 | alias_of: "tree_fir_large" |
+| `bush` |  | 80 | alias_of: "bush_round" |
+| `rock` |  | 40 | alias_of: "rock_medium" |
+| `fence` |  | 36 | alias_of: "fence_wood" |
+| `log_pile` |  | 888 | alias_of: "woodpile" |
+
+### `train.glb` (328 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `locomotive` |  | 3392 | length_over_buffers: 7.4, front: "+x", smoke_anchor: "locomotive_smoke" |
+| `coach` |  | 2060 | length_over_buffers: 9.0 |
+| `van` |  | 2004 | length_over_buffers: 7.0, door: "porte coulissante au milieu, côté -Z et +Z" |
+
+Animations: `locomotive_roll`, `coach_roll`, `van_roll`
+
+### `maison.glb` (448 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `straw_mattress` | 1 x 2 | 320 | sleep_height: 0.15 |
+| `double_bed` | 2 x 2 | 540 | sleep_height: 0.5, sleep_spots: [[-0.36, 0.0], [0.36, 0.0]] |
+| `mattress` |  | 324 | kind: "item" |
+| `table` | 2 x 1 | 116 | top_height: 0.78 |
+| `chair` | 1 x 1 | 164 | seat_height: 0.47 |
+| `chest` | 1 x 1 | 128 |  |
+| `shelf` | 2 x 1 | 512 | wall: true |
+| `stove` | 1 x 1 | 324 | station: "stove" |
+| `flower_pot` | 1 x 1 | 352 |  |
+| `oil_lamp` | 1 x 1 | 232 | light_anchor: "oil_lamp_light" |
+| `rug` | 2 x 2 | 296 | floor: true |
+| `curtains` | 1 x 1 | 224 | wall: true |
+| `crystal_radio` | 1 x 1 | 364 |  |
+| `wood_stove` | 1 x 1 | 240 | tier: "P1" |
+| `picture_frame` | 1 x 1 | 92 | wall: true, tier: "P1" |
+| `bread` |  | 136 | kind: "item" |
+| `dish_radishes` |  | 464 | kind: "item" |
+| `dish_omelette` |  | 276 | kind: "item" |
+| `dish_soup` |  | 244 | kind: "item" |
+| `parcel` |  | 92 | kind: "item" |
+| `iron_box` |  | 136 | kind: "item" |
+| `riddle_card` |  | 72 | kind: "item" |
+| `shed_key` |  | 112 | kind: "item" |
+| `old_photo` |  | 60 | kind: "item" |
+| `jay_feather` |  | 172 | kind: "item" |
+| `kit_wall_stone` | 1 x 1 | 12 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
+| `kit_wall_wood` | 1 x 1 | 108 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
+| `kit_door` | 1 x 1 | 148 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
+| `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
+| `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |

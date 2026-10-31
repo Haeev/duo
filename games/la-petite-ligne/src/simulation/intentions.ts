@@ -25,8 +25,9 @@ function canAct(c: Character, sim: Sim): boolean {
 function createCharacter(sim: Sim, c: Character, name: string, hair: number, outfit: number): void {
   if (sim.world.phase !== 'creation') return;
   const trimmed = name.normalize('NFC').trim();
-  const chars = [...trimmed];
-  c.name = chars.length >= 1 ? chars.slice(0, NAME_MAX).join('') : c.name;
+  // 1 à 16 graphèmes (PE-01, H-01): « Œ » ou un accent combiné comptent pour un.
+  const graphemes = Array.from(new Intl.Segmenter('fr', { granularity: 'grapheme' }).segment(trimmed), (s) => s.segment);
+  c.name = graphemes.length >= 1 ? graphemes.slice(0, NAME_MAX).join('') : c.name;
   c.appearance.hair = Math.max(0, Math.min(2, Math.round(hair)));
   c.appearance.outfit = Math.max(0, Math.min(3, Math.round(outfit)));
   c.created = true;
@@ -42,7 +43,7 @@ function examine(sim: Sim, c: Character): void {
   const covering = (cell: { cx: number; cy: number }, floor: boolean): string | null => {
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
-      if (def?.footprint === null || def === undefined || def.floor !== floor) continue;
+      if (def?.floor !== floor || def.footprint === null) continue;
       if (footprintCells(def.footprint, f.cell, f.rotation).some((k) => k.cx === cell.cx && k.cy === cell.cy)) return f.id;
     }
     return null;

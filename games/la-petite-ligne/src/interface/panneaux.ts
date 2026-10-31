@@ -10,7 +10,7 @@ import { UI_SETTINGS } from './config';
 import { characterOf, nameOf } from './contexte';
 import { button, chip, el, icon, keysLine, token } from './dom';
 import { defaultCrateLine, defaultProduct } from './focus';
-import { countIn, hourLabel, itemName } from './format';
+import { countIn, hourLabel, itemName, lowerFirst } from './format';
 import { linesText, orderFullAmount, orderLines, purseModel, splitAmount } from './modele';
 import {
   catalogueDelivered,
@@ -518,7 +518,7 @@ export class StationPanel extends Panel {
     this.setFooter([
       backKeys(host, [
         { keys: [a[0], a[1]], text: ctx.texts.extra.notebook.keysChoose },
-        { keys: [ctx.key('Enter')], text: ctx.texts.extra.workbench.keysCraft },
+        { keys: [ctx.key('Enter')], text: station === 'workbench' ? ctx.texts.extra.workbench.keysCraft : lowerFirst(ctx.texts.game.ui.stove.cook) },
       ]),
     ]);
   }

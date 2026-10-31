@@ -1,0 +1,177 @@
+/*
+ * La Petite Ligne: compléments de l'interface en jeu, propres au code du jeu.
+ * Repris des styles de page des maquettes (création) et des écrans non
+ * maquettés (comptoir, établi, réchaud, coffre), avec les jetons de jeton.css.
+ * Mêmes règles de coût: aucun flou, aucun filtre, animations de transform et
+ * d'opacité seulement.
+ */
+
+/* Correctif de composants.css: le remplissage de l'endurance est un span en ligne, sans largeur. */
+.lpl-stamina__fill {
+  display: block;
+}
+
+/* Pendant un panneau du jeu, le HUD ne garde que le haut gauche (horloge, bourse, notifications) et l'autre joueur (carnet.html). */
+.lpl-hud[data-state='panel'] .lpl-objective,
+.lpl-hud[data-state='panel'] .lpl-hud__bottom,
+.lpl-hud[data-state='panel'] .lpl-hud__bottom-left,
+.lpl-hud[data-state='panel'] .lpl-hud__bottom-right {
+  visibility: hidden;
+}
+
+/* Création: formulaire, aperçu, l'autre joueur (creation.html). */
+.lpl-creation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--lpl-space-5);
+  width: min(64rem, 100%);
+  align-items: start;
+}
+
+.lpl-creation__preview {
+  display: grid;
+  justify-items: center;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-creation__preview > .lpl-portrait {
+  --lpl-portrait-size: clamp(6rem, 22vh, 10rem);
+}
+
+.lpl-creation__other {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--lpl-space-1) var(--lpl-space-3);
+  width: 100%;
+}
+
+.lpl-creation__other .lpl-portrait {
+  --lpl-portrait-size: 4.5rem;
+
+  grid-row: span 2;
+}
+
+.lpl-creation__scarf {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+/* Petit-déjeuner: portrait et forme du jour. */
+.lpl-breakfast__head {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.lpl-breakfast__head .lpl-overline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.25rem;
+}
+
+/* Carnet: courrier en deux colonnes, icône de quête faite, case en cours de déplacement. */
+.lpl-mail {
+  display: grid;
+  grid-template-columns: minmax(12rem, 16rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.lpl-quest__done {
+  color: var(--lpl-color-primary);
+}
+
+.lpl-section-gap {
+  margin-top: var(--lpl-space-4);
+}
+
+.lpl-empty__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.lpl-ui .lpl-slot--moving {
+  outline: var(--lpl-border-thick) dashed var(--lpl-color-brass);
+  outline-offset: 0.125rem;
+  transform: translateY(-0.25rem);
+}
+
+.lpl-text-alert {
+  color: var(--lpl-color-stamp);
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Comptoir, établi, réchaud, coffre: lignes à quatre colonnes (icône, nom, prix, actions). */
+.lpl-order__line.lpl-shop__line,
+.lpl-order__line.lpl-chest__line {
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto auto;
+}
+
+.lpl-shop__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-order__action.lpl-shop__actions {
+  min-width: 0;
+}
+
+.lpl-shop__fine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin-left: var(--lpl-space-2);
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+}
+
+.lpl-shop__fine .lpl-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lpl-chest {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--lpl-space-5);
+  align-items: start;
+}
+
+/* Dialogue: répliques empilées, objet lu à la place du portrait. */
+.lpl-dialogue__lines {
+  display: grid;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-dialogue__object {
+  display: grid;
+  place-items: center;
+}
+
+.lpl-dialogue__object > svg {
+  width: 70%;
+  height: 70%;
+}
+
+/* Proposition: rappel de la touche Entrée. */
+.lpl-proposal__hint {
+  color: var(--lpl-color-ink-muted);
+}
+
+@media (max-width: 52rem) {
+  .lpl-creation,
+  .lpl-chest,
+  .lpl-mail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Titres de panneau sur une ligne (les onglets prennent la place restante). */
+.lpl-panel__title {
+  white-space: nowrap;
+}

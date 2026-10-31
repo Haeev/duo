@@ -187,4 +187,10 @@ export class DaylightRig {
     this.sun.shadow.normalBias = texel * shadows.normalBiasTexels;
     this.sun.shadow.intensity = shadows.intensity * look.shadowFactor;
   }
+
+  /** Libère la carte d'ombre. */
+  dispose(): void {
+    this.sun.dispose();
+    this.hemi.dispose();
+  }
 }

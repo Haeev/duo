@@ -160,5 +160,5 @@ export function safeColor(color: string): string {
 
 /** Prénom saisi: espaces de bord retirés, normalisé, coupé à la longueur maximale. */
 export function cleanName(raw: string, max: number = UI_SETTINGS.nameMaxLength): string {
-  return [...raw.normalize('NFC').trim()].slice(0, max).join('');
+  return Array.from(raw.normalize('NFC').trim()).slice(0, max).join('');
 }

@@ -6,11 +6,19 @@ Point d'avancement du dev gameplay, du plus récent au plus ancien.
 
 Tenue par le dev rendu 3D (`src/rendu/`). Chaque point dit ce que le rendu fait en attendant.
 
-1. `cameraYaw()` (convention proposée par le rendu): angle, dans le repère du sol et avec la convention de `facing` (0 vers l'est, PI/2 vers le sud), de la direction « haut de l'écran » posée au sol. Z (haut): `(cos yaw, sin yaw)`; D (droite): `(cos(yaw + PI/2), sin(yaw + PI/2))`; S et Q à l'opposé. La valeur suit l'orientation visée (pas l'animation de 0,3 s), pour que la marche tourne d'un coup avec la touche. Première orientation: caméra au sud-est, `yaw = -3 PI/4` (Z part vers le nord-ouest).
-2. `GameMap.props[i]`: ajouter `height` (la `hauteur` du type dans la carte) et `category` (`categorie`: `batiment`, `sol`, `equipement`, `mobilier`, `decor`, `arbre`). Le rendu en a besoin pour poser les personnages sur les sols surélevés (`platform` 0,4 m, `pontoon` 0,5 m) et pour dimensionner les substituts. En attendant: table de secours dans `src/rendu/reglages.ts` (`floorProps`).
-3. Arbres: le rendu suppose que `map.trees` ne contient que les 12 arbres à couper de la lisière, et que les autres arbres de la carte (`tree_oak`, `tree_fir`) restent dans `map.props` (décor fusionné, jamais abattu).
-4. Rotation des meubles (`PlacedFurniture.rotation`, `PlacementPreview.rotation`): le rendu applique la convention de la carte (`rotation.y = rotation x PI/2`, 0 face au sud, 1 face à l'est). À confirmer: `types.ts` dit « sens horaire vu de dessus », ce qui donnerait l'ouest pour 1.
-5. Facultatif: savoir quelles cases sont en « herbe haute » (`,` de la carte) pour y pousser des touffes plus denses. En attendant, les touffes suivent un bruit déterministe.
+1. Fait: convention de `cameraYaw()` (haut de l'écran posé au sol, convention de `facing`; première orientation `yaw = -3 PI/4`), adoptée par `src/entrees/`.
+2. Fait: `MapProp.height` et `MapProp.category` (le rendu prend d'abord la hauteur de marche `walk_height` du modèle de l'artiste, sinon `height` pour la catégorie `sol`).
+3. Fait: `map.trees` = les 12 arbres à couper; les autres arbres restent dans `map.props`.
+4. Fait: rotation des meubles selon la convention de la carte.
+5. Facultatif, toujours ouvert: cases d'« herbe haute » (`,`) pour des touffes plus denses. En attendant: bruit déterministe.
+
+### Ce que le rendu offre en plus du contrat `Renderer`
+
+- `RenderEngine` (exporté par `src/rendu/index.ts`): `setReducedMotion(bool)` (réglage qui change en cours de partie), `detailedStats()` (appels, triangles, programmes, géométries, textures, images par seconde), `programList()`, `resolutionScale()`.
+- `pick()` renvoie la cible la plus proche (personnage, habitant, meuble, objet au sol, arbre debout) avant le sol; le sol tient compte de la hauteur du terrain (quai, berges) et vaut `null` hors de la carte.
+- Indicateur de performances en haut à gauche en mode développement (`import.meta.env.DEV`), rouge au-delà des budgets (150 appels, 250 000 triangles, 12 programmes); résolution dynamique qui descend par paliers jusqu'à 0,75 si les images dépassent 20 ms en moyenne.
+- Trous de visibilité: ce qui cache un des deux joueurs (bâtiment, arbre, auvent) s'efface en trame autour de lui; la maisonnette coupe toit et murs côté caméra quand le personnage local y est (`inHouse`).
+- Page de démonstration du rendu seul: `rendu.html` (paramètres en tête de `src/rendu/demo/main.ts`), essai d'endurance `rendu.html?cycles=12`.
 
 ## Demandes de l'interface
 
@@ -18,6 +26,31 @@ Tenue par le dev interface (`src/interface/`). Chaque point dit ce que l'interfa
 
 1. Barre d'outils de 10 cases (brief du manager, maquettes): `TOOLBAR_SLOTS = 10` dans la simulation (`selected` de 0 à 9), idéalement exporté depuis `etat/` pour que l'interface le lise. En attendant: l'interface montre 10 cases; un clic sur la 9e ou la 10e est ignoré par la simulation actuelle.
 2. Polices: `@fontsource-variable/fraunces` et `@fontsource-variable/nunito-sans` 5.3.0 ajoutées au paquet du jeu (`pnpm add`, 2026-10-31, aucun autre `pnpm install` en cours à ce moment). L'interface les importe elle-même.
+
+## Écarts et questions signalés (dev gameplay)
+
+- Données, `quetes.json`, « Premières pousses »: les étapes comptent depuis leur début (`since` par défaut `step_start`). Un duo qui sème le jour 1, avant que la quête ne démarre (au matin du jour 2), doit ressemer pour valider l'étape; rien n'est bloqué (la récolte et le resemis la valident), mais c'est déroutant. Proposition au game designer: `"since": "game_start"` sur les conditions `sowed` et `watered` de cette quête.
+- Données, énigme d'Émile: rien n'empêche de la résoudre dès le jour 1 à 17 h (soleil) si l'on a trouvé la boîte; le robot le fait. Si l'on veut que Jeanne et Firmin aient le temps d'aider: ajouter `day_at_least` à l'étape.
+- Repas pris ensemble: le code ne demande pas « le même plat » (README des données): les deux mangent le soir à moins de `ranges.eatTogether`; le souper partagé (Cœur +5, `ate_together:table`) demande en plus une table à côté, comme dans `demo.md`.
+- Réglages absents de `reglages.json`, avec une valeur par défaut dans `src/donnees/defauts.ts` (une clé `feel` dans `reglages.json` les remplace): durées des gestes, glissement du train (6 s), vitesse des habitants (1,6 m/s) et des poules, fenêtre de « Déjà pris » (1,5 s), `ranges.eatTogether` et `ranges.stayAt` (3 m).
+- Pas faits (P1 de `demo.md`): absence (horloge arrêtée après 3 min sans entrée), pêche, regard du métier, coin à soi, repère. Pas d'écran « Qui joue qui ? »: un identifiant inconnu prend le personnage libre.
+- `public/vignette.png` est une vignette provisoire (dégradé et titre): à remplacer par le directeur artistique.
+
+## 2026-10-31, étape 3: réseau, SDK, sauvegardes, point d'entrée
+
+- SDK branché: `src/main.ts` (`connect`, boucle à 30 pas par seconde, entrées par les actions du manifeste), `duo-game.json` (validé par `parseManifest`, `play: session`, 26 actions, sauvegarde `auto` toutes les 5 minutes, `exit` et `manual`), `index.html`, `vite.config.ts` (`base: './'`). L'ancien relais par Vite est retiré.
+- Réseau (`src/reseau/`): l'hôte fait autorité; l'invité envoie commandes et intentions (canal 0, fiable), reçoit l'état complet quand il change (canal 1, au plus 5 par seconde), les positions à chaque pas (canal 2) et les événements (canal 3, fiable); interpolation des autres (133 ms de retard) et prédiction de son propre déplacement, corrigée en douceur. Tous les messages ont un schéma Valibot (`schemas.ts`).
+- Séance (`src/session.ts`): hôte ou invité derrière la même `GameView`; sauvegarde à l'aube et aux étapes de quête (`manual`), toutes les 5 minutes et en quittant (SDK); fin de séance par `results.endSession` (fin de la démo, ou « Finir la séance » des deux à l'écran de nuit) avec les trois chiffres de l'écran de fin.
+- Sauvegarde (`src/sauvegarde/`): état complet en JSON, contrôlé à la relecture, personnages liés à l'identifiant stable du joueur (reprise quelle que soit la machine qui héberge; un identifiant inconnu prend le personnage libre), scène en cours reprise à son début.
+- Entrées (`src/entrees/commandes.ts`): Z Q S D tournés selon `cameraYaw()`, clic gauche (aller et agir, via `renderer.pick`), Espace, X ou clic droit, molette (outil, ou meuble en main), T (tourner le meuble), A et E, R et F (caméra), 1 à 0 (barre de 10 cases), Tab, Retour arrière et Entrée passés à l'interface.
+- Interface de secours (`src/plateforme/interface-secours.ts`), utilisée seulement si `src/interface/index.ts` n'exporte pas `createInterface`.
+- Son: `main.ts` monte `src/audio/index.ts` (`createAudio`, contrat `CreateAudio` de `etat/vue.ts`) dès qu'il existe. Flux d'événements décrit dans `src/README.md`, section « Événements ».
+- Vérifié: démo servie par `pnpm --filter @duo/sdk-dev servir la-petite-ligne`, deux vues locales dans Chromium, création des personnages et scène d'arrivée jouée en même temps sur les deux écrans (captures examinées). Le rendu logiciel de l'environnement cloud est trop lent pour une partie complète dans le navigateur: la partie complète est prouvée par les robots (Node).
+
+## Réponses du dev gameplay aux demandes de l'interface
+
+1. Fait: `TOOLBAR_SLOTS = 10` et `BAG_SLOTS = 24`, exportés par `src/etat/types.ts`; `selected` va de 0 à 9; manifeste: touches 1 à 0.
+2. Noté (polices dans le paquet).
 
 ## 2026-10-31, étape 2: simulation jouable de bout en bout
 

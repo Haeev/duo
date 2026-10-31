@@ -17,6 +17,8 @@ export interface UiHost {
   send(intent: Intent): void;
   /** Ouvre ou ferme un menu du jeu: affiché aussitôt, confirmé par l'état. */
   setMenu(menu: MenuKind | null, tab?: PanelTab): void;
+  /** Ouvre le menu, ou le ferme s'il est déjà ouvert (bouton du carnet). */
+  toggleMenu(menu: MenuKind): void;
   /** Redessine au prochain `frame`. */
   invalidate(): void;
   camera(command: CameraCommand): void;

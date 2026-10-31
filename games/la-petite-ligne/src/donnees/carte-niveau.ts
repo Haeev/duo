@@ -130,7 +130,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   }
 
   // Hors de la carte: les habitants « chez eux » loin du bourg.
-  points.offstage ??= { x: -20, y: -20 };
+  if (!('offstage' in points)) points.offstage = { x: -20, y: -20 };
 
   return {
     id: r.at('id').string(),

@@ -517,7 +517,8 @@ export interface VillagerState {
 }
 
 export interface DialogueLineView {
-  speaker: VillagerId | CharacterId;
+  /** Un habitant, un personnage (`p1`, `p2`) ou `narrator`. */
+  speaker: string;
   text: string;
 }
 
@@ -706,7 +707,7 @@ export type WorldEvent =
   | { type: 'order_paid'; amount: number; linesDone: number }
   | { type: 'proposal'; by: CharacterId; proposal: string }
   | { type: 'proposal_resolved'; proposal: string; accepted: boolean }
-  | { type: 'gave'; by: CharacterId; to: VillagerId | CharacterId; item: ItemId; count: number }
+  | { type: 'gave'; by: CharacterId; /** habitant ou personnage */ to: string; item: ItemId; count: number }
   | { type: 'talk'; by: CharacterId; villager: VillagerId }
   | { type: 'scene_started'; dialogue: DialogueId; villager: VillagerId }
   | { type: 'scene_ended'; dialogue: DialogueId }

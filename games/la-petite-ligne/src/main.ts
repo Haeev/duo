@@ -9,7 +9,7 @@ import { loadContent } from './donnees/contenu';
 import { loadMap } from './donnees/carte';
 import { MAP_FILES } from './donnees/cartes-fichiers';
 import { CONTENT_FILES } from './donnees/fichiers';
-import type { CreateInterface, GameInterface, Renderer } from './etat/vue';
+import type { CreateAudio, CreateInterface, GameAudio, GameInterface, Renderer } from './etat/vue';
 import { createControls } from './entrees/commandes';
 import { createFallbackInterface } from './plateforme/interface-secours';
 import { createRenderer } from './rendu/index';
@@ -41,6 +41,16 @@ async function pickInterface(): Promise<CreateInterface> {
   return createFallbackInterface;
 }
 
+/** Le son (`src/audio/`), s'il est livré. */
+async function pickAudio(): Promise<CreateAudio | null> {
+  const modules = import.meta.glob<Record<string, unknown>>('./audio/index.ts');
+  const load = modules['./audio/index.ts'];
+  if (load === undefined) return null;
+  const mod = await load();
+  const create = mod.createAudio;
+  return typeof create === 'function' ? (create as CreateAudio) : null;
+}
+
 /** Robot de test (`?robot=1`), seulement en développement: absent de la version livrée. */
 async function pickRobot(): Promise<Robot | null> {
   if (!import.meta.env.DEV || new URLSearchParams(window.location.search).get('robot') !== '1') return null;
@@ -62,6 +72,7 @@ async function main(): Promise<void> {
   const view = session.view;
   let renderer: Renderer | null = null;
   let ui: GameInterface | null = null;
+  let sound: GameAudio | null = null;
   const controls = createControls({
     input: duo.input,
     renderer: () => renderer,
@@ -77,6 +88,15 @@ async function main(): Promise<void> {
     renderer = r;
     const createInterface = await pickInterface();
     ui = createInterface({ view, overlay, uiScale: duo.ui.scale, reducedMotion: duo.ui.reducedMotion });
+    const createAudio = await pickAudio();
+    if (createAudio !== null) {
+      const a = createAudio({ view, audio: duo.audio, url: (path) => duo.assets.url(path), reducedMotion: duo.ui.reducedMotion });
+      // Un son manquant ne doit jamais empêcher de jouer.
+      await a.load(() => undefined).catch((error: unknown) => {
+        duo.log.warn('sons non chargés', { message: error instanceof Error ? error.message : String(error) });
+      });
+      sound = a;
+    }
     duo.input.attach(container);
     status.hidden = true;
   };
@@ -113,6 +133,7 @@ async function main(): Promise<void> {
       }
       renderer?.frame(dt);
       ui?.frame(dt);
+      sound?.frame(dt);
     },
   });
 
@@ -121,6 +142,7 @@ async function main(): Promise<void> {
   });
   duo.on('stop', () => {
     duo.loop.stop();
+    sound?.dispose();
     ui?.dispose();
     renderer?.dispose();
     session.dispose();

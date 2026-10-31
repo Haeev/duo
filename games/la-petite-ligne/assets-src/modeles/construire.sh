@@ -8,20 +8,20 @@ sortie="$ici/../../assets/modeles"
 gt="npx --yes @gltf-transform/cli@4.5.1"
 cd "$ici"
 
+if [[ "${1:-}" == "--sans-planches" ]]; then export LPL_SANS_PLANCHES=1; fi
 for script in personnages.py ferme.py bourg.py train.py maison.py; do
   echo "== $script"
   duo-python "$script" > /dev/null
 done
 
-# Optimisation sans perte visible: dédoublonnage, soudure, nettoyage (en gardant les nœuds vides
-# qui servent de repères: prises des mains, panache, lumière de la lampe), quantification.
-# personnages.glb reste tel qu'exporté: la quantification y densifierait les clés de forme (plus lourd).
+# Nettoyage sans perte: dédoublonnage, soudure, élagage (en gardant les nœuds vides qui servent de
+# repères: prises des mains, panache, lumière de la lampe). Pas de quantification: elle range la
+# déquantification dans la transformation des nœuds, que le jeu écrase en posant position et échelle.
 tmp="$(mktemp -d)"
 for f in bourg ferme train maison; do
   $gt dedup "$sortie/$f.glb" "$tmp/$f.1.glb" > /dev/null
   $gt weld "$tmp/$f.1.glb" "$tmp/$f.2.glb" > /dev/null
-  $gt prune --keep-leaves true "$tmp/$f.2.glb" "$tmp/$f.3.glb" > /dev/null
-  $gt quantize "$tmp/$f.3.glb" "$sortie/$f.glb" > /dev/null
+  $gt prune --keep-leaves true "$tmp/$f.2.glb" "$sortie/$f.glb" > /dev/null
 done
 rm -rf "$tmp"
 ls -l "$sortie"/*.glb

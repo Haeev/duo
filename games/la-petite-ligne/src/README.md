@@ -6,16 +6,18 @@ Démo d'une heure (`docs/jeux/jeu-1/demo.md`). Ce fichier dit qui possède quoi 
 
 | Dossier | Contenu | Propriétaire | Peut importer |
 |---|---|---|---|
-| `etat/` | contrats: `types.ts` (état du monde), `actions.ts` (intentions), `carte.ts` (carte statique), `vue.ts` (`GameView`, contrats du rendu et de l'interface), `lecture.ts` (aides de lecture) | dev gameplay (simulation) | rien d'autre que `etat/` et `donnees/types.ts` |
+| `etat/` | contrats: `types.ts` (état du monde, tailles du sac et de la barre), `actions.ts` (intentions), `carte.ts` (carte statique), `vue.ts` (`GameView`, contrats du rendu, de l'interface et du son) | dev gameplay (simulation) | rien d'autre que `etat/` et `donnees/types.ts` |
 | `donnees/` | lecture et contrôle des JSON de `../donnees/` (contenu, réglages, carte), types du contenu | dev gameplay | `etat/` |
 | `simulation/` | toute la logique, TypeScript pur, pas fixe, sans DOM ni horloge ni `Math.random`; testée dans Node | dev gameplay | `etat/`, `donnees/` |
 | `reseau/` | hôte qui fait autorité, invité qui envoie ses intentions, prédiction du déplacement de l'invité, schémas des messages | dev gameplay | `etat/`, `donnees/`, `simulation/`, `plateforme/` |
 | `sauvegarde/` | sérialisation, contrôle et migration de l'état sauvegardé | dev gameplay | `etat/`, `donnees/`, `simulation/` |
-| `plateforme/` | adaptateur vers le SDK Duo (session, boucle, réseau, sauvegardes, résultats, entrées), et faux hôte de secours | dev gameplay | tout sauf `rendu/` et `interface/` |
+| `plateforme/` | interface de secours (tant que `interface/` n'est pas livrée) | dev gameplay | `etat/`, `donnees/` |
 | `entrees/` | clavier et souris vers `ControlFrame` et `Intent` (Z Q S D tournés selon la caméra, clic au sol, molette) | dev gameplay | `etat/` |
 | `rendu/` | rendu Three.js: scène, modèles, animations, caméra, effets, son spatial éventuel | dev rendu 3D | `etat/`, `donnees/types.ts`, `three` |
 | `interface/` | HUD, menus, dialogues, carnet, astuces, écrans (création, petit-déjeuner, nuit, fin) | dev interface | `etat/`, `donnees/types.ts` |
-| `main.ts` | point d'entrée: lit le contenu, crée la session, la simulation ou l'invité, le rendu, l'interface, la boucle | dev gameplay | tout |
+| `audio/` | sons et musiques, branchés sur les événements et l'état | dev audio | `etat/`, `donnees/types.ts`, `@duo/sdk` (module `audio`) |
+| `session.ts` | une séance sur cette machine (hôte ou invité) derrière une `GameView`; sauvegardes et historique chez l'hôte; sans DOM, testée dans Node | dev gameplay | tout sauf `rendu/`, `interface/`, `audio/` |
+| `main.ts` | point d'entrée: `connect` du SDK, contenu et carte, séance, rendu, interface, audio, boucle | dev gameplay | tout |
 
 Règle d'or: **le rendu et l'interface lisent l'état, ils ne le modifient jamais**. Toute volonté d'un joueur devient une `Intent` envoyée par `view.send(...)`.
 
@@ -81,17 +83,43 @@ Ce que le rendu trouve dans l'état:
 - L'interface envoie les intentions de menu (`menu`, `buy`, `sell`, `craft`, `eat`, `crate_deposit`, `dialogue_next`, `dialogue_choice`, `start_day`, `night_choice`, `create_character`...). Ouvrir un menu: `send({ type: 'menu', menu: 'shop' })`; le fermer: `menu: null`. L'horloge s'arrête quand les deux joueurs sont dans un menu, un dialogue ou une scène.
 - Un refus (fonds, portée, sac plein) arrive comme notification dans `characters[i].notifications`, avec le texte de `textes.json`.
 
+## Événements (son, effets)
+
+Un seul flux, le même chez l'hôte et chez l'invité: `view.onEvent((event) => ...)`, avec `event` du type `WorldEvent` (`etat/types.ts`, fin du fichier). L'hôte les produit à chaque pas; l'invité les reçoit par le réseau (canal fiable), dans l'ordre. Quelques repères pour le son:
+
+| Son | Événement ou lecture de l'état |
+|---|---|
+| pas selon le sol | pas d'événement: `characters[i].speed > 0` et `map.ground[cy * map.width + cx]` sous `characters[i].pos` |
+| bêcher, semer, arroser, arrosoir vide, remplir | `tilled`, `sowed`, `watered`, `can_empty`, `refilled` |
+| récolte, qualité « belle », déjà pris | `harvested` (`quality`), `already_taken` |
+| hache, arbre qui tombe, bêche de l'énigme | `chop` (`felled`), `dig` (`found`) |
+| marteau, élément fini, construction finie | `build_progress` (début du travail; le marteau dure tant que `action.kind === 'hammer'`), `element_built`, `construction_done` |
+| poutre | `beam_lifted`, `beam_dropped`, `beam_placed` |
+| meuble posé, repris | `furniture_placed`, `furniture_taken` |
+| scie, cuisine, repas | `crafted`, `cooked`, `ate` (et `action.kind` `saw`, `cook`, `eat`) |
+| monnaie, caisse, proposition | `bought`, `sold`, `money`, `deposited`, `order_paid`, `proposal`, `proposal_resolved` |
+| courrier, quêtes, envies | `letter`, `quest_started`, `quest_step`, `quest_done`, `envie_done` |
+| train | `train_whistle`, `train_arriving`, `train_departing` (et `train.phase`, `train.progress`) |
+| porte, coucher, nuit, matin, minuit | `door`, `went_to_bed`, `got_up`, `night`, `morning`, `midnight`, `veillee_started` |
+| poules | `hens_arrived`, `eggs_laid`, `fed_hens` |
+| habitants, scènes | `talk` (`villager`: motif de l'habitant), `scene_started`, `scene_ended` |
+| fin | `demo_ended` |
+
+Musique et ambiance se lisent dans l'état: `clock.minutes`, `clock.veillee`, `phase`, `weather`, `characters[local].inHouse`.
+
 ## Contrats des modules d'affichage
 
 - `src/rendu/index.ts` exporte `createRenderer: CreateRenderer` (`etat/vue.ts`): `load`, `frame`, `cameraYaw`, `camera`, `pick`, `stats`, `dispose`.
-- `src/interface/index.ts` exporte `createInterface: CreateInterface`: `frame`, `handleKey`, `capturesMovement`, `dispose`.
-- `main.ts` appelle `frame` des deux à chaque image, dans cet ordre: rendu, puis interface.
+- `src/interface/index.ts` exporte `createInterface: CreateInterface`: `frame`, `handleKey`, `capturesMovement`, `dispose`. Tant qu'il n'existe pas, `main.ts` monte l'interface de secours (`plateforme/interface-secours.ts`).
+- `src/audio/index.ts` exporte `createAudio: CreateAudio` (`etat/vue.ts`): il reçoit la `GameView` (état et événements) et le module `audio` du SDK; `frame`, `dispose`. Branché par `main.ts` dès que le fichier existe.
+- `main.ts` appelle `frame` à chaque image, dans cet ordre: rendu, interface, audio.
 
 ## Simulation
 
-- `simulation/monde.ts`: `createWorld(content, map, seed, players)`; `simulation/pas.ts`: `step(sim, inputs, intents)`, un pas de `1 / SIM_HZ` s (30 par seconde).
-- Systèmes, un fichier chacun: `horloge`, `deplacement`, `potager`, `sac`, `economie`, `construction`, `amenagement`, `habitants`, `dialogues`, `quetes` (conditions et effets lus dans les données), `courrier`, `astuces`, `poules`, `besoins`, `train`, `fin`.
-- Hasard: `simulation/hasard.ts` (générateur à graine, état dans `world.rng`).
+- `simulation/monde.ts`: `createWorld(content, map, seed, players)`; `simulation/pas.ts`: `step(sim, { controls, intents })`, un pas de `1 / SIM_HZ` s (30 par seconde).
+- Systèmes, un fichier chacun: `horloge`, `deplacement` (et la poutre à deux), `grille` (collisions, A*), `potager` (et la hache, l'eau, la bêche libre), `sac`, `economie`, `construction`, `amenagement`, `habitants`, `dialogues` (et scènes à deux), `quetes`, `conditions`, `effets`, `courrier`, `astuces`, `envies`, `poules`, `besoins`, `train`, `fin`; `agir` (case visée, verbe, clic), `intentions` (application des intentions).
+- Identifiants du contenu cités par le code: `simulation/ids.ts`.
+- Hasard: générateur à graine du SDK (`@duo/sdk/sim`), état dans `world.rng`.
 - Empreinte: `simulation/empreinte.ts`, `hash(world)`.
 - Robot: `simulation/robot.ts`, joue à deux (tests de fumée, d'endurance, partie complète).
 
@@ -101,5 +129,6 @@ Lues dans `../donnees/*.json` (game designer) et `../donnees/cartes/` (level des
 
 ## Lancer
 
-- `pnpm --filter @duo/la-petite-ligne dev`: Vite; ouvrir `/?vue=double` pour deux vues dans la même page, ou deux onglets `/?role=host` et `/?role=guest` (relais par `BroadcastChannel`), ou deux machines avec `/?role=host&relais=vite` et `/?role=guest&relais=vite` (relais par le serveur de Vite).
-- `pnpm --filter @duo/la-petite-ligne test`: simulation, robots, réseau, sauvegarde.
+- Deux vues locales (développement): `pnpm --filter @duo/la-petite-ligne dev` et `pnpm --filter @duo/sdk-dev dev`, puis `http://localhost:5180/deux-vues.html?jeu=http://localhost:5173/`. Ajouter `?robot=1` à l'adresse du jeu pour qu'un robot joue (développement seulement).
+- Deux ordinateurs du réseau local (sans Duo): `pnpm --filter @duo/sdk-dev servir la-petite-ligne --construire` sur le Mac, puis l'adresse affichée sur chaque machine; l'un héberge, l'autre rejoint.
+- `pnpm --filter @duo/la-petite-ligne test`: contenu, carte, simulation, robots (première journée et démo complète), sauvegarde, réseau à deux (`startLocalDuo`).

@@ -10,7 +10,7 @@ import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, keysLine, portrait, setAttr, setHidden, setIcon, setPortrait, setStyleVar, setText, token } from './dom';
-import { fill, itemTitle, keyTokens } from './format';
+import { clockTime, fill, itemTitle, keyTokens } from './format';
 import {
   clockModel,
   formModel,
@@ -234,7 +234,7 @@ export class Hud {
         host.camera('rotate_right');
       }),
       shortcut('ui-notebook', 'Tab', x.hud.openNotebook, () => {
-        host.setMenu('notebook');
+        host.toggleMenu('notebook');
       }),
     ]);
 
@@ -264,13 +264,18 @@ export class Hud {
 
   /** Heure seule (appelée à chaque image: compare une chaîne). */
   updateClockOnly(world: ReadonlyWorld): void {
-    const m = clockModel(world, this.host.ctx);
-    setText(this.clockTime, m.time);
+    const { ctx } = this.host;
+    const minutes = Math.floor(world.clock.minutes / UI_SETTINGS.clockStepMinutes);
+    if (minutes === this.clockStep) return;
+    this.clockStep = minutes;
+    setText(this.clockTime, ctx.t(clockTime(world.clock.minutes, ctx.texts.game.ui.hud.time)));
   }
 
-  /** Masque le bas du HUD pendant une conversation. */
-  setDialogue(open: boolean): void {
-    setAttr(this.root, 'data-state', open ? 'dialogue' : null);
+  private clockStep = -1;
+
+  /** Masque le bas du HUD pendant une conversation, et l'objectif et le bas pendant un panneau. */
+  setLayer(kind: 'dialogue' | 'panel' | null): void {
+    setAttr(this.root, 'data-state', kind);
   }
 
   update(world: ReadonlyWorld): void {
@@ -299,7 +304,7 @@ export class Hud {
       setText(this.purseDelta, `+${purse.amount - this.lastPurse}`);
       // Rejoue l'animation d'apparition.
       this.purseDelta.toggleAttribute('hidden', true);
-      void this.purseDelta.offsetWidth;
+      void this.purseDelta.getBoundingClientRect();
       this.purseDelta.toggleAttribute('hidden', false);
       this.deltaUntil = now + UI_SETTINGS.purseDeltaMs;
     }

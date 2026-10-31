@@ -86,7 +86,7 @@ export function water(sim: Sim, c: Character, g: GardenCell): void {
 
 export function harvest(sim: Sim, c: Character, g: GardenCell): void {
   const crop = g.crop;
-  if (crop === null || !crop.ripe) {
+  if (!crop?.ripe) {
     const last = g.lastHarvest;
     const window = secondsToTicks(sim.content.settings.feel.alreadyTakenSeconds);
     if (crop === null && last !== null && last.by !== c.id && sim.world.tick - last.tick <= window) {

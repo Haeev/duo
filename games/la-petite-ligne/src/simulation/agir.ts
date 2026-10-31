@@ -366,7 +366,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
   switch (click.kind) {
     case 'villager': {
       const v = sim.world.villagers.find((x) => x.id === click.villager);
-      return v === undefined || !v.visible ? null : { kind: 'villager', id: v.id, pos: v.pos };
+      return !v?.visible ? null : { kind: 'villager', id: v.id, pos: v.pos };
     }
     case 'ground_item': {
       const g = sim.world.groundItems.find((x) => x.id === click.groundItem);

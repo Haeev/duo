@@ -102,7 +102,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return world.quests.some((q) => q.id === condition.quest && q.status === 'done');
     case 'step_active': {
       const q = world.quests.find((x) => x.id === condition.quest);
-      return q !== undefined && q.status === 'active' && q.step === stepIndex(sim, condition.quest, condition.step);
+      return q?.status === 'active' && q.step === stepIndex(sim, condition.quest, condition.step);
     }
     case 'quest_step_done': {
       const q = world.quests.find((x) => x.id === condition.quest);
@@ -133,7 +133,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       );
     case 'used_tool_at': {
       const ev = ctx.toolEvent;
-      if (ev === null || ev.tool !== condition.tool) return false;
+      if (ev?.tool !== condition.tool) return false;
       const target = sim.map.points[condition.point];
       return target !== undefined && distance(ev.pos, target) <= condition.radius;
     }
@@ -160,23 +160,12 @@ export function hasToolCondition(conditions: readonly Condition[]): boolean {
 export function captureBaselines(sim: Sim, conditions: readonly Condition[]): Record<string, number> {
   const out: Record<string, number> = {};
   const visit = (c: Condition): void => {
-    switch (c.type) {
-      case 'all':
-      case 'any':
-        c.conditions.forEach(visit);
-        return;
-      case 'not':
-        visit(c.condition);
-        return;
-      case 'counter':
-        if (c.since === 'step_start') {
-          for (const scope of ['duo', 'p1', 'p2'] as const) {
-            out[`${scope}:${c.key}`] = sim.world.counters[scope][c.key] ?? 0;
-          }
-        }
-        return;
-      default:
-        return;
+    if (c.type === 'all' || c.type === 'any') c.conditions.forEach(visit);
+    else if (c.type === 'not') visit(c.condition);
+    else if (c.type === 'counter' && c.since === 'step_start') {
+      for (const scope of ['duo', 'p1', 'p2'] as const) {
+        out[`${scope}:${c.key}`] = sim.world.counters[scope][c.key] ?? 0;
+      }
     }
   };
   conditions.forEach(visit);

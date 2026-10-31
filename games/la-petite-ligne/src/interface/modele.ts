@@ -320,16 +320,15 @@ export interface ToolbarModel {
 export function toolbarModel(ctx: UiContext, c: ReadonlyCharacter): ToolbarModel {
   const slots: SlotModel[] = [];
   for (let i = 0; i < UI_SETTINGS.toolbarSlots; i++) slots.push(slotModel(ctx, c, i));
-  const held = slots[c.selected];
+  const stack = c.bag[c.selected] ?? null;
   let detail = '';
   let name = ctx.texts.extra.hud.emptyHand;
-  if (held?.item !== null && held !== undefined) {
-    const stack = c.bag[c.selected] ?? null;
-    const def = held.item === null ? undefined : ctx.content.items[held.item];
-    name = itemTitle(def, stack?.count ?? 1, held.item);
+  if (stack !== null) {
+    const def = ctx.content.items[stack.item];
+    name = itemTitle(def, stack.count, stack.item);
     const capacity = def?.capacity ?? null;
     if (capacity !== null) detail = ctx.t(ctx.texts.extra.hud.water, { water: c.water, capacity });
-    else if (stack !== null && stack.count > 1) detail = ctx.t(ctx.texts.extra.hud.stack, { count: stack.count });
+    else if (stack.count > 1) detail = ctx.t(ctx.texts.extra.hud.stack, { count: stack.count });
   }
   return { slots, selected: c.selected, held: ctx.t(name), detail };
 }

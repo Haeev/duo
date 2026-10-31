@@ -57,7 +57,8 @@ function deliver(sim: Sim, c: Character, request: PurchaseRequest, price: number
 /** Achat (épicerie ou catalogue). Au-delà du seuil, une proposition chez l'autre. */
 export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void {
   const def = sim.content.items[request.item];
-  if (def?.buyPrice === null || def === undefined || def.shop !== request.source || request.count < 1) return;
+  if (def === undefined) return;
+  if (def.buyPrice === null || def.shop !== request.source || request.count < 1) return;
   if (request.source === 'grocery' && (!canShop(sim, c) || !shopOpen(sim))) return;
   if (request.source === 'catalogue') {
     if (!canUseCatalogue(sim, c)) return;

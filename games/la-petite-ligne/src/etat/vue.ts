@@ -7,6 +7,7 @@
  * `src/interface/index.ts` avec elle. Ni le rendu ni l'interface n'importent la
  * simulation ou le réseau.
  */
+import type { Audio } from '@duo/sdk';
 import type { Intent } from './actions';
 import type { GameMap } from './carte';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from './types';
@@ -96,3 +97,22 @@ export interface GameInterface {
 }
 
 export type CreateInterface = (options: InterfaceOptions) => GameInterface;
+
+export interface AudioOptions {
+  view: GameView;
+  /** Module audio du SDK: bus musique, effets, interface; volumes de la machine appliqués. */
+  audio: Audio;
+  /** Adresse d'un fichier du paquet du jeu (`assets/son/...`). */
+  url: (path: string) => string;
+  reducedMotion: boolean;
+}
+
+export interface GameAudio {
+  /** Chargement des sons (appelé pendant le chargement du jeu). */
+  load(onProgress: (ratio: number) => void): Promise<void>;
+  /** À chaque image (ambiances, musique selon l'heure et le lieu). */
+  frame(dtSeconds: number): void;
+  dispose(): void;
+}
+
+export type CreateAudio = (options: AudioOptions) => GameAudio;

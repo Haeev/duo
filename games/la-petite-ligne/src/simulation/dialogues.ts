@@ -87,7 +87,7 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
 /** Ouvre la conversation d'un joueur avec un habitant (portée vérifiée par l'appelant). */
 export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const v = sim.world.villagers.find((x) => x.id === villager);
-  if (v === undefined || !v.visible) return false;
+  if (!v?.visible) return false;
   const def = pickDialogue(sim, villager, c.id);
   if (def === null) return false;
   const choices: DialogueChoiceView[] = [
@@ -284,7 +284,7 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
     return;
   }
   const d = c.dialogue;
-  if (d === null || !d.choices.some((ch) => ch.id === choice)) return;
+  if (!d?.choices.some((ch) => ch.id === choice)) return;
   if (choice.startsWith(GIVE_PREFIX)) {
     const [, item, count] = choice.split(':');
     if (item !== undefined && count !== undefined) give(sim, c, d.villager, item, Number(count));

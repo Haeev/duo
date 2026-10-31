@@ -77,14 +77,14 @@ export class Reader {
     if (typeof this.value !== 'string') {
       this.fail('texte attendu');
     }
-    return this.value as string;
+    return this.value;
   }
 
   number(): number {
     if (typeof this.value !== 'number' || !Number.isFinite(this.value)) {
       this.fail('nombre attendu');
     }
-    return this.value as number;
+    return this.value;
   }
 
   integer(min = Number.MIN_SAFE_INTEGER, max = Number.MAX_SAFE_INTEGER): number {
@@ -99,7 +99,7 @@ export class Reader {
     if (typeof this.value !== 'boolean') {
       this.fail('booléen attendu');
     }
-    return this.value as boolean;
+    return this.value;
   }
 
   isNull(): boolean {

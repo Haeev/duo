@@ -68,7 +68,8 @@ export type Intent =
   | { type: 'craft'; recipe: RecipeId }
   | { type: 'eat'; item: ItemId }
   // Donner (à l'autre ou à un habitant)
-  | { type: 'give'; to: VillagerId | CharacterId; item: ItemId; quality: Quality; count: number }
+  // `to`: un habitant ou l'autre personnage (`p1`, `p2`).
+  | { type: 'give'; to: string; item: ItemId; quality: Quality; count: number }
   // Courrier lu
   | { type: 'read_letter'; letter: string }
   // Journée

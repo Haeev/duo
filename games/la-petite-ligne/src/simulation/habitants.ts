@@ -43,7 +43,7 @@ export function placeVillagers(sim: Sim): void {
     v.activity = entry.activity;
     v.visible = entry.point !== POINT.offstage && !HIDDEN_ACTIVITIES.has(entry.activity);
     v.speed = 0;
-    delete sim.runtime.villagerPaths[v.id];
+    sim.runtime.villagerPaths[v.id] = { target: entry.point, path: [] };
   }
 }
 
@@ -64,7 +64,7 @@ export function updateVillagers(sim: Sim, dt: number): void {
           const off = point(sim, POINT.offstage);
           teleport(v, off.x, off.y);
           v.visible = false;
-          delete sim.runtime.villagerPaths[v.id];
+          sim.runtime.villagerPaths[v.id] = { target: entry.point, path: [] };
           continue;
         }
         if (!v.visible) {

@@ -300,7 +300,7 @@ export class DialogueBox implements Layer {
 
   private isShopKeeper(world: ReadonlyWorld, villager: string): boolean {
     const v = world.villagers.find((x) => x.id === villager);
-    return v !== undefined && v.activity === 'serve' && shopIsOpen(world, this.host.ctx);
+    return v?.activity === 'serve' && shopIsOpen(world, this.host.ctx);
   }
 
   defaultFocus(): HTMLElement | null {

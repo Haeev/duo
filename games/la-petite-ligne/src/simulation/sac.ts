@@ -68,7 +68,7 @@ export function takeFromBag(c: Character, item: string, count: number, quality?:
   for (const q of order) {
     for (let i = 0; i < c.bag.length && left > 0; i++) {
       const slot = c.bag[i];
-      if (slot === null || slot === undefined || slot.item !== item || slot.quality !== q) continue;
+      if (slot?.item !== item || slot.quality !== q) continue;
       const removed = Math.min(left, slot.count);
       slot.count -= removed;
       left -= removed;

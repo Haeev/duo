@@ -150,10 +150,7 @@ export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = 4000): Ve
           smallest = l;
           smallestF = heapF[l] ?? 0;
         }
-        if (r < n && (heapF[r] ?? 0) < smallestF) {
-          smallest = r;
-          smallestF = heapF[r] ?? 0;
-        }
+        if (r < n && (heapF[r] ?? 0) < smallestF) smallest = r;
         if (smallest === i) break;
         heapNodes[i] = heapNodes[smallest] ?? 0;
         heapF[i] = heapF[smallest] ?? 0;

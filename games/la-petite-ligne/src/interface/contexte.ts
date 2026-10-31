@@ -17,9 +17,9 @@ export interface UiContext {
   readonly me: CharacterId;
   readonly partner: CharacterId;
   /** Libellé réel d'une touche (`KeyW` donne « Z » sur un clavier AZERTY). */
-  key(code: string): string;
+  readonly key: (code: string) => string;
   /** Gabarit rempli et mis en typographie française, prêt à afficher. */
-  t(template: string, vars?: TextVars): string;
+  readonly t: (template: string, vars?: TextVars) => string;
 }
 
 export function createUiContext(

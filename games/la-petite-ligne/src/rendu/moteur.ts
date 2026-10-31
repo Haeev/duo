@@ -52,6 +52,7 @@ const LOAD_BUILD_SHARE = 0.9;
 const SEE_THROUGH_RADIUS = 1.7;
 const SEE_THROUGH_CHEST = 1.0;
 const HALF = 0.5;
+const MS_PER_SECOND = 1000;
 
 function toneMapping(name: (typeof RENDER_SETTINGS.renderer)['toneMapping']): ToneMapping {
   switch (name) {
@@ -96,6 +97,9 @@ export class RenderEngine implements Renderer {
   private readonly viewPoint = new Vector3();
   private readonly bufferSize = new Vector2();
   private readonly holes: SeeThroughHole[] = [];
+  private resolutionStep = 0;
+  private frameAverageMs = 0;
+  private sinceResolutionChange = 0;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -149,7 +153,8 @@ export class RenderEngine implements Renderer {
     const height = Math.max(1, this.container.clientHeight);
     const settings = RENDER_SETTINGS.renderer;
     const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
-    const ratio = Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio);
+    const scale = RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
+    const ratio = Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
     this.renderer.setPixelRatio(ratio);
     this.renderer.setSize(width, height, false);
     this.rig.setAspect(width / height);
@@ -373,6 +378,31 @@ export class RenderEngine implements Renderer {
     this.updateFrame(dtSeconds);
     this.renderer.render(this.scene, this.rig.camera);
     this.perf.record(this.renderer, Math.min(MAX_FRAME_SECONDS, Math.max(0, dtSeconds)));
+    this.adaptResolution(dtSeconds);
+  }
+
+  /** Résolution dynamique: un palier de moins si les images restent trop lentes (voir `reglages.ts`). */
+  private adaptResolution(dtSeconds: number): void {
+    const settings = RENDER_SETTINGS.dynamicResolution;
+    if (dtSeconds <= 0 || dtSeconds > MAX_FRAME_SECONDS) {
+      return;
+    }
+    this.frameAverageMs += (dtSeconds * MS_PER_SECOND - this.frameAverageMs) * Math.min(1, dtSeconds / settings.averageSeconds);
+    this.sinceResolutionChange += dtSeconds;
+    if (this.time < settings.warmupSeconds || this.sinceResolutionChange < settings.cooldownSeconds) {
+      return;
+    }
+    if (this.frameAverageMs > settings.slowFrameMs && this.resolutionStep < settings.steps.length - 1) {
+      this.resolutionStep += 1;
+      this.sinceResolutionChange = 0;
+      this.resize();
+      this.perf.setResolutionScale(this.resolutionScale());
+    }
+  }
+
+  /** Palier de résolution dynamique courant (1 = pleine résolution). */
+  resolutionScale(): number {
+    return RENDER_SETTINGS.dynamicResolution.steps[this.resolutionStep] ?? 1;
   }
 
   cameraYaw(): number {
@@ -463,6 +493,7 @@ export class RenderEngine implements Renderer {
     this.unsubscribe();
     this.resizeObserver.disconnect();
     this.world?.dispose();
+    this.daylight.dispose();
     this.scene.clear();
     this.resources.dispose();
     this.perf.dispose();

@@ -19,6 +19,7 @@ export interface RenderStats {
 }
 
 const MS_PER_SECOND = 1000;
+const PERCENT = 100;
 const OVERLAY_STYLE = [
   'position:absolute',
   'left:6px',
@@ -50,6 +51,7 @@ export class PerfMonitor {
   private maxCalls = 0;
   private readonly overlay: HTMLDivElement | null;
   private missing: readonly string[] = [];
+  private resolution = 1;
 
   constructor(container: HTMLElement, showOverlay: boolean) {
     if (showOverlay) {
@@ -65,6 +67,11 @@ export class PerfMonitor {
   /** Modèles remplacés par un substitut, listés dans l'indicateur. */
   setMissingModels(names: readonly string[]): void {
     this.missing = names;
+  }
+
+  /** Palier de résolution dynamique (1 = pleine résolution), affiché s'il a baissé. */
+  setResolutionScale(scale: number): void {
+    this.resolution = scale;
   }
 
   /** À appeler juste après `renderer.render()`. */
@@ -106,6 +113,9 @@ export class PerfMonitor {
       `programmes ${s.programs} / ${budgets.programs}`,
       `géométries ${s.geometries}  textures ${s.textures}`,
     ];
+    if (this.resolution < 1) {
+      lines.push(`résolution ${(this.resolution * PERCENT).toFixed(0)} %`);
+    }
     if (this.missing.length > 0) {
       lines.push(`substituts ${this.missing.length}`);
     }

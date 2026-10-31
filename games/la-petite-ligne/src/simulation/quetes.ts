@@ -57,7 +57,10 @@ function refreshChecklist(sim: Sim, state: QuestState, quest: QuestDef): void {
   }
   const same =
     items.length === state.checklist.length &&
-    items.every((item, i) => item.label === state.checklist[i]?.label && item.done === state.checklist[i]?.done);
+    items.every((item, i) => {
+      const previous = state.checklist[i];
+      return item.label === previous?.label && item.done === previous.done;
+    });
   if (!same) {
     state.checklist = items;
     sim.runtime.changed = true;

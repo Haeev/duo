@@ -248,6 +248,8 @@ def main():
     lpl.write_stats("train", {"nodes": st, "animations": ["locomotive_roll", "coach_roll", "van_roll"], "file_bytes": size})
     print("TRAIN", size, {k: v["tris"] for k, v in st.items()})
     # planche: le train sur sa voie, de trois quarts
+    if os.environ.get("LPL_SANS_PLANCHES"):
+        return
     rail = rail_straight(A).to_object("rail_tmp", mat)
     rails = []
     for k in range(8):

@@ -226,7 +226,7 @@ export function createSession(options: SessionOptions): Session {
     },
     ready() {
       if (guest === null) return true;
-      if (guestWorld === null) guestWorld = guest.render(options.now());
+      guestWorld ??= guest.render(options.now());
       return guestWorld !== null;
     },
     hostSim() {
