@@ -1622,6 +1622,8 @@ def main():
              A.add("rail_curve_90", rail_curve(A), {"footprint": [13, 13], "radius": 12.0, "rail_top": RAIL_TOP}),
              A.add("buffer_stop", buffer_stop(A), {"footprint": [1, 2]})]
     lpl.AUTO_ROUND = True
+    # mobilier et clôtures (peu d'exemplaires, vus de près): planches et montants arrondis eux aussi
+    lpl.AUTO_MIN = (0.3, 0.03)
     track.append(level_crossing(A))
     props = []
     for name, fn, fp in (("bell_post", bell_post, [1, 1]), ("bench", bench, [2, 1]), ("lamp_post", lamp_post, [1, 1]),
@@ -1630,15 +1632,20 @@ def main():
                          ("mailbox", mailbox, [1, 1]), ("barrel", barrel, [1, 1]), ("crate", crate, [1, 1]),
                          ("crate_stack", crate_stack, [2, 1]), ("sacks", sacks, [1, 1]), ("cart", cart, [3, 2]),
                          ("bicycle", bicycle, [2, 1])):
+        # charrette et tonnelle: beaucoup de pièces, gardées au seuil des bâtiments (plafond de 900)
+        lpl.AUTO_MIN = (0.6, 0.08) if name in ("cart", "arbor") else (0.3, 0.03)
         props.append(A.add(name, fn(A), {"footprint": fp}))
+    lpl.AUTO_MIN = (0.6, 0.08)
     lpl.AUTO_ROUND = False  # sols et bordures: dalles qui se raccordent
     grounds = []
     for k in ("grass", "dirt", "cobble"):
         grounds.append(A.add("ground_" + k, ground_tile(A, k), {"footprint": [1, 1]}))
     grounds.append(A.add("path_border", path_border(A), {"footprint": [1, 1], "note": "bordure de 1 m le long de X"}))
     lpl.AUTO_ROUND = True
+    lpl.AUTO_MIN = (0.3, 0.03)
     for k in ("wood", "picket", "broken", "gate", "post"):
         grounds.append(A.add("fence_" + k, fence(A, k), {"footprint": [1, 1], "note": "segment de 1 m le long de X, poteau à x=-0,5"}))
+    lpl.AUTO_MIN = (0.6, 0.08)
     nature = []
     for ess, fn in (("oak", tree_oak), ("fir", tree_fir), ("birch", tree_birch)):
         for i, size in enumerate(("small", "large")):

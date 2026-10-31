@@ -25,7 +25,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 - Un seul matériau par fichier: `lpl_palette` (décor) ou `lpl_characters` (personnages). Filtrage au plus proche, faces à une seule face (pas de double face).
 - Émission de nuit: le matériau `lpl_palette` est exporté avec l'émission à 1 (vitres, lanternes, flammes, braises, cadran du poste). Le jeu met `material.emissiveIntensity` à 0 le jour et à 1 la nuit.
 - Saisons: remplacer `material.map` par la texture de la saison (même disposition, `flipY = false`, `colorSpace = SRGBColorSpace`, `NearestFilter`).
-- Low poly arrondi (décision du client du 2026-10-31, bible artistique section 8): facettes gardées (une normale par face), angles droits cassés par des chanfreins de 2 segments au plus, arêtes au sol vives. Témoins déjà refaits: `firmin_house` (angles des murs, chaînes d'angle enveloppantes, rives de toit épaisses chanfreinées, faîtage fléchi de 8 cm, pans bombés de 6 cm, pierres d'angle aux coins abattus irréguliers), `tree_oak_small`, `tree_oak_large` (tronc à 8 pans évasé, 3 racines, boules facettées de 80 faces), `bush_round` (deux boules aplaties) et toutes les pièces des joueurs (tête en boule facettée de 34 cm, coiffures en lobes, torse octogonal bombé aux épaules arrondies, membres à 6 pans renflés, moufles, chaussures en galets, foulard agrandi d'un tiers avec un pan qui dépasse). Les habitants et les autres bâtiments restent pour l'instant à angles droits. Planche: `docs/jeux/jeu-1/gauntlet/captures/tour-05/arrondi-planche.png` (`assets-src/modeles/planche_arrondi.py` puis `planche_arrondi.sh`).
+- Low poly arrondi (décision du client du 2026-10-31, bible artistique section 8): facettes gardées (une normale par face), angles droits cassés par des chanfreins de 2 segments au plus, arêtes au sol vives. Témoins déjà refaits: `firmin_house` (angles des murs, chaînes d'angle enveloppantes, rives de toit épaisses chanfreinées, faîtage fléchi de 8 cm, pans bombés de 6 cm, pierres d'angle aux coins abattus irréguliers), `tree_oak_small`, `tree_oak_large` (tronc à 8 pans évasé, 3 racines, boules facettées de 80 faces), `bush_round` (deux boules aplaties) et toutes les pièces des joueurs (tête en boule facettée de 34 cm, coiffures en lobes, torse octogonal bombé aux épaules arrondies, membres à 6 pans renflés, moufles, chaussures en galets, foulard agrandi d'un tiers avec un pan qui dépasse). Depuis, tout le décor y est passé: habitants (`build_npc_round`), bâtiments (`gable_roof` arrondi, toits relevés de 3 cm pour que les pignons ne les percent plus, chaînes d'angle aux coins abattus), arbres, buissons, mobilier et meubles par l'arrondi automatique de `lpl.Geo.box` (`lpl.AUTO_ROUND`: chanfrein selon la taille, arêtes au sol vives, murs chanfreinés sur leurs seuls angles verticaux, détails de moins de 60 cm et planches de moins de 8 cm laissés vifs dans les bâtiments pour tenir le budget). La voie, les sols, la rivière et les modules de murs restent vifs (raccords bord à bord). Dépassements de plafond (bible 8.8): `gatekeeper_house` environ 5 000 triangles par état (plafond 3 000, 3 250 avant l'arrondi), `arbor` 1 272 (944 avant), `woodpile` 936, `flower_bed` 1 348 (plafond 900): pièces nombreuses, à alléger si le budget de la scène l'exige. Planche: `docs/jeux/jeu-1/gauntlet/captures/tour-05/arrondi-planche.png` (`assets-src/modeles/planche_arrondi.py` puis `planche_arrondi.sh`).
 - Optimisation: `bourg`, `ferme`, `train`, `maison` passent par gltf-transform (dédoublonnage, soudure, élagage). Ni quantification ni compression: aucune extension requise, aucun décodeur à brancher, et l'on peut poser `position`, `rotation` et `scale` sur un nœud cloné sans risque (la quantification range sa déquantification dans la transformation des nœuds: à éviter, ou alors envelopper chaque nœud dans un groupe). Total des cinq fichiers: environ 6,5 Mo. Si le poids devient un sujet, la compression Meshopt (avec `MeshoptDecoder`, livré avec Three.js) le divise par trois ou quatre.
 
 ## Personnages
@@ -185,80 +185,80 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3061 Ko)
+### `bourg.glb` (3735 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
-| `station` | 10 x 6 | 3264 | door_cell: 4 |
-| `platform` | 30 x 4 | 3160 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
-| `gatekeeper_house` | 7 x 6 | 6500 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
-| `ferrand_shop` | 10 x 8 | 3664 | door_cell: 2, counter_cell: 6 |
+| `station` | 10 x 6 | 4004 | door_cell: 4 |
+| `platform` | 30 x 4 | 3236 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
+| `gatekeeper_house` | 7 x 6 | 10036 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
+| `ferrand_shop` | 10 x 8 | 4740 | door_cell: 2, counter_cell: 6 |
 | `firmin_house` | 7 x 6 | 4524 | door_cell: 3 |
-| `sawmill` | 10 x 8 | 1356 | door_cell: 5 |
-| `handcar_shed` | 6 x 5 | 1132 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
-| `handcar` | 2 x 2 | 476 | on_rails: true, note: "balancier handcar_lever: pivot sur l'axe X, +-20 degrés" |
-| `well` | 2 x 2 | 442 | water_point: true |
-| `henhouse` | 3 x 3 | 2108 | door_cell: 1, states: ["henhouse_ruin", "henhouse_repaired"] |
-| `workbench` | 2 x 2 | 400 |  |
-| `woodpile` | 2 x 1 | 888 |  |
-| `plank_stack` | 2 x 1 | 132 |  |
+| `sawmill` | 10 x 8 | 2088 | door_cell: 5 |
+| `handcar_shed` | 6 x 5 | 1512 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
+| `handcar` | 2 x 2 | 556 | on_rails: true, note: "balancier handcar_lever: pivot sur l'axe X, +-20 degrés" |
+| `well` | 2 x 2 | 490 | water_point: true |
+| `henhouse` | 3 x 3 | 2524 | door_cell: 1, states: ["henhouse_ruin", "henhouse_repaired"] |
+| `workbench` | 2 x 2 | 528 |  |
+| `woodpile` | 2 x 1 | 936 |  |
+| `plank_stack` | 2 x 1 | 204 |  |
 | `rail_straight` | 4 x 2 | 294 | rail_top: 0.32, gauge: 1.0 |
 | `rail_curve_90` | 13 x 13 | 2676 | radius: 12.0, rail_top: 0.32 |
 | `buffer_stop` | 1 x 2 | 152 |  |
-| `level_crossing_gate` | 1 x 1 | 228 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
-| `bell_post` | 1 x 1 | 198 |  |
-| `bench` | 2 x 1 | 316 |  |
+| `level_crossing_gate` | 1 x 1 | 584 | note: "lisse level_crossing_gate_arm: pivot sur l'axe Z glTF, 0 baissée, +80 degrés levée" |
+| `bell_post` | 1 x 1 | 302 |  |
+| `bench` | 2 x 1 | 508 |  |
 | `lamp_post` | 1 x 1 | 248 |  |
-| `coop_crate` | 1 x 1 | 168 |  |
-| `notice_board` | 1 x 1 | 332 |  |
-| `station_sign` | 2 x 1 | 260 |  |
-| `arbor` | 3 x 2 | 944 |  |
-| `mailbox` | 1 x 1 | 92 |  |
+| `coop_crate` | 1 x 1 | 240 |  |
+| `notice_board` | 1 x 1 | 388 |  |
+| `station_sign` | 2 x 1 | 316 |  |
+| `arbor` | 3 x 2 | 1272 |  |
+| `mailbox` | 1 x 1 | 140 |  |
 | `barrel` | 1 x 1 | 276 |  |
 | `crate` | 1 x 1 | 92 |  |
-| `crate_stack` | 2 x 1 | 180 |  |
+| `crate_stack` | 2 x 1 | 276 |  |
 | `sacks` | 1 x 1 | 228 |  |
-| `cart` | 3 x 2 | 404 |  |
-| `bicycle` | 2 x 1 | 520 |  |
+| `cart` | 3 x 2 | 428 |  |
+| `bicycle` | 2 x 1 | 744 |  |
 | `ground_grass` | 1 x 1 | 24 |  |
 | `ground_dirt` | 1 x 1 | 48 |  |
 | `ground_cobble` | 1 x 1 | 716 |  |
 | `path_border` | 1 x 1 | 176 | note: "bordure de 1 m le long de X" |
-| `fence_wood` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `fence_picket` | 1 x 1 | 156 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `fence_broken` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `fence_gate` | 1 x 1 | 108 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `fence_post` | 1 x 1 | 12 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
-| `tree_oak_small` | 1 x 1 | 438 | choppable: true |
-| `tree_oak_large` | 2 x 2 | 438 | choppable: true |
-| `tree_fir_small` | 1 x 1 | 68 | choppable: true |
-| `tree_fir_large` | 2 x 2 | 68 | choppable: true |
-| `tree_birch_small` | 1 x 1 | 184 | choppable: false |
-| `tree_birch_large` | 2 x 2 | 184 | choppable: false |
+| `fence_wood` | 1 x 1 | 124 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_picket` | 1 x 1 | 244 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_broken` | 1 x 1 | 124 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_gate` | 1 x 1 | 348 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `fence_post` | 1 x 1 | 36 | note: "segment de 1 m le long de X, poteau à x=-0,5" |
+| `tree_oak_small` | 1 x 1 | 358 | choppable: true |
+| `tree_oak_large` | 2 x 2 | 358 | choppable: true |
+| `tree_fir_small` | 1 x 1 | 174 | choppable: true |
+| `tree_fir_large` | 2 x 2 | 174 | choppable: true |
+| `tree_birch_small` | 1 x 1 | 366 | choppable: false |
+| `tree_birch_large` | 2 x 2 | 366 | choppable: false |
 | `tree_stump` | 1 x 1 | 144 |  |
-| `bush_round` | 1 x 1 | 160 |  |
-| `bush_bramble` | 1 x 1 | 180 |  |
-| `bush_hazel` | 1 x 1 | 140 |  |
+| `bush_round` | 1 x 1 | 100 |  |
+| `bush_bramble` | 1 x 1 | 280 |  |
+| `bush_hazel` | 1 x 1 | 128 |  |
 | `rock_small` | 1 x 1 | 20 |  |
 | `rock_medium` | 1 x 1 | 40 |  |
 | `rock_large` | 2 x 2 | 52 |  |
-| `grass_tall` | 1 x 1 | 36 |  |
-| `flowers_red` | 1 x 1 | 316 |  |
-| `flowers_yellow` | 1 x 1 | 316 |  |
-| `flowers_white` | 1 x 1 | 316 |  |
-| `flowers_blue` | 1 x 1 | 316 |  |
-| `flower_bed` | 2 x 1 | 1148 |  |
-| `reeds` | 1 x 1 | 144 |  |
+| `grass_tall` | 1 x 1 | 90 |  |
+| `flowers_red` | 1 x 1 | 400 |  |
+| `flowers_yellow` | 1 x 1 | 400 |  |
+| `flowers_white` | 1 x 1 | 400 |  |
+| `flowers_blue` | 1 x 1 | 400 |  |
+| `flower_bed` | 2 x 1 | 1348 |  |
+| `reeds` | 1 x 1 | 224 |  |
 | `river_straight` | 4 x 8 | 220 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
 | `pontoon` | 2 x 3 | 640 | walk_height: 0.5 |
-| `tree_oak` |  | 438 | alias_of: "tree_oak_large" |
-| `tree_fir` |  | 68 | alias_of: "tree_fir_large" |
-| `bush` |  | 160 | alias_of: "bush_round" |
+| `tree_oak` |  | 358 | alias_of: "tree_oak_large" |
+| `tree_fir` |  | 174 | alias_of: "tree_fir_large" |
+| `bush` |  | 100 | alias_of: "bush_round" |
 | `rock` |  | 40 | alias_of: "rock_medium" |
-| `fence` |  | 36 | alias_of: "fence_wood" |
-| `log_pile` |  | 888 | alias_of: "woodpile" |
+| `fence` |  | 124 | alias_of: "fence_wood" |
+| `log_pile` |  | 936 | alias_of: "woodpile" |
 
 ### `train.glb` (328 Ko)
 
@@ -270,35 +270,35 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (448 Ko)
+### `maison.glb` (533 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
 | `straw_mattress` | 1 x 2 | 320 | sleep_height: 0.15 |
-| `double_bed` | 2 x 2 | 540 | sleep_height: 0.5, sleep_spots: [[-0.36, 0.0], [0.36, 0.0]] |
+| `double_bed` | 2 x 2 | 708 | sleep_height: 0.5, sleep_spots: [[-0.36, 0.0], [0.36, 0.0]] |
 | `mattress` |  | 324 | kind: "item" |
-| `table` | 2 x 1 | 116 | top_height: 0.78 |
-| `chair` | 1 x 1 | 164 | seat_height: 0.47 |
-| `chest` | 1 x 1 | 128 |  |
-| `shelf` | 2 x 1 | 512 | wall: true |
-| `stove` | 1 x 1 | 324 | station: "stove" |
+| `table` | 2 x 1 | 268 | top_height: 0.78 |
+| `chair` | 1 x 1 | 452 | seat_height: 0.47 |
+| `chest` | 1 x 1 | 176 |  |
+| `shelf` | 2 x 1 | 656 | wall: true |
+| `stove` | 1 x 1 | 372 | station: "stove" |
 | `flower_pot` | 1 x 1 | 352 |  |
 | `oil_lamp` | 1 x 1 | 232 | light_anchor: "oil_lamp_light" |
 | `rug` | 2 x 2 | 296 | floor: true |
-| `curtains` | 1 x 1 | 224 | wall: true |
-| `crystal_radio` | 1 x 1 | 364 |  |
+| `curtains` | 1 x 1 | 504 | wall: true |
+| `crystal_radio` | 1 x 1 | 368 |  |
 | `wood_stove` | 1 x 1 | 240 | tier: "P1" |
-| `picture_frame` | 1 x 1 | 92 | wall: true, tier: "P1" |
+| `picture_frame` | 1 x 1 | 124 | wall: true, tier: "P1" |
 | `bread` |  | 136 | kind: "item" |
 | `dish_radishes` |  | 464 | kind: "item" |
 | `dish_omelette` |  | 276 | kind: "item" |
 | `dish_soup` |  | 244 | kind: "item" |
-| `parcel` |  | 92 | kind: "item" |
+| `parcel` |  | 140 | kind: "item" |
 | `iron_box` |  | 136 | kind: "item" |
 | `riddle_card` |  | 72 | kind: "item" |
 | `shed_key` |  | 112 | kind: "item" |
 | `old_photo` |  | 60 | kind: "item" |
-| `jay_feather` |  | 172 | kind: "item" |
+| `jay_feather` |  | 176 | kind: "item" |
 | `kit_wall_stone` | 1 x 1 | 12 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_wall_wood` | 1 x 1 | 108 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_door` | 1 x 1 | 148 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |

@@ -1,8 +1,8 @@
 """Planche avant et après du low poly arrondi pour une liste de nœuds d'un GLB du décor.
 
 Lancer: duo-python planche_bourg.py <dossier des GLB d'avant> <dossier de sortie> <fichier.glb> <nom> <nœud,...>
-Pose les nœuds sur une rangée (même place avant et après), rend une vue isométrique d'ensemble pour
-chaque version, puis un gros plan par nœud. Assemblage: planche_bourg.sh.
+Pose les nœuds sur une rangée (même place avant et après) et rend un gros plan isométrique par nœud,
+avant puis après. Assemblage: planche_bourg.sh.
 """
 import math
 import os
@@ -85,7 +85,6 @@ def main():
     for t in sets:
         for n, o in sets[t].items():
             o.location = (pos[n][0], pos[n][1], 0)
-    centre = (u / 2 * R[0], u / 2 * R[1], hmax / 3)
     for t in ("A_", "B_"):
         other = sets["B_" if t == "A_" else "A_"]
         for o in other.values():
@@ -96,7 +95,6 @@ def main():
                 ob.hide_render = False
             # états alternatifs (ruine / réparé): on montre le premier, comme le jeu par défaut
         k = t[0].lower()
-        shot(f"{NOM}_ensemble_{k}", centre, u * 0.75, (1600, 700))
         for n, o in sets[t].items():
             w, h = size_of(o)
             shot(f"{NOM}_{n}_{k}", (pos[n][0], pos[n][1], h / 2.5), max(w, h) * 1.25, (700, 560))
