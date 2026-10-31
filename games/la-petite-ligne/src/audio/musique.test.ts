@@ -62,6 +62,13 @@ describe('choix de la musique selon le moment', () => {
     expect(bed({ phase: 'ended' })).toBeNull();
   });
 
+  it('le dernier samedi, la musique du quai dure jusqu au départ et s efface avec son fondu de 4 s', () => {
+    expect(bed({ day: 8, minutes: 16 * H, saturdayWindow: true, nearSaturdaySpot: true })).toBe(MUSIC.saturday);
+    const out: BedWish = { id: null, rest: false, fadeOut: null };
+    chooseBed(moment({ day: 8, minutes: 16 * H, silence: { fadeOut: 4 } }), RULES, catalogue.restingMusic, out);
+    expect(out).toEqual({ id: null, rest: false, fadeOut: 4 });
+  });
+
   it('retient le petit-déjeuner jusqu à la fin du réveil (coq, air du matin)', () => {
     const hold = { music: MUSIC.breakfast, until: 3.5, fadeOut: 2.5 };
     expect(bed({ phase: 'breakfast', hold, now: 1 })).toBeNull();

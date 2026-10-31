@@ -34,7 +34,7 @@ const BUSES: readonly AudioBus[] = ['music', 'effects', 'interface'];
 const SCREEN_DWELL_SECONDS = 8;
 const SCREEN_INTENTS = new Set(['create_character', 'start_day', 'night_choice']);
 
-export type Scenario = 'arrivee' | 'depart' | 'matin' | 'pluie' | 'boucle' | 'nuit';
+export type Scenario = 'arrivee' | 'depart' | 'matin' | 'pluie' | 'boucle' | 'nuit' | 'interieur';
 
 export interface BancResult {
   scenario: Scenario;
@@ -96,8 +96,8 @@ function dwellingRobot(): (sim: Sim, t: number) => { controls: ReturnType<Return
 interface Setup {
   sim: Sim | null;
   seconds: number;
-  /** Image synthétique (sans simulation), pour le contrôle de la boucle. */
-  synthetic?: (frame: BrainFrame, index: number) => void;
+  /** Image synthétique (sans simulation), pour le contrôle de la boucle, de l'intérieur et de la pause. */
+  synthetic?: (frame: BrainFrame, index: number, engine: AudioEngine) => void;
 }
 
 function setupOf(scenario: Scenario): Setup {
@@ -112,6 +112,20 @@ function setupOf(scenario: Scenario): Setup {
       return { sim: fastForward((s) => s.world.clock.day === 3 && s.world.clock.minutes >= 19 * 60 && s.world.characters.every((c) => c.inHouse)), seconds: 30 };
     case 'pluie':
       return { sim: fastForward((s) => s.world.clock.day === 4 && s.world.phase === 'day' && s.world.clock.minutes >= 8 * 60), seconds: 30 };
+    case 'interieur':
+      // Vent dehors 0 à 3 s, dans la maisonnette 3 à 6 s, dehors ensuite; pause de la plateforme de 8 à 10 s.
+      return {
+        sim: null,
+        seconds: 12,
+        synthetic: (frame, index, engine) => {
+          const t = index * SIM_DT;
+          frame.ambience.set('wind', 1);
+          frame.ambienceNeeded.add('wind');
+          frame.listener.inHouse = t >= 3 && t < 6;
+          frame.music = index === 0 ? [{ kind: 'start', id: 'halte-matin', offset: 10, fadeIn: 0, at: 0 }] : [];
+          engine.setPaused(t >= 8 && t < 10);
+        },
+      };
     case 'boucle':
       return {
         sim: null,
@@ -223,7 +237,7 @@ async function run(scenario: Scenario, withMix: boolean): Promise<BancResult> {
     let frame: BrainFrame;
     if (sim === null) {
       frame = emptyFrame();
-      setup.synthetic?.(frame, index);
+      setup.synthetic?.(frame, index, engine);
     } else {
       if (index > 0) step(sim, decide(sim, gameTime));
       frame = brain.update({
