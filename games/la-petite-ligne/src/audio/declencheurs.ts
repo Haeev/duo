@@ -303,6 +303,18 @@ export function soundsForEvent(
     case 'session_finish':
     case 'absence':
       break;
+    // Moments rares et secrets (tour 6): sons à brancher avec le sound-designer (sons de `moments.json`).
+    case 'moment_waiting':
+    case 'moment_climax':
+    case 'moment_paused':
+    case 'moment_resumed':
+    case 'moment_left':
+    case 'hold_started':
+    case 'hold_released':
+    case 'hen_called':
+    case 'dialogue_choice':
+    case 'secret_revealed':
+      break;
   }
 }
 

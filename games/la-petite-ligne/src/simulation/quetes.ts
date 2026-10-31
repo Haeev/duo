@@ -17,6 +17,7 @@ import { type Sim, emit, format, notify, say, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { textVars } from './courrier';
 import { runEffects } from './effets';
+import { finishSecret, startSecret, updateSecrets } from './secrets';
 
 function def(sim: Sim, id: string): QuestDef | undefined {
   return sim.content.quests.find((q) => q.id === id);
@@ -36,6 +37,8 @@ export function startQuest(sim: Sim, id: string): void {
     startedDay: world.clock.day,
   };
   world.quests.push(state);
+  // Quête à secret (R16): l'informé et l'autre sont fixés dès le démarrage.
+  startSecret(sim, quest);
   notifyKey(sim, 'both', 'quest', 'quest_started', { quest: quest.title });
   queueHint(sim, 'p1', { on: 'quest_started', quest: id });
   queueHint(sim, 'p2', { on: 'quest_started', quest: id });
@@ -50,7 +53,7 @@ function refreshChecklist(sim: Sim, state: QuestState, quest: QuestDef): void {
     state.checklist = [];
     return;
   }
-  const ctx: ConditionContext = { ...NO_CONTEXT, baselines: state.baselines };
+  const ctx: ConditionContext = { ...NO_CONTEXT, baselines: state.baselines, quest: state.id };
   const items: { label: string; done: boolean }[] = [];
   for (const c of step.conditions) {
     if (c.label !== undefined) items.push({ label: c.label, done: evaluate(sim, c, ctx) });
@@ -78,6 +81,7 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
     state.checklist = [];
     notify(sim, 'both', 'quest', format(quest.completionText, textVars(sim)), { key: 'quest_done' });
     emit(sim, { type: 'quest_done', quest: quest.id });
+    finishSecret(sim, quest.id);
     runEffects(sim, quest.completionEffects, actor);
     sim.world.revision += 1;
     sim.events.push({ type: 'save_point', reason: 'quest' });
@@ -124,7 +128,7 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
         refreshChecklist(sim, state, quest);
         break;
       }
-      const ctx: ConditionContext = { actor: toolEvent?.by ?? null, baselines: state.baselines, toolEvent };
+      const ctx: ConditionContext = { actor: toolEvent?.by ?? null, baselines: state.baselines, toolEvent, quest: state.id };
       if (evaluateAll(sim, step.conditions, ctx)) {
         if (needsTool) toolConsumed = true;
         advance(sim, state, quest, toolEvent?.by ?? null);
@@ -138,6 +142,7 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
       break;
     }
   }
+  updateSecrets(sim);
   return toolConsumed;
 }
 

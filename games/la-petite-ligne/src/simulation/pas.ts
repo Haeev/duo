@@ -23,6 +23,8 @@ import { updateFishing } from './peche';
 import { wanderHens } from './poules';
 import { updateQuests } from './quetes';
 import { updateTrain } from './train';
+import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
+import { updateHenCalls } from './secrets';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -118,6 +120,8 @@ export function step(sim: Sim, input: StepInput): void {
   // Assis: une direction relève (avant de marcher, au même pas); Espace tenu ne porte ni ne bâtit.
   const controls = seatedControls(sim, input.controls);
   if (world.phase === 'day') {
+    // L'échelle: toute direction la lâche, puis l'on marche au même pas.
+    releaseHoldsOnMove(sim, controls);
     spawnLoads(sim);
     const placed = updateBeam(sim, controls, dt);
     if (placed !== null) {
@@ -138,12 +142,15 @@ export function step(sim: Sim, input: StepInput): void {
     updateConstructions(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
+  updateHolds(sim);
   updateSeats(sim);
   updateVillagers(sim, dt);
   wanderHens(sim, dt);
   updateTrain(sim, dt);
   updateAbsence(sim);
   updateClock(sim, dt);
+  updateMoments(sim);
+  updateHenCalls(sim);
 
   autoStartScenes(sim);
   pumpScripts(sim);

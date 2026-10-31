@@ -7,21 +7,61 @@ import { type Sim, bump, distance, emit, newId, point, notifyKey } from './conte
 import { gesture } from './potager';
 import { ITEM, POINT, ZONE } from './ids';
 import { dropAt } from './sac';
+import { variantOf } from './conditions';
 
-export function spawnHens(sim: Sim, animal: string, count: number, names: string[], pointId: string): void {
+/**
+ * La permutation n° `k` (ordre lexicographique) des indices 0 à n - 1: avec trois variantes,
+ * 0 donne [0, 1, 2], 1 donne [0, 2, 1]... 5 donne [2, 1, 0] (tableau 2.2 de la conception).
+ */
+export function permutation(n: number, k: number): number[] {
+  const pool = Array.from({ length: n }, (_, i) => i);
+  const out: number[] = [];
+  let factorial = 1;
+  for (let i = 2; i < n; i++) factorial *= i;
+  let rest = k % (factorial * Math.max(1, n));
+  for (let left = n; left > 0; left--) {
+    const index = Math.floor(rest / factorial);
+    rest %= factorial;
+    out.push(pool.splice(index, 1)[0] ?? 0);
+    if (left > 1) factorial /= left - 1;
+  }
+  return out;
+}
+
+/** Nombre de permutations de n variantes (n!). */
+export function permutationCount(n: number): number {
+  let f = 1;
+  for (let i = 2; i <= n; i++) f *= i;
+  return f;
+}
+
+export function spawnHens(
+  sim: Sim,
+  animal: string,
+  count: number,
+  names: string[],
+  pointId: string,
+  shuffleVariantsBy: string | null = null,
+): void {
   const def = sim.content.animals[animal];
   if (def === undefined || sim.world.hens.length > 0) return;
   const at = point(sim, pointId);
+  const n = def.variants.length;
+  // Qui porte quelle couleur change d'une partie à l'autre (R16): tirage par la graine, sans le générateur.
+  const order = shuffleVariantsBy === null || n === 0 ? null : permutation(n, variantOf(sim.world.seed, shuffleVariantsBy, permutationCount(n)));
   for (let i = 0; i < count; i++) {
     const pos = { x: at.x + (i - (count - 1) / 2) * 0.8, y: at.y + 0.6 };
+    const v = order === null ? i % Math.max(1, n) : (order[i % n] ?? 0);
     sim.world.hens.push({
       id: newId(sim, 'h'),
       name: names[i] ?? def.name,
-      variant: def.variants[i % def.variants.length] ?? def.id,
+      variant: def.variants[v] ?? def.id,
       pos,
       prev: { ...pos },
       facing: 0,
       wander: { ...pos },
+      nameKnownBy: [],
+      namedBy: null,
     });
   }
   notifyKey(sim, 'both', 'message', 'hens_arrived');

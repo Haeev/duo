@@ -3,19 +3,54 @@
  * `habitants.json` et la section 2.3 du README des données.
  */
 import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
-import type { DialogueDef } from '../donnees/types';
+import type { Condition, Content, DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
 import { type Sim, bump, character, distance, emit, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';
 import { MINUTES_PER_DAY } from './constantes';
+import { evaluate } from './conditions';
+import { henVars } from '../etat/secrets';
+import { answerHenCall, HEN_CALL_DIALOGUE, secretMistake } from './secrets';
 
 const GIVE_PREFIX = 'give:';
 
 function vars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
-  const base = textVars(sim);
+  // Les couleurs des poules (`{henColor1}`...): seul l'informé entend le dialogue qui les cite.
+  const base = { ...textVars(sim), ...henVars(sim.world, sim.content) };
   return who === null ? base : { ...base, partner: partnerName(sim, who) };
+}
+
+/** Quête à secret d'un dialogue réservé à un rôle (sa condition `secret_role`), ou `null`. */
+function secretQuestOf(def: DialogueDef): string | null {
+  for (const c of def.when) if (c.type === 'secret_role') return c.quest;
+  return null;
+}
+
+const choiceKeyCache = new WeakMap<Content, Set<string>>();
+
+/** Clés des compteurs de choix que lisent les conditions `choice_made` des données. */
+function choiceKeys(content: Content): Set<string> {
+  let keys = choiceKeyCache.get(content);
+  if (keys !== undefined) return keys;
+  const found = new Set<string>();
+  const visit = (c: Condition): void => {
+    if (c.type === 'choice_made') found.add(c.key);
+    if (c.type === 'all' || c.type === 'any') c.conditions.forEach(visit);
+    if (c.type === 'not') visit(c.condition);
+  };
+  for (const q of content.quests) for (const s of q.steps) s.conditions.forEach(visit);
+  for (const d of Object.values(content.dialogues)) d.when.forEach(visit);
+  for (const e of content.envies) [...e.availableWhen, ...e.fulfilledWhen].forEach(visit);
+  keys = found;
+  choiceKeyCache.set(content, keys);
+  return keys;
+}
+
+/** Un dialogue à bonne et mauvaise réponse se rejoue tout de suite après une erreur (jamais punitif). */
+function retryable(def: DialogueDef): boolean {
+  return def.choices.some((ch) => ch.correct !== null);
 }
 
 function lineViews(sim: Sim, def: DialogueDef, who: CharacterId | null): DialogueLineView[] {
@@ -52,7 +87,7 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
     if (d.kind === 'daily' || d.kind === 'ending' || (d.kind === 'scene' && d.shared)) continue;
     if (!isAvailable(sim, d, who)) continue;
     // Un rappel répétable déjà entendu aujourd'hui laisse la place au quotidien.
-    if (d.once === null && heardToday(d)) continue;
+    if (d.once === null && heardToday(d) && !retryable(d)) continue;
     if (best === null || d.priority > best.priority) best = d;
   }
   if (best !== null) return best;
@@ -312,6 +347,10 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
     sceneChoice(sim, c, choice);
     return;
   }
+  if (c.dialogue?.dialogue === HEN_CALL_DIALOGUE) {
+    answerHenCall(sim, c, choice);
+    return;
+  }
   const d = c.dialogue;
   if (!d?.choices.some((ch) => ch.id === choice)) return;
   if (choice.startsWith(GIVE_PREFIX)) {
@@ -323,12 +362,24 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
   }
   const def = sim.content.dialogues[d.dialogue];
   const picked = def?.choices.find((ch) => ch.id === choice);
-  if (picked === undefined) return;
+  if (def === undefined || picked === undefined) return;
+  const quest = secretQuestOf(def);
+  const correct = picked.correct === null ? null : evaluate(sim, picked.correct, { actor: c.id, baselines: null, toolEvent: null, quest });
   const start = d.lines.length;
-  d.lines.push({ speaker: c.id, text: picked.text });
-  for (const r of picked.reply) d.lines.push({ speaker: r.speaker, text: format(r.text, vars(sim, c.id)) });
+  d.lines.push({ speaker: c.id, text: format(picked.text, vars(sim, c.id)) });
+  const reply = correct === false ? picked.replyWrong : picked.reply;
+  for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, vars(sim, c.id)) });
   d.choices = d.choices.filter((ch) => ch.id.startsWith(GIVE_PREFIX));
   d.line = start;
+  // Compteurs des conditions `choice_made` (n'importe quel choix, ce choix, un choix juste), seulement
+  // ceux que les données lisent: l'état transmis à l'invité reste petit (ADR 0007).
+  const used = choiceKeys(sim.content);
+  for (const key of [`choice:${def.id}`, `choice:${def.id}:${picked.id}`, ...(correct === true ? [`choice:${def.id}:correct`] : [])]) {
+    if (used.has(key)) bump(sim, key, c.id);
+  }
+  emit(sim, { type: 'dialogue_choice', dialogue: def.id, choice: picked.id, correct, by: c.id });
+  if (correct === false) secretMistake(sim, quest);
+  runEffects(sim, correct === false ? picked.effectsWrong : picked.effects, c.id);
 }
 
 export function dialogueClose(sim: Sim, c: Character): void {

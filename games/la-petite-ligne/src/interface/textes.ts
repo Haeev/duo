@@ -19,6 +19,8 @@ const GameUiSchema = v.object({
     notebookTabs: strings(['quests', 'mail', 'bag'] as const),
     questKinds: strings(['main', 'side'] as const),
     questDone: str,
+    /** En-tête de la fiche secrète (R16) au carnet. */
+    secretCard: str,
     hud: strings(['purse', 'day', 'time', 'nextGoal'] as const),
     shop: strings(['title', 'buy', 'sell', 'price', 'close'] as const),
     catalogue: strings(['title', 'subtitle', 'order'] as const),

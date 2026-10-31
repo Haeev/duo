@@ -176,12 +176,56 @@
           "lines": [{ "speaker": "firmin", "text": "Regardez-moi ça. Le plus beau quai de la ligne. Bon, le seul quai de la ligne. Tenez, pour la peine." }]
         },
         {
-          "id": "firmin_lucie_reply",
+          "id": "firmin_lucie_reply_0",
           "kind": "quest",
           "once": "duo",
           "priority": 47,
-          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
-          "lines": [{ "speaker": "firmin", "text": "Une lettre de Lucie. Pour moi. Je la lirai ce soir, au calme. Dites-lui merci. Non, ne lui dites rien. Si, dites-lui merci." }]
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }, { "type": "variant", "group": "lucie_reply", "value": 0, "of": 3 }],
+          "lines": [
+            { "speaker": "firmin", "text": "Une lettre de Lucie. Pour moi. Je la lirai ce soir, au calme." },
+            { "speaker": "firmin", "text": "Dis-lui que samedi, au train, je mettrai ma casquette du dimanche." }
+          ]
+        },
+        {
+          "id": "firmin_lucie_reply_1",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }, { "type": "variant", "group": "lucie_reply", "value": 1, "of": 3 }],
+          "lines": [
+            { "speaker": "firmin", "text": "Une lettre de Lucie. Pour moi. Je la lirai ce soir, au calme." },
+            { "speaker": "firmin", "text": "Dis-lui qu'il reste une place sur le banc du quai. À côté de la mienne." }
+          ]
+        },
+        {
+          "id": "firmin_lucie_reply_2",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }, { "type": "variant", "group": "lucie_reply", "value": 2, "of": 3 }],
+          "lines": [
+            { "speaker": "firmin", "text": "Une lettre de Lucie. Pour moi. Je la lirai ce soir, au calme." },
+            { "speaker": "firmin", "text": "Dis-lui que les jonquilles du quai, c'est moi qui les ai plantées. Pour elle." }
+          ]
+        },
+        {
+          "id": "firmin_lucie_reply_wrong_person",
+          "kind": "quest",
+          "once": "player",
+          "priority": 48,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "doer" }, { "type": "given", "villager": "firmin", "item": "lucie_letter", "who": "doer" }],
+          "lines": [{ "speaker": "firmin", "text": "Merci. Ma réponse, je la donnerai à {partner}: c'est à {partner} que Jeanne l'a confiée." }]
+        },
+        {
+          "id": "firmin_lucie_already_told",
+          "kind": "quest",
+          "priority": 46,
+          "when": [
+            { "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" },
+            { "type": "secret_role", "quest": "lucie_note", "role": "doer" },
+            { "type": "any", "conditions": [{ "type": "dialogue_done", "dialogue": "firmin_lucie_reply_0" }, { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_1" }, { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_2" }] }
+          ],
+          "lines": [{ "speaker": "firmin", "text": "J'ai tout dit à {partner}. Je ne vais pas le répéter: j'ai déjà rougi une fois." }]
         },
         {
           "id": "firmin_end2_full",
@@ -238,14 +282,14 @@
           "kind": "quest",
           "priority": 22,
           "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
-          "lines": [{ "speaker": "firmin", "text": "Basile est passé tout à l'heure, une échelle sur l'épaule, du côté de la lisière." }]
+          "lines": [{ "speaker": "firmin", "text": "Basile est passé tout à l'heure, une échelle sur l'épaule. Il allait vers le grand chêne, près de la remise." }]
         },
         {
           "id": "firmin_geese_ask",
           "kind": "quest",
           "priority": 23,
           "when": [{ "type": "step_active", "quest": "wild_geese", "step": "watch" }],
-          "lines": [{ "speaker": "firmin", "text": "Entre cinq heures et six heures et demie, les oies sauvages passent au-dessus du quai. Asseyez-vous à deux sur le banc, et levez les yeux." }]
+          "lines": [{ "speaker": "firmin", "text": "Des oies sauvages se sont posées sur l'Aubrune, devant le banc de la berge. En fin d'après-midi, elles repartent vers le nord. Asseyez-vous à deux sur ce banc, et regardez-les partir." }]
         },
         {
           "id": "firmin_geese_done",
@@ -458,6 +502,25 @@
           "lines": [{ "speaker": "odette", "text": "Les voilà: Bichette, Cocotte et la Duchesse. La Duchesse pond quand elle veut, ne le prenez pas pour vous." }]
         },
         {
+          "id": "odette_hen_names_tell",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 46,
+          "when": [{ "type": "step_active", "quest": "hen_names", "step": "listen" }, { "type": "secret_role", "quest": "hen_names", "role": "informed" }],
+          "lines": [
+            { "speaker": "odette", "text": "Approche, que je te présente tes poules. Bichette, c'est {henColor1}: elle pond la première. Cocotte, c'est {henColor2}: elle se dispute avec tout le monde. Et la Duchesse, c'est {henColor3}: elle se prend pour une reine." },
+            { "speaker": "odette", "text": "Mais c'est {partner} qui les appellera. Une poule, ça apprend une voix à la fois. Tu lui diras ?" }
+          ]
+        },
+        {
+          "id": "odette_hen_names_redirect",
+          "kind": "quest",
+          "once": "player",
+          "priority": 46,
+          "when": [{ "type": "step_active", "quest": "hen_names", "step": "listen" }, { "type": "secret_role", "quest": "hen_names", "role": "doer" }],
+          "lines": [{ "speaker": "odette", "text": "J'ai une confidence pour les oreilles de {partner}. Envoie-moi {partner}, et ensuite, c'est toi qui joueras." }]
+        },
+        {
           "id": "odette_supper_ask",
           "kind": "quest",
           "once": "duo",
@@ -568,7 +631,7 @@
           "kind": "quest",
           "priority": 23,
           "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
-          "lines": [{ "speaker": "odette", "text": "Basile ? Je l'ai vu partir vers le bois avec une échelle sur l'épaule. À son âge !" }]
+          "lines": [{ "speaker": "odette", "text": "Basile ? Je l'ai vu partir vers la remise avec une échelle sur l'épaule. À son âge !" }]
         },
         {
           "id": "odette_dandelions_ask",
@@ -723,7 +786,7 @@
       "schedule": [
         { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "beam_pickup", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
-        { "when": [{ "type": "quest_active", "quest": "basile_lost" }], "from": "12:00", "to": "18:00", "point": "forage_edge_03", "activity": "work" },
+        { "when": [{ "type": "quest_active", "quest": "basile_lost" }], "from": "12:00", "to": "18:00", "point": "nest_oak_basile", "activity": "work" },
         { "when": [{ "type": "quest_active", "quest": "handcar" }], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work" },
         { "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home" },
         { "from": "08:00", "to": "18:00", "point": "sawmill_workbench", "activity": "work" },
@@ -913,7 +976,7 @@
           "kind": "quest",
           "priority": 22,
           "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }],
-          "lines": [{ "speaker": "basile", "text": "Un de chaque côté de l'échelle. Ne bougez plus, je monte." }]
+          "lines": [{ "speaker": "basile", "text": "Mettez-vous de part et d'autre de l'échelle, et tenez bon. Je monte." }]
         },
         {
           "id": "basile_lost_done",
@@ -1169,31 +1232,75 @@
           "kind": "quest",
           "once": "duo",
           "priority": 43,
-          "when": [{ "type": "day_at_least", "day": 11 }, { "type": "dialogue_done", "dialogue": "jeanne_meeting" }],
-          "effects": [{ "type": "give_item", "item": "lucie_letter", "count": 1, "to": "actor" }],
-          "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie a écrit une lettre à Firmin. Elle n'ose pas la lui donner. Moi non plus. Vous, vous osez ?" }]
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "receive" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }],
+          "effects": [{ "type": "give_item", "item": "lucie_letter", "count": 1, "to": "informed" }],
+          "lines": [
+            { "speaker": "jeanne", "text": "Ma tante Lucie a écrit une lettre à Firmin. Elle n'ose pas la lui donner. Moi non plus. Toi, tu oses ?" },
+            { "speaker": "jeanne", "text": "Et après, ne me raconte rien, tu vas rougir. C'est {partner} qui me dira ce qu'il a répondu." }
+          ]
+        },
+        {
+          "id": "jeanne_lucie_redirect",
+          "kind": "quest",
+          "once": "player",
+          "priority": 43,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "receive" }, { "type": "secret_role", "quest": "lucie_note", "role": "doer" }],
+          "lines": [{ "speaker": "jeanne", "text": "C'est un secret pour {partner}. Toi, tu auras ton tour après. Va me chercher {partner} !" }]
         },
         {
           "id": "jeanne_lucie_reminder",
           "kind": "quest",
           "priority": 20,
-          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "give" }],
-          "lines": [{ "speaker": "jeanne", "text": "Vous l'avez donnée ? Non ? Firmin est sur le quai. Il ne mord pas. Enfin, je crois." }]
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "give" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }],
+          "lines": [{ "speaker": "jeanne", "text": "Tu l'as donnée ? Non ? Firmin est sur le quai. Il ne mord pas. Enfin, je crois." }]
         },
         {
-          "id": "jeanne_lucie_done",
+          "id": "jeanne_lucie_quiz",
           "kind": "quest",
-          "once": "duo",
           "priority": 45,
-          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }],
-          "lines": [{ "speaker": "jeanne", "text": "Il a dit merci ? Trois fois ? Ma tante va devenir rouge comme une tomate. Tenez, c'est mon argent de poche." }]
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "doer" }],
+          "lines": [
+            { "speaker": "jeanne", "text": "Alors ? Qu'est-ce qu'il a dit ?" },
+            {
+              "choices": [
+                {
+                  "id": "reply_0",
+                  "text": "Il mettra sa casquette du dimanche, samedi.",
+                  "correct": { "type": "variant", "group": "lucie_reply", "value": 0, "of": 3 },
+                  "reply": [{ "speaker": "jeanne", "text": "Ça, c'est Firmin tout craché ! Ma tante va devenir rouge comme une tomate. Tenez, mon argent de poche." }],
+                  "replyWrong": [{ "speaker": "jeanne", "text": "Hmm... Ça ne ressemble pas à Firmin. Va redemander à {partner} !" }]
+                },
+                {
+                  "id": "reply_1",
+                  "text": "Il lui garde une place sur le banc du quai.",
+                  "correct": { "type": "variant", "group": "lucie_reply", "value": 1, "of": 3 },
+                  "reply": [{ "speaker": "jeanne", "text": "Ça, c'est Firmin tout craché ! Ma tante va devenir rouge comme une tomate. Tenez, mon argent de poche." }],
+                  "replyWrong": [{ "speaker": "jeanne", "text": "Hmm... Ça ne ressemble pas à Firmin. Va redemander à {partner} !" }]
+                },
+                {
+                  "id": "reply_2",
+                  "text": "Les jonquilles du quai, c'est lui. Pour elle.",
+                  "correct": { "type": "variant", "group": "lucie_reply", "value": 2, "of": 3 },
+                  "reply": [{ "speaker": "jeanne", "text": "Ça, c'est Firmin tout craché ! Ma tante va devenir rouge comme une tomate. Tenez, mon argent de poche." }],
+                  "replyWrong": [{ "speaker": "jeanne", "text": "Hmm... Ça ne ressemble pas à Firmin. Va redemander à {partner} !" }]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "jeanne_lucie_not_you",
+          "kind": "quest",
+          "priority": 44,
+          "when": [{ "type": "step_active", "quest": "lucie_note", "step": "tell_jeanne" }, { "type": "secret_role", "quest": "lucie_note", "role": "informed" }],
+          "lines": [{ "speaker": "jeanne", "text": "Non, pas toi: tu vas rougir ! Je veux l'entendre de {partner}." }]
         },
         {
           "id": "jeanne_heron_ask",
           "kind": "quest",
           "priority": 23,
           "when": [{ "type": "step_active", "quest": "heron_watch", "step": "watch" }],
-          "lines": [{ "speaker": "jeanne", "text": "Le héron est revenu au gué ! Il vient l'après-midi. Si on parle, il s'envole. Allez-y à deux, et regardez-le sans bouger." }]
+          "lines": [{ "speaker": "jeanne", "text": "Le héron est revenu au gué ! Il pêche l'après-midi, au bord, là où l'eau devient profonde. Allez-y à deux, et regardez-le sans bouger." }]
         },
         {
           "id": "jeanne_heron_done",

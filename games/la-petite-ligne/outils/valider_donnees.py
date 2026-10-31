@@ -23,7 +23,7 @@ from typing import Any
 FILES = ("objets", "cultures", "habitants", "quetes", "courrier", "astuces", "envies", "textes", "reglages")
 ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 TIME_RE = re.compile(r"^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$")
-PLACEHOLDER_RE = re.compile(r"\{([A-Za-z]+)\}")
+PLACEHOLDER_RE = re.compile(r"\{([A-Za-z][A-Za-z0-9]*)\}")
 FORBIDDEN_DASHES = (chr(0x2014), chr(0x2013))  # tirets cadratin et demi-cadratin, écrits par leur code
 # Jours de la démo, de 1 à `reglages.clock.lastDay.day` (fixé au chargement dans main()).
 DEMO_DAYS = range(1, 9)
@@ -37,8 +37,13 @@ TIERS = {"P0", "P1"}
 WEATHERS = {"sunny", "cloudy", "rain"}
 QUALITIES = {"ordinary", "fine"}
 WHO = {"actor", "either", "both"}
+# Dans une quête à secret (R16), « who » accepte aussi les deux rôles.
+WHO_ROLES = WHO | {"informed", "doer"}
+SECRET_ROLES = {"informed", "doer"}
+MOMENT_MODES = {"quest", "ambient", "both"}
+MOMENT_PLAYERS = {"p1", "p2"}
 SINCE = {"game_start", "step_start", "day_start"}
-GIVE_TO = {"actor", "each", "cellar"}
+GIVE_TO = {"actor", "each", "cellar", "informed", "doer"}
 TAKE_FROM = {"actor", "either", "cellar"}
 NEEDS = {"belly", "sleep", "heart"}
 EVENTS = {"train_arrival", "train_departure"}
@@ -95,7 +100,12 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "caught": ({"item"}, {"count", "who", "since"}),
     "used_tool_at": ({"tool", "point"}, {"radius", "who"}),
     "stayed_at": ({"point", "seconds"}, {"who", "seated"}),
-    "looked_at": ({"point"}, {"distance", "who"}),
+    "looked_at": ({"point"}, {"distance", "who", "minDistance", "still"}),
+    # Tour 6: moments rares et informations propres (R16).
+    "moment_seen": ({"moment"}, {"since"}),
+    "secret_role": ({"quest", "role"}, set()),
+    "hens_named": (set(), {"count", "who"}),
+    "choice_made": ({"dialogue"}, {"choice", "correct", "who", "since", "count"}),
     "variant": ({"group", "value", "of"}, set()),
     "witnessed": ({"event"}, {"who"}),
     "nights_passed": ({"count"}, set()),
@@ -113,7 +123,8 @@ EFFECTS: dict[str, tuple[set[str], set[str]]] = {
     "send_letter": ({"letter"}, set()),
     "unlock_recipe": ({"recipe"}, set()),
     "spawn_object": ({"item", "point"}, set()),
-    "spawn_animals": ({"animal", "count", "point"}, {"names"}),
+    "spawn_animals": ({"animal", "count", "point"}, {"names", "shuffleVariantsBy"}),
+    "reveal_secret": ({"quest"}, set()),
     "set_need": ({"need", "value", "who"}, set()),
     "play_dialogue": ({"dialogue"}, set()),
     "gather_players": ({"point"}, set()),
@@ -133,7 +144,9 @@ HINT_TRIGGERS: dict[str, set[str]] = {
 
 PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
-                "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase"}
+                "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
+                # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
+                "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret"}
 
 # Points de carte demandés par les données. Le level designer les crée dans donnees/cartes/ (voir README).
 NAMED_POINTS_OUTSIDE_MAP = {"offstage"}
@@ -174,6 +187,10 @@ class Registry:
         self.order_days: set[int] = set()
         self.order_days_used: dict[int, str] = {}
         self.variants: dict[str, list[tuple[Any, Any, str]]] = {}
+        self.moments: set[str] = set()
+        self.secret_quests: set[str] = set()
+        self.secret_role_uses: list[tuple[str, str]] = []
+        self.moments_seen: list[tuple[str, str]] = []
 
 
 def load(folder: Path, report: Report) -> dict[str, Any]:
@@ -304,8 +321,16 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
         report.error(w, f"météo inconnue {cond['weather']!r}")
     if "quality" in cond and cond["quality"] not in QUALITIES:
         report.error(w, f"qualité inconnue {cond['quality']!r}")
-    if "who" in cond and cond["who"] not in WHO:
+    if "who" in cond and cond["who"] not in WHO_ROLES:
         report.error(w, f"« who » inconnu {cond['who']!r}")
+    if ctype == "secret_role":
+        if cond.get("role") not in SECRET_ROLES:
+            report.error(w, f"rôle inconnu {cond.get('role')!r} (informed ou doer)")
+        reg.secret_role_uses.append((str(cond.get("quest")), w))
+    if ctype == "moment_seen":
+        reg.moments_seen.append((str(cond.get("moment")), w))
+    if ctype == "choice_made" and "correct" in cond and cond["correct"] is not True:
+        report.error(w, "choice_made: « correct » ne peut valoir que true")
     if "since" in cond and cond["since"] not in SINCE:
         report.error(w, f"« since » inconnu {cond['since']!r}")
     if "count" in cond:
@@ -573,10 +598,20 @@ def check_lines(lines: Any, where: str, reg: Registry, report: Report) -> None:
         if "choices" in line:
             choice_ids: set[str] = set()
             for j, choice in enumerate(line["choices"]):
-                register(choice_ids, choice.get("id"), f"{wl}.choices[{j}]", report)
+                wc = f"{wl}.choices[{j}]"
+                register(choice_ids, choice.get("id"), wc, report)
                 if not choice.get("text"):
                     report.error(wl, "choix sans texte")
-                check_lines(choice.get("reply", []), f"{wl}.choices[{j}]", reg, report)
+                check_lines(choice.get("reply", []), wc, reg, report)
+                # Choix à bonne et mauvaise réponse (R16): condition `correct`, réplique `replyWrong`.
+                if "correct" in choice:
+                    check_condition(choice["correct"], f"{wc}.correct", reg, report)
+                    if not choice.get("replyWrong"):
+                        report.error(wc, "« correct » sans « replyWrong » (que répond l'habitant à une erreur ?)")
+                if "replyWrong" in choice:
+                    check_lines(choice["replyWrong"], f"{wc}.replyWrong", reg, report)
+                check_effects(choice.get("effects", []), f"{wc}.effects", reg, report)
+                check_effects(choice.get("effectsWrong", []), f"{wc}.effectsWrong", reg, report)
         else:
             speaker = line.get("speaker")
             if speaker not in reg.villagers and speaker not in SPEAKERS_EXTRA:
@@ -598,10 +633,17 @@ def check_quetes(data: dict[str, Any], reg: Registry, report: Report) -> None:
         if not start.get("byEffect"):
             check_conditions(start.get("when", []), f"{w}.start.when", reg, report)
         check_effects(start.get("effects", []), f"{w}.start.effects", reg, report)
+        check_secret(quest, w, reg, report)
         for step in quest.get("steps", []):
             ws = f"{w}.{step.get('id')}"
             if not step.get("objective"):
                 report.error(ws, "objectif manquant")
+            by_role = step.get("objectiveByRole")
+            if by_role is not None:
+                if "secret" not in quest:
+                    report.error(ws, "« objectiveByRole » dans une quête sans secret")
+                if not isinstance(by_role, dict) or set(by_role) != SECRET_ROLES or not all(isinstance(v, str) and v for v in by_role.values()):
+                    report.error(ws, "« objectiveByRole »: textes « informed » et « doer » attendus")
             check_conditions(step.get("conditions", []), f"{ws}.conditions", reg, report)
             check_effects(step.get("effects", []), f"{ws}.effects", reg, report)
             if "failText" in step:
@@ -620,6 +662,231 @@ def check_quetes(data: dict[str, Any], reg: Registry, report: Report) -> None:
     for quest in data.get("quetes", {}).get("quests", []):
         if quest.get("start", {}).get("byEffect") and quest.get("id") not in reg.quests_started_by_effect:
             report.error(f"quetes.{quest.get('id')}", "démarrée par un effet, mais aucun effet « start_quest » ne la lance")
+
+
+def check_secret(quest: dict[str, Any], w: str, reg: Registry, report: Report) -> None:
+    """Secret d'une quête (R16): un seul joueur sait, l'autre agit."""
+    secret = quest.get("secret")
+    if secret is None:
+        return
+    ws = f"{w}.secret"
+    reg.secret_quests.add(str(quest.get("id")))
+    check_id(secret.get("id"), ws, report)
+    if secret.get("informed") not in {"turn"} | MOMENT_PLAYERS:
+        report.error(ws, f"« informed » inconnu {secret.get('informed')!r} (turn, p1 ou p2)")
+    check_id(secret.get("variantGroup"), ws, report)
+    of = secret.get("of")
+    if not isinstance(of, int) or isinstance(of, bool) or of < 1:
+        report.error(ws, f"« of » entier positif attendu, pas {of!r}")
+        of = 1
+    card = secret.get("card", {})
+    if not isinstance(card.get("title"), str) or not card.get("title"):
+        report.error(ws, "« card.title » manquant")
+    lines = card.get("lines")
+    if not isinstance(lines, list) or not lines:
+        report.error(ws, "« card.lines » liste non vide attendue")
+    elif any(isinstance(line, list) for line in lines):
+        if len(lines) != of or not all(isinstance(line, list) and all(isinstance(x, str) for x in line) for line in lines):
+            report.error(ws, f"« card.lines »: une liste de textes par variante attendue ({of})")
+    elif not all(isinstance(line, str) for line in lines):
+        report.error(ws, "« card.lines »: textes attendus")
+    if "revealOn" in secret:
+        check_condition(secret["revealOn"], f"{ws}.revealOn", reg, report)
+    if "nudge" in secret:
+        ref("text", secret["nudge"], ws, reg, report)
+
+
+def check_secret_texts(data: dict[str, Any], report: Report) -> None:
+    """`{secret}` n'est permis que dans un texte vu par l'informé seul (objectif de son rôle)."""
+
+    def visit(node: Any, where: str) -> None:
+        if isinstance(node, str):
+            if "{secret}" in node and not where.endswith("objectiveByRole.informed"):
+                report.error(where, "{secret} hors d'un texte de l'informé (objectiveByRole.informed)")
+        elif isinstance(node, dict):
+            for key, value in node.items():
+                visit(value, f"{where}.{key}")
+        elif isinstance(node, list):
+            for i, value in enumerate(node):
+                visit(value, f"{where}[{i}]")
+
+    for name, content in data.items():
+        visit(content, name)
+
+
+def check_moments(folder: Path, reg: Registry, report: Report, map_objects: set[str] | None) -> dict[str, Any] | None:
+    """Moments rares (`moments.json`, tour 6): schéma, renvois, images clés, modèles et sons attendus (M-01)."""
+    path = folder / "moments.json"
+    if not path.exists():
+        report.warn("moments.json", "fichier absent: aucun moment rare dans le jeu")
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        report.error("moments.json", f"JSON invalide ({exc})")
+        return None
+    if data.get("version") != 1:
+        report.error("moments.json", "« version » doit valoir 1")
+    root = folder.parent
+    models: set[str] | None = None
+    sounds: set[str] | None = None
+    try:
+        models = set(json.loads((root / "assets" / "modeles" / "index.json").read_text(encoding="utf-8")))
+    except (OSError, json.JSONDecodeError):
+        report.warn("moments.json", "assets/modeles/index.json illisible: modèles non vérifiés")
+    try:
+        sounds = set(json.loads((root / "assets" / "son" / "sons.json").read_text(encoding="utf-8")).get("sounds", {}))
+    except (OSError, json.JSONDecodeError):
+        report.warn("moments.json", "assets/son/sons.json illisible: sons non vérifiés")
+    for m in data.get("moments", []):
+        register(reg.moments, m.get("id"), "moments.moments", report)
+    missing_models: dict[str, str] = {}
+    missing_sounds: dict[str, str] = {}
+
+    def sound(name: Any, where: str) -> None:
+        if isinstance(name, str) and sounds is not None and name not in sounds and name.replace("_", "-") not in sounds:
+            missing_sounds.setdefault(name, where)
+
+    def time_of(value: Any, where: str) -> int:
+        check_time(value, where, report)
+        if isinstance(value, str) and TIME_RE.match(value):
+            h, mi = value.split(":")
+            return int(h) * 60 + int(mi)
+        return 0
+
+    def watch(wt: Any, where: str, actors: set[str]) -> None:
+        if not isinstance(wt, dict):
+            report.error(where, "objet attendu")
+            return
+        for key in ("radius", "holdSeconds"):
+            if not isinstance(wt.get(key), (int, float)) or wt[key] <= 0:
+                report.error(where, f"« {key} » positif attendu")
+        if wt.get("minRadius", 0) > wt.get("radius", 0):
+            report.error(where, "« minRadius » plus grand que « radius »")
+        if wt.get("seated") and not wt.get("bench"):
+            report.error(where, "« seated » sans « bench »")
+        if wt.get("bench") and map_objects is not None and wt["bench"] not in map_objects:
+            report.error(where, f"banc {wt['bench']!r} absent des objets de la carte")
+        for place in wt.get("hold") or []:
+            ref("point", place, where, reg, report)
+        target = wt.get("target", "anchor")
+        if target != "anchor" and target not in actors:
+            report.error(where, f"cible {target!r}: ni « anchor » ni un acteur")
+
+    def choreo(c: Any, where: str, actors: set[str]) -> None:
+        if c is None:
+            return
+        seconds = c.get("seconds")
+        if not isinstance(seconds, (int, float)) or seconds <= 0:
+            report.error(where, "« seconds » positif attendu")
+            seconds = 0
+        for actor, frames in c.get("keyframes", {}).items():
+            if actor not in actors:
+                report.error(where, f"images clés d'un acteur inconnu {actor!r}")
+            last = -1.0
+            for i, f in enumerate(frames):
+                wf = f"{where}.keyframes.{actor}[{i}]"
+                if not isinstance(f, list) or len(f) != 5:
+                    report.error(wf, "image clé [t, x, y, z, clip] attendue")
+                    continue
+                t, x, y, z, clip = f
+                if not isinstance(t, (int, float)) or t < last or t > seconds + 1e-9:
+                    report.error(wf, f"temps {t!r} hors de l'ordre ou de la durée ({seconds} s)")
+                else:
+                    last = t
+                for v in (x, y):
+                    if v is not None and not isinstance(v, (int, float)):
+                        report.error(wf, "x et y: nombres ou null")
+                if not isinstance(z, (int, float)):
+                    report.error(wf, "z: nombre attendu")
+                if clip is not None and not isinstance(clip, str):
+                    report.error(wf, "clip: texte ou null")
+        for i, s in enumerate(c.get("sounds", [])):
+            if not isinstance(s, list) or len(s) != 2 or not isinstance(s[0], (int, float)) or s[0] > seconds + 1e-9:
+                report.error(f"{where}.sounds[{i}]", "[t, son] attendu, t dans la durée")
+            else:
+                sound(s[1], f"{where}.sounds[{i}]")
+        for v in c.get("lookers", []):
+            ref("villager", v, where, reg, report)
+
+    for m in data.get("moments", []):
+        mid = m.get("id")
+        w = f"moments.{mid}"
+        if m.get("tier") not in TIERS:
+            report.error(w, f"tier inconnu {m.get('tier')!r}")
+        if m.get("mode") not in MOMENT_MODES:
+            report.error(w, f"« mode » inconnu {m.get('mode')!r}")
+        quest = m.get("quest")
+        if m.get("mode") in ("quest", "both"):
+            ref("quest", quest, w, reg, report)
+        step = m.get("questStep")
+        if step is not None and step not in reg.quests.get(quest, set()):
+            report.error(w, f"étape {step!r} inconnue de la quête {quest!r}")
+        ref("point", m.get("anchor"), w, reg, report)
+        if not isinstance(m.get("weight"), int) or m["weight"] < 0:
+            report.error(w, "« weight » entier positif ou nul attendu")
+        mx = m.get("maxPerSeason")
+        if mx is not None and (not isinstance(mx, int) or mx < 1):
+            report.error(w, "« maxPerSeason » entier positif ou null attendu")
+        check_conditions(m.get("availableWhen", []), f"{w}.availableWhen", reg, report)
+        pf, pt = time_of(m.get("present", {}).get("from"), f"{w}.present"), time_of(m.get("present", {}).get("to"), f"{w}.present")
+        wf, wt_ = time_of(m.get("window", {}).get("from"), f"{w}.window"), time_of(m.get("window", {}).get("to"), f"{w}.window")
+        if not pf <= wf < wt_ <= pt:
+            report.error(w, "fenêtre de l'apogée hors de la présence (window incluse dans present)")
+        actors = set()
+        for i, a in enumerate(m.get("actors", [])):
+            wa = f"{w}.actors[{i}]"
+            register(actors, a.get("id"), wa, report)
+            ref("point", a.get("at"), wa, reg, report)
+            model = a.get("model")
+            if a.get("villager") is not None:
+                ref("villager", a["villager"], wa, reg, report)
+            elif isinstance(model, str) and models is not None and model not in models:
+                missing_models.setdefault(model, wa)
+            count = a.get("count", 1)
+            if count > 1 and len(a.get("offsets", [])) != count:
+                report.error(wa, f"un décalage par membre du groupe attendu ({count})")
+            choreo(a.get("arrive"), f"{wa}.arrive", actors | {a.get("id")})
+        watch(m.get("watch"), f"{w}.watch", actors)
+        if m.get("questWatch") is not None:
+            watch(m["questWatch"], f"{w}.questWatch", actors)
+        choreo(m.get("climax"), f"{w}.climax", actors)
+        choreo(m.get("leave"), f"{w}.leave", actors)
+        for aid, spec in (m.get("after") or {}).get("actors", {}).items():
+            if aid not in actors:
+                report.error(f"{w}.after", f"acteur inconnu {aid!r}")
+            if spec.get("at") is not None:
+                ref("point", spec["at"], f"{w}.after", reg, report)
+        for s in m.get("sounds", {}).get("idle", []):
+            sound(s.get("id"), f"{w}.sounds.idle")
+        texts = m.get("texts", {})
+        for key in ("climax", "memory"):
+            ref("text", texts.get(key), f"{w}.texts", reg, report)
+        if texts.get("hint") is not None:
+            ref("text", texts["hint"], f"{w}.texts", reg, report)
+        if m.get("hintFrom") is not None:
+            ref("villager", m["hintFrom"], w, reg, report)
+        if not isinstance(m.get("reward", {}).get("heart"), (int, float)):
+            report.error(w, "« reward.heart » attendu")
+        check_effects(m.get("effects", []), f"{w}.effects", reg, report)
+    # Les modèles et les sons arrivent de l'artiste 3D et du sound-designer: avertissement tant qu'ils manquent.
+    if missing_models:
+        report.warn("moments.json", "modèles pas encore livrés (M-01): " + ", ".join(sorted(missing_models)))
+    if missing_sounds:
+        report.warn("moments.json", "sons pas encore livrés (M-01): " + ", ".join(sorted(missing_sounds)))
+    return data
+
+
+def map_objects(folder: Path) -> set[str] | None:
+    maps = sorted((folder / "cartes").glob("*.json")) if (folder / "cartes").is_dir() else []
+    found: set[str] = set()
+    for path in maps:
+        try:
+            carte = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        found.update(o.get("id") for o in carte.get("objets", []) if isinstance(o, dict))
+    return found if maps else None
 
 
 def check_courrier(data: dict[str, Any], reg: Registry, report: Report) -> None:
@@ -739,6 +1006,10 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
         reg.flags_set.add(fishing_flag)
     # Drapeaux posés par le moteur lui-même (geste à deux de la draisine arrivé au bout).
     reg.flags_set.update(ENGINE_FLAGS)
+    # Posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms (migration du format 3).
+    known_hens = settings.get("secrets", {}).get("knownHensFlag")
+    if known_hens:
+        reg.flags_set.add(known_hens)
     for fish_id, weight in settings.get("feel", {}).get("fishWeights", {}).items():
         ref("item", fish_id, "reglages.feel.fishWeights", reg, report)
         if fish_id in reg.items and reg.items[fish_id].get("category") != "fish":
@@ -796,6 +1067,16 @@ def main() -> int:
     check_astuces(data, reg, report)
     check_envies(data, reg, report)
     check_textes_reglages(data, reg, report)
+    moments = check_moments(folder, reg, report, map_objects(folder))
+    for moment, where in reg.moments_seen:
+        if moment not in reg.moments:
+            report.error(where, f"moment inconnu {moment!r}")
+    for quest, where in reg.secret_role_uses:
+        if quest not in reg.secret_quests:
+            report.error(where, f"secret_role: la quête {quest!r} n'a pas de secret")
+    check_secret_texts(data, report)
+    if moments is not None:
+        data = {**data, "moments": moments}
     for name, content in data.items():
         walk_strings(content, name, report)
     readme = folder / "README.md"

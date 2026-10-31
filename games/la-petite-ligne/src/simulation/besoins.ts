@@ -54,6 +54,9 @@ function heartOf(sim: Sim, c: Character): number {
   if (c.heartToday.sharedEnvie) value += h.sharedEnvie;
   if (c.heartToday.ateTogether) value += h.ateTogether;
   if (c.heartToday.gesture) value += h.gestureTogether;
+  // Moment rare vu à deux, quête secrète réussie du premier coup (tour 6).
+  if (c.heartToday.moment === true) value += sim.content.settings.moments.heartBonus;
+  if (c.heartToday.firstTry === true) value += sim.content.settings.secrets.firstTryHeart;
   return Math.min(h.max, value);
 }
 

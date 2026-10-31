@@ -22,6 +22,8 @@ import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } f
 import { placeFurniture } from './amenagement';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
+import { holdPlaceNear, takeHold } from './moments';
+import { callableHen, callHen } from './secrets';
 
 /** Ce sur quoi on peut agir. */
 export type Target =
@@ -37,7 +39,11 @@ export type Target =
   | { kind: 'partner'; pos: Vec2 }
   | { kind: 'place'; pos: Vec2 }
   /** Place libre d'un banc: `pos` au milieu de l'assise, `stand` devant (où l'on va avant de s'asseoir). */
-  | { kind: 'bench'; bench: string; slot: number; pos: Vec2; stand: Vec2 };
+  | { kind: 'bench'; bench: string; slot: number; pos: Vec2; stand: Vec2 }
+  /** Place de l'échelle de Basile (geste « tenir »); `taken`: l'autre la tient déjà. */
+  | { kind: 'hold'; point: string; taken: boolean; pos: Vec2 }
+  /** Une poule à appeler par son nom (« Les noms des poules »). */
+  | { kind: 'hen'; id: string; pos: Vec2 };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
@@ -103,6 +109,10 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return held !== null && heldDef?.category !== 'tool' ? 'give' : null;
     case 'place':
       return 'place';
+    case 'hold':
+      return t.taken ? null : 'hold';
+    case 'hen':
+      return 'call';
     case 'bench': {
       const prop = benchById(sim.map, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
@@ -129,7 +139,11 @@ function gardenVerb(sim: Sim, g: GardenCell, held: string | null): AimVerb | nul
 
 /** Ordre de préférence quand plusieurs cibles sont devant soi. */
 const TIER: Record<Target['kind'], number> = {
+  // Pendant l'étape de l'échelle, Basile se tient juste entre les deux places: tenir passe avant lui.
+  hold: -1,
   villager: 0,
+  // Pendant la quête des noms seulement (avant la mangeoire et la porte du poulailler).
+  hen: 3,
   ground_item: 1,
   beam: 2,
   place: 3,
@@ -235,6 +249,10 @@ export function candidates(sim: Sim, c: Character): Target[] {
   }
   const other = character(sim, partnerOf(c.id));
   if (other.created && distance(c.pos, other.pos) <= reach) out.push({ kind: 'partner', pos: other.pos });
+  const hold = holdPlaceNear(sim, c);
+  if (hold !== null) out.push({ kind: 'hold', point: hold.point, taken: hold.taken, pos: point(sim, hold.point) });
+  const hen = callableHen(sim, c);
+  if (hen !== null) out.push({ kind: 'hen', id: hen.id, pos: hen.pos });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
@@ -247,7 +265,8 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
   let best: { target: Target; verb: AimVerb | null; tier: number; d: number } | null = null;
   for (const t of candidates(sim, c)) {
     // Un chantier se vise comme le reste, dans le regard (son point peut être derrière soi).
-    if (t.kind !== 'cell' && t.kind !== 'place' && !inCone(c, t.pos)) continue;
+    // Une place de l'échelle à portée se prend sans viser: on y est déjà presque.
+    if (t.kind !== 'cell' && t.kind !== 'place' && t.kind !== 'hold' && !inCone(c, t.pos)) continue;
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
     if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
@@ -396,6 +415,14 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'give':
       giveHeld(sim, c);
       return;
+    case 'hold':
+      if (t.kind === 'hold') takeHold(sim, c, t.point);
+      return;
+    case 'call': {
+      const hen = t.kind === 'hen' ? sim.world.hens.find((h) => h.id === t.id) : undefined;
+      if (hen !== undefined) callHen(sim, c, hen);
+      return;
+    }
     case 'chop': {
       const tree = t.kind === 'tree' ? sim.world.trees.find((x) => x.id === t.id) : undefined;
       if (tree !== undefined) chop(sim, c, tree);
@@ -432,6 +459,12 @@ export function actFront(sim: Sim, c: Character): void {
   const best = bestTarget(sim, c);
   if (best !== null && best.verb !== null) {
     perform(sim, c, best.target, best.verb);
+    return;
+  }
+  // Près de la place que l'autre tient déjà: prendre l'autre côté.
+  const hold = holdPlaceNear(sim, c);
+  if (hold?.taken === true) {
+    takeHold(sim, c, hold.point);
     return;
   }
   // Près d'un banc plein, Espace dit pourquoi on ne s'assoit pas (aucune touche morte).

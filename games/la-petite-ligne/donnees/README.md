@@ -34,6 +34,9 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `{recipe}`, `{envie}`, `{quest}`, `{title}`, `{construction}` | nom d'une recette, texte d'une envie, titre d'une quête, titre d'une lettre, nom d'une construction |
 | `{weekday}`, `{day}`, `{hours}`, `{minutes}`, `{days}`, `{furniture}` | jour de la semaine (`textes.weekdays`), numéro du jour, heure, journées vécues, meubles posés |
 | `{move}`, `{act}`, `{examine}`, `{notebook}` | libellés réels des touches des actions Se déplacer, Agir, Examiner, Carnet, selon le clavier du joueur |
+| `{henColor1}`, `{henColor2}`, `{henColor3}` | couleur de la première, deuxième, troisième poule (ordre de leurs noms: Bichette, Cocotte, la Duchesse), d'après `textes.henColors` (« la blanche »...) |
+| `{henName}`, `{henUnknown}` | nom d'une poule; la poule pour qui ne connaît pas encore son nom (`textes.henUnknown`, « la poule blanche »). Aucun texte ne commence par `{henName}` (« la Duchesse ») |
+| `{secret}` | la ligne du secret de la quête, pour la variante tirée; permise seulement dans `objectiveByRole.informed` (le validateur refuse ailleurs) |
 
 ## 2. Fichiers
 
@@ -48,6 +51,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `envies.json` | les envies du jour, personnelles et à deux |
 | `textes.json` | forme du matin, messages, interface du jeu, écran de nuit, écran de fin |
 | `reglages.json` | toutes les valeurs de réglage de la démo |
+| `moments.json` | les moments rares (tour 6): bêtes et gestes qui se jouent quand les deux joueurs regardent ensemble (section 2.10) |
 
 ### 2.1 `objets.json`
 
@@ -213,8 +217,16 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 | `absence`, `autosave`, `fishing` | P1: horloge arrêtée en cas d'absence, sauvegarde, pêche (le drapeau `fishing_enabled` est posé quand la pêche est activée) |
 | `benches` | bancs de la carte: places le long du banc (`slots`, m depuis son milieu, deux par banc: jamais deux corps sur la même), avancée de l'assise (`seatForward`), lever devant la place (`standForward`), Espace à moins de `sitRange` m d'une place libre fait s'asseoir, un habitant arrêté à `villagerReach` m du banc y tient une place; valeurs par défaut dans `src/donnees/defauts.ts` |
 | `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
+| `moments` | moments rares (section 2.10): `dailyChance` (0,5), `maxPerDay`, `cooldownDays` (7), `firstAmbientDay`, `noAmbientOnTrainDays`, `stillSpeed` (m/s sous laquelle on est immobile), `noticeRadius` (« Montre-le à {partner} ! »), `heartBonus` (Cœur à l'apogée, une fois par jour), `musicDuckDb` et ses durées, `firstHint` (premier destinataire d'une confidence, `p2`), `maxSyncGapSeconds`, `holdRange` (portée du geste « tenir »), `tiers` (niveaux tirés, `["P0"]`) |
+| `secrets` | informations propres (R16): `firstInformed` (`p1`), `nudgeAfterErrors` (coup de coude à l'informé), `firstTryHeart`, `henChoiceRange` (portée de l'appel d'une poule), `henChoiceKeepOpen` (le choix reste ouvert tant que la poule est à moins de tant), `hideFromGuestSnapshot` (P1, pas encore lu), `knownHensFlag` (drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms) |
 
 Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 sous, la commande 2 990 sous.
+
+### 2.10 `moments.json` (tour 6)
+
+`moments[]`, dans l'ordre du tirage (le premier admissible passe d'abord à égalité de tirage): `id`, `tier`, `name`, `mode` (`quest`, `ambient`, `both`), `quest` et `questStep` (quête qui l'impose, et l'étape pendant laquelle l'apogée peut partir), `anchor` (point de carte), `weight` (poids au tirage, 0: jamais tiré), `maxPerSeason`, `availableWhen` (conditions évaluées à 6 h), `present` et `window` (`{ from, to }`: présence à l'écran, fenêtre de l'apogée, incluse), `watch` et `questWatch` (`radius`, `minRadius` en m, `holdSeconds` en secondes réelles d'affilée, `still`, `facing`, `seated` et `bench` (objet banc de la carte), `hold` (points à tenir), `target`: `anchor` ou un acteur qui bouge), `actors[]` (`id`, `model`, `count`, `offsets`, `at`, `facing`, `idle`, `idleExtra`, `arrive`, `collisionRadius`, `shy`, `villager` pour un habitant joué par le moment), `climax` (`seconds`, `keyframes` par acteur `[t, x, y, z, clip]`, `null` en x ou y: position courante, `fadeLastSeconds`, `sounds` `[t, son]`, `lookers`, `pauseWhenReleased` et `pauseBefore` pour l'échelle, `formation` des oies), `after` (`actors`: où se tient chaque acteur après l'apogée et ce qu'il joue; `at` et `idle` à `null`: parti; `after` à `null`: l'attente reprend), `leave` (départ discret sans apogée), `sounds.idle`, `texts` (`hint`, `climax`, `memory`: clés de `textes.messages`), `hintFrom` (habitant que le destinataire de la confidence doit avoir rencontré), `reward` (`heart`, `money`), `effects` (à l'apogée), `render` (valeurs propres au rendu, lues telles quelles).
+
+Règles (conception du tour 6, section 1.2): chaque matin, le moment d'une quête active ou qui démarre ce jour-là, sinon un tirage (`moments.dailyChance`) parmi les moments admissibles au prorata de `weight`, par empreinte de la graine et du jour (le générateur de la partie n'est pas touché); jamais deux fois le même moment en `moments.cooldownDays` jours; l'apogée part quand les deux joueurs remplissent `watch` sans interruption pendant `holdSeconds`, dehors, hors menu et conversation. Une confidence (`texts.hint`) va au petit-déjeuner d'un seul joueur, en alternance.
 
 ## 3. Conditions
 
@@ -259,6 +271,10 @@ Paramètres communs des conditions qui comptent:
 | `witnessed` | `event` (`train_arrival`, `train_departure`), `who` | le joueur était à moins de `ranges.witness` du train à ce moment-là |
 | `nights_passed` | `count` | nuits passées depuis le démarrage de l'étape |
 | `recipe_known` | `recipe` | la recette est débloquée |
+| `moment_seen` | `moment`, `since` (défaut `step_start`) | l'apogée de ce moment a eu lieu depuis `since` |
+| `secret_role` | `quest`, `role` (`informed` ou `doer`) | le joueur concerné (celui qui parle) a ce rôle dans le secret de cette quête: dialogues réservés à un rôle |
+| `hens_named` | `count`, `who` | autant de poules différentes appelées par leur bon nom (par `doer`, l'autre, dans la quête des noms) |
+| `choice_made` | `dialogue`, `choice` ou `correct: true` (facultatifs), `who`, `since` | le joueur a fait ce choix (ou un choix juste) dans ce dialogue personnel |
 | `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande du prochain train); après le départ de ce train (`pay_order`), garde la réponse du moment du départ. Les données écrivent toujours `day` |
 
 ## 4. Effets
@@ -282,6 +298,16 @@ Paramètres communs des conditions qui comptent:
 | `pay_order` | | paie la commande et vide la caisse (section 2.9) |
 | `end_demo` | | affiche l'écran de fin (`textes.endScreen`) et clôt la séance |
 | `if` | `condition`, `then`, `else` | applique `then` si la condition est vraie, sinon `else` |
+| `reveal_secret` | `quest` | le secret de la quête devient visible des deux joueurs (fin d'une quête secrète: les noms des poules chez les deux) |
+
+`give_item` accepte aussi `to: "informed"` et `to: "doer"` (le rôle dans le secret de la quête en cours); `spawn_animals` accepte `shuffleVariantsBy` (groupe de variante: qui porte quelle couleur suit la permutation tirée par la graine, `hen_names`). Dans les conditions qui comptent, `who` accepte `"informed"` et `"doer"` dans une quête à secret; `looked_at` accepte `minDistance` (m) et `still` (immobile).
+
+### 4.1 Quêtes à secret (R16) et choix justes
+
+- Quête: champ `secret` facultatif, `{ id, informed: "turn" | "p1" | "p2", variantGroup, of, card: { title, lines }, revealOn?, nudge? }`. Au démarrage, l'informé est le joueur dont c'est le tour (`turn`, d'abord `reglages.secrets.firstInformed`), puis le tour passe à l'autre. `card.lines`: une liste de textes, ou une liste par variante; la fiche n'apparaît au carnet de l'informé qu'une fois `revealOn` vraie. `nudge`: message soufflé une fois à l'informé après `secrets.nudgeAfterErrors` erreurs de l'autre.
+- Étape: `objectiveByRole: { informed, doer }` facultatif (l'objectif vu par chaque rôle; `objective` reste le texte par défaut).
+- Choix d'un dialogue personnel: `correct` (une condition, souvent `variant`), `reply` (si juste), `replyWrong` (sinon), `effects`, `effectsWrong`. Une mauvaise réponse ne coûte rien: on peut rejouer le dialogue aussitôt (il échappe à la règle « une fois par jour » des rappels). Réussie sans aucune erreur, la quête donne `secrets.firstTryHeart` de Cœur à chacun.
+- Appeler une poule par son nom: pendant une étape à condition `hens_named`, Agir près d'une poule ouvre chez l'autre seul « Comment s'appelle {henUnknown} ? » (`hen_call_question`), les trois noms et « Laisser » (`hen_call_leave`). L'informé qui appelle entend `hen_names_informed_call`.
 
 Les effets d'une liste s'appliquent dans l'ordre, sur la machine hôte qui fait autorité; leurs résultats sont envoyés aux deux joueurs.
 
@@ -312,6 +338,8 @@ Les données renvoient à ces points et zones nommés. Le level designer les cr�
 | `forest_edge` | zone | la lisière et ses 12 arbres |
 | `riverbank` | point | la berge, Jeanne l'après-midi, les envies de la rivière |
 | `river_ford` | point | le gué: pêche (P1) et astuce de la pêche |
+
+Moments rares (`moments.json`, `actors[].at`, `after`, `watch.hold`) et quêtes du tour 6: `heron_stand`, `heron_rest_far`, `geese_rest`, `nest_box`, `ladder_foot`, `ladder_hold_north`, `ladder_hold_south`, `nest_oak_basile` (Basile au chêne pendant « Où est passé Basile ? »), `fox_track_west`, `fox_mousing`, `meadow_glow`; en P1, `roe_deer_edge`, `roe_deer_graze`, `kingfisher_post`, `notebook_spot_pontoon`, `notebook_spot_bench`, `notebook_spot_rock`. Les petits objets accrochés (nichoir, chicot, pieu) sont dans `accroches` de la carte.
 
 Points aussi nécessaires au code, sans renvoi dans ces données: `well` (puits, remplir l'arrosoir), `water_barrel` (tonneau de la maisonnette), `notice_board` (tableau: commande, catalogue, courrier), `handcar_shed` (remise de la draisine), `house_interior` (zone: la pièce, pour la veillée et l'aménagement).
 

@@ -168,10 +168,66 @@
         }
       ],
       "completionEffects": [
-        { "type": "spawn_animals", "animal": "hen", "count": 3, "names": ["Bichette", "Cocotte", "la Duchesse"], "point": "chicken_coop" },
+        { "type": "spawn_animals", "animal": "hen", "count": 3, "names": ["Bichette", "Cocotte", "la Duchesse"], "point": "chicken_coop", "shuffleVariantsBy": "hen_names" },
         { "type": "set_flag", "flag": "eggs_enabled" }
       ],
       "completionText": "Trois poules, et des œufs chaque matin."
+    },
+    {
+      "id": "hen_names",
+      "kind": "side",
+      "tier": "P0",
+      "title": "Les noms des poules",
+      "giver": "odette",
+      "start": {
+        "when": [
+          { "type": "quest_done", "quest": "hens" },
+          { "type": "day_at_least", "day": 5 },
+          { "type": "time_is", "from": "07:00", "to": "19:00" },
+          { "type": "not", "condition": { "type": "flag", "flag": "hen_names_known" } }
+        ]
+      },
+      "secret": {
+        "id": "hen_names",
+        "informed": "turn",
+        "variantGroup": "hen_names",
+        "of": 6,
+        "card": {
+          "title": "Les poules d'Odette",
+          "lines": [
+            "Bichette, c'est {henColor1}: elle pond la première.",
+            "Cocotte, c'est {henColor2}: elle se dispute avec tout le monde.",
+            "La Duchesse, c'est {henColor3}: elle se prend pour une reine."
+          ]
+        },
+        "revealOn": { "type": "dialogue_done", "dialogue": "odette_hen_names_tell" },
+        "nudge": "secret_nudge_hens"
+      },
+      "steps": [
+        {
+          "id": "listen",
+          "objective": "Odette veut présenter les poules.",
+          "objectiveByRole": {
+            "informed": "Odette a une confidence pour toi, au comptoir.",
+            "doer": "Odette a une confidence pour {partner}, au comptoir."
+          },
+          "conditions": [{ "type": "dialogue_done", "dialogue": "odette_hen_names_tell" }]
+        },
+        {
+          "id": "call",
+          "objective": "Appeler les trois poules par leur nom.",
+          "objectiveByRole": {
+            "informed": "Leurs noms, il n'y a que toi qui les connais. Dis-les à {partner}: c'est sa voix qu'elles doivent apprendre.",
+            "doer": "Appelle chaque poule par son nom ({act} près d'une poule). Les noms, c'est {partner} qui les connaît."
+          },
+          "conditions": [{ "type": "hens_named", "count": 3, "who": "doer", "label": "3 poules" }]
+        }
+      ],
+      "completionEffects": [
+        { "type": "reveal_secret", "quest": "hen_names" },
+        { "type": "give_money", "amount": 15 }
+      ],
+      "completionText": "Bichette, Cocotte et la Duchesse répondent à leur nom. 15 sous d'Odette."
     },
     {
       "id": "planks",
@@ -396,9 +452,8 @@
       "steps": [
         {
           "id": "watch",
-          "objective": "Regarder à deux le héron du gué, sans bruit, l'après-midi entre 14 h et 19 h.",
-          "conditions": [{ "type": "looked_at", "point": "river_ford", "distance": 8, "who": "both" }, { "type": "time_is", "from": "14:00", "to": "19:00" }],
-          "effects": [{ "type": "show_text", "text": "heron_seen" }]
+          "objective": "Regarder le héron du gué à deux, sans bouger, entre 14 h et 19 h.",
+          "conditions": [{ "type": "moment_seen", "moment": "heron" }]
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
@@ -419,11 +474,11 @@
         },
         {
           "id": "help",
-          "objective": "Tenir l'échelle de Basile à deux, au bord du bois.",
-          "conditions": [{ "type": "stayed_at", "point": "forage_edge_03", "seconds": 8, "who": "both" }]
+          "objective": "Tenir à deux l'échelle de Basile, de part et d'autre, au grand chêne près de la remise.",
+          "conditions": [{ "type": "moment_seen", "moment": "ladder" }]
         }
       ],
-      "completionEffects": [{ "type": "give_money", "amount": 30 }],
+      "completionEffects": [{ "type": "set_flag", "flag": "nest_box_straight" }, { "type": "give_money", "amount": 30 }],
       "completionText": "Le nichoir est droit. 30 sous de Basile."
     },
     {
@@ -436,9 +491,8 @@
       "steps": [
         {
           "id": "watch",
-          "objective": "S'asseoir à deux sur le banc du quai entre 17 h et 18 h 30, et lever les yeux.",
-          "conditions": [{ "type": "stayed_at", "point": "quay_bench", "seconds": 10, "who": "both", "seated": true }, { "type": "time_is", "from": "17:00", "to": "18:30" }],
-          "effects": [{ "type": "show_text", "text": "geese_seen" }]
+          "objective": "S'asseoir à deux sur le banc de la berge entre 16 h 30 et 18 h 30, et regarder les oies.",
+          "conditions": [{ "type": "moment_seen", "moment": "geese" }]
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
@@ -624,17 +678,63 @@
       "tier": "P0",
       "title": "Le mot de Lucie",
       "giver": "jeanne",
-      "start": { "when": [{ "type": "dialogue_done", "dialogue": "jeanne_lucie_ask" }] },
+      "start": {
+        "when": [
+          { "type": "day_at_least", "day": 11 },
+          { "type": "dialogue_done", "dialogue": "jeanne_meeting" },
+          { "type": "time_is", "from": "08:00", "to": "20:00" }
+        ]
+      },
+      "secret": {
+        "id": "lucie_reply",
+        "informed": "turn",
+        "variantGroup": "lucie_reply",
+        "of": 3,
+        "card": {
+          "title": "La réponse de Firmin",
+          "lines": [
+            ["Samedi, au train, il mettra sa casquette du dimanche."],
+            ["Il reste une place sur le banc du quai, à côté de la sienne."],
+            ["Les jonquilles du quai, c'est lui qui les a plantées. Pour elle."]
+          ]
+        },
+        "revealOn": {
+          "type": "any",
+          "conditions": [
+            { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_0" },
+            { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_1" },
+            { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_2" }
+          ]
+        },
+        "nudge": "secret_nudge_lucie"
+      },
       "steps": [
+        {
+          "id": "receive",
+          "objective": "Jeanne a quelque chose à confier.",
+          "objectiveByRole": {
+            "informed": "Jeanne a quelque chose à te confier.",
+            "doer": "Jeanne a quelque chose à confier à {partner}."
+          },
+          "conditions": [{ "type": "dialogue_done", "dialogue": "jeanne_lucie_ask" }]
+        },
         {
           "id": "give",
           "objective": "Porter la lettre de Lucie à Firmin.",
+          "objectiveByRole": {
+            "informed": "Porte la lettre de Lucie à Firmin, sur le quai.",
+            "doer": "{partner} porte une lettre de Lucie à Firmin. Jeanne voudra savoir la réponse: c'est toi qui la lui diras."
+          },
           "conditions": [{ "type": "given", "villager": "firmin", "item": "lucie_letter", "count": 1 }]
         },
         {
           "id": "tell_jeanne",
-          "objective": "Raconter à Jeanne comment Firmin l'a prise.",
-          "conditions": [{ "type": "dialogue_done", "dialogue": "jeanne_lucie_done" }]
+          "objective": "Raconter à Jeanne ce que Firmin a répondu.",
+          "objectiveByRole": {
+            "informed": "Firmin a répondu: « {secret} » Raconte-le à {partner}: c'est {partner} qui le dira à Jeanne.",
+            "doer": "Demande à {partner} ce que Firmin a répondu, puis va le dire à Jeanne."
+          },
+          "conditions": [{ "type": "choice_made", "dialogue": "jeanne_lucie_quiz", "correct": true, "who": "doer" }]
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],

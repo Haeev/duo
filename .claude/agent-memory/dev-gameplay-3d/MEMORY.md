@@ -111,3 +111,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Habitants et bancs (La Petite Ligne): le point d'emploi du temps d'un banc est au milieu de son emprise (infranchissable). Un habitant ne va jamais au point lui-même: il va à `villagerRestSpot` (devant la place, comme `standPlace`) et n'est dessiné assis qu'arrêté exactement là (`BenchSeating`, écart de 1 cm). Une tolérance plus large le fait clignoter assis/debout quand un joueur lui parle juste avant l'arrivée (il s'arrête, `speed` 0). Les trajets des habitants ne sont pas sauvegardés: après une reprise, `updateVillagers` les recalcule.
 - `findPath` vers un point déjà atteint renvoie un pas de longueur nulle: l'habitant passe une image à `speed > 0` (dessiné debout). Ne pas tracer de chemin quand on est déjà rendu.
 - Le soleil du soir de `DaylightRig` (17 h 30) a une hauteur d'environ 24°: une ombre de 1,7 m fait 3,8 m vers l'est. Sonde rapide: un test Vitest jetable qui écrit `rig.direction` dans un fichier, puis un calcul de rayons en Python.
+
+## Moments rares et secrets (La Petite Ligne, vérifié le 2026-10-31, tour 6)
+
+- Tout nouveau type de `WorldEvent` casse le lint (`switch-exhaustiveness-check`) de `src/audio/declencheurs.ts`: y ajouter les cas, même sans son.
+- Les JSON de `donnees/` ne sont pas au format de `json.dumps(indent=2)`: les retoucher par remplacement de texte exact (script `rep.py` du scratchpad: paires ancien/nouveau, échec si l'ancien manque), jamais par relecture et réécriture.
+- Outil Bash isolé: `cd <jeu> && python3 /tmp/<moi>/rep.py <fichier relatif> /dev/stdin <<'EOF' ... EOF` passe; un `python3 - <<EOF` qui ouvre des fichiers du dépôt ou une boucle `for f in ...` est refusé.
+- Un trajet au clic s'arrête au centre d'une case: à 0,5 m d'un point posé hors du centre (les places de l'échelle). Un robot qui doit « être au point » vise une portée (ici `moments.holdRange - 0,2`) et laisse la simulation le placer.
+- Une étape finie par un compteur posé au début d'une chorégraphie (`moment_seen`) rend la quête finie pendant la chorégraphie: ce qui dépend de « l'étape en cours » (tenir l'échelle) ne doit plus l'exiger une fois l'apogée partie.
+- Spline de Catmull-Rom entre deux images clés au même point: léger dépassement (environ 0,1 m) si la suivante s'éloigne; doubler l'image clé ou l'accepter.
+- Tests sur un monde « truqué » (jour 1 avancé à la main): les rencontres passent avant tout dialogue (marquer les `meeting` comme faits), l'emploi du temps d'un habitant le rend invisible au pas suivant (appeler `talkTo`, `dialogueChoice`, `dialogueClose` directement), et la bêche en main vole Espace (verbe `dig`): vider la main (`selected` sur une case vide).

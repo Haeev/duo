@@ -16,6 +16,7 @@ import { placeVillagers } from './habitants';
 import { morningEggs } from './poules';
 import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
+import { morningMoments } from './moments';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
 
@@ -187,6 +188,8 @@ export function morning(sim: Sim): void {
   pickEnvies(sim);
   deliverScheduledLetters(sim);
   placeVillagers(sim);
+  // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
+  morningMoments(sim);
   world.phase = 'breakfast';
   world.clock.running = false;
   world.clock.stoppedBy = 'breakfast';
@@ -216,6 +219,7 @@ export function startGame(sim: Sim): void {
   }
   copyCounters(sim);
   placeVillagers(sim);
+  morningMoments(sim);
   sim.runtime.changed = true;
 }
 

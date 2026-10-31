@@ -326,3 +326,12 @@
   gap: clamp(var(--lpl-space-2), 2.5vh, var(--lpl-space-4));
   padding-block: clamp(var(--lpl-space-3), 4vh, var(--lpl-space-5));
 }
+
+/* Fiche secrète (R16) au carnet, affichage minimal du tour 6: une ligne par phrase, en encre pleine. */
+.lpl-quest__secret {
+  color: var(--lpl-color-ink);
+}
+
+.lpl-quest__secret-line {
+  display: block;
+}

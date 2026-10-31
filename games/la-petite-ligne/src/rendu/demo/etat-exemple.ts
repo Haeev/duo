@@ -191,6 +191,8 @@ export function createExampleWorld(
       prev: { ...at },
       facing: index,
       wander: { ...at },
+      nameKnownBy: [],
+      namedBy: null,
     };
   });
 

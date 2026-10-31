@@ -201,21 +201,16 @@ describe('bancs: envies et quête des oies', () => {
     if (def === undefined) throw new Error('envie bench_together absente');
     return evaluateAll(sim, def.fulfilledWhen, NO_CONTEXT);
   };
-  const geeseWatch = (sim: Sim): boolean => {
-    const step0 = sim.content.quests.find((q) => q.id === 'wild_geese')?.steps[0];
-    if (step0 === undefined) throw new Error('quête wild_geese absente');
-    return evaluateAll(sim, step0.conditions, NO_CONTEXT);
-  };
-
   it('les conditions des données demandent d’être assis (seated)', () => {
     const { content } = contentAndMap();
     const seatedStays = [
       ...(content.envies.find((e) => e.id === 'bench_moment')?.fulfilledWhen ?? []),
       ...(content.envies.find((e) => e.id === 'bench_together')?.fulfilledWhen ?? []),
-      ...(content.quests.find((q) => q.id === 'wild_geese')?.steps[0]?.conditions ?? []),
     ].filter((c) => c.type === 'stayed_at');
-    expect(seatedStays).toHaveLength(3);
+    expect(seatedStays).toHaveLength(2);
     for (const c of seatedStays) expect(c).toMatchObject({ point: BENCH, seated: true });
+    // Les oies (tour 6): un moment rare, les deux assis sur le banc de la berge, face à la rivière.
+    expect(content.moments.find((m) => m.id === 'geese')?.questWatch).toMatchObject({ seated: true, bench: 'riverbank_bench' });
   });
 
   it('« S’asseoir un moment »: debout 12 s à côté du banc ne suffit pas, assis 10 s oui', () => {
@@ -234,7 +229,7 @@ describe('bancs: envies et quête des oies', () => {
     expect(benchMoment(sim)).toBe(false);
   });
 
-  it('« Se retrouver sur le banc » et les oies: les deux assis, 10 s, l’un seul ne suffit pas', () => {
+  it('« Se retrouver sur le banc »: les deux assis, 10 s, l’un seul ne suffit pas', () => {
     const sim = readySim();
     standBefore(sim, 'p1', 0);
     press(sim, 'p1');
@@ -244,11 +239,6 @@ describe('bancs: envies et quête des oies', () => {
     press(sim, 'p2');
     wait(sim, 10.1);
     expect(benchTogether(sim)).toBe(true);
-    // Les oies: même condition, entre 17 h et 18 h 30 seulement.
-    sim.world.clock.minutes = 16 * 60;
-    expect(geeseWatch(sim)).toBe(false);
-    sim.world.clock.minutes = 17 * 60 + 15;
-    expect(geeseWatch(sim)).toBe(true);
   });
 });
 
