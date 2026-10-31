@@ -220,6 +220,8 @@ Ajoutée le 2026-10-31 après la remarque du client sur l'établi (« des poutre
 9. **Rien de provisoire**: pas de texte remplacé par des carrés, pas de pavé à la place d'une forme (queue de poule, grignes de pain), pas de doublon inutile entre deux modèles.
 10. **Au bon endroit, dans le bon sens, à la bonne taille, et pourquoi** (règle du studio « Cohérence du monde et sens du détail »): une barrière de passage à niveau barre la route, une enseigne fait face à la rue ou au quai, une porte donne sur un chemin, un banc regarde ce qu'on contemple, un tuyau de poêle rejoint un conduit, des rails mènent quelque part. Ce qui relève du modèle (orientation de son axe, pièces qui le relient au reste) est à l'artiste 3D; ce qui relève de la carte (position, rotation) est au level designer.
 
+Piège connu: les ombres du moteur Workbench de Blender dessinent de faux traits fins sur les grands murs plats; un trait suspect se confirme avec les ombres coupées, ou dans Cycles ou Three.js, avant d'être signalé.
+
 Outils: le script de rendu d'audit (quatre vues par nœud racine dans Blender, contrôle des îles qui flottent) décrit dans `docs/jeux/jeu-1/gauntlet/revues/audit-modeles.md`.
 
 ## 9. Historique

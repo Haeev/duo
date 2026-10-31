@@ -387,9 +387,9 @@ export const AMBIANCE_SETTINGS = {
      * Hauteur des objets qui reçoivent l'ombre près du bas de l'écran (m): la
      * zone couverte par l'ombre s'étend vers la caméra d'autant.
      */
-    receiverHeight: 3,
+    receiverHeight: 2,
     /** Marge autour de la zone vue (m), et pas d'arrondi de sa taille (pas de scintillement au fil des minutes). */
-    margin: 1.5,
+    margin: 0.75,
     extentStep: 1,
     /** Hauteur des plus hauts objets qui portent une ombre (m), et recul de la lumière. */
     casterHeight: 14,

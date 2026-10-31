@@ -71,6 +71,12 @@ Tenue par le technical artist. Ce que l'ambiance fait en attendant est dit à ch
 
 ## Technical artist
 
+### 2026-10-31, passe d'ombre resserrée
+
+- `lumiere.ts`: profondeur de la caméra d'ombre serrée. Devant les receveurs, seulement la distance d'où un objet peut porter ombre dans la vue (`casterHeight / sin(hauteur du soleil)`, plafonnée à `casterReach` = 11 m le long du rayon); derrière, rien. Cadre latéral plus serré (`receiverHeight` 2 m au lieu de 3, `margin` 0,75 au lieu de 1,5). Test de la cloche et tests du rendu verts.
+- Mesure (`lplRendu.triangleSplit()`, place à 19 h, même scène servie juste avant et juste après): zoom moyen, ombre 82 252 vers 74 984 triangles (-9 %), appels 96 vers 83; zoom large, ombre 84 264 inchangée. Ombres à l'écran identiques (écart moyen 0,2 sur 255). Captures: `docs/jeux/jeu-1/gauntlet/captures/ombre-passe/ombre-z1-avant-apres.png` et `ombre-z2-avant-apres.png`.
+- Limite: au zoom large, tout ce qui porte ombre est déjà à l'écran, et le décor est fusionné par morceaux de 24 m: la caméra d'ombre ne peut plus rien retirer. Demande au dev rendu, au choix: morceaux de décor plus petits pour la passe d'ombre (`terrain.chunkSize`, 12 m), ou `castShadow = false` sur ce qui ne porte pas d'ombre visible (roues et bielles sous les voitures, environ 3 000 triangles; meubles sous le toit de la maisonnette, environ 1 500; poules).
+
 ### 2026-10-31, gauntlet tour 4: fumées, sol continu
 
 - Fumées des cheminées: même bouffée ronde et douce que la vapeur du train (fin des hexagones); elle naît à 15 cm au-dessus de la bouche, petite (0,18 m, 20 % de sa taille finale) et transparente, devient la plus dense vers le milieu de sa vie, grandit et s'éclaircit en montant; bouffées plus petites et plus nombreuses (1,4 par seconde). La vapeur du train suit la même loi de naissance (fondu sur 40 % de la vie au lieu de 8 %).
