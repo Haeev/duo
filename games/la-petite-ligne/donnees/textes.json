@@ -8,6 +8,7 @@
     { "level": "radiant", "name": "Forme rayonnante", "text": "Tout sourit ce matin: forme rayonnante." }
   ],
   "messages": {
+    "save_refused": "Ta sauvegarde n'a pas pu être reprise: elle est gardée intacte. Vous jouez une partie provisoire, préviens le studio.",
     "already_taken": "Déjà pris par {partner}.",
     "not_enough_money": "Il manque {missing} sous.",
     "big_purchase_proposal": "{partner} propose d'acheter {item} pour {price} sous. D'accord ?",
