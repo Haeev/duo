@@ -47,3 +47,9 @@ minimumReleaseAgeExclude:
   - eslint@10.14.0
   - '@types/three@0.187.0'
   - three@0.187.0
+
+# Scripts d'installation des dépendances: pnpm 12 fait échouer l'installation
+# sur tout script non tranché ici (true: lancé, false: ignoré).
+allowBuilds:
+  # Squirrel.Windows, amené par electron-builder: Duo fabrique un NSIS (ADR 0011).
+  electron-winstaller: false
