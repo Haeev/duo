@@ -8,15 +8,20 @@ export type CancelTimer = () => void;
  * l'heure ni `setTimeout` directement, pour que les tests tournent en temps simulé.
  */
 export interface Clock {
-  /** Millisecondes monotones (origine arbitraire). */
+  /** Millisecondes monotones (origine propre à chaque horloge). */
   now(): number;
   setTimeout(callback: () => void, delayMs: number): CancelTimer;
 }
 
-/** Horloge du système: `performance.now()` et les minuteurs de Node. */
+/**
+ * Horloge du système et minuteurs de Node. `performance.timeOrigin + performance.now()`:
+ * monotone dans le processus, et sur la même base que l'heure de session du SDK des
+ * jeux (page: `performance.timeOrigin + performance.now()` + écart), si bien que
+ * l'écart d'horloge mesuré par les battements est directement celui du jeu.
+ */
 export function createSystemClock(): Clock {
   return {
-    now: () => performance.now(),
+    now: () => performance.timeOrigin + performance.now(),
     setTimeout: (callback, delayMs) => {
       const timer = setTimeout(callback, Math.max(0, delayMs));
       return () => {
