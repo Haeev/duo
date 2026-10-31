@@ -24,7 +24,7 @@ import { BreakfastScreen, CreationScreen, EndScreen, NightScreen, SessionEndScre
 import { directionOf, spatialNeighbour } from './focus';
 import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
-import { type ScreenKind, screenOf } from './modele';
+import { type ScreenKind, hudState, screenOf } from './modele';
 import { CataloguePanel, ChestPanel, CratePanel, ShopPanel, StationPanel } from './panneaux';
 import { ProposalCards } from './proposition';
 import { loadUiTexts } from './textes';
@@ -346,8 +346,7 @@ class GameUi implements GameInterface, UiHost {
     const fullScreen = this.mounted?.kind === 'screen';
     this.hud.root.toggleAttribute('hidden', fullScreen);
     this.proposals.root.toggleAttribute('hidden', fullScreen);
-    const layerKind = this.mounted?.kind;
-    this.hud.setLayer(layerKind === 'dialogue' || layerKind === 'panel' ? layerKind : null);
+    this.hud.setLayer(hudState(this.mounted?.kind ?? null, me.placement !== null));
     if (!fullScreen) {
       this.hud.update(world);
       this.proposals.update(world);

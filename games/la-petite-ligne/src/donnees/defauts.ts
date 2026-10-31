@@ -28,6 +28,9 @@ export const DEFAULT_FEEL: FeelSettings = {
   villagerSpeed: 1.6,
   henSpeed: 0.5,
   alreadyTakenSeconds: 1.5,
+  // Gauntlet, ressenti (tour 2): un appui pendant un geste n'est pas perdu; Espace tenu bêche la rangée.
+  inputBufferSeconds: 0.3,
+  heldRepeatSeconds: 0.1,
   notificationsKept: 12,
   trainWarningMinutes: 60,
   // GE-07: l'épingle reste 15 s.

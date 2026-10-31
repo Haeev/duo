@@ -503,6 +503,22 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
 }
 
 // ---------------------------------------------------------------------------
+// État du HUD
+
+/** `dialogue` et `build` effacent le bas du HUD, `panel` aussi l'objectif (`interface.css`). */
+export type HudState = 'dialogue' | 'panel' | 'build' | null;
+
+/**
+ * La couche ouverte l'emporte; sinon, un meuble en main met le HUD en
+ * aménagement: la barre d'aménagement prend le bas de l'écran (revue I1).
+ */
+export function hudState(layer: 'screen' | 'dialogue' | 'panel' | null, placing: boolean): HudState {
+  if (layer === 'dialogue' || layer === 'panel') return layer;
+  if (layer === 'screen') return null;
+  return placing ? 'build' : null;
+}
+
+// ---------------------------------------------------------------------------
 // Création
 
 /**

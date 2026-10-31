@@ -4,6 +4,7 @@
  * Fonctions pures; le composant du HUD tient les horloges réelles.
  */
 import type { GameNotification, NotificationKind } from '../etat/types';
+import { type RefusalTexts, isRefusal } from './refus';
 import { fill, type TextVars } from './format';
 
 export type ToastVariant = '' | 'error' | 'event';
@@ -104,9 +105,17 @@ export function messageKeyOf(text: string, messages: Readonly<Record<string, str
   return null;
 }
 
-export function toastVisual(notification: Readonly<GameNotification>, messages: Readonly<Record<string, string>>): ToastVisual {
+export function toastVisual(
+  notification: Readonly<GameNotification>,
+  messages: Readonly<Record<string, string>>,
+  refusal: RefusalTexts = { missingTemplate: null },
+): ToastVisual {
   const key = notification.key ?? messageKeyOf(notification.text, messages);
-  return (key === null ? undefined : MESSAGE_VISUALS[key]) ?? KIND_VISUALS[notification.kind];
+  const known = key === null ? undefined : MESSAGE_VISUALS[key];
+  if (known !== undefined) return known;
+  // Un refus sans style propre (refus de pose, coin de l'autre, matériaux manquants): le style d'erreur.
+  if (isRefusal({ kind: notification.kind, key, text: notification.text }, refusal)) return error('ui-warning');
+  return KIND_VISUALS[notification.kind];
 }
 
 /**

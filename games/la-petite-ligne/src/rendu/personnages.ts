@@ -32,6 +32,7 @@ import type {
   ReadonlyWorld,
   VillagerState,
 } from '../etat/types';
+import { SIM_HZ } from '../etat/types';
 import type { Content } from '../donnees/types';
 import {
   BODY_COLORS,
@@ -84,6 +85,9 @@ const SIT_CHAIR = 'sit';
 const SIT_GROUND = 'sit_ground';
 /** Fondu court entre les clips de pêche, qui partent et finissent sur la même pose. */
 const FISH_FADE = 0.1;
+/** Bornes du calage d'un geste: part de la durée prise par l'avance du contact, départ au plus tard dans le clip. */
+const GESTURE_LEAD_SHARE_MAX = 0.5;
+const GESTURE_START_MAX = 0.9;
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
@@ -159,6 +163,8 @@ interface ClipRequest {
   token?: number;
   /** Partir du début (pose commune des clips de pêche) plutôt que d'une phase propre au personnage. */
   fromStart?: boolean;
+  /** Instant de départ dans le clip (s) pour un clip joué une fois. */
+  startAt?: number;
   fade?: number;
 }
 
@@ -236,7 +242,11 @@ class CharacterFigure {
     );
     action.clampWhenFinished = request.once === true;
     action.time =
-      request.once === true || request.fromStart === true ? 0 : this.phase * clip.duration;
+      request.once === true
+        ? Math.min(request.startAt ?? 0, clip.duration)
+        : request.fromStart === true
+          ? 0
+          : this.phase * clip.duration;
     if (sameAction) {
       // Le même geste relancé (deux lancers de suite): pas de fondu sur soi-même.
       action.play();
@@ -478,6 +488,68 @@ export class CharactersPart implements EventfulPart {
     }
   }
 
+  /** Gestes vus, par joueur: jeton (`since`), et instant local de leur fin prévue. */
+  private readonly gestures = new Map<CharacterId, { token: number; endsAt: number }>();
+
+  /**
+   * Geste d'outil (action à durée): joué une fois, depuis juste avant le
+   * contact, étiré pour finir avec le geste de la simulation, relancé à chaque
+   * nouveau `since`. `null` pour une action sans durée, ou un geste fini.
+   */
+  private gestureRequest(
+    character: DeepReadonly<Character>,
+    context: FrameContext,
+  ): ClipRequest | null {
+    const action = character.action;
+    if (action.duration <= 0 || character.status === 'sleeping') {
+      return null;
+    }
+    const name = CLIP_FOR_ACTION[action.kind];
+    const clip = this.clips.get(name);
+    const seconds = action.duration / SIM_HZ;
+    // Déjà joué jusqu'au bout: chez l'invité, « attente » arrive avec l'état complet suivant.
+    const seen = this.gestures.get(character.id);
+    if (seen?.token === action.since && context.time >= seen.endsAt) {
+      return null;
+    }
+    if (clip === undefined || seconds > clip.duration * SETTINGS.gestureLoopAbove) {
+      return null;
+    }
+    const elapsed = Math.min(seconds, Math.max(0, (context.world.tick - action.since) / SIM_HZ));
+    if (seen?.token !== action.since) {
+      this.gestures.set(character.id, {
+        token: action.since,
+        endsAt: context.time + seconds - elapsed,
+      });
+    }
+    // Départ tel que le contact tombe `gestureImpactLead` après l'appui, et fin avec le geste.
+    const impact = SETTINGS.gestureImpact[name] ?? 0;
+    const share = Math.min(GESTURE_LEAD_SHARE_MAX, SETTINGS.gestureImpactLead / seconds);
+    const startAt = Math.min(
+      clip.duration * GESTURE_START_MAX,
+      Math.max(0, (impact - share * clip.duration) / (1 - share)),
+    );
+    const timeScale = (clip.duration - startAt) / seconds;
+    return {
+      name,
+      timeScale,
+      once: true,
+      token: action.since,
+      startAt: startAt + elapsed * timeScale,
+      fade: SETTINGS.gestureFadeSeconds,
+    };
+  }
+
+  /** Le geste en cours est-il déjà fini (son clip joué en entier)? */
+  private gestureOver(character: DeepReadonly<Character>): boolean {
+    const seen = this.gestures.get(character.id);
+    return (
+      character.action.duration > 0 &&
+      seen?.token === character.action.since &&
+      this.time >= seen.endsAt
+    );
+  }
+
   /** Bout de la canne d'un joueur (nœud `fishing_rod_tip`, pour la ligne), `false` s'il ne tient rien. */
   rodTip(id: CharacterId, out: Vector3): boolean {
     return this.players.get(id)?.figure.toolPoint(ROD_TIP_NODE, ROD_TIP, out) ?? false;
@@ -651,15 +723,22 @@ export class CharactersPart implements EventfulPart {
         WALK_SCALE_MAX,
         Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
       );
+      const gesture = this.gestureRequest(character, context);
       let request: ClipRequest;
       if (moving && kind !== 'carry') {
-        request = { name: 'walk', timeScale: walkScale };
+        request = { name: 'walk', timeScale: walkScale, fade: SETTINGS.walkFadeSeconds };
       } else if (shotActive) {
         request = { name: shot.clip, timeScale: 1, once: true, token: shot.start, fade: FISH_FADE };
       } else if (character.fishing !== null) {
         request = { name: FISH_WAIT, timeScale: 1, fromStart: true, fade: FISH_FADE };
       } else if (seat !== null) {
         request = { name: seat.clip, timeScale: 1 };
+      } else if (gesture !== null) {
+        request = gesture;
+      } else if (kind === 'walk' || this.gestureOver(character)) {
+        // Arrêté (la vitesse est tombée, l'état complet dit encore « marche » chez l'invité)
+        // ou geste fini avant que l'état ne repasse à « attente »: on attend.
+        request = { name: 'idle', timeScale: 1, fade: SETTINGS.walkFadeSeconds };
       } else {
         const name = CLIP_FOR_ACTION[kind];
         request = { name, timeScale: kind === 'carry' ? (moving ? walkScale : 0) : 1 };

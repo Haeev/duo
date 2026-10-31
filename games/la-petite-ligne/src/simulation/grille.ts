@@ -5,7 +5,7 @@
  */
 import type { GameMap } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
-import { BODY_RADIUS } from './constantes';
+import { BODY_RADIUS, CORNER_NUDGE_MAX, CORNER_NUDGE_STEP } from './constantes';
 
 /** Ce qui bloque: la carte, plus une couche dynamique (arbres debout, meubles). */
 export interface Blockers {
@@ -48,10 +48,40 @@ export function moveBody(b: Blockers, pos: Vec2, dx: number, dy: number): void {
   if (dx !== 0) {
     const nx = pos.x + dx;
     if (!bodyCollides(b, nx, pos.y)) pos.x = nx;
+    else if (Math.abs(dx) >= Math.abs(dy)) nudgeY(b, pos, nx, Math.abs(dx), dy);
   }
   if (dy !== 0) {
     const ny = pos.y + dy;
     if (!bodyCollides(b, pos.x, ny)) pos.y = ny;
+    else if (Math.abs(dy) > Math.abs(dx)) nudgeX(b, pos, ny, Math.abs(dy), dx);
+  }
+}
+
+/** Bloqué sur x: le plus petit décalage en y qui libère le passage en `nx`; on glisse de ce côté d'au plus `step`. */
+function nudgeY(b: Blockers, pos: Vec2, nx: number, step: number, hint: number): void {
+  const first = hint < 0 ? -1 : 1;
+  for (let o = CORNER_NUDGE_STEP; o <= CORNER_NUDGE_MAX + 1e-9; o += CORNER_NUDGE_STEP) {
+    for (let k = 0; k < 2; k++) {
+      const side = k === 0 ? first : -first;
+      if (bodyCollides(b, nx, pos.y + side * o)) continue;
+      const ny = pos.y + side * Math.min(o, step);
+      if (!bodyCollides(b, pos.x, ny)) pos.y = ny;
+      return;
+    }
+  }
+}
+
+/** Bloqué sur y: même chose en x. */
+function nudgeX(b: Blockers, pos: Vec2, ny: number, step: number, hint: number): void {
+  const first = hint < 0 ? -1 : 1;
+  for (let o = CORNER_NUDGE_STEP; o <= CORNER_NUDGE_MAX + 1e-9; o += CORNER_NUDGE_STEP) {
+    for (let k = 0; k < 2; k++) {
+      const side = k === 0 ? first : -first;
+      if (bodyCollides(b, pos.x + side * o, ny)) continue;
+      const nx = pos.x + side * Math.min(o, step);
+      if (!bodyCollides(b, nx, pos.y)) pos.x = nx;
+      return;
+    }
   }
 }
 

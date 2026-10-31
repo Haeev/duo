@@ -13,5 +13,5 @@ Repères: 10 = à ce niveau de soin, aucune différence visible avec les référ
 | 5. Interface et lisibilité | 6,5 | ux-ui-designer | 2026-10-31 | `revues/tour-01-interface-son.md`, `captures/tour-01/ux-*.png` |
 | 6. Contenu et rythme | 5 | level-designer | 2026-10-31 | `revues/tour-01-contenu-coop.md` |
 | 7. Coopération | 6 | level-designer | 2026-10-31 | `revues/tour-01-contenu-coop.md` |
-| 8. Robustesse et performance | à noter | | | |
-| Moyenne | | | | |
+| 8. Robustesse et performance | 6,5 | architecte-technique | 2026-10-31 | `revues/tour-01-robustesse.md` |
+| Moyenne | 5,8 | | 2026-10-31 | tour 1, notation de départ |

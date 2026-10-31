@@ -9,6 +9,15 @@ import { SIM_HZ } from '../etat/types';
 export { SIM_HZ };
 export const SIM_DT = 1 / SIM_HZ;
 
+/**
+ * Correction de coin (gauntlet, ressenti): poussé droit contre un coin (arbre,
+ * montant de porte) qu'il ne chevauche que de peu, le corps glisse de côté
+ * pour passer. Décalages essayés de `CORNER_NUDGE_STEP` à `CORNER_NUDGE_MAX` (m).
+ * Ici et non dans `reglages.json`: la prédiction de l'invité doit faire le même calcul.
+ */
+export const CORNER_NUDGE_MAX = 0.35;
+export const CORNER_NUDGE_STEP = 0.05;
+
 /** Rayon de collision d'un personnage (m). */
 export const BODY_RADIUS = 0.3;
 

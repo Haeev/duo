@@ -418,6 +418,10 @@ export interface FeelSettings {
   henSpeed: number;
   /** Fenêtre de « Déjà pris par... » après une récolte (s). */
   alreadyTakenSeconds: number;
+  /** Mémoire d'un appui (Espace, clic à portée) reçu pendant un geste: joué à la fin du geste s'il a moins de tant (s). */
+  inputBufferSeconds: number;
+  /** Espace tenu sur le potager: pause minimale entre la fin d'un geste et le geste sur la case suivante (s). */
+  heldRepeatSeconds: number;
   /** Nombre de notifications gardées par joueur. */
   notificationsKept: number;
   /** Minutes avant le départ du train pour l'annonce « dans une heure ». */

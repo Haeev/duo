@@ -221,3 +221,13 @@
 .lpl-nowrap {
   white-space: nowrap;
 }
+
+/* Aménagement: la barre d'aménagement occupe le bas, le portrait et les commandes s'effacent (maquette amenagement.html, revue I1). L'astuce redirait les touches déjà affichées. */
+.lpl-hud[data-state='build'] .lpl-hud__bottom-left,
+.lpl-hud[data-state='build'] .lpl-hud__bottom-right {
+  visibility: hidden;
+}
+
+.lpl-hud[data-state='build'] .lpl-tip {
+  display: none;
+}

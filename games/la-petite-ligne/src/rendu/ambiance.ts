@@ -25,13 +25,15 @@ import {
   type Material,
 } from 'three';
 import type { WorldEvent } from '../etat/types';
-import { createNoiseTexture, createTerrainField, type TerrainField } from './champs';
+import { createNoiseTexture, createTerrainField, createWindMask, type TerrainField } from './champs';
+import { collectChimneys, type Chimney } from './cheminees';
 import { SkyLayer } from './ciel';
 import type { FrameContext } from './contexte';
 import { createWaterMaterial, type WaterUniforms } from './eau';
 import type { ExtensionPart, RenderHooks } from './extensions';
 import { collectGlowSources, groundLights, type GroundLight } from './lueurs';
 import type { DaylightRig } from './lumiere';
+import { PALETTE_CELLS, PALETTE_GRID } from './palette';
 import { PARTICLE_MODE, PARTICLE_SHAPE, PuffPool, createParticleMaterial } from './particules';
 import { RainLayer } from './pluie';
 import { RENDER_SETTINGS } from './reglages';
@@ -57,6 +59,10 @@ type SteamProfile = (typeof AMBIANCE_SETTINGS.puffs.steam)['moving' | 'idle'];
 const DUST_LIFT = 0.15;
 const STAR_LIFT = 0.25;
 const STAR_SPREAD = 0.35;
+/** Construction dont la fin rend la cheminée de la maisonnette utilisable. */
+const HOUSE_ROOF = 'house_roof';
+/** Décalage de départ d'une cheminée à la suivante (part d'une bouffée). */
+const CHIMNEY_STAGGER = 0.37;
 /** Le rond d'eau flotte juste au-dessus des billons de la case bêchée. */
 const RING_LIFT = 0.08;
 
@@ -94,6 +100,9 @@ export class AmbiancePart implements ExtensionPart {
   private readonly sky: SkyLayer;
   private readonly puffs: PuffPool;
   private readonly lights: GroundLight[];
+  private readonly chimneys: { chimney: Chimney; clock: number }[];
+  private readonly windDir = new Vector3();
+  private lastCooked = Number.NEGATIVE_INFINITY;
   private readonly meshes: Mesh[] = [];
   private readonly lit = new Color();
   private readonly shade = new Color();
@@ -105,6 +114,7 @@ export class AmbiancePart implements ExtensionPart {
   private readonly at = new Vector3();
   private readonly colors = {
     steam: new Color(AMBIANCE_SETTINGS.puffs.steam.color),
+    smoke: new Color(AMBIANCE_SETTINGS.chimneys.color),
     water: new Color(AMBIANCE_SETTINGS.puffs.water.color),
     dust: new Color(AMBIANCE_SETTINGS.puffs.dust.color),
     stars: new Color(AMBIANCE_SETTINGS.puffs.stars.color),
@@ -127,9 +137,16 @@ export class AmbiancePart implements ExtensionPart {
     const noise = resources.track(createNoiseTexture());
     this.field = createTerrainField(hooks.map, hooks.terrain);
     resources.track(this.field.texture);
-    this.surfaces = createSurfaceUniforms(noise);
+    const windMask = resources.track(createWindMask(PALETTE_CELLS, PALETTE_GRID));
+    this.surfaces = createSurfaceUniforms(noise, windMask);
+    const wind = AMBIANCE_SETTINGS.wind.direction;
+    this.windDir.set(wind[0], 0, wind[1]).normalize();
 
-    patchSurface(hooks.materials.palette, this.surfaces, { puddles: true, key: 'decor' });
+    patchSurface(hooks.materials.palette, this.surfaces, {
+      puddles: true,
+      wind: true,
+      key: 'decor',
+    });
     this.patchCharacters();
 
     const waterSettings = AMBIANCE_SETTINGS.water;
@@ -165,6 +182,11 @@ export class AmbiancePart implements ExtensionPart {
 
     const glows = collectGlowSources(hooks.map, hooks.library, hooks.terrain);
     this.lights = groundLights(glows);
+    this.chimneys = collectChimneys(hooks.map, hooks.library, hooks.terrain).map((chimney, index) => ({
+      chimney,
+      // Décalage de départ: les cheminées ne fument pas toutes au même instant.
+      clock: (index * CHIMNEY_STAGGER) % 1,
+    }));
     this.rain = new RainLayer(this.field, resources);
     this.sky = new SkyLayer(hooks.map, hooks.terrain, this.field, glows, resources);
     this.puffs = new PuffPool(
@@ -186,7 +208,7 @@ export class AmbiancePart implements ExtensionPart {
   private patchCharacters(): void {
     const shared = this.hooks.characterMaterial;
     if (shared !== null) {
-      patchSurface(shared, this.surfaces, { puddles: false, key: 'characters' });
+      patchSurface(shared, this.surfaces, { puddles: false, wind: false, key: 'characters' });
     }
     this.hooks.scene.traverse((object) => {
       if (!(object instanceof Mesh)) {
@@ -200,16 +222,19 @@ export class AmbiancePart implements ExtensionPart {
           continue;
         }
         if (material.name.includes(CHARACTER_MATERIAL)) {
-          patchSurface(material, this.surfaces, { puddles: false, key: 'characters' });
+          patchSurface(material, this.surfaces, { puddles: false, wind: false, key: 'characters' });
         } else if (material.name.startsWith(PALETTE_MATERIAL)) {
           // Copie de la palette (foulard, substitut): mêmes ajouts que le décor, sans flaques.
-          patchSurface(material, this.surfaces, { puddles: false, key: 'decor_copy' });
+          patchSurface(material, this.surfaces, { puddles: false, wind: false, key: 'decor_copy' });
         }
       }
     });
   }
 
   handleEvent(event: WorldEvent, context: FrameContext): void {
+    if (event.type === 'cooked') {
+      this.lastCooked = this.time;
+    }
     if (context.reducedMotion && event.type !== 'train_whistle') {
       return;
     }
@@ -534,10 +559,78 @@ export class AmbiancePart implements ExtensionPart {
     if (!context.reducedMotion) {
       this.updateSteam(context);
     }
+    this.updateWind(context);
+    this.updateChimneys(context);
     this.puffs.material.uniforms.uLitColor.value.copy(this.lit);
     this.puffs.material.uniforms.uShadeColor.value.copy(this.shade);
     this.puffs.material.uniforms.uLightView.value.copy(this.lightView);
     this.puffs.update(context.time);
+  }
+
+  /** Vent: plus fort par nuages et par pluie, arrêté en version légère et si les animations sont réduites. */
+  private updateWind(context: FrameContext): void {
+    const wind = AMBIANCE_SETTINGS.wind;
+    const still = this.light || context.reducedMotion;
+    this.surfaces.uWindStrength.value = still
+      ? 0
+      : wind.strength * wind.weather[context.world.weather];
+  }
+
+  /** Vrai si `minutes` tombe dans une des plages `[début, fin]`. */
+  private static within(minutes: number, ranges: readonly (readonly [number, number])[]): boolean {
+    return ranges.some(([from, to]) => minutes >= from && minutes < to);
+  }
+
+  /** Fumées des cheminées: le bourg aux heures des repas et le soir, la maisonnette une fois réparée. */
+  private updateChimneys(context: FrameContext): void {
+    const settings = AMBIANCE_SETTINGS.chimneys;
+    const world = context.world;
+    const minutes = world.clock.minutes;
+    const village = AmbiancePart.within(minutes, settings.villageHours);
+    const repaired = world.constructions.some(
+      (construction) => construction.id === HOUSE_ROOF && construction.status === 'done',
+    );
+    const cooking = this.time - this.lastCooked < settings.afterCookingSeconds;
+    const house = repaired && (cooking || AmbiancePart.within(minutes, settings.houseHours));
+    const rate = settings.rate * (this.light ? HALF_CELL : 1);
+    const weather = AMBIANCE_SETTINGS.wind.weather[world.weather];
+    for (const entry of this.chimneys) {
+      if (!(entry.chimney.house ? house : village)) {
+        continue;
+      }
+      entry.clock += context.dt * rate;
+      while (entry.clock >= 1) {
+        entry.clock -= 1;
+        this.smokePuff(entry.chimney.position, weather);
+      }
+    }
+  }
+
+  private smokePuff(at: Vector3, windFactor: number): void {
+    const s = AMBIANCE_SETTINGS.chimneys;
+    const p = this.puffs;
+    const jitter = (): number => (p.random() - HALF_CELL) * 2;
+    p.emit(
+      {
+        x: at.x + jitter() * s.spread,
+        y: at.y,
+        z: at.z + jitter() * s.spread,
+        vx: jitter() * s.spread,
+        vy: s.rise * (STEAM_RISE_MIN + p.random() * (1 - STEAM_RISE_MIN)),
+        vz: jitter() * s.spread,
+        ax: this.windDir.x * s.drift * windFactor,
+        ay: s.lift,
+        az: this.windDir.z * s.drift * windFactor,
+        drag: s.drag,
+        life: s.seconds * (STEAM_LIFE_MIN + p.random() * (1 - STEAM_LIFE_MIN)),
+        startSize: s.startSize,
+        endSize: s.endSize,
+        shape: PARTICLE_SHAPE.puff,
+        color: this.colors.smoke,
+        opacity: s.opacity,
+      },
+      this.time,
+    );
   }
 
   dispose(): void {

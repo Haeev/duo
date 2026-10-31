@@ -760,6 +760,8 @@ function parseFeel(r: Reader | null): FeelSettings {
     'villagerSpeed',
     'henSpeed',
     'alreadyTakenSeconds',
+    'inputBufferSeconds',
+    'heldRepeatSeconds',
     'notificationsKept',
     'trainWarningMinutes',
     'pinSeconds',

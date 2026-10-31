@@ -46,10 +46,17 @@ export interface SurfaceUniforms {
   uLamps: { value: Vector4[] };
   uLampColors: { value: Color[] };
   uLampCount: { value: number };
+  /** Vent: carte des cases qui bougent, direction, force (0: arrêté), réglages. */
+  uWindMask: { value: Texture | null };
+  uWindDir: { value: Vector2 };
+  uWindStrength: { value: number };
+  uWindParams: { value: Vector4 };
+  uWindCloth: { value: Vector3 };
 }
 
-export function createSurfaceUniforms(noise: Texture): SurfaceUniforms {
+export function createSurfaceUniforms(noise: Texture, windMask: Texture): SurfaceUniforms {
   const s = AMBIANCE_SETTINGS.surfaces;
+  const w = AMBIANCE_SETTINGS.wind;
   return {
     uAmbTime: { value: 0 },
     uAmbNoise: { value: noise },
@@ -70,12 +77,66 @@ export function createSurfaceUniforms(noise: Texture): SurfaceUniforms {
     uLamps: { value: Array.from({ length: GLOW_SLOTS }, () => new Vector4()) },
     uLampColors: { value: Array.from({ length: GLOW_SLOTS }, () => new Color()) },
     uLampCount: { value: 0 },
+    uWindMask: { value: windMask },
+    uWindDir: {
+      value: new Vector2(w.direction[0], w.direction[1]).normalize(),
+    },
+    uWindStrength: { value: 0 },
+    uWindParams: { value: new Vector4(w.swaySpeed, w.gustSpeed, 1 / w.gustSize, w.phaseScale) },
+    uWindCloth: { value: new Vector3(w.cloth, w.clothSpeed, w.maxHeight) },
   };
 }
 
-/** Déclarations communes (vertex): position dans le monde. */
+/** Déclarations communes (vertex): position dans le monde, vent. */
 const VERTEX_PARS = /* glsl */ `
 varying vec3 vAmbWorld;
+#ifdef AMB_WIND
+uniform float uAmbTime;
+uniform sampler2D uWindMask;
+uniform vec2 uWindDir;
+uniform float uWindStrength;
+uniform vec4 uWindParams; // balancement (rad/s), rafales (rad/s), 1 / taille des rafales, déphasage par mètre
+uniform vec3 uWindCloth;  // frisson des tissus (m), sa vitesse (rad/s), hauteur plafond (m)
+#endif
+`;
+
+/**
+ * Après `begin_vertex`: le vent pousse les sommets du feuillage et des herbes
+ * (case de palette lue par l'UV) d'autant plus qu'ils sont haut au-dessus du
+ * pied de l'objet (origine de l'instance; sol pour le décor fusionné), et fait
+ * frissonner les tissus. Le déplacement est calculé dans le monde puis ramené
+ * dans le repère de l'objet.
+ */
+const VERTEX_WIND = /* glsl */ `
+#ifdef AMB_WIND
+if (uWindStrength > 0.0) {
+  float windKind = texelFetch(uWindMask, ivec2(clamp(floor(uv * 16.0), 0.0, 15.0)), 0).r;
+  if (windKind > 0.0) {
+    mat4 windModel = modelMatrix;
+    #ifdef USE_INSTANCING
+    windModel = modelMatrix * instanceMatrix;
+    #endif
+    vec3 windWorld = (windModel * vec4(transformed, 1.0)).xyz;
+    float windFoot = 0.0;
+    #ifdef USE_INSTANCING
+    windFoot = (windModel * vec4(0.0, 0.0, 0.0, 1.0)).y;
+    #endif
+    float windPhase = dot(windWorld.xz, vec2(uWindParams.w, uWindParams.w * 0.77));
+    float gust = 0.55 + 0.45 * sin(uAmbTime * uWindParams.y + dot(windWorld.xz, uWindDir) * uWindParams.z * 6.2831853);
+    vec3 windPush = vec3(0.0);
+    if (windKind > 0.75) {
+      float sway = sin(uAmbTime * uWindParams.x + windPhase) + 0.35 * sin(uAmbTime * uWindParams.x * 2.3 + windPhase * 1.7);
+      float height = clamp(windWorld.y - windFoot, 0.0, uWindCloth.z);
+      vec2 push = uWindDir * (0.6 + 0.4 * sway) * gust * height * uWindStrength;
+      windPush = vec3(push.x, 0.0, push.y);
+    } else {
+      float flutter = sin(uAmbTime * uWindCloth.y + windWorld.x * 3.1 + windWorld.z * 2.3);
+      windPush = vec3(0.0, flutter * uWindCloth.x * gust * uWindStrength / ${AMBIANCE_SETTINGS.wind.strength.toFixed(4)}, 0.0);
+    }
+    transformed += inverse(mat3(windModel)) * windPush;
+  }
+}
+#endif
 `;
 
 /** Après `project_vertex`: `transformed` porte déjà peau, formes et instance. */
@@ -172,6 +233,8 @@ reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, ambNormal) * material.di
 export interface SurfacePatchOptions {
   /** Flaques au sol (décor et terrain), pas sur les personnages. */
   puddles: boolean;
+  /** Vent sur le feuillage, les herbes et les tissus (décor seulement). */
+  wind: boolean;
   /** Suffixe de la clé de programme (un programme par variante). */
   key: string;
 }
@@ -213,7 +276,19 @@ export function patchSurface(
     previous(shader, renderer);
     Object.assign(shader.uniforms, uniforms);
     const label = material.name || material.type;
-    shader.vertexShader = injectAfter(shader.vertexShader, '#include <common>', VERTEX_PARS, label);
+    const windDefine = options.wind ? '#define AMB_WIND\n' : '';
+    shader.vertexShader = injectAfter(
+      shader.vertexShader,
+      '#include <common>',
+      windDefine + VERTEX_PARS,
+      label,
+    );
+    shader.vertexShader = injectAfter(
+      shader.vertexShader,
+      '#include <begin_vertex>',
+      VERTEX_WIND,
+      label,
+    );
     shader.vertexShader = injectAfter(
       shader.vertexShader,
       '#include <project_vertex>',

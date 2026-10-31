@@ -14,6 +14,7 @@ import {
   clockModel,
   absenceMinutes,
   formModel,
+  type HudState,
   itemIcon,
   nextObjective,
   partnerModel,
@@ -25,6 +26,7 @@ import {
   type SlotModel,
 } from './modele';
 import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
+import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
 
@@ -60,6 +62,7 @@ export class Hud {
   private deltaUntil = 0;
 
   private readonly toasts: HTMLUListElement;
+  private readonly refusal: RefusalTexts;
   /** Notifications à l'écran, par texte (`toastKey`): une répétition rafraîchit le délai sans empiler. */
   private readonly toastItems = new Map<string, HTMLLIElement>();
   private readonly seenAt = new Map<number, number>();
@@ -108,6 +111,7 @@ export class Hud {
     this.host = host;
     const { ctx } = host;
     const x = ctx.texts.extra;
+    this.refusal = refusalTexts(ctx.content.texts.raw);
 
     // Haut gauche: horloge, bourse, notifications.
     this.clockWeather = icon('weather-sun', '');
@@ -282,8 +286,8 @@ export class Hud {
 
   private clockStep = -1;
 
-  /** Masque le bas du HUD pendant une conversation, et l'objectif et le bas pendant un panneau. */
-  setLayer(kind: 'dialogue' | 'panel' | null): void {
+  /** Masque le bas du HUD pendant une conversation ou l'aménagement, et l'objectif et le bas pendant un panneau. */
+  setLayer(kind: HudState): void {
     setAttr(this.root, 'data-state', kind);
   }
 
@@ -488,8 +492,8 @@ export class Hud {
         if (known !== this.toasts.lastElementChild && shown[shown.length - 1] === n) this.toasts.append(known);
         continue;
       }
-      const visual = toastVisual(n, ctx.texts.messages);
-      const li = el('li', { class: `lpl-toast${visual.variant === '' ? '' : ` lpl-toast--${visual.variant}`}` }, [
+      const visual = toastVisual(n, ctx.texts.messages, this.refusal);
+      const li = el('li', { class: `lpl-toast${visual.variant === '' ? '' : ` lpl-toast--${visual.variant}`}`, 'data-kind': notificationSort(n, this.refusal) }, [
         visual.partnerToken ? token('other', this.host.symbol('other'), 'small') : icon(visual.icon === '' ? 'ui-note' : visual.icon),
         typographier(toastText(n, ctx.texts.messages, { partner })),
       ]);

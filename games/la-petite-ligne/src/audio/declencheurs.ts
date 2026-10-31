@@ -15,6 +15,7 @@ import type { Content } from '../donnees/types';
 import type { GameMap } from '../etat/carte';
 import type { Cell, CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import type { AudioSettings } from './reglages';
+import { isRefusal, refusalTexts } from '../interface/refus';
 
 export interface SoundRequest {
   sound: string;
@@ -348,6 +349,7 @@ export class StateWatcher {
   /** Une image: sons dérivés de l'état (`out`), boucles voulues (`loops`). */
   update(ctx: TriggerContext, dt: number, now: number, out: SoundRequest[], loops: LoopWish[]): void {
     const { world, local, map, content } = ctx;
+    const refusal = refusalTexts(content.texts.raw);
     const s = this.settings;
     const emit = new Emitter(ctx, out);
     const first = !this.initialized;
@@ -441,7 +443,8 @@ export class StateWatcher {
       for (const n of me.notifications) {
         if (n.id > this.lastNotification) {
           newest = Math.max(newest, n.id);
-          if (NOTIFY_KINDS.has(n.kind)) notify = true;
+          // Un refus (« Déjà pris », sac plein, « Il manque 40 sous ») n'a pas le carillon des bonnes nouvelles (revue S2).
+          if (NOTIFY_KINDS.has(n.kind) && !isRefusal(n, refusal)) notify = true;
         }
       }
       if (notify && !first && !out.some((r) => COVERING_UI.has(r.sound) || r.sound.startsWith(s.villagerMotifPrefix))) emit.ui('notify', local);

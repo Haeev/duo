@@ -13,6 +13,7 @@ import {
   DataTexture,
   LinearFilter,
   LinearMipmapLinearFilter,
+  NearestFilter,
   NoColorSpace,
   RedFormat,
   RepeatWrapping,
@@ -223,4 +224,37 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
     height: new Vector2(FIELD_HEIGHT_MIN, FIELD_HEIGHT_RANGE),
     fordCells,
   };
+}
+
+/** Valeur de la carte du vent pour le feuillage et les herbes (balancement selon la hauteur). */
+const WIND_FOLIAGE = 255;
+/** Valeur pour les tissus (frisson). */
+const WIND_CLOTH = 128;
+/** Cases de tissu qui frissonnent au vent (store de l'épicerie). */
+const WIND_CLOTH_CELLS: readonly string[] = ['awning_red', 'awning_cream'];
+/** Cases de feuillage en dehors de la première rangée de la palette. */
+const WIND_EXTRA_FOLIAGE = /^(flower_|ivy$)/;
+
+/**
+ * Carte du vent: une valeur par case de la palette (16 x 16), lue par le
+ * nuanceur de sommets. Feuillage, herbes et cultures (toute la première
+ * rangée), fleurs et lierre se balancent; le store frissonne.
+ */
+export function createWindMask(cells: readonly string[], grid: number): DataTexture {
+  const data = new Uint8Array(grid * grid);
+  cells.forEach((cell, index) => {
+    const row = Math.floor(index / grid);
+    if (row === 0 || WIND_EXTRA_FOLIAGE.test(cell)) {
+      data[index] = WIND_FOLIAGE;
+    } else if (WIND_CLOTH_CELLS.includes(cell)) {
+      data[index] = WIND_CLOTH;
+    }
+  });
+  const texture = new DataTexture(data, grid, grid, RedFormat, UnsignedByteType);
+  texture.magFilter = NearestFilter;
+  texture.minFilter = NearestFilter;
+  texture.generateMipmaps = false;
+  texture.colorSpace = NoColorSpace;
+  texture.needsUpdate = true;
+  return texture;
 }

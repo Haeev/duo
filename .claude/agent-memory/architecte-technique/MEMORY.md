@@ -47,3 +47,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Vite 8: `build.rolldownOptions` remplace `rollupOptions` (dépréciée).
 - typescript-eslint: `JSON.stringify` est typé `string`; pour tester `undefined` sans `no-unnecessary-condition`, passer par une fonction typée `string | undefined`. Étaler un objet à accesseurs (`{ ...base }`) fige leurs valeurs: `Object.assign(base, ...)` les garde.
 - Valibot: un schéma `v.array` sort un tableau mutable; ajouter `v.readonly()` pour accepter des `readonly T[]` du code appelant.
+
+## Mesures et revues de jeux (vérifié le 2026-10-31, gauntlet de La Petite Ligne)
+
+- Temps d'un pas de simulation sur la machine cloud partagée: `performance.now()` donne des pics de plusieurs centaines de ms, non reproductibles (charge moyenne de 25 quand d'autres agents tournent); mesurer le temps processeur avec `process.cpuUsage()` et écarter le ramasse-miettes par `PerformanceObserver` sur `entryTypes: ['gc']` (`node:perf_hooks`).
+- Lancer un test Vitest de mesure sans toucher au dépôt: fichier et config dans `/tmp` (`test.include` en chemin absolu, `test.root` = dossier du jeu), imports du jeu par `await import('/chemin/absolu/fichier.ts')`, puis `npx vitest run --config /tmp/.../vitest.config.mjs` depuis le dossier du jeu.
+- Playwright: écrire chaque résultat au fil de l'eau; un seul `console.log` final se perd si la page ou le navigateur tombe en fin de script. Sous SwiftShader et machine chargée, une scène de `rendu.html` demande environ 1,5 min.
+- SDK: `NetChannel.send` lève une `RangeError` au-delà de 64 Kio et la boucle (`loop.ts`, `stepper.ts`) n'attrape rien: l'exception devient `fatal` et arrête la partie des deux côtés. Un jeu qui réplique son état complet doit surveiller sa taille.
+- Three.js 0.187 gère la perte du contexte WebGL (`preventDefault` dans `onContextLost`, réinitialisation dans `onContextRestore`); essai possible par `renderer.forceContextLoss()`.

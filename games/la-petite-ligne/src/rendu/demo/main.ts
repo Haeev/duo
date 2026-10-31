@@ -30,6 +30,10 @@ const DEMO_MINUTES_PER_SECOND = 12;
 const MINUTES_PER_DAY = 1440;
 const WALK_SPEED = 3.5;
 const ENDURANCE_FRAMES = 30;
+/** Geste de houe de la démo: 0,5 s à 30 pas par seconde, comme la simulation. */
+const HOE_TICKS = 15;
+const MAX_STEP = 0.1;
+const MS_PER_SECOND = 1000;
 /** Durée d'un repère (15 s) à 30 pas par seconde. */
 const PIN_TICKS = 450;
 const ENDURANCE_FPS = 60;
@@ -62,6 +66,8 @@ interface DemoHandle {
   missing(): string[];
   breakdown(): Record<string, number>;
   programs(): string[];
+  /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
+  advance(dt: number): void;
   pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
   destination(): { x: number; y: number } | null;
   frames: number;
@@ -161,6 +167,7 @@ async function main(): Promise<void> {
     missing: () => [],
     breakdown: () => engine.breakdown(),
     programs: () => engine.programList(),
+    advance: () => undefined,
     pick: (x: number, y: number) => engine.pick(x, y),
     destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
@@ -218,6 +225,9 @@ async function main(): Promise<void> {
     if (event.code === 'KeyH') {
       emit({ type: 'harvested', by: 'p1', cell, item: 'radish', quality: 'fine', count: 3 });
     } else if (event.code === 'KeyB') {
+      // Comme la simulation: un geste de houe à durée, l'événement au pas de l'appui.
+      me.action = { kind: 'till', since: world.tick, duration: HOE_TICKS, target: null };
+      me.speed = 0;
       emit({ type: 'tilled', by: 'p1', cell });
     } else if (event.code === 'KeyT') {
       const tree = world.trees[1];
@@ -265,9 +275,8 @@ async function main(): Promise<void> {
 
   let last = performance.now();
   let seconds = 0;
-  const tick = (now: number): void => {
-    const dt = Math.min(0.1, (now - last) / 1000);
-    last = now;
+  const guestLike = params.get('invite') === '1';
+  const step = (dt: number): void => {
     seconds += dt;
     if (autoInput?.checked === true) {
       world.clock.minutes = (world.clock.minutes + dt * DEMO_MINUTES_PER_SECOND) % MINUTES_PER_DAY;
@@ -306,15 +315,36 @@ async function main(): Promise<void> {
       me.speed = WALK_SPEED;
       me.action = { kind: 'walk', since: 0, duration: 0, target: null };
     } else if (me?.action.kind === 'walk' && lifeInput?.checked === false) {
+      me.prev = { ...me.pos };
       me.speed = 0;
+      // `invite=1`: comme chez l'invité, l'état complet dit encore « marche » après l'arrêt.
+      if (!guestLike) {
+        me.action = { kind: 'idle', since: 0, duration: 0, target: null };
+      }
+    }
+    if (
+      me !== undefined &&
+      me.action.duration > 0 &&
+      world.tick >= me.action.since + me.action.duration
+    ) {
       me.action = { kind: 'idle', since: 0, duration: 0, target: null };
     }
     engine.frame(dt);
     handle.frames += 1;
-    window.requestAnimationFrame(tick);
+  };
+  const loop = (now: number): void => {
+    step(Math.min(MAX_STEP, (now - last) / MS_PER_SECOND));
+    last = now;
+    window.requestAnimationFrame(loop);
+  };
+  // `manuel=1`: le temps n'avance que par `lplRendu.advance(dt)` (planches d'images successives).
+  handle.advance = (dt: number): void => {
+    step(dt);
   };
   handle.ready = true;
-  window.requestAnimationFrame(tick);
+  if (!params.has('manuel')) {
+    window.requestAnimationFrame(loop);
+  }
 }
 
 /** Mémoire du tas JavaScript (Chromium seulement), en octets. */

@@ -18,8 +18,63 @@ import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
 
 const NAME_MAX = 16;
 
+function inGesture(c: Character, sim: Sim): boolean {
+  return c.action.duration > 0 && sim.world.tick < c.action.since + c.action.duration;
+}
+
 function canAct(c: Character, sim: Sim): boolean {
-  return c.created && c.status === 'active' && c.crafting === null && !(c.action.duration > 0 && sim.world.tick < c.action.since + c.action.duration);
+  return c.created && c.status === 'active' && c.crafting === null && !inGesture(c, sim);
+}
+
+/** Un appui pendant un geste n'est pas perdu: il attend la fin du geste (le dernier remplace le précédent). */
+function bufferAct(sim: Sim, c: Character, intent: Intent): void {
+  if (c.status !== 'active' || c.crafting !== null || !inGesture(c, sim)) return;
+  sim.runtime.bufferedAct[c.id] = { intent, tick: sim.world.tick };
+}
+
+/**
+ * Fin d'un geste à durée (bêcher, semer, arroser, récolter, couper, ramasser,
+ * remplir, manger): l'action repasse à `idle`, puis l'appui mémorisé est joué
+ * s'il n'est pas trop vieux. Le rendu joue le geste une fois, de `since` à
+ * `since + duration`.
+ */
+export function endGesture(sim: Sim, c: Character): void {
+  const a = c.action;
+  if (a.duration > 0 && c.crafting === null && sim.world.tick >= a.since + a.duration) {
+    c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+    sim.runtime.changed = true;
+  }
+  const buffered = sim.runtime.bufferedAct[c.id];
+  if (buffered === null || inGesture(c, sim)) return;
+  sim.runtime.bufferedAct[c.id] = null;
+  if (sim.world.tick - buffered.tick <= secondsToTicks(sim.content.settings.feel.inputBufferSeconds)) applyIntent(sim, c.id, buffered.intent);
+}
+
+/** Gestes que l'action tenue répète, case après case, sur le potager. */
+const REPEATED: ReadonlySet<string> = new Set(['till', 'sow', 'water', 'harvest']);
+
+/**
+ * Espace tenu sur le potager: le geste se répète sur la case suivante visée
+ * (jamais deux fois sur la même), après `feel.heldRepeatSeconds` de pause.
+ */
+export function heldRepeat(sim: Sim, c: Character, held: boolean): void {
+  const r = sim.runtime;
+  if (!held) {
+    r.heldRepeat[c.id] = null;
+    return;
+  }
+  const a = c.action;
+  if (a.duration > 0 && REPEATED.has(a.kind) && a.target !== null) {
+    r.heldRepeat[c.id] = { cx: Math.floor(a.target.x), cy: Math.floor(a.target.y), endsAt: a.since + a.duration };
+  }
+  const last = r.heldRepeat[c.id];
+  const aim = c.aim;
+  const verb = aim?.verb ?? null;
+  if (last === null || aim === null || verb === null || !REPEATED.has(verb) || !canAct(c, sim)) return;
+  if (aim.cell.cx === last.cx && aim.cell.cy === last.cy) return;
+  if (sim.world.garden.every((g) => g.cell.cx !== aim.cell.cx || g.cell.cy !== aim.cell.cy)) return;
+  if (sim.world.tick < last.endsAt + secondsToTicks(sim.content.settings.feel.heldRepeatSeconds)) return;
+  actFront(sim, c);
 }
 
 function createCharacter(sim: Sim, c: Character, name: string, hair: number, outfit: number): void {
@@ -146,6 +201,7 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (intent.act && distance(c.pos, target.pos) <= reach) {
         stopPath(sim, c);
         if (canAct(c, sim)) actOnClick(sim, c, intent.target, target, sim.world.tick);
+        else bufferAct(sim, c, intent);
         return;
       }
       if (goTo(sim, c, target.pos)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
@@ -155,6 +211,7 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (c.status === 'dialogue' || c.status === 'scene') dialogueNext(sim, c);
       else if (c.status === 'sleeping') getUp(sim, c);
       else if (canAct(c, sim)) actFront(sim, c);
+      else bufferAct(sim, c, intent);
       return;
     case 'examine':
       examine(sim, c);

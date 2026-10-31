@@ -119,7 +119,8 @@ def _remplir(v: int, rng: np.random.Generator) -> np.ndarray:
     duree = 1.7
     n = dsp.n_ech(duree)
     x = rng.standard_normal(n)
-    y = dsp.pb_variable(x, lambda u: 380 + 900 * (u / duree) ** 1.3, type_="band", q_bande=3.0) * 0.8
+    debut_f, montee = ((380, 900), (430, 780))[v % 2]
+    y = dsp.pb_variable(x, lambda u: debut_f + montee * (u / duree) ** 1.3, type_="band", q_bande=3.0) * 0.8
     glouglou = dsp.grains(duree, 40, lambda r: dsp.bulle(r, r.uniform(250, 600), r.uniform(0.01, 0.03), 1.5) * r.uniform(0.3, 0.8), rng)
     eclab = dsp.grains(duree, 260, lambda r: dsp.clic(r, 1500, 6000, 0.003, 0.0008) * r.uniform(0.05, 0.2), rng)
     y = y + 0.6 * glouglou + 0.4 * eclab + 0.2 * dsp.pbande(x, 900, 3000)
@@ -320,16 +321,17 @@ def _porte_ferme(v: int, rng: np.random.Generator) -> np.ndarray:
 
 def _coffre_ouvre(v: int, rng: np.random.Generator) -> np.ndarray:
     y = dsp.toile(1.0)
-    grince = ins.crissement(rng, 0.45, lambda u: 120 + 260 * u, [(700, 11), (1450, 13), (2300, 12)], 0.1)
+    base, pente, choc = ((120, 260, 0.5), (150, 190, 0.44))[v % 2]
+    grince = ins.crissement(rng, 0.45, lambda u: base + pente * u, [(700, 11), (1450, 13), (2300, 12)], 0.1)
     grince *= dsp.env_ar(len(grince), 0.05, 0.15)
     dsp.poser(y, grince * 0.35, 0.0)
-    dsp.poser(y, ins.bois(rng, 170, 0.4, 0.7, t60=0.12) * 0.5, 0.5)
+    dsp.poser(y, ins.bois(rng, (170, 185)[v % 2], 0.4, 0.7, t60=0.12) * 0.5, choc)
     return y
 
 
 def _coffre_ferme(v: int, rng: np.random.Generator) -> np.ndarray:
     y = dsp.toile(0.7)
-    dsp.poser(y, ins.bois(rng, 125, 0.5, 1.1, rapports=(1.0, 2.5, 5.1), t60=0.2, amps=(1.0, 0.5, 0.2)), 0.0)
+    dsp.poser(y, ins.bois(rng, (125, 136)[v % 2], 0.5, 1.1, rapports=(1.0, 2.5, 5.1), t60=0.2, amps=(1.0, 0.5, 0.2)), 0.0)
     dsp.poser(y, ins.bruit_bref(rng, 0.15, 50, 220, 0.04) * 0.8, 0.0)
     for t in (0.06, 0.1):
         dsp.poser(y, ins.metal(rng, rng.uniform(2800, 3400), 0.05, t60=0.03) * 0.06, t)
@@ -346,9 +348,10 @@ def _caisse(v: int, rng: np.random.Generator) -> np.ndarray:
 
 def _tampon(v: int, rng: np.random.Generator) -> np.ndarray:
     y = dsp.toile(0.45)
-    dsp.poser(y, ins.bruit_bref(rng, 0.08, 140, 450, 0.02, 0.001) * 1.0, 0.0)
+    k = (1.0, 1.07, 0.94)[v % 3]  # trois tampons: le bois du manche sonne un peu différemment
+    dsp.poser(y, ins.bruit_bref(rng, 0.08, 140 * k, 450 * k, 0.02, 0.001) * 1.0, 0.0)
     dsp.poser(y, ins.bruit_bref(rng, 0.03, 900, 5000, 0.006, 0.0003) * 0.6, 0.0)
-    dsp.poser(y, ins.bois(rng, 380, 0.2, 0.7, t60=0.05) * 0.35, 0.002)
+    dsp.poser(y, ins.bois(rng, 380 * k, 0.2, 0.7, t60=0.05) * 0.35, 0.002)
     return dsp.stereo(y)
 
 
@@ -523,6 +526,96 @@ def _poule(v: int, rng: np.random.Generator) -> np.ndarray:
     return y
 
 
+# --- Interface du jeu: papier et bois ---------------------------------------------------------
+# La plateforme Duo parle en verre (célesta, harpe de verre, feutre); le jeu parle en papier et en
+# bois: le carnet, le crayon, la table de la maisonnette. Sons brefs et doux, pour la centième fois.
+
+def _papier(rng: np.random.Generator, duree: float, f_de: float, f_a: float, q: float = 1.2) -> np.ndarray:
+    """Une feuille qui glisse: bruit filtré dont la bande va de f_de à f_a, et un léger crépitement."""
+    n = dsp.n_ech(duree)
+    x = dsp.pb_variable(rng.standard_normal(n), lambda u: f_de + (f_a - f_de) * min(u / duree, 1.0),
+                        type_="band", q_bande=q)
+    x += ins.froissement(rng, duree, 1800, 7000, rng.uniform(80, 140), 0.004, duree * 0.6) * 0.25
+    return x * dsp.env_points(n, [(0, 0), (duree * 0.25, 1.0), (duree, 0)])
+
+
+def _ui_focus(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le focus se déplace: un tic de crayon sur le bois de la table, à peine là."""
+    y = dsp.toile(0.07)
+    dsp.poser(y, ins.bois(rng, (2150, 2400, 2650)[v % 3], 0.06, 0.4, rapports=(1.0, 1.72), t60=0.018,
+                          amps=(1.0, 0.25)), 0.0)
+    return dsp.stereo(dsp.pb(y, 6000))
+
+
+def _ui_suite(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Réplique suivante: un ongle sur le papier et un souffle de feuille."""
+    y = dsp.toile(0.12)
+    dsp.poser(y, dsp.clic(rng, 1500, 5000, 0.004, 0.0012) * 0.5, 0.0)
+    dsp.poser(y, _papier(rng, 0.07, (3800, 4200, 3500)[v % 3], 2200, 1.5) * 0.35, 0.004)
+    return dsp.stereo(y)
+
+
+def _ui_onglet(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Changer d'onglet: le coin d'une page qu'on tourne vite."""
+    y = dsp.toile(0.2)
+    dsp.poser(y, _papier(rng, 0.13, (6000, 5400, 6500)[v % 3], 2000, 1.0) * 0.7, 0.0)
+    dsp.poser(y, ins.bruit_bref(rng, 0.03, 400, 2200, 0.006) * 0.25, 0.1)
+    return dsp.stereo(y)
+
+
+def _ui_valider(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Valider: un « tok » rond de bois, une petite claque de papier, un tic plus clair juste après."""
+    y = dsp.toile(0.3)
+    k = (1.0, 1.05, 0.95)[v % 3]
+    dsp.poser(y, ins.bruit_bref(rng, 0.04, 1500, 6000, 0.01, 0.001) * 0.3, 0.0)
+    dsp.poser(y, ins.bois(rng, 520 * k, 0.2, 0.7, rapports=(1.0, 2.3, 4.4), t60=0.07, amps=(1.0, 0.4, 0.15)), 0.0)
+    dsp.poser(y, ins.bois(rng, 760 * k, 0.15, 0.5, rapports=(1.0, 2.3), t60=0.05, amps=(1.0, 0.3)) * 0.45, 0.045)
+    return dsp.stereo(y)
+
+
+def _ui_retour(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Revenir, fermer: la feuille glisse vers le bas et un « tok » plus grave, plus mat."""
+    y = dsp.toile(0.3)
+    dsp.poser(y, _papier(rng, 0.1, 4000, 1500, 1.3) * 0.4, 0.0)
+    dsp.poser(y, dsp.pb(ins.bois(rng, (360, 340)[v % 2], 0.2, 0.5, rapports=(1.0, 2.3, 4.4), t60=0.06,
+                                 amps=(1.0, 0.35, 0.1)), 3000), 0.05)
+    return dsp.stereo(y)
+
+
+def _ui_ouvre(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Un panneau s'ouvre: une feuille qu'on déplie (la bande monte), posée d'un petit coup sur la table."""
+    y = dsp.toile(0.35)
+    dsp.poser(y, _papier(rng, 0.18, 1200, (4500, 5000)[v % 2], 1.1) * 0.6, 0.0)
+    dsp.poser(y, ins.bois(rng, 290, 0.15, 0.4, rapports=(1.0, 2.4), t60=0.05, amps=(1.0, 0.3)) * 0.4, 0.17)
+    return dsp.stereo(y)
+
+
+def _ui_ferme(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Un panneau se ferme: la feuille qu'on replie (la bande descend) et un coup plus sourd."""
+    y = dsp.toile(0.32)
+    dsp.poser(y, _papier(rng, 0.15, (4200, 3800)[v % 2], 1000, 1.1) * 0.55, 0.0)
+    dsp.poser(y, dsp.pb(ins.bois(rng, 230, 0.15, 0.4, rapports=(1.0, 2.4), t60=0.05, amps=(1.0, 0.25)), 2500) * 0.45,
+              0.14)
+    return dsp.stereo(y)
+
+
+def _ui_refus(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Refus doux: deux petits coups feutrés sur une boîte en bois, à la même hauteur (« toc-toc,
+    pas ici »). Ni mélodie, ni dissonance: rien de punitif, et rien de commun avec le carillon de
+    marimba qui monte (notify) ni avec les coups de feutre qui descendent de Duo."""
+    y = dsp.toile(0.45)
+    # Fondamentale vers 330 Hz et deuxième mode marqué: le refus doit s'entendre aussi sur les petits
+    # haut-parleurs d'un portable, qui rendent mal ce qui est sous 300 Hz.
+    f1 = (330, 352)[v % 2]
+    ecart = (0.105, 0.12)[v % 2]
+    for k, (t, g) in enumerate(((0.0, 1.0), (ecart, 0.72))):
+        coup = ins.bois(rng, f1 * (1.0 - 0.015 * k), 0.25, 0.3, rapports=(1.0, 2.6, 4.9), t60=0.08,
+                        amps=(1.0, 0.55, 0.2))
+        coup = dsp.somme(coup, ins.bruit_bref(rng, 0.05, 100, 320, 0.012) * 0.4)
+        dsp.poser(y, dsp.pb(coup, 3000) * g, t)
+    return dsp.stereo(y)
+
+
 # --- Pêche au gué ----------------------------------------------------------------------------
 
 def _lancer(v: int, rng: np.random.Generator) -> np.ndarray:
@@ -623,7 +716,7 @@ def sons() -> list[Son]:
         Son("sow", "Semer", "effets", "effects", _semer, 3, -26.0, 3, 0.05, 1.0, "pres"),
         Son("water", "Arroser une case", "effets", "effects", _arroser, 2, -25.0, 3, 0.04, 1.0, "pres"),
         Son("water-empty", "Arrosoir vide", "effets", "effects", _arrosoir_vide, 1, -24.0, 2, 0.03, 0.5, "pres"),
-        Son("water-fill", "Remplir l'arrosoir au puits ou au tonneau", "effets", "effects", _remplir, 1, -24.0, 3,
+        Son("water-fill", "Remplir l'arrosoir au puits ou au tonneau", "effets", "effects", _remplir, 2, -24.0, 3,
             0.03, 0.5, "pres"),
         Son("harvest", "Récolter (« pop »)", "effets", "effects", _recolter, 3, -21.0, 2, 0.05, 1.0, "pres"),
         Son("quality-fine", "Récolte de qualité « belle » (un tintement, joué avec le « pop »)", "effets", "effects",
@@ -654,11 +747,11 @@ def sons() -> list[Son]:
         Son("door-open", "Ouvrir la porte (elle grince)", "effets", "effects", _porte_ouvre, 2, -22.0, 3, 0.03, 1.0,
             "moyen"),
         Son("door-close", "Fermer la porte", "effets", "effects", _porte_ferme, 2, -21.0, 3, 0.04, 1.0, "moyen"),
-        Son("chest-open", "Ouvrir le coffre", "effets", "effects", _coffre_ouvre, 1, -23.0, 3, 0.04, 0.5, "pres"),
-        Son("chest-close", "Fermer le coffre", "effets", "effects", _coffre_ferme, 1, -22.0, 3, 0.04, 0.5, "pres"),
+        Son("chest-open", "Ouvrir le coffre", "effets", "effects", _coffre_ouvre, 2, -23.0, 3, 0.04, 1.0, "pres"),
+        Son("chest-close", "Fermer le coffre", "effets", "effects", _coffre_ferme, 2, -22.0, 3, 0.04, 1.0, "pres"),
         Son("crate-deposit", "Déposer un produit dans la caisse de la coopérative", "effets", "effects", _caisse, 2,
             -23.0, 3, 0.05, 1.0, "pres", note="suivi de order-stamp quand une ligne de la commande se coche"),
-        Son("order-stamp", "Coup de tampon: une ligne de la commande se coche", "interface", "ui", _tampon, 1, -22.5,
+        Son("order-stamp", "Coup de tampon: une ligne de la commande se coche", "interface", "ui", _tampon, 3, -22.5,
             2, 0.03, 0.5, None, canaux=2),
         Son("coins", "Monnaie (vendre, acheter, paiement de la coopérative)", "interface", "ui", _pieces, 3, -21.0, 2,
             0.04, 1.0, None, canaux=2),
@@ -682,6 +775,27 @@ def sons() -> list[Son]:
             None, canaux=2, intervalle_min_ms=50),
         Son("tool-switch", "Changer d'outil", "interface", "ui", _outil, 2, -27.0, 4, 0.06, 1.0, None, canaux=2,
             intervalle_min_ms=60),
+        Son("ui-focus", "Interface du jeu: le focus se déplace (Tab, flèches)", "interface", "ui", _ui_focus, 3, -31.0, 4,
+            0.03, 1.5, None, canaux=2, intervalle_min_ms=45, voix_max=2,
+            note="jamais pour un focus posé par le programme (ouverture d'un écran), comme la plateforme"),
+        Son("ui-next", "Interface du jeu: réplique suivante (Espace, « Suite »)", "interface", "ui", _ui_suite, 3, -28.0,
+            4, 0.04, 1.0, None, canaux=2, intervalle_min_ms=80, voix_max=2),
+        Son("ui-tab", "Interface du jeu: changer d'onglet (carnet, panneaux, A et E)", "interface", "ui", _ui_onglet, 3,
+            -26.0, 3, 0.05, 1.0, None, canaux=2, intervalle_min_ms=60, voix_max=2),
+        Son("ui-confirm", "Interface du jeu: valider (Entrée, Espace, clic sur un bouton)", "interface", "ui",
+            _ui_valider, 3, -23.0, 3, 0.02, 1.0, None, canaux=2, intervalle_min_ms=80, voix_max=2,
+            queue_reverbe=(0.35, 0.1)),
+        Son("ui-back", "Interface du jeu: revenir ou fermer (Retour arrière, « Fermer »)", "interface", "ui", _ui_retour,
+            2, -24.0, 3, 0.02, 1.0, None, canaux=2, intervalle_min_ms=80, voix_max=2, queue_reverbe=(0.35, 0.1)),
+        Son("ui-panel-open", "Interface du jeu: un panneau s'ouvre (caisse, comptoir, catalogue, coffre, plan)",
+            "interface", "ui", _ui_ouvre, 2, -25.0, 3, 0.03, 1.0, None, canaux=2, intervalle_min_ms=120, voix_max=2,
+            queue_reverbe=(0.35, 0.1), note="pas pour le carnet, qui a déjà journal-open"),
+        Son("ui-panel-close", "Interface du jeu: un panneau se ferme", "interface", "ui", _ui_ferme, 2, -26.0, 3, 0.03,
+            1.0, None, canaux=2, intervalle_min_ms=120, voix_max=2, queue_reverbe=(0.35, 0.1),
+            note="remplace ui-back quand c'est un panneau qui se ferme"),
+        Son("ui-refusal", "Refus doux: action impossible, bouton désactivé, pose refusée, notification d'erreur",
+            "interface", "ui", _ui_refus, 2, -24.0, 2, 0.02, 1.0, None, canaux=2, intervalle_min_ms=600, voix_max=1,
+            note="« Déjà pris par Sacha », sac plein, sous ou matériaux manquants; notify reste aux bonnes nouvelles"),
         Son("duo-hop", "Geste à deux: on soulève ensemble (« hop »)", "effets", "effects", _hop, 1, -20.0, 2, 0.02,
             0.5, "pres", note="sans voix: le souffle de l'effort est remplacé par le bois de la poutre (duo-carry-loop)"),
         Son("duo-carry-loop", "Geste à deux: la poutre portée (boucle)", "effets", "effects", _poutre, 1, -28.0, 3,

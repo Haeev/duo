@@ -3,8 +3,8 @@
 | Champ | Valeur |
 |---|---|
 | Relecteur | architecte-technique (concepteur de l'architecture de la plateforme, pas du code du jeu) |
-| Date | 2026-10-31, de 08 h 57 à 09 h 45 UTC |
-| Version relue | arbre de travail à `85026e7`, sans aucune modification du code ni des données |
+| Date | 2026-10-31, de 08 h 57 à 09 h 30 UTC |
+| Version relue | arbre de travail à `85026e7` (puis `4352b17`, commits de documentation seulement), sans aucune modification du code ni des données de ma part. L'arbre bougeait: d'autres membres modifiaient `src/` pendant la relecture (ressenti des commandes, ambiance; Vite a rechargé la page de 09 h 16 à 09 h 20). Mesures dans Node faites de 08 h 59 à 09 h 05, captures de 09 h 00 à 09 h 17 |
 | Méthode | revue de code ciblée (`src/reseau/`, `src/sauvegarde/`, `src/session.ts`, `src/main.ts`, `src/simulation/pas.ts`, `src/rendu/moteur.ts`, `src/rendu/reglages.ts`), suite Vitest, typecheck et lint du jeu; mesures dans Node (robots sur les quinze jours, graine 42, règle d'envoi de `hote.ts` reproduite) et dans Chromium (page `rendu.html` servie par Vite sur le port 5305, fenêtre de 1366x768); lecture de la recette (sections 9 et 10, endurance à deux navigateurs). Scripts de mesure hors du dépôt (`/tmp/lpl-archi/`) |
 
 ## 1. Note: 6,5 sur 10
@@ -26,11 +26,11 @@ Repères: 5 = fonctionne mais fragile; 8 = un joueur ne remarque aucun manque. O
 | Poste | Budget (architecture, 14.2) | Mesuré | Verdict |
 |---|---|---|---|
 | Pas de simulation (temps processeur) | 2 ms au plus par pas | médiane 0,029 ms, 99e centile 0,64 ms, 99,9e 3,3 ms, maximum 25,7 ms (jour 1, compilation à la volée); 14 pas sur 125 609 au-delà de 8 ms | tenu, large marge |
-| Pas de simulation (temps mural) | | jusqu'à 230 ms, à des pas différents d'une passe à l'autre, sans ramasse-miettes pendant ces pas (4 passages du ramasse-miettes en tout, 8 ms au plus): machine partagée (charge moyenne 25), pas le code | non significatif ici |
+| Pas de simulation (temps mural) | | jusqu'à 479 ms, à des pas différents d'une passe à l'autre (quatre passes), sans ramasse-miettes pendant ces pas (4 passages du ramasse-miettes en tout, 8 ms au plus): machine partagée (charge moyenne 25), pas le code | non significatif ici |
 | Message rapide (positions) | 2 Ko au plus, 20 à 30 par seconde | 0,9 Ko au plus, 30 par seconde (27 Kio/s) | tenu |
 | Message d'état complet | 64 Kio au plus par message (SDK, `net.ts`) | 26,8 Kio au plus; 6 467 envois en 70 min de jeu, 1,5 par seconde en moyenne | tenu, marge de 2,4 |
-| Débit total vers l'invité | 100 Ko/s au plus | 33 Kio/s d'état en moyenne plus 27 Kio/s de positions; pire seconde: 133 Kio d'état seul | **dépassé** par pointes (jours 1 à 3, 8 à 10: 44 à 60 Kio/s en moyenne sur la journée) |
-| Sauvegarde à la fin des deux semaines | 1 Mio (`duo-game.json`, `saves.maxBytes`) | 27 560 octets (5 725 compressés); 16,0 Kio au jour 1, 23,0 au jour 8, 26,1 au jour 14 | tenu |
+| Débit total vers l'invité | 100 Ko/s au plus | 33 Kio/s d'état en moyenne plus 27 Kio/s de positions; pire seconde: 133 Kio d'état, environ 160 Kio avec les positions | **dépassé** par pointes (jours 1 à 3, 8 à 10: 44 à 60 Kio/s en moyenne sur la journée) |
+| Sauvegarde à la fin des deux semaines | 1 Mio (`duo-game.json`, `saves.maxBytes`) | 27 560 octets (5 725 compressés); 16,0 Kio à la fin du jour 1, 23,0 à la fin du jour 8, 26,1 à la fin du jour 14 | tenu |
 | Copie et sérialisation de l'état | | `structuredClone` 0,48 ms, `JSON.stringify` 0,21 ms, `JSON.parse` 0,15 ms | tenu |
 | Chargement du contenu et de la carte (fil principal) | 5 s pour toute la partie | contenu 2 à 9 ms, carte 3 à 7 ms, reprise d'une sauvegarde 0,1 à 0,8 ms | tenu |
 
@@ -38,7 +38,20 @@ Composition de la sauvegarde du jour 15 (champs les plus lourds): `characters` 7
 
 ### 2.2 Rendu (Chromium, rendu logiciel, page `rendu.html`, 1366x768)
 
-RENDU_TABLE
+| Scène (paramètres de `rendu.html`) | Appels de dessin (pointe) | Triangles | Programmes | Géométries | Textures |
+|---|---|---|---|---|---|
+| Budget (architecture, 14.2) | 150 | 250 000 | 12 | | |
+| 10 h 30, soleil | 104 | 153 600 | 11 | 68 | 20 |
+| 17 h 15, carte d'ombre de 2048 (`heure=17:15`) | 114 | 168 600 | 11 | 75 | 22 |
+| pluie à 14 h (`meteo=rain`) | 106 | 158 100 | 11 | 71 | 22 |
+| nuit à 21 h | 106 | 156 200 | 11 | 70 | 22 |
+| train à quai, zoom rapproché (`train=stopped&zoom=0`) | 96 | 138 900 | 11 | 68 | 20 |
+| vue la plus large (`zoom=2&orientation=2`) | **121** | **187 600** | 11 | 75 | 24 |
+| maisonnette meublée et coins (`interieur=1&repare=1&coins=1`) | 98 | 163 100 | 11 | 59 | 22 |
+| pêche et repère (`peche=touche&repere=1`) | 107 | 153 500 | 11 | 71 | 20 |
+| mode léger (`rendu=leger`) | 67 | 69 400 | 7 | 62 | 15 |
+
+Valeurs lues sur l'indicateur de performances de chaque capture (`/tmp/lpl-archi/pw/overlays.png`, planche examinée, ainsi que les captures entières de 17 h 15, du train à quai et de la vue la plus large). Pire cas: 81 % des appels, 75 % des triangles, **11 programmes sur 12**. La part des triangles due à l'ombre (100 000 au plus) ne se lit pas séparément.
 
 Le rendu logiciel ne dit rien des images par seconde ni du temps GPU: seuls les appels, triangles, programmes, géométries et textures sont des mesures valables ici. L'état affiché est l'état d'exemple de la page, pas une partie réelle.
 
@@ -55,10 +68,10 @@ Le rendu logiciel ne dit rien des images par seconde ni du temps GPU: seuls les 
 ## 3. Ce qui est déjà au niveau
 
 - **Simulation séparée du rendu**, pure, à pas fixe de 30 Hz, testable dans Node: un pas coûte 0,03 ms en médiane, soit une marge d'un facteur 60 sur le budget, même avec un i3 deux fois plus lent.
-- **Robots et endurance**: les robots jouent les quinze jours sur dix graines, avec et sans l'énigme, avec sauvegarde et reprise à chaque aube en inversant hôte et invité (`tests/endurance.test.ts`); la même démo tourne à deux navigateurs sans erreur ni écart (recette, 10.2). Peu de jeux commerciaux ont un tel filet.
+- **Robots et endurance**: les robots jouent les quinze jours sur dix graines, avec et sans l'énigme, avec sauvegarde et reprise à chaque aube en inversant hôte et invité (`tests/endurance.test.ts`); la même démo tourne à deux navigateurs sans erreur ni écart (recette, 10.2).
 - **Entrées de l'invité validées strictement** (`src/reseau/schemas.ts`: `strictObject`, bornes, `picklist`): l'hôte ne fait confiance à rien de ce qui vient de l'autre machine.
 - **Sauvegardes liées à l'identifiant stable des joueurs** (`bindPlayers`), format versionné (`DATA_SCHEMA` 2), migration du format 1 testée sur deux cas, refus d'une sauvegarde plus récente, sauvegarde de sortie à l'arrêt (`connect.ts`, `saveFromProvider('exit')`), copies de secours gardées par la plateforme (ADR 0009).
-- **Budgets de rendu tenus dans la page de démonstration**, shaders compilés pendant le chargement (`compileAsync`, `moteur.ts` ligne 370), libération vérifiée par l'essai d'endurance du rendu.
+- **Budgets de rendu tenus dans la page de démonstration** (§2.2), shaders compilés pendant le chargement (`compileAsync`, `moteur.ts` ligne 370), libération complète à la sortie (`dispose` des parties, des ressources suivies, des listes de rendu, puis `forceContextLoss` et retrait du canevas, `moteur.ts` lignes 594 à 610).
 - **Code propre**: TypeScript strict sans échappatoire, lint et typecheck verts, aucun reste de débogage, commentaires qui expliquent le pourquoi.
 - **LPL-R01 corrigé** (chien de garde): aucun arrêt en dix séances depuis.
 
@@ -69,15 +82,15 @@ Classés par probabilité multipliée par gravité, du point de vue des deux jou
 ### Risque 1: le PC ne tient pas le rythme, et personne ne peut baisser la qualité
 
 - **Constat**: le PC de référence (UHD 620, 1366x768 ou 1920x1080 à 150 %) est la machine la plus faible et n'a jamais fait tourner le jeu. Si les images dépassent le budget, le seul levier automatique est la résolution dynamique, qui ne descend qu'à 0,75 et seulement quand la moyenne dépasse 20 ms (moins de 50 images par seconde): entre 50 et 58, rien ne bouge, et sous 0,75 non plus. Le mode léger (ombres coupées, antialiasing coupé, 640x360, végétation au quart) existe, mais ne s'active que par `?rendu=leger` dans l'adresse, qu'aucun joueur ne peut taper dans Duo (`main.ts`, `renderQuality()`: « l'application Duo: pas de mode léger »). Le SDK n'a pas de réglage de qualité graphique (`packages/sdk/src/api.ts`).
-- **Preuve**: `src/rendu/reglages.ts` lignes 187 à 195 (`steps: [1, 0.9, 0.8, 0.75]`, `slowFrameMs: 20`); `src/main.ts` lignes 50 à 59; 11 programmes sur 12 dans la page de démonstration (marge d'un seul matériau).
-- **Correction proposée**: (a) dans `src/rendu/moteur.ts`, après le dernier palier, si la moyenne reste au-dessus de 20 ms pendant 8 s, passer au mode léger à chaud pour ce qui se change sans recréer le contexte (ombres, rapport de pixels, effets et végétation), et l'inscrire dans le journal (`duo.log.info`); descendre aussi quand la moyenne dépasse 17,2 ms (58 images par seconde); (b) retenir ce choix d'une séance à l'autre (préférence locale du jeu); (c) plus tard, un réglage « Qualité graphique: automatique, belle, légère » de la plateforme, transmis par le SDK à tous les jeux (ADR à écrire, avec dev-plateforme).
+- **Preuve**: `src/rendu/reglages.ts` lignes 207 à 216 à l'heure de la relecture (`steps: [1, 0.9, 0.8, 0.75]`, `slowFrameMs: 20`); `src/main.ts` lignes 50 à 59; 11 programmes sur 12 dans la page de démonstration (marge d'un seul matériau).
+- **Correction proposée**: (a) dans `src/rendu/moteur.ts`, après le dernier palier, si la moyenne reste au-dessus de 20 ms pendant 8 s, passer au mode léger à chaud pour ce qui se change sans recréer le contexte (ombres, rapport de pixels, effets et végétation), et l'inscrire dans le journal (`duo.log.info`); descendre aussi d'un palier quand la moyenne dépasse 18 ms (environ 55 images par seconde); (b) retenir ce choix d'une séance à l'autre (préférence propre à chaque machine: le SDK n'offre pas encore de stockage local, à voir avec dev-plateforme); (c) plus tard, un réglage « Qualité graphique: automatique, belle, légère » de la plateforme, transmis par le SDK à tous les jeux (ADR à écrire, avec dev-plateforme).
 - **Effort**: (a) et (b) 150 minutes (dev rendu 3D) plus 30 minutes de test; (c) 240 minutes (ADR, SDK, réglages de Duo).
 - **Gain attendu**: +1 (c'est ce qui rend une note de 8 défendable avant même la mesure chez le client).
 
 ### Risque 2: au-delà de 64 Kio d'état, la partie plante chez les deux
 
 - **Constat**: l'hôte envoie l'état complet à l'invité (`hote.ts`, `sendWorld`) dès qu'il change, au plus cinq fois par seconde. Le SDK lève une `RangeError` au-delà de 64 Kio (`packages/sdk/src/net.ts` ligne 120); l'exception sort du pas (aucun `try` dans la boucle du SDK), remonte en erreur de page, donc en `fatal`: la partie s'arrête sur les deux machines, et à chaque reprise de la même sauvegarde. L'état pèse déjà 26,8 Kio au jour 15 (41 % du plafond) et contient ce qui n'a rien à y faire: notifications de l'interface (1,8 Kio par personnage), textes complets des lettres, copie intégrale des compteurs (`countersAtDawn`). Le débit dépasse aussi le budget par pointes (133 Kio en une seconde).
-- **Preuve**: mesure du §2.1 (règle d'envoi de `hote.ts` reproduite sur les quinze jours); `tests/endurance.test.ts` vérifie bien 64 Kio, mais sans marge ni alerte avant le mur. Au rythme de la semaine 2 (environ 0,2 Kio de plus par jour), le plafond tomberait vers le jour 200, soit 25 à 30 heures de jeu; plus tôt si chaque semaine ajoute des lettres, quêtes et dialogues comme la semaine 2 (+10 Kio en sept jours).
+- **Preuve**: mesure du §2.1 (règle d'envoi de `hote.ts` reproduite sur les quinze jours); `tests/endurance.test.ts` vérifie bien 64 Kio, mais sans marge ni alerte avant le mur. Projection: si chaque semaine nouvelle ajoute autant que la semaine 2 (+3,8 Kio du jour 8 au jour 15, dont 2 Kio dès son premier jour), le plafond tombe vers la dixième semaine après la démo, soit une douzaine d'heures de jeu en tout (une semaine par séance d'environ une heure); sans contenu nouveau, au rythme de la fin de la semaine 2 (0,2 Kio par jour), vers le jour 200, près de 28 heures.
 - **Correction proposée**: (a) `src/reseau/hote.ts`: n'envoyer que les champs de premier niveau qui ont changé (comparaison de leur JSON tous les six pas, 0,2 ms) et les fusionner chez l'invité (`invite.ts`); l'état complet seulement au début et après une reconnexion; (b) sortir les notifications de l'état (canal d'événements), remplacer le texte des lettres par leur identifiant et leurs variables, et `countersAtDawn` par les seuls écarts du jour, avec une migration vers le format 3 testée; (c) relever dans `endurance.test.ts` une alerte à 32 Kio (moitié du plafond) pour voir venir le mur.
 - **Effort**: (c) 15 minutes; (a) 120 minutes (dev réseau); (b) 150 minutes (dev gameplay, migration comprise).
 - **Gain attendu**: +0,5 (et la condition pour dépasser la démo, voir §5).
@@ -86,7 +99,7 @@ Classés par probabilité multipliée par gravité, du point de vue des deux jou
 
 - **Constat**: `checkWorld` (`src/sauvegarde/sauvegarde.ts` lignes 73 à 102) ne contrôle que la présence de quelques champs de premier niveau. Une sauvegarde dont un champ imbriqué manque (oubli dans une migration future, par exemple) est acceptée, puis le premier pas lève une `TypeError`: plantage chez les deux, à chaque relance. À l'inverse, une sauvegarde refusée fait démarrer **une nouvelle partie sans rien dire** au joueur (`src/session.ts` lignes 133 à 139, « sauvegarde illisible: nouvelle partie »), que la sauvegarde automatique écrasera cinq minutes plus tard; les copies de secours de la plateforme existent, mais rien n'invite le duo à s'en servir. Enfin, les tests de migration fabriquent l'ancien format en retirant des champs à un état actuel (`asVersion1`, `tests/sauvegarde.test.ts`): aucune vraie sauvegarde d'une version publiée n'est gardée comme référence.
 - **Preuve**: essai dans Node sur la sauvegarde du jour 15, privée de `characters[0].bag` et de `counters`, avec une case de potager vide: `restoreWorld` l'accepte, puis `step` lève « TypeError: Cannot read properties of undefined (reading '1') ».
-- **Correction proposée**: (a) dans `restoreWorld`, jouer un pas sur une copie (`structuredClone`) et transformer toute exception en `SaveError` (garde-fou bon marché, en attendant un schéma); (b) dans `session.ts`, sur `SaveError`, ne pas démarrer de nouvelle partie: afficher « Ta sauvegarde n'a pas pu être relue » avec le choix de reprendre la copie précédente ou de recommencer, et ne rien écrire avant ce choix; (c) un schéma Valibot de `WorldState`, partagé par la sauvegarde et le réseau (risque 5); (d) garder dans `tests/sauvegardes/` une vraie sauvegarde de chaque version publiée (0.1.0 au jour 4, au jour 8 et au jour 15), rechargée et jouée jusqu'au lendemain à chaque `pnpm test`.
+- **Correction proposée**: (a) dans `restoreWorld`, jouer une centaine de pas sur une copie (`structuredClone`, quelques millisecondes) et transformer toute exception en `SaveError` (garde-fou bon marché, en attendant un schéma); (b) dans `session.ts`, sur `SaveError`, ne pas démarrer de nouvelle partie: afficher « Ta sauvegarde n'a pas pu être relue » avec le choix de reprendre la copie précédente ou de recommencer, et ne rien écrire avant ce choix; (c) un schéma Valibot de `WorldState`, partagé par la sauvegarde et le réseau (risque 5); (d) garder dans `tests/sauvegardes/` une vraie sauvegarde de chaque version publiée (0.1.0 au jour 4, au jour 8 et au jour 15), rechargée et jouée jusqu'au lendemain à chaque `pnpm test`.
 - **Effort**: (a) 30 minutes; (d) 45 minutes; (b) 90 minutes (avec dev-plateforme si la reprise d'une copie passe par Duo); (c) 240 minutes.
 - **Gain attendu**: +0,5.
 
@@ -137,6 +150,7 @@ L'architecture actuelle porte bien une démo de deux semaines. Pour un jeu de 10
 - Mémoire totale de Duo en partie (1 Go au plus) et audio décodé dans le jeu réel: pas de séance Duo lancée (d'autres relecteurs travaillent en parallèle; la recette a déjà mesuré le tas JavaScript).
 - Reprise après une vraie coupure du réseau pendant une partie: non rejouée; lecture du code: la plateforme met les deux en pause et l'hôte renvoie l'état complet au moins toutes les 3 s (`WORLD_KEEPALIVE_TICKS`), ce qui suffit à recaler l'invité.
 - Écart de position entre les deux écrans: non mesurable sans crochet (recette, 10.3, point 4).
+- Essai d'endurance du rendu (`rendu.html?cycles=12`, créer, dessiner et libérer douze fois): non conclu. Un premier essai s'est arrêté sur « Target page, context or browser has been closed », le second après un cycle (67 géométries, 20 textures, tas de 57 Mo, aucun canevas restant) parce que Vite rechargeait la page à chaque modification faite en parallèle dans `src/`. Cet essai n'est appelé par aucun test automatique: à brancher dans `tests/e2e/` pour qu'il tourne à chaque recette (20 minutes).
 
 ## 7. À tester chez le client
 

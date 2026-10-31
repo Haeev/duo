@@ -3,7 +3,7 @@
  * générateur, les événements du pas et des caches qui ne se sauvegardent pas.
  */
 import { createRandom, type RandomSource } from '@duo/sdk/sim';
-import type { ClickTarget } from '../etat/actions';
+import type { ClickTarget, Intent } from '../etat/actions';
 import type { GameMap } from '../etat/carte';
 import type {
   Character,
@@ -56,6 +56,10 @@ export interface Runtime {
   holdNotified: Record<CharacterId, boolean>;
   /** Ce maintien de l'action a servi à un geste d'outil: il ne bâtit pas avant d'être relâché. */
   holdForTool: Record<CharacterId, boolean>;
+  /** Appui reçu pendant un geste (Espace, clic à portée), joué à la fin du geste (`feel.inputBufferSeconds`). */
+  bufferedAct: Record<CharacterId, { intent: Intent; tick: number } | null>;
+  /** Espace tenu: case du dernier geste et fin de ce geste, pour passer à la case suivante de la rangée. */
+  heldRepeat: Record<CharacterId, { cx: number; cy: number; endsAt: number } | null>;
 }
 
 export interface Sim {
@@ -81,6 +85,8 @@ export function createRuntime(map: GameMap): Runtime {
     beamOffsets: { p1: { x: 0, y: 0 }, p2: { x: 0, y: 0 } },
     holdNotified: { p1: false, p2: false },
     holdForTool: { p1: false, p2: false },
+    bufferedAct: { p1: null, p2: null },
+    heldRepeat: { p1: null, p2: null },
   };
 }
 

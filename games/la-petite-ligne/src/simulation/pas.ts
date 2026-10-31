@@ -16,7 +16,7 @@ import { envieStayPoints, updateEnvies, updateStays } from './envies';
 import { moveCharacter, refreshBlockers, updateBeam, updateInside } from './deplacement';
 import { updateVillagers } from './habitants';
 import { checkNight, updateAbsence, updateClock } from './horloge';
-import { applyIntent, arrive, updateCrafting } from './intentions';
+import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
 import { updateFishing } from './peche';
 import { wanderHens } from './poules';
 import { updateQuests } from './quetes';
@@ -105,6 +105,8 @@ export function step(sim: Sim, input: StepInput): void {
       if (c.status === 'gesture') continue;
       if (moveCharacter(sim, c, input.controls[c.id], dt)) arrive(sim, c);
       updateCrafting(sim, c);
+      endGesture(sim, c);
+      heldRepeat(sim, c, input.controls[c.id]?.actHeld === true);
       updateFishing(sim, c);
     }
     updateConstructions(sim, input.controls, dt);

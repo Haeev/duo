@@ -646,6 +646,69 @@ export const AMBIANCE_SETTINGS = {
   },
 
   /**
+   * Vent (gauntlet, tour 2): balancement du feuillage, des herbes et des
+   * fleurs (première rangée de la palette et cases `flower_*`), proportionnel
+   * à la hauteur au-dessus du pied, et frisson du store de l'épicerie. Rien
+   * dans la carte d'ombre: les ombres restent immobiles.
+   */
+  wind: {
+    /** Direction du vent au sol (x, z), celle des nuages. */
+    direction: [1.1, 0.45] as const,
+    /** Déplacement par mètre de hauteur (m), plafonné à `maxHeight`. */
+    strength: 0.018,
+    maxHeight: 6,
+    /** Balancement (rad/s), rafales lentes (rad/s) et taille des rafales (m par onde). */
+    swaySpeed: 1.6,
+    gustSpeed: 0.33,
+    gustSize: 28,
+    /** Déphasage d'un arbre à l'autre (par mètre). */
+    phaseScale: 0.37,
+    /** Frisson des tissus (m) et sa vitesse (rad/s). */
+    cloth: 0.025,
+    clothSpeed: 4.2,
+    /** Force selon la météo. */
+    weather: { sunny: 1, cloudy: 1.4, rain: 1.9 },
+  },
+
+  /**
+   * Fumées de cheminée (gauntlet, tour 2): fines, rares, qui montent en
+   * dérivant avec le vent et s'effacent. Les bouches de cheminée sont
+   * trouvées dans les modèles (faces sombres tournées vers le haut, au sommet
+   * du bâtiment).
+   */
+  chimneys: {
+    /** Heures des foyers du bourg (minutes): petit-déjeuner, midi, soirée. */
+    villageHours: [
+      [390, 540],
+      [690, 790],
+      [1080, 1350],
+    ] as const,
+    /** Maisonnette réparée: le soir (veillée, réchaud) et au petit-déjeuner. */
+    houseHours: [
+      [360, 480],
+      [1080, 1440],
+    ] as const,
+    /** Après un repas cuisiné à la maisonnette, elle fume encore ce temps (s, temps réel). */
+    afterCookingSeconds: 90,
+    rate: 0.55,
+    seconds: 3.6,
+    startSize: 0.16,
+    endSize: 0.85,
+    rise: 0.55,
+    lift: 0.12,
+    /** Le vent pousse la fumée (part de sa direction, m/s²). */
+    drift: 0.22,
+    spread: 0.06,
+    drag: 0.6,
+    opacity: 0.4,
+    color: '#dcd8d1',
+    /** Une bouche de cheminée: faces de cette case, tournées vers le haut, à moins de `topBand` m du sommet. */
+    openingCell: 'shadow',
+    topBand: 1.2,
+    clusterRadius: 0.8,
+  },
+
+  /**
    * Version légère des effets: le moteur la prend de lui-même si les images
    * restent trop longues (mêmes seuils que la résolution dynamique).
    */

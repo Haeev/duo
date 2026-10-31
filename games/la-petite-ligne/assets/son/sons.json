@@ -298,9 +298,10 @@
       "bus": "effects",
       "priority": 3,
       "files": [
-        "effets/water-fill.ogg"
+        "effets/water-fill-1.ogg",
+        "effets/water-fill-2.ogg"
       ],
-      "pick": "single",
+      "pick": "shuffle-no-repeat",
       "pitchVariation": 0.03,
       "gainVariationDb": 0.5,
       "volumeDb": 0.0,
@@ -316,7 +317,8 @@
         "cullBeyondM": 28.0
       },
       "durationMs": [
-        1693
+        1693,
+        1695
       ],
       "momentaryMaxLufs": -24.0
     },
@@ -793,11 +795,12 @@
       "bus": "effects",
       "priority": 3,
       "files": [
-        "effets/chest-open.ogg"
+        "effets/chest-open-1.ogg",
+        "effets/chest-open-2.ogg"
       ],
-      "pick": "single",
+      "pick": "shuffle-no-repeat",
       "pitchVariation": 0.04,
-      "gainVariationDb": 0.5,
+      "gainVariationDb": 1.0,
       "volumeDb": 0.0,
       "minIntervalMs": 0,
       "maxVoices": 4,
@@ -811,7 +814,8 @@
         "cullBeyondM": 28.0
       },
       "durationMs": [
-        618
+        618,
+        561
       ],
       "momentaryMaxLufs": -23.0
     },
@@ -820,11 +824,12 @@
       "bus": "effects",
       "priority": 3,
       "files": [
-        "effets/chest-close.ogg"
+        "effets/chest-close-1.ogg",
+        "effets/chest-close-2.ogg"
       ],
-      "pick": "single",
+      "pick": "shuffle-no-repeat",
       "pitchVariation": 0.04,
-      "gainVariationDb": 0.5,
+      "gainVariationDb": 1.0,
       "volumeDb": 0.0,
       "minIntervalMs": 0,
       "maxVoices": 4,
@@ -838,7 +843,8 @@
         "cullBeyondM": 28.0
       },
       "durationMs": [
-        219
+        219,
+        217
       ],
       "momentaryMaxLufs": -22.0
     },
@@ -877,9 +883,11 @@
       "bus": "ui",
       "priority": 2,
       "files": [
-        "interface/order-stamp.ogg"
+        "interface/order-stamp-1.ogg",
+        "interface/order-stamp-2.ogg",
+        "interface/order-stamp-3.ogg"
       ],
-      "pick": "single",
+      "pick": "shuffle-no-repeat",
       "pitchVariation": 0.03,
       "gainVariationDb": 0.5,
       "volumeDb": 0.0,
@@ -889,7 +897,9 @@
       "channels": 2,
       "spatial": null,
       "durationMs": [
-        92
+        92,
+        90,
+        90
       ],
       "momentaryMaxLufs": -22.5
     },
@@ -1130,6 +1140,202 @@
         76
       ],
       "momentaryMaxLufs": -27.0
+    },
+    "ui-focus": {
+      "event": "Interface du jeu: le focus se déplace (Tab, flèches)",
+      "bus": "ui",
+      "priority": 4,
+      "files": [
+        "interface/ui-focus-1.ogg",
+        "interface/ui-focus-2.ogg",
+        "interface/ui-focus-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 45,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        29,
+        30,
+        30
+      ],
+      "momentaryMaxLufs": -31.0,
+      "note": "jamais pour un focus posé par le programme (ouverture d'un écran), comme la plateforme"
+    },
+    "ui-next": {
+      "event": "Interface du jeu: réplique suivante (Espace, « Suite »)",
+      "bus": "ui",
+      "priority": 4,
+      "files": [
+        "interface/ui-next-1.ogg",
+        "interface/ui-next-2.ogg",
+        "interface/ui-next-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 80,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        84,
+        84,
+        84
+      ],
+      "momentaryMaxLufs": -28.0
+    },
+    "ui-tab": {
+      "event": "Interface du jeu: changer d'onglet (carnet, panneaux, A et E)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "interface/ui-tab-1.ogg",
+        "interface/ui-tab-2.ogg",
+        "interface/ui-tab-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 60,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        140,
+        140,
+        140
+      ],
+      "momentaryMaxLufs": -26.0
+    },
+    "ui-confirm": {
+      "event": "Interface du jeu: valider (Entrée, Espace, clic sur un bouton)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "interface/ui-confirm-1.ogg",
+        "interface/ui-confirm-2.ogg",
+        "interface/ui-confirm-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 80,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        317,
+        328,
+        327
+      ],
+      "momentaryMaxLufs": -23.0
+    },
+    "ui-back": {
+      "event": "Interface du jeu: revenir ou fermer (Retour arrière, « Fermer »)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "interface/ui-back-1.ogg",
+        "interface/ui-back-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 80,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        322,
+        348
+      ],
+      "momentaryMaxLufs": -24.0
+    },
+    "ui-panel-open": {
+      "event": "Interface du jeu: un panneau s'ouvre (caisse, comptoir, catalogue, coffre, plan)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "interface/ui-panel-open-1.ogg",
+        "interface/ui-panel-open-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 120,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        466,
+        465
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "pas pour le carnet, qui a déjà journal-open"
+    },
+    "ui-panel-close": {
+      "event": "Interface du jeu: un panneau se ferme",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "interface/ui-panel-close-1.ogg",
+        "interface/ui-panel-close-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 120,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        413,
+        448
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "remplace ui-back quand c'est un panneau qui se ferme"
+    },
+    "ui-refusal": {
+      "event": "Refus doux: action impossible, bouton désactivé, pose refusée, notification d'erreur",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "interface/ui-refusal-1.ogg",
+        "interface/ui-refusal-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 600,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        195,
+        212
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "« Déjà pris par Sacha », sac plein, sous ou matériaux manquants; notify reste aux bonnes nouvelles"
     },
     "duo-hop": {
       "event": "Geste à deux: on soulève ensemble (« hop »)",

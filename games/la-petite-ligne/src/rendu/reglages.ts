@@ -110,6 +110,26 @@ export const RENDER_SETTINGS = {
     blinkSeconds: 0.12,
     /** Silhouette du joueur vue derrière un mur. */
     silhouetteOpacity: 0.38,
+    /** Fondu entre la marche et l'attente: court, pour que les pieds ne glissent pas au départ et à l'arrêt. */
+    walkFadeSeconds: 0.1,
+    /** Fondu d'entrée et de sortie d'un geste d'outil joué une fois. */
+    gestureFadeSeconds: 0.06,
+    /**
+     * Instant du contact dans chaque clip de geste (s, mesuré sur la main droite
+     * de `personnages.glb`: au plus bas pour la houe, la récolte, le marteau;
+     * la hache touche le tronc à mi-descente). Le clip démarre juste avant, pour
+     * que le coup tombe avec le son et la terre, émis au pas de l'appui.
+     */
+    gestureImpact: { hoe: 0.53, chop: 0.62, harvest: 0.34, sow: 0.4, hammer: 0.27 } as Readonly<
+      Record<string, number>
+    >,
+    /** Le contact tombe au plus ce délai après l'appui (s). */
+    gestureImpactLead: 0.08,
+    /**
+     * Un geste beaucoup plus long que son clip (scie et cuisine à l'établi,
+     * plusieurs secondes) se joue en boucle à son rythme plutôt qu'étiré.
+     */
+    gestureLoopAbove: 1.6,
   },
 
   garden: {
