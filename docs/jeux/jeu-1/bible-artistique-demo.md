@@ -4,7 +4,7 @@
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (démo d'une heure, printemps à la Halte d'Aubrune) |
 | Statut | proposition de l'artiste 3D, à relire par le directeur artistique |
-| Version | 0.2, 2026-10-31 (formes: low poly arrondi, section 8) |
+| Version | 0.3, 2026-10-31 (formes: low poly arrondi, section 8, réglée sur les témoins) |
 | Sources des couleurs | `games/la-petite-ligne/assets-src/modeles/palette.py` (seule source; ce document en est l'extrait) |
 | Planches | `games/la-petite-ligne/assets-src/modeles/planches/` (scène assemblée de jour et de nuit, personnages, poses, bâtiments, ferme, train, maison) |
 
@@ -103,6 +103,8 @@ Une lumière directionnelle avec ombre, une hémisphérique, quatre ponctuelles 
 
 Décision du client (2026-10-31): le jeu est trop « angle droit », il demande de la courbure. Le style devient un **low poly arrondi**: les mêmes facettes visibles, mais plus aucune arête vive ni aucun coin à 90° là où l'œil s'arrête. On arrondit par des chanfreins à facettes et des volumes gonflés, jamais par un lissage des normales.
 
+État au 2026-10-31: la règle s'applique aux trois modèles témoins (`firmin_house`, joueur avec `outfit_work` et `hair_short`, `tree_oak_large` et `bush_round`). Rien n'est appliqué au reste du bourg avant l'accord du client.
+
 ### 8.1 Ce qu'on garde
 
 - Les facettes visibles: une normale par face (ombrage en aplats), pas de lissage, pas de normales moyennées sur les chanfreins. Un chanfrein se voit comme une ou deux bandes de lumière, c'est voulu.
@@ -122,12 +124,12 @@ Décision du client (2026-10-31): le jeu est trop « angle droit », il demande 
 
 - Chanfreiner les arêtes vues par la caméra (angles verticaux des murs, bords des toits, dessus des meubles et des marches). Les arêtes posées au sol ou cachées restent vives.
 - Pas plus de 2 segments: au-delà, la facette disparaît et le coût monte sans gain lisible à 16 à 36 m de champ.
-- Pierres et moellons: coins abattus irréguliers (pas de cube parfait), décalés de 1 à 3 cm d'un bloc à l'autre.
+- Pierres, moellons et pierres d'angle: coins abattus irréguliers (pas de cube ni de rectangle parfait), décalés de 1 à 3 cm d'un bloc à l'autre.
 
 ### 8.3 Toits
 
 - Débords: 30 à 40 cm au pignon, 25 à 35 cm à l'égout; rive épaisse de 12 à 15 cm, chanfreinée (2 segments).
-- Faîtage légèrement fléchi (3 à 5 cm au milieu) et pans un peu bombés (une rangée de sommets intermédiaire décalée de 2 à 4 cm): le toit doit paraître posé et mou, pas tiré à la règle.
+- Faîtage fléchi de 6 à 10 cm au milieu et pans bombés (une rangée de sommets intermédiaire décalée de 4 à 6 cm): le toit doit paraître posé et mou, pas tiré à la règle. En dessous de 6 cm, la courbure ne se voit pas à 24 m de champ (constaté sur le témoin `firmin_house`).
 - Lauzes et tuiles: rangs suggérés par des bandes de facettes, pas par des tuiles modélisées une à une. Cheminées chanfreinées, chapeau débordant de 5 cm.
 - Auvents, store et marquise: bord libre ondulé ou arrondi, jamais une dalle plate.
 
@@ -148,13 +150,13 @@ Jamais moins de 5 pans pour une pièce ronde vue, jamais plus de 16.
 ### 8.5 Personnages
 
 - Hauteur inchangée (1,74 m avec les cheveux, Jeanne à 0,75), positions des os inchangées, clips inchangés.
-- Tête plus grosse: un cinquième de la hauteur (environ 34 cm, contre un sixième), plus large que haute de 5 %, menton arrondi; nez et oreilles en petites formes à 1 segment.
-- Torse en tonneau: section octogonale, épaules arrondies (pas de carré d'épaule), taille à peine marquée, épaisseur du corps +15 %; silhouette gonflée, douce, sans coin.
+- Tête plus grosse: un cinquième de la hauteur (environ 34 cm, contre un sixième), boule facettée de 10 à 12 pans, plus large que haute de 5 %, menton arrondi; nez et oreilles en petites formes à 1 segment. Si la hauteur de 1,74 m coince, prendre la place sur le cou et le haut du torse, jamais sur les jambes.
+- Torse en tonneau: section octogonale, épaules arrondies (pas de carré d'épaule), ventre et dos légèrement bombés, taille à peine marquée, épaisseur du corps +15 %; silhouette gonflée, douce, sans coin. Le changement doit se voir au zoom de jeu: un joueur arrondi qui garde la silhouette d'avant n'est pas accepté.
 - Membres: cylindres de 6 pans effilés et un peu renflés au milieu, coudes et genoux sans pointe; mains en moufles arrondies (pouce seul détaché), pieds et chaussures en galets arrondis.
-- Cheveux et coiffes en masses arrondies (casquette de Firmin, béret de Basile, chignon d'Odette, tresses de Jeanne): les silhouettes distinctes restent, en plus rondes.
+- Cheveux et coiffes en masses arrondies, mèches en lobes (jamais un casque cubique): casquette de Firmin, béret de Basile, chignon d'Odette, tresses de Jeanne gardent leurs silhouettes distinctes, en plus rondes.
 - Le foulard des joueurs grossit d'un tiers, avec un pan qui dépasse de la silhouette: c'est le signe du profil Duo, il doit se lire de loin.
 - Repeindre la rangée du personnage (`personnages.png`) doit continuer de marcher: mêmes cases de palette, mêmes rôles (section 2).
-- Poids de peau recalculés pour le volume gonflé; vérifier chaque clip (pas de bras qui traverse le torse plus gros: écarter l'épaule de 1 à 2 cm si besoin, sans bouger l'os).
+- Poids de peau recalculés pour le volume gonflé, ou peau rigide par pièce tant qu'aucune traversée ne se voit; vérifier au moins `idle`, `walk`, `hoe`, `water` et `carry_two` (bras devant le torse plus gros: écarter l'épaule de 1 à 2 cm si besoin, sans bouger l'os). Le budget du joueur (3 200) est là pour arrondir: ne pas finir sous le compte d'avant.
 
 ### 8.6 Feuillages
 
@@ -209,3 +211,4 @@ Plafond de la plateforme: 250 000 triangles et 150 appels de dessin à l'écran.
 |---|---|---|---|
 | 2026-10-31 | 0.1 | Première version (palette, matériaux, lumière, lisibilité, personnages) | artiste 3D |
 | 2026-10-31 | 0.2 | Section 8 « Formes: low poly arrondi » (décision du client: plus de courbure), budgets du PC de référence; section 9 | directeur artistique |
+| 2026-10-31 | 0.3 | Réglages après la planche des témoins de l'artiste 3D: flèche du faîtage de 6 à 10 cm et bombé des pans de 4 à 6 cm (3 à 5 et 2 à 4 cm invisibles à 24 m), pierres d'angle irrégulières, tête de 10 à 12 pans, coiffures en lobes, torse bombé, clips à vérifier, budget du joueur à employer. Style appliqué aux seuls témoins jusqu'à l'accord du client | directeur artistique |

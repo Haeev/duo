@@ -30,10 +30,17 @@ export function pickEnvies(sim: Sim): void {
   }
 }
 
-/** Points suivis par les envies « rester à » (calculé une fois). */
+/**
+ * Points suivis par les conditions « rester à » (calculé une fois): envies, et aussi étapes des
+ * quêtes (sans eux, un rendez-vous de quête ne se remplissait jamais).
+ */
 export function envieStayPoints(sim: Sim): string[] {
   const set = new Set<string>();
   for (const e of sim.content.envies) stayPoints(e.fulfilledWhen, set);
+  for (const q of sim.content.quests) {
+    stayPoints(q.start.when, set);
+    for (const step of q.steps) stayPoints(step.conditions, set);
+  }
   return [...set];
 }
 

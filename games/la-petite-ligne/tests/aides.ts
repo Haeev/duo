@@ -28,6 +28,14 @@ export function newSim(seed = SEED, content: Content = contentAndMap().content):
   ]);
 }
 
+/** Buts d'après-midi des jours creux: un groupe de variantes par jour, une seule tirée par la graine (`quetes.json`). */
+export const AFTERNOON_GROUPS: Readonly<Record<string, readonly [string, string]>> = {
+  afternoon_d6: ['odette_dandelions', 'heron_watch'],
+  afternoon_d10: ['odette_parcels', 'basile_lost'],
+  afternoon_d11: ['firmin_chub', 'wild_geese'],
+  afternoon_d13: ['jeanne_notebook', 'jeanne_challenge'],
+};
+
 /** Somme versée pour la commande `index` partie complète (prime de ligne et bonus, sans surplus). */
 export function fullOrderAmount(content: Content, index: number): number {
   const o = content.settings.order.trains[index];

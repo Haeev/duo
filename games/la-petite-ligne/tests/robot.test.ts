@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { hash } from '../src/simulation/empreinte';
 import { step } from '../src/simulation/pas';
 import { SIM_HZ } from '../src/simulation/constantes';
-import { contentAndMap, createRobot, fullOrderAmount, newSim, play } from './aides';
+import { variantOf } from '../src/simulation/conditions';
+import { AFTERNOON_GROUPS, contentAndMap, createRobot, fullOrderAmount, newSim, play } from './aides';
 
 /** Une démo complète dure au plus quelques heures de jeu réel: borne de sécurité. */
 const MAX_TICKS = SIM_HZ * 60 * 120;
@@ -67,7 +68,9 @@ describe('robot', () => {
     expect(w.ending?.furniturePlaced).toBeGreaterThan(0);
     expect(w.ending?.keyFound).toBe(true);
     expect(w.worldStates.handcar_shed).toBe('open');
-    const weekTwo = ['second_order', 'handcar', 'emile_riddle_2', 'odette_fry', 'basile_omelette', 'lucie_note', 'firmin_flowers', 'odette_parcels', 'firmin_chub', 'jeanne_notebook'];
+    // Buts d'après-midi: la variante que la graine tire pour chaque jour creux.
+    const afternoon = Object.entries(AFTERNOON_GROUPS).map(([group, quests]) => quests[variantOf(w.seed, group, quests.length)] ?? '');
+    const weekTwo = ['second_order', 'handcar', 'emile_riddle_2', 'odette_fry', 'basile_omelette', 'lucie_note', 'firmin_flowers', ...afternoon];
     for (const quest of ['first_train', 'roof', 'first_sprouts', 'meet_village', 'saturday_order', 'hens', 'planks', 'welcome_supper', ...weekTwo]) {
       expect(w.quests.find((q) => q.id === quest)?.status, quest).toBe('done');
     }

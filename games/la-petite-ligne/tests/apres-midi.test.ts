@@ -1,6 +1,6 @@
-// Quêtes d'après-midi des jours creux (gauntlet, tour 4): la cueillette de pissenlits du jour 6 jouée
-// pas à pas sur la vraie carte (la semaine 1 des robots ne change pas); les trois de la semaine 2
-// (colis d'Odette, chevesne de Firmin, carnet de Jeanne) sont jouées par les robots (`robot.test.ts`).
+// Quêtes d'après-midi des jours creux (gauntlet, tours 4 et 5): la cueillette de pissenlits du jour 6
+// jouée pas à pas sur la vraie carte, avec une graine qui tire cette variante (les robots jouent toutes
+// les variantes dans `endurance.test.ts` et `robot.test.ts`).
 import { describe, expect, it } from 'vitest';
 import type { Intent } from '../src/etat/actions';
 import type { Sim } from '../src/simulation/contexte';
@@ -9,6 +9,7 @@ import { SIM_HZ } from '../src/simulation/constantes';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { step } from '../src/simulation/pas';
 import { countInBag } from '../src/simulation/sac';
+import { variantOf } from '../src/simulation/conditions';
 import { createRobot, newSim, play } from './aides';
 
 function act(sim: Sim, intent: Intent, ticks = 20): void {
@@ -18,7 +19,9 @@ function act(sim: Sim, intent: Intent, ticks = 20): void {
 
 describe('pissenlits du jour 6', () => {
   it('cinq pissenlits au bord du bois, trois apportés à Odette: la quête se termine', () => {
-    const sim = newSim(7);
+    // Graine 42: variante 0 du jour 6 (`afternoon_d6`), la cueillette.
+    const sim = newSim(42);
+    expect(variantOf(42, 'afternoon_d6', 2)).toBe(0);
     play(sim, createRobot(), (s) => s.world.clock.day === 6 && s.world.clock.minutes >= 12 * 60 + 30 && s.world.scene === null && s.world.phase === 'day', SIM_HZ * 60 * 60);
     expect(sim.world.quests.find((q) => q.id === 'odette_dandelions')?.status).toBe('active');
     const c = character(sim, 'p1');

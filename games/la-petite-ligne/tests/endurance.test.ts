@@ -7,7 +7,8 @@ import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import type { Sim } from '../src/simulation/contexte';
 import { SIM_HZ } from '../src/simulation/constantes';
 import { step } from '../src/simulation/pas';
-import { contentAndMap, createRobot, fullOrderAmount, newSim } from './aides';
+import { variantOf } from '../src/simulation/conditions';
+import { AFTERNOON_GROUPS, contentAndMap, createRobot, fullOrderAmount, newSim } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
@@ -114,6 +115,12 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   const w = sim.world;
   const status = (id: string): string => w.quests.find((q) => q.id === id)?.status ?? 'pas commencée';
   for (const id of [...WEEK_TWO_SIDE, ...(keyExpected ? WEEK_TWO_SHED : [])]) expect(status(id), `quête ${id} terminée`).toBe('done');
+  // Buts d'après-midi: la variante tirée par la graine se termine, l'autre ne démarre pas.
+  for (const [group, quests] of Object.entries(AFTERNOON_GROUPS)) {
+    const chosen = variantOf(w.seed, group, quests.length);
+    expect(status(quests[chosen] ?? ''), `${group}: ${quests[chosen] ?? ''}`).toBe('done');
+    expect(status(quests[1 - chosen] ?? ''), `${group}: l'autre variante`).toBe('pas commencée');
+  }
   // Sans l'énigme 1, Basile ouvre la remise lui-même au jour 12 (rattrapage du game designer): la draisine se joue quand même.
   if (!keyExpected) {
     expect(status('handcar'), 'draisine après le rattrapage du jour 12').toBe('done');
@@ -142,6 +149,14 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
 }
 
 describe('endurance des robots', () => {
+  it('chaque variante des buts d’après-midi est tirée par au moins une graine', () => {
+    const seeds = [...SEEDS, 3, 5150, 777];
+    for (const [group, quests] of Object.entries(AFTERNOON_GROUPS)) {
+      const drawn = new Set(seeds.map((s) => variantOf(s, group, quests.length)));
+      expect([...drawn].sort(), group).toEqual([0, 1]);
+    }
+  });
+
   for (const seed of SEEDS) {
     it(`graine ${seed}: la démo se termine, commande payée, sans blocage`, () => {
       const { sim, run } = playToEnd(newSim(seed), true);
