@@ -3,21 +3,22 @@
 | Champ | Valeur |
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (titre provisoire) |
-| Statut | proposition, à valider par le client (section 9) |
-| Version du document | 0.1 |
-| Dernière mise à jour | 2026-10-31 |
+| Statut | proposition; D1 et D3 tranchées par le client le 2026-11-01, les autres décisions à valider (section 9) |
+| Version du document | 0.2 |
+| Dernière mise à jour | 2026-11-01 |
 | Rédaction | game-designer, sur brief du manager (gauntlet de qualité, tour 1) |
-| Documents liés | cahier des charges (règles de référence): `cahier-des-charges.md`; démo: `demo.md`, `semaine-2.md`; gauntlet: `gauntlet/grille.md`, `docs/modeles/gauntlet-qualite.md`; simulation de ce plan: `simulations/plan_100_heures.py` |
+| Documents liés | cahier des charges (règles de référence): `cahier-des-charges.md`; démo: `demo.md`, `semaine-2.md`; gauntlet: `gauntlet/grille.md`, `docs/modeles/gauntlet-qualite.md`; simulation de ce plan: `simulations/plan_100_heures.py`; retours du client: `retours/2026-11-01/retours.md`; conception du tour 10: `tour-10-conception.md` (simulation `simulations/tour10_maison.py`) |
 
 ## En bref
 
 - **Objectif du client (2026-10-31)**: 100 heures de jeu à deux, amusantes et sans répétition, au niveau de soin des meilleures simulations de vie paisibles (références de qualité, jamais de contenu).
 - **Point de départ**: une démo de deux semaines (environ 2 h), écrite jour par jour: chaque événement est calé sur une date. Ce calendrier écrit ne passe pas à l'échelle: à 100 h, il faudrait écrire 372 journées une par une.
 - **Le principe du plan**: deux couches qui s'empilent. Des **systèmes qui renouvellent** le quotidien (saisons, météo tirée, commande générée, annonces, répliques vivantes, envies, visiteurs, collections) et du **contenu écrit qui avance** (huit arcs, 30 habitants et leurs histoires, sept gares, quatre métiers de plus, la maison qui grandit, le mystère d'Émile).
-- **Le calendrier**: 372 journées, 4,4 années de jeu, 99,9 h, 150 séances de 40 minutes (section 2). Huit arcs de 3 à 21 heures; chaque arc ouvre un lieu, des habitants, une mécanique et un but au long cours.
+- **Le calendrier**: 372 journées, 4,4 années de jeu, 99,9 h, 150 séances de 40 minutes (section 2); avec la journée doublée (D1), 397 journées et 4,7 années pour 100 h (section 2.2). Huit arcs de 3 à 21 heures; chaque arc ouvre un lieu, des habitants, une mécanique et un but au long cours.
 - **Anti-répétition et coopération**: seize règles chiffrées (section 4), toutes vérifiées par un robot « longue vie » qui joue cinq années simulées et par des statistiques sur les données. Exemple mesuré: avec la réserve de répliques de la démo, 41 % des conversations d'un habitant redisent une phrase entendue dans les 28 jours; avec la règle proposée, 0,7 %.
 - **Prochain jalon (J1, détaillé section 7)**: « La fête des semailles et l'inauguration du quai », jours 15 à 23. Il pose huit systèmes de renouvellement (lots L1 à L8) sur la carte actuelle, avec dix modèles 3D nouveaux. Environ 1 h 20 de jeu en plus.
-- **Neuf décisions pour le client** (section 9), dont la plus structurante: la journée s'allonge au début de l'été (0,35 s puis 0,8 s par minute de jeu, de 8 à 16,6 minutes réelles), parce que le monde s'agrandit.
+- **Neuf décisions pour le client** (section 9). Deux sont tranchées depuis la première soirée de jeu (2026-11-01): **D1**, des journées plus longues (la journée double dès le jour 1, 0,7 s par minute de jeu, avec un réglage de rythme; section 2.1), et **D3**, la maison s'agrandit (pièces bâties à deux d'abord, plan libre ensuite).
+- **Retours du 1er novembre** (section 3.4): carte trop petite, trop peu d'habitants, aucun intérieur, besoins, coupes de cheveux, fenêtres, rangement, maison. Le tour 10 en fait la première étape (`tour-10-conception.md`): la rue Haute, deux habitants, deux intérieurs, des besoins doux, le cellier et la chambre, un rangement à cases; la suite est répartie dans les arcs.
 
 ## 1. Point de départ: ce que contient la démo
 
@@ -25,7 +26,7 @@ Mesures du 2026-10-31 sur `games/la-petite-ligne/donnees/` et `assets/`:
 
 | Contenu | Démo (jours 1 à 15) | Version 1 du cahier (année 1) | Jeu complet (100 h, ce plan) |
 |---|---|---|---|
-| Habitants | 4 (Firmin, Odette, Basile, Jeanne) | 10 | 30 |
+| Habitants | 4 (Firmin, Odette, Basile, Jeanne) | 10, puis 13 avec ceux du bourg ajoutés au tour 10 | 30, puis 34 (section 3.4) |
 | Textes (répliques, objectifs, lettres, messages) | 282, dont 88 répliques d'habitants en 77 dialogues | environ 1 500 | environ 9 000 (section 6) |
 | Quêtes | 17 (6 principales, 11 secondaires) | 14 étapes de chapitre, 50 étapes d'habitants | environ 330 (section 6) |
 | Objets | 46, dont 8 recettes | environ 250 | environ 700 |
@@ -48,15 +49,17 @@ Diagnostic:
 
 ## 2. Le rythme et la somme des heures
 
-### 2.1 La journée s'allonge avec le monde
+### 2.1 La journée doublée (D1, tranchée par le client le 2026-11-01)
+
+Après sa première soirée de jeu, le client a trouvé les journées « beaucoup trop courtes » (R14) et a tranché D1: des journées plus longues. Au lieu du passage de 0,35 s à 0,8 s au jour 24 que proposait la version 0.1, la journée double dès le jour 1, avec un réglage de rythme décidé à deux.
 
 | Période | Horloge | Journée réelle | Raison |
 |---|---|---|---|
-| Printemps de l'année 1 et J1 (jours 1 à 23) | 0,35 s par minute de jeu | 8 min estimées (`demo_rythme.py`: 63 min pour 8 journées; 9,8 min au modèle du cahier) | bourg compact, une nouveauté par journée, apprentissage |
-| À partir du jour 24 (lendemain de l'inauguration du quai, début de J2) | 0,8 s (cahier, TE-01) | 16,6 min | la Halte entière (120x90 m), cinq métiers, deux gares puis plus: la marche et les activités demandent de vraies journées |
-| Réglage du duo « Rythme » | « vif » 0,6 s, « normal » 0,8 s, « paisible » 1,0 s | 13,6, 16,6 et 19,6 min | chaque duo choisit; une proposition chez l'autre, comme EC-11 |
+| Version 0.1 (proposée) | 0,35 s jusqu'au jour 23, puis 0,8 s | 8 min, puis 16,6 min | la démo sur la carte compacte, puis la Halte entière |
+| **Retenu (D1, 2026-11-01)** | 0,7 s par minute de jeu dès le jour 1 (la durée de la démo doublée) | 15,1 min au modèle du cahier (900 minutes de jeu dehors et 4,6 min fixes) | le duo a fait le tour de la journée trop vite; un autre membre double la durée et ajoute le réglage |
+| Réglage du duo « Rythme » | trois vitesses autour de 0,7 s (valeurs posées avec le réglage, à reporter ici) | | chaque duo choisit; une proposition chez l'autre, comme EC-11 |
 
-Une journée plus longue réduit aussi la répétition: à 100 h, 0,8 s donne 4,4 années de jeu; 0,6 s en donnerait 5,3, soit une saison de plus vécue cinq fois. Le changement se fait au lendemain de l'inauguration, quand la Halte s'ouvre en entier et que l'été commence, sans annonce technique; une phrase d'Odette le dit dans le monde (« Les jours rallongent, vous verrez: on a le temps de tout faire, l'été. »). Décision D1.
+Le contenu se compte en heures de jeu, jamais en secondes: les horaires, les besoins (tour 10, section 3) et les envies tiennent à toute vitesse entre 0,5 et 1,0 s. Ce qui dépend de la vitesse: la marche (la rue Haute est à 24 à 27 s de la maisonnette, 34 à 39 minutes de jeu) et l'économie (la paie des commandes a été calée sur les robots à 0,35 s: à remesurer à la nouvelle vitesse avant tout réglage de prix; le tour 10 l'a testée aussi à revenus x 1,25). La phrase d'Odette prévue au jour 22 (« Les jours rallongent... ») reste une phrase d'été, sans changement d'horloge.
 
 ### 2.2 Le calendrier des arcs
 
@@ -74,6 +77,8 @@ Résultat de `python3 simulations/plan_100_heures.py` (partie 1), saisons de 21 
 | A8 La vallée entière | 297 à 372 | automne 4 à été 5 | 76 | 21,0 | 99,9 |
 | **Total** | | 4,4 années | **372** | **99,9** | 150 séances de 40 min |
 
+Avec la journée doublée (D1), les mêmes journées durent plus longtemps (`simulations/tour10_maison.py`, partie 1): A1 5,8 h, A2 4,8 h, A3 10,6 h, A4 à A7 13,3 h chacun, soit 93,6 h pour les 372 journées. Pour 100 h, A8 passe de 76 à 102 journées (25,7 h): **397 journées, 4,7 années de jeu, 100,2 h**. L'année 1 (A1 à A3) fait 21,2 h au lieu de 20,2 h. `plan_100_heures.py` garde l'ancienne horloge: à mettre à jour quand les vitesses du réglage seront fixées.
+
 Contrôle: A1 à A3 (20,2 h) forment la version 1 du cahier (une année, deux gares); A4 à A7 (58,7 h) les quatre épisodes du cahier (53 journées chacun, 6.11); A8 (21 h) le « long terme » du cahier (18,1 h dans la version 0.1), allongé de 2,9 h parce que la démo, plus rapide, raccourcit l'année 1 de 3,1 h. Le script refuse un total hors de 99 à 101,5 h.
 
 À deux heures par semaine, c'est un an de soirées. Un duo optimiseur ira plus vite sur les chapitres (une semaine de moins sur le chapitre 2 selon `economie_et_chapitres.py`), mais les saisons, les fêtes et les années ne s'accélèrent pas: le jeu ne s'épuise pas plus vite qu'il ne se vit.
@@ -87,7 +92,7 @@ Chaque arc apporte au moins: un lieu neuf, des habitants neufs ou une étape neu
 | Arc | Durée | Lieu neuf | Habitants | Mécanique neuve | Buts | Relié à |
 |---|---|---|---|---|---|---|
 | **A1 Le printemps de la Halte** | 3,3 h | la place en fête, le quai et sa marquise | Lucie (5e habitante de la Halte) | saisons et météo tirée, commande générée, répliques vivantes, petites annonces, carnet de la vallée, chantier collectif, repousse des arbres | inaugurer le quai (chapitre 1) | ouvre la voie (A2): la draisine est prête depuis la semaine 2 |
-| **A2 L'été du bourg** | 5,3 h | la Halte entière: bois de la Côte, amont de l'Aubrune, gué, remise; puis la voie des Vergers (400 m) | les cinq de la Halte passent aux étapes 2 et 3 de leur histoire; trois premiers visiteurs | les cinq métiers, rangs 1 à 3 et regard du métier; liens chiffrés; jumelles et oiseaux; cultures d'été; agrandissements de la maison par pièces; aléas d'été (grêle, coup de sec) | rangs de métier, carnet d'oiseaux, la cuisine et la chambre, dégager les quatre obstacles de la voie à deux | la voie mène aux Vergers (A3) |
+| **A2 L'été du bourg** | 5,3 h | la Halte entière: la rue Haute (tour 10), les intérieurs du bourg, l'amont de l'Aubrune et le moulin, le bois de la Côte, gué, remise; puis la voie des Vergers (400 m) | les habitants de la Halte passent aux étapes 2 et 3 de leur histoire; Achille, Solange, Armand et Berthe arrivent (section 3.4); trois premiers visiteurs | les cinq métiers, rangs 1 à 3 et regard du métier; liens chiffrés; jumelles et oiseaux; cultures d'été; agrandissements de la maison par pièces; aléas d'été (grêle, coup de sec) | rangs de métier, carnet d'oiseaux, la cuisine et la chambre, dégager les quatre obstacles de la voie à deux | la voie mène aux Vergers (A3) |
 | **A3 Les Vergers** | 11,6 h | le hameau des Vergers, l'étang, les terrasses | Hélène, Augustin, Rose, Victor, Nadia | deux gares et trajets, chèvres, ruches, arbres fruitiers, conserverie, Foire d'automne, hiver (neige, poêle, Veillée des contes), plan libre de la maison | chapitre 2 (gare des Vergers), première année complète | la page du carnet de l'oncle parle de Lac-Clair (A4); le locotracteur de Nadia annonce Cheminot (A5) |
 | **A4 Lac-Clair** | 14,7 h | le lac, ses rives, le lavoir, l'île | cinq habitants du lac | métier Artisanat (poterie, tissage), barque, pêche au lac et pêche de nuit aux lanternes; les fêtes de l'année 2 ont chacune une activité nouvelle | rebâtir le lavoir, Fête des lanternes du lac | l'argile et la laine nourrissent la maison; le tissage habille les coins à soi |
 | **A5 La Tourbière** | 14,7 h | les brumes, l'herboristerie, la tourbière | cinq habitants | métier Cheminot (voie, signaux, wagons), croisement des semences et conservatoire, brumes qui cachent et révèlent | premier wagon restauré (wagon-serre), conservatoire à moitié | les wagons deviennent un fil au long cours (A8) |
@@ -103,8 +108,8 @@ Les arcs avancent dans l'espace; ces fils avancent dans le temps et relient les 
 |---|---|---|---|
 | **Saisons et années** | cultures, poissons, oiseaux, cueillettes, palette, musiques, emplois du temps des habitants, fêtes | une saison toutes les 21 journées (5,8 h); chaque année a son almanach (règle R9) | année 2: la crue de printemps de l'Aubrune (un gué à rebâtir, des poissons remontés) |
 | **Métiers** | 5 métiers aux rangs 1 à 3 (A2), Artisanat (A4), Cheminot (A5), rangs 4 et 5 (A6), une spécialité par rang 3 et 5 | un rang principal tous les 20 à 30 jours | rang 4 de Pêche et cueillette: la nasse à anguilles et la pêche de nuit |
-| **La maison qui grandit** | maisonnette (démo), puis pièces ajoutées (A2), plan libre et grenier (A3), atelier de poterie (A4), véranda (A5), étage (A6), maison idéale (A8) | une étape par arc au moins | « La chambre a enfin une fenêtre. Tu dors avec le chant du merle. » |
-| **Habitants** | 30 habitants, chacun en cinq étapes (HA-02), puis une vie après leur histoire (ils changent de métier, d'emploi du temps, de tenue, d'avis) | une étape d'habitant tous les deux à trois jours en moyenne | Jeanne grandit: dix ans à l'année 1, onze à l'année 2, d'autres questions, d'autres envies |
+| **La maison qui grandit** (D3, tranchée le 2026-11-01) | maisonnette (démo), cellier et chambre bâtis à deux (tour 10, été et automne de l'année 1), grenier aménagé (hiver 1), cuisine et atelier (A2 et A3), plan libre (J3), atelier de poterie (A4), véranda (A5), étage (A6), maison idéale (A8); le rangement grandit avec elle (coffre, grand coffre, étagères, cellier) | une étape par arc au moins | « La chambre a enfin une fenêtre. Tu dors avec le chant du merle. » |
+| **Habitants** | 34 habitants (les 30 de la version 0.1 et quatre de plus au bourg: Achille, Solange, Armand, Berthe), chacun en cinq étapes (HA-02), puis une vie après leur histoire (ils changent de métier, d'emploi du temps, de tenue, d'avis) | une étape d'habitant tous les deux à trois jours en moyenne | Jeanne grandit: dix ans à l'année 1, onze à l'année 2, d'autres questions, d'autres envies |
 | **Le mystère d'Émile** | trois énigmes (A1, A3), le carnet de route (démo), une énigme par épisode, la chaîne finale (A7) | une énigme par arc | « Là où l'eau ne gèle jamais, j'ai laissé la clé du dernier quai. É. L. » |
 | **Le carnet de la vallée** | 165 pages (version 1) puis 80 par épisode et 50 au long cours: 535 pages | des pages tous les jours; coup de pouce des collections (CN-04) | « Martin-pêcheur: vu ensemble, au gué, le 9 de l'été, année 1. » |
 | **La ligne** | chaque gare rouverte allonge le trajet du train du samedi; le train porte plus de visiteurs et de colis | une gare par arc à partir de A3 | le train du samedi s'arrête désormais à Lac-Clair: les visiteurs du lac descendent chez vous |
@@ -119,6 +124,21 @@ Pour vérifier qu'à mi-chemin le jeu reste neuf, une journée typique de l'ann�
 - Veillée: tissage d'un rideau pour le coin à soi, plan de l'étage.
 - La semaine: la commande du samedi tirée parmi 120 produits, un visiteur, un aléa (orage de montagne).
 - La saison: une fête dont une activité est neuve cette année, un changement de métier principal possible.
+
+### 3.4 Les retours du 1er novembre dans les 100 heures
+
+Après la première soirée de jeu (`retours/2026-11-01/retours.md`), le client a demandé un monde plus grand, plus d'habitants, des intérieurs, des besoins, plus de coiffures, des fenêtres, un rangement limité et une maison qui grandit. Chaque sujet commence au tour 10 (`tour-10-conception.md`) et continue dans les arcs, pour se renouveler jusqu'à 100 h.
+
+| Sujet | Tour 10 (année 1, jours 1 à 64) | Suite dans les arcs | Ce qui le renouvelle sur 100 h |
+|---|---|---|---|
+| R23 Monde plus grand | la rue Haute: la carte passe de 64 à 100 m de large (ru de la Côte, fournil, mercerie-coiffure, maison de Lucie, école) | A2: intérieurs du bourg, amont de l'Aubrune et moulin de la Vanne, bois de la Côte; A3: la voie des Vergers; puis une gare par arc | un lieu par arc au moins (section 3.1) |
+| R24 Habitants | Achille Pradel (boulanger), Solange Mérigot (coiffeuse et mercière, elle garde Jeanne) | A2: Armand Castagné (instituteur et secrétaire de mairie, les archives d'Émile), Berthe Lavergne (meunière); Lucie avec J1; cinq habitants par gare | 34 habitants en cinq étapes, réserves de répliques R3 (environ 430 phrases de plus pour les quatre du bourg) |
+| R25 Intérieurs | l'épicerie-pension d'Odette, la mercerie-coiffure | A2: la halte, le fournil, l'école, la scierie, le moulin; un intérieur au moins par gare (chèvrerie, gare des Vergers...); les maisons des habitants dans les scènes de leurs histoires | chaque intérieur a ses heures, ce qu'on y fait et une étape d'histoire |
+| R15 Besoins | Ventre, Repos et Cœur visibles, bonus seulement; souper, sieste, retrouvailles, sommeil de la chambre | recettes et desserts de la cuisine (A2), poêle de l'hiver (A3), Veillée des contes | les plats changent avec les saisons et les gares; jamais de besoin nouveau qui punit |
+| R16 Coiffures | 15 coupes, 8 couleurs; au salon en cours de partie, proposition de l'autre depuis le banc | une coupe de saison par saison (Solange, après sa scène 3), barbes et moustaches si le client les veut, perruques de théâtre (scène) | quatre coupes nouvelles par année |
+| R17 Fenêtres | rideaux aux seules fenêtres, ouverts et fermés; six couleurs | tissage (A4): rideaux tissés à la maison; volets peints | les fenêtres des pièces nouvelles |
+| R18 Maison (D3) | cellier et chambre, bâtis à deux, l'ordre choisi par le duo | grenier, cuisine, atelier, plan libre (J3) et la suite de la section 3.2 | une étape de maison par arc |
+| R19 Rangement | coffre de 20 cases, grand coffre, étagères, cellier; outils au râtelier | buffet, commode, grenier de rangement, cellier de la gare des Vergers | la capacité suit les objets (690 à 100 h) |
 
 ## 4. Principes anti-répétition
 
@@ -206,6 +226,10 @@ Effort en tours de gauntlet (60 à 90 minutes de studio, membres en parallèle):
 | 16 | **Almanach des années** (R9): événements uniques, variantes des fêtes, habitants qui changent | l'année 3 ne ressemble pas à l'année 1 | M | 60 événements, 16 variantes de fêtes | J4 |
 | 17 | **Cadre d'épisode** (SV-06): contenu ajouté sans réinstaller, migrations | rend les arcs A4 à A8 livrables un par un | L (architecte-technique) | | J4 |
 | 18 | **Robot longue vie** et statistiques (section 4.4) | sans lui, on ne prouve rien | M (qa-testeur) | | J1 (premier jet), J2 |
+| 19 | **Besoins doux** (tour 10, R15): Ventre, Repos et Cœur visibles, bonus seulement, sieste, retrouvailles | donne un sens aux repas, au lit et aux moments à deux | M | plats et desserts de chaque arc | tour 10 |
+| 20 | **Intérieurs visitables** (tour 10, R25): règle commune, heures, coupe des murs par joueur | le bourg a des lieux où entrer | M (règle), S par intérieur | un intérieur par gare, cinq au bourg | tour 10, puis chaque arc |
+| 21 | **Rangement à cases** (tour 10, R19) et râtelier | un but d'aménagement qui suit la maison | S | meubles de rangement par arc | tour 10 |
+| 22 | **Apparence en cours de partie** (tour 10, R16): salon, couleurs, proposition de l'autre | se regarder, se surprendre | S | coupes de saison | tour 10 |
 
 ## 6. Volume de contenu à produire
 
@@ -230,7 +254,7 @@ Chaque jalon prolonge la même sauvegarde (la partie du client continue), finit 
 | Jalon | Contenu | Heures ajoutées | Cumul | Ce qu'on valide avec le client |
 |---|---|---|---|---|
 | **J1 La fête des semailles et l'inauguration du quai** (jours 15 à 23) | section 7.1 | 1,3 | 3,3 | le monde qui réagit, la commande générée, la première fête |
-| J2 L'été du bourg (jours 24 à 42) | la Halte entière, horloge 0,8 s, cinq métiers et rangs, liens et étapes 2 et 3 des cinq habitants, jumelles et 8 oiseaux, 7 cultures d'été, 3 visiteurs, cuisine et chambre ajoutées, la voie et ses quatre obstacles, Feux de la mi-été | 5,3 | 8,6 | la vraie journée de 16,6 min, l'asymétrie des métiers |
+| J2 L'été du bourg (jours 24 à 42) | la Halte entière, cinq métiers et rangs, liens et étapes 2 et 3 des cinq habitants, jumelles et 8 oiseaux, 7 cultures d'été, 3 visiteurs, cuisine et chambre ajoutées, la voie et ses quatre obstacles, Feux de la mi-été | 5,3 | 8,6 | l'asymétrie des métiers (la journée doublée est livrée avant, D1) |
 | J3 Les Vergers, l'automne (jours 43 à 63) | le hameau, cinq habitants, chèvres, ruches, verger, Foire aux bêtes et aux fruits, chantier de la gare, plan libre de la maison | 5,8 | 14,4 | deux gares, la maison libre |
 | J4 L'hiver et la première année (jours 64 à 84) | neige, poêle, Veillée des contes, inauguration des Vergers, almanach de l'année 2, cadre d'épisode | 5,8 | 20,2 | une année complète: c'est la version 1 du cahier |
 | J5 à J8 Les quatre épisodes (A4 à A7) | un jalon par épisode, découpé en deux livraisons (le chapitre, puis la vie à la nouvelle gare) | 14,7 chacun | 78,8 | chaque gare |
@@ -253,7 +277,7 @@ Chaque jalon prolonge la même sauvegarde (la partie du client continue), finit 
 | 19, mercredi | Lucie confie la première carte postale ancienne (point de vue 1) | trouver le point de vue (CN-07), remplir la page | regarder le point de vue ensemble (page « ensemble ») |
 | 20, jeudi | confiance niveau 2 (si atteinte: le catalogue gagne un rayon de meubles); Jeanne veut planter des fraisiers | lever la marquise (geste à deux), dernières planches | lever la marquise |
 | 21, vendredi | dernier jour du catalogue et du printemps | remplir la caisse de la commande 3 | |
-| 22, samedi | **premier jour de l'été**: palette d'été (P1, directeur artistique et tech-artist), envies d'été, Odette remarque que les jours rallongent (l'horloge reste à 0,35 s jusqu'au jour 23 compris, puis passe à 0,8 s en J2). 10 h: le train, le catalogue, un visiteur (l'inspecteur de la coopérative, venu pour l'inauguration). 16 h: commande 3 payée | dernières livraisons | le départ du train |
+| 22, samedi | **premier jour de l'été**: palette d'été (P1, directeur artistique et tech-artist), envies d'été, Odette remarque que les jours rallongent (phrase de saison: l'horloge ne change plus ce jour-là, D1 l'a doublée dès le jour 1). 10 h: le train, le catalogue, un visiteur (l'inspecteur de la coopérative, venu pour l'inauguration). 16 h: commande 3 payée | dernières livraisons | le départ du train |
 | 23, dimanche | **Inauguration du quai** (étape 1.6 du cahier): scène à deux, Firmin ressort l'uniforme d'Émile, bal, lettre de la coopérative (« Si la voie des Vergers est dégagée, le train ira jusque là-haut. ») | la fête, la photo du duo par Lucie | la scène, le bal (si la lettre de Lucie a été remise en semaine 2, Firmin l'invite à danser: le fil de la démo continue); écran de fin « Trois semaines à la Halte d'Aubrune » |
 
 Garde-fou du jalon: si le chantier n'est pas fini au départ du train du jour 22, Basile et Firmin le finissent dans la nuit (« On a fini la marquise à la lanterne. Elle tient, regardez-moi ça. »), pour que l'inauguration ait lieu le 23 sur toutes les graines. À partir de J2, la règle du cahier (MA-08, HI-03) reprend: le village aide, l'inauguration attend.
@@ -339,13 +363,13 @@ Exemples, dans le ton:
 | J1-12 | Au moins un geste à deux exigé (lever la marquise) et deux proposés (l'arbre de mai, la danse); trois quêtes « apporter » au plus sur onze (R13) | robots, statistiques |
 | J1-13 | Séance chez le client: les deux joueurs disent que le bourg « parle de ce qu'on fait » et que la fête est un moment à deux | observation |
 
-**Hors de J1**: métiers et rangs, affichage des liens (le lien est compté dès J1, sans être montré, pour que les répliques par niveau et les étapes de J2 partent du bon point), oiseaux et jumelles, cultures d'été, visiteurs au-delà de l'inspecteur, agrandissement de la maison, nouvelle carte, horloge à 0,8 s (tout cela en J2).
+**Hors de J1**: métiers et rangs, affichage des liens (le lien est compté dès J1, sans être montré, pour que les répliques par niveau et les étapes de J2 partent du bon point), oiseaux et jumelles, cultures d'été, visiteurs au-delà de l'inspecteur, agrandissement de la maison, nouvelle carte (tout cela en J2; la rue Haute, le cellier et la chambre arrivent dès le tour 10).
 
 ## 8. Écarts avec la version 0.1 du cahier des charges
 
 | Sujet | Cahier 0.1 | Ce plan | Raison |
 |---|---|---|---|
-| Horloge | 0,8 s par minute de jeu dès le jour 1 (TE-01) | 0,35 s jusqu'au jour 23, 0,8 s ensuite; réglage du duo à trois vitesses | la démo est construite sur la carte compacte et cette vitesse; la vraie journée vient avec le monde entier |
+| Horloge | 0,8 s par minute de jeu dès le jour 1 (TE-01) | 0,7 s dès le jour 1 (D1, tranchée le 2026-11-01), réglage du duo à trois vitesses | le client a trouvé les journées trop courtes; la démo doublée est proche de la vitesse du cahier |
 | Heures de l'année 1 | 23,3 h | 20,2 h | printemps plus court; compensé par l'arc A8 (21 h au lieu de 18,1 h) |
 | Arrivée aux Vergers | jour 30 (été, duo médian) | jour 43 (début de l'automne) | l'été entier sert à la Halte complète, aux métiers et à la voie; à resimuler: la règle des collections (« chaque entrée des Vergers visible en automne ou en hiver ») reste vraie, mais `collections_v1.py` doit être relancé avec cette arrivée |
 | Draisine | étape 2.1: 500 sous de pièces au chapitre 2 | réparée par Basile en semaine 2 (démo) | déjà joué; la voie (étape 2.2) reste au chapitre 2 |
@@ -368,9 +392,9 @@ Exemples, dans le ton:
 
 | # | Décision | Options | Recommandation |
 |---|---|---|---|
-| D1 | Le rythme de la journée après la démo | garder 0,35 s (journée de 8 min, 750 journées pour 100 h); passer à 0,8 s (journée de 16,6 min); 0,6 s (13,6 min) | passer à 0,8 s au jour 24, lendemain de l'inauguration du quai, avec un réglage « vif, normal, paisible » décidé à deux; à mesurer chez vous en J2 |
+| D1 | Le rythme de la journée après la démo | garder 0,35 s (journée de 8 min, 750 journées pour 100 h); passer à 0,8 s (journée de 16,6 min); 0,6 s (13,6 min) | **Tranchée par le client le 2026-11-01**: des journées plus longues. La journée double dès le jour 1 (0,7 s, 15,1 min), avec un réglage de rythme (section 2.1) |
 | D2 | L'ordre de l'année 1 | Vergers dès l'été (cahier 0.1); tout l'été à la Halte, Vergers à l'automne (ce plan) | ce plan: la Halte entière, les métiers et la voie avant la deuxième gare, pour ne pas ouvrir deux lieux à moitié vides |
-| D3 | La maison qui grandit | plan libre dès J2; pièces ajoutées en J2, plan libre en J3 | pièces ajoutées d'abord (cuisine, chambre, salle commune posées par Basile), plan libre à deux en J3: on a une vraie maison plus tôt, et le plan libre arrive quand il y a de quoi la remplir |
+| D3 | La maison qui grandit | plan libre dès J2; pièces ajoutées en J2, plan libre en J3 | **Tranchée par le client le 2026-11-01**: oui, la maison s'agrandit. Appliquée selon la recommandation: pièces ajoutées d'abord, bâties à deux avec la charpente de Basile (cellier et chambre dès le tour 10, l'ordre choisi par le duo), plan libre à deux en J3 (section 3.2; `tour-10-conception.md`, section 4) |
 | D4 | La partie de la démo continue-t-elle dans J1 ? | oui, la sauvegarde du jour 15 se poursuit; ou nouvelle partie à chaque jalon | oui: rien ne se perd, migration testée (critère J1-01) |
 | D5 | Le volume d'écriture | 1 500 textes (cahier 0.1); 9 000 avec les règles anti-répétition | 9 000, écrits par jalon (450 en J1), avec des gabarits de souvenir pour que le monde réagisse; c'est ce qui fait qu'on ne s'ennuie pas à 50 h |
 | D6 | Le garde-fou de J1 | inauguration le 23 quoi qu'il arrive (le village finit la marquise); ou inauguration le dimanche qui suit le chantier fini (règle du cahier) | garde-fou pour J1 seulement, pour que chaque jalon finisse sur sa fête; règle du cahier dès J2 |
@@ -383,3 +407,4 @@ Exemples, dans le ton:
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-10-31 | 0.1 | Première rédaction: arcs, règles anti-répétition chiffrées, systèmes manquants, jalons, J1 détaillé, écarts avec le cahier 0.1, simulation `plan_100_heures.py` | game-designer, sur brief du manager (objectif de 100 heures fixé par le client) |
+| 2026-11-01 | 0.2 | D1 et D3 tranchées par le client (journée doublée dès le jour 1 avec un réglage; la maison s'agrandit, pièces d'abord); calendrier recompté à 0,7 s (397 journées pour 100 h); section 3.4: les retours de la soirée du 1er novembre dans les 100 heures; quatre habitants de plus au bourg (34 au total); systèmes 19 à 22 | client (soirée de jeu du 2026-11-01), par le manager; game-designer |
