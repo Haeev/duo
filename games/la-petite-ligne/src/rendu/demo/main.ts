@@ -14,7 +14,9 @@
  * `fox`, `glowworms`) avec `t=<s>` (instant de l'apogée, figé), `phase=attente|apres` et `joue=1`
  * (la chorégraphie avance depuis `t`); l'heure par défaut est alors dans la fenêtre du moment.
  * `vue=x,y` pose la caméra sur un point sans déplacer les joueurs; `noms=1`: Camille connaît le nom
- * des poules (étiquettes au-dessus d'elles, chez elle seule). Touches: G repère, J lancer,
+ * des poules (étiquettes au-dessus d'elles, chez elle seule). `jour=<n>` ou
+ * `saison=printemps|ete|automne|hiver` (tour 8: palette et lumière de la saison; le même jour de
+ * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
@@ -33,6 +35,8 @@ import {
   type DemoOptions,
 } from './etat-exemple';
 import { applyEdgeExample } from './lisiere-exemple';
+import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
+import type { WorldState } from '../../etat/types';
 
 const MINUTES_PER_HOUR = 60;
 const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
@@ -52,6 +56,31 @@ const ENDURANCE_FPS = 60;
 const HEN_NAMES = ['Bichette', 'Cocotte', 'la Duchesse'];
 /** Moment de la démonstration: l'heure par défaut, tant de minutes après l'ouverture de sa fenêtre. */
 const MOMENT_MINUTES_IN = 20;
+/** Noms des saisons dans l'adresse (`saison=`), dans l'ordre du calendrier. */
+const SEASON_PARAMS = ['printemps', 'ete', 'automne', 'hiver'] as const;
+
+/**
+ * `jour=<n>` ou `saison=<nom>`: change le jour de l'exemple. Les arbres abattus gardent leur âge
+ * (souche, rejet), pour comparer les saisons au même état du bourg.
+ */
+function applyDemoDay(world: WorldState, params: URLSearchParams, content: ReturnType<typeof loadContent>): void {
+  const current = world.clock.day;
+  let day = current;
+  const asked = Number(params.get('jour'));
+  const season = SEASON_PARAMS.indexOf(params.get('saison') as (typeof SEASON_PARAMS)[number]);
+  if (params.has('jour') && Number.isInteger(asked) && asked >= 1) {
+    day = asked;
+  } else if (season >= 0 && season < SEASONS.length) {
+    day = season * content.settings.calendar.seasonDays + dayOfSeason(content.settings, current);
+  }
+  const shift = day - current;
+  world.clock.day = day;
+  for (const tree of world.trees) {
+    if (tree.felledDay !== null) tree.felledDay += shift;
+  }
+  if (params.get('brume') === '1') world.morningMist = true;
+}
+
 const KEY_TO_COMMAND: Record<string, CameraCommand> = {
   KeyQ: 'rotate_left',
   KeyE: 'rotate_right',
@@ -152,6 +181,7 @@ async function main(): Promise<void> {
   const world = createExampleWorld(map, content, options);
   // `lisiere=1` (tour 8): souche, rejets et cueillettes posées un jour d'été.
   if (params.get('lisiere') === '1') applyEdgeExample(world, map, content);
+  applyDemoDay(world, params, content);
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
     world.hens.forEach((hen, index) => {

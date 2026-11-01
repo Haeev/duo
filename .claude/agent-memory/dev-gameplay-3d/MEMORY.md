@@ -194,3 +194,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Taille de l'état (I-06, 48 000 octets): chaque dialogue fini s'écrivait trois fois dans `dialoguesDone` (`id`, `id@p1`, `id@p2`), réplique du quotidien comprise; avec beaucoup de répliques, c'est la première clé qui grossit. Mesurer par une sonde jetable (clé par clé, `JSON.stringify`) avant de chercher ailleurs.
 - Rendu des arbres (`rendu/potager.ts`): un arbre abattu sans chute en cours (`fallStart` vide: partie reprise, page de démonstration) doit sauter le tronc; sinon il reste debout au-dessus de sa souche.
 - Les props de la carte sont rendus par nom de type (nœud GLB du même nom, sinon variantes de `MODEL_VARIANTS`): ajouter un type dans `construire_carte_halte.py` suffit pour le voir en jeu, sans toucher au rendu.
+
+## Saisons du rendu (La Petite Ligne, vérifié le 2026-11-01, tour 8)
+
+- Changer de palette sans toucher aux matériaux: remplacer `texture.image` (même objet `Texture`, `needsUpdate = true`). Ne jamais réaffecter `texture.source` dans Three.js 0.187: `WebGLTextures` range ses textures GL par source et par clé de réglages; une source changée à clé égale réutilise la texture GL de l'ancienne, et la libération (`onTextureDispose`) lit une entrée absente et plante.
+- Couleurs lues une fois dans la palette (`paletteColor`): teintes continues de l'herbe (`uGroundColors` de `ambiance.ts`) et couleurs d'instance des touffes (`vegetation.ts`). Elles ne suivent pas l'image: s'abonner à `materials.onPaletteChange`.
+- Le jour avance à 6 h en même temps que la phase passe à `breakfast` (`horloge.ts`): basculer ce qui dépend du jour hors de la phase `day` suffit à le cacher derrière l'écran du petit-déjeuner.
+- Déformer l'heure accélère la journée (pente au plus 1,5 le soir d'hiver): un test de continuité à seuil fixe doit multiplier son seuil par la pente.
+- Outil isolé: `pnpm test` dépasse 10 minutes quand des captures tournent en même temps; le lancer en arrière-plan.

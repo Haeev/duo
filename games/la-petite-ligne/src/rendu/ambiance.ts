@@ -150,12 +150,17 @@ export class AmbiancePart implements ExtensionPart {
     resources.track(this.field.texture);
     const windMask = resources.track(createWindMask(PALETTE_CELLS, PALETTE_GRID));
     this.surfaces = createSurfaceUniforms(noise, windMask);
-    GROUND_CELLS.forEach((cell, index) => {
-      const color = this.surfaces.uGroundColors.value[index];
-      if (color !== undefined) {
-        hooks.materials.paletteColor(cell, color);
-      }
-    });
+    const readGround = (): void => {
+      GROUND_CELLS.forEach((cell, index) => {
+        const color = this.surfaces.uGroundColors.value[index];
+        if (color !== undefined) {
+          hooks.materials.paletteColor(cell, color);
+        }
+      });
+    };
+    readGround();
+    // Palette de saison: l'herbe du sol suit (ses teintes continues sont lues dans la palette).
+    hooks.materials.onPaletteChange(readGround);
     const room = hooks.map.house.room;
     this.hearth.set(
       room.x + room.w * HALF_CELL,
@@ -605,6 +610,7 @@ export class AmbiancePart implements ExtensionPart {
       this.lit,
       this.shade,
       this.lightView,
+      day.morningMist,
     );
     if (!context.reducedMotion) {
       this.updateSteam(context);

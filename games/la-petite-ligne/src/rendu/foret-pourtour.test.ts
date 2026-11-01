@@ -31,6 +31,7 @@ function setup(): { map: GameMap; terrain: Terrain; forest: InstancedMesh[] } {
     palette: new MeshBasicMaterial(),
     water: new MeshBasicMaterial(),
     paletteColor: (_cell: string, out: Color): Color => out.setRGB(1, 1, 1),
+    onPaletteChange: (): (() => void) => () => undefined,
   } as unknown as SharedMaterials;
   const map = loadMap(MAP_FILES).map;
   const resources = new ResourceTracker();

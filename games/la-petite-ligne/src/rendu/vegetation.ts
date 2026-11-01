@@ -98,8 +98,14 @@ function pick<T>(items: readonly T[], value: number): T {
 
 export class Vegetation {
   readonly group = new Group();
-  /** Semis (touffes, fleurs, galets) et leur nombre complet d'instances. */
-  private readonly scattered: { mesh: InstancedMesh; full: number }[] = [];
+  /** Semis (touffes, fleurs, galets), leur nombre complet d'instances et la case de chacune. */
+  private readonly scattered: {
+    mesh: InstancedMesh;
+    full: number;
+    cells: PaletteCell[];
+    /** Fleurs: aucune l'hiver (le pré givré n'en porte pas). */
+    flowers: boolean;
+  }[] = [];
   private detail = 1;
 
   constructor(
@@ -184,6 +190,7 @@ export class Vegetation {
       const shuffled = [...list].sort(
         (a, b) => hash2(a.cx, a.cy, SEED_ORDER + seed) - hash2(b.cx, b.cy, SEED_ORDER + seed),
       );
+      const cells: PaletteCell[] = [];
       for (const { cx, cy } of shuffled) {
         const x = cx + 0.5 + (hash2(cx, cy, SEED_JITTER_X + seed) - 0.5) * JITTER;
         const y = cy + 0.5 + (hash2(cx, cy, SEED_JITTER_Y + seed) - 0.5) * JITTER;
@@ -192,20 +199,35 @@ export class Vegetation {
         rotation.setFromEuler(euler.set(0, hash2(cx, cy, SEED_ANGLE + seed) * Math.PI * 2, 0));
         scale.set(size, size, size);
         mesh.setMatrixAt(mesh.count, matrix.compose(position, rotation, scale));
-        mesh.setColorAt(
-          mesh.count,
-          materials.paletteColor(pick(tints, hash2(cx, cy, SEED_KIND + seed)), color),
-        );
+        const cell = pick(tints, hash2(cx, cy, SEED_KIND + seed));
+        cells.push(cell);
+        mesh.setColorAt(mesh.count, materials.paletteColor(cell, color));
         mesh.count += 1;
       }
       finishInstances(mesh);
-      this.scattered.push({ mesh, full: mesh.count });
+      this.scattered.push({ mesh, full: mesh.count, cells, flowers: tints === FLOWER_CELLS });
       this.group.add(mesh);
     };
     scatter('touffes', tuft, tufts, TUFT_CELLS, SEED_TUFT, false);
     scatter('fleurs', flower, flowers, FLOWER_CELLS, SEED_FLOWER, false);
     scatter('galets', pebble, pebbles, PEBBLE_CELLS, SEED_PEBBLE, false);
     this.plantOuterForest(map, terrain, materials, resources);
+    // Palette de saison: les touffes prennent la teinte de l'herbe du moment (couleur d'instance).
+    materials.onPaletteChange(() => {
+      this.repaint(materials);
+    });
+  }
+
+  /** Relit la couleur de chaque semis dans la palette en vigueur. */
+  private repaint(materials: SharedMaterials): void {
+    const color = new Color();
+    for (const entry of this.scattered) {
+      entry.cells.forEach((cell, index) => {
+        entry.mesh.setColorAt(index, materials.paletteColor(cell, color));
+      });
+      if (entry.mesh.instanceColor !== null) entry.mesh.instanceColor.needsUpdate = true;
+      entry.mesh.visible = !(entry.flowers && materials.season === 'winter');
+    }
   }
 
   /**

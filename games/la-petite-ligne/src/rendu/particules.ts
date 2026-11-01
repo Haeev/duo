@@ -73,7 +73,7 @@ uniform sampler2D uField;
 uniform vec4 uFieldRect;
 uniform vec2 uFieldHeight;
 uniform vec4 uSpriteArea; // demi-côté de la zone des nuages, de la brume, vent des nuages (x, z)
-uniform vec4 uGroupAlpha; // nuages, brume, halos, réserve
+uniform vec4 uGroupAlpha; // nuages, brume, halos, nappe de la brume du matin
 uniform vec2 uCloudFade;  // rayon (écran) où les nuages sont invisibles, puis pleins
 uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra
 uniform float uGroundFade; // hauteur (m) au-dessus du sol sur laquelle un sprite fondu apparaît
@@ -187,12 +187,12 @@ void main() {
       vec2 xz = aOrigin.xz + uSpriteArea.zw * uTime;
       xz = vec2(ambWrap(xz.x, uFocus.x, uSpriteArea.x), ambWrap(xz.y, uFocus.z, uSpriteArea.x));
       centre = vec3(xz.x, aOrigin.y, xz.y);
-    } else if (group == 1) {
+    } else if (group == 1 || group == 3) {
       vec2 drift = vec2(sin(uTime * 0.11 + aOrigin.w * 6.0), cos(uTime * 0.09 + aOrigin.w * 4.0));
       vec2 xz = aOrigin.xz + drift * aVelocity.x;
       centre = vec3(xz.x, aOrigin.y, xz.y);
     }
-    float groupAlpha = group == 0 ? uGroupAlpha.x : (group == 1 ? uGroupAlpha.y : uGroupAlpha.z);
+    float groupAlpha = group == 0 ? uGroupAlpha.x : (group == 1 ? uGroupAlpha.y : (group == 2 ? uGroupAlpha.z : uGroupAlpha.w));
     if (groupAlpha <= 0.0) { hideInstance(); return; }
     vColor.a *= groupAlpha;
     onGround = aAccel.x > 0.5;
