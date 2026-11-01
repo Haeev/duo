@@ -11,6 +11,7 @@
       .lpl-ikf { fill: none; stroke: #2a2522; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
       .lpl-iu { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
       .lpl-iuf { fill: currentColor; }
+      .lpl-vo { stroke: #2a2522; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
     </style>
   </defs>
 
@@ -385,150 +386,271 @@
     <path class="lpl-iu" d="M5 12h14" stroke-width="2.4"/>
   </symbol>
 
-  <!-- Vignettes des souvenirs (onglet Souvenirs du carnet, tour 7): grille de 40, encre et lavis.
-       Substituts du dev gameplay, à reprendre par l'artiste 2D (même nom de symbole). -->
+  <!-- Vignettes des souvenirs (onglet Souvenirs du carnet), définitives (artiste 2D, tour 9).
+       Grille de 40: disque de 36 (rayon 18) d'un ton de la palette du décor, un ton par moment.
+       Encre #2A2522: 2 pour le contour extérieur du sujet (lpl-vo), 1,5 pour le reste (lpl-ik, lpl-ikf).
+       Ligne de sol: trait de 1,5 dans la couleur de l'élément (eau, herbe, ballast, pavé).
+       Joueurs: celui à la casquette en foncé, celui au chignon en clair (forme et valeur, pas seulement la teinte). -->
   <symbol id="memory-generic" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="16" fill="#e6dabd" opacity=".7"/>
-    <path class="lpl-ik" d="M11 10.5c3.5-1 6.5-.6 9 1.2 2.5-1.8 5.5-2.2 9-1.2v18.5c-3.5-1-6.5-.6-9 1.2-2.5-1.8-5.5-2.2-9-1.2z" fill="#fbf6e9"/>
-    <path class="lpl-ikf" d="M20 11.7v18.5M13.5 15c1.6-.3 3-.2 4.2.4M13.5 19c1.6-.3 3-.2 4.2.4M22.3 15.4c1.2-.6 2.6-.7 4.2-.4"/>
+    <circle cx="20" cy="20" r="18" fill="#B59C79"/>
+    <path class="lpl-vo" d="M9.5 12.5c3.8-1.2 7.4-.8 10.5 1.4 3.1-2.2 6.7-2.6 10.5-1.4v15.8c-3.8-1.2-7.4-.8-10.5 1.4-3.1-2.2-6.7-2.6-10.5-1.4z" fill="#F3EBD4"/>
+    <path class="lpl-ikf" d="M20 13.9v15.8M12.4 16.8c1.8-.4 3.4-.3 4.9.4M12.4 20c1.8-.4 3.4-.3 4.9.4M12.4 23.2c1.2-.3 2.3-.2 3.3.2M22.6 24.6l2-2.8 1.6 1.8 1.2-1.2 1.2 2.2"/>
+    <circle cx="26.4" cy="17.6" r="1.1" fill="#2A2522"/>
+    <path class="lpl-ik" d="M24.6 28.1v4.4l1.3-1.1 1.3 1.1v-4.8" fill="#BA554C"/>
   </symbol>
+  <!-- Le héron s'envole au ras de l'eau du gué: cou replié en S, pattes tendues derrière. -->
   <symbol id="memory-heron" viewBox="0 0 40 40">
-    <circle cx="20" cy="19" r="16" fill="#e6dabd" opacity=".7"/>
-    <ellipse cx="20" cy="31.5" rx="17" ry="4.5" fill="#9fbfd2" opacity=".75"/>
-    <path d="M6 31h6M16 33.2h9M28.5 30.6h5.5" stroke="#5e86a1" stroke-width="1.1" stroke-linecap="round" fill="none"/>
-    <path class="lpl-ik" d="M21 23.2c2.6-5.6 6.6-9.6 13-11.6-1.6 4.6-5.2 8.8-9.8 11.6z" fill="#6c7179"/>
-    <path class="lpl-ik" d="M15.8 23.6c2-1.8 5.4-2.6 8.8-2.2 2.4.3 4 1.3 4.6 2.4-1.8 1.4-5 2-8.2 1.6-2.4-.3-4.2-.9-5.2-1.8z" fill="#bac4c7"/>
-    <path class="lpl-ik" d="M16.2 23.4c-1.8-.2-3-1.4-2.4-2.8.6-1.4-.4-2.6-2-2.4" fill="none"/>
-    <circle class="lpl-ik" cx="11.2" cy="18.4" r="1.7" fill="#bac4c7"/>
-    <path class="lpl-ik" d="M9.6 18.1 3.8 19.6l5.9-.2z" fill="#e0c56f"/>
-    <path d="M10.4 17.3l1.8-.9" stroke="#2a2522" stroke-width="1" stroke-linecap="round"/>
-    <path d="M29 24.3l7.2 1.5M29.2 24.8l7 2" stroke="#2a2522" stroke-width="1" stroke-linecap="round"/>
-    <path class="lpl-ik" d="M22 24.6c2.6 2.2 5.4 3.4 8.6 3.6-1.6-1.8-3.6-3-6-3.6z" fill="#9aa3a8"/>
+    <circle cx="20" cy="20" r="18" fill="#DAD0BE"/>
+    <path d="M5.5 30.5h29M9.5 33.5h6M21 33.5h9" stroke="#4C899A" stroke-width="1.5" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M26.8 23.2l8.2 1.2M27 23.8l7.8 2.2"/>
+    <path class="lpl-vo" d="M29.6 21.8c-2.6-2.2-8.6-2.6-12.6-2-1.6.2-2.4-.4-2.8-1.4-.4-1.2-1.6-1.8-2.6-1.4-1 .4-1.2 1.4-.8 2.2.6 1-.6 2.2-.4 3.6.4 1.6 2.6 2.2 5.6 1.8 4.4-.4 9.4-.8 13.6-2.8z" fill="#7F888E"/>
+    <path class="lpl-ik" d="M10.9 18.3 4.4 19.6l6.4.6z" fill="#B3A26E"/>
+    <path class="lpl-ikf" d="M13 17.4c1.2 0 2.2.3 3.2.9"/>
+    <circle cx="12.2" cy="18.3" r=".7" fill="#2A2522"/>
+    <path class="lpl-vo" d="M16.6 21.2c1-4.6 3.6-9 7.2-11.6 1.6-1.2 3.6-1.6 4.8-1 .4 1.2-.2 2.8-1 4.2-1.4 3-3.4 5.6-5.6 8.4z" fill="#7F888E"/>
+    <path class="lpl-ik" d="M28.6 8.6c.4 1.2-.2 2.8-1 4.2l-1.2 2-3.4-2.2 1.2-1.6c1.4-1.4 2.8-2.4 4.4-2.4z" fill="#5F676D"/>
   </symbol>
+  <!-- Le V des oies, cap au nord (vers le haut), au-dessus de la rivière; soleil couchant à l'ouest (à gauche). -->
   <symbol id="memory-geese" viewBox="0 0 40 40">
-    <circle cx="20" cy="18" r="16" fill="#9fbfd2" opacity=".45"/>
-    <path d="M4 32c5-1.6 10-1.6 16 0s11 1.6 16 0" stroke="#5e86a1" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-    <path d="M8 35.5c4-1 8-1 12 0" stroke="#5e86a1" stroke-width="1" stroke-linecap="round" fill="none" opacity=".7"/>
-    <g fill="#44484e" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round">
-      <path d="M20 9.5l-3.4 2.2 3.4-.6 3.4.6z"/>
-      <path d="M13.5 14.5l-3 2 3-.5 3 .5z"/>
-      <path d="M26.5 14.5l-3 2 3-.5 3 .5z"/>
-      <path d="M8 19.2l-2.6 1.7 2.6-.4 2.6.4z"/>
-      <path d="M32 19.2l-2.6 1.7 2.6-.4 2.6.4z"/>
+    <circle cx="20" cy="20" r="18" fill="#DEAF9D"/>
+    <path d="M5 30.5a4.2 4.2 0 0 1 8.4 0z" fill="#FFD27A"/>
+    <path d="M3.6 30.5h32.8M9 33.6h8M22 33.6h8" stroke="#4C899A" stroke-width="1.5" stroke-linecap="round"/>
+    <g fill="#625B52">
+      <g transform="translate(20 10.4) scale(1.1)"><path d="M.9-1.4C2.4-2.7 4-2.4 6.8.8 4.8.1 3-.2.9 1.1zM-.9-1.4C-2.4-2.7-4-2.4-6.8.8-4.8.1-3-.2-.9 1.1z"/><ellipse rx="1.25" ry="2.6"/><path d="M-.5-1.8v-1.8h1v1.8z"/><circle cy="-4" r=".95"/></g>
+      <g transform="translate(13.6 15.8) scale(1.0)"><path d="M.9-1.4C2.4-2.7 4-2.4 6.8.8 4.8.1 3-.2.9 1.1zM-.9-1.4C-2.4-2.7-4-2.4-6.8.8-4.8.1-3-.2-.9 1.1z"/><ellipse rx="1.25" ry="2.6"/><path d="M-.5-1.8v-1.8h1v1.8z"/><circle cy="-4" r=".95"/></g>
+      <g transform="translate(26.4 15.8) scale(1.0)"><path d="M.9-1.4C2.4-2.7 4-2.4 6.8.8 4.8.1 3-.2.9 1.1zM-.9-1.4C-2.4-2.7-4-2.4-6.8.8-4.8.1-3-.2-.9 1.1z"/><ellipse rx="1.25" ry="2.6"/><path d="M-.5-1.8v-1.8h1v1.8z"/><circle cy="-4" r=".95"/></g>
+      <g transform="translate(7.8 21.2) scale(0.92)"><path d="M.9-1.4C2.4-2.7 4-2.4 6.8.8 4.8.1 3-.2.9 1.1zM-.9-1.4C-2.4-2.7-4-2.4-6.8.8-4.8.1-3-.2-.9 1.1z"/><ellipse rx="1.25" ry="2.6"/><path d="M-.5-1.8v-1.8h1v1.8z"/><circle cy="-4" r=".95"/></g>
+      <g transform="translate(32.2 21.2) scale(0.92)"><path d="M.9-1.4C2.4-2.7 4-2.4 6.8.8 4.8.1 3-.2.9 1.1zM-.9-1.4C-2.4-2.7-4-2.4-6.8.8-4.8.1-3-.2-.9 1.1z"/><ellipse rx="1.25" ry="2.6"/><path d="M-.5-1.8v-1.8h1v1.8z"/><circle cy="-4" r=".95"/></g>
     </g>
-    <path d="M20 9.5v-1.6M13.5 14.5v-1.4M26.5 14.5v-1.4M8 19.2v-1.3M32 19.2v-1.3" stroke="#2a2522" stroke-width=".9" stroke-linecap="round"/>
   </symbol>
+  <!-- L'échelle de Basile appuyée contre le tronc du grand chêne, le nichoir redressé sur le tronc, sous le houppier. -->
   <symbol id="memory-ladder" viewBox="0 0 40 40">
-    <circle cx="22" cy="12" r="11" fill="#98c95d" opacity=".55"/>
-    <circle cx="13" cy="9" r="7" fill="#6faa47" opacity=".45"/>
-    <ellipse cx="20" cy="35" rx="16" ry="3" fill="#c1a577" opacity=".6"/>
-    <path class="lpl-ik" d="M23.5 35V13c0-2.2.8-4 2.4-5 .4 1.8 1.6 2.8 3.6 3-1.2 1.2-1.6 2.6-1.6 4.4V35z" fill="#765130"/>
-    <path class="lpl-ik" d="M28.6 16.6h-5.6v5.2h5.6z" fill="#d3a66d"/>
-    <path class="lpl-ik" d="M22.2 16.8l3.6-2.6 3.6 2.6z" fill="#a97749"/>
-    <circle cx="25.8" cy="19" r="1" fill="#2a2522"/>
-    <path class="lpl-ikf" d="M10 35 18.6 12M14.2 35 22.9 12.6"/>
-    <path class="lpl-ikf" d="M11.8 30.4h4.2M13.6 25.6h4.2M15.4 20.8h4.2M17.2 16h4.2"/>
+    <circle cx="20" cy="20" r="18" fill="#C6E17F"/>
+    <path d="M7.5 32.5h25M9.5 32.5l-.6-2M11.5 32.5l.5-2.2M30.4 32.5l.6-2" stroke="#6F9148" stroke-width="1.5" stroke-linecap="round"/>
+    <path class="lpl-vo" d="M21.6 32.5c1.2-1.2 1.6-3 1.6-5.4V10h4.6v17.1c0 2.4.4 4.2 1.6 5.4z" fill="#6E5743"/>
+    <path class="lpl-ikf" d="M26 24.6v5.2"/>
+    <path class="lpl-vo" transform="translate(0 1.6)" d="M8.6 9.4c-.6-3 1.8-5.2 4.6-4.6 1.4-2.2 5-2.8 7-1.2 2-1.6 5.6-1.4 7.2.6 2.8-.2 4.8 2 4 4.6-.4 1.8-2.2 2.8-4 2.4-1.6 1.6-4.4 1.8-6.2.6-1.8 1.2-4.6 1.2-6.2 0-2.2 1-5.6.8-6.4-2.4z" fill="#6C9944"/>
+    <path class="lpl-ik" d="M22.7 13.6h5.6v5.6h-5.6z" fill="#D3A66D"/>
+    <path class="lpl-ik" d="M21.8 13.8l3.7-2.8 3.7 2.8z" fill="#D3A66D"/>
+    <circle cx="25.5" cy="16.2" r="1.1" fill="#2A2522"/>
+    <path class="lpl-ikf" d="M16.7 29.9l4.3.2M18.8 26.7l4 .4M20.9 23.5l3.6.5M22.8 20.5l3.3.7"/>
+    <path d="M15 32.5l8.4-12.9M19.6 32.5l7-12.1" stroke="#2A2522" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M15 32.5l8.4-12.9M19.6 32.5l7-12.1" stroke="#D3A66D" stroke-width="1" stroke-linecap="round"/>
   </symbol>
+  <!-- Les mésanges du grand chêne: l'une à l'entrée du nichoir, l'autre sur le toit. -->
   <symbol id="memory-tits" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="16" fill="#98c95d" opacity=".45"/>
-    <path class="lpl-ik" d="M30 38V4" stroke-width="4.5" stroke="#765130" fill="none"/>
-    <path class="lpl-ik" d="M27.5 11.5h-12v16h12z" fill="#d3a66d"/>
-    <path class="lpl-ik" d="M13.5 12l8-5.5 8 5.5z" fill="#a97749"/>
-    <circle class="lpl-ik" cx="21.5" cy="17" r="2.2" fill="#44484e"/>
-    <path class="lpl-ikf" d="M18 21.5h7"/>
-    <path class="lpl-ik" d="M15.4 21.4c-.6-2.8 1-5 3.4-5 1.8 0 3 1.2 3 3 0 2.4-2 4.2-4.4 4-1 0-1.6-.6-2-2z" fill="#f2c74e"/>
-    <path class="lpl-ik" d="M15.8 18.8c.2-1.6 1.4-2.6 3-2.6 1.4 0 2.6.8 3 2.2-1.8-.6-4-.6-6 .4z" fill="#6b87b1"/>
-    <path class="lpl-ik" d="M16.4 21.6c-1.6 1-3.4 2.6-4.4 4.4 2-.4 3.6-1.4 4.8-3z" fill="#6b87b1"/>
-    <circle cx="19.6" cy="18.9" r=".7" fill="#2a2522"/>
-    <path d="M21.6 19.2l1.4.2-1.3.6z" fill="#2a2522"/>
+    <circle cx="20" cy="20" r="18" fill="#C4D877"/>
+    <path d="M15.5 3h5v34h-5z" fill="#6E5743"/>
+    <path class="lpl-ikf" d="M15.5 3v34M20.5 3v34"/>
+    <path class="lpl-vo" d="M12.5 14.6h11v13.4h-11z" fill="#D3A66D"/>
+    <path class="lpl-vo" d="M11 14.8l7-5.2 7 5.2z" fill="#6E5743"/>
+    <circle cx="18" cy="19" r="1.9" fill="#2A2522"/>
+    <g transform="translate(16.4 22.6) rotate(-32) scale(1.25)">
+      <path class="lpl-ik" d="M-3 1.6-5.6 3l.4 1 2.6-.8z" fill="#3D7CC6"/>
+      <path class="lpl-ik" d="M-3.4.6c0-2.4 1.8-3.8 3.8-3.8 2 0 3.4 1.4 3.4 3.2 0 2.2-1.8 3.6-3.8 3.6-1.8 0-3.4-1.2-3.4-3z" fill="#EFCB45"/>
+      <path d="M-3.2-.2c.4-1.6 1.8-2.6 3.4-2.4.4 1.4 0 2.8-1 3.6-.8.2-1.6-.2-2.4-1.2z" fill="#3D7CC6"/>
+      <circle cx="2.2" cy="-2" r="1.8" fill="#F0E7D8"/>
+      <path d="M.4-2.8c.8-1.6 3.2-1.8 4-.2-1.4-.4-2.6-.4-4 .2z" fill="#3D7CC6"/>
+      <circle cx="2.8" cy="-1.9" r=".55" fill="#2A2522"/>
+      <path d="M4 -1.8l1.2.3-1.1.5z" fill="#2A2522"/>
+    </g>
+    <g transform="translate(22 9.6) scale(-1.25 1.25)">
+      <path class="lpl-ikf" d="M-.4 3.2-.6 4.2M1 3.2l.2 1"/>
+      <path class="lpl-ik" d="M-3 1.6-5.6 3l.4 1 2.6-.8z" fill="#3D7CC6"/>
+      <path class="lpl-ik" d="M-3.4.6c0-2.4 1.8-3.8 3.8-3.8 2 0 3.4 1.4 3.4 3.2 0 2.2-1.8 3.6-3.8 3.6-1.8 0-3.4-1.2-3.4-3z" fill="#EFCB45"/>
+      <path d="M-3.2-.2c.4-1.6 1.8-2.6 3.4-2.4.4 1.4 0 2.8-1 3.6-.8.2-1.6-.2-2.4-1.2z" fill="#3D7CC6"/>
+      <circle cx="2.2" cy="-2" r="1.8" fill="#F0E7D8"/>
+      <path d="M.4-2.8c.8-1.6 3.2-1.8 4-.2-1.4-.4-2.6-.4-4 .2z" fill="#3D7CC6"/>
+      <circle cx="2.8" cy="-1.9" r=".55" fill="#2A2522"/>
+      <path d="M4 -1.8l1.2.3-1.1.5z" fill="#2A2522"/>
+    </g>
   </symbol>
+  <!-- Le renard mulote: bond, pattes avant groupées vers l'herbe, queue en arrière; le ballast de la voie à droite. -->
   <symbol id="memory-fox" viewBox="0 0 40 40">
-    <circle cx="20" cy="18" r="16" fill="#e98a3b" opacity=".2"/>
-    <path d="M2 32.5h36" stroke="#9aa3a8" stroke-width="5" stroke-linecap="round" opacity=".7"/>
-    <path d="M5 30h4M14 30h4M23 30h4M32 30h4" stroke="#6e5743" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M3 29.2h34M3 31.2h34" stroke="#44484e" stroke-width="1" stroke-linecap="round"/>
-    <path class="lpl-ik" d="M12 28.6c-1.6-1.2-1.4-3.6 1-4.2 3-.8 6.6.8 9.6.6-1.8 2.6-6.6 4.6-10.6 3.6z" fill="#e98a3b"/>
-    <path class="lpl-ik" d="M12.8 27.2c.8.6 2.4.8 3.8.4" fill="none"/>
-    <path class="lpl-ik" d="M19.6 28.8c-1.4-3.4-1.4-7.4.6-10.6 1.8-2.8 4.6-3.8 6.6-2.6 1.4 2.4.8 6.6-.6 10.4-.6 1.6-1.6 2.6-3.2 2.8z" fill="#e98a3b"/>
-    <path class="lpl-ik" d="M23.2 18.6c-1 2.6-1 5.8 0 8.6 1.4-2.6 2-5.6 1.6-8.4z" fill="#fbf6e9"/>
-    <path class="lpl-ik" d="M21 14.6l-.6-4.6 3.4 2.6M26.4 13.4l2.6-3.6.4 4.4" fill="#e98a3b"/>
-    <path class="lpl-ik" d="M21.4 14.6c.4-1.6 1.8-2.6 3.6-2.6 2 0 3.6 1.4 3.6 3.2 0 .8-.4 1.4-1 1.8l-2.4 2.6-2.6-1.6c-.8-.8-1.4-2-1.2-3.4z" fill="#e98a3b"/>
-    <path d="M24.8 19.2l.9-.6.7.7z" fill="#2a2522"/>
-    <circle cx="23.6" cy="15.6" r=".65" fill="#2a2522"/>
-    <circle cx="26.8" cy="15.2" r=".65" fill="#2a2522"/>
+    <circle cx="20" cy="20" r="18" fill="#DCCAA2"/>
+    <path class="lpl-ik" d="M21.8 31l2.4-2.2h8.4l2.4 2.2z" fill="#9D968B"/>
+    <path class="lpl-ikf" d="M24.4 28.8h8M26 31v-2.2M30.6 31v-2.2"/>
+    <path d="M5.5 31h17M7.6 31l-.8-2.4M9.8 31l.4-2.8M17.8 31l-.6-2.6M20 31l.8-2.2" stroke="#6F9148" stroke-width="1.5" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M16.4 24.8l-2.8 5.4M17.6 24.4l-2.6 5.8M25.4 14.2l4.2 1.8M26.4 12.6l3.8 1"/>
+    <path class="lpl-vo" d="M25.2 11c.8-3.2 2.4-5 4.6-4.4 1 .8.4 2.8-1 4-1.2 1.2-2.6 2-3.4 2.6z" fill="#C7652F"/>
+    <path class="lpl-ik" d="M29.8 6.6c1 .8.4 2.8-1 4-.4-1.4-.2-3 1-4z" fill="#F0E7D8"/>
+    <path class="lpl-vo" d="M13.6 21c.9-6 5.4-10.6 11-10.4 2 .1 3 1.6 2.4 3.4-1.4 3-4.6 5.6-8 9.6-1.4 1.6-3 2.2-4.4 1.4-1.2-.8-1.2-2.4-1-4z" fill="#C7652F"/>
+    <path class="lpl-vo" d="M12.2 20.6c2.2-.8 4.6.2 5.2 2.2.2 1.4-1 2.8-3 4.2l-3.8 2c.2-1.8.4-3.6.8-5.2.2-1.4.4-2.6.8-3.2z" fill="#C7652F"/>
+    <path class="lpl-ik" d="M12.8 21l-2.4-3 3.4.8zM14.6 20.6l-1-3.4 2.6 2.2z" fill="#C7652F"/>
+    <path class="lpl-ik" d="M14.4 26.6c1.4-.6 2.6-1.6 3-3" fill="none"/>
+    <circle cx="13.6" cy="23.2" r=".65" fill="#2A2522"/>
+    <circle cx="10.7" cy="28.6" r=".8" fill="#2A2522"/>
   </symbol>
+  <!-- Les vers luisants dans l'herbe haute du pré, la nuit (vert-jaune #B8F05A, celui du jeu). -->
   <symbol id="memory-glowworms" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="16" fill="#2f3f5c" opacity=".85"/>
-    <path d="M5 30c3-5 2-9 1-12M10 33c1-6 3-9 6-11M15 34c0-5-1-8-3-11M21 34c1-6 3-10 6-12M27 34c0-4-2-7-4-10M32 32c1-4 0-8-2-10M35 28c-1-3-2-5-4-6" stroke="#4f7a3a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-    <g fill="#e6f5a0">
-      <circle cx="9" cy="24" r="2.6" opacity=".25"/><circle cx="9" cy="24" r="1"/>
-      <circle cx="17" cy="20" r="2.8" opacity=".25"/><circle cx="17" cy="20" r="1.1"/>
-      <circle cx="24.5" cy="25.5" r="2.4" opacity=".25"/><circle cx="24.5" cy="25.5" r=".9"/>
-      <circle cx="30" cy="19" r="2.6" opacity=".25"/><circle cx="30" cy="19" r="1"/>
-      <circle cx="13" cy="29.5" r="2" opacity=".25"/><circle cx="13" cy="29.5" r=".8"/>
-      <circle cx="22" cy="13.5" r="1.8" opacity=".2"/><circle cx="22" cy="13.5" r=".7"/>
+    <circle cx="20" cy="20" r="18" fill="#1F2B45"/>
+    <path d="M5 31h30M7 31c0-4 1-8 3-11M11 31c0-5-1-9-3-12M15 31c.4-5 2-9 5-12M19 31c-.4-4-1.6-7-3.4-9.6M23 31c.4-5 2.4-9 5.4-11.4M27 31c-.2-4-1.2-7-3-9.4M31 31c0-3.6.8-6.4 2.4-8.6M33 31c-.4-2.4-1.4-4.4-2.8-6" stroke="#4E7A3F" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <g fill="#B8F05A">
+      <circle cx="10" cy="24" r="2.8" opacity=".3"/><circle cx="10" cy="24" r="1.2"/>
+      <circle cx="17.4" cy="20.6" r="3" opacity=".3"/><circle cx="17.4" cy="20.6" r="1.3"/>
+      <circle cx="24.6" cy="25.4" r="2.6" opacity=".3"/><circle cx="24.6" cy="25.4" r="1.1"/>
+      <circle cx="29.8" cy="19.4" r="2.8" opacity=".3"/><circle cx="29.8" cy="19.4" r="1.2"/>
+      <circle cx="14" cy="28.4" r="2.2" opacity=".3"/><circle cx="14" cy="28.4" r=".9"/>
+      <circle cx="22" cy="14.2" r="2" opacity=".3"/><circle cx="22" cy="14.2" r=".8"/>
     </g>
-    <circle cx="27" cy="9" r=".6" fill="#f3ebd4"/>
-    <circle cx="12" cy="11" r=".5" fill="#f3ebd4"/>
+    <circle cx="27" cy="8.6" r=".7" fill="#F6F2E7"/>
+    <circle cx="12.4" cy="10.6" r=".6" fill="#F6F2E7"/>
   </symbol>
-  <!-- Tour 7 (dev gameplay 3D, substituts en attendant la direction artistique): la chevrette et son faon, le martin-pêcheur sur son pieu, la brume entre deux rives. -->
+  <!-- La chevrette (sans bois: larges oreilles en V) lèche le faon tacheté qui tète; herbe à mi-pattes. -->
   <symbol id="memory-roe-deer" viewBox="0 0 40 40">
-    <circle cx="20" cy="18" r="16" fill="#7ba05b" opacity=".2"/>
-    <path d="M3 33h34" stroke="#6f8f4a" stroke-width="3" stroke-linecap="round"/>
-    <path class="lpl-ik" d="M8 20.5c0-2.4 2.6-3.6 6.4-3.6h6.4c1.6 0 2.4-1 3-2.6l1.6-4 2.6 1-1 4.6c-.4 1.8-1 3.4-2 4.6-.8 1-2.2 1.6-3.8 1.6h-9c-2.4 0-4.2-.6-4.2-1.6z" fill="#c8662e"/>
-    <path class="lpl-ik" d="M24.6 10.4l1.2-3.2 1 3M27.4 11l2.4-1.8-.6 2.8" fill="#c8662e"/>
-    <path class="lpl-ik" d="M10.4 22v9.4M13.6 22v9.4M19.4 22v9.4M22.2 21.4v10" fill="none"/>
-    <path d="M7.6 19.6c.8 1.2 2 1.6 2.8 1.4" stroke="#fbf6e9" stroke-width="1.6" stroke-linecap="round" fill="none"/>
-    <circle cx="26.6" cy="12" r=".6" fill="#2a2522"/>
-    <path class="lpl-ik" d="M27 27c0-1.6 1.6-2.4 3.8-2.4h2.6c.8 0 1.4-.6 1.8-1.4l.8-2 1.6.6-.6 2.6c-.4 1.6-1.4 2.6-2.8 2.6h-5.2c-1.2 0-2-.2-2-.6z" fill="#d9844a"/>
-    <path class="lpl-ik" d="M28.6 27.6v4.6M31.6 27.6v4.6M33.6 27.4v4.8" fill="none"/>
-    <circle cx="29.6" cy="25.4" r=".55" fill="#fbf6e9"/>
-    <circle cx="31.6" cy="25.2" r=".55" fill="#fbf6e9"/>
+    <circle cx="20" cy="20" r="18" fill="#C6E17F"/>
+    <path class="lpl-ikf" d="M13.6 15.8 13.4 32M15.8 16v16M26 16.2V32M28 14.8c.8 3 1 5.6-.2 7.6l.4 9.6"/>
+    <path class="lpl-vo" d="M11.8 12.2c.6-1.8 2.2-2.6 4.6-2.4 3.6.2 7.6-.8 10.4-.4 2.2.4 3 2.4 2.6 4.6-.4 1.8-1.6 2.6-3.2 2.8-1.8.2-3.6-.4-5.2-.4-1.8 0-3.4.6-5.2.4-2.2-.2-4.2-1.4-4-4.6z" fill="#B5693C"/>
+    <path class="lpl-ik" d="M28.2 10.4c1.2 1 1.4 2.8.8 4-.6-1.2-1-2.6-.8-4z" fill="#F0E7D8"/>
+    <path class="lpl-vo" d="M12.8 10.4c-1.8.8-3.4 3.2-4.4 5.8l2.6.9c.8-2 2-3.6 3.6-4.6z" fill="#B5693C"/>
+    <path class="lpl-ikf" d="M10.4 24.2V32M12 24.2V32M18.6 24.2V32M20.2 24V32"/>
+    <path class="lpl-vo" d="M8.4 21.8c0-1.4 1.2-2.2 3-2.2h7c1.2 0 2 .4 2.4 1.2l1.4-2.4c.6-.8 1.6-1.2 2.4-.8l-.2 1.6c-.6 1.6-1.6 2.6-2.8 3-.2 1.2-.8 2-1.6 2h-8.6c-1.6 0-3-.6-3-2.4z" fill="#B5693C"/>
+    <path class="lpl-ik" d="M22.2 18.8c-.8-.8-2-1.2-2.8-.8l.6 1.4z" fill="#B5693C"/>
+    <g fill="#F0E7D8"><circle cx="11" cy="20.9" r=".7"/><circle cx="13.6" cy="20.6" r=".7"/><circle cx="16.2" cy="20.7" r=".7"/><circle cx="12.4" cy="22.6" r=".6"/><circle cx="15" cy="22.5" r=".6"/><circle cx="17.6" cy="22.4" r=".6"/></g>
+    <circle cx="23.2" cy="19" r=".45" fill="#2A2522"/>
+    <path class="lpl-vo" d="M6.8 16c1.4-1 4-.6 4.6 1 .2 1.4-.6 2.8-1.6 3.8-.8.4-1.6.2-2-.4-.8-1.2-1.4-3-1-4.4z" fill="#B5693C"/>
+    <path class="lpl-ik" d="M7.4 15.8c-2-.6-3.2-2.6-2.6-4 1.8 0 3.4 1.8 3.6 3.6zM9.6 15.6c-.2-2 1-3.8 2.8-4 .6 1.6-.2 3.4-1.8 4.4z" fill="#B5693C"/>
+    <circle cx="8.7" cy="17.3" r=".55" fill="#2A2522"/>
+    <circle cx="9.3" cy="20.6" r=".75" fill="#2A2522"/>
+    <path d="M5.5 32h29M7.4 32l-.6-3.6M9.6 32l.6-4M12.6 32l-.4-3.8M15 32l.8-4.2M18.4 32l-.4-3.6M21.6 32l.6-4M24.4 32l-.6-3.8M27.8 32l.6-4.2M30.6 32l-.4-3.6M32.6 32l.4-2.6" stroke="#6F9148" stroke-width="1.5" stroke-linecap="round"/>
   </symbol>
+  <!-- Le martin-pêcheur sur le pieu (bande de mousse), l'ablette en travers du bec, son éclat blanc. -->
   <symbol id="memory-kingfisher" viewBox="0 0 40 40">
-    <circle cx="20" cy="18" r="16" fill="#3f7f93" opacity=".2"/>
-    <path d="M2 31h36M6 35h28" stroke="#7fbcc0" stroke-width="2.4" stroke-linecap="round"/>
-    <path class="lpl-ik" d="M21 18h4v18h-4z" fill="#8a6a48"/>
-    <path class="lpl-ik" d="M21 26.6h4" fill="none"/>
-    <path class="lpl-ik" d="M17.6 16.8c-1-3.2.6-6.6 4-7.4 2.6-.6 5 .8 5.6 3 .6 2-.4 4.2-2.6 4.8l-4.4.6z" fill="#2f6fb5"/>
-    <path class="lpl-ik" d="M20 17c.6-2.4 2.8-3.4 5.2-3 .2 1.6-.8 2.8-2.4 3z" fill="#e98a3b"/>
-    <path class="lpl-ik" d="M25.4 10.6l7.4 1.2-7 1.2z" fill="#2a2522"/>
-    <path d="M18.6 13.2c1.4-1.4 3.4-2.2 5.4-2" stroke="#4fd6d0" stroke-width="1.4" stroke-linecap="round" fill="none"/>
-    <circle cx="24.4" cy="11.6" r=".6" fill="#fbf6e9"/>
-    <path d="M19 31.6c2-1.6 6-1.6 8 0" stroke="#fbf6e9" stroke-width="1" stroke-linecap="round" fill="none" opacity=".8"/>
+    <circle cx="20" cy="20" r="18" fill="#D4ECEB"/>
+    <path d="M5.5 30.5h12.6M23.4 30.5h11M13 33.4h4.4M23.8 33.4h4.4" stroke="#4C899A" stroke-width="1.5" stroke-linecap="round"/>
+    <path class="lpl-vo" d="M18.6 19.6h4.4v10.9h-4.4z" fill="#908879"/>
+    <path class="lpl-ik" d="M18.6 25.6h4.4v2.6h-4.4z" fill="#809B4F"/>
+    <path class="lpl-ik" d="M17.6 19.8l-2.4 3 1.4.4 2.2-2.2z" fill="#3D7CC6"/>
+    <ellipse class="lpl-vo" cx="20.4" cy="15.8" rx="3.4" ry="4.8" transform="rotate(-25 20.4 15.8)" fill="#3D7CC6"/>
+    <path class="lpl-ik" d="M23.2 12.8c1.2 1.8 1.4 4.2.4 6-.8 1.4-2.2 2-3.6 2 1.4-2.4 2.4-5 3.2-8z" fill="#E68A3A"/>
+    <path d="M18.2 18.6c-.6-2-.2-4 1-5.6" stroke="#2BB5C8" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ikf" d="M20 19.6v.8M21.4 19.4v1"/>
+    <circle class="lpl-vo" cx="22.4" cy="10.4" r="3.2" fill="#3D7CC6"/>
+    <path d="M21.4 11c1.2-.4 2.4-.2 3.4.6-.8.8-2.2 1-3.4.4z" fill="#E68A3A"/>
+    <circle cx="23.6" cy="9.8" r=".6" fill="#2A2522"/>
+    <path d="M25 9 32.4 10.5 25.1 12.2z" fill="#2A2522"/>
+    <path class="lpl-ik" d="M30.5 7.6 29 5.4l1.6.5 1.5-.9z" fill="#BAC4C7"/>
+    <path class="lpl-ik" d="M28.2 15.6c-1-2.8.4-6.4 2.4-8.2 1 2.8 0 6.4-2.4 8.2z" fill="#BAC4C7"/>
+    <path d="M29.4 12.4c.2-1.4.6-2.6 1.2-3.6" stroke="#F0ECE3" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="28.8" cy="14.2" r=".5" fill="#2A2522"/>
   </symbol>
+  <!-- La brume de l'Aubrune: de part et d'autre de l'eau, le joueur foncé de dos (casquette) et le joueur clair de face
+       (chignon), sur la rive opposée devant la haie; nappe blanche effilochée au ras de l'eau, soleil bas doré. -->
   <symbol id="memory-mist" viewBox="0 0 40 40">
-    <circle cx="20" cy="18" r="16" fill="#ffd9a0" opacity=".3"/>
-    <path d="M2 27h36v6H2z" fill="#7fbcc0" opacity=".8"/>
-    <path class="lpl-ik" d="M4.8 27v-6.2c0-1.4 1-2.2 2.2-2.2s2.2.8 2.2 2.2V27zM30.8 27v-6.2c0-1.4 1-2.2 2.2-2.2s2.2.8 2.2 2.2V27z" fill="#3d85c6"/>
-    <circle class="lpl-ik" cx="7" cy="16.6" r="2.2" fill="#e8b48a"/>
-    <circle class="lpl-ik" cx="33" cy="16.6" r="2.2" fill="#e8b48a"/>
-    <path d="M4 25.6c4-2 8 0 12-1.4s8-1.6 12 0 6 .8 8-.4M5 29.4c5-1.6 9 .4 14-1s9-.6 15 .8" stroke="#fbf6e9" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".9"/>
-    <path d="M18.4 30.2c.6-1.8 2.4-2 3.2-.4" stroke="#2a2522" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <circle cx="20" cy="20" r="18" fill="#D49248"/>
+    <path d="M10.6 23.5a5 5 0 0 1 10 0z" fill="#FFD27A"/>
+    <path class="lpl-ik" d="M22.6 23.5c0-2.2 1.4-3.4 3.2-3.2.8-1.8 3.6-2.2 5-.8 1.6-1 4-.4 4.6 1.6.8.6 1.2 1.4 1.2 2.4z" fill="#3F6C4D"/>
+    <path d="M2.8 23.5h34.4" stroke="#4C899A" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M6 25.6h7M16 25.6h11.6M30 25.6h4M8 28h5M15.6 28h9M27.4 28h6M12 30.4h11M25.4 30.4h5" stroke="#EEECE4" stroke-width="2" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M27 23.4l.6-4.8c.2-.8 2.2-.8 2.4 0l.6 4.8z" fill="#EEECE4"/>
+    <path class="lpl-ikf" d="M30 19l1.6-2.6"/>
+    <circle class="lpl-ik" cx="28.8" cy="16.4" r="1.6" fill="#EEECE4"/>
+    <circle class="lpl-ik" cx="27.6" cy="14.8" r=".9" fill="#EEECE4"/>
+    <path d="M4.2 32.4h12" stroke="#3F6C4D" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M8.6 27.4v4.6M11.2 27.4v4.6" stroke="#2A2522" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M7 28c-.4-4 .4-6.4 2.9-6.8 2.5.4 3.3 2.8 2.9 6.8z" fill="#2A2522"/>
+    <path d="M12.2 23.2l2.4-4.4" stroke="#2A2522" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="9.9" cy="18.8" r="2.3" fill="#2A2522"/>
+    <path d="M7.3 18.4c0-3.2 5.2-3.2 5.2 0z" fill="#2A2522"/>
+    <path d="M7.6 18.2h4.6" stroke="#D49248" stroke-width=".8" stroke-linecap="round"/>
   </symbol>
+  <!-- Les noms des poules: la rousse, la blanche et la noire accourent. -->
   <symbol id="memory-hen-names" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="16" fill="#e2c47c" opacity=".45"/>
-    <ellipse cx="20" cy="33" rx="16" ry="3" fill="#c1a577" opacity=".6"/>
-    <path class="lpl-ik" d="M13 33.5h14l-1.4-4H14.4z" fill="#a97749"/>
-    <path d="M15 29.3c1.5.8 3 .8 4.5 0M21 29.3c1.5.8 3 .8 4.5 0" stroke="#f2e4b6" stroke-width="1.2" stroke-linecap="round" fill="none"/>
-    <g class="lpl-ik">
-      <path d="M4.5 26.5c-.4-3.6 1.6-6.6 4.6-6.6 1.6 0 2.4-1.8 2-3.4 1.6-.6 3 .6 3 2.4 0 1.6-.8 2.4-.8 3.4 1.2.6 1.8 2.4 1.4 4-.6 2.4-3 3.6-5.6 3.6-2.4 0-4.4-1.4-4.6-3.4z" fill="#f3e7d0"/>
-      <path d="M15 22.4c-.4-3.8 1.6-6.8 4.8-6.8 1.6 0 2.6-1.8 2.2-3.6 1.6-.6 3.2.6 3.2 2.6 0 1.6-.8 2.6-.8 3.6 1.2.6 2 2.4 1.6 4.2-.6 2.6-3.2 3.8-5.8 3.8-2.6 0-4.8-1.4-5.2-3.8z" fill="#c4553b"/>
-      <path d="M25.4 26.6c-.4-3.4 1.6-6.4 4.6-6.4 1.6 0 2.4-1.8 2-3.4 1.6-.6 3 .6 3 2.4 0 1.6-.8 2.4-.8 3.4 1.2.6 1.8 2.4 1.4 4-.6 2.4-3 3.6-5.6 3.6-2.4 0-4.4-1.4-4.6-3.6z" fill="#44484e"/>
+    <circle cx="20" cy="20" r="18" fill="#E2C47C"/>
+    <path d="M4.5 30.4h31" stroke="#B69B73" stroke-width="1.5" stroke-linecap="round"/>
+    <g transform="translate(30.4 23.8) rotate(-10)">
+      <path class="lpl-ikf" d="M-.8 3.4-2.6 6.4-4 6.6M1.4 3.4l1.4 2.6 1.2-.8"/>
+      <path class="lpl-vo" d="M-3.8-4.6c.2-1.6 1.4-2.4 2.6-2.2 1.2.2 1.8 1.2 1.6 2.4-.2.8-.2 1.4.4 1.8 1.2.2 2.6-.8 3.4-2.6 1.2.8 1.6 3.2 1 5.2-.8 2.6-3.2 3.8-5.8 3.6-2.4-.2-4-1.8-4-3.8 0-1.4.6-2.4 1-3.2z" fill="#3D3B3B"/>
+      <path d="M-3.2-6.4c-.6-1.4.4-2.4 1.4-1.6.2-1.2 1.8-1.2 1.8 0 1-.4 1.6.6.8 1.4z" fill="#D3423C"/>
+      <path d="M-3.6-6-6-5.1l2.6.6z" fill="#E9B13F"/><path d="M-3.8-4.6c-.6.8-.4 1.8.4 1.8.4-.4.4-1.2.1-1.8z" fill="#D3423C"/>
+      <circle cx="-2.4" cy="-5.2" r=".55" fill="#F2EDE1"/>
+      <path d="M-1.4-.2C0 1.2 2 1.4 3.4.2" stroke="#F2EDE1" stroke-width="1" stroke-linecap="round" fill="none"/>
     </g>
-    <path d="M11.2 16.4c-.2-1 .6-1.6 1.2-1M22.1 12c-.2-1 .6-1.6 1.2-1M32.1 16.6c-.2-1 .6-1.6 1.2-1" stroke="#d44b5d" stroke-width="1.5" stroke-linecap="round" fill="none"/>
-    <path d="M14.4 18.4l1.4.4-1.3.6zM25.5 14l1.4.4-1.3.6zM35 18.6l1.4.4-1.3.6z" fill="#e8b04a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/>
-    <circle cx="12.8" cy="18" r=".6" fill="#2a2522"/>
-    <circle cx="23.9" cy="13.6" r=".6" fill="#2a2522"/>
-    <circle cx="33.4" cy="18.2" r=".6" fill="#fbf6e9"/>
+    <g transform="translate(20 23.8) rotate(-10)">
+      <path class="lpl-ikf" d="M-.8 3.4-2.6 6.4-4 6.6M1.4 3.4l1.4 2.6 1.2-.8"/>
+      <path class="lpl-vo" d="M-3.8-4.6c.2-1.6 1.4-2.4 2.6-2.2 1.2.2 1.8 1.2 1.6 2.4-.2.8-.2 1.4.4 1.8 1.2.2 2.6-.8 3.4-2.6 1.2.8 1.6 3.2 1 5.2-.8 2.6-3.2 3.8-5.8 3.6-2.4-.2-4-1.8-4-3.8 0-1.4.6-2.4 1-3.2z" fill="#F2EDE1"/>
+      <path d="M-3.2-6.4c-.6-1.4.4-2.4 1.4-1.6.2-1.2 1.8-1.2 1.8 0 1-.4 1.6.6.8 1.4z" fill="#D3423C"/>
+      <path d="M-3.6-6-6-5.1l2.6.6z" fill="#E9B13F"/><path d="M-3.8-4.6c-.6.8-.4 1.8.4 1.8.4-.4.4-1.2.1-1.8z" fill="#D3423C"/>
+      <circle cx="-2.4" cy="-5.2" r=".55" fill="#2A2522"/>
+      <path class="lpl-ikf" d="M-1.4-.2C0 1.2 2 1.4 3.4.2"/>
+    </g>
+    <g transform="translate(9.6 23.8) rotate(-10)">
+      <path class="lpl-ikf" d="M-.8 3.4-2.6 6.4-4 6.6M1.4 3.4l1.4 2.6 1.2-.8"/>
+      <path class="lpl-vo" d="M-3.8-4.6c.2-1.6 1.4-2.4 2.6-2.2 1.2.2 1.8 1.2 1.6 2.4-.2.8-.2 1.4.4 1.8 1.2.2 2.6-.8 3.4-2.6 1.2.8 1.6 3.2 1 5.2-.8 2.6-3.2 3.8-5.8 3.6-2.4-.2-4-1.8-4-3.8 0-1.4.6-2.4 1-3.2z" fill="#B5693C"/>
+      <path d="M-3.2-6.4c-.6-1.4.4-2.4 1.4-1.6.2-1.2 1.8-1.2 1.8 0 1-.4 1.6.6.8 1.4z" fill="#D3423C"/>
+      <path d="M-3.6-6-6-5.1l2.6.6z" fill="#E9B13F"/><path d="M-3.8-4.6c-.6.8-.4 1.8.4 1.8.4-.4.4-1.2.1-1.8z" fill="#D3423C"/>
+      <circle cx="-2.4" cy="-5.2" r=".55" fill="#2A2522"/>
+      <path class="lpl-ikf" d="M-1.4-.2C0 1.2 2 1.4 3.4.2"/>
+    </g>
   </symbol>
+  <!-- Le mot de Lucie: le billet plié en quatre, glissé sous son galet, dans l'herbe. -->
   <symbol id="memory-lucie-note" viewBox="0 0 40 40">
-    <circle cx="20" cy="20" r="16" fill="#e2c47c" opacity=".35"/>
-    <path class="lpl-ik" d="M7.5 13.5l22.5-3.6 3 17.6-22.5 3.6z" fill="#fbf6e9"/>
-    <path d="M18.7 11.7l3 17.6M8.9 22.1l22.6-3.6" stroke="#d9ccab" stroke-width="1.1" fill="none"/>
-    <path d="M11.4 16.2l5-.8M11.8 18.6l4.4-.7M22.4 14.6l5-.8M22.8 17l3.6-.6" stroke="#6b87b1" stroke-width=".9" stroke-linecap="round"/>
-    <path d="M12.6 25.4c1-.6 2-.4 2.6.2" stroke="#6b87b1" stroke-width=".9" stroke-linecap="round" fill="none"/>
-    <path class="lpl-ik" d="M20.5 30.5c-.6-2.6 1.4-4.8 4.6-5.2 3.4-.4 6.4 1 6.8 3.4.4 2.2-1.8 3.8-5.4 4-3.2.2-5.6-.6-6-2.2z" fill="#9aa3a8"/>
-    <path d="M23 28.6c1.4-.8 3.4-1 5-.4" stroke="#6c7179" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <circle cx="20" cy="20" r="18" fill="#809B4F"/>
+    <path class="lpl-vo" d="M8.6 14.2l18.6-3 2.6 15.4-18.6 3z" fill="#F0ECE3"/>
+    <path d="M17.9 12.7l2.6 15.4M9.9 21.9l18.6-3" stroke="#D9CCAB" stroke-width="1.5"/>
+    <path d="M11.4 16.6l4.6-.8M11.8 19.2l3.6-.6M21 15.2l4.6-.8M21.4 17.6l3-.5M12.8 24.4l3.6-.6M13.2 26.8l2.4-.4" stroke="#6B87B1" stroke-width="1" stroke-linecap="round"/>
+    <path class="lpl-vo" d="M21.4 27.6c-.4-2.6 1.6-4.6 4.8-5 3.4-.4 6.4 1 6.8 3.4.4 2.2-1.8 3.8-5.4 4-3.2.2-5.8-.6-6.2-2.4z" fill="#A09C92"/>
+    <path class="lpl-ikf" d="M24.2 24.8c1.4-.6 3.2-.6 4.6 0"/>
+  </symbol>
+  <!-- Les étoiles de l'Aubrune: deux dos assis au bout du ponton, une étoile filante reflétée dans l'eau noire. -->
+  <symbol id="memory-falling-stars" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="18" fill="#1F2B45"/>
+    <path d="M6.5 28h4.5M29 28h5M5.5 32.2h5.5M29.6 32.4h4" stroke="#6B87B1" stroke-width="1" stroke-linecap="round"/>
+    <path d="M22.8 6.4l7 5.2" stroke="#E8DDC4" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+    <path d="M26.2 8.9l3.6 2.7" stroke="#E8DDC4" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="30" cy="11.7" r="1.2" fill="#E8DDC4"/>
+    <g fill="#E8DDC4"><circle cx="14" cy="7" r=".6"/><circle cx="9.6" cy="12" r=".7"/><circle cx="7" cy="18" r=".6"/><circle cx="33.4" cy="20" r=".6"/><circle cx="27" cy="13" r=".5"/><circle cx="10" cy="24" r=".5"/><circle cx="31" cy="25" r=".5"/></g>
+    <path class="lpl-vo" d="M15.6 25.6h8.8l3.2 10h-15.2z" fill="#908879"/>
+    <path class="lpl-ikf" d="M18.5 25.6l-1.1 10M21.5 25.6l1.1 10"/>
+    <path class="lpl-ik" d="M14.6 25.8c-.2-4 .8-6.2 2.8-6.4 2 .2 2.8 2.4 2.6 6.4z" fill="#E8DDC4"/>
+    <circle class="lpl-ik" cx="17.3" cy="17.1" r="2.1" fill="#6F5B45"/>
+    <circle class="lpl-ik" cx="16.9" cy="14.6" r="1.1" fill="#6F5B45"/>
+    <path class="lpl-ik" d="M20 25.8c-.2-4.2.8-6.6 3-6.8 2.2.2 3.2 2.6 3 6.8z" fill="#6B87B1"/>
+    <circle class="lpl-ik" cx="23.2" cy="16.9" r="2.2" fill="#6F5B45"/>
+    <path class="lpl-ik" d="M20.8 16.4c0-2.8 4.8-2.8 4.8 0z" fill="#6B87B1"/>
+  </symbol>
+  <!-- La valse d'Odette: le phonographe sur le rebord du comptoir, les deux joueurs qui tournent, mains jointes. -->
+  <symbol id="memory-odette-waltz" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="18" fill="#5F7D8C"/>
+    <path class="lpl-vo" d="M6.4 24.6h7.8v6.6H6.4z" fill="#DEBA80"/>
+    <path class="lpl-ik" d="M7.2 21.8h5.8v2.8H7.2z" fill="#765130"/>
+    <path class="lpl-ik" d="M10.6 21.8c.4-3 1.6-5.4 3.4-7l-1-2.6c3.2-.4 5.8 1.8 6.2 5l-2.8-.4c-1.8 1.4-3 3.2-3.4 5z" fill="#C8A150"/>
+    <path class="lpl-ikf" d="M7.6 21.6h3M13 23.2h1.4"/>
+    <path d="M5.5 31.5h29" stroke="#ABA498" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M19.6 33.2c2.6 1.4 8.8 1.4 11.4 0M20 10.6c2.8-1.6 8-1.6 10.6 0" stroke="#F3EBD4" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path d="M23.4 20.4l1.8 1.2 1.8-1.2" stroke="#2A2522" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.6 26l-1.2 5.5M22.8 26l1.4 5.5" stroke="#2A2522" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M19.4 26c-.4-4 .2-7 2.2-7.6 2 .6 2.6 3.6 2.4 7.6z" fill="#2A2522"/>
+    <circle cx="21.6" cy="15.8" r="2.3" fill="#2A2522"/>
+    <path d="M19.2 15.2c0-2.8 4.6-2.8 4.8-.4l1.4.6h-6.2z" fill="#2A2522"/>
+    <path class="lpl-ikf" d="M27.8 26l-1.2 5.5M30 26l1.2 5.5"/>
+    <path class="lpl-ik" d="M26.6 26c-.2-4 .4-7 2.2-7.6 2 .6 2.6 3.6 2.2 7.6z" fill="#F3EBD4"/>
+    <circle class="lpl-ik" cx="28.8" cy="15.8" r="2.3" fill="#F3EBD4"/>
+    <circle class="lpl-ik" cx="31" cy="14.4" r="1.2" fill="#F3EBD4"/>
+  </symbol>
+  <!-- Le salut du mécanicien: la locomotive de trois quarts sort au pas, le mécanicien penché lève sa casquette;
+       la lisse du passage à niveau est baissée (elle barre la route, au premier plan, parallèle à la voie). -->
+  <symbol id="memory-train-salute" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="18" fill="#EBDCBF"/>
+    <path d="M4.6 29h30.8" stroke="#7F786E" stroke-width="1.5" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M11.2 8.2c-1.4 0-1.8-1.6-.6-2.2.2-1.4 2.2-1.8 3-.6 1.2-.4 2.2.6 1.8 1.8-.4.8-1.4 1-2 .6" fill="#F0ECE3"/>
+    <path class="lpl-vo" d="M9.6 13.4h13.6v8.4H9.6z" fill="#3F6453"/>
+    <path class="lpl-ik" d="M15.2 13.4c0-2.2 3.4-2.2 3.4 0z" fill="#3F6453"/>
+    <path class="lpl-ik" d="M10.8 13.4V9h3v4.4z" fill="#2A2522"/>
+    <path class="lpl-ikf" d="M10.2 8.6h4.2"/>
+    <path class="lpl-vo" d="M22.4 9.8h9.2v14.2h-9.2z" fill="#3F6453"/>
+    <path class="lpl-ik" d="M24.2 12h5.4v4.6h-5.4z" fill="#2A2522"/>
+    <path d="M21.4 9.6h11.4" stroke="#2A2522" stroke-width="2" stroke-linecap="round"/>
+    <ellipse class="lpl-vo" cx="9.6" cy="17.6" rx="3" ry="4.2" fill="#2A2522"/>
+    <path class="lpl-ik" d="M5.6 21.6h4.2v2.2H5.6z" fill="#A4463B"/>
+    <circle class="lpl-ik" cx="14.4" cy="25.2" r="3.2" fill="#2A2522"/>
+    <circle class="lpl-ik" cx="21" cy="25.2" r="3.2" fill="#2A2522"/>
+    <circle class="lpl-ik" cx="27.8" cy="26.2" r="2.4" fill="#2A2522"/>
+    <path d="M23.4 15.6l-3.4-8" stroke="#2A2522" stroke-width="2" stroke-linecap="round"/>
+    <path d="M17.6 6.6c0-2.6 4.4-2.6 4.6 0l1.2.4h-5.8z" fill="#2A2522"/>
+    <circle class="lpl-ik" cx="22.8" cy="13.4" r="1.9" fill="#DEAF9D"/>
+    <path class="lpl-ik" d="M32.6 21h1.8v9.4h-1.8z" fill="#2A2522"/>
+    <path class="lpl-ik" d="M6.2 25.4h26.4v2H6.2z" fill="#F0ECE3"/>
+    <path d="M9.2 25.4h3v2h-3zM15.2 25.4h3v2h-3zM21.2 25.4h3v2h-3zM27.2 25.4h3v2h-3z" fill="#A4463B"/>
   </symbol>
 </svg>
