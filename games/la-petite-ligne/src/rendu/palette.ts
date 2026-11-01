@@ -177,6 +177,18 @@ export const PALETTE_CELLS = [
   'blackberry',
   'vine_leaf',
   'vine_leaf_dark',
+  'copper',
+  'copper_light',
+  'bamboo',
+  'bamboo_node',
+  'steel_forged',
+  'cep_cap',
+  'cep_stem',
+  'elder_stem',
+  'leaf_litter',
+  'hazel_husk',
+  'hazel_shell',
+  'owl_buff',
 ] as const;
 
 export type PaletteCell = (typeof PALETTE_CELLS)[number];

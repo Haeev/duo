@@ -193,6 +193,21 @@ WORLD = [
     # printemps, vert franc l'été, or et rouge à l'automne, feuilles sèches l'hiver
     ("vine_leaf", "#5E8B45", 0.9, 0.0, None),
     ("vine_leaf_dark", "#4C7638", 0.9, 0.0, None),
+    # Tour 9: outils de la Halte (arrosoir de cuivre, canne en bambou refendu, hache de la forge)
+    ("copper", "#B8693A", 0.35, 0.6, None),
+    ("copper_light", "#DE9A62", 0.3, 0.6, None),
+    ("bamboo", "#D9C27E", 0.6, 0.0, None),
+    ("bamboo_node", "#9E8343", 0.7, 0.0, None),
+    ("steel_forged", "#3B4652", 0.45, 0.5, None),
+    # Tour 9: cueillette d'automne et lisibilité (cèpe, sureau, litière sous le noisetier, noisettes)
+    ("cep_cap", "#6E3F22", 0.7, 0.0, None),
+    ("cep_stem", "#EDE2C2", 0.85, 0.0, None),
+    ("elder_stem", "#B0303F", 0.7, 0.0, None),
+    ("leaf_litter", "#D9A04A", 0.95, 0.0, None),
+    ("hazel_husk", "#D2DC92", 0.85, 0.0, None),
+    ("hazel_shell", "#52301A", 0.5, 0.0, None),
+    # Tour 9: dame blanche (dos chamois de l'effraie)
+    ("owl_buff", "#D8AE72", 0.9, 0.0, None),
 ]
 
 # Variantes de saison: seules les cases citées changent (même disposition).
@@ -272,8 +287,21 @@ CHAR_ROWS = {
         "bottom": "#3E4A5C", "shoes": "#3A2F29", "scarf": "#E0C25A", "scarf_mark": "#4E6F8F",
         "extra_a": "#8C5A35", "extra_b": "#3D5874", "metal": "#C8A150", "cheek": "#D9857A",
     },
+    # Tour 9: équipage du train (salut du mécanicien), bustes à la fenêtre de la cabine
+    "driver": {
+        "skin": "#E0AE88", "skin_shade": "#C48E6C", "hair": "#8C8379", "hair_dark": "#6A625A",
+        "eye": "#2A2522", "mouth": "#87463F", "top": "#3E5A86", "top_trim": "#5573A0",
+        "bottom": "#2F3E57", "shoes": "#2E2A27", "scarf": "#C2453B", "scarf_mark": "#F0E6D2",
+        "extra_a": "#2F3E57", "extra_b": "#33415A", "metal": "#B9A15E", "cheek": "#DE8C7C",
+    },
+    "stoker": {
+        "skin": "#C99572", "skin_shade": "#A97858", "hair": "#3A2E26", "hair_dark": "#261E19",
+        "eye": "#2A2522", "mouth": "#7A3F38", "top": "#5B5246", "top_trim": "#6F665A",
+        "bottom": "#3C362F", "shoes": "#2E2A27", "scarf": "#EDE6D6", "scarf_mark": "#5B5246",
+        "extra_a": "#3C362F", "extra_b": "#4A443D", "metal": "#8F8A82", "cheek": "#8E7A6A",
+    },
 }
-CHAR_ROW_ORDER = ["player_a", "player_b", "firmin", "odette", "basile", "jeanne", "lucie"]
+CHAR_ROW_ORDER = ["player_a", "player_b", "firmin", "odette", "basile", "jeanne", "lucie", "driver", "stoker"]
 
 # Choix proposés à la création du personnage (démo: quatre tenues).
 PLAYER_PRESETS = {

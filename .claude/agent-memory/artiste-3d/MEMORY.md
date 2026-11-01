@@ -110,3 +110,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le jeu met un `grow_node` à l'échelle d'un bloc autour de son origine: tout ce qui doit rester accroché ailleurs qu'à l'origine glisse (pieds des rejets vers le milieu de la coupe). Une origine par pièce (un nœud par brin, origine au pied) et une matrice par pièce côté rendu.
 - Deux objets du même lieu dessinés par le rendu à des échelles différentes (souche fixe, plant de 0,7 à 1,3): contrôler le contact à toutes les échelles par arbres BVH (`verifier/souche_et_plants.py`).
 - Garde-fou du worktree: `montage` avec un motif glob, ou une commande enchaînant un heredoc Python et autre chose, est refusé; passer par un script écrit avec Write.
+
+## Tour 9 (vérifié le 2026-11-01)
+
+- Fruit posé sur un hôte fait dans un autre GLB (mûres sur roncier, sureau): reconstruire l'hôte dans un Geo jetable (graines fixes) et lancer des rayons horizontaux depuis le sud (`_host_hits` de `cueillette.py`); un seul point de pose dans l'extra, le modèle du fruit porte ses grappes à leur place. Reconstruire `ferme.py` et `bourg.py` ensemble.
+- Lisibilité mesurable: rendre avec et sans la cueillette, masque = pixels qui diffèrent, puis taille à l'écran et contraste de luminance (`planche_tour9.py zoom1`). Les 14 x 14 px sont faciles; le contraste 3:1 au soleil couchant ne l'est pas.
+- Objet porté long (perche): le modéliser couché vers l'avant (-Y) au repos du bras. Une flexion positive des bras relève un objet qui pointe vers l'avant et rabat vers l'arrière un objet dressé (pente = 90 - somme des flexions).
+- Ailes de vol dans le plan du dos (XZ au repos) pour un oiseau debout au repos: racine inclinée de 80 degrés en vol, le plan devient horizontal. Battement = rotation autour de Z du repère du squelette. Une asymétrie vue sur une planche peut venir de la perspective: vérifier par la position des bouts d'os (`pose.bones[...].tail`).
+- Auvent sous une rive existante: mesurer d'abord le dessous du toit par lancer de rayons sur le GLB (la rive de la maisonnette descend à 2,12 m à 0,33 m du mur).
+- Garde-fou: refuse une variable shell devant duo-python, `grep --exclude-dir` et les heredocs vers des fichiers hors du dépôt; passer par un script (`verifier/controle_tirets.sh`, `verifier/planches_quatre_tour9.sh`).
+- Vitest avec node_modules liés vers l'arbre principal: les tests d'interface sous Chromium échouent sur des 403 des polices `@fontsource` (Vite refuse les fichiers hors racine); artefact du lien, pas des modèles.
+- `verifier/quatre_tour9.sh` envoie tout nœud inconnu vers `bourg.glb`: y ajouter chaque nouveau nœud de ferme ou de maison. `verifier.cjs` écrit `planches/threejs-*.png`: retirer ceux qu'on ne livre pas.

@@ -71,6 +71,18 @@
   "file": "personnages.glb",
   "tris": 1986
  },
+ "villager_firmin_scarf": {
+  "file": "personnages.glb",
+  "tris": 232
+ },
+ "rail_crew_driver": {
+  "file": "personnages.glb",
+  "tris": 1470
+ },
+ "rail_crew_stoker": {
+  "file": "personnages.glb",
+  "tris": 1514
+ },
  "rig": {
   "file": "personnages.glb",
   "animations": [
@@ -100,7 +112,16 @@
    "climb_ladder",
    "reach_up",
    "hammer_tap",
-   "hold_ladder"
+   "hold_ladder",
+   "sit_edge",
+   "look_up",
+   "crank_hold",
+   "crank_turn",
+   "wave_back",
+   "pole_raise",
+   "pole_lower",
+   "driver_lean",
+   "driver_wave"
   ]
  },
  "garden_cell_grass": {
@@ -253,11 +274,19 @@
  },
  "blackberry": {
   "file": "ferme.glb",
-  "tris": 224
+  "tris": 744
  },
  "hazelnut": {
   "file": "ferme.glb",
-  "tris": 392
+  "tris": 948
+ },
+ "cep": {
+  "file": "ferme.glb",
+  "tris": 522
+ },
+ "elderberry": {
+  "file": "ferme.glb",
+  "tris": 804
  },
  "seed_packet_radish": {
   "file": "ferme.glb",
@@ -294,6 +323,30 @@
  "fishing_rod": {
   "file": "ferme.glb",
   "tris": 80
+ },
+ "watering_can_copper": {
+  "file": "ferme.glb",
+  "tris": 292
+ },
+ "axe_forged": {
+  "file": "ferme.glb",
+  "tris": 200
+ },
+ "fishing_rod_bamboo": {
+  "file": "ferme.glb",
+  "tris": 316
+ },
+ "lamp_pole": {
+  "file": "ferme.glb",
+  "tris": 164
+ },
+ "hen_crate": {
+  "file": "ferme.glb",
+  "tris": 564,
+  "footprint": [
+   1,
+   1
+  ]
  },
  "fishing_float": {
   "file": "ferme.glb",
@@ -426,7 +479,7 @@
  },
  "well": {
   "file": "bourg.glb",
-  "tris": 686,
+  "tris": 658,
   "footprint": [
    2,
    2
@@ -434,7 +487,7 @@
  },
  "henhouse": {
   "file": "bourg.glb",
-  "tris": 2392,
+  "tris": 2468,
   "footprint": [
    3,
    3
@@ -612,6 +665,46 @@
    1
   ]
  },
+ "ford_bench": {
+  "file": "bourg.glb",
+  "tris": 448,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "house_bench": {
+  "file": "bourg.glb",
+  "tris": 536,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "quay_planter": {
+  "file": "bourg.glb",
+  "tris": 1196,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "well_roof": {
+  "file": "bourg.glb",
+  "tris": 1040,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "door_canopy": {
+  "file": "bourg.glb",
+  "tris": 232
+ },
+ "level_crossing_crank": {
+  "file": "bourg.glb",
+  "tris": 296
+ },
  "ground_grass": {
   "file": "bourg.glb",
   "tris": 24,
@@ -775,6 +868,14 @@
  "bush_hazel": {
   "file": "bourg.glb",
   "tris": 160,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bush_elder": {
+  "file": "bourg.glb",
+  "tris": 210,
   "footprint": [
    1,
    1
@@ -1061,6 +1162,82 @@
    1
   ]
  },
+ "straw_hat": {
+  "file": "maison.glb",
+  "tris": 256,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "pressed_flowers": {
+  "file": "maison.glb",
+  "tris": 628,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "autumn_wreath": {
+  "file": "maison.glb",
+  "tris": 752,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "jeanne_drawing": {
+  "file": "maison.glb",
+  "tris": 264,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "coop_calendar": {
+  "file": "maison.glb",
+  "tris": 832,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "wall_clock": {
+  "file": "maison.glb",
+  "tris": 608,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "wicker_armchair": {
+  "file": "maison.glb",
+  "tris": 748,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "chalk_box": {
+  "file": "maison.glb",
+  "tris": 176
+ },
+ "coffee_mill": {
+  "file": "maison.glb",
+  "tris": 248
+ },
+ "elder_jelly": {
+  "file": "maison.glb",
+  "tris": 190
+ },
+ "leather_apron": {
+  "file": "maison.glb",
+  "tris": 80
+ },
+ "wool_scarf": {
+  "file": "maison.glb",
+  "tris": 184
+ },
  "bread": {
   "file": "maison.glb",
   "tris": 136
@@ -1223,6 +1400,24 @@
    "kf_beat",
    "kf_swallow"
   ]
+ },
+ "barn_owl": {
+  "file": "faune.glb",
+  "tris": 658,
+  "animations": [
+   "owl_glide",
+   "owl_hover",
+   "owl_strike",
+   "owl_mantle",
+   "owl_flap",
+   "owl_land",
+   "owl_look",
+   "owl_perch"
+  ]
+ },
+ "vole": {
+  "file": "faune.glb",
+  "tris": 158
  },
  "ladder_wood": {
   "file": "faune.glb",

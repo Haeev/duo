@@ -1051,6 +1051,66 @@ def build_npc_round(g, who, expr):
         hands_round(g)
 
 
+# Tour 9: équipage du train (bustes à la fenêtre de la cabine) et écharpe de Firmin ---------------------
+
+def build_crew_round(g, who, expr):
+    """Buste d'un membre de l'équipage (salut du mécanicien): tête, torse, bras et bas de veste fermé à 0,82 m;
+    pas de jambes (la caisse de la cabine les cache). Mécanicien: casquette ronde à visière et lunettes
+    relevées, grosse moustache, bleu de chauffe, foulard rouge. Chauffeur: casquette plate, barbe courte,
+    vareuse de toile sombre aux manches retroussées, foulard blanc, suie sur les joues."""
+    if who == "driver":
+        hc = head_round_face(g, expr, brow_k=1.4)
+        hair_round(g, "sides", hc)
+        mustache_round(g, hc, big=True)
+        cap_post_round(g, hc)
+        top = hat_top(hc, 1.0, 0.08)
+        # lunettes de cabine relevées sur la casquette
+        for sx in (1, -1):
+            g.cyl(0.028, 0.02, loc=(sx * 0.045, -0.15, top + 0.06), color="metal", segs=8, rot=(70, 0, 0),
+                  bone="head")
+        g.box((0.03, 0.012, 0.012), loc=(0, -0.155, top + 0.062), color="metal", bone="head")
+        sleeve = "long"
+    else:
+        hc = head_round_face(g, expr, brow_k=1.2, cheek_base=0.2)
+        hair_round(g, "sides", hc)
+        beard_round(g, hc)
+        beret_round(g, hc)
+        sleeve = "rolled"
+    neck(g)
+    rings = torso_rings(0.40, 0.33, 0.22)
+    torso_round(g, w_top=0.40, w_bot=0.33, d=0.22)
+    coat_skirt_round(g, 0.168, 0.128, 0.82, 0.97)
+    collar(g, color="top_trim")
+    buttons(g, n=3, z0=1.0, z1=1.28, y=-0.118, color="metal", rings=rings)
+    # foulard noué au cou, pointe sur la poitrine
+    g.cyl(0.1, 0.06, loc=(0, 0.0, 1.38), r2=0.09, color="scarf", segs=10, scale=(1.35, 1.05, 1), bone="chest")
+    g.prism([(-0.11, 0.0), (0.11, 0.0), (0.0, -0.15)], 0.022, loc=(0, torso_front_y(1.32, rings) - 0.012, 1.385),
+            color="scarf", rot=(-6, 0, 0), bone="chest")
+    for side in ("l", "r"):
+        arm_round(g, side, sleeve=sleeve, puff=1.05)
+    hands_round(g)
+
+
+def firmin_scarf(g, expr):
+    """Écharpe de laine de Firmin (cadeau, tour 9): rouge à rayures crème comme l'objet offert (wool_scarf),
+    deux tours au cou par-dessus le col, un pan sur la poitrine (frange crème), l'autre rejeté sur l'épaule
+    gauche, dans le dos. Pièce à part sur le squelette commun, rangée de Firmin."""
+    rings = torso_rings(0.40, 0.34, 0.23, belly=0.05)
+    g.cyl(0.108, 0.09, loc=(0, 0.0, 1.39), r2=0.096, color="scarf_mark", segs=10, scale=(1.42, 1.12, 1),
+          bone="chest")
+    g.cyl(0.11, 0.02, loc=(0, 0.0, 1.405), r2=0.1, color="scarf", segs=10, scale=(1.42, 1.12, 1), bone="chest")
+    fy = torso_front_y(1.22, rings) - 0.022
+    g.box((0.085, 0.03, 0.32), loc=(0.07, fy, 1.215), color="scarf_mark", rot=(-9, 0, 4), bevel=0.008, bone="chest")
+    for z in (1.12, 1.16):
+        g.box((0.088, 0.034, 0.018), loc=(0.07 - 0.004 * (1.215 - z) * 10, fy - 0.006 * (1.215 - z) * 10, z),
+              color="scarf", rot=(-9, 0, 4), bone="chest")
+    for k in range(4):
+        g.box((0.012, 0.02, 0.04), loc=(0.04 + k * 0.02, fy - 0.02, 1.04), color="scarf", rot=(-9, 0, 4),
+              bone="chest")
+    g.box((0.085, 0.03, 0.3), loc=(-0.12, 0.13, 1.28), color="scarf_mark", rot=(12, 0, -12), bevel=0.008,
+          bone="chest")
+
+
 def build_player_base(g, expr):
     if ROUND:
         hc, hx, hy, hz = head_round(g)
@@ -1328,6 +1388,63 @@ def anims():
     ground_b = merge(ground, {"chest": (2, 0, 0), "head": (-8, 8, 0), "hips_loc": (0, -0.736, 0.0)})
     A["sit_ground"] = (True, {0: ground, 45: ground_b, 90: ground})
     A.update(ladder_anims())
+    A.update(tour9_anims())
+    return A
+
+
+def tour9_anims():
+    """Clips des moments du tour 9 (tour-09-conception.md, 4.1 à 4.4), sur le squelette commun."""
+    A = {}
+    # Étoiles de l'Aubrune: assis au bord du ponton (même assise que sit: placer la racine sous le bord, 0,47 m
+    # plus bas que le plancher), jambes qui pendent au-dessus de l'eau et se balancent en décalé, mains posées sur
+    # le plancher à côté des hanches. Boucle de 4 s.
+    edge = merge(SIT_LEGS, {"thigh_l": (84, 0, 3), "thigh_r": (84, 0, -3), "spine": (4, 0, 0), "chest": (2, 0, 0),
+                            "upper_arm_l": (-14, 0, 10), "upper_arm_r": (-14, 0, -10), "forearm_l": (12, 0, 0),
+                            "forearm_r": (12, 0, 0), "hand_l": (70, 0, 0), "hand_r": (70, 0, 0)})
+
+    def swing(a, b):
+        return {"shin_l": (-a, 0, 0), "shin_r": (-b, 0, 0), "foot_l": (a - 80, 0, 0), "foot_r": (b - 80, 0, 0)}
+    A["sit_edge"] = (True, {0: merge(edge, swing(70, 100)), 30: merge(edge, swing(100, 70), {"head": (2, 6, 0)}),
+                            60: merge(edge, swing(70, 100)), 90: merge(edge, swing(100, 70), {"head": (2, -5, 0)}),
+                            120: merge(edge, swing(70, 100))})
+    # regarder le ciel, toujours assis au bord (1,5 s, une fois): la tête bascule en arrière, le buste suit
+    up = merge(edge, swing(85, 85), {"neck": (-14, 0, 0), "head": (-34, 0, 0), "chest": (-8, 0, 0), "spine": (-4, 0, 0)})
+    A["look_up"] = (False, {0: merge(edge, swing(85, 85)), 18: up, 45: merge(up, {"head": (-36, 4, 0)})})
+    # Salut du mécanicien: les deux mains sur le volant de la manivelle (1,0 m, à 0,4 m devant), puis la main
+    # droite tourne la poignée (un tour par seconde, cercle de 0,15 m face au joueur), la gauche tient le poteau
+    hold = {"spine": (8, 0, 0), "chest": (4, 0, 0), "head": (10, 0, 0), "upper_arm_l": (40, 0, 8), "forearm_l": (14, 0, 0),
+            "hand_l": (-10, 0, 0), "upper_arm_r": (40, 0, -8), "forearm_r": (14, 0, 0), "hand_r": (-10, 0, 0),
+            "thigh_l": (6, 0, 0), "thigh_r": (-4, 0, 0)}
+    A["crank_hold"] = (True, {0: hold, 30: merge(hold, {"chest": (6, 0, 0), "hips_loc": (0, -0.006, 0)}), 60: hold})
+    turn = merge(hold, {"upper_arm_l": (34, 0, 14), "forearm_l": (24, 0, 0)})
+    A["crank_turn"] = (True, {0: merge(turn, {"upper_arm_r": (56, 0, -8), "forearm_r": (6, 0, 0)}),
+                              8: merge(turn, {"upper_arm_r": (42, 0, -22), "forearm_r": (10, 0, 0), "chest": (4, -4, 0)}),
+                              15: merge(turn, {"upper_arm_r": (28, 0, -8), "forearm_r": (22, 0, 0)}),
+                              23: merge(turn, {"upper_arm_r": (42, 0, 6), "forearm_r": (14, 0, 0), "chest": (4, 4, 0)}),
+                              30: merge(turn, {"upper_arm_r": (56, 0, -8), "forearm_r": (6, 0, 0)})})
+    # répondre au salut: grand geste du bras droit levé, de tout le bras, buste qui suit
+    wb0 = merge(ARMS_DOWN, {"upper_arm_r": (20, 0, -160), "forearm_r": (0, 0, -10), "hand_r": (0, 0, -6),
+                            "chest": (-4, 0, 6), "head": (-6, 0, 6)})
+    wb1 = merge(wb0, {"upper_arm_r": (20, 0, -132), "forearm_r": (0, 0, 24), "chest": (-4, 0, 2)})
+    A["wave_back"] = (True, {0: wb0, 9: wb1, 18: wb0, 27: wb1, 36: wb0})
+    # Lanternes du quai: perche (lamp_pole, portée à l'horizontale le long du corps) prise devant la poitrine,
+    # dressée (0 s), puis levée vers la lanterne, inclinée de 20 degrés vers l'avant, le bout à 2,8 m et 0,9 m
+    # devant (0,6 s); pole_lower fait le chemin inverse (0,5 s). La perche suit la main droite: sa pente vaut
+    # 90 degrés moins la somme des flexions bras, avant-bras et main.
+    pole_hold = merge(ARMS_DOWN, {"upper_arm_r": (30, 0, -6), "forearm_r": (90, 0, 0), "hand_r": (-30, 0, 0),
+                                  "upper_arm_l": (34, 0, 18), "forearm_l": (70, 0, 0), "hand_l": (-10, 0, 0)})
+    pole_up = merge(ARMS_DOWN, {"upper_arm_r": (110, 0, -4), "forearm_r": (10, 0, 0), "hand_r": (-50, 0, 0),
+                                "upper_arm_l": (80, 0, 16), "forearm_l": (34, 0, 0), "hand_l": (-20, 0, 0),
+                                "spine": (-6, 0, 0), "chest": (-6, 0, 0), "head": (-22, 0, 0)})
+    A["pole_raise"] = (False, {0: pole_hold, 10: merge(pole_up, {"head": (-16, 0, 0)}), 18: pole_up})
+    A["pole_lower"] = (False, {0: pole_up, 15: pole_hold})
+    # Équipage (bustes): le mécanicien se penche à la fenêtre et salue de la main gauche (côté quai)
+    lean = {"spine": (14, 0, 6), "chest": (8, 0, 8), "head": (-6, 0, 10), "upper_arm_l": (30, 0, 14),
+            "forearm_l": (60, 0, 0), "upper_arm_r": (20, 0, -6), "forearm_r": (50, 0, 0)}
+    A["driver_lean"] = (True, {0: lean, 45: merge(lean, {"head": (-4, 0, 16), "chest": (9, 0, 9)}), 90: lean})
+    dw0 = merge(lean, {"upper_arm_l": (20, 0, 150), "forearm_l": (0, 0, 16), "hand_l": (0, 0, 8)})
+    dw1 = merge(dw0, {"forearm_l": (0, 0, -22), "hand_l": (0, 0, -10)})
+    A["driver_wave"] = (True, {0: dw0, 8: dw1, 16: dw0, 24: dw1, 32: dw0})
     return A
 
 
@@ -1519,6 +1636,11 @@ def main():
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
             ob["scale"] = 0.75
+    # tour 9: écharpe de Firmin (pièce à montrer avec villager_firmin en automne et en hiver), équipage du train
+    add("villager_firmin_scarf", "firmin", rounded(firmin_scarf), False)
+    for who in ("driver", "stoker"):
+        ob = add("rail_crew_" + who, who, rounded(lambda g, e, who=who: build_crew_round(g, who, e)), True)
+        ob["note"] = "buste (pas de jambes): racine au plancher de la cabine, clips driver_lean et driver_wave"
 
     A = anims()
     names = bake_actions(arm, A)

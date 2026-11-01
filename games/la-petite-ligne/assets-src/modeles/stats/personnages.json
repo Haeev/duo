@@ -17,7 +17,10 @@
   "villager_odette": 1950,
   "villager_basile": 2166,
   "villager_jeanne": 2054,
-  "villager_lucie": 1986
+  "villager_lucie": 1986,
+  "villager_firmin_scarf": 232,
+  "rail_crew_driver": 1470,
+  "rail_crew_stoker": 1514
  },
  "animations": [
   {
@@ -154,8 +157,53 @@
    "name": "hold_ladder",
    "seconds": 2.0,
    "loop": true
+  },
+  {
+   "name": "sit_edge",
+   "seconds": 4.0,
+   "loop": true
+  },
+  {
+   "name": "look_up",
+   "seconds": 1.5,
+   "loop": false
+  },
+  {
+   "name": "crank_hold",
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "crank_turn",
+   "seconds": 1.0,
+   "loop": true
+  },
+  {
+   "name": "wave_back",
+   "seconds": 1.2,
+   "loop": true
+  },
+  {
+   "name": "pole_raise",
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "pole_lower",
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "driver_lean",
+   "seconds": 3.0,
+   "loop": true
+  },
+  {
+   "name": "driver_wave",
+   "seconds": 1.067,
+   "loop": true
   }
  ],
- "file_bytes": 2276536,
+ "file_bytes": 2770540,
  "player_example_tris": 2006
 }
