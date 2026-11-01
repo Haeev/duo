@@ -38,6 +38,11 @@ export const UI_SETTINGS = {
   partnerPlaceRadius: 4,
   /** Achat groupé au comptoir (graines, clous). */
   shopBulk: 4,
+  /** Barre de progression (R10): un geste plus court que cette durée n'en a pas (s). */
+  progressMinSeconds: 1,
+  /** Un arbre entamé montre ses coups ce temps après le dernier (s), à cette distance au plus (m). */
+  chopProgressSeconds: 2.5,
+  chopProgressRadius: 3,
   /** Pas de l'horloge affichée (minutes de jeu). */
   clockStepMinutes: 10,
   /**

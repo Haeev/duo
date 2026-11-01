@@ -55,6 +55,7 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('stage_choice'), choice: v.nullable(v.picklist(['stay', 'finish'])) }),
   v.strictObject({ type: v.literal('create_character'), name: v.pipe(v.string(), v.maxLength(64)), hair: Int, outfit: Int }),
   v.strictObject({ type: v.literal('move_to'), target: ClickTargetSchema, act: v.boolean() }),
+  v.strictObject({ type: v.literal('point_at'), target: v.nullable(ClickTargetSchema) }),
   v.strictObject({ type: v.literal('act') }),
   v.strictObject({ type: v.literal('examine') }),
   v.strictObject({ type: v.literal('select_slot'), slot: Int }),

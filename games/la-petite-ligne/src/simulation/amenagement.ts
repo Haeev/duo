@@ -49,6 +49,16 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
   }
 }
 
+/**
+ * Coin nord-ouest d'une empreinte centrée sur le point du sol que survole la souris (R11), s'il est
+ * dans la pièce; sinon `null` et l'aperçu reste devant le personnage (clavier).
+ */
+export function pointerCell(sim: Sim, c: Character, size: { w: number; d: number }): Cell | null {
+  const target = sim.runtime.pointer[c.id];
+  if (target?.kind !== 'ground' || !inRect(sim.map.house.room, target.x, target.y)) return null;
+  return { cx: Math.round(target.x - size.w / 2), cy: Math.round(target.y - size.d / 2) };
+}
+
 /** Pourquoi un meuble ne tient pas là (clé `placement_<raison>` de `textes.json`), ou `null` s'il tient. */
 /**
  * Dos au mur (convention de la carte: rotation 0 tournée vers le sud, 1 l'est, 2 le nord,
@@ -140,7 +150,8 @@ export function updatePlacement(sim: Sim, c: Character): void {
     return;
   }
   const rotation = c.placement?.item === item ? c.placement.rotation : 0;
-  const cell = previewCell(c, rotatedSize(def.footprint, rotation));
+  const size = rotatedSize(def.footprint, rotation);
+  const cell = pointerCell(sim, c, size) ?? previewCell(c, size);
   const problem = placementProblem(sim, item, cell, rotation, null, c.id);
   const valid = problem === null;
   // Sans texte dans `textes.json`, la clé: l'interface la traduit, sinon montre son message général.

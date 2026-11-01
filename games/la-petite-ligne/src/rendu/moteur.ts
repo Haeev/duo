@@ -766,6 +766,35 @@ export class RenderEngine implements Renderer {
   }
 
   pick(clientX: number, clientY: number): PickResult | null {
+    const ndc = this.toNdc(clientX, clientY);
+    if (ndc === null) {
+      return null;
+    }
+    const ray = this.rig.ray(ndc.x, ndc.y).ray;
+    const entity = this.picks.nearest(ray);
+    const ground = this.groundPoint(ndc.x, ndc.y);
+    const groundDistance =
+      ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
+    if (entity !== null && entity.distance <= groundDistance) {
+      return entity.result;
+    }
+    if (ground === null || !this.onMap(ground.x, ground.z)) {
+      return null;
+    }
+    return { kind: 'ground', x: ground.x, y: ground.z };
+  }
+
+  pickGround(clientX: number, clientY: number): { x: number; y: number } | null {
+    const ndc = this.toNdc(clientX, clientY);
+    const ground = ndc === null ? null : this.groundPoint(ndc.x, ndc.y);
+    if (ground === null || !this.onMap(ground.x, ground.z)) {
+      return null;
+    }
+    return { x: ground.x, y: ground.z };
+  }
+
+  /** Coordonnées normalisées du canevas, ou `null` avant le chargement. */
+  private toNdc(clientX: number, clientY: number): { x: number; y: number } | null {
     if (!this.loaded || this.terrain === null) {
       return null;
     }
@@ -773,28 +802,25 @@ export class RenderEngine implements Renderer {
     if (rect.width === 0 || rect.height === 0) {
       return null;
     }
-    const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    const ndcY = -(((clientY - rect.top) / rect.height) * 2 - 1);
-    const ray = this.rig.ray(ndcX, ndcY).ray;
-    const entity = this.picks.nearest(ray);
-    // Le sol: deux passes pour tenir compte de la hauteur du terrain (quai, berges).
+    return {
+      x: ((clientX - rect.left) / rect.width) * 2 - 1,
+      y: -(((clientY - rect.top) / rect.height) * 2 - 1),
+    };
+  }
+
+  /** Le sol: deux passes pour tenir compte de la hauteur du terrain (quai, berges). */
+  private groundPoint(ndcX: number, ndcY: number): Vector3 | null {
+    const terrain = this.terrain;
     let ground = this.rig.groundAt(ndcX, ndcY, 0);
-    if (ground !== null) {
-      ground = this.rig.groundAt(ndcX, ndcY, this.terrain.heightAt(ground.x, ground.z));
+    if (ground !== null && terrain !== null) {
+      ground = this.rig.groundAt(ndcX, ndcY, terrain.heightAt(ground.x, ground.z));
     }
-    const groundDistance =
-      ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
-    if (entity !== null && entity.distance <= groundDistance) {
-      return entity.result;
-    }
-    if (ground === null) {
-      return null;
-    }
+    return ground;
+  }
+
+  private onMap(x: number, y: number): boolean {
     const map = this.view.map;
-    if (ground.x < 0 || ground.z < 0 || ground.x >= map.width || ground.z >= map.height) {
-      return null;
-    }
-    return { kind: 'ground', x: ground.x, y: ground.z };
+    return x >= 0 && y >= 0 && x < map.width && y < map.height;
   }
 
   stats(): { drawCalls: number; triangles: number } {

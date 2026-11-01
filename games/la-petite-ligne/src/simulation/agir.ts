@@ -7,7 +7,7 @@ import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Tree, Vec
 import { AIM_CONE, AIM_DISTANCE } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
-import { ghostNear } from './construction';
+import { ghostAt, ghostNear } from './construction';
 import { footprintCells } from './deplacement';
 import { talkTo } from './dialogues';
 import { nearPoint, shopOpen } from './economie';
@@ -58,6 +58,8 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
 };
 /** Un clic au sol à moins de tant d'une place libre (m) vise le banc. */
 const BENCH_CLICK_RADIUS = 1.2;
+/** Un clic au sol à moins de tant du point d'un chantier (m) vise le chantier (la porte, le poulailler). */
+const GHOST_CLICK_RADIUS = 1.5;
 const ACT_POINTS = [POINT.well, POINT.waterBarrel, POINT.groceryCounter, POINT.noticeBoard, POINT.coopCrate, POINT.workbench, POINT.henFeeder];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
@@ -286,16 +288,41 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
   return best === null ? null : { target: best.target, verb: best.verb };
 }
 
-/** Case surlignée devant le personnage (pour le rendu) et astuces de visée. */
+/**
+ * Bêcher l'herbe hors du potager vaut partout où l'on tient la houe: le simple survol du pré ne
+ * le met pas en évidence (Espace garderait sinon la case sous une souris oubliée sur le jeu).
+ * Le clic y va et bêche toujours, comme avant.
+ */
+const POINTER_IGNORED: ReadonlySet<AimVerb> = new Set<AimVerb>(['dig']);
+
+/**
+ * Ce que survole la souris (R11), s'il y a quelque chose à y faire: la cible et son verbe, tels
+ * qu'un clic les prendrait. `null` sans survol, pendant l'aménagement (la souris place alors
+ * l'aperçu) ou sur une cible sans geste: la visée revient à la case devant soi.
+ */
+export function pointerTarget(sim: Sim, c: Character): { click: ClickTarget; target: Target; verb: AimVerb } | null {
+  const click = sim.runtime.pointer[c.id];
+  if (click === null || c.placement !== null) return null;
+  const target = resolveClick(sim, c, click);
+  if (target === null) return null;
+  const verb = verbOf(sim, c, target);
+  return verb === null || POINTER_IGNORED.has(verb) ? null : { click, target, verb };
+}
+
+/** Case surlignée (pour le rendu): la cible survolée à la souris, sinon devant le personnage; astuces de visée. */
 export function updateAim(sim: Sim, c: Character): void {
   if (c.status !== 'active' || !c.created) {
     if (c.aim !== null) c.aim = null;
     return;
   }
-  const best = bestTarget(sim, c);
+  const pointed = pointerTarget(sim, c);
+  const best = pointed === null ? bestTarget(sim, c) : null;
   let aim: AimInfo | null = null;
-  const water = holdsRod(sim, c) && c.seat === null ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
-  if (water !== null) {
+  const water = pointed === null && holdsRod(sim, c) && c.seat === null ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
+  if (pointed !== null) {
+    const pos = pointed.target.kind === 'cell' ? { x: pointed.target.cell.cx + 0.5, y: pointed.target.cell.cy + 0.5 } : pointed.target.pos;
+    aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: pointed.verb, blocked: null, source: 'pointer' };
+  } else if (water !== null) {
     aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
   } else if (best !== null) {
     const pos = best.target.kind === 'cell' ? { x: best.target.cell.cx + 0.5, y: best.target.cell.cy + 0.5 } : best.target.pos;
@@ -321,7 +348,12 @@ export function updateAim(sim: Sim, c: Character): void {
   const before = c.aim;
   const same =
     (before === null && aim === null) ||
-    (before !== null && aim !== null && before.cell.cx === aim.cell.cx && before.cell.cy === aim.cell.cy && before.verb === aim.verb);
+    (before !== null &&
+      aim !== null &&
+      before.cell.cx === aim.cell.cx &&
+      before.cell.cy === aim.cell.cy &&
+      before.verb === aim.verb &&
+      before.source === aim.source);
   if (!same) {
     c.aim = aim;
     sim.runtime.changed = true;
@@ -583,6 +615,8 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       // Un clic sur un banc (le sol juste sous ou derrière lui): sa place libre la plus proche,
       // sauf si la case cliquée a son geste (bêcher au pied du banc, comme à la touche).
       if (verbOf(sim, c, cellTarget) !== null) return cellTarget;
+      const ghost = ghostAt(sim, at, GHOST_CLICK_RADIUS);
+      if (ghost !== null) return { kind: 'construction', id: ghost.state.id, pos: point(sim, ghost.def.point) };
       const seat = c.inHouse ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
       return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }

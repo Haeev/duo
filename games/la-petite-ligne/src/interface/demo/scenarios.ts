@@ -87,6 +87,18 @@ function near(sim: Sim, id: CharacterId, point: string, dx = 0.9, dy = 0.4): voi
 // graine de la démo, p1 est l'informé des poules, p2 celui du mot de Lucie; `joueur=p1` et
 // `joueur=p2` montrent les deux écrans d'une même situation.
 
+/** Jour 1, scène d'arrivée jouée par le robot, l'horloge en marche, personne en conversation ni dans un menu. */
+function firstDay(sim: Sim): void {
+  playUntil(
+    sim,
+    (s) =>
+      s.world.phase === 'day' &&
+      s.world.scene === null &&
+      s.world.clock.running &&
+      s.world.characters.every((c) => c.status === 'active' && c.dialogue === null && c.menu === null),
+  );
+}
+
 /** Quelques pas sans entrée (personne ne bouge): la simulation recalcule ce que chacun remplit. */
 function idle(sim: Sim, ticks: number): void {
   for (let i = 0; i < ticks; i++) step(sim, { controls: {}, intents: [] });
@@ -583,6 +595,69 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       near(sim, other, 'grocery_counter');
       apply(sim, other, [{ type: 'menu', menu: 'shop' }, { type: 'buy', item: 'mattress', count: 1 }, { type: 'menu', menu: null }]);
       return;
+    // Souris (R11): le potager en herbe, la bêche en main, l'autre au comptoir.
+    case 'souris': {
+      firstDay(sim);
+      for (const g of sim.world.garden) {
+        g.soil = 'grass';
+        g.crop = null;
+      }
+      near(sim, other, 'grocery_counter');
+      teleport(sim, me, 4.5, 31.5);
+      const c = character(sim, me);
+      c.selected = Math.max(0, c.bag.findIndex((x, i) => x?.item === 'hoe' && i < 10));
+      c.facing = Math.PI;
+      idle(sim, 1);
+      return;
+    }
+    // Souris (R11): dans la pièce débarrassée de ses tables, chaises et étagères, une chaise en main.
+    case 'souris-maison': {
+      firstDay(sim);
+      sim.world.furniture = sim.world.furniture.filter((f) => !['table', 'chair', 'shelf'].includes(f.item));
+      sim.runtime.dynamicDirty = true;
+      const room = sim.map.house.room;
+      teleport(sim, me, room.x + 2.5, room.y + 0.5);
+      teleport(sim, other, room.x + 0.5, room.y + 1.5);
+      for (const id of [me, other]) character(sim, id).inHouse = true;
+      const c = character(sim, me);
+      const free = c.bag.findIndex((x, i) => x === null && i < 8);
+      c.bag[free < 0 ? 0 : free] = stack('chair', 1);
+      c.selected = free < 0 ? 0 : free;
+      c.facing = Math.PI / 2;
+      idle(sim, 1);
+      return;
+    }
+    // Barre de progression (R10): des planches sciées à l'établi, à mi-chemin (avec `temps=arrete` pour la figer).
+    case 'progression-etabli': {
+      day5();
+      near(sim, me, 'sawmill_workbench', 0, 0);
+      const c = character(sim, me);
+      const free = c.bag.findIndex((x, i) => x === null && i < 10);
+      c.bag[free < 0 ? 9 : free] = stack('log', 1);
+      apply(sim, me, [{ type: 'craft', recipe: 'saw_plank' }]);
+      idle(sim, Math.floor(c.action.duration * 0.45));
+      return;
+    }
+    // Barre de progression (R10): la porte bâtie à deux, mains libres (avec `temps=arrete` pour la figer).
+    case 'progression-chantier': {
+      firstDay(sim);
+      const door = sim.map.points.house_door;
+      if (door === undefined) return;
+      teleport(sim, me, door.x - 0.4, door.y + 1.2);
+      teleport(sim, other, door.x + 0.6, door.y + 1.2);
+      for (const id of [me, other]) {
+        const c = character(sim, id);
+        c.selected = Math.max(0, c.bag.findIndex((x, i) => x === null && i < 10));
+        c.facing = -Math.PI / 2;
+      }
+      for (let i = 0; i < 100; i++) {
+        step(sim, {
+          controls: { [me]: { seq: i, moveX: 0, moveY: 0, actHeld: true }, [other]: { seq: i, moveX: 0, moveY: 0, actHeld: true } },
+          intents: [],
+        });
+      }
+      return;
+    }
     case 'amenagement': {
       playUntil(sim, (s) => s.world.clock.day >= 4 && s.world.clock.veillee && s.world.phase === 'day');
       const c = character(sim, me);

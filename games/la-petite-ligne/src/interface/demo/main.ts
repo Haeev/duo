@@ -8,8 +8,14 @@
  * Paramètres: `scenario` (voir `scenarios.ts`), `joueur` (p1 ou p2),
  * `taille` (100, 125, 150), `animations=reduites`, `rendu=0` (sans 3D), `temps=arrete`
  * (la simulation ne tourne plus: la situation posée par le scénario reste telle quelle),
- * `onglet=souvenirs` (le carnet s'ouvre sur les Souvenirs).
+ * `onglet=souvenirs` (le carnet s'ouvre sur les Souvenirs), `entrees=sdk` (clavier et souris par
+ * l'entrée du SDK et `createControls`, comme dans le jeu: survol, clic, pose à la souris).
  */
+import { parseManifest } from '@duo/sdk';
+import { createInput } from '../../../../../packages/sdk/src/input';
+import manifest from '../../../duo-game.json';
+import { createControls } from '../../entrees/commandes';
+import type { GameAction } from '../../session';
 import type { Intent } from '../../etat/actions';
 import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameInterface, GameView } from '../../etat/vue';
@@ -39,6 +45,10 @@ declare global {
       remount(n: number): { nodes: number; layers: number; sprites: number };
       /** Durée moyenne de `frame()` de l'interface sur `n` appels (ms). */
       measure(n: number): Promise<number>;
+      /** L'état de la simulation de la page (lecture par les tests). */
+      world(): typeof sim.world;
+      /** Ce que touche le rendu sous ce point de l'écran (coordonnées client), pour viser à la souris. */
+      pick(clientX: number, clientY: number): ReturnType<NonNullable<typeof renderer>['pick']>;
       /** Journal de la page: commandes de caméra et sons reçus de l'interface, intentions du joueur local. */
       log: { camera: string[]; intents: string[]; sounds: string[] };
     };
@@ -115,12 +125,23 @@ const mountUi = (): GameInterface =>
   });
 let ui = mountUi();
 
+// Entrées du jeu (`entrees=sdk`): l'entrée du SDK et les commandes de `src/entrees/`, à la place des écouteurs de la page.
+const parsedManifest = parseManifest(manifest);
+const sdkInput =
+  params.get('entrees') === 'sdk' && parsedManifest.ok ? createInput<GameAction>(parsedManifest.manifest.actions, {}, { onEscape: () => undefined }) : null;
+sdkInput?.attach(container);
+const gameControls =
+  sdkInput === null
+    ? null
+    : createControls({ input: sdkInput, renderer: () => renderer, ui: () => ui, canvasRect: () => container.getBoundingClientRect() });
+
 const robot = params.get('autre') === 'fige' ? null : createRobot();
 const frozen = params.get('temps') === 'arrete';
 const held = new Set<string>();
 let seq = 0;
 
 window.addEventListener('keydown', (e) => {
+  if (gameControls !== null) return;
   if (ui.handleKey(e.code)) {
     e.preventDefault();
     return;
@@ -160,12 +181,14 @@ window.addEventListener('keyup', (e) => {
 window.addEventListener(
   'wheel',
   (e) => {
+    if (gameControls !== null) return;
     const placing = sim.world.characters.find((c) => c.id === me)?.placement ?? null;
     view.send(placing !== null ? { type: 'rotate_furniture', delta: Math.sign(e.deltaY) } : { type: 'cycle_slot', delta: Math.sign(e.deltaY) });
   },
   { passive: true },
 );
 container.addEventListener('pointerdown', (e) => {
+  if (gameControls !== null) return;
   const hit = renderer?.pick(e.clientX, e.clientY) ?? null;
   if (hit !== null) view.send({ type: 'move_to', target: hit, act: e.button === 0 });
 });
@@ -189,8 +212,9 @@ function loop(now: number): void {
   while (!frozen && acc >= SIM_DT) {
     acc -= SIM_DT;
     seq++;
+    const frame = gameControls?.step(view) ?? { seq, ...controls(), actHeld: held.has('Space') && !ui.capturesMovement() };
     const intents = queue.splice(0);
-    const input = { controls: { [me]: { seq, ...controls(), actHeld: held.has('Space') && !ui.capturesMovement() } }, intents };
+    const input = { controls: { [me]: frame }, intents };
     if (robot !== null) {
       const auto = robot.decide(sim);
       const partnerControl = auto.controls[partnerId];
@@ -198,6 +222,7 @@ function loop(now: number): void {
       for (const i of auto.intents) if (i.by === partnerId) input.intents.push(i);
     }
     step(sim, input);
+    sdkInput?.endStep();
     for (const event of sim.events) for (const l of listeners) l(event);
   }
   renderer?.frame(1 / 60);
@@ -216,6 +241,8 @@ async function start(): Promise<void> {
     partner: (intent) => {
       queue.push({ by: partnerId, intent });
     },
+    world: () => sim.world,
+    pick: (clientX, clientY) => renderer?.pick(clientX, clientY) ?? null,
     log,
     remount: (n) => {
       for (let i = 0; i < n; i++) {

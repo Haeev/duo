@@ -78,6 +78,11 @@ export interface Renderer {
   camera(command: CameraCommand): void;
   /** Lancer de rayon depuis un point de l'écran (coordonnées client). */
   pick(clientX: number, clientY: number): PickResult | null;
+  /**
+   * Point du sol sous l'écran (coordonnées client), à travers les meubles et les
+   * personnages: l'aperçu d'un meuble suit la case sous la souris (R11). `null` hors de la carte.
+   */
+  pickGround?(clientX: number, clientY: number): { x: number; y: number } | null;
   /** Statistiques de dessin pour l'indicateur de développement. */
   stats(): { drawCalls: number; triangles: number };
   dispose(): void;
