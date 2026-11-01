@@ -16,6 +16,7 @@ import bpy  # noqa: I001
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cueillette  # noqa: E402
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
 
@@ -1582,9 +1583,11 @@ def tree_stump(A):
     g.cyl(0.24, 0.42, color="bark", segs=8, base=True, r2=0.21)
     g.cyl(0.19, 0.02, loc=(0, 0, 0.42), color="log_end", segs=8)
     g.cyl(0.09, 0.022, loc=(0, 0, 0.42), color="log_ring", segs=8)
+    # racines en cônes à 5 pans qui plongent au sol, comme celles des chênes (tour 8: plus de pavés)
     for k in range(4):
         a = math.radians(k * 90 + 30)
-        g.box((0.4, 0.12, 0.1), loc=(0.26 * math.cos(a), 0.26 * math.sin(a), 0.03), color="bark_dark", rot=(0, 0, k * 90 + 30))
+        g.cyl(0.075, 0.38, loc=(0.25 * math.cos(a), 0.25 * math.sin(a), 0.06), color="bark_dark", segs=5,
+              r2=0.02, cap=False, rot=(0, 118, k * 90 + 30))
     g.box((0.12, 0.05, 0.05), loc=(0.05, 0.1, 0.44), color="log_end", rot=(0, 0, 30))
     return g
 
@@ -1606,13 +1609,6 @@ def bush(A, kind, seed):
             rr = rnd.uniform(0.25, 0.5)
             g.box((0.05, 0.05, 0.05), loc=(rr * math.cos(a), rr * math.sin(a) - 0.05, rnd.uniform(0.25, 0.6)),
                   color="flower_white", rot=(0, 0, 45))
-    else:  # hazel
-        for k in range(3):
-            a = math.radians(k * 120)
-            g.cyl(0.035, 1.3, loc=(0.1 * math.cos(a), 0.1 * math.sin(a), 0), color="bark", segs=5, base=True,
-                  rot=(12 * math.sin(a), -12 * math.cos(a), 0))
-        g.sphere(0.72, loc=(0.0, 0.05, 1.25), color="leaf_hazel", ico=2, jitter=0.08, seed=rnd.randint(0, 99),
-                 scale=(1.1, 1.0, 0.85))
     return g
 
 
@@ -1935,8 +1931,21 @@ def main():
             nature.append(A.add(f"tree_{ess}_{size}", fn(A, size == "large", 11 + i), {"footprint": [1, 1] if size == "small" else [2, 2],
                                                                                        "choppable": ess in ("oak", "fir")}))
     nature.append(A.add("tree_stump", tree_stump(A), {"footprint": [1, 1]}))
+    # tour 8 (cueillette.py): rejet du chêne sur la même souche que tree_stump, jeune sapin replanté
+    sap = A.add("oak_sapling", tree_stump(A), {"footprint": [1, 1], "grow_node": "oak_sapling_shoots",
+                                                "note": "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1)"})
+    A.add("oak_sapling_shoots", cueillette.oak_shoots(A), parent=sap, loc=(0, 0, 0.42))
+    nature.append(sap)
+    nature.append(A.add("fir_sapling", cueillette.fir_sapling(A), {"footprint": [1, 1], "height": 1.24,
+                                                                   "note": "échelle 1 le premier jour, jusqu'à 1,3 ensuite"}))
     for i, k in enumerate(("round", "bramble", "hazel")):
-        nature.append(A.add("bush_" + k, bush(A, k, 20 + i), {"footprint": [1, 1]}))
+        fn = cueillette.bush_hazel(A) if k == "hazel" else bush(A, k, 20 + i)
+        nature.append(A.add("bush_" + k, fn, {"footprint": [1, 1]}))
+    br = A.add("bramble", cueillette.bramble(A), {"footprint": [1, 1], "size_m": list(cueillette.BRAMBLE_SIZE)})
+    spots = cueillette.berry_spots(br)
+    br["berry_spots"] = spots
+    A.info["bramble"]["berry_spots"] = spots
+    nature.append(br)
     for i, k in enumerate(("small", "medium", "large")):
         nature.append(A.add("rock_" + k, rock(A, k, 30 + i), {"footprint": [1, 1] if k != "large" else [2, 2]}))
     nature.append(A.add("grass_tall", grass_tall(A, 40), {"footprint": [1, 1]}))

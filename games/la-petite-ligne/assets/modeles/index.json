@@ -243,6 +243,22 @@
   "file": "ferme.glb",
   "tris": 200
  },
+ "wild_garlic": {
+  "file": "ferme.glb",
+  "tris": 220
+ },
+ "chanterelle": {
+  "file": "ferme.glb",
+  "tris": 376
+ },
+ "blackberry": {
+  "file": "ferme.glb",
+  "tris": 224
+ },
+ "hazelnut": {
+  "file": "ferme.glb",
+  "tris": 392
+ },
  "seed_packet_radish": {
   "file": "ferme.glb",
   "tris": 116
@@ -718,7 +734,23 @@
  },
  "tree_stump": {
   "file": "bourg.glb",
-  "tris": 144,
+  "tris": 136,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "oak_sapling": {
+  "file": "bourg.glb",
+  "tris": 440,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fir_sapling": {
+  "file": "bourg.glb",
+  "tris": 175,
   "footprint": [
    1,
    1
@@ -742,7 +774,15 @@
  },
  "bush_hazel": {
   "file": "bourg.glb",
-  "tris": 128,
+  "tris": 160,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bramble": {
+  "file": "bourg.glb",
+  "tris": 564,
   "footprint": [
    1,
    1

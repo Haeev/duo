@@ -9,8 +9,8 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 | Fichier | Contenu | Animations |
 |---|---|---|
 | `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 27 clips sur le squelette |
-| `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature, rivière | aucune (pièces mobiles en nœuds à part) |
-| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
+| `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière | aucune (pièces mobiles en nœuds à part) |
+| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles, mûres, noisettes), sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
 | `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 41 clips, chacun sur le squelette de sa bête |
@@ -130,6 +130,23 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 - La brume de l'Aubrune n'a pas de modèle (fiche 1.4.9): nappes, volutes et éclats sont des effets du technical artist.
 - Budgets (bible 8.8; pas de ligne pour la faune, plafond d'un accessoire 900 comme au tour 6): chevrette 892, faon 896, martin-pêcheur 416, ablette 124, pieu 162 triangles. Au plus chargé du moment, chevrette et faon ensemble: 1 788 triangles. Fichier: 1 046 Ko après dédoublonnage, soudure et élagage (543 Ko avant le tour 7: trois bêtes et 18 clips de plus).
 
+## Cueillette et lisière du tour 8 (`ferme.glb`, `bourg.glb`)
+
+Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `assets-src/modeles/cueillette.py` (appelé par `ferme.py` et `bourg.py`), `planche_cueillette.py` (échelle, zoom 1, au sol), `verifier/quatre_cueillette.sh` (quatre angles), `verifier/mesures_cueillette.py` (emprises et point bas mesurés dans les GLB). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-08/objets-*.png`.
+
+- Objets de cueillette (`kind: "item"`, origine au centre de la base, posés au sol comme le pissenlit), grossis deux à trois fois par rapport au réel pour tenir au moins 14 pixels au zoom de départ (57 px/m, leçon du martin-pêcheur), extra `size_m` = plus grande dimension:
+  - `wild_garlic` (ail des ours, printemps): touffe de huit larges feuilles en volume (section en chevron) et deux ombelles blanches à 0,31 m; le blanc fait la lecture sur l'herbe. 0,41 x 0,38 m, 0,35 m de haut.
+  - `chanterelle` (girolles, été et automne): bouquet de quatre, pied évasé en entonnoir, chapeau creux au bord ondulé, jaune d'oeuf (`flower_center`, dessous `fabric_yellow`). 0,30 x 0,26 m, 0,15 m de haut.
+  - `blackberry` (mûres, été): brin cueilli, cinq fruits noirs (case `blackberry`, luisante) et deux encore rouges sur trois folioles, posé à plat (point bas à 0). Se pose sur le roncier à l'un des points `berry_spots` de `bramble` (repère glTF du nœud `bramble`: x, hauteur, z vers l'avant; déjà enfoncés de 1,5 cm pour que le brin se cale sur le dessus bombé), sinon au sol. 0,30 x 0,16 m.
+  - `hazelnut` (noisettes, automne): tas de sept noisettes (cicatrice pâle à la base) et une huitième debout dans son involucre de trois bractées, sur deux feuilles de noisetier tombées (`leaf_hazel`: jaunes avec la palette d'automne, comme le noisetier). 0,33 x 0,23 m, 0,13 m de haut.
+- `bramble` (roncier, posé contre la lisière au nord des coins 03 à 05): 1,20 x 0,80 m, 0,68 m de haut, emprise de carte 1 x 1 (extra `size_m`). Trois masses de feuillage basses (`leaf_bush`, `ivy`) et quatre jeunes ronces arquées aux quatre coins, feuillues au bout; aucune ne passe sur le dessus, où se posent les mûres. Sans fruits: les mûres sont l'objet `blackberry`, qui disparaît à la cueillette. 564 triangles: au-dessus du plafond d'un buisson (160, pensé pour 79 instances), sous celui d'un accessoire (900); trois instances sur la carte.
+- `bush_hazel` (noisetier, variante de `bush` déjà tirée pour un quart des buissons de la carte par `MODEL_VARIANTS`): refait en low poly arrondi, quatre brins en vase depuis une même souche, feuillage de trois boules de 0,55 à 1,97 m; chaque brin finit dans le feuillage. 160 triangles (plafond d'un buisson). Change l'aspect des noisetiers déjà posés sur la carte (même taille qu'avant, environ 2 m).
+- `oak_sapling` (rejet du chêne, P1): même souche que `tree_stump` (la souche de l'abattage reste en place, le rejet en sort), et son enfant `oak_sapling_shoots` (origine au centre du dessus de la souche, à 0,42 m): quatre brins feuillés de la coupe jusqu'à 1,68 m. Pour la pousse, mettre à l'échelle le seul enfant (0,4 à 1), jamais la souche (extra `grow_node`). 440 triangles (plafond d'un chêne: 450).
+- `fir_sapling` (jeune sapin replanté par Basile, P1): 1,24 m, trois étages à 7 pans comme les grands sapins, tige visible, butte de terre fraîche de 0,85 m. Peut s'agrandir d'un bloc jusqu'à 1,3. 175 triangles (plafond d'un sapin: 300).
+- `tree_stump` (déjà livré): racines refaites en cônes à 5 pans qui plongent dans le sol (c'étaient des pavés), 136 triangles; le reste est inchangé.
+- Palette: une seule case ajoutée, `blackberry` (#2E2136, rugosité 0,35), en fin de liste (`palette.py` et `src/rendu/palette.ts`). Les textures de saison existantes n'ont pas besoin de case nouvelle: les cueillettes n'apparaissent qu'en leur saison et les feuillages du roncier et du noisetier suivent déjà `leaf_bush` et `leaf_hazel`.
+- `bush_bramble` (ancienne variante de `bush`, boule à petits cubes blancs) n'est pas touché: il reste distinct du roncier de cueillette.
+
 ## Fiche par modèle
 
 ### `personnages.glb` (2223 Ko)
@@ -185,7 +202,7 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 | `hammer_tap` | 0.6 | oui |
 | `hold_ladder` | 2.0 | oui |
 
-### `ferme.glb` (677 Ko)
+### `ferme.glb` (773 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -209,6 +226,10 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 | `lettuce` |  | 174 | kind: "item" |
 | `egg` |  | 80 | kind: "item" |
 | `dandelion` |  | 200 | kind: "item" |
+| `wild_garlic` |  | 220 | kind: "item", size_m: 0.41 |
+| `chanterelle` |  | 376 | kind: "item", size_m: 0.3 |
+| `blackberry` |  | 224 | kind: "item", size_m: 0.3, note: "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol" |
+| `hazelnut` |  | 392 | kind: "item", size_m: 0.33 |
 | `seed_packet_radish` |  | 116 | kind: "item" |
 | `seed_packet_lettuce` |  | 116 | kind: "item" |
 | `seed_packet_carrot` |  | 116 | kind: "item" |
@@ -233,7 +254,7 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3383 Ko)
+### `bourg.glb` (3476 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -283,10 +304,13 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `tree_fir_large` | 2 x 2 | 174 | choppable: true |
 | `tree_birch_small` | 1 x 1 | 366 | choppable: false |
 | `tree_birch_large` | 2 x 2 | 366 | choppable: false |
-| `tree_stump` | 1 x 1 | 144 |  |
+| `tree_stump` | 1 x 1 | 136 |  |
+| `oak_sapling` | 1 x 1 | 440 | grow_node: "oak_sapling_shoots", note: "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1)" |
+| `fir_sapling` | 1 x 1 | 175 | height: 1.24, note: "échelle 1 le premier jour, jusqu'à 1,3 ensuite" |
 | `bush_round` | 1 x 1 | 100 |  |
 | `bush_bramble` | 1 x 1 | 280 |  |
-| `bush_hazel` | 1 x 1 | 128 |  |
+| `bush_hazel` | 1 x 1 | 160 |  |
+| `bramble` | 1 x 1 | 564 | size_m: [1.2, 0.8, 0.7], berry_spots: [[-0.3, 0.552, 0.05], [0.08, 0.569, 0.1], [-0.12, 0.534, 0.18]] |
 | `rock_small` | 1 x 1 | 20 |  |
 | `rock_medium` | 1 x 1 | 40 |  |
 | `rock_large` | 2 x 2 | 52 |  |

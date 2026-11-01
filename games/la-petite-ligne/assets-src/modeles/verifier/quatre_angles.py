@@ -2,7 +2,7 @@
 ne dépasse, ne flotte ni ne traverse.
 
 Lancer: duo-python verifier/quatre_angles.py <fichier.glb> <nœud> <image.png> [--pose <clip>:<image>] [--elevation <degrés>]
-       [--azimuts 90,270] (profil strict: 90 et 270; par défaut 45,135,225,315)
+       [--azimuts 90,270] (profil strict: 90 et 270; par défaut 45,135,225,315) [--marge 1.5] (cadre: taille x marge)
 --pose: pour un squelette (faune), pose le nœud sur une image d'un de ses clips (sinon la pose de repos,
 ailes dépliées pour les oiseaux). Le cadrage suit le maillage déformé.
 """
@@ -73,7 +73,7 @@ def main():
     lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
     hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
     c = (lo + hi) / 2
-    size = max(hi - lo) * 1.2
+    size = max(hi - lo) * float(OPTS.get("marge", 1.2))
     shots = []
     azimuts = [float(a) for a in OPTS.get("azimuts", "45,135,225,315").split(",")]
     for i, az in enumerate(azimuts):

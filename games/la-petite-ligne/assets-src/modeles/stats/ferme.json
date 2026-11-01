@@ -137,6 +137,27 @@
    "kind": "item",
    "tris": 200
   },
+  "wild_garlic": {
+   "kind": "item",
+   "size_m": 0.41,
+   "tris": 220
+  },
+  "chanterelle": {
+   "kind": "item",
+   "size_m": 0.3,
+   "tris": 376
+  },
+  "blackberry": {
+   "kind": "item",
+   "size_m": 0.3,
+   "note": "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol",
+   "tris": 224
+  },
+  "hazelnut": {
+   "kind": "item",
+   "size_m": 0.33,
+   "tris": 392
+  },
   "seed_packet_radish": {
    "kind": "item",
    "tris": 116
@@ -247,5 +268,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 687956
+ "file_bytes": 786424
 }

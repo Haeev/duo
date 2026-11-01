@@ -19,6 +19,7 @@ import bpy  # noqa: I001
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import cueillette  # noqa: E402
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
 
@@ -463,6 +464,12 @@ def main():
     A.add("lettuce", item_lettuce(A), {"kind": "item"})
     A.add("egg", item_egg(A), {"kind": "item"})
     A.add("dandelion", dandelion(A), {"kind": "item"})
+    # cueillette du tour 8 (cueillette.py): grossies comme le pissenlit, 0,25 m au moins (lisibles au zoom 1)
+    A.add("wild_garlic", cueillette.wild_garlic(A), {"kind": "item", "size_m": 0.41})
+    A.add("chanterelle", cueillette.chanterelle(A), {"kind": "item", "size_m": 0.3})
+    A.add("blackberry", cueillette.blackberry(A),
+          {"kind": "item", "size_m": 0.3, "note": "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol"})
+    A.add("hazelnut", cueillette.hazelnut(A), {"kind": "item", "size_m": 0.33})
     for crop in ("radish", "lettuce", "carrot"):
         A.add("seed_packet_" + crop, seed_packet(A, crop), {"kind": "item"})
     for name, fn in (("hoe", tool_hoe), ("watering_can", tool_watering_can), ("axe", tool_axe), ("saw", tool_saw),
