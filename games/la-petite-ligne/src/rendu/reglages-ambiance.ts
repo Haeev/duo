@@ -773,8 +773,8 @@ export const AMBIANCE_SETTINGS = {
      * vers cette teinte, à clarté égale. La part suit la force du soleil
      * (rien la nuit: tout est déjà bleu).
      */
-    shadeTint: '#7d8fe0',
-    shadeTintAmount: 0.36,
+    shadeTint: '#8794d0',
+    shadeTintAmount: 0.3,
     /** Les ombres s'éclaircissent un peu (part de la lumière du ciel ajoutée à l'ombre). */
     shadeLift: 0.1,
     /**
@@ -837,13 +837,13 @@ export const AMBIANCE_SETTINGS = {
      * douce (0: aucun) et relevé des noirs.
      */
     gradeBalance: [1.025, 1.0, 0.97] as const,
-    saturation: 1.25,
+    saturation: 1.15,
     contrast: 0.18,
     lift: 0.012,
     /** Vignettage très doux: assombrissement aux coins (0 à 1), début (part du rayon) et teinte. */
     vignette: 0.2,
     vignetteStart: 0.55,
-    vignetteColor: '#3a2c3c',
+    vignetteColor: '#302a2f',
     /** Ce qui reste en mode léger: les ombres teintées et l'occlusion (presque gratuites), pas l'étalonnage ni le bord. */
     light: { shade: true, occlusion: true, rim: false, grade: false },
   },
