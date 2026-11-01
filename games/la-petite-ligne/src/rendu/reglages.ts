@@ -10,6 +10,23 @@
 
 import type { IdlePose } from './attentes';
 
+/**
+ * Éclaircie de la forêt du pourtour: sur le côté `side` de la carte, entre `from` et `to`
+ * (cases le long de ce côté: y pour l'est et l'ouest, x pour le nord et le sud), la lisière
+ * recule de `depth` cases, puis revient à sa place sur `feather` cases de part et d'autre, en
+ * courbe douce (pas d'angle droit dans le bois). Son tracé ondule de `wobble` case au plus
+ * (bruit lissé), pour qu'aucune rangée d'arbres ne paraisse coupée net. La densité suit la
+ * distance à la lisière reculée, comme ailleurs: arbres épars devant, bois serré derrière.
+ */
+export interface ForestClearing {
+  side: 'north' | 'south' | 'east' | 'west';
+  from: number;
+  to: number;
+  depth: number;
+  feather: number;
+  wobble: number;
+}
+
 export const RENDER_SETTINGS = {
   renderer: {
     /** Rapport de pixels plafonné (Retina, mise à l'échelle de Windows). */
@@ -187,6 +204,32 @@ export const RENDER_SETTINGS = {
     /** Arbres du pourtour: densité selon la distance au bord (cases). */
     outerTreeDensity: 0.22,
     outerTreeStart: 2,
+    /**
+     * Éclaircies de la forêt du pourtour (level designer, tour 7): là où un moment se joue au
+     * bord de la carte, la forêt cachait la scène depuis la caméra par défaut (au sud-est, un
+     * arbre de 5 à 9 m cache autant de terrain au nord-ouest de son pied). Sur ces tronçons, la
+     * lisière recule de `depth` cases; voir `ForestClearing` et `src/rendu/foret-pourtour.test.ts`
+     * (lignes de vue des bêtes et des joueurs). Cases de la carte: x vers l'est, y vers le sud.
+     */
+    forestClearings: [
+      /*
+       * Pâture de l'est, au droit du pré de l'est (zone `meadow`, y 24 à 33): derrière la haie du
+       * bord (x 62 et 63), le pré continue en pâture jusqu'au bois. Les bêtes qui y paissent
+       * empêchent la forêt de gagner; la chevrette en sort à l'aube pour rejoindre son faon.
+       * De y 18 à 36: tout ce que la caméra voit derrière le pré en orientation 0 (au sud-est,
+       * jusqu'à la promenade et la berge, y 34 à 37) et en orientation 3 (au nord-est); la
+       * lisière revient à sa place avant la voie (y 12 à 14).
+       */
+      { side: 'east', from: 18, to: 36, depth: 4, feather: 3, wobble: 0.8 },
+      /*
+       * Pré inondable du sud, face à l'anse de sable (rive sud, x 23 à 31, y 42 et 43): le
+       * fond de vallée que l'Aubrune noie en hiver reste en prairie de fauche, le bois commence
+       * plus haut sur le coteau. C'est l'air froid de ce fond qui fait fumer la rivière au matin
+       * de la brume. De x 19 à 40: derrière l'anse vue du sud-est (orientation 0) et du sud-ouest
+       * (orientation 1); la route du sud (x 17 à 19) le traverse.
+       */
+      { side: 'south', from: 19, to: 40, depth: 4, feather: 4, wobble: 0.8 },
+    ] as readonly ForestClearing[],
     pebbleDensity: 0.12,
     /**
      * Décor de la carte hors de la passe d'ombre: objets de cette hauteur ou
@@ -456,29 +499,11 @@ export const RENDER_SETTINGS = {
       halfHeight: 1.0,
       nearer: 0.6,
     },
-    /**
-     * Troisième trou, sur les bêtes d'un moment que le décor du pourtour cache (tour 7): la forêt
-     * qui ferme le bord est passe devant la chevrette et son faon en orientation 0 (la caméra au
-     * sud-est voit la lisière entre elle et eux). Centre: le milieu des bêtes dessinées, à `lift`
-     * (m) du sol; assez large pour la chevrette et le faon côte à côte.
+    /*
+     * Pas de trou pour la chevrette ni de trous élargis pour la brume (tour 7): la forêt du
+     * pourtour recule derrière le pré de l'est et l'anse (`terrain.forestClearings`), plus rien ne
+     * les cache en orientation 0 ni 1 (`foret-pourtour.test.ts`).
      */
-    /**
-     * Trous des joueurs élargis pendant un moment où ils se tiennent devant le pourtour (la brume:
-     * la rive sud est à 3 m de la forêt du bord, qui la cache jusqu'aux épaules en orientation 0).
-     */
-    players: {
-      moments: ['mist'],
-      halfWidth: 1.2,
-      halfHeight: 1.25,
-    },
-    animals: {
-      moments: ['roe_deer'],
-      phases: ['waiting', 'climax', 'left'],
-      lift: 0.6,
-      halfWidth: 1.7,
-      halfHeight: 1.2,
-      nearer: 0.4,
-    },
   },
   /**
    * Main droite de Basile au bas du nichoir pendant `reach_up` (contrôle du DA après le tour 6:
