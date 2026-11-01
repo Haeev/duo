@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Quatre angles de chaque modèle de faune.glb (et de la cloche du quai), assemblés en une planche par modèle.
-#   bash games/la-petite-ligne/assets-src/modeles/verifier/quatre_faune.sh <dossier de sortie>
+#   bash games/la-petite-ligne/assets-src/modeles/verifier/quatre_faune.sh <dossier de sortie> [tour7]
+# Avec « tour7 »: seulement les modèles du tour 7 (chevrette, faon, martin-pêcheur, ablette, pieu).
 set -euo pipefail
 ici="$(cd "$(dirname "$0")/.." && pwd)"
 sortie="$(mkdir -p "$1" && cd "$1" && pwd)"
@@ -25,6 +26,15 @@ img.save(out)
 print(out)
 EOF
 }
+if [[ "${2:-}" == "tour7" ]]; then
+  rendre faune.glb roe_deer deer_graze:0
+  rendre faune.glb fawn fawn_trot:0
+  rendre faune.glb kingfisher kf_perch:0
+  rendre faune.glb small_fish
+  rendre faune.glb mooring_post
+  rm -rf "$tmp"
+  exit 0
+fi
 rendre faune.glb heron heron_idle:0
 rendre faune.glb goose goose_swim:0
 rendre faune.glb blue_tit tit_perch:0
@@ -33,5 +43,10 @@ rendre faune.glb ladder_wood
 rendre faune.glb nest_box
 rendre faune.glb oak_branch_stub
 rendre faune.glb moss_tuft
+rendre faune.glb roe_deer deer_graze:0
+rendre faune.glb fawn fawn_trot:0
+rendre faune.glb kingfisher kf_perch:0
+rendre faune.glb small_fish
+rendre faune.glb mooring_post
 rendre bourg.glb bell_post
 rm -rf "$tmp"

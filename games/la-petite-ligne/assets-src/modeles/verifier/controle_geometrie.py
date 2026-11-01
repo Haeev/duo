@@ -1,7 +1,8 @@
 """Contrôle automatique de la géométrie des GLB (Blender 5.2): pièces qui flottent, faces inversées,
 pièces qui en traversent une autre de part en part.
 
-Lancer: duo-python verifier/controle_geometrie.py [fichier.glb ...]   (défaut: tous les GLB des modèles)
+Lancer: duo-python verifier/controle_geometrie.py [fichier.glb ...] [--peaux]   (défaut: tous les GLB des modèles)
+--peaux: contrôle aussi les faces inversées des maillages à squelette (faune), en pose de repos.
 Chaque nœud est découpé en pièces (îlots de faces reliées). Signalé:
 - FLOTTE: pièce dont le point le plus bas est au-dessus du sol (plus de 2 cm) et qui ne touche
   aucune autre pièce du même nœud (plus de 6 mm de jeu): elle ne porte sur rien;
@@ -60,7 +61,7 @@ def part_info(faces):
     return {"co": co, "tree": BVHTree.FromPolygons(co, polys), "closed": closed, "vol": vol, "min": mn, "max": mx}
 
 
-def check_node(ob):
+def check_node(ob, only_inverted=False):
     me = ob.evaluated_get(bpy.context.evaluated_depsgraph_get()).to_mesh()
     bm = bmesh.new()
     bm.from_mesh(me)
@@ -71,8 +72,10 @@ def check_node(ob):
     issues = []
     for i, p in enumerate(parts):
         size = p["max"] - p["min"]
-        if p["closed"] and p["vol"] < -1e-7:
+        if p["closed"] and p["vol"] < (-1e-12 if only_inverted else -1e-7):
             issues.append(f"INVERSEE pièce {i} vers {tuple(round(c, 2) for c in p['min'])}")
+        if only_inverted:
+            continue
         if p["min"].z > 0.02 and len(parts) > 1:
             near = False
             for j, q in enumerate(parts):
@@ -124,9 +127,14 @@ def main():
         path = f if os.path.isabs(f) else os.path.join(MODELES, f)
         bpy.ops.import_scene.gltf(filepath=path)
         for ob in sorted(bpy.context.scene.objects, key=lambda o: o.name):
-            if ob.type != "MESH" or ob.name.endswith("_water") or ob.find_armature():
+            if ob.type != "MESH" or ob.name.endswith("_water"):
                 continue
-            for msg in check_node(ob):
+            # bêtes à peau rigide (faune): pièces jointives par construction, on ne cherche que les faces
+            # inversées (seuil bas: les yeux d'un oiseau font moins d'un dixième de centimètre cube)
+            skinned = ob.find_armature() is not None
+            if skinned and "--peaux" not in sys.argv:
+                continue
+            for msg in check_node(ob, only_inverted=skinned):
                 print(f"CONTROLE {os.path.basename(path)} {ob.name}: {msg}")
                 total += 1
     print(f"CONTROLE total {total} cas à examiner")

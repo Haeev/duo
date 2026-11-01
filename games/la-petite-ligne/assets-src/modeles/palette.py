@@ -185,6 +185,8 @@ WORLD = [
     ("fox_white", "#F0E7D8", 0.9, 0.0, None),
     ("fox_black", "#2E2521", 0.9, 0.0, None),
     ("tar", "#3C3835", 0.7, 0.0, None),
+    # Tour 7: raie du dos du martin-pêcheur (aucune case turquoise vive avant lui)
+    ("kingfisher_teal", "#2BB5C8", 0.6, 0.0, None),
 ]
 
 # Variantes de saison: seules les cases citées changent (même disposition).

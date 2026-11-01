@@ -1,5 +1,6 @@
-"""Faune et objets des moments rares (tour 6): héron, oie, mésange bleue, renard, échelle, nichoir,
-chicot du chêne, brin de mousse.
+"""Faune et objets des moments rares: héron, oie, mésange bleue, renard, échelle, nichoir, chicot du chêne,
+brin de mousse (tour 6); chevrette, faon, martin-pêcheur, ablette, pieu d'amarrage (tour 7, fiches 1.4.7 et
+1.4.8 de docs/jeux/jeu-1/tour-07-conception.md).
 
 Lancer: duo-python faune.py
 Produit: assets/modeles/faune.glb, stats/faune.json, blend/faune.blend
@@ -7,9 +8,11 @@ Produit: assets/modeles/faune.glb, stats/faune.json, blend/faune.blend
 Conventions propres à ce fichier (fiches: docs/jeux/jeu-1/tour-06-conception.md, section 1.4):
 - chaque bête a son propre squelette (nœud racine du nom de la bête, maillage enfant `<bête>_mesh`),
   peau rigide par pièce comme la poule; animations sur place, la racine ne bouge pas;
-- tailles réelles, sauf la mésange et sa mousse, agrandies de TIT_SCALE (lisibilité au zoom 1);
+- tailles réelles, sauf la mésange et sa mousse (TIT_SCALE), le martin-pêcheur et son ablette (KF_SCALE),
+  agrandis pour la lisibilité au zoom 1;
 - origine au sol entre les pattes, sauf l'oie (ligne de flottaison) et les objets dont la fiche fixe
-  le pivot (nichoir: le clou; chicot: le bout où se pose la mésange; échelle: milieu du pied);
+  le pivot (nichoir: le clou; chicot: le bout où se pose la mésange; échelle: milieu du pied; pieu: bord
+  du sommet, comme l'accroche de la carte);
 - les poses sont écrites en rotations du repère du squelette (x: tangage, positif = le bout d'un os
   tourné vers l'avant descend; y: roulis; z: lacet, positif = vers la gauche de la bête), relatives au
   parent; Rig.pose les traduit en quaternions locaux.
@@ -29,6 +32,9 @@ FPS = 30
 # Mésange bleue (0,12 m) et martin-pêcheur: 7 à 10 pixels au zoom 1 à taille réelle. x 1,5 décidé sur
 # la capture docs/jeux/jeu-1/gauntlet/captures/tour-06/faune-mesange-zoom1.png.
 TIT_SCALE = 1.5
+# Martin-pêcheur (0,17 m) et son ablette: même exception x 1,5 (tour 7), décidée sur la capture
+# docs/jeux/jeu-1/gauntlet/captures/tour-07/faune-martin-pecheur-zoom1.png.
+KF_SCALE = 1.5
 LADDER_ANGLE = 75.0      # degrés au-dessus du sol
 LADDER_LENGTH = 3.0
 RUNG_STEP = 0.28         # écart vertical des barreaux (5 barreaux = 1,40 m, comme la fiche)
@@ -637,6 +643,462 @@ def fox_clips(rig):
     return rig.bake(C)
 
 
+# Chevrette et faon (tour 7) ---------------------------------------------------------------
+#
+# Un seul constructeur pour les deux (mêmes os, mêmes pièces), avec des mesures propres: le faon a la
+# tête plus grosse, le corps plus court et les pattes plus longues en proportion. Os préfixés par la
+# bête (`roe_`, `fawn_`); clips `deer_*` et `fawn_*` (noms des fiches).
+
+ROE = {
+    "p": "roe",
+    "chest": ((0.118, 0.27, 0.148), (0, -0.10, 0.572), 3),
+    "hips": ((0.115, 0.27, 0.145), (0, 0.15, 0.592), -2),
+    "spine": ((0, 0.03, 0.585), (0, 0.42, 0.60), (0, -0.33, 0.60)),   # centre, arrière (croupe), avant
+    "neck": ((0, -0.28, 0.625), (0, -0.45, 0.815), 0.076, 0.054),
+    "head": ((0.056, 0.084, 0.062), (0, -0.497, 0.857), 14),
+    "muzzle": ((0, -0.535, 0.845), (0, -0.63, 0.815), (0, -0.645, 0.81), (0, -0.68, 0.801), 0.042, 0.031, 0.028, 0.018),
+    "chin": ((0.025, 0.036, 0.015), (0, -0.617, 0.789)),
+    "eye": ((0.052, -0.515, 0.873), 0.0105),
+    "ear": (0.13, 0.036, (0.036, -0.47, 0.903), 28, -12),
+    "front": (0.068, (-0.27, 0.51), (-0.28, 0.33), (-0.275, 0.18), (-0.28, 0.035),
+              (0.045, 0.03, 0.023, 0.017, 0.015, 0.013, 0.018)),
+    "hind": (0.073, (0.29, 0.58), (0.21, 0.40), (0.34, 0.22), (0.305, 0.035), (0.036, 0.022, 0.015, 0.013, 0.018),
+             ((0.05, 0.09, 0.115), (0.262, 0.495), -18)),
+    "tail": ((0, 0.40, 0.55), (0, 0.425, 0.47), 0.022, 0.006),
+    "coat": "chicken_russet", "back": "fox_red_dark", "belly": "burlap", "leg": "sepia_dark",
+}
+
+FAWN = {
+    "p": "fawn",
+    "chest": ((0.07, 0.15, 0.088), (0, -0.09, 0.36), 3),
+    "hips": ((0.068, 0.14, 0.086), (0, 0.13, 0.372), -3),
+    "spine": ((0, 0.02, 0.37), (0, 0.25, 0.38), (0, -0.20, 0.38)),
+    "neck": ((0, -0.18, 0.39), (0, -0.255, 0.535), 0.045, 0.033),
+    "head": ((0.04, 0.058, 0.046), (0, -0.29, 0.565), 10),
+    "muzzle": ((0, -0.315, 0.556), (0, -0.37, 0.538), (0, -0.38, 0.535), (0, -0.402, 0.529), 0.028, 0.021, 0.019, 0.013),
+    "chin": ((0.017, 0.024, 0.01), (0, -0.365, 0.52)),
+    "eye": ((0.038, -0.305, 0.58), 0.0085),
+    "ear": (0.095, 0.026, (0.03, -0.27, 0.595), 30, -16),
+    "front": (0.042, (-0.165, 0.32), (-0.17, 0.215), (-0.165, 0.118), (-0.17, 0.022),
+              (0.026, 0.017, 0.012, 0.009, 0.0085, 0.0075, 0.011)),
+    "hind": (0.045, (0.17, 0.36), (0.125, 0.25), (0.205, 0.132), (0.185, 0.022), (0.016, 0.011, 0.0085, 0.0075, 0.011),
+             ((0.032, 0.055, 0.07), (0.16, 0.305), -18)),
+    "tail": ((0, 0.255, 0.385), (0, 0.275, 0.335), 0.016, 0.005),
+    "coat": "chicken_russet", "back": "fox_red_dark", "belly": "burlap", "leg": "sepia_dark",
+}
+
+
+def deer_bones(d):
+    p = d["p"]
+    centre, back, front = d["spine"]
+    n0, n1 = d["neck"][0], d["neck"][1]
+    m_end = d["muzzle"][1]
+    ear_len, _, ear_loc, _, _ = d["ear"]
+    bones = [
+        (p + "_root", (0, 0, 0), (0, 0, 0.1), None),
+        (p + "_hips", centre, back, p + "_root"),
+        (p + "_chest", centre, front, p + "_hips"),
+        (p + "_neck", n0, n1, p + "_chest"),
+        (p + "_head", n1, (0, m_end[1], m_end[2]), p + "_neck"),
+        (p + "_tail", d["tail"][0], d["tail"][1], p + "_hips"),
+    ]
+    for s, side in ((1, "l"), (-1, "r")):
+        ex, ey, ez = ear_loc
+        bones.append((f"{p}_ear_{side}", (s * ex, ey, ez), (s * ex, ey, ez + ear_len), p + "_head"))
+    x, j0, j1, j2, j3, _ = d["front"]
+    for s, side in ((1, "l"), (-1, "r")):
+        xs = s * x
+        bones += [(f"{p}_leg_f{side}", (xs, *j0), (xs, *j1), p + "_chest"),
+                  (f"{p}_leg_f{side}_2", (xs, *j1), (xs, *j2), f"{p}_leg_f{side}"),
+                  (f"{p}_leg_f{side}_3", (xs, *j2), (xs, *j3), f"{p}_leg_f{side}_2")]
+    x, j0, j1, j2, j3, _, _ = d["hind"]
+    for s, side in ((1, "l"), (-1, "r")):
+        xs = s * x
+        bones += [(f"{p}_leg_b{side}", (xs, *j0), (xs, *j1), p + "_hips"),
+                  (f"{p}_leg_b{side}_2", (xs, *j1), (xs, *j2), f"{p}_leg_b{side}"),
+                  (f"{p}_leg_b{side}_3", (xs, *j2), (xs, *j3), f"{p}_leg_b{side}_2")]
+    return bones
+
+
+def deer_mesh(A, d, spots=False):
+    g = A.geo()
+    p = d["p"]
+    coat, back, belly, leg = d["coat"], d["back"], d["belly"], d["leg"]
+
+    def body_color(rump):
+        def f(face):
+            n = face.normal
+            # écusson fessier crème (vu de derrière et pendant les bonds), dos plus sombre, ventre clair
+            if rump and n.y > 0.5 and n.z > -0.6:
+                return "fox_white"
+            if n.z > 0.72:
+                return back
+            if n.z < -0.55:
+                return belly
+            return coat
+        return f
+
+    def spotted(rump, loc):
+        # livrée du faon: taches blanches en deux rangées le long du dos, une facette sur deux
+        def f(band, face):
+            n = face.normal
+            if rump and n.y > 0.5 and n.z > -0.6:
+                return "fox_white"
+            c = face.calc_center_median()
+            az = math.atan2(c.y - loc[1], c.x - loc[0])
+            k = int(math.floor((az + math.pi) / (2 * math.pi) * 10))
+            if band in (1, 3) and abs(math.sin(az)) < 0.95 and (k + band // 2) % 2 == 0:
+                return "fox_white"
+            if band == 0:
+                return back
+            if band >= 6:
+                return belly
+            return coat
+        return f
+
+    for part, rump in (("chest", False), ("hips", True)):
+        semi, loc, tilt = d[part]
+        bone = p + "_chest" if part == "chest" else p + "_hips"
+        if spots:
+            banded_ball(g, semi, loc, [0, 24, 34, 50, 60, 92, 132, 180], 10, spotted(rump, loc), bone)
+        else:
+            ell(g, semi, loc, body_color(rump), bone, segs=10, rings=6, rot=(tilt, 0, 0))
+    n0, n1, r0, r1 = d["neck"]
+    big = p == "roe"
+    seg(g, n0, n1, r0, r1, by_normal(back, coat, belly, thr=0.75), p + "_neck", segs=7 if big else 6)
+    # nuque: boule qui raccorde le cou au crâne (sinon un jour s'ouvre derrière la tête quand elle tourne)
+    ell(g, (r1 * 1.02, r1 * 1.1, r1 * 1.05), n1, by_normal(back, coat, belly, thr=0.75), p + "_neck",
+        segs=7 if big else 6, rings=3)
+    h = p + "_head"
+    semi, hc, tilt = d["head"]
+    ell(g, semi, hc, by_normal(back, coat, belly, thr=0.8), h, segs=8, rings=5, rot=(tilt, 0, 0))
+    m0, m1, m2, m3, ra, rb, rc, rd = d["muzzle"]
+    seg(g, m0, m1, ra, rb, by_normal(coat, coat, belly, thr=0.8), h, segs=6, cap=False)
+    seg(g, m1, m2, rb, rc, "fox_white", h, segs=6, cap=False)          # bande blanche au-dessus du nez
+    seg(g, m2, m3, rc, rd, "black", h, segs=6)                          # mufle noir
+    semi_c, loc_c = d["chin"]
+    ell(g, semi_c, loc_c, "fox_white", h, segs=6, rings=3)
+    (ex, ey, ez), er = d["eye"]
+    ear_len, ear_w, (ax, ay, az_), ear_out, ear_back = d["ear"]
+    for s, side in ((1, "l"), (-1, "r")):
+        g.sphere(er, loc=(s * ex, ey, ez), color="black", segs=5, rings=3, bone=h)
+        w = ear_w
+        pts = [(-w * 0.8, 0.0), (w * 0.8, 0.0), (w, ear_len * 0.45), (w * 0.5, ear_len * 0.88), (0.0, ear_len),
+               (-w * 0.5, ear_len * 0.88), (-w, ear_len * 0.45)]
+
+        def ear_color(face):
+            return "fox_white" if face.normal.y < -0.45 else "sepia_dark"
+        # pavillon tourné vers l'avant (dedans clair, dos et bord sombres); base enfoncée de 1 cm dans le crâne
+        g.prism(pts, w * 0.35, loc=(s * ax, ay, az_ - 0.01), color=ear_color,
+                rot=(ear_back, s * ear_out, 0), bone=f"{p}_ear_{side}")
+    ls = 6 if p == "roe" else 5      # pattes grêles du faon: 5 pans (bible 8.4, moins de 5 cm)
+    x, j0, j1, j2, j3, rr = d["front"]
+    for s, side in ((1, "l"), (-1, "r")):
+        xs = s * x
+        b = f"{p}_leg_f{side}"
+        seg(g, (xs, *j0), (xs, *j1), rr[0], rr[1], coat, b, segs=ls)
+        seg(g, (xs, *j1), (xs, *j2), rr[2], rr[3], coat, b + "_2", segs=ls)
+        g.sphere(rr[3] * 1.05, loc=(xs, *j2), color=leg, segs=6, rings=3, bone=b + "_3")
+        seg(g, (xs, *j2), (xs, j3[0], j3[1]), rr[4], rr[5], leg, b + "_3", segs=5, cap=False)
+        seg(g, (xs, j3[0], j3[1]), (xs, j3[0] - 0.008, 0.0), rr[5] * 1.15, rr[6], "black", b + "_3", segs=5)
+    x, j0, j1, j2, j3, rr, (ts, tl, tt) = d["hind"]
+    for s, side in ((1, "l"), (-1, "r")):
+        xs = s * x
+        b = f"{p}_leg_b{side}"
+        ell(g, ts, (xs, *tl), body_color(True), b, segs=7, rings=4, rot=(tt, 0, 0))
+        seg(g, (xs, *j1), (xs, *j2), rr[0], rr[1], coat, b + "_2", segs=ls)
+        g.sphere(rr[1] * 1.05, loc=(xs, *j2), color=leg, segs=6, rings=3, bone=b + "_3")
+        seg(g, (xs, *j2), (xs, j3[0], j3[1]), rr[2], rr[3], leg, b + "_3", segs=5, cap=False)
+        seg(g, (xs, j3[0], j3[1]), (xs, j3[0] - 0.008, 0.0), rr[3] * 1.15, rr[4], "black", b + "_3", segs=5)
+    t0, t1, tr0, tr1 = d["tail"]
+    # pinceau de poils sous l'écusson (propre aux chevrettes); petite queue rousse dessous blanc pour le faon
+    seg(g, t0, t1, tr0, tr1, "fox_white" if p == "roe" else by_normal(coat, coat, "fox_white", thr=0.3), p + "_tail", segs=5)
+    return g
+
+
+def _legs(p, **kw):
+    """Pose des pattes: fl=(épaule, avant-bras, canon), ..., bl=(cuisse, jambe, canon). Négatif = vers l'avant."""
+    out = {}
+    for k, (a, b, c) in kw.items():
+        out[f"{p}_leg_{k}"] = R(a)
+        out[f"{p}_leg_{k}_2"] = R(b)
+        out[f"{p}_leg_{k}_3"] = R(c)
+    return out
+
+
+def _gait(p, phases, stance, swing_front, swing_hind, amp_f=18, amp_h=16, steps=12, frames=36, bob=0.0, base=None):
+    """Allure en boucle: phases {patte: décalage}; appui de 0 à stance (la patte recule), puis lever."""
+    keys = {}
+    for i in range(steps + 1):
+        t = i / steps
+        pose = dict(base or {})
+        for legk, off in phases.items():
+            ph = (t + off) % 1.0
+            front = legk.startswith("f")
+            amp = amp_f if front else amp_h
+            if ph < stance:
+                a = -amp + 2 * amp * ph / stance
+                b2 = c3 = 0.0
+            else:
+                s = (ph - stance) / (1 - stance)
+                a = amp - 2 * amp * s
+                sn = math.sin(math.pi * s)
+                b2, c3 = (swing_front if front else swing_hind)
+                b2, c3 = b2 * sn, c3 * sn
+            pose.update(_legs(p, **{legk: (a, b2, c3)}))
+        if bob:
+            pose[p + "_root"] = {"l": (0, 0, bob * math.cos(4 * math.pi * t))}
+        keys[round(t * frames)] = pose
+    return keys
+
+
+def deer_clips(rig):
+    p = "roe"
+    C = {}
+    stand = {}
+    ears_fwd = {"roe_ear_l": R(-14, 0, 8), "roe_ear_r": R(-14, 0, -8)}
+    graze = merge({"roe_chest": R(3), "roe_neck": R(120), "roe_head": R(-24),
+                   "roe_ear_l": R(-30, 0, 20), "roe_ear_r": R(-30, 0, -20)},
+                  _legs(p, fl=(-6, 2, 0), fr=(-6, 2, 0), bl=(4, -2, 0), br=(4, -2, 0)))
+    walk_base = {"roe_neck": R(16), "roe_head": R(4)}
+    C["deer_walk"] = (True, _gait(p, {"bl": 0.0, "fl": 0.25, "br": 0.5, "fr": 0.75}, 0.62,
+                                  (22, 62), (-28, 52), 16, 15, steps=12, frames=36, bob=0.006, base=walk_base))
+    bite_l = merge(graze, {"roe_head": R(30, 0, 14), "roe_ear_l": R(10), "roe_ear_r": R(0, 0, -10)})
+    bite_r = merge(graze, {"roe_head": R(30, 0, -12), "roe_ear_r": R(10)})
+    step = merge(graze, _legs(p, fl=(-14, 6, 20)))
+    C["deer_graze"] = (True, {0: graze, 18: bite_l, 34: graze, 52: merge(step, {"roe_ear_r": R(0, 0, -24)}),
+                              60: merge(graze, _legs(p, fl=(-12, 0, 0))), 80: bite_r, 98: graze,
+                              108: merge(graze, {"roe_ear_l": R(-20, 0, 16)}), 120: graze})
+    look = merge(ears_fwd, {"roe_neck": R(-16), "roe_head": R(-4)})
+    C["deer_lookup"] = (False, {0: graze, 8: merge(look, {"roe_neck": R(-10)}), 12: look,
+                                40: merge(look, {"roe_head": R(-6, 0, 4)}), 60: look})
+    alert = merge(ears_fwd, {"roe_neck": R(-10), "roe_head": R(-2)})
+    raise_ = merge(alert, _legs(p, fr=(-34, 18, 52)), {"roe_chest": R(-4)})
+    strike = merge(alert, _legs(p, fr=(4, 0, 0)), {"roe_chest": R(3), "roe_root": {"l": (0, 0, -0.008)}})
+    C["deer_stamp"] = (False, {0: alert, 5: raise_, 8: strike, 15: alert})
+    call = {"roe_neck": R(46), "roe_head": R(-18), "roe_ear_l": R(14, 0, -10), "roe_ear_r": R(14, 0, 10)}
+    call2 = merge(call, {"roe_head": R(-26), "roe_neck": R(42)})
+    C["deer_call"] = (False, {0: stand, 10: call, 18: call2, 24: call, 32: call2, 38: call,
+                              48: merge(ears_fwd, {"roe_neck": R(14), "roe_head": R(-2)})})
+    watch = merge(ears_fwd, {"roe_neck": R(14, 0, 20), "roe_head": R(-2, 0, 18)})
+    C["deer_watch_fawn"] = (True, {0: watch, 20: merge(watch, {"roe_ear_r": R(18, 0, -30)}), 26: watch,
+                                   40: merge(watch, {"roe_head": R(0, 0, 24)}), 60: watch})
+    lick_a = {"roe_neck": R(40, 0, 74), "roe_head": R(30, 0, 34), "roe_ear_l": R(10), "roe_ear_r": R(10),
+              "roe_chest": R(0, 0, 8)}
+    lick_b = merge(lick_a, {"roe_head": R(48, 0, 38), "roe_neck": R(46, 0, 72)})
+    C["deer_lick"] = (True, {0: lick_a, 11: lick_b, 22: lick_a, 33: lick_b, 44: lick_a, 55: lick_b, 66: lick_a})
+    C["deer_bound"] = (True, _bound(p, 0.60))
+    return rig.bake(C)
+
+
+def _bound(p, apex, extra=None):
+    """Bond sur place (0,8 s): rassemblé, poussée, pattes repliées au sommet, réception sur l'avant."""
+    k = apex / 0.6
+    e = extra or {}
+    gather = merge({p + "_hips": R(4), p + "_root": {"l": (0, 0, -0.07 * k)}}, _legs(p, fl=(16, -8, 30), fr=(18, -6, 26), bl=(-30, 30, -6), br=(-28, 28, -4)),
+                   e.get("gather", {}))
+    push = merge({p + "_hips": R(-16), p + "_root": {"l": (0, 0, 0.07 * k)}},
+                 _legs(p, fl=(-30, 20, 60), fr=(-26, 18, 56), bl=(16, -4, 8), br=(18, -4, 8)), e.get("push", {}))
+    tuck = merge({p + "_hips": R(-4), p + "_root": {"l": (0, 0, apex)}, p + "_tail": R(-40)},
+                 _legs(p, fl=(-38, 30, 100), fr=(-34, 28, 96), bl=(-32, 44, -40), br=(-30, 42, -38)), e.get("tuck", {}))
+    reach = merge({p + "_hips": R(14), p + "_root": {"l": (0, 0, 0.30 * k)}},
+                  _legs(p, fl=(-46, 6, 4), fr=(-38, 4, 6), bl=(30, -30, 50), br=(26, -28, 48)), e.get("reach", {}))
+    land = merge({p + "_hips": R(10), p + "_root": {"l": (0, 0, 0.04 * k)}},
+                 _legs(p, fl=(-8, 0, 0), fr=(-2, 0, 0), bl=(10, -6, 30), br=(6, -4, 28)), e.get("land", {}))
+    return {0: gather, 4: push, 12: tuck, 18: reach, 21: land, 24: gather}
+
+
+def fawn_clips(rig):
+    p = "fawn"
+    C = {}
+    # couché dans l'herbe haute: pattes repliées sous le corps, cou bas, tête en avant; seules les oreilles
+    # montent vers 0,34 m (posé à -0,3 m, il en dépasse 4 cm, comme la fiche)
+    bed = merge({"fawn_root": {"l": (0, 0, -0.262)}, "fawn_hips": R(-3), "fawn_neck": R(46), "fawn_head": R(-34),
+                 "fawn_ear_l": R(14, 0, -8), "fawn_ear_r": R(14, 0, 8)},
+                _legs(p, fl=(-78, 160, 0), fr=(-78, 160, 0), bl=(-92, 152, -40), br=(-92, 152, -40)))
+    bed_b = merge(bed, {"fawn_head": R(-28, 0, 10), "fawn_ear_l": R(-8, 0, 14), "fawn_ear_r": R(20, 0, 4)})
+    C["fawn_rustle"] = (True, {0: bed, 6: bed_b, 10: merge(bed, {"fawn_hips": R(-3, 4, 0)}), 18: bed_b, 30: bed})
+    # lever réel d'un faon: l'arrière-train d'abord (pattes arrière tendues, à genoux devant), puis l'avant
+    haunch = merge({"fawn_root": {"l": (0, 0, -0.17)}, "fawn_hips": R(8), "fawn_neck": R(36), "fawn_head": R(-24)},
+                   _legs(p, fl=(-70, 150, 10), fr=(-70, 150, 10), bl=(-62, 96, -22), br=(-62, 96, -22)))
+    kneel = merge({"fawn_root": {"l": (0, 0, -0.045)}, "fawn_hips": R(16), "fawn_neck": R(20), "fawn_head": R(-10)},
+                  _legs(p, fl=(-16, 4, 92), fr=(-16, 4, 92), bl=(-16, 0, 0), br=(-16, 0, 0)))
+    C["fawn_rise"] = (False, {0: bed, 5: haunch, 10: kneel,
+                              17: merge(kneel, {"fawn_hips": R(6), "fawn_root": {"l": (0, 0, -0.012)}},
+                                        _legs(p, fl=(-30, 20, 40), fr=(-8, 0, 0), bl=(-6, 0, 0), br=(-6, 0, 0))),
+                              24: {"fawn_neck": R(6)}})
+    trot_base = {"fawn_neck": R(10), "fawn_head": R(-4), "fawn_tail": R(-20)}
+    C["fawn_trot"] = (True, _gait(p, {"fl": 0.0, "br": 0.0, "fr": 0.5, "bl": 0.5}, 0.5,
+                                  (20, 70), (-30, 60), 24, 22, steps=5, frames=15, bob=0.012, base=trot_base))
+    suck = merge({"fawn_hips": R(4), "fawn_chest": R(4), "fawn_neck": R(-26), "fawn_head": R(-50),
+                  "fawn_ear_l": R(30, 0, 30), "fawn_ear_r": R(30, 0, -30)},
+                 _legs(p, fl=(-14, 0, 0), fr=(-10, 0, 0), bl=(10, 0, 0), br=(12, 0, 0)))
+    wag = [34, -34]
+    keys = {}
+    for i, f in enumerate((0, 6, 11, 17, 22, 28, 33)):
+        extra = {"fawn_tail": R(-30, 0, wag[i % 2])}
+        if f in (6, 22):
+            extra["fawn_head"] = R(-46 if f == 6 else -54)
+        keys[f] = merge(suck, extra)
+    keys[33] = keys[0]
+    C["fawn_suckle"] = (True, keys)
+    C["fawn_bound"] = (True, _bound(p, 0.35))
+    return rig.bake(C)
+
+
+# Martin-pêcheur, ablette, pieu d'amarrage (tour 7) -----------------------------------------
+
+def _ks(p):
+    return tuple(v * KF_SCALE for v in p)
+
+
+KF_BONES = [
+    ("kf_root", (0, 0, 0), _ks((0, 0, 0.02)), None),
+    ("kf_body", _ks((0, 0.026, 0.018)), _ks((0, -0.012, 0.052)), "kf_root"),
+    ("kf_head", _ks((0, -0.014, 0.062)), _ks((0, -0.05, 0.066)), "kf_body"),
+    ("kf_tail", _ks((0, 0.03, 0.02)), _ks((0, 0.048, 0.002)), "kf_body"),
+    ("kf_wing_l", _ks((0.014, -0.004, 0.046)), _ks((0.125, -0.004, 0.046)), "kf_body"),
+    ("kf_wing_r", _ks((-0.014, -0.004, 0.046)), _ks((-0.125, -0.004, 0.046)), "kf_body"),
+]
+# dos du corps perché (avant relevé de 40 degrés): sert à peindre la raie turquoise
+_KF_TILT = -40
+_KF_DORSAL = Vector((0, math.sin(math.radians(-_KF_TILT)), math.cos(math.radians(_KF_TILT))))
+
+
+def kingfisher_mesh(A):
+    g = A.geo()
+    S = KF_SCALE
+    b = "kf_body"
+
+    def body_color(face):
+        n = face.normal
+        d = n.dot(_KF_DORSAL)
+        if d > 0.55 and abs(n.x) < 0.42:
+            return "kingfisher_teal"
+        if d > -0.15:
+            return "tit_blue"
+        return "goose_bill"
+    ell(g, _ks((0.019, 0.04, 0.021)), _ks((0, 0.006, 0.036)), body_color, b, segs=8, rings=6, rot=(_KF_TILT, 0, 0))
+    # ailes repliées: coquilles arrondies couchées sur les flancs, de l'épaule au croupion
+    for s in (1, -1):
+        ell(g, _ks((0.0055, 0.03, 0.0135)), _ks((s * 0.0158, 0.012, 0.035)),
+            by_normal("tit_blue", "tit_blue", "goose_bill", thr=0.7), b, segs=6, rings=4, rot=(_KF_TILT + 2, 0, s * 4))
+    # queue courte et sombre, enfoncée dans le croupion
+    ell(g, _ks((0.0075, 0.016, 0.003)), _ks((0, 0.04, 0.012)), "tit_blue", "kf_tail", segs=6, rings=3, rot=(36, 0, 0))
+    h = "kf_head"
+
+    # tête en bandes de facettes: calotte bleue, bande orange de l'oeil à la nuque, tache blanche du cou
+    # derrière la joue, moustache bleue, gorge blanche, dessous orange (rien n'est posé par-dessus)
+    def head_color(band, face):
+        n = face.normal
+        if band <= 1:
+            return "tit_blue"
+        if band == 2:
+            return "goose_bill" if n.y > -0.75 else "tit_blue"
+        if band == 3:
+            if n.y > 0.35 or n.y < -0.55:
+                return "white_paint"
+            return "tit_blue"
+        return "goose_bill" if n.y > -0.2 else "white_paint"
+    r = 0.0165 * S
+    banded_ball(g, (r, r * 1.08, r * 0.98), _ks((0, -0.025, 0.066)), [0, 30, 58, 84, 112, 150, 180], 8, head_color, h)
+    seg(g, _ks((0, -0.039, 0.065)), _ks((0, -0.078, 0.059)), 0.0062 * S, 0.0009 * S, "black", h, segs=5)
+    for s in (1, -1):
+        g.sphere(0.0028 * S, loc=_ks((s * 0.0148, -0.031, 0.069)), color="black", segs=5, rings=3, bone=h)
+        # pattes rouges très courtes, doigts sur le perchoir (origine)
+        seg(g, _ks((s * 0.006, 0.006, 0.012)), _ks((s * 0.006, 0.004, 0.0015)), 0.0022 * S, 0.0018 * S, "comb_red",
+            "kf_root", segs=5)
+        g.box(_ks((0.0035, 0.014, 0.003)), loc=_ks((s * 0.006, 0.0, 0.0015)), color="comb_red", bone="kf_root")
+    # ailes de vol, dépliées au repos du squelette (réduites et rentrées dans le corps par les poses)
+    for s, side in ((1, "l"), (-1, "r")):
+        outline = [(0.012, -0.012), (0.07, -0.016), (0.112, -0.01), (0.125, 0.002), (0.112, 0.016), (0.07, 0.022),
+                   (0.012, 0.02)]
+        outline = [(x * S, y * S) for x, y in outline]
+        if s < 0:
+            outline = mirror_x(outline)
+        plate(g, outline, 0.046 * S, 0.006 * S, 0.0025 * S, "tit_blue", "goose_bill", "kf_wing_" + side, side="tit_blue")
+    return g
+
+
+def kingfisher_clips(rig):
+    S = KF_SCALE
+    rest = {"kf_wing_l": {"s": (0.04, 0.04, 0.04)}, "kf_wing_r": {"s": (0.04, 0.04, 0.04)}}
+
+    def flap(a):
+        w = {"kf_wing_l": {"r": [("y", -a)]}}
+        return merge(w, mirror(w), {"kf_body": R(40), "kf_head": R(-34), "kf_tail": R(-30)})
+    C = {}
+    look_down = merge(rest, {"kf_head": R(26)})
+    bob = merge(look_down, {"kf_body": {"r": (6, 0, 0), "l": (0, 0, -0.002 * S)}, "kf_head": R(18)})
+    C["kf_perch"] = (True, {0: look_down, 8: bob, 14: look_down, 22: bob, 28: merge(look_down, {"kf_tail": R(-24)}),
+                            32: look_down, 44: merge(look_down, {"kf_head": R(26, 0, 22)}),
+                            52: merge(bob, {"kf_head": R(18, 0, 18)}), 60: look_down})
+    crouch = merge(rest, {"kf_body": {"r": (24, 0, 0), "l": (0, 0, -0.004 * S)}, "kf_head": R(10), "kf_tail": R(-20)})
+    # il quitte le pieu en piquant: la racine monte et avance pour que le bec ne traverse pas le perchoir
+    dive = merge(rest, {"kf_body": R(118), "kf_head": R(-8), "kf_tail": R(-14),
+                        "kf_root": {"l": (0, -0.03 * S, 0.075 * S)}})
+    C["kf_dive"] = (False, {0: look_down, 3: crouch, 9: dive})
+    # battement très rapide: 4 images (0,133 s) au lieu des 0,12 s de la fiche (l'export échantillonne à 30 i/s)
+    C["kf_fly"] = (True, {0: flap(62), 2: flap(-48), 4: flap(62)})
+    raise_ = merge(rest, {"kf_body": R(-6), "kf_head": R(-30, 0, 70)})
+    hit = merge(rest, {"kf_body": R(18), "kf_head": R(52, 0, -40)})
+    C["kf_beat"] = (False, {0: look_down, 5: raise_, 9: hit, 14: merge(raise_, {"kf_head": R(-26, 0, 64)}),
+                            20: raise_, 24: hit, 30: merge(rest, {"kf_head": R(10, 0, -10)}), 36: look_down})
+    toss = merge(rest, {"kf_body": R(-10), "kf_head": R(-64)})
+    gulp = merge(toss, {"kf_head": R(-52), "kf_body": {"r": (-8, 0, 0), "s": (1.06, 1.0, 1.06)}})
+    C["kf_swallow"] = (False, {0: look_down, 5: toss, 9: gulp, 15: look_down})
+    return rig.bake(C)
+
+
+def small_fish(A):
+    """Ablette tenue en travers du bec: origine au milieu du corps (point de prise), tête vers +X Blender."""
+    g = A.geo()
+    S = KF_SCALE
+    ell(g, (0.03 * S, 0.0055 * S, 0.0095 * S), (0.004 * S, 0, 0), by_normal("fish_back", "fish_silver", "fish_belly", thr=0.6),
+        segs=8, rings=5)
+    # queue fourchue: plaque mince verticale enfoncée dans le pédoncule; petite dorsale
+    g.prism([(-0.022 * S, 0.0), (-0.04 * S, 0.009 * S), (-0.035 * S, 0.0), (-0.04 * S, -0.009 * S)], 0.0016 * S,
+            color="fish_silver")
+    g.prism([(-0.006 * S, 0.005 * S), (0.006 * S, 0.006 * S), (-0.007 * S, 0.0135 * S)], 0.0014 * S, color="fish_back")
+    for s in (1, -1):
+        g.sphere(0.0013 * S, loc=(0.025 * S, s * 0.0033 * S, 0.0022 * S), color="black", segs=5, rings=3)
+    return g
+
+
+def mooring_post(A):
+    """Pieu d'amarrage du ponton: chêne de 0,14 m, 1,40 m de long, origine au bord du sommet.
+
+    Le sommet usé bombe de 2 cm au centre (le martin-pêcheur s'y tient 0,02 m au-dessus de l'origine);
+    la ligne d'eau est à -0,95 m, le pied à -1,40 m (fiché dans le lit de la rivière). Anneau de fer à
+    0,60 m au-dessus de l'eau, à plat contre la face +Z glTF (vers le large), pendu à un crampon.
+    """
+    g = A.geo()
+    wl = -0.95
+    prof = [(0.062, -1.40), (0.07, -1.20), (0.07, wl - 0.06), (0.07, wl + 0.09), (0.07, -0.035), (0.063, 0.0),
+            (0.036, 0.016), (0.0, 0.02)]
+    g.lathe(prof, colors=["wood_dark", "wood_dark", "moss", "wood_old_dark", "wood_old_dark", "wood_old", "wood_old"],
+            segs=6, phase=0.0)
+    zr = wl + 0.60
+    apo = 0.07 * math.cos(math.pi / 6)
+    seg(g, (0, -apo + 0.012, zr), (0, -apo - 0.016, zr), 0.0055, 0.0055, "iron", segs=5)
+    R0, r0, cy, cz = 0.036, 0.0065, -apo - 0.0145, zr - 0.036
+    vs, faces = [], []
+    nm, nn = 8, 4
+    for i in range(nm):
+        a = 2 * math.pi * i / nm + math.pi / 2
+        for j in range(nn):
+            b = 2 * math.pi * j / nn
+            rr = R0 + r0 * math.cos(b)
+            vs.append((rr * math.cos(a), cy + r0 * math.sin(b), cz + rr * math.sin(a)))
+    for i in range(nm):
+        for j in range(nn):
+            a0, a1 = i * nn + j, ((i + 1) % nm) * nn + j
+            b0, b1 = i * nn + (j + 1) % nn, ((i + 1) % nm) * nn + (j + 1) % nn
+            faces.append([a0, b0, b1, a1])
+    g.mesh(vs, faces, "iron")
+    return g
+
+
 # Objets ---------------------------------------------------------------------------------
 
 def ladder_wood(A):
@@ -756,6 +1218,29 @@ def main():
     fox.skin(A, "fox_mesh", fox_mesh(A))
     anims["fox"] = fox_clips(fox)
 
+    # tour 7: chevrette et faon du pré, martin-pêcheur du ponton
+    roe = Rig("roe_deer", deer_bones(ROE))
+    A._register(roe.arm, {"kind": "animal", "origin": "sol entre les pattes", "withers": 0.7, "head_up": 1.05,
+                          "length": 1.1, "collision_radius": 0.4,
+                          "note": "tête tournée vers sa gauche dans deer_watch_fawn et deer_lick: le faon à sa gauche"})
+    roe.skin(A, "roe_deer_mesh", deer_mesh(A, ROE))
+    anims["roe_deer"] = deer_clips(roe)
+
+    fawn = Rig("fawn", deer_bones(FAWN))
+    A._register(fawn.arm, {"kind": "animal", "origin": "sol entre les pattes", "withers": 0.45, "length": 0.65,
+                           "collision_radius": 0.4, "bed_ears_top": 0.32,
+                           "note": "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)"})
+    fawn.skin(A, "fawn_mesh", deer_mesh(A, FAWN, spots=True))
+    anims["fawn"] = fawn_clips(fawn)
+
+    kf = Rig("kingfisher", KF_BONES)
+    A._register(kf.arm, {"kind": "animal", "origin": "pattes sur le perchoir", "display_scale": KF_SCALE,
+                         "length": round(0.17 * KF_SCALE, 3), "wingspan": round(0.25 * KF_SCALE, 3),
+                         "beak_socket": "socket_kingfisher_beak"})
+    kf.skin(A, "kingfisher_mesh", kingfisher_mesh(A))
+    kf.socket("socket_kingfisher_beak", "kf_head", Vector(_ks((0, -0.064, 0.0615))))
+    anims["kingfisher"] = kingfisher_clips(kf)
+
     a = math.radians(LADDER_ANGLE)
     A.add("ladder_wood", ladder_wood(A), {"kind": "prop", "lean_deg": LADDER_ANGLE, "length": LADDER_LENGTH,
                                           "rung_step": RUNG_STEP, "rungs": 10,
@@ -767,6 +1252,13 @@ def main():
                                     "note": "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)"})
     A.add("oak_branch_stub", oak_branch_stub(A), {"kind": "prop", "pivot": "bout du chicot (perchoir)"})
     A.add("moss_tuft", moss_tuft(A), {"kind": "item", "socket": "socket_blue_tit_beak"})
+    A.add("small_fish", small_fish(A), {"kind": "item", "socket": "socket_kingfisher_beak", "display_scale": KF_SCALE,
+                                        "length": round(0.08 * KF_SCALE, 3),
+                                        "note": "en travers du bec, tête vers la gauche de l'oiseau"})
+    A.add("mooring_post", mooring_post(A), {"kind": "prop", "pivot": "bord du sommet (accroche kingfisher_post, z 0,95)",
+                                            "perch": [0.0, 0.02, 0.0], "water_line": -0.95, "length": 1.4,
+                                            "ring": [0.0, -0.35, 0.075],
+                                            "note": "anneau sur la face +Z (vers le large); aucune emprise"})
 
     objs = A.all_objects()
     path = os.path.join(lpl.OUT, "faune.glb")

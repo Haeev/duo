@@ -33,6 +33,35 @@
    "tail": 0.4,
    "tris": 798
   },
+  "roe_deer": {
+   "kind": "animal",
+   "origin": "sol entre les pattes",
+   "withers": 0.7,
+   "head_up": 1.05,
+   "length": 1.1,
+   "collision_radius": 0.4,
+   "note": "tête tournée vers sa gauche dans deer_watch_fawn et deer_lick: le faon à sa gauche",
+   "tris": 892
+  },
+  "fawn": {
+   "kind": "animal",
+   "origin": "sol entre les pattes",
+   "withers": 0.45,
+   "length": 0.65,
+   "collision_radius": 0.4,
+   "bed_ears_top": 0.32,
+   "note": "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)",
+   "tris": 900
+  },
+  "kingfisher": {
+   "kind": "animal",
+   "origin": "pattes sur le perchoir",
+   "display_scale": 1.5,
+   "length": 0.255,
+   "wingspan": 0.375,
+   "beak_socket": "socket_kingfisher_beak",
+   "tris": 416
+  },
   "ladder_wood": {
    "kind": "prop",
    "lean_deg": 75.0,
@@ -73,6 +102,32 @@
    "kind": "item",
    "socket": "socket_blue_tit_beak",
    "tris": 96
+  },
+  "small_fish": {
+   "kind": "item",
+   "socket": "socket_kingfisher_beak",
+   "display_scale": 1.5,
+   "length": 0.12,
+   "note": "en travers du bec, tête vers la gauche de l'oiseau",
+   "tris": 124
+  },
+  "mooring_post": {
+   "kind": "prop",
+   "pivot": "bord du sommet (accroche kingfisher_post, z 0,95)",
+   "perch": [
+    0.0,
+    0.02,
+    0.0
+   ],
+   "water_line": -0.95,
+   "length": 1.4,
+   "ring": [
+    0.0,
+    -0.35,
+    0.075
+   ],
+   "note": "anneau sur la face +Z (vers le large); aucune emprise",
+   "tris": 162
   }
  },
  "animations": {
@@ -198,7 +253,103 @@
     "seconds": 1.2,
     "loop": false
    }
+  ],
+  "roe_deer": [
+   {
+    "name": "deer_walk",
+    "seconds": 1.2,
+    "loop": true
+   },
+   {
+    "name": "deer_graze",
+    "seconds": 4.0,
+    "loop": true
+   },
+   {
+    "name": "deer_lookup",
+    "seconds": 2.0,
+    "loop": false
+   },
+   {
+    "name": "deer_stamp",
+    "seconds": 0.5,
+    "loop": false
+   },
+   {
+    "name": "deer_call",
+    "seconds": 1.6,
+    "loop": false
+   },
+   {
+    "name": "deer_watch_fawn",
+    "seconds": 2.0,
+    "loop": true
+   },
+   {
+    "name": "deer_lick",
+    "seconds": 2.2,
+    "loop": true
+   },
+   {
+    "name": "deer_bound",
+    "seconds": 0.8,
+    "loop": true
+   }
+  ],
+  "fawn": [
+   {
+    "name": "fawn_rustle",
+    "seconds": 1.0,
+    "loop": true
+   },
+   {
+    "name": "fawn_rise",
+    "seconds": 0.8,
+    "loop": false
+   },
+   {
+    "name": "fawn_trot",
+    "seconds": 0.5,
+    "loop": true
+   },
+   {
+    "name": "fawn_suckle",
+    "seconds": 1.1,
+    "loop": true
+   },
+   {
+    "name": "fawn_bound",
+    "seconds": 0.8,
+    "loop": true
+   }
+  ],
+  "kingfisher": [
+   {
+    "name": "kf_perch",
+    "seconds": 2.0,
+    "loop": true
+   },
+   {
+    "name": "kf_dive",
+    "seconds": 0.3,
+    "loop": false
+   },
+   {
+    "name": "kf_fly",
+    "seconds": 0.133,
+    "loop": true
+   },
+   {
+    "name": "kf_beat",
+    "seconds": 1.2,
+    "loop": false
+   },
+   {
+    "name": "kf_swallow",
+    "seconds": 0.5,
+    "loop": false
+   }
   ]
  },
- "file_bytes": 573624
+ "file_bytes": 1099884
 }

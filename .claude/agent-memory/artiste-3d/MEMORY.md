@@ -72,3 +72,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Pièce posée au bout d'un corps (queue): l'enfoncer à moitié et lui donner la couleur du dessus voisin, sinon elle se lit détachée. Vue d'en haut, ce qui part loin de la caméra semble relevé.
 - Lisibilité en niveaux de gris: mesurer en jeu, pas sur la palette. Le soir, roux L* 54 rendu 22, herbe L* 69 rendue 30: éclaircir le roux le rapprochait de l'herbe (27). Jouer sur les blancs et les noirs plutôt que sur la valeur moyenne.
 - Page de rendu en `manuel=1`: le temps n'avance que par `window.lplRendu.advance(dt)`. Sans l'appeler, les fondus des clips restent à 0 et les bêtes montrent la pose de repos (ailes dépliées); `zoom=0` n'agit qu'après quelques pas. Captures: attendre que `#chargement` disparaisse, appeler advance(0.05) x 20, délai de capture de 180 s (SwiftShader).
+
+## Faune du tour 7 (vérifié le 2026-11-01)
+
+- `controle_geometrie.py` sautait les maillages à squelette: la faune n'était pas contrôlée. Option `--peaux` (faces inversées seules, seuil de volume bas pour les petites pièces). Toujours la passer sur `faune.glb`.
+- Planches: la scène n'a qu'une image courante pour tous les squelettes. `set_action(a, clip, 60)` puis `set_action(b, clip, 0)` remet `a` à l'image 0. Poser toutes les bêtes d'une planche à la même image.
+- `quatre_angles.py` supprime tout maillage hors du nœud, sol compris: pas d'ombre portée, donc vérifier le contact au sol par calcul et non à l'oeil.
+- Contact au sol des clips: sonde (bout des os et point le plus bas du maillage déformé, image par image). Baisser la racine sans plier les pattes enfonce les sabots; un cou trop court ne mène pas le mufle à l'herbe: rallonger le cou au repos plutôt que tordre la tête (la tête hérite de la rotation du cou: rotation propre négative).
+- Quadrupède: hanches au centre du corps (pivot du tangage), poitrine enfant des hanches. Lever d'un faon: arrière-train d'abord (tangage positif, avant à genoux), sinon le corps flotte.
+- Taches de livrée: bandes étroites de `banded_ball` (deux bandes fines, une facette sur deux), pas des facettes entières (carreaux).
+- Accroche de carte avec z (pieu, nichoir): l'origine du modèle est le point de l'accroche, pas forcément la base.
+- L'export échantillonne à 30 i/s: un clip de 0,12 s devient 4 images (0,133 s); le dire dans la fiche.
+- Le worktree isolé refuse les commandes composées avec heredoc vers des fichiers hors du dépôt, ou nommant git de façon complexe: écrire les scripts avec Write et lancer des commandes simples.
