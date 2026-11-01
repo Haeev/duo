@@ -53,7 +53,7 @@
     "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur, le meuble tourné vers la pièce.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
     "fish_escaped": "Il s'est échappé.",
-    "stump_hint": "Rien à couper: la souche repartira.",
+    "stump_hint": "Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place.",
     "tree_too_young": "Trop jeune pour la hache. Laisse-le grandir.",
     "handcar_needs_both": "La draisine ne bouge pas d'un pouce. Appelle {partner}: elle se pousse à deux.",
     "handcar_pushed": "La draisine a roulé jusqu'au bout ! Basile vous attend devant la remise.",
@@ -137,7 +137,7 @@
   },
   "orderGreetings": {
     "all": [
-      "Merci pour le train de samedi !",
+      "Le train de ce samedi est bien arrivé en ville.",
       "Bonjour à la Halte d'Aubrune !",
       "Les étals de la ville se vident vite, et c'est un peu grâce à vous.",
       "Le chef de train dit que votre caisse est la mieux rangée de la ligne.",
@@ -145,7 +145,7 @@
       "Une nouvelle semaine commence à la coopérative."
     ],
     "spring": ["Bon printemps à la Halte !"],
-    "summer": ["Bel été à la Halte !", "Les jours rallongent, et nos listes aussi."],
+    "summer": ["Bel été à la Halte !", "Les journées sont longues, et nos listes aussi."],
     "autumn": ["Bel automne à la Halte !"],
     "winter": []
   },
@@ -158,7 +158,7 @@
     "wild_garlic": "L'ail des ours pousse à l'ombre, au pied des chênes de la lisière.",
     "chanterelle": "Les girolles sortent au lendemain des pluies, sous les arbres de la lisière.",
     "blackberry": "Les mûres mûrissent au roncier de la lisière: attention aux griffes.",
-    "hazelnut": "Les noisettes tombent sous le noisetier, au bord du bois.",
+    "hazelnut": "Les noisettes tombent sous les noisetiers, au bord du bois.",
     "dandelion": "Les pissenlits poussent au bord du bois, du côté du soleil.",
     "egg": "Pensez à remplir la mangeoire: une poule nourrie pond chaque jour.",
     "omelette": "Trois œufs font deux omelettes, au réchaud de la maisonnette.",
@@ -177,7 +177,7 @@
     "summer_end": {
       "title": "Six semaines à la Halte d'Aubrune",
       "subtitle": "Du premier train au premier matin d'automne.",
-      "text": "L'automne arrive à la Halte, et sa suite est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici.",
+      "text": "L'automne arrive à la Halte, et la suite de votre histoire est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici.",
       "next": "« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.",
       "highlight": "Six semaines à la Halte"
     }
@@ -186,7 +186,7 @@
     "summer": {
       "title": "Premier jour de l'été",
       "lines": [
-        "Les jours rallongent: il fait clair jusqu'à 21 h 30.",
+        "Les journées sont longues: il fait clair jusqu'à 21 h 30.",
         "À la lisière: des mûres au roncier, des girolles après la pluie.",
         "Le soir, les gens du bourg restent dehors un peu plus tard."
       ]
@@ -196,7 +196,7 @@
       "lines": [
         "Le soir tombe plus tôt, vers 19 h 30.",
         "À la lisière: des noisettes, et toujours des girolles après la pluie.",
-        "À la rivière, les truites reviennent."
+        "À la rivière, les truites reviennent en nombre."
       ]
     },
     "winter": {
@@ -222,7 +222,7 @@
     "notebookTabs": { "quests": "Quêtes", "mail": "Courrier", "bag": "Sac", "memories": "Souvenirs" },
     "secretCard": "Rien que pour toi",
     "momentHint": "Aujourd'hui",
-    "questKinds": { "main": "Deux semaines à la Halte", "side": "Coups de main" },
+    "questKinds": { "main": "À la Halte", "side": "Coups de main" },
     "questDone": "Terminée",
     "hud": {
       "purse": "{amount} sous",
@@ -299,9 +299,9 @@
     "partnerFinish": "{partner} veut finir la séance."
   },
   "endScreen": {
-    "title": "Fin de la démo",
-    "subtitle": "Deux semaines à la Halte d'Aubrune.",
-    "text": "La suite de la ligne monte vers les Vergers. Elle arrive bientôt.",
+    "title": "Le train est reparti",
+    "subtitle": "Une étape à la Halte d'Aubrune.",
+    "text": "Votre partie s'arrête ici. Rien n'est perdu: elle reprendra à cet endroit.",
     "stats": {
       "days": "Journées vécues: {days}",
       "order": "Commandes: {linesDone} lignes sur {linesTotal}",

@@ -115,7 +115,7 @@
       "steps": [
         {
           "id": "fill_crate",
-          "objective": "Déposer dans la caisse du quai avant samedi 16 h: {order}.",
+          "objective": "Déposer dans la caisse du quai avant samedi 8 à 16 h: {order}.",
           "conditions": [{ "type": "order_complete", "day": 8 }],
           "resolve": "at_deadline",
           "deadline": { "day": 8, "time": "16:00" },

@@ -24,7 +24,7 @@
     { "id": "hint_handcar_push", "text": "Réparée, la draisine se pousse à deux: un de chaque côté, maintenez {act} ensemble et avancez.", "trigger": { "on": "near_point", "point": "handcar_shed" }, "tier": "P0" },
     { "id": "hint_order2", "text": "Nouvelle commande au tableau. Les carottes poussent en quatre jours: sème-les tôt.", "trigger": { "on": "quest_started", "quest": "second_order" }, "tier": "P0" },
     { "id": "hint_omelette", "text": "Au réchaud de la maison, trois œufs font deux omelettes.", "trigger": { "on": "quest_started", "quest": "basile_omelette" }, "tier": "P0" },
-    { "id": "forage_hint", "text": "À la lisière, quelque chose se cueille: approche-toi et fais Agir.", "trigger": { "on": "near_forage" }, "tier": "P0" },
-    { "id": "sapling_hint", "text": "Un rejet: dans quelques jours, ce sera de nouveau un arbre.", "trigger": { "on": "aim_sapling" }, "tier": "P0" }
+    { "id": "forage_hint", "text": "Quelque chose se cueille à la lisière: approche-toi, puis {act} ou un clic pour le ramasser.", "trigger": { "on": "near_forage" }, "tier": "P0" },
+    { "id": "sapling_hint", "text": "Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir.", "trigger": { "on": "aim_sapling" }, "tier": "P0" }
   ]
 }
