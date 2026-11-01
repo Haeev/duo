@@ -58,3 +58,14 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Sauvegarde de test en milieu de journée: partir d'un état de robot, déplacer les joueurs par `placeCharacter`, avancer `clock.minutes` pour laisser au moins 30 s réelles avant l'instant à capturer (le chargement à deux en prend 10 à 20).
 - Dans le faux hôte, la touche envoyée par `frame.locator('body').press` n'atteint pas toujours l'invité; dans Duo (Electron), `page.keyboard.press` sur la vue du jeu marche chez les deux.
 - Les places et les habitants ne se repoussent pas entre eux (règle du jeu depuis le tour 6): un contact joueur-Basile près de l'échelle n'est pas un bug du tour.
+
+## Robot longue vie et Duo à deux instances (vérifié le 2026-11-01, tour 8)
+
+- Une commande lancée en tâche de fond sans `timeout` est tuée au bout de 30 minutes: toujours fixer `timeout` (jusqu'à 7 200 000 ms) pour les suites de robots.
+- Machine partagée (charge 25 sur 4 cœurs): le temps réel d'une partie de robot ne veut rien dire; relever `process.cpuUsage()` dans la partie (une partie par fichier, un processus par fichier avec le pool `forks`). Repère: 2,2 s de processeur par journée de jeu, 3,9 s au rythme de 0,8 s par minute.
+- Rapport agrégé de plusieurs fichiers de test Vitest: chaque test écrit son relevé JSON, puis `globalSetup` (fonctions `setup` et `teardown`) assemble le rapport à la fin.
+- Lever la limite du jour 43 sans toucher au code: `structuredClone(contentAndMap().content)`, puis `settings.clock.lastDay`; `restoreWorld(sim.content, ...)` garde ce contenu aux reprises. Au jour `lastDay` sans étape, l'horloge s'arrête (`stoppedBy: 'ended'`) mais la phase reste `day`.
+- Sauvegarde de La Petite Ligne posée dans Duo: `sauvegardes-locales/la-petite-ligne/1/<sha256>.json` (octets UTF-8 de `JSON.stringify(world)`) et `head.json` (schema 1, revision, sha256, label, progress, dataSchema, gameVersion, size, writtenAt, previous). L'invitée n'appuie pas sur « Prête »: le décompte part dès l'hôte (son bouton est masqué par le voile du décompte).
+- L'interface du jeu écrit l'apostrophe typographique (’): les attentes de texte des tests de bout en bout doivent l'employer.
+- Contrôle I-08 (variables non remplies): les astuces gardent les jetons de touches et de `contentVars` (`{bigPurchase}`...), les répliques `{partner}`, `{henColorN}`, `{secret}`, remplis par l'interface; lettres, titres de quête et écrans arrivent déjà remplis.
+- Robot glouton: sac plein, il rachète un matelas chaque fois que le précédent tombe au sol (il ne compte que sac et coffre): ne pas lire sa taille d'état comme celle d'un vrai duo.
