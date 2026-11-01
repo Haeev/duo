@@ -114,7 +114,7 @@ describe("écran d'étape du jour 15 chez les deux joueurs", () => {
       'Choisis sur ton ordinateur, Sacha sur le sien : rien ne se passe tant que vos deux choix diffèrent.',
     );
     expect(plain(p1.countersLabel)).toBe(
-      'Journées vécues : 15. Commandes : 9 lignes sur 9. Meubles posés : 3',
+      'Journées vécues : 15. Commandes : 9 lignes sur 9. Meubles posés : 3. Chantiers bâtis : 0',
     );
   });
 

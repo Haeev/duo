@@ -40,6 +40,12 @@ export interface ProductModel {
   big: boolean;
   missing: number;
   available: boolean;
+  /** Rayon du catalogue de la semaine (tour 9). */
+  shelf: 'tools' | 'hens' | 'house' | 'gifts';
+  /** Exemplaires en vente en tout, encore à acheter, et commandés pour le prochain train. */
+  copies: number;
+  left: number;
+  ordered: number;
 }
 
 export function catalogueOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
@@ -56,37 +62,6 @@ export function catalogueDelivered(world: ReadonlyWorld, ctx: UiContext): boolea
 
 function effectOf(ctx: UiContext, def: ItemDef): string {
   return ctx.t(ctx.texts.extra.catalogue.effects[def.id] ?? '');
-}
-
-export function catalogueProducts(world: ReadonlyWorld, ctx: UiContext): ProductModel[] {
-  const open = catalogueOpen(world, ctx);
-  const delivered = catalogueDelivered(world, ctx);
-  const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
-  return Object.values(ctx.content.items)
-    .filter((def) => def.shop === 'catalogue' && def.buyPrice !== null && onSale(def, world.clock.day))
-    .map((def) => {
-      const price = def.buyPrice ?? 0;
-      const ordered = world.catalogueOrders.includes(def.id);
-      const proposal = world.proposals.find((p) => p.purchase.source === 'catalogue' && p.purchase.item === def.id);
-      let state: ProductState;
-      if (ordered) state = 'ordered';
-      else if (delivered && countIn(world.cellar, def.id) > 0) state = 'delivered';
-      else if (proposal !== undefined) state = proposal.by === ctx.me ? 'waiting' : 'partner_waiting';
-      else if (!open) state = 'closed';
-      else if (price > world.purse) state = 'too_expensive';
-      else state = 'orderable';
-      return {
-        item: def.id,
-        icon: itemIcon(ctx, def.id),
-        name: itemTitle(def, 1, def.id),
-        effect: effectOf(ctx, def),
-        price,
-        state,
-        big: price >= threshold,
-        missing: Math.max(0, price - world.purse),
-        available: state === 'orderable',
-      };
-    });
 }
 
 // ---------------------------------------------------------------------------
@@ -420,7 +395,7 @@ export function proposalModels(world: ReadonlyWorld, ctx: UiContext): ProposalMo
     id: p.id,
     mine: p.by === ctx.me,
     item: p.purchase.item,
-    icon: itemIcon(ctx, p.purchase.item),
+    icon: p.purchase.source === 'improvement' ? 'ui-hammer' : itemIcon(ctx, p.purchase.item),
     itemText: p.purchase.source === 'improvement' ? (rawText(ctx.content.texts, 'chantiers', p.purchase.item, 'name') ?? p.purchase.item) : indefiniteItem(ctx, p.purchase.item),
     price: p.price,
     source: p.purchase.source,

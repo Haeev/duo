@@ -39,6 +39,8 @@ export interface StageModel {
   linesDone: number;
   linesTotal: number;
   furniture: number;
+  /** Chantiers bâtis (tour 9, quatrième compteur, à toutes les étapes). */
+  chantiers: number;
   /** « samedi 8 : 4 sur 4 · samedi 15 : 5 sur 5 », ou le nombre de commandes si l'historique est borné. */
   detail: string;
   /** Nom accessible des compteurs (récapitulatif de `textes.json`). */
@@ -163,11 +165,14 @@ export function stageModel(world: ReadonlyWorld, ctx: UiContext): StageModel | n
     linesDone: screen.linesDone,
     linesTotal: screen.linesTotal,
     furniture,
+    chantiers: screen.chantiers,
     detail: stageOrdersDetail(ctx, world.orderHistory, screen.orders),
     countersLabel: [
       ctx.t(game.stats.days, vars),
       ctx.t(game.stats.order, vars),
       ctx.t(game.stats.furniture, vars),
+      // Même forme que les trois autres (« Meubles posés : 3 »), juste au singulier comme au pluriel.
+      ctx.t(e.chantiersStat, { n: screen.chantiers }),
     ].join('. '),
     self: player(ctx, characterOf(world, ctx.me)?.name ?? '', meChoice),
     other: player(ctx, partner, otherChoice),

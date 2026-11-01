@@ -173,6 +173,15 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   crystal_radio: 'crystal-radio',
   wood_stove: 'wood-stove',
   picture_frame: 'picture-frame',
+  // Tour 9: les outils améliorés gardent le dessin de leur verbe, les poules commandées celui de la poule.
+  watering_can_copper: 'watering-can',
+  axe_forged: 'axe',
+  fishing_rod_bamboo: 'fishing-rod',
+  hen_extra: 'hen',
+  hen_extra_2: 'hen',
+  wicker_armchair: 'chair',
+  pressed_flowers: 'picture-frame',
+  jeanne_drawing: 'picture-frame',
 };
 
 /** Icône de secours par catégorie (objet sans dessin propre). */
@@ -189,6 +198,8 @@ export const CATEGORY_ICONS: Readonly<Record<string, string>> = {
   fish: 'fish',
   decoration: 'flower-pot',
   furniture: 'parcel',
+  gift: 'gift',
+  animal_order: 'hen',
 };
 
 /** Expression du portrait pour chaque niveau de forme (`ui-maquettes`: low, ok, good, great, radiant). */

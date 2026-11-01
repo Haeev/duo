@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   bagFull,
   catalogueOpen,
-  catalogueProducts,
   foodEntries,
   grocerBudget,
   grocerPrice,
@@ -15,6 +14,7 @@ import {
   shopSellEntries,
   stackEntries,
 } from '../modele-panneaux';
+import { catalogueProducts } from '../modele-tableau';
 import { character, started, uiContext } from './aides';
 
 const plain = (s: string): string => s.replace(/[\u00a0\u202f]/g, ' ');

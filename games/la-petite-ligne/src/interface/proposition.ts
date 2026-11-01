@@ -96,7 +96,12 @@ export class ProposalCards {
       el('p', {
         class: 'lpl-proposal__text',
         id: textId,
-        text: ctx.t(mine ? p.sent : p.received, { partner: partnerName, item: model.itemText, price: model.price }),
+        // Un versement à un chantier (tour 9) se dit « verser », pas « acheter ».
+        text: ctx.t(model.source === 'improvement' ? (mine ? p.sentImprovement : p.receivedImprovement) : mine ? p.sent : p.received, {
+          partner: partnerName,
+          item: model.itemText,
+          price: model.price,
+        }),
       }),
     ]);
 
@@ -104,7 +109,7 @@ export class ProposalCards {
       // La proposition vient d'être tranchée: tampon, ou repli.
       if (ending.kind === 'accepted') {
         const buyer = model.mine ? meName : model.byName;
-        const note = model.source === 'catalogue' ? p.acceptedCatalogue : p.acceptedGrocery;
+        const note = model.source === 'improvement' ? p.acceptedImprovement : model.source === 'catalogue' ? p.acceptedCatalogue : p.acceptedGrocery;
         card.append(
           el('p', { class: 'lpl-proposal__note', text: ctx.t(note, { item: model.itemText, buyer, price: model.price }) }),
           el('span', { class: 'lpl-stamp lpl-stamp--green lpl-stamp--large', text: ctx.t(g.accept) }),
