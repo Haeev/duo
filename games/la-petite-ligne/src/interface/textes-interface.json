@@ -454,7 +454,8 @@
       "dig": "Bêcher ici",
       "sit": "S'asseoir",
       "hold": "Tenir l'échelle",
-      "call": "Appeler la poule"
+      "call": "Appeler la poule",
+      "light": "Allumer la lanterne"
     }
   },
   "corner": {

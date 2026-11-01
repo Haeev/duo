@@ -167,6 +167,7 @@ describe('invite du survol', () => {
       sit: true,
       hold: true,
       call: true,
+      light: true,
     };
     const verbs = uiContext().texts.extra.aim.verbs;
     for (const verb of Object.keys(all)) {
