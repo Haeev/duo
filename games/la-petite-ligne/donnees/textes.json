@@ -278,7 +278,7 @@
     "fresh": "Nouveau souvenir",
     "secrets": {
       "hen_names": {
-        "vignette": "Trois poules qui accourent : la rousse, la blanche et la noire.",
+        "vignette": "Trois poules qui accourent: la rousse, la blanche et la noire.",
         "informed": "Odette te les avait confiés; {partner} les a appelées.",
         "doer": "{partner} te les a soufflés; tu les as appelées."
       },
