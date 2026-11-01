@@ -20,6 +20,8 @@ import { settleSavedClimax } from '../simulation/moments';
 import { memoriesFromSave } from '../simulation/souvenirs';
 import { drawNextOrder, emptyOrderBook } from '../simulation/semaine';
 import { startQuest } from '../simulation/quetes';
+import { emptyBoard } from '../simulation/annonces';
+import { emptyImprovements } from '../simulation/chantiers';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -119,13 +121,60 @@ function checkWorld(data: unknown): WorldState {
   }
   checkMemories(data.memories);
   checkWeekly(data);
+  checkTour9(data);
   return data as unknown as WorldState;
+}
+
+/** Champs du tour 9 (format 6): tableau des annonces, chantiers, catalogue de la semaine. */
+function checkTour9(data: Record<string, unknown>): void {
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const who = (v: unknown): boolean => v === null || v === 'p1' || v === 'p2';
+  const annonce = (a: unknown): boolean =>
+    a === null ||
+    (isRecord(a) &&
+      typeof a.gabarit === 'string' &&
+      num(a.variant) &&
+      typeof a.quest === 'string' &&
+      num(a.posted) &&
+      isRecord(a.deadline) &&
+      num(a.deadline.day) &&
+      num(a.deadline.time) &&
+      num(a.reward) &&
+      (a.state === 'open' || a.state === 'done' || a.state === 'expired') &&
+      who(a.by) &&
+      (a.closedDay === null || num(a.closedDay)));
+  const board = data.board;
+  const okBoard =
+    isRecord(board) &&
+    annonce(board.current) &&
+    annonce(board.previous) &&
+    Array.isArray(board.recent) &&
+    board.recent.every((r) => isRecord(r) && typeof r.gabarit === 'string' && num(r.day)) &&
+    Array.isArray(board.posted) &&
+    board.posted.every((p) => typeof p === 'string') &&
+    Array.isArray(board.uniquesGiven) &&
+    board.uniquesGiven.every((p) => typeof p === 'string');
+  if (!okBoard) throw new SaveError('sauvegarde: tableau des annonces invalide');
+  const improvements = data.improvements;
+  const okImprovements =
+    isRecord(improvements) &&
+    Object.values(improvements).every(
+      (x) => isRecord(x) && num(x.paid) && num(x.planks) && typeof x.funded === 'boolean' && (x.builtDay === null || num(x.builtDay)),
+    );
+  if (!okImprovements) throw new SaveError('sauvegarde: chantiers invalides');
+  const counts = (r: unknown): boolean => isRecord(r) && Object.values(r).every(num);
+  if (!counts(data.catalogueBought) || !counts(data.giftsGiven)) throw new SaveError('sauvegarde: catalogue de la semaine invalide');
+  const old = data.heardOld;
+  const bits = (v: unknown): boolean => typeof v === 'string' && /^[A-Za-z0-9_-]*$/.test(v);
+  if (old !== undefined && !(isRecord(old) && typeof old.key === 'string' && bits(old.p1) && bits(old.p2))) throw new SaveError('sauvegarde: mémoire des répliques invalide');
+  const by = data.catalogueOrderBy;
+  if (!Array.isArray(by) || !by.every((b) => b === 'p1' || b === 'p2')) throw new SaveError('sauvegarde: acheteurs du catalogue invalides');
 }
 
 /** Champs du format 5 (tour 8): étapes, commande générée, totaux, journal de la météo. */
 function checkWeekly(data: Record<string, unknown>): void {
   const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
-  const stageId = (v: unknown): boolean => v === 'demo' || v === 'summer_end';
+  const stageId = (v: unknown): boolean => v === 'demo' || v === 'summer_end' || v === 'autumn_end';
   const choice = (v: unknown): boolean => v === null || v === 'stay' || v === 'finish';
   const stages = data.stages;
   const okStages =
@@ -340,7 +389,40 @@ function migrate(data: unknown, dataSchema: number, content: Content): unknown {
   if (dataSchema < 3 && isRecord(data)) migrateToMoments(data, content);
   if (dataSchema < 4 && isRecord(data)) data.memories = memoriesFromSave(data, content, dataSchema);
   if (dataSchema < 5 && isRecord(data)) migrateToStages(data, content);
+  if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
   return data;
+}
+
+/** Objets du catalogue que le duo a déjà (sacs, coffre, posés, en route): achetés une fois. */
+function ownedCatalogueItems(world: Record<string, unknown>, content: Content): Record<string, number> {
+  const seen = new Set<string>();
+  const add = (item: unknown): void => {
+    if (typeof item === 'string' && content.items[item]?.shop === 'catalogue') seen.add(item);
+  };
+  const stacks = (list: unknown): void => {
+    if (Array.isArray(list)) for (const s of list) if (isRecord(s)) add(s.item);
+  };
+  stacks(world.cellar);
+  if (Array.isArray(world.furniture)) for (const f of world.furniture) if (isRecord(f)) add(f.item);
+  if (Array.isArray(world.characters)) for (const c of world.characters) if (isRecord(c)) stacks(c.bag);
+  if (Array.isArray(world.catalogueOrders)) for (const i of world.catalogueOrders) add(i);
+  if (Array.isArray(world.heavyDeliveries)) for (const i of world.heavyDeliveries) add(i);
+  return Object.fromEntries([...seen].sort().map((i) => [i, 1]));
+}
+
+/**
+ * Format 6 (tour 9): tableau vide (il s'ouvre à l'aube suivante si le jour est au moins 16, avec la
+ * lettre `firmin_board`, rattrapée par le courrier), chantiers à zéro, articles du catalogue déjà
+ * achetés reconstruits d'après ce que le duo possède. Une partie arrêtée sur l'écran du jour 43 se
+ * charge sur ce même écran, qui propose maintenant « Rester ». Aucune autre donnée ne change.
+ */
+function migrateToTour9(world: Record<string, unknown>, content: Content): void {
+  world.board = emptyBoard();
+  world.improvements = emptyImprovements({ content });
+  world.catalogueBought = ownedCatalogueItems(world, content);
+  world.giftsGiven = {};
+  const orders = Array.isArray(world.catalogueOrders) ? world.catalogueOrders : [];
+  world.catalogueOrderBy = orders.map(() => 'p1');
 }
 
 /**
@@ -431,6 +513,10 @@ function resume(
   // Champ facultatif (mémoire des répliques entendues), absent des sauvegardes plus anciennes.
   const heard = (world as Partial<WorldState>).heard;
   world.heard = { p1: heard?.p1 ?? {}, p2: heard?.p2 ?? {} };
+  // Tour 9: les gains du jour au lieu de la copie de l'aube (même lecture des conditions « depuis ce matin »).
+  fillCountersToday(world);
+  // Tour 9: l'ensemble des vieilles répliques; une sauvegarde d'avant n'en a pas (ses rangs y passent à l'aube).
+  world.heardOld = (world as Partial<WorldState>).heardOld ?? { key: '', p1: '', p2: '' };
   // Gestes à deux (tour 4): colis en attente et charge décrite, absents des sauvegardes plus anciennes.
   world.heavyDeliveries = (world as Partial<WorldState>).heavyDeliveries ?? [];
   world.handcarAt = (world as Partial<WorldState>).handcarAt ?? null;
@@ -491,6 +577,25 @@ function resume(
  * du jour 16 (`trees.catchUpDays`, comme un arbre abattu tôt); abattu après, il redevient une
  * souche d'aujourd'hui (son jour est perdu).
  */
+/** `countersToday` d'une sauvegarde qui n'a que `countersAtDawn`: la différence, clé par clé. */
+function fillCountersToday(world: WorldState): void {
+  const raw = world as Partial<WorldState> & { countersAtDawn?: Record<string, Record<string, number> | undefined> };
+  const dawn = raw.countersAtDawn;
+  if (raw.countersToday === undefined) {
+    const today: WorldState['countersToday'] = { duo: {}, p1: {}, p2: {} };
+    for (const scope of ['duo', 'p1', 'p2'] as const) {
+      const before = dawn?.[scope];
+      if (before === undefined) continue;
+      for (const [key, value] of Object.entries(world.counters[scope])) {
+        const gained = value - (before[key] ?? 0);
+        if (gained > 0) today[scope][key] = gained;
+      }
+    }
+    world.countersToday = today;
+  }
+  delete raw.countersAtDawn;
+}
+
 function fillRegrowth(content: Content, world: WorldState): void {
   const trees = content.settings.trees;
   const day = world.clock.day;

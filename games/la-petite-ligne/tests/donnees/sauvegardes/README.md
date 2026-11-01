@@ -23,6 +23,12 @@ Règles:
 | `format-5-milieu-semaine-2.json` | 5 | mardi, jour 11, midi (tour 8) | 7 | `generer.ts` (tour 8) |
 | `format-5-fin-de-la-demo.json` | 5 | jour 15 à 16 h, écran d'étape « Deux semaines », commande 3 tirée pour le samedi 22 | 42 | `generer.ts` (tour 8) |
 | `format-5-ete-jour-25.json` | 5 | restés à la Halte, mardi 25 à midi, été, commande générée du samedi 29 en cours | 7 | `generer.ts` (tour 8) |
+| `format-5-fin-ete-jour-43.json` | 5 | écran d'étape du samedi 43, « Six semaines », sans « Rester » dans cette version (T9-17) | 7 | `generer.ts` du format 5 (avant le tour 9) |
+| `format-6-fin-semaine-1.json` | 6 | jour 8 à 16 h, commande 1 payée (tour 9) | 42 | `generer.ts` (tour 9) |
+| `format-6-milieu-semaine-2.json` | 6 | mardi, jour 11, midi (tour 9) | 7 | `generer.ts` (tour 9) |
+| `format-6-fin-de-la-demo.json` | 6 | jour 15 à 16 h, écran d'étape « Deux semaines » (tour 9) | 42 | `generer.ts` (tour 9) |
+| `format-6-ete-jour-25.json` | 6 | mardi 25 à midi, tableau des annonces, achats et chantiers du robot (tour 9) | 7 | `generer.ts` (tour 9) |
+| `format-6-automne-jour-62.json` | 6 | jeudi 62 à midi, automne, commande du samedi 64 en cours (T9-16) | 7 | `generer.ts` (tour 9) |
 
 ## Format en cours
 

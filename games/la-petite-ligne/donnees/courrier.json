@@ -64,6 +64,20 @@
       "text": "Passez voir la lisière: les souches de chêne repartent, et je replanterai les sapins. Le bois ne manquera pas. B."
     },
     {
+      "id": "firmin_board",
+      "from": "firmin",
+      "title": "Le tableau des annonces",
+      "delivery": { "day": 16, "time": "06:00" },
+      "text": "Les gens du bourg ont toujours un service à demander, et maintenant ils savent à qui. J'épinglerai leurs annonces au tableau du quai, le dimanche et le mercredi matin. Le bourg a aussi ses projets: un banc au gué, des fleurs sur le quai. J'en tiendrai les comptes au même tableau, et Basile se met au travail dès que la somme est là. Rien n'oblige, tout fait plaisir. F."
+    },
+    {
+      "id": "basile_works",
+      "from": "basile",
+      "title": "Basile prend des commandes",
+      "delivery": { "day": 22, "time": "06:00" },
+      "text": "Maintenant que la lisière repousse, j'ai du bois pour vous. Un banc contre votre pignon, un auvent sur votre porte. Passez à l'établi. Si vous m'apportez des planches, ce sera moins cher. B."
+    },
+    {
       "id": "jeanne_key_note",
       "from": "jeanne",
       "title": "Un mot de Jeanne",
@@ -93,14 +107,14 @@
     {
       "id": "coop_order_generated",
       "from": "coop",
-      "title": "La commande du samedi {day}",
+      "title": "Commande pour samedi {day}",
       "delivery": { "instance": "train", "time": "18:00" },
       "text": "{greeting} La coopérative passe commande pour samedi {day}, à déposer dans la caisse du quai avant 16 h: {order}. {tip}"
     },
     {
       "id": "coop_recap_generated",
       "from": "coop",
-      "title": "La commande du samedi {day} est partie",
+      "title": "Bilan du samedi {day}",
       "delivery": { "byEffect": true, "instance": "train" },
       "variantsNoRepeat": true,
       "variants": [
@@ -120,6 +134,7 @@
   "senders": [
     { "id": "coop", "label": "La coopérative de la ligne" },
     { "id": "basile", "label": "Basile" },
-    { "id": "jeanne", "label": "Jeanne" }
+    { "id": "jeanne", "label": "Jeanne" },
+    { "id": "firmin", "label": "Firmin, chef de halte" }
   ]
 }

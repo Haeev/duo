@@ -20,6 +20,8 @@ import { ITEM, SPAWN_POINTS } from './ids';
 import { emptyMemories } from './souvenirs';
 import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
+import { emptyBoard } from './annonces';
+import { emptyImprovements } from './chantiers';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
 export interface PlayerInfo {
@@ -193,6 +195,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     cellar: [],
     crate: [],
     catalogueOrders: [],
+    catalogueOrderBy: [],
     heavyDeliveries: [],
     handcarAt: null,
     grocerSoldToday: 0,
@@ -207,10 +210,11 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     dialoguesDone: [],
     scene: null,
     counters: emptyCounters(),
-    countersAtDawn: emptyCounters(),
+    countersToday: emptyCounters(),
     scripts: [],
     nextId,
     heard: { p1: {}, p2: {} },
+    heardOld: { key: '', p1: '', p2: '' },
     orderIndex: 0,
     orderResult: null,
     orderHistory: [],
@@ -224,6 +228,10 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     secrets: { turn: s.secrets.firstInformed, entries: [] },
     memories: emptyMemories(),
     sharedEnvieRecent: [],
+    board: emptyBoard(),
+    improvements: emptyImprovements({ content }),
+    catalogueBought: {},
+    giftsGiven: {},
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

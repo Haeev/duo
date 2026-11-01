@@ -210,3 +210,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Robot: compter un meuble ou un matelas partout (sacs des deux, coffre, sol, posé), sinon il rachète en boucle ce qui est tombé d'un sac plein; mais ne fabriquer qu'avec ce qui est sous la main (son sac, le coffre), sinon il boucle à l'établi.
 - Les sorties de `pnpm test:longue-vie` (`test-results/`) ne sont pas versionnées; tailles par profil dans le tableau « Taille de l'état (L-03) ».
 - Un `pnpm test` lancé avant d'ajouter un fichier de test ne l'inclut pas: relancer à la fin.
+
+## Tour 9: annonces, chantiers, catalogue (La Petite Ligne, vérifié le 2026-11-01)
+
+- Outil isolé: un heredoc qui écrit dans `/tmp` est refusé, mais `python3 - <<'EOF'` qui ouvre des fichiers relatifs du jeu passe; pour un gros script, l'écrire avec Write dans le scratchpad et le lancer avec la racine en argument. Le petit module `r.py` du scratchpad (`F(chemin).sub(ancien, nouveau)` puis `done()`, tout ou rien) évite les éditions à moitié faites.
+- Une quête synthétisée par le code (annonces, cadeaux) se déclare dans `loadContent` après `parseQuests` (`content.quests.push`): carnet, liste à cocher, choix « Donner » et compteurs `given` marchent sans rien d'autre. `completionText` vide: pas de notification de fin (`quetes.ts`).
+- Avancer un monde de référence à la main (jour 25 vers 45) déclenche l'échéance de la commande en cours (`pay_order`) et l'étape `summer_end` au premier pas: dans les tests, poser `stages.passed` et déplacer `order.generated.train` et la quête `weekly_order` vers le samedi suivant.
+- Le robot qui attend le train au quai (`lastDay`) passe avant `watchMoment`: un moment du samedi (le salut) doit s'y insérer explicitement.
+- `catalogueWindow` d'un samedi après la démo donne une échéance la veille: le catalogue est fermé tout le samedi; une page parue le samedi à 10 h se commande dès le dimanche.
+- Les champs facultatifs nouveaux de l'état (`train.slow`, `today.presses`) ne s'écrivent que s'ils servent (`delete` sinon): l'état des parties sans eux reste identique.

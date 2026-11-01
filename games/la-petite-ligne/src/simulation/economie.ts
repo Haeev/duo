@@ -11,6 +11,9 @@ import { orderSatisfied } from './conditions';
 import { type Sim, character, distance, emit, itemName, itemWithArticle, newId, notifyKey, partnerOf, point, say } from './contexte';
 import { queueHint } from './astuces';
 import { addStack, countInBag, countInStacks, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
+import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
+import { deliverWeeklyItem } from './catalogue';
+import { creditImprovement, improvementName } from './chantiers';
 
 /** Un habitant tient la boutique (activité `serve` au comptoir). */
 export function shopOpen(sim: Sim): boolean {
@@ -48,8 +51,17 @@ function purchasePrice(sim: Sim, request: PurchaseRequest): number {
 }
 
 function deliver(sim: Sim, c: Character, request: PurchaseRequest, price: number): void {
+  if (request.source === 'improvement') {
+    creditImprovement(sim, c, request.item, price);
+    return;
+  }
   if (request.source === 'catalogue') {
-    for (let i = 0; i < request.count; i++) sim.world.catalogueOrders.push(request.item);
+    for (let i = 0; i < request.count; i++) {
+      sim.world.catalogueOrders.push(request.item);
+      sim.world.catalogueOrderBy.push(c.id);
+    }
+    // Exemplaires achetés (tour 9): le catalogue de la semaine n'en vend jamais plus que prévu.
+    sim.world.catalogueBought[request.item] = (sim.world.catalogueBought[request.item] ?? 0) + request.count;
     say(sim, c.id, 'catalogue_ordered');
   } else {
     giveToCharacter(sim, c, request.item, 'ordinary', request.count);
@@ -63,6 +75,10 @@ export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void
   if (def === undefined) return;
   if (def.buyPrice === null || def.shop !== request.source || request.count < 1) return;
   if (!onSale(def, sim.world.clock.day)) return;
+  // Catalogue de la semaine (tour 9): l'article est paru (page, souhait entendu) et il en reste.
+  if (request.source === 'catalogue' && !onWeeklyCatalogue(sim.content.settings, sim.content, sim.world, request.item)) return;
+  const cat = sim.content.catalogue;
+  if (request.source === 'catalogue' && cat !== null && request.item in cat.copies && copiesLeft(cat, sim.world, request.item) < request.count) return;
   if (request.source === 'grocery' && (!canShop(sim, c) || !shopOpen(sim))) return;
   if (request.source === 'catalogue') {
     if (!canUseCatalogue(sim, c)) return;
@@ -91,7 +107,7 @@ function propose(sim: Sim, c: Character, request: PurchaseRequest, price: number
   sim.world.purse -= price;
   sim.world.proposals.push({ id, by: c.id, purchase: request, price });
   const other = partnerOf(c.id);
-  const item = itemWithArticle(sim, request.item, request.count);
+  const item = request.source === 'improvement' ? improvementName(sim, request.item) : itemWithArticle(sim, request.item, request.count);
   notifyKey(sim, other, 'proposal', 'big_purchase_proposal', { partner: c.name, item, price }, { proposal: id });
   emit(sim, { type: 'proposal', by: c.id, proposal: id });
 }
@@ -115,7 +131,8 @@ export function answerProposal(sim: Sim, c: Character, id: string, accept: boole
   const buyer = character(sim, proposal.by);
   if (accept) {
     deliver(sim, buyer, proposal.purchase, proposal.price);
-    say(sim, 'both', 'big_purchase_accepted', { item: itemWithArticle(sim, proposal.purchase.item, proposal.purchase.count) });
+    const item = proposal.purchase.source === 'improvement' ? improvementName(sim, proposal.purchase.item) : itemWithArticle(sim, proposal.purchase.item, proposal.purchase.count);
+    say(sim, 'both', 'big_purchase_accepted', { item });
   } else {
     sim.world.purse += proposal.price;
     say(sim, 'both', 'big_purchase_declined');
@@ -279,11 +296,13 @@ export function reopenCrate(sim: Sim): void {
 /** Les colis du catalogue arrivent par le train, dans le cellier (EC-03). */
 export function deliverCatalogue(sim: Sim): void {
   // Un objet lourd arrive en colis sur le quai, à porter à deux (`portages.ts`); le reste au cellier.
-  for (const item of sim.world.catalogueOrders) {
+  sim.world.catalogueOrders.forEach((item, i) => {
+    if (deliverWeeklyItem(sim, item, sim.world.catalogueOrderBy[i] ?? null)) return;
     if (sim.content.items[item]?.carriedByTwo === true && sim.content.settings.carry.parcel !== null) sim.world.heavyDeliveries.push(item);
     else addStack(sim.world.cellar, item, 'ordinary', 1);
-  }
+  });
   sim.world.catalogueOrders = [];
+  sim.world.catalogueOrderBy = [];
 }
 
 export function crateReachable(sim: Sim, c: Character): boolean {

@@ -41,6 +41,7 @@ function matches(trigger: HintTrigger, signal: HintSignal): boolean {
     case 'letter_received':
     case 'near_forage':
     case 'aim_sapling':
+    case 'near_board_annonce':
       return true;
   }
 }

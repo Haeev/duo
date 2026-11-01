@@ -205,36 +205,23 @@ describe("écran d'étape du jour 15 chez les deux joueurs", () => {
   });
 });
 
-describe("écran d'étape du jour 43 (dernière étape de cette version)", () => {
-  it('sans « Rester », avec le texte de la suite, chez les deux; « Rester » refusé par la simulation', () => {
+describe("écran d'étape du jour 43 (tour 9: « Rester » pour l'automne)", () => {
+  it('« Rester » chez les deux, avec le texte réécrit de l’automne; le choix s’enregistre', () => {
     const sim = day43();
     const { p1, p2 } = both(sim);
     for (const m of [p1, p2]) {
       expect(m.stage).toBe('summer_end');
       expect(plain(m.ticket)).toBe('Samedi 43, 16 h · le train est reparti');
       expect(plain(m.title)).toBe("Six semaines à la Halte d'Aubrune");
-      expect(m.canStay).toBe(false);
-      expect(plain(m.next ?? '')).toBe(
-        '« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.',
-      );
-      expect(plain(m.after)).toBe(
-        "Ensuite : l'écran de fin de Duo, et la séance dans votre historique.",
-      );
-      expect(plain(m.message.text)).toBe(
-        'Quand vous aurez choisi « Finir la séance » sur les deux ordinateurs, la séance se terminera.',
-      );
+      expect(m.canStay).toBe(true);
+      expect(m.next).toBeNull();
       expect(m.days).toBe(43);
       expect([m.linesDone, m.linesTotal]).toEqual([25, 27]);
-      // Six commandes: un résumé plutôt que six lignes de détail.
       expect(plain(m.detail)).toBe('6 commandes, dont 4 complètes');
     }
     send(sim, 'p1', choose('stay'));
-    expect(sim.world.stages.choice.p1).toBeNull();
-    expect(both(sim).p1.self.choice).toBeNull();
-    send(sim, 'p1', choose('finish'));
-    const { p2: after } = both(sim);
-    expect(after.other.chip).toBe('Veut finir');
-    expect(after.message.kind).toBe('partner');
+    expect(sim.world.stages.choice.p1).toBe('stay');
+    expect(both(sim).p1.self.choice).toBe('stay');
   });
 
   it('résumé des commandes: toutes complètes, une seule, aucune; nombre seul si l’historique ne les couvre plus', () => {
@@ -359,6 +346,7 @@ describe('saison, météo et quête de la semaine', () => {
     const letters = letterModels(sim.world, uiContext());
     // L'identifiant d'instance porte le jour du train: la lettre du samedi 29 part le samedi 22.
     const order = letters.find((l) => l.id === 'coop_order_generated@29');
+    // Lettre écrite par la version du tour 8 (sauvegarde de référence du format 5): son titre d'alors.
     expect(order?.title).toBe('La commande du samedi 29');
     expect(order?.day).toBe('Samedi 22');
     expect(letters.find((l) => l.id === 'coop_recap_generated@22')?.title).toBe(

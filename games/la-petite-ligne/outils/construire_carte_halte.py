@@ -547,6 +547,38 @@ POINTS = [
     p("forage_edge_03", 30.5, 9.5, "cueillette au bord du bois", cueillette=True, important=True),
     p("forage_edge_04", 35.5, 9.5, "cueillette au bord du bois", cueillette=True, important=True),
     p("forage_edge_05", 38.5, 9.5, "cueillette au bord du bois", cueillette=True, important=True),
+    # Tour 9: le sureau (`bush_41`, en 33, 8) donne ses grappes au début de l'automne; le coin est à son pied,
+    # côté chemin (au sud), comme les ronciers aux coins 03 à 05.
+    p("forage_edge_06", 33.5, 9.5, "cueillette: les grappes du sureau, au pied du buisson, côté chemin",
+      cueillette=True, important=True),
+    # Tour 9: les lanternes du quai (moment `quay_lanterns`). Une place à l'est de chaque lanterne (les
+    # lanternes de l'ouest du quai sont cachées par la pension en orientation 0), tournée vers elle.
+    p("lantern_quay", 48.5, 18.5, "place de l'allumeur, à l'est de la lanterne du bout du quai", cap_degres=270),
+    p("lantern_square", 35.5, 24.5, "place de l'allumeur, à l'est du lampadaire nord de la place, près de "
+      "l'épicerie", cap_degres=270),
+    # Tour 9: la marelle à la craie de Jeanne (cadeau des craies): pavés de l'est de la place, hors du passage
+    # du quai (x 43 et 44), à 6 m du puits et à plus de 3 m des places des moments.
+    # Tour 9: sous le toit du puits (chantier `well_roof`), Jeanne joue les jours de pluie, contre la margelle ouest.
+    p("well_shelter", 38.5, 28.0, "contre la margelle ouest du puits, sous son toit une fois bâti (Jeanne les jours de pluie)"),
+    p("hopscotch", 45.5, 29.5, "la marelle de Jeanne (1 x 3 m, cases 45 de y 28 à 30), où elle joue le soir"),
+    # Tour 9: chantiers (points des envies et des répliques).
+    p("ford_bench", 24.0, 36.5, "le banc du gué (chantier `ford_bench`), rive nord, tourné vers l'eau",
+      portee=1.5),
+    p("house_bench", 12.5, 23.0, "le banc contre le pignon est de la maisonnette (chantier `house_bench`), "
+      "tourné vers l'est", portee=1.5),
+    p("path_lamp", 14.5, 27.5, "sur le chemin, au pied du réverbère (chantier `path_lamp`, case 14, 26)"),
+    # Tour 9: les étoiles de l'Aubrune (fiche 1.4.10 du tour 7): l'eau calme au pied du ponton et ses deux
+    # places au bord du plancher (siège sans modèle `pontoon_edge`, ci-dessous).
+    p("stars_water", 45.0, 40.6, "l'eau au pied du ponton, où se reflètent les étoiles"),
+    p("pontoon_seat_west", 44.55, 39.8, "place ouest au bord du ponton, jambes au-dessus de l'eau",
+      cap_degres=180),
+    p("pontoon_seat_east", 45.45, 39.8, "place est au bord du ponton, jambes au-dessus de l'eau",
+      cap_degres=180),
+    # Tour 9: le salut du mécanicien (fiche 1.4.12 du tour 7): une place à chaque manivelle, hors de la route.
+    p("gate_north_crank", 15.6, 11.5, "manivelle de la barrière nord, sur le chemin à l'ouest du poteau",
+      cap_degres=90),
+    p("gate_south_crank", 21.4, 15.5, "manivelle de la barrière sud, au bout du quai à l'est du poteau",
+      cap_degres=270),
     # Sortie des habitants
     p("village_exit", 61.5, 34.5, "bout de la promenade: les habitants qui rentrent chez eux hors carte "
       "(`offstage`) y disparaissent", rotation=1),
@@ -605,6 +637,53 @@ ACCROCHES = [
      "echelle": 1.168,
      "role": "pieu d'amarrage dans l'eau au coin est du bout du ponton, sommet 0,45 m au-dessus du plancher "
              "(1,11 m au-dessus de l'eau)"},
+]
+
+# Tour 9: manivelles des barrières (salut du mécanicien), sur chaque poteau, à 1,0 m, côté de la place.
+ACCROCHES += [
+    {"id": "level_crossing_crank_n", "modele": "level_crossing_crank", "sur": "level_crossing_gate_north",
+     "x": 16.3, "y": 11.5, "z": 1.0, "regarde": "ouest",
+     "role": "manivelle de la barrière nord, face ouest du poteau (16,5 ; 11,5), vers la place `gate_north_crank`"},
+    {"id": "level_crossing_crank_s", "modele": "level_crossing_crank", "sur": "level_crossing_gate_south",
+     "x": 20.7, "y": 15.5, "z": 1.0, "regarde": "est",
+     "role": "manivelle de la barrière sud, face est du poteau (20,5 ; 15,5), vers la place `gate_south_crank`"},
+]
+
+# Tour 9: sièges sans modèle (des places où s'asseoir comme sur un banc, sans objet posé ni emprise).
+SIEGES = [
+    {"id": "pontoon_edge", "x": 45.0, "y": 39.8, "rotation": 0,
+     "places": ["pontoon_seat_west", "pontoon_seat_east"],
+     "role": "le bord du ponton (étoiles de l'Aubrune): deux places tournées vers le sud, assis à 0,5 m, jambes "
+             "au-dessus de l'eau; on se relève vers le nord, sur le plancher"},
+]
+
+# Tour 9: chantiers (chantiers.json). Rien n'est posé ni bloqué tant que le chantier n'est pas bâti; ses cases
+# restent libres de tout décor (réservées). `type`: le modèle; `cases`: les cases occupées une fois bâti;
+# `rect`: l'emprise d'un banc (ses places), sinon `None`.
+CHANTIERS = [
+    {"id": "ford_bench", "type": "bench", "x": 24.0, "y": 36.5, "rotation": 0,
+     "rect": {"x": 23, "y": 36, "w": 2, "h": 1}, "cases": [[23, 36], [24, 36]],
+     "role": "banc à deux places sur la rive nord du gué, tourné vers l'eau (au sud): 2 m à l'est du point de "
+             "pêche nord (21,5 ; 37,5), hors du chemin du gué (x 17 à 19); la clôture de la rive occupe l'ouest"},
+    {"id": "quay_planters", "type": "quay_planter", "x": 25.5, "y": 18.5, "rotation": 0, "rect": None,
+     "cases": [[25, 18], [34, 18], [49, 18]],
+     "role": "trois jardinières au bord sud du quai, côté place, en (25, 18), (34, 18) et (49, 18): jamais devant "
+             "la porte de la voiture (38,5 ; 17,5), ni sur les passages vers la place (x 30 et 31, x 43 et 44), "
+             "ni contre le panneau de la gare (x 45 et 46)"},
+    {"id": "well_roof", "type": "well_roof", "x": 40.0, "y": 28.0, "rotation": 0,
+     "rect": {"x": 39, "y": 27, "w": 2, "h": 2}, "cases": [],
+     "role": "toit de tuiles à deux pans sur quatre poteaux, au-dessus de la margelle du puits (déjà "
+             "infranchissable): faîte à 2,4 m, treuil; il ne déborde pas de la margelle"},
+    {"id": "path_lamp", "type": "lamp_post", "x": 14.5, "y": 26.5, "rotation": 0,
+     "rect": {"x": 14, "y": 26, "w": 1, "h": 1}, "cases": [[14, 26]],
+     "role": "réverbère au bord nord du chemin de la maisonnette: le tronçon le plus sombre du retour de la "
+             "place (le lampadaire du passage à niveau est à 9 m); à 31 m du ponton, qui reste sombre"},
+    {"id": "house_bench", "type": "bench", "x": 12.5, "y": 23.0, "rotation": 1,
+     "rect": {"x": 12, "y": 22, "w": 1, "h": 2}, "cases": [[12, 22], [12, 23]],
+     "role": "banc contre le pignon est de la maisonnette, tourné vers l'est: entre le mur (x 11) et le chemin "
+             "(x 13), sans le toucher; soleil du matin, chemin du quai, passage des trains"},
+    {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": None, "cases": [],
+     "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
 ]
 
 # Meubles déjà posés dans la maisonnette (objets.json, startingInventory.houseFurniture).
@@ -756,6 +835,8 @@ def main() -> int:
             "note": "cx, cy d'un meuble: case nord-ouest de son emprise (objets.json, footprint w x d)",
         },
         "accroches": ACCROCHES,
+        "sieges": SIEGES,
+        "chantiers": CHANTIERS,
         "habitants": HABITANTS,
         "trajets": TRAJETS,
         "trajets_cles": {"vitesse": 3.5, "max_secondes": 25, "paires": TRAJETS_CLES},

@@ -91,6 +91,10 @@ function greeting(sim: Sim, day: number): string {
   const list = [
     ...all,
     ...rawStrings(sim, ['orderGreetings', seasonOfDay(sim.content.settings, day)]),
+    // Tour 9: une salutation de plus par chantier bâti (les jardinières du quai).
+    ...sim.content.improvements
+      .filter((x) => (sim.world.improvements[x.id]?.builtDay ?? null) !== null)
+      .flatMap((x) => rawStrings(sim, ['orderGreetings', 'improvements', x.id])),
   ];
   const index = drawNoRepeat(
     sim,

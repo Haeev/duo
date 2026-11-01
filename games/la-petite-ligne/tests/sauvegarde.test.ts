@@ -17,8 +17,9 @@ describe('sauvegarde', () => {
     const snap = snapshotOf(sim);
     expect(snap.label).toMatch(/lundi, jour 3, 12 h/);
     // Jour 3 à midi jusqu'à la limite de la partie (tour 8: jours 1 à 43, `clock.lastDay`).
-    expect(snap.progress).toBeGreaterThan(0.05);
-    expect(snap.progress).toBeLessThan(0.07);
+    // Tour 9: la limite passe au samedi 64 (2,5 jours sur 63).
+    expect(snap.progress).toBeGreaterThan(0.035);
+    expect(snap.progress).toBeLessThan(0.045);
     const json = JSON.stringify(snap.data);
     expect(json.length).toBeLessThan(1024 * 1024);
     const { content, map } = contentAndMap();

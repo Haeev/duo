@@ -7,6 +7,7 @@ import { catalogueWindow } from '../donnees/commandes';
 import { type Sim, bump, distance, emit, say } from './contexte';
 import { deliverCatalogue } from './economie';
 import { POINT } from './ids';
+import type { MomentDef } from '../donnees/types';
 
 /** L'heure `t` a-t-elle été franchie entre deux lectures de l'horloge ? */
 export function crossed(before: number, after: number, t: number): boolean {
@@ -43,17 +44,33 @@ export function trainClock(sim: Sim, before: number, after: number): void {
   }
   if (crossed(before, after, s.train.departure) && train.phase !== 'away') {
     train.phase = 'departing';
+    // Le salut du mécanicien armé (tour 9): départ au pas, si `train.saluteSlowRoll`.
+    // Champ absent sinon: l'état des parties sans salut ne change pas.
+    if (s.train.saluteSlowRoll && saluteArmed(sim) !== null) train.slow = true;
     emit(sim, { type: 'train_whistle' });
     emit(sim, { type: 'train_departing' });
     witnesses(sim, 'train_departure');
   }
 }
 
+/** Le moment armé du jour (`watch.arm`, le salut du mécanicien), ou `null`. */
+export function saluteArmed(sim: Sim): MomentDef | null {
+  const today = sim.world.moments.today;
+  if (today === null || (today.armedTick ?? null) === null) return null;
+  const def = sim.content.moments.find((m) => m.id === today.id) ?? null;
+  return def?.watch.arm === null ? null : def;
+}
+
+/** Durée du départ au pas: celle de l'apogée du salut (la cabine suit sa piste), sinon le glissement ordinaire. */
+function slowSeconds(sim: Sim): number {
+  return sim.content.moments.find((m) => m.watch.arm !== null)?.climax.seconds ?? sim.content.settings.feel.trainSlideSeconds;
+}
+
 /** Glissement du train, en temps réel (il roule même horloge arrêtée). */
 export function updateTrain(sim: Sim, dt: number): void {
   const train = sim.world.train;
   train.prevProgress = train.progress;
-  const rate = dt / sim.content.settings.feel.trainSlideSeconds;
+  const rate = dt / (train.phase === 'departing' && train.slow === true ? slowSeconds(sim) : sim.content.settings.feel.trainSlideSeconds);
   if (train.phase === 'arriving') {
     train.progress = Math.min(1, train.progress + rate);
     if (train.progress >= 1) train.phase = 'stopped';
@@ -62,6 +79,7 @@ export function updateTrain(sim: Sim, dt: number): void {
     train.progress = Math.max(0, train.progress - rate);
     if (train.progress <= 0) {
       train.phase = 'away';
+      delete train.slow;
       sim.runtime.dynamicDirty = true;
     }
     sim.runtime.changed = true;

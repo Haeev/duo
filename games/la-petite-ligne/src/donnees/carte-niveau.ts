@@ -3,7 +3,8 @@
  * décrit en section 9 de `docs/jeux/jeu-1/carte-halte.md`), contrôlée à
  * l'exécution et traduite en `GameMap`.
  */
-import type { GameMap, GroundKind, MapHook, MapProp, MapTree, Rect } from '../etat/carte';
+import type { GameMap, GroundKind, MapHook, MapImprovement, MapProp, MapTree, Rect } from '../etat/carte';
+import { BENCH_MODEL } from '../etat/bancs';
 import type { Cell, Vec2 } from '../etat/types';
 import { ContentError, Reader } from './lecteur';
 
@@ -151,6 +152,41 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   // Hors de la carte: les habitants « chez eux » loin du bourg.
   if (!('offstage' in points)) points.offstage = { x: -20, y: -20 };
 
+  // Tour 9: sièges sans modèle (des bancs sans objet) et chantiers (posés une fois bâtis).
+  const seats: MapProp[] = (r.opt('sieges')?.items() ?? []).map((s) => ({
+    id: s.at('id').string(),
+    model: BENCH_MODEL,
+    pos: { x: s.at('x').number(), y: s.at('y').number() },
+    rotation: s.at('rotation').integer(0, 3),
+    rect: null,
+    height: 0,
+    category: 'siege',
+  }));
+  const improvements: Record<string, MapImprovement> = {};
+  for (const s of r.opt('chantiers')?.items() ?? []) {
+    const type = s.at('type').string();
+    const area = s.opt('rect');
+    const info = typeInfo.get(type);
+    const id = s.at('id').string();
+    improvements[id] = {
+      id,
+      model: type,
+      pos: { x: s.at('x').number(), y: s.at('y').number() },
+      rotation: s.at('rotation').integer(0, 3),
+      rect: area === null || area.isNull() ? null : rect(area),
+      height: info?.height ?? 0,
+      category: info?.category ?? 'decor',
+      cells: s
+        .at('cases')
+        .items()
+        .map((cell) => {
+          const [cx, cy] = cell.numberList();
+          if (cx === undefined || cy === undefined) return cell.fail('[cx, cy] attendu');
+          return { cx, cy };
+        }),
+    };
+  }
+
   return {
     id: r.at('id').string(),
     name: r.at('nom').string(),
@@ -167,5 +203,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     trees,
     props,
     startFurniture,
+    seats,
+    improvements,
   };
 }

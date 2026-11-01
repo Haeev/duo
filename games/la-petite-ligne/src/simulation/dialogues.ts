@@ -12,9 +12,33 @@ import { countInBag, takeFromBag } from './sac';
 import { MINUTES_PER_DAY } from './constantes';
 import { evaluate } from './conditions';
 import { henVars } from '../etat/secrets';
+import { fnv1a } from '../etat/tirage';
 import { answerHenCall, HEN_CALL_DIALOGUE, secretMistake } from './secrets';
 
 const GIVE_PREFIX = 'give:';
+
+const annonceScenes = new WeakMap<Content, Set<string>>();
+
+/** Scènes à deux des annonces (tour 9): comptées (`scene:<id>`), lancées seulement l'habitant présent. */
+function annonceSceneIds(content: Content): Set<string> {
+  let ids = annonceScenes.get(content);
+  if (ids === undefined) {
+    ids = new Set<string>();
+    for (const a of content.annonces) {
+      if (a.scene !== null) ids.add(a.scene);
+      if (a.uniqueScene !== null) ids.add(a.uniqueScene);
+    }
+    annonceScenes.set(content, ids);
+  }
+  return ids;
+}
+
+/** L'habitant d'une scène d'annonce est là, près du point de la scène (section 1.7: sinon elle attend). */
+function sceneVillagerHere(sim: Sim, def: DialogueDef): boolean {
+  if (!annonceSceneIds(sim.content).has(def.id) || def.point === null) return true;
+  const v = sim.world.villagers.find((x) => x.id === def.villager);
+  return v !== undefined && v.visible && distance(v.pos, point(sim, def.point)) <= sim.content.settings.ranges.talk + 2;
+}
 
 function vars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
   // Les couleurs des poules (`{henColor1}`...): seul l'informé entend le dialogue qui les cite.
@@ -72,14 +96,67 @@ function isAvailable(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
   return evaluateAll(sim, def.when, ctx);
 }
 
+// ---------------------------------------------------------------------------
+// Mémoire des répliques entendues (tour 9): heures récentes, puis un ensemble de bits
+
+/** Alphabet de l'ensemble de bits (6 bits par caractère). */
+const BITS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+interface HeardIndex {
+  pos: Map<string, number>;
+  key: string;
+}
+
+const heardIndexes = new WeakMap<Content, HeardIndex>();
+
+/** Répliques qui se gardent dans `heard` (quotidien et rappels répétables), triées: leur rang est leur bit. */
+function heardIndex(content: Content): HeardIndex {
+  let index = heardIndexes.get(content);
+  if (index === undefined) {
+    const ids = Object.values(content.dialogues)
+      .filter((d) => d.kind === 'daily' || d.once === null)
+      .map((d) => d.id)
+      .sort();
+    index = { pos: new Map(ids.map((id, i) => [id, i])), key: fnv1a(ids.join(',')).toString(36) };
+    heardIndexes.set(content, index);
+  }
+  return index;
+}
+
+function hasBit(bits: string, i: number): boolean {
+  const c = BITS.indexOf(bits.charAt(Math.floor(i / 6)));
+  return c > 0 && (c & (1 << (i % 6))) !== 0;
+}
+
+function withBit(bits: string, i: number): string {
+  const at = Math.floor(i / 6);
+  const padded = bits.length > at ? bits : bits + 'A'.repeat(at + 1 - bits.length);
+  const c = Math.max(0, BITS.indexOf(padded.charAt(at))) | (1 << (i % 6));
+  return padded.slice(0, at) + (BITS.charAt(c) || 'A') + padded.slice(at + 1);
+}
+
+/**
+ * Quand ce joueur a entendu cette réplique: l'heure absolue (jour x 1440 + minutes) si c'est
+ * récent, 0 si c'est vieux (toutes les vieilles à égalité, avant toute heure réelle), `undefined`
+ * jamais.
+ */
+export function heardAt(sim: Sim, who: CharacterId, id: string): number | undefined {
+  const at = sim.world.heard[who][id];
+  if (at !== undefined) return at;
+  const old = sim.world.heardOld;
+  const index = heardIndex(sim.content);
+  const i = index.pos.get(id);
+  return old.key === index.key && i !== undefined && hasBit(old[who], i) ? 0 : undefined;
+}
+
 /** Ce que l'habitant dit à ce joueur maintenant (README des données, 2.3). */
 export function pickDialogue(sim: Sim, villager: string, who: CharacterId): DialogueDef | null {
   const v = sim.content.villagers.find((x) => x.id === villager);
   if (v === undefined) return null;
-  const heard = sim.world.heard[who];
+  const heard = (id: string): number | undefined => heardAt(sim, who, id);
   const today = sim.world.clock.day;
   const heardToday = (d: DialogueDef): boolean => {
-    const at = heard[d.id];
+    const at = heard(d.id);
     return at !== undefined && Math.floor(at / MINUTES_PER_DAY) === today;
   };
   let best: DialogueDef | null = null;
@@ -99,7 +176,7 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
   const story = sim.content.settings.feel.dailyStoryPriority;
   const rule = sim.content.settings.dialogues;
   const recentlyHeard = (d: DialogueDef): boolean => {
-    const at = heard[d.id];
+    const at = heard(d.id);
     return today >= rule.datedRepeatFromDay && at !== undefined && today - Math.floor(at / MINUTES_PER_DAY) < rule.datedRepeatDays;
   };
   let dated: DialogueDef | null = null;
@@ -112,8 +189,8 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
   const ordinary = daily.filter((d) => d.priority < story || recentlyHeard(d));
   const pool = ordinary.length > 0 ? ordinary : daily;
   let oldest = Infinity;
-  for (const d of pool) oldest = Math.min(oldest, heard[d.id] ?? -1);
-  return sim.rng.pick(pool.filter((d) => (heard[d.id] ?? -1) === oldest));
+  for (const d of pool) oldest = Math.min(oldest, heard(d.id) ?? -1);
+  return sim.rng.pick(pool.filter((d) => (heard(d.id) ?? -1) === oldest));
 }
 
 /** Répliques du quotidien que cet habitant peut dire à ce joueur maintenant (conditions remplies). */
@@ -134,17 +211,24 @@ export function foldOldHeard(sim: Sim): void {
   const rule = sim.content.settings.dialogues;
   const today = sim.world.clock.day;
   if (today < rule.datedRepeatFromDay) return;
+  const index = heardIndex(sim.content);
+  const old = sim.world.heardOld;
+  // Le contenu a changé (une version nouvelle): l'ordre des bits ne vaut plus, l'ensemble repart.
+  if (old.key !== index.key) {
+    old.key = index.key;
+    old.p1 = '';
+    old.p2 = '';
+  }
   // Entendue avant ce jour: plus « récente » au sens de la règle des répliques datées.
   const oldBefore = Math.min(today - rule.datedRepeatDays + 1, today) * MINUTES_PER_DAY;
   for (const who of ['p1', 'p2'] as const) {
     const heard = sim.world.heard[who];
-    const old = [...new Set(Object.values(heard).filter((at) => at < oldBefore))].sort((a, b) => a - b);
-    // Un rang doit rester sous une journée entière (jamais lu comme un jour joué).
-    if (old.length === 0 || old.length >= MINUTES_PER_DAY) continue;
-    const rank = new Map(old.map((at, i) => [at, i]));
     for (const [id, at] of Object.entries(heard)) {
-      const r = rank.get(at);
-      if (r !== undefined) heard[id] = r;
+      if (at >= oldBefore) continue;
+      const i = index.pos.get(id);
+      if (i !== undefined) old[who] = withBit(old[who], i);
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- mémoire bornée: la vieille entrée passe dans l'ensemble.
+      delete heard[id];
     }
   }
 }
@@ -153,6 +237,13 @@ export function foldOldHeard(sim: Sim): void {
 export function hearDialogue(sim: Sim, who: CharacterId, def: DialogueDef): void {
   if (def.kind !== 'daily' && def.once !== null) return;
   sim.world.heard[who][def.id] = sim.world.clock.day * MINUTES_PER_DAY + Math.floor(sim.world.clock.minutes);
+}
+
+/** Texte de `textes.ui.<key>`, ou `null`. */
+function uiText(sim: Sim, key: string): string | null {
+  const raw = sim.content.texts.raw.ui;
+  const value = typeof raw === 'object' && raw !== null ? (raw as Record<string, unknown>)[key] : undefined;
+  return typeof value === 'string' ? value : null;
 }
 
 /** Choix « Donner » quand une étape active attend un objet pour cet habitant. */
@@ -172,12 +263,14 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
       const parts = cond.key.split(':');
       if (parts[0] !== 'given' || parts[1] !== villager || parts[2] === undefined) continue;
       const item = parts[2];
+      const offer = sim.content.items[item]?.category === 'gift' ? uiText(sim, 'offer') : null;
       const given = (sim.world.counters.duo[cond.key] ?? 0) - (state.baselines[`duo:${cond.key}`] ?? 0);
       const remaining = cond.count - given;
       const have = countInBag(c, item);
       const n = Math.min(remaining, have);
       if (n <= 0 || out.some((o) => o.id.startsWith(`${GIVE_PREFIX}${item}:`))) continue;
-      out.push({ id: `${GIVE_PREFIX}${item}:${n}`, text: format(template, { count: n, item: itemName(sim, item, n) }) });
+      const article = sim.content.items[item]?.indefinite ?? itemName(sim, item, n);
+      out.push({ id: `${GIVE_PREFIX}${item}:${n}`, text: offer === null ? format(template, { count: n, item: itemName(sim, item, n) }) : format(offer, { item: article }) });
     }
   }
   return out;
@@ -302,6 +395,7 @@ function endScene(sim: Sim): void {
   const v = sim.world.villagers.find((x) => x.id === scene.villager);
   if (v !== undefined) v.talkingWith = [];
   if (!sim.world.dialoguesDone.includes(scene.dialogue)) sim.world.dialoguesDone.push(scene.dialogue);
+  if (annonceSceneIds(sim.content).has(scene.dialogue)) bump(sim, `scene:${scene.dialogue}`, null);
   emit(sim, { type: 'scene_ended', dialogue: scene.dialogue });
   if (def !== undefined) runEffects(sim, def.effects, null);
   pumpScripts(sim);
@@ -357,7 +451,7 @@ export function autoStartScenes(sim: Sim): void {
     if (def.once === 'duo' && world.dialoguesDone.includes(def.id)) continue;
     const at = point(sim, def.point);
     if (!world.characters.every((c) => distance(c.pos, at) <= range)) continue;
-    if (!evaluateAll(sim, def.when, NO_CONTEXT)) continue;
+    if (!evaluateAll(sim, def.when, NO_CONTEXT) || !sceneVillagerHere(sim, def)) continue;
     startScene(sim, def.id);
     return;
   }

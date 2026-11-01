@@ -12,6 +12,7 @@ import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurn
 import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
+import { bringPlanks, payImprovement } from './chantiers';
 import { footprintCells, goTo, stopPath } from './deplacement';
 import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
@@ -295,6 +296,12 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'catalogue_order':
       purchase(sim, c, { source: 'catalogue', item: intent.item, count: 1 });
+      return;
+    case 'improvement_pay':
+      payImprovement(sim, c, intent.improvement, intent.amount === null ? null : Math.floor(intent.amount));
+      return;
+    case 'improvement_planks':
+      bringPlanks(sim, c, intent.improvement, Math.floor(intent.count));
       return;
     case 'proposal_answer':
       answerProposal(sim, c, intent.proposal, intent.accept);

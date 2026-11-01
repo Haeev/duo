@@ -11,6 +11,7 @@ import { abortConversation } from './dialogues';
 import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { ZONE } from './ids';
 import { treeBlocks } from './lisiere';
+import { armedCells } from '../etat/moments';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
@@ -29,6 +30,15 @@ export function refreshBlockers(sim: Sim): Blockers {
       }
     }
     for (const cell of handcarCells(sim)) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    // Tour 9: les chantiers bâtis occupent leurs cases; les barrières baissées ferment la traversée.
+    for (const x of sim.content.improvements) {
+      if ((sim.world.improvements[x.id]?.builtDay ?? null) === null) continue;
+      for (const cell of x.cells) if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    }
+    const gates = armedCells(sim.content, sim.world.moments.today);
+    if (gates !== null) {
+      for (let cy = gates.y; cy < gates.y + gates.h; cy++) for (let cx = gates.x; cx < gates.x + gates.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
+    }
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
       if (def?.footprint === null || def === undefined || def.floor || def.bed !== null) continue;

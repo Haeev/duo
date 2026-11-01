@@ -3,8 +3,8 @@
  * progression du budget. Pure (aucun générateur de la partie: `unitDraw` par ligne), pour que la
  * simulation, les tests et le robot tirent la même commande.
  */
-import { seasonOfDay } from '../donnees/calendrier';
-import type { GeneratedOrderSettings, OrderProduct, Settings } from '../donnees/types';
+import { dayOfSeason, seasonOfDay } from '../donnees/calendrier';
+import type { GeneratedOrderSettings, OrderProduct, Season, Settings } from '../donnees/types';
 import { unitDraw } from './tirage';
 import type { GeneratedOrderLine, OrderBook } from './types';
 
@@ -22,9 +22,62 @@ export interface OrderDrawInput {
   /** Arbres debout au moment du tirage. */
   matureTrees: number;
   book: Readonly<Pick<OrderBook, 'budget' | 'recent' | 'ordered'>>;
+  /** Poules au tirage (tour 9: la capacité d'œufs suit leur nombre); absent: 3. */
+  hens?: number;
 }
 
-type Rules = Pick<Settings, 'calendar' | 'forage'>;
+type Rules = Pick<Settings, 'calendar' | 'forage'> & { feel?: Pick<Settings['feel'], 'fishWeights' | 'fishWeightsBySeason'> };
+
+/**
+ * Saison de référence d'une commande (section 2.11): celle des six jours de production, ou celle
+ * qui en compte le plus (règle « 4 jours sur 6 »). Les saisons changent un samedi: les six jours de
+ * production sont toujours dans la même.
+ */
+export function productionSeason(settings: Pick<Settings, 'calendar'>, train: number): Season {
+  const counts = new Map<Season, number>();
+  let best: Season = seasonOfDay(settings, train - 1);
+  for (let d = train - 6; d < train; d++) {
+    const s = seasonOfDay(settings, d);
+    counts.set(s, (counts.get(s) ?? 0) + 1);
+    if ((counts.get(s) ?? 0) > (counts.get(best) ?? 0)) best = s;
+  }
+  return best;
+}
+
+/** Part d'un poisson parmi les prises d'une saison (poids divisé par la somme des poids). */
+function fishShare(feel: NonNullable<Rules['feel']>, season: Season, item: string): number {
+  const weights = feel.fishWeightsBySeason[season] ?? feel.fishWeights;
+  const total = Object.values(weights).reduce((sum, w) => sum + w, 0);
+  return total <= 0 ? 0 : (weights[item] ?? 0) / total;
+}
+
+/**
+ * Coût d'un poisson dans une commande (tour 9, section 2.11): le coût de la saison de référence
+ * des réglages, ramené à la part du poisson dans la saison de la commande; `null` s'il ne mord pas
+ * cette saison-là (jamais commandé). Sans `fishCostFromWeights`, le coût écrit.
+ */
+export function fishCost(settings: Rules & Pick<Settings, 'order'>, p: OrderProduct, train: number): number | null {
+  const g = settings.order.generated;
+  const feel = settings.feel;
+  if (g === null || !g.fishCostFromWeights || p.resource !== 'river' || feel === undefined) return p.cost;
+  const ref = fishShare(feel, g.fishCostReferenceSeason, p.item);
+  const now = fishShare(feel, productionSeason(settings, train), p.item);
+  if (now <= 0) return null;
+  return (p.cost * ref) / now;
+}
+
+/**
+ * Quantité rangée (tour 9, section 2.11): radis et carottes au rendement d'une case (3), chaque
+ * ligne sous son plafond; la part suit une quantité ramenée sous le plafond (jamais au-dessus).
+ */
+export function tidyLine(g: GeneratedOrderSettings, line: GeneratedOrderLine, min: number): GeneratedOrderLine {
+  const step = g.roundTo[line.item] ?? 1;
+  let count = Math.max(min, step * Math.max(1, Math.round(line.count / step)));
+  const cap = g.lineMax[line.item];
+  if (cap !== undefined) count = Math.min(count, cap);
+  const share = count < line.count && line.count > 0 ? (line.share * count) / line.count : line.share;
+  return { item: line.item, count, share };
+}
 
 /** Lignes de la commande `number` (paliers de `linesByOrder`). */
 export function linesFor(g: GeneratedOrderSettings, number: number): number {
@@ -36,8 +89,17 @@ export function linesFor(g: GeneratedOrderSettings, number: number): number {
 /** « En saison »: au moins 4 des 6 jours de production (du lendemain du tirage au vendredi). */
 export function inSeason(settings: Rules, p: OrderProduct, train: number): boolean {
   let days = 0;
-  for (let d = train - 6; d < train; d++) if (p.seasons.includes(seasonOfDay(settings, d))) days++;
+  for (let d = train - 6; d < train; d++) if (p.seasons.includes(seasonOfDay(settings, d)) && forageOn(settings, p, d)) days++;
   return days >= 4;
+}
+
+/** Une cueillette avec une plage de jours (tour 9, le sureau) ne compte que ses jours. */
+function forageOn(settings: Rules, p: OrderProduct, day: number): boolean {
+  if (p.resource !== 'forage') return true;
+  const def = settings.forage?.items.find((i) => i.item === p.item);
+  if (def?.days === null || def === undefined) return true;
+  const d = dayOfSeason(settings, day);
+  return d >= def.days[0] && d <= def.days[1];
 }
 
 /** Unités qu'une cueillette donne en moyenne sur les 6 jours de production (section 5.2, sans coup de pouce). */
@@ -48,8 +110,13 @@ export function forageWeekly(settings: Rules, item: string, train: number): numb
   let total = 0;
   for (let d = train - 6; d < train; d++) {
     const season = seasonOfDay(settings, d);
+    const sd = dayOfSeason(settings, d);
+    const inWindow = (i: string): boolean => {
+      const days = defs.get(i)?.days ?? null;
+      return days === null || (sd >= days[0] && sd <= days[1]);
+    };
     for (const point of f.points) {
-      const here = point.items.filter((i) => defs.get(i)?.seasons.includes(season) === true);
+      const here = point.items.filter((i) => defs.get(i)?.seasons.includes(season) === true && inWindow(i));
       if (!here.includes(item)) continue;
       const weights = here.reduce((sum, i) => sum + (defs.get(i)?.weight ?? 0), 0);
       const def = defs.get(item);
@@ -67,12 +134,15 @@ export function clashes(g: GeneratedOrderSettings, a: string, b: string): boolea
   return base(a).some((x) => ofB.includes(x));
 }
 
-function capacity(g: GeneratedOrderSettings, p: OrderProduct): number {
+function capacity(g: GeneratedOrderSettings, p: OrderProduct, hens: number): number {
   switch (p.resource) {
     case 'garden':
       return g.resources.garden;
-    case 'eggs':
-      return g.resources.eggs;
+    case 'eggs': {
+      // Tour 9: poules x œufs par semaine (5,4 x 3 = 16,2, comme avant); arrondi au millième.
+      const per = g.eggsPerHenPerWeek;
+      return per === null ? g.resources.eggs : Math.round(per * hens * 1000) / 1000;
+    }
     case 'river':
       return g.resources.river;
     case 'wood':
@@ -112,7 +182,7 @@ function quantity(
     if (count > cap || count * p.cost > room + 1e-9) count = Math.max(p.min, Math.floor(units));
     return { item: p.item, count, share: count * p.cost };
   }
-  const c = capacity(g, p);
+  const c = capacity(g, p, input.hens ?? 3);
   const minShare = (p.min * p.cost) / c;
   if (minShare > room + 1e-9) return null;
   const s = Math.min(share, room);
@@ -150,7 +220,13 @@ export function composeOrder(
   const twoAgo = input.book.recent[input.book.recent.length - 2] ?? [];
   const familyOf = new Map(g.products.map((p) => [p.item, p.family]));
   const previousFamilies = new Set(previous.map((i) => familyOf.get(i)));
-  const candidates = g.products.filter(
+  // Poissons au coût de la saison de la commande (tour 9); celui qui ne mord pas cette saison n'est pas commandé.
+  const priced: OrderProduct[] = [];
+  for (const p of g.products) {
+    const cost = fishCost(settings, p, input.train);
+    if (cost !== null) priced.push(cost === p.cost ? p : { ...p, cost });
+  }
+  const candidates = priced.filter(
     (p) =>
       (input.counters[p.obtained] ?? 0) > 0 &&
       !input.buyable.has(p.item) &&
@@ -204,7 +280,17 @@ export function composeOrder(
     draws++;
     return weighted(unitDraw(input.seed, key, input.train), open, weight);
   };
-  while (chosen.length < target) {
+  // Part perdue aux plafonds (tour 9): au-delà de `extraLineMinShare`, une ligne de plus la reprend.
+  let lost = 0;
+  let extra = false;
+  let lineShare = share;
+  for (;;) {
+    if (chosen.length >= target) {
+      const room = g.extraLineMinShare;
+      if (room === null || lost < room - 1e-9 || chosen.length >= g.maxLines) break;
+      extra = true;
+      lineShare = lost;
+    }
     draws = 0;
     let line: GeneratedOrderLine | null = null;
     let product: OrderProduct | null;
@@ -221,7 +307,7 @@ export function composeOrder(
         fromPrevious = product !== null;
       }
       if (product === null) break;
-      line = quantity(settings, g, product, share, used.get(product.resource) ?? 0, input);
+      line = quantity(settings, g, product, lineShare, used.get(product.resource) ?? 0, input);
       if (line !== null) {
         if (fromPrevious) repeats--;
         break;
@@ -229,9 +315,12 @@ export function composeOrder(
       rejected.add(product.item);
     }
     if (product === null || line === null) break;
+    const tidy = tidyLine(g, line, product.min);
+    if (!extra) lost += line.share - tidy.share;
     chosen.push(product);
-    lines.push(line);
-    used.set(product.resource, (used.get(product.resource) ?? 0) + line.share);
+    lines.push(tidy);
+    used.set(product.resource, (used.get(product.resource) ?? 0) + tidy.share);
+    if (extra) break;
   }
   return { lines, budget };
 }

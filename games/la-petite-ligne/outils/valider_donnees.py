@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Any
 
 FILES = ("objets", "cultures", "habitants", "quetes", "courrier", "astuces", "envies", "textes", "reglages")
+# Tour 9: annonces du tableau, chantiers, catalogue de la semaine (facultatifs: absents, rien de tout cela).
+OPTIONAL_FILES = ("annonces", "chantiers", "catalogue")
 ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 TIME_RE = re.compile(r"^(([01][0-9]|2[0-3]):[0-5][0-9]|24:00)$")
 PLACEHOLDER_RE = re.compile(r"\{([A-Za-z][A-Za-z0-9]*)\}")
@@ -29,7 +31,11 @@ FORBIDDEN_DASHES = (chr(0x2014), chr(0x2013))  # tirets cadratin et demi-cadrati
 DEMO_DAYS = range(1, 9)
 
 ITEM_CATEGORIES = {"seed", "crop", "forage", "animal_product", "material", "carried", "tool", "food", "quest", "fish",
-                   "decoration", "furniture"}
+                   "decoration", "furniture",
+                   # Tour 9: poules commandées au catalogue, cadeaux pour les habitants.
+                   "animal_order", "gift"}
+# Tour 9: verbes des outils (`toolKind`), outils améliorés compris.
+TOOL_KINDS = {"hoe", "watering_can", "axe", "fishing_rod"}
 SHOPS = {"grocery", "catalogue"}
 DISHES = {"bread", "simple", "stew"}
 STATIONS = {"workbench", "stove"}
@@ -124,6 +130,11 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "nights_passed": ({"count"}, set()),
     "recipe_known": ({"recipe"}, set()),
     "order_complete": (set(), {"day"}),
+    # Tour 9: annonce au tableau (de ce gabarit, à cette étape), chantier bâti, article acheté, scène d'annonce jouée.
+    "annonce_active": (set(), {"gabarit", "step"}),
+    "improvement_built": ({"id"}, set()),
+    "bought": ({"item"}, set()),
+    "scene_played": ({"dialogue"}, {"count", "who", "since"}),
 }
 COMMON_CONDITION_KEYS = {"type", "label"}
 
@@ -157,6 +168,8 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "veillee_started": set(), "holding_furniture": set(), "big_purchase_attempt": set(), "letter_received": set(),
     # Tour 8: la lisière (cueillette posée à moins de 6 m, rejet visé).
     "near_forage": set(), "aim_sapling": set(),
+    # Tour 9: une annonce au tableau, près du tableau du quai.
+    "near_board_annonce": set(),
 }
 
 PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
@@ -167,9 +180,11 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
                 "villager", "season", "year", "times", "seasonOf",
                 # Tour 8: lettres de la commande générée (`courrier.json`) et formats (`textes.orderFormat`).
-                "greeting", "tip", "linesDoneText", "n"}
+                "greeting", "tip", "linesDoneText", "n",
+                # Tour 9: annonces, chantiers, établi de Basile, paroles d'un habitant en notification.
+                "giver", "text", "name", "paid", "time", "discount"}
 # Tour 8: étapes, niveaux de tendresse (D7), modes de continuation (D4), saisons, familles et ressources des commandes.
-STAGE_IDS = {"demo", "summer_end"}
+STAGE_IDS = {"demo", "summer_end", "autumn_end"}
 TENDERNESS = ["none", "accomplices", "gentle"]
 CONTINUATION = {"same_save", "new_game_per_stage"}
 SEASONS = ["spring", "summer", "autumn", "winter"]
@@ -239,7 +254,94 @@ def load(folder: Path, report: Report) -> dict[str, Any]:
             continue
         if data[name].get("version") != 1:
             report.error(path.name, "« version » doit valoir 1")
+    for name in OPTIONAL_FILES:
+        path = folder / f"{name}.json"
+        if not path.exists():
+            continue
+        try:
+            data[name] = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            report.error(path.name, f"JSON invalide ({exc})")
+            continue
+        if data[name].get("version") != 1:
+            report.error(path.name, "« version » doit valoir 1")
     return data
+
+
+def check_tour9(data: dict[str, Any], reg: Registry, report: Report) -> None:
+    """Annonces, chantiers et catalogue de la semaine (tour 9): renvois, sortes, textes."""
+    textes = data.get("textes", {})
+    ids: set[str] = set()
+    for a in data.get("annonces", {}).get("annonces", []):
+        w = f"annonces.{a.get('id')}"
+        if check_id(a.get("id"), w, report):
+            if a["id"] in ids:
+                report.error(w, "gabarit en double")
+            ids.add(a["id"])
+        if a.get("kind") not in ("help", "together"):
+            report.error(w, f"« kind » inconnu {a.get('kind')!r} (help ou together)")
+        ref("villager", a.get("giver"), w, reg, report)
+        seasons = a.get("seasons")
+        if not isinstance(seasons, list) or not seasons or not set(seasons) <= set(SEASONS):
+            report.error(w, f"saisons attendues parmi {', '.join(SEASONS)}")
+        if ("lines" in a) == ("variants" in a):
+            report.error(w, "« lines » ou « variants » attendu (un des deux)")
+        variants = a.get("variants") or [a.get("lines") or []]
+        for lines in variants:
+            for line in lines:
+                ref("item", line.get("item"), w, reg, report)
+                check_count(line.get("count"), w, report)
+        for key in ("scene", "uniqueScene"):
+            if a.get(key) is not None:
+                ref("dialogue", a[key], w, reg, report)
+        if a.get("unique") is not None:
+            ref("item", a["unique"], w, reg, report)
+        block = textes.get("annonces", {}).get(a.get("id"), {})
+        for key in ("title", "text") + (() if a.get("scene") else ("thanks",)):
+            if not isinstance(block.get(key), str):
+                report.error(w, f"textes.annonces.{a.get('id')}.{key} manquant")
+        if not a.get("scene") and not any(variants):
+            report.error(w, "une annonce sans demande finit par une scène")
+    queues = {"bourg", "maisonnette"}
+    for ch in data.get("chantiers", {}).get("improvements", []):
+        w = f"chantiers.{ch.get('id')}"
+        check_id(ch.get("id"), w, report)
+        if ch.get("queue") not in queues:
+            report.error(w, f"file inconnue {ch.get('queue')!r}")
+        if ch.get("payAt") not in ("board", "basile"):
+            report.error(w, f"« payAt » inconnu {ch.get('payAt')!r} (board ou basile)")
+        if not isinstance(ch.get("price"), int) or ch["price"] <= 0:
+            report.error(w, "« price » entier positif attendu")
+        if not isinstance(textes.get("chantiers", {}).get(ch.get("id"), {}).get("name"), str):
+            report.error(w, f"textes.chantiers.{ch.get('id')}.name manquant")
+    cat = data.get("catalogue")
+    if cat is None:
+        return
+    listed: set[str] = set()
+    for i, page in enumerate(cat.get("pages", [])):
+        w = f"catalogue.pages[{i}]"
+        if page.get("season") not in SEASONS or page.get("week") not in (1, 2, 3):
+            report.error(w, "saison et semaine de saison (1 à 3) attendues")
+        for item in page.get("items", []):
+            ref("item", item, w, reg, report)
+            if item in listed:
+                report.error(w, f"{item!r} sur deux pages")
+            listed.add(item)
+            if reg.items.get(item, {}).get("shop") != "catalogue":
+                report.error(w, f"{item!r} n'est pas en vente au catalogue")
+    for g in cat.get("gifts", []):
+        w = f"catalogue.gifts.{g.get('item')}"
+        ref("item", g.get("item"), w, reg, report)
+        ref("villager", g.get("villager"), w, reg, report)
+        ref("dialogue", g.get("wish"), w, reg, report)
+        ref("text", g.get("thanks"), w, reg, report)
+        if reg.items.get(g.get("item"), {}).get("category") != "gift":
+            report.error(w, "catégorie « gift » attendue")
+    for item, hen in cat.get("hens", {}).items():
+        ref("item", item, "catalogue.hens", reg, report)
+        ref("text", hen.get("naming"), "catalogue.hens", reg, report)
+    for item in list(cat.get("copies", {})) + list(cat.get("seasonal", {})):
+        ref("item", item, "catalogue", reg, report)
 
 
 def check_id(value: Any, where: str, report: Report) -> bool:
@@ -627,7 +729,8 @@ def check_habitants(data: dict[str, Any], reg: Registry, report: Report) -> None
                 report.error(wd, "« priority » entier attendu")
             if "tier" in dialogue and dialogue["tier"] not in TIERS:
                 report.error(wd, f"tier inconnu {dialogue['tier']!r}")
-            if dialogue.get("shared"):
+            # Une scène à deux jouée par un effet (le dessin de Jeanne, tour 9) n'a pas de point de rendez-vous.
+            if dialogue.get("shared") and dialogue.get("point") is not None:
                 ref("point", dialogue.get("point"), wd, reg, report)
             check_conditions(dialogue.get("when", []), f"{wd}.when", reg, report)
             check_lines(dialogue.get("lines", []), wd, reg, report)
@@ -991,6 +1094,9 @@ def map_objects(folder: Path) -> set[str] | None:
         except json.JSONDecodeError:
             continue
         found.update(o.get("id") for o in carte.get("objets", []) if isinstance(o, dict))
+        # Tour 9: sièges sans modèle (le bord du ponton) et chantiers (les bancs bâtis).
+        found.update(o.get("id") for o in carte.get("sieges", []) if isinstance(o, dict))
+        found.update(o.get("id") for o in carte.get("chantiers", []) if isinstance(o, dict))
     return found if maps else None
 
 
@@ -1124,6 +1230,10 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
         reg.flags_set.add(fishing_flag)
     # Drapeaux posés par le moteur lui-même (geste à deux de la draisine arrivé au bout).
     reg.flags_set.update(ENGINE_FLAGS)
+    # Tour 9: chaque chantier bâti pose son drapeau (`<id>_built`, ou `flag`).
+    for ch in data.get("chantiers", {}).get("improvements", []):
+        if isinstance(ch, dict):
+            reg.flags_set.add(ch.get("flag") or f"{ch.get('id')}_built")
     # Posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms (migration du format 3).
     known_hens = settings.get("secrets", {}).get("knownHensFlag")
     if known_hens:
@@ -1368,6 +1478,7 @@ def main() -> int:
     check_astuces(data, reg, report)
     check_envies(data, reg, report)
     check_textes_reglages(data, reg, report)
+    check_tour9(data, reg, report)
     moments = check_moments(folder, reg, report, map_objects(folder))
     for moment, where in reg.moments_seen:
         if moment not in reg.moments:

@@ -26,6 +26,8 @@ import { updateTrain } from './train';
 import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
 import { updateHenCalls } from './secrets';
 import { forageHints } from './lisiere';
+import { boardHints, updateBoard } from './annonces';
+import { updateGifts } from './catalogue';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -156,11 +158,14 @@ export function step(sim: Sim, input: StepInput): void {
   autoStartScenes(sim);
   pumpScripts(sim);
   updateQuests(sim);
+  updateBoard(sim);
+  updateGifts(sim);
   if (world.phase === 'day') {
     updateStays(sim, stayPointsOf(sim), dt);
     updateEnvies(sim);
     nearHints(sim);
     forageHints(sim);
+    boardHints(sim);
   }
   for (const c of world.characters) {
     updatePlacement(sim, c);

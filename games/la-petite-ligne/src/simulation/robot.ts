@@ -18,8 +18,11 @@ import { canPlace } from './amenagement';
 import { catalogueWindow, currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { unitDraw } from '../etat/tirage';
 import { holdsRod, waterAhead } from './peche';
+import { toolKindOf } from './catalogue';
 import { inSowingSeason } from './potager';
-import { counterRemaining } from './conditions';
+import { counterRemaining, evaluateAll, NO_CONTEXT, orderSatisfied } from './conditions';
+import { catalogueOffers } from '../etat/catalogue';
+import { improvementRemaining, improvementState, openImprovement } from './chantiers';
 import { freeSeatsNear, seatedSeconds } from './bancs';
 import type { Condition, MomentWatch } from '../donnees/types';
 import { benchById } from '../etat/bancs';
@@ -121,6 +124,16 @@ function selectItem(c: Character, item: string, out: Intent[]): boolean {
   return false;
 }
 
+/** L'outil de ce verbe dans le sac (l'amélioré s'il y est, tour 9), ou `null`. */
+function toolIn(sim: Sim, c: Character, kind: string): string | null {
+  let found: string | null = null;
+  for (const s of c.bag) {
+    if (s === null || toolKindOf(sim, s.item) !== kind) continue;
+    if (found === null || sim.content.items[s.item]?.buyPrice !== null) found = s.item;
+  }
+  return found;
+}
+
 function pt(sim: Sim, id: string): Vec2 {
   return sim.map.points[id] ?? { x: 0, y: 0 };
 }
@@ -204,7 +217,7 @@ function orderSeedPlan(sim: Sim, day: number, last: number): string[] {
   for (const crop of Object.values(sim.content.crops)) {
     if (day + crop.growthDays > last || !inSowingSeason(sim, crop)) continue;
     const growing = sim.world.garden.filter((g) => g.crop?.crop === crop.id).length * crop.yieldPerCell;
-    if (orderNeed(sim, crop.harvest) + ingredientNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
+    if (wantedOf(sim, crop.harvest) + ingredientNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
   }
   return plan;
 }
@@ -252,10 +265,10 @@ function garden(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   if (thirsty !== undefined) {
     if (c.water <= 0) {
       const barrel = pt(sim, POINT.waterBarrel);
-      if (!selectItem(c, ITEM.wateringCan, out)) return true;
+      if (!selectItem(c, toolIn(sim, c, 'watering_can') ?? ITEM.wateringCan, out)) return true;
       return goAct(sim, c, m, 'remplir', ground(barrel), barrel, 1.2, out);
     }
-    if (!selectItem(c, ITEM.wateringCan, out)) return true;
+    if (!selectItem(c, toolIn(sim, c, 'watering_can') ?? ITEM.wateringCan, out)) return true;
     const p = { x: thirsty.cell.cx + 0.5, y: thirsty.cell.cy + 0.5 };
     return goAct(sim, c, m, `arroser:${thirsty.index}`, ground(p), p, 1.2, out);
   }
@@ -290,7 +303,7 @@ function ingredientNeed(sim: Sim, item: string): number {
     if (recipe.station !== 'stove' || !sim.world.unlockedRecipes.includes(recipe.id)) continue;
     const input = recipe.inputs.find((i) => i.item === item);
     if (input === undefined) continue;
-    const dishes = orderNeed(sim, recipe.output.item) - inBags(sim, recipe.output.item);
+    const dishes = wantedOf(sim, recipe.output.item) - inBags(sim, recipe.output.item);
     if (dishes > 0) need += Math.ceil(dishes / recipe.output.count) * input.count;
   }
   return need;
@@ -337,6 +350,7 @@ function planksOwned(sim: Sim): number {
 function planksWanted(sim: Sim): number {
   let wanted = planksForOrder(sim) - countInStacks(sim.world.crate, 'plank') + reserved(sim, 'plank') - orderNeed(sim, 'plank');
   if (!built(sim, 'chicken_coop')) wanted += 8;
+  if (afterDemo(sim)) wanted += annonceNeed(sim, 'plank');
   for (const r of ['craft_table', 'craft_chair', 'craft_shelf', 'craft_double_bed']) {
     const recipe = sim.content.recipes[r];
     const item = recipe?.output.item ?? '';
@@ -347,7 +361,8 @@ function planksWanted(sim: Sim): number {
 }
 
 function wood(sim: Sim, c: Character, m: Memory, out: Intent[], glutton = false): boolean {
-  if (countInBag(c, ITEM.axe) === 0) return false;
+  const axe = toolIn(sim, c, 'axe');
+  if (axe === null) return false;
   const logs = countInBag(c, ITEM.log);
   const planks = planksOwned(sim);
   if (logs > 0 && (questStep(sim, 'planks') === 'saw' || planks < planksWanted(sim) || logs >= 2)) {
@@ -365,7 +380,7 @@ function wood(sim: Sim, c: Character, m: Memory, out: Intent[], glutton = false)
     .filter((t) => !t.felled && (m.skip[`arbre:${t.id}`] ?? 0) <= sim.world.tick)
     .sort((a, b) => distance(c.pos, a.pos) - distance(c.pos, b.pos))[0];
   if (tree === undefined) return false;
-  if (!selectItem(c, ITEM.axe, out)) return true;
+  if (!selectItem(c, axe, out)) return true;
   return goAct(sim, c, m, `arbre:${tree.id}`, { kind: 'tree', tree: tree.id }, tree.pos, 1.4, out);
 }
 
@@ -595,7 +610,7 @@ function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   if (sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   for (const recipe of Object.values(sim.content.recipes)) {
     if (recipe.station !== 'stove' || !sim.world.unlockedRecipes.includes(recipe.id)) continue;
-    if (orderNeed(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) continue;
+    if (wantedOf(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) continue;
     if (!recipe.inputs.every((i) => countInBag(c, i.item) - orderNeed(sim, i.item) >= i.count)) continue;
     if (!c.inHouse) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
     out.push({ type: 'craft', recipe: recipe.id });
@@ -609,15 +624,15 @@ function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 /** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
   const wanted =
-    orderNeed(sim, 'trout') > inBags(sim, 'trout') ||
+    wantedOf(sim, 'trout') > inBags(sim, 'trout') ||
     reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') ||
-    reserved(sim, 'chub') > inBags(sim, 'chub') ||
+    reserved(sim, 'chub') + (afterDemo(sim) ? annonceNeed(sim, 'chub') : 0) > inBags(sim, 'chub') ||
     questWantsFish(sim);
   if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
-  if (countInBag(c, ITEM.fishingRod) === 0) return false;
+  if (toolIn(sim, c, 'fishing_rod') === null) return false;
   const ford = pt(sim, 'river_ford');
   if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, 'gue', ford, 0.4, out) || true;
-  if (!holdsRod(c)) return selectItem(c, ITEM.fishingRod, out) || true;
+  if (!holdsRod(sim, c)) return selectItem(c, toolIn(sim, c, 'fishing_rod') ?? ITEM.fishingRod, out) || true;
   m.job = 'pêcher';
   if (c.fishing?.phase === 'bite') {
     out.push({ type: 'act' });
@@ -926,12 +941,204 @@ function ironBox(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 function lastDay(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const train = currentOrder(sim.content.settings, sim.world).day;
   if (sim.world.clock.day !== train || sim.world.orderResult !== null) return false;
+  // Le salut du mécanicien (tour 9): la caisse remplie, on va aux manivelles au lieu d'attendre au quai.
+  if (afterDemo(sim) && saluteDue(sim)) return false;
   if (order(sim, c, m, out)) return true;
   const quay = pt(sim, POINT.trainStop);
   return goTo(sim, c, m, 'quai', quay, 2, out) || true;
 }
 
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Tour 9 (section 2.12): annonces, achats au catalogue, chantiers, cadeaux. Rien avant la fin de
+// la démo (`afterDemo`): les jours 1 à 15 ne changent pas.
+
+/** Le salut à armer maintenant: la caisse remplie (ou 15 h 25 passées), avant le départ. */
+function saluteDue(sim: Sim): boolean {
+  const today = sim.world.moments.today;
+  const def = today === null ? null : momentDef(sim.content, today.id);
+  if (def === null || today?.phase !== 'waiting' || def.watch.arm === null || (today.armedTick ?? null) !== null) return false;
+  const minutes = sim.world.clock.minutes;
+  return minutes >= def.window.from - MOMENT_LEAD_MINUTES && minutes < def.window.to && (orderSatisfied(sim) || minutes >= 15 * HOUR + 25);
+}
+
+/** Ordre des envies d'achat d'un duo (`WISH_ORDER` de `tour9_automne.py`): le premier abordable d'abord. */
+export const WISH_ORDER: readonly string[] = [
+  'watering_can_copper', 'watering_can_copper', 'chalk_box', 'straw_hat', 'axe_forged',
+  'fishing_rod_bamboo', 'hen_extra', 'coffee_mill', 'pressed_flowers', 'axe_forged',
+  'fishing_rod_bamboo', 'leather_apron', 'coop_calendar', 'wool_scarf', 'wicker_armchair',
+  'wall_clock', 'hen_extra_2', 'autumn_wreath',
+];
+/** Ce que le duo garde pour ses graines (section 2.9). */
+const PURSE_RESERVE = 150;
+/** Au-delà de cette bourse, le surplus va au chantier ouvert, par versements de 100 sous. */
+const IMPROVEMENT_KEEP = 300;
+const IMPROVEMENT_STEP = 100;
+
+/** Ce que l'annonce en cours attend encore de cet objet (étape des dons), 0 sinon. */
+function annonceNeed(sim: Sim, item: string): number {
+  const a = sim.world.board.current;
+  if (a?.state !== 'open') return 0;
+  const q = sim.world.quests.find((x) => x.id === a.quest);
+  const step = sim.content.quests.find((x) => x.id === a.quest)?.steps[q?.step ?? -1];
+  if (q?.status !== 'active' || step?.id !== 'give') return 0;
+  let need = 0;
+  for (const cond of step.conditions) {
+    if (cond.type !== 'counter' || !cond.key.endsWith(`:${item}`) || !cond.key.startsWith('given:')) continue;
+    need += Math.max(0, counterRemaining(sim, q.baselines, cond.key, cond.count, cond.since));
+  }
+  return need;
+}
+
+/** Ce qu'il faut produire de cet objet: la commande, puis l'annonce en cours (après la démo). */
+function wantedOf(sim: Sim, item: string): number {
+  return orderNeed(sim, item) + (afterDemo(sim) ? annonceNeed(sim, item) : 0);
+}
+
+/**
+ * L'annonce en cours: donner ce qu'on a de ses lignes à son habitant (dans les deux sacs, chacun
+ * le sien), puis, pour une annonce à deux, aller ensemble au point de la scène à l'heure dite.
+ */
+function annonceRound(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const a = sim.world.board.current;
+  if (a?.state !== 'open') return false;
+  const def = sim.content.annonces.find((x) => x.id === a.gabarit);
+  const q = sim.world.quests.find((x) => x.id === a.quest);
+  const step = sim.content.quests.find((x) => x.id === a.quest)?.steps[q?.step ?? -1];
+  if (def === undefined || q?.status !== 'active' || step === undefined) return false;
+  if (step.id === 'give') {
+    for (const line of def.variants[a.variant] ?? []) {
+      const need = annonceNeed(sim, line.item);
+      // La commande d'abord: ce qui reste au-delà de sa ligne va à l'annonce.
+      const spare = countInBag(c, line.item) - orderNeed(sim, line.item);
+      const n = Math.min(need, spare);
+      if (n > 0 && giveVillager(sim, c, m, def.giver, [{ item: line.item, count: n }], out)) return true;
+    }
+    return false;
+  }
+  if (step.id !== 'scene' || def.scene === null) return false;
+  const scene = sim.content.dialogues[def.scene];
+  const at = scene?.point === null || scene === undefined ? undefined : sim.map.points[scene.point];
+  if (scene === undefined || at === undefined || !evaluateAll(sim, scene.when, NO_CONTEXT)) return false;
+  const v = sim.world.villagers.find((x) => x.id === scene.villager);
+  if (v?.visible !== true || distance(v.pos, at) > sim.content.settings.ranges.talk + 2) return false;
+  m.job = `scène ${def.scene}`;
+  if (distance(c.pos, at) > sim.content.settings.ranges.talk - 0.6) return goTo(sim, c, m, `scene:${def.scene}`, at, 0.8, out) || true;
+  return true;
+}
+
+/** Article du catalogue de la semaine à acheter par ce joueur maintenant, ou `null`. */
+function nextWish(sim: Sim, c: Character): string | null {
+  const offers = catalogueOffers(sim.content.settings, sim.content, sim.world);
+  const seen = new Map<string, number>();
+  for (const item of WISH_ORDER) {
+    const k = (seen.get(item) ?? 0) + 1;
+    seen.set(item, k);
+    if ((sim.world.catalogueBought[item] ?? 0) >= k) continue;
+    const offer = offers.find((o) => o.item === item);
+    if (offer === undefined || offer.price > sim.world.purse - PURSE_RESERVE) continue;
+    // Un outil par joueur: le premier exemplaire pour p1, le second pour p2; le reste, p1.
+    const buyer: CharacterId = offer.shelf === 'tools' && k === 2 ? 'p2' : 'p1';
+    return buyer === c.id ? item : null;
+  }
+  return null;
+}
+
+/** Commander au catalogue (au tableau du quai) l'article suivant de la liste. */
+function shopCatalogue(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (sim.world.proposals.length > 0 || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  const item = nextWish(sim, c);
+  if (item === null) return false;
+  const board = pt(sim, POINT.noticeBoard);
+  if (distance(c.pos, board) > sim.content.settings.ranges.talk - 0.3) return goTo(sim, c, m, `catalogue:${item}`, board, 1.0, out) || true;
+  out.push({ type: 'catalogue_order', item });
+  m.waitUntil = sim.world.tick + 4;
+  m.job = `commander ${item}`;
+  return true;
+}
+
+/**
+ * Chantiers: au-delà de `IMPROVEMENT_KEEP` sous, verser 100 sous au chantier du bourg ouvert (au
+ * tableau); payer d'un coup celui de la maisonnette chez Basile quand la bourse le permet, après
+ * lui avoir apporté les planches de trop (p2, qui coupe le bois).
+ */
+function fundImprovements(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (sim.world.proposals.length > 0 || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  // Les achats du catalogue d'abord: la liste passe avant les chantiers (section 2.12).
+  if (nextWish(sim, character(sim, 'p1')) !== null || nextWish(sim, character(sim, 'p2')) !== null) return false;
+  const s = sim.content.settings.improvements;
+  if (s === null) return false;
+  const home = openImprovement(sim, 'maisonnette');
+  if (home !== null && !improvementState(sim, home.id).funded && c.id === 'p2') {
+    const state = improvementState(sim, home.id);
+    const spare = countInBag(c, 'plank') - Math.max(0, planksWanted(sim));
+    const room = s.plankDiscountMax - state.planks;
+    const remaining = improvementRemaining(sim, home);
+    const bench = pt(sim, POINT.workbench);
+    const near = distance(c.pos, bench) <= sim.content.settings.ranges.talk - 0.3;
+    if (spare > 0 && room > 0 && remaining > 0) {
+      if (!near) return goTo(sim, c, m, `basile:${home.id}`, bench, 1.0, out) || true;
+      out.push({ type: 'improvement_planks', improvement: home.id, count: Math.min(spare, room) });
+      m.waitUntil = sim.world.tick + 3;
+      m.job = 'planches pour Basile';
+      return true;
+    }
+    if (remaining > 0 && sim.world.purse - IMPROVEMENT_KEEP >= remaining) {
+      if (!near) return goTo(sim, c, m, `basile:${home.id}`, bench, 1.0, out) || true;
+      out.push({ type: 'improvement_pay', improvement: home.id, amount: null });
+      m.waitUntil = sim.world.tick + 4;
+      m.job = `commander ${home.id} à Basile`;
+      return true;
+    }
+  }
+  const town = openImprovement(sim, 'bourg');
+  if (town === null || c.id !== 'p1' || improvementState(sim, town.id).funded) return false;
+  const remaining = improvementRemaining(sim, town);
+  const sum = Math.min(remaining, IMPROVEMENT_STEP);
+  if (remaining <= 0 || sim.world.purse - IMPROVEMENT_KEEP < sum) return false;
+  const board = pt(sim, POINT.noticeBoard);
+  if (distance(c.pos, board) > sim.content.settings.ranges.talk - 0.3) return goTo(sim, c, m, `souscrire:${town.id}`, board, 1.0, out) || true;
+  out.push({ type: 'improvement_pay', improvement: town.id, amount: sum });
+  m.waitUntil = sim.world.tick + 4;
+  m.job = `verser à ${town.id}`;
+  return true;
+}
+
+/** Un cadeau du catalogue dans le sac: l'offrir à son habitant (quête « Un cadeau pour ... »). */
+function offerGifts(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  for (const g of sim.content.catalogue?.gifts ?? []) {
+    if (countInBag(c, g.item) === 0 || questStep(sim, g.quest) !== 'give') continue;
+    if (giveVillager(sim, c, m, g.villager, [{ item: g.item, count: 1 }], out)) return true;
+  }
+  return false;
+}
+
+/** Les lanternes: chacun à sa place, et les deux allument au même pas (le robot « compte » parfaitement). */
+function lanternMoment(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const today = sim.world.moments.today;
+  const def = today === null ? null : momentDef(sim.content, today.id);
+  const sp = def === null || today === null ? null : activeWatch(def, today).syncPress;
+  if (sp === null || def === null || today === null || today.phase === 'gone' || today.phase === 'left') return false;
+  const minutes = sim.world.clock.minutes;
+  if (today.phase === 'climax' || today.phase === 'after') return false;
+  if (minutes < def.window.from - MOMENT_LEAD_MINUTES || minutes >= def.window.to) return false;
+  const place = sp.places[c.id === 'p1' ? 0 : 1] ?? sp.places[0];
+  const at = place === undefined ? undefined : sim.map.points[place];
+  if (place === undefined || at === undefined) return false;
+  m.job = `lanterne ${place}`;
+  const reach = sim.content.settings.moments.holdRange - 0.2;
+  if (distance(c.pos, at) > reach) return goTo(sim, c, m, `lanterne:${place}`, at, 0.3, out) || true;
+  const other = character(sim, partnerOf(c.id));
+  const otherPlace = sp.places.find((p) => p !== place);
+  const otherAt = otherPlace === undefined ? undefined : sim.map.points[otherPlace];
+  const ready = otherAt !== undefined && distance(other.pos, otherAt) <= reach && other.status === 'active';
+  if (ready && minutes >= def.window.from && !busy(sim, c) && !busy(sim, other)) {
+    out.push({ type: 'act' });
+    m.waitUntil = sim.world.tick + SIM_HZ;
+  }
+  return true;
+}
 
 export interface RobotOptions {
   /** Résoudre l'énigme d'Émile (faux: vérifier qu'elle ne bloque jamais la fin, D-08). */
@@ -969,7 +1176,7 @@ function afterDemo(sim: Sim): boolean {
 /** A-t-il parlé à cet habitant aujourd'hui ? */
 function talkedToday(sim: Sim, c: Character, villager: string): boolean {
   const key = `talked:${villager}`;
-  return (sim.world.counters[c.id][key] ?? 0) > (sim.world.countersAtDawn[c.id][key] ?? 0);
+  return (sim.world.countersToday[c.id][key] ?? 0) > 0;
 }
 
 /** Conversations du quotidien d'après la démo, selon le profil (R2 se mesure sur elles). */
@@ -1116,6 +1323,9 @@ export function createRobot(options: RobotOptions = {}): Robot {
       if (def.questStep !== null && step !== def.questStep) return false;
     }
     const w = activeWatch(def, today);
+    // Les lanternes ont leur propre geste (`lanternMoment`); le salut attend la caisse remplie (ou 15 h 40).
+    if (w.syncPress !== null) return false;
+    if (w.arm !== null && (today.armedTick ?? null) === null && !orderSatisfied(sim) && minutes < 15 * HOUR + 25) return false;
     m.job = `moment: ${def.id}`;
     if (w.hold !== null) {
       const place = w.hold[c.id === 'p1' ? 0 : 1] ?? w.hold[0];
@@ -1317,6 +1527,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       (solveRiddle && riddle(sim, c, m, out)) ||
       (solveRiddle && riddle2(sim, c, m, out)) ||
       handcarTry(sim, c, m, out) ||
+      (afterDemo(sim) && lanternMoment(sim, c, m, out)) ||
       watchMoment(sim, c, m, f, out) ||
       evening(sim, c, m, out) ||
       secretQuests(sim, c, m, f, out) ||
@@ -1324,6 +1535,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       giveOdette(sim, c, m, out) ||
       order(sim, c, m, out) ||
       cookForOrder(sim, c, m, out) ||
+      (afterDemo(sim) && (annonceRound(sim, c, m, out) || offerGifts(sim, c, m, out) || shopCatalogue(sim, c, m, out) || fundImprovements(sim, c, m, out))) ||
       (afterDemo(sim) && dailyTalks(sim, c, m, profile, out)) ||
       (afterDemo(sim) && c.id === 'p2' && forageRound(sim, c, m, out)) ||
       weekTwoQuests(sim, c, m, out) ||

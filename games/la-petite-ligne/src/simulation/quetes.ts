@@ -81,7 +81,8 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
   if (next === undefined) {
     state.status = 'done';
     state.checklist = [];
-    notify(sim, 'both', 'quest', format(quest.completionText, { ...textVars(sim), day: state.train ?? '' }), { key: 'quest_done' });
+    // Une annonce (tour 9) a son propre message, avec la récompense (`annonces.ts`).
+    if (quest.completionText !== '') notify(sim, 'both', 'quest', format(quest.completionText, { ...textVars(sim), day: state.train ?? '' }), { key: 'quest_done' });
     emit(sim, { type: 'quest_done', quest: quest.id });
     finishSecret(sim, quest.id);
     runEffects(sim, quest.completionEffects, actor);

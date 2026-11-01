@@ -590,7 +590,18 @@
                 { "type": "play_dialogue", "dialogue": "firmin_stage_summer" },
                 { "type": "end_stage", "stage": "summer_end" }
               ],
-              "else": []
+              "else": [
+                {
+                  "type": "if",
+                  "condition": { "type": "stage_due", "stage": "autumn_end" },
+                  "then": [
+                    { "type": "gather_players", "point": "quay_bell" },
+                    { "type": "play_dialogue", "dialogue": "firmin_stage_autumn" },
+                    { "type": "end_stage", "stage": "autumn_end" }
+                  ],
+                  "else": []
+                }
+              ]
             }
           ]
         }

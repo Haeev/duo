@@ -215,6 +215,9 @@ export function bump(sim: Sim, key: string, by: CharacterId | null, amount = 1):
   const counters = sim.world.counters;
   counters.duo[key] = (counters.duo[key] ?? 0) + amount;
   if (by !== null) counters[by][key] = (counters[by][key] ?? 0) + amount;
+  const today = sim.world.countersToday;
+  today.duo[key] = (today.duo[key] ?? 0) + amount;
+  if (by !== null) today[by][key] = (today[by][key] ?? 0) + amount;
   sim.runtime.changed = true;
 }
 
