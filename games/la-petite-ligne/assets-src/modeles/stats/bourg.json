@@ -507,7 +507,7 @@
     3
    ],
    "walk_height": 0.5,
-   "tris": 652
+   "tris": 906
   },
   "tree_oak": {
    "alias_of": "tree_oak_large",
@@ -537,5 +537,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3464288
+ "file_bytes": 3482144
 }

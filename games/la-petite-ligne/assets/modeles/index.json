@@ -854,7 +854,7 @@
  },
  "pontoon": {
   "file": "bourg.glb",
-  "tris": 652,
+  "tris": 906,
   "footprint": [
    2,
    3
@@ -1164,7 +1164,7 @@
  },
  "fawn": {
   "file": "faune.glb",
-  "tris": 900,
+  "tris": 896,
   "animations": [
    "fawn_rustle",
    "fawn_rise",
