@@ -18,8 +18,10 @@ import {
   type Texture,
   type WebGLProgramParametersWithUniforms,
 } from 'three';
+import type { Season } from '../donnees/types';
 import { paletteUv, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
+import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import type { ResourceTracker } from './ressources';
 
 const TEXTURE_URLS = import.meta.glob<string>('../../assets/modeles/textures/*.png', {
@@ -87,6 +89,16 @@ export interface SharedMaterials {
   /** Silhouette d'un joueur caché derrière un mur. */
   silhouette: MeshBasicMaterial;
   paletteTexture: Texture;
+  /** Saison de la palette en vigueur. */
+  readonly season: Season;
+  /**
+   * Palette de la saison (section 2.2): l'image de `paletteTexture` est remplacée, donc tout
+   * matériau qui la lit (décor, terrain, fantômes, copies des personnages, effets) suit, sans
+   * programme de plus. Vrai si la saison a changé.
+   */
+  setSeason(season: Season): boolean;
+  /** Appelé après chaque changement de palette (couleurs lues une fois et gardées ailleurs). */
+  onPaletteChange(listener: () => void): () => void;
   /** Temps des animations de shader (s). */
   setTime(seconds: number): void;
   /** Lueur des fenêtres et des lampes (0 le jour, 1 la nuit). */
@@ -132,6 +144,12 @@ const SEE_THROUGH_MIN_HEIGHT = 0.45;
 const BYTE = 255;
 const RGBA = 4;
 
+interface PalettePixels {
+  data: Uint8ClampedArray;
+  width: number;
+  height: number;
+}
+
 /** Lit les pixels de la texture palette (une fois, au chargement). */
 function readPixels(
   texture: Texture,
@@ -162,10 +180,14 @@ function readPixels(
 /** Charge les textures palette et crée les matériaux partagés. */
 export async function createSharedMaterials(resources: ResourceTracker): Promise<SharedMaterials> {
   const loader = new TextureLoader();
-  const [base, roughMetal, emission] = await Promise.all([
-    loadTexture(loader, 'palette.png', whiteTexture),
+  const looks = SEASON_RENDER_SETTINGS.seasons;
+  const [base, roughMetal, emission, summer, autumn, winter] = await Promise.all([
+    loadTexture(loader, looks.spring.palette, whiteTexture),
     loadTexture(loader, 'palette-mr.png', whiteTexture),
     loadTexture(loader, 'palette-emission.png', blackTexture),
+    loadTexture(loader, looks.summer.palette, whiteTexture),
+    loadTexture(loader, looks.autumn.palette, whiteTexture),
+    loadTexture(loader, looks.winter.palette, whiteTexture),
   ]);
   resources.track(preparePaletteTexture(base, true));
   resources.track(preparePaletteTexture(roughMetal, false));
@@ -257,7 +279,27 @@ diffuseColor.a = mix(diffuseColor.a, 1.0, glint * 0.5);`,
   };
   water.customProgramCacheKey = (): string => 'lpl_water';
 
-  const pixels = readPixels(base);
+  // Images des quatre saisons (même disposition): seule l'image de `base` change, jamais l'objet.
+  // Une texture de repli (fichier manquant) n'a pas d'image: la palette garde alors la sienne.
+  const imageOf = (texture: Texture): unknown =>
+    texture instanceof DataTexture || base instanceof DataTexture ? null : texture.image;
+  const seasonImages: Record<Season, unknown> = {
+    spring: imageOf(base),
+    summer: imageOf(summer),
+    autumn: imageOf(autumn),
+    winter: imageOf(winter),
+  };
+  const seasonPixels: Record<Season, PalettePixels | null> = {
+    spring: readPixels(base),
+    summer: readPixels(summer),
+    autumn: readPixels(autumn),
+    winter: readPixels(winter),
+  };
+  // Les textures de saison ne servent qu'à charger leur image: jamais envoyées au GPU.
+  for (const texture of [summer, autumn, winter]) resources.track(texture);
+  let season: Season = 'spring';
+  let pixels = seasonPixels.spring;
+  const paletteListeners = new Set<() => void>();
 
   // Trous de visibilité: un personnage caché derrière un bâtiment ou un arbre reste visible.
   const cutUniforms = {
@@ -320,6 +362,25 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
     water,
     silhouette,
     paletteTexture: base,
+    get season(): Season {
+      return season;
+    },
+    setSeason(next: Season): boolean {
+      if (next === season) return false;
+      season = next;
+      pixels = seasonPixels[next];
+      const image = seasonImages[next];
+      if (image !== null && image !== undefined) {
+        base.image = image;
+        base.needsUpdate = true;
+      }
+      for (const listener of paletteListeners) listener();
+      return true;
+    },
+    onPaletteChange(listener: () => void): () => void {
+      paletteListeners.add(listener);
+      return () => paletteListeners.delete(listener);
+    },
     setTime(seconds: number): void {
       waterUniforms.uTime.value = seconds;
     },

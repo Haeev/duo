@@ -72,6 +72,18 @@ Tenue par le technical artist. Ce que l'ambiance fait en attendant est dit à ch
 
 ## Technical artist
 
+### 2026-11-01, gauntlet tour 8: rendu des saisons (dev gameplay 3D)
+
+Conception: `docs/jeux/jeu-1/tour-08-conception.md`, sections 2.2, 2.5, 3.3, 3.4 et ligne « Dev rendu et technical artist » de la section 11.
+
+- Réglages: `src/rendu/reglages-saisons.ts` (texture de palette, lever, fin du jour et `sunElevationScale` par saison; ancres de la déformation; niveau de la brume du matin, 0,6). Fonctions pures dans `src/rendu/saisons.ts` (`seasonalMinutes`, `seasonalElevation`, `morningMistLevel`).
+- Palette: `SharedMaterials.setSeason(saison)` remplace l'image de `paletteTexture` (même objet `Texture`, nouvel envoi de 64 x 64): `lpl_palette`, les fantômes, les copies des personnages, les matériaux des effets, de la maison, des signes et de la pêche suivent tous, mode léger compris, sans programme de plus. `paletteColor` lit la palette en vigueur; `onPaletteChange(listener)` prévient ceux qui gardent des couleurs lues une fois: les teintes continues de l'herbe du sol (`ambiance.ts`, `uGroundColors`) et les couleurs d'instance des touffes (`vegetation.ts`). L'hiver, les fleurs du pré ne sont pas dessinées.
+- Quand: le moteur (`applySeason` de `moteur.ts`) prend `seasonOfDay(jour)`; il ne change qu'hors de la phase `day` (le jour avance à 6 h, sur l'écran du petit-déjeuner), et à la première image (partie reprise).
+- Lumière (`lumiere.ts`): `DaylightRig.setSeason(look)` déforme l'heure lue par les courbes (identité au printemps: les jours 1 à 21 et l'énigme de la cloche ne changent pas) et multiplie la hauteur du soleil par `sunElevationScale` le jour (la lune garde la sienne, transition par la lueur de nuit). Lampadaires et fenêtres suivent la courbe déformée.
+- Brume du matin: `DaylightRig.setMorningMist(mistAmount(...))` à chaque image; la brume au sol vaut au moins 0,6 x `mistAmount` (0,6 jusqu'à 9 h, levée jusqu'à 10 h 30), ce qui allume les bancs couchés de l'aube (`ciel.ts`) et rapproche la brume du fond (`fog.mistPull`). En plus, une nappe propre aux matins de brume (`ciel.ts`, groupe 3 du programme des particules, `uGroupAlpha.w`, même appel de dessin): 46 bancs couchés semés sur l'eau et l'herbe basse des zones `river` et `meadow` (réglages `morningMist` de `reglages-saisons.ts`), d'opacité `DaylightRig.morningMist`. Rien en mode léger (comme les autres bancs).
+- Page de démonstration: `saison=printemps|ete|automne|hiver` (même jour de la saison, âges des souches gardés), `jour=<n>`, `brume=1`.
+- Tests: `src/rendu/saisons.test.ts` (déformation, ancres, soirées, hauteur du soleil, continuité dans chaque saison, brume). Captures: `docs/jeux/jeu-1/gauntlet/captures/tour-08/saisons-*.png`.
+
 ### 2026-10-31, passe d'ombre resserrée
 
 - `lumiere.ts`: profondeur de la caméra d'ombre serrée. Devant les receveurs, seulement la distance d'où un objet peut porter ombre dans la vue (`casterHeight / sin(hauteur du soleil)`, plafonnée à `casterReach` = 11 m le long du rayon); derrière, rien. Cadre latéral plus serré (`receiverHeight` 2 m au lieu de 3, `margin` 0,75 au lieu de 1,5). Test de la cloche et tests du rendu verts.

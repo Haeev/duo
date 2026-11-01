@@ -6,7 +6,9 @@
  * modifie jamais. `dispose` libère tout (géométries, matériaux, textures,
  * contexte WebGL).
  */
+import { seasonOfDay } from '../donnees/calendrier';
 import { benchesOf } from '../etat/bancs';
+import { mistAmount } from '../etat/meteo';
 import {
   ACESFilmicToneMapping,
   Color,
@@ -24,6 +26,7 @@ import {
   type Object3D,
   type ToneMapping,
 } from 'three';
+import type { Season } from '../donnees/types';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { GameView, PickResult, Renderer, RendererOptions } from '../etat/vue';
 import { IsoCameraRig, type CameraCommand } from './camera';
@@ -36,6 +39,7 @@ import { ShadowCasterCulling } from './ombre-tri';
 import { PerfMonitor } from './perf';
 import { AdaptiveQuality, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
+import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
 import { Vegetation } from './vegetation';
@@ -135,6 +139,8 @@ export class RenderEngine implements Renderer {
   private vegetation: Vegetation | null = null;
   private moments: MomentsPart | null = null;
   private readonly shadowCulling = new ShadowCasterCulling();
+  /** Saison montée (palette et lumière), `null` avant la première image. */
+  private season: Season | null = null;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -468,6 +474,10 @@ export class RenderEngine implements Renderer {
       this.rig.update(dt, this.rig.focus.x, this.rig.focus.z, 0, 0, null);
     }
     this.focus.copy(this.rig.focus);
+    this.applySeason(world);
+    this.daylight.setMorningMist(
+      mistAmount(this.view.content.settings, world.morningMist, world.clock.minutes),
+    );
     this.daylight.update(
       world.clock.minutes,
       world.weather,
@@ -506,6 +516,21 @@ export class RenderEngine implements Renderer {
     }
     // Après les parties: la pose de l'habitant mené par un moment est celle de cette image.
     this.updateSeeThrough(world, alpha);
+  }
+
+  /**
+   * Saison du jour (palette et lumière, sections 2.2 et 2.5). Le jour change à 6 h, sur l'écran
+   * du petit-déjeuner: c'est là que la palette bascule, jamais en pleine journée (sauf à la
+   * première image, partie reprise comprise).
+   */
+  private applySeason(world: ReadonlyWorld): void {
+    const materials = this.materials;
+    if (materials === null) return;
+    const season = seasonOfDay(this.view.content.settings, world.clock.day);
+    if (season === this.season || (this.season !== null && world.phase === 'day')) return;
+    this.season = season;
+    materials.setSeason(season);
+    this.daylight.setSeason(SEASON_RENDER_SETTINGS.seasons[season]);
   }
 
   /** Trous de visibilité autour des deux joueurs (ce qui les cache s'efface, voir `materiaux.ts`). */

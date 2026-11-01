@@ -18,18 +18,21 @@ import {
   type ParticleUniforms,
 } from './particules';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
+import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 
 const GROUP_CLOUD = 0;
 const GROUP_MIST = 1;
 const GROUP_HALO = 2;
+const GROUP_MORNING = 3;
 /** Réglages par instance du mode sprites (`aAccel.x`, `aAccel.y`): couché à plat, fondu au sol. */
 const LYING = 1;
 const GROUND_FADE = 1;
 /** Graines des tirages (bruit déterministe). */
 const SEED_CLOUD = 11;
 const SEED_MIST = 23;
+const SEED_MORNING = 37;
 /** Étalement des bouffées d'un nuage autour de son centre (part de la taille d'une bouffée). */
 const CLOUD_SPREAD = 0.9;
 const CLOUD_FLATTEN = 0.35;
@@ -45,6 +48,7 @@ export class SkyLayer {
   private readonly clouds: number;
   private readonly mist: number;
   private readonly halos: number;
+  private readonly morning: number;
 
   constructor(
     map: GameMap,
@@ -57,7 +61,8 @@ export class SkyLayer {
     this.clouds = sky.clouds * sky.cloudPuffs;
     this.mist = sky.mist;
     this.halos = glows.length;
-    const total = this.clouds + this.mist + this.halos;
+    this.morning = SEASON_RENDER_SETTINGS.morningMist.banks;
+    const total = this.clouds + this.mist + this.halos + this.morning;
     const material = createParticleMaterial(PARTICLE_MODE.sprites, field, resources);
     this.uniforms = material.uniforms;
     const built = createParticleMesh('ciel', Math.max(1, total), material, resources, false);
@@ -66,7 +71,8 @@ export class SkyLayer {
     let index = 0;
     index = this.fillClouds(b, index);
     index = this.fillMist(b, index, map, terrain);
-    this.fillHalos(b, index, glows);
+    index = this.fillHalos(b, index, glows);
+    this.fillMorningMist(b, index, map, terrain);
     built.geometry.instanceCount = total;
     this.mesh.renderOrder = 2;
     const u = this.uniforms;
@@ -132,7 +138,34 @@ export class SkyLayer {
     return index;
   }
 
-  private fillHalos(b: ParticleBuffers, start: number, glows: readonly GlowSource[]): void {
+  /**
+   * Nappe de la brume du matin (tour 8, section 3.4): bancs serrés sur l'eau et l'herbe basse de
+   * l'Aubrune et du pré de l'est, là où l'air froid s'accumule; jamais sur le quai ni sur un toit.
+   */
+  private fillMorningMist(b: ParticleBuffers, start: number, map: GameMap, terrain: Terrain): void {
+    const m = SEASON_RENDER_SETTINGS.morningMist;
+    const rects = m.zones.map((id) => map.zones[id]).filter((rect) => rect !== undefined);
+    const color = new Color(AMBIANCE_SETTINGS.sky.mistColor);
+    for (let bank = 0; bank < this.morning; bank += 1) {
+      const index = start + bank;
+      const rect = rects[bank % Math.max(1, rects.length)];
+      let x = rect === undefined ? map.width * HALF : rect.x + rect.w * HALF;
+      let y = rect === undefined ? map.height * HALF : rect.y + rect.h * HALF;
+      for (let attempt = 0; rect !== undefined && attempt < MIST_TRIES; attempt += 1) {
+        x = rect.x + hash2(bank, attempt * 2, SEED_MORNING) * rect.w;
+        y = rect.y + hash2(bank, attempt * 2 + 1, SEED_MORNING) * rect.h;
+        if (terrain.heightAt(x, y) < MIST_MAX_GROUND) break;
+      }
+      const size = m.size * (0.8 + 0.4 * hash2(bank, 0, SEED_MORNING + 1));
+      b.origin.setXYZW(index, x, terrain.heightAt(x, y) + m.height, y, hash2(bank, 1, SEED_MORNING + 1));
+      b.velocity.setXYZW(index, AMBIANCE_SETTINGS.sky.mistDrift * size, 0, 0, 1);
+      b.accel.setXYZW(index, LYING, GROUND_FADE, 0, GROUP_MORNING);
+      b.size.setXYZW(index, size, size, PARTICLE_SHAPE.puff, 0);
+      b.color.setXYZW(index, color.r, color.g, color.b, m.opacity);
+    }
+  }
+
+  private fillHalos(b: ParticleBuffers, start: number, glows: readonly GlowSource[]): number {
     const kinds = AMBIANCE_SETTINGS.glow.kinds;
     let index = start;
     const color = new Color();
@@ -153,11 +186,12 @@ export class SkyLayer {
       b.color.setXYZW(index, color.r, color.g, color.b, kind.haloOpacity);
       index += 1;
     }
+    return index;
   }
 
   /**
-   * `cloudAmount`, `mistAmount`, `glowAmount`: de 0 à 1. En version légère, ni
-   * nuages ni brume (les halos restent: ils disent la nuit).
+   * `cloudAmount`, `mistAmount`, `glowAmount`, `morningAmount` (nappe de la brume du matin): de 0
+   * à 1. En version légère, ni nuages ni brume (les halos restent: ils disent la nuit).
    */
   update(
     time: number,
@@ -169,12 +203,15 @@ export class SkyLayer {
     lit: Color,
     shade: Color,
     lightView: Vector3,
+    morningAmount = 0,
   ): void {
     const u = this.uniforms;
     const clouds = light ? 0 : cloudAmount;
     const mist = light ? 0 : mistAmount;
-    u.uGroupAlpha.value.set(clouds, mist, glowAmount, 0);
-    this.mesh.visible = clouds > 0 || mist > 0 || (glowAmount > 0 && this.halos > 0);
+    const morning = light ? 0 : morningAmount;
+    u.uGroupAlpha.value.set(clouds, mist, glowAmount, morning);
+    this.mesh.visible =
+      clouds > 0 || mist > 0 || morning > 0 || (glowAmount > 0 && this.halos > 0);
     if (!this.mesh.visible) {
       return;
     }

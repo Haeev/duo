@@ -27,6 +27,8 @@ import {
 import type { Weather } from '../etat/types';
 import { CyclicCurve } from './courbes';
 import { AMBIANCE_SETTINGS, type LightKey, type WeatherLook } from './reglages-ambiance';
+import { SEASON_RENDER_SETTINGS, type SeasonLook } from './reglages-saisons';
+import { morningMistLevel, seasonalElevation, seasonalMinutes } from './saisons';
 
 const DEG = Math.PI / 180;
 const MINUTES_PER_DAY = 1440;
@@ -181,6 +183,10 @@ export class DaylightRig {
   private readonly corner = new Vector3();
   private readonly forward = new Vector3();
   private readonly ground = new Vector3();
+  /** Saison de la lumière (déformation de l'heure, hauteur du soleil): le printemps par défaut. */
+  private season: SeasonLook = SEASON_RENDER_SETTINGS.seasons.spring;
+  /** Brume du matin du jour (`mistAmount`, 0 à 1): la nappe sur l'eau et le pré (`ciel.ts`). */
+  morningMist = 0;
 
   constructor(scene: Scene) {
     this.curves = new DayCurves(AMBIANCE_SETTINGS.daylight);
@@ -211,6 +217,16 @@ export class DaylightRig {
     this.camera = camera;
   }
 
+  /** Saison de la lumière, lue à la prochaine mise à jour (section 2.5). */
+  setSeason(look: SeasonLook): void {
+    this.season = look;
+  }
+
+  /** Brume du matin (`mistAmount` de `etat/meteo.ts`: 1 jusqu'à 9 h, 0 à 10 h 30). */
+  setMorningMist(amount: number): void {
+    this.morningMist = clamp01(amount);
+  }
+
   /**
    * Met la lumière à l'heure (`minutes` depuis minuit) et à la météo, et cale
    * l'ombre sur la vue (autour de `focus`, rayon `viewRadius` sans caméra).
@@ -222,7 +238,7 @@ export class DaylightRig {
     viewRadius: number,
     cameraDistance: number,
   ): void {
-    const m = MathUtils.euclideanModulo(minutes, MINUTES_PER_DAY);
+    const m = seasonalMinutes(MathUtils.euclideanModulo(minutes, MINUTES_PER_DAY), this.season);
     const curves = this.curves;
     const look: WeatherLook = AMBIANCE_SETTINGS.weather[weather];
     const tint = this.tints[weather];
@@ -249,11 +265,16 @@ export class DaylightRig {
     this.wet = look.wet;
     this.rain = look.rain;
     this.cloudCover = clamp01(look.cloudCover * curves.clouds.at(m));
-    this.mist = clamp01(curves.mist.at(m) + look.mist);
+    this.mist = clamp01(morningMistLevel(curves.mist.at(m), this.morningMist) + look.mist);
 
     const shadows = AMBIANCE_SETTINGS.shadows;
     const azimuth = curves.azimuth.at(m) * DEG;
-    const elevation = Math.max(shadows.minElevationDeg, curves.elevation.at(m)) * DEG;
+    const sunHeight = seasonalElevation(
+      curves.elevation.at(m),
+      this.season.sunElevationScale,
+      this.night,
+    );
+    const elevation = Math.max(shadows.minElevationDeg, sunHeight) * DEG;
     this.direction.set(
       Math.cos(azimuth) * Math.cos(elevation),
       Math.sin(elevation),
