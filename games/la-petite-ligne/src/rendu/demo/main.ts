@@ -32,6 +32,7 @@ import {
   createExampleWorld,
   type DemoOptions,
 } from './etat-exemple';
+import { applyEdgeExample } from './lisiere-exemple';
 
 const MINUTES_PER_HOUR = 60;
 const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
@@ -149,6 +150,8 @@ async function main(): Promise<void> {
     moment,
   };
   const world = createExampleWorld(map, content, options);
+  // `lisiere=1` (tour 8): souche, rejets et cueillettes posées un jour d'été.
+  if (params.get('lisiere') === '1') applyEdgeExample(world, map, content);
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
     world.hens.forEach((hen, index) => {

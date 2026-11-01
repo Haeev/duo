@@ -111,6 +111,11 @@ TYPES = {
     "tree_fir": {"categorie": "arbre", "nom": "sapin", "emprise": [1, 1], "hauteur": 9.0,
                  "occultation_arbre": {"tronc": [0.4, 0.0, 1.2], "houppier": [2.4, 1.2, 9.0]}},
     "bush": {"categorie": "decor", "nom": "massif, arbuste bas", "emprise": [1, 1], "hauteur": 1.2},
+    # Tour 8 (section 5.2): le roncier des mûres (1,2 x 0,8 m) et le noisetier des noisettes.
+    "bramble": {"categorie": "decor", "nom": "roncier de la lisière (les mûres s'y posent)", "emprise": [1, 1],
+                "hauteur": 0.7},
+    "bush_hazel": {"categorie": "decor", "nom": "noisetier (les noisettes tombent à son pied)", "emprise": [1, 1],
+                   "hauteur": 2.0},
     "rock": {"categorie": "decor", "nom": "rocher", "emprise": [1, 1], "hauteur": 0.8},
 }
 
@@ -345,8 +350,19 @@ def construire_objets() -> None:
     objet("rock", 60, 9)
 
     # Sous-bois de la lisière: sureaux, ronces, quelques rochers (ni arbres ni obstacles en ligne).
-    for x, y in ((17, 3), (19, 7), (23, 5), (27, 8), (29, 7), (33, 3), (35, 8), (37, 4), (39, 7)):
+    # Tour 8: le sureau de (35, 8) passe en (33, 8) pour laisser la place au roncier du coin 04.
+    for x, y in ((17, 3), (19, 7), (23, 5), (27, 8), (29, 7), (33, 3), (33, 8), (37, 4), (39, 7)):
         objet("bush", x, y)
+    # Tour 8 (section 5.2): un roncier contre la lisière, au nord de chaque coin au soleil
+    # (forage_edge_03 à _05, y 9,5), face avant (+Z, rotation 0) tournée vers le coin, d'où l'on
+    # cueille les mûres posées dessus. La rangée des coins (y 9) et le chemin de la lisière (y 10 et
+    # 11), qui mène au passage à niveau, restent libres.
+    for n, x in ((3, 30), (4, 35), (5, 38)):
+        objet("bramble", x, 8, ident=f"bramble_edge_{n:02d}")
+    # Un noisetier juste au nord de chacun des deux coins de sous-bois (forage_edge_01 et _02), à
+    # l'ombre des chênes: les noisettes de l'automne tombent à son pied, là où on les ramasse.
+    for n, x in ((1, 19), (2, 25)):
+        objet("bush_hazel", x, 8, ident=f"hazel_edge_{n:02d}")
     for x, y in ((21, 3), (31, 3)):
         objet("rock", x, y)
 

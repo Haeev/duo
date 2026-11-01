@@ -93,15 +93,23 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
   if (best !== null) return best;
   const daily = eligibleDailies(sim, villager, who);
   if (daily.length === 0) return null;
-  // Répliques datées (jour du train, pluie): la plus prioritaire, une fois par jour.
+  // Répliques datées (jour du train, pluie): la plus prioritaire, une fois par jour. Après la démo
+  // (tour 8, section 5.5), seulement si ce joueur ne l'a pas entendue depuis `datedRepeatDays`
+  // jours; sinon elle rejoint la réserve ordinaire.
   const story = sim.content.settings.feel.dailyStoryPriority;
+  const rule = sim.content.settings.dialogues;
+  const recentlyHeard = (d: DialogueDef): boolean => {
+    const at = heard[d.id];
+    return today >= rule.datedRepeatFromDay && at !== undefined && today - Math.floor(at / MINUTES_PER_DAY) < rule.datedRepeatDays;
+  };
   let dated: DialogueDef | null = null;
   for (const d of daily) {
-    if (d.priority >= story && !heardToday(d) && (dated === null || d.priority > dated.priority)) dated = d;
+    if (d.priority < story || heardToday(d) || recentlyHeard(d)) continue;
+    if (dated === null || d.priority > dated.priority) dated = d;
   }
   if (dated !== null) return dated;
   // Sinon la moins récemment entendue par ce joueur (jamais entendue d'abord), au hasard à égalité.
-  const ordinary = daily.filter((d) => d.priority < story);
+  const ordinary = daily.filter((d) => d.priority < story || recentlyHeard(d));
   const pool = ordinary.length > 0 ? ordinary : daily;
   let oldest = Infinity;
   for (const d of pool) oldest = Math.min(oldest, heard[d.id] ?? -1);
@@ -183,9 +191,13 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
   if (!completed) return;
   const def = sim.content.dialogues[d.dialogue];
   if (def === undefined) return;
-  const done = sim.world.dialoguesDone;
-  if (!done.includes(def.id)) done.push(def.id);
-  if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
+  // Une réplique du quotidien répétable ne se garde que dans `heard` (tirage « la moins récente »):
+  // l'écrire aussi ici ferait grossir la sauvegarde de trois entrées par réplique (tour 8, I-06).
+  if (def.kind !== 'daily' || def.once !== null) {
+    const done = sim.world.dialoguesDone;
+    if (!done.includes(def.id)) done.push(def.id);
+    if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
+  }
   hearDialogue(sim, c.id, def);
   runEffects(sim, def.effects, c.id);
 }

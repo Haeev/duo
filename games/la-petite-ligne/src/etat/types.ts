@@ -188,6 +188,11 @@ export interface WorldState {
   secrets: SecretsState;
   /** Souvenirs du duo (tour 7): une ligne par moment vu ensemble et par quête secrète finie, bornée. */
   memories: MemoriesState;
+  /**
+   * Envies à deux tirées (tour 8, section 5.4), les `envies.sharedNoRepeatDays` derniers jours.
+   * Absent des sauvegardes d'avant: rempli à vide à la reprise.
+   */
+  sharedEnvieRecent: { id: EnvieId; day: number }[];
 }
 
 /**
@@ -552,7 +557,10 @@ export interface Tree {
   pos: Vec2;
   /** Coups de hache reçus. */
   hits: number;
+  /** Abattu: souche, puis rejet (ou jeune sapin), jusqu'à ce qu'il redevienne adulte (`etat/repousse.ts`). */
   felled: boolean;
+  /** Jour de l'abattage (tour 8, repousse), `null` debout. Absent des sauvegardes d'avant: rempli à la reprise. */
+  felledDay: number | null;
   /** Tick du dernier coup (tremblement). */
   lastHitTick: number;
 }
@@ -994,6 +1002,10 @@ export type WorldEvent =
   | { type: 'harvested'; by: CharacterId; cell: Cell; item: ItemId; quality: Quality; count: number }
   | { type: 'already_taken'; by: CharacterId; other: CharacterId; cell: Cell }
   | { type: 'chop'; by: CharacterId; tree: string; felled: boolean }
+  /** La hache refusée sur une souche (`stump`) ou un rejet trop jeune (`young`, il tremble un peu). */
+  | { type: 'chop_refused'; by: CharacterId; tree: string; reason: 'stump' | 'young' }
+  /** Un arbre abattu est redevenu adulte au matin. */
+  | { type: 'tree_regrown'; tree: string }
   | { type: 'dig'; by: CharacterId; cell: Cell; found: boolean }
   | { type: 'crafted'; by: CharacterId; recipe: RecipeId; item: ItemId; count: number }
   | { type: 'build_progress'; by: CharacterId; construction: ConstructionId; element: string }

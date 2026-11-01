@@ -25,6 +25,7 @@ import { updateQuests } from './quetes';
 import { updateTrain } from './train';
 import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
 import { updateHenCalls } from './secrets';
+import { forageHints } from './lisiere';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -159,6 +160,7 @@ export function step(sim: Sim, input: StepInput): void {
     updateStays(sim, stayPointsOf(sim), dt);
     updateEnvies(sim);
     nearHints(sim);
+    forageHints(sim);
   }
   for (const c of world.characters) {
     updatePlacement(sim, c);

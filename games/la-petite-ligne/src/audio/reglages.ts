@@ -132,6 +132,10 @@ export interface AudioSettings {
   loopFadeSeconds: number;
   /** Habitants dont le motif existe (`talk-<id>` dans `sons.json`). */
   villagerMotifPrefix: string;
+  /** Tour 8 (son.md 4.6): un son de cueillette par sorte, à la place de `pickup`. */
+  pickSounds: Readonly<Record<string, string>>;
+  /** Tournant de saison: `season-turn-<saison>`, au petit-déjeuner, chez les deux. */
+  seasonTurnPrefix: string;
   /** Sons demandés par l'interface (`GameAudio.ui`): au plus tant par image, le reste est perdu. */
   interface: { maxQueued: number };
   /** Moments rares (tour 6, `moments.json`): d'où part chaque son, ce qui suit une bête. */
@@ -244,6 +248,14 @@ export const AUDIO_SETTINGS: AudioSettings = {
   },
   loopFadeSeconds: 0.2,
   villagerMotifPrefix: 'talk-',
+  pickSounds: {
+    dandelion: 'pick-herb',
+    wild_garlic: 'pick-herb',
+    chanterelle: 'pick-mushroom',
+    blackberry: 'pick-berries',
+    hazelnut: 'pick-nuts',
+  },
+  seasonTurnPrefix: 'season-turn-',
   interface: { maxQueued: 4 },
   moments: {
     sources: {

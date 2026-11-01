@@ -5,12 +5,42 @@
  */
 import type {
   BenchSettings,
+  DialogueSettings,
+  EnvieSettings,
   FeelSettings,
   MemorySettings,
   MomentSettings,
   SecretSettings,
+  TreeSettings,
   WeatherSettings,
 } from './types';
+
+/** Repousse des arbres (tour 8, section 5.1); sans `regrow` dans `reglages.trees`, rien ne repousse. */
+export const DEFAULT_TREES: TreeSettings = {
+  chopsPerTree: 3,
+  logsPerTree: 2,
+  regrow: false,
+  regrowFromDay: 16,
+  catchUpDays: 6,
+  stumpDays: 4,
+  saplingDays: 6,
+  saplingScale: { first: 0.3, perDay: 0.1, max: 0.8 },
+};
+
+/** Envies (tour 8, section 5.4): sans ces clés, seule la règle de la démo vaut. */
+export const DEFAULT_ENVIES: EnvieSettings = {
+  noRepeatWindowDays: 7,
+  unseenFactor: 1,
+  sharedFromDay: null,
+  sharedEveryDays: 3,
+  sharedNoRepeatDays: 14,
+};
+
+/** Répliques datées (tour 8, section 5.5): 28 jours, à partir du lendemain de la démo. */
+export const DEFAULT_DIALOGUES: DialogueSettings = {
+  datedRepeatDays: 28,
+  datedRepeatFromDay: 16,
+};
 
 /** Moments rares (tour 6): valeurs de la conception, section 3.2; `reglages.moments` les remplace. */
 export const DEFAULT_MOMENTS: MomentSettings = {
@@ -115,6 +145,7 @@ export const DEFAULT_FEEL: FeelSettings = {
   pinSeconds: 15,
   // CN-04: goujon commun, chevesne peu commun, truite rare.
   fishWeights: { gudgeon: 6, chub: 3, trout: 1 },
+  fishWeightsBySeason: {},
 };
 
 /** Bancs: deux places à 0,5 m du milieu, lever à 0,85 m devant l'assise (hors de l'emprise de 1 m). */

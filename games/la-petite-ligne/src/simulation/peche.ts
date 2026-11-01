@@ -7,6 +7,7 @@ import { type Sim, bump, emit, sayIfWritten, secondsToTicks } from './contexte';
 import { spend } from './besoins';
 import { ITEM } from './ids';
 import { giveToCharacter, heldItem } from './sac';
+import { seasonOfDay } from '../donnees/calendrier';
 
 /** Pas d'échantillonnage du regard vers l'eau (m). */
 const LOOK_STEP = 0.5;
@@ -31,8 +32,26 @@ export function waterAhead(sim: Sim, c: Character): Vec2 | null {
   return null;
 }
 
+/** Poids des poissons ce jour-là: ceux de la saison (tour 8, section 5.3), sinon `fishWeights`. */
+export function fishWeightsOn(sim: Sim, day: number): Record<string, number> {
+  const feel = sim.content.settings.feel;
+  return feel.fishWeightsBySeason[seasonOfDay(sim.content.settings, day)] ?? feel.fishWeights;
+}
+
+/**
+ * Attente avant la touche multipliée selon le temps (pluie, brume du matin), à partir du premier
+ * jour de météo tirée: la démo garde ses attentes.
+ */
+export function biteWaitFactor(sim: Sim): number {
+  const { world } = sim;
+  const w = sim.content.settings.weather;
+  if (world.clock.day < w.fromDay) return 1;
+  const mist = world.morningMist && world.clock.minutes < w.mist.until ? w.mist.biteWaitFactor : 1;
+  return w.biteWaitFactor[world.weather] * mist;
+}
+
 function pickFish(sim: Sim): string | null {
-  const weights = Object.entries(sim.content.settings.feel.fishWeights).filter(([item, w]) => w > 0 && item in sim.content.items);
+  const weights = Object.entries(fishWeightsOn(sim, sim.world.clock.day)).filter(([item, w]) => w > 0 && item in sim.content.items);
   const total = weights.reduce((sum, [, w]) => sum + w, 0);
   if (total <= 0) return null;
   let roll = sim.rng.float(0, total);
@@ -67,7 +86,8 @@ export function fishAct(sim: Sim, c: Character): void {
   const bobber = waterAhead(sim, c);
   if (bobber === null) return;
   const [min, max] = fishing.biteWaitSeconds;
-  c.fishing = { phase: 'waiting', bobber, biteAt: sim.world.tick + secondsToTicks(sim.rng.float(min, max)), until: 0 };
+  const wait = sim.rng.float(min, max) * biteWaitFactor(sim);
+  c.fishing = { phase: 'waiting', bobber, biteAt: sim.world.tick + secondsToTicks(wait), until: 0 };
   c.facing = Math.atan2(bobber.y - c.pos.y, bobber.x - c.pos.x);
   spend(sim, c, 'fish_cast');
   emit(sim, { type: 'cast', by: c.id, at: { ...bobber } });

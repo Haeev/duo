@@ -9,6 +9,10 @@
     { "id": "lettuce", "name": "laitue", "plural": "laitues", "indefinite": "une laitue", "category": "crop", "stack": 99, "buyPrice": null, "sellPrice": 32, "shop": null, "model": "lettuce", "qualities": ["ordinary", "fine"], "tier": "P0" },
     { "id": "carrot", "name": "carotte", "plural": "carottes", "indefinite": "une carotte", "category": "crop", "stack": 99, "buyPrice": null, "sellPrice": 16, "shop": null, "model": "carrot", "qualities": ["ordinary", "fine"], "tier": "P0" },
     { "id": "dandelion", "name": "pissenlit", "plural": "pissenlits", "indefinite": "un pissenlit", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 4, "shop": null, "model": "dandelion", "tier": "P0" },
+    { "id": "wild_garlic", "name": "ail des ours", "plural": "ails des ours", "indefinite": "un ail des ours", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "wild_garlic", "tier": "P0" },
+    { "id": "chanterelle", "name": "girolle", "plural": "girolles", "indefinite": "une girolle", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 12, "shop": null, "model": "chanterelle", "tier": "P0" },
+    { "id": "blackberry", "name": "mûre", "plural": "mûres", "indefinite": "une mûre", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 3, "shop": null, "model": "blackberry", "tier": "P0" },
+    { "id": "hazelnut", "name": "noisette", "plural": "noisettes", "indefinite": "une noisette", "category": "forage", "stack": 99, "buyPrice": null, "sellPrice": 3, "shop": null, "model": "hazelnut", "tier": "P0" },
     { "id": "egg", "name": "œuf", "plural": "œufs", "indefinite": "un œuf", "category": "animal_product", "stack": 99, "buyPrice": null, "sellPrice": 8, "shop": null, "model": "egg", "tier": "P0" },
 
     { "id": "log", "name": "rondin", "plural": "rondins", "indefinite": "un rondin", "category": "material", "stack": 99, "buyPrice": null, "sellPrice": null, "shop": null, "model": "log", "tier": "P0" },

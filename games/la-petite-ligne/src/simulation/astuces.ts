@@ -39,6 +39,8 @@ function matches(trigger: HintTrigger, signal: HintSignal): boolean {
     case 'holding_furniture':
     case 'big_purchase_attempt':
     case 'letter_received':
+    case 'near_forage':
+    case 'aim_sapling':
       return true;
   }
 }

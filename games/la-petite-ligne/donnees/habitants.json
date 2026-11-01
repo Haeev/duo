@@ -66,7 +66,7 @@
           "id": "firmin_daily_rain",
           "kind": "daily",
           "priority": 5,
-          "when": [{ "type": "weather_is", "weather": "rain" }],
+          "when": [{ "type": "weather_is", "weather": "rain" }, { "type": "season_is", "seasons": ["spring", "summer", "autumn"] }],
           "lines": [{ "speaker": "firmin", "text": "Belle pluie. Vos radis vous remercient, mes genoux un peu moins." }]
         },
         {
@@ -127,7 +127,7 @@
           "id": "firmin_daily_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 9 }],
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "day_at_least", "day": 16 } }],
           "lines": [{ "speaker": "firmin", "text": "Une deuxième commande ! Je l'ai lue trois fois. Les omelettes, ça voyage bien, vous croyez ?" }]
         },
         {
@@ -417,7 +417,7 @@
           "id": "firmin_mid_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 11 }],
+          "when": [{ "type": "day_at_least", "day": 11 }, { "type": "any", "conditions": [{ "type": "not", "condition": { "type": "day_at_least", "day": 16 } }, { "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday"] }] }],
           "lines": [{ "speaker": "firmin", "text": "Mardi, mercredi, jeudi... La semaine passe plus vite quand on attend un train." }]
         },
         {
@@ -431,7 +431,7 @@
           "id": "firmin_crate_full",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "order_complete", "day": 15 }, { "type": "day_at_least", "day": 9 }],
+          "when": [{ "type": "order_complete", "day": 15 }, { "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "day_at_least", "day": 16 } }],
           "lines": [{ "speaker": "firmin", "text": "La caisse est pleine ! Je l'ai soupesée. Doucement: elle appartient à la coopérative." }]
         },
         {
@@ -440,6 +440,133 @@
           "priority": 1,
           "when": [{ "type": "quest_done", "quest": "firmin_flowers" }],
           "lines": [{ "speaker": "firmin", "text": "Mes pots de fleurs tiennent bon. Je leur parle un peu. Ils ne répondent pas, c'est reposant." }]
+        },
+        {
+          "id": "firmin_day16",
+          "kind": "daily",
+          "priority": 6,
+          "once": "player",
+          "when": [{ "type": "day_is", "days": [16] }],
+          "lines": [{ "speaker": "firmin", "text": "La coopérative cherche des traverses pour la voie des Vergers. Tant qu'elle n'en a pas, la Halte a de quoi vous occuper. Et moi aussi." }]
+        },
+        {
+          "id": "firmin_g1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Chaque samedi, je compte les voyageurs. Pour l'instant, c'est surtout la caisse qui voyage. Elle a l'air contente." }]
+        },
+        {
+          "id": "firmin_g2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Mon oncle Émile notait le temps qu'il faisait dans un cahier. J'ai repris l'habitude. Aujourd'hui: ça ira." }]
+        },
+        {
+          "id": "firmin_g3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Par vent d'ouest, le sifflet du train porte jusqu'aux Vergers. Un jour, le train y montera pour de bon." }]
+        },
+        {
+          "id": "firmin_g4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Vous avez remarqué ? Les gens du bourg passent plus souvent sur le quai, depuis que vous êtes là. Moi, je fais semblant de ne pas les voir." }]
+        },
+        {
+          "id": "firmin_g5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Une halte, ce n'est pas grand-chose: un quai, une cloche, un banc. Mais c'est là qu'on arrive, et là qu'on repart." }]
+        },
+        {
+          "id": "firmin_ls1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Le printemps tire à sa fin. Odette sort déjà ses chapeaux de paille. Elle en a trois, et un pour moi qu'elle ne me donne jamais." }]
+        },
+        {
+          "id": "firmin_ls2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "Samedi, ce sera l'été. Le train sera le même, mais je mettrai la casquette légère." }]
+        },
+        {
+          "id": "firmin_su1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "L'été, les rails chauffent tant qu'on les entend craquer l'après-midi. Ils s'étirent, comme moi." }]
+        },
+        {
+          "id": "firmin_su2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Trop chaud pour la veste. Ne le dites pas à la coopérative: un chef de halte ne transpire pas, il veille." }]
+        },
+        {
+          "id": "firmin_su3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Le soir, je prends le frais sur le banc du quai. Si vous passez, il y a de la place pour deux. Pour trois, on se serre." }]
+        },
+        {
+          "id": "firmin_su4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "En été, Émile laissait la porte de la halte ouverte toute la nuit. Pour que la nuit entre, disait-il. Elle n'est jamais repartie." }]
+        },
+        {
+          "id": "firmin_su5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Les jours sont si longs que je compte les traverses deux fois. Il en manque toujours une. C'est rassurant." }]
+        },
+        {
+          "id": "firmin_su6",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Après une pluie d'été, la voie fume comme une locomotive. C'est le seul train qui passe en semaine." }]
+        },
+        {
+          "id": "firmin_su7",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Jeanne m'a demandé si le train prenait des vacances. J'ai dit que non. Elle m'a regardé comme si j'étais à plaindre." }]
+        },
+        {
+          "id": "firmin_su8",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "firmin", "text": "Les mûres de la lisière, c'est le dessert des chefs de halte. Enfin, du chef de halte: il n'y en a qu'un." }]
+        },
+        {
+          "id": "firmin_rain2",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "firmin", "text": "Encore de la pluie. Le quai brille comme un parquet ciré. N'y courez pas." }]
+        },
+        {
+          "id": "firmin_crate_full_week",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "order_complete" }, { "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "firmin", "text": "La caisse est pleine ! Je l'ai soupesée. Doucement: elle appartient à la coopérative." }]
         },
         {
           "id": "firmin_eve_scene",
@@ -609,7 +736,7 @@
           "id": "odette_daily_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 9 }],
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "day_at_least", "day": 16 } }],
           "lines": [{ "speaker": "odette", "text": "J'ai reçu des cadres de la ville. Pour une photo de famille. Ou une vieille photo de la halte, tiens." }]
         },
         {
@@ -774,8 +901,135 @@
           "id": "odette_mid_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 11 }],
+          "when": [{ "type": "day_at_least", "day": 11 }, { "type": "any", "conditions": [{ "type": "not", "condition": { "type": "day_at_least", "day": 16 } }, { "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday"] }] }],
           "lines": [{ "speaker": "odette", "text": "Plus que quelques jours avant le train. Je l'entends déjà siffler. C'est peut-être la bouilloire." }]
+        },
+        {
+          "id": "odette_day16",
+          "kind": "daily",
+          "priority": 6,
+          "once": "player",
+          "when": [{ "type": "day_is", "days": [16] }],
+          "lines": [{ "speaker": "odette", "text": "Un dimanche sans train, ça repose. Je l'ai dit à ma caisse: elle ne m'a pas crue." }]
+        },
+        {
+          "id": "odette_rain_tomorrow",
+          "kind": "daily",
+          "priority": 6,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "weather_tomorrow_is", "weather": "rain" }],
+          "lines": [{ "speaker": "odette", "text": "Mon genou annonce la pluie pour demain. Il n'a jamais tort, il a seulement mauvais caractère." }]
+        },
+        {
+          "id": "odette_g1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Je pèse tout deux fois: une fois pour la balance, une fois pour moi. Les deux ne sont jamais d'accord." }]
+        },
+        {
+          "id": "odette_g2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Mes clients les plus fidèles, ce sont les moineaux: ils viennent tous les matins pour les miettes." }]
+        },
+        {
+          "id": "odette_g3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Vous avez de la terre sous les ongles. Ici, c'est une politesse." }]
+        },
+        {
+          "id": "odette_g4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Firmin dit que je parle trop. Je dis qu'il écoute trop peu. Et nous avons raison, lui et moi: c'est ce qui nous tient." }]
+        },
+        {
+          "id": "odette_g5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Quand la vitrine est pleine, je suis contente. Quand elle est vide, je suis riche. Je ne sais jamais quoi souhaiter." }]
+        },
+        {
+          "id": "odette_ls1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "odette", "text": "Les radis de fin de printemps piquent plus que les autres. Comme les fins de phrases de Basile." }]
+        },
+        {
+          "id": "odette_ls2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "odette", "text": "J'ai sorti les bocaux d'été. Ils sont vides, mais ça donne le moral." }]
+        },
+        {
+          "id": "odette_su1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "La chaleur fait fondre le beurre et la patience. Il me reste un peu des deux, profitez-en." }]
+        },
+        {
+          "id": "odette_su2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "Le soir, je m'assois sous la tonnelle. On y voit passer tout le bourg, c'est-à-dire trois personnes et vous." }]
+        },
+        {
+          "id": "odette_su3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "Des mûres de la lisière ? Mangez-les sur place, c'est la règle. Celles qui arrivent à la maison sont déjà un souvenir." }]
+        },
+        {
+          "id": "odette_su4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "Les girolles, il faut les nettoyer au pinceau. Ma mère me le disait, et je ne l'ai jamais fait." }]
+        },
+        {
+          "id": "odette_su5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "Laitue d'été, laitue pressée: elle monte vite. Cueillez-la avant qu'elle se prenne pour un arbre." }]
+        },
+        {
+          "id": "odette_su6",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "En été, je reste dehors jusqu'à neuf heures. Personne ne passe, mais j'aime l'idée qu'on pourrait." }]
+        },
+        {
+          "id": "odette_su7",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "Jeanne a les genoux écorchés et des histoires plein les poches. C'est l'été, quoi." }]
+        },
+        {
+          "id": "odette_su8",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "odette", "text": "À la ville, ils vendent de la glace dans la rue. Ici, on a le puits: son eau vous fait claquer des dents en plein été." }]
+        },
+        {
+          "id": "odette_rain2",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "odette", "text": "Encore la pluie. Le comptoir sent le parapluie mouillé: c'est mon parfum de la semaine." }]
         },
         {
           "id": "odette_market",
@@ -874,7 +1128,7 @@
           "id": "basile_daily_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 9 }],
+          "when": [{ "type": "day_at_least", "day": 9 }, { "type": "not", "condition": { "type": "day_at_least", "day": 16 } }],
           "lines": [{ "speaker": "basile", "text": "Il reste quelques arbres à la lisière. Après, il faudra attendre qu'ils repoussent. Trente ans, à peu près." }]
         },
         {
@@ -1107,6 +1361,126 @@
           "priority": 1,
           "when": [{ "type": "quest_done", "quest": "basile_omelette" }],
           "lines": [{ "speaker": "basile", "text": "J'ai encore le goût de votre omelette. Bon, je ne vous en redemande pas. Pas aujourd'hui." }]
+        },
+        {
+          "id": "basile_day16",
+          "kind": "daily",
+          "priority": 6,
+          "once": "player",
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Venez voir la lisière: les souches de chêne font des rejets. Les sapins, je les replanterai. J'avais dit trente ans ? Ici, la terre est pressée." }]
+        },
+        {
+          "id": "basile_g1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Une planche droite, c'est une planche qu'on a écoutée." }]
+        },
+        {
+          "id": "basile_g2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Je ne dis pas souvent merci. Je le pense en rabotant." }]
+        },
+        {
+          "id": "basile_g3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Le bois se souvient de tout: la pluie, le vent, et qui l'a coupé. Coupez gentiment." }]
+        },
+        {
+          "id": "basile_g4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Mon établi a quarante ans. Il a plus de rides que moi, et moins de plaintes." }]
+        },
+        {
+          "id": "basile_g5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Quand vous sciez, ne regardez pas la lame. Regardez le trait. Le reste suit." }]
+        },
+        {
+          "id": "basile_ls1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Fin de printemps: la sève monte. Le bois coupé maintenant pleure un peu. Ça passe." }]
+        },
+        {
+          "id": "basile_ls2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "basile", "text": "Odette veut une étagère pour l'été. Elle veut toujours une étagère. Je crois qu'elle aime me voir arriver avec." }]
+        },
+        {
+          "id": "basile_su1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "La chaleur fait travailler le bois. Une porte qui ferme en hiver frotte en été. Ne lui en voulez pas." }]
+        },
+        {
+          "id": "basile_su2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Je scie le matin, avant le grand soleil. L'après-midi, c'est la scie qui me regarde." }]
+        },
+        {
+          "id": "basile_su3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Les rejets de chêne poussent comme de la mauvaise herbe, l'été. C'est la meilleure herbe que je connaisse." }]
+        },
+        {
+          "id": "basile_su4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Le soir, je m'assois dans ma cour et j'écoute la scierie refroidir. Elle craque, comme un vieux." }]
+        },
+        {
+          "id": "basile_su5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Un sapin replanté, c'est une promesse à quelqu'un qu'on ne connaît pas encore. Vous, peut-être." }]
+        },
+        {
+          "id": "basile_su6",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Les mûres, ça griffe. Comme tout ce qui vaut la peine." }]
+        },
+        {
+          "id": "basile_su7",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Jeanne m'a montré un galet en forme de rabot. J'ai dit que c'était un galet. Elle ne me parle plus. Depuis une heure." }]
+        },
+        {
+          "id": "basile_su8",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "basile", "text": "Été sec, bois léger. Été mouillé, bois lourd. Moi, je suis lourd toute l'année." }]
+        },
+        {
+          "id": "basile_rain2",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "basile", "text": "La pluie sur le toit de la scierie, c'est le seul bruit que je préfère à celui de la scie." }]
         },
         {
           "id": "basile_force_lock",
@@ -1425,14 +1799,14 @@
           "id": "jeanne_summer",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 5 }],
+          "when": [{ "type": "day_at_least", "day": 5 }, { "type": "season_is", "seasons": ["spring", "summer"] }],
           "lines": [{ "speaker": "jeanne", "text": "L'école est fermée pour l'été. Alors j'apprends toute seule: les trains, les poules, et Firmin." }]
         },
         {
           "id": "jeanne_mid_week2",
           "kind": "daily",
           "priority": 1,
-          "when": [{ "type": "day_at_least", "day": 11 }],
+          "when": [{ "type": "day_at_least", "day": 11 }, { "type": "any", "conditions": [{ "type": "not", "condition": { "type": "day_at_least", "day": 16 } }, { "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday"] }] }],
           "lines": [{ "speaker": "jeanne", "text": "Je compte les jours jusqu'au train. Il en reste... attends... je recompte." }]
         },
         {
@@ -1455,6 +1829,126 @@
           "priority": 1,
           "when": [{ "type": "harvested", "item": "carrot", "since": "game_start" }],
           "lines": [{ "speaker": "jeanne", "text": "Une carotte, ça pousse la tête en bas. J'ai vérifié. C'est bizarre." }]
+        },
+        {
+          "id": "jeanne_day16",
+          "kind": "daily",
+          "priority": 6,
+          "once": "player",
+          "when": [{ "type": "day_is", "days": [16] }],
+          "lines": [{ "speaker": "jeanne", "text": "C'est dimanche ! Le dimanche, je fais tout pareil, mais plus lentement. C'est la règle." }]
+        },
+        {
+          "id": "jeanne_g1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Tu sais siffler avec deux doigts ? Moi non plus. Firmin dit que ça s'apprend en regardant les trains." }]
+        },
+        {
+          "id": "jeanne_g2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "J'ai demandé à la Duchesse si elle s'ennuyait. Elle a pondu. Je crois que c'est non." }]
+        },
+        {
+          "id": "jeanne_g3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Quand je serai grande, je serai cheffe de gare. Ou cheffe des poules. Je n'ai pas encore décidé." }]
+        },
+        {
+          "id": "jeanne_g4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Ma tante Lucie m'écrit des cartes. Quand elle n'a plus de timbres, elle en dessine." }]
+        },
+        {
+          "id": "jeanne_g5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Le puits a mangé un de mes galets. Je lui ai dit son prénom, pour qu'il le garde bien." }]
+        },
+        {
+          "id": "jeanne_ls1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Plus que quelques jours d'école... Non, attends, l'école est déjà fermée. Alors plus que quelques jours de printemps." }]
+        },
+        {
+          "id": "jeanne_ls2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 16 }],
+          "lines": [{ "speaker": "jeanne", "text": "Les pissenlits font des boules. Si tu souffles dessus, tu fais un vœu. J'en ai fait quarante. Rien ne s'est passé. Pour l'instant." }]
+        },
+        {
+          "id": "jeanne_su1",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "C'est l'été pour de vrai ! Je reste dehors jusqu'à neuf heures. C'est écrit dans un règlement que j'ai écrit." }]
+        },
+        {
+          "id": "jeanne_su2",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "J'ai trouvé un ver luisant. Il ne luisait pas. Peut-être qu'il était timide." }]
+        },
+        {
+          "id": "jeanne_su3",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Les mûres, je les mange avant qu'elles soient mûres. Après, il n'y en a plus." }]
+        },
+        {
+          "id": "jeanne_su4",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Il fait si chaud que les poules marchent à l'ombre. La Duchesse, elle, fait marcher l'ombre." }]
+        },
+        {
+          "id": "jeanne_su5",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Le soir, je compte les étoiles par la fenêtre. Je m'arrête à cent, sinon je m'endors au milieu." }]
+        },
+        {
+          "id": "jeanne_su6",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Les galets de la rivière sont chauds l'après-midi. Je les mets dans mes poches. Ma tante dit que je ressemble à un rocher." }]
+        },
+        {
+          "id": "jeanne_su7",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Les vacances, c'est quand les jours n'ont plus de nom. Aujourd'hui, c'est... un jour bleu." }]
+        },
+        {
+          "id": "jeanne_su8",
+          "kind": "daily",
+          "priority": 1,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "season_is", "seasons": ["summer"] }],
+          "lines": [{ "speaker": "jeanne", "text": "Firmin dit qu'en été, les trains ont soif. Je lui ai proposé de l'eau du puits. Il a ri, mais il n'a pas dit non." }]
+        },
+        {
+          "id": "jeanne_rain2",
+          "kind": "daily",
+          "priority": 5,
+          "when": [{ "type": "day_at_least", "day": 16 }, { "type": "weather_is", "weather": "rain" }],
+          "lines": [{ "speaker": "jeanne", "text": "Il pleut encore ! Je compte les flaques du quai. Il y en a sept, plus une qui ne compte pas parce que c'est la mienne." }]
         },
         {
           "id": "jeanne_rain_story",

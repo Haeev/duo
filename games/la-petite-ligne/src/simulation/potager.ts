@@ -147,6 +147,7 @@ export function chop(sim: Sim, c: Character, tree: Tree): void {
   const felled = tree.hits >= s.chopsPerTree;
   if (felled) {
     tree.felled = true;
+    tree.felledDay = sim.world.clock.day;
     sim.runtime.dynamicDirty = true;
     giveToCharacter(sim, c, ITEM.log, 'ordinary', s.logsPerTree);
     bump(sim, 'chopped', c.id);

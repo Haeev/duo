@@ -10,6 +10,8 @@ import type { Content } from '../donnees/types';
 import type { GameMap, Rect } from '../etat/carte';
 import type { CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
+import { seasonOfDay } from '../donnees/calendrier';
+import { mistAmount } from '../etat/meteo';
 import { type Catalogue, type SequenceStep, sequenceOf, stepTime, stopTime } from './catalogue';
 import { type EventSignals, type LoopWish, type SoundRequest, StateWatcher, type TriggerContext, noSignals, soundsForEvent } from './declencheurs';
 import { distanceBetween, distanceToRect, earPosition } from './espace';
@@ -135,7 +137,14 @@ export class AudioBrain {
   private readonly moment: MusicMoment;
   private readonly loco = { x: 0, y: 0 };
   private readonly levelsSoon = new Map<string, number>();
-  private readonly ambienceInput: AmbienceInput = { minutes: 0, weather: 'sunny', inHouse: false, at: { x: 0, y: 0 } };
+  private readonly ambienceInput: AmbienceInput = {
+    minutes: 0,
+    weather: 'sunny',
+    season: 'spring',
+    mist: 0,
+    inHouse: false,
+    at: { x: 0, y: 0 },
+  };
   private triggerContext: TriggerContext | null = null;
 
   constructor(private readonly options: BrainOptions) {
@@ -320,13 +329,17 @@ export class AudioBrain {
 
     // Ambiances: maintenant et bientôt (pour décoder à l'avance).
     const amb = this.ambienceInput;
+    const rules = this.options.content.settings;
     amb.minutes = world.clock.minutes;
     amb.weather = world.weather;
+    amb.season = seasonOfDay(rules, world.clock.day);
+    amb.mist = mistAmount(rules, world.morningMist, world.clock.minutes);
     amb.inHouse = f.listener.inHouse;
     amb.at = f.listener.at;
-    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, f.ambience);
+    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, f.ambience, catalogue.morningMist);
     amb.minutes = world.clock.minutes + settings.ambience.prefetchMinutes;
-    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, this.levelsSoon);
+    amb.mist = mistAmount(rules, world.morningMist, amb.minutes);
+    ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, this.levelsSoon, catalogue.morningMist);
     f.ambienceNeeded.clear();
     for (const [id, gain] of f.ambience) if (gain > 0) f.ambienceNeeded.add(id);
     for (const [id, gain] of this.levelsSoon) if (gain > 0) f.ambienceNeeded.add(id);

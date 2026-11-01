@@ -192,10 +192,14 @@ Lettres hebdomadaires (tour 8): `delivery.instance: "train"`. Une instance par t
 | `holding_furniture` | | tient un meuble à poser |
 | `big_purchase_attempt` | | lance un achat d'au moins `bigPurchaseThreshold` sous |
 | `letter_received` | | reçoit du courrier |
+| `near_forage` | | passe à moins de 6 m d'une cueillette posée à la lisière (tour 8, à partir de `forage.fromDay`) |
+| `aim_sapling` | | vise un rejet de chêne ou un jeune sapin (tour 8) |
 
 ### 2.7 `envies.json`
 
 `envies[]`: `id`, `kind` (`personal` ou `shared`), `text`, `availableWhen` (conditions pour que l'envie puisse être tirée ce matin-là), `fulfilledWhen` (conditions qui la réalisent; les conditions qui comptent partent du début de la journée). Chaque matin, chaque joueur tire une envie personnelle disponible, jamais deux fois la même pour lui (`reglages.envies`). `sharedSchedule[]`: le jour et l'envie à deux de ce jour, la même chez les deux. Réalisée, une envie donne Cœur +`reglages.needs.heart.envie` (+`sharedEnvie` à chacun pour une envie à deux) et le message `envie_done`. Non réalisée: rien.
+
+Après la démo (tour 8, `reglages.envies`): à partir de `sharedFromDay` (16), le poids d'une envie personnelle jamais reçue par ce joueur est multiplié par `unseenFactor` (4), et l'envie à deux n'est plus lue dans `sharedSchedule`: elle est tirée un jour sur `sharedEveryDays` (16, 19, 22...) parmi les envies à deux possibles, la même chez les deux, jamais la même en `sharedNoRepeatDays` jours (14; rien plutôt qu'une redite). Les envies écrites pour après la démo portent `day_at_least 16` (et `season_is` pour l'été).
 
 ### 2.8 `textes.json`
 
@@ -218,17 +222,18 @@ Lettres hebdomadaires (tour 8): `delivery.instance: "train"`. Une instance par t
 | `train` | jours écrits (1, 8 et 15), puis un tous les `repeatEveryDays` jours (7: chaque samedi), arrivée, départ, `saluteSlowRoll` (question 2 du tour 7, réservé) |
 | `weatherByDay` | une valeur par jour écrit, `sunny`, `cloudy` ou `rain`, du jour 1 au jour 15 (`weather.fromDay - 1`) |
 | `weather` | tour 8, météo tirée à partir de `fromDay` (16): `draw` (table de tirage par saison, soleil, nuages, pluie, somme 100), `target` (fréquences visées, pour les tests), `persistence` (part de « même temps que la veille »), `maxRainStreak` (3), `maxDaysWithoutSun` (6), `forced` (jours imposés: le 16 au soleil), `logDays` (journal de 7 jours), `biteWaitFactor`, `mist` (`afterRain` 1, `base` par saison, levée de `fadeFrom` à `until`, `biteWaitFactor`). Tirage par `unitDraw` (`src/etat/meteo.ts`), même calcul que `tour8_suite.py` |
-| `forage` | tour 8, cueillette de la lisière: `fromDay`, `spawnChance`, `unseenFactor`, `rainBoost`, `points` (coins et leurs cueillettes), `items` (saisons, poids, quantité); lue par la commande générée (capacité de la lisière) |
+| `forage` | tour 8, cueillette de la lisière: `fromDay`, `spawnChance`, `unseenFactor`, `rainBoost`, `points` (coins et leurs cueillettes), `items` (saisons, poids, quantité); lue par la commande générée (capacité de la lisière). Chaque matin à partir de `fromDay`, les cueillettes hors de saison posées sur un coin s'en vont (sans message), puis chaque coin vide (aucun objet à moins de 0,75 m) se garnit avec la chance `spawnChance`, d'une cueillette de saison du coin tirée au prorata des poids (`unseenFactor` pour une cueillette jamais ramassée, `rainBoost` le lendemain d'une pluie); règle pure dans `src/etat/cueillette.ts`. On la ramasse comme un objet au sol |
 | `spawn` | point d'apparition des deux joueurs |
 | `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (`windows`: une fenêtre par semaine, date limite et livraison; celle du moment est la première dont la livraison n'est pas passée; puis `repeatWeekly`: commande jusqu'au `deadlineWeekday` à `deadlineTime`, livraison le lendemain à `deliveryTime`) |
 | `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train). `generated` (tour 8, sections 4.2 à 4.7 de la conception): commandes tirées à partir de `fromOrder` (3), au départ du train précédent: lignes par commande (`linesByOrder`), familles, reprises, poids, budget et sa progression, taille du duo (`size`), capacités des ressources (`resources`), paie minimale d'une ligne (`paymentPerWorkWeek` sous par semaine de travail), produits de base partagés (`noSharedBase`), et `products` (`item`, `family`, `resource`, `cost`, `min`, `price` facultatif, `seasons`, `obtained`: le compteur du duo qui dit que le produit est obtenu, `leadDays`) |
-| `garden`, `quality`, `trees`, `hens` | potager (12 cases, zone de carte), qualité, arbres (nombre, zone, coups de hache, rondins), poules |
+| `garden`, `quality`, `trees`, `hens` | potager (12 cases, zone de carte), qualité, arbres (nombre, zone, coups de hache, rondins; tour 8: `regrow`, `regrowFromDay` 16, `catchUpDays` 6, `stumpDays` 4, `saplingDays` 6, `saplingScale` `{ first, perDay, max }`: un arbre abattu est une souche, puis un rejet, puis de nouveau un arbre; rien ne pousse avant `regrowFromDay`, où une souche de la démo compte au plus `catchUpDays` jours; règle dans `src/etat/repousse.ts`), poules |
 | `endurance` | `base + perFormPoint x forme`; coûts par action, multipliés par `costMultiplier`; à 0, les actions durent `atZeroDurationMultiplier` fois plus longtemps (jamais de blocage) |
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
-| `envies`, `movement`, `ranges`, `building`, `hints` | une envie par joueur et par jour; vitesses en m/s; portées en mètres; vitesse à deux; astuces |
+| `envies`, `movement`, `ranges`, `building`, `hints` | une envie par joueur et par jour (section 2.7; tour 8: `unseenFactor`, `sharedFromDay`, `sharedEveryDays`, `sharedNoRepeatDays`); vitesses en m/s; portées en mètres; vitesse à deux; astuces |
+| `dialogues` | tour 8: une réplique datée (priorité `feel.dailyStoryPriority`, 5, ou plus: pluie, jour du train) n'est dite en priorité que si ce joueur ne l'a pas entendue depuis `datedRepeatDays` jours (28), à partir du jour `datedRepeatFromDay` (16, la démo garde sa règle); sinon elle rejoint la réserve ordinaire, tirée « la moins récente » |
 | `absence`, `autosave`, `fishing` | P1: horloge arrêtée en cas d'absence, sauvegarde, pêche (le drapeau `fishing_enabled` est posé quand la pêche est activée) |
 | `benches` | bancs de la carte: places le long du banc (`slots`, m depuis son milieu, deux par banc: jamais deux corps sur la même), avancée de l'assise (`seatForward`), lever devant la place (`standForward`), Espace à moins de `sitRange` m d'une place libre fait s'asseoir, un habitant arrêté à `villagerReach` m du banc y tient une place; valeurs par défaut dans `src/donnees/defauts.ts` |
-| `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
+| `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2); `fishWeightsBySeason` (tour 8): les mêmes poids par saison (printemps comme la démo, pas de truite l'hiver), une saison absente garde `fishWeights`. L'attente avant la touche est multipliée par `weather.biteWaitFactor` et `weather.mist.biteWaitFactor` à partir de `weather.fromDay` |
 | `moments` | moments rares (section 2.10): `dailyChance` (0,5), `maxPerDay`, `cooldownDays` (7), `firstAmbientDay`, `noAmbientOnTrainDays`, `stillSpeed` (m/s sous laquelle on est immobile), `noticeRadius` (« Montre-le à {partner} ! »), `heartBonus` (Cœur à l'apogée, une fois par jour), `musicDuckDb` et ses durées, `firstHint` (premier destinataire d'une confidence, `p2`), `maxSyncGapSeconds`, `holdRange` (portée du geste « tenir »), `tiers` (niveaux tirés, `["P0"]`) |
 | `memories` | souvenirs du carnet (tour 7): `maxBytes` (1536: borne de `world.memories` vérifiée par les tests, S-14); les saisons sont celles de `calendar` |
 | `secrets` | informations propres (R16): `firstInformed` (`p1`), `nudgeAfterErrors` (coup de coude à l'informé), `firstTryHeart`, `henChoiceRange` (portée de l'appel d'une poule), `henChoiceKeepOpen` (le choix reste ouvert tant que la poule est à moins de tant), `hideFromGuestSnapshot` (P1, pas encore lu), `knownHensFlag` (drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms) |
@@ -275,7 +280,7 @@ Paramètres communs des conditions qui comptent:
 | `flag` | `flag` | le drapeau est posé |
 | `quest_active`, `quest_done` | `quest` | la quête a démarré et n'est pas finie, ou elle est finie |
 | `step_active`, `quest_step_done` | `quest`, `step` | l'étape est l'étape en cours, ou elle est finie |
-| `dialogue_done` | `dialogue` | le dialogue a été joué jusqu'au bout (par au moins un joueur) |
+| `dialogue_done` | `dialogue` | le dialogue a été joué jusqu'au bout (par au moins un joueur); pas pour une réplique du quotidien sans `once` (tour 8: elle n'est gardée que dans la mémoire des répliques entendues) |
 | `talked_to` | `villager`, comptage | les joueurs ont parlé à l'habitant |
 | `given` | `villager`, `item` facultatif, comptage | les joueurs ont donné cet objet (ou n'importe lequel) à l'habitant |
 | `item_owned` | `item`, `count` | le duo possède l'objet: sacs des deux et cellier |
@@ -291,6 +296,7 @@ Paramètres communs des conditions qui comptent:
 | `ate_together` | `atFurniture` facultatif | les deux ont mangé le même plat à moins de `ranges.eatTogether` l'un de l'autre, à ce meuble s'il est précisé |
 | `went_to_bed` | `item` facultatif, `who` | le joueur s'est couché, dans ce lit s'il est précisé |
 | `caught` | `item`, comptage | poissons pêchés (P1) |
+| `picked` | `item` facultatif, comptage | tour 8: unités ramassées de cette cueillette (`picked:<objet>`); sans `item`, toutes les cueillettes (objets de catégorie `forage`), pas les œufs |
 | `used_tool_at` | `tool`, `point`, `radius` (m) | événement: le joueur se sert de l'outil à moins de `radius` du point |
 | `stayed_at` | `point`, `seconds`, `who`, `seated` (facultatif) | le joueur (ou chacun des deux, ensemble) est resté à moins de `ranges.stayAt` du point pendant ce temps d'affilée; avec `"seated": true`, assis sur un banc à cette portée du point (Espace près d'une place libre), pendant ce temps d'affilée |
 | `witnessed` | `event` (`train_arrival`, `train_departure`), `who` | le joueur était à moins de `ranges.witness` du train à ce moment-là |
@@ -300,7 +306,7 @@ Paramètres communs des conditions qui comptent:
 | `secret_role` | `quest`, `role` (`informed` ou `doer`) | le joueur concerné (celui qui parle) a ce rôle dans le secret de cette quête: dialogues réservés à un rôle |
 | `hens_named` | `count`, `who` | autant de poules différentes appelées par leur bon nom (par `doer`, l'autre, dans la quête des noms) |
 | `choice_made` | `dialogue`, `choice` ou `correct: true` (facultatifs), `who`, `since` | le joueur a fait ce choix (ou un choix juste) dans ce dialogue personnel |
-| `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande du prochain train); après le départ de ce train (`pay_order`), garde la réponse du moment du départ. Les données écrivent toujours `day` |
+| `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande en cours, celle du prochain train, comme `firmin_crate_full_week`); après le départ de ce train (`pay_order`), garde la réponse du moment du départ |
 
 ## 4. Effets
 

@@ -191,3 +191,6 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Lint: un commentaire entre deux `case` vides déclenche `no-fallthrough`; le mettre au-dessus du groupe.
 - Outil isolé: un heredoc qui écrit un fichier dans `/tmp` avec du contenu complexe est refusé; écrire le fichier de remplacements avec Write, puis `python3 /tmp/<moi>/rep.py <fichier> <spec>`.
 - Robots d'été (`pnpm test:ete`, `tests/ete/`): une partie de 43 jours avec reprise à chaque aube coûte une à trois minutes par graine selon la charge de la machine.
+- Taille de l'état (I-06, 48 000 octets): chaque dialogue fini s'écrivait trois fois dans `dialoguesDone` (`id`, `id@p1`, `id@p2`), réplique du quotidien comprise; avec beaucoup de répliques, c'est la première clé qui grossit. Mesurer par une sonde jetable (clé par clé, `JSON.stringify`) avant de chercher ailleurs.
+- Rendu des arbres (`rendu/potager.ts`): un arbre abattu sans chute en cours (`fallStart` vide: partie reprise, page de démonstration) doit sauter le tronc; sinon il reste debout au-dessus de sa souche.
+- Les props de la carte sont rendus par nom de type (nœud GLB du même nom, sinon variantes de `MODEL_VARIANTS`): ajouter un type dans `construire_carte_halte.py` suffit pour le voir en jeu, sans toucher au rendu.
