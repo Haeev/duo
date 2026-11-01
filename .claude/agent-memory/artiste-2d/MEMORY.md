@@ -5,3 +5,10 @@
 - Le sprite `games/la-petite-ligne/ui-maquettes/icones.svg` est généré: modifier la source `ui-maquettes/outils/icones-source.svg`, puis lancer `node games/la-petite-ligne/ui-maquettes/outils/generer-icones.mjs` (réécrit aussi `support/icones.js`). Le générateur relancé sur une source intacte ne change rien: s'en servir pour vérifier l'absence de dérive.
 - Dans ce sprite, les règles CSS des classes `lpl-ik`, `lpl-ikf` et `lpl-iu` l'emportent sur les attributs `stroke` et `stroke-width` du même élément: un détail d'une autre couleur ou d'une autre épaisseur se dessine sans classe.
 - Style: viewBox 0 0 24 24, trait d'encre #2a2522 de 1,5, lumière en haut à gauche, couleurs tirées de `palette.py`; contrôle sur une planche Chromium à 24 et 48 px, sur fond papier, gris et bois.
+
+## La Petite Ligne: vignettes du carnet (memory-*)
+
+- Grille de 40, disque `r=18` centré d'un ton opaque de `palette.py`; contour extérieur du sujet en classe `lpl-vo` (encre 2), détails en `lpl-ik`/`lpl-ikf` (1,5). Les très petits détails colorés (crêtes, becs, calottes) se dessinent sans trait: un contour de 1,5 les noie à 40 px.
+- Contrôle: `node games/la-petite-ligne/ui-maquettes/outils/planche-vignettes.cjs [sortie.png]` (palette, L* disque et sujet, planche 40/60/190 px en couleur et en gris). Onglet en jeu: `capturer-souvenirs.cjs <url> "" tour-NN vignettes`, serveur Vite du jeu sur un port libre (5197 est souvent pris par une autre copie: `--strictPort` le signale).
+- Lisibilité à 40 px: un oiseau en vol se lit par des ailes larges en M aplati, pas par une croix; un poisson tenu au bec se lit en biais avec queue fourchue et oeil; une échelle se lit par ses barreaux (montants espacés d'au moins 4 unités).
+- Les scénarios de démo `souvenirs-*` ne montrent que héron, oies, échelle, mésanges, renard, vers luisants, poules et mot de Lucie: les autres vignettes ne se vérifient que sur la planche.
