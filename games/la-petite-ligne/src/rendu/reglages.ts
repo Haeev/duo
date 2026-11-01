@@ -195,21 +195,52 @@ export const RENDER_SETTINGS = {
      */
     fordBed: -0.24,
     /**
-     * Pierres plates du gué (bible, 8.7): côtés (un modèle par nombre),
-     * épaisseur, saillie au-dessus de la surface (m: le courant s'ouvre autour
-     * d'elles), taille (m), places dans la case (décalage depuis son coin) et désordre.
+     * Pierres plates du gué (bible, 8.7; revue du tour 8): côtés (un modèle par
+     * nombre), épaisseur, saillie au-dessus de la surface (m: le courant
+     * s'ouvre autour d'elles). `gue.ts` les pose.
      */
     fordStones: {
-      sides: [5, 6, 7],
+      sides: [5, 6, 7] as readonly number[],
       thickness: 0.13,
       protrude: 0.05,
-      minSize: 0.3,
-      maxSize: 0.55,
-      perCell: [
-        [0.28, 0.3],
-        [0.72, 0.7],
-      ] as readonly (readonly [number, number])[],
-      jitter: 0.12,
+      /** Les pierres à fleur d'eau: dessus sous la surface de tant (m), sous l'eau claire. */
+      flushBelow: 0.015,
+      /**
+       * Ligne de passage, du bout du chemin nord à celui du chemin sud (là où l'on
+       * traverse): nombre de pierres, pas d'axe en axe (m), taille (m), retrait
+       * depuis le bord du gué (m), sinuosité (m, nombre de demi-ondes) et désordre (m).
+       */
+      passage: {
+        count: [8, 10] as const,
+        pitch: [0.55, 0.65] as const,
+        size: [0.45, 0.6] as const,
+        margin: 0.3,
+        sway: 0.1,
+        swayWaves: 1.5,
+        jitter: 0.06,
+      },
+      /**
+       * Pierres dispersées autour (tirage de Poisson, pas de grille): nombre,
+       * taille (m), écart minimal entre deux pierres et avec la ligne (m),
+       * chance d'être gardée à l'aval et à l'amont de la ligne, part à fleur
+       * d'eau, retrait du bord du gué (m), essais. Rien sur la place du héron
+       * (il pêche au bord aval du gué).
+       */
+      scatter: {
+        count: 18,
+        size: [0.2, 0.4] as const,
+        gap: 0.22,
+        lineGap: 0.32,
+        downstreamOdds: 1,
+        upstreamOdds: 0.4,
+        flushShare: 0.35,
+        inset: 0.15,
+        attempts: 600,
+        keepClear: ['heron_stand'] as readonly string[],
+        clearRadius: 0.35,
+        /** Jamais quatre pierres dispersées à moins de tant (m) d'une même droite. */
+        alignTolerance: 0.06,
+      },
     },
     /**
      * Lit de la rivière (technical artist, tour 8, `riviere.ts`): forme visible
@@ -309,6 +340,22 @@ export const RENDER_SETTINGS = {
       stoneLength: 0.3,
       /** La place elle-même (cases de pavés de la carte dans ce rectangle): pavés selon `paved`, terre battue ailleurs. */
       area: { x: 31, y: 23, w: 18, h: 11 },
+      /**
+       * Bord des zones pavées de la place (revue du tour 8): un bourg finit un pavage par
+       * un rang de boutisses (pavés posés en travers) sur un bord en courbe douce, pas en
+       * marches d'escalier. Largeur du rang (m, la longueur d'un pavé posé en travers),
+       * largeur d'une boutisse le long du bord (m), rayon des raccords entre zones (m).
+       * La rue de la Gare (au nord de la place, pavée en entier) a le même rang côté place;
+       * contre le chemin du sud, le pavage s'arrête droit sur son rang.
+       */
+      border: { width: 0.3, stoneWidth: 0.19, fillet: 0.9 },
+      /**
+       * Limite sud de la terre battue contre le chemin: pas de bordure (une place de foire
+       * en terre rejoint le chemin sans rien entre les deux), mais une limite ondulée de
+       * `amplitude` m (longueur d'onde `wavelength` m, comme la ligne d'eau des berges), qui
+       * s'éteint sur `fade` m aux deux bouts de la place.
+       */
+      earthEdge: { amplitude: 0.25, wavelength: 2.4, fade: 1.5 },
     },
     /** Touffes d'herbe et fleurs semées sur l'herbe (part des cases). */
     tuftDensity: 0.32,

@@ -458,6 +458,10 @@ export const AMBIANCE_SETTINGS = {
      */
     pavingJoint: 0.024,
     pavingTint: 0.27,
+    /** Rang de bordure de la place: joint plus large (m) et boutisses un ton plus foncées (part vers `cobble_dark`, facteur). */
+    pavingBorderJoint: 0.034,
+    pavingBorderDark: 0.5,
+    pavingBorderShade: 0.94,
   },
 
   /** Lueurs de nuit: halos autour des lanternes et des fenêtres, flaques de lumière chaude au sol. */
@@ -775,6 +779,18 @@ export const AMBIANCE_SETTINGS = {
      */
     shadeTint: '#8794d0',
     shadeTintAmount: 0.3,
+    /**
+     * Cases déjà froides (ardoise, lauze): à l'ombre, elles ne gardent que
+     * `coldShadeKeep` de la teinte des ombres, et la lumière du ciel qu'elles
+     * reçoivent perd `coldSkyNeutral` de sa couleur, à clarté égale plus
+     * `coldShadeLift`. Sinon un pan tourné à l'opposé du soleil du soir, froid
+     * et sombre par lui-même, sous un ciel bleu-violet, vire au bleu roi
+     * (revue du tour 8; cible: b* -8 à -14, L* au moins 14).
+     */
+    coldCells: ['lauze', 'lauze_light', 'lauze_dark'],
+    coldShadeKeep: 0,
+    coldSkyNeutral: 0.25,
+    coldShadeLift: 0.12,
     /** Les ombres s'éclaircissent un peu (part de la lumière du ciel ajoutée à l'ombre). */
     shadeLift: 0.1,
     /**

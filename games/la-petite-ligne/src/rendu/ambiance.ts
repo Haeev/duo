@@ -159,6 +159,19 @@ export class AmbiancePart implements ExtensionPart {
     if (ring?.kind === 'ring' && centre !== undefined) {
       this.surfaces.uPavingRing.value.set(centre.pos.x, centre.pos.y, ring.radius, 1);
     }
+    // Bord des zones pavées de la place (rang de boutisses, limite sud ondulée).
+    const square = RENDER_SETTINGS.terrain.square;
+    let band = 0;
+    for (const shape of square.paved) {
+      const slot = this.surfaces.uPaveBands.value[band];
+      if (shape.kind !== 'band' || slot === undefined) continue;
+      slot.set(shape.a[0], shape.a[1], shape.b[0], shape.b[1]);
+      this.surfaces.uPaveHalf.value[band] = shape.half;
+      band += 1;
+    }
+    const area = square.area;
+    this.surfaces.uPaveArea.value.set(area.x, area.y, area.x + area.w, area.y + area.h);
+    this.surfaces.uPaveEdge.value.w = 1;
 
     patchSurface(hooks.materials.palette, this.surfaces, {
       puddles: true,
