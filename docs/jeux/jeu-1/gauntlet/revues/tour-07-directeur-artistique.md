@@ -206,3 +206,27 @@ Gains réels: faune neuve du même style et de la même palette (une seule case 
 
 - Fluidité pendant l'apogée de la brume sur le PC (700 bouffées mélangées sur la rivière; le mode léger en garde 260): ce coût de remplissage ne se mesure pas en rendu logiciel.
 - Lisibilité du martin-pêcheur sur un écran de portable de 1366 x 768: le voit-on sur son pieu sans le chercher ?
+
+## Contrôle après correctifs
+
+Version contrôlée: `56bad2f` (commits `56d77ec` oreilles et amarre, `8ed936e` place est de l'échelle), arbre principal servi sur le port 5231 par une copie de `/tmp/dg3d-budget/serveur.sh`, 1366 x 768, `manuel=1`, 40 images de 1/30 s avancées par `lplRendu.advance`. Six captures faites par moi, aucune erreur de page ni de console; plan le plus chargé 136 174 triangles et 80 appels (dans les budgets). Planches relues: `correctif-oreilles-*` (dont `jeu-o1` et `jeu-o3`), `correctif-ponton-*`.
+
+Planches probantes: `da-controle-chevrette.png`, `da-controle-ponton-echelle.png`.
+
+| Point | Constat en jeu | Verdict |
+|---|---|---|
+| Oreilles de la chevrette, orientation 3, attente 8,2 s | La pointe au-dessus du crâne a disparu: l'oreille est une feuille large couchée vers l'arrière, intérieur crème visible. Plus aucune lecture de dague | corrigé |
+| Oreilles de la chevrette, orientation 1, attente 8,2 s | L'oreille proche est un ovale clair ouvert sur le côté; l'oreille du fond reste un petit coin gris-brun dressé (environ 2 pixels de base, 4 de haut au zoom 1), comme l'a signalé l'artiste. Il se lit avec l'ovale clair comme une paire d'oreilles en V, pas comme un bois: une dague serait un trait fin et sombre, ici c'est un coin à base large et de teinte claire. C'est d'ailleurs ce qu'on voit d'une vraie chevrette de profil. En gris, même lecture | accepté |
+| Profils stricts et faon (planches de l'artiste) | Ovales creusés en V sur les quatre azimuts et les deux profils, dos gris-brun, faon aux oreilles cohérentes avec la mère; pinceau fondu en lobe dans l'écusson | corrigé |
+| Ponton, zoom 1, orientations 0 et 1 | Plus de bitte au coin: la glène est posée sur le plancher, l'amarre court jusqu'à l'anneau du pieu et le bout pend vers l'eau. Un seul amarrage, au bon endroit (le pieu sur l'eau profonde) | corrigé |
+| Place est de l'échelle, zoom 1, orientation 0 | Le joueur est remonte d'environ 5 pixels le long de l'échelle. La pointe de ses pieds effleure encore le haut de la rive du toit de la remise (1 à 2 pixels, avec la trame d'occlusion du toit autour des chaussures); aucun recouvrement du corps | amélioré, accepté |
+
+**G8: oui.** La silhouette de la chevrette dit « une mère », sous les deux orientations du regard du « figer ».
+
+**G9: oui** (confirmé), les deux retouches légères sont faites.
+
+Ce qui reste, **rien de bloquant pour `main`**:
+
+- Léger, facultatif: dans `deer_lookup`, ouvrir l'oreille du fond de 10° de plus vers l'extérieur rendrait l'orientation 1 encore plus nette (artiste-3d, 5 min). À faire seulement si l'on repasse sur le modèle.
+- Léger, facultatif: les pieds du joueur est frôlent la rive du toit à l'écran; reculer encore de 0,06 m le long de l'échelle effacerait le contact (level-designer, 5 min). Acceptable tel quel.
+- Les défauts moyens et ouverts du tableau précédent (brume trop sombre, bancs du matin, traînée et éclat du martin-pêcheur, vignettes, place, berges, gué) sont inchangés par ce correctif et restent à traiter avant la bêta.
