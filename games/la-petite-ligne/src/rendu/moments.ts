@@ -1189,25 +1189,6 @@ export class MomentsPart implements EventfulPart {
     return true;
   }
 
-  /**
-   * Milieu des bêtes dessinées du moment du jour (repère de la scène: x, y en hauteur, z), pour
-   * le trou de visibilité; faux si aucune n'est à l'écran.
-   */
-  animalCenter(out: Vector3): boolean {
-    let count = 0;
-    out.set(0, 0, 0);
-    for (const scene of this.scenes.values()) {
-      for (const view of scene.views) {
-        if (!view.root.visible || view.actor.model === LADDER_MODEL) continue;
-        out.add(view.root.position);
-        count += 1;
-      }
-    }
-    if (count === 0) return false;
-    out.multiplyScalar(1 / count);
-    return true;
-  }
-
   /** Où regardent les habitants spectateurs: la première bête dessinée du moment. */
   private lookTarget(def: MomentDef): { x: number; y: number } | null {
     const scene = this.scenes.get(def.id);

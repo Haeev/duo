@@ -505,11 +505,8 @@ export class RenderEngine implements Renderer {
     // Pixels par mètre à l'écran; une hauteur se voit raccourcie par l'inclinaison de la caméra.
     const pixelsPerMeter = this.bufferSize.x / this.rig.viewWidth();
     const elevation = (RENDER_SETTINGS.camera.elevationDeg * Math.PI) / 180;
-    const wide = RENDER_SETTINGS.momentSeeThrough.players;
-    const today = world.moments.today;
-    const widen = today !== null && (wide.moments as readonly string[]).includes(today.id) && today.phase !== 'gone';
-    const radiusX = (widen ? wide.halfWidth : SEE_THROUGH_HALF_WIDTH) * pixelsPerMeter;
-    const radiusY = (widen ? wide.halfHeight : SEE_THROUGH_HALF_HEIGHT) * Math.cos(elevation) * pixelsPerMeter;
+    const radiusX = SEE_THROUGH_HALF_WIDTH * pixelsPerMeter;
+    const radiusY = SEE_THROUGH_HALF_HEIGHT * Math.cos(elevation) * pixelsPerMeter;
     // Monter d'un pixel sur le corps, c'est monter de 1 / (cos e) pixel-mètres, donc se rapprocher de tan e.
     const depthPerPixel = Math.tan(elevation) / pixelsPerMeter;
     this.holes.length = 0;
@@ -532,43 +529,7 @@ export class RenderEngine implements Renderer {
     }
     this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     this.pushActorHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
-    this.pushAnimalHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     materials.setSeeThrough(this.holes);
-  }
-
-  /** Trou sur les bêtes d'un moment cachées par le pourtour (la chevrette), voir `momentSeeThrough.animals`. */
-  private pushAnimalHole(
-    world: ReadonlyWorld,
-    terrain: Terrain,
-    pixelsPerMeter: number,
-    elevation: number,
-    depthPerPixel: number,
-  ): void {
-    const settings = RENDER_SETTINGS.momentSeeThrough.animals;
-    const today = world.moments.today;
-    if (
-      this.moments === null ||
-      today === null ||
-      !(settings.moments as readonly string[]).includes(today.id) ||
-      !(settings.phases as readonly string[]).includes(today.phase) ||
-      !this.moments.animalCenter(this.probe)
-    ) {
-      return;
-    }
-    const camera = this.rig.camera;
-    const ground = terrain.heightAt(this.probe.x, this.probe.z);
-    this.probe.y = ground + settings.lift;
-    this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
-    this.probe.project(camera);
-    this.holes.push({
-      x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
-      y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
-      radiusX: settings.halfWidth * pixelsPerMeter,
-      radiusY: settings.halfHeight * Math.cos(elevation) * pixelsPerMeter,
-      depth: -this.viewPoint.z - settings.nearer,
-      depthPerPixel,
-      ground,
-    });
   }
 
   /** Trou du lieu d'un moment (le nichoir sous le houppier), voir `RENDER_SETTINGS.momentSeeThrough`. */

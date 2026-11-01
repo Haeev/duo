@@ -7,12 +7,12 @@
 import { Color, Euler, Group, Matrix4, Quaternion, Vector3, type InstancedMesh } from 'three';
 import type { GameMap } from '../etat/carte';
 import { inRect } from '../etat/carte';
-import { hash2 } from './bruit';
+import { hash2, valueNoise } from './bruit';
 import { ShapeBuilder } from './geometrie';
 import { createInstanced, finishInstances } from './instances';
 import type { SharedMaterials } from './materiaux';
 import type { PaletteCell } from './palette';
-import { RENDER_SETTINGS } from './reglages';
+import { RENDER_SETTINGS, type ForestClearing } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 
@@ -27,6 +27,9 @@ const SEED_SCALE = 17;
 const SEED_KIND = 18;
 const SEED_ANGLE = 19;
 const SEED_ORDER = 23;
+const SEED_CLEARING = 31;
+/** Longueur d'onde du tracé d'une lisière reculée (cases). */
+const CLEARING_WOBBLE_SCALE = 3;
 const TUFT_CELLS: readonly PaletteCell[] = [
   'grass_light',
   'grass_dark',
@@ -57,6 +60,33 @@ const PLAYABLE_BORDER = 2;
 const STRIPS = 4;
 /** Tronçons par côté au plus (côté prolongé divisé par `stripSegment`, large marge). */
 const FOREST_SEGMENTS_MAX = 16;
+
+function smoothstep(t: number): number {
+  const u = Math.min(1, Math.max(0, t));
+  return u * u * (3 - 2 * u);
+}
+
+/**
+ * Recul de la lisière du pourtour (cases) sur un côté de la carte, à cette case le long du
+ * côté (`RENDER_SETTINGS.terrain.forestClearings`): 0 hors des éclaircies.
+ */
+export function clearingShift(side: ForestClearing['side'], along: number): number {
+  let shift = 0;
+  SETTINGS.forestClearings.forEach((clearing, index) => {
+    if (clearing.side !== side) {
+      return;
+    }
+    const centre = along + 0.5;
+    const gap = Math.max(clearing.from - centre, centre - (clearing.to + 1), 0);
+    const weight = clearing.feather > 0 ? smoothstep(1 - gap / clearing.feather) : gap > 0 ? 0 : 1;
+    if (weight <= 0) {
+      return;
+    }
+    const wobble = (valueNoise(along, 0, CLEARING_WOBBLE_SCALE, SEED_CLEARING + index) - 0.5) * 2;
+    shift = Math.max(shift, weight * (clearing.depth + wobble * clearing.wobble));
+  });
+  return shift;
+}
 
 function pick<T>(items: readonly T[], value: number): T {
   const item = items[Math.min(items.length - 1, Math.floor(value * items.length))];
@@ -223,7 +253,10 @@ export class Vegetation {
       for (let cx = -ext; cx < map.width + ext; cx += 1) {
         const dx = cx < min ? min - cx : cx >= maxX ? cx - maxX + 1 : 0;
         const dy = cy < min ? min - cy : cy >= maxY ? cy - maxY + 1 : 0;
-        const distance = Math.max(dx, dy);
+        // Distance à la lisière, reculée dans les éclaircies (les tronçons gardent la distance au bord).
+        const shiftX = dx === 0 ? 0 : clearingShift(cx < min ? 'west' : 'east', cy);
+        const shiftY = dy === 0 ? 0 : clearingShift(cy < min ? 'north' : 'south', cx);
+        const distance = Math.max(dx - shiftX, dy - shiftY);
         if (
           distance < SETTINGS.outerTreeStart ||
           distance > TREE_BAND_DEPTH ||

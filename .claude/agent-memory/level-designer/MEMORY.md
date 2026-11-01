@@ -10,6 +10,10 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Arbres de lisière: houppier compris (3,4 m pour un chêne), une rangée d'arbres dont le houppier s'arrête au nord d'un point ne le cache jamais depuis le sud. Garder les arbres au moins deux cases au nord des points de cueillette.
 - Exiger « vu depuis la caméra par défaut et depuis au moins une autre orientation » pour les lieux où l'on revient; les places d'apparition, vues une fois, n'ont besoin que de l'orientation par défaut. Ignorer poteaux et troncs de moins de 0,6 m dans le calcul: ils ne cachent pas tout un personnage.
 
+- La Petite Ligne: la forêt du pourtour n'est pas dans la carte, le rendu la sème (`src/rendu/vegetation.ts`, hors du bord jouable, arbres de 3 à 9,5 m, houppier jusqu'à 2,3 m de rayon). Tout lieu à moins de 10 m du bord sud ou est est caché depuis la caméra par défaut: vérifier ces lignes de vue en plus de la carte. Recul de lisière: `RENDER_SETTINGS.terrain.forestClearings`.
+- Ligne de vue exacte dans Node: construire `Terrain` et `Vegetation` avec des matériaux factices (`MeshBasicMaterial`, `paletteColor` qui rend blanc) puis `Raycaster.intersectObjects` sur les maillages instanciés `foret*`, rayon vers la caméra (`-cos yaw, sin e, -sin yaw`, yaw = -3 PI/4 + k PI/2). Exemple: `src/rendu/foret-pourtour.test.ts`.
+- Page `rendu.html` pour un moment: ajouter `vie=0`, sinon la promenade déplace Camille et la caméra ne montre pas le moment.
+
 ## Méthode et outils
 
 - Carte produite par un script de construction (composition en code), un validateur sans dépendance et un script d'aperçu; ne jamais retoucher le JSON à la main. Éprouver le validateur sur des cartes cassées exprès: deux de mes premiers cas de test étaient faux (le validateur avait raison), relire le cas avant d'accuser l'outil.
