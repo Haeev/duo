@@ -65,7 +65,7 @@ def is_train_day(day: int) -> bool:
 
 
 # ---------------------------------------------------------------------------
-# Météo (table 3.1 du document)
+# Météo (section 3 du document, table 3.1)
 # ---------------------------------------------------------------------------
 WEATHERS = ["sunny", "cloudy", "rain"]
 WEATHER_TABLE = {  # fréquences visées, en %
@@ -178,7 +178,7 @@ def draw_weather(seed: int, days: int) -> list[WeatherDay]:
 
 
 # ---------------------------------------------------------------------------
-# Commande générée (tables 4.1 et 4.2 du document)
+# Commande générée (section 4 du document, table 4.2)
 # ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class Product:
@@ -489,7 +489,7 @@ def itertools_accumulate(xs: list[float]) -> list[float]:
 
 
 # ---------------------------------------------------------------------------
-# Repousse des arbres (table 6.1 du document)
+# Repousse des arbres (section 5.1 du document)
 # ---------------------------------------------------------------------------
 TREES = 12
 STUMP_DAYS = 4        # souche nue
@@ -556,7 +556,7 @@ def simulate_trees(seeds: int, policy: str) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
-# Cueillette (table 6.2 du document)
+# Cueillette (section 5.2 du document, table 5.2)
 # ---------------------------------------------------------------------------
 FORAGE = {
     "dandelion": {"seasons": ("spring",), "weight": 6, "mean": 2.5, "count": (2, 3)},
@@ -633,15 +633,15 @@ def simulate_forage(seeds: int) -> dict[str, object]:
 
 
 # ---------------------------------------------------------------------------
-# Répliques du quotidien (section 6.4 du document)
+# Répliques du quotidien (section 5.5 du document)
 # ---------------------------------------------------------------------------
 # Les répliques de la démo encore vraies après le jour 15 (après les bornes proposées), lues
 # dans habitants.json; chaque réplique est classée par sa condition.
-STALE_AFTER_15 = {  # bornées au jour 15 par le document (section 6.4): elles mentiraient ensuite
+STALE_AFTER_15 = {  # bornées au jour 15 par le document (section 5.5): elles mentiraient ensuite
     "firmin_daily_week2", "odette_daily_week2", "basile_daily_week2", "firmin_crate_full",
-    "firmin_mid_week2", "odette_mid_week2", "basile_mid_week2", "jeanne_mid_week2",
+    "firmin_mid_week2", "odette_mid_week2", "jeanne_mid_week2",  # gardées les mardis à jeudis: comptées absentes
 }
-# Ajouts écrits dans le document (section 6.4): par habitant, (générales dès le jour 16,
+# Ajouts écrits dans le document (section 5.5): par habitant, (générales dès le jour 16,
 # fin du printemps 16 à 21, été, pluie de plus, souvenirs du lendemain).
 NEW_LINES = {"general": 5, "late_spring": 2, "summer": 8, "rain": 1}
 VISIBLE = {"firmin": (8, 18), "odette": (7, 20), "basile": (8, 18), "jeanne": (8, 20)}
@@ -768,7 +768,7 @@ def simulate_lines(pools: dict[str, list[Line]], seeds: int, profile: str, last_
 
 
 # ---------------------------------------------------------------------------
-# Envies (section 6.5 du document)
+# Envies (section 5.4 du document)
 # ---------------------------------------------------------------------------
 ENVIES_RETIRED_AFTER_15 = {"meet_jeanne", "help_odette", "chop_wood"}   # bornées par leurs quêtes ou rencontres
 ENVIES_NEW = {"all": 4, "late_spring": 0, "summer": 10, "autumn": 0, "winter": 0}
@@ -844,7 +844,7 @@ def simulate_envies(seeds: int, last_day: int) -> dict[str, object]:
 def simulate_firsts(seeds: int, pools: dict[str, list[Line]]) -> dict[str, object]:
     """Une journée compte si ce joueur y vit au moins une première fois.
 
-    Sources comptées (section 7.2 du document): réplique jamais entendue, envie jamais reçue,
+    Sources comptées (section 6.3 du document): réplique jamais entendue, envie jamais reçue,
     cueillette jamais cueillie, moment jamais vu ensemble, première brume, premier jour de
     saison, produit jamais commandé dans la lettre de la coopérative, premier rejet, premier
     arbre repoussé abattu.
@@ -1040,6 +1040,9 @@ def main() -> None:
     a = [x.weather for x in draw_weather(1, 43)[15:]]
     b = [x.weather for x in draw_weather(2, 43)[15:]]
     print(f"graines 1 et 2, jours 16 à 43: {sum(1 for x, y in zip(a, b) if x != y)} jours différents sur 28")
+    w = draw_weather(20261030, 43)
+    print("graine 20261030, jour par jour (épinglé par le critère T8-12): " + ", ".join(
+        f"{d} {w[d-1].weather}{' brume' if w[d-1].mist else ''}" for d in range(16, 44)))
     for seed in (20261030, 1, 2):
         w = draw_weather(seed, 43)
         txt = "".join({"sunny": "S", "cloudy": "N", "rain": "P"}[x.weather] + ("b" if x.mist else "")
