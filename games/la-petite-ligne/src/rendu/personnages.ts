@@ -34,6 +34,7 @@ import type {
 } from '../etat/types';
 import { SIM_HZ } from '../etat/types';
 import { BoneOffsets, poseEnvelope, stableUnit, termAngle } from './attentes';
+import { ArmReach } from './portee';
 import type { Content } from '../donnees/types';
 import type { MapProp } from '../etat/carte';
 import { BenchSeating, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
@@ -196,6 +197,14 @@ interface ClipRequest {
   exactTime?: number;
 }
 
+/** Main droite posée sur un point: x, y de la carte, z hauteur dans le monde, poids de 0 à 1 (`portee.ts`). */
+export interface HandReach {
+  x: number;
+  y: number;
+  z: number;
+  weight: number;
+}
+
 /**
  * Habitant mené par une chorégraphie (moments rares, `moments.ts`): `pose` le place et l'anime
  * à la place de son emploi du temps (Basile sur l'échelle), `look` lui fait seulement tourner la
@@ -217,6 +226,8 @@ export type VillagerDirection =
       tool: string | null;
       /** Regard (tête), ou `null`. */
       look: { x: number; y: number } | null;
+      /** Main droite posée sur un point, ou `null`: le clip seul. */
+      reach: HandReach | null;
     }
   | { kind: 'look'; x: number; y: number };
 
@@ -243,6 +254,10 @@ class CharacterFigure {
   private readonly position = { x: 0, y: 0 };
   /** Rotations d'os ajoutées au clip (attentes procédurales, regard). */
   private readonly offsets: BoneOffsets;
+  /** Main droite amenée sur un point (habitant mené par une chorégraphie). */
+  private readonly reach: ArmReach;
+  private readonly reachTarget = new Vector3();
+  private reachWeight = 0;
   private idleFor = 0;
   private idleRank = 0;
   private idleNextAt: number;
@@ -284,6 +299,7 @@ class CharacterFigure {
     });
     this.hand = model.getObjectByName(HAND_SOCKET) ?? null;
     this.offsets = new BoneOffsets(model);
+    this.reach = new ArmReach(model, 'chest', 'upper_arm_r', 'forearm_r', HAND_SOCKET);
     this.idleNextAt = this.idleDelay();
   }
 
@@ -301,6 +317,14 @@ class CharacterFigure {
     this.lookPoint.x = target.x;
     this.lookPoint.y = target.y;
     this.lookTarget = this.lookPoint;
+  }
+
+  /** Main droite vers ce point de la carte (z: hauteur dans le monde), ou `null`. */
+  setReach(target: HandReach | null): void {
+    this.reachWeight = target === null ? 0 : target.weight;
+    if (target !== null) {
+      this.reachTarget.set(target.x, target.z, target.y);
+    }
   }
 
   /** Joue `clip` une fois par-dessus l'attente (salut). Faux s'il n'existe pas ou si autre chose joue. */
@@ -548,10 +572,14 @@ class CharacterFigure {
     if (request.exactTime !== undefined && this.current !== null) {
       this.current.time = Math.max(0, request.exactTime);
     }
+    this.reach.restore();
     this.offsets.restore();
     this.mixer?.update(context.dt);
     if (this.mixer !== null) {
       this.applyOffsets(context.time, context.dt);
+      if (this.reachWeight > 0) {
+        this.reach.apply(this.root, this.reachTarget, this.reachWeight);
+      }
     }
     setStandingBox(
       this.pick.box,
@@ -1199,6 +1227,7 @@ export class CharactersPart implements EventfulPart {
         figure.root.visible = true;
         figure.pick.enabled = villager.visible;
         figure.lookAt(direction.look);
+        figure.setReach(direction.reach);
         const point = this.directedPoint;
         point.x = direction.x;
         point.y = direction.y;
@@ -1218,6 +1247,7 @@ export class CharactersPart implements EventfulPart {
         continue;
       }
       figure.setTool(this.library, null);
+      figure.setReach(null);
       figure.root.visible = villager.visible;
       figure.pick.enabled = villager.visible;
       if (!villager.visible) {

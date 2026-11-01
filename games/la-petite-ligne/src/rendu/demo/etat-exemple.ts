@@ -113,7 +113,7 @@ export interface DemoMoment {
 const MOMENT_SPOTS: Readonly<Record<string, readonly [number, number, number, number]>> = {
   heron: [22.5, 35.5, 21.0, 35.5],
   geese: [24.5, 37.5, 26.5, 37.5],
-  ladder: [51.61, 5.79, 50.79, 6.61],
+  ladder: [51.48, 5.66, 50.79, 6.61],
   tits: [50.6, 8.2, 51.4, 7.4],
   fox: [10.5, 17.5, 11.5, 16.5],
   glowworms: [53.5, 32.5, 54.5, 31.5],
@@ -611,6 +611,12 @@ function placeMoment(
       if (place === undefined) return;
       c.holding = place;
       c.facing = map.pointFacings[place] ?? c.facing;
+      // À la place même de la carte (la simulation l'y pose en prenant l'échelle).
+      const at = map.points[place];
+      if (at !== undefined) {
+        c.pos = { x: at.x, y: at.y };
+        c.prev = { x: at.x, y: at.y };
+      }
       c.bag[c.selected] = null;
     });
   }
