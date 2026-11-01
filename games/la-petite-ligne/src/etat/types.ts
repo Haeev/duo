@@ -171,6 +171,8 @@ export interface WorldState {
   moments: MomentsState;
   /** Informations propres à un seul joueur (R16): les secrets des quêtes et le tour de l'informé. */
   secrets: SecretsState;
+  /** Souvenirs du duo (tour 7): une ligne par moment vu ensemble et par quête secrète finie, bornée. */
+  memories: MemoriesState;
 }
 
 /**
@@ -650,6 +652,48 @@ export interface SecretsState {
   /** Prochain informé. */
   turn: CharacterId;
   entries: SecretEntry[];
+}
+
+// ---------------------------------------------------------------------------
+// Souvenirs du carnet (tour 7, conception section 2.4)
+
+/**
+ * Un moment vu ensemble, quel que soit le nombre de passages (la taille ne grandit pas avec le
+ * temps de jeu). La semaine, la saison et l'année se déduisent des jours.
+ */
+export interface MomentMemoryEntry {
+  id: string;
+  /** Jour de la première fois. */
+  first: number;
+  /**
+   * Destinataire de la confidence de la première fois. `null`: pas de confidence (moment de
+   * quête, habitant pas encore rencontré) ou inconnu (sauvegarde du format 3).
+   */
+  hintTo: CharacterId | null;
+  /**
+   * Habitant de la première fois: celui de la confidence, ou celui qui a donné la quête quand
+   * `hintTo` vaut `null`. `null` avec `hintTo`: indice sans habitant (le héron, les oies).
+   */
+  hintFrom: string | null;
+  count: number;
+  /** Jour de la dernière fois. */
+  last: number;
+}
+
+/** Une quête à secret (R16) finie. */
+export interface SecretMemoryEntry {
+  quest: QuestId;
+  day: number;
+  informed: CharacterId;
+  /** Aucune mauvaise réponse. */
+  firstTry: boolean;
+  /** Variante du secret (la réponse de Firmin, lisible chez les deux une fois la quête finie). */
+  variant: number;
+}
+
+export interface MemoriesState {
+  moments: MomentMemoryEntry[];
+  secrets: SecretMemoryEntry[];
 }
 
 // ---------------------------------------------------------------------------

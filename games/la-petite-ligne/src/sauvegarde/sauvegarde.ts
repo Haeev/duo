@@ -16,6 +16,7 @@ import { variantOf } from '../simulation/conditions';
 import type { PlayerInfo } from '../simulation/monde';
 import { type StepInput, step } from '../simulation/pas';
 import { settleSavedClimax } from '../simulation/moments';
+import { memoriesFromSave } from '../simulation/souvenirs';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -109,7 +110,31 @@ function checkWorld(data: unknown): WorldState {
   if (!Array.isArray(rng) || rng.length !== 4 || !rng.every((n) => typeof n === 'number')) {
     throw new SaveError('sauvegarde: état du générateur invalide');
   }
+  checkMemories(data.memories);
   return data as unknown as WorldState;
+}
+
+/** Souvenirs (format 4): l'onglet du carnet les lit tels quels, chez les deux. */
+function checkMemories(memories: unknown): void {
+  const who = (v: unknown): boolean => v === 'p1' || v === 'p2';
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const moment = (m: unknown): boolean =>
+    isRecord(m) &&
+    typeof m.id === 'string' &&
+    num(m.first) &&
+    num(m.count) &&
+    num(m.last) &&
+    (m.hintTo === null || who(m.hintTo)) &&
+    (m.hintFrom === null || typeof m.hintFrom === 'string');
+  const secret = (s: unknown): boolean =>
+    isRecord(s) && typeof s.quest === 'string' && num(s.day) && who(s.informed) && typeof s.firstTry === 'boolean' && num(s.variant);
+  const ok =
+    isRecord(memories) &&
+    Array.isArray(memories.moments) &&
+    Array.isArray(memories.secrets) &&
+    memories.moments.every(moment) &&
+    memories.secrets.every(secret);
+  if (!ok) throw new SaveError('sauvegarde: souvenirs invalides');
 }
 
 /**
@@ -192,6 +217,7 @@ function migrate(data: unknown, dataSchema: number, content: Content): unknown {
   if (dataSchema > DATA_SCHEMA) throw new SaveError(`sauvegarde d'une version plus récente (format ${dataSchema})`);
   if (dataSchema < 2 && isRecord(data)) migrateToTwoWeeks(data, content);
   if (dataSchema < 3 && isRecord(data)) migrateToMoments(data, content);
+  if (dataSchema < 4 && isRecord(data)) data.memories = memoriesFromSave(data, content, dataSchema);
   return data;
 }
 

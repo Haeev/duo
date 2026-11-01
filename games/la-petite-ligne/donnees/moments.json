@@ -51,7 +51,8 @@
         "sounds": [[0.0, "heron_wings"]]
       },
       "sounds": { "idle": [{ "id": "heron_wade", "everySeconds": [6, 12], "range": 15 }] },
-      "texts": { "hint": "moment_heron_hint", "climax": "heron_seen", "memory": "moment_heron_memory" },
+      "texts": { "hint": "moment_heron_hint", "climax": "heron_seen", "memory": "moment_heron_memory", "rumor": "moment_heron_rumor", "vignette": "moment_heron_vignette" },
+      "vignette": "memory-heron",
       "hintFrom": null,
       "reward": { "heart": 10 }
     },
@@ -128,7 +129,8 @@
         "sounds": [[0.0, "geese_alarm"], [1.0, "geese_takeoff"], [3.0, "geese_flight"]]
       },
       "sounds": { "idle": [{ "id": "geese_rest", "everySeconds": [6, 6], "range": 20 }] },
-      "texts": { "hint": "moment_geese_hint", "climax": "geese_seen", "memory": "moment_geese_memory" },
+      "texts": { "hint": "moment_geese_hint", "climax": "geese_seen", "memory": "moment_geese_memory", "rumor": "moment_geese_rumor", "vignette": "moment_geese_vignette" },
+      "vignette": "memory-geese",
       "hintFrom": null,
       "reward": { "heart": 10 }
     },
@@ -206,7 +208,8 @@
       },
       "leave": null,
       "sounds": { "idle": [] },
-      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory" },
+      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory", "vignette": "moment_ladder_vignette" },
+      "vignette": "memory-ladder",
       "hintFrom": null,
       "reward": { "heart": 10 }
     },
@@ -269,7 +272,8 @@
       "after": null,
       "leave": null,
       "sounds": { "idle": [{ "id": "tit_song", "everySeconds": [8, 8], "range": 12 }] },
-      "texts": { "hint": "moment_tits_hint", "climax": "moment_tits_climax", "memory": "moment_tits_memory" },
+      "texts": { "hint": "moment_tits_hint", "climax": "moment_tits_climax", "memory": "moment_tits_memory", "rumor": "moment_tits_rumor", "vignette": "moment_tits_vignette" },
+      "vignette": "memory-tits",
       "hintFrom": "basile",
       "reward": { "heart": 10 }
     },
@@ -327,7 +331,8 @@
         "sounds": []
       },
       "sounds": { "idle": [{ "id": "fox_pounce", "everySeconds": [6, 8], "range": 15 }] },
-      "texts": { "hint": "moment_fox_hint", "climax": "moment_fox_climax", "memory": "moment_fox_memory" },
+      "texts": { "hint": "moment_fox_hint", "climax": "moment_fox_climax", "memory": "moment_fox_memory", "rumor": "moment_fox_rumor", "vignette": "moment_fox_vignette" },
+      "vignette": "memory-fox",
       "hintFrom": null,
       "reward": { "heart": 10 }
     },
@@ -361,7 +366,8 @@
       "after": { "actors": { "glowworms": { "at": "meadow_glow", "idle": "glow_all" } } },
       "leave": null,
       "sounds": { "idle": [{ "id": "crickets_night", "everySeconds": [8, 8], "range": 20 }] },
-      "texts": { "hint": "moment_glowworms_hint", "climax": "moment_glowworms_climax", "memory": "moment_glowworms_memory" },
+      "texts": { "hint": "moment_glowworms_hint", "climax": "moment_glowworms_climax", "memory": "moment_glowworms_memory", "rumor": "moment_glowworms_rumor", "vignette": "moment_glowworms_vignette" },
+      "vignette": "memory-glowworms",
       "hintFrom": "odette",
       "reward": { "heart": 10 },
       "render": {

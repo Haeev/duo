@@ -5,7 +5,7 @@
  * de captures seulement: le jeu ne passe jamais par ici.
  */
 import type { Intent } from '../../etat/actions';
-import type { CharacterId, ItemStack } from '../../etat/types';
+import type { CharacterId, ItemStack, MomentMemoryEntry } from '../../etat/types';
 import type { Sim } from '../../simulation/contexte';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
@@ -129,6 +129,32 @@ function answerRight(sim: Sim, doer: CharacterId): void {
   const d = character(sim, doer).dialogue;
   const index = sim.world.hens.findIndex((h) => h.id === d?.villager);
   apply(sim, doer, [{ type: 'dialogue_choice', choice: `name:${String(Math.max(0, index))}` }]);
+}
+
+// ---------------------------------------------------------------------------
+// Tour 7: onglet Souvenirs. La page s'ouvre sur l'onglet avec `onglet=souvenirs`. Avec la graine
+// de la démo, les robots finissent les poules au jour 5 (p1 informé), voient le héron au jour 6
+// (quête de Jeanne), finissent le mot de Lucie (p2 informé) et voient les oies au jour 11.
+
+/** Journée en cours, personne en conversation ni dans un menu, le carnet ouvert chez `me`. */
+function openNotebookWhenFree(sim: Sim, me: CharacterId, until: (s: Sim) => boolean): void {
+  playUntil(sim, (s) => until(s) && s.world.phase === 'day' && s.world.scene === null && s.world.characters.every((c) => c.dialogue === null && c.menu === null));
+  apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+}
+
+/**
+ * Le dernier souvenir arrive une fois l'interface montée: il porte le filet des nouveautés,
+ * comme une entrée née pendant la séance.
+ */
+function lastMemoryAfterMount(sim: Sim): () => void {
+  const entry = sim.world.memories.moments.pop();
+  return () => {
+    if (entry !== undefined) sim.world.memories.moments.push(entry);
+  };
+}
+
+function memory(id: string, first: number, hintTo: CharacterId | null, hintFrom: string | null, count = 1, last = first): MomentMemoryEntry {
+  return { id, first, hintTo, hintFrom, count, last };
 }
 
 /**
@@ -381,6 +407,37 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       playUntil(sim, (s) => s.world.secrets.entries.some((e) => e.quest === 'lucie_note' && e.revealed) && s.world.characters.every((c) => c.dialogue === null && c.menu === null));
       apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
       return;
+    case 'souvenirs-vide':
+      // Début de partie: la page vide et la rumeur du bourg.
+      openNotebookWhenFree(sim, me, (s) => at(s, 2, 9 * HOUR));
+      return;
+    case 'souvenirs-premier':
+      // Le premier souvenir, né dans la séance: le renard du jour 3, confidence chez p2.
+      openNotebookWhenFree(sim, me, (s) => at(s, 3, 21 * HOUR));
+      sim.world.memories.moments = [memory('fox', 3, 'p2', null)];
+      return lastMemoryAfterMount(sim);
+    case 'souvenirs-secret':
+      // Les noms des poules trouvés (p1 informé, p2 a appelé): une quête secrète finie.
+      openNotebookWhenFree(sim, me, (s) => s.world.memories.secrets.some((m) => m.quest === 'hen_names'));
+      return;
+    case 'souvenirs-plusieurs':
+      // Le lendemain des oies: deux quêtes secrètes et deux moments de quête, une saison.
+      openNotebookWhenFree(sim, me, (s) => at(s, 12, 9 * HOUR));
+      return lastMemoryAfterMount(sim);
+    case 'souvenirs-deux-annees': {
+      // Une longue partie (deux années): les quêtes de la démo, puis des moments revus d'une saison à l'autre.
+      openNotebookWhenFree(sim, me, (s) => at(s, 12, 9 * HOUR));
+      sim.world.clock.day = 96;
+      sim.world.memories.moments = [
+        memory('heron', 6, null, 'jeanne', 3, 47),
+        memory('geese', 11, null, 'firmin', 2, 95),
+        memory('fox', 16, 'p1', null, 5, 88),
+        memory('glowworms', 23, 'p2', 'odette', 2, 37),
+        memory('ladder', 31, null, 'basile'),
+        memory('tits', 90, 'p1', 'basile'),
+      ];
+      return;
+    }
     default:
       return undefined;
   }

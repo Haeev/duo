@@ -306,6 +306,8 @@ export interface QuestSecretDef {
   revealOn: Condition | null;
   /** Coup de coude chez l'informé après `secrets.nudgeAfterErrors` erreurs (clé de `textes.messages`). */
   nudge: string | null;
+  /** Vignette du souvenir de la quête finie (onglet Souvenirs): symbole du sprite, `null`: générique. */
+  vignette: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -395,7 +397,13 @@ export interface MomentDef {
   after: { actors: Record<string, { at: string | null; idle: string | null }> } | null;
   leave: MomentChoreography | null;
   sounds: { idle: { id: string; everySeconds: [number, number]; range: number }[] };
-  texts: { hint: string | null; climax: string; memory: string };
+  /**
+   * Clés de `textes.json`. `rumor`: la rumeur du bourg (onglet Souvenirs), `null` si le moment
+   * n'en a pas (l'échelle); `vignette`: texte de remplacement de la vignette.
+   */
+  texts: { hint: string | null; climax: string; memory: string; rumor: string | null; vignette: string | null };
+  /** Vignette du souvenir: symbole du sprite des icônes (`null`: vignette générique). */
+  vignette: string | null;
   hintFrom: string | null;
   reward: { heart: number; money: number };
   /** Effets à l'apogée (le drapeau du nichoir redressé). */
@@ -567,6 +575,8 @@ export interface Settings {
   moments: MomentSettings;
   /** Informations propres à un seul joueur (`reglages.secrets`, R16). */
   secrets: SecretSettings;
+  /** Souvenirs du carnet et calendrier des saisons (`reglages.memories`, tour 7). */
+  memories: MemorySettings;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
 }
@@ -601,6 +611,16 @@ export interface SecretSettings {
   hideFromGuestSnapshot: boolean;
   /** Drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms: la quête des noms ne démarre pas. */
   knownHensFlag: string;
+}
+
+/** Souvenirs du carnet (tour 7, section 2): calendrier des saisons et borne de taille. */
+export interface MemorySettings {
+  /** Jours par saison (le jour 1 ouvre le printemps de la première année). */
+  seasonDays: number;
+  /** Saisons par année. */
+  seasonsPerYear: number;
+  /** Taille maximale de `world.memories` en JSON (octets), contrôlée par les tests (S-14). */
+  maxBytes: number;
 }
 
 /** S'asseoir sur un banc de la carte (modèle `bench`). */

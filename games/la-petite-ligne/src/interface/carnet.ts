@@ -1,9 +1,9 @@
 /**
- * Carnet (maquette `carnet.html`): onglets Quêtes, Courrier et Sac. A et E
- * changent d'onglet (la caméra ne tourne pas pendant le carnet), Tab ou
+ * Carnet (maquette `carnet.html`): onglets Quêtes, Courrier, Sac et Souvenirs.
+ * A et E changent d'onglet (la caméra ne tourne pas pendant le carnet), Tab ou
  * Retour arrière le ferment.
  */
-import type { ReadonlyWorld } from '../etat/types';
+import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
@@ -12,14 +12,39 @@ import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, questModels, slotModel, type QuestModel } from './modele';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
+import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { Panel } from './panneau';
 import { SOUND_ATTR } from './sons';
 
-type NotebookTab = 'quests' | 'mail' | 'bag';
-const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag'];
+type NotebookTab = 'quests' | 'mail' | 'bag' | 'memories';
+const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'memories'];
 
 /** Dernier onglet ouvert, gardé d'une ouverture à l'autre. */
 let lastTab: NotebookTab = 'quests';
+
+/** Onglet du prochain carnet ouvert (page de démonstration, captures). */
+export function rememberNotebookTab(tab: NotebookTab): void {
+  lastTab = tab;
+}
+
+/**
+ * Souvenirs déjà vus par ce joueur pendant la séance (`stamp` des entrées): une entrée née ou
+ * revue depuis porte un filet de laiton à l'ouverture suivante de l'onglet, jusqu'à ce qu'on
+ * l'ait vue. Ceux d'avant la séance sont tenus pour vus (`startMemorySession`).
+ */
+const seenMemories = new Map<CharacterId, Set<string>>();
+
+function stampsOf(world: ReadonlyWorld): string[] {
+  return [
+    ...world.memories.moments.map((m) => `moment:${m.id}:${String(m.count)}`),
+    ...world.memories.secrets.map((m) => `secret:${m.quest}`),
+  ];
+}
+
+/** Début de séance (montage de l'interface): les souvenirs déjà là ne sont pas nouveaux. */
+export function startMemorySession(world: ReadonlyWorld, me: CharacterId): void {
+  seenMemories.set(me, new Set(stampsOf(world)));
+}
 
 export class NotebookPanel extends Panel {
   private tab: NotebookTab;
@@ -29,6 +54,8 @@ export class NotebookPanel extends Panel {
   private moving: number | null = null;
   private letter: string | null = null;
   private dragFrom: number | null = null;
+  /** Souvenirs nouveaux pendant cette visite de l'onglet (filet de laiton), ou `null` hors de l'onglet. */
+  private freshMemories: Set<string> | null = null;
 
   constructor(host: UiHost, tab: PanelTab | undefined) {
     const { ctx } = host;
@@ -45,7 +72,7 @@ export class NotebookPanel extends Panel {
       },
       'Tab',
     );
-    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' ? tab : lastTab;
+    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'memories' ? tab : lastTab;
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
@@ -56,12 +83,14 @@ export class NotebookPanel extends Panel {
       quests: make('quests', ctx.t(g.quests), 'ui-flag', null),
       mail: make('mail', ctx.t(g.mail), 'ui-letter', this.badge),
       bag: make('bag', ctx.t(g.bag), 'grain-sack', null),
+      memories: make('memories', ctx.t(g.memories), 'ui-heart', null),
     };
     const tabs = el('div', { class: 'lpl-tabs', role: 'tablist', 'aria-label': n.tabsLabel }, [
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyQ') }),
       this.tabButtons.quests,
       this.tabButtons.mail,
       this.tabButtons.bag,
+      this.tabButtons.memories,
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyE') }),
     ]);
     this.header.insertBefore(tabs, this.closeButton);
@@ -100,6 +129,7 @@ export class NotebookPanel extends Panel {
       this.tab = tab;
       lastTab = tab;
       this.moving = null;
+      this.freshMemories = null;
       this.markTabs();
       this.host.invalidate();
     }
@@ -190,7 +220,76 @@ export class NotebookPanel extends Panel {
     setAttr(this.badge, 'aria-label', ctx.t(unread > 1 ? ctx.texts.extra.notebook.unreadMany : ctx.texts.extra.notebook.unread, { count: unread }));
     if (this.tab === 'quests') this.renderQuests(world);
     else if (this.tab === 'mail') this.renderMail(letters);
-    else this.renderBag(world);
+    else if (this.tab === 'bag') this.renderBag(world);
+    else this.renderMemories(world);
+  }
+
+  /**
+   * Souvenirs (tour 7): une colonne du plus récent au plus ancien, un intercalaire par saison,
+   * la rumeur du bourg en bas. Rien de ce qui manque ne se voit (pas de compteur, pas de case vide).
+   */
+  private renderMemories(world: ReadonlyWorld): void {
+    const { ctx } = this.host;
+    const page = memoriesPageModel(world, ctx);
+    const seen = seenMemories.get(ctx.me) ?? new Set<string>();
+    seenMemories.set(ctx.me, seen);
+    const fresh = this.freshMemories ?? new Set<string>();
+    this.freshMemories = fresh;
+    for (const season of page.seasons) {
+      for (const entry of season.entries) {
+        if (!seen.has(entry.stamp)) fresh.add(entry.stamp);
+        seen.add(entry.stamp);
+      }
+    }
+    const sig = JSON.stringify(['memories', page, [...fresh]]);
+    this.renderBody(sig, () => this.memoriesNodes(page, fresh));
+  }
+
+  private memoriesNodes(page: MemoriesPageModel, fresh: ReadonlySet<string>): HTMLElement[] {
+    const { ctx } = this.host;
+    const t = ctx.texts.game.souvenirs;
+    const nodes: HTMLElement[] = [];
+    if (page.empty !== null) nodes.push(el('p', { class: 'lpl-memories__empty', text: page.empty }));
+    const first = page.seasons[0]?.entries[0]?.key ?? null;
+    for (const season of page.seasons) {
+      const list = el('ul', { class: 'lpl-memories__list', 'data-nav': 'list' });
+      for (const entry of season.entries) list.append(this.memoryItem(entry, fresh.has(entry.stamp), entry.key === first));
+      nodes.push(el('section', { class: 'lpl-memories__season' }, [el('h3', { class: 'lpl-section-title lpl-memories__divider', text: season.title }), list]));
+    }
+    if (page.rumor !== null) {
+      nodes.push(
+        el('p', { class: 'lpl-rumor', tabindex: '0', 'data-nav-item': true, 'data-key': 'rumor' }, [
+          el('span', { class: 'lpl-rumor__lead', text: page.rumor.lead }),
+          el('em', { class: 'lpl-rumor__text', text: page.rumor.text }),
+        ]),
+      );
+    }
+    return [el('div', { class: 'lpl-memories', role: 'region', 'aria-label': ctx.t(t.listLabel) }, nodes)];
+  }
+
+  private memoryItem(entry: MemoryEntryModel, fresh: boolean, autofocus: boolean): HTMLLIElement {
+    const { ctx } = this.host;
+    // Une vignette pas encore dessinée dans le sprite: la page générique, jamais une case vide.
+    const vignette = document.getElementById(entry.vignette) === null ? GENERIC_VIGNETTE : entry.vignette;
+    return el(
+      'li',
+      {
+        class: 'lpl-memory',
+        tabindex: '0',
+        'data-nav-item': true,
+        'data-key': entry.key,
+        'data-fresh': fresh,
+        'data-autofocus': autofocus,
+      },
+      [
+        el('span', { class: 'lpl-memory__vignette', role: 'img', 'aria-label': entry.alt }, [icon(vignette, 'lpl-memory__icon')]),
+        el('span', { class: 'lpl-memory__title', text: entry.title }),
+        // « Nouveau souvenir » pour le lecteur d'écran; à l'œil, le filet de laiton suffit.
+        el('span', { class: 'lpl-memory__date' }, [fresh ? el('span', { class: 'lpl-sr-only', text: `${ctx.t(ctx.texts.game.souvenirs.fresh)}. ` }) : null, entry.date]),
+        entry.self === null ? null : el('span', { class: 'lpl-memory__self', text: entry.self }),
+        entry.returns === null ? null : el('span', { class: 'lpl-memory__returns', text: entry.returns }),
+      ],
+    );
   }
 
   private renderQuests(world: ReadonlyWorld): void {

@@ -3,7 +3,13 @@
  * `feel` dans `reglages.json` remplace chaque valeur une à une; `ranges`
  * complète de même les portées absentes. À reprendre par le game designer.
  */
-import type { BenchSettings, FeelSettings, MomentSettings, SecretSettings } from './types';
+import type {
+  BenchSettings,
+  FeelSettings,
+  MemorySettings,
+  MomentSettings,
+  SecretSettings,
+} from './types';
 
 /** Moments rares (tour 6): valeurs de la conception, section 3.2; `reglages.moments` les remplace. */
 export const DEFAULT_MOMENTS: MomentSettings = {
@@ -33,6 +39,13 @@ export const DEFAULT_SECRETS: SecretSettings = {
   henChoiceKeepOpen: 3,
   hideFromGuestSnapshot: false,
   knownHensFlag: 'hen_names_known',
+};
+
+/** Souvenirs (tour 7, section 2.4): saisons de 21 jours (script `moments_rares.py`), moins de 1,5 Kio. */
+export const DEFAULT_MEMORIES: MemorySettings = {
+  seasonDays: 21,
+  seasonsPerYear: 4,
+  maxBytes: 1536,
 };
 
 export const DEFAULT_FEEL: FeelSettings = {

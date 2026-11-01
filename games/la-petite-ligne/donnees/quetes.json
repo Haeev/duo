@@ -201,7 +201,7 @@
           ]
         },
         "revealOn": { "type": "dialogue_done", "dialogue": "odette_hen_names_tell" },
-        "nudge": "secret_nudge_hens"
+        "nudge": "secret_nudge_hens", "vignette": "memory-hen-names"
       },
       "steps": [
         {
@@ -706,7 +706,7 @@
             { "type": "dialogue_done", "dialogue": "firmin_lucie_reply_2" }
           ]
         },
-        "nudge": "secret_nudge_lucie"
+        "nudge": "secret_nudge_lucie", "vignette": "memory-lucie-note"
       },
       "steps": [
         {

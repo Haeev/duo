@@ -388,7 +388,8 @@
     "partnerLetGo": "{partner} a lâché l'échelle.",
     "hintOverline": "Une confidence",
     "hintChip": "Rien que pour toi",
-    "hintHelp": "{partner} n'en sait rien. Dis-le-lui : ça ne se voit qu'à deux."
+    "hintHelp": "{partner} n'en sait rien. Dis-le-lui : ça ne se voit qu'à deux.",
+    "memoryAdded": "Dans ton carnet : Souvenirs"
   },
   "secrets": {
     "mineHelp": "{partner} ne voit pas cette fiche : c'est à toi de le lui dire.",

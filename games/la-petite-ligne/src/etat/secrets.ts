@@ -85,6 +85,16 @@ export function secretVars(world: ReadonlyWorld, content: Content, quest: QuestD
   return vars;
 }
 
+/**
+ * La réponse d'une quête à secret finie (`{secret}` des souvenirs), lisible chez les deux: l'autre
+ * l'a lui-même donnée pour finir la quête. Ne sert qu'aux souvenirs, nés à la fin de la quête.
+ */
+export function finishedSecretLine(world: ReadonlyWorld, content: Content, quest: string, variant: number): string {
+  const def = content.quests.find((q) => q.id === quest);
+  if (def === undefined) return '';
+  return fill(secretLine(def, variant), henVars(world, content));
+}
+
 export interface SecretCard {
   quest: string;
   title: string;
