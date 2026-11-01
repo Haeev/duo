@@ -83,3 +83,9 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Une brume ou une nappe se juge d'abord en valeur: mesurer L* (ImageMagick `-colorspace Lab`, moyenne du canal L) de la nappe, de l'eau claire et des berges. Une brume plus sombre que ses berges se lit comme de la fumée.
 - Une bouffée de particules face à la caméra plus grande que deux fois sa hauteur au-dessus du sol est coupée par le sol en ligne droite (bancs de brume du matin de `ciel.ts`): demander des sprites posés à plat ou un fondu du bas.
 - Oreilles d'une bête vues de profil: une oreille étroite et dressée devient une pointe qui se lit comme un bois. Toujours contrôler une silhouette de profil strict au zoom de jeu.
+
+## Étalonnage et passe de rendu (La Petite Ligne, 2026-11-01)
+
+- Une saturation d'étalonnage qui « agit plus sur les teintes ternes » (`look.saturation`) resature d'abord les ombres: c'est elle, plus que la teinte d'ombre, qui fait virer une ombre froide au mauve le soir. Baisser la saturation avant de toucher à la teinte.
+- Un pan de toit entièrement à l'ombre sur une case déjà froide (lauzes) ne se règle pas par les valeurs globales de `look` (essais à 3 variantes: b\* -25 à -17 seulement): demander une part de teinte réduite sur les cases froides.
+- Essais de réglages sans toucher au dépôt: copie du jeu sans `node_modules` dans `/tmp` avec un lien vers le `node_modules` du jeu suffit (Vite résout les liens pnpm); donner à ce Vite son propre `cacheDir` et passer un `timeout` explicite à `page.goto` (30 s ne suffisent pas sous charge).
