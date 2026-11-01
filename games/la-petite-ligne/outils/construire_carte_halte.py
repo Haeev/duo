@@ -360,9 +360,15 @@ def construire_objets() -> None:
         objet(t, x, y, ident=f"tree_edge_{n:02d}", coupable=True)
 
     # Arbres du bois de la Côte hors lisière (décor, non coupables).
-    decor = [("tree_fir", 51, 2), ("tree_oak", 52, 5), ("tree_fir", 60, 3), ("tree_oak", 61, 6)]
-    for t, x, y in decor:
-        objet(t, x, y)
+    # Le grand chêne `tree_oak_01` (nichoir de Basile, revue du DA au tour 6): en (50,5 ; 5,5) pour que la
+    # face sud-est du tronc, celle que voit la caméra par défaut, soit dégagée de la remise (à 2 m de plus vers
+    # l'est, tout ce qui est au pied du tronc tombait derrière son toit). Tourné, son houppier va jusqu'à
+    # 2,34 m à l'ouest du tronc (x 48,2) et s'arrête à 0,5 m du débord de toit de Firmin (x 47,7), mesuré
+    # sur les GLB. Tourné d'un quart: sa grosse branche basse part
+    # au nord au lieu de l'est, où elle traverserait le nichoir.
+    decor = [("tree_fir", 51, 2, 0), ("tree_oak", 50, 5, 1), ("tree_fir", 60, 3, 0), ("tree_oak", 61, 6, 0)]
+    for t, x, y, quart in decor:
+        objet(t, x, y, rotation=quart)
 
     # Décor lointain dans l'anneau du bord: forêt au nord, haies et bosquets ailleurs.
     for x in range(0, LARGEUR, 2):
@@ -461,23 +467,30 @@ POINTS = [
     # de la berge (le carnet perdu, P1), où passe Jeanne: c'est voulu.
     p("heron_stand", 20.6, 39.6, "moment du héron: il pêche au bord aval du gué, dans la lame d'eau (case `g`), "
       "là où l'eau basse plonge vers l'eau profonde", moment="heron"),
-    p("heron_rest_far", 29.5, 42.3, "moment du héron: il se pose sur la grève de sable d'en face, à l'écart du "
-      "chemin", moment="heron"),
+    # Rive nord (revue du DA, tour 6): sur la grève d'en face, les arbres de la rive sud le cachaient à la
+    # caméra (qui regarde vers le nord-ouest); ici, seule l'eau est entre elle et lui.
+    p("heron_rest_far", 31.5, 38.5, "moment du héron: il se pose en aval, sur la langue de sable de la rive nord "
+      "(case `b`), à 3,9 m du banc de la berge: un héron habitué aux gens", moment="heron"),
     p("geese_rest", 25.5, 40.0, "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de "
       "lui; on la regarde depuis la berge", moment="geese", portee=4.5),
-    # L'échelle et le nichoir (décision du manager, tour 6): l'échelle au sud-ouest du tronc, où aucune
-    # branche ne passe (à l'ouest, la branche basse du chêne traversait l'échelle et Basile); tout est
-    # abaissé de 0,56 m sous le houppier (dessous vers 2,6 m), qui cachait le nichoir et le grimpeur.
-    p("nest_box", 52.5, 5.80, "le nichoir de Basile, face sud du seul vieux chêne qu'on ne coupe pas "
-      "(`tree_oak_01`): centre de la caisse à 1,84 m, trou à 1,89 m", moment="tits", z=1.84),
-    p("ladder_foot", 51.77, 6.23, "pied de l'échelle de Basile, au sud-ouest du chêne, tête contre le tronc "
-      "en (52,32 ; 5,68) à 2,90 m", moment="ladder", cap_degres=45),
-    p("ladder_hold_east", 52.36, 6.42, "tenir l'échelle, côté est, mains au montant (tourné vers le nord-ouest)",
-      moment="ladder", cap_degres=315),
-    p("ladder_hold_west", 51.58, 5.64, "tenir l'échelle, côté ouest, mains au montant (tourné vers le sud-est)",
-      moment="ladder", cap_degres=135),
-    p("nest_oak_basile", 51.42, 6.58, "Basile derrière le pied de son échelle, pendant « Où est passé Basile ? »; "
-      "il en part et y revient", cap_degres=45),
+    # L'échelle et le nichoir (revue du DA, tour 6). La caméra par défaut regarde vers le nord-ouest: deux
+    # points sont sur la même colonne de l'écran quand x - y est égal. L'échelle est donc contre la face
+    # sud-est du tronc, vue de face, penchée vers le nord-ouest; les deux places sont de part et d'autre de son
+    # pied (x - y de 45,8 et 44,2), Basile derrière lui (45,0): trois silhouettes séparées. Le nichoir est sur
+    # la face est, à la droite de Basile (main droite, `reach_up`), vu de trois quarts; son centre à 2,25 m
+    # (Basile atteint 2,15 m bras levé: sans échelle il ne l'atteindrait pas). Le pied est à 1 m du tronc, la
+    # tête (3 m d'échelle à 75°) appuie par son dernier barreau sur l'écorce (écart de 6 mm mesuré sur les GLB).
+    p("nest_box", 50.822, 5.40, "le nichoir de Basile, face est du seul vieux chêne qu'on ne coupe pas "
+      "(`tree_oak_01`): centre de la caisse à 2,25 m, trou à 2,30 m; un peu au nord de l'est pour laisser "
+      "4,7 cm au montant de l'échelle", moment="tits", z=2.25),
+    p("ladder_foot", 51.19, 6.19, "pied de l'échelle de Basile, au sud-est du chêne, tête contre le tronc "
+      "en (50,64 ; 5,64) vers 2,8 m", moment="ladder", cap_degres=315),
+    p("ladder_hold_east", 51.61, 5.79, "tenir l'échelle, côté est (au nord-est du pied), mains au montant "
+      "(tourné vers le sud-ouest)", moment="ladder", cap_degres=225),
+    p("ladder_hold_west", 50.79, 6.61, "tenir l'échelle, côté ouest (au sud-ouest du pied), mains au montant "
+      "(tourné vers le nord-est)", moment="ladder", cap_degres=45),
+    p("nest_oak_basile", 51.58, 6.58, "Basile derrière le pied de son échelle, pendant « Où est passé Basile ? »; "
+      "il en part et y revient", cap_degres=315),
     p("fox_track_west", 0.2, 13.5, "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast",
       moment="fox", portee=4.0),
     p("fox_mousing", 7.5, 17.0, "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la "
@@ -486,7 +499,7 @@ POINTS = [
       moment="glowworms"),
     p("roe_deer_edge", 49.8, 1.6, "moment de la chevrette (P1): là où le bois descend jusqu'au bourg",
       moment="roe_deer"),
-    p("roe_deer_graze", 50.0, 5.5, "moment de la chevrette (P1): herbe entre la maison de Firmin et la remise",
+    p("roe_deer_graze", 52.5, 4.5, "moment de la chevrette (P1): herbe entre le grand chêne et la remise",
       moment="roe_deer"),
     p("kingfisher_post", 46.1, 39.9, "moment du martin-pêcheur (P1): pieu d'amarrage au coin est du bout du "
       "ponton", moment="kingfisher"),
@@ -538,14 +551,19 @@ ZONES = [
 # bloquent rien et ne se dessinent pas en substitut; le rendu les pose sur leur support, à la hauteur z.
 # x, y, z: point d'attache en mètres (le clou du nichoir, le bout du chicot, le haut du pieu).
 ACCROCHES = [
-    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 52.5, "y": 5.71, "z": 2.015,
-     "regarde": "sud", "penche_degres": 25,
-     "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe nord-sud); redressé par "
-             "le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce; le centre "
-             "de la caisse est 0,09 m devant (y 5,80) et 0,175 m dessous (1,84 m)"},
-    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 52.85, "y": 5.95, "z": 2.19,
-     "role": "chicot de 0,6 m sur la face sud du chêne, sous le houppier, à hauteur du nichoir: perchoir des "
-             "mésanges"},
+    {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 50.732, "y": 5.40, "z": 2.425,
+     "regarde": "est", "penche_degres": 25,
+     "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe est-ouest); redressé par "
+             "le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce (rayon du "
+             "tronc 0,21 à 0,23 m à cette hauteur); le centre de la caisse est 0,09 m devant (x 50,822) et "
+             "0,175 m dessous (2,25 m)"},
+    # Le chicot sort de la face nord-est: au sud, à cette hauteur, part une branche vivante du chêne (tourné),
+    # et l'échelle occupe le sud-est. Vu de la caméra par défaut, il dépasse à droite du tronc, au-dessus du
+    # nichoir, sous le houppier.
+    {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 50.915, "y": 4.996, "z": 2.67,
+     "regarde": "est",
+     "role": "chicot de 0,6 m sur la face nord-est du chêne, sous le houppier, au-dessus du nichoir (il "
+             "entre dans l'écorce vers 2,3 m, 7 cm au nord du nichoir penché): perchoir des mésanges"},
     {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95,
      "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"},
 ]

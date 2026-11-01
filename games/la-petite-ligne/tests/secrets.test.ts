@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { CharacterId, Hen } from '../src/etat/types';
-import { HEN_NAMES_QUEST, henLabel, objectiveFor, secretCards } from '../src/etat/secrets';
+import { HEN_FALLBACK, HEN_NAMES_QUEST, henColor, henLabel, henUnknown, objectiveFor, secretCards } from '../src/etat/secrets';
 import { decodeSave, restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { type Sim, character } from '../src/simulation/contexte';
 import { SIM_HZ } from '../src/simulation/constantes';
@@ -384,4 +384,18 @@ describe('secrets: les robots finissent les deux quêtes (S-04, S-05)', () => {
     }
     expect((hens?.errors ?? 0) + (lucie?.errors ?? 0)).toBeGreaterThan(0);
   }, 300_000);
+});
+
+describe('secrets: texte de secours des poules', () => {
+  it('une variante sans texte donne « une poule », jamais son identifiant brut', () => {
+    const { content } = contentAndMap();
+    const bare = { ...content, texts: { ...content.texts, raw: { ...content.texts.raw, henColors: {}, henUnknown: {} } } };
+    expect(henColor(bare, 'hen_white')).toBe(HEN_FALLBACK);
+    expect(henUnknown(bare, 'hen_white')).toBe(HEN_FALLBACK);
+    expect(henColor(content, 'hen_inconnue')).toBe(HEN_FALLBACK);
+    // Avec son texte, la variante garde le sien.
+    const known = Object.keys(content.texts.raw.henUnknown as Record<string, unknown>)[0] ?? 'hen_white';
+    expect(henUnknown(content, known)).not.toBe(HEN_FALLBACK);
+    expect(henUnknown(content, known)).not.toContain('hen_');
+  });
 });

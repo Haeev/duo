@@ -423,6 +423,23 @@ export const RENDER_SETTINGS = {
     returnSeconds: 60,
     maxReturns: 1,
   },
+  /**
+   * Trou de visibilité d'un moment (revue du DA, tour 6): le houppier du grand chêne cache le
+   * nichoir et le haut de l'échelle depuis la caméra par défaut. Pendant l'attente, l'apogée et
+   * l'après de ces moments, ce qui est devant eux s'efface comme devant un joueur (`materiaux.ts`).
+   * Centre: l'accroche `hook` de la carte (le clou du nichoir), abaissée de `drop` (m); demi-largeur et demi-hauteur (m);
+   * `nearer`: le repère de profondeur est avancé d'autant vers la caméra, pour que l'échelle et le
+   * tronc, juste devant le nichoir, restent pleins (seul le feuillage, bien plus près, s'efface).
+   */
+  momentSeeThrough: {
+    moments: ['ladder', 'tits'],
+    phases: ['waiting', 'climax', 'after'],
+    hook: 'nest_box',
+    drop: 0.3,
+    halfWidth: 1.1,
+    halfHeight: 1.0,
+    nearer: 0.35,
+  },
 } as const;
 
 export type RenderSettings = typeof RENDER_SETTINGS;

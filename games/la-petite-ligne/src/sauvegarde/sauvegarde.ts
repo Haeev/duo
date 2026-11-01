@@ -15,6 +15,7 @@ import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
 import type { PlayerInfo } from '../simulation/monde';
 import { type StepInput, step } from '../simulation/pas';
+import { settleSavedClimax } from '../simulation/moments';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -322,16 +323,12 @@ function resume(
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
   for (const v of world.villagers) v.talkingWith = [];
-  // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état d'après.
-  const today = world.moments.today;
-  if (today?.phase === 'climax') {
-    today.phase = 'after';
-    today.elapsed = 0;
-    today.paused = false;
-  }
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
+  // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état
+  // d'après, avec le texte d'apogée et la fin de l'étape de quête (QA6-08).
+  settleSavedClimax(sim);
   if (dataSchema < 2) catchUpFirstDeadline(sim);
   if (scene !== null) startScene(sim, scene.dialogue);
   return sim;

@@ -29,14 +29,20 @@ function rawText(block: Record<string, unknown>, key: string, fallback: string):
   return typeof value === 'string' ? value : fallback;
 }
 
+/**
+ * Texte de secours quand une variante de poule n'a pas son texte: jamais l'identifiant brut
+ * (« hen_white ») à l'écran.
+ */
+export const HEN_FALLBACK = 'une poule';
+
 /** « la blanche » (`textes.henColors`) pour une variante de poule. */
 export function henColor(content: Content, variant: string): string {
-  return rawText(rawBlock(content, 'henColors'), variant, variant);
+  return rawText(rawBlock(content, 'henColors'), variant, HEN_FALLBACK);
 }
 
 /** « la poule blanche » (`textes.henUnknown`): ce que lit celui qui ne connaît pas encore son nom. */
 export function henUnknown(content: Content, variant: string): string {
-  return rawText(rawBlock(content, 'henUnknown'), variant, variant);
+  return rawText(rawBlock(content, 'henUnknown'), variant, HEN_FALLBACK);
 }
 
 /** `{henColor1}`, `{henColor2}`, `{henColor3}`: couleur de la première, deuxième, troisième poule (ordre des noms). */

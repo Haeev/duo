@@ -117,8 +117,8 @@ export interface SeeThroughHole {
   ground: number;
 }
 
-/** Nombre de trous (les deux joueurs). */
-export const SEE_THROUGH_SLOTS = 2;
+/** Nombre de trous: les deux joueurs, et le lieu d'un moment rare (`RENDER_SETTINGS.momentSeeThrough`). */
+export const SEE_THROUGH_SLOTS = 3;
 /** Marge de profondeur: seul ce qui est nettement devant le corps du personnage s'efface. */
 const SEE_THROUGH_DEPTH_MARGIN = 0.35;
 /** Largeur relative du bord tramé de l'ellipse (le reste du trou est net). */
