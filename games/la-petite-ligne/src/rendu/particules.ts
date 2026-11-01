@@ -9,6 +9,11 @@
  * (`PuffPool`), pluie déterministe autour de la vue (`pluie.ts`), sprites posés
  * qui dérivent (`ciel.ts`). Le mélange est en alpha prémultiplié: une même
  * passe fait les fumées (alpha) et les halos (addition).
+ *
+ * En mode sprites, deux réglages par instance (`aAccel.x` et `aAccel.y`, inutilisés sinon):
+ * carré couché à plat au lieu de tourné vers la caméra (bancs et nappes de brume), et fondu du
+ * bas selon la hauteur au-dessus du sol lue dans le champ du terrain (aucun bord net là où le sol
+ * coupe le carré). `aSize.y` y donne la demi-longueur du second axe (bouffée étirée).
  */
 import {
   BufferAttribute,
@@ -71,11 +76,12 @@ uniform vec4 uSpriteArea; // demi-côté de la zone des nuages, de la brume, ven
 uniform vec4 uGroupAlpha; // nuages, brume, halos, réserve
 uniform vec2 uCloudFade;  // rayon (écran) où les nuages sont invisibles, puis pleins
 uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra
+uniform float uGroundFade; // hauteur (m) au-dessus du sol sur laquelle un sprite fondu apparaît
 
 attribute vec4 aOrigin;   // position, naissance (bouffées) ou phase
 attribute vec4 aVelocity; // vitesse, durée de vie
-attribute vec4 aAccel;    // accélération, frein (bouffées) ou groupe (sprites)
-attribute vec4 aSize;     // taille au départ, à la fin, forme, graine
+attribute vec4 aAccel;    // accélération, frein (bouffées) ou couché, fondu au sol, groupe (sprites)
+attribute vec4 aSize;     // taille au départ, à la fin (sprites: second axe), forme, graine
 attribute vec4 aColor;    // couleur (linéaire), opacité
 
 varying vec2 vCorner;
@@ -83,6 +89,8 @@ varying vec4 vColor;
 flat varying int vShape;
 varying float vAge;
 varying float vLight;
+varying vec3 vWorld;
+flat varying int vGroundFade;
 
 uint ambHash(uint x) {
   x ^= x >> 16u; x *= 0x7feb352du; x ^= x >> 15u; x *= 0x846ca68bu; x ^= x >> 16u;
@@ -113,8 +121,10 @@ void main() {
   vColor = aColor;
   vAge = 0.0;
   vLight = 1.0;
+  vGroundFade = 0;
   vec3 centre = aOrigin.xyz;
   float size = aSize.x;
+  vec2 stretch = vec2(1.0);
   vec3 axis = vec3(0.0);
   bool onGround = false;
 
@@ -185,6 +195,9 @@ void main() {
     float groupAlpha = group == 0 ? uGroupAlpha.x : (group == 1 ? uGroupAlpha.y : uGroupAlpha.z);
     if (groupAlpha <= 0.0) { hideInstance(); return; }
     vColor.a *= groupAlpha;
+    onGround = aAccel.x > 0.5;
+    vGroundFade = aAccel.y > 0.5 ? 1 : 0;
+    stretch.y = aSize.y / max(aSize.x, 0.0001);
     if (shape == 4) {
       // Flamme: léger scintillement.
       vColor.a *= 0.88 + 0.12 * sin(uTime * 7.0 + aOrigin.w * 40.0);
@@ -196,15 +209,16 @@ void main() {
   vec3 forward = -vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]);
   vec3 world;
   if (onGround) {
-    world = centre + vec3(position.x, 0.0, position.y) * size;
+    world = centre + vec3(position.x * stretch.x, 0.0, position.y * stretch.y) * size;
   } else if (dot(axis, axis) > 0.0) {
     vec3 side = normalize(cross(axis, forward));
     // Trait de pluie à sa longueur réglée; gouttelette d'arrosage quatre fois plus longue que large.
     float streak = shape == 1 ? uRainShape.x : size * 4.0;
     world = centre + side * position.x * size + axis * position.y * streak * 0.5;
   } else {
-    world = centre + (right * position.x + up * position.y) * size;
+    world = centre + (right * position.x * stretch.x + up * position.y * stretch.y) * size;
   }
+  vWorld = world;
   vec4 mvPosition = viewMatrix * vec4(world, 1.0);
   gl_Position = projectionMatrix * mvPosition;
   if (uMode == 2 && int(aAccel.w + 0.5) == 0) {
@@ -224,12 +238,19 @@ const FRAGMENT_SHADER = /* glsl */ `
 
 uniform vec3 uLitColor;   // lumière directe (soleil ou lune), intensité comprise
 uniform vec3 uShadeColor; // lumière du ciel (hémisphérique)
+uniform vec4 uSelfLight;  // lumière propre des bouffées (brume claire): couleur, part (0: aucune)
+uniform sampler2D uField;
+uniform vec4 uFieldRect;
+uniform vec2 uFieldHeight;
+uniform float uGroundFade;
 
 varying vec2 vCorner;
 varying vec4 vColor;
 flat varying int vShape;
 varying float vAge;
 varying float vLight;
+varying vec3 vWorld;
+flat varying int vGroundFade;
 
 void main() {
   float r = length(vCorner);
@@ -238,7 +259,9 @@ void main() {
   vec3 color = vColor.rgb;
   if (vShape == 0) {
     alpha = smoothstep(1.0, 0.25, r);
-    color *= uShadeColor + uLitColor * vLight;
+    // Une brume de petit jour est plus claire que ce qu'elle voile: elle tient une part de sa
+    // lumière du ciel diffusé, pas seulement du soleil et de l'hémisphère.
+    color = mix(color * (uShadeColor + uLitColor * vLight), color * uSelfLight.rgb, uSelfLight.w);
   } else if (vShape == 1) {
     alpha = (1.0 - abs(vCorner.x)) * smoothstep(1.0, 0.3, abs(vCorner.y)) * (0.6 + 0.4 * vCorner.y);
     color *= uShadeColor + uLitColor * 0.5;
@@ -260,6 +283,10 @@ void main() {
     color *= uShadeColor + uLitColor * 0.8;
   }
   alpha *= vColor.a;
+  if (vGroundFade == 1) {
+    vec4 field = textureLod(uField, (vWorld.xz - uFieldRect.xy) * uFieldRect.zw, 0.0);
+    alpha *= smoothstep(0.0, uGroundFade, vWorld.y - (uFieldHeight.x + field.r * uFieldHeight.y));
+  }
   if (alpha < 0.004) discard;
   gl_FragColor = vec4(color, alpha);
   #include <tonemapping_fragment>
@@ -289,6 +316,8 @@ export interface ParticleUniforms {
   uLightView: IUniform<Vector3>;
   uLitColor: IUniform<Color>;
   uShadeColor: IUniform<Color>;
+  uSelfLight: IUniform<Vector4>;
+  uGroundFade: IUniform<number>;
 }
 
 /** Matériau des particules dans un mode donné. Tous partagent le même programme. */
@@ -314,6 +343,8 @@ export function createParticleMaterial(
     uLightView: { value: new Vector3(0, 0, 1) },
     uLitColor: { value: new Color(1, 1, 1) },
     uShadeColor: { value: new Color(1, 1, 1) },
+    uSelfLight: { value: new Vector4(1, 1, 1, 0) },
+    uGroundFade: { value: 0.25 },
   };
   const material = new ShaderMaterial({
     name: 'lpl_ambiance',

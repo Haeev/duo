@@ -665,8 +665,11 @@ export const AMBIANCE_SETTINGS = {
     cloudClearCenter: 0.45,
     cloudFullEdge: 0.95,
     mist: 26,
+    /** Demi-côté d'un banc (m), couché à plat à `mistHeight` au-dessus du sol (sous les genoux). */
     mistSize: 5.5,
-    mistHeight: 0.5,
+    mistHeight: 0.3,
+    /** Hauteur (m) au-dessus du sol sur laquelle un banc s'efface là où le sol remonte vers lui. */
+    mistGroundFade: 0.25,
     mistOpacity: 0.2,
     mistColor: '#eef1f2',
     /** Bancs de brume posés sur l'eau et dans les prés, dans cette zone autour de la vue (demi-côté, m). */

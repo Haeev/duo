@@ -24,6 +24,9 @@ import type { Terrain } from './terrain';
 const GROUP_CLOUD = 0;
 const GROUP_MIST = 1;
 const GROUP_HALO = 2;
+/** Réglages par instance du mode sprites (`aAccel.x`, `aAccel.y`): couché à plat, fondu au sol. */
+const LYING = 1;
+const GROUND_FADE = 1;
 /** Graines des tirages (bruit déterministe). */
 const SEED_CLOUD = 11;
 const SEED_MIST = 23;
@@ -69,6 +72,7 @@ export class SkyLayer {
     const u = this.uniforms;
     u.uSpriteArea.value.set(sky.cloudArea, sky.mistArea, sky.cloudWind[0], sky.cloudWind[1]);
     u.uCloudFade.value.set(sky.cloudClearCenter, sky.cloudFullEdge);
+    u.uGroundFade.value = sky.mistGroundFade;
   }
 
   private fillClouds(b: ParticleBuffers, start: number): number {
@@ -98,7 +102,11 @@ export class SkyLayer {
     return index;
   }
 
-  /** Bancs de brume semés sur l'eau et l'herbe basse de la carte (bande prolongée comprise). */
+  /**
+   * Bancs de brume semés sur l'eau et l'herbe basse de la carte (bande prolongée comprise),
+   * couchés à plat au ras du sol: un carré tourné vers la caméra passait à moitié sous le sol, qui
+   * le coupait d'un bord droit. Là où le sol remonte (berge, quai), le banc s'efface en douceur.
+   */
   private fillMist(b: ParticleBuffers, start: number, map: GameMap, terrain: Terrain): number {
     const sky = AMBIANCE_SETTINGS.sky;
     const color = new Color(sky.mistColor);
@@ -116,7 +124,7 @@ export class SkyLayer {
       const ground = terrain.heightAt(x, y);
       b.origin.setXYZW(index, x, ground + sky.mistHeight, y, hash2(bank, 0, SEED_MIST + 1));
       b.velocity.setXYZW(index, sky.mistDrift * sky.mistSize, 0, 0, 1);
-      b.accel.setXYZW(index, 0, 0, 0, GROUP_MIST);
+      b.accel.setXYZW(index, LYING, GROUND_FADE, 0, GROUP_MIST);
       b.size.setXYZW(index, sky.mistSize, sky.mistSize, PARTICLE_SHAPE.puff, 0);
       b.color.setXYZW(index, color.r, color.g, color.b, sky.mistOpacity);
       index += 1;

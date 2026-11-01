@@ -605,7 +605,7 @@
       "render": {
         "fromX": 14, "toX": 44, "fadeEnd": 2.5, "northLimitY": 37.6,
         "drift": 0.35, "waterOpacity": 0.7, "bankOpacity": 0.3, "top": 1.2,
-        "puffs": 700, "puffsLight": 260, "frontFrom": 44, "frontSpeed": 4, "frontStart": 1.5, "frontWidth": 2.5, "plumeHeight": 2.5,
+        "puffs": 400, "puffsLight": 160, "frontFrom": 44, "frontSpeed": 4, "frontStart": 1.5, "frontWidth": 2.5, "plumeHeight": 2.5,
         "leaveSeconds": 20, "color": "#F4F7F8"
       }
     }

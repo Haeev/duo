@@ -13,7 +13,16 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Particules par `InstancedBufferGeometry` + `Mesh` + `ShaderMaterial`: plusieurs matériaux au même source partagent un programme (un seul compté par `renderer.info.programs`); `frustumCulled = false`; cacher une instance en sortant `gl_Position` du volume (`vec4(0, 0, 2, 1)`).
 - Lumière directionnelle: sa caméra d'ombre regarde la cible avec `up = (0, 1, 0)`; ses axes sont `right = normalize(cross(up, dir))` et `up' = cross(dir, right)`. Caler le centre du cadre sur des multiples du texel dans ce repère évite le scintillement.
 
+- Rendu direct dans le canevas (pas de cible intermédiaire): le mélange alpha se fait en sRGB, après tone mapping. Une brume d'opacité a sur une eau de L* 26 plafonne vers L* 66 à a = 0,55 même blanche: viser la clarté d'un voile oblige à monter l'opacité (0,65 à 0,7 effectifs pour L* 70).
+- Programme des particules (`particules.ts`, mode sprites): `aAccel.x` = carré couché à plat, `aAccel.y` = fondu du bas selon la hauteur au-dessus du sol lue dans `uField` (il faut le vrai champ du terrain, pas le champ factice 1 x 1 de `brume.ts`), `aSize.y` = second demi-axe. `uSelfLight` (couleur, part) donne une lumière propre aux bouffées. Tout cela sans programme de plus.
+- Bouffées en grand nombre: une grille tremblée (tremblement 0,5 maille) donne un banc continu; un tirage au hasard laisse des trous et des amas. Moins de bouffées (mode léger): les agrandir, sinon la grille se voit en taches régulières.
+- Forme `star` du programme des particules: scintillement `sin(vAge * 40)` sur la vie normalisée; sur une vie courte (0,3 s) elle clignote et peut tomber à 0,3 d'opacité à l'image près. Deux étoiles décalées de `PI / 40` de la vie s'ajoutent en un éclat stable.
+- Traînée par particules: émettre au pas de distance (pas à l'image), naissance interpolée entre les deux positions; la forme `droplet` s'oriente le long d'une petite vitesse fortement freinée.
+
 ## Environnement cloud et captures
+
+- Page de démonstration: `joue=1` fait avancer la chorégraphie d'un moment avec `advance(dt)` (sinon `t` reste figé et les effets déclenchés par un passage, gerbe, éclat, traînée, n'apparaissent jamais sur une capture). `phase=apres&t=60` donne le même cadre sans l'effet (référence des mesures).
+- Agent isolé dans une copie: les commandes composées qui écrivent hors de la copie (`/tmp`) sont refusées; écrire les scripts avec l'outil d'écriture puis les lancer par une commande simple. Pour des captures « avant », `git diff > patch`, `git apply -R patch`, capturer, `git apply patch` (avec une copie des fichiers de côté).
 
 - Serveur Vite de travail hors de l'arbre: config dans le dossier de travail, `root` vers le jeu, `server.hmr: false` (les autres membres écrivent: sinon rechargements en pleine capture). Ne pas mettre `watch: null`: Vite servirait alors des modules périmés.
 - Une config Vite hors du dépôt ne trouve pas `vite`: exporter un objet simple au lieu de `defineConfig`.
