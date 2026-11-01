@@ -124,3 +124,19 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Un texte qui dit où est un habitant (« Firmin est sur le quai ») doit tenir sur toute la plage horaire de la condition: comparer avec l'emploi du temps dans `habitants.json`.
 - Des tests vérifient des phrases exactes (`src/interface/tests/moments.test.ts`, `tests/secrets.test.ts`): grep la phrase dans `tests/` et `src/**/tests/` avant de la changer; sinon la proposer au manager avec la ligne du test.
 - Un texte d'apogée ou de récompense doit partir quand la chose est vue, pas quand elle commence: vérifier où le code émet la notification (`startClimax` l'envoyait au tick 0 au tour 6).
+
+## Géométrie des moments (vérifié le 2026-11-01, tour 7)
+
+- Outil: `docs/jeux/jeu-1/simulations/moments_tour7_geometrie.py` (M-02, cadre des zooms, ligne de vue dans les 4 orientations, cases des points). Il retrouve au centième les mesures du jeu (héron 3,6 s, oies 3,75, renard 3,6, mésanges 3,7): le réutiliser avant de proposer un lieu, plutôt que raisonner de tête.
+- « Zoom 1 » = zoom de départ (`initialZoom: 1`, 24 m de large, 57 px par mètre à 1366 px); le zoom 0 fait 16 m. La caméra vise le pied du joueur.
+- Rayon vers la caméra en orientation 0: chaque mètre vers l'est et vers le sud fait monter d'un mètre (x + s, y + s, z + s). Un objet de h mètres au sud-est d'un point, à moins de h mètres en diagonale, le cache. La remise et le houppier du chêne cachent la bande nord entre Firmin et la remise.
+- Le test M-02 du jeu compte n'importe quel acteur et prend `watch.radius` comme seuil (3 m pour l'échelle); un acteur à 2,3 m de haut sort du cadre du zoom 0 depuis 4,5 m au sud-est (mésanges).
+- Le modèle à boîtes pleines jusqu'au faîtage est prudent: « 0 % caché » est sûr, un fort pourcentage se recoupe par capture.
+
+## Réserve de moments au long cours (simulation du tour 7)
+
+- Avec 12 moments: 9 possibles au printemps, 8 en été, 4 en automne, 2 en hiver. Une chance fixe fait repasser les mêmes bêtes tous les 11 jours en hiver: réduire la chance quand la réserve de la saison est petite (`seasonPoolFull` 9).
+- Fenêtre de 10 jours dès J2: écart médian en été de 18 à 21 jours sans perdre de moments; baisser la chance en retire.
+- Après l'année 1, il faut 2 moments neufs par saison et par année pour garder une première fois dans 9 saisons sur 10 (coup de pouce x 3 aux jamais vus compris).
+- Une quête à variante (l'échelle au jour 10, variante 1) qui débloque un moment (mésanges) prive la moitié des graines de ce moment: prévoir un rattrapage.
+- `world.moments.history` grandit à chaque occurrence: proposer une mémoire bornée par moment (taille de l'état transmis).

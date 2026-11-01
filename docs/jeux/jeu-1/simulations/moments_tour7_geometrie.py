@@ -394,7 +394,7 @@ NEW_POINTS = {
     "waltz_floor": WALTZ_FLOOR,
     "waltz_a": WALTZ_PLACES[0],
     "waltz_b": WALTZ_PLACES[1],
-    "odette_phonograph": (31.2, 26.0),
+    "odette_phonograph": (30.85, 26.0),
     "gate_north_crank": CRANKS[0],
     "gate_south_crank": CRANKS[1],
 }
