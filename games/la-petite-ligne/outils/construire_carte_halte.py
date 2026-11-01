@@ -499,12 +499,26 @@ POINTS = [
       "maisonnette, à 4 m de son mur nord", moment="fox"),
     p("meadow_glow", 56.5, 29.5, "moment des vers luisants: herbes hautes du pré, à plus de 9 m des lampadaires",
       moment="glowworms"),
-    p("roe_deer_edge", 49.8, 1.6, "moment de la chevrette (P1): là où le bois descend jusqu'au bourg",
-      moment="roe_deer"),
-    p("roe_deer_graze", 52.5, 4.5, "moment de la chevrette (P1): herbe entre le grand chêne et la remise",
-      moment="roe_deer"),
-    p("kingfisher_post", 46.1, 39.9, "moment du martin-pêcheur (P1): pieu d'amarrage au coin est du bout du "
+    # Tour 7 (docs/jeux/jeu-1/tour-07-conception.md, section 1.5). La chevrette quitte la lisière nord (cachée
+    # en orientation 0 par la remise et le houppier du chêne) pour le pré de l'est, le seul pré non fauché, où
+    # rien de haut n'est au sud-est (la caméra par défaut): la rivière et la promenade.
+    p("roe_deer_edge", 62.2, 27.0, "moment de la chevrette: elle sort de la haie du bord est, au droit du pré "
+      "(case `X`, hors d'atteinte)", moment="roe_deer"),
+    p("roe_deer_graze", 58.0, 27.0, "moment de la chevrette: herbe rase du pré, entre le rocher (56,5 ; 27,5) et "
+      "la haie", moment="roe_deer"),
+    p("fawn_bed", 59.4, 25.9, "moment de la chevrette: le lit du faon dans l'herbe haute, à 1,8 m d'elle au "
+      "nord-est (l'axe horizontal de l'écran en orientation 0: il reste dans le cadre)", moment="roe_deer"),
+    p("kingfisher_post", 46.1, 39.9, "moment du martin-pêcheur: pieu d'amarrage au coin est du bout du "
       "ponton", moment="kingfisher"),
+    # La brume: entre la langue de sable de la rive nord (x 27 à 34, y 38) et l'anse de la rive sud (x 23 à 31,
+    # y 42), l'Aubrune n'a que trois mètres d'eau: le seul endroit où l'on se tient face à face, chacun sur sa
+    # rive, à quatre mètres l'un de l'autre.
+    p("mist_narrows", 29.5, 40.5, "moment de la brume: milieu des trois mètres d'eau entre les deux bancs de "
+      "sable; on la regarde depuis les deux rives, à 2 m", moment="mist", portee=2.5),
+    p("mist_bank_north", 29.5, 38.5, "moment de la brume: place de vue sur le banc de sable nord (indicative)",
+      moment="mist"),
+    p("mist_bank_south", 29.5, 42.5, "moment de la brume: place de vue sur l'anse de sable sud, par le gué "
+      "(indicative)", moment="mist"),
     p("notebook_spot_pontoon", 43.8, 37.6, "carnet perdu de Jeanne (P1): sous les planches du ponton, côté "
       "amont"),
     p("notebook_spot_bench", 28.0, 36.5, "carnet perdu de Jeanne (P1): sous le banc de la berge",
@@ -566,8 +580,15 @@ ACCROCHES = [
      "regarde": "est",
      "role": "chicot de 0,6 m sur la face nord-est du chêne, sous le houppier, au-dessus du nichoir (il "
              "entre dans l'écorce vers 2,3 m, 7 cm au nord du nichoir penché): perchoir des mésanges"},
-    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 0.95,
-     "role": "pieu d'amarrage (P1) dans l'eau au coin est du bout du ponton, 0,45 m au-dessus du plancher"},
+    # Le pieu (tour 7): dans le moteur, l'eau est à -0,16 m et le plancher du ponton à 0,5 m; à 0,95 m au-dessus
+    # de l'eau, le sommet ne dépassait le plancher que de 0,29 m, un moignon où l'on se prend les pieds. Un pieu
+    # d'amarrage se plante plus long et plus profond: le modèle est agrandi de 1,168 (0,95 à 1,11 m au-dessus de
+    # l'eau, 0,45 m au-dessus du plancher comme la fiche), ce qui garde sa bande de mousse à la ligne d'eau,
+    # l'anneau à 0,70 m (sous le plancher plus 0,2: la barque s'y attache même en crue) et un fût de 16 cm.
+    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 1.11,
+     "echelle": 1.168,
+     "role": "pieu d'amarrage dans l'eau au coin est du bout du ponton, sommet 0,45 m au-dessus du plancher "
+             "(1,11 m au-dessus de l'eau)"},
 ]
 
 # Meubles déjà posés dans la maisonnette (objets.json, startingInventory.houseFurniture).

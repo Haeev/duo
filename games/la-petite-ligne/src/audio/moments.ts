@@ -13,7 +13,8 @@
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content, MomentChoreography, MomentDef } from '../donnees/types';
 import type { GameMap } from '../etat/carte';
-import { actorPose } from '../etat/moments';
+import { actorPose, idleGestureAt, startleTicks } from '../etat/moments';
+import { SIM_HZ } from '../etat/types';
 import type { DeepReadonly, MomentToday, ReadonlyWorld, Vec2 } from '../etat/types';
 import type { Catalogue, SoundDef } from './catalogue';
 import type { SyncState } from './cerveau';
@@ -39,6 +40,11 @@ export class MomentSounds {
   private choreoKey = '';
   private firedUntil = Number.NEGATIVE_INFINITY;
   private duck = 0;
+  /** Effarouchement ou timidité en cours (tick de début, sons pas encore joués), pour ses sons datés. */
+  private reaction: { start: number; pending: [number, string][] } | null = null;
+  private reactionActive = false;
+  /** Geste d'attente en cours par acteur (début en s depuis l'attente) et ses sons déjà joués. */
+  private readonly gestures = new Map<string, { start: number; fired: number }>();
 
   constructor(
     private readonly catalogue: Catalogue,
@@ -79,6 +85,7 @@ export class MomentSounds {
       if (s.moment?.id === def.id) for (const file of s.files) this.needed.add(file);
     }
     this.idle(world, def, today, gameTime, shots, loops);
+    this.reactions(world, def, today, shots);
     const choreography = today.phase === 'climax' ? def.climax : today.phase === 'left' ? def.leave : null;
     if (today.phase === 'climax') this.duck = this.content.settings.moments.musicDuckDb;
     if (choreography === null) {
@@ -171,6 +178,68 @@ export class MomentSounds {
       const near = at === null || world.characters.some((c) => Math.hypot(c.pos.x - at.x, c.pos.y - at.y) <= entry.range);
       if (near) shots.push({ sound: s.id, at, gainDb: 0, delay: 0, offset: 0, tag: null });
     }
+  }
+
+  /**
+   * Sons datés de l'attente (tour 7): l'effarouchement de la chevrette (coup de sabot, aboiement),
+   * la fuite du martin-pêcheur (sifflet), et ses plongeons manqués, aux instants que le rendu
+   * dessine (`freezeState`, `idleGestureAt`, tirés de l'état: mêmes chez l'hôte et l'invité).
+   */
+  private reactions(world: ReadonlyWorld, def: MomentDef, today: DeepReadonly<MomentToday>, shots: SoundRequest[]): void {
+    if (today.phase !== 'waiting') {
+      this.reaction = null;
+      this.reactionActive = false;
+      this.gestures.clear();
+      return;
+    }
+    const tick = world.tick;
+    const active = today.shyUntil > tick;
+    const freeze = def.watch.freeze;
+    if (active && !this.reactionActive) {
+      const shy = def.actors.find((a) => a.shy !== null)?.shy ?? null;
+      const start = freeze !== null ? today.shyUntil - startleTicks(freeze) : tick;
+      const sounds = freeze !== null ? freeze.sounds : (shy?.sounds ?? []);
+      this.reaction = { start, pending: [...sounds] };
+    }
+    this.reactionActive = active;
+    const r = this.reaction;
+    if (r !== null) {
+      for (let i = r.pending.length - 1; i >= 0; i -= 1) {
+        const entry = r.pending[i];
+        if (entry === undefined) continue;
+        const at = r.start + Math.round(entry[0] * SIM_HZ);
+        if (tick < at) continue;
+        r.pending.splice(i, 1);
+        if (tick - at > SIM_HZ) continue;
+        this.shot(def, today, entry[1], shots);
+      }
+    }
+    const t = (tick - today.phaseTick) / SIM_HZ;
+    for (const actor of def.actors) {
+      const extra = actor.idleExtra;
+      if ((extra?.segment ?? null) === null || extra === null || extra.sounds.length === 0) continue;
+      // Pas de plongeon pendant qu'il est parti (timidité): le rendu ne le dessine pas non plus.
+      const since = active ? null : idleGestureAt(def, actor, world.seed, today.day, t);
+      if (since === null) continue;
+      const start = t - since;
+      let g = this.gestures.get(actor.id);
+      if (g === undefined || Math.abs(g.start - start) > 0.25) {
+        g = { start, fired: 0 };
+        this.gestures.set(actor.id, g);
+      }
+      while (g.fired < extra.sounds.length) {
+        const entry = extra.sounds[g.fired];
+        if (entry === undefined || since < entry[0]) break;
+        g.fired += 1;
+        if (since - entry[0] <= 1) this.shot(def, today, entry[1], shots);
+      }
+    }
+  }
+
+  private shot(def: MomentDef, today: DeepReadonly<MomentToday>, name: string, shots: SoundRequest[]): void {
+    const s = this.sound(name);
+    if (s === undefined) return;
+    shots.push({ sound: s.id, at: this.source(def, today, name), gainDb: 0, delay: 0, offset: 0, tag: null });
   }
 
   /** D'où part un son: l'acteur ou le point des réglages, sinon la bête du moment, sinon son point. */

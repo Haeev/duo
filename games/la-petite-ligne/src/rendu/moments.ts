@@ -9,19 +9,41 @@
  * même instant. Le rendu garde sa propre horloge, recalée sur le temps de la simulation, pour un
  * mouvement continu entre deux pas (et entre deux états reçus chez l'invité).
  */
-import { AnimationMixer, Box3, Group, LoopOnce, LoopRepeat, Matrix4, Mesh, Vector3, type AnimationAction, type AnimationClip, type BufferGeometry, type Object3D } from 'three';
+import {
+  AnimationMixer,
+  Box3,
+  Color,
+  Group,
+  LoopOnce,
+  LoopRepeat,
+  Matrix4,
+  Mesh,
+  Vector3,
+  type AnimationAction,
+  type AnimationClip,
+  type BufferGeometry,
+  type Camera,
+  type Object3D,
+} from 'three';
 import type { Content, MomentActorDef, MomentChoreography, MomentDef, MomentKeyframe } from '../donnees/types';
 import type { GameMap, MapHook } from '../etat/carte';
 import {
   actorPose,
   choreographyFade,
+  freezeState,
+  idleGestureAt,
   resolveTrack,
   restPosition,
   sampleResolved,
   afterPosition,
+  startlePose,
+  type StartlePose,
   type TrackSample,
   type Vec3,
 } from '../etat/moments';
+import { MistBank } from './brume';
+import { Splashes } from './eclaboussures';
+import type { DaylightRig } from './lumiere';
 import { SIM_HZ, type DeepReadonly, type MomentToday, type ReadonlyWorld, type VillagerState } from '../etat/types';
 import { smoothFactor } from './camera';
 import { dampAngle, yawFromFacing, yawFromQuarter, type FrameContext } from './contexte';
@@ -50,7 +72,34 @@ const ONCE_CLIPS: ReadonlySet<string> = new Set([
   'fox_sniff',
   'fox_look',
   'fox_bark',
+  // Tour 7 (fiche de l'artiste): chevrette, faon, martin-pêcheur.
+  'deer_lookup',
+  'deer_stamp',
+  'deer_call',
+  'fawn_rise',
+  'kf_dive',
+  'kf_beat',
+  'kf_swallow',
 ]);
+/**
+ * Pseudo-clips des données joués figés: le faon couché dans l'herbe haute (`fawn_bed`) est la
+ * première pose de `fawn_rustle`, immobile (seules les oreilles dépassent de l'herbe).
+ */
+const STILL_CLIPS: ReadonlyMap<string, readonly [string, number]> = new Map([['fawn_bed', ['fawn_rustle', 0]]]);
+/** Prises du bec (mousse de la mésange, ablette du martin-pêcheur), d'après les extras `beak_socket`. */
+const BEAK_SOCKETS = ['socket_blue_tit_beak', 'socket_kingfisher_beak'] as const;
+/** Porté par tout le repère de la prise (l'ablette suit la tête qui frappe), pas seulement sa position. */
+const CARRIED_WHOLE: ReadonlySet<string> = new Set(['small_fish']);
+/** Brume de l'Aubrune: effet procédural (`brume.ts`). */
+const MIST_MODEL = 'mist_bank';
+/** Martin-pêcheur timide: il file au ras de l'eau (s), à cette hauteur au-dessus de l'eau (m), puis disparaît. */
+const SHY_FLY_SECONDS = 0.8;
+const SHY_FLY_Z = 0.4;
+/** Entrée et sortie de l'eau (m au-dessus de la surface): une gerbe, un rond. */
+const SPLASH_ABOVE = 0.05;
+const SPLASH_BELOW = -0.03;
+/** Lumière diffuse des bouffées (comme `ambiance.ts`). */
+const LAMBERT = 1 / Math.PI;
 /** Clips pendant lesquels la bête regarde le joueur le plus proche (« vous regarde »). */
 const FACE_PLAYER_CLIPS: ReadonlySet<string> = new Set(['heron_alert', 'fox_look', 'fox_bark']);
 /** Pseudo-clips des données: acteur non dessiné, ou porté par un autre (la mousse au bec). */
@@ -60,7 +109,6 @@ const CARRIED_BY = 'carried_by_';
 /** La mésange disparaît dans le nichoir à la fin de `tit_enter`. */
 const ENTER_SECONDS = 0.3;
 const TIT_ENTER = 'tit_enter';
-const BEAK_SOCKET = 'socket_blue_tit_beak';
 /** Nichoir (acteur de l'échelle et accroche de la carte): penché, puis redressé. */
 const NEST_MODEL = 'nest_box';
 const NEST_STRAIGHT_FLAG = 'nest_box_straight';
@@ -151,6 +199,8 @@ class ActorView {
   /** Héron timide: début de la timidité et du retour (temps du rendu), ou `null`. */
   shySince: number | null = null;
   shyEnded: number | null = null;
+  /** Hauteur à l'image d'avant (au-dessus de l'eau), pour les gerbes; `null` si caché. */
+  prevZ: number | null = null;
 
   constructor(
     readonly actor: MomentActorDef,
@@ -167,12 +217,17 @@ class ActorView {
       object.frustumCulled = false;
     });
     this.mixer = animated && clips.size > 0 ? new AnimationMixer(model) : null;
-    this.socket = model.getObjectByName(BEAK_SOCKET) ?? null;
+    let socket: Object3D | null = null;
+    for (const name of BEAK_SOCKETS) socket ??= model.getObjectByName(name) ?? null;
+    this.socket = socket;
   }
 
   /** Joue `name` à l'instant `time` du clip (boucle ou une fois), fondu depuis le précédent. */
-  pose(name: string | null, time: number, dt: number): void {
+  pose(wanted: string | null, wantedTime: number, dt: number): void {
     const mixer = this.mixer;
+    const still = wanted === null ? undefined : STILL_CLIPS.get(wanted);
+    const name = still?.[0] ?? wanted;
+    const time = still?.[1] ?? wantedTime;
     const clip = name === null ? undefined : this.clips.get(name);
     if (mixer === null || clip === undefined) {
       return;
@@ -219,6 +274,7 @@ class ActorView {
     this.root.visible = false;
     this.ground = null;
     this.yaw = null;
+    this.prevZ = null;
   }
 
   dispose(): void {
@@ -236,6 +292,7 @@ interface MomentScene {
   leave: Map<string, Track>;
   arrive: Map<string, Track>;
   glow: GlowwormLights | null;
+  mist: MistBank | null;
 }
 
 /** Hachage stable vers [0, 1[ (attentes des bêtes, mêmes tirages d'une image à l'autre). */
@@ -273,6 +330,11 @@ export class MomentsPart implements EventfulPart {
   private readonly sample: TrackSample = { x: 0, y: 0, z: 0, clip: null, clipSince: 0 };
   private readonly ahead: TrackSample = { x: 0, y: 0, z: 0, clip: null, clipSince: 0 };
   private readonly frame: ActorFrame = { x: 0, y: 0, z: 0, facing: null, clip: null, clipTime: 0, visible: false };
+  private readonly startle: StartlePose = { x: 0, y: 0, clip: '', clipTime: 0, walking: false };
+  private readonly splashes: Splashes;
+  private readonly lit = new Color();
+  private readonly shade = new Color();
+  private readonly lightView = new Vector3();
   private readonly socketPoint = new Vector3();
   private readonly rung: number;
   /** Dessous de la caisse du nichoir, dans son repère (calculé au premier besoin). */
@@ -290,8 +352,12 @@ export class MomentsPart implements EventfulPart {
     private readonly resources: ResourceTracker,
     characters: CharactersPart,
     private readonly light: boolean,
+    private readonly daylight: DaylightRig | null = null,
+    private readonly camera: Camera | null = null,
   ) {
     this.group.name = 'moments rares';
+    this.splashes = new Splashes(resources);
+    this.group.add(this.splashes.mesh);
     for (const clip of library.animations(FAUNA_FILE)) {
       this.clips.set(clip.name, clip);
     }
@@ -307,6 +373,7 @@ export class MomentsPart implements EventfulPart {
       });
       object.position.set(hook.pos.x, terrain.heightAt(hook.pos.x, hook.pos.y) + hook.pos.z, hook.pos.y);
       object.rotation.set(0, yawFromQuarter(hook.rotation), hook.tiltDeg * DEGREE);
+      object.scale.setScalar(hook.scale);
       this.group.add(object);
       const entry = { hook, object };
       this.hooks.push(entry);
@@ -353,8 +420,14 @@ export class MomentsPart implements EventfulPart {
     group.name = `moment ${def.id}`;
     const views: ActorView[] = [];
     let glow: GlowwormLights | null = null;
+    let mist: MistBank | null = null;
     for (const actor of def.actors) {
       if (actor.villager !== null || actor.model === NEST_MODEL) continue;
+      if (actor.model === MIST_MODEL) {
+        mist = new MistBank(def, this.map, this.terrain, this.light, this.resources);
+        group.add(mist.mesh);
+        continue;
+      }
       if (actor.model === GLOW_MODEL) {
         glow = new GlowwormLights(def, this.map, this.terrain, world.seed, this.light, this.resources);
         group.add(glow.mesh);
@@ -390,6 +463,7 @@ export class MomentsPart implements EventfulPart {
       leave: tracksOf(def.leave, afterOrRest),
       arrive,
       glow,
+      mist,
     };
     this.scenes.set(def.id, scene);
     this.group.add(group);
@@ -415,11 +489,14 @@ export class MomentsPart implements EventfulPart {
   update(context: FrameContext): void {
     const world = context.world;
     const current = this.currentMoment(world);
+    this.updateLighting();
+    this.splashes.update(context.time, this.lit, this.shade, this.lightView);
     this.updateNest(world, current, context);
     for (const scene of this.scenes.values()) {
       if (current?.def.id === scene.def.id) continue;
       for (const view of scene.views) view.hide();
       scene.glow?.update({ phase: 'off', t: 0 }, context.time, context.dt, context.reducedMotion);
+      scene.mist?.update({ phase: 'off', t: 0 }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView);
     }
     if (current === null) return;
     const { def, today } = current;
@@ -429,9 +506,45 @@ export class MomentsPart implements EventfulPart {
       const phase = today.phase === 'waiting' || today.phase === 'climax' || today.phase === 'after' ? today.phase : 'off';
       scene.glow.update({ phase, t }, context.time, context.dt, context.reducedMotion);
     }
+    if (scene.mist !== null) {
+      // La brume se lève à l'apogée; sans apogée, elle se dissipe sur place au départ.
+      const phase = today.phase === 'waiting' || today.phase === 'climax' || today.phase === 'left' ? today.phase : 'off';
+      scene.mist.update({ phase, t }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView);
+    }
     for (const view of scene.views) {
       this.updateView(scene, view, today, t, context);
     }
+  }
+
+  /** Lumière des bouffées (brume, gerbes): soleil et ciel de l'heure, direction vue de la caméra. */
+  private updateLighting(): void {
+    const day = this.daylight;
+    if (day === null) {
+      this.lit.setRGB(1, 1, 1);
+      this.shade.setRGB(0.6, 0.6, 0.6);
+      return;
+    }
+    this.lit.copy(day.sun.color).multiplyScalar(day.sun.intensity * LAMBERT);
+    this.shade.copy(day.hemi.color).multiplyScalar(day.hemi.intensity * LAMBERT);
+    this.lightView.copy(day.direction);
+    if (this.camera !== null) this.lightView.transformDirection(this.camera.matrixWorldInverse);
+  }
+
+  /**
+   * Teinte de la lumière voulue par le moment du jour (`climax.lightGrade`, la brume dorée): force
+   * de 0 à `force`, montée pendant l'apogée, rendue après. La couleur est écrite dans `out`.
+   */
+  lightGrade(world: ReadonlyWorld, out: Color): number {
+    const current = this.currentMoment(world);
+    const grade = current?.def.climax.lightGrade ?? null;
+    if (current === null || grade === null) return 0;
+    const { today } = current;
+    let amount = 0;
+    if (today.phase === 'climax') amount = smoothstep(0, Math.max(0.01, grade.inSeconds), today.elapsed);
+    else if (today.phase === 'after') amount = 1 - smoothstep(0, Math.max(0.01, grade.outSeconds), (world.tick - today.phaseTick) / SIM_HZ);
+    if (amount <= 0) return 0;
+    out.set(grade.color);
+    return amount * grade.force;
   }
 
   /** Le nichoir accroché: penché jusqu'au redressement (apogée de l'échelle), droit ensuite. */
@@ -517,7 +630,7 @@ export class MomentsPart implements EventfulPart {
     }
     if (!view.root.visible) snap = true;
     view.root.visible = true;
-    // Porté (la mousse au bec): à la place de la prise du porteur.
+    // Porté (la mousse ou l'ablette au bec): à la place de la prise du porteur.
     if (f.clip?.startsWith(CARRIED_BY) === true) {
       const carrier = scene.views.find((v) => v.actor.id === f.clip?.slice(CARRIED_BY.length));
       const socket = carrier?.socket ?? null;
@@ -525,11 +638,18 @@ export class MomentsPart implements EventfulPart {
         view.hide();
         return;
       }
+      if (CARRIED_WHOLE.has(actor.model)) {
+        // L'ablette « sous la prise, sans transformation »: elle suit la tête qui frappe et avale.
+        socket.updateWorldMatrix(true, false);
+        socket.matrixWorld.decompose(view.root.position, view.root.quaternion, view.root.scale);
+        return;
+      }
       socket.getWorldPosition(this.socketPoint);
       view.root.position.copy(this.socketPoint);
       view.root.rotation.y = carrier.root.rotation.y;
       return;
     }
+    this.splashAt(view, f, context);
     let facing = f.facing;
     if (facing === null) {
       if (f.clip !== null && FACE_PLAYER_CLIPS.has(f.clip)) facing = this.facePlayer(context.world, f.x, f.y);
@@ -538,6 +658,19 @@ export class MomentsPart implements EventfulPart {
     view.place(f.x, f.y, f.z, this.groundAt(f.x, f.y), facing, context.dt, snap);
     view.pose(f.clip, f.clipTime, context.dt);
     if (actor.model === LADDER_MODEL) this.shakeLadder(scene, view, today, t, context);
+  }
+
+  /** Une bête qui entre dans l'eau ou en sort (le plongeon, le poisson qui saute): gerbe et ronds. */
+  private splashAt(view: ActorView, f: ActorFrame, context: FrameContext): void {
+    const before = view.prevZ;
+    view.prevZ = f.z;
+    if (before === null) return;
+    const entering = before > SPLASH_ABOVE && f.z <= 0;
+    const leaving = before < SPLASH_BELOW && f.z >= 0;
+    if (!entering && !leaving) return;
+    const level = this.terrain.waterLevelAt(f.x, f.y);
+    if (level === null) return;
+    this.splashes.emit(f.x, f.y, level, context.time, entering);
   }
 
   /** Échantillon d'une piste au temps `t`, clip et instant dans le clip compris. */
@@ -550,7 +683,17 @@ export class MomentsPart implements EventfulPart {
     f.clipTime = t - s.clipSince;
     // Direction du mouvement à venir: plus stable que la différence d'une image à l'autre.
     const a = sampleResolved(track.frames, track.points, t + LOOK_AHEAD, this.ahead);
-    if (Math.hypot(a.x - s.x, a.y - s.y) > MOVE_EPSILON) f.facing = Math.atan2(a.y - s.y, a.x - s.x);
+    if (Math.hypot(a.x - s.x, a.y - s.y) > MOVE_EPSILON) {
+      f.facing = Math.atan2(a.y - s.y, a.x - s.x);
+      return;
+    }
+    // À l'arrêt: le cap de l'image clé en cours, s'il est donné (la chevrette, le faon à son flanc).
+    let heading: number | undefined;
+    for (const frame of track.frames) {
+      if (frame[0] > t) break;
+      heading = frame[5];
+    }
+    if (heading !== undefined) f.facing = heading;
   }
 
   /**
@@ -588,7 +731,7 @@ export class MomentsPart implements EventfulPart {
     const rest = restPosition(this.map, actor);
     f.x = rest.x;
     f.y = rest.y;
-    f.z = 0;
+    f.z = rest.z;
     f.clip = actor.idle;
     f.facing = actor.facing;
     const time = context.time;
@@ -598,9 +741,26 @@ export class MomentsPart implements EventfulPart {
       f.visible = false;
       return;
     }
-    if (actor.shy !== null) {
+    const freeze = scene.def.watch.freeze;
+    if (freeze !== null && freeze.actor === actor.id) {
+      this.freezeFrame(scene, view, today, t, context);
+      return;
+    }
+    if (actor.shy?.hideAway === true) {
+      if (this.hideAwayFrame(view, today, context)) return;
+    } else if (actor.shy !== null) {
       this.shyFrame(view, today, context);
       if (f.clip !== actor.idle) return;
+    }
+    const segment = actor.idleExtra?.segment ?? null;
+    if (segment !== null && climaxStart !== undefined) {
+      // Un passage de l'apogée rejoué (le plongeon manqué), aux instants partagés avec le son.
+      const since = idleGestureAt(scene.def, actor, context.world.seed, today.day, t);
+      const [from, to] = segment;
+      if (since !== null && since < to - from) {
+        this.trackFrame(climaxStart, from + since, f);
+      }
+      return;
     }
     if (actor.idleExtra !== null && actor.model !== 'blue_tit' && actor.model !== 'fox') {
       // Un geste de temps en temps (le coup de bec du héron), à un instant tiré par période.
@@ -630,6 +790,93 @@ export class MomentsPart implements EventfulPart {
     if (actor.model === 'fox') {
       this.foxWaiting(scene, view, t, rest, key);
     }
+  }
+
+  /**
+   * La chevrette aux aguets (fiche 1.4.7): elle sort de la haie (`arrive`), broute, lève la tête
+   * vers le joueur le plus proche quand la simulation le dit (`freezeState`, mêmes instants chez
+   * l'hôte et l'invité), et, effarouchée, frappe du pied, recule, broute, puis revient.
+   */
+  private freezeFrame(scene: MomentScene, view: ActorView, today: DeepReadonly<MomentToday>, t: number, context: FrameContext): void {
+    const f = this.frame;
+    const actor = view.actor;
+    const freeze = scene.def.watch.freeze;
+    if (freeze === null) return;
+    const arrive = scene.arrive.get(actor.id);
+    const arriveSeconds = actor.arrive?.seconds ?? 0;
+    if (arrive !== undefined && t < arriveSeconds) {
+      this.trackFrame(arrive, t, f);
+      return;
+    }
+    const tick = context.world.tick;
+    const state = freezeState(scene.def, freeze, today, tick, context.world.seed);
+    const rest = restPosition(this.map, actor);
+    f.facing = null;
+    if (state.kind === 'look') {
+      f.clip = freeze.lookClip;
+      f.clipTime = (state.since + context.alpha) / SIM_HZ;
+      f.facing = this.facePlayer(context.world, f.x, f.y);
+      return;
+    }
+    if (state.kind === 'startled') {
+      const s = startlePose(freeze, rest, actor.idle, state.since + context.alpha, this.startle);
+      if (s.walking) {
+        // Dans le sens de la marche: vers la haie, puis de retour vers son point.
+        const dx = s.x - f.x;
+        const dy = s.y - f.y;
+        if (Math.hypot(dx, dy) > 1e-4) f.facing = Math.atan2(dy, dx);
+      }
+      f.x = s.x;
+      f.y = s.y;
+      f.clip = s.clip;
+      f.clipTime = s.clipTime;
+    }
+  }
+
+  /**
+   * Martin-pêcheur trop approché (`shy.hideAway`): il file au ras de l'eau vers `stepTo`, disparaît,
+   * et revient se poser sur son pieu quand la simulation le dit. Vrai si la pose est écrite.
+   */
+  private hideAwayFrame(view: ActorView, today: DeepReadonly<MomentToday>, context: FrameContext): boolean {
+    const shy = view.actor.shy;
+    const stepTo = shy?.stepTo ?? null;
+    if (shy === null || stepTo === null) return false;
+    const f = this.frame;
+    const active = today.shyUntil > context.world.tick;
+    const time = context.time;
+    if (active && view.shySince === null) {
+      view.shySince = time;
+      view.shyEnded = null;
+    } else if (!active && view.shySince !== null) {
+      view.shySince = null;
+      view.shyEnded = time;
+    }
+    const rest = { x: f.x, y: f.y, z: f.z };
+    const away = { x: stepTo[0], y: stepTo[1], z: SHY_FLY_Z };
+    const fly = (from: Vec3, to: Vec3, u: number): void => {
+      const w = smoothstep(0, 1, u);
+      f.x = from.x + (to.x - from.x) * w;
+      f.y = from.y + (to.y - from.y) * w;
+      f.z = from.z + (to.z - from.z) * w;
+      f.clip = shy.stepClip ?? shy.clip;
+      f.clipTime = time;
+      f.facing = Math.atan2(to.y - from.y, to.x - from.x);
+    };
+    if (view.shySince !== null) {
+      const u = (time - view.shySince) / SHY_FLY_SECONDS;
+      if (u >= 1) f.visible = false;
+      else fly(rest, away, u);
+      return true;
+    }
+    if (view.shyEnded !== null) {
+      const u = (time - view.shyEnded) / SHY_FLY_SECONDS;
+      if (u < 1) {
+        fly(away, rest, u);
+        return true;
+      }
+      view.shyEnded = null;
+    }
+    return false;
   }
 
   /** Héron trop approché: il se redresse, deux pas de côté, puis revient 5 s après (simulation). */
@@ -942,6 +1189,25 @@ export class MomentsPart implements EventfulPart {
     return true;
   }
 
+  /**
+   * Milieu des bêtes dessinées du moment du jour (repère de la scène: x, y en hauteur, z), pour
+   * le trou de visibilité; faux si aucune n'est à l'écran.
+   */
+  animalCenter(out: Vector3): boolean {
+    let count = 0;
+    out.set(0, 0, 0);
+    for (const scene of this.scenes.values()) {
+      for (const view of scene.views) {
+        if (!view.root.visible || view.actor.model === LADDER_MODEL) continue;
+        out.add(view.root.position);
+        count += 1;
+      }
+    }
+    if (count === 0) return false;
+    out.multiplyScalar(1 / count);
+    return true;
+  }
+
   /** Où regardent les habitants spectateurs: la première bête dessinée du moment. */
   private lookTarget(def: MomentDef): { x: number; y: number } | null {
     const scene = this.scenes.get(def.id);
@@ -954,7 +1220,9 @@ export class MomentsPart implements EventfulPart {
     for (const scene of this.scenes.values()) {
       for (const view of scene.views) view.dispose();
       scene.glow?.dispose();
+      scene.mist?.dispose();
     }
+    this.splashes.dispose();
     this.scenes.clear();
     this.hooks.length = 0;
     this.group.removeFromParent();

@@ -111,14 +111,16 @@ export function glowSettings(def: MomentDef): GlowSettings {
 }
 
 /** Hachage stable de trois entiers vers [0, 1[ (même tirage sur les deux machines). */
-function unit(seed: number, index: number, salt: number): number {
+export function glowUnit(seed: number, index: number, salt: number): number {
   let h = (seed ^ Math.imul(index + 1, 0x9e3779b1) ^ Math.imul(salt + 7, 0x85ebca6b)) >>> 0;
   h ^= h >>> 16;
   h = Math.imul(h, 0x7feb352d) >>> 0;
   h ^= h >>> 15;
   h = Math.imul(h, 0x846ca68b) >>> 0;
   h ^= h >>> 16;
-  return h / 2 ** 32;
+  // `>>> 0`: le dernier XOR rend un entier signé; sans lui, un tirage sur deux environ est négatif
+  // (rayon impossible, lanterne sous l'herbe, vitesse et cadence hors de leurs plages).
+  return (h >>> 0) / 2 ** 32;
 }
 
 function lerp(a: number, b: number, t: number): number {
@@ -183,9 +185,9 @@ export class GlowwormLights {
     this.placeGround(map, terrain, seed, wanted);
     for (let i = 0; i < s.flyingLights; i += 1) {
       this.flyers.push({
-        phase: unit(seed, i, 41) * 100,
-        speed: lerp(s.flySpeed[0], s.flySpeed[1], unit(seed, i, 43)),
-        flashEvery: lerp(s.flashEverySeconds[0], s.flashEverySeconds[1], unit(seed, i, 47)),
+        phase: glowUnit(seed, i, 41) * 100,
+        speed: lerp(s.flySpeed[0], s.flySpeed[1], glowUnit(seed, i, 43)),
+        flashEvery: lerp(s.flashEverySeconds[0], s.flashEverySeconds[1], glowUnit(seed, i, 47)),
       });
     }
     // Le programme des particules lit un champ du terrain; les sprites posés ne s'en servent pas.
@@ -214,8 +216,8 @@ export class GlowwormLights {
     const s = this.settings;
     const [ax, ay] = s.ellipse;
     for (let attempt = 0; attempt < MAX_TRIES && this.lights.length < wanted; attempt += 1) {
-      const angle = unit(seed, attempt, 3) * TWO_PI;
-      const radius = Math.sqrt(unit(seed, attempt, 5));
+      const angle = glowUnit(seed, attempt, 3) * TWO_PI;
+      const radius = Math.sqrt(glowUnit(seed, attempt, 5));
       const x = this.center.x + Math.cos(angle) * radius * ax;
       const y = this.center.y + Math.sin(angle) * radius * ay;
       const cx = Math.floor(x);
@@ -229,10 +231,10 @@ export class GlowwormLights {
       this.lights.push({
         x,
         y,
-        z: terrain.heightAt(x, y) + lerp(s.groundZ[0], s.groundZ[1], unit(seed, i, 7)),
+        z: terrain.heightAt(x, y) + lerp(s.groundZ[0], s.groundZ[1], glowUnit(seed, i, 7)),
         distance: Math.hypot(x - this.center.x, y - this.center.y),
-        breathe: lerp(s.breatheSeconds[0], s.breatheSeconds[1], unit(seed, i, 11)),
-        phase: unit(seed, i, 13) * TWO_PI,
+        breathe: lerp(s.breatheSeconds[0], s.breatheSeconds[1], glowUnit(seed, i, 11)),
+        phase: glowUnit(seed, i, 13) * TWO_PI,
         early: false,
       });
     }

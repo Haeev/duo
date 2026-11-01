@@ -145,6 +145,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     pos: { x: h.at('x').number(), y: h.at('y').number(), z: h.at('z').number() },
     rotation: h.has('regarde') ? need(FACING_QUARTERS[h.at('regarde').string()], h.at('regarde'), 'sud, est, nord ou ouest attendu') : 0,
     tiltDeg: h.opt('penche_degres')?.number() ?? 0,
+    scale: h.opt('echelle')?.number() ?? 1,
   }));
 
   // Hors de la carte: les habitants « chez eux » loin du bourg.

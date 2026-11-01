@@ -21,7 +21,8 @@ import { counterRemaining } from './conditions';
 import { freeSeatsNear, seatedSeconds } from './bancs';
 import type { Condition, MomentWatch } from '../donnees/types';
 import { benchById } from '../etat/bancs';
-import { momentDef, watchTarget } from '../etat/moments';
+import { freezeState, momentDef, watchTarget } from '../etat/moments';
+import { bankSide } from './moments';
 import { HEN_NAMES_QUEST, henLabel, secretCards } from '../etat/secrets';
 import { LOOK_CONE } from './conditions';
 import { activeWatch } from '../etat/moments';
@@ -901,6 +902,8 @@ interface Tried {
 
 /** Les moments de la journée que le robot va voir: heure d'arrivée avant la fenêtre (minutes de jeu). */
 const MOMENT_LEAD_MINUTES = 30;
+/** Le robot se fige tant d'avance sur le regard de la chevrette (pas): il ne bouge jamais pendant. */
+const FREEZE_LOOKAHEAD = 20;
 const LUCIE_QUEST = 'lucie_note';
 const LUCIE_QUIZ = 'jeanne_lucie_quiz';
 
@@ -910,7 +913,10 @@ function angleTo(c: Character, at: Vec2): number {
   return diff;
 }
 
-/** Deux places de spectateurs (cases libres atteignables) dans l'anneau du moment, l'une près de l'autre. */
+/**
+ * Deux places de spectateurs (cases libres atteignables) dans l'anneau du moment, l'une près de
+ * l'autre; pour la brume (`opposite`), une sur chaque rive, face à face.
+ */
 function watchSpots(sim: Sim, w: MomentWatch, target: Vec2, from: Vec2): { p1: Vec2; p2: Vec2 } | null {
   const b = refreshBlockers(sim);
   const lo = w.minRadius + 0.4;
@@ -927,6 +933,16 @@ function watchSpots(sim: Sim, w: MomentWatch, target: Vec2, from: Vec2): { p1: V
     }
   }
   cells.sort((a, c) => distance(a, from) - distance(c, from));
+  const opposite = w.opposite;
+  if (opposite !== null) {
+    // Chacun sur sa rive, au plus près de l'axe qui passe par la cible (face à face par-dessus l'eau).
+    const across = (p: Vec2): number => (opposite.axis === 'x' ? Math.abs(p.y - target.y) : Math.abs(p.x - target.x));
+    const side = (s: -1 | 1): Vec2 | undefined =>
+      cells.filter((c) => bankSide(c, opposite) === s && findPath(b, from, c) !== null).sort((a, c) => across(a) - across(c))[0];
+    const near = side(-1);
+    const far = side(1);
+    return near === undefined || far === undefined ? null : { p1: near, p2: far };
+  }
   for (const first of cells) {
     if (findPath(b, from, first) === null) continue;
     const second = cells
@@ -1014,7 +1030,31 @@ export function createRobot(options: RobotOptions = {}): Robot {
     if (!(key in spots)) spots[key] = watchSpots(sim, w, target, character(sim, 'p1').pos);
     const spot = spots[key]?.[c.id];
     if (spot === undefined) return false;
+    // Aux aguets (la chevrette): on se fige pendant un regard, et juste avant, dès qu'elle peut nous voir.
+    const freeze = w.freeze;
+    if (freeze !== null && distance(c.pos, target) <= sim.content.settings.moments.noticeRadius + 1) {
+      const soon = freezeState(def, freeze, today, sim.world.tick + FREEZE_LOOKAHEAD, sim.world.seed);
+      const now = freezeState(def, freeze, today, sim.world.tick, sim.world.seed);
+      if (now.kind === 'look' || soon.kind === 'look' || now.kind === 'startled') {
+        m.job = `figé: ${def.id}`;
+        if (c.destination !== null) {
+          // Un trajet en cours continuerait tout seul: on le remplace par un pas sur place.
+          out.push({ type: 'move_to', target: { kind: 'ground', x: c.pos.x, y: c.pos.y }, act: false });
+          m.goingTo = 'figé';
+        }
+        return true;
+      }
+    }
     if (distance(c.pos, spot) > 0.35) return goTo(sim, c, m, `regarder:${def.id}`, spot, 0.3, out) || true;
+    if (w.facingPartner) {
+      const other = character(sim, partnerOf(c.id)).pos;
+      if (angleTo(c, other) > LOOK_CONE * 0.8) {
+        const d = Math.max(1e-6, distance(c.pos, other));
+        f.mx = ((other.x - c.pos.x) / d) * 0.2;
+        f.my = ((other.y - c.pos.y) / d) * 0.2;
+      }
+      return true;
+    }
     if (w.facing && angleTo(c, target) > LOOK_CONE * 0.8) {
       // Un pas minuscule vers la bête suffit à se tourner vers elle.
       const d = Math.max(1e-6, distance(c.pos, target));

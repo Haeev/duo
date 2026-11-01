@@ -9,8 +9,8 @@
  */
 import type { ControlFrame } from '../etat/actions';
 import type { Character, CharacterId, MomentToday, Vec2 } from '../etat/types';
-import type { Condition, MomentDef, MomentWatch } from '../donnees/types';
-import { activeWatch, momentDef, restPosition, watchTarget } from '../etat/moments';
+import type { Condition, MomentDef, MomentWatch, Season } from '../donnees/types';
+import { activeWatch, freezeState, momentDef, restPosition, startleTicks, watchTarget, type FreezeState } from '../etat/moments';
 import { MOVE_DEADZONE, SIM_DT, SIM_HZ } from './constantes';
 import { evaluate, evaluateAll, LOOK_CONE, NO_CONTEXT, variantOf } from './conditions';
 import { type Sim, bump, character, distance, emit, message, notifyKey, partnerName, partnerOf, point, say } from './contexte';
@@ -19,6 +19,7 @@ import { moveBody } from './grille';
 import { runEffects } from './effets';
 import { unitDraw } from '../etat/tirage';
 import { recordMoment } from './souvenirs';
+import { seasonIndex, seasonOf } from '../etat/souvenirs';
 
 // ---------------------------------------------------------------------------
 // Tirage sans le générateur de la partie
@@ -76,22 +77,84 @@ function lastOccurrence(sim: Sim, id: string): number | null {
   return last;
 }
 
+/** Jour du train (jours de `train.days`): seuls les moments `trainDays: "only"` y sortent. */
+function isTrainDay(sim: Sim): boolean {
+  return sim.content.settings.train.days.includes(sim.world.clock.day);
+}
+
+/**
+ * Fenêtre entre deux passages d'un même moment (tour 7, règles 4 et 6): la sienne, sinon 7 jours,
+ * puis `cooldownDaysLong` à partir de `longFromDay` (la démo et J1 gardent 7).
+ */
+export function cooldownOf(sim: Sim, def: MomentDef): number {
+  const s = sim.content.settings.moments;
+  return def.cooldownDays ?? (sim.world.clock.day >= s.longFromDay ? s.cooldownDaysLong : s.cooldownDays);
+}
+
 /** Un moment d'ambiance peut-il sortir ce matin (section 1.2, étape 4) ? */
 export function admissible(sim: Sim, def: MomentDef): boolean {
   const s = sim.content.settings.moments;
   const day = sim.world.clock.day;
   if (def.mode === 'quest' || def.weight <= 0 || !s.tiers.includes(def.tier)) return false;
+  // Règle 1: un moment du train ne sort que ces jours-là; les autres, jamais ces jours-là.
+  if (def.trainDays === 'only' ? !isTrainDay(sim) : s.noAmbientOnTrainDays && isTrainDay(sim)) return false;
   if (!evaluateAll(sim, def.availableWhen, NO_CONTEXT)) return false;
   const last = lastOccurrence(sim, def.id);
-  if (last !== null && day - last < s.cooldownDays) return false;
+  if (last !== null && day - last < cooldownOf(sim, def)) return false;
   if (questState(sim, def.quest)?.status === 'active') return false;
   const planned = plannedQuestDay(sim, def);
   if (planned !== null && planned - day < s.cooldownDays) return false;
   if (def.maxPerSeason !== null) {
-    const count = sim.world.moments.history.filter((h) => h.id === def.id).length + (planned === null ? 0 : 1);
+    const memories = sim.content.settings.memories;
+    const season = seasonIndex(memories, day);
+    const count =
+      sim.world.moments.history.filter((h) => h.id === def.id && seasonIndex(memories, h.day) === season).length +
+      (planned === null || seasonIndex(memories, planned) !== season ? 0 : 1);
     if (count >= def.maxPerSeason) return false;
   }
   return true;
+}
+
+/**
+ * Ce moment d'ambiance peut-il sortir dans cette saison (règle 5, taille de la réserve) ? Seules
+ * comptent ses conditions de saison et de jour minimal (au plus tard `longFromDay`); le reste
+ * (météo, drapeaux) est tenu pour vrai.
+ */
+function possibleInSeason(def: MomentDef, season: number, day: number, longFromDay: number): boolean {
+  const test = (c: Condition): boolean => {
+    if (c.type === 'season_is') return c.seasons.some((s) => SEASON_INDEX[s] === season);
+    if (c.type === 'day_at_least') return c.day <= Math.max(day, longFromDay);
+    if (c.type === 'all') return c.conditions.every(test);
+    if (c.type === 'any') return c.conditions.some(test);
+    return true;
+  };
+  return def.availableWhen.every(test);
+}
+
+const SEASON_INDEX: Readonly<Record<Season, number>> = { spring: 0, summer: 1, autumn: 2, winter: 3 };
+
+/** Moments d'ambiance possibles dans la saison du jour, hors train (règle 5). */
+export function seasonPool(sim: Sim): number {
+  const s = sim.content.settings.moments;
+  const day = sim.world.clock.day;
+  const season = seasonOf(sim.content.settings.memories, day);
+  return sim.content.moments.filter(
+    (def) => def.mode !== 'quest' && def.weight > 0 && def.trainDays === 'never' && s.tiers.includes(def.tier) && possibleInSeason(def, season, day, s.longFromDay),
+  ).length;
+}
+
+/** Chance du jour (règle 5): réduite dès J2 quand la réserve de la saison est petite. */
+export function dailyChanceOf(sim: Sim): number {
+  const s = sim.content.settings.moments;
+  if (sim.world.clock.day < s.longFromDay || isTrainDay(sim)) return s.dailyChance;
+  return s.dailyChance * Math.min(1, seasonPool(sim) / Math.max(1, s.seasonPoolFull));
+}
+
+/** Poids au tirage (règle 7): dès J2, un moment jamais vu ensemble pèse `unseenWeightFactor` fois plus. */
+export function drawWeight(sim: Sim, def: MomentDef): number {
+  const s = sim.content.settings.moments;
+  const unseen = !sim.world.memories.moments.some((m) => m.id === def.id);
+  return def.weight * (sim.world.clock.day >= s.longFromDay && unseen ? s.unseenWeightFactor : 1);
 }
 
 /** Un moment du jour neuf (phase `absent`), pour ce jour. */
@@ -123,14 +186,15 @@ export function drawToday(sim: Sim): MomentToday | null {
     if (s.tiers.includes(def.tier) && questMomentToday(sim, def)) return newToday(sim, def, 'quest');
   }
   if (s.maxPerDay < 1 || day < s.firstAmbientDay) return null;
-  if (s.noAmbientOnTrainDays && content.settings.train.days.includes(day)) return null;
-  if (unitDraw(world.seed, 'moment', day) >= s.dailyChance) return null;
+  // Les jours de fête ont déjà leur scène à deux (règle 2).
+  if (s.noAmbientOnFestivalDays && s.festivalDays.includes(day)) return null;
+  if (unitDraw(world.seed, 'moment', day) >= dailyChanceOf(sim)) return null;
   const pool = content.moments.filter((def) => admissible(sim, def));
-  const total = pool.reduce((sum, def) => sum + def.weight, 0);
+  const total = pool.reduce((sum, def) => sum + drawWeight(sim, def), 0);
   if (total <= 0) return null;
   let pick = unitDraw(world.seed, 'moment_pick', day) * total;
   for (const def of pool) {
-    pick -= def.weight;
+    pick -= drawWeight(sim, def);
     if (pick < 0) return newToday(sim, def, 'ambient');
   }
   return null;
@@ -213,7 +277,24 @@ export function watchPart(sim: Sim, c: Character, w: MomentWatch, target: { x: n
   }
   if (w.seated && c.seat?.bench !== w.bench) return false;
   if (w.hold !== null && (c.holding === null || !w.hold.includes(c.holding))) return false;
+  if (w.opposite !== null && bankSide(c.pos, w.opposite) === 0) return false;
+  if (w.facingPartner) {
+    const other = character(sim, partnerOf(c.id));
+    if (distance(c.pos, other.pos) >= 0.5) {
+      let diff = Math.abs(Math.atan2(other.pos.y - c.pos.y, other.pos.x - c.pos.x) - c.facing) % (2 * Math.PI);
+      if (diff > Math.PI) diff = 2 * Math.PI - diff;
+      if (diff > LOOK_CONE) return false;
+    }
+  }
   return true;
+}
+
+/** Rive d'un joueur (`watch.opposite`): -1 en deçà de `at - gap`, +1 au-delà de `at + gap`, 0 entre les deux. */
+export function bankSide(pos: Vec2, o: NonNullable<MomentWatch['opposite']>): -1 | 0 | 1 {
+  const v = o.axis === 'x' ? pos.x : pos.y;
+  if (v <= o.at - o.gap) return -1;
+  if (v >= o.at + o.gap) return 1;
+  return 0;
 }
 
 function releaseAll(sim: Sim): void {
@@ -335,13 +416,17 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
   }
   const m = minutes(sim);
   const inWindow = m >= def.window.from && m < def.window.to && questStepReady(sim, def, today);
-  const both = parts.p1 && parts.p2;
+  // La brume: chacun sur sa rive, pas tous deux sur la même.
+  const sides = w.opposite === null || bankSide(a.pos, w.opposite) !== bankSide(b.pos, w.opposite);
+  const freeze = w.freeze === null ? null : updateFreeze(sim, def, today, w, target);
+  const both = parts.p1 && parts.p2 && sides;
   const early = both && !inWindow && m < def.window.from;
   if (early !== today.early) {
     today.early = early;
     sim.runtime.changed = true;
   }
-  if (both && inWindow) {
+  // Aux aguets (la chevrette): le compteur ne tourne que pendant un regard.
+  if (both && inWindow && (freeze === null || freeze.kind === 'look')) {
     today.watchTicks += 1;
     sim.runtime.changed = true;
   } else if (today.watchTicks !== 0) {
@@ -362,6 +447,32 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     say(sim, c.id, 'moment_notice', { partner: other.name });
   }
   updateShy(sim, def, today);
+}
+
+/**
+ * La bête aux aguets (`watch.freeze`, la chevrette): qui bouge à moins de `noticeRadius` pendant
+ * un regard, ou passe sous `watch.minRadius`, l'effarouche; elle recule, broute, revient (pose
+ * tirée de `today.shyUntil` par `freezeState`), jamais ne s'enfuit. Rend l'état de ce pas.
+ */
+function updateFreeze(sim: Sim, def: MomentDef, today: MomentToday, w: MomentWatch, target: Vec2): FreezeState | null {
+  const freeze = w.freeze;
+  if (freeze === null) return null;
+  const { world } = sim;
+  const state = freezeState(def, freeze, today, world.tick, world.seed);
+  if (state.kind === 'startled') return state;
+  const s = sim.content.settings.moments;
+  const startles = world.characters.some((c) => {
+    if (c.inHouse || !c.created) return false;
+    const d = distance(c.pos, target);
+    if (d < w.minRadius) return true;
+    return state.kind === 'look' && d <= s.noticeRadius && c.speed >= s.stillSpeed;
+  });
+  if (!startles) return state;
+  today.shyUntil = world.tick + startleTicks(freeze);
+  today.watchTicks = 0;
+  sim.runtime.changed = true;
+  if (freeze.startleText !== null) notifyKey(sim, 'both', 'message', freeze.startleText);
+  return freezeState(def, freeze, today, world.tick, world.seed);
 }
 
 /** Un joueur trop près: l'animal se redresse ou recule, jamais ne s'enfuit (section 1.2, cas limites). */

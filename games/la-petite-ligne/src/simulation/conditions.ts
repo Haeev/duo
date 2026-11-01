@@ -9,6 +9,10 @@ import { MINUTES_PER_DAY } from './constantes';
 import { type Sim, character, distance, point } from './contexte';
 import { countInBag, countInStacks, duoOwns } from './sac';
 import { seatedSeconds } from './bancs';
+import { seasonOf } from '../etat/souvenirs';
+
+/** Saisons dans l'ordre du calendrier (`seasonOf`: 0 pour le printemps). */
+const SEASON_ORDER = ['spring', 'summer', 'autumn', 'winter'] as const;
 
 export interface ToolEvent {
   tool: string;
@@ -133,6 +137,15 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     }
     case 'weather_is':
       return world.weather === condition.weather;
+    case 'weather_was':
+      // La météo de la démo est écrite jour par jour: la veille se lit dans les réglages.
+      return world.clock.day > 1 && sim.content.settings.weatherByDay[world.clock.day - 2] === condition.weather;
+    case 'season_is': {
+      const s = sim.content.settings.memories;
+      const season = SEASON_ORDER[seasonOf(s, world.clock.day)];
+      const dayOfSeason = ((world.clock.day - 1) % s.seasonDays) + 1;
+      return season !== undefined && condition.seasons.includes(season) && dayOfSeason >= condition.fromSeasonDay;
+    }
     case 'flag':
       return world.flags.includes(condition.flag);
     case 'quest_active':

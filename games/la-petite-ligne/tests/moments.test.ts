@@ -31,16 +31,17 @@ const PYTHON_UNITS: [number, string, number, number][] = [
 
 /** Annexe A et `play_demo` du script, mêmes graines: « jour:moment:origine » (q: quête, a: ambiance). */
 const PYTHON_DEMOS: Record<number, string> = {
-  1: '5:fox:a 6:heron:q 11:geese:q 13:glowworms:a',
-  2: '3:fox:a 5:heron:a 7:geese:a 10:ladder:q 13:tits:a 14:fox:a',
-  3: '5:fox:a 6:heron:q 9:glowworms:a 11:geese:q 13:fox:a',
-  4: '5:heron:a 6:geese:a 10:ladder:q 11:fox:a 13:glowworms:a',
-  5: '3:fox:a 6:heron:q 10:fox:a 11:geese:q 14:glowworms:a',
-  6: '3:fox:a 6:heron:a 7:geese:a 10:ladder:q 13:heron:a',
-  7: '6:heron:q 7:fox:a 9:glowworms:a 11:geese:q 13:heron:a',
-  8: '5:heron:a 6:fox:a 7:geese:a 10:ladder:q 14:glowworms:a',
-  42: '3:fox:a 7:geese:a 10:ladder:q 14:tits:a',
-  20261030: '3:fox:a 7:heron:a 9:glowworms:a 10:ladder:q 11:tits:a 14:heron:a',
+  // Réserve de 12 (tour 7, annexe A partie 6 de tour-07-conception.md; `play_12` du script, M-23).
+  1: '5:fox:a 6:heron:q 7:kingfisher:a 10:roe_deer:a 11:geese:q 13:mist:a',
+  2: '3:fox:a 5:kingfisher:a 7:heron:a 10:ladder:q 13:fox:a 14:tits:a',
+  3: '5:mist:a 6:heron:q 9:glowworms:a 11:geese:q 13:kingfisher:a',
+  4: '5:heron:a 6:geese:a 10:ladder:q 11:fox:a 13:mist:a',
+  5: '3:fox:a 6:heron:q 10:fox:a 11:geese:q 14:kingfisher:a',
+  6: '3:fox:a 6:heron:a 7:geese:a 10:ladder:q 13:tits:a',
+  7: '6:heron:q 7:fox:a 9:kingfisher:a 10:roe_deer:a 11:geese:q 13:glowworms:a',
+  8: '5:geese:a 6:fox:a 7:heron:a 10:ladder:q 14:roe_deer:a',
+  42: '3:fox:a 7:kingfisher:a 10:ladder:q 14:tits:a',
+  20261030: '3:fox:a 7:heron:a 9:roe_deer:a 10:ladder:q 11:tits:a 14:geese:a',
 };
 
 /**
@@ -542,6 +543,7 @@ describe('moments: chorégraphies et temps à l’écran (M-02)', () => {
    * encore après ses jappements). Aucun écart toléré.
    */
   const M02_MIN_SECONDS = 3.4;
+  const M02_RADIUS = 6;
 
   it('mesure, pour chaque moment, le pire temps où une bête reste dans le rayon de chaque case libre de l’anneau', () => {
     const sim = newSim(1);
@@ -564,7 +566,8 @@ describe('moments: chorégraphies et temps à l’écran (M-02)', () => {
               today.elapsed = t;
               const near = def.actors.some((a) => {
                 const pose = actorPose(sim.map, def, today, a.id);
-                return pose !== null && Math.hypot(pose.x - p.x, pose.y - p.y) <= w.radius;
+                // M-14 (tour 7): seuil fixé à 6 m pour tous, quel que soit `watch.radius`.
+                return pose !== null && Math.hypot(pose.x - p.x, pose.y - p.y) <= Math.max(M02_RADIUS, w.radius);
               });
               if (near) inside += 0.05;
             }

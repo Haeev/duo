@@ -28,6 +28,12 @@ export const DEFAULT_MOMENTS: MomentSettings = {
   maxSyncGapSeconds: 0.5,
   holdRange: 1.2,
   tiers: ['P0'],
+  noAmbientOnFestivalDays: true,
+  festivalDays: [16, 23],
+  cooldownDaysLong: 10,
+  longFromDay: 24,
+  seasonPoolFull: 9,
+  unseenWeightFactor: 3,
 };
 
 /** Informations propres (R16): valeurs de la conception, section 3.2; `reglages.secrets` les remplace. */
