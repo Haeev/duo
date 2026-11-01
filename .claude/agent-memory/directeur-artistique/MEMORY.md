@@ -76,3 +76,10 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le trou tramé d'un moment (`RENDER_SETTINGS.momentSeeThrough`) est centré sur une accroche: un objet sur une face du tronc passe derrière lui dans deux orientations, et le trou ne sert plus. Vérifier les quatre orientations, pas seulement la vue par défaut, et demander un centre sur le personnage qui agit.
 - Repère pour savoir qui est le joueur 1 sur une capture: c'est celui qui a le trou tramé autour de lui (le joueur 2 n'en a pas).
 - Vérifier la portée d'un geste (`reach_up`) au zoom 0: au zoom 1 un écart main-objet de 0,3 m ne fait que quelques pixels.
+
+## Captures en mode manuel et lecture des effets (La Petite Ligne, 2026-11-01)
+
+- Avec `manuel=1`, `lplRendu.frames` reste à 0: attendre `lplRendu.ready`, puis `advance(1/30)` 40 fois, puis capturer. Attendre `frames > 3` bloque jusqu'au délai.
+- Une brume ou une nappe se juge d'abord en valeur: mesurer L* (ImageMagick `-colorspace Lab`, moyenne du canal L) de la nappe, de l'eau claire et des berges. Une brume plus sombre que ses berges se lit comme de la fumée.
+- Une bouffée de particules face à la caméra plus grande que deux fois sa hauteur au-dessus du sol est coupée par le sol en ligne droite (bancs de brume du matin de `ciel.ts`): demander des sprites posés à plat ou un fondu du bas.
+- Oreilles d'une bête vues de profil: une oreille étroite et dressée devient une pointe qui se lit comme un bois. Toujours contrôler une silhouette de profil strict au zoom de jeu.
