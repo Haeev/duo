@@ -129,12 +129,19 @@ const SupplementSchema = v.object({
     breakfast: str,
     night: str,
     talking: str,
+    /** Appel d'une poule (`hen_call`): la poule nommée comme ce joueur la connaît. */
+    callingHen: str,
+    /** Interlocuteur inconnu des données: jamais un identifiant à l'écran. */
+    someone: str,
     scene: str,
     carrying: str,
     building: str,
     crafting: str,
     cooking: str,
     seated: str,
+    /** L'autre remplit sa part d'un moment rare, par identifiant de moment. */
+    watching: v.record(str, str),
+    watchingAny: str,
     menus: v.record(str, str),
     actions: v.record(str, str),
     places: v.record(str, str),

@@ -10,7 +10,7 @@ import type { Sim } from '../../simulation/contexte';
 import { setupScenario } from '../demo/scenarios';
 import { watchModel, momentHintModel } from '../modele-moments';
 import { henCallModel, henWrongAside } from '../modele-secrets';
-import { nextObjective, questModels } from '../modele';
+import { nextObjective, partnerModel, questModels } from '../modele';
 import { toastVisual } from '../notifications';
 import { apply, character, newSim, playUntil, uiContext } from './aides';
 
@@ -24,7 +24,7 @@ function scenario(name: string): Sim {
   return sim;
 }
 
-/** Tout ce que l'interface de ce joueur tire de l'état, à plat (carnet, HUD, appel, confidence). */
+/** Tout ce que l'interface de ce joueur tire de l'état, à plat (carnet, HUD, carte de l'autre, appel, confidence). */
 function everythingShown(sim: Sim, me: CharacterId): string {
   const ctx = uiContext(me);
   const notifications = character(sim, me).notifications.map((n) => n.text);
@@ -32,6 +32,7 @@ function everythingShown(sim: Sim, me: CharacterId): string {
     JSON.stringify([
       questModels(sim.world, ctx),
       nextObjective(sim.world, ctx),
+      partnerModel(sim.world, ctx, null),
       watchModel(sim.world, ctx),
       momentHintModel(sim.world, ctx),
       henCallModel(sim.world, ctx),
