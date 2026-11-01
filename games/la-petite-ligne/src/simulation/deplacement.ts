@@ -10,6 +10,7 @@ import { type Sim, character, distance, emit, partnerName, point, say } from './
 import { abortConversation } from './dialogues';
 import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { ZONE } from './ids';
+import { treeBlocks } from './lisiere';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
@@ -18,7 +19,8 @@ export function refreshBlockers(sim: Sim): Blockers {
     const { map } = sim;
     rt.dynamicBlocked.fill(0);
     for (const t of sim.world.trees) {
-      if (!t.felled) rt.dynamicBlocked[Math.floor(t.pos.y) * map.width + Math.floor(t.pos.x)] = 1;
+      // Le rejet garde la case de l'arbre; la souche se traverse (tour 8, section 5.1).
+      if (treeBlocks(sim, t)) rt.dynamicBlocked[Math.floor(t.pos.y) * map.width + Math.floor(t.pos.x)] = 1;
     }
     const platform = map.zones[ZONE.trainAtPlatform];
     if (platform !== undefined && sim.world.train.phase !== 'away') {

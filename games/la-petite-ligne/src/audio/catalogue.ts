@@ -5,6 +5,7 @@
  * du moteur (secondes, gains, boucles).
  */
 import * as v from 'valibot';
+import type { Season } from '../donnees/types';
 
 const Finite = v.pipe(v.number(), v.finite());
 const NonNegative = v.pipe(Finite, v.minValue(0));
@@ -70,12 +71,23 @@ const StepSchema = v.object({
   when: v.optional(v.string()),
 });
 
+const SeasonSchema = v.picklist(['spring', 'summer', 'autumn', 'winter']);
+
 const AmbienceRuleSchema = v.object({
   ambience: v.string(),
   hours: v.optional(v.tuple([Finite, Finite])),
   when: v.optional(v.string()),
   notWhen: v.optional(v.string()),
   volumeDb: Finite,
+  // Tour 8: seulement ces saisons, ou pas pendant celles-ci (l'ambiance de la saison prend sa place).
+  seasons: v.optional(v.array(SeasonSchema)),
+  exceptSeasons: v.optional(v.array(SeasonSchema)),
+});
+
+const MorningMistSchema = v.object({
+  ambience: v.string(),
+  volumeDb: Finite,
+  alsoLowerDb: v.record(v.string(), Finite),
 });
 
 const CatalogueSchema = v.object({
@@ -102,6 +114,7 @@ const CatalogueSchema = v.object({
     }),
     musicByMoment: v.array(v.object({ moment: v.string(), music: v.string(), rest: v.optional(v.boolean()), once: v.optional(v.boolean()) })),
     ambienceByTime: v.array(AmbienceRuleSchema),
+    morningMist: v.optional(MorningMistSchema),
     interior: v.object({ ambienceLowpassHz: v.pipe(Finite, v.minValue(10)), ambienceDb: Finite, rampMs: NonNegative }),
     peer: v.object({ peerWorldSoundsDb: Finite }),
     sequences: v.record(v.string(), v.object({ steps: v.array(StepSchema) })),
@@ -186,6 +199,16 @@ export interface AmbienceRule {
   /** Se tait sous la pluie. */
   silentInRain: boolean;
   volumeDb: number;
+  /** Seulement pendant ces saisons (`null`: toute l'année), et jamais pendant celles-ci (tour 8). */
+  seasons: readonly Season[] | null;
+  exceptSeasons: readonly Season[];
+}
+
+/** Matins de brume (tour 8): l'ambiance suit la nappe; d'autres ambiances baissent tant qu'elle dure. */
+export interface MorningMistRule {
+  ambience: string;
+  volumeDb: number;
+  lowerDb: Readonly<Record<string, number>>;
 }
 
 export interface Catalogue {
@@ -203,6 +226,7 @@ export interface Catalogue {
   /** Musiques du jour qui laissent place aux ambiances après une boucle. */
   restingMusic: ReadonlySet<string>;
   ambienceRules: readonly AmbienceRule[];
+  morningMist: MorningMistRule | null;
   interior: { lowpassHz: number; ambienceDb: number; rampSeconds: number };
   peerDb: number;
   sequences: ReadonlyMap<string, readonly SequenceStep[]>;
@@ -325,8 +349,18 @@ export function parseCatalogue(raw: unknown): Catalogue {
       rain: rainRule ? (INDOOR_WORDS.test(r.when ?? '') ? 'indoor' : 'outdoor') : null,
       silentInRain: r.notWhen !== undefined && RAIN_WORDS.test(r.notWhen),
       volumeDb: r.volumeDb,
+      seasons: r.seasons ?? null,
+      exceptSeasons: r.exceptSeasons ?? [],
     };
   });
+  const mist = data.plan.morningMist;
+  if (mist !== undefined) {
+    for (const id of [mist.ambience, ...Object.keys(mist.alsoLowerDb)]) {
+      if (!sounds.has(id)) throw new CatalogueError(`sons.json: plan.morningMist: ambiance inconnue « ${id} »`);
+    }
+  }
+  const morningMist: MorningMistRule | null =
+    mist === undefined ? null : { ambience: mist.ambience, volumeDb: mist.volumeDb, lowerDb: { ...mist.alsoLowerDb } };
   const restingMusic = new Set(data.plan.musicByMoment.filter((m) => m.rest === true).map((m) => m.music));
   for (const id of restingMusic) {
     if (!music.has(id)) throw new CatalogueError(`sons.json: plan.musicByMoment: musique inconnue « ${id} »`);
@@ -352,6 +386,7 @@ export function parseCatalogue(raw: unknown): Catalogue {
     rest: { playLoops: data.plan.rest.playLoops, silenceSeconds: data.plan.rest.silenceSeconds },
     restingMusic,
     ambienceRules,
+    morningMist,
     interior: {
       lowpassHz: data.plan.interior.ambienceLowpassHz,
       ambienceDb: data.plan.interior.ambienceDb,

@@ -164,7 +164,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
       crop: null,
       lastHarvest: null,
     })),
-    trees: map.trees.map((t) => ({ id: t.id, kind: t.kind, pos: { x: t.pos.x, y: t.pos.y }, hits: 0, felled: false, lastHitTick: -1 })),
+    trees: map.trees.map((t) => ({ id: t.id, kind: t.kind, pos: { x: t.pos.x, y: t.pos.y }, hits: 0, felled: false, felledDay: null, lastHitTick: -1 })),
     beam:
       beamFrom === undefined
         ? null
@@ -223,6 +223,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     moments: { today: null, history: [], hintTurn: s.moments.firstHint },
     secrets: { turn: s.secrets.firstInformed, entries: [] },
     memories: emptyMemories(),
+    sharedEnvieRecent: [],
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

@@ -527,7 +527,11 @@ export type HintTrigger =
   | { on: 'veillee_started' }
   | { on: 'holding_furniture' }
   | { on: 'big_purchase_attempt' }
-  | { on: 'letter_received' };
+  | { on: 'letter_received' }
+  /** Tour 8: une cueillette posée à moins de 6 m (`forage_hint`). */
+  | { on: 'near_forage' }
+  /** Tour 8: on vise un rejet ou un jeune sapin (`sapling_hint`). */
+  | { on: 'aim_sapling' };
 
 export interface HintDef {
   id: string;
@@ -663,6 +667,41 @@ export interface ForageSettings {
   points: readonly ForagePoint[];
   items: readonly ForageItem[];
 }
+/** Arbres de la lisière (tour 8, section 5.1): abattage, puis souche, rejet et arbre adulte. */
+export interface TreeSettings {
+  chopsPerTree: number;
+  logsPerTree: number;
+  /** Les arbres abattus repoussent (`false`: une souche pour toujours, comme la démo). */
+  regrow: boolean;
+  /** Rien ne repousse avant ce jour. */
+  regrowFromDay: number;
+  /** Une souche abattue avant `regrowFromDay` compte au plus ce nombre de jours d'avance ce jour-là. */
+  catchUpDays: number;
+  /** Jours de souche, puis jours de rejet (ou de jeune sapin), avant l'arbre adulte. */
+  stumpDays: number;
+  saplingDays: number;
+  /** Taille du rejet (part de l'arbre adulte): le premier jour, la pousse par jour, le plafond. */
+  saplingScale: { first: number; perDay: number; max: number };
+}
+/** Envies (HA-07, tour 8 section 5.4). */
+export interface EnvieSettings {
+  /** Une envie personnelle ne revient pas pour un joueur avant ce nombre de jours. */
+  noRepeatWindowDays: number;
+  /** À partir de `sharedFromDay`: poids d'une envie personnelle jamais reçue par ce joueur multiplié par ce facteur. */
+  unseenFactor: number;
+  /** Envie à deux tirée un jour sur `sharedEveryDays` à partir de ce jour (`null`: seulement `sharedSchedule`). */
+  sharedFromDay: number | null;
+  sharedEveryDays: number;
+  /** Une envie à deux tirée ne revient pas avant ce nombre de jours. */
+  sharedNoRepeatDays: number;
+}
+/** Répliques du quotidien (tour 8, section 5.5). */
+export interface DialogueSettings {
+  /** Une réplique datée (priorité `feel.dailyStoryPriority` ou plus) n'est prioritaire que si ce joueur ne l'a pas entendue depuis ce nombre de jours. */
+  datedRepeatDays: number;
+  /** Jour à partir duquel la règle s'applique (la démo garde la sienne). */
+  datedRepeatFromDay: number;
+}
 export type ContinuationMode = 'same_save' | 'new_game_per_stage';
 /** D7: tendresse entre les personnages, du moins au plus. */
 export type Tenderness = 'none' | 'accomplices' | 'gentle';
@@ -716,7 +755,7 @@ export interface Settings {
     /** Commandes tirées après les commandes écrites (tour 8), ou `null`. */
     generated: GeneratedOrderSettings | null;
   };
-  trees: { chopsPerTree: number; logsPerTree: number };
+  trees: TreeSettings;
   /** Cueillette (tour 8), ou `null`. */
   forage: ForageSettings | null;
   hens: { eggsPerHenPerDay: number; feedRequired: boolean };
@@ -768,8 +807,10 @@ export interface Settings {
     } | null;
     parcel: { item: string; from: string; to: string } | null;
   };
-  /** Envies (HA-07): une envie ne revient pas pour un joueur avant ce nombre de jours. */
-  envies: { noRepeatWindowDays: number };
+  /** Envies (HA-07, tour 8 section 5.4). */
+  envies: EnvieSettings;
+  /** Répliques du quotidien (tour 8, section 5.5). */
+  dialogues: DialogueSettings;
   /** Bancs de la carte: places, assise et lever (`reglages.benches`, défauts dans `defauts.ts`). */
   benches: BenchSettings;
   fishing: {
@@ -890,6 +931,8 @@ export interface FeelSettings {
   pinSeconds: number;
   /** Poids de tirage des poissons (CN-04: commun 6, peu commun 3, rare 1). */
   fishWeights: Record<string, number>;
+  /** Poids par saison (tour 8, section 5.3); une saison absente garde `fishWeights`. */
+  fishWeightsBySeason: Partial<Record<Season, Record<string, number>>>;
 }
 
 export interface Content {

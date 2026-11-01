@@ -57,6 +57,13 @@
       ]
     },
     {
+      "id": "basile_regrow",
+      "from": "basile",
+      "title": "Basile et la lisière",
+      "delivery": { "day": 16, "time": "06:00" },
+      "text": "Passez voir la lisière: les souches de chêne repartent, et je replanterai les sapins. Le bois ne manquera pas. B."
+    },
+    {
       "id": "jeanne_key_note",
       "from": "jeanne",
       "title": "Un mot de Jeanne",

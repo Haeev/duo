@@ -7,11 +7,14 @@
 import type { CropStage, Quality, Weather } from '../etat/types';
 import {
   DEFAULT_BENCHES,
+  DEFAULT_DIALOGUES,
+  DEFAULT_ENVIES,
   DEFAULT_FEEL,
   DEFAULT_MEMORIES,
   DEFAULT_MOMENTS,
   DEFAULT_RANGES,
   DEFAULT_SECRETS,
+  DEFAULT_TREES,
   DEFAULT_WEATHER,
 } from './defauts';
 import { ContentError, Reader } from './lecteur';
@@ -383,6 +386,9 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return counter(r, `bed${suffix(r, 'item')}`, since);
     case 'caught':
       return counter(r, `caught${suffix(r, 'item')}`, since);
+    // Tour 8: cueillettes ramassées (`picked:<objet>`; sans objet, toutes les cueillettes).
+    case 'picked':
+      return counter(r, `picked${suffix(r, 'item')}`, since);
     case 'witnessed':
       return counter(r, `witnessed:${r.at('event').string()}`, since);
     case 'nights_passed':
@@ -1091,6 +1097,8 @@ function parseTrigger(r: Reader): HintTrigger {
     case 'holding_furniture':
     case 'big_purchase_attempt':
     case 'letter_received':
+    case 'near_forage':
+    case 'aim_sapling':
       return { on };
     case 'near_point':
       return { on, point: r.at('point').string() };
@@ -1169,7 +1177,12 @@ function parseTexts(r: Reader): Texts {
 }
 
 function parseFeel(r: Reader | null): FeelSettings {
-  const feel: FeelSettings = { ...DEFAULT_FEEL, actionSeconds: { ...DEFAULT_FEEL.actionSeconds }, fishWeights: { ...DEFAULT_FEEL.fishWeights } };
+  const feel: FeelSettings = {
+    ...DEFAULT_FEEL,
+    actionSeconds: { ...DEFAULT_FEEL.actionSeconds },
+    fishWeights: { ...DEFAULT_FEEL.fishWeights },
+    fishWeightsBySeason: {},
+  };
   if (r === null) return feel;
   const actions = r.opt('actionSeconds');
   if (actions !== null) {
@@ -1180,7 +1193,18 @@ function parseFeel(r: Reader | null): FeelSettings {
     feel.fishWeights = {};
     for (const [key, value] of fish.entries()) feel.fishWeights[key] = value.number();
   }
-  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights'>)[] = [
+  const bySeasonReader = r.opt('fishWeightsBySeason');
+  if (bySeasonReader !== null) {
+    feel.fishWeightsBySeason = {};
+    for (const [season, weights] of bySeasonReader.entries()) {
+      const key = SEASONS.find((x) => x === season);
+      if (key === undefined) bySeasonReader.at(season).fail(`saison inconnue « ${season} »`);
+      const table: Record<string, number> = {};
+      for (const [item, value] of weights.entries()) table[item] = value.number();
+      if (key !== undefined) feel.fishWeightsBySeason[key] = table;
+    }
+  }
+  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights' | 'fishWeightsBySeason'>)[] = [
     'trainSlideSeconds',
     'pointRadius',
     'beamGrabRange',
@@ -1272,6 +1296,51 @@ function parseSecretSettings(r: Reader | null): Settings['secrets'] {
     henChoiceKeepOpen: optNumber(r, 'henChoiceKeepOpen', d.henChoiceKeepOpen),
     hideFromGuestSnapshot: optBoolean(r, 'hideFromGuestSnapshot', d.hideFromGuestSnapshot),
     knownHensFlag: optString(r, 'knownHensFlag') ?? d.knownHensFlag,
+  };
+}
+
+/** Arbres (tour 8, section 5.1): sans `regrow`, une souche reste une souche (la démo). */
+function parseTrees(r: Reader): Settings['trees'] {
+  const d = DEFAULT_TREES;
+  const scale = r.opt('saplingScale');
+  const trees: Settings['trees'] = {
+    chopsPerTree: r.at('chopsPerTree').integer(1),
+    logsPerTree: r.at('logsPerTree').integer(1),
+    regrow: optBoolean(r, 'regrow', false),
+    regrowFromDay: r.has('regrowFromDay') ? r.at('regrowFromDay').integer(1) : d.regrowFromDay,
+    catchUpDays: r.has('catchUpDays') ? r.at('catchUpDays').integer(0) : d.catchUpDays,
+    stumpDays: r.has('stumpDays') ? r.at('stumpDays').integer(0) : d.stumpDays,
+    saplingDays: r.has('saplingDays') ? r.at('saplingDays').integer(0) : d.saplingDays,
+    saplingScale:
+      scale === null
+        ? { ...d.saplingScale }
+        : { first: probability(scale.at('first')), perDay: scale.at('perDay').number(), max: probability(scale.at('max')) },
+  };
+  if (trees.saplingScale.max < trees.saplingScale.first) r.at('saplingScale').fail('« max » au moins égal à « first »');
+  return trees;
+}
+
+/** Envies (HA-07, tour 8 section 5.4): chaque clé absente garde sa valeur de `defauts.ts`. */
+function parseEnvieSettings(r: Reader | null): Settings['envies'] {
+  const d = DEFAULT_ENVIES;
+  if (r === null) return { ...d };
+  const from = r.opt('sharedFromDay');
+  return {
+    noRepeatWindowDays: r.has('noRepeatWindowDays') ? r.at('noRepeatWindowDays').integer(1) : d.noRepeatWindowDays,
+    unseenFactor: optNumber(r, 'unseenFactor', d.unseenFactor),
+    sharedFromDay: from === null || from.isNull() ? d.sharedFromDay : from.integer(1),
+    sharedEveryDays: r.has('sharedEveryDays') ? r.at('sharedEveryDays').integer(1) : d.sharedEveryDays,
+    sharedNoRepeatDays: r.has('sharedNoRepeatDays') ? r.at('sharedNoRepeatDays').integer(0) : d.sharedNoRepeatDays,
+  };
+}
+
+/** Répliques du quotidien (tour 8, section 5.5). */
+function parseDialogueSettings(r: Reader | null): Settings['dialogues'] {
+  const d = DEFAULT_DIALOGUES;
+  if (r === null) return { ...d };
+  return {
+    datedRepeatDays: r.has('datedRepeatDays') ? r.at('datedRepeatDays').integer(0) : d.datedRepeatDays,
+    datedRepeatFromDay: r.has('datedRepeatFromDay') ? r.at('datedRepeatFromDay').integer(1) : d.datedRepeatFromDay,
   };
 }
 
@@ -1612,7 +1681,7 @@ function parseSettings(r: Reader): Settings {
       extraItemsRate: order.at('extraItemsRate').number(),
       generated: parseGenerated(order.opt('generated'), trains.length),
     },
-    trees: { chopsPerTree: r.at('trees').at('chopsPerTree').integer(1), logsPerTree: r.at('trees').at('logsPerTree').integer(1) },
+    trees: parseTrees(r.at('trees')),
     forage: parseForage(r.opt('forage')),
     hens: {
       eggsPerHenPerDay: r.at('hens').at('eggsPerHenPerDay').integer(0),
@@ -1667,7 +1736,8 @@ function parseSettings(r: Reader): Settings {
     hints: { durationSeconds: r.at('hints').at('durationSeconds').number() },
     absence: { minutes: r.at('absence').at('minutes').number() },
     carry: parseCarry(r.opt('carry')),
-    envies: { noRepeatWindowDays: r.has('envies') && r.at('envies').has('noRepeatWindowDays') ? r.at('envies').at('noRepeatWindowDays').integer(1) : 7 },
+    envies: parseEnvieSettings(r.opt('envies')),
+    dialogues: parseDialogueSettings(r.opt('dialogues')),
     fishing: parseFishing(r.opt('fishing')),
     benches: parseBenches(r.opt('benches')),
     moments: parseMomentSettings(r.opt('moments')),

@@ -18,6 +18,7 @@ import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
 import { morningMoments } from './moments';
 import { morningWeather } from './meteo';
+import { morningForage, morningTrees } from './lisiere';
 import { pruneLetters } from './semaine';
 import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
@@ -167,6 +168,8 @@ export function morning(sim: Sim): void {
   world.clock.veillee = false;
   morningWeather(sim);
   morningGrowth(sim);
+  morningTrees(sim);
+  morningForage(sim);
   morningEggs(sim);
   reopenCrate(sim);
   world.grocerSoldToday = 0;

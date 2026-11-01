@@ -55,6 +55,41 @@ export function expectSummer(run: SummerRun, name: string): void {
   ).toEqual([8, 15, 22, 29, 36, 43]);
   for (const [day, bytes] of Object.entries(run.bytesByDay))
     expect(bytes, `${where}: état au jour ${day}`).toBeLessThan(MAX_STATE_BYTES);
+  if (run.profile === 'median') expectMedianGoals(run, where);
+  if (run.profile === 'glouton') expectGluttonTrees(run, where);
+}
+
+/**
+ * Profil médian (seconde vague du tour 8): T8-16, les commandes 3 à 6 complètes (80 % sur les huit
+ * graines, vérifié ici graine par graine: au moins 3 sur 4); T8-20, au moins 6 arbres abattables le
+ * jour 42, jamais aucun à partir du jour 16 (repousse).
+ */
+function expectMedianGoals(run: SummerRun, where: string): void {
+  const generated = run.orders.filter((o) => o.number >= 3 && o.number <= 6);
+  expect(generated, `${where}: commandes 3 à 6 payées`).toHaveLength(4);
+  expect(
+    generated.filter((o) => o.complete).length,
+    `${where}: commandes 3 à 6 complètes (T8-16)`,
+  ).toBeGreaterThanOrEqual(3);
+  expect(
+    run.treesByDay[42] ?? 0,
+    `${where}: arbres abattables le jour 42 (T8-20)`,
+  ).toBeGreaterThanOrEqual(6);
+  for (const [day, trees] of Object.entries(run.treesByDay)) {
+    if (Number(day) >= 16)
+      expect(trees, `${where}: arbres abattables le jour ${day} (T8-20)`).toBeGreaterThan(0);
+  }
+}
+
+/** Profil glouton (section 5.1): tout ce qui est debout abattu chaque jour, au plus 5 jours sans arbre. */
+function expectGluttonTrees(run: SummerRun, where: string): void {
+  let without = 0;
+  for (let day = 16; day <= 43; day++) {
+    const trees = run.treesByDay[day];
+    if (trees === undefined) continue;
+    without = trees === 0 ? without + 1 : 0;
+    expect(without, `${where}: jours sans arbre au jour ${String(day)}`).toBeLessThanOrEqual(5);
+  }
 }
 
 /** Relevé lisible d'une partie (objectifs mesurés, section 6.4). */

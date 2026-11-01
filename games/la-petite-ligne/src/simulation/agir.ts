@@ -3,7 +3,7 @@
  * un clic sur une cible, et l'exécution de l'action.
  */
 import type { ClickTarget } from '../etat/actions';
-import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Vec2 } from '../etat/types';
+import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Tree, Vec2 } from '../etat/types';
 import { AIM_CONE, AIM_DISTANCE } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
@@ -24,6 +24,7 @@ import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 import { holdPlaceNear, takeHold } from './moments';
 import { callableHen, callHen } from './secrets';
+import { refuseChop, treeStage } from './lisiere';
 
 /** Ce sur quoi on peut agir. */
 export type Target =
@@ -292,6 +293,10 @@ export function updateAim(sim: Sim, c: Character): void {
     const pos = best.target.kind === 'cell' ? { x: best.target.cell.cx + 0.5, y: best.target.cell.cy + 0.5 } : best.target.pos;
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: best.verb, blocked: null };
     if (best.verb !== null) queueHint(sim, c.id, { on: 'near_interactable' });
+    if (best.target.kind === 'cell' && sim.world.trees.some((t) => t.felled)) {
+      const young = youngTreeAhead(sim, c);
+      if (young !== null && treeStage(sim, young) === 'sapling') queueHint(sim, c.id, { on: 'aim_sapling' });
+    }
     if (best.target.kind === 'cell') {
       const g = gardenCellAt(sim, best.target.cell);
       const held = heldStack(c);
@@ -360,6 +365,8 @@ function pickUp(sim: Sim, c: Character, id: string): void {
   if (left < g.count) rememberPickup(sim, c, g.id, g.pos);
   gesture(sim, c, 'pickup', sim.content.settings.feel.actionSeconds.pickup ?? 0, { x: g.pos.x, y: g.pos.y });
   bump(sim, `picked:${g.item}`, c.id, g.count - left);
+  // Condition `picked` sans objet (tour 8): toutes les cueillettes, pas les œufs ni les objets tombés.
+  if (sim.content.items[g.item]?.category === 'forage') bump(sim, 'picked', c.id, g.count - left);
   emit(sim, { type: 'picked_up', by: c.id, item: g.item, count: g.count - left });
 }
 
@@ -472,6 +479,12 @@ export function actFront(sim: Sim, c: Character): void {
     sayIfWritten(sim, c.id, 'bench_full');
     return;
   }
+  // La hache devant une souche ou un rejet: on dit pourquoi rien ne se coupe (tour 8, section 9).
+  const young = youngTreeAhead(sim, c);
+  if (young !== null && heldStack(c)?.item === ITEM.axe && c.seat === null) {
+    refuseChop(sim, c, young);
+    return;
+  }
   if (best !== null && takenByPartner(sim, c, best.target, sim.world.tick)) return;
   const reach = sim.content.settings.ranges.action;
   pickupTakenNear(sim, c, (pos) => distance(c.pos, pos) <= reach && inCone(c, pos));
@@ -496,7 +509,27 @@ export function actOnClick(sim: Sim, c: Character, click: ClickTarget, target: T
   }
   const verb = verbOf(sim, c, target);
   if (verb !== null) perform(sim, c, target, verb);
-  else takenByPartner(sim, c, target, since);
+  else if (target.kind === 'tree' && heldStack(c)?.item === ITEM.axe) {
+    const tree = sim.world.trees.find((x) => x.id === target.id);
+    if (tree?.felled === true) refuseChop(sim, c, tree);
+  } else takenByPartner(sim, c, target, since);
+}
+
+/** L'arbre abattu (souche ou rejet) le plus proche devant soi, à portée de hache, ou `null`. */
+export function youngTreeAhead(sim: Sim, c: Character): Tree | null {
+  if (c.inHouse) return null;
+  const reach = sim.content.settings.ranges.action + 0.3;
+  let best: Tree | null = null;
+  let bestD = Infinity;
+  for (const t of sim.world.trees) {
+    if (!t.felled) continue;
+    const d = distance(c.pos, t.pos);
+    if (d <= reach && d < bestD && inCone(c, t.pos)) {
+      best = t;
+      bestD = d;
+    }
+  }
+  return best;
 }
 
 /** Cible d'un clic, traduite en cible de la simulation (avec sa position). */

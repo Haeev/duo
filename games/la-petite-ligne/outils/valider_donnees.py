@@ -109,6 +109,8 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "ate_together": (set(), {"atFurniture", "since"}),
     "went_to_bed": (set(), {"item", "who"}),
     "caught": ({"item"}, {"count", "who", "since"}),
+    # Tour 8: cueillettes ramassées (sans objet: toutes).
+    "picked": (set(), {"item", "count", "who", "since"}),
     "used_tool_at": ({"tool", "point"}, {"radius", "who"}),
     "stayed_at": ({"point", "seconds"}, {"who", "seated"}),
     "looked_at": ({"point"}, {"distance", "who", "minDistance", "still"}),
@@ -153,6 +155,8 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "near_construction": set(), "quest_started": {"quest"}, "aim_cell": {"cellState", "tool", "holding"},
     "sowed": set(), "tool_empty": {"item"}, "crop_ripe_in_view": set(), "time_reached": {"time"},
     "veillee_started": set(), "holding_furniture": set(), "big_purchase_attempt": set(), "letter_received": set(),
+    # Tour 8: la lisière (cueillette posée à moins de 6 m, rejet visé).
+    "near_forage": set(), "aim_sapling": set(),
 }
 
 PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
@@ -1130,6 +1134,19 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
             report.error("reglages.feel.fishWeights", f"{fish_id!r} n'est pas un poisson")
         if not isinstance(weight, (int, float)) or weight <= 0:
             report.error("reglages.feel.fishWeights", f"poids positif attendu pour {fish_id!r}")
+    # Tour 8 (section 5.3): poids par saison; un poids nul est permis (pas de truite l'hiver).
+    for season, weights in settings.get("feel", {}).get("fishWeightsBySeason", {}).items():
+        w = f"reglages.feel.fishWeightsBySeason.{season}"
+        if season not in ("spring", "summer", "autumn", "winter"):
+            report.error(w, "saison inconnue")
+        for fish_id, weight in weights.items():
+            ref("item", fish_id, w, reg, report)
+            if fish_id in reg.items and reg.items[fish_id].get("category") != "fish":
+                report.error(w, f"{fish_id!r} n'est pas un poisson")
+            if not isinstance(weight, (int, float)) or weight < 0:
+                report.error(w, f"poids positif ou nul attendu pour {fish_id!r}")
+        if sum(v for v in weights.values() if isinstance(v, (int, float))) <= 0:
+            report.error(w, "au moins un poisson doit pouvoir mordre")
     levels_settings = [entry.get("level") for entry in settings.get("needs", {}).get("formLevels", [])]
     if levels_settings != FORM_LEVELS:
         report.error("reglages.needs.formLevels", f"niveaux attendus {FORM_LEVELS}")

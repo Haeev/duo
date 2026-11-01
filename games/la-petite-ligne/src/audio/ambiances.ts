@@ -6,7 +6,8 @@
  */
 import type { GameMap, Rect } from '../etat/carte';
 import type { Vec2, Weather } from '../etat/types';
-import type { AmbienceRule } from './catalogue';
+import type { AmbienceRule, MorningMistRule } from './catalogue';
+import type { Season } from '../donnees/types';
 import { distanceToRect } from './espace';
 import { dbToGain, type AudioSettings } from './reglages';
 
@@ -16,6 +17,10 @@ const HOURS_PER_DAY = 24;
 export interface AmbienceInput {
   minutes: number;
   weather: Weather;
+  /** Saison du jour (tour 8). */
+  season: Season;
+  /** Brume du matin, de 0 (rien) à 1 (pleine), comme la nappe du rendu (`mistAmount`). */
+  mist: number;
   /** Le personnage local est dans la maisonnette. */
   inHouse: boolean;
   /** Position du personnage local. */
@@ -56,11 +61,15 @@ export function ambienceLevels(
   zones: AmbienceZones,
   settings: AudioSettings['ambience'],
   out: Map<string, number>,
+  mist: MorningMistRule | null = null,
 ): Map<string, number> {
   for (const rule of rules) out.set(rule.ambience, 0);
+  if (mist !== null) out.set(mist.ambience, 0);
   const hour = input.minutes / MINUTES_PER_HOUR;
   const rain = input.weather === 'rain';
   for (const rule of rules) {
+    if (rule.seasons !== null && !rule.seasons.includes(input.season)) continue;
+    if (rule.exceptSeasons.includes(input.season)) continue;
     let active: boolean;
     if (rule.rain !== null) {
       active = rain && (rule.rain === 'indoor' ? input.inHouse : !input.inHouse);
@@ -75,6 +84,14 @@ export function ambienceLevels(
     if (rule.ambience === 'wind') db += proximityDb(input.at, zones.wind, settings.wind.farM, settings.wind.farDb);
     const gain = dbToGain(db);
     out.set(rule.ambience, Math.max(out.get(rule.ambience) ?? 0, gain));
+  }
+  // La brume du matin, dehors comme dedans (les murs la feutrent comme le reste): elle suit la nappe.
+  if (mist !== null && input.mist > 0) {
+    out.set(mist.ambience, Math.max(out.get(mist.ambience) ?? 0, dbToGain(mist.volumeDb) * input.mist));
+    for (const [id, db] of Object.entries(mist.lowerDb)) {
+      const gain = out.get(id);
+      if (gain !== undefined && gain > 0) out.set(id, gain * dbToGain(db * input.mist));
+    }
   }
   return out;
 }

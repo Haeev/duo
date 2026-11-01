@@ -283,8 +283,23 @@ export class RenderEngine implements Renderer {
       this.resources,
       this.picks,
     );
-    const garden = new GardenPart(library, materials, terrain, this.resources, this.picks);
-    const farm = new FarmLifePart(library, materials, terrain, this.resources, this.picks, content);
+    const garden = new GardenPart(
+      library,
+      materials,
+      terrain,
+      this.resources,
+      this.picks,
+      content.settings.trees,
+    );
+    const farm = new FarmLifePart(
+      library,
+      materials,
+      terrain,
+      this.resources,
+      this.picks,
+      content,
+      map,
+    );
     this.scene.add(
       characters.group,
       house.group,

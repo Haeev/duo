@@ -53,6 +53,8 @@
     "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur, le meuble tourné vers la pièce.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
     "fish_escaped": "Il s'est échappé.",
+    "stump_hint": "Rien à couper: la souche repartira.",
+    "tree_too_young": "Trop jeune pour la hache. Laisse-le grandir.",
     "handcar_needs_both": "La draisine ne bouge pas d'un pouce. Appelle {partner}: elle se pousse à deux.",
     "handcar_pushed": "La draisine a roulé jusqu'au bout ! Basile vous attend devant la remise.",
     "parcel_needs_both": "Ce colis pèse son poids. Appelle {partner}: il se porte à deux.",

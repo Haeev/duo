@@ -1,17 +1,21 @@
 /**
  * Envies du jour (HA-07): une personnelle par joueur et par matin, jamais la
  * même deux fois en `envies.noRepeatWindowDays` jours (réserve vide: la moins
- * récente des possibles), et une envie à deux les jours prévus.
+ * récente des possibles), et une envie à deux les jours prévus; après la démo (tour 8, section
+ * 5.4), coup de pouce aux envies jamais reçues et envie à deux tirée un jour sur trois.
  */
 import { evaluateAll, NO_CONTEXT, stayPoints } from './conditions';
 import { type Sim, character, distance, emit, notifyKey } from './contexte';
+import { unitDraw } from '../etat/tirage';
 
 export function pickEnvies(sim: Sim): void {
   const { day } = sim.world.clock;
+  const settings = sim.content.settings.envies;
+  const longRun = settings.sharedFromDay !== null && day >= settings.sharedFromDay;
   for (const c of sim.world.characters) {
     const ctx = { ...NO_CONTEXT, actor: c.id };
     const possible = sim.content.envies.filter((e) => e.kind === 'personal' && evaluateAll(sim, e.availableWhen, ctx));
-    const recent = c.envieHistory.slice(-sim.content.settings.envies.noRepeatWindowDays);
+    const recent = c.envieHistory.slice(-settings.noRepeatWindowDays);
     let candidates = possible.filter((e) => !recent.includes(e.id));
     if (candidates.length === 0 && possible.length > 0) {
       const last = (id: string): number => c.envieHistory.lastIndexOf(id);
@@ -21,13 +25,50 @@ export function pickEnvies(sim: Sim): void {
     if (candidates.length === 0) {
       c.envie = null;
     } else {
-      const pick = sim.rng.pick(candidates);
+      // Après la démo, coup de pouce aux envies jamais reçues par ce joueur (la démo garde son tirage).
+      const pick = longRun ? weightedPick(sim, candidates, (e) => (c.envieHistory.includes(e.id) ? 1 : settings.unseenFactor)) : sim.rng.pick(candidates);
       c.envie = { id: pick.id, done: false };
       c.envieHistory.push(pick.id);
     }
-    const shared = sim.content.sharedEnvieSchedule.find((s) => s.day === day);
-    c.sharedEnvie = shared === undefined ? null : { id: shared.envie, done: false };
   }
+  const shared = longRun ? drawSharedEnvie(sim, day) : (sim.content.sharedEnvieSchedule.find((s) => s.day === day)?.envie ?? null);
+  for (const c of sim.world.characters) c.sharedEnvie = shared === null ? null : { id: shared, done: false };
+}
+
+/** Tirage pondéré par le générateur de la partie (un seul nombre tiré, comme `pick`). */
+function weightedPick<T>(sim: Sim, items: readonly T[], weight: (item: T) => number): T {
+  const total = items.reduce((sum, item) => sum + weight(item), 0);
+  let roll = sim.rng.float(0, total);
+  for (const item of items) {
+    roll -= weight(item);
+    if (roll < 0) return item;
+  }
+  const last = items[items.length - 1];
+  if (last === undefined) throw new Error('tirage pondéré sur une liste vide');
+  return last;
+}
+
+/**
+ * Envie à deux d'après la démo (section 5.4): un jour sur `sharedEveryDays` à partir de
+ * `sharedFromDay`, la même chez les deux, tirée par empreinte parmi celles possibles, jamais la
+ * même en `sharedNoRepeatDays` jours (rien plutôt qu'une redite).
+ */
+export function drawSharedEnvie(sim: Sim, day: number): string | null {
+  const s = sim.content.settings.envies;
+  const world = sim.world;
+  if (s.sharedFromDay === null || day < s.sharedFromDay) return null;
+  world.sharedEnvieRecent = world.sharedEnvieRecent.filter((e) => day - e.day < s.sharedNoRepeatDays);
+  if ((day - s.sharedFromDay) % s.sharedEveryDays !== 0) return null;
+  const taken = new Set(world.sharedEnvieRecent.map((e) => e.id));
+  const candidates = sim.content.envies.filter(
+    (e) => e.kind === 'shared' && !taken.has(e.id) && evaluateAll(sim, e.availableWhen, NO_CONTEXT),
+  );
+  if (candidates.length === 0) return null;
+  const index = Math.floor(unitDraw(world.seed, 'shared-envie', day) * candidates.length);
+  const pick = candidates[Math.min(index, candidates.length - 1)];
+  if (pick === undefined) return null;
+  world.sharedEnvieRecent.push({ id: pick.id, day });
+  return pick.id;
 }
 
 /**

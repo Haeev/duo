@@ -329,6 +329,7 @@ export function createExampleWorld(
     pos: { ...tree.pos },
     hits: 0,
     felled: index === 0,
+    felledDay: index === 0 ? 1 : null,
     lastHitTick: -1000,
   }));
   world.beam = null;

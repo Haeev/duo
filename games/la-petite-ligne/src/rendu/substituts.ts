@@ -139,6 +139,20 @@ const TREES: Record<string, Builder> = {
     b.blob(0.42, [0, 0.32, 0], 'leaf_bush');
     b.blob(0.3, [0.3, 0.24, 0.12], 'leaf_hazel', { rotation: [0, 40, 0] });
   },
+  // Lisière du tour 8: roncier bas (1,2 x 0,8 m, 0,7 m), brins du rejet de chêne, jeune sapin.
+  bramble: (b) => {
+    b.blob(0.4, [-0.3, 0.3, 0], 'leaf_bush', { scale: [1, 0.85, 0.9] });
+    b.blob(0.38, [0.3, 0.28, 0.05], 'leaf_bush', { scale: [1, 0.85, 0.9] });
+  },
+  oak_sapling_shoots: (b) => {
+    b.cylinder(0.03, 0.04, 1.2, [0, 0, 0], 'bark', { base: true, segments: 5 });
+    b.blob(0.35, [0, 1.3, 0], 'leaf_oak_light');
+  },
+  fir_sapling: (b) => {
+    b.cylinder(0.04, 0.05, 0.3, [0, 0, 0], 'bark_dark', { base: true, segments: 5 });
+    b.cone(0.4, 0.7, [0, 0.25, 0], 'leaf_fir', { base: true, segments: 7 });
+    b.cone(0.28, 0.55, [0, 0.65, 0], 'leaf_fir_light', { base: true, segments: 7 });
+  },
 };
 
 // ---------------------------------------------------------------------------
@@ -157,6 +171,39 @@ const ITEMS: Record<string, Builder> = {
   dandelion: (b) => {
     b.cylinder(0.01, 0.01, 0.18, [0, 0, 0], 'leaf_crop', { base: true });
     b.ball(0.05, [0, 0.2, 0], 'flower_yellow');
+  },
+  // Cueillettes de la lisière (tour 8): à la taille des modèles de l'artiste, grossies pour se lire.
+  wild_garlic: (b) => {
+    leaves(b, 6, 0.3, 'leaf_crop', 35);
+    b.ball(0.04, [0.04, 0.31, 0.02], 'flower_white');
+    b.ball(0.04, [-0.05, 0.28, -0.03], 'flower_white');
+  },
+  chanterelle: (b) => {
+    for (const [x, z, h] of [
+      [0, 0, 0.15],
+      [0.08, 0.05, 0.11],
+      [-0.07, 0.06, 0.09],
+      [0.02, -0.08, 0.12],
+    ] as const) {
+      b.cylinder(0.015, 0.025, h, [x, 0, z], 'fabric_yellow', { base: true, segments: 5 });
+      b.cylinder(0.055, 0.03, 0.035, [x, h, z], 'flower_center', { base: true, segments: 7 });
+    }
+  },
+  blackberry: (b) => {
+    b.box([0.28, 0.02, 0.05], [0, 0, 0], 'leaf_bush', { base: true });
+    for (const x of [-0.1, -0.05, 0, 0.05, 0.1]) b.ball(0.03, [x, 0.04, 0.02], 'blackberry');
+  },
+  hazelnut: (b) => {
+    b.box([0.3, 0.01, 0.2], [0, 0, 0], 'leaf_hazel', { base: true, rotation: [0, 25, 0] });
+    for (const [x, z] of [
+      [0, 0],
+      [0.06, 0.03],
+      [-0.05, 0.04],
+      [0.02, -0.06],
+      [-0.07, -0.03],
+    ] as const) {
+      b.ball(0.03, [x, 0.035, z], 'wood', { scale: [1, 0.9, 1] });
+    }
   },
   egg: (b) => b.ball(0.045, [0, 0.055, 0], 'egg', { scale: [0.85, 1.1, 0.85], detail: 1 }),
   log: (b) =>

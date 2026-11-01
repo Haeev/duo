@@ -16,12 +16,15 @@ import {
   type Object3D,
 } from 'three';
 import type { Content } from '../donnees/types';
+import type { GameMap } from '../etat/carte';
+import type { Vec2 } from '../etat/types';
 import { smoothFactor } from './camera';
 import {
   dampAngle,
   interpolate,
   setStandingBox,
   yawFromFacing,
+  yawFromQuarter,
   type FrameContext,
   type PickRegistry,
   type PickTarget,
@@ -49,6 +52,12 @@ const ITEM_PICK_HEIGHT = 0.5;
 const BEAM_GROUND_HEIGHT = 0.12;
 const DEFAULT_CARRY_HEIGHT = 1.6;
 const HEN_RADIUS = 0.3;
+/** Tour 8: modèle du roncier de la lisière et portée où une mûre posée se cale sur lui (m). */
+const BRAMBLE_MODEL = 'bramble';
+const BRAMBLE_REACH = 1.6;
+/** Dessus du roncier quand le modèle n'a pas de points `berry_spots` (substitut), en m. */
+const BRAMBLE_TOP_FALLBACK = 0.6;
+const BERRY_ITEM = 'blackberry';
 
 interface HenView {
   root: Group;
@@ -73,6 +82,8 @@ export class FarmLifePart implements EventfulPart {
   private readonly unit = new Vector3(1, 1, 1);
   private readonly position = new Vector3();
   private readonly point = { x: 0, y: 0 };
+  /** Points de pose des mûres sur chaque roncier de la carte, en coordonnées du monde (tour 8). */
+  private readonly berrySpots: BrambleSpots[];
 
   constructor(
     private readonly library: ModelLibrary,
@@ -81,8 +92,10 @@ export class FarmLifePart implements EventfulPart {
     resources: ResourceTracker,
     private readonly picks: PickRegistry,
     private readonly content: Content,
+    map: GameMap | null = null,
   ) {
     this.group.name = 'ferme';
+    this.berrySpots = map === null ? [] : bramblesOf(map, library, terrain);
     for (const clip of library.animations(FARM_FILE)) {
       this.clips.set(clip.name, clip);
     }
@@ -160,20 +173,37 @@ export class FarmLifePart implements EventfulPart {
     const seen = new Set<string>();
     for (const item of world.groundItems) {
       seen.add(item.id);
-      const model = this.content.items[item.item]?.model ?? item.item;
-      const ground = this.terrain.heightAt(item.pos.x, item.pos.y);
-      const bob = context.reducedMotion
-        ? 0
-        : (Math.sin(context.time * ITEM_BOB_SPEED + textHash(item.id)) + 1) * ITEM_BOB;
+      const def = this.content.items[item.item];
+      const model = def?.model ?? item.item;
+      let ground = this.terrain.heightAt(item.pos.x, item.pos.y);
+      // Une cueillette de la lisière pousse là: posée, sans flotter; les mûres sur leur roncier.
+      const grown = def?.category === 'forage';
+      const bob =
+        context.reducedMotion || grown
+          ? 0
+          : (Math.sin(context.time * ITEM_BOB_SPEED + textHash(item.id)) + 1) * ITEM_BOB;
       this.quaternion.setFromAxisAngle(this.up, textHash(item.id));
-      this.position.set(item.pos.x, ground + bob, item.pos.y);
+      const spot = item.item === BERRY_ITEM ? this.berrySpot(item.id, item.pos) : null;
+      if (spot === null) {
+        this.position.set(item.pos.x, ground + bob, item.pos.y);
+      } else {
+        this.position.set(spot.x, spot.y, spot.z);
+        ground = spot.y;
+      }
       this.items.add(model, this.matrix.compose(this.position, this.quaternion, this.unit));
       let pick = this.itemPicks.get(item.id);
       if (pick === undefined) {
         pick = this.picks.add({ kind: 'ground_item', groundItem: item.id });
         this.itemPicks.set(item.id, pick);
       }
-      setStandingBox(pick.box, item.pos.x, ground, item.pos.y, ITEM_PICK_RADIUS, ITEM_PICK_HEIGHT);
+      setStandingBox(
+        pick.box,
+        this.position.x,
+        ground,
+        this.position.z,
+        ITEM_PICK_RADIUS,
+        ITEM_PICK_HEIGHT,
+      );
       pick.enabled = true;
     }
     this.items.end();
@@ -218,6 +248,23 @@ export class FarmLifePart implements EventfulPart {
     this.beam.rotation.y = yawFromFacing(beam.facing);
   }
 
+  /** Le point du roncier voisin où se pose cette mûre (choisi par son identifiant), ou `null`. */
+  private berrySpot(id: string, at: Readonly<Vec2>): Readonly<Vector3> | null {
+    let best: BrambleSpots | null = null;
+    let bestD = BRAMBLE_REACH;
+    for (const bramble of this.berrySpots) {
+      const d = Math.hypot(bramble.x - at.x, bramble.y - at.y);
+      if (d <= bestD) {
+        best = bramble;
+        bestD = d;
+      }
+    }
+    if (best === null || best.spots.length === 0) {
+      return null;
+    }
+    return best.spots[textHash(id) % best.spots.length] ?? null;
+  }
+
   dispose(): void {
     for (const hen of this.hens.values()) {
       hen.mixer?.stopAllAction();
@@ -229,4 +276,46 @@ export class FarmLifePart implements EventfulPart {
     this.itemPicks.clear();
     this.group.removeFromParent();
   }
+}
+
+interface BrambleSpots {
+  x: number;
+  y: number;
+  spots: Vector3[];
+}
+
+/**
+ * Les ronciers de la carte et leurs points `berry_spots` (repère glTF du nœud: x, hauteur, z vers
+ * l'avant), tournés et posés comme le décor (`propMatrix`); sans eux, le milieu du dessus.
+ */
+function bramblesOf(map: GameMap, library: ModelLibrary, terrain: Terrain): BrambleSpots[] {
+  const raw = library.extras(BRAMBLE_MODEL).berry_spots;
+  const local: [number, number, number][] = [];
+  if (Array.isArray(raw)) {
+    for (const p of raw as unknown[]) {
+      const [x, h, z] = Array.isArray(p) ? (p as unknown[]) : [];
+      if (typeof x === 'number' && typeof h === 'number' && typeof z === 'number') {
+        local.push([x, h, z]);
+      }
+    }
+  }
+  if (local.length === 0) {
+    local.push([0, BRAMBLE_TOP_FALLBACK, 0]);
+  }
+  return map.props
+    .filter((prop) => prop.model === BRAMBLE_MODEL)
+    .map((prop) => {
+      const yaw = yawFromQuarter(prop.rotation);
+      const cos = Math.cos(yaw);
+      const sin = Math.sin(yaw);
+      const ground = terrain.heightAt(prop.pos.x, prop.pos.y);
+      return {
+        x: prop.pos.x,
+        y: prop.pos.y,
+        spots: local.map(
+          ([x, h, z]) =>
+            new Vector3(prop.pos.x + x * cos + z * sin, ground + h, prop.pos.y - x * sin + z * cos),
+        ),
+      };
+    });
 }

@@ -245,6 +245,18 @@
       "occultation_arbre": {"tronc": [0.4, 0.0, 1.2], "houppier": [2.4, 1.2, 9.0]}
     },
     "bush": {"categorie": "decor", "nom": "massif, arbuste bas", "emprise": [1, 1], "hauteur": 1.2},
+    "bramble": {
+      "categorie": "decor",
+      "nom": "roncier de la lisière (les mûres s'y posent)",
+      "emprise": [1, 1],
+      "hauteur": 0.7
+    },
+    "bush_hazel": {
+      "categorie": "decor",
+      "nom": "noisetier (les noisettes tombent à son pied)",
+      "emprise": [1, 1],
+      "hauteur": 2.0
+    },
     "rock": {"categorie": "decor", "nom": "rocher", "emprise": [1, 1], "hauteur": 0.8}
   },
   "objets": [
@@ -352,9 +364,14 @@
     {"id": "bush_38", "type": "bush", "x": 27.5, "y": 8.5, "rotation": 0, "rect": {"x": 27, "y": 8, "w": 1, "h": 1}},
     {"id": "bush_39", "type": "bush", "x": 29.5, "y": 7.5, "rotation": 0, "rect": {"x": 29, "y": 7, "w": 1, "h": 1}},
     {"id": "bush_40", "type": "bush", "x": 33.5, "y": 3.5, "rotation": 0, "rect": {"x": 33, "y": 3, "w": 1, "h": 1}},
-    {"id": "bush_41", "type": "bush", "x": 35.5, "y": 8.5, "rotation": 0, "rect": {"x": 35, "y": 8, "w": 1, "h": 1}},
+    {"id": "bush_41", "type": "bush", "x": 33.5, "y": 8.5, "rotation": 0, "rect": {"x": 33, "y": 8, "w": 1, "h": 1}},
     {"id": "bush_42", "type": "bush", "x": 37.5, "y": 4.5, "rotation": 0, "rect": {"x": 37, "y": 4, "w": 1, "h": 1}},
     {"id": "bush_43", "type": "bush", "x": 39.5, "y": 7.5, "rotation": 0, "rect": {"x": 39, "y": 7, "w": 1, "h": 1}},
+    {"id": "bramble_edge_03", "type": "bramble", "x": 30.5, "y": 8.5, "rotation": 0, "rect": {"x": 30, "y": 8, "w": 1, "h": 1}},
+    {"id": "bramble_edge_04", "type": "bramble", "x": 35.5, "y": 8.5, "rotation": 0, "rect": {"x": 35, "y": 8, "w": 1, "h": 1}},
+    {"id": "bramble_edge_05", "type": "bramble", "x": 38.5, "y": 8.5, "rotation": 0, "rect": {"x": 38, "y": 8, "w": 1, "h": 1}},
+    {"id": "hazel_edge_01", "type": "bush_hazel", "x": 19.5, "y": 8.5, "rotation": 0, "rect": {"x": 19, "y": 8, "w": 1, "h": 1}},
+    {"id": "hazel_edge_02", "type": "bush_hazel", "x": 25.5, "y": 8.5, "rotation": 0, "rect": {"x": 25, "y": 8, "w": 1, "h": 1}},
     {"id": "rock_11", "type": "rock", "x": 21.5, "y": 3.5, "rotation": 0, "rect": {"x": 21, "y": 3, "w": 1, "h": 1}},
     {"id": "rock_12", "type": "rock", "x": 31.5, "y": 3.5, "rotation": 0, "rect": {"x": 31, "y": 3, "w": 1, "h": 1}},
     {"id": "tree_edge_01", "type": "tree_oak", "x": 16.5, "y": 6.5, "rotation": 0, "coupable": true, "rect": {"x": 16, "y": 6, "w": 1, "h": 1}},
@@ -661,7 +678,7 @@
       "############........#..#......#..........#######..#...######..##",
       "############....#.........#.........#....#######......######.###",
       "##############.....#..#......#..#......#.#######......######..##",
-      "##############.............#.......#...............#..######..##",
+      "##############.....#.....#.#..#..#.#..#............#..######..##",
       "############............................#...................#.##",
       "##............................................................##",
       "##..............#.............................................##",

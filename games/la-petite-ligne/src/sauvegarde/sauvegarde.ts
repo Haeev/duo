@@ -4,7 +4,7 @@
  * stable des joueurs (jamais au rôle d'hôte ou d'invité).
  */
 import type { GameMap } from '../etat/carte';
-import type { CharacterId, WorldState } from '../etat/types';
+import type { CharacterId, Tree, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
@@ -170,6 +170,15 @@ function checkWeekly(data: Record<string, unknown>): void {
   }
   if (typeof data.morningMist !== 'boolean' || !isRecord(data.letterVariants) || !isRecord(data.content)) {
     throw new SaveError('sauvegarde: champs du tour 8 invalides');
+  }
+  // Seconde vague du tour 8: champs facultatifs (remplis à la reprise s'ils manquent).
+  const recent = data.sharedEnvieRecent;
+  if (recent !== undefined && !(Array.isArray(recent) && recent.every((e) => isRecord(e) && typeof e.id === 'string' && num(e.day)))) {
+    throw new SaveError('sauvegarde: envies à deux tirées invalides');
+  }
+  const trees = Array.isArray(data.trees) ? (data.trees as unknown[]) : [];
+  if (!trees.every((t) => isRecord(t) && (t.felledDay === undefined || t.felledDay === null || num(t.felledDay)))) {
+    throw new SaveError('sauvegarde: arbres invalides');
   }
 }
 
@@ -463,6 +472,7 @@ function resume(
   }
   for (const v of world.villagers) v.talkingWith = [];
   world.stages.choice = { p1: null, p2: null };
+  fillRegrowth(content, world);
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
@@ -473,6 +483,23 @@ function resume(
   if (dataSchema < 5) catchUpWeekly(sim);
   if (scene !== null) startScene(sim, scene.dialogue);
   return sim;
+}
+
+/**
+ * Tour 8, seconde vague (même format 5): le jour d'abattage des arbres et les envies à deux tirées,
+ * absents des sauvegardes écrites avant. Un arbre abattu pendant la démo prend tout le rattrapage
+ * du jour 16 (`trees.catchUpDays`, comme un arbre abattu tôt); abattu après, il redevient une
+ * souche d'aujourd'hui (son jour est perdu).
+ */
+function fillRegrowth(content: Content, world: WorldState): void {
+  const trees = content.settings.trees;
+  const day = world.clock.day;
+  const unknown = day < trees.regrowFromDay ? trees.regrowFromDay - trees.catchUpDays : day;
+  for (const t of world.trees) {
+    const known: number | null | undefined = (t as Partial<Tree>).felledDay;
+    if (known === undefined) t.felledDay = t.felled ? Math.min(unknown, day) : null;
+  }
+  world.sharedEnvieRecent = (world as Partial<WorldState>).sharedEnvieRecent ?? [];
 }
 
 /** Lit le JSON d'une sauvegarde (texte UTF-8 ou valeur déjà décodée par le SDK). */

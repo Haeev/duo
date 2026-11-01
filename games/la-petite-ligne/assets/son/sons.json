@@ -4181,7 +4181,10 @@
           12
         ],
         "volumeDb": 0.0,
-        "notWhen": "pluie"
+        "notWhen": "pluie",
+        "exceptSeasons": [
+          "autumn"
+        ]
       },
       {
         "ambience": "birds-morning",
@@ -4199,7 +4202,11 @@
           30
         ],
         "volumeDb": 0.0,
-        "notWhen": "pluie"
+        "notWhen": "pluie",
+        "exceptSeasons": [
+          "summer",
+          "winter"
+        ]
       },
       {
         "ambience": "village",
@@ -4215,7 +4222,10 @@
           6,
           30
         ],
-        "volumeDb": -3.0
+        "volumeDb": -3.0,
+        "exceptSeasons": [
+          "autumn"
+        ]
       },
       {
         "ambience": "river",
@@ -4234,82 +4244,74 @@
         "ambience": "rain-roof",
         "when": "pluie, dans la maisonnette",
         "volumeDb": 0.0
+      },
+      {
+        "ambience": "birds-morning",
+        "hours": [
+          6,
+          12
+        ],
+        "volumeDb": -6.0,
+        "notWhen": "pluie",
+        "seasons": [
+          "autumn"
+        ]
+      },
+      {
+        "ambience": "crickets-summer",
+        "hours": [
+          19,
+          30
+        ],
+        "volumeDb": 0.0,
+        "notWhen": "pluie",
+        "seasons": [
+          "summer"
+        ]
+      },
+      {
+        "ambience": "swifts",
+        "hours": [
+          7,
+          21
+        ],
+        "volumeDb": 0.0,
+        "notWhen": "pluie",
+        "seasons": [
+          "summer"
+        ]
+      },
+      {
+        "ambience": "wind-leaves",
+        "hours": [
+          6,
+          30
+        ],
+        "volumeDb": -3.0,
+        "seasons": [
+          "autumn"
+        ]
+      },
+      {
+        "ambience": "crows",
+        "hours": [
+          7,
+          18
+        ],
+        "volumeDb": 0.0,
+        "notWhen": "pluie",
+        "seasons": [
+          "autumn"
+        ]
       }
     ],
-    "ambienceBySeason": {
-      "description": "Ambiances de saison (tour 8, docs/jeux/jeu-1/son.md 4.6). replaces: l'ambiance de l'année qu'elle remplace pendant cette saison, aux mêmes heures et au même niveau; silenced: ambiance de l'année qui se tait pendant cette saison.",
-      "rules": [
-        {
-          "season": "summer",
-          "ambience": "crickets-summer",
-          "replaces": "crickets",
-          "hours": [
-            19,
-            30
-          ],
-          "volumeDb": 0.0,
-          "notWhen": "pluie"
-        },
-        {
-          "season": "summer",
-          "ambience": "swifts",
-          "hours": [
-            7,
-            21
-          ],
-          "volumeDb": 0.0,
-          "notWhen": "pluie"
-        },
-        {
-          "season": "autumn",
-          "ambience": "wind-leaves",
-          "replaces": "wind",
-          "hours": [
-            6,
-            30
-          ],
-          "volumeDb": -3.0
-        },
-        {
-          "season": "autumn",
-          "ambience": "crows",
-          "hours": [
-            7,
-            18
-          ],
-          "volumeDb": 0.0,
-          "notWhen": "pluie"
-        },
-        {
-          "season": "autumn",
-          "ambience": "birds-morning",
-          "hours": [
-            6,
-            12
-          ],
-          "volumeDb": -6.0,
-          "notWhen": "pluie",
-          "note": "moins d'oiseaux chanteurs en automne (remplace la règle de 6 h à 12 h)"
-        }
-      ],
-      "silenced": [
-        {
-          "season": "winter",
-          "ambience": "crickets",
-          "note": "pas de grillons l'hiver"
-        }
-      ],
-      "morningMist": {
-        "ambience": "mist-morning",
-        "fadeInMs": 3000,
-        "fullUntil": "9 h",
-        "fadeOutUntil": "10 h 30",
-        "volumeDb": 0.0,
-        "alsoLowerDb": {
-          "birds-morning": -4.0,
-          "village": -3.0
-        },
-        "note": "dès le lever quand world.morningMist est vrai, s'efface avec la brume de 9 h à 10 h 30; la brume étouffe le reste: oiseaux et bourg un peu plus bas"
+    "morningMist": {
+      "description": "Matins de brume (world.morningMist, tour 8): l'ambiance suit la nappe visible (pleine jusqu'à 9 h, éteinte à 10 h 30, d'après weather.mist du jeu); tant qu'elle dure, oiseaux et bourg un peu plus bas.",
+      "ambience": "mist-morning",
+      "volumeDb": 0.0,
+      "alsoLowerDb": {
+        "birds-morning": -4.0,
+        "village": -3.0
       }
     },
     "seasonTurn": {

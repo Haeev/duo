@@ -108,7 +108,7 @@
   },
   "garden": { "cells": 12, "layout": { "w": 4, "d": 3 }, "zone": "garden", "startState": "grass" },
   "quality": { "fineIfWateredEveryDay": true },
-  "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": false },
+  "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": true, "regrowFromDay": 16, "catchUpDays": 6, "stumpDays": 4, "saplingDays": 6, "saplingScale": { "first": 0.3, "perDay": 0.1, "max": 0.8 } },
   "forage": {
     "fromDay": 16,
     "spawnChance": 0.6,
@@ -155,7 +155,8 @@
     "handcar": { "item": "handcar", "from": "handcar_shed", "path": [[0, 4], [-2.5, 4]], "size": [1.4, 1.6], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
     "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" }
   },
-  "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7 },
+  "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7, "unseenFactor": 4, "sharedFromDay": 16, "sharedEveryDays": 3, "sharedNoRepeatDays": 14 },
+  "dialogues": { "datedRepeatDays": 28, "datedRepeatFromDay": 16 },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
   "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0, "eatTogether": 3.0, "stayAt": 4.0 },
   "building": { "twoPlayersSpeedMultiplier": 2 },
@@ -193,5 +194,13 @@
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": { "tier": "P1", "castRange": 6, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
-  "feel": { "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 } }
+  "feel": {
+    "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 },
+    "fishWeightsBySeason": {
+      "spring": { "gudgeon": 6, "chub": 3, "trout": 2 },
+      "summer": { "gudgeon": 6, "chub": 4, "trout": 1 },
+      "autumn": { "gudgeon": 5, "chub": 3, "trout": 3 },
+      "winter": { "gudgeon": 6, "chub": 2, "trout": 0 }
+    }
+  }
 }

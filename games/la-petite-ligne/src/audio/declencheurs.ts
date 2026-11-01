@@ -195,8 +195,25 @@ export function soundsForEvent(
       emit.world('bench-sit', characterAt(world, event.by), event.by);
       break;
     case 'furniture_taken':
-    case 'picked_up':
       emit.world('pickup', characterAt(world, event.by), event.by);
+      break;
+    case 'picked_up': {
+      // Une cueillette a son propre son (herbes, girolles, mûres, noisettes); le reste, `pickup`.
+      const pick = settings.pickSounds[event.item];
+      emit.world(pick !== undefined && ctx.hasSound(pick) ? pick : 'pickup', characterAt(world, event.by), event.by);
+      break;
+    }
+    case 'chop_refused': {
+      // Le refus de la hache est le son lui-même: un coup mat, sans `ui-refusal` (son.md 4.6).
+      const tree = world.trees.find((t) => t.id === event.tree);
+      emit.world('axe-thud-soft', tree === undefined ? characterAt(world, event.by) : { x: tree.pos.x, y: tree.pos.y }, event.by);
+      break;
+    }
+    case 'season_started':
+      emit.ui(`${settings.seasonTurnPrefix}${event.season}`, 'both');
+      break;
+    case 'stage_choice':
+      if (event.choice !== null) emit.ui('ui-confirm', event.by);
       break;
     case 'gave':
     case 'fed_hens':
@@ -317,17 +334,16 @@ export function soundsForEvent(
       if (event.correct) emit.world('hen', hen === undefined ? characterAt(world, event.by) : { x: hen.pos.x, y: hen.pos.y }, event.by);
       break;
     }
-    // Tour 8: `stage_choice`, `stage_continue`, `season_started` et `order_drawn` attendent leurs sons (section 9).
+    // Tour 8: le retour du thème après `stage_continue` suit l'état (musique); la commande tirée arrive par lettre.
     case 'moment_climax':
     case 'moment_paused':
     case 'moment_resumed':
     case 'moment_left':
     case 'hold_released':
     case 'dialogue_choice':
-    case 'stage_choice':
     case 'stage_continue':
-    case 'season_started':
     case 'order_drawn':
+    case 'tree_regrown':
     case 'secret_revealed':
       break;
   }

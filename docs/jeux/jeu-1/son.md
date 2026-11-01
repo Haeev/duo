@@ -70,7 +70,7 @@ Contre la lassitude sur une longue séance (le cahier vise des journées de 16,6
 - Oiseaux du matin de 6 h à 12 h, à -6 dB l'après-midi, jamais sous la pluie ni après 19 h; grillons dès 19 h; bourg de 8 h à 19 h; vent et rivière toujours (le vent à -3 dB); pluie le jour 4 (dehors `rain`, dans la maisonnette `rain-roof`).
 - Rivière: plusieurs sources placées le long du bord sud (une tous les 15 m, chacune avec son propre décalage de départ), entendues jusqu'à la maisonnette, plus fortes au gué.
 - Dans la maisonnette: les ambiances du dehors passent derrière un passe-bas à 900 Hz et à -10 dB (rampe de 600 ms).
-- Saisons et brume du matin (tour 8): règles dans `plan.ambienceBySeason`, une clé à part que le moteur ne lit pas encore (placées dans `ambienceByTime`, ces ambiances joueraient toute l'année). Section 4.6.
+- Saisons et brume du matin (tour 8): règles dans `plan.ambienceByTime` (`seasons`: seulement ces saisons; `exceptSeasons`: pas pendant celles-ci) et `plan.morningMist`, lues par le moteur selon la saison du jour et `world.morningMist` (l'ancienne clé `plan.ambienceBySeason` est retirée). Section 4.6.
 
 ### 3.4 Le train, battement de cœur du jeu
 
@@ -247,7 +247,7 @@ Sons des fiches de `docs/jeux/jeu-1/tour-06-conception.md` et `tour-07-conceptio
 
 ### 4.6 Saisons, brume du matin, cueillette (tour 8)
 
-Sons de `docs/jeux/jeu-1/tour-08-conception.md` (sections 2.2, 2.6, 3.4, 5.1, 5.2 et 9), source `assets-src/son/saisons.py`. Aucun déclencheur n'existe encore dans le code (`season`, `morningMist`, cueillette, refus de la hache): le dev les branchera, les sons sont déclarés dans `sons.json`.
+Sons de `docs/jeux/jeu-1/tour-08-conception.md` (sections 2.2, 2.6, 3.4, 5.1, 5.2 et 9), source `assets-src/son/saisons.py`. Déclencheurs branchés au tour 8 (seconde vague): `season_started`, `world.morningMist`, `picked_up` selon l'objet, `chop_refused` (`src/audio/declencheurs.ts` et `ambiances.ts`).
 
 | Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
 |---|---|---|---|---|---|---|---|
@@ -262,7 +262,7 @@ Sons de `docs/jeux/jeu-1/tour-08-conception.md` (sections 2.2, 2.6, 3.4, 5.1, 5.
 - **La cueillette** remplace `pickup` pour ces objets (un son par sorte, demande de la section 9). Elles se distinguent par la mesure: herbes centroïde 1,7 à 1,8 kHz (une cassure de tige et des feuilles), girolles 0,6 à 0,7 kHz (couinement puis « pop » rond), mûres 2,1 à 2,6 kHz (froissement et épines, deux ou trois « plic »), noisettes 2,8 à 3,0 kHz (trois à cinq « toc » secs). `pickup` est à 1,9 à 2,1 kHz mais ne dure que 0,11 s et n'a qu'un temps. Aucune n'a d'énergie notable sous 300 Hz.
 - **La hache refusée** est le refus lui-même: le jouer seul, sans `ui-refusal`. Elle se distingue de `axe-chop` par l'absence de fer qui sonne et de copeaux, une durée utile plus courte (0,22 à 0,24 s contre 0,29 à 0,37 s), 3,5 dB de moins, et le frémissement des feuilles du rejet à la fin; 34 à 43 % de l'énergie sous 300 Hz (contre 49 à 67 % pour `axe-chop`), pour rester audible sur un portable.
 
-Ambiances (boucles mono, non placées, bus ambiance, dossier `ambiance/`), règles proposées dans `plan.ambienceBySeason`:
+Ambiances (boucles mono, non placées, bus ambiance, dossier `ambiance/`), règles dans `plan.ambienceByTime` et `plan.morningMist`:
 
 | Ambiance | Quand | Remplace | Niveau |
 |---|---|---|---|
