@@ -45,3 +45,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Teinte appliquée à une lumière: la ramener à une luminance de 1 (`unitLuminance` de `surfaces.ts`) pour changer la couleur sans changer la clarté.
 - L'occlusion cuite (`occlusion.ts`) sert aussi en mode léger: sans ombres portées, elle seule pose encore les objets au sol.
 - Port 5281 pris par une autre session: vérifier `ss -ltn` avant de lancer son serveur Vite.
+
+## Sol, berges et gué (tour 8, vérifié le 2026-11-01)
+
+- Rive courbe sans toucher à la grille: une surface d'eau plate et un lit en hauteur continue (`riviere.ts`); la ligne d'eau est là où le lit passe sous la surface. Distance signée floutée: une droite reste en place sous le flou, seuls les angles s'arrondissent. Un nœud qui touche une case sèche compte sec: la ligne d'eau reste dans les cases d'eau (berges marchables au sec).
+- Profil de berge C1: `top + (level - top) u²` jusqu'à la ligne d'eau, puis `level + (deep - level)(1 - (1 - v)²)` avec `run = shore (deep - level) / (level - top)`: pas de replat au ras de l'eau (un replat fait une écume large et floue).
+- Écume selon la vraie profondeur: quelques vaguelettes seulement sur une bande de 4 à 6 cm de profondeur; avec 9 bandes, on dessine des courbes de niveau. Un bruit de quelques centimètres sur un haut-fond proche du seuil trace des lignes fines: garder le fond hors de la bande d'écume.
+- Courant à vitesse variable par pixel: jamais `uv - flow * t * vitesse(x)` (le motif se cisaille avec le temps); une couche à vitesse constante, mêlée par un masque.
+- Motifs procéduraux au sol (pavés, galets): un seul tirage par maille (le motif reste dans sa maille, pas de voisins à lire); `fwidth` calculé hors des branches; fondu vers la teinte moyenne quand un pixel dépasse 5 à 10 cm.
+- Pavés posés entiers: lire le masque au milieu du pavé (centre recalculé dans le shader), le bord de la zone suit les joints.
+- Un lit de rivière en un seul maillage coûte tout son quadrillage à chaque image: le couper en tronçons de 12 m (élimination hors du cadre) a ramené le surcoût de 18 000 à 5 000 triangles pour deux ou trois appels de plus.
+- Machine chargée (charge 18): un lot de dix captures prend plus de 10 min; lancer en arrière-plan.

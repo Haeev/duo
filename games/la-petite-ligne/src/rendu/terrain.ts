@@ -1,10 +1,10 @@
 /**
  * Terrain d'après la grille de la carte: un seul maillage pour tous les sols
  * (texture palette, un appel de dessin), avec des marches propres là où deux
- * sols n'ont pas la même hauteur (berges, gué, traversées), l'eau animée de la
- * rivière, et une bande prolongée au-delà du bord pour ne jamais voir le vide
- * (la rivière, la voie et les chemins continuent; la forêt du pourtour pousse
- * dans `vegetation.ts`).
+ * sols n'ont pas la même hauteur (traversées, sols posés), le lit de la
+ * rivière en pentes douces (`riviere.ts`), l'eau animée, et une bande
+ * prolongée au-delà du bord pour ne jamais voir le vide (la rivière, la voie
+ * et les chemins continuent; la forêt du pourtour pousse dans `vegetation.ts`).
  */
 import {
   BufferAttribute,
@@ -26,6 +26,13 @@ import type { SharedMaterials } from './materiaux';
 import { paletteUv, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
+import {
+  createRiverField,
+  riverTexture,
+  type RiverCell,
+  type RiverField,
+  type RiverStone,
+} from './riviere';
 
 const SETTINGS = RENDER_SETTINGS.terrain;
 const NOISE_SEED_GRASS = 1;
@@ -122,6 +129,44 @@ class GeometryWriter {
     }
   }
 
+  /**
+   * Triangle a, b, c aux normales par sommet (pentes douces du lit de la
+   * rivière), tourné vers le haut.
+   */
+  smoothTriangle(
+    points: readonly (readonly [number, number, number])[],
+    normals: readonly (readonly [number, number, number])[],
+    cell: PaletteCell,
+  ): void {
+    const [p0, p1, p2] = points;
+    const [n0, n1, n2] = normals;
+    if (
+      p0 === undefined ||
+      p1 === undefined ||
+      p2 === undefined ||
+      n0 === undefined ||
+      n1 === undefined ||
+      n2 === undefined
+    ) {
+      return;
+    }
+    this.a.set(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]);
+    this.b.set(p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]);
+    this.n.crossVectors(this.a, this.b);
+    const order: [number, number, number] = this.n.y >= 0 ? [0, 1, 2] : [0, 2, 1];
+    const uv = paletteUv(cell);
+    for (const index of order) {
+      const p = points[index];
+      const normal = normals[index];
+      if (p === undefined || normal === undefined) {
+        continue;
+      }
+      this.positions.push(p[0], p[1], p[2]);
+      this.normals.push(normal[0], normal[1], normal[2]);
+      this.uvs.push(uv.u, uv.v);
+    }
+  }
+
   build(): BufferGeometry {
     const geometry = new BufferGeometry();
     geometry.setAttribute('position', new BufferAttribute(new Float32Array(this.positions), 3));
@@ -135,17 +180,18 @@ class GeometryWriter {
 
 /**
  * Sols dont les coins s'arrondissent entre eux: herbe, chemins, pavés de la
- * place, gravier (écart de hauteur d'au plus `cornerMaxStep`).
+ * place (écart de hauteur d'au plus `cornerMaxStep`). Le gravier des berges et
+ * du gué appartient au lit de la rivière, qui dessine ses propres bords.
  */
-const ROUNDED_KINDS: ReadonlySet<GroundKind> = new Set<GroundKind>([
-  'grass',
-  'path',
-  'stone',
-  'gravel',
-]);
-/** Normale (approchée) d'une berge en pente: vers l'eau et vers le ciel. */
-const BANK_NORMAL_SIDE = 0.6;
-const BANK_NORMAL_UP = 0.8;
+const ROUNDED_KINDS: ReadonlySet<GroundKind> = new Set<GroundKind>(['grass', 'path', 'stone']);
+/** Teinte du lit de la rivière (le shader des surfaces le peint: sable, galets, fond). */
+const RIVER_BED_CELL: PaletteCell = 'sand';
+/** Écart de hauteur (m) sous lequel une case du lit est plate (un seul quadrilatère). */
+const FLAT_EPSILON = 1e-4;
+const SEED_RIVER_STONE = 131;
+const SEED_REED = 151;
+const RIVER_STONE_CELLS: readonly PaletteCell[] = ['rock', 'rock_light', 'rock_dark', 'rock'];
+const REED_CELLS: readonly PaletteCell[] = ['grass_dark', 'moss', 'grass_dark', 'grass_dry'];
 /** Coins d'une case, dans l'ordre du pourtour: direction (sx, sy) vers le coin. */
 const CORNERS = [
   [-1, -1],
@@ -206,6 +252,7 @@ export class Terrain {
       }
     }
     this.findCrossings();
+    this.river = this.buildRiverField();
     const ground = new Mesh(resources.track(this.buildGround()), materials.palette);
     ground.name = 'sol';
     ground.receiveShadow = true;
@@ -221,20 +268,142 @@ export class Terrain {
     outer.receiveShadow = true;
     outer.matrixAutoUpdate = false;
     this.group.add(ground, water, outer);
-    this.placeFordStones(materials, resources);
+    const stones = this.buildRiver(materials, resources);
+    this.river.texture = resources.track(riverTexture(this.river, stones));
   }
 
-  /** Cases du gué (gravier entre deux bras d'eau): fond bas, sous la lame d'eau. */
+  /** Cases du gué (gravier entre deux bras d'eau): haut-fond de galets sous l'eau. */
   private readonly fords = new Set<number>();
+  /** Lit de la rivière: forme des berges et du gué, texture des shaders (sol et eau). */
+  readonly river: RiverField;
+
+  /** Ce qu'est une case pour le lit de la rivière (bande prolongée comprise). */
+  private riverCell(cx: number, cy: number): RiverCell {
+    if (!this.insideBand(cx, cy)) {
+      return 'land';
+    }
+    const look = this.look(cx, cy);
+    if (look.ford) {
+      return 'ford';
+    }
+    if (look.kind === 'water') {
+      return 'water';
+    }
+    return look.kind === 'gravel' ? 'bank' : 'land';
+  }
+
+  /** Vrai si la case appartient au lit de la rivière (eau, gué, berge), dessiné à part. */
+  private inRiverBed(cx: number, cy: number): boolean {
+    return this.riverCell(cx, cy) !== 'land';
+  }
+
+  /** Lit de la rivière sur les rangées qui en contiennent (toute la largeur de la bande). */
+  private buildRiverField(): RiverField {
+    let y0 = Number.POSITIVE_INFINITY;
+    let y1 = Number.NEGATIVE_INFINITY;
+    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
+      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+        if (this.inRiverBed(cx, cy)) {
+          y0 = Math.min(y0, cy);
+          y1 = Math.max(y1, cy + 1);
+          break;
+        }
+      }
+    }
+    if (!Number.isFinite(y0)) {
+      // Carte sans rivière: une grille minuscule, jamais lue.
+      y0 = 0;
+      y1 = 1;
+    }
+    return createRiverField(
+      (cx, cy) => this.riverCell(cx, cy),
+      -this.ext,
+      this.map.width + this.ext,
+      y0,
+      y1,
+    );
+  }
+
+  /** Hauteur dessinée du lit sous un point (berge, gué, fond), ou celle de la case hors du lit. */
+  private bedHeight(x: number, y: number): number {
+    return this.river.bedAt(x, y) ?? this.look(Math.floor(x), Math.floor(y)).height;
+  }
 
   /**
-   * Pierres plates du gué, espacées, dont le dessus affleure la lame d'eau
-   * (l'eau passe entre elles): de 5 à 7 côtés, de 30 à 60 cm.
+   * Lit de la rivière en tronçons de `stripSegment` m le long de x (chacun un
+   * appel de dessin, éliminé hors du cadre): pentes des berges et fond, pierres
+   * plates du gué, pierres rondes des rives, roseaux. Renvoie les pierres qui
+   * affleurent, autour desquelles le courant s'ouvre.
    */
-  private placeFordStones(materials: SharedMaterials, resources: ResourceTracker): void {
-    if (this.fords.size === 0) {
-      return;
+  private buildRiver(materials: SharedMaterials, resources: ResourceTracker): RiverStone[] {
+    const length = SETTINGS.stripSegment;
+    const segmentOf = (x: number): number => Math.floor((x + this.ext) / length);
+    const writers = new Map<number, GeometryWriter>();
+    this.buildRiverBed((cx) => {
+      const key = segmentOf(cx + 0.5);
+      const existing = writers.get(key);
+      if (existing !== undefined) {
+        return existing;
+      }
+      const created = new GeometryWriter();
+      writers.set(key, created);
+      return created;
+    });
+    const builders = new Map<number, ShapeBuilder>();
+    const builderAt = (x: number): ShapeBuilder => {
+      const key = segmentOf(x);
+      const existing = builders.get(key);
+      if (existing !== undefined) {
+        return existing;
+      }
+      const created = new ShapeBuilder();
+      builders.set(key, created);
+      return created;
+    };
+    const pieces = new Map<number, BufferGeometry[]>();
+    const surfacing = this.placeFordStones((x, geometry) => {
+      const key = segmentOf(x);
+      pieces.set(key, [...(pieces.get(key) ?? []), geometry]);
+    });
+    this.bankStones(builderAt);
+    this.reeds(builderAt);
+    for (const [key, builder] of builders) {
+      if (!builder.isEmpty) {
+        pieces.set(key, [...(pieces.get(key) ?? []), builder.build()]);
+      }
     }
+    const keys = new Set([...writers.keys(), ...pieces.keys()]);
+    for (const key of [...keys].sort((a, b) => a - b)) {
+      const parts = [...(pieces.get(key) ?? [])];
+      const writer = writers.get(key);
+      if (writer !== undefined) {
+        parts.unshift(writer.build());
+      }
+      const merged = parts.length === 1 ? parts[0] : mergeGeometries(parts, false);
+      for (const part of parts) {
+        if (part !== merged) {
+          part.dispose();
+        }
+      }
+      if (merged === undefined) {
+        continue;
+      }
+      merged.computeBoundingSphere();
+      const mesh = new Mesh(resources.track(merged), materials.palette);
+      mesh.name = `lit de la riviere ${key}`;
+      mesh.receiveShadow = true;
+      mesh.matrixAutoUpdate = false;
+      this.group.add(mesh);
+    }
+    return surfacing;
+  }
+
+  /**
+   * Pierres plates du gué, espacées, dont le dessus crève la surface (l'eau
+   * passe entre elles): de 5 à 7 côtés, de 30 à 60 cm (bible, 8.7). Chacune
+   * part dans son tronçon par `add`; renvoie leur emprise pour le courant.
+   */
+  private placeFordStones(add: (x: number, geometry: BufferGeometry) => void): RiverStone[] {
     const stones = SETTINGS.fordStones;
     const shapes = stones.sides.map((sides) =>
       new ShapeBuilder()
@@ -249,7 +418,9 @@ export class Terrain {
     const rotation = new Quaternion();
     const euler = new Euler();
     const scale = new Vector3();
-    const parts: BufferGeometry[] = [];
+    const surfacing: RiverStone[] = [];
+    // Dessus à `protrude` au-dessus de la surface: posées sur le haut-fond du gué.
+    const base = SETTINGS.waterSurface + stones.protrude - stones.thickness;
     for (const index of this.fords) {
       const cx = index % this.map.width;
       const cy = Math.floor(index / this.map.width);
@@ -261,26 +432,168 @@ export class Terrain {
         const size = stones.minSize + hash2(cx, cy, 81 + slot) * (stones.maxSize - stones.minSize);
         const x = cx + ox + (hash2(cx, cy, 91 + slot) - 0.5) * stones.jitter;
         const y = cy + oy + (hash2(cx, cy, 101 + slot) - 0.5) * stones.jitter;
-        position.set(x, stones.bed, y);
+        const depth = 0.75 + hash2(cx, cy, 121 + slot) * 0.25;
+        position.set(x, base, y);
         rotation.setFromEuler(euler.set(0, hash2(cx, cy, 111 + slot) * Math.PI * 2, 0));
-        scale.set(size, 1, size * (0.75 + hash2(cx, cy, 121 + slot) * 0.25));
-        parts.push(shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+        scale.set(size, 1, size * depth);
+        add(x, shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+        surfacing.push({ x, y, radius: (size * (1 + depth)) / 4 });
       });
     }
-    // Une seule géométrie fusionnée: un appel de dessin pour toutes les pierres.
-    const merged = parts.length > 0 ? mergeGeometries(parts, false) : null;
-    for (const geometry of [...parts, ...shapes]) {
-      geometry.dispose();
+    for (const shape of shapes) {
+      shape.dispose();
     }
-    if (merged === null) {
-      return;
+    return surfacing;
+  }
+
+  /**
+   * Points de la ligne d'eau (nœuds du lit au-dessus de la surface dont un
+   * voisin est dessous), un au plus par carré de `spacing` m, dans l'ordre de la grille.
+   */
+  private shorePoints(spacing: number): { x: number; y: number }[] {
+    const { bed, width, height, step, originX, originY } = this.river;
+    const level = SETTINGS.waterSurface;
+    const seen = new Set<string>();
+    const out: { x: number; y: number }[] = [];
+    for (let j = 1; j < height - 1; j += 1) {
+      for (let i = 1; i < width - 1; i += 1) {
+        const h = bed[j * width + i] ?? 0;
+        if (h < level) {
+          continue;
+        }
+        const below = [
+          bed[j * width + i + 1],
+          bed[j * width + i - 1],
+          bed[(j + 1) * width + i],
+          bed[(j - 1) * width + i],
+        ].some((v) => v !== undefined && v < level);
+        if (!below) {
+          continue;
+        }
+        const x = originX + i * step;
+        const y = originY + j * step;
+        const key = `${Math.floor(x / spacing)}:${Math.floor(y / spacing)}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          out.push({ x, y });
+        }
+      }
     }
-    merged.computeBoundingSphere();
-    const mesh = new Mesh(resources.track(merged), materials.palette);
-    mesh.name = 'pierres du gue';
-    mesh.receiveShadow = true;
-    mesh.matrixAutoUpdate = false;
-    this.group.add(mesh);
+    return out;
+  }
+
+  /** Vrai si un point de la rive est assez loin du gué et des sols posés (on y passe). */
+  private shoreClear(x: number, y: number, clearance: number): boolean {
+    const margin = SETTINGS.river.stones.margin;
+    if (x < -margin || y < -margin || x > this.map.width + margin || y > this.map.height + margin) {
+      return false;
+    }
+    for (const rect of this.floorRects) {
+      const dx = Math.max(rect.x - x, 0, x - (rect.x + rect.w));
+      const dy = Math.max(rect.y - y, 0, y - (rect.y + rect.h));
+      if (Math.hypot(dx, dy) < clearance) {
+        return false;
+      }
+    }
+    for (const index of this.fords) {
+      const cx = index % this.map.width;
+      const cy = Math.floor(index / this.map.width);
+      const dx = Math.max(cx - x, 0, x - (cx + 1));
+      const dy = Math.max(cy - y, 0, y - (cy + 1));
+      if (Math.hypot(dx, dy) < clearance) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** Pente du lit au point: direction (unitaire) vers où il monte. */
+  private uphill(x: number, y: number): [number, number] {
+    const e = this.river.step;
+    const gx = this.bedHeight(x + e, y) - this.bedHeight(x - e, y);
+    const gy = this.bedHeight(x, y + e) - this.bedHeight(x, y - e);
+    const length = Math.hypot(gx, gy);
+    return length > 1e-6 ? [gx / length, gy / length] : [0, -1];
+  }
+
+  /**
+   * Pierres rondes des rives (bible, 8.7): un rang au ras de l'eau, à demi
+   * noyé, et un rang de plus petites un peu plus haut sur la pente.
+   */
+  private bankStones(builderAt: (x: number) => ShapeBuilder): void {
+    const s = SETTINGS.river.stones;
+    const level = SETTINGS.waterSurface;
+    for (const { x, y } of this.shorePoints(s.spacing)) {
+      if (!this.shoreClear(x, y, s.clearance)) {
+        continue;
+      }
+      const qx = Math.round(x * 8);
+      const qy = Math.round(y * 8);
+      const pick = <T>(list: readonly T[], seed: number): T | undefined =>
+        list[Math.floor(hash2(qx, qy, seed) * list.length)];
+      if (hash2(qx, qy, SEED_RIVER_STONE) < s.lowChance) {
+        const size = s.lowSize[0] + hash2(qx, qy, SEED_RIVER_STONE + 1) * (s.lowSize[1] - s.lowSize[0]);
+        builderAt(x).ball(size / 2, [x, level - size * 0.12, y], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 2) ?? 'rock', {
+          scale: [1, 0.62, 0.8 + hash2(qx, qy, SEED_RIVER_STONE + 3) * 0.3],
+          rotation: [0, hash2(qx, qy, SEED_RIVER_STONE + 4) * 360, 0],
+        });
+      }
+      if (hash2(qx, qy, SEED_RIVER_STONE + 5) < s.highChance) {
+        // Remonter la pente jusqu'à `highAbove` au-dessus de l'eau.
+        const [ux, uy] = this.uphill(x, y);
+        let px = x;
+        let py = y;
+        for (let k = 0; k < 16 && this.bedHeight(px, py) < level + s.highAbove; k += 1) {
+          px += ux * 0.05;
+          py += uy * 0.05;
+        }
+        const along = (hash2(qx, qy, SEED_RIVER_STONE + 6) - 0.5) * s.spacing;
+        px += -uy * along;
+        py += ux * along;
+        const size = s.highSize[0] + hash2(qx, qy, SEED_RIVER_STONE + 7) * (s.highSize[1] - s.highSize[0]);
+        builderAt(px).ball(size / 2, [px, this.bedHeight(px, py) + size * 0.12, py], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 8) ?? 'rock_light', {
+          scale: [1, 0.55, 0.85],
+          rotation: [0, hash2(qx, qy, SEED_RIVER_STONE + 9) * 360, 0],
+        });
+      }
+    }
+  }
+
+  /** Touffes de roseaux posées sur la ligne d'eau la plus proche de leur place (réglages). */
+  private reeds(builderAt: (x: number) => ShapeBuilder): void {
+    const r = SETTINGS.river;
+    const shore = this.shorePoints(r.stones.spacing / 2);
+    r.reeds.forEach((clump, index) => {
+      let best: { x: number; y: number } | null = null;
+      let bestDistance = 2;
+      for (const point of shore) {
+        const d = Math.hypot(point.x - clump.x, point.y - clump.y);
+        if (d < bestDistance) {
+          best = point;
+          bestDistance = d;
+        }
+      }
+      if (best === null) {
+        return;
+      }
+      for (let stem = 0; stem < clump.stems; stem += 1) {
+        const seed = SEED_REED + index * 31 + stem;
+        const angle = hash2(index, stem, seed) * Math.PI * 2;
+        const reach = Math.sqrt(hash2(index, stem, seed + 1)) * 0.38;
+        const x = best.x + Math.cos(angle) * reach;
+        const y = best.y + Math.sin(angle) * reach * 0.7;
+        const tall = r.reedHeight[0] + hash2(index, stem, seed + 2) * (r.reedHeight[1] - r.reedHeight[0]);
+        // Les tiges penchent un peu, chacune à sa façon (pas de gerbe parfaite).
+        const lean = (hash2(index, stem, seed + 3) - 0.5) * 16;
+        const turn = hash2(index, stem, seed + 4) * 360;
+        const cell = REED_CELLS[Math.floor(hash2(index, stem, seed + 5) * REED_CELLS.length)] ?? 'grass_dark';
+        builderAt(x).cone(r.reedRadius, tall, [x, this.bedHeight(x, y) - 0.04, y], cell, {
+          base: true,
+          segments: 3,
+          rotation: [lean, turn, lean / 2],
+        });
+      }
+    });
   }
 
   /** Case de la carte ou de la bande prolongée (coordonnées rabattues sur le bord). */
@@ -295,25 +608,23 @@ export class Terrain {
       (kind === 'water' && this.map.blocked[index] === false) ||
       (inside && kind === 'gravel' && this.fords.has(index));
     const height = ford
-      ? kind === 'gravel'
-        ? SETTINGS.fordStones.bed
-        : SETTINGS.fordBed
+      ? SETTINGS.fordBed
       : kind === 'water'
         ? SETTINGS.heights.water
         : SETTINGS.heights[kind];
     return { kind, ford, height };
   }
 
-  /** Hauteur du sol sous un point (pour poser personnages, objets et décor). */
-  /** Hauteur de la surface de l'eau dessinée sous un point, ou `null` hors de l'eau (bouchon, ronds dans l'eau). */
+  /**
+   * Hauteur de la surface de l'eau dessinée sous un point, ou `null` hors de
+   * l'eau (bouchon, ronds dans l'eau). Le gué est sous la même surface que la rivière.
+   */
   waterLevelAt(x: number, y: number): number | null {
     const look = this.look(Math.floor(x), Math.floor(y));
-    if (look.kind !== 'water') {
-      return null;
-    }
-    return look.ford ? SETTINGS.fordBed + SETTINGS.waveAmplitude * 2 : SETTINGS.waterSurface;
+    return look.kind === 'water' || look.ford ? SETTINGS.waterSurface : null;
   }
 
+  /** Hauteur du sol sous un point (pour poser personnages, objets et décor). */
   heightAt(x: number, y: number): number {
     for (const rect of this.floorRects) {
       if (inRect(rect, x, y)) {
@@ -327,8 +638,12 @@ export class Terrain {
       }
     }
     const look = this.look(Math.floor(x), Math.floor(y));
-    if (look.kind === 'water') {
-      return look.ford ? SETTINGS.fordBed : SETTINGS.waterSurface;
+    if (look.kind === 'water' && !look.ford) {
+      return SETTINGS.waterSurface;
+    }
+    if (look.kind === 'water' || look.kind === 'gravel') {
+      // Berge et gué: le lit tel qu'il est dessiné (pentes douces, haut-fond de galets).
+      return this.bedHeight(x, y);
     }
     let ground = look.height;
     for (const crossing of this.crossings) {
@@ -359,11 +674,8 @@ export class Terrain {
       case 'dirt':
         return 'soil';
       case 'gravel':
-        // Gué: fond de sable et de galets sombres sous l'eau, plus de chaussée pavée.
-        if (look.ford) {
-          return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'rock_dark' : 'sand';
-        }
-        return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'ballast' : 'sand';
+        // Berge et gué: dessinés par le lit de la rivière, que le shader peint (plus de damier).
+        return RIVER_BED_CELL;
       case 'wood':
         return cx % 2 === 0 ? 'wood' : 'wood_dark';
       case 'floor':
@@ -373,7 +685,8 @@ export class Terrain {
       case 'rail':
         return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'ballast_dark' : 'ballast';
       case 'stone':
-        return hash2(cx, cy) < COBBLE_DARK_CHANCE ? 'cobble_dark' : 'cobble';
+        // Une seule teinte: le shader des surfaces pose pavés et terre battue (bandes plus longues, moins de triangles).
+        return 'cobble';
     }
   }
 
@@ -513,32 +826,94 @@ export class Terrain {
     }
   }
 
-  /** Le côté vers (nx, ny) est une berge en pente: case sèche au-dessus d'une eau profonde. */
-  private bankSlopes(look: CellLook, nx: number, ny: number): boolean {
-    if (look.kind === 'water' || !this.insideBand(nx, ny)) {
-      return false;
-    }
-    const other = this.look(nx, ny);
-    return other.kind === 'water' && !other.ford;
+  /** Normale du lit au point (pente douce): différences centrées sur la grille fine. */
+  private bedNormal(x: number, y: number): [number, number, number] {
+    const e = this.river.step;
+    const nx = -(this.bedHeight(x + e, y) - this.bedHeight(x - e, y)) / (2 * e);
+    const nz = -(this.bedHeight(x, y + e) - this.bedHeight(x, y - e)) / (2 * e);
+    const length = Math.hypot(nx, 1, nz);
+    return [nx / length, 1 / length, nz / length];
   }
 
-  /** Coin saillant d'une berge (eau sur deux côtés voisins): on bouche l'angle entre les deux pentes. */
-  private bankCorners(writer: GeometryWriter, cx: number, cy: number, look: CellLook): void {
-    const slope = SETTINGS.bankSlope;
-    const low = SETTINGS.heights.water;
-    for (const [sx, sy] of CORNERS) {
-      if (!this.bankSlopes(look, cx + sx, cy) || !this.bankSlopes(look, cx, cy + sy)) {
-        continue;
+  /**
+   * Lit de la rivière (berges, gué, fond): une case plate reste un seul
+   * quadrilatère; une case en pente est quadrillée (`river.subdivisions`), aux
+   * normales douces. Au bord de la bande prolongée, une joue ferme le lit
+   * jusqu'au pourtour.
+   */
+  private buildRiverBed(writerAt: (cx: number) => GeometryWriter): void {
+    const n = SETTINGS.river.subdivisions;
+    const size = 1 / n;
+    const ring = -SETTINGS.outerDrop;
+    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
+      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+        if (!this.inRiverBed(cx, cy)) {
+          continue;
+        }
+        const writer = writerAt(cx);
+        const heights: number[] = [];
+        for (let j = 0; j <= n; j += 1) {
+          for (let i = 0; i <= n; i += 1) {
+            heights.push(this.bedHeight(cx + i * size, cy + j * size));
+          }
+        }
+        const first = heights[0] ?? 0;
+        const point = (i: number, j: number): [number, number, number] => [
+          cx + i * size,
+          heights[j * (n + 1) + i] ?? first,
+          cy + j * size,
+        ];
+        if (heights.every((h) => Math.abs(h - first) < FLAT_EPSILON)) {
+          writer.quad([point(0, 0), point(0, n), point(n, n), point(n, 0)], [0, 1, 0], RIVER_BED_CELL);
+        } else {
+          const normals: [number, number, number][] = [];
+          for (let j = 0; j <= n; j += 1) {
+            for (let i = 0; i <= n; i += 1) {
+              normals.push(this.bedNormal(cx + i * size, cy + j * size));
+            }
+          }
+          const normal = (i: number, j: number): [number, number, number] =>
+            normals[j * (n + 1) + i] ?? [0, 1, 0];
+          for (let j = 0; j < n; j += 1) {
+            for (let i = 0; i < n; i += 1) {
+              writer.smoothTriangle(
+                [point(i, j), point(i + 1, j + 1), point(i + 1, j)],
+                [normal(i, j), normal(i + 1, j + 1), normal(i + 1, j)],
+                RIVER_BED_CELL,
+              );
+              writer.smoothTriangle(
+                [point(i, j), point(i, j + 1), point(i + 1, j + 1)],
+                [normal(i, j), normal(i, j + 1), normal(i + 1, j + 1)],
+                RIVER_BED_CELL,
+              );
+            }
+          }
+        }
+        // Joues au bord de la bande: le lit ne s'ouvre jamais sur le vide.
+        for (const side of SIDES) {
+          if (this.insideBand(cx + side.dx, cy + side.dy)) {
+            continue;
+          }
+          for (let s = 0; s < n; s += 1) {
+            const [a, b]: [[number, number], [number, number]] =
+              side.dx === 1
+                ? [[n, s], [n, s + 1]]
+                : side.dx === -1
+                  ? [[0, s], [0, s + 1]]
+                  : side.dy === 1
+                    ? [[s, n], [s + 1, n]]
+                    : [[s, 0], [s + 1, 0]];
+            const pa = point(a[0], a[1]);
+            const pb = point(b[0], b[1]);
+            const facesOut = (pa[1] + pb[1]) / 2 > ring;
+            writer.quad(
+              [pa, pb, [pb[0], ring, pb[2]], [pa[0], ring, pa[2]]],
+              facesOut ? [side.dx, 0, side.dy] : [-side.dx, 0, -side.dy],
+              'bank',
+            );
+          }
+        }
       }
-      const px = cx + (sx > 0 ? 1 : 0);
-      const pz = cy + (sy > 0 ? 1 : 0);
-      const top: [number, number, number] = [px, look.height, pz];
-      const a: [number, number, number] = [px + sx * slope, low, pz];
-      const b: [number, number, number] = [px, low, pz + sy * slope];
-      const d: [number, number, number] = [px + sx * slope, low, pz + sy * slope];
-      const normal = [sx * BANK_NORMAL_SIDE, BANK_NORMAL_UP, sy * BANK_NORMAL_SIDE] as const;
-      writer.triangle(top, a, d, normal, 'bank');
-      writer.triangle(top, d, b, normal, 'bank');
     }
   }
 
@@ -554,8 +929,9 @@ export class Terrain {
       for (let cx = -this.ext; cx <= this.map.width + this.ext; cx += 1) {
         const atEnd = cx === this.map.width + this.ext;
         const raw = atEnd ? null : this.look(cx, cy);
-        // Les traversées en planches sont dessinées à part (`buildCrossing`).
-        const look = raw !== null && raw.kind === 'wood' ? null : raw;
+        // Les traversées en planches (`buildCrossing`) et le lit de la rivière sont dessinés à part.
+        const look =
+          raw !== null && (raw.kind === 'wood' || this.inRiverBed(cx, cy)) ? null : raw;
         const cell = look === null ? null : this.topCell(look, cx, cy);
         const fills = look === null ? null : this.roundedCorners(cx, cy, look);
         if (
@@ -590,10 +966,9 @@ export class Terrain {
       // Côtés: une marche là où le voisin est plus bas; au bord de la bande, on ferme vers le pourtour.
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
-        if (look.kind === 'wood') {
+        if (look.kind === 'wood' || this.inRiverBed(cx, cy)) {
           continue;
         }
-        this.bankCorners(writer, cx, cy, look);
         const h = look.height;
         for (const side of SIDES) {
           const outside = !this.insideBand(cx + side.dx, cy + side.dy);
@@ -603,7 +978,9 @@ export class Terrain {
           if (
             neighbourHeight === h ||
             (!outside && neighbourHeight > h) ||
-            (!outside && this.look(cx + side.dx, cy + side.dy).kind === 'wood')
+            (!outside && this.look(cx + side.dx, cy + side.dy).kind === 'wood') ||
+            // Le lit de la rivière rejoint ses voisins à leur hauteur: pas de marche.
+            (!outside && this.inRiverBed(cx + side.dx, cy + side.dy))
           ) {
             continue;
           }
@@ -615,24 +992,15 @@ export class Terrain {
           const alongX = side.dx === 0;
           const x1 = alongX ? x0 + 1 : x0;
           const z1 = alongX ? z0 : z0 + 1;
-          // Berge de rivière: une pente douce qui descend sous l'eau, plus de quai droit.
-          const slope =
-            !outside && this.bankSlopes(look, cx + side.dx, cy + side.dy) ? SETTINGS.bankSlope : 0;
-          const sx = side.dx * slope;
-          const sz = side.dy * slope;
           writer.quad(
             [
-              [x0 + sx, low, z0 + sz],
-              [x1 + sx, low, z1 + sz],
+              [x0, low, z0],
+              [x1, low, z1],
               [x1, high, z1],
               [x0, high, z0],
             ],
-            slope > 0
-              ? [side.dx * BANK_NORMAL_SIDE, BANK_NORMAL_UP, side.dy * BANK_NORMAL_SIDE]
-              : facesOut
-                ? [side.dx, 0, side.dy]
-                : [-side.dx, 0, -side.dy],
-            slope > 0 ? 'bank' : this.sideCell(look.kind),
+            facesOut ? [side.dx, 0, side.dy] : [-side.dx, 0, -side.dy],
+            this.sideCell(look.kind),
           );
         }
       }
@@ -721,10 +1089,11 @@ export class Terrain {
     for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
-        if (look.kind !== 'water') {
+        // Une seule surface pour la rivière et le gué (le lit monte au-dessus d'elle sur les berges).
+        if (look.kind !== 'water' && !look.ford) {
           continue;
         }
-        const h = look.ford ? SETTINGS.fordBed + SETTINGS.waveAmplitude * 2 : SETTINGS.waterSurface;
+        const h = SETTINGS.waterSurface;
         for (let sy = 0; sy < steps; sy += 1) {
           for (let sx = 0; sx < steps; sx += 1) {
             const x = cx + sx * size;

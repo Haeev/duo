@@ -7,7 +7,9 @@
  * - des rides qui suivent le courant (deux bruits qui défilent);
  * - le ciel reflété (sa couleur suit l'heure: aube rose, midi bleu, soir doré,
  *   nuit bleu sombre), plus ou moins fort selon les rides;
- * - l'écume qui bat le long des berges, et une lame d'eau vive sur le gué;
+ * - l'écume qui bat le long des berges et autour des pierres (profondeur vraie
+ *   lue dans le lit de `riviere.ts`), et sur le gué le courant vif qui file
+ *   entre les pierres en traînées claires et en sillages;
  * - des étincelles de soleil (et de lune, plus discrètes, la nuit);
  * - les ombres des nuages et les lumières de sol de `surfaces.ts`.
  */
@@ -90,15 +92,45 @@ diffuseColor.rgb = mix(waterBase, uReflection, mirror);
 // Reflets doux: de longues taches claires étirées dans le sens du courant, qui glissent lentement.
 float sheenNoise = texture(uAmbNoise, vec2(rippleUv.x * 0.35, rippleUv.y * 1.6) - uFlow * uAmbTime * 0.6).r;
 diffuseColor.rgb = mix(diffuseColor.rgb, uReflection * 1.12, smoothstep(uSheen.y, uSheen.y + 0.2, sheenNoise) * uSheen.x);
+// Profondeur vraie sous ce point (m), lue dans le lit dessiné (\`riviere.ts\`): la ligne d'eau courbe,
+// les pierres du gué qui crèvent la surface. Hors du lit, une estimation par la distance à la berge.
+vec4 waterBed = ambRiver(vAmbWorld.xz);
+float waterBedHeight = uRiverParams.y + waterBed.r * uRiverParams.z;
+float waterTrue = waterBed.a > 0.0 ? uRiverParams.x - waterBedHeight : waterDepth * 0.3;
+float waterRiffle = waterBed.g;
 // Sous la berge, l'eau s'assombrit et verdit (ombre et reflet du talus): le bord prend du relief.
-float bankShade = (1.0 - smoothstep(0.0, uBankParams.x, waterDepth)) * uBankParams.y;
+float bankShade = (1.0 - smoothstep(0.0, uBankParams.x * 0.3, waterTrue)) * uBankParams.y * (1.0 - waterRiffle);
 diffuseColor.rgb = mix(diffuseColor.rgb, uBankShade, bankShade);
-// Écume: des vaguelettes qui battent la berge, déchirées par le bruit.
-float nearBank = 1.0 - smoothstep(0.0, uFoamParams.x, waterDepth);
-float beat = 0.5 + 0.5 * sin(waterDepth * uFoamParams.z * 6.2831853 - uAmbTime * uFoamParams.y * 6.2831853);
-float foam = nearBank * smoothstep(0.35, 0.75, beat * 0.6 + ripple2 * 0.6) * uFoamParams.w;
+// Écume: des vaguelettes qui battent la rive et le tour des pierres, déchirées par le bruit.
+// Quelques vaguelettes seulement (\`foamBands\` sur la largeur de l'écume): plus fines, elles dessinent des courbes de niveau.
+float nearBank = 1.0 - smoothstep(0.0, uFoamParams.x * 0.13, waterTrue);
+float beat = 0.5 + 0.5 * sin(max(waterTrue, 0.0) / (uFoamParams.x * 0.13) * uFoamParams.z * 0.25 * 6.2831853 - uAmbTime * uFoamParams.y * 6.2831853);
+// Pas de vaguelettes sur le gué: le courant y couche l'eau (traînées et collerettes plus bas).
+float foam = nearBank * smoothstep(0.45, 0.8, beat * 0.5 + ripple2 * 0.7) * uFoamParams.w * (1.0 - waterBed.g);
+// Gué: le courant vif file entre les pierres en traînées claires, et s'ouvre en sillage derrière chacune.
+vec2 flowDir = normalize(uFlow);
+vec2 flowAt = vec2(dot(vAmbWorld.xz, flowDir), dot(vAmbWorld.xz, vec2(-flowDir.y, flowDir.x)));
+float rushA = texture(uAmbNoise, vec2(flowAt.x * 0.55 - uAmbTime * 0.9, flowAt.y * 3.2)).r;
+float rushB = texture(uAmbNoise, vec2(flowAt.x * 1.2 - uAmbTime * 1.6, flowAt.y * 5.5 + 0.41)).r;
+float rush = smoothstep(0.56, 0.76, rushA * 0.55 + rushB * 0.55) * waterRiffle;
+float wake = 0.0;
+if (waterRiffle > 0.0) {
+  for (int i = 1; i <= 3; i++) {
+    vec4 upstream = ambRiver(vAmbWorld.xz - flowDir * 0.16 * float(i));
+    float upHeight = uRiverParams.y + upstream.r * uRiverParams.z;
+    wake = max(wake, smoothstep(uRiverParams.x - 0.03, uRiverParams.x + 0.01, upHeight) * (1.0 - 0.24 * float(i)));
+  }
+}
+float wakeFoam = wake * smoothstep(0.42, 0.7, rushB) * 0.85;
+foam = max(foam, max(rush * 0.75, wakeFoam));
+// Collerette blanche là où l'eau bute contre une pierre du gué (le coussin d'eau qui se relève).
+float collar = (1.0 - smoothstep(-0.045, -0.025, waterTrue)) * waterRiffle;
+foam = max(foam, collar * 0.8 * smoothstep(0.3, 0.6, ripple2 + 0.15));
+// Le courant vif ride plus fin et plus vite: la surface du gué scintille de petites facettes.
+diffuseColor.rgb = mix(diffuseColor.rgb, mix(diffuseColor.rgb, uReflection * 1.15, rushA), waterRiffle * 0.35);
 diffuseColor.rgb = mix(diffuseColor.rgb, uFoam, foam);
-diffuseColor.a = mix(uWaterParams.w, diffuseColor.a, smoothstep(0.0, 0.6, waterDepth));
+// Eau peu profonde plus transparente: on voit le sable, les galets et le pied des pierres.
+diffuseColor.a = mix(uWaterParams.w * 0.7, diffuseColor.a, smoothstep(0.0, 0.3, waterTrue));
 diffuseColor.a = max(diffuseColor.a, foam);
 // Étincelles: deux motifs fins qui se croisent vite; leur produit ne dépasse le seuil qu'en petits points fugaces.
 vec2 glintUv = rippleUv * uGlintParams.x;
@@ -116,7 +148,7 @@ reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, vec3(0.0, 1.0, 0.0)) * m
 totalEmissiveRadiance += uGlintColor * waterGlint * waterCloud;
 `;
 
-/** Matériau de la rivière (et de la lame d'eau du gué, avec `opacity` plus basse). */
+/** Matériau de la rivière et du gué (une seule surface). */
 export function createWaterMaterial(
   field: TerrainField,
   surfaces: SurfaceUniforms,

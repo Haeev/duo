@@ -451,6 +451,13 @@ export const AMBIANCE_SETTINGS = {
     stoneVariation: 0.5,
     /** Seules les faces tournées vers le haut et plus basses que cela (m) sont du sol. */
     groundMaxHeight: 0.6,
+    /**
+     * Pavés de la place (tour 8): largeur des joints (m), et écart de teinte
+     * d'un pavé à l'autre, en part de l'écart entre `cobble` et `cobble_dark`
+     * (bible, 8.7: 8 niveaux de gris au plus; les deux tons en ont 29).
+     */
+    pavingJoint: 0.024,
+    pavingTint: 0.27,
   },
 
   /** Lueurs de nuit: halos autour des lanternes et des fenêtres, flaques de lumière chaude au sol. */
@@ -539,10 +546,6 @@ export const AMBIANCE_SETTINGS = {
     waveAmplitude: 0.02,
     waveSpeed: 1.3,
     waveLength: 3.2,
-    /** Lame d'eau sur les galets du gué: hauteur au-dessus du gravier et opacité. */
-    fordLift: 0.05,
-    fordOpacity: 0.3,
-    fordFoam: 0.2,
     /** Rugosité de la surface (reflet du soleil). */
     roughness: 0.14,
     /**

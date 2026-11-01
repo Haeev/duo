@@ -23,11 +23,14 @@ import {
   type WebGLRenderer,
 } from 'three';
 import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
+import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
+import { RIVER_BED_MIN, RIVER_BED_RANGE, RIVER_SAND_RANGE } from './riviere';
 
 /**
  * Cases du sol dont la teinte devient continue, dans l'ordre des couleurs de
- * `uGroundColors`: trois verts, puis pavés (clair, sombre) et chemins (clair, sombre).
+ * `uGroundColors`: trois verts, pavés (clair, sombre), chemins (clair,
+ * sombre), puis le lit de la rivière: sable, berge (fond), galets (trois tons).
  */
 export const GROUND_CELLS = [
   'grass_dark',
@@ -37,6 +40,11 @@ export const GROUND_CELLS = [
   'cobble_dark',
   'path',
   'path_dark',
+  'sand',
+  'bank',
+  'rock',
+  'rock_light',
+  'rock_dark',
 ] as const satisfies readonly PaletteCell[];
 
 /** Coefficients de luminance (Rec. 709, linéaire). */
@@ -73,6 +81,21 @@ export interface SurfaceUniforms {
   /** Sol continu: couleurs (linéaires) des verts, des pavés et des chemins, et réglages. */
   uGroundColors: { value: Color[] };
   uGroundParams: { value: Vector4 };
+  /**
+   * Lit de la rivière (`riviere.ts`, tour 8): texture (R: hauteur du lit et des
+   * pierres, G: courant vif, B: distance signée au sable), son rectangle, et
+   * surface de l'eau, minimum et étendue des hauteurs codées, étendue du sable (m).
+   */
+  uRiverField: { value: Texture | null };
+  uRiverRect: { value: Vector4 };
+  uRiverParams: { value: Vector4 };
+  /**
+   * Pavés de la place (tour 8): pas d'un rang, longueur d'un pavé, largeur des
+   * joints (m), écart de teinte entre pavés; anneau du puits: centre (x, z), rayon (m), présent (1).
+   * Où sont les pavés: canaux B (cases de pavés) et A (pavées ou terre battue) de `uLookField`.
+   */
+  uPaving: { value: Vector4 };
+  uPavingRing: { value: Vector4 };
   /** Passe « maquette » (tour 8, réglages `look`): occlusion cuite, ombres teintées, bord, étalonnage. */
   uLookField: { value: Texture | null };
   uLookRect: { value: Vector4 };
@@ -138,6 +161,25 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
     uGroundParams: {
       value: new Vector4(1 / s.groundPatch, s.groundDetail, s.stoneVariation, s.groundMaxHeight),
     },
+    uRiverField: { value: null },
+    uRiverRect: { value: new Vector4(0, 0, 0, 0) },
+    uRiverParams: {
+      value: new Vector4(
+        RENDER_SETTINGS.terrain.waterSurface,
+        RIVER_BED_MIN,
+        RIVER_BED_RANGE,
+        RIVER_SAND_RANGE,
+      ),
+    },
+    uPaving: {
+      value: new Vector4(
+        RENDER_SETTINGS.terrain.square.rowPitch,
+        RENDER_SETTINGS.terrain.square.stoneLength,
+        s.pavingJoint,
+        s.pavingTint,
+      ),
+    },
+    uPavingRing: { value: new Vector4(0, 0, 0, 0) },
     uLookField: { value: null },
     uLookRect: { value: new Vector4(0, 0, 1, 1) },
     uLookHeight: { value: new Vector2(0, 1) },
@@ -263,6 +305,152 @@ uniform vec4 uGrade;       // saturation, contraste, relevé des noirs, allumé
 uniform vec3 uGradeBalance;
 uniform vec4 uVignette;    // force, début, 1 / largeur, 1 / hauteur
 uniform vec3 uVignetteColor;
+uniform sampler2D uRiverField;
+uniform vec4 uRiverRect;
+uniform vec4 uRiverParams; // surface de l'eau, hauteur min et étendue codées, étendue du sable
+uniform vec4 uPaving;      // pas d'un rang, longueur d'un pavé, joint, écart de teinte
+uniform vec4 uPavingRing;  // centre (x, z), rayon, présent
+
+float ambHash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+/** Champ du lit de la rivière au point (R: lit, G: courant vif, B: sable); tout à zéro hors de lui. */
+vec4 ambRiver(vec2 xz) {
+  vec2 uv = (xz - uRiverRect.xy) * uRiverRect.zw;
+  if (uRiverRect.z <= 0.0 || any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0)))) return vec4(0.0);
+  return texture(uRiverField, uv);
+}
+
+/** Herbe continue: les trois verts mêlés par le bruit des taches. */
+vec3 ambGreen(float patchNoise) {
+  float g = smoothstep(0.25, 0.75, patchNoise);
+  vec3 lowGreen = mix(uGroundColors[0], uGroundColors[1], smoothstep(0.0, 0.5, g));
+  return mix(lowGreen, uGroundColors[2], smoothstep(0.5, 1.0, g));
+}
+
+/** Part de sable au point (bord qui ondule entre le sable des rives et l'herbe). */
+float ambSand(vec4 river, vec2 xz, float pixel) {
+  if (river.a <= 0.0) return 0.0;
+  float side = (river.b - 0.5) * 2.0 * uRiverParams.w;
+  float grain = texture(uAmbNoise, xz * 0.7 + 0.13).r - 0.5;
+  float soft = max(0.03, pixel);
+  return smoothstep(-soft, soft, side + grain * 0.06);
+}
+
+/**
+ * Galets: au plus un par maille de \`size\` m, entier dans sa maille (un seul
+ * tirage, pas de voisins à lire). Renvoie la part de galet (bord adouci) et sa teinte.
+ */
+float ambPebble(vec2 xz, float size, float density, float pixel, float seed, out vec3 tone) {
+  vec2 q = xz / size;
+  vec2 id = floor(q) + seed;
+  vec2 f = fract(q);
+  float h1 = ambHash(id);
+  float h2 = ambHash(id + 17.3);
+  float h3 = ambHash(id + 41.7);
+  float radius = 0.26 + 0.17 * h2;
+  vec2 centre = vec2(radius) + (1.0 - 2.0 * radius) * vec2(h1, h3);
+  float r = length((f - centre) * vec2(1.0, 1.0 + 0.6 * h1)) / radius;
+  float soft = max(0.08, pixel / (size * radius));
+  float present = step(ambHash(id + 5.1), density);
+  tone = h3 < 0.4 ? uGroundColors[9] : (h3 < 0.75 ? uGroundColors[10] : uGroundColors[11]);
+  // Dessus bombé: le galet s'éclaire en son milieu.
+  tone *= 1.06 - 0.16 * r * r;
+  return present * (1.0 - smoothstep(1.0 - soft, 1.0, r));
+}
+
+/**
+ * Lit de la rivière: sable sec, sable mouillé au ras de l'eau, galets sur la
+ * ligne d'eau et sur le gué, fond brun-vert qui s'assombrit avec la profondeur.
+ */
+vec3 ambBed(vec3 p, vec4 river, float patchNoise, float pixel) {
+  float above = p.y - uRiverParams.x;
+  vec3 sand = mix(uGroundColors[7], mix(uGroundColors[7], uGroundColors[6], 0.35), patchNoise);
+  float wet = 1.0 - smoothstep(0.0, 0.07, above);
+  vec3 c = mix(sand, sand * vec3(0.8, 0.78, 0.74), wet);
+  float under = smoothstep(0.0, 0.22, -above);
+  c = mix(c, uGroundColors[8] * vec3(0.9, 0.95, 0.85), under);
+  // Galets: serrés au ras de l'eau et sur le gué, épars plus haut sur la grève.
+  float band = 1.0 - smoothstep(0.03, 0.14, abs(above + 0.02));
+  float density = max(max(band * 0.6, river.g * 0.7 * under), 0.07 * (1.0 - smoothstep(0.0, 0.25, above)));
+  vec3 tone;
+  float pebble = ambPebble(p.xz, 0.17, density, pixel, 0.0, tone);
+  vec3 small;
+  float grit = ambPebble(p.xz, 0.09, density * 0.35, pixel, 7.0, small);
+  float detail = 1.0 - smoothstep(0.03, 0.08, pixel);
+  c = mix(c, mix(small, c, 0.55), grit * detail);
+  c = mix(c, mix(mix(tone, c, 0.3), tone * 0.8, wet), pebble * detail);
+  // De loin, les galets se fondent en une teinte de grève.
+  c = mix(c, mix(c, uGroundColors[9], density * 0.35), 1.0 - detail);
+  return c;
+}
+
+/**
+ * Pavés de la place, en rangs décalés (ou en anneaux autour du puits). Renvoie
+ * la teinte du pavé (joint compris), et dans \`centre\` le milieu du pavé dans
+ * le monde (le shader y lit s'il est posé: le bord de la zone suit les joints).
+ */
+vec3 ambPaving(vec2 xz, float patchNoise, float pixel, out vec2 centre, out float stoneHash) {
+  float pitch = uPaving.x;
+  float len = uPaving.y;
+  float along;
+  float across;
+  float alongLen;
+  vec2 id;
+  vec2 toRing = xz - uPavingRing.xy;
+  float ringR = length(toRing);
+  if (uPavingRing.w > 0.0 && ringR < uPavingRing.z) {
+    // Anneaux autour du puits: chaque rang compte un nombre entier de pavés.
+    float row = floor(ringR / pitch);
+    float mid = (row + 0.5) * pitch;
+    float count = max(6.0, floor(6.2831853 * mid / len + 0.5));
+    float angle = atan(toRing.y, toRing.x) / 6.2831853 + 0.5;
+    float offset = ambHash(vec2(row, 3.7));
+    float s = angle * count + offset;
+    float stone = floor(s);
+    along = fract(s);
+    across = fract(ringR / pitch);
+    alongLen = 6.2831853 * ringR / count;
+    id = vec2(stone, row + 101.0);
+    float a = ((stone + 0.5 - offset) / count - 0.5) * 6.2831853;
+    centre = uPavingRing.xy + vec2(cos(a), sin(a)) * mid;
+  } else {
+    // Rangs d'est en ouest, décalés d'un demi-pavé, longueur un peu différente d'un rang à l'autre.
+    float row = floor(xz.y / pitch);
+    float rowLen = len * (0.88 + 0.24 * ambHash(vec2(row, 9.1)));
+    float s = xz.x / rowLen + 0.5 * mod(row, 2.0) + ambHash(vec2(row, 1.3)) * 0.2;
+    float stone = floor(s);
+    along = fract(s);
+    across = fract(xz.y / pitch);
+    alongLen = rowLen;
+    id = vec2(stone, row);
+    centre = vec2((stone + 0.5 - 0.5 * mod(row, 2.0) - ambHash(vec2(row, 1.3)) * 0.2) * rowLen, (row + 0.5) * pitch);
+  }
+  stoneHash = ambHash(id);
+  float edge = min(min(along, 1.0 - along) * alongLen, min(across, 1.0 - across) * pitch);
+  vec3 stoneColor = mix(uGroundColors[3], uGroundColors[4], stoneHash * uPaving.w + patchNoise * 0.08);
+  // Dessus arrondi: le pavé fonce un peu vers ses bords.
+  stoneColor *= mix(0.9, 1.0, smoothstep(0.0, 0.05, edge));
+  vec3 jointColor = mix(uGroundColors[4], uGroundColors[6], 0.4) * 0.72;
+  float joint = 1.0 - smoothstep(uPaving.z * 0.5 - pixel * 0.5, uPaving.z * 0.5 + pixel * 0.5, edge);
+  vec3 c = mix(stoneColor, jointColor, joint);
+  // De loin, joints et pavés se fondent en une teinte moyenne.
+  float far = smoothstep(0.05, 0.1, pixel);
+  return mix(c, mix(uGroundColors[3], jointColor, 0.18), far);
+}
+
+/** Terre battue de la place: chemin tassé, plus gris, piqué de petits cailloux. */
+vec3 ambBeatenEarth(vec2 xz, float patchNoise, float pixel) {
+  vec3 c = mix(uGroundColors[6], uGroundColors[5], 0.45 + 0.4 * smoothstep(0.25, 0.85, patchNoise));
+  // Tassée par les pas et les charrettes: plus grise et plus sombre que la terre des chemins.
+  c = mix(c, uGroundColors[3], 0.34) * 0.94;
+  float grain = texture(uAmbNoise, xz * 2.7 + 0.47).r;
+  c *= 0.95 + 0.1 * grain;
+  vec3 tone;
+  float stone = ambPebble(xz, 0.21, 0.12, pixel, 13.0, tone);
+  return mix(c, mix(c, tone, 0.45), stone * (1.0 - smoothstep(0.03, 0.08, pixel)));
+}
 
 /** Ombre des nuages au point du monde p (1: plein soleil). */
 float ambCloudLight(vec3 p) {
@@ -309,18 +497,42 @@ const FRAGMENT_GROUND = /* glsl */ `
   ivec2 groundCell = ivec2(clamp(floor(vMapUv * ${PALETTE_GRID}.0), 0.0, ${PALETTE_GRID - 1}.0));
   int groundIndex = groundCell.y * ${PALETTE_GRID} + groundCell.x;
   bool groundFace = vAmbWorld.y < uGroundParams.w && abs(vAmbNormalY) > 0.9;
-  if (groundFace) {
+  bool bedFace = groundIndex == ${cellIndex('sand')} && vAmbWorld.y < 0.1;
+  // Taille d'un pixel au sol (m): les motifs fins s'effacent avant de scintiller (hors des branches).
+  float groundPixel = length(fwidth(vAmbWorld.xz));
+  if (groundFace || bedFace) {
     vec2 groundUv = vAmbWorld.xz * uGroundParams.x;
     float patchNoise = texture(uAmbNoise, groundUv).r * (1.0 - uGroundParams.y)
       + texture(uAmbNoise, groundUv * 3.7 + 0.21).r * uGroundParams.y;
-    if (groundIndex == ${cellIndex('grass_dark')} || groundIndex == ${cellIndex('grass')} || groundIndex == ${cellIndex('grass_light')}) {
-      float g = smoothstep(0.25, 0.75, patchNoise);
-      vec3 lowGreen = mix(uGroundColors[0], uGroundColors[1], smoothstep(0.0, 0.5, g));
-      diffuseColor.rgb = mix(lowGreen, uGroundColors[2], smoothstep(0.5, 1.0, g));
-    } else if (groundIndex == ${cellIndex('cobble')} || groundIndex == ${cellIndex('cobble_dark')}) {
-      diffuseColor.rgb = mix(uGroundColors[3], uGroundColors[4], patchNoise * uGroundParams.z);
-    } else if (groundIndex == ${cellIndex('path')} || groundIndex == ${cellIndex('path_dark')}) {
-      diffuseColor.rgb = mix(uGroundColors[5], uGroundColors[6], smoothstep(0.3, 0.8, patchNoise) * uGroundParams.z * 2.0);
+    vec4 river = ambRiver(vAmbWorld.xz);
+    bool grassFace = groundIndex == ${cellIndex('grass_dark')} || groundIndex == ${cellIndex('grass')} || groundIndex == ${cellIndex('grass_light')};
+    bool pathFace = groundIndex == ${cellIndex('path')} || groundIndex == ${cellIndex('path_dark')};
+    if (bedFace && river.a > 0.0) {
+      // Lit de la rivière; l'herbe y avance là où le bord du sable recule.
+      vec3 bed = ambBed(vAmbWorld, river, patchNoise, groundPixel);
+      diffuseColor.rgb = mix(ambGreen(patchNoise), bed, ambSand(river, vAmbWorld.xz, groundPixel));
+    } else if (groundFace && grassFace) {
+      vec3 green = ambGreen(patchNoise);
+      float sand = ambSand(river, vAmbWorld.xz, groundPixel);
+      diffuseColor.rgb = sand > 0.0 ? mix(green, ambBed(vAmbWorld, river, patchNoise, groundPixel), sand) : green;
+    } else if (groundFace && (groundIndex == ${cellIndex('cobble')} || groundIndex == ${cellIndex('cobble_dark')})) {
+      vec4 lookAt = texture(uLookField, (vAmbWorld.xz - uLookRect.xy) * uLookRect.zw);
+      if (lookAt.b > 0.05) {
+        // Place, rue et quai: pavés posés entiers là où le champ les veut (lu au milieu du pavé), terre battue ailleurs.
+        vec2 stoneCentre;
+        float stoneHash;
+        vec3 paving = ambPaving(vAmbWorld.xz, patchNoise, groundPixel, stoneCentre, stoneHash);
+        vec4 lookStone = texture(uLookField, (stoneCentre - uLookRect.xy) * uLookRect.zw);
+        float laid = lookStone.a / max(lookStone.b, 0.05);
+        bool stoneLaid = lookStone.b > 0.05 && laid > 0.35 + 0.3 * stoneHash;
+        diffuseColor.rgb = stoneLaid ? paving : ambBeatenEarth(vAmbWorld.xz, patchNoise, groundPixel);
+      } else {
+        diffuseColor.rgb = mix(uGroundColors[3], uGroundColors[4], patchNoise * uGroundParams.z);
+      }
+    } else if (groundFace && pathFace) {
+      vec3 path = mix(uGroundColors[5], uGroundColors[6], smoothstep(0.3, 0.8, patchNoise) * uGroundParams.z * 2.0);
+      float sand = ambSand(river, vAmbWorld.xz, groundPixel);
+      diffuseColor.rgb = sand > 0.0 ? mix(path, ambBed(vAmbWorld, river, patchNoise, groundPixel), sand) : path;
     }
   }
 }
