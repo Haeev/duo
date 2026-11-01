@@ -40,3 +40,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Vitest 5 (config de /tmp/qa5/g2) n'affiche pas les `console.info` des tests qui passent: écrire les rapports d'exploration dans un fichier (`appendFileSync`) plutôt que dans la console.
 - Valider un test à verser sans toucher au dépôt: copie du jeu par `tar` (pas de rsync ici) dans /tmp, liens vers `node_modules` et `assets`, puis `tsc`, `eslint` et `vitest` dans la copie (seuls les imports relatifs vers `packages/` cassent, c'est attendu).
 - Bancs de La Petite Ligne: les places se vérifient avec `BenchSeating` (comme le rendu) et non avec la seule position des habitants; un habitant « assis » garde sa vraie position à un mètre du banc.
+
+## Moments rares et reprises dans le faux hôte (vérifié le 2026-11-01, tour 6)
+
+- `page.on('websocket')` ne voit que les WebSocket ouvertes après l'abonnement: s'abonner avant `goto` (la sonde de `sonde.ts` le fait dans `startDuo`; un écouteur ajouté après `startDuo` ne reçoit rien).
+- Démarrer une partie à deux au jour voulu: sauvegarde générée en Node (robot jusqu'à l'aube voulue, `snapshotOf`), écrite dans `<donnees>/sauvegardes/emplacement-1.json` (champs de `StoredSaveSchema`, `data` = `JSON.stringify(world)`), profils fixés par `addInitScript` dans `localStorage['duo-sdk-dev:profil']` (`{id:'membre-a',name,color:'orb'}`), puis « Héberger et continuer ». Le serveur réécrit la sauvegarde à l'aube: en garder une copie.
+- Début d'apogée lisible dans le DOM: `.lpl-clock[data-watch="climax"]` (sans délai de stabilisation); un `MutationObserver` posé par `addInitScript` de contexte s'applique aussi au cadre du jeu.
+- `tests/aides.ts` ne s'importe pas dans Playwright (`import.meta.glob` de Vite): charger le contenu par `loadContent(CONTENT_FILES)`; pas de `"type":"module"` dans le dossier de la spec (les imports JSON exigeraient un attribut).
+- Le serveur Vite de la page de rendu recharge la page quand l'arbre de travail change (autres membres): une capture peut tomber sur « Chargement du rendu... »; vérifier la taille du PNG et refaire.
+- Le dépôt bouge pendant la mission (commits et arbre de travail des autres): noter le commit de chaque mesure et relancer G1 sur le dernier avant de conclure.

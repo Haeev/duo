@@ -58,7 +58,7 @@
     "parcel_needs_both": "Ce colis pèse son poids. Appelle {partner}: il se porte à deux.",
     "parcel_delivered": "Livré à la maisonnette: {item}, rangé dans le coffre.",
     "heron_seen": "Le héron se redresse, vous regarde, pousse un cri rauque et s'envole au ras de l'eau. Il se pose sur la grève d'en face.",
-    "geese_seen": "Les oies courent sur l'eau, s'élèvent en criant et passent juste au-dessus de vous. Au-dessus du quai, elles forment un grand V.",
+    "geese_seen": "Les oies courent sur l'eau, s'élèvent en criant et passent au-dessus de la berge, puis forment un grand V au-dessus du quai.",
     "moment_watch_self": "Sans bouger...",
     "moment_watch_partner": "{partner} n'est pas encore là.",
     "moment_notice": "Montre-le à {partner} !",

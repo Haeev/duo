@@ -771,7 +771,7 @@ Messages (`textes.messages`):
 | `moment_heron_hint` | Hier soir, au bord de l'eau, tu as vu un grand oiseau gris remonter la rivière vers le gué. Les hérons pêchent l'après-midi. |
 | `moment_heron_memory` | Le héron du gué, un {weekday} après-midi. |
 | `geese_not_yet` | Les oies se reposent encore. Elles repartent en fin d'après-midi, à partir de 16 h 30. |
-| `geese_seen` | Les oies courent sur l'eau, s'élèvent en criant et passent juste au-dessus de vous. Au-dessus du quai, elles forment un grand V. |
+| `geese_seen` | Les oies courent sur l'eau, s'élèvent en criant et passent au-dessus de la berge, puis forment un grand V au-dessus du quai. |
 | `moment_geese_hint` | Cette nuit, tu as entendu des oies se poser sur l'Aubrune, pas loin du banc de la berge. |
 | `moment_geese_memory` | Le V des oies, cap au nord, un {weekday} soir. |
 | `ladder_hold_on` | Tenez bon, là en bas ! |
