@@ -70,3 +70,9 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Rien d'important au nord-ouest d'un bâtiment haut à moins de 3 m (règle `camera.regle` de la carte): il passe derrière son toit.
 - Page de rendu d'un moment: `rendu.html?vie=0&manuel=1&moment=<id>&t=<s>`, puis `lplRendu.advance(1/30)` 40 fois. Sans `vie=0`, la promenade déplace le joueur 1 et la caméra quitte le moment.
 - Essayer une mise en scène sans toucher au dépôt: copier `games/la-petite-ligne` (sans `node_modules`, avec des liens vers `node_modules` du jeu, de la racine et vers `packages`) dans `/tmp`, modifier `halte.json`, `moments.json` et `MOMENT_SPOTS` de `etat-exemple.ts`, servir par un Vite à part (autre port). Sous charge, deux captures en parallèle au plus, `timeout` de capture à 480 s.
+
+## Contrôle d'un moment dans les quatre orientations (La Petite Ligne, 2026-11-01)
+
+- Le trou tramé d'un moment (`RENDER_SETTINGS.momentSeeThrough`) est centré sur une accroche: un objet sur une face du tronc passe derrière lui dans deux orientations, et le trou ne sert plus. Vérifier les quatre orientations, pas seulement la vue par défaut, et demander un centre sur le personnage qui agit.
+- Repère pour savoir qui est le joueur 1 sur une capture: c'est celui qui a le trou tramé autour de lui (le joueur 2 n'en a pas).
+- Vérifier la portée d'un geste (`reach_up`) au zoom 0: au zoom 1 un écart main-objet de 0,3 m ne fait que quelques pixels.

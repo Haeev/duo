@@ -11,6 +11,7 @@
 | Verdict G9 | **non**: l'échelle de Basile ne se lit pas en vue par défaut (mise en scène contraire à la règle de caméra de la carte), le nichoir à 1,84 m s'atteint sans échelle, le héron se pose derrière les arbres |
 | Bloquant pour `main` | échelle de Basile (G9), mésange (G8), libellé « Parle avec h145 » (texte provisoire à l'écran) |
 | Notes proposées | **pilier 2: 7,5/10** (7 avant); **pilier 3: 7,5/10** (inchangé) |
+| Contrôle après correctifs (2026-11-01, `a61d2b4`) | **G6 oui, G8 oui, G9 oui**; plus rien de bloquant pour `main`; voir la dernière section |
 
 ## Méthode
 
@@ -153,3 +154,43 @@ La faune est du même style que le bourg (facettes, palette tenue, 17 cases ajou
 | Léger | « Rien que pour toi » en deux styles; boîte d'appel qui couvre la poule et coupe l'objectif à 150 %; titre du carnet coupé au défilement; statut « En chemin » contre « déjà en place » à vérifier | ux-ui-designer, dev interface | 45 min |
 | Léger | Talus en pointes au coin des platelages | dev rendu | 15 min |
 | Ouvert (tour 5) | Place en aplat gris, berges à angle droit | tech-artist, dev rendu, level-designer | 240 min |
+
+## Contrôle après correctifs (2026-11-01)
+
+Version contrôlée: `a61d2b4`, arbre principal servi par `/tmp/dg3d-budget/serveur.sh` (relancé avant les captures), page `rendu.html?vie=0&manuel=1&moment=<id>&t=<s>`, 1366 x 768, rendu normal. Dix captures faites par moi, aucune erreur de page ni de console. Planches relues: `correctif-echelle-*`, `correctif-heron-mesanges`, `retouche-faune-*`, `interface-correctif-*`.
+
+Planches probantes (`captures/tour-06/`):
+
+- `da-controle-echelle-o0.png`: orientation 0, zoom 1, t = 0,1 s, 2,85 s et 7,7 s, plus le plein écran;
+- `da-controle-echelle-4-orientations.png`: les quatre orientations à t = 2,85 s;
+- `da-controle-main-nichoir.png`: zoom 0, main de Basile au geste `reach_up` (orientation 0) et houppier en orientation 1;
+- `da-controle-echelle-gris-daltonisme.png`: couleur, gris, deutéranopie, protanopie;
+- `da-controle-heron-mesanges.png`: héron posé (phase après) et mésanges au nichoir (t = 2 s).
+
+### Verdicts
+
+| Critère | Verdict | Pourquoi |
+|---|---|---|
+| G6 visuel | **oui** | Acquis du tour, sans régression; l'échelle et le héron rejoignent les moments qui se lisent au zoom de jeu |
+| G8 | **oui** | Mésange: bandeau peint sur la tête, ailes repliées au repos et attachées aux épaules en vol. Héron: ailes en coquilles contre le corps, dos #7F888E (L* 47 en jeu au lieu de 58), il se détache enfin des galets. Oie: queue soudée au croupion. Échelle: montants pleins sous les quatre angles. Renard: blancs agrandis, roux gardé (l'essai #E58A4C rejoint la valeur de l'herbe du soir, L* 27,0 contre 29,7: la mesure du dev est juste, je retire ma demande d'éclaircir) |
+| G9 | **oui** | Critère d'acceptation du point 1 rempli en vue par défaut: échelle de face avec ses barreaux, Basile entre les deux joueurs (écart de 0,82 m sur `x - y`, 0,58 m à l'écran de chaque côté), nichoir entier et visible, droit après le moment avec la mésange dessus, aucun houppier dans un toit (0,5 m de jeu avec le débord de Firmin, mesuré par le level designer). Nichoir à 2,25 m: Basile en a besoin de son échelle. Héron posé sur la grève nord en (31,5 ; 38,5): seulement de l'eau et du sable entre la caméra et lui, il se lit au zoom 1 (cou blanc, dos sombre) |
+
+Chicot sur la face nord-est et non sud: **accepté**. Une branche vivante part au sud; un chicot au même endroit serait une branche dans une branche. Au nord-est, il reste au-dessus du nichoir, sous le houppier, visible en vue par défaut (trait clair qui monte à droite du tronc), et c'est le perchoir d'où les mésanges plongent vers le trou: il est au bon endroit pour la bonne raison.
+
+Interface: « Appelle Cocotte » chez celui qui connaît les noms, « Appelle la poule blanche » chez l'autre, aucun identifiant (test `identifiants.test.ts` relancé: 6 réussis). Un seul style de tampon, rouge à filet: il dit désormais « qui voit cette information » (« Rien que pour toi », « Chez les deux »), règle claire, je l'accepte. Boîte d'appel compacte à 150 %: la poule appelée reste visible au-dessus, l'objectif est masqué. Titre « Coups de main » collé sous les onglets. Carte du partenaire « Regarde le héron » cohérente avec « Sacha est déjà en place ».
+
+### Ce qui reste
+
+Rien de bloquant pour `main`.
+
+| Gravité | Défaut | Correction | Propriétaire |
+|---|---|---|---|
+| Léger (à faire avant la bêta) | Orientations 1 et 2 pendant l'échelle: en 1, le houppier cache la tête et les bras de Basile et le joueur 2 passe devant lui; en 2, un sapin de la lisière cache l'échelle et Basile, seuls les joueurs se voient dans leur trou tramé. L'orientation 3 se lit en partie (le joueur 1 recoupe Basile). Le trou du moment est centré sur le nichoir, qui passe derrière le tronc dans ces vues | Deuxième centre de `momentSeeThrough` sur Basile (tête) pendant l'apogée de `ladder`, et le trou étendu aux arbres du décor qui sont devant (le sapin de l'orientation 2), comme pour les joueurs. L'orientation 0 est celle de toute partie qui commence et elle est juste: ne rien changer à la mise en scène | dev rendu |
+| Léger | Au geste `reach_up` (t = 2,3 à 3,1 s), la main droite de Basile reste sous le nichoir et en avant de lui (environ 0,3 à 0,4 m à l'œil au zoom 0) pendant que le nichoir pivote: il le redresse sans le toucher. Invisible au zoom 1, visible de près | Clip `reach_up`: bras droit tendu vers l'avant et la droite, main au bas de la caisse (vers 2,15 m, à 0,35 m devant l'épaule, pieds à 0,84 m). Ne pas baisser le nichoir ni ajouter un barreau: la hauteur et la chorégraphie de 8,2 s sont justes | artiste-3d, puis capture zoom 0 par le dev gameplay |
+| Léger | Joueur de `ladder_hold_east`: ses pieds touchent le bord du toit de la remise à l'écran (deux ou trois pixels recoupés au zoom 1); c'est le trou tramé autour du joueur 1 qui les rend visibles | `ladder_hold_east` reculé le long de l'échelle de 0,13 m en x et en y, vers (51,48 ; 5,66): même colonne de l'écran, toujours au montant, environ 6 pixels plus haut au zoom 1, hors du toit | level-designer (`construire_carte_halte.py`) |
+| Ouvert (inchangé) | Gué sans lame d'eau; place en aplat gris, berges à angle droit | Voir les tableaux plus haut | tech-artist, dev rendu, level-designer |
+
+### Notes proposées après correctifs
+
+- **Pilier 2, vie du monde et animation: 7,5/10** (inchangé par rapport à ma proposition). Le moment de quête de Basile se voit enfin, de la montée au coup de marteau jusqu'à la mésange qui revient: c'est ce que le 7,5 supposait déjà. Le 8 demande toujours une petite faune d'ambiance hors des moments et de l'eau qui coule au gué.
+- **Pilier 3, direction artistique: 7,5/10** (inchangé). Les défauts que le tour avait fait entrer sont tous fermés (échelle, héron derrière les arbres, mésange et héron en planches, identifiant à l'écran), et la faune est maintenant propre de près. Mais cela ramène le jeu à son niveau, sans lever ce qui bloquait déjà le 8: place en aplat gris, berges à angle droit, gué sans eau. Ces trois-là donnent le 8.
