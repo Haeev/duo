@@ -750,7 +750,7 @@
  },
  "fir_sapling": {
   "file": "bourg.glb",
-  "tris": 175,
+  "tris": 170,
   "footprint": [
    1,
    1
@@ -782,7 +782,7 @@
  },
  "bramble": {
   "file": "bourg.glb",
-  "tris": 564,
+  "tris": 860,
   "footprint": [
    1,
    1

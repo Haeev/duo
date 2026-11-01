@@ -1298,8 +1298,10 @@ def arbor(A):
     """Tonnelle d'Odette: pergola, vigne, table et deux bancs (emprise 3 x 2).
 
     La vigne tient à la tonnelle: tiges qui s'enroulent autour de trois poteaux et portent leurs
-    feuilles; feuillage du dessus posé sur les lattes, qui retombe un peu sur les bords. Moins de 900
-    triangles (bible 8.8)."""
+    feuilles; feuillage du dessus posé sur les lattes, qui retombe un peu sur les bords. La vigne est
+    caduque: ses touffes sont sur les cases vine_leaf et vine_leaf_dark, qui suivent les saisons (or et
+    rouge à l'automne, feuilles sèches l'hiver), jamais sur ivy (persistant). Moins de 900 triangles
+    (bible 8.8)."""
     g = A.geo()
     for x in (-1.35, 1.35):
         for y in (-0.85, 0.85):
@@ -1321,14 +1323,15 @@ def arbor(A):
         for k in (2, 4):
             p = pts[k]
             a = math.radians(k * 100 + 30)
-            g.sphere(0.12, loc=(p[0] + 0.1 * math.cos(a), p[1] + 0.1 * math.sin(a), p[2]), color="ivy", ico=1,
+            g.sphere(0.12, loc=(p[0] + 0.1 * math.cos(a), p[1] + 0.1 * math.sin(a), p[2]),
+                     color="vine_leaf_dark" if (k + int(px > 0)) % 4 == 0 else "vine_leaf", ico=1,
                      jitter=0.15, seed=20 + k, scale=(0.9, 0.9, 1.2))
     # feuillage du dessus: posé sur les lattes (2 cm engagés), deux touffes qui retombent sur les bords
     for k, (x, y, r) in enumerate(((-0.9, -0.3, 0.42), (0.0, 0.25, 0.46), (0.85, -0.2, 0.42), (-0.35, 0.5, 0.36),
                                    (0.5, 0.6, 0.34))):
-        g.sphere(r, loc=(x, y, 2.55 + r * 0.45 * 0.6 - 0.02), color="ivy" if k % 3 else "leaf_oak", ico=1,
+        g.sphere(r, loc=(x, y, 2.55 + r * 0.45 * 0.6 - 0.02), color="vine_leaf_dark" if k % 3 == 1 else "vine_leaf", ico=1,
                  jitter=0.12, seed=k, scale=(1.25, 1.0, 0.45), rot=(0, 0, rnd.uniform(0, 360)))
-    g.sphere(0.3, loc=(-1.2, 0.9, 2.42), color="ivy", ico=1, jitter=0.12, seed=31, scale=(1.0, 0.6, 0.9))  # retombe
+    g.sphere(0.3, loc=(-1.2, 0.9, 2.42), color="vine_leaf", ico=1, jitter=0.12, seed=31, scale=(1.0, 0.6, 0.9))  # retombe
     # table et bancs
     g.box((1.6, 0.8, 0.05), loc=(0, 0, 0.72), color="wood_new", base=True, bevel=0.01)
     g.box((1.62, 0.82, 0.02), loc=(0, 0, 0.77), color="fabric_red", base=True)
@@ -1933,11 +1936,20 @@ def main():
     nature.append(A.add("tree_stump", tree_stump(A), {"footprint": [1, 1]}))
     # tour 8 (cueillette.py): rejet du chêne sur la même souche que tree_stump, jeune sapin replanté
     sap = A.add("oak_sapling", tree_stump(A), {"footprint": [1, 1], "grow_node": "oak_sapling_shoots",
-                                                "note": "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1)"})
-    A.add("oak_sapling_shoots", cueillette.oak_shoots(A), parent=sap, loc=(0, 0, 0.42))
+                                                "note": "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1), "
+                                                        "chaque brin oak_sapling_shoot_* autour de son pied (origine du brin, "
+                                                        "sur le flanc de la souche)"})
+    # un nœud par brin, origine à son pied sur le flanc (tour 8): mis à l'échelle autour de ce pied, le brin
+    # reste planté dans l'écorce; mis à l'échelle d'un bloc depuis le centre de la coupe, il en sortirait
+    shoots = A.subgroup("oak_sapling_shoots", sap, {"grow_nodes": list(cueillette.SHOOT_NAMES)})
+    shoots.location = (0, 0, 0.42)
+    for name, foot, geo in cueillette.oak_shoots(A):
+        A.add(name, geo, parent=shoots, loc=foot)
     nature.append(sap)
-    nature.append(A.add("fir_sapling", cueillette.fir_sapling(A), {"footprint": [1, 1], "height": 1.24,
-                                                                   "note": "échelle 1 le premier jour, jusqu'à 1,3 ensuite"}))
+    nature.append(A.add("fir_sapling", cueillette.fir_sapling(A), {
+        "footprint": [1, 1], "height": 1.24, "beside_stump": list(cueillette.FIR_BESIDE_STUMP),
+        "note": "échelle 1 le premier jour, jusqu'à 1,3 ensuite; la souche tree_stump reste au centre de la case, "
+                "le plant se pose à beside_stump (sans rotation du décalage)"}))
     for i, k in enumerate(("round", "bramble", "hazel")):
         fn = cueillette.bush_hazel(A) if k == "hazel" else bush(A, k, 20 + i)
         nature.append(A.add("bush_" + k, fn, {"footprint": [1, 1]}))

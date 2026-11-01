@@ -282,39 +282,93 @@ def hazelnut(A):
 
 BRAMBLE_SIZE = (1.2, 0.8, 0.7)
 # fruits: points du dessus du roncier, calculés par lancer de rayons (voir berry_spots)
-BERRY_XY = ((-0.3, -0.05), (0.08, -0.1), (-0.12, -0.18))
+BERRY_XY = ((-0.2, -0.06), (0.07, -0.05), (-0.07, -0.14))
+
+
+def bezier3(p0, p1, p2, p3, n):
+    """n points d'une courbe de Bézier cubique (arceau d'une ronce: montée, retombée, bout planté)."""
+    p0, p1, p2, p3 = Vector(p0), Vector(p1), Vector(p2), Vector(p3)
+    out = []
+    for i in range(n):
+        t = i / (n - 1)
+        u = 1 - t
+        out.append(u ** 3 * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t ** 3 * p3)
+    return out
+
+
+def small_leaf(g, base, yaw, pitch, length, width, top, under, fold=0.3, thick=0.006):
+    """Petite feuille en losange, 8 triangles: deux pointes (pied, bout), deux bords un peu tombants, une
+    nervure bombée dessus et un dessous mince. Jamais une plaque seule (vue par la tranche, elle garde un
+    volume)."""
+    base = Vector(base)
+    yr, pr = math.radians(yaw), math.radians(pitch)
+    d = Vector((math.cos(yr) * math.cos(pr), math.sin(yr) * math.cos(pr), math.sin(pr)))
+    side = Vector((-math.sin(yr), math.cos(yr), 0.0))
+    up = d.cross(side).normalized() * -1.0
+    if up.z < 0:
+        up = -up
+    c = base + d * (length * 0.45)
+    w = width / 2
+    coords = [base, base + d * length, c + side * w - up * fold * w, c - side * w - up * fold * w,
+              c + up * thick, c - up * thick * 0.6]
+    faces = [(0, 2, 4), (0, 4, 3), (1, 4, 2), (1, 3, 4), (0, 5, 2), (0, 3, 5), (1, 2, 5), (1, 5, 3)]
+    return _closed(g, coords, faces, by_normal(top, under, thr=-0.05))
+
+
+def _cane_leaves(g, pts, ts, seed, size=0.12, min_z=0.07):
+    """Feuilles de ronce le long d'une tige (losanges de 8 à 13 cm, plus grands près du départ), de part et
+    d'autre, assez serrées pour que l'arceau se lise comme une branche feuillue et non comme un fil (pattes),
+    le pied collé à la tige, un peu tombantes. ts: positions le long de la polyligne (0 à 1)."""
+    rnd = random.Random(seed)
+    n = len(pts) - 1
+    for k, t in enumerate(ts):
+        f = t * n
+        i = min(int(f), n - 1)
+        p = pts[i].lerp(pts[i + 1], f - i)
+        if p.z < min_z:
+            continue
+        tan = pts[i + 1] - pts[i]
+        yaw = math.degrees(math.atan2(tan.y, tan.x)) + (1 if k % 2 else -1) * 55 + rnd.uniform(-15, 15)
+        ln = size * (1.05 - 0.35 * t) * rnd.uniform(0.92, 1.08)
+        small_leaf(g, p, yaw, rnd.uniform(-10, 12), ln, ln * 0.62, "leaf_bush" if k % 3 else "ivy", "ivy")
 
 
 def bramble(A):
-    """Roncier de 1,2 x 0,8 m et 0,7 m de haut, sans fruits: trois masses de feuillage basses et irrégulières
-    (deux verts) et quatre jeunes ronces arquées qui en sortent en biais et retombent vers le bord, feuillues au
-    bout: c'est ce qui distingue un roncier d'un buisson. Tout tient dans l'emprise."""
+    """Roncier de 1,2 x 0,8 m et 0,7 m de haut, sans fruits: un fourré bas qui couvre l'emprise (sombre), un
+    massif plus haut au milieu (deux verts) et six ronces en arceau de tailles différentes. Une ronce s'enracine en arceau: chaque tige sort du massif à mi-hauteur, monte peu (0,4 à 0,45 m,
+    sous le dessus du massif), retombe en pente par-dessus le fourré et plante son bout dans le sol (enfoncé de
+    2 cm), au bord de l'emprise; ses feuilles sont réparties le long de la tige, serrées, jamais en boule au bout
+    (tour 8: quatre tiges fines terminées par une boule, au-dessus de l'herbe, se lisaient comme une araignée).
+    Seuls les derniers centimètres de la tige, qui plongent au sol, restent nus. Aucune tige devant la face
+    avant (+Z glTF), côté mûres, ni sur le dessus où elles se posent. Tout tient dans l'emprise."""
     g = A.geo()
-    rnd = random.Random(7)
-    # massif un peu en retrait du bord de l'emprise: la place des arcs de ronces
-    g.sphere(0.37, loc=(-0.07, 0.0, 0.33), color="leaf_bush", ico=2, jitter=0.08, seed=71, scale=(1.15, 0.85, 0.92),
+    # fourré bas en deux bosses inégales: les arceaux retombent sur du feuillage et non sur l'herbe (plus de
+    # vides entre des « pattes »), sans le bord net d'un disque
+    g.sphere(0.34, loc=(-0.24, 0.08, 0.09), color="ivy", ico=2, jitter=0.12, seed=70, scale=(1.05, 0.95, 0.33),
+             rot=(0, 0, 20))
+    g.sphere(0.3, loc=(0.27, 0.06, 0.09), color="ivy", ico=2, jitter=0.12, seed=69, scale=(1.05, 1.0, 0.37),
+             rot=(0, 0, -15))
+    # massif resserré au milieu de l'emprise
+    g.sphere(0.3, loc=(-0.03, 0.0, 0.3), color="leaf_bush", ico=2, jitter=0.08, seed=71, scale=(1.12, 0.86, 1.0),
              rot=(0, 0, 8))
-    g.sphere(0.27, loc=(0.22, 0.05, 0.24), color="ivy", ico=2, jitter=0.08, seed=72, scale=(1.05, 1.0, 0.9))
-    g.sphere(0.2, loc=(-0.33, -0.1, 0.15), color="ivy", ico=1, jitter=0.1, seed=73, scale=(1.1, 1.0, 0.8))
-    # chaque ronce sort du flanc du massif (départ caché dans le feuillage), passe en arc juste au-dessus et
-    # replonge au sol au bord de l'emprise; une touffe de feuilles au sommet de l'arc
-    # jeunes ronces de l'année, aux quatre coins: elles sortent du massif en biais, s'arquent et retombent vers
-    # le bord de l'emprise, la pointe encore en l'air (elle touchera le sol plus tard et s'y enracinera); aucune
-    # ne passe sur le dessus, où se posent les mûres
-    canes = (((-0.25, -0.05, 0.42), (-0.52, -0.28, 0.74), (-0.58, -0.36, 0.3)),
-             ((0.1, -0.12, 0.4), (0.4, -0.38, 0.66), (0.56, -0.37, 0.26)),
-             ((0.24, 0.1, 0.34), (0.52, 0.32, 0.6), (0.58, 0.36, 0.22)),
-             ((-0.22, 0.1, 0.46), (-0.5, 0.36, 0.76), (-0.57, 0.37, 0.34)))
-    for i, (p0, p1, p2) in enumerate(canes):
-        pts = bezier(p0, p1, p2, 6)
-        tube(g, pts, 0.016, 0.009, "coach_brown")
-        # une touffe de feuilles sur l'arc et une au bout (la pointe d'une ronce est feuillue)
-        for j, t in enumerate((3, 5)):
-            p = pts[t]
-            g.sphere(0.075 - 0.01 * j, loc=(p.x, p.y, p.z + 0.02 - 0.03 * j), color="leaf_bush" if (i + j) % 2 else "ivy",
-                     ico=1, jitter=0.12, seed=74 + 2 * i + j, scale=(1.2, 1.0, 0.75), rot=(0, 0, rnd.uniform(0, 360)))
-    # les touffes et le jitter débordaient de 4 à 5 cm: ramené à l'emprise exacte de 1,2 x 0,8 m
-    g.transform(list(g.bm.verts), Matrix.Diagonal((0.934, 0.935, 1.0, 1.0)))
+    g.sphere(0.2, loc=(0.2, 0.05, 0.2), color="ivy", ico=1, jitter=0.08, seed=72, scale=(1.05, 1.0, 0.95))
+    # arceaux (Bézier cubiques): départ caché dans le massif, retombée en pente sur les côtés et vers l'arrière
+    canes = (((-0.22, 0.06, 0.3), (-0.44, 0.08, 0.5), (-0.58, 0.02, 0.24), (-0.6, -0.04, -0.02)),
+             ((-0.18, 0.14, 0.32), (-0.36, 0.3, 0.5), (-0.5, 0.38, 0.22), (-0.5, 0.36, -0.02)),
+             ((-0.02, 0.14, 0.34), (-0.06, 0.34, 0.48), (-0.1, 0.4, 0.2), (-0.12, 0.38, -0.02)),
+             ((0.12, 0.12, 0.32), (0.26, 0.32, 0.48), (0.38, 0.4, 0.2), (0.4, 0.36, -0.02)),
+             ((0.24, 0.06, 0.26), (0.46, 0.08, 0.46), (0.6, 0.04, 0.2), (0.6, -0.02, -0.02)),
+             ((-0.26, 0.0, 0.2), (-0.42, 0.18, 0.36), (-0.5, 0.24, 0.12), (-0.46, 0.22, -0.02)))
+    for i, c in enumerate(canes):
+        pts = bezier3(*c, 6)
+        tube(g, pts, 0.013, 0.007, "coach_brown", segs=4)
+        _cane_leaves(g, pts, (0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8), 90 + i)
+    # ramené à l'emprise exacte (1,2 x 0,8 m, 0,7 m): le jitter des boules et les feuilles débordent un peu
+    vs = list(g.bm.verts)
+    sx = BRAMBLE_SIZE[0] / 2 / max(abs(v.co.x) for v in vs)
+    sy = BRAMBLE_SIZE[1] / 2 / max(abs(v.co.y) for v in vs)
+    sz = BRAMBLE_SIZE[2] / max(v.co.z for v in vs)
+    g.transform(vs, Matrix.Diagonal((min(1.0, sx), min(1.0, sy), min(1.0, sz), 1.0)))
     return g
 
 
@@ -352,42 +406,60 @@ def bush_hazel(A):
     return g
 
 
+SHOOT_NAMES = ("oak_sapling_shoot_a", "oak_sapling_shoot_b", "oak_sapling_shoot_c", "oak_sapling_shoot_d")
+
+
 def oak_shoots(A):
-    """Rejets de souche du chêne (taillis): quatre brins qui partent du bord de la coupe, s'écartent puis montent,
-    0,7 à 1,0 m au-dessus de la souche, chacun avec son feuillage (deux tons du chêne). Origine au centre du
-    dessus de la souche: le jeu peut mettre ce nœud seul à l'échelle (0,4 à 1) pour la pousse."""
-    g = A.geo()
+    """Rejets de souche du chêne (taillis): quatre brins nés dans l'écorce, sur le flanc de la souche, 4 à 5 cm
+    sous la coupe (un chêne rejette de ses bourgeons dormants, pas du bois de la coupe, qui reste nue). Chaque brin
+    sort à l'horizontale, s'écarte puis monte, 0,7 à 1,0 m au-dessus de la coupe, feuillé sur sa moitié haute
+    (deux tons du chêne). Renvoie [(nom, pied, geo)]: un nœud par brin, origine à son pied sur le flanc
+    (repère du nœud oak_sapling_shoots, centre de la coupe), pour que le jeu puisse faire pousser chaque brin
+    depuis son pied sans le faire glisser sur la coupe."""
     rnd = random.Random(31)
     shoots = ((20, 0.95), (115, 0.75), (200, 1.0), (290, 0.7))
+    out = []
     for i, (deg, h) in enumerate(shoots):
+        g = A.geo()
         a = math.radians(deg + rnd.uniform(-10, 10))
         c, s = math.cos(a), math.sin(a)
-        # le brin naît dans l'écorce, 3 cm sous la coupe, et sort du bord de la souche
-        p0 = (0.18 * c, 0.18 * s, -0.03)
-        p1 = (0.3 * c, 0.3 * s, h * 0.35)
-        p2 = (0.3 * c, 0.3 * s, h)
-        pts = bezier(p0, p1, p2, 4)
-        tube(g, pts, 0.022, 0.012, "bark", segs=5)
+        # pied 1 cm sous l'écorce (souche à 8 pans: 0,197 m au milieu d'un pan, 4,5 cm sous la coupe), sortie à
+        # l'horizontale, puis le brin se redresse hors de l'aplomb de la coupe (0,25 m au niveau de la coupe)
+        foot = Vector((0.185 * c, 0.185 * s, -0.045))
+        p1 = (0.3 * c, 0.3 * s, -0.04)
+        p2 = (0.32 * c, 0.32 * s, h * 0.3)
+        p3 = (0.31 * c, 0.31 * s, h)
+        pts = bezier3(foot, p1, p2, p3, 5)
+        tube(g, pts, 0.022, 0.012, "bark", segs=4)
         # feuillé sur toute sa moitié haute (un rejet est une verge feuillue, pas une sucette): deux touffes
         # allongées qui se chevauchent le long du brin
         top = pts[-1]
         g.sphere(0.17, loc=(top.x, top.y, top.z - 0.02), color="leaf_oak" if i % 2 else "leaf_oak_light",
                  ico=1, jitter=0.1, seed=40 + i, scale=(1.0, 1.0, 1.35), rot=(0, 0, rnd.uniform(0, 360)))
-        mid = top * 0.55 + pts[1] * 0.45
-        g.sphere(0.14, loc=(mid.x + 0.04 * c, mid.y + 0.04 * s, mid.z), color="leaf_oak", ico=1, jitter=0.1,
+        g.sphere(0.14, loc=(0.35 * c, 0.35 * s, h * 0.58), color="leaf_oak", ico=1, jitter=0.1,
                  seed=50 + i, scale=(1.0, 1.0, 1.3))
-    return g
+        g.transform(list(g.bm.verts), Matrix.Translation(-foot))
+        out.append((SHOOT_NAMES[i], tuple(foot), g))
+    return out
+
+
+# jeune sapin planté à côté de la souche du sapin abattu (on ne dessouche pas pour replanter au même trou):
+# décalage du pied du plant par rapport au centre de la souche, en mètres, repère glTF (x, hauteur, z vers le sud)
+FIR_BESIDE_STUMP = (0.0, 0.0, 0.6)
 
 
 def fir_sapling(A):
-    """Jeune sapin replanté par Basile: 1,2 m, trois étages de cônes à 7 pans (bords arrondis, pointe molle, comme
-    les grands), tige de 7 cm visible au pied, butte de terre fraîchement retournée de 0,85 m. À l'échelle 1 le jour du rejet;
-    le jeu peut l'agrandir (jusqu'à 1,3) jour après jour."""
+    """Jeune sapin planté par Basile: 1,24 m, trois étages de cônes à 7 pans (bords arrondis, pointe molle, comme
+    les grands), tige de 7 cm visible au pied, cuvette de plantation de 0,4 m (terre fraîche tassée au pied).
+    Origine au pied du plant. Il se pose à côté de la souche, qui reste (extra beside_stump: 0,6 m au sud du
+    centre de la souche); l'étage du bas, 0,31 m de rayon à 0,3 m du sol, passe sans toucher la souche (0,42 m de
+    haut, 0,21 m de rayon) de l'échelle 0,7 à 1,3. À l'échelle 1 le jour de la plantation; le jeu peut
+    l'agrandir (jusqu'à 1,3) jour après jour."""
     g = A.geo()
-    g.lathe([(0.42, 0.0), (0.34, 0.03), (0.14, 0.055), (0.0, 0.06)], colors="soil_tilled_light", segs=9,
+    g.lathe([(0.2, 0.0), (0.16, 0.022), (0.07, 0.04), (0.0, 0.045)], colors="soil_tilled_light", segs=8,
             close_bottom=False, phase=11)
     g.cyl(0.035, 0.45, color="bark_dark", segs=5, base=True, r2=0.03, cap=False)
-    tiers = [(0.26, 0.4, 0.5), (0.58, 0.31, 0.42), (0.86, 0.2, 0.38)]
+    tiers = [(0.3, 0.31, 0.48), (0.6, 0.27, 0.42), (0.88, 0.19, 0.36)]
     for i, (z, r, h) in enumerate(tiers):
         g.lathe([(r * 0.88, 0.0), (r, 0.05), (r * 0.12, h * 0.9), (0.0, h)], loc=(0, 0, z),
                 colors=by_normal("leaf_fir_light", "leaf_fir", "leaf_fir", thr=0.3), segs=7, rot=(0, 0, i * 25 + 7))

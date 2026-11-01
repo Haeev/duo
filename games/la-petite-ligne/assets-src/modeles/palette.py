@@ -189,6 +189,10 @@ WORLD = [
     ("kingfisher_teal", "#2BB5C8", 0.6, 0.0, None),
     # Tour 8: mûre mûre (noir violacé, luisant); aucune case assez sombre et brillante avant elle
     ("blackberry", "#2E2136", 0.35, 0.0, None),
+    # Tour 8: vigne de la tonnelle, caduque (le lierre « ivy » reste vert l'hiver, à juste titre): vert tendre au
+    # printemps, vert franc l'été, or et rouge à l'automne, feuilles sèches l'hiver
+    ("vine_leaf", "#5E8B45", 0.9, 0.0, None),
+    ("vine_leaf_dark", "#4C7638", 0.9, 0.0, None),
 ]
 
 # Variantes de saison: seules les cases citées changent (même disposition).
@@ -197,6 +201,7 @@ SEASONS = {
         "grass": "#9AAF55", "grass_light": "#B9C26B", "grass_dark": "#738D43",
         "grass_dry": "#D3C273", "leaf_oak": "#5E8C3D", "leaf_oak_light": "#7AA34B",
         "leaf_birch": "#94B455", "leaf_birch_light": "#B1C86A",
+        "vine_leaf": "#577F3E", "vine_leaf_dark": "#466B33",
     },
     "automne": {
         "grass": "#A6A55C", "grass_light": "#BDB46B", "grass_dark": "#7D8447",
@@ -204,6 +209,7 @@ SEASONS = {
         "leaf_oak": "#C27F3B", "leaf_oak_light": "#D69A47",
         "leaf_birch": "#E2B84E", "leaf_birch_light": "#EECB63",
         "leaf_bush": "#9C7A3E", "leaf_hazel": "#C8A048",
+        "vine_leaf": "#B8862F", "vine_leaf_dark": "#8E4A2E",
     },
     "hiver": {
         "grass": "#C9CEC4", "grass_light": "#E2E5DE", "grass_dark": "#A4AC9F",
@@ -212,6 +218,7 @@ SEASONS = {
         "leaf_birch": "#B5A88F", "leaf_birch_light": "#C9BFA9",
         "leaf_bush": "#7D8A72", "leaf_hazel": "#9A8C72",
         "leaf_fir": "#486B57", "leaf_fir_light": "#C9D4D0",
+        "vine_leaf": "#6E5A48", "vine_leaf_dark": "#5E4B3C",
     },
 }
 
