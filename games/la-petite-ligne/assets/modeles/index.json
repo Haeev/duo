@@ -1148,6 +1148,42 @@
    "fox_bark"
   ]
  },
+ "roe_deer": {
+  "file": "faune.glb",
+  "tris": 892,
+  "animations": [
+   "deer_walk",
+   "deer_graze",
+   "deer_lookup",
+   "deer_stamp",
+   "deer_call",
+   "deer_watch_fawn",
+   "deer_lick",
+   "deer_bound"
+  ]
+ },
+ "fawn": {
+  "file": "faune.glb",
+  "tris": 900,
+  "animations": [
+   "fawn_rustle",
+   "fawn_rise",
+   "fawn_trot",
+   "fawn_suckle",
+   "fawn_bound"
+  ]
+ },
+ "kingfisher": {
+  "file": "faune.glb",
+  "tris": 416,
+  "animations": [
+   "kf_perch",
+   "kf_dive",
+   "kf_fly",
+   "kf_beat",
+   "kf_swallow"
+  ]
+ },
  "ladder_wood": {
   "file": "faune.glb",
   "tris": 176
@@ -1163,5 +1199,13 @@
  "moss_tuft": {
   "file": "faune.glb",
   "tris": 96
+ },
+ "small_fish": {
+  "file": "faune.glb",
+  "tris": 124
+ },
+ "mooring_post": {
+  "file": "faune.glb",
+  "tris": 162
  }
 }
