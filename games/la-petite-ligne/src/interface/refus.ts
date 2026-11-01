@@ -24,6 +24,7 @@ export const REFUSAL_KEYS: ReadonlySet<string> = new Set([
   'corner_outside',
   'corner_taken',
   'corner_partner_things',
+  'sow_out_of_season',
 ]);
 
 /** Toutes les raisons d'un refus de pose (`placement_outside`, `placement_wall`...). */

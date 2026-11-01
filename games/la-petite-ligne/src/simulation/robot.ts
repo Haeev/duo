@@ -18,6 +18,7 @@ import { canPlace } from './amenagement';
 import { catalogueWindow, currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { unitDraw } from '../etat/tirage';
 import { holdsRod, waterAhead } from './peche';
+import { inSowingSeason } from './potager';
 import { counterRemaining } from './conditions';
 import { freeSeatsNear, seatedSeconds } from './bancs';
 import type { Condition, MomentWatch } from '../donnees/types';
@@ -201,7 +202,7 @@ function seedPlan(sim: Sim): string[] {
 function orderSeedPlan(sim: Sim, day: number, last: number): string[] {
   const plan: string[] = [];
   for (const crop of Object.values(sim.content.crops)) {
-    if (day + crop.growthDays > last) continue;
+    if (day + crop.growthDays > last || !inSowingSeason(sim, crop)) continue;
     const growing = sim.world.garden.filter((g) => g.crop?.crop === crop.id).length * crop.yieldPerCell;
     if (orderNeed(sim, crop.harvest) + ingredientNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
   }
@@ -321,6 +322,13 @@ function inBags(sim: Sim, item: string): number {
   return countInBag(character(sim, 'p1'), item) + countInBag(character(sim, 'p2'), item);
 }
 
+/** Exemplaires de cet objet qu'a le duo: sacs, coffre, objets au sol et meubles posés. */
+function owned(sim: Sim, item: string): number {
+  const w = sim.world;
+  const lying = w.groundItems.reduce((n, g) => n + (g.item === item ? g.count : 0), 0);
+  return inBags(sim, item) + countInStacks(w.cellar, item) + lying + w.furniture.filter((f) => f.item === item).length;
+}
+
 function planksOwned(sim: Sim): number {
   return countInBag(character(sim, 'p1'), 'plank') + countInBag(character(sim, 'p2'), 'plank') + countInStacks(sim.world.cellar, 'plank');
 }
@@ -418,12 +426,19 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     { recipe: 'craft_double_bed', item: 'double_bed', needsMattress: true },
     { recipe: 'craft_shelf', item: 'shelf' },
   ];
+  // Après la démo, un meuble déjà fabriqué compte partout où il est (sacs, coffre, sol, posé), pas
+  // seulement posé; de même le matelas: sinon un meuble qui ne trouve pas de place fait racheter
+  // un matelas et refabriquer un lit chaque jour (QA8-04). La démo garde sa règle (jours 1 à 15).
+  const later = afterDemo(sim);
   for (const p of plan) {
-    if (sim.world.furniture.some((f) => f.item === p.item)) continue;
+    if (later ? owned(sim, p.item) > 0 : sim.world.furniture.some((f) => f.item === p.item)) continue;
     const recipe = sim.content.recipes[p.recipe];
     const cost = recipe?.inputs.find((i) => i.item === 'plank')?.count ?? 0;
     if (planksOwned(sim) - cost < reserve) continue;
-    if (p.needsMattress === true && countInBag(c, 'mattress') + countInStacks(sim.world.cellar, 'mattress') === 0) {
+    const usable = countInBag(c, 'mattress') + countInStacks(sim.world.cellar, 'mattress');
+    // Un matelas chez l'autre ou au sol n'est pas sous la main: on attend qu'il arrive au coffre.
+    if (p.needsMattress === true && later && usable === 0 && owned(sim, 'mattress') > 0) continue;
+    if (p.needsMattress === true && usable === 0) {
       if (sim.world.proposals.some((x) => x.by === c.id)) return false;
       if (sim.world.purse < (sim.content.items.mattress?.buyPrice ?? 0) + 20) continue;
       if (buy(sim, c, m, [{ item: 'mattress', count: 1 }], out)) return true;

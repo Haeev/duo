@@ -11,6 +11,7 @@ import type {
   MemorySettings,
   MomentSettings,
   SecretSettings,
+  TidySettings,
   TreeSettings,
   WeatherSettings,
 } from './types';
@@ -41,6 +42,9 @@ export const DEFAULT_DIALOGUES: DialogueSettings = {
   datedRepeatDays: 28,
   datedRepeatFromDay: 16,
 };
+
+/** Rangement de la nuit (QA8-02): sans `reglages.tidy`, rien ne se range. */
+export const DEFAULT_TIDY: TidySettings = { fromDay: null };
 
 /** Moments rares (tour 6): valeurs de la conception, section 3.2; `reglages.moments` les remplace. */
 export const DEFAULT_MOMENTS: MomentSettings = {

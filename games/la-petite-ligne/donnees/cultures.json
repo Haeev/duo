@@ -25,7 +25,7 @@
       "yieldPerCell": 3,
       "regrows": false,
       "needsWaterDaily": true,
-      "seasons": ["spring"],
+      "seasons": ["spring", "summer", "autumn"],
       "stagesByDay": ["seed", "sprout", "ripe"],
       "models": { "seed": "radish_stage_seed", "sprout": "radish_stage_sprout", "young": "radish_stage_young", "ripe": "radish_stage_ripe" },
       "tier": "P0"
@@ -39,7 +39,7 @@
       "yieldPerCell": 1,
       "regrows": false,
       "needsWaterDaily": true,
-      "seasons": ["spring"],
+      "seasons": ["spring", "summer", "autumn"],
       "stagesByDay": ["seed", "sprout", "young", "ripe"],
       "models": { "seed": "lettuce_stage_seed", "sprout": "lettuce_stage_sprout", "young": "lettuce_stage_young", "ripe": "lettuce_stage_ripe" },
       "tier": "P0"
@@ -53,7 +53,7 @@
       "yieldPerCell": 3,
       "regrows": false,
       "needsWaterDaily": true,
-      "seasons": ["spring"],
+      "seasons": ["spring", "summer", "autumn"],
       "stagesByDay": ["seed", "sprout", "young", "young", "ripe"],
       "models": { "seed": "carrot_stage_seed", "sprout": "carrot_stage_sprout", "young": "carrot_stage_young", "ripe": "carrot_stage_ripe" },
       "tier": "P0"

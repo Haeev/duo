@@ -202,3 +202,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le jour avance à 6 h en même temps que la phase passe à `breakfast` (`horloge.ts`): basculer ce qui dépend du jour hors de la phase `day` suffit à le cacher derrière l'écran du petit-déjeuner.
 - Déformer l'heure accélère la journée (pente au plus 1,5 le soir d'hiver): un test de continuité à seuil fixe doit multiplier son seuil par la pente.
 - Outil isolé: `pnpm test` dépasse 10 minutes quand des captures tournent en même temps; le lancer en arrière-plan.
+
+## Taille de l'état sans changer le format (La Petite Ligne, vérifié le 2026-11-01, QA8)
+
+- Borner une mémoire sans migration: garder exactement ce que ses lecteurs en lisent. `envieHistory`: la fenêtre telle quelle, puis un exemplaire de chaque envie plus ancienne (`compactEnvieHistory`); `heard`: les heures plus vieilles que `datedRepeatDays` remplacées par leur rang (0, 1...), même ordre, mêmes égalités (`foldOldHeard`). Un test d'équivalence (même `pickDialogue` avec et sans compactage, sur des `rng.setState` fixés) le prouve.
+- Ce qui change l'identité des objets (fusion de piles au sol, rangement au coffre) se garde derrière un `fromDay` après la démo, sinon `newId` décale et I-07 (jours 1 à 15) casse.
+- Robot: compter un meuble ou un matelas partout (sacs des deux, coffre, sol, posé), sinon il rachète en boucle ce qui est tombé d'un sac plein; mais ne fabriquer qu'avec ce qui est sous la main (son sac, le coffre), sinon il boucle à l'établi.
+- Les sorties de `pnpm test:longue-vie` (`test-results/`) ne sont pas versionnées; tailles par profil dans le tableau « Taille de l'état (L-03) ».
+- Un `pnpm test` lancé avant d'ajouter un fichier de test ne l'inclut pas: relancer à la fin.

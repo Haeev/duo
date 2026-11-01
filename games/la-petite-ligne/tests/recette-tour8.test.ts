@@ -1,6 +1,5 @@
 // Recette du tour 8 (qa-testeur): critères T8 qui n'avaient pas de test. T8-10, semer selon la
-// saison (sections 2.3, 8.4 et 9): bogue QA8-01, pas encore corrigé, d'où les `it.fails` (la CI
-// reste verte; chacun échouera dès la correction, il faudra alors le passer en `it`).
+// saison (sections 2.3, 8.4 et 9): bogue QA8-01, corrigé (les `it.fails` sont passés en `it`).
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +44,7 @@ function trySow(sim: Sim, cell: Cell): void {
 }
 
 describe('T8-10: semer selon la saison (QA8-01)', () => {
-  it.fails('QA8-01: radis, laitue et carotte se sèment au printemps, en été et en automne (cultures.json, section 8.4)', () => {
+  it('QA8-01: radis, laitue et carotte se sèment au printemps, en été et en automne (cultures.json, section 8.4)', () => {
     const raw = JSON.parse(readFileSync(fileURLToPath(new URL('../donnees/cultures.json', import.meta.url)), 'utf8')) as {
       crops: { id: string; seasons: unknown }[];
     };
@@ -54,12 +53,12 @@ describe('T8-10: semer selon la saison (QA8-01)', () => {
     }
   });
 
-  it.fails('QA8-01: le message `sow_out_of_season` existe (section 8.4)', () => {
+  it('QA8-01: le message `sow_out_of_season` existe (section 8.4)', () => {
     const { content } = contentAndMap();
     expect(Object.hasOwn(content.texts.messages, 'sow_out_of_season')).toBe(true);
   });
 
-  it.fails('QA8-01: en hiver (jour 64), semer est refusé, la graine reste dans le sac (section 9)', () => {
+  it('QA8-01: en hiver (jour 64), semer est refusé, la graine reste dans le sac (section 9)', () => {
     const { sim, cell } = readyToSow(64, 'radish_seed');
     trySow(sim, cell);
     expect(gardenCellAt(sim, cell)?.crop ?? null).toBeNull();

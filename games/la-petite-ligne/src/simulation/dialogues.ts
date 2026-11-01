@@ -122,6 +122,33 @@ export function eligibleDailies(sim: Sim, villager: string, who: CharacterId): D
   return v === undefined ? [] : v.dialogues.filter((d) => d.kind === 'daily' && isAvailable(sim, d, who));
 }
 
+/**
+ * Compacte la mémoire des répliques entendues (QA8-02, I-06), chaque matin après la démo. Une
+ * entrée plus vieille que `datedRepeatDays` ne sert plus qu'au tirage « la moins récente » (son
+ * rang parmi les autres) et à dire qu'elle a été entendue: l'heure absolue (jour x 1440 + minutes)
+ * est remplacée par son rang parmi les vieilles entrées (0, 1, 2...), plus petit que toute heure
+ * réelle et toujours au-dessus de -1 (jamais entendue). Même ordre, mêmes égalités, et aucune
+ * vieille entrée ne passe pour « entendue aujourd'hui » ni « depuis moins de 28 jours ».
+ */
+export function foldOldHeard(sim: Sim): void {
+  const rule = sim.content.settings.dialogues;
+  const today = sim.world.clock.day;
+  if (today < rule.datedRepeatFromDay) return;
+  // Entendue avant ce jour: plus « récente » au sens de la règle des répliques datées.
+  const oldBefore = Math.min(today - rule.datedRepeatDays + 1, today) * MINUTES_PER_DAY;
+  for (const who of ['p1', 'p2'] as const) {
+    const heard = sim.world.heard[who];
+    const old = [...new Set(Object.values(heard).filter((at) => at < oldBefore))].sort((a, b) => a - b);
+    // Un rang doit rester sous une journée entière (jamais lu comme un jour joué).
+    if (old.length === 0 || old.length >= MINUTES_PER_DAY) continue;
+    const rank = new Map(old.map((at, i) => [at, i]));
+    for (const [id, at] of Object.entries(heard)) {
+      const r = rank.get(at);
+      if (r !== undefined) heard[id] = r;
+    }
+  }
+}
+
 /** Ce joueur vient d'entendre ce dialogue (mémoire du tirage « la moins récente »). */
 export function hearDialogue(sim: Sim, who: CharacterId, def: DialogueDef): void {
   if (def.kind !== 'daily' && def.once !== null) return;
