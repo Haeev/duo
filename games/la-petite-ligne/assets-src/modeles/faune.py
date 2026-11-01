@@ -659,7 +659,8 @@ ROE = {
     "muzzle": ((0, -0.535, 0.845), (0, -0.63, 0.815), (0, -0.645, 0.81), (0, -0.68, 0.801), 0.042, 0.031, 0.028, 0.018),
     "chin": ((0.025, 0.036, 0.015), (0, -0.617, 0.789)),
     "eye": ((0.052, -0.515, 0.873), 0.0105),
-    "ear": (0.13, 0.036, (0.036, -0.47, 0.903), 28, -12),
+    # oreille: longueur, largeur, base, écart du V (degrés depuis la verticale), recul, pavillon tourné vers dehors
+    "ear": (0.13, 0.072, (0.041, -0.462, 0.893), 40, -10, 25),
     "front": (0.068, (-0.27, 0.51), (-0.28, 0.33), (-0.275, 0.18), (-0.28, 0.035),
               (0.045, 0.03, 0.023, 0.017, 0.015, 0.013, 0.018)),
     "hind": (0.073, (0.29, 0.58), (0.21, 0.40), (0.34, 0.22), (0.305, 0.035), (0.036, 0.022, 0.015, 0.013, 0.018),
@@ -678,7 +679,7 @@ FAWN = {
     "muzzle": ((0, -0.315, 0.556), (0, -0.37, 0.538), (0, -0.38, 0.535), (0, -0.402, 0.529), 0.028, 0.021, 0.019, 0.013),
     "chin": ((0.017, 0.024, 0.01), (0, -0.365, 0.52)),
     "eye": ((0.038, -0.305, 0.58), 0.0085),
-    "ear": (0.095, 0.026, (0.03, -0.27, 0.595), 30, -16),
+    "ear": (0.105, 0.06, (0.030, -0.272, 0.590), 35, -12, 25),
     "front": (0.042, (-0.165, 0.32), (-0.17, 0.215), (-0.165, 0.118), (-0.17, 0.022),
               (0.026, 0.017, 0.012, 0.009, 0.0085, 0.0075, 0.011)),
     "hind": (0.045, (0.17, 0.36), (0.125, 0.25), (0.205, 0.132), (0.185, 0.022), (0.016, 0.011, 0.0085, 0.0075, 0.011),
@@ -688,12 +689,55 @@ FAWN = {
 }
 
 
+def ear_frame(d, s):
+    """Base et orientation d'une oreille de cervidé (s = 1 gauche, -1 droite).
+
+    Pavillon tourné vers dehors autour de son axe, puis écarté en V, puis reculé: de profil, on voit
+    l'ovale et son creux clair, jamais la tranche (la tranche dressée se lisait comme une dague de brocard).
+    """
+    _, _, (ax, ay, az_), splay, back, yaw = d["ear"]
+    M = (Matrix.Rotation(math.radians(back), 3, "X") @ Matrix.Rotation(math.radians(s * splay), 3, "Y")
+         @ Matrix.Rotation(math.radians(s * yaw), 3, "Z"))
+    return Vector((s * ax, ay, az_)), M
+
+
+def cupped_ear(g, d, s, inner, outer, bone):
+    """Oreille en ovale large et creusé: contour de 11 points (base pincée, plus large aux 45 centièmes,
+    bout arrondi), creux clair 1 cm en retrait du bord devant, dos bombé 1,2 cm derrière; 22 triangles."""
+    L, W = d["ear"][0], d["ear"][1]
+    base, M = ear_frame(d, s)
+    a, zc, b = W / 2, 0.45 * L, 0.55 * L
+
+    def half(z):
+        # super-ellipse: bout franchement arrondi, jamais en pointe
+        return a * max(0.0, 1 - abs((z - zc) / b) ** 2.6) ** (1 / 2.6)
+    zs = (0.0, 0.24 * L, 0.5 * L, 0.76 * L, 0.93 * L)
+    ring = [(half(z), z) for z in zs] + [(0.0, L)] + [(-half(z), z) for z in reversed(zs)]
+    sink = 0.012                       # base enfoncée dans le crâne
+    roll = 0.42 * W                    # bords roulés vers l'avant (cornet), plus à la base qu'au bout:
+    # vue par la tranche, l'oreille reste un croissant large et non une lame
+    pts = [(x, -roll * (1 - 0.6 * z / L) * (abs(x) / a) ** 1.5, z - sink) for x, z in ring]
+    pts.append((0.0, 0.012, 0.5 * L - sink))     # fond du creux (devant = -Y)
+    pts.append((0.0, 0.026, 0.5 * L - sink))     # bosse du dos
+    n = len(ring)
+    fc, bc = n, n + 1
+    faces = []
+    # contour dans le sens trigonométrique vu de devant: [i, j, creux] regarde devant, [j, i, bosse] derrière
+    for i in range(n):
+        j = (i + 1) % n
+        faces.append([i, j, fc])
+        faces.append([j, i, bc])
+    vs = [tuple(base + M @ Vector(p)) for p in pts]
+    ahead = M @ Vector((0, -1, 0))
+    return g.mesh(vs, faces, lambda f: inner if f.normal.dot(ahead) > 0 else outer, bone=bone)
+
+
 def deer_bones(d):
     p = d["p"]
     centre, back, front = d["spine"]
     n0, n1 = d["neck"][0], d["neck"][1]
     m_end = d["muzzle"][1]
-    ear_len, _, ear_loc, _, _ = d["ear"]
+    ear_len = d["ear"][0]
     bones = [
         (p + "_root", (0, 0, 0), (0, 0, 0.1), None),
         (p + "_hips", centre, back, p + "_root"),
@@ -703,8 +747,10 @@ def deer_bones(d):
         (p + "_tail", d["tail"][0], d["tail"][1], p + "_hips"),
     ]
     for s, side in ((1, "l"), (-1, "r")):
-        ex, ey, ez = ear_loc
-        bones.append((f"{p}_ear_{side}", (s * ex, ey, ez), (s * ex, ey, ez + ear_len), p + "_head"))
+        # os dans l'axe de l'oreille (les poses des clips sont données dans le repère du squelette)
+        base, M = ear_frame(d, s)
+        tip = base + M @ Vector((0, 0, ear_len))
+        bones.append((f"{p}_ear_{side}", tuple(base), tuple(tip), p + "_head"))
     x, j0, j1, j2, j3, _ = d["front"]
     for s, side in ((1, "l"), (-1, "r")):
         xs = s * x
@@ -779,18 +825,11 @@ def deer_mesh(A, d, spots=False):
     semi_c, loc_c = d["chin"]
     ell(g, semi_c, loc_c, "fox_white", h, segs=6, rings=3)
     (ex, ey, ez), er = d["eye"]
-    ear_len, ear_w, (ax, ay, az_), ear_out, ear_back = d["ear"]
     for s, side in ((1, "l"), (-1, "r")):
         g.sphere(er, loc=(s * ex, ey, ez), color="black", segs=5, rings=3, bone=h)
-        w = ear_w
-        pts = [(-w * 0.8, 0.0), (w * 0.8, 0.0), (w, ear_len * 0.45), (w * 0.5, ear_len * 0.88), (0.0, ear_len),
-               (-w * 0.5, ear_len * 0.88), (-w, ear_len * 0.45)]
-
-        def ear_color(face):
-            return "fox_white" if face.normal.y < -0.45 else "sepia_dark"
-        # pavillon tourné vers l'avant (dedans clair, dos et bord sombres); base enfoncée de 1 cm dans le crâne
-        g.prism(pts, w * 0.35, loc=(s * ax, ay, az_ - 0.01), color=ear_color,
-                rot=(ear_back, s * ear_out, 0), bone=f"{p}_ear_{side}")
+        # creux clair, dos gris-brun comme chez le vrai chevreuil: ni brun sombre (il se détachait comme un
+        # bois), ni roux (vue de dos, l'oreille du fond se lisait comme une excroissance du crâne)
+        cupped_ear(g, d, s, "fox_white", "wood_old", f"{p}_ear_{side}")
     ls = 6 if p == "roe" else 5      # pattes grêles du faon: 5 pans (bible 8.4, moins de 5 cm)
     x, j0, j1, j2, j3, rr = d["front"]
     for s, side in ((1, "l"), (-1, "r")):
@@ -811,8 +850,13 @@ def deer_mesh(A, d, spots=False):
         seg(g, (xs, *j2), (xs, j3[0], j3[1]), rr[2], rr[3], leg, b + "_3", segs=5, cap=False)
         seg(g, (xs, j3[0], j3[1]), (xs, j3[0] - 0.008, 0.0), rr[3] * 1.15, rr[4], "black", b + "_3", segs=5)
     t0, t1, tr0, tr1 = d["tail"]
-    # pinceau de poils sous l'écusson (propre aux chevrettes); petite queue rousse dessous blanc pour le faon
-    seg(g, t0, t1, tr0, tr1, "fox_white" if p == "roe" else by_normal(coat, coat, "fox_white", thr=0.3), p + "_tail", segs=5)
+    if p == "roe":
+        # pinceau de poils sous l'écusson (propre aux chevrettes): petit lobe gonflé à moitié enfoncé dans la
+        # croupe et fondu dans l'écusson (une baguette pendait comme une plaque)
+        ell(g, (0.03, 0.026, 0.042), (0, 0.392, 0.505), "fox_white", p + "_tail", segs=5, rings=3)
+    else:
+        # petite queue rousse dessous blanc pour le faon
+        seg(g, t0, t1, tr0, tr1, by_normal(coat, coat, "fox_white", thr=0.3), p + "_tail", segs=5)
     return g
 
 

@@ -24,7 +24,7 @@ Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/carte
 
 - `duo-python verifier/rendre_audit.py <sortie> [bourg ferme ...]`: audit du directeur artistique. Pour chaque nœud racine, quatre vues de près (iso avant, iso arrière, profil rasant, perspective plongeante) en Workbench avec cavités, planche `<fichier>__<nœud>.png`, et rapport `<fichier>.json`: îlots isolés qui ne touchent aucune autre pièce (pièces qui flottent), faces inversées (indicatif: les surfaces ouvertes comme l'eau sortent en faux positifs), arêtes ouvertes.
 - `duo-python verifier/controle_geometrie.py [fichier.glb ...]`: pièces qui flottent sans appui, faces inversées des volumes fermés, pièce longue (poutre, poteau) qui traverse une plaque (toit, auvent) de part en part. Rapport indicatif, chaque cas se vérifie à l'œil.
-- `duo-python verifier/quatre_angles.py <fichier.glb> <nœud> <image.png>`: rendu Cycles d'un nœud sous quatre azimuts, pour un contrôle de près.
+- `duo-python verifier/quatre_angles.py <fichier.glb> <nœud> <image.png>`: rendu Cycles d'un nœud sous quatre azimuts, pour un contrôle de près (`--pose <clip>:<image>` pour la faune, `--azimuts 90,270 --elevation 4` pour un profil strict).
 - `node verifier/verifier.cjs` (depuis la racine du dépôt): chargement dans Three.js 0.187 sous Chromium, animations comprises.
 - Validateur glTF (`gltf-validator`, `validateBytes` en Node): aucune erreur.
 
@@ -121,13 +121,14 @@ Fiches: `docs/jeux/jeu-1/tour-06-conception.md` section 1.4. Sources: `assets-sr
 
 Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes sources et conventions que le tour 6 (nœud racine du nom de la bête, maillage enfant `<bête>_mesh`, peau rigide par pièce, clips sur place). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-07/faune-*.png` (`verifier/quatre_faune.sh <dossier> tour7`, `planche_faune.py <dossier> clips roe_deer,fawn,kingfisher`, puis `echelle7`, `zoom1kf`, `contraste7`).
 
-- `roe_deer` (chevrette, sans bois): 0,70 m au garrot, tête dressée à 1,05 m (`deer_lookup`, `deer_stamp`), 1,10 m du mufle à la croupe; pelage d'été roux (`chicken_russet`, dos `fox_red_dark`, ventre `burlap`), mufle noir à bande blanche, menton blanc, oreilles de 0,13 m claires dedans, écusson fessier crème et pinceau de poils dessous (vus pendant `deer_bound`). Os préfixés `roe_`, 20 os. Dans `deer_watch_fawn` et `deer_lick`, la tête tourne vers sa gauche: orienter la chevrette le faon à sa gauche. `deer_bound`: bond sur place de 0,8 s, racine à 0,60 m au sommet, à boucler pour deux bonds.
-- `fawn` (faon de trois semaines): 0,45 m au garrot, 0,65 m de long, pattes grêles, livrée rousse à taches blanches en deux rangées le long du dos (bandes de facettes, rien de posé). `fawn_rustle` est la pose couchée au lit (pattes repliées, cou bas): posé à -0,3 m comme la fiche, seules les oreilles dépassent, d'environ 2 cm (sommet à 0,32 m, extra `bed_ears_top`). `fawn_rise` (0,8 s) lève l'arrière-train d'abord (0,17 s), à genoux devant (0,33 s), puis l'avant. `fawn_suckle`: tête relevée sous le flanc, queue qui frétille.
+- `roe_deer` (chevrette, sans bois): 0,70 m au garrot, tête dressée à 1,05 m (`deer_lookup`, `deer_stamp`), 1,10 m du mufle à la croupe; pelage d'été roux (`chicken_russet`, dos `fox_red_dark`, ventre `burlap`), mufle noir à bande blanche, menton blanc, oreilles en ovale large (0,13 x 0,072 m, bout arrondi), creusées en cornet (creux crème, dos gris-brun `wood_old`), écartées en V à 40° de la verticale, pavillon tourné de 25° vers dehors, os dans l'axe de chaque oreille (correctif G8 du tour 7: les lames étroites se lisaient de profil comme des dagues de brocard; `correctif-oreilles-*.png`), écusson fessier crème et pinceau de poils en petit lobe fondu dessous (vus pendant `deer_bound`). Os préfixés `roe_`, 20 os. Dans `deer_watch_fawn` et `deer_lick`, la tête tourne vers sa gauche: orienter la chevrette le faon à sa gauche. `deer_bound`: bond sur place de 0,8 s, racine à 0,60 m au sommet, à boucler pour deux bonds.
+- `fawn` (faon de trois semaines): 0,45 m au garrot, 0,65 m de long, pattes grêles, livrée rousse à taches blanches en deux rangées le long du dos (bandes de facettes, rien de posé). `fawn_rustle` est la pose couchée au lit (pattes repliées, cou bas): posé à -0,3 m comme la fiche, seules les oreilles dépassent, d'environ 2 cm (sommet à 0,32 m, extra `bed_ears_top`); oreilles de même forme que la mère (0,105 x 0,06 m, V à 35°). `fawn_rise` (0,8 s) lève l'arrière-train d'abord (0,17 s), à genoux devant (0,33 s), puis l'avant. `fawn_suckle`: tête relevée sous le flanc, queue qui frétille.
 - `kingfisher` (martin-pêcheur) agrandi x 1,5 comme la mésange (0,26 m, envergure 0,38 m; extra `display_scale`): à taille réelle il tient en 3 pixels sur son pieu au zoom de départ (24 m de large, 57 px/m) et son bleu ne se lit plus; à x 1,5, 5 à 6 pixels où le bleu et le roux se distinguent (`faune-martin-pecheur-zoom1.png`). Dos cobalt (`tit_blue`) avec la raie turquoise vive (`kingfisher_teal`, seule case ajoutée à la palette), ventre roux orangé (`goose_bill`), gorge et tache du cou blanches, pattes rouges. Ailes repliées en coquilles; ailes de vol réduites (échelle 0,04) au repos, déployées dans `kf_fly` (4 images, 0,133 s au lieu des 0,12 s de la fiche: l'export échantillonne à 30 images par seconde). `kf_dive` monte et avance la racine de 0,11 et 0,05 m pour que le bec ne traverse pas le pieu. Accroche du poisson: `socket_kingfisher_beak` (sur l'os `kf_head`).
 - `small_fish` (ablette): 0,12 m (0,08 m x 1,5, comme l'oiseau), origine au milieu du corps, tête vers +X glTF: sous `socket_kingfisher_beak` sans transformation, il est pris en travers du bec, tête à gauche de l'oiseau. Case `fish_silver` (rugosité 0,3, métal 0,3) pour le reflet.
 - `mooring_post` (pieu d'amarrage): chêne de 0,14 m à 6 pans, 1,40 m. Origine au bord du sommet, comme l'accroche `kingfisher_post` de la carte (z 0,95 au-dessus de l'eau); le sommet usé bombe de 2 cm (l'oiseau s'y tient à 0,97 m, comme la fiche), ligne d'eau à -0,95 m (bande de mousse), pied à -1,40 m fiché dans le lit. Anneau de fer à 0,60 m au-dessus de l'eau, à plat contre la face +Z glTF (vers le large), pendu à un crampon.
+- Amarre du ponton (`pontoon` de `bourg.glb`, correctif G9 du tour 7): la bitte du coin est retirée (elle doublait le pieu à 10 cm). Une glène de deux tours reste couchée sur le platelage, l'amarre passe le bord et file à l'anneau du pieu, nœud sur l'anneau, bout libre qui pend de 0,30 m vers l'eau. Le pieu étant posé par le jeu depuis la carte, l'amarre est modelée dans le ponton vers la position réelle de l'anneau en jeu (constantes `POST_MAP`, `POST_TOP`, `POST_SCALE`, `PONTOON_MAP` en tête de `_pontoon_rope` dans `bourg.py`): si le pieu ou le ponton bougent sur la carte, les reprendre. Contrôle: `verifier/ponton_pieu.py <bourg.glb> <faune.glb> <image.png>` (coin du ponton et pieu posé comme en jeu, quatre angles et dessus).
 - La brume de l'Aubrune n'a pas de modèle (fiche 1.4.9): nappes, volutes et éclats sont des effets du technical artist.
-- Budgets (bible 8.8; pas de ligne pour la faune, plafond d'un accessoire 900 comme au tour 6): chevrette 892, faon 900, martin-pêcheur 416, ablette 124, pieu 162 triangles. Au plus chargé du moment, chevrette et faon ensemble: 1 792 triangles. Fichier: 1 040 Ko après dédoublonnage, soudure et élagage (543 Ko avant le tour 7: trois bêtes et 18 clips de plus).
+- Budgets (bible 8.8; pas de ligne pour la faune, plafond d'un accessoire 900 comme au tour 6): chevrette 892, faon 896, martin-pêcheur 416, ablette 124, pieu 162 triangles. Au plus chargé du moment, chevrette et faon ensemble: 1 788 triangles. Fichier: 1 046 Ko après dédoublonnage, soudure et élagage (543 Ko avant le tour 7: trois bêtes et 18 clips de plus).
 
 ## Fiche par modèle
 
@@ -232,7 +233,7 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3365 Ko)
+### `bourg.glb` (3383 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -299,7 +300,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `river_straight` | 4 x 8 | 220 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
-| `pontoon` | 2 x 3 | 652 | walk_height: 0.5 |
+| `pontoon` | 2 x 3 | 906 | walk_height: 0.5 |
 | `tree_oak` |  | 358 | alias_of: "tree_oak_large" |
 | `tree_fir` |  | 174 | alias_of: "tree_fir_large" |
 | `bush` |  | 100 | alias_of: "bush_round" |
@@ -352,7 +353,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |
 
-### `faune.glb` (1040 Ko)
+### `faune.glb` (1046 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -361,7 +362,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `blue_tit` |  | 304 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.18, beak_socket: "socket_blue_tit_beak" |
 | `fox` |  | 798 | kind: "animal", origin: "sol entre les pattes", withers: 0.4, length: 0.65, tail: 0.4 |
 | `roe_deer` |  | 892 | kind: "animal", origin: "sol entre les pattes", withers: 0.7, head_up: 1.05, length: 1.1, collision_radius: 0.4, note: "tête tournée vers sa gauche dans deer_watch_fawn et deer_lick: le faon à sa gauche" |
-| `fawn` |  | 900 | kind: "animal", origin: "sol entre les pattes", withers: 0.45, length: 0.65, collision_radius: 0.4, bed_ears_top: 0.32, note: "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)" |
+| `fawn` |  | 896 | kind: "animal", origin: "sol entre les pattes", withers: 0.45, length: 0.65, collision_radius: 0.4, bed_ears_top: 0.32, note: "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)" |
 | `kingfisher` |  | 416 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.255, wingspan: 0.375, beak_socket: "socket_kingfisher_beak" |
 | `ladder_wood` |  | 176 | kind: "prop", lean_deg: 75.0, length: 3.0, rung_step: 0.28, rungs: 10, top: [0.0, 2.898, 0.776], note: "penchée vers +Z: la poser avec la rotation de celui qui grimpe" |
 | `nest_box` |  | 156 | kind: "prop", pivot: "clou", tilt_deg: 25, entrance: [0.0, -0.13, 0.181], roof_perch: [0.0, -0.048, 0.12], note: "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)" |

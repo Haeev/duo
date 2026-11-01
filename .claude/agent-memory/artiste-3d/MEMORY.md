@@ -84,3 +84,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Accroche de carte avec z (pieu, nichoir): l'origine du modèle est le point de l'accroche, pas forcément la base.
 - L'export échantillonne à 30 i/s: un clip de 0,12 s devient 4 images (0,133 s); le dire dans la fiche.
 - Le worktree isolé refuse les commandes composées avec heredoc vers des fichiers hors du dépôt, ou nommant git de façon complexe: écrire les scripts avec Write et lancer des commandes simples.
+
+## Oreilles, plaques fines et vues de jeu (vérifié le 2026-11-01)
+
+- Une plaque fine (oreille, aile, feuille) se voit par la tranche sous un angle au moins: la tranche dressée se lit comme une corne ou une dague. Remèdes vérifiés: contour en super-ellipse (bout arrondi), bords roulés vers l'avant en cornet (plus à la base qu'au bout), creux et dos bombé, dos de couleur intermédiaire (ni sombre, ni de la couleur du crâne). `cupped_ear` de `faune.py`.
+- Le lacet du pavillon est un compromis: grand, l'oreille se voit de profil mais l'oreille du fond passe par la tranche en vue de trois quarts avant (les vues de jeu sont à 45 + 90 k, élévation 35,264); 25 degrés tient les deux.
+- Contrôler une forme fine sous les 8 azimuts à 35 degrés (`quatre_angles.py --azimuts 0,45,...,315 --elevation 35`), pas seulement aux quatre angles standard ni en profil strict.
+- `controle_geometrie.py` donne des résultats différents d'une exécution à l'autre sur le même fichier (TRAVERSE et FLOTTE): comparer seulement les nœuds touchés.
+- Serveur de la page de rendu dans un worktree isolé: lier `node_modules` (racine et jeu) vers l'arbre principal par des liens symboliques, puis les retirer (ils apparaissent en non suivis). Les commandes contenant `--exclude-dir=.git` sont refusées: passer par un script.
+- Un tore fait à la main (`g.mesh`) avec l'ordre [a0, b0, b1, a1] sort inversé (vu par `--peaux`); [a0, a1, b1, b0] est juste.

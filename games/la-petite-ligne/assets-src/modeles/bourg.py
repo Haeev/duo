@@ -1777,6 +1777,67 @@ def river_curve(A, R=6.0):
     return root
 
 
+# Amarre du ponton. Le pieu d'amarrage (`mooring_post` de faune.glb) est posé par le jeu depuis la carte
+# (accroche `kingfisher_post` de donnees/cartes/halte.json: x 46,1, y 39,9, z 1,11 au-dessus de l'eau à
+# -0,16, échelle 1,168), pas par ce modèle: l'amarre part donc du ponton (posé en x 45, y 38,5, rotation 0)
+# vers la position réelle de l'anneau du pieu. Si le pieu ou le ponton bougent sur la carte, reprendre ces
+# valeurs (même calcul que `ring` dans les extras de mooring_post).
+POST_MAP = (46.1, 39.9)
+POST_TOP = -0.16 + 1.11
+POST_SCALE = 1.168
+PONTOON_MAP = (45.0, 38.5)
+RING_BOTTOM_LOCAL = (-0.422, 0.0751)    # bas de l'anneau sous le sommet du pieu, et saillie vers le large
+
+
+def _rope(g, pts, r=0.011, free_end=False):
+    """Corde: tronçons de cylindre d'un point au suivant, avec une perle à chaque coude (pas de jour).
+    Bouts ouverts (cachés dans la glène, le nœud ou une perle), sauf le bout libre."""
+    for k, (p0, p1) in enumerate(zip(pts, pts[1:])):
+        p0, p1 = Vector(p0), Vector(p1)
+        d = p1 - p0
+        eul = d.normalized().to_track_quat("Z", "Y").to_euler("XYZ")
+        g.cyl(r, d.length, loc=tuple((p0 + p1) / 2), color="rope", segs=5,
+              rot=tuple(math.degrees(a) for a in eul), cap=free_end and k == len(pts) - 2)
+    for p in pts[1:-1]:
+        g.sphere(r * 1.05, loc=p, color="rope", segs=5, rings=3)
+
+
+def _pontoon_rope(g):
+    """Glène posée sur le platelage au coin est, amarre qui passe le bord et file à l'anneau du pieu, nœud
+    sur l'anneau, bout libre qui pend vers l'eau (il n'y a plus de bitte: le pieu est l'amarrage)."""
+    # anneau dans le repère du ponton (Blender: x vers l'est, -y vers le sud = +Z glTF)
+    rx = POST_MAP[0] - PONTOON_MAP[0]
+    ry = -(POST_MAP[1] - PONTOON_MAP[1] + RING_BOTTOM_LOCAL[1] * POST_SCALE)
+    rz = POST_TOP + RING_BOTTOM_LOCAL[0] * POST_SCALE
+    deck = 0.50
+    cx, cy, R, rt = 0.60, -1.22, 0.075, 0.012
+    # glène: deux tours couchés l'un dans l'autre (un seul tour se lisait comme un anneau)
+    for Rk, phase in ((R, 0.0), (R - 0.026, 0.4)):
+        vs, faces = [], []
+        nm, nn = 7, 4
+        for i in range(nm):
+            a = 2 * math.pi * i / nm + phase
+            for j in range(nn):
+                b = 2 * math.pi * j / nn + math.pi / 4
+                rr = Rk + rt * math.cos(b)
+                vs.append((cx + rr * math.cos(a), cy + rr * math.sin(a), deck + rt + rt * math.sin(b)))
+        for i in range(nm):
+            for j in range(nn):
+                a0, a1 = i * nn + j, ((i + 1) % nm) * nn + j
+                b0, b1 = i * nn + (j + 1) % nn, ((i + 1) % nm) * nn + (j + 1) % nn
+                faces.append([a0, a1, b1, b0])
+        g.mesh(vs, faces, "rope")
+    a = math.radians(-40)
+    start = (cx + R * math.cos(a), cy + R * math.sin(a), deck + 0.011)
+    edge = (0.885, -1.465, deck + 0.011)
+    sag = (0.99, -1.482, rz + 0.004)     # légère flèche: la corde pend entre le bord et l'anneau
+    knot = (rx, ry - 0.004, rz - 0.004)
+    _rope(g, [start, edge, (0.905, -1.468, deck - 0.004), sag, knot])
+    g.sphere(0.019, loc=knot, color="rope", segs=6, rings=4, scale=(1.2, 0.9, 1.0))
+    _rope(g, [(rx + 0.004, ry - 0.006, rz - 0.015), (rx + 0.012, ry - 0.012, rz - 0.16),
+              (rx + 0.008, ry - 0.016, rz - 0.30)], free_end=True)
+
+
 def pontoon(A):
     """Ponton de 2 x 3, platelage à 0,5 m (posé sur la berge, il avance au-dessus de l'eau)."""
     g = A.geo()
@@ -1790,8 +1851,7 @@ def pontoon(A):
         g.box((0.1, 3.0, 0.12), loc=(x, 0, 0.32), color="wood_dark", base=True)
     for y in (-1.3, 1.3):
         g.box((1.8, 0.1, 0.1), loc=(0, y, 0.33), color="wood_dark", base=True)
-    g.cyl(0.06, 0.35, loc=(0.85, -1.3, 0.5), color="wood_dark", segs=6, base=True)
-    g.cyl(0.08, 0.05, loc=(0.85, -1.3, 0.7), color="rope", segs=6)
+    _pontoon_rope(g)
     # escalier côté sud, vers l'eau (-Y ici, +Z glTF): deux limons posés sur le pont et en bas, deux
     # marches de 30 cm
     # logées entre eux, contremarches de 17 cm (0,5 m en trois hauteurs)

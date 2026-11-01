@@ -51,7 +51,7 @@
    "collision_radius": 0.4,
    "bed_ears_top": 0.32,
    "note": "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)",
-   "tris": 900
+   "tris": 896
   },
   "kingfisher": {
    "kind": "animal",
@@ -351,5 +351,5 @@
    }
   ]
  },
- "file_bytes": 1099884
+ "file_bytes": 1107020
 }
