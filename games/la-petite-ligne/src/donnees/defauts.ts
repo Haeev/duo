@@ -9,6 +9,7 @@ import type {
   MemorySettings,
   MomentSettings,
   SecretSettings,
+  WeatherSettings,
 } from './types';
 
 /** Moments rares (tour 6): valeurs de la conception, section 3.2; `reglages.moments` les remplace. */
@@ -52,6 +53,32 @@ export const DEFAULT_MEMORIES: MemorySettings = {
   seasonDays: 21,
   seasonsPerYear: 4,
   maxBytes: 1536,
+};
+
+/** Météo tirée (tour 8, section 3): valeurs de la conception; `reglages.weather` les remplace. */
+export const DEFAULT_WEATHER: WeatherSettings = {
+  fromDay: 16,
+  draw: { spring: [41, 23, 36], summer: [59, 21, 20], autumn: [27, 28, 45], winter: [19, 49, 32] },
+  target: {
+    spring: [45, 25, 30],
+    summer: [60, 22, 18],
+    autumn: [35, 30, 35],
+    winter: [30, 45, 25],
+  },
+  persistence: 0.35,
+  maxRainStreak: 3,
+  maxDaysWithoutSun: 6,
+  forced: [{ day: 16, weather: 'sunny' }],
+  logDays: 7,
+  biteWaitFactor: { sunny: 1, cloudy: 1, rain: 0.8 },
+  // 9 h et 10 h 30, en minutes.
+  mist: {
+    afterRain: 1,
+    base: { spring: 0.08, summer: 0.04, autumn: 0.25, winter: 0.15 },
+    fadeFrom: 540,
+    until: 630,
+    biteWaitFactor: 0.75,
+  },
 };
 
 export const DEFAULT_FEEL: FeelSettings = {

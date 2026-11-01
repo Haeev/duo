@@ -161,11 +161,15 @@ Les dialogues `scene` partagés et `ending` ne se déclenchent pas par l'action 
 - `failText`: clé de `textes.messages`, affichée quand la condition d'événement de l'étape survient sans que les autres soient vraies (bêcher au bon endroit, mais pas à la bonne heure);
 - `resolve: "at_deadline"` avec `deadline` (`{ day, time }`) et `onDeadline` (effets): l'étape se clôt à l'échéance, quoi qu'il arrive; ses conditions servent seulement à savoir si elle est remplie. C'est la commande du samedi.
 
+Quête de la semaine (tour 8): `repeat: "each_train"` sur la quête. Une étape `at_deadline` sans `deadline` échoit au départ du train de la commande en cours (`train.departure`); la quête finie redémarre aussitôt pour le train suivant (étapes et compteurs remis à zéro). `{day}` dans `title`, `objective` et `completionText`: le jour de ce train. C'est `weekly_order`, démarrée par `second_order`.
+
 Les conditions d'une étape sont évaluées à chaque changement d'état et à chaque événement. Une condition d'événement (`used_tool_at`) est vraie à l'instant de l'événement, et les autres conditions de la liste sont vérifiées à ce même instant.
 
 ### 2.5 `courrier.json`
 
 `letters[]`: `id`, `from` (identifiant de `senders`), `title`, `delivery` (`{ day, time }`, ou `{ byEffect: true }` pour l'effet `send_letter`), et `text`, ou bien `variants` (`[{ when, text }]`: la première dont `when` est vrai; la dernière est sans condition). Une lettre arrive au tableau de la halte et dans l'onglet Courrier du carnet, chez les deux joueurs. `senders[]`: `id`, `label` affiché.
+
+Lettres hebdomadaires (tour 8): `delivery.instance: "train"`. Une instance par train, d'identifiant `<id>@<jour du train>` (le `@` est réservé). Avec `time` (sans `day`): elle arrive à cette heure le jour où la commande générée est tirée (départ du train précédent), ou aussitôt si la partie reprend plus tard; avec `byEffect`, elle part par `send_letter` et porte le jour du train qui vient de partir. `variantsNoRepeat: true`: la variante est tirée par la graine parmi celles dont `when` tient, jamais celle de la fois d'avant (chacune peut alors avoir sa condition). Le titre accepte les espaces réservés. Variables: `{day}` (jour du train), `{greeting}` (salutation de `textes.orderGreetings`, celles de toute saison et de la saison, jamais la même deux semaines de suite), `{order}`, `{tip}` (`textes.orderTips` du produit qui demande le plus d'avance, `leadDays`), `{linesDoneText}` (« aucune ligne », « une ligne », « 3 lignes »), `{linesTotal}`, `{amount}`. Le courrier garde les 12 lettres lues (par les deux) les plus récentes et toutes les non lues; seules les lettres hebdomadaires lues et anciennes s'en vont.
 
 ### 2.6 `astuces.json`
 
@@ -200,18 +204,24 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 - `orderFormat`: mise en forme de `{order}`: `line` pour chaque ligne, `separator` entre les lignes, `lastSeparator` avant la dernière.
 - `ui`: libellés de l'interface propre au jeu (carnet, HUD, comptoir, catalogue, caisse, établi, réchaud, propositions, petit-déjeuner, création des personnages).
 - `weekdays` (du samedi au vendredi, index = (jour - 1) modulo 7), `weather`, `nightScreen`, `endScreen`.
-- `souvenirs` (tour 7): textes de l'onglet Souvenirs du carnet. `empty` (page vide), `rumorLead` (« On dit au bourg… »), `listLabel`, `date` et `divider` (`{day}`, `{season}`, `{year}`), `seasons`, `seasonTitles` et `seasonsOf` (une entrée par saison, `reglages.memories.seasonsPerYear`), `years` puis `yearN` au-delà, `times` (index = nombre de passages: « Vu deux fois ensemble »...; au-delà, `often`), `last` et `lastOtherYear` (la dernière fois), `self` (ligne à soi d'un moment: `hintVillager` chez qui avait la confidence, `hintVillagerPartner` chez l'autre, `hintEve` et `hintEvePartner` sans habitant, `quest` pour un moment de quête), `firstTry`, `vignetteGeneric`, `fresh` (lu par le lecteur d'écran), et `secrets.<quête>` pour chaque quête à secret: `vignette` (texte de remplacement), `informed` et `doer` (ligne à soi). Aucun participe ni adjectif accordé à un joueur.
+- Tour 8: `stages.<étape>` (écran d'étape: `title`, `subtitle`, `text`, `highlight` pour les faits marquants de la séance, `next` quand « Rester à la Halte » manque), `seasonCards.<saison>` (carte du premier matin d'une saison: `title`, trois `lines`), `orderFormat.linesDone` (`none`, `one`, `many` avec `{n}`), `orderGreetings` (`all` et une liste par saison), `orderTips` (un conseil par produit de la commande générée), `weather.mistMorning` (« brume au lever », ajouté après le temps du matin), `ui.hud.season` (« {season} · jour {day} », jour de la saison) et `ui.hud.seasonNames`, `messages.stage_continue`.
+- `souvenirs` (tour 7): textes de l'onglet Souvenirs du carnet. `empty` (page vide), `rumorLead` (« On dit au bourg… »), `listLabel`, `date` et `divider` (`{day}`, `{season}`, `{year}`), `seasons`, `seasonTitles` et `seasonsOf` (une entrée par saison, `reglages.calendar.seasonsPerYear`), `years` puis `yearN` au-delà, `times` (index = nombre de passages: « Vu deux fois ensemble »...; au-delà, `often`), `last` et `lastOtherYear` (la dernière fois), `self` (ligne à soi d'un moment: `hintVillager` chez qui avait la confidence, `hintVillagerPartner` chez l'autre, `hintEve` et `hintEvePartner` sans habitant, `quest` pour un moment de quête), `firstTry`, `vignetteGeneric`, `fresh` (lu par le lecteur d'écran), et `secrets.<quête>` pour chaque quête à secret: `vignette` (texte de remplacement), `informed` et `doer` (ligne à soi). Aucun participe ni adjectif accordé à un joueur.
 
 ### 2.9 `reglages.json`
 
 | Bloc | Contenu |
 |---|---|
-| `clock` | `secondsPerGameMinute` (0,35 s), début et fin de journée, début possible de la veillée, heure de départ du jour 1 (10 h), fin de la démo (jour 15, 16 h), jour de la semaine du jour 1, horloge arrêtée quand les deux sont dans un menu |
-| `train` | jours (1, 8 et 15), arrivée, départ |
-| `weatherByDay` | une valeur par jour, `sunny`, `cloudy` ou `rain`, du jour 1 au dernier jour (quinze) |
+| `calendar` | tour 8: `seasonDays` (21), `seasonsPerYear` (4); le jour 1 ouvre le printemps, chaque saison commence un samedi. Seule source des saisons (`memories` ne les porte plus: le validateur refuse les deux) |
+| `clock` | `secondsPerGameMinute` (0,35 s, rythme du jour 1), `schedule` (D1: `[{ fromDay, secondsPerGameMinute }]`, appliqué à l'aube du jour donné; livré: 0,35 s partout), début et fin de journée, début possible de la veillée, heure de départ du jour 1 (10 h), `lastDay` (limite de la partie: samedi 43, 16 h), jour de la semaine du jour 1, horloge arrêtée quand les deux sont dans un menu |
+| `stages` | tour 8: étapes `{ id, day, time, texts }` (`demo` au jour 15 à 16 h, `summer_end` au jour 43 à 16 h); l'effet `end_stage` ouvre l'écran d'étape; « Rester à la Halte » existe si `clock.lastDay` tombe après l'étape |
+| `continuation`, `tenderness` | D4: `mode` (`same_save`, livré; `new_game_per_stage`), sans effet dans cette version. D7: `none`, `accomplices`, `gentle` (livré), lu par la condition `tenderness_at_least` |
+| `train` | jours écrits (1, 8 et 15), puis un tous les `repeatEveryDays` jours (7: chaque samedi), arrivée, départ, `saluteSlowRoll` (question 2 du tour 7, réservé) |
+| `weatherByDay` | une valeur par jour écrit, `sunny`, `cloudy` ou `rain`, du jour 1 au jour 15 (`weather.fromDay - 1`) |
+| `weather` | tour 8, météo tirée à partir de `fromDay` (16): `draw` (table de tirage par saison, soleil, nuages, pluie, somme 100), `target` (fréquences visées, pour les tests), `persistence` (part de « même temps que la veille »), `maxRainStreak` (3), `maxDaysWithoutSun` (6), `forced` (jours imposés: le 16 au soleil), `logDays` (journal de 7 jours), `biteWaitFactor`, `mist` (`afterRain` 1, `base` par saison, levée de `fadeFrom` à `until`, `biteWaitFactor`). Tirage par `unitDraw` (`src/etat/meteo.ts`), même calcul que `tour8_suite.py` |
+| `forage` | tour 8, cueillette de la lisière: `fromDay`, `spawnChance`, `unseenFactor`, `rainBoost`, `points` (coins et leurs cueillettes), `items` (saisons, poids, quantité); lue par la commande générée (capacité de la lisière) |
 | `spawn` | point d'apparition des deux joueurs |
-| `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (`windows`: une fenêtre par semaine, date limite et livraison; celle du moment est la première dont la livraison n'est pas passée) |
-| `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train) |
+| `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (`windows`: une fenêtre par semaine, date limite et livraison; celle du moment est la première dont la livraison n'est pas passée; puis `repeatWeekly`: commande jusqu'au `deadlineWeekday` à `deadlineTime`, livraison le lendemain à `deliveryTime`) |
+| `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train). `generated` (tour 8, sections 4.2 à 4.7 de la conception): commandes tirées à partir de `fromOrder` (3), au départ du train précédent: lignes par commande (`linesByOrder`), familles, reprises, poids, budget et sa progression, taille du duo (`size`), capacités des ressources (`resources`), paie minimale d'une ligne (`paymentPerWorkWeek` sous par semaine de travail), produits de base partagés (`noSharedBase`), et `products` (`item`, `family`, `resource`, `cost`, `min`, `price` facultatif, `seasons`, `obtained`: le compteur du duo qui dit que le produit est obtenu, `leadDays`) |
 | `garden`, `quality`, `trees`, `hens` | potager (12 cases, zone de carte), qualité, arbres (nombre, zone, coups de hache, rondins), poules |
 | `endurance` | `base + perFormPoint x forme`; coûts par action, multipliés par `costMultiplier`; à 0, les actions durent `atZeroDurationMultiplier` fois plus longtemps (jamais de blocage) |
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
@@ -220,10 +230,12 @@ Les conditions d'une étape sont évaluées à chaque changement d'état et à c
 | `benches` | bancs de la carte: places le long du banc (`slots`, m depuis son milieu, deux par banc: jamais deux corps sur la même), avancée de l'assise (`seatForward`), lever devant la place (`standForward`), Espace à moins de `sitRange` m d'une place libre fait s'asseoir, un habitant arrêté à `villagerReach` m du banc y tient une place; valeurs par défaut dans `src/donnees/defauts.ts` |
 | `feel` | réglages fins dont le code a une valeur par défaut (`src/donnees/defauts.ts`); ceux écrits ici la remplacent. `fishWeights`: poids du tirage de chaque poisson (goujon 6, chevesne 3, truite 2) |
 | `moments` | moments rares (section 2.10): `dailyChance` (0,5), `maxPerDay`, `cooldownDays` (7), `firstAmbientDay`, `noAmbientOnTrainDays`, `stillSpeed` (m/s sous laquelle on est immobile), `noticeRadius` (« Montre-le à {partner} ! »), `heartBonus` (Cœur à l'apogée, une fois par jour), `musicDuckDb` et ses durées, `firstHint` (premier destinataire d'une confidence, `p2`), `maxSyncGapSeconds`, `holdRange` (portée du geste « tenir »), `tiers` (niveaux tirés, `["P0"]`) |
-| `memories` | souvenirs du carnet (tour 7): `seasonDays` (21 jours par saison, le jour 1 ouvre le printemps de la première année), `seasonsPerYear` (4), `maxBytes` (1536: borne de `world.memories` vérifiée par les tests, S-14) |
+| `memories` | souvenirs du carnet (tour 7): `maxBytes` (1536: borne de `world.memories` vérifiée par les tests, S-14); les saisons sont celles de `calendar` |
 | `secrets` | informations propres (R16): `firstInformed` (`p1`), `nudgeAfterErrors` (coup de coude à l'informé), `firstTryHeart`, `henChoiceRange` (portée de l'appel d'une poule), `henChoiceKeepOpen` (le choix reste ouvert tant que la poule est à moins de tant), `hideFromGuestSnapshot` (P1, pas encore lu), `knownHensFlag` (drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms) |
 
 Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 sous, la commande 2 990 sous.
+
+Commande générée (tour 8): une ligne remplie rapporte le plus grand de `count x prix x linePremium` (le prix de `products[].price`, sinon `sellPrice`) et de `part x paymentPerWorkWeek`; la prime `fullBonus` et le paiement du reste ne changent pas. Au départ du train, la coopérative tire la commande suivante (`world.order.generated`) pour le samedi qui suit: le budget monte de `stepOnComplete` après une commande complète, ne bouge pas après un échec, baisse de `afterTwoMisses` après deux échecs de suite, entre `floor` et `max`.
 
 ### 2.10 `moments.json` (tour 6)
 
@@ -254,8 +266,12 @@ Paramètres communs des conditions qui comptent:
 | `weekday_is` | `weekdays` (liste) | le jour de la semaine est dans la liste |
 | `time_is` | `from`, `to` | l'heure est dans `[from, to[` |
 | `weather_is` | `weather` | la météo du jour est celle-là |
-| `weather_was` | `weather` | la météo de la veille était celle-là (faux le jour 1; la brume après la pluie) |
-| `season_is` | `seasons` (liste de `spring`, `summer`, `autumn`, `winter`), `fromSeasonDay` (facultatif, 1) | la saison du jour en fait partie (calendrier de `reglages.memories`, printemps au jour 1), et le jour de la saison est au moins `fromSeasonDay` |
+| `weather_was` | `weather` | la météo de la veille était celle-là (faux le jour 1; écrite pendant la démo, puis lue dans le journal de la météo tirée) |
+| `weather_tomorrow_is` | `weather` | la prévision du soir (la météo déjà tirée du lendemain) est celle-là |
+| `morning_mist` | | ce matin, la brume est sur l'Aubrune (`world.morningMist`, à partir du jour 16) |
+| `tenderness_at_least` | `level` (`none`, `accomplices`, `gentle`) | le réglage D7 (`reglages.tenderness`) est au moins celui-là |
+| `stage_due` | `stage` | l'heure de l'étape est venue et elle n'est pas franchie |
+| `season_is` | `seasons` (liste de `spring`, `summer`, `autumn`, `winter`), `fromSeasonDay` (facultatif, 1) | la saison du jour en fait partie (calendrier de `reglages.calendar`, printemps au jour 1), et le jour de la saison est au moins `fromSeasonDay` |
 | `flag` | `flag` | le drapeau est posé |
 | `quest_active`, `quest_done` | `quest` | la quête a démarré et n'est pas finie, ou elle est finie |
 | `step_active`, `quest_step_done` | `quest`, `step` | l'étape est l'étape en cours, ou elle est finie |
@@ -305,7 +321,9 @@ Paramètres communs des conditions qui comptent:
 | `show_text` | `text` | affiche un message de `textes.messages` chez les deux joueurs |
 | `set_world_state` | `key`, `value` | change l'état d'un lieu: `handcar_shed` passe de `closed` à `open` (la remise s'ouvre sur la draisine) |
 | `pay_order` | | paie la commande et vide la caisse (section 2.9) |
-| `end_demo` | | affiche l'écran de fin (`textes.endScreen`) et clôt la séance |
+| `end_stage` | `stage` | ouvre l'écran d'étape (`textes.stages`), pas avant le jour et l'heure de l'étape, jamais une étape déjà franchie; les deux choisissent « Rester à la Halte » ou « Finir la séance » |
+| `end_demo` | | ancien nom: vaut `end_stage` de l'étape `demo` |
+
 | `if` | `condition`, `then`, `else` | applique `then` si la condition est vraie, sinon `else` |
 | `reveal_secret` | `quest` | le secret de la quête devient visible des deux joueurs (fin d'une quête secrète: les noms des poules chez les deux) |
 

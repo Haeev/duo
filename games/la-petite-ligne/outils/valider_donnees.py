@@ -83,6 +83,11 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     # Tour 7: météo de la veille (la brume) et saison du jour (calendrier de `reglages.memories`).
     "weather_was": ({"weather"}, set()),
     "season_is": ({"seasons"}, {"fromSeasonDay"}),
+    # Tour 8: prévision du lendemain, brume du matin, tendresse (D7), étape due.
+    "weather_tomorrow_is": ({"weather"}, set()),
+    "morning_mist": (set(), set()),
+    "tenderness_at_least": ({"level"}, set()),
+    "stage_due": ({"stage"}, set()),
     "flag": ({"flag"}, set()),
     "quest_active": ({"quest"}, set()),
     "quest_done": ({"quest"}, set()),
@@ -138,6 +143,8 @@ EFFECTS: dict[str, tuple[set[str], set[str]]] = {
     "set_world_state": ({"key", "value"}, set()),
     "pay_order": (set(), set()),
     "end_demo": (set(), set()),
+    # Tour 8: écran d'étape (`end_demo` vaut `end_stage` de l'étape `demo`).
+    "end_stage": ({"stage"}, set()),
     "if": ({"condition", "then", "else"}, set()),
 }
 
@@ -154,7 +161,17 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
                 "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
-                "villager", "season", "year", "times", "seasonOf"}
+                "villager", "season", "year", "times", "seasonOf",
+                # Tour 8: lettres de la commande générée (`courrier.json`) et formats (`textes.orderFormat`).
+                "greeting", "tip", "linesDoneText", "n"}
+# Tour 8: étapes, niveaux de tendresse (D7), modes de continuation (D4), saisons, familles et ressources des commandes.
+STAGE_IDS = {"demo", "summer_end"}
+TENDERNESS = ["none", "accomplices", "gentle"]
+CONTINUATION = {"same_save", "new_game_per_stage"}
+SEASONS = ["spring", "summer", "autumn", "winter"]
+ORDER_FAMILIES = {"potager", "basse-cour", "cuisine", "rivière", "bois", "lisière"}
+ORDER_RESOURCES = {"garden", "eggs", "river", "wood", "forage"}
+WEEKDAYS = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday"]
 
 # Sprite des icônes de l'interface: les vignettes des souvenirs y sont des symboles (tour 7).
 ICONS_SOURCE = Path(__file__).resolve().parent.parent / "ui-maquettes" / "outils" / "icones-source.svg"
@@ -347,6 +364,10 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
         reg.secret_role_uses.append((str(cond.get("quest")), w))
     if ctype == "moment_seen":
         reg.moments_seen.append((str(cond.get("moment")), w))
+    if ctype == "tenderness_at_least" and cond.get("level") not in TENDERNESS:
+        report.error(w, f"niveau de tendresse inconnu {cond.get('level')!r} ({', '.join(TENDERNESS)})")
+    if ctype == "stage_due" and cond.get("stage") not in STAGE_IDS:
+        report.error(w, f"étape inconnue {cond.get('stage')!r}")
     if ctype == "choice_made" and "correct" in cond and cond["correct"] is not True:
         report.error(w, "choice_made: « correct » ne peut valoir que true")
     if "since" in cond and cond["since"] not in SINCE:
@@ -416,6 +437,8 @@ def check_effect(eff: Any, where: str, reg: Registry, report: Report) -> None:
         allowed = WORLD_STATES.get(eff.get("key", ""))
         if allowed is None or eff.get("value") not in allowed:
             report.error(w, f"état du monde inconnu {eff.get('key')!r}={eff.get('value')!r}")
+    if etype == "end_stage" and eff.get("stage") not in STAGE_IDS:
+        report.error(w, f"étape inconnue {eff.get('stage')!r}")
     if etype == "spawn_animals" and "names" in eff and len(eff["names"]) != eff.get("count"):
         report.error(w, "autant de noms que de bêtes attendus")
     for key, kind in (("item", "item"), ("quest", "quest"), ("letter", "letter"), ("recipe", "recipe"),
@@ -667,14 +690,18 @@ def check_quetes(data: dict[str, Any], reg: Registry, report: Report) -> None:
             if "failText" in step:
                 ref("text", step["failText"], ws, reg, report)
             if step.get("resolve") == "at_deadline":
-                deadline = step.get("deadline", {})
-                if deadline.get("day") not in DEMO_DAYS:
-                    report.error(ws, "échéance hors de la démo")
-                check_time(deadline.get("time"), ws, report)
+                # Quête de la semaine (`repeat: each_train`, tour 8): l'échéance est le départ de chaque train.
+                if "deadline" in step or quest.get("repeat") is None:
+                    deadline = step.get("deadline", {})
+                    if deadline.get("day") not in DEMO_DAYS:
+                        report.error(ws, "échéance hors de la démo")
+                    check_time(deadline.get("time"), ws, report)
                 check_effects(step.get("onDeadline", []), f"{ws}.onDeadline", reg, report)
             elif "resolve" in step:
                 report.error(ws, f"« resolve » inconnu {step['resolve']!r}")
         check_effects(quest.get("completionEffects", []), f"{w}.completionEffects", reg, report)
+        if "repeat" in quest and quest["repeat"] != "each_train":
+            report.error(w, f"« repeat » inconnu {quest['repeat']!r} (each_train)")
         if not quest.get("completionText"):
             report.error(w, "« completionText » manquant")
     for quest in data.get("quetes", {}).get("quests", []):
@@ -739,7 +766,8 @@ def check_souvenirs(data: dict[str, Any], reg: Registry, report: Report) -> None
         return
     for key in ("seasons", "seasonTitles", "seasonsOf"):
         values = souvenirs.get(key)
-        seasons = data.get("reglages", {}).get("memories", {}).get("seasonsPerYear", 4)
+        settings = data.get("reglages", {})
+        seasons = settings.get("calendar", settings.get("memories", {})).get("seasonsPerYear", 4)
         if not isinstance(values, list) or len(values) != seasons:
             report.error(f"textes.souvenirs.{key}", f"{seasons} saisons attendues")
     secrets = souvenirs.get("secrets", {})
@@ -968,12 +996,21 @@ def check_courrier(data: dict[str, Any], reg: Registry, report: Report) -> None:
         if letter.get("from") not in reg.senders:
             report.error(w, f"expéditeur inconnu {letter.get('from')!r}")
         delivery = letter.get("delivery", {})
+        instance = delivery.get("instance")
+        if instance is not None and instance != "train":
+            report.error(w, f"« instance » inconnue {instance!r} (train)")
+        if "@" in str(letter.get("id")):
+            report.error(w, "« @ » est réservé aux lettres hebdomadaires")
+        if instance is not None and not settings_generated(data):
+            report.error(w, "lettre hebdomadaire sans commande générée (reglages.order.generated)")
         if not delivery.get("byEffect"):
-            if delivery.get("day") not in DEMO_DAYS:
+            # Une lettre hebdomadaire arrive à l'heure dite le jour du tirage de la commande: pas de jour écrit.
+            if instance is None and delivery.get("day") not in DEMO_DAYS:
                 report.error(w, "jour de livraison hors de la démo")
             check_time(delivery.get("time"), w, report)
         if "variants" in letter:
-            if not letter["variants"] or letter["variants"][-1].get("when"):
+            # Variantes tirées sans redite (`variantsNoRepeat`): chacune a sa condition, le texte de repli est la dernière.
+            if not letter["variants"] or (letter["variants"][-1].get("when") and not letter.get("variantsNoRepeat")):
                 report.error(w, "la dernière variante doit être sans condition")
             for i, variant in enumerate(letter["variants"]):
                 check_conditions(variant.get("when", []), f"{w}.variants[{i}]", reg, report)
@@ -1037,8 +1074,8 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
         report.error("textes.form", f"niveaux attendus {FORM_LEVELS}, trouvés {levels}")
     if len(textes.get("weekdays", [])) != 7:
         report.error("textes.weekdays", "sept jours attendus, du samedi au vendredi")
-    if set(textes.get("weather", {})) != WEATHERS:
-        report.error("textes.weather", f"météos attendues {sorted(WEATHERS)}")
+    if set(textes.get("weather", {})) - {"mistMorning"} != WEATHERS:
+        report.error("textes.weather", f"météos attendues {sorted(WEATHERS)} (et « mistMorning »)")
     settings = data.get("reglages", {})
     clock = settings.get("clock", {})
     for key in ("dayStart", "dayEnd", "veilleeFrom"):
@@ -1046,8 +1083,12 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
     if not isinstance(clock.get("secondsPerGameMinute"), (int, float)) or clock["secondsPerGameMinute"] <= 0:
         report.error("reglages.clock", "« secondsPerGameMinute » positif attendu")
     weather = settings.get("weatherByDay", [])
-    if len(weather) != len(DEMO_DAYS) or not set(weather) <= WEATHERS:
-        report.error("reglages.weatherByDay", f"{len(DEMO_DAYS)} météos connues attendues, une par jour de la démo")
+    # Tour 8: la météo est écrite jusqu'au premier jour tiré (`weather.fromDay`), puis tirée.
+    drawn_from = settings.get("weather", {}).get("fromDay") if isinstance(settings.get("weather"), dict) else None
+    written = drawn_from - 1 if isinstance(drawn_from, int) else len(DEMO_DAYS)
+    if len(weather) != written or not set(weather) <= WEATHERS:
+        report.error("reglages.weatherByDay", f"{written} météos connues attendues, une par jour écrit")
+    check_weekly(data, reg, report)
     order = settings.get("order", {})
     # Une commande par train (`trains`), ou l'ancienne forme à une seule commande (`lines`).
     trains = order.get("trains") if isinstance(order.get("trains"), list) else [{"day": None, "lines": order.get("lines", [])}]
@@ -1094,7 +1135,177 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
         report.error("reglages.needs.formLevels", f"niveaux attendus {FORM_LEVELS}")
 
 
+def settings_generated(data: dict[str, Any]) -> bool:
+    order = data.get("reglages", {}).get("order", {})
+    return isinstance(order, dict) and isinstance(order.get("generated"), dict)
+
+
+def check_odds(value: Any, where: str, report: Report) -> None:
+    if not isinstance(value, list) or len(value) != 3 or not all(isinstance(x, (int, float)) and x >= 0 for x in value):
+        report.error(where, "[soleil, nuages, pluie] positifs attendus")
+    elif abs(sum(value) - 100) > 1e-9:
+        report.error(where, f"somme de 100 attendue ({sum(value)})")
+
+
+def check_probability(value: Any, where: str, report: Report) -> None:
+    if not isinstance(value, (int, float)) or not 0 <= value <= 1:
+        report.error(where, f"probabilité de 0 à 1 attendue ({value!r})")
+
+
+def check_weekly(data: dict[str, Any], reg: Registry, report: Report) -> None:
+    """Réglages et textes de la suite après le jour 15 (tour 8): calendrier, rythme, étapes, météo,
+    catalogue et commande hebdomadaires, cueillette, D4 et D7."""
+    settings = data.get("reglages", {})
+    textes = data.get("textes", {})
+    clock = settings.get("clock", {})
+    last = clock.get("lastDay", {})
+    last_day = last.get("day") if isinstance(last.get("day"), int) else len(DEMO_DAYS)
+    calendar = settings.get("calendar")
+    memories = settings.get("memories", {})
+    if calendar is not None:
+        if any(k in memories for k in ("seasonDays", "seasonsPerYear")):
+            report.error("reglages.memories", "saisons à lire dans « calendar » seulement (retirer seasonDays et seasonsPerYear)")
+        for key in ("seasonDays", "seasonsPerYear"):
+            if not isinstance(calendar.get(key), int) or calendar[key] < 1:
+                report.error(f"reglages.calendar.{key}", "entier positif attendu")
+    schedule = clock.get("schedule")
+    if schedule is not None:
+        previous = 0
+        for i, step in enumerate(schedule if isinstance(schedule, list) else []):
+            w = f"reglages.clock.schedule[{i}]"
+            day = step.get("fromDay")
+            if not isinstance(day, int) or day <= previous:
+                report.error(w, "« fromDay » croissant attendu")
+            else:
+                previous = day
+            spm = step.get("secondsPerGameMinute")
+            if not isinstance(spm, (int, float)) or spm <= 0:
+                report.error(w, "« secondsPerGameMinute » positif attendu")
+        first = schedule[0] if isinstance(schedule, list) and schedule else {}
+        if first.get("fromDay") != 1 or first.get("secondsPerGameMinute") != clock.get("secondsPerGameMinute"):
+            report.error("reglages.clock.schedule", "le premier pas commence au jour 1 et vaut clock.secondsPerGameMinute")
+    stages_texts = textes.get("stages", {})
+    previous = 0
+    for i, stage in enumerate(settings.get("stages", [])):
+        w = f"reglages.stages[{i}]"
+        if stage.get("id") not in STAGE_IDS or stage.get("texts") not in STAGE_IDS:
+            report.error(w, f"étape inconnue {stage.get('id')!r} (textes {stage.get('texts')!r})")
+        day = stage.get("day")
+        if not isinstance(day, int) or day <= previous or day > last_day:
+            report.error(w, f"jour {day!r}: étapes dans l'ordre, au plus tard le jour {last_day} (clock.lastDay)")
+        else:
+            previous = day
+        check_time(stage.get("time"), w, report)
+        block = stages_texts.get(stage.get("texts"), {})
+        for key in ("title", "subtitle", "text", "highlight"):
+            if not isinstance(block.get(key), str) or not block.get(key):
+                report.error(f"textes.stages.{stage.get('texts')}", f"« {key} » attendu")
+    if settings.get("tenderness", "gentle") not in TENDERNESS:
+        report.error("reglages.tenderness", f"niveau inconnu {settings.get('tenderness')!r}")
+    if settings.get("continuation", {}).get("mode", "same_save") not in CONTINUATION:
+        report.error("reglages.continuation", f"mode inconnu {settings.get('continuation')!r}")
+    repeat = settings.get("train", {}).get("repeatEveryDays", 0)
+    if not isinstance(repeat, int) or repeat < 0:
+        report.error("reglages.train.repeatEveryDays", "entier positif ou nul attendu")
+    weekly = settings.get("economy", {}).get("catalogue", {}).get("repeatWeekly")
+    if weekly is not None:
+        if weekly.get("deadlineWeekday") not in WEEKDAYS:
+            report.error("reglages.economy.catalogue.repeatWeekly", f"jour inconnu {weekly.get('deadlineWeekday')!r}")
+        check_time(weekly.get("deadlineTime"), "reglages.economy.catalogue.repeatWeekly", report)
+        check_time(weekly.get("deliveryTime"), "reglages.economy.catalogue.repeatWeekly", report)
+    weather = settings.get("weather")
+    if isinstance(weather, dict):
+        for block in ("draw", "target"):
+            for season in SEASONS:
+                check_odds(weather.get(block, {}).get(season), f"reglages.weather.{block}.{season}", report)
+        check_probability(weather.get("persistence"), "reglages.weather.persistence", report)
+        mist = weather.get("mist", {})
+        check_probability(mist.get("afterRain"), "reglages.weather.mist.afterRain", report)
+        for season in SEASONS:
+            check_probability(mist.get("base", {}).get(season), f"reglages.weather.mist.base.{season}", report)
+        check_time(mist.get("fadeFrom"), "reglages.weather.mist", report)
+        check_time(mist.get("until"), "reglages.weather.mist", report)
+        for i, forced in enumerate(weather.get("forced", [])):
+            if not isinstance(forced.get("day"), int) or forced["day"] < weather.get("fromDay", 1) or forced.get("weather") not in WEATHERS:
+                report.error(f"reglages.weather.forced[{i}]", "jour tiré et météo connue attendus")
+        if "mistMorning" not in textes.get("weather", {}):
+            report.error("textes.weather", "« mistMorning » attendu (brume du matin)")
+    forage = settings.get("forage")
+    forage_items: set[str] = set()
+    if isinstance(forage, dict):
+        check_probability(forage.get("spawnChance"), "reglages.forage.spawnChance", report)
+        for i, item in enumerate(forage.get("items", [])):
+            w = f"reglages.forage.items[{i}]"
+            forage_items.add(str(item.get("item")))
+            if not set(item.get("seasons", [])) <= set(SEASONS) or not item.get("seasons"):
+                report.error(w, f"saisons inconnues {item.get('seasons')!r}")
+            count = item.get("count")
+            if not isinstance(count, list) or len(count) != 2 or not 1 <= count[0] <= count[1]:
+                report.error(w, f"« count » [min, max] attendu ({count!r})")
+        for i, point in enumerate(forage.get("points", [])):
+            w = f"reglages.forage.points[{i}]"
+            ref("point", point.get("point"), w, reg, report)
+            for item in point.get("items", []):
+                if item not in forage_items:
+                    report.error(w, f"cueillette inconnue {item!r} (forage.items)")
+    generated = settings.get("order", {}).get("generated")
+    if isinstance(generated, dict):
+        products: set[str] = set()
+        for i, p in enumerate(generated.get("products", [])):
+            w = f"reglages.order.generated.products[{i}]"
+            item = p.get("item")
+            products.add(str(item))
+            if p.get("family") not in ORDER_FAMILIES:
+                report.error(w, f"famille inconnue {p.get('family')!r}")
+            if p.get("resource") not in ORDER_RESOURCES:
+                report.error(w, f"ressource inconnue {p.get('resource')!r}")
+            if p.get("resource") == "forage":
+                if item not in forage_items:
+                    report.error(w, f"cueillette inconnue {item!r} (reglages.forage.items)")
+            else:
+                ref("item", item, w, reg, report)
+                known = reg.items.get(item)
+                if known is not None and known.get("sellPrice") is None and p.get("price") is None:
+                    report.error(w, f"{item!r} sans prix de vente ni « price »: la ligne ne rapporterait rien")
+            if not isinstance(p.get("cost"), (int, float)) or p["cost"] <= 0:
+                report.error(w, "« cost » positif attendu")
+            if not isinstance(p.get("min"), int) or p["min"] < 1:
+                report.error(w, "« min » entier positif attendu")
+            if not set(p.get("seasons", [])) <= set(SEASONS) or not p.get("seasons"):
+                report.error(w, f"saisons inconnues {p.get('seasons')!r}")
+            if not re.match(r"^[a-z_]+:[a-z_]+$", str(p.get("obtained"))):
+                report.error(w, f"« obtained » attendu en « compteur:objet » ({p.get('obtained')!r})")
+            if item not in textes.get("orderTips", {}):
+                report.error("textes.orderTips", f"conseil manquant pour {item!r}")
+        for dish, bases in generated.get("noSharedBase", {}).items():
+            for pid in [dish, *bases]:
+                if pid not in products:
+                    report.error("reglages.order.generated.noSharedBase", f"produit inconnu {pid!r}")
+        sizes = generated.get("size", {})
+        if sizes.get("current") not in sizes.get("factors", {}):
+            report.error("reglages.order.generated.size", f"taille inconnue {sizes.get('current')!r}")
+        budget = generated.get("budget", {})
+        if not budget.get("floor", 0) <= budget.get("start", 0) <= budget.get("max", 0):
+            report.error("reglages.order.generated.budget", "plancher <= départ <= maximum attendu")
+        greetings = textes.get("orderGreetings", {})
+        if not greetings.get("all"):
+            report.error("textes.orderGreetings.all", "salutations de toute saison attendues")
+        for key in ("none", "one", "many"):
+            if not textes.get("orderFormat", {}).get("linesDone", {}).get(key):
+                report.error("textes.orderFormat.linesDone", f"« {key} » attendu (« une ligne », jamais « 1 lignes »)")
+    cards = textes.get("seasonCards")
+    if cards is not None:
+        for season in SEASONS:
+            card = cards.get(season, {})
+            if not card.get("title") or len(card.get("lines", [])) != 3:
+                report.error(f"textes.seasonCards.{season}", "titre et trois lignes attendus")
+    hud = textes.get("ui", {}).get("hud", {})
+    if "season" in hud and set(hud.get("seasonNames", {})) != set(SEASONS):
+        report.error("textes.ui.hud.seasonNames", "un nom par saison attendu")
+
+
 def map_points(folder: Path, report: Report) -> set[str] | None:
+
     """Points et zones nommés de la carte (donnees/cartes/*.json), ou None si aucune carte n'existe."""
     maps = sorted((folder / "cartes").glob("*.json")) if (folder / "cartes").is_dir() else []
     if not maps:

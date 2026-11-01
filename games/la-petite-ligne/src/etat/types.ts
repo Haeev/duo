@@ -24,7 +24,7 @@
  * - Tout l'état est du JSON pur (ni Map, ni Set, ni classe): il se sauvegarde
  *   et se transmet tel quel.
  */
-import type { Effect } from '../donnees/types';
+import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
 
 // ---------------------------------------------------------------------------
@@ -101,7 +101,14 @@ export interface WorldState {
   phase: Phase;
   clock: ClockState;
   weather: Weather;
+  /** Prévision du soir: la météo du lendemain, déjà tirée (FE-09). */
   weatherTomorrow: Weather;
+  /** Météo tirée des derniers jours (tour 8, à partir de `weather.fromDay`), la plus récente à la fin, `weather.logDays` au plus. */
+  weatherLog: WeatherLogEntry[];
+  /** Brume du matin aujourd'hui (tour 8): elle se lève de `weather.mist.fadeFrom` à `weather.mist.until`. */
+  morningMist: boolean;
+  /** Étapes de la partie (tour 8): franchies, en cours d'écran, choix des deux joueurs. */
+  stages: StagesState;
   characters: Character[];
   garden: GardenCell[];
   trees: Tree[];
@@ -161,8 +168,16 @@ export interface WorldState {
   orderIndex: number;
   /** Résultat de la commande en cours, une fois payée au départ du train (jusqu'au matin suivant). */
   orderResult: OrderResult | null;
-  /** Résultats des commandes payées, dans l'ordre des trains. */
+  /** Résultats des commandes payées, dans l'ordre des trains (les `ORDER_HISTORY_KEPT` dernières). */
   orderHistory: OrderResult[];
+  /** Toutes les commandes payées depuis le début (compteurs de l'écran d'étape). */
+  orderTotals: OrderTotals;
+  /** Commande du samedi générée (tour 8, section 4): la commande tirée et la mémoire du tirage. */
+  order: OrderBook;
+  /** Dernière variante tirée par clé (salutation de la lettre de commande, variantes sans redite). */
+  letterVariants: Record<string, number>;
+  /** Premier jour joué avec chaque jalon de contenu (section 1.5), pour les contenus futurs. */
+  content: { firstDayWith: Record<string, number> };
   /** Récapitulatif de fin, une fois la démo finie. */
   ending: EndingSummary | null;
   /** Statistiques de la séance pour l'historique de la plateforme. */
@@ -184,6 +199,24 @@ export interface WorldState {
  * - `ended`: écran de fin de la démo; la séance se clôt quand les deux ont choisi « Continuer » (`endReady`).
  */
 export type Phase = 'creation' | 'day' | 'night' | 'breakfast' | 'ended';
+
+/** Choix d'un joueur sur l'écran d'étape. */
+export type StageChoice = 'stay' | 'finish';
+
+export interface StagesState {
+  /** Étapes franchies par « Rester à la Halte ». */
+  passed: StageId[];
+  /** Étape dont l'écran est ouvert (phase `ended`), ou `null`. */
+  current: StageId | null;
+  /** Choix de chacun sur l'écran (rien ne se passe tant qu'ils diffèrent). */
+  choice: Record<CharacterId, StageChoice | null>;
+}
+
+export interface WeatherLogEntry {
+  day: number;
+  weather: Weather;
+  mist: boolean;
+}
 
 export interface ClockState {
   /** Jour de la démo, de 1 (samedi) à `reglages.clock.lastDay.day` (15, le troisième samedi). */
@@ -804,11 +837,56 @@ export interface PurchaseRequest {
 }
 
 export interface OrderResult {
+  /** Rang de la commande (1, 2, puis les commandes générées). */
+  number: number;
+  /** Jour du train qui l'a emportée. */
+  day: number;
   linesDone: number;
   linesTotal: number;
   complete: boolean;
   /** Somme versée à la bourse au départ du train. */
   amount: number;
+}
+
+export interface OrderTotals {
+  orders: number;
+  linesDone: number;
+  linesTotal: number;
+  amount: number;
+}
+
+export interface GeneratedOrderLine {
+  item: ItemId;
+  count: number;
+  /** Part de la semaine de travail (section 4.3). */
+  share: number;
+}
+
+/** Une commande composée par la coopérative au départ du train précédent. */
+export interface GeneratedOrder {
+  /** Rang de la commande (3 pour le samedi 22). */
+  number: number;
+  /** Jour du train qui l'emportera. */
+  train: number;
+  /** Jour du tirage (départ du train précédent): la lettre arrive ce jour-là. */
+  drawnDay: number;
+  lines: GeneratedOrderLine[];
+  /** Budget de la commande, taille du duo comprise (semaines de travail). */
+  budget: number;
+  /** Lettres de cette commande déjà envoyées (identifiants des définitions). */
+  lettersSent: LetterId[];
+}
+
+export interface OrderBook {
+  generated: GeneratedOrder | null;
+  /** Budget de la prochaine commande (avant le facteur de taille). */
+  budget: number;
+  /** Commandes incomplètes d'affilée. */
+  misses: number;
+  /** Produits des deux dernières commandes, la plus récente à la fin. */
+  recent: ItemId[][];
+  /** Produits déjà commandés une fois. */
+  ordered: ItemId[];
 }
 
 // ---------------------------------------------------------------------------
@@ -824,6 +902,8 @@ export interface QuestState {
   /** Valeurs des compteurs au début de l'étape (conditions « depuis le début de l'étape »). */
   baselines: Record<string, number>;
   startedDay: number;
+  /** Quête répétée à chaque train (`repeat: each_train`): jour du train de cette fois-ci. Absent sinon. */
+  train?: number;
 }
 
 export interface Letter {
@@ -962,7 +1042,16 @@ export type WorldEvent =
   | { type: 'envie_done'; by: CharacterId | 'both'; envie: EnvieId }
   | { type: 'unlocked'; recipe: RecipeId }
   | { type: 'shed_opened' }
-  | { type: 'demo_ended' }
+  /** L'écran d'étape s'ouvre (l'écran de fin de la démo pour l'étape `demo`). */
+  | { type: 'demo_ended'; stage: StageId }
+  /** Un joueur a choisi sur l'écran d'étape. */
+  | { type: 'stage_choice'; by: CharacterId; choice: StageChoice | null }
+  /** « Rester à la Halte » choisi par les deux: la partie reprend. */
+  | { type: 'stage_continue'; stage: StageId }
+  /** Premier matin d'une saison (carte de saison du petit-déjeuner). */
+  | { type: 'season_started'; season: Season; day: number }
+  /** La coopérative a composé la commande suivante (au départ du train). */
+  | { type: 'order_drawn'; number: number; train: number }
   | { type: 'save_point'; reason: 'dawn' | 'quest' }
   | { type: 'session_finish' }
   | { type: 'pin'; by: CharacterId; pos: Vec2 }

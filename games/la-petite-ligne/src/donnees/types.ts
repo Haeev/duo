@@ -40,8 +40,16 @@ export type Condition = { label?: string } & (
   | { type: 'weather_is'; weather: Weather }
   /** Météo de la veille (la brume après la pluie, tour 7); faux le premier jour. */
   | { type: 'weather_was'; weather: Weather }
-  /** Saison du jour (calendrier de `reglages.memories`), pas avant le jour `fromSeasonDay` de la saison. */
+  /** Saison du jour (calendrier de `reglages.calendar`), pas avant le jour `fromSeasonDay` de la saison. */
   | { type: 'season_is'; seasons: Season[]; fromSeasonDay: number }
+  /** Prévision du lendemain (tour 8): la météo tirée du jour suivant. */
+  | { type: 'weather_tomorrow_is'; weather: Weather }
+  /** Brume du matin aujourd'hui (tour 8, `world.morningMist`). */
+  | { type: 'morning_mist' }
+  /** Réglage de tendresse entre les personnages au moins égal à `level` (D7). */
+  | { type: 'tenderness_at_least'; level: Tenderness }
+  /** L'étape est due (son jour et son heure passés) et pas encore franchie. */
+  | { type: 'stage_due'; stage: StageId }
   | { type: 'flag'; flag: string }
   | { type: 'quest_active'; quest: string }
   | { type: 'quest_done'; quest: string }
@@ -92,7 +100,8 @@ export type Effect =
   | { type: 'show_text'; text: string }
   | { type: 'set_world_state'; key: string; value: string }
   | { type: 'pay_order' }
-  | { type: 'end_demo' }
+  /** Écran d'étape (tour 8); `end_demo` des données vaut `end_stage` de l'étape `demo`. */
+  | { type: 'end_stage'; stage: StageId }
   | { type: 'if'; condition: Condition; then: Effect[]; else: Effect[] };
 
 // ---------------------------------------------------------------------------
@@ -294,6 +303,11 @@ export interface QuestDef {
   completionText: string;
   /** Information propre à un seul joueur (R16), ou `null`. */
   secret: QuestSecretDef | null;
+  /**
+   * `each_train` (tour 8): la quête redémarre aussitôt finie, pour le train suivant; une étape
+   * `at_deadline` sans `deadline` échoit au départ de ce train. `{day}`: le jour de ce train.
+   */
+  repeat: 'each_train' | null;
 }
 
 /**
@@ -484,10 +498,18 @@ export interface LetterDef {
   id: string;
   from: string;
   title: string;
-  /** `null`: seulement par un effet; sinon arrivée à ce jour et cette heure. */
+  /** `null`: seulement par un effet (ou chaque semaine, `instance`); sinon arrivée à ce jour et cette heure. */
   delivery: { day: number; time: number } | null;
+  /**
+   * Lettre hebdomadaire (tour 8): une instance par train (`<id>@<jour du train>`). `time`: arrivée
+   * à cette heure le jour où la commande du train est tirée (aussitôt si elle est passée); `null`:
+   * seulement par un effet.
+   */
+  instance: { kind: 'train'; time: number | null } | null;
   text: string;
   variants: { when: Condition[]; text: string }[];
+  /** Variantes tirées par la graine parmi celles dont `when` tient, jamais celle de la fois d'avant. */
+  variantsNoRepeat: boolean;
 }
 
 export type HintTrigger =
@@ -549,10 +571,111 @@ export interface OrderDef {
   fullBonus: number;
 }
 
+/** Étapes de la partie (tour 8, section 1.1). */
+export type StageId = 'demo' | 'summer_end';
+export interface StageDef {
+  id: StageId;
+  day: number;
+  /** Minutes depuis minuit. */
+  time: number;
+  /** Bloc de `textes.stages`. */
+  texts: StageId;
+}
+/** Rythme de l'horloge à partir d'un jour (D1), appliqué à l'aube. */
+export interface ClockStep {
+  fromDay: number;
+  secondsPerGameMinute: number;
+}
+/** Soleil, nuages, pluie (en %). */
+export type WeatherOdds = readonly [sunny: number, cloudy: number, rain: number];
+export interface WeatherSettings {
+  /** Premier jour tiré (le jour après la dernière météo écrite). */
+  fromDay: number;
+  draw: Record<Season, WeatherOdds>;
+  target: Record<Season, WeatherOdds>;
+  persistence: number;
+  maxRainStreak: number;
+  maxDaysWithoutSun: number;
+  forced: readonly { day: number; weather: Weather }[];
+  logDays: number;
+  biteWaitFactor: Record<Weather, number>;
+  mist: { afterRain: number; base: Record<Season, number>; fadeFrom: number; until: number; biteWaitFactor: number };
+}
+export type OrderFamily = 'potager' | 'basse-cour' | 'cuisine' | 'rivière' | 'bois' | 'lisière';
+export type OrderResource = 'garden' | 'eggs' | 'river' | 'wood' | 'forage';
+export interface OrderProduct {
+  item: string;
+  family: OrderFamily;
+  resource: OrderResource;
+  cost: number;
+  min: number;
+  /** Prix de la commande; `null`: le prix de vente de l'objet. */
+  price: number | null;
+  seasons: readonly Season[];
+  /** Compteur du duo qui dit que le produit est obtenu (`harvested:radish`). */
+  obtained: string;
+  leadDays: number;
+}
+/** Commande du samedi générée (tour 8, sections 4.2 à 4.7). */
+export interface GeneratedOrderSettings {
+  fromOrder: number;
+  linesByOrder: readonly { from: number; lines: number }[];
+  minLines: number;
+  maxPerFamily: number;
+  minFamilies: number;
+  maxRepeatFromPrevious: number;
+  weights: { absentFamily: number; neverOrdered: number; twoOrdersAgo: number };
+  budget: { start: number; stepOnComplete: number; max: number; afterMiss: number; afterTwoMisses: number; floor: number };
+  size: { current: string; factors: Record<string, number> };
+  resources: {
+    garden: number;
+    eggs: number;
+    river: number;
+    wood: number;
+    resourceCap: number;
+    minLineShare: number;
+    forageCap: number;
+    forageShare: number;
+    woodPlanksPerTree: number;
+    woodCap: number;
+    woodMinTrees: number;
+  };
+  paymentPerWorkWeek: number;
+  noSharedBase: Record<string, readonly string[]>;
+  products: readonly OrderProduct[];
+}
+export interface ForagePoint {
+  point: string;
+  items: readonly string[];
+}
+export interface ForageItem {
+  item: string;
+  seasons: readonly Season[];
+  weight: number;
+  count: readonly [number, number];
+}
+/** Cueillette de la lisière (tour 8, section 5.2). */
+export interface ForageSettings {
+  fromDay: number;
+  spawnChance: number;
+  unseenFactor: number;
+  rainBoost: { item: string; factor: number } | null;
+  points: readonly ForagePoint[];
+  items: readonly ForageItem[];
+}
+export type ContinuationMode = 'same_save' | 'new_game_per_stage';
+/** D7: tendresse entre les personnages, du moins au plus. */
+export type Tenderness = 'none' | 'accomplices' | 'gentle';
+
 export interface Settings {
   profile: string;
+  /** Calendrier (tour 8): saisons de `seasonDays` jours, le jour 1 ouvre le printemps. */
+  calendar: { seasonDays: number; seasonsPerYear: number };
   clock: {
+    /** Rythme du jour 1 (le premier pas de `schedule`). */
     secondsPerGameMinute: number;
+    /** Rythme par jour (D1), dans l'ordre des jours. */
+    schedule: ClockStep[];
     dayStart: number;
     dayEnd: number;
     veilleeFrom: number;
@@ -560,22 +683,42 @@ export interface Settings {
     lastDay: { day: number; end: number };
     stopWhenBothInMenu: boolean;
   };
-  train: { days: number[]; arrival: number; departure: number };
+  /** Trains écrits (`days`), puis un tous les `repeatEveryDays` jours après le dernier (0: aucun). */
+  train: { days: number[]; repeatEveryDays: number; arrival: number; departure: number; saluteSlowRoll: boolean };
+  /** Météo écrite des jours 1 à `weather.fromDay - 1`. */
   weatherByDay: Weather[];
+  /** Météo tirée (tour 8, section 3). */
+  weather: WeatherSettings;
+  /** Étapes de la partie, dans l'ordre (tour 8). */
+  stages: StageDef[];
+  /** D4: la partie de la démo continue dans la même sauvegarde. */
+  continuation: { mode: ContinuationMode };
+  /** D7. */
+  tenderness: Tenderness;
   spawn: { point: string };
   economy: {
     startPurse: number;
     bigPurchaseThreshold: number;
     grocer: { buyRate: number; dailyCap: number; buysAfterFlag: string };
-    /** Une fenêtre de commande par semaine, dans l'ordre (la livraison arrive par le train). */
-    catalogue: { windows: CatalogueWindow[] };
+    /**
+     * Une fenêtre de commande par semaine, dans l'ordre (la livraison arrive par le train); après
+     * la dernière, une fenêtre par semaine (`repeatWeekly`, tour 8), ou aucune (`null`).
+     */
+    catalogue: {
+      windows: CatalogueWindow[];
+      repeatWeekly: { deadlineWeekday: number; deadlineTime: number; deliveryTime: number } | null;
+    };
   };
   order: {
     /** Une commande par train du samedi qui emporte la caisse, dans l'ordre des jours. */
     trains: OrderDef[];
     extraItemsRate: number;
+    /** Commandes tirées après les commandes écrites (tour 8), ou `null`. */
+    generated: GeneratedOrderSettings | null;
   };
   trees: { chopsPerTree: number; logsPerTree: number };
+  /** Cueillette (tour 8), ou `null`. */
+  forage: ForageSettings | null;
   hens: { eggsPerHenPerDay: number; feedRequired: boolean };
   endurance: {
     base: number;

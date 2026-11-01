@@ -16,7 +16,7 @@ import { isBlockedCell } from '../src/simulation/grille';
 import { morning } from '../src/simulation/horloge';
 import { drawToday, morningMoments, newToday, unitDraw } from '../src/simulation/moments';
 import { step } from '../src/simulation/pas';
-import { contentAndMap, createRobot, newSim, play } from './aides';
+import { contentAndMap, createRobot, demoLastDay, newSim, play } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
@@ -53,7 +53,7 @@ function drawDemo(seed: number, content: Content = contentAndMap().content): str
   const w = sim.world;
   const s = content.settings;
   const out: string[] = [];
-  for (let day = 1; day <= s.clock.lastDay.day; day++) {
+  for (let day = 1; day <= demoLastDay(content); day++) {
     w.clock.day = day;
     w.clock.minutes = s.clock.dayStart;
     w.weather = s.weatherByDay[day - 1] ?? 'sunny';

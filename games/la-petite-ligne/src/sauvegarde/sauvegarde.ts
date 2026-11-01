@@ -9,6 +9,7 @@ import type { Content } from '../donnees/types';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
+import { stageCanContinue } from '../donnees/calendrier';
 import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
@@ -17,6 +18,8 @@ import type { PlayerInfo } from '../simulation/monde';
 import { type StepInput, step } from '../simulation/pas';
 import { settleSavedClimax } from '../simulation/moments';
 import { memoriesFromSave } from '../simulation/souvenirs';
+import { drawNextOrder, emptyOrderBook } from '../simulation/semaine';
+import { startQuest } from '../simulation/quetes';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -54,11 +57,15 @@ export function saveLabel(sim: Sim): string {
   return label.length > LABEL_MAX ? label.slice(0, LABEL_MAX) : label;
 }
 
-/** Avancement dans la semaine de la démo, de 0 à 1. */
+/**
+ * Avancement jusqu'à la limite de la partie (`clock.lastDay`), de 0 à 1: une partie arrêtée sur
+ * l'écran d'étape du jour 15 en est au tiers (tour 8, section 1.6).
+ */
 export function progressOf(sim: Sim): number {
   const s = sim.content.settings.clock;
   const days = s.lastDay.day - s.firstDay.day;
-  if (sim.world.phase === 'ended' || days <= 0) return 1;
+  const stage = sim.world.stages.current;
+  if (days <= 0 || (sim.world.phase === 'ended' && (stage === null || !stageCanContinue(sim.content.settings, stage)))) return 1;
   const elapsed = sim.world.clock.day - s.firstDay.day + sim.world.clock.minutes / (MINUTES_PER_HOUR * 24);
   return Math.max(0, Math.min(1, elapsed / days));
 }
@@ -111,7 +118,59 @@ function checkWorld(data: unknown): WorldState {
     throw new SaveError('sauvegarde: état du générateur invalide');
   }
   checkMemories(data.memories);
+  checkWeekly(data);
   return data as unknown as WorldState;
+}
+
+/** Champs du format 5 (tour 8): étapes, commande générée, totaux, journal de la météo. */
+function checkWeekly(data: Record<string, unknown>): void {
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const stageId = (v: unknown): boolean => v === 'demo' || v === 'summer_end';
+  const choice = (v: unknown): boolean => v === null || v === 'stay' || v === 'finish';
+  const stages = data.stages;
+  const okStages =
+    isRecord(stages) &&
+    Array.isArray(stages.passed) &&
+    stages.passed.every(stageId) &&
+    (stages.current === null || stageId(stages.current)) &&
+    isRecord(stages.choice) &&
+    choice(stages.choice.p1) &&
+    choice(stages.choice.p2);
+  if (!okStages) throw new SaveError('sauvegarde: étapes invalides');
+  const totals = data.orderTotals;
+  if (!isRecord(totals) || !['orders', 'linesDone', 'linesTotal', 'amount'].every((k) => num(totals[k]))) {
+    throw new SaveError('sauvegarde: totaux des commandes invalides');
+  }
+  const line = (l: unknown): boolean => isRecord(l) && typeof l.item === 'string' && num(l.count) && num(l.share);
+  const order = data.order;
+  const generated = isRecord(order) ? order.generated : undefined;
+  const okGenerated =
+    generated === null ||
+    (isRecord(generated) &&
+      num(generated.number) &&
+      num(generated.train) &&
+      num(generated.drawnDay) &&
+      num(generated.budget) &&
+      Array.isArray(generated.lines) &&
+      generated.lines.every(line) &&
+      Array.isArray(generated.lettersSent));
+  const okOrder =
+    isRecord(order) &&
+    okGenerated &&
+    num(order.budget) &&
+    num(order.misses) &&
+    Array.isArray(order.recent) &&
+    order.recent.every((r) => Array.isArray(r) && r.every((i) => typeof i === 'string')) &&
+    Array.isArray(order.ordered);
+  if (!okOrder) throw new SaveError('sauvegarde: commande de la semaine invalide');
+  const log = data.weatherLog;
+  const weather = (w: unknown): boolean => w === 'sunny' || w === 'cloudy' || w === 'rain';
+  if (!Array.isArray(log) || !log.every((e) => isRecord(e) && num(e.day) && weather(e.weather) && typeof e.mist === 'boolean')) {
+    throw new SaveError('sauvegarde: journal de la météo invalide');
+  }
+  if (typeof data.morningMist !== 'boolean' || !isRecord(data.letterVariants) || !isRecord(data.content)) {
+    throw new SaveError('sauvegarde: champs du tour 8 invalides');
+  }
 }
 
 /** Souvenirs (format 4): l'onglet du carnet les lit tels quels, chez les deux. */
@@ -212,12 +271,66 @@ function migrateToMoments(world: Record<string, unknown>, content: Content): voi
   secrets.turn = doer;
 }
 
+/**
+ * Format 4 vers 5 (tour 8): aucune étape franchie (une partie finie au jour 15 rouvre l'écran
+ * d'étape, avec « Rester à la Halte »), commandes payées numérotées et datées, totaux recalculés,
+ * aucune météo tirée encore. La commande générée est tirée à la reprise (`resume`).
+ */
+function migrateToStages(world: Record<string, unknown>, content: Content): void {
+  const trains = content.settings.order.trains;
+  world.stages = { passed: [], current: world.phase === 'ended' ? 'demo' : null, choice: { p1: null, p2: null } };
+  world.weatherLog = [];
+  world.morningMist = false;
+  const history = Array.isArray(world.orderHistory) ? world.orderHistory : [];
+  const totals = { orders: 0, linesDone: 0, linesTotal: 0, amount: 0 };
+  history.forEach((h, i) => {
+    if (!isRecord(h)) return;
+    h.number = i + 1;
+    h.day = trains[i]?.day ?? 0;
+    totals.orders += 1;
+    totals.linesDone += typeof h.linesDone === 'number' ? h.linesDone : 0;
+    totals.linesTotal += typeof h.linesTotal === 'number' ? h.linesTotal : 0;
+    totals.amount += typeof h.amount === 'number' ? h.amount : 0;
+  });
+  const result = world.orderResult;
+  if (isRecord(result)) {
+    const last: unknown = history[history.length - 1];
+    result.number = isRecord(last) ? last.number : history.length;
+    result.day = isRecord(last) ? last.day : (trains[history.length - 1]?.day ?? 0);
+  }
+  world.orderTotals = totals;
+  world.order = emptyOrderBook({ content });
+  world.letterVariants = {};
+  world.content = { firstDayWith: {} };
+}
+
+/**
+ * Reprise d'une sauvegarde d'avant le format 5: si toutes les commandes écrites sont payées, la
+ * commande suivante est tirée maintenant (déterministe par la graine, pour le train qui suit le
+ * dernier payé), et les quêtes que les données démarrent depuis à l'échéance d'une quête finie
+ * démarrent (la quête de la semaine).
+ */
+function catchUpWeekly(sim: Sim): void {
+  const { world } = sim;
+  const trains = sim.content.settings.order.trains;
+  const lastPaid = world.orderHistory[world.orderHistory.length - 1];
+  if (world.orderTotals.orders >= trains.length && lastPaid !== undefined) drawNextOrder(sim, lastPaid.day);
+  for (const quest of sim.content.quests) {
+    if (!world.quests.some((q) => q.id === quest.id && q.status === 'done')) continue;
+    for (const step of quest.steps) {
+      if (step.resolve !== 'at_deadline') continue;
+      for (const e of step.onDeadline) if (e.type === 'start_quest') startQuest(sim, e.quest);
+    }
+  }
+}
+
 /** Migrations d'un format au suivant. */
 function migrate(data: unknown, dataSchema: number, content: Content): unknown {
   if (dataSchema > DATA_SCHEMA) throw new SaveError(`sauvegarde d'une version plus récente (format ${dataSchema})`);
   if (dataSchema < 2 && isRecord(data)) migrateToTwoWeeks(data, content);
   if (dataSchema < 3 && isRecord(data)) migrateToMoments(data, content);
   if (dataSchema < 4 && isRecord(data)) data.memories = memoriesFromSave(data, content, dataSchema);
+  if (dataSchema < 5 && isRecord(data)) migrateToStages(data, content);
   return data;
 }
 
@@ -329,7 +442,7 @@ function resume(
     world.beam = { ...current, route, leg: 0, ...(route !== null && from !== undefined ? { pos: { ...from }, prev: { ...from }, to: route[route.length - 1] ?? current.to } : {}) };
   }
   for (const c of world.characters) {
-    // Nouvelle séance: l'écran titre se repasse à deux.
+    // Nouvelle séance: l'écran titre se repasse à deux; l'écran d'étape se choisit de nouveau.
     c.titleReady = false;
     c.endReady = false;
     // Personne n'est absent au début d'une séance.
@@ -349,6 +462,7 @@ function resume(
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
   for (const v of world.villagers) v.talkingWith = [];
+  world.stages.choice = { p1: null, p2: null };
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
@@ -356,6 +470,7 @@ function resume(
   // d'après, avec le texte d'apogée et la fin de l'étape de quête (QA6-08).
   settleSavedClimax(sim);
   if (dataSchema < 2) catchUpFirstDeadline(sim);
+  if (dataSchema < 5) catchUpWeekly(sim);
   if (scene !== null) startScene(sim, scene.dialogue);
   return sim;
 }

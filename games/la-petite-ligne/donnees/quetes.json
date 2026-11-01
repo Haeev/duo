@@ -558,12 +558,46 @@
             },
             { "type": "play_dialogue", "dialogue": "firmin_end2_vergers" },
             { "type": "send_letter", "letter": "coop_recap_2" },
-            { "type": "end_demo" }
+            { "type": "start_quest", "quest": "weekly_order" },
+            { "type": "end_stage", "stage": "demo" }
           ]
         }
       ],
       "completionText": "Le train est parti avec la deuxième commande."
     },
+    {
+      "id": "weekly_order",
+      "kind": "main",
+      "tier": "P0",
+      "title": "La commande du samedi {day}",
+      "giver": "firmin",
+      "start": { "byEffect": true },
+      "repeat": "each_train",
+      "steps": [
+        {
+          "id": "fill_crate",
+          "objective": "Déposer dans la caisse du quai avant samedi {day} à 16 h: {order}.",
+          "conditions": [{ "type": "order_complete" }],
+          "resolve": "at_deadline",
+          "onDeadline": [
+            { "type": "pay_order" },
+            { "type": "send_letter", "letter": "coop_recap_generated" },
+            {
+              "type": "if",
+              "condition": { "type": "stage_due", "stage": "summer_end" },
+              "then": [
+                { "type": "gather_players", "point": "quay_bell" },
+                { "type": "play_dialogue", "dialogue": "firmin_stage_summer" },
+                { "type": "end_stage", "stage": "summer_end" }
+              ],
+              "else": []
+            }
+          ]
+        }
+      ],
+      "completionText": "Le train est parti avec la commande du samedi {day}."
+    },
+
     {
       "id": "handcar",
       "kind": "main",

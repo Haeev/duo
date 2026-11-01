@@ -317,12 +317,17 @@ export function soundsForEvent(
       if (event.correct) emit.world('hen', hen === undefined ? characterAt(world, event.by) : { x: hen.pos.x, y: hen.pos.y }, event.by);
       break;
     }
+    // Tour 8: `stage_choice`, `stage_continue`, `season_started` et `order_drawn` attendent leurs sons (section 9).
     case 'moment_climax':
     case 'moment_paused':
     case 'moment_resumed':
     case 'moment_left':
     case 'hold_released':
     case 'dialogue_choice':
+    case 'stage_choice':
+    case 'stage_continue':
+    case 'season_started':
+    case 'order_drawn':
     case 'secret_revealed':
       break;
   }

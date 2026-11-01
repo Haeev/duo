@@ -17,6 +17,8 @@ interface Reference {
   file: string;
   seed: number;
   until: (sim: Sim) => boolean;
+  /** Format à partir duquel la référence existe (la suite après le jour 15: format 5). */
+  fromSchema?: number;
 }
 
 const REFERENCES: readonly Reference[] = [
@@ -33,14 +35,27 @@ const REFERENCES: readonly Reference[] = [
     seed: 7,
     until: (s) => s.world.clock.day === 11 && s.world.clock.minutes >= NOON,
   },
+  {
+    // Fin de la démo (tour 8): jour 15, commande 2 payée, scènes jouées, écran de fin ou d'étape.
+    file: `format-${String(DATA_SCHEMA)}-fin-de-la-demo.json`,
+    seed: 42,
+    until: (s) => s.world.phase === 'ended',
+  },
+  {
+    // Été (tour 8): la partie restée à la Halte, mardi 25 à midi, commande générée du samedi 29 en cours.
+    file: `format-${String(DATA_SCHEMA)}-ete-jour-25.json`,
+    seed: 7,
+    until: (s) => s.world.clock.day === 25 && s.world.clock.minutes >= NOON,
+    fromSchema: 5,
+  },
 ];
 
 it('fabrique les sauvegardes de référence manquantes', () => {
   for (const ref of REFERENCES) {
     const path = fileURLToPath(new URL(ref.file, import.meta.url));
-    if (existsSync(path)) continue;
+    if (existsSync(path) || DATA_SCHEMA < (ref.fromSchema ?? 1)) continue;
     const sim = newSim(ref.seed);
-    play(sim, createRobot(), ref.until, MAX_TICKS);
+    play(sim, createRobot({ stages: 'stay' }), ref.until, MAX_TICKS * 3);
     expect(ref.until(sim), `${ref.file}: moment atteint`).toBe(true);
     writeFileSync(path, `${JSON.stringify(snapshotOf(sim), null, 2)}\n`);
   }

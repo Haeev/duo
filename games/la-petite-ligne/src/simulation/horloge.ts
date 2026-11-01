@@ -17,6 +17,9 @@ import { morningEggs } from './poules';
 import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
 import { morningMoments } from './moments';
+import { morningWeather } from './meteo';
+import { pruneLetters } from './semaine';
+import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
 
@@ -95,7 +98,8 @@ export function updateClock(sim: Sim, dt: number): void {
   }
   if (!running) return;
   const before = clock.minutes;
-  let after = before + dt / s.secondsPerGameMinute;
+  // Rythme du jour (D1, `clock.schedule`): il change à l'aube, jamais au milieu d'une journée.
+  let after = before + dt / secondsPerGameMinuteOn(sim.content.settings, clock.day);
   if (clock.day >= s.lastDay.day) after = Math.min(after, s.lastDay.end);
   after = Math.min(after, s.dayEnd);
   clock.minutes = after;
@@ -161,8 +165,7 @@ export function morning(sim: Sim): void {
   world.clock.day += 1;
   world.clock.minutes = s.clock.dayStart;
   world.clock.veillee = false;
-  world.weather = s.weatherByDay[world.clock.day - 1] ?? world.weather;
-  world.weatherTomorrow = s.weatherByDay[world.clock.day] ?? world.weather;
+  morningWeather(sim);
   morningGrowth(sim);
   morningEggs(sim);
   reopenCrate(sim);
@@ -186,6 +189,7 @@ export function morning(sim: Sim): void {
   }
   copyCounters(sim);
   pickEnvies(sim);
+  pruneLetters(sim);
   deliverScheduledLetters(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
@@ -194,6 +198,9 @@ export function morning(sim: Sim): void {
   world.clock.running = false;
   world.clock.stoppedBy = 'breakfast';
   emit(sim, { type: 'morning', day: world.clock.day });
+  // Premier matin d'une saison: la carte de saison du petit-déjeuner (section 2.6).
+  const season = seasonStartingOn(s, world.clock.day);
+  if (season !== null) emit(sim, { type: 'season_started', season, day: world.clock.day });
   emit(sim, { type: 'save_point', reason: 'dawn' });
 }
 

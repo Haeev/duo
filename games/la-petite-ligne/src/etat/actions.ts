@@ -33,6 +33,8 @@ export type Intent =
   // Écrans titre et de fin, synchronisés entre les deux joueurs
   | { type: 'title_ready'; ready: boolean }
   | { type: 'end_ready'; ready: boolean }
+  // Écran d'étape (tour 8): « Rester à la Halte », « Finir la séance », ou revenir sur son choix (`null`)
+  | { type: 'stage_choice'; choice: 'stay' | 'finish' | null }
   // Création (PE-01, version démo)
   | { type: 'create_character'; name: string; hair: number; outfit: number }
   // Déplacement à la souris: aller là (et agir si `act`)

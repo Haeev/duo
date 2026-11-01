@@ -54,4 +54,12 @@ export function play(sim: Sim, robot: Robot, until: (s: Sim) => boolean, maxTick
   return ticks;
 }
 
+/**
+ * Dernier jour de la démo: celui de l'étape `demo` (tour 8). Depuis le tour 8, `clock.lastDay`
+ * est la limite de la partie (jour 43), plus la fin de la démo.
+ */
+export function demoLastDay(content: Content = contentAndMap().content): number {
+  return content.settings.stages.find((s) => s.id === 'demo')?.day ?? content.settings.clock.lastDay.day;
+}
+
 export { createRobot };

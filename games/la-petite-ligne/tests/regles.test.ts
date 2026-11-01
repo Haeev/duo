@@ -99,7 +99,7 @@ describe('règles', () => {
     for (const line of sim.content.settings.order.trains[0]?.lines ?? []) addStack(sim.world.crate, line.item, 'ordinary', line.count);
     addStack(sim.world.crate, 'carrot', 'ordinary', 2);
     payOrder(sim);
-    expect(sim.world.orderResult).toEqual({ linesDone: 4, linesTotal: 4, complete: true, amount: 540 + 2 * 16 });
+    expect(sim.world.orderResult).toEqual({ number: 1, day: 8, linesDone: 4, linesTotal: 4, complete: true, amount: 540 + 2 * 16 });
   });
 
   it("veillée: dès 19 h, les deux dans la maison arrêtent l'horloge; minuit ramène à la maison", () => {

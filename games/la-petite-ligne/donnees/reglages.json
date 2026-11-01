@@ -1,18 +1,38 @@
 {
   "version": 1,
   "profile": "demo",
+  "calendar": { "seasonDays": 21, "seasonsPerYear": 4 },
   "clock": {
     "secondsPerGameMinute": 0.35,
+    "schedule": [{ "fromDay": 1, "secondsPerGameMinute": 0.35 }],
     "dayStart": "06:00",
     "dayEnd": "24:00",
     "veilleeFrom": "19:00",
     "firstDay": { "day": 1, "start": "10:00" },
-    "lastDay": { "day": 15, "end": "16:00" },
+    "lastDay": { "day": 43, "end": "16:00" },
     "weekdayOfDay1": "saturday",
     "stopWhenBothInMenu": true
   },
-  "train": { "days": [1, 8, 15], "arrival": "10:00", "departure": "16:00" },
+  "stages": [
+    { "id": "demo", "day": 15, "time": "16:00", "texts": "demo" },
+    { "id": "summer_end", "day": 43, "time": "16:00", "texts": "summer_end" }
+  ],
+  "continuation": { "mode": "same_save" },
+  "tenderness": "gentle",
+  "train": { "days": [1, 8, 15], "repeatEveryDays": 7, "arrival": "10:00", "departure": "16:00", "saluteSlowRoll": true },
   "weatherByDay": ["sunny", "sunny", "sunny", "rain", "sunny", "cloudy", "sunny", "sunny", "sunny", "cloudy", "sunny", "rain", "sunny", "sunny", "sunny"],
+  "weather": {
+    "fromDay": 16,
+    "draw": { "spring": [41, 23, 36], "summer": [59, 21, 20], "autumn": [27, 28, 45], "winter": [19, 49, 32] },
+    "target": { "spring": [45, 25, 30], "summer": [60, 22, 18], "autumn": [35, 30, 35], "winter": [30, 45, 25] },
+    "persistence": 0.35,
+    "maxRainStreak": 3,
+    "maxDaysWithoutSun": 6,
+    "forced": [{ "day": 16, "weather": "sunny" }],
+    "logDays": 7,
+    "biteWaitFactor": { "sunny": 1.0, "cloudy": 1.0, "rain": 0.8 },
+    "mist": { "afterRain": 1.0, "base": { "spring": 0.08, "summer": 0.04, "autumn": 0.25, "winter": 0.15 }, "fadeFrom": "09:00", "until": "10:30", "biteWaitFactor": 0.75 }
+  },
   "spawn": { "point": "train_stop" },
   "economy": {
     "startPurse": 200,
@@ -23,7 +43,8 @@
       "windows": [
         { "orderDeadline": { "day": 7, "time": "24:00" }, "delivery": { "day": 8, "time": "10:00" } },
         { "orderDeadline": { "day": 14, "time": "24:00" }, "delivery": { "day": 15, "time": "10:00" } }
-      ]
+      ],
+      "repeatWeekly": { "deadlineWeekday": "friday", "deadlineTime": "24:00", "deliveryTime": "10:00" }
     }
   },
   "order": {
@@ -51,11 +72,63 @@
     "linePremium": 1.5,
     "fullBonus": 0.25,
     "crateAcceptsAnyItem": true,
-    "extraItemsRate": 1.0
+    "extraItemsRate": 1.0,
+    "generated": {
+      "fromOrder": 3,
+      "linesByOrder": [{ "from": 3, "lines": 4 }, { "from": 5, "lines": 5 }, { "from": 9, "lines": 6 }],
+      "minLines": 3,
+      "maxPerFamily": 2,
+      "minFamilies": 3,
+      "maxRepeatFromPrevious": 1,
+      "weights": { "absentFamily": 3, "neverOrdered": 2, "twoOrdersAgo": 0.5 },
+      "budget": { "start": 1.9, "stepOnComplete": 0.15, "max": 3.1, "afterMiss": 0, "afterTwoMisses": -0.25, "floor": 1.52 },
+      "size": { "current": "normale", "factors": { "petite": 0.7, "normale": 1.0, "grande": 1.3 } },
+      "resources": { "garden": 54, "eggs": 16.2, "river": 1, "wood": 1, "resourceCap": 0.85, "minLineShare": 0.6, "forageCap": 0.6, "forageShare": 0.5, "woodPlanksPerTree": 8, "woodCap": 0.6, "woodMinTrees": 2 },
+      "paymentPerWorkWeek": 380,
+      "noSharedBase": { "omelette": ["egg"], "crunchy_radishes": ["radish"], "vegetable_soup": ["radish", "carrot", "lettuce"] },
+      "products": [
+        { "item": "radish", "family": "potager", "resource": "garden", "cost": 1.0, "min": 6, "seasons": ["spring", "summer", "autumn"], "obtained": "harvested:radish", "leadDays": 3 },
+        { "item": "lettuce", "family": "potager", "resource": "garden", "cost": 4.0, "min": 2, "seasons": ["spring", "summer", "autumn"], "obtained": "harvested:lettuce", "leadDays": 4 },
+        { "item": "carrot", "family": "potager", "resource": "garden", "cost": 1.67, "min": 6, "seasons": ["spring", "summer", "autumn"], "obtained": "harvested:carrot", "leadDays": 5 },
+        { "item": "egg", "family": "basse-cour", "resource": "eggs", "cost": 1.0, "min": 4, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "picked:egg", "leadDays": 1 },
+        { "item": "omelette", "family": "cuisine", "resource": "eggs", "cost": 1.5, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "crafted:cook_omelette", "leadDays": 1 },
+        { "item": "crunchy_radishes", "family": "cuisine", "resource": "garden", "cost": 1.5, "min": 4, "price": 16, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_crunchy_radishes", "leadDays": 3 },
+        { "item": "vegetable_soup", "family": "cuisine", "resource": "garden", "cost": 4.67, "min": 2, "price": 60, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_vegetable_soup", "leadDays": 5 },
+        { "item": "gudgeon", "family": "rivière", "resource": "river", "cost": 0.0833, "min": 4, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:gudgeon", "leadDays": 1 },
+        { "item": "chub", "family": "rivière", "resource": "river", "cost": 0.1667, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:chub", "leadDays": 1 },
+        { "item": "trout", "family": "rivière", "resource": "river", "cost": 0.3333, "min": 2, "seasons": ["spring", "summer", "autumn"], "obtained": "caught:trout", "leadDays": 1 },
+        { "item": "plank", "family": "bois", "resource": "wood", "cost": 0.03125, "min": 6, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "crafted:saw_plank", "leadDays": 1 },
+        { "item": "dandelion", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 6, "seasons": ["spring"], "obtained": "picked:dandelion", "leadDays": 2 },
+        { "item": "wild_garlic", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 3, "seasons": ["spring"], "obtained": "picked:wild_garlic", "leadDays": 2 },
+        { "item": "chanterelle", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 3, "seasons": ["summer", "autumn"], "obtained": "picked:chanterelle", "leadDays": 2 },
+        { "item": "blackberry", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 8, "seasons": ["summer"], "obtained": "picked:blackberry", "leadDays": 2 },
+        { "item": "hazelnut", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 8, "seasons": ["autumn"], "obtained": "picked:hazelnut", "leadDays": 2 }
+      ]
+    }
   },
   "garden": { "cells": 12, "layout": { "w": 4, "d": 3 }, "zone": "garden", "startState": "grass" },
   "quality": { "fineIfWateredEveryDay": true },
   "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": false },
+  "forage": {
+    "fromDay": 16,
+    "spawnChance": 0.6,
+    "unseenFactor": 4,
+    "rainBoost": { "item": "chanterelle", "factor": 3 },
+    "points": [
+      { "point": "forage_edge_01", "items": ["wild_garlic", "chanterelle", "hazelnut"] },
+      { "point": "forage_edge_02", "items": ["wild_garlic", "chanterelle", "hazelnut"] },
+      { "point": "forage_edge_03", "items": ["dandelion", "blackberry"] },
+      { "point": "forage_edge_04", "items": ["dandelion", "blackberry"] },
+      { "point": "forage_edge_05", "items": ["dandelion", "blackberry", "chanterelle"] }
+    ],
+    "items": [
+      { "item": "dandelion", "seasons": ["spring"], "weight": 6, "count": [2, 3] },
+      { "item": "wild_garlic", "seasons": ["spring"], "weight": 3, "count": [1, 2] },
+      { "item": "blackberry", "seasons": ["summer"], "weight": 6, "count": [2, 3] },
+      { "item": "chanterelle", "seasons": ["summer", "autumn"], "weight": 3, "count": [1, 2] },
+      { "item": "hazelnut", "seasons": ["autumn"], "weight": 6, "count": [2, 3] }
+    ]
+  },
   "hens": { "eggsPerHenPerDay": 1, "feedRequired": true, "feedFree": true },
   "endurance": {
     "base": 80,
@@ -104,7 +177,8 @@
     "firstHint": "p2",
     "maxSyncGapSeconds": 0.5,
     "holdRange": 1.2,
-    "tiers": ["P0"]
+    "tiers": ["P0"],
+    "festivalDays": []
   },
   "secrets": {
     "firstInformed": "p1",
@@ -115,7 +189,8 @@
     "hideFromGuestSnapshot": false,
     "knownHensFlag": "hen_names_known"
   },
-  "memories": { "seasonDays": 21, "seasonsPerYear": 4, "maxBytes": 1536 },
+  "memories": { "maxBytes": 1536 },
+
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": { "tier": "P1", "castRange": 6, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
   "feel": { "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 } }

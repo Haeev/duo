@@ -8,7 +8,7 @@ import type { Sim } from '../src/simulation/contexte';
 import { SIM_HZ } from '../src/simulation/constantes';
 import { step } from '../src/simulation/pas';
 import { variantOf } from '../src/simulation/conditions';
-import { AFTERNOON_GROUPS, contentAndMap, createRobot, fullOrderAmount, newSim } from './aides';
+import { AFTERNOON_GROUPS, contentAndMap, createRobot, demoLastDay, fullOrderAmount, newSim } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
@@ -132,7 +132,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.phase, 'la démo se termine').toBe('ended');
   expect(run.ticks).toBeLessThan(MAX_TICKS);
   const { content } = contentAndMap();
-  const last = content.settings.clock.lastDay.day;
+  const last = demoLastDay(content);
   expect(w.clock.day).toBe(last);
   expect(w.orderHistory, 'une commande payée par train').toHaveLength(content.settings.order.trains.length);
   expect(w.orderHistory[0], 'commande 1 complète, 540 sous').toMatchObject({ complete: true, amount: 540 });

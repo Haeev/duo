@@ -15,7 +15,8 @@ import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
 import { shopOpen } from './economie';
 import { canPlace } from './amenagement';
-import { catalogueWindow, currentOrder } from '../donnees/commandes';
+import { catalogueWindow, currentOrder, isGeneratedOrder } from '../donnees/commandes';
+import { unitDraw } from '../etat/tirage';
 import { holdsRod, waterAhead } from './peche';
 import { counterRemaining } from './conditions';
 import { freeSeatsNear, seatedSeconds } from './bancs';
@@ -27,6 +28,7 @@ import { HEN_NAMES_QUEST, henLabel, secretCards } from '../etat/secrets';
 import { LOOK_CONE } from './conditions';
 import { activeWatch } from '../etat/moments';
 import { HEN_CALL_DIALOGUE } from './secrets';
+import { stageCanContinue } from '../donnees/calendrier';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -201,7 +203,7 @@ function orderSeedPlan(sim: Sim, day: number, last: number): string[] {
   for (const crop of Object.values(sim.content.crops)) {
     if (day + crop.growthDays > last) continue;
     const growing = sim.world.garden.filter((g) => g.crop?.crop === crop.id).length * crop.yieldPerCell;
-    if (orderNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
+    if (orderNeed(sim, crop.harvest) + ingredientNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
   }
   return plan;
 }
@@ -276,10 +278,27 @@ function orderNeed(sim: Sim, item: string): number {
   return line === undefined ? 0 : Math.max(0, line.count - countInStacks(sim.world.crate, item));
 }
 
+/**
+ * Après la démo (commande générée): ce qu'il faut encore de cet ingrédient pour cuisiner les plats
+ * demandés (soupes, croque-au-sel, omelettes), plats déjà prêts déduits. 0 pendant la démo.
+ */
+function ingredientNeed(sim: Sim, item: string): number {
+  if (!isGeneratedOrder(sim.content.settings, sim.world)) return 0;
+  let need = 0;
+  for (const recipe of Object.values(sim.content.recipes)) {
+    if (recipe.station !== 'stove' || !sim.world.unlockedRecipes.includes(recipe.id)) continue;
+    const input = recipe.inputs.find((i) => i.item === item);
+    if (input === undefined) continue;
+    const dishes = orderNeed(sim, recipe.output.item) - inBags(sim, recipe.output.item);
+    if (dishes > 0) need += Math.ceil(dishes / recipe.output.count) * input.count;
+  }
+  return need;
+}
+
 /** Ce que la commande et les quêtes de la semaine 2 attendent encore de cet objet (à ne pas manger ni vendre). */
 function reserved(sim: Sim, item: string): number {
   const quest = QUEST_NEEDS.find((q) => q.item === item && questStep(sim, q.quest) === q.step);
-  return orderNeed(sim, item) + (quest?.count ?? 0);
+  return orderNeed(sim, item) + ingredientNeed(sim, item) + (quest?.count ?? 0);
 }
 
 /** Objets demandés par les quêtes de la semaine 2 (`quetes.json`), à l'étape où on les apporte. */
@@ -319,7 +338,7 @@ function planksWanted(sim: Sim): number {
   return Math.max(0, wanted);
 }
 
-function wood(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+function wood(sim: Sim, c: Character, m: Memory, out: Intent[], glutton = false): boolean {
   if (countInBag(c, ITEM.axe) === 0) return false;
   const logs = countInBag(c, ITEM.log);
   const planks = planksOwned(sim);
@@ -332,7 +351,8 @@ function wood(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     return true;
   }
   const questChop = openCounters(sim).some((o) => o.key === 'chopped');
-  if (planks + logs * 4 >= planksWanted(sim) && questStep(sim, 'planks') !== 'chop' && !questChop) return false;
+  const greedy = glutton && afterDemo(sim) && sim.world.clock.minutes < GO_HOME_AT - HOUR;
+  if (!greedy && planks + logs * 4 >= planksWanted(sim) && questStep(sim, 'planks') !== 'chop' && !questChop) return false;
   const tree = sim.world.trees
     .filter((t) => !t.felled && (m.skip[`arbre:${t.id}`] ?? 0) <= sim.world.tick)
     .sort((a, b) => distance(c.pos, a.pos) - distance(c.pos, b.pos))[0];
@@ -513,7 +533,9 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
       const reserveRadish = r !== 'cook_omelette' ? 12 - countInStacks(sim.world.crate, 'radish') : 0;
       return recipe.inputs.every((i) => {
         const reserve = i.item === ITEM.egg ? reserveEggs : i.item === 'radish' ? Math.max(0, reserveRadish - 3) : 0;
-        return countInBag(c, i.item) - Math.max(0, reserve) >= i.count;
+        // Après la démo: ce que la commande de la semaine attend de cet ingrédient n'est pas pour le souper.
+        const weekly = isGeneratedOrder(sim.content.settings, sim.world) ? reserved(sim, i.item) : 0;
+        return countInBag(c, i.item) - Math.max(0, reserve, weekly) >= i.count;
       });
     });
     if (cookable !== undefined && c.status === 'active') {
@@ -537,6 +559,7 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 
 /** Omelettes de la commande: au réchaud, une fois les œufs de la commande dans la caisse. */
 function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (isGeneratedOrder(sim.content.settings, sim.world)) return cookDishes(sim, c, m, out);
   const recipe = sim.content.recipes.cook_omelette;
   if (recipe === undefined || reserved(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) return false;
   const eggs = recipe.inputs.find((i) => i.item === ITEM.egg)?.count ?? 0;
@@ -547,6 +570,25 @@ function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean
   m.waitUntil = sim.world.tick + 3;
   m.job = 'cuisiner pour la commande';
   return true;
+}
+
+/**
+ * Après la démo: chaque plat demandé (soupe, croque-au-sel, omelette) se cuisine au réchaud dès
+ * que ses ingrédients sont dans le sac, au-delà de ce que la commande demande d'eux tels quels.
+ */
+function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  for (const recipe of Object.values(sim.content.recipes)) {
+    if (recipe.station !== 'stove' || !sim.world.unlockedRecipes.includes(recipe.id)) continue;
+    if (orderNeed(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) continue;
+    if (!recipe.inputs.every((i) => countInBag(c, i.item) - orderNeed(sim, i.item) >= i.count)) continue;
+    if (!c.inHouse) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
+    out.push({ type: 'craft', recipe: recipe.id });
+    m.waitUntil = sim.world.tick + 3;
+    m.job = `cuisiner ${recipe.output.item} pour la commande`;
+    return true;
+  }
+  return false;
 }
 
 /** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
@@ -886,6 +928,58 @@ export interface RobotOptions {
   secrets?: 'voice' | 'deaf';
   /** Aller voir les moments d'ambiance (les moments de quête, toujours). */
   ambientMoments?: boolean;
+  /** Écran d'étape (tour 8): « Rester à la Halte » quand c'est possible, ou « Finir la séance » (par défaut). */
+  stages?: 'stay' | 'finish';
+  /**
+   * Après la démo (tour 8, section 6.1): `median` parle à chaque habitant visible avec une chance
+   * de 0,55 par jour, à une heure tirée; `assidu` à chacun une fois par jour; `glouton` comme le
+   * médian, mais abat chaque jour tous les arbres debout.
+   */
+  profile?: RobotProfile;
+}
+
+export type RobotProfile = 'median' | 'assidu' | 'glouton';
+
+/** Chance de parler à un habitant visible dans la journée (profil médian, section 6.1). */
+const MEDIAN_TALK_CHANCE = 0.55;
+/** Les conversations du jour se tirent entre 8 h et 18 h. */
+const TALK_FROM = 8 * HOUR;
+const TALK_SPAN = 10 * HOUR;
+
+/** Après la démo: la commande de la semaine est tirée (et non écrite). */
+function afterDemo(sim: Sim): boolean {
+  return isGeneratedOrder(sim.content.settings, sim.world);
+}
+
+/** A-t-il parlé à cet habitant aujourd'hui ? */
+function talkedToday(sim: Sim, c: Character, villager: string): boolean {
+  const key = `talked:${villager}`;
+  return (sim.world.counters[c.id][key] ?? 0) > (sim.world.countersAtDawn[c.id][key] ?? 0);
+}
+
+/** Conversations du quotidien d'après la démo, selon le profil (R2 se mesure sur elles). */
+function dailyTalks(sim: Sim, c: Character, m: Memory, profile: RobotProfile, out: Intent[]): boolean {
+  const { day, minutes } = sim.world.clock;
+  for (const v of sim.world.villagers) {
+    if (!v.visible || v.talkingWith.length > 0 || talkedToday(sim, c, v.id)) continue;
+    const key = `robot-talk:${c.id}:${v.id}`;
+    const chance = profile === 'assidu' ? 1 : MEDIAN_TALK_CHANCE;
+    if (unitDraw(sim.world.seed, key, day) >= chance) continue;
+    const at = profile === 'assidu' ? TALK_FROM : TALK_FROM + unitDraw(sim.world.seed, `${key}:at`, day) * TALK_SPAN;
+    if (minutes < at) continue;
+    if (goAct(sim, c, m, `bavarder:${v.id}`, { kind: 'villager', villager: v.id }, v.pos, sim.content.settings.ranges.talk - 0.5, out)) return true;
+  }
+  return false;
+}
+
+/** Cueillettes posées au sol (lisière), deux jours sur trois après la démo. */
+function forageRound(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  if (sim.world.clock.day % 3 === 0 || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
+  const found = sim.world.groundItems
+    .filter((g) => sim.content.items[g.item]?.category === 'forage' && (m.skip[`cueillir:${g.id}`] ?? 0) <= sim.world.tick)
+    .sort((a, b) => distance(c.pos, a.pos) - distance(c.pos, b.pos))[0];
+  if (found === undefined) return false;
+  return goAct(sim, c, m, `cueillir:${found.id}`, { kind: 'ground_item', groundItem: found.id }, found.pos, 1.2, out);
 }
 
 /** Ce que l'informé a « dit » à l'autre (robot à voix): le nom de chaque poule, la réponse de Firmin. */
@@ -957,6 +1051,8 @@ export function createRobot(options: RobotOptions = {}): Robot {
   const solveRiddle = options.riddle ?? true;
   const voice = (options.secrets ?? 'voice') === 'voice';
   const ambient = options.ambientMoments ?? true;
+  const stay = options.stages === 'stay';
+  const profile: RobotProfile = options.profile ?? 'median';
   const told: Told = { hens: {}, lucie: null };
   const tried: Tried = { hens: {}, lucie: [] };
   const spots: Record<string, { p1: Vec2; p2: Vec2 } | null> = {};
@@ -1139,7 +1235,12 @@ export function createRobot(options: RobotOptions = {}): Robot {
       return frame(m);
     }
     if (w.phase === 'ended') {
-      if (!c.endReady) out.push({ type: 'end_ready', ready: true });
+      const stage = w.stages.current;
+      if (stay && stage !== null && stageCanContinue(sim.content.settings, stage)) {
+        if (w.stages.choice[c.id] !== 'stay') out.push({ type: 'stage_choice', choice: 'stay' });
+      } else if (!c.endReady) {
+        out.push({ type: 'end_ready', ready: true });
+      }
       return frame(m);
     }
     if (w.phase === 'night') {
@@ -1186,6 +1287,10 @@ export function createRobot(options: RobotOptions = {}): Robot {
       return frame(m, 0, 1);
     }
     if (c.menu !== null && c.menu !== 'shop' && c.menu !== 'crate') out.push({ type: 'menu', menu: null });
+    // Après la démo: le courrier se lit (sinon il s'entasse, les lettres non lues restent toutes).
+    if (afterDemo(sim)) {
+      for (const l of w.letters) if (!l.read.includes(c.id)) out.push({ type: 'read_letter', letter: l.id });
+    }
 
     const f = { held: false, mx: 0, my: 0 };
     const done =
@@ -1204,6 +1309,8 @@ export function createRobot(options: RobotOptions = {}): Robot {
       giveOdette(sim, c, m, out) ||
       order(sim, c, m, out) ||
       cookForOrder(sim, c, m, out) ||
+      (afterDemo(sim) && dailyTalks(sim, c, m, profile, out)) ||
+      (afterDemo(sim) && c.id === 'p2' && forageRound(sim, c, m, out)) ||
       weekTwoQuests(sim, c, m, out) ||
       genericQuests(sim, c, m, out) ||
       orderHeavy(sim, c, m, out) ||
@@ -1211,7 +1318,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       (c.id === 'p2'
         ? coop(sim, c, m, f, out) ||
           fishForOrder(sim, c, m, f, out) ||
-          wood(sim, c, m, out) ||
+          wood(sim, c, m, out, profile === 'glouton') ||
           furniture(sim, c, m, out) ||
           hens(sim, c, m, out) ||
           garden(sim, c, m, out)

@@ -69,10 +69,12 @@ describe('sauvegardes de référence', () => {
       );
       expect(sim.world.clock.day).toBe(day);
       expect(sim.world.characters.find((c) => c.playerId === A.id)?.id).toBe('p1');
+      // Une partie finie sur l'écran d'étape (jour 15) reprend par « Rester à la Halte » (tour 8).
       const ticks = play(
         sim,
-        createRobot(),
-        (s) => s.world.clock.day > day || s.world.phase === 'ended',
+        createRobot({ stages: 'stay' }),
+        (s) =>
+          s.world.clock.day > day || (s.world.phase === 'ended' && s.world.stages.current === null),
         MAX_TICKS,
       );
       expect(ticks, 'le lendemain arrive').toBeLessThan(MAX_TICKS);

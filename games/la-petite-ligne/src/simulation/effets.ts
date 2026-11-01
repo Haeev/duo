@@ -10,7 +10,7 @@ import { type Sim, character, emit, point, notifyKey } from './contexte';
 import { sendLetter } from './courrier';
 import { startScene } from './dialogues';
 import { payOrder } from './economie';
-import { finishDemo } from './fin';
+import { finishStage } from './fin';
 import { spawnHens } from './poules';
 import { startQuest } from './quetes';
 import { addStack, dropAt, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
@@ -137,8 +137,8 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
     case 'pay_order':
       payOrder(sim);
       return;
-    case 'end_demo':
-      finishDemo(sim);
+    case 'end_stage':
+      finishStage(sim, effect.stage);
       return;
   }
 }
