@@ -85,3 +85,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Une boucle qui contient un sinus continu aigu (trille à 2,7 kHz) sort au centile 97 des sauts au raccord alors que la continuation vaut 0: normal (les sauts voisins d'un sinus aigu sont grands partout), tant que le seuil de 99,5 tient.
 - `generer.py --seulement musiques sons planche --musiques <id>` ajoute une musique sans rendre les autres; les fichiers existants ressortent identiques à l'octet.
 - Les commandes avec boucle `for` sur des fichiers et ffmpeg sont refusées dans un worktree isolé: les mettre dans un script hors du dépôt (`/tmp/...sh CHEMIN`).
+
+## La Petite Ligne: tour 9 (vérifié le 2026-11-01)
+
+- Question S3 réglée: un son peut avoir `bus: "music"` (schéma de `catalogue.ts`, `SoundBus`, `busOf` qui rend `musicPause`, après `duck` et `momentDuck`). Test `src/audio/moteur-bus.test.ts`: le vrai `AudioEngine` sur un faux contexte qui note les `connect`; modèle réutilisable pour tester d'autres branchements du moteur sans navigateur.
+- Le plafond de 30 Mo des sons résidents (`memoire.test.ts`) est presque plein (environ 29,2 Mo après le tour 9, calculé): un son lié à un objet rare va dans `objets/` (non résident) avec un champ `decodeWhen` pour le dev audio. Compter avant: 192 Ko par seconde en mono, 384 en stéréo (float32 à 48 kHz).
+- Une boucle dont une attaque tombe à moins de 0,05 s du début sort « niveau au raccord centile 100 » dans `controler.py` (contrôle réussi quand même): placer les attaques à égale distance du raccord (tic-tac à 0,5 et 1,5 s; coups encadrant le raccord de 0,25 s).
+- Cinq notes « dans l'ordre »: cinq identifiants (`star-chime-1` à `-5`, champ `order`), comme les tournants de saison; do pentatonique (do, ré, mi, sol, la) est juste à la fois sur fa, sol et do majeur.
+- Une suite vitest complète prend environ 8 minutes dans le worktree; `npx vitest run src/audio src/interface/tests/sons.test.ts` (20 s) suffit pour itérer sur les sons.

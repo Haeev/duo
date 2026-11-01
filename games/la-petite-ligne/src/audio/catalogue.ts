@@ -26,7 +26,8 @@ const LoopSchema = v.object({
 
 const SoundSchema = v.object({
   event: v.optional(v.string()),
-  bus: v.picklist(['effects', 'ui', 'ambience']),
+  // `music`: motif court et accordé (étoiles, vers luisants, saisons), réglé avec la musique (son.md, S3).
+  bus: v.picklist(['effects', 'ui', 'ambience', 'music']),
   priority: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(4)),
   files: v.pipe(v.array(v.string()), v.minLength(1)),
   pick: v.picklist(['shuffle-no-repeat', 'single']),
@@ -124,7 +125,7 @@ const CatalogueSchema = v.object({
 // ---------------------------------------------------------------------------
 // Types du moteur
 
-export type SoundBus = 'effects' | 'ui' | 'ambience';
+export type SoundBus = 'effects' | 'ui' | 'ambience' | 'music';
 export type Priority = 1 | 2 | 3 | 4;
 
 export interface SpatialDef {

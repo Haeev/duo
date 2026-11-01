@@ -37,10 +37,12 @@ sys.path.insert(0, str(ICI))
 sys.dont_write_bytecode = True  # pas de __pycache__ dans le dossier versionné
 
 import ambiances  # noqa: E402
+import bourg  # noqa: E402
 import dsp  # noqa: E402
 import effets  # noqa: E402
 import habitants  # noqa: E402
 import moments  # noqa: E402
+import moments_tour9  # noqa: E402
 import musiques  # noqa: E402
 import partition  # noqa: E402
 import saisons  # noqa: E402
@@ -75,6 +77,8 @@ INFOS_MUSIQUE = {
     "fanfare-train": ("Le train entre en gare (samedi 10 h), une fois", "do majeur", "trompette, cor, accordéon, tuba"),
     "fin": ("Départ du train du jour 8, récapitulatif et écran de fin, une fois", "sol majeur",
             "flûte, clarinette, guitare, cordes, harpe, cor"),
+    "halte-evening": ("Lanternes du quai allumées ensemble (apogée, t = 6,5 s), une fois (P1)", "sol majeur",
+                      "célesta, harpe, cordes"),
 }
 
 
@@ -225,7 +229,8 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 
 def tous_les_sons() -> list[Son]:
-    return effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
+    return (effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
+            + moments_tour9.sons() + bourg.sons())
 
 
 PLAN = {
@@ -242,6 +247,8 @@ PLAN = {
         {"moment": "écran de nuit (les deux couchés)", "music": "nuit"},
         {"moment": "le train s'arrête au quai (samedi 10 h)", "music": "fanfare-train", "once": True},
         {"moment": "le train du jour 8 est parti: récapitulatif et écran de fin", "music": "fin", "once": True},
+        {"moment": "lanternes du quai allumées ensemble: apogée, t = 6,5 s (tour 9, P1)", "music": "halte-evening",
+         "once": True},
     ],
     "rest": {
         "description": "Contre la lassitude sur une longue séance: la musique du jour joue une boucle, puis "
@@ -279,6 +286,14 @@ PLAN = {
                                   "jouer le son de la saison du jour, une fois, chez les deux.",
                    "sounds": {"spring": "season-turn-spring", "summer": "season-turn-summer",
                               "autumn": "season-turn-autumn", "winter": "season-turn-winter"}},
+    # Tour 9: cris lointains joués une fois par soir (pas des boucles). Clé à part, ignorée par le
+    # schéma de sons.json tant que le dev audio ne la lit pas.
+    "eveningCalls": [
+        {"sound": "owl-far", "seasons": ["autumn"], "hours": [19.5, 21.0], "timesPerEvening": 1,
+         "notWhen": "pluie", "notWithMoment": "barn_owl",
+         "description": "le cri de l'effraie au loin, une fois à un instant tiré entre 19 h 30 et 21 h, les soirs "
+                        "d'automne sans la dame blanche; non placé, chez les deux au même instant"},
+    ],
     "interior": {"description": "Dans la maisonnette: les ambiances du dehors passent derrière les murs.",
                  "ambienceLowpassHz": 900, "ambienceDb": -10.0, "rampMs": 600},
     "peer": {"description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués "
@@ -361,7 +376,7 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
     morceaux = []
     blanc = lambda s: np.zeros((dsp.n_ech(s), 2))  # noqa: E731
     ordre_musique = ["halte-matin", "halte-apres-midi", "halte-ete", "veillee", "petit-dejeuner", "nuit", "samedi", "titre",
-                     "fanfare-train", "fin"]
+                     "fanfare-train", "fin", "halte-evening"]
     defs_musique = json.loads((SORTIE / "sons.json").read_text(encoding="utf-8"))["music"]
     for id_ in ordre_musique:
         # Toujours à partir des fichiers livrés: le client entend exactement ce que joue le jeu.
@@ -369,7 +384,7 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         d = defs_musique[id_]
         if d.get("loop"):
             y = y[d["loop"]["startSample"]:d["loop"]["endSample"]]
-        if id_ in ("fanfare-train", "fin"):
+        if id_ in ("fanfare-train", "fin", "halte-evening"):
             extrait = y
         else:
             # 14 s avant la fin de la boucle puis 10 s après son début: on entend le raccord.
@@ -423,13 +438,19 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["mist-ambience", "mist-lift", "blackbird-wake", "fish-jump"],
         ["season-turn-spring", "season-turn-summer", "season-turn-autumn", "season-turn-winter"],
         ["pick-herb", "pick-mushroom", "pick-berries", "pick-nuts", "axe-thud-soft"],
+        ["star-chime-1", "star-chime-2", "star-chime-3", "star-chime-4", "star-chime-5", "night-water"],
+        ["gate-crank", "gate-lock", "train-slow-roll", "train-whistle-salute", "cylinder-cocks"],
+        ["owl-screech", "grass-strike", "owl-far"],
+        ["lantern-light", "lantern-out", "quay-bell-once"],
+        ["coins-drop", "chantier-built", "gift-give", "coffee-grind", "clock-tick", "water-pour-copper"],
     ]
     for groupe in groupes:
         for nom in groupe:
             k = 0
             while f"{nom}/{k}" in apercus:
                 x = apercus[f"{nom}/{k}"]
-                if nom.endswith("loop") or nom in ("geese-rest", "crickets-night", "mist-ambience"):
+                if nom.endswith("loop") or nom in ("geese-rest", "crickets-night", "mist-ambience", "night-water",
+                                                   "train-slow-roll", "clock-tick"):
                     x = np.concatenate([x, x])[: dsp.n_ech(min(5.0, 2 * len(x) / dsp.SR))]
                     x = dsp.fondu(x, 0.01, 0.3)
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]

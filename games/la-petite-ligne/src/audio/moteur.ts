@@ -7,7 +7,9 @@
  * - effets: voix -> limiteur -> pause -> bus `effects`; l'ambiance est un
  *   sous-bus des effets (le SDK n'a que trois bus), avec le passe-bas de
  *   l'intérieur pour les ambiances du dehors;
- * - interface: voix -> limiteur -> pause -> bus `interface`.
+ * - interface: voix -> limiteur -> pause -> bus `interface`;
+ * - sons du bus musique (motifs accordés des moments et des saisons): voix -> pause de la musique
+ *   -> bus `music`, après les deux atténuations: ni l'apogée ni un autre son ne les baissent.
  * Les boucles se jouent par `AudioBufferSourceNode` (`loopStart`, `loopEnd`),
  * jamais par `<audio loop>`, qui insère un clic dans Chromium (son.md 6).
  */
@@ -874,6 +876,10 @@ export class AudioEngine {
         return this.effectsIn;
       case 'ambience':
         return this.indoorAmbience.has(def.id) ? this.indoorIn : this.outdoorIn;
+      case 'music':
+        // Après `duck` et `momentDuck` (son.md, S3): la descente de l'apogée ne doit pas baisser
+        // l'accord qui l'accompagne; le réglage Musique du joueur s'applique, la pause aussi.
+        return this.musicPause;
     }
   }
 
