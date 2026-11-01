@@ -147,3 +147,15 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Tester ce qu'affiche le HUD: test jetable dans `/tmp/<dossier>` qui importe `tests/aides` et `src/interface/tests/aides` (`uiContext`) par chemins absolus et appelle `watchModel`; lancer `games/la-petite-ligne/node_modules/.bin/vitest run --dir /tmp/<dossier>` depuis le dossier du jeu. La sortie console est masquée: écrire les résultats dans un fichier.
 - La rumeur de l'onglet Souvenirs s'affiche sous « On dit au bourg… » (épinglé par un test): elle commence par « que » ou « qu' », en minuscule.
 - Capturer l'onglet sans écraser les preuves des devs: copier `ui-maquettes/outils/capturer-souvenirs.cjs` dans `/tmp` avec `SORTIE` changé, Vite sur un port libre (le 5197 peut servir un autre arbre de travail), `NODE_PATH=$(npm root -g)`.
+
+## Monde après le jour 15 (vérifié au tour 8, script `simulations/tour8_suite.py`)
+
+- Les robots de la démo restent oisifs après le jour 15 (bourse figée, plus aucun arbre abattu, presque aucune réplique quotidienne entendue): mesurer avec un test jetable avant d'affirmer ce qu'ils « jouent ». Vitesse mesurée: 0,79 s par journée et par graine.
+- `unitDraw(seed, clé, jour)` (`src/etat/tirage.ts`) est porté à l'identique en Python dans `tour8_suite.py`: tout tirage nouveau passe par lui (jamais `sim.rng`), ce qui garde les jours 1 à 15 identiques et permet d'épingler une graine dans un test.
+- Des garde-fous de météo (pluie plafonnée, soleil forcé) faussent les fréquences: caler une table de tirage distincte de la table visée (boucle d'ajustement multiplicatif, 10 itérations suffisent). Un garde-fou « 5 jours sans soleil » force trop souvent en hiver; 6 est plus doux.
+- `sendLetter` ne part qu'une fois par identifiant et `world.letters` ne se vide jamais: une lettre hebdomadaire demande un identifiant d'instance et une liste bornée.
+- Une commande valorisée au prix du marché varie du simple au quadruple (goujon à 2 sous): payer chaque ligne au moins sa part d'effort. Interdire un plat et son ingrédient (ou deux plats du même légume) dans la même commande, sinon une semaine de radis.
+- Avec une météo tirée, une réplique datée de pluie (priorité 5) se redirait à chaque pluie: règle « datée seulement si pas entendue depuis 28 jours ».
+- Un bouton « continuer » qui laisse jouer au-delà d'un jalon futur rend caduques ses dates absolues: ancrer le contenu futur par conditions (saison, jour de semaine, premier jour joué avec la version).
+- Pièges de cohérence trouvés en écrivant: le bourg n'a ni chats ni mois; l'hirondelle est un oiseau prévu de la Halte (ne pas écrire qu'il n'y en a pas); l'eau de l'Aubrune ne baisse pas l'été; ne pas dire « à l'ombre » d'un banc sans l'avoir vérifié.
+- Charger le script par `importlib` avec des `dataclass`: enregistrer le module dans `sys.modules` avant `exec_module`.
