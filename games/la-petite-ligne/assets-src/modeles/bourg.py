@@ -16,6 +16,7 @@ import bpy  # noqa: I001
 from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import chantiers  # noqa: E402
 import cueillette  # noqa: E402
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
@@ -980,27 +981,15 @@ def handcar(A):
 # Puits (2 x 2) et poulailler (3 x 3) ------------------------------------------------
 
 def well(A):
+    """Puits ouvert (tour 9: le toit est le chantier well_roof): margelle, et la potence de fer à poulie en
+    nœud enfant well_gallows, à cacher quand well_roof est bâti (son treuil la remplace)."""
     g = A.geo()
-    g.lathe([(0.85, 0.0), (0.85, 0.75), (0.68, 0.75), (0.68, 0.2)], colors=["stone", "stone_light", "stone"], segs=12,
-            close_top=False, close_bottom=True)
-    g.cyl(0.68, 0.02, loc=(0, 0, 0.35), color="water_deep", segs=12)
-    for k in range(10):
-        a = math.radians(k * 36 + 10)
-        g.box((0.4, 0.06, 0.18), loc=(0.86 * math.cos(a), 0.86 * math.sin(a), 0.2 + (k % 2) * 0.3), color="stone_dark",
-              rot=(0, 0, k * 36 + 100))
-    for s in (1, -1):
-        g.box((0.12, 0.12, 2.07), loc=(s * 0.78, 0, 0.6), color="wood_dark", base=True)
-    g.box((1.9, 0.1, 0.1), loc=(0, 0, 2.67), color="wood_dark", base=True)  # panne faîtière sous le toit
-    g.cyl(0.07, 1.7, loc=(0, 0, 2.05), color="wood", segs=8, rot=(0, 90, 0))
-    g.cyl(0.1, 0.5, loc=(0, 0, 2.05), color="rope", segs=8, rot=(0, 90, 0))
-    g.box((0.04, 0.3, 0.04), loc=(-0.88, -0.15, 2.05), color="iron")
-    g.box((0.04, 0.04, 0.2), loc=(-0.88, -0.3, 1.95), color="wood")
-    g.box((0.01, 0.01, 0.75), loc=(0.0, -0.1, 1.68), color="rope")
-    g.lathe([(0.11, 0.0), (0.14, 0.24)], loc=(0.0, -0.1, 1.05), colors="wood", segs=8)
-    g.cyl(0.145, 0.03, loc=(0, -0.1, 1.08), color="iron", segs=8)
-    gable_roof(g, -0.85, 0.85, -0.8, 0.8, 2.85 - 0.8 * 0.5 / 0.95, 2.85, "tile", edge="tile_dark", over=0.15,
-               thick=0.06, ridge_color="tile_dark")
-    return g
+    chantiers.well_curb(g)
+    root = A.add("well", g, {"footprint": [2, 2], "water_point": True,
+                             "note": "puits ouvert; quand le chantier well_roof est bâti: poser well_roof à la même "
+                                     "origine et cacher l'enfant well_gallows"})
+    A.add("well_gallows", chantiers.well_gallows(A), parent=root)
+    return root
 
 
 def henhouse(A, ruin, parent):
@@ -1009,8 +998,9 @@ def henhouse(A, ruin, parent):
     wood, dark = ("wood_old", "wood_old_dark") if ruin else ("wood_new", "wood")
     parts = {k: A.geo() for k in ("walls", "roof", "door", "ramp", "fence")}
     g = parts["walls"]
-    for x in (-0.75, 0.75):
-        for y in (-0.15, 1.15):
+    for x in (-0.74, 0.74):
+        for y in (-0.14, 1.14):
+            # pieds en retrait de 1 cm du bord du plancher (faces confondues, papillotement)
             g.box((0.1, 0.1, 0.5), loc=(x, y, 0), color=dark, base=True)
     g.box((1.6, 1.4, 0.08), loc=(0, 0.5, 0.45), color=dark, base=True)
     for side, (L, cx, cy, rz) in {"front": (1.6, 0, -0.2, 0), "back": (1.6, 0, 1.2, 0), "left": (1.4, -0.8, 0.5, 90),
@@ -1029,6 +1019,14 @@ def henhouse(A, ruin, parent):
         g.prism([(-0.22, 1.38), (1.22, 1.38), (0.5, 1.75)], 0.05, loc=(x, 0, 0), color=wood, rot=(0, 0, 90))
     if ruin:
         g.box((0.5, 0.05, 0.12), loc=(0.3, -0.5, 0.03), color=wood, rot=(0, 0, 30))
+    else:
+        # perchoir (tour 9, cinq poules au plus): barre ronde de 1,55 m d'un mur de côté à l'autre, sur deux
+        # tasseaux, soit cinq places de 0,3 m, marquées par des encoches sombres; on la voit par la porte
+        g.cyl(0.028, 1.55, loc=(0, 0.72, 0.9), color="wood", segs=6, rot=(0, 90, 0))
+        for x in (-0.76, 0.76):
+            g.box((0.03, 0.1, 0.08), loc=(x, 0.72, 0.84), color=dark)
+        for k in range(4):
+            g.cyl(0.03, 0.012, loc=(-0.465 + k * 0.31, 0.72, 0.9), color=dark, segs=6, rot=(0, 90, 0))
     r = parts["roof"]
     holes = (1,) if ruin else ()
     gable_roof([r, r, r, r, r] if not ruin else [r, A.geo(), r, r, r], -0.85, 0.85, -0.25, 1.25, 1.38, 1.78, wood,
@@ -1040,15 +1038,22 @@ def henhouse(A, ruin, parent):
         d.box((0.24, 0.04, 0.55), loc=(0.0, -0.24, 0.81), color=dark)
         d.box((0.24, 0.045, 0.05), loc=(0.0, -0.245, 0.95), color=wood)
     rp = parts["ramp"]
-    rp.box((0.3, 0.9, 0.04), loc=(0.0, -0.6, 0.27), color=wood, rot=(-32, 0, 0))
+    # rampe qui monte du sol (devant) à la porte (tour 9: elle descendait vers la porte, tasseaux en l'air)
+    ang = math.radians(32)
+    axis, nrm = Vector((0, math.cos(ang), math.sin(ang))), Vector((0, -math.sin(ang), math.cos(ang)))
+    c = Vector((0.0, -0.6, 0.27))
+    rp.box((0.3, 0.9, 0.04), loc=tuple(c), color=wood, rot=(32, 0, 0))
     for k in range(4):
-        rp.box((0.28, 0.03, 0.03), loc=(0.0, -0.95 + k * 0.22, 0.08 + k * 0.14), color=dark)
+        p = c + axis * (-0.33 + k * 0.2) + nrm * 0.032
+        rp.box((0.28, 0.03, 0.03), loc=tuple(p), color=dark, rot=(32, 0, 0))
     fe = parts["fence"]
     for i in range(13):
         a = -1.45 + i * 0.242
-        for (x, y) in ((a, -1.45), (a, 1.45), (-1.45, a), (1.45, a)):
+        for j, (x, y) in enumerate(((a, -1.45), (a, 1.45), (-1.45, a), (1.45, a))):
             if ruin and i % 3 == 0:
                 continue
+            if j >= 2 and i in (0, 12):
+                continue  # poteaux d'angle déjà posés par les côtés nord et sud (pas de doublon)
             if y == -1.45 and -0.4 < x < 0.4:
                 continue
             fe.box((0.05, 0.05, 0.6 if i % 2 else 0.7), loc=(x, y, 0), color=dark, base=True)
@@ -1892,7 +1897,7 @@ def main():
     buildings.append(sawmill(A))
     buildings.append(handcar_shed(A))
     buildings.append(handcar(A))
-    buildings.append(A.add("well", well(A), {"footprint": [2, 2], "water_point": True}))
+    buildings.append(well(A))
     hh = A.group("henhouse", {"footprint": [3, 3], "door_cell": 1, "states": ["henhouse_ruin", "henhouse_repaired"]})
     henhouse(A, True, hh)
     henhouse(A, False, hh)
@@ -1918,6 +1923,36 @@ def main():
         lpl.AUTO_MIN = (2.0, 0.08)
         lpl.AUTO_ROUND = name not in ("arbor",)  # tonnelle: plafond de 900, gardée vive
         props.append(A.add(name, fn(A), {"footprint": fp}))
+    # Chantiers du tour 9 (chantiers.py): chanfreins posés à la main (bible 8.2)
+    lpl.AUTO_ROUND = False
+    seats = [[-0.45, 0.0], [0.45, 0.0]]
+    works = [A.add("ford_bench", chantiers.ford_bench(A), {"footprint": [2, 1], "seat_height": chantiers.SEAT_H,
+                                                            "seat_spots": seats, "improvement": "ford_bench"}),
+             A.add("house_bench", chantiers.house_bench(A), {
+                 "footprint": [2, 1], "seat_height": chantiers.SEAT_H, "seat_spots": seats, "improvement": "house_bench",
+                 "wall_back": chantiers.HOUSE_BENCH_BACK,
+                 "note": "dos au mur: le haut du dossier touche un mur à wall_back m derrière l'origine (-Z glTF)"})]
+    planter = A.add("quay_planter", chantiers.quay_planter(A), {
+        "footprint": [1, 1], "improvement": "quay_planters",
+        "seasons": {"spring": "quay_planter_summer", "summer": "quay_planter_summer",
+                    "autumn": "quay_planter_autumn", "winter": "quay_planter_winter"},
+        "note": "une jardinière par case (trois posées); n'afficher que l'enfant de la saison"})
+    for season in ("summer", "autumn", "winter"):
+        A.add("quay_planter_" + season, chantiers.planter_flowers(A, season), parent=planter)
+    works.append(planter)
+    works.append(A.add("well_roof", chantiers.well_roof(A), {
+        "footprint": [2, 2], "improvement": "well_roof", "ridge_height": 2.4,
+        "note": "à la même origine que well; cacher well_gallows"}))
+    works.append(A.add("door_canopy", chantiers.door_canopy(A), {
+        "improvement": "door_canopy", "attach": "gatekeeper_house_repaired: façade avant, porte (u = 0)",
+        "note": "origine au nu du mur de façade au droit de la porte, au sol: (0, 0, 2,30) dans le repère de "
+                "gatekeeper_house; abri de 1,15 m devant le mur, dessous à 1,93 m au bord"}))
+    crank = A.add("level_crossing_crank", chantiers.crank_bracket(A), {
+        "anchor": "level_crossing_crank_n | level_crossing_crank_s (accroches des poteaux, 1,0 m)",
+        "note": "origine au point d'accroche sur le poteau; le volant level_crossing_crank_wheel tourne autour de "
+                "son axe Z local (vers la place)"})
+    A.add("level_crossing_crank_wheel", chantiers.crank_wheel(A), parent=crank, loc=(0, -0.14, 0))
+    works.append(crank)
     lpl.AUTO_MIN = (2.0, 0.08)
     lpl.AUTO_ROUND = False  # sols et bordures: dalles qui se raccordent
     grounds = []
@@ -1952,11 +1987,17 @@ def main():
                 "le plant se pose à beside_stump (sans rotation du décalage)"}))
     for i, k in enumerate(("round", "bramble", "hazel")):
         fn = cueillette.bush_hazel(A) if k == "hazel" else bush(A, k, 20 + i)
-        nature.append(A.add("bush_" + k, fn, {"footprint": [1, 1]}))
-    br = A.add("bramble", cueillette.bramble(A), {"footprint": [1, 1], "size_m": list(cueillette.BRAMBLE_SIZE)})
-    spots = cueillette.berry_spots(br)
-    br["berry_spots"] = spots
-    A.info["bramble"]["berry_spots"] = spots
+        ex = {"footprint": [1, 1]}
+        if k == "hazel":
+            # tour 9: tas de noisettes (ferme.glb, hazelnut) posé sous la couronne, au sud du pied
+            ex["nut_spots"] = cueillette.nut_spots()
+        nature.append(A.add("bush_" + k, fn, ex))
+    # tour 9: le sureau (bush_41), et les points de pose des fruits sur la face sud des hôtes (un point chacun:
+    # le modèle du fruit porte ses trois grappes ou ombelles à leur place)
+    nature.append(A.add("bush_elder", cueillette.bush_elder(A), {"footprint": [1, 1],
+                                                                 "berry_spots": cueillette.elder_spots(A)}))
+    br = A.add("bramble", cueillette.bramble(A), {"footprint": [1, 1], "size_m": list(cueillette.BRAMBLE_SIZE),
+                                                  "berry_spots": cueillette.berry_spots(A)})
     nature.append(br)
     for i, k in enumerate(("small", "medium", "large")):
         nature.append(A.add("rock_" + k, rock(A, k, 30 + i), {"footprint": [1, 1] if k != "large" else [2, 2]}))
@@ -2004,6 +2045,8 @@ def main():
               res=(2000, 1300))
     lpl.board(track + extra + props + grounds, os.path.join(lpl.BOARDS, "bourg-voie-mobilier.png"), cols=8,
               spacing=lambda r: max(r.get("footprint", [1, 1])) + 0.8, label_size=0.2, res=(2000, 1300))
+    lpl.board(works, os.path.join(lpl.BOARDS, "bourg-chantiers.png"), cols=6,
+              spacing=lambda r: max(r.get("footprint", [1, 1])) + 0.8, label_size=0.2, res=(2000, 900))
     lpl.board(nature + water, os.path.join(lpl.BOARDS, "bourg-nature.png"), cols=9,
               spacing=lambda r: max(r.get("footprint", [1, 1])) + 0.8, label_size=0.22, res=(2000, 1300))
 

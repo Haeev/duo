@@ -91,7 +91,8 @@
     2
    ],
    "water_point": true,
-   "tris": 686
+   "note": "puits ouvert; quand le chantier well_roof est bâti: poser well_roof à la même origine et cacher l'enfant well_gallows",
+   "tris": 658
   },
   "henhouse": {
    "footprint": [
@@ -103,7 +104,7 @@
     "henhouse_ruin",
     "henhouse_repaired"
    ],
-   "tris": 2392
+   "tris": 2468
   },
   "workbench": {
    "footprint": [
@@ -256,6 +257,82 @@
     1
    ],
    "tris": 820
+  },
+  "ford_bench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "seat_height": 0.45,
+   "seat_spots": [
+    [
+     -0.45,
+     0.0
+    ],
+    [
+     0.45,
+     0.0
+    ]
+   ],
+   "improvement": "ford_bench",
+   "tris": 448
+  },
+  "house_bench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "seat_height": 0.45,
+   "seat_spots": [
+    [
+     -0.45,
+     0.0
+    ],
+    [
+     0.45,
+     0.0
+    ]
+   ],
+   "improvement": "house_bench",
+   "wall_back": 0.386,
+   "note": "dos au mur: le haut du dossier touche un mur à wall_back m derrière l'origine (-Z glTF)",
+   "tris": 536
+  },
+  "quay_planter": {
+   "footprint": [
+    1,
+    1
+   ],
+   "improvement": "quay_planters",
+   "seasons": {
+    "spring": "quay_planter_summer",
+    "summer": "quay_planter_summer",
+    "autumn": "quay_planter_autumn",
+    "winter": "quay_planter_winter"
+   },
+   "note": "une jardinière par case (trois posées); n'afficher que l'enfant de la saison",
+   "tris": 1196
+  },
+  "well_roof": {
+   "footprint": [
+    2,
+    2
+   ],
+   "improvement": "well_roof",
+   "ridge_height": 2.4,
+   "note": "à la même origine que well; cacher well_gallows",
+   "tris": 1040
+  },
+  "door_canopy": {
+   "improvement": "door_canopy",
+   "attach": "gatekeeper_house_repaired: façade avant, porte (u = 0)",
+   "note": "origine au nu du mur de façade au droit de la porte, au sol: (0, 0, 2,30) dans le repère de gatekeeper_house; abri de 1,15 m devant le mur, dessous à 1,93 m au bord",
+   "tris": 232
+  },
+  "level_crossing_crank": {
+   "anchor": "level_crossing_crank_n | level_crossing_crank_s (accroches des poteaux, 1,0 m)",
+   "note": "origine au point d'accroche sur le poteau; le volant level_crossing_crank_wheel tourne autour de son axe Z local (vers la place)",
+   "tris": 296
   },
   "ground_grass": {
    "footprint": [
@@ -423,7 +500,28 @@
     1,
     1
    ],
+   "nut_spots": [
+    [
+     0.0,
+     0.0,
+     0.48
+    ]
+   ],
    "tris": 160
+  },
+  "bush_elder": {
+   "footprint": [
+    1,
+    1
+   ],
+   "berry_spots": [
+    [
+     0.02,
+     1.0,
+     0.439
+    ]
+   ],
+   "tris": 210
   },
   "bramble": {
    "footprint": [
@@ -437,19 +535,9 @@
    ],
    "berry_spots": [
     [
-     -0.2,
-     0.497,
-     0.06
-    ],
-    [
-     0.07,
-     0.532,
-     0.05
-    ],
-    [
-     -0.07,
-     0.474,
-     0.14
+     0.02,
+     0.5,
+     0.11
     ]
    ],
    "tris": 860
@@ -589,5 +677,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3618400
+ "file_bytes": 3933996
 }

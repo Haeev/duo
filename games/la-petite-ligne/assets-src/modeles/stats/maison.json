@@ -124,6 +124,90 @@
    "tier": "P1",
    "tris": 116
   },
+  "straw_hat": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tris": 256
+  },
+  "pressed_flowers": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tris": 628
+  },
+  "autumn_wreath": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tris": 752
+  },
+  "jeanne_drawing": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "tris": 264
+  },
+  "coop_calendar": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "seasons": {
+    "spring": "coop_calendar_spring",
+    "summer": "coop_calendar_summer",
+    "autumn": "coop_calendar_autumn",
+    "winter": "coop_calendar_winter"
+   },
+   "note": "n'afficher que la gravure de la saison (enfant coop_calendar_<saison>)",
+   "tris": 832
+  },
+  "wall_clock": {
+   "footprint": [
+    1,
+    1
+   ],
+   "wall": true,
+   "note": "wall_clock_hour et wall_clock_minute: tourner autour de leur axe Z local (vers la pièce) selon l'heure du jeu, sens horaire vu de face; wall_clock_pendulum: pivot en haut, osciller de +-8 degrés autour de Z, une seconde par battement (tic-tac)",
+   "tris": 608
+  },
+  "wicker_armchair": {
+   "footprint": [
+    1,
+    1
+   ],
+   "seat_height": 0.42,
+   "tris": 748
+  },
+  "chalk_box": {
+   "kind": "item",
+   "tris": 176
+  },
+  "coffee_mill": {
+   "kind": "item",
+   "tris": 248
+  },
+  "elder_jelly": {
+   "kind": "item",
+   "tris": 190
+  },
+  "leather_apron": {
+   "kind": "item",
+   "tris": 80
+  },
+  "wool_scarf": {
+   "kind": "item",
+   "tris": 184
+  },
   "bread": {
    "kind": "item",
    "tris": 136
@@ -209,5 +293,5 @@
    "tris": 24
   }
  },
- "file_bytes": 563800
+ "file_bytes": 916376
 }

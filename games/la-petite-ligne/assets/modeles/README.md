@@ -10,7 +10,7 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 |---|---|---|
 | `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 27 clips sur le squelette |
 | `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière | aucune (pièces mobiles en nœuds à part) |
-| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles, mûres, noisettes), sachets, outils, matériaux, poissons, poule, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
+| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poissons, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
 | `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 41 clips, chacun sur le squelette de sa bête |
@@ -137,8 +137,8 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 - Objets de cueillette (`kind: "item"`, origine au centre de la base, posés au sol comme le pissenlit), grossis deux à trois fois par rapport au réel pour tenir au moins 14 pixels au zoom de départ (57 px/m, leçon du martin-pêcheur), extra `size_m` = plus grande dimension:
   - `wild_garlic` (ail des ours, printemps): touffe de huit larges feuilles en volume (section en chevron) et deux ombelles blanches à 0,31 m; le blanc fait la lecture sur l'herbe. 0,41 x 0,38 m, 0,35 m de haut.
   - `chanterelle` (girolles, été et automne): bouquet de quatre, pied évasé en entonnoir, chapeau creux au bord ondulé, jaune d'oeuf (`flower_center`, dessous `fabric_yellow`). 0,30 x 0,26 m, 0,15 m de haut.
-  - `blackberry` (mûres, été): brin cueilli, cinq fruits noirs (case `blackberry`, luisante) et deux encore rouges sur trois folioles, posé à plat (point bas à 0). Se pose sur le roncier à l'un des points `berry_spots` de `bramble` (repère glTF du nœud `bramble`: x, hauteur, z vers l'avant; déjà enfoncés de 1,5 cm pour que le brin se cale sur le dessus bombé), sinon au sol. 0,30 x 0,16 m.
-  - `hazelnut` (noisettes, automne): tas de sept noisettes (cicatrice pâle à la base) et une huitième debout dans son involucre de trois bractées, sur deux feuilles de noisetier tombées (`leaf_hazel`: jaunes avec la palette d'automne, comme le noisetier). 0,33 x 0,23 m, 0,13 m de haut.
+  - `blackberry` (mûres, été; remplacé au tour 9 par trois grappes, voir plus bas): brin cueilli, cinq fruits noirs (case `blackberry`, luisante) et deux encore rouges sur trois folioles, posé à plat (point bas à 0). Se pose sur le roncier à l'un des points `berry_spots` de `bramble` (repère glTF du nœud `bramble`: x, hauteur, z vers l'avant; déjà enfoncés de 1,5 cm pour que le brin se cale sur le dessus bombé), sinon au sol. 0,30 x 0,16 m.
+  - `hazelnut` (noisettes, automne; remplacé au tour 9 par le tas sur jonchée, voir plus bas): tas de sept noisettes (cicatrice pâle à la base) et une huitième debout dans son involucre de trois bractées, sur deux feuilles de noisetier tombées (`leaf_hazel`: jaunes avec la palette d'automne, comme le noisetier). 0,33 x 0,23 m, 0,13 m de haut.
 - `bramble` (roncier, posé contre la lisière au nord des coins 03 à 05): 1,18 x 0,64 m, 0,61 m de haut, dans l'emprise de 1,2 x 0,8 m (extra `size_m`), emprise de carte 1 x 1. Repris au tour 8 (le premier se lisait comme une araignée verte: quatre tiges fines terminées par une boule en l'air): un fourré bas en deux bosses (`ivy`) qui couvre l'emprise, un massif plus haut au milieu (`leaf_bush`, `ivy`) et six ronces en arceau de tailles différentes. Chaque ronce sort du massif à mi-hauteur, monte à 0,4 ou 0,45 m (sous le dessus du massif), retombe en pente par-dessus le fourré et plante son bout dans le sol (enfoncé de 2 cm), comme une ronce qui marcotte; sept petites feuilles en losange (8 triangles, 8 à 13 cm) le long de chaque tige, aucune boule au bout. Aucune tige devant la face avant (+Z) ni sur le dessus, où se posent les mûres (extra `berry_spots`, recalculé par lancer de rayons sur le dessus réel). Sans fruits: les mûres sont l'objet `blackberry`, qui disparaît à la cueillette. 860 triangles: au-dessus du plafond d'un buisson (160, pensé pour 79 instances), sous celui d'un accessoire (900); trois instances sur la carte.
 - `bush_hazel` (noisetier, variante de `bush` déjà tirée pour un quart des buissons de la carte par `MODEL_VARIANTS`): refait en low poly arrondi, quatre brins en vase depuis une même souche, feuillage de trois boules de 0,55 à 1,97 m; chaque brin finit dans le feuillage. 160 triangles (plafond d'un buisson). Change l'aspect des noisetiers déjà posés sur la carte (même taille qu'avant, environ 2 m).
 - `oak_sapling` (rejet du chêne, P1): même souche que `tree_stump` (la souche de l'abattage reste en place, le rejet en sort), et son enfant `oak_sapling_shoots` (nœud vide, origine au centre du dessus de la souche, à 0,42 m), qui porte quatre brins `oak_sapling_shoot_a` à `oak_sapling_shoot_d` (extra `grow_nodes`). Tour 8: un chêne rejette de l'écorce, pas du bois de la coupe; chaque brin naît sur le flanc, 4,5 cm sous la coupe, sort à l'horizontale, s'écarte puis monte jusqu'à 1,68 m, et la coupe reste nue. L'origine de chaque brin est son pied: pour la pousse (0,4 à 1), mettre à l'échelle chaque brin autour de son pied, jamais la souche (extra `grow_node`). Mis à l'échelle d'un bloc depuis le centre de la coupe (rendu du tour 8), le pied glisse vers le milieu de la coupe (0,07 m de l'axe à 0,4): voir « Rendu à adapter » ci-dessous. 440 triangles (plafond d'un chêne: 450).
@@ -151,9 +151,43 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
   - rejet du chêne: pour chaque enfant `oak_sapling_shoot_*` de `oak_sapling_shoots`, instancier le brin seul avec la matrice T(arbre, sol + hauteur de `oak_sapling_shoots`) x R(lacet de l'arbre) x T(position de l'enfant) x S(taille), au lieu du nœud entier mis à l'échelle depuis le centre de la coupe; la souche reste `stump`;
   - jeune sapin: dessiner aussi `stump` au centre de la case, et poser `fir_sapling` à (x, sol, y) + `beside_stump` (0, 0, 0,6), soit 0,6 m au sud, avec son lacet et son échelle autour de son propre pied; la cible de clic suit le plant.
 
+## Tour 9: chantiers, outils, maison, cueillette d'automne, moments (`docs/jeux/jeu-1/tour-09-conception.md`)
+
+Sources: `chantiers.py` (appelé par `bourg.py`), `maison_t9.py` (par `maison.py`), `chouette.py` (par `faune.py`), `cueillette.py`, `ferme.py`, `personnages.py`. Planches: `planche_tour9.py` (échelle, maison, posés, zoom 1 mesuré), `rendus_personnages.py <dossier> tour9|equipage`, `verifier/quatre_tour9.sh` et `verifier/quatre_poses.sh` (quatre angles), sorties dans `docs/jeux/jeu-1/gauntlet/captures/tour-09/modeles-*.png`.
+
+Chantiers (`bourg.glb`, extra `improvement` = identifiant du chantier):
+- `ford_bench` (2 x 1, `seat_height` 0,45, `seat_spots`): madrier de chêne de 1,8 m sur deux tréteaux posés sur des pierres plates, sans dossier; avant (+Z glTF) vers l'eau.
+- `house_bench` (2 x 1): banc à dossier, accoudoirs; le haut du dossier touche un mur à `wall_back` = 0,386 m derrière l'origine. Le nu du soubassement du pignon est de la maisonnette est à x = 11,33 (mur à 11,30): origine du banc à x = 11,72, tourné vers l'est; les sièges débordent alors dans les cases (12, 22) et (12, 23), où l'on se tient pour s'asseoir. Posé dans la case 12 elle-même, il resterait à 0,7 m du mur (à trancher par le level designer, voir le compte rendu).
+- `quay_planter` (1 x 1, une par case, trois posées): caisse verte cerclée de fer; enfants `quay_planter_summer` (géraniums rouges, aussi au printemps), `quay_planter_autumn` (asters mauves), `quay_planter_winter` (paillage et branches de sapin), extra `seasons`: n'en montrer qu'un.
+- `well` est désormais le puits ouvert (le toit est un chantier): margelle inchangée, enfant `well_gallows` (arceau de fer, poulie, seau sur la margelle) à cacher quand `well_roof` est bâti. `well_roof` (2 x 2, même origine que `well`): quatre poteaux sur dés hors de la margelle, sablières, entraits, arbalétriers, toit de tuiles à deux pans, faîte à 2,4 m, dans l'emprise; treuil sur deux lisses à 1,3 m, manivelle à l'est, seau au-dessus de l'eau. 1 040 triangles (au-delà du plafond d'un accessoire, 900, en deçà d'un petit bâtiment, 3 000: c'est une petite construction).
+- `door_canopy` (sans emprise): origine au nu de la façade avant de `gatekeeper_house_repaired`, au droit de la porte, au sol, soit (0, 0, 2,30) dans le repère de la maisonnette. La rive du toit ne couvre que 0,33 m devant le mur (dessous à 2,20 puis 2,12 m): l'auvent se glisse dessous (haut à 2,08 m) et abrite jusqu'à 1,15 m du mur, bord à 1,93 m (on passe dessous à 1,74 m). Deux consoles et deux jambes de force à x = +-0,80, hors du chambranle et de la lampe.
+- `path_lamp`: reprend `lamp_post` (rien de neuf).
+- `level_crossing_crank`: support vissé, origine au point d'accroche sur la surface du poteau (accroches `level_crossing_crank_n` et `_s` du level designer, à 1,0 m); enfant `level_crossing_crank_wheel` (volant de 0,30 m à cinq rayons, poignée), tourner autour de son axe Z local. Le volant est à 0,14 m du poteau, côté opposé au boîtier de fer de la barrière.
+- `henhouse_repaired_walls`: perchoir intérieur de 1,55 m (cinq places de 0,3 m marquées), vu par la porte. Corrigés au passage: la rampe descendait vers la porte (tasseaux en l'air), les poteaux d'angle de la clôture étaient en double, les pieds avaient des faces confondues avec le plancher.
+
+Outils et objets portés (`ferme.glb`, extra `tool_kind`): `watering_can_copper` (20 litres, cuivre cerclé de laiton), `axe_forged` (tête d'acier bleui évasée, tranchant clair, garde de cuir), `fishing_rod_bamboo` (même pente et même longueur que la canne, nœud `fishing_rod_bamboo_tip` au même point que `fishing_rod_tip`, donc `ROD_TIP` reste juste), `lamp_pole` (perche de 2,2 m couchée vers l'avant au repos du bras, nœud `lamp_pole_tip`; `pole_raise` la dresse puis l'incline de 20 degrés, bout à 2,8 m et 0,9 m devant), `hen_crate` (cage de 0,62 x 0,44 x 0,5 m, place intérieure pour une poule, porte coulissante côté +Z). Corrigé: le bec de l'arrosoir de départ (`watering_can`) pendait vers le bas, pomme en l'air; il monte maintenant vers l'avant.
+
+Cueillette (5.1 de la conception: 14 x 14 px au zoom 1, contraste, posée contre son support):
+- `blackberry` remplace le brin du tour 8: trois grappes de 0,12 m (neuf baies, trois rouges, un reflet blanc) sur la face sud du roncier, à 0,37 à 0,5 m. Origine au point unique `berry_spots` de `bramble` (la grappe du milieu); poser avec le lacet du roncier, jamais au sol.
+- `hazelnut` remplace le tas du tour 8: sept noisettes brun foncé (case `hazel_shell`) et trois dans leur collerette vert pâle (`hazel_husk`), sur une jonchée de feuilles ocre de 0,6 m (`leaf_litter`, fixe en toute saison). Origine au point `nut_spots` de `bush_hazel` (0,48 m au sud du pied, sous la couronne).
+- `cep` (nouveau): trois cèpes serrés, chapeau `cep_cap`, pied clair et ventru `cep_stem`, 0,25 m.
+- `elderberry` (nouveau): trois ombelles de baies noires sur tiges rouges retombantes (`elder_stem`), face sud du sureau, 0,6 à 1,0 m. Origine au point `berry_spots` de `bush_elder` (nouveau buisson de 2 m, tiges claires, feuillage jusqu'à 0,25 m du sol: le modèle de `bush_41`, à poser par le level designer).
+- Les points de pose sont calculés par lancer de rayons sur l'hôte reconstruit à l'identique dans `ferme.py` (fruits) et `bourg.py` (hôtes): ils restent justes tant que les deux sont reconstruits ensemble.
+
+Maison (`maison.glb`; muraux: extra `wall`, dos à y = 0,5 de la case): `straw_hat` (au clou, 1,5 m), `pressed_flowers` (cadre pendu à une ficelle, 1,45 m), `coop_calendar` (enfants `coop_calendar_spring | summer | autumn | winter`, la gravure d'automne montre la Halte), `wall_clock` (enfants `wall_clock_hour`, `wall_clock_minute`: axe Z local; `wall_clock_pendulum`: pivot en haut, +-8 degrés), `autumn_wreath` (couleurs fixes, rousse toute l'année), `jeanne_drawing` (feuille punaisée, train, soleil, quatre lignes); au sol: `wicker_armchair` (1 x 1, `seat_height` 0,42). Objets: `chalk_box`, `coffee_mill` (origine sous la caisse, pour le rebord du comptoir), `elder_jelly`, `leather_apron` (plié, objet seul: le tablier porté par Basile reste P1), `wool_scarf` (roulé).
+
+Personnages (`personnages.glb`): `villager_firmin_scarf` (écharpe rouge à rayures crème, pièce à montrer avec `villager_firmin` en automne et en hiver), `rail_crew_driver` et `rail_crew_stoker` (bustes sans jambes, bas de veste fermé à 0,82 m; rangées `driver` et `stoker` de `personnages.png`, ajoutées en fin). Clips: `sit_edge` (4 s, boucle, même assise que `sit`: racine 0,47 m sous le bord du plancher), `look_up` (1,5 s, une fois), `crank_hold` (boucle), `crank_turn` (1 s par tour), `wave_back` (boucle), `pole_raise` (0,6 s) et `pole_lower` (0,5 s) (une fois, perche dans `socket_hand_r`), `driver_lean` (3 s, boucle) et `driver_wave` (boucle).
+
+Faune (`faune.glb`): `barn_owl` (0,35 m, 0,9 m d'envergure, face en coeur blanche cerclée de chamois, `socket_barn_owl_beak`), clips `owl_glide`, `owl_hover`, `owl_strike`, `owl_mantle`, `owl_flap`, `owl_land`, `owl_look` (tête à 120 degrés vers sa gauche, une fois, garder la dernière image) et `owl_perch`; `vole` (campagnol de 8 cm, `socket_barn_owl_beak`, en travers du bec).
+
+Palette: cases ajoutées en fin de liste (`palette.py` et `src/rendu/palette.ts`): `copper`, `copper_light`, `bamboo`, `bamboo_node`, `steel_forged`, `cep_cap`, `cep_stem`, `elder_stem`, `leaf_litter`, `hazel_husk`, `hazel_shell`, `owl_buff`.
+
+Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas le jeu): de jour, mûres, sureau et cèpes dépassent 3 pour 1 vus du sud, noisettes autour de 2,3; au soleil couchant simulé, 1,6 à 2,3. Les grappes et les ombelles sont sur la face sud (consigne de la conception): vues du nord, elles sont cachées par le buisson. Le jugement final se fait sur captures du jeu (directeur artistique).
+
 ## Fiche par modèle
 
-### `personnages.glb` (2223 Ko)
+
+### `personnages.glb` (2706 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -175,6 +209,9 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 | `villager_basile` | 2166 |
 | `villager_jeanne` | 2054 |
 | `villager_lucie` | 1986 |
+| `villager_firmin_scarf` | 232 |
+| `rail_crew_driver` | 1470 |
+| `rail_crew_stoker` | 1514 |
 
 | Animation | Durée (s) | Boucle |
 |---|---|---|
@@ -205,8 +242,17 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 | `reach_up` | 0.8 | non (jouer une fois) |
 | `hammer_tap` | 0.6 | oui |
 | `hold_ladder` | 2.0 | oui |
+| `sit_edge` | 4.0 | oui |
+| `look_up` | 1.5 | non (jouer une fois) |
+| `crank_hold` | 2.0 | oui |
+| `crank_turn` | 1.0 | oui |
+| `wave_back` | 1.2 | oui |
+| `pole_raise` | 0.6 | non (jouer une fois) |
+| `pole_lower` | 0.5 | non (jouer une fois) |
+| `driver_lean` | 3.0 | oui |
+| `driver_wave` | 1.067 | oui |
 
-### `ferme.glb` (773 Ko)
+### `ferme.glb` (1066 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -232,8 +278,10 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 | `dandelion` |  | 200 | kind: "item" |
 | `wild_garlic` |  | 220 | kind: "item", size_m: 0.41 |
 | `chanterelle` |  | 376 | kind: "item", size_m: 0.3 |
-| `blackberry` |  | 224 | kind: "item", size_m: 0.3, note: "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol" |
-| `hazelnut` |  | 392 | kind: "item", size_m: 0.33 |
+| `blackberry` |  | 744 | kind: "item", size_m: 0.66, posed_on: "bramble", note: "trois grappes: origine au point berry_spots de bramble, même lacet que le roncier (pas de lacet au hasard), jamais au sol" |
+| `hazelnut` |  | 948 | kind: "item", size_m: 0.6, posed_on: "bush_hazel", note: "jonchée de feuilles et tas: origine au point nut_spots de bush_hazel, au sol" |
+| `cep` |  | 522 | kind: "item", size_m: 0.25, note: "au pied d'un chêne, côté sud" |
+| `elderberry` |  | 804 | kind: "item", size_m: 0.7, posed_on: "bush_elder", note: "trois ombelles: origine au point berry_spots de bush_elder, même lacet que le sureau, jamais au sol" |
 | `seed_packet_radish` |  | 116 | kind: "item" |
 | `seed_packet_lettuce` |  | 116 | kind: "item" |
 | `seed_packet_carrot` |  | 116 | kind: "item" |
@@ -243,6 +291,11 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 | `saw` |  | 176 | kind: "tool", socket: "socket_hand_r" |
 | `hammer` |  | 92 | kind: "tool", socket: "socket_hand_r" |
 | `fishing_rod` |  | 80 | kind: "tool", socket: "socket_hand_r" |
+| `watering_can_copper` |  | 292 | kind: "tool", socket: "socket_hand_r", tool_kind: "watering_can" |
+| `axe_forged` |  | 200 | kind: "tool", socket: "socket_hand_r", tool_kind: "axe" |
+| `fishing_rod_bamboo` |  | 316 | kind: "tool", socket: "socket_hand_r", tool_kind: "fishing_rod" |
+| `lamp_pole` |  | 164 | kind: "tool", socket: "socket_hand_r", length_m: 2.2, note: "perche couchée vers l'avant (+Z glTF) au repos; clips pole_raise et pole_lower" |
+| `hen_crate` | 1 x 1 | 564 | note: "cage de transport: posée devant le poulailler, poule à l'origine, dedans" |
 | `fishing_float` |  | 104 | kind: "item", note: "bouchon: origine au niveau de l'eau" |
 | `log` |  | 216 | kind: "item" |
 | `plank` |  | 68 | kind: "item" |
@@ -258,7 +311,7 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3507 Ko)
+### `bourg.glb` (3814 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -270,8 +323,8 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `sawmill` | 10 x 8 | 1944 | door_cell: 5 |
 | `handcar_shed` | 6 x 5 | 1480 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
 | `handcar` | 2 x 2 | 476 | on_rails: true, note: "balancier handcar_lever: pivot sur l'axe X, +-20 degrés" |
-| `well` | 2 x 2 | 686 | water_point: true |
-| `henhouse` | 3 x 3 | 2392 | door_cell: 1, states: ["henhouse_ruin", "henhouse_repaired"] |
+| `well` | 2 x 2 | 658 | water_point: true, note: "puits ouvert; quand le chantier well_roof est bâti: poser well_roof à la même origine et cacher l'enfant well_gallows" |
+| `henhouse` | 3 x 3 | 2468 | door_cell: 1, states: ["henhouse_ruin", "henhouse_repaired"] |
 | `workbench` | 2 x 2 | 496 |  |
 | `woodpile` | 2 x 1 | 312 |  |
 | `plank_stack` | 2 x 1 | 132 |  |
@@ -293,6 +346,12 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `sacks` | 1 x 1 | 228 |  |
 | `cart` | 3 x 2 | 428 |  |
 | `bicycle` | 2 x 1 | 820 |  |
+| `ford_bench` | 2 x 1 | 448 | seat_height: 0.45, seat_spots: [[-0.45, 0.0], [0.45, 0.0]], improvement: "ford_bench" |
+| `house_bench` | 2 x 1 | 536 | seat_height: 0.45, seat_spots: [[-0.45, 0.0], [0.45, 0.0]], improvement: "house_bench", wall_back: 0.386, note: "dos au mur: le haut du dossier touche un mur à wall_back m derrière l'origine (-Z glTF)" |
+| `quay_planter` | 1 x 1 | 1196 | improvement: "quay_planters", seasons: {"spring": "quay_planter_summer", "summer": "quay_planter_summer", "autumn": "quay_planter_autumn", "winter": "quay_planter_winter"}, note: "une jardinière par case (trois posées); n'afficher que l'enfant de la saison" |
+| `well_roof` | 2 x 2 | 1040 | improvement: "well_roof", ridge_height: 2.4, note: "à la même origine que well; cacher well_gallows" |
+| `door_canopy` |  | 232 | improvement: "door_canopy", attach: "gatekeeper_house_repaired: façade avant, porte (u = 0)", note: "origine au nu du mur de façade au droit de la porte, au sol: (0, 0, 2,30) dans le repère de gatekeeper_house; abri de 1,15 m devant le mur, dessous à 1,93 m au bord" |
+| `level_crossing_crank` |  | 296 | anchor: "level_crossing_crank_n | level_crossing_crank_s (accroches des poteaux, 1,0 m)", note: "origine au point d'accroche sur le poteau; le volant level_crossing_crank_wheel tourne autour de son axe Z local (vers la place)" |
 | `ground_grass` | 1 x 1 | 24 |  |
 | `ground_dirt` | 1 x 1 | 48 |  |
 | `ground_cobble` | 1 x 1 | 716 |  |
@@ -313,8 +372,9 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `fir_sapling` | 1 x 1 | 170 | height: 1.24, beside_stump: [0.0, 0.0, 0.6], note: "échelle 1 le premier jour, jusqu'à 1,3 ensuite; la souche tree_stump reste au centre de la case, le plant se pose à beside_stump (sans rotation du décalage)" |
 | `bush_round` | 1 x 1 | 100 |  |
 | `bush_bramble` | 1 x 1 | 280 |  |
-| `bush_hazel` | 1 x 1 | 160 |  |
-| `bramble` | 1 x 1 | 860 | size_m: [1.2, 0.8, 0.7], berry_spots: [[-0.2, 0.497, 0.06], [0.07, 0.532, 0.05], [-0.07, 0.474, 0.14]] |
+| `bush_hazel` | 1 x 1 | 160 | nut_spots: [[0.0, 0.0, 0.48]] |
+| `bush_elder` | 1 x 1 | 210 | berry_spots: [[0.02, 1.0, 0.439]] |
+| `bramble` | 1 x 1 | 860 | size_m: [1.2, 0.8, 0.7], berry_spots: [[0.02, 0.5, 0.11]] |
 | `rock_small` | 1 x 1 | 20 |  |
 | `rock_medium` | 1 x 1 | 40 |  |
 | `rock_large` | 2 x 2 | 52 |  |
@@ -346,7 +406,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (547 Ko)
+### `maison.glb` (890 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -365,6 +425,18 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `crystal_radio` | 1 x 1 | 368 |  |
 | `wood_stove` | 1 x 1 | 380 | tier: "P1" |
 | `picture_frame` | 1 x 1 | 116 | wall: true, tier: "P1" |
+| `straw_hat` | 1 x 1 | 256 | wall: true |
+| `pressed_flowers` | 1 x 1 | 628 | wall: true |
+| `autumn_wreath` | 1 x 1 | 752 | wall: true |
+| `jeanne_drawing` | 1 x 1 | 264 | wall: true |
+| `coop_calendar` | 1 x 1 | 832 | wall: true, seasons: {"spring": "coop_calendar_spring", "summer": "coop_calendar_summer", "autumn": "coop_calendar_autumn", "winter": "coop_calendar_winter"}, note: "n'afficher que la gravure de la saison (enfant coop_calendar_<saison>)" |
+| `wall_clock` | 1 x 1 | 608 | wall: true, note: "wall_clock_hour et wall_clock_minute: tourner autour de leur axe Z local (vers la pièce) selon l'heure du jeu, sens horaire vu de face; wall_clock_pendulum: pivot en haut, osciller de +-8 degrés autour de Z, une seconde par battement (tic-tac)" |
+| `wicker_armchair` | 1 x 1 | 748 | seat_height: 0.42 |
+| `chalk_box` |  | 176 | kind: "item" |
+| `coffee_mill` |  | 248 | kind: "item" |
+| `elder_jelly` |  | 190 | kind: "item" |
+| `leather_apron` |  | 80 | kind: "item" |
+| `wool_scarf` |  | 184 | kind: "item" |
 | `bread` |  | 136 | kind: "item" |
 | `dish_radishes` |  | 464 | kind: "item" |
 | `dish_omelette` |  | 276 | kind: "item" |
@@ -381,7 +453,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |
 
-### `faune.glb` (1046 Ko)
+### `faune.glb` (1187 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -392,6 +464,8 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `roe_deer` |  | 892 | kind: "animal", origin: "sol entre les pattes", withers: 0.7, head_up: 1.05, length: 1.1, collision_radius: 0.4, note: "tête tournée vers sa gauche dans deer_watch_fawn et deer_lick: le faon à sa gauche" |
 | `fawn` |  | 896 | kind: "animal", origin: "sol entre les pattes", withers: 0.45, length: 0.65, collision_radius: 0.4, bed_ears_top: 0.32, note: "fawn_rustle = couché au lit: posé à -0,3 m, seules les oreilles dépassent (2 cm)" |
 | `kingfisher` |  | 416 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.255, wingspan: 0.375, beak_socket: "socket_kingfisher_beak" |
+| `barn_owl` |  | 658 | kind: "animal", origin: "pattes sur le perchoir (rocher rock_02) ou au sol", height: 0.35, wingspan: 0.9, beak_socket: "socket_barn_owl_beak", note: "vol: owl_glide, owl_flap; surplace: owl_hover; owl_look tourne la tête de 120 degrés vers sa gauche et y reste (LoopOnce, clampWhenFinished)" |
+| `vole` |  | 158 | kind: "item", socket: "socket_barn_owl_beak", carried_by: "barn_owl", length: 0.08, note: "en travers du bec, tête vers la gauche de l'oiseau" |
 | `ladder_wood` |  | 176 | kind: "prop", lean_deg: 75.0, length: 3.0, rung_step: 0.28, rungs: 10, top: [0.0, 2.898, 0.776], note: "penchée vers +Z: la poser avec la rotation de celui qui grimpe" |
 | `nest_box` |  | 156 | kind: "prop", pivot: "clou", tilt_deg: 25, entrance: [0.0, -0.13, 0.181], roof_perch: [0.0, -0.048, 0.12], note: "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)" |
 | `oak_branch_stub` |  | 60 | kind: "prop", pivot: "bout du chicot (perchoir)" |
@@ -442,3 +516,11 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kingfisher` | `kf_fly` | 0.133 | oui |
 | `kingfisher` | `kf_beat` | 1.2 | non (jouer une fois) |
 | `kingfisher` | `kf_swallow` | 0.5 | non (jouer une fois) |
+| `barn_owl` | `owl_glide` | 1.0 | oui |
+| `barn_owl` | `owl_hover` | 0.4 | oui |
+| `barn_owl` | `owl_strike` | 0.4 | non (jouer une fois) |
+| `barn_owl` | `owl_mantle` | 1.6 | oui |
+| `barn_owl` | `owl_flap` | 0.5 | oui |
+| `barn_owl` | `owl_land` | 0.6 | non (jouer une fois) |
+| `barn_owl` | `owl_look` | 2.0 | non (jouer une fois) |
+| `barn_owl` | `owl_perch` | 2.0 | oui |
