@@ -65,6 +65,9 @@ export interface ButterflySettings {
   legsBeforeRest: readonly [number, number];
   restSeconds: readonly [number, number];
   restHeight: number;
+  /** Leurs heures finies, posés, ils ferment les ailes et descendent de tant (m) dans l'herbe en tant de secondes. */
+  hideSink: number;
+  hideSeconds: number;
   hours: HourRange;
   weathers: readonly Weather[];
 }
@@ -114,6 +117,8 @@ export const AMBIENT_FAUNA: AmbientFaunaSettings = {
     legsBeforeRest: [2, 5],
     restSeconds: [2, 6],
     restHeight: 0.3,
+    hideSink: 0.22,
+    hideSeconds: 1.5,
     // Au soleil des heures chaudes seulement: ni nuit, ni pluie, ni ciel couvert.
     hours: { from: 9 * HOUR + 30, to: 18 * HOUR + 30 },
     weathers: ['sunny'],

@@ -63,6 +63,8 @@ const WING_HIGH = 75 * DEG;
 const WING_CLOSED = 85 * DEG;
 const WING_RESTING_OPEN = 35 * DEG;
 const REST_FLAP_HZ = 0.4;
+/** Temps pour se poser au bout d'un bond (s), avant de rentrer dans l'herbe. */
+const REST_SETTLE_SECONDS = 0.6;
 /** Zigzag latéral et tangage du vol des papillons (m, Hz). */
 const WOBBLE = 0.18;
 const WOBBLE_HZ = 1.3;
@@ -169,7 +171,26 @@ export function chooseButterflyHomes(map: GameMap, seed: number, wanted: number,
   return out;
 }
 
-type BirdState = 'gone' | 'perched' | 'leaving' | 'away' | 'arriving';
+export type BirdState = 'gone' | 'perched' | 'leaving' | 'away' | 'arriving';
+
+/**
+ * Un buisson ne porte qu'une mésange (QA7-06): pris si une autre y est posée ou y arrive. Une
+ * mésange qui en part le libère.
+ */
+export function perchTaken(birds: readonly { perch: number; state: BirdState }[], perch: number, self: number): boolean {
+  return birds.some((b, i) => i !== self && b.perch === perch && (b.state === 'perched' || b.state === 'arriving'));
+}
+
+/**
+ * Présence d'un papillon (1: dehors, 0: caché dans l'herbe), un pas plus loin. À l'heure où ils
+ * s'en vont (QA7-07), il ne disparaît pas en vol: posé d'abord, il ferme les ailes et descend
+ * dans l'herbe en `hideSeconds`; il en ressort de même quand ils reviennent.
+ */
+export function nextPresence(presence: number, on: boolean, resting: boolean, dt: number, hideSeconds: number): number {
+  if (!resting) return presence;
+  const step = dt / Math.max(0.01, hideSeconds);
+  return on ? Math.min(1, presence + step) : Math.max(0, presence - step);
+}
 
 interface Bird {
   root: Group;
@@ -200,6 +221,8 @@ interface Butterfly {
   since: number;
   duration: number;
   resting: boolean;
+  /** 1: dehors, 0: caché dans l'herbe (`nextPresence`). */
+  presence: number;
   legsLeft: number;
   rank: number;
   flapHz: number;
@@ -384,6 +407,7 @@ export class AmbientFaunaPart implements EventfulPart {
         since: 0,
         duration: 0,
         resting: true,
+        presence: 1,
         legsLeft: 0,
         rank: 0,
         flapHz: lerp(b.flapHz[0], b.flapHz[1], faunaUnit(seed, i, 37)),
@@ -404,14 +428,16 @@ export class AmbientFaunaPart implements EventfulPart {
     this.frustum.setFromProjectionMatrix(this.viewProjection);
     const minutes = world.clock.minutes;
     const s = this.settings;
-    const birdsOn = world.phase === 'day' && faunaActive(s.birds.hours, s.birds.weathers, minutes, world.weather);
-    const butterfliesOn =
-      world.phase === 'day' && faunaActive(s.butterflies.hours, s.butterflies.weathers, minutes, world.weather);
+    // Hors de la journée (nuit, petit-déjeuner), tout est caché d'un coup: l'écran a changé. À la
+    // fin de leurs heures ou à la pluie, elles partent à vue (QA7-07).
+    const day = world.phase === 'day';
+    const birdsOn = day && faunaActive(s.birds.hours, s.birds.weathers, minutes, world.weather);
+    const butterfliesOn = day && faunaActive(s.butterflies.hours, s.butterflies.weathers, minutes, world.weather);
     for (let i = 0; i < this.birds.length; i += 1) {
       const bird = this.birds[i];
-      if (bird !== undefined) this.updateBird(bird, i, birdsOn, context);
+      if (bird !== undefined) this.updateBird(bird, i, day, birdsOn, context);
     }
-    this.updateButterflies(butterfliesOn, context);
+    this.updateButterflies(day, butterfliesOn, context);
   }
 
   private random(index: number, rank: number, salt: number): number {
@@ -454,15 +480,46 @@ export class AmbientFaunaPart implements EventfulPart {
     bird.control.y = Math.max(bird.from.y, bird.to.y) + s.arcHeight;
   }
 
-  private updateBird(bird: Bird, index: number, on: boolean, context: FrameContext): void {
+  /** Fin de leurs heures (ou la pluie): chaque mésange posée ou en route s'envole vers son houppier. */
+  private updateLeaving(bird: Bird, context: FrameContext): void {
+    const time = context.time;
+    if (bird.state === 'perched') {
+      this.perchPoint(bird.perch, bird.from);
+      this.refugePoint(bird.perch, bird.to);
+      this.fly(bird, 'leaving', time);
+    } else if (bird.state === 'arriving') {
+      // Demi-tour depuis là où elle est.
+      const t = Math.min(1, (time - bird.since) / bird.duration);
+      bezier(bird.from, bird.control, bird.to, t, tmpPosition);
+      bird.from.copy(tmpPosition);
+      this.refugePoint(bird.perch, bird.to);
+      this.fly(bird, 'leaving', time);
+    } else if (bird.state === 'leaving' && time - bird.since >= bird.duration) {
+      bird.state = 'gone';
+    } else if (bird.state === 'away') {
+      bird.state = 'gone';
+    }
+    bird.settled = false;
+    if (bird.state === 'gone') {
+      bird.root.visible = false;
+      return;
+    }
+    this.drawBird(bird, context);
+  }
+
+  private updateBird(bird: Bird, index: number, day: boolean, on: boolean, context: FrameContext): void {
     const s = this.settings.birds;
     const time = context.time;
-    if (!on) {
+    if (!day) {
       bird.state = 'gone';
       bird.root.visible = false;
       return;
     }
-    if (bird.state === 'gone' && bird.settled && perchClear(this, bird, context)) {
+    if (!on) {
+      this.updateLeaving(bird, context);
+      return;
+    }
+    if (bird.state === 'gone' && bird.settled && perchClear(this, bird, context) && !perchTaken(this.birds, bird.perch, index)) {
       bird.state = 'perched';
       bird.nextIdle = time + lerp(s.idleEverySeconds[0], s.idleEverySeconds[1], this.random(index, bird.rank++, 17));
     }
@@ -504,7 +561,8 @@ export class AmbientFaunaPart implements EventfulPart {
       for (let k = 0; k < bird.perches.length && chosen === null; k += 1) {
         const candidate = bird.perches[(start + k) % bird.perches.length];
         const p = candidate === undefined ? undefined : this.perches[candidate];
-        if (candidate !== undefined && p !== undefined && this.nearestPlayer(context, p.x, p.y) >= s.returnClear) chosen = candidate;
+        if (candidate === undefined || p === undefined || perchTaken(this.birds, candidate, index)) continue;
+        if (this.nearestPlayer(context, p.x, p.y) >= s.returnClear) chosen = candidate;
       }
       if (chosen === null) {
         bird.since = time;
@@ -575,13 +633,21 @@ export class AmbientFaunaPart implements EventfulPart {
     bird.clip = name;
   }
 
-  /** Prochain bond d'un papillon: vers un point du pré autour de sa fleur, ou posé sur une tête d'herbe. */
-  private nextLeg(fly: Butterfly, index: number, time: number): void {
+  /**
+   * Prochain bond d'un papillon: vers un point du pré autour de sa fleur, ou posé sur une tête
+   * d'herbe. Leurs heures finies (`on` faux), il se pose au bout du bond en cours et y reste; il
+   * ne repart qu'une fois ressorti de l'herbe.
+   */
+  private nextLeg(fly: Butterfly, index: number, time: number, on: boolean): void {
     const b = this.settings.butterflies;
     fly.from.copy(fly.to);
     fly.since = time;
     const r = (k: number): number => this.random(index, fly.rank++, k);
-    if (!fly.resting && fly.legsLeft <= 0) {
+    if (fly.resting && (!on || fly.presence < 1)) {
+      fly.duration = lerp(b.restSeconds[0], b.restSeconds[1], r(47));
+      return;
+    }
+    if (!fly.resting && (fly.legsLeft <= 0 || !on)) {
       // Se pose là où il est arrivé: descend sur l'herbe.
       fly.resting = true;
       fly.to.set(fly.from.x, this.terrain.heightAt(fly.from.x, fly.from.z) + b.restHeight, fly.from.z);
@@ -599,14 +665,21 @@ export class AmbientFaunaPart implements EventfulPart {
     fly.duration = Math.max(0.4, fly.from.distanceTo(fly.to) / lerp(b.speed[0], b.speed[1], r(71)));
   }
 
-  private updateButterflies(on: boolean, context: FrameContext): void {
+  private updateButterflies(day: boolean, on: boolean, context: FrameContext): void {
     const mesh = this.wings;
-    if (!on || this.butterflies.length === 0 || !this.frustum.intersectsSphere(this.meadow)) {
+    const b = this.settings.butterflies;
+    const seen = day && this.butterflies.length > 0 && this.frustum.intersectsSphere(this.meadow);
+    let out = false;
+    for (const fly of this.butterflies) {
+      // Hors du cadre ou de la journée, personne ne les voit partir ni revenir.
+      if (!seen) fly.presence = on ? 1 : 0;
+      out ||= fly.presence > 0 || on;
+    }
+    if (!seen || !out) {
       mesh.visible = false;
       return;
     }
     mesh.visible = true;
-    const b = this.settings.butterflies;
     const time = context.time;
     const size = (b.wingspan / 2) * b.displayScale;
     for (let i = 0; i < this.butterflies.length; i += 1) {
@@ -615,17 +688,21 @@ export class AmbientFaunaPart implements EventfulPart {
       // Rattrapage borné: un long passage hors du cadre ne rejoue qu'un bond.
       if (time - fly.since >= fly.duration) {
         if (time - fly.since > fly.duration + 1) fly.since = time - fly.duration;
-        this.nextLeg(fly, i, time);
+        this.nextLeg(fly, i, time, on);
       }
+      // Posé, il rentre dans l'herbe ou en ressort (ailes fermées, plus bas, plus petit).
+      if (fly.resting && time - fly.since >= REST_SETTLE_SECONDS) fly.presence = nextPresence(fly.presence, on, true, context.dt, b.hideSeconds);
+      const hide = 1 - fly.presence;
       const t = Math.min(1, (time - fly.since) / fly.duration);
       let wing: number;
       if (fly.resting) {
-        const settle = Math.min(1, (time - fly.since) / 0.6);
+        const settle = Math.min(1, (time - fly.since) / REST_SETTLE_SECONDS);
         const ease = settle * settle * (3 - 2 * settle);
         tmpPosition.lerpVectors(fly.from, fly.to, ease);
         const slow = 0.5 + 0.5 * Math.sin(TWO_PI * REST_FLAP_HZ * time + fly.phase);
         const flapping = 0.5 + 0.5 * Math.sin(TWO_PI * fly.flapHz * time + fly.phase);
-        wing = lerp(lerp(WING_LOW, WING_HIGH, flapping), lerp(WING_CLOSED, WING_RESTING_OPEN, slow), ease);
+        wing = lerp(lerp(lerp(WING_LOW, WING_HIGH, flapping), lerp(WING_CLOSED, WING_RESTING_OPEN, slow), ease), WING_CLOSED, hide);
+        tmpPosition.y -= hide * b.hideSink;
       } else {
         const ease = t * t * (3 - 2 * t);
         tmpPosition.lerpVectors(fly.from, fly.to, ease);
@@ -648,7 +725,8 @@ export class AmbientFaunaPart implements EventfulPart {
         const mirror = side === 0 ? 1 : -1;
         tmpRoll.setFromAxisAngle(Z_AXIS, wing * mirror);
         tmpRotation.multiplyQuaternions(tmpYaw, tmpRoll);
-        tmpScale.set(size * mirror, size, size);
+        const shown = size * fly.presence;
+        tmpScale.set(shown * mirror, shown, shown);
         mesh.setMatrixAt(i * 2 + side, tmpMatrix.compose(tmpPosition, tmpRotation, tmpScale));
       }
     }

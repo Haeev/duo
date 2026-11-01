@@ -145,6 +145,11 @@ export interface AudioSettings {
     followed: readonly string[];
     /** Son joué seulement si les poules sont là. */
     hensOnly: readonly string[];
+    /**
+     * Niveau (dB) où descend, à la fin de l'apogée, une boucle d'attente dont le moment part tout
+     * entier pendant l'apogée (la brume levée), avant de s'éteindre en fondu de boucle.
+     */
+    departFloorDb: number;
   };
 }
 
@@ -266,6 +271,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
     },
     followed: ['geese_flight'],
     hensOnly: ['hens_alarm'],
+    departFloorDb: -24,
   },
 };
 
