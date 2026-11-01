@@ -39,7 +39,10 @@ export type Intent =
   | { type: 'create_character'; name: string; hair: number; outfit: number }
   // Déplacement à la souris: aller là (et agir si `act`)
   | { type: 'move_to'; target: ClickTarget; act: boolean }
-  // Agir une fois sur ce qui est devant soi (Espace pressé)
+  // Ce que survole la souris (R11): la cible mise en évidence, ou l'aperçu du meuble en main.
+  // Envoyée quand la cible change; `null` rend la visée au clavier (souris sortie, Z Q S D).
+  | { type: 'point_at'; target: ClickTarget | null }
+  // Agir une fois sur ce qui est visé (Espace pressé): la cible survolée, sinon ce qui est devant soi
   | { type: 'act' }
   // Examiner, ou reprendre un meuble posé (X, clic droit)
   | { type: 'examine' }

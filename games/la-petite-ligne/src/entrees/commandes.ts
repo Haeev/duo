@@ -2,6 +2,12 @@
  * Clavier et souris (par le SDK) vers commandes et intentions: Z Q S D tournés
  * selon la caméra, Espace ou clic pour agir, molette pour l'outil ou le
  * meuble, A et E pour la caméra, R et F pour le zoom (section 6 de `demo.md`).
+ *
+ * Survol (R11): la cible sous la souris part vers l'hôte (`point_at`) quand
+ * elle change; l'hôte la met en évidence s'il y a un geste à y faire, et le
+ * clic comme Espace la prennent. Pendant l'aménagement, c'est le point du sol
+ * sous la souris: l'aperçu du meuble le suit. Z Q S D rendent la main au
+ * clavier jusqu'au prochain mouvement de la souris.
  */
 import type { Input } from '@duo/sdk';
 import type { ClickTarget, ControlFrame } from '../etat/actions';
@@ -56,6 +62,42 @@ function pickPosition(view: GameView, pick: PickResult): { x: number; y: number 
   }
 }
 
+/**
+ * Ce que survole la souris, et sa clé (une nouvelle clé seulement part vers l'hôte): l'entité par
+ * son identifiant, le sol par case; en aménagement, le sol par demi-case (l'empreinte se centre sur
+ * le point, son coin change aux cases entières et aux demi-cases).
+ */
+export function hoverTarget(
+  renderer: Pick<Renderer, 'pick' | 'pickGround'>,
+  clientX: number,
+  clientY: number,
+  placing: boolean,
+  self: string,
+): { key: string; target: ClickTarget } | null {
+  if (placing) {
+    const ground = renderer.pickGround?.(clientX, clientY) ?? null;
+    if (ground === null) return null;
+    return { key: `place:${Math.floor(ground.x * 2)}:${Math.floor(ground.y * 2)}`, target: { kind: 'ground', x: ground.x, y: ground.y } };
+  }
+  const pick = renderer.pick(clientX, clientY);
+  if (pick === null || (pick.kind === 'character' && pick.character === self)) return null;
+  const target = toTarget(pick);
+  switch (target.kind) {
+    case 'ground':
+      return { key: `ground:${Math.floor(target.x)}:${Math.floor(target.y)}`, target };
+    case 'villager':
+      return { key: `villager:${target.villager}`, target };
+    case 'character':
+      return { key: `character:${target.character}`, target };
+    case 'furniture':
+      return { key: `furniture:${target.furniture}`, target };
+    case 'ground_item':
+      return { key: `item:${target.groundItem}`, target };
+    case 'tree':
+      return { key: `tree:${target.tree}`, target };
+  }
+}
+
 function toTarget(pick: PickResult): ClickTarget {
   switch (pick.kind) {
     case 'ground':
@@ -77,6 +119,10 @@ export function createControls(options: ControlsOptions): Controls {
   const { input } = options;
   let seq = 0;
   let rightWasDown = false;
+  /** Clé de la dernière cible survolée envoyée à l'hôte, `null`: visée au clavier. */
+  let hoverKey: string | null = null;
+  let lastPointerX = Number.NaN;
+  let lastPointerY = Number.NaN;
 
   return {
     step(view) {
@@ -118,10 +164,33 @@ export function createControls(options: ControlsOptions): Controls {
         }
       }
 
-      // Clic gauche: aller là et agir; Espace: agir devant soi. Le clic est une action du
+      // Survol: la souris qui bouge vise; Z Q S D, un menu ou la souris hors du jeu rendent la visée au clavier.
+      const pointer = input.pointer;
+      const placing = me?.placement !== null && me?.placement !== undefined;
+      const pointerMoved = pointer.x !== lastPointerX || pointer.y !== lastPointerY;
+      lastPointerX = pointer.x;
+      lastPointerY = pointer.y;
+      const keyboardMove = mx !== 0 || my !== 0;
+      let hovered: ClickTarget | null | undefined;
+      if (!pointer.inside || captured || renderer === null || me === undefined || keyboardMove) hovered = null;
+      else if (pointerMoved || hoverKey !== null) {
+        // Tant que la souris vise, on revise à chaque pas: un habitant passe sous elle, l'aperçu change de taille.
+        const rect = options.canvasRect();
+        const hit = hoverTarget(renderer, rect.left + pointer.x, rect.top + pointer.y, placing, me.id);
+        if (hit === null) hovered = null;
+        else if (hit.key !== hoverKey) {
+          hoverKey = hit.key;
+          view.send({ type: 'point_at', target: hit.target });
+        }
+      }
+      if (hovered === null && hoverKey !== null) {
+        hoverKey = null;
+        view.send({ type: 'point_at', target: null });
+      }
+
+      // Clic gauche: aller là et agir; Espace: agir sur ce qui est visé. Le clic est une action du
       // manifeste (`click`), mémorisée par le SDK jusqu'au pas: une tape de pavé tactile
       // plus courte qu'un pas compte aussi.
-      const pointer = input.pointer;
       const leftPressed = input.wasPressed('click');
       const rightPressed = pointer.right && !rightWasDown;
       rightWasDown = pointer.right;
@@ -136,7 +205,14 @@ export function createControls(options: ControlsOptions): Controls {
         }
       }
       if (!clicked && input.wasPressed('act') && !captured) view.send({ type: 'act' });
-      if ((input.wasPressed('examine') && !rightPressed) || (rightPressed && pointer.inside && !captured)) view.send({ type: 'examine' });
+      // Clic droit: en aménagement, tourne le meuble; sur un meuble posé, le reprend; sinon examine (comme X).
+      if (rightPressed && pointer.inside && !captured) {
+        const rect = options.canvasRect();
+        const pick = placing || renderer === null ? null : renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
+        if (placing) view.send({ type: 'rotate_furniture', delta: 1 });
+        else if (pick?.kind === 'furniture' && me?.inHouse === true) view.send({ type: 'take_furniture', furniture: pick.furniture });
+        else view.send({ type: 'examine' });
+      } else if (input.wasPressed('examine') && !rightPressed) view.send({ type: 'examine' });
 
       // Molette: le meuble en main tourne, sinon l'outil change. T tourne aussi le meuble.
       const wheel = (input.wasPressed('tool-next') ? 1 : 0) - (input.wasPressed('tool-previous') ? 1 : 0);

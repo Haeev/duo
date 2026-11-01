@@ -236,6 +236,7 @@ class GameUi implements GameInterface, UiHost {
     const world = this.view.world();
     const now = this.now();
     this.hud.updateClockOnly(world);
+    this.hud.updateProgress(world);
     const revisionChanged = world.revision !== this.lastRevision;
     const since = now - this.lastRefresh;
     if (this.dirty || since >= UI_SETTINGS.refreshMaxMs || (revisionChanged && since >= UI_SETTINGS.refreshMinMs)) {

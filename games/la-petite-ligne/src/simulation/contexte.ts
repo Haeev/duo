@@ -58,6 +58,8 @@ export interface Runtime {
   bufferedAct: Record<CharacterId, { intent: Intent; tick: number } | null>;
   /** Espace tenu: case du dernier geste et fin de ce geste, pour passer à la case suivante de la rangée. */
   heldRepeat: Record<CharacterId, { cx: number; cy: number; endsAt: number } | null>;
+  /** Ce que survole la souris de chaque joueur (intention `point_at`, R11), ou `null`: visée au clavier. */
+  pointer: Record<CharacterId, ClickTarget | null>;
 }
 
 export interface Sim {
@@ -84,6 +86,7 @@ export function createRuntime(map: GameMap): Runtime {
     holdForTool: { p1: false, p2: false },
     bufferedAct: { p1: null, p2: null },
     heldRepeat: { p1: null, p2: null },
+    pointer: { p1: null, p2: null },
   };
 }
 

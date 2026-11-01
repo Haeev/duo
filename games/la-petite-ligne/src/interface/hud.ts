@@ -26,6 +26,7 @@ import {
   type SlotModel,
 } from './modele';
 import { SteadyWatch, watchModel } from './modele-moments';
+import { aimPromptModel, progressModel } from './modele-progression';
 import { henWrongAside } from './modele-secrets';
 import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
@@ -121,6 +122,17 @@ export class Hud {
   private readonly buildRotation: HTMLSpanElement;
   private buildSig = '';
 
+  /** Barre de progression de l'action en cours (R10), mise à jour à chaque image. */
+  private readonly progress: HTMLDivElement;
+  private readonly progressIcon: SVGSVGElement;
+  private readonly progressLabel: HTMLSpanElement;
+  private progressSig = '';
+  private progressValue = -1;
+  /** Invite de la cible survolée à la souris (R11). */
+  private readonly aimPrompt: HTMLParagraphElement;
+  private readonly aimText: HTMLSpanElement;
+  private aimSig = '';
+
   constructor(host: UiHost) {
     this.host = host;
     const { ctx } = host;
@@ -210,7 +222,16 @@ export class Hud {
       el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.stamina]),
     ]);
 
-    // Bas centre: astuce, barre d'outils, barre d'aménagement.
+    // Bas centre: avancée de l'action, invite du survol, astuce, barre d'outils, barre d'aménagement.
+    this.progressIcon = icon('ui-hourglass');
+    this.progressLabel = el('span', { class: 'lpl-progress__label' });
+    this.progress = el(
+      'div',
+      { class: 'lpl-progress', role: 'progressbar', 'aria-label': x.progress.label, 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 0, hidden: true },
+      [this.progressIcon, this.progressLabel, el('span', { class: 'lpl-progress__bar' }, [el('span', { class: 'lpl-progress__fill' })])],
+    );
+    this.aimText = el('span');
+    this.aimPrompt = el('p', { class: 'lpl-aim', role: 'status', 'aria-label': x.aim.label, hidden: true }, [keycap(x.aim.click), this.aimText]);
     this.tip = el('p', { class: 'lpl-tip', role: 'status', hidden: true });
     this.toolbarHeld = el('span');
     this.toolbarDetail = el('small');
@@ -242,10 +263,11 @@ export class Hud {
       this.buildState,
       this.buildRotation,
       keysLine([
-        { keys: [x.keys.wheel, keyLabel('KeyT')], text: k.rotate, between: x.keys.or },
-        { keys: ['KeyW', 'KeyA', 'KeyS', 'KeyD'].map(keyLabel), text: `${x.keys.or} ${x.keys.click} ${k.move}` },
+        // Souris (R11): l'aperçu suit le pointeur, le clic droit tourne, le clic pose.
+        { keys: [x.keys.wheel, keyLabel('KeyT')], text: `${x.keys.or} ${x.keys.rightClick} ${k.rotate}`, between: x.keys.or },
+        { keys: ['KeyW', 'KeyA', 'KeyS', 'KeyD'].map(keyLabel), text: `${x.keys.or} ${x.keys.mouse} ${k.move}` },
         { keys: [keyLabel('Space')], text: `${x.keys.or} ${x.keys.click} ${k.place}` },
-        { keys: [keyLabel('KeyX')], text: `${x.keys.or} ${x.keys.rightClick} ${k.take}` },
+        { keys: [keyLabel('KeyX')], text: k.take },
         { keys: [keyLabel('Backspace')], text: k.store },
         { keys: [keyLabel('KeyC')], text: k.corner },
       ]),
@@ -284,7 +306,7 @@ export class Hud {
       el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
-      el('div', { class: 'lpl-hud__bottom' }, [this.tip, this.toolbar, this.build]),
+      el('div', { class: 'lpl-hud__bottom' }, [this.progress, this.aimPrompt, this.tip, this.toolbar, this.build]),
       el('div', { class: 'lpl-hud__bottom-right' }, [shortcuts]),
     ]);
   }
@@ -314,6 +336,26 @@ export class Hud {
   }
 
   private clockStep = -1;
+
+  /** Barre de progression (appelée à chaque image: l'avancée suit le pas de la simulation). */
+  updateProgress(world: ReadonlyWorld): void {
+    const model = progressModel(world, this.host.ctx);
+    const sig = model === null ? '' : `${model.kind}|${model.icon}|${model.label}|${model.together ? 1 : 0}`;
+    if (sig !== this.progressSig) {
+      this.progressSig = sig;
+      setHidden(this.progress, model === null);
+      if (model !== null) {
+        setIcon(this.progressIcon, model.icon);
+        setText(this.progressLabel, model.label);
+        setAttr(this.progress, 'data-state', model.together ? 'together' : null);
+      }
+    }
+    const value = model === null ? 0 : Math.round(model.ratio * 200) / 2;
+    if (value === this.progressValue) return;
+    this.progressValue = value;
+    setStyleVar(this.progress, '--lpl-value', `${value}%`);
+    setAttr(this.progress, 'aria-valuenow', String(Math.round(value)));
+  }
 
   /** Masque le bas du HUD pendant une conversation ou l'aménagement, et l'objectif et le bas pendant un panneau. */
   setLayer(kind: HudState): void {
@@ -404,6 +446,15 @@ export class Hud {
     setAttr(this.stamina, 'aria-valuenow', String(Math.round(st.ratio * 100)));
     setAttr(this.stamina, 'data-level', st.level === '' ? null : st.level);
     setText(this.staminaLabel, st.label);
+
+    // Invite de la cible survolée à la souris.
+    const prompt = aimPromptModel(world, ctx);
+    const aimSig = prompt === null ? '' : prompt.text;
+    if (aimSig !== this.aimSig) {
+      this.aimSig = aimSig;
+      setHidden(this.aimPrompt, prompt === null);
+      setText(this.aimText, prompt?.text ?? '');
+    }
 
     // Barre d'outils ou barre d'aménagement.
     const placing = me.placement !== null;

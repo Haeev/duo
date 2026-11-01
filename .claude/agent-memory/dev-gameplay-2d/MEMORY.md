@@ -36,3 +36,11 @@ Apprentissages durables et vérifiés. Ni avancement ni secret. Voir aussi le ca
 - Chromium ne passe pas la requête de favicon par les événements de Playwright (`response`), mais l'erreur 404 arrive en console: `<link rel="icon" href="data:," />` dans `demo/index.html`.
 - Les identifiants des lettres hebdomadaires portent le jour du train (`coop_order_generated@29` part le samedi 22). `ctx.texts.game.ui.hud.time` donne « 16 h » pour une heure pile (pas « 16 h 00 »).
 - L'heredoc et `python3 - <<'EOF'` passent maintenant dans Bash (vérifié le 2026-11-01); seules les commandes composées avec `git` ou un `cd` hors du worktree sont refusées.
+
+## La Petite Ligne: souris (R11) et progression (R10), vérifié le 2026-11-01
+
+- Survol: intention `point_at` (cible ou `null`), gardée par l'hôte dans `sim.runtime.pointer`; `pointerTarget` (`agir.ts`) en tire `aim` avec `source: 'pointer'` s'il y a un verbe (sauf `dig`); Espace (`act`) prend alors la cible comme un clic (`move_to`). En aménagement, `pointerCell` (`amenagement.ts`) centre l'empreinte sur le point du sol (`Renderer.pickGround`). Les entrées n'envoient `point_at` qu'au changement de clé, et `null` dès que Z Q S D bougent.
+- Parcours à la souris dans Chromium: page de démonstration avec `entrees=sdk` (entrée du SDK et `createControls` du jeu), `window.lplInterface.pick(x, y)` et `world()`; chercher le point d'écran voulu en balayant une grille par `pick`, puis `page.mouse`. Scénarios `souris`, `souris-maison`, `progression-etabli`, `progression-chantier` (avec `temps=arrete` pour figer la barre).
+- Avec le rendu 3D (SwiftShader), `locator.evaluate` et `locator.screenshot` expirent (attente des polices, fil occupé): lire par `page.evaluate(() => document.querySelector(...))` et capturer par `page.screenshot({ clip })`.
+- Un script Playwright `.cjs` doit être copié dans le paquet du jeu pour trouver `playwright`, puis retiré aussitôt: laissé là, `pnpm lint` échoue (fichier hors du projet TypeScript).
+- `ressenti.test.ts` (tape de pavé tactile) attend la liste exacte des intentions d'un clic: le survol y ajoute `point_at` avant `move_to`.

@@ -453,6 +453,11 @@ export interface AimInfo {
   verb: AimVerb | null;
   /** L'action est impossible: raison affichable (« Il faut de l'eau. »). */
   blocked: string | null;
+  /**
+   * `pointer`: la cible survolée à la souris (R11), que le clic gauche et Espace prennent;
+   * absent: la case devant le personnage. Recalculé à chaque pas, jamais relu d'une sauvegarde.
+   */
+  source?: 'pointer';
 }
 
 export type AimVerb =

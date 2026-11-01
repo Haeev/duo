@@ -28,7 +28,8 @@
     "wheel": "Molette",
     "or": "ou",
     "click": "clic",
-    "rightClick": "clic droit"
+    "rightClick": "clic droit",
+    "mouse": "la souris"
   },
   "title": {
     "ticket": "Six semaines à la Halte d'Aubrune",
@@ -370,6 +371,53 @@
     "take": "reprendre",
     "store": "ranger au sac",
     "corner": "ton coin"
+  },
+  "progress": {
+    "label": "Avancée de l'action",
+    "craft": "À l'établi : {recipe}",
+    "cook": "Au réchaud : {recipe}",
+    "build": "{construction}",
+    "buildTogether": "{construction}, à deux",
+    "buildPartner": "{partner} bâtit : {construction}",
+    "chop": "Arbre entamé : {hits} coups de hache sur {total}",
+    "busy": "En cours…",
+    "actions": {
+      "eat": "Tu manges",
+      "till": "Tu bêches",
+      "sow": "Tu sèmes",
+      "water": "Tu arroses",
+      "harvest": "Tu récoltes",
+      "chop": "Tu coupes",
+      "pickup": "Tu ramasses",
+      "refill": "Tu remplis l'arrosoir",
+      "feed": "Tu nourris les poules"
+    }
+  },
+  "aim": {
+    "label": "Ce que fait le clic",
+    "click": "clic",
+    "verbs": {
+      "fish": "Pêcher",
+      "till": "Bêcher",
+      "sow": "Semer",
+      "water": "Arroser",
+      "harvest": "Récolter",
+      "chop": "Couper",
+      "refill": "Remplir l'arrosoir",
+      "talk": "Parler",
+      "pickup": "Ramasser",
+      "build": "Bâtir (garde le bouton enfoncé)",
+      "carry": "Porter la poutre",
+      "open": "Ouvrir",
+      "sleep": "Dormir",
+      "feed": "Nourrir les poules",
+      "place": "Poser",
+      "give": "Donner ce que tu tiens",
+      "dig": "Bêcher ici",
+      "sit": "S'asseoir",
+      "hold": "Tenir l'échelle",
+      "call": "Appeler la poule"
+    }
   },
   "corner": {
     "designate": "désigner ton coin (2x2 cases rien qu'à toi)",

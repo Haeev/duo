@@ -2,13 +2,13 @@
  * Application des intentions des joueurs. L'hôte les valide toutes (portée,
  * fonds, état): une intention impossible est ignorée ou donne un message.
  */
-import type { Intent } from '../etat/actions';
+import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
-import { actFront, actOnClick, getUp, openMenu, resolveClick } from './agir';
+import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
-import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, updatePlacement } from './amenagement';
 import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
@@ -72,11 +72,18 @@ export function heldRepeat(sim: Sim, c: Character, held: boolean): void {
   const last = r.heldRepeat[c.id];
   const aim = c.aim;
   const verb = aim?.verb ?? null;
-  if (last === null || aim === null || verb === null || !REPEATED.has(verb) || !canAct(c, sim)) return;
+  // La visée de la souris n'enchaîne pas la rangée: ce n'est pas la case devant soi (R11).
+  if (last === null || aim === null || aim.source === 'pointer' || verb === null || !REPEATED.has(verb) || !canAct(c, sim)) return;
   if (aim.cell.cx === last.cx && aim.cell.cy === last.cy) return;
   if (sim.world.garden.every((g) => g.cell.cx !== aim.cell.cx || g.cell.cy !== aim.cell.cy)) return;
   if (sim.world.tick < last.endsAt + secondsToTicks(sim.content.settings.feel.heldRepeatSeconds)) return;
   actFront(sim, c);
+}
+
+/** Cible survolée reçue du réseau: un point du sol hors des nombres finis ne vise rien. */
+function validPointer(target: ClickTarget | null): ClickTarget | null {
+  if (target?.kind !== 'ground') return target;
+  return Number.isFinite(target.x) && Number.isFinite(target.y) ? target : null;
 }
 
 function createCharacter(sim: Sim, c: Character, name: string, hair: number, outfit: number): void {
@@ -219,12 +226,27 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (goTo(sim, c, goal)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
       return;
     }
-    case 'act':
-      if (c.status === 'dialogue' || c.status === 'scene') dialogueNext(sim, c);
-      else if (c.status === 'sleeping') getUp(sim, c);
+    case 'point_at':
+      sim.runtime.pointer[c.id] = validPointer(intent.target);
+      // L'aperçu du meuble suit la souris dès ce pas: un clic qui suit pose là où on le voit.
+      if (c.placement !== null) updatePlacement(sim, c);
+      return;
+    case 'act': {
+      if (c.status === 'dialogue' || c.status === 'scene') {
+        dialogueNext(sim, c);
+        return;
+      }
+      if (c.status === 'sleeping') {
+        getUp(sim, c);
+        return;
+      }
+      // Espace prend la cible survolée et mise en évidence, comme le clic: les deux ne se contredisent pas.
+      const pointed = c.status === 'active' ? pointerTarget(sim, c) : null;
+      if (pointed !== null) applyIntent(sim, by, { type: 'move_to', target: pointed.click, act: true });
       else if (canAct(c, sim)) actFront(sim, c);
       else bufferAct(sim, c, intent);
       return;
+    }
     case 'examine':
       examine(sim, c);
       return;

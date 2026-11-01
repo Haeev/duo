@@ -83,7 +83,7 @@ const SupplementSchema = v.object({
     emptySlot: str,
     orientation: v.tuple([str, str, str, str]),
   }),
-  keys: v.object({ arrows: v.tuple([str, str, str, str]), escape: str, wheel: str, or: str, click: str, rightClick: str }),
+  keys: v.object({ arrows: v.tuple([str, str, str, str]), escape: str, wheel: str, or: str, click: str, rightClick: str, mouse: str }),
   title: strings(['ticket', 'name', 'lead', 'start', 'resume', 'helpSynced', 'resumeHelp', 'pause'] as const),
   creation: v.object({
     overline: str,
@@ -289,6 +289,16 @@ const SupplementSchema = v.object({
   proposal: strings(['from', 'mine', 'received', 'sent', 'receivedNote', 'acceptedGrocery', 'acceptedCatalogue', 'enterHint', 'you'] as const),
   build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store', 'corner'] as const),
   corner: strings(['designate', 'move'] as const),
+  /** Barre de progression des actions qui durent (R10). `actions`: par genre d'action (`ActionKind`). */
+  progress: v.object({
+    ...strings(['label', 'craft', 'cook', 'build', 'buildTogether', 'buildPartner', 'chop', 'busy'] as const).entries,
+    actions: v.record(str, str),
+  }),
+  /** Invite de la cible survolée à la souris (R11). `verbs`: par verbe de visée (`AimVerb`). */
+  aim: v.object({
+    ...strings(['label', 'click'] as const).entries,
+    verbs: v.record(str, str),
+  }),
   /** Moments rares (tour 6): ligne d'observation sous l'horloge, confidence du matin. */
   moments: v.object({
     ...strings(['watchLabel', 'partnerReady', 'partnerNotSettled', 'partnerLetGo', 'hintOverline', 'hintChip', 'hintHelp', 'memoryAdded'] as const).entries,
