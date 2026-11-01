@@ -49,3 +49,12 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - `tests/aides.ts` ne s'importe pas dans Playwright (`import.meta.glob` de Vite): charger le contenu par `loadContent(CONTENT_FILES)`; pas de `"type":"module"` dans le dossier de la spec (les imports JSON exigeraient un attribut).
 - Le serveur Vite de la page de rendu recharge la page quand l'arbre de travail change (autres membres): une capture peut tomber sur « Chargement du rendu... »; vérifier la taille du PNG et refaire.
 - Le dépôt bouge pendant la mission (commits et arbre de travail des autres): noter le commit de chaque mesure et relancer G1 sur le dernier avant de conclure.
+
+## Moments du tour 7 et souvenirs (vérifié le 2026-11-01)
+
+- Les bêtes des moments ne sont repoussées des joueurs (`pushOut`) qu'en attente et après, autour de leur point de repos (`roam`, `shy.stepTo`): les trajets d'arrivée, d'effarouchement et d'apogée ne sont pas protégés. Contrôle: placer un joueur sur le trajet (cases libres de l'anneau) et mesurer la distance à la pose dessinée (`freezeState`, `startlePose`, `sampleTrack`, `actorPose`), pas seulement à `actorPose`.
+- Après une apogée réussie, un moment d'ambiance passe encore en `left` à `present.to`: tout ce qui est parti pendant l'apogée (`after.actors.*.at: null`) rejoue son départ. Toujours regarder la phase `left` après une apogée, pas seulement sans apogée.
+- La rumeur (`rumorMoment`) se vérifie au long cours avec `content.settings.clock.lastDay.day` relevé (400): dans la démo, l'horizon est borné au jour 15 et masque les saisons.
+- Sauvegarde de test en milieu de journée: partir d'un état de robot, déplacer les joueurs par `placeCharacter`, avancer `clock.minutes` pour laisser au moins 30 s réelles avant l'instant à capturer (le chargement à deux en prend 10 à 20).
+- Dans le faux hôte, la touche envoyée par `frame.locator('body').press` n'atteint pas toujours l'invité; dans Duo (Electron), `page.keyboard.press` sur la vue du jeu marche chez les deux.
+- Les places et les habitants ne se repoussent pas entre eux (règle du jeu depuis le tour 6): un contact joueur-Basile près de l'échelle n'est pas un bug du tour.
