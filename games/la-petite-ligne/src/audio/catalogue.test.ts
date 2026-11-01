@@ -5,9 +5,9 @@ import { CatalogueError, parseCatalogue, sequenceOf, stepTime, stopTime } from '
 describe('catalogue (sons.json)', () => {
   const catalogue = parseCatalogue(soundsFile);
 
-  it('lit les 120 sons et les 9 musiques du sound designer', () => {
-    expect(catalogue.sounds.size).toBe(120);
-    expect(catalogue.music.size).toBe(9);
+  it('lit les 134 sons et les 10 musiques du sound designer', () => {
+    expect(catalogue.sounds.size).toBe(134);
+    expect(catalogue.music.size).toBe(10);
     expect(catalogue.mix.maxEffectVoices).toBe(24);
     expect(catalogue.peerDb).toBe(-3);
   });
@@ -32,7 +32,7 @@ describe('catalogue (sons.json)', () => {
     expect(roof?.rain).toBe('indoor');
     const birds = catalogue.ambienceRules.filter((r) => r.ambience === 'birds-morning');
     expect(birds.every((r) => r.silentInRain)).toBe(true);
-    expect(catalogue.restingMusic).toEqual(new Set(['halte-matin', 'halte-apres-midi', 'samedi']));
+    expect(catalogue.restingMusic).toEqual(new Set(['halte-matin', 'halte-apres-midi', 'halte-ete', 'samedi']));
   });
 
   it('donne les instants des séquences du train', () => {
@@ -81,6 +81,28 @@ describe('catalogue (sons.json)', () => {
     const sit = catalogue.sounds.get('bench-sit');
     expect(sit?.files).toHaveLength(3);
     expect(sit?.spatial).not.toBeNull();
+  });
+
+  it('déclare les sons des saisons et de la cueillette (tour 8)', () => {
+    // Un motif par saison, juste (aucune variation de hauteur), non placé.
+    for (const season of ['spring', 'summer', 'autumn', 'winter']) {
+      const turn = catalogue.sounds.get(`season-turn-${season}`);
+      expect(turn?.pitchVariation, season).toBe(0);
+      expect(turn?.spatial, season).toBeNull();
+      expect(turn?.files, season).toHaveLength(1);
+    }
+    for (const id of ['mist-morning', 'crickets-summer', 'swifts', 'wind-leaves', 'crows']) {
+      const bed = catalogue.sounds.get(id);
+      expect(bed?.bus, id).toBe('ambience');
+      expect(bed?.loop, id).not.toBeNull();
+    }
+    for (const id of ['pick-herb', 'pick-mushroom', 'pick-berries', 'pick-nuts']) {
+      expect(catalogue.sounds.get(id)?.files, id).toHaveLength(3);
+      expect(catalogue.sounds.get(id)?.spatial, id).not.toBeNull();
+    }
+    expect(catalogue.sounds.get('axe-thud-soft')?.files).toHaveLength(2);
+    // La variation d'été du thème garde la boucle du matin: même position de lecture.
+    expect(catalogue.music.get('halte-ete')?.loop).toEqual(catalogue.music.get('halte-matin')?.loop);
   });
 
   it('refuse un fichier abîmé en citant le champ', () => {

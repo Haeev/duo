@@ -74,3 +74,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Le contrôle des tirets contient `.git` (`--exclude-dir`): dans un worktree isolé l'outil le refuse; le mettre dans un petit script et lancer `bash script.sh CHEMIN`.
 - Accepter `music` comme bus d'un son (question S3) n'est pas une ligne: schéma Valibot, type `SoundBus`, `busOf` de `moteur.ts`, et le raccord après `momentDuck` (sinon la descente de l'apogée atténue aussi le son).
 - Un son musical court (accord de harpe et cordes) se rend par `partition.produire` depuis moments.py comme les motifs d'habitants: le MIDI va dans `assets-src/son/midi/`. `partition.frottements` ne signale rien si `m.accords` est vide: pour un accord tenu, tester soi-même toutes les paires de notes (seconde mineure, triton, septième majeure).
+
+## La Petite Ligne: tour 8 (vérifié le 2026-11-01)
+
+- Le moteur n'a pas d'API pour jouer une variante précise (`VariantPicker` tire au hasard): un son choisi par l'état (saison) se déclare en plusieurs identifiants (`season-turn-spring`...), pas en variantes.
+- Les règles d'ambiance de `plan.ambienceByTime` sont toutes appliquées (aucun champ saison): une ambiance de saison qu'on y mettrait jouerait toute l'année. Les mettre dans une clé à part du plan (`plan.ambienceBySeason`), ignorée par le schéma Valibot (`v.object` retire les clés inconnues), en attendant que le dev audio les branche.
+- Un motif musical joué sur une autre musique (petit-déjeuner en fa majeur): l'écrire en pentatonique de cette tonalité; aucune paire de notes de la pentatonique ne forme de seconde mineure, septième majeure ni triton, et un contrôle strict toutes paires confondues (même piste) le prouve.
+- Une ambiance à événements (martinets) normalisée en sonie intégrée peut sortir 13 dB plus forte en momentanée: viser la momentanée maximale sous celle des oiseaux du matin (-24 LUFS ffmpeg) et ajuster la cible intégrée en conséquence.
+- Un LFO de rafales `0,5 + 0,5 x clip(...)` descend à zéro: trou de silence visible au spectrogramme. Garder un plancher (0,62 + 0,38 x ...).
+- Une boucle qui contient un sinus continu aigu (trille à 2,7 kHz) sort au centile 97 des sauts au raccord alors que la continuation vaut 0: normal (les sauts voisins d'un sinus aigu sont grands partout), tant que le seuil de 99,5 tient.
+- `generer.py --seulement musiques sons planche --musiques <id>` ajoute une musique sans rendre les autres; les fichiers existants ressortent identiques à l'octet.
+- Les commandes avec boucle `for` sur des fichiers et ffmpeg sont refusées dans un worktree isolé: les mettre dans un script hors du dépôt (`/tmp/...sh CHEMIN`).

@@ -175,6 +175,41 @@ def halte_apres_midi() -> Morceau:
     )
 
 
+def halte_ete() -> Morceau:
+    """La Halte en été (tour 8): même grille, même tempo et même longueur que le matin et l'après-midi
+    (on passe de l'une à l'autre à la même position de lecture). Le violon chante le motif comme un
+    air de fête de village, la flûte prend le pont, le violoncelle la partie C; la guitare et les
+    pizzicati gardent le balancement, la harpe roule la lumière longue des soirs d'été."""
+    rng = _rng(13)
+    acc = _grille_halte()
+    melo = _melodie_halte(vel=82)
+    tempo = 90.0
+    guitare = humaniser(arpege(acc, ARPEGE_68_B, vel=74, bas=40, haut_v=(52, 67)), rng, tempo=tempo)
+    violon = melo["A"] + melo["A2"] + melo["A3"]
+    flute = decaler(melo["B"], dv=-2)
+    violoncelle = decaler(melo["C"], transpo=-12, dv=-2)
+    pizz = ligne_basse(_filtrer(acc, 4, 48), [0.0, 1.5], vel=70, bas=36, haut=50, duree=0.6)
+    harpe = _harpe_roulee(_filtrer(acc, 12, 20) + _filtrer(acc, 28, 36) + _filtrer(acc, 44, 48), vel=48, bas=67,
+                          haut=86)
+    contre = contrechant(_filtrer(acc, 20, 28), 62, 74, vel=52, eviter=melo["B"])
+    return Morceau(
+        accords=acc, id="halte-ete", titre="La Halte, l'été", tempo=tempo, signature=(6, 8), mesures=48,
+        temps_par_mesure=M68, graine=3, rt60=1.5,
+        pistes=[
+            Piste("guitare", GUITARE_NYLON, guitare, sonie_lu=-5.0, pan=52, reverbe=0.22, passe_haut=70),
+            Piste("violon", VIOLON, humaniser(violon, rng, 0.008, 4, tempo), sonie_lu=0.0, pan=70, reverbe=0.30,
+                  souffle=True),
+            Piste("flute", FLUTE, humaniser(flute, rng, 0.008, 4, tempo), sonie_lu=-1.0, pan=60, reverbe=0.30,
+                  souffle=True),
+            Piste("violoncelle", VIOLONCELLE, humaniser(violoncelle, rng, 0.008, 4, tempo), sonie_lu=-2.0, pan=48,
+                  reverbe=0.30, souffle=True),
+            Piste("contrechant", CLARINETTE, contre, sonie_lu=-10.0, pan=44, reverbe=0.32, souffle=True),
+            Piste("pizz", PIZZ, humaniser(pizz, rng, tempo=tempo), sonie_lu=-8.0, pan=64, reverbe=0.18),
+            Piste("harpe", HARPE, humaniser(harpe, rng, tempo=tempo), sonie_lu=-11.0, pan=84, reverbe=0.35),
+        ],
+    )
+
+
 # --- Écran titre (ré majeur, 6/8, plus lent) -------------------------------------------
 
 def titre() -> Morceau:
@@ -455,6 +490,7 @@ def fin() -> Morceau:
 MORCEAUX = {
     "halte-matin": halte_matin,
     "halte-apres-midi": halte_apres_midi,
+    "halte-ete": halte_ete,
     "veillee": veillee,
     "petit-dejeuner": petit_dejeuner,
     "nuit": nuit,

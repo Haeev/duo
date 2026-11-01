@@ -3492,6 +3492,412 @@
         339
       ],
       "momentaryMaxLufs": -26.0
+    },
+    "season-turn-spring": {
+      "event": "Premier jour du printemps: motif sous la carte de saison au petit-déjeuner",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "saisons/season-turn-spring.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4500
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "season": "spring",
+      "family": "season-turn"
+    },
+    "season-turn-summer": {
+      "event": "Premier jour de l'été: motif sous la carte de saison au petit-déjeuner",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "saisons/season-turn-summer.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4314
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "season": "summer",
+      "family": "season-turn"
+    },
+    "season-turn-autumn": {
+      "event": "Premier jour de l'automne: motif sous la carte de saison au petit-déjeuner",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "saisons/season-turn-autumn.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4500
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "season": "autumn",
+      "family": "season-turn"
+    },
+    "season-turn-winter": {
+      "event": "Premier jour de l'hiver: motif sous la carte de saison au petit-déjeuner",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "saisons/season-turn-winter.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4500
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "season": "winter",
+      "family": "season-turn"
+    },
+    "mist-morning": {
+      "event": "Matin de brume (world.morningMist): air feutré, gouttes des feuilles, merle lointain",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/mist-morning.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        24000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 24.5,
+        "startSample": 24000,
+        "endSample": 1176000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -31.0,
+      "note": "non placé, sur toute la carte; se lève avec la brume (9 h à 10 h 30); ne remplace pas mist-ambience, la boucle placée du moment de la brume",
+      "until": "10 h 30",
+      "fadeFrom": "9 h"
+    },
+    "crickets-summer": {
+      "event": "Grillons d'un soir d'été (dès 19 h, et la nuit, en été)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/crickets-summer.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        20000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 20.5,
+        "startSample": 24000,
+        "endSample": 984000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "remplace crickets en été",
+      "season": "summer"
+    },
+    "swifts": {
+      "event": "Martinets qui passent en criant au-dessus du bourg (jour d'été)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/swifts.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        30000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 30.5,
+        "startSample": 24000,
+        "endSample": 1464000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -36.0,
+      "note": "de 7 h à 21 h en été, se tait sous la pluie",
+      "season": "summer"
+    },
+    "wind-leaves": {
+      "event": "Vent d'automne dans les feuilles sèches",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/wind-leaves.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        24000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 24.5,
+        "startSample": 24000,
+        "endSample": 1176000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "remplace wind en automne; plus fort près de la lisière (forest_edge)",
+      "season": "autumn"
+    },
+    "crows": {
+      "event": "Corneilles au loin, sur l'autre rive (jour d'automne)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/crows.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        40000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 40.5,
+        "startSample": 24000,
+        "endSample": 1944000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -34.0,
+      "note": "de 7 h à 18 h en automne, se tait sous la pluie",
+      "season": "autumn"
+    },
+    "pick-herb": {
+      "event": "Cueillir de l'ail des ours ou des pissenlits",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/pick-herb-1.ogg",
+        "effets/pick-herb-2.ogg",
+        "effets/pick-herb-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        264,
+        286,
+        260
+      ],
+      "momentaryMaxLufs": -24.0
+    },
+    "pick-mushroom": {
+      "event": "Cueillir des girolles",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/pick-mushroom-1.ogg",
+        "effets/pick-mushroom-2.ogg",
+        "effets/pick-mushroom-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        185,
+        288,
+        230
+      ],
+      "momentaryMaxLufs": -24.0
+    },
+    "pick-berries": {
+      "event": "Cueillir des mûres (avec le froissement du roncier)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/pick-berries-1.ogg",
+        "effets/pick-berries-2.ogg",
+        "effets/pick-berries-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        354,
+        470,
+        351
+      ],
+      "momentaryMaxLufs": -24.0
+    },
+    "pick-nuts": {
+      "event": "Ramasser des noisettes",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/pick-nuts-1.ogg",
+        "effets/pick-nuts-2.ogg",
+        "effets/pick-nuts-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        218,
+        249,
+        299
+      ],
+      "momentaryMaxLufs": -24.0
+    },
+    "axe-thud-soft": {
+      "event": "Hache refusée sur une souche ou un rejet (stump_hint, tree_too_young)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "effets/axe-thud-soft-1.ogg",
+        "effets/axe-thud-soft-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 250,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        286,
+        279
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "joué seul, à la place de ui-refusal: le refus s'entend dans le monde"
     }
   },
   "music": {
@@ -3685,6 +4091,29 @@
       "durationSeconds": 44.127,
       "fadeInMs": 0,
       "fadeOutMs": 1500
+    },
+    "halte-ete": {
+      "event": "Journée dehors en été (proposé: 13 h à 19 h, à la place de l'après-midi)",
+      "bus": "music",
+      "file": "musique/halte-ete.ogg",
+      "key": "sol majeur",
+      "tempoBpm": 90.0,
+      "timeSignature": "6/8",
+      "instruments": "violon, flûte, violoncelle, guitare, pizzicati, harpe",
+      "integratedLufs": -18.0,
+      "volumeDb": -4.0,
+      "loop": {
+        "startSeconds": 1.0,
+        "endSeconds": 97.0,
+        "startSample": 48000,
+        "endSample": 4656000,
+        "sampleRate": 48000,
+        "bars": 48,
+        "firstDownbeatSeconds": 1.12
+      },
+      "playFromSeconds": 1.12,
+      "fadeInMs": 2500,
+      "fadeOutMs": 2500
     }
   },
   "plan": {
@@ -3705,6 +4134,11 @@
       {
         "moment": "dehors, 13 h à 19 h",
         "music": "halte-apres-midi",
+        "rest": true
+      },
+      {
+        "moment": "dehors l'été, 13 h à 19 h (proposé, à la place de halte-apres-midi)",
+        "music": "halte-ete",
         "rest": true
       },
       {
@@ -3802,6 +4236,91 @@
         "volumeDb": 0.0
       }
     ],
+    "ambienceBySeason": {
+      "description": "Ambiances de saison (tour 8, docs/jeux/jeu-1/son.md 4.6). replaces: l'ambiance de l'année qu'elle remplace pendant cette saison, aux mêmes heures et au même niveau; silenced: ambiance de l'année qui se tait pendant cette saison.",
+      "rules": [
+        {
+          "season": "summer",
+          "ambience": "crickets-summer",
+          "replaces": "crickets",
+          "hours": [
+            19,
+            30
+          ],
+          "volumeDb": 0.0,
+          "notWhen": "pluie"
+        },
+        {
+          "season": "summer",
+          "ambience": "swifts",
+          "hours": [
+            7,
+            21
+          ],
+          "volumeDb": 0.0,
+          "notWhen": "pluie"
+        },
+        {
+          "season": "autumn",
+          "ambience": "wind-leaves",
+          "replaces": "wind",
+          "hours": [
+            6,
+            30
+          ],
+          "volumeDb": -3.0
+        },
+        {
+          "season": "autumn",
+          "ambience": "crows",
+          "hours": [
+            7,
+            18
+          ],
+          "volumeDb": 0.0,
+          "notWhen": "pluie"
+        },
+        {
+          "season": "autumn",
+          "ambience": "birds-morning",
+          "hours": [
+            6,
+            12
+          ],
+          "volumeDb": -6.0,
+          "notWhen": "pluie",
+          "note": "moins d'oiseaux chanteurs en automne (remplace la règle de 6 h à 12 h)"
+        }
+      ],
+      "silenced": [
+        {
+          "season": "winter",
+          "ambience": "crickets",
+          "note": "pas de grillons l'hiver"
+        }
+      ],
+      "morningMist": {
+        "ambience": "mist-morning",
+        "fadeInMs": 3000,
+        "fullUntil": "9 h",
+        "fadeOutUntil": "10 h 30",
+        "volumeDb": 0.0,
+        "alsoLowerDb": {
+          "birds-morning": -4.0,
+          "village": -3.0
+        },
+        "note": "dès le lever quand world.morningMist est vrai, s'efface avec la brume de 9 h à 10 h 30; la brume étouffe le reste: oiseaux et bourg un peu plus bas"
+      }
+    },
+    "seasonTurn": {
+      "description": "Premier jour d'une saison, au petit-déjeuner, sous la carte de saison: jouer le son de la saison du jour, une fois, chez les deux.",
+      "sounds": {
+        "spring": "season-turn-spring",
+        "summer": "season-turn-summer",
+        "autumn": "season-turn-autumn",
+        "winter": "season-turn-winter"
+      }
+    },
     "interior": {
       "description": "Dans la maisonnette: les ambiances du dehors passent derrière les murs.",
       "ambienceLowpassHz": 900,

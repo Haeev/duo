@@ -43,6 +43,7 @@ import habitants  # noqa: E402
 import moments  # noqa: E402
 import musiques  # noqa: E402
 import partition  # noqa: E402
+import saisons  # noqa: E402
 import train  # noqa: E402
 from catalogue import SPATIAL, Son  # noqa: E402
 
@@ -65,6 +66,8 @@ INFOS_MUSIQUE = {
     "halte-matin": ("Journée dehors, de 6 h à 13 h", "sol majeur", "flûte, hautbois, guitare, pizzicati, harpe, cordes"),
     "halte-apres-midi": ("Journée dehors, de 13 h à 19 h", "sol majeur",
                          "clarinette, accordéon, violoncelle, guitare, contrebasse"),
+    "halte-ete": ("Journée dehors en été (proposé: 13 h à 19 h, à la place de l'après-midi)", "sol majeur",
+                  "violon, flûte, violoncelle, guitare, pizzicati, harpe"),
     "samedi": ("Samedi, train à quai (10 h à 16 h): marché sur le quai", "do majeur",
                "accordéon, clarinette, guitare, contrebasse, tambourin"),
     "veillee": ("Veillée à deux dans la maison (dès 19 h)", "ré majeur", "clarinette et flûte en duo, guitare, violoncelle"),
@@ -222,7 +225,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 
 def tous_les_sons() -> list[Son]:
-    return effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons()
+    return effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
 
 
 PLAN = {
@@ -231,6 +234,8 @@ PLAN = {
         {"moment": "petit-déjeuner (6 h, jusqu'à ce que l'un sorte)", "music": "petit-dejeuner"},
         {"moment": "dehors, 6 h à 13 h", "music": "halte-matin", "rest": True},
         {"moment": "dehors, 13 h à 19 h", "music": "halte-apres-midi", "rest": True},
+        {"moment": "dehors l'été, 13 h à 19 h (proposé, à la place de halte-apres-midi)", "music": "halte-ete",
+         "rest": True},
         {"moment": "samedi, du sifflet d'arrivée (10 h) au départ (16 h), près du quai et sur la place",
          "music": "samedi", "rest": True},
         {"moment": "veillée (les deux dans la maison dès 19 h)", "music": "veillee"},
@@ -254,6 +259,33 @@ PLAN = {
         {"ambience": "rain", "when": "pluie (jour 4), dehors", "volumeDb": 0.0},
         {"ambience": "rain-roof", "when": "pluie, dans la maisonnette", "volumeDb": 0.0},
     ],
+    # Tour 8: règles selon la saison et la brume du matin. Clé à part, que le moteur ne lit pas
+    # encore: dans ambienceByTime, ces ambiances joueraient toute l'année. Le dev audio les
+    # rejoindra aux règles quand la saison et world.morningMist seront dans l'état.
+    "ambienceBySeason": {
+        "description": "Ambiances de saison (tour 8, docs/jeux/jeu-1/son.md 4.6). replaces: l'ambiance de "
+                       "l'année qu'elle remplace pendant cette saison, aux mêmes heures et au même niveau; "
+                       "silenced: ambiance de l'année qui se tait pendant cette saison.",
+        "rules": [
+            {"season": "summer", "ambience": "crickets-summer", "replaces": "crickets", "hours": [19, 30],
+             "volumeDb": 0.0, "notWhen": "pluie"},
+            {"season": "summer", "ambience": "swifts", "hours": [7, 21], "volumeDb": 0.0, "notWhen": "pluie"},
+            {"season": "autumn", "ambience": "wind-leaves", "replaces": "wind", "hours": [6, 30], "volumeDb": -3.0},
+            {"season": "autumn", "ambience": "crows", "hours": [7, 18], "volumeDb": 0.0, "notWhen": "pluie"},
+            {"season": "autumn", "ambience": "birds-morning", "hours": [6, 12], "volumeDb": -6.0,
+             "notWhen": "pluie", "note": "moins d'oiseaux chanteurs en automne (remplace la règle de 6 h à 12 h)"},
+        ],
+        "silenced": [{"season": "winter", "ambience": "crickets", "note": "pas de grillons l'hiver"}],
+        "morningMist": {"ambience": "mist-morning", "fadeInMs": 3000, "fullUntil": "9 h",
+                        "fadeOutUntil": "10 h 30", "volumeDb": 0.0,
+                        "alsoLowerDb": {"birds-morning": -4.0, "village": -3.0},
+                        "note": "dès le lever quand world.morningMist est vrai, s'efface avec la brume de 9 h à "
+                                "10 h 30; la brume étouffe le reste: oiseaux et bourg un peu plus bas"},
+    },
+    "seasonTurn": {"description": "Premier jour d'une saison, au petit-déjeuner, sous la carte de saison: "
+                                  "jouer le son de la saison du jour, une fois, chez les deux.",
+                   "sounds": {"spring": "season-turn-spring", "summer": "season-turn-summer",
+                              "autumn": "season-turn-autumn", "winter": "season-turn-winter"}},
     "interior": {"description": "Dans la maisonnette: les ambiances du dehors passent derrière les murs.",
                  "ambienceLowpassHz": 900, "ambienceDb": -10.0, "rampMs": 600},
     "peer": {"description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués "
@@ -335,7 +367,7 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
     ambiances et les motifs. Chaque élément est séparé par un court silence."""
     morceaux = []
     blanc = lambda s: np.zeros((dsp.n_ech(s), 2))  # noqa: E731
-    ordre_musique = ["halte-matin", "halte-apres-midi", "veillee", "petit-dejeuner", "nuit", "samedi", "titre",
+    ordre_musique = ["halte-matin", "halte-apres-midi", "halte-ete", "veillee", "petit-dejeuner", "nuit", "samedi", "titre",
                      "fanfare-train", "fin"]
     defs_musique = json.loads((SORTIE / "sons.json").read_text(encoding="utf-8"))["music"]
     for id_ in ordre_musique:
@@ -396,6 +428,8 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["roe-call", "fawn-rustle", "fawn-bleat", "deer-stamp", "roe-bark", "deer-bounds"],
         ["kf-whistle", "kf-dive", "kf-beat"],
         ["mist-ambience", "mist-lift", "blackbird-wake", "fish-jump"],
+        ["season-turn-spring", "season-turn-summer", "season-turn-autumn", "season-turn-winter"],
+        ["pick-herb", "pick-mushroom", "pick-berries", "pick-nuts", "axe-thud-soft"],
     ]
     for groupe in groupes:
         for nom in groupe:
@@ -408,7 +442,8 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]
                 k += 1
         morceaux.append(blanc(1.2))
-    for nom in ("river", "wind", "birds-morning", "crickets", "village", "rain", "rain-roof"):
+    for nom in ("river", "wind", "birds-morning", "crickets", "village", "rain", "rain-roof", "mist-morning",
+                "swifts", "crickets-summer", "wind-leaves", "crows"):
         x = apercus.get(f"{nom}/0")
         if x is None:
             continue

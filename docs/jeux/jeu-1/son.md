@@ -4,7 +4,7 @@
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (titre provisoire) |
 | Statut | première livraison, pour la démo (`docs/jeux/jeu-1/demo.md`, section 4.2) |
-| Dernière mise à jour | 2026-10-31 |
+| Dernière mise à jour | 2026-11-01 (tour 8: saisons, brume du matin, cueillette) |
 | Rédaction | sound-designer |
 | Fichiers | sons: `games/la-petite-ligne/assets/son/` et leurs définitions `sons.json`; sources: `games/la-petite-ligne/assets-src/son/`; écoute pour le client: `design/son/la-petite-ligne/` |
 | Documents liés | cahier des charges (sections 5.2, 6.3, 8), démo (sections 1 et 4.2), identité sonore de la plateforme (`design/son/plateforme/`) |
@@ -28,6 +28,7 @@ Toutes à -18 LUFS intégrés dans le fichier (mesuré: -18,1), crêtes entre -3
 | Petit-déjeuner (6 h) | `musique/petit-dejeuner.ogg` | fa majeur, 4/4, 96 | 70 s (28) | basson qui sautille, clarinette qui répond, piano, pizzicati | oui |
 | Dehors, 6 h à 13 h | `musique/halte-matin.ogg` | sol majeur, 6/8, 90 | 96 s (48) | flûte, hautbois, guitare, pizzicati, harpe, cordes | oui |
 | Dehors, 13 h à 19 h | `musique/halte-apres-midi.ogg` | sol majeur, 6/8, 90 | 96 s (48) | clarinette, accordéon, violoncelle, guitare, contrebasse | oui |
+| Dehors l'été, 13 h à 19 h (proposé, à la place de l'après-midi; tour 8) | `musique/halte-ete.ogg` | sol majeur, 6/8, 90 | 96 s (48) | violon, flûte, violoncelle, guitare, pizzicati, harpe | oui |
 | Samedi, train à quai (10 h à 16 h) | `musique/samedi.ogg` | do majeur, 4/4, 120 | 80 s (40) | accordéon, clarinette, guitare, contrebasse, tambourin | oui |
 | Veillée (dès 19 h, les deux dans la maison) | `musique/veillee.ogg` | ré majeur, 3/4, 72 | 100 s (40) | clarinette et flûte en duo, guitare seule, violoncelle | oui |
 | Écran de nuit (les deux couchés) | `musique/nuit.ogg` | fa majeur, 3/4, 60 | 84 s (28) | harpe, célesta, flûte, cordes | oui |
@@ -35,6 +36,7 @@ Toutes à -18 LUFS intégrés dans le fichier (mesuré: -18,1), crêtes entre -3
 | Le train du jour 8 est parti: récapitulatif, fin | `musique/fin.ogg` | sol majeur, 6/8, 84 | 44 s | flûte, clarinette, guitare, cordes, harpe, cor | non, une fois |
 
 - **Matin et après-midi** partagent tempo, tonalité, grille et longueur: le motif de la Halte à la flûte le matin (plus clair, harpe et cordes), à la clarinette l'après-midi (plus chaud, accordéon et violoncelle). On passe de l'un à l'autre pendant un silence de repos (section 3.2), ou en fondu enchaîné à la même position de lecture.
+- **L'été** (`halte-ete`, tour 8): même grille, tempo et longueur que le matin et l'après-midi, donc fondu enchaîné possible à la même position de lecture. Le violon chante le motif (A), la flûte prend le pont (B), le violoncelle la partie C; guitare, pizzicati et harpe gardent le balancement. Proposé l'après-midi en été (`plan.musicByMoment`), à brancher par le dev audio quand la saison sera dans l'état.
 - **Veillée, pour deux**: la clarinette chante, la flûte répond, puis elles chantent ensemble en tierces; une seule guitare les accompagne. Les deux voix sont les deux joueurs.
 - **Petit-déjeuner**: le basson pose la question en sautillant, la clarinette répond: tendre et un peu drôle.
 - Les partitions sont versionnées en MIDI (`assets-src/son/midi/*.mid`) et rendues par FluidSynth avec la banque General MIDI FluidR3_GM (licence MIT, à inscrire dans `CREDITS.md`).
@@ -45,7 +47,7 @@ Toutes à -18 LUFS intégrés dans le fichier (mesuré: -18,1), crêtes entre -3
 
 | Bus | Identifiant | Volume par défaut | Contenu |
 |---|---|---|---|
-| Musique | `music` | 0,8 | les neuf musiques |
+| Musique | `music` | 0,8 | les dix musiques |
 | Effets | `effects` | 1,0 | sons du monde, train, coq |
 | Interface | `ui` | 0,9 | monnaie, tampon, notifications, carnet, propositions, airs courts, motifs des habitants |
 | Ambiance | `ambience` | 0,9 | rivière, vent, oiseaux, grillons, bourg, pluie |
@@ -68,6 +70,7 @@ Contre la lassitude sur une longue séance (le cahier vise des journées de 16,6
 - Oiseaux du matin de 6 h à 12 h, à -6 dB l'après-midi, jamais sous la pluie ni après 19 h; grillons dès 19 h; bourg de 8 h à 19 h; vent et rivière toujours (le vent à -3 dB); pluie le jour 4 (dehors `rain`, dans la maisonnette `rain-roof`).
 - Rivière: plusieurs sources placées le long du bord sud (une tous les 15 m, chacune avec son propre décalage de départ), entendues jusqu'à la maisonnette, plus fortes au gué.
 - Dans la maisonnette: les ambiances du dehors passent derrière un passe-bas à 900 Hz et à -10 dB (rampe de 600 ms).
+- Saisons et brume du matin (tour 8): règles dans `plan.ambienceBySeason`, une clé à part que le moteur ne lit pas encore (placées dans `ambienceByTime`, ces ambiances joueraient toute l'année). Section 4.6.
 
 ### 3.4 Le train, battement de cœur du jeu
 
@@ -186,6 +189,11 @@ Les menus du jeu ont leur propre famille, « papier et bois » (le carnet, le cr
 | Petit bruit du bourg (8 h à 19 h) | `village` | 40 s | -32 LUFS | ambiance |
 | Pluie dehors (jour 4) | `rain` | 16 s | -27 LUFS | ambiance |
 | Pluie sur le toit, à l'intérieur de la maisonnette | `rain-roof` | 16 s | -29 LUFS | ambiance |
+| Matin de brume (tour 8) | `mist-morning` | 24 s | -31 LUFS | ambiance |
+| Grillons d'un soir d'été (tour 8) | `crickets-summer` | 20 s | -30 LUFS | ambiance |
+| Martinets du jour d'été (tour 8) | `swifts` | 30 s | -36 LUFS | ambiance |
+| Vent d'automne dans les feuilles sèches (tour 8) | `wind-leaves` | 24 s | -30 LUFS | ambiance |
+| Corneilles au loin, jour d'automne (tour 8) | `crows` | 40 s | -34 LUFS | ambiance |
 
 ### 4.5 Moments rares (tours 6 et 7)
 
@@ -237,6 +245,39 @@ Sons des fiches de `docs/jeux/jeu-1/tour-06-conception.md` et `tour-07-conceptio
 - **Ne pas confondre**: `crickets-night` (grillons champêtres du pré, placé, net) n'est pas l'ambiance générale `crickets` (non placée, lointaine). Le premier s'ajoute au second pendant le moment.
 - **Les cris** suivent l'espèce sans imiter d'enregistrement: héron « kraak » grave et rauque (fondamentale vers 300 Hz qui retombe, voix rugueuse), oies nasales (330 à 495 Hz, neuf hauteurs distinctes dans la volée), mésange bleue fine (notes vers 6 kHz, trille vers 4 kHz), renard en deux jappements brefs, chevrette en « pi-é » nasal (vers 500 Hz) et aboiement rauque « bö » (vers 350 Hz), faon en « mi » vers 1 kHz, martin-pêcheur en sifflet droit vers 4,2 kHz, merle en phrase flûtée de 1,6 à 2,7 kHz suivie d'un gazouillis aigu et doux (trois phrases écrites). Tout est filtré au-dessus de 4 à 8 kHz et plus bas que les actions du joueur.
 
+### 4.6 Saisons, brume du matin, cueillette (tour 8)
+
+Sons de `docs/jeux/jeu-1/tour-08-conception.md` (sections 2.2, 2.6, 3.4, 5.1, 5.2 et 9), source `assets-src/son/saisons.py`. Aucun déclencheur n'existe encore dans le code (`season`, `morningMist`, cueillette, refus de la hache): le dev les branchera, les sons sont déclarés dans `sons.json`.
+
+| Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
+|---|---|---|---|---|---|---|---|
+| Premier jour d'une saison, au petit-déjeuner, sous la carte de saison (chez les deux) | `season-turn-spring`, `-summer`, `-autumn`, `-winter` (`saisons/`) | -20 | 2 | aucune: un fichier par saison, choisi par la saison du jour (`plan.seasonTurn`) | interface (S3) | non placé, stéréo | -6 dB |
+| Cueillir de l'ail des ours ou des pissenlits | `pick-herb` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Cueillir des girolles | `pick-mushroom` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Cueillir des mûres (froissement du roncier) | `pick-berries` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Ramasser des noisettes | `pick-nuts` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Hache sur une souche ou un rejet (`stump_hint`, `tree_too_young`) | `axe-thud-soft` | -25 | 2 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 3 m, coupé au-delà de 45 m |  |
+
+- **Le tournant de saison**: quatre couleurs, toutes en fa pentatonique (fa, sol, la, do, ré), justes sur la musique du petit-déjeuner (fa majeur) et sans aucune paire de notes dure (contrôle bloquant dans `saisons.py`). Printemps: la flûte monte sur un accord roulé de harpe. Été: la guitare s'étale sur un accord de sixte, le hautbois balance et s'attarde sur le la, une pointe de glockenspiel. Automne: la clarinette descend, le violoncelle pose ré puis fa, le cor tient le la. Hiver: quatre notes de célesta espacées sur une nappe de cordes lentes. Trois secondes de motif, 4,3 à 4,5 s avec la résonance. Partitions dans `assets-src/son/midi/season-turn-*.mid`, rendu FluidSynth. Dossier `saisons/` non résident (6,8 Mo décodés pour les quatre, 1,7 Mo pour un seul): décoder la veille du premier jour de saison, ou au début du petit-déjeuner.
+- **La cueillette** remplace `pickup` pour ces objets (un son par sorte, demande de la section 9). Elles se distinguent par la mesure: herbes centroïde 1,7 à 1,8 kHz (une cassure de tige et des feuilles), girolles 0,6 à 0,7 kHz (couinement puis « pop » rond), mûres 2,1 à 2,6 kHz (froissement et épines, deux ou trois « plic »), noisettes 2,8 à 3,0 kHz (trois à cinq « toc » secs). `pickup` est à 1,9 à 2,1 kHz mais ne dure que 0,11 s et n'a qu'un temps. Aucune n'a d'énergie notable sous 300 Hz.
+- **La hache refusée** est le refus lui-même: le jouer seul, sans `ui-refusal`. Elle se distingue de `axe-chop` par l'absence de fer qui sonne et de copeaux, une durée utile plus courte (0,22 à 0,24 s contre 0,29 à 0,37 s), 3,5 dB de moins, et le frémissement des feuilles du rejet à la fin; 34 à 43 % de l'énergie sous 300 Hz (contre 49 à 67 % pour `axe-chop`), pour rester audible sur un portable.
+
+Ambiances (boucles mono, non placées, bus ambiance, dossier `ambiance/`), règles proposées dans `plan.ambienceBySeason`:
+
+| Ambiance | Quand | Remplace | Niveau |
+|---|---|---|---|
+| `mist-morning` | matins où `world.morningMist` est vrai: dès le lever, fondu de sortie de 9 h à 10 h 30 (comme la nappe visible) | rien; oiseaux du matin -4 dB et bourg -3 dB tant qu'elle dure | 0 dB |
+| `crickets-summer` | été, dès 19 h et la nuit, pas sous la pluie | `crickets` | 0 dB |
+| `swifts` | été, de 7 h à 21 h, pas sous la pluie | rien | 0 dB |
+| `wind-leaves` | automne, toujours | `wind` | -3 dB, comme le vent |
+| `crows` | automne, de 7 h à 18 h, pas sous la pluie | rien | 0 dB |
+| `birds-morning` | automne, de 6 h à 12 h | la règle de 6 h à 12 h | -6 dB (moins d'oiseaux chanteurs) |
+| `crickets` | hiver | (se tait) |  |
+
+- **`mist-morning` n'est pas `mist-ambience`**: la première couvre toute la carte (air presque immobile, centroïde 0,29 kHz, gouttes des feuilles, une goutte ronde dans une flaque de temps en temps, un merle très lointain deux fois par tour de 24 s, phrases différentes de `blackbird-wake`); la seconde est l'eau toute proche du moment de la brume, placée à `mist_narrows` (centroïde 0,68 kHz). Un matin de brume après la pluie, les deux s'entendent ensemble près du rétrécissement. Sur des haut-parleurs de portable, `mist-morning` se réduit volontairement aux gouttes et au merle: c'est le feutré du matin.
+- **Été**: `crickets-summer` ajoute au chœur des grillons champêtres le trille continu du grillon d'Italie vers 2,7 kHz, qui signe l'été (centroïde 3,97 kHz contre 4,48 kHz pour `crickets`). `swifts`: cinq passages de bandes de martinets par tour de 30 s, cris coupés au-dessus de 6,5 kHz, à -28 LUFS de sonie momentanée maximale (ffmpeg), sous les oiseaux du matin (-24).
+- **Automne**: `wind-leaves` garde un vent qui ne tombe jamais tout à fait, avec le crépitement sec des feuilles dans les rafales et des feuilles qui roulent sur le chemin trois fois par tour (centroïde 1,05 kHz contre 0,84 kHz pour `wind`). `crows`: des corneilles sur l'autre rive, quatre séries de deux à quatre « kraa » (fondamentale vers 500 Hz, formants vers 1,1 et 1,7 kHz: plus haut et plus bref que le héron), le reste du tour en silence.
+
 ## 5. Les habitants
 
 Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez celui qui parle (musique à -8 dB, 4 s au moins entre deux motifs du même habitant). Tous en sol majeur, comme le thème qu'ils interrompent.
@@ -251,10 +292,10 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 ## 6. Intégration technique
 
-- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 12,0 Mo (budget visé: 20 Mo).
+- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 14,6 Mo mesuré au tour 8 (budget: 20 Mo).
 - **Boucles**: chaque fichier de boucle porte une amorce de chaque côté (la fin de la boucle avant, son début après: 1 s pour les musiques, 0,4 à 0,5 s pour les autres). Jouer avec `AudioBufferSourceNode`: `loop = true`, `loopStart` et `loopEnd` lus dans `loop.startSeconds` et `loop.endSeconds`, départ à `playFromSeconds` (pour une musique, le premier temps, 0,12 s après le début de la boucle: le raccord tombe entre deux notes).
 - **Pas de lecture en flux pour les boucles**: mesuré dans Chromium, `<audio loop>` insère 128 à 256 échantillons de silence (2,7 à 5,3 ms) à chaque tour, un clic audible sur une musique. Les boucles doivent être décodées (`decodeAudioData`).
-- **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
+- **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Tour 8: ambiances de saison décodées selon la saison (`mist-morning` 4,8 Mo, `crickets-summer` 4,0 Mo à la place de `crickets`, `swifts` 6,0 Mo, `wind-leaves` 4,8 Mo à la place de `wind`, `crows` 7,9 Mo), motifs de saison 6,8 Mo dans `saisons/`, `halte-ete` 37,6 Mo comme les autres thèmes du jour. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
 - **Hauteur**: la variation se fait par `playbackRate` (elle change aussi un peu la durée, voulu).
 - **Rien n'est joué deux fois au même instant**: `minIntervalMs` évite les doublons (deux joueurs qui récoltent ensemble, double clic) et `maxVoices` borne les répétitions d'un même son.
 - `sons.json` est généré par `generer.py`: ne pas le modifier à la main; tout réglage passe par les sources.
@@ -262,12 +303,12 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 ## 7. Contrôles (sans écouter)
 
 - `duo-python games/la-petite-ligne/assets-src/son/generer.py` régénère tout (environ 6 minutes) puis lance `controler.py`: sonie et crête vraie de chaque fichier par le filtre `ebur128` de ffmpeg après décodage (aucune crête au-dessus de -1,5 dBTP, aucun échantillon écrêté), silence en tête des effets (2,6 ms au plus), longueur exacte et raccord de chaque boucle (saut et seconde différence comparés à leur distribution dans le fichier, niveau au raccord comparé aux variations internes), poids du jeu.
-- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 225 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
+- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 249 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
 - Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
 
-**Pour l'écoute du client** (`design/son/la-petite-ligne/`, AAC à 96 kbit/s, lisible directement sur Mac): `ecoute.m4a` (9 min) enchaîne les musiques (pour chaque boucle, 14 s avant le raccord et 10 s après: on entend le passage de la fin au début), la séquence du train (arrivée, attente, départ), le sifflet lointain, chaque effet avec toutes ses variantes, les motifs des habitants et les ambiances; `musiques/` contient une boucle complète de chaque musique. Les niveaux relatifs sont ceux du jeu, sauf les musiques, jouées 4 dB plus fort que dans le jeu.
+**Pour l'écoute du client** (`design/son/la-petite-ligne/`, AAC à 96 kbit/s, lisible directement sur Mac): `ecoute.m4a` (14 min) enchaîne les musiques (pour chaque boucle, 14 s avant le raccord et 10 s après: on entend le passage de la fin au début), la séquence du train (arrivée, attente, départ), le sifflet lointain, chaque effet avec toutes ses variantes, les motifs des habitants et les ambiances; `musiques/` contient une boucle complète de chaque musique. Les niveaux relatifs sont ceux du jeu, sauf les musiques, jouées 4 dB plus fort que dans le jeu.
 
 ## 8. Écarts et limites
 
@@ -284,7 +325,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 |---|---|---|
 | S1 | Mémoire: un samedi en journée demande environ 94 Mo d'audio décodé pour des boucles sans clic, contre 64 Mo prévus (`docs/plateforme/architecture.md`). | Porter le plafond d'audio décodé à 128 Mo pour ce jeu, dans le budget de 1 Go de Duo; sinon, lecture des musiques par segments décodés à la suite (travail du SDK, architecte-technique). |
 | S2 | Bus ambiance: le SDK n'en prévoit que trois. | Un quatrième réglage « Ambiance » dans les réglages de Duo; en attendant, un sous-bus des effets. |
-| S3 | `glow-shimmer` (vers luisants) et `mist-lift` (brume) sont musicaux; `star_chime` (étoiles) le sera: les fiches les veulent sur le bus musique, que `sons.json` refuse pour un son. | Accepter `music` comme bus d'un son: le schéma de `catalogue.ts`, le type `SoundBus` et `busOf` de `moteur.ts` (raccordé après `momentDuck`, sinon la descente de l'apogée atténuerait aussi ces sons), avec un test (dev audio); puis les déplacer. En attendant, bus interface. |
+| S3 | `glow-shimmer` (vers luisants) et `mist-lift` (brume) sont musicaux; `star_chime` (étoiles) le sera: les fiches les veulent sur le bus musique, que `sons.json` refuse pour un son. Même cas pour les quatre `season-turn-*` (tour 8). | Accepter `music` comme bus d'un son: le schéma de `catalogue.ts`, le type `SoundBus` et `busOf` de `moteur.ts` (raccordé après `momentDuck`, sinon la descente de l'apogée atténuerait aussi ces sons), avec un test (dev audio); puis les déplacer. En attendant, bus interface. |
 
 ## 10. Historique
 
@@ -295,3 +336,4 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 | 2026-10-31 | Gauntlet, tour 2 (défauts S1 à S3): famille d'interface « papier et bois » (`ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`), refus doux `ui-refusal`, variantes du tampon (3), du remplissage de l'arrosoir (2) et du coffre (2 et 2); 84 sons, 156 fichiers |
 | 2026-10-31 | Gauntlet, tour 6: sons des six moments rares P0 (22 sons, 43 fichiers dans `moments/`, section 4.5) et `bench-sit` (s'asseoir sur un banc, 3 variantes), branché sur `sat_down` à la place de `furniture-place`; 107 sons, 202 fichiers |
 | 2026-11-01 | Gauntlet, tour 7: sons de la chevrette du pré, du martin-pêcheur du ponton et de la brume de l'Aubrune (13 sons, 23 fichiers dans `moments/`, préréglage `faune-30` pour l'aboiement); instants du champ `event` recalés sur `donnees/moments.json` (héron, oies, échelle, mésanges); 120 sons, 225 fichiers |
+| 2026-11-01 | Gauntlet, tour 8: motifs du tournant de saison (`season-turn-*`, 4 couleurs, dossier `saisons/`), ambiances `mist-morning`, `crickets-summer`, `swifts`, `wind-leaves`, `crows` et leurs règles (`plan.ambienceBySeason`), cueillette (`pick-herb`, `pick-mushroom`, `pick-berries`, `pick-nuts`), refus de la hache (`axe-thud-soft`), variation d'été du thème (`halte-ete`, P1); section 4.6; 134 sons, 10 musiques, 249 fichiers |
