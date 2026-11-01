@@ -27,6 +27,14 @@ export interface ForestClearing {
   wobble: number;
 }
 
+/**
+ * Zone pavée de la place: anneau autour d'un objet de la carte (pavés posés en
+ * cercles), ou bande droite de `a` à `b` (centres, m) de demi-largeur `half`.
+ */
+export type SquareShape =
+  | { kind: 'ring'; model: string; radius: number }
+  | { kind: 'band'; a: readonly [number, number]; b: readonly [number, number]; half: number };
+
 export const RENDER_SETTINGS = {
   renderer: {
     /** Rapport de pixels plafonné (Retina, mise à l'échelle de Windows). */
@@ -76,7 +84,9 @@ export const RENDER_SETTINGS = {
       grass: 0,
       path: 0,
       dirt: 0,
-      gravel: 0.03,
+      // Berges de sable et de galets à la hauteur de l'herbe: le bord entre les deux est une
+      // teinte qui ondule (`river.sandWobble`), plus une marche droite le long des cases.
+      gravel: 0,
       // Dessus du platelage des traversées (passage à niveau, traversée de service): 1,5 cm sous le
       // champignon du rail (0,38 m: voie posée à 0,06 m, `rail_top` de 0,32 m). Les personnages y
       // marchent à cette hauteur; la rampe de terre (`crossing.rampLength`) rattrape la route.
@@ -84,7 +94,9 @@ export const RENDER_SETTINGS = {
       floor: 0.12,
       water: -0.42,
       rail: 0.06,
-      stone: 0.04,
+      // Pavés et terre battue de la place au ras des chemins (tour 8): une bordure droite de
+      // 4 cm le long des cases traçait le bord de la terre battue au cordeau.
+      stone: 0,
     },
     waterSurface: -0.16,
     /**
@@ -176,20 +188,21 @@ export const RENDER_SETTINGS = {
     stripSegment: 12,
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
-    /** Berges de la rivière: la pente descend sous l'eau sur cette largeur (m), dans la case d'eau. */
-    bankSlope: 0.6,
-    /** Fond du gué (eau basse franchissable). */
-    fordBed: -0.12,
     /**
-     * Pierres plates du gué: côtés (un modèle par nombre), épaisseur (posées sur
-     * le fond, elles affleurent la lame d'eau), taille (m), places dans la case
-     * (décalage depuis son coin) et désordre.
+     * Fond du gué: un haut-fond de galets 8 cm sous la surface (on y passe les pieds dans
+     * l'eau, comme le dit le pas « eau » de la carte; le héron y a de l'eau aux pattes).
+     * Une seule surface pour toute la rivière: plus de lame d'eau surélevée sur le gué.
+     */
+    fordBed: -0.24,
+    /**
+     * Pierres plates du gué (bible, 8.7): côtés (un modèle par nombre),
+     * épaisseur, saillie au-dessus de la surface (m: le courant s'ouvre autour
+     * d'elles), taille (m), places dans la case (décalage depuis son coin) et désordre.
      */
     fordStones: {
-      /** Fond du gué de gravier: une douzaine de centimètres sous la lame d'eau. */
-      bed: -0.04,
       sides: [5, 6, 7],
       thickness: 0.13,
+      protrude: 0.05,
       minSize: 0.3,
       maxSize: 0.55,
       perCell: [
@@ -197,6 +210,105 @@ export const RENDER_SETTINGS = {
         [0.72, 0.7],
       ] as readonly (readonly [number, number])[],
       jitter: 0.12,
+    },
+    /**
+     * Lit de la rivière (technical artist, tour 8, `riviere.ts`): forme visible
+     * des berges et du gué sur une grille fine, sans changer la grille de la
+     * simulation. Distances en mètres.
+     */
+    river: {
+      /** Nœuds de la grille fine par mètre (texture des shaders), et quadrillage de la géométrie par case. */
+      texelsPerMeter: 8,
+      subdivisions: 4,
+      /**
+       * Ligne d'eau: entre `shoreMin` et `shoreMax` du bord des cases sèches, côté eau
+       * (les cases de berge, où l'on marche, restent au sec), selon un bruit de
+       * `shoreNoise` m le long de la rive. La pente se prolonge sous l'eau d'autant.
+       */
+      shoreMin: 0.18,
+      shoreMax: 0.7,
+      shoreNoise: 2.4,
+      /** Rayon du flou des distances signées: les angles des anses et des langues de sable s'arrondissent. */
+      roundRadius: 1.4,
+      /** Borne des distances signées avant le flou (m): une rive lointaine n'attire pas la ligne d'eau. */
+      signedClamp: 3,
+      /** Le haut de la berge rejoint l'herbe sur cette largeur (m). */
+      crestRun: 0.4,
+      /** Le haut-fond du gué retombe vers les fosses sur cette largeur (m), avec un relief de galets (m). */
+      fordRamp: 1.4,
+      fordBedNoise: 0.012,
+      /** Courant vif: sur le gué, puis il s'éteint sur cette distance (m). */
+      riffleReach: 1.6,
+      /** Bord du sable et de l'herbe: écart (m) de part et d'autre du bord des cases, taille du bruit (m). */
+      sandWobble: 0.32,
+      sandNoise: 1.8,
+      /**
+       * Pierres rondes des rives (bible, 8.7: « deux niveaux de pierres
+       * arrondies »): un rang au ras de l'eau, à demi noyé, que le courant a
+       * déchaussé, et un rang de plus petites un peu plus haut sur la pente,
+       * laissées par les crues. Un point tous les `spacing` m le long de la ligne
+       * d'eau; chance d'y trouver une pierre et taille (m) de chaque rang.
+       */
+      stones: {
+        spacing: 0.55,
+        lowChance: 0.5,
+        lowSize: [0.16, 0.3] as const,
+        highChance: 0.28,
+        highSize: [0.09, 0.16] as const,
+        /** Le rang haut est à cette hauteur au-dessus de l'eau (m). */
+        highAbove: 0.08,
+        /** Pas de pierres au-delà de `margin` cases du bord de la carte (on ne les voit pas). */
+        margin: 6,
+        /** Pas de pierres à moins de cette distance (m) du gué et des sols posés (ponton): on y passe. */
+        clearance: 1.2,
+      },
+      /**
+       * Roseaux (bible, 8.7: « quelques roseaux »): seulement sur la rive nord,
+       * au fond des anses où l'eau dort (là où ils poussent), loin du gué et du
+       * ponton où l'on passe; jamais sur la rive sud, au premier plan de la
+       * caméra (la carte veut une rive sud basse, rien qui cache la rivière).
+       * Centre de la touffe (m; elle se pose sur la ligne d'eau la plus proche), nombre de tiges.
+       */
+      reeds: [
+        // Anse en amont du gué, entre la langue de sable de l'ouest et le gué: eau calme avant le radier.
+        { x: 11.2, y: 38.2, stems: 9 },
+        { x: 13.4, y: 38.3, stems: 6 },
+        // Anse à l'est du ponton, au pied du pré: loin du banc de la berge et du ponton.
+        { x: 50.6, y: 38.2, stems: 8 },
+        { x: 52.4, y: 38.3, stems: 6 },
+      ] as readonly { x: number; y: number; stems: number }[],
+      /** Tige de roseau: hauteur (m, de la plus petite à la plus grande), rayon au pied (m). */
+      reedHeight: [0.55, 0.9] as const,
+      reedRadius: 0.018,
+    },
+    /**
+     * Place du bourg (revue du directeur artistique, tours 4 à 7; bible, 8.7):
+     * pavés seulement là où un vrai bourg en poserait, terre battue ailleurs
+     * (l'est de la place reste dégagé pour les fêtes: un sol de foire).
+     * Le shader pose les pavés entiers: le bord de la zone pavée suit leurs joints.
+     */
+    square: {
+      paved: [
+        /*
+         * Autour du puits, en anneaux: l'eau qu'on y renverse ferait de la boue. Le
+         * pavage tourne autour de la margelle (pavés posés en cercles).
+         */
+        { kind: 'ring', model: 'well', radius: 2.7 },
+        /*
+         * Devant l'épicerie, sur toute la façade (x 31): on y attend au comptoir, on
+         * décharge les caisses à la porte, la tonnelle du souper y est posée.
+         */
+        { kind: 'band', a: [32.6, 23.2], b: [32.6, 32.8], half: 1.9 },
+        /* Du puits à la porte d'Odette (30, 30): le chemin des seaux de l'épicerie. */
+        { kind: 'band', a: [37.6, 28.4], b: [32.6, 30.2], half: 0.85 },
+        /* Du puits à la rue de la Gare (au nord): on y vient de la halte et des maisons. */
+        { kind: 'band', a: [40, 26], b: [40, 22.5], half: 0.9 },
+      ] as readonly SquareShape[],
+      /** Hors de la place (rue de la Gare, quai): tout est pavé. Rangs: pas (m), longueur d'un pavé (m). */
+      rowPitch: 0.22,
+      stoneLength: 0.3,
+      /** La place elle-même (cases de pavés de la carte dans ce rectangle): pavés selon `paved`, terre battue ailleurs. */
+      area: { x: 31, y: 23, w: 18, h: 11 },
     },
     /** Touffes d'herbe et fleurs semées sur l'herbe (part des cases). */
     tuftDensity: 0.32,

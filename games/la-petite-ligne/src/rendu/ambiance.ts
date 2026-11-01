@@ -11,13 +11,11 @@
  * - panache de la locomotive, gouttes d'arrosage, poussière de bêche, étoiles
  *   de la récolte « belle » (`particules.ts`).
  *
- * Coût: quatre appels de dessin au plus (pluie, ciel, bouffées, gué), un
+ * Coût: trois appels de dessin au plus (pluie, ciel, bouffées; le gué est sous la surface de la rivière), un
  * programme de shader (les particules), aucune passe de rendu en plus. Chaque
  * effet a une version légère, prise d'elle-même si les images s'allongent.
  */
 import {
-  BufferAttribute,
-  BufferGeometry,
   Color,
   Mesh,
   MeshStandardMaterial,
@@ -56,7 +54,6 @@ const CHARACTER_MATERIAL = 'character';
 const PALETTE_MATERIAL = 'lpl_palette';
 /** Facteur des lumières de Three.js (irradiance / pi) pour éclairer les sprites comme le décor. */
 const LAMBERT = 1 / Math.PI;
-const FORD_STEPS = 2;
 /** Écart de la bouffée autour de la cheminée (part de sa taille), et part minimale de sa montée et de sa vie (variété). */
 const STEAM_JITTER = 0.5;
 const STEAM_RISE_MIN = 0.7;
@@ -72,31 +69,6 @@ const HOUSE_ROOF = 'house_roof';
 const CHIMNEY_STAGGER = 0.37;
 /** Le rond d'eau flotte juste au-dessus des billons de la case bêchée. */
 const RING_LIFT = 0.08;
-
-/** Lame d'eau posée sur les cases du gué. */
-function buildFord(cells: readonly { cx: number; cy: number }[], height: number): BufferGeometry {
-  const positions: number[] = [];
-  const size = 1 / FORD_STEPS;
-  for (const cell of cells) {
-    for (let sy = 0; sy < FORD_STEPS; sy += 1) {
-      for (let sx = 0; sx < FORD_STEPS; sx += 1) {
-        const x = cell.cx + sx * size;
-        const z = cell.cy + sy * size;
-        positions.push(x, height, z, x, height, z + size, x + size, height, z + size);
-        positions.push(x, height, z, x + size, height, z + size, x + size, height, z);
-      }
-    }
-  }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute('position', new BufferAttribute(new Float32Array(positions), 3));
-  const normals = new Float32Array(positions.length);
-  for (let i = 1; i < normals.length; i += 3) {
-    normals[i] = 1;
-  }
-  geometry.setAttribute('normal', new BufferAttribute(normals, 3));
-  geometry.computeBoundingSphere();
-  return geometry;
-}
 
 export class AmbiancePart implements ExtensionPart {
   private readonly daylight: DaylightRig;
@@ -170,6 +142,18 @@ export class AmbiancePart implements ExtensionPart {
     this.surfaces.uLookField.value = occlusion.texture;
     this.surfaces.uLookRect.value.copy(occlusion.rect);
     this.surfaces.uLookHeight.value.copy(this.field.height);
+    // Lit de la rivière (berges, gué) et anneaux de pavés autour du puits (tour 8).
+    const riverBed = hooks.terrain.river;
+    this.surfaces.uRiverField.value = riverBed.texture;
+    if (riverBed.texture !== null) {
+      this.surfaces.uRiverRect.value.copy(riverBed.rect);
+    }
+    const ring = RENDER_SETTINGS.terrain.square.paved.find((shape) => shape.kind === 'ring');
+    const centre =
+      ring?.kind === 'ring' ? hooks.map.props.find((prop) => prop.model === ring.model) : undefined;
+    if (ring?.kind === 'ring' && centre !== undefined) {
+      this.surfaces.uPavingRing.value.set(centre.pos.x, centre.pos.y, ring.radius, 1);
+    }
 
     patchSurface(hooks.materials.palette, this.surfaces, {
       puddles: true,
@@ -189,26 +173,6 @@ export class AmbiancePart implements ExtensionPart {
     resources.track(river.material);
     hooks.water.material = river.material;
     this.water.push(river.uniforms);
-    if (this.field.fordCells.length > 0) {
-      const ford = createWaterMaterial(
-        this.field,
-        this.surfaces,
-        waterSettings.fordOpacity,
-        waterSettings.fordFoam,
-      );
-      resources.track(ford.material);
-      const gravel = RENDER_SETTINGS.terrain.heights.gravel;
-      const mesh = new Mesh(
-        resources.track(buildFord(this.field.fordCells, gravel + waterSettings.fordLift)),
-        ford.material,
-      );
-      mesh.name = 'lame du gue';
-      mesh.receiveShadow = true;
-      mesh.matrixAutoUpdate = false;
-      mesh.renderOrder = 1;
-      this.water.push(ford.uniforms);
-      this.add(mesh);
-    }
 
     const glows = collectGlowSources(hooks.map, hooks.library, hooks.terrain);
     this.lights = groundLights(glows);

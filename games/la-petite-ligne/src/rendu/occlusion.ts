@@ -6,7 +6,9 @@
  * le teinter (herbe plus profonde sous les arbres), sans SSAO ni passe de plus.
  *
  * Canaux: occlusion (R, 0 à 1) et hauteur du sol (G, codée comme le champ du
- * terrain), qui sert à assombrir le pied des faces verticales.
+ * terrain), qui sert à assombrir le pied des faces verticales; cases de pavés
+ * de la carte (B) et, parmi elles, celles qui sont vraiment pavées (A: la place
+ * n'est pavée que là où un bourg en poserait, terre battue ailleurs).
  *
  * Tout est déterministe (mêmes données, même carte chez les deux joueurs).
  */
@@ -23,6 +25,7 @@ import {
   type Object3D,
 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
+import { cellIndex, inRect } from '../etat/carte';
 import { FIELD_HEIGHT_MIN, FIELD_HEIGHT_RANGE } from './champs';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
@@ -200,6 +203,42 @@ function forestTrees(scene: Object3D): { x: number; y: number }[] {
   return out;
 }
 
+/** Distance du point (x, y) au segment de a à b. */
+function segmentDistance(
+  x: number,
+  y: number,
+  a: readonly [number, number],
+  b: readonly [number, number],
+): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const length2 = dx * dx + dy * dy;
+  const t = length2 > 0 ? Math.min(1, Math.max(0, ((x - a[0]) * dx + (y - a[1]) * dy) / length2)) : 0;
+  return Math.hypot(x - (a[0] + t * dx), y - (a[1] + t * dy));
+}
+
+/**
+ * Où sont les pavés sur une case de pavés de la carte (`terrain.square`): dans
+ * la place, seulement dans ses zones pavées (puits, devant l'épicerie, chemins
+ * qui les relient); hors de la place (rue de la Gare, quai), partout.
+ */
+export function squarePaving(map: GameMap): (x: number, y: number) => boolean {
+  const square = RENDER_SETTINGS.terrain.square;
+  const shapes = square.paved.flatMap((shape) => {
+    if (shape.kind === 'band') {
+      return [{ a: shape.a, b: shape.b, half: shape.half }];
+    }
+    const prop = map.props.find((candidate) => candidate.model === shape.model);
+    if (prop === undefined) {
+      return [];
+    }
+    const centre: [number, number] = [prop.pos.x, prop.pos.y];
+    return [{ a: centre, b: centre, half: shape.radius }];
+  });
+  return (x: number, y: number): boolean =>
+    !inRect(square.area, x, y) || shapes.some((s) => segmentDistance(x, y, s.a, s.b) <= s.half);
+}
+
 /** Ce que les shaders doivent savoir pour lire l'occlusion. */
 export interface OcclusionField {
   texture: DataTexture;
@@ -235,6 +274,7 @@ export function createOcclusionField(map: GameMap, terrain: Terrain, scene: Obje
     grid,
     look.occlusionRadius,
   );
+  const paved = squarePaving(map);
   const data = new Uint8Array(grid.width * grid.height * RGBA);
   for (let py = 0; py < grid.height; py += 1) {
     const y = grid.originY + (py + HALF) / k;
@@ -246,7 +286,16 @@ export function createOcclusionField(map: GameMap, terrain: Terrain, scene: Obje
       data[i * RGBA + 1] = Math.round(
         Math.min(1, Math.max(0, (ground - FIELD_HEIGHT_MIN) / FIELD_HEIGHT_RANGE)) * BYTE,
       );
-      data[i * RGBA + 3] = BYTE;
+      const cx = Math.floor(x);
+      const cy = Math.floor(y);
+      const stone =
+        cx >= 0 &&
+        cy >= 0 &&
+        cx < map.width &&
+        cy < map.height &&
+        map.ground[cellIndex(map, cx, cy)] === 'stone';
+      data[i * RGBA + 2] = stone ? BYTE : 0;
+      data[i * RGBA + 3] = stone && paved(x, y) ? BYTE : 0;
     }
   }
   const texture = new DataTexture(data, grid.width, grid.height, RGBAFormat, UnsignedByteType);
