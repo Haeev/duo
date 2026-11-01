@@ -4,7 +4,7 @@
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne (titre provisoire) |
 | Statut | première livraison, pour la démo (`docs/jeux/jeu-1/demo.md`, section 4.2) |
-| Dernière mise à jour | 2026-11-01 (tour 8: saisons, brume du matin, cueillette) |
+| Dernière mise à jour | 2026-11-01 (tour 9: moments de l'été et de l'automne, chantiers et catalogue, bus musique pour les motifs accordés) |
 | Rédaction | sound-designer |
 | Fichiers | sons: `games/la-petite-ligne/assets/son/` et leurs définitions `sons.json`; sources: `games/la-petite-ligne/assets-src/son/`; écoute pour le client: `design/son/la-petite-ligne/` |
 | Documents liés | cahier des charges (sections 5.2, 6.3, 8), démo (sections 1 et 4.2), identité sonore de la plateforme (`design/son/plateforme/`) |
@@ -34,11 +34,13 @@ Toutes à -18 LUFS intégrés dans le fichier (mesuré: -18,1), crêtes entre -3
 | Écran de nuit (les deux couchés) | `musique/nuit.ogg` | fa majeur, 3/4, 60 | 84 s (28) | harpe, célesta, flûte, cordes | oui |
 | Le train s'arrête au quai | `musique/fanfare-train.ogg` | do majeur, 4/4, 112 | 13 s | trompette, cor, accordéon, tuba, glockenspiel | non, une fois |
 | Le train du jour 8 est parti: récapitulatif, fin | `musique/fin.ogg` | sol majeur, 6/8, 84 | 44 s | flûte, clarinette, guitare, cordes, harpe, cor | non, une fois |
+| Lanternes du quai allumées ensemble, apogée à t = 6,5 s (tour 9, P1) | `musique/halte-evening.ogg` | sol majeur, 6/8, 72 | 27,5 s plus la résonance | célesta, harpe, cordes lentes | non, une fois |
 
 - **Matin et après-midi** partagent tempo, tonalité, grille et longueur: le motif de la Halte à la flûte le matin (plus clair, harpe et cordes), à la clarinette l'après-midi (plus chaud, accordéon et violoncelle). On passe de l'un à l'autre pendant un silence de repos (section 3.2), ou en fondu enchaîné à la même position de lecture.
 - **L'été** (`halte-ete`, tour 8): même grille, tempo et longueur que le matin et l'après-midi, donc fondu enchaîné possible à la même position de lecture. Le violon chante le motif (A), la flûte prend le pont (B), le violoncelle la partie C; guitare, pizzicati et harpe gardent le balancement. Proposé l'après-midi en été (`plan.musicByMoment`), à brancher par le dev audio quand la saison sera dans l'état.
 - **Veillée, pour deux**: la clarinette chante, la flûte répond, puis elles chantent ensemble en tierces; une seule guitare les accompagne. Les deux voix sont les deux joueurs.
 - **Petit-déjeuner**: le basson pose la question en sautillant, la clarinette répond: tendre et un peu drôle.
+- **Le soir des lanternes** (`halte-evening`, tour 9, P1): le motif de la Halte (partie A) au célesta, une octave au-dessus du jour, plus lent (72), sur une harpe qui arpège et des cordes lentes, puis une cadence douce (do/sol, sol). Le célesta est la voix de la nuit dans le jeu (nuit, vers luisants, étoiles). Lancé à 6,5 s de l'apogée, il subit la descente de l'apogée (-6 dB jusqu'à 2 s après la fin): c'est le « en douceur » de la fiche, sans réglage de plus.
 - Les partitions sont versionnées en MIDI (`assets-src/son/midi/*.mid`) et rendues par FluidSynth avec la banque General MIDI FluidR3_GM (licence MIT, à inscrire dans `CREDITS.md`).
 
 ## 3. Règles de lecture
@@ -47,7 +49,7 @@ Toutes à -18 LUFS intégrés dans le fichier (mesuré: -18,1), crêtes entre -3
 
 | Bus | Identifiant | Volume par défaut | Contenu |
 |---|---|---|---|
-| Musique | `music` | 0,8 | les dix musiques |
+| Musique | `music` | 0,8 | les onze musiques, et les motifs accordés des moments et des saisons (`star-chime-*`, `glow-shimmer`, `mist-lift`, `season-turn-*`) |
 | Effets | `effects` | 1,0 | sons du monde, train, coq |
 | Interface | `ui` | 0,9 | monnaie, tampon, notifications, carnet, propositions, airs courts, motifs des habitants |
 | Ambiance | `ambience` | 0,9 | rivière, vent, oiseaux, grillons, bourg, pluie |
@@ -222,7 +224,7 @@ Sons des fiches de `docs/jeux/jeu-1/tour-06-conception.md` et `tour-07-conceptio
 | renard | `fox_bark` | `fox-bark` | apogée, t = 1,0 s | -21 | 2 | 2 variantes, hauteur ±3 % | effets | réf. 4 m, coupé au-delà de 25 m |
 | renard | `hens_alarm` | `hens-alarm` | apogée, t = 1,2 s, au poulailler, si les poules y sont | -23 | 3 | hauteur ±4 % | effets | réf. 3 m, coupé au-delà de 45 m |
 | vers luisants | `crickets_night` | `crickets-night` (boucle de 8 s) | placé à `meadow_glow`; attente à -6 dB, pleine force en 4 s à l'apogée (`waitingDb`, `climaxRampMs`) | -29 LUFS int. | 3 | aucune | ambiance | coupé au-delà de 20 m |
-| vers luisants | `glow_shimmer` | `glow-shimmer` | apogée, t = 0,5 s | -22 | 2 | 2 variantes, aucune variation de hauteur (sol pentatonique) | interface | non placé |
+| vers luisants | `glow_shimmer` | `glow-shimmer` | apogée, t = 0,5 s | -22 | 2 | 2 variantes, aucune variation de hauteur (sol pentatonique) | musique | non placé |
 | chevrette | `roe_call` | `roe-call` | apogée, t = 0 | -26 | 2 | 2 variantes, hauteur ±3 % | effets | réf. 2,5 m, coupé au-delà de 15 m |
 | chevrette | `fawn_rustle` | `fawn-rustle` | apogée, t = 1,0 s, au lit du faon | -29 | 2 | hauteur ±4 % | effets | réf. 2 m, coupé au-delà de 12 m |
 | chevrette | `fawn_bleat` | `fawn-bleat` | apogée, t = 2,6 s, au faon | -25 | 2 | 2 variantes, hauteur ±3 % | effets | coupé au-delà de 12 m |
@@ -233,12 +235,12 @@ Sons des fiches de `docs/jeux/jeu-1/tour-06-conception.md` et `tour-07-conceptio
 | martin-pêcheur | `kf_dive` | `kf-dive` | plongeons manqués (attente); apogée, t = 1,3 s | -24 | 2 | 2 variantes, hauteur ±4 % | effets | coupé au-delà de 20 m |
 | martin-pêcheur | `kf_beat` | `kf-beat` | apogée, **un seul déclenchement** à 2,7 s (le fichier contient les deux coups, 2,7 et 3,2 s) | -26 | 2 | hauteur ±3 % | effets | réf. 2,5 m, coupé au-delà de 15 m |
 | brume | `mist_ambience` | `mist-ambience` (boucle de 8 s) | placé à `mist_narrows`; attente à -6 dB, pleine force en 3 s au début de l'apogée (`waitingDb`, `climaxRampMs`) | -29 LUFS int. | 3 | aucune | ambiance | réf. 3 m, coupé au-delà de 20 m |
-| brume | `mist_lift` | `mist-lift` | apogée, t = 1,5 s | -22 | 2 | 2 variantes (sol majeur, do majeur), aucune variation de hauteur | interface (S3) | non placé, stéréo |
+| brume | `mist_lift` | `mist-lift` | apogée, t = 1,5 s | -22 | 2 | 2 variantes (sol majeur, do majeur), aucune variation de hauteur | musique | non placé, stéréo |
 | brume | `blackbird_wake` | `blackbird-wake` | apogée, t = 3,0 s | -26 | 2 | 3 phrases, hauteur ±2 % | effets | non localisé (fiche) |
 | brume | `fish_jump` | `fish-jump` | apogée, t = 5,2 s, en (29,0 ; 40,4) | -25 | 2 | 2 variantes, hauteur ±4 % | effets | coupé au-delà de 20 m |
 
 - **Descente de la musique pendant l'apogée** (fiche 1.2, `moments.musicDuckDb`): -6 dB en 0,5 s au début, retour en 2 s après la fin, chez les deux. Elle se règle dans le moteur, pas dans `sons.json` (aucun son des moments n'a de `duckMusicDb`, pour ne pas cumuler deux atténuations).
-- **`glow-shimmer` et `mist-lift` sur le bus interface**: les fiches demandent le bus musique, mais `sons.json` n'accepte pour les sons que `effects`, `ui` et `ambience` (schéma de `src/audio/catalogue.ts`). Bus interface en attendant (question S3). `mist-lift` est rendu par FluidSynth (harpe et cordes lentes, partitions `assets-src/son/midi/mist-lift-1.mid` et `-2.mid`), accords sans seconde mineure, septième majeure ni triton: juste sous la musique du matin en sol majeur.
+- **`glow-shimmer` et `mist-lift` sur le bus musique** (question S3, réglée au tour 9): ils suivent le réglage Musique du joueur et passent après la descente de l'apogée, qui ne les baisse donc pas. `mist-lift` est rendu par FluidSynth (harpe et cordes lentes, partitions `assets-src/son/midi/mist-lift-1.mid` et `-2.mid`), accords sans seconde mineure, septième majeure ni triton: juste sous la musique du matin en sol majeur.
 - **`kf-beat` ne se joue qu'une fois**: le « tac tac » entier est dans le fichier; le déclencher aussi à 3,2 s donnerait quatre coups.
 - **`deer-stamp` puis `roe-bark`**: le coup de sabot et l'aboiement disent tous deux « elle t'a vu bouger »; l'aboiement porte à 30 m pour que l'autre joueur, plus loin, l'entende aussi.
 - **Se distinguer par la mesure**: `fawn-bleat` (centroïde 1,3 à 1,4 kHz) est deux fois plus haut que `roe-call` (0,6 à 0,7 kHz); `fish-jump` est en deux temps (sortie, puis rentrée vers 700 Hz) quand `kf-dive` n'en a qu'un (1 à 1,1 kHz, gerbe fine) et que le bouchon de la pêche reste vers 500 Hz; `deer-stamp` et `deer-bounds` gardent moins de 25 % de leur énergie sous 300 Hz (haut-parleurs de portable).
@@ -251,7 +253,7 @@ Sons de `docs/jeux/jeu-1/tour-08-conception.md` (sections 2.2, 2.6, 3.4, 5.1, 5.
 
 | Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
 |---|---|---|---|---|---|---|---|
-| Premier jour d'une saison, au petit-déjeuner, sous la carte de saison (chez les deux) | `season-turn-spring`, `-summer`, `-autumn`, `-winter` (`saisons/`) | -20 | 2 | aucune: un fichier par saison, choisi par la saison du jour (`plan.seasonTurn`) | interface (S3) | non placé, stéréo | -6 dB |
+| Premier jour d'une saison, au petit-déjeuner, sous la carte de saison (chez les deux) | `season-turn-spring`, `-summer`, `-autumn`, `-winter` (`saisons/`) | -20 | 2 | aucune: un fichier par saison, choisi par la saison du jour (`plan.seasonTurn`) | musique | non placé, stéréo | -6 dB |
 | Cueillir de l'ail des ours ou des pissenlits | `pick-herb` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Cueillir des girolles | `pick-mushroom` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
 | Cueillir des mûres (froissement du roncier) | `pick-berries` | -24 | 2 | 3 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
@@ -278,6 +280,49 @@ Ambiances (boucles mono, non placées, bus ambiance, dossier `ambiance/`), règl
 - **Été**: `crickets-summer` ajoute au chœur des grillons champêtres le trille continu du grillon d'Italie vers 2,7 kHz, qui signe l'été (centroïde 3,97 kHz contre 4,48 kHz pour `crickets`). `swifts`: cinq passages de bandes de martinets par tour de 30 s, cris coupés au-dessus de 6,5 kHz, à -28 LUFS de sonie momentanée maximale (ffmpeg), sous les oiseaux du matin (-24).
 - **Automne**: `wind-leaves` garde un vent qui ne tombe jamais tout à fait, avec le crépitement sec des feuilles dans les rafales et des feuilles qui roulent sur le chemin trois fois par tour (centroïde 1,05 kHz contre 0,84 kHz pour `wind`). `crows`: des corneilles sur l'autre rive, quatre séries de deux à quatre « kraa » (fondamentale vers 500 Hz, formants vers 1,1 et 1,7 kHz: plus haut et plus bref que le héron), le reste du tour en silence.
 
+### 4.7 Moments de l'été et de l'automne, chantiers, catalogue (tour 9)
+
+Sons de `docs/jeux/jeu-1/tour-09-conception.md` (sections 2, 4, 7 et 9; fiches 1.4.10 et 1.4.12 du tour 7), sources `assets-src/son/moments_tour9.py` et `bourg.py`. Aucun déclencheur n'existe encore pour ces moments ni pour les chantiers: les sons sont déclarés dans `sons.json`, le dev gameplay et le dev audio les branchent (noms de la fiche dans `momentSound`).
+
+| Moment | Fiche | Son | Quand | Niveau | Priorité | Variations | Bus | Écoute |
+|---|---|---|---|---|---|---|---|---|
+| étoiles | `star_chime` (note 1) | `star-chime-1` | apogée, t = 0,0 s: sol 5 | -24 | 2 | aucune variation de hauteur | musique | non placé, stéréo |
+| étoiles | `star_chime` (note 2) | `star-chime-2` | t = 2,4 s: mi 6 | -24 | 2 | idem | musique | non placé |
+| étoiles | `star_chime` (accord) | `star-chime-3` | t = 4,5 s, la grosse étoile: la, ré, sol, do roulés vers le grave | -21 | 2 | idem | musique | non placé |
+| étoiles | `star_chime` (note 3) | `star-chime-4` | t = 7,6 s: ré 6 | -24 | 2 | idem | musique | non placé |
+| étoiles | `star_chime` (note 4) | `star-chime-5` | t = 9,4 s: do 6 | -24 | 2 | idem | musique | non placé |
+| étoiles | `night_water` | `night-water` (boucle de 6 s) | présence, attente et apogée, placé à `stars_water` | -30 LUFS int. | 3 | aucune | ambiance | coupé au-delà de 12 m |
+| salut | `gate_crank` | `gate-crank` | armement, 2,5 s, à chaque manivelle | -24 | 2 | 2 variantes (11 et 13 crans par tour), hauteur ±3 % | effets | réf. 3 m, coupé au-delà de 45 m |
+| salut | `gate_lock` | `gate-lock` | fin de l'armement (2,5 s), à chaque poteau | -22 | 2 | hauteur ±4 % | effets | idem |
+| salut | `train_slow_roll` | `train-slow-roll` (boucle de 2 s) | apogée, de t = 8 s à la sortie, suit la cabine | -24 LUFS int. | 1 | aucune | effets | réf. 8 m, coupé au-delà de 160 m |
+| salut | `train_whistle_salute` | `train-whistle-salute` | **un seul déclenchement** à t = 10,0 s (le fichier contient les deux coups, 10,0 et 10,6 s) | -15 | 1 | aucune | effets | réf. 15 m, jamais sous -14 dB |
+| salut | `cylinder_cocks` | `cylinder-cocks` | t = 11 s, à la locomotive | -20 | 2 | hauteur ±3 % | effets | réf. 8 m, coupé au-delà de 160 m |
+| dame blanche | `owl_screech` | `owl-screech` | attente, toutes les 20 à 30 s; apogée, t = 13,4 s | -23 | 2 | 3 cris, hauteur ±3 %, 5 s au moins entre deux | effets | réf. 4 m, coupé au-delà de 25 m |
+| dame blanche | `grass_strike` | `grass-strike` | apogée, t = 6,2 s | -25 | 2 | hauteur ±4 % | effets | réf. 3 m, coupé au-delà de 20 m |
+| lanternes | `lantern_light` | `lantern-light` | chaque allumage, à la lanterne; les deux à t = 0 de l'apogée | -24 | 2 | 2 variantes, hauteur ±4 %, aucun intervalle minimal | effets | réf. 3 m, coupé au-delà de 45 m |
+| lanternes | `lantern_out` | `lantern-out` | flamme allumée seule, 0,8 s après | -26 | 2 | hauteur ±5 % | effets | réf. 2 m, coupé au-delà de 28 m |
+| lanternes | `quay_bell_once` | `quay-bell-once` | apogée, t = 6,0 s, à la cloche du quai | -18 | 2 | aucune | effets | réf. 8 m, coupé au-delà de 160 m |
+
+| Événement | Son | Niveau | Priorité | Variations | Bus | Écoute | Atténue la musique |
+|---|---|---|---|---|---|---|---|
+| Verser au chantier | `coins-drop` | -21 | 2 | 2 variantes, hauteur ±3 %, niveau ±1 dB | interface | non placé |  |
+| Un chantier est bâti (notification du matin, chez les deux) | `chantier-built` | -19 | 2 | aucune | interface | non placé | -6 dB |
+| Offrir un cadeau | `gift-give` | -24 | 2 | 2 variantes, hauteur ±5 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Odette moud du café (moulin offert, sur son comptoir) | `coffee-grind` | -27 | 4 | 2 variantes, hauteur ±4 %, 8 s au moins entre deux | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Horloge murale (boucle, posée au mur) | `clock-tick` (boucle de 2 s) | -38 LUFS int. | 4 | aucune | effets | placé, réf. 0,8 m, coupé au-delà de 3 m (préréglage `horloge`) |  |
+| Arroser avec l'arrosoir de cuivre (P1) | `water-pour-copper` | -25 | 3 | 2 variantes, hauteur ±4 %, niveau ±1 dB | effets | placé, réf. 2 m, coupé au-delà de 28 m |  |
+| Soir d'automne sans la dame blanche: l'effraie au loin | `owl-far` (`ambiance/`) | -30 | 4 | 2 cris | ambiance | non placé, une fois par soir (`plan.eveningCalls`) |  |
+
+- **Les étoiles « dans l'ordre »**: le moteur tire les variantes au hasard (`VariantPicker`), donc les cinq notes sont cinq sons (`star-chime-1` à `-5`, champ `order`), comme les tournants de saison: la chorégraphie nomme `star_chime_1` à `star_chime_5`. Do pentatonique (do, ré, mi, sol, la), dans fa majeur (la nuit), sol majeur (le jour) et do majeur (le samedi); aucune paire de notes dure (contrôle bloquant dans `moments_tour9.py`). La phrase monte (sol, mi), s'ouvre sur l'accord de la grosse étoile, puis se pose (ré, do). Les étoiles filantes ne font aucun bruit: c'est la musique qui les accompagne. La musique de la nuit à -9 dB pendant l'apogée (`starsMusicDuckDb`) se règle dans le moteur; ces notes, sur le bus musique, n'en sont pas baissées.
+- **Le salut**: le sifflet du salut est la même locomotive (les trois tuyaux ré, sol, si de `train-whistle`), mais deux coups brefs de 0,4 s au lieu du « pou-pouuu »: on reconnaît le train et on comprend que c'est un autre message. `cylinder-cocks` est plus rauque et plus bas que le grand jet de l'arrêt (centroïde 2,6 kHz contre 6,6 kHz pour `train-steam`), deux jets décalés (un par cylindre). `train-slow-roll`: quatre bouffées douces par tour de 2 s, la bielle, un joint de rail « ta... dam » (deux essieux à 2,4 m, 1,5 s d'écart à 1,6 m/s); 49 % de l'énergie sous 300 Hz, sous la limite de 60 % du jeu.
+- **L'effraie**: un chuintement rauque et soufflé (« chhhrrééé », 1,1 à 1,3 s), presque sans note, centroïde 3,3 à 3,4 kHz: rien de commun avec le héron (1,0 kHz) ni les corneilles (0,9 kHz). Son vol reste silencieux (fiche): aucun son d'aile. `owl-far` est le même cri passé au loin (aigus coupés vers 2,6 kHz, écho des granges, -7 dB sous le cri proche).
+- **Les lanternes**: la mèche qui prend (centroïde 2,1 kHz, 0,5 s utiles, un « fffou » qui monte), la flamme seule qui vacille trois fois et s'éteint dans un « pff ». `quay-bell-once` est le premier coup de `station-bell`, seul.
+- **Les chantiers**: `coins-drop` (7 ou 9 pièces en tas dans le tronc de bois, deux qui roulent, 0,66 à 0,72 s utiles) se distingue de `coins` (3 à 6 pièces comptées, 0,26 à 0,32 s). `chantier-built`: deux coups de maillet de Basile, puis le marimba monte sol, si, ré, sol sous une clochette (si): plus ample que `notify`, à jouer à sa place pour ce message.
+- **Dossier `objets/`**: `chantier-built`, `gift-give`, `coffee-grind`, `clock-tick` et `water-pour-copper` tiennent à un objet acheté ou offert. Ils ne sont pas décodés au lancement (le plafond de 30 Mo des sons permanents, `memoire.test.ts`, aurait été dépassé: 32,3 Mo mesurés avec eux dans `effets/` et `interface/`). Chacun porte `decodeWhen` dans `sons.json`: le moment où le dev audio le demande au cache (chantier payé, cadeau dans un sac, moulin offert et écouteur près du comptoir, horloge posée et écouteur dans la maisonnette, arrosoir de cuivre dans un sac). Sans cette demande, le moteur décode au premier appel et le premier son manque (une boucle, elle, démarre à l'image suivante).
+- **L'arrosoir de cuivre** est plus clair que celui de zinc (centroïde 3,4 à 3,5 kHz contre 2,8 kHz), avec deux résonances longues du cuivre sous le filet.
+- **Noms de la section 7 de la conception**: plusieurs sons y sont cités comme « actuels » sous un autre nom. Correspondance proposée: `letter-open` est `journal-open`; `crate-drop` est `crate-deposit`; `coins-gain` est `coins`; `catalogue-order` est `order-stamp`; `tool-pickup` est `pickup`; `hen-cluck` est `hen` (aussi pour le caquet de la nouvelle poule). Le départ du train du 64 garde le sifflet et `fin`.
+- **Ambiances d'automne**: `wind-leaves`, `crows` et les oiseaux du matin plus rares (tour 8) restent; le tour 9 ajoute seulement `owl-far` pour les soirs. Les grillons (`crickets`) jouent toujours en automne dès 19 h, ce qui reste juste pour la fin de septembre et octobre (grillons champêtres tardifs).
+
 ## 5. Les habitants
 
 Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez celui qui parle (musique à -8 dB, 4 s au moins entre deux motifs du même habitant). Tous en sol majeur, comme le thème qu'ils interrompent.
@@ -292,10 +337,10 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 
 ## 6. Intégration technique
 
-- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 14,6 Mo mesuré au tour 8 (budget: 20 Mo).
+- **Formats**: Ogg Vorbis 48 kHz; musiques en stéréo (qualité 3, environ 110 kbit/s), ambiances mono (qualité 2), effets placés mono (pour le `PannerNode`), interface et airs en stéréo (qualité 4). Poids total: 15,5 Mo mesuré au tour 9 (budget: 20 Mo).
 - **Boucles**: chaque fichier de boucle porte une amorce de chaque côté (la fin de la boucle avant, son début après: 1 s pour les musiques, 0,4 à 0,5 s pour les autres). Jouer avec `AudioBufferSourceNode`: `loop = true`, `loopStart` et `loopEnd` lus dans `loop.startSeconds` et `loop.endSeconds`, départ à `playFromSeconds` (pour une musique, le premier temps, 0,12 s après le début de la boucle: le raccord tombe entre deux notes).
 - **Pas de lecture en flux pour les boucles**: mesuré dans Chromium, `<audio loop>` insère 128 à 256 échantillons de silence (2,7 à 5,3 ms) à chaque tour, un clic audible sur une musique. Les boucles doivent être décodées (`decodeAudioData`).
-- **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Tour 8: ambiances de saison décodées selon la saison (`mist-morning` 4,8 Mo, `crickets-summer` 4,0 Mo à la place de `crickets`, `swifts` 6,0 Mo, `wind-leaves` 4,8 Mo à la place de `wind`, `crows` 7,9 Mo), motifs de saison 6,8 Mo dans `saisons/`, `halte-ete` 37,6 Mo comme les autres thèmes du jour. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
+- **Mémoire décodée** (float32 à 48 kHz): effets placés 9,1 Mo, interface 10,6 Mo, motifs 5,6 Mo, train 13,0 Mo, ambiances 33,8 Mo si toutes chargées (jour: rivière, vent, oiseaux, bourg 23,8 Mo; soir: 13 Mo), une musique de 28 à 39 Mo. Chargement conseillé: effets, interface et motifs en permanence (25 Mo); une seule musique décodée à la fois (libérée après son fondu ou pendant le repos); ambiances selon l'heure; train le samedi seulement. Tour 8: ambiances de saison décodées selon la saison (`mist-morning` 4,8 Mo, `crickets-summer` 4,0 Mo à la place de `crickets`, `swifts` 6,0 Mo, `wind-leaves` 4,8 Mo à la place de `wind`, `crows` 7,9 Mo), motifs de saison 6,8 Mo dans `saisons/`, `halte-ete` 37,6 Mo comme les autres thèmes du jour. Tour 9: `coins-drop` rejoint les sons permanents (0,5 Mo); les sons des moments nouveaux sont dans `moments/` (décodés avec leur moment), ceux des objets dans `objets/` (section 4.7); `halte-evening` 12 Mo décodés, une fois. Pic d'un samedi en journée: environ 94 Mo, au-dessus des 64 Mo d'audio décodé prévus par l'architecture (question ouverte, section 9).
 - **Hauteur**: la variation se fait par `playbackRate` (elle change aussi un peu la durée, voulu).
 - **Rien n'est joué deux fois au même instant**: `minIntervalMs` évite les doublons (deux joueurs qui récoltent ensemble, double clic) et `maxVoices` borne les répétitions d'un même son.
 - `sons.json` est généré par `generer.py`: ne pas le modifier à la main; tout réglage passe par les sources.
@@ -303,7 +348,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 ## 7. Contrôles (sans écouter)
 
 - `duo-python games/la-petite-ligne/assets-src/son/generer.py` régénère tout (environ 6 minutes) puis lance `controler.py`: sonie et crête vraie de chaque fichier par le filtre `ebur128` de ffmpeg après décodage (aucune crête au-dessus de -1,5 dBTP, aucun échantillon écrêté), silence en tête des effets (2,6 ms au plus), longueur exacte et raccord de chaque boucle (saut et seconde différence comparés à leur distribution dans le fichier, niveau au raccord comparé aux variations internes), poids du jeu.
-- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 249 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
+- `node games/la-petite-ligne/assets-src/son/verifier-chromium.cjs` (Playwright): les 282 fichiers se décodent dans Chromium; chaque boucle, décodée à 48 et 44,1 kHz puis réellement jouée en boucle dans un `OfflineAudioContext`, passe le raccord sans saut.
 - Avant le rendu, un contrôle de l'écriture bloque toute musique où deux instruments tiennent ensemble une seconde mineure, une septième majeure ou un triton hors de l'accord (il a corrigé deux fautes d'harmonie pendant la production).
 - Les spectrogrammes et formes d'onde (`controler.py --images DOSSIER`) ont été examinés pour chaque famille de sons.
 - Deux générations successives donnent les mêmes fichiers à l'octet (graines fixes, encodage sans métadonnées variables).
@@ -325,7 +370,7 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 |---|---|---|
 | S1 | Mémoire: un samedi en journée demande environ 94 Mo d'audio décodé pour des boucles sans clic, contre 64 Mo prévus (`docs/plateforme/architecture.md`). | Porter le plafond d'audio décodé à 128 Mo pour ce jeu, dans le budget de 1 Go de Duo; sinon, lecture des musiques par segments décodés à la suite (travail du SDK, architecte-technique). |
 | S2 | Bus ambiance: le SDK n'en prévoit que trois. | Un quatrième réglage « Ambiance » dans les réglages de Duo; en attendant, un sous-bus des effets. |
-| S3 | `glow-shimmer` (vers luisants) et `mist-lift` (brume) sont musicaux; `star_chime` (étoiles) le sera: les fiches les veulent sur le bus musique, que `sons.json` refuse pour un son. Même cas pour les quatre `season-turn-*` (tour 8). | Accepter `music` comme bus d'un son: le schéma de `catalogue.ts`, le type `SoundBus` et `busOf` de `moteur.ts` (raccordé après `momentDuck`, sinon la descente de l'apogée atténuerait aussi ces sons), avec un test (dev audio); puis les déplacer. En attendant, bus interface. |
+| S3 | Réglée au tour 9. | `sons.json` accepte `music` comme bus d'un son (schéma de `catalogue.ts`, type `SoundBus`); `busOf` de `moteur.ts` branche ces sons sur la pause de la musique, après `duck` et `momentDuck`. Test: `src/audio/moteur-bus.test.ts` (vrai moteur, faux contexte qui note les branchements). Sur ce bus: `star-chime-1` à `-5`, `glow-shimmer`, `mist-lift`, `season-turn-*`. |
 
 ## 10. Historique
 
@@ -336,4 +381,5 @@ Un motif de 2 à 4 s par habitant, joué à l'ouverture d'une conversation chez 
 | 2026-10-31 | Gauntlet, tour 2 (défauts S1 à S3): famille d'interface « papier et bois » (`ui-focus`, `ui-next`, `ui-tab`, `ui-confirm`, `ui-back`, `ui-panel-open`, `ui-panel-close`), refus doux `ui-refusal`, variantes du tampon (3), du remplissage de l'arrosoir (2) et du coffre (2 et 2); 84 sons, 156 fichiers |
 | 2026-10-31 | Gauntlet, tour 6: sons des six moments rares P0 (22 sons, 43 fichiers dans `moments/`, section 4.5) et `bench-sit` (s'asseoir sur un banc, 3 variantes), branché sur `sat_down` à la place de `furniture-place`; 107 sons, 202 fichiers |
 | 2026-11-01 | Gauntlet, tour 7: sons de la chevrette du pré, du martin-pêcheur du ponton et de la brume de l'Aubrune (13 sons, 23 fichiers dans `moments/`, préréglage `faune-30` pour l'aboiement); instants du champ `event` recalés sur `donnees/moments.json` (héron, oies, échelle, mésanges); 120 sons, 225 fichiers |
+| 2026-11-01 | Gauntlet, tour 9: sons des étoiles de l'Aubrune, du salut du mécanicien, de la dame blanche et des lanternes du quai (16 sons dans `moments/`, plus `owl-far` dans `ambiance/` et `plan.eveningCalls`), chantiers, cadeaux et objets du catalogue (`coins-drop`, et 5 sons dans le nouveau dossier `objets/`), musique `halte-evening` (P1); question S3 réglée: bus musique pour les motifs accordés (étoiles, vers luisants, brume, saisons), avec son test; section 4.7; 157 sons, 11 musiques, 282 fichiers |
 | 2026-11-01 | Gauntlet, tour 8: motifs du tournant de saison (`season-turn-*`, 4 couleurs, dossier `saisons/`), ambiances `mist-morning`, `crickets-summer`, `swifts`, `wind-leaves`, `crows` et leurs règles (`plan.ambienceBySeason`), cueillette (`pick-herb`, `pick-mushroom`, `pick-berries`, `pick-nuts`), refus de la hache (`axe-thud-soft`), variation d'été du thème (`halte-ete`, P1); section 4.6; 134 sons, 10 musiques, 249 fichiers |

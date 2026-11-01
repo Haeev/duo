@@ -433,10 +433,11 @@ SAISONS_FR = {"spring": "du printemps", "summer": "de l'été", "autumn": "de l'
 def sons() -> list[Son]:
     tournants = [
         Son(f"season-turn-{s}", f"Premier jour {fr}: motif sous la carte de saison au petit-déjeuner",
-            "saisons", "ui", _tournant(s), 1, -20.0, 2, 0.0, 0.0, None, canaux=2, duck_db=-6.0, voix_max=1,
+            "saisons", "music", _tournant(s), 1, -20.0, 2, 0.0, 0.0, None, canaux=2, duck_db=-6.0, voix_max=1,
             duree_max=4.5, extra={"season": s, "family": "season-turn"},
             note="un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, "
-                 "juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur")
+                 "juste sur la musique du petit-déjeuner; bus musique (question S3 réglée au tour 9), sans variation de "
+                 "hauteur")
         for s, fr in SAISONS_FR.items()
     ]
     return tournants + [

@@ -5,9 +5,9 @@ import { CatalogueError, parseCatalogue, sequenceOf, stepTime, stopTime } from '
 describe('catalogue (sons.json)', () => {
   const catalogue = parseCatalogue(soundsFile);
 
-  it('lit les 134 sons et les 10 musiques du sound designer', () => {
-    expect(catalogue.sounds.size).toBe(134);
-    expect(catalogue.music.size).toBe(10);
+  it('lit les 157 sons et les 11 musiques du sound designer', () => {
+    expect(catalogue.sounds.size).toBe(157);
+    expect(catalogue.music.size).toBe(11);
     expect(catalogue.mix.maxEffectVoices).toBe(24);
     expect(catalogue.peerDb).toBe(-3);
   });
@@ -103,6 +103,52 @@ describe('catalogue (sons.json)', () => {
     expect(catalogue.sounds.get('axe-thud-soft')?.files).toHaveLength(2);
     // La variation d'été du thème garde la boucle du matin: même position de lecture.
     expect(catalogue.music.get('halte-ete')?.loop).toEqual(catalogue.music.get('halte-matin')?.loop);
+  });
+
+  it('déclare les sons des moments, des chantiers et du catalogue (tour 9)', () => {
+    // Cinq notes d'étoiles, une par étoile filante, dans l'ordre de la fiche.
+    for (let k = 1; k <= 5; k += 1) {
+      const chime = catalogue.sounds.get(`star-chime-${String(k)}`);
+      expect(chime?.moment, String(k)).toEqual({ id: 'falling_stars', sound: `star_chime_${String(k)}`, waitingDb: 0, climaxRampSeconds: 0 });
+      expect(chime?.pitchVariation, String(k)).toBe(0);
+    }
+    const moments: Record<string, string> = {
+      'night-water': 'falling_stars',
+      'gate-crank': 'train_salute',
+      'gate-lock': 'train_salute',
+      'train-slow-roll': 'train_salute',
+      'train-whistle-salute': 'train_salute',
+      'cylinder-cocks': 'train_salute',
+      'owl-screech': 'barn_owl',
+      'grass-strike': 'barn_owl',
+      'lantern-light': 'quay_lanterns',
+      'lantern-out': 'quay_lanterns',
+      'quay-bell-once': 'quay_lanterns',
+    };
+    for (const [id, moment] of Object.entries(moments)) {
+      const def = catalogue.sounds.get(id);
+      expect(def?.moment?.id, id).toBe(moment);
+      expect(def?.moment?.sound, id).toBe(id.replaceAll('-', '_'));
+      expect(def?.files.every((f) => f.startsWith('moments/')), id).toBe(true);
+    }
+    // Fiches: audible à 12 m (eau du ponton), 25 m (effraie); boucles qui suivent la source.
+    expect(catalogue.sounds.get('night-water')?.spatial?.cullBeyond).toBe(12);
+    expect(catalogue.sounds.get('owl-screech')?.spatial?.cullBeyond).toBe(25);
+    expect(catalogue.sounds.get('train-slow-roll')?.loop).not.toBeNull();
+    expect(catalogue.sounds.get('owl-screech')?.files).toHaveLength(3);
+    expect(catalogue.sounds.get('gate-crank')?.files).toHaveLength(2);
+    // Les deux lanternes s'allument au même instant: deux voix, aucun intervalle minimal.
+    expect(catalogue.sounds.get('lantern-light')?.minIntervalSeconds).toBe(0);
+    expect(catalogue.sounds.get('lantern-light')?.maxVoices).toBe(2);
+    // L'effraie lointaine: ambiance des soirs sans le moment, non placée.
+    expect(catalogue.sounds.get('owl-far')?.moment).toBeNull();
+    expect(catalogue.sounds.get('owl-far')?.spatial).toBeNull();
+    // L'horloge ne s'entend qu'à moins de 3 m.
+    expect(catalogue.sounds.get('clock-tick')?.spatial?.cullBeyond).toBe(3);
+    for (const id of ['coins-drop', 'chantier-built', 'gift-give', 'coffee-grind', 'water-pour-copper']) {
+      expect(catalogue.sounds.has(id), id).toBe(true);
+    }
+    expect(catalogue.music.get('halte-evening')?.loop).toBeNull();
   });
 
   it('refuse un fichier abîmé en citant le champ', () => {

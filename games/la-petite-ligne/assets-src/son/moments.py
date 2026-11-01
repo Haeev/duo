@@ -752,11 +752,11 @@ def sons() -> list[Son]:
             _grillons_pre, 1, -29.0, 3, 0.0, 0.0, "faune-20", boucle=True, passe_haut=200, voix_max=1,
             extra={"momentSound": "crickets_night", "moment": "glowworms", "waitingDb": -6.0, "climaxRampMs": 4000},
             note="en attente à -6 dB (waitingDb), à pleine force pendant l'apogée en 4 s (climaxRampMs)"),
-        Son("glow-shimmer", "Vers luisants: quatre notes de célesta quand le pré s'allume (apogée, t = 0,5 s)", m, "ui",
+        Son("glow-shimmer", "Vers luisants: quatre notes de célesta quand le pré s'allume (apogée, t = 0,5 s)", m, "music",
             _scintillement, 2, -22.0, 2, 0.0, 0.0, None, canaux=2, voix_max=1, queue_reverbe=(1.6, 0.3),
             extra={"momentSound": "glow_shimmer", "moment": "glowworms"},
-            note="la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: "
-                 "bus interface, non placé, sans variation de hauteur (notes justes en sol majeur)"),
+            note="bus musique (fiche, question S3 réglée au tour 9): passe après la descente de l'apogée; non placé, "
+                 "sans variation de hauteur (notes justes en sol majeur)"),
         # Chevrette du pré (tour 7)
         Son("roe-call", "Chevrette: appel doux et nasal à son faon (apogée, t = 0)", m, "effects", _chevrette_appel,
             2, -26.0, 2, 0.03, 1.0, "faune-15", voix_max=1, extra={"momentSound": "roe_call", "moment": "roe_deer"}),
@@ -795,11 +795,11 @@ def sons() -> list[Son]:
             extra={"momentSound": "mist_ambience", "moment": "mist", "waitingDb": -6.0, "climaxRampMs": 3000},
             note="en attente à -6 dB (waitingDb), à pleine force en 3 s au début de l'apogée (climaxRampMs), "
                  "en même temps que la lumière se réchauffe"),
-        Son("mist-lift", "Brume: accord ouvert qui monte, harpe et cordes douces (apogée, t = 1,5 s)", m, "ui",
+        Son("mist-lift", "Brume: accord ouvert qui monte, harpe et cordes douces (apogée, t = 1,5 s)", m, "music",
             _brume_leve, 2, -22.0, 2, 0.0, 0.0, None, canaux=2, voix_max=1, duree_max=4.6,
             extra={"momentSound": "mist_lift", "moment": "mist"},
-            note="la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: "
-                 "bus interface (question S3), non placé, sans variation de hauteur (sol et do majeur)"),
+            note="bus musique (fiche, question S3 réglée au tour 9): passe après la descente de l'apogée; non placé, "
+                 "sans variation de hauteur (sol et do majeur)"),
         Son("blackbird-wake", "Brume: un merle chante dans les arbres de la rive nord (apogée, t = 3,0 s)", m, "effects",
             _merle, 3, -26.0, 2, 0.02, 1.0, None, voix_max=1, queue_reverbe=(1.2, 0.22),
             extra={"momentSound": "blackbird_wake", "moment": "mist"},
