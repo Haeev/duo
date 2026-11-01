@@ -219,3 +219,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le robot qui attend le train au quai (`lastDay`) passe avant `watchMoment`: un moment du samedi (le salut) doit s'y insérer explicitement.
 - `catalogueWindow` d'un samedi après la démo donne une échéance la veille: le catalogue est fermé tout le samedi; une page parue le samedi à 10 h se commande dès le dimanche.
 - Les champs facultatifs nouveaux de l'état (`train.slow`, `today.presses`) ne s'écrivent que s'ils servent (`delete` sinon): l'état des parties sans eux reste identique.
+
+## Retours de la soirée du 2026-11-01 (La Petite Ligne, vérifié le 2026-11-01)
+
+- Pose de meuble: le contrôle « occupé » doit tester le disque du corps (`touchesCell`, rayon 0,3 m), pas la case des pieds; un corps déjà dans un obstacle ne bougeait plus (`moveBody` refusait tout pas). Garde-fous: `closesRoom` (parcours à quatre voisins depuis la porte, seules les cases perdues comptent), `unstick` et `freeStuck` au chargement (`simulation/deblocage.ts`), et `moveBody` qui laisse sortir à pied (enfoncement qui ne grandit pas).
+- Le jeu n'a pas de menu de pause à lui: Échap ouvre celui de la plateforme (`apps/duo`, hors du jeu). Une commande « de pause » du jeu va dans le carnet (pied du panneau).
+- Un habitant a le rang de visée 0: posé sur le point d'usage d'un objet (Basile devant l'établi, sur la poutre), il vole Espace (parler, ou rien si aucune réplique). Règle `OBJECT_KINDS` de `bestTarget`: l'objet visé de plus près passe avant lui. Odette au comptoir reste à égalité (elle est sur le point même).
+- Rythme de la journée (`clock.pace`, `paces`): `secondsPerGameMinuteOn` multiplie par le facteur. Les aides des tests (`tests/aides.ts`, `src/interface/tests/aides.ts`) et la page de démonstration jouent au rythme `vif` (l'ancienne journée): les budgets de pas des robots et les durées des tests restent ceux d'avant. Une démo entière au rythme normal est jouée dans `tests/retours-soiree.test.ts`.
+- `pnpm test` du jeu: 18 min sur machine partagée (charge 30 sur 4 cœurs); lancer en arrière-plan avec `timeout` de 7 200 000 ms, la limite par défaut (30 min) tue la commande.
+- Basile joue l'animation `saw` toute la journée (activité `work`): posé sur la place des joueurs, il donnait l'impression qu'on sciait sans fin.

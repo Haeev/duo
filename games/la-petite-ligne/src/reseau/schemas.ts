@@ -91,6 +91,7 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('get_up') }),
   v.strictObject({ type: v.literal('night_choice'), choice: v.picklist(['continue', 'finish']) }),
   v.strictObject({ type: v.literal('hint_seen'), hint: Id }),
+  v.strictObject({ type: v.literal('unstick') }),
   v.strictObject({ type: v.literal('pin'), x: Finite, y: Finite }),
 ]) satisfies v.GenericSchema<Intent>;
 

@@ -10,7 +10,7 @@ import type { Content } from '../donnees/types';
 import type { GameMap, Rect } from '../etat/carte';
 import type { CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
-import { seasonOfDay } from '../donnees/calendrier';
+import { seasonOfDay, secondsPerGameMinuteOn } from '../donnees/calendrier';
 import { mistAmount } from '../etat/meteo';
 import { unitDraw } from '../etat/tirage';
 import { type Catalogue, type SequenceStep, sequenceOf, stepTime, stopTime } from './catalogue';
@@ -177,7 +177,7 @@ export class AudioBrain {
       arrival: content.settings.train.arrival,
       departure: content.settings.train.departure,
       firstDay: clock.firstDay.day,
-      secondsPerGameMinute: clock.secondsPerGameMinute,
+      secondsPerGameMinute: secondsPerGameMinuteOn(content.settings, clock.firstDay.day),
       slideSeconds: content.settings.feel.trainSlideSeconds,
       arrivalStopAt,
       departureMoveAt,

@@ -9,10 +9,11 @@ import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } 
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
 import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, updatePlacement } from './amenagement';
-import { durationMultiplier, eat, spend } from './besoins';
+import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
 import { bringPlanks, payImprovement } from './chantiers';
+import { unstick } from './deblocage';
 import { footprintCells, goTo, stopPath } from './deplacement';
 import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
@@ -149,15 +150,6 @@ export function updateCrafting(sim: Sim, c: Character): void {
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   emit(sim, { type: 'crafted', by: c.id, recipe: recipe.id, item: recipe.output.item, count: recipe.output.count });
   if (recipe.station === 'stove') emit(sim, { type: 'cooked', by: c.id, recipe: recipe.id });
-}
-
-function eatItem(sim: Sim, c: Character, item: string): void {
-  const def = sim.content.items[item];
-  if (def?.dish === null || def === undefined) return;
-  if (c.status !== 'active' && c.status !== 'menu') return;
-  if (takeFromBag(c, item, 1).length === 0) return;
-  eat(sim, c, item);
-  c.action = { kind: 'eat', since: sim.world.tick, duration: secondsToTicks(sim.content.settings.feel.actionSeconds.eat ?? 0), target: null };
 }
 
 function give(sim: Sim, c: Character, to: string, item: string, quality: Quality, count: number): void {
@@ -343,7 +335,7 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       craft(sim, c, intent.recipe);
       return;
     case 'eat':
-      eatItem(sim, c, intent.item);
+      eatFromBag(sim, c, intent.item);
       return;
     case 'give':
       give(sim, c, intent.to, intent.item, intent.quality, Math.floor(intent.count));
@@ -366,6 +358,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       nightChoice(sim, c.id, intent.choice);
       return;
     case 'hint_seen':
+      return;
+    case 'unstick':
+      unstick(sim, c);
       return;
     case 'pin': {
       if (!c.created || !Number.isFinite(intent.x) || !Number.isFinite(intent.y)) return;

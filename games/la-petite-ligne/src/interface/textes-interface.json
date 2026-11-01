@@ -234,6 +234,8 @@
     "keysClose": "fermer",
     "keysActivate": "activer",
     "gameGoesOn": "Le jeu continue pendant que tu lis.",
+    "unstick": "Débloquer mon personnage",
+    "unstickHelp": "Coincé dans un meuble ? Ton personnage revient sur la case libre la plus proche.",
     "categories": {
       "seed": "Graines",
       "crop": "Récolte",

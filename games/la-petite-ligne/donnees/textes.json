@@ -52,6 +52,8 @@
     "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
     "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur, le meuble tourné vers la pièce.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
+    "placement_blocks_way": "Ça fermerait le passage vers la porte: laisse un chemin libre.",
+    "unstuck": "Te revoilà sur une case libre: tu peux de nouveau marcher.",
     "fish_escaped": "Il s'est échappé.",
     "stump_hint": "Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place.",
     "tree_too_young": "Trop jeune pour la hache. Laisse-le grandir.",

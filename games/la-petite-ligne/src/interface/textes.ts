@@ -213,6 +213,8 @@ const SupplementSchema = v.object({
     keysPages: str,
     keysChoose: str,
     keysClose: str,
+    unstick: str,
+    unstickHelp: str,
     keysActivate: str,
     gameGoesOn: str,
     categories: v.record(str, str),

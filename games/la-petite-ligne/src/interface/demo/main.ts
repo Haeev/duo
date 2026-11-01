@@ -19,6 +19,7 @@ import type { GameAction } from '../../session';
 import type { Intent } from '../../etat/actions';
 import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameInterface, GameView } from '../../etat/vue';
+import { withClockPace } from '../../donnees/calendrier';
 import { loadContent } from '../../donnees/contenu';
 import { CONTENT_FILES } from '../../donnees/fichiers';
 import { loadMap } from '../../donnees/carte';
@@ -58,7 +59,8 @@ declare global {
 const params = new URLSearchParams(location.search);
 const me: CharacterId = params.get('joueur') === 'p2' ? 'p2' : 'p1';
 const partnerId: CharacterId = me === 'p1' ? 'p2' : 'p1';
-const content = loadContent(CONTENT_FILES);
+// Rythme vif (R14): les situations préparées par les robots restent dans leurs budgets de pas.
+const content = withClockPace(loadContent(CONTENT_FILES), 'vif');
 const map = loadMap(MAP_FILES).map;
 const players = [
   { id: 'membre-a', name: 'Camille', color: '#5CE1E6' },

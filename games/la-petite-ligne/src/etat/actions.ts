@@ -93,7 +93,9 @@ export type Intent =
   // Repère (G ou clic molette): une épingle à sa couleur, visible chez les deux (GE-07)
   | { type: 'pin'; x: number; y: number }
   // Astuce vue (l'interface l'a affichée)
-  | { type: 'hint_seen'; hint: string };
+  | { type: 'hint_seen'; hint: string }
+  /** « Débloquer mon personnage » (R01): l'hôte le replace sur la case libre atteignable la plus proche. */
+  | { type: 'unstick' };
 
 export type IntentType = Intent['type'];
 
