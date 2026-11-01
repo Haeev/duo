@@ -9,6 +9,7 @@ import type { QuestDef } from '../donnees/types';
 import { HEN_NAMES_QUEST, henUnknown } from '../etat/secrets';
 import { evaluate, secretEntry, variantOf } from './conditions';
 import { type Sim, character, distance, emit, message, partnerName, partnerOf, say } from './contexte';
+import { recordSecret } from './souvenirs';
 
 /** Conversation « Comment s'appelle... ? » ouverte chez celui qui appelle une poule (pas un dialogue des données). */
 export const HEN_CALL_DIALOGUE = 'hen_call';
@@ -79,8 +80,9 @@ export function secretMistake(sim: Sim, quest: string | null): void {
   say(sim, entry.informed, nudge, { partner: character(sim, entry.doer).name });
 }
 
-/** Fin d'une quête à secret: réussie sans aucune erreur, un petit Cœur en plus pour chacun. */
+/** Fin d'une quête à secret: un souvenir chez les deux; réussie sans aucune erreur, un petit Cœur en plus pour chacun. */
 export function finishSecret(sim: Sim, quest: string): void {
+  recordSecret(sim, quest);
   const entry = secretEntry(sim, quest);
   if (entry?.errors !== 0) return;
   for (const c of sim.world.characters) c.heartToday.firstTry = true;

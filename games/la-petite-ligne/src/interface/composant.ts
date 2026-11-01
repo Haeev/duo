@@ -9,7 +9,7 @@ import type { UiContext } from './contexte';
 import type { UiSoundId } from './sons';
 
 /** Onglet ou partie d'un panneau à montrer à l'ouverture. */
-export type PanelTab = 'quests' | 'mail' | 'bag' | 'buy' | 'sell';
+export type PanelTab = 'quests' | 'mail' | 'bag' | 'memories' | 'buy' | 'sell';
 
 export interface UiHost {
   readonly ctx: UiContext;

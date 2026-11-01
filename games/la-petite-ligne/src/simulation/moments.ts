@@ -17,35 +17,14 @@ import { type Sim, bump, character, distance, emit, message, notifyKey, partnerN
 import { refreshBlockers, stopPath } from './deplacement';
 import { moveBody } from './grille';
 import { runEffects } from './effets';
+import { unitDraw } from '../etat/tirage';
+import { recordMoment } from './souvenirs';
 
 // ---------------------------------------------------------------------------
 // Tirage sans le générateur de la partie
 
-/** FNV-1a 32 bits (comme `variantOf`). */
-export function fnv1a(text: string): number {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i);
-    h = Math.imul(h, 0x01000193) >>> 0;
-  }
-  return h;
-}
-
-/** Mélange final de MurmurHash3. */
-export function fmix32(value: number): number {
-  let h = value >>> 0;
-  h ^= h >>> 16;
-  h = Math.imul(h, 0x85ebca6b) >>> 0;
-  h ^= h >>> 13;
-  h = Math.imul(h, 0xc2b2ae35) >>> 0;
-  h ^= h >>> 16;
-  return h >>> 0;
-}
-
-/** Nombre de [0, 1[ tiré de « graine:clé:jour » (script `moments_rares.py`, même formule). */
-export function unitDraw(seed: number, key: string, day: number): number {
-  return fmix32(fnv1a(`${String(seed)}:${key}:${String(day)}`)) / 2 ** 32;
-}
+// Formule commune avec la rumeur du bourg (`etat/tirage.ts`), réexportée pour les tests.
+export { fmix32, fnv1a, unitDraw } from '../etat/tirage';
 
 // ---------------------------------------------------------------------------
 // Quêtes qui portent un moment
@@ -262,6 +241,7 @@ function startClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
     world.moments.history.push({ id: def.id, day: world.clock.day, weekday: (world.clock.day - 1) % Math.max(1, weekdays), origin: today.origin, seen: true });
   }
   world.session.togetherMoments += 1;
+  recordMoment(sim, def, today);
   runEffects(sim, def.effects, null);
 }
 

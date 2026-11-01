@@ -16,6 +16,8 @@ Règles:
 | `format-2-milieu-semaine-2.json` | 2 | mardi, jour 11, midi | 7 | `generer.ts` (`d64237e`) |
 | `format-3-fin-semaine-1.json` | 3 | jour 8 à 16 h, commande 1 payée; moments rares et secrets (tour 6) | 42 | `generer.ts` (tour 6) |
 | `format-3-milieu-semaine-2.json` | 3 | mardi, jour 11, midi; « Le mot de Lucie » fini, les oies à venir | 7 | `generer.ts` (tour 6) |
+| `format-4-fin-semaine-1.json` | 4 | jour 8 à 16 h, commande 1 payée; souvenirs: renard, oies, noms des poules (tour 7) | 42 | `generer.ts` (tour 7) |
+| `format-4-milieu-semaine-2.json` | 4 | mardi, jour 11, midi; souvenirs: héron, renard, vers luisants, poules, mot de Lucie | 7 | `generer.ts` (tour 7) |
 
 ## Format en cours
 

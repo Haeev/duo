@@ -14,7 +14,7 @@ import spriteIcones from '../../ui-maquettes/icones.svg?raw';
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { CameraCommand, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
-import { NotebookPanel } from './carnet';
+import { NotebookPanel, startMemorySession } from './carnet';
 import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type UiContext, characterOf, createUiContext } from './contexte';
@@ -83,6 +83,7 @@ class GameUi implements GameInterface, UiHost {
     const world = options.view.world();
     const me = characterOf(world, this.ctx.me);
     this.titleDone = !((world.phase === 'creation' && me?.created !== true) || world.phase === 'breakfast');
+    startMemorySession(world, this.ctx.me);
 
     // Réglages de la plateforme et couleurs des deux joueurs (README des maquettes, 2.2).
     const html = document.documentElement;

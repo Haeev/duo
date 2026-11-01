@@ -16,7 +16,7 @@ const strings = <K extends string>(keys: readonly K[]): v.ObjectSchema<Record<K,
 /** Parties de `textes.json` que l'interface lit (`Texts.raw`). */
 const GameUiSchema = v.object({
   ui: v.object({
-    notebookTabs: strings(['quests', 'mail', 'bag'] as const),
+    notebookTabs: strings(['quests', 'mail', 'bag', 'memories'] as const),
     questKinds: strings(['main', 'side'] as const),
     questDone: str,
     /** En-tête de la fiche secrète (R16) au carnet. */
@@ -33,6 +33,19 @@ const GameUiSchema = v.object({
     proposal: strings(['accept', 'decline', 'withdraw'] as const),
     breakfast: strings(['title', 'envie', 'sharedEnvie', 'weather', 'start'] as const),
     creation: strings(['title', 'name', 'hair', 'outfit', 'ready', 'waiting'] as const),
+  }),
+  /** Onglet Souvenirs du carnet (tour 7, conception section 2.3). */
+  souvenirs: v.object({
+    ...strings(['empty', 'rumorLead', 'listLabel', 'date', 'divider', 'yearN', 'often', 'last', 'lastOtherYear', 'firstTry', 'vignetteGeneric', 'fresh'] as const).entries,
+    seasons: v.pipe(v.array(str), v.minLength(1)),
+    seasonTitles: v.pipe(v.array(str), v.minLength(1)),
+    seasonsOf: v.pipe(v.array(str), v.minLength(1)),
+    years: v.array(str),
+    /** Par nombre de passages: 2 « Vu deux fois ensemble », 3...; au-delà, `often`. */
+    times: v.array(str),
+    self: strings(['hintVillager', 'hintVillagerPartner', 'hintEve', 'hintEvePartner', 'quest'] as const),
+    /** Une entrée par quête à secret: texte de la vignette, ligne chez l'informé, chez l'autre. */
+    secrets: v.record(v.string(), strings(['vignette', 'informed', 'doer'] as const)),
   }),
   nightScreen: strings(['title', 'text', 'continue', 'finish', 'partnerContinue', 'partnerFinish'] as const),
   endScreen: v.object({
@@ -275,7 +288,7 @@ const SupplementSchema = v.object({
   corner: strings(['designate', 'move'] as const),
   /** Moments rares (tour 6): ligne d'observation sous l'horloge, confidence du matin. */
   moments: v.object({
-    ...strings(['watchLabel', 'partnerReady', 'partnerNotSettled', 'partnerLetGo', 'hintOverline', 'hintChip', 'hintHelp'] as const).entries,
+    ...strings(['watchLabel', 'partnerReady', 'partnerNotSettled', 'partnerLetGo', 'hintOverline', 'hintChip', 'hintHelp', 'memoryAdded'] as const).entries,
     pose: strings(['close', 'tooClose', 'still', 'facing', 'stillFacing', 'seated', 'hold'] as const),
   }),
   /** Informations propres (R16): fiches du carnet et appel des poules. */

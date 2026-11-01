@@ -149,7 +149,12 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
                 "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
-                "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret"}
+                "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
+                # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
+                "villager", "season", "year", "times", "seasonOf"}
+
+# Sprite des icônes de l'interface: les vignettes des souvenirs y sont des symboles (tour 7).
+ICONS_SOURCE = Path(__file__).resolve().parent.parent / "ui-maquettes" / "outils" / "icones-source.svg"
 
 # Points de carte demandés par les données. Le level designer les crée dans donnees/cartes/ (voir README).
 NAMED_POINTS_OUTSIDE_MAP = {"offstage"}
@@ -697,6 +702,45 @@ def check_secret(quest: dict[str, Any], w: str, reg: Registry, report: Report) -
         check_condition(secret["revealOn"], f"{ws}.revealOn", reg, report)
     if "nudge" in secret:
         ref("text", secret["nudge"], ws, reg, report)
+    check_vignette(secret.get("vignette"), ws, report)
+
+
+def icon_ids() -> set[str] | None:
+    if not ICONS_SOURCE.exists():
+        return None
+    return set(re.findall(r'<symbol id="([^"]+)"', ICONS_SOURCE.read_text(encoding="utf-8")))
+
+
+def check_vignette(value: Any, where: str, report: Report) -> None:
+    """Vignette d'un souvenir: un symbole du sprite des icônes (avertissement s'il n'est pas encore dessiné)."""
+    if not isinstance(value, str) or not value:
+        report.error(where, "« vignette » attendue (symbole du sprite des icônes)")
+        return
+    ids = icon_ids()
+    if ids is not None and value not in ids:
+        report.warn(where, f"vignette {value!r} absente de icones-source.svg: vignette générique en attendant")
+
+
+def check_souvenirs(data: dict[str, Any], reg: Registry, report: Report) -> None:
+    """Textes de l'onglet Souvenirs (`textes.souvenirs`, tour 7): une entrée par quête à secret."""
+    souvenirs = data.get("textes", {}).get("souvenirs")
+    if not isinstance(souvenirs, dict):
+        report.error("textes.souvenirs", "bloc attendu (onglet Souvenirs du carnet)")
+        return
+    for key in ("seasons", "seasonTitles", "seasonsOf"):
+        values = souvenirs.get(key)
+        seasons = data.get("reglages", {}).get("memories", {}).get("seasonsPerYear", 4)
+        if not isinstance(values, list) or len(values) != seasons:
+            report.error(f"textes.souvenirs.{key}", f"{seasons} saisons attendues")
+    secrets = souvenirs.get("secrets", {})
+    for quest in sorted(reg.secret_quests):
+        entry = secrets.get(quest)
+        for role in ("vignette", "informed", "doer"):
+            if not isinstance(entry, dict) or not isinstance(entry.get(role), str) or not entry.get(role):
+                report.error(f"textes.souvenirs.secrets.{quest}", f"« {role} » attendu (souvenir de la quête à secret)")
+    for quest in secrets:
+        if quest not in reg.secret_quests:
+            report.error(f"textes.souvenirs.secrets.{quest}", "quête inconnue ou sans secret")
 
 
 def check_secret_texts(data: dict[str, Any], report: Report) -> None:
@@ -704,8 +748,10 @@ def check_secret_texts(data: dict[str, Any], report: Report) -> None:
 
     def visit(node: Any, where: str) -> None:
         if isinstance(node, str):
-            if "{secret}" in node and not where.endswith("objectiveByRole.informed"):
-                report.error(where, "{secret} hors d'un texte de l'informé (objectiveByRole.informed)")
+            souvenir = where.startswith("textes.souvenirs.secrets.") and where.rsplit(".", 1)[-1] in SECRET_ROLES
+            if "{secret}" in node and not where.endswith("objectiveByRole.informed") and not souvenir:
+                report.error(where, "{secret} hors d'un texte de l'informé (objectiveByRole.informed) "
+                             "ou d'un souvenir de quête finie (textes.souvenirs.secrets.<quête>.informed|doer)")
         elif isinstance(node, dict):
             for key, value in node.items():
                 visit(value, f"{where}.{key}")
@@ -868,6 +914,15 @@ def check_moments(folder: Path, reg: Registry, report: Report, map_objects: set[
         texts = m.get("texts", {})
         for key in ("climax", "memory"):
             ref("text", texts.get(key), f"{w}.texts", reg, report)
+        # Onglet Souvenirs (tour 7): rumeur (sauf moment de quête seule), vignette et son texte de remplacement.
+        for key in ("rumor", "vignette"):
+            if texts.get(key) is not None:
+                ref("text", texts[key], f"{w}.texts", reg, report)
+        if texts.get("rumor") is None and m.get("mode") != "quest":
+            report.error(f"{w}.texts", "« rumor » attendu: un moment d'ambiance a sa rumeur du bourg (onglet Souvenirs)")
+        if texts.get("vignette") is None:
+            report.error(f"{w}.texts", "« vignette » attendu: texte de remplacement de la vignette du souvenir")
+        check_vignette(m.get("vignette"), w, report)
         if texts.get("hint") is not None:
             ref("text", texts["hint"], f"{w}.texts", reg, report)
         if m.get("hintFrom") is not None:
@@ -1081,6 +1136,7 @@ def main() -> int:
         if quest not in reg.secret_quests:
             report.error(where, f"secret_role: la quête {quest!r} n'a pas de secret")
     check_secret_texts(data, report)
+    check_souvenirs(data, reg, report)
     if moments is not None:
         data = {**data, "moments": moments}
     for name, content in data.items():

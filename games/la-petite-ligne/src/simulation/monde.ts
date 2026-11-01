@@ -17,6 +17,7 @@ import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { type Sim, wrapWorld } from './contexte';
 import { ITEM, SPAWN_POINTS } from './ids';
+import { emptyMemories } from './souvenirs';
 import { addToBag, addStack } from './sac';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
@@ -213,6 +214,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     session: { firstDay: s.clock.firstDay.day, togetherMoments: 0, highlights: [] },
     moments: { today: null, history: [], hintTurn: s.moments.firstHint },
     secrets: { turn: s.secrets.firstInformed, entries: [] },
+    memories: emptyMemories(),
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

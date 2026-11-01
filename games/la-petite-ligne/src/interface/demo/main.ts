@@ -7,7 +7,8 @@
  *
  * Paramètres: `scenario` (voir `scenarios.ts`), `joueur` (p1 ou p2),
  * `taille` (100, 125, 150), `animations=reduites`, `rendu=0` (sans 3D), `temps=arrete`
- * (la simulation ne tourne plus: la situation posée par le scénario reste telle quelle).
+ * (la simulation ne tourne plus: la situation posée par le scénario reste telle quelle),
+ * `onglet=souvenirs` (le carnet s'ouvre sur les Souvenirs).
  */
 import type { Intent } from '../../etat/actions';
 import type { CharacterId, WorldEvent } from '../../etat/types';
@@ -21,6 +22,7 @@ import { createWorld } from '../../simulation/monde';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { SIM_DT } from '../../simulation/constantes';
+import { rememberNotebookTab } from '../carnet';
 import { createInterface } from '../index';
 import { setupScenario } from './scenarios';
 
@@ -51,6 +53,7 @@ const sim = createWorld(content, map, 20261031, [
   { id: 'membre-b', name: 'Sacha', color: '#8D6CFF' },
 ]);
 const afterMount = setupScenario(sim, params.get('scenario') ?? 'titre', me);
+if (params.get('onglet') === 'souvenirs') rememberNotebookTab('memories');
 
 const listeners = new Set<(event: WorldEvent) => void>();
 const log: { camera: string[]; intents: string[]; sounds: string[] } = { camera: [], intents: [], sounds: [] };

@@ -542,6 +542,8 @@ export class Hud {
         typographier(toastText(n, ctx.texts.messages, { partner })),
         // Un mauvais nom: la poule répond à sa façon, une réplique différente d'une erreur à l'autre.
         visual.henAside === true ? el('span', { class: 'lpl-toast__aside', 'aria-hidden': 'true', text: henWrongAside(ctx, n.id) }) : null,
+        // L'apogée d'un moment vu à deux: il entre dans l'onglet Souvenirs du carnet (tour 7).
+        visual.variant === 'moment' ? el('span', { class: 'lpl-toast__more', text: ctx.t(ctx.texts.extra.moments.memoryAdded) }) : null,
       ]);
       this.toastItems.set(key, li);
       this.toasts.append(li);

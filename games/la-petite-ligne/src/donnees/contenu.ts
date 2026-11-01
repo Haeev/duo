@@ -5,7 +5,7 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
-import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_MOMENTS, DEFAULT_RANGES, DEFAULT_SECRETS } from './defauts';
+import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_MEMORIES, DEFAULT_MOMENTS, DEFAULT_RANGES, DEFAULT_SECRETS } from './defauts';
 import { ContentError, Reader } from './lecteur';
 import type {
   AnimalDef,
@@ -740,6 +740,7 @@ function parseSecret(r: Reader | null): QuestSecretDef | null {
     card: { title: card.at('title').string(), lines },
     revealOn: reveal === null ? null : parseCondition(reveal, 'game_start'),
     nudge: optString(r, 'nudge'),
+    vignette: optString(r, 'vignette'),
   };
 }
 
@@ -909,7 +910,14 @@ function parseMoment(m: Reader): MomentDef {
         range: s.at('range').number(),
       })),
     },
-    texts: { hint: optString(texts, 'hint'), climax: texts.at('climax').string(), memory: texts.at('memory').string() },
+    texts: {
+      hint: optString(texts, 'hint'),
+      climax: texts.at('climax').string(),
+      memory: texts.at('memory').string(),
+      rumor: optString(texts, 'rumor'),
+      vignette: optString(texts, 'vignette'),
+    },
+    vignette: optString(m, 'vignette'),
     hintFrom: optString(m, 'hintFrom'),
     reward: { heart: optNumber(reward, 'heart', 0), money: optNumber(reward, 'money', 0) },
     effects: effects(m.opt('effects')),
@@ -1132,6 +1140,17 @@ function parseMomentSettings(r: Reader | null): Settings['moments'] {
   };
 }
 
+/** Souvenirs (`reglages.memories`, tour 7): chaque clé absente garde sa valeur de `defauts.ts`. */
+function parseMemorySettings(r: Reader | null): Settings['memories'] {
+  const d = DEFAULT_MEMORIES;
+  if (r === null) return { ...d };
+  return {
+    seasonDays: r.has('seasonDays') ? r.at('seasonDays').integer(1) : d.seasonDays,
+    seasonsPerYear: r.has('seasonsPerYear') ? r.at('seasonsPerYear').integer(1) : d.seasonsPerYear,
+    maxBytes: r.has('maxBytes') ? r.at('maxBytes').integer(1) : d.maxBytes,
+  };
+}
+
 /** Informations propres (`reglages.secrets`): chaque clé absente garde sa valeur de `defauts.ts`. */
 function parseSecretSettings(r: Reader | null): Settings['secrets'] {
   const d = DEFAULT_SECRETS;
@@ -1280,6 +1299,7 @@ function parseSettings(r: Reader): Settings {
     benches: parseBenches(r.opt('benches')),
     moments: parseMomentSettings(r.opt('moments')),
     secrets: parseSecretSettings(r.opt('secrets')),
+    memories: parseMemorySettings(r.opt('memories')),
     feel: parseFeel(r.opt('feel')),
   };
 }
@@ -1376,7 +1396,7 @@ function checkReferences(content: Content): void {
     if (m.quest !== null && !questIds.has(m.quest)) fail(`${where}: quête inconnue « ${m.quest} »`);
     const steps = content.quests.find((q) => q.id === m.quest)?.steps ?? [];
     if (m.questStep !== null && !steps.some((s) => s.id === m.questStep)) fail(`${where}: étape inconnue « ${m.questStep} »`);
-    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory]) {
+    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory, m.texts.rumor, m.texts.vignette]) {
       if (key !== null && !(key in content.texts.messages)) fail(`${where}: message inconnu « ${key} »`);
     }
     if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);
