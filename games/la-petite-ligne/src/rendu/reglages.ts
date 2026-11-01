@@ -439,6 +439,37 @@ export const RENDER_SETTINGS = {
     halfWidth: 1.1,
     halfHeight: 1.0,
     nearer: 0.35,
+    /**
+     * Second trou, sur l'habitant mené par la chorégraphie (Basile en haut de son échelle,
+     * contrôle du DA après le tour 6): dans les orientations 1 à 3, le nichoir passe derrière le
+     * tronc et le trou du lieu se ferme, mais le houppier (orientation 1) ou un sapin de la lisière
+     * (orientation 2) cache encore Basile. Tout le décor devant lui s'efface, arbres compris.
+     * Centre: ses pieds plus `lift` (m), entre la poitrine et les mains levées; `nearer` comme
+     * plus haut: l'échelle et le tronc, à moins d'un mètre devant lui, restent pleins.
+     */
+    actor: {
+      moments: ['ladder'],
+      phases: ['climax'],
+      villager: 'basile',
+      lift: 1.3,
+      halfWidth: 0.75,
+      halfHeight: 1.0,
+      nearer: 0.6,
+    },
+  },
+  /**
+   * Main droite de Basile au bas du nichoir pendant `reach_up` (contrôle du DA après le tour 6:
+   * le clip lève la main à hauteur d'épaule, 0,35 m sous la caisse). Cible: le milieu du dessous
+   * de la caisse (suit son pivot), avancé de `inset` (m) vers Basile pour que la main tienne le
+   * bord avant, visible d'en haut, et relevé de `lift` (m). Poids: monte entre `riseFrom` et
+   * `riseTo` (s dans le clip), puis retombe en `releaseSeconds` au début des coups de marteau.
+   */
+  ladderReach: {
+    inset: 0.08,
+    lift: 0.02,
+    riseFrom: 0.1,
+    riseTo: 0.45,
+    releaseSeconds: 0.25,
   },
 } as const;
 

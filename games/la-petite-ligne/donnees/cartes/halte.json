@@ -485,7 +485,7 @@
     {"id": "geese_rest", "x": 25.5, "y": 40.0, "role": "moment des oies: eau profonde et calme devant le banc de la berge, à 4,3 m de lui; on la regarde depuis la berge", "moment": "geese", "portee": 4.5},
     {"id": "nest_box", "x": 50.822, "y": 5.4, "role": "le nichoir de Basile, face est du seul vieux chêne qu'on ne coupe pas (`tree_oak_01`): centre de la caisse à 2,25 m, trou à 2,30 m; un peu au nord de l'est pour laisser 4,7 cm au montant de l'échelle", "moment": "tits", "z": 2.25},
     {"id": "ladder_foot", "x": 51.19, "y": 6.19, "role": "pied de l'échelle de Basile, au sud-est du chêne, tête contre le tronc en (50,64 ; 5,64) vers 2,8 m", "moment": "ladder", "cap_degres": 315},
-    {"id": "ladder_hold_east", "x": 51.61, "y": 5.79, "role": "tenir l'échelle, côté est (au nord-est du pied), mains au montant (tourné vers le sud-ouest)", "moment": "ladder", "cap_degres": 225},
+    {"id": "ladder_hold_east", "x": 51.48, "y": 5.66, "role": "tenir l'échelle, côté est (au nord-est du pied), mains au montant (tourné vers le sud-ouest)", "moment": "ladder", "cap_degres": 225},
     {"id": "ladder_hold_west", "x": 50.79, "y": 6.61, "role": "tenir l'échelle, côté ouest (au sud-ouest du pied), mains au montant (tourné vers le nord-est)", "moment": "ladder", "cap_degres": 45},
     {"id": "nest_oak_basile", "x": 51.58, "y": 6.58, "role": "Basile derrière le pied de son échelle, pendant « Où est passé Basile ? »; il en part et y revient", "cap_degres": 315},
     {"id": "fox_track_west", "x": 0.2, "y": 13.5, "role": "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast", "moment": "fox", "portee": 4.0},

@@ -9,7 +9,7 @@
  * même instant. Le rendu garde sa propre horloge, recalée sur le temps de la simulation, pour un
  * mouvement continu entre deux pas (et entre deux états reçus chez l'invité).
  */
-import { AnimationMixer, Group, LoopOnce, LoopRepeat, Vector3, type AnimationAction, type AnimationClip, type Object3D } from 'three';
+import { AnimationMixer, Box3, Group, LoopOnce, LoopRepeat, Matrix4, Mesh, Vector3, type AnimationAction, type AnimationClip, type BufferGeometry, type Object3D } from 'three';
 import type { Content, MomentActorDef, MomentChoreography, MomentDef, MomentKeyframe } from '../donnees/types';
 import type { GameMap, MapHook } from '../etat/carte';
 import {
@@ -27,7 +27,7 @@ import { smoothFactor } from './camera';
 import { dampAngle, yawFromFacing, yawFromQuarter, type FrameContext } from './contexte';
 import { textHash, type ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
-import type { CharactersPart, VillagerDirection } from './personnages';
+import type { CharactersPart, HandReach, VillagerDirection } from './personnages';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -275,6 +275,12 @@ export class MomentsPart implements EventfulPart {
   private readonly frame: ActorFrame = { x: 0, y: 0, z: 0, facing: null, clip: null, clipTime: 0, visible: false };
   private readonly socketPoint = new Vector3();
   private readonly rung: number;
+  /** Dessous de la caisse du nichoir, dans son repère (calculé au premier besoin). */
+  private nestBottom: Vector3 | null = null;
+  private readonly reachPoint = new Vector3();
+  private readonly reachTarget: HandReach = { x: 0, y: 0, z: 0, weight: 0 };
+  /** Dernière pose imposée par une chorégraphie (habitant, position, hauteur, image), lue par le moteur. */
+  private readonly directed = { villager: '', x: 0, y: 0, z: 0, time: Number.NaN };
 
   constructor(
     private readonly map: GameMap,
@@ -844,7 +850,13 @@ export class MomentsPart implements EventfulPart {
       const clip = s.clip ?? 'idle';
       const since = t - s.clipSince;
       const nest = this.map.points[NEST_MODEL] ?? null;
-      const base = { kind: 'pose' as const, x: s.x, y: s.y, z: s.z, facing, look: nest, tool: null };
+      const reach = this.nestReach(clip, since, s.x, s.y);
+      const base = { kind: 'pose' as const, x: s.x, y: s.y, z: s.z, facing, look: nest, tool: null, reach };
+      this.directed.villager = villager.id;
+      this.directed.x = s.x;
+      this.directed.y = s.y;
+      this.directed.z = s.z;
+      this.directed.time = context.time;
       if (clip === CLIMB) {
         // Les pieds suivent les barreaux: l'instant du clip vient de la hauteur atteinte.
         const loop = SECONDS_PER_RUNG * 2;
@@ -868,7 +880,66 @@ export class MomentsPart implements EventfulPart {
     const stopped = villager.speed <= RENDER_SETTINGS.characters.walkThreshold;
     if (!stopped || villager.talkingWith.length > 0 || Math.hypot(villager.pos.x - rest.x, villager.pos.y - rest.y) > 0.8) return null;
     const nest = this.map.points[NEST_MODEL] ?? null;
-    return { kind: 'pose', x: villager.pos.x, y: villager.pos.y, z: 0, facing: actor.facing, clip: 'idle', clipTime: null, timeScale: 1, tool: null, look: nest };
+    return { kind: 'pose', x: villager.pos.x, y: villager.pos.y, z: 0, facing: actor.facing, clip: 'idle', clipTime: null, timeScale: 1, tool: null, look: nest, reach: null };
+  }
+
+  /**
+   * Main droite de Basile au bas du nichoir pendant qu'il le redresse (`RENDER_SETTINGS.ladderReach`),
+   * relâchée au début des coups de marteau; `null` hors de ces clips.
+   */
+  private nestReach(clip: string, since: number, x: number, y: number): HandReach | null {
+    const settings = RENDER_SETTINGS.ladderReach;
+    let weight = 0;
+    if (clip === REACH) weight = smoothstep(settings.riseFrom, settings.riseTo, since);
+    else if (clip === HAMMER) weight = 1 - smoothstep(0, settings.releaseSeconds, since);
+    const nest = this.nest;
+    if (weight <= 0 || nest === null) return null;
+    if (this.nestBottom === null) {
+      // Boîte du modèle dans son propre repère (une seule fois: la géométrie ne change pas).
+      // Matrices locales seulement, du maillage jusqu'au nichoir (son pivot n'y entre pas).
+      const box = new Box3();
+      const chain = new Matrix4();
+      nest.object.traverse((child) => {
+        if (!(child instanceof Mesh)) return;
+        const geometry = child.geometry as BufferGeometry;
+        geometry.computeBoundingBox();
+        const local = geometry.boundingBox;
+        if (local === null) return;
+        chain.identity();
+        for (let node: Object3D | null = child; node !== null && node !== nest.object; node = node.parent) {
+          node.updateMatrix();
+          chain.premultiply(node.matrix);
+        }
+        box.union(local.clone().applyMatrix4(chain));
+      });
+      if (box.isEmpty()) return null;
+      this.nestBottom = new Vector3((box.min.x + box.max.x) / 2, box.min.y, (box.min.z + box.max.z) / 2);
+    }
+    const p = this.reachPoint.copy(this.nestBottom).applyMatrix4(nest.object.matrixWorld);
+    const dx = x - p.x;
+    const dy = y - p.z;
+    const length = Math.hypot(dx, dy);
+    if (length > 0) {
+      p.x += (dx / length) * settings.inset;
+      p.z += (dy / length) * settings.inset;
+    }
+    const target = this.reachTarget;
+    target.x = p.x;
+    target.y = p.z;
+    target.z = p.y + settings.lift;
+    target.weight = weight;
+    return target;
+  }
+
+  /**
+   * Pose de chorégraphie imposée à cet habitant pendant l'image `time` (x, y de la carte, z hauteur
+   * au-dessus du sol dans `out`); faux s'il n'est pas mené par un moment à cette image.
+   */
+  directedPose(villagerId: string, time: number, out: Vector3): boolean {
+    const d = this.directed;
+    if (d.villager !== villagerId || d.time !== time) return false;
+    out.set(d.x, d.y, d.z);
+    return true;
   }
 
   /** Où regardent les habitants spectateurs: la première bête dessinée du moment. */

@@ -485,7 +485,9 @@ POINTS = [
       "4,7 cm au montant de l'échelle", moment="tits", z=2.25),
     p("ladder_foot", 51.19, 6.19, "pied de l'échelle de Basile, au sud-est du chêne, tête contre le tronc "
       "en (50,64 ; 5,64) vers 2,8 m", moment="ladder", cap_degres=315),
-    p("ladder_hold_east", 51.61, 5.79, "tenir l'échelle, côté est (au nord-est du pied), mains au montant "
+    # Place est reculée de 0,13 m en x et en y le long de l'échelle (revue du DA, tour 6): même colonne de
+    # l'écran en vue par défaut, mais ses pieds ne passent plus derrière le bord du toit de la remise.
+    p("ladder_hold_east", 51.48, 5.66, "tenir l'échelle, côté est (au nord-est du pied), mains au montant "
       "(tourné vers le sud-ouest)", moment="ladder", cap_degres=225),
     p("ladder_hold_west", 50.79, 6.61, "tenir l'échelle, côté ouest (au sud-ouest du pied), mains au montant "
       "(tourné vers le nord-est)", moment="ladder", cap_degres=45),

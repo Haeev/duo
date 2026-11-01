@@ -153,3 +153,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Trou tramé d'un lieu (pas d'un personnage): avancer le repère de profondeur (`nearer`) pour que ce qui est juste devant (échelle, tronc) reste plein, et ne l'ouvrir que si la caméra voit la face de l'objet (sinon il coupe le tronc qui est devant).
 - Un compteur qui finit une quête (`moment_seen`) posé à la fin d'un spectacle: les tests qui attendaient la quête finie juste après le début doivent attendre la fin; une sauvegarde faite pendant le spectacle doit le finir au rechargement (`settleSavedClimax`), sinon le compteur n'est jamais posé.
 - Les tests audio fabriquent un monde par `newSim` (phase du titre, pas `day`): tout filtre « journée seulement » demande `world.phase = 'day'` dans leur préparation.
+
+## Correctifs légers et faune d'ambiance (La Petite Ligne, vérifié le 2026-11-01, tour 7)
+
+- Hachage `h ^= h >>> 16; return h / 2 ** 32`: le dernier XOR rend un entier signé, donc parfois négatif. Finir par `(h >>> 0) / 2 ** 32` (bug encore présent dans `vers-luisants.ts`: des lanternes peuvent tomber hors de l'ellipse).
+- Boîte d'un modèle dans son propre repère: ne pas composer `child.matrixWorld` et l'inverse du `matrixWorld` du parent (matrices des enfants pas à jour au premier passage, écart de 9 cm sur le nichoir); multiplier les `matrix` locales du maillage jusqu'au nœud.
+- Trous de visibilité: un trou par personnage mené par un moment (`momentSeeThrough.actor`), calculé après la mise à jour des parties (pose de l'image en cours); `nearer` de 0,6 m garde l'échelle pleine et efface houppier et sapin devant.
+- Main posée par le rendu (`portee.ts`): deux os et le buste, après le mélangeur, avec retour des rotations du clip avant sa mise à jour (comme `BoneOffsets`, sinon la pose s'accumule quand le clip est figé). Basile en haut de l'échelle (`reach_up`): épaules à 1,13 m au-dessus des pieds (genoux pliés), bras de 0,55 m jusqu'à `socket_hand_r`.
+- Sonde de pose dans la page: `window.dgEngine.world.parts` donne les parties (`constructor.name`), leurs champs privés se lisent à l'exécution. Déplacer un joueur après le chargement: muter `engine.view.world().characters[0].pos` et `prev` avant `advance`.
+- Petite faune côté rendu: le test du cadre (`Frustum` de la caméra, une sphère par bête, une pour tout le pré) suffit à ne rien animer hors champ; les papillons en deux instances d'aile par bête dans le programme des semis (palette instanciée avec couleur): zéro programme de plus, un appel.
