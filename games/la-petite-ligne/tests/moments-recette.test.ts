@@ -106,21 +106,24 @@ describe('QA6-01: les places de l’échelle citées dans le code existent sur l
 
 describe('M-06: le texte d’apogée ne décrit rien qui ne se voie (relecture outillée)', () => {
   // Les autres affirmations ont été relues à la main contre la chorégraphie et les sons
-  // (rapport de recette, tableau M-06). Celle-ci se mesure: « passent juste au-dessus de vous ».
-  it.fails('QA6-03 oies: l’oie de tête passe à moins de 2,5 m (à l’horizontale) d’une place du banc de la berge, entre 1 et 8 m de haut', () => {
+  // (rapport de recette, tableau M-06). QA6-03: l'oie de tête ne passe jamais à moins de 5 m
+  // du banc de la berge; le texte a été corrigé plutôt que la trajectoire (décision du manager).
+  it('QA6-03 oies: le texte ne dit plus qu’elles passent juste au-dessus de vous, et dit vrai sur la berge', () => {
     const { content, map } = contentAndMap();
     const def = momentDef(content, 'geese');
     const track = def?.climax.keyframes.goose;
     const rest = map.points.geese_rest;
     const bench = map.props.find((p) => p.id === 'riverbank_bench');
     if (def === null || track === undefined || rest === undefined || bench === undefined) throw new Error('oies ou banc absents');
-    let best = Infinity;
+    const text = content.texts.messages.geese_seen ?? '';
+    expect(text).not.toContain('au-dessus de vous');
+    expect(text).toContain('au-dessus de la berge');
+    let overBank = false;
     for (let t = 0; t <= def.climax.seconds; t += 0.05) {
       const p = sampleTrack(track, t, { x: rest.x, y: rest.y, z: 0 });
-      if (p.z < 1 || p.z > 8) continue;
-      best = Math.min(best, Math.hypot(p.x - bench.pos.x, p.y - bench.pos.y));
+      if (p.z >= 1 && Math.hypot(p.x - bench.pos.x, p.y - bench.pos.y) < 12) overBank = true;
     }
-    expect(best).toBeLessThan(2.5);
+    expect(overBank).toBe(true);
   });
 });
 
