@@ -29,6 +29,7 @@ import type {
   LetterDef,
   MomentChoreography,
   MomentDef,
+  MomentFreeze,
   MomentKeyframe,
   MomentWatch,
   QualityDef,
@@ -36,6 +37,7 @@ import type {
   QuestDef,
   QuestStepDef,
   RecipeDef,
+  Season,
   ScheduleEntry,
   Settings,
   Since,
@@ -62,6 +64,7 @@ export interface RawContentFiles {
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
 const QUALITIES: readonly Quality[] = ['ordinary', 'fine'];
 const STAGES: readonly CropStage[] = ['seed', 'sprout', 'young', 'ripe'];
+const SEASONS: readonly Season[] = ['spring', 'summer', 'autumn', 'winter'];
 const WEEKDAYS = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as const;
 const WHO: readonly Who[] = ['either', 'actor', 'both', 'informed', 'doer'];
 const CHARACTERS = ['p1', 'p2'] as const;
@@ -242,7 +245,14 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     case 'time_is':
       return { type, from: r.at('from').time(), to: r.at('to').time() };
     case 'weather_is':
+    case 'weather_was':
       return { type, weather: r.at('weather').oneOf(WEATHERS) };
+    case 'season_is':
+      return {
+        type,
+        seasons: r.at('seasons').items().map((s) => s.oneOf(SEASONS)),
+        fromSeasonDay: r.has('fromSeasonDay') ? r.at('fromSeasonDay').integer(1) : 1,
+      };
     case 'flag':
       return { type, flag: r.at('flag').string() };
     case 'quest_active':
@@ -755,11 +765,22 @@ function pair(r: Reader): [number, number] {
 }
 
 function keyframe(r: Reader): MomentKeyframe {
-  const [t, x, y, z, clip, ...rest] = r.items();
+  const [t, x, y, z, clip, heading, ...rest] = r.items();
   if (t === undefined || x === undefined || y === undefined || z === undefined || clip === undefined || rest.length > 0) {
-    return r.fail('image clé [t, x, y, z, clip] attendue');
+    return r.fail('image clé [t, x, y, z, clip] ou [t, x, y, z, clip, cap] attendue');
   }
-  return [t.number(), x.isNull() ? null : x.number(), y.isNull() ? null : y.number(), z.number(), clip.isNull() ? null : clip.string()];
+  const frame: MomentKeyframe = [t.number(), x.isNull() ? null : x.number(), y.isNull() ? null : y.number(), z.number(), clip.isNull() ? null : clip.string()];
+  if (heading !== undefined) frame.push(heading.number());
+  return frame;
+}
+
+function timedSounds(r: Reader | null): [number, string][] {
+  if (r === null || r.isNull()) return [];
+  return r.items().map((s): [number, string] => {
+    const [t, id] = s.items();
+    if (t === undefined || id === undefined) return s.fail('[t, son] attendu');
+    return [t.number(), id.string()];
+  });
 }
 
 function choreography(r: Reader | null): MomentChoreography | null {
@@ -773,20 +794,13 @@ function choreography(r: Reader | null): MomentChoreography | null {
     });
     keyframes[actor] = frames;
   }
-  const sounds = r.opt('sounds');
   const formation = r.opt('formation');
+  const grade = r.opt('lightGrade');
   return {
     seconds: r.at('seconds').number(),
     keyframes,
     fadeLastSeconds: optNumber(r, 'fadeLastSeconds', 0),
-    sounds:
-      sounds === null
-        ? []
-        : sounds.items().map((s): [number, string] => {
-            const [t, id] = s.items();
-            if (t === undefined || id === undefined) return s.fail('[t, son] attendu');
-            return [t.number(), id.string()];
-          }),
+    sounds: timedSounds(r.opt('sounds')),
     lookers: r.opt('lookers')?.stringList() ?? [],
     pauseWhenReleased: optBoolean(r, 'pauseWhenReleased', false),
     pauseBefore: optNumber(r, 'pauseBefore', 0),
@@ -799,18 +813,59 @@ function choreography(r: Reader | null): MomentChoreography | null {
             spacing: formation.at('spacing').number(),
             armAngleDeg: formation.at('armAngleDeg').number(),
           },
+    lightGrade:
+      grade === null || grade.isNull()
+        ? null
+        : {
+            color: grade.at('color').string(),
+            force: grade.at('force').number(),
+            inSeconds: grade.at('inSeconds').number(),
+            outSeconds: grade.at('outSeconds').number(),
+          },
+  };
+}
+
+function freeze(r: Reader | null): MomentFreeze | null {
+  if (r === null || r.isNull()) return null;
+  const every = pair(r.at('everySeconds'));
+  if (every[0] <= 0 || every[1] < every[0]) r.at('everySeconds').fail('intervalle [min, max] positif attendu');
+  return {
+    actor: r.at('actor').string(),
+    everySeconds: every,
+    lookSeconds: r.at('lookSeconds').number(),
+    lookClip: r.at('lookClip').string(),
+    firstAfterSeconds: optNumber(r, 'firstAfterSeconds', every[0]),
+    startleBack: r.at('startleBack').number(),
+    startleToward: pair(r.at('startleToward')),
+    startleClip: r.at('startleClip').string(),
+    startleSeconds: optNumber(r, 'startleSeconds', 0.5),
+    resumeAfterSeconds: r.at('resumeAfterSeconds').number(),
+    walkSpeed: optNumber(r, 'walkSpeed', 0.8),
+    walkClip: optString(r, 'walkClip') ?? 'walk',
+    sounds: timedSounds(r.opt('sounds')),
+    startleText: optString(r, 'startleText'),
   };
 }
 
 function watch(r: Reader): MomentWatch {
   const bench = r.opt('bench');
   const hold = r.opt('hold');
+  const opposite = r.opt('opposite');
+  // `"facing": "partner"`: se faire face; `true`: regarder la cible.
+  // Lu par `oneOf`: toute autre chaîne que « partner » est refusée.
+  const facingPartner = r.has('facing') && typeof r.at('facing').value === 'string' && r.at('facing').oneOf(['partner'] as const).length > 0;
   const w: MomentWatch = {
     radius: r.at('radius').number(),
     minRadius: optNumber(r, 'minRadius', 0),
     holdSeconds: r.at('holdSeconds').number(),
     still: optBoolean(r, 'still', false),
-    facing: optBoolean(r, 'facing', false),
+    facing: facingPartner ? false : optBoolean(r, 'facing', false),
+    facingPartner,
+    opposite:
+      opposite === null || opposite.isNull()
+        ? null
+        : { axis: opposite.at('axis').oneOf(['x', 'y'] as const), at: opposite.at('at').number(), gap: opposite.at('gap').number() },
+    freeze: freeze(r.opt('freeze')),
     seated: optBoolean(r, 'seated', false),
     bench: bench === null || bench.isNull() ? null : bench.string(),
     hold: hold === null || hold.isNull() ? null : hold.stringList(),
@@ -843,7 +898,16 @@ function parseActor(a: Reader): MomentDef['actors'][number] {
     offsets: list,
     facing: optNumber(a, 'facing', 0),
     idle: a.at('idle').string(),
-    idleExtra: extra === null || extra.isNull() ? null : { clip: extra.at('clip').string(), everySeconds: pair(extra.at('everySeconds')) },
+    idleExtra:
+      extra === null || extra.isNull()
+        ? null
+        : {
+            clip: extra.at('clip').string(),
+            everySeconds: pair(extra.at('everySeconds')),
+            segment: extra.has('segment') && !extra.at('segment').isNull() ? pair(extra.at('segment')) : null,
+            sounds: timedSounds(extra.opt('sounds')),
+          },
+    z: optNumber(a, 'z', 0),
     arrive: choreography(a.opt('arrive')),
     collisionRadius: optNumber(a, 'collisionRadius', 0),
     roam: optNumber(a, 'roam', 0),
@@ -856,6 +920,8 @@ function parseActor(a: Reader): MomentDef['actors'][number] {
             stepTo: shy.has('stepTo') && !shy.at('stepTo').isNull() ? pair(shy.at('stepTo')) : null,
             stepClip: optString(shy, 'stepClip'),
             returnAfterSeconds: shy.at('returnAfterSeconds').number(),
+            hideAway: optBoolean(shy, 'hideAway', false),
+            sounds: timedSounds(shy.opt('sounds')),
           },
     villager: optString(a, 'villager'),
     keepFacing: optBoolean(a, 'keepFacing', false),
@@ -887,6 +953,8 @@ function parseMoment(m: Reader): MomentDef {
     anchor: m.at('anchor').string(),
     weight: m.at('weight').integer(0),
     maxPerSeason: max === null || max.isNull() ? null : max.integer(1),
+    cooldownDays: m.has('cooldownDays') && !m.at('cooldownDays').isNull() ? m.at('cooldownDays').integer(1) : null,
+    trainDays: m.has('trainDays') ? m.at('trainDays').oneOf(['never', 'only'] as const) : 'never',
     availableWhen: conditions(m.opt('availableWhen'), 'game_start'),
     present,
     window,
@@ -927,6 +995,8 @@ function parseMoment(m: Reader): MomentDef {
     if (w !== null && w.target !== 'anchor' && !actors.some((a) => a.id === w.target)) {
       m.at('watch').fail(`cible « ${w.target} »: ni « anchor » ni un acteur du moment`);
     }
+    const frozen = w === null ? null : w.freeze;
+    if (frozen !== null && !actors.some((a) => a.id === frozen.actor)) m.at('watch').fail(`« freeze »: acteur inconnu « ${frozen.actor} »`);
   }
   return def;
 }
@@ -1116,7 +1186,7 @@ function parseBenches(r: Reader | null): Settings['benches'] {
 /** Moments rares (`reglages.moments`): chaque clé absente garde sa valeur de `defauts.ts`. */
 function parseMomentSettings(r: Reader | null): Settings['moments'] {
   const d = DEFAULT_MOMENTS;
-  if (r === null) return { ...d, tiers: [...d.tiers] };
+  if (r === null) return { ...d, tiers: [...d.tiers], festivalDays: [...d.festivalDays] };
   const first = r.opt('firstHint');
   const tiers = r.opt('tiers');
   const chance = optNumber(r, 'dailyChance', d.dailyChance);
@@ -1137,6 +1207,12 @@ function parseMomentSettings(r: Reader | null): Settings['moments'] {
     maxSyncGapSeconds: optNumber(r, 'maxSyncGapSeconds', d.maxSyncGapSeconds),
     holdRange: optNumber(r, 'holdRange', d.holdRange),
     tiers: tiers === null ? [...d.tiers] : tiers.items().map((t) => t.oneOf(TIERS)),
+    noAmbientOnFestivalDays: optBoolean(r, 'noAmbientOnFestivalDays', d.noAmbientOnFestivalDays),
+    festivalDays: r.has('festivalDays') ? r.at('festivalDays').numberList() : [...d.festivalDays],
+    cooldownDaysLong: r.has('cooldownDaysLong') ? r.at('cooldownDaysLong').integer(1) : d.cooldownDaysLong,
+    longFromDay: r.has('longFromDay') ? r.at('longFromDay').integer(1) : d.longFromDay,
+    seasonPoolFull: r.has('seasonPoolFull') ? r.at('seasonPoolFull').integer(1) : d.seasonPoolFull,
+    unseenWeightFactor: optNumber(r, 'unseenWeightFactor', d.unseenWeightFactor),
   };
 }
 

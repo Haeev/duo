@@ -68,6 +68,7 @@
       "maxPerSeason": 1,
       "availableWhen": [
         { "type": "day_at_least", "day": 5 },
+        { "type": "season_is", "seasons": ["spring"] },
         { "type": "any", "conditions": [{ "type": "weather_is", "weather": "sunny" }, { "type": "weather_is", "weather": "cloudy" }] }
       ],
       "present": { "from": "14:00", "to": "18:30" },
@@ -226,6 +227,7 @@
       "availableWhen": [
         { "type": "flag", "flag": "nest_box_straight" },
         { "type": "day_at_least", "day": 4 },
+        { "type": "season_is", "seasons": ["spring"] },
         { "type": "any", "conditions": [{ "type": "weather_is", "weather": "sunny" }, { "type": "weather_is", "weather": "cloudy" }] }
       ],
       "present": { "from": "08:00", "to": "11:00" },
@@ -330,7 +332,7 @@
         "fadeLastSeconds": 0.5,
         "sounds": []
       },
-      "sounds": { "idle": [{ "id": "fox_pounce", "everySeconds": [6, 8], "range": 15 }] },
+      "sounds": { "idle": [{ "id": "fox_pounce", "everySeconds": [6, 8], "range": 12 }] },
       "texts": { "hint": "moment_fox_hint", "climax": "moment_fox_climax", "memory": "moment_fox_memory", "rumor": "moment_fox_rumor", "vignette": "moment_fox_vignette" },
       "vignette": "memory-fox",
       "hintFrom": null,
@@ -348,6 +350,7 @@
       "maxPerSeason": null,
       "availableWhen": [
         { "type": "day_at_least", "day": 9 },
+        { "type": "any", "conditions": [{ "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 9 }, { "type": "season_is", "seasons": ["summer"] }] },
         { "type": "weather_is", "weather": "sunny" }
       ],
       "present": { "from": "21:00", "to": "23:30" },
@@ -388,6 +391,222 @@
         "fadeOutSeconds": 10,
         "color": "#B8F05A",
         "avoid": [[58.5, 29.5], [56.5, 27.5], [60.5, 32.5]]
+      }
+    },
+    {
+      "id": "roe_deer",
+      "tier": "P0",
+      "name": "La chevrette du pré",
+      "mode": "ambient",
+      "quest": null,
+      "questStep": null,
+      "anchor": "roe_deer_graze",
+      "weight": 2,
+      "maxPerSeason": null,
+      "availableWhen": [
+        { "type": "day_at_least", "day": 9 },
+        { "type": "any", "conditions": [{ "type": "season_is", "seasons": ["spring"], "fromSeasonDay": 9 }, { "type": "season_is", "seasons": ["summer"] }] },
+        { "type": "any", "conditions": [{ "type": "weather_is", "weather": "sunny" }, { "type": "weather_is", "weather": "cloudy" }] }
+      ],
+      "present": { "from": "06:00", "to": "08:30" },
+      "window": { "from": "06:00", "to": "08:30" },
+      "watch": {
+        "radius": 5.5, "minRadius": 3, "holdSeconds": 2, "still": true, "facing": false, "seated": false, "bench": null, "hold": null, "target": "roe_deer",
+        "freeze": {
+          "actor": "roe_deer", "everySeconds": [6, 10], "lookSeconds": 2, "lookClip": "deer_lookup", "firstAfterSeconds": 8,
+          "startleBack": 1.5, "startleToward": [61.2, 27.0], "startleClip": "deer_stamp", "startleSeconds": 0.5,
+          "resumeAfterSeconds": 4, "walkSpeed": 0.8, "walkClip": "deer_walk", "sounds": [[0.0, "deer_stamp"], [0.35, "roe_bark"]],
+          "startleText": "moment_roe_deer_startled"
+        }
+      },
+      "questWatch": null,
+      "actors": [
+        {
+          "id": "roe_deer", "model": "roe_deer", "count": 1, "at": "roe_deer_graze", "facing": 0.905,
+          "idle": "deer_graze", "idleExtra": null,
+          "arrive": {
+            "seconds": 5.3,
+            "keyframes": { "roe_deer": [[0.0, 62.2, 27.0, 0.0, "deer_walk"], [5.25, 58.0, 27.0, 0.0, "deer_graze", 0.905]] }
+          },
+          "collisionRadius": 0.4, "shy": null
+        },
+        { "id": "fawn", "model": "fawn", "count": 1, "at": "fawn_bed", "z": -0.3, "facing": 2.475, "idle": "fawn_bed", "idleExtra": null, "collisionRadius": 0, "shy": null }
+      ],
+      "climax": {
+        "seconds": 9.2,
+        "keyframes": {
+          "roe_deer": [
+            [0.0, 58.0, 27.0, 0.0, "deer_call", 0.905],
+            [1.6, 58.0, 27.0, 0.0, "deer_watch_fawn", 0.905],
+            [4.6, 58.0, 27.0, 0.0, "deer_lick", 0.905],
+            [6.8, 58.0, 27.0, 0.0, "deer_walk"],
+            [7.6, 59.2, 27.0, 0.0, "deer_bound"],
+            [8.4, 60.9, 27.1, 0.0, "deer_bound"],
+            [9.2, 62.4, 27.2, 0.0, null]
+          ],
+          "fawn": [
+            [0.0, 59.4, 25.9, -0.3, "fawn_bed", 2.475],
+            [1.0, 59.4, 25.9, -0.3, "fawn_rustle", 2.475],
+            [1.6, 59.4, 25.9, -0.3, "fawn_rise", 2.475],
+            [2.1, 59.4, 25.9, 0.0, null, 2.475],
+            [2.4, 59.4, 25.9, 0.0, "fawn_trot"],
+            [3.6, 58.9, 26.45, 0.0, "fawn_trot"],
+            [4.6, 58.34, 26.92, 0.0, "fawn_suckle", -2.237],
+            [4.6, 58.34, 26.92, 0.0, null, -2.237],
+            [6.8, 58.34, 26.92, 0.0, "fawn_trot"],
+            [7.2, 58.8, 26.5, 0.0, "fawn_trot"],
+            [7.6, 59.6, 26.3, 0.0, "fawn_bound"],
+            [8.4, 61.0, 26.4, 0.0, "fawn_bound"],
+            [9.2, 62.4, 26.5, 0.0, null]
+          ]
+        },
+        "fadeLastSeconds": 0.8,
+        "sounds": [[0.0, "roe_call"], [1.0, "fawn_rustle"], [2.6, "fawn_bleat"], [7.6, "deer_bounds"]],
+        "lookers": []
+      },
+      "after": { "actors": { "roe_deer": { "at": null, "idle": null }, "fawn": { "at": null, "idle": null } } },
+      "leave": {
+        "seconds": 4.0,
+        "keyframes": { "roe_deer": [[0.0, null, null, 0.0, "deer_walk"], [4.0, 62.4, 27.0, 0.0, null]] },
+        "fadeLastSeconds": 0.6,
+        "sounds": []
+      },
+      "sounds": { "idle": [] },
+      "texts": { "hint": "moment_roe_deer_hint", "climax": "moment_roe_deer_climax", "memory": "moment_roe_deer_memory", "rumor": "moment_roe_deer_rumor", "vignette": "moment_roe_deer_vignette" },
+      "vignette": "memory-roe-deer",
+      "hintFrom": "odette",
+      "reward": { "heart": 10 }
+    },
+    {
+      "id": "kingfisher",
+      "tier": "P0",
+      "name": "Le martin-pêcheur du ponton",
+      "mode": "ambient",
+      "quest": null,
+      "questStep": null,
+      "anchor": "kingfisher_post",
+      "weight": 2,
+      "maxPerSeason": null,
+      "availableWhen": [
+        { "type": "day_at_least", "day": 4 },
+        { "type": "season_is", "seasons": ["spring", "summer", "autumn"] },
+        { "type": "weather_is", "weather": "sunny" }
+      ],
+      "present": { "from": "09:00", "to": "12:00" },
+      "window": { "from": "09:00", "to": "12:00" },
+      "watch": { "radius": 5.5, "minRadius": 2.5, "holdSeconds": 3, "still": true, "facing": false, "seated": false, "bench": null, "hold": null, "target": "anchor" },
+      "questWatch": null,
+      "actors": [
+        {
+          "id": "kingfisher", "model": "kingfisher", "count": 1, "at": "kingfisher_post", "z": 1.13, "facing": 1.2,
+          "idle": "kf_perch",
+          "idleExtra": { "clip": "kf_dive", "everySeconds": [15, 25], "segment": [1.0, 2.4], "sounds": [[0.0, "kf_whistle"], [0.3, "kf_dive"]] },
+          "collisionRadius": 0,
+          "shy": { "distance": 2.5, "clip": "kf_fly", "stepTo": [40.1, 40.3], "stepClip": "kf_fly", "returnAfterSeconds": 6, "hideAway": true, "sounds": [[0.0, "kf_whistle"]] }
+        },
+        { "id": "small_fish", "model": "small_fish", "count": 1, "at": "kingfisher_post", "facing": 0, "idle": "hidden", "idleExtra": null, "collisionRadius": 0, "shy": null }
+      ],
+      "climax": {
+        "seconds": 5.8,
+        "keyframes": {
+          "kingfisher": [
+            [0.0, 46.1, 39.9, 1.13, "kf_perch", 1.2],
+            [1.0, 46.1, 39.9, 1.13, "kf_dive"],
+            [1.3, 46.6, 40.6, -0.05, null],
+            [1.55, 46.6, 40.6, -0.2, null],
+            [1.8, 46.6, 40.6, 0.0, "kf_fly"],
+            [2.1, 46.4, 40.3, 0.5, null],
+            [2.4, 46.1, 39.9, 1.13, "kf_beat", 1.2],
+            [2.4, 46.1, 39.9, 1.13, null, 1.2],
+            [3.6, 46.1, 39.9, 1.13, "kf_swallow", 1.2],
+            [4.1, 46.1, 39.9, 1.13, "kf_perch", 1.2],
+            [4.8, 46.1, 39.9, 1.13, "kf_fly"],
+            [5.3, 43.0, 40.3, 0.4, "kf_fly"],
+            [5.8, 39.0, 40.3, 0.4, null]
+          ],
+          "small_fish": [
+            [0.0, 46.6, 40.6, -0.3, "hidden"],
+            [1.75, 46.6, 40.6, -0.3, "carried_by_kingfisher"],
+            [4.0, 46.1, 39.9, 1.13, "hidden"]
+          ]
+        },
+        "fadeLastSeconds": 0.4,
+        "sounds": [[1.3, "kf_dive"], [2.7, "kf_beat"], [4.1, "kf_whistle"]],
+        "lookers": []
+      },
+      "after": { "actors": { "kingfisher": { "at": null, "idle": null }, "small_fish": { "at": null, "idle": null } } },
+      "leave": {
+        "seconds": 1.2,
+        "keyframes": { "kingfisher": [[0.0, null, null, 1.13, "kf_fly"], [0.5, 43.0, 40.3, 0.4, "kf_fly"], [1.2, 39.0, 40.3, 0.4, null]] },
+        "fadeLastSeconds": 0.4,
+        "sounds": [[0.0, "kf_whistle"]]
+      },
+      "sounds": { "idle": [] },
+      "texts": { "hint": "moment_kingfisher_hint", "climax": "moment_kingfisher_climax", "memory": "moment_kingfisher_memory", "rumor": "moment_kingfisher_rumor", "vignette": "moment_kingfisher_vignette" },
+      "vignette": "memory-kingfisher",
+      "hintFrom": "jeanne",
+      "reward": { "heart": 10 }
+    },
+    {
+      "id": "mist",
+      "tier": "P0",
+      "name": "La brume de l'Aubrune",
+      "mode": "ambient",
+      "quest": null,
+      "questStep": null,
+      "anchor": "mist_narrows",
+      "weight": 3,
+      "maxPerSeason": null,
+      "availableWhen": [
+        { "type": "day_at_least", "day": 2 },
+        { "type": "season_is", "seasons": ["spring", "summer", "autumn"] },
+        { "type": "weather_was", "weather": "rain" },
+        { "type": "any", "conditions": [{ "type": "weather_is", "weather": "sunny" }, { "type": "weather_is", "weather": "cloudy" }] }
+      ],
+      "present": { "from": "06:00", "to": "08:30" },
+      "window": { "from": "06:00", "to": "08:30" },
+      "watch": {
+        "radius": 6, "minRadius": 0, "holdSeconds": 3, "still": true, "facing": "partner", "seated": false, "bench": null, "hold": null, "target": "anchor",
+        "opposite": { "axis": "y", "at": 40.5, "gap": 1.5 }
+      },
+      "questWatch": null,
+      "actors": [
+        { "id": "mist", "model": "mist_bank", "count": 1, "at": "mist_narrows", "facing": 0, "idle": "mist_waiting", "idleExtra": null, "collisionRadius": 0, "shy": null },
+        { "id": "mist_fish", "model": "small_fish", "count": 1, "at": "mist_narrows", "facing": 0, "idle": "hidden", "idleExtra": null, "collisionRadius": 0, "shy": null }
+      ],
+      "climax": {
+        "seconds": 9.0,
+        "keyframes": {
+          "mist": [[0.0, 29.5, 40.5, 0.0, "mist_lift"], [9.0, 29.5, 40.5, 0.0, null]],
+          "mist_fish": [
+            [0.0, 29.0, 40.4, -0.3, "hidden"],
+            [5.2, 28.85, 40.4, -0.12, "fish_leap", 0.0],
+            [5.45, 29.05, 40.4, 0.3, null, 0.0],
+            [5.7, 29.25, 40.4, -0.12, "hidden", 0.0]
+          ]
+        },
+        "fadeLastSeconds": 0,
+        "lightGrade": { "color": "#FFD9A0", "force": 0.35, "inSeconds": 3, "outSeconds": 6 },
+        "sounds": [[1.5, "mist_lift"], [3.0, "blackbird_wake"], [5.2, "fish_jump"]],
+        "lookers": []
+      },
+      "after": { "actors": { "mist": { "at": null, "idle": null }, "mist_fish": { "at": null, "idle": null } } },
+      "leave": {
+        "seconds": 20.0,
+        "keyframes": { "mist": [[0.0, 29.5, 40.5, 0.0, "mist_fade"], [20.0, 29.5, 40.5, 0.0, null]] },
+        "fadeLastSeconds": 0,
+        "sounds": []
+      },
+      "sounds": { "idle": [{ "id": "mist_ambience", "everySeconds": [8, 8], "range": 20 }] },
+      "texts": { "hint": "moment_mist_hint", "climax": "moment_mist_climax", "memory": "moment_mist_memory", "rumor": "moment_mist_rumor", "vignette": "moment_mist_vignette" },
+      "vignette": "memory-mist",
+      "hintFrom": "firmin",
+      "reward": { "heart": 10 },
+      "render": {
+        "fromX": 14, "toX": 44, "fadeEnd": 2.5, "northLimitY": 37.6,
+        "drift": 0.35, "waterOpacity": 0.7, "bankOpacity": 0.3, "top": 1.2,
+        "puffs": 700, "puffsLight": 260, "frontFrom": 44, "frontSpeed": 4, "frontStart": 1.5, "frontWidth": 2.5, "plumeHeight": 2.5,
+        "leaveSeconds": 20, "color": "#F4F7F8"
       }
     }
   ]

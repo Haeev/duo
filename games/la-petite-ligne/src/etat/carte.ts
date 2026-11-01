@@ -61,6 +61,8 @@ export interface MapHook {
   rotation: number;
   /** Penché au départ (degrés), le nichoir de travers; 0 sinon. */
   tiltDeg: number;
+  /** Échelle du modèle (le pieu allongé jusqu'au lit de la rivière), 1 sinon. */
+  scale: number;
 }
 
 export interface GameMap {

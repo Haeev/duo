@@ -456,6 +456,29 @@ export const RENDER_SETTINGS = {
       halfHeight: 1.0,
       nearer: 0.6,
     },
+    /**
+     * Troisième trou, sur les bêtes d'un moment que le décor du pourtour cache (tour 7): la forêt
+     * qui ferme le bord est passe devant la chevrette et son faon en orientation 0 (la caméra au
+     * sud-est voit la lisière entre elle et eux). Centre: le milieu des bêtes dessinées, à `lift`
+     * (m) du sol; assez large pour la chevrette et le faon côte à côte.
+     */
+    /**
+     * Trous des joueurs élargis pendant un moment où ils se tiennent devant le pourtour (la brume:
+     * la rive sud est à 3 m de la forêt du bord, qui la cache jusqu'aux épaules en orientation 0).
+     */
+    players: {
+      moments: ['mist'],
+      halfWidth: 1.2,
+      halfHeight: 1.25,
+    },
+    animals: {
+      moments: ['roe_deer'],
+      phases: ['waiting', 'climax', 'left'],
+      lift: 0.6,
+      halfWidth: 1.7,
+      halfHeight: 1.2,
+      nearer: 0.4,
+    },
   },
   /**
    * Main droite de Basile au bas du nichoir pendant `reach_up` (contrôle du DA après le tour 6:

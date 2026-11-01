@@ -59,7 +59,7 @@ INDEFINITE_ARTICLES = {"un", "une", "des"}
 ENGINE_FLAGS = {"handcar_pushed"}
 # Acteurs des moments dessinés par un effet procédural, sans modèle de `index.json` (M-01), avec le
 # fichier du rendu qui les dessine (même liste que `tests/moments-recette.test.ts`).
-PROCEDURAL_ACTORS = {"glowworm_light": "src/rendu/vers-luisants.ts"}
+PROCEDURAL_ACTORS = {"glowworm_light": "src/rendu/vers-luisants.ts", "mist_bank": "src/rendu/brume.ts"}
 # Tournures qui accordent au genre d'un joueur (rédaction neutre): un avertissement à relire, pas une erreur.
 GENDERED_RE = re.compile(
     r"\b(?:tu es|tu étais|tu seras|vous êtes|vous étiez|vous serez|sois|soyez) "
@@ -80,6 +80,9 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "weekday_is": ({"weekdays"}, set()),
     "time_is": ({"from", "to"}, set()),
     "weather_is": ({"weather"}, set()),
+    # Tour 7: météo de la veille (la brume) et saison du jour (calendrier de `reglages.memories`).
+    "weather_was": ({"weather"}, set()),
+    "season_is": ({"seasons"}, {"fromSeasonDay"}),
     "flag": ({"flag"}, set()),
     "quest_active": ({"quest"}, set()),
     "quest_done": ({"quest"}, set()),
@@ -327,6 +330,13 @@ def check_condition(cond: Any, where: str, reg: Registry, report: Report) -> Non
         check_time(cond.get("to"), w, report)
     if "weather" in cond and cond["weather"] not in WEATHERS:
         report.error(w, f"météo inconnue {cond['weather']!r}")
+    if ctype == "season_is":
+        seasons = cond.get("seasons")
+        if not isinstance(seasons, list) or not seasons or not set(seasons) <= {"spring", "summer", "autumn", "winter"}:
+            report.error(w, f"saisons attendues parmi spring, summer, autumn, winter ({seasons!r})")
+        start = cond.get("fromSeasonDay", 1)
+        if not isinstance(start, int) or start < 1:
+            report.error(w, f"« fromSeasonDay » entier positif attendu ({start!r})")
     if "quality" in cond and cond["quality"] not in QUALITIES:
         report.error(w, f"qualité inconnue {cond['quality']!r}")
     if "who" in cond and cond["who"] not in WHO_ROLES:
@@ -835,10 +845,12 @@ def check_moments(folder: Path, reg: Registry, report: Report, map_objects: set[
             last = -1.0
             for i, f in enumerate(frames):
                 wf = f"{where}.keyframes.{actor}[{i}]"
-                if not isinstance(f, list) or len(f) != 5:
-                    report.error(wf, "image clé [t, x, y, z, clip] attendue")
+                if not isinstance(f, list) or len(f) not in (5, 6):
+                    report.error(wf, "image clé [t, x, y, z, clip] ou [t, x, y, z, clip, cap] attendue")
                     continue
-                t, x, y, z, clip = f
+                t, x, y, z, clip = f[:5]
+                if len(f) == 6 and not isinstance(f[5], (int, float)):
+                    report.error(wf, "cap (radians): nombre attendu")
                 if not isinstance(t, (int, float)) or t < last or t > seconds + 1e-9:
                     report.error(wf, f"temps {t!r} hors de l'ordre ou de la durée ({seconds} s)")
                 else:

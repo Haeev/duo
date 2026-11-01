@@ -127,7 +127,10 @@
       "ladder": "Tient l'échelle de Basile",
       "tits": "Guette les mésanges",
       "fox": "Regarde le renard",
-      "glowworms": "Guette les vers luisants"
+      "glowworms": "Guette les vers luisants",
+      "roe_deer": "Guette la chevrette",
+      "kingfisher": "Guette le martin-pêcheur",
+      "mist": "Attend dans la brume"
     },
     "watchingAny": "Regarde sans bouger",
     "menus": {

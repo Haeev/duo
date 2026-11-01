@@ -178,7 +178,14 @@ function expectMomentsAndSecrets(sim: Sim): void {
     last[h.id] = h.day;
   }
   expect(new Set(w.moments.history.map((h) => h.day)).size, 'au plus un moment par jour').toBe(w.moments.history.length);
+  // Tour 7: les robots prennent les poses nouvelles (se figer devant la chevrette, immobiles près du
+  // pieu, un sur chaque rive face à face dans la brume) et voient chaque passage de ces moments.
+  for (const h of w.moments.history) {
+    if (TOUR7_MOMENTS.includes(h.id)) expect(h.seen, `${h.id} du jour ${String(h.day)} vu par les robots`).toBe(true);
+  }
 }
+
+const TOUR7_MOMENTS: readonly string[] = ['roe_deer', 'kingfisher', 'mist'];
 
 describe('endurance des robots', () => {
   it('chaque variante des buts d’après-midi est tirée par au moins une graine', () => {

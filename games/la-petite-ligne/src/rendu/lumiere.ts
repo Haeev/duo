@@ -275,6 +275,16 @@ export class DaylightRig {
     this.fitShadow(focus, viewRadius);
   }
 
+  /**
+   * Teinte passagère (un moment rare: la lumière qui dore sur la brume), après `update`: le soleil
+   * va vers `color` de `amount` (0 à 1), le ciel de moitié.
+   */
+  tint(color: Color, amount: number): void {
+    const a = clamp01(amount);
+    this.sun.color.lerp(color, a);
+    this.hemi.color.lerp(color, a * 0.5);
+  }
+
   /** Change la taille de la carte d'ombre (le moteur la recrée à la prochaine image). */
   private setShadowMapSize(size: number): void {
     const shadow = this.sun.shadow;

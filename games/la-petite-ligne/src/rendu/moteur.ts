@@ -9,6 +9,7 @@
 import { benchesOf } from '../etat/bancs';
 import {
   ACESFilmicToneMapping,
+  Color,
   InstancedMesh,
   Mesh,
   type BufferGeometry,
@@ -121,6 +122,7 @@ export class RenderEngine implements Renderer {
   private disposed = false;
   private readonly context: FrameContext;
   private readonly focus = new Vector3();
+  private readonly gradeColor = new Color();
   private readonly probe = new Vector3();
   private readonly viewPoint = new Vector3();
   private readonly bufferSize = new Vector2();
@@ -303,6 +305,8 @@ export class RenderEngine implements Renderer {
       this.resources,
       characters,
       this.light,
+      this.daylight,
+      this.rig.camera,
     );
     const henLabels = new HenLabels(terrain, this.resources, this.rig.camera);
     this.scene.add(moments.group, henLabels.group);
@@ -456,6 +460,9 @@ export class RenderEngine implements Renderer {
       this.rig.viewRadius(),
       RENDER_SETTINGS.camera.distance,
     );
+    // Teinte voulue par le moment du jour (la brume dorée), après la lumière de l'heure.
+    const grade = this.moments?.lightGrade(world, this.gradeColor) ?? 0;
+    if (grade > 0) this.daylight.tint(this.gradeColor, grade);
     this.materials?.setNight(this.daylight.night);
     this.materials?.setTime(this.time);
 
@@ -498,8 +505,11 @@ export class RenderEngine implements Renderer {
     // Pixels par mètre à l'écran; une hauteur se voit raccourcie par l'inclinaison de la caméra.
     const pixelsPerMeter = this.bufferSize.x / this.rig.viewWidth();
     const elevation = (RENDER_SETTINGS.camera.elevationDeg * Math.PI) / 180;
-    const radiusX = SEE_THROUGH_HALF_WIDTH * pixelsPerMeter;
-    const radiusY = SEE_THROUGH_HALF_HEIGHT * Math.cos(elevation) * pixelsPerMeter;
+    const wide = RENDER_SETTINGS.momentSeeThrough.players;
+    const today = world.moments.today;
+    const widen = today !== null && (wide.moments as readonly string[]).includes(today.id) && today.phase !== 'gone';
+    const radiusX = (widen ? wide.halfWidth : SEE_THROUGH_HALF_WIDTH) * pixelsPerMeter;
+    const radiusY = (widen ? wide.halfHeight : SEE_THROUGH_HALF_HEIGHT) * Math.cos(elevation) * pixelsPerMeter;
     // Monter d'un pixel sur le corps, c'est monter de 1 / (cos e) pixel-mètres, donc se rapprocher de tan e.
     const depthPerPixel = Math.tan(elevation) / pixelsPerMeter;
     this.holes.length = 0;
@@ -522,7 +532,43 @@ export class RenderEngine implements Renderer {
     }
     this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     this.pushActorHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
+    this.pushAnimalHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     materials.setSeeThrough(this.holes);
+  }
+
+  /** Trou sur les bêtes d'un moment cachées par le pourtour (la chevrette), voir `momentSeeThrough.animals`. */
+  private pushAnimalHole(
+    world: ReadonlyWorld,
+    terrain: Terrain,
+    pixelsPerMeter: number,
+    elevation: number,
+    depthPerPixel: number,
+  ): void {
+    const settings = RENDER_SETTINGS.momentSeeThrough.animals;
+    const today = world.moments.today;
+    if (
+      this.moments === null ||
+      today === null ||
+      !(settings.moments as readonly string[]).includes(today.id) ||
+      !(settings.phases as readonly string[]).includes(today.phase) ||
+      !this.moments.animalCenter(this.probe)
+    ) {
+      return;
+    }
+    const camera = this.rig.camera;
+    const ground = terrain.heightAt(this.probe.x, this.probe.z);
+    this.probe.y = ground + settings.lift;
+    this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
+    this.probe.project(camera);
+    this.holes.push({
+      x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
+      y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
+      radiusX: settings.halfWidth * pixelsPerMeter,
+      radiusY: settings.halfHeight * Math.cos(elevation) * pixelsPerMeter,
+      depth: -this.viewPoint.z - settings.nearer,
+      depthPerPixel,
+      ground,
+    });
   }
 
   /** Trou du lieu d'un moment (le nichoir sous le houppier), voir `RENDER_SETTINGS.momentSeeThrough`. */

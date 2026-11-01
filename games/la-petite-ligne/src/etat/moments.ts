@@ -5,9 +5,10 @@
  * mesurer le temps à l'écran (M-02). Les deux machines échantillonnent les mêmes images clés
  * au même temps de simulation: mêmes images au même instant.
  */
-import type { Content, MomentActorDef, MomentChoreography, MomentDef, MomentKeyframe, MomentWatch } from '../donnees/types';
+import type { Content, MomentActorDef, MomentChoreography, MomentDef, MomentFreeze, MomentKeyframe, MomentWatch } from '../donnees/types';
 import type { GameMap } from './carte';
-import type { DeepReadonly, MomentToday } from './types';
+import { SIM_HZ, type DeepReadonly, type MomentToday } from './types';
+import { unitDraw } from './tirage';
 
 export interface Vec3 {
   x: number;
@@ -122,7 +123,116 @@ function pointOf(map: GameMap, id: string | null, fallback: Vec3): Vec3 {
 
 /** Où l'acteur attend (son point `at`). */
 export function restPosition(map: GameMap, actor: MomentActorDef): Vec3 {
-  return pointOf(map, actor.at, { x: 0, y: 0, z: 0 });
+  const p = pointOf(map, actor.at, { x: 0, y: 0, z: 0 });
+  return { x: p.x, y: p.y, z: actor.z };
+}
+
+// ---------------------------------------------------------------------------
+// « Un, deux, trois, soleil » (la chevrette, tour 7) et gestes d'attente datés
+
+/** Ce que fait la bête aux aguets à ce pas: elle broute, elle regarde, ou elle a été effarouchée. */
+export type FreezeState =
+  | { kind: 'graze'; /** Pas restants avant le prochain regard. */ nextLookIn: number }
+  | { kind: 'look'; /** Pas depuis le début du regard. */ since: number }
+  | { kind: 'startled'; since: number };
+
+function lerp(a: number, b: number, u: number): number {
+  return a + (b - a) * u;
+}
+
+/** Durée d'un effarouchement (pas): coup de sabot, recul, broute au point de recul, retour. */
+export function startleTicks(freeze: MomentFreeze): number {
+  const walk = freeze.startleBack / Math.max(0.05, freeze.walkSpeed);
+  return Math.round((freeze.startleSeconds + walk + freeze.resumeAfterSeconds + walk) * SIM_HZ);
+}
+
+/**
+ * Regards de la bête: le premier `firstAfterSeconds` après le début de l'attente (ou après la fin
+ * d'un effarouchement), puis tous les `everySeconds` (tirés par empreinte de la graine, du jour
+ * et du point de départ: mêmes regards chez l'hôte et l'invité, sans générateur). L'effarouchement
+ * en cours se lit dans `today.shyUntil` (pas de fin), posé par la simulation.
+ */
+export function freezeState(def: MomentDef, freeze: MomentFreeze, today: DeepReadonly<MomentToday>, tick: number, seed: number): FreezeState {
+  const total = startleTicks(freeze);
+  if (today.shyUntil > tick && tick >= today.shyUntil - total) return { kind: 'startled', since: tick - (today.shyUntil - total) };
+  // Un effarouchement compte s'il a commencé pendant cette attente (pas le 0 d'un moment neuf).
+  const startled = today.shyUntil - total >= today.phaseTick && today.shyUntil <= tick;
+  const ref = startled ? today.shyUntil : today.phaseTick;
+  const look = Math.max(1, Math.round(freeze.lookSeconds * SIM_HZ));
+  const [low, high] = freeze.everySeconds;
+  const gap = (k: number): number => Math.round(lerp(low, high, unitDraw(seed, `freeze:${def.id}:${String(ref)}:${String(k)}`, today.day)) * SIM_HZ);
+  let start = ref + (startled ? gap(0) : Math.round(freeze.firstAfterSeconds * SIM_HZ));
+  for (let k = 1; start + look <= tick; k += 1) start += Math.max(look + 1, gap(k));
+  if (tick >= start) return { kind: 'look', since: tick - start };
+  return { kind: 'graze', nextLookIn: start - tick };
+}
+
+/** Pose de la bête effarouchée, `since` pas après le coup de sabot: position, clip, instant du clip. */
+export interface StartlePose {
+  x: number;
+  y: number;
+  clip: string;
+  clipTime: number;
+  /** Elle marche (cap dans le sens du mouvement), sinon elle garde son cap. */
+  walking: boolean;
+}
+
+/**
+ * Effarouchée (fiche 1.4.7): coup de sabot sur place, recul de `startleBack` m vers
+ * `startleToward` (jamais au-delà de ce point), broute `resumeAfterSeconds`, puis revient à son
+ * point. Pur: le rendu la dessine, les tests vérifient qu'elle ne passe jamais la limite.
+ */
+export function startlePose(freeze: MomentFreeze, rest: Vec3, idle: string, since: number, out: StartlePose): StartlePose {
+  const t = since / SIM_HZ;
+  const dx = freeze.startleToward[0] - rest.x;
+  const dy = freeze.startleToward[1] - rest.y;
+  const room = Math.hypot(dx, dy);
+  const back = Math.min(freeze.startleBack, room);
+  const bx = room > 1e-6 ? rest.x + (dx / room) * back : rest.x;
+  const by = room > 1e-6 ? rest.y + (dy / room) * back : rest.y;
+  const walk = back / Math.max(0.05, freeze.walkSpeed);
+  const t1 = freeze.startleSeconds;
+  const t2 = t1 + walk;
+  const t3 = t2 + freeze.resumeAfterSeconds;
+  out.walking = false;
+  if (t < t1) {
+    out.x = rest.x;
+    out.y = rest.y;
+    out.clip = freeze.startleClip;
+    out.clipTime = t;
+    return out;
+  }
+  if (t < t2 || t >= t3) {
+    const going = t < t2;
+    const u = Math.min(1, going ? (t - t1) / Math.max(1e-6, walk) : (t - t3) / Math.max(1e-6, walk));
+    const w = going ? u : 1 - u;
+    out.x = rest.x + (bx - rest.x) * w;
+    out.y = rest.y + (by - rest.y) * w;
+    out.clip = freeze.walkClip;
+    out.clipTime = going ? t - t1 : t - t3;
+    out.walking = u < 1;
+    return out;
+  }
+  out.x = bx;
+  out.y = by;
+  out.clip = idle;
+  out.clipTime = t - t2;
+  return out;
+}
+
+/**
+ * Geste d'attente daté (`idleExtra` avec `segment`, le plongeon manqué du martin-pêcheur): secondes
+ * depuis le début du geste en cours à `t` (s depuis le début de l'attente), ou `null`. Mêmes
+ * instants pour le rendu et le son, chez les deux joueurs.
+ */
+export function idleGestureAt(def: MomentDef, actor: MomentActorDef, seed: number, day: number, t: number): number | null {
+  const extra = actor.idleExtra;
+  if (extra === null) return null;
+  const [low, high] = extra.everySeconds;
+  const length = extra.segment === null ? 1 : extra.segment[1] - extra.segment[0];
+  let start = lerp(low, high, unitDraw(seed, `gesture:${def.id}:${actor.id}:0`, day));
+  for (let k = 1; start + length <= t; k += 1) start += Math.max(length + 0.5, lerp(low, high, unitDraw(seed, `gesture:${def.id}:${actor.id}:${String(k)}`, day)));
+  return t >= start ? t - start : null;
 }
 
 /** Où l'acteur se tient après l'apogée (point `after.actors[id].at`, sinon la fin de l'apogée). */

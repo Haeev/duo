@@ -117,6 +117,10 @@ const MOMENT_SPOTS: Readonly<Record<string, readonly [number, number, number, nu
   tits: [50.6, 8.2, 51.4, 7.4],
   fox: [10.5, 17.5, 11.5, 16.5],
   glowworms: [53.5, 32.5, 54.5, 31.5],
+  // Tour 7: figés à l'ouest de la chevrette (3,6 et 3,4 m), au bout du ponton et sur la berge, un sur chaque rive de la brume.
+  roe_deer: [54.5, 28.0, 55.0, 25.5],
+  kingfisher: [44.5, 37.5, 45.5, 36.5],
+  mist: [29.5, 38.5, 29.5, 42.5],
 };
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */

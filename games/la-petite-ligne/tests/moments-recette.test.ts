@@ -24,7 +24,7 @@ import { contentAndMap, createRobot, newSim, play } from './aides';
 const ROOT = join(import.meta.dirname, '..');
 
 /** Acteurs dessinés sans modèle de `index.json` (effet procédural), avec le fichier qui les dessine. */
-const PROCEDURAL_ACTORS: Readonly<Record<string, string>> = { glowworm_light: 'src/rendu/vers-luisants.ts' };
+const PROCEDURAL_ACTORS: Readonly<Record<string, string>> = { glowworm_light: 'src/rendu/vers-luisants.ts', mist_bank: 'src/rendu/brume.ts' };
 
 function json(path: string): unknown {
   return JSON.parse(readFileSync(join(ROOT, path), 'utf8')) as unknown;

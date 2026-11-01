@@ -13,6 +13,8 @@ import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
  * envie, `game_start` ailleurs (dialogues, emplois du temps, courrier).
  */
 export type Since = 'step_start' | 'day_start' | 'game_start';
+/** Saisons du calendrier (printemps au jour 1). */
+export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 /**
  * Qui doit l'avoir fait: l'un ou l'autre (cumulé), le joueur concerné, ou chacun des deux;
  * dans une quête à secret (R16), l'informé (`informed`) ou l'autre (`doer`).
@@ -36,6 +38,10 @@ export type Condition = { label?: string } & (
   | { type: 'weekday_is'; weekdays: number[] }
   | { type: 'time_is'; from: number; to: number }
   | { type: 'weather_is'; weather: Weather }
+  /** Météo de la veille (la brume après la pluie, tour 7); faux le premier jour. */
+  | { type: 'weather_was'; weather: Weather }
+  /** Saison du jour (calendrier de `reglages.memories`), pas avant le jour `fromSeasonDay` de la saison. */
+  | { type: 'season_is'; seasons: Season[]; fromSeasonDay: number }
   | { type: 'flag'; flag: string }
   | { type: 'quest_active'; quest: string }
   | { type: 'quest_done'; quest: string }
@@ -313,8 +319,11 @@ export interface QuestSecretDef {
 // ---------------------------------------------------------------------------
 // Moments rares (`moments.json`, tour 6)
 
-/** Image clé d'une chorégraphie: `[t, x, y, z, clip]`; `null` en x ou y: la position courante. */
-export type MomentKeyframe = [number, number | null, number | null, number, string | null];
+/**
+ * Image clé d'une chorégraphie: `[t, x, y, z, clip]`, et un cap facultatif (radians, comme
+ * `facing`) tenu par une bête à l'arrêt; `null` en x ou y: la position courante.
+ */
+export type MomentKeyframe = [number, number | null, number | null, number, string | null, number?];
 
 /** Conditions de l'apogée: deux joueurs dans le rayon de la cible, dans la pose demandée. */
 export interface MomentWatch {
@@ -330,6 +339,38 @@ export interface MomentWatch {
   hold: string[] | null;
   /** `anchor` (le point du moment) ou l'identifiant d'un acteur qui bouge. */
   target: string;
+  /** Chacun regarde l'autre, à `LOOK_CONE` près (`"facing": "partner"`, la brume). */
+  facingPartner: boolean;
+  /** De part et d'autre de l'eau: l'un à au plus `at - gap`, l'autre à au moins `at + gap` sur l'axe. */
+  opposite: { axis: 'x' | 'y'; at: number; gap: number } | null;
+  /** « Un, deux, trois, soleil » (la chevrette): le compteur ne tourne que pendant un regard. */
+  freeze: MomentFreeze | null;
+}
+
+/**
+ * La bête lève la tête de temps en temps (`etat/moments.ts`, `freezeState`); qui bouge à moins de
+ * `moments.noticeRadius` pendant un regard, ou passe sous `watch.minRadius`, l'effarouche.
+ */
+export interface MomentFreeze {
+  /** Acteur qui regarde (son point d'attente est la cible). */
+  actor: string;
+  everySeconds: [number, number];
+  lookSeconds: number;
+  lookClip: string;
+  /** Premier regard après l'arrivée (s depuis le début de l'attente). */
+  firstAfterSeconds: number;
+  /** Recul (m) vers `startleToward`, sans dépasser ce point; clip et sons de l'effarouchement. */
+  startleBack: number;
+  startleToward: [number, number];
+  startleClip: string;
+  startleSeconds: number;
+  /** Elle broute au point de recul, puis revient à son point (vitesse de marche, m/s). */
+  resumeAfterSeconds: number;
+  walkSpeed: number;
+  walkClip: string;
+  sounds: [number, string][];
+  /** Message aux deux joueurs quand elle s'effarouche (clé de `textes.messages`), ou `null`. */
+  startleText: string | null;
 }
 
 /** Une chorégraphie en images clés (apogée, départ, arrivée). */
@@ -345,6 +386,8 @@ export interface MomentChoreography {
   pauseBefore: number;
   /** Formation en V des oies (section 1.4.2), lue par le rendu; `null` sinon. */
   formation: { fromSeconds: number; toSeconds: number; spacing: number; armAngleDeg: number } | null;
+  /** Teinte de la lumière pendant l'apogée (la brume dorée), montée en `inSeconds`, rendue en `outSeconds` après. */
+  lightGrade: { color: string; force: number; inSeconds: number; outSeconds: number } | null;
 }
 
 export interface MomentActorDef {
@@ -357,7 +400,13 @@ export interface MomentActorDef {
   offsets: [number, number][];
   facing: number;
   idle: string;
-  idleExtra: { clip: string; everySeconds: [number, number] } | null;
+  /**
+   * Un geste de temps en temps pendant l'attente: un clip, ou un passage de l'apogée rejoué
+   * (`segment`, le plongeon manqué du martin-pêcheur), avec ses sons datés depuis son début.
+   */
+  idleExtra: { clip: string; everySeconds: [number, number]; segment: [number, number] | null; sounds: [number, string][] } | null;
+  /** Hauteur de l'attente au-dessus du sol ou de l'eau (le faon couché dans l'herbe, le martin-pêcheur sur son pieu). */
+  z: number;
   arrive: MomentChoreography | null;
   collisionRadius: number;
   /**
@@ -365,7 +414,19 @@ export interface MomentActorDef {
    * la zone d'où les joueurs sont repoussés le couvre, pour qu'elle ne les traverse pas. 0 sinon.
    */
   roam: number;
-  shy: { distance: number; clip: string; stepTo: [number, number] | null; stepClip: string | null; returnAfterSeconds: number } | null;
+  /**
+   * Timidité: `hideAway`, la bête file à `stepTo` et disparaît jusqu'au retour (le martin-pêcheur),
+   * sinon elle y fait un pas de côté (le héron); `sounds` partent au début.
+   */
+  shy: {
+    distance: number;
+    clip: string;
+    stepTo: [number, number] | null;
+    stepClip: string | null;
+    returnAfterSeconds: number;
+    hideAway: boolean;
+    sounds: [number, string][];
+  } | null;
   /** Habitant joué par cet acteur pendant le moment (Basile sur l'échelle), ou `null`. */
   villager: string | null;
   /**
@@ -386,6 +447,10 @@ export interface MomentDef {
   anchor: string;
   weight: number;
   maxPerSeason: number | null;
+  /** Fenêtre propre en jours (`null`: `moments.cooldownDays`, puis `cooldownDaysLong`). */
+  cooldownDays: number | null;
+  /** `only`: seulement les jours du train (le salut du mécanicien); `never`: jamais ces jours-là. */
+  trainDays: 'never' | 'only';
   availableWhen: Condition[];
   present: { from: number; to: number };
   window: { from: number; to: number };
@@ -600,6 +665,16 @@ export interface MomentSettings {
   holdRange: number;
   /** Niveaux de moments tirés au matin (`["P0"]`: les P1 ne sortent pas). */
   tiers: ('P0' | 'P1')[];
+  /** Tour 7 (section 1.2): aucun moment d'ambiance les jours de fête. */
+  noAmbientOnFestivalDays: boolean;
+  festivalDays: number[];
+  /** Fenêtre longue à partir de `longFromDay` (J2); la démo et J1 gardent `cooldownDays`. */
+  cooldownDaysLong: number;
+  longFromDay: number;
+  /** Dès `longFromDay`: chance du jour x min(1, réserve de la saison / `seasonPoolFull`). */
+  seasonPoolFull: number;
+  /** Dès `longFromDay`: poids d'un moment jamais vu ensemble multiplié par ce facteur. */
+  unseenWeightFactor: number;
 }
 
 export interface SecretSettings {
