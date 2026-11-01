@@ -205,6 +205,44 @@ def mirror_x(outline):
     return [(-x, y) for x, y in outline]
 
 
+def banded_ball(g, semi, loc, lats, segs, color, bone=None):
+    """Ellipsoïde à facettes aux cercles de latitude choisis (degrés depuis le haut, 0 et 180 compris).
+    Les marques (calotte, bandeau, bavette) sont des bandes de facettes: rien n'est posé par-dessus, donc
+    rien ne dépasse. color(bande, face), bande 0 en haut."""
+    sx, sy, sz = semi
+    lx, ly, lz = loc
+    vs = [(lx, ly, lz + sz)]
+    for lat in lats[1:-1]:
+        t = math.radians(lat)
+        for k in range(segs):
+            a = 2 * math.pi * k / segs
+            vs.append((lx + sx * math.sin(t) * math.cos(a), ly + sy * math.sin(t) * math.sin(a), lz + sz * math.cos(t)))
+    vs.append((lx, ly, lz - sz))
+    nr = len(lats) - 2
+    bot = len(vs) - 1
+
+    def ring(i, k):
+        return 1 + i * segs + k % segs
+    faces, bands = [], []
+    for k in range(segs):
+        faces.append([0, ring(0, k), ring(0, k + 1)])
+        bands.append(0)
+    for i in range(nr - 1):
+        for k in range(segs):
+            faces.append([ring(i, k), ring(i + 1, k), ring(i + 1, k + 1), ring(i, k + 1)])
+            bands.append(i + 1)
+    for k in range(segs):
+        faces.append([ring(nr - 1, k), bot, ring(nr - 1, k + 1)])
+        bands.append(nr)
+    # chaque bande a sa hauteur de centre propre: on retrouve la bande d'une face par cette hauteur
+    levels = [(sum(vs[i][2] for i in f) / len(f), b) for f, b in zip(faces, bands)]
+
+    def col(face):
+        z = face.calc_center_median().z
+        return color(min(levels, key=lambda p: abs(p[0] - z))[1], face)
+    return g.mesh(vs, faces, col, bone=bone)
+
+
 # Héron cendré ------------------------------------------------------------------------
 
 HERON_BONES = [
@@ -232,6 +270,13 @@ def heron_mesh(A):
     # poitrail clair et plumes pendantes sous le cou
     ell(g, (0.07, 0.07, 0.08), (0, -0.10, 0.58), "feather_white", b, segs=7, rings=4, rot=(-30, 0, 0))
     ell(g, (0.06, 0.09, 0.025), (0, 0.29, 0.475), "heron_grey_dark", b, segs=6, rings=3, rot=(-14, 0, 0))
+    # ailes repliées (tour 6): coquilles arrondies couchées sur les flancs, rémiges sombres croisées
+    # au-dessus de la queue. Elles tiennent au corps; les ailes de vol (os heron_wing_*) sortent d'elles
+    # au décollage et y rentrent à l'atterrissage (repliées, elles sont réduites dans le corps)
+    for s in (1, -1):
+        ell(g, (0.036, 0.20, 0.082), (s * 0.072, 0.085, 0.57), by_normal("heron_grey", "heron_grey", "heron_grey_dark", thr=0.55),
+            b, segs=7, rings=5, rot=(-24, 0, s * 5))
+        ell(g, (0.026, 0.10, 0.036), (s * 0.04, 0.27, 0.495), "heron_grey_dark", b, segs=6, rings=3, rot=(-26, 0, s * 9))
     n = "heron_neck"
     seg(g, (0, -0.12, 0.61), (0, -0.17, 0.79), 0.042, 0.03, "feather_white", n, segs=6)
     # trait noir du devant du cou
@@ -240,10 +285,13 @@ def heron_mesh(A):
     n2 = "heron_neck_2"
     seg(g, (0, -0.17, 0.79), (0, -0.135, 0.895), 0.029, 0.025, "feather_white", n2, segs=6)
     h = "heron_head"
-    ell(g, (0.032, 0.056, 0.037), (0, -0.155, 0.905), "feather_white", h, segs=7, rings=5)
-    # bandeau noir au-dessus de l'oeil, prolongé en aigrette derrière la tête
-    for s in (1, -1):
-        g.box((0.006, 0.07, 0.014), loc=(s * 0.026, -0.15, 0.922), color="black", rot=(0, s * 14, 0), bone=h)
+    # tête en bandes de facettes: calotte blanche, sourcil noir de l'oeil à la nuque (bande peinte sur
+    # les côtés et l'arrière, le front reste blanc), joues blanches; prolongé par l'aigrette noire
+    def head_color(band, face):
+        if band == 2 and face.normal.y > -0.55:
+            return "black"
+        return "feather_white"
+    banded_ball(g, (0.033, 0.056, 0.037), (0, -0.155, 0.905), [0, 30, 52, 76, 110, 150, 180], 8, head_color, h)
     seg(g, (0, -0.13, 0.928), (0, -0.01, 0.905), 0.011, 0.002, "black", h, segs=5)
     seg(g, (0, -0.205, 0.902), (0, -0.325, 0.893), 0.014, 0.0025, "beak", h, segs=5)
     for s in (1, -1):
@@ -271,11 +319,10 @@ def heron_mesh(A):
 
 
 def heron_clips(rig):
-    # aile repliée le long du flanc: bord d'attaque en haut, bas de l'aile rentré contre le ventre
-    # (une plaque rigide repliée ainsi montre sa face inférieure: les deux faces sont grises)
-    fold = {"heron_wing_l": {"r": [("x", -90), ("z", 88), ("y", 14), ("x", -16)], "l": (0.035, 0.0, 0.03),
-                             "s": (0.62, 0.95, 1)},
-            "heron_wingtip_l": {"s": (0.85, 0.28, 1)}}
+    # au repos, l'aile de vol est repliée vers l'arrière et réduite à l'intérieur du corps: ce sont les
+    # coquilles du maillage (os heron_body) qui montrent l'aile repliée. Entre deux clés, elle se déploie
+    # depuis le flanc (décollage) ou y rentre (atterrissage)
+    fold = {"heron_wing_l": {"r": [("x", -90), ("z", 88)], "l": (-0.05, 0.08, -0.05), "s": (0.04, 0.04, 0.04)}}
     fold = merge(fold, mirror(fold))
     stand = merge(fold, {"heron_neck": R(14), "heron_neck_2": R(-12), "heron_head": R(-2)})
     alert = merge(fold, {"heron_body": R(-8), "heron_neck": R(-12), "heron_neck_2": R(-22), "heron_head": R(40)})
@@ -345,8 +392,11 @@ def goose_mesh(A):
     ell(g, (0.15, 0.29, 0.12), (0, 0.04, 0.03), by_normal("goose_grey", "goose_grey", "goose_belly", thr=0.3), b,
         segs=8, rings=6, rot=(-4, 0, 0))
     ell(g, (0.10, 0.10, 0.09), (0, -0.17, 0.06), "goose_grey", b, segs=7, rings=4)
-    ell(g, (0.07, 0.075, 0.03), (0, 0.33, 0.09), "goose_grey_dark", b, segs=6, rings=3, rot=(-20, 0, 0))
-    ell(g, (0.06, 0.05, 0.035), (0, 0.30, 0.045), "white_paint", b, segs=6, rings=3)
+    # queue courte dans le prolongement du dos, enfoncée dans le croupion, pointe à peine relevée (tour 6:
+    # l'ancienne, posée au bout, semblait détachée); dessous blanc
+    ell(g, (0.06, 0.12, 0.03), (0, 0.29, 0.05), by_normal("goose_grey", "goose_grey_dark", "white_paint", thr=0.5), b,
+        segs=7, rings=4, rot=(8, 0, 0))
+    ell(g, (0.05, 0.065, 0.03), (0, 0.29, 0.018), "white_paint", b, segs=6, rings=3, rot=(5, 0, 0))
     n = "goose_neck"
     seg(g, (0, -0.19, 0.08), (0, -0.235, 0.32), 0.05, 0.034, "goose_grey_dark", n, segs=6)
     h = "goose_head"
@@ -367,7 +417,7 @@ def goose_mesh(A):
         seg(g, (x, 0.08, -0.04), (x, 0.10, -0.16), 0.014, 0.011, "goose_leg", leg, segs=5)
         g.mesh([(x, 0.10, -0.168), (x - 0.04, 0.02, -0.17), (x + 0.04, 0.02, -0.17),
                 (x, 0.10, -0.158), (x - 0.04, 0.02, -0.162), (x + 0.04, 0.02, -0.162)],
-               [[0, 1, 2], [3, 5, 4], [0, 3, 4, 1], [1, 4, 5, 2], [2, 5, 3, 0]], "goose_leg", bone=leg)
+               [[0, 2, 1], [3, 4, 5], [0, 1, 4, 3], [1, 2, 5, 4], [2, 0, 3, 5]], "goose_leg", bone=leg)
     return g
 
 
@@ -426,38 +476,37 @@ def blue_tit_mesh(A):
     ell(g, _ts((0.021, 0.031, 0.022)), _ts((0, 0.002, 0.03)), by_normal("tit_green", "tit_yellow", "tit_yellow", thr=0.45), b,
         segs=7, rings=5, rot=(-12, 0, 0))
     h = "tit_head"
-
-    def head_color(face):
-        n = face.normal
-        if n.z > 0.42:
-            return "tit_blue"
-        if n.z < -0.55:
-            return "jay_stripe"
-        return "white_paint"
-    g.sphere(0.0175 * S, loc=_ts((0, -0.027, 0.048)), color=head_color, segs=7, rings=5, bone=h)
-    seg(g, _ts((0, -0.042, 0.047)), _ts((0, -0.054, 0.046)), 0.004 * S, 0.0008 * S, "jay_stripe", h, segs=5)
+    # tête en bandes de facettes: calotte bleue, liseré blanc, bandeau noir de l'oeil (du bec à la nuque),
+    # joue blanche, collier sombre dessous (tour 6: l'ancien bandeau était une barre posée qui dépassait)
+    head_bands = ["tit_blue", "tit_blue", "white_paint", "jay_stripe", "white_paint", "jay_stripe"]
+    r = 0.0185 * S
+    banded_ball(g, (r, r * 1.05, r * 0.95), _ts((0, -0.027, 0.048)), [0, 34, 60, 72, 88, 136, 180], 8,
+                lambda band, face: head_bands[band], h)
+    seg(g, _ts((0, -0.044, 0.046)), _ts((0, -0.056, 0.0445)), 0.0042 * S, 0.0008 * S, "jay_stripe", h, segs=5)
     for s in (1, -1):
-        g.box(_ts((0.003, 0.02, 0.004)), loc=_ts((s * 0.0155, -0.03, 0.049)), color="jay_stripe", rot=(0, 0, s * 8), bone=h)
         side = "tit_wing_" + ("l" if s > 0 else "r")
-        wing = [(0.0, -0.012), (0.005, -0.01), (0.005, 0.024), (0.0, 0.03)]
-        pts = [(s * 0.0135 + s * x, y) for x, y in wing]
-        plate(g, [_ts((x, y))[:2] for x, y in pts], 0.036 * S, 0.006 * S, 0.004 * S, "tit_blue", "tit_blue", side)
+        # aile repliée: coquille arrondie couchée sur le flanc, de l'épaule jusqu'au-dessus de la queue,
+        # pointe un peu basse et rentrée vers le croupion; dépliée seulement en vol (tit_fly, tit_exit)
+        ell(g, _ts((0.005, 0.021, 0.0105)), _ts((s * 0.0163, 0.014, 0.031)), "tit_blue", side, segs=6, rings=4,
+            rot=(-18, 0, s * 5))
         # pattes: deux brins sous le corps, doigts posés sur le perchoir (origine)
         seg(g, _ts((s * 0.007, 0.004, 0.014)), _ts((s * 0.007, 0.002, 0.001)), 0.0018 * S, 0.0015 * S, "lauze_dark", "tit_root", segs=5)
         g.box(_ts((0.003, 0.014, 0.002)), loc=_ts((s * 0.007, 0.0, 0.001)), color="lauze_dark", bone="tit_root")
-    plate(g, [_ts((-0.008, 0.026))[:2], _ts((0.008, 0.026))[:2], _ts((0.009, 0.06))[:2], _ts((-0.009, 0.06))[:2]],
-          0.027 * S, 0.004 * S, 0.003 * S, "tit_blue", "tit_blue", "tit_tail")
+    # queue: fuseau aplati qui sort du croupion, un peu tombante (plus de planche)
+    ell(g, _ts((0.0075, 0.017, 0.003)), _ts((0, 0.043, 0.0245)), "tit_blue", "tit_tail", segs=6, rings=3, rot=(-16, 0, 0))
     return g
 
 
 def tit_clips(rig):
     S = TIT_SCALE
     rest = {}
-    opn = {"tit_wing_l": {"r": [("z", -80)]}}
+    # l'aile est modelée repliée (long axe vers l'arrière, à plat contre le flanc): roulis de 90 degrés puis
+    # lacet de -80 pour l'ouvrir à l'horizontale (long axe vers l'extérieur), puis battement (roulis)
+    opn = {"tit_wing_l": {"r": [("y", 90), ("z", -80)]}}
     opn = merge(opn, mirror(opn))
 
     def flap(a):
-        w = {"tit_wing_l": {"r": [("z", -80), ("y", -a)]}}
+        w = {"tit_wing_l": {"r": [("y", 90), ("z", -80), ("y", -a)]}}
         return merge(w, mirror(w), {"tit_body": R(10), "tit_tail": R(-6)})
     C = {}
     C["tit_perch"] = (True, {0: rest, 10: {"tit_head": R(0, 0, 40)}, 18: {"tit_head": R(-6, 0, -32)},
@@ -515,14 +564,17 @@ FOX_BONES = [
 
 def fox_mesh(A):
     g = A.geo()
+    # pelage inchangé au tour 6: mesuré en jeu le soir, un roux éclairci (#E58A4C) rejoint la valeur de
+    # l'herbe (L* 27 contre 30, au lieu de 22); la lecture sans la teinte passe par les blancs agrandis
     coat = by_normal("fox_red_dark", "fox_red", "fox_white", thr=0.55)
     ell(g, (0.085, 0.15, 0.10), (0, -0.09, 0.31), coat, "fox_chest", segs=8, rings=5)
     ell(g, (0.08, 0.15, 0.09), (0, 0.12, 0.315), coat, "fox_hips", segs=8, rings=5, rot=(4, 0, 0))
-    ell(g, (0.055, 0.05, 0.065), (0, -0.215, 0.32), "fox_white", "fox_chest", segs=6, rings=4)
+    # plastron et bout de queue blancs agrandis d'un tiers (tour 6: lecture en niveaux de gris et par les daltoniens)
+    ell(g, (0.072, 0.066, 0.086), (0, -0.218, 0.31), "fox_white", "fox_chest", segs=7, rings=4)
     seg(g, (0, -0.17, 0.34), (0, -0.275, 0.43), 0.058, 0.046, "fox_red", "fox_neck", segs=6)
     h = "fox_head"
     ell(g, (0.056, 0.062, 0.05), (0, -0.305, 0.44), "fox_red", h, segs=7, rings=5)
-    ell(g, (0.05, 0.045, 0.028), (0, -0.335, 0.412), "fox_white", h, segs=7, rings=4)
+    ell(g, (0.056, 0.05, 0.032), (0, -0.335, 0.41), "fox_white", h, segs=7, rings=4)
     seg(g, (0, -0.335, 0.428), (0, -0.44, 0.414), 0.03, 0.011, by_normal("fox_red", "fox_red", "fox_white", thr=0.4), h, segs=6)
     g.sphere(0.012, loc=(0, -0.443, 0.415), color="fox_black", segs=5, rings=3, bone=h)
     for s in (1, -1):
@@ -536,7 +588,7 @@ def fox_mesh(A):
     # queue touffue, bout blanc
     ell(g, (0.05, 0.12, 0.05), (0, 0.35, 0.30), "fox_red", "fox_tail", segs=7, rings=4, rot=(-18, 0, 0))
     ell(g, (0.058, 0.12, 0.056), (0, 0.54, 0.238), "fox_red", "fox_tail_2", segs=7, rings=4, rot=(-18, 0, 0))
-    ell(g, (0.042, 0.055, 0.042), (0, 0.655, 0.20), "fox_white", "fox_tail_2", segs=6, rings=4, rot=(-18, 0, 0))
+    ell(g, (0.056, 0.073, 0.056), (0, 0.665, 0.197), "fox_white", "fox_tail_2", segs=7, rings=4, rot=(-18, 0, 0))
     for s, side in ((1, "l"), (-1, "r")):
         x = s * 0.045
         seg(g, (x, -0.15, 0.30), (x, -0.145, 0.15), 0.03, 0.02, "fox_red", "fox_leg_f" + side, segs=6)
@@ -611,7 +663,8 @@ def ladder_wood(A):
                         p = p - axis * ((p.y - top.y) / axis.y)
                     vs.append(tuple(p))
         # sommets: pied (0..3), tête (4..7); ordre (sx, sn): (-,-), (-,+), (+,-), (+,+)
-        faces = [[0, 2, 3, 1], [4, 5, 7, 6], [0, 1, 5, 4], [2, 6, 7, 3], [0, 4, 6, 2], [1, 3, 7, 5]]
+        # sens des faces vers l'extérieur (tour 6: elles étaient inversées, volume négatif)
+        faces = [f[::-1] for f in [[0, 2, 3, 1], [4, 5, 7, 6], [0, 1, 5, 4], [2, 6, 7, 3], [0, 4, 6, 2], [1, 3, 7, 5]]]
         verts = g.mesh(vs, faces, "wood_old")
         g.bevel(verts, 0.008, 1, "wood_old", lambda p, q: abs((Vector(q) - Vector(p)).normalized().dot(axis)) > 0.9)
     for k in range(1, 11):

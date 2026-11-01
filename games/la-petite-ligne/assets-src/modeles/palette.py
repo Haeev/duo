@@ -168,7 +168,7 @@ WORLD = [
     ("mattress_stripe", "#8FA5BF", 0.95, 0.0, None),
     ("ivy", "#4E7A3F", 0.9, 0.0, None),
     # Faune des moments rares (tour 6): héron cendré, oie cendrée, mésange bleue, renard roux, nichoir
-    ("heron_grey", "#9BA2A6", 0.9, 0.0, None),
+    ("heron_grey", "#7F888E", 0.9, 0.0, None),
     ("heron_grey_dark", "#5F676D", 0.9, 0.0, None),
     ("feather_white", "#EEECE4", 0.9, 0.0, None),
     ("heron_leg", "#B3A26E", 0.8, 0.0, None),

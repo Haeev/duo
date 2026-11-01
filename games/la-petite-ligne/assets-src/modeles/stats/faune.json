@@ -7,7 +7,7 @@
    "length": 0.9,
    "wingspan": 1.7,
    "collision_radius": 0.3,
-   "tris": 706
+   "tris": 866
   },
   "goose": {
    "kind": "animal",
@@ -15,7 +15,7 @@
    "length": 0.8,
    "wingspan": 1.6,
    "note": "neuf instances d'un seul maillage (SkeletonUtils.clone)",
-   "tris": 388
+   "tris": 406
   },
   "blue_tit": {
    "kind": "animal",
@@ -23,7 +23,7 @@
    "display_scale": 1.5,
    "length": 0.18,
    "beak_socket": "socket_blue_tit_beak",
-   "tris": 244
+   "tris": 304
   },
   "fox": {
    "kind": "animal",
@@ -31,7 +31,7 @@
    "withers": 0.4,
    "length": 0.65,
    "tail": 0.4,
-   "tris": 786
+   "tris": 798
   },
   "ladder_wood": {
    "kind": "prop",
@@ -200,5 +200,5 @@
    }
   ]
  },
- "file_bytes": 542576
+ "file_bytes": 573624
 }
