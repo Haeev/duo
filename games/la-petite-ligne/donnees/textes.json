@@ -89,7 +89,7 @@
     "moment_fox_climax": "Le renard s'arrête, vous regarde, jappe deux fois, et file le long de la voie.",
     "moment_fox_memory": "Le renard de la voie, un {weekday} soir.",
     "moment_fox_rumor": "qu'un renard suit la voie, à la tombée du jour.",
-    "moment_fox_vignette": "Le renard assis sur le ballast, la queue autour des pattes.",
+    "moment_fox_vignette": "Le renard qui mulote, en plein bond, près du ballast.",
     "moment_glowworms_hint": "Odette te l'a dit hier: « Par une nuit douce, les vers luisants s'allument dans le pré de l'est. Après neuf heures du soir ! »",
     "moment_glowworms_climax": "Une à une, de petites lanternes vertes s'allument dans l'herbe haute. Le pré tout entier scintille.",
     "moment_glowworms_memory": "Les vers luisants du pré, un {weekday} soir.",
@@ -278,7 +278,7 @@
     "fresh": "Nouveau souvenir",
     "secrets": {
       "hen_names": {
-        "vignette": "Trois poules au pied de la mangeoire.",
+        "vignette": "Trois poules qui accourent : la rousse, la blanche et la noire.",
         "informed": "Odette te les avait confiés; {partner} les a appelées.",
         "doer": "{partner} te les a soufflés; tu les as appelées."
       },

@@ -1046,9 +1046,9 @@ OWL_TRACK = [
     [8.6, 57.4, 27.6, 0.9, "owl_flap"],
     [9.2, 56.6, 27.5, 0.8, "owl_land"],
     [12.4, 56.6, 27.5, 0.8, "owl_look"],
-    [13.4, 55.0, 25.4, 2.0, "owl_flap"],
-    [14.6, 53.4, 22.6, 3.4, "owl_glide"],
-    [16.0, 52.0, 19.6, 5.0, "owl_glide"],
+    [13.4, 56.0, 25.6, 2.0, "owl_flap"],
+    [14.6, 56.4, 22.4, 3.6, "owl_glide"],
+    [16.0, 56.8, 19.6, 7.4, "owl_glide"],
 ]
 LANTERN_PLACES = [(48.5, 18.5), (35.5, 24.5)]       # au quai (est de la lanterne), sur la place
 LANTERN_HEADS = [(47.5, 18.5, 3.3), (34.5, 24.5, 3.3)]   # lamp_quay_east, lamp_square_north
