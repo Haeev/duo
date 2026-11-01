@@ -10,7 +10,7 @@ import { characterOf } from './contexte';
 import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText, secretStamp } from './dom';
 import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
-import { letterModels, nextObjective, questModels, slotModel, type QuestModel } from './modele';
+import { letterModels, nextObjective, notebookQuests, slotModel, type QuestModel } from './modele';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { Panel } from './panneau';
@@ -294,26 +294,31 @@ export class NotebookPanel extends Panel {
 
   private renderQuests(world: ReadonlyWorld): void {
     const { ctx } = this.host;
-    const quests = questModels(world, ctx);
+    const groups = notebookQuests(world, ctx);
     const current = nextObjective(world, ctx)?.id ?? null;
     const hint = momentHintModel(world, ctx);
-    const sig = JSON.stringify(['quests', quests, current, hint]);
+    const sig = JSON.stringify(['quests', groups, current, hint]);
     this.renderBody(sig, () => {
-      const ordered = [...quests].sort((a, b) => Number(a.done) - Number(b.done));
-      // Ordre d'affichage: la semaine puis les coups de main, les quêtes finies en bas de chacun.
+      const byDone = (list: readonly QuestModel[]): QuestModel[] => [...list].sort((a, b) => Number(a.done) - Number(b.done));
+      // Ordre d'affichage: la semaine, les coups de main, puis les annonces (tour 9), les quêtes finies en bas de chacun.
       // Le focus va à la première quête encore ouverte, en haut de la liste: le carnet s'ouvre sans défiler.
-      const shown = [...ordered.filter((q) => q.kind === 'main'), ...ordered.filter((q) => q.kind === 'side')];
+      const lists = { main: byDone(groups.main), side: byDone(groups.side), annonces: byDone(groups.annonces) };
+      const shown = [...lists.main, ...lists.side, ...lists.annonces];
       const focusId = shown[defaultQuest(shown, null)]?.id ?? null;
-      const section = (kind: 'main' | 'side'): HTMLElement[] => {
-        const list = ordered.filter((q) => q.kind === kind);
+      let first = true;
+      const section = (kind: 'main' | 'side' | 'annonces'): HTMLElement[] => {
+        const list = lists[kind];
         if (list.length === 0) return [];
         const ul = el('ul', { class: 'lpl-quests', 'data-nav': 'list' });
         for (const q of list) ul.append(this.questItem(q, q.id === current, q.id === focusId));
         // Une section par bloc: son titre collé en haut au défilement s'en va avec elle.
-        const title = el('h3', { class: 'lpl-section-title', text: ctx.t(ctx.texts.game.ui.questKinds[kind]) });
-        return [el('section', { class: `lpl-quest-section${kind === 'side' ? ' lpl-section-gap' : ''}` }, [title, ul])];
+        const label = kind === 'annonces' ? ctx.texts.extra.notebook.annonces : ctx.texts.game.ui.questKinds[kind];
+        const title = el('h3', { class: 'lpl-section-title', text: ctx.t(label) });
+        const gap = first ? '' : ' lpl-section-gap';
+        first = false;
+        return [el('section', { class: `lpl-quest-section${gap}`, 'data-group': kind }, [title, ul])];
       };
-      const nodes = [...(hint === null ? [] : [this.hintCard(hint)]), ...section('main'), ...section('side')];
+      const nodes = [...(hint === null ? [] : [this.hintCard(hint)]), ...section('main'), ...section('side'), ...section('annonces')];
       return nodes.length === 0 ? [el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.notebook.noQuests) })] : nodes;
     });
   }
@@ -321,10 +326,12 @@ export class NotebookPanel extends Panel {
   private questItem(q: QuestModel, current: boolean, autofocus: boolean): HTMLLIElement {
     const { ctx } = this.host;
     let side: HTMLElement;
-    if (q.done) side = chip(ctx.t(ctx.texts.game.ui.questDone), 'ready', 'ui-check');
+    if (q.withdrawn) side = chip(ctx.t(ctx.texts.extra.notebook.annonceExpired));
+    else if (q.done) side = chip(ctx.t(ctx.texts.game.ui.questDone), 'ready', 'ui-check');
     else if (q.progress !== '') side = chip(q.progress);
     else side = el('span');
-    const lead = q.done ? icon('ui-check', 'lpl-icon lpl-quest__done') : icon(q.kind === 'main' ? 'ui-flag' : 'ui-heart');
+    const open = q.id.startsWith('annonce_') ? 'ui-notice' : q.kind === 'main' ? 'ui-flag' : 'ui-heart';
+    const lead = q.withdrawn ? icon('ui-cross') : q.done ? icon('ui-check', 'lpl-icon lpl-quest__done') : icon(open);
     return el(
       'li',
       {
@@ -332,7 +339,7 @@ export class NotebookPanel extends Panel {
         tabindex: '0',
         'data-nav-item': true,
         'data-key': `quest:${q.id}`,
-        'data-state': q.done ? 'done' : current ? 'current' : null,
+        'data-state': q.withdrawn ? 'withdrawn' : q.done ? 'done' : current ? 'current' : null,
         'data-autofocus': autofocus,
       },
       [lead, el('span', { class: 'lpl-quest__title', text: q.title }), side, el('span', { class: 'lpl-quest__text', text: q.text }), ...this.secretCard(q)],
@@ -388,14 +395,15 @@ export class NotebookPanel extends Panel {
     }
     const selected = letters.find((l) => l.id === this.letter) ?? null;
     if (selected?.unread === true) this.host.send({ type: 'read_letter', letter: selected.id });
-    const sig = JSON.stringify(['mail', letters.map((l) => [l.id, l.unread]), this.letter]);
+    const sig = JSON.stringify(['mail', letters.map((l) => [l.id, l.unread, l.title]), this.letter]);
     this.renderBody(sig, () => {
       if (letters.length === 0) return [el('div', { class: 'lpl-empty' }, [icon('ui-letter'), ctx.t(n.noLetters)])];
       const list = el('ul', { class: 'lpl-letter-list', 'data-nav': 'list', 'aria-label': n.lettersLabel });
       for (const l of letters) {
         list.append(
           el('li', {}, [
-            button([icon('ui-letter'), el('strong', { text: l.from }), el('small', { text: l.day })], () => {
+            // Titre d'abord (une ligne, coupé par des points de suspension), puis l'expéditeur et le jour (section 5.2).
+            button([icon('ui-letter'), el('strong', { class: 'lpl-letter-item__title', text: l.title }), el('small', { class: 'lpl-letter-item__meta', text: l.meta })], () => {
               this.letter = l.id;
               this.host.invalidate();
             }, {
@@ -403,6 +411,8 @@ export class NotebookPanel extends Panel {
               attrs: {
                 'data-nav-item': true,
                 'data-key': `letter:${l.id}`,
+                'aria-label': l.label,
+                title: l.title,
                 'aria-current': String(l.id === this.letter),
                 'data-state': l.unread && l.id !== this.letter ? 'unread' : null,
                 'data-autofocus': l.id === this.letter,

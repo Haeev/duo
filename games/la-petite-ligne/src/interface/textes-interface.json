@@ -251,7 +251,13 @@
     "furniture": "À poser dans la maisonnette : prends-le en main, puis vise un coin de la pièce.",
     "tool": "Un outil : mets-le en main pour t'en servir.",
     "seed": "Pousse en {days} jours, {yield} par case. Arrose chaque jour.",
-    "inProgress": "{done} sur {total}"
+    "inProgress": "{done} sur {total}",
+    "letterMeta": "{from} · {day}",
+    "letterLabel": "{title}, de {from}, {day}",
+    "letterUnread": "{title}, de {from}, {day}, non lue",
+    "annonces": "Annonces",
+    "orderResult": "{lines}, {amount} sous",
+    "annonceExpired": "Retirée"
   },
   "crate": {
     "board": "Commande du samedi {day}, départ du train à {time}",
@@ -310,8 +316,33 @@
       "flower_pot": "Beauté",
       "nail": "Pour réparer le poulailler, puis la draisine",
       "wood_stove": "Confort · une chaleur douce pour les soirées",
-      "picture_frame": "Beauté · s'accroche au mur"
-    }
+      "picture_frame": "Beauté · s'accroche au mur",
+      "watering_can_copper": "Deux fois plus d'eau, deux fois moins d'allers au puits.",
+      "axe_forged": "Forgée dans la vallée. Deux coups, et l'arbre se couche.",
+      "fishing_rod_bamboo": "Souple et sensible : on sent la touche plus tôt, on a plus de temps pour ferrer.",
+      "hen_extra": "Une poule de plus pour le poulailler. Jeanne a déjà un nom pour elle.",
+      "hen_extra_2": "Une poule de plus pour le poulailler. Jeanne a déjà un nom pour elle.",
+      "chalk_box": "Des craies de toutes les couleurs, pour dessiner sur les pavés.",
+      "coffee_mill": "Un moulin neuf, en bois et en laiton. Il ne grince pas.",
+      "leather_apron": "Un tablier de scieur, en cuir épais, cousu main.",
+      "wool_scarf": "Une écharpe de laine tricotée, pour les soirs sur le quai.",
+      "straw_hat": "Pour les jours de soleil. Le clou est fourni.",
+      "pressed_flowers": "Les fleurs de la vallée, pressées et encadrées.",
+      "wicker_armchair": "En osier tressé. Il grince juste ce qu'il faut.",
+      "coop_calendar": "La gravure change avec la saison. Celle de l'automne montre la Halte.",
+      "wall_clock": "Elle sonne les heures, et elle a toujours raison.",
+      "autumn_wreath": "Feuilles de chêne et de vigne vierge, nouées d'un ruban."
+    },
+    "shelves": {
+      "tools": "Outillage",
+      "hens": "Basse-cour",
+      "house": "Maison",
+      "gifts": "Pour offrir"
+    },
+    "shelvesLabel": "Rayons du catalogue",
+    "forVillager": "Pour {villager} : {item}",
+    "copiesLeft": "Encore {left} sur {copies}",
+    "orderedCount": "{count} déjà commandé"
   },
   "shop": {
     "closedNotice": "Odette n'est pas au comptoir pour l'instant.",
@@ -362,7 +393,10 @@
     "acceptedGrocery": "Dans le sac de {buyer} : {item}. {price} sous dépensés.",
     "acceptedCatalogue": "Commandé : {item}, livraison au train de samedi. {price} sous dépensés.",
     "enterHint": "{key} pour répondre, ou un clic sur la proposition. Tu peux continuer à jouer.",
-    "you": "toi"
+    "you": "toi",
+    "receivedImprovement": "{partner} propose de verser {price} sous pour {item}. D'accord ?",
+    "sentImprovement": "Tu proposes de verser {price} sous pour {item}.",
+    "acceptedImprovement": "Versé : {price} sous pour {item}."
   },
   "build": {
     "holding": "En main",
@@ -464,6 +498,56 @@
     "bothFinish": "Vous avez choisi « Finir la séance » sur les deux ordinateurs.",
     "after": "« Rester à la Halte » reprend la partie ce samedi à 16 h, chez les deux. « Finir la séance » la garde telle quelle : elle vous proposera de rester la prochaine fois.",
     "afterLast": "Ensuite : l'écran de fin de Duo, et la séance dans votre historique.",
-    "choicesLabel": "Vos deux choix"
+    "choicesLabel": "Vos deux choix",
+    "chantiers": "chantiers bâtis",
+    "chantiersStat": "Chantiers bâtis : {n}"
+  },
+  "board": {
+    "title": "Le tableau du quai",
+    "tabsLabel": "Pages du tableau",
+    "catalogueTab": "Catalogue",
+    "annoncesSubtitle": "Firmin épingle une annonce le dimanche et le mercredi, à 6 h.",
+    "chantiersSubtitle": "Vous versez ensemble, Basile bâtit dans la nuit.",
+    "noAnnonce": "Pas encore d'annonce. Firmin en épinglera une dimanche ou mercredi matin.",
+    "kinds": {
+      "help": "Coup de main",
+      "together": "À deux"
+    },
+    "current": "L'annonce en cours",
+    "previous": "L'annonce d'avant",
+    "linesLabel": "Ce qu'il faut donner",
+    "line": "{count} {item}",
+    "lineGiven": "{have} sur {need}",
+    "sceneLine": "Puis venir à deux au rendez-vous",
+    "sceneOnly": "Venir à deux au rendez-vous",
+    "lineDone": "Fait",
+    "lineTodo": "À faire",
+    "howTo": "Parle à {giver} pour donner ce qu'il faut.",
+    "doneBy": "Fait par {name}",
+    "doneTogether": "Fait à deux",
+    "expiredText": "{giver} a trouvé une autre solution. Rien de perdu.",
+    "payAmount": "Verser {amount} sous",
+    "progressLabel": "{paid} sur {price} sous",
+    "planksPaid": "dont {planks} planches apportées",
+    "allBuilt": "Tous les chantiers du bourg sont bâtis.",
+    "builtTitle": "Déjà bâtis",
+    "builtOn": "Bâti dans la nuit du {weekday} {day}",
+    "home": "Chez vous : {name}, à commander à l'établi de Basile.",
+    "homeFrom": "Chez vous : Basile prendra des commandes à partir du {weekday} {day}.",
+    "keysPay": "verser",
+    "bigPay": "À partir de {amount} sous, le versement attend l'accord de {partner}.",
+    "nextTomorrow": "Le chantier suivant s'affiche demain matin.",
+    "missingFor": "Il manque {missing} sous pour verser {amount} sous.",
+    "planksPaidOne": "dont 1 planche apportée"
+  },
+  "basile": {
+    "subtitle": "Payé d'un coup, bâti dans la nuit.",
+    "orderButton": "Commander pour {price} sous",
+    "bring": "Apporter {count} planches",
+    "bringOne": "Apporter 1 planche",
+    "noPlanks": "Aucune planche dans ton sac",
+    "planksFull": "Basile ne prend pas plus de planches pour ce chantier.",
+    "help": "Chaque planche apportée retire {discount} sous du prix.",
+    "allBuilt": "Basile a fini les chantiers de la maisonnette."
   }
 }

@@ -1180,3 +1180,262 @@
     padding-block: var(--lpl-space-1);
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* Tour 9: tableau du quai, établi de Basile, courrier à titres        */
+/* ------------------------------------------------------------------ */
+
+/* Courrier (section 5.2): le titre d'abord, sur une ligne, coupé par des points de suspension; l'expéditeur et le jour en petit. */
+.lpl-mail {
+  grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+}
+
+.lpl-letter-item {
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.lpl-letter-item__title,
+.lpl-letter-item__meta {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-letter-item__title {
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Non lue: titre plus gras et pastille, sans texte ajouté qui serait coupé avec le titre. */
+.lpl-letter-item[data-state='unread'] strong::after {
+  content: none;
+}
+
+.lpl-letter-item[data-state='unread'] .lpl-letter-item__title {
+  padding-right: 0.875rem;
+  font-weight: 850;
+}
+
+.lpl-letter-item[data-state='unread']::after {
+  position: absolute;
+  top: 50%;
+  right: var(--lpl-space-2);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--lpl-color-stamp);
+  content: '';
+  transform: translateY(-50%);
+}
+
+/* Tableau du quai: trois onglets, la bourse et le bouton de fermeture tiennent dans l'en-tête à 150 %. */
+.lpl-board .lpl-panel__header {
+  flex-wrap: wrap;
+  row-gap: var(--lpl-space-1);
+}
+
+.lpl-board .lpl-panel__header > div:first-of-type {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lpl-board__tabs {
+  order: 5;
+  flex: 1 0 100%;
+  margin-left: 0;
+}
+
+/* Fenêtre basse (150 %): l'en-tête du tableau a deux rangées, le sous-titre laisse la place au contenu. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-board .lpl-panel__subtitle {
+    display: none;
+  }
+}
+
+.lpl-product__copies {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Annonce: une feuille épinglée, le mot de l'habitant écrit à la main. */
+.lpl-annonce {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-annonce--previous {
+  padding-block: var(--lpl-space-2);
+  box-shadow: none;
+}
+
+.lpl-annonce[data-state='expired'] {
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-annonce__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-3);
+}
+
+.lpl-annonce__title {
+  flex: 1 1 12rem;
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-annonce__text {
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.lpl-annonce__lines .lpl-order__line {
+  min-height: 2.75rem;
+  padding-block: var(--lpl-space-1);
+}
+
+.lpl-annonce__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-1) var(--lpl-space-4);
+  margin: 0;
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-annonce__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lpl-annonce__help {
+  margin: 0;
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Tampon « Fait » à la couleur de qui a remis l'annonce; « Retirée » en gris. */
+.lpl-annonce__stamp[data-player='self'] {
+  border-color: var(--lpl-player-self);
+}
+
+.lpl-annonce__stamp[data-player='other'] {
+  border-color: var(--lpl-player-other);
+}
+
+.lpl-annonce__stamp[data-state='expired'] {
+  border-color: var(--lpl-color-line);
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Chantier: progression, puis les versements. */
+.lpl-chantier {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-chantier__head {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-chantier__title {
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-chantier__progress {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.lpl-chantier__progress .lpl-order__bar {
+  width: 100%;
+}
+
+.lpl-chantier__note,
+.lpl-chantier__missing {
+  margin: 0;
+}
+
+.lpl-chantier__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-chantier__home {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: var(--lpl-space-3);
+}
+
+.lpl-chantier__planks {
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-built {
+  display: grid;
+  gap: var(--lpl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-built__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 var(--lpl-space-2);
+}
+
+.lpl-built__name {
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-built__when {
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-built__text {
+  grid-column: 2 / -1;
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Carnet: annonce retirée en gris (sans la rature d'une quête faite: elle n'a pas été faite). */
+.lpl-quest[data-state='withdrawn'] {
+  background: transparent;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-quest[data-state='withdrawn'] .lpl-quest__title {
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Écran d'étape: quatre compteurs (chantiers bâtis, tour 9); celui des commandes, qui a un détail, prend plus de place. */
+.lpl-screen--stage .lpl-counters {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr);
+}

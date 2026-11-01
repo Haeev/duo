@@ -790,6 +790,7 @@ export class EndScreen implements Layer {
   private readonly lines: HTMLSpanElement;
   private readonly linesDetail: HTMLSpanElement;
   private readonly furniture: HTMLSpanElement;
+  private readonly chantiers: HTMLSpanElement;
   private readonly counters: HTMLDivElement;
   private readonly self: PlayerCard;
   private readonly other: PlayerCard;
@@ -812,12 +813,18 @@ export class EndScreen implements Layer {
     this.days = el('span', { class: 'lpl-counter__value' });
     this.lines = el('span', { class: 'lpl-counter__value' });
     this.furniture = el('span', { class: 'lpl-counter__value' });
+    this.chantiers = el('span', { class: 'lpl-counter__value' });
     const counter = (value: HTMLElement, label: string): HTMLDivElement =>
       el('div', { class: 'lpl-counter' }, [value, el('span', { class: 'lpl-counter__label', text: ctx.t(label) })]);
     this.linesDetail = el('span', { class: 'lpl-counter__detail', hidden: true });
     const linesCounter = counter(this.lines, x.lines);
     linesCounter.append(this.linesDetail);
-    this.counters = el('div', { class: 'lpl-counters' }, [counter(this.days, x.days), linesCounter, counter(this.furniture, x.furniture)]);
+    this.counters = el('div', { class: 'lpl-counters' }, [
+      counter(this.days, x.days),
+      linesCounter,
+      counter(this.furniture, x.furniture),
+      counter(this.chantiers, x.chantiers),
+    ]);
     this.self = new PlayerCard(host, 'self', true);
     this.other = new PlayerCard(host, 'other', true);
     this.text = el('p', { class: 'lpl-sheet__lead lpl-stage__text' });
@@ -874,6 +881,7 @@ export class EndScreen implements Layer {
     }
     setHidden(this.linesDetail, m.detail === '');
     setText(this.furniture, String(m.furniture));
+    setText(this.chantiers, String(m.chantiers));
     setAttr(this.counters, 'aria-label', m.countersLabel);
 
     const chipOf = (p: StageModel['self']): HTMLElement =>

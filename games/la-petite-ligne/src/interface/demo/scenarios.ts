@@ -220,8 +220,10 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
 // format 5 (`tests/donnees/sauvegardes`): la fin de la démo (jour 15, écran d'étape) et l'été
 // (jour 25). `scenarioSave` dit laquelle charger; la page la restaure au lieu d'une partie neuve.
 
-/** Sauvegarde de référence d'où part un scénario du tour 8, ou `null` (partie neuve). */
+/** Sauvegarde de référence d'où part un scénario du tour 8 ou 9, ou `null` (partie neuve). */
 export function scenarioSave(name: string): string | null {
+  const t9 = TOUR9_SAVES[name];
+  if (t9 !== undefined) return t9;
   if (name.startsWith('etape-43') || ['ete-hud', 'ete-carnet', 'ete-caisse', 'ete-courrier', 'ete-nuit', 'brume-matin'].includes(name)) return 'format-5-ete-jour-25.json';
   if (name.startsWith('etape') || name === 'saison-ete' || name === 'reprise') return 'format-5-fin-de-la-demo.json';
   return null;
@@ -246,13 +248,169 @@ function pastTitle(sim: Sim): void {
   apply(sim, 'p2', [{ type: 'title_ready', ready: true }]);
 }
 
-/** L'écran d'étape du samedi 43: les robots restent à chaque étape jusqu'à la fin de l'été. */
+/** L'écran d'étape suivant (samedi 43, ou 64 depuis l'automne): les robots restent à chaque étape jusque-là. */
 function summerEnd(sim: Sim): void {
   const robot = createRobot({ stages: 'stay' });
   let ticks = 0;
   while (sim.world.phase !== 'ended' && ticks < 30 * MAX_TICKS) {
     step(sim, robot.decide(sim));
     ticks++;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tour 9: tableau du quai (catalogue par rayons, annonces, chantiers), établi de Basile, courrier à
+// titres, carnet, écran du jour 64. Ces situations partent des références du format 6: l'été
+// (jour 25: le banc du gué bâti, les jardinières à 600 sur 700, une planche apportée pour le banc
+// du pignon) et l'automne (jour 62: tout est bâti, une vingtaine de lettres).
+
+const SUMMER_25 = 'format-6-ete-jour-25.json';
+const AUTUMN_62 = 'format-6-automne-jour-62.json';
+
+const TOUR9_SAVES: Readonly<Record<string, string>> = {
+  'tableau-catalogue': SUMMER_25,
+  'tableau-catalogue-ferme': SUMMER_25,
+  'tableau-annonces': SUMMER_25,
+  'tableau-annonce-faite': SUMMER_25,
+  'tableau-annonce-retiree': SUMMER_25,
+  'tableau-chantiers': SUMMER_25,
+  'tableau-chantiers-accord': SUMMER_25,
+  'tableau-chantiers-tous': AUTUMN_62,
+  'etabli-basile': SUMMER_25,
+  'courrier-titres': AUTUMN_62,
+  'carnet-tour9': AUTUMN_62,
+  'etape-64': AUTUMN_62,
+};
+
+/** Onglet du tableau du quai qu'ouvre un scénario du tour 9, ou `null`. */
+export function scenarioBoardTab(name: string): 'catalogue' | 'annonces' | 'chantiers' | null {
+  if (name.startsWith('tableau-catalogue')) return 'catalogue';
+  if (name.startsWith('tableau-annonce')) return 'annonces';
+  if (name.startsWith('tableau-chantiers')) return 'chantiers';
+  return null;
+}
+
+/** Devant le tableau du quai, le tableau ouvert. */
+function atBoard(sim: Sim, id: CharacterId): void {
+  near(sim, id, 'notice_board');
+  apply(sim, id, [{ type: 'menu', menu: 'catalogue' }]);
+}
+
+/** L'annonce à deux du mercredi 26 vient d'être épinglée (la veille, celle du dimanche est faite). */
+function wednesdayAnnonce(sim: Sim): void {
+  playUntil(sim, (s) => s.world.board.current?.posted === 26 && free(s) && at(s, 26, 7 * HOUR));
+}
+
+/** Le catalogue du dimanche 30: deux pages d'été parues, un outil commandé par l'autre, le moulin d'Odette souhaité. */
+function catalogueSunday(sim: Sim, other: CharacterId): void {
+  const w = sim.world;
+  // La livraison du samedi 29 est passée: les arrosoirs et le chapeau sont arrivés.
+  w.clock.day = 30;
+  w.clock.minutes = 10 * HOUR;
+  w.catalogueOrders = ['axe_forged'];
+  w.catalogueOrderBy = [other];
+  w.catalogueBought = { ...w.catalogueBought, axe_forged: 1 };
+  if (!w.dialoguesDone.includes('odette_wish')) w.dialoguesDone.push('odette_wish');
+}
+
+/** Après le premier pas (qui rattrape la journée posée à la main): la bourse d'un dimanche d'été. */
+function catalogueSundayPurse(sim: Sim): void {
+  sim.world.purse = 640;
+  sim.world.proposals = [];
+}
+
+function tour9(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
+  switch (name) {
+    case 'tableau-catalogue':
+      catalogueSunday(sim, other);
+      atBoard(sim, me);
+      catalogueSundayPurse(sim);
+      return undefined;
+    case 'tableau-catalogue-ferme':
+      // Samedi 29 au matin: les commandes sont parties avec la poste, rien ne se commande avant 10 h.
+      sim.world.clock.day = 29;
+      sim.world.clock.minutes = 8 * HOUR;
+      atBoard(sim, me);
+      return undefined;
+    case 'tableau-annonces': {
+      // Le coup de main du dimanche 30 (des produits à donner, une liste à cocher).
+      playUntil(sim, (s) => s.world.board.current?.posted === 30 && free(s) && at(s, 30, 7 * HOUR));
+      // Une partie des dons est faite (comme si l'un des deux était déjà passé chez l'habitant).
+      const a = sim.world.board.current;
+      const def = sim.content.annonces.find((x) => x.id === a?.gabarit);
+      const line = def?.variants[a?.variant ?? 0]?.[0];
+      if (def !== undefined && line !== undefined) {
+        const key = `given:${def.giver}:${line.item}`;
+        sim.world.counters.duo[key] = (sim.world.counters.duo[key] ?? 0) + Math.floor(line.count / 2);
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-annonce-faite': {
+      wednesdayAnnonce(sim);
+      const a = sim.world.board.current;
+      if (a !== null) {
+        a.state = 'done';
+        a.by = me;
+        a.closedDay = 26;
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-annonce-retiree': {
+      wednesdayAnnonce(sim);
+      const a = sim.world.board.current;
+      if (a !== null) {
+        a.state = 'expired';
+        a.closedDay = 28;
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-chantiers':
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      sim.world.purse = Math.max(sim.world.purse, 320);
+      atBoard(sim, me);
+      return undefined;
+    case 'tableau-chantiers-accord':
+      // p1 propose de verser le reste (100 sous, l'accord de l'autre); chacun devant le tableau.
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      sim.world.purse = Math.max(sim.world.purse, 320);
+      atBoard(sim, 'p1');
+      near(sim, 'p2', 'notice_board', -0.9, 0.4);
+      apply(sim, 'p2', [{ type: 'menu', menu: 'catalogue' }]);
+      apply(sim, 'p1', [{ type: 'improvement_pay', improvement: 'quay_planters', amount: null }]);
+      return undefined;
+    case 'tableau-chantiers-tous':
+      atBoard(sim, me);
+      return undefined;
+    case 'etabli-basile':
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      fillBag(sim, me);
+      sim.world.purse = Math.max(sim.world.purse, 520);
+      near(sim, me, 'sawmill_workbench');
+      apply(sim, me, [{ type: 'menu', menu: 'workbench' }]);
+      return undefined;
+    case 'courrier-titres':
+      // Les deux dernières lettres de la coopérative pas encore lues chez ce joueur.
+      for (const l of sim.world.letters.slice(-2)) l.read = l.read.filter((id) => id !== me);
+      apply(sim, me, [{ type: 'menu', menu: 'letter' }]);
+      return undefined;
+    case 'carnet-tour9': {
+      // L'annonce d'avant n'a pas été faite: elle est « Retirée » au carnet, en gris.
+      const prev = sim.world.board.previous;
+      if (prev !== null) {
+        prev.state = 'expired';
+        prev.by = null;
+      }
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    }
+    case 'etape-64':
+      summerEnd(sim);
+      return undefined;
+    default:
+      return null;
   }
 }
 
@@ -333,6 +491,8 @@ function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
  */
 export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
+  const later = tour9(sim, name, me, other);
+  if (later !== null) return later;
   const suite = tour8(sim, name, me, other);
   if (suite !== null) return suite;
   const day5 = (): void => {

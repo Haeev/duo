@@ -25,7 +25,8 @@ import { directionOf, spatialNeighbour } from './focus';
 import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
 import { type ScreenKind, hudState, screenOf } from './modele';
-import { CataloguePanel, ChestPanel, CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { ChestPanel, CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { BoardPanel } from './tableau';
 import { ProposalCards } from './proposition';
 import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } from './sons';
 import { loadUiTexts } from './textes';
@@ -393,7 +394,7 @@ class GameUi implements GameInterface, UiHost {
       case 'shop':
         return () => new ShopPanel(this, tab);
       case 'catalogue':
-        return () => new CataloguePanel(this);
+        return () => new BoardPanel(this, tab);
       case 'crate':
         return () => new CratePanel(this);
       case 'workbench':
