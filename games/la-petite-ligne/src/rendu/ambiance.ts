@@ -21,6 +21,7 @@ import {
   Color,
   Mesh,
   MeshStandardMaterial,
+  Vector2,
   Vector3,
   type Material,
 } from 'three';
@@ -30,6 +31,7 @@ import { collectChimneys, type Chimney } from './cheminees';
 import { SkyLayer } from './ciel';
 import type { FrameContext } from './contexte';
 import { createWaterMaterial, type WaterUniforms } from './eau';
+import { createOcclusionField } from './occlusion';
 import type { ExtensionPart, RenderHooks } from './extensions';
 import { collectGlowSources, groundLights, type GroundLight } from './lueurs';
 import type { DaylightRig } from './lumiere';
@@ -128,6 +130,7 @@ export class AmbiancePart implements ExtensionPart {
     stars: new Color(AMBIANCE_SETTINGS.puffs.stars.color),
   };
   private readonly order: number[] = [];
+  private readonly bufferSize = new Vector2();
   private hadChimney = false;
   private steamClock = 0;
   private scanClock = 0;
@@ -161,6 +164,12 @@ export class AmbiancePart implements ExtensionPart {
     );
     const wind = AMBIANCE_SETTINGS.wind.direction;
     this.windDir.set(wind[0], 0, wind[1]).normalize();
+    // Occlusion cuite: la scène est construite (décor, forêt du pourtour), on la lit une fois.
+    const occlusion = createOcclusionField(hooks.map, hooks.terrain, hooks.scene);
+    resources.track(occlusion.texture);
+    this.surfaces.uLookField.value = occlusion.texture;
+    this.surfaces.uLookRect.value.copy(occlusion.rect);
+    this.surfaces.uLookHeight.value.copy(this.field.height);
 
     patchSurface(hooks.materials.palette, this.surfaces, {
       puddles: true,
@@ -229,7 +238,13 @@ export class AmbiancePart implements ExtensionPart {
   private patchCharacters(): void {
     const shared = this.hooks.characterMaterial;
     if (shared !== null) {
-      patchSurface(shared, this.surfaces, { puddles: false, wind: false, ground: false, key: 'characters' });
+      patchSurface(shared, this.surfaces, {
+        puddles: false,
+        wind: false,
+        ground: false,
+        rim: true,
+        key: 'characters',
+      });
     }
     this.hooks.scene.traverse((object) => {
       if (!(object instanceof Mesh)) {
@@ -243,7 +258,13 @@ export class AmbiancePart implements ExtensionPart {
           continue;
         }
         if (material.name.includes(CHARACTER_MATERIAL)) {
-          patchSurface(material, this.surfaces, { puddles: false, wind: false, ground: false, key: 'characters' });
+          patchSurface(material, this.surfaces, {
+            puddles: false,
+            wind: false,
+            ground: false,
+            rim: true,
+            key: 'characters',
+          });
         } else if (material.name.startsWith(PALETTE_MATERIAL)) {
           // Copie de la palette (foulard, substitut): mêmes ajouts que le décor, sans flaques.
           patchSurface(material, this.surfaces, { puddles: false, wind: false, ground: false, key: 'decor_copy' });
@@ -556,6 +577,7 @@ export class AmbiancePart implements ExtensionPart {
     u.uWet.value = day.wet;
     u.uReflection.value.copy(day.reflection);
     this.updateLights(day.focus, day.viewRadius, day.night);
+    this.updateLook(day);
 
     const w = AMBIANCE_SETTINGS.water;
     const glint = Math.max(day.sunLevel, day.night * w.moonGlint) * w.glintStrength;
@@ -593,6 +615,28 @@ export class AmbiancePart implements ExtensionPart {
     this.puffs.material.uniforms.uShadeColor.value.copy(this.shade);
     this.puffs.material.uniforms.uLightView.value.copy(this.lightView);
     this.puffs.update(context.time);
+  }
+
+  /**
+   * Passe « maquette » (réglages `look`): ombres teintées selon la force du
+   * soleil, occlusion, bord des personnages, étalonnage et vignettage. Le
+   * mode léger (demandé, automatique du moteur ou de l'ambiance) garde ce que
+   * `look.light` autorise.
+   */
+  private updateLook(day: DaylightRig): void {
+    const look = AMBIANCE_SETTINGS.look;
+    const light = this.light || !this.hooks.renderer.shadowMap.enabled;
+    const allow = (key: keyof typeof look.light): number => (light && !look.light[key] ? 0 : 1);
+    const u = this.surfaces;
+    u.uSunRadiance.value.copy(day.sun.color).multiplyScalar(day.sun.intensity);
+    u.uShadeParams.value.x = look.shadeTintAmount * (1 - day.night) * allow('shade');
+    u.uLookOcc.value.x = look.occlusionGround * allow('occlusion');
+    u.uRim.value.x = look.rim * allow('rim');
+    u.uRimColor.value.copy(this.lit).add(this.shade);
+    u.uGrade.value.w = allow('grade');
+    this.hooks.renderer.getDrawingBufferSize(this.bufferSize);
+    u.uVignette.value.z = 1 / Math.max(1, this.bufferSize.x);
+    u.uVignette.value.w = 1 / Math.max(1, this.bufferSize.y);
   }
 
   /** Vent: plus fort par nuages et par pluie, arrêté en version légère et si les animations sont réduites. */

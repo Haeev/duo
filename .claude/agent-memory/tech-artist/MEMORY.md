@@ -37,3 +37,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Énigme de la cloche: la cloche pend au bout du bras, à l'est du poteau (x local 0,35 à 0,9; hauteur 1,9 à 2,3 m). Le test doit viser l'assise et le dossier du banc, pas sa boîte entière (l'ombre qui passe entre les pieds compterait).
 - Le gué de la carte est du gravier (`g`), pas de l'eau: le reconnaître par l'eau à l'est et à l'ouest sur la rangée et pas d'eau dans la colonne.
 - Les lueurs de nuit se trouvent dans les modèles: faces dont l'UV pointe une case lumineuse de la palette (`glass`, `glass_lamp`, `flame`, `ember`, `lamp_shade`, `radio_dial`).
+
+## Passe « maquette » (tour 8, vérifié le 2026-11-01)
+
+- Ombres teintées sans programme de plus: après `lights_fragment_end`, comparer `reflectedLight.directDiffuse` au soleil attendu `uSunRadiance * diffuseContribution / PI * max(dot(N, L), 0)`. Sans le facteur `dot(N, L)`, un sol éclairé par un soleil rasant passe pour « à l'ombre » et toute la scène bleuit.
+- Étalonnage et vignettage injectés après `#include <tonemapping_fragment>` (sur `gl_FragColor`) dans les programmes existants: aucune cible intermédiaire ni passe plein écran. Saturation en « vibrance » (`mix(sat, 1, saturation actuelle)`): une saturation simple brûle les chemins orangés du soir.
+- Teinte appliquée à une lumière: la ramener à une luminance de 1 (`unitLuminance` de `surfaces.ts`) pour changer la couleur sans changer la clarté.
+- L'occlusion cuite (`occlusion.ts`) sert aussi en mode léger: sans ombres portées, elle seule pose encore les objets au sol.
+- Port 5281 pris par une autre session: vérifier `ss -ltn` avant de lancer son serveur Vite.

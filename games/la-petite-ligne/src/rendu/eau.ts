@@ -21,7 +21,7 @@ import {
 } from 'three';
 import type { TerrainField } from './champs';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
-import { SURFACE_FRAGMENT_PARS, injectAfter, type SurfaceUniforms } from './surfaces';
+import { FRAGMENT_GRADE, SURFACE_FRAGMENT_PARS, injectAfter, type SurfaceUniforms } from './surfaces';
 
 /** Uniformes propres à l'eau (les autres viennent des surfaces). */
 export interface WaterUniforms {
@@ -37,6 +37,11 @@ export interface WaterUniforms {
   uGlintLevel: { value: number };
   uGlintParams: { value: Vector3 };
   uWave: { value: Vector3 };
+  /** Bord ombré sous la berge (tour 8): teinte, puis largeur (part de la profondeur) et force. */
+  uBankShade: { value: Color };
+  uBankParams: { value: Vector2 };
+  /** Reflets doux du ciel qui glissent avec le courant: force, seuil. */
+  uSheen: { value: Vector2 };
 }
 
 const VERTEX_PARS = /* glsl */ `
@@ -66,6 +71,9 @@ uniform vec4 uFoamParams;  // largeur, vitesse, nombre de vaguelettes, force
 uniform vec3 uGlintColor;
 uniform float uGlintLevel;
 uniform vec3 uGlintParams; // finesse, vitesse, seuil
+uniform vec3 uBankShade;
+uniform vec2 uBankParams;  // largeur, force
+uniform vec2 uSheen;       // force, seuil
 `;
 
 /** Après `color_fragment`: couleur de l'eau, reflet, écume, transparence. */
@@ -79,6 +87,12 @@ float ripple = ripple1 * 0.6 + ripple2 * 0.4;
 vec3 waterBase = mix(uShallow, uDeep, smoothstep(0.0, 1.0, waterDepth));
 float mirror = clamp(uWaterParams.y + (ripple - 0.5) * uWaterParams.z * 2.0, 0.0, 1.0);
 diffuseColor.rgb = mix(waterBase, uReflection, mirror);
+// Reflets doux: de longues taches claires étirées dans le sens du courant, qui glissent lentement.
+float sheenNoise = texture(uAmbNoise, vec2(rippleUv.x * 0.35, rippleUv.y * 1.6) - uFlow * uAmbTime * 0.6).r;
+diffuseColor.rgb = mix(diffuseColor.rgb, uReflection * 1.12, smoothstep(uSheen.y, uSheen.y + 0.2, sheenNoise) * uSheen.x);
+// Sous la berge, l'eau s'assombrit et verdit (ombre et reflet du talus): le bord prend du relief.
+float bankShade = (1.0 - smoothstep(0.0, uBankParams.x, waterDepth)) * uBankParams.y;
+diffuseColor.rgb = mix(diffuseColor.rgb, uBankShade, bankShade);
 // Écume: des vaguelettes qui battent la berge, déchirées par le bruit.
 float nearBank = 1.0 - smoothstep(0.0, uFoamParams.x, waterDepth);
 float beat = 0.5 + 0.5 * sin(waterDepth * uFoamParams.z * 6.2831853 - uAmbTime * uFoamParams.y * 6.2831853);
@@ -127,6 +141,9 @@ export function createWaterMaterial(
     uGlintLevel: { value: 0 },
     uGlintParams: { value: new Vector3(w.glintScale, w.glintSpeed, w.glintThreshold) },
     uWave: { value: new Vector3(w.waveAmplitude, w.waveSpeed, w.waveLength) },
+    uBankShade: { value: new Color(w.bankShade) },
+    uBankParams: { value: new Vector2(w.bankShadeWidth, w.bankShadeAmount) },
+    uSheen: { value: new Vector2(w.sheen, w.sheenThreshold) },
   };
   const material = new MeshStandardMaterial({
     name: 'lpl_water',
@@ -163,6 +180,12 @@ export function createWaterMaterial(
       shader.fragmentShader,
       '#include <lights_fragment_end>',
       FRAGMENT_LIGHT,
+      label,
+    );
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <tonemapping_fragment>',
+      FRAGMENT_GRADE,
       label,
     );
   };
