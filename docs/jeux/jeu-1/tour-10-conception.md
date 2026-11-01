@@ -806,6 +806,8 @@ Question technique pour l'architecte (par le manager, pas pour le client): les i
 
 ## 12. Questions pour le client
 
+Réponses du client (2026-11-01): 1. des icônes, avec les chiffres dans le carnet; 2. oui aux barbes et moustaches; 3. les bâtiments (intérieurs) d'abord.
+
 1. **Les besoins se montrent en trois petites icônes à trois états, ou en jauges chiffrées ?** Les jauges chiffrées font plus « simulation de vie »; les icônes laissent l'écran calme et ne donnent pas envie d'optimiser chaque point. Recommandation: les icônes, avec la possibilité d'afficher les chiffres dans le carnet si vous le souhaitez.
 2. **Barbes et moustaches au choix, pour tous les personnages ?** Le jeu ne demande pas de genre; une barbe se choisirait comme une coupe, pour qui veut. Recommandation: oui, trois au salon (barbe courte, barbe fournie, moustache), au tour suivant.
 3. **Après la rue Haute, d'abord plus d'intérieurs, ou d'abord plus de dehors ?** Plus d'intérieurs: la halte, le fournil et l'école (l'histoire de Firmin et le mystère d'Émile avancent). Plus de dehors: le moulin de l'amont et son geste à deux (la vanne). Recommandation: les intérieurs d'abord (étape 2), parce qu'ils font avancer des histoires déjà commencées et qu'ils servent tous les jours; le moulin suit après l'hiver.
@@ -830,3 +832,4 @@ Hypothèses du script: revenus de la commande, des annonces et des ventes du tou
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-11-01 | 1 | Première rédaction: rue Haute et quatre étapes suivantes, Achille et Solange, intérieurs de l'épicerie et du salon, 15 coupes et 8 couleurs, besoins doux (Ventre, Repos, Cœur, Sommeil), cellier et chambre bâtis à deux, rangement à cases et râtelier, rideaux aux fenêtres; simulation `tour10_maison.py` | manager (retours du client, soirée du 1er novembre) |
+| 2026-11-01 | 1.1 | Réponses du client aux trois questions: icônes et chiffres au carnet, barbes et moustaches, intérieurs d'abord | client |
