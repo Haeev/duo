@@ -134,7 +134,7 @@ export const AMBIANCE_SETTINGS = {
       minutes: 420,
       azimuthDeg: 0,
       elevationDeg: 15,
-      sunColor: '#ffd3a0',
+      sunColor: '#ffc994',
       sunIntensity: 2.15,
       skyColor: '#cfe0ee',
       groundColor: '#9daa7a',
@@ -150,7 +150,7 @@ export const AMBIANCE_SETTINGS = {
       minutes: 540,
       azimuthDeg: 25,
       elevationDeg: 30,
-      sunColor: '#ffe2bb',
+      sunColor: '#ffdcae',
       sunIntensity: 2.5,
       skyColor: '#d3e3f0',
       groundColor: '#9fac7c',
@@ -545,6 +545,16 @@ export const AMBIANCE_SETTINGS = {
     fordFoam: 0.2,
     /** Rugosité de la surface (reflet du soleil). */
     roughness: 0.14,
+    /**
+     * Bord ombré sous la berge (tour 8): teinte, largeur depuis la berge (part
+     * de `depthCells`) et force. Il passe sous l'écume, qui reste par-dessus.
+     */
+    bankShade: '#3d6b62',
+    bankShadeWidth: 0.4,
+    bankShadeAmount: 0.42,
+    /** Reflets doux du ciel, étirés dans le courant: force et seuil du bruit (plus haut, moins de taches). */
+    sheen: 0.28,
+    sheenThreshold: 0.52,
   },
 
   /** Pluie (jour 4): gouttes en traits fins autour de la vue, éclaboussures au sol, ronds dans l'eau. */
@@ -744,6 +754,95 @@ export const AMBIANCE_SETTINGS = {
     hearthHeight: 1.3,
     topBand: 1.2,
     clusterRadius: 0.8,
+  },
+
+  /**
+   * Passe de rendu « maquette » (tour 8): ombres teintées, occlusion cuite au
+   * pied des murs et des objets, lumière de bord des personnages, étalonnage
+   * et vignettage. Tout est calculé dans les programmes existants (palette,
+   * personnages, eau): aucun programme, aucune passe, aucun appel de plus.
+   * `light`: ce qui reste allumé en mode léger (demandé ou automatique).
+   */
+  look: {
+    /**
+     * Ombres colorées: la lumière du ciel qui éclaire les zones à l'ombre
+     * (ombres portées, faces tournées vers l'ombre, ombres des nuages) tire
+     * vers cette teinte, à clarté égale. La part suit la force du soleil
+     * (rien la nuit: tout est déjà bleu).
+     */
+    shadeTint: '#7d8fe0',
+    shadeTintAmount: 0.36,
+    /** Les ombres s'éclaircissent un peu (part de la lumière du ciel ajoutée à l'ombre). */
+    shadeLift: 0.1,
+    /**
+     * Occlusion cuite (carte de 4 pixels par mètre calculée au chargement,
+     * `occlusion.ts`): le sol s'assombrit au pied des bâtiments, des meubles,
+     * des rochers et sous le houppier des arbres. Rayon de la pénombre (m),
+     * force au sol (0 à 1) et teinte du sol occulté (herbe plus profonde).
+     */
+    occlusionTexelsPerMeter: 4,
+    occlusionRadius: 0.7,
+    occlusionGround: 0.38,
+    occlusionTint: '#5d7a8a',
+    /** Part de l'occlusion appliquée à la lumière directe (le reste: lumière du ciel seulement). */
+    occlusionDirect: 0.35,
+    /**
+     * Pied des murs, des troncs et des objets: les faces verticales
+     * s'assombrissent près du sol, sur `wallHeight` m, d'au plus `wallStrength`.
+     */
+    wallHeight: 0.55,
+    wallStrength: 0.3,
+    /**
+     * Ce qui fait de l'ombre au sol: l'emprise des bâtiments, de
+     * l'équipement et du mobilier, ou un disque (rayon en m) pour les modèles
+     * ronds ou fins, avec son poids (0 à 1). Les arbres projettent aussi
+     * la pénombre de leur houppier (`canopy`). Les clôtures n'en ont pas: elles
+     * sont trop fines pour une case entière.
+     */
+    occluders: {
+      building: { weight: 1 },
+      equipment: { weight: 0.75 },
+      furniture: { weight: 0.55 },
+      discs: {
+        tree_oak: { radius: 0.45, weight: 1 },
+        tree_fir: { radius: 0.5, weight: 1 },
+        bush: { radius: 0.55, weight: 0.8 },
+        rock: { radius: 0.5, weight: 0.8 },
+        barrel: { radius: 0.38, weight: 0.8 },
+        water_barrel: { radius: 0.38, weight: 0.8 },
+        well: { radius: 0.95, weight: 0.9 },
+        lamp_post: { radius: 0.18, weight: 0.8 },
+        bell_post: { radius: 0.18, weight: 0.8 },
+        mailbox: { radius: 0.15, weight: 0.6 },
+      },
+      /** Pénombre du houppier des arbres (carte et forêt du pourtour): rayon (m), poids. */
+      canopy: { radius: 1.9, weight: 0.38 },
+      forestCanopy: { radius: 1.6, weight: 0.45 },
+    },
+    /**
+     * Lumière de bord des personnages (silhouettes détachées du sol): face
+     * presque de profil, côté soleil surtout. Force, finesse (exposant) et part
+     * du côté opposé au soleil.
+     */
+    rim: 0.32,
+    rimPower: 2.6,
+    rimBackSide: 0.35,
+    /**
+     * Étalonnage final, après le tone mapping: chaleur (multiplicateur de
+     * l'image en linéaire), saturation des teintes ternes (1: inchangée; les
+     * teintes déjà vives gagnent d'autant moins), contraste en courbe en S
+     * douce (0: aucun) et relevé des noirs.
+     */
+    gradeBalance: [1.025, 1.0, 0.97] as const,
+    saturation: 1.25,
+    contrast: 0.18,
+    lift: 0.012,
+    /** Vignettage très doux: assombrissement aux coins (0 à 1), début (part du rayon) et teinte. */
+    vignette: 0.2,
+    vignetteStart: 0.55,
+    vignetteColor: '#3a2c3c',
+    /** Ce qui reste en mode léger: les ombres teintées et l'occlusion (presque gratuites), pas l'étalonnage ni le bord. */
+    light: { shade: true, occlusion: true, rim: false, grade: false },
   },
 
   /**

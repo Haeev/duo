@@ -39,6 +39,9 @@ export const GROUND_CELLS = [
   'path_dark',
 ] as const satisfies readonly PaletteCell[];
 
+/** Coefficients de luminance (Rec. 709, linéaire). */
+const LUMA = [0.2126, 0.7152, 0.0722] as const;
+
 /** Nombre de lumières de sol que le shader sait lire (le plus grand des deux niveaux de détail). */
 export const GLOW_SLOTS = AMBIANCE_SETTINGS.glow.slots;
 
@@ -70,11 +73,40 @@ export interface SurfaceUniforms {
   /** Sol continu: couleurs (linéaires) des verts, des pavés et des chemins, et réglages. */
   uGroundColors: { value: Color[] };
   uGroundParams: { value: Vector4 };
+  /** Passe « maquette » (tour 8, réglages `look`): occlusion cuite, ombres teintées, bord, étalonnage. */
+  uLookField: { value: Texture | null };
+  uLookRect: { value: Vector4 };
+  /** Hauteur codée dans la carte d'occlusion: minimum et étendue (m). */
+  uLookHeight: { value: Vector2 };
+  /** Occlusion: force au sol (0: coupée), part sur la lumière directe, hauteur et force du pied des murs. */
+  uLookOcc: { value: Vector4 };
+  uLookOccTint: { value: Color };
+  /** Soleil (couleur fois intensité, linéaire): ce que reçoit une face en plein soleil. */
+  uSunRadiance: { value: Color };
+  uShadeTint: { value: Color };
+  /** Ombres teintées: part (0: coupées), éclaircissement. */
+  uShadeParams: { value: Vector2 };
+  /** Bord des personnages: force (0: coupé), exposant, part du côté opposé au soleil. */
+  uRim: { value: Vector3 };
+  uRimColor: { value: Color };
+  /** Étalonnage: saturation, contraste, relevé des noirs, allumé (1) ou non (0). */
+  uGrade: { value: Vector4 };
+  uGradeBalance: { value: Vector3 };
+  /** Vignettage: force, début, 1 / largeur et 1 / hauteur du tampon (pixels). */
+  uVignette: { value: Vector4 };
+  uVignetteColor: { value: Color };
+}
+
+/** Une teinte ramenée à une clarté de 1 (elle change la couleur, pas la lumière). */
+export function unitLuminance(color: Color): Color {
+  const luma = color.r * LUMA[0] + color.g * LUMA[1] + color.b * LUMA[2];
+  return luma > 0 ? color.multiplyScalar(1 / luma) : color.setRGB(1, 1, 1);
 }
 
 export function createSurfaceUniforms(noise: Texture, windMask: Texture): SurfaceUniforms {
   const s = AMBIANCE_SETTINGS.surfaces;
   const w = AMBIANCE_SETTINGS.wind;
+  const look = AMBIANCE_SETTINGS.look;
   return {
     uAmbTime: { value: 0 },
     uAmbNoise: { value: noise },
@@ -106,6 +138,22 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
     uGroundParams: {
       value: new Vector4(1 / s.groundPatch, s.groundDetail, s.stoneVariation, s.groundMaxHeight),
     },
+    uLookField: { value: null },
+    uLookRect: { value: new Vector4(0, 0, 1, 1) },
+    uLookHeight: { value: new Vector2(0, 1) },
+    uLookOcc: { value: new Vector4(0, look.occlusionDirect, look.wallHeight, look.wallStrength) },
+    uLookOccTint: { value: unitLuminance(new Color(look.occlusionTint)) },
+    uSunRadiance: { value: new Color() },
+    uShadeTint: { value: unitLuminance(new Color(look.shadeTint)) },
+    uShadeParams: { value: new Vector2(0, look.shadeLift) },
+    uRim: { value: new Vector3(0, look.rimPower, look.rimBackSide) },
+    uRimColor: { value: new Color() },
+    uGrade: { value: new Vector4(look.saturation, look.contrast, look.lift, 0) },
+    uGradeBalance: {
+      value: new Vector3(look.gradeBalance[0], look.gradeBalance[1], look.gradeBalance[2]),
+    },
+    uVignette: { value: new Vector4(look.vignette, look.vignetteStart, 1, 1) },
+    uVignetteColor: { value: new Color(look.vignetteColor) },
   };
 }
 
@@ -201,6 +249,20 @@ uniform float uGlow;
 uniform vec4 uLamps[${GLOW_SLOTS}];
 uniform vec3 uLampColors[${GLOW_SLOTS}];
 uniform int uLampCount;
+uniform sampler2D uLookField;
+uniform vec4 uLookRect;
+uniform vec2 uLookHeight;
+uniform vec4 uLookOcc;     // force au sol, part directe, hauteur et force du pied des murs
+uniform vec3 uLookOccTint;
+uniform vec3 uSunRadiance;
+uniform vec3 uShadeTint;
+uniform vec2 uShadeParams; // part, éclaircissement
+uniform vec3 uRim;         // force, exposant, part du côté opposé au soleil
+uniform vec3 uRimColor;
+uniform vec4 uGrade;       // saturation, contraste, relevé des noirs, allumé
+uniform vec3 uGradeBalance;
+uniform vec4 uVignette;    // force, début, 1 / largeur, 1 / hauteur
+uniform vec3 uVignetteColor;
 
 /** Ombre des nuages au point du monde p (1: plein soleil). */
 float ambCloudLight(vec3 p) {
@@ -284,6 +346,20 @@ diffuseColor.rgb *= mix(1.0, uWetParams.x, ambWet);
 diffuseColor.rgb *= mix(1.0, uPuddleParams.z, ambPuddle);
 roughnessFactor = mix(roughnessFactor, roughnessFactor * uWetParams.y, ambWet);
 roughnessFactor = mix(roughnessFactor, 0.05, ambPuddle);
+#ifdef AMB_LOOK_OCC
+// Occlusion cuite (occlusion.ts): pénombre au sol près de ce qui se dresse, pied des faces verticales.
+float lookOcc = 1.0;
+if (uLookOcc.x > 0.0) {
+  vec4 lookField = texture(uLookField, (vAmbWorld.xz - uLookRect.xy) * uLookRect.zw);
+  float lookAbove = vAmbWorld.y - (uLookHeight.x + lookField.g * uLookHeight.y);
+  float lookUp = smoothstep(0.6, 0.9, ambNormal.y);
+  float lookGround = lookField.r * lookUp * (1.0 - smoothstep(0.04, 0.2, lookAbove)) * uLookOcc.x;
+  float lookWall = (1.0 - lookUp) * (1.0 - smoothstep(0.0, uLookOcc.z, max(lookAbove, 0.0))) * uLookOcc.w;
+  lookOcc = 1.0 - max(lookGround, lookWall);
+  // L'herbe et la terre à l'ombre des arbres et des murs tirent vers un vert plus profond.
+  diffuseColor.rgb *= mix(vec3(1.0), uLookOccTint, lookGround);
+}
+#endif
 `;
 
 /** Après `lights_fragment_end`: nuages, reflet du ciel dans les flaques, lumières de sol. */
@@ -292,7 +368,58 @@ float ambCloud = ambCloudLight(vAmbWorld);
 reflectedLight.directDiffuse *= ambCloud;
 reflectedLight.directSpecular *= ambCloud;
 reflectedLight.indirectSpecular += uReflection * (ambPuddle * uWetParams.w + ambWet * uWetSheen);
+if (uShadeParams.x > 0.0) {
+  // À l'ombre: ombre portée ou nuage (soleil reçu comparé à celui qu'attend la face), ou face
+  // tournée vers l'ombre. Un sol éclairé par un soleil rasant reste au soleil (chaud).
+  // L'ombre prend alors la teinte froide du ciel (ombres colorées), à clarté égale.
+  const vec3 lookLuma = vec3(0.2126, 0.7152, 0.0722);
+  float lookNdotL = dot(ambNormal, uLightDir);
+  float lookSunWanted = dot(uSunRadiance * material.diffuseContribution, lookLuma) * RECIPROCAL_PI * max(lookNdotL, 0.0);
+  float lookSunGot = dot(reflectedLight.directDiffuse, lookLuma);
+  float lookCast = 1.0 - clamp(lookSunGot / max(lookSunWanted, 1e-5), 0.0, 1.0);
+  float lookShade = max(lookCast * smoothstep(0.0, 0.08, lookNdotL), 1.0 - smoothstep(0.0, 0.2, lookNdotL));
+  reflectedLight.indirectDiffuse *= mix(vec3(1.0), uShadeTint, lookShade * uShadeParams.x)
+    * (1.0 + lookShade * uShadeParams.y);
+}
+#ifdef AMB_LOOK_OCC
+reflectedLight.indirectDiffuse *= lookOcc;
+reflectedLight.directDiffuse *= mix(1.0, lookOcc, uLookOcc.y);
+#endif
+#ifdef AMB_RIM
+if (uRim.x > 0.0) {
+  // Lumière de bord: les faces presque de profil s'éclairent, surtout côté soleil (silhouette détachée du sol).
+  float lookFacing = clamp(dot(normal, geometryViewDir), 0.0, 1.0);
+  float lookRim = pow(1.0 - lookFacing, uRim.y);
+  float lookSide = mix(uRim.z, 1.0, clamp(dot(ambNormal, uLightDir) * 0.5 + 0.5, 0.0, 1.0));
+  reflectedLight.directDiffuse += uRimColor * (lookRim * lookSide * uRim.x) * material.diffuseContribution;
+}
+#endif
 reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, ambNormal) * material.diffuseContribution;
+`;
+
+/**
+ * Après `tonemapping_fragment`: étalonnage (chaleur, saturation, courbe en S
+ * douce, relevé des noirs) et vignettage très doux, dans chaque programme qui
+ * dessine le décor, les personnages et l'eau. Pas de cible intermédiaire ni de
+ * passe plein écran: le coût est celui de quelques opérations par pixel.
+ */
+export const FRAGMENT_GRADE = /* glsl */ `
+if (uGrade.w > 0.0) {
+  vec3 gradeColor = max(gl_FragColor.rgb * uGradeBalance, 0.0);
+  float gradeLuma = dot(gradeColor, vec3(0.2126, 0.7152, 0.0722));
+  // Saturation « douce » (vibrance): les teintes ternes gagnent, les teintes déjà vives presque pas.
+  float gradeMax = max(max(gradeColor.r, gradeColor.g), gradeColor.b);
+  float gradeSat = (gradeMax - min(min(gradeColor.r, gradeColor.g), gradeColor.b)) / max(gradeMax, 1e-4);
+  gradeColor = max(mix(vec3(gradeLuma), gradeColor, mix(uGrade.x, 1.0, gradeSat)), 0.0);
+  // Courbe en S dans un espace proche de la perception (racine carrée), puis retour au linéaire.
+  vec3 gradeP = sqrt(gradeColor);
+  gradeP = mix(gradeP, gradeP * gradeP * (3.0 - 2.0 * gradeP), uGrade.y);
+  gradeP = gradeP * (1.0 - uGrade.z) + uGrade.z;
+  gradeColor = gradeP * gradeP;
+  vec2 vignetteAt = gl_FragCoord.xy * uVignette.zw - 0.5;
+  float vignette = smoothstep(uVignette.y, 1.0, length(vignetteAt) * 1.41421) * uVignette.x;
+  gl_FragColor.rgb = mix(gradeColor, gradeColor * uVignetteColor, vignette);
+}
 `;
 
 export interface SurfacePatchOptions {
@@ -300,8 +427,10 @@ export interface SurfacePatchOptions {
   puddles: boolean;
   /** Vent sur le feuillage, les herbes et les tissus (décor seulement). */
   wind: boolean;
-  /** Teinte continue du sol (décor et terrain seulement). */
+  /** Teinte continue du sol et occlusion cuite (décor et terrain seulement). */
   ground: boolean;
+  /** Lumière de bord (personnages). */
+  rim?: boolean;
   /** Suffixe de la clé de programme (un programme par variante). */
   key: string;
 }
@@ -364,7 +493,8 @@ export function patchSurface(
     );
     const defines =
       (options.puddles ? '#define AMB_PUDDLES\n' : '') +
-      (options.ground ? '#define AMB_GROUND\n' : '');
+      (options.ground ? '#define AMB_GROUND\n#define AMB_LOOK_OCC\n' : '') +
+      (options.rim === true ? '#define AMB_RIM\n' : '');
     shader.fragmentShader = injectAfter(
       shader.fragmentShader,
       '#include <common>',
@@ -387,6 +517,12 @@ export function patchSurface(
       shader.fragmentShader,
       '#include <lights_fragment_end>',
       FRAGMENT_LIGHT,
+      label,
+    );
+    shader.fragmentShader = injectAfter(
+      shader.fragmentShader,
+      '#include <tonemapping_fragment>',
+      FRAGMENT_GRADE,
       label,
     );
   };
