@@ -41,7 +41,8 @@ export function refreshBlockers(sim: Sim): Blockers {
     }
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
-      if (def?.footprint === null || def === undefined || def.floor || def.bed !== null) continue;
+      // Tapis, lits et objets muraux (rideaux, cadres: R02) ne barrent pas le passage.
+      if (def?.footprint === null || def === undefined || def.floor || def.wall || def.bed !== null) continue;
       for (const cell of footprintCells(def.footprint, f.cell, f.rotation)) {
         if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) {
           rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;

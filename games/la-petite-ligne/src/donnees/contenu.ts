@@ -21,6 +21,7 @@ import {
 import { ContentError, Reader } from './lecteur';
 import type {
   AnimalDef,
+  ClockPace,
   Condition,
   ConstructionDef,
   Content,
@@ -1496,6 +1497,23 @@ function parseCalendar(r: Reader): Settings['calendar'] {
   };
 }
 
+/** Rythme de la journée (`clock.pace`, R14); absent: normal, sans facteur. */
+function parsePace(clock: Reader): Pick<Settings['clock'], 'pace' | 'paces'> {
+  const r = clock.opt('paces');
+  const paces: Record<ClockPace, number> = { vif: 1, normal: 1, paisible: 1 };
+  if (r !== null) {
+    for (const id of CLOCK_PACES) {
+      const factor = r.at(id).number();
+      if (factor <= 0) r.at(id).fail('facteur positif attendu');
+      paces[id] = factor;
+    }
+  }
+  const pace = clock.opt('pace')?.oneOf(CLOCK_PACES) ?? 'normal';
+  return { pace, paces };
+}
+
+const CLOCK_PACES = ['vif', 'normal', 'paisible'] as const;
+
 /** Rythme par jour (`clock.schedule`, D1); absent: le rythme du jour 1 partout. */
 function parseSchedule(clock: Reader, base: number): Settings['clock']['schedule'] {
   const r = clock.opt('schedule');
@@ -1809,6 +1827,7 @@ function parseSettings(r: Reader): Settings {
     clock: {
       secondsPerGameMinute: base,
       schedule: parseSchedule(clock, base),
+      ...parsePace(clock),
       dayStart: clock.at('dayStart').time(),
       dayEnd: clock.at('dayEnd').time(),
       veilleeFrom: clock.at('veilleeFrom').time(),

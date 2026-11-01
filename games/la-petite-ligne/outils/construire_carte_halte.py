@@ -447,6 +447,10 @@ POINTS = [
       rayon=2.0, important=True),
     p("beam_pickup", 14.5, 18.5, "la poutre, posée là par Basile au jour 1 (et Basile à côté)", rayon=2.0,
       important=True),
+    # R06 (soirée du 2026-11-01): Basile se tenait au milieu de la poutre et volait la touche aux
+    # porteurs. Il attend au nord, côté voie d'où il l'a apportée, dans l'herbe entre les deux
+    # chemins (x 13 et x 17 à 19): ni sur la poutre (couchée d'est en ouest), ni sur le passage.
+    p("basile_by_beam", 15.5, 16.8, "Basile au jour 1, à côté de la poutre, tourné vers elle", rotation=0),
     p("water_barrel", 12.5, 26.5, "le tonneau d'eau: remplir l'arrosoir", objet="water_barrel", portee=1.5,
       important=True),
     p("mailbox", 16.5, 26.5, "la boîte aux lettres du garde-barrière (décor dans la démo)", objet="mailbox",
@@ -469,6 +473,10 @@ POINTS = [
     p("sawmill_yard", 9.5, 10.5, "la cour de la scierie: Basile chez lui", rotation=0, important=True),
     p("sawmill_workbench", 13.0, 9.5, "devant l'établi de Basile: scier les rondins, fabriquer les meubles",
       objet="sawmill_workbench", rotation=2, important=True),
+    # R06: Basile travaillait à la place des joueurs, devant l'établi. Il se tient au bout est de
+    # son établi (cases 12-13, 7-8), tourné vers lui: la face sud reste aux joueurs.
+    p("basile_at_workbench", 14.6, 8.0, "Basile au travail, au bout est de son établi", objet="sawmill_workbench",
+      rotation=3),
     p("handcar_shed", 56.5, 9.5, "devant la remise de la draisine (fermée, s'ouvre à la fin)",
       objet="handcar_shed", important=True),
     # La rivière
@@ -708,12 +716,12 @@ TRAJETS = [
      "par": [[30.5, 26.5], [31.5, 26.5], [31.5, 30.5]]},
     {"id": "odette_counter_to_terrace", "habitant": "odette", "de": "grocery_counter", "a": "grocery_terrace",
      "par": [[30.5, 26.5], [31.5, 26.5], [31.5, 30.5], [33.5, 30.5]]},
-    {"id": "basile_yard_to_workbench", "habitant": "basile", "de": "sawmill_yard", "a": "sawmill_workbench",
-     "par": [[9.5, 10.5], [12.5, 10.5], [13.0, 9.5]]},
-    {"id": "basile_workbench_to_yard", "habitant": "basile", "de": "sawmill_workbench", "a": "sawmill_yard",
-     "par": [[13.0, 9.5], [12.5, 10.5], [9.5, 10.5]]},
-    {"id": "basile_yard_to_beam", "habitant": "basile", "de": "sawmill_yard", "a": "beam_pickup",
-     "par": [[9.5, 10.5], [14.5, 11.5], [14.5, 18.5]], "note": "jour 1, par-dessus la voie"},
+    {"id": "basile_yard_to_workbench", "habitant": "basile", "de": "sawmill_yard", "a": "basile_at_workbench",
+     "par": [[9.5, 10.5], [14.5, 10.5], [14.6, 8.0]]},
+    {"id": "basile_workbench_to_yard", "habitant": "basile", "de": "basile_at_workbench", "a": "sawmill_yard",
+     "par": [[14.6, 8.0], [14.5, 10.5], [9.5, 10.5]]},
+    {"id": "basile_yard_to_beam", "habitant": "basile", "de": "sawmill_yard", "a": "basile_by_beam",
+     "par": [[9.5, 10.5], [14.5, 11.5], [15.5, 16.8]], "note": "jour 1, par-dessus la voie"},
     {"id": "basile_yard_to_train", "habitant": "basile", "de": "sawmill_yard", "a": "train_stop",
      "par": [[9.5, 10.5], [18.5, 10.5], [18.5, 16.5], [21.5, 16.5], [38.5, 17.5]],
      "note": "jour 8, par le passage à niveau puis le quai"},
@@ -735,8 +743,8 @@ HABITANTS = {
     "odette": {"matin": "grocery_counter", "midi": "grocery_counter", "soir": "grocery_door",
                "souper_jour_5": "grocery_terrace",
                "trajets": ["odette_door_to_counter", "odette_counter_to_door", "odette_counter_to_terrace"]},
-    "basile": {"matin": "sawmill_workbench", "midi": "sawmill_workbench", "soir": "sawmill_yard",
-               "jour_1": "beam_pickup", "jour_8": "train_stop",
+    "basile": {"matin": "basile_at_workbench", "midi": "basile_at_workbench", "soir": "sawmill_yard",
+               "jour_1": "basile_by_beam", "jour_8": "train_stop",
                "trajets": ["basile_yard_to_workbench", "basile_workbench_to_yard", "basile_yard_to_beam",
                            "basile_yard_to_train"]},
     "jeanne": {"matin": "quay_bench", "midi": "riverbank", "soir": "village_square", "absente": "village_exit",

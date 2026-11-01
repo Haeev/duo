@@ -21,6 +21,7 @@ import { toolKindOf } from './catalogue';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { placeFurniture } from './amenagement';
+import { eatFromBag } from './besoins';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 import { holdPlaceNear, lanternTargetNear, lightLantern, takeHold } from './moments';
@@ -173,6 +174,9 @@ const TIER: Record<Target['kind'], number> = {
  */
 const GARDEN_TIER = TIER.partner;
 
+/** Objets qu'un habitant ne masque pas quand on les vise de plus près que lui. */
+const OBJECT_KINDS: ReadonlySet<Target['kind']> = new Set<Target['kind']>(['point', 'station', 'beam']);
+
 /**
  * Un habitant assis sur un banc passe après la place libre à côté de lui: Espace devant le banc
  * assoit près de lui, puis, assis, parle avec lui (un clic sur lui lui parle tout de suite).
@@ -271,7 +275,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
 /** La meilleure cible devant soi (Espace), avec son verbe. */
 export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimVerb | null } | null {
   const front = frontPoint(c, { x: 0, y: 0 });
-  let best: { target: Target; verb: AimVerb | null; tier: number; d: number } | null = null;
+  const scored: { target: Target; verb: AimVerb | null; tier: number; d: number }[] = [];
   for (const t of candidates(sim, c)) {
     // Un chantier se vise comme le reste, dans le regard (son point peut être derrière soi).
     // Une place de l'échelle à portée se prend sans viser: on y est déjà presque.
@@ -279,9 +283,15 @@ export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimV
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
     if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
-    const tier = verb === null ? 99 : tierOf(sim, c, t);
-    const d = distance(front, t.pos);
-    if (best === null || tier < best.tier || (tier === best.tier && d < best.d)) best = { target: t, verb, tier, d };
+    scored.push({ target: t, verb, tier: verb === null ? 99 : tierOf(sim, c, t), d: distance(front, t.pos) });
+  }
+  // Un habitant ne vole pas la touche à l'objet qu'on vise de plus près (R06: Basile devant son
+  // établi, ou à côté de la poutre): l'objet passe avant lui; tourné vers lui, on lui parle.
+  const nearestObject = Math.min(...scored.filter((e) => e.verb !== null && OBJECT_KINDS.has(e.target.kind)).map((e) => e.d));
+  let best: (typeof scored)[number] | null = null;
+  for (const e of scored) {
+    if (e.target.kind === 'villager' && e.tier === TIER.villager && nearestObject < e.d) e.tier = TIER.partner;
+    if (best === null || e.tier < best.tier || (e.tier === best.tier && e.d < best.d)) best = e;
   }
   return best === null ? null : { target: best.target, verb: best.verb };
 }
@@ -496,6 +506,9 @@ export function actFront(sim: Sim, c: Character): void {
     refuseChop(sim, c, young);
     return;
   }
+  // Un plat en main, rien à faire devant soi: on le mange (R04, le pain ne se mangeait qu'au carnet).
+  const held = heldStack(c);
+  if (held !== null && eatFromBag(sim, c, held.item)) return;
   if (best !== null && takenByPartner(sim, c, best.target, sim.world.tick)) return;
   const reach = sim.content.settings.ranges.action;
   pickupTakenNear(sim, c, (pos) => distance(c.pos, pos) <= reach && inCone(c, pos));

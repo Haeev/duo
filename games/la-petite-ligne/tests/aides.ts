@@ -4,6 +4,7 @@ import { CONTENT_FILES } from '../src/donnees/fichiers';
 import { loadMap } from '../src/donnees/carte';
 import { MAP_FILES } from '../src/donnees/cartes-fichiers';
 import type { Content } from '../src/donnees/types';
+import { withClockPace } from '../src/donnees/calendrier';
 import type { GameMap } from '../src/etat/carte';
 import type { Sim } from '../src/simulation/contexte';
 import { createWorld } from '../src/simulation/monde';
@@ -14,10 +15,17 @@ export const SEED = 20261030;
 
 let cached: { content: Content; map: GameMap } | null = null;
 
+/**
+ * Le contenu du jeu au rythme « vif » (R14): l'ancienne journée, deux fois plus courte que le
+ * rythme normal livré. Les robots des tests gardent ainsi leurs budgets de pas et leur durée;
+ * le rythme normal est joué à part (`retours-soiree.test.ts`, démo entière par le robot).
+ */
 export function contentAndMap(): { content: Content; map: GameMap } {
-  cached ??= { content: loadContent(CONTENT_FILES), map: loadMap(MAP_FILES).map };
+  cached ??= { content: withClockPace(loadContent(CONTENT_FILES), 'vif'), map: loadMap(MAP_FILES).map };
   return cached;
 }
+
+export { withClockPace as withPace };
 
 /** Monde neuf; `content` remplace le contenu du jeu (variante d'un fichier pour un test). */
 export function newSim(seed = SEED, content: Content = contentAndMap().content): Sim {

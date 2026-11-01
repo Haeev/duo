@@ -10,7 +10,8 @@ import type { ItemDef } from '../donnees/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, emit, message, newId, partnerName, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
-import { footprintCells, rotatedSize } from './deplacement';
+import { closesRoom } from './deblocage';
+import { footprintCells, rotatedSize, touchesCell } from './deplacement';
 import { giveToCharacter, heldItem, takeFromBag } from './sac';
 
 function quarterOf(facing: number): number {
@@ -68,7 +69,7 @@ function problemKey(sim: Sim, problem: PlacementProblem): string {
   return problem === 'back_wall' && !Object.hasOwn(sim.content.texts.messages, key) ? PROBLEM_KEYS.wall : key;
 }
 
-export type PlacementProblem = 'outside' | 'wall' | 'back_wall' | 'not_yours' | 'overlap' | 'occupied';
+export type PlacementProblem = 'outside' | 'wall' | 'back_wall' | 'not_yours' | 'overlap' | 'occupied' | 'blocks_way';
 
 const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   outside: 'placement_outside',
@@ -77,6 +78,7 @@ const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   not_yours: 'placement_not_yours',
   overlap: 'placement_overlap',
   occupied: 'placement_occupied',
+  blocks_way: 'placement_blocks_way',
 };
 
 /**
@@ -118,12 +120,13 @@ export function placementProblem(
     const taken = footprintCells(other.footprint, f.cell, f.rotation);
     if (taken.some((t) => cells.some((k) => k.cx === t.cx && k.cy === t.cy))) return 'overlap';
   }
-  if (!def.floor && def.bed === null) {
+  // Ce qui barre le passage (ni tapis, ni lit, ni objet mural) ne touche aucun corps et ne coupe
+  // aucune case de la pièce de sa porte (R01: les deux personnages étaient restés enfermés).
+  if (!def.floor && !def.wall && def.bed === null) {
     for (const ch of sim.world.characters) {
-      const cx = Math.floor(ch.pos.x);
-      const cy = Math.floor(ch.pos.y);
-      if (cells.some((k) => k.cx === cx && k.cy === cy)) return 'occupied';
+      if (cells.some((k) => touchesCell(ch.pos, k))) return 'occupied';
     }
+    if (closesRoom(sim, cells)) return 'blocks_way';
   }
   return null;
 }

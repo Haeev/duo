@@ -1095,12 +1095,12 @@
       "soundMotif": "motif_basile",
       "schedule": [
         { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "18:00", "to": "19:30", "point": "sawmill_yard", "activity": "stand" },
-        { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "beam_pickup", "activity": "stand" },
+        { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "basile_by_beam", "activity": "stand" },
         { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [8, 15] }, { "type": "all", "conditions": [{ "type": "day_at_least", "day": 22 }, { "type": "weekday_is", "weekdays": ["saturday"] }] }] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
         { "when": [{ "type": "quest_active", "quest": "basile_lost" }], "from": "12:00", "to": "18:00", "point": "nest_oak_basile", "activity": "work" },
         { "when": [{ "type": "quest_active", "quest": "handcar" }], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work" },
         { "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home" },
-        { "from": "08:00", "to": "18:00", "point": "sawmill_workbench", "activity": "work" },
+        { "from": "08:00", "to": "18:00", "point": "basile_at_workbench", "activity": "work" },
         { "from": "18:00", "to": "24:00", "point": "sawmill_yard", "activity": "home" }
       ],
       "dialogues": [

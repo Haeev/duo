@@ -37,6 +37,8 @@ function toolUsed(sim: Sim, c: Character): void {
 export function till(sim: Sim, c: Character, g: GardenCell): void {
   if (g.soil !== 'grass') return;
   g.soil = 'tilled';
+  // Jour de pluie: la terre fraîchement bêchée est mouillée comme le reste du potager (R13).
+  if (sim.world.weather === 'rain') g.wet = true;
   spend(sim, c, 'till');
   gesture(sim, c, 'till', actionSeconds(sim, 'till'), centre(g.cell));
   bump(sim, 'tilled', c.id);

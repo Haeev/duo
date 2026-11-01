@@ -41,10 +41,39 @@ export function bodyCollides(b: Blockers, x: number, y: number, radius = BODY_RA
 }
 
 /**
+ * Enfoncement du disque dans les cases bloquées: somme des carrés de ce qui dépasse dans chacune.
+ * Glisser à l'intérieur d'une seule case ne le change pas; toucher une seconde case l'augmente.
+ */
+function overlap(b: Blockers, x: number, y: number, radius = BODY_RADIUS): number {
+  let total = 0;
+  for (let cy = Math.floor(y - radius); cy <= Math.floor(y + radius); cy++) {
+    for (let cx = Math.floor(x - radius); cx <= Math.floor(x + radius); cx++) {
+      if (!isBlockedCell(b, cx, cy)) continue;
+      const nx = Math.max(cx, Math.min(x, cx + 1));
+      const ny = Math.max(cy, Math.min(y, cy + 1));
+      const d = Math.hypot(x - nx, y - ny);
+      if (d < radius) total += (radius - d) ** 2;
+    }
+  }
+  return total;
+}
+
+/**
  * Déplace `pos` de (dx, dy) en glissant le long des obstacles (axe par axe).
  * Modifie `pos` en place, sans allocation.
  */
 export function moveBody(b: Blockers, pos: Vec2, dx: number, dy: number): void {
+  // Déjà pris dans un obstacle (posé sur soi, train, vieille sauvegarde): tout pas qui ne
+  // s'enfonce pas est permis, sinon le personnage resterait figé (R01).
+  if (bodyCollides(b, pos.x, pos.y)) {
+    const nx = pos.x + dx;
+    const ny = pos.y + dy;
+    if (overlap(b, nx, ny) <= overlap(b, pos.x, pos.y) + 1e-12) {
+      pos.x = nx;
+      pos.y = ny;
+    }
+    return;
+  }
   if (dx !== 0) {
     const nx = pos.x + dx;
     if (!bodyCollides(b, nx, pos.y)) pos.x = nx;

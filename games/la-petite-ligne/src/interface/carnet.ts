@@ -112,6 +112,13 @@ export class NotebookPanel extends Panel {
       keys?.append(el('span', {}, [keycap(back), ` ${n.keysClose}`]));
     }
     this.footer.append(el('span', { text: ctx.t(n.gameGoesOn) }));
+    // R01: le jeu n'a pas de menu de pause à lui (Échap ouvre celui de Duo); le carnet le remplace.
+    this.footer.append(
+      button(ctx.t(n.unstick), () => {
+        this.host.send({ type: 'unstick' });
+        this.close();
+      }, { class: 'lpl-button', attrs: { title: ctx.t(n.unstickHelp), 'data-key': 'unstick' } }),
+    );
     this.markTabs();
   }
 

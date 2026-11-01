@@ -22,6 +22,7 @@ import { drawNextOrder, emptyOrderBook } from '../simulation/semaine';
 import { startQuest } from '../simulation/quetes';
 import { emptyBoard } from '../simulation/annonces';
 import { emptyImprovements } from '../simulation/chantiers';
+import { freeStuck } from '../simulation/deblocage';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -562,6 +563,8 @@ function resume(
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
+  // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
+  freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état
   // d'après, avec le texte d'apogée et la fin de l'étape de quête (QA6-08).
   settleSavedClimax(sim);

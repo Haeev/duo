@@ -625,6 +625,9 @@ export interface StageDef {
   /** Bloc de `textes.stages`. */
   texts: StageId;
 }
+/** Rythme de la journée (R14): vif (l'ancienne journée), normal, paisible. */
+export type ClockPace = 'vif' | 'normal' | 'paisible';
+
 /** Rythme de l'horloge à partir d'un jour (D1), appliqué à l'aube. */
 export interface ClockStep {
   fromDay: number;
@@ -779,6 +782,9 @@ export interface Settings {
     secondsPerGameMinute: number;
     /** Rythme par jour (D1), dans l'ordre des jours. */
     schedule: ClockStep[];
+    /** Rythme choisi (R14): multiplie les secondes par minute de jeu de `schedule` par `paces[pace]`. */
+    pace: ClockPace;
+    paces: Record<ClockPace, number>;
     dayStart: number;
     dayEnd: number;
     veilleeFrom: number;

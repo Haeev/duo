@@ -3,8 +3,10 @@
   "profile": "demo",
   "calendar": { "seasonDays": 21, "seasonsPerYear": 4 },
   "clock": {
-    "secondsPerGameMinute": 0.35,
-    "schedule": [{ "fromDay": 1, "secondsPerGameMinute": 0.35 }],
+    "secondsPerGameMinute": 0.7,
+    "schedule": [{ "fromDay": 1, "secondsPerGameMinute": 0.7 }],
+    "pace": "normal",
+    "paces": { "vif": 0.5, "normal": 1, "paisible": 1.5 },
     "dayStart": "06:00",
     "dayEnd": "24:00",
     "veilleeFrom": "19:00",

@@ -3,7 +3,8 @@
  * des moments de la journée; forme du matin et endurance du jour.
  */
 import type { Character, FormLevel } from '../etat/types';
-import { type Sim, bump, character, distance, emit, partnerOf, say } from './contexte';
+import { type Sim, bump, character, distance, emit, partnerOf, say, secondsToTicks } from './contexte';
+import { takeFromBag } from './sac';
 
 const FORM_LEVELS: readonly FormLevel[] = ['low', 'okay', 'good', 'great', 'radiant'];
 
@@ -118,4 +119,18 @@ export function eat(sim: Sim, c: Character, item: string): void {
   bump(sim, `ate:${item}`, c.id);
   bump(sim, 'ate', c.id);
   emit(sim, { type: 'ate', by: c.id, item });
+}
+
+/**
+ * Manger un plat du sac: depuis le carnet, le réchaud, ou Espace le plat en main (R04). Faux si
+ * ce n'est pas un plat, ou s'il n'est pas dans le sac.
+ */
+export function eatFromBag(sim: Sim, c: Character, item: string): boolean {
+  const def = sim.content.items[item];
+  if (def?.dish === null || def === undefined) return false;
+  if (c.status !== 'active' && c.status !== 'menu') return false;
+  if (takeFromBag(c, item, 1).length === 0) return false;
+  eat(sim, c, item);
+  c.action = { kind: 'eat', since: sim.world.tick, duration: secondsToTicks(sim.content.settings.feel.actionSeconds.eat ?? 0), target: null };
+  return true;
 }
