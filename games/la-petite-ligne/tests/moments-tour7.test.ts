@@ -24,7 +24,7 @@ import {
   seasonPool,
 } from '../src/simulation/moments';
 import { step } from '../src/simulation/pas';
-import { createRobot, newSim, play } from './aides';
+import { createRobot, demoLastDay, newSim, play } from './aides';
 import { createRandom } from '@duo/sdk/sim';
 import soundsFile from '../assets/son/sons.json';
 import { parseCatalogue } from '../src/audio/catalogue';
@@ -236,7 +236,7 @@ describe('règles de tirage du tour 7: sans effet sur la démo', () => {
     const s = sim.content.settings.moments;
     const kingfisher = momentDef(sim.content, 'kingfisher');
     if (kingfisher === null) throw new Error('martin-pêcheur absent');
-    for (let day = 1; day <= sim.content.settings.clock.lastDay.day; day++) {
+    for (let day = 1; day <= demoLastDay(sim.content); day++) {
       sim.world.clock.day = day;
       expect(dailyChanceOf(sim)).toBe(s.dailyChance);
       expect(cooldownOf(sim, kingfisher)).toBe(s.cooldownDays);

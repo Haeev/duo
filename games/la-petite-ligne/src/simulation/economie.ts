@@ -3,7 +3,9 @@
  * EC-03), catalogue de la coopérative, gros achats à deux (EC-04), caisse et
  * commande du samedi (EC-05, EC-08).
  */
-import { catalogueWindow, currentOrder, onSale } from '../donnees/commandes';
+import { catalogueWindow, currentOrder, isGeneratedOrder, onSale } from '../donnees/commandes';
+import { linePay, productPrice } from '../etat/commande-generee';
+import { drawNextOrder, recordPaidOrder } from './semaine';
 import type { Character, CharacterId, ItemStack, PurchaseRequest, Quality } from '../etat/types';
 import { orderSatisfied } from './conditions';
 import { type Sim, character, distance, emit, itemName, itemWithArticle, newId, notifyKey, partnerOf, point, say } from './contexte';
@@ -215,16 +217,25 @@ export function chestMove(sim: Sim, c: Character, item: string, quality: Quality
 export function payOrder(sim: Sim): void {
   const { world } = sim;
   if (world.orderResult !== null) return;
-  const o = currentOrder(sim.content.settings, world);
-  const rate = sim.content.settings.order.extraItemsRate;
+  const s = sim.content.settings;
+  const o = currentOrder(s, world);
+  const rate = s.order.extraItemsRate;
   const complete = orderSatisfied(sim);
+  // Commande générée (tour 8, section 4.7): une ligne remplie rapporte au moins sa part de travail.
+  const g = s.order.generated;
+  const generated = g !== null && isGeneratedOrder(s, world) ? world.order.generated : null;
   let linesDone = 0;
   let linesPay = 0;
-  for (const line of o.lines) {
+  for (const [i, line] of o.lines.entries()) {
     if (countInStacks(world.crate, line.item) < line.count) continue;
     linesDone++;
     takeFromStacks(world.crate, line.item, line.count);
-    linesPay += line.count * (sim.content.items[line.item]?.sellPrice ?? 0) * o.linePremium;
+    const sellPrice = sim.content.items[line.item]?.sellPrice ?? 0;
+    const drawn = generated?.lines[i];
+    linesPay +=
+      g !== null && drawn !== undefined
+        ? linePay(g, drawn, productPrice(g, line.item, sellPrice), o.linePremium)
+        : line.count * sellPrice * o.linePremium;
   }
   let extras = 0;
   for (const stack of world.crate) {
@@ -239,11 +250,19 @@ export function payOrder(sim: Sim): void {
   world.crate = [];
   const amount = Math.round(linesPay * (complete ? 1 + o.fullBonus : 1) + extras);
   world.purse += amount;
-  world.orderResult = { linesDone, linesTotal: o.lines.length, complete, amount };
-  world.orderHistory.push({ ...world.orderResult });
+  world.orderResult = { number: world.orderTotals.orders + 1, day: o.day, linesDone, linesTotal: o.lines.length, complete, amount };
+  recordPaidOrder(sim, world.orderResult, o.lines.map((l) => l.item), generated !== null);
   // `{order}` et la quête suivante citent déjà le prochain train; la caisse rouvre au matin (`reopenCrate`).
-  if (world.orderIndex + 1 < sim.content.settings.order.trains.length) world.orderIndex += 1;
+  if (world.orderIndex + 1 < s.order.trains.length) world.orderIndex += 1;
+  else drawNextOrder(sim, world.clock.day);
   emit(sim, { type: 'order_paid', amount, linesDone });
+}
+
+/** Rang de la commande que la caisse prépare (écrite, puis générée), 0 s'il n'y en a plus. */
+export function currentOrderNumber(sim: Sim): number {
+  const { world } = sim;
+  const written = sim.content.settings.order.trains.length;
+  return world.orderIndex < written ? world.orderIndex + 1 : (world.order.generated?.number ?? 0);
 }
 
 /**
@@ -252,7 +271,7 @@ export function payOrder(sim: Sim): void {
  */
 export function reopenCrate(sim: Sim): void {
   const { world } = sim;
-  if (world.orderResult === null || world.orderHistory.length >= sim.content.settings.order.trains.length) return;
+  if (world.orderResult === null || currentOrderNumber(sim) <= world.orderTotals.orders) return;
   world.orderResult = null;
   sim.runtime.changed = true;
 }

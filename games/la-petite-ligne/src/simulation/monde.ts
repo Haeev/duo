@@ -18,6 +18,7 @@ import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { type Sim, wrapWorld } from './contexte';
 import { ITEM, SPAWN_POINTS } from './ids';
 import { emptyMemories } from './souvenirs';
+import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
@@ -151,6 +152,9 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     },
     weather: s.weatherByDay[s.clock.firstDay.day - 1] ?? 'sunny',
     weatherTomorrow: s.weatherByDay[s.clock.firstDay.day] ?? 'sunny',
+    weatherLog: [],
+    morningMist: false,
+    stages: { passed: [], current: null, choice: { p1: null, p2: null } },
     characters,
     garden: map.garden.map((cell, index) => ({
       index,
@@ -210,6 +214,10 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     orderIndex: 0,
     orderResult: null,
     orderHistory: [],
+    orderTotals: { orders: 0, linesDone: 0, linesTotal: 0, amount: 0 },
+    order: emptyOrderBook({ content }),
+    letterVariants: {},
+    content: { firstDayWith: {} },
     ending: null,
     session: { firstDay: s.clock.firstDay.day, togetherMoments: 0, highlights: [] },
     moments: { today: null, history: [], hintTurn: s.moments.firstHint },

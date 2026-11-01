@@ -33,7 +33,7 @@ describe('robot', () => {
     const w = sim.world;
     expect(w.phase).toBe('day');
     expect(w.ending).toBeNull();
-    expect(w.orderHistory).toEqual([{ linesDone: 4, linesTotal: 4, complete: true, amount: 540 }]);
+    expect(w.orderHistory).toEqual([{ number: 1, day: 8, linesDone: 4, linesTotal: 4, complete: true, amount: 540 }]);
     // Au matin du jour 9, la caisse est rouverte pour la commande du train suivant.
     expect(w.orderIndex).toBe(1);
     expect(w.orderResult).toBeNull();

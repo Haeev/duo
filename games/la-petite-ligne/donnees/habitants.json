@@ -11,8 +11,9 @@
       "scale": 1.0,
       "soundMotif": "motif_firmin",
       "schedule": [
+        { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "18:00", "to": "20:00", "point": "quay_bench", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [1] }], "from": "06:00", "to": "18:00", "point": "train_stop", "activity": "wait_train" },
-        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "06:00", "to": "17:00", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [8, 15] }, { "type": "all", "conditions": [{ "type": "day_at_least", "day": 22 }, { "type": "weekday_is", "weekdays": ["saturday"] }] }] }], "from": "06:00", "to": "17:00", "point": "train_stop", "activity": "wait_train" },
         { "from": "06:00", "to": "08:00", "point": "firmin_house", "activity": "home" },
         { "from": "08:00", "to": "18:00", "point": "quay_bell", "activity": "stand" },
         { "from": "18:00", "to": "24:00", "point": "firmin_house", "activity": "home" }
@@ -278,6 +279,20 @@
           "lines": [{ "speaker": "firmin", "text": "La coopérative écrit que la voie des Vergers sera la prochaine. Les cerisiers vous attendent. Moi aussi, un peu." }]
         },
         {
+          "id": "firmin_stage_summer",
+          "kind": "ending",
+          "once": "duo",
+          "priority": 80,
+          "when": [],
+          "shared": true,
+          "point": "quay_bell",
+          "lines": [
+            { "speaker": "firmin", "text": "Six trains depuis votre arrivée. L'été est passé sans qu'on le voie partir." },
+            { "speaker": "firmin", "text": "Sur la Côte, les feuilles commencent à roussir. À la halte, ça veut dire qu'on rentre du bois et qu'on attend la suite." }
+          ]
+        },
+
+        {
           "id": "firmin_basile_lost",
           "kind": "quest",
           "priority": 22,
@@ -457,8 +472,9 @@
       "scale": 1.0,
       "soundMotif": "motif_odette",
       "schedule": [
+        { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "20:00", "to": "21:00", "point": "grocery_terrace", "activity": "stand" },
         { "when": [{ "type": "step_active", "quest": "welcome_supper", "step": "supper" }, { "type": "day_at_least", "day": 5 }], "from": "19:00", "to": "21:00", "point": "grocery_terrace", "activity": "host" },
-        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "grocery_counter", "activity": "serve" },
+        { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [8, 15] }, { "type": "all", "conditions": [{ "type": "day_at_least", "day": 22 }, { "type": "weekday_is", "weekdays": ["saturday"] }] }] }], "from": "09:30", "to": "16:30", "point": "grocery_counter", "activity": "serve" },
         { "when": [{ "type": "day_is", "days": [13] }], "from": "08:00", "to": "12:00", "point": "village_square", "activity": "serve" },
         { "from": "06:00", "to": "07:00", "point": "grocery_door", "activity": "home" },
         { "from": "07:00", "to": "20:00", "point": "grocery_counter", "activity": "serve" },
@@ -784,8 +800,9 @@
       "scale": 1.0,
       "soundMotif": "motif_basile",
       "schedule": [
+        { "when": [{ "type": "season_is", "seasons": ["summer"] }], "from": "18:00", "to": "19:30", "point": "sawmill_yard", "activity": "stand" },
         { "when": [{ "type": "day_is", "days": [1] }, { "type": "not", "condition": { "type": "built", "construction": "house_roof" } }], "from": "06:00", "to": "18:00", "point": "beam_pickup", "activity": "stand" },
-        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [8, 15] }, { "type": "all", "conditions": [{ "type": "day_at_least", "day": 22 }, { "type": "weekday_is", "weekdays": ["saturday"] }] }] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
         { "when": [{ "type": "quest_active", "quest": "basile_lost" }], "from": "12:00", "to": "18:00", "point": "nest_oak_basile", "activity": "work" },
         { "when": [{ "type": "quest_active", "quest": "handcar" }], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work" },
         { "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home" },
@@ -1117,8 +1134,9 @@
       "soundMotif": "motif_jeanne",
       "schedule": [
         { "when": [{ "type": "not", "condition": { "type": "day_at_least", "day": 3 } }], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent" },
-        { "when": [{ "type": "day_is", "days": [8, 15] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
-        { "when": [{ "type": "day_is", "days": [12] }, { "type": "weather_is", "weather": "rain" }], "from": "08:00", "to": "18:00", "point": "quay_bench", "activity": "play" },
+        { "when": [{ "type": "season_is", "seasons": ["summer"] }, { "type": "day_at_least", "day": 3 }], "from": "18:00", "to": "21:00", "point": "village_square", "activity": "play" },
+        { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [8, 15] }, { "type": "all", "conditions": [{ "type": "day_at_least", "day": 22 }, { "type": "weekday_is", "weekdays": ["saturday"] }] }] }], "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train" },
+        { "when": [{ "type": "any", "conditions": [{ "type": "day_is", "days": [12] }, { "type": "day_at_least", "day": 16 }] }, { "type": "weather_is", "weather": "rain" }], "from": "08:00", "to": "18:00", "point": "quay_bench", "activity": "play" },
         { "from": "06:00", "to": "08:00", "point": "offstage", "activity": "home" },
         { "from": "08:00", "to": "12:00", "point": "quay_bench", "activity": "play" },
         { "from": "12:00", "to": "18:00", "point": "riverbank", "activity": "play" },

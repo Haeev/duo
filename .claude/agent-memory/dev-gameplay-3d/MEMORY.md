@@ -183,3 +183,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `leaveNow` depuis l'état d'après rejoue `leave` depuis `afterPosition`: si tous les acteurs sont partis pendant l'apogée, aller droit à `gone` (`allGoneAfterClimax`), sinon la bête revient pour repartir.
 - Preuve en jeu réel d'un correctif de phase: la recette QA garde ses sauvegardes et ses specs Playwright à deux navigateurs dans `/tmp/qa7/`; en copier la spec (sorties, port, dossier de données à soi), `vite build --outDir` du worktree dans un dossier avec `duo-game.json` et `package.json`, et le serveur `packages/sdk-dev/src/serveur/servir.ts` de la copie principale (sa `dist/coque` existe, pas celle du worktree). Deux minutes.
 - Libellés `convert -annotate` dans une commande: refusés par l'outil isolé (texte trop complexe); les mettre dans un script du scratchpad.
+## Suite après le jour 15 (La Petite Ligne, vérifié le 2026-11-01, tour 8)
+
+- Depuis le tour 8, `clock.lastDay` est la limite de la partie (jour 43), plus la fin de la démo: la fin de la démo est l'étape `demo` (`settings.stages`). Dans les tests, `demoLastDay()` de `tests/aides.ts`; un robot qui doit passer le jour 15 prend `createRobot({ stages: 'stay' })`.
+- Avant de monter `DATA_SCHEMA`, fabriquer avec le code encore à l'ancien format la référence qui manque (`generer.ts`): après, il est trop tard pour une vraie sauvegarde de l'ancien format.
+- Tout système d'après la démo tire par `unitDraw(graine, clé, jour)` (jamais `sim.rng`) et reste inerte avant son `fromDay`: le test T8-04 (`tests/suite-etapes.test.ts`) compare chaque aube des jours 2 à 15 à une partie sans les systèmes nouveaux; toute logique nouvelle du robot se garde par `afterDemo()` (commande générée).
+- Lint: un commentaire entre deux `case` vides déclenche `no-fallthrough`; le mettre au-dessus du groupe.
+- Outil isolé: un heredoc qui écrit un fichier dans `/tmp` avec du contenu complexe est refusé; écrire le fichier de remplacements avec Write, puis `python3 /tmp/<moi>/rep.py <fichier> <spec>`.
+- Robots d'été (`pnpm test:ete`, `tests/ete/`): une partie de 43 jours avec reprise à chaque aube coûte une à trois minutes par graine selon la charge de la machine.

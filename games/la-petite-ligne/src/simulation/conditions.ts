@@ -9,10 +9,11 @@ import { MINUTES_PER_DAY } from './constantes';
 import { type Sim, character, distance, point } from './contexte';
 import { countInBag, countInStacks, duoOwns } from './sac';
 import { seatedSeconds } from './bancs';
-import { seasonOf } from '../etat/souvenirs';
+import { dayOfSeason, seasonOfDay, stageDef, stageReached } from '../donnees/calendrier';
+import { weatherOf } from './meteo';
 
-/** Saisons dans l'ordre du calendrier (`seasonOf`: 0 pour le printemps). */
-const SEASON_ORDER = ['spring', 'summer', 'autumn', 'winter'] as const;
+/** D7, du moins au plus tendre. */
+const TENDERNESS_ORDER = ['none', 'accomplices', 'gentle'] as const;
 
 export interface ToolEvent {
   tool: string;
@@ -103,13 +104,10 @@ function stepIndex(sim: Sim, quest: string, step: string): number {
  */
 export function orderSatisfied(sim: Sim, day: number | null = null): boolean {
   const { world } = sim;
-  const trains = sim.content.settings.order.trains;
   if (day !== null) {
-    const index = trains.findIndex((o) => o.day === day);
-    const paid = world.orderHistory[index];
-    if (index < 0) return false;
+    const paid = world.orderHistory.find((o) => o.day === day);
     if (paid !== undefined) return paid.complete;
-    if (index !== world.orderIndex || world.orderResult !== null) return false;
+    if (currentOrder(sim.content.settings, world).day !== day || world.orderResult !== null) return false;
   } else if (world.orderResult !== null) {
     return world.orderResult.complete;
   }
@@ -138,13 +136,21 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     case 'weather_is':
       return world.weather === condition.weather;
     case 'weather_was':
-      // La météo de la démo est écrite jour par jour: la veille se lit dans les réglages.
-      return world.clock.day > 1 && sim.content.settings.weatherByDay[world.clock.day - 2] === condition.weather;
+      // La veille: écrite pendant la démo, puis lue dans le journal de la météo tirée.
+      return weatherOf(sim, world.clock.day - 1) === condition.weather;
+    case 'weather_tomorrow_is':
+      return world.weatherTomorrow === condition.weather;
+    case 'morning_mist':
+      return world.morningMist;
+    case 'tenderness_at_least':
+      return TENDERNESS_ORDER.indexOf(sim.content.settings.tenderness) >= TENDERNESS_ORDER.indexOf(condition.level);
+    case 'stage_due': {
+      const stage = stageDef(sim.content.settings, condition.stage);
+      return stage !== null && !world.stages.passed.includes(condition.stage) && stageReached(stage, world.clock);
+    }
     case 'season_is': {
-      const s = sim.content.settings.memories;
-      const season = SEASON_ORDER[seasonOf(s, world.clock.day)];
-      const dayOfSeason = ((world.clock.day - 1) % s.seasonDays) + 1;
-      return season !== undefined && condition.seasons.includes(season) && dayOfSeason >= condition.fromSeasonDay;
+      const s = sim.content.settings;
+      return condition.seasons.includes(seasonOfDay(s, world.clock.day)) && dayOfSeason(s, world.clock.day) >= condition.fromSeasonDay;
     }
     case 'flag':
       return world.flags.includes(condition.flag);

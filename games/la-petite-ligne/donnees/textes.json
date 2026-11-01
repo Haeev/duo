@@ -124,12 +124,95 @@
     "riddle2_card_found": "Dans le coffre à outils de la draisine, une deuxième carte d'Émile !",
     "riddle_card_2_text": "Chaque matin, quand le train approchait, je baissais la barrière et j'attendais à son pied. Ce que je gardais pour la suite de la ligne y dort encore. É. L.",
     "riddle2_found": "Au pied de la barrière, une boîte à biscuits rouillée: le carnet de route d'Émile.",
-    "emile_logbook_text": "Voie des Vergers: six kilomètres, trois ponts, un tunnel. Pour la draisine: deux bras devant, deux bras derrière, et de la patience. Le jour où quelqu'un lira ceci, la ligne aura de nouveau du monde. É. L."
+    "emile_logbook_text": "Voie des Vergers: six kilomètres, trois ponts, un tunnel. Pour la draisine: deux bras devant, deux bras derrière, et de la patience. Le jour où quelqu'un lira ceci, la ligne aura de nouveau du monde. É. L.",
+    "stage_continue": "La Halte continue. Prochain train: samedi {day}, 10 h."
   },
   "orderFormat": {
     "line": "{count} {item}",
     "separator": ", ",
-    "lastSeparator": ", "
+    "lastSeparator": ", ",
+    "linesDone": { "none": "aucune ligne", "one": "une ligne", "many": "{n} lignes" }
+  },
+  "orderGreetings": {
+    "all": [
+      "Merci pour le train de samedi !",
+      "Bonjour à la Halte d'Aubrune !",
+      "Les étals de la ville se vident vite, et c'est un peu grâce à vous.",
+      "Le chef de train dit que votre caisse est la mieux rangée de la ligne.",
+      "La ville a goûté vos produits: elle en redemande.",
+      "Une nouvelle semaine commence à la coopérative."
+    ],
+    "spring": ["Bon printemps à la Halte !"],
+    "summer": ["Bel été à la Halte !", "Les jours rallongent, et nos listes aussi."],
+    "autumn": ["Bel automne à la Halte !"],
+    "winter": []
+  },
+  "orderTips": {
+    "carrot": "Les carottes demandent quatre jours de pousse: ne tardez pas trop.",
+    "vegetable_soup": "Pour deux soupes: deux carottes, deux radis et une laitue.",
+    "lettuce": "Les laitues poussent en trois jours: semez-les tôt dans la semaine.",
+    "radish": "Les radis poussent en deux jours: rien ne presse, mais rien ne traîne.",
+    "crunchy_radishes": "Trois radis font deux portions de croque-au-sel.",
+    "wild_garlic": "L'ail des ours pousse à l'ombre, au pied des chênes de la lisière.",
+    "chanterelle": "Les girolles sortent au lendemain des pluies, sous les arbres de la lisière.",
+    "blackberry": "Les mûres mûrissent au roncier de la lisière: attention aux griffes.",
+    "hazelnut": "Les noisettes tombent sous le noisetier, au bord du bois.",
+    "dandelion": "Les pissenlits poussent au bord du bois, du côté du soleil.",
+    "egg": "Pensez à remplir la mangeoire: une poule nourrie pond chaque jour.",
+    "omelette": "Trois œufs font deux omelettes, au réchaud de la maisonnette.",
+    "gudgeon": "Les goujons mordent au gué à toute heure.",
+    "chub": "Le chevesne est plus rare que le goujon: prévoyez quelques lancers.",
+    "trout": "Par temps de pluie, ça mord plus vite, dit Firmin.",
+    "plank": "Basile prête son établi: un rondin fait quatre planches."
+  },
+  "stages": {
+    "demo": {
+      "title": "Deux semaines à la Halte d'Aubrune",
+      "subtitle": "La démo s'arrête ici. La Halte, elle, continue.",
+      "text": "Restez pour l'été: désormais, le temps, la lisière et la commande du samedi changent d'eux-mêmes.",
+      "highlight": "Deux semaines à la Halte"
+    },
+    "summer_end": {
+      "title": "Six semaines à la Halte d'Aubrune",
+      "subtitle": "Du premier train au premier matin d'automne.",
+      "text": "L'automne arrive à la Halte, et sa suite est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici.",
+      "next": "« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.",
+      "highlight": "Six semaines à la Halte"
+    }
+  },
+  "seasonCards": {
+    "summer": {
+      "title": "Premier jour de l'été",
+      "lines": [
+        "Les jours rallongent: il fait clair jusqu'à 21 h 30.",
+        "À la lisière: des mûres au roncier, des girolles après la pluie.",
+        "Le soir, les gens du bourg restent dehors un peu plus tard."
+      ]
+    },
+    "autumn": {
+      "title": "Premier jour de l'automne",
+      "lines": [
+        "Le soir tombe plus tôt, vers 19 h 30.",
+        "À la lisière: des noisettes, et toujours des girolles après la pluie.",
+        "À la rivière, les truites reviennent."
+      ]
+    },
+    "winter": {
+      "title": "Premier jour de l'hiver",
+      "lines": [
+        "Le potager se repose jusqu'au printemps.",
+        "La nuit tombe tôt, vers 18 h.",
+        "Plus de truites, mais les goujons mordent toujours."
+      ]
+    },
+    "spring": {
+      "title": "Premier jour du printemps",
+      "lines": [
+        "Le potager se réveille: radis, laitues et carottes.",
+        "À la lisière: pissenlits et ail des ours.",
+        "Les jours rallongent de nouveau."
+      ]
+    }
   },
   "henColors": { "hen_white": "la blanche", "hen_red": "la rousse", "hen_black": "la noire" },
   "henUnknown": { "hen_white": "la poule blanche", "hen_red": "la poule rousse", "hen_black": "la poule noire" },
@@ -139,7 +222,14 @@
     "momentHint": "Aujourd'hui",
     "questKinds": { "main": "Deux semaines à la Halte", "side": "Coups de main" },
     "questDone": "Terminée",
-    "hud": { "purse": "{amount} sous", "day": "{weekday}, jour {day}", "time": "{hours} h {minutes}", "nextGoal": "Prochain objectif" },
+    "hud": {
+      "purse": "{amount} sous",
+      "day": "{weekday}, jour {day}",
+      "time": "{hours} h {minutes}",
+      "nextGoal": "Prochain objectif",
+      "season": "{season} · jour {day}",
+      "seasonNames": { "spring": "Printemps", "summer": "Été", "autumn": "Automne", "winter": "Hiver" }
+    },
     "shop": { "title": "Le comptoir d'Odette", "buy": "Acheter", "sell": "Vendre", "price": "{price} sous", "close": "Fermer" },
     "catalogue": { "title": "Catalogue de la coopérative", "subtitle": "Commandé avant vendredi minuit, livré samedi par le train.", "order": "Commander" },
     "crate": { "title": "Caisse de la coopérative", "subtitle": "Départ samedi à 16 h.", "deposit": "Déposer", "takeBack": "Reprendre" },
@@ -196,7 +286,8 @@
     }
   },
   "weekdays": ["samedi", "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi"],
-  "weather": { "sunny": "Soleil", "cloudy": "Nuages", "rain": "Pluie" },
+  "weather": { "sunny": "Soleil", "cloudy": "Nuages", "rain": "Pluie", "mistMorning": "brume au lever" },
+
   "nightScreen": {
     "title": "Bonne nuit",
     "text": "La nuit tombe sur la Halte d'Aubrune.",

@@ -18,6 +18,11 @@ Règles:
 | `format-3-milieu-semaine-2.json` | 3 | mardi, jour 11, midi; « Le mot de Lucie » fini, les oies à venir | 7 | `generer.ts` (tour 6) |
 | `format-4-fin-semaine-1.json` | 4 | jour 8 à 16 h, commande 1 payée; souvenirs: renard, oies, noms des poules (tour 7) | 42 | `generer.ts` (tour 7) |
 | `format-4-milieu-semaine-2.json` | 4 | mardi, jour 11, midi; souvenirs: héron, renard, vers luisants, poules, mot de Lucie | 7 | `generer.ts` (tour 7) |
+| `format-4-fin-de-la-demo.json` | 4 | démo finie, jour 15 à 16 h, écran de fin (la sauvegarde du client au tour 8) | 42 | `generer.ts` du format 4 (`12459fd`, avant le tour 8) |
+| `format-5-fin-semaine-1.json` | 5 | jour 8 à 16 h, commande 1 payée (tour 8) | 42 | `generer.ts` (tour 8) |
+| `format-5-milieu-semaine-2.json` | 5 | mardi, jour 11, midi (tour 8) | 7 | `generer.ts` (tour 8) |
+| `format-5-fin-de-la-demo.json` | 5 | jour 15 à 16 h, écran d'étape « Deux semaines », commande 3 tirée pour le samedi 22 | 42 | `generer.ts` (tour 8) |
+| `format-5-ete-jour-25.json` | 5 | restés à la Halte, mardi 25 à midi, été, commande générée du samedi 29 en cours | 7 | `generer.ts` (tour 8) |
 
 ## Format en cours
 

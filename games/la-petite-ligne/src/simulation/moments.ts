@@ -20,6 +20,7 @@ import { runEffects } from './effets';
 import { unitDraw } from '../etat/tirage';
 import { recordMoment } from './souvenirs';
 import { seasonIndex, seasonOf } from '../etat/souvenirs';
+import { isTrainDay as trainOn } from '../donnees/calendrier';
 
 // ---------------------------------------------------------------------------
 // Tirage sans le générateur de la partie
@@ -77,9 +78,9 @@ function lastOccurrence(sim: Sim, id: string): number | null {
   return last;
 }
 
-/** Jour du train (jours de `train.days`): seuls les moments `trainDays: "only"` y sortent. */
+/** Jour du train (`train.days`, puis chaque samedi): seuls les moments `trainDays: "only"` y sortent. */
 function isTrainDay(sim: Sim): boolean {
-  return sim.content.settings.train.days.includes(sim.world.clock.day);
+  return trainOn(sim.content.settings, sim.world.clock.day);
 }
 
 /**

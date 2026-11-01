@@ -82,8 +82,34 @@
         { "when": [{ "type": "order_complete", "day": 15 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Les omelettes d'Aubrune sont arrivées encore tièdes. Merci, et à bientôt pour les Vergers !" },
         { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! La ligne vous doit déjà beaucoup." }
       ]
+    },
+    {
+      "id": "coop_order_generated",
+      "from": "coop",
+      "title": "La commande du samedi {day}",
+      "delivery": { "instance": "train", "time": "18:00" },
+      "text": "{greeting} La coopérative passe commande pour samedi {day}, à déposer dans la caisse du quai avant 16 h: {order}. {tip}"
+    },
+    {
+      "id": "coop_recap_generated",
+      "from": "coop",
+      "title": "La commande du samedi {day} est partie",
+      "delivery": { "byEffect": true, "instance": "train" },
+      "variantsNoRepeat": true,
+      "variants": [
+        { "when": [{ "type": "order_complete" }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} sous. Tout y était. Merci !" },
+        { "when": [{ "type": "order_complete" }], "text": "Commande complète: {amount} sous. Le chef de train a sifflé deux fois, c'est bon signe." },
+        { "when": [{ "type": "order_complete" }], "text": "Rien ne manquait: {amount} sous pour {linesTotal} lignes. La ville vous dit merci." },
+        { "when": [{ "type": "order_complete" }], "text": "Tout est arrivé en bon état: {amount} sous. À samedi !" },
+        { "when": [{ "type": "order_complete" }], "text": "Les cuisines de la ville ont tout pris: {amount} sous. Merci !" },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} sous. Le reste viendra une autre fois, rien ne presse." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} sous pour {linesDoneText} sur {linesTotal}. Le train repart quand même le cœur léger." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "Merci pour ce qui était là: {amount} sous. La semaine prochaine sera la bonne." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} sous pour {linesDoneText} sur {linesTotal}. La coopérative garde confiance." }
+      ]
     }
   ],
+
   "senders": [
     { "id": "coop", "label": "La coopérative de la ligne" },
     { "id": "basile", "label": "Basile" },

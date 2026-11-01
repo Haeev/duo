@@ -96,7 +96,13 @@ describe('souvenirs: partie de robots de 42 jours (S-10, S-14)', () => {
     const content = structuredClone(contentAndMap().content);
     content.settings.clock.lastDay.day = 42;
     sim = newSim(SEED, content);
-    play(sim, createRobot(), (s) => s.world.clock.day >= 42, SIM_HZ * 60 * 60 * 6);
+    // Tour 8: la démo s'arrête sur l'écran d'étape du jour 15; les robots y choisissent « Rester à la Halte ».
+    play(
+      sim,
+      createRobot({ stages: 'stay' }),
+      (s) => s.world.clock.day >= 42,
+      SIM_HZ * 60 * 60 * 6,
+    );
   }, 600_000);
 
   it('les robots arrivent au jour 42 en ayant vu des moments et fini les quêtes secrètes', () => {

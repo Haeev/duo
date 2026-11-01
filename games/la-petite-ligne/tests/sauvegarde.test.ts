@@ -16,9 +16,9 @@ describe('sauvegarde', () => {
     play(sim, robot, (s) => s.world.clock.day === 3 && s.world.clock.minutes >= 12 * 60, MAX_TICKS);
     const snap = snapshotOf(sim);
     expect(snap.label).toMatch(/lundi, jour 3, 12 h/);
-    // Jour 3 à midi sur deux semaines (jours 1 à 15).
-    expect(snap.progress).toBeGreaterThan(0.15);
-    expect(snap.progress).toBeLessThan(0.2);
+    // Jour 3 à midi jusqu'à la limite de la partie (tour 8: jours 1 à 43, `clock.lastDay`).
+    expect(snap.progress).toBeGreaterThan(0.05);
+    expect(snap.progress).toBeLessThan(0.07);
     const json = JSON.stringify(snap.data);
     expect(json.length).toBeLessThan(1024 * 1024);
     const { content, map } = contentAndMap();
@@ -92,7 +92,7 @@ describe('sauvegarde', () => {
     expect(w.phase).toBe('day');
     expect(w.ending).toBeNull();
     expect(w.orderIndex).toBe(1);
-    expect(w.orderHistory).toEqual([{ linesDone: 4, linesTotal: 4, complete: true, amount: 540 }]);
+    expect(w.orderHistory).toEqual([{ number: 1, day: 8, linesDone: 4, linesTotal: 4, complete: true, amount: 540 }]);
     // Les effets durables de l'échéance du jour 8 que l'ancienne version n'avait pas: quête, drapeau.
     expect(w.quests.find((q) => q.id === 'second_order')?.status).toBe('active');
     play(restored, createRobot(), (s) => s.world.phase === 'ended', MAX_TICKS);

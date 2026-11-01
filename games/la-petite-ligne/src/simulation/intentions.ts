@@ -13,6 +13,7 @@ import { durationMultiplier, eat, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
 import { footprintCells, goTo, stopPath } from './deplacement';
+import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
 import { ITEM, POINT } from './ids';
 import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
@@ -178,14 +179,13 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       c.titleReady = intent.ready;
       sim.runtime.changed = true;
       return;
-    case 'end_ready': {
-      if (sim.world.phase !== 'ended') return;
-      const before = sim.world.characters.every((x) => x.endReady);
-      c.endReady = intent.ready;
-      sim.runtime.changed = true;
-      if (!before && sim.world.characters.every((x) => x.endReady)) emit(sim, { type: 'session_finish' });
+    case 'end_ready':
+      // L'ancien « Continuer » de l'écran de fin: « Finir la séance ».
+      chooseAtStage(sim, by, intent.ready ? 'finish' : null);
       return;
-    }
+    case 'stage_choice':
+      chooseAtStage(sim, by, intent.choice);
+      return;
     case 'create_character':
       createCharacter(sim, c, intent.name, intent.hair, intent.outfit);
       return;

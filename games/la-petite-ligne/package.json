@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:ete": "vitest run --config vitest.ete.config.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

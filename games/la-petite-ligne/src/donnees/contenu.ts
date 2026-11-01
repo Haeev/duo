@@ -5,7 +5,15 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
-import { DEFAULT_BENCHES, DEFAULT_FEEL, DEFAULT_MEMORIES, DEFAULT_MOMENTS, DEFAULT_RANGES, DEFAULT_SECRETS } from './defauts';
+import {
+  DEFAULT_BENCHES,
+  DEFAULT_FEEL,
+  DEFAULT_MEMORIES,
+  DEFAULT_MOMENTS,
+  DEFAULT_RANGES,
+  DEFAULT_SECRETS,
+  DEFAULT_WEATHER,
+} from './defauts';
 import { ContentError, Reader } from './lecteur';
 import type {
   AnimalDef,
@@ -37,10 +45,15 @@ import type {
   QuestDef,
   QuestStepDef,
   RecipeDef,
+  OrderFamily,
+  OrderResource,
   Season,
   ScheduleEntry,
   Settings,
   Since,
+  StageId,
+  Tenderness,
+  WeatherOdds,
   Texts,
   VillagerDef,
   Who,
@@ -84,6 +97,10 @@ const CATEGORIES: readonly ItemCategory[] = [
   'furniture',
 ];
 const DISHES: readonly DishKind[] = ['bread', 'simple', 'stew'];
+const STAGE_IDS: readonly StageId[] = ['demo', 'summer_end'];
+const TENDERNESS: readonly Tenderness[] = ['none', 'accomplices', 'gentle'];
+const FAMILIES: readonly OrderFamily[] = ['potager', 'basse-cour', 'cuisine', 'rivière', 'bois', 'lisière'];
+const RESOURCES: readonly OrderResource[] = ['garden', 'eggs', 'river', 'wood', 'forage'];
 const TIERS = ['P0', 'P1'] as const;
 
 function root(file: string, value: unknown): Reader {
@@ -246,7 +263,14 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return { type, from: r.at('from').time(), to: r.at('to').time() };
     case 'weather_is':
     case 'weather_was':
+    case 'weather_tomorrow_is':
       return { type, weather: r.at('weather').oneOf(WEATHERS) };
+    case 'morning_mist':
+      return { type };
+    case 'tenderness_at_least':
+      return { type, level: r.at('level').oneOf(TENDERNESS) };
+    case 'stage_due':
+      return { type, stage: r.at('stage').oneOf(STAGE_IDS) };
     case 'season_is':
       return {
         type,
@@ -428,8 +452,11 @@ export function parseEffect(r: Reader): Effect {
     case 'set_world_state':
       return { type, key: r.at('key').string(), value: r.at('value').string() };
     case 'pay_order':
-    case 'end_demo':
       return { type };
+    case 'end_demo':
+      return { type: 'end_stage', stage: 'demo' };
+    case 'end_stage':
+      return { type, stage: r.at('stage').oneOf(STAGE_IDS) };
     case 'if':
       return {
         type,
@@ -729,6 +756,7 @@ function parseQuests(r: Reader): QuestDef[] {
         completionEffects: effects(q.opt('completionEffects')),
         completionText: q.at('completionText').string(),
         secret: parseSecret(q.opt('secret')),
+        repeat: q.has('repeat') ? q.at('repeat').oneOf(['each_train'] as const) : null,
       };
     });
 }
@@ -1025,16 +1053,23 @@ function parseLetters(r: Reader): { letters: Record<string, LetterDef>; senders:
         ? []
         : variants.items().map((v) => ({ when: conditions(v.opt('when'), 'game_start'), text: v.at('text').string() }));
     const text = optString(l, 'text') ?? parsedVariants.at(-1)?.text ?? l.at('text').string();
+    const instance = delivery.opt('instance');
+    if (id.includes('@')) l.at('id').fail('« @ » est réservé aux lettres hebdomadaires');
     letters[id] = {
       id,
       from: l.at('from').string(),
       title: l.at('title').string(),
-      delivery: delivery.has('byEffect')
-        ? null
-        : { day: delivery.at('day').integer(1), time: delivery.at('time').time() },
+      delivery:
+        delivery.has('byEffect') || instance !== null ? null : { day: delivery.at('day').integer(1), time: delivery.at('time').time() },
+      instance:
+        instance === null
+          ? null
+          : { kind: instance.oneOf(['train'] as const), time: delivery.has('byEffect') ? null : delivery.at('time').time() },
       text,
       variants: parsedVariants,
+      variantsNoRepeat: optBoolean(l, 'variantsNoRepeat', false),
     };
+
   }
   const senders: Record<string, string> = {};
   for (const s of r.at('senders').items()) {
@@ -1217,15 +1252,12 @@ function parseMomentSettings(r: Reader | null): Settings['moments'] {
 }
 
 /** Souvenirs (`reglages.memories`, tour 7): chaque clé absente garde sa valeur de `defauts.ts`. */
-function parseMemorySettings(r: Reader | null): Settings['memories'] {
+function parseMemorySettings(r: Reader | null, calendar: Settings['calendar']): Settings['memories'] {
+  // Le calendrier des souvenirs est celui de `reglages.calendar` (une seule source, tour 8).
   const d = DEFAULT_MEMORIES;
-  if (r === null) return { ...d };
-  return {
-    seasonDays: r.has('seasonDays') ? r.at('seasonDays').integer(1) : d.seasonDays,
-    seasonsPerYear: r.has('seasonsPerYear') ? r.at('seasonsPerYear').integer(1) : d.seasonsPerYear,
-    maxBytes: r.has('maxBytes') ? r.at('maxBytes').integer(1) : d.maxBytes,
-  };
+  return { seasonDays: calendar.seasonDays, seasonsPerYear: calendar.seasonsPerYear, maxBytes: r?.has('maxBytes') === true ? r.at('maxBytes').integer(1) : d.maxBytes };
 }
+
 
 /** Informations propres (`reglages.secrets`): chaque clé absente garde sa valeur de `defauts.ts`. */
 function parseSecretSettings(r: Reader | null): Settings['secrets'] {
@@ -1257,6 +1289,253 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
   };
 }
 
+/** Liste de saisons (`["spring", "summer"]`). */
+function seasonList(r: Reader): Season[] {
+  return r.items().map((s) => s.oneOf(SEASONS));
+}
+
+/** Une valeur par saison (`{ "spring": ..., ... }`), toutes présentes. */
+function bySeason<T>(r: Reader, read: (x: Reader) => T): Record<Season, T> {
+  return { spring: read(r.at('spring')), summer: read(r.at('summer')), autumn: read(r.at('autumn')), winter: read(r.at('winter')) };
+}
+
+function odds(r: Reader, sumTo100: boolean): WeatherOdds {
+  const list = r.numberList();
+  const [sunny, cloudy, rain] = list;
+  if (list.length !== 3 || sunny === undefined || cloudy === undefined || rain === undefined) return r.fail('[soleil, nuages, pluie] attendu');
+  if (list.some((x) => x < 0)) return r.fail('valeurs positives attendues');
+  if (sumTo100 && Math.abs(sunny + cloudy + rain - 100) > 1e-9) return r.fail('somme de 100 attendue');
+  return [sunny, cloudy, rain];
+}
+
+function positive(r: Reader): number {
+  const x = r.number();
+  if (x <= 0) r.fail('valeur positive attendue');
+  return x;
+}
+
+function probability(r: Reader): number {
+  const p = r.number();
+  if (p < 0 || p > 1) r.fail('probabilité de 0 à 1 attendue');
+  return p;
+}
+
+/**
+ * Calendrier (`reglages.calendar`, tour 8): seule source des saisons. Les anciennes clés
+ * `memories.seasonDays` et `memories.seasonsPerYear` restent lues si `calendar` manque, jamais
+ * les deux à la fois.
+ */
+function parseCalendar(r: Reader): Settings['calendar'] {
+  const calendar = r.opt('calendar');
+  const memories = r.opt('memories');
+  const old = memories !== null && (memories.has('seasonDays') || memories.has('seasonsPerYear'));
+  if (calendar !== null && old) return r.at('memories').fail('saisons à lire dans « calendar » seulement (retirer seasonDays et seasonsPerYear)');
+  const from = calendar ?? memories;
+  const d = DEFAULT_MEMORIES;
+  return {
+    seasonDays: from?.has('seasonDays') === true ? from.at('seasonDays').integer(1) : d.seasonDays,
+    seasonsPerYear: from?.has('seasonsPerYear') === true ? from.at('seasonsPerYear').integer(1) : d.seasonsPerYear,
+  };
+}
+
+/** Rythme par jour (`clock.schedule`, D1); absent: le rythme du jour 1 partout. */
+function parseSchedule(clock: Reader, base: number): Settings['clock']['schedule'] {
+  const r = clock.opt('schedule');
+  if (r === null) return [{ fromDay: 1, secondsPerGameMinute: base }];
+  let previous = 0;
+  const steps = r.items().map((s) => {
+    const fromDay = s.at('fromDay').integer(1);
+    if (fromDay <= previous) s.at('fromDay').fail('pas attendus dans l\'ordre des jours');
+    previous = fromDay;
+    const spm = s.at('secondsPerGameMinute').number();
+    if (spm <= 0) s.at('secondsPerGameMinute').fail('valeur positive attendue');
+    return { fromDay, secondsPerGameMinute: spm };
+  });
+  const first = steps[0];
+  if (first?.fromDay !== 1) return r.fail('le premier pas commence au jour 1');
+  if (first.secondsPerGameMinute !== base) return r.at('0').fail('le premier pas vaut clock.secondsPerGameMinute');
+  return steps;
+}
+
+function parseStages(r: Reader | null, lastDay: { day: number; end: number }): Settings['stages'] {
+  // Sans étapes écrites: une seule, la fin de la démo, à la limite de la partie.
+  if (r === null) return [{ id: 'demo', day: lastDay.day, time: lastDay.end, texts: 'demo' }];
+  let previous = 0;
+  const stages = r.items().map((s) => {
+    const day = s.at('day').integer(1);
+    if (day <= previous) s.at('day').fail('étapes attendues dans l\'ordre des jours');
+    previous = day;
+    return { id: s.at('id').oneOf(STAGE_IDS), day, time: s.at('time').time(), texts: s.at('texts').oneOf(STAGE_IDS) };
+  });
+  if (new Set(stages.map((s) => s.id)).size !== stages.length) r.fail('étape en double');
+  const last = stages[stages.length - 1];
+  if (last !== undefined && (last.day > lastDay.day || (last.day === lastDay.day && last.time > lastDay.end))) {
+    r.fail('la dernière étape tombe après clock.lastDay');
+  }
+  return stages;
+}
+
+function parseWeather(r: Reader | null, written: number): Settings['weather'] {
+  const d = DEFAULT_WEATHER;
+  if (r === null) return { ...d, fromDay: Math.max(d.fromDay, written + 1) };
+  const fromDay = r.has('fromDay') ? r.at('fromDay').integer(1) : d.fromDay;
+  if (fromDay > written + 1) r.at('fromDay').fail(`weatherByDay s'arrête au jour ${written}: jours ${written + 1} à ${fromDay - 1} sans météo`);
+  const mist = r.opt('mist');
+  const bite = r.opt('biteWaitFactor');
+  const forced = r.opt('forced');
+  return {
+    fromDay,
+    draw: r.has('draw') ? bySeason(r.at('draw'), (x) => odds(x, true)) : d.draw,
+    target: r.has('target') ? bySeason(r.at('target'), (x) => odds(x, true)) : d.target,
+    persistence: r.has('persistence') ? probability(r.at('persistence')) : d.persistence,
+    maxRainStreak: r.has('maxRainStreak') ? r.at('maxRainStreak').integer(1) : d.maxRainStreak,
+    maxDaysWithoutSun: r.has('maxDaysWithoutSun') ? r.at('maxDaysWithoutSun').integer(1) : d.maxDaysWithoutSun,
+    forced:
+      forced === null
+        ? d.forced
+        : forced.items().map((f) => {
+            const day = f.at('day').integer(1);
+            if (day < fromDay) f.at('day').fail('jour écrit dans weatherByDay');
+            return { day, weather: f.at('weather').oneOf(WEATHERS) };
+          }),
+    logDays: r.has('logDays') ? r.at('logDays').integer(7, 60) : d.logDays,
+    biteWaitFactor:
+      bite === null ? d.biteWaitFactor : { sunny: bite.at('sunny').number(), cloudy: bite.at('cloudy').number(), rain: bite.at('rain').number() },
+    mist:
+      mist === null
+        ? d.mist
+        : {
+            afterRain: probability(mist.at('afterRain')),
+            base: bySeason(mist.at('base'), probability),
+            fadeFrom: mist.at('fadeFrom').time(),
+            until: mist.at('until').time(),
+            biteWaitFactor: mist.at('biteWaitFactor').number(),
+          },
+  };
+}
+
+/** Fenêtre hebdomadaire du catalogue après les fenêtres écrites (`catalogue.repeatWeekly`). */
+function parseRepeatWeekly(catalogue: Reader): Settings['economy']['catalogue']['repeatWeekly'] {
+  const r = catalogue.opt('repeatWeekly');
+  if (r === null) return null;
+  return {
+    deadlineWeekday: WEEKDAYS.indexOf(r.at('deadlineWeekday').oneOf(WEEKDAYS)),
+    deadlineTime: r.at('deadlineTime').time(),
+    deliveryTime: r.at('deliveryTime').time(),
+  };
+}
+
+function parseGenerated(r: Reader | null, written: number): Settings['order']['generated'] {
+  if (r === null) return null;
+  const fromOrder = r.at('fromOrder').integer(1);
+  if (fromOrder !== written + 1) r.at('fromOrder').fail(`la commande ${written + 1} suit les commandes écrites`);
+  const budget = r.at('budget');
+  const res = r.at('resources');
+  const weights = r.at('weights');
+  const size = r.at('size');
+  const factors: Record<string, number> = {};
+  for (const [key, value] of size.at('factors').entries()) factors[key] = value.number();
+  const current = size.at('current').string();
+  if (!(current in factors)) size.at('current').fail(`taille inconnue « ${current} »`);
+  const noShared: Record<string, string[]> = {};
+  for (const [key, value] of r.at('noSharedBase').entries()) noShared[key] = value.stringList();
+  let previousFrom = 0;
+  const linesByOrder = r
+    .at('linesByOrder')
+    .items()
+    .map((x) => {
+      const from = x.at('from').integer(fromOrder);
+      if (from <= previousFrom) x.at('from').fail('paliers attendus dans l\'ordre');
+      previousFrom = from;
+      return { from, lines: x.at('lines').integer(1, 12) };
+    });
+  if (linesByOrder[0]?.from !== fromOrder) r.at('linesByOrder').fail(`le premier palier commence à la commande ${fromOrder}`);
+  const products = r
+    .at('products')
+    .items()
+    .map((p) => {
+      const price = p.opt('price');
+      return {
+        item: p.at('item').string(),
+        family: p.at('family').oneOf(FAMILIES),
+        resource: p.at('resource').oneOf(RESOURCES),
+        cost: positive(p.at('cost')),
+        min: p.at('min').integer(1),
+        price: price === null || price.isNull() ? null : price.integer(0),
+        seasons: seasonList(p.at('seasons')),
+        obtained: p.at('obtained').string(),
+        leadDays: p.at('leadDays').integer(0),
+      };
+    });
+  if (new Set(products.map((p) => p.item)).size !== products.length) r.at('products').fail('produit en double');
+  const minLines = r.at('minLines').integer(1);
+  return {
+    fromOrder,
+    linesByOrder,
+    minLines,
+    maxPerFamily: r.at('maxPerFamily').integer(1),
+    minFamilies: r.at('minFamilies').integer(1),
+    maxRepeatFromPrevious: r.at('maxRepeatFromPrevious').integer(0),
+    weights: { absentFamily: weights.at('absentFamily').number(), neverOrdered: weights.at('neverOrdered').number(), twoOrdersAgo: weights.at('twoOrdersAgo').number() },
+    budget: {
+      start: budget.at('start').number(),
+      stepOnComplete: budget.at('stepOnComplete').number(),
+      max: budget.at('max').number(),
+      afterMiss: budget.at('afterMiss').number(),
+      afterTwoMisses: budget.at('afterTwoMisses').number(),
+      floor: budget.at('floor').number(),
+    },
+    size: { current, factors },
+    resources: {
+      garden: res.at('garden').number(),
+      eggs: res.at('eggs').number(),
+      river: res.at('river').number(),
+      wood: res.at('wood').number(),
+      resourceCap: probability(res.at('resourceCap')),
+      minLineShare: probability(res.at('minLineShare')),
+      forageCap: probability(res.at('forageCap')),
+      forageShare: res.at('forageShare').number(),
+      woodPlanksPerTree: res.at('woodPlanksPerTree').number(),
+      woodCap: probability(res.at('woodCap')),
+      woodMinTrees: res.at('woodMinTrees').integer(0),
+    },
+    paymentPerWorkWeek: r.at('paymentPerWorkWeek').number(),
+    noSharedBase: noShared,
+    products,
+  };
+}
+
+function parseForage(r: Reader | null): Settings['forage'] {
+  if (r === null) return null;
+  const boost = r.opt('rainBoost');
+  const items = r
+    .at('items')
+    .items()
+    .map((i) => {
+      const count = i.at('count').numberList();
+      const [lo, hi] = count;
+      if (count.length !== 2 || lo === undefined || hi === undefined || lo < 1 || hi < lo) return i.at('count').fail('[min, max] attendu');
+      return { item: i.at('item').string(), seasons: seasonList(i.at('seasons')), weight: i.at('weight').number(), count: [lo, hi] as const };
+    });
+  const known = new Set(items.map((i) => i.item));
+  const points = r
+    .at('points')
+    .items()
+    .map((p) => {
+      const list = p.at('items').stringList();
+      for (const it of list) if (!known.has(it)) p.at('items').fail(`cueillette inconnue « ${it} » (forage.items)`);
+      return { point: p.at('point').string(), items: list };
+    });
+  return {
+    fromDay: r.at('fromDay').integer(1),
+    spawnChance: probability(r.at('spawnChance')),
+    unseenFactor: r.at('unseenFactor').number(),
+    rainBoost: boost === null ? null : { item: boost.at('item').string(), factor: boost.at('factor').number() },
+    points,
+    items,
+  };
+}
+
 function parseSettings(r: Reader): Settings {
   const clock = r.at('clock');
   const economy = r.at('economy');
@@ -1279,28 +1558,44 @@ function parseSettings(r: Reader): Settings {
     .at('weatherByDay')
     .items()
     .map((w) => w.oneOf(WEATHERS));
-  const lastDay = clock.at('lastDay');
-  if (weatherByDay.length < lastDay.at('day').integer(1)) {
+  const lastDayReader = clock.at('lastDay');
+  const lastDay = { day: lastDayReader.at('day').integer(1), end: lastDayReader.at('end').time() };
+  const weather = parseWeather(r.opt('weather'), weatherByDay.length);
+  // Une météo écrite par jour jusqu'au premier jour tiré (et jusqu'à la limite si rien n'est tiré).
+  if (weatherByDay.length < Math.min(lastDay.day, weather.fromDay - 1)) {
     r.at('weatherByDay').fail('une météo par jour de la démo attendue');
   }
   const trainDays = r.at('train').at('days').numberList();
+  const train = r.at('train');
+  const base = clock.at('secondsPerGameMinute').number();
+  const trains = trainOrders(order, trainDays);
+  const tenderness = r.opt('tenderness');
+  const continuation = r.opt('continuation');
   return {
     profile: r.at('profile').string(),
+    calendar: parseCalendar(r),
     clock: {
-      secondsPerGameMinute: clock.at('secondsPerGameMinute').number(),
+      secondsPerGameMinute: base,
+      schedule: parseSchedule(clock, base),
       dayStart: clock.at('dayStart').time(),
       dayEnd: clock.at('dayEnd').time(),
       veilleeFrom: clock.at('veilleeFrom').time(),
       firstDay: { day: clock.at('firstDay').at('day').integer(1), start: clock.at('firstDay').at('start').time() },
-      lastDay: { day: lastDay.at('day').integer(1), end: lastDay.at('end').time() },
+      lastDay,
       stopWhenBothInMenu: clock.at('stopWhenBothInMenu').boolean(),
     },
     train: {
       days: trainDays,
-      arrival: r.at('train').at('arrival').time(),
-      departure: r.at('train').at('departure').time(),
+      repeatEveryDays: train.has('repeatEveryDays') ? train.at('repeatEveryDays').integer(0) : 0,
+      arrival: train.at('arrival').time(),
+      departure: train.at('departure').time(),
+      saluteSlowRoll: optBoolean(train, 'saluteSlowRoll', true),
     },
     weatherByDay,
+    weather,
+    stages: parseStages(r.opt('stages'), lastDay),
+    continuation: { mode: continuation === null ? 'same_save' : continuation.at('mode').oneOf(['same_save', 'new_game_per_stage'] as const) },
+    tenderness: tenderness === null ? 'gentle' : tenderness.oneOf(TENDERNESS),
     spawn: { point: r.at('spawn').at('point').string() },
     economy: {
       startPurse: economy.at('startPurse').integer(0),
@@ -1310,13 +1605,15 @@ function parseSettings(r: Reader): Settings {
         dailyCap: grocer.at('dailyCap').integer(0),
         buysAfterFlag: grocer.at('buysAfterFlag').string(),
       },
-      catalogue: { windows: catalogueWindows(catalogue, dayTime) },
+      catalogue: { windows: catalogueWindows(catalogue, dayTime), repeatWeekly: parseRepeatWeekly(catalogue) },
     },
     order: {
-      trains: trainOrders(order, trainDays),
+      trains,
       extraItemsRate: order.at('extraItemsRate').number(),
+      generated: parseGenerated(order.opt('generated'), trains.length),
     },
     trees: { chopsPerTree: r.at('trees').at('chopsPerTree').integer(1), logsPerTree: r.at('trees').at('logsPerTree').integer(1) },
+    forage: parseForage(r.opt('forage')),
     hens: {
       eggsPerHenPerDay: r.at('hens').at('eggsPerHenPerDay').integer(0),
       feedRequired: r.at('hens').at('feedRequired').boolean(),
@@ -1375,7 +1672,7 @@ function parseSettings(r: Reader): Settings {
     benches: parseBenches(r.opt('benches')),
     moments: parseMomentSettings(r.opt('moments')),
     secrets: parseSecretSettings(r.opt('secrets')),
-    memories: parseMemorySettings(r.opt('memories')),
+    memories: parseMemorySettings(r.opt('memories'), parseCalendar(r)),
     feel: parseFeel(r.opt('feel')),
   };
 }
@@ -1403,6 +1700,7 @@ function checkReferences(content: Content): void {
   content.settings.order.trains.forEach((o, i) => {
     for (const line of o.lines) item(line.item, `reglages.json: order.trains[${i}].lines`);
   });
+  checkWeeklyReferences(content, fail, item);
   const questIds = new Set(content.quests.map((q) => q.id));
   const walkEffects = (list: Effect[], where: string): void => {
     for (const e of list) {
@@ -1443,7 +1741,7 @@ function checkReferences(content: Content): void {
         case 'gather_players':
         case 'set_world_state':
         case 'pay_order':
-        case 'end_demo':
+        case 'end_stage':
           break;
       }
     }
@@ -1477,6 +1775,44 @@ function checkReferences(content: Content): void {
     }
     if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);
     walkEffects(m.effects, where);
+  }
+}
+
+/** Renvois du tour 8: produits de la commande générée, cueillettes, étapes, quêtes de la semaine. */
+function checkWeeklyReferences(content: Content, fail: (message: string) => never, item: (id: string, where: string) => void): void {
+  const s = content.settings;
+  const g = s.order.generated;
+  const forage = new Set((s.forage?.items ?? []).map((i) => i.item));
+  if (g !== null) {
+    const products = new Set(g.products.map((p) => p.item));
+    for (const p of g.products) {
+      // Les cueillettes de la lisière sont décrites par `forage.items` (leurs objets viennent avec la cueillette).
+      if (p.resource === 'forage') {
+        if (!forage.has(p.item)) fail(`reglages.json: order.generated.products: cueillette inconnue « ${p.item} » (forage.items)`);
+      } else {
+        item(p.item, 'reglages.json: order.generated.products');
+      }
+      if (!/^[a-z_]+:[a-z_]+$/.test(p.obtained)) fail(`reglages.json: order.generated.products: « obtained » attendu en « compteur:objet » (${p.item})`);
+    }
+    for (const [dish, bases] of Object.entries(g.noSharedBase)) {
+      for (const id of [dish, ...bases]) if (!products.has(id)) fail(`reglages.json: order.generated.noSharedBase: produit inconnu « ${id} »`);
+    }
+  }
+  const stages = content.texts.raw.stages;
+  for (const stage of s.stages) {
+    const block = typeof stages === 'object' && stages !== null ? (stages as Record<string, unknown>)[stage.texts] : undefined;
+    const title = typeof block === 'object' && block !== null ? (block as Record<string, unknown>).title : undefined;
+    if (typeof title !== 'string') fail(`textes.json: stages.${stage.texts}.title manquant (étape ${stage.id})`);
+  }
+  for (const quest of content.quests) {
+    for (const step of quest.steps) {
+      if (step.resolve === 'at_deadline' && step.deadline === null && quest.repeat === null) {
+        fail(`quetes.json: ${quest.id}.${step.id}: échéance attendue (ou « repeat »)`);
+      }
+    }
+  }
+  for (const letter of Object.values(content.letters)) {
+    if (letter.instance !== null && g === null) fail(`courrier.json: ${letter.id}: lettre hebdomadaire sans commande générée (order.generated)`);
   }
 }
 

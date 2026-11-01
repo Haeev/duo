@@ -13,6 +13,7 @@ import {
   type ConditionContext,
   type ToolEvent,
 } from './conditions';
+import { currentOrder } from '../donnees/commandes';
 import { type Sim, emit, format, notify, say, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { textVars } from './courrier';
@@ -36,10 +37,11 @@ export function startQuest(sim: Sim, id: string): void {
     baselines: first === undefined ? {} : captureBaselines(sim, first.conditions),
     startedDay: world.clock.day,
   };
+  if (quest.repeat === 'each_train') state.train = currentOrder(sim.content.settings, world).day;
   world.quests.push(state);
   // Quête à secret (R16): l'informé et l'autre sont fixés dès le démarrage.
   startSecret(sim, quest);
-  notifyKey(sim, 'both', 'quest', 'quest_started', { quest: quest.title });
+  notifyKey(sim, 'both', 'quest', 'quest_started', { quest: questTitle(sim, state, quest) });
   queueHint(sim, 'p1', { on: 'quest_started', quest: id });
   queueHint(sim, 'p2', { on: 'quest_started', quest: id });
   emit(sim, { type: 'quest_started', quest: id });
@@ -79,16 +81,45 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
   if (next === undefined) {
     state.status = 'done';
     state.checklist = [];
-    notify(sim, 'both', 'quest', format(quest.completionText, textVars(sim)), { key: 'quest_done' });
+    notify(sim, 'both', 'quest', format(quest.completionText, { ...textVars(sim), day: state.train ?? '' }), { key: 'quest_done' });
     emit(sim, { type: 'quest_done', quest: quest.id });
     finishSecret(sim, quest.id);
     runEffects(sim, quest.completionEffects, actor);
     sim.world.revision += 1;
     sim.events.push({ type: 'save_point', reason: 'quest' });
+    if (quest.repeat === 'each_train') restartForNextTrain(sim, state, quest);
     return;
   }
   state.baselines = captureBaselines(sim, next.conditions);
-  notifyKey(sim, 'both', 'quest', 'quest_step_done', { quest: quest.title });
+  notifyKey(sim, 'both', 'quest', 'quest_step_done', { quest: questTitle(sim, state, quest) });
+}
+
+/** Quête de la semaine (`repeat: each_train`): elle repart aussitôt pour la commande nouvellement tirée. */
+function restartForNextTrain(sim: Sim, state: QuestState, quest: QuestDef): void {
+  const next = currentOrder(sim.content.settings, sim.world).day;
+  // Plus de train après celui-ci (aucune commande tirée): la quête reste finie.
+  if (state.train !== undefined && next <= state.train) return;
+  const first = quest.steps[0];
+  state.status = 'active';
+  state.step = 0;
+  state.checklist = [];
+  state.baselines = first === undefined ? {} : captureBaselines(sim, first.conditions);
+  state.startedDay = sim.world.clock.day;
+  state.train = next;
+  notifyKey(sim, 'both', 'quest', 'quest_started', { quest: questTitle(sim, state, quest) });
+  emit(sim, { type: 'quest_started', quest: quest.id });
+  refreshChecklist(sim, state, quest);
+}
+
+/** Titre de la quête, `{day}` remplacé par le jour du train d'une quête de la semaine. */
+export function questTitle(sim: Sim, state: QuestState, quest: QuestDef | undefined = def(sim, state.id)): string {
+  return quest === undefined ? state.id : format(quest.title, { day: state.train ?? '' });
+}
+
+/** Échéance d'une étape: écrite, ou le départ du train de la quête de la semaine. */
+function stepDeadline(sim: Sim, state: QuestState, step: QuestDef['steps'][number]): { day: number; time: number } | null {
+  if (step.deadline !== null) return step.deadline;
+  return state.train === undefined ? null : { day: state.train, time: sim.content.settings.train.departure };
 }
 
 function deadlineReached(sim: Sim, deadline: { day: number; time: number }): boolean {
@@ -116,7 +147,8 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
       if (step === undefined) break;
       if (step.resolve === 'at_deadline') {
         refreshChecklist(sim, state, quest);
-        if (step.deadline !== null && deadlineReached(sim, step.deadline)) {
+        const deadline = stepDeadline(sim, state, step);
+        if (deadline !== null && deadlineReached(sim, deadline)) {
           runEffects(sim, step.onDeadline, null);
           advance(sim, state, quest, null);
           continue;
@@ -151,6 +183,7 @@ export function objectiveText(sim: Sim, state: QuestState): string {
   const quest = def(sim, state.id);
   const step = quest?.steps[state.step];
   if (quest === undefined) return '';
-  if (step === undefined) return format(quest.completionText, textVars(sim));
-  return format(step.objective, textVars(sim));
+  const vars = { ...textVars(sim), day: state.train ?? '' };
+  if (step === undefined) return format(quest.completionText, vars);
+  return format(step.objective, vars);
 }
