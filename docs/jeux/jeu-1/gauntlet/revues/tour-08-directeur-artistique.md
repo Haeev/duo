@@ -167,3 +167,52 @@ Un seul défaut bloquant: la silhouette du roncier. Les autres modèles du tour 
 
 - Sur l'écran du PC (portable possible, dalle peu fidèle), la place à 19 h avec les réglages A: le mauve doit disparaître sans que les ombres deviennent brunes.
 - Fluidité au gué et sur la rivière (lit en tronçons, texture du lit, eau qui lit la profondeur): non mesurable en rendu logiciel.
+
+## Contrôle après correctifs (2026-11-01, `c93b5a6`)
+
+| Champ | Valeur |
+|---|---|
+| Version contrôlée | branche `claude/stoic-lamport-lueey2`, `c93b5a6`, arbre principal servi par une copie de `/tmp/dg3d-budget/serveur.sh`, port 5231, relancé avant les captures |
+| Méthode | 13 captures faites par moi aux cadrages de la revue (même script, mêmes requêtes `rendu.html?stats=0&vie=0&...`, 1366 x 768): place à 19 h (orientations 0 et 2), place à 8 h 15, bord sud (zoom 0), gué (zoom 0, orientations 0 et 1), quai à 16 h, lisière au zoom 0 (orientations 0, 1 et 2), tonnelle en automne et en hiver (zoom 0), place en hiver. Aucune erreur de page ni de console; plan le plus chargé 145 996 triangles et 74 appels (lisière, orientation 1). Mesures CIELAB aux mêmes zones que la revue; conversions en gris. Relu les planches `correctif-*.png` de l'équipe |
+| **G6 (visuel)** | **oui** (inchangé, renforcé: les deux excès du soir sont corrigés) |
+| **G8** | **oui**: le roncier n'a plus de pattes |
+| **G9** | **oui, sans réserve**: vigne et gué corrigés, jeune sapin à côté de sa souche, rejets sur le flanc |
+| Bloquant pour `main` | **rien** |
+
+Planches: `da-controle-place-19h.png`, `da-controle-lauzes-19h.png`, `da-controle-roncier.png`, `da-controle-gue.png`, `da-controle-place-bords.png`, `da-controle-vigne-saisons.png`.
+
+### Point par point
+
+| Défaut de la revue | Constat en jeu | Verdict |
+|---|---|---|
+| Roncier en araignée (bloquant G8) | Au zoom 0, orientations 0 et 1 (`da-controle-roncier.png`): masse basse et fourré, quatre arceaux fins qui retombent et touchent l'herbe à côté du fourré, petites feuilles le long des tiges, plus aucune boule en l'air. On lit une ronce. Les mûres restent sur la masse | **levé** |
+| Place mauve à 19 h | Réglages A en place (`#8794d0` x 0,3, saturation 1,15, vignettage `#302a2f`). Ombre de la terre battue, orientation 0, mêmes zones: b\* de -2,6 / -3,4 / +3,0 à **+3,0 / +2,3 / +7,0**, a\* abaissé de 1,3 à 1,5, **L\* identique** (31,7 / 31,0 / 34,3). Orientation 2: b\* de -5,3 à +0,9 sur la zone la plus violette. Ombres encore froides, sans mauve; la lumière chaude des lampadaires s'en détache mieux. Lisible en gris (`da-controle-place-19h.png`) | **levé** |
+| Lauzes bleu roi à l'ombre du soir | Pan arrière de l'épicerie, 19 h, orientation 2: de `#1A2042` (L\* 13,4, b\* -23,3) à **`#212231` (L\* 13,9, b\* -10,2)**, et de b\* -25,5 à **-12,3** près de la cheminée; cible -8 à -14 et L\* au moins 14 tenue à 0,1 près. Le pan au soleil n'a pas bougé. On relit une ardoise (`da-controle-lauzes-19h.png`) | **levé** |
+| Vigne verte en automne et en hiver (G9) | Automne: touffes ocre et rouge de vigne, plus de touffe rousse isolée; hiver: toutes brun sec, aucune verte (`da-controle-vigne-saisons.png`). Le choix de garder les touffes brunes l'hiver plutôt que de les masquer me va: quelques feuilles sèches s'accrochent à une treille en décembre, et la tonnelle reste lisible comme une tonnelle | **levé** |
+| Pierres du gué en grille (G9) | Une ligne de 8 grandes pierres au pas, légèrement sinueuse, d'une rive à l'autre, et des pierres plus petites dispersées autour, quelques-unes à fleur d'eau (`da-controle-gue.png`). En gris, aux deux orientations, plus aucun alignement hors de la ligne. On voit où l'on passe | **levé** |
+| Bord des pavés en escalier | Bord en courbe, rang de boutisses continu, plus de pavé isolé (`da-controle-place-bords.png`). Le pavage se termine comme un vrai pavage | **levé** |
+| Limite sud droite de la terre battue | Ondulée, sans bordure (`da-controle-place-bords.png`, bas gauche) | **levé** (la frange d'herbe n'a pas été faite, voir plus bas) |
+| Rejet au milieu de la coupe; souche remplacée par le sapin | Brins nés sur le flanc, coupe nue; jeune sapin planté à côté de sa souche, sans contact (`lisiere-z0-o0`, `correctif-rejet-sapin*.png`) | **levés** |
+
+### Ton des boutisses (`pavingBorderDark` 0,5, `pavingBorderShade` 0,94): validé
+
+Mesuré au soleil à 8 h 15: boutisses L\* 36, pavés voisins L\* 41, terre battue L\* 46. Un palier de 5 points de chaque côté: le rang se lit comme un cadre, un ton sous les pavés, sans tracer un contour noir; la teinte reste celle de la pierre (b\* +16 contre +15 pour les pavés). En gris, le bord reste net sans dominer le puits ni les bancs. À 19 h le rang ne fonce pas davantage que l'ombre autour. Je ne change rien.
+
+### Ce qui reste (aucun point bloquant pour `main`)
+
+| Gravité | Point | Correction | Qui | Effort |
+|---|---|---|---|---|
+| Léger | Les enclaves de terre battue autour du puits ont des formes de rectangle aux coins arrondis, un peu dessinées au gabarit (`place-19h-z1-o2`) | casser une ou deux courbes par enclave (bord plus long d'un côté, renflement là où l'on coupe le coin en marchant) | dev rendu | 20 min |
+| Léger | Frange d'herbe rase au pied des lampadaires et derrière le banc sud, demandée avec l'ondulation, absente | section 2 de la revue | dev rendu | 15 min |
+| Léger | Pierres de passage du gué toujours en prismes réguliers à 6 ou 7 côtés, de même épaisseur | aplatir et biseauter une arête sur deux, faire varier l'épaisseur de 30 % | dev rendu | 15 min |
+| Léger (déjà listés) | Galets en pointillé le long de l'eau, roseaux sans pied, fleurs des buissons en cubes, boule brune des buissons l'hiver, séparateur de l'écran d'étape à 150 % | voir le tableau des défauts | divers | 1 h en tout |
+| Ouvert (tour 7) | Vignettes du carnet provisoires | point 6 du tour 7 | artiste-2d | 4 h |
+
+### Notes proposées
+
+- **Pilier 2, vie du monde et animation: 8/10** (inchangé). La vigne suit désormais l'année, ce qui retire le défaut qu'un joueur aurait remarqué; il manque toujours, pour 8,5, que les habitants gagnent quelque chose à l'écran.
+- **Pilier 3, direction artistique: 8/10, confirmé** (7,5 avant le tour 8). Le roncier, l'étalonnage du soir, les lauzes, le gué et le bord des pavés sont faits: trois des quatre manques que je citais pour 8,5 sont levés. Le dernier, les vignettes définitives du carnet, est visible à chaque ouverture du carnet: 8,5 dès qu'elles sont livrées.
+
+### À tester chez le client
+
+- La place à 19 h sur l'écran du PC: ombres froides sans mauve, lampadaires bien détachés.

@@ -8,10 +8,10 @@ Repères: 10 = à ce niveau de soin, aucune différence visible avec les référ
 |---|---|---|---|---|
 | 1. Ressenti des commandes | 7,5 (7) | game-designer | 2026-11-01, tour 6 | `revues/tour-06-game-designer.md` |
 | 2. Vie du monde et animation | 8 (7,5) | directeur-artistique | 2026-11-01, tour 7 | `revues/tour-07-directeur-artistique.md` |
-| 3. Direction artistique | 7,5 (7) | directeur-artistique | 2026-10-31, tour 5 | `revues/tour-05-directeur-artistique.md` |
+| 3. Direction artistique | 8 (7,5) | directeur-artistique | 2026-11-01, tour 8 | `revues/tour-08-directeur-artistique.md` |
 | 4. Son et musique | 7,5 (7), sans écoute | ux-ui-designer | 2026-10-31, tour 2 | `revues/tour-02-interface-son.md` |
-| 5. Interface et lisibilité | 7,5 (7) | game-designer | 2026-11-01, tour 6 | `revues/tour-06-game-designer.md` |
+| 5. Interface et lisibilité | 8 (7,5) | game-designer | 2026-11-01, tour 8 | `revues/tour-08-game-designer.md` |
 | 6. Contenu et rythme | 7,5 (7) | game-designer | 2026-10-31, tour 5 | `revues/tour-05-game-designer.md` |
 | 7. Coopération | 8 (7,5), à confirmer chez le client (S-08) | game-designer | 2026-11-01, tour 6 | `revues/tour-06-game-designer.md` |
 | 8. Robustesse et performance | 7,5 (6,5) | architecte-technique | 2026-10-31, tour 2 | `revues/tour-02-robustesse.md` |
-| Moyenne | 7,6 (7,6; 7,63 contre 7,56) | | 2026-11-01 | tour 7 |
+| Moyenne | 7,8 (7,6) | | 2026-11-01 | tour 8 |
