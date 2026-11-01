@@ -213,7 +213,7 @@ export function soundsForEvent(
       emit.ui(`${settings.seasonTurnPrefix}${event.season}`, 'both');
       break;
     case 'stage_choice':
-      if (event.choice !== null) emit.ui('ui-confirm', event.by);
+      // Le bouton de l'écran d'étape joue déjà ui-confirm chez son auteur (interface/sons.ts).
       break;
     case 'gave':
     case 'fed_hens':
