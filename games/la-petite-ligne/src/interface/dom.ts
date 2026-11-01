@@ -124,6 +124,14 @@ export function chip(text: string, variant: '' | 'ready' | 'waiting' | 'alert' |
   return span;
 }
 
+/**
+ * Tampon « Rien que pour toi », « Chez les deux », « Chez Sacha »: qui voit une information.
+ * Un seul style partout (carnet, matin, confidence), pour qu'une même étiquette dise une même chose.
+ */
+export function secretStamp(text: string): HTMLSpanElement {
+  return el('span', { class: 'lpl-secret__chip', text });
+}
+
 /** Portrait rond (SVG fourni par `portrait.ts`), avec un jeton facultatif. */
 export function portrait(svg: string, size: '' | 'small' | 'large', badge: HTMLElement | null = null): HTMLSpanElement {
   const span = el('span', { class: `lpl-portrait${size === '' ? '' : ` lpl-portrait--${size}`}` });

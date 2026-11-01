@@ -7,7 +7,7 @@ import { currentOrder } from '../donnees/commandes';
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
-import { objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
+import { henLabel, objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
 import {
   ACTION_ICONS,
   CATEGORY_ICONS,
@@ -197,8 +197,24 @@ export interface PartnerModel {
   state: PartnerState;
 }
 
-function villagerLabel(ctx: UiContext, id: string): string {
-  return ctx.content.villagers.find((v) => v.id === id)?.label ?? id;
+/**
+ * Celui ou celle avec qui l'on parle, comme ce joueur le connaît: le nom d'un habitant, une
+ * poule par son nom s'il le voit déjà au-dessus d'elle, sinon par sa couleur (« la poule
+ * rousse »). Jamais un identifiant: à défaut, « quelqu'un ».
+ */
+function speakerLabel(world: ReadonlyWorld, ctx: UiContext, id: string): string {
+  const villager = ctx.content.villagers.find((v) => v.id === id);
+  if (villager !== undefined) return villager.label;
+  const hen = world.hens.find((h) => h.id === id);
+  if (hen !== undefined) return henLabel(world, ctx.content, hen, ctx.me);
+  return ctx.texts.extra.partner.someone;
+}
+
+/** L'autre remplit sa part d'un moment rare (dans le rayon, dans la pose): ce qu'il regarde. */
+function watchingLabel(world: ReadonlyWorld, ctx: UiContext, id: CharacterId): string | null {
+  const today = world.moments.today;
+  if (today === null || (today.phase !== 'waiting' && today.phase !== 'climax') || !today.watching[id]) return null;
+  return ctx.texts.extra.partner.watching[today.id] ?? ctx.texts.extra.partner.watchingAny;
 }
 
 function placeOf(ctx: UiContext, c: ReadonlyCharacter): string {
@@ -248,10 +264,11 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
   if (p.status === 'breakfast') return make(txt.breakfast, 'bread');
   if (awayMinutes !== null) return make(ctx.t(txt.away, { minutes: awayMinutes }), 'ui-hourglass', 'away');
   if (p.status === 'scene' && world.scene !== null) {
-    return make(ctx.t(txt.scene, { villager: villagerLabel(ctx, world.scene.villager) }), 'ui-pin');
+    return make(ctx.t(txt.scene, { villager: speakerLabel(world, ctx, world.scene.villager) }), 'ui-pin');
   }
   if (p.status === 'dialogue' && p.dialogue !== null) {
-    return make(ctx.t(txt.talking, { villager: villagerLabel(ctx, p.dialogue.villager) }), 'ui-note');
+    const hen = p.dialogue.dialogue === UI_SETTINGS.henCallDialogue;
+    return make(ctx.t(hen ? txt.callingHen : txt.talking, { villager: speakerLabel(world, ctx, p.dialogue.villager) }), hen ? 'hen' : 'ui-note');
   }
   if (p.status === 'menu' && p.menu !== null) {
     return make(txt.menus[p.menu] ?? txt.elsewhere, MENU_ICONS[p.menu]);
@@ -262,6 +279,8 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
   }
   if (world.beam?.holders.includes(p.id) === true) return make(txt.carrying, 'beam');
   if (world.constructions.some((k) => k.elements.some((e) => e.workers.includes(p.id)))) return make(txt.building, 'plank');
+  const watching = watchingLabel(world, ctx, p.id);
+  if (watching !== null) return make(watching, 'ui-eye');
   if (p.seat !== null) return make(txt.seated, ACTION_ICONS.sit ?? 'ui-pin');
   const kind = p.action.kind;
   const running = p.action.duration === 0 || world.tick < p.action.since + p.action.duration;

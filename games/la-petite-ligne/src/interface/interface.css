@@ -14,6 +14,14 @@
   visibility: hidden;
 }
 
+/*
+ * Pendant une conversation aussi, l'objectif s'efface: à 150 %, la boîte de dialogue montait
+ * jusqu'à lui et coupait son titre. L'autre joueur reste visible en haut à droite.
+ */
+.lpl-hud[data-state='dialogue'] .lpl-objective {
+  visibility: hidden;
+}
+
 /* Création: formulaire, aperçu, l'autre joueur (creation.html). */
 .lpl-creation {
   display: grid;
@@ -81,6 +89,24 @@
 
 .lpl-section-gap {
   margin-top: var(--lpl-space-4);
+}
+
+/*
+ * Titres de section collés en haut du corps qui défile: un titre n'est jamais coupé par le bord,
+ * il reste lisible tant que sa section est à l'écran. Le décalage négatif annule le rembourrage
+ * haut du corps; la marge de défilement garde la quête qui prend le focus sous le titre.
+ */
+.lpl-panel__body {
+  scroll-padding-top: calc(var(--lpl-text-lg) * 1.6 + var(--lpl-space-3));
+}
+
+.lpl-panel__body .lpl-section-title {
+  position: sticky;
+  top: calc(-1 * var(--lpl-space-4));
+  z-index: 1;
+  margin-inline: calc(-1 * var(--lpl-space-2));
+  padding: var(--lpl-space-1) var(--lpl-space-2);
+  background: var(--lpl-color-paper);
 }
 
 .lpl-empty__icon {
@@ -701,6 +727,31 @@
   height: 80%;
 }
 
+/*
+ * Boîte compacte: la poule appelée est juste au-dessus du joueur, au centre de l'écran. Les
+ * trois noms côte à côte et « Laisser » au bout de la même rangée gardent la boîte basse,
+ * pour que la poule reste visible même à 150 %.
+ */
+.lpl-dialogue[data-speaker='hen'] .lpl-dialogue__aside {
+  width: 6rem;
+}
+
+.lpl-dialogue[data-speaker='hen'] .lpl-dialogue__aside .lpl-portrait {
+  --lpl-portrait-size: 4.5rem;
+}
+
+.lpl-dialogue[data-speaker='hen'] .lpl-dialogue__text {
+  min-height: 0;
+}
+
+.lpl-dialogue[data-speaker='hen'] .lpl-choices {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+}
+
+.lpl-dialogue[data-speaker='hen'] .lpl-choice {
+  height: 100%;
+}
+
 /* Les trois noms en grand, dans l'ordre fixe; « Laisser » à part. */
 .lpl-choice--name {
   font-family: var(--lpl-font-display);
@@ -718,6 +769,16 @@
   border-color: var(--lpl-color-ink-muted);
 }
 
+/* « déjà trouvée : la noire » sous le nom, pour tenir dans un tiers de rangée. */
+.lpl-choice--name:has(> .lpl-choice__note) {
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+}
+
+.lpl-choice--name > .lpl-choice__note {
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
 .lpl-choice__note {
   font-family: var(--lpl-font-text);
   font-size: var(--lpl-text-xs);
@@ -725,7 +786,6 @@
 }
 
 .lpl-choice--leave {
-  margin-top: var(--lpl-space-1);
   border-color: var(--lpl-color-hairline);
   color: var(--lpl-color-ink-muted);
 }

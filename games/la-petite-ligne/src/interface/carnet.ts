@@ -7,7 +7,7 @@ import type { ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
-import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText } from './dom';
+import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText, secretStamp } from './dom';
 import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, questModels, slotModel, type QuestModel } from './modele';
@@ -210,7 +210,9 @@ export class NotebookPanel extends Panel {
         if (list.length === 0) return [];
         const ul = el('ul', { class: 'lpl-quests', 'data-nav': 'list' });
         for (const q of list) ul.append(this.questItem(q, q.id === current, q.id === focusId));
-        return [el('h3', { class: `lpl-section-title${kind === 'side' ? ' lpl-section-gap' : ''}`, text: ctx.t(ctx.texts.game.ui.questKinds[kind]) }), ul];
+        // Une section par bloc: son titre collé en haut au défilement s'en va avec elle.
+        const title = el('h3', { class: 'lpl-section-title', text: ctx.t(ctx.texts.game.ui.questKinds[kind]) });
+        return [el('section', { class: `lpl-quest-section${kind === 'side' ? ' lpl-section-gap' : ''}` }, [title, ul])];
       };
       const nodes = [...(hint === null ? [] : [this.hintCard(hint)]), ...section('main'), ...section('side')];
       return nodes.length === 0 ? [el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.notebook.noQuests) })] : nodes;
@@ -249,7 +251,7 @@ export class NotebookPanel extends Panel {
     const head = el('span', { class: 'lpl-secret__head' }, [
       icon('ui-whisper'),
       el('strong', { class: 'lpl-secret__title', text: view.title }),
-      el('span', { class: 'lpl-secret__chip', text: view.chip }),
+      secretStamp(view.chip),
     ]);
     if (view.kind === 'ask') {
       return [el('span', { class: 'lpl-secret', 'data-kind': 'ask' }, [head, el('span', { class: 'lpl-secret__help', text: view.text })])];
@@ -272,7 +274,7 @@ export class NotebookPanel extends Panel {
       el('span', { class: 'lpl-confidence__head' }, [
         icon('ui-whisper'),
         el('strong', { class: 'lpl-confidence__overline', text: ctx.t(ctx.texts.game.ui.momentHint) }),
-        el('span', { class: 'lpl-secret__chip', text: hint.chip }),
+        secretStamp(hint.chip),
       ]),
       el('p', { class: 'lpl-confidence__text', text: hint.text }),
       el('p', { class: 'lpl-confidence__help', text: hint.help }),

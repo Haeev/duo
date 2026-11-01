@@ -8,7 +8,7 @@ import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { Layer, UiHost } from './composant';
 import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, token } from './dom';
+import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, secretStamp, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
 import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, ordersDetail, outfitTakenByPartner } from './modele';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
@@ -509,7 +509,7 @@ export class BreakfastScreen implements Layer {
     clear(this.list);
     if (envie !== null && envie !== undefined) {
       this.list.append(
-        questItem(icon('ui-heart'), ctx.t(`${g.envie} : ${lowerFirst(envie.text)}`), chip(ctx.t(b.secret)), ctx.t(b.secretHelp, { partner: partnerName })),
+        questItem(icon('ui-heart'), ctx.t(`${g.envie} : ${lowerFirst(envie.text)}`), secretStamp(ctx.t(b.secret)), ctx.t(b.secretHelp, { partner: partnerName })),
       );
     } else {
       this.list.append(questItem(icon('ui-heart'), ctx.t(b.noEnvie), null, ''));
@@ -517,7 +517,7 @@ export class BreakfastScreen implements Layer {
     if (shared !== null && shared !== undefined) {
       const t = token('other', this.host.symbol('other'), 'small');
       t.style.gridRow = 'span 2';
-      this.list.append(questItem(t, ctx.t(`${g.sharedEnvie} : ${lowerFirst(shared.text)}`), chip(ctx.t(b.shared)), ctx.t(b.sharedHelp)));
+      this.list.append(questItem(t, ctx.t(`${g.sharedEnvie} : ${lowerFirst(shared.text)}`), secretStamp(ctx.t(b.shared)), ctx.t(b.sharedHelp)));
     }
     const mail = todays.length === 0 ? b.mailNone : todays.map((l) => l.title).join(', ');
     const eggsText = eggs <= 0 ? '' : eggs === 1 ? ctx.t(b.egg) : ctx.t(b.eggs, { count: eggs });
@@ -547,7 +547,7 @@ export class BreakfastScreen implements Layer {
       el('span', { class: 'lpl-confidence__head' }, [
         icon('ui-whisper'),
         el('strong', { class: 'lpl-confidence__overline', text: hint.overline }),
-        el('span', { class: 'lpl-secret__chip', text: hint.chip }),
+        secretStamp(hint.chip),
       ]),
       el('p', { class: 'lpl-confidence__text', text: hint.text }),
       el('p', { class: 'lpl-confidence__help' }, [token('other', this.host.symbol('other'), 'small'), hint.help]),

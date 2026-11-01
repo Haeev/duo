@@ -113,12 +113,23 @@
     "breakfast": "Prend son petit-déjeuner",
     "night": "Fait de beaux rêves",
     "talking": "Parle avec {villager}",
+    "callingHen": "Appelle {villager}",
+    "someone": "quelqu'un",
     "scene": "Dans la scène, avec {villager}",
     "carrying": "Porte la poutre",
     "building": "Construit à la maisonnette",
     "crafting": "Travaille à l'établi",
     "cooking": "Cuisine au réchaud",
     "seated": "Se repose sur un banc",
+    "watching": {
+      "heron": "Regarde le héron",
+      "geese": "Regarde les oies",
+      "ladder": "Tient l'échelle de Basile",
+      "tits": "Guette les mésanges",
+      "fox": "Regarde le renard",
+      "glowworms": "Guette les vers luisants"
+    },
+    "watchingAny": "Regarde sans bouger",
     "menus": {
       "notebook": "Lit son carnet",
       "shop": "Au comptoir d'Odette",
