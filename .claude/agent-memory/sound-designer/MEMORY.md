@@ -65,3 +65,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Bois frappé (banc, barreau, échelle): avec `ins.bois` à fondamentale sous 150 Hz, plus de 85 % de l'énergie tombe sous 300 Hz (inaudible sur un portable). Monter la fondamentale vers 150 à 250 Hz, baisser son amplitude au profit des partiels et du craquement, puis vérifier la part sous 300 Hz (viser moins de 60 %).
 - Le robot de `cerveau.test.ts` ne s'assoit sur aucun banc: un son de `sat_down` ne peut pas figurer dans la liste des sons attendus de ce test.
 - Dans un worktree isolé, l'outil refuse les commandes qui mêlent `cd`, heredoc et `duo-python` avec `$PWD`, ou qui contiennent le mot git dans un motif: appeler `duo-python` avec des chemins absolus, une commande à la fois, et éditer avec Edit.
+
+## La Petite Ligne: tour 7 (vérifié le 2026-11-01)
+
+- Les instants écrits dans le champ `event` (description) viennent de `donnees/moments.json` (`climax.sounds`, `leave.sounds`), pas des fiches: le dev recale les chorégraphies. Les relire à chaque tour; changer une description ne change aucun fichier audio (graine tirée de l'identifiant).
+- `src/audio/catalogue.test.ts` compte les sons de `sons.json` (« lit les N sons »): mettre N à jour quand on en ajoute.
+- Worktree neuf: `node_modules` absent, toute la suite vitest échoue sur « Cannot find package »; lancer `pnpm install --frozen-lockfile` à la racine du worktree avant `npx vitest run`.
+- Le contrôle des tirets contient `.git` (`--exclude-dir`): dans un worktree isolé l'outil le refuse; le mettre dans un petit script et lancer `bash script.sh CHEMIN`.
+- Accepter `music` comme bus d'un son (question S3) n'est pas une ligne: schéma Valibot, type `SoundBus`, `busOf` de `moteur.ts`, et le raccord après `momentDuck` (sinon la descente de l'apogée atténue aussi le son).
+- Un son musical court (accord de harpe et cordes) se rend par `partition.produire` depuis moments.py comme les motifs d'habitants: le MIDI va dans `assets-src/son/midi/`. `partition.frottements` ne signale rien si `m.accords` est vide: pour un accord tenu, tester soi-même toutes les paires de notes (seconde mineure, triton, septième majeure).

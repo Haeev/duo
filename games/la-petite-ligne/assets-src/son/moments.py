@@ -1,5 +1,5 @@
-"""Sons des moments rares de La Petite Ligne (tour 6, `docs/jeux/jeu-1/tour-06-conception.md`,
-section 1.4) et de l'assise sur un banc de bois.
+"""Sons des moments rares de La Petite Ligne (fiches de `docs/jeux/jeu-1/tour-06-conception.md` et
+`tour-07-conception.md`, section 1.4) et de l'assise sur un banc de bois.
 
 Les bêtes sont synthétisées comme les poules et le coq (instruments.py): une source voisée dont
 la hauteur suit une courbe, filtrée par quelques formants, avec une rugosité réglée. Rien n'est
@@ -14,12 +14,19 @@ L'assise sur le banc, fréquente, va dans effets/ avec les autres gestes.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
+import ambiances
 import dsp
 import instruments as ins
 from catalogue import Son
 from dsp import SR
+from partition import Morceau, Note, Piste, produire
+
+ICI = Path(__file__).resolve().parent
+HARPE_GM, CORDES_LENTES_GM = 46, 49
 
 
 # --- Outils propres aux bêtes --------------------------------------------------------------
@@ -432,6 +439,227 @@ def _scintillement(v: int, rng: np.random.Generator) -> np.ndarray:
     return y
 
 
+# --- La chevrette du pré (tour 7) ----------------------------------------------------------------
+
+def _chevrette_appel(v: int, rng: np.random.Generator) -> np.ndarray:
+    """La mère appelle son faon tout bas: un « pi-é » nasal et doux, qui monte un peu puis retombe.
+    Voix presque lisse (peu de rugosité), formants serrés du nez, aigus arrondis."""
+    duree = (0.36, 0.42)[v % 2]
+    f0 = (520, 470)[v % 2] * rng.uniform(0.98, 1.02)
+    f_t = courbe(duree, [(0, f0 * 0.92), (0.3, f0 * 1.08), (1.0, f0 * 0.8)])
+    x = voix(rng, f_t, [(1100, 6.0, 1.0), (2400, 8.0, 0.45), (520, 4.0, 0.5)], rugosite=0.1, f_rugosite=f0 / 4,
+             souffle=0.1, pente=1.3, f_max=5000)
+    x *= dsp.env_points(len(x), [(0, 0), (0.04, 1.0), (duree * 0.6, 0.75), (duree, 0)])
+    y = dsp.toile(0.5)
+    dsp.poser(y, x, 0.0)
+    return dsp.pb(y, 4500, 2)
+
+
+def _faon_herbe(v: int, rng: np.random.Generator) -> np.ndarray:
+    """L'herbe haute frémit au lit du faon: froissement lent de tiges, quelques brins qui claquent."""
+    y = dsp.toile(0.65)
+    dsp.poser(y, ins.froissement(rng, 0.55, 1200, 6000, 45, 0.12, 0.3) * 0.5, 0.0)
+    dsp.poser(y, ins.froissement(rng, 0.3, 700, 3000, 30, 0.08, 0.15) * 0.25, 0.15)
+    brins = dsp.grains(0.45, 60, lambda r: dsp.clic(r, 2500, 7000, 0.003, 0.0007) * r.uniform(0.1, 0.35), rng)
+    dsp.poser(y, brins * 0.5, 0.08)
+    return dsp.pb(y, 7000)
+
+
+def _faon_mi(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le petit « mi » aigu du faon: deux fois plus haut que l'appel de la mère, bref, qui monte."""
+    duree = (0.24, 0.28)[v % 2]
+    f0 = (980, 1080)[v % 2] * rng.uniform(0.98, 1.02)
+    f_t = courbe(duree, [(0, f0 * 0.9), (0.55, f0 * 1.1), (1.0, f0 * 0.95)])
+    x = voix(rng, f_t, [(1500, 5.0, 1.0), (2900, 7.0, 0.4)], rugosite=0.08, f_rugosite=f0 / 5, souffle=0.08,
+             pente=1.2, f_max=7000)
+    x *= dsp.env_points(len(x), [(0, 0), (0.025, 1.0), (duree * 0.65, 0.8), (duree, 0)])
+    y = dsp.toile(0.34)
+    dsp.poser(y, x, 0.0)
+    return dsp.pb(y, 6000, 2)
+
+
+def _sabot(rng: np.random.Generator, force: float, f1: float) -> np.ndarray:
+    """Un sabot sur le sol du pré: appui sourd, motte de terre (au-dessus de 300 Hz, pour les
+    haut-parleurs de portable), herbe écrasée."""
+    y = dsp.toile(0.3)
+    dsp.poser(y, ins.bois(rng, f1, 0.2, 0.3, rapports=(1.0, 2.1, 3.9), t60=0.05, amps=(0.5, 0.6, 0.3)) * 0.6, 0.0)
+    dsp.poser(y, ins.bruit_bref(rng, 0.08, 300, 2500, 0.02, 0.002) * 0.6, 0.0)
+    dsp.poser(y, ins.bruit_bref(rng, 0.1, 60, 260, 0.03) * 0.25, 0.0)
+    dsp.poser(y, ins.froissement(rng, 0.14, 1500, 6000, 90, 0.005, 0.1) * 0.25, 0.004)
+    return y * force
+
+
+def _chevrette_sabot(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Elle frappe du pied: un coup de sabot sec et sourd sur l'herbe rase."""
+    y = dsp.toile(0.32)
+    dsp.poser(y, _sabot(rng, 1.0, 230), 0.0)
+    # L'herbe écrasée se redresse sous le sabot.
+    dsp.poser(y, ins.froissement(rng, 0.2, 1500, 6000, 70, 0.02, 0.15) * 0.12, 0.06)
+    return dsp.pb(y, 6000)
+
+
+def _chevrette_aboi(v: int, rng: np.random.Generator) -> np.ndarray:
+    """« Bö »: l'aboiement d'alarme, rauque et soufflé, bref, qui retombe. Assez fort pour prévenir
+    l'autre joueur à 30 m, filtré au-dessus de 4,5 kHz pour ne pas agresser."""
+    duree = (0.34, 0.3)[v % 2]
+    f0 = (360, 320)[v % 2] * rng.uniform(0.98, 1.02)
+    f_t = courbe(duree, [(0, f0 * 0.85), (0.15, f0 * 1.1), (1.0, f0 * 0.7)])
+    x = voix(rng, f_t, [(700, 3.0, 1.0), (1300, 4.0, 0.7), (2500, 6.0, 0.3)], rugosite=0.8, f_rugosite=f0 / 2,
+             souffle=0.35, pente=0.9, f_max=6000)
+    x *= dsp.env_points(len(x), [(0, 0), (0.01, 1.0), (duree * 0.35, 0.85), (duree, 0)])
+    y = dsp.toile(0.62)
+    dsp.poser(y, x, 0.0)
+    # L'écho bref de la haie et des maisons: l'aboiement porte dans le matin calme.
+    ir = dsp.ir_salle(0.9, 0.04, 0.35, graine=71 + v)
+    y = dsp.reverbe_mono(y, ir, 0.18, 1.0)[: len(y)]
+    return dsp.pb(y, 4500, 2)
+
+
+def _chevrette_bonds(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Deux bonds chacun vers la haie (0,8 s par bond): l'appel des pattes, la réception, puis la
+    haie qui les avale. Le faon, plus léger, suit d'un souffle."""
+    y = dsp.toile(1.75)
+    for t, force, f1 in ((0.0, 0.6, 220), (0.6, 1.0, 210), (0.8, 0.55, 225), (1.4, 0.8, 215)):
+        dsp.poser(y, _sabot(rng, force, f1), t)
+        dsp.poser(y, _sabot(rng, force * 0.45, f1 * 1.3), t + 0.07 + rng.uniform(0, 0.03))
+    dsp.poser(y, ins.froissement(rng, 0.35, 900, 6000, 120, 0.02, 0.25) * 0.45, 1.38)
+    return dsp.pb(y, 6000)
+
+
+# --- Le martin-pêcheur du ponton (tour 7) ---------------------------------------------------------
+
+def _martin_sifflet(v: int, rng: np.random.Generator) -> np.ndarray:
+    """« Tiiii »: un sifflet aigu, droit et perçant, qui retombe à peine. La troisième variante le
+    double (« ti-tiii »). C'est lui qu'on entend avant de voir l'oiseau."""
+    y = dsp.toile(0.5)
+    plan = (((0.0, 0.34, 4200),), ((0.0, 0.38, 3950),), ((0.0, 0.09, 4400), (0.14, 0.3, 4400)))[v % 3]
+    for t0, duree, f in plan:
+        n = dsp.n_ech(duree)
+        tt = np.arange(n) / SR
+        f_t = np.linspace(f * 1.02, f * 0.95, n) * (1 + 0.006 * np.sin(2 * np.pi * 38 * tt))
+        x = dsp.sinus_glisse(f_t, rng.uniform(0, 6.28)) + 0.06 * dsp.sinus_glisse(2 * f_t)
+        x *= dsp.env_ar(n, 0.015, min(0.08, duree * 0.4))
+        dsp.poser(y, x, t0)
+    return dsp.pb(y, 9000, 2)
+
+
+def _martin_plongeon(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Le plongeon d'un petit oiseau: entrée nette et claire (« plic »), une bulle vive, une gerbe
+    fine qui retombe. Plus aigu et plus sec que le bouchon de la pêche."""
+    y = dsp.toile(0.45)
+    dsp.poser(y, ins.bruit_bref(rng, 0.04, 900, 6500, 0.007, 0.0005) * 0.6, 0.0)
+    dsp.poser(y, dsp.bulle(rng, (1100, 960)[v % 2] * rng.uniform(0.97, 1.03), 0.016, 1.3) * 0.8, 0.004)
+    # La gerbe retombe pendant 0,3 s: c'est elle qui donne sa durée au plongeon.
+    dsp.poser(y, gouttes(rng, 0.34, 45, 1500, 3600, 0.3, 0.2), 0.05)
+    return dsp.pb(y, 7000)
+
+
+def _martin_frappe(v: int, rng: np.random.Generator) -> np.ndarray:
+    """« Tac tac »: il assomme l'ablette contre le pieu, deux coups secs à 0,5 s d'écart (le fichier
+    contient les deux: un seul déclenchement)."""
+    y = dsp.toile(0.62)
+    for t, force in ((0.0, 1.0), (0.5, 0.85)):
+        coup = ins.bois(rng, rng.uniform(620, 700), 0.12, 0.9, rapports=(1.0, 2.6, 4.9), t60=0.04, amps=(0.7, 0.5, 0.2))
+        dsp.poser(y, coup * 0.6 * force, t)
+        dsp.poser(y, ins.bruit_bref(rng, 0.03, 900, 5000, 0.004, 0.0003) * 0.4 * force, t)
+    return dsp.pb(y, 7000)
+
+
+# --- La brume de l'Aubrune (tour 7) ---------------------------------------------------------------
+
+def _brume_riviere(v: int, rng: np.random.Generator) -> np.ndarray:
+    """L'eau toute proche, feutrée par la brume: un lit grave et doux (aigus coupés vers 1,8 kHz),
+    un babil lent, et les gouttes qui tombent des herbes mouillées. Boucle de 8 s: bruit périodique,
+    modulations à nombre entier de cycles, gouttes sur une ligne de temps circulaire."""
+    duree = 8.0
+    n = dsp.n_ech(duree)
+    lit = dsp.filtre_circulaire(dsp.bruit_spectral(n, rng, -3.0), dsp.gain_bande(110, 1800)) * 0.4
+    babil = dsp.filtre_circulaire(dsp.bruit_spectral(n, rng, -1.0), dsp.gain_bande(350, 1500))
+    mod = np.abs(dsp.filtre_circulaire(dsp.bruit_spectral(n, rng, 0.0), dsp.gain_bande(1, 8)))
+    babil *= (mod / (mod.max() + 1e-12)) ** 1.5 * 1.2
+    y = lit + babil * 0.35
+    y += dsp.grains(duree, 3, lambda r: dsp.bulle(r, r.uniform(160, 320), r.uniform(0.03, 0.05), 1.0) *
+                    r.uniform(0.1, 0.25), rng, circulaire=True)
+    y *= 1 + 0.1 * ambiances.lfo_periodique(n, [(1, 1.0), (3, 0.4)], rng)
+    # Gouttes des herbes: rares, nettes, chacune sur sa hauteur (1,4 à 3,2 kHz).
+    y += dsp.grains(duree, 1.6, lambda r: dsp.bulle(r, r.uniform(1400, 3200), r.uniform(0.004, 0.008)) *
+                    r.uniform(0.15, 0.4), rng, circulaire=True)
+    return au_plus_calme(dsp.filtre_circulaire(y, dsp.gain_bande(0, 5000)))
+
+
+def _brume_leve(v: int, rng: np.random.Generator) -> np.ndarray:
+    """La brume se lève: un accord ouvert qui monte à la harpe, porté par des cordes douces qui
+    gonflent. Sol majeur (sol, ré, la, si) ou do (do, sol, ré, mi), sans seconde mineure, septième
+    majeure ni triton: juste sous la musique du matin (sol majeur), descendue de 6 dB."""
+    arpege, cordes = ((["G2", "D3", "G3", "A3", "D4", "G4", "A4", "B4", "D5"], ["G3", "D4", "A4"]),
+                      (["C3", "G3", "C4", "D4", "G4", "C5", "D5", "E5", "G5"], ["C4", "G4", "D5"]))[v % 2]
+    harpe = [Note(0.2 * k, 3.6 - 0.2 * k, dsp.note_midi(p), 58 + 2 * k) for k, p in enumerate(arpege)]
+    nappe_ = [Note(0.1, 3.4, dsp.note_midi(p), 48) for p in cordes]
+    m = Morceau(id=f"mist-lift-{v + 1}", titre=f"mist-lift-{v + 1}", tempo=60.0, signature=(4, 4), mesures=1,
+                temps_par_mesure=4.0, pistes=[
+                    Piste("harpe", HARPE_GM, harpe, 0.0, pan=58, reverbe=0.4),
+                    Piste("cordes", CORDES_LENTES_GM, nappe_, -5.0, pan=70, reverbe=0.45, souffle=True),
+                ], boucle=False, queue_s=2.0, rt60=1.8, sonie_cible=-20.0)
+    # Toutes les notes sonnent ensemble: aucune paire ne doit former une seconde mineure, une
+    # septième majeure ou un triton (contrôle sans grille d'accords, plus strict que frottements()).
+    hauteurs = sorted({n.p for p in m.pistes for n in p.notes})
+    durs = [(a, b) for i, a in enumerate(hauteurs) for b in hauteurs[i + 1:] if (b - a) % 12 in (1, 6, 11)]
+    if durs:
+        raise SystemExit(f"mist-lift: intervalles durs dans l'accord: {durs}")
+    y, _ = produire(m, ICI / "midi")
+    return y
+
+
+# Le merle: phrase flûtée et grave (1,6 à 2,7 kHz), notes glissées, puis un gazouillis aigu et
+# doux à la fin. Trois phrases écrites, aucune copiée d'un enregistrement:
+# (début s, durée s, f départ, f arrivée, amplitude, vibrato Hz).
+PHRASES_MERLE = (
+    [(0.00, 0.22, 1700, 2050, 0.8, 0), (0.28, 0.16, 2300, 2200, 0.9, 0), (0.48, 0.30, 1950, 1750, 1.0, 9),
+     (0.86, 0.14, 2250, 2500, 0.7, 0), (1.04, 0.34, 2100, 1800, 0.9, 7)],
+    [(0.00, 0.18, 2000, 2400, 0.8, 0), (0.24, 0.26, 2450, 2050, 1.0, 8), (0.58, 0.12, 1800, 1850, 0.7, 0),
+     (0.74, 0.12, 2100, 2150, 0.7, 0), (0.92, 0.38, 2300, 1850, 0.9, 6)],
+    [(0.00, 0.30, 1600, 1900, 0.9, 6), (0.38, 0.18, 2200, 2650, 0.8, 0), (0.62, 0.22, 2400, 2000, 1.0, 0),
+     (0.92, 0.32, 1900, 1700, 0.9, 8)],
+)
+
+
+def _merle(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Un merle chante dans les arbres de la rive nord (non localisé): phrase flûtée, gazouillis,
+    petit écho des arbres."""
+    notes = PHRASES_MERLE[v % 3]
+    fin = max(t + d for t, d, *_ in notes)
+    y = dsp.toile(3.0)
+    for (t0, d, fa, fb, a, vib) in notes:
+        m = dsp.n_ech(d)
+        tt = np.arange(m) / SR
+        f = np.interp(tt, [0, d * 0.3, d], [fa, fa + (fb - fa) * 0.6, fb])
+        if vib:
+            f = f * (1 + 0.025 * np.sin(2 * np.pi * vib * tt))
+        x = dsp.sinus_glisse(f, rng.uniform(0, 6.28)) + 0.15 * dsp.sinus_glisse(2 * f) + 0.04 * dsp.sinus_glisse(3 * f)
+        dsp.poser(y, x * dsp.env_ar(m, min(0.02, d * 0.25), min(0.06, d * 0.4)) * a, t0)
+    t = fin + 0.12
+    for k in range(int(rng.integers(5, 8))):
+        f = rng.uniform(4800, 6400)
+        dsp.poser(y, note_oiseau(rng, 0.035, f * 1.05, f * 0.93, 0.22 * (1 - 0.08 * k)), t)
+        t += rng.uniform(0.045, 0.065)
+    return dsp.pb(y, 8000, 2)
+
+
+def _poisson_saut(v: int, rng: np.random.Generator) -> np.ndarray:
+    """Un poisson saute entre les deux rives: la sortie (petite claque mouillée et gouttes), puis la
+    rentrée ronde (« blop ») et quelques gouttes. Deux temps: on ne le confond pas avec le plongeon
+    du martin-pêcheur (un seul temps, plus aigu) ni avec le bouchon."""
+    y = dsp.toile(0.48)
+    dsp.poser(y, ins.bruit_bref(rng, 0.03, 600, 4500, 0.004, 0.0004) * 0.35, 0.0)
+    dsp.poser(y, gouttes(rng, 0.1, 50, 1600, 3200, 0.18, 0.05), 0.01)
+    t_retour = (0.15, 0.18)[v % 2]
+    dsp.poser(y, ins.bruit_bref(rng, 0.04, 300, 2500, 0.01, 0.001) * 0.4, t_retour)
+    # Rentrée vers 700 Hz: au-dessus du bouchon de la pêche (460 à 540 Hz), sous le plongeon (1 kHz).
+    dsp.poser(y, dsp.bulle(rng, (690, 760)[v % 2] * rng.uniform(0.97, 1.03), 0.03, 1.0) * 0.9, t_retour + 0.004)
+    dsp.poser(y, gouttes(rng, 0.22, 35, 1200, 2800, 0.25, 0.08), t_retour + 0.04)
+    return dsp.pb(y, 6500)
+
+
 # --- S'asseoir sur un banc de bois ---------------------------------------------------------------
 
 def _banc_assise(v: int, rng: np.random.Generator) -> np.ndarray:
@@ -463,23 +691,23 @@ def sons() -> list[Son]:
         Son("heron-strike", "Héron: coup de bec dans l'eau (clip heron_strike)", m, "effects", _heron_bec, 2, -26.0,
             3, 0.05, 1.0, "faune-15", intervalle_min_ms=2000, voix_max=1,
             extra={"momentSound": "heron_strike", "moment": "heron"}),
-        Son("heron-croak", "Héron: cri rauque « kraak » à l'envol (apogée, t = 1,2 s)", m, "effects", _heron_cri, 2,
+        Son("heron-croak", "Héron: cri rauque « kraak » à l'envol (apogée, t = 3,8 s)", m, "effects", _heron_cri, 2,
             -21.0, 2, 0.03, 1.0, "faune-25", voix_max=1, extra={"momentSound": "heron_croak", "moment": "heron"}),
-        Son("heron-wings", "Héron: trois battements lourds à l'envol (apogée, t = 1,0 s)", m, "effects", _heron_ailes,
+        Son("heron-wings", "Héron: trois battements lourds à l'envol (apogée, t = 2,6 s; départ sans apogée, t = 0)", m, "effects", _heron_ailes,
             1, -22.0, 2, 0.04, 1.0, "faune-20", voix_max=1, extra={"momentSound": "heron_wings", "moment": "heron"}),
-        Son("heron-land", "Héron: il freine et se pose sur la grève (apogée, t = 4,4 s)", m, "effects", _heron_pose, 1,
+        Son("heron-land", "Héron: il freine et se pose sur la grève (apogée, t = 6,6 s)", m, "effects", _heron_pose, 1,
             -24.0, 2, 0.04, 1.0, "faune-20", voix_max=1, extra={"momentSound": "heron_land", "moment": "heron"}),
         # Oies de l'Aubrune
         Son("geese-rest", "Oies posées sur l'Aubrune: murmures du groupe (boucle, en attente)", m, "ambience",
             _oies_repos, 1, -30.0, 3, 0.0, 0.0, "faune-20", boucle=True, passe_haut=120, voix_max=1,
             extra={"momentSound": "geese_rest", "moment": "geese"},
             note="placé à geese_rest; c'est ce qui attire le passant: audible à 20 m"),
-        Son("geese-alarm", "Oies: les cous se dressent, cris montants (apogée, t = 0)", m, "effects", _oies_alarme, 1,
+        Son("geese-alarm", "Oies: les cous se dressent, cris montants (apogée et départ sans apogée, t = 0)", m, "effects", _oies_alarme, 1,
             -21.0, 2, 0.03, 1.0, "moyen", voix_max=1, extra={"momentSound": "geese_alarm", "moment": "geese"}),
-        Son("geese-takeoff", "Oies: course sur l'eau, ailes et pattes, cris (apogée, t = 1 s)", m, "effects",
+        Son("geese-takeoff", "Oies: course sur l'eau, ailes et pattes, cris (apogée, t = 2,8 s; départ sans apogée, t = 1 s)", m, "effects",
             _oies_envol, 1, -19.5, 2, 0.03, 1.0, "moyen", voix_max=1,
             extra={"momentSound": "geese_takeoff", "moment": "geese"}),
-        Son("geese-flight", "Oies: la volée qui s'éloigne, chœur de neuf voix (apogée, t = 3 s, et départ sans apogée)",
+        Son("geese-flight", "Oies: la volée qui s'éloigne, chœur de neuf voix (apogée, t = 5,8 s; départ sans apogée, t = 3 s)",
             m, "effects", _oies_vol, 3, -21.0, 2, 0.02, 1.0, "loin", voix_max=1,
             extra={"momentSound": "geese_flight", "moment": "geese"},
             note="placé à l'oie de tête et déplacé avec elle (le PannerNode fait la distance et le panoramique)"),
@@ -491,23 +719,23 @@ def sons() -> list[Son]:
         Son("ladder-grip", "Échelle: on prend une place, le montant craque", m, "effects", _echelle_prise, 3, -27.0, 3,
             0.05, 1.0, "pres", intervalle_min_ms=150, voix_max=2,
             extra={"momentSound": "ladder_grip", "moment": "ladder"}),
-        Son("ladder-step", "Échelle: un barreau sous le pied de Basile (montée et descente)", m, "effects",
+        Son("ladder-step", "Échelle: un barreau sous le pied de Basile (apogée, montée à 0,5, 1,1 et 1,7 s, descente à 4,9, 5,73 et 6,57 s)", m, "effects",
             _echelle_barreau, 4, -27.0, 2, 0.05, 1.5, "pres", intervalle_min_ms=200, voix_max=2,
             extra={"momentSound": "ladder_step", "moment": "ladder"}),
-        Son("nest-box-turn", "Le nichoir pivote sur son clou et se redresse (apogée, t = 3 s)", m, "effects",
+        Son("nest-box-turn", "Le nichoir pivote sur son clou et se redresse (apogée, t = 2,3 s)", m, "effects",
             _nichoir_tourne, 1, -26.0, 2, 0.03, 0.5, "pres", voix_max=1,
             extra={"momentSound": "nest_box_turn", "moment": "ladder"}),
-        Son("hammer-tap", "Petit marteau de Basile sur le clou du nichoir (trois coups)", m, "effects", _marteau_clou,
+        Son("hammer-tap", "Petit marteau de Basile sur le clou du nichoir (apogée, trois coups à 3,35, 3,95 et 4,55 s)", m, "effects", _marteau_clou,
             3, -25.0, 2, 0.04, 1.0, "moyen", intervalle_min_ms=200, voix_max=2,
             extra={"momentSound": "hammer_tap", "moment": "ladder"}),
-        Son("tit-call", "Mésange bleue: « tsi-tsi-tsi » (fin de l'échelle, t = 9 s)", m, "effects", _mesange_cri, 3,
+        Son("tit-call", "Mésange bleue: « tsi-tsi-tsi » (fin de l'échelle, t = 7,8 s)", m, "effects", _mesange_cri, 3,
             -26.0, 2, 0.03, 1.0, "faune-12", intervalle_min_ms=600, voix_max=1,
             extra={"momentSound": "tit_call", "moment": "ladder"}),
         # Mésanges du nichoir
-        Son("tit-song", "Mésange bleue: chant « tsi-tsi-tsuhuhuhu » (attente toutes les 8 s, apogée)", m, "effects",
+        Son("tit-song", "Mésange bleue: chant « tsi-tsi-tsuhuhuhu » (attente toutes les 8 s; apogée, t = 1,9 s)", m, "effects",
             _mesange_chant, 3, -25.0, 3, 0.03, 1.0, "faune-12", intervalle_min_ms=2500, voix_max=1,
             extra={"momentSound": "tit_song", "moment": "tits"}),
-        Son("tit-wings", "Mésange: froissement d'ailes à l'envol ou au posé", m, "effects", _mesange_ailes, 2, -31.0, 4,
+        Son("tit-wings", "Mésange: froissement d'ailes à l'envol ou au posé (apogée, t = 4,3 s)", m, "effects", _mesange_ailes, 2, -31.0, 4,
             0.08, 1.5, "faune-12", intervalle_min_ms=300, voix_max=2,
             extra={"momentSound": "tit_wings", "moment": "tits"}),
         # Renard de la voie
@@ -529,6 +757,56 @@ def sons() -> list[Son]:
             extra={"momentSound": "glow_shimmer", "moment": "glowworms"},
             note="la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: "
                  "bus interface, non placé, sans variation de hauteur (notes justes en sol majeur)"),
+        # Chevrette du pré (tour 7)
+        Son("roe-call", "Chevrette: appel doux et nasal à son faon (apogée, t = 0)", m, "effects", _chevrette_appel,
+            2, -26.0, 2, 0.03, 1.0, "faune-15", voix_max=1, extra={"momentSound": "roe_call", "moment": "roe_deer"}),
+        Son("fawn-rustle", "Faon: l'herbe haute frémit à son lit (apogée, t = 1,0 s)", m, "effects", _faon_herbe, 1,
+            -29.0, 2, 0.04, 1.0, "faune-12", voix_max=1,
+            extra={"momentSound": "fawn_rustle", "moment": "roe_deer"}),
+        Son("fawn-bleat", "Faon: petit « mi » aigu en trottinant vers sa mère (apogée, t = 2,6 s)", m, "effects",
+            _faon_mi, 2, -25.0, 2, 0.03, 1.0, "faune-12", voix_max=1,
+            extra={"momentSound": "fawn_bleat", "moment": "roe_deer"}),
+        Son("deer-stamp", "Chevrette effarouchée: elle frappe du pied (clip deer_stamp)", m, "effects",
+            _chevrette_sabot, 1, -24.0, 2, 0.05, 1.0, "faune-20", intervalle_min_ms=1500, voix_max=1,
+            extra={"momentSound": "deer_stamp", "moment": "roe_deer"},
+            note="joué au début de l'effarouchement, roe-bark suit (un joueur a bougé pendant un regard)"),
+        Son("roe-bark", "Chevrette effarouchée: aboiement d'alarme « bö » (après deer_stamp)", m, "effects",
+            _chevrette_aboi, 2, -21.0, 2, 0.03, 1.0, "faune-30", intervalle_min_ms=1500, voix_max=1,
+            extra={"momentSound": "roe_bark", "moment": "roe_deer"},
+            note="audible à 30 m: il prévient aussi l'autre joueur que la chevrette a été dérangée"),
+        Son("deer-bounds", "Chevrette et faon: deux bonds chacun vers la haie (apogée, t = 7,6 s)", m, "effects",
+            _chevrette_bonds, 1, -25.0, 2, 0.03, 1.0, "faune-20", voix_max=1,
+            extra={"momentSound": "deer_bounds", "moment": "roe_deer"}, note="placé à la chevrette, déplacé avec elle"),
+        # Martin-pêcheur du ponton (tour 7)
+        Son("kf-whistle", "Martin-pêcheur: sifflet aigu « tiiii » à chaque envol (attente; apogée, t = 4,1 s)", m,
+            "effects", _martin_sifflet, 3, -25.0, 3, 0.03, 1.0, "faune-25", intervalle_min_ms=800, voix_max=1,
+            extra={"momentSound": "kf_whistle", "moment": "kingfisher"},
+            note="c'est lui qu'on entend avant de voir l'oiseau: audible à 25 m"),
+        Son("kf-dive", "Martin-pêcheur: plongeon net (plongeons manqués en attente; apogée, t = 1,3 s)", m, "effects",
+            _martin_plongeon, 2, -24.0, 2, 0.04, 1.0, "faune-20", intervalle_min_ms=1000, voix_max=1,
+            extra={"momentSound": "kf_dive", "moment": "kingfisher"}),
+        Son("kf-beat", "Martin-pêcheur: il assomme l'ablette contre le pieu, « tac tac » (apogée, t = 2,7 s)", m,
+            "effects", _martin_frappe, 1, -26.0, 2, 0.03, 1.0, "faune-15", voix_max=1,
+            extra={"momentSound": "kf_beat", "moment": "kingfisher"},
+            note="un seul déclenchement à 2,7 s: le fichier contient les deux coups (2,7 et 3,2 s)"),
+        # Brume de l'Aubrune (tour 7)
+        Son("mist-ambience", "Brume: l'eau toute proche et feutrée, gouttes des herbes (boucle placée à mist_narrows)",
+            m, "ambience", _brume_riviere, 1, -29.0, 3, 0.0, 0.0, "faune-20", boucle=True, passe_haut=100, voix_max=1,
+            extra={"momentSound": "mist_ambience", "moment": "mist", "waitingDb": -6.0, "climaxRampMs": 3000},
+            note="en attente à -6 dB (waitingDb), à pleine force en 3 s au début de l'apogée (climaxRampMs), "
+                 "en même temps que la lumière se réchauffe"),
+        Son("mist-lift", "Brume: accord ouvert qui monte, harpe et cordes douces (apogée, t = 1,5 s)", m, "ui",
+            _brume_leve, 2, -22.0, 2, 0.0, 0.0, None, canaux=2, voix_max=1, duree_max=4.6,
+            extra={"momentSound": "mist_lift", "moment": "mist"},
+            note="la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: "
+                 "bus interface (question S3), non placé, sans variation de hauteur (sol et do majeur)"),
+        Son("blackbird-wake", "Brume: un merle chante dans les arbres de la rive nord (apogée, t = 3,0 s)", m, "effects",
+            _merle, 3, -26.0, 2, 0.02, 1.0, None, voix_max=1, queue_reverbe=(1.2, 0.22),
+            extra={"momentSound": "blackbird_wake", "moment": "mist"},
+            note="non localisé (fiche): les deux joueurs l'entendent pareil, chacun sur sa rive"),
+        Son("fish-jump", "Brume: un poisson saute entre les deux rives (apogée, t = 5,2 s, en 29,0 ; 40,4)", m,
+            "effects", _poisson_saut, 2, -25.0, 2, 0.04, 1.0, "faune-20", voix_max=1,
+            extra={"momentSound": "fish_jump", "moment": "mist"}),
         # Banc
         Son("bench-sit", "S'asseoir sur un banc de bois (événement sat_down)", "effets", "effects", _banc_assise, 3,
             -26.0, 3, 0.05, 1.0, "pres", intervalle_min_ms=150, voix_max=2),

@@ -35,6 +35,8 @@ SPATIAL = {
                  "cullBeyondM": 20.0},
     "faune-25": {"distanceModel": "inverse", "refDistance": 4.0, "rolloffFactor": 1.0, "maxDistance": 25.0,
                  "cullBeyondM": 25.0},
+    "faune-30": {"distanceModel": "inverse", "refDistance": 4.0, "rolloffFactor": 1.0, "maxDistance": 30.0,
+                 "cullBeyondM": 30.0},
     # Le repère de l'autre: placé à l'épingle, jamais sous -10 dB, où qu'elle soit.
     "repere": {"distanceModel": "inverse", "refDistance": 6.0, "rolloffFactor": 0.6, "maxDistance": 80.0,
                "cullBeyondM": 100000.0, "minGainDb": -10.0},

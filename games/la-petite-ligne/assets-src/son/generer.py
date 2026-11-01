@@ -393,13 +393,16 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["ladder-lean", "ladder-grip", "ladder-step", "nest-box-turn", "hammer-tap", "tit-call"],
         ["tit-song", "tit-wings", "fox-pounce", "fox-bark", "hens-alarm"],
         ["crickets-night", "glow-shimmer"],
+        ["roe-call", "fawn-rustle", "fawn-bleat", "deer-stamp", "roe-bark", "deer-bounds"],
+        ["kf-whistle", "kf-dive", "kf-beat"],
+        ["mist-ambience", "mist-lift", "blackbird-wake", "fish-jump"],
     ]
     for groupe in groupes:
         for nom in groupe:
             k = 0
             while f"{nom}/{k}" in apercus:
                 x = apercus[f"{nom}/{k}"]
-                if nom.endswith("loop") or nom in ("geese-rest", "crickets-night"):
+                if nom.endswith("loop") or nom in ("geese-rest", "crickets-night", "mist-ambience"):
                     x = np.concatenate([x, x])[: dsp.n_ech(min(5.0, 2 * len(x) / dsp.SR))]
                     x = dsp.fondu(x, 0.01, 0.3)
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]
