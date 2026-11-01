@@ -1108,13 +1108,12 @@ def geometry() -> list[str]:
 # Partie 11: taille de l'état
 # ---------------------------------------------------------------------------
 STATE_ADDED = {
-    "board (annonce en cours, 4 gabarits récents)": 230,
-    "improvements (6 chantiers: payé, bâti)": 190,
+    "board (annonce en cours et précédente, 4 gabarits récents)": 230,
+    "improvements (6 chantiers: versé, bâti)": 190,
     "catalogueBought (15 articles au plus)": 260,
-    "tools (outil amélioré par joueur)": 60,
     "animals (deux poules de plus)": 180,
-    "gifts (4 cadeaux: drapeaux)": 120,
-    "heard: 69 répliques nouvelles par joueur, au plus": 2 * 69 * 24,
+    "drapeaux (cadeaux offerts, chantiers bâtis)": 120,
+    "heard: 76 répliques nouvelles par joueur, au plus": 2 * 76 * 24,
 }
 
 
