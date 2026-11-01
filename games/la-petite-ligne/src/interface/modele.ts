@@ -3,7 +3,10 @@
  * DOM), testées dans Node. Les composants comparent ces modèles d'une image à
  * l'autre et ne touchent le DOM que s'ils changent.
  */
-import { currentOrder } from '../donnees/commandes';
+import { isTrainDay } from '../donnees/calendrier';
+import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
+import { linePay, productPrice } from '../etat/commande-generee';
+import { hudSeason, questTitleOf, weatherLabel } from '../etat/semaine';
 import { inRect } from '../etat/carte';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
@@ -68,6 +71,8 @@ export type ClockState = '' | 'stopped' | 'evening' | 'waiting';
 
 export interface ClockModel {
   day: string;
+  /** Saison sous la date: « Été · jour 3 » (`ui.hud.season`, tour 8, section 2.6). */
+  season: string;
   weather: string;
   weatherIcon: string;
   time: string;
@@ -85,7 +90,7 @@ export function dayLabel(ctx: UiContext, day: number): string {
 function trainNotice(world: ReadonlyWorld, ctx: UiContext): string | null {
   const s = ctx.content.settings.train;
   const { day, minutes } = world.clock;
-  if (!s.days.includes(day)) return null;
+  if (!isTrainDay(ctx.content.settings, day)) return null;
   const window = UI_SETTINGS.trainNoticeMinutes;
   const time = (m: number): string => hourLabel(m, ctx.texts.game.ui.hud.time);
   if (minutes < s.arrival && s.arrival - minutes <= window && world.train.phase === 'away') {
@@ -100,7 +105,9 @@ function trainNotice(world: ReadonlyWorld, ctx: UiContext): string | null {
 
 export function clockModel(world: ReadonlyWorld, ctx: UiContext): ClockModel {
   const hud = ctx.texts.extra.hud;
-  const weather = ctx.texts.weather[world.weather] ?? world.weather;
+  // La brume du matin se dit tant qu'elle est là (elle s'est levée à `weather.mist.until`).
+  const misty = world.morningMist && world.clock.minutes < ctx.content.settings.weather.mist.until;
+  const weather = misty ? weatherLabel(world, ctx.content) : (ctx.texts.weather[world.weather] ?? world.weather);
   let state: ClockState = '';
   let status: string | null = null;
   let statusIcon = 'ui-pause';
@@ -127,6 +134,7 @@ export function clockModel(world: ReadonlyWorld, ctx: UiContext): ClockModel {
   }
   return {
     day: `${dayLabel(ctx, world.clock.day)} · ${weather}`,
+    season: ctx.t(hudSeason(world, ctx.content)),
     weather,
     weatherIcon: WEATHER_ICONS[world.weather] ?? 'weather-sun',
     time: ctx.t(clockTime(world.clock.minutes, ctx.texts.game.ui.hud.time)),
@@ -358,12 +366,32 @@ export function toolbarModel(ctx: UiContext, c: ReadonlyCharacter): ToolbarModel
 // ---------------------------------------------------------------------------
 // Commande du samedi
 
-/** La quête de la commande: celle dont une étape se résout à l'échéance. */
-/** La quête de la commande en cours: échéance au jour de son train (sinon la première à échéance). */
+/**
+ * La quête de la commande en cours: après les commandes écrites, la quête de la semaine
+ * (`repeat: each_train`, tour 8, section 4.9); avant, celle dont l'échéance tombe au jour de son
+ * train (sinon la première à échéance).
+ */
 export function orderQuest(ctx: UiContext, world: ReadonlyWorld): QuestDef | null {
-  const day = currentOrder(ctx.content.settings, world).day;
+  const settings = ctx.content.settings;
   const atDeadline = ctx.content.quests.filter((q) => q.steps.some((s) => s.resolve === 'at_deadline'));
+  if (isGeneratedOrder(settings, world)) {
+    const weekly = atDeadline.find((q) => q.repeat === 'each_train');
+    if (weekly !== undefined) return weekly;
+  }
+  const day = currentOrder(settings, world).day;
   return atDeadline.find((q) => q.steps.some((s) => s.deadline?.day === day)) ?? atDeadline[0] ?? null;
+}
+
+/** Jour du train d'une quête: celui de son instance (quête de la semaine), sinon celui de la commande en cours. */
+function questTrainDay(world: ReadonlyWorld, ctx: UiContext, questId: string): number {
+  const state = world.quests.find((q) => q.id === questId);
+  return state?.train ?? currentOrder(ctx.content.settings, world).day;
+}
+
+/** Titre de la quête de la commande, `{day}` rempli (« La commande du samedi 22 »). */
+export function orderQuestTitle(ctx: UiContext, world: ReadonlyWorld): string | null {
+  const def = orderQuest(ctx, world);
+  return def === null ? null : ctx.t(def.title, { day: questTrainDay(world, ctx, def.id) });
 }
 
 export interface OrderLineModel {
@@ -393,10 +421,20 @@ export function orderLines(world: ReadonlyWorld, ctx: UiContext): OrderLineModel
   });
 }
 
-/** Somme versée si la commande part complète (prime de ligne et bonus). */
+/**
+ * Somme versée si la commande part complète (prime de ligne et bonus). Une commande générée paie
+ * chaque ligne au moins sa part de travail (section 4.7, `linePay`, comme `payOrder`).
+ */
 export function orderFullAmount(ctx: UiContext, world: ReadonlyWorld): number {
-  const o = currentOrder(ctx.content.settings, world);
-  const base = o.lines.reduce((sum, l) => sum + l.count * (ctx.content.items[l.item]?.sellPrice ?? 0) * o.linePremium, 0);
+  const settings = ctx.content.settings;
+  const o = currentOrder(settings, world);
+  const g = settings.order.generated;
+  const drawn = g !== null && isGeneratedOrder(settings, world) ? world.order.generated : null;
+  const base = o.lines.reduce((sum, l, i) => {
+    const sellPrice = ctx.content.items[l.item]?.sellPrice ?? 0;
+    const line = drawn?.lines[i];
+    return sum + (g !== null && line !== undefined ? linePay(g, line, productPrice(g, l.item, sellPrice), o.linePremium) : l.count * sellPrice * o.linePremium);
+  }, 0);
   return Math.round(base * (1 + o.fullBonus));
 }
 
@@ -436,7 +474,12 @@ export interface QuestModel {
 function questText(world: ReadonlyWorld, ctx: UiContext, def: QuestDef, step: number, done: boolean): string {
   // Objectif selon le rôle dans une quête à secret; `{secret}` n'est rempli que chez l'informé.
   // `{act}` et les autres touches: l'objectif de l'autre dit quelle touche appelle une poule.
-  const vars = { ...contentVars(ctx.content, world, ctx.texts.orderFormat), ...keyTokens(ctx.key), ...secretVars(world, ctx.content, def, ctx.me) };
+  const vars = {
+    ...contentVars(ctx.content, world, ctx.texts.orderFormat),
+    ...keyTokens(ctx.key),
+    ...secretVars(world, ctx.content, def, ctx.me),
+    day: questTrainDay(world, ctx, def.id),
+  };
   const s = def.steps[step];
   return ctx.t(done || s === undefined ? def.completionText : objectiveTemplate(world, ctx.content, def.id, step, ctx.me), vars);
 }
@@ -470,7 +513,7 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
       id: def.id,
       kind: def.kind,
       optional: def.tier === 'P1',
-      title: ctx.t(def.title),
+      title: ctx.t(questTitleOf(ctx.content, state)),
       text: questText(world, ctx, def, state.step, done),
       done,
       progress,
@@ -560,37 +603,6 @@ export function hudState(layer: 'screen' | 'dialogue' | 'panel' | null, placing:
 export function outfitTakenByPartner(world: ReadonlyWorld, ctx: UiContext): number | null {
   const other = characterOf(world, ctx.partner);
   return other?.created === true ? other.appearance.outfit : null;
-}
-
-// ---------------------------------------------------------------------------
-// Écran de fin
-
-/** Ce que montre le pied de l'écran de fin, selon les choix des deux (« Continuer »). */
-export interface EndActions {
-  /** Bouton « Continuer ». */
-  cont: boolean;
-  /** « En attente de Sacha… » et le bouton « Pas encore ». */
-  waiting: boolean;
-  /** Les deux ont choisi: plus d'attente, la plateforme prend le relais. */
-  done: boolean;
-}
-
-/**
- * Détail des commandes sous le total de l'écran de fin, quand il y en a eu
- * plusieurs: « samedi 8 : 4 sur 4 · samedi 15 : 5 sur 5 ». Vide pour une seule.
- */
-export function ordersDetail(ctx: UiContext, orders: readonly { linesDone: number; linesTotal: number }[]): string {
-  if (orders.length < 2) return '';
-  return orders
-    .map((o, i) => {
-      const day = ctx.content.settings.order.trains[i]?.day ?? 0;
-      return ctx.t(ctx.texts.extra.end.perOrder, { weekday: weekdayOf(day, ctx.texts.weekdays), day, done: o.linesDone, total: o.linesTotal });
-    })
-    .join(' · ');
-}
-
-export function endActions(meReady: boolean, otherReady: boolean): EndActions {
-  return { cont: !meReady, waiting: meReady && !otherReady, done: meReady && otherReady };
 }
 
 // ---------------------------------------------------------------------------

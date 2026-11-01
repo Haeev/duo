@@ -106,11 +106,11 @@ export class CratePanel extends Panel {
     const c = ctx.texts.extra.crate;
     const lines = orderLines(world, ctx);
     const result = world.orderResult;
-    // Le soir du départ, la simulation prépare déjà la commande suivante: la caisse montre celle qui vient de partir.
-    const shippedIndex = result === null ? -1 : world.orderHistory.length - 1;
-    const shipped = shippedIndex < 0 ? undefined : ctx.content.settings.order.trains[shippedIndex];
-    const nextComing = shippedIndex >= 0 && shippedIndex + 1 < ctx.content.settings.order.trains.length;
-    const orderDay = (shipped ?? currentOrder(ctx.content.settings, world)).day;
+    // Le soir du départ, la simulation prépare déjà la commande suivante: la caisse montre celle qui vient de partir
+    // (son jour est gardé dans le résultat, commandes générées comprises).
+    const coming = currentOrder(ctx.content.settings, world).day;
+    const orderDay = result === null ? coming : result.day;
+    const nextComing = result !== null && coming > result.day;
     this.takeBackHint.toggleAttribute('hidden', result !== null);
     this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
     const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));

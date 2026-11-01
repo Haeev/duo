@@ -215,6 +215,117 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
   return { today, deer };
 }
 
+// ---------------------------------------------------------------------------
+// Tour 8: la suite après le jour 15. Ces situations partent des sauvegardes de référence du
+// format 5 (`tests/donnees/sauvegardes`): la fin de la démo (jour 15, écran d'étape) et l'été
+// (jour 25). `scenarioSave` dit laquelle charger; la page la restaure au lieu d'une partie neuve.
+
+/** Sauvegarde de référence d'où part un scénario du tour 8, ou `null` (partie neuve). */
+export function scenarioSave(name: string): string | null {
+  if (name.startsWith('etape-43') || ['ete-hud', 'ete-carnet', 'ete-caisse', 'ete-courrier', 'ete-nuit', 'brume-matin'].includes(name)) return 'format-5-ete-jour-25.json';
+  if (name.startsWith('etape') || name === 'saison-ete' || name === 'reprise') return 'format-5-fin-de-la-demo.json';
+  return null;
+}
+
+const stayChoice = (choice: 'stay' | 'finish' | null): Intent => ({ type: 'stage_choice', choice });
+
+/** Les deux choisissent « Rester » sur l'écran d'étape: la journée reprend. */
+function stayBoth(sim: Sim): void {
+  apply(sim, 'p1', [stayChoice('stay')]);
+  apply(sim, 'p2', [stayChoice('stay')]);
+}
+
+/** Personne en conversation, dans un menu ou une scène: le HUD seul. */
+function free(s: Sim): boolean {
+  return s.world.phase === 'day' && s.world.scene === null && s.world.scripts.length === 0 && s.world.characters.every((c) => c.status === 'active' && c.dialogue === null && c.menu === null);
+}
+
+/** Une partie reprise au petit-déjeuner s'ouvre sur l'écran titre (« Reprendre »): les deux l'ont passé. */
+function pastTitle(sim: Sim): void {
+  apply(sim, 'p1', [{ type: 'title_ready', ready: true }]);
+  apply(sim, 'p2', [{ type: 'title_ready', ready: true }]);
+}
+
+/** L'écran d'étape du samedi 43: les robots restent à chaque étape jusqu'à la fin de l'été. */
+function summerEnd(sim: Sim): void {
+  const robot = createRobot({ stages: 'stay' });
+  let ticks = 0;
+  while (sim.world.phase !== 'ended' && ticks < 30 * MAX_TICKS) {
+    step(sim, robot.decide(sim));
+    ticks++;
+  }
+}
+
+function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
+  switch (name) {
+    case 'etape':
+      return undefined;
+    case 'etape-moi-reste':
+      apply(sim, me, [stayChoice('stay')]);
+      return undefined;
+    case 'etape-autre-reste':
+      apply(sim, other, [stayChoice('stay')]);
+      return undefined;
+    case 'etape-autre-finit':
+      apply(sim, other, [stayChoice('finish')]);
+      return undefined;
+    case 'etape-desaccord':
+      apply(sim, me, [stayChoice('finish')]);
+      apply(sim, other, [stayChoice('stay')]);
+      return undefined;
+    case 'etape-finir':
+      apply(sim, me, [stayChoice('finish')]);
+      apply(sim, other, [stayChoice('finish')]);
+      return undefined;
+    case 'reprise':
+      // Les deux restent après le montage: la notification « La Halte continue » paraît chez soi.
+      return () => {
+        stayBoth(sim);
+      };
+    case 'etape-43':
+      summerEnd(sim);
+      return undefined;
+    case 'etape-43-finir':
+      summerEnd(sim);
+      apply(sim, other, [stayChoice('finish')]);
+      return undefined;
+    case 'saison-ete':
+      // Premier matin de l'été (jour 22): la carte de saison sous la météo.
+      stayBoth(sim);
+      playUntil(sim, (s) => s.world.phase === 'breakfast' && s.world.clock.day >= 22);
+      pastTitle(sim);
+      return undefined;
+    case 'brume-matin':
+      // Un matin de brume (retouché si la graine n'en tire pas ce jour-là).
+      playUntil(sim, (s) => s.world.phase === 'breakfast' && s.world.clock.day >= 26);
+      sim.world.morningMist = true;
+      if (sim.world.weather === 'rain') sim.world.weather = 'sunny';
+      pastTitle(sim);
+      return undefined;
+    case 'ete-hud':
+      playUntil(sim, (s) => free(s) && at(s, 26, 9 * HOUR));
+      return undefined;
+    case 'ete-carnet':
+      playUntil(sim, (s) => free(s) && at(s, 26, 9 * HOUR));
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    case 'ete-courrier':
+      playUntil(sim, (s) => free(s) && at(s, 26, 9 * HOUR));
+      apply(sim, me, [{ type: 'menu', menu: 'letter' }]);
+      return undefined;
+    case 'ete-caisse':
+      playUntil(sim, (s) => free(s) && at(s, 27, 15 * HOUR));
+      near(sim, me, 'coop_crate');
+      apply(sim, me, [{ type: 'menu', menu: 'crate' }]);
+      return undefined;
+    case 'ete-nuit':
+      playUntil(sim, (s) => s.world.phase === 'night' && s.world.clock.day >= 26);
+      return undefined;
+    default:
+      return null;
+  }
+}
+
 /**
  * Prépare la situation demandée. `me`: le personnage de cette page. Renvoie parfois la suite à
  * jouer une fois l'interface montée (une notification déjà là au montage est ancienne et ne
@@ -222,6 +333,8 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
  */
 export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
+  const suite = tour8(sim, name, me, other);
+  if (suite !== null) return suite;
   const day5 = (): void => {
     playUntil(sim, (s) => at(s, 5, 9 * HOUR + 20));
   };

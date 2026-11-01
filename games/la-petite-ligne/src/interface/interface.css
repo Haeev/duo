@@ -261,18 +261,19 @@
 /* Revue I3 (panneaux à 150 %). La hauteur de la fenêtre se lit en rem de l'interface, échelle comprise (requêtes de conteneur). */
 .lpl-ui {
   container: lpl-ui / size;
-  --lpl-panel-top-band: 4.75rem;
+  --lpl-panel-top-band: 5.75rem;
 }
 
-/* Un panneau monte jusque sous l'horloge (une ligne de plus quand elle s'arrête ou quand le train approche). La proposition garde la bande
+/* Un panneau monte jusque sous l'horloge (date, saison et heure; une ligne de plus quand elle s'arrête ou quand le train approche).
+   Dans une fenêtre basse, la saison est à côté de l'heure: la bande garde sa hauteur d'avant (plus bas). La proposition garde la bande
    d'origine: à 150 %, la bourse et sa somme réservée passent sous l'horloge et doivent rester lisibles. */
 .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])),
 .lpl-ui:has(.lpl-clock[data-train='soon']) {
-  --lpl-panel-top-band: 6.5rem;
+  --lpl-panel-top-band: 7.5rem;
 }
 
 .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])[data-train='soon']) {
-  --lpl-panel-top-band: 8.25rem;
+  --lpl-panel-top-band: 9.25rem;
 }
 
 .lpl-ui .lpl-panel {
@@ -302,6 +303,20 @@
 
 /* Fenêtre basse (150 %): lignes resserrées, « Reprendre » à côté du bouton, pour voir les quatre lignes de la caisse; nuit et fin resserrées. */
 @container lpl-ui (max-height: 36rem) {
+  /* La requête de conteneur ne vise que les descendants de `.lpl-ui`: la bande se pose sur le panneau. */
+  .lpl-ui .lpl-panel {
+    --lpl-panel-top-band: 4.75rem;
+  }
+
+  .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])) .lpl-panel,
+  .lpl-ui:has(.lpl-clock[data-train='soon']) .lpl-panel {
+    --lpl-panel-top-band: 6.5rem;
+  }
+
+  .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])[data-train='soon']) .lpl-panel {
+    --lpl-panel-top-band: 8.25rem;
+  }
+
   .lpl-panel__header {
     padding-block: var(--lpl-space-1);
   }
@@ -936,5 +951,232 @@
   .lpl-memories,
   .lpl-memories__season {
     gap: var(--lpl-space-2);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Suite après le jour 15 (tour 8): saison du HUD, carte de saison, écran d'étape */
+/* ------------------------------------------------------------------ */
+
+/* Saison sous la date (« Été · jour 3 »): une petite ligne de plus, le rond de la météo couvre les trois. */
+.lpl-clock {
+  grid-template-areas:
+    'weather day'
+    'weather season'
+    'weather time';
+}
+
+.lpl-clock__weather {
+  grid-area: weather;
+}
+
+.lpl-clock__day {
+  grid-area: day;
+}
+
+.lpl-clock__season {
+  grid-area: season;
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0.86;
+}
+
+.lpl-clock__time {
+  grid-area: time;
+}
+
+/* Fenêtre basse (150 %): la saison passe à droite de l'heure, l'horloge garde sa hauteur et les panneaux leur place. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-clock {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas:
+      'weather day day'
+      'weather time season';
+  }
+
+  .lpl-clock__season {
+    align-self: end;
+    padding-bottom: 0.3rem;
+  }
+}
+
+/* Carte de saison du petit-déjeuner: une affichette de la halte, sous la météo. */
+.lpl-season-card {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-left: 0.375rem solid var(--lpl-color-primary);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+  color: var(--lpl-color-ink);
+}
+
+.lpl-season-card__title {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.2;
+}
+
+.lpl-season-card__lines {
+  display: grid;
+  gap: var(--lpl-space-1);
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: var(--lpl-text-sm);
+  line-height: 1.4;
+}
+
+/* Écran d'étape: le titre de l'étape est une phrase, plus longue que « Fin de la démo ». */
+.lpl-stage__title {
+  font-size: var(--lpl-text-3xl);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.lpl-stage__text {
+  text-align: center;
+}
+
+.lpl-stage__next {
+  margin: 0;
+  color: var(--lpl-color-ink-muted);
+  font-weight: var(--lpl-weight-bold);
+  text-align: center;
+}
+
+.lpl-stage__message {
+  margin: 0;
+  text-align: center;
+}
+
+.lpl-stage__actions {
+  justify-content: center;
+}
+
+.lpl-stage__after {
+  margin: 0;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  text-align: center;
+}
+
+.lpl-counter__of {
+  font-size: var(--lpl-text-lg);
+}
+
+/* L'écran d'étape a deux textes et deux actions de plus que l'ancien écran de fin: tout se resserre pour tenir sans défiler à 1366 x 768. */
+.lpl-screen--stage .lpl-title {
+  gap: var(--lpl-space-1);
+}
+
+.lpl-screen--stage .lpl-counter {
+  align-content: center;
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+}
+
+.lpl-screen--stage .lpl-counter__value {
+  font-size: var(--lpl-text-2xl);
+}
+
+.lpl-screen--stage .lpl-player-card {
+  padding-block: var(--lpl-space-2);
+}
+
+/* Fenêtre basse (150 %): l'écran d'étape et le matin d'une saison tiennent sans défiler. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-ui .lpl-screen--stage .lpl-sheet {
+    gap: var(--lpl-space-2);
+    padding-block: var(--lpl-space-3);
+  }
+
+  .lpl-stage__title {
+    font-size: var(--lpl-text-2xl);
+  }
+
+  .lpl-screen--stage .lpl-sheet__lead {
+    font-size: var(--lpl-text-sm);
+  }
+
+  .lpl-screen--stage .lpl-title__ticket {
+    padding-block: 0;
+    font-size: var(--lpl-text-xs);
+  }
+
+  .lpl-screen--stage .lpl-counter {
+    gap: 0;
+    padding: var(--lpl-space-1) var(--lpl-space-2);
+  }
+
+  .lpl-screen--stage .lpl-counter__value {
+    font-size: var(--lpl-text-xl);
+    white-space: nowrap;
+  }
+
+  .lpl-screen--stage .lpl-counter__label {
+    font-size: var(--lpl-text-xs);
+    line-height: 1.25;
+  }
+
+  .lpl-screen--stage .lpl-counter__of {
+    font-size: var(--lpl-text-sm);
+  }
+
+  .lpl-screen--stage .lpl-player-card {
+    padding: var(--lpl-space-1) var(--lpl-space-3);
+  }
+
+  .lpl-screen--stage .lpl-player-card .lpl-portrait {
+    --lpl-portrait-size: 2.5rem;
+  }
+
+  .lpl-screen--stage .lpl-button--large {
+    min-height: 2.5rem;
+    padding-block: var(--lpl-space-1);
+  }
+
+  .lpl-stage__after,
+  .lpl-stage__next {
+    font-size: var(--lpl-text-xs);
+  }
+
+  .lpl-stage__message {
+    font-size: var(--lpl-text-sm);
+  }
+
+  .lpl-sheet:has(> .lpl-season-card:not([hidden])) {
+    gap: var(--lpl-space-2);
+    padding-block: var(--lpl-space-3);
+  }
+
+  .lpl-sheet:has(> .lpl-season-card:not([hidden])) .lpl-breakfast__head .lpl-portrait {
+    --lpl-portrait-size: 4rem;
+  }
+
+  .lpl-sheet:has(> .lpl-season-card:not([hidden])) .lpl-breakfast__head .lpl-sheet__lead,
+  .lpl-sheet:has(> .lpl-season-card:not([hidden])) > .lpl-field__help {
+    display: none;
+  }
+
+  .lpl-sheet > .lpl-season-card {
+    gap: var(--lpl-space-1);
+    padding: var(--lpl-space-2) var(--lpl-space-3);
+  }
+
+  .lpl-season-card__title {
+    font-size: var(--lpl-text-lg);
+  }
+
+  .lpl-sheet:has(> .lpl-season-card:not([hidden])) .lpl-quest {
+    padding-block: var(--lpl-space-1);
   }
 }
