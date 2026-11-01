@@ -5,8 +5,8 @@ import { CatalogueError, parseCatalogue, sequenceOf, stepTime, stopTime } from '
 describe('catalogue (sons.json)', () => {
   const catalogue = parseCatalogue(soundsFile);
 
-  it('lit les 107 sons et les 9 musiques du sound designer', () => {
-    expect(catalogue.sounds.size).toBe(107);
+  it('lit les 120 sons et les 9 musiques du sound designer', () => {
+    expect(catalogue.sounds.size).toBe(120);
     expect(catalogue.music.size).toBe(9);
     expect(catalogue.mix.maxEffectVoices).toBe(24);
     expect(catalogue.peerDb).toBe(-3);
@@ -62,6 +62,22 @@ describe('catalogue (sons.json)', () => {
     expect(catalogue.sounds.get('ladder-step')?.files).toHaveLength(4);
     // Le scintillement des vers luisants reste juste: aucune variation de hauteur.
     expect(catalogue.sounds.get('glow-shimmer')?.pitchVariation).toBe(0);
+    // Tour 7: chevrette, martin-pêcheur et brume.
+    const audible7: Record<string, number> = {
+      'roe-call': 15,
+      'roe-bark': 30,
+      'kf-whistle': 25,
+      'mist-ambience': 20,
+    };
+    for (const [id, metres] of Object.entries(audible7)) {
+      expect(catalogue.sounds.get(id)?.spatial?.cullBeyond, id).toBe(metres);
+    }
+    expect(catalogue.sounds.get('kf-whistle')?.files).toHaveLength(3);
+    expect(catalogue.sounds.get('mist-ambience')?.loop).not.toBeNull();
+    expect(catalogue.sounds.get('mist-ambience')?.moment).toMatchObject({ id: 'mist', sound: 'mist_ambience', waitingDb: -6 });
+    expect(catalogue.sounds.get('mist-lift')?.pitchVariation).toBe(0);
+    // Le merle n'est pas localisé (fiche 1.4.9).
+    expect(catalogue.sounds.get('blackbird-wake')?.spatial).toBeNull();
     const sit = catalogue.sounds.get('bench-sit');
     expect(sit?.files).toHaveLength(3);
     expect(sit?.spatial).not.toBeNull();

@@ -2427,7 +2427,7 @@
       "moment": "heron"
     },
     "heron-croak": {
-      "event": "Héron: cri rauque « kraak » à l'envol (apogée, t = 1,2 s)",
+      "event": "Héron: cri rauque « kraak » à l'envol (apogée, t = 3,8 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2458,7 +2458,7 @@
       "moment": "heron"
     },
     "heron-wings": {
-      "event": "Héron: trois battements lourds à l'envol (apogée, t = 1,0 s)",
+      "event": "Héron: trois battements lourds à l'envol (apogée, t = 2,6 s; départ sans apogée, t = 0)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2487,7 +2487,7 @@
       "moment": "heron"
     },
     "heron-land": {
-      "event": "Héron: il freine et se pose sur la grève (apogée, t = 4,4 s)",
+      "event": "Héron: il freine et se pose sur la grève (apogée, t = 6,6 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2554,7 +2554,7 @@
       "moment": "geese"
     },
     "geese-alarm": {
-      "event": "Oies: les cous se dressent, cris montants (apogée, t = 0)",
+      "event": "Oies: les cous se dressent, cris montants (apogée et départ sans apogée, t = 0)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2583,7 +2583,7 @@
       "moment": "geese"
     },
     "geese-takeoff": {
-      "event": "Oies: course sur l'eau, ailes et pattes, cris (apogée, t = 1 s)",
+      "event": "Oies: course sur l'eau, ailes et pattes, cris (apogée, t = 2,8 s; départ sans apogée, t = 1 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2612,7 +2612,7 @@
       "moment": "geese"
     },
     "geese-flight": {
-      "event": "Oies: la volée qui s'éloigne, chœur de neuf voix (apogée, t = 3 s, et départ sans apogée)",
+      "event": "Oies: la volée qui s'éloigne, chœur de neuf voix (apogée, t = 5,8 s; départ sans apogée, t = 3 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2709,7 +2709,7 @@
       "moment": "ladder"
     },
     "ladder-step": {
-      "event": "Échelle: un barreau sous le pied de Basile (montée et descente)",
+      "event": "Échelle: un barreau sous le pied de Basile (apogée, montée à 0,5, 1,1 et 1,7 s, descente à 4,9, 5,73 et 6,57 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2744,7 +2744,7 @@
       "moment": "ladder"
     },
     "nest-box-turn": {
-      "event": "Le nichoir pivote sur son clou et se redresse (apogée, t = 3 s)",
+      "event": "Le nichoir pivote sur son clou et se redresse (apogée, t = 2,3 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2773,7 +2773,7 @@
       "moment": "ladder"
     },
     "hammer-tap": {
-      "event": "Petit marteau de Basile sur le clou du nichoir (trois coups)",
+      "event": "Petit marteau de Basile sur le clou du nichoir (apogée, trois coups à 3,35, 3,95 et 4,55 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2806,7 +2806,7 @@
       "moment": "ladder"
     },
     "tit-call": {
-      "event": "Mésange bleue: « tsi-tsi-tsi » (fin de l'échelle, t = 9 s)",
+      "event": "Mésange bleue: « tsi-tsi-tsi » (fin de l'échelle, t = 7,8 s)",
       "bus": "effects",
       "priority": 2,
       "files": [
@@ -2839,7 +2839,7 @@
       "moment": "ladder"
     },
     "tit-song": {
-      "event": "Mésange bleue: chant « tsi-tsi-tsuhuhuhu » (attente toutes les 8 s, apogée)",
+      "event": "Mésange bleue: chant « tsi-tsi-tsuhuhuhu » (attente toutes les 8 s; apogée, t = 1,9 s)",
       "bus": "effects",
       "priority": 3,
       "files": [
@@ -2872,7 +2872,7 @@
       "moment": "tits"
     },
     "tit-wings": {
-      "event": "Mésange: froissement d'ailes à l'envol ou au posé",
+      "event": "Mésange: froissement d'ailes à l'envol ou au posé (apogée, t = 4,3 s)",
       "bus": "effects",
       "priority": 4,
       "files": [
@@ -3058,6 +3058,409 @@
       "note": "la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: bus interface, non placé, sans variation de hauteur (notes justes en sol majeur)",
       "momentSound": "glow_shimmer",
       "moment": "glowworms"
+    },
+    "roe-call": {
+      "event": "Chevrette: appel doux et nasal à son faon (apogée, t = 0)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/roe-call-1.ogg",
+        "moments/roe-call-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.5,
+        "rolloffFactor": 1.2,
+        "maxDistance": 15.0,
+        "cullBeyondM": 15.0
+      },
+      "durationMs": [
+        370,
+        430
+      ],
+      "momentaryMaxLufs": -26.0,
+      "momentSound": "roe_call",
+      "moment": "roe_deer"
+    },
+    "fawn-rustle": {
+      "event": "Faon: l'herbe haute frémit à son lit (apogée, t = 1,0 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/fawn-rustle.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        541
+      ],
+      "momentaryMaxLufs": -29.0,
+      "momentSound": "fawn_rustle",
+      "moment": "roe_deer"
+    },
+    "fawn-bleat": {
+      "event": "Faon: petit « mi » aigu en trottinant vers sa mère (apogée, t = 2,6 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/fawn-bleat-1.ogg",
+        "moments/fawn-bleat-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        250,
+        290
+      ],
+      "momentaryMaxLufs": -25.0,
+      "momentSound": "fawn_bleat",
+      "moment": "roe_deer"
+    },
+    "deer-stamp": {
+      "event": "Chevrette effarouchée: elle frappe du pied (clip deer_stamp)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/deer-stamp.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        255
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "joué au début de l'effarouchement, roe-bark suit (un joueur a bougé pendant un regard)",
+      "momentSound": "deer_stamp",
+      "moment": "roe_deer"
+    },
+    "roe-bark": {
+      "event": "Chevrette effarouchée: aboiement d'alarme « bö » (après deer_stamp)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/roe-bark-1.ogg",
+        "moments/roe-bark-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 4.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 30.0,
+        "cullBeyondM": 30.0
+      },
+      "durationMs": [
+        620,
+        620
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "audible à 30 m: il prévient aussi l'autre joueur que la chevrette a été dérangée",
+      "momentSound": "roe_bark",
+      "moment": "roe_deer"
+    },
+    "deer-bounds": {
+      "event": "Chevrette et faon: deux bonds chacun vers la haie (apogée, t = 7,6 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/deer-bounds.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        1730
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "placé à la chevrette, déplacé avec elle",
+      "momentSound": "deer_bounds",
+      "moment": "roe_deer"
+    },
+    "kf-whistle": {
+      "event": "Martin-pêcheur: sifflet aigu « tiiii » à chaque envol (attente; apogée, t = 4,1 s)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "moments/kf-whistle-1.ogg",
+        "moments/kf-whistle-2.ogg",
+        "moments/kf-whistle-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 800,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 4.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 25.0,
+        "cullBeyondM": 25.0
+      },
+      "durationMs": [
+        349,
+        389,
+        449
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "c'est lui qu'on entend avant de voir l'oiseau: audible à 25 m",
+      "momentSound": "kf_whistle",
+      "moment": "kingfisher"
+    },
+    "kf-dive": {
+      "event": "Martin-pêcheur: plongeon net (plongeons manqués en attente; apogée, t = 1,3 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/kf-dive-1.ogg",
+        "moments/kf-dive-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        211,
+        192
+      ],
+      "momentaryMaxLufs": -24.0,
+      "momentSound": "kf_dive",
+      "moment": "kingfisher"
+    },
+    "kf-beat": {
+      "event": "Martin-pêcheur: il assomme l'ablette contre le pieu, « tac tac » (apogée, t = 2,7 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/kf-beat.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.5,
+        "rolloffFactor": 1.2,
+        "maxDistance": 15.0,
+        "cullBeyondM": 15.0
+      },
+      "durationMs": [
+        550
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "un seul déclenchement à 2,7 s: le fichier contient les deux coups (2,7 et 3,2 s)",
+      "momentSound": "kf_beat",
+      "moment": "kingfisher"
+    },
+    "mist-ambience": {
+      "event": "Brume: l'eau toute proche et feutrée, gouttes des herbes (boucle placée à mist_narrows)",
+      "bus": "ambience",
+      "priority": 3,
+      "files": [
+        "moments/mist-ambience.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        8000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 8.5,
+        "startSample": 24000,
+        "endSample": 408000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -29.0,
+      "note": "en attente à -6 dB (waitingDb), à pleine force en 3 s au début de l'apogée (climaxRampMs), en même temps que la lumière se réchauffe",
+      "momentSound": "mist_ambience",
+      "moment": "mist",
+      "waitingDb": -6.0,
+      "climaxRampMs": 3000
+    },
+    "mist-lift": {
+      "event": "Brume: accord ouvert qui monte, harpe et cordes douces (apogée, t = 1,5 s)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "moments/mist-lift-1.ogg",
+        "moments/mist-lift-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4600,
+        4600
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: bus interface (question S3), non placé, sans variation de hauteur (sol et do majeur)",
+      "momentSound": "mist_lift",
+      "moment": "mist"
+    },
+    "blackbird-wake": {
+      "event": "Brume: un merle chante dans les arbres de la rive nord (apogée, t = 3,0 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/blackbird-wake-1.ogg",
+        "moments/blackbird-wake-2.ogg",
+        "moments/blackbird-wake-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        2322,
+        2300,
+        2282
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "non localisé (fiche): les deux joueurs l'entendent pareil, chacun sur sa rive",
+      "momentSound": "blackbird_wake",
+      "moment": "mist"
+    },
+    "fish-jump": {
+      "event": "Brume: un poisson saute entre les deux rives (apogée, t = 5,2 s, en 29,0 ; 40,4)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/fish-jump-1.ogg",
+        "moments/fish-jump-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        344,
+        374
+      ],
+      "momentaryMaxLufs": -25.0,
+      "momentSound": "fish_jump",
+      "moment": "mist"
     },
     "bench-sit": {
       "event": "S'asseoir sur un banc de bois (événement sat_down)",
