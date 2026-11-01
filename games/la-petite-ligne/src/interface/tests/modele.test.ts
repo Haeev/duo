@@ -6,8 +6,6 @@ import { NBSP } from '../typographie';
 import {
   absenceMinutes,
   clockModel,
-  endActions,
-  ordersDetail,
   outfitTakenByPartner,
   dayLabel,
   formModel,
@@ -279,26 +277,6 @@ describe('création', () => {
     apply(sim, 'p2', { type: 'title_ready', ready: true }, { type: 'create_character', name: 'Sacha', hair: 1, outfit: 2 });
     expect(outfitTakenByPartner(sim.world, ctx)).toBe(2);
     expect(outfitTakenByPartner(sim.world, uiContext('p2'))).toBeNull();
-  });
-});
-
-describe('écran de fin, deux commandes', () => {
-  it('détaille les commandes quand il y en a eu plusieurs', () => {
-    const ctx = uiContext();
-    expect(ordersDetail(ctx, [{ linesDone: 4, linesTotal: 4 }])).toBe('');
-    const trains = ctx.content.settings.order.trains;
-    if (trains.length < 2) return;
-    const detail = plain(ordersDetail(ctx, [{ linesDone: 4, linesTotal: 4 }, { linesDone: 3, linesTotal: 5 }]));
-    expect(detail).toBe(`samedi ${trains[0]?.day ?? 0} : 4 sur 4 · samedi ${trains[1]?.day ?? 0} : 3 sur 5`);
-  });
-});
-
-describe('écran de fin', () => {
-  it('montre l’état final quand les deux ont choisi « Continuer »: plus d’attente ni de « Pas encore »', () => {
-    expect(endActions(false, false)).toEqual({ cont: true, waiting: false, done: false });
-    expect(endActions(false, true)).toEqual({ cont: true, waiting: false, done: false });
-    expect(endActions(true, false)).toEqual({ cont: false, waiting: true, done: false });
-    expect(endActions(true, true)).toEqual({ cont: false, waiting: false, done: true });
   });
 });
 

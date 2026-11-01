@@ -370,6 +370,8 @@ class GameUi implements GameInterface, UiHost {
     if (!fullScreen) {
       this.hud.update(world);
       this.proposals.update(world);
+    } else {
+      this.hud.observeNotifications(world);
     }
 
     this.mounted?.layer.update(world);
@@ -434,6 +436,8 @@ class GameUi implements GameInterface, UiHost {
 
   private onEvent(event: WorldEvent): void {
     if (event.type === 'session_finish') this.sessionFinished = true;
+    // Écran d'étape: deux « Finir » puis deux « Rester » (la plateforme n'a pas encore fermé) font reprendre la partie.
+    if (event.type === 'stage_continue') this.sessionFinished = false;
     this.proposals.onEvent(event);
     this.dirty = true;
   }

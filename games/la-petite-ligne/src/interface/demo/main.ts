@@ -18,13 +18,14 @@ import { CONTENT_FILES } from '../../donnees/fichiers';
 import { loadMap } from '../../donnees/carte';
 import { MAP_FILES } from '../../donnees/cartes-fichiers';
 import { createRenderer } from '../../rendu/index';
+import { decodeSave, restoreWorld } from '../../sauvegarde/sauvegarde';
 import { createWorld } from '../../simulation/monde';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { SIM_DT } from '../../simulation/constantes';
 import { rememberNotebookTab } from '../carnet';
 import { createInterface } from '../index';
-import { setupScenario } from './scenarios';
+import { scenarioSave, setupScenario } from './scenarios';
 
 declare global {
   interface Window {
@@ -48,11 +49,21 @@ const me: CharacterId = params.get('joueur') === 'p2' ? 'p2' : 'p1';
 const partnerId: CharacterId = me === 'p1' ? 'p2' : 'p1';
 const content = loadContent(CONTENT_FILES);
 const map = loadMap(MAP_FILES).map;
-const sim = createWorld(content, map, 20261031, [
+const players = [
   { id: 'membre-a', name: 'Camille', color: '#5CE1E6' },
   { id: 'membre-b', name: 'Sacha', color: '#8D6CFF' },
-]);
-const afterMount = setupScenario(sim, params.get('scenario') ?? 'titre', me);
+] as const;
+const scenario = params.get('scenario') ?? 'titre';
+// Les scénarios de la suite (tour 8) partent d'une sauvegarde de référence du format 5.
+const SAVES = import.meta.glob<{ dataSchema: number; data: unknown }>('../../../tests/donnees/sauvegardes/format-5-*.json', { eager: true, import: 'default' });
+const saveName = scenarioSave(scenario);
+const save = saveName === null ? undefined : SAVES[`../../../tests/donnees/sauvegardes/${saveName}`];
+if (saveName !== null && save === undefined) throw new Error(`sauvegarde de référence absente: ${saveName}`);
+const sim =
+  save === undefined
+    ? createWorld(content, map, 20261031, players)
+    : restoreWorld(content, map, decodeSave(structuredClone(save.data)), save.dataSchema, players);
+const afterMount = setupScenario(sim, scenario, me);
 if (params.get('onglet') === 'souvenirs') rememberNotebookTab('memories');
 
 const listeners = new Set<(event: WorldEvent) => void>();

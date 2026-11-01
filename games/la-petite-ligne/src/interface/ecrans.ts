@@ -10,8 +10,10 @@ import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICO
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, secretStamp, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
-import { dayLabel, endActions, formModel, linesText, nextObjective, orderLines, orderQuest, ordersDetail, outfitTakenByPartner } from './modele';
+import { dayLabel, formModel, linesText, nextObjective, orderLines, orderQuest, orderQuestTitle, outfitTakenByPartner } from './modele';
+import { type StageModel, stageModel } from './modele-etape';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
+import { type SeasonCard, seasonCard, weatherLabel } from '../etat/semaine';
 import { playerColors, portraitSvg } from './portrait';
 
 
@@ -445,6 +447,7 @@ export class BreakfastScreen implements Layer {
   private readonly partner: HTMLSpanElement;
   private readonly help: HTMLParagraphElement;
   private readonly confidence: HTMLDivElement;
+  private readonly season: HTMLElement;
   private sig = '';
 
   constructor(host: UiHost) {
@@ -462,11 +465,13 @@ export class BreakfastScreen implements Layer {
     this.partner = el('span', { class: 'lpl-player-name' });
     this.help = el('p', { class: 'lpl-field__help' });
     this.confidence = el('div', { class: 'lpl-confidence', role: 'note', hidden: true });
+    this.season = el('section', { class: 'lpl-season-card', hidden: true });
     this.root = screen(
       'scene',
       titleId,
       sheet('42rem', [
         el('div', { class: 'lpl-breakfast__head' }, [this.face, el('div', {}, [this.overline, this.title, this.lead])]),
+        this.season,
         this.confidence,
         this.list,
         el('div', { class: 'lpl-sheet__actions' }, [this.start, this.partner]),
@@ -483,7 +488,9 @@ export class BreakfastScreen implements Layer {
     const b = ctx.texts.extra.breakfast;
     const g = ctx.texts.game.ui.breakfast;
     const form = formModel(ctx, me);
-    const weather = ctx.texts.weather[world.weather] ?? world.weather;
+    // « Soleil, brume au lever » un matin de brume (tour 8, section 3.4).
+    const weather = ctx.t(weatherLabel(world, ctx.content));
+    const card = seasonCard(world, ctx.content);
     const time = ctx.t(ctx.texts.game.ui.hud.time, timeParts(world.clock.minutes));
     const envie = me.envie === null ? null : ctx.content.envies.find((e) => e.id === me.envie?.id);
     const shared = me.sharedEnvie === null ? null : ctx.content.envies.find((e) => e.id === me.sharedEnvie?.id);
@@ -491,7 +498,7 @@ export class BreakfastScreen implements Layer {
     const eggs = world.groundItems.filter((i) => i.item === 'egg').reduce((s, i) => s + i.count, 0);
     const partnerName = nameOf(world, ctx.partner);
     const hint = momentHintModel(world, ctx);
-    const sig = JSON.stringify([me.form, me.appearance, world.clock.day, world.weather, envie?.id, shared?.id, todays.length, eggs, other?.breakfastDone, partnerName, hint]);
+    const sig = JSON.stringify([me.form, me.appearance, world.clock.day, weather, card, envie?.id, shared?.id, todays.length, eggs, other?.breakfastDone, partnerName, hint]);
     if (sig === this.sig) return;
     this.sig = sig;
 
@@ -505,6 +512,7 @@ export class BreakfastScreen implements Layer {
     setText(this.title, form.name);
     setText(this.lead, ctx.t(`« ${form.text} »`));
 
+    this.renderSeason(card);
     this.renderConfidence(hint);
     clear(this.list);
     if (envie !== null && envie !== undefined) {
@@ -533,6 +541,26 @@ export class BreakfastScreen implements Layer {
       this.help.append(icon('ui-pause'), ` ${ctx.t(b.clockHelp, { time: hourLabel(ctx.content.settings.clock.dayStart, ctx.texts.game.ui.hud.time) })}`);
     }
     setHidden(this.help, other?.breakfastDone === true);
+  }
+
+  /**
+   * Carte de saison du premier matin d'une saison (tour 8, section 2.6), sous la météo, chez les
+   * deux: le titre et trois lignes de ce qui change.
+   */
+  private renderSeason(card: SeasonCard | null): void {
+    setHidden(this.season, card === null);
+    clear(this.season);
+    if (card === null) return;
+    const { ctx } = this.host;
+    const titleId = uid('saison');
+    this.season.dataset.season = card.season;
+    setAttr(this.season, 'aria-labelledby', titleId);
+    const list = el('ul', { class: 'lpl-season-card__lines' });
+    for (const line of card.lines) list.append(el('li', { text: ctx.t(line) }));
+    this.season.append(
+      el('h2', { class: 'lpl-season-card__title', id: titleId }, [icon('ui-star'), ctx.t(card.title)]),
+      list,
+    );
   }
 
   /**
@@ -639,7 +667,7 @@ export class NightScreen implements Layer {
       this.list.append(
         questItem(
           icon('ui-train'),
-          ctx.t(x.orderLine, { title: order?.title ?? ctx.texts.game.ui.crate.title, lines: linesText(ctx, done, lines.length) }),
+          ctx.t(x.orderLine, { title: orderQuestTitle(ctx, world) ?? ctx.texts.game.ui.crate.title, lines: linesText(ctx, done, lines.length) }),
           null,
           daysLeft === 1 ? ctx.t(x.orderTomorrow, { time }) : ctx.t(x.orderDays, { time, days: daysLeft }),
         ),
@@ -742,14 +770,22 @@ export class SessionEndScreen implements Layer {
 }
 
 // ---------------------------------------------------------------------------
-// Fin de la démo
+// Écran d'étape (fin de la démo au jour 15, fin de l'été au jour 43)
 
+/**
+ * Écran d'étape (tour 8, section 1.2): le train de l'étape est reparti. Chacun choisit « Rester à
+ * la Halte » ou « Finir la séance » sur sa machine; sa carte le dit chez les deux, rien ne se
+ * passe tant que les choix diffèrent, et l'on peut changer d'avis. Retour arrière ne ferme rien,
+ * Échap reste à la pause de la plateforme.
+ */
 export class EndScreen implements Layer {
   readonly root: HTMLElement;
   readonly closable = false;
   readonly letterNavigation = false;
   private readonly host: UiHost;
   private readonly ticket: HTMLSpanElement;
+  private readonly title: HTMLHeadingElement;
+  private readonly subtitle: HTMLParagraphElement;
   private readonly days: HTMLSpanElement;
   private readonly lines: HTMLSpanElement;
   private readonly linesDetail: HTMLSpanElement;
@@ -757,18 +793,22 @@ export class EndScreen implements Layer {
   private readonly counters: HTMLDivElement;
   private readonly self: PlayerCard;
   private readonly other: PlayerCard;
-  private readonly cont: HTMLButtonElement;
-  private readonly notYet: HTMLButtonElement;
-  private readonly waiting: HTMLSpanElement;
-  private readonly bothReady: HTMLSpanElement;
+  private readonly text: HTMLParagraphElement;
+  private readonly next: HTMLParagraphElement;
+  private readonly message: HTMLParagraphElement;
+  private readonly stay: HTMLButtonElement;
+  private readonly finish: HTMLButtonElement;
+  private readonly after: HTMLParagraphElement;
+  private sig = '';
 
   constructor(host: UiHost) {
     this.host = host;
     const { ctx } = host;
-    const e = ctx.texts.game.endScreen;
     const x = ctx.texts.extra.end;
-    const titleId = uid('fin');
+    const titleId = uid('etape');
     this.ticket = el('span', { class: 'lpl-title__ticket' });
+    this.title = el('h1', { class: 'lpl-title__name lpl-stage__title', id: titleId });
+    this.subtitle = el('p', { class: 'lpl-sheet__lead' });
     this.days = el('span', { class: 'lpl-counter__value' });
     this.lines = el('span', { class: 'lpl-counter__value' });
     this.furniture = el('span', { class: 'lpl-counter__value' });
@@ -780,85 +820,89 @@ export class EndScreen implements Layer {
     this.counters = el('div', { class: 'lpl-counters' }, [counter(this.days, x.days), linesCounter, counter(this.furniture, x.furniture)]);
     this.self = new PlayerCard(host, 'self', true);
     this.other = new PlayerCard(host, 'other', true);
-    this.cont = button(ctx.t(x.continue), () => {
-      host.send({ type: 'end_ready', ready: true });
-    }, { class: 'lpl-button lpl-button--primary lpl-button--large' });
-    this.notYet = button(ctx.t(ctx.texts.extra.common.notYet), () => {
-      host.send({ type: 'end_ready', ready: false });
-    });
-    this.waiting = chip('', 'waiting', 'ui-hourglass');
-    this.bothReady = chip(ctx.t(x.bothReady), 'ready', 'ui-check');
-    this.bothReady.setAttribute('role', 'status');
-    this.bothReady.toggleAttribute('hidden', true);
+    this.text = el('p', { class: 'lpl-sheet__lead lpl-stage__text' });
+    this.next = el('p', { class: 'lpl-stage__next', hidden: true });
+    this.message = el('p', { class: 'lpl-stage__message', role: 'status' });
+    this.stay = button(ctx.t(x.stay), () => {
+      host.send({ type: 'stage_choice', choice: 'stay' });
+    }, { class: 'lpl-button lpl-button--primary lpl-button--large', attrs: { 'aria-pressed': 'false', 'data-nav-item': true, 'data-choice': 'stay' } });
+    this.finish = button(ctx.t(x.finish), () => {
+      host.send({ type: 'stage_choice', choice: 'finish' });
+    }, { class: 'lpl-button lpl-button--large', attrs: { 'aria-pressed': 'false', 'data-nav-item': true, 'data-choice': 'finish' } });
+    this.after = el('p', { class: 'lpl-stage__after' });
     this.root = screen(
       '',
       titleId,
-      sheet('46rem', [
-        el('div', { class: 'lpl-title' }, [
-          this.ticket,
-          el('h1', { class: 'lpl-title__name', id: titleId, style: 'font-size: var(--lpl-text-3xl)', text: ctx.t(e.title) }),
-          el('p', { class: 'lpl-sheet__lead', text: ctx.t(e.subtitle) }),
-        ]),
+      sheet('52rem', [
+        el('div', { class: 'lpl-title' }, [this.ticket, this.title, this.subtitle]),
         this.counters,
-        el('div', { class: 'lpl-players', 'aria-label': ctx.texts.extra.common.playersLabel }, [this.self.root, this.other.root]),
-        el('p', { class: 'lpl-sheet__lead', style: 'text-align: center' }, [el('strong', { text: ctx.t(e.text) })]),
-        el('div', { class: 'lpl-sheet__actions', style: 'justify-content: center', 'data-nav': 'row' }, [this.cont, this.waiting, this.notYet, this.bothReady]),
-        el('p', { style: 'text-align: center; color: var(--lpl-color-ink-muted)', text: ctx.t(x.after) }),
+        el('div', { class: 'lpl-players', 'aria-label': ctx.t(x.choicesLabel) }, [this.self.root, this.other.root]),
+        this.text,
+        this.next,
+        this.message,
+        el('div', { class: 'lpl-sheet__actions lpl-stage__actions', 'data-nav': 'row' }, [this.stay, this.finish]),
+        this.after,
       ]),
     );
+    this.root.classList.add('lpl-screen--stage');
   }
 
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
+    const m = stageModel(world, ctx);
+    if (m === null) return;
     const x = ctx.texts.extra.end;
-    const e = ctx.texts.game.endScreen;
-    const ending = world.ending;
-    const days = ending?.days ?? world.clock.day;
-    const linesDone = ending?.linesDone ?? world.orderHistory.reduce((n, o) => n + o.linesDone, 0);
-    const linesTotal = ending?.linesTotal ?? ctx.content.settings.order.trains.reduce((n, o) => n + o.lines.length, 0);
-    const furniture = ending?.furniturePlaced ?? world.furniture.filter((f) => f.placedBy !== null).length;
-    const time = hourLabel(ctx.content.settings.clock.lastDay.end, ctx.texts.game.ui.hud.time);
+    const sig = JSON.stringify([m, characterOf(world, ctx.me)?.appearance, characterOf(world, ctx.partner)?.appearance]);
+    if (sig === this.sig) return;
+    this.sig = sig;
+
     clear(this.ticket);
-    this.ticket.append(icon('ui-train'), ctx.t(x.ticket, { day: days, time }));
-    setText(this.days, String(days));
+    this.ticket.append(icon('ui-train'), m.ticket);
+    setText(this.title, m.title);
+    setText(this.subtitle, m.subtitle);
+    setText(this.days, String(m.days));
     clear(this.lines);
-    this.lines.append(String(linesDone), ' ', el('small', { style: 'font-size: var(--lpl-text-lg)', text: ctx.t(x.linesOf, { total: linesTotal }) }));
-    const detail = ordersDetail(ctx, ending?.orders ?? world.orderHistory);
-    if (this.linesDetail.dataset.text !== detail) {
+    this.lines.append(String(m.linesDone), ' ', el('small', { class: 'lpl-counter__of', text: ctx.t(x.linesOf, { total: m.linesTotal }) }));
+    if (this.linesDetail.dataset.text !== m.detail) {
       // Une commande par morceau insécable: la ligne ne se coupe qu'entre deux commandes.
-      this.linesDetail.dataset.text = detail;
+      this.linesDetail.dataset.text = m.detail;
       clear(this.linesDetail);
-      detail.split(' · ').forEach((part, i) => {
+      m.detail.split(' · ').forEach((part, i) => {
         if (i > 0) this.linesDetail.append(' · ');
         this.linesDetail.append(el('span', { class: 'lpl-nowrap', text: part }));
       });
     }
-    setHidden(this.linesDetail, detail === '');
-    setText(this.furniture, String(furniture));
-    // Le récapitulatif de `textes.json` sert de nom accessible aux chiffres.
-    setAttr(this.counters, 'aria-label', [
-      ctx.t(e.stats.days, { days }),
-      ctx.t(e.stats.order, { linesDone, linesTotal }),
-      ctx.t(e.stats.furniture, { furniture }),
-    ].join('. '));
+    setHidden(this.linesDetail, m.detail === '');
+    setText(this.furniture, String(m.furniture));
+    setAttr(this.counters, 'aria-label', m.countersLabel);
 
-    const meReady = characterOf(world, ctx.me)?.endReady === true;
-    const otherReady = characterOf(world, ctx.partner)?.endReady === true;
-    const chipOf = (ready: boolean): HTMLElement =>
-      ready ? chip(ctx.t(x.chipContinue), 'ready', 'ui-check') : chip(ctx.t(ctx.texts.extra.common.notYet), '', 'ui-hourglass');
-    this.self.set(nameOf(world, ctx.me), ctx.texts.extra.common.you, chipOf(meReady), svgOf(world, ctx.me, 'radiant'));
-    this.other.set(nameOf(world, ctx.partner), null, chipOf(otherReady), svgOf(world, ctx.partner, 'great'));
-    // Quand les deux ont choisi, plus de ligne d'attente: l'état final, comme sur les cartes.
-    const actions = endActions(meReady, otherReady);
-    setHidden(this.cont, !actions.cont);
-    setHidden(this.waiting, !actions.waiting);
-    setHidden(this.notYet, !actions.waiting);
-    setHidden(this.bothReady, !actions.done);
-    setText(this.waiting.lastChild ?? this.waiting, ctx.t(ctx.texts.extra.common.waitingFor, { partner: nameOf(world, ctx.partner) }));
+    const chipOf = (p: StageModel['self']): HTMLElement =>
+      p.choice === null ? chip(p.chip, '', 'ui-hourglass') : chip(p.chip, 'ready', p.choice === 'stay' ? 'ui-check' : 'ui-moon');
+    this.self.set(m.self.name, ctx.texts.extra.common.you, chipOf(m.self), svgOf(world, ctx.me, 'radiant'));
+    this.other.set(m.other.name, null, chipOf(m.other), svgOf(world, ctx.partner, 'great'));
+
+    clear(this.text);
+    this.text.append(el('strong', { text: m.text }));
+    setText(this.next, m.next ?? '');
+    setHidden(this.next, m.next === null);
+
+    clear(this.message);
+    const msg = m.message;
+    if (msg.kind === 'waiting') this.message.append(chip(msg.text, 'waiting', 'ui-hourglass'));
+    else if (msg.kind === 'done') this.message.append(chip(msg.text, 'ready', 'ui-check'));
+    else if (msg.kind === 'partner') this.message.append(el('strong', { text: msg.strong }), ` ${msg.text}`);
+    else this.message.append(msg.text);
+
+    // « Rester » n'existe que si une journée jouable suit l'étape dans cette version.
+    setHidden(this.stay, !m.canStay);
+    this.finish.classList.toggle('lpl-button--primary', !m.canStay);
+    setAttr(this.stay, 'aria-pressed', m.self.choice === 'stay' ? 'true' : 'false');
+    setAttr(this.finish, 'aria-pressed', m.self.choice === 'finish' ? 'true' : 'false');
+    setText(this.after, m.after);
   }
 
   defaultFocus(): HTMLElement | null {
-    if (!this.cont.hidden) return this.cont;
-    return this.notYet.hidden ? null : this.notYet;
+    if (this.finish.getAttribute('aria-pressed') === 'true' || this.stay.hidden) return this.finish;
+    return this.stay;
   }
 }

@@ -50,6 +50,7 @@ export class Hud {
   private readonly clock: HTMLDivElement;
   private readonly clockWeather: SVGSVGElement;
   private readonly clockDay: HTMLSpanElement;
+  private readonly clockSeason: HTMLSpanElement;
   private readonly clockTime: HTMLSpanElement;
   private readonly clockStatus: HTMLSpanElement;
   private readonly clockStatusIcon: SVGSVGElement;
@@ -79,6 +80,7 @@ export class Hud {
   private readonly toastItems = new Map<string, HTMLLIElement>();
   private readonly seenAt = new Map<number, number>();
   private firstSight = true;
+  private toastFirstSight = true;
 
   private readonly partner: HTMLDivElement;
   private readonly partnerPortrait: HTMLSpanElement;
@@ -128,6 +130,7 @@ export class Hud {
     // Haut gauche: horloge, bourse, notifications.
     this.clockWeather = icon('weather-sun', '');
     this.clockDay = el('span', { class: 'lpl-clock__day' });
+    this.clockSeason = el('span', { class: 'lpl-clock__season' });
     this.clockTime = el('span', { class: 'lpl-clock__time' });
     this.clockStatusIcon = icon('ui-pause');
     this.clockStatusText = el('span');
@@ -141,6 +144,7 @@ export class Hud {
     this.clock = el('div', { class: 'lpl-clock', 'aria-label': x.hud.clockLabel }, [
       el('span', { class: 'lpl-clock__weather' }, [this.clockWeather, this.watchRing]),
       this.clockDay,
+      this.clockSeason,
       this.clockTime,
       this.clockStatus,
       this.clockTrain,
@@ -326,6 +330,7 @@ export class Hud {
     const clock = clockModel(world, ctx);
     setIcon(this.clockWeather, clock.weatherIcon);
     setText(this.clockDay, clock.day);
+    setText(this.clockSeason, clock.season);
     setText(this.clockTime, clock.time);
     setAttr(this.clock, 'data-state', clock.state === '' ? null : clock.state);
     setText(this.clockStatusText, clock.status ?? '');
@@ -477,16 +482,36 @@ export class Hud {
     setText(this.buildRotation, ctx.t(ctx.texts.extra.common.orientation[placement.rotation % 4] ?? ''));
   }
 
-  private updateToasts(list: readonly Readonly<GameNotification>[], now: number, partner: string): void {
-    const { ctx } = this.host;
-    const durationMs = (ctx.content.settings.hints.durationSeconds || UI_SETTINGS.toastSeconds) * 1000;
+  private toastDurationMs(): number {
+    return (this.host.ctx.content.settings.hints.durationSeconds || UI_SETTINGS.toastSeconds) * 1000;
+  }
+
+  /**
+   * Sous un écran plein cadre monté d'emblée (sauvegarde reprise sur l'écran d'étape), retient les
+   * notifications déjà là comme anciennes, sans rien afficher. Celles qui arrivent ensuite (« La
+   * Halte continue » au départ de l'écran) paraissent à la sortie, comme après la nuit.
+   */
+  observeNotifications(world: ReadonlyWorld): void {
+    if (!this.toastFirstSight) return;
+    const me = characterOf(world, this.host.ctx.me);
+    if (me !== null) this.markSeen(me.notifications, this.host.now());
+  }
+
+  private markSeen(list: readonly Readonly<GameNotification>[], now: number): void {
+    const durationMs = this.toastDurationMs();
     for (const n of list) {
       if (!this.seenAt.has(n.id)) {
         // Au montage, les notifications déjà là sont anciennes: on ne les rejoue pas.
-        this.seenAt.set(n.id, this.firstSight ? now - durationMs : now);
+        this.seenAt.set(n.id, this.toastFirstSight ? now - durationMs : now);
       }
     }
-    this.firstSight = false;
+    this.toastFirstSight = false;
+  }
+
+  private updateToasts(list: readonly Readonly<GameNotification>[], now: number, partner: string): void {
+    const { ctx } = this.host;
+    const durationMs = this.toastDurationMs();
+    this.markSeen(list, now);
     // La simulation ne garde que les dernières notifications: on oublie les autres (séance d'une heure).
     if (this.seenAt.size > list.length * 2) {
       const ids = new Set(list.map((n) => n.id));
