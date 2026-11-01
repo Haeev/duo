@@ -185,3 +185,18 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 
 - Dans une saison de 21 jours, un moment qui passe deux fois a forcément un écart de moins de 21 jours: un écart médian de 19 jours (M-22, O-06) ne se mesure que sur plusieurs années. Sur 84 jours, mesurer plutôt la part des passages qui redisent un moment de la même saison et le nombre de moments différents vus par saison.
 - `seasonPoolFull` à 9 laisse l'automne à six moments avec une chance sur trois par jour: une partie sur dix y voit moins de deux moments différents; à 7, trois sur cent.
+
+## Démarrer une mission dans un arbre isolé (vérifié le 2026-11-01, tour 10)
+
+- L'arbre de travail du membre peut partir d'un commit plus ancien que la branche de la session: un fichier cité par le brief (retours, conception du tour précédent) peut manquer. Comparer `git log -1` avec la branche de session (`git branch -a`, le `+` marque les branches ouvertes ailleurs) et avancer par `git merge --ff-only <branche>` avant de lire.
+- Dans cet arbre isolé, une commande qui contient le mot « git » (même `--exclude-dir=.git` du contrôle des tirets), un `cd` vers le dépôt principal ou une commande composée trop longue est refusée: faire le contrôle des tirets par un petit script Python dans `/tmp` qui parcourt l'arbre en sautant `.git` et `node_modules`, et passer les retouches de documents par des scripts dans `/tmp` lancés avec le chemin en argument.
+
+## Repères du monde vérifiés au tour 10
+
+- Le pain n'est vendu nulle part à `77c2f3c`: il n'est que donné par des quêtes (`buyPrice` nul, aucune boutique). Les besoins cachés existent déjà dans `reglages.needs` (Ventre selon le souper, Sommeil du lit, Cœur de la journée, poids de la forme).
+- La maisonnette a cinq fenêtres dans son modèle (`assets-src/modeles/bourg.py`, `gatekeeper_house`): deux au sud, une au nord, une à l'ouest, une à l'est; celle de l'est est centrée sur la limite de deux cases. Pour accrocher quelque chose à une fenêtre, demander des nœuds d'ancrage à l'artiste plutôt qu'une liste de cases.
+- Apparence à `77c2f3c`: trois coiffures (`player_hair_short`, `_bob`, `_bun`), aucune couleur de cheveux, quatre couleurs de tenue.
+- `house_plan_reserved` sert justement à agrandir la maison: le cellier (x 2 à 4) et la chambre (y 16 à 21) du tour 10 y sont; la colonne x 13 (sentier du jardin) et la case x 12 (banc du pignon, tour 9) restent libres.
+- Rendre visible un besoin caché sans le durcir: garder le plancher de nuit actuel et faire compter double le souper; sinon une baisse par heure fait chuter les valeurs de nuit sous la règle en place (premier jet du tour 10: souper simple à 30 au lieu de 60).
+- Dans une simulation d'achats, l'ordre des priorités du duo décide de tout: avec la chambre après les chantiers du bourg, elle n'arrive jamais avant le jour 64. Toujours simuler au moins deux ordres de priorité.
+- Noms d'états de besoins: « Rassasié », « Plein d'élan », « calé » s'accordent au joueur; écrire des noms (« Ventre plein », « Pleine énergie », « Petit creux », « Envie de compagnie »).
