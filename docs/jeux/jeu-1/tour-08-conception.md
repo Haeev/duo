@@ -91,7 +91,7 @@ Textes (`textes.json`, bloc `stages`; `textes-interface.json` pour les libellés
 | `stages.demo.text` | Restez pour l'été: désormais, le temps, la lisière et la commande du samedi changent d'eux-mêmes. |
 | `stages.summer_end.title` | Six semaines à la Halte d'Aubrune |
 | `stages.summer_end.subtitle` | Du premier train au premier matin d'automne. |
-| `stages.summer_end.text` | L'automne arrive à la Halte, et sa suite est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici. |
+| `stages.summer_end.text` | L'automne arrive à la Halte, et la suite de votre histoire est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici. |
 | `stages.summer_end.next` | « Rester à la Halte » reviendra avec la prochaine mise à jour du jeu. |
 | `end.stay` | Rester à la Halte |
 | `end.finish` | Finir la séance |
@@ -215,8 +215,8 @@ Le petit-déjeuner du premier jour d'une saison (jours 22, 43, 64) montre une ca
 
 | Saison | Titre | Lignes |
 |---|---|---|
-| Été | Premier jour de l'été | Les jours rallongent: il fait clair jusqu'à 21 h 30. / À la lisière: des mûres au roncier, des girolles après la pluie. / Le soir, les gens du bourg restent dehors un peu plus tard. |
-| Automne | Premier jour de l'automne | Le soir tombe plus tôt, vers 19 h 30. / À la lisière: des noisettes, et toujours des girolles après la pluie. / À la rivière, les truites reviennent. |
+| Été | Premier jour de l'été | Les journées sont longues: il fait clair jusqu'à 21 h 30. / À la lisière: des mûres au roncier, des girolles après la pluie. / Le soir, les gens du bourg restent dehors un peu plus tard. |
+| Automne | Premier jour de l'automne | Le soir tombe plus tôt, vers 19 h 30. / À la lisière: des noisettes, et toujours des girolles après la pluie. / À la rivière, les truites reviennent en nombre. |
 | Hiver | Premier jour de l'hiver | Le potager se repose jusqu'au printemps. / La nuit tombe tôt, vers 18 h. / Plus de truites, mais les goujons mordent toujours. |
 | Printemps (année 2) | Premier jour du printemps | Le potager se réveille: radis, laitues et carottes. / À la lisière: pissenlits et ail des ours. / Les jours rallongent de nouveau. |
 
@@ -375,9 +375,9 @@ Au départ du train, comme aujourd'hui (EC-08), avec une règle de plus pour les
 
 | Saison | Salutations |
 |---|---|
-| toutes | « Merci pour le train de samedi ! » / « Bonjour à la Halte d'Aubrune ! » / « Les étals de la ville se vident vite, et c'est un peu grâce à vous. » / « Le chef de train dit que votre caisse est la mieux rangée de la ligne. » / « La ville a goûté vos produits: elle en redemande. » / « Une nouvelle semaine commence à la coopérative. » |
+| toutes | « Le train de ce samedi est bien arrivé en ville. » / « Bonjour à la Halte d'Aubrune ! » / « Les étals de la ville se vident vite, et c'est un peu grâce à vous. » / « Le chef de train dit que votre caisse est la mieux rangée de la ligne. » / « La ville a goûté vos produits: elle en redemande. » / « Une nouvelle semaine commence à la coopérative. » |
 | printemps | « Bon printemps à la Halte ! » |
-| été | « Bel été à la Halte ! » / « Les jours rallongent, et nos listes aussi. » |
+| été | « Bel été à la Halte ! » / « Les journées sont longues, et nos listes aussi. » |
 | automne | « Bel automne à la Halte ! » |
 
 `{tip}`: le conseil du produit de la commande qui demande le plus d'avance (`leadDays`, à égalité la première ligne). Chaque conseil est vrai dans le jeu:
@@ -389,7 +389,7 @@ Au départ du train, comme aujourd'hui (EC-08), avec une règle de plus pour les
 | laitue | 4 | Les laitues poussent en trois jours: semez-les tôt dans la semaine. |
 | radis | 3 | Les radis poussent en deux jours: rien ne presse, mais rien ne traîne. |
 | croque-au-sel | 3 | Trois radis font deux portions de croque-au-sel. |
-| ail des ours, girolle, mûre, noisette, pissenlit | 2 | L'ail des ours pousse à l'ombre, au pied des chênes de la lisière. / Les girolles sortent au lendemain des pluies, sous les arbres de la lisière. / Les mûres mûrissent au roncier de la lisière: attention aux griffes. / Les noisettes tombent sous le noisetier, au bord du bois. / Les pissenlits poussent au bord du bois, du côté du soleil. |
+| ail des ours, girolle, mûre, noisette, pissenlit | 2 | L'ail des ours pousse à l'ombre, au pied des chênes de la lisière. / Les girolles sortent au lendemain des pluies, sous les arbres de la lisière. / Les mûres mûrissent au roncier de la lisière: attention aux griffes. / Les noisettes tombent sous les noisetiers, au bord du bois. / Les pissenlits poussent au bord du bois, du côté du soleil. |
 | œuf | 1 | Pensez à remplir la mangeoire: une poule nourrie pond chaque jour. |
 | omelette | 1 | Trois œufs font deux omelettes, au réchaud de la maisonnette. |
 | goujon, chevesne, truite | 1 | Les goujons mordent au gué à toute heure. / Le chevesne est plus rare que le goujon: prévoyez quelques lancers. / Par temps de pluie, ça mord plus vite, dit Firmin. |
@@ -441,7 +441,7 @@ Hiver (robot seulement): 3,2 lignes en moyenne, dont 1,2 reprises de la commande
 | État | Durée | Visible | Hache |
 |---|---|---|---|
 | Arbre adulte | jusqu'à l'abattage | modèle actuel | 3 coups, 2 rondins (actuel) |
-| Souche | 4 jours | `tree_stump` (déjà livré) | refus: « Rien à couper: la souche repartira. » (`stump_hint`) |
+| Souche | 4 jours | `tree_stump` (déjà livré) | refus: « Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place. » (`stump_hint`) |
 | Rejet (chêne) ou jeune sapin (sapin) | 6 jours | le modèle de l'arbre à l'échelle 0,3 le premier jour, puis +0,1 par jour jusqu'à 0,8; P1: modèles `oak_sapling` et `fir_sapling` | refus, petit tremblement, son mat: « Trop jeune pour la hache. Laisse-le grandir. » (`tree_too_young`) |
 | Arbre adulte | 10 jours après l'abattage | modèle actuel, échelle 1 | de nouveau 3 coups |
 
@@ -460,7 +460,7 @@ Les cinq coins `forage_edge_01` à `_05` de la carte, au bord du bois de la Côt
 | Sous-bois | `forage_edge_01` (19,5 ; 9,5), `_02` (25,5 ; 9,5) | à l'ombre des chênes `tree_edge_01`, `_03` et `_05` (x 16,5 à 24,5) | ail des ours, girolle, noisette |
 | Lisière au soleil | `forage_edge_03` (30,5), `_04` (35,5), `_05` (38,5), tous à y 9,5 | bord du bois tourné vers le quai, en plein sud | pissenlit, mûre; girolle aussi en `_05`, au pied du chêne `tree_edge_11` |
 
-Décor ajouté par le level designer: un roncier à chacun des points 03, 04 et 05 (posé contre la lisière, au nord du point, sans gêner le chemin qui longe le bois), et un noisetier (variante `bush_hazel` d'un buisson existant) près des points 01 et 02. Les mûres sont un petit bouquet de fruits posé sur le roncier; cueillies, elles disparaissent, le roncier reste.
+Décor ajouté par le level designer: un roncier à chacun des points 03, 04 et 05 (posé contre la lisière, au nord du point, sans gêner le chemin qui longe le bois), et un noisetier (variante `bush_hazel` d'un buisson existant) au nord de chacun des points 01 et 02 (deux en tout). Les mûres sont un petit bouquet de fruits posé sur le roncier; cueillies, elles disparaissent, le roncier reste.
 
 | Cueillette | `id` | Saisons | Poids | Quantité | Coins | Prix | Modèle |
 |---|---|---|---|---|---|---|---|
@@ -468,7 +468,7 @@ Décor ajouté par le level designer: un roncier à chacun des points 03, 04 et 
 | Ail des ours | `wild_garlic` | P | 3 | 1 à 2 | sous-bois | 8 | `wild_garlic`, touffe de larges feuilles, 0,3 m |
 | Mûre | `blackberry` | E | 6 | 2 à 3 | lisière | 3 | `blackberry`, grappe de fruits noirs sur le roncier, 0,25 m |
 | Girolle | `chanterelle` | E, A | 3 | 1 à 2 | sous-bois, `_05` | 12 | `chanterelle`, bouquet de trois ou quatre girolles, 0,25 m |
-| Noisette | `hazelnut` | A | 6 | 2 à 3 | sous-bois | 3 | `hazelnut`, petit tas au sol sous le noisetier, 0,25 m |
+| Noisette | `hazelnut` | A | 6 | 2 à 3 | sous-bois | 3 | `hazelnut`, petit tas au sol sous le noisetier du coin, 0,25 m |
 
 Règles (chaque matin à 6 h, à partir du jour 16):
 
@@ -499,7 +499,7 @@ Réserve après la démo:
 | `fill_pockets` | personnelle | dès le jour 16 | Remplir ses poches à la lisière. | `picked`, 3, `actor` |
 | `rain_walk` | personnelle | pluie | Marcher sous la pluie jusqu'au gué. | `stayed_at river_ford` 5 s |
 | `misty_morning` | personnelle | `morning_mist` | Voir la brume sur l'Aubrune avant 10 h. | `stayed_at riverbank` 10 s et `time_is` 6 h à 10 h |
-| `visit_saplings` | personnelle | dès le jour 16, un arbre abattu depuis le début | Aller voir pousser les rejets de la lisière. | `stayed_at forage_edge_02` 5 s |
+| `visit_saplings` | personnelle | dès le jour 16, un arbre abattu depuis le début | Aller voir où en est la lisière. | `stayed_at forage_edge_02` 5 s |
 | `summer_square` | personnelle | été | Passer la soirée sur la place, à la fraîche. | `stayed_at village_square` 10 s et `time_is` 19 h à 21 h |
 | `pick_blackberries` | personnelle | été | Cueillir des mûres. | `picked blackberry`, 1 |
 | `find_chanterelles` | personnelle | été | Trouver des girolles au pied des chênes. | `picked chanterelle`, 1 |
@@ -889,11 +889,11 @@ Chaque bloc est validé à la lecture (`src/donnees/contenu.ts`, comme les autre
 - `objets.json`: `wild_garlic` (ail des ours, `forage`, 8 sous, `wild_garlic`), `chanterelle` (girolle, 12), `blackberry` (mûre, pluriel « mûres », 3), `hazelnut` (noisette, 3); chacun avec `plural`, `indefinite`, et un substitut dans `src/rendu/substituts.ts` (sinon `rendu.test.ts` échoue).
 - `cultures.json`: `seasons` de radis, laitue et carotte à `["spring", "summer", "autumn"]`.
 - `textes.json`: blocs `stages`, `seasonCards`, `orderFormat.linesDone`, `weather.mistMorning`; messages `stage_continue`, `sow_out_of_season`, `tree_too_young`, `stump_hint`, `forage_hint`, `sapling_hint`; `ui.hud.season` (« {season} · jour {day} »).
-- `astuces.json`: `forage_hint` (« À la lisière, quelque chose se cueille: approche-toi et fais Agir. », à moins de 6 m d'une cueillette, une fois par joueur) et `sapling_hint` (« Un rejet: dans quelques jours, ce sera de nouveau un arbre. », en visant un jeune arbre, une fois par joueur).
+- `astuces.json`: `forage_hint` (« Quelque chose se cueille à la lisière: approche-toi, puis {act} ou un clic pour le ramasser. », à moins de 6 m d'une cueillette, une fois par joueur) et `sapling_hint` (« Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir. », en visant un jeune arbre, une fois par joueur).
 - `courrier.json`: `basile_regrow`, `coop_order_generated`, `coop_recap_generated` (4.8).
 - `habitants.json`: 70 répliques nouvelles (5.5: 64 du quotidien, 4 du lendemain de la démo, la prévision d'Odette, la caisse pleine de Firmin), 9 bornes, horaires d'été (2.4).
 - `envies.json`: 18 envies (5.4), `real_bed` et `see_train` corrigées.
-- `cartes/halte.json`: trois ronciers (points 03 à 05) et un noisetier (près de 01 et 02), sans toucher aux points.
+- `cartes/halte.json`: trois ronciers (points 03 à 05) et deux noisetiers (un au nord de 01, un au nord de 02), sans toucher aux points.
 
 ## 9. Actions et retours
 
@@ -953,7 +953,7 @@ Chaque bloc est validé à la lecture (`src/donnees/contenu.ts`, comme les autre
 | Dev interface | écran d'étape (deux actions, choix de l'autre, textes de 1.2, focus, Retour arrière ne ferme rien, Échap à la plateforme); carte de saison au petit-déjeuner; « brume au lever »; saison sous la date (`ui.hud.season`); quête de la semaine au carnet et au HUD; lettres à variantes; compteurs de l'écran d'étape sur toutes les commandes; P1: réglage « taille de la commande » par proposition (EC-11) |
 | Sound-designer | `season-turn` (motif de 3 s, 4 couleurs de saison), `mist-morning` (ambiance feutrée, gouttes, merle lointain), ambiances d'été (grillons du soir, martinets du jour) et d'automne (vent dans les feuilles, corneilles), `pick-herb`, `pick-mushroom`, `pick-berries`, `pick-nuts`, `axe-thud-soft`; P1: variation d'été du thème de la Halte |
 | Artiste 3D | `wild_garlic`, `chanterelle`, `blackberry` (grappe), `hazelnut` (tas), `bramble` (roncier de 1,2 x 0,8 m, 0,7 m de haut, sans fruits), `bush_hazel` (variante de `bush`); P1: `oak_sapling`, `fir_sapling`; chaque objet lisible à 0,25 m au moins (leçon du martin-pêcheur), budgets de triangles de `assets/modeles/README.md`, vérifié de près (rien qui flotte ni traverse le sol) |
-| Level designer (avec l'artiste 3D) | trois ronciers aux points 03 à 05 et un noisetier près de 01 et 02, sans gêner le passage de la lisière au passage à niveau; contrôle de la ligne de vue des cinq coins (outil `moments_tour7_geometrie.py`) |
+| Level designer (avec l'artiste 3D) | trois ronciers aux points 03 à 05 et un noisetier au nord de 01 et de 02, sans gêner le passage de la lisière au passage à niveau; contrôle de la ligne de vue des cinq coins (outil `moments_tour7_geometrie.py`) |
 | QA | critères T8-01 à T8-30; robot longue vie et son rapport (6.4); sauvegarde de référence du jour 15 au format 3 et du jour 43 au format 4; captures de l'écran d'étape et des saisons |
 | Game designer (fait dans ce document) | textes (1.2, 1.4, 2.6, 4.8, 5.4, 5.5, 8.4), tables, simulation; relecture des textes en jeu après production |
 
@@ -972,6 +972,43 @@ Chaque bloc est validé à la lecture (`src/donnees/contenu.ts`, comme les autre
 2. **Pour l'architecte: format 4 et bornes de l'état** (1.6, 8.3): lettres bornées, `orderHistory` borné avec totaux, `weatherLog` sur 7 jours, et le remplacement de `world.moments.history` proposé au tour 7 (question 4). Recommandation: tout borner dans ce tour, puisque le robot longue vie va en mesurer la taille.
 3. **Pour le dev plateforme: l'avancement d'une sauvegarde** (`progressOf`) mesuré jusqu'à `lastDay` fait passer une partie du jour 15 de 100 % à environ 33 %. Recommandation: garder cette mesure, plus honnête, et l'afficher en jours dans la bibliothèque si la plateforme le permet.
 4. **Pour le manager: le seuil de la commande** (4.6). Si les robots médians remplissent plus de 95 % des commandes, monter la hausse à +0,2 au tour suivant. Recommandation: livrer les valeurs de ce document, ajuster sur le premier rapport.
+
+## 14. Relecture après production (revue du tour 8)
+
+### 14.1 Textes corrigés en situation
+
+| Clé | Avant | Après | Pourquoi |
+|---|---|---|---|
+| `ui.questKinds.main` | Deux semaines à la Halte | À la Halte | titre de groupe du carnet, lu pendant toute la partie: il mentait dès le jour 16 |
+| `saturday_order`, objectif | avant samedi 16 h | avant samedi 8 à 16 h | même forme que les commandes 2 et suivantes, qui donnent le jour |
+| `forage_hint` | approche-toi et fais Agir | approche-toi, puis {act} ou un clic pour le ramasser | « Agir » n'est le nom d'aucune touche; les autres astuces disent la touche réelle par `{act}` |
+| `sapling_hint` | Un rejet: dans quelques jours, ce sera de nouveau un arbre. | Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir. | l'astuce vise aussi le jeune sapin replanté, qui n'est pas un rejet |
+| `messages.stump_hint` | Rien à couper: la souche repartira. | Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place. | la souche de sapin ne repart pas (Basile replante); vrai pour les deux essences |
+| `orderGreetings.all` | Merci pour le train de samedi ! | Le train de ce samedi est bien arrivé en ville. | la lettre est datée du samedi même: « de samedi » s'y lisait comme le samedi suivant |
+| `orderGreetings.summer`, `seasonCards.summer` | Les jours rallongent | Les journées sont longues | l'été du jeu commence au plus long des jours; « rallongent » ne vaut qu'au printemps |
+| `seasonCards.autumn` | les truites reviennent | les truites reviennent en nombre | l'été garde un peu de truite (poids 1): elles ne revenaient pas de nulle part |
+| `orderTips.hazelnut` | sous le noisetier | sous les noisetiers | deux noisetiers posés (14.2) |
+| `stages.summer_end.text` | et sa suite est en préparation | et la suite de votre histoire est en préparation | « sa » renvoyait à l'automne |
+| `visit_saplings` (envie) | Aller voir pousser les rejets de la lisière. | Aller voir où en est la lisière. | l'envie reste tirable quand tout a repoussé, et le sapin n'a pas de rejet |
+| `title.ticket` (`textes-interface.json`) | Démo · Deux semaines à la Halte d'Aubrune | Six semaines à la Halte d'Aubrune | l'écran titre annonçait une partie de deux semaines |
+| `endScreen` (interface de secours seulement) | Fin de la démo / Deux semaines… / La suite… arrive bientôt. | Le train est reparti / Une étape à la Halte d'Aubrune. / Votre partie s'arrête ici. Rien n'est perdu: elle reprendra à cet endroit. | vrai aux deux étapes; `stats` inchangés (historique de Duo) |
+
+Relu sans changement: écran d'étape des jours 15 et 43 (captures `interface-etape-*`), cartes de saison, lettres de commande et de récapitulatif, 18 envies, 70 répliques et 9 bornes, `tree_too_young`, conseils des commandes. Chaque lieu cité par une réplique existe sur la carte (tonnelle d'Odette, banc du quai, cour de la scierie); les répliques datées du jour 16 sont bornées à ce jour, sauf celle de Basile, sans date dans le texte.
+
+### 14.2 Écarts des devs, validés
+
+| Écart | Verdict | Raison |
+|---|---|---|
+| Tirage ligne par ligne par `unitDraw` au lieu de `random.Random` du script | validé | c'est ce que disait 4.4; la commande d'une graine devient épinglable dans un test. Les statistiques de 4.11 restent valables à la variance près, pas graine par graine |
+| Candidat écarté si son minimum ne tient plus | validé | même règle que 4.5 (garde-fou de faisabilité), appliquée avant le tirage plutôt qu'après: aucun effet visible |
+| Trois premières lignes de trois familles différentes | validé | réalise « au moins 3 familles tant que c'est possible » (4.4, règle 4) sans retirage; mesuré: 3 à 4 familles par commande, 0 problème I-04 |
+| Deux noisetiers au lieu d'un | validé | une noisette tombe au pied d'un noisetier: un par coin de sous-bois, au nord du point, est la seule pose juste (`cueillette-noisettes.png`) |
+| T8-16 vérifié graine par graine (au moins 3 sur 4 par graine médiane) | validé | plus exigeant que 80 % en moyenne, et un duo vit une seule graine |
+| O-06: écart médian de 11 jours au printemps et de 16,5 en été, pour 19 | accepté pour ce tour, à reprendre | printemps: 9 écarts seulement, à cheval sur la démo, où la fenêtre longue (dès le jour 24) ne s'applique pas encore; non jugeable avant le printemps de l'année 2. Été: la réserve n'a que 6 moments, dont 3 à conditions étroites (brume, vers luisants, chevrette); le héron, le renard et le martin-pêcheur reviennent donc plus souvent. Baisser la chance retirerait des moments; le remède est du contenu (deux moments d'été, priorité 3 du tour 9) et, en réglage, `longFromDay` à 16 |
+
+### 14.3 Défaut d'équilibrage trouvé à la relecture
+
+**La truite d'été coûte deux fois ce que la commande croit.** Le coût d'une truite (1/3 de semaine de pêche, 4.2) est calculé avec le poids de printemps (2 sur 11); l'été, le poids passe à 1 sur 11 (5.3): deux truites demandent deux fois plus de lancers que la part payée et prévue. Correctif proposé (données et code du générateur): un coût par saison (`costBySeason`, truite: été 0,667), ou un poids d'été de 1,5. Recommandation: le coût par saison, qui garde « la truite se cache l'été ».
 
 ## Annexe A: résultats de la simulation
 
@@ -995,3 +1032,4 @@ Chaque bloc est validé à la lecture (`src/donnees/contenu.ts`, comme les autre
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-11-01 | 1 | Première rédaction: étapes et « Rester à la Halte », limite au jour 43, saisons, météo tirée et brume, commande générée, repousse, cueillette, envies et répliques d'été, robot longue vie, réglages de D1, D4, D6 et D7, simulation `tour8_suite.py` | manager (gauntlet, tour 8) |
+| 2026-11-01 | 2 | Relecture après production (section 14): 13 textes corrigés, écarts des devs validés, défaut de la truite d'été | manager (revue du tour 8) |

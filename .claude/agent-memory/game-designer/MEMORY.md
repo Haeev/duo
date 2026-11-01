@@ -159,3 +159,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Un bouton « continuer » qui laisse jouer au-delà d'un jalon futur rend caduques ses dates absolues: ancrer le contenu futur par conditions (saison, jour de semaine, premier jour joué avec la version).
 - Pièges de cohérence trouvés en écrivant: le bourg n'a ni chats ni mois; l'hirondelle est un oiseau prévu de la Halte (ne pas écrire qu'il n'y en a pas); l'eau de l'Aubrune ne baisse pas l'été; ne pas dire « à l'ombre » d'un banc sans l'avoir vérifié.
 - Charger le script par `importlib` avec des `dataclass`: enregistrer le module dans `sys.modules` avant `exec_module`.
+
+## Quand la limite de la partie bouge (vérifié au tour 8)
+
+- Chercher toute durée écrite en dur: `title.ticket` (`textes-interface.json`), `ui.questKinds.main` (titre de groupe du carnet), `endScreen` (lu par `src/plateforme/interface-secours.ts` et, pour `stats`, par l'historique de Duo). Au tour 8, les trois disaient encore « Deux semaines » ou « Fin de la démo ».
+- Une astuce cite la touche par jeton (`{act}`, `{examine}`, `{move}`, `{notebook}`, `src/interface/format.ts`), jamais par un nom de verbe (« fais Agir »).
+- Un coût de commande « par unité » tiré d'une probabilité (poisson) doit suivre la saison des poids: la truite d'été (poids 1 sur 11) coûtait deux fois la part prévue au poids de printemps.
+- Une monnaie gagnée chaque semaine sans nouvel usage se voit au bout de deux semaines de jeu: compter le total des prix en vente face aux gains d'une commande avant de livrer une économie.
