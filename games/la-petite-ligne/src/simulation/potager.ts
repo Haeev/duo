@@ -2,8 +2,10 @@
  * Potager (FE-02 à FE-04, FE-06 simplifié), bois (hache), eau (puits et
  * tonneau) et bêche libre (énigme d'Émile).
  */
+import type { CropDef } from '../donnees/types';
+import { seasonOfDay } from '../donnees/calendrier';
 import type { Cell, Character, GardenCell, Quality, Tree } from '../etat/types';
-import { type Sim, bump, emit, secondsToTicks, notifyKey } from './contexte';
+import { type Sim, bump, emit, say, secondsToTicks, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { durationMultiplier, spend } from './besoins';
 import { giveToCharacter, heldStack, takeFromBag } from './sac';
@@ -41,11 +43,21 @@ export function till(sim: Sim, c: Character, g: GardenCell): void {
   toolUsed(sim, c);
 }
 
+/** Cette culture se sème-t-elle aujourd'hui (saison du jour) ? */
+export function inSowingSeason(sim: Sim, crop: CropDef): boolean {
+  return crop.seasons.includes(seasonOfDay(sim.content.settings, sim.world.clock.day));
+}
+
 export function sow(sim: Sim, c: Character, g: GardenCell, seedItem: string): void {
   const seed = sim.content.items[seedItem];
   const cropId = seed?.plants ?? null;
   const crop = cropId === null ? undefined : sim.content.crops[cropId];
   if (g.soil !== 'tilled' || g.crop !== null || crop === undefined || cropId === null) return;
+  // Hors saison (l'hiver), le semis est refusé et la graine reste dans le sac (section 2.3).
+  if (!inSowingSeason(sim, crop)) {
+    say(sim, c.id, 'sow_out_of_season');
+    return;
+  }
   if (takeFromBag(c, seedItem, 1).length === 0) return;
   g.crop = {
     crop: cropId,

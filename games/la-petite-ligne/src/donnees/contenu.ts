@@ -8,6 +8,7 @@ import type { CropStage, Quality, Weather } from '../etat/types';
 import {
   DEFAULT_BENCHES,
   DEFAULT_DIALOGUES,
+  DEFAULT_TIDY,
   DEFAULT_ENVIES,
   DEFAULT_FEEL,
   DEFAULT_MEMORIES,
@@ -618,6 +619,7 @@ function parseCrops(r: Reader): { crops: Record<string, CropDef>; qualities: Rec
       growthDays,
       yieldPerCell: it.at('yieldPerCell').integer(1),
       stagesByDay: stages,
+      seasons: cropSeasons(it.at('seasons')),
     };
   }
   const qualities = {} as Record<Quality, QualityDef>;
@@ -1344,6 +1346,12 @@ function parseDialogueSettings(r: Reader | null): Settings['dialogues'] {
   };
 }
 
+/** Rangement de la nuit (QA8-02). */
+function parseTidySettings(r: Reader | null): Settings['tidy'] {
+  const from = r?.opt('fromDay') ?? null;
+  return { fromDay: from === null || from.isNull() ? DEFAULT_TIDY.fromDay : from.integer(1) };
+}
+
 function parseFishing(r: Reader | null): Settings['fishing'] {
   if (r === null) return null;
   const wait = r.at('biteWaitSeconds').numberList();
@@ -1356,6 +1364,13 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
     hookWindowSeconds: r.at('hookWindowSeconds').number(),
     flag: r.at('flag').string(),
   };
+}
+
+/** Saisons des semis: au moins une, sans doublon. */
+function cropSeasons(r: Reader): Season[] {
+  const seasons = seasonList(r);
+  if (seasons.length === 0 || new Set(seasons).size !== seasons.length) return r.fail('au moins une saison, sans doublon');
+  return seasons;
 }
 
 /** Liste de saisons (`["spring", "summer"]`). */
@@ -1738,6 +1753,7 @@ function parseSettings(r: Reader): Settings {
     carry: parseCarry(r.opt('carry')),
     envies: parseEnvieSettings(r.opt('envies')),
     dialogues: parseDialogueSettings(r.opt('dialogues')),
+    tidy: parseTidySettings(r.opt('tidy')),
     fishing: parseFishing(r.opt('fishing')),
     benches: parseBenches(r.opt('benches')),
     moments: parseMomentSettings(r.opt('moments')),

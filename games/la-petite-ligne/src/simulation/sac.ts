@@ -54,8 +54,23 @@ export function giveToCharacter(sim: Sim, c: Character, item: string, quality: Q
 }
 
 export function dropAt(sim: Sim, x: number, y: number, item: string, quality: Quality, count: number): void {
+  // Après la démo, une pile du même objet au même endroit grossit au lieu d'en poser une autre
+  // (les œufs du poulailler, jour après jour): le sol reste borné (QA8-02).
+  const from = sim.content.settings.tidy.fromDay;
+  if (from !== null && sim.world.clock.day >= from) {
+    const same = sim.world.groundItems.find(
+      (g) => g.item === item && g.quality === quality && Math.abs(g.pos.x - x) < SAME_SPOT && Math.abs(g.pos.y - y) < SAME_SPOT,
+    );
+    if (same !== undefined) {
+      same.count += count;
+      return;
+    }
+  }
   sim.world.groundItems.push({ id: newId(sim, 'g'), item, quality, count, pos: { x, y } });
 }
+
+/** Deux piles plus proches que ceci (m) sont au même endroit. */
+const SAME_SPOT = 0.01;
 
 /**
  * Retire du sac; préfère la qualité donnée, sinon commence par l'ordinaire.

@@ -206,6 +206,8 @@ export interface CropDef {
   growthDays: number;
   yieldPerCell: number;
   stagesByDay: CropStage[];
+  /** Saisons où l'on sème (tour 8, section 2.3); une culture semée en saison finit sa pousse. */
+  seasons: readonly Season[];
 }
 
 export interface QualityDef {
@@ -702,6 +704,14 @@ export interface DialogueSettings {
   /** Jour à partir duquel la règle s'applique (la démo garde la sienne). */
   datedRepeatFromDay: number;
 }
+/**
+ * Rangement de la nuit (QA8-02): à partir de `fromDay`, ce qui traîne par terre (piles tombées
+ * d'un sac plein) rentre au coffre pendant la nuit, et deux piles du même objet au même endroit
+ * n'en font qu'une. `null`: rien ne se range (la démo).
+ */
+export interface TidySettings {
+  fromDay: number | null;
+}
 export type ContinuationMode = 'same_save' | 'new_game_per_stage';
 /** D7: tendresse entre les personnages, du moins au plus. */
 export type Tenderness = 'none' | 'accomplices' | 'gentle';
@@ -811,6 +821,8 @@ export interface Settings {
   envies: EnvieSettings;
   /** Répliques du quotidien (tour 8, section 5.5). */
   dialogues: DialogueSettings;
+  /** Rangement de la nuit (QA8-02). */
+  tidy: TidySettings;
   /** Bancs de la carte: places, assise et lever (`reglages.benches`, défauts dans `defauts.ts`). */
   benches: BenchSettings;
   fishing: {

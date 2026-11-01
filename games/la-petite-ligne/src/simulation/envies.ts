@@ -29,10 +29,36 @@ export function pickEnvies(sim: Sim): void {
       const pick = longRun ? weightedPick(sim, candidates, (e) => (c.envieHistory.includes(e.id) ? 1 : settings.unseenFactor)) : sim.rng.pick(candidates);
       c.envie = { id: pick.id, done: false };
       c.envieHistory.push(pick.id);
+      if (c.envieHistory.length > ENVIE_HISTORY_MAX) c.envieHistory = compactEnvieHistory(c.envieHistory, settings.noRepeatWindowDays);
     }
   }
   const shared = longRun ? drawSharedEnvie(sim, day) : (sim.content.sharedEnvieSchedule.find((s) => s.day === day)?.envie ?? null);
   for (const c of sim.world.characters) c.sharedEnvie = shared === null ? null : { id: shared, done: false };
+}
+
+/** Au-delà de ce nombre d'entrées (six semaines), l'historique d'un joueur se compacte (QA8-02). */
+export const ENVIE_HISTORY_MAX = 42;
+
+/**
+ * L'historique des envies sert à trois choses: les `window` dernières (aucune redite dans la
+ * fenêtre), la moins récente parmi elles quand toutes y sont, et « déjà reçue » (coup de pouce).
+ * Les `window` dernières restent telles quelles; avant elles, il suffit d'un exemplaire de chaque
+ * envie absente de la fenêtre, dans l'ordre de sa dernière venue: les trois réponses ne changent
+ * pas, et l'historique reste borné par le nombre d'envies (I-06).
+ */
+export function compactEnvieHistory(history: readonly string[], window: number): string[] {
+  const tail = history.slice(-window);
+  const inTail = new Set(tail);
+  const older: string[] = [];
+  const seen = new Set<string>();
+  const head = history.slice(0, history.length - tail.length);
+  for (let i = head.length - 1; i >= 0; i--) {
+    const id = head[i];
+    if (id === undefined || inTail.has(id) || seen.has(id)) continue;
+    seen.add(id);
+    older.push(id);
+  }
+  return [...older.reverse(), ...tail];
 }
 
 /** Tirage pondéré par le générateur de la partie (un seul nombre tiré, comme `pick`). */

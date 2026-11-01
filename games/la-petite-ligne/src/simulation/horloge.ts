@@ -20,6 +20,8 @@ import { morningMoments } from './moments';
 import { morningWeather } from './meteo';
 import { morningForage, morningTrees } from './lisiere';
 import { pruneLetters } from './semaine';
+import { tidyGround } from './rangement';
+import { foldOldHeard } from './dialogues';
 import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
@@ -169,6 +171,8 @@ export function morning(sim: Sim): void {
   morningWeather(sim);
   morningGrowth(sim);
   morningTrees(sim);
+  // Avant la cueillette: une cueillette tombée d'un sac au pied d'un coin y reste (`tidyGround`).
+  tidyGround(sim);
   morningForage(sim);
   morningEggs(sim);
   reopenCrate(sim);
@@ -193,6 +197,7 @@ export function morning(sim: Sim): void {
   copyCounters(sim);
   pickEnvies(sim);
   pruneLetters(sim);
+  foldOldHeard(sim);
   deliverScheduledLetters(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.

@@ -55,6 +55,8 @@
     "fish_escaped": "Il s'est échappé.",
     "stump_hint": "Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place.",
     "tree_too_young": "Trop jeune pour la hache. Laisse-le grandir.",
+    "sow_out_of_season": "Le potager se repose: on sèmera au printemps.",
+    "ground_tidied": "Ce qui traînait par terre est rangé dans le coffre de la maisonnette.",
     "handcar_needs_both": "La draisine ne bouge pas d'un pouce. Appelle {partner}: elle se pousse à deux.",
     "handcar_pushed": "La draisine a roulé jusqu'au bout ! Basile vous attend devant la remise.",
     "parcel_needs_both": "Ce colis pèse son poids. Appelle {partner}: il se porte à deux.",

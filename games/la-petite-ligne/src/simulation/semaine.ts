@@ -11,6 +11,13 @@ import { type Sim, emit } from './contexte';
 export const ORDER_HISTORY_KEPT = 8;
 /** Lettres lues gardées (les non lues restent toutes). */
 export const LETTERS_READ_KEPT = 12;
+/**
+ * Âge (jours) au-delà duquel une lettre hebdomadaire part dès qu'un des deux l'a lue: trois
+ * semaines, la commande en cours, la précédente et le récapitulatif restent (QA8-02).
+ */
+export const WEEKLY_LETTER_DAYS = 21;
+/** Âge (jours) au-delà duquel une lettre hebdomadaire part, même jamais ouverte: six semaines. */
+export const WEEKLY_LETTER_MAX_DAYS = 42;
 
 export function emptyOrderBook(sim: Pick<Sim, 'content'>): OrderBook {
   const s = sim.content.settings.order;
@@ -96,17 +103,24 @@ export function instanceId(id: string, train: number): string {
 }
 
 /**
- * Le courrier garde les `LETTERS_READ_KEPT` lettres lues les plus récentes et toutes les non lues.
- * Les lettres uniques (une par définition) restent: elles ne partent qu'une fois, et leur présence
- * le dit; seules les lettres hebdomadaires (`@`) lues et anciennes s'en vont.
+ * Le courrier garde les `LETTERS_READ_KEPT` lettres lues par les deux les plus récentes. Les
+ * lettres uniques (une par définition) restent: elles ne partent qu'une fois, et leur présence le
+ * dit; seules les lettres hebdomadaires (`@`) s'en vont: lues par les deux et au-delà des
+ * `LETTERS_READ_KEPT`, lues par l'un des deux et plus vieilles que `WEEKLY_LETTER_DAYS`, ou plus
+ * vieilles que `WEEKLY_LETTER_MAX_DAYS` (une commande passée depuis longtemps). Une lettre récente
+ * non lue reste toujours.
  */
 export function pruneLetters(sim: Sim): void {
   const letters = sim.world.letters;
+  const today = sim.world.clock.day;
+  const weekly = (l: (typeof letters)[number]): boolean => l.id.includes('@');
   const read = letters.filter((l) => l.read.length >= 2);
-  if (read.length <= LETTERS_READ_KEPT) return;
-  const old = new Set(
-    read.slice(0, read.length - LETTERS_READ_KEPT).filter((l) => l.id.includes('@')),
-  );
+  const old = new Set(read.slice(0, Math.max(0, read.length - LETTERS_READ_KEPT)).filter(weekly));
+  for (const l of letters) {
+    if (!weekly(l)) continue;
+    const age = today - l.day;
+    if ((age > WEEKLY_LETTER_DAYS && l.read.length >= 1) || age > WEEKLY_LETTER_MAX_DAYS) old.add(l);
+  }
   if (old.size === 0) return;
   sim.world.letters = letters.filter((l) => !old.has(l));
   sim.runtime.changed = true;
