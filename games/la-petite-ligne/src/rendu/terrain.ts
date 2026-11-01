@@ -20,11 +20,13 @@ import type { GameMap, GroundKind, MapProp } from '../etat/carte';
 import { cellIndex, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import { isFord } from './champs';
+import { layFordStones } from './gue';
 import { ShapeBuilder } from './geometrie';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { SharedMaterials } from './materiaux';
 import { paletteUv, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
+import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import type { ResourceTracker } from './ressources';
 import {
   createRiverField,
@@ -399,19 +401,22 @@ export class Terrain {
   }
 
   /**
-   * Pierres plates du gué, espacées, dont le dessus crève la surface (l'eau
-   * passe entre elles): de 5 à 7 côtés, de 30 à 60 cm (bible, 8.7). Chacune
-   * part dans son tronçon par `add`; renvoie leur emprise pour le courant.
+   * Pierres plates du gué (`gue.ts`): ligne de passage d'un chemin à l'autre,
+   * pierres dispersées autour. Chacune part dans son tronçon par `add`;
+   * renvoie l'emprise de celles qui crèvent la surface, pour le courant.
    */
   private placeFordStones(add: (x: number, geometry: BufferGeometry) => void): RiverStone[] {
     const stones = SETTINGS.fordStones;
-    const shapes = stones.sides.map((sides) =>
-      new ShapeBuilder()
-        .cylinder(0.5, 0.5, stones.thickness, [0, 0, 0], 'cobble_dark', {
-          base: true,
-          segments: sides,
-        })
-        .build(),
+    const shapes = new Map(
+      stones.sides.map((sides) => [
+        sides,
+        new ShapeBuilder()
+          .cylinder(0.5, 0.5, stones.thickness, [0, 0, 0], 'cobble_dark', {
+            base: true,
+            segments: sides,
+          })
+          .build(),
+      ]),
     );
     const matrix = new Matrix4();
     const position = new Vector3();
@@ -419,28 +424,30 @@ export class Terrain {
     const euler = new Euler();
     const scale = new Vector3();
     const surfacing: RiverStone[] = [];
-    // Dessus à `protrude` au-dessus de la surface: posées sur le haut-fond du gué.
-    const base = SETTINGS.waterSurface + stones.protrude - stones.thickness;
-    for (const index of this.fords) {
-      const cx = index % this.map.width;
-      const cy = Math.floor(index / this.map.width);
-      stones.perCell.forEach(([ox, oy], slot) => {
-        const shape = shapes[Math.floor(hash2(cx, cy, 71 + slot) * shapes.length)];
-        if (shape === undefined) {
-          return;
-        }
-        const size = stones.minSize + hash2(cx, cy, 81 + slot) * (stones.maxSize - stones.minSize);
-        const x = cx + ox + (hash2(cx, cy, 91 + slot) - 0.5) * stones.jitter;
-        const y = cy + oy + (hash2(cx, cy, 101 + slot) - 0.5) * stones.jitter;
-        const depth = 0.75 + hash2(cx, cy, 121 + slot) * 0.25;
-        position.set(x, base, y);
-        rotation.setFromEuler(euler.set(0, hash2(cx, cy, 111 + slot) * Math.PI * 2, 0));
-        scale.set(size, 1, size * depth);
-        add(x, shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
-        surfacing.push({ x, y, radius: (size * (1 + depth)) / 4 });
-      });
+    const cells = [...this.fords].map((index) => ({
+      cx: index % this.map.width,
+      cy: Math.floor(index / this.map.width),
+    }));
+    const downstream = Math.sign(AMBIANCE_SETTINGS.water.flow[0]) || 1;
+    for (const stone of layFordStones(this.map, cells, downstream)) {
+      const shape = shapes.get(stone.sides);
+      if (shape === undefined) {
+        continue;
+      }
+      // Dessus à `protrude` au-dessus de la surface (posées sur le haut-fond), ou juste dessous.
+      const top =
+        stone.kind === 'flush'
+          ? SETTINGS.waterSurface - stones.flushBelow
+          : SETTINGS.waterSurface + stones.protrude;
+      position.set(stone.x, top - stones.thickness, stone.y);
+      rotation.setFromEuler(euler.set(0, stone.rotation, 0));
+      scale.set(stone.size, 1, stone.size * stone.depth);
+      add(stone.x, shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+      if (stone.kind !== 'flush') {
+        surfacing.push({ x: stone.x, y: stone.y, radius: (stone.size * (1 + stone.depth)) / 4 });
+      }
     }
-    for (const shape of shapes) {
+    for (const shape of shapes.values()) {
       shape.dispose();
     }
     return surfacing;

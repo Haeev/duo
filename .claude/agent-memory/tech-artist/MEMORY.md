@@ -53,6 +53,16 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Écume selon la vraie profondeur: quelques vaguelettes seulement sur une bande de 4 à 6 cm de profondeur; avec 9 bandes, on dessine des courbes de niveau. Un bruit de quelques centimètres sur un haut-fond proche du seuil trace des lignes fines: garder le fond hors de la bande d'écume.
 - Courant à vitesse variable par pixel: jamais `uv - flow * t * vitesse(x)` (le motif se cisaille avec le temps); une couche à vitesse constante, mêlée par un masque.
 - Motifs procéduraux au sol (pavés, galets): un seul tirage par maille (le motif reste dans sa maille, pas de voisins à lire); `fwidth` calculé hors des branches; fondu vers la teinte moyenne quand un pixel dépasse 5 à 10 cm.
-- Pavés posés entiers: lire le masque au milieu du pavé (centre recalculé dans le shader), le bord de la zone suit les joints.
+- Pavés posés entiers: lire le masque au milieu du pavé (centre recalculé dans le shader), le bord de la zone suit les joints. Effet de bord: contour en marches et pavés isolés (revue du tour 8); voir plus bas le bord analytique.
 - Un lit de rivière en un seul maillage coûte tout son quadrillage à chaque image: le couper en tronçons de 12 m (élimination hors du cadre) a ramené le surcoût de 18 000 à 5 000 triangles pour deux ou trois appels de plus.
 - Machine chargée (charge 18): un lot de dix captures prend plus de 10 min; lancer en arrière-plan.
+
+## Correctifs du tour 8 (vérifié le 2026-11-01)
+
+- Une case froide (lauze) à l'ombre le soir reste bleue même sans `shadeTint`: c'est la lumière du ciel elle-même (19 h, bleu-violet) qui bleuit. Retirer la teinte seule: b* de -21 à -16. Il faut aussi neutraliser en partie la lumière du ciel reçue (vers sa luminance) et garder la clarté qu'aurait donnée la teinte entière (bleu sur bleu réfléchit plus: sans compensation, L* perd 1 à 2 points).
+- `half` est un mot réservé en GLSL ES 3.0 (comme `flat`): ne pas nommer une variable ainsi.
+- `hash2(i, g, graineA)` et `hash2(i, g, graineB)` au même `i` entier se suivent: un tirage filtré par l'un biaise l'autre (72 % de pierres « à fleur d'eau » au lieu de 35 %). Tirer le second sur la position (`hash2(x * 17.3, y * 11.1, graine)`).
+- Bord de pavage propre: distance signée analytique dans le shader (anneau, bandes en gélules, demi-plan de la rue), union lisse `max + h² / 4k` pour des raccords arrondis, et une coordonnée le long du bord propre à la forme qui domine (angle pour l'anneau; `t`, puis `t ± demi-largeur x atan` autour des bouts d'une gélule: continu jusqu'à la pointe). Un masque binaire de 4 texels par mètre donne toujours des marches.
+- Bruit `uAmbNoise` (128 px, octaves 8, 16, 32): sur une ligne, valeurs de 0,30 à 0,76, écart type 0,11. Pour une ondulation de ± A: `tanh((n - 0,5) x 7) x A`.
+- Copie isolée: une commande qui contient le mot `git` sous une forme non vérifiable (`--exclude-dir=.git`, variable de boucle passée à `convert`), un préfixe `NODE_PATH=` ou un heredoc vers un fichier est refusée. Contrôle des tirets: `--exclude-dir=.g?t`; planches de captures par un petit script Pillow plutôt qu'une boucle shell; carnet modifié avec l'outil d'édition.
+- `simplifyPath` (simulation) rend des points de passage espacés: pour vérifier qu'un trajet suit une ligne, l'échantillonner tous les 10 cm le long des segments.

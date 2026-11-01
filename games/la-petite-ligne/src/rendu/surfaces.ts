@@ -50,6 +50,12 @@ export const GROUND_CELLS = [
 /** Coefficients de luminance (Rec. 709, linéaire). */
 const LUMA = [0.2126, 0.7152, 0.0722] as const;
 
+/** Bandes pavées de la place que le shader sait lire (au moins une, pour la taille des tableaux). */
+export const PAVE_BANDS = Math.max(
+  1,
+  RENDER_SETTINGS.terrain.square.paved.filter((shape) => shape.kind === 'band').length,
+);
+
 /** Nombre de lumières de sol que le shader sait lire (le plus grand des deux niveaux de détail). */
 export const GLOW_SLOTS = AMBIANCE_SETTINGS.glow.slots;
 
@@ -96,6 +102,20 @@ export interface SurfaceUniforms {
    */
   uPaving: { value: Vector4 };
   uPavingRing: { value: Vector4 };
+  /**
+   * Bord des zones pavées de la place (revue du tour 8), calculé dans le shader:
+   * bandes pavées (a, b en x, z) et leur demi-largeur, rectangle de la place
+   * (x0, z0, x1, z1), puis largeur du rang de boutisses, largeur d'une
+   * boutisse, rayon des raccords (m), présent (1); joint du rang (m), part
+   * vers le ton sombre, facteur de teinte; ondulation de la limite sud de la
+   * terre battue: amplitude, 1 / longueur d'onde, fondu aux bouts (m).
+   */
+  uPaveBands: { value: Vector4[] };
+  uPaveHalf: { value: number[] };
+  uPaveArea: { value: Vector4 };
+  uPaveEdge: { value: Vector4 };
+  uPaveBorderLook: { value: Vector3 };
+  uPaveEarthEdge: { value: Vector3 };
   /** Passe « maquette » (tour 8, réglages `look`): occlusion cuite, ombres teintées, bord, étalonnage. */
   uLookField: { value: Texture | null };
   uLookRect: { value: Vector4 };
@@ -130,6 +150,7 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
   const s = AMBIANCE_SETTINGS.surfaces;
   const w = AMBIANCE_SETTINGS.wind;
   const look = AMBIANCE_SETTINGS.look;
+  const square = RENDER_SETTINGS.terrain.square;
   return {
     uAmbTime: { value: 0 },
     uAmbNoise: { value: noise },
@@ -180,6 +201,22 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
       ),
     },
     uPavingRing: { value: new Vector4(0, 0, 0, 0) },
+    uPaveBands: { value: Array.from({ length: PAVE_BANDS }, () => new Vector4()) },
+    uPaveHalf: { value: Array.from({ length: PAVE_BANDS }, () => -1e3) },
+    uPaveArea: { value: new Vector4(0, 0, 0, 0) },
+    uPaveEdge: {
+      value: new Vector4(square.border.width, square.border.stoneWidth, square.border.fillet, 0),
+    },
+    uPaveBorderLook: {
+      value: new Vector3(s.pavingBorderJoint, s.pavingBorderDark, s.pavingBorderShade),
+    },
+    uPaveEarthEdge: {
+      value: new Vector3(
+        square.earthEdge.amplitude,
+        1 / square.earthEdge.wavelength,
+        square.earthEdge.fade,
+      ),
+    },
     uLookField: { value: null },
     uLookRect: { value: new Vector4(0, 0, 1, 1) },
     uLookHeight: { value: new Vector2(0, 1) },
@@ -310,6 +347,12 @@ uniform vec4 uRiverRect;
 uniform vec4 uRiverParams; // surface de l'eau, hauteur min et étendue codées, étendue du sable
 uniform vec4 uPaving;      // pas d'un rang, longueur d'un pavé, joint, écart de teinte
 uniform vec4 uPavingRing;  // centre (x, z), rayon, présent
+uniform vec4 uPaveBands[${PAVE_BANDS}];  // a (x, z), b (x, z)
+uniform float uPaveHalf[${PAVE_BANDS}];
+uniform vec4 uPaveArea;    // x0, z0, x1, z1 de la place
+uniform vec4 uPaveEdge;    // largeur du rang de bordure, largeur d'une boutisse, rayon des raccords, présent
+uniform vec3 uPaveBorderLook; // joint du rang, part vers le ton sombre, facteur
+uniform vec3 uPaveEarthEdge;  // ondulation de la limite sud: amplitude, 1 / longueur d'onde, fondu aux bouts
 
 float ambHash(vec2 p) {
   return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
@@ -440,6 +483,91 @@ vec3 ambPaving(vec2 xz, float patchNoise, float pixel, out vec2 centre, out floa
   return mix(c, mix(uGroundColors[3], jointColor, 0.18), far);
 }
 
+/** Terre des chemins: teinte claire et sombre mêlées par le bruit des taches. */
+vec3 ambPathColor(float patchNoise) {
+  return mix(uGroundColors[5], uGroundColors[6], smoothstep(0.3, 0.8, patchNoise) * uGroundParams.z * 2.0);
+}
+
+/** Union lisse de deux distances signées (raccord arrondi de rayon k). */
+float ambSmoothMax(float a, float b, float k) {
+  float h = max(k - abs(a - b), 0.0);
+  return max(a, b) + h * h / (4.0 * k);
+}
+
+/**
+ * Distance signée au bord des pavés de la place (m, positive dans les pavés): anneau du
+ * puits, bandes pavées et rue de la Gare au nord, unies en douceur; coupées net au sud
+ * par le chemin si \`south\`. \`border\`: coordonnée des boutisses le long du bord (une
+ * unité par boutisse) et numéro de la forme qui porte le bord.
+ */
+float ambPaveField(vec2 p, bool south, out vec2 border) {
+  float k = uPaveEdge.z;
+  float w = uPaveEdge.y;
+  float d = uPaveArea.y - p.y;
+  float best = d;
+  border = vec2(p.x / w, 0.0);
+  if (uPavingRing.w > 0.0) {
+    vec2 v = p - uPavingRing.xy;
+    float di = uPavingRing.z - length(v);
+    if (di > best) {
+      // Autour du puits: un nombre entier de boutisses sur le cercle.
+      float count = floor(6.2831853 * uPavingRing.z / w + 0.5);
+      border = vec2((atan(v.y, v.x) / 6.2831853 + 0.5) * count, 1.0);
+      best = di;
+    }
+    d = ambSmoothMax(d, di, k);
+  }
+  for (int i = 0; i < ${PAVE_BANDS}; i++) {
+    vec2 a = uPaveBands[i].xy;
+    vec2 ab = uPaveBands[i].zw - a;
+    float len = length(ab);
+    vec2 u = ab / max(len, 1e-4);
+    vec2 v = p - a;
+    float t = dot(v, u);
+    float bandHalf = uPaveHalf[i];
+    float di = bandHalf - length(v - u * clamp(t, 0.0, len));
+    if (di > best) {
+      // Le long des côtés, puis autour des bouts arrondis (continu jusqu'à la pointe).
+      float side = abs(u.x * v.y - u.y * v.x);
+      float along = t < 0.0 ? -bandHalf * atan(-t, side) : (t > len ? len + bandHalf * atan(t - len, side) : t);
+      border = vec2(along / w, float(i) + 2.0);
+      best = di;
+    }
+    d = ambSmoothMax(d, di, k);
+  }
+  if (south && uPaveArea.w - p.y < d) {
+    d = uPaveArea.w - p.y;
+    border = vec2(p.x / w, 9.0);
+  }
+  return d;
+}
+
+/** Rang de bordure: boutisses posées en travers, un ton plus foncées, joints plus larges. */
+vec3 ambPaveBorder(vec2 border, float d, float patchNoise, float pixel) {
+  float stone = floor(border.x);
+  float along = fract(border.x);
+  float hash = ambHash(vec2(stone, border.y + 57.0));
+  float joint = uPaveBorderLook.x;
+  float edge = min(min(along, 1.0 - along) * uPaveEdge.y, uPaveEdge.x - d);
+  vec3 stoneColor = mix(uGroundColors[3], uGroundColors[4], uPaveBorderLook.y + (hash - 0.5) * uPaving.w + patchNoise * 0.08)
+    * uPaveBorderLook.z;
+  stoneColor *= mix(0.88, 1.0, smoothstep(0.0, 0.05, min(edge, d)));
+  vec3 jointColor = mix(uGroundColors[4], uGroundColors[6], 0.4) * 0.72;
+  float jointPart = 1.0 - smoothstep(joint * 0.5 - pixel * 0.5, joint * 0.5 + pixel * 0.5, edge);
+  vec3 c = mix(stoneColor, jointColor, jointPart);
+  float far = smoothstep(0.05, 0.1, pixel);
+  return mix(c, mix(uGroundColors[4], jointColor, 0.2) * uPaveBorderLook.z, far);
+}
+
+/** Ondulation de la limite sud de la terre battue (m, vers le sud), éteinte aux deux bouts de la place. */
+float ambEarthEdge(float x) {
+  float n = texture(uAmbNoise, vec2(x * uPaveEarthEdge.y * 0.125, 0.31)).r;
+  float fade = smoothstep(uPaveArea.x, uPaveArea.x + uPaveEarthEdge.z, x)
+    * (1.0 - smoothstep(uPaveArea.z - uPaveEarthEdge.z, uPaveArea.z, x));
+  // Le bruit tient surtout entre 0,4 et 0,6: on l'étire, en arrondissant les crêtes.
+  return tanh((n - 0.5) * 7.0) * uPaveEarthEdge.x * fade;
+}
+
 /** Terre battue de la place: chemin tassé, plus gris, piqué de petits cailloux. */
 vec3 ambBeatenEarth(vec2 xz, float patchNoise, float pixel) {
   vec3 c = mix(uGroundColors[6], uGroundColors[5], 0.45 + 0.4 * smoothstep(0.25, 0.85, patchNoise));
@@ -517,7 +645,24 @@ const FRAGMENT_GROUND = /* glsl */ `
       diffuseColor.rgb = sand > 0.0 ? mix(green, ambBed(vAmbWorld, river, patchNoise, groundPixel), sand) : green;
     } else if (groundFace && (groundIndex == ${cellIndex('cobble')} || groundIndex == ${cellIndex('cobble_dark')})) {
       vec4 lookAt = texture(uLookField, (vAmbWorld.xz - uLookRect.xy) * uLookRect.zw);
-      if (lookAt.b > 0.05) {
+      vec2 placeAt = vAmbWorld.xz;
+      bool inPlace = uPaveEdge.w > 0.0 && placeAt.x > uPaveArea.x && placeAt.x < uPaveArea.z
+        && placeAt.y > uPaveArea.y - uPaveEdge.x - 0.1 && placeAt.y < uPaveArea.w;
+      if (lookAt.b > 0.05 && inPlace) {
+        // Place: pavés dans les zones pavées, rang de boutisses sur leur bord courbe, terre battue
+        // ailleurs, qui rejoint le chemin du sud sur une limite ondulée.
+        vec2 border;
+        float paveD = ambPaveField(placeAt, true, border);
+        vec2 stoneCentre;
+        float stoneHash;
+        vec3 paved = paveD >= uPaveEdge.x
+          ? ambPaving(placeAt, patchNoise, groundPixel, stoneCentre, stoneHash)
+          : ambPaveBorder(border, paveD, patchNoise, groundPixel);
+        vec3 earth = ambBeatenEarth(placeAt, patchNoise, groundPixel);
+        float edgeZ = uPaveArea.w + ambEarthEdge(placeAt.x);
+        earth = mix(earth, ambPathColor(patchNoise), smoothstep(edgeZ - 0.04, edgeZ + 0.04, placeAt.y));
+        diffuseColor.rgb = mix(earth, paved, smoothstep(-0.5 * groundPixel, 0.5 * groundPixel, paveD));
+      } else if (lookAt.b > 0.05) {
         // Place, rue et quai: pavés posés entiers là où le champ les veut (lu au milieu du pavé), terre battue ailleurs.
         vec2 stoneCentre;
         float stoneHash;
@@ -530,7 +675,17 @@ const FRAGMENT_GROUND = /* glsl */ `
         diffuseColor.rgb = mix(uGroundColors[3], uGroundColors[4], patchNoise * uGroundParams.z);
       }
     } else if (groundFace && pathFace) {
-      vec3 path = mix(uGroundColors[5], uGroundColors[6], smoothstep(0.3, 0.8, patchNoise) * uGroundParams.z * 2.0);
+      vec3 path = ambPathColor(patchNoise);
+      if (uPaveEdge.w > 0.0 && vAmbWorld.x > uPaveArea.x && vAmbWorld.x < uPaveArea.z
+        && vAmbWorld.z >= uPaveArea.w && vAmbWorld.z < uPaveArea.w + uPaveEarthEdge.x + 0.05) {
+        // Au sud de la place: la terre battue déborde par endroits sur le chemin (pas devant les pavés).
+        vec2 border;
+        if (ambPaveField(vec2(vAmbWorld.x, uPaveArea.w - 0.02), false, border) < 0.0) {
+          float edgeZ = uPaveArea.w + ambEarthEdge(vAmbWorld.x);
+          path = mix(ambBeatenEarth(vAmbWorld.xz, patchNoise, groundPixel), path,
+            smoothstep(edgeZ - 0.04, edgeZ + 0.04, vAmbWorld.z));
+        }
+      }
       float sand = ambSand(river, vAmbWorld.xz, groundPixel);
       diffuseColor.rgb = sand > 0.0 ? mix(path, ambBed(vAmbWorld, river, patchNoise, groundPixel), sand) : path;
     }
@@ -574,6 +729,11 @@ if (uLookOcc.x > 0.0) {
 #endif
 `;
 
+/** Test GLSL « la case `lookIndex` est une case froide » (`look.coldCells`). */
+const COLD_CELL_TEST = AMBIANCE_SETTINGS.look.coldCells
+  .map((cell) => `lookIndex == ${cellIndex(cell)}`)
+  .join(' || ');
+
 /** Après `lights_fragment_end`: nuages, reflet du ciel dans les flaques, lumières de sol. */
 const FRAGMENT_LIGHT = /* glsl */ `
 float ambCloud = ambCloudLight(vAmbWorld);
@@ -590,8 +750,25 @@ if (uShadeParams.x > 0.0) {
   float lookSunGot = dot(reflectedLight.directDiffuse, lookLuma);
   float lookCast = 1.0 - clamp(lookSunGot / max(lookSunWanted, 1e-5), 0.0, 1.0);
   float lookShade = max(lookCast * smoothstep(0.0, 0.08, lookNdotL), 1.0 - smoothstep(0.0, 0.2, lookNdotL));
-  reflectedLight.indirectDiffuse *= mix(vec3(1.0), uShadeTint, lookShade * uShadeParams.x)
-    * (1.0 + lookShade * uShadeParams.y);
+  float lookLift = 1.0 + lookShade * uShadeParams.y;
+  vec3 lookSky = reflectedLight.indirectDiffuse * mix(vec3(1.0), uShadeTint, lookShade * uShadeParams.x) * lookLift;
+  #if defined(AMB_GROUND) && defined(USE_MAP)
+  {
+    // Cases déjà froides (lauzes): le bleu du ciel et de la teinte s'ajouterait au leur.
+    // Moins de teinte, lumière du ciel en partie neutre, clarté de la teinte entière un peu relevée.
+    ivec2 lookCell = ivec2(clamp(floor(vMapUv * ${PALETTE_GRID}.0), 0.0, ${PALETTE_GRID - 1}.0));
+    int lookIndex = lookCell.y * ${PALETTE_GRID} + lookCell.x;
+    if (${COLD_CELL_TEST}) {
+      vec3 lookCold = reflectedLight.indirectDiffuse * lookLift
+        * mix(vec3(1.0), uShadeTint, lookShade * uShadeParams.x * ${AMBIANCE_SETTINGS.look.coldShadeKeep.toFixed(3)});
+      float lookColdLuma = dot(lookCold, lookLuma);
+      lookCold = mix(lookCold, vec3(lookColdLuma), lookShade * ${AMBIANCE_SETTINGS.look.coldSkyNeutral.toFixed(3)});
+      lookSky = lookCold * (dot(lookSky, lookLuma) / max(lookColdLuma, 1e-6))
+        * (1.0 + lookShade * ${AMBIANCE_SETTINGS.look.coldShadeLift.toFixed(3)});
+    }
+  }
+  #endif
+  reflectedLight.indirectDiffuse = lookSky;
 }
 #ifdef AMB_LOOK_OCC
 reflectedLight.indirectDiffuse *= lookOcc;
