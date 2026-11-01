@@ -51,6 +51,8 @@ export interface StageScreen {
   linesDone: number;
   linesTotal: number;
   orders: number;
+  /** Chantiers bâtis (tour 9). */
+  chantiers: number;
 }
 
 /** L'écran d'étape ouvert (phase `ended`), ou `null`. */
@@ -72,6 +74,8 @@ export function stageScreen(world: ReadWorld, content: Content): StageScreen | n
     linesDone: world.orderTotals.linesDone,
     linesTotal: world.orderTotals.linesTotal,
     orders: world.orderTotals.orders,
+    // Tour 9: quatrième compteur de l'écran d'étape (`ui.stage.chantiers`).
+    chantiers: Object.values(world.improvements).filter((x) => x.builtDay !== null).length,
   };
 }
 

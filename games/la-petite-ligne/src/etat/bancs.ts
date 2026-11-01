@@ -34,7 +34,8 @@ const benchCache = new WeakMap<GameMap, readonly MapProp[]>();
 export function benchesOf(map: GameMap): readonly MapProp[] {
   let list = benchCache.get(map);
   if (list === undefined) {
-    list = map.props.filter((p) => p.model === BENCH_MODEL);
+    // Les sièges sans modèle (tour 9, le bord du ponton) s'utilisent comme des bancs.
+    list = [...map.props.filter((p) => p.model === BENCH_MODEL), ...(map.seats ?? [])];
     benchCache.set(map, list);
   }
   return list;
@@ -42,6 +43,25 @@ export function benchesOf(map: GameMap): readonly MapProp[] {
 
 export function benchById(map: GameMap, id: string): MapProp | null {
   return benchesOf(map).find((b) => b.id === id) ?? null;
+}
+
+const builtCache = new WeakMap<GameMap, { key: string; list: readonly MapProp[] }>();
+
+/**
+ * Les bancs de la carte, plus ceux des chantiers bâtis (tour 9: le banc du gué, le banc du pignon),
+ * dans l'ordre de `built`.
+ */
+export function benchesWithBuilt(map: GameMap, built: readonly string[]): readonly MapProp[] {
+  const base = benchesOf(map);
+  const all = map.improvements;
+  if (all === undefined || built.length === 0) return base;
+  const key = built.join(',');
+  const cached = builtCache.get(map);
+  if (cached?.key === key) return cached.list;
+  const extra = built.map((id) => all[id]).filter((p): p is NonNullable<typeof p> => p?.model === BENCH_MODEL);
+  const list = extra.length === 0 ? base : [...base, ...extra];
+  builtCache.set(map, { key, list });
+  return list;
 }
 
 function yaw(prop: MapProp): number {

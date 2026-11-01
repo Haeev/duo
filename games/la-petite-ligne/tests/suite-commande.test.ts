@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { seasonOfDay } from '../src/donnees/calendrier';
 import { currentOrder } from '../src/donnees/commandes';
 import type { GeneratedOrderSettings } from '../src/donnees/types';
-import { clashes, composeOrder, inSeason, linePay, nextBudget } from '../src/etat/commande-generee';
+import { clashes, composeOrder, fishCost, inSeason, linePay, nextBudget } from '../src/etat/commande-generee';
 import { unitDraw } from '../src/etat/tirage';
 import type { OrderBook } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
@@ -66,11 +66,13 @@ describe('composition (T8-14, sections 4.4 et 4.5)', () => {
           expect(inSeason(s, p, train), `${where}: ${p.item} de saison`).toBe(true);
           expect(buyable.has(p.item), where).toBe(false);
           expect(line.count, `${where}: ${p.item}`).toBeGreaterThanOrEqual(p.min);
+          // Tour 9 (section 2.11): poissons au coût de la saison, quantités arrondies et plafonnées
+          // (la part suit une quantité ramenée sous le plafond, jamais au-dessus).
+          expect(line.count, `${where}: ${p.item} plafond`).toBeLessThanOrEqual(g.lineMax[p.item] ?? Infinity);
+          if ((g.roundTo[p.item] ?? 1) > 1 && line.count < (g.lineMax[p.item] ?? Infinity)) expect(line.count % (g.roundTo[p.item] ?? 1), where).toBe(0);
           if (p.resource !== 'forage' && p.resource !== 'wood') {
-            expect(line.share, where).toBeCloseTo(
-              (line.count * p.cost) / capacityOf(p.resource),
-              9,
-            );
+            const cost = fishCost(s, p, train) ?? Infinity;
+            expect(line.share, where).toBeLessThanOrEqual((line.count * cost) / capacityOf(p.resource) + 1e-9);
           }
         }
         for (const [family, count] of families)
@@ -198,7 +200,7 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
       expect(result?.amount).toBe(Math.round(expected * 1.25));
       sendLetter(sim, 'coop_recap_generated');
       const letter = sim.world.letters.find((l) => l.id === 'coop_recap_generated@22');
-      expect(letter?.title).toBe('La commande du samedi 22 est partie');
+      expect(letter?.title).toBe('Bilan du samedi 22');
       expect(letter?.text).toContain(`${String(result?.amount)} sous`);
       expect(letter?.text).not.toContain('{');
       // La commande suivante est tirée au départ du train, pour samedi 29, avec un budget plus grand.
@@ -239,7 +241,7 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
         );
         expect(letter, `graine ${String(seed)}, semaine ${String(week)}`).toBeDefined();
         const text = letter?.text ?? '';
-        expect(letter?.title).toBe(`La commande du samedi ${String(order.train)}`);
+        expect(letter?.title).toBe(`Commande pour samedi ${String(order.train)}`);
         expect(text).not.toContain('{');
         expect(text).toContain(`samedi ${String(order.train)}`);
         for (const line of order.lines) expect(text).toContain(String(line.count));

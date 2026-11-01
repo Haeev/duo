@@ -63,6 +63,7 @@ export function drawNextOrder(sim: Sim, today: number): void {
     buyable,
     matureTrees: matureTrees(sim),
     book: world.order,
+    hens: world.hens.length > 0 ? world.hens.length : 3,
   });
   world.order.generated = { number, train, drawnDay: today, lines, budget, lettersSent: [] };
   world.orderIndex = s.order.trains.length;

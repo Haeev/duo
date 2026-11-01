@@ -31,7 +31,7 @@
     "rightClick": "clic droit"
   },
   "title": {
-    "ticket": "Six semaines à la Halte d'Aubrune",
+    "ticket": "Neuf semaines à la Halte d'Aubrune",
     "name": "La Petite Ligne",
     "lead": "La ligne rouvre. Faites revivre la halte, et le train ira plus loin.",
     "start": "Commencer la semaine",
@@ -130,7 +130,11 @@
       "glowworms": "Guette les vers luisants",
       "roe_deer": "Guette la chevrette",
       "kingfisher": "Guette le martin-pêcheur",
-      "mist": "Attend dans la brume"
+      "mist": "Attend dans la brume",
+      "falling_stars": "Guette les étoiles au bout du ponton",
+      "train_salute": "Tient la manivelle de la barrière",
+      "barn_owl": "Guette la dame blanche",
+      "quay_lanterns": "Attend pour allumer la lanterne"
     },
     "watchingAny": "Regarde sans bouger",
     "menus": {

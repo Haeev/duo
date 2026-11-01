@@ -74,6 +74,8 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('buy'), item: Id, count: Count }),
   v.strictObject({ type: v.literal('sell'), ...stack }),
   v.strictObject({ type: v.literal('catalogue_order'), item: Id }),
+  v.strictObject({ type: v.literal('improvement_pay'), improvement: Id, amount: v.nullable(v.pipe(Int, v.minValue(0), v.maxValue(100_000))) }),
+  v.strictObject({ type: v.literal('improvement_planks'), improvement: Id, count: Count }),
   v.strictObject({ type: v.literal('proposal_answer'), proposal: Id, accept: v.boolean() }),
   v.strictObject({ type: v.literal('proposal_withdraw') }),
   v.strictObject({ type: v.literal('crate_deposit'), ...stack }),

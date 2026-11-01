@@ -8,6 +8,10 @@ import { hashState } from '@duo/sdk/sim';
 import { seasonIndexOf, seasonOfDay } from '../../src/donnees/calendrier';
 import type { Content } from '../../src/donnees/types';
 import { clashes, inSeason } from '../../src/etat/commande-generee';
+import { forageAvailableOn, postKindOn } from '../../src/etat/annonces';
+import { catalogueOffers } from '../../src/etat/catalogue';
+import { improvementRemaining, openImprovements } from '../../src/simulation/chantiers';
+import { weekdayOf } from '../../src/donnees/calendrier';
 import { treeGrowth } from '../../src/etat/repousse';
 import { hudSeason, questTitleOf, seasonCard, stageScreen, weatherLabel } from '../../src/etat/semaine';
 import type { CharacterId, Weather, WorldState } from '../../src/etat/types';
@@ -94,7 +98,18 @@ export interface DayRecord {
   firsts: Record<CharacterId, string[]>;
   /** L-12: secondes de simulation dehors en journée, à arroser (et remplir l'arrosoir), à nourrir les poules. */
   care: Record<CharacterId, { outside: number; water: number; feed: number }>;
+  /** L-13 (tour 9): bourse à l'aube; dépenses de la journée par usage; revenus de la journée. */
+  purse: number;
+  spent: Record<SpendKind, number>;
+  income: number;
+  /** L-14: buts ouverts à l'aube, buts nouveaux du jour; but d'épargne (un article ou chantier plus cher que la bourse moins 150). */
+  goals: string[];
+  newGoals: string[];
+  savingGoal: boolean;
 }
+
+/** Usages de l'argent (section 2.12, L-13). */
+export type SpendKind = 'outil' | 'poule' | 'maison' | 'cadeau' | 'chantier' | 'graines' | 'autre';
 
 export interface LongRun {
   name: string;
@@ -122,6 +137,14 @@ export interface LongRun {
   envieProblems: string[];
   /** L-10: chaque passage d'un moment (historique complet, l'état n'en garde qu'une partie). */
   momentPasses: { id: string; day: number; origin: string; seen: boolean }[];
+  /** L-15 (tour 9): annonces affichées, faites ou retirées. */
+  annonces: { gabarit: string; kind: string; day: number; state: string; closedDay: number | null; reward: number }[];
+  /** L-16: achats du catalogue de la semaine; versements et construction des chantiers. */
+  purchases: { item: string; day: number; price: number; by: string }[];
+  improvements: Record<string, { payments: { day: number; amount: number; planks: number }[]; builtDays: number[] }>;
+  /** I-09 et I-10: problèmes constatés (vide: tenu). */
+  boardProblems: string[];
+  economyProblems: string[];
 }
 
 export interface LongOptions {
@@ -198,7 +221,46 @@ function newDay(day: number): DayRecord {
     moment: null,
     firsts: { p1: [], p2: [] },
     care: { p1: { outside: 0, water: 0, feed: 0 }, p2: { outside: 0, water: 0, feed: 0 } },
+    purse: 0,
+    spent: { outil: 0, poule: 0, maison: 0, cadeau: 0, chantier: 0, graines: 0, autre: 0 },
+    income: 0,
+    goals: [],
+    newGoals: [],
+    savingGoal: false,
   };
+}
+
+function spendKind(content: Content, item: string): SpendKind {
+  const def = content.items[item];
+  if (def === undefined) return 'autre';
+  if (def.category === 'tool') return 'outil';
+  if (def.category === 'animal_order') return 'poule';
+  if (def.category === 'gift') return 'cadeau';
+  if (def.category === 'seed') return 'graines';
+  if (def.category === 'furniture' || def.category === 'decoration') return 'maison';
+  return 'autre';
+}
+
+/** Buts ouverts à l'aube (L-14): envie, annonce, commande, chantier ouvert, cadeau en attente. */
+function goalsOf(sim: Sim): string[] {
+  const w = sim.world;
+  const out: string[] = [];
+  for (const c of w.characters) if (c.envie !== null && !c.envie.done) out.push(`envie:${c.envie.id}`);
+  if (w.board.current?.state === 'open') out.push(`annonce:${w.board.current.gabarit}`);
+  if (w.order.generated !== null) out.push(`commande:${String(w.order.generated.train)}`);
+  for (const x of openImprovements(sim)) out.push(`chantier:${x.id}`);
+  for (const g of sim.content.catalogue?.gifts ?? []) {
+    if (w.dialoguesDone.includes(g.wish) && !(g.villager in w.giftsGiven)) out.push(`cadeau:${g.item}`);
+  }
+  for (const o of catalogueOffers(sim.content.settings, sim.content, w)) out.push(`article:${o.item}`);
+  return out;
+}
+
+/** Un but d'épargne (O-12): un article en vente ou un chantier ouvert coûte plus que la bourse moins 150 sous. */
+function savingGoalOf(sim: Sim): boolean {
+  const room = sim.world.purse - 150;
+  if (catalogueOffers(sim.content.settings, sim.content, sim.world).some((o) => o.price > room)) return true;
+  return openImprovements(sim).some((x) => improvementRemaining(sim, x) > room);
 }
 
 export function playLong(options: LongOptions): LongRun {
@@ -231,7 +293,15 @@ export function playLong(options: LongOptions): LongRun {
     unfilled: [],
     envieProblems: [],
     momentPasses: [],
+    annonces: [],
+    purchases: [],
+    improvements: {},
+    boardProblems: [],
+    economyProblems: [],
   };
+  const goalsEver = new Set<string>();
+  const board = content.settings.board;
+  const copies = content.catalogue?.copies ?? {};
   // Mémoires de la partie entière (l'état, borné, oublie).
   const heardEver: Record<CharacterId, Set<string>> = { p1: new Set(), p2: new Set() };
   const enviesEver: Record<CharacterId, Set<string>> = { p1: new Set(), p2: new Set() };
@@ -267,7 +337,67 @@ export function playLong(options: LongOptions): LongRun {
     step(sim, robot.decide(sim));
     ticks++;
     const w = sim.world;
+    if (w.purse < 0 && run.economyProblems.length < 20) run.economyProblems.push(`jour ${String(w.clock.day)}: bourse ${String(w.purse)}`);
     for (const e of sim.events) {
+      // Tour 9: L-13 à L-16, I-09 et I-10.
+      if (e.type === 'bought' && record !== null) {
+        const kind = spendKind(content, e.item);
+        record.spent[kind] += e.price;
+        if (content.items[e.item]?.shop === 'catalogue') run.purchases.push({ item: e.item, day: w.clock.day, price: e.price, by: e.by });
+        const bought = w.catalogueBought[e.item] ?? 0;
+        if (e.item in copies && bought > (copies[e.item] ?? 1)) run.economyProblems.push(`${e.item}: ${String(bought)} exemplaires achetés`);
+        continue;
+      }
+      if (e.type === 'improvement_paid') {
+        if (record !== null) record.spent.chantier += e.amount;
+        (run.improvements[e.improvement] ??= { payments: [], builtDays: [] }).payments.push({ day: w.clock.day, amount: e.amount, planks: e.planks });
+        continue;
+      }
+      if (e.type === 'improvement_built') {
+        const entry = (run.improvements[e.improvement] ??= { payments: [], builtDays: [] });
+        entry.builtDays.push(w.clock.day);
+        const def = content.improvements.find((x) => x.id === e.improvement);
+        const paid = entry.payments.reduce((n, x) => n + x.amount, 0);
+        const planks = entry.payments.reduce((n, x) => n + x.planks, 0);
+        const discount = content.settings.improvements?.plankDiscount ?? 0;
+        if (entry.builtDays.length > 1) run.economyProblems.push(`${e.improvement} bâti deux fois`);
+        if (def !== undefined && paid + planks * discount !== def.price) run.economyProblems.push(`${e.improvement}: ${String(paid)} sous et ${String(planks)} planches pour ${String(def.price)}`);
+        continue;
+      }
+      if (e.type === 'money' || e.type === 'sold') {
+        if (record !== null) record.income += e.type === 'money' ? e.amount : e.price;
+        continue;
+      }
+      if (e.type === 'order_paid') {
+        if (record !== null) record.income += e.amount;
+        continue;
+      }
+      if (e.type === 'annonce_posted') {
+        const a = w.board.current;
+        const def = content.annonces.find((x) => x.id === e.gabarit);
+        if (a === null || def === undefined) continue;
+        const before = [...run.annonces].reverse().find((x) => x.gabarit === e.gabarit);
+        if (before !== undefined && a.posted - before.day < (board?.noRepeatDays ?? 0)) run.boardProblems.push(`${e.gabarit} aux jours ${String(before.day)} et ${String(a.posted)}`);
+        const open = run.annonces.find((x) => x.state === 'open');
+        if (open !== undefined) run.boardProblems.push(`deux annonces en cours: ${open.gabarit} et ${e.gabarit} (jour ${String(a.posted)})`);
+        if (board !== null && postKindOn(board, a.posted) !== def.kind) run.boardProblems.push(`${e.gabarit} un ${String(weekdayOf(a.posted))}e jour de semaine`);
+        for (const line of def.variants[a.variant] ?? []) {
+          for (let d = a.posted; d < a.posted + (board?.deadlineDays ?? 1); d++)
+            if (!forageAvailableOn(content.settings, line.item, d)) run.boardProblems.push(`${e.gabarit}: ${line.item} hors saison le jour ${String(d)}`);
+          const product = g?.products.find((x) => x.item === line.item);
+          if (line.item !== 'plank' && product !== undefined && (w.counters.duo[product.obtained] ?? 0) <= 0) run.boardProblems.push(`${e.gabarit}: ${line.item} jamais obtenu (jour ${String(a.posted)})`);
+        }
+        run.annonces.push({ gabarit: e.gabarit, kind: def.kind, day: a.posted, state: 'open', closedDay: null, reward: a.reward });
+        continue;
+      }
+      if (e.type === 'annonce_done' || e.type === 'annonce_expired') {
+        const open = [...run.annonces].reverse().find((x) => x.gabarit === e.gabarit && x.state === 'open');
+        if (open !== undefined) {
+          open.state = e.type === 'annonce_done' ? 'done' : 'expired';
+          open.closedDay = w.clock.day;
+        }
+        continue;
+      }
       if (e.type === 'order_drawn') {
         const order = w.order.generated;
         if (order === null || g === null) continue;
@@ -500,6 +630,18 @@ export function playLong(options: LongOptions): LongRun {
         first('both', 'premier rejet');
       }
       checkScreens(run, sim);
+      // L-13 et L-14 (tour 9): bourse, buts ouverts et nouveaux, but d'épargne.
+      record.purse = w.purse;
+      record.goals = goalsOf(sim);
+      record.newGoals = record.goals.filter((x) => !x.startsWith('envie:') && !x.startsWith('commande:') && !goalsEver.has(x));
+      for (const x of record.goals) goalsEver.add(x);
+      record.savingGoal = savingGoalOf(sim);
+      // I-09: une affiche chaque dimanche et chaque mercredi dès l'ouverture du tableau (les saisons
+      // qui ont des gabarits de cette sorte: aucun pour l'hiver, hors du contenu de cette version).
+      const postKind = board === null ? null : postKindOn(board, day);
+      const daySeason = seasonOfDay(content.settings, day);
+      const possible = postKind !== null && content.annonces.some((a) => a.kind === postKind && a.seasons.includes(daySeason));
+      if (board !== null && day >= board.fromDay && possible && w.board.current?.posted !== day) run.boardProblems.push(`jour ${String(day)}: pas d'annonce`);
       // Sauvegarde et reprise à chaque aube, en inversant hôte et invité (L-02).
       const snap = snapshotOf(sim);
       const before = hashState(lasting(snap.data));

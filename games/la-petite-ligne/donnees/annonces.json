@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "note": "Petites annonces du tableau du quai (tour 9, docs/jeux/jeu-1/tour-09-conception.md, table 1.3). Textes: textes.json, annonces.<id>. Ordre de la table: il compte pour le tirage (unitDraw, comme tour9_automne.py).",
+  "annonces": [
+    { "id": "odette_shelf", "kind": "help", "giver": "odette", "seasons": ["spring", "summer", "autumn"], "variants": [[{ "item": "radish", "count": 6 }], [{ "item": "carrot", "count": 4 }], [{ "item": "lettuce", "count": 2 }]] },
+    { "id": "firmin_trout", "kind": "help", "giver": "firmin", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "trout", "count": 1 }] },
+    { "id": "basile_planks", "kind": "help", "giver": "basile", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "plank", "count": 6 }] },
+    { "id": "jeanne_chub", "kind": "help", "giver": "jeanne", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "chub", "count": 1 }] },
+    { "id": "odette_eggs", "kind": "help", "giver": "odette", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "egg", "count": 6 }] },
+    { "id": "firmin_soup", "kind": "help", "giver": "firmin", "seasons": ["autumn"], "lines": [{ "item": "vegetable_soup", "count": 1 }] },
+    { "id": "basile_tisane", "kind": "help", "giver": "basile", "seasons": ["spring"], "lines": [{ "item": "dandelion", "count": 6 }] },
+    { "id": "basile_nuts", "kind": "help", "giver": "basile", "seasons": ["autumn"], "lines": [{ "item": "hazelnut", "count": 8 }] },
+    { "id": "odette_blackberries", "kind": "help", "giver": "odette", "seasons": ["summer"], "lines": [{ "item": "blackberry", "count": 10 }] },
+    { "id": "odette_elder", "kind": "help", "giver": "odette", "seasons": ["autumn"], "seasonDays": [1, 10], "lines": [{ "item": "elderberry", "count": 6 }] },
+    { "id": "jeanne_mushroom", "kind": "help", "giver": "jeanne", "seasons": ["summer", "autumn"], "lines": [{ "item": "chanterelle", "count": 1 }] },
+    { "id": "firmin_omelettes", "kind": "help", "giver": "firmin", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "omelette", "count": 2 }] },
+    { "id": "odette_basket", "kind": "together", "giver": "odette", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "carrot", "count": 3 }, { "item": "egg", "count": 3 }] },
+    { "id": "firmin_supper", "kind": "together", "giver": "firmin", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "trout", "count": 1 }, { "item": "lettuce", "count": 1 }] },
+    { "id": "basile_fence", "kind": "together", "giver": "basile", "seasons": ["spring", "summer", "autumn"], "lines": [{ "item": "plank", "count": 4 }], "scene": "basile_fence_scene" },
+    { "id": "jeanne_poem", "kind": "together", "giver": "jeanne", "seasons": ["spring", "summer", "autumn"], "lines": [], "scene": "jeanne_poem_scene", "unique": "jeanne_drawing", "uniqueScene": "jeanne_poem_gift" },
+    { "id": "jeanne_snack", "kind": "together", "giver": "jeanne", "seasons": ["summer"], "lines": [{ "item": "egg", "count": 2 }, { "item": "blackberry", "count": 4 }], "scene": "jeanne_snack_scene" },
+    { "id": "jeanne_snack_nuts", "kind": "together", "giver": "jeanne", "seasons": ["autumn"], "lines": [{ "item": "egg", "count": 2 }, { "item": "hazelnut", "count": 4 }], "scene": "jeanne_snack_nuts_scene" },
+    { "id": "odette_preserves", "kind": "together", "giver": "odette", "seasons": ["autumn"], "lines": [{ "item": "hazelnut", "count": 6 }, { "item": "radish", "count": 6 }], "unique": "elder_jelly" }
+  ]
+}

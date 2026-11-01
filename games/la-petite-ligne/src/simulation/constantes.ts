@@ -45,7 +45,7 @@ export const MINUTES_PER_DAY = 1440;
  * 3: moments rares et secrets (tour 6). 4: souvenirs du carnet (tour 7). 5: la suite après le
  * jour 15 (tour 8: étapes, météo tirée, commande générée, totaux, courrier hebdomadaire).
  */
-export const DATA_SCHEMA = 5;
+export const DATA_SCHEMA = 6;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';

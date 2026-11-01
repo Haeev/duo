@@ -23,7 +23,9 @@ const MAX_STATE_BYTES = 64 * 1024;
  */
 // Tour 6: relevé de 32 à 34 Kio (moments rares et secrets, environ 1,2 Kio de plus); à trancher
 // avec l'architecte (le gros de l'état: `counters` et `countersAtDawn`, 7 Kio à eux deux).
-const ALERT_STATE_BYTES = 34 * 1024;
+// Tour 9: relevé de 34 à 35 Kio (tableau, chantiers, catalogue de la semaine: environ 0,5 Kio de
+// champs vides dès le jour 1); plafond dur de 64 Kio inchangé.
+const ALERT_STATE_BYTES = 35 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */

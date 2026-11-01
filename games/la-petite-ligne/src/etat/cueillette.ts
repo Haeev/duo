@@ -2,7 +2,7 @@
  * Cueillette de la lisière (tour 8, section 5.2): ce qu'un coin vide porte au matin. Pur, tiré par
  * empreinte (`unitDraw`), sans le générateur de la partie: la démo n'en est pas changée.
  */
-import { seasonOfDay } from '../donnees/calendrier';
+import { dayOfSeason, seasonOfDay } from '../donnees/calendrier';
 import type { ForageItem, ForageSettings, Season, Settings } from '../donnees/types';
 import { unitDraw } from './tirage';
 import type { Weather } from './types';
@@ -27,6 +27,7 @@ export function forageCandidates(
   point: string,
   season: Season,
   input: Pick<ForageInput, 'pickedBefore' | 'yesterday'>,
+  seasonDay: number | null = null,
 ): { def: ForageItem; weight: number }[] {
   const corner = forage.points.find((p) => p.point === point);
   if (corner === undefined) return [];
@@ -34,10 +35,11 @@ export function forageCandidates(
   for (const id of corner.items) {
     const def = forage.items.find((i) => i.item === id);
     if (def === undefined || !def.seasons.includes(season) || def.weight <= 0) continue;
+    // Plage de jours de saison (tour 9, le sureau): hors de la plage, hors saison.
+    if (def.days !== null && seasonDay !== null && (seasonDay < def.days[0] || seasonDay > def.days[1])) continue;
     let weight = def.weight;
     if (!input.pickedBefore.has(id)) weight *= forage.unseenFactor;
-    const boost = forage.rainBoost;
-    if (boost !== null && boost.item === id && input.yesterday === 'rain') weight *= boost.factor;
+    for (const boost of forage.rainBoost) if (boost.item === id && input.yesterday === 'rain') weight *= boost.factor;
     out.push({ def, weight });
   }
   return out;
@@ -54,7 +56,7 @@ export function drawForage(
 ): ForageDraw | null {
   const forage = settings.forage;
   if (forage === null || input.day < forage.fromDay) return null;
-  const candidates = forageCandidates(forage, point, seasonOfDay(settings, input.day), input);
+  const candidates = forageCandidates(forage, point, seasonOfDay(settings, input.day), input, dayOfSeason(settings, input.day));
   if (candidates.length === 0) return null;
   if (unitDraw(input.seed, `forage:${point}`, input.day) >= forage.spawnChance) return null;
   const total = candidates.reduce((sum, c) => sum + c.weight, 0);
@@ -80,5 +82,8 @@ export function forageInSeason(
   day: number,
 ): boolean {
   const def = settings.forage?.items.find((i) => i.item === item);
-  return def === undefined || def.seasons.includes(seasonOfDay(settings, day));
+  if (def === undefined) return true;
+  if (!def.seasons.includes(seasonOfDay(settings, day))) return false;
+  const d = dayOfSeason(settings, day);
+  return def.days === null || (d >= def.days[0] && d <= def.days[1]);
 }

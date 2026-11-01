@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { expect } from 'vitest';
 import type { SummerRun } from './aides-ete';
 
-/** I-06: l'état reste sous 48 000 octets à chaque aube. */
-const MAX_STATE_BYTES = 48_000;
+/** I-06: l'état reste sous 52 000 octets à chaque aube (borne du tour 9, section 3.8). */
+const MAX_STATE_BYTES = 52_000;
 
 export function expectSummer(run: SummerRun, name: string): void {
   const where = `${name} (graine ${String(run.seed)})`;

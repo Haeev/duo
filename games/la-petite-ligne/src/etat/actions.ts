@@ -66,6 +66,9 @@ export type Intent =
   | { type: 'buy'; item: ItemId; count: number }
   | { type: 'sell'; item: ItemId; quality: Quality; count: number }
   | { type: 'catalogue_order'; item: ItemId }
+  // Chantiers (tour 9): verser au chantier ouvert (`amount` sous, ou le reste: `null`), apporter des planches à Basile
+  | { type: 'improvement_pay'; improvement: string; amount: number | null }
+  | { type: 'improvement_planks'; improvement: string; count: number }
   | { type: 'proposal_answer'; proposal: string; accept: boolean }
   | { type: 'proposal_withdraw' }
   | { type: 'crate_deposit'; item: ItemId; quality: Quality; count: number }

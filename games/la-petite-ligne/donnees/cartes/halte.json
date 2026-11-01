@@ -523,6 +523,19 @@
     {"id": "forage_edge_03", "x": 30.5, "y": 9.5, "role": "cueillette au bord du bois", "cueillette": true, "important": true},
     {"id": "forage_edge_04", "x": 35.5, "y": 9.5, "role": "cueillette au bord du bois", "cueillette": true, "important": true},
     {"id": "forage_edge_05", "x": 38.5, "y": 9.5, "role": "cueillette au bord du bois", "cueillette": true, "important": true},
+    {"id": "forage_edge_06", "x": 33.5, "y": 9.5, "role": "cueillette: les grappes du sureau, au pied du buisson, côté chemin", "cueillette": true, "important": true},
+    {"id": "lantern_quay", "x": 48.5, "y": 18.5, "role": "place de l'allumeur, à l'est de la lanterne du bout du quai", "cap_degres": 270},
+    {"id": "lantern_square", "x": 35.5, "y": 24.5, "role": "place de l'allumeur, à l'est du lampadaire nord de la place, près de l'épicerie", "cap_degres": 270},
+    {"id": "well_shelter", "x": 38.5, "y": 28.0, "role": "contre la margelle ouest du puits, sous son toit une fois bâti (Jeanne les jours de pluie)"},
+    {"id": "hopscotch", "x": 45.5, "y": 29.5, "role": "la marelle de Jeanne (1 x 3 m, cases 45 de y 28 à 30), où elle joue le soir"},
+    {"id": "ford_bench", "x": 24.0, "y": 36.5, "role": "le banc du gué (chantier `ford_bench`), rive nord, tourné vers l'eau", "portee": 1.5},
+    {"id": "house_bench", "x": 12.5, "y": 23.0, "role": "le banc contre le pignon est de la maisonnette (chantier `house_bench`), tourné vers l'est", "portee": 1.5},
+    {"id": "path_lamp", "x": 14.5, "y": 27.5, "role": "sur le chemin, au pied du réverbère (chantier `path_lamp`, case 14, 26)"},
+    {"id": "stars_water", "x": 45.0, "y": 40.6, "role": "l'eau au pied du ponton, où se reflètent les étoiles"},
+    {"id": "pontoon_seat_west", "x": 44.55, "y": 39.8, "role": "place ouest au bord du ponton, jambes au-dessus de l'eau", "cap_degres": 180},
+    {"id": "pontoon_seat_east", "x": 45.45, "y": 39.8, "role": "place est au bord du ponton, jambes au-dessus de l'eau", "cap_degres": 180},
+    {"id": "gate_north_crank", "x": 15.6, "y": 11.5, "role": "manivelle de la barrière nord, sur le chemin à l'ouest du poteau", "cap_degres": 90},
+    {"id": "gate_south_crank", "x": 21.4, "y": 15.5, "role": "manivelle de la barrière sud, au bout du quai à l'est du poteau", "cap_degres": 270},
     {"id": "village_exit", "x": 61.5, "y": 34.5, "role": "bout de la promenade: les habitants qui rentrent chez eux hors carte (`offstage`) y disparaissent", "rotation": 1}
   ],
   "zones": [
@@ -556,7 +569,20 @@
   "accroches": [
     {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 50.732, "y": 5.4, "z": 2.425, "regarde": "est", "penche_degres": 25, "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe est-ouest); redressé par le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce (rayon du tronc 0,21 à 0,23 m à cette hauteur); le centre de la caisse est 0,09 m devant (x 50,822) et 0,175 m dessous (2,25 m)"},
     {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 50.915, "y": 4.996, "z": 2.67, "regarde": "est", "role": "chicot de 0,6 m sur la face nord-est du chêne, sous le houppier, au-dessus du nichoir (il entre dans l'écorce vers 2,3 m, 7 cm au nord du nichoir penché): perchoir des mésanges"},
-    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 1.11, "echelle": 1.168, "role": "pieu d'amarrage dans l'eau au coin est du bout du ponton, sommet 0,45 m au-dessus du plancher (1,11 m au-dessus de l'eau)"}
+    {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 1.11, "echelle": 1.168, "role": "pieu d'amarrage dans l'eau au coin est du bout du ponton, sommet 0,45 m au-dessus du plancher (1,11 m au-dessus de l'eau)"},
+    {"id": "level_crossing_crank_n", "modele": "level_crossing_crank", "sur": "level_crossing_gate_north", "x": 16.3, "y": 11.5, "z": 1.0, "regarde": "ouest", "role": "manivelle de la barrière nord, face ouest du poteau (16,5 ; 11,5), vers la place `gate_north_crank`"},
+    {"id": "level_crossing_crank_s", "modele": "level_crossing_crank", "sur": "level_crossing_gate_south", "x": 20.7, "y": 15.5, "z": 1.0, "regarde": "est", "role": "manivelle de la barrière sud, face est du poteau (20,5 ; 15,5), vers la place `gate_south_crank`"}
+  ],
+  "sieges": [
+    {"id": "pontoon_edge", "x": 45.0, "y": 39.8, "rotation": 0, "places": ["pontoon_seat_west", "pontoon_seat_east"], "role": "le bord du ponton (étoiles de l'Aubrune): deux places tournées vers le sud, assis à 0,5 m, jambes au-dessus de l'eau; on se relève vers le nord, sur le plancher"}
+  ],
+  "chantiers": [
+    {"id": "ford_bench", "type": "bench", "x": 24.0, "y": 36.5, "rotation": 0, "rect": {"x": 23, "y": 36, "w": 2, "h": 1}, "cases": [[23, 36], [24, 36]], "role": "banc à deux places sur la rive nord du gué, tourné vers l'eau (au sud): 2 m à l'est du point de pêche nord (21,5 ; 37,5), hors du chemin du gué (x 17 à 19); la clôture de la rive occupe l'ouest"},
+    {"id": "quay_planters", "type": "quay_planter", "x": 25.5, "y": 18.5, "rotation": 0, "rect": null, "cases": [[25, 18], [34, 18], [49, 18]], "role": "trois jardinières au bord sud du quai, côté place, en (25, 18), (34, 18) et (49, 18): jamais devant la porte de la voiture (38,5 ; 17,5), ni sur les passages vers la place (x 30 et 31, x 43 et 44), ni contre le panneau de la gare (x 45 et 46)"},
+    {"id": "well_roof", "type": "well_roof", "x": 40.0, "y": 28.0, "rotation": 0, "rect": {"x": 39, "y": 27, "w": 2, "h": 2}, "cases": [], "role": "toit de tuiles à deux pans sur quatre poteaux, au-dessus de la margelle du puits (déjà infranchissable): faîte à 2,4 m, treuil; il ne déborde pas de la margelle"},
+    {"id": "path_lamp", "type": "lamp_post", "x": 14.5, "y": 26.5, "rotation": 0, "rect": {"x": 14, "y": 26, "w": 1, "h": 1}, "cases": [[14, 26]], "role": "réverbère au bord nord du chemin de la maisonnette: le tronçon le plus sombre du retour de la place (le lampadaire du passage à niveau est à 9 m); à 31 m du ponton, qui reste sombre"},
+    {"id": "house_bench", "type": "bench", "x": 12.5, "y": 23.0, "rotation": 1, "rect": {"x": 12, "y": 22, "w": 1, "h": 2}, "cases": [[12, 22], [12, 23]], "role": "banc contre le pignon est de la maisonnette, tourné vers l'est: entre le mur (x 11) et le chemin (x 13), sans le toucher; soleil du matin, chemin du quai, passage des trains"},
+    {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": null, "cases": [], "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"}
   ],
   "habitants": {
     "source": "games/la-petite-ligne/donnees/habitants.json fait foi pour les heures; ce résumé dit où",

@@ -476,6 +476,39 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                            f"par exemple {sorted(poches)[:5]}")
         resultats[f"atteintes {nom_cas}"] = len(atteint)
 
+    # 4 bis. Chantiers du tour 9: leurs cases sont libres de tout décor (réservées), et une fois tous bâtis,
+    # ils ne coupent le chemin d'aucun point.
+    chantiers = carte.get("chantiers", [])
+    occupees = {}
+    for o in carte["objets"]:
+        if types[o["type"]]["categorie"] == "sol":
+            continue
+        x0, y0, w, h = emprise_monde(o, types)
+        for y in range(y0, y0 + h):
+            for x in range(x0, x0 + w):
+                occupees[(x, y)] = o["id"]
+    bati = [ligne[:] for ligne in libre]
+    for ch in chantiers:
+        for x, y in ch.get("cases", []):
+            if not libre[y][x]:
+                rapport.erreur(f"chantier {ch['id']}: case ({x}, {y}) déjà infranchissable")
+            if (x, y) in occupees:
+                rapport.erreur(f"chantier {ch['id']}: case ({x}, {y}) déjà occupée par {occupees[(x, y)]}")
+            bati[y][x] = False
+    if chantiers:
+        sources = [c for pid in depart for c in lieux.cases(pid, bati)]
+        atteint = dijkstra(bati, sources)
+        for p in carte["points"]:
+            cases = lieux.cases(p["id"], bati)
+            if not cases:
+                rapport.erreur(f"[chantiers bâtis] point {p['id']}: aucune case franchissable pour s'y tenir")
+            elif not any(c in atteint for c in cases):
+                rapport.erreur(f"[chantiers bâtis] point {p['id']}: inatteignable à pied depuis l'apparition")
+        poches = {(x, y) for y in range(haut) for x in range(larg) if bati[y][x]} - set(atteint)
+        if poches:
+            rapport.erreur(f"[chantiers bâtis] {len(poches)} cases isolées, par exemple {sorted(poches)[:5]}")
+        resultats["atteintes chantiers bâtis"] = len(atteint)
+
     # Portes dégagées
     for o in carte["objets"]:
         t = types[o["type"]]

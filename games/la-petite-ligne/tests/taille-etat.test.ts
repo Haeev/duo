@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { Sim } from '../src/simulation/contexte';
 import { character, point, wrapWorld } from '../src/simulation/contexte';
 import { MINUTES_PER_DAY } from '../src/simulation/constantes';
-import { foldOldHeard, pickDialogue } from '../src/simulation/dialogues';
+import { foldOldHeard, heardAt, pickDialogue } from '../src/simulation/dialogues';
 import { compactEnvieHistory } from '../src/simulation/envies';
 import { morning } from '../src/simulation/horloge';
 import { ITEM, POINT } from '../src/simulation/ids';
@@ -60,35 +60,46 @@ describe("historique des envies compacté (QA8-02)", () => {
 });
 
 describe('mémoire des répliques compactée (QA8-02)', () => {
-  it('les rangs remplacent les vieilles heures sans changer aucun tirage', () => {
+  it('tour 9: les vieilles heures passent dans un ensemble de bits, toutes à égalité; les récentes et les jamais entendues ne changent pas', () => {
+    const dated = content.settings.dialogues.datedRepeatDays;
     for (const day of [30, 45, 60, 84]) {
       const sim = atDay(day);
       const rng = createRandom([day, 2, 3, 4]);
-      // Chaque réplique entendue à une heure tirée, parfois la même pour deux (égalités).
-      const stamps = [1, 2, 3].map(() => (1 + rng.int(0, day - 1)) * MINUTES_PER_DAY + rng.int(0, 1000));
       for (const who of ['p1', 'p2'] as const) {
         for (const d of Object.values(content.dialogues)) {
+          if (d.kind !== 'daily' && d.once !== null) continue;
           if (rng.float(0, 1) < 0.2) continue;
-          sim.world.heard[who][d.id] = rng.float(0, 1) < 0.1 ? rng.pick(stamps) : (1 + rng.int(0, day - 1)) * MINUTES_PER_DAY + rng.int(0, 1000);
+          sim.world.heard[who][d.id] = (1 + rng.int(0, day - 1)) * MINUTES_PER_DAY + rng.int(0, 1000);
         }
       }
       const folded = wrapWorld(content, map, structuredClone(sim.world));
       foldOldHeard(folded);
-      const changed = Object.keys(folded.world.heard.p1).filter((id) => folded.world.heard.p1[id] !== sim.world.heard.p1[id]);
-      if (day > 30) expect(changed.length).toBeGreaterThan(0);
+      const oldBefore = (day - dated + 1) * MINUTES_PER_DAY;
+      for (const who of ['p1', 'p2'] as const) {
+        for (const d of Object.values(content.dialogues)) {
+          const at = sim.world.heard[who][d.id];
+          const expected = at === undefined ? undefined : at < oldBefore ? 0 : at;
+          expect(heardAt(folded, who, d.id), `jour ${String(day)}, ${who}, ${d.id}`).toBe(expected);
+        }
+      }
+      const size = (w: typeof sim.world): number => JSON.stringify([w.heard, w.heardOld]).length;
+      if (day > 30) expect(size(folded.world)).toBeLessThan(size(sim.world));
+      // Une réplique jamais entendue passe toujours avant une vieille (le tirage « la moins récente »).
       for (let i = 0; i < 25; i++) {
         for (const v of content.villagers) {
           for (const who of ['p1', 'p2'] as const) {
             sim.rng.setState([i + 1, day, 3, 4]);
             folded.rng.setState([i + 1, day, 3, 4]);
-            expect(pickDialogue(folded, v.id, who)?.id, `jour ${String(day)}, ${v.id}, ${who}`).toBe(pickDialogue(sim, v.id, who)?.id);
+            const before = pickDialogue(sim, v.id, who);
+            const after = pickDialogue(folded, v.id, who);
+            if (before !== null && sim.world.heard[who][before.id] === undefined) expect(heardAt(folded, who, after?.id ?? ''), `jour ${String(day)}, ${v.id}`).toBeUndefined();
           }
         }
       }
-      // Relancé le lendemain, le compactage ne change pas un ordre déjà compacté.
-      const again = structuredClone(folded.world.heard);
+      // Relancé le lendemain, le compactage ne change pas un état déjà compacté.
+      const again = structuredClone([folded.world.heard, folded.world.heardOld]);
       foldOldHeard(folded);
-      expect(folded.world.heard).toEqual(again);
+      expect([folded.world.heard, folded.world.heardOld]).toEqual(again);
     }
   });
 

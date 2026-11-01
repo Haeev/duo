@@ -235,6 +235,65 @@ const ITEMS: Record<string, Builder> = {
   },
   fishing_rod: (b) =>
     b.cylinder(0.01, 0.02, 1.6, [0, 0, 0], 'wood_new', { base: true, segments: 4 }),
+  // Tour 9: outils améliorés, cadeaux, cueillettes d'automne (substituts en attendant l'artiste).
+  watering_can_copper: (b) => {
+    b.cylinder(0.12, 0.13, 0.22, [0, 0, 0], 'brass', { base: true });
+    b.cylinder(0.015, 0.02, 0.24, [0, 0.17, 0.15], 'brass', { rotation: [55, 0, 0], segments: 5 });
+    b.box([0.02, 0.13, 0.13], [0, 0.26, -0.02], 'brass', {});
+  },
+  axe_forged: (b) => {
+    b.cylinder(0.02, 0.02, 0.82, [0, 0, 0], 'wood_dark', { base: true, segments: 5 });
+    b.box([0.04, 0.14, 0.19], [0, 0.75, 0.07], 'iron', {});
+  },
+  fishing_rod_bamboo: (b) => {
+    b.cylinder(0.01, 0.022, 1.7, [0, 0, 0], 'straw', { base: true, segments: 4 });
+    for (const y of [0.4, 0.8, 1.2]) b.cylinder(0.026, 0.026, 0.03, [0, y, 0], 'wood_dark', { base: true, segments: 4 });
+  },
+  hen_crate: (b) => {
+    b.box([0.6, 0.45, 0.45], [0, 0, 0], 'wood_new', { base: true });
+    b.box([0.5, 0.3, 0.02], [0, 0.08, 0.23], 'straw', { base: true });
+  },
+  chalk_box: (b) => {
+    b.box([0.2, 0.05, 0.12], [0, 0, 0], 'paper', { base: true });
+    for (const [x, c] of [[-0.06, 'flower_red'], [0, 'flower_yellow'], [0.06, 'flower_blue']] as const) b.box([0.02, 0.02, 0.1], [x, 0.05, 0], c, { base: true });
+  },
+  coffee_mill: (b) => {
+    b.box([0.16, 0.16, 0.16], [0, 0, 0], 'wood_dark', { base: true });
+    b.cylinder(0.06, 0.08, 0.08, [0, 0.16, 0], 'brass', { base: true, segments: 8 });
+    b.box([0.02, 0.02, 0.14], [0.04, 0.26, 0], 'iron', { base: true });
+  },
+  leather_apron: (b) => b.box([0.4, 0.02, 0.5], [0, 0, 0], 'wood_old_dark', { base: true }),
+  wool_scarf: (b) => {
+    b.box([0.12, 0.03, 0.5], [0, 0, 0], 'fabric_red', { base: true });
+    b.box([0.12, 0.031, 0.06], [0, 0, 0.1], 'fabric_cream', { base: true });
+  },
+  elder_jelly: (b) => {
+    b.cylinder(0.05, 0.05, 0.1, [0, 0, 0], 'glass', { base: true, segments: 8 });
+    b.cylinder(0.045, 0.045, 0.08, [0, 0.005, 0], 'blackberry', { base: true, segments: 8 });
+    b.cylinder(0.055, 0.055, 0.02, [0, 0.1, 0], 'fabric_red', { base: true, segments: 8 });
+  },
+  cep: (b) => {
+    for (const [x, z, h] of [
+      [0, 0, 0.2],
+      [0.09, 0.04, 0.15],
+      [-0.07, 0.06, 0.12],
+    ] as const) {
+      b.cylinder(0.035, 0.045, h, [x, 0, z], 'fabric_cream', { base: true, segments: 6 });
+      b.ball(0.07, [x, h, z], 'wood', { scale: [1, 0.55, 1] });
+    }
+  },
+  elderberry: (b) => {
+    b.cylinder(0.008, 0.008, 0.25, [0, 0, 0], 'paint_red', { base: true, segments: 4 });
+    for (const [x, z] of [
+      [0, 0],
+      [0.04, 0.02],
+      [-0.03, 0.03],
+      [0.02, -0.04],
+      [-0.04, -0.02],
+    ] as const) {
+      b.ball(0.025, [x, 0.25, z], 'black');
+    }
+  },
   bread: (b) =>
     b.ball(0.12, [0, 0.08, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.7, 1] }),
   dish_radishes: (b) => {
@@ -351,6 +410,40 @@ const FURNITURE: Record<string, Builder> = {
     b.box([0.9, 0.04, 0.04], [0, 1.85, -0.42], 'wood', { base: true });
     b.box([0.38, 1.1, 0.03], [-0.25, 0.75, -0.42], 'fabric_rose', { base: true });
     b.box([0.38, 1.1, 0.03], [0.25, 0.75, -0.42], 'fabric_rose', { base: true });
+  },
+  // Tour 9: objets muraux et fauteuil (au mur: bord arrière de la case, -Z).
+  straw_hat: (b) => {
+    b.cylinder(0.2, 0.2, 0.02, [0, 1.4, -0.44], 'straw', { rotation: [90, 0, 0], segments: 10 });
+    b.cylinder(0.1, 0.1, 0.08, [0, 1.4, -0.42], 'straw_dark', { rotation: [90, 0, 0], segments: 8 });
+  },
+  pressed_flowers: (b) => {
+    b.box([0.4, 0.5, 0.03], [0, 1.15, -0.47], 'wood', { base: true });
+    b.box([0.32, 0.42, 0.01], [0, 1.19, -0.45], 'paper', { base: true });
+    b.ball(0.03, [-0.06, 1.42, -0.44], 'flower_pink');
+    b.ball(0.03, [0.06, 1.32, -0.44], 'flower_blue');
+  },
+  coop_calendar: (b) => {
+    b.box([0.34, 0.48, 0.01], [0, 1.1, -0.47], 'paper', { base: true });
+    b.box([0.3, 0.2, 0.012], [0, 1.34, -0.465], 'sepia', { base: true });
+  },
+  wall_clock: (b) => {
+    b.cylinder(0.17, 0.17, 0.05, [0, 1.6, -0.45], 'wood_dark', { rotation: [90, 0, 0], segments: 12 });
+    b.cylinder(0.14, 0.14, 0.01, [0, 1.6, -0.42], 'paper', { rotation: [90, 0, 0], segments: 12 });
+  },
+  autumn_wreath: (b) => {
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      b.ball(0.06, [Math.cos(a) * 0.15, 1.45 + Math.sin(a) * 0.15, -0.45], i % 2 === 0 ? 'leaf_oak' : 'paint_red');
+    }
+  },
+  jeanne_drawing: (b) => {
+    b.box([0.42, 0.3, 0.005], [0, 1.25, -0.47], 'paper', { base: true });
+    b.box([0.3, 0.08, 0.006], [0, 1.22, -0.468], 'loco_green', { base: true });
+  },
+  wicker_armchair: (b) => {
+    b.box([0.55, 0.36, 0.55], [0, 0, 0], 'straw', { base: true });
+    b.box([0.55, 0.5, 0.08], [0, 0.36, -0.24], 'straw_dark', { base: true });
+    for (const sx of [-1, 1]) b.box([0.07, 0.2, 0.5], [sx * 0.26, 0.36, 0], 'straw_dark', { base: true });
   },
   // Cadre au mur: comme le modèle de l'artiste, accroché au bord arrière de la case (-Z), à hauteur d'yeux.
   picture_frame: (b) => {

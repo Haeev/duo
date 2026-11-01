@@ -22,6 +22,9 @@ import { morningForage, morningTrees } from './lisiere';
 import { pruneLetters } from './semaine';
 import { tidyGround } from './rangement';
 import { foldOldHeard } from './dialogues';
+import { morningBoard } from './annonces';
+import { morningImprovements } from './chantiers';
+import { catalogueClock } from './catalogue';
 import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
@@ -112,6 +115,7 @@ export function updateClock(sim: Sim, dt: number): void {
 function timeTriggers(sim: Sim, before: number, after: number): void {
   const s = sim.content.settings.clock;
   trainClock(sim, before, after);
+  catalogueClock(sim, before, after);
   deliverScheduledLetters(sim);
   for (const hint of sim.content.hints) {
     if (hint.trigger.on === 'time_reached' && crossed(before, after, hint.trigger.time)) {
@@ -154,9 +158,9 @@ export function nightChoice(sim: Sim, id: 'p1' | 'p2', choice: 'continue' | 'fin
   if (finish) emit(sim, { type: 'session_finish' });
 }
 
+/** L'aube: rien de gagné depuis (`countersToday`); les compteurs eux-mêmes ne bougent pas. */
 function copyCounters(sim: Sim): void {
-  const c = sim.world.counters;
-  sim.world.countersAtDawn = { duo: { ...c.duo }, p1: { ...c.p1 }, p2: { ...c.p2 } };
+  sim.world.countersToday = { duo: {}, p1: {}, p2: {} };
 }
 
 /** Le matin (TE-04): besoins de la nuit, pousse, œufs, courrier, envies, petit-déjeuner. */
@@ -199,6 +203,9 @@ export function morning(sim: Sim): void {
   pruneLetters(sim);
   foldOldHeard(sim);
   deliverScheduledLetters(sim);
+  // Tour 9: ce que Basile a bâti dans la nuit, puis l'annonce du jour (dimanche, mercredi).
+  morningImprovements(sim);
+  morningBoard(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
   morningMoments(sim);

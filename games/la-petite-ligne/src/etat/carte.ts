@@ -50,6 +50,11 @@ export interface MapProp {
  * Petit objet accroché à un objet de la carte (`accroches` de la carte: nichoir, chicot, pieu): sans
  * emprise ni collision, posé par le rendu sur son support.
  */
+export interface MapImprovement extends MapProp {
+  /** Cases occupées une fois bâti (vide: sans emprise au sol). */
+  cells: Cell[];
+}
+
 export interface MapHook {
   id: string;
   model: string;
@@ -100,6 +105,16 @@ export interface GameMap {
   props: MapProp[];
   /** Meubles déjà posés au début (paillasses, coffre, réchaud): coin nord-ouest et quarts de tour. */
   startFurniture: { item: string; cell: Cell; rotation: number }[];
+  /**
+   * Sièges sans modèle (tour 9: le bord du ponton): des bancs où s'asseoir, sans objet dessiné ni
+   * emprise. Absent: aucun.
+   */
+  seats?: MapProp[];
+  /**
+   * Chantiers (tour 9), par identifiant de `chantiers.json`: le modèle posé une fois bâti, sa place,
+   * ses cases (qui bloquent alors le passage). Rien n'est posé ni bloqué avant. Absent: aucun.
+   */
+  improvements?: Record<string, MapImprovement>;
 }
 
 /** Index d'une case dans les tableaux `ground` et `blocked`. */

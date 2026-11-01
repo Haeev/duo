@@ -5,15 +5,22 @@
 import type { Character, Vec2 } from '../etat/types';
 import { type Sim, bump, emit, sayIfWritten, secondsToTicks } from './contexte';
 import { spend } from './besoins';
-import { ITEM } from './ids';
 import { giveToCharacter, heldItem } from './sac';
 import { seasonOfDay } from '../donnees/calendrier';
 
 /** Pas d'échantillonnage du regard vers l'eau (m). */
 const LOOK_STEP = 0.5;
 
-export function holdsRod(c: Character): boolean {
-  return heldItem(c) === ITEM.fishingRod;
+/** Tient une canne (la canne de départ ou une canne améliorée, même `toolKind`). */
+export function holdsRod(sim: Pick<Sim, 'content'>, c: Character): boolean {
+  const held = heldItem(c);
+  return held !== null && (sim.content.items[held]?.tool?.toolKind ?? null) === 'fishing_rod';
+}
+
+/** Valeurs de la canne tenue (tour 9: la canne en bambou attend moins et laisse plus de temps pour ferrer). */
+function rodStats(sim: Sim, c: Character): { wait: number; hook: number | null } {
+  const tool = sim.content.items[heldItem(c) ?? '']?.tool ?? null;
+  return { wait: tool?.biteWaitFactor ?? 1, hook: tool?.hookWindowSeconds ?? null };
 }
 
 /** Premier point d'eau devant le personnage, à portée de lancer, ou `null`. */
@@ -86,7 +93,7 @@ export function fishAct(sim: Sim, c: Character): void {
   const bobber = waterAhead(sim, c);
   if (bobber === null) return;
   const [min, max] = fishing.biteWaitSeconds;
-  const wait = sim.rng.float(min, max) * biteWaitFactor(sim);
+  const wait = sim.rng.float(min, max) * biteWaitFactor(sim) * rodStats(sim, c).wait;
   c.fishing = { phase: 'waiting', bobber, biteAt: sim.world.tick + secondsToTicks(wait), until: 0 };
   c.facing = Math.atan2(bobber.y - c.pos.y, bobber.x - c.pos.x);
   spend(sim, c, 'fish_cast');
@@ -98,7 +105,7 @@ export function updateFishing(sim: Sim, c: Character): void {
   const fishing = sim.content.settings.fishing;
   const line = c.fishing;
   if (line === null || fishing === null) return;
-  if (c.speed > 0 || c.status !== 'active' || !holdsRod(c)) {
+  if (c.speed > 0 || c.status !== 'active' || !holdsRod(sim, c)) {
     c.fishing = null;
     sim.runtime.changed = true;
     return;
@@ -106,7 +113,7 @@ export function updateFishing(sim: Sim, c: Character): void {
   const tick = sim.world.tick;
   if (line.phase === 'waiting' && tick >= line.biteAt) {
     line.phase = 'bite';
-    line.until = tick + secondsToTicks(fishing.hookWindowSeconds);
+    line.until = tick + secondsToTicks(rodStats(sim, c).hook ?? fishing.hookWindowSeconds);
     emit(sim, { type: 'bite', by: c.id });
   } else if (line.phase === 'bite' && tick > line.until) {
     c.fishing = null;

@@ -3,6 +3,7 @@
  * fonctions pures sur l'état, testées dans Node.
  */
 import { catalogueWindow, onSale } from '../donnees/commandes';
+import { rawText } from '../donnees/contenu';
 import type { ItemDef } from '../donnees/types';
 import type { ItemStack, Quality, ReadonlyWorld } from '../etat/types';
 import { UI_SETTINGS } from './config';
@@ -401,7 +402,8 @@ export interface ProposalModel {
   /** « un matelas » (article indéfini des textes, sinon le nom seul). */
   itemText: string;
   price: number;
-  source: 'grocery' | 'catalogue';
+  /** `improvement` (tour 9): un versement à un chantier, `item` est le chantier. */
+  source: 'grocery' | 'catalogue' | 'improvement';
   by: string;
   byName: string;
 }
@@ -419,7 +421,7 @@ export function proposalModels(world: ReadonlyWorld, ctx: UiContext): ProposalMo
     mine: p.by === ctx.me,
     item: p.purchase.item,
     icon: itemIcon(ctx, p.purchase.item),
-    itemText: indefiniteItem(ctx, p.purchase.item),
+    itemText: p.purchase.source === 'improvement' ? (rawText(ctx.content.texts, 'chantiers', p.purchase.item, 'name') ?? p.purchase.item) : indefiniteItem(ctx, p.purchase.item),
     price: p.price,
     source: p.purchase.source,
     by: p.by,

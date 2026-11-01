@@ -245,9 +245,10 @@ describe('règles de tirage du tour 7: sans effet sur la démo', () => {
     sim.world.clock.day = 24;
     expect(cooldownOf(sim, kingfisher)).toBe(s.cooldownDaysLong);
     expect(drawWeight(sim, kingfisher)).toBe(kingfisher.weight * s.unseenWeightFactor);
-    // Été (jours 22 à 42): héron, renard, vers luisants, chevrette, martin-pêcheur, brume (les autres moments du tour 7 ne sont pas encore écrits).
-    expect(seasonPool(sim)).toBe(6);
-    expect(dailyChanceOf(sim)).toBeCloseTo(s.dailyChance * (6 / s.seasonPoolFull), 9);
+    // Été (jours 22 à 42): héron, renard, vers luisants, chevrette, martin-pêcheur, brume, et les étoiles
+    // (tour 9; le salut, moment du train, ne compte pas); `seasonPoolFull` à 7 depuis le tour 9.
+    expect(seasonPool(sim)).toBe(7);
+    expect(dailyChanceOf(sim)).toBeCloseTo(s.dailyChance * Math.min(1, 7 / s.seasonPoolFull), 9);
   });
 });
 

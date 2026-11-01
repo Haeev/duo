@@ -134,6 +134,8 @@ const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
   feed: 'sow',
   pickup: 'harvest',
   refill: 'water',
+  // Tour 9 (les lanternes): la perche levée (`pole_raise` quand l'artiste l'aura livré).
+  light: 'give',
 };
 
 /** Actions pendant lesquelles l'outil reste rangé. */

@@ -71,6 +71,8 @@ export interface AudioSettings {
     treeFallSeconds: number;
     digFoundSeconds: number;
     stampSeconds: number;
+    /** Tour 9: la lisse se verrouille à la fin de l'armement (s). */
+    gateLockSeconds: number;
     duoDoneSeconds: number;
     /** Le bouchon touche l'eau après le lancer (son.md 4). */
     fishingSplashSeconds: number;
@@ -211,6 +213,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
     treeFallSeconds: 1.3,
     digFoundSeconds: 0.25,
     stampSeconds: 0.25,
+    gateLockSeconds: 2.5,
     duoDoneSeconds: 0.35,
     fishingSplashSeconds: 0.55,
   },
@@ -280,8 +283,17 @@ export const AUDIO_SETTINGS: AudioSettings = {
       kf_beat: 'kingfisher',
       fish_jump: 'mist_fish',
       mist_ambience: '@mist_narrows',
+      // Tour 9: l'eau du ponton, la locomotive (cabine du mécanicien), l'effraie, les lanternes et la cloche.
+      night_water: '@stars_water',
+      train_slow_roll: 'driver',
+      train_whistle_salute: 'driver',
+      cylinder_cocks: 'driver',
+      owl_screech: 'barn_owl',
+      grass_strike: 'barn_owl',
+      lantern_light: '@lantern_square',
+      quay_bell_once: '@quay_bell',
     },
-    followed: ['geese_flight'],
+    followed: ['geese_flight', 'train_slow_roll'],
     hensOnly: ['hens_alarm'],
     departFloorDb: -24,
   },

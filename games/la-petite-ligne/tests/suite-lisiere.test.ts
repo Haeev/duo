@@ -373,7 +373,9 @@ describe('répliques du quotidien après la démo (T8-23, section 5.5)', () => {
     // 28 jours plus tard, de nouveau prioritaire.
     const later = at(48, 'rain', 11 * HOUR);
     heard(later, 20);
-    expect(rain).toContain(pickDialogue(later, 'firmin', 'p1')?.id);
+    // Tour 9: au jour 48 (automne), le lendemain de l'étape est déjà dit; la pluie d'automne s'ajoute aux répliques de pluie.
+    later.world.dialoguesDone.push('firmin_autumn1@p1');
+    expect([...rain, 'firmin_rain_au']).toContain(pickDialogue(later, 'firmin', 'p1')?.id);
     // La démo garde sa règle: la pluie du jour 12 reste prioritaire même entendue le jour 4.
     const demo = at(12, 'rain', 11 * HOUR);
     demo.world.heard.p1.firmin_daily_rain = 4 * MINUTES_PER_DAY + 9 * HOUR;
