@@ -16,6 +16,7 @@
 - **Douze moments.** Aux six joués s'ajoutent les deux P1 esquissés (la chevrette, déplacée au pré de l'est et dotée d'un faon; le martin-pêcheur du ponton) et quatre moments qui ne sont pas des bêtes: **la brume de l'Aubrune** (la météo: le matin d'après la pluie), **les étoiles de l'Aubrune** (le ciel, vu dans l'eau puisque la caméra ne montre pas le ciel), **la valse d'Odette** (un habitant) et **le salut du mécanicien** (le train).
 - **Cinq poses nouvelles**, toutes différentes de « immobiles et tournés vers lui »: se figer quand la chevrette lève la tête (« un, deux, trois, soleil »), se tenir face à face de part et d'autre de la rivière, s'asseoir côte à côte au bout du ponton, se prendre les mains pour valser, tenir chacun sa barrière du passage à niveau à l'heure du train.
 - **Vérifié sur la carte jouée**, par un script qui retrouve au centième les mesures du jeu sur les six moments joués (héron 3,60 s, oies 3,75 s, renard 3,60 s, mésanges 3,70 s): M-02 tenu par les six nouveaux (4,4 à 16 s au pire, seuil 3,4 s), acteur principal jamais caché en orientation 0, dans le cadre au zoom de départ pendant 4,8 à 16 s.
+- **Joué au tour 7** (section 7): la chevrette, le martin-pêcheur, la brume et l'onglet Souvenirs, avec les règles de tirage 1, 2 et 4 à 7. Restent à produire les étoiles, la valse et le salut du mécanicien, et les lignes d'observation propres à la chevrette et à la brume (défaut signalé, section 7.3).
 - **Onglet Souvenirs**: une page de carnet par duo, qui garde les moments vus ensemble et les quêtes secrètes, datés, chacun avec sa vignette et une ligne écrite du point de vue de qui la lit (« Tu étais dans la confidence. »). Aucun compteur, aucune case vide; une seule « rumeur du bourg » en bas de page, différente chez les deux joueurs, donne envie de revenir.
 - **Simulation**: démo à 5,2 moments (au lieu de 4,8), sans reprise à moins de 7 jours. Au long cours, avec trois réglages nouveaux (chance réduite quand la réserve de la saison est petite, fenêtre de 10 jours à partir de J2, coup de pouce x 3 aux moments jamais vus), l'écart médian entre deux passages d'un même moment est de **46 jours au printemps et 21 en été** (objectif de la revue: 19). L'automne (3,4 moments) et l'hiver (1,9) restent pauvres tant qu'ils n'ont pas leur réserve propre, et après l'année 1 il faut **2 moments neufs par saison et par année** pour garder au moins une première fois dans neuf saisons sur dix.
 
@@ -29,7 +30,7 @@
 |---|---|
 | La caméra isométrique ne montre pas le ciel | les étoiles filantes se voient **dans l'eau** calme au pied du ponton; aucun acteur nouveau ne monte au-dessus de 2,6 m (la cabine du train) |
 | Un bâtiment au sud-est d'un lieu le cache (orientation 0, caméra au sud-est) | le point de la chevrette prévu au tour 6, (52,5 ; 4,5), est caché par la remise; la bande au nord-ouest du chêne l'est par son houppier (annexe B, partie 5). La chevrette passe au pré de l'est, où rien de haut n'est au sud-est |
-| Les bêtes de moins de 0,2 m se lisent mal | le martin-pêcheur (0,17 m, 10 px au zoom de départ) se lit par ce qu'il fait: son poste est un pieu de 1,4 m bien visible, sa gerbe d'eau, sa traînée bleue en vol (tech-artist), son « tac tac »; l'échelle de lisibilité x 1,5 reste à trancher (question 3). Aucun autre moment nouveau ne repose sur une bête de moins de 0,45 m |
+| Les bêtes de moins de 0,2 m se lisent mal | le martin-pêcheur (0,17 m, 10 px au zoom de départ) se lit par ce qu'il fait: son poste est un pieu de 1,6 m (1,11 m hors de l'eau) bien visible, sa gerbe d'eau, sa traînée bleue en vol (tech-artist), son « tac tac »; l'échelle de lisibilité x 1,5 reste à trancher (question 3). Aucun autre moment nouveau ne repose sur une bête de moins de 0,45 m |
 | Lisible au zoom 1 en orientation 0 | « zoom 1 » est le zoom de départ (`initialZoom: 1`, 24 m de large, 57 px par mètre à 1366 px). Chaque fiche donne le temps où l'acteur est dans le cadre, au zoom 0 (16 m) et au zoom 1, depuis la pire case (annexe B, partie 2 bis) |
 | Le texte de l'apogée part à la fin du spectacle (QA6-07) | règle reprise telle quelle; chaque texte ne dit que ce qui se voit ou s'entend (M-06), relu ligne à ligne dans les fiches |
 | M-02: 3,4 s à moins de 6 m depuis toute case de l'anneau | mesuré pour chaque moment (annexe B). Pour les moments à places imposées (tenir, s'asseoir, rives), on mesure depuis ces places: c'est là que sont les joueurs. Le seuil est 6 m pour tous (le test actuel prend `watch.radius`, qui vaut 3 pour l'échelle: proposition de le fixer à 6, section 1.8) |
@@ -136,7 +137,7 @@ Textes: confidence `moment_roe_deer_hint` (d'Odette), apogée `moment_roe_deer_c
 |---|---|
 | Déclencheur | ambiance; jour 4 au moins; printemps, été ou automne; soleil; poids 2 |
 | Présence | 9 h à 12 h (63 s réelles à 0,35) |
-| Point `kingfisher_post` | pieu `mooring_post` (accroche, sans emprise) en (46,10 ; 39,90), dans l'eau au coin sud-est du ponton (le ponton occupe x 44 à 46, y 37 à 40); sommet à 0,95 m au-dessus de l'eau, 0,45 m au-dessus du plancher; l'oiseau s'y tient à 0,97 m |
+| Point `kingfisher_post` | pieu `mooring_post` (accroche, sans emprise) en (46,10 ; 39,90), dans l'eau au coin sud-est du ponton (le ponton occupe x 44 à 46, y 37 à 40); sommet à 1,11 m au-dessus de l'eau, 0,45 m au-dessus du plancher (le moteur met l'eau à -0,16 m et le plancher à 0,5 m: le pieu a été agrandi de 1,168 au tour 7 pour garder ces 0,45 m); l'oiseau s'y tient à 1,13 m |
 | Attente | posé, hoche la tête (`kf_perch`); toutes les 15 à 25 s, un plongeon manqué (`kf_dive`, gerbe, retour au pieu), `kf_whistle` à chaque envol |
 | Déclenchement | les deux dehors, entre 2,5 et 5,5 m du pieu, immobiles, 3 s (sans condition de regard) |
 | Timidité | un joueur à moins de 2,5 m (le bout du ponton est à 0,7 m du pieu): il file à 6 m vers l'amont au ras de l'eau, puis revient au pieu 6 s après le départ du joueur. Les places de vue: la racine du ponton (y 37 à 38) et la berge |
@@ -147,21 +148,21 @@ Apogée (5,8 s):
 
 | t (s) | x | y | z | Clip | Ce qui se voit et s'entend |
 |---|---|---|---|---|---|
-| 0,0 | 46,1 | 39,9 | 0,97 | `kf_perch` | il fixe l'eau, tête basse, hochements |
-| 1,0 | 46,1 | 39,9 | 0,97 | `kf_dive` | il se lance, ailes fermées |
+| 0,0 | 46,1 | 39,9 | 1,13 | `kf_perch` | il fixe l'eau, tête basse, hochements |
+| 1,0 | 46,1 | 39,9 | 1,13 | `kf_dive` | il se lance, ailes fermées |
 | 1,3 | 46,6 | 40,6 | 0,0 | | plongeon (`kf_dive`), gerbe et rides (tech-artist) |
 | 1,8 | 46,6 | 40,6 | 0,0 | `kf_fly` | il ressort, un éclat d'argent au bec (l'ablette, reflet spéculaire) |
 | 2,1 | 46,4 | 40,3 | 0,5 | | |
-| 2,4 | 46,1 | 39,9 | 0,97 | `kf_beat` | de retour au pieu, il frappe deux fois le poisson (`kf_beat` à 2,7 et 3,2 s) |
-| 3,6 | 46,1 | 39,9 | 0,97 | `kf_swallow` | il l'avale, tête renversée |
-| 4,1 | 46,1 | 39,9 | 0,97 | `kf_perch` | sifflet (`kf_whistle`) |
-| 4,8 | 46,1 | 39,9 | 0,97 | `kf_fly` | envol |
+| 2,4 | 46,1 | 39,9 | 1,13 | `kf_beat` | de retour au pieu, il frappe deux fois le poisson (`kf_beat` à 2,7 et 3,2 s) |
+| 3,6 | 46,1 | 39,9 | 1,13 | `kf_swallow` | il l'avale, tête renversée |
+| 4,1 | 46,1 | 39,9 | 1,13 | `kf_perch` | sifflet (`kf_whistle`) |
+| 4,8 | 46,1 | 39,9 | 1,13 | `kf_fly` | envol |
 | 5,3 | 43,0 | 40,3 | 0,4 | `kf_fly` | au ras de l'eau vers l'amont, traînée bleue de 0,3 s |
 | 5,8 | 39,0 | 40,3 | 0,4 | | fondu de 5,4 à 5,8 s |
 
 Temps à l'écran: M-02 4,4 s au pire; cadre 5,2 s au zoom 0, 5,65 s au zoom 1; jamais caché dans les quatre orientations. État `after`: rien. Départ sans apogée: même envol, sans texte.
 
-Modèles: `kingfisher` (0,17 m de long dont 4 cm de bec, envergure 0,25 m; dos bleu cobalt avec une raie turquoise vive, ventre roux orangé, gorge blanche, pattes rouges; à l'échelle x 1,5 si le directeur artistique la retient: 0,25 m); `small_fish` (ablette, 0,08 m, argentée, porte un reflet spéculaire fort); `mooring_post` (pieu de chêne de 0,14 m de diamètre, 1,4 m dont 0,45 m dans l'eau et 0,95 m dehors, sommet usé, anneau de fer à 0,6 m). Clips: `kf_perch` (boucle de 2 s), `kf_dive` (0,3 s), `kf_fly` (boucle de 0,12 s), `kf_beat` (1,2 s, deux coups), `kf_swallow` (0,5 s).
+Modèles: `kingfisher` (0,17 m de long dont 4 cm de bec, envergure 0,25 m; dos bleu cobalt avec une raie turquoise vive, ventre roux orangé, gorge blanche, pattes rouges; à l'échelle x 1,5 si le directeur artistique la retient: 0,25 m); `small_fish` (ablette, 0,08 m, argentée, porte un reflet spéculaire fort); `mooring_post` (pieu de chêne de 0,14 m de diamètre, joué à l'échelle 1,168: fût de 16 cm, 1,11 m hors de l'eau, sommet usé, bande de mousse à la ligne d'eau, anneau de fer à 0,70 m). Clips: `kf_perch` (boucle de 2 s), `kf_dive` (0,3 s), `kf_fly` (boucle de 0,12 s), `kf_beat` (1,2 s, deux coups), `kf_swallow` (0,5 s).
 
 Sons: `kf_whistle` (« tiiii » aigu, 0,4 s, 3 variantes, audible à 25 m: c'est lui qu'on entend avant de le voir), `kf_dive` (plouf net, 0,4 s, 2 variantes), `kf_beat` (« tac tac » sec, 0,5 s).
 
@@ -173,7 +174,7 @@ Textes: confidence `moment_kingfisher_hint` (de Jeanne, texte du tour 6), apogé
 
 | Élément | Valeur |
 |---|---|
-| Déclencheur | ambiance; jour 2 au moins; printemps, été ou automne; pluie ou orage la veille (`weather_was`); soleil ou nuages ce jour; poids 3 |
+| Déclencheur | ambiance; jour 2 au moins; printemps, été ou automne; pluie la veille (`weather_was`; le jeu n'a pas d'orage, la météo vaut soleil, nuages ou pluie); soleil ou nuages ce jour; poids 3 |
 | Présence | 6 h à 8 h 30 |
 | Point `mist_narrows` | (29,5 ; 40,5), eau profonde au milieu du passage |
 | Places de vue (indicatives) | `mist_bank_north` (29,5 ; 38,5, case `b`), `mist_bank_south` (29,5 ; 42,5, case `b`); la rive sud se gagne par le gué (x 16 à 20): 27 m, environ 8 s de marche depuis la rive nord |
@@ -340,7 +341,7 @@ Mêmes champs que le tour 6 (section 3.1), plus ceux de la section 1.2. Valeurs:
 |---|---|---|---|---|---|---|---|---|---|---|
 | `roe_deer` | P1 (tour 7) | ambient | `roe_deer_graze` | 2 | | | jour ≥ 9; printemps (jour de saison ≥ 9) ou été; soleil ou nuages | 06:00 à 08:30 | 06:00 à 08:30 | rayon 5,5, min 3, cible l'acteur `roe_deer`, `freeze` (6 à 10 s, regard 2 s, recul 1,5 m, reprise 4 s), `holdSeconds` 2 |
 | `kingfisher` | P1 (tour 7) | ambient | `kingfisher_post` | 2 | | | jour ≥ 4; printemps, été ou automne; soleil | 09:00 à 12:00 | 09:00 à 12:00 | rayon 5,5, min 2,5, immobiles, 3 s |
-| `mist` | P0 (tour 7) | ambient | `mist_narrows` | 3 | | | jour ≥ 2; printemps, été ou automne; `weather_was` pluie ou orage; soleil ou nuages | 06:00 à 08:30 | 06:00 à 08:30 | rayon 6, `opposite` (y, 40,5, 1,5), `facing: "partner"`, immobiles, 3 s |
+| `mist` | P0 (tour 7) | ambient | `mist_narrows` | 3 | | | jour ≥ 2; printemps, été ou automne; `weather_was` pluie; soleil ou nuages | 06:00 à 08:30 | 06:00 à 08:30 | rayon 6, `opposite` (y, 40,5, 1,5), `facing: "partner"`, immobiles, 3 s |
 | `falling_stars` | P0 (tour 7) | ambient | `stars_water` | 2 | | 2 | jour ≥ 22; été; soleil | 22:00 à 24:00 | 22:00 à 23:30 | rayon 3, assis sur `pontoon_edge`, 3 s |
 | `odette_waltz` | P0 (tour 7) | ambient | `waltz_floor` | 2 | | | jour ≥ 17; printemps ou été; soleil ou nuages | 20:30 à 22:30 | 20:30 à 22:30 | rayon 3, `hold`: `waltz_a`, `waltz_b`, 0,5 s; `pauseWhenReleased`, `pauseBefore` 14 |
 | `train_salute` | P0 (tour 7) | ambient, `trainDays: "only"` | `level_crossing` | 1 | 14 | | jour ≥ 22; pas de neige | 15:00 à 16:30 | 15:20 à 16:00 | rayon 4, `hold`: les deux manivelles, 1 s, `arm` (2,5 s, apogée à 16:00, verrou) |
@@ -382,31 +383,31 @@ Tutoiement, rédaction neutre: aucun participe ni adjectif accordé au genre d'u
 | Clé | Texte |
 |---|---|
 | `moment_roe_deer_hint` | Odette te l'a dit hier: « À l'aube, de ma porte, je vois une chevrette dans le pré de l'est. Si elle lève la tête, ne bougez plus: elle vous prendra pour des piquets. » |
-| `moment_roe_deer_climax` | La chevrette baisse la tête et appelle tout bas. Dans l'herbe haute, un faon tacheté se lève, court à elle et tète un instant. Puis tous deux rentrent dans la haie, en bondissant. |
+| `moment_roe_deer_climax` | La chevrette baisse la tête et appelle tout bas. Dans l'herbe haute, un faon tacheté se lève, court à elle et tète un instant. Puis tous deux regagnent le fourré, en bondissant. |
 | `moment_roe_deer_memory` | La chevrette et son faon, un {weekday} matin. |
-| `moment_roe_deer_rumor` | On dit qu'une chevrette vient au pré de l'est, avant le café. |
-| `moment_freeze_graze` | Elle broute: approche. |
+| `moment_roe_deer_rumor` | qu'une chevrette vient brouter au pré de l'est, à l'aube. |
+| `moment_freeze_graze` | Elle broute: tu peux bouger. |
 | `moment_freeze_look` | Ne bouge plus: elle regarde ! |
-| `moment_roe_deer_startled` | Elle a vu bouger quelqu'un: elle recule un peu. Attends qu'elle broute. |
+| `moment_roe_deer_startled` | Elle a vu bouger: elle frappe du pied et recule. Attends qu'elle se remette à brouter. |
 | `moment_kingfisher_hint` | Jeanne te l'a juré hier: « Il y a un oiseau bleu au bout du ponton, le matin. Bleu comme un bouton de veste ! » (inchangé) |
 | `moment_kingfisher_climax` | Un éclair bleu plonge et ressort, un éclat d'argent au bec. Tac, tac, contre le pieu, et le poisson est avalé. Puis l'oiseau file au ras de l'eau. |
 | `moment_kingfisher_memory` | Le martin-pêcheur du ponton, un {weekday} matin. |
-| `moment_kingfisher_rumor` | On dit qu'un oiseau bleu pêche au bout du ponton. |
-| `moment_mist_hint` | Firmin te l'a dit hier, sous la pluie: « Demain à l'aube, la brume couvrira l'Aubrune. Là où les deux bancs de sable se font face, la rivière n'a pas quatre mètres de large. » |
-| `moment_mist_climax` | La lumière dore d'un coup. La brume se lève, de l'aval vers le gué, et vous voilà face à face, de part et d'autre de l'eau. Un poisson saute entre vous. |
+| `moment_kingfisher_rumor` | qu'un oiseau bleu pêche au bout du ponton, les matins de soleil. |
+| `moment_mist_hint` | Firmin te l'a dit hier, sous la pluie: « Demain à l'aube, la brume couvrira l'Aubrune. Là où les deux bancs de sable se répondent, la rivière n'a pas quatre mètres de large. Mettez-vous de part et d'autre, face à face, et attendez que la brume se lève. » |
+| `moment_mist_climax` | La lumière se réchauffe. La brume se lève, de l'aval vers le gué, et vous voilà face à face, de part et d'autre de l'eau. Un poisson saute entre vous. |
 | `moment_mist_memory` | La brume de l'Aubrune, un {weekday} matin, de part et d'autre de l'eau. |
-| `moment_mist_rumor` | On dit qu'après la pluie, l'Aubrune fume au petit jour. |
-| `moment_opposite_same_bank` | {partner} est sur la même rive que toi: l'un de vous deux doit passer de l'autre côté de l'eau. |
+| `moment_mist_rumor` | qu'après la pluie, l'Aubrune fume au petit jour. |
+| `moment_opposite_same_bank` | {partner} est sur la même rive que toi: passe sur l'autre par le gué, ou attends que {partner} y passe. |
 | `moment_face_partner` | Tourne-toi vers {partner}. |
 | `moment_falling_stars_hint` | Basile te l'a dit hier: « En été, des étoiles tombent dans l'Aubrune. Gamin, je les regardais du bout du ponton, assis, sans un mot. » |
 | `moment_falling_stars_climax` | Des étoiles filent dans l'eau noire. La plus grosse éclaire l'Aubrune d'un coup; vous levez la tête, trop tard. |
 | `moment_falling_stars_memory` | Les étoiles de l'Aubrune, une nuit d'été, les pieds au-dessus de l'eau. |
-| `moment_falling_stars_rumor` | On dit que des étoiles tombent dans l'Aubrune, les nuits d'été. |
+| `moment_falling_stars_rumor` | que des étoiles tombent dans l'Aubrune, les nuits d'été. |
 | `moment_seat_edge` | Assieds-toi au bout du ponton ({act}). |
 | `moment_odette_waltz_hint` | Odette te l'a dit hier: « Certains soirs, je sors mon phonographe. Sous le lampadaire de la place, le pavé est juste assez lisse pour une valse. » |
 | `moment_odette_waltz_climax` | Odette remet le disque au début. Vous valsez sous le lampadaire, un tour et demi, et elle applaudit derrière son comptoir. |
 | `moment_odette_waltz_memory` | La valse d'Odette, un {weekday} soir, sous le lampadaire. |
-| `moment_odette_waltz_rumor` | On dit qu'Odette garde un phonographe sous son comptoir. |
+| `moment_odette_waltz_rumor` | qu'Odette garde un phonographe sous son comptoir. |
 | `odette_waltz_start` (bulle) | Allez, en piste ! |
 | `odette_waltz_pause` (bulle) | On ne lâche pas en pleine valse ! |
 | `odette_waltz_bravo` (bulle) | Bravo ! |
@@ -414,13 +415,15 @@ Tutoiement, rédaction neutre: aucun participe ni adjectif accordé au genre d'u
 | `moment_train_salute_hint` | Firmin te l'a dit hier: « Samedi, au départ de quatre heures, baissez les barrières à la main, une de chaque côté de la voie. Le mécanicien salue toujours les gardes-barrières. » |
 | `moment_train_salute_climax` | Le train sort au pas. Au passage à niveau, le mécanicien et le chauffeur agitent leur casquette, deux coups de sifflet, et un nuage de vapeur roule sur la route. |
 | `moment_train_salute_memory` | Le salut du mécanicien, au train d'un samedi. |
-| `moment_train_salute_rumor` | On dit que les mécaniciens saluent quand on tourne la manivelle à la main. |
+| `moment_train_salute_rumor` | que les mécaniciens saluent quand on tourne la manivelle à la main. |
 | `moment_crank_take` | Le train part à 16 h. Prends la manivelle d'une barrière ({act}). |
 | `moment_crank_partner` | {partner} tient l'autre barrière. |
 | `moment_gates_down` | Barrières baissées. Le train part à 16 h. |
 | `moment_crank_too_early` | Trop tôt: on baisse les barrières à partir de 15 h 20. |
 
-Rumeurs des six moments joués (onglet Souvenirs, section 2): `moment_heron_rumor` « On dit qu'un héron pêche au gué, certains après-midi. », `moment_geese_rumor` « On dit que des oies font halte sur l'Aubrune au printemps. », `moment_tits_rumor` « On dit que les mésanges aiment les nichoirs bien droits. », `moment_fox_rumor` « On dit qu'un renard suit la voie, à la tombée du jour. », `moment_glowworms_rumor` « On dit que le pré de l'est s'allume, certaines nuits douces. ». L'échelle, moment de quête, n'a pas de rumeur.
+Rumeurs des six moments joués (onglet Souvenirs, section 2): `moment_heron_rumor` « qu'un héron pêche au gué, certains après-midi. », `moment_geese_rumor` « que des oies font halte sur l'Aubrune, au printemps. », `moment_tits_rumor` « que les mésanges visitent le nichoir du grand chêne, certains matins. », `moment_fox_rumor` « qu'un renard suit la voie, à la tombée du jour. », `moment_glowworms_rumor` « que le pré de l'est s'allume, certaines nuits douces. ». L'échelle, moment de quête, n'a pas de rumeur.
+
+**Forme d'une rumeur** (relecture du tour 7): l'onglet l'affiche sous « On dit au bourg… »; elle en est la suite et commence donc par « que » ou « qu' », en minuscule, sans redire « On dit ». Elle reste vraie à tout moment où elle peut s'afficher (« les matins de soleil » pour le martin-pêcheur, qui ne vient que par soleil; la mésange ne parle plus du nichoir droit, puisque sa rumeur ne sort qu'une fois le nichoir redressé).
 
 Relecture texte contre chorégraphie (M-06): chevrette (baisse la tête, appel `roe_call`, faon qui se lève et tète, bonds dans la haie: tout est dans les images clés); martin-pêcheur (plongeon, éclat du poisson, deux « tac », avalé par `kf_swallow`, vol au ras de l'eau); brume (teinte dorée, front de l'aval vers l'amont, poisson à 5,2 s); étoiles (cinq traînées, la grosse éclaire l'eau, `look_up` à 4,6 s, après le début de la grosse: « trop tard » est vrai); valse (aiguille remise, un tour et demi, applaudissements); train (sortie au pas, deux casquettes, deux coups de sifflet, vapeur).
 
@@ -491,7 +494,7 @@ La ligne à soi:
 
 Aucune ligne n'accorde un participe au duo ni à un joueur (« vous y avait envoyés » ou « l'avais vu venir », qui s'accorderait aux oies, ont été écartés). Les participes restants s'accordent à « les » (les noms, les poules) ou « l' » (la réponse), jamais à un joueur. « {secret} » n'est permis chez l'autre qu'une fois la quête finie (l'autre a lui-même donné la bonne réponse à Jeanne): le validateur doit l'accepter dans `souvenirs.*` et le refuser partout ailleurs pour le rôle de l'autre.
 
-Bas de page, la **rumeur du bourg** (`moment_<id>_rumor`): une seule ligne, en italique, précédée de « On dit au bourg... » rien d'autre. Elle porte sur un moment jamais vu ensemble, possible dans la saison en cours ou la suivante. Les deux joueurs n'ont pas la même: le premier joueur de la liste tire parmi les moments non vus d'index pair, l'autre d'index impair (s'il n'en reste qu'un, les deux ont la même; s'il n'en reste aucun, pas de rumeur et la page finit sur l'intercalaire de la saison). La rumeur change chaque matin, par empreinte (graine, joueur, jour), sans toucher au générateur. Elle dit moins qu'une confidence: un lieu vague, jamais l'heure exacte ni la pose.
+Bas de page, la **rumeur du bourg** (`moment_<id>_rumor`): une seule ligne, en italique, précédée de « On dit au bourg… », dont elle est la suite (« … qu'un héron pêche au gué, certains après-midi. »), rien d'autre. Elle porte sur un moment jamais vu ensemble, possible dans la saison en cours ou la suivante. Les deux joueurs n'ont pas la même: le premier joueur de la liste tire parmi les moments non vus d'index pair, l'autre d'index impair (s'il n'en reste qu'un, les deux ont la même; s'il n'en reste aucun, pas de rumeur et la page finit sur l'intercalaire de la saison). La rumeur change chaque matin, par empreinte (graine, joueur, jour), sans toucher au générateur. Elle dit moins qu'une confidence: un lieu vague, jamais l'heure exacte ni la pose.
 
 Page vide (début de partie): « Pas encore de souvenir. Le bourg garde ses plus beaux moments pour les jours où l'on flâne à deux. », puis la rumeur.
 
@@ -585,6 +588,58 @@ Constats sur les moments joués, relevés en passant par le même script (pour l
 4. **Pour l'architecte (via le manager): remplacer `world.moments.history` par une mémoire bornée** (`lastEnd`, `seasonCount`, `memories`). Recommandation: oui, dans la même passe que l'onglet Souvenirs: l'historique actuel grossirait l'état transmis de 7 Kio en 100 heures.
 5. **Pour le manager: l'hiver presque sans moment** (1,9 par hiver de 21 jours) tant que la réserve d'hiver n'existe pas. Recommandation: accepter pour J1 et J2 (le premier hiver commence au jour 64), et commander 2 moments d'automne et 2 d'hiver au tour qui ouvrira l'arc A3.
 6. **Pour le manager: la chevrette change de lieu et de nom** (« La chevrette du pré », au lieu de la lisière nord, cachée par la remise et le chêne en orientation 0). Recommandation: valider; l'esquisse du tour 6 n'était pas produite.
+
+---
+
+## 7. Ce qui a été joué au tour 7 (relecture du 2026-11-01)
+
+Relu sur `063d907`: `games/la-petite-ligne/ETAT.md` (tour 7), données, captures `gauntlet/captures/tour-07/` (moments, souvenirs, faune, échelle).
+
+### 7.1 Joué, et écarts acceptés
+
+| Sujet | Ce qui est joué | Écart avec les fiches, et pourquoi il est accepté |
+|---|---|---|
+| Chevrette, « figer » | regards toutes les 6 à 10 s, tirés par empreinte depuis le début de l'attente ou la fin d'un effarouchement; anneau qui ne se remplit que pendant un regard (2 s); bouger à moins de 12 m pendant un regard, ou passer sous 3 m, la fait frapper du pied, aboyer et reculer de 1,5 m vers (61,2 ; 27,0), puis brouter de nouveau 4 s plus tard; elle ne fuit jamais | premier regard 8 s après le début de l'attente (`firstAfterSeconds`, ajouté par le dev): laisse le temps d'arriver à distance sans être surpris dès la première seconde. Le texte d'effarouchement part chez les deux (l'aboiement s'entend à 30 m: les deux savent de toute façon) |
+| Faon | couché, seules les oreilles dépassent; se lève, trotte, tète, bondit avec elle | aucun |
+| Pieu du martin-pêcheur | le moteur met l'eau à -0,16 m et le plancher du ponton à 0,5 m: le pieu est agrandi de 1,168; son sommet est à 1,11 m au-dessus de l'eau et garde 0,45 m au-dessus du plancher, la mousse à la ligne d'eau, l'anneau à 0,70 m; l'oiseau s'y pose à 1,13 m | les 0,45 m au-dessus du plancher sont ce qui compte (un poste d'affût plus haut que le ponton, visible depuis la berge); la fiche est mise à jour (1.4.8) |
+| Brume | un joueur sur chaque rive (`opposite`, y au plus 39,0 et au moins 42,0), chacun tourné vers l'autre (`facing: "partner"`), immobiles 3 s; 700 bouffées (260 en mode léger), front de l'aval vers le gué, poisson à 5,2 s, merle à 3 s; teinte dorée montée en 3 s | la forêt du pourtour cache la rive sud en orientation 0: les trous tramés des joueurs sont élargis pendant la brume. La teinte monte en 3 s: le texte d'apogée dit « se réchauffe » au lieu de « dore d'un coup » |
+| Tirage | règles 1, 2 et 4 à 7 de la section 1.2, conditions `season_is` et `weather_was`; sans effet sur la démo (test) | la règle 8 (l'échelle au printemps 2) n'est pas jouée: P1, utile après le jour 84 |
+| Onglet Souvenirs | S-10 à S-15 tenus (tests et captures); vignettes substituts; rumeur différente chez les deux | l'intercalaire en notification et les sons `journal-new` et `journal-open` restent à faire (P1, `ui-tab` joue à l'ouverture) |
+
+### 7.2 Textes relus
+
+| Clé | Avant | Après | Raison |
+|---|---|---|---|
+| les 8 `moment_*_rumor` | « On dit qu'un héron pêche au gué... » | « qu'un héron pêche au gué, certains après-midi. » | le titre « On dit au bourg… » est déjà affiché au-dessus: la rumeur en est la suite (capture vérifiée) |
+| `moment_roe_deer_rumor` | « ..., avant le café. » | « qu'une chevrette vient brouter au pré de l'est, à l'aube. » | le bourg n'a pas de café: la tournure faisait chercher un lieu qui n'existe pas |
+| `moment_kingfisher_rumor` | « ...au bout du ponton. » | « ..., les matins de soleil. » | il ne vient que par soleil, le matin: vrai et un peu plus utile |
+| `moment_tits_rumor` | « que les mésanges aiment les nichoirs bien droits » | « que les mésanges visitent le nichoir du grand chêne, certains matins. » | la rumeur ne sort qu'une fois le nichoir redressé: elle disait ce que le duo a déjà fait |
+| `moment_roe_deer_climax` | « rentrent dans la haie » | « regagnent le fourré » | à l'écran, la lisière est du pré se voit comme des arbres (forêt du pourtour); « fourré » est vrai pour une haie comme pour un bois |
+| `moment_roe_deer_startled` | « Elle a vu bouger quelqu'un: elle recule un peu. Attends qu'elle broute. » | « Elle a vu bouger: elle frappe du pied et recule. Attends qu'elle se remette à brouter. » | dit ce qui se voit (le coup de sabot), plus court |
+| `moment_freeze_graze` | « Elle broute: approche. » | « Elle broute: tu peux bouger. » | vrai aussi pour qui est déjà à bonne distance |
+| `moment_mist_hint` | (finissait sur la largeur de la rivière) | ajoute « Mettez-vous de part et d'autre, face à face, et attendez que la brume se lève. » | la pose (une rive chacun) était introuvable: aucune ligne du HUD ne la dit (7.3) |
+| `moment_mist_climax` | « La lumière dore d'un coup. » | « La lumière se réchauffe. » | la teinte monte en 3 s |
+| `moment_opposite_same_bank` | « l'un de vous deux doit passer... » | « passe sur l'autre par le gué, ou attends que {partner} y passe. » | « l'un » est un masculin générique; dit aussi le chemin |
+| `moment_roe_deer_vignette` | « ...dans l'herbe haute. » | « ..., dans le pré. » | la vignette montre un pré ras |
+| `moment_ladder_vignette` | « L'échelle contre le grand chêne, le nichoir redressé. » | « Le nichoir de Basile, bien droit sur le grand chêne. » | la vignette ne montre pas d'échelle; vrai aussi si l'artiste en ajoute une |
+
+Relus sans changement: textes de confidence de la chevrette et du martin-pêcheur, apogée du martin-pêcheur (plongeon, éclat d'argent, deux « tac », avalé, vol au ras de l'eau: tout est dans les images clés), souvenirs (titres), lignes d'activité de l'autre (« Guette la chevrette », « Guette le martin-pêcheur », « Attend dans la brume »), bloc `souvenirs` (dates, saisons, années, retours, lignes à soi). Aucun accord au genre d'un joueur: les participes restants s'accordent à un objet (« Vu deux fois ensemble », au moment; « confiés », aux noms).
+
+Proposé sans l'appliquer (phrases épinglées par `src/interface/tests/souvenirs.test.ts`, lignes 115 à 123): `secrets.hen_names.informed` « Odette t'avait confié leurs noms; {partner} les a appelées. » et `doer` « {partner} t'a soufflé leurs noms; tu les as appelées. »: dans la version jouée, « les » renvoie d'abord aux noms puis aux poules dans la même phrase.
+
+### 7.3 Défauts trouvés (code, pour le manager)
+
+1. **Brume: le HUD ment quand les deux sont sur la même rive** (P0 du tour 8). Mesuré par un test jetable avec les robots (`watchModel` de `modele-moments.ts`): deux joueurs immobiles, face à face sur la rive nord, voient tous les deux « Sans bouger… » et un anneau à 0 qui ne se remplit jamais. Sur deux rives, si l'un tourne le dos, aucune ligne chez l'un ni chez l'autre. Cause: `missingPose` ne connaît ni `opposite` ni `facingPartner`, et la ligne « ensemble » ne regarde pas la condition de rives. Les textes `moment_opposite_same_bank` et `moment_face_partner` existent mais aucun code ne les affiche.
+2. **Chevrette: les lignes « figer » ne sont pas branchées** (P1). Pendant qu'elle broute, les deux voient « Sans bouger… » avec l'anneau vide; l'anneau se remplit bien pendant un regard. `moment_freeze_graze` et `moment_freeze_look` ne sont lus par aucun code. Le jeu reste jouable (le texte d'effarouchement et l'anneau suffisent à comprendre au deuxième essai), mais le « un, deux, trois, soleil » se lit mieux avec les deux lignes.
+3. **Vignette de la chevrette** (directeur artistique): les deux pointes de la tête se lisent comme des bois à 40 px; une chevrette n'en a pas. Vignette de l'échelle: pas d'échelle dessinée.
+
+### 7.4 Critères d'acceptation ajoutés
+
+| N° | Critère | Vérification |
+|---|---|---|
+| M-26 | Brume: deux joueurs immobiles sur la même rive voient `moment_opposite_same_bank`, jamais « Sans bouger… »; sur deux rives, celui qui ne regarde pas l'autre voit `moment_face_partner`, et l'autre « {partner} est là, mais pas encore en place. » | test du modèle d'interface, positions du test M-18 |
+| M-27 | Chevrette: pendant qu'elle broute, `moment_freeze_graze` chez qui est à moins de 8 m (rayon 5,5 m et marge de l'interface, `watchNearMargin` 2,5 m); pendant un regard, `moment_freeze_look` chez qui bouge, puis « Sans bouger… » et l'anneau | test du modèle d'interface, `ticksToLook` du test M-17 |
+| M-28 | Chaque rumeur commence par « que » ou « qu' », en minuscule | validateur des données |
 
 ---
 
@@ -755,3 +810,4 @@ Lecture: « faon seul » est donné pour information (M-02 compte tout acteur, c
 | Date | Version | Changement |
 |---|---|---|
 | 2026-11-01 | 1 | Première version (tour 7 du gauntlet, priorité 3 de la revue du tour 6) |
+| 2026-11-01 | 2 | Relecture après production (revue du tour 7): section 7 (joué, écarts, textes relus, défauts, M-26 à M-28); pieu à 1,11 m hors de l'eau; brume sur la pluie seule; forme des rumeurs (suite de « On dit au bourg… »); textes de la section 1.7 alignés sur `textes.json` |

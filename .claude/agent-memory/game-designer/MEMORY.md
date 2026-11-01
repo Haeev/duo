@@ -140,3 +140,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Après l'année 1, il faut 2 moments neufs par saison et par année pour garder une première fois dans 9 saisons sur 10 (coup de pouce x 3 aux jamais vus compris).
 - Une quête à variante (l'échelle au jour 10, variante 1) qui débloque un moment (mésanges) prive la moitié des graines de ce moment: prévoir un rattrapage.
 - `world.moments.history` grandit à chaque occurrence: proposer une mémoire bornée par moment (taille de l'état transmis).
+
+## Relire un tour produit (vérifié au tour 7)
+
+- Un texte de HUD écrit dans la conception peut exister dans `textes.json` sans être lu par le code: grep chaque clé nouvelle dans `src/` (hors tests). Au tour 7, `moment_freeze_*`, `moment_opposite_same_bank` et `moment_face_partner` étaient orphelins et la brume affichait « Sans bouger… » avec un anneau vide.
+- Tester ce qu'affiche le HUD: test jetable dans `/tmp/<dossier>` qui importe `tests/aides` et `src/interface/tests/aides` (`uiContext`) par chemins absolus et appelle `watchModel`; lancer `games/la-petite-ligne/node_modules/.bin/vitest run --dir /tmp/<dossier>` depuis le dossier du jeu. La sortie console est masquée: écrire les résultats dans un fichier.
+- La rumeur de l'onglet Souvenirs s'affiche sous « On dit au bourg… » (épinglé par un test): elle commence par « que » ou « qu' », en minuscule.
+- Capturer l'onglet sans écraser les preuves des devs: copier `ui-maquettes/outils/capturer-souvenirs.cjs` dans `/tmp` avec `SORTIE` changé, Vite sur un port libre (le 5197 peut servir un autre arbre de travail), `NODE_PATH=$(npm root -g)`.
