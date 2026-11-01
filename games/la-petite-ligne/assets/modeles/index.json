@@ -1103,7 +1103,7 @@
  },
  "heron": {
   "file": "faune.glb",
-  "tris": 706,
+  "tris": 866,
   "animations": [
    "heron_idle",
    "heron_strike",
@@ -1117,7 +1117,7 @@
  },
  "goose": {
   "file": "faune.glb",
-  "tris": 388,
+  "tris": 406,
   "animations": [
    "goose_swim",
    "goose_alert",
@@ -1127,7 +1127,7 @@
  },
  "blue_tit": {
   "file": "faune.glb",
-  "tris": 244,
+  "tris": 304,
   "animations": [
    "tit_perch",
    "tit_fly",
@@ -1138,7 +1138,7 @@
  },
  "fox": {
   "file": "faune.glb",
-  "tris": 786,
+  "tris": 798,
   "animations": [
    "fox_trot",
    "fox_listen",

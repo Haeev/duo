@@ -104,13 +104,18 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 Fiches: `docs/jeux/jeu-1/tour-06-conception.md` section 1.4. Sources: `assets-src/modeles/faune.py` (modèles et clips), `planche_faune.py` (planches des clips, échelle, zoom 1), `scene_echelle.py` (scène de l'échelle avec les vrais GLB), `verifier/quatre_faune.sh` (quatre angles de chaque modèle). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-06/faune-*.png`.
 
-- Une bête = un nœud racine (son squelette: `heron`, `goose`, `blue_tit`, `fox`) avec son maillage enfant `<bête>_mesh` (peau rigide par pièce), comme la poule. Instancier par `SkeletonUtils.clone`; jouer toujours un clip (la pose de repos des oiseaux a les ailes dépliées). Les clips sont sur place: le jeu déplace et oriente la racine (chorégraphies de la fiche).
+- Une bête = un nœud racine (son squelette: `heron`, `goose`, `blue_tit`, `fox`) avec son maillage enfant `<bête>_mesh` (peau rigide par pièce), comme la poule. Instancier par `SkeletonUtils.clone`; jouer toujours un clip (la pose de repos du héron et de l'oie a les ailes dépliées). Les clips sont sur place: le jeu déplace et oriente la racine (chorégraphies de la fiche).
 - Tailles réelles: héron 0,95 m debout (1,0 m cou tendu, envergure 1,70 m), oie 0,80 m (envergure 1,60 m, tête à 0,40 m au-dessus de l'eau), renard 0,40 m au garrot (corps 0,65 m, queue 0,40 m). Mésange agrandie x 1,5 (0,18 m) et sa mousse avec elle (0,06 m): à taille réelle elle tient en 10 pixels au zoom 1 et sa calotte bleue ne se lit plus (planche `faune-mesange-zoom1.png`). Extra `display_scale`.
 - Origines: au sol sous les pattes (héron, renard); ligne de flottaison (oie); pattes sur le perchoir (mésange). La mousse s'accroche sous `socket_blue_tit_beak`, sans transformation.
 - `ladder_wood`: 3,0 m, penchée à 75 degrés vers +Z (la poser avec la même rotation que Basile qui y grimpe), origine au milieu du pied, montants de 0,05 x 0,07 coupés à plat au sol et contre le tronc, 10 barreaux à 0,28 m de hauteur l'un de l'autre (le premier à 0,28 m, le dernier à 2,80 m), tête à `top` [0 ; 2,898 ; 0,776].
 - `nest_box`: 0,15 x 0,25 m, 0,18 m de profondeur avec la planche de dos qui dépasse au-dessus du toit pour le clou; trou de 28 mm à 0,17 m du bas, toit goudronné débordant de 4 cm. Origine sur le clou (dos contre l'écorce): le centre de la caisse est 0,175 m sous le clou et 0,09 m devant. Penché: rotation de 25 degrés autour de Z glTF, le bas vers +X (vers l'est sur la carte, à l'opposé de l'échelle proposée). Perchoir du toit: extra `roof_perch`.
 - `oak_branch_stub`: origine au bout (dessus), là où la mésange se pose; il repart vers le tronc de `tree_oak_01` posé à rotation 0.
-- Budgets (bible 8.8, poule 500, accessoire 900): héron 706, oie 388 (neuf instances: 3 492), mésange 244, renard 786, échelle 176, nichoir 156, chicot 60, mousse 96 triangles. Aucun nouveau matériau; 17 cases ajoutées en fin de palette (`palette.py`, de `heron_grey` à `tar`).
+- Budgets (bible 8.8, poule 500, accessoire 900): héron 866, oie 406 (neuf instances: 3 654), mésange 304, renard 798, échelle 176, nichoir 156, chicot 60, mousse 96 triangles. Héron et renard dépassent le plafond de la poule (500) mais restent sous celui d'un accessoire (900): une seule bête de chaque à l'écran, pendant un moment rare. Aucun nouveau matériau; 17 cases ajoutées en fin de palette (`palette.py`, de `heron_grey` à `tar`).
+- Retouches du tour 6 (revue G8 du directeur artistique, planches `retouche-faune-*.png`):
+  - mésange: tête en bandes de facettes (`banded_ball` de `faune.py`: calotte bleue, liseré blanc, bandeau noir du bec à la nuque, joue blanche, collier), plus de barre posée qui dépasse; ailes en coquilles arrondies couchées sur les flancs, modelées repliées (le vol les ouvre par roulis de 90 degrés puis lacet de -80 dans `tit_fly` et `tit_exit`); queue en fuseau aplati.
+  - héron: ailes repliées montrées par deux coquilles sur les flancs (os `heron_body`) avec les rémiges sombres croisées sur la queue; au repos, les ailes de vol sont réduites (échelle 0,04) et rentrées dans le corps, et se déploient entre deux clés au décollage, y rentrent à l'atterrissage. `heron_grey` assombri (#7F888E, L* 56 au lieu de 66) contre les galets du gué; sourcil noir peint sur les facettes de la tête.
+  - oie: queue courte enfoncée dans le croupion, dessus couleur du dos, pointe à peine relevée, dessous blanc.
+  - renard: plastron, museau et bout de queue blancs agrandis d'un tiers. Roux inchangé: éclairci (#E58A4C), il rejoignait en jeu la valeur de l'herbe du soir (L* 27 contre 30, au lieu de 22 contre 30), donc moins lisible en niveaux de gris (essai en bas de `retouche-faune-gris-daltonisme.png`).
 
 ## Fiche par modèle
 
@@ -335,14 +340,14 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |
 
-### `faune.glb` (513 Ko)
+### `faune.glb` (543 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
-| `heron` |  | 706 | kind: "animal", origin: "sol sous les pattes", height: 0.95, length: 0.9, wingspan: 1.7, collision_radius: 0.3 |
-| `goose` |  | 388 | kind: "animal", origin: "ligne de flottaison", length: 0.8, wingspan: 1.6, note: "neuf instances d'un seul maillage (SkeletonUtils.clone)" |
-| `blue_tit` |  | 244 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.18, beak_socket: "socket_blue_tit_beak" |
-| `fox` |  | 786 | kind: "animal", origin: "sol entre les pattes", withers: 0.4, length: 0.65, tail: 0.4 |
+| `heron` |  | 866 | kind: "animal", origin: "sol sous les pattes", height: 0.95, length: 0.9, wingspan: 1.7, collision_radius: 0.3 |
+| `goose` |  | 406 | kind: "animal", origin: "ligne de flottaison", length: 0.8, wingspan: 1.6, note: "neuf instances d'un seul maillage (SkeletonUtils.clone)" |
+| `blue_tit` |  | 304 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.18, beak_socket: "socket_blue_tit_beak" |
+| `fox` |  | 798 | kind: "animal", origin: "sol entre les pattes", withers: 0.4, length: 0.65, tail: 0.4 |
 | `ladder_wood` |  | 176 | kind: "prop", lean_deg: 75.0, length: 3.0, rung_step: 0.28, rungs: 10, top: [0.0, 2.898, 0.776], note: "penchée vers +Z: la poser avec la rotation de celui qui grimpe" |
 | `nest_box` |  | 156 | kind: "prop", pivot: "clou", tilt_deg: 25, entrance: [0.0, -0.13, 0.181], roof_perch: [0.0, -0.048, 0.12], note: "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)" |
 | `oak_branch_stub` |  | 60 | kind: "prop", pivot: "bout du chicot (perchoir)" |
