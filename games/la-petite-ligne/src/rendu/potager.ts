@@ -38,16 +38,47 @@ const STUMP_PICK_RADIUS = 0.4;
 const STUMP_PICK_HEIGHT = 0.6;
 /** Le refus de la hache sur un rejet: un petit tremblement (part de celui d'un coup). */
 const REFUSED_SHAKE = 0.5;
-/** Brins du rejet de chêne (`grow_node` de `oak_sapling`): échelle du nœud seul, de 0,4 à 1 (fiche du modèle). */
+/**
+ * Brins du rejet de chêne (`grow_nodes` du nœud `oak_sapling_shoots`): chacun mis à l'échelle
+ * autour de son pied, sur le flanc de la souche, de 0,4 à 1 (fiche du modèle, tour 8).
+ */
 const OAK_SHOOTS_MODEL = 'oak_sapling_shoots';
+const OAK_SHOOT_MODELS: readonly string[] = [
+  'oak_sapling_shoot_a',
+  'oak_sapling_shoot_b',
+  'oak_sapling_shoot_c',
+  'oak_sapling_shoot_d',
+];
 const OAK_SHOOTS_SCALE: readonly [number, number] = [0.4, 1];
-/** Hauteur des brins au-dessus du sol (dessus de la souche) quand le modèle ne la donne pas (m). */
+/** Hauteur du nœud des brins au-dessus du sol (dessus de la souche) quand le modèle ne la donne pas (m). */
 const OAK_SHOOTS_LIFT = 0.42;
 const OAK_SHOOTS_TOP = 1.68;
 /** Jeune sapin replanté par Basile: agrandi d'un bloc, de 0,7 à 1,3 (fiche du modèle). */
 const FIR_SAPLING_MODEL = 'fir_sapling';
 const FIR_SAPLING_SCALE: readonly [number, number] = [0.7, 1.3];
 const FIR_SAPLING_TOP = 1.24;
+/** Place du plant à côté de la souche (`beside_stump`, repère glTF, sans rotation) si le modèle ne la donne pas. */
+const FIR_BESIDE_STUMP: readonly [number, number, number] = [0, 0, 0.6];
+
+/** Noms des brins lus dans les `extras` du modèle, sinon la liste connue. */
+function growNodes(extras: Readonly<Record<string, unknown>>): readonly string[] {
+  const names = extras.grow_nodes;
+  return Array.isArray(names) &&
+    names.length > 0 &&
+    names.every((n): n is string => typeof n === 'string')
+    ? names
+    : OAK_SHOOT_MODELS;
+}
+
+/** Décalage `beside_stump` validé (trois nombres), sinon la valeur de la fiche. */
+function besideStump(extras: Readonly<Record<string, unknown>>): readonly number[] {
+  const offset = extras.beside_stump;
+  return Array.isArray(offset) &&
+    offset.length === 3 &&
+    offset.every((n): n is number => typeof n === 'number' && Number.isFinite(n))
+    ? offset
+    : FIR_BESIDE_STUMP;
+}
 
 function cellKey(cell: { cx: number; cy: number }): string {
   return `${cell.cx}:${cell.cy}`;
@@ -73,6 +104,10 @@ export class GardenPart implements EventfulPart {
   private readonly rotation = new Quaternion();
   private readonly euler = new Euler();
   private readonly scale = new Vector3();
+  private readonly shootMatrix = new Matrix4();
+  private readonly localMatrix = new Matrix4();
+  /** Pied de ce qui pousse sur la case (plant ou souche), pour la cible de clic. */
+  private readonly youngFoot = new Vector3();
   private time = 0;
 
   constructor(
@@ -197,9 +232,9 @@ export class GardenPart implements EventfulPart {
         // Visée à la souris: la hache refuse et dit pourquoi (tour 8, section 9).
         setStandingBox(
           pick.box,
-          tree.pos.x,
-          ground,
-          tree.pos.y,
+          this.youngFoot.x,
+          this.youngFoot.y,
+          this.youngFoot.z,
           STUMP_PICK_RADIUS,
           Math.max(STUMP_PICK_HEIGHT, height),
         );
@@ -242,8 +277,9 @@ export class GardenPart implements EventfulPart {
   }
 
   /**
-   * Souche, rejet de chêne (la souche et ses brins, mis à l'échelle seuls) ou jeune sapin replanté
-   * (tour 8, section 5.1), d'après `etat/repousse.ts`. Rend la hauteur dessinée (m).
+   * Souche, rejet de chêne (la souche et ses brins, chacun mis à l'échelle autour de son pied) ou
+   * jeune sapin replanté à côté de la souche (tour 8, section 5.1), d'après `etat/repousse.ts`.
+   * Rend la hauteur dessinée (m) et place `youngFoot` au pied de ce qu'il faut viser.
    */
   private drawYoung(tree: DeepReadonly<Tree>, ground: number, context: FrameContext): number {
     const growth =
@@ -264,28 +300,50 @@ export class GardenPart implements EventfulPart {
         : 0;
     this.euler.set(shake, (textHash(tree.id) % 4) * (Math.PI / 2), shake / 2, 'XYZ');
     this.rotation.setFromEuler(this.euler);
-    if (young && tree.kind === 'fir') {
-      // Basile replante: le jeune sapin prend la place de la souche, sur sa butte de terre.
+    // La souche de l'abattage reste au centre de la case dans tous les cas.
+    this.matrix.makeTranslation(tree.pos.x, ground, tree.pos.y);
+    this.trees.add('stump', this.matrix);
+    this.youngFoot.set(tree.pos.x, ground, tree.pos.y);
+    if (!young) {
+      return STUMP_PICK_HEIGHT;
+    }
+    if (tree.kind === 'fir') {
+      // On ne dessouche pas pour replanter: Basile pose le plant à côté, au sud de la souche.
+      // Le décalage ne tourne pas avec le lacet; le plant tourne et grandit autour de son pied.
+      const offset = besideStump(this.library.extras(FIR_SAPLING_MODEL));
+      const px = tree.pos.x + (offset[0] ?? 0);
+      const pz = tree.pos.y + (offset[2] ?? 0);
+      // Sol pris sous le plant lui-même: sur une pente, sa cuvette ne flotte pas.
+      const py = this.terrain.heightAt(px, pz) + (offset[1] ?? 0);
       const size = FIR_SAPLING_SCALE[0] + (FIR_SAPLING_SCALE[1] - FIR_SAPLING_SCALE[0]) * t;
-      this.position.set(tree.pos.x, ground, tree.pos.y);
+      this.position.set(px, py, pz);
       this.scale.setScalar(size);
       this.trees.add(
         FIR_SAPLING_MODEL,
         this.matrix.compose(this.position, this.rotation, this.scale),
       );
+      this.youngFoot.set(px, py, pz);
       return FIR_SAPLING_TOP * size;
     }
-    this.matrix.makeTranslation(tree.pos.x, ground, tree.pos.y);
-    this.trees.add('stump', this.matrix);
-    if (!young) {
-      return STUMP_PICK_HEIGHT;
-    }
-    // Le chêne rejette de sa souche: seuls les brins grandissent (`grow_node` du modèle).
-    const lift = this.library.node(OAK_SHOOTS_MODEL)?.position.y ?? OAK_SHOOTS_LIFT;
+    // Le chêne rejette du flanc de sa souche: chaque brin grandit seul autour de son pied,
+    // T(arbre, sol + nœud des brins) x R(lacet) x T(pied du brin) x S(taille).
+    const shoots = this.library.node(OAK_SHOOTS_MODEL);
+    const lift = shoots?.position.y ?? OAK_SHOOTS_LIFT;
     const size = OAK_SHOOTS_SCALE[0] + (OAK_SHOOTS_SCALE[1] - OAK_SHOOTS_SCALE[0]) * t;
     this.position.set(tree.pos.x, ground + lift, tree.pos.y);
-    this.scale.setScalar(size);
-    this.trees.add(OAK_SHOOTS_MODEL, this.matrix.compose(this.position, this.rotation, this.scale));
-    return lift + (OAK_SHOOTS_TOP - OAK_SHOOTS_LIFT) * size;
+    this.scale.setScalar(1);
+    this.shootMatrix.compose(this.position, this.rotation, this.scale);
+    let footY = 0;
+    for (const name of growNodes(shoots?.userData ?? {})) {
+      const foot = this.library.node(name)?.position;
+      if (foot === undefined) {
+        continue;
+      }
+      footY = foot.y;
+      this.localMatrix.makeScale(size, size, size).setPosition(foot.x, foot.y, foot.z);
+      this.trees.add(name, this.matrix.multiplyMatrices(this.shootMatrix, this.localMatrix));
+    }
+    const footHeight = lift + footY;
+    return footHeight + (OAK_SHOOTS_TOP - footHeight) * size;
   }
 }
