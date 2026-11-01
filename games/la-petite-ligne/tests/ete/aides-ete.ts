@@ -71,7 +71,7 @@ const RESET_AT_RESUME = new Set([
 ]);
 
 /** L'état comparable avant et après une reprise (ce que `resume` remet à zéro est retiré). */
-function lasting(w: WorldState): unknown {
+export function lasting(w: WorldState): unknown {
   const { characters, villagers, stages, ...rest } = structuredClone(w);
   return {
     ...rest,
