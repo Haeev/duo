@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { cellIndex } from '../etat/carte';
-import { chooseButterflyHomes, choosePerches, faunaActive, faunaUnit, treeSpots } from './faune-ambiance';
+import { chooseButterflyHomes, choosePerches, faunaActive, faunaUnit, nextPresence, perchTaken, treeSpots } from './faune-ambiance';
 import { AMBIENT_FAUNA } from './reglages-faune';
 
 const map = loadMap(MAP_FILES).map;
@@ -70,5 +70,34 @@ describe('faune d’ambiance: tirages et règles', () => {
       expect(map.blocked[cellIndex(map, Math.floor(h.x), Math.floor(h.y))]).toBe(false);
     }
     expect(chooseButterflyHomes(map, 7, s.count, s.zones)).toEqual(homes);
+  });
+
+  it('QA7-06: un buisson ne porte qu’une mésange (posée ou en approche), libéré quand elle s’en va', () => {
+    const birds = [
+      { perch: 2, state: 'perched' as const },
+      { perch: 3, state: 'arriving' as const },
+      { perch: 4, state: 'leaving' as const },
+      { perch: 5, state: 'away' as const },
+    ];
+    expect(perchTaken(birds, 2, 9)).toBe(true);
+    expect(perchTaken(birds, 3, 9)).toBe(true);
+    expect(perchTaken(birds, 4, 9)).toBe(false);
+    expect(perchTaken(birds, 5, 9)).toBe(false);
+    // La mésange posée ne se gêne pas elle-même.
+    expect(perchTaken(birds, 2, 0)).toBe(false);
+  });
+
+  it('QA7-07: à la fin de leurs heures, les papillons rentrent dans l’herbe posés, jamais en vol', () => {
+    const s = AMBIENT_FAUNA.butterflies;
+    expect(nextPresence(1, false, false, 0.5, s.hideSeconds)).toBe(1);
+    let p = 1;
+    let frames = 0;
+    while (p > 0 && frames < 1000) {
+      p = nextPresence(p, false, true, 1 / 60, s.hideSeconds);
+      frames += 1;
+    }
+    expect(p).toBe(0);
+    expect(frames / 60).toBeCloseTo(s.hideSeconds, 1);
+    expect(nextPresence(0, true, true, s.hideSeconds, s.hideSeconds)).toBe(1);
   });
 });

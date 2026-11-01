@@ -287,3 +287,66 @@ export function watchTarget(map: GameMap, def: MomentDef, target: string, today:
   if (today === null) return anchor;
   return actorPose(map, def, today, target) ?? anchor;
 }
+
+/**
+ * Tous les acteurs sont partis pendant l'apogée (`after.actors[id]` à `at: null, idle: null`):
+ * la brume levée, la chevrette rentrée dans la haie, le martin-pêcheur envolé. Rien ne reste à
+ * faire partir à l'heure du départ (QA7-01), ni de boucle d'ambiance à garder (QA7-04).
+ */
+export function allGoneAfterClimax(def: MomentDef): boolean {
+  const after = def.after;
+  if (after === null) return false;
+  return def.actors.every((a) => {
+    const entry = after.actors[a.id];
+    // Un acteur absent de `after` reste là où l'apogée l'a laissé.
+    return entry?.at === null && entry.idle === null;
+  });
+}
+
+/** Clip d'un acteur qui n'est pas dessiné (sous l'eau, dans l'herbe). */
+const HIDDEN_CLIP = 'hidden';
+
+/**
+ * Position de l'acteur telle que le rendu la dessine, `back` pas avant `tick` (0: le pas
+ * courant): arrivée et effarouchement de l'attente compris, chorégraphies de l'apogée et du
+ * départ, état d'après. `null`: pas à l'écran. Sert à repousser les joueurs de la bête qui bouge
+ * (QA7-02); le pas d'avant donne son sens de marche.
+ */
+export function drawnPose(map: GameMap, def: MomentDef, today: DeepReadonly<MomentToday>, actor: MomentActorDef, tick: number, seed: number, back: number): Vec3 | null {
+  const rest = restPosition(map, actor);
+  switch (today.phase) {
+    case 'absent':
+    case 'gone':
+      return null;
+    case 'waiting': {
+      const at = tick - back;
+      const t = Math.max(0, (at - today.phaseTick) / SIM_HZ);
+      const arrive = actor.arrive?.keyframes[actor.id];
+      if (actor.arrive !== null && arrive !== undefined && t < actor.arrive.seconds) return sampleTrack(arrive, t, rest);
+      const freeze = def.watch.freeze;
+      if (freeze !== null && freeze.actor === actor.id) {
+        const state = freezeState(def, freeze, today, at, seed);
+        if (state.kind === 'startled') {
+          const pose = startlePose(freeze, rest, actor.idle, state.since, { x: 0, y: 0, clip: '', clipTime: 0, walking: false });
+          return { x: pose.x, y: pose.y, z: rest.z };
+        }
+      }
+      return rest;
+    }
+    case 'climax':
+    case 'left': {
+      const choreo = today.phase === 'climax' ? def.climax : def.leave;
+      const track = choreo?.keyframes[actor.id];
+      if (choreo === null || track === undefined) return today.phase === 'climax' ? rest : null;
+      const t = Math.max(0, today.elapsed - back / SIM_HZ);
+      if (choreographyFade(choreo, t) <= 0.5) return null;
+      const from = today.phase === 'left' && today.startTick !== null ? afterPosition(map, def, actor) : rest;
+      const pose = sampleTrack(track, t, from);
+      return pose.clip === HIDDEN_CLIP ? null : pose;
+    }
+    case 'after': {
+      const pose = actorPose(map, def, today, actor.id);
+      return pose === null ? null : { x: pose.x, y: pose.y, z: pose.z };
+    }
+  }
+}

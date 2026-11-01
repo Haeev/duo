@@ -10,12 +10,12 @@
 import type { ControlFrame } from '../etat/actions';
 import type { Character, CharacterId, MomentToday, Vec2 } from '../etat/types';
 import type { Condition, MomentDef, MomentWatch, Season } from '../donnees/types';
-import { activeWatch, freezeState, momentDef, restPosition, startleTicks, watchTarget, type FreezeState } from '../etat/moments';
+import { activeWatch, allGoneAfterClimax, drawnPose, freezeState, momentDef, restPosition, startleTicks, watchTarget, type FreezeState } from '../etat/moments';
 import { MOVE_DEADZONE, SIM_DT, SIM_HZ } from './constantes';
 import { evaluate, evaluateAll, LOOK_CONE, NO_CONTEXT, variantOf } from './conditions';
 import { type Sim, bump, character, distance, emit, message, notifyKey, partnerName, partnerOf, point, say } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
-import { moveBody } from './grille';
+import { type Blockers, moveBody } from './grille';
 import { runEffects } from './effets';
 import { unitDraw } from '../etat/tirage';
 import { recordMoment } from './souvenirs';
@@ -393,8 +393,11 @@ export function settleSavedClimax(sim: Sim): void {
 function leaveNow(sim: Sim, def: MomentDef, today: MomentToday): void {
   releaseAll(sim);
   for (const c of sim.world.characters) if (c.momentHint?.moment === def.id) c.momentHint = null;
+  // Tout est parti pendant l'apogée (la brume levée, la chevrette dans la haie): rien ne revient
+  // pour repartir (QA7-01), le moment s'éteint.
+  const nothingLeft = today.phase === 'after' && allGoneAfterClimax(def);
   // Un moment de quête manqué reviendra demain (même occurrence); un moment d'ambiance s'en va.
-  if (def.leave !== null && (today.origin === 'ambient' || today.phase === 'after')) {
+  if (def.leave !== null && !nothingLeft && (today.origin === 'ambient' || today.phase === 'after')) {
     enter(sim, today, 'left');
     emit(sim, { type: 'moment_left', moment: def.id });
     return;
@@ -414,6 +417,11 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     today.watching = { p1: parts.p1, p2: parts.p2 };
     sim.runtime.changed = true;
   }
+  // Timidité d'abord: un joueur qui s'approche à ce pas fait filer la bête avant l'apogée.
+  updateShy(sim, def, today);
+  // Une bête partie se cacher (le martin-pêcheur au ras de l'eau) n'est pas là pour l'apogée:
+  // elle partirait de son pieu, où elle réapparaîtrait d'un coup (QA7-03).
+  const hidden = today.shyUntil > world.tick && def.actors.some((a) => a.shy?.hideAway === true);
   const m = minutes(sim);
   const inWindow = m >= def.window.from && m < def.window.to && questStepReady(sim, def, today);
   // La brume: chacun sur sa rive, pas tous deux sur la même.
@@ -426,7 +434,7 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     sim.runtime.changed = true;
   }
   // Aux aguets (la chevrette): le compteur ne tourne que pendant un regard.
-  if (both && inWindow && (freeze === null || freeze.kind === 'look')) {
+  if (both && inWindow && !hidden && (freeze === null || freeze.kind === 'look')) {
     today.watchTicks += 1;
     sim.runtime.changed = true;
   } else if (today.watchTicks !== 0) {
@@ -446,7 +454,6 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     today.noticed.push(c.id);
     say(sim, c.id, 'moment_notice', { partner: other.name });
   }
-  updateShy(sim, def, today);
 }
 
 /**
@@ -491,28 +498,80 @@ function updateShy(sim: Sim, def: MomentDef, today: MomentToday): void {
   }
 }
 
-/** On ne traverse pas une bête: les joueurs sont repoussés hors de son rayon de collision. */
+/**
+ * On ne traverse pas une bête: les joueurs sont repoussés hors de son rayon de collision, où
+ * qu'elle soit dessinée (QA7-02): à son point, à l'arrivée, effarouchée, pendant l'apogée, le
+ * départ et l'état d'après. Une bête qui marche écarte le joueur de côté, perpendiculairement à
+ * son trajet, au lieu de le pousser devant elle.
+ */
 function pushOut(sim: Sim, def: MomentDef, today: MomentToday): void {
-  if (today.phase !== 'waiting' && today.phase !== 'after') return;
-  const b = refreshBlockers(sim);
+  if (today.phase === 'absent' || today.phase === 'gone') return;
+  const { world } = sim;
+  let b: Blockers | null = null;
+  const blockers = (): Blockers => (b ??= refreshBlockers(sim));
   for (const actor of def.actors) {
     if (actor.collisionRadius <= 0) continue;
+    const reach = actor.collisionRadius + BODY;
+    const rest = restPosition(sim.map, actor);
     const waiting = today.phase === 'waiting';
-    const at = waiting ? restPosition(sim.map, actor) : watchTarget(sim.map, def, actor.id, today);
-    // En attente, la bête bouge autour de son point (QA6-04): le renard mulote dans `roam`, le héron
-    // effarouché recule jusqu'à `shy.stepTo`. La zone repoussée couvre ces déplacements.
-    const stepTo = waiting ? (actor.shy?.stepTo ?? null) : null;
-    const reach = actor.collisionRadius + BODY + (waiting ? actor.roam : 0);
-    for (const c of sim.world.characters) {
-      if (c.inHouse) continue;
-      const from = stepTo === null ? at : closestOnSegment(c.pos, at, { x: stepTo[0], y: stepTo[1] });
-      const d = distance(c.pos, from);
-      if (d >= reach) continue;
-      const nx = d < 1e-6 ? 1 : (c.pos.x - from.x) / d;
-      const ny = d < 1e-6 ? 0 : (c.pos.y - from.y) / d;
-      moveBody(b, c.pos, nx * (reach - d), ny * (reach - d));
+    if (waiting) {
+      // Autour de son point, la bête bouge (QA6-04): le renard mulote dans `roam`, le héron
+      // effarouché recule jusqu'à `shy.stepTo`. La zone repoussée couvre ces déplacements.
+      const stepTo = actor.shy?.stepTo ?? null;
+      for (const c of world.characters) {
+        if (c.inHouse) continue;
+        const from = stepTo === null ? rest : closestOnSegment(c.pos, rest, { x: stepTo[0], y: stepTo[1] });
+        radialPush(blockers, c.pos, from, reach + actor.roam);
+      }
+    }
+    const at = drawnPose(sim.map, def, today, actor, world.tick, world.seed, 0);
+    // En vol (le héron, les oies), la bête passe au-dessus des têtes.
+    if (at === null || at.z > AIRBORNE) continue;
+    if (waiting && Math.abs(at.x - rest.x) < 1e-6 && Math.abs(at.y - rest.y) < 1e-6) continue;
+    const prev = drawnPose(sim.map, def, today, actor, world.tick, world.seed, 1);
+    const vx = prev === null ? 0 : at.x - prev.x;
+    const vy = prev === null ? 0 : at.y - prev.y;
+    const speed = Math.hypot(vx, vy);
+    for (const c of world.characters) {
+      if (c.inHouse || distance(c.pos, at) >= reach) continue;
+      if (speed > MOVING && sideStep(blockers(), c.pos, at, vx / speed, vy / speed, reach)) continue;
+      radialPush(blockers, c.pos, at, reach);
     }
   }
+}
+
+/** Repousse `pos` droit devant lui, à `reach` de `from`. */
+function radialPush(blockers: () => Blockers, pos: Vec2, from: Vec2, reach: number): void {
+  const d = distance(pos, from);
+  if (d >= reach) return;
+  const nx = d < 1e-6 ? 1 : (pos.x - from.x) / d;
+  const ny = d < 1e-6 ? 0 : (pos.y - from.y) / d;
+  moveBody(blockers(), pos, nx * (reach - d), ny * (reach - d));
+}
+
+/**
+ * Écarte `pos` de côté du trajet d'une bête qui marche (sens `ux`, `uy`) jusqu'à `reach` de
+ * `at`, du côté où il se trouve (l'autre si ce côté est bouché). Faux si rien n'a pu bouger.
+ */
+function sideStep(b: Blockers, pos: Vec2, at: Vec2, ux: number, uy: number, reach: number): boolean {
+  const rx = pos.x - at.x;
+  const ry = pos.y - at.y;
+  const along = rx * ux + ry * uy;
+  const across = rx * -uy + ry * ux;
+  const need = Math.sqrt(Math.max(0, reach * reach - along * along)) - Math.abs(across);
+  if (need <= 0) return true;
+  const first = across >= 0 ? 1 : -1;
+  for (const side of [first, -first]) {
+    const x = pos.x;
+    const y = pos.y;
+    // De l'autre côté, il faut repasser le trajet: toute la largeur, plus l'écart actuel.
+    const step = side === first ? need : need + 2 * Math.abs(across);
+    moveBody(b, pos, -uy * side * step, ux * side * step);
+    if (Math.hypot(pos.x - x, pos.y - y) >= step * 0.9) return true;
+    pos.x = x;
+    pos.y = y;
+  }
+  return false;
 }
 
 /** Point du segment [a, b] le plus proche de p. */
@@ -526,6 +585,10 @@ function closestOnSegment(p: Vec2, a: Vec2, b: Vec2): Vec2 {
 
 /** Rayon du corps d'un personnage pour la collision avec une bête (m). */
 const BODY = 0.3;
+/** Au-dessus de cette hauteur (m), une bête vole et ne repousse personne. */
+const AIRBORNE = 0.6;
+/** Déplacement d'une bête en un pas (m) au-delà duquel elle marche: elle écarte de côté. */
+const MOVING = 1e-4;
 
 /** Si une quête de moment démarre en cours de journée sans moment ce jour-là, son moment arrive. */
 function attachQuestMoment(sim: Sim): void {

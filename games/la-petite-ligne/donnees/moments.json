@@ -430,7 +430,7 @@
           },
           "collisionRadius": 0.4, "shy": null
         },
-        { "id": "fawn", "model": "fawn", "count": 1, "at": "fawn_bed", "z": -0.3, "facing": 2.475, "idle": "fawn_bed", "idleExtra": null, "collisionRadius": 0, "shy": null }
+        { "id": "fawn", "model": "fawn", "count": 1, "at": "fawn_bed", "z": -0.3, "facing": 2.475, "idle": "fawn_bed", "idleExtra": null, "collisionRadius": 0.3, "shy": null }
       ],
       "climax": {
         "seconds": 9.2,

@@ -13,7 +13,7 @@
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content, MomentChoreography, MomentDef } from '../donnees/types';
 import type { GameMap } from '../etat/carte';
-import { actorPose, idleGestureAt, startleTicks } from '../etat/moments';
+import { actorPose, allGoneAfterClimax, idleGestureAt, startleTicks } from '../etat/moments';
 import { SIM_HZ } from '../etat/types';
 import type { DeepReadonly, MomentToday, ReadonlyWorld, Vec2 } from '../etat/types';
 import type { Catalogue, SoundDef } from './catalogue';
@@ -154,11 +154,17 @@ export class MomentSounds {
       if (s.loop !== null) {
         const ramp = s.moment?.climaxRampSeconds ?? 0;
         const waitingDb = s.moment?.waitingDb ?? 0;
-        // Une boucle qui monte à l'apogée (les grillons) reste jusqu'au départ; les autres s'arrêtent à l'envol.
+        // Une boucle qui monte à l'apogée reste jusqu'au départ si le moment reste à l'écran après
+        // (les grillons des vers luisants). Si tout part pendant l'apogée (la brume qui se lève),
+        // elle redescend pendant les `ramp` dernières secondes et s'éteint avec lui (QA7-04).
+        // Les autres boucles s'arrêtent à l'envol.
+        const stays = !allGoneAfterClimax(def);
         let gainDb: number | null = null;
         if (today.phase === 'waiting') gainDb = waitingDb;
-        else if (ramp > 0 && today.phase === 'climax') gainDb = waitingDb * Math.max(0, 1 - today.elapsed / ramp);
-        else if (ramp > 0 && today.phase === 'after') gainDb = 0;
+        else if (ramp > 0 && today.phase === 'climax') {
+          gainDb = waitingDb * Math.max(0, 1 - today.elapsed / ramp);
+          if (!stays) gainDb = Math.min(gainDb, this.settings.moments.departFloorDb * Math.min(1, Math.max(0, 1 - (def.climax.seconds - today.elapsed) / ramp)));
+        } else if (ramp > 0 && today.phase === 'after' && stays) gainDb = 0;
         if (gainDb !== null) loops.push({ key, sound: s.id, at: this.source(def, today, entry.id), gainDb });
         continue;
       }

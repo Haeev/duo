@@ -176,3 +176,10 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Page de rendu figée (`today.paused`): les gerbes émises au franchissement de la surface n'apparaissent pas sur une capture figée (rien ne franchit); les juger en jeu ou au son.
 - `eqeqeq` et `prefer-optional-chain` se contredisent sur `x?.y != null`: passer par une variable (`const s = x?.y ?? null; if (s !== null)`).
 - Serveur Vite de capture lancé en arrière-plan: il est coupé à la limite de temps de la tâche (30 min par défaut); le lancer avec un `timeout` long.
+
+## Correctifs de la recette QA7 (La Petite Ligne, vérifié le 2026-11-01)
+
+- Une bête jouée par une chorégraphie doit repousser les joueurs à chaque instant où elle est dessinée (arrivée, effarouchement, apogée, départ), pas seulement à son point: `drawnPose` de `etat/moments.ts` donne la pose du rendu, `back = 1` le pas d'avant (sens de marche). Écarter perpendiculairement au trajet, sinon la bête pousse le joueur devant elle jusqu'à un mur et le traverse.
+- `leaveNow` depuis l'état d'après rejoue `leave` depuis `afterPosition`: si tous les acteurs sont partis pendant l'apogée, aller droit à `gone` (`allGoneAfterClimax`), sinon la bête revient pour repartir.
+- Preuve en jeu réel d'un correctif de phase: la recette QA garde ses sauvegardes et ses specs Playwright à deux navigateurs dans `/tmp/qa7/`; en copier la spec (sorties, port, dossier de données à soi), `vite build --outDir` du worktree dans un dossier avec `duo-game.json` et `package.json`, et le serveur `packages/sdk-dev/src/serveur/servir.ts` de la copie principale (sa `dist/coque` existe, pas celle du worktree). Deux minutes.
+- Libellés `convert -annotate` dans une commande: refusés par l'outil isolé (texte trop complexe); les mettre dans un script du scratchpad.
