@@ -827,9 +827,64 @@ Réponses du client (2026-11-01): 1. des icônes, avec les chiffres dans le carn
 
 Hypothèses du script: revenus de la commande, des annonces et des ventes du tour 9 (`tour9_automne.py`, calés sur les robots à 0,35 s); petites dépenses de la rue Haute 40 sous par semaine (pain, chocolat, coupes) et quatre rideaux de couleur; planches des pièces en partie fournies par le duo (10 pour le médian), le reste acheté 8 sous; un chantier de pièce bâti deux jours après sa commande; grand coffre acheté au jour 16 s'il ne l'a pas été avant.
 
+## 13. Découpage technique (architecte-technique)
+
+Décisions: ADR 0016 (`docs/plateforme/decisions/0016-interieurs-et-carte-elargie-petite-ligne.md`, proposée le 2026-11-01). En résumé: les intérieurs sont **sur la carte, à leur place**, avec la coupe des murs pour le joueur local (règle de la maisonnette généralisée à tous les bâtiments visitables); la carte de 100 m tient les budgets **à condition** que tout ce qui couvre la carte soit découpé et éliminé hors du cadre (mesuré: la vue la plus chargée de la place passe de 201 830 à 227 148 triangles avec une région est dense, sans rien de nouveau à l'écran). Ni niveaux de détail, ni chargement par zones, ni « mode léger au-delà de 40 m » (section 1.3): la caméra ne montre jamais plus de 36 m de large.
+
+### 13.1 Lots
+
+Chaque lot a ses fichiers. Un fichier partagé n'a qu'un propriétaire; les autres lui demandent leurs ajouts (ligne « Demandes » de `ETAT.md`). Le dev gameplay 3D tourne en trois exemplaires (L0 puis L3, L4, L5), chacun dans sa copie isolée.
+
+| Lot | Membre | Travail | Fichiers (propriétaire) | Dépend de |
+|---|---|---|---|---|
+| **L0. Contrat** | dev-gameplay-3d (simulation), relu par dev-reseau | Types et lecture de la carte élargie: `MapBuilding` et `GameMap.buildings` (pièces, portes, point d'apparition, clé des heures, ambiance; `GameMap.house` lu depuis `buildings.house`); clé `interieurs` de `halte.json` décrite dans les conventions de la carte; `Character.inside: BuildingId \| null` calculé par `updateInside` et `placeCharacter`, **à côté** de `inHouse` (gardé tel quel jusqu'à L3 pour que rien ne casse); **tous les champs d'état de 7.2 déclarés d'un coup** avec leurs valeurs par défaut (besoins, coiffure et couleur, pièces, rangement, rideaux, `inside`), schémas réseau compris; carte de secours mise à jour; tests de lecture | `src/etat/carte.ts`, `src/etat/types.ts`, `src/donnees/carte.ts`, `src/donnees/carte-secours.ts`, `src/simulation/deplacement.ts` (deux fonctions), `src/simulation/monde.ts`, `src/reseau/schemas.ts` | rien; à faire seul et en premier (court) |
+| **L1. Carte** | level-designer | Région est (x 64 à 99) et la table 1.3: ru, ponceau, pont, passerelle, gué de pierres, rue Haute, emprises des quatre bâtiments, `interieurs` (épicerie, mercerie, maisonnette avec les pièces du cellier et de la chambre), portes, points de 1.4 et 1.6, `village_exit` déplacée, sites des pièces, trajets d'Achille et de Solange; contrôles nouveaux de `valider_carte.py` (pièces dans l'emprise et hors des murs, porte sur le pourtour et devant une case libre, ru franchissable aux seuls trois passages et au gué); lignes de vue; `carte-halte.md` | `outils/construire_carte_halte.py`, `outils/valider_carte.py`, `donnees/cartes/halte.json` et ses aperçus (seul à les écrire), `docs/jeux/jeu-1/carte-halte.md` | ADR 0016 (format); L0 pour relire la carte dans le jeu. Peut commencer tout de suite |
+| **L2. Modèles** | artiste-3d | Dans l'ordre: (a) bâtiments de la rue Haute aux emprises de 1.3, avec les métadonnées d'intérieur (`footprint`, `door_cell`, `cut_walls`, `interior`) pour la mercerie, et l'épicerie existante reprise avec un intérieur (murs en enfants directs, toit et étage repérables, contenu fixe sous un nœud `<id>_interior`, sol jamais coupé), ponts et passerelle; (b) mobilier des deux intérieurs; (c) cellier et chambre (fantôme et bâti), nœuds `window_<n>`, rideaux, rangement; (d) Achille et Solange; (e) 12 coupes et couleurs. Budget par bâtiment de la bible 8.8; chaque modèle vu de près | `assets-src/modeles/bourg.py`, `maison.py` ou `maison_t9.py`, `personnages.py`, `assets/modeles/*.glb`, `assets/modeles/README.md`, `index.json` | emprises de 1.3 (à confirmer avec L1 dès son premier jet) |
+| **L3. Simulation du monde** | dev-gameplay-3d (simulation, exemplaire 1) | Bâtiments visitables: portes et heures (couche dynamique de `refreshBlockers`, sortie toujours permise), pas de porte en portant à deux, sons d'intérieur côté événements; **migration de `inHouse` vers `inside`**, lecteur par lecteur (« à l'abri » contre « chez soi », ADR 0016), puis retrait du champ; Achille, Solange, Jeanne (emplois du temps, trajets), fournil, chocolat chaud, salon et coiffures côté règles, quêtes `achille_basket` et `solange_first_cut`, souhaits et cadeaux; robots (aller au fournil, s'asseoir chez Odette) | `src/simulation/` sauf les fichiers de L4, nouveau `src/simulation/interieurs.ts`, `donnees/habitants.json`, `quetes.json`, `courrier.json`, `objets.json`, `textes.json` (répliques), `src/simulation/robot.ts` | L0; L1 pour les tests sur la vraie carte |
+| **L4. Simulation de la maison** | dev-gameplay-3d (simulation, exemplaire 2) | Besoins (Ventre, Repos et sieste, Cœur, retrouvailles, Sommeil), pièces bâties (commande, site, éléments, panne, nuit, fenêtre devenue porte), rangement à cases et râtelier, rideaux aux fenêtres; **format de sauvegarde 7** et sa migration (y compris `inside` recalculé depuis la position et les champs de L3); robot longue vie | `src/simulation/besoins.ts`, `rangement.ts`, `chantiers.ts`, `amenagement.ts`, nouveau `src/simulation/pieces.ts`, `donnees/pieces.json` (nouveau), `src/sauvegarde/sauvegarde.ts`, `tests/longue-vie/` | L0. `donnees/reglages.json`: L4 en est le propriétaire et y verse aussi les clés de L3 (`bakery`, `salon`, `grocer`) qu'il lui demande |
+| **L5. Rendu et son** | dev-gameplay-3d (rendu) | `StagedBuilding` sorti de `maison.ts` vers `src/rendu/interieurs.ts` (une vue par bâtiment, contenu masqué hors de l'intérieur où l'on est, lampe unique déplacée, lumières de sol `interior`); **budgets de la carte de 100 m** (13.3); Achille et Solange, coupes et couleurs, animations; cellier, chambre, rideaux ouverts et fermés; écoute: `listener.inside` et ambiance par bâtiment; pages de démonstration `scene=mercerie`, `scene=epicerie`, `scene=pont` | `src/rendu/` (seul), `src/audio/moteur.ts`, `src/audio/declencheurs.ts`, `src/audio/catalogue.ts` | L0; GLB de L2 (substituts en attendant, `substituts.ts`) |
+| **L6. Interface** | dev-gameplay-2d | Icônes des besoins (chiffres au carnet, réponse du client), panneaux du salon, du rangement, du chantier de pièce, guichet, rêverie, établi; lieu de l'autre joueur par bâtiment (`places` de `modele.ts`, au lieu de `house_interior`); textes d'interface | `src/interface/` (seul), `src/interface/textes-interface.json` | L0 (types de 7.2); maquettes UX |
+| **L7. Sons** | sound-designer | Liste de la section 10 | `assets/son/` et ses sources, catalogue des sons livré à L5 | rien |
+
+### 13.2 Ordre et intégration
+
+1. **L0 seul** (un exemplaire du dev gameplay 3D). Pendant ce temps, L1, L2 et L7 travaillent déjà: ils ne touchent pas à `src/`.
+2. **Ensuite en parallèle**: L1, L2, L3, L4, L5, L6, L7, chacun dans sa copie isolée, à partir de L0 intégré.
+3. **Intégration par le manager dans cet ordre**, chaque lot repris sur le précédent: L0, L1 (la carte), L2 (les modèles), L4 (format 7 et `reglages.json`), L3 (migration de `inHouse`, qui touche le plus de fichiers; repris en dernier des lots de simulation pour absorber les autres), L5, L6, L7. Si L3 finit avant L4, L3 attend: sa migration de `inHouse` est la plus sujette aux conflits.
+4. **Fin**: budgets mesurés sur la vraie carte (13.3), revue de code, captures de près, recette T10-01 à T10-30.
+
+Fichiers à risque de conflit et règle:
+
+| Fichier | Propriétaire | Règle |
+|---|---|---|
+| `src/etat/types.ts` | L0, puis L3 | après L0, ajouts seulement par L3; L4 et L6 lui demandent |
+| `donnees/reglages.json` | L4 | L3 demande ses clés; une clé de premier niveau par sujet |
+| `donnees/cartes/halte.json` | L1 | fichier généré: jamais retouché à la main ni par un autre lot |
+| `src/simulation/deplacement.ts` | L0, puis L3 | L4 n'y touche pas |
+| `src/simulation/amenagement.ts` (lit `inHouse` et `map.house`) | L4 | la migration de L3 n'y remplace que la lecture de `inHouse`, rien d'autre |
+| `src/sauvegarde/sauvegarde.ts` | L4 | la migration de format 7 recalcule aussi les champs de L3 |
+| `ETAT.md` | chaque lot dans sa propre section datée | le manager fusionne |
+
+### 13.3 Budgets de la carte de 100 m (lot L5, avec le tech-artist)
+
+Mesuré par l'architecte (ADR 0016, prototype hors dépôt): la vue la plus chargée de la place passe de 201 830 à 227 148 triangles quand la région est est pleine, sans rien de nouveau à l'écran; 207 000 à 218 000 triangles et 95 à 102 appels au pont de la rue sur une région est plus dense que celle prévue; 11 programmes partout. À faire, dans l'ordre:
+
+1. Sol et eau du terrain en morceaux de 12 m éliminés hors du cadre; semis (touffes, fleurs, galets) répartis par morceaux; arbres de la lisière par tronçons. Règle: aucun maillage dont la taille croît avec la carte n'est dessiné d'un seul tenant.
+2. Regroupement des petits morceaux du décor (`chunkMergeBelow`, `chunkMergeBlock`) réglé pour qu'un bloc ne déborde pas de plus de 12 m du cadre; passe d'ombre éliminée par morceau.
+3. Intérieurs: contenu masqué hors de l'intérieur où l'on est; mobilier fixe fusionné avec le bâtiment; aucune `PointLight` de plus (la lampe unique se déplace), sinon les programmes sortent du budget.
+4. Cible, sans habitants à l'écran: **205 000 triangles et 135 appels au plus**, 11 programmes, dans les vues de l'ADR 0016 (place orientation 2, pont dans les quatre orientations, rue Haute zoom 1 et 2, mercerie et épicerie ouvertes, maisonnette avec ses deux pièces); puis T10-04 avec six habitants et les deux joueurs sous 225 000 et 150.
+
+### 13.4 Points d'attention pour la revue de code
+
+- Migration de `inHouse`: un test par règle qui change de sens (pluie, moments rares, minuit, aménagement, sieste, bancs) et le robot longue vie avant et après, mêmes graines.
+- Porte fermée et prédiction de l'invité: test à deux contextes où la porte ferme pendant le passage de l'invité (aucun accroc, aucun joueur déplacé).
+- Aucune allocation par image dans la coupe des murs ni dans le choix du bâtiment courant (dix rectangles au plus, une fois par pas).
+- Ressources libérées à la sortie: géométries fusionnées par bâtiment, matériaux des fantômes, lumières de sol.
+
 ## Historique
 
 | Date | Version | Changement | Demandé par |
 |---|---|---|---|
 | 2026-11-01 | 1 | Première rédaction: rue Haute et quatre étapes suivantes, Achille et Solange, intérieurs de l'épicerie et du salon, 15 coupes et 8 couleurs, besoins doux (Ventre, Repos, Cœur, Sommeil), cellier et chambre bâtis à deux, rangement à cases et râtelier, rideaux aux fenêtres; simulation `tour10_maison.py` | manager (retours du client, soirée du 1er novembre) |
 | 2026-11-01 | 1.1 | Réponses du client aux trois questions: icônes et chiffres au carnet, barbes et moustaches, intérieurs d'abord | client |
+| 2026-11-01 | 1.2 | Section 13, découpage technique: intérieurs sur la carte (ADR 0016), budgets de la carte de 100 m mesurés sur prototype, lots L0 à L7 avec fichiers, propriétaires et ordre d'intégration | manager (question technique de la section 11) |

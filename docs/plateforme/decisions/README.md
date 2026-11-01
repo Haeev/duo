@@ -28,6 +28,7 @@ Chaque décision structurante de la plateforme a son ADR: contexte, au moins deu
 | 0013 | Stratégie de test et CI | acceptée | architecte-technique (avec qa-testeur, ingenieur-build) | [0013-tests-ci.md](0013-tests-ci.md) |
 | 0014 | Moteur 2D par défaut (PixiJS ou Phaser 4) | différée au premier jeu 2D | architecte-technique (avec dev-gameplay-2d) | non rédigé |
 | 0015 | Journal et rapport de diagnostic (F14) | acceptée | architecte-technique (avec dev-plateforme) | [0015-journal-rapport-diagnostic.md](0015-journal-rapport-diagnostic.md) |
+| 0016 | Intérieurs sur la carte et carte élargie (La Petite Ligne, tour 10) | acceptée | architecte-technique (avec dev-gameplay-3d, dev-reseau, level-designer, tech-artist) | [0016-interieurs-et-carte-elargie-petite-ligne.md](0016-interieurs-et-carte-elargie-petite-ligne.md) |
 
 « Avec » désigne les membres qui doivent relire l'ADR; ils ne l'ont pas encore fait au 2026-10-30. Les ADR 0007 et 0008 étaient en cours de rédaction par dev-reseau à la date de cet index: leur ligne est à compléter (statut, lien) à leur intégration.
 
