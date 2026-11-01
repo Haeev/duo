@@ -845,6 +845,7 @@ function parseActor(a: Reader): MomentDef['actors'][number] {
     idleExtra: extra === null || extra.isNull() ? null : { clip: extra.at('clip').string(), everySeconds: pair(extra.at('everySeconds')) },
     arrive: choreography(a.opt('arrive')),
     collisionRadius: optNumber(a, 'collisionRadius', 0),
+    roam: optNumber(a, 'roam', 0),
     shy:
       shy === null || shy.isNull()
         ? null

@@ -57,6 +57,9 @@ SPEAKERS_EXTRA = {"narrator"}
 FORM_LEVELS = ["low", "okay", "good", "great", "radiant"]
 INDEFINITE_ARTICLES = {"un", "une", "des"}
 ENGINE_FLAGS = {"handcar_pushed"}
+# Acteurs des moments dessinés par un effet procédural, sans modèle de `index.json` (M-01), avec le
+# fichier du rendu qui les dessine (même liste que `tests/moments-recette.test.ts`).
+PROCEDURAL_ACTORS = {"glowworm_light": "src/rendu/vers-luisants.ts"}
 # Tournures qui accordent au genre d'un joueur (rédaction neutre): un avertissement à relire, pas une erreur.
 GENDERED_RE = re.compile(
     r"\b(?:tu es|tu étais|tu seras|vous êtes|vous étiez|vous serez|sois|soyez) "
@@ -841,6 +844,9 @@ def check_moments(folder: Path, reg: Registry, report: Report, map_objects: set[
             model = a.get("model")
             if a.get("villager") is not None:
                 ref("villager", a["villager"], wa, reg, report)
+            elif isinstance(model, str) and model in PROCEDURAL_ACTORS:
+                if not (folder.parent / PROCEDURAL_ACTORS[model]).is_file():
+                    report.error(wa, f"effet procédural « {model} »: {PROCEDURAL_ACTORS[model]} absent")
             elif isinstance(model, str) and models is not None and model not in models:
                 missing_models.setdefault(model, wa)
             count = a.get("count", 1)

@@ -324,7 +324,10 @@ describe('moments: l’apogée n’attend que les deux (M-05)', () => {
     expect(today.early).toBe(true);
     sim.world.clock.minutes = 16 * 60 + 40;
     expect(climaxes(wait(sim, 5.2))).toHaveLength(1);
+    // L'étape finit avec le spectacle (16,8 s), pas à son début (QA6-07).
     wait(sim, 1);
+    expect(sim.world.quests.find((q) => q.id === 'wild_geese')?.status).toBe('active');
+    wait(sim, 17);
     expect(sim.world.quests.find((q) => q.id === 'wild_geese')?.status).toBe('done');
   });
 });
@@ -342,26 +345,26 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
   }
 
   function holdBoth(sim: Sim): void {
-    place(sim, 'p1', { x: 51.2, y: 5.3 });
-    place(sim, 'p2', { x: 52.6, y: 6.8 });
+    place(sim, 'p1', { x: 50.5, y: 7.3 });
+    place(sim, 'p2', { x: 52.3, y: 5.5 });
     press(sim, 'p1');
     press(sim, 'p2');
   }
 
   it('Agir près d’une place libre la prend, face à l’échelle; la place de l’autre ne se prend pas', () => {
     const { sim } = ladderSim();
-    place(sim, 'p1', { x: 51.2, y: 5.3 });
+    place(sim, 'p1', { x: 50.5, y: 7.3 });
     step(sim, { controls: {}, intents: [] });
     expect(character(sim, 'p1').aim?.verb).toBe('hold');
     const events = press(sim, 'p1');
     const c = character(sim, 'p1');
     expect(c.holding).toBe('ladder_hold_west');
     expect(c.pos).toEqual(sim.map.points.ladder_hold_west);
-    // Face au montant: la place de l'ouest regarde le sud-est (cap de la carte).
-    expect(c.facing).toBeCloseTo(Math.PI / 4, 6);
+    // Face au montant: la place de l'ouest regarde le nord-est (cap de la carte).
+    expect(c.facing).toBeCloseTo(-Math.PI / 4, 6);
     expect(events).toContainEqual({ type: 'hold_started', by: 'p1', point: 'ladder_hold_west' });
     // L'autre arrive du même côté: on lui dit de prendre l'autre côté.
-    place(sim, 'p2', { x: 51.0, y: 5.9 });
+    place(sim, 'p2', { x: 50.4, y: 6.9 });
     // Mains libres (sinon la bêche qu'on tient bêcherait la case devant soi, comme ailleurs).
     const p2 = character(sim, 'p2');
     p2.selected = p2.bag.findIndex((s, i) => s === null && i < 10);
@@ -387,8 +390,8 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
     const frozen = today.elapsed;
     wait(sim, 2);
     expect(today.elapsed).toBe(frozen);
-    // L'étape est finie dès le début de l'apogée (la récompense part au début): lâcher n'est jamais un échec.
-    expect(sim.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('done');
+    // L'étape (et son texte de fin) attend la fin du spectacle (QA6-07); la récompense, elle, est partie au début.
+    expect(sim.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('active');
     // Il revient à sa place: Basile reprend où il en était.
     const back = press(sim, 'p2');
     expect(character(sim, 'p2').holding).toBe('ladder_hold_east');
@@ -402,14 +405,64 @@ describe('moments: l’échelle de Basile (geste « tenir », M-09)', () => {
     expect(sim.world.flags).toContain('nest_box_straight');
   });
 
-  it('après 8,6 s on peut lâcher: Basile finit de descendre sans s’arrêter', () => {
+  it('après 7,4 s (Basile au sol), on peut lâcher: il finit de reculer sans s’arrêter', () => {
     const { sim, today } = ladderSim();
     holdBoth(sim);
-    wait(sim, 0.6 + 8.7);
+    wait(sim, 0.6 + 7.5);
+    expect(today.phase).toBe('climax');
+    expect(today.elapsed).toBeGreaterThan(7.4);
     const events = wait(sim, 0.1, (i) => ({ p1: { seq: i, moveX: -1, moveY: 0, actHeld: false }, p2: still(i) }));
     expect(events.some((e) => e.type === 'moment_paused')).toBe(false);
     wait(sim, 1);
     expect(today.phase).toBe('after');
+  });
+
+  it('QA6-07: le texte de fin de quête et le texte d’apogée tombent à la fin du spectacle, pas au début', () => {
+    const { sim, today } = ladderSim();
+    const before = character(sim, 'p1').notifications.filter((n) => n.key === 'quest_done').length;
+    const done = (): number => character(sim, 'p1').notifications.filter((n) => n.key === 'quest_done').length - before;
+    const climaxText = (): number => character(sim, 'p1').notifications.filter((n) => n.key === 'moment_ladder_climax').length;
+    holdBoth(sim);
+    wait(sim, 1.5);
+    expect(today.phase).toBe('climax');
+    expect(character(sim, 'p1').heartToday.moment).toBe(true);
+    expect([done(), climaxText()]).toEqual([0, 0]);
+    expect(sim.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('active');
+    wait(sim, 8);
+    expect(today.phase).toBe('after');
+    expect([done(), climaxText()]).toEqual([1, 1]);
+    expect(sim.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('done');
+    expect(sim.world.flags).toContain('nest_box_straight');
+  });
+
+  it('QA6-08: une sauvegarde faite pendant l’apogée finit l’étape et montre le texte au rechargement', () => {
+    const { sim, today } = ladderSim();
+    holdBoth(sim);
+    wait(sim, 2);
+    expect(today.phase).toBe('climax');
+    const snap = snapshotOf(sim);
+    const back = restoreWorld(sim.content, sim.map, JSON.parse(JSON.stringify(snap.data)) as unknown, snap.dataSchema, [A, B]);
+    expect(back.world.moments.today?.phase).toBe('after');
+    expect(character(back, 'p1').notifications.some((n) => n.key === 'moment_ladder_climax')).toBe(true);
+    step(back, { controls: {}, intents: [] });
+    expect(back.world.quests.find((q) => q.id === 'basile_lost')?.status).toBe('done');
+    expect(character(back, 'p2').notifications.some((n) => n.key === 'quest_done')).toBe(true);
+  });
+});
+
+describe('moments: les bêtes ne traversent pas les joueurs (QA6-04)', () => {
+  it('le renard qui mulote: un joueur dans son coin d’herbe en est écarté au-delà de `roam` et des deux rayons', () => {
+    const sim = readySim();
+    const today = setMoment(sim, 'fox', 'ambient', 20 * 60);
+    const actor = momentDef(sim.content, 'fox')?.actors.find((a) => a.id === 'fox');
+    const at = sim.map.points.fox_mousing;
+    if (actor === undefined || at === undefined) throw new Error('renard absent');
+    expect(actor.roam).toBeGreaterThan(2);
+    const p1 = character(sim, 'p1');
+    placeCharacter(sim, p1, { x: at.x + 1.5, y: at.y });
+    wait(sim, 0.5);
+    expect(today.phase).toBe('waiting');
+    expect(Math.hypot(p1.pos.x - at.x, p1.pos.y - at.y)).toBeGreaterThanOrEqual(actor.roam + actor.collisionRadius + 0.3 - 1e-6);
   });
 });
 

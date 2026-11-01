@@ -26,6 +26,8 @@ function setup(id: string, phase: MomentToday['phase']): { sim: Sim; sounds: Mom
   today.phase = phase;
   today.startTick = phase === 'climax' ? sim.world.tick : null;
   sim.world.moments.today = today;
+  // Les moments ne sonnent qu'en journée (QA6-05).
+  sim.world.phase = 'day';
   const sounds = new MomentSounds(catalogue, AUDIO_SETTINGS, sim.content, sim.map, createRandom(1));
   return { sim, sounds, today };
 }

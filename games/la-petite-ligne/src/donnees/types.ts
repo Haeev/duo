@@ -358,6 +358,11 @@ export interface MomentActorDef {
   idleExtra: { clip: string; everySeconds: [number, number] } | null;
   arrive: MomentChoreography | null;
   collisionRadius: number;
+  /**
+   * Rayon (m) où la bête se promène autour de son point pendant l'attente (le renard qui mulote):
+   * la zone d'où les joueurs sont repoussés le couvre, pour qu'elle ne les traverse pas. 0 sinon.
+   */
+  roam: number;
   shy: { distance: number; clip: string; stepTo: [number, number] | null; stepClip: string | null; returnAfterSeconds: number } | null;
   /** Habitant joué par cet acteur pendant le moment (Basile sur l'échelle), ou `null`. */
   villager: string | null;

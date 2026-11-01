@@ -107,6 +107,7 @@ const FOX_LISTEN = 2.5;
 const FOX_POUNCE = 1.2;
 const FOX_SNIFF = 2;
 const FOX_WALK = 1;
+/** Rayon de mulotage si la fiche ne donne pas `roam` (m); avec `roam`, il en garde la longueur d'un saut. */
 const FOX_ROAM = 1.2;
 const FOX_LEAP = 1;
 const FOX_APEX = 0.9;
@@ -740,7 +741,8 @@ export class MomentsPart implements EventfulPart {
     const spot = (n: number): { x: number; y: number } => {
       if (n === 0) return { x: rest.x, y: rest.y };
       const angle = unit(key, n, 7) * Math.PI * 2;
-      const radius = FOX_ROAM * Math.sqrt(unit(key, n, 8));
+      const roam = view.actor.roam > FOX_LEAP ? view.actor.roam - FOX_LEAP : FOX_ROAM;
+      const radius = roam * Math.sqrt(unit(key, n, 8));
       return { x: rest.x + Math.cos(angle) * radius, y: rest.y + Math.sin(angle) * radius };
     };
     const from = spot(k);

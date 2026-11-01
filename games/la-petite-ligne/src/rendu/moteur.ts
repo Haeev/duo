@@ -26,7 +26,7 @@ import {
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { GameView, PickResult, Renderer, RendererOptions } from '../etat/vue';
 import { IsoCameraRig, type CameraCommand } from './camera';
-import { PickRegistry, type FrameContext, type RenderPart } from './contexte';
+import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
 import { DaylightRig } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
@@ -512,7 +512,54 @@ export class RenderEngine implements Renderer {
         ground,
       });
     }
+    this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     materials.setSeeThrough(this.holes);
+  }
+
+  /** Trou du lieu d'un moment (le nichoir sous le houppier), voir `RENDER_SETTINGS.momentSeeThrough`. */
+  private pushMomentHole(
+    world: ReadonlyWorld,
+    terrain: Terrain,
+    pixelsPerMeter: number,
+    elevation: number,
+    depthPerPixel: number,
+  ): void {
+    const settings = RENDER_SETTINGS.momentSeeThrough;
+    const today = world.moments.today;
+    if (
+      today === null ||
+      !(settings.moments as readonly string[]).includes(today.id) ||
+      !(settings.phases as readonly string[]).includes(today.phase)
+    ) {
+      return;
+    }
+    const hook = this.view.map.hooks.find((h) => h.id === settings.hook);
+    if (hook === undefined) {
+      return;
+    }
+    const camera = this.rig.camera;
+    const ground = terrain.heightAt(hook.pos.x, hook.pos.y);
+    this.probe.set(hook.pos.x, ground + hook.pos.z - settings.drop, hook.pos.y);
+    // Seulement quand la caméra voit la face de l'accroche: de l'autre côté, le tronc est devant
+    // elle et le trou le couperait (un tronc scié net, sans rien derrière à montrer).
+    const yaw = yawFromQuarter(hook.rotation);
+    const towardCamera =
+      Math.sin(yaw) * (camera.position.x - this.probe.x) +
+      Math.cos(yaw) * (camera.position.z - this.probe.z);
+    if (towardCamera <= 0) {
+      return;
+    }
+    this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
+    this.probe.project(camera);
+    this.holes.push({
+      x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
+      y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
+      radiusX: settings.halfWidth * pixelsPerMeter,
+      radiusY: settings.halfHeight * Math.cos(elevation) * pixelsPerMeter,
+      depth: -this.viewPoint.z - settings.nearer,
+      depthPerPixel,
+      ground,
+    });
   }
 
   frame(dtSeconds: number): void {

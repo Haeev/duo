@@ -68,7 +68,9 @@ export class MomentSounds {
     const def = today === null ? undefined : this.content.moments.find((m) => m.id === today.id);
     this.needed.clear();
     this.duck = 0;
-    if (today === null || def === undefined || today.phase === 'gone') {
+    // Hors de la journée (écran de nuit, fin), la simulation n'avance plus les moments: leurs sons
+    // se taisent comme l'ambiance, même si le moment est encore « là » jusqu'à 23 h 30 (QA6-05).
+    if (today === null || def === undefined || today.phase === 'gone' || world.phase !== 'day') {
       this.stopFollowed(syncs);
       return;
     }

@@ -8,7 +8,7 @@
  * `variantOf`): ajouter ou retirer un moment ne change rien d'autre (M-11).
  */
 import type { ControlFrame } from '../etat/actions';
-import type { Character, CharacterId, MomentToday } from '../etat/types';
+import type { Character, CharacterId, MomentToday, Vec2 } from '../etat/types';
 import type { Condition, MomentDef, MomentWatch } from '../donnees/types';
 import { activeWatch, momentDef, restPosition, watchTarget } from '../etat/moments';
 import { MOVE_DEADZONE, SIM_DT, SIM_HZ } from './constantes';
@@ -262,7 +262,6 @@ function startClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
     world.moments.history.push({ id: def.id, day: world.clock.day, weekday: (world.clock.day - 1) % Math.max(1, weekdays), origin: today.origin, seen: true });
   }
   world.session.togetherMoments += 1;
-  bump(sim, `moment_seen:${def.id}`, null);
   runEffects(sim, def.effects, null);
 }
 
@@ -290,15 +289,44 @@ function updateClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
     today.paused = false;
     emit(sim, { type: 'moment_resumed', moment: def.id });
   }
-  if (today.paused) return;
+  if (today.paused) {
+    // Échelle lâchée pour de bon (QA6-06): à l'heure de départ, l'apogée se termine quand même,
+    // sinon Basile resterait figé et la musique baissée jusqu'au lendemain.
+    if (minutes(sim) >= def.present.to) finishClimax(sim, def, today);
+    return;
+  }
   today.elapsed += SIM_DT;
   sim.runtime.changed = true;
   if (today.elapsed < choreo.seconds) return;
-  // Le texte arrive à la fin du spectacle: au début, il détournait les yeux de la bête.
+  finishClimax(sim, def, today);
+}
+
+/**
+ * Fin du spectacle: le texte d'apogée et le compteur `moment_seen` (qui finit l'étape de quête,
+ * donc son texte de fin) arrivent maintenant; au début, ils détournaient les yeux de la bête
+ * (QA6-07). La récompense, elle, est partie au début.
+ */
+function finishClimax(sim: Sim, def: MomentDef, today: MomentToday): void {
   notifyKey(sim, 'both', 'message', def.texts.climax);
+  bump(sim, `moment_seen:${def.id}`, null);
   releaseAll(sim);
   // L'heure de départ passée pendant l'apogée: l'état d'après se termine aussitôt.
   enter(sim, today, minutes(sim) >= def.present.to ? 'gone' : 'after');
+}
+
+/**
+ * Reprise d'une sauvegarde faite pendant l'apogée (QA6-08): le spectacle est perdu, mais il compte
+ * comme vu; son texte et la fin de l'étape de quête arrivent au rechargement.
+ */
+export function settleSavedClimax(sim: Sim): void {
+  const today = sim.world.moments.today;
+  if (today?.phase !== 'climax') return;
+  const def = momentDef(sim.content, today.id);
+  if (def === null) {
+    enter(sim, today, 'gone');
+    return;
+  }
+  finishClimax(sim, def, today);
 }
 
 function leaveNow(sim: Sim, def: MomentDef, today: MomentToday): void {
@@ -378,16 +406,31 @@ function pushOut(sim: Sim, def: MomentDef, today: MomentToday): void {
   const b = refreshBlockers(sim);
   for (const actor of def.actors) {
     if (actor.collisionRadius <= 0) continue;
-    const at = today.phase === 'waiting' ? restPosition(sim.map, actor) : watchTarget(sim.map, def, actor.id, today);
+    const waiting = today.phase === 'waiting';
+    const at = waiting ? restPosition(sim.map, actor) : watchTarget(sim.map, def, actor.id, today);
+    // En attente, la bête bouge autour de son point (QA6-04): le renard mulote dans `roam`, le héron
+    // effarouché recule jusqu'à `shy.stepTo`. La zone repoussée couvre ces déplacements.
+    const stepTo = waiting ? (actor.shy?.stepTo ?? null) : null;
+    const reach = actor.collisionRadius + BODY + (waiting ? actor.roam : 0);
     for (const c of sim.world.characters) {
-      const reach = actor.collisionRadius + BODY;
-      const d = distance(c.pos, at);
-      if (d >= reach || c.inHouse) continue;
-      const nx = d < 1e-6 ? 1 : (c.pos.x - at.x) / d;
-      const ny = d < 1e-6 ? 0 : (c.pos.y - at.y) / d;
+      if (c.inHouse) continue;
+      const from = stepTo === null ? at : closestOnSegment(c.pos, at, { x: stepTo[0], y: stepTo[1] });
+      const d = distance(c.pos, from);
+      if (d >= reach) continue;
+      const nx = d < 1e-6 ? 1 : (c.pos.x - from.x) / d;
+      const ny = d < 1e-6 ? 0 : (c.pos.y - from.y) / d;
       moveBody(b, c.pos, nx * (reach - d), ny * (reach - d));
     }
   }
+}
+
+/** Point du segment [a, b] le plus proche de p. */
+function closestOnSegment(p: Vec2, a: Vec2, b: Vec2): Vec2 {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const length2 = dx * dx + dy * dy;
+  const u = length2 < 1e-12 ? 0 : Math.min(1, Math.max(0, ((p.x - a.x) * dx + (p.y - a.y) * dy) / length2));
+  return { x: a.x + dx * u, y: a.y + dy * u };
 }
 
 /** Rayon du corps d'un personnage pour la collision avec une bête (m). */
