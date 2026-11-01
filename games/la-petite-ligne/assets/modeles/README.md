@@ -132,20 +132,24 @@ Fiches: `docs/jeux/jeu-1/tour-07-conception.md` sections 1.4.7 et 1.4.8. Mêmes 
 
 ## Cueillette et lisière du tour 8 (`ferme.glb`, `bourg.glb`)
 
-Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `assets-src/modeles/cueillette.py` (appelé par `ferme.py` et `bourg.py`), `planche_cueillette.py` (échelle, zoom 1, au sol), `verifier/quatre_cueillette.sh` (quatre angles), `verifier/mesures_cueillette.py` (emprises et point bas mesurés dans les GLB). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-08/objets-*.png`.
+Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `assets-src/modeles/cueillette.py` (appelé par `ferme.py` et `bourg.py`), `planche_cueillette.py` (échelle, zoom 1, au sol), `verifier/quatre_cueillette.sh` (quatre angles), `verifier/mesures_cueillette.py` (emprises et point bas mesurés dans les GLB), `verifier/souche_et_plants.py` (jeune sapin à côté de la souche et brins du rejet à toutes les échelles: contacts par arbres BVH), `verifier/nettoyer_bourg.sh` (nettoyage de `bourg.glb` seul, même chaîne que `construire.sh`). Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-08/objets-*.png`, correctifs de la revue du tour 8 dans `correctif-*.png`.
 
 - Objets de cueillette (`kind: "item"`, origine au centre de la base, posés au sol comme le pissenlit), grossis deux à trois fois par rapport au réel pour tenir au moins 14 pixels au zoom de départ (57 px/m, leçon du martin-pêcheur), extra `size_m` = plus grande dimension:
   - `wild_garlic` (ail des ours, printemps): touffe de huit larges feuilles en volume (section en chevron) et deux ombelles blanches à 0,31 m; le blanc fait la lecture sur l'herbe. 0,41 x 0,38 m, 0,35 m de haut.
   - `chanterelle` (girolles, été et automne): bouquet de quatre, pied évasé en entonnoir, chapeau creux au bord ondulé, jaune d'oeuf (`flower_center`, dessous `fabric_yellow`). 0,30 x 0,26 m, 0,15 m de haut.
   - `blackberry` (mûres, été): brin cueilli, cinq fruits noirs (case `blackberry`, luisante) et deux encore rouges sur trois folioles, posé à plat (point bas à 0). Se pose sur le roncier à l'un des points `berry_spots` de `bramble` (repère glTF du nœud `bramble`: x, hauteur, z vers l'avant; déjà enfoncés de 1,5 cm pour que le brin se cale sur le dessus bombé), sinon au sol. 0,30 x 0,16 m.
   - `hazelnut` (noisettes, automne): tas de sept noisettes (cicatrice pâle à la base) et une huitième debout dans son involucre de trois bractées, sur deux feuilles de noisetier tombées (`leaf_hazel`: jaunes avec la palette d'automne, comme le noisetier). 0,33 x 0,23 m, 0,13 m de haut.
-- `bramble` (roncier, posé contre la lisière au nord des coins 03 à 05): 1,20 x 0,80 m, 0,68 m de haut, emprise de carte 1 x 1 (extra `size_m`). Trois masses de feuillage basses (`leaf_bush`, `ivy`) et quatre jeunes ronces arquées aux quatre coins, feuillues au bout; aucune ne passe sur le dessus, où se posent les mûres. Sans fruits: les mûres sont l'objet `blackberry`, qui disparaît à la cueillette. 564 triangles: au-dessus du plafond d'un buisson (160, pensé pour 79 instances), sous celui d'un accessoire (900); trois instances sur la carte.
+- `bramble` (roncier, posé contre la lisière au nord des coins 03 à 05): 1,18 x 0,64 m, 0,61 m de haut, dans l'emprise de 1,2 x 0,8 m (extra `size_m`), emprise de carte 1 x 1. Repris au tour 8 (le premier se lisait comme une araignée verte: quatre tiges fines terminées par une boule en l'air): un fourré bas en deux bosses (`ivy`) qui couvre l'emprise, un massif plus haut au milieu (`leaf_bush`, `ivy`) et six ronces en arceau de tailles différentes. Chaque ronce sort du massif à mi-hauteur, monte à 0,4 ou 0,45 m (sous le dessus du massif), retombe en pente par-dessus le fourré et plante son bout dans le sol (enfoncé de 2 cm), comme une ronce qui marcotte; sept petites feuilles en losange (8 triangles, 8 à 13 cm) le long de chaque tige, aucune boule au bout. Aucune tige devant la face avant (+Z) ni sur le dessus, où se posent les mûres (extra `berry_spots`, recalculé par lancer de rayons sur le dessus réel). Sans fruits: les mûres sont l'objet `blackberry`, qui disparaît à la cueillette. 860 triangles: au-dessus du plafond d'un buisson (160, pensé pour 79 instances), sous celui d'un accessoire (900); trois instances sur la carte.
 - `bush_hazel` (noisetier, variante de `bush` déjà tirée pour un quart des buissons de la carte par `MODEL_VARIANTS`): refait en low poly arrondi, quatre brins en vase depuis une même souche, feuillage de trois boules de 0,55 à 1,97 m; chaque brin finit dans le feuillage. 160 triangles (plafond d'un buisson). Change l'aspect des noisetiers déjà posés sur la carte (même taille qu'avant, environ 2 m).
-- `oak_sapling` (rejet du chêne, P1): même souche que `tree_stump` (la souche de l'abattage reste en place, le rejet en sort), et son enfant `oak_sapling_shoots` (origine au centre du dessus de la souche, à 0,42 m): quatre brins feuillés de la coupe jusqu'à 1,68 m. Pour la pousse, mettre à l'échelle le seul enfant (0,4 à 1), jamais la souche (extra `grow_node`). 440 triangles (plafond d'un chêne: 450).
-- `fir_sapling` (jeune sapin replanté par Basile, P1): 1,24 m, trois étages à 7 pans comme les grands sapins, tige visible, butte de terre fraîche de 0,85 m. Peut s'agrandir d'un bloc jusqu'à 1,3. 175 triangles (plafond d'un sapin: 300).
+- `oak_sapling` (rejet du chêne, P1): même souche que `tree_stump` (la souche de l'abattage reste en place, le rejet en sort), et son enfant `oak_sapling_shoots` (nœud vide, origine au centre du dessus de la souche, à 0,42 m), qui porte quatre brins `oak_sapling_shoot_a` à `oak_sapling_shoot_d` (extra `grow_nodes`). Tour 8: un chêne rejette de l'écorce, pas du bois de la coupe; chaque brin naît sur le flanc, 4,5 cm sous la coupe, sort à l'horizontale, s'écarte puis monte jusqu'à 1,68 m, et la coupe reste nue. L'origine de chaque brin est son pied: pour la pousse (0,4 à 1), mettre à l'échelle chaque brin autour de son pied, jamais la souche (extra `grow_node`). Mis à l'échelle d'un bloc depuis le centre de la coupe (rendu du tour 8), le pied glisse vers le milieu de la coupe (0,07 m de l'axe à 0,4): voir « Rendu à adapter » ci-dessous. 440 triangles (plafond d'un chêne: 450).
+- `fir_sapling` (jeune sapin planté par Basile, P1): 1,24 m, trois étages à 7 pans comme les grands sapins, tige visible, cuvette de plantation de 0,4 m. Tour 8: on ne dessouche pas pour replanter au même trou; la souche `tree_stump` reste au centre de la case et le plant se pose à côté, 0,6 m au sud (extra `beside_stump`: décalage x, hauteur, z en repère glTF, sans rotation). Étages resserrés (0,31 m de rayon en bas) pour que le plant ne touche pas la souche de l'échelle 0,7 à 1,3 (contrôlé par `verifier/souche_et_plants.py`: aucun triangle en contact). Peut s'agrandir d'un bloc jusqu'à 1,3. 170 triangles (plafond d'un sapin: 300).
 - `tree_stump` (déjà livré): racines refaites en cônes à 5 pans qui plongent dans le sol (c'étaient des pavés), 136 triangles; le reste est inchangé.
-- Palette: une seule case ajoutée, `blackberry` (#2E2136, rugosité 0,35), en fin de liste (`palette.py` et `src/rendu/palette.ts`). Les textures de saison existantes n'ont pas besoin de case nouvelle: les cueillettes n'apparaissent qu'en leur saison et les feuillages du roncier et du noisetier suivent déjà `leaf_bush` et `leaf_hazel`.
+- Palette: case `blackberry` (#2E2136, rugosité 0,35) en fin de liste (`palette.py` et `src/rendu/palette.ts`); les cueillettes n'apparaissent qu'en leur saison et les feuillages du roncier et du noisetier suivent déjà `leaf_bush` et `leaf_hazel`.
+- Vigne de la tonnelle (`arbor`, tour 8): la vigne est caduque, elle ne prend plus les cases `ivy` (lierre, persistant) ni `leaf_oak`. Deux cases ajoutées en fin de liste, avec leurs valeurs de saison: `vine_leaf` (printemps #5E8B45, été #577F3E, automne #B8862F, hiver #6E5A48, feuilles sèches) et `vine_leaf_dark` (#4C7638, #466B33, automne #8E4A2E pour le rouge de la vigne, hiver #5E4B3C). Trois touffes sur douze sont sur `vine_leaf_dark`. Mieux encore l'hiver, si le rendu le veut: masquer les touffes et ne laisser que les sarments (voir « Rendu à adapter »).
 - `bush_bramble` (ancienne variante de `bush`, boule à petits cubes blancs) n'est pas touché: il reste distinct du roncier de cueillette.
+- Rendu à adapter (dev rendu, `src/rendu/potager.ts`), demandé par la revue du tour 8:
+  - rejet du chêne: pour chaque enfant `oak_sapling_shoot_*` de `oak_sapling_shoots`, instancier le brin seul avec la matrice T(arbre, sol + hauteur de `oak_sapling_shoots`) x R(lacet de l'arbre) x T(position de l'enfant) x S(taille), au lieu du nœud entier mis à l'échelle depuis le centre de la coupe; la souche reste `stump`;
+  - jeune sapin: dessiner aussi `stump` au centre de la case, et poser `fir_sapling` à (x, sol, y) + `beside_stump` (0, 0, 0,6), soit 0,6 m au sud, avec son lacet et son échelle autour de son propre pied; la cible de clic suit le plant.
 
 ## Fiche par modèle
 
@@ -254,7 +258,7 @@ Fiche: `docs/jeux/jeu-1/tour-08-conception.md` sections 5.1 et 5.2. Sources: `as
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3476 Ko)
+### `bourg.glb` (3507 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -305,12 +309,12 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `tree_birch_small` | 1 x 1 | 366 | choppable: false |
 | `tree_birch_large` | 2 x 2 | 366 | choppable: false |
 | `tree_stump` | 1 x 1 | 136 |  |
-| `oak_sapling` | 1 x 1 | 440 | grow_node: "oak_sapling_shoots", note: "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1)" |
-| `fir_sapling` | 1 x 1 | 175 | height: 1.24, note: "échelle 1 le premier jour, jusqu'à 1,3 ensuite" |
+| `oak_sapling` | 1 x 1 | 440 | grow_node: "oak_sapling_shoots", note: "souche de tree_stump et rejets enfants: mettre à l'échelle les seuls rejets (0,4 à 1), chaque brin oak_sapling_shoot_* autour de son pied (origine du brin, sur le flanc de la souche)" |
+| `fir_sapling` | 1 x 1 | 170 | height: 1.24, beside_stump: [0.0, 0.0, 0.6], note: "échelle 1 le premier jour, jusqu'à 1,3 ensuite; la souche tree_stump reste au centre de la case, le plant se pose à beside_stump (sans rotation du décalage)" |
 | `bush_round` | 1 x 1 | 100 |  |
 | `bush_bramble` | 1 x 1 | 280 |  |
 | `bush_hazel` | 1 x 1 | 160 |  |
-| `bramble` | 1 x 1 | 564 | size_m: [1.2, 0.8, 0.7], berry_spots: [[-0.3, 0.552, 0.05], [0.08, 0.569, 0.1], [-0.12, 0.534, 0.18]] |
+| `bramble` | 1 x 1 | 860 | size_m: [1.2, 0.8, 0.7], berry_spots: [[-0.2, 0.497, 0.06], [0.07, 0.532, 0.05], [-0.07, 0.474, 0.14]] |
 | `rock_small` | 1 x 1 | 20 |  |
 | `rock_medium` | 1 x 1 | 40 |  |
 | `rock_large` | 2 x 2 | 52 |  |

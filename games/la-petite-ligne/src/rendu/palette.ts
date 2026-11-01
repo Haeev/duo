@@ -175,6 +175,8 @@ export const PALETTE_CELLS = [
   'tar',
   'kingfisher_teal',
   'blackberry',
+  'vine_leaf',
+  'vine_leaf_dark',
 ] as const;
 
 export type PaletteCell = (typeof PALETTE_CELLS)[number];

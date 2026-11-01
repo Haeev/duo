@@ -102,3 +102,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Lisibilité au zoom 1 (57 px/m): à 0,25 m, un tas brun sur l'herbe d'automne tient en 12 pixels et se perd; le blanc (ombelles) et l'orange vif tiennent. Planche: palette de la saison de l'objet (`set_season` de `planche_cueillette.py`) et herbe de cette saison.
 - Objet posé sur un autre (mûres sur roncier): objet à plat, point bas à 0, et points de pose calculés par lancer de rayons sur l'hôte puis enfoncés de 1,5 cm (extra `berry_spots`, repère glTF). Aucune autre pièce de l'hôte ne doit passer sur ces points.
 - `quatre_angles.py --marge 1.5` pour les modèles hauts (le cadre à 1,2 coupait le pied). Commandes Python en heredoc parfois refusées par le garde-fou du worktree sans raison claire: passer par Edit ou un script écrit avec Write.
+
+## Silhouettes au zoom de jeu (tour 8, correctifs, vérifié le 2026-11-01)
+
+- Roncier: des tiges fines et contrastées qui partent d'une masse ronde se lisent comme des pattes (araignée), qu'elles finissent par une boule en l'air ou qu'elles touchent le sol. Ce qui a marché: arceaux bas (sommet sous le dessus du massif), retombée en pente, feuilles serrées le long de la tige (7 losanges de 8 triangles, `small_leaf` de `cueillette.py`) et un fourré bas sous les arceaux, pour qu'ils retombent sur du feuillage et non sur l'herbe. Juger en jeu (zoom 0), pas sur les quatre angles à 30 degrés.
+- Une sphère aplatie posée trop bas s'enfonce de moitié (bosse à -17 cm): poser le centre à la demi-hauteur, vérifier le point bas avec `verifier/mesures_cueillette.py`.
+- Le jeu met un `grow_node` à l'échelle d'un bloc autour de son origine: tout ce qui doit rester accroché ailleurs qu'à l'origine glisse (pieds des rejets vers le milieu de la coupe). Une origine par pièce (un nœud par brin, origine au pied) et une matrice par pièce côté rendu.
+- Deux objets du même lieu dessinés par le rendu à des échelles différentes (souche fixe, plant de 0,7 à 1,3): contrôler le contact à toutes les échelles par arbres BVH (`verifier/souche_et_plants.py`).
+- Garde-fou du worktree: `montage` avec un motif glob, ou une commande enchaînant un heredoc Python et autre chose, est refusé; passer par un script écrit avec Write.
