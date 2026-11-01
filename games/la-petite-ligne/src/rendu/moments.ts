@@ -98,6 +98,20 @@ const SHY_FLY_Z = 0.4;
 /** Entrée et sortie de l'eau (m au-dessus de la surface): une gerbe, un rond. */
 const SPLASH_ABOVE = 0.05;
 const SPLASH_BELOW = -0.03;
+/**
+ * Martin-pêcheur (fiche 1.4.8): traînée bleue quand il file au ras de l'eau (`kf_fly` sous cette
+ * hauteur, plus vite que cela à l'horizontale), éclat d'argent de l'ablette quand elle sort de
+ * l'eau et à chaque coup contre le pieu (instants dans `kf_beat`: 2,7 et 3,2 s de l'apogée, clip
+ * lancé à 2,4 s).
+ */
+const KINGFISHER_MODEL = 'kingfisher';
+const KF_FLY = 'kf_fly';
+const KF_BEAT = 'kf_beat';
+const TRAIL_MAX_Z = 0.6;
+const TRAIL_MIN_SPEED = 2;
+const BEAT_STRIKES: readonly number[] = [0.3, 0.8];
+/** L'éclat reste au-dessus de la surface (l'eau cacherait l'étoile). */
+const GLINT_ABOVE_WATER = 0.1;
 /** Lumière diffuse des bouffées (comme `ambiance.ts`). */
 const LAMBERT = 1 / Math.PI;
 /** Clips pendant lesquels la bête regarde le joueur le plus proche (« vous regarde »). */
@@ -201,6 +215,13 @@ class ActorView {
   shyEnded: number | null = null;
   /** Hauteur à l'image d'avant (au-dessus de l'eau), pour les gerbes; `null` si caché. */
   prevZ: number | null = null;
+  /** Traînée du martin-pêcheur: dernière position (monde) et instant, trajet pas encore marqué. */
+  trailPoint: Vector3 | null = null;
+  trailTime = 0;
+  trailCarry = 0;
+  /** Clip et instant du clip à l'image d'avant (coups de bec qui font briller l'ablette). */
+  lastClip: string | null = null;
+  lastClipTime = 0;
 
   constructor(
     readonly actor: MomentActorDef,
@@ -275,6 +296,9 @@ class ActorView {
     this.ground = null;
     this.yaw = null;
     this.prevZ = null;
+    this.trailPoint = null;
+    this.trailCarry = 0;
+    this.lastClip = null;
   }
 
   dispose(): void {
@@ -335,6 +359,8 @@ export class MomentsPart implements EventfulPart {
   private readonly lit = new Color();
   private readonly shade = new Color();
   private readonly lightView = new Vector3();
+  /** Teinte de l'apogée du moment (la brume dorée), relue à chaque image. */
+  private readonly gradeColor = new Color();
   private readonly socketPoint = new Vector3();
   private readonly rung: number;
   /** Dessous de la caisse du nichoir, dans son repère (calculé au premier besoin). */
@@ -496,7 +522,7 @@ export class MomentsPart implements EventfulPart {
       if (current?.def.id === scene.def.id) continue;
       for (const view of scene.views) view.hide();
       scene.glow?.update({ phase: 'off', t: 0 }, context.time, context.dt, context.reducedMotion);
-      scene.mist?.update({ phase: 'off', t: 0 }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView);
+      scene.mist?.update({ phase: 'off', t: 0 }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView, this.gradeColor, 0);
     }
     if (current === null) return;
     const { def, today } = current;
@@ -509,7 +535,8 @@ export class MomentsPart implements EventfulPart {
     if (scene.mist !== null) {
       // La brume se lève à l'apogée; sans apogée, elle se dissipe sur place au départ.
       const phase = today.phase === 'waiting' || today.phase === 'climax' || today.phase === 'left' ? today.phase : 'off';
-      scene.mist.update({ phase, t }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView);
+      const grade = this.lightGrade(world, this.gradeColor);
+      scene.mist.update({ phase, t }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView, this.gradeColor, grade);
     }
     for (const view of scene.views) {
       this.updateView(scene, view, today, t, context);
@@ -642,6 +669,8 @@ export class MomentsPart implements EventfulPart {
         // L'ablette « sous la prise, sans transformation »: elle suit la tête qui frappe et avale.
         socket.updateWorldMatrix(true, false);
         socket.matrixWorld.decompose(view.root.position, view.root.quaternion, view.root.scale);
+        // Elle sort de l'eau au bec: un éclat d'argent, seul repère du poisson au zoom de jeu.
+        if (snap) this.glintAt(view.root.position, context);
         return;
       }
       socket.getWorldPosition(this.socketPoint);
@@ -658,6 +687,45 @@ export class MomentsPart implements EventfulPart {
     view.place(f.x, f.y, f.z, this.groundAt(f.x, f.y), facing, context.dt, snap);
     view.pose(f.clip, f.clipTime, context.dt);
     if (actor.model === LADDER_MODEL) this.shakeLadder(scene, view, today, t, context);
+    if (actor.model === KINGFISHER_MODEL) this.kingfisherEffects(scene, view, f, context);
+  }
+
+  /** Traînée bleue au ras de l'eau et éclats de l'ablette frappée contre le pieu. */
+  private kingfisherEffects(scene: MomentScene, view: ActorView, f: ActorFrame, context: FrameContext): void {
+    const here = view.root.position;
+    const before = view.trailPoint;
+    const low = f.clip === KF_FLY && f.z < TRAIL_MAX_Z;
+    const elapsed = context.time - view.trailTime;
+    const fast =
+      before !== null && elapsed > 0 && Math.hypot(here.x - before.x, here.z - before.z) / elapsed > TRAIL_MIN_SPEED;
+    if (low && before !== null && fast) {
+      view.trailCarry = this.splashes.trail(before, here, view.trailTime, context.time, view.trailCarry);
+    } else {
+      view.trailCarry = 0;
+    }
+    if (low) {
+      view.trailPoint ??= new Vector3();
+      view.trailPoint.copy(here);
+      view.trailTime = context.time;
+    } else {
+      view.trailPoint = null;
+    }
+    if (f.clip === KF_BEAT && view.lastClip === KF_BEAT && view.socket !== null) {
+      const carrying = scene.views.some((v) => CARRIED_WHOLE.has(v.actor.model) && v.root.visible);
+      const struck = BEAT_STRIKES.some((s) => view.lastClipTime < s && f.clipTime >= s);
+      if (carrying && struck) {
+        view.socket.getWorldPosition(this.socketPoint);
+        this.glintAt(this.socketPoint, context);
+      }
+    }
+    view.lastClip = f.clip;
+    view.lastClipTime = f.clipTime;
+  }
+
+  private glintAt(point: Vector3, context: FrameContext): void {
+    const level = this.terrain.waterLevelAt(point.x, point.z);
+    const y = level === null ? point.y : Math.max(point.y, level + GLINT_ABOVE_WATER);
+    this.splashes.glint(point.x, y, point.z, context.time);
   }
 
   /** Une bête qui entre dans l'eau ou en sort (le plongeon, le poisson qui saute): gerbe et ronds. */
