@@ -461,6 +461,12 @@
   color: var(--lpl-color-wood);
 }
 
+/* La bête regarde: on se fige. Le trait d'encre dit l'urgence sans couleur d'alarme. */
+.lpl-watch__pill[data-tone='alert'] {
+  border-color: var(--lpl-color-ink);
+  box-shadow: 0 0 0 var(--lpl-border) var(--lpl-color-ink), var(--lpl-shadow-1);
+}
+
 .lpl-watch__pill[data-tone='early'] {
   color: var(--lpl-color-ink-muted);
 }

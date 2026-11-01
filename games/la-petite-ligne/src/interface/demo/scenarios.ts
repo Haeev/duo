@@ -5,8 +5,10 @@
  * de captures seulement: le jeu ne passe jamais par ici.
  */
 import type { Intent } from '../../etat/actions';
-import type { CharacterId, ItemStack, MomentMemoryEntry } from '../../etat/types';
+import { freezeState, momentDef } from '../../etat/moments';
+import type { CharacterId, ItemStack, MomentMemoryEntry, MomentToday } from '../../etat/types';
 import type { Sim } from '../../simulation/contexte';
+import { newToday } from '../../simulation/moments';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { benchById, seatPlace } from '../../etat/bancs';
@@ -155,6 +157,62 @@ function lastMemoryAfterMount(sim: Sim): () => void {
 
 function memory(id: string, first: number, hintTo: CharacterId | null, hintFrom: string | null, count = 1, last = first): MomentMemoryEntry {
   return { id, first, hintTo, hintFrom, count, last };
+}
+
+// ---------------------------------------------------------------------------
+// Tour 7: ligne d'observation de la brume et de la chevrette (M-26, M-27). La graine de la démo
+// ne les tire pas: à l'aube du jour 2, le moment est posé à la main, puis les deux sont placés.
+
+/** L'aube du jour 2, le moment `id` en attente (ses conditions de météo ne comptent pas ici). */
+function dawnMoment(sim: Sim, id: string): MomentToday | null {
+  playUntil(sim, (s) => s.world.clock.day === 2 && s.world.phase === 'day' && s.world.clock.running && s.world.scene === null);
+  const def = momentDef(sim.content, id);
+  if (def === null) return null;
+  const today = newToday(sim, def, 'ambient');
+  today.phase = 'waiting';
+  today.phaseTick = sim.world.tick;
+  sim.world.moments.today = today;
+  for (const c of sim.world.characters) {
+    c.menu = null;
+    c.dialogue = null;
+    c.seat = null;
+    c.status = 'active';
+    c.crafting = null;
+    c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+  }
+  return today;
+}
+
+/** Place `id` en (x, y), immobile, tourné vers `look`. */
+function stand(sim: Sim, id: CharacterId, x: number, y: number, look: { x: number; y: number }): void {
+  teleport(sim, id, x, y);
+  const c = character(sim, id);
+  c.facing = Math.atan2(look.y - y, look.x - x);
+  c.speed = 0;
+}
+
+// Places du test M-18: de part et d'autre de l'Aubrune, là où elle n'a pas quatre mètres.
+const MIST_NORTH = { x: 29.5, y: 38.5 };
+const MIST_SOUTH = { x: 29.5, y: 42.5 };
+
+/** Pas jusqu'au prochain regard de la chevrette, ou `null`. */
+function untilDeerLook(sim: Sim, today: MomentToday): number | null {
+  const def = momentDef(sim.content, today.id);
+  const freeze = def?.watch.freeze ?? null;
+  if (def === null || freeze === null) return null;
+  for (let k = 0; k < 30 * 60; k++) if (freezeState(def, freeze, today, sim.world.tick + k, sim.world.seed).kind === 'look') return k;
+  return null;
+}
+
+/** La chevrette du pré: p1 à 4 m d'elle, p2 `p2Distance` m à l'ouest et 2 m au nord (hors du buisson), tournés vers elle. */
+function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { x: number; y: number } } | null {
+  const today = dawnMoment(sim, 'roe_deer');
+  const deer = sim.map.points.roe_deer_graze;
+  if (today === null || deer === undefined) return null;
+  stand(sim, 'p1', deer.x - 4, deer.y + 0.5, deer);
+  stand(sim, 'p2', deer.x - p2Distance, deer.y - 2, deer);
+  idle(sim, 15);
+  return { today, deer };
 }
 
 /**
@@ -342,6 +400,55 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
         c.seat = { bench: bench.id, slot, since: sim.world.tick };
       });
       idle(sim, 2);
+      return;
+    }
+    case 'brume-meme-rive':
+      // Les deux sur la rive nord, face à face et immobiles: la simulation ne compte pas.
+      if (dawnMoment(sim, 'mist') === null) return;
+      stand(sim, 'p1', MIST_NORTH.x, MIST_NORTH.y, { x: 31.5, y: 38.5 });
+      stand(sim, 'p2', 31.5, 38.5, MIST_NORTH);
+      idle(sim, 30);
+      return;
+    case 'brume-de-dos':
+      // Une rive chacun, p2 tourne le dos à p1.
+      if (dawnMoment(sim, 'mist') === null) return;
+      stand(sim, 'p1', MIST_NORTH.x, MIST_NORTH.y, MIST_SOUTH);
+      stand(sim, 'p2', MIST_SOUTH.x, MIST_SOUTH.y, { x: 29.5, y: 46 });
+      idle(sim, 30);
+      return;
+    case 'brume-face-a-face':
+      // Une rive chacun, face à face: l'anneau se remplit (1,5 s sur 3).
+      if (dawnMoment(sim, 'mist') === null) return;
+      stand(sim, 'p1', MIST_NORTH.x, MIST_NORTH.y, MIST_SOUTH);
+      stand(sim, 'p2', MIST_SOUTH.x, MIST_SOUTH.y, MIST_NORTH);
+      idle(sim, 45);
+      return;
+    case 'chevrette-broute':
+      // Elle broute: p1 à 4 m, p2 à 7 m (encore un peu loin).
+      deerScene(sim, 7);
+      return;
+    case 'chevrette-regarde': {
+      // Elle regarde, p2 encore à 7 m: personne ne compte, on se fige.
+      const scene = deerScene(sim, 7);
+      const k = scene === null ? null : untilDeerLook(sim, scene.today);
+      if (k !== null) idle(sim, k + 15);
+      return;
+    }
+    case 'chevrette-ensemble': {
+      // Elle regarde, les deux en place: l'anneau tourne.
+      const scene = deerScene(sim, 4.5);
+      const k = scene === null ? null : untilDeerLook(sim, scene.today);
+      if (k !== null) idle(sim, k + 30);
+      return;
+    }
+    case 'chevrette-effarouchee': {
+      // p2 a bougé pendant un regard: elle frappe du pied et recule.
+      const scene = deerScene(sim, 5);
+      const k = scene === null ? null : untilDeerLook(sim, scene.today);
+      if (k === null) return;
+      idle(sim, k + 10);
+      for (let i = 0; i < 6; i++) step(sim, { controls: { p2: { seq: i, moveX: 1, moveY: 0, actHeld: false } }, intents: [] });
+      idle(sim, 15);
       return;
     }
     case 'moment-echelle': {

@@ -4,7 +4,7 @@
  * se voit: pas de compteur, pas de case vide, seulement ce qui a été vécu, et une rumeur du bourg
  * différente chez les deux joueurs.
  */
-import type { Content, MomentDef } from '../donnees/types';
+import type { Condition, Content, MomentDef, Season } from '../donnees/types';
 import { finishedSecretLine } from '../etat/secrets';
 import { lastDayOfSeason, seasonIndex, seasonOf, yearOf } from '../etat/souvenirs';
 import { unitDraw } from '../etat/tirage';
@@ -167,19 +167,31 @@ function secretEntry(
   };
 }
 
+/** Ordre des saisons du calendrier (`seasonOf`), le même que celui de la simulation. */
+const SEASON_ORDER: readonly Season[] = ['spring', 'summer', 'autumn', 'winter'];
+
 /**
- * Le moment peut-il venir d'ici la fin de la saison suivante (et de la partie) ? Les conditions
- * de jour se lisent d'avance, un drapeau doit déjà être posé (les mésanges attendent le nichoir
+ * Le moment peut-il venir un jour de `[from, lastDay]` (d'ici la fin de la saison suivante et de
+ * la partie) ? Les conditions de jour et de saison (QA7-05) se lisent d'avance, jour par jour,
+ * comme la simulation les lit; un drapeau doit déjà être posé (les mésanges attendent le nichoir
  * redressé); la météo et l'heure changent d'un jour à l'autre et ne comptent pas.
  */
-function possibleBefore(world: ReadonlyWorld, def: MomentDef, lastDay: number): boolean {
-  return def.availableWhen.every((c) =>
-    c.type === 'day_at_least'
-      ? c.day <= lastDay
-      : c.type === 'flag'
-        ? world.flags.includes(c.flag)
-        : true,
-  );
+function possibleBefore(world: ReadonlyWorld, content: Content, def: MomentDef, from: number, lastDay: number): boolean {
+  const s = content.settings.memories;
+  const holds = (c: Condition, day: number): boolean => {
+    if (c.type === 'day_at_least') return day >= c.day;
+    if (c.type === 'season_is') {
+      const season = SEASON_ORDER[seasonOf(s, day)];
+      const dayOfSeason = ((day - 1) % s.seasonDays) + 1;
+      return season !== undefined && c.seasons.includes(season) && dayOfSeason >= c.fromSeasonDay;
+    }
+    if (c.type === 'flag') return world.flags.includes(c.flag);
+    if (c.type === 'all') return c.conditions.every((x) => holds(x, day));
+    if (c.type === 'any') return c.conditions.some((x) => holds(x, day));
+    return true;
+  };
+  for (let day = from; day <= lastDay; day++) if (def.availableWhen.every((c) => holds(c, day))) return true;
+  return false;
 }
 
 /**
@@ -206,7 +218,7 @@ export function rumorMoment(
       def.texts.rumor !== null &&
       content.settings.moments.tiers.includes(def.tier) &&
       !seen.has(def.id) &&
-      possibleBefore(world, def, horizon),
+      possibleBefore(world, content, def, day, horizon),
   );
   if (pool.length === 0) return null;
   const parity = viewer === (world.characters[0]?.id ?? 'p1') ? 0 : 1;
