@@ -69,7 +69,8 @@ export interface SyncState {
 }
 
 export interface BrainFrame {
-  listener: { at: Vec2; ear: Vec2; yaw: number; inHouse: boolean };
+  /** `inside`: bâtiment visitable où est l'écouteur (tour 10, ADR 0016), `null` dehors. */
+  listener: { at: Vec2; ear: Vec2; yaw: number; inHouse: boolean; inside: string | null };
   shots: SoundRequest[];
   loops: LoopWish[];
   music: readonly MusicCommand[];
@@ -224,7 +225,7 @@ export class AudioBrain {
       now: 0,
     };
     this.frame = {
-      listener: { at: { x: 0, y: 0 }, ear: { x: 0, y: 0 }, yaw: 0, inHouse: false },
+      listener: { at: { x: 0, y: 0 }, ear: { x: 0, y: 0 }, yaw: 0, inHouse: false, inside: null },
       shots: [],
       loops: [],
       music: [],
@@ -281,6 +282,7 @@ export class AudioBrain {
       f.listener.at.x = me.prev.x + (me.pos.x - me.prev.x) * input.alpha;
       f.listener.at.y = me.prev.y + (me.pos.y - me.prev.y) * input.alpha;
       f.listener.inHouse = me.inHouse;
+      f.listener.inside = me.inside;
     }
     f.listener.yaw = input.yaw;
     earPosition(f.listener.at, input.yaw, settings.listener.backOffsetM, f.listener.ear);
@@ -360,7 +362,8 @@ export class AudioBrain {
     amb.weather = world.weather;
     amb.season = seasonOfDay(rules, world.clock.day);
     amb.mist = mistAmount(rules, world.morningMist, world.clock.minutes);
-    amb.inHouse = f.listener.inHouse;
+    // À l'abri dans n'importe quel intérieur (ADR 0016): la pluie sur le toit, pas dans les arbres.
+    amb.inHouse = f.listener.inside !== null || f.listener.inHouse;
     amb.at = f.listener.at;
     ambienceLevels(catalogue.ambienceRules, amb, this.zones, settings.ambience, f.ambience, catalogue.morningMist);
     amb.minutes = world.clock.minutes + settings.ambience.prefetchMinutes;

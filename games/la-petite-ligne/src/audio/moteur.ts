@@ -132,6 +132,19 @@ const TARGET_EPSILON = 0.002;
 /** Une ambiance tue depuis ce temps (en rampes) est arrêtée et son tampon libéré. */
 const BED_STOP_RAMPS = 3;
 const OPEN_FILTER_HZ = 20000;
+/** Ambiance de pièce décodée à moins de tant de mètres d'une porte de son bâtiment (`decodeWhen`). */
+const ROOM_TONE_DECODE_M = 6;
+/** Le ru: portée si `sons.json` ne la donne pas, marge de décodage au-delà (m). */
+const STREAM_DEFAULT_REACH_M = 30;
+const STREAM_DECODE_MARGIN_M = 15;
+/** Dossiers des lieux du tour 10: la rue Haute à l'est du ru (x 63), la maison près d'elle. */
+const ZONE_FOLDERS: readonly { folder: string; fromX: number; reach: number }[] = [
+  { folder: 'rue-haute/', fromX: 63, reach: 30 },
+  { folder: 'maison/', fromX: 0, reach: 20 },
+];
+const ZONE_RELEASE_MARGIN_M = 10;
+/** Décodés au lancement, libérables (question S4 du tour 10). */
+const PRELOADED_FOLDERS: readonly string[] = ['besoins/'];
 const PANNER_FAR = 10000;
 /** Écart relatif de gain de distance sous lequel on ne réécrit pas le gain d'une voix. */
 const DISTANCE_GAIN_STEP = 0.02;
@@ -156,11 +169,16 @@ export class AudioEngine {
   private readonly ducks: { db: number; until: number }[] = [];
   private duckDb = 0;
   private readonly river: RiverSource[];
+  /** Tour 10: sources du ru de la Côte (`plan.stream`), placées comme celles de la rivière. */
+  private readonly streamSources: RiverSource[];
   private readonly indoorAmbience: Set<string>;
   private readonly trainFiles: string[];
   private trainWanted = false;
-  private listener: { at: Vec2; inHouse: boolean } = { at: { x: 0, y: 0 }, inHouse: false };
-  private inHouse: boolean | null = null;
+  private listener: { at: Vec2; inside: string | null } = { at: { x: 0, y: 0 }, inside: null };
+  /** Bâtiment dont le filtre du dehors est en place (`undefined`: aucun encore, première image). */
+  private filteredFor: string | null | undefined = undefined;
+  /** Dossiers décodés quand l'écouteur s'approche de leurs lieux (tour 10, `decodeWhen`). */
+  private readonly zoneFolders = new Map<string, boolean>();
   private paused = false;
   private disposed = false;
   private readonly wishedLoops = new Set<string>();
@@ -181,6 +199,9 @@ export class AudioEngine {
   private readonly lowpass: BiquadFilterNode;
   private readonly interior: GainNode;
   private readonly indoorIn: GainNode;
+  /** Sons de l'autre joueur dans un autre bâtiment: étouffés par les murs (son.md 4.8). */
+  private readonly peerWallIn: GainNode;
+  private readonly peerWall: BiquadFilterNode;
   private readonly uiIn: GainNode;
   private readonly uiLimiter: DynamicsCompressorNode;
   private readonly uiPause: GainNode;
@@ -204,7 +225,12 @@ export class AudioEngine {
     this.pool = new VoicePool(catalogue.mix.maxEffectVoices);
     this.picker = new VariantPicker(options.random);
     this.river = riverSources(options.map, settings.ambience.river);
+    this.streamSources = (catalogue.stream?.sources ?? []).map((s) => ({ at: { x: s.at.x, y: s.at.y }, gainDb: s.gainDb }));
     this.indoorAmbience = new Set(catalogue.ambienceRules.filter((r) => r.rain === 'indoor').map((r) => r.ambience));
+    // Les ambiances de pièce sont dedans: jamais étouffées par le filtre du dehors.
+    for (const building of catalogue.interiors.buildings.values()) {
+      if (building.roomTone !== null) this.indoorAmbience.add(building.roomTone);
+    }
     this.trainFiles = [...catalogue.sounds.values()].flatMap((s) => s.files).filter((f) => f.startsWith('train/'));
 
     const gain = (value = 1): GainNode => {
@@ -239,6 +265,12 @@ export class AudioEngine {
     this.indoorIn = gain();
     this.outdoorIn.connect(this.lowpass).connect(this.interior).connect(this.effectsIn);
     this.indoorIn.connect(this.effectsIn);
+    const peer = catalogue.interiors.peer;
+    this.peerWallIn = gain(dbToGain(peer?.db ?? 0));
+    this.peerWall = ctx.createBiquadFilter();
+    this.peerWall.type = 'lowpass';
+    this.peerWall.frequency.value = peer?.lowpassHz ?? OPEN_FILTER_HZ;
+    this.peerWallIn.connect(this.peerWall).connect(this.outdoorIn);
     this.uiIn = gain();
     this.uiLimiter = limiter();
     this.uiPause = gain();
@@ -255,14 +287,23 @@ export class AudioEngine {
       this.lowpass,
       this.interior,
       this.indoorIn,
+      this.peerWallIn,
+      this.peerWall,
       this.uiIn,
       this.uiLimiter,
       this.uiPause,
     ];
   }
 
-  /** Décode les sons permanents (effets, interface, motifs). */
+  /** Décode les sons permanents (effets, interface, motifs), puis ceux des besoins (libérables). */
   async loadResident(onProgress: (ratio: number) => void): Promise<void> {
+    // Tour 10, question S4: `besoins/` n'est pas permanent. Le rendre permanent (2,9 Mo, 32,2 Mo
+    // de permanents) fait refuser la seconde musique du fondu au pic d'un samedi (128 Mo, essai de
+    // `memoire.test.ts`). Ses sons sont décodés au lancement sans être tenus: le cache ne les libère
+    // qu'au pic, et un son libéré est redécodé à sa prochaine demande.
+    for (const sound of this.options.catalogue.sounds.values()) {
+      for (const file of sound.files) if (PRELOADED_FOLDERS.some((folder) => file.startsWith(folder))) void this.cache.request(file);
+    }
     const folders = this.options.settings.memory.residentFolders;
     const files = [...new Set([...this.options.catalogue.sounds.values()].flatMap((s) => s.files))].filter((f) =>
       folders.some((folder) => f.startsWith(folder)),
@@ -295,9 +336,11 @@ export class AudioEngine {
   apply(frame: BrainFrame): void {
     if (this.disposed) return;
     const now = this.ctx.currentTime;
-    this.listener = frame.listener;
+    this.listener.at = frame.listener.at;
+    this.listener.inside = frame.listener.inside;
     this.placeListener(frame);
-    this.updateInterior(frame.listener.inHouse);
+    this.updateInterior(frame.listener.inside);
+    this.updateZoneBuffers();
     this.updateTrainBuffers(frame.trainDay);
     this.updateMomentBuffers(frame.momentFiles);
     for (const command of frame.music) this.music(command);
@@ -356,7 +399,10 @@ export class AudioEngine {
       distance = distanceBetween(this.listener.at, request.at);
       if (!loop && !withinCull(spatial, distance)) return null;
     }
-    const index = this.picker.pick(def.id, def.files.length, def.shuffle);
+    const index =
+      request.variant !== undefined && request.variant < def.files.length
+        ? request.variant
+        : this.picker.pick(def.id, def.files.length, def.shuffle);
     const file = def.files[index] ?? def.files[0];
     if (file === undefined) return null;
     const buffer = this.cache.get(file);
@@ -392,11 +438,12 @@ export class AudioEngine {
     gain.gain.value = level * dGain;
     let panner: PannerNode | null = null;
     source.connect(gain);
+    const bus = request.muffled === true && def.bus !== 'ui' && def.bus !== 'music' ? this.peerWallIn : this.busOf(def);
     if (spatial !== null && request.at !== null) {
       panner = this.createPanner(request.at);
-      gain.connect(panner).connect(this.busOf(def));
+      gain.connect(panner).connect(bus);
     } else {
-      gain.connect(this.busOf(def));
+      gain.connect(bus);
     }
     const offset = loop ? (request.offset > 0 ? request.offset : def.playFrom) : request.offset;
     const startAt = now + Math.max(0, request.delay);
@@ -688,36 +735,10 @@ export class AudioEngine {
   private updateBeds(frame: BrainFrame, now: number): void {
     const tc = this.options.settings.ambience.rampSeconds / 3;
     for (const [id, target] of frame.ambience) {
-      const def = this.options.catalogue.sounds.get(id);
-      const file = def?.files[0];
-      if (def === undefined || file === undefined) continue;
-      let bed = this.beds.get(id);
-      if (bed === undefined) {
-        if (target <= 0) {
-          if (!frame.ambienceNeeded.has(id)) this.cache.release(file);
-          else void this.cache.request(file);
-          continue;
-        }
-        const buffer = this.cache.get(file);
-        if (buffer === null) {
-          void this.cache.request(file);
-          continue;
-        }
-        bed = this.createBed(def, file, buffer);
-        this.beds.set(id, bed);
-      }
-      if (Math.abs(bed.target - target) > TARGET_EPSILON) {
-        bed.target = target;
-        bed.out.gain.setTargetAtTime(target, now, Math.max(0.01, tc));
-      }
-      if (target <= 0) {
-        bed.silentSince ??= now;
-        if (now - bed.silentSince > this.options.settings.ambience.rampSeconds * BED_STOP_RAMPS) this.stopBed(bed, frame.ambienceNeeded.has(id));
-      } else {
-        bed.silentSince = null;
-      }
+      this.updateBed(id, target, frame.ambienceNeeded.has(id), now, tc);
     }
-    // Rivière: chaque source suit la distance à l'oreille.
+    this.updateRoomAndStream(now);
+    // Rivière et ru: chaque source suit la distance à l'oreille.
     for (const bed of this.beds.values()) {
       const spatial = bed.def.spatial;
       if (spatial === null) continue;
@@ -729,13 +750,99 @@ export class AudioEngine {
     }
   }
 
+  /** Une ambiance vers son niveau visé; décodée si elle sert bientôt (`needed`), libérée sinon. */
+  private updateBed(id: string, target: number, needed: boolean, now: number, tc: number): void {
+    const def = this.options.catalogue.sounds.get(id);
+    const file = def?.files[0];
+    if (def === undefined || file === undefined) return;
+    let bed = this.beds.get(id);
+    if (bed === undefined) {
+      if (target <= 0) {
+        if (!needed) this.cache.release(file);
+        else void this.cache.request(file);
+        return;
+      }
+      const buffer = this.cache.get(file);
+      if (buffer === null) {
+        void this.cache.request(file);
+        return;
+      }
+      bed = this.createBed(def, file, buffer);
+      this.beds.set(id, bed);
+    }
+    if (Math.abs(bed.target - target) > TARGET_EPSILON) {
+      bed.target = target;
+      bed.out.gain.setTargetAtTime(target, now, Math.max(0.01, tc));
+    }
+    if (target <= 0) {
+      bed.silentSince ??= now;
+      if (now - bed.silentSince > this.options.settings.ambience.rampSeconds * BED_STOP_RAMPS) this.stopBed(bed, needed);
+    } else {
+      bed.silentSince = null;
+    }
+  }
+
+  /**
+   * Tour 10: l'ambiance de la pièce où est l'écouteur (non placée, fondu à la porte) et le ru de
+   * la Côte (placé le long du ru, toute la journée), décodés quand l'écouteur s'en approche.
+   */
+  private updateRoomAndStream(now: number): void {
+    const { catalogue, map } = this.options;
+    const ramp = catalogue.interiors.rampSeconds / 3;
+    for (const [id, building] of catalogue.interiors.buildings) {
+      if (building.roomTone === null) continue;
+      const inside = this.listener.inside === id;
+      const doors = map.buildings[id]?.doors ?? [];
+      let near = inside;
+      for (const door of doors) {
+        near ||= distanceBetween(this.listener.at, { x: door.cell.cx + 0.5, y: door.cell.cy + 0.5 }) < ROOM_TONE_DECODE_M;
+      }
+      this.updateBed(building.roomTone, inside ? dbToGain(building.roomToneDb) : 0, near, now, ramp);
+    }
+    const stream = catalogue.stream;
+    if (stream !== null) {
+      const def = catalogue.sounds.get(stream.sound);
+      const reach = def?.spatial?.cullBeyond ?? STREAM_DEFAULT_REACH_M;
+      let nearest = Number.POSITIVE_INFINITY;
+      for (const source of this.streamSources) nearest = Math.min(nearest, distanceBetween(this.listener.at, source.at));
+      const tc = this.options.settings.ambience.rampSeconds / 3;
+      this.updateBed(stream.sound, nearest <= reach ? 1 : 0, nearest <= reach + STREAM_DECODE_MARGIN_M, now, tc);
+    }
+  }
+
+  /**
+   * Sons des lieux du tour 10 (`decodeWhen` de `sons.json`): ceux de la rue Haute décodés quand
+   * l'écouteur est à l'est de la halte, ceux de la maison quand il en est proche; libérés au-delà
+   * (avec une marge, pour ne pas décoder et libérer à chaque pas).
+   */
+  private updateZoneBuffers(): void {
+    const at = this.listener.at;
+    const house = this.options.map.buildings.house?.rooms[0]?.rect;
+    const houseDistance =
+      house === undefined ? Number.POSITIVE_INFINITY : distanceBetween(at, { x: house.x + house.w / 2, y: house.y + house.h / 2 });
+    for (const zone of ZONE_FOLDERS) {
+      const distance = zone.folder === 'maison/' ? houseDistance : Math.max(0, zone.fromX - at.x);
+      const wasLoaded = this.zoneFolders.get(zone.folder) === true;
+      const load = distance <= (wasLoaded ? zone.reach + ZONE_RELEASE_MARGIN_M : zone.reach);
+      if (load === wasLoaded) continue;
+      this.zoneFolders.set(zone.folder, load);
+      for (const sound of this.options.catalogue.sounds.values()) {
+        for (const file of sound.files) {
+          if (!file.startsWith(zone.folder)) continue;
+          if (load) void this.cache.request(file);
+          else this.cache.release(file);
+        }
+      }
+    }
+  }
+
   private createBed(def: SoundDef, file: string, buffer: AudioBuffer): Bed {
     const ctx = this.ctx;
     const out = ctx.createGain();
     out.gain.value = 0;
     out.connect(this.indoorAmbience.has(def.id) ? this.indoorIn : this.outdoorIn);
     const sources: BedSource[] = [];
-    const placed = def.spatial !== null ? this.river : [null];
+    const placed = def.spatial === null ? [null] : def.id === this.options.catalogue.stream?.sound ? this.streamSources : this.river;
     for (const river of placed) {
       const source = ctx.createBufferSource();
       source.buffer = buffer;
@@ -778,20 +885,25 @@ export class AudioEngine {
     if (!keepBuffer) this.cache.release(bed.file);
   }
 
-  private updateInterior(inHouse: boolean): void {
-    if (inHouse === this.inHouse) return;
-    const first = this.inHouse === null;
-    this.inHouse = inHouse;
-    const interior = this.options.catalogue.interior;
+  /**
+   * Le dehors entendu de dedans (ADR 0016): passe-bas et niveau propres au bâtiment où est
+   * l'écouteur (`plan.interiorByBuilding`), celui de la maisonnette (`plan.interior`) sinon.
+   */
+  private updateInterior(inside: string | null): void {
+    if (inside === this.filteredFor) return;
+    const first = this.filteredFor === undefined;
+    this.filteredFor = inside;
+    const { interior, interiors } = this.options.catalogue;
+    const building = inside === null ? undefined : interiors.buildings.get(inside);
     const t = this.ctx.currentTime;
-    const frequency = inHouse ? interior.lowpassHz : OPEN_FILTER_HZ;
-    const level = inHouse ? dbToGain(interior.ambienceDb) : 1;
+    const frequency = inside === null ? OPEN_FILTER_HZ : (building?.lowpassHz ?? interior.lowpassHz);
+    const level = inside === null ? 1 : dbToGain(building?.outdoorDb ?? interior.ambienceDb);
     if (first) {
       this.lowpass.frequency.value = frequency;
       this.interior.gain.value = level;
       return;
     }
-    const end = t + interior.rampSeconds;
+    const end = t + (building === undefined ? interior.rampSeconds : interiors.rampSeconds);
     this.lowpass.frequency.cancelScheduledValues(t);
     this.lowpass.frequency.setValueAtTime(this.lowpass.frequency.value, t);
     this.lowpass.frequency.exponentialRampToValueAtTime(frequency, end);

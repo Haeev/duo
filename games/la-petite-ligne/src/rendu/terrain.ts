@@ -16,7 +16,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import type { GameMap, GroundKind, MapProp } from '../etat/carte';
+import type { GameMap, GroundKind, MapCrossing, MapProp } from '../etat/carte';
 import { cellIndex, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import { isFord } from './champs';
@@ -35,6 +35,7 @@ import {
   type RiverField,
   type RiverStone,
 } from './riviere';
+import { isStreamCell, streamHeight, streamLayout, type StreamLayout } from './ru';
 
 const SETTINGS = RENDER_SETTINGS.terrain;
 const NOISE_SEED_GRASS = 1;
@@ -192,6 +193,9 @@ const RIVER_BED_CELL: PaletteCell = 'sand';
 const FLAT_EPSILON = 1e-4;
 const SEED_RIVER_STONE = 131;
 const SEED_REED = 151;
+const SEED_STREAM_STONE = 171;
+/** Rangées du ru avant l'embouchure vues comme de l'eau par le champ de la rivière. */
+const STREAM_MOUTH_ROWS = 2;
 const RIVER_STONE_CELLS: readonly PaletteCell[] = ['rock', 'rock_light', 'rock_dark', 'rock'];
 const REED_CELLS: readonly PaletteCell[] = ['grass_dark', 'moss', 'grass_dark', 'grass_dry'];
 /** Coins d'une case, dans l'ordre du pourtour: direction (sx, sy) vers le coin. */
@@ -221,16 +225,24 @@ function extendedKind(kind: GroundKind): GroundKind {
 
 export class Terrain {
   readonly group = new Group();
-  /** Surface de la rivière (point d'accroche du technical artist: matériau d'eau). */
-  readonly water: Mesh;
+  /**
+   * Surface de la rivière en morceaux de `surfaceChunk` m (point d'accroche du technical artist:
+   * matériau d'eau), éliminés hors du cadre: aucun maillage ne grandit avec la carte (ADR 0016).
+   */
+  readonly water: Mesh[] = [];
+  /** Surface du ru de la Côte, en morceaux (même programme que la rivière, courant vers le sud). */
+  readonly streamWater: Mesh[] = [];
   private readonly ext = SETTINGS.extension;
   private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] =
     [];
   private readonly crossings: Crossing[] = [];
+  /** Le ru de la Côte (`ru.ts`), `null` sur une carte sans ru. */
+  readonly stream: StreamLayout | null;
 
   /**
    * `floorHeight`: hauteur de marche d'un sol posé (quai, ponton), lue dans les
-   * données de l'artiste quand elles existent.
+   * données de l'artiste quand elles existent; `crossingHeight`: celle d'un
+   * ouvrage du ru (pont, passerelle, gué de pierres).
    */
   constructor(
     private readonly map: GameMap,
@@ -238,11 +250,13 @@ export class Terrain {
     resources: ResourceTracker,
     floorHeight: (prop: MapProp) => number | undefined = (prop) =>
       RENDER_SETTINGS.floorProps[prop.model],
+    crossingHeight: (crossing: MapCrossing) => number | undefined = () => undefined,
   ) {
     this.group.name = 'terrain';
+    this.stream = streamLayout(map, this.ext);
     for (let cy = 0; cy < map.height; cy += 1) {
       for (let cx = 0; cx < map.width; cx += 1) {
-        if (isFord(map, cx, cy)) {
+        if (isFord(map, cx, cy) && !isStreamCell(this.stream, cx, cy)) {
           this.fords.add(cellIndex(map, cx, cy));
         }
       }
@@ -253,25 +267,84 @@ export class Terrain {
         this.floorRects.push({ ...prop.rect, height });
       }
     }
+    for (const crossing of map.crossings) {
+      const height = crossingHeight(crossing);
+      // Le ponceau ne porte rien: on marche sur le remblai de la voie.
+      if (height !== undefined && crossing.kind !== 'culvert') {
+        this.floorRects.push({ ...crossing.rect, height });
+      }
+    }
     this.findCrossings();
     this.river = this.buildRiverField();
-    const ground = new Mesh(resources.track(this.buildGround()), materials.palette);
-    ground.name = 'sol';
-    ground.receiveShadow = true;
-    ground.matrixAutoUpdate = false;
-    const water = new Mesh(resources.track(this.buildWater()), materials.water);
-    this.water = water;
-    water.name = 'eau';
-    water.receiveShadow = true;
-    water.matrixAutoUpdate = false;
-    water.renderOrder = 1;
+    // Sol et creux du ru: même matériau, mêmes morceaux de `surfaceChunk` m. Le lit de la rivière
+    // (berges quadrillées, pierres, roseaux: dense) garde ses tronçons de `stripSegment` m: dans
+    // les morceaux du sol, la vue de la place gagnait 10 000 triangles pour 5 appels de moins.
+    const writers = new Map<string, GeometryWriter>();
+    const pieces = new Map<string, BufferGeometry[]>();
+    const keyOf = (x: number, y: number, river: boolean): string =>
+      river ? `lit ${Math.floor((x + this.ext) / SETTINGS.stripSegment)}` : this.chunkOf(x, y);
+    const writerFor = (river: boolean) => (x: number, y: number): GeometryWriter => {
+      const key = keyOf(x, y, river);
+      let writer = writers.get(key);
+      if (writer === undefined) {
+        writer = new GeometryWriter();
+        writers.set(key, writer);
+      }
+      return writer;
+    };
+    const pieceFor = (river: boolean) => (x: number, y: number, geometry: BufferGeometry): void => {
+      const key = keyOf(x, y, river);
+      const list = pieces.get(key);
+      if (list === undefined) pieces.set(key, [geometry]);
+      else list.push(geometry);
+    };
+    this.buildGround(writerFor(false));
+    const stones = this.buildRiver(writerFor(true), pieceFor(true));
+    this.buildStreamBed(writerFor(false), pieceFor(false));
+    for (const key of new Set([...writers.keys(), ...pieces.keys()])) {
+      const writer = writers.get(key);
+      const parts = [...(pieces.get(key) ?? [])];
+      if (writer !== undefined && writer.positions.length > 0) parts.unshift(writer.build());
+      if (parts.length === 0) continue;
+      const merged = parts.length === 1 ? parts[0] : mergeGeometries(parts, false);
+      for (const part of parts) {
+        if (part !== merged) part.dispose();
+      }
+      if (merged === undefined) continue;
+      merged.computeBoundingSphere();
+      const ground = new Mesh(resources.track(merged), materials.palette);
+      ground.name = key.startsWith('lit ') ? `${key} de la riviere` : `sol ${key}`;
+      ground.receiveShadow = true;
+      ground.matrixAutoUpdate = false;
+      this.group.add(ground);
+    }
+    for (const [key, geometry] of this.buildWater()) {
+      const water = new Mesh(resources.track(geometry), materials.water);
+      water.name = `eau ${key}`;
+      water.receiveShadow = true;
+      water.matrixAutoUpdate = false;
+      water.renderOrder = 1;
+      this.water.push(water);
+      this.group.add(water);
+    }
     const outer = new Mesh(resources.track(this.buildOuterRing()), materials.palette);
     outer.name = 'pourtour';
     outer.receiveShadow = true;
     outer.matrixAutoUpdate = false;
-    this.group.add(ground, water, outer);
-    const stones = this.buildRiver(materials, resources);
+    this.group.add(outer);
+    this.buildStreamWater(materials, resources);
     this.river.texture = resources.track(riverTexture(this.river, stones));
+  }
+
+  /** Clé du morceau de `surfaceChunk` m qui contient le point (bande prolongée comprise). */
+  private chunkOf(x: number, y: number): string {
+    const size = SETTINGS.surfaceChunk;
+    return `${Math.floor((x + this.ext) / size)}:${Math.floor((y + this.ext) / size)}`;
+  }
+
+  /** Vrai si la case est creusée par le ru. */
+  isStream(cx: number, cy: number): boolean {
+    return isStreamCell(this.stream, cx, cy);
   }
 
   /** Cases du gué (gravier entre deux bras d'eau): haut-fond de galets sous l'eau. */
@@ -283,6 +356,13 @@ export class Terrain {
   private riverCell(cx: number, cy: number): RiverCell {
     if (!this.insideBand(cx, cy)) {
       return 'land';
+    }
+    if (this.isStream(cx, cy)) {
+      // Le ru sur la grève (deux rangées avant l'embouchure) compte comme de l'eau pour le champ
+      // de la rivière: la ligne d'eau suit le ru jusqu'à elle, sans mur de sable entre les deux.
+      // Plus haut, c'est de la terre (le creux est dessiné par le ru lui-même).
+      const mouth = this.stream?.mouthY ?? 0;
+      return cy >= mouth - STREAM_MOUTH_ROWS ? 'water' : 'land';
     }
     const look = this.look(cx, cy);
     if (look.ford) {
@@ -300,6 +380,7 @@ export class Terrain {
 
   /** Vrai si la case appartient au lit de la rivière (eau, gué, berge), dessiné à part. */
   private inRiverBed(cx: number, cy: number): boolean {
+    if (this.isStream(cx, cy)) return false;
     const cell = this.riverCell(cx, cy);
     return cell !== 'land' && cell !== 'path';
   }
@@ -337,70 +418,30 @@ export class Terrain {
   }
 
   /**
-   * Lit de la rivière en tronçons de `stripSegment` m le long de x (chacun un
-   * appel de dessin, éliminé hors du cadre): pentes des berges et fond, pierres
-   * plates du gué, pierres rondes des rives, roseaux. Renvoie les pierres qui
-   * affleurent, autour desquelles le courant s'ouvre.
+   * Lit de la rivière, dans les morceaux du sol (éliminés hors du cadre): pentes
+   * des berges et fond, pierres plates du gué, pierres rondes des rives, roseaux.
+   * Renvoie les pierres qui affleurent, autour desquelles le courant s'ouvre.
    */
-  private buildRiver(materials: SharedMaterials, resources: ResourceTracker): RiverStone[] {
-    const length = SETTINGS.stripSegment;
-    const segmentOf = (x: number): number => Math.floor((x + this.ext) / length);
-    const writers = new Map<number, GeometryWriter>();
-    this.buildRiverBed((cx) => {
-      const key = segmentOf(cx + 0.5);
-      const existing = writers.get(key);
-      if (existing !== undefined) {
-        return existing;
+  private buildRiver(
+    writerAt: (x: number, y: number) => GeometryWriter,
+    addPiece: (x: number, y: number, geometry: BufferGeometry) => void,
+  ): RiverStone[] {
+    this.buildRiverBed((cx, cy) => writerAt(cx + 0.5, cy + 0.5));
+    const builders = new Map<string, { builder: ShapeBuilder; x: number; y: number }>();
+    const builderAt = (x: number, y: number): ShapeBuilder => {
+      const key = this.chunkOf(x, y);
+      let entry = builders.get(key);
+      if (entry === undefined) {
+        entry = { builder: new ShapeBuilder(), x, y };
+        builders.set(key, entry);
       }
-      const created = new GeometryWriter();
-      writers.set(key, created);
-      return created;
-    });
-    const builders = new Map<number, ShapeBuilder>();
-    const builderAt = (x: number): ShapeBuilder => {
-      const key = segmentOf(x);
-      const existing = builders.get(key);
-      if (existing !== undefined) {
-        return existing;
-      }
-      const created = new ShapeBuilder();
-      builders.set(key, created);
-      return created;
+      return entry.builder;
     };
-    const pieces = new Map<number, BufferGeometry[]>();
-    const surfacing = this.placeFordStones((x, geometry) => {
-      const key = segmentOf(x);
-      pieces.set(key, [...(pieces.get(key) ?? []), geometry]);
-    });
+    const surfacing = this.placeFordStones(addPiece);
     this.bankStones(builderAt);
     this.reeds(builderAt);
-    for (const [key, builder] of builders) {
-      if (!builder.isEmpty) {
-        pieces.set(key, [...(pieces.get(key) ?? []), builder.build()]);
-      }
-    }
-    const keys = new Set([...writers.keys(), ...pieces.keys()]);
-    for (const key of [...keys].sort((a, b) => a - b)) {
-      const parts = [...(pieces.get(key) ?? [])];
-      const writer = writers.get(key);
-      if (writer !== undefined) {
-        parts.unshift(writer.build());
-      }
-      const merged = parts.length === 1 ? parts[0] : mergeGeometries(parts, false);
-      for (const part of parts) {
-        if (part !== merged) {
-          part.dispose();
-        }
-      }
-      if (merged === undefined) {
-        continue;
-      }
-      merged.computeBoundingSphere();
-      const mesh = new Mesh(resources.track(merged), materials.palette);
-      mesh.name = `lit de la riviere ${key}`;
-      mesh.receiveShadow = true;
-      mesh.matrixAutoUpdate = false;
-      this.group.add(mesh);
+    for (const { builder, x, y } of builders.values()) {
+      if (!builder.isEmpty) addPiece(x, y, builder.build());
     }
     return surfacing;
   }
@@ -410,7 +451,7 @@ export class Terrain {
    * pierres dispersées autour. Chacune part dans son tronçon par `add`;
    * renvoie l'emprise de celles qui crèvent la surface, pour le courant.
    */
-  private placeFordStones(add: (x: number, geometry: BufferGeometry) => void): RiverStone[] {
+  private placeFordStones(add: (x: number, y: number, geometry: BufferGeometry) => void): RiverStone[] {
     const stones = SETTINGS.fordStones;
     const shapes = new Map(
       stones.sides.map((sides) => [
@@ -447,7 +488,7 @@ export class Terrain {
       position.set(stone.x, top - stones.thickness, stone.y);
       rotation.setFromEuler(euler.set(0, stone.rotation, 0));
       scale.set(stone.size, 1, stone.size * stone.depth);
-      add(stone.x, shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+      add(stone.x, stone.y, shape.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
       if (stone.kind !== 'flush') {
         surfacing.push({ x: stone.x, y: stone.y, radius: (stone.size * (1 + stone.depth)) / 4 });
       }
@@ -532,7 +573,7 @@ export class Terrain {
    * Pierres rondes des rives (bible, 8.7): un rang au ras de l'eau, à demi
    * noyé, et un rang de plus petites un peu plus haut sur la pente.
    */
-  private bankStones(builderAt: (x: number) => ShapeBuilder): void {
+  private bankStones(builderAt: (x: number, y: number) => ShapeBuilder): void {
     const s = SETTINGS.river.stones;
     const level = SETTINGS.waterSurface;
     for (const { x, y } of this.shorePoints(s.spacing)) {
@@ -545,7 +586,7 @@ export class Terrain {
         list[Math.floor(hash2(qx, qy, seed) * list.length)];
       if (hash2(qx, qy, SEED_RIVER_STONE) < s.lowChance) {
         const size = s.lowSize[0] + hash2(qx, qy, SEED_RIVER_STONE + 1) * (s.lowSize[1] - s.lowSize[0]);
-        builderAt(x).ball(size / 2, [x, level - size * 0.12, y], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 2) ?? 'rock', {
+        builderAt(x, y).ball(size / 2, [x, level - size * 0.12, y], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 2) ?? 'rock', {
           scale: [1, 0.62, 0.8 + hash2(qx, qy, SEED_RIVER_STONE + 3) * 0.3],
           rotation: [0, hash2(qx, qy, SEED_RIVER_STONE + 4) * 360, 0],
         });
@@ -563,7 +604,7 @@ export class Terrain {
         px += -uy * along;
         py += ux * along;
         const size = s.highSize[0] + hash2(qx, qy, SEED_RIVER_STONE + 7) * (s.highSize[1] - s.highSize[0]);
-        builderAt(px).ball(size / 2, [px, this.bedHeight(px, py) + size * 0.12, py], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 8) ?? 'rock_light', {
+        builderAt(px, py).ball(size / 2, [px, this.bedHeight(px, py) + size * 0.12, py], pick(RIVER_STONE_CELLS, SEED_RIVER_STONE + 8) ?? 'rock_light', {
           scale: [1, 0.55, 0.85],
           rotation: [0, hash2(qx, qy, SEED_RIVER_STONE + 9) * 360, 0],
         });
@@ -572,7 +613,7 @@ export class Terrain {
   }
 
   /** Touffes de roseaux posées sur la ligne d'eau la plus proche de leur place (réglages). */
-  private reeds(builderAt: (x: number) => ShapeBuilder): void {
+  private reeds(builderAt: (x: number, y: number) => ShapeBuilder): void {
     const r = SETTINGS.river;
     const shore = this.shorePoints(r.stones.spacing / 2);
     r.reeds.forEach((clump, index) => {
@@ -599,7 +640,7 @@ export class Terrain {
         const lean = (hash2(index, stem, seed + 3) - 0.5) * 16;
         const turn = hash2(index, stem, seed + 4) * 360;
         const cell = REED_CELLS[Math.floor(hash2(index, stem, seed + 5) * REED_CELLS.length)] ?? 'grass_dark';
-        builderAt(x).cone(r.reedRadius, tall, [x, this.bedHeight(x, y) - 0.04, y], cell, {
+        builderAt(x, y).cone(r.reedRadius, tall, [x, this.bedHeight(x, y) - 0.04, y], cell, {
           base: true,
           segments: 3,
           rotation: [lean, turn, lean / 2],
@@ -633,7 +674,9 @@ export class Terrain {
    */
   waterLevelAt(x: number, y: number): number | null {
     const look = this.look(Math.floor(x), Math.floor(y));
-    return look.kind === 'water' || look.ford ? SETTINGS.waterSurface : null;
+    return look.kind === 'water' || look.ford || this.isStream(Math.floor(x), Math.floor(y))
+      ? SETTINGS.waterSurface
+      : null;
   }
 
   /** Hauteur du sol sous un point (pour poser personnages, objets et décor). */
@@ -648,6 +691,10 @@ export class Terrain {
       if (h !== null) {
         return h;
       }
+    }
+    if (this.isStream(Math.floor(x), Math.floor(y))) {
+      // Le ru (hors des ouvrages, déjà vus): la surface de l'eau, le haut des berges au bord.
+      return Math.max(SETTINGS.waterSurface, this.streamGround(x, y));
     }
     const look = this.look(Math.floor(x), Math.floor(y));
     if (look.kind === 'water' && !look.ford) {
@@ -666,7 +713,31 @@ export class Terrain {
 
   /** Vrai si l'herbe pousse là (touffes, fleurs, arbres du pourtour). */
   isGrass(cx: number, cy: number): boolean {
-    return this.look(cx, cy).kind === 'grass';
+    return this.look(cx, cy).kind === 'grass' && !this.isStream(cx, cy);
+  }
+
+  /**
+   * Hauteur du creux du ru au point: berges et fond (`ru.ts`), le haut au niveau du sol voisin;
+   * à l'embouchure, le fond rejoint le lit de la rivière sur la dernière rangée.
+   */
+  private streamGround(x: number, y: number): number {
+    const layout = this.stream;
+    if (layout === null) {
+      return 0;
+    }
+    const cy = Math.floor(y);
+    const west = this.look(layout.x0 - 1, cy).height;
+    const east = this.look(layout.x1, cy).height;
+    const t = (x - layout.x0) / (layout.x1 - layout.x0);
+    const top = west + (east - west) * Math.min(1, Math.max(0, t));
+    const h = streamHeight(layout, x, y, top);
+    const into = y - (layout.mouthY - 1);
+    if (into <= 0) {
+      return h;
+    }
+    const s = Math.min(1, into);
+    const blend = s * s * (3 - 2 * s);
+    return h + (this.bedHeight(x, layout.mouthY) - h) * blend;
   }
 
   private topCell(look: CellLook, cx: number, cy: number): PaletteCell {
@@ -853,7 +924,7 @@ export class Terrain {
    * normales douces. Au bord de la bande prolongée, une joue ferme le lit
    * jusqu'au pourtour.
    */
-  private buildRiverBed(writerAt: (cx: number) => GeometryWriter): void {
+  private buildRiverBed(writerAt: (cx: number, cy: number) => GeometryWriter): void {
     const n = SETTINGS.river.subdivisions;
     const size = 1 / n;
     const ring = -SETTINGS.outerDrop;
@@ -862,7 +933,7 @@ export class Terrain {
         if (!this.inRiverBed(cx, cy)) {
           continue;
         }
-        const writer = writerAt(cx);
+        const writer = writerAt(cx, cy);
         const heights: number[] = [];
         for (let j = 0; j <= n; j += 1) {
           for (let i = 0; i <= n; i += 1) {
@@ -929,26 +1000,42 @@ export class Terrain {
     }
   }
 
-  private buildGround(): BufferGeometry {
-    const writer = new GeometryWriter();
+  /**
+   * Sol en morceaux de `surfaceChunk` m (élimination hors du cadre, dans la vue et dans la passe
+   * d'ombre): une géométrie par morceau.
+   */
+  private buildGround(writerAt: (x: number, y: number) => GeometryWriter): void {
+    const size = SETTINGS.surfaceChunk;
+    const chunkColumn = (cx: number): number => Math.floor((cx + this.ext) / size);
     const up = [0, 1, 0] as const;
     const ringHeight = -SETTINGS.outerDrop;
     for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
-      // Dessus: les cases voisines de même aspect sont fusionnées en bandes (moins de triangles).
+      // Dessus: les cases voisines de même aspect sont fusionnées en bandes (moins de triangles),
+      // sans déborder de leur morceau.
       let runStart = -this.ext;
       let runCell: PaletteCell | null = null;
       let runHeight = 0;
       for (let cx = -this.ext; cx <= this.map.width + this.ext; cx += 1) {
         const atEnd = cx === this.map.width + this.ext;
         const raw = atEnd ? null : this.look(cx, cy);
-        // Les traversées en planches (`buildCrossing`) et le lit de la rivière sont dessinés à part.
+        // Les traversées en planches (`buildCrossing`), le lit de la rivière et le ru sont dessinés à part.
         const look =
-          raw !== null && (raw.kind === 'wood' || this.inRiverBed(cx, cy)) ? null : raw;
+          raw !== null &&
+          ((raw.kind === 'wood' && !this.isStream(cx, cy)) ||
+            this.inRiverBed(cx, cy) ||
+            this.isStream(cx, cy))
+            ? null
+            : raw;
         const cell = look === null ? null : this.topCell(look, cx, cy);
         const fills = look === null ? null : this.roundedCorners(cx, cy, look);
+        const writer = writerAt(runCell !== null ? runStart : cx, cy);
         if (
           runCell !== null &&
-          (look === null || fills !== null || cell !== runCell || look.height !== runHeight)
+          (look === null ||
+            fills !== null ||
+            cell !== runCell ||
+            look.height !== runHeight ||
+            chunkColumn(cx) !== chunkColumn(runStart))
         ) {
           writer.quad(
             [
@@ -963,7 +1050,7 @@ export class Terrain {
           runCell = null;
         }
         if (look !== null && cell !== null && fills !== null) {
-          this.roundedTop(writer, cx, cy, look.height, cell, fills);
+          this.roundedTop(writerAt(cx, cy), cx, cy, look.height, cell, fills);
           continue;
         }
         if (look === null) {
@@ -978,9 +1065,10 @@ export class Terrain {
       // Côtés: une marche là où le voisin est plus bas; au bord de la bande, on ferme vers le pourtour.
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
-        if (look.kind === 'wood' || this.inRiverBed(cx, cy)) {
+        if (look.kind === 'wood' || this.inRiverBed(cx, cy) || this.isStream(cx, cy)) {
           continue;
         }
+        const writer = writerAt(cx, cy);
         const h = look.height;
         for (const side of SIDES) {
           const outside = !this.insideBand(cx + side.dx, cy + side.dy);
@@ -992,7 +1080,9 @@ export class Terrain {
             (!outside && neighbourHeight > h) ||
             (!outside && this.look(cx + side.dx, cy + side.dy).kind === 'wood') ||
             // Le lit de la rivière rejoint ses voisins à leur hauteur: pas de marche.
-            (!outside && this.inRiverBed(cx + side.dx, cy + side.dy))
+            (!outside && this.inRiverBed(cx + side.dx, cy + side.dy)) ||
+            // Le creux du ru dessine lui-même ses berges et ses têtes contre le remblai.
+            (!outside && this.isStream(cx + side.dx, cy + side.dy))
           ) {
             continue;
           }
@@ -1018,9 +1108,12 @@ export class Terrain {
       }
     }
     for (const crossing of this.crossings) {
-      buildCrossing(writer, crossing);
+      const middle = (crossing.u0 + crossing.u1) / 2;
+      buildCrossing(
+        crossing.alongX ? writerAt(middle, crossing.axis) : writerAt(crossing.axis, middle),
+        crossing,
+      );
     }
-    return writer.build();
   }
 
   /**
@@ -1035,7 +1128,9 @@ export class Terrain {
       cy >= 0 &&
       cx < map.width &&
       cy < map.height &&
-      map.ground[cellIndex(map, cx, cy)] === 'wood';
+      map.ground[cellIndex(map, cx, cy)] === 'wood' &&
+      // La passerelle du ru est un modèle (`footbridge`), pas une traversée de voie.
+      !this.isStream(cx, cy);
     for (let cy = 0; cy < map.height; cy += 1) {
       for (let cx = 0; cx < map.width; cx += 1) {
         if (!isWood(cx, cy) || seen.has(cellIndex(map, cx, cy))) {
@@ -1093,8 +1188,9 @@ export class Terrain {
     }
   }
 
-  private buildWater(): BufferGeometry {
-    const writer = new GeometryWriter();
+  /** Surface de la rivière et du gué, en morceaux de `surfaceChunk` m (le ru a la sienne). */
+  private buildWater(): Map<string, BufferGeometry> {
+    const writers = new Map<string, GeometryWriter>();
     const up = [0, 1, 0] as const;
     const steps = SETTINGS.waterSubdivisions;
     const size = 1 / steps;
@@ -1102,8 +1198,14 @@ export class Terrain {
       for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
         const look = this.look(cx, cy);
         // Une seule surface pour la rivière et le gué (le lit monte au-dessus d'elle sur les berges).
-        if (look.kind !== 'water' && !look.ford) {
+        if ((look.kind !== 'water' && !look.ford) || this.isStream(cx, cy)) {
           continue;
+        }
+        const key = this.chunkOf(cx, cy);
+        let writer = writers.get(key);
+        if (writer === undefined) {
+          writer = new GeometryWriter();
+          writers.set(key, writer);
         }
         const h = SETTINGS.waterSurface;
         for (let sy = 0; sy < steps; sy += 1) {
@@ -1124,7 +1226,146 @@ export class Terrain {
         }
       }
     }
-    return writer.build();
+    const out = new Map<string, BufferGeometry>();
+    for (const [key, writer] of writers) {
+      out.set(key, writer.build());
+    }
+    return out;
+  }
+
+  /**
+   * Le ru de la Côte (`ru.ts`): creux à berges raides et fond de galets, tête de maçonnerie
+   * contre le remblai de la voie, surface de l'eau; en morceaux de `surfaceChunk` m le long du ru.
+   */
+  private buildStreamBed(
+    writerAt: (x: number, y: number) => GeometryWriter,
+    addPiece: (x: number, y: number, geometry: BufferGeometry) => void,
+  ): void {
+    this.streamGeometry(writerAt, addPiece, null);
+  }
+
+  private buildStreamWater(materials: SharedMaterials, resources: ResourceTracker): void {
+    const waters = new Map<string, GeometryWriter>();
+    this.streamGeometry(null, null, (x, y) => {
+      const key = this.chunkOf(x, y);
+      let writer = waters.get(key);
+      if (writer === undefined) {
+        writer = new GeometryWriter();
+        waters.set(key, writer);
+      }
+      return writer;
+    });
+    for (const [key, writer] of waters) {
+      const mesh = new Mesh(resources.track(writer.build()), materials.water);
+      mesh.name = `eau du ru ${key}`;
+      mesh.receiveShadow = true;
+      mesh.matrixAutoUpdate = false;
+      mesh.renderOrder = 1;
+      this.streamWater.push(mesh);
+      this.group.add(mesh);
+    }
+  }
+
+  /** Géométrie du ru: creux et galets (`bedAt`, `addPiece`) ou surface de l'eau (`waterAt`). */
+  private streamGeometry(
+    bedWriterAt: ((x: number, y: number) => GeometryWriter) | null,
+    addPiece: ((x: number, y: number, geometry: BufferGeometry) => void) | null,
+    waterWriterAt: ((x: number, y: number) => GeometryWriter) | null,
+  ): void {
+    const layout = this.stream;
+    if (layout === null) {
+      return;
+    }
+    const s = SETTINGS.stream;
+    const across = s.across;
+    const width = layout.x1 - layout.x0;
+    const fallback = new GeometryWriter();
+    const bedAt = (y: number): GeometryWriter => bedWriterAt?.(layout.x0 + width / 2, y) ?? fallback;
+    const waterAt = (y: number): GeometryWriter => waterWriterAt?.(layout.x0 + width / 2, y) ?? fallback;
+    const point = (i: number, y: number): [number, number, number] => {
+      const x = layout.x0 + (i / (across - 1)) * width;
+      return [x, this.streamGround(x, y), y];
+    };
+    const normalAt = (x: number, y: number): [number, number, number] => {
+      const e = 0.06;
+      const nx = -(this.streamGround(x + e, y) - this.streamGround(x - e, y)) / (2 * e);
+      const nz = -(this.streamGround(x, y + e) - this.streamGround(x, y - e)) / (2 * e);
+      const length = Math.hypot(nx, 1, nz);
+      return [nx / length, 1 / length, nz / length];
+    };
+    const tone = (h: number): PaletteCell =>
+      h < s.bed + s.toeRise + 0.02 ? 'rock_dark' : h < SETTINGS.waterSurface + 0.05 ? 'rock' : 'bank';
+    const surface = SETTINGS.waterSurface;
+    for (let cy = layout.fromY; cy < layout.mouthY; cy += 1) {
+      if (layout.embankment.has(cy)) {
+        continue;
+      }
+      for (let y = cy; y < cy + 1 - 1e-6; y += s.step) {
+        const y1 = Math.min(cy + 1, y + s.step);
+        const writer = bedAt(y);
+        for (let i = 0; i < across - 1 && bedWriterAt !== null; i += 1) {
+          const a = point(i, y);
+          const b = point(i + 1, y);
+          const c = point(i + 1, y1);
+          const d = point(i, y1);
+          const cell = tone((a[1] + b[1] + c[1] + d[1]) / 4);
+          writer.smoothTriangle([a, c, b], [normalAt(a[0], a[2]), normalAt(c[0], c[2]), normalAt(b[0], b[2])], cell);
+          writer.smoothTriangle([a, d, c], [normalAt(a[0], a[2]), normalAt(d[0], d[2]), normalAt(c[0], c[2])], cell);
+        }
+        // Surface de l'eau, d'une berge à l'autre (les berges, au-dessus, en cachent le bord).
+        const water = waterAt(y);
+        const half = width / 2;
+        const mid = layout.x0 + half;
+        for (const [u0, u1] of waterWriterAt === null ? [] : [
+          [-0.47, 0],
+          [0, 0.47],
+        ] as const) {
+          water.quad(
+            [
+              [mid + u0 * width, surface, y],
+              [mid + u0 * width, surface, y1],
+              [mid + u1 * width, surface, y1],
+              [mid + u1 * width, surface, y],
+            ],
+            [0, 1, 0],
+            'water',
+          );
+        }
+        // Galets du fond: quelques-uns affleurent, le courant s'ouvre autour.
+        const seed = Math.round(y * 16);
+        if (addPiece !== null && hash2(seed, 7, SEED_STREAM_STONE) < s.step / s.pebbleSpacing) {
+          const u = (hash2(seed, 8, SEED_STREAM_STONE) - 0.5) * 0.7;
+          const x = mid + u * half;
+          const size = s.pebbleSize[0] + hash2(seed, 9, SEED_STREAM_STONE) * (s.pebbleSize[1] - s.pebbleSize[0]);
+          const py = y + hash2(seed, 10, SEED_STREAM_STONE) * s.step;
+          const stone = new ShapeBuilder().ball(size / 2, [x, this.streamGround(x, py) + size * 0.1, py], RIVER_STONE_CELLS[seed % RIVER_STONE_CELLS.length] ?? 'rock', {
+            scale: [1, 0.6, 0.85],
+            rotation: [0, hash2(seed, 11, SEED_STREAM_STONE) * 360, 0],
+          });
+          addPiece(x, py, stone.build());
+        }
+      }
+      // Têtes contre le remblai de la voie (ponceau) et au bout de la bande prolongée.
+      for (const [edgeY, toward, top] of [
+        [cy, -1, layout.embankment.has(cy - 1) ? this.look(layout.x0, cy - 1).height : null],
+        [cy + 1, 1, layout.embankment.has(cy + 1) ? this.look(layout.x0, cy + 1).height : null],
+        [cy, -1, cy === layout.fromY ? -SETTINGS.outerDrop : null],
+      ] as const) {
+        if (top === null || bedWriterAt === null) {
+          continue;
+        }
+        const writer = bedAt(cy + 0.5);
+        for (let i = 0; i < across - 1; i += 1) {
+          const a = point(i, edgeY);
+          const b = point(i + 1, edgeY);
+          writer.quad(
+            [a, b, [b[0], Math.max(top, b[1]), edgeY], [a[0], Math.max(top, a[1]), edgeY]],
+            [0, 0, -toward],
+            'stone_dark',
+          );
+        }
+      }
+    }
   }
 
   /** Cadre d'herbe au-delà de la bande prolongée, jusqu'à l'horizon. */

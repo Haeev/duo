@@ -4,9 +4,20 @@
  * l'horizon. Tout est instancié (quelques appels de dessin) et placé par un
  * bruit déterministe, identique sur les deux machines.
  */
-import { Color, Euler, Group, Matrix4, Quaternion, Vector3, type InstancedMesh } from 'three';
+import {
+  Color,
+  Euler,
+  Group,
+  Matrix4,
+  Mesh,
+  Quaternion,
+  Vector3,
+  type BufferGeometry,
+  type InstancedMesh,
+} from 'three';
 import type { GameMap } from '../etat/carte';
 import { inRect } from '../etat/carte';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { hash2, valueNoise } from './bruit';
 import { ShapeBuilder } from './geometrie';
 import { createInstanced, finishInstances } from './instances';
@@ -52,13 +63,11 @@ const TREE_MAX_DENSITY = 0.42;
 const TREE_BAND_DEPTH = 11;
 const TREE_SCALE_MIN = 0.8;
 const TREE_SCALE_SPREAD = 0.6;
-const TINT_MIN = 0.86;
-const TINT_SPREAD = 0.24;
 const JITTER = 0.7;
 /** Bord infranchissable de la carte (`bord` du level designer), en cases. */
 const PLAYABLE_BORDER = 2;
 const STRIPS = 4;
-/** Tronçons par côté au plus (côté prolongé divisé par `stripSegment`, large marge). */
+/** Tronçons par côté au plus (côté prolongé divisé par `forestSegment`, large marge). */
 const FOREST_SEGMENTS_MAX = 16;
 
 function smoothstep(t: number): number {
@@ -107,6 +116,8 @@ export class Vegetation {
     flowers: boolean;
   }[] = [];
   private detail = 1;
+  /** Arbres de la forêt du pourtour (cuits par tronçons, plus comptables par instance). */
+  forestTrees = 0;
 
   constructor(
     map: GameMap,
@@ -134,13 +145,15 @@ export class Vegetation {
       tuft.cone(0.035, 0.26, [x, 0, z], 'white_paint', {
         base: true,
         segments: 3,
+        open: true,
         rotation: [tilt, 0, tilt / 2],
       });
     }
+    // Tour 10 (budget de la carte de 100 m): tige ouverte, le cœur de 2 cm (invisible à la distance
+    // de jeu) retiré: 23 triangles au lieu de 46.
     const flower = new ShapeBuilder()
-      .cone(0.012, 0.24, [0, 0, 0], 'leaf_crop', { base: true, segments: 3 })
-      .ball(0.05, [0, 0.25, 0], 'white_paint')
-      .ball(0.02, [0, 0.27, 0.03], 'flower_center');
+      .cone(0.012, 0.24, [0, 0, 0], 'leaf_crop', { base: true, segments: 3, open: true })
+      .ball(0.05, [0, 0.25, 0], 'white_paint');
     const pebble = new ShapeBuilder().ball(0.12, [0, 0.02, 0], 'white_paint', {
       scale: [1.2, 0.45, 1],
     });
@@ -171,6 +184,7 @@ export class Vegetation {
     const euler = new Euler();
     const scale = new Vector3();
 
+    const chunk = RENDER_SETTINGS.terrain.scatterChunk;
     const scatter = (
       name: string,
       builder: ShapeBuilder,
@@ -178,15 +192,33 @@ export class Vegetation {
       tints: readonly PaletteCell[],
       seed: number,
       shadows: boolean,
+      size: number = chunk,
     ): void => {
-      const mesh = createInstanced(
-        name,
-        resources.track(builder.build()),
-        materials.palette,
-        list.length,
-      );
+      const geometry = resources.track(builder.build());
+      // Un maillage par morceau de `scatterChunk` m: ceux hors du cadre sont éliminés (ADR 0016,
+      // aucun maillage qui grandit avec la carte).
+      const byChunk = new Map<string, { cx: number; cy: number }[]>();
+      for (const cell of list) {
+        const key = `${Math.floor(cell.cx / size)}:${Math.floor(cell.cy / size)}`;
+        const bucket = byChunk.get(key);
+        if (bucket === undefined) byChunk.set(key, [cell]);
+        else bucket.push(cell);
+      }
+      for (const [key, cellsInChunk] of byChunk) {
+        scatterChunk(`${name} ${key}`, geometry, cellsInChunk, tints, seed, shadows);
+      }
+    };
+    const scatterChunk = (
+      name: string,
+      geometry: BufferGeometry,
+      list: { cx: number; cy: number }[],
+      tints: readonly PaletteCell[],
+      seed: number,
+      shadows: boolean,
+    ): void => {
+      const mesh = createInstanced(name, geometry, materials.palette, list.length);
       mesh.castShadow = shadows;
-      // Ordre mêlé (stable): les premières instances couvrent toute la carte, `setDetail` n'en garde qu'une part.
+      // Ordre mêlé (stable): les premières instances couvrent tout le morceau, `setDetail` n'en garde qu'une part.
       const shuffled = [...list].sort(
         (a, b) => hash2(a.cx, a.cy, SEED_ORDER + seed) - hash2(b.cx, b.cy, SEED_ORDER + seed),
       );
@@ -209,8 +241,9 @@ export class Vegetation {
       this.group.add(mesh);
     };
     scatter('touffes', tuft, tufts, TUFT_CELLS, SEED_TUFT, false);
-    scatter('fleurs', flower, flowers, FLOWER_CELLS, SEED_FLOWER, false);
-    scatter('galets', pebble, pebbles, PEBBLE_CELLS, SEED_PEBBLE, false);
+    // Fleurs: peu de triangles (23 chacune), par grands morceaux comme les galets.
+    scatter('fleurs', flower, flowers, FLOWER_CELLS, SEED_FLOWER, false, RENDER_SETTINGS.terrain.pebbleChunk);
+    scatter('galets', pebble, pebbles, PEBBLE_CELLS, SEED_PEBBLE, false, RENDER_SETTINGS.terrain.pebbleChunk);
     this.plantOuterForest(map, terrain, materials, resources);
     // Palette de saison: les touffes prennent la teinte de l'herbe du moment (couleur d'instance).
     materials.onPaletteChange(() => {
@@ -265,8 +298,21 @@ export class Vegetation {
       .blob(0.75, [0.5, 2.9, 0.2], 'leaf_oak_light', { rotation: [0, 40, 20] });
     const firGeometry = resources.track(fir.build());
     const oakGeometry = resources.track(oak.build());
+    const firLight = resources.track(
+      new ShapeBuilder()
+        .cylinder(0.12, 0.16, 0.7, [0, 0, 0], 'bark_dark', { base: true, segments: 5 })
+        .cone(1.0, 1.9, [0, 0.55, 0], 'leaf_fir_light', { base: true, segments: 6 })
+        .cone(0.7, 1.7, [0, 1.6, 0], 'leaf_fir_light', { base: true, segments: 6, rotation: [0, 30, 0] })
+        .build(),
+    );
+    const oakLight = resources.track(
+      new ShapeBuilder()
+        .cylinder(0.15, 0.2, 1.3, [0, 0, 0], 'bark', { base: true, segments: 5 })
+        .blob(1.15, [0, 2.2, 0], 'leaf_oak_light')
+        .blob(0.75, [0.5, 2.9, 0.2], 'leaf_oak', { rotation: [0, 40, 20] })
+        .build(),
+    );
     const ext = SETTINGS.extension;
-    const strips: InstancedMesh[][] = [];
     const cells: { cx: number; cy: number; strip: number }[] = [];
     const min = PLAYABLE_BORDER;
     const maxX = map.width - PLAYABLE_BORDER;
@@ -296,11 +342,10 @@ export class Vegetation {
         const side = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;
         // Chaque côté coupé en tronçons: ceux hors du cadre sont éliminés (ni triangles ni appel).
         const along = side < 2 ? cx : cy;
-        const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.stripSegment);
+        const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.forestSegment);
         cells.push({ cx, cy, strip: side * FOREST_SEGMENTS_MAX + segment });
       }
     }
-    const color = new Color();
     const matrix = new Matrix4();
     const position = new Vector3();
     const rotation = new Quaternion();
@@ -311,39 +356,33 @@ export class Vegetation {
       if (inStrip.length === 0) {
         continue;
       }
-      const firs = createInstanced(
-        `foret sapins ${strip}`,
-        firGeometry,
-        materials.palette,
-        inStrip.length,
-      );
-      const oaks = createInstanced(
-        `foret chenes ${strip}`,
-        oakGeometry,
-        materials.palette,
-        inStrip.length,
-      );
+      // Sapins et chênes d'un tronçon cuits en un seul maillage (tour 10: un appel par tronçon au
+      // lieu de deux; ils ne bougent jamais). La teinte de chaque arbre passe par la palette:
+      // la moitié prend le feuillage clair (`leaf_*_light`), à la place de la couleur d'instance.
+      const pieces: BufferGeometry[] = [];
       for (const { cx, cy } of inStrip) {
         const isFir = hash2(cx, cy, SEED_KIND) < 0.5;
-        const mesh = isFir ? firs : oaks;
+        const light = hash2(cx, cy, SEED_KIND + 1) < 0.5;
         const x = cx + 0.5 + (hash2(cx, cy, SEED_JITTER_X) - 0.5) * JITTER;
         const y = cy + 0.5 + (hash2(cx, cy, SEED_JITTER_Y) - 0.5) * JITTER;
         const size = TREE_SCALE_MIN + hash2(cx, cy, SEED_SCALE) * TREE_SCALE_SPREAD * 2;
         position.set(x, terrain.heightAt(x, y), y);
         rotation.setFromEuler(euler.set(0, hash2(cx, cy, SEED_ANGLE) * Math.PI * 2, 0));
         scale.set(size, size * (1 + hash2(cx, cy, SEED_SCALE + 1) * 0.3), size);
-        const tint = TINT_MIN + hash2(cx, cy, SEED_KIND + 1) * TINT_SPREAD;
-        mesh.setMatrixAt(mesh.count, matrix.compose(position, rotation, scale));
-        mesh.setColorAt(mesh.count, color.setRGB(tint, tint, tint));
-        mesh.count += 1;
+        const source = isFir ? (light ? firLight : firGeometry) : light ? oakLight : oakGeometry;
+        pieces.push(source.clone().applyMatrix4(matrix.compose(position, rotation, scale)));
+        this.forestTrees += 1;
       }
+      const merged = mergeGeometries(pieces, false);
+      for (const piece of pieces) piece.dispose();
+      merged.computeBoundingSphere();
+      const mesh = new Mesh(resources.track(merged), materials.palette);
+      mesh.name = `foret ${strip}`;
+      mesh.matrixAutoUpdate = false;
       // Hors du terrain jouable, l'ombre de la forêt n'apporterait rien: autant d'appels de dessin en moins.
-      firs.castShadow = false;
-      oaks.castShadow = false;
-      finishInstances(firs);
-      finishInstances(oaks);
-      strips.push([firs, oaks]);
-      this.group.add(firs, oaks);
+      mesh.castShadow = false;
+      mesh.receiveShadow = true;
+      this.group.add(mesh);
     }
   }
 }
