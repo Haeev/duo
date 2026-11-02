@@ -3,8 +3,8 @@
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
 import type { ControlFrame } from '../etat/actions';
-import { inRect } from '../etat/carte';
-import type { Beam, Character, CharacterId, Vec2 } from '../etat/types';
+import { buildingAt, inRect } from '../etat/carte';
+import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
@@ -209,8 +209,9 @@ export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | unde
   return false;
 }
 
-/** Après les déplacements: dans la maison ou non, la porte qui grince. */
+/** Après les déplacements: dans la maison ou non, la porte qui grince; le bâtiment visitable (ADR 0016). */
 export function updateInside(sim: Sim, c: Character): void {
+  c.inside = buildingAt(sim.map, sim.world.rooms, c.pos.x, c.pos.y);
   const inside = inRect(sim.map.house.room, c.pos.x, c.pos.y);
   if (inside !== c.inHouse) {
     c.inHouse = inside;
@@ -218,6 +219,11 @@ export function updateInside(sim: Sim, c: Character): void {
     if (doorBuilt) emit(sim, { type: 'door', by: c.id, entering: inside });
   }
   if (c.speed === 0 && c.action.kind === 'walk') c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+}
+
+/** Le bâtiment visitable où se trouve un habitant (ADR 0016), `null` hors de la carte jouée. */
+export function updateVillagerInside(sim: Sim, v: VillagerState): void {
+  v.inside = v.visible ? buildingAt(sim.map, sim.world.rooms, v.pos.x, v.pos.y) : null;
 }
 
 /** Place un personnage (téléportation derrière un fondu). */
@@ -229,6 +235,7 @@ export function placeCharacter(sim: Sim, c: Character, at: Vec2): void {
   c.speed = 0;
   stopPath(sim, c);
   c.inHouse = inRect(sim.map.house.room, at.x, at.y);
+  c.inside = buildingAt(sim.map, sim.world.rooms, at.x, at.y);
 }
 
 function release(sim: Sim, c: Character): void {

@@ -52,7 +52,7 @@ function dress(
 ): Character {
   c.name = name;
   c.created = true;
-  c.appearance = { hair, outfit, scarf };
+  c.appearance = { ...c.appearance, hair, outfit, scarf };
   c.pos = { x, y };
   c.prev = { x, y };
   c.facing = Math.PI / 2;

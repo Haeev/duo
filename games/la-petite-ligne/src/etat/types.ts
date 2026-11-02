@@ -26,6 +26,7 @@
  */
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
+import type { BuildingId } from './carte';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -214,6 +215,31 @@ export interface WorldState {
   catalogueBought: Record<ItemId, number>;
   /** Cadeaux offerts (tour 9, section 2.7), par habitant: jour de la remise. */
   giftsGiven: Record<VillagerId, number>;
+  /**
+   * Pièces de la maisonnette à bâtir (tour 10, section 4), par identifiant de `pieces.json`
+   * (`room_cellar`, `room_bedroom`): une entrée dès la commande. Vide au départ et dans les
+   * sauvegardes d'avant.
+   */
+  rooms: Record<string, RoomState>;
+  /**
+   * Le râtelier près de la porte (tour 10, section 5.3): les outils rangés, hors des cases du
+   * rangement (`cellar` reste le contenu du rangement commun). Vide au départ.
+   */
+  rack: ItemStack[];
+}
+
+/** Une pièce commandée à Basile (tour 10, section 4.3). */
+export interface RoomState {
+  /** Jour de la commande (le site paraît au matin suivant), `null` si pas encore commandée. */
+  ordered: number | null;
+  /** Ce qui a été déposé à la caisse du chantier (rien ne se perd). */
+  crate: ItemStack[];
+  /** Éléments bâtis (identifiants des éléments de `pieces.json`). */
+  elementsBuilt: string[];
+  /** Panne faîtière portée à deux jusqu'au faîte (chambre). */
+  beamPlaced: boolean;
+  /** Jour où la pièce est à vous (tuiles posées, porte percée), `null` avant. */
+  builtDay: number | null;
 }
 
 /** Une annonce affichée au tableau du quai (tour 9, section 1). */
@@ -315,8 +341,18 @@ export type ClockStop =
 // Personnages
 
 export interface Appearance {
-  /** Coiffure, de 0 à 2. */
+  /**
+   * Coiffure, de 0 à 14 (tour 10, section 2.1, dans l'ordre de la table: 0 à 2 les trois d'avant,
+   * 3 à 11 les nouvelles de la création, 12 à 14 celles du salon seulement).
+   */
   hair: number;
+  /**
+   * Couleur des cheveux, de 0 à 7 (section 2.2): noir, brun, châtain, auburn, roux, blond paille,
+   * gris, blanc. Défaut: celle des portraits d'avant (p1 brun, p2 noir).
+   */
+  hairColor: number;
+  /** Barbe ou moustache (réponse du client du 2026-11-01): 0 aucune, 1 barbe courte, 2 barbe fournie, 3 moustache. */
+  beard: number;
   /** Couleur de la tenue, de 0 à 3. */
   outfit: number;
   /** Couleur du foulard: celle du profil Duo du joueur (CSS, `#rrggbb`). */
@@ -340,8 +376,18 @@ export interface Character {
   facing: number;
   /** Vitesse au sol à ce pas (m/s), pour caler l'animation de marche. */
   speed: number;
-  /** Dans la pièce de la maisonnette. */
+  /** Dans la pièce de la maisonnette (gardé jusqu'à la migration du lot L3 vers `inside`). */
   inHouse: boolean;
+  /**
+   * Bâtiment visitable où il se trouve (ADR 0016), `null` dehors. Recalculé à chaque pas par
+   * `updateInside` et à chaque `placeCharacter`. « À l'abri »: `inside !== null`; « chez soi »:
+   * `inside === HOUSE_BUILDING`.
+   */
+  inside: BuildingId | null;
+  /** Jour du dernier changement de coiffure (salon, section 2.3), `null` si jamais. */
+  hairChangedDay: number | null;
+  /** Qui a remarqué ce changement (Cœur +10 une fois), `null` tant que personne. */
+  hairNoticedBy: CharacterId | null;
   /** Ce que fait le personnage (animation et barre de progression). */
   action: CharacterAction;
   /** Ce qui occupe son joueur (arrêt de l'horloge si les deux sont occupés). */
@@ -498,6 +544,18 @@ export interface Needs {
   sleep: number;
   /** Cœur, recalculé chaque nuit (0 à 100). */
   heart: number;
+  /** Tour 10 (section 3.5): minutes de jeu de suite à plus de `needs.heart.reunion.apartRadius` de l'autre. */
+  apartMinutes: number;
+  /** Retrouvailles comptées aujourd'hui (`needs.heart.reunion.maxPerDay` au plus). */
+  reunionsToday: number;
+  /** Sieste faite aujourd'hui (une par jour, section 3.4). */
+  nappedToday: boolean;
+  /** Début de la sieste en cours (heure de jeu absolue: jour x 1440 + minutes), `null` hors sieste. */
+  napStart: number | null;
+  /** Premiers rideaux ouverts du matin déjà comptés aujourd'hui (Cœur +2, section 6.2). */
+  curtainsMorningDone: boolean;
+  /** Ligne `heart_missing` déjà montrée aujourd'hui (une fois par jour). */
+  missingShown: boolean;
 }
 
 export type FormLevel = 'low' | 'okay' | 'good' | 'great' | 'radiant';
@@ -591,6 +649,13 @@ export interface PlacedFurniture {
   rotation: number;
   /** Qui l'a posé en dernier (`null` pour les meubles de départ). */
   placedBy: CharacterId | null;
+  /**
+   * Rideaux seulement (tour 10, section 6): la fenêtre où ils pendent (nom du nœud `window_<n>` du
+   * modèle). Absent pour les autres meubles et dans les sauvegardes d'avant (lot L4: migration).
+   */
+  window?: string;
+  /** Rideaux seulement: fermés. Absent: ouverts. */
+  closed?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -860,6 +925,8 @@ export interface VillagerState {
   talkingWith: CharacterId[];
   /** Le duo lui a parlé (rencontre faite par au moins un des deux). */
   met: boolean;
+  /** Bâtiment visitable où il se trouve (ADR 0016, son et interface), `null` dehors ou hors de la carte. */
+  inside: BuildingId | null;
 }
 
 export interface DialogueLineView {

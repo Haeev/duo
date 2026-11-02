@@ -14,7 +14,7 @@ import { type Sim, format, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
-import type { PlayerInfo } from '../simulation/monde';
+import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
 import { type StepInput, step } from '../simulation/pas';
 import { settleSavedClimax } from '../simulation/moments';
 import { memoriesFromSave } from '../simulation/souvenirs';
@@ -560,6 +560,8 @@ function resume(
   for (const v of world.villagers) v.talkingWith = [];
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
+  // Tour 10 (lot L0, même format 6): besoins, coiffure, pièces, râtelier et `inside` par défaut.
+  fillTour10Fields(map, world);
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
