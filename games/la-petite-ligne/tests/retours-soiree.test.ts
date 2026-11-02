@@ -1,5 +1,6 @@
 // Retours de la soirée de jeu du 2026-11-01 (docs/jeux/jeu-1/retours/2026-11-01/retours.md):
 // un test par correction (R01, R02, R03, R04, R06, R13, R14), sur la vraie carte et le vrai contenu.
+import { isHome } from '../src/etat/interieurs';
 import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
 import type { AuthoredIntent, Intent } from '../src/etat/actions';
@@ -140,7 +141,7 @@ describe('R01: personne ne reste coincé dans les meubles', () => {
     act(sim, 'p2', { type: 'unstick' });
     for (const id of ['p1', 'p2'] as const) {
       expect(isStuck(sim, character(sim, id))).toBe(false);
-      expect(character(sim, id).inHouse).toBe(true);
+      expect(isHome(character(sim, id))).toBe(true);
       expect(reachesFront(sim, id)).toBe(true);
     }
     expect(character(sim, 'p1').notifications.some((n) => n.key === 'unstuck')).toBe(true);

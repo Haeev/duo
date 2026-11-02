@@ -8,6 +8,8 @@
  * (`pieces.json`, nœuds `window_<n>` du modèle), qu'on ouvre et qu'on ferme.
  */
 import { type GameMap, HOUSE_BUILDING, type MapRoom, type Rect, inRect } from '../etat/carte';
+import { isHome } from '../etat/interieurs';
+import { TOOL_RACK } from './ids';
 import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacedFurniture, type PlacementPreview } from '../etat/types';
 import type { ItemDef } from '../donnees/types';
 import type { WindowDef, WindowSide } from '../donnees/maison';
@@ -170,7 +172,7 @@ export function placementProblem(
 export function updatePlacement(sim: Sim, c: Character): void {
   const item = heldItem(c);
   const def = item === null ? undefined : sim.content.items[item];
-  if (item === null || !isPlaceable(def) || def.footprint === null || c.inside !== HOUSE_BUILDING || c.status !== 'active') {
+  if (item === null || !isPlaceable(def) || def.footprint === null || !isHome(c) || c.status !== 'active') {
     if (c.placement !== null) {
       c.placement = null;
       sim.runtime.changed = true;
@@ -216,7 +218,7 @@ export function rotatePlacement(sim: Sim, c: Character, delta: number): void {
 /** Pose le meuble tenu (à l'aperçu, ou à la case donnée par un clic). */
 export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotation: number | null): boolean {
   const item = heldItem(c);
-  if (item === null || c.inside !== HOUSE_BUILDING) return false;
+  if (item === null || !isHome(c)) return false;
   const def = sim.content.items[item];
   if (!isPlaceable(def) || def.footprint === null) return false;
   let r = rotation ?? c.placement?.rotation ?? 0;
@@ -254,6 +256,8 @@ export function takeFurniture(sim: Sim, c: Character, furnitureId: string): bool
   const f = sim.world.furniture[index];
   if (f === undefined) return false;
   if (sim.world.characters.some((ch) => ch.bedId === f.id)) return false;
+  // Le râtelier a sa place fixe près de la porte (lot L3): il ne se reprend pas.
+  if (f.item === TOOL_RACK.item) return false;
   // Jamais de débordement provoqué: le reste du rangement doit tout contenir (section 5.3).
   if (removalOverflows(sim, f.id)) {
     say(sim, c.id, 'storage_remove_refused');
@@ -346,7 +350,7 @@ export function cornerProblem(sim: Sim, c: Character, cell: Cell): CornerProblem
  * Au même endroit, le retire. Il faut être dans la maison.
  */
 export function designateCorner(sim: Sim, c: Character, x: number, y: number): void {
-  if (!c.inHouse) {
+  if (!isHome(c)) {
     say(sim, c.id, CORNER_KEYS.outside);
     return;
   }
@@ -469,6 +473,7 @@ export function toggleCurtains(sim: Sim, c: Character, furnitureId: string): boo
   else delete f.closed;
   sim.runtime.changed = true;
   bump(sim, closing ? 'curtains_closed' : 'curtains_opened', c.id);
+  emit(sim, { type: 'curtains', by: c.id, furniture: f.id, closed: closing });
   if (!closing && !c.needs.curtainsMorningDone && sim.world.clock.minutes < MORNING_UNTIL) {
     c.needs.curtainsMorningDone = true;
     addHeart(sim, c, sim.content.settings.needs.soft.heart.curtainsMorning);

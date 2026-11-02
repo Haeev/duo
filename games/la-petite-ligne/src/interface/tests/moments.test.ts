@@ -3,6 +3,7 @@
  * Le héron du jour 6 est joué une fois par les robots (graine de la démo), puis chaque cas part
  * d'une copie de cet état.
  */
+import { HOUSE_BUILDING } from '../../etat/carte';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { momentDef } from '../../etat/moments';
 import type { CharacterId, MomentToday } from '../../etat/types';
@@ -131,7 +132,7 @@ describe("ligne d'observation et anneau", () => {
         character(s, 'p1').menu = 'notebook';
       },
       (s: Sim): void => {
-        character(s, 'p1').inHouse = true;
+        character(s, 'p1').inside = HOUSE_BUILDING;
       },
     ]) {
       const sim = copy();

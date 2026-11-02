@@ -8,9 +8,10 @@ import { evaluateAll, NO_CONTEXT } from './conditions';
 import { MINUTES_PER_DAY, SCHEDULE_PERIOD_TICKS } from './constantes';
 import { type Sim, distance, point } from './contexte';
 import { villagerRestSpot } from './bancs';
-import { refreshBlockers } from './deplacement';
+import { villagerBlockers } from './deplacement';
 import { bodyCollides, findPath } from './grille';
-import { POINT } from './ids';
+import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
+import { newVillagerState } from './monde';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
 const HIDDEN_ACTIVITIES = new Set(['home', 'absent']);
@@ -48,12 +49,29 @@ function routeTo(sim: Sim, v: VillagerState, pointId: string): void {
   const goal = goalOf(sim, v, pointId);
   // Déjà rendu (apparu à sa place): aucun pas, sinon il se dessinerait un instant debout.
   const there = goal !== undefined && distance(v.pos, goal) < 1e-6;
-  const path = goal === undefined || there ? null : findPath(refreshBlockers(sim), v.pos, goal);
+  const path = goal === undefined || there ? null : findPath(villagerBlockers(sim), v.pos, goal);
+  // Derrière un meuble (Odette au guichet): le dernier pas va sur la case même.
+  const last = path?.[path.length - 1];
+  if (path !== null && goal !== undefined && VILLAGER_BEHIND_POINTS.has(pointId) && (last === undefined || distance(last, goal) > 1e-6)) path.push({ x: goal.x, y: goal.y });
   sim.runtime.villagerPaths[v.id] = { target: pointId, path: path ?? [] };
+}
+
+/**
+ * Un habitant ajouté au contenu après la sauvegarde (Achille et Solange, tour 10) n'a pas encore
+ * d'état: il en reçoit un, hors de la carte, à la suite des autres.
+ */
+function ensureVillagers(sim: Sim): void {
+  const { villagers } = sim.world;
+  if (villagers.length >= sim.content.villagers.length) return;
+  for (const def of sim.content.villagers) {
+    if (!villagers.some((v) => v.id === def.id)) villagers.push(newVillagerState(sim.map, def.id));
+  }
+  sim.runtime.changed = true;
 }
 
 /** Place tous les habitants à leur point de l'emploi du temps (début de partie, matin, chargement). */
 export function placeVillagers(sim: Sim): void {
+  ensureVillagers(sim);
   for (const def of sim.content.villagers) {
     const v = sim.world.villagers.find((x) => x.id === def.id);
     if (v === undefined) continue;
@@ -69,6 +87,7 @@ export function placeVillagers(sim: Sim): void {
 }
 
 export function updateVillagers(sim: Sim, dt: number): void {
+  ensureVillagers(sim);
   const speed = sim.content.settings.feel.villagerSpeed;
   const refresh = sim.world.tick % SCHEDULE_PERIOD_TICKS === 0;
   for (const def of sim.content.villagers) {
@@ -102,7 +121,7 @@ export function updateVillagers(sim: Sim, dt: number): void {
     // (un corps resté dans un obstacle, comme une ancienne sauvegarde au milieu d'un banc, y est posé).
     if (sim.runtime.villagerPaths[v.id] === undefined && v.visible) {
       const goal = goalOf(sim, v, v.target);
-      const stuck = bodyCollides(refreshBlockers(sim), v.pos.x, v.pos.y);
+      const stuck = bodyCollides(villagerBlockers(sim), v.pos.x, v.pos.y);
       if (goal !== undefined && stuck) teleport(v, goal.x, goal.y);
       routeTo(sim, v, v.target);
     }

@@ -2,6 +2,7 @@
  * Modèles des panneaux (comptoir, catalogue, établi, réchaud, coffre, sac):
  * fonctions pures sur l'état, testées dans Node.
  */
+import { HOUSE_BUILDING } from '../etat/carte';
 import { catalogueWindow, onSale } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
 import type { ItemDef } from '../donnees/types';
@@ -266,7 +267,7 @@ export function foodEntries(world: ReadonlyWorld, ctx: UiContext): FoodEntry[] {
 
 /** L'autre est dans la maison aussi (manger ensemble compte au souper partagé). */
 export function partnerAtHome(world: ReadonlyWorld, ctx: UiContext): boolean {
-  return characterOf(world, ctx.partner)?.inHouse === true && characterOf(world, ctx.me)?.inHouse === true;
+  return characterOf(world, ctx.partner)?.inside === HOUSE_BUILDING && characterOf(world, ctx.me)?.inside === HOUSE_BUILDING;
 }
 
 // ---------------------------------------------------------------------------

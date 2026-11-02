@@ -10,6 +10,7 @@
  * à leur place de l'emploi du temps (`placeVillagers`, assis sur un banc
  * quand le jeu les y assoit) et l'assise des joueurs (`sitDown`).
  */
+import { HOUSE_BUILDING } from '../../etat/carte';
 import type { GameMap } from '../../etat/carte';
 import { createWorld } from '../../simulation/monde';
 import { sitDown } from '../../simulation/bancs';
@@ -188,7 +189,7 @@ export function createExampleWorld(
     ? dress(first, 'Camille', room.x + 1.5, room.y + 2.5, SCARF_P1, 0, 0)
     : dress(first, 'Camille', door.x + 0.5, door.y + 2.2, SCARF_P1, 0, 0);
   const p2 = dress(second, 'Sacha', door.x - 1.5, door.y + 3.5, SCARF_P2, 1, 2);
-  p1.inHouse = options.inside;
+  p1.inside = options.inside ? HOUSE_BUILDING : null;
   // Case visée (surlignage): une culture mûre du potager.
   const aimed = map.garden[4];
   if (aimed !== undefined && !options.inside) {
@@ -303,7 +304,7 @@ export function createExampleWorld(
     // Chaise au sud de la table, tournée vers elle (vers le nord: rotation 2).
     const chair = { cx: room.x + 2, cy: room.y + 3 };
     furniture.push({ id: 'f9', item: 'chair', cell: chair, rotation: 2, placedBy: 'p1' });
-    p1.inHouse = true;
+    p1.inside = HOUSE_BUILDING;
     p1.pos = { x: chair.cx + 0.5, y: chair.cy + 0.5 };
     p1.prev = { ...p1.pos };
     p1.facing = -Math.PI / 2;
@@ -419,7 +420,7 @@ export function createExampleWorld(
     p2.corner = { cx: room.x, cy: room.y + room.h - 2 };
     p2.pos = { x: room.x + 1.5, y: room.y + room.h - 0.5 };
     p2.prev = { ...p2.pos };
-    p2.inHouse = true;
+    p2.inside = HOUSE_BUILDING;
   }
   if (options.pin) {
     p1.pin = { pos: { x: door.x + 3.5, y: door.y + 4.5 }, since: 0, until: PIN_TICKS };
@@ -534,7 +535,7 @@ export function animateExampleWorld(
     p1.speed =
       u < 1 ? Math.hypot(MEET_TO.x - MEET_FROM.x, MEET_TO.y - MEET_FROM.y) / MEET_SECONDS : 0;
     p1.action = { kind: u < 1 ? 'walk' : 'idle', since: 0, duration: 0, target: null };
-  } else if (p1 !== undefined && walking && !p1.inHouse && options?.scene === undefined) {
+  } else if (p1 !== undefined && walking && p1.inside !== HOUSE_BUILDING && options?.scene === undefined) {
     const stroll = strollPosition(
       {
         points: [
@@ -631,7 +632,7 @@ function placeMoment(
     ] as const) {
       c.pos = { x, y };
       c.prev = { x, y };
-      c.inHouse = false;
+      c.inside = null;
       c.aim = null;
       c.action = { kind: 'idle', since: 0, duration: 0, target: null };
       c.facing = Math.atan2(anchor.y - y, anchor.x - x);
@@ -698,7 +699,7 @@ function layBeds(
   ];
   // Comme `goToBed` de la simulation: centre du lit, et 0,45 m vers l'ouest pour le premier d'un lit double.
   const lay = (c: Character, bed: PlacedFurniture, w: number, d: number, side: number): void => {
-    c.inHouse = true;
+    c.inside = HOUSE_BUILDING;
     c.status = 'sleeping';
     c.bedId = bed.id;
     c.aim = null;
@@ -724,7 +725,7 @@ function holdTools(
     c.bag[0] = { item: tool, quality: 'ordinary', count: 1 };
     c.selected = 0;
     c.aim = null;
-    c.inHouse = false;
+    c.inside = null;
   }
   p1.pos = { x: door.x + 0.5, y: door.y + 3.5 };
   p1.prev = { ...p1.pos };

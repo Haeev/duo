@@ -11,7 +11,7 @@ import type { Content } from '../donnees/types';
 import { MOVE_DEADZONE, SIM_DT } from '../simulation/constantes';
 import { standingSpot } from '../simulation/bancs';
 import { type Sim, wrapWorld } from '../simulation/contexte';
-import { refreshBlockers, walkStep } from '../simulation/deplacement';
+import { blockersFor, walkStep } from '../simulation/deplacement';
 import {
   CHANNEL,
   EventsMessageSchema,
@@ -156,8 +156,7 @@ export function createGuest(
   function replay(from: Vec2): Vec2 {
     const pos = { x: from.x, y: from.y };
     if (sim === null) return pos;
-    const b = refreshBlockers(sim);
-    for (const f of pendingFrames) walkStep(b, pos, f.moveX, f.moveY, content.settings.movement.walkSpeed, SIM_DT);
+    for (const f of pendingFrames) walkStep(blockersFor(sim, pos), pos, f.moveX, f.moveY, content.settings.movement.walkSpeed, SIM_DT);
     return pos;
   }
 
@@ -248,7 +247,7 @@ export function createGuest(
       }
       predictedPrev.x = predicted.x;
       predictedPrev.y = predicted.y;
-      const facing = walkStep(refreshBlockers(sim), predicted, frame.moveX, frame.moveY, content.settings.movement.walkSpeed, SIM_DT);
+      const facing = walkStep(blockersFor(sim, predicted), predicted, frame.moveX, frame.moveY, content.settings.movement.walkSpeed, SIM_DT);
       if (facing !== null) predictedFacing = facing;
       predictedSpeed = Math.hypot(predicted.x - predictedPrev.x, predicted.y - predictedPrev.y) / SIM_DT;
     },

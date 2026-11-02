@@ -5,6 +5,7 @@
  * positions interpolées (`prev` vers `pos`), orientation lissée, outil en
  * main, clignement des yeux et expression selon la forme.
  */
+import { isSheltered } from '../etat/interieurs';
 import {
   AnimationMixer,
   LoopOnce,
@@ -886,7 +887,7 @@ export class CharactersPart implements EventfulPart {
   private resolveHighFive(world: ReadonlyWorld): void {
     this.highFivePending = false;
     const [a, b] = world.characters;
-    if (a === undefined || b?.inHouse !== a.inHouse) {
+    if (a === undefined || b?.inside !== a.inside) {
       return;
     }
     const near = Math.hypot(a.pos.x - b.pos.x, a.pos.y - b.pos.y) <= SETTINGS.highFiveRange;
@@ -898,7 +899,7 @@ export class CharactersPart implements EventfulPart {
 
   /** Une poule devant le joueur, à portée de main? */
   private henInFront(character: DeepReadonly<Character>, world: ReadonlyWorld): boolean {
-    if (character.inHouse) {
+    if (isSheltered(character)) {
       return false;
     }
     const fx = Math.cos(character.facing);
@@ -1390,7 +1391,7 @@ export class CharactersPart implements EventfulPart {
       // comme le banc, dos au dossier (`benchPlace`). Il y mange aussi (`sit_eat`).
       const benchSeat = this.seatOf(character);
       const onBench =
-        benchSeat !== null && !character.inHouse && this.benchSeat(benchSeat.bench, benchSeat.slot);
+        benchSeat !== null && !isSheltered(character) && this.benchSeat(benchSeat.bench, benchSeat.slot);
       const shown = this.shownSeats[character.id === 'p1' ? 0 : 1];
       if (shown !== undefined) {
         shown.seat = onBench ? benchSeat : null;
@@ -1588,7 +1589,7 @@ export class CharactersPart implements EventfulPart {
     let nearest: DeepReadonly<Character> | null = null;
     let best: number = SETTINGS.lookRange;
     for (const character of world.characters) {
-      if (character.inHouse || character.status === 'sleeping') {
+      if (isSheltered(character) || character.status === 'sleeping') {
         continue;
       }
       const distance = Math.hypot(

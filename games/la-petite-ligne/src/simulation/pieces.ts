@@ -19,21 +19,11 @@ import { storeAtHome } from './rangement';
 import { addStack, countInBag, countInStacks, takeFromBag, takeFromStacks } from './sac';
 import { POINT } from './ids';
 
-/** Travail en cours sur un élément (dans l'état: l'invité suit la barre, une reprise la garde). */
-export interface RoomWork {
-  element: string;
-  /** 0 à 1. */
-  progress: number;
-  /** Planches et clous de l'élément déjà pris (caisse, puis sac de qui travaille). */
-  paid: boolean;
-  workers: CharacterId[];
-}
+/** Travail en cours sur un élément: déclaré dans `etat/types.ts` (lot L3), avec `RoomState.work`. */
+export type { RoomWork } from '../etat/types';
 
-/**
- * `RoomState` et son travail en cours. Le champ `work` manque au contrat de L0 (`etat/types.ts`,
- * au lot L3): il est déclaré ici, facultatif, en attendant d'y être repris.
- */
-export type RoomProgress = RoomState & { work?: RoomWork | null };
+/** `RoomState` et son travail en cours (`work`, dans le contrat depuis le lot L3). */
+export type RoomProgress = RoomState;
 
 /** Le grand coffre se commande comme un chantier de Basile (`improvement_pay`), sous cet identifiant. */
 export const OAK_CHEST = 'oak_chest';
@@ -416,6 +406,7 @@ function finishRoom(sim: Sim, def: RoomDef): void {
   if (!sim.world.flags.includes(flag)) sim.world.flags.push(flag);
   bump(sim, 'room_built', null);
   bump(sim, `room_built:${def.id}`, null);
+  emit(sim, { type: 'room_built', room: def.id });
   sim.runtime.dynamicDirty = true;
   sim.runtime.changed = true;
   notifyKey(sim, 'both', 'message', 'room_built', { room: roomName(sim, def.id) });

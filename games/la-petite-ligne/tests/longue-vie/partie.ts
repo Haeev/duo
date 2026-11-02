@@ -4,6 +4,7 @@
  * les mesures L-01 à L-12 de la section 6.2. La limite du jour 43 n'est levée que dans le contenu
  * passé au test (`clock.lastDay`), jamais dans les réglages livrés.
  */
+import { isHome } from '../../src/etat/interieurs';
 import { hashState } from '@duo/sdk/sim';
 import { seasonIndexOf, seasonOfDay } from '../../src/donnees/calendrier';
 import type { Content } from '../../src/donnees/types';
@@ -526,7 +527,7 @@ export function playLong(options: LongOptions): LongRun {
     if (record !== null && w.phase === 'day' && w.clock.running)
       for (const c of w.characters) {
         const care = record.care[c.id];
-        if (!c.inHouse) care.outside += 1 / SIM_HZ;
+        if (!isHome(c)) care.outside += 1 / SIM_HZ;
         if (c.action.kind === 'water' || c.action.kind === 'refill') care.water += 1 / SIM_HZ;
         if (c.action.kind === 'feed') care.feed += 1 / SIM_HZ;
       }

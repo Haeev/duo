@@ -16,6 +16,9 @@ export const POINT = {
   well: 'well',
   waterBarrel: 'water_barrel',
   groceryCounter: 'grocery_counter',
+  groceryInsideCounter: 'grocery_inside_counter',
+  /** La place du client au comptoir intérieur, face à Odette. */
+  groceryCustomer: 'grocery_customer',
   noticeBoard: 'notice_board',
   coopCrate: 'coop_crate',
   workbench: 'sawmill_workbench',
@@ -24,6 +27,18 @@ export const POINT = {
   trainStop: 'train_stop',
   offstage: 'offstage',
 } as const;
+
+/**
+ * Points où l'habitant se tient sur la case même, derrière un meuble où les joueurs n'entrent pas
+ * (Odette au guichet de son comptoir): son trajet s'arrête à la case libre voisine, puis il y passe.
+ */
+export const VILLAGER_BEHIND_POINTS: ReadonlySet<string> = new Set([POINT.groceryInsideCounter]);
+
+/**
+ * Le râtelier des outils (tour 10, section 5): au mur sud de la pièce, entre la porte (8, 26) et la
+ * fenêtre sud-est (`window_1`, case 10, 25), à portée de main en entrant. Place fixe, jamais reprise.
+ */
+export const TOOL_RACK = { id: 'f_rack', item: 'tool_rack', cell: { cx: 9, cy: 25 }, rotation: 2 } as const;
 
 /** Points d'apparition de chaque personnage à la descente du train (sinon le point de `reglages.spawn`). */
 export const SPAWN_POINTS = { p1: 'spawn_1', p2: 'spawn_2' } as const;

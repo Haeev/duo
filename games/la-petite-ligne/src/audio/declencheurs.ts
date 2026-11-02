@@ -9,6 +9,7 @@
  * l'autre joueur sont joués plus bas (`peerDb`). Les sons d'interface de
  * l'autre ne s'entendent pas chez soi, sauf la proposition d'achat.
  */
+import { isSheltered } from '../etat/interieurs';
 import { currentOrder } from '../donnees/commandes';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
@@ -350,7 +351,23 @@ export function soundsForEvent(
       emit.ui(`${settings.villagerMotifPrefix}${event.villager}`, 'both');
       break;
     case 'ate':
-      emit.world('eat', characterAt(world, event.by), event.by);
+      // Le chocolat chaud d'Odette se boit (tour 10): une gorgée plutôt qu'une bouchée.
+      emit.world(event.item === 'hot_chocolate' && ctx.hasSound('cup-sip') ? 'cup-sip' : 'eat', characterAt(world, event.by), event.by);
+      break;
+    case 'ate_together':
+      emit.ui('eat-together', 'both');
+      break;
+    case 'door_locked':
+      emit.world('door-locked', nearestDoor(map, characterAt(world, event.by))?.at ?? characterAt(world, event.by), event.by);
+      break;
+    case 'salon_seated':
+      emit.world('chair-creak', characterAt(world, event.by), event.by);
+      break;
+    case 'hair_noticed':
+      emit.ui('hair-noticed', 'both');
+      break;
+    case 'storage_full':
+      emit.world('chest-full', characterAt(world, event.by), event.by);
       break;
     case 'went_to_bed':
       if (event.by === local) signals.wentToBed = true;
@@ -473,12 +490,20 @@ export function soundsForEvent(
     case 'lantern_out':
       emit.world('lantern-out', pointAt(map, event.place) ?? characterAt(world, event.by), event.by);
       break;
+    // Tour 10 (lot L5): loquet, salon, coupe remarquée et panière, sons à brancher.
     case 'annonce_posted':
     case 'annonce_done':
     case 'annonce_expired':
     case 'improvement_funded':
     case 'catalogue_page':
     case 'hen_named':
+    case 'haircut':
+    case 'hair_offer':
+    case 'basket_delivered':
+    case 'nap_started':
+    case 'reunion':
+    case 'curtains':
+    case 'room_built':
       break;
     case 'moment_climax':
     case 'moment_paused':
@@ -581,7 +606,7 @@ export class StateWatcher {
         track.stepPhase += (dt * s.steps.stepsPerCycle * scale) / cycle;
         if (track.stepPhase >= 1) {
           track.stepPhase -= Math.floor(track.stepPhase);
-          emit.world(this.stepSound(map, c.inside !== null || c.inHouse, at), at, c.id);
+          emit.world(this.stepSound(map, isSheltered(c), at), at, c.id);
         }
       } else {
         track.stepPhase = s.steps.firstStepPhase;

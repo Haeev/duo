@@ -15,6 +15,8 @@ import type {
   WorldState,
 } from '../etat/types';
 import type { Content } from '../donnees/types';
+import type { BuildingId } from '../etat/carte';
+import type { Blockers } from './grille';
 import { SIM_DT } from './constantes';
 
 /** Clic sur une cible encore loin: on agira en arrivant. */
@@ -60,6 +62,18 @@ export interface Runtime {
   heldRepeat: Record<CharacterId, { cx: number; cy: number; endsAt: number } | null>;
   /** Ce que survole la souris de chaque joueur (intention `point_at`, R11), ou `null`: visée au clavier. */
   pointer: Record<CharacterId, ClickTarget | null>;
+  /** Bâtiments fermés écrits dans `dynamicBlocked` (masque de `closedMask`), -1 avant le premier calcul. */
+  closedDoors: number;
+  /** Bâtiments fermés déjà annoncés à qui est dedans, `null` avant le premier pas. */
+  announcedClosed: number | null;
+  /** Collisions vues de dedans, par code de porte (`interieurs.ts`). */
+  doorBlockers: Record<number, Blockers>;
+  /** Porte fermée déjà dite à ce joueur (et où), jusqu'à ce qu'il s'en éloigne. */
+  doorKnocked: Record<CharacterId, { building: BuildingId; at: Vec2 } | null>;
+  /** « On ne passe pas la porte à deux avec ça. » déjà dit pendant ce portage. */
+  doorCarryNotified: boolean;
+  /** Minute de jeu du dernier chocolat chaud de chacun (bu ensemble dans la demi-heure: Cœur +5). */
+  chocolateAt: Record<CharacterId, number | null>;
 }
 
 export interface Sim {
@@ -87,6 +101,12 @@ export function createRuntime(map: GameMap): Runtime {
     bufferedAct: { p1: null, p2: null },
     heldRepeat: { p1: null, p2: null },
     pointer: { p1: null, p2: null },
+    closedDoors: -1,
+    announcedClosed: null,
+    doorBlockers: {},
+    doorKnocked: { p1: null, p2: null },
+    doorCarryNotified: false,
+    chocolateAt: { p1: null, p2: null },
   };
 }
 

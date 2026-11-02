@@ -5,6 +5,7 @@
  * (`moteur.ts`) applique ses décisions, et les tests le font jouer toute la
  * démo avec le robot de la simulation.
  */
+import { isHome } from '../etat/interieurs';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
 import type { GameMap, Rect } from '../etat/carte';
@@ -281,7 +282,7 @@ export class AudioBrain {
     if (me !== undefined) {
       f.listener.at.x = me.prev.x + (me.pos.x - me.prev.x) * input.alpha;
       f.listener.at.y = me.prev.y + (me.pos.y - me.prev.y) * input.alpha;
-      f.listener.inHouse = me.inHouse;
+      f.listener.inHouse = isHome(me);
       f.listener.inside = me.inside;
     }
     f.listener.yaw = input.yaw;

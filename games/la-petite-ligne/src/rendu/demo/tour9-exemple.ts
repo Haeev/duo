@@ -137,7 +137,7 @@ function seatBoth(map: GameMap, content: Content, id: string, p1: Character, p2:
     c.pos = { x: place.x, y: place.y };
     c.prev = { x: place.x, y: place.y };
     c.facing = place.facing;
-    c.inHouse = false;
+    c.inside = null;
     c.speed = 0;
     c.aim = null;
     c.seat = { bench: id, slot, since: 0 };

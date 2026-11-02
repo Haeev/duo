@@ -4,14 +4,14 @@
   "dataSchema": 7,
   "data": {
     "schema": 7,
-    "tick": 124225,
-    "revision": 55812,
+    "tick": 124207,
+    "revision": 55872,
     "seed": 42,
     "rng": [
-      45146969,
-      2796155493,
-      193014164,
-      3317857994
+      175420859,
+      738962618,
+      2831178038,
+      3317856424
     ],
     "phase": "ended",
     "clock": {
@@ -58,13 +58,13 @@
         },
         "facing": -1.5707963267948966,
         "speed": 0,
-        "inHouse": false,
         "inside": null,
         "hairChangedDay": null,
         "hairNoticedBy": null,
+        "hairOffer": null,
         "action": {
           "kind": "idle",
-          "since": 124225,
+          "since": 124207,
           "duration": 0,
           "target": null
         },
@@ -150,7 +150,7 @@
           null
         ],
         "selected": 1,
-        "water": 7,
+        "water": 8,
         "placement": null,
         "aim": {
           "cell": {
@@ -166,7 +166,7 @@
         "needs": {
           "belly": 24.99365079365205,
           "sleep": 50,
-          "heart": 77.69999999998868,
+          "heart": 62.69999999998868,
           "apartMinutes": 0,
           "reunionsToday": 0,
           "nappedToday": false,
@@ -176,8 +176,8 @@
         },
         "form": "okay",
         "envie": {
-          "id": "see_train",
-          "done": true
+          "id": "cook_soup",
+          "done": false
         },
         "sharedEnvie": null,
         "bedId": null,
@@ -207,112 +207,112 @@
         ],
         "notifications": [
           {
-            "id": 509,
+            "id": 536,
             "kind": "message",
             "text": "Une mésange entre dans le nichoir de Basile, un brin de mousse au bec. Elle y bâtit son nid.",
             "hint": null,
             "proposal": null,
             "key": "moment_tits_climax",
-            "tick": 110726
+            "tick": 110712
           },
           {
-            "id": 511,
+            "id": 538,
             "kind": "message",
-            "text": "belly_low",
+            "text": "Achille: « Bon. Je l'ai descendue seul, à petits pas. Demain, si vous passez, je ne dirai pas non. »",
+            "hint": null,
+            "proposal": null,
+            "key": "villager_says",
+            "tick": 112363
+          },
+          {
+            "id": 540,
+            "kind": "message",
+            "text": "Un petit creux. Un en-cas, ou on attend le souper ?",
             "hint": null,
             "proposal": null,
             "key": "belly_low",
-            "tick": 115533
+            "tick": 115513
           },
           {
-            "id": 521,
+            "id": 550,
             "kind": "message",
             "text": "3 œufs ce matin.",
             "hint": null,
             "proposal": null,
             "key": "eggs_found",
-            "tick": 117919
+            "tick": 117901
           },
           {
-            "id": 523,
+            "id": 552,
             "kind": "message",
             "text": "Le train de samedi est en gare !",
             "hint": null,
             "proposal": null,
             "key": "train_arrived",
-            "tick": 120440
+            "tick": 120422
           },
           {
-            "id": 525,
-            "kind": "envie",
-            "text": "Envie réalisée: Voir arriver le train.",
-            "hint": null,
-            "proposal": null,
-            "key": "envie_done",
-            "tick": 120440
-          },
-          {
-            "id": 527,
+            "id": 554,
             "kind": "message",
             "text": "Livré à la maisonnette: un poste à galène, rangé dans le coffre.",
             "hint": null,
             "proposal": null,
             "key": "parcel_delivered",
-            "tick": 120962
+            "tick": 120944
           },
           {
-            "id": 529,
+            "id": 556,
             "kind": "message",
-            "text": "heart_light",
+            "text": "Achille: « Bon. Je l'ai descendue seul, à petits pas. Demain, si vous passez, je ne dirai pas non. »",
             "hint": null,
             "proposal": null,
-            "key": "heart_light",
-            "tick": 120962
+            "key": "villager_says",
+            "tick": 121052
           },
           {
-            "id": 531,
+            "id": 558,
             "kind": "message",
             "text": "Le train part dans une heure.",
             "hint": null,
             "proposal": null,
             "key": "train_leaves_soon",
-            "tick": 123590
+            "tick": 123572
           },
           {
-            "id": 533,
+            "id": 560,
             "kind": "message",
-            "text": "belly_low",
+            "text": "Un petit creux. Un en-cas, ou on attend le souper ?",
             "hint": null,
             "proposal": null,
             "key": "belly_low",
-            "tick": 124220
+            "tick": 124202
           },
           {
-            "id": 535,
+            "id": 562,
             "kind": "quest",
             "text": "Le train est parti avec la deuxième commande.",
             "hint": null,
             "proposal": null,
             "key": "quest_done",
-            "tick": 124220
+            "tick": 124202
           },
           {
-            "id": 542,
+            "id": 569,
             "kind": "letter",
             "text": "Du courrier: La deuxième commande est partie",
             "hint": null,
             "proposal": null,
             "key": "letter_received",
-            "tick": 124225
+            "tick": 124207
           },
           {
-            "id": 544,
+            "id": 571,
             "kind": "quest",
             "text": "Nouvelle quête: La commande du samedi 22",
             "hint": null,
             "proposal": null,
             "key": "quest_started",
-            "tick": 124225
+            "tick": 124207
           }
         ],
         "supper": {
@@ -321,7 +321,7 @@
           "stew": 0
         },
         "midnightReturn": false,
-        "lastInputTick": 124225,
+        "lastInputTick": 124207,
         "absent": false,
         "needsSet": {
           "belly": null,
@@ -329,13 +329,13 @@
           "heart": null
         },
         "heartToday": {
-          "envie": true,
+          "envie": false,
           "sharedEnvie": false,
           "ateTogether": false,
           "gesture": true
         },
         "hintQueue": [],
-        "lastHintTick": 76802,
+        "lastHintTick": 76774,
         "stays": {
           "riverbank": 0,
           "quay_bench": 0,
@@ -355,20 +355,20 @@
         },
         "lastMeal": null,
         "envieHistory": [
-          "watch_river",
-          "meet_jeanne",
           "talk_firmin",
-          "bench_moment",
           "saw_planks",
-          "real_bed",
           "meet_jeanne_square",
           "crunchy_cook",
-          "pontoon_sit",
+          "sow_more",
+          "real_bed",
+          "eat_radishes",
+          "visit_hens",
           "fine_harvest",
+          "level_crossing_walk",
           "more_wood",
-          "eat_omelette",
-          "hang_frame",
-          "see_train"
+          "saw_planks",
+          "fresh_bread",
+          "cook_soup"
         ],
         "crafting": null,
         "pin": null,
@@ -401,13 +401,13 @@
         },
         "facing": -1.5707963267948966,
         "speed": 0,
-        "inHouse": false,
         "inside": null,
         "hairChangedDay": null,
         "hairNoticedBy": null,
+        "hairOffer": null,
         "action": {
           "kind": "idle",
-          "since": 124225,
+          "since": 124207,
           "duration": 0,
           "target": null
         },
@@ -461,13 +461,19 @@
             "quality": "fine",
             "count": 10
           },
+          null,
           {
-            "item": "gudgeon",
+            "item": "riddle_card_2",
             "quality": "ordinary",
             "count": 1
           },
           {
-            "item": "riddle_card_2",
+            "item": "chub",
+            "quality": "ordinary",
+            "count": 2
+          },
+          {
+            "item": "trout",
             "quality": "ordinary",
             "count": 1
           },
@@ -476,12 +482,6 @@
             "quality": "ordinary",
             "count": 1
           },
-          {
-            "item": "trout",
-            "quality": "ordinary",
-            "count": 1
-          },
-          null,
           null,
           null,
           null,
@@ -493,7 +493,7 @@
           null
         ],
         "selected": 8,
-        "water": 10,
+        "water": 8,
         "placement": null,
         "aim": {
           "cell": {
@@ -504,12 +504,12 @@
           "blocked": null
         },
         "destination": null,
-        "endurance": 104.98666666666571,
-        "enduranceMax": 104.98666666666571,
+        "endurance": 104.98488888888792,
+        "enduranceMax": 104.98488888888792,
         "needs": {
           "belly": 24.99365079365205,
           "sleep": 50,
-          "heart": 77.69999999998868,
+          "heart": 62.69999999998868,
           "apartMinutes": 0,
           "reunionsToday": 0,
           "nappedToday": false,
@@ -519,8 +519,8 @@
         },
         "form": "good",
         "envie": {
-          "id": "see_train",
-          "done": true
+          "id": "fine_harvest",
+          "done": false
         },
         "sharedEnvie": null,
         "bedId": null,
@@ -552,112 +552,112 @@
         ],
         "notifications": [
           {
-            "id": 528,
+            "id": 555,
             "kind": "message",
             "text": "Livré à la maisonnette: un poste à galène, rangé dans le coffre.",
             "hint": null,
             "proposal": null,
             "key": "parcel_delivered",
-            "tick": 120962
+            "tick": 120944
           },
           {
-            "id": 530,
+            "id": 557,
             "kind": "message",
-            "text": "heart_light",
+            "text": "Achille: « Bon. Je l'ai descendue seul, à petits pas. Demain, si vous passez, je ne dirai pas non. »",
             "hint": null,
             "proposal": null,
-            "key": "heart_light",
-            "tick": 120962
+            "key": "villager_says",
+            "tick": 121052
           },
           {
-            "id": 532,
+            "id": 559,
             "kind": "message",
             "text": "Le train part dans une heure.",
             "hint": null,
             "proposal": null,
             "key": "train_leaves_soon",
-            "tick": 123590
+            "tick": 123572
           },
           {
-            "id": 534,
+            "id": 561,
             "kind": "message",
-            "text": "belly_low",
+            "text": "Un petit creux. Un en-cas, ou on attend le souper ?",
             "hint": null,
             "proposal": null,
             "key": "belly_low",
-            "tick": 124220
+            "tick": 124202
           },
           {
-            "id": 536,
+            "id": 563,
             "kind": "quest",
             "text": "Le train est parti avec la deuxième commande.",
             "hint": null,
             "proposal": null,
             "key": "quest_done",
-            "tick": 124220
+            "tick": 124202
           },
           {
-            "id": 537,
+            "id": 564,
             "kind": "message",
             "text": "Camille t'attend pour la suite.",
             "hint": null,
             "proposal": null,
             "key": "partner_waits_scene",
-            "tick": 124221
+            "tick": 124203
           },
           {
-            "id": 538,
+            "id": 565,
             "kind": "message",
             "text": "Camille t'attend pour la suite.",
             "hint": null,
             "proposal": null,
             "key": "partner_waits_scene",
-            "tick": 124222
+            "tick": 124204
           },
           {
-            "id": 539,
+            "id": 566,
             "kind": "message",
             "text": "Camille t'attend pour la suite.",
             "hint": null,
             "proposal": null,
             "key": "partner_waits_scene",
-            "tick": 124223
+            "tick": 124205
           },
           {
-            "id": 540,
+            "id": 567,
             "kind": "message",
             "text": "Camille t'attend pour la suite.",
             "hint": null,
             "proposal": null,
             "key": "partner_waits_scene",
-            "tick": 124224
+            "tick": 124206
           },
           {
-            "id": 541,
+            "id": 568,
             "kind": "message",
             "text": "Camille t'attend pour la suite.",
             "hint": null,
             "proposal": null,
             "key": "partner_waits_scene",
-            "tick": 124225
+            "tick": 124207
           },
           {
-            "id": 543,
+            "id": 570,
             "kind": "letter",
             "text": "Du courrier: La deuxième commande est partie",
             "hint": null,
             "proposal": null,
             "key": "letter_received",
-            "tick": 124225
+            "tick": 124207
           },
           {
-            "id": 545,
+            "id": 572,
             "kind": "quest",
             "text": "Nouvelle quête: La commande du samedi 22",
             "hint": null,
             "proposal": null,
             "key": "quest_started",
-            "tick": 124225
+            "tick": 124207
           }
         ],
         "supper": {
@@ -666,7 +666,7 @@
           "stew": 0
         },
         "midnightReturn": false,
-        "lastInputTick": 124225,
+        "lastInputTick": 124207,
         "absent": false,
         "needsSet": {
           "belly": null,
@@ -674,13 +674,13 @@
           "heart": null
         },
         "heartToday": {
-          "envie": true,
+          "envie": false,
           "sharedEnvie": false,
           "ateTogether": false,
           "gesture": true
         },
         "hintQueue": [],
-        "lastHintTick": 76802,
+        "lastHintTick": 76774,
         "stays": {
           "riverbank": 0,
           "quay_bench": 0,
@@ -700,20 +700,20 @@
         },
         "lastMeal": null,
         "envieHistory": [
+          "talk_firmin",
           "water_all",
-          "saw_planks",
           "fine_harvest",
           "news_odette",
-          "talk_firmin",
+          "cook_soup",
+          "bench_moment",
+          "meal_shared",
+          "watch_river",
+          "crunchy_cook",
           "fresh_bread",
-          "decorate",
-          "catch_gudgeon",
-          "sow_more",
-          "visit_hens",
-          "visit_basile",
-          "meet_jeanne_square",
-          "catch_trout",
-          "see_train"
+          "pontoon_sit",
+          "eat_radishes",
+          "news_odette",
+          "fine_harvest"
         ],
         "crafting": null,
         "pin": null,
@@ -735,7 +735,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p1",
-          "tick": 92202
+          "tick": 92183
         }
       },
       {
@@ -749,7 +749,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 92351
+          "tick": 92330
         }
       },
       {
@@ -763,7 +763,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p1",
-          "tick": 100687
+          "tick": 100668
         }
       },
       {
@@ -777,7 +777,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 100821
+          "tick": 100802
         }
       },
       {
@@ -791,7 +791,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p1",
-          "tick": 49228
+          "tick": 49204
         }
       },
       {
@@ -805,7 +805,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49303
+          "tick": 49279
         }
       },
       {
@@ -819,7 +819,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49680
+          "tick": 49656
         }
       },
       {
@@ -833,7 +833,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49692
+          "tick": 49668
         }
       },
       {
@@ -847,7 +847,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49723
+          "tick": 49699
         }
       },
       {
@@ -861,7 +861,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49735
+          "tick": 49711
         }
       },
       {
@@ -875,7 +875,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p2",
-          "tick": 49747
+          "tick": 49723
         }
       },
       {
@@ -889,7 +889,7 @@
         "crop": null,
         "lastHarvest": {
           "by": "p1",
-          "tick": 49748
+          "tick": 49724
         }
       }
     ],
@@ -904,7 +904,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 2,
-        "lastHitTick": 7674
+        "lastHitTick": 7664
       },
       {
         "id": "tree_edge_02",
@@ -916,7 +916,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 2,
-        "lastHitTick": 10949
+        "lastHitTick": 10946
       },
       {
         "id": "tree_edge_03",
@@ -928,7 +928,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 2,
-        "lastHitTick": 12003
+        "lastHitTick": 12000
       },
       {
         "id": "tree_edge_04",
@@ -940,7 +940,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 2,
-        "lastHitTick": 9387
+        "lastHitTick": 9375
       },
       {
         "id": "tree_edge_05",
@@ -952,7 +952,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 3,
-        "lastHitTick": 15584
+        "lastHitTick": 15586
       },
       {
         "id": "tree_edge_06",
@@ -964,7 +964,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 3,
-        "lastHitTick": 14867
+        "lastHitTick": 14869
       },
       {
         "id": "tree_edge_07",
@@ -976,7 +976,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 9,
-        "lastHitTick": 71907
+        "lastHitTick": 72306
       },
       {
         "id": "tree_edge_08",
@@ -1000,7 +1000,7 @@
         "hits": 3,
         "felled": true,
         "felledDay": 2,
-        "lastHitTick": 13434
+        "lastHitTick": 13436
       },
       {
         "id": "tree_edge_10",
@@ -1212,7 +1212,17 @@
         "placedBy": null
       },
       {
-        "id": "f221",
+        "id": "f_rack",
+        "item": "tool_rack",
+        "cell": {
+          "cx": 9,
+          "cy": 25
+        },
+        "rotation": 2,
+        "placedBy": null
+      },
+      {
+        "id": "f218",
         "item": "table",
         "cell": {
           "cx": 8,
@@ -1222,7 +1232,7 @@
         "placedBy": "p2"
       },
       {
-        "id": "f222",
+        "id": "f220",
         "item": "chair",
         "cell": {
           "cx": 8,
@@ -1232,7 +1242,7 @@
         "placedBy": "p2"
       },
       {
-        "id": "f224",
+        "id": "f221",
         "item": "shelf",
         "cell": {
           "cx": 9,
@@ -1244,7 +1254,7 @@
     ],
     "groundItems": [
       {
-        "id": "g299",
+        "id": "g304",
         "item": "dandelion",
         "quality": "ordinary",
         "count": 1,
@@ -1254,7 +1264,7 @@
         }
       },
       {
-        "id": "g300",
+        "id": "g305",
         "item": "dandelion",
         "quality": "ordinary",
         "count": 1,
@@ -1264,7 +1274,7 @@
         }
       },
       {
-        "id": "g520",
+        "id": "g549",
         "item": "egg",
         "quality": "ordinary",
         "count": 3,
@@ -1304,10 +1314,10 @@
           "x": 29.5,
           "y": 26.5
         },
-        "facing": -1.5707963267948966,
+        "facing": 0,
         "speed": 0,
         "visible": true,
-        "target": "grocery_counter",
+        "target": "grocery_inside_counter",
         "activity": "serve",
         "talkingWith": [],
         "met": true,
@@ -1350,25 +1360,86 @@
         "talkingWith": [],
         "met": true,
         "inside": null
+      },
+      {
+        "id": "achille",
+        "pos": {
+          "x": 70.5,
+          "y": 21.5
+        },
+        "prev": {
+          "x": 70.5,
+          "y": 21.5
+        },
+        "facing": -2.6011731533190705,
+        "speed": 0,
+        "visible": false,
+        "target": "bakery_window",
+        "activity": "home",
+        "talkingWith": [],
+        "met": false,
+        "inside": null
+      },
+      {
+        "id": "solange",
+        "pos": {
+          "x": -20,
+          "y": -20
+        },
+        "prev": {
+          "x": -20,
+          "y": -20
+        },
+        "facing": 1.5707963267948966,
+        "speed": 0,
+        "visible": false,
+        "target": "offstage",
+        "activity": "absent",
+        "talkingWith": [],
+        "met": false,
+        "inside": null
       }
     ],
     "hens": [
       {
-        "id": "h149",
+        "id": "h148",
         "name": "Bichette",
         "variant": "hen_red",
         "pos": {
-          "x": 14.495365595273263,
-          "y": 34.16427593988755
+          "x": 14.192244305837676,
+          "y": 32.55965042251296
         },
         "prev": {
-          "x": 14.495225950896632,
-          "y": 34.18094202152739
+          "x": 14.19021226968004,
+          "y": 32.54310809477978
         },
-        "facing": -1.5624175661607884,
+        "facing": 1.4485700562140282,
         "wander": {
-          "x": 14.512707306351512,
-          "y": 32.09460167461075
+          "x": 14.238970363885164,
+          "y": 32.940036255214366
+        },
+        "nameKnownBy": [
+          "p1",
+          "p2"
+        ],
+        "namedBy": "p2"
+      },
+      {
+        "id": "h149",
+        "name": "Cocotte",
+        "variant": "hen_black",
+        "pos": {
+          "x": 14.47853712814399,
+          "y": 33.56331747631983
+        },
+        "prev": {
+          "x": 14.468594614075885,
+          "y": 33.576693731094
+        },
+        "facing": -0.9315997278952929,
+        "wander": {
+          "x": 15.312231733184309,
+          "y": 32.4416986016091
         },
         "nameKnownBy": [
           "p1",
@@ -1378,43 +1449,20 @@
       },
       {
         "id": "h150",
-        "name": "Cocotte",
-        "variant": "hen_black",
-        "pos": {
-          "x": 13.865762350751888,
-          "y": 31.910409827876418
-        },
-        "prev": {
-          "x": 13.859160106649353,
-          "y": 31.895106620676998
-        },
-        "facing": 1.163493065704411,
-        "wander": {
-          "x": 13.935299940221013,
-          "y": 32.07158959088847
-        },
-        "nameKnownBy": [
-          "p1",
-          "p2"
-        ],
-        "namedBy": "p2"
-      },
-      {
-        "id": "h151",
         "name": "la Duchesse",
         "variant": "hen_white",
         "pos": {
-          "x": 16.20640392191701,
-          "y": 32.69589239525013
+          "x": 14.22261168667322,
+          "y": 32.93415840614671
         },
         "prev": {
-          "x": 16.197687255931182,
-          "y": 32.68168685014023
+          "x": 14.212620538529,
+          "y": 32.94749837378303
         },
-        "facing": 1.0204294571121388,
+        "facing": -0.9279589420352053,
         "wander": {
-          "x": 16.570654855901374,
-          "y": 33.289511914737524
+          "x": 15.339641740499065,
+          "y": 31.44272373300046
         },
         "nameKnownBy": [
           "p1",
@@ -1535,6 +1583,14 @@
         "checklist": [],
         "baselines": {},
         "startedDay": 3
+      },
+      {
+        "id": "achille_basket",
+        "status": "active",
+        "step": 0,
+        "checklist": [],
+        "baselines": {},
+        "startedDay": 4
       },
       {
         "id": "welcome_supper",
@@ -1769,6 +1825,7 @@
       "house_keys",
       "eggs_enabled",
       "grocer_buys",
+      "achille_here",
       "week1_over",
       "shed_open",
       "handcar_pushed",
@@ -1779,6 +1836,7 @@
       "handcar_shed": "open"
     },
     "unlockedRecipes": [
+      "craft_cellar_rack",
       "saw_plank",
       "cook_crunchy_radishes",
       "cook_omelette",
@@ -1799,11 +1857,11 @@
       "basile_roof_done@p2",
       "basile_meeting@p1",
       "odette_hens_ask",
-      "odette_hens_ask@p2",
-      "odette_hens_reminder",
-      "odette_hens_reminder@p1",
+      "odette_hens_ask@p1",
       "basile_planks_ask",
-      "basile_planks_ask@p1",
+      "basile_planks_ask@p2",
+      "basile_planks_reminder",
+      "basile_planks_reminder@p1",
       "basile_planks_done",
       "basile_planks_done@p2",
       "odette_hens_done",
@@ -1889,14 +1947,14 @@
       "duo": {
         "talked:firmin": 26,
         "picked:iron_box": 1,
-        "talked:odette": 17,
-        "talked:basile": 16,
+        "talked:odette": 16,
+        "talked:basile": 17,
         "tilled": 12,
         "sowed": 32,
         "sowed:radish": 16,
         "sowed:lettuce": 10,
+        "watered": 74,
         "sowed:carrot": 6,
-        "watered": 73,
         "ate:bread": 4,
         "ate": 19,
         "needs_ate_together": 6,
@@ -1943,8 +2001,9 @@
         "witnessed:train_arrival": 4,
         "witnessed:train_departure": 4,
         "crafted:craft_double_bed": 1,
-        "caught": 9,
-        "caught:gudgeon": 5,
+        "caught": 10,
+        "caught:gudgeon": 4,
+        "caught:chub": 3,
         "caught:trout": 3,
         "given:odette:gudgeon": 4,
         "given:basile": 13,
@@ -1955,7 +2014,6 @@
         "given:firmin": 4,
         "given:firmin:lucie_letter": 1,
         "choice:jeanne_lucie_quiz:correct": 1,
-        "caught:chub": 1,
         "given:firmin:chub": 1,
         "given:firmin:flower_pot": 2,
         "picked:jeanne_notebook": 1,
@@ -1973,7 +2031,7 @@
         "sowed:radish": 10,
         "sowed:lettuce": 6,
         "sowed:carrot": 6,
-        "watered": 53,
+        "watered": 52,
         "ate:bread": 2,
         "ate": 8,
         "bed": 14,
@@ -2010,13 +2068,13 @@
       },
       "p2": {
         "talked:firmin": 13,
-        "talked:odette": 9,
-        "talked:basile": 7,
+        "talked:odette": 8,
+        "talked:basile": 8,
         "tilled": 6,
         "sowed": 10,
         "sowed:radish": 6,
         "sowed:lettuce": 4,
-        "watered": 20,
+        "watered": 22,
         "ate:bread": 2,
         "ate": 11,
         "bed": 14,
@@ -2049,8 +2107,9 @@
         "witnessed:train_arrival": 2,
         "witnessed:train_departure": 2,
         "crafted:craft_double_bed": 1,
-        "caught": 9,
-        "caught:gudgeon": 5,
+        "caught": 10,
+        "caught:gudgeon": 4,
+        "caught:chub": 3,
         "caught:trout": 3,
         "given:odette": 4,
         "given:odette:gudgeon": 4,
@@ -2062,7 +2121,6 @@
         "given:basile:omelette": 1,
         "given:firmin": 2,
         "given:firmin:lucie_letter": 1,
-        "caught:chub": 1,
         "given:firmin:chub": 1
       }
     },
@@ -2076,7 +2134,6 @@
       "p1": {
         "needs:near_heart": 12,
         "witnessed:train_arrival": 1,
-        "needs:light_said": 1,
         "witnessed:train_departure": 1,
         "talked:firmin": 4,
         "talked:basile": 1
@@ -2084,28 +2141,27 @@
       "p2": {
         "needs:near_heart": 12,
         "witnessed:train_arrival": 1,
-        "needs:light_said": 1,
         "witnessed:train_departure": 1,
         "talked:firmin": 4,
         "talked:basile": 1
       }
     },
     "scripts": [],
-    "nextId": 545,
+    "nextId": 572,
     "heard": {
       "p1": {
-        "odette_hens_reminder": 3325,
-        "basile_daily_wood": 3430,
-        "odette_rain": 6205,
-        "odette_radishes_sold": 13822,
-        "basile_omelette_reminder": 15185,
-        "jeanne_lucie_quiz": 16383,
-        "firmin_soup": 16683
+        "basile_planks_reminder": 3389,
+        "basile_daily_workbench": 3429,
+        "odette_rain": 6206,
+        "odette_lettuce": 13861,
+        "basile_omelette_reminder": 15186,
+        "jeanne_lucie_quiz": 16384,
+        "firmin_daily_week2": 16563
       },
       "p2": {
-        "odette_daily_jeanne": 9516,
-        "firmin_daily_rain": 17813,
-        "jeanne_mid_week2": 19506
+        "odette_cloudy": 9478,
+        "firmin_daily_rain": 17802,
+        "jeanne_summer": 19505
       }
     },
     "heardOld": {
@@ -2396,6 +2452,7 @@
     },
     "giftsGiven": {},
     "rooms": {},
-    "rack": []
+    "rack": [],
+    "upperStreetSince": 1
   }
 }

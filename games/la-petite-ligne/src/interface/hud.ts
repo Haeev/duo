@@ -4,6 +4,7 @@
  * barre d'aménagement, commandes de la caméra et du carnet à la souris.
  * Le DOM n'est touché que si une valeur affichée change.
  */
+import { isHome } from '../etat/interieurs';
 import type { GameNotification, ReadonlyWorld } from '../etat/types';
 import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
@@ -591,7 +592,7 @@ export class Hud {
     setText(this.toolbarHeld, model.held);
     setText(this.toolbarDetail, model.detail);
     setHidden(this.toolbarDetail, model.detail === '');
-    setHidden(this.toolbarCorner, !me.inHouse);
+    setHidden(this.toolbarCorner, !isHome(me));
     const corner = this.host.ctx.texts.extra.corner;
     setText(this.toolbarCornerText, this.host.ctx.t((me.corner ?? null) === null ? corner.designate : corner.move));
     model.slots.forEach((slot, i) => {

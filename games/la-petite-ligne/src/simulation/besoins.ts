@@ -249,6 +249,7 @@ export function eat(sim: Sim, c: Character, item: string): void {
     setToday(sim, other, TODAY.pairedMeal, meal.tick + 1);
     setToday(sim, c, TODAY.pairedMeal, sim.world.tick + 1);
     bump(sim, 'needs_ate_together', null);
+    emit(sim, { type: 'ate_together' });
   }
   if (isSupperTime(sim)) {
     const otherSupped = other.supper.bread + other.supper.simple + other.supper.stew > 0;
@@ -325,6 +326,7 @@ export function beginNapIfAfternoon(sim: Sim, c: Character): void {
   sim.runtime.changed = true;
   bump(sim, 'napped', c.id);
   const other = character(sim, partnerOf(c.id));
+  emit(sim, { type: 'nap_started', by: c.id, together: isNapping(other) });
   if (!isNapping(other)) {
     say(sim, c.id, 'nap_start');
     return;
@@ -428,6 +430,7 @@ function updatePair(sim: Sim, a: Character, b: Character, minutes: number): void
         addHeart(sim, c, r.gain);
         say(sim, c.id, 'reunion');
         bump(sim, 'reunion', c.id);
+        emit(sim, { type: 'reunion', by: c.id });
       }
       c.needs.apartMinutes = 0;
     } else if (c.needs.apartMinutes < r.apartMinutes) c.needs.apartMinutes = 0;

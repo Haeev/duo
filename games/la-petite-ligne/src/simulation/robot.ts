@@ -6,10 +6,11 @@
  */
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
+import { isHome } from '../etat/interieurs';
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
-import { refreshBlockers } from './deplacement';
+import { blockersFor, refreshBlockers } from './deplacement';
 import { findPath, isBlockedCell } from './grille';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
@@ -33,6 +34,8 @@ import { LOOK_CONE } from './conditions';
 import { activeWatch } from '../etat/moments';
 import { HEN_CALL_DIALOGUE } from './secrets';
 import { stageCanContinue } from '../donnees/calendrier';
+import { TOWN, bakeryRefusal, canDrinkChocolate, chocolateOn } from './bourg';
+import { SALON, chairTaken, firstCutFree, salonServing } from './salon';
 
 interface Memory {
   /** Ne rien décider avant ce tick (attente d'un geste, d'un trajet). */
@@ -46,6 +49,12 @@ interface Memory {
   job: string;
   /** Dernier tick où il a envoyé une intention (présence, PA-04). */
   lastIntent: number;
+  /**
+   * Charge à deux qui ne bouge plus (un coin de rocher sous un porteur, la panière du tour 10):
+   * pas immobiles de suite, et l'écart en cours (fin, côté) pour la dégager.
+   */
+  beamStill?: number;
+  beamDodge?: { until: number; side: number };
 }
 
 export interface Robot {
@@ -87,7 +96,7 @@ function goAct(sim: Sim, c: Character, m: Memory, key: string, target: ClickTarg
     return true;
   }
   if (m.goingTo === key && c.destination !== null) return true;
-  const path = findPath(refreshBlockers(sim), c.pos, pos);
+  const path = findPath(blockersFor(sim, c.pos), c.pos, pos);
   if (path === null) {
     m.skip[key] = sim.world.tick + 300;
     return false;
@@ -102,7 +111,7 @@ function goTo(sim: Sim, c: Character, m: Memory, key: string, pos: Vec2, reach: 
   if (distance(c.pos, pos) <= reach || (m.skip[key] ?? 0) > sim.world.tick) return false;
   m.job = key;
   if (m.goingTo === key && c.destination !== null) return true;
-  if (findPath(refreshBlockers(sim), c.pos, pos) === null) {
+  if (findPath(blockersFor(sim, c.pos), c.pos, pos) === null) {
     m.skip[key] = sim.world.tick + 300;
     return false;
   }
@@ -163,6 +172,8 @@ function built(sim: Sim, id: string): boolean {
 function social(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   for (const v of sim.world.villagers) {
     if (!v.visible || v.talkingWith.length > 0) continue;
+    // La rue Haute (tour 10) attend la fin de la démo: ses quêtes sont dans `town`.
+    if (TOWN_VILLAGERS.has(v.id)) continue;
     const d = pickDialogue(sim, v.id, c.id);
     if (d === null || d.kind === 'daily') continue;
     if ((d.kind === 'quest' || d.kind === 'hint') && d.once === null) continue;
@@ -406,7 +417,7 @@ function furniture(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   );
   if (toPlace !== null && toPlace !== undefined) {
     const room = sim.map.house.room;
-    if (!c.inHouse) return goTo(sim, c, m, 'maison', sim.map.house.spawn, 0.3, out);
+    if (!isHome(c)) return goTo(sim, c, m, 'maison', sim.map.house.spawn, 0.3, out);
     if (!selectItem(c, toPlace.item, out)) return true;
     const def = sim.content.items[toPlace.item];
     if (def?.footprint === null || def === undefined) return false;
@@ -540,9 +551,9 @@ function evening(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const { minutes, day } = sim.world.clock;
   const last = sim.content.settings.clock.lastDay.day;
   if (minutes < GO_HOME_AT || day >= last) return false;
-  if (!c.inHouse) return goTo(sim, c, m, 'rentrer', sim.map.house.spawn, 0.3, out) || true;
+  if (!isHome(c)) return goTo(sim, c, m, 'rentrer', sim.map.house.spawn, 0.3, out) || true;
   const other = character(sim, partnerOf(c.id));
-  if (!other.inHouse) {
+  if (!isHome(other)) {
     m.job = 'attendre';
     return true;
   }
@@ -595,7 +606,7 @@ function cookForOrder(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean
   const eggs = recipe.inputs.find((i) => i.item === ITEM.egg)?.count ?? 0;
   if (orderNeed(sim, ITEM.egg) > 0 || countInBag(c, ITEM.egg) < eggs) return false;
   if (sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
-  if (!c.inHouse) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
+  if (!isHome(c)) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
   out.push({ type: 'craft', recipe: recipe.id });
   m.waitUntil = sim.world.tick + 3;
   m.job = 'cuisiner pour la commande';
@@ -612,7 +623,7 @@ function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     if (recipe.station !== 'stove' || !sim.world.unlockedRecipes.includes(recipe.id)) continue;
     if (wantedOf(sim, recipe.output.item) <= inBags(sim, recipe.output.item)) continue;
     if (!recipe.inputs.every((i) => countInBag(c, i.item) - orderNeed(sim, i.item) >= i.count)) continue;
-    if (!c.inHouse) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
+    if (!isHome(c)) return goTo(sim, c, m, 'rechaud', sim.map.house.spawn, 0.3, out) || true;
     out.push({ type: 'craft', recipe: recipe.id });
     m.waitUntil = sim.world.tick + 3;
     m.job = `cuisiner ${recipe.output.item} pour la commande`;
@@ -918,9 +929,104 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
     f.mx = (next.x - b.pos.x) / d;
     f.my = (next.y - b.pos.y) / d;
   }
+  // Le chemin de la charge ignore la largeur des porteurs: bloquée une demi-seconde, on l'écarte
+  // de biais pendant une seconde et demie, d'un côté puis de l'autre (les deux robots font pareil).
+  const still = Math.hypot(b.pos.x - b.prev.x, b.pos.y - b.prev.y) < 1e-6;
+  m.beamStill = still ? (m.beamStill ?? 0) + 1 : 0;
+  const tick = sim.world.tick;
+  if (b.route === null && (m.beamStill ?? 0) > SIM_HZ / 2 && (m.beamDodge === undefined || tick >= m.beamDodge.until)) {
+    m.beamDodge = { until: tick + Math.round(SIM_HZ * 1.5), side: -(m.beamDodge?.side ?? -1) };
+    m.beamStill = 0;
+  }
+  if (b.route === null && m.beamDodge !== undefined && tick < m.beamDodge.until) {
+    const angle = Math.atan2(f.my, f.mx) + m.beamDodge.side * BEAM_DODGE_ANGLE;
+    f.mx = Math.cos(angle);
+    f.my = Math.sin(angle);
+  }
   m.job = 'porter la poutre';
   return true;
 }
+
+/** Habitants de la rue Haute (tour 10): le robot ne les suit qu'après la démo, dans `town`. */
+const TOWN_VILLAGERS: ReadonlySet<string> = new Set([TOWN.achille, TOWN.solange]);
+/** Heure où le robot boit son chocolat chez Odette, et le pain du matin (avant 9 h: pain chaud). */
+const CHOCOLATE_FROM = 15 * HOUR;
+const BREAD_UNTIL = 8 * HOUR + 30;
+
+/**
+ * La rue Haute (tour 10): monter au fournil pour la panière (le portage passe par `beam`), la
+ * première coupe chez Solange chacun son tour puis le miroir, un pain chaud le matin pour le
+ * premier, un chocolat l'après-midi chez Odette quand elle en fait.
+ */
+function town(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const w = sim.world;
+  const minutes = w.clock.minutes;
+  const talk = sim.content.settings.ranges.talk - 0.5;
+  // Un autre menu ouvert (la boutique d'Odette, la caisse): la rue Haute attend qu'il se ferme.
+  if (c.menu !== null && c.menu !== 'bakery' && c.menu !== 'salon') return false;
+  if (c.id === 'p1' && questStep(sim, TOWN.basketQuest) === 'go_bakery' && minutes < 10 * HOUR + 30) {
+    const achille = w.villagers.find((v) => v.id === TOWN.achille);
+    if (achille?.visible === true && achille.talkingWith.length === 0) {
+      m.job = 'monter au fournil';
+      return goAct(sim, c, m, 'parler:achille', { kind: 'villager', villager: TOWN.achille }, achille.pos, talk, out) || true;
+    }
+  }
+  const cut = questStep(sim, TOWN.cutQuest);
+  if (cut !== null && salonServing(sim)) {
+    const inside = pt(sim, 'salon_inside');
+    if (c.menu === 'salon') {
+      // Première coupe offerte: garder sa coiffure compte (le robot ne paie rien).
+      const a = c.appearance;
+      out.push({ type: 'haircut', hair: a.hair, hairColor: a.hairColor, beard: a.beard });
+      m.waitUntil = w.tick + 2;
+      return true;
+    }
+    if (cut === 'chairs' && firstCutFree(sim, c.id) && !chairTaken(sim, c) && (c.id === 'p1' || !firstCutFree(sim, 'p1'))) {
+      m.job = 'au fauteuil de Solange';
+      const chair = pt(sim, SALON.chair);
+      return goAct(sim, c, m, 'fauteuil', ground(chair), chair, 1.2, out) || true;
+    }
+    m.job = 'chez Solange';
+    if (distance(c.pos, inside) > 0.6) return goTo(sim, c, m, 'salon', inside, 0.4, out) || true;
+    return true;
+  }
+  if (c.id === 'p1' && w.flags.includes(TOWN.bakeryOpen) && minutes < BREAD_UNTIL && (w.countersToday[c.id]['bakery:bread'] ?? 0) === 0) {
+    if (bakeryRefusal(sim) === null && w.purse >= 40) {
+      const window = pt(sim, TOWN.window);
+      if (c.menu !== 'bakery') {
+        m.job = 'pain chaud';
+        return goAct(sim, c, m, 'guichet', ground(window), window, 1.2, out) || true;
+      }
+      out.push({ type: 'bakery_buy', item: 'bread' });
+      out.push({ type: 'menu', menu: null });
+      m.waitUntil = w.tick + 2;
+      return true;
+    }
+  }
+  if (c.menu === 'bakery') {
+    out.push({ type: 'menu', menu: null });
+    return true;
+  }
+  const warm = c.bag.find((s) => s?.item === TOWN.warmBread);
+  if (warm !== undefined && warm !== null) {
+    out.push({ type: 'eat', item: TOWN.warmBread });
+    m.waitUntil = w.tick + 2;
+    return true;
+  }
+  if (minutes >= CHOCOLATE_FROM && chocolateOn(sim) && (w.countersToday[c.id][TOWN.chocolate] ?? 0) === 0 && w.purse >= 40) {
+    m.job = 'chocolat chez Odette';
+    if (canDrinkChocolate(sim, c)) {
+      const table = pt(sim, TOWN.table);
+      return goAct(sim, c, m, 'chocolat', ground(table), table, 1.4, out) || true;
+    }
+    const table = pt(sim, TOWN.table);
+    return goTo(sim, c, m, 'petite table', { x: table.x + (c.id === 'p1' ? -1 : 1), y: table.y }, 0.4, out) || true;
+  }
+  return false;
+}
+
+/** Angle de biais pour dégager une charge à deux bloquée (radians). */
+const BEAM_DODGE_ANGLE = (75 * Math.PI) / 180;
 
 function buildHouse(sim: Sim, c: Character, m: Memory, f: { held: boolean }, out: Intent[]): boolean {
   if (built(sim, 'house_roof') && built(sim, 'house_door')) return false;
@@ -1511,7 +1617,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       m.job = 'se lever du banc';
       return frame(m, 0, 1);
     }
-    if (c.menu !== null && c.menu !== 'shop' && c.menu !== 'crate') out.push({ type: 'menu', menu: null });
+    if (c.menu !== null && c.menu !== 'shop' && c.menu !== 'crate' && c.menu !== 'salon' && c.menu !== 'bakery') out.push({ type: 'menu', menu: null });
     // Après la démo: le courrier se lit (sinon il s'entasse, les lettres non lues restent toutes).
     if (afterDemo(sim)) {
       for (const l of w.letters) if (!l.read.includes(c.id)) out.push({ type: 'read_letter', letter: l.id });
@@ -1530,6 +1636,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       (afterDemo(sim) && lanternMoment(sim, c, m, out)) ||
       watchMoment(sim, c, m, f, out) ||
       evening(sim, c, m, out) ||
+      (afterDemo(sim) && town(sim, c, m, out)) ||
       secretQuests(sim, c, m, f, out) ||
       social(sim, c, m, out) ||
       giveOdette(sim, c, m, out) ||

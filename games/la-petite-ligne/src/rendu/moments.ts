@@ -9,6 +9,7 @@
  * même instant. Le rendu garde sa propre horloge, recalée sur le temps de la simulation, pour un
  * mouvement continu entre deux pas (et entre deux états reçus chez l'invité).
  */
+import { isSheltered } from '../etat/interieurs';
 import {
   AnimationMixer,
   Box3,
@@ -1247,7 +1248,7 @@ export class MomentsPart implements EventfulPart {
     let best: number | null = null;
     let distance = Number.POSITIVE_INFINITY;
     for (const c of world.characters) {
-      if (c.inHouse) continue;
+      if (isSheltered(c)) continue;
       const d = Math.hypot(c.pos.x - x, c.pos.y - y);
       if (d < distance && d > 0.1) {
         distance = d;

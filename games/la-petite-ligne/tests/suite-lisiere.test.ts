@@ -38,7 +38,7 @@ function axeman(sim: Sim, tree: Tree): Character {
   sim.world.phase = 'day';
   c.created = true;
   c.status = 'active';
-  c.inHouse = false;
+  c.inside = null;
   c.pos = { x: tree.pos.x, y: tree.pos.y + 1.2 };
   c.facing = -Math.PI / 2;
   addToBag(sim, c, 'axe', 'ordinary', 1);

@@ -128,13 +128,16 @@
         { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "Merci pour ce qui était là: {amount} sous. La semaine prochaine sera la bonne." },
         { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} sous pour {linesDoneText} sur {linesTotal}. La coopérative garde confiance." }
       ]
-    }
+    },
+    {"id": "basile_rooms", "from": "basile", "title": "Deux plans sur l'établi", "delivery": {"day": 23, "time": "06:00"}, "text": "Votre maisonnette est petite pour deux, ça se voit depuis la voie. J'ai tiré deux plans: un cellier contre le pignon ouest, une chambre derrière, côté bois. Choisissez par lequel commencer. Je fournis la charpente, vous apportez les planches et les bras. B."},
+    {"id": "solange_note", "from": "solange", "title": "Un mot de la mercerie", "delivery": {"byEffect": true}, "text": "Passez au salon, rue Haute, à l'angle. La première coupe est pour moi: c'est comme ça qu'on se présente, chez nous. Jeanne m'a tout dit de vous, je veux vérifier. Solange Mérigot (qui garde Jeanne pendant la tournée de Lucie)."}
   ],
 
   "senders": [
     { "id": "coop", "label": "La coopérative de la ligne" },
     { "id": "basile", "label": "Basile" },
     { "id": "jeanne", "label": "Jeanne" },
-    { "id": "firmin", "label": "Firmin, chef de halte" }
+    { "id": "firmin", "label": "Firmin, chef de halte" },
+    { "id": "solange", "label": "Solange Mérigot, mercerie-coiffure" }
   ]
 }

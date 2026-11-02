@@ -301,7 +301,7 @@ describe('pièces bâties à deux: commande à Basile et chantier', () => {
           },
         },
       };
-      expect(basileRoomsModel(sim.world, base)?.oakChest ?? null).toBe(
+      expect(basileRoomsModel(sim.world, base)?.oakChest ?? null).toEqual(
         base.content.items.oak_chest === undefined ? null : expect.anything(),
       );
       const m = basileRoomsModel(sim.world, ctx);

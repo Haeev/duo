@@ -13,7 +13,9 @@
     { "item": "chalk_box", "villager": "jeanne", "wish": "jeanne_wish", "thanks": "gift_thanks_jeanne" },
     { "item": "coffee_mill", "villager": "odette", "wish": "odette_wish", "thanks": "gift_thanks_odette" },
     { "item": "leather_apron", "villager": "basile", "wish": "basile_wish", "thanks": "gift_thanks_basile" },
-    { "item": "wool_scarf", "villager": "firmin", "wish": "firmin_wish", "thanks": "gift_thanks_firmin" }
+    { "item": "wool_scarf", "villager": "firmin", "wish": "firmin_wish", "thanks": "gift_thanks_firmin" },
+    { "item": "hourglass", "villager": "achille", "wish": "achille_wish", "thanks": "gift_thanks_achille" },
+    { "item": "horn_comb", "villager": "solange", "wish": "solange_wish", "thanks": "gift_thanks_solange" }
   ],
   "copies": { "watering_can_copper": 2, "axe_forged": 2, "fishing_rod_bamboo": 2 },
   "seasonal": { "straw_hat": "summer", "pressed_flowers": "summer", "autumn_wreath": "autumn" },

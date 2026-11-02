@@ -226,6 +226,20 @@ export interface WorldState {
    * rangement (`cellar` reste le contenu du rangement commun). Vide au départ.
    */
   rack: ItemStack[];
+  /**
+   * Premier jour joué avec la rue Haute (tour 10, section 1.7): 1 pour une partie commencée avec elle,
+   * sinon la première aube de la partie reprise. Les départs du tour (panière, lettre de Solange,
+   * souhaits) s'échelonnent à partir de là, un par journée (`simulation/bourg.ts`, `townDays`).
+   */
+  upperStreetSince: number;
+}
+
+/** Une coupe proposée depuis le banc du salon: coiffure, couleur et barbe (bornes de `town.appearance`). */
+export interface HairOffer {
+  by: CharacterId;
+  hair: number;
+  hairColor: number;
+  beard: number;
 }
 
 /** Une pièce commandée à Basile (tour 10, section 4.3). */
@@ -240,6 +254,18 @@ export interface RoomState {
   beamPlaced: boolean;
   /** Jour où la pièce est à vous (tuiles posées, porte percée), `null` avant. */
   builtDay: number | null;
+  /** Élément en cours de construction (l'invité suit la barre, une reprise la garde), `null` sinon. */
+  work?: RoomWork | null;
+}
+
+/** Travail en cours sur un élément de pièce (tour 10, section 4.3). */
+export interface RoomWork {
+  element: string;
+  /** 0 à 1. */
+  progress: number;
+  /** Planches et clous de l'élément déjà pris (caisse, puis sac de qui travaille). */
+  paid: boolean;
+  workers: CharacterId[];
 }
 
 /** Une annonce affichée au tableau du quai (tour 9, section 1). */
@@ -376,18 +402,21 @@ export interface Character {
   facing: number;
   /** Vitesse au sol à ce pas (m/s), pour caler l'animation de marche. */
   speed: number;
-  /** Dans la pièce de la maisonnette (gardé jusqu'à la migration du lot L3 vers `inside`). */
-  inHouse: boolean;
   /**
    * Bâtiment visitable où il se trouve (ADR 0016), `null` dehors. Recalculé à chaque pas par
-   * `updateInside` et à chaque `placeCharacter`. « À l'abri »: `inside !== null`; « chez soi »:
-   * `inside === HOUSE_BUILDING`.
+   * `updateInside` et à chaque `placeCharacter`. « À l'abri »: `isSheltered`; « chez soi »:
+   * `isHome` (`etat/interieurs.ts`, qui remplacent l'ancien booléen `inHouse`).
    */
   inside: BuildingId | null;
   /** Jour du dernier changement de coiffure (salon, section 2.3), `null` si jamais. */
   hairChangedDay: number | null;
   /** Qui a remarqué ce changement (Cœur +10 une fois), `null` tant que personne. */
   hairNoticedBy: CharacterId | null;
+  /**
+   * Au fauteuil du salon (menu `salon`): la coupe que l'autre propose depuis le banc d'attente
+   * (section 2.3), `null` sans proposition. Effacée en quittant le fauteuil.
+   */
+  hairOffer: HairOffer | null;
   /** Ce que fait le personnage (animation et barre de progression). */
   action: CharacterAction;
   /** Ce qui occupe son joueur (arrêt de l'horloge si les deux sont occupés). */
@@ -503,7 +532,11 @@ export type MenuKind =
   | 'stove'
   | 'chest'
   | 'proposal'
-  | 'letter';
+  | 'letter'
+  /** Le fauteuil de Solange (tour 10, section 2.3): coupe, couleur, barbe, proposition reçue. */
+  | 'salon'
+  /** Le guichet du fournil d'Achille (section 1.5): pain, pain chaud, brioche. */
+  | 'bakery';
 
 export type ActionKind =
   | 'idle'
@@ -609,7 +642,11 @@ export type AimVerb =
   /** Appeler une poule par son nom (R16, « Les noms des poules »). */
   | 'call'
   /** Allumer une lanterne (tour 9, les lanternes du quai). */
-  | 'light';
+  | 'light'
+  /** Boire un chocolat chaud à la petite table d'Odette (tour 10, section 1.6). */
+  | 'drink'
+  /** Ouvrir ou fermer des rideaux accrochés à une fenêtre (tour 10, section 6.2). */
+  | 'curtains';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -704,7 +741,7 @@ export interface Tree {
 }
 
 /** Ce qu'on porte à deux: la poutre, la draisine poussée, le colis lourd du train. */
-export type LoadPurpose = 'construction' | 'handcar' | 'parcel';
+export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket';
 
 export interface Beam {
   /** Objet porté (modèle de `objets.json`): `beam`, `handcar`, `heavy_parcel`. */
@@ -1190,7 +1227,10 @@ export type WorldEvent =
   /** Assis sur un banc (place `slot`), ou relevé: le rendu et le son répondent tout de suite, avant l'état complet. */
   | { type: 'sat_down'; by: CharacterId; bench: string; slot: number }
   | { type: 'stood_up'; by: CharacterId; bench: string }
-  | { type: 'door'; by: CharacterId; entering: boolean }
+  /** Une porte passée (ADR 0016): celle de `building`, en entrant ou en sortant. */
+  | { type: 'door'; by: CharacterId; entering: boolean; building: BuildingId }
+  /** Porte fermée devant soi (hors des heures): le loquet (`door-locked`). */
+  | { type: 'door_locked'; by: CharacterId; building: BuildingId }
   | { type: 'fed_hens'; by: CharacterId }
   | { type: 'hens_arrived' }
   | { type: 'eggs_laid'; count: number }
@@ -1256,4 +1296,28 @@ export type WorldEvent =
   // Tour 9: moments (barrières armées, lanternes)
   | { type: 'moment_armed'; moment: string }
   | { type: 'lantern_lit'; by: CharacterId; place: PointId }
-  | { type: 'lantern_out'; by: CharacterId; place: PointId };
+  | { type: 'lantern_out'; by: CharacterId; place: PointId }
+  // Tour 10: rue Haute (guichet du fournil, chocolat chaud, salon de Solange)
+  /** Coupe validée au fauteuil (`changed`: coiffure, couleur ou barbe autre qu'avant; sinon « Garder ma coiffure »). */
+  | { type: 'haircut'; by: CharacterId; changed: boolean; price: number }
+  /** Proposition envoyée depuis le banc d'attente à celui qui est au fauteuil. */
+  | { type: 'hair_offer'; by: CharacterId; to: CharacterId }
+  /** L'autre a remarqué la coupe (« {name} a changé de coiffure. »): tête penchée chez `by`. */
+  | { type: 'hair_noticed'; by: CharacterId; of: CharacterId }
+  /** La panière d'Achille posée devant la porte d'Odette (quête `achille_basket`). */
+  | { type: 'basket_delivered' }
+  // Tour 10: la maison (lot L4), pour le son
+  /** Une sieste commence (`together`: l'autre dort déjà, l'horloge file). */
+  | { type: 'nap_started'; by: CharacterId; together: boolean }
+  /** Retrouvailles comptées (Cœur des deux). */
+  | { type: 'reunion'; by: CharacterId }
+  /** Rideaux ouverts ou fermés (`curtain-draw`). */
+  | { type: 'curtains'; by: CharacterId; furniture: string; closed: boolean }
+  /** Une pièce bâtie au matin (`room-built`). */
+  | { type: 'room_built'; room: string }
+  /** Assis au fauteuil du salon (`chair-creak`). */
+  | { type: 'salon_seated'; by: CharacterId }
+  /** Un repas pris ensemble (`eat-together`, besoins du tour 10). */
+  | { type: 'ate_together' }
+  /** Le rangement est plein: le couvercle bute (`chest-full`). */
+  | { type: 'storage_full'; by: CharacterId }

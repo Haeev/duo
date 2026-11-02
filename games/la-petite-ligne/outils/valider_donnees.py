@@ -134,6 +134,15 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "annonce_active": (set(), {"gabarit", "step"}),
     "improvement_built": ({"id"}, set()),
     "bought": ({"item"}, set()),
+    # Tour 10: dans un bâtiment visitable (`interieurs` de la carte).
+    "inside": ({"building"}, {"who"}),
+    # Tour 10: passé au fauteuil de Solange (`changed`: une coupe qui change quelque chose).
+    "haircut": (set(), {"changed", "count", "who", "since"}),
+    # Tour 10 (lot L4): sieste, repas pris ensemble, pièce bâtie, rideaux ouverts.
+    "napped": (set(), {"count", "who", "since"}),
+    "needs_ate_together": (set(), {"count", "since"}),
+    "room_built": (set(), {"room", "count", "since"}),
+    "curtains_opened": (set(), {"count", "who", "since"}),
     "scene_played": ({"dialogue"}, {"count", "who", "since"}),
 }
 COMMON_CONDITION_KEYS = {"type", "label"}
@@ -182,7 +191,9 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 # Tour 8: lettres de la commande générée (`courrier.json`) et formats (`textes.orderFormat`).
                 "greeting", "tip", "linesDoneText", "n",
                 # Tour 9: annonces, chantiers, établi de Basile, paroles d'un habitant en notification.
-                "giver", "text", "name", "paid", "time", "discount"}
+                "giver", "text", "name", "paid", "time", "discount",
+                # Tour 10: pièces bâties et rangement (lot L4).
+                "room", "planks", "nails", "used", "total"}
 # Tour 8: étapes, niveaux de tendresse (D7), modes de continuation (D4), saisons, familles et ressources des commandes.
 STAGE_IDS = {"demo", "summer_end", "autumn_end"}
 TENDERNESS = ["none", "accomplices", "gentle"]
@@ -194,6 +205,10 @@ WEEKDAYS = ["saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", 
 
 # Sprite des icônes de l'interface: les vignettes des souvenirs y sont des symboles (tour 7).
 ICONS_SOURCE = Path(__file__).resolve().parent.parent / "ui-maquettes" / "outils" / "icones-source.svg"
+
+# Drapeaux posés par la simulation elle-même (tour 10, `simulation/bourg.ts`): départs de la rue Haute.
+FLAGS_SET_BY_CODE = {"achille_here", "solange_here", "solange_note_sent", "achille_wish_open", "solange_wish_open",
+                     "achille_cart_said", "basket_carried"}
 
 # Points de carte demandés par les données. Le level designer les crée dans donnees/cartes/ (voir README).
 NAMED_POINTS_OUTSIDE_MAP = {"offstage"}
@@ -750,7 +765,10 @@ def check_lines(lines: Any, where: str, reg: Registry, report: Report) -> None:
                 register(choice_ids, choice.get("id"), wc, report)
                 if not choice.get("text"):
                     report.error(wl, "choix sans texte")
-                check_lines(choice.get("reply", []), wc, reg, report)
+                # Une scène à deux dont l'habitant répond après les deux choix (`same`, `different`) peut
+                # laisser chaque choix sans réplique propre (le miroir de Solange, tour 10).
+                if choice.get("reply") or not ("same" in line or "different" in line):
+                    check_lines(choice.get("reply", []), wc, reg, report)
                 # Choix à bonne et mauvaise réponse (R16): condition `correct`, réplique `replyWrong`.
                 if "correct" in choice:
                     check_condition(choice["correct"], f"{wc}.correct", reg, report)
@@ -760,6 +778,9 @@ def check_lines(lines: Any, where: str, reg: Registry, report: Report) -> None:
                     check_lines(choice["replyWrong"], f"{wc}.replyWrong", reg, report)
                 check_effects(choice.get("effects", []), f"{wc}.effects", reg, report)
                 check_effects(choice.get("effectsWrong", []), f"{wc}.effectsWrong", reg, report)
+            for key in ("same", "different"):
+                if key in line:
+                    check_lines(line[key], f"{wl}.{key}", reg, report)
         else:
             speaker = line.get("speaker")
             if speaker not in reg.villagers and speaker not in SPEAKERS_EXTRA:
@@ -1496,7 +1517,7 @@ def main() -> int:
     if readme.exists():
         walk_strings(readme.read_text(encoding="utf-8").replace("{", "").replace("}", ""), "README.md", report)
     for flag, where in sorted(reg.flags_read.items()):
-        if flag not in reg.flags_set:
+        if flag not in reg.flags_set and flag not in FLAGS_SET_BY_CODE:
             report.warn(where, f"drapeau {flag!r} lu mais jamais posé par un effet")
     points = map_points(folder, report)
     used = {p: w for p, w in reg.points_used.items() if p not in NAMED_POINTS_OUTSIDE_MAP}

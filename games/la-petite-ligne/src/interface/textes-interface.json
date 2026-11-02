@@ -487,7 +487,9 @@
       "sit": "S'asseoir",
       "hold": "Tenir l'échelle",
       "call": "Appeler la poule",
-      "light": "Allumer la lanterne"
+      "light": "Allumer la lanterne",
+      "drink": "Boire un chocolat chaud",
+      "curtains": "Ouvrir ou fermer les rideaux"
     },
     "nap": "Faire la sieste"
   },
