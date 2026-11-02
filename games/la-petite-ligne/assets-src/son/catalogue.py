@@ -40,6 +40,9 @@ SPATIAL = {
     # L'horloge murale (tour 9): un tic-tac qu'on n'entend qu'à moins de 3 m, dans la pièce.
     "horloge": {"distanceModel": "inverse", "refDistance": 0.8, "rolloffFactor": 1.5, "maxDistance": 3.0,
                 "cullBeyondM": 3.0},
+    # Le ru de la Côte (tour 10): un filet d'eau qui s'entend de près, coupé au-delà de 30 m.
+    "ru": {"distanceModel": "inverse", "refDistance": 3.0, "rolloffFactor": 1.0, "maxDistance": 30.0,
+           "cullBeyondM": 30.0},
     # Le repère de l'autre: placé à l'épingle, jamais sous -10 dB, où qu'elle soit.
     "repere": {"distanceModel": "inverse", "refDistance": 6.0, "rolloffFactor": 0.6, "maxDistance": 80.0,
                "cullBeyondM": 100000.0, "minGainDb": -10.0},
