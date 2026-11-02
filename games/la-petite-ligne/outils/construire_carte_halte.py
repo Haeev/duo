@@ -252,6 +252,11 @@ def construire_terrain() -> None:
             T[38][x] = "b"
         if math.sin(x / 5.1 + 2.6) > 0.6 and not 14 <= x <= 22:
             T[42][x] = "b"
+    # Retours du 2026-11-01 (R22): la grève monte jusqu'à la promenade. La rangée d'herbe entre
+    # les deux (y 36) faisait une bande étroite qui coupait la berge en long, sans raison: un
+    # chemin de halage longe directement la grève. Le jardin du garde-barrière (à l'ouest de la
+    # route) garde son herbe et sa clôture.
+    peindre("b", 20, 36, 42, 1)
     peindre("g", 16, 37, 5, 7)       # le gué, sur toute la largeur
     peindre(":", 17, 44, 3, 4)       # la vieille route continue au sud (fermée par le bord)
 
@@ -402,7 +407,13 @@ def construire_objets() -> None:
     objet("lamp_post", 47, 24, ident="lamp_square_east")
     objet("lamp_post", 47, 32, ident="lamp_square_south")
     # Massifs fleuris aux angles; l'est de la place reste libre pour les fêtes (arbre de mai, foire).
-    for x, y in ((48, 23), (48, 24), (47, 23), (48, 33), (48, 32), (33, 33), (34, 33), (41, 25), (38, 25)):
+    # Retours du 2026-11-01 (R22): aucun massif sur les pavés. L'angle sud-ouest est pavé devant
+    # l'épicerie depuis le tour 8 (on y décharge les caisses): ses deux massifs sont retirés. Les
+    # deux qui encadrent l'allée pavée du nord (rue de la Gare vers le puits) mordaient sur le
+    # raccord arrondi de l'allée et de l'anneau: deux pas plus loin, sur la terre battue et hors
+    # du trajet de Jeanne (x 37,5), ils bordent encore l'allée (contrôle automatique:
+    # `src/rendu/coherence-carte.test.ts`).
+    for x, y in ((48, 23), (48, 24), (47, 23), (48, 33), (48, 32), (43, 25), (36, 25)):
         objet("bush", x, y)
     objet("bench", 42, 28, rotation=3, ident="square_bench_east")
 

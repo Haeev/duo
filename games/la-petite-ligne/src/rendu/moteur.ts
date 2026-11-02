@@ -37,7 +37,7 @@ import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from
 import { ModelLibrary } from './modeles';
 import { ShadowCasterCulling } from './ombre-tri';
 import { PerfMonitor } from './perf';
-import { AdaptiveQuality, type QualityChange } from './qualite';
+import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
@@ -114,6 +114,10 @@ export class RenderEngine implements Renderer {
   private readonly perf: PerfMonitor;
   private readonly picks = new PickRegistry();
   private readonly resizeObserver: ResizeObserver;
+  /** Taille exacte du conteneur en pixels physiques, si le navigateur la donne. */
+  private devicePixels: { width: number; height: number } | null = null;
+  /** Rapport de pixels effectif du rendu (pixels du tampon par point CSS). */
+  private effectiveRatio = 1;
   private readonly unsubscribe: () => void;
   private readonly pendingEvents: WorldEvent[] = [];
   private readonly parts: RenderPart[] = [];
@@ -177,10 +181,24 @@ export class RenderEngine implements Renderer {
       this.container,
       options.showStats ?? (import.meta.env.DEV && !this.light),
     );
-    this.resizeObserver = new ResizeObserver(() => {
+    // Boîte en pixels physiques: taille exacte de l'écran sous le canevas, et
+    // nouvel appel quand la mise à l'échelle change (fenêtre glissée sur un
+    // autre écran, réglage de Windows modifié en cours de partie).
+    this.resizeObserver = new ResizeObserver((entries) => {
+      // Absent des navigateurs qui ne connaissent pas cette boîte (le type DOM le dit toujours là).
+      const entry = entries[0];
+      const box =
+        entry !== undefined && 'devicePixelContentBoxSize' in entry
+          ? entry.devicePixelContentBoxSize[0]
+          : undefined;
+      this.devicePixels = box === undefined ? null : { width: box.inlineSize, height: box.blockSize };
       this.resize();
     });
-    this.resizeObserver.observe(this.container);
+    try {
+      this.resizeObserver.observe(this.container, { box: 'device-pixel-content-box' });
+    } catch {
+      this.resizeObserver.observe(this.container);
+    }
     this.resize();
     this.unsubscribe = this.view.onEvent((event) => {
       this.pendingEvents.push(event);
@@ -198,25 +216,28 @@ export class RenderEngine implements Renderer {
     };
   }
 
-  /** Taille du canevas: rapport de pixels plafonné à 2, et à 1920x1080 pixels physiques. */
+  /**
+   * Taille du tampon de rendu (`renderPixelSize` de `qualite.ts`): rapport
+   * plafonné à 2 et à 1920x1080 pixels physiques, jamais sous le plancher de
+   * netteté, pixels physiques exacts à pleine résolution. Le tampon est donné
+   * en pixels (rapport 1 pour Three.js), le CSS l'étend au conteneur.
+   */
   private resize(): void {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
-    const settings = RENDER_SETTINGS.renderer;
-    if (this.light || this.quality?.isLight() === true) {
-      const light = RENDER_SETTINGS.light;
-      const lightBudget = Math.sqrt(light.maxPhysicalPixels / (width * height));
-      this.renderer.setPixelRatio(Math.min(light.pixelRatio, lightBudget));
-      this.renderer.setSize(width, height, false);
-      this.rig.setAspect(width / height);
-      return;
-    }
-    const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
-    const scale = this.resolutionScale();
-    const ratio =
-      Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
-    this.renderer.setPixelRatio(ratio);
-    this.renderer.setSize(width, height, false);
+    const size = renderPixelSize(
+      {
+        cssWidth: width,
+        cssHeight: height,
+        devicePixelRatio: window.devicePixelRatio || 1,
+        devicePixels: this.devicePixels,
+      },
+      this.resolutionScale(),
+      this.light,
+    );
+    this.effectiveRatio = size.ratio;
+    this.renderer.setPixelRatio(1);
+    this.renderer.setSize(size.width, size.height, false);
     this.rig.setAspect(width / height);
   }
 
@@ -702,9 +723,16 @@ export class RenderEngine implements Renderer {
         final: change.kind === 'light' && change.final,
         averageFrameMs: Math.round(this.quality?.averageFrameMs() ?? 0),
         refreshMs: Math.round(this.quality?.refreshMs() ?? 0),
-        pixelRatio: this.renderer.getPixelRatio(),
+        pixelRatio: this.effectiveRatio,
       },
     );
+  }
+
+  /** Repli automatique imposé (page de démonstration, `adaptatif=1&repli=1`). */
+  forceQualityFallback(): void {
+    if (this.quality !== null) {
+      this.applyQuality(this.quality.forceFallback());
+    }
   }
 
   /**
@@ -733,7 +761,7 @@ export class RenderEngine implements Renderer {
 
   /** Rapport de pixels du rendu (résolution interne), pour les tests. */
   pixelRatio(): number {
-    return this.renderer.getPixelRatio();
+    return this.effectiveRatio;
   }
 
   /** Qualité en vigueur: mode léger demandé ou automatique, sinon normale. */

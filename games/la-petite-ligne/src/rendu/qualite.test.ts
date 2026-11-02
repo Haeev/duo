@@ -1,6 +1,6 @@
 // Qualité adaptative (risque 1 du gauntlet, tour 2): durées d'image injectées, aucune carte graphique.
 import { describe, expect, it } from 'vitest';
-import { AdaptiveQuality, type QualityChange } from './qualite';
+import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
 
 const HZ_60 = 1 / 60;
@@ -137,5 +137,92 @@ describe('qualité adaptative du rendu', () => {
     });
     const changes = run(quality, 0.03, 10);
     expect(changes.map((c) => c.change)).toEqual([{ kind: 'light', final: true }]);
+  });
+});
+
+// Retour R07 (2026-11-01): tout était flou sur le PC Windows. Écran de portable 1366x768
+// à 100, 125 et 150 %: le tampon doit avoir les pixels physiques de l'écran, à tout palier
+// de la résolution dynamique et après le repli automatique (qui garde la résolution).
+describe('taille du rendu (R07)', () => {
+  const lastScale = RENDER_SETTINGS.dynamicResolution.steps[LAST_STEP] ?? 1;
+  const screens = [
+    { dpr: 1, css: [1366, 768] },
+    { dpr: 1.25, css: [1092.8, 614.4] },
+    { dpr: 1.5, css: [910.67, 512] },
+  ] as const;
+
+  for (const screen of screens) {
+    it(`1366x768 à ${String(screen.dpr * 100)} %: pixels physiques exacts au dernier palier`, () => {
+      // Le conteneur arrondit sa taille CSS; la boîte physique donne la vraie taille.
+      const surface = {
+        cssWidth: Math.round(screen.css[0]),
+        cssHeight: Math.round(screen.css[1]),
+        devicePixelRatio: screen.dpr,
+        devicePixels: { width: 1366, height: 768 },
+      };
+      for (const scale of [1, lastScale]) {
+        const size = renderPixelSize(surface, scale, false);
+        expect([size.width, size.height]).toEqual([1366, 768]);
+      }
+    });
+
+    it(`1366x768 à ${String(screen.dpr * 100)} %: jamais sous le pixel physique sans boîte physique`, () => {
+      const surface = {
+        cssWidth: Math.round(screen.css[0]),
+        cssHeight: Math.round(screen.css[1]),
+        devicePixelRatio: screen.dpr,
+        devicePixels: null,
+      };
+      const size = renderPixelSize(surface, lastScale, false);
+      expect(Math.abs(size.width - 1366)).toBeLessThanOrEqual(1);
+      expect(Math.abs(size.height - 768)).toBeLessThanOrEqual(1);
+    });
+  }
+
+  it('boîte physique incohérente (échelle émulée sans elle): on reprend CSS x dpr', () => {
+    const surface = {
+      cssWidth: 1093,
+      cssHeight: 614,
+      devicePixelRatio: 1.25,
+      devicePixels: { width: 1093, height: 614 },
+    };
+    const size = renderPixelSize(surface, lastScale, false);
+    expect(Math.abs(size.width - 1366)).toBeLessThanOrEqual(1);
+    expect(Math.abs(size.height - 768)).toBeLessThanOrEqual(1);
+  });
+
+  it('Retina: la résolution dynamique descend, jamais sous 1,5 pixel par point', () => {
+    const surface = {
+      cssWidth: 800,
+      cssHeight: 500,
+      devicePixelRatio: 2,
+      devicePixels: { width: 1600, height: 1000 },
+    };
+    expect(renderPixelSize(surface, 1, false)).toEqual({ width: 1600, height: 1000, ratio: 2 });
+    expect(renderPixelSize(surface, lastScale, false).width).toBe(1200);
+  });
+
+  it('le budget de 1920x1080 pixels physiques tient toujours', () => {
+    const surface = {
+      cssWidth: 1440,
+      cssHeight: 900,
+      devicePixelRatio: 2,
+      devicePixels: { width: 2880, height: 1800 },
+    };
+    const size = renderPixelSize(surface, 1, false);
+    expect(size.width * size.height).toBeLessThanOrEqual(1920 * 1080 + 2000);
+  });
+
+  it('le mode léger demandé (tests en rendu logiciel) garde sa basse résolution', () => {
+    const surface = {
+      cssWidth: 1366,
+      cssHeight: 768,
+      devicePixelRatio: 1,
+      devicePixels: { width: 1366, height: 768 },
+    };
+    const size = renderPixelSize(surface, 1, true);
+    expect(size.width * size.height).toBeLessThanOrEqual(
+      RENDER_SETTINGS.light.maxPhysicalPixels + 2000,
+    );
   });
 });

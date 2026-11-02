@@ -29,6 +29,7 @@ import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameView } from '../../etat/vue';
 import { RenderEngine } from '../moteur';
 import {
+  DEMO_ACTIONS,
   DEMO_SCENES,
   animateExampleWorld,
   createExampleWorld,
@@ -177,6 +178,10 @@ async function main(): Promise<void> {
     corners: params.get('coins') === '1',
     handcarParked: params.get('draisine') === 'posee',
     moment,
+    bedRotation: Number(params.get('lit') ?? '0') || 0,
+    fishingSpot: params.get('peche_lieu') ?? undefined,
+    tool: params.get('outil') ?? undefined,
+    toolAction: DEMO_ACTIONS.find((action) => action === params.get('geste')),
   };
   const world = createExampleWorld(map, content, options);
   // `lisiere=1` (tour 8): souche, rejets et cueillettes posées un jour d'été.
@@ -261,6 +266,10 @@ async function main(): Promise<void> {
   window.lplRendu = handle;
   await engine.load(() => undefined);
   loading?.remove();
+  if (params.get('repli') === '1') {
+    // `adaptatif=1&repli=1`: image d'un PC à la peine (dernier palier, ombres coupées).
+    engine.forceQualityFallback();
+  }
   const focus = /^(-?[\d.]+),(-?[\d.]+)$/.exec(params.get('vue') ?? '');
   if (focus !== null) {
     // `vue=x,y`: caméra posée sur ce point (gros plans), les joueurs restent où ils sont.

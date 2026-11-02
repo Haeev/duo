@@ -10,6 +10,8 @@ import { seasonOfDay } from '../donnees/calendrier';
 
 /** Pas d'échantillonnage du regard vers l'eau (m). */
 const LOOK_STEP = 0.5;
+/** Pas plus fin pour le lancer à distance: la rive d'en face se trouve à 25 cm près. */
+const CAST_STEP = 0.25;
 
 /** Tient une canne (la canne de départ ou une canne améliorée, même `toolKind`). */
 export function holdsRod(sim: Pick<Sim, 'content'>, c: Character): boolean {
@@ -23,20 +25,43 @@ function rodStats(sim: Sim, c: Character): { wait: number; hook: number | null }
   return { wait: tool?.biteWaitFactor ?? 1, hook: tool?.hookWindowSeconds ?? null };
 }
 
-/** Premier point d'eau devant le personnage, à portée de lancer, ou `null`. */
+/**
+ * Point d'eau où le bouchon se pose devant le personnage, à portée de lancer, ou `null`.
+ *
+ * Retour R09 (2026-11-01): « on la jette à nos pieds ». Le bouchon allait au premier point
+ * d'eau, soit à un mètre du bord. Il va maintenant à `castDistance` (configuration) le long
+ * du regard, sans passer la fin de cette étendue d'eau (rive d'en face, moins
+ * `castShoreMargin`), et jamais plus près que le premier point d'eau. Toujours sur un point
+ * échantillonné dans l'eau, donc jamais sur la terre.
+ */
 export function waterAhead(sim: Sim, c: Character): Vec2 | null {
   const fishing = sim.content.settings.fishing;
   if (fishing === null) return null;
   const { map } = sim;
-  for (let d = LOOK_STEP; d <= fishing.castRange; d += LOOK_STEP) {
-    const x = c.pos.x + Math.cos(c.facing) * d;
-    const y = c.pos.y + Math.sin(c.facing) * d;
-    const cx = Math.floor(x);
-    const cy = Math.floor(y);
-    if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return null;
-    if (map.ground[cy * map.width + cx] === 'water') return { x: cx + 0.5, y: cy + 0.5 };
+  const dx = Math.cos(c.facing);
+  const dy = Math.sin(c.facing);
+  const stepSize = fishing.castDistance === null ? LOOK_STEP : CAST_STEP;
+  let first: number | null = null;
+  let lastWater = 0;
+  for (let d = stepSize; d <= fishing.castRange; d += stepSize) {
+    const cx = Math.floor(c.pos.x + dx * d);
+    const cy = Math.floor(c.pos.y + dy * d);
+    if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) break;
+    const water = map.ground[cy * map.width + cx] === 'water';
+    if (first === null) {
+      if (!water) continue;
+      if (fishing.castDistance === null) return { x: cx + 0.5, y: cy + 0.5 };
+      first = d;
+    } else if (!water) {
+      break;
+    }
+    lastWater = d;
   }
-  return null;
+  if (first === null) return null;
+  const wanted = Math.max(first, Math.min(fishing.castDistance ?? first, lastWater - fishing.castShoreMargin));
+  // Ramené sur un point échantillonné (tous dans l'eau entre `first` et `lastWater`).
+  const d = first + Math.floor((wanted - first) / stepSize + 1e-9) * stepSize;
+  return { x: c.pos.x + dx * d, y: c.pos.y + dy * d };
 }
 
 /** Poids des poissons ce jour-là: ceux de la saison (tour 8, section 5.3), sinon `fishWeights`. */

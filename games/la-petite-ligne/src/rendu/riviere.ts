@@ -43,8 +43,11 @@ export const RIVER_BED_RANGE = 0.75;
 /** Distance signée du sable codée dans le canal B: de -`SAND_RANGE` à +`SAND_RANGE` (m). */
 export const RIVER_SAND_RANGE = 0.75;
 
-/** Ce que le lit doit savoir d'une case (bande prolongée comprise). */
-export type RiverCell = 'water' | 'ford' | 'bank' | 'land';
+/**
+ * Ce que le lit doit savoir d'une case (bande prolongée comprise). `path`: terre ferme comme
+ * `land` (hauteur, ligne d'eau), mais le sable de la grève va jusqu'à elle (R22).
+ */
+export type RiverCell = 'water' | 'ford' | 'bank' | 'land' | 'path';
 
 /** Une pierre qui affleure (gué): elle crève la surface, le courant s'ouvre autour d'elle. */
 export interface RiverStone {
@@ -237,6 +240,8 @@ export function createRiverField(
   const ford = new Uint8Array(count);
   const sandy = new Uint8Array(count);
   const land = new Uint8Array(count);
+  const bankNode = new Uint8Array(count);
+  const grass = new Uint8Array(count);
   for (let j = 0; j < height; j += 1) {
     const y = originY + j * step;
     for (let i = 0; i < width; i += 1) {
@@ -248,20 +253,24 @@ export function createRiverField(
       let anyFord = false;
       let anyBank = false;
       let anyLand = false;
+      let anyGrass = false;
       for (const cy of cys) {
         for (const cx of cxs) {
           const cell = cellAt(cx, cy);
-          anyDry ||= cell === 'bank' || cell === 'land';
+          anyDry ||= cell === 'bank' || cell === 'land' || cell === 'path';
           anyFord ||= cell === 'ford';
           anyBank ||= cell === 'bank' || cell === 'ford' || cell === 'water';
-          anyLand ||= cell === 'land';
+          anyLand ||= cell === 'land' || cell === 'path';
+          anyGrass ||= cell === 'land';
         }
       }
       const index = j * width + i;
       dry[index] = anyDry ? 1 : 0;
       ford[index] = anyFord ? 1 : 0;
-      // Sable: tout le lit (berge, gué, eau); l'herbe et les chemins n'en sont pas.
-      sandy[index] = anyBank && !anyLand ? 1 : 0;
+      // Sable: tout le lit (berge, gué, eau) jusqu'aux chemins; l'herbe l'arrête.
+      sandy[index] = anyBank && !anyGrass ? 1 : 0;
+      bankNode[index] = anyBank ? 1 : 0;
+      grass[index] = anyGrass ? 1 : 0;
       land[index] = anyLand ? 1 : 0;
     }
   }
@@ -270,6 +279,7 @@ export function createRiverField(
   const sandDistance = signedDistance(sandy, width, height, step, RIVER.roundRadius);
   const toFord = distanceField(ford, width, height, step);
   const toLand = distanceField(land, width, height, step);
+  const toGrass = distanceField(grass, width, height, step);
 
   const bed = new Float32Array(count);
   const sand = new Float32Array(count);
@@ -297,6 +307,11 @@ export function createRiverField(
       bed[index] = h;
       const wobble = (valueNoise(x, y, RIVER.sandNoise, SEED_SAND) - 0.5) * 2 * RIVER.sandWobble;
       sand[index] = (sandDistance[index] ?? 0) + wobble;
+      // Loin de toute herbe (le long d'un chemin, R22), le sable ne recule pas: le bord du lit
+      // touche le chemin sans liseré vert.
+      if (bankNode[index] === 1 && (toGrass[index] ?? 0) > RIVER.sandWobble + RIVER.roundRadius) {
+        sand[index] = Math.max(sand[index] ?? 0, RIVER_SAND_RANGE);
+      }
       riffle[index] = 1 - smoothstep(0, RIVER.riffleReach, fordDistance);
     }
   }

@@ -15,6 +15,7 @@ import { createWorld } from '../../simulation/monde';
 import { sitDown } from '../../simulation/bancs';
 import { placeVillagers } from '../../simulation/habitants';
 import { newToday } from '../../simulation/moments';
+import { waterAhead } from '../../simulation/peche';
 import type {
   ActionKind,
   Character,
@@ -61,7 +62,15 @@ function dress(
   return c;
 }
 
-export const DEMO_SCENES = ['rencontre', 'place', 'repas', 'banc', 'banc-quai'] as const;
+export const DEMO_SCENES = [
+  'rencontre',
+  'place',
+  'repas',
+  'banc',
+  'banc-quai',
+  'coucher',
+  'outils',
+] as const;
 export type DemoScene = (typeof DEMO_SCENES)[number];
 
 export interface DemoOptions {
@@ -92,6 +101,16 @@ export interface DemoOptions {
   scene?: DemoScene | undefined;
   /** Draisine poussée, posée au bout de la voie (`world.handcarAt`), remise ouverte. */
   handcarParked?: boolean;
+  /**
+   * Scène `coucher` (retour R05): Camille sur une paillasse et Sacha dans le lit double, tous deux
+   * posés en quarts de tour `bedRotation`. Scène `outils` (retour R08): Camille tient `tool` et
+   * fait `toolAction` (ou attend), Sacha marche à côté avec le même outil.
+   */
+  bedRotation?: number;
+  /** Point de pêche de Sacha (`peche=...`): par défaut la berge nord du gué. */
+  fishingSpot?: string | undefined;
+  tool?: string | undefined;
+  toolAction?: ActionKind | undefined;
   /**
    * Moment rare du jour (`moment=<id>`): en attente, à l'instant `t` de l'apogée (`t=<s>`), ou
    * après; les deux joueurs à leurs places de spectateurs (tenant l'échelle pour `ladder`).
@@ -335,6 +354,12 @@ export function createExampleWorld(
   world.beam = null;
   world.constructions = constructions;
   world.furniture = furniture;
+  if (options.scene === 'coucher') {
+    layBeds(world, p1, p2, room, options.bedRotation ?? 0);
+  }
+  if (options.scene === 'outils') {
+    holdTools(p1, p2, door, options.tool ?? 'hoe', options.toolAction ?? 'idle');
+  }
   world.groundItems = [
     {
       id: 'g1',
@@ -397,7 +422,7 @@ export function createExampleWorld(
     p1.pin = { pos: { x: door.x + 3.5, y: door.y + 4.5 }, since: 0, until: PIN_TICKS };
   }
   if (options.fishing !== 'none' || options.absent) {
-    const bank = point(map, 'fishing_ford_north', 21.5, 37.5);
+    const bank = point(map, options.fishingSpot ?? 'fishing_ford_north', 21.5, 37.5);
     p2.pos = { ...bank };
     p2.prev = { ...bank };
     p2.facing = Math.PI / 2;
@@ -406,7 +431,8 @@ export function createExampleWorld(
     if (options.fishing !== 'none') {
       p2.fishing = {
         phase: options.fishing,
-        bobber: { x: bank.x, y: bank.y + CAST_DISTANCE },
+        // Le bouchon là où la simulation le lancerait (R09), sinon à distance fixe.
+        bobber: waterAhead(sim, p2) ?? { x: bank.x, y: bank.y + CAST_DISTANCE },
         biteAt: 0,
         until: PIN_TICKS,
       };
@@ -637,4 +663,73 @@ function placeMoment(
     villager.visible = true;
     villager.activity = 'stand';
   }
+}
+
+/** Scène `coucher`: une paillasse et un lit double dans la pièce, un joueur couché dans chacun. */
+function layBeds(
+  world: WorldState,
+  p1: Character,
+  p2: Character,
+  room: { x: number; y: number; w: number; h: number },
+  rotation: number,
+): void {
+  const turned = rotation % 2 !== 0;
+  const mattress: PlacedFurniture = {
+    id: 'lit-a',
+    item: 'straw_mattress',
+    cell: { cx: room.x, cy: room.y },
+    rotation,
+    placedBy: 'p1',
+  };
+  const double: PlacedFurniture = {
+    id: 'lit-b',
+    item: 'double_bed',
+    cell: { cx: room.x + (turned ? 2 : 1) + 1, cy: room.y },
+    rotation,
+    placedBy: 'p2',
+  };
+  world.furniture = [
+    ...world.furniture.filter((piece) => piece.item !== 'straw_mattress' && piece.item !== 'table'),
+    mattress,
+    double,
+  ];
+  // Comme `goToBed` de la simulation: centre du lit, et 0,45 m vers l'ouest pour le premier d'un lit double.
+  const lay = (c: Character, bed: PlacedFurniture, w: number, d: number, side: number): void => {
+    c.inHouse = true;
+    c.status = 'sleeping';
+    c.bedId = bed.id;
+    c.aim = null;
+    c.pos = { x: bed.cell.cx + w / 2 + side, y: bed.cell.cy + d / 2 };
+    c.prev = { ...c.pos };
+    // Cap quelconque (celui de la marche vers le lit): le rendu doit l'ignorer.
+    c.facing = -Math.PI / 2;
+    c.action = { kind: 'sleep', since: 0, duration: 0, target: null };
+  };
+  lay(p1, mattress, turned ? 2 : 1, turned ? 1 : 2, 0);
+  lay(p2, double, 2, 2, -0.45);
+}
+
+/** Scène `outils`: Camille fait le geste de l'outil (ou attend), Sacha passe à côté en le portant. */
+function holdTools(
+  p1: Character,
+  p2: Character,
+  door: { x: number; y: number },
+  tool: string,
+  action: ActionKind,
+): void {
+  for (const c of [p1, p2]) {
+    c.bag[0] = { item: tool, quality: 'ordinary', count: 1 };
+    c.selected = 0;
+    c.aim = null;
+    c.inHouse = false;
+  }
+  p1.pos = { x: door.x + 0.5, y: door.y + 3.5 };
+  p1.prev = { ...p1.pos };
+  p1.facing = Math.PI / 4;
+  p1.action = { kind: action, since: 0, duration: 0, target: null };
+  p2.pos = { x: door.x + 2.6, y: door.y + 3.5 };
+  p2.prev = { x: p2.pos.x - 0.05, y: p2.pos.y };
+  p2.facing = 0;
+  p2.speed = 2.4;
+  p2.action = { kind: 'walk', since: 0, duration: 0, target: null };
 }
