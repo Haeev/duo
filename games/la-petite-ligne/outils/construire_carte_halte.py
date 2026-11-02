@@ -11,6 +11,9 @@ l'aperçu:
     python3 games/la-petite-ligne/outils/apercu_carte.py
 
 Document de conception: docs/jeux/jeu-1/carte-halte.md.
+Tour 10 (rue Haute, lot L1): la carte passe de 64 à 100 m de large; la région est (x 62 à 99) est
+composée par `construire_terrain_est` et `construire_objets_est`, les intérieurs (ADR 0016) par
+`INTERIEURS`. Conception: docs/jeux/jeu-1/tour-10-conception.md, sections 1.3 à 1.6 et 4.2.
 Bibliothèque standard uniquement; le résultat est identique à chaque exécution.
 """
 
@@ -25,9 +28,11 @@ ICI = Path(__file__).resolve().parent
 SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
 
 sys.path.insert(0, str(ICI))
-from valider_carte import calculer_infranchissable, emprise_monde  # noqa: E402
+from valider_carte import calculer_infranchissable, emprise_monde, ouvertures  # noqa: E402
 
-LARGEUR, HAUTEUR = 64, 48
+LARGEUR, HAUTEUR = 100, 48
+# Le ru de la Côte (tour 10): deux colonnes d'eau vive qui bornent le bourg ancien et la rue Haute.
+RU_X = (63, 64)
 BORD = 2  # anneau de décor lointain, jamais franchissable
 
 # ---------------------------------------------------------------------------
@@ -48,6 +53,14 @@ LEGENDE = {
     "q": {"nom": "quai (dalles de pierre, bordure en bois)", "sol": "stone", "franchissable": True, "pas": "pierre"},
     "s": {"nom": "sol de bâtiment", "sol": "floor", "franchissable": True, "pas": "bois"},
     "X": {"nom": "bord infranchissable (décor lointain: forêt, haies, champs)", "sol": "grass", "franchissable": False, "pas": None},
+    # Tour 10: le ru de la Côte et ses passages (le ponceau garde les codes de la voie).
+    "r": {"nom": "ru de la Côte (eau vive peu profonde, berges raides)", "sol": "water", "franchissable": False,
+          "pas": None},
+    "P": {"nom": "tablier du pont de la rue (pierre, parapets bas)", "sol": "stone", "franchissable": True,
+          "pas": "pierre"},
+    "Y": {"nom": "planches de la passerelle de la promenade", "sol": "wood", "franchissable": True, "pas": "bois"},
+    "j": {"nom": "gué de pierres plates du ru (on saute de pierre en pierre)", "sol": "gravel", "franchissable": True,
+          "pas": "pierre"},
 }
 
 # ---------------------------------------------------------------------------
@@ -67,8 +80,10 @@ TYPES = {
     "platform": {"categorie": "sol", "nom": "quai", "emprise": [30, 4], "hauteur": 0.4, "franchissable": True},
     "gatekeeper_house": {"categorie": "batiment", "nom": "maisonnette du garde-barrière", "emprise": [7, 6],
                          "hauteur": 5.5, "portes": {"porte": 3}, "interieur": True},
+    # Tour 10: la boutique se visite (pièce de 6 x 6 au sud; la salle à manger de la pension, au nord, reste
+    # fermée: on la regarde par la porte entrouverte).
     "ferrand_shop": {"categorie": "batiment", "nom": "épicerie-pension Ferrand", "emprise": [10, 8], "hauteur": 8.5,
-                     "portes": {"porte": 2, "comptoir": 6}, "interieur": False},
+                     "portes": {"porte": 2, "comptoir": 6}, "interieur": True},
     "firmin_house": {"categorie": "batiment", "nom": "maison de Firmin", "emprise": [7, 6], "hauteur": 6.0,
                      "portes": {"porte": 3}, "interieur": False},
     "sawmill": {"categorie": "batiment", "nom": "scierie de Basile", "emprise": [10, 8], "hauteur": 7.5,
@@ -117,6 +132,25 @@ TYPES = {
     "bush_hazel": {"categorie": "decor", "nom": "noisetier (les noisettes tombent à son pied)", "emprise": [1, 1],
                    "hauteur": 2.0},
     "rock": {"categorie": "decor", "nom": "rocher", "emprise": [1, 1], "hauteur": 0.8},
+    # Tour 10, rue Haute. `toit`: hauteur à l'égout (m) et sens du faîtage par rapport à la façade; le contrôle
+    # de la caméra suit alors la pente du toit au lieu d'un volume plein jusqu'au faîte (c'est ce qui permet de
+    # vérifier que la mercerie et la maison de Lucie ne cachent pas la rue de la halte en orientation 0).
+    "bakehouse": {"categorie": "batiment", "nom": "fournil d'Achille (four et cheminée à l'arrière, côté voie)",
+                  "emprise": [7, 6], "hauteur": 5.0, "toit": {"egout": 3.0, "faitage": "parallele"},
+                  "portes": {"porte": 3, "guichet": 5}, "interieur": False},
+    "salon_shop": {"categorie": "batiment", "nom": "mercerie-coiffure de Solange (un niveau, pignon sur la rue Haute)",
+                   "emprise": [7, 7], "hauteur": 4.8, "toit": {"egout": 3.0, "faitage": "perpendiculaire"},
+                   "portes": {"porte": 3, "vitrine": 4}, "interieur": True},
+    "lucie_house": {"categorie": "batiment", "nom": "maison de Lucie (un niveau, pignon sur la rue Haute)",
+                    "emprise": [6, 6], "hauteur": 4.6, "toit": {"egout": 2.8, "faitage": "perpendiculaire"},
+                    "portes": {"porte": 2}, "interieur": False},
+    "school_house": {"categorie": "batiment", "nom": "école-mairie (classe au rez-de-chaussée, mairie à l'étage)",
+                     "emprise": [7, 6], "hauteur": 8.0, "toit": {"egout": 6.0, "faitage": "parallele"},
+                     "portes": {"porte": 3}, "interieur": False},
+    "school_yard": {"categorie": "enclos", "nom": "cour de l'école, murée (mur de 2,2 m, tilleul, portail de 2 m)",
+                    "emprise": [6, 6], "hauteur": 2.2, "portes": {"portail": 3}},
+    "tree_apple": {"categorie": "arbre", "nom": "pommier du verger de Lucie", "emprise": [1, 1], "hauteur": 5.0,
+                   "occultation_arbre": {"tronc": [0.35, 0.0, 1.6], "houppier": [3.0, 1.6, 5.0]}},
 }
 
 OBJETS: list[dict] = []
@@ -167,7 +201,7 @@ def construire_terrain() -> None:
         for x in range(LARGEUR):
             if y <= 9 and bruit(x, y, 1) < 45:
                 T[y][x] = ","
-            if 50 <= x and 24 <= y <= 33 and bruit(x, y, 2) < 60:
+            if 50 <= x <= 62 and 24 <= y <= 33 and bruit(x, y, 2) < 60:
                 T[y][x] = ","
             if y in (36,) and bruit(x, y, 3) < 35:
                 T[y][x] = ","
@@ -224,7 +258,62 @@ def construire_terrain() -> None:
     # Le potager de la démo: 12 cases devant la porte.
     peindre("p", 7, 28, 4, 3)
 
+    construire_terrain_est()
+
     # Sols des bâtiments (peints ensuite d'après les objets).
+
+
+def construire_terrain_est() -> None:
+    """Tour 10: la rue Haute, à l'est du ru de la Côte (x 62 à 99; ancien bord est en x 62 et 63).
+
+    Le récit, du nord au sud: le coteau de la Côte descend jusqu'à la voie; le ru en sort et coule vers le
+    sud jusqu'à l'Aubrune, qui coule vers l'est. La voie passe le ru sur un ponceau (elle existait avant la
+    rue Haute); la rue de la halte le passe sur un pont de pierre et devient la route des hameaux; la
+    promenade de la berge le passe sur une passerelle. Entre les deux, un gué de pierres plates.
+    """
+    rx0 = RU_X[0]
+    # Herbe haute: pied du coteau au nord de la voie, prés en pente douce vers la rivière au sud-est.
+    for y in range(HAUTEUR):
+        for x in range(65, LARGEUR):
+            if 85 <= x and 24 <= y <= 35 and bruit(x, y, 11) < 55:
+                T[y][x] = ","
+            if 79 <= x <= 84 and 32 <= y <= 35 and bruit(x, y, 12) < 40:
+                T[y][x] = ","
+
+    # Le ru, du bois (hors carte au nord) à l'Aubrune: deux cases d'eau vive. Sous la voie (y 12 à 14), le
+    # ballast reste tel quel: c'est le ponceau.
+    for y in range(0, 38):
+        if 12 <= y <= 14:
+            continue
+        peindre("r", rx0, y, 2, 1)
+
+    # La rue de la halte continue vers l'est: cour de la halte jusqu'au ru (x 62, ancien bord), pont de
+    # pierre de 3 m (y 21 à 23, la largeur de la cour), puis la petite place pavée du carrefour de la rue
+    # Haute (y 21 à 24), et la route des hameaux (y 21 et 22): pavée jusqu'à l'école, dernière maison du
+    # bourg, en terre au-delà, jusqu'au bord où partent les habitants et d'où arrivent les élèves.
+    peindre("+", 62, 21, 1, 3)
+    peindre("P", rx0, 21, 2, 3)
+    peindre("+", 65, 21, 14, 4)
+    peindre("+", 79, 21, 8, 2)
+    peindre(":", 87, 21, LARGEUR - 87, 2)
+
+    # La rue Haute: chaussée x 76 et 77, trottoirs x 75 et 78 (pas de porte de la mercerie et de la maison
+    # de Lucie), du carrefour (y 21) jusqu'à la promenade (y 34). Elle monte de la rivière vers le pied du
+    # coteau, d'où son nom; son bout nord est le portail de l'école.
+    peindre("+", 75, 25, 4, 9)
+
+    # La promenade de la berge continue (elle s'arrêtait au bord de l'ancienne carte): passerelle sur le ru,
+    # puis jusqu'au bas de la rue Haute, où elle finit. Pas plus loin vers l'est: elle n'irait nulle part.
+    peindre(":", 62, 34, 1, 2)
+    peindre("Y", rx0, 34, 2, 2)
+    peindre(":", 65, 34, 14, 2)
+
+    # La grève touche la promenade (retour R22: pas de bande d'herbe entre le chemin et la berge).
+    peindre("b", 62, 36, 1, 1)
+    peindre("b", 65, 36, LARGEUR - 65, 1)
+
+    # Le gué de pierres plates, à mi-chemin du pont et de la passerelle: le raccourci de Jeanne.
+    peindre("j", rx0, 30, 2, 1)
 
 
 def peindre_sols_batiments() -> None:
@@ -243,7 +332,7 @@ def peindre_bord() -> None:
             if not dans_bord:
                 continue
             # La voie, la rivière, ses berges et les routes continuent dans le décor (rendu seulement).
-            if T[y][x] in "=~:bg":
+            if T[y][x] in "=~:bgr":
                 continue
             T[y][x] = "X"
 
@@ -296,7 +385,8 @@ def construire_objets() -> None:
     for y in range(32, 36):
         objet("fence", 16, y, rotation=1)
     objet("bush", 2, 27)
-    objet("bush", 4, 21)
+    # Tour 10: hors de l'emprise du futur cellier (x 2 à 4, y 21 à 26), où il était en (4, 21).
+    objet("bush", 2, 20)
     objet("bush", 12, 21)
     objet("rock", 3, 33)
 
@@ -387,22 +477,84 @@ def construire_objets() -> None:
         objet(t, x, y, rotation=quart)
 
     # Décor lointain dans l'anneau du bord: forêt au nord, haies et bosquets ailleurs.
-    for x in range(0, LARGEUR, 2):
+    # Tour 10: les identifiants numérotés (`bush_41`, `tree_oak_01`...) sont cités ailleurs; on garde donc
+    # l'ordre de création d'avant pour l'ancienne carte, et la région est ajoute les siens après.
+    for x in range(0, 64, 2):
         t = "tree_fir" if bruit(x, 0, 7) < 50 else "tree_oak"
         objet(t, x, 0 if bruit(x, 1, 8) < 50 else 1)
     for y in range(4, 44, 3):
         if 11 <= y <= 15 or 36 <= y <= 43:
             continue
         # A l'ouest, des arbres le long du bois, puis la haie du jardin du garde-barrière; à l'est, une
-        # haie basse: des arbres y cacheraient la remise, la cour de la halte et le pré.
+        # haie basse: des arbres y cacheraient les prés de la rue Haute. La route des hameaux la traverse.
         if y <= 10:
             objet("tree_oak" if bruit(0, y, 9) < 50 else "tree_fir", 0, y)
         else:
             objet("bush", 0, y)
-        objet("bush", 63, y)
-    for x in range(1, LARGEUR, 3):
+        # La route des hameaux passe le bord en y 21 et 22: le buisson de y 22 se pousse en y 24.
+        objet("bush", LARGEUR - 1, 24 if y == 22 else y)
+    for x in range(1, 64, 3):
         if 15 <= x <= 21:
             continue
+        objet("bush", x, 47)
+
+    construire_objets_est()
+
+
+def construire_objets_est() -> None:
+    """Tour 10: bâtiments et décor de la rue Haute (table 1.3 de la conception, places calées ici).
+
+    Règle de la caméra (orientation 0 au sud-est): ce qui est haut au nord, contre la voie (fournil, école);
+    au sud de la rue de la halte, seulement des maisons basses à un niveau (mercerie, maison de Lucie),
+    en retrait de deux rangées pour que leur toit ne cache pas la chaussée.
+    """
+    # Le fournil, entre la rue et la voie, au plus près du quai: les sacs de farine du train du samedi se
+    # portent le long du ballast et passent le ponceau jusqu'à la trappe de l'arrière, sans traverser le
+    # bourg; le four et sa fumée sont à l'arrière, côté voie, loin des maisons. Porte et guichet sur la rue.
+    objet("bakehouse", 65, 15, ident="bakehouse")
+    # La ruelle de 2 m (x 72 et 73) entre le fournil et la cour de l'école mène à l'arrière du fournil.
+    # L'école-mairie au bout nord de la rue Haute: la cour murée (avec son tilleul) dans l'axe de la rue,
+    # portail en x 77; le bâtiment à l'est de la cour, porte de la mairie sur la route des hameaux.
+    objet("school_yard", 74, 15, ident="school_yard")
+    objet("school_house", 80, 15, ident="school_house")
+    # La mercerie-coiffure à l'angle des deux rues, première boutique qu'on voit en passant le pont; pignon,
+    # vitrine et porte sur la rue Haute (à l'est), là où l'on passe.
+    objet("salon_shop", 68, 25, rotation=1, ident="salon_shop")
+    # La maison de Lucie en face: les deux portes se regardent (y 28), Jeanne traverse seule les 4 m de rue.
+    objet("lucie_house", 79, 26, rotation=3, ident="lucie_house")
+    # Le verger de trois pommiers derrière la maison (jardinet à l'est).
+    for n, (x, y) in enumerate(((87, 27), (89, 29), (87, 31)), start=1):
+        objet("tree_apple", x, y, ident=f"tree_apple_{n:02d}")
+
+    # Le banc de la rue Haute, dos au mur de la mercerie au sud de sa porte, face à la maison de Lucie: on y
+    # déjeune à midi, Achille aussi; on y attend que le salon rouvre.
+    objet("bench", 75, 30, rotation=1, ident="upper_street_bench")
+    # Le banc de la berge à l'est de la passerelle, tourné vers l'Aubrune.
+    objet("bench", 66, 36, ident="east_riverbank_bench")
+    # Un lampadaire au carrefour, à l'angle de la maison de Lucie: il éclaire le pont, la rue Haute et la
+    # porte de la mercerie (le bourg s'allume jusqu'à sa dernière boutique).
+    objet("lamp_post", 78, 24, ident="lamp_upper_street")
+
+    # La haie du ru (aulnes, saules) le long de sa rive ouest, au bord du pré de l'est: la chevrette en sort
+    # (`roe_deer_edge`, case 62, 27). Ouverte au droit du gué de pierres (y 29 à 31).
+    for y in (24, 25, 26, 27, 28, 32, 33):
+        objet("bush", 62, y)
+    # Pied du coteau, au nord de la voie: bois clair du haut de la Côte (décor, non coupable).
+    for t, x, y in (("tree_oak", 68, 5), ("tree_fir", 72, 3), ("tree_oak", 77, 7), ("tree_fir", 81, 4),
+                    ("tree_oak", 86, 6), ("tree_fir", 90, 3), ("tree_oak", 94, 7)):
+        objet(t, x, y)
+    for x, y in ((66, 8), (75, 9), (83, 9), (91, 9), (96, 5)):
+        objet("bush", x, y)
+    # Prés du sud-est: quelques buissons et rochers, rien de haut (premier plan de la caméra).
+    for x, y in ((92, 25), (95, 30), (90, 34), (82, 33)):
+        objet("bush", x, y)
+    for x, y in ((70, 33), (93, 27)):
+        objet("rock", x, y)
+    # L'anneau du décor lointain, prolongé vers l'est: forêt au nord (le ru en sort, x 63 et 64), haie au sud.
+    for x in range(66, LARGEUR, 2):
+        t = "tree_fir" if bruit(x, 0, 7) < 50 else "tree_oak"
+        objet(t, x, 0 if bruit(x, 1, 8) < 50 else 1)
+    for x in range(64, LARGEUR, 3):
         objet("bush", x, 47)
 
 
@@ -587,9 +739,62 @@ POINTS = [
       cap_degres=90),
     p("gate_south_crank", 21.4, 15.5, "manivelle de la barrière sud, au bout du quai à l'est du poteau",
       cap_degres=270),
-    # Sortie des habitants
-    p("village_exit", 61.5, 34.5, "bout de la promenade: les habitants qui rentrent chez eux hors carte "
-      "(`offstage`) y disparaissent", rotation=1),
+    # Sortie des habitants (tour 10: la promenade ne sort plus de la carte, elle passe le ru et finit au bas de
+    # la rue Haute; la seule route qui sort est celle des hameaux, à l'est).
+    p("village_exit", 97.5, 21.5, "bout de la route des hameaux, au bord est: les habitants qui rentrent chez eux "
+      "hors carte (`offstage`) y disparaissent, les élèves des hameaux en arrivent", rotation=1),
+]
+
+# Tour 10 (conception, sections 1.4 et 1.6; `porte_lieu`: porte d'un lieu, vue dans 3 orientations sur 4).
+POINTS += [
+    # Le fournil d'Achille
+    p("bakery_door", 68.5, 21.5, "devant la porte du fournil, sur la rue", objet="bakehouse", rotation=2,
+      important=True, porte_lieu=True),
+    p("bakery_window", 70.5, 20.5, "Achille au guichet du fournil (dans l'embrasure), qui donne sur la rue; on "
+      "achète depuis la rue, sous l'auvent", objet="bakehouse", portee=2.0, rotation=0, dans_batiment=True,
+      important=True),
+    p("bakery_back", 68.5, 14.5, "l'arrière du fournil, sur le ballast: la trappe où l'on rentre les sacs de farine "
+      "du train du samedi", objet="bakehouse", rotation=0),
+    # La rue Haute
+    p("upper_street_bench", 75.5, 31.0, "le banc de la rue Haute, contre la mercerie, face à la maison de Lucie",
+      objet="upper_street_bench", portee=1.5, important=True),
+    p("salon_door", 75.5, 28.5, "devant la porte de la mercerie-coiffure, sur la rue Haute", objet="salon_shop",
+      rotation=3, important=True, porte_lieu=True),
+    p("lucie_house_door", 78.5, 28.5, "devant la porte de la maison de Lucie (Jeanne y loge), en face de la mercerie",
+      objet="lucie_house", rotation=1, important=True, porte_lieu=True),
+    p("school_gate", 77.0, 21.5, "devant le portail de la cour de l'école, au bout nord de la rue Haute",
+      objet="school_yard", rotation=2, important=True, porte_lieu=True),
+    p("school_door", 83.5, 21.5, "devant la porte de l'école-mairie, sur la route des hameaux", objet="school_house",
+      rotation=2),
+    p("ru_stepping_stones", 64.0, 30.5, "le gué de pierres plates du ru, que Jeanne passe en sautant"),
+    # Dans la mercerie-coiffure (pièce de 5 x 5, x 69 à 73, y 26 à 30; porte en 74, 28)
+    p("salon_inside", 72.5, 28.5, "dans la mercerie, juste passé la porte (apparition)", objet="salon_shop",
+      interieur=True),
+    p("salon_counter", 71.0, 26.5, "Solange derrière le comptoir de mercerie (rouleaux de tissu au mur nord)",
+      objet="salon_shop", rotation=0, interieur=True),
+    p("salon_chair", 69.5, 29.5, "le fauteuil de coiffure, face au miroir du mur ouest (un joueur à la fois)",
+      objet="salon_shop", portee=1.5, interieur=True),
+    p("salon_stylist", 70.5, 29.5, "Solange derrière le fauteuil quand elle coupe", objet="salon_shop",
+      cap_degres=270, interieur=True),
+    p("salon_bench", 72.0, 30.5, "le banc d'attente à deux places, tourné vers le comptoir et le fauteuil",
+      objet="salon_shop", portee=1.5, interieur=True),
+    p("salon_window", 73.5, 26.5, "Solange coud derrière la vitrine (lundi), vue de la rue Haute",
+      objet="salon_shop", interieur=True),
+    # Dans l'épicerie-pension (boutique de 6 x 6, x 24 à 29, y 26 à 31; porte en 30, 30)
+    p("grocery_inside", 27.5, 28.5, "dans la boutique d'Odette (apparition)", objet="ferrand_shop", interieur=True),
+    p("grocery_inside_counter", 28.5, 27.0, "le comptoir intérieur (le même que le guichet de la place, vu de "
+      "dedans): on y achète et vend depuis la boutique", objet="ferrand_shop", portee=1.5, interieur=True),
+    p("grocery_table", 26.5, 30.5, "la petite table et ses deux chaises, près du poêle: chocolat chaud, repas",
+      objet="ferrand_shop", portee=1.5, interieur=True),
+    p("grocery_dining_door", 27.5, 26.5, "la porte entrouverte de la salle à manger de la pension (examiner)",
+      objet="ferrand_shop", cap_degres=0, interieur=True),
+    p("grocery_stairs", 25.0, 26.5, "le pied de l'escalier des chambres de la pension (examiner)",
+      objet="ferrand_shop", portee=1.5, interieur=True),
+    # Sites des pièces à bâtir de la maisonnette (section 4.3: panneau et caisse du chantier)
+    p("room_cellar_site", 3.5, 18.5, "chantier du cellier: panneau et caisse, au nord du pignon ouest, hors de "
+      "l'emprise de l'appentis (x 2 à 4, y 21 à 26) et hors du chemin"),
+    p("room_bedroom_site", 12.5, 17.5, "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son "
+      "pignon et le sentier du jardin (la panne attend à `beam_pickup`)"),
 ]
 
 ZONES = [
@@ -702,6 +907,105 @@ MOBILIER_DEPART = [
     {"item": "chest", "cx": 6, "cy": 25, "rotation": 0},
 ]
 
+
+def rect(x: int, y: int, w: int, h: int) -> dict:
+    return {"x": x, "y": y, "w": w, "h": h}
+
+
+# Tour 10: bâtiments visitables (ADR 0016, section 1). Une entrée par bâtiment: l'objet qui le porte, ses
+# pièces (rectangles de cases franchissables, dans l'emprise et à l'intérieur des murs), ses portes (case
+# franchissable sur le pourtour, côté façade, et la case du dehors devant elle), le point d'apparition, la clé
+# de `reglages.json` qui porte ses heures (aucune pour la maisonnette), son ambiance sonore. `mobilier`: le
+# mobilier fixe qui occupe des cases (bloquées dans `infranchissable`; l'artiste 3D le pose là). Une pièce
+# `a_batir` (cellier, chambre) n'existe qu'une fois bâtie: son `emprise` (sans le mur commun, qui est celui de
+# la maisonnette) reste libre jusque-là; sa `porte` est percée dans le mur commun, à la place d'une fenêtre.
+INTERIEURS = [
+    {
+        "id": "house", "objet": "gatekeeper_house", "nom": "la maisonnette",
+        "pieces": [
+            {"id": "house_main", "nom": "la pièce (puis la salle commune)", "rect": rect(6, 22, 5, 4),
+             "zone": "house_interior"},
+            {"id": "house_cellar", "nom": "le cellier", "a_batir": "room_cellar", "rect": rect(3, 22, 2, 4),
+             "emprise": rect(2, 21, 3, 6), "mur_commun": "est", "site": "room_cellar_site",
+             "porte": {"cx": 5, "cy": 24, "vers": "house_main",
+                       "role": "la fenêtre ouest de la pièce (modèle: mur gauche, u 0,3) devient la porte"},
+             "fenestron": "nord",
+             "etageres": [rect(3, 22, 1, 2), rect(3, 24, 1, 2)],
+             "role": "appentis contre le pignon ouest (toit à un pan, faîtage à 2,6 m); deux places d'étagère "
+                     "haute contre le mur ouest, le passage x 4 reste libre devant la porte"},
+            {"id": "house_bedroom", "nom": "la chambre", "a_batir": "room_bedroom", "rect": rect(6, 17, 5, 4),
+             "emprise": rect(5, 16, 7, 5), "mur_commun": "sud", "site": "room_bedroom_site",
+             "porte": {"cx": 9, "cy": 21, "vers": "house_main",
+                       "role": "la fenêtre nord de la pièce (modèle: mur arrière, u -1) devient la porte"},
+             "fenetres": ["nord", "est"],
+             "role": "aile nord, côté voie: la rangée y 15 reste libre (1 m avant le ballast), le banc du pignon "
+                     "(x 12) et le sentier du jardin (x 13) restent dehors"},
+        ],
+        "apparition": "house_spawn", "heures": None, "ambiance": None, "mobilier": [],
+    },
+    {
+        "id": "grocery", "objet": "ferrand_shop", "nom": "l'épicerie-pension d'Odette",
+        "pieces": [
+            {"id": "grocery_shop", "nom": "la boutique", "rect": rect(24, 26, 6, 6)},
+        ],
+        "fermees": [
+            {"id": "grocery_dining_room", "rect": rect(24, 24, 6, 2),
+             "role": "la salle à manger de la pension, tables sous des draps: on la regarde par la porte "
+                     "entrouverte (`grocery_dining_door`), on n'y entre pas (étape 3 de l'histoire d'Odette)"},
+        ],
+        "apparition": "grocery_inside", "heures": "grocer", "ambiance": "room-tone-shop",
+        "mobilier": [
+            {"id": "grocery_inner_counter", "cases": [[28, 26], [28, 27]], "rotation": 3,
+             "role": "le comptoir intérieur, Odette derrière (x 29), le guichet de la place dans son dos (30, 26)"},
+            {"id": "grocery_stairs", "cases": [[24, 26], [25, 26]], "rotation": 2,
+             "role": "l'escalier des chambres, contre la cloison de la salle à manger"},
+            {"id": "grocery_shelves", "cases": [[24, 27], [24, 28]], "rotation": 1,
+             "role": "rayonnages, bocaux et sacs de graines contre le mur ouest (qui reste debout pour la caméra)"},
+            {"id": "grocery_stove", "cases": [[24, 30]], "rotation": 1,
+             "role": "le poêle de fonte, son tuyau contre le mur ouest"},
+            {"id": "grocery_small_table", "cases": [[26, 30]], "rotation": 0,
+             "role": "la petite table près du poêle; ses deux chaises en (25, 30) et (27, 30), cases libres"},
+        ],
+    },
+    {
+        "id": "salon", "objet": "salon_shop", "nom": "la mercerie-coiffure de Solange",
+        "pieces": [
+            {"id": "salon_room", "nom": "le salon et la mercerie", "rect": rect(69, 26, 5, 5)},
+        ],
+        "apparition": "salon_inside", "heures": "salon", "ambiance": "room-tone-salon",
+        "mobilier": [
+            {"id": "salon_counter_desk", "cases": [[70, 27], [71, 27], [72, 27]], "rotation": 0,
+             "role": "le comptoir de mercerie, Solange derrière (y 26), rouleaux de tissu et rubans au mur nord"},
+            {"id": "salon_chair_seat", "cases": [[69, 29]], "rotation": 3,
+             "role": "le fauteuil de coiffure à pied, tourné vers le grand miroir et la tablette du mur ouest (un "
+                     "mur qui reste debout pour la caméra, au contraire des murs sud et est)"},
+            {"id": "salon_waiting_bench", "cases": [[71, 30], [72, 30]], "rotation": 2,
+             "role": "le banc d'attente à deux places et ses journaux, dos au mur sud, tourné vers le fauteuil"},
+        ],
+    },
+]
+
+# Tour 10: les passages du ru de la Côte. Le ru ne se franchit que là (contrôlé par `valider_carte.py`).
+RU = {"colonnes": list(RU_X), "de_y": 0, "a_y": 37,
+      "role": "le ru de la Côte descend du coteau (au nord, hors carte) et se jette dans l'Aubrune en y 37"}
+OUVRAGES = [
+    {"id": "ru_culvert", "nature": "ponceau", "franchit": "ru", "rect": rect(63, 12, 2, 3), "modele": "ru_culvert",
+     "role": "voûte de pierre sous le remblai de la voie (la voie existait avant la rue Haute); les cases de la "
+             "voie ne changent pas, on y passe sur le ballast comme partout ailleurs"},
+    {"id": "ru_road_bridge", "nature": "pont", "franchit": "ru", "rect": rect(63, 21, 2, 3),
+     "modele": "ru_road_bridge", "largeur_m": 3.0,
+     "role": "pont de pierre de la rue de la halte, 3 m entre parapets bas (deux personnes et une charrette), "
+             "parapets sur les bords nord et sud du tablier"},
+    {"id": "ru_footbridge", "nature": "passerelle", "franchit": "ru", "rect": rect(63, 34, 2, 2),
+     "modele": "ru_footbridge", "largeur_m": 1.6,
+     "role": "planches sur deux poutres, 1,6 m (on y croise un habitant), centrée en y 35; garde-corps côté "
+             "amont (nord) seulement, pour ne rien masquer à la caméra par défaut"},
+    {"id": "ru_stepping_stones", "nature": "gue", "franchit": "ru", "rect": rect(63, 30, 2, 1),
+     "modele": "ru_stepping_stones",
+     "role": "trois pierres plates dans l'eau vive, que Jeanne passe en sautant: le raccourci du pré de l'est "
+             "vers l'arrière de la mercerie"},
+]
+
 TRAJETS = [
     {"id": "firmin_home_to_bell", "habitant": "firmin", "de": "firmin_house", "a": "quay_bell",
      "par": [[44.5, 8.5], [45.5, 10.5], [50.5, 10.5], [50.5, 17.5], [37.5, 17.5], [28.5, 17.5], [27.5, 18.5]],
@@ -725,14 +1029,51 @@ TRAJETS = [
     {"id": "basile_yard_to_train", "habitant": "basile", "de": "sawmill_yard", "a": "train_stop",
      "par": [[9.5, 10.5], [18.5, 10.5], [18.5, 16.5], [21.5, 16.5], [38.5, 17.5]],
      "note": "jour 8, par le passage à niveau puis le quai"},
-    {"id": "jeanne_exit_to_bench", "habitant": "jeanne", "de": "village_exit", "a": "quay_bench",
-     "par": [[61.5, 34.5], [49.5, 34.5], [49.5, 21.5], [32.5, 21.5], [32.5, 19.5]]},
+    # Tour 10: Jeanne loge chez Lucie, rue Haute; elle prend le gué de pierres en sautant.
+    {"id": "jeanne_home_to_bench", "habitant": "jeanne", "de": "lucie_house_door", "a": "quay_bench",
+     "par": [[78.5, 28.5], [76.5, 32.5], [67.5, 32.5], [65.5, 30.5], [62.5, 30.5], [49.5, 30.5], [49.5, 21.5],
+             [32.5, 21.5], [32.5, 19.5]],
+     "note": "par le gué de pierres du ru et le pré de l'est"},
     {"id": "jeanne_bench_to_riverbank", "habitant": "jeanne", "de": "quay_bench", "a": "riverbank",
      "par": [[32.5, 19.5], [32.5, 21.5], [37.5, 21.5], [37.5, 34.5], [29.5, 34.5], [29.0, 37.5], [28.0, 37.5]]},
     {"id": "jeanne_riverbank_to_square", "habitant": "jeanne", "de": "riverbank", "a": "village_square",
      "par": [[28.0, 37.5], [29.0, 37.5], [29.5, 34.5], [37.5, 34.5], [38.5, 30.5]]},
-    {"id": "jeanne_square_to_exit", "habitant": "jeanne", "de": "village_square", "a": "village_exit",
-     "par": [[38.5, 30.5], [42.5, 34.5], [61.5, 34.5]]},
+    {"id": "jeanne_home_to_school", "habitant": "jeanne", "de": "lucie_house_door", "a": "school_gate",
+     "par": [[78.5, 28.5], [77.5, 24.5], [77.5, 21.5]], "note": "jours d'école d'automne, 8 h 15"},
+    # Tour 10: Achille (conception 1.4).
+    {"id": "achille_basket_to_grocery", "habitant": "achille", "de": "bakery_window", "a": "grocery_door",
+     "par": [[70.5, 21.5], [62.0, 22.0], [49.5, 22.5], [33.5, 22.5], [31.5, 24.5], [31.5, 30.5]],
+     "note": "la panière, 9 h: par le pont, la rue de la halte et la place (`achille_basket` se porte à deux)"},
+    {"id": "achille_grocery_to_bakery", "habitant": "achille", "de": "grocery_door", "a": "bakery_door",
+     "par": [[31.5, 30.5], [31.5, 24.5], [33.5, 22.5], [49.5, 22.5], [62.0, 22.0], [68.5, 21.5]]},
+    {"id": "achille_bakery_to_bench", "habitant": "achille", "de": "bakery_window", "a": "upper_street_bench",
+     "par": [[70.5, 21.5], [76.5, 23.5], [76.5, 30.5]], "note": "midi, il déjeune sur le banc de la rue Haute"},
+    {"id": "achille_bakery_to_ford", "habitant": "achille", "de": "bakery_door", "a": "fishing_ford_north",
+     "par": [[68.5, 21.5], [76.5, 23.5], [76.5, 34.5], [21.5, 34.5], [21.5, 37.5]],
+     "note": "17 h 30, la pêche au gué: la rue Haute, la promenade et la passerelle"},
+    {"id": "achille_bakery_to_train", "habitant": "achille", "de": "bakery_door", "a": "train_stop",
+     "par": [[68.5, 21.5], [72.5, 21.5], [72.5, 14.5], [50.5, 14.5], [50.5, 16.5], [38.5, 17.5]],
+     "note": "samedi, 10 h: par la ruelle, le ballast et le ponceau, la traversée de service au bout du quai "
+             "(libre quand le train est là)"},
+    {"id": "achille_train_to_hatch", "habitant": "achille", "de": "train_stop", "a": "bakery_back",
+     "par": [[38.5, 17.5], [50.5, 16.5], [50.5, 14.5], [68.5, 14.5]],
+     "note": "les sacs de farine jusqu'à la trappe de l'arrière du fournil, sans traverser le bourg"},
+    # Tour 10: Solange (conception 1.4).
+    {"id": "solange_salon_to_square", "habitant": "solange", "de": "salon_counter", "a": "village_square",
+     "par": [[71.0, 26.5], [73.5, 26.5], [73.5, 28.5], [75.5, 28.5], [75.5, 23.5], [62.0, 22.5], [49.5, 22.5],
+             [49.5, 30.5], [38.5, 30.5]],
+     "note": "18 h, elle descend chercher Jeanne sur la place, par le pont"},
+    {"id": "solange_square_to_lucie", "habitant": "solange", "de": "village_square", "a": "lucie_house_door",
+     "par": [[38.5, 30.5], [49.5, 30.5], [49.5, 22.5], [62.0, 22.5], [76.5, 23.5], [77.5, 27.5], [78.5, 28.5]],
+     "note": "18 h 30, elle remonte avec Jeanne jusqu'à la porte de Lucie"},
+    {"id": "solange_salon_to_riverbank", "habitant": "solange", "de": "salon_counter", "a": "riverbank",
+     "par": [[71.0, 26.5], [73.5, 26.5], [73.5, 28.5], [76.5, 29.5], [76.5, 34.5], [29.5, 34.5], [29.0, 37.5],
+             [28.0, 37.5]],
+     "note": "dimanche, la promenade de la berge avec Jeanne"},
+    {"id": "solange_salon_to_grocery_table", "habitant": "solange", "de": "salon_counter", "a": "grocery_table",
+     "par": [[71.0, 26.5], [73.5, 26.5], [73.5, 28.5], [75.5, 28.5], [75.5, 23.5], [62.0, 22.5], [49.5, 22.5],
+             [33.5, 22.5], [31.5, 24.5], [31.5, 30.5], [29.5, 30.5], [27.5, 29.5]],
+     "note": "dimanche, 14 h: sa mise en plis chez Odette, par la porte de l'épicerie"},
 ]
 
 HABITANTS = {
@@ -747,9 +1088,22 @@ HABITANTS = {
                "jour_1": "basile_by_beam", "jour_8": "train_stop",
                "trajets": ["basile_yard_to_workbench", "basile_workbench_to_yard", "basile_yard_to_beam",
                            "basile_yard_to_train"]},
-    "jeanne": {"matin": "quay_bench", "midi": "riverbank", "soir": "village_square", "absente": "village_exit",
-               "trajets": ["jeanne_exit_to_bench", "jeanne_bench_to_riverbank", "jeanne_riverbank_to_square",
-                           "jeanne_square_to_exit"]},
+    # Tour 10 (conception 1.4): Jeanne ne sort plus par `village_exit`, elle rentre avec Solange chez Lucie à
+    # 18 h 30 (à reporter dans habitants.json par le lot L3).
+    "jeanne": {"matin": "quay_bench", "midi": "riverbank", "soir": "village_square", "nuit": "lucie_house_door",
+               "ecole": "school_gate",
+               "trajets": ["jeanne_home_to_bench", "jeanne_bench_to_riverbank", "jeanne_riverbank_to_square",
+                           "solange_square_to_lucie", "jeanne_home_to_school"]},
+    "achille": {"matin": "bakery_window", "midi": "upper_street_bench", "apres_midi": "bakery_window (absent, il dort)",
+                "soir": "fishing_ford_north", "lundi": "fishing_pontoon", "samedi": "train_stop",
+                "paniere": "grocery_door",
+                "trajets": ["achille_basket_to_grocery", "achille_grocery_to_bakery", "achille_bakery_to_bench",
+                            "achille_bakery_to_ford", "achille_bakery_to_train", "achille_train_to_hatch"]},
+    "solange": {"matin": "salon_counter", "midi": "salon_counter (absente, chez elle)", "soir": "village_square",
+                "nuit": "salon_counter (absente)", "dimanche": "riverbank, grocery_table", "lundi": "salon_window",
+                "samedi": "train_stop",
+                "trajets": ["solange_salon_to_square", "solange_square_to_lucie", "solange_salon_to_riverbank",
+                            "solange_salon_to_grocery_table"]},
 }
 
 # Trajets clés contrôlés par le validateur (25 s au plus à 3,5 m/s).
@@ -766,6 +1120,10 @@ TRAJETS_CLES = [
     ["train_stop", "grocery_counter"], ["train_stop", "riverbank"], ["train_stop", "handcar_shed"],
     ["quay_bell", "bell_shadow_spot"], ["riverbank", "river_ford"], ["fishing_pontoon", "house_door"],
     ["sawmill_yard", "riverbank"], ["firmin_house", "grocery_counter"], ["forage_edge_05", "house_door"],
+    # Tour 10: la rue Haute (conception, annexe A, partie 5: 24 à 27 s prévus par le modèle du game designer).
+    ["house_door", "bakery_window"], ["house_door", "salon_door"], ["house_door", "lucie_house_door"],
+    ["house_door", "school_gate"], ["grocery_door", "bakery_door"], ["village_square", "salon_door"],
+    ["train_stop", "bakery_back"], ["house_door", "grocery_inside_counter"], ["upper_street_bench", "riverbank"],
 ]
 
 
@@ -818,6 +1176,19 @@ def main() -> int:
                       "d'arrivée; `rotation`: où regarde un habitant posté là; `cap_degres`: où regarde celui "
                       "qui s'y tient, en degrés de boussole (0 nord, 90 est), pour les directions en biais "
                       "(places de l'échelle)",
+            "interieurs": "bâtiments visitables (ADR 0016): `pieces` (rectangles `rect` de cases franchissables, "
+                          "dans l'emprise et à l'intérieur des murs), `portes` (case sur le pourtour et case "
+                          "`dehors` devant elle), `apparition` (point), `heures` (clé de premier niveau de "
+                          "reglages.json, null: toujours ouvert), `ambiance` (son), `mobilier` (mobilier fixe: "
+                          "`cases` bloquées), `fermees` (parties du bâtiment où l'on n'entre pas). Une pièce "
+                          "`a_batir` n'existe qu'une fois bâtie: `emprise` (sans le mur commun, `mur_commun`), "
+                          "`porte` percée dans le mur commun; jusque-là ses cases restent dehors",
+            "ouvertures": "seules les ouvertures `porte` d'un bâtiment à intérieur sont franchissables; comptoir, "
+                          "guichet et vitrine restent des murs",
+            "toit": "type à `toit`: hauteur à l'égout et faîtage parallèle ou perpendiculaire à la façade; "
+                    "`hauteur` est celle du faîtage",
+            "ouvrages": "ponts, passerelle, ponceau et gué du ru: `rect` des cases qu'ils occupent, `modele` à "
+                        "poser par le rendu (aucun objet posé tant que le modèle n'existe pas)",
         },
         "camera": {
             "orientation_par_defaut": "sud-est (regard vers le nord-ouest), comme le rendu (yaw = -3 PI/4)",
@@ -825,6 +1196,11 @@ def main() -> int:
             "regle": "éléments hauts au nord et à l'ouest, lieux importants au sud-est de ce qui est haut; "
                      "transparence ou découpe obligatoire pour un personnage caché derrière un bâtiment, "
                      "un arbre ou le train",
+            # Tour 10 (conception 1.3): la mercerie et la maison de Lucie restent basses et en retrait pour ne
+            # pas cacher la chaussée de la rue de la halte et de la route des hameaux en orientation 0.
+            "rues_degagees": [
+                {"id": "rue_de_la_halte_est", "rect": rect(62, 21, 25, 2), "objets": ["salon_shop", "lucie_house"]},
+            ],
         },
         "terrain": {
             "legende": LEGENDE,
@@ -842,6 +1218,9 @@ def main() -> int:
             "mobilier_depart": MOBILIER_DEPART,
             "note": "cx, cy d'un meuble: case nord-ouest de son emprise (objets.json, footprint w x d)",
         },
+        "interieurs": INTERIEURS,
+        "ru": RU,
+        "ouvrages": OUVRAGES,
         "accroches": ACCROCHES,
         "sieges": SIEGES,
         "chantiers": CHANTIERS,
@@ -854,13 +1233,23 @@ def main() -> int:
              "ouverte": False},
             {"id": "exit_line_east", "nature": "voie des Vergers (chapitre 2)", "ouverte": False},
             {"id": "exit_old_road_south", "nature": "vieille route au sud du gué", "ouverte": False},
-            {"id": "exit_east_promenade", "nature": "haut du bourg, par la promenade (habitants seulement)",
-             "ouverte": False, "point": "village_exit"},
+            {"id": "exit_hamlets_road", "nature": "route des hameaux, au bout est (habitants seulement; tour 10: "
+             "elle remplace la sortie par la promenade)", "ouverte": False, "point": "village_exit"},
         ],
     }
     for o in OBJETS:
         x0, y0, w, h = emprise_monde(o, TYPES)
         o["rect"] = {"x": x0, "y": y0, "w": w, "h": h}
+    # Portes des bâtiments visitables: les ouvertures `porte` de leur objet (une seule source de vérité).
+    par_id = {o["id"]: o for o in OBJETS}
+    points_porte = {"house": "house_door", "grocery": "grocery_door", "salon": "salon_door"}
+    for b in INTERIEURS:
+        portes = []
+        for nom, ((cx, cy), (fx, fy)) in ouvertures(par_id[b["objet"]], TYPES).items():
+            if nom.startswith("porte"):
+                portes.append({"id": f"{b['id']}_{nom}", "cx": cx, "cy": cy, "dehors": {"cx": fx, "cy": fy},
+                               "point": points_porte[b["id"]]})
+        b["portes"] = portes
     carte["infranchissable"] = calculer_infranchissable(carte)
 
     SORTIE.parent.mkdir(parents=True, exist_ok=True)

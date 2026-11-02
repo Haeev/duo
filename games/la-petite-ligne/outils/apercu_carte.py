@@ -25,12 +25,15 @@ from xml.sax.saxutils import escape
 
 ICI = Path(__file__).resolve().parent
 sys.path.insert(0, str(ICI))
-from valider_carte import CARTE_PAR_DEFAUT, emprise_monde, ouvertures  # noqa: E402
+from valider_carte import (  # noqa: E402
+    CARTE_PAR_DEFAUT, boites_occultantes, emprise_monde, est_porte, hauteur_toit, ouvertures,
+)
 
 COULEURS = {
     ".": "#a7c97a", ",": "#8bb563", ":": "#d9bf8c", "+": "#c4bcae", "p": "#9a6a45",
     "~": "#4f8fc0", "g": "#8fc0dc", "b": "#e6d7aa", "=": "#9a9186", "#": "#b08657",
     "q": "#d3c9b8", "s": "#a8806a", "X": "#5d7650",
+    "r": "#3f86c4", "P": "#b3a998", "Y": "#a77b4f", "j": "#b9c6cc",
 }
 BATIMENTS = {
     "station": ("#c9824f", "La halte"),
@@ -40,8 +43,14 @@ BATIMENTS = {
     "sawmill": ("#9c6b45", "Scierie de Basile"),
     "handcar_shed": ("#7f6a58", "Remise"),
     "henhouse": ("#c7a774", "Poulailler"),
+    "bakehouse": ("#c99a5b", "Fournil"),
+    "salon_shop": ("#b07aa1", "Mercerie-coiffure"),
+    "lucie_house": ("#d8b26e", "Maison de Lucie"),
+    "school_house": ("#9fa7b5", "École-mairie"),
+    "school_yard": ("#c9c2b0", "Cour de l'école"),
 }
-HABITANTS = {"firmin": "#2f5fa8", "odette": "#b33a3a", "basile": "#7a4a1f", "jeanne": "#7b3fa0"}
+HABITANTS = {"firmin": "#2f5fa8", "odette": "#b33a3a", "basile": "#7a4a1f", "jeanne": "#7b3fa0",
+             "achille": "#c27c0e", "solange": "#1f8a70"}
 ZONES_TRACEES = {
     "garden": ("#fff2c4", "potager (12 cases)"),
     "forest_edge": ("#ffd166", "lisière: 12 arbres à couper"),
@@ -67,36 +76,57 @@ def svg_vers_png(svg: str, sortie: Path, largeur: int) -> None:
 # Vue de dessus
 
 
-def vue_de_dessus(carte: dict) -> tuple[str, int]:
+def vue_de_dessus(carte: dict, region: tuple[int, int, int, int] | None = None, c: int = 16,
+                  titre: str = "") -> tuple[str, int]:
+    """Vue de dessus; `region` (x0, y0, x1, y1, bornes exclues à droite) pour une vue rapprochée."""
     larg, haut = carte["taille"]["largeur"], carte["taille"]["hauteur"]
-    c = 16  # pixels par mètre
+    rx0, ry0, rx1, ry1 = region or (0, 0, larg, haut)
     marge_g, marge_h = 34, 92
     panneau = 430
-    W = marge_g + larg * c + 20 + panneau
-    H = max(marge_h + haut * c + 44, 930)
+    complete = region is None
+    W = marge_g + (rx1 - rx0) * c + 20 + (panneau if complete else 0)
+    hauteur_panneau = marge_h + 17 * (len(carte["terrain"]["legende"]) + 2) + 15 * ((len(carte["points"]) + 1) // 2) \
+        + 16 * (len(HABITANTS) + len(ZONES_TRACEES)) + 160
+    H = max(marge_h + (ry1 - ry0) * c + 44, hauteur_panneau if complete else 0)
     types = carte["types"]
+    interieurs = {b["objet"]: b for b in carte.get("interieurs", [])}
     out: list[str] = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
                       f'viewBox="0 0 {W} {H}" font-family="{POLICE}">',
                       f'<rect width="{W}" height="{H}" fill="#f6f1e6"/>']
 
     def X(x: float) -> float:
-        return marge_g + x * c
+        return marge_g + (x - rx0) * c
 
     def Y(y: float) -> float:
-        return marge_h + y * c
+        return marge_h + (y - ry0) * c
 
     out.append(f'<text x="{marge_g}" y="30" font-size="22" font-weight="bold" fill="#2b2b2b">'
-               f'{escape(carte["nom"])}</text>')
+               f'{escape(carte["nom"])}{escape(titre)}</text>')
     out.append(f'<text x="{marge_g}" y="52" font-size="13" fill="#555">Vue de dessus, 1 case = 1 m, nord en haut. '
                f'Blockout: formes simples, couleurs par code de terrain.</text>')
+    out.append(f'<clipPath id="cadre"><rect x="{X(rx0)}" y="{Y(ry0)}" width="{(rx1 - rx0) * c}" '
+               f'height="{(ry1 - ry0) * c}"/></clipPath><g clip-path="url(#cadre)">')
 
     lignes = carte["terrain"]["lignes"]
     for y, ligne in enumerate(lignes):
+        if not ry0 - 1 <= y <= ry1:
+            continue
         for x, code in enumerate(ligne):
+            if not rx0 - 1 <= x <= rx1:
+                continue
             out.append(f'<rect x="{X(x)}" y="{Y(y)}" width="{c}" height="{c}" fill="{COULEURS.get(code, "#f0f")}"/>')
+            if code == "j":
+                for k in range(3):
+                    out.append(f'<ellipse cx="{X(x) + c * (0.25 + 0.25 * k)}" cy="{Y(y) + c * 0.5}" rx="{c * 0.12}" '
+                               f'ry="{c * 0.18}" fill="#8d8a84" stroke="#555"/>')
+            if code == "Y":
+                for k in range(1, 4):
+                    out.append(f'<line x1="{X(x) + k * c / 4}" y1="{Y(y)}" x2="{X(x) + k * c / 4}" y2="{Y(y) + c}" '
+                               f'stroke="#6b4a2b" stroke-width="0.8"/>')
             if code == "=":
-                out.append(f'<line x1="{X(x)}" y1="{Y(y) + 5}" x2="{X(x) + c}" y2="{Y(y) + 5}" stroke="#5b544b" stroke-width="1"/>')
-                out.append(f'<line x1="{X(x)}" y1="{Y(y) + 11}" x2="{X(x) + c}" y2="{Y(y) + 11}" stroke="#5b544b" stroke-width="1"/>')
+                for f in (0.31, 0.69):
+                    out.append(f'<line x1="{X(x)}" y1="{Y(y) + c * f}" x2="{X(x) + c}" y2="{Y(y) + c * f}" '
+                               f'stroke="#5b544b" stroke-width="1"/>')
             if code == "X":
                 out.append(f'<line x1="{X(x)}" y1="{Y(y) + c}" x2="{X(x) + c}" y2="{Y(y)}" stroke="#4a6040" stroke-width="1"/>')
     # Bord jouable
@@ -104,14 +134,20 @@ def vue_de_dessus(carte: dict) -> tuple[str, int]:
     out.append(f'<rect x="{X(b)}" y="{Y(b)}" width="{(larg - 2 * b) * c}" height="{(haut - 2 * b) * c}" '
                f'fill="none" stroke="#2b2b2b" stroke-width="1.5" stroke-dasharray="6 4"/>')
     # Grille légère
-    for x in range(0, larg + 1):
-        out.append(f'<line x1="{X(x)}" y1="{Y(0)}" x2="{X(x)}" y2="{Y(haut)}" stroke="#000" stroke-opacity="0.06"/>')
-    for y in range(0, haut + 1):
-        out.append(f'<line x1="{X(0)}" y1="{Y(y)}" x2="{X(larg)}" y2="{Y(y)}" stroke="#000" stroke-opacity="0.06"/>')
-    for x in range(0, larg + 1, 4):
-        out.append(f'<text x="{X(x)}" y="{Y(0) - 4}" font-size="9" fill="#666" text-anchor="middle">{x}</text>')
-    for y in range(0, haut + 1, 4):
-        out.append(f'<text x="{X(0) - 4}" y="{Y(y) + 3}" font-size="9" fill="#666" text-anchor="end">{y}</text>')
+    for x in range(rx0, rx1 + 1):
+        out.append(f'<line x1="{X(x)}" y1="{Y(ry0)}" x2="{X(x)}" y2="{Y(ry1)}" stroke="#000" stroke-opacity="0.06"/>')
+    for y in range(ry0, ry1 + 1):
+        out.append(f'<line x1="{X(rx0)}" y1="{Y(y)}" x2="{X(rx1)}" y2="{Y(y)}" stroke="#000" stroke-opacity="0.06"/>')
+    pas = 4 if complete else 2
+    graduations = []
+    for x in range(rx0 - rx0 % pas, rx1 + 1, pas):
+        if x >= rx0:
+            graduations.append(f'<text x="{X(x) + (c / 2 if not complete else 0)}" y="{Y(ry0) - 4}" font-size="9" '
+                               f'fill="#666" text-anchor="middle">{x}</text>')
+    for y in range(ry0 - ry0 % pas, ry1 + 1, pas):
+        if y >= ry0:
+            graduations.append(f'<text x="{X(rx0) - 4}" y="{Y(y) + 3 + (c / 2 if not complete else 0)}" '
+                               f'font-size="9" fill="#666" text-anchor="end">{y}</text>')
 
     # Zones
     for z in carte["zones"]:
@@ -132,12 +168,24 @@ def vue_de_dessus(carte: dict) -> tuple[str, int]:
             out.append(f'<rect x="{X(x0)}" y="{Y(y0)}" width="{w * c}" height="{h * c}" fill="{coul}" '
                        f'stroke="#3a2a1e" stroke-width="2"/>')
             if t.get("interieur"):
-                out.append(f'<rect x="{X(x0 + 1)}" y="{Y(y0 + 1)}" width="{(w - 2) * c}" height="{(h - 2) * c}" '
-                           f'fill="#ead8bf" stroke="#3a2a1e" stroke-width="1"/>')
+                decrit = interieurs.get(o["id"])
+                pieces = [pc["rect"] for pc in decrit["pieces"] if not pc.get("a_batir")] if decrit else \
+                    [{"x": x0 + 1, "y": y0 + 1, "w": w - 2, "h": h - 2}]
+                for r in pieces:
+                    out.append(f'<rect x="{X(r["x"])}" y="{Y(r["y"])}" width="{r["w"] * c}" height="{r["h"] * c}" '
+                               f'fill="#ead8bf" stroke="#3a2a1e" stroke-width="1"/>')
+                for m in (decrit or {}).get("mobilier", []):
+                    for mx, my in m["cases"]:
+                        out.append(f'<rect x="{X(mx) + 2}" y="{Y(my) + 2}" width="{c - 4}" height="{c - 4}" '
+                                   f'fill="#7a5a3c" fill-opacity="0.75" rx="2"/>')
+            d = c * 0.2
             for nom_o, ((dx, dy), _) in ouvertures(o, types).items():
-                coul_p = "#3a2a1e" if nom_o == "porte" else "#f4e3a1"
-                out.append(f'<rect x="{X(dx) + 3}" y="{Y(dy) + 3}" width="{c - 6}" height="{c - 6}" fill="{coul_p}"/>')
+                coul_p = "#3a2a1e" if est_porte(nom_o) else "#f4e3a1"
+                out.append(f'<rect x="{X(dx) + d}" y="{Y(dy) + d}" width="{c - 2 * d}" height="{c - 2 * d}" '
+                           f'fill="{coul_p}"/>')
             taille = 11 if w * h > 20 else 9
+            if not complete:
+                taille += 3
             ty = Y(y0) + 14 if t.get("interieur") else cy + 4
             out.append(f'<text x="{cx}" y="{ty}" font-size="{taille}" font-weight="bold" fill="#1d1208" '
                        f'text-anchor="middle">{escape(nom)}</text>')
@@ -147,9 +195,9 @@ def vue_de_dessus(carte: dict) -> tuple[str, int]:
             out.append(f'<text x="{X(x0) + 6}" y="{Y(y0) + 12}" font-size="10" fill="#3a3329">Quai</text>')
         elif o["type"] == "pontoon":
             out.append(f'<rect x="{X(x0)}" y="{Y(y0)}" width="{w * c}" height="{h * c}" fill="#a77b4f" stroke="#5a3e22"/>')
-        elif o["type"] in ("tree_oak", "tree_fir"):
-            coul = "#3f7a34" if o["type"] == "tree_oak" else "#2c5a3a"
-            rayon = 1.5 * c if o["type"] == "tree_oak" else 1.1 * c
+        elif o["type"] in ("tree_oak", "tree_fir", "tree_apple"):
+            coul = {"tree_oak": "#3f7a34", "tree_fir": "#2c5a3a", "tree_apple": "#6f9a3a"}[o["type"]]
+            rayon = {"tree_oak": 1.5, "tree_fir": 1.1, "tree_apple": 1.3}[o["type"]] * c
             out.append(f'<circle cx="{cx}" cy="{cy}" r="{rayon}" fill="{coul}" fill-opacity="0.85"/>')
             out.append(f'<circle cx="{cx}" cy="{cy}" r="3" fill="#5b3a1e"/>')
             if o.get("coupable"):
@@ -174,6 +222,32 @@ def vue_de_dessus(carte: dict) -> tuple[str, int]:
             out.append(f'<rect x="{X(x0) + 1.5}" y="{Y(y0) + 1.5}" width="{w * c - 3}" height="{h * c - 3}" '
                        f'fill="{coul}" stroke="#222" stroke-width="0.8" rx="2"/>')
 
+    # Tour 10: pièces à bâtir (emprise en tirets, pièce, porte percée dans le mur commun) et ouvrages du ru.
+    for b in carte.get("interieurs", []):
+        for pc in b["pieces"]:
+            if not pc.get("a_batir"):
+                continue
+            e, r = pc["emprise"], pc["rect"]
+            out.append(f'<rect x="{X(e["x"])}" y="{Y(e["y"])}" width="{e["w"] * c}" height="{e["h"] * c}" '
+                       f'fill="#e0a35c" fill-opacity="0.18" stroke="#8a5a2a" stroke-width="1.5" '
+                       f'stroke-dasharray="6 3"/>')
+            out.append(f'<rect x="{X(r["x"])}" y="{Y(r["y"])}" width="{r["w"] * c}" height="{r["h"] * c}" '
+                       f'fill="none" stroke="#8a5a2a" stroke-width="1" stroke-dasharray="2 2"/>')
+            for et in pc.get("etageres", []):
+                out.append(f'<rect x="{X(et["x"]) + 3}" y="{Y(et["y"]) + 3}" width="{et["w"] * c - 6}" '
+                           f'height="{et["h"] * c - 6}" fill="none" stroke="#5a3e22" stroke-dasharray="2 2"/>')
+            px, py = pc["porte"]["cx"], pc["porte"]["cy"]
+            out.append(f'<rect x="{X(px) + c * 0.2}" y="{Y(py) + c * 0.2}" width="{c * 0.6}" height="{c * 0.6}" '
+                       f'fill="none" stroke="#3a2a1e" stroke-width="1.5" stroke-dasharray="2 1"/>')
+            if not complete:
+                out.append(f'<text x="{X(r["x"] + r["w"] / 2)}" y="{Y(r["y"] + r["h"] / 2) + 4}" font-size="12" '
+                           f'font-style="italic" fill="#5a3e22" text-anchor="middle">{escape(pc["nom"])} '
+                           f'(à bâtir)</text>')
+    for ov in carte.get("ouvrages", []):
+        r = ov["rect"]
+        out.append(f'<rect x="{X(r["x"]) - 1}" y="{Y(r["y"]) - 1}" width="{r["w"] * c + 2}" height="{r["h"] * c + 2}" '
+                   f'fill="none" stroke="#1d3557" stroke-width="2"/>')
+
     # Trajets des habitants
     for tr in carte.get("trajets", []):
         coul = HABITANTS.get(tr.get("habitant", ""), "#444")
@@ -191,20 +265,29 @@ def vue_de_dessus(carte: dict) -> tuple[str, int]:
         out.append(f'<circle cx="{px}" cy="{py}" r="6.5" fill="{coul}" stroke="#fff" stroke-width="1.5"/>')
         out.append(f'<text x="{px}" y="{py + 3.2}" font-size="8" font-weight="bold" fill="#fff" '
                    f'text-anchor="middle">{n}</text>')
+        if not complete and rx0 <= p["x"] < rx1 and ry0 <= p["y"] < ry1:
+            out.append(f'<text x="{px + 8}" y="{py - 5}" font-size="9" fill="#111" stroke="#fff" stroke-width="2.5" '
+                       f'paint-order="stroke">{escape(p["id"])}</text>')
         liste.append((n, p["id"], coul))
+    out.append("</g>")
+    out.extend(graduations)
 
     # Rose des vents, échelle, caméra
-    rx, ry = X(larg) - 30, Y(haut) + 26
-    out.append(f'<text x="{X(0)}" y="{Y(haut) + 22}" font-size="11" fill="#333">10 m</text>')
-    out.append(f'<line x1="{X(0) + 34}" y1="{Y(haut) + 18}" x2="{X(10) + 34}" y2="{Y(haut) + 18}" stroke="#333" stroke-width="3"/>')
-    out.append(f'<text x="{X(14)}" y="{Y(haut) + 22}" font-size="11" fill="#333">Caméra par défaut au sud-est '
-               f'(regard vers le nord-ouest): le haut est au nord-ouest, le bas au sud-est.</text>')
-    out.append(f'<text x="{rx}" y="{Y(0) - 14}" font-size="12" font-weight="bold" fill="#333" text-anchor="middle">N</text>')
-    out.append(f'<line x1="{rx}" y1="{Y(0) - 26}" x2="{rx}" y2="{Y(0) - 40}" stroke="#333" stroke-width="2"/>')
-    del ry
+    rx = X(rx1) - 30
+    out.append(f'<text x="{X(rx0)}" y="{Y(ry1) + 22}" font-size="11" fill="#333">10 m</text>')
+    out.append(f'<line x1="{X(rx0) + 34}" y1="{Y(ry1) + 18}" x2="{X(rx0 + 10) + 34}" y2="{Y(ry1) + 18}" stroke="#333" '
+               f'stroke-width="3"/>')
+    out.append(f'<text x="{X(rx0 + 14) + 34}" y="{Y(ry1) + 22}" font-size="11" fill="#333">Caméra par défaut au '
+               f'sud-est (regard vers le nord-ouest).</text>')
+    out.append(f'<text x="{rx}" y="{Y(ry0) - 14}" font-size="12" font-weight="bold" fill="#333" '
+               f'text-anchor="middle">N</text>')
+    out.append(f'<line x1="{rx}" y1="{Y(ry0) - 26}" x2="{rx}" y2="{Y(ry0) - 40}" stroke="#333" stroke-width="2"/>')
+    if not complete:
+        out.append("</svg>")
+        return "\n".join(out), W
 
     # Panneau de légende
-    px0 = marge_g + larg * c + 22
+    px0 = marge_g + (rx1 - rx0) * c + 22
     yy = marge_h
     out.append(f'<text x="{px0}" y="{yy}" font-size="14" font-weight="bold" fill="#2b2b2b">Terrain</text>')
     yy += 8
@@ -298,6 +381,7 @@ def vue_iso(carte: dict) -> tuple[str, int]:
             poly([P(x0, y0, z1), P(x1, y0, z1), P(x1, y1, z1), P(x0, y1, z1)], haut_, "#222", 0.3),
         ]
 
+    volumes = {b[0]: b for b in boites_occultantes(carte, False)}
     for o in carte["objets"]:
         t = types[o["type"]]
         x0, y0, w, h = emprise_monde(o, types)
@@ -307,14 +391,16 @@ def vue_iso(carte: dict) -> tuple[str, int]:
             coul = BATIMENTS[o["type"]][0]
             for yy in range(y0, y0 + h):
                 for xx in range(x0, x0 + w):
-                    elements.append((xx + yy, 0, colonne(xx, yy, xx + 1, yy + 1, 0, t["hauteur"], coul, "#8c4b3a")))
-        elif o["type"] in ("tree_oak", "tree_fir"):
+                    # Toit à deux pans (types à `toit`): chaque colonne monte à la hauteur du toit en son milieu.
+                    z1 = hauteur_toit(volumes[o["id"]], xx + 0.5, yy + 0.5) if o["id"] in volumes else t["hauteur"]
+                    elements.append((xx + yy, 0, colonne(xx, yy, xx + 1, yy + 1, 0, z1, coul, "#8c4b3a")))
+        elif o["type"] in ("tree_oak", "tree_fir", "tree_apple"):
             cx, cy = o["x"], o["y"]
             occ = t["occultation_arbre"]
             tronc, houp = occ["tronc"], occ["houppier"]
             svg = colonne(cx - 0.2, cy - 0.2, cx + 0.2, cy + 0.2, 0, houp[1], "#6b4423")
             demi = houp[0] / 2 * 0.8
-            coul = "#3f7a34" if o["type"] == "tree_oak" else "#2c5a3a"
+            coul = {"tree_oak": "#3f7a34", "tree_fir": "#2c5a3a", "tree_apple": "#6f9a3a"}[o["type"]]
             if o.get("coupable"):
                 coul = "#5a9a3c" if o["type"] == "tree_oak" else "#3c7a4a"
             svg += colonne(cx - demi, cy - demi, cx + demi, cy + demi, houp[1], houp[2], coul)
@@ -356,7 +442,8 @@ def vue_iso(carte: dict) -> tuple[str, int]:
             out.append(f'<text x="{a:.1f}" y="{b:.1f}" font-size="12" font-weight="bold" fill="#111" '
                        f'stroke="#fff" stroke-width="3" paint-order="stroke" text-anchor="middle">{escape(nom)}</text>')
     for etiquette, (x, y) in {"Quai": (34, 16.5), "Place": (40, 31), "Lisière": (27, 3), "L'Aubrune": (52, 40),
-                              "Gué": (18.5, 41), "Potager": (9, 30)}.items():
+                              "Gué": (18.5, 41), "Potager": (9, 30), "Rue Haute": (77, 33), "Ru de la Côte": (62, 9),
+                              "Route des hameaux": (92, 22)}.items():
         a, b = P(x, y, 0.2)
         out.append(f'<text x="{a:.1f}" y="{b:.1f}" font-size="12" font-style="italic" fill="#111" stroke="#fff" '
                    f'stroke-width="3" paint-order="stroke" text-anchor="middle">{escape(etiquette)}</text>')
@@ -376,6 +463,15 @@ def main(argv: list[str]) -> int:
     sortie = base.parent / f"{base.name}-apercu-iso.png"
     svg_vers_png(svg, sortie, w)
     print(f"aperçu écrit: {sortie}")
+    # Tour 10: vues rapprochées, pour regarder de près la rue Haute et les intérieurs.
+    for nom, region, titre in (("est", (58, 10, 100, 40), ": la rue Haute (vue rapprochée)"),
+                               ("interieurs", (0, 14, 34, 34), ": maisonnette et épicerie (vue rapprochée)")):
+        if region[2] > carte["taille"]["largeur"]:
+            continue
+        svg, w = vue_de_dessus(carte, region=region, c=28, titre=titre)
+        sortie = base.parent / f"{base.name}-apercu-{nom}.png"
+        svg_vers_png(svg, sortie, w)
+        print(f"aperçu écrit: {sortie}")
     return 0
 
 
