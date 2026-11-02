@@ -6,6 +6,16 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 
 ## [Non publié]
 
+## [0.2.0] - 2026-11-02
+
+Duo met désormais à jour ses jeux tout seul, sans réinstaller l'application, et embarque La Petite Ligne 0.11.1.
+
+### Ajouté
+
+- Mise à jour automatique des jeux: Duo cherche les nouvelles versions au démarrage puis toutes les 6 heures, les vérifie (signature) et les installe hors des parties.
+- « Installer un jeu depuis un fichier » dans la bibliothèque, en secours sans Internet.
+- La Petite Ligne 0.11.1: la rue Haute et ses habitants, la maison qui grandit, les besoins, le rangement, les tenues; toutes les notes sont sur l'écran titre du jeu.
+
 ## [0.1.0] - 2026-10-31
 
 Première préversion de Duo, pour jouer à deux à la démo de La Petite Ligne sur le réseau de la maison.
