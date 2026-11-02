@@ -15,6 +15,7 @@
     "test": "pnpm --recursive --if-present run test",
     "verifier": "node outils/verifier-depot.mjs",
     "controler": "node outils/verifier-depot.mjs",
+    "jeu:version": "node outils/publication-jeu.mjs monter",
     "format": "prettier --write .",
     "format:verifier": "prettier --check .",
     "build:app": "pnpm --filter duo... --filter @duo/la-petite-ligne... run build",
