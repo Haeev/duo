@@ -29,6 +29,10 @@ on:
         description: Brouillon même en préversion (invisible des joueurs jusqu'à sa publication)
         type: boolean
         default: false
+      tag:
+        description: Depuis une branche, tag vX.Y.Z à créer sur ce commit avec la release (vide = fabrication seule)
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -54,9 +58,9 @@ jobs:
           node-version-file: .nvmrc
 
       - name: Tag égal à la version de l'application, section du CHANGELOG présente
-        if: github.ref_type == 'tag'
+        if: github.ref_type == 'tag' || inputs.tag != ''
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ inputs.tag || github.ref_name }}
         run: node outils/preparer-release.mjs --tag "$TAG" --controle-seul
 
   fabrication:
@@ -69,7 +73,7 @@ jobs:
   release:
     name: Release GitHub
     needs: fabrication
-    if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag' || inputs.tag != ''
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -78,7 +82,9 @@ jobs:
       run:
         shell: bash
     env:
-      TAG: ${{ github.ref_name }}
+      # Tag poussé, ou tag demandé au lancement manuel depuis une branche (créé par la release).
+      TAG: ${{ inputs.tag || github.ref_name }}
+      SUR_TAG: ${{ github.ref_type == 'tag' }}
       # Un push de tag n'a pas d'entrées (inputs.* vaut null): préversion publiée.
       PREVERSION: ${{ github.event_name != 'workflow_dispatch' || inputs.preversion }}
       BROUILLON: ${{ github.event_name == 'workflow_dispatch' && inputs.brouillon }}
@@ -133,7 +139,8 @@ jobs:
             gh release upload "$TAG" "${fichiers[@]}" --clobber
             gh release edit "$TAG" --title "$titre" --notes-file publication/notes.md
           else
-            gh release create "$TAG" "${fichiers[@]}" --verify-tag --title "$titre" --notes-file publication/notes.md "${etat[@]}"
+            if [ "$SUR_TAG" = true ]; then cible=(--verify-tag); else cible=(--target "$GITHUB_SHA"); fi
+            gh release create "$TAG" "${fichiers[@]}" "${cible[@]}" --title "$titre" --notes-file publication/notes.md "${etat[@]}"
           fi
           gh release view "$TAG" --json name,url,isDraft,isPrerelease,assets \
             --jq '"\(.name): \(.url) (brouillon: \(.isDraft), préversion: \(.isPrerelease))", (.assets[] | "  \(.name) \(.size) octets")'
