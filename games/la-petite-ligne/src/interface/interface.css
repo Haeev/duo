@@ -1988,3 +1988,37 @@
 .lpl-hud[data-nap] .lpl-toolbar {
   visibility: hidden;
 }
+
+/* Notes de version de l'écran titre: repliées par défaut, liste qui défile sans agrandir la feuille. */
+.lpl-notes {
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--lpl-color-line, rgba(0, 0, 0, 0.12));
+  padding-top: 0.5rem;
+}
+.lpl-notes__summary {
+  cursor: pointer;
+  text-align: center;
+  color: var(--lpl-color-ink-muted);
+}
+.lpl-notes__summary:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+.lpl-notes__list {
+  max-height: 9rem;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  padding-right: 0.5rem;
+}
+.lpl-notes__title {
+  font-size: 1rem;
+  margin: 0.75rem 0 0.25rem;
+}
+.lpl-notes__version ul {
+  list-style: disc;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+.lpl-notes__version li {
+  margin: 0.15rem 0;
+}

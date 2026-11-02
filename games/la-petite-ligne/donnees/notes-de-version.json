@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "notes": [
+    {
+      "version": "0.11.0",
+      "titre": "La rue Haute s'anime",
+      "changements": [
+        "Achille le boulanger, Solange la coiffeuse et Jeanne vivent leur journée dans la rue Haute.",
+        "Le fournil vend du pain chaud de 6 h à 9 h, du pain jusqu'à midi et de la brioche le dimanche.",
+        "Le salon de Solange: 15 coupes, 8 couleurs, barbes et moustaches; la première coupe est offerte, et depuis le banc tu peux proposer une coupe à l'autre.",
+        "Odette sert derrière son guichet, et on boit un chocolat chaud à sa petite table.",
+        "Les boutiques ont leurs heures: une porte fermée dit quand revenir.",
+        "Deux missions: porter à deux la panière d'Achille, et la première coupe chez Solange.",
+        "Les poules livrées arrivent à côté du poulailler, plus dans la clôture.",
+        "Duo installe désormais tout seul les nouvelles versions du jeu, sans réinstaller l'application.",
+        "Ces notes de version, sur l'écran titre."
+      ]
+    },
+    {
+      "version": "0.10.0",
+      "titre": "Un monde plus grand et une maison qui grandit",
+      "changements": [
+        "La carte s'agrandit vers l'est: le ru de la Côte, son pont, sa passerelle et son gué, et la rue Haute avec le fournil, la mercerie, l'école et la maison de Lucie.",
+        "On entre dans l'épicerie et la mercerie: les murs s'effacent quand tu es dedans.",
+        "Besoins doux: Ventre, Repos et Cœur, en icônes près du portrait et en chiffres dans le carnet. Ils donnent des bonus, jamais de pénalité.",
+        "La sieste de l'après-midi (le temps passe quatre fois plus vite à deux), les repas pris ensemble et les retrouvailles.",
+        "Le cellier et la chambre se commandent à Basile et se bâtissent à deux; une fenêtre devient une porte.",
+        "Le coffre se range en cases, avec plus de place selon les meubles, et les outils vont au râtelier.",
+        "Les rideaux s'accrochent aux fenêtres et s'ouvrent ou se ferment.",
+        "Coupes, couleurs et barbes au choix dès la création du personnage.",
+        "Le dehors s'entend étouffé dans les bâtiments; chaque intérieur a son ambiance."
+      ]
+    },
+    {
+      "version": "0.9.0",
+      "titre": "L'automne et tes retours de la première soirée",
+      "changements": [
+        "La partie continue jusqu'au samedi 64, en automne.",
+        "Le tableau du quai: catalogue par rayons, petites annonces avec récompense, chantiers du bourg payés à deux.",
+        "Nouveaux moments: les étoiles de l'Aubrune, la dame blanche, les lanternes et le salut du mécanicien.",
+        "Plus jamais coincé: un meuble ne peut plus enfermer quelqu'un, et le carnet a un bouton « Débloquer mon personnage ».",
+        "Les journées durent deux fois plus longtemps.",
+        "La souris met en valeur ce qu'on peut utiliser, un clic y va et agit, et les meubles se posent à la souris.",
+        "Une barre de progression pendant les constructions et la fabrication.",
+        "Le pain se mange avec Espace, la pluie arrose les cultures, les rideaux ne bloquent plus le passage.",
+        "Image nette sur Windows, outils tenus naturellement, ligne de pêche lancée plus loin, couchage dans le bon sens, porte visible dans la maison.",
+        "Basile ne prend plus ta place à l'établi ni sur la poutre.",
+        "Corrections de la carte: voie de garage, escalier du ponton, buissons sur les pavés, berge."
+      ]
+    },
+    {
+      "version": "0.8.0",
+      "titre": "Les saisons",
+      "changements": [
+        "Après le jour 15, tu choisis à deux de rester: la partie continue jusqu'au samedi 43.",
+        "L'été puis le premier jour de l'automne, une météo qui change et de la brume le matin.",
+        "Une commande nouvelle chaque samedi.",
+        "Les arbres repoussent, et la cueillette arrive à la lisière: ail des ours, pissenlits, mûres, girolles, noisettes.",
+        "La place pavée, des berges plus douces et un gué où l'eau court."
+      ]
+    },
+    {
+      "version": "0.7.0",
+      "titre": "Souvenirs et petite faune",
+      "changements": [
+        "Trois nouveaux moments: la chevrette du pré, le martin-pêcheur du ponton et la brume de l'Aubrune.",
+        "L'onglet Souvenirs du carnet garde les moments vus ensemble.",
+        "Des mésanges et des papillons, et une lisière ouverte sur la pâture et le pré."
+      ]
+    },
+    {
+      "version": "0.6.0",
+      "titre": "Moments rares et secrets",
+      "changements": [
+        "Six moments rares: le héron du gué, les oies, l'échelle de Basile, les mésanges, le renard de la voie, les vers luisants.",
+        "Deux quêtes où l'information n'apparaît que chez l'un de vous: les noms des poules et le mot de Lucie.",
+        "On s'assoit à deux sur les bancs."
+      ]
+    },
+    {
+      "version": "0.5.0",
+      "titre": "Un bourg plus doux et plus juste",
+      "changements": [
+        "Tout le bourg passe en formes arrondies.",
+        "Les barrières du passage à niveau barrent enfin la route et se lèvent.",
+        "Joueurs et habitants s'assoient sur les bancs."
+      ]
+    },
+    {
+      "version": "0.4.0",
+      "titre": "Gestes à deux",
+      "changements": [
+        "Pousser la draisine à deux et porter à deux le colis lourd du catalogue.",
+        "Des buts l'après-midi pour les jours plus calmes.",
+        "Les habitants te suivent du regard et te saluent."
+      ]
+    },
+    {
+      "version": "0.3.0",
+      "titre": "Plus de choses à dire et à faire",
+      "changements": [
+        "56 répliques du quotidien qui se répètent beaucoup moins.",
+        "Un événement par jour en deuxième semaine et de nouvelles envies.",
+        "Des soirées plus chaudes autour du foyer."
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "titre": "Le ressenti",
+      "changements": [
+        "Des gestes d'outil plus nets, Espace tenu pour répéter une action.",
+        "Le vent, les fumées et de nouveaux sons.",
+        "Des sauvegardes plus sûres."
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "titre": "Première version",
+      "changements": [
+        "Deux semaines à la Halte d'Aubrune: retaper la maisonnette, cultiver le potager et remplir la caisse du train chaque samedi."
+      ]
+    }
+  ]
+}

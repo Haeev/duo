@@ -39,7 +39,9 @@
     "resume": "Reprendre : {weekday} {day}, {time}",
     "helpSynced": "La semaine commence quand vous avez choisi « Commencer la semaine » sur les deux ordinateurs.",
     "resumeHelp": "La halte vous attend : {weekday} {day}, {time}.",
-    "pause": "pause et réglages de Duo"
+    "pause": "pause et réglages de Duo",
+    "notes": "Notes de version",
+    "notesVersion": "Version {version}"
   },
   "creation": {
     "overline": "Samedi 1, 9 h 50 · le train approche d'Aubrune",

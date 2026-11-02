@@ -13,6 +13,7 @@ import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts
 import { dayLabel, formModel, linesText, nextObjective, orderLines, orderQuest, orderQuestTitle, outfitTakenByPartner } from './modele';
 import { type StageModel, stageModel } from './modele-etape';
 import { nightTogetherLine } from './modele-maison';
+import { releaseNotes } from './notes-version';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { type SeasonCard, seasonCard, weatherLabel } from '../etat/semaine';
 import { playerColors, portraitSvg } from './portrait';
@@ -75,6 +76,24 @@ function svgOf(world: ReadonlyWorld, id: CharacterId, expression: Expression): s
 // ---------------------------------------------------------------------------
 // Écran titre
 
+/** Section repliable des notes de version (écran titre): la plus récente ouverte. */
+function notesSection(label: string, versionLabel: string): HTMLElement {
+  const notes = releaseNotes();
+  return el('details', { class: 'lpl-notes' }, [
+    el('summary', { class: 'lpl-notes__summary', text: label, 'data-nav-item': true }),
+    el(
+      'div',
+      { class: 'lpl-notes__list' },
+      notes.map((n) =>
+        el('section', { class: 'lpl-notes__version' }, [
+          el('h2', { class: 'lpl-notes__title', text: `${versionLabel.replace('{version}', n.version)} · ${n.titre}` }),
+          el('ul', {}, n.changements.map((c) => el('li', { text: c }))),
+        ]),
+      ),
+    ),
+  ]);
+}
+
 export class TitleScreen implements Layer {
   readonly root: HTMLElement;
   readonly closable = false;
@@ -120,6 +139,7 @@ export class TitleScreen implements Layer {
         el('div', { class: 'lpl-sheet__actions', style: 'justify-content: center', 'data-nav': 'row' }, [this.start, this.notYet]),
         this.help,
         keys,
+        notesSection(x.title.notes, x.title.notesVersion),
       ]),
     );
     this.helpText(world);
