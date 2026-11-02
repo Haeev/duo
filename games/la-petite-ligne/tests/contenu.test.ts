@@ -19,7 +19,8 @@ describe('carte', () => {
     const result = loadMap(MAP_FILES);
     expect(result.warning).toBeNull();
     expect(result.source).toBe('level');
-    expect(result.map.width).toBe(64);
+    // Tour 10 (T10-01): la rue Haute élargit la carte de 64 à 100 m.
+    expect(result.map.width).toBe(100);
     expect(result.map.garden).toHaveLength(12);
     expect(result.map.trees).toHaveLength(12);
     expect(result.map.startFurniture.length).toBeGreaterThanOrEqual(4);

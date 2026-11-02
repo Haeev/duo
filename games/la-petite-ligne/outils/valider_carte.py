@@ -11,7 +11,13 @@ Contrôles:
 6. pêche (eau profonde à 6 m au plus), cueillette au bord du bois, arbres à couper accessibles;
 7. caméra isométrique: chaque lieu important visible depuis l'orientation par défaut
    (sud-est) et depuis au moins une autre orientation;
-8. points et zones demandés par les données du jeu (donnees/*.json, README section 5).
+8. points et zones demandés par les données du jeu (donnees/*.json, README section 5);
+9. tour 10 (ADR 0016): bâtiments visitables (pièces dans l'emprise et hors des murs, porte sur le
+   pourtour et devant une case libre, pièce d'un seul tenant malgré le mobilier fixe, au moins une case
+   entre deux bâtiments visitables, aucune pièce partagée), pièces à bâtir (emprise libre, porte dans le
+   mur commun, carte entière atteignable une fois bâties); le ru de la Côte franchissable aux seuls
+   passages prévus, chacun reliant les deux rives; portes des lieux vues dans trois orientations sur
+   quatre; rue de la halte jamais cachée par les maisons basses du sud; rien de planté sur un passage.
 
 Usage: python3 games/la-petite-ligne/outils/valider_carte.py [carte.json]
 Bibliothèque standard uniquement. Code de sortie 1 s'il reste une erreur.
@@ -127,8 +133,22 @@ def cases_interieures(o: dict, types: dict) -> list[tuple[int, int]]:
     return [(x, y) for y in range(y0 + 1, y0 + h - 1) for x in range(x0 + 1, x0 + w - 1)]
 
 
-def calculer_infranchissable(carte: dict) -> dict:
-    """Grille de marche: '#' bloqué, '.' libre. Même calcul pour la construction et le contrôle."""
+def cases_rect(r: dict) -> list[tuple[int, int]]:
+    return [(x, y) for y in range(r["y"], r["y"] + r["h"]) for x in range(r["x"], r["x"] + r["w"])]
+
+
+def est_porte(nom: str) -> bool:
+    """Seules les ouvertures `porte` laissent passer; comptoir, guichet, vitrine et portail sont fermés."""
+    return nom.startswith("porte")
+
+
+def calculer_infranchissable(carte: dict, pieces_baties: bool = False) -> dict:
+    """Grille de marche: '#' bloqué, '.' libre. Même calcul pour la construction et le contrôle.
+
+    Un bâtiment à intérieur décrit dans `interieurs` n'ouvre que ses pièces (moins le mobilier fixe); sinon,
+    toutes ses cases intérieures. `pieces_baties`: ajoute les pièces `a_batir` (cellier, chambre) comme si
+    elles étaient bâties (emprise bloquée, pièce et porte du mur commun libres), pour les contrôles.
+    """
     larg = carte["taille"]["largeur"]
     haut = carte["taille"]["hauteur"]
     bord = carte["taille"]["bord"]
@@ -139,6 +159,8 @@ def calculer_infranchissable(carte: dict) -> dict:
 
     def dans(x: int, y: int) -> bool:
         return 0 <= x < larg and 0 <= y < haut
+
+    interieurs = {b["objet"]: b for b in carte.get("interieurs", [])}
 
     # Les sols posés (ponton) rendent leur emprise franchissable.
     for o in carte["objets"]:
@@ -159,10 +181,31 @@ def calculer_infranchissable(carte: dict) -> dict:
                 if dans(x, y):
                     g[y][x] = False
         if t["categorie"] == "batiment" and t.get("interieur"):
-            for x, y in cases_interieures(o, types):
+            decrit = interieurs.get(o["id"])
+            if decrit is None:
+                ouvert = cases_interieures(o, types)
+            else:
+                ouvert = [c for pc in decrit["pieces"] if not pc.get("a_batir") for c in cases_rect(pc["rect"])]
+            for x, y in ouvert:
                 g[y][x] = True
-            for (cx, cy), _ in ouvertures(o, types).values():
-                g[cy][cx] = True
+            for nom, ((cx, cy), _) in ouvertures(o, types).items():
+                if est_porte(nom):
+                    g[cy][cx] = True
+    for b in interieurs.values():
+        if pieces_baties:
+            for pc in b["pieces"]:
+                if not pc.get("a_batir"):
+                    continue
+                for x, y in cases_rect(pc["emprise"]):
+                    if dans(x, y):
+                        g[y][x] = False
+                for x, y in cases_rect(pc["rect"]):
+                    g[y][x] = True
+                g[pc["porte"]["cy"]][pc["porte"]["cx"]] = True
+        for m in b.get("mobilier", []):
+            for x, y in m["cases"]:
+                if dans(x, y):
+                    g[y][x] = False
     for y in range(haut):
         for x in range(larg):
             if x < bord or y < bord or x >= larg - bord or y >= haut - bord:
@@ -171,7 +214,8 @@ def calculer_infranchissable(carte: dict) -> dict:
         "regles": {
             "terrain": "codes dont `franchissable` vaut false dans la légende (eau profonde, bord)",
             "objets": "toute l'emprise des objets, sauf les sols posés (quai, ponton) et les types marqués "
-                      "franchissables; bâtiment à intérieur: murs seulement, porte et pièce libres",
+                      "franchissables; bâtiment à intérieur: murs seulement, portes et pièces (`interieurs`) "
+                      "libres, mobilier fixe bloqué; comptoirs, guichets et vitrines fermés",
             "bord": "les cases à moins de `taille.bord` du bord de la carte",
             "train": "en plus, la zone `train_at_platform` quand le train est à quai",
         },
@@ -268,8 +312,32 @@ class Lieux:
 # Caméra isométrique
 
 
-def boites_occultantes(carte: dict, avec_train: bool) -> list[tuple[str, float, float, float, float, float, float]]:
-    """(id, x0, y0, x1, y1, z0, z1) des volumes qui peuvent cacher la vue."""
+def profil_toit(o: dict, t: dict) -> tuple[str, float] | None:
+    """Toit à deux pans d'un type à `toit`: (axe du faîtage dans le monde, hauteur à l'égout)."""
+    toit = t.get("toit")
+    if not toit:
+        return None
+    facade_le_long_de_x = o["rotation"] % 2 == 0
+    parallele = toit.get("faitage", "parallele") == "parallele"
+    axe = "x" if facade_le_long_de_x == parallele else "y"
+    return axe, float(toit["egout"])
+
+
+def hauteur_toit(boite: tuple, x: float, y: float) -> float:
+    """Hauteur du volume en (x, y): le faîte au milieu, l'égout sur les deux longs pans."""
+    _, x0, y0, x1, y1, _, z1, profil = boite
+    if profil is None:
+        return z1
+    axe, egout = profil
+    if axe == "x":  # faîtage est-ouest: la hauteur varie avec y
+        milieu, demi, u = (y0 + y1) / 2, (y1 - y0) / 2, y
+    else:
+        milieu, demi, u = (x0 + x1) / 2, (x1 - x0) / 2, x
+    return egout + (z1 - egout) * max(0.0, 1.0 - abs(u - milieu) / demi)
+
+
+def boites_occultantes(carte: dict, avec_train: bool) -> list[tuple]:
+    """(id, x0, y0, x1, y1, z0, z1, profil) des volumes qui peuvent cacher la vue (profil: toit, ou None)."""
     types = carte["types"]
     boites = []
     for o in carte["objets"]:
@@ -279,25 +347,27 @@ def boites_occultantes(carte: dict, avec_train: bool) -> list[tuple[str, float, 
         cx, cy = o["x"], o["y"]
         if "occultation_arbre" in t:
             for cote, z0, z1 in t["occultation_arbre"].values():
-                boites.append((o["id"], cx - cote / 2, cy - cote / 2, cx + cote / 2, cy + cote / 2, z0, z1))
+                boites.append((o["id"], cx - cote / 2, cy - cote / 2, cx + cote / 2, cy + cote / 2, z0, z1, None))
         elif "occultation" in t:
             cote, z0, z1 = t["occultation"]
-            boites.append((o["id"], cx - cote / 2, cy - cote / 2, cx + cote / 2, cy + cote / 2, z0, z1))
+            boites.append((o["id"], cx - cote / 2, cy - cote / 2, cx + cote / 2, cy + cote / 2, z0, z1, None))
         else:
             x0, y0, w, h = emprise_monde(o, types)
-            boites.append((o["id"], x0, y0, x0 + w, y0 + h, 0.0, t["hauteur"]))
+            boites.append((o["id"], x0, y0, x0 + w, y0 + h, 0.0, t["hauteur"], profil_toit(o, t)))
     # Un poteau, un lampadaire ou un tronc plus fins que 0,6 m ne cachent pas tout un personnage.
     boites = [b for b in boites if b[3] - b[1] >= 0.6 or b[4] - b[2] >= 0.6]
     if avec_train:
         r = next(z for z in carte["zones"] if z["id"] == "train_at_platform")["rect"]
-        boites.append(("train", r["x"], r["y"] + 0.15, r["x"] + r["w"], r["y"] + r["h"] - 0.15, 0.0, HAUTEUR_TRAIN))
+        boites.append(("train", r["x"], r["y"] + 0.15, r["x"] + r["w"], r["y"] + r["h"] - 0.15, 0.0, HAUTEUR_TRAIN,
+                       None))
     return boites
 
 
 def cache_par(px: float, py: float, hp: float, direction: tuple[float, float], boites: list,
               exclus: set[str]) -> str | None:
     ux, uy = direction[0] / SQRT2, direction[1] / SQRT2
-    for ident, x0, y0, x1, y1, z0, z1 in boites:
+    for boite in boites:
+        ident, x0, y0, x1, y1, z0, z1, profil = boite
         if ident in exclus or z1 <= hp:
             continue
         s_bas = max(0.0, (z0 - hp) / TAN_E)
@@ -312,7 +382,14 @@ def cache_par(px: float, py: float, hp: float, direction: tuple[float, float], b
                 t1, t2 = t2, t1
             s_bas, s_haut = max(s_bas, t1), min(s_haut, t2)
         if s_bas < s_haut:
-            return ident
+            if profil is None:
+                return ident
+            # Toit à deux pans: on suit le rayon dans le volume, par pas de 5 cm.
+            s = s_bas
+            while s < s_haut:
+                if hp + s * TAN_E < hauteur_toit(boite, px + ux * s, py + uy * s):
+                    return ident
+                s += 0.05
     return None
 
 
@@ -438,7 +515,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                     rapport.erreur(f"emprises qui se chevauchent: {occupe[(x, y)]} et {o['id']} en ({x}, {y})")
                 occupe[(x, y)] = o["id"]
                 c = lignes[y][x]
-                if t["categorie"] != "batiment" and c in "~=#gp":
+                if t["categorie"] != "batiment" and c in "~=#gprPYj":
                     if not (c == "~" and "~" in t.get("sols_permis", [])):
                         rapport.erreur(f"{o['id']}: posé sur un sol interdit {c!r} en ({x}, {y})")
 
@@ -515,8 +592,10 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         for nom, ((cx, cy), (fx, fy)) in ouvertures(o, types).items():
             if not (0 <= fx < larg and 0 <= fy < haut) or not libre[fy][fx]:
                 rapport.erreur(f"{o['id']}: {nom} bloquée (case devant ({fx}, {fy}) infranchissable)")
-            if t.get("interieur") and not libre[cy][cx]:
+            if t.get("interieur") and est_porte(nom) and not libre[cy][cx]:
                 rapport.erreur(f"{o['id']}: {nom} ({cx}, {cy}) infranchissable alors que la pièce est jouable")
+            if not est_porte(nom) and libre[cy][cx]:
+                rapport.erreur(f"{o['id']}: {nom} ({cx}, {cy}) franchissable (seules les portes laissent passer)")
 
     # Maison
     maison = carte["maison"]
@@ -563,8 +642,12 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
             if sorted(f"{k}x{v}" for k, v in dans_carte.items()) != depart_meubles:
                 rapport.erreur(f"maison: mobilier de départ {dans_carte} différent de objets.json {depart_meubles}")
 
-    # Potager
     reglages = _charger(chemin_donnees, "reglages.json") if chemin_donnees else None
+    controler_interieurs(carte, rapport, libre, lieux, depart, reglages, resultats)
+    controler_ru(carte, rapport, libre, lieux, resultats)
+    controler_details(carte, rapport)
+
+    # Potager
     if "garden" in zones:
         g = zones["garden"]
         cases_g = {(x, y) for y in range(g["y"], g["y"] + g["h"]) for x in range(g["x"], g["x"] + g["w"])}
@@ -597,9 +680,11 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         for o in coupables:
             if not any(c in atteint for c in lieux.cases(o["id"], libre)):
                 rapport.erreur(f"arbre {o['id']}: aucune case atteignable autour")
-        for o in arbres:
+        # Le code ne lit comme arbres (à couper) que les chênes et sapins coupables; les autres arbres (pommiers
+        # du verger de Lucie, tour 10) sont du décor comme les autres objets.
+        for o in coupables:
             if o["type"] not in ("tree_oak", "tree_fir"):
-                rapport.erreur(f"arbre {o['id']}: seuls tree_oak et tree_fir existent dans la démo")
+                rapport.erreur(f"arbre {o['id']}: seuls tree_oak et tree_fir se coupent")
 
     # 5. Trajets clés et portage
     vitesse = carte.get("trajets_cles", {}).get("vitesse", 3.5)
@@ -707,7 +792,24 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                     if qui:
                         rapport.erreur(f"caméra: case du potager ({x}, {y}) cachée par {qui}")
     resultats["visibilite"] = vis
+    # Tour 10 (T10-03): la porte de chaque lieu nouveau, vue dans au moins trois orientations sur quatre.
+    for pid, res in vis.items():
+        if points[pid].get("porte_lieu") and sum(v is None for v in res.values()) < 3:
+            caches = ", ".join(f"{n} ({v})" for n, v in res.items() if v is not None)
+            rapport.erreur(f"caméra: porte {pid} vue dans moins de trois orientations (cachée: {caches})")
+    # Tour 10: des rues que certains bâtiments ne doivent pas cacher en orientation par défaut.
     boites = boites_occultantes(carte, False)
+    for regle in carte.get("camera", {}).get("rues_degagees", []):
+        sous = [b for b in boites if b[0] in set(regle["objets"])]
+        caches = []
+        for x, y in cases_rect(regle["rect"]):
+            qui = cache_par(x + 0.5, y + 0.5, HAUTEUR_PERSONNAGE, ORIENTATIONS[PAR_DEFAUT], sous, set())
+            if qui:
+                caches.append(((x, y), qui))
+        if caches:
+            rapport.erreur(f"caméra: {regle['id']}: {len(caches)} cases cachées en orientation par défaut, par "
+                           f"exemple {caches[:3]}")
+        resultats[f"rue {regle['id']}"] = len(caches)
     parts = {}
     for nom, d in ORIENTATIONS.items():
         cachees = sum(1 for y in range(haut) for x in range(larg) if libre[y][x]
@@ -747,6 +849,302 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     if chr(0x2014) in texte or chr(0x2013) in texte:
         rapport.erreur("typographie: tiret cadratin ou demi-cadratin dans la carte")
     return resultats
+
+
+def _composantes(cases: set[tuple[int, int]]) -> list[set[tuple[int, int]]]:
+    """Composantes connexes (8 voisins sans couper les angles) d'un ensemble de cases libres."""
+    reste = set(cases)
+    res = []
+    while reste:
+        debut = reste.pop()
+        comp = {debut}
+        pile = [debut]
+        while pile:
+            x, y = pile.pop()
+            for dx, dy, _ in VOISINS:
+                n = (x + dx, y + dy)
+                if n not in reste:
+                    continue
+                if dx and dy and not ((x + dx, y) in cases and (x, y + dy) in cases):
+                    continue
+                reste.discard(n)
+                comp.add(n)
+                pile.append(n)
+        res.append(comp)
+    return res
+
+
+def _dans_rect(r: dict, x: float, y: float) -> bool:
+    return r["x"] <= x < r["x"] + r["w"] and r["y"] <= y < r["y"] + r["h"]
+
+
+def _ecart(a: dict, b: dict) -> int:
+    """Nombre de cases entre deux rectangles (0: ils se touchent ou se chevauchent)."""
+    dx = max(b["x"] - (a["x"] + a["w"]), a["x"] - (b["x"] + b["w"]), 0)
+    dy = max(b["y"] - (a["y"] + a["h"]), a["y"] - (b["y"] + b["h"]), 0)
+    return max(dx, dy)
+
+
+def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: Lieux, depart: list[str],
+                         reglages: Any, resultats: dict[str, Any]) -> None:
+    """Tour 10, ADR 0016: bâtiments visitables, pièces, portes, mobilier fixe, pièces à bâtir."""
+    interieurs = carte.get("interieurs")
+    if interieurs is None:
+        return
+    types = carte["types"]
+    objets = {o["id"]: o for o in carte["objets"]}
+    points = {p["id"]: p for p in carte["points"]}
+    haut, larg = len(libre), len(libre[0])
+    vus_pieces: dict[tuple[int, int], str] = {}
+    emprises: dict[str, dict] = {}
+    ids: set[str] = set()
+    for b in interieurs:
+        bid = b.get("id", "?")
+        if bid in ids:
+            rapport.erreur(f"intérieur {bid}: identifiant en double")
+        ids.add(bid)
+        o = objets.get(b.get("objet", ""))
+        if o is None:
+            rapport.erreur(f"intérieur {bid}: objet {b.get('objet')!r} inconnu")
+            continue
+        t = types[o["type"]]
+        if t["categorie"] != "batiment" or not t.get("interieur"):
+            rapport.erreur(f"intérieur {bid}: {o['id']} n'est pas un bâtiment à intérieur")
+            continue
+        x0, y0, w, h = emprise_monde(o, types)
+        emprises[bid] = {"x": x0, "y": y0, "w": w, "h": h}
+        dedans = set(cases_interieures(o, types))
+        pieces_actives: set[tuple[int, int]] = set()
+        mobilier = {(x, y): m["id"] for m in b.get("mobilier", []) for x, y in m["cases"]}
+        for pc in b.get("pieces", []):
+            cases = set(cases_rect(pc["rect"]))
+            for c in cases:
+                if c in vus_pieces:
+                    rapport.erreur(f"intérieur {bid}: pièce {pc['id']} partage la case {c} avec {vus_pieces[c]}")
+                vus_pieces[c] = pc["id"]
+            if not pc.get("a_batir"):
+                if not cases <= dedans:
+                    rapport.erreur(f"intérieur {bid}: pièce {pc['id']} hors de l'emprise ou dans les murs de "
+                                   f"{o['id']} ({sorted(cases - dedans)[:3]})")
+                pieces_actives |= cases
+                continue
+            # Pièce à bâtir: dans sa propre emprise, murs sur les côtés sauf le mur commun.
+            e = pc.get("emprise")
+            if e is None or pc.get("porte") is None:
+                rapport.erreur(f"intérieur {bid}: pièce à bâtir {pc['id']} sans emprise ou sans porte")
+                continue
+            emprises[f"{bid}/{pc['id']}"] = e
+            commun = pc.get("mur_commun")
+            g = e["x"] + (0 if commun == "ouest" else 1)
+            d = e["x"] + e["w"] - (0 if commun == "est" else 1)
+            hh = e["y"] + (0 if commun == "nord" else 1)
+            bb = e["y"] + e["h"] - (0 if commun == "sud" else 1)
+            utiles = {(x, y) for y in range(hh, bb) for x in range(g, d)}
+            if not cases <= utiles:
+                rapport.erreur(f"intérieur {bid}: pièce {pc['id']} hors de son emprise ou dans ses murs")
+            voisin = {"est": (1, 0), "ouest": (-1, 0), "nord": (0, -1), "sud": (0, 1)}.get(commun or "")
+            if voisin is None:
+                rapport.erreur(f"intérieur {bid}: pièce {pc['id']}: mur commun {commun!r} inconnu")
+                continue
+            # L'emprise touche le bâtiment par le mur commun, sans le chevaucher.
+            ext = set(cases_rect(e))
+            if ext & set(cases_rect(emprises[bid])):
+                rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} chevauche le bâtiment")
+            for x, y in ext:
+                if not (0 <= x < larg and 0 <= y < haut) or not libre[y][x]:
+                    rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} sur une case déjà bloquée ({x}, {y})")
+                    break
+            for oo in carte["objets"]:
+                if types[oo["type"]]["categorie"] == "sol":
+                    continue
+                if set(cases_rect(oo["rect"])) & ext:
+                    rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} occupée par {oo['id']}")
+            for ch in carte.get("chantiers", []):
+                if {tuple(c) for c in ch.get("cases", [])} & ext:
+                    rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} sur le chantier {ch['id']}")
+            # La porte du mur commun: dans le mur du bâtiment, entre la pièce et une pièce active.
+            px, py = pc["porte"]["cx"], pc["porte"]["cy"]
+            mur = set(cases_rect(emprises[bid])) - dedans
+            cote_piece = (px - voisin[0], py - voisin[1])
+            cote_maison = (px + voisin[0], py + voisin[1])
+            if (px, py) not in mur or cote_piece not in cases or cote_maison not in dedans:
+                rapport.erreur(f"intérieur {bid}: porte de {pc['id']} ({px}, {py}) pas dans le mur commun, entre "
+                               f"la pièce et la maison")
+            if pc.get("site") and pc["site"] not in points:
+                rapport.erreur(f"intérieur {bid}: site {pc['site']!r} de {pc['id']} absent des points")
+            elif pc.get("site"):
+                sp = points[pc["site"]]
+                if _dans_rect(e, sp["x"], sp["y"]):
+                    rapport.erreur(f"intérieur {bid}: le site {pc['site']} est dans l'emprise de {pc['id']}")
+            for et in pc.get("etageres", []):
+                if not set(cases_rect(et)) <= cases or cote_piece in cases_rect(et):
+                    rapport.erreur(f"intérieur {bid}: place d'étagère {et} hors de {pc['id']} ou devant la porte")
+            # Les points de la carte (hors sites) ne doivent pas tomber dans l'emprise d'une pièce à bâtir.
+            for p in carte["points"]:
+                if p["id"] != pc.get("site") and _dans_rect(e, p["x"], p["y"]):
+                    msg = f"le point {p['id']} sera dans {pc['id']} une fois bâtie"
+                    if p.get("important"):
+                        rapport.erreur(f"intérieur {bid}: {msg}")
+                    else:
+                        rapport.avert(f"intérieur {bid}: {msg} (à déplacer à ce moment-là)")
+        # Mobilier fixe: dans une pièce active.
+        for (x, y), mid in mobilier.items():
+            if (x, y) not in pieces_actives:
+                rapport.erreur(f"intérieur {bid}: mobilier {mid} hors des pièces en ({x}, {y})")
+        # Parties fermées: dans l'emprise, hors des pièces, bloquées.
+        for f in b.get("fermees", []):
+            for x, y in cases_rect(f["rect"]):
+                if (x, y) not in dedans or (x, y) in pieces_actives or libre[y][x]:
+                    rapport.erreur(f"intérieur {bid}: partie fermée {f['id']}: case ({x}, {y}) hors de l'emprise, "
+                                   f"dans une pièce ou franchissable")
+                    break
+        # Portes: sur le pourtour (pas un coin), une ouverture `porte` de l'objet, devant une case libre du
+        # dehors, et derrière elle une case libre d'une pièce.
+        ouv = {c: nom for nom, (c, _) in ouvertures(o, types).items() if est_porte(nom)}
+        if not b.get("portes"):
+            rapport.erreur(f"intérieur {bid}: aucune porte")
+        coins = {(x0, y0), (x0 + w - 1, y0), (x0, y0 + h - 1), (x0 + w - 1, y0 + h - 1)}
+        libres_piece = {c for c in pieces_actives if libre[c[1]][c[0]]}
+        for pt in b.get("portes", []):
+            c = (pt["cx"], pt["cy"])
+            f = (pt["dehors"]["cx"], pt["dehors"]["cy"])
+            sur_pourtour = (c in set(cases_rect(emprises[bid]))) and c not in dedans and c not in coins
+            if not sur_pourtour or c not in ouv:
+                rapport.erreur(f"intérieur {bid}: porte {pt['id']} {c} pas sur le pourtour ou pas une porte de "
+                               f"{o['id']}")
+                continue
+            if abs(f[0] - c[0]) + abs(f[1] - c[1]) != 1 or _dans_rect(emprises[bid], f[0] + 0.5, f[1] + 0.5) \
+                    or not libre[f[1]][f[0]]:
+                rapport.erreur(f"intérieur {bid}: porte {pt['id']}: la case du dehors {f} n'est pas libre devant "
+                               f"elle")
+            derriere = (2 * c[0] - f[0], 2 * c[1] - f[1])
+            if derriere not in libres_piece:
+                rapport.erreur(f"intérieur {bid}: porte {pt['id']}: la case derrière {derriere} n'est pas une case "
+                               f"libre d'une pièce")
+            if pt.get("point") and pt["point"] in points:
+                q = points[pt["point"]]
+                if (int(math.floor(q["x"])), int(math.floor(q["y"]))) != f:
+                    rapport.erreur(f"intérieur {bid}: le point {pt['point']} n'est pas sur la case devant la porte")
+        # Les cases libres des pièces forment un seul espace relié à la porte.
+        comps = _composantes(libres_piece | {(pt["cx"], pt["cy"]) for pt in b.get("portes", [])})
+        if len(comps) > 1:
+            rapport.erreur(f"intérieur {bid}: {len(comps)} morceaux de pièce séparés (mobilier qui coupe la pièce)")
+        # Apparition et points d'intérieur.
+        app = b.get("apparition")
+        if app not in points:
+            rapport.erreur(f"intérieur {bid}: point d'apparition {app!r} absent")
+        else:
+            a = points[app]
+            if (int(math.floor(a["x"])), int(math.floor(a["y"]))) not in libres_piece:
+                rapport.erreur(f"intérieur {bid}: apparition {app} hors d'une case libre de pièce")
+        for p in carte["points"]:
+            if p.get("interieur") and p.get("objet") == o["id"] and not p.get("etage"):
+                cases = lieux.cases(p["id"], libre)
+                if not any(c in libres_piece for c in cases):
+                    rapport.erreur(f"intérieur {bid}: point {p['id']} ne se joue depuis aucune case de pièce")
+        # Heures et ambiance.
+        heures = b.get("heures")
+        if heures is not None and reglages is not None and heures not in reglages:
+            rapport.avert(f"intérieur {bid}: heures {heures!r} pas encore dans reglages.json (lot L4)")
+        # Mobilier de départ de la maisonnette: rien devant une porte de pièce à bâtir.
+        if b.get("objet") == carte.get("maison", {}).get("objet"):
+            for pc in b.get("pieces", []):
+                if not pc.get("a_batir"):
+                    continue
+                px, py = pc["porte"]["cx"], pc["porte"]["cy"]
+                for m in carte["maison"].get("mobilier_depart", []):
+                    if (m["cx"], m["cy"]) in {(px + 1, py), (px - 1, py), (px, py + 1), (px, py - 1)} & dedans:
+                        rapport.erreur(f"maison: {m['item']} devant la future porte de {pc['id']}")
+    # Au moins une case entre deux bâtiments visitables (pièces à bâtir comprises, sauf avec leur maison).
+    cles = sorted(emprises)
+    for i, a in enumerate(cles):
+        for bk in cles[i + 1:]:
+            if a.split("/")[0] == bk.split("/")[0]:
+                continue
+            if _ecart(emprises[a], emprises[bk]) < 1:
+                rapport.erreur(f"intérieurs {a} et {bk}: moins d'une case entre eux")
+
+    # Toutes les pièces bâties: rien d'inatteignable, aucune poche, les pièces reliées (T10-21).
+    bati = grille_bool(calculer_infranchissable(carte, pieces_baties=True))
+    for ch in carte.get("chantiers", []):
+        for x, y in ch.get("cases", []):
+            bati[y][x] = False
+    sources = [c for pid in depart for c in lieux.cases(pid, bati)]
+    atteint = dijkstra(bati, sources)
+    for p in carte["points"]:
+        cases = lieux.cases(p["id"], bati)
+        if cases and not any(c in atteint for c in cases):
+            rapport.erreur(f"[pièces bâties] point {p['id']}: inatteignable")
+    poches = {(x, y) for y in range(haut) for x in range(larg) if bati[y][x]} - set(atteint)
+    if poches:
+        rapport.erreur(f"[pièces bâties] {len(poches)} cases isolées, par exemple {sorted(poches)[:5]}")
+    for b in interieurs:
+        for pc in b.get("pieces", []):
+            if pc.get("a_batir") and not any(c in atteint for c in cases_rect(pc["rect"])):
+                rapport.erreur(f"[pièces bâties] {pc['id']}: inatteignable depuis la maison")
+    resultats["atteintes pièces bâties"] = len(atteint)
+
+
+def controler_ru(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: Lieux,
+                 resultats: dict[str, Any]) -> None:
+    """Tour 10: le ru de la Côte ne se franchit qu'aux passages prévus (ponceau, pont, passerelle, gué)."""
+    ru = carte.get("ru")
+    if ru is None:
+        return
+    lignes = carte["terrain"]["lignes"]
+    passages = [o for o in carte.get("ouvrages", []) if o.get("franchit") == "ru"]
+    cases_passage: dict[tuple[int, int], str] = {}
+    for o in passages:
+        for c in cases_rect(o["rect"]):
+            cases_passage[c] = o["id"]
+    # Dans le lit du ru, chaque case est de l'eau ou un passage déclaré; l'eau bloque, un passage laisse passer.
+    for y in range(ru["de_y"], ru["a_y"] + 1):
+        for x in ru["colonnes"]:
+            if (x, y) in cases_passage:
+                if not libre[y][x] and y >= carte["taille"]["bord"]:
+                    rapport.erreur(f"ru: passage {cases_passage[(x, y)]} bloqué en ({x}, {y})")
+            elif lignes[y][x] != "r" or libre[y][x]:
+                rapport.erreur(f"ru: case ({x}, {y}) ni eau du ru ni passage déclaré")
+    # Le ru sépare deux rives: sans aucun passage, la rue Haute est hors d'atteinte depuis la maisonnette;
+    # avec un seul passage ouvert, elle est atteinte, quel que soit ce passage.
+    ouest = lieux.cases("house_door", libre)
+    est = [c for pid in ("bakery_door", "salon_door", "lucie_house_door", "school_gate")
+           for c in lieux.cases(pid, libre)]
+    if not ouest or not est:
+        return
+
+    def grille_sans(garder: str | None) -> list[list[bool]]:
+        g = [ligne[:] for ligne in libre]
+        for (x, y), oid in cases_passage.items():
+            if oid != garder:
+                g[y][x] = False
+        return g
+
+    atteint = dijkstra(grille_sans(None), ouest)
+    if any(c in atteint for c in est):
+        rapport.erreur("ru: la rue Haute est atteinte sans passer par un passage du ru (il fuit ailleurs)")
+    longueurs = {}
+    for o in passages:
+        atteint = dijkstra(grille_sans(o["id"]), ouest)
+        d = min((atteint[c] for c in est if c in atteint), default=math.inf)
+        if d == math.inf:
+            rapport.erreur(f"ru: le passage {o['id']} ne relie pas les deux rives")
+        longueurs[o["id"]] = d
+    resultats["passages du ru"] = longueurs
+
+
+def controler_details(carte: dict, rapport: Rapport) -> None:
+    """Cohérence du monde (retour R22): ni buisson, ni rocher, ni arbre planté sur un sol de passage."""
+    types = carte["types"]
+    lignes = carte["terrain"]["lignes"]
+    for o in carte["objets"]:
+        t = types[o["type"]]
+        if o["type"] in ("bush", "rock", "bramble", "bush_hazel") or t["categorie"] == "arbre":
+            x0, y0, w, h = emprise_monde(o, types)
+            for x, y in cases_rect({"x": x0, "y": y0, "w": w, "h": h}):
+                if lignes[y][x] in "+:qPYj":
+                    rapport.avert(f"{o['id']} ({o['type']}) planté sur un sol de passage {lignes[y][x]!r} en "
+                                  f"({x}, {y})")
 
 
 def _charger(dossier: Path | None, nom: str) -> Any:
@@ -807,6 +1205,13 @@ def main(argv: list[str]) -> int:
         print("  " + " " * 22 + "  ".join(f"{n:>10}" for n in noms))
         for pid, r in res["visibilite"].items():
             print(f"  {pid:>22}" + "  ".join(f"{('o' if r[n] is None else 'x ' + r[n][:8]):>10}" for n in noms))
+    if "passages du ru" in res:
+        print("\nLe ru de la Côte, un seul passage ouvert à la fois (porte de la maisonnette -> rue Haute):")
+        for pid, d in res["passages du ru"].items():
+            print(f"  {pid:>20}: {d:5.1f} m")
+    for cle in ("atteintes pièces bâties", "rue rue_de_la_halte_est"):
+        if cle in res:
+            print(f"\n{cle}: {res[cle]}")
     if "cases_cachees" in res:
         print("\nPart des cases franchissables où un personnage est caché (transparence nécessaire):")
         for n, v in res["cases_cachees"].items():
