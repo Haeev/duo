@@ -57,3 +57,6 @@ export const SCHEDULE_PERIOD_TICKS = 15;
 
 /** Distance de vue d'une culture mûre pour l'astuce A10 (m). */
 export const RIPE_VIEW_DISTANCE = 10;
+
+/** Nombre de tenues proposées à la création (les couleurs vivent dans le rendu et l'interface). */
+export const OUTFIT_COUNT = 8;

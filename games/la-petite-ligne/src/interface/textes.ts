@@ -103,7 +103,7 @@ const SupplementSchema = v.object({
     beard: str,
     /** Barbe ou moustache, dans l'ordre de `Appearance.beard`: aucune, courte, fournie, moustache. */
     beards: v.pipe(v.array(str), v.minLength(4)),
-    outfits: v.tuple([str, str, str, str]),
+    outfits: v.pipe(v.array(str), v.length(8)),
     scarf: str,
     edit: str,
     trainArriving: str,

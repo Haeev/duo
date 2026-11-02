@@ -303,6 +303,10 @@ export const PLAYER_OUTFITS: readonly { top: string; trim: string; bg: string }[
   { top: '#B5663F', trim: '#EDE6D3', bg: '#EADBCF' },
   { top: '#8BA37B', trim: '#F1EBDB', bg: '#E1E8DA' },
   { top: '#D4A746', trim: '#F3ECDA', bg: '#F1E6CC' },
+  { top: '#8C4A5E', trim: '#EFE4D6', bg: '#EBDCE0' },
+  { top: '#3F6F6A', trim: '#ECE6D5', bg: '#D8E4E1' },
+  { top: '#C9B79A', trim: '#5F4B3A', bg: '#EFE8DC' },
+  { top: '#6B7FB0', trim: '#F2EAD8', bg: '#DCE1EE' },
 ];
 
 /** Peau et cheveux de chaque personnage (la démo ne les fait pas choisir), comme `BODY_COLORS` du rendu. */

@@ -83,6 +83,22 @@ export const OUTFITS: readonly OutfitLook[] = [
     mesh: 'player_outfit_work',
     colors: { top: '#d4a746', top_trim: '#f3ecda', bottom: '#6e5b48', shoes: '#4a3a2e' },
   },
+  {
+    mesh: 'player_outfit_smock',
+    colors: { top: '#8c4a5e', top_trim: '#efe4d6', bottom: '#4f4450', shoes: '#463830' },
+  },
+  {
+    mesh: 'player_outfit_overalls',
+    colors: { top: '#3f6f6a', top_trim: '#ece6d5', bottom: '#3d4b52', shoes: '#4a3a2e' },
+  },
+  {
+    mesh: 'player_outfit_work',
+    colors: { top: '#c9b79a', top_trim: '#5f4b3a', bottom: '#5a5048', shoes: '#3f3229' },
+  },
+  {
+    mesh: 'player_outfit_smock',
+    colors: { top: '#6b7fb0', top_trim: '#f2ead8', bottom: '#2f3a52', shoes: '#4a3a2e' },
+  },
 ];
 
 /** Peau et cheveux par défaut de chaque personnage (la démo ne les fait pas choisir). */

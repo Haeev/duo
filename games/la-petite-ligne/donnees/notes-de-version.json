@@ -2,6 +2,13 @@
   "version": 1,
   "notes": [
     {
+      "version": "0.11.1",
+      "titre": "Nouvelles tenues",
+      "changements": [
+        "Quatre tenues de plus à la création: Prune, Canard, Lin et Bleuet, soit huit en tout."
+      ]
+    },
+    {
       "version": "0.11.0",
       "titre": "La rue Haute s'anime",
       "changements": [

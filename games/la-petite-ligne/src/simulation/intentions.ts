@@ -7,7 +7,7 @@ import type { Character, CharacterId, Quality } from '../etat/types';
 import { isHome } from '../etat/interieurs';
 import { bakeryBuy, openBakery } from './bourg';
 import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
-import { TOOLBAR_SLOTS } from './constantes';
+import { OUTFIT_COUNT, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
@@ -115,7 +115,7 @@ function createCharacter(
   c.appearance.hair = pick(hair, look.creationHairStyles, 0);
   c.appearance.hairColor = pick(intent.hairColor, look.hairColors, c.appearance.hairColor);
   c.appearance.beard = pick(intent.beard, look.beards, c.appearance.beard);
-  c.appearance.outfit = Math.max(0, Math.min(3, Math.round(outfit)));
+  c.appearance.outfit = Math.max(0, Math.min(OUTFIT_COUNT - 1, Math.round(outfit)));
   c.created = true;
   sim.runtime.changed = true;
   startGame(sim);

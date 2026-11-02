@@ -15,7 +15,7 @@ describe('textes de l’interface', () => {
     expect(texts.extra.creation.hairs).toHaveLength(15);
     expect(texts.extra.creation.hairColors).toHaveLength(8);
     expect(texts.extra.creation.beards).toHaveLength(4);
-    expect(texts.extra.creation.outfits).toHaveLength(4);
+    expect(texts.extra.creation.outfits).toHaveLength(8);
   });
 
   it('refuse de monter sans une clé attendue, en citant le fichier et le champ', () => {
