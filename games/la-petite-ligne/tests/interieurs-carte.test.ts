@@ -245,7 +245,7 @@ describe('état du tour 10: valeurs par défaut', () => {
     expect(sim.world.villagers.every((villager) => villager.inside === null)).toBe(true);
   });
 
-  it('sauvegarde du format 6 (écrite avant le tour 10): champs remplis, `inside` recalculé, état sous la borne', () => {
+  it('sauvegarde du format 6 (écrite avant le tour 10): champs remplis, `inside` recalculé, état sous la borne, relue au format 7', () => {
     const { content, map } = contentAndMap();
     const file = new URL('./donnees/sauvegardes/format-6-automne-jour-62.json', import.meta.url);
     const ref = JSON.parse(readFileSync(fileURLToPath(file), 'utf8')) as {
@@ -264,10 +264,10 @@ describe('état du tour 10: valeurs par défaut', () => {
       expect(c.inside === HOUSE_BUILDING).toBe(c.inHouse);
     }
     expect(sim.world.rooms).toEqual({});
-    expect(sim.world.rack).toEqual([]);
-    // L'écriture reste au format 6 (le format 7 vient avec le lot L4) et repasse la lecture.
+    // Lot L4 (format 7): les outils du coffre passent au râtelier.
+    expect(sim.world.rack.map((s) => s.item).sort()).toEqual(['axe', 'fishing_rod', 'watering_can']);
     const snap = snapshotOf(sim);
-    expect(snap.dataSchema).toBe(6);
+    expect(snap.dataSchema).toBe(7);
     const bytes = new TextEncoder().encode(JSON.stringify(snap.data)).length;
     expect(bytes).toBeLessThan(MAX_STATE_BYTES);
     const again = restoreWorld(content, map, structuredClone(snap.data), snap.dataSchema, [A, B]);

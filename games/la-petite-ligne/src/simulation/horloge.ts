@@ -7,7 +7,8 @@ import type { CharacterStatus, ClockStop } from '../etat/types';
 import { SECONDS_PER_MINUTE, SIM_HZ } from './constantes';
 import { type Sim, character, emit, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
-import { applyForm, settleNight } from './besoins';
+import { applyForm, napClockFactor, settleNight } from './besoins';
+import { isNapping } from '../etat/maison';
 import { deliverScheduledLetters } from './courrier';
 import { cancelProposalsAtNight } from './economie';
 import { pickEnvies } from './envies';
@@ -105,7 +106,8 @@ export function updateClock(sim: Sim, dt: number): void {
   if (!running) return;
   const before = clock.minutes;
   // Rythme du jour (D1, `clock.schedule`): il change à l'aube, jamais au milieu d'une journée.
-  let after = before + dt / secondsPerGameMinuteOn(sim.content.settings, clock.day);
+  // Sieste à deux (tour 10, section 3.4): le temps file `togetherClockFactor` fois plus vite.
+  let after = before + (dt * napClockFactor(sim)) / secondsPerGameMinuteOn(sim.content.settings, clock.day);
   if (clock.day >= s.lastDay.day) after = Math.min(after, s.lastDay.end);
   after = Math.min(after, s.dayEnd);
   clock.minutes = after;
@@ -134,7 +136,7 @@ function timeTriggers(sim: Sim, before: number, after: number): void {
 export function checkNight(sim: Sim): void {
   const { world } = sim;
   if (world.phase !== 'day' || world.scene !== null) return;
-  if (!world.characters.every((c) => c.status === 'sleeping')) return;
+  if (!world.characters.every((c) => c.status === 'sleeping' && !isNapping(c))) return;
   world.phase = 'night';
   for (const c of world.characters) {
     c.status = 'night';

@@ -8,10 +8,12 @@ import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
-import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, updatePlacement } from './amenagement';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, toggleCurtains, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
-import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
+import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
+import { depositFamily, sortStorage, storageMove } from './rangement';
+import { roomDeposit } from './pieces';
 import { bringPlanks, payImprovement } from './chantiers';
 import { unstick } from './deblocage';
 import { footprintCells, goTo, stopPath } from './deplacement';
@@ -329,7 +331,20 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'chest_deposit':
     case 'chest_take':
-      if (nearChest(sim, c)) chestMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'chest_deposit');
+      // Tour 10: rangement à cases et râtelier (`rangement.ts`).
+      if (nearChest(sim, c)) storageMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'chest_deposit');
+      return;
+    case 'storage_deposit_family':
+      if (nearChest(sim, c)) depositFamily(sim, c, intent.family);
+      return;
+    case 'storage_sort':
+      if (nearChest(sim, c)) sortStorage(sim);
+      return;
+    case 'room_deposit':
+      roomDeposit(sim, c, intent.room, intent.item, Math.floor(intent.count));
+      return;
+    case 'curtains':
+      if (canAct(c, sim)) toggleCurtains(sim, c, intent.furniture);
       return;
     case 'craft':
       craft(sim, c, intent.recipe);

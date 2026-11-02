@@ -12,6 +12,7 @@ import envies from '../../donnees/envies.json';
 import habitants from '../../donnees/habitants.json';
 import moments from '../../donnees/moments.json';
 import objets from '../../donnees/objets.json';
+import pieces from '../../donnees/pieces.json';
 import quetes from '../../donnees/quetes.json';
 import reglages from '../../donnees/reglages.json';
 import textes from '../../donnees/textes.json';
@@ -31,4 +32,5 @@ export const CONTENT_FILES: RawContentFiles = {
   annonces,
   chantiers,
   catalogue,
+  pieces,
 };

@@ -13,7 +13,8 @@ import { payOrder } from './economie';
 import { finishStage } from './fin';
 import { spawnHens } from './poules';
 import { startQuest } from './quetes';
-import { addStack, dropAt, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
+import { dropAt, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
+import { storeAtHome } from './rangement';
 import { gatherAt } from './deplacement';
 import { revealToBoth } from './secrets';
 import { secretEntry } from './conditions';
@@ -63,7 +64,7 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
   switch (effect.type) {
     case 'give_item':
       if (effect.to === 'cellar') {
-        addStack(world.cellar, effect.item, 'ordinary', effect.count);
+        storeAtHome(sim, effect.item, 'ordinary', effect.count);
       } else {
         const entry = effect.to === 'informed' || effect.to === 'doer' ? secretEntry(sim, null) : null;
         const who: CharacterId[] =

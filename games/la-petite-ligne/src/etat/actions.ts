@@ -87,6 +87,13 @@ export type Intent =
   | { type: 'crate_take'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_take'; item: ItemId; quality: Quality; count: number }
+  // Tour 10 (section 5): rangement à cases, « Tout déposer » par famille (catégorie d'objet), « Ranger »
+  | { type: 'storage_deposit_family'; family: string }
+  | { type: 'storage_sort' }
+  // Tour 10 (section 4.3): déposer planches et clous à la caisse du chantier d'une pièce
+  | { type: 'room_deposit'; room: string; item: ItemId; count: number }
+  // Tour 10 (section 6.2): ouvrir ou fermer des rideaux accrochés à une fenêtre
+  | { type: 'curtains'; furniture: string }
   // Fabrication, cuisine, repas
   | { type: 'craft'; recipe: RecipeId }
   | { type: 'eat'; item: ItemId }

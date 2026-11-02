@@ -11,6 +11,7 @@ import type { Character, ImprovementState } from '../etat/types';
 import { type Sim, distance, emit, newId, notifyKey, partnerOf, say } from './contexte';
 import { countInBag, takeFromBag } from './sac';
 import { POINT } from './ids';
+import { confirmOrder, isRoomOrder, morningRooms, orderAtBasile, roomName } from './pieces';
 
 export function emptyImprovements(sim: Pick<Sim, 'content'>): Record<string, ImprovementState> {
   const out: Record<string, ImprovementState> = {};
@@ -32,7 +33,9 @@ export function improvementBuilt(sim: Pick<Sim, 'world'>, id: string): boolean {
   return s !== undefined && s.builtDay !== null;
 }
 
-export function improvementName(sim: Pick<Sim, 'content'>, id: string): string {
+export function improvementName(sim: Sim, id: string): string {
+  // Tour 10: les pièces et le grand coffre se commandent aussi à Basile.
+  if (isRoomOrder(sim, id)) return roomName(sim, id);
   return rawText(sim.content.texts, 'chantiers', id, 'name') ?? id;
 }
 
@@ -103,6 +106,10 @@ export function bringPlanks(sim: Sim, c: Character, id: string, count: number): 
  * coup). Au-delà de `bigPurchaseThreshold`, l'autre doit d'abord accepter (EC-04).
  */
 export function payImprovement(sim: Sim, c: Character, id: string, amount: number | null): void {
+  if (isRoomOrder(sim, id)) {
+    orderAtBasile(sim, c, id);
+    return;
+  }
   const def = sim.content.improvements.find((x) => x.id === id);
   if (def === undefined || openImprovement(sim, def.queue)?.id !== id || !atPayPoint(sim, c, def)) return;
   const state = improvementState(sim, id);
@@ -130,6 +137,10 @@ export function payImprovement(sim: Sim, c: Character, id: string, amount: numbe
 
 /** Le versement accepté (ou petit): il s'ajoute au chantier. */
 export function creditImprovement(sim: Sim, c: Character, id: string, sum: number): void {
+  if (isRoomOrder(sim, id)) {
+    confirmOrder(sim, c, id, sum);
+    return;
+  }
   const def = sim.content.improvements.find((x) => x.id === id);
   if (def === undefined) return;
   const state = improvementState(sim, id);
@@ -163,6 +174,8 @@ export function morningImprovements(sim: Sim): void {
     notifyKey(sim, 'both', 'message', 'chantier_built', { name: improvementName(sim, def.id) });
     emit(sim, { type: 'improvement_built', improvement: def.id });
   }
+  // Tour 10: sites et pièces bâties dans la nuit, grand coffre livré.
+  morningRooms(sim);
 }
 
 /** Chantiers bâtis (compteur de l'écran d'étape). */

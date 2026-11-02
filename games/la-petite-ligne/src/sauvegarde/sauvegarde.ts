@@ -10,11 +10,16 @@ import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { stageCanContinue } from '../donnees/calendrier';
-import { type Sim, format, wrapWorld } from '../simulation/contexte';
+import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
 import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
+import { isCurtains, rehangCurtains } from '../simulation/amenagement';
+import { wakeNeedsAfterMigration } from '../simulation/besoins';
+import { buildingAt } from '../etat/carte';
+import { isTool } from '../etat/maison';
+import { addStack } from '../simulation/sac';
 import { type StepInput, step } from '../simulation/pas';
 import { settleSavedClimax } from '../simulation/moments';
 import { memoriesFromSave } from '../simulation/souvenirs';
@@ -123,7 +128,31 @@ function checkWorld(data: unknown): WorldState {
   checkMemories(data.memories);
   checkWeekly(data);
   checkTour9(data);
+  checkTour10(data);
   return data as unknown as WorldState;
+}
+
+/** Champs du format 7 (tour 10): pièces commandées, râtelier, besoins doux des personnages. */
+function checkTour10(data: Record<string, unknown>): void {
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const stacks = (v: unknown): boolean => Array.isArray(v) && v.every((s) => isRecord(s) && typeof s.item === 'string' && num(s.count));
+  if (!isRecord(data.rooms)) throw new SaveError('sauvegarde: pièces invalides');
+  for (const r of Object.values(data.rooms)) {
+    const ok =
+      isRecord(r) &&
+      (r.ordered === null || num(r.ordered)) &&
+      (r.builtDay === null || num(r.builtDay)) &&
+      stacks(r.crate) &&
+      Array.isArray(r.elementsBuilt) &&
+      r.elementsBuilt.every((e) => typeof e === 'string') &&
+      typeof r.beamPlaced === 'boolean';
+    if (!ok) throw new SaveError('sauvegarde: pièce invalide');
+  }
+  if (!stacks(data.rack)) throw new SaveError('sauvegarde: râtelier invalide');
+  for (const c of data.characters as unknown[]) {
+    const n = isRecord(c) ? c.needs : null;
+    if (!isRecord(n) || !num(n.belly) || !num(n.heart) || !num(n.apartMinutes) || !num(n.reunionsToday)) throw new SaveError('sauvegarde: besoins invalides');
+  }
 }
 
 /** Champs du tour 9 (format 6): tableau des annonces, chantiers, catalogue de la semaine. */
@@ -384,14 +413,22 @@ function catchUpWeekly(sim: Sim): void {
 }
 
 /** Migrations d'un format au suivant. */
-function migrate(data: unknown, dataSchema: number, content: Content): unknown {
+function migrate(data: unknown, dataSchema: number, content: Content, map: GameMap): unknown {
   if (dataSchema > DATA_SCHEMA) throw new SaveError(`sauvegarde d'une version plus récente (format ${dataSchema})`);
   if (dataSchema < 2 && isRecord(data)) migrateToTwoWeeks(data, content);
   if (dataSchema < 3 && isRecord(data)) migrateToMoments(data, content);
   if (dataSchema < 4 && isRecord(data)) data.memories = memoriesFromSave(data, content, dataSchema);
   if (dataSchema < 5 && isRecord(data)) migrateToStages(data, content);
   if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
+  if (dataSchema < 7 && isRecord(data) && tour10Fillable(data)) fillTour10Fields(map, data as unknown as WorldState);
   return data;
+}
+
+/** Assez de forme pour poser les défauts du tour 10 (le contrôle complet suit, `checkWorld`). */
+function tour10Fillable(data: Record<string, unknown>): boolean {
+  const people = data.characters;
+  const ok = (c: unknown): boolean => isRecord(c) && isRecord(c.pos) && isRecord(c.appearance) && isRecord(c.needs);
+  return Array.isArray(people) && people.every(ok) && Array.isArray(data.villagers) && data.villagers.every((v) => isRecord(v) && isRecord(v.pos));
 }
 
 /** Objets du catalogue que le duo a déjà (sacs, coffre, posés, en route): achetés une fois. */
@@ -481,7 +518,7 @@ export function restoreWorld(
   dataSchema: number,
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
-  const world = checkWorld(migrate(data, dataSchema, content));
+  const world = checkWorld(migrate(data, dataSchema, content, map));
   trialRun(content, map, structuredClone(world), dataSchema, players);
   return resume(content, map, world, dataSchema, players);
 }
@@ -560,11 +597,13 @@ function resume(
   for (const v of world.villagers) v.talkingWith = [];
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
-  // Tour 10 (lot L0, même format 6): besoins, coiffure, pièces, râtelier et `inside` par défaut.
-  fillTour10Fields(map, world);
+  // Tour 10: `inside` se déduit de la position (pièces bâties comprises), quel que soit le format.
+  for (const c of world.characters) c.inside = buildingAt(map, world.rooms, c.pos.x, c.pos.y);
+  for (const v of world.villagers) v.inside = v.visible ? buildingAt(map, world.rooms, v.pos.x, v.pos.y) : null;
   const scene = world.scene;
   world.scene = null;
   const sim = wrapWorld(content, map, world);
+  if (dataSchema < 7) migrateToTour10(sim);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état
@@ -610,6 +649,37 @@ function fillRegrowth(content: Content, world: WorldState): void {
     if (known === undefined) t.felledDay = t.felled ? Math.min(unknown, day) : null;
   }
   world.sharedEnvieRecent = (world as Partial<WorldState>).sharedEnvieRecent ?? [];
+}
+
+/**
+ * Format 7 (tour 10, section 7.2), après les valeurs par défaut de `fillTour10Fields`: les outils du
+ * coffre passent au râtelier (12 crochets; le reste attend au coffre, sans prendre de case), les
+ * rideaux posés sur un mur sans fenêtre vont à la fenêtre libre la plus proche de la même pièce,
+ * sinon au rangement, et les besoins doux prennent les valeurs du réveil. Rien n'est perdu: un coffre
+ * qui déborde garde tout (le panneau dit « Ça déborde »).
+ */
+function migrateToTour10(sim: Sim): void {
+  const { world, content } = sim;
+  const hooks = content.settings.storage?.rackHooks ?? 0;
+  let hung = 0;
+  const kept: typeof world.cellar = [];
+  for (const s of world.cellar) {
+    const room = Math.max(0, hooks - hung);
+    const moved = isTool(content, s.item) ? Math.min(room, s.count) : 0;
+    if (moved > 0) addStack(world.rack, s.item, s.quality, moved);
+    hung += moved;
+    if (s.count > moved) kept.push({ ...s, count: s.count - moved });
+  }
+  world.cellar = kept;
+  let rehung = false;
+  for (const f of [...world.furniture]) {
+    if (!isCurtains(content.items[f.item]) || f.window !== undefined) continue;
+    rehangCurtains(sim, f);
+    rehung = true;
+  }
+  if (rehung) notifyKey(sim, 'both', 'message', 'curtains_found_window', {});
+  for (const c of world.characters) wakeNeedsAfterMigration(sim, c);
+  sim.runtime.dynamicDirty = true;
 }
 
 /** Lit le JSON d'une sauvegarde (texte UTF-8 ou valeur déjà décodée par le SDK). */

@@ -21,7 +21,7 @@ import { toolKindOf } from './catalogue';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { placeFurniture } from './amenagement';
-import { eatFromBag } from './besoins';
+import { beginNapIfAfternoon, eatFromBag } from './besoins';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 import { holdPlaceNear, lanternTargetNear, lightLantern, takeHold } from './moments';
@@ -447,7 +447,10 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       queueHint(sim, c.id, { on: 'near_construction' });
       return;
     case 'sleep':
-      if (t.kind === 'bed') goToBed(sim, c, t.furniture);
+      if (t.kind === 'bed') {
+        goToBed(sim, c, t.furniture);
+        beginNapIfAfternoon(sim, c);
+      }
       return;
     case 'open':
       if (t.kind === 'station') openMenu(sim, c, t.menu);

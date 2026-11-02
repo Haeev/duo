@@ -19,6 +19,17 @@ import {
   DEFAULT_WEATHER,
 } from './defauts';
 import { ContentError, Reader } from './lecteur';
+import {
+  EMPTY_HOME,
+  parseAppearance,
+  parseBakery,
+  parseGrocer,
+  parseHome,
+  parseRoomsSettings,
+  parseSalon,
+  parseSoftNeeds,
+  parseStorageSettings,
+} from './maison';
 import type {
   AnimalDef,
   ClockPace,
@@ -89,6 +100,8 @@ export interface RawContentFiles {
   annonces?: unknown;
   chantiers?: unknown;
   catalogue?: unknown;
+  /** Tour 10: pièces à bâtir et fenêtres (`pieces.json`); absent: ni pièce ni fenêtre. */
+  pieces?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -1904,7 +1917,14 @@ function parseSettings(r: Reader): Settings {
         .at('formLevels')
         .items()
         .map((l) => ({ level: l.at('level').string(), below: l.at('below').number() })),
+      soft: parseSoftNeeds(needs),
     },
+    rooms: parseRoomsSettings(r.opt('rooms')),
+    storage: parseStorageSettings(r.opt('storage')),
+    bakery: parseBakery(r.opt('bakery')),
+    salon: parseSalon(r.opt('salon')),
+    grocer: parseGrocer(r.opt('grocer')),
+    appearance: parseAppearance(r.opt('appearance')),
     movement: {
       walkSpeed: movement.at('walkSpeed').number(),
       carrySpeedTogether: movement.at('carrySpeedTogether').number(),
@@ -2356,6 +2376,7 @@ export function loadContent(files: RawContentFiles): Content {
     annonces: files.annonces === undefined ? [] : parseAnnonces(root('annonces.json', files.annonces)),
     improvements: files.chantiers === undefined ? [] : parseImprovements(root('chantiers.json', files.chantiers)),
     catalogue: files.catalogue === undefined ? null : parseCatalogue(root('catalogue.json', files.catalogue)),
+    home: files.pieces === undefined ? EMPTY_HOME : parseHome(root('pieces.json', files.pieces)),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
