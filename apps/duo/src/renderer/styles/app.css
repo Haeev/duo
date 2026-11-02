@@ -686,6 +686,12 @@ input {
   margin: 0 auto;
 }
 
+.bibliotheque-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--space-4);
+}
+
 .grille-jeux {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));

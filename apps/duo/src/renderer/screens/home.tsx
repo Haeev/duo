@@ -222,6 +222,19 @@ function Library({ state }: { state: AppState }): JSX.Element {
           ))}
         </div>
       )}
+      <div class="bibliotheque-actions">
+        {/* Recours sans Internet (ADR 0010, point 7): même vérification qu'un téléchargement. */}
+        <button
+          type="button"
+          class="bouton bouton-secondaire"
+          data-testid="installer-fichier"
+          onClick={() => {
+            void send('library:install-file', null);
+          }}
+        >
+          {t.bibliotheque.installerFichier}
+        </button>
+      </div>
     </section>
   );
 }

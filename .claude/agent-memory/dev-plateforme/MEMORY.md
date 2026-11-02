@@ -17,6 +17,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 
 ## Outillage
 
+- Paquet partagé Node et principal: sources TypeScript avec imports en `.ts` et `erasableSyntaxOnly` (comme `@duo/liaison`, `@duo/paquet`). Un `.mjs` d'`outils/` l'importe par son nom de paquet: Node 22.22 retire les types sans avertissement, car le lien pnpm se résout hors de `node_modules` (vérifié le 2026-11-02). Le consommateur TypeScript ajoute `allowImportingTsExtensions`. `@duo/protocol` (imports sans extension) ne tourne pas sous Node seul.
+- yazl écrit l'heure DOS avec les accesseurs locaux: une archive reproductible veut `new Date(2000, 0, 1)` (heure locale) et `forceDosTimestamp: true`. yazl refuse d'écrire `..`: pour un test, remplacer le nom dans les octets (même longueur).
+- La CSP du lanceur interdit `fetch('duo-game://...')` depuis la page: vérifier une vignette par `naturalWidth`.
+- Constantes de test (clé publique de test, variables `DUO_TEST_*`) écrites dans une branche `if (DUO_TEST)`: absentes de `out/main/index.js` en version publiée (seuls les commentaires JSDoc restent).
 - Vite 8 (Oxc) sans greffon Preact: `oxc: { jsx: { runtime: 'automatic', importSource: 'preact' } }` dans la config du rendu.
 - Trois programmes TypeScript (Node, page, preload) plus un pour les tests Playwright: ESLint avec `parserOptions.project` (liste) et `projectService: false`, ajouté après `createEslintConfig`.
 - Le Chromium préinstallé (`/opt/pw-browsers/chromium-*/chrome-linux64/chrome`) ne correspond pas toujours à la version attendue par `@playwright/test`: passer `executablePath` en repli.

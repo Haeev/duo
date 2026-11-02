@@ -124,12 +124,31 @@ export type ToastKind =
   | 'stopped-match'
   | 'quit-duo';
 
-export interface Toast {
-  readonly id: number;
-  readonly kind: ToastKind;
-  /** Pseudo de l'autre joueur. */
-  readonly name: string;
-}
+/** Notifications des jeux installés (ADR 0010): téléchargement ou import d'un fichier. */
+export type GameToastKind =
+  | 'game-updated'
+  | 'game-installed'
+  | 'install-invalid'
+  | 'install-not-newer'
+  | 'install-unsupported'
+  | 'install-busy'
+  | 'install-failed';
+
+export type Toast =
+  | {
+      readonly id: number;
+      readonly kind: ToastKind;
+      /** Pseudo de l'autre joueur. */
+      readonly name: string;
+    }
+  | {
+      readonly id: number;
+      readonly kind: GameToastKind;
+      /** Nom du jeu (vide si le fichier n'a pas pu être lu). */
+      readonly game: string;
+      /** Version installée, ou déjà présente pour `install-not-newer`. */
+      readonly version: string;
+    };
 
 export interface Settings {
   /** `null`: suivre le réglage du système (`prefers-reduced-motion`). */

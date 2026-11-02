@@ -26,6 +26,7 @@ export const INTENT_SCHEMAS: {
   'app:quit-confirm': NoArgument,
   'app:quit-cancel': NoArgument,
   'window:toggle-fullscreen': NoArgument,
+  'library:install-file': NoArgument,
 };
 
 export type IntentCheck<C extends IntentChannel> =

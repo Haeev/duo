@@ -38,8 +38,11 @@ export const EXPECTED_FUSES = [
   ['wasmTrapHandlers', '1'],
 ];
 
-/** Marqueurs des crochets de test, interdits dans une version publiée (ADR 0013, point 1). */
-export const FORBIDDEN_MARKERS = ['__duoTest'];
+/**
+ * Marqueurs des crochets de test et clé publique de test des paquets de jeux
+ * (packages/paquet/cle-test), interdits dans une version publiée (ADR 0013, point 1).
+ */
+export const FORBIDDEN_MARKERS = ['__duoTest', 'BykDvRBr0nsJcew7Ilc4Dc4KYzGIyXYyLlJPAqBQxfs='];
 
 /** Seules entrées admises à la racine de app.asar. */
 const ASAR_TOP_LEVEL = new Set(['out', 'package.json']);
