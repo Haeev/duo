@@ -151,7 +151,7 @@ describe('HUD', () => {
     other.action = { kind: 'chop', since: sim.world.tick, duration: 30, target: null };
     expect(partnerModel(sim.world, ctx, null)?.activity).toBe('Coupe du bois à la lisière');
     other.action = { kind: 'idle', since: 0, duration: 0, target: null };
-    other.inHouse = true;
+    other.inside = 'house';
     expect(partnerModel(sim.world, ctx, null)?.activity).toBe('Dans la maisonnette');
     expect(plain(partnerModel(sim.world, ctx, 3)?.activity ?? '')).toBe('Fait une pause depuis 3 min');
     expect(partnerModel(sim.world, ctx, 3)?.state).toBe('away');

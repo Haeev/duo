@@ -12,7 +12,9 @@ describe('textes de l’interface', () => {
     expect(texts.game.ui.hud.nextGoal).toBe('Prochain objectif');
     expect(texts.game.nightScreen.finish).toBe('Finir la séance');
     expect(texts.extra.title.name).toBe('La Petite Ligne');
-    expect(texts.extra.creation.hairs).toHaveLength(3);
+    expect(texts.extra.creation.hairs).toHaveLength(15);
+    expect(texts.extra.creation.hairColors).toHaveLength(8);
+    expect(texts.extra.creation.beards).toHaveLength(4);
     expect(texts.extra.creation.outfits).toHaveLength(4);
   });
 

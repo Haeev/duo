@@ -21,10 +21,11 @@ import {
   placementReason,
   purseModel,
   splitAmount,
-  staminaModel,
   toolbarModel,
   type SlotModel,
 } from './modele';
+import { type InviteModel, type NeedIconModel, audibleNotifications, inviteModel, napModel, needIcons } from './modele-maison';
+import { needsMuted } from './preferences';
 import { SteadyWatch, watchModel } from './modele-moments';
 import { aimPromptModel, progressModel } from './modele-progression';
 import { henWrongAside } from './modele-secrets';
@@ -32,6 +33,20 @@ import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from '.
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
+
+/** Une icône de besoin du HUD (à côté du portrait, ou en petit sur la carte de l'autre). */
+interface NeedView {
+  box: HTMLSpanElement;
+  icon: SVGSVGElement;
+}
+
+/** Les trois icônes d'une rangée de besoins (Ventre, Repos, Cœur). */
+function needViews(): NeedView[] {
+  return ['belly', 'rest', 'heart'].map((need) => {
+    const svg = icon(`need-${need}-ok`);
+    return { box: el('span', { class: 'lpl-need', role: 'img', 'data-need': need }, [svg]), icon: svg };
+  });
+}
 
 interface SlotView {
   button: HTMLButtonElement;
@@ -99,8 +114,21 @@ export class Hud {
   private readonly selfPortrait: HTMLSpanElement;
   private readonly selfName: HTMLSpanElement;
   private readonly selfMood: HTMLSpanElement;
-  private readonly stamina: HTMLSpanElement;
-  private readonly staminaLabel: HTMLSpanElement;
+  /** Besoins doux (tour 10): trois icônes à trois états, sans chiffre; l'état bas en un mot. */
+  private readonly selfNeeds: HTMLSpanElement;
+  private readonly selfNeedViews: NeedView[];
+  private readonly selfNeedNote: HTMLSpanElement;
+  private readonly partnerNeeds: HTMLSpanElement;
+  private readonly partnerNeedViews: NeedView[];
+  private needsSig = '';
+  /** Invite de la maison (rideaux, chantier de la pièce): Entrée ou clic. */
+  private readonly invite: HTMLButtonElement;
+  private readonly inviteText: HTMLSpanElement;
+  private inviteModel: InviteModel | null = null;
+  /** Rêverie de la sieste: le carnet reste ouvert, « Se lever » à tout moment. */
+  private readonly nap: HTMLElement;
+  private readonly napTitle: HTMLElement;
+  private readonly napText: HTMLElement;
 
   private readonly tip: HTMLParagraphElement;
   private tipId = -1;
@@ -191,9 +219,11 @@ export class Hud {
     this.partnerName = el('span', { class: 'lpl-partner__name' });
     this.partnerIcon = icon('ui-pin');
     this.partnerActivity = el('span');
+    this.partnerNeedViews = needViews();
+    this.partnerNeeds = el('span', { class: 'lpl-needs lpl-needs--small', role: 'group' }, this.partnerNeedViews.map((v) => v.box));
     this.partner = el('div', { class: 'lpl-partner' }, [
       this.partnerPortrait,
-      this.partnerName,
+      el('span', { class: 'lpl-partner__head' }, [this.partnerName, this.partnerNeeds]),
       el('span', { class: 'lpl-partner__activity' }, [this.partnerIcon, this.partnerActivity]),
     ]);
 
@@ -211,15 +241,15 @@ export class Hud {
     this.selfPortrait = portrait('', '', token('self', host.symbol('self')));
     this.selfName = el('span', { class: 'lpl-self__name' });
     this.selfMood = el('span', { class: 'lpl-self__mood' });
-    this.staminaLabel = el('span', { class: 'lpl-stamina__label' });
-    this.stamina = el(
-      'span',
-      { class: 'lpl-stamina', role: 'meter', 'aria-label': x.hud.stamina, 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': 100 },
-      [icon('ui-stamina'), el('span', { class: 'lpl-stamina__bar' }, [el('span', { class: 'lpl-stamina__fill' })]), this.staminaLabel],
-    );
+    this.selfNeedViews = needViews();
+    this.selfNeedNote = el('span', { class: 'lpl-needs__note', hidden: true });
+    this.selfNeeds = el('span', { class: 'lpl-needs', role: 'group', 'aria-label': x.needs.label }, [
+      ...this.selfNeedViews.map((v) => v.box),
+      this.selfNeedNote,
+    ]);
     this.self = el('div', { class: 'lpl-self' }, [
       this.selfPortrait,
-      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.stamina]),
+      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.selfNeeds]),
     ]);
 
     // Bas centre: avancée de l'action, invite du survol, astuce, barre d'outils, barre d'aménagement.
@@ -233,6 +263,26 @@ export class Hud {
     this.aimText = el('span');
     this.aimPrompt = el('p', { class: 'lpl-aim', role: 'status', 'aria-label': x.aim.label, hidden: true }, [keycap(x.aim.click), this.aimText]);
     this.tip = el('p', { class: 'lpl-tip', role: 'status', hidden: true });
+    this.inviteText = el('span');
+    this.invite = button([keycap(ctx.key('Enter')), this.inviteText], () => {
+      this.activateInvite();
+    }, { class: 'lpl-aim lpl-invite', attrs: { hidden: true, 'data-key': 'invite' } });
+    keepFocusOnGame(this.invite);
+    this.napTitle = el('strong', { class: 'lpl-nap__title' });
+    this.napText = el('span', { class: 'lpl-nap__text' });
+    const napNotebook = button([icon('ui-notebook'), x.nap.notebook, ' ', keycap(ctx.key('Tab'))], () => {
+      host.setMenu('notebook');
+    }, { class: 'lpl-button', attrs: { 'data-key': 'nap-notebook' } });
+    const napGetUp = button([x.nap.getUp, ' ', keycap(ctx.key('Space'))], () => {
+      host.send({ type: 'get_up' });
+    }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-key': 'nap-get-up' } });
+    keepFocusOnGame(napNotebook);
+    keepFocusOnGame(napGetUp);
+    this.nap = el('section', { class: 'lpl-nap', role: 'status', 'aria-label': x.nap.label, hidden: true }, [
+      icon('ui-moon', 'lpl-icon lpl-nap__icon'),
+      el('span', { class: 'lpl-nap__body' }, [this.napTitle, this.napText]),
+      el('span', { class: 'lpl-nap__actions' }, [napNotebook, napGetUp]),
+    ]);
     this.toolbarHeld = el('span');
     this.toolbarDetail = el('small');
     this.toolbarCornerText = el('span');
@@ -306,7 +356,7 @@ export class Hud {
       el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
-      el('div', { class: 'lpl-hud__bottom' }, [this.progress, this.aimPrompt, this.tip, this.toolbar, this.build]),
+      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
       el('div', { class: 'lpl-hud__bottom-right' }, [shortcuts]),
     ]);
   }
@@ -441,11 +491,14 @@ export class Hud {
     setText(this.selfName, me.name);
     setAttr(this.self, 'aria-label', ctx.t(ctx.texts.extra.hud.selfLabel, { name: me.name }));
     setText(this.selfMood, form.name);
-    const st = staminaModel(ctx, me);
-    setStyleVar(this.stamina, '--lpl-value', `${Math.round(st.ratio * 100)}%`);
-    setAttr(this.stamina, 'aria-valuenow', String(Math.round(st.ratio * 100)));
-    setAttr(this.stamina, 'data-level', st.level === '' ? null : st.level);
-    setText(this.staminaLabel, st.label);
+    this.updateNeeds(world);
+    this.updateNap(world);
+
+    // Invite de la maison (rideaux, chantier de la pièce).
+    const invite = inviteModel(world, ctx);
+    this.inviteModel = invite;
+    setHidden(this.invite, invite === null);
+    setText(this.inviteText, invite?.text ?? '');
 
     // Invite de la cible survolée à la souris.
     const prompt = aimPromptModel(world, ctx);
@@ -462,6 +515,57 @@ export class Hud {
     setHidden(this.build, !placing);
     if (me.placement !== null) this.updateBuild(me.placement, characterOf(world, ctx.partner)?.name ?? '');
     else this.updateToolbar(me, now);
+  }
+
+  /** Entrée ou clic sur l'invite: ouvrir ou fermer les rideaux, regarder le chantier. Vrai si une invite était là. */
+  activateInvite(): boolean {
+    const invite = this.inviteModel;
+    if (invite === null) return false;
+    if (invite.kind === 'curtains') this.host.send({ type: 'curtains', furniture: invite.furniture });
+    else this.host.openRoomPanel();
+    return true;
+  }
+
+  /** Icônes des besoins: chez soi et en petit chez l'autre (on voit quand l'autre a faim). */
+  private updateNeeds(world: ReadonlyWorld): void {
+    const { ctx } = this.host;
+    const me = characterOf(world, ctx.me);
+    const other = characterOf(world, ctx.partner);
+    const mine = me === null ? [] : needIcons(ctx, me);
+    const theirs = other === null ? [] : needIcons(ctx, other);
+    const sig = JSON.stringify([mine, theirs, other?.name]);
+    if (sig === this.needsSig) return;
+    this.needsSig = sig;
+    const paint = (views: readonly NeedView[], models: readonly NeedIconModel[]): void => {
+      views.forEach((v, i) => {
+        const m = models[i];
+        setHidden(v.box, m === undefined);
+        if (m === undefined) return;
+        setIcon(v.icon, m.icon);
+        setAttr(v.box, 'data-tone', m.tone);
+        setAttr(v.box, 'aria-label', m.label);
+        setAttr(v.box, 'title', m.label);
+      });
+    };
+    paint(this.selfNeedViews, mine);
+    paint(this.partnerNeedViews, theirs);
+    // Le mot de l'état bas le plus pressant (Repos d'abord: c'est la seule contrainte du jeu).
+    const low = [...mine].sort((a, b) => Number(b.need === 'rest') - Number(a.need === 'rest')).find((m) => m.tone === 'low' || m.tone === 'empty');
+    setHidden(this.selfNeedNote, low === undefined);
+    setText(this.selfNeedNote, low?.state ?? '');
+    setAttr(this.selfNeedNote, 'data-tone', low?.tone ?? null);
+    setAttr(this.partnerNeeds, 'aria-label', ctx.t(ctx.texts.extra.needs.partnerLabel, { partner: other?.name ?? '' }));
+  }
+
+  /** Rêverie de la sieste, chez qui dort. */
+  private updateNap(world: ReadonlyWorld): void {
+    const nap = napModel(world, this.host.ctx);
+    setHidden(this.nap, nap === null);
+    // Pendant la sieste, la rêverie prend la place de l'objectif et de la barre d'outils.
+    setAttr(this.root, 'data-nap', nap === null ? null : 'true');
+    setAttr(this.nap, 'data-state', nap?.together === true ? 'together' : null);
+    setText(this.napTitle, nap?.title ?? '');
+    setText(this.napText, nap?.text ?? '');
   }
 
   /** Ligne d'observation et anneau: stabilisés, pour ne jamais clignoter au bord du rayon. */
@@ -559,7 +663,8 @@ export class Hud {
     this.toastFirstSight = false;
   }
 
-  private updateToasts(list: readonly Readonly<GameNotification>[], now: number, partner: string): void {
+  private updateToasts(all: readonly Readonly<GameNotification>[], now: number, partner: string): void {
+    let list = all;
     const { ctx } = this.host;
     const durationMs = this.toastDurationMs();
     this.markSeen(list, now);
@@ -568,6 +673,8 @@ export class Hud {
       const ids = new Set(list.map((n) => n.id));
       for (const id of this.seenAt.keys()) if (!ids.has(id)) this.seenAt.delete(id);
     }
+    // « Besoins en sourdine » (aide du carnet): les lignes des besoins ne paraissent pas.
+    list = audibleNotifications(list, needsMuted());
     // Astuce: la plus récente encore fraîche, en bas au centre.
     const hints = visibleToasts(
       list.filter((n) => n.kind === 'hint'),

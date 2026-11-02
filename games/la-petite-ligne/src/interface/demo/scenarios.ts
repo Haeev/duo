@@ -234,6 +234,8 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
 
 /** Sauvegarde de référence d'où part un scénario du tour 8 ou 9, ou `null` (partie neuve). */
 export function scenarioSave(name: string): string | null {
+  const t10 = TOUR10_SAVES[name];
+  if (t10 !== undefined) return t10;
   const t9 = TOUR9_SAVES[name];
   if (t9 !== undefined) return t9;
   if (name.startsWith('etape-43') || ['ete-hud', 'ete-carnet', 'ete-caisse', 'ete-courrier', 'ete-nuit', 'brume-matin'].includes(name)) return 'format-5-ete-jour-25.json';
@@ -426,6 +428,187 @@ function tour9(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
   }
 }
 
+// ---------------------------------------------------------------------------
+// Tour 10 (lot L6): besoins doux, rangement à cases, pièces bâties, rideaux, sieste, nuit, lieu de
+// l'autre. Ces situations partent de la référence du format 7 de l'été (mardi 25 à midi: coffre et
+// étagère dans la maison, ni pièce ni rideaux).
+
+const SUMMER_25_V7 = 'format-7-ete-jour-25.json';
+
+const TOUR10_SAVES: Readonly<Record<string, string>> = {
+  'besoins-hud': SUMMER_25_V7,
+  'besoins-carnet': SUMMER_25_V7,
+  rangement: SUMMER_25_V7,
+  'rangement-deborde': SUMMER_25_V7,
+  'etabli-pieces': SUMMER_25_V7,
+  chantier: SUMMER_25_V7,
+  'chantier-chambre': SUMMER_25_V7,
+  rideaux: SUMMER_25_V7,
+  'rideaux-refus': SUMMER_25_V7,
+  sieste: SUMMER_25_V7,
+  'nuit-ensemble': SUMMER_25_V7,
+  'autre-epicerie': SUMMER_25_V7,
+};
+
+/** Création du tour 10 (12 coupes, 8 couleurs, barbe): partie neuve, les deux ont passé l'écran titre. */
+export const CREATION_T10 = 'creation-coiffure';
+
+/** Besoins de la page: soi au petit creux et fatigué, l'autre au ventre plein et loin depuis longtemps. */
+function setNeeds(sim: Sim, me: CharacterId, other: CharacterId): void {
+  const self = character(sim, me);
+  self.needs.belly = 18;
+  self.endurance = Math.round(self.enduranceMax * 0.2);
+  self.needs.heart = 76;
+  self.needs.apartMinutes = 0;
+  const o = character(sim, other);
+  o.needs.belly = 72;
+  o.endurance = Math.round(o.enduranceMax * 0.6);
+  o.needs.heart = 40;
+  o.needs.apartMinutes = 200;
+}
+
+/** Les mains vides et le sac garni pour le rangement (des familles à « Tout déposer »). */
+function storageBag(sim: Sim, id: CharacterId): void {
+  const c = character(sim, id);
+  const items: (ItemStack | null)[] = [
+    stack('hoe', 1),
+    stack('watering_can', 1),
+    stack('axe', 1),
+    stack('radish', 7),
+    stack('carrot', 4, 'fine'),
+    stack('gudgeon', 2),
+    stack('dandelion', 3),
+    stack('omelette', 1),
+    stack('plank', 6),
+    null,
+    stack('nail', 4),
+    stack('log', 2),
+  ];
+  c.bag = c.bag.map((_, i) => items[i] ?? null);
+  c.selected = 9;
+}
+
+/** Près du coffre de la maison (case 6, 25), le rangement ouvert. */
+function atChest(sim: Sim, id: CharacterId): void {
+  teleport(sim, id, 7.5, 25.3);
+  apply(sim, id, [{ type: 'menu', menu: 'chest' }]);
+}
+
+/** p1 a commandé `room` la veille (le site est là ce matin), deux éléments bâtis, la caisse entamée. */
+function roomSite(sim: Sim, me: CharacterId, room: 'room_cellar' | 'room_bedroom'): void {
+  const day = sim.world.clock.day;
+  const built = room === 'room_cellar' ? ['post_south', 'post_north'] : ['post_nw', 'post_ne', 'post_sw', 'post_se', 'plate_west'];
+  sim.world.rooms[room] = { ordered: day - 1, crate: [stack('plank', 5), stack('nail', 1)], elementsBuilt: built, beamPlaced: false, builtDay: null };
+  const r = sim.map.buildings.house?.rooms.find((x) => x.build?.room === room);
+  const site = r?.build === null || r === undefined ? undefined : sim.map.points[r.build.site];
+  if (site !== undefined) teleport(sim, me, site.x, site.y);
+  const c = character(sim, me);
+  c.bag = c.bag.map((s, i) => (i === 10 ? stack('plank', 8) : i === 11 ? stack('nail', 3) : s));
+  c.selected = 9;
+  c.bag[9] = null;
+  idle(sim, 1);
+}
+
+/** Des rideaux à la fenêtre est (`window_5`), et `me` devant, les mains vides. */
+function curtainsEast(sim: Sim, me: CharacterId): void {
+  sim.world.furniture.push({ id: 'f-rideaux', item: 'curtains', cell: { cx: 10, cy: 24 }, rotation: 3, placedBy: me, window: 'window_5' });
+  teleport(sim, me, 9.6, 24.5);
+  const c = character(sim, me);
+  c.facing = 0;
+  c.bag[9] = null;
+  c.selected = 9;
+  // Un pas: la simulation recalcule le bâtiment où l'on est (`inside`).
+  idle(sim, 1);
+}
+
+function tour10(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
+  switch (name) {
+    case 'besoins-hud':
+      setNeeds(sim, me, other);
+      return undefined;
+    case 'besoins-carnet':
+      setNeeds(sim, me, other);
+      character(sim, me).needs.apartMinutes = 45;
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    case 'rangement':
+      storageBag(sim, me);
+      sim.world.cellar = [stack('radish', 12), stack('lettuce', 3, 'fine'), stack('vegetable_soup', 2), stack('jay_feather', 1), stack('crystal_radio', 1), stack('egg', 6), stack('plank', 120)];
+      sim.world.rack = [stack('axe', 1), stack('hoe', 1)];
+      atChest(sim, me);
+      return undefined;
+    case 'rangement-deborde': {
+      storageBag(sim, me);
+      const items = Object.keys(sim.content.items).filter((id) => {
+        const cat = sim.content.items[id]?.category;
+        return cat === 'crop' || cat === 'forage' || cat === 'material' || cat === 'food' || cat === 'fish' || cat === 'seed' || cat === 'decoration';
+      });
+      sim.world.cellar = items.slice(0, 30).map((item) => stack(item, 3));
+      atChest(sim, me);
+      return undefined;
+    }
+    case 'etabli-pieces':
+      sim.world.purse = 1600;
+      near(sim, me, 'sawmill_workbench');
+      apply(sim, me, [{ type: 'menu', menu: 'workbench' }]);
+      return undefined;
+    case 'chantier':
+      roomSite(sim, me, 'room_cellar');
+      return undefined;
+    case 'chantier-chambre':
+      roomSite(sim, me, 'room_bedroom');
+      return undefined;
+    case 'rideaux':
+      curtainsEast(sim, me);
+      return undefined;
+    case 'rideaux-refus': {
+      // Les rideaux en main, tourné vers le mur sud entre les deux fenêtres: aucune fenêtre visée.
+      teleport(sim, me, 8.5, 24.6);
+      const c = character(sim, me);
+      c.facing = Math.PI / 2;
+      c.bag[9] = stack('curtains', 1);
+      c.selected = 9;
+      idle(sim, 1);
+      return undefined;
+    }
+    case 'sieste': {
+      // 13 h: les deux font la sieste sur leur paillasse (le temps file à deux).
+      sim.world.clock.minutes = 13 * HOUR;
+      const beds = sim.world.furniture.filter((f) => f.item === 'straw_mattress');
+      [me, other].forEach((id, i) => {
+        const c = character(sim, id);
+        const bed = beds[i];
+        if (bed !== undefined) teleport(sim, id, bed.cell.cx + 0.5, bed.cell.cy + 0.5);
+        c.status = 'sleeping';
+        c.menu = null;
+        c.bedId = bed?.id ?? null;
+        c.needs.napStart = sim.world.clock.day * 1440 + 13 * HOUR;
+        c.action = { kind: 'sleep', since: sim.world.tick, duration: 0, target: null };
+      });
+      return undefined;
+    }
+    case 'nuit-ensemble': {
+      playUntil(sim, (s) => s.world.phase === 'night');
+      const since = sim.world.tick;
+      for (const c of sim.world.characters) c.action = { kind: 'sleep', since, duration: 0, target: null };
+      return undefined;
+    }
+    case CREATION_T10:
+      apply(sim, me, [{ type: 'title_ready', ready: true }]);
+      apply(sim, other, [{ type: 'title_ready', ready: true }]);
+      return undefined;
+    case 'autre-epicerie': {
+      setNeeds(sim, me, other);
+      const shop = sim.map.buildings.grocery?.rooms[0]?.rect;
+      if (shop !== undefined) teleport(sim, other, shop.x + 2.5, shop.y + 3.5);
+      idle(sim, 1);
+      return undefined;
+    }
+    default:
+      return null;
+  }
+}
+
 function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
   switch (name) {
     case 'etape':
@@ -503,6 +686,8 @@ function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
  */
 export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
+  const t10 = tour10(sim, name, me, other);
+  if (t10 !== null) return t10;
   const later = tour9(sim, name, me, other);
   if (later !== null) return later;
   const suite = tour8(sim, name, me, other);

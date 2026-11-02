@@ -8,7 +8,8 @@ import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
 import { linePay, productPrice } from '../etat/commande-generee';
 import { hudSeason, questTitleOf, weatherLabel } from '../etat/semaine';
-import { inRect } from '../etat/carte';
+import { HOUSE_BUILDING, inRect } from '../etat/carte';
+import { houseRoomAt, isNapping } from '../etat/maison';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
 import { henLabel, objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
@@ -226,9 +227,28 @@ function watchingLabel(world: ReadonlyWorld, ctx: UiContext, id: CharacterId): s
   return ctx.texts.extra.partner.watching[today.id] ?? ctx.texts.extra.partner.watchingAny;
 }
 
-function placeOf(ctx: UiContext, c: ReadonlyCharacter): string {
+/**
+ * Où est un personnage qui est dans un bâtiment (ADR 0016, `Character.inside`): la pièce bâtie de
+ * la maisonnette (« Dans le cellier »), sinon le bâtiment (« Au salon de Solange »), sinon « À
+ * l'intérieur ». `null` dehors.
+ */
+export function buildingPlace(world: ReadonlyWorld, ctx: UiContext, c: ReadonlyCharacter): string | null {
+  const inside = c.inside;
+  if (inside === null) return null;
   const places = ctx.texts.extra.partner.places;
-  if (c.inHouse) return places.house_interior ?? ctx.texts.extra.partner.elsewhere;
+  if (inside === HOUSE_BUILDING) {
+    const room = houseRoomAt(ctx.map, world.rooms, c.pos.x, c.pos.y);
+    const built = room?.build ?? null;
+    const label = built === null || room === null ? undefined : places[`room:${room.id}`];
+    if (label !== undefined) return label;
+  }
+  return places[`building:${inside}`] ?? ctx.texts.extra.partner.inside;
+}
+
+function placeOf(world: ReadonlyWorld, ctx: UiContext, c: ReadonlyCharacter): string {
+  const places = ctx.texts.extra.partner.places;
+  const building = buildingPlace(world, ctx, c);
+  if (building !== null) return building;
   const radius = UI_SETTINGS.partnerPlaceRadius;
   for (const id of PARTNER_POINTS) {
     const at = ctx.map.points[id];
@@ -269,7 +289,7 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
     state,
   });
   if (p.status === 'night') return make(txt.night, 'ui-moon', 'asleep');
-  if (p.status === 'sleeping') return make(txt.asleep, 'ui-moon', 'asleep');
+  if (p.status === 'sleeping') return make(isNapping(p) ? txt.napping : txt.asleep, 'ui-moon', 'asleep');
   if (p.status === 'breakfast') return make(txt.breakfast, 'bread');
   if (awayMinutes !== null) return make(ctx.t(txt.away, { minutes: awayMinutes }), 'ui-hourglass', 'away');
   if (p.status === 'scene' && world.scene !== null) {
@@ -297,7 +317,7 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
   if (running && actionText !== undefined && kind !== 'walk' && kind !== 'idle' && kind !== 'talk') {
     return make(actionText, ACTION_ICONS[kind] ?? 'ui-pin');
   }
-  return make(placeOf(ctx, p), 'ui-pin');
+  return make(placeOf(world, ctx, p), p.inside === null ? 'ui-pin' : 'ui-house');
 }
 
 // ---------------------------------------------------------------------------

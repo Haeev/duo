@@ -6,12 +6,13 @@
 import { currentOrder } from '../donnees/commandes';
 import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { Layer, UiHost } from './composant';
-import { type Expression, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
+import { type Expression, PLAYER_BEARDS, PLAYER_HAIR_COLORS, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
 import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, secretStamp, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
 import { dayLabel, formModel, linesText, nextObjective, orderLines, orderQuest, orderQuestTitle, outfitTakenByPartner } from './modele';
 import { type StageModel, stageModel } from './modele-etape';
+import { nightTogetherLine } from './modele-maison';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { type SeasonCard, seasonCard, weatherLabel } from '../etat/semaine';
 import { playerColors, portraitSvg } from './portrait';
@@ -168,6 +169,8 @@ export class CreationScreen implements Layer {
   private readonly host: UiHost;
   private mode: CreationMode = 'edit';
   private hair = 0;
+  private hairColor = 0;
+  private beard = 0;
   private outfit = 0;
   private readonly input: HTMLInputElement;
   private readonly fields: HTMLElement[] = [];
@@ -175,6 +178,8 @@ export class CreationScreen implements Layer {
   private readonly previewName: HTMLParagraphElement;
   private readonly hairPortraits: HTMLSpanElement[] = [];
   private readonly hairInputs: HTMLInputElement[] = [];
+  /** Tour 10 (section 2.2 et réponse du client): couleur des cheveux, barbe ou moustache. */
+  private readonly beardPortraits: HTMLSpanElement[] = [];
   private readonly outfitInputs: HTMLInputElement[] = [];
   /** Marque « Déjà portée par Sacha » sur la tenue que l'autre a choisie (déconseillée, pas interdite). */
   private readonly outfitTaken: HTMLSpanElement[] = [];
@@ -197,6 +202,8 @@ export class CreationScreen implements Layer {
     const g = ctx.texts.game.ui.creation;
     const me = characterOf(world, ctx.me);
     this.hair = me?.appearance.hair ?? 0;
+    this.hairColor = me?.appearance.hairColor ?? 0;
+    this.beard = me?.appearance.beard ?? 0;
     this.outfit = me?.appearance.outfit ?? 0;
     this.scarf = me?.appearance.scarf ?? this.scarf;
     if (me?.created === true) this.mode = 'done';
@@ -227,9 +234,11 @@ export class CreationScreen implements Layer {
     ]);
 
     const hairGroup = el('fieldset', { class: 'lpl-choice-group' }, [el('legend', { text: g.hair })]);
-    const hairOptions = el('div', { class: 'lpl-choice-group__options', 'data-nav': 'row' });
+    const hairOptions = el('div', { class: 'lpl-choice-group__options lpl-choice-group__options--compact', 'data-nav': 'row' });
     const radioName = uid('coiffure');
-    PLAYER_HAIRS.forEach((_, i) => {
+    // À la création, les coupes de la création seulement (les dernières sont celles du salon).
+    const creationHairs = Math.min(PLAYER_HAIRS.length, ctx.content.settings.appearance?.creationHairStyles ?? 3);
+    PLAYER_HAIRS.slice(0, creationHairs).forEach((_, i) => {
       const input = el('input', { type: 'radio', name: radioName, value: String(i), 'data-nav-item': true });
       input.checked = i === this.hair;
       input.addEventListener('change', () => {
@@ -242,6 +251,37 @@ export class CreationScreen implements Layer {
       hairOptions.append(el('label', { class: 'lpl-option' }, [input, face, x.hairs[i] ?? '']));
     });
     hairGroup.append(hairOptions);
+
+    const colorCount = Math.min(PLAYER_HAIR_COLORS.length, ctx.content.settings.appearance?.hairColors ?? 1);
+    const colorGroup = el('fieldset', { class: 'lpl-choice-group', hidden: colorCount <= 1 }, [el('legend', { text: x.hairColor })]);
+    const colorOptions = el('div', { class: 'lpl-choice-group__options lpl-choice-group__options--compact', 'data-nav': 'row' });
+    const colorName = uid('couleur');
+    PLAYER_HAIR_COLORS.slice(0, colorCount).forEach((color, i) => {
+      const input = el('input', { type: 'radio', name: colorName, value: String(i), 'data-nav-item': true, 'data-key': `hair-color:${i}` });
+      input.checked = i === this.hairColor;
+      input.addEventListener('change', () => {
+        this.hairColor = i;
+        this.refreshPreview();
+      });
+      colorOptions.append(el('label', { class: 'lpl-option lpl-option--swatch' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${color}` }), x.hairColors[i] ?? '']));
+    });
+    colorGroup.append(colorOptions);
+
+    const beardGroup = el('fieldset', { class: 'lpl-choice-group' }, [el('legend', { text: x.beard })]);
+    const beardOptions = el('div', { class: 'lpl-choice-group__options lpl-choice-group__options--compact', 'data-nav': 'row' });
+    const beardName = uid('barbe');
+    PLAYER_BEARDS.forEach((_, i) => {
+      const input = el('input', { type: 'radio', name: beardName, value: String(i), 'data-nav-item': true, 'data-key': `beard:${i}` });
+      input.checked = i === this.beard;
+      input.addEventListener('change', () => {
+        this.beard = i;
+        this.refreshPreview();
+      });
+      const face = portrait('', 'small');
+      this.beardPortraits.push(face);
+      beardOptions.append(el('label', { class: 'lpl-option' }, [input, face, x.beards[i] ?? '']));
+    });
+    beardGroup.append(beardOptions);
 
     const outfitGroup = el('fieldset', { class: 'lpl-choice-group' }, [el('legend', { text: g.outfit })]);
     const outfitOptions = el('div', { class: 'lpl-choice-group__options', 'data-nav': 'row' });
@@ -269,7 +309,7 @@ export class CreationScreen implements Layer {
       token('self', symbol),
       ctx.t(x.scarf, { profile: x.profiles[profileSymbol(this.scarf)] ?? '' }),
     ]);
-    this.fields.push(field, hairGroup, outfitGroup, scarfNote);
+    this.fields.push(field, hairGroup, colorGroup, beardGroup, outfitGroup, scarfNote);
 
     // La lettre de la coopérative, lue en attendant l'autre.
     const letterDef = Object.values(ctx.content.letters)[0];
@@ -319,6 +359,9 @@ export class CreationScreen implements Layer {
         el('div', { class: 'lpl-creation__preview' }, [
           this.preview,
           this.previewName,
+          // Tour 10: la couleur et la barbe à côté de l'aperçu (la colonne du formulaire garde les coupes).
+          colorGroup,
+          beardGroup,
           this.submit,
           this.otherCard,
           el('p', { class: 'lpl-field__help', style: 'text-align: center', text: ctx.t(x.together) }),
@@ -329,8 +372,8 @@ export class CreationScreen implements Layer {
     this.render();
   }
 
-  private appearance(): { hair: number; outfit: number; scarf: string } {
-    return { hair: this.hair, outfit: this.outfit, scarf: this.scarf };
+  private appearance(): { hair: number; hairColor: number; beard: number; outfit: number; scarf: string } {
+    return { hair: this.hair, hairColor: this.hairColor, beard: this.beard, outfit: this.outfit, scarf: this.scarf };
   }
 
   private refreshPreview(): void {
@@ -339,6 +382,9 @@ export class CreationScreen implements Layer {
     setPortrait(this.preview, portraitSvg(playerColors(ctx.me, a), 'great', ''));
     this.hairPortraits.forEach((face, i) => {
       setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, hair: i }), 'good', ''));
+    });
+    this.beardPortraits.forEach((face, i) => {
+      setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, beard: i }), 'good', ''));
     });
     const name = cleanName(this.input.value);
     setText(this.previewName, name === '' ? ctx.texts.extra.creation.noName : name);
@@ -353,7 +399,7 @@ export class CreationScreen implements Layer {
       this.refreshPreview();
       return;
     }
-    this.host.send({ type: 'create_character', name, hair: this.hair, outfit: this.outfit });
+    this.host.send({ type: 'create_character', name, hair: this.hair, outfit: this.outfit, hairColor: this.hairColor, beard: this.beard });
     this.mode = 'done';
     this.render();
     this.edit.focus();
@@ -609,6 +655,8 @@ export class NightScreen implements Layer {
   private readonly self: PlayerCard;
   private readonly other: PlayerCard;
   private readonly message: HTMLParagraphElement;
+  /** « Vous avez éteint la lampe en même temps. » (tour 10, section 3.6). */
+  private readonly together: HTMLParagraphElement;
   private readonly cont: HTMLButtonElement;
   private readonly finish: HTMLButtonElement;
   private sig = '';
@@ -617,6 +665,7 @@ export class NightScreen implements Layer {
     this.host = host;
     const { ctx } = host;
     const n = ctx.texts.game.nightScreen;
+    this.together = el('p', { class: 'lpl-night__together', hidden: true });
     const titleId = uid('nuit');
     this.overline = el('p', { class: 'lpl-overline' });
     this.list = el('ul', { class: 'lpl-quests' });
@@ -635,6 +684,7 @@ export class NightScreen implements Layer {
       sheet('44rem', [
         el('div', {}, [this.overline, el('h1', { class: 'lpl-sheet__title', id: titleId, text: ctx.t(n.title) })]),
         el('p', { class: 'lpl-sheet__lead', text: ctx.t(n.text) }),
+        this.together,
         this.list,
         el('div', { class: 'lpl-players', 'aria-label': ctx.texts.extra.night.choicesLabel }, [this.self.root, this.other.root]),
         this.message,
@@ -648,9 +698,13 @@ export class NightScreen implements Layer {
     const me = characterOf(world, ctx.me);
     const other = characterOf(world, ctx.partner);
     if (me === null || other === null) return;
-    const sig = JSON.stringify([world.clock.day, me.nightChoice, other.nightChoice, other.name, world.crate, world.quests.length]);
+    const together = nightTogetherLine(world, ctx);
+    const sig = JSON.stringify([world.clock.day, me.nightChoice, other.nightChoice, other.name, world.crate, world.quests.length, together]);
     if (sig === this.sig) return;
     this.sig = sig;
+    clear(this.together);
+    if (together !== null) this.together.append(icon('ui-heart'), ` ${together}`);
+    setHidden(this.together, together === null);
     const x = ctx.texts.extra.night;
     const n = ctx.texts.game.nightScreen;
     clear(this.overline);

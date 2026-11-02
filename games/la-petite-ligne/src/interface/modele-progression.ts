@@ -10,6 +10,7 @@ import { ACTION_ICONS, UI_SETTINGS } from './config';
 import { type ReadonlyCharacter, type UiContext, characterOf } from './contexte';
 import { capitalize } from './format';
 import { itemIcon } from './modele';
+import { roomWorkProgress, sleepVerbText } from './modele-maison';
 
 export type ProgressKind = 'craft' | 'build' | 'chop' | 'gesture';
 
@@ -80,6 +81,9 @@ function buildProgress(world: ReadonlyWorld, ctx: UiContext): ProgressModel | nu
       workers: working.workers.length,
     };
   }
+  // Tour 10: le chantier d'une pièce de la maisonnette (cellier, chambre), avancée de la pièce entière.
+  const room = roomWorkProgress(world, ctx);
+  if (room !== null && (found === null || (room.mine && !found.mine))) found = room;
   if (found === null) return null;
   const partner = characterOf(world, ctx.partner)?.name ?? '';
   const together = found.workers >= 2;
@@ -167,7 +171,8 @@ export function aimPromptModel(world: ReadonlyWorld, ctx: UiContext): AimPromptM
   const aim = me?.aim ?? null;
   if (aim?.source !== 'pointer' || aim.verb === null || me?.placement !== null) return null;
   const txt = ctx.texts.extra.aim;
-  const text = txt.verbs[aim.verb];
+  // L'après-midi, un lit propose la sieste (tour 10, section 3.4).
+  const text = aim.verb === 'sleep' ? sleepVerbText(world, ctx) : txt.verbs[aim.verb];
   if (text === undefined) return null;
   return { key: txt.click, text: ctx.t(text) };
 }

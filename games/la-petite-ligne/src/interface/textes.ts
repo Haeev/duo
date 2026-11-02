@@ -95,7 +95,14 @@ const SupplementSchema = v.object({
     nameHelp: str,
     nameError: str,
     noName: str,
-    hairs: v.tuple([str, str, str]),
+    /** Coupes, dans l'ordre de `Appearance.hair` (tour 10, section 2.1): les 12 de la création, puis les 3 du salon. */
+    hairs: v.pipe(v.array(str), v.minLength(15)),
+    hairColor: str,
+    /** Couleurs, dans l'ordre de `Appearance.hairColor` (section 2.2). */
+    hairColors: v.pipe(v.array(str), v.minLength(8)),
+    beard: str,
+    /** Barbe ou moustache, dans l'ordre de `Appearance.beard`: aucune, courte, fournie, moustache. */
+    beards: v.pipe(v.array(str), v.minLength(4)),
     outfits: v.tuple([str, str, str, str]),
     scarf: str,
     edit: str,
@@ -165,8 +172,12 @@ const SupplementSchema = v.object({
     watchingAny: str,
     menus: v.record(str, str),
     actions: v.record(str, str),
+    /** Où est l'autre: points, zones, puis `building:<id>` et `room:<id>` des intérieurs (tour 10). */
     places: v.record(str, str),
     elsewhere: str,
+    /** Dans un bâtiment sans libellé à lui. */
+    inside: str,
+    napping: str,
   }),
   dialogue: strings([
     'sceneChip',
@@ -368,7 +379,7 @@ const SupplementSchema = v.object({
   }),
   /** Invite de la cible survolée à la souris (R11). `verbs`: par verbe de visée (`AimVerb`). */
   aim: v.object({
-    ...strings(['label', 'click'] as const).entries,
+    ...strings(['label', 'click', 'nap'] as const).entries,
     verbs: v.record(str, str),
   }),
   /** Moments rares (tour 6): ligne d'observation sous l'horloge, confidence du matin. */
@@ -399,6 +410,7 @@ const SupplementSchema = v.object({
     'over',
     'saved',
     'choicesLabel',
+    'together',
   ] as const),
   end: strings([
     'ticket',
@@ -430,6 +442,121 @@ const SupplementSchema = v.object({
     'afterLast',
     'choicesLabel',
   ] as const),
+  /** Besoins doux (tour 10, section 3): icônes du HUD, page du carnet, aide « Besoins en sourdine ». */
+  needs: v.object({
+    ...strings(['label', 'partnerLabel', 'iconLabel', 'tab', 'pageLabel', 'form', 'value', 'bellyHelp', 'restHelp', 'heartHelp', 'apart', 'near', 'napped', 'aids', 'aidsHelp', 'mute', 'muteHelp'] as const).entries,
+    names: strings(['belly', 'rest', 'heart'] as const),
+    belly: strings(['full', 'ok', 'low'] as const),
+    rest: strings(['high', 'ok', 'low', 'empty'] as const),
+    heart: strings(['light', 'ok', 'missing'] as const),
+  }),
+  /** Rangement à cases et râtelier (section 5). `families`: par catégorie de « Tout déposer ». */
+  storage: v.object({
+    ...strings([
+      'title',
+      'subtitle',
+      'count',
+      'countFree',
+      'overflow',
+      'full',
+      'cellsLabel',
+      'emptyCell',
+      'overflowCell',
+      'cell',
+      'take',
+      'takeOne',
+      'takeCell',
+      'deposit',
+      'depositFamily',
+      'depositLabel',
+      'sort',
+      'sortHelp',
+      'rack',
+      'rackCount',
+      'rackHelp',
+      'hook',
+      'inBag',
+      'emptyBag',
+      'emptyStorage',
+      'selected',
+      'keysTake',
+    ] as const).entries,
+    families: v.record(str, str),
+  }),
+  /** Pièces bâties à deux (section 4): commande à Basile et panneau du chantier. */
+  rooms: v.object({
+    ...strings([
+      'orderTitle',
+      'line',
+      'orderFor',
+      'proposeFor',
+      'busy',
+      'ordered',
+      'site',
+      'tonight',
+      'built',
+      'help',
+      'oakChest',
+      'oakChestText',
+      'oakChestPending',
+      'oakChestDone',
+      'panelTitle',
+      'panelSubtitle',
+      'progress',
+      'bring',
+      'bringNone',
+      'crate',
+      'crateEmpty',
+      'and',
+      'deposit',
+      'depositNone',
+      'depositDone',
+      'support',
+      'beam',
+      'beamHelp',
+      'beamDone',
+      'elementBuilt',
+      'elementReady',
+      'elementWorking',
+      'elementsLabel',
+    ] as const).entries,
+    names: v.record(str, str),
+    titles: v.record(str, str),
+    uses: v.record(str, str),
+    /** Par identifiant d'élément de `pieces.json`, avec l'article (« le poteau sud »). */
+    elements: v.record(str, str),
+  }),
+  /** Rideaux aux fenêtres (section 6.2): l'invite qui les ouvre ou les ferme. */
+  curtains: strings(['open', 'close', 'label'] as const),
+  /** Rêverie de la sieste (section 3.4). */
+  nap: strings(['title', 'text', 'together', 'notebook', 'getUp', 'label'] as const),
+  /** Fauteuil du salon (section 2.3). */
+  salon: strings([
+    'title',
+    'subtitle',
+    'cut',
+    'color',
+    'beard',
+    'keep',
+    'cutPrice',
+    'colorPrice',
+    'bothPrice',
+    'free',
+    'confirm',
+    'confirmFree',
+    'unchanged',
+    'propose',
+    'proposal',
+    'try',
+    'decline',
+    'salonOnly',
+    'current',
+    'missing',
+  ] as const),
+  /** Guichet du fournil (section 1.5). */
+  bakery: strings(['title', 'subtitle', 'buy', 'left', 'cap', 'closed', 'warmOnly', 'sundayOnly', 'missing'] as const),
+  /** Épicerie (section 1.6): le chocolat chaud. */
+  grocer: strings(['chocolate', 'chocolateText', 'chocolateBuy', 'chocolateDone', 'chocolateSeason'] as const),
 });
 
 export type GameUiTexts = v.InferOutput<typeof GameUiSchema>;

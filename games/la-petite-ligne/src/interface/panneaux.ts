@@ -25,6 +25,8 @@ import {
   stackEntries,
 } from './modele-panneaux';
 import { type BasileModel, basileModel } from './modele-tableau';
+import { basileRoomsModel } from './modele-maison';
+import { basileRoomsSection } from './maison';
 import { Panel, backKeys, price } from './panneau';
 import { builtList, chantierCard } from './tableau';
 import { SOUND_ATTR } from './sons';
@@ -373,8 +375,10 @@ export class StationPanel extends Panel {
     const together = partnerAtHome(world, ctx);
     // Tour 9: la commande des chantiers de la maisonnette, à l'établi de Basile (dès la lettre `basile_works`).
     const basile = this.station === 'workbench' ? basileModel(world, ctx) : null;
+    // Tour 10: « Agrandir la maisonnette » (cellier, chambre) et le grand coffre de chêne.
+    const rooms = this.station === 'workbench' ? basileRoomsModel(world, ctx) : null;
     const partnerName = nameOf(world, ctx.partner);
-    const sig = JSON.stringify([entries, locked, food, together, basile, partnerName, world.purse]);
+    const sig = JSON.stringify([entries, locked, food, together, basile, rooms, partnerName, world.purse]);
     this.renderBody(sig, () => {
       const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
       const focusIndex = defaultProduct(entries);
@@ -413,6 +417,7 @@ export class StationPanel extends Panel {
       nodes.push(entries.length === 0 ? el('div', { class: 'lpl-empty', text: ctx.t(w.noRecipes) }) : list);
       if (locked > 0 && this.station === 'workbench') nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(w.lockedPlans) }));
       if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
+      if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
       if (this.station === 'stove') {
         nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.stove.eatSection) }));
         if (food.length === 0) nodes.push(el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.stove.nothingToEat) }));
