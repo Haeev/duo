@@ -92,7 +92,8 @@ jobs:
           fi
           # À la main, le tag est créé par la release sur ce commit: s'il existe déjà, il doit le désigner.
           if [ "$EVENEMENT" = workflow_dispatch ]; then
-            existant="$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha 2> /dev/null || true)"
+            # En cas d'erreur (tag absent), gh api écrit le corps de l'erreur sur la sortie standard: on se fie au code de retour.
+            if ! existant="$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha 2> /dev/null)"; then existant=""; fi
             if [ -n "$existant" ] && [ "$existant" != "$GITHUB_SHA" ]; then
               echo "::error::Le tag $tag existe déjà sur $existant, pas sur $GITHUB_SHA. Lance le workflow depuis ce tag."
               exit 1
