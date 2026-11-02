@@ -9,6 +9,7 @@
  * sous la souris: l'aperçu du meuble le suit. Z Q S D rendent la main au
  * clavier jusqu'au prochain mouvement de la souris.
  */
+import { isHome } from '../etat/interieurs';
 import type { Input } from '@duo/sdk';
 import type { ClickTarget, ControlFrame } from '../etat/actions';
 import { TOOLBAR_SLOTS } from '../etat/types';
@@ -210,7 +211,7 @@ export function createControls(options: ControlsOptions): Controls {
         const rect = options.canvasRect();
         const pick = placing || renderer === null ? null : renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
         if (placing) view.send({ type: 'rotate_furniture', delta: 1 });
-        else if (pick?.kind === 'furniture' && me?.inHouse === true) view.send({ type: 'take_furniture', furniture: pick.furniture });
+        else if (pick?.kind === 'furniture' && me !== undefined && isHome(me)) view.send({ type: 'take_furniture', furniture: pick.furniture });
         else view.send({ type: 'examine' });
       } else if (input.wasPressed('examine') && !rightPressed) view.send({ type: 'examine' });
 

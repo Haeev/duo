@@ -10,6 +10,7 @@ import type { AnnonceDef, AnnonceLine } from '../donnees/types';
 import { annonceReward, drawAnnonce } from '../etat/annonces';
 import { productPrice } from '../etat/commande-generee';
 import type { BoardAnnonce, CharacterId, QuestState } from '../etat/types';
+import { isSheltered } from '../etat/interieurs';
 import { MINUTES_PER_DAY } from './constantes';
 import { type Sim, character, distance, emit, format, notifyKey } from './contexte';
 import { queueHint } from './astuces';
@@ -230,7 +231,7 @@ export function boardHints(sim: Sim): void {
   const at = sim.map.points[POINT.noticeBoard];
   if (a?.state !== 'open' || at === undefined || sim.world.phase !== 'day') return;
   for (const c of sim.world.characters) {
-    if (!c.inHouse && c.created && distance(c.pos, at) <= BOARD_HINT_RADIUS) queueHint(sim, c.id, { on: 'near_board_annonce' });
+    if (!isSheltered(c) && c.created && distance(c.pos, at) <= BOARD_HINT_RADIUS) queueHint(sim, c.id, { on: 'near_board_annonce' });
   }
 }
 

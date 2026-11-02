@@ -17,7 +17,9 @@ import type { CameraCommand, GameInterface, GameView, InterfaceOptions } from '.
 import { NotebookPanel, startMemorySession } from './carnet';
 import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
-import { type UiContext, characterOf, createUiContext } from './contexte';
+import { type ReadonlyCharacter, type UiContext, characterOf, createUiContext } from './contexte';
+import { type BakeryPort, BakeryPanel, type SalonPort, SalonPanel } from './salon';
+import { atSalonChair, bakeryBoughtToday, firstCutFree } from '../etat/interieurs';
 import { DialogueBox, type DialogueSource } from './dialogue';
 import { el, focusElement, focusables, isVisible, setStyleVar } from './dom';
 import { BreakfastScreen, CreationScreen, EndScreen, NightScreen, SessionEndScreen, TitleScreen } from './ecrans';
@@ -415,6 +417,35 @@ class GameUi implements GameInterface, UiHost {
     }
   }
 
+  private salonPort(): SalonPort {
+    const me = (world: ReadonlyWorld): ReadonlyCharacter | null => characterOf(world, this.ctx.me);
+    return {
+      seat: (world) => {
+        const c = me(world);
+        return c !== null && atSalonChair(c) ? 'chair' : 'bench';
+      },
+      firstFree: (world) => firstCutFree(world, this.ctx.me),
+      received: (world) => {
+        const offer = me(world)?.hairOffer ?? null;
+        return offer === null ? null : { hair: offer.hair, hairColor: offer.hairColor, beard: offer.beard };
+      },
+      apply: (look) => { this.send({ type: 'haircut', ...look }); },
+      keep: () => {
+        const look = me(this.view.world())?.appearance;
+        if (look !== undefined) this.send({ type: 'haircut', hair: look.hair, hairColor: look.hairColor, beard: look.beard });
+      },
+      propose: (look) => { this.send({ type: 'hair_offer', ...look }); },
+      answer: (accept) => { this.send({ type: 'hair_offer_answer', accept }); },
+    };
+  }
+
+  private bakeryPort(): BakeryPort {
+    return {
+      bought: (world) => bakeryBoughtToday(world, this.ctx.me),
+      buy: (item) => { this.send({ type: 'bakery_buy', item: item === 'brioche' ? 'brioche' : 'bread' }); },
+    };
+  }
+
   private panelFor(menu: MenuKind): (() => Layer) | null {
     const tab = this.panelTab;
     switch (menu) {
@@ -436,6 +467,11 @@ class GameUi implements GameInterface, UiHost {
         return () => new StoragePanel(this);
       case 'proposal':
         return null;
+      // Tour 10: salon de Solange et guichet du fournil (ports vers les intentions du lot L3).
+      case 'salon':
+        return () => new SalonPanel(this, this.salonPort());
+      case 'bakery':
+        return () => new BakeryPanel(this, this.bakeryPort());
     }
   }
 

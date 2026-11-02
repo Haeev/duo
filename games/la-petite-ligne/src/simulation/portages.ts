@@ -7,6 +7,7 @@
 import type { Beam } from '../etat/types';
 import { type Sim, itemWithArticle, sayIfWritten } from './contexte';
 import { storeAtHome } from './rangement';
+import { TOWN, basketDue, basketPlaced } from './bourg';
 
 function load(
   sim: Sim,
@@ -54,6 +55,12 @@ export function spawnLoads(sim: Sim): void {
       return;
     }
   }
+  // Tour 10: la panière d'Achille, devant le fournil, le matin de l'étape « porter » (jusqu'à 11 h).
+  const basketTo = sim.map.points[TOWN.basketTo];
+  if (basketTo !== undefined && basketDue(sim)) {
+    load(sim, TOWN.basketItem, 'basket', TOWN.basketFrom, basketTo, null);
+    return;
+  }
   const next = world.heavyDeliveries[0];
   const to = parcel === null ? undefined : sim.map.points[parcel.to];
   if (parcel !== null && next !== undefined && to !== undefined) load(sim, parcel.item, 'parcel', parcel.from, to, next);
@@ -61,6 +68,10 @@ export function spawnLoads(sim: Sim): void {
 
 /** La charge vient d'être posée: drapeau de la draisine, ou objet du colis au cellier. */
 export function loadPlaced(sim: Sim, beam: Beam): void {
+  if (beam.purpose === 'basket') {
+    basketPlaced(sim, beam.holders);
+    return;
+  }
   const { world } = sim;
   if (beam.purpose === 'handcar') {
     const flag = sim.content.settings.carry.handcar?.flag;

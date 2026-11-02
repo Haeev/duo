@@ -2,6 +2,7 @@
 // D1): part des redites du quotidien, mesurée comme la revue (le premier joueur parle une fois par jour
 // à chaque habitant présent, à 13 h, toute la démo jouée par les robots). Avant la règle « la moins
 // récente » (R4 du plan des 100 heures): 60 % de redites (32 sur 53), graine 20261030.
+import { isHome } from '../src/etat/interieurs';
 import { describe, expect, it } from 'vitest';
 import type { Sim } from '../src/simulation/contexte';
 import { SIM_HZ } from '../src/simulation/constantes';
@@ -33,13 +34,13 @@ function measure(seed: number): Measure {
   const heard = new Set<string>();
   const out: Measure = { conversations: 0, repeats: 0, avoidable: 0, doorPerDay: new Map(), sim };
   let talkedOn = 0;
-  const inside = sim.world.characters.map((c) => c.inHouse);
+  const inside = sim.world.characters.map((c) => isHome(c));
   while (sim.world.phase !== 'ended' && sim.world.tick < SIM_HZ * 60 * 120) {
     step(sim, robot.decide(sim));
     const w = sim.world;
     w.characters.forEach((c, i) => {
-      if (c.inHouse === inside[i]) return;
-      inside[i] = c.inHouse;
+      if (isHome(c) === inside[i]) return;
+      inside[i] = isHome(c);
       out.doorPerDay.set(w.clock.day, (out.doorPerDay.get(w.clock.day) ?? 0) + 1);
     });
     if (w.phase !== 'day' || w.scene !== null || w.clock.minutes < 13 * 60 || w.clock.day === talkedOn) continue;

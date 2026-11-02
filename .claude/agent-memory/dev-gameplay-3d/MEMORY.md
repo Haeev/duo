@@ -276,3 +276,13 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `lplRendu.missing()` de la page de démonstration était un bouchon (toujours vide): il lit maintenant `RenderEngine.missingModels()`. Types de carte sans nœud du même nom: les relier dans `MODEL_VARIANTS` (`salon_shop` vers `haberdashery`...); tout collecteur qui parcourt `map.props` (cheminées, lueurs) doit passer par `library.resolve`.
 - Près de la rivière, le shader des surfaces mêle le sable aux faces de chemin (`ambSand`): une géométrie de chemin posée sur la grève y est peinte en sable. Un coin de chemin contre le sable se corrige dans le champ du lit (`riviere.ts`), pas par de la géométrie.
 - Question S4 (sons `besoins/` permanents): refusé par l'essai du pic d'un samedi (`memoire.test.ts`: la seconde musique du fondu est refusée à 128 Mo); décodés au lancement sans être tenus.
+
+## Tour 10, lot L3: intérieurs et rue Haute (La Petite Ligne, vérifié le 2026-11-02)
+
+- « Chez soi » contre « à l'abri »: `isHome(c)` et `isSheltered(c)` de `src/etat/interieurs.ts` remplacent l'ancien booléen `inHouse` (retiré). Aménagement, coucher, minuit, veillée, réchaud, astuces de l'heure: `isHome`; bancs du dehors, bêche, moments rares, lisière, tableau, poules: `isSheltered`.
+- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
+- Un habitant ajouté au contenu n'existe pas dans une sauvegarde d'avant: `ensureVillagers` (habitants.ts) lui crée son état au premier pas, sans toucher à `sauvegarde.ts`.
+- Le robot pousse une charge à deux le long du chemin de son centre, qui ignore la largeur des porteurs: un coin de rocher le bloquait pour toujours. Écart de biais après une demi-seconde immobile (`beamDodge`).
+- Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
+- Outil isolé: une boucle `for` avec `sed -n "${a},${b}p"` est refusée; un heredoc qui écrit dans `/tmp` aussi. Écrire le script avec Write, puis `python3 /tmp/<moi>/script.py` depuis le dossier du jeu.
+- `valider_donnees.py`: les drapeaux posés par le code (et non par un effet) vont dans `FLAGS_SET_BY_CODE`, sinon un avertissement.

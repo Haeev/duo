@@ -3,6 +3,7 @@
  * calculé à chaque pas et à chaque placement, champs nouveaux par défaut (monde neuf et sauvegarde
  * du format 6), état borné.
  */
+import { isHome, isSheltered } from '../src/etat/interieurs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import * as v from 'valibot';
@@ -198,7 +199,7 @@ describe('Character.inside', () => {
     expect(buildingAt(map, {}, 26.5, 24.5)).toBeNull();
   });
 
-  it('`placeCharacter` et chaque pas le recalculent, à côté de `inHouse`', () => {
+  it('`placeCharacter` et chaque pas le recalculent; « chez soi » et « à l\'abri » en découlent', () => {
     const sim = newSim();
     const c = character(sim, 'p1');
     const { points } = sim.map;
@@ -213,7 +214,7 @@ describe('Character.inside', () => {
       const at = points[id];
       if (at === undefined) throw new Error(`point ${id} absent`);
       placeCharacter(sim, c, at);
-      expect([id, c.inside, c.inHouse]).toEqual([id, building, inHouse]);
+      expect([id, c.inside, isHome(c), isSheltered(c)]).toEqual([id, building, inHouse, building !== null]);
     }
     // Déplacé sans `placeCharacter` (comme le fait la marche): le pas suivant suit.
     const shop = points.grocery_inside;
@@ -262,7 +263,6 @@ describe('état du tour 10: valeurs par défaut', () => {
       expect(c.needs.apartMinutes).toBe(0);
       expect(c.needs.napStart).toBeNull();
       expect(c.inside).toBe(buildingAt(map, {}, c.pos.x, c.pos.y));
-      expect(c.inside === HOUSE_BUILDING).toBe(c.inHouse);
     }
     expect(sim.world.rooms).toEqual({});
     // Lot L4 (format 7): les outils du coffre passent au râtelier.

@@ -801,6 +801,8 @@
       ],
       "completionEffects": [{ "type": "give_money", "amount": 50 }],
       "completionText": "Le quai est fleuri. 50 sous."
-    }
+    },
+    {"id": "achille_basket", "kind": "side", "tier": "P0", "title": "La panière d'Achille", "giver": "achille", "start": {"when": [{"type": "flag", "flag": "achille_here"}], "effects": [{"type": "show_text", "text": "achille_late"}]}, "steps": [{"id": "go_bakery", "objective": "Monter au fournil, rue Haute, avant 11 h.", "conditions": [{"type": "dialogue_done", "dialogue": "achille_basket_ask"}]}, {"id": "carry", "objective": "Porter la panière à deux jusqu'à la porte d'Odette.", "conditions": [{"type": "flag", "flag": "basket_carried"}]}], "completionEffects": [{"type": "give_item", "item": "warm_bread", "count": 2, "to": "each"}, {"type": "set_flag", "flag": "bakery_open"}, {"type": "show_text", "text": "basket_achille"}], "completionText": "Le guichet du fournil est ouvert."},
+    {"id": "solange_first_cut", "kind": "side", "tier": "P0", "title": "Une coupe chez Solange", "giver": "solange", "start": {"when": [{"type": "flag", "flag": "solange_note_sent"}]}, "steps": [{"id": "enter", "objective": "Entrer chez Solange, à l'angle de la rue Haute.", "conditions": [{"type": "inside", "building": "salon"}]}, {"id": "chairs", "objective": "Passer chacun au fauteuil de Solange.", "conditions": [{"type": "haircut", "count": 1, "since": "step_start", "who": "both", "label": "chacun son tour"}]}, {"id": "mirror", "objective": "Se regarder devant le miroir, à deux.", "conditions": [{"type": "dialogue_done", "dialogue": "solange_mirror"}]}], "completionEffects": [{"type": "set_flag", "flag": "salon_open"}], "completionText": "Le salon et la mercerie sont ouverts."}
   ]
 }

@@ -4,6 +4,7 @@
  */
 import type { ClickTarget } from '../etat/actions';
 import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Tree, Vec2 } from '../etat/types';
+import { isHome, isSheltered } from '../etat/interieurs';
 import { AIM_CONE, AIM_DISTANCE } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
@@ -20,13 +21,16 @@ import { fishAct, holdsRod, waterAhead } from './peche';
 import { toolKindOf } from './catalogue';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
-import { placeFurniture } from './amenagement';
+import { isCurtains, placeFurniture, toggleCurtains } from './amenagement';
 import { beginNapIfAfternoon, eatFromBag } from './besoins';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 import { holdPlaceNear, lanternTargetNear, lightLantern, takeHold } from './moments';
 import { callableHen, callHen } from './secrets';
 import { refuseChop, treeStage } from './lisiere';
+import { TOWN, canDrinkChocolate, drinkChocolate, openBakery } from './bourg';
+import { SALON, chairTaken, openSalon, sitAtChair } from './salon';
+import { buildingOpen } from './interieurs';
 
 /** Ce sur quoi on peut agir. */
 export type Target =
@@ -48,11 +52,15 @@ export type Target =
   /** Une poule à appeler par son nom (« Les noms des poules »). */
   | { kind: 'hen'; id: string; pos: Vec2 }
   /** Une place d'allumage des lanternes (tour 9), le moment du jour à sa fenêtre. */
-  | { kind: 'lantern'; place: string; pos: Vec2 };
+  | { kind: 'lantern'; place: string; pos: Vec2 }
+  /** Des rideaux à une fenêtre (tour 10): les ouvrir ou les fermer, de dedans. */
+  | { kind: 'curtains'; furniture: string; pos: Vec2 };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
   [POINT.groceryCounter]: 'shop',
+  // Tour 10: le même comptoir, vu de dedans la boutique d'Odette (depuis la place du client).
+  [POINT.groceryCustomer]: 'shop',
   [POINT.noticeBoard]: 'catalogue',
   [POINT.coopCrate]: 'crate',
   [POINT.workbench]: 'workbench',
@@ -61,7 +69,21 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
 const BENCH_CLICK_RADIUS = 1.2;
 /** Un clic au sol à moins de tant du point d'un chantier (m) vise le chantier (la porte, le poulailler). */
 const GHOST_CLICK_RADIUS = 1.5;
-const ACT_POINTS = [POINT.well, POINT.waterBarrel, POINT.groceryCounter, POINT.noticeBoard, POINT.coopCrate, POINT.workbench, POINT.henFeeder];
+const ACT_POINTS = [
+  POINT.well,
+  POINT.waterBarrel,
+  POINT.groceryCounter,
+  POINT.noticeBoard,
+  POINT.coopCrate,
+  POINT.workbench,
+  POINT.henFeeder,
+  // Tour 10: comptoir intérieur d'Odette, petite table (chocolat), guichet du fournil, fauteuil du salon.
+  POINT.groceryCustomer,
+  TOWN.table,
+  TOWN.window,
+  SALON.chair,
+  SALON.bench,
+];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
   out.x = c.pos.x + Math.cos(c.facing) * AIM_DISTANCE;
@@ -105,6 +127,11 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       if (t.point === POINT.well || t.point === POINT.waterBarrel) return toolKindOf(sim, held?.item) === 'watering_can' ? 'refill' : null;
       if (t.point === POINT.henFeeder) return sim.world.hens.length > 0 ? 'feed' : null;
       if (t.point === POINT.groceryCounter) return shopOpen(sim) ? 'open' : null;
+      if (t.point === POINT.groceryCustomer) return insideShopOpen(sim, c) ? 'open' : null;
+      if (t.point === TOWN.table) return canDrinkChocolate(sim, c) ? 'drink' : null;
+      if (t.point === TOWN.window) return sim.world.flags.includes(TOWN.bakeryOpen) && !isSheltered(c) ? 'open' : null;
+      if (t.point === SALON.chair) return c.inside === SALON.building && c.menu === null ? 'sit' : null;
+      if (t.point === SALON.bench) return c.inside === SALON.building && c.menu === null && chairTaken(sim, c) ? 'open' : null;
       return 'open';
     case 'construction':
       return 'build';
@@ -122,16 +149,18 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return 'call';
     case 'lantern':
       return 'light';
+    case 'curtains':
+      return isHome(c) ? 'curtains' : null;
     case 'bench': {
       const prop = playerBench(sim, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
-      const free = sim.world.phase === 'day' && c.seat === null && !c.inHouse && prop !== null && !slotTaken(sim, prop, t.slot);
+      const free = sim.world.phase === 'day' && c.seat === null && !isSheltered(c) && prop !== null && !slotTaken(sim, prop, t.slot);
       return free ? 'sit' : null;
     }
     case 'cell': {
       const g = gardenCellAt(sim, t.cell);
       if (g !== null) return gardenVerb(sim, g, held?.item ?? null);
-      if (held?.item === ITEM.hoe && !c.inHouse && !isBlockedCell(refreshBlockers(sim), t.cell.cx, t.cell.cy)) return 'dig';
+      if (held?.item === ITEM.hoe && !isSheltered(c) && !isBlockedCell(refreshBlockers(sim), t.cell.cx, t.cell.cy)) return 'dig';
       return null;
     }
   }
@@ -152,6 +181,7 @@ const TIER: Record<Target['kind'], number> = {
   hold: -1,
   lantern: -1,
   villager: 0,
+  curtains: 4,
   // Pendant la quête des noms seulement (avant la mangeoire et la porte du poulailler).
   hen: 3,
   ground_item: 1,
@@ -223,7 +253,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
   const s = sim.content.settings;
   const out: Target[] = [];
   const reach = s.ranges.action;
-  if (c.seat === null && !c.inHouse) {
+  if (c.seat === null && !isSheltered(c)) {
     // La place libre la plus proche de chaque banc à portée.
     const seen = new Set<string>();
     for (const seat of freeSeatsNear(sim, c.pos, s.benches.sitRange)) {
@@ -248,6 +278,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
     const centre = furnitureCentre(sim, f);
     if (distance(c.pos, centre) > reach + 0.5) continue;
     if (def.bed !== null) out.push({ kind: 'bed', furniture: f.id, pos: centre });
+    else if (f.window !== undefined && isCurtains(def)) out.push({ kind: 'curtains', furniture: f.id, pos: centre });
     else if (def.station === 'stove') out.push({ kind: 'station', menu: 'stove', furniture: f.id, pos: centre });
     else if (def.storage === 'cellar') out.push({ kind: 'station', menu: 'chest', furniture: f.id, pos: centre });
   }
@@ -370,8 +401,19 @@ export function updateAim(sim: Sim, c: Character): void {
   }
 }
 
+/** La boutique vue de dedans: Odette sert et la boutique est dans ses heures (le comptoir ferme avec elle). */
+function insideShopOpen(sim: Sim, c: Character): boolean {
+  const grocery = sim.map.buildings[TOWN.grocery];
+  return c.inside === TOWN.grocery && grocery !== undefined && buildingOpen(sim, grocery) && shopOpen(sim);
+}
+
 /** Ouvre un menu du jeu (déclaré par la simulation à côté d'un comptoir, ou par l'interface). */
 export function openMenu(sim: Sim, c: Character, menu: MenuKind | null): void {
+  // Quitter le fauteuil du salon efface la proposition reçue et relève.
+  if (c.menu === 'salon' && menu !== 'salon') {
+    c.hairOffer = null;
+    if (c.action.kind === 'sit') c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+  }
   c.menu = menu;
   if (c.status === 'active' || c.status === 'menu') c.status = menu === null ? 'active' : 'menu';
   sim.runtime.changed = true;
@@ -454,6 +496,8 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       return;
     case 'open':
       if (t.kind === 'station') openMenu(sim, c, t.menu);
+      else if (t.kind === 'point' && t.point === TOWN.window) openBakery(sim, c);
+      else if (t.kind === 'point' && t.point === SALON.bench) openSalon(sim, c);
       else if (t.kind === 'point') {
         const menu = POINT_MENUS[t.point];
         if (menu !== undefined) openMenu(sim, c, menu);
@@ -471,6 +515,13 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'sit':
       // Assis, on regarde comme le banc (`sitDown` remplace l'orientation vers la cible).
       if (t.kind === 'bench') sitDown(sim, c, t.bench, t.slot);
+      else if (t.kind === 'point' && t.point === SALON.chair) sitAtChair(sim, c);
+      return;
+    case 'drink':
+      drinkChocolate(sim, c);
+      return;
+    case 'curtains':
+      if (t.kind === 'curtains') toggleCurtains(sim, c, t.furniture);
       return;
     case 'give':
       giveHeld(sim, c);
@@ -531,7 +582,7 @@ export function actFront(sim: Sim, c: Character): void {
     return;
   }
   // Près d'un banc plein, Espace dit pourquoi on ne s'assoit pas (aucune touche morte).
-  if (c.seat === null && !c.inHouse && fullBenchNear(sim, c) !== null) {
+  if (c.seat === null && !isSheltered(c) && fullBenchNear(sim, c) !== null) {
     sayIfWritten(sim, c.id, 'bench_full');
     return;
   }
@@ -576,7 +627,7 @@ export function actOnClick(sim: Sim, c: Character, click: ClickTarget, target: T
 
 /** L'arbre abattu (souche ou rejet) le plus proche devant soi, à portée de hache, ou `null`. */
 export function youngTreeAhead(sim: Sim, c: Character): Tree | null {
-  if (c.inHouse) return null;
+  if (isSheltered(c)) return null;
   const reach = sim.content.settings.ranges.action + 0.3;
   let best: Tree | null = null;
   let bestD = Infinity;
@@ -614,6 +665,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       if (f === undefined || def === undefined) return null;
       const centre = furnitureCentre(sim, f);
       if (def.bed !== null) return { kind: 'bed', furniture: f.id, pos: centre };
+      if (f.window !== undefined && isCurtains(def)) return { kind: 'curtains', furniture: f.id, pos: centre };
       if (def.station === 'stove') return { kind: 'station', menu: 'stove', furniture: f.id, pos: centre };
       if (def.storage === 'cellar') return { kind: 'station', menu: 'chest', furniture: f.id, pos: centre };
       return null;
@@ -633,7 +685,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       if (verbOf(sim, c, cellTarget) !== null) return cellTarget;
       const ghost = ghostAt(sim, at, GHOST_CLICK_RADIUS);
       if (ghost !== null) return { kind: 'construction', id: ghost.state.id, pos: point(sim, ghost.def.point) };
-      const seat = c.inHouse ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
+      const seat = isSheltered(c) ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
       return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }
   }

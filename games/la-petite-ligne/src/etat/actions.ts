@@ -78,6 +78,14 @@ export type Intent =
   | { type: 'buy'; item: ItemId; count: number }
   | { type: 'sell'; item: ItemId; quality: Quality; count: number }
   | { type: 'catalogue_order'; item: ItemId }
+  // Tour 10: au guichet du fournil, un pain (chaud de 6 h à 9 h) ou une brioche (le dimanche)
+  | { type: 'bakery_buy'; item: 'bread' | 'brioche' }
+  // Tour 10: au fauteuil du salon, valider sa coiffure (la même: « Garder ma coiffure », gratuit)
+  | { type: 'haircut'; hair: number; hairColor: number; beard: number }
+  // Tour 10: depuis le banc d'attente, proposer une coupe à l'autre quand il est au fauteuil
+  | { type: 'hair_offer'; hair: number; hairColor: number; beard: number }
+  // Tour 10: au fauteuil, répondre à la proposition reçue (« Essayer » ou « Non merci »)
+  | { type: 'hair_offer_answer'; accept: boolean }
   // Chantiers (tour 9): verser au chantier ouvert (`amount` sous, ou le reste: `null`), apporter des planches à Basile
   | { type: 'improvement_pay'; improvement: string; amount: number | null }
   | { type: 'improvement_planks'; improvement: string; count: number }

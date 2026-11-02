@@ -4,6 +4,7 @@
  * retouches de l'état montrent l'écran demandé. Outil de développement et
  * de captures seulement: le jeu ne passe jamais par ici.
  */
+import { HOUSE_BUILDING } from '../../etat/carte';
 import type { Intent } from '../../etat/actions';
 import { freezeState, momentDef } from '../../etat/moments';
 import type { CharacterId, ItemStack, MomentMemoryEntry, MomentToday } from '../../etat/types';
@@ -803,7 +804,7 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       const room = sim.map.house.room;
       teleport(sim, me, room.x + 2.5, room.y + 0.5);
       teleport(sim, other, room.x + 0.5, room.y + 1.5);
-      for (const id of [me, other]) character(sim, id).inHouse = true;
+      for (const id of [me, other]) character(sim, id).inside = HOUSE_BUILDING;
       const c = character(sim, me);
       const free = c.bag.findIndex((x, i) => x === null && i < 8);
       c.bag[free < 0 ? 0 : free] = stack('chair', 1);
@@ -857,7 +858,7 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       const room = sim.map.house.room;
       teleport(sim, me, room.x + 2.5, room.y + 2.5);
       teleport(sim, other, room.x + 1.5, room.y + 3.5);
-      for (const id of [me, other]) character(sim, id).inHouse = true;
+      for (const id of [me, other]) character(sim, id).inside = HOUSE_BUILDING;
       apply(sim, other, [{ type: 'corner', x: room.x + 1, y: room.y + 3 }]);
       const c = character(sim, me);
       // Le premier carré libre en partant du réchaud (les robots ont meublé la pièce).

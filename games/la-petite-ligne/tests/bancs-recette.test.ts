@@ -1,5 +1,6 @@
 // Recette de l'assise (qa-testeur, gauntlet tour 5): cas trouvés en exploration. Les bugs y gardent
 // leur référence; corrigés, leurs tests sont devenus des tests de non-régression.
+import { isHome } from '../src/etat/interieurs';
 import { describe, expect, it } from 'vitest';
 import type { AuthoredIntent, ControlFrame } from '../src/etat/actions';
 import { benchById, seatPlace } from '../src/etat/bancs';
@@ -50,7 +51,7 @@ function at(day: number, minutes: number): Sim {
   for (const c of sim.world.characters) {
     if (c.dialogue !== null) tick(sim, [{ by: c.id, intent: { type: 'dialogue_close' } }]);
     if (c.menu !== null) tick(sim, [{ by: c.id, intent: { type: 'menu', menu: null } }]);
-    if (c.inHouse) placeCharacter(sim, c, { x: 36, y: 22 });
+    if (isHome(c)) placeCharacter(sim, c, { x: 36, y: 22 });
   }
   return sim;
 }
@@ -87,7 +88,7 @@ describe('assise: cas de recette', () => {
     tick(sim);
     const c = character(sim, 'p1');
     expect(c.seat).toBeNull();
-    expect(c.inHouse).toBe(true);
+    expect(isHome(c)).toBe(true);
   });
 
   // B-T5-07 (corrigé): le point `quay_bench` est au milieu de l'emprise du banc; Jeanne y apparaissait à 8 h et en sortait à pied.

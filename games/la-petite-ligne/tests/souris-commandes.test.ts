@@ -1,6 +1,7 @@
 // Choix de la cible à la souris côté entrées (R11): `createControls` envoie à l'hôte ce que survole la
 // souris (`point_at`) quand la cible change, rend la visée au clavier dès que Z Q S D bougent, suit le
 // sol sous la souris pendant l'aménagement, où le clic droit tourne le meuble.
+import { HOUSE_BUILDING } from '../src/etat/carte';
 import { parseManifest, type Input } from '@duo/sdk';
 import { describe, expect, it } from 'vitest';
 import { createInputState, type InputState } from '../../../packages/sdk/src/input-state';
@@ -188,7 +189,7 @@ describe('commandes à la souris', () => {
       valid: true,
       blocked: null,
     };
-    me.inHouse = true;
+    me.inside = HOUSE_BUILDING;
     b.under.pick = { kind: 'furniture', furniture: 'f1' };
     b.under.ground = { x: 9.3, y: 24.6 };
     b.step();
@@ -219,7 +220,7 @@ describe('commandes à la souris', () => {
   it('clic droit sur un meuble posé, dans la maison: le reprend (comme X devant lui)', () => {
     const b = bench();
     const me = character(b.sim, 'p1');
-    me.inHouse = true;
+    me.inside = HOUSE_BUILDING;
     b.under.pick = { kind: 'furniture', furniture: 'f7' };
     b.pointer.right = true;
     b.keys.mouseDown('right');

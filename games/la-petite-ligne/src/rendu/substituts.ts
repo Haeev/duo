@@ -296,6 +296,25 @@ const ITEMS: Record<string, Builder> = {
   },
   bread: (b) =>
     b.ball(0.12, [0, 0.08, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.7, 1] }),
+  // Tour 10 (lot L3, en attendant les modèles de l'artiste): rue Haute.
+  warm_bread: (b) =>
+    b.ball(0.12, [0, 0.08, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.75, 1] }),
+  brioche: (b) => {
+    b.ball(0.1, [0, 0.07, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1, 0.8, 1] });
+    b.ball(0.05, [0, 0.16, 0], { top: 'bread', side: 'bread_crust' });
+  },
+  cup: (b) => b.cylinder(0.04, 0.035, 0.08, [0, 0, 0], 'ceramic', { base: true, segments: 8 }),
+  bread_basket: (b) => {
+    b.box([0.7, 0.3, 0.45], [0, 0, 0], 'straw', { base: true });
+    b.ball(0.12, [0, 0.32, 0], { top: 'bread', side: 'bread_crust' }, { scale: [1.5, 0.7, 1] });
+  },
+  hourglass: (b) => {
+    b.cylinder(0.06, 0.06, 0.02, [0, 0, 0], 'wood_dark', { base: true, segments: 6 });
+    b.cylinder(0.05, 0.015, 0.08, [0, 0.02, 0], 'glass', { base: true, segments: 6 });
+    b.cylinder(0.015, 0.05, 0.08, [0, 0.1, 0], 'glass', { base: true, segments: 6 });
+    b.cylinder(0.06, 0.06, 0.02, [0, 0.18, 0], 'wood_dark', { base: true, segments: 6 });
+  },
+  horn_comb: (b) => b.box([0.16, 0.01, 0.05], [0, 0, 0], 'fabric_cream', { base: true }),
   dish_radishes: (b) => {
     b.cylinder(0.14, 0.1, 0.04, [0, 0, 0], 'ceramic', { base: true, segments: 10 });
     b.ball(0.04, [0.04, 0.06, 0], 'radish');
@@ -375,6 +394,20 @@ const FURNITURE: Record<string, Builder> = {
     b.box([0.8, 0.45, 0.5], [0, 0, 0], { top: 'wood', side: 'wood_dark' }, { base: true });
     b.box([0.82, 0.06, 0.52], [0, 0.45, 0], 'iron', { base: true });
     b.box([0.08, 0.1, 0.02], [0, 0.32, 0.26], 'brass', { base: true });
+  },
+  // Tour 10 (lot L4, en attendant les modèles de l'artiste): grand coffre et étagère haute du cellier.
+  oak_chest: (b) => {
+    b.box([0.85, 0.8, 0.55], [0, 0, 0], { top: 'wood', side: 'wood_dark' }, { base: true });
+    b.box([0.08, 0.1, 0.02], [0, 0.6, 0.28], 'brass', { base: true });
+  },
+  tool_rack: (b) => {
+    b.box([0.9, 0.08, 0.04], [0, 1.4, -0.45], 'wood_dark', { base: true });
+    for (const x of [-0.3, 0, 0.3]) b.box([0.03, 0.03, 0.1], [x, 1.35, -0.4], 'iron', { base: true });
+  },
+  cellar_rack: (b) => {
+    for (const y of [0, 0.6, 1.2, 1.8]) b.box([0.9, 0.04, 1.8], [0, y + 0.1, 0], 'wood_new', { base: true });
+    b.box([0.05, 2.2, 1.8], [-0.43, 0, 0], 'wood', { base: true });
+    b.box([0.05, 2.2, 1.8], [0.43, 0, 0], 'wood', { base: true });
   },
   shelf: (b, w) => {
     for (const y of [0, 0.55, 1.1]) {

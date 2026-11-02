@@ -4,6 +4,9 @@
  */
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
+import { isHome } from '../etat/interieurs';
+import { bakeryBuy, openBakery } from './bourg';
+import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
@@ -90,13 +93,28 @@ function validPointer(target: ClickTarget | null): ClickTarget | null {
   return Number.isFinite(target.x) && Number.isFinite(target.y) ? target : null;
 }
 
-function createCharacter(sim: Sim, c: Character, name: string, hair: number, outfit: number): void {
+/** Une valeur choisie à l'écran, bornée à [0, `count` - 1] (une valeur absente garde l'actuelle). */
+function pick(value: number | undefined, count: number, current: number): number {
+  if (value === undefined || !Number.isFinite(value)) return current;
+  return Math.max(0, Math.min(count - 1, Math.round(value)));
+}
+
+function createCharacter(
+  sim: Sim,
+  c: Character,
+  intent: { name: string; hair: number; outfit: number; hairColor?: number; beard?: number },
+): void {
+  const { name, hair, outfit } = intent;
   if (sim.world.phase !== 'creation') return;
   const trimmed = name.normalize('NFC').trim();
   // 1 à 16 graphèmes (PE-01, H-01): « Œ » ou un accent combiné comptent pour un.
   const graphemes = Array.from(new Intl.Segmenter('fr', { granularity: 'grapheme' }).segment(trimmed), (s) => s.segment);
   c.name = graphemes.length >= 1 ? graphemes.slice(0, NAME_MAX).join('') : c.name;
-  c.appearance.hair = Math.max(0, Math.min(2, Math.round(hair)));
+  // Tour 10 (section 2): 12 coupes à la création (les trois du salon se choisissent chez Solange), 8 couleurs, barbe.
+  const look = sim.content.settings.town.appearance;
+  c.appearance.hair = pick(hair, look.creationHairStyles, 0);
+  c.appearance.hairColor = pick(intent.hairColor, look.hairColors, c.appearance.hairColor);
+  c.appearance.beard = pick(intent.beard, look.beards, c.appearance.beard);
   c.appearance.outfit = Math.max(0, Math.min(3, Math.round(outfit)));
   c.created = true;
   sim.runtime.changed = true;
@@ -104,7 +122,7 @@ function createCharacter(sim: Sim, c: Character, name: string, hair: number, out
 }
 
 function examine(sim: Sim, c: Character): void {
-  if (!canAct(c, sim) || !c.inHouse) return;
+  if (!canAct(c, sim) || !isHome(c)) return;
   const front = { cx: Math.floor(c.pos.x + Math.cos(c.facing)), cy: Math.floor(c.pos.y + Math.sin(c.facing)) };
   const here = { cx: Math.floor(c.pos.x), cy: Math.floor(c.pos.y) };
   // Le meuble devant soi d'abord, puis le tapis sous ses pieds.
@@ -127,7 +145,7 @@ function craft(sim: Sim, c: Character, recipeId: string): void {
   const near =
     recipe.station === 'workbench'
       ? nearPoint(sim, c, POINT.workbench, sim.content.settings.ranges.talk)
-      : c.inHouse && sim.world.furniture.some((f) => sim.content.items[f.item]?.station === 'stove');
+      : isHome(c) && sim.world.furniture.some((f) => sim.content.items[f.item]?.station === 'stove');
   if (!near || c.crafting !== null) return;
   const paid = payMaterials(sim, c, recipe.inputs);
   if (!paid.ok) return;
@@ -189,7 +207,7 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       chooseAtStage(sim, by, intent.choice);
       return;
     case 'create_character':
-      createCharacter(sim, c, intent.name, intent.hair, intent.outfit);
+      createCharacter(sim, c, intent);
       return;
     case 'move_to': {
       if (!c.created || (c.status !== 'active' && c.status !== 'menu') || c.crafting !== null) return;
@@ -270,7 +288,7 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'take_furniture': {
       const f = sim.world.furniture.find((x) => x.id === intent.furniture);
-      if (f !== undefined && canAct(c, sim) && c.inHouse) takeFurniture(sim, c, f.id);
+      if (f !== undefined && canAct(c, sim) && isHome(c)) takeFurniture(sim, c, f.id);
       return;
     }
     case 'corner':
@@ -293,7 +311,29 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     }
     case 'menu':
-      if (c.status === 'active' || c.status === 'menu') openMenu(sim, c, intent.menu);
+      // Pendant la sieste, le carnet s'ouvre (et se ferme) sans réveiller (section 3.4).
+      if (c.status === 'sleeping' && c.needs.napStart !== null && (intent.menu === null || intent.menu === 'notebook' || intent.menu === 'letter')) {
+        c.menu = intent.menu;
+        sim.runtime.changed = true;
+        return;
+      }
+      if (c.status !== 'active' && c.status !== 'menu') return;
+      // Le fauteuil et le guichet ont leurs règles (portée, heures, un seul au fauteuil).
+      if (intent.menu === 'salon') openSalon(sim, c);
+      else if (intent.menu === 'bakery') openBakery(sim, c);
+      else openMenu(sim, c, intent.menu);
+      return;
+    case 'bakery_buy':
+      if (c.status === 'active' || c.status === 'menu') bakeryBuy(sim, c, intent.item);
+      return;
+    case 'haircut':
+      haircut(sim, c, intent.hair, intent.hairColor, intent.beard);
+      return;
+    case 'hair_offer':
+      if (c.status === 'active' || c.status === 'menu') offerHaircut(sim, c, intent.hair, intent.hairColor, intent.beard);
+      return;
+    case 'hair_offer_answer':
+      answerHairOffer(sim, c, intent.accept);
       return;
     case 'dialogue_next':
       dialogueNext(sim, c);

@@ -160,7 +160,10 @@ export function storageMove(sim: Sim, c: Character, item: string, quality: Quali
   const room = toRack ? rackFree(sim) : storageRoomFor(sim, item, quality);
   const n = Math.min(count, inBag, room);
   if (n <= 0) {
-    if (inBag > 0) say(sim, c.id, 'storage_full');
+    if (inBag > 0) {
+      say(sim, c.id, 'storage_full');
+      emit(sim, { type: 'storage_full', by: c.id });
+    }
     return 0;
   }
   const taken = takeFromBag(c, item, n, quality);
@@ -168,7 +171,10 @@ export function storageMove(sim: Sim, c: Character, item: string, quality: Quali
   addStack(toRack ? sim.world.rack : sim.world.cellar, item, quality, moved);
   sim.runtime.changed = true;
   emit(sim, { type: 'deposited', by: c.id, item, count: moved });
-  if (moved < Math.min(count, inBag)) say(sim, c.id, 'storage_full');
+  if (moved < Math.min(count, inBag)) {
+    say(sim, c.id, 'storage_full');
+    emit(sim, { type: 'storage_full', by: c.id });
+  }
   return moved;
 }
 

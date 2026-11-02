@@ -84,7 +84,10 @@ export function houseFirst(base: Robot): Robot & { log: HouseLog } {
     const m = mem[c.id];
     const shopping = c.status === 'menu' && c.menu === 'shop';
     if (w.phase !== 'day' || (c.status !== 'active' && !shopping) || w.beam?.carried === true || w.scene !== null) return null;
-    if (w.clock.minutes < FROM || w.clock.minutes > UNTIL || w.tick < m.wait) return null;
+    if (w.clock.minutes < FROM || w.clock.minutes > UNTIL) return null;
+    // Juste après un geste de la maison (Agir au comptoir, une commande): on garde la main quelques
+    // pas, sinon le robot du jeu repart ailleurs (la rue Haute est loin) et referme la boutique.
+    if (w.tick < m.wait) return frame(m);
     const busy = roomInProgress(sim);
     // Commander (p1, à l'établi; p2 accepte par le robot du jeu).
     if (busy === null) {

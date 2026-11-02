@@ -273,6 +273,9 @@ const MENU_ICONS: Readonly<Record<MenuKind, string>> = {
   chest: 'chest',
   proposal: 'ui-coin',
   letter: 'ui-letter',
+  // Tour 10 (lot L6): icônes à choisir avec l'interface du salon et du guichet.
+  salon: 'ui-notebook',
+  bakery: 'ui-coin',
 };
 
 /** Ce que fait l'autre joueur, en mots. `awayMinutes`: minutes sans entrée (mesurées par l'interface), ou `null`. */

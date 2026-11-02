@@ -18,7 +18,7 @@ import type {
 import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { type Sim, wrapWorld } from './contexte';
-import { ITEM, SPAWN_POINTS } from './ids';
+import { ITEM, SPAWN_POINTS, TOOL_RACK } from './ids';
 import { emptyMemories } from './souvenirs';
 import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
@@ -41,6 +41,30 @@ const DEFAULT_HAIR_COLOR: Readonly<Record<CharacterId, number>> = { p1: 1, p2: 0
 /** Besoins du tour 10 (section 3) au repos: rien de compté aujourd'hui, personne loin de l'autre. */
 function tour10Needs(): Pick<Needs, 'apartMinutes' | 'reunionsToday' | 'nappedToday' | 'napStart' | 'curtainsMorningDone' | 'missingShown'> {
   return { apartMinutes: 0, reunionsToday: 0, nappedToday: false, napStart: null, curtainsMorningDone: false, missingShown: false };
+}
+
+/** Le râtelier posé à sa place fixe (`ids.ts`, `TOOL_RACK`). */
+function rackFurniture(): PlacedFurniture {
+  const r = TOOL_RACK;
+  return { id: r.id, item: r.item, cell: { cx: r.cell.cx, cy: r.cell.cy }, rotation: r.rotation, placedBy: null };
+}
+
+/** Un habitant hors de la carte, avant sa première entrée d'emploi du temps. */
+export function newVillagerState(map: GameMap, id: string): VillagerState {
+  const start = map.points.offstage ?? { x: -20, y: -20 };
+  return {
+    id,
+    pos: { x: start.x, y: start.y },
+    prev: { x: start.x, y: start.y },
+    facing: Math.PI / 2,
+    speed: 0,
+    visible: false,
+    target: 'offstage',
+    activity: 'absent',
+    talkingWith: [],
+    met: false,
+    inside: null,
+  };
 }
 
 export function emptyCounters(): Counters {
@@ -73,10 +97,10 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     prev: { x: pos.x, y: pos.y },
     facing: Math.PI / 2,
     speed: 0,
-    inHouse: false,
     inside: buildingAt(map, {}, pos.x, pos.y),
     hairChangedDay: null,
     hairNoticedBy: null,
+    hairOffer: null,
     action: { kind: 'idle', since: 0, duration: 0, target: null },
     status: 'active',
     menu: null,
@@ -135,26 +159,13 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     nextId += 1;
     return { id: `f${nextId}`, item: f.item, cell: { cx: f.cell.cx, cy: f.cell.cy }, rotation: f.rotation, placedBy: null };
   });
+  // Le râtelier, à sa place fixe (identifiant hors de `nextId`: les autres meubles gardent les leurs).
+  if (content.items[TOOL_RACK.item] !== undefined) furniture.push(rackFurniture());
 
   const beamDef = content.constructions.find((c) => c.kind === 'carry');
   const beamFrom = beamDef?.carry ? map.points[beamDef.carry.from] : undefined;
 
-  const villagers: VillagerState[] = content.villagers.map((v) => {
-    const start = map.points.offstage ?? { x: -20, y: -20 };
-    return {
-      id: v.id,
-      pos: { x: start.x, y: start.y },
-      prev: { x: start.x, y: start.y },
-      facing: Math.PI / 2,
-      speed: 0,
-      visible: false,
-      target: 'offstage',
-      activity: 'absent',
-      talkingWith: [],
-      met: false,
-      inside: null,
-    };
-  });
+  const villagers: VillagerState[] = content.villagers.map((v) => newVillagerState(map, v.id));
 
   const world: WorldState = {
     schema: DATA_SCHEMA,
@@ -252,6 +263,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     giftsGiven: {},
     rooms: {},
     rack: [],
+    upperStreetSince: 1,
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.
@@ -272,16 +284,23 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
  * valeurs par défaut, et `inside` recalculé depuis la position. Rien n'est écrasé s'il est déjà là.
  */
 export function fillTour10Fields(map: GameMap, world: WorldState): void {
-  const w = world as Omit<WorldState, 'rooms' | 'rack'> & Partial<Pick<WorldState, 'rooms' | 'rack'>>;
+  const w = world as Omit<WorldState, 'rooms' | 'rack' | 'upperStreetSince'> &
+    Partial<Pick<WorldState, 'rooms' | 'rack' | 'upperStreetSince'>>;
   w.rooms ??= {};
   w.rack ??= [];
+  if (!world.furniture.some((f) => f.item === TOOL_RACK.item)) world.furniture.push(rackFurniture());
+  // Partie reprise d'avant la rue Haute: ses départs comptent depuis la première aube jouée avec elle.
+  w.upperStreetSince ??= world.phase === 'breakfast' ? world.clock.day : world.clock.day + 1;
   const rooms = w.rooms;
   for (const c of world.characters) {
-    const old = c as Omit<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy'> &
-      Partial<Pick<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy'>>;
+    const old = c as Omit<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy' | 'hairOffer'> &
+      Partial<Pick<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy' | 'hairOffer'>>;
     old.inside = buildingAt(map, rooms, c.pos.x, c.pos.y);
+    // L'ancien booléen `inHouse` (formats 1 à 6) ne sert plus: `inside` le remplace (lot L3).
+    delete (old as { inHouse?: boolean }).inHouse;
     old.hairChangedDay ??= null;
     old.hairNoticedBy ??= null;
+    old.hairOffer ??= null;
     const look: Partial<Appearance> = c.appearance;
     look.hairColor ??= DEFAULT_HAIR_COLOR[c.id];
     look.beard ??= 0;

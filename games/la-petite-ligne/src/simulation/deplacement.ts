@@ -3,20 +3,29 @@
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
 import type { ControlFrame } from '../etat/actions';
-import { buildingAt, inRect } from '../etat/carte';
+import { buildingAt } from '../etat/carte';
+import { isHome } from '../etat/interieurs';
 import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
-import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
+import { type Blockers, OPENED_CELL, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
+import { builtRoomCells } from './pieces';
 import { ZONE } from './ids';
 import { treeBlocks } from './lisiere';
 import { armedCells } from '../etat/moments';
 import { walkFactor } from './besoins';
+import { ALL_DOORS, blockersAt, closedMask, isDoorCell, markClosedDoors, refuseDoorCarry, trackInside, withDoor } from './interieurs';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
   const rt = sim.runtime;
+  // Une porte ouvre ou ferme quand l'heure franchit un bord de ses heures (ADR 0016).
+  const closed = closedMask(sim);
+  if (closed !== rt.closedDoors) {
+    rt.closedDoors = closed;
+    rt.dynamicDirty = true;
+  }
   if (rt.dynamicDirty) {
     const { map } = sim;
     rt.dynamicBlocked.fill(0);
@@ -50,9 +59,28 @@ export function refreshBlockers(sim: Sim): Blockers {
         }
       }
     }
+    // Tour 10 (lot L4): les murs d'une pièce bâtie bloquent, sa porte percée s'ouvre dans l'ancienne fenêtre.
+    const built = builtRoomCells(sim);
+    for (const cell of built.walls) {
+      if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    }
+    for (const cell of built.doors) {
+      if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = OPENED_CELL;
+    }
+    markClosedDoors(sim, rt.dynamicBlocked, closed);
     rt.dynamicDirty = false;
   }
   return { map: sim.map, dynamic: rt.dynamicBlocked };
+}
+
+/** Collisions pour un corps à ce point: dedans, la porte de son bâtiment reste passable (sortie toujours permise). */
+export function blockersFor(sim: Sim, pos: Vec2): Blockers {
+  return blockersAt(sim, refreshBlockers(sim), pos);
+}
+
+/** Collisions des habitants: ils ont leurs clés, toutes les portes s'ouvrent devant eux. */
+export function villagerBlockers(sim: Sim): Blockers {
+  return withDoor(sim, refreshBlockers(sim), ALL_DOORS);
 }
 
 /**
@@ -150,7 +178,7 @@ export function canWalk(sim: Sim, c: Character): boolean {
 
 /** Ordonne d'aller vers un point (clic au sol). */
 export function goTo(sim: Sim, c: Character, target: Vec2): boolean {
-  const b = refreshBlockers(sim);
+  const b = blockersFor(sim, c.pos);
   const path = findPath(b, c.pos, target);
   if (path === null) return false;
   sim.runtime.charPaths[c.id] = path;
@@ -170,7 +198,7 @@ export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | unde
   const speed = sim.content.settings.movement.walkSpeed * walkFactor(sim, c);
   c.speed = 0;
   if (!canWalk(sim, c)) return false;
-  const b = refreshBlockers(sim);
+  const b = blockersFor(sim, c.pos);
   const before = { x: c.pos.x, y: c.pos.y };
   if (frame !== undefined && Math.hypot(frame.moveX, frame.moveY) >= MOVE_DEADZONE) {
     if (c.destination !== null) stopPath(sim, c);
@@ -210,15 +238,9 @@ export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | unde
   return false;
 }
 
-/** Après les déplacements: dans la maison ou non, la porte qui grince; le bâtiment visitable (ADR 0016). */
+/** Après les déplacements: le bâtiment visitable où l'on est (ADR 0016), la porte qui s'entend. */
 export function updateInside(sim: Sim, c: Character): void {
-  c.inside = buildingAt(sim.map, sim.world.rooms, c.pos.x, c.pos.y);
-  const inside = inRect(sim.map.house.room, c.pos.x, c.pos.y);
-  if (inside !== c.inHouse) {
-    c.inHouse = inside;
-    const doorBuilt = sim.world.constructions.some((k) => k.id === 'house_door' && k.status === 'done');
-    if (doorBuilt) emit(sim, { type: 'door', by: c.id, entering: inside });
-  }
+  trackInside(sim, c);
   if (c.speed === 0 && c.action.kind === 'walk') c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
 }
 
@@ -235,7 +257,6 @@ export function placeCharacter(sim: Sim, c: Character, at: Vec2): void {
   c.prev.y = at.y;
   c.speed = 0;
   stopPath(sim, c);
-  c.inHouse = inRect(sim.map.house.room, at.x, at.y);
   c.inside = buildingAt(sim.map, sim.world.rooms, at.x, at.y);
 }
 
@@ -289,7 +310,7 @@ export function houseSpawn(sim: Sim): Vec2 {
 /** Minuit (TE-08): qui est dehors rentre par le sentier. */
 export function midnightReturn(sim: Sim): void {
   for (const c of sim.world.characters) {
-    if (c.inHouse) continue;
+    if (isHome(c)) continue;
     release(sim, c);
     placeCharacter(sim, c, houseSpawn(sim));
     c.midnightReturn = true;
@@ -337,6 +358,7 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
   if (holders.length < 2) {
     if (beam.carried) {
       beam.carried = false;
+      sim.runtime.doorCarryNotified = false;
       for (const c of sim.world.characters) {
         if (c.status === 'gesture') {
           c.status = 'active';
@@ -375,9 +397,15 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     vy = i.y * s.movement.carrySpeedOneMoving;
   }
   const blockers = refreshBlockers(sim);
+  // On ne passe pas une porte en portant à deux (tour 10, section 1.6): ni dedans, ni dehors.
+  const door = { hit: false };
   const fits = (x: number, y: number): boolean =>
     holders.every((c) => {
       const off = sim.runtime.beamOffsets[c.id];
+      if (isDoorCell(sim.map, x + off.x, y + off.y)) {
+        door.hit = true;
+        return false;
+      }
       return !bodyCollides(blockers, x + off.x, y + off.y);
     });
   if (beam.route !== null) {
@@ -397,6 +425,7 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
       beam.pos.y = ny;
     }
   }
+  if (door.hit) refuseDoorCarry(sim, beam.holders);
   // La draisine roule: elle regarde dans le sens de la marche (axe de la voie), le rendu la pose sur les rails.
   if (beam.purpose === 'handcar' && (vx !== 0 || vy !== 0)) beam.facing = Math.atan2(vy, vx);
   for (const c of holders) {
@@ -409,6 +438,7 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
   const arrived = beam.route !== null ? beam.leg >= beam.route.length : distance(beam.pos, beam.to) <= s.feel.beamDropRadius;
   if (arrived) {
     sim.world.beam = null;
+    sim.runtime.doorCarryNotified = false;
     for (const c of holders) {
       c.status = 'active';
       c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };

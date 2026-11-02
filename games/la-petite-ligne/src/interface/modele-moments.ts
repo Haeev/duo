@@ -3,6 +3,7 @@
  * confidence du matin. Fonctions pures (aucun DOM), testées dans Node; la simulation décide,
  * l'interface ne fait que dire ce qu'elle a décidé et ce qui manque encore.
  */
+import { isSheltered } from '../etat/interieurs';
 import type { MomentDef, MomentWatch } from '../donnees/types';
 import { type FreezeState, activeWatch, freezeState, momentDef, watchTarget } from '../etat/moments';
 import type { DeepReadonly, MomentToday, ReadonlyWorld } from '../etat/types';
@@ -40,7 +41,7 @@ export interface WatchModel {
 
 /** Ce joueur peut-il regarder (dehors, sans menu ni conversation, éveillé) ? Même règle que la simulation. */
 function free(world: ReadonlyWorld, c: ReadonlyCharacter): boolean {
-  return c.created && !c.inHouse && c.menu === null && c.dialogue === null && c.status === 'active' && !c.absent && world.scene === null;
+  return c.created && !isSheltered(c) && c.menu === null && c.dialogue === null && c.status === 'active' && !c.absent && world.scene === null;
 }
 
 function angleGap(a: number, b: number): number {

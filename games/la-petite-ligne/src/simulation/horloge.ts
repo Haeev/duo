@@ -4,6 +4,8 @@
  */
 import { reopenCrate } from './economie';
 import type { CharacterStatus, ClockStop } from '../etat/types';
+import { isHome } from '../etat/interieurs';
+import { morningTown } from './bourg';
 import { SECONDS_PER_MINUTE, SIM_HZ } from './constantes';
 import { type Sim, character, emit, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
@@ -84,7 +86,7 @@ export function updateClock(sim: Sim, dt: number): void {
   const s = sim.content.settings.clock;
   const clock = world.clock;
   if (world.phase === 'day') {
-    const bothInside = world.characters.every((c) => c.inHouse);
+    const bothInside = world.characters.every((c) => isHome(c));
     const veillee = clock.minutes >= s.veilleeFrom && bothInside;
     if (veillee && !clock.veillee) {
       emit(sim, { type: 'veillee_started' });
@@ -122,7 +124,7 @@ function timeTriggers(sim: Sim, before: number, after: number): void {
   for (const hint of sim.content.hints) {
     if (hint.trigger.on === 'time_reached' && crossed(before, after, hint.trigger.time)) {
       for (const c of sim.world.characters) {
-        if (!c.inHouse) queueHint(sim, c.id, { on: 'time_reached', time: hint.trigger.time });
+        if (!isHome(c)) queueHint(sim, c.id, { on: 'time_reached', time: hint.trigger.time });
       }
     }
   }
@@ -208,6 +210,8 @@ export function morning(sim: Sim): void {
   // Tour 9: ce que Basile a bâti dans la nuit, puis l'annonce du jour (dimanche, mercredi).
   morningImprovements(sim);
   morningBoard(sim);
+  // Tour 10: la nouveauté du jour de la rue Haute (avant les emplois du temps qui la lisent).
+  morningTown(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
   morningMoments(sim);

@@ -19,6 +19,9 @@ import { pumpScripts } from './effets';
 import { envieStayPoints, updateEnvies, updateStays } from './envies';
 import { clearHandcarSpot, moveCharacter, refreshBlockers, updateBeam, updateInside, updateVillagerInside } from './deplacement';
 import { updateVillagers } from './habitants';
+import { updateDoors } from './interieurs';
+import { updateTown } from './bourg';
+import { updateHairNoticed } from './salon';
 import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
 import { updateFishing } from './peche';
@@ -149,6 +152,7 @@ export function step(sim: Sim, input: StepInput): void {
     updateRoomWork(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
+  updateDoors(sim);
   updateHolds(sim);
   updateSeats(sim);
   updateVillagers(sim, dt);
@@ -159,6 +163,8 @@ export function step(sim: Sim, input: StepInput): void {
   const minutesBefore = world.clock.minutes;
   updateClock(sim, dt);
   updateNeeds(sim, minutesBefore);
+  updateTown(sim, minutesBefore);
+  updateHairNoticed(sim);
   updateMoments(sim);
   updateHenCalls(sim);
 

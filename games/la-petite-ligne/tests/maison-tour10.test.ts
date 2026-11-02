@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { deliverScheduledLetters } from '../src/simulation/courrier';
 import type { ControlFrame, Intent } from '../src/etat/actions';
 import { HOUSE_BUILDING } from '../src/etat/carte';
 import { bellyLevel, heartLevel, isNapping, restLevel, storageView, windowsNow } from '../src/etat/maison';
@@ -61,7 +62,10 @@ function contentT10(): Content {
 /** Jeudi 62 à midi (sauvegarde de référence du format 6), relue au format 7. */
 function autumn(content: Content = contentT10()): Sim {
   const ref = reference('format-6-automne-jour-62.json');
-  return restoreWorld(content, contentAndMap().map, decodeSave(structuredClone(ref.data)), ref.dataSchema, [A, B]);
+  const sim = restoreWorld(content, contentAndMap().map, decodeSave(structuredClone(ref.data)), ref.dataSchema, [A, B]);
+  // La lettre des plans de Basile (jour 23) part au premier pas d'une partie reprise après.
+  deliverScheduledLetters(sim);
+  return sim;
 }
 
 function at(sim: Sim, id: CharacterId, x: number, y: number): Character {
@@ -631,7 +635,8 @@ describe('pièces bâties à deux (T10-20, T10-21)', () => {
     nextDay(sim);
     expect(sim.world.beam?.construction).toBe('room_bedroom');
     expect(sim.world.beam?.pos).toEqual(sim.map.points.beam_pickup);
-    const s = sim.world.rooms.room_bedroom as RoomProgress;
+    const s: RoomProgress | undefined = sim.world.rooms.room_bedroom;
+    if (s === undefined) throw new Error('chambre commandée attendue');
     s.elementsBuilt = (roomDef(sim, 'room_bedroom')?.elements ?? []).filter((e) => !e.needsBeam).map((e) => e.id);
     expect(buildableElements(sim, 'room_bedroom')).toEqual([]);
     buildUntil(sim, 'room_bedroom', () => keys(character(sim, 'p1')).includes('room_beam'), 10);
@@ -819,7 +824,8 @@ describe('format 7 et migration du format 6 (T10-24, T10-25, 7.2)', () => {
       expect(ch.needs.belly).toBe(65);
       expect(ch.needs.sleep).toBe(50);
       expect(ch.needs.reunionsToday).toBe(0);
-      expect(ch.inside).toBe(ch.inHouse ? HOUSE_BUILDING : ch.inside);
+      // L'ancien booléen `inHouse` disparaît à la reprise (lot L3): seul `inside` reste.
+      expect('inHouse' in ch).toBe(false);
     }
     expect(sim.world.rooms).toEqual({});
     // Écrit au format 7, relu tel quel.

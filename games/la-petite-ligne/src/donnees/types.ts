@@ -13,6 +13,7 @@ import type {
   SoftNeedsSettings,
   StorageSettings,
 } from './maison';
+import type { TownSettings } from './bourg';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -93,6 +94,8 @@ export type Condition = { label?: string } & (
   | { type: 'annonce_active'; gabarit: string | null; step: string | null }
   | { type: 'improvement_built'; id: string }
   | { type: 'bought'; item: string }
+  // Tour 10: dans un bâtiment visitable (ADR 0016), le joueur concerné ou l'un des deux.
+  | { type: 'inside'; building: string; who: Who }
 );
 
 export type Effect =
@@ -293,6 +296,11 @@ export interface DialogueDef {
   when: Condition[];
   lines: DialogueLineDef[];
   choices: DialogueChoiceDef[];
+  /**
+   * Scène à deux (tour 10, le miroir de Solange): ce que dit l'habitant après les deux choix, selon
+   * qu'ils sont pareils (`same`) ou non (`different`). Absent: rien de plus.
+   */
+  agreement?: { same: DialogueLineDef[]; different: DialogueLineDef[] };
   effects: Effect[];
 }
 
@@ -910,6 +918,8 @@ export interface Settings {
   tidy: TidySettings;
   /** Bancs de la carte: places, assise et lever (`reglages.benches`, défauts dans `defauts.ts`). */
   benches: BenchSettings;
+  /** Rue Haute (tour 10): fournil, salon, heures d'Odette, apparence (`bourg.ts`, défauts de la conception). */
+  town: TownSettings;
   fishing: {
     castRange: number;
     /**

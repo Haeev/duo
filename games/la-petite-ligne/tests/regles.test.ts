@@ -1,4 +1,5 @@
 // Règles de la démo, une par une, sur la vraie carte et le vrai contenu.
+import { isHome } from '../src/etat/interieurs';
 import { describe, expect, it } from 'vitest';
 import type { AuthoredIntent } from '../src/etat/actions';
 import type { CharacterId } from '../src/etat/types';
@@ -121,7 +122,7 @@ describe('règles', () => {
     sim.world.clock.minutes = 24 * 60 - 0.01;
     step(sim, { controls: {}, intents: [] });
     step(sim, { controls: {}, intents: [] });
-    expect(character(sim, 'p2').inHouse).toBe(true);
+    expect(isHome(character(sim, 'p2'))).toBe(true);
     expect(character(sim, 'p2').midnightReturn).toBe(true);
   });
 
