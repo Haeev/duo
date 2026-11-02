@@ -1,0 +1,276 @@
+# Publication d'un jeu (ADR 0010, point 3).
+#
+# Sur un tag jeu-<id>-v<version> (égale à celle de games/<id>/duo-game.json),
+# ou à la main (entrée: identifiant du jeu, version lue dans son manifeste au
+# commit choisi): tests du seul jeu, construction, paquet signé
+# <id>-<version>.duogame (outils/paquet-jeu.mjs, clé dans le secret
+# DUO_CLE_PAQUETS), release jeu-<id>-v<version>, puis mise à jour de
+# catalogue.json dans la release au tag fixe « catalogue ».
+#
+# Une version publiée ne se republie jamais: la release existe déjà, on s'arrête.
+# Toutes ces releases se créent avec --latest=false (la marque « Latest » reste
+# aux releases de l'application, ADR 0011).
+#
+# Recours: si la release du jeu existe mais que le catalogue n'a pas suivi
+# (échec ou annulation du job), relancer à la main avec « catalogue seul ».
+name: Jeux
+
+on:
+  push:
+    tags: ['jeu-*-v*']
+  workflow_dispatch:
+    inputs:
+      jeu:
+        description: Identifiant du jeu (dossier games/<id>), par exemple la-petite-ligne
+        type: string
+        required: true
+      catalogue_seul:
+        description: Catalogue seul (la release du jeu existe déjà, rien n'est reconstruit)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  # Corepack télécharge pnpm sans poser de question.
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  cible:
+    name: Jeu, version et tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      id: ${{ steps.cible.outputs.id }}
+      version: ${{ steps.cible.outputs.version }}
+      tag: ${{ steps.cible.outputs.tag }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      EVENEMENT: ${{ github.event_name }}
+      REF_TYPE: ${{ github.ref_type }}
+      REF_NAME: ${{ github.ref_name }}
+      JEU: ${{ inputs.jeu }}
+      CATALOGUE_SEUL: ${{ github.event_name == 'workflow_dispatch' && inputs.catalogue_seul }}
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Tag égal à la version de duo-game.json
+        id: cible
+        run: |
+          if [ "$EVENEMENT" = workflow_dispatch ]; then
+            node outils/publication-jeu.mjs tag "$JEU" > cible.txt
+          else
+            node outils/publication-jeu.mjs controle "$REF_NAME" > cible.txt
+          fi
+          cat cible.txt
+          cat cible.txt >> "$GITHUB_OUTPUT"
+          tag="$(sed -n 's/^tag=//p' cible.txt)"
+          if [ "$REF_TYPE" = tag ] && [ "$REF_NAME" != "$tag" ]; then
+            echo "::error::Lancé depuis le tag $REF_NAME, mais le manifeste désigne $tag."
+            exit 1
+          fi
+          if [ "$CATALOGUE_SEUL" = true ]; then
+            gh release view "$tag" > /dev/null || { echo "::error::Release $tag absente: rien à inscrire au catalogue."; exit 1; }
+            exit 0
+          fi
+          if gh release view "$tag" > /dev/null 2>&1; then
+            echo "::error::La release $tag existe déjà: une version publiée ne se republie jamais. Monte la version du jeu (pnpm jeu:version <id> patch)."
+            exit 1
+          fi
+          # À la main, le tag est créé par la release sur ce commit: s'il existe déjà, il doit le désigner.
+          if [ "$EVENEMENT" = workflow_dispatch ]; then
+            existant="$(gh api "repos/$GH_REPO/commits/$tag" --jq .sha 2> /dev/null || true)"
+            if [ -n "$existant" ] && [ "$existant" != "$GITHUB_SHA" ]; then
+              echo "::error::Le tag $tag existe déjà sur $existant, pas sur $GITHUB_SHA. Lance le workflow depuis ce tag."
+              exit 1
+            fi
+          fi
+
+  construction:
+    name: Tests, construction et paquet signé
+    needs: cible
+    if: github.event_name != 'workflow_dispatch' || !inputs.catalogue_seul
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash
+    env:
+      ID: ${{ needs.cible.outputs.id }}
+      VERSION: ${{ needs.cible.outputs.version }}
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Node de .nvmrc: son corepack (0.36) sait lancer pnpm 12.
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: pnpm (version du champ packageManager, par corepack)
+        run: |
+          corepack enable
+          pnpm --version
+
+      - name: Dossier du magasin pnpm
+        id: magasin
+        run: echo "dossier=$(pnpm store path)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache du magasin pnpm
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.magasin.outputs.dossier }}
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - name: Installation
+        run: pnpm install --frozen-lockfile
+
+      - name: Types du jeu
+        run: pnpm --filter "./games/$ID" run typecheck
+
+      - name: Tests du jeu
+        run: pnpm --filter "./games/$ID" run test
+
+      - name: Construction du jeu et de ses dépendances
+        run: pnpm --filter "./games/$ID..." run build
+
+      - name: Paquet signé
+        env:
+          DUO_CLE_PAQUETS: ${{ secrets.DUO_CLE_PAQUETS }}
+          # Identifiant de la clé: variable du dépôt, pour une rotation (ADR 0010, point 1).
+          DUO_CLE_PAQUETS_ID: ${{ vars.DUO_CLE_PAQUETS_ID || 'duo-2026' }}
+        run: |
+          if [ -z "$DUO_CLE_PAQUETS" ]; then
+            echo "::error::Secret DUO_CLE_PAQUETS absent (docs/plateforme/publier-un-jeu.md)."
+            exit 1
+          fi
+          node outils/paquet-jeu.mjs "games/$ID" --sortie paquet | tee paquet-jeu.txt
+          node outils/publication-jeu.mjs entree paquet-jeu.txt --sortie paquet/entree-catalogue.json
+          fichier="paquet/$ID-$VERSION.duogame"
+          test -f "$fichier" || { echo "::error::$fichier absent."; exit 1; }
+          attendue="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).sha256)' paquet/entree-catalogue.json)"
+          echo "$attendue  $fichier" | sha256sum -c -
+          node outils/publication-jeu.mjs notes "$ID" --sortie paquet/notes.md
+
+      - name: Paquet en artefact
+        uses: actions/upload-artifact@v7
+        with:
+          name: paquet-jeu
+          path: |
+            paquet/*.duogame
+            paquet/entree-catalogue.json
+            paquet/notes.md
+          if-no-files-found: error
+          retention-days: 7
+
+  release:
+    name: Release du jeu
+    needs: [cible, construction]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ID: ${{ needs.cible.outputs.id }}
+      VERSION: ${{ needs.cible.outputs.version }}
+      TAG: ${{ needs.cible.outputs.tag }}
+      EVENEMENT: ${{ github.event_name }}
+    steps:
+      - name: Paquet construit
+        uses: actions/download-artifact@v8
+        with:
+          name: paquet-jeu
+          path: paquet
+
+      - name: Création de la release (refusée si elle existe)
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "::error::La release $TAG existe déjà: une version publiée ne se republie jamais."
+            exit 1
+          fi
+          if [ "$EVENEMENT" = workflow_dispatch ]; then cible=(--target "$GITHUB_SHA"); else cible=(--verify-tag); fi
+          nom="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1], "utf8")).manifeste.nom)' paquet/entree-catalogue.json)"
+          gh release create "$TAG" "paquet/$ID-$VERSION.duogame" paquet/entree-catalogue.json \
+            "${cible[@]}" --latest=false --title "$nom $VERSION" --notes-file paquet/notes.md
+          gh release view "$TAG" --json url,assets --jq '.url, (.assets[] | "  \(.name) \(.size) octets")'
+
+  catalogue:
+    name: Catalogue des jeux
+    needs: [cible, release]
+    # Aussi en « catalogue seul », où release est sautée.
+    if: >-
+      always() && needs.cible.result == 'success' &&
+      (needs.release.result == 'success' ||
+      (github.event_name == 'workflow_dispatch' && inputs.catalogue_seul && needs.release.result == 'skipped'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Un seul job de catalogue à la fois, tous jeux confondus. GitHub ne garde
+    # qu'un job en attente par groupe: un troisième lancé pendant qu'un premier
+    # tourne annule le deuxième en attente; le recours « catalogue seul » le rattrape.
+    concurrency:
+      group: catalogue-jeux
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.cible.outputs.tag }}
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - name: Mise à jour de catalogue.json
+        run: |
+          mkdir -p catalogue
+          gh release download "$TAG" --pattern entree-catalogue.json --dir catalogue
+          actuel=()
+          if gh release view catalogue --json assets --jq '.assets[].name' > catalogue/fichiers.txt 2> /dev/null; then
+            existe=true
+            # Fichier présent: son téléchargement doit réussir, sinon les autres jeux disparaîtraient du catalogue.
+            if grep -qx catalogue.json catalogue/fichiers.txt; then
+              gh release download catalogue --pattern catalogue.json --output catalogue/actuel.json
+              actuel=(--actuel catalogue/actuel.json)
+            fi
+          else
+            existe=false
+          fi
+          node outils/publication-jeu.mjs catalogue --entree catalogue/entree-catalogue.json "${actuel[@]}" --sortie catalogue/catalogue.json
+          if [ "$existe" = true ]; then
+            gh release upload catalogue catalogue/catalogue.json --clobber
+          else
+            gh release create catalogue catalogue/catalogue.json --target "$GITHUB_SHA" --latest=false \
+              --title "Catalogue des jeux" \
+              --notes "Liste des jeux publiés, lue par Duo. Mise à jour automatiquement à chaque publication d'un jeu: ne pas modifier à la main."
+          fi
+          gh release view catalogue --json assets --jq '.assets[] | "\(.name) \(.size) octets"'
