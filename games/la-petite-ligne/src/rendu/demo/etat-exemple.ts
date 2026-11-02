@@ -140,6 +140,9 @@ const MOMENT_SPOTS: Readonly<Record<string, readonly [number, number, number, nu
   roe_deer: [54.5, 28.0, 55.0, 25.5],
   kingfisher: [44.5, 37.5, 45.5, 36.5],
   mist: [29.5, 38.5, 29.5, 42.5],
+  // Tour 9: côte à côte à 3,5 m de la dame blanche; chacun à sa lanterne.
+  barn_owl: [54.5, 26.6, 54.5, 27.8],
+  quay_lanterns: [48.5, 18.5, 35.5, 24.5],
 };
 
 /** Rencontre: départ et arrivée de Camille par rapport à Firmin (m), durée de l'approche (s). */

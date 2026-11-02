@@ -7,8 +7,10 @@
  */
 import type { Object3D } from 'three';
 import { AnimationMixer, Group, Matrix4, Mesh } from 'three';
+import type { Content, MomentDef } from '../donnees/types';
 import type { GameMap, MapProp } from '../etat/carte';
-import type { TrainPhase } from '../etat/types';
+import { armedCells, resolveTrack, sampleResolved, type TrackSample, type Vec3 } from '../etat/moments';
+import { SIM_HZ, type DeepReadonly, type MomentToday, type TrainPhase } from '../etat/types';
 import { smoothFactor } from './camera';
 import { yawFromFacing, type FrameContext } from './contexte';
 import { propHints, propMatrix, type ClockHand } from './decor';
@@ -162,6 +164,31 @@ function easeIn(t: number): number {
   return t * t * t;
 }
 
+/**
+ * Le salut du mécanicien (tour 9, section 4.2): le moment armé par les manivelles (`watch.arm`),
+ * la piste de la cabine (`driver`) et l'écart entre la cabine et l'arrêt du train
+ * (`render.trainOffsetFromCab`): au départ au pas (`train.slow`), le train suit la cabine.
+ */
+interface SaluteTrack {
+  def: MomentDef;
+  frames: MomentDef['climax']['keyframes'][string];
+  points: Vec3[];
+  fromCab: number;
+}
+
+function saluteTrack(content: Content | null): SaluteTrack | null {
+  const def = content?.moments.find((m) => m.watch.arm !== null) ?? null;
+  const frames = def?.climax.keyframes[RENDER_SETTINGS.salute.cabActor];
+  const fromCab = def?.render.trainOffsetFromCab;
+  if (def === null || frames === undefined || typeof fromCab !== 'number') return null;
+  return { def, frames, points: resolveTrack(frames, { x: 0, y: 0, z: 0 }), fromCab };
+}
+
+/** Lisses baissées pour le salut: de l'armement (`armedTick`) à leur remontée (`liftAt`). */
+function saluteGateTarget(content: Content | null, today: DeepReadonly<MomentToday> | null): boolean {
+  return content !== null && armedCells(content, today) !== null;
+}
+
 export class RailwayPart implements EventfulPart {
   readonly group = new Group();
   /** Rails par tronçons de `chunkSize`: ceux hors du cadre sont éliminés. */
@@ -195,6 +222,15 @@ export class RailwayPart implements EventfulPart {
   }
 
   private moving = false;
+  private readonly salute: SaluteTrack | null;
+  private readonly cab: TrackSample = { x: 0, y: 0, z: 0, clip: null, clipSince: 0 };
+  /** Décalage du train à cette image (m depuis son arrêt), `NaN` s'il est parti. */
+  private shownOffset = Number.NaN;
+
+  /** Décalage du train depuis son arrêt à l'image courante (m), `NaN` quand il n'est pas là. */
+  currentOffset(): number {
+    return this.shownOffset;
+  }
 
   constructor(
     private readonly map: GameMap,
@@ -203,8 +239,11 @@ export class RailwayPart implements EventfulPart {
     private readonly terrain: Terrain,
     resources: ResourceTracker,
     private readonly clockHands: readonly ClockHand[],
+    /** Contenu (tour 9: le salut du mécanicien), `null` dans les essais. */
+    private readonly content: Content | null = null,
   ) {
     this.group.name = 'voie';
+    this.salute = saluteTrack(content);
     const line = mainLine(map);
     this.trackY = line.trackY;
     this.stopX = map.points.train_stop?.x ?? map.width / 2;
@@ -467,7 +506,14 @@ export class RailwayPart implements EventfulPart {
   update(context: FrameContext): void {
     const state = context.world.train;
     const progress = state.prevProgress + (state.progress - state.prevProgress) * context.alpha;
-    const offset = trainOffset(state.phase, progress);
+    let offset = trainOffset(state.phase, progress);
+    if (state.phase === 'departing' && state.slow === true && this.salute !== null) {
+      // Départ au pas: la cabine suit la piste du mécanicien, le train suit la cabine.
+      const seconds = this.salute.def.climax.seconds;
+      sampleResolved(this.salute.frames, this.salute.points, (1 - progress) * seconds, this.cab);
+      offset = this.cab.x + this.salute.fromCab;
+    }
+    this.shownOffset = offset;
     const visible = !Number.isNaN(offset);
     this.train.visible = visible;
     const moving = visible && state.phase !== 'stopped';
@@ -492,8 +538,19 @@ export class RailwayPart implements EventfulPart {
       this.trainX = Number.NaN;
     }
 
+    const today = context.world.moments.today;
+    const armed = saluteGateTarget(this.content, today);
+    const armedTick = today?.armedTick ?? null;
+    const lowering = armed && armedTick !== null ? (context.world.tick - armedTick + context.alpha) / SIM_HZ : Number.NaN;
+    const downSeconds = this.salute?.def.watch.arm?.seconds ?? 1;
     for (const gate of this.gates) {
-      gate.angle = gateAngleStep(gate.angle, state.phase, context.dt, context.reducedMotion);
+      if (armed && lowering < downSeconds) {
+        // Baissées à la main: les lisses suivent la manivelle, du haut en bas pendant `arm.seconds`.
+        const u = Math.min(1, Math.max(0, lowering / downSeconds));
+        gate.angle = GATE_OPEN + (GATE_CLOSED - GATE_OPEN) * u * u * (3 - 2 * u);
+      } else {
+        gate.angle = gateAngleStep(gate.angle, armed ? 'departing' : state.phase, context.dt, context.reducedMotion);
+      }
       if (gate.arm !== null) {
         gate.arm.rotation.z = gate.angle;
       }

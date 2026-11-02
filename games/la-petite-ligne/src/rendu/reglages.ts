@@ -504,6 +504,17 @@ export const RENDER_SETTINGS = {
      * pendant le fondu, au lieu d'y sauter.
      */
     bench: { seatHeight: 0.45, glideSeconds: 0.22 },
+    /**
+     * Tour 9: siège sans modèle (le bord du ponton): clip `sit_edge` (même assise que `sit`), la
+     * racine `edgeLift` m sous le plancher, jambes au-dessus de l'eau; `look_up` une fois à
+     * l'instant `lookUpAt` de l'apogée des étoiles (données du moment, `render.lookUpAt`).
+     */
+    edge: { clip: 'sit_edge', lift: -0.47, lookClip: 'look_up' },
+    /**
+     * Tour 9, le salut du mécanicien: manivelle tenue (`crank_hold`), tournée pendant la descente
+     * des lisses (`crank_turn`, un tour par seconde), main levée au salut (`wave_back`).
+     */
+    crank: { hold: 'crank_hold', turn: 'crank_turn', turnSeconds: 1, wave: 'wave_back' },
     /** Hauteur d'assise de l'animation `sit` (m): le bassin y est posé quand la racine est au sol. */
     sitClipSeatHeight: 0.47,
     /**
@@ -549,6 +560,60 @@ export const RENDER_SETTINGS = {
     wheelRadius: 0.42,
     /** Voie: rangée de la carte et décalage des voitures depuis `train_stop`. */
     carSpacing: 0.25,
+  },
+
+  /**
+   * Tour 9, le salut du mécanicien: l'acteur dont la piste mène la cabine (et le train au pas),
+   * l'équipage (bustes de `personnages.glb`) posé dans la cabine du train où qu'il soit, le volant
+   * des manivelles (un tour par seconde pendant la descente des lisses).
+   */
+  salute: {
+    cabActor: 'driver',
+    crewModels: ['rail_crew_driver', 'rail_crew_stoker'] as readonly string[],
+    /** Hauteur de la racine des bustes (m au-dessus du sol de la voie): le plancher de la cabine. */
+    crewRootZ: 1.05,
+    crankModel: 'level_crossing_crank',
+    crankWheel: 'level_crossing_crank_wheel',
+    crankTurnSeconds: 1,
+  },
+
+  /** Tour 9 (`chantiers.ts`): chantiers, marelle, lampadaires allumés à la perche. */
+  improvements: {
+    /** Nœud de l'artiste par chantier quand la carte garde un type commun (`bench`). */
+    models: { ford_bench: 'ford_bench', house_bench: 'house_bench' } as Readonly<Record<string, string>>,
+    /** Chantiers posés une fois par case (les trois jardinières du quai). */
+    onePerCell: ['quay_planters'] as readonly string[],
+    /** L'auvent: dans le repère de la maisonnette, devant la porte (extras de `door_canopy`). */
+    canopy: 'door_canopy',
+    canopyOffset: [0, 0, 2.3] as readonly [number, number, number],
+    /** Le toit du puits: l'arceau du puits ouvert s'efface une fois bâti. */
+    wellRoof: 'well_roof',
+    /** Verre d'une lanterne éteinte: case sans émission, grossi autour de la lanterne pour couvrir le verre du décor. */
+    darkGlassCell: 'shadow' as const,
+    darkGlassGrow: 1.04,
+    /** En dessous de cet allumage, la lanterne montre son verre éteint. */
+    darkGlassBelow: 0.35,
+    /** Flamme qui grandit (s) si le moment ne le dit pas; un lampadaire sans heure dans la vague (le réverbère du chemin). */
+    flameGrowSeconds: 0.6,
+    unscheduledLampAt: 4,
+    /** Flamme allumée seule: elle prend en `flameCatchSeconds`, vacille, s'éteint en `flameOutSeconds`. */
+    flameCatchSeconds: 0.25,
+    flameOutSeconds: 0.3,
+    aloneFlame: 0.8,
+    aloneFlicker: 0.35,
+    aloneFlickerHz: 7,
+    /** Marelle à la craie: point de la carte, cases (m), rangées du sud au nord, traits. */
+    hopscotch: {
+      point: 'hopscotch',
+      square: 0.42,
+      rows: [1, 1, 2, 1, 2] as readonly number[],
+      line: 0.035,
+      thickness: 0.006,
+      lift: 0.004,
+      skySegments: 7,
+      chalk: 'white_paint' as const,
+      sky: 'flower_pink' as const,
+    },
   },
 
   house: {
@@ -738,6 +803,17 @@ export const RENDER_SETTINGS = {
       halfWidth: 0.75,
       halfHeight: 1.0,
       nearer: 0.6,
+    },
+    /**
+     * Trou sur l'eau des étoiles de l'Aubrune (tour 9): les arbres de la rive sud cachent les
+     * reflets au sud du ponton en orientation 0. Ellipse autour du milieu des reflets, à la surface.
+     */
+    water: {
+      moments: ['falling_stars'],
+      phases: ['waiting', 'climax'],
+      halfWidth: 5,
+      halfHeight: 3.6,
+      nearer: 1,
     },
     /*
      * Pas de trou pour la chevrette ni de trous élargis pour la brume (tour 7): la forêt du

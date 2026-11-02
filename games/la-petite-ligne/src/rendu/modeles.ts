@@ -77,6 +77,16 @@ export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
   van: ['train_van', 'van'],
 };
 
+/**
+ * Objets de la carte dessinés par un autre nœud que celui de leur type (clé: identifiant de
+ * l'objet). Tour 9: le buisson `bush_41` de la lisière est le sureau (`bush_elder`), qui porte les
+ * grappes de la cueillette d'automne; la carte le garde en `bush` (la simulation n'y voit qu'un
+ * buisson).
+ */
+export const MODEL_BY_PROP: Readonly<Record<string, string>> = {
+  bush_41: 'bush_elder',
+};
+
 const HASH_MULTIPLIER = 31;
 const HASH_MODULO = 1_000_003;
 
@@ -230,6 +240,10 @@ export class ModelLibrary {
    * une de ses variantes présentes (choisie par `key`), sinon lui-même (substitut).
    */
   resolve(name: string, key = ''): string {
+    const forced = MODEL_BY_PROP[key];
+    if (forced !== undefined && this.table.has(forced)) {
+      return forced;
+    }
     // Les variantes passent d'abord (l'artiste garde aussi le nom générique, qui n'en montre qu'une).
     const present = (MODEL_VARIANTS[name] ?? []).filter((variant) => this.table.has(variant));
     if (present.length > 0) {
