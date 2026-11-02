@@ -29,6 +29,8 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { preparePaletteTexture, type SharedMaterials } from './materiaux';
 import type { ResourceTracker } from './ressources';
 import { buildSubstitute, type SubstituteHints } from './substituts';
+import { RENDER_SETTINGS } from './reglages';
+import { trimGeometry } from './retouches';
 
 const MODEL_URLS = import.meta.glob<string>('../../assets/modeles/*.glb', {
   query: '?url',
@@ -73,6 +75,16 @@ export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
   locomotive: ['train_locomotive', 'locomotive'],
   coach: ['train_coach', 'coach'],
   van: ['train_van', 'van'],
+};
+
+/**
+ * Objets de la carte dessinés par un autre nœud que celui de leur type (clé: identifiant de
+ * l'objet). Tour 9: le buisson `bush_41` de la lisière est le sureau (`bush_elder`), qui porte les
+ * grappes de la cueillette d'automne; la carte le garde en `bush` (la simulation n'y voit qu'un
+ * buisson).
+ */
+export const MODEL_BY_PROP: Readonly<Record<string, string>> = {
+  bush_41: 'bush_elder',
 };
 
 const HASH_MULTIPLIER = 31;
@@ -166,6 +178,12 @@ export class ModelLibrary {
         nodes.set(object.name, object);
       }
       if (object instanceof Mesh) {
+        const trim = RENDER_SETTINGS.modelTrims.find((candidate) => candidate.node === object.name);
+        if (trim !== undefined) {
+          const original = object.geometry as BufferGeometry;
+          object.geometry = trimGeometry(original, trim);
+          if (object.geometry !== original) original.dispose();
+        }
         this.resources.track(object.geometry as BufferGeometry);
         object.material = this.adoptMaterial(object.material as Material);
       }
@@ -222,6 +240,10 @@ export class ModelLibrary {
    * une de ses variantes présentes (choisie par `key`), sinon lui-même (substitut).
    */
   resolve(name: string, key = ''): string {
+    const forced = MODEL_BY_PROP[key];
+    if (forced !== undefined && this.table.has(forced)) {
+      return forced;
+    }
     // Les variantes passent d'abord (l'artiste garde aussi le nom générique, qui n'en montre qu'une).
     const present = (MODEL_VARIANTS[name] ?? []).filter((variant) => this.table.has(variant));
     if (present.length > 0) {

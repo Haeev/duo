@@ -107,6 +107,14 @@ class Emitter {
   }
 }
 
+/** Son d'arrosage propre à un arrosoir (tour 9, son.md 4.7). */
+const WATER_SOUNDS: Readonly<Record<string, string>> = { watering_can_copper: 'water-pour-copper' };
+
+function villagerAt(world: ReadonlyWorld, id: string): Vec2 | null {
+  const v = world.villagers.find((k) => k.id === id);
+  return v === undefined ? null : { x: v.pos.x, y: v.pos.y };
+}
+
 function sawRecipe(content: Content, recipe: string): boolean {
   return content.recipes[recipe]?.inputs.some((i) => i.item === 'log') === true;
 }
@@ -129,9 +137,14 @@ export function soundsForEvent(
     case 'sowed':
       emit.world('sow', cellCenter(event.cell), event.by);
       break;
-    case 'watered':
-      emit.world('water', cellCenter(event.cell), event.by);
+    case 'watered': {
+      // L'arrosoir de cuivre (tour 9) a son timbre, plus clair.
+      const c = world.characters.find((k) => k.id === event.by);
+      const held = c?.bag[c.selected]?.item ?? null;
+      const own = held === null ? undefined : WATER_SOUNDS[held];
+      emit.world(own !== undefined && ctx.hasSound(own) ? own : 'water', cellCenter(event.cell), event.by);
       break;
+    }
     case 'can_empty':
       emit.world('water-empty', characterAt(world, event.by), event.by);
       break;
@@ -335,6 +348,43 @@ export function soundsForEvent(
       break;
     }
     // Tour 8: le retour du thème après `stage_continue` suit l'état (musique); la commande tirée arrive par lettre.
+    // Tour 9 (son.md 4.7): chantiers, cadeaux, poules commandées, outils, salut et lanternes.
+    case 'improvement_paid':
+      if (event.amount > 0) emit.ui('coins-drop', event.by);
+      else emit.world('bag', characterAt(world, event.by), event.by);
+      break;
+    case 'improvement_built':
+      emit.ui('chantier-built', 'both');
+      break;
+    case 'gift_given':
+      emit.world('gift-give', villagerAt(world, event.villager) ?? characterAt(world, event.by), event.by);
+      break;
+    case 'hen_delivered':
+      emit.world('hen', pointAt(map, 'chicken_coop'), null);
+      break;
+    case 'tool_upgraded':
+      emit.world('pickup', characterAt(world, event.by), event.by);
+      break;
+    case 'moment_armed':
+      // Les deux manivelles tournent, puis chaque lisse se verrouille (fin des 2,5 s de l'armement).
+      for (const crank of GATE_CRANKS) {
+        emit.world('gate-crank', pointAt(map, crank), null);
+        emit.world('gate-lock', pointAt(map, crank), null, d.gateLockSeconds);
+      }
+      break;
+    case 'lantern_lit':
+      emit.world('lantern-light', pointAt(map, event.place) ?? characterAt(world, event.by), event.by);
+      break;
+    case 'lantern_out':
+      emit.world('lantern-out', pointAt(map, event.place) ?? characterAt(world, event.by), event.by);
+      break;
+    case 'annonce_posted':
+    case 'annonce_done':
+    case 'annonce_expired':
+    case 'improvement_funded':
+    case 'catalogue_page':
+    case 'hen_named':
+      break;
     case 'moment_climax':
     case 'moment_paused':
     case 'moment_resumed':
@@ -362,7 +412,9 @@ interface CharacterTrack {
 }
 
 /** Sons d'interface qui couvrent déjà une notification arrivée dans la même image. */
-const COVERING_UI = new Set(['journal-new', 'duo-done', 'purchase-proposal', 'purchase-accept', 'purchase-decline']);
+const COVERING_UI = new Set(['journal-new', 'duo-done', 'purchase-proposal', 'purchase-accept', 'purchase-decline', 'chantier-built', 'coins-drop']);
+/** Manivelles du passage à niveau (salut du mécanicien, tour 9). */
+const GATE_CRANKS: readonly string[] = ['gate_north_crank', 'gate_south_crank'];
 const NOTIFY_KINDS = new Set(['hint', 'message', 'letter', 'envie']);
 const NOTEBOOK_MENUS = new Set(['notebook', 'letter']);
 /** Clés des boucles de chaque personnage (pas de texte fabriqué à chaque image). */

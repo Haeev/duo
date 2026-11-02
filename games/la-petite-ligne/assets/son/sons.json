@@ -3035,7 +3035,7 @@
     },
     "glow-shimmer": {
       "event": "Vers luisants: quatre notes de célesta quand le pré s'allume (apogée, t = 0,5 s)",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "moments/glow-shimmer-1.ogg",
@@ -3055,7 +3055,7 @@
         3097
       ],
       "momentaryMaxLufs": -22.0,
-      "note": "la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: bus interface, non placé, sans variation de hauteur (notes justes en sol majeur)",
+      "note": "bus musique (fiche, question S3 réglée au tour 9): passe après la descente de l'apogée; non placé, sans variation de hauteur (notes justes en sol majeur)",
       "momentSound": "glow_shimmer",
       "moment": "glowworms"
     },
@@ -3379,7 +3379,7 @@
     },
     "mist-lift": {
       "event": "Brume: accord ouvert qui monte, harpe et cordes douces (apogée, t = 1,5 s)",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "moments/mist-lift-1.ogg",
@@ -3399,7 +3399,7 @@
         4600
       ],
       "momentaryMaxLufs": -22.0,
-      "note": "la fiche demande le bus musique; sons.json n'accepte pour les sons que effects, ui et ambience: bus interface (question S3), non placé, sans variation de hauteur (sol et do majeur)",
+      "note": "bus musique (fiche, question S3 réglée au tour 9): passe après la descente de l'apogée; non placé, sans variation de hauteur (sol et do majeur)",
       "momentSound": "mist_lift",
       "moment": "mist"
     },
@@ -3495,7 +3495,7 @@
     },
     "season-turn-spring": {
       "event": "Premier jour du printemps: motif sous la carte de saison au petit-déjeuner",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "saisons/season-turn-spring.ogg"
@@ -3513,13 +3513,13 @@
         4500
       ],
       "momentaryMaxLufs": -20.0,
-      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus musique (question S3 réglée au tour 9), sans variation de hauteur",
       "season": "spring",
       "family": "season-turn"
     },
     "season-turn-summer": {
       "event": "Premier jour de l'été: motif sous la carte de saison au petit-déjeuner",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "saisons/season-turn-summer.ogg"
@@ -3537,13 +3537,13 @@
         4314
       ],
       "momentaryMaxLufs": -20.0,
-      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus musique (question S3 réglée au tour 9), sans variation de hauteur",
       "season": "summer",
       "family": "season-turn"
     },
     "season-turn-autumn": {
       "event": "Premier jour de l'automne: motif sous la carte de saison au petit-déjeuner",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "saisons/season-turn-autumn.ogg"
@@ -3561,13 +3561,13 @@
         4500
       ],
       "momentaryMaxLufs": -20.0,
-      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus musique (question S3 réglée au tour 9), sans variation de hauteur",
       "season": "autumn",
       "family": "season-turn"
     },
     "season-turn-winter": {
       "event": "Premier jour de l'hiver: motif sous la carte de saison au petit-déjeuner",
-      "bus": "ui",
+      "bus": "music",
       "priority": 2,
       "files": [
         "saisons/season-turn-winter.ogg"
@@ -3585,7 +3585,7 @@
         4500
       ],
       "momentaryMaxLufs": -20.0,
-      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus interface (question S3), sans variation de hauteur",
+      "note": "un fichier par saison (pas de tirage): jouer season-turn-<saison du jour>; fa pentatonique, juste sur la musique du petit-déjeuner; bus musique (question S3 réglée au tour 9), sans variation de hauteur",
       "season": "winter",
       "family": "season-turn"
     },
@@ -3898,6 +3898,1467 @@
       ],
       "momentaryMaxLufs": -25.0,
       "note": "joué seul, à la place de ui-refusal: le refus s'entend dans le monde"
+    },
+    "star-chime-1": {
+      "event": "Étoiles de l'Aubrune: première étoile filante (apogée, t = 0,0 s), célesta: sol 5",
+      "bus": "music",
+      "priority": 2,
+      "files": [
+        "moments/star-chime-1.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1900
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "cinq sons joués dans l'ordre de la fiche (star_chime note 1, note 2, accord, note 3, note 4), un par étoile; do pentatonique, juste sur la nuit (fa), le jour (sol) et le samedi (do); aucune variation de hauteur",
+      "momentSound": "star_chime_1",
+      "moment": "falling_stars",
+      "order": 1,
+      "family": "star-chime"
+    },
+    "star-chime-2": {
+      "event": "Étoiles de l'Aubrune: deuxième étoile filante (apogée, t = 2,4 s), célesta: mi 6",
+      "bus": "music",
+      "priority": 2,
+      "files": [
+        "moments/star-chime-2.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1900
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "cinq sons joués dans l'ordre de la fiche (star_chime note 1, note 2, accord, note 3, note 4), un par étoile; do pentatonique, juste sur la nuit (fa), le jour (sol) et le samedi (do); aucune variation de hauteur",
+      "momentSound": "star_chime_2",
+      "moment": "falling_stars",
+      "order": 2,
+      "family": "star-chime"
+    },
+    "star-chime-3": {
+      "event": "Étoiles de l'Aubrune: troisième, la grosse étoile filante (apogée, t = 4,5 s), célesta: accord la, ré, sol, do roulé vers le grave",
+      "bus": "music",
+      "priority": 2,
+      "files": [
+        "moments/star-chime-3.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2562
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "cinq sons joués dans l'ordre de la fiche (star_chime note 1, note 2, accord, note 3, note 4), un par étoile; do pentatonique, juste sur la nuit (fa), le jour (sol) et le samedi (do); aucune variation de hauteur",
+      "momentSound": "star_chime_3",
+      "moment": "falling_stars",
+      "order": 3,
+      "family": "star-chime"
+    },
+    "star-chime-4": {
+      "event": "Étoiles de l'Aubrune: quatrième étoile filante (apogée, t = 7,6 s), célesta: ré 6",
+      "bus": "music",
+      "priority": 2,
+      "files": [
+        "moments/star-chime-4.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1900
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "cinq sons joués dans l'ordre de la fiche (star_chime note 1, note 2, accord, note 3, note 4), un par étoile; do pentatonique, juste sur la nuit (fa), le jour (sol) et le samedi (do); aucune variation de hauteur",
+      "momentSound": "star_chime_4",
+      "moment": "falling_stars",
+      "order": 4,
+      "family": "star-chime"
+    },
+    "star-chime-5": {
+      "event": "Étoiles de l'Aubrune: cinquième étoile filante (apogée, t = 9,4 s), célesta: do 6",
+      "bus": "music",
+      "priority": 2,
+      "files": [
+        "moments/star-chime-5.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1900
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "cinq sons joués dans l'ordre de la fiche (star_chime note 1, note 2, accord, note 3, note 4), un par étoile; do pentatonique, juste sur la nuit (fa), le jour (sol) et le samedi (do); aucune variation de hauteur",
+      "momentSound": "star_chime_5",
+      "moment": "falling_stars",
+      "order": 5,
+      "family": "star-chime"
+    },
+    "night-water": {
+      "event": "Étoiles de l'Aubrune: l'eau calme qui clapote contre les pieux du ponton (boucle placée à stars_water)",
+      "bus": "ambience",
+      "priority": 3,
+      "files": [
+        "moments/night-water.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        6000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 6.5,
+        "startSample": 24000,
+        "endSample": 312000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "audible à 12 m (fiche); pendant la présence, l'attente et l'apogée",
+      "momentSound": "night_water",
+      "moment": "falling_stars"
+    },
+    "gate-crank": {
+      "event": "Salut du mécanicien: on tourne la manivelle d'une barrière (2,5 s, armement)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/gate-crank-1.ogg",
+        "moments/gate-crank-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        2500,
+        2500
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "un par poteau, placé à la manivelle; les deux jouent ensemble (deux variantes, tirées sans répétition)",
+      "momentSound": "gate_crank",
+      "moment": "train_salute"
+    },
+    "gate-lock": {
+      "event": "Salut du mécanicien: la lisse se pose et le verrou claque (fin de l'armement)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/gate-lock.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        241
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "un par poteau, à 2,5 s",
+      "momentSound": "gate_lock",
+      "moment": "train_salute"
+    },
+    "train-slow-roll": {
+      "event": "Salut du mécanicien: la locomotive au pas, bouffées douces et joints de rail (boucle)",
+      "bus": "effects",
+      "priority": 1,
+      "files": [
+        "moments/train-slow-roll.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        2000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 2.5,
+        "startSample": 24000,
+        "endSample": 120000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -24.0,
+      "note": "de t = 8 s à la sortie de la carte, placé à la cabine et déplacé avec elle",
+      "momentSound": "train_slow_roll",
+      "moment": "train_salute"
+    },
+    "train-whistle-salute": {
+      "event": "Salut du mécanicien: deux coups de sifflet courts (apogée, t = 10,0 s)",
+      "bus": "effects",
+      "priority": 1,
+      "files": [
+        "moments/train-whistle-salute.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 15.0,
+        "rolloffFactor": 0.5,
+        "maxDistance": 400.0,
+        "cullBeyondM": 100000.0,
+        "minGainDb": -14.0
+      },
+      "durationMs": [
+        2310
+      ],
+      "momentaryMaxLufs": -15.0,
+      "note": "un seul déclenchement à 10,0 s: le fichier contient les deux coups (10,0 et 10,6 s); mêmes tuyaux que train-whistle, deux coups brefs au lieu du « pou-pouuu »",
+      "momentSound": "train_whistle_salute",
+      "moment": "train_salute"
+    },
+    "cylinder-cocks": {
+      "event": "Salut du mécanicien: purgeurs ouverts, deux jets de vapeur au ras du ballast (t = 11 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/cylinder-cocks.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        2500
+      ],
+      "momentaryMaxLufs": -20.0,
+      "momentSound": "cylinder_cocks",
+      "moment": "train_salute"
+    },
+    "owl-screech": {
+      "event": "Dame blanche: cri rauque et soufflé de l'effraie (attente toutes les 20 à 30 s; apogée, t = 13,4 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/owl-screech-1.ogg",
+        "moments/owl-screech-2.ogg",
+        "moments/owl-screech-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 5000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 4.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 25.0,
+        "cullBeyondM": 25.0
+      },
+      "durationMs": [
+        1199,
+        1099,
+        1299
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "audible à 25 m; placé à l'effraie; son vol reste silencieux (fiche)",
+      "momentSound": "owl_screech",
+      "moment": "barn_owl"
+    },
+    "grass-strike": {
+      "event": "Dame blanche: elle plonge dans l'herbe haute, serres en avant (apogée, t = 6,2 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/grass-strike.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.2,
+        "maxDistance": 20.0,
+        "cullBeyondM": 20.0
+      },
+      "durationMs": [
+        398
+      ],
+      "momentaryMaxLufs": -25.0,
+      "momentSound": "grass_strike",
+      "moment": "barn_owl"
+    },
+    "owl-far": {
+      "event": "Soir d'automne: le cri de l'effraie, loin dans la nuit (une fois entre 19 h 30 et 21 h, les soirs sans la dame blanche)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/owl-far-1.ogg",
+        "ambiance/owl-far-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        3299,
+        3380
+      ],
+      "momentaryMaxLufs": -30.0,
+      "note": "non placé, joué une fois par soir (plan.eveningCalls); jamais sous la pluie ni le soir du moment",
+      "season": "autumn"
+    },
+    "lantern-light": {
+      "event": "Lanternes du quai: la perche allume la mèche (fffou, grésillement, flamme)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/lantern-light-1.ogg",
+        "moments/lantern-light-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        600,
+        600
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "à chaque lanterne; les deux s'allument au même instant à l'apogée: aucun intervalle minimal",
+      "momentSound": "lantern_light",
+      "moment": "quay_lanterns"
+    },
+    "lantern-out": {
+      "event": "Lanternes du quai: allumée seule, la flamme vacille et s'éteint (0,8 s après)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/lantern-out.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        350
+      ],
+      "momentaryMaxLufs": -26.0,
+      "momentSound": "lantern_out",
+      "moment": "quay_lanterns"
+    },
+    "quay-bell-once": {
+      "event": "Lanternes du quai: Firmin sonne une fois la cloche du quai (apogée, t = 6,0 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "moments/quay-bell-once.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        2959
+      ],
+      "momentaryMaxLufs": -18.0,
+      "note": "le premier coup de station-bell, seul; placé à la cloche (quay_bell), entendu des deux places",
+      "momentSound": "quay_bell_once",
+      "moment": "quay_lanterns"
+    },
+    "coins-drop": {
+      "event": "Verser au chantier: les pièces tombent dans le tronc de la coopérative",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "interface/coins-drop-1.ogg",
+        "interface/coins-drop-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 300,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        707,
+        762
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "chez celui qui verse; distinct de coins (on compte au comptoir): plus long, en tas, deux pièces qui roulent"
+    },
+    "chantier-built": {
+      "event": "Un chantier est bâti dans la nuit (notification du matin, chez les deux)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "objets/chantier-built.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2303
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "sol majeur, sans variation de hauteur; à la place de notify pour ce message",
+      "decodeWhen": "un chantier est entièrement payé (il sera bâti dans la nuit)"
+    },
+    "gift-give": {
+      "event": "Offrir un cadeau à un habitant (papier froissé)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "objets/gift-give-1.ogg",
+        "objets/gift-give-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 200,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        468,
+        466
+      ],
+      "momentaryMaxLufs": -24.0,
+      "decodeWhen": "un cadeau du rayon « Pour offrir » est dans un sac"
+    },
+    "coffee-grind": {
+      "event": "Odette moud du café au moulin offert, sur son comptoir",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "objets/coffee-grind-1.ogg",
+        "objets/coffee-grind-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 8000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        2397,
+        2398
+      ],
+      "momentaryMaxLufs": -27.0,
+      "note": "placé au moulin (comptoir d'Odette); le geste d'Odette qui le déclenche reste à définir",
+      "decodeWhen": "le moulin est offert et l'écouteur à moins de 28 m du comptoir d'Odette"
+    },
+    "clock-tick": {
+      "event": "Horloge murale: tic-tac du balancier (boucle, à moins de 3 m dans la pièce)",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "objets/clock-tick.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 0.8,
+        "rolloffFactor": 1.5,
+        "maxDistance": 3.0,
+        "cullBeyondM": 3.0
+      },
+      "durationMs": [
+        2000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 2.5,
+        "startSample": 24000,
+        "endSample": 120000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -38.0,
+      "note": "boucle placée à l'horloge posée au mur; coupée au-delà de 3 m",
+      "decodeWhen": "l'horloge est posée et l'écouteur dans la maisonnette"
+    },
+    "water-pour-copper": {
+      "event": "Arroser une case avec l'arrosoir de cuivre (P1)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "objets/water-pour-copper-1.ogg",
+        "objets/water-pour-copper-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        1497,
+        1496
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "à la place de water quand l'outil est l'arrosoir de cuivre (toolKind watering_can)",
+      "decodeWhen": "l'arrosoir de cuivre est dans le sac de l'un des deux"
+    },
+    "door-locked": {
+      "event": "Porte fermée: le loquet bute, la porte ne s'ouvre pas (0,3 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "rue-haute/door-locked-1.ogg",
+        "rue-haute/door-locked-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 600,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        242,
+        214
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "à la porte, chez celui qui essaie d'entrer hors des heures; le texte de la porte suit",
+      "decodeWhen": "l'écouteur est à moins de 45 m d'une porte d'intérieur à heures (épicerie, mercerie)"
+    },
+    "bakery-bell": {
+      "event": "Acheter au guichet du fournil: la clochette du guichet",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "rue-haute/bakery-bell.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        1345
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "ré 6, sans variation de hauteur (accordé); au guichet bakery_window; bread-crack suit à 0,3 s",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "bread-crack": {
+      "event": "Pain chaud reçu: deux coups sous la miche, la croûte qui chante",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/bread-crack-1.ogg",
+        "rue-haute/bread-crack-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        1600,
+        1596
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "seulement pour le pain chaud (6 h à 9 h); joué au joueur qui achète, 0,3 s après bakery-bell",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "salon-bell": {
+      "event": "Entrer au salon de Solange: la clochette de la porte, sur son ressort",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/salon-bell.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        1158
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "sol 6 et si 6, sans variation de hauteur; à la porte salon_door, avec door-open",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "chair-creak": {
+      "event": "S'asseoir au fauteuil de coiffure (cuir, pied de fonte, bois)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/chair-creak-1.ogg",
+        "rue-haute/chair-creak-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        587,
+        592
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "au fauteuil salon_chair",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "scissors-snip": {
+      "event": "Valider une coupe: coup de ciseaux de Solange",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/scissors-snip-1.ogg",
+        "rue-haute/scissors-snip-2.ogg",
+        "rue-haute/scissors-snip-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 120,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        107,
+        265,
+        105
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "trois variantes (la deuxième coupe deux fois); jouer 2 ou 3 coups espacés de 0,2 à 0,35 s pendant cut_hair, puis hair-reveal",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "hair-reveal": {
+      "event": "La coupe est faite: petit accord du miroir (harpe et célesta)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "rue-haute/hair-reveal.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3200
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "chez la personne au fauteuil (et chez l'autre s'il est au salon); sol majeur, sans variation de hauteur",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "cup-sip": {
+      "event": "Boire un chocolat chaud à la petite table d'Odette",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/cup-sip.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        1083
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "au joueur qui boit (drink_cup), à grocery_table",
+      "decodeWhen": "l'écouteur est dans l'épicerie (inside = épicerie)"
+    },
+    "school-recess": {
+      "event": "Récréation de l'école (10 h 30 et 15 h, jours d'école): la cour derrière son mur, au loin",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "rue-haute/school-recess.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        15974
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "placé au milieu de la cour (x 79, y 16); 16 s, une fois à chaque récréation; aucune voix: cloche, galopades, balle, corde à sauter; chez les deux",
+      "decodeWhen": "jour d'école, à 10 h 15 et 14 h 45 de jeu (un quart d'heure avant)"
+    },
+    "footbridge-steps": {
+      "event": "Pas sur la passerelle du ru (planches sur deux poutres)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "rue-haute/footbridge-steps-1.ogg",
+        "rue-haute/footbridge-steps-2.ogg",
+        "rue-haute/footbridge-steps-3.ogg",
+        "rue-haute/footbridge-steps-4.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 120,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        243,
+        257,
+        246,
+        255
+      ],
+      "momentaryMaxLufs": -27.5,
+      "note": "à la place de step-wood sur les cases de la passerelle (sol « passerelle » ou objet footbridge)",
+      "decodeWhen": "à moins de 30 m de la passerelle du ru (x 63 à 64, y 34 et 35)"
+    },
+    "talk-achille": {
+      "event": "Motif d'Achille Pradel, le boulanger",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "rue-haute/talk-achille.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4200
+      ],
+      "momentaryMaxLufs": -19.5,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "talk-solange": {
+      "event": "Motif de Solange Mérigot, la coiffeuse et mercière",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "rue-haute/talk-solange.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3384
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'écouteur est dans la région est (x 56 ou plus) ou dans un intérieur de la rue Haute"
+    },
+    "belly-rumble": {
+      "event": "Petit creux: le ventre gargouille (discret)",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "besoins/belly-rumble-1.ogg",
+        "besoins/belly-rumble-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.06,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 20000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        959,
+        1020
+      ],
+      "momentaryMaxLufs": -30.0,
+      "note": "chez soi seulement, non placé (jamais chez l'autre); une fois quand le Ventre passe sous le seuil du petit creux; muet avec « Besoins en sourdine »",
+      "decodeWhen": "au lancement de la partie (petit, joué n'importe où)",
+      "localOnly": true
+    },
+    "eat-together": {
+      "event": "Manger ensemble: deux cuillères qui tintent",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "besoins/eat-together.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 3000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        553
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "une fois pour le repas partagé, entre les deux mangeurs; en plus de eat",
+      "decodeWhen": "au lancement de la partie (repas à deux, partout)"
+    },
+    "yawn-soft": {
+      "event": "Commencer la sieste: un bâillement sans voix (petite flûte qui glisse), l'oreiller",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "besoins/yawn-soft.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        2045
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "au lit, chez les deux (l'autre l'entend placé, 3 dB plus bas); épicène: aucune voix",
+      "decodeWhen": "de 12 h à 16 h de jeu (plage de la sieste)"
+    },
+    "nap-tick": {
+      "event": "Sieste à deux: l'horloge qui file quatre fois plus vite (boucle)",
+      "bus": "ui",
+      "priority": 4,
+      "files": [
+        "besoins/nap-tick.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        2000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 2.5,
+        "startSample": 24000,
+        "endSample": 120000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -34.0,
+      "note": "boucle de 2 s, chez les deux, du début de l'horloge x 4 au réveil du premier (fondu de 0,4 s)",
+      "decodeWhen": "de 12 h à 16 h de jeu (plage de la sieste)"
+    },
+    "reunion-chime": {
+      "event": "Retrouvailles: deux voix qui se rejoignent sur sol (flûte et clarinette)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "besoins/reunion-chime.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3000
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "chez les deux, au même instant; sol majeur, sans variation de hauteur",
+      "decodeWhen": "au lancement de la partie (les retrouvailles tombent partout)"
+    },
+    "hair-noticed": {
+      "event": "Coupe remarquée: deux notes qui montent (glockenspiel)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "besoins/hair-noticed.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -3.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1230
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "chez les deux; ré 6 puis sol 6",
+      "decodeWhen": "dès qu'une coupe ou une couleur a changé, jusqu'à ce qu'elle soit remarquée"
+    },
+    "beam-ridge": {
+      "event": "Pièce: la panne faîtière se pose au faîte (bois sur bois)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "maison/beam-ridge.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        807
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "au repère du faîte, à la fin du porter à deux; duo-done suit comme pour tout geste à deux",
+      "decodeWhen": "le chantier de la chambre est ouvert (site paru)"
+    },
+    "room-built": {
+      "event": "Une pièce est bâtie (notification du matin, chez les deux): marteaux lointains puis accord",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "maison/room-built.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        5000
+      ],
+      "momentaryMaxLufs": -18.0,
+      "note": "à la place de chantier-built et de notify pour ce message; sol majeur",
+      "decodeWhen": "le dernier élément d'une pièce est bâti (elle paraîtra au matin)"
+    },
+    "chest-full": {
+      "event": "Rangement plein: le couvercle bute (refus doux)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "maison/chest-full.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 600,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        381
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "au meuble de rangement; avec le texte storage_full; à la place de ui-refusal pour ce refus",
+      "decodeWhen": "l'écouteur est dans la maisonnette"
+    },
+    "rack-hang": {
+      "event": "Accrocher un outil au râtelier (fer et bois)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "maison/rack-hang-1.ogg",
+        "maison/rack-hang-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        484,
+        427
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "au râtelier",
+      "decodeWhen": "l'écouteur est dans la maisonnette"
+    },
+    "curtain-hang": {
+      "event": "Accrocher des rideaux à une fenêtre (anneaux, tringle, étoffe)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "maison/curtain-hang.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        1138
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "à la fenêtre, à la pose (à la place de furniture-place)",
+      "decodeWhen": "des rideaux sont dans un sac et l'écouteur dans la maisonnette"
+    },
+    "curtain-draw": {
+      "event": "Ouvrir ou fermer les rideaux (anneaux qui filent, étoffe)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "maison/curtain-draw-1.ogg",
+        "maison/curtain-draw-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 300,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        462,
+        491
+      ],
+      "momentaryMaxLufs": -27.0,
+      "note": "première variante pour ouvrir, seconde pour fermer (au hasard si le moteur ne choisit pas)",
+      "decodeWhen": "l'écouteur est dans la maisonnette"
+    },
+    "stream-ru": {
+      "event": "Le ru de la Côte: eau vive peu profonde (boucle placée le long du ru)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/stream-ru.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 30.0,
+        "cullBeyondM": 30.0
+      },
+      "durationMs": [
+        20000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 20.5,
+        "startSample": 24000,
+        "endSample": 984000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -28.0,
+      "note": "sources le long du ru, une tous les 8 m (plan.stream), chacune à son propre décalage de départ; plus forte au gué de pierres",
+      "decodeWhen": "l'écouteur est à moins de 30 m du ru (x 63 à 64, y 2 à 37)"
+    },
+    "room-tone-shop": {
+      "event": "Dans la boutique d'Odette: la pièce, la pendule, le plancher, bocaux et balance (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/room-tone-shop.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        30000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 30.5,
+        "startSample": 24000,
+        "endSample": 1464000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -36.0,
+      "note": "non placé, quand l'écouteur est dedans (plan.interiorByBuilding); fondu de 0,6 s à la porte",
+      "decodeWhen": "l'écouteur est à moins de 6 m d'une porte de l'épicerie"
+    },
+    "room-tone-salon": {
+      "event": "Dans le salon de Solange: la pièce, le robinet qui goutte, journal, bobine (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/room-tone-salon.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        30000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 30.5,
+        "startSample": 24000,
+        "endSample": 1464000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -36.0,
+      "note": "non placé, quand l'écouteur est dedans (plan.interiorByBuilding); fondu de 0,6 s à la porte",
+      "decodeWhen": "l'écouteur est à moins de 6 m de la porte du salon"
     }
   },
   "music": {
@@ -4114,6 +5575,21 @@
       "playFromSeconds": 1.12,
       "fadeInMs": 2500,
       "fadeOutMs": 2500
+    },
+    "halte-evening": {
+      "event": "Lanternes du quai allumées ensemble (apogée, t = 6,5 s), une fois (P1)",
+      "bus": "music",
+      "file": "musique/halte-evening.ogg",
+      "key": "sol majeur",
+      "tempoBpm": 72.0,
+      "timeSignature": "6/8",
+      "instruments": "célesta, harpe, cordes",
+      "integratedLufs": -18.0,
+      "volumeDb": -4.0,
+      "loop": null,
+      "durationSeconds": 31.181,
+      "fadeInMs": 0,
+      "fadeOutMs": 1500
     }
   },
   "plan": {
@@ -4162,6 +5638,11 @@
       {
         "moment": "le train du jour 8 est parti: récapitulatif et écran de fin",
         "music": "fin",
+        "once": true
+      },
+      {
+        "moment": "lanternes du quai allumées ensemble: apogée, t = 6,5 s (tour 9, P1)",
+        "music": "halte-evening",
         "once": true
       }
     ],
@@ -4323,11 +5804,78 @@
         "winter": "season-turn-winter"
       }
     },
+    "eveningCalls": [
+      {
+        "sound": "owl-far",
+        "seasons": [
+          "autumn"
+        ],
+        "hours": [
+          19.5,
+          21.0
+        ],
+        "timesPerEvening": 1,
+        "notWhen": "pluie",
+        "notWithMoment": "barn_owl",
+        "description": "le cri de l'effraie au loin, une fois à un instant tiré entre 19 h 30 et 21 h, les soirs d'automne sans la dame blanche; non placé, chez les deux au même instant"
+      }
+    ],
     "interior": {
       "description": "Dans la maisonnette: les ambiances du dehors passent derrière les murs.",
       "ambienceLowpassHz": 900,
       "ambienceDb": -10.0,
       "rampMs": 600
+    },
+    "interiorByBuilding": {
+      "description": "Tour 10 (ADR 0016, section 4): le filtre du dehors s'applique à tout intérieur (listener.inside non nul); chaque bâtiment a son ambiance de pièce et son propre étouffement. Les identifiants des bâtiments sont ceux de GameMap.buildings (à confirmer par L0); le champ « ambiance » d'un bâtiment de la carte nomme le même son que roomTone.",
+      "rampMs": 600,
+      "buildings": {
+        "house": {
+          "roomTone": null,
+          "outdoorLowpassHz": 900,
+          "outdoorDb": -10.0,
+          "rain": "rain-roof",
+          "note": "la maisonnette, comme avant (plan.interior)"
+        },
+        "grocery": {
+          "roomTone": "room-tone-shop",
+          "roomToneDb": 0.0,
+          "outdoorLowpassHz": 1100,
+          "outdoorDb": -9.0,
+          "rain": "rain-roof",
+          "note": "épicerie d'Odette: porte vitrée et comptoir sur la place, un peu moins étouffé que la maisonnette"
+        },
+        "salon": {
+          "roomTone": "room-tone-salon",
+          "roomToneDb": 0.0,
+          "outdoorLowpassHz": 1300,
+          "outdoorDb": -8.0,
+          "rain": "rain-roof",
+          "note": "mercerie-coiffure de Solange: la vitrine laisse passer la rue"
+        }
+      },
+      "otherPlayerInside": {
+        "description": "l'autre joueur dans un autre bâtiment (ADR 0016): ses sons placés passent par le même étouffement que ceux du dehors, en plus de peerWorldSoundsDb",
+        "lowpassHz": 900,
+        "db": -8.0
+      }
+    },
+    "stream": {
+      "description": "Le ru de la Côte (tour 10, x 63 à 64, du bois en y 2 à l'Aubrune en y 37): sources de stream-ru le long du ru, chacune à son propre décalage de départ dans la boucle.",
+      "sound": "stream-ru",
+      "x": 63.5,
+      "fromY": 2.0,
+      "toY": 37.0,
+      "spacingM": 8.0,
+      "fordPoint": {
+        "x": 63.0,
+        "y": 30.0
+      },
+      "fordBoostDb": 3.0,
+      "hours": [
+        6,
+        30
+      ]
     },
     "peer": {
       "description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués un peu plus bas que les siens; ses sons d'interface ne s'entendent pas chez soi, sauf le repère (ping-peer) et la proposition d'achat.",

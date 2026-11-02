@@ -31,6 +31,20 @@ export function ghostNear(sim: Sim, c: Character): { state: ConstructionState; d
   return null;
 }
 
+/**
+ * Chantier guidé dont le point est à moins de `radius` (m) d'un point du sol (clic ou survol à la
+ * souris, R11): le même que `ghostNear` prendrait une fois arrivé, ou `null`.
+ */
+export function ghostAt(sim: Sim, at: { x: number; y: number }, radius: number): { state: ConstructionState; def: ConstructionDef } | null {
+  for (const state of sim.world.constructions) {
+    if (state.status !== 'ghost') continue;
+    const def = defOf(sim, state.id);
+    if (def?.kind !== 'guided' || state.elements.every((e) => e.done)) continue;
+    if (distance(at, point(sim, def.point)) <= radius) return { state, def };
+  }
+  return null;
+}
+
 /** Une construction vient d'être achevée: les suivantes deviennent fantômes. */
 export function completeConstruction(sim: Sim, id: string): void {
   const state = sim.world.constructions.find((c) => c.id === id);
@@ -123,6 +137,8 @@ export function updateConstructions(sim: Sim, frames: Partial<Record<CharacterId
     const slowest = Math.max(...workers.map((w) => durationMultiplier(sim, w)));
     const speed = workers.length >= 2 ? s.building.twoPlayersSpeedMultiplier : 1;
     element.progress = Math.min(1, element.progress + (dt * speed) / (elementDef.seconds * slowest));
+    // L'avancée part chez l'invité avec l'état complet: sa barre de progression suit (R10).
+    sim.runtime.changed = true;
     if (element.progress >= 1) {
       element.done = true;
       element.workers = [];

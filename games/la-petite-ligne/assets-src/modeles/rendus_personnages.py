@@ -84,7 +84,7 @@ def clone_character(parts, loc, rot_z=0.0, mat=None, expr=None, scale=1.0):
 
 def hide_sources():
     for ob in list(bpy.data.objects):
-        if ob.name == "rig" or ob.name.startswith(("player_", "villager_", "socket_")):
+        if ob.name == "rig" or ob.name.startswith(("player_", "villager_", "socket_", "rail_crew_")):
             ob.hide_render = True
 
 
@@ -165,7 +165,7 @@ def expressions():
 TOOLS = {"hoe": "hoe", "water": "watering_can", "chop": "axe", "saw": "saw", "hammer": "hammer",
          "sow": "seed_packet_radish", "eat": "bread", "sit_eat": "dish_soup", "harvest": "radish",
          "give": "egg", "talk": None, "pet": None, "fish_wait": "fishing_rod", "fish_cast": "fishing_rod",
-         "fish_strike": "fishing_rod"}
+         "fish_strike": "fishing_rod", "pole_raise": "lamp_pole", "pole_lower": "lamp_pole"}
 POSE_FRAMES = {"idle": 30, "walk": 0, "carry_two": 6, "hoe": 16, "sow": 12, "water": 20, "harvest": 15,
                "chop": 12, "saw": 9, "hammer": 0, "talk": 15, "give": 15, "sit": 0, "eat": 12, "sit_eat": 12,
                "sleep": 0, "wave": 8, "pet": 0, "high_five": 10, "fish_wait": 0, "fish_cast": 10,
@@ -175,7 +175,13 @@ PECHE = [("fish_wait", 0), ("fish_cast", 10), ("fish_cast", 14), ("fish_cast", 1
          ("fish_strike", 21), ("sit_ground", 0), ("sit_ground", 45)]
 
 
-def poses(liste=None, sortie="personnages-poses.png", cols=7):
+# tour 9: clips des moments (étoiles, salut du mécanicien, lanternes), plusieurs images par clip
+TOUR9 = [("sit_edge", 0), ("sit_edge", 30), ("look_up", 45), ("crank_hold", 0), ("crank_turn", 0),
+         ("crank_turn", 15), ("wave_back", 0), ("wave_back", 9), ("pole_raise", 0), ("pole_raise", 18),
+         ("pole_lower", 15)]
+
+
+def poses(liste=None, sortie="personnages-poses.png", cols=7, dossier=None, cam=None):
     """Une vignette par animation (image clé caractéristique), outil en main, assemblées en planche."""
     from PIL import Image, ImageDraw, ImageFont
     base_scene()
@@ -199,7 +205,10 @@ def poses(liste=None, sortie="personnages-poses.png", cols=7):
     r2 = objs[0]
     ad = r2.animation_data_create()
     sock = bpy.data.objects["socket_hand_r"]
-    lpl.persp_camera((2.3, -3.3, 1.75), (0, 0, 0.82), lens=34)
+    if cam:
+        lpl.persp_camera(*cam)
+    else:
+        lpl.persp_camera((2.3, -3.3, 1.75), (0, 0, 0.82), lens=34)
     tiles = []
     for act, frame in acts:
         held = []
@@ -247,7 +256,31 @@ def poses(liste=None, sortie="personnages-poses.png", cols=7):
         sheet.paste(im, (x, y))
         dr.text((x + 12, y + 10), name, fill=(30, 30, 36), font=font)
         os.remove(path)
-    sheet.save(os.path.join(lpl.BOARDS, sortie))
+    sheet.save(os.path.join(dossier or lpl.BOARDS, sortie))
+
+
+def equipage(dossier):
+    """Mécanicien et chauffeur (bustes) penchés et saluant, Firmin avec son écharpe, un joueur de 1,74 m."""
+    base_scene()
+    sc = bpy.context.scene
+    sc.render.resolution_x, sc.render.resolution_y = (1800, 900)
+    cast = [(["player_base", "player_outfit_work", "player_hair_short", "player_scarf_orb"], None, "joueur 1,74 m"),
+            (["villager_firmin", "villager_firmin_scarf"], None, "Firmin et son écharpe"),
+            (["rail_crew_driver"], "driver_lean", "mécanicien (driver_lean)"),
+            (["rail_crew_driver"], "driver_wave", "mécanicien (driver_wave)"),
+            (["rail_crew_stoker"], "driver_lean", "chauffeur (driver_lean)")]
+    for i, (parts, clip, lab) in enumerate(cast):
+        x = (i - 2) * 0.95
+        objs = clone_character(parts, (x, 0, 0), 0)
+        if clip:
+            act = bpy.data.actions[clip]
+            ad = objs[0].animation_data_create()
+            ad.action = act
+            ad.action_slot = act.slots[0]
+        lpl.label(lab, (x, -0.55, 0.02), size=0.07, rot=(90, 0, 0))
+    sc.frame_set(8)
+    lpl.persp_camera((1.2, -6.5, 1.6), (0, 0, 1.0), lens=40)
+    lpl.render(os.path.join(dossier, "modeles-equipage.png"))
 
 
 if __name__ == "__main__":
@@ -260,3 +293,12 @@ if __name__ == "__main__":
         poses()
     if what in ("peche", "tout"):
         poses(PECHE, "personnages-peche.png", cols=4)
+    if what == "equipage":
+        # duo-python rendus_personnages.py <dossier> equipage: bustes de l'équipage, écharpe de Firmin, joueur
+        dossier = os.path.abspath(sys.argv[-2])
+        equipage(dossier)
+    if what == "tour9":
+        # duo-python rendus_personnages.py <dossier> tour9: clips du tour 9, perche en main, vue de côté
+        dossier = os.path.abspath(sys.argv[-2])
+        poses(TOUR9, "modeles-clips-joueurs.png", cols=6, dossier=dossier,
+              cam=((4.2, -0.5, 1.5), (0, -0.4, 1.3), 34))

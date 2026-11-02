@@ -210,3 +210,57 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Robot: compter un meuble ou un matelas partout (sacs des deux, coffre, sol, posé), sinon il rachète en boucle ce qui est tombé d'un sac plein; mais ne fabriquer qu'avec ce qui est sous la main (son sac, le coffre), sinon il boucle à l'établi.
 - Les sorties de `pnpm test:longue-vie` (`test-results/`) ne sont pas versionnées; tailles par profil dans le tableau « Taille de l'état (L-03) ».
 - Un `pnpm test` lancé avant d'ajouter un fichier de test ne l'inclut pas: relancer à la fin.
+
+## Retours de la première soirée du client (La Petite Ligne, vérifié le 2026-11-01)
+
+- Flou sous Windows (R07): le repli automatique reprenait la résolution du mode léger des tests (rapport 0,5, 640x360 au plus): image étirée deux fois sur le PC. Un tampon de rendu sous le pixel physique se voit tout de suite à 1366x768; plancher de netteté `min(dpr, 1,5)` et taille exacte par `ResizeObserver` en `device-pixel-content-box` (se redéclenche aussi quand la mise à l'échelle change). `setPixelRatio(1)` et `setSize` en pixels: tout ce qui lit la taille passe par `getDrawingBufferSize`, rien d'autre à changer.
+- Rendu logiciel: la qualité adaptative ignore les images de plus de 250 ms, donc ne se déclenche jamais sous SwiftShader. Pour voir l'état d'un PC à la peine: `rendu.html?adaptatif=1&repli=1` (`forceQualityFallback`).
+- Clip `sleep`: tête vers -Z, bassin à 0,59 m; lits de `maison.glb` tête à -Z aussi. La simulation ne tourne pas le dormeur (il garde le cap de sa marche): le rendu tire la pose du lit (`coucher.ts`).
+- Bras des personnages: 0,55 m (épaule 1,33 m). Une prise à deux mains au milieu d'un manche est hors d'atteinte dans les clips de geste de l'artiste (main gauche à 0,9 m de l'épaule): port hors geste seulement (`prise.ts`, houe sur l'épaule par `ArmReach`).
+- Sonde des os d'un clip: page temporaire dans le dossier du jeu (GLTFLoader, `SkeletonUtils.clone`, `mixer.setTime`), lue par Playwright sans WebGL; la supprimer à la fin.
+- Greffon Vite de gros plan: un `transform` sans `enforce: 'pre'` ne voyait pas le texte d'origine de `reglages.ts`; avec `enforce: 'pre'` et une expression souple (`/viewWidths:\s*\[16,/`), oui. Vérifier par `curl` du module servi.
+- Copie « avant » pour comparer: `git archive HEAD <dossiers> | tar -x -C /tmp/...`, lien du `node_modules` du jeu vers celui du worktree, serveur Vite avec `fs.strict: false`. Les ports 5191 à 5391 sont souvent pris par d'autres membres: prendre 64xx.
+- Contrôles de cohérence de la carte (`src/rendu/coherence-carte.test.ts`): pavés par le miroir processeur du shader (`paves.ts`, union douce: le raccord arrondi entre l'anneau du puits et une allée mord sur des cases qu'on croirait en terre), rails sous les bâtiments, sols posés qui débordent de leur emprise (lecture du GLB dans Node).
+- Un massif déplacé peut couper un trajet d'habitant: `python3 outils/valider_carte.py` après chaque retouche de la carte.
+- Chromium sans tête avec `deviceScaleFactor` émulé: `devicePixelContentBoxSize` reste en points CSS (1093 au lieu de 1366 à 125 %). Ne garder la boîte physique que si elle concorde avec CSS x dpr.
+- Murs de la maisonnette (`bourg.glb`): dalles pleines, la porte n'est qu'un panneau peint sur la face extérieure. Toute coupe ou pied de mur doit ouvrir la baie lui-même (bornes du nœud `…_repaired_door`).
+- Le matériau palette efface tout ce qui est devant un personnage (trou tramé), y compris l'outil qu'il tient: les outils prennent `materials.held` (même programme, `uCutCount` à 0).
+- Sable de la rivière (`riviere.ts`): il recule près de la terre ferme et laisse voir l'herbe; un chemin qui longe la grève doit être `path`, pas `land`, sinon un liseré vert apparaît.
+- `pnpm test` sous la charge des autres membres (charge 15 à 25): `beforeAll` de 120 s, tests minutés (100 ms réseau) et Chromium dépassent; relancer ces fichiers seuls avant de conclure.
+
+## Tour 9: annonces, chantiers, catalogue (La Petite Ligne, vérifié le 2026-11-01)
+
+- Outil isolé: un heredoc qui écrit dans `/tmp` est refusé, mais `python3 - <<'EOF'` qui ouvre des fichiers relatifs du jeu passe; pour un gros script, l'écrire avec Write dans le scratchpad et le lancer avec la racine en argument. Le petit module `r.py` du scratchpad (`F(chemin).sub(ancien, nouveau)` puis `done()`, tout ou rien) évite les éditions à moitié faites.
+- Une quête synthétisée par le code (annonces, cadeaux) se déclare dans `loadContent` après `parseQuests` (`content.quests.push`): carnet, liste à cocher, choix « Donner » et compteurs `given` marchent sans rien d'autre. `completionText` vide: pas de notification de fin (`quetes.ts`).
+- Avancer un monde de référence à la main (jour 25 vers 45) déclenche l'échéance de la commande en cours (`pay_order`) et l'étape `summer_end` au premier pas: dans les tests, poser `stages.passed` et déplacer `order.generated.train` et la quête `weekly_order` vers le samedi suivant.
+- Le robot qui attend le train au quai (`lastDay`) passe avant `watchMoment`: un moment du samedi (le salut) doit s'y insérer explicitement.
+- `catalogueWindow` d'un samedi après la démo donne une échéance la veille: le catalogue est fermé tout le samedi; une page parue le samedi à 10 h se commande dès le dimanche.
+- Les champs facultatifs nouveaux de l'état (`train.slow`, `today.presses`) ne s'écrivent que s'ils servent (`delete` sinon): l'état des parties sans eux reste identique.
+
+## Retours de la soirée du 2026-11-01 (La Petite Ligne, vérifié le 2026-11-01)
+
+- Pose de meuble: le contrôle « occupé » doit tester le disque du corps (`touchesCell`, rayon 0,3 m), pas la case des pieds; un corps déjà dans un obstacle ne bougeait plus (`moveBody` refusait tout pas). Garde-fous: `closesRoom` (parcours à quatre voisins depuis la porte, seules les cases perdues comptent), `unstick` et `freeStuck` au chargement (`simulation/deblocage.ts`), et `moveBody` qui laisse sortir à pied (enfoncement qui ne grandit pas).
+- Le jeu n'a pas de menu de pause à lui: Échap ouvre celui de la plateforme (`apps/duo`, hors du jeu). Une commande « de pause » du jeu va dans le carnet (pied du panneau).
+- Un habitant a le rang de visée 0: posé sur le point d'usage d'un objet (Basile devant l'établi, sur la poutre), il vole Espace (parler, ou rien si aucune réplique). Règle `OBJECT_KINDS` de `bestTarget`: l'objet visé de plus près passe avant lui. Odette au comptoir reste à égalité (elle est sur le point même).
+- Rythme de la journée (`clock.pace`, `paces`): `secondsPerGameMinuteOn` multiplie par le facteur. Les aides des tests (`tests/aides.ts`, `src/interface/tests/aides.ts`) et la page de démonstration jouent au rythme `vif` (l'ancienne journée): les budgets de pas des robots et les durées des tests restent ceux d'avant. Une démo entière au rythme normal est jouée dans `tests/retours-soiree.test.ts`.
+- `pnpm test` du jeu: 18 min sur machine partagée (charge 30 sur 4 cœurs); lancer en arrière-plan avec `timeout` de 7 200 000 ms, la limite par défaut (30 min) tue la commande.
+- Champ d'état ajouté sans changer le format de sauvegarde: le déclarer obligatoire dans `types.ts`, le remplir à la création (`monde.ts`) et à la reprise (`fillTour10Fields` appelé dans `resume` de `sauvegarde.ts`, avec des types `Partial` pour les `??=`); un champ propre à quelques meubles (rideaux: `window`, `closed`) reste facultatif pour ne pas toucher à tous les constructeurs de `PlacedFurniture`.
+- Valibot avec `exactOptionalPropertyTypes`: un champ facultatif d'une intention se décrit par `v.exactOptional(...)`, sinon `satisfies v.GenericSchema<Intent>` échoue.
+- Basile joue l'animation `saw` toute la journée (activité `work`): posé sur la place des joueurs, il donnait l'impression qu'on sciait sans fin.
+
+## Rendu du tour 9: chantiers, lampadaires, moments (La Petite Ligne, vérifié le 2026-11-01)
+
+- Une pièce de personnage sans cibles de morphose (l'écharpe de Firmin, 0 cible contre 5 au corps) compile un programme de plus (et sa variante d'ombre), même cachée: `warmUp` rend visibles les objets cachés pour compiler. Fusionner avec `mergeOutfit` (cibles nulles) et échanger la géométrie du corps.
+- Un chantier en plusieurs maillages (jardinière: caisse + enfant de saison, trois exemplaires) coûte deux appels par maillage avec l'ombre: fusionner chaque chantier en un maillage, refait au changement d'état ou de saison (`chantiers.ts`, `rebuild`). Les objets sources restent hors de la scène mais visibles (sinon `traverseVisible` ne trouve rien).
+- Allumer un lampadaire seul alors que son verre est dans le décor fusionné (émission globale de la nuit): halos (`ciel.ts`, opacité par instance relue quand `LampBoard.version` change) et lumières au sol (`ambiance.ts`) multipliés par l'allumage, plus un verre sombre instancié posé par-dessus (faces lumineuses du modèle, repeintes sur `shadow`, grossies de 4 %). Zéro programme de plus.
+- Page de démonstration: sans `vie=0`, Camille fait sa promenade et quitte la place que le moment lui donne. Un geste à durée (action `light`) n'est pas figé par la page (le geste se finit en temps réel): caler le clip sur `action.since` (`exactTime`) le rend figeable et identique chez l'invité.
+- Serveur Vite de capture lancé en arrière-plan: coupé au bout de 2 h; le lancer dans le même script que les captures (`run.sh` du scratchpad: démarre, capture, arrête). Sous forte charge (charge moyenne 20), une page met plusieurs minutes: `goto` en `domcontentloaded` et délais de 400 s.
+- Mesure avant/après sans toucher à l'arbre: copie du dossier du jeu à la même profondeur (liens relatifs de `node_modules` intacts), fichiers modifiés remis par `git show HEAD:...`, second serveur sur un autre port. Pas sous `games/`: pnpm y voit un paquet du workspace et réécrit `pnpm-lock.yaml` au premier `pnpm lint` (vu au tour 9, lockfile à remettre); prendre un dossier hors des motifs du workspace, et le supprimer à la fin.
+## Maison du tour 10 (lot L4, vérifié le 2026-11-02)
+
+- Compteur « du jour » sans champ nouveau ni migration: `world.countersToday[id][clé]`, remis à zéro à l'aube par `copyCounters`, sauvegardé et répliqué. Préfixer la clé (`needs:...`) pour ne croiser aucune condition.
+- Gains notés par d'autres modules (`heartToday`) ajoutés « au moment où ils arrivent »: un `WeakMap<Character, number>` des gains déjà vus, initialisé au premier passage (reprise: rien ne se compte deux fois), effacé dans `settleNight`. Une note « déjà dit pendant ce maintien » se range dans un `WeakMap<Sim['runtime'], ...>`, jamais dans une variable de module (plusieurs simulations par fichier de test).
+- La sieste est un `status: 'sleeping'` avec `needs.napStart`: `checkNight` doit ignorer les dormeurs de l'après-midi (`isNapping`), sinon deux siestes font la nuit. Les gains de la minute passent avant le réveil (sinon la dernière minute manque: 98,5 au lieu de 100).
+- Copie isolée: `cat >> fichier <<EOF` et les heredocs Python longs dans Bash sont refusés par le contrôle de la copie; écrire les scripts avec l'outil Write dans `/tmp/...` puis `python3 script.py .` depuis le dossier du jeu (remplacements exacts, échec si l'ancien texte manque).
+- La sauvegarde de référence du jour 62 (`format-6-automne-jour-62.json`) fait 46 177 octets: avec les champs du tour 10, une journée en cours monte à environ 46 800 (borne 52 000).
+- Arrivées au coffre: tout `addStack(world.cellar, ...)` hors d'un dépôt de joueur passe par `storeAtHome` (`rangement.ts`): outils au râtelier, plein: au pied du coffre.

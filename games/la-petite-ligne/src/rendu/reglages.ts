@@ -9,6 +9,8 @@
  */
 
 import type { IdlePose } from './attentes';
+import type { ToolHoldSpec } from './prise';
+import type { ModelTrim } from './retouches';
 
 /**
  * Éclaircie de la forêt du pourtour: sur le côté `side` de la carte, entre `from` et `to`
@@ -41,6 +43,14 @@ export const RENDER_SETTINGS = {
     maxPixelRatio: 2,
     /** Budget de la plateforme: 1920x1080 pixels physiques au plus sur le PC. */
     maxPhysicalPixels: 1920 * 1080,
+    /**
+     * Plancher de netteté (retour R07, Windows flou): la résolution dynamique
+     * ne descend jamais sous `min(devicePixelRatio, minCrispRatio)` pixels de
+     * rendu par point CSS, dans la limite du budget. Sous Windows à 100, 125
+     * et 150 %, c'est le pixel physique de l'écran: aucun étirement, l'image
+     * reste nette; sur un écran Retina (2), 1,5 pixel par point reste net.
+     */
+    minCrispRatio: 1.5,
     antialias: true as boolean,
     /** Tone mapping neutre (Khronos PBR Neutral): garde les teintes de la palette. */
     toneMapping: 'neutral' as 'neutral' | 'agx' | 'aces',
@@ -494,8 +504,25 @@ export const RENDER_SETTINGS = {
      * pendant le fondu, au lieu d'y sauter.
      */
     bench: { seatHeight: 0.45, glideSeconds: 0.22 },
+    /**
+     * Tour 9: siège sans modèle (le bord du ponton): clip `sit_edge` (même assise que `sit`), la
+     * racine `edgeLift` m sous le plancher, jambes au-dessus de l'eau; `look_up` une fois à
+     * l'instant `lookUpAt` de l'apogée des étoiles (données du moment, `render.lookUpAt`).
+     */
+    edge: { clip: 'sit_edge', lift: -0.47, lookClip: 'look_up' },
+    /**
+     * Tour 9, le salut du mécanicien: manivelle tenue (`crank_hold`), tournée pendant la descente
+     * des lisses (`crank_turn`, un tour par seconde), main levée au salut (`wave_back`).
+     */
+    crank: { hold: 'crank_hold', turn: 'crank_turn', turnSeconds: 1, wave: 'wave_back' },
     /** Hauteur d'assise de l'animation `sit` (m): le bassin y est posé quand la racine est au sol. */
     sitClipSeatHeight: 0.47,
+    /**
+     * Coucher (retour R05): l'animation `sleep` pose le dos à cette hauteur (m) au-dessus de la
+     * racine, celle du lit double; sur une couche plus basse (`sleep_height` du modèle: paillasse
+     * à 0,15 m), le corps descend d'autant. Tête vers -Z du personnage, comme les lits.
+     */
+    sleepClipBackHeight: 0.5,
     /** Tape dans la main (clip `high_five`) à une réussite à deux, si les joueurs sont à moins de (m). */
     highFiveRange: 1.8,
   },
@@ -535,6 +562,60 @@ export const RENDER_SETTINGS = {
     carSpacing: 0.25,
   },
 
+  /**
+   * Tour 9, le salut du mécanicien: l'acteur dont la piste mène la cabine (et le train au pas),
+   * l'équipage (bustes de `personnages.glb`) posé dans la cabine du train où qu'il soit, le volant
+   * des manivelles (un tour par seconde pendant la descente des lisses).
+   */
+  salute: {
+    cabActor: 'driver',
+    crewModels: ['rail_crew_driver', 'rail_crew_stoker'] as readonly string[],
+    /** Hauteur de la racine des bustes (m au-dessus du sol de la voie): le plancher de la cabine. */
+    crewRootZ: 1.05,
+    crankModel: 'level_crossing_crank',
+    crankWheel: 'level_crossing_crank_wheel',
+    crankTurnSeconds: 1,
+  },
+
+  /** Tour 9 (`chantiers.ts`): chantiers, marelle, lampadaires allumés à la perche. */
+  improvements: {
+    /** Nœud de l'artiste par chantier quand la carte garde un type commun (`bench`). */
+    models: { ford_bench: 'ford_bench', house_bench: 'house_bench' } as Readonly<Record<string, string>>,
+    /** Chantiers posés une fois par case (les trois jardinières du quai). */
+    onePerCell: ['quay_planters'] as readonly string[],
+    /** L'auvent: dans le repère de la maisonnette, devant la porte (extras de `door_canopy`). */
+    canopy: 'door_canopy',
+    canopyOffset: [0, 0, 2.3] as readonly [number, number, number],
+    /** Le toit du puits: l'arceau du puits ouvert s'efface une fois bâti. */
+    wellRoof: 'well_roof',
+    /** Verre d'une lanterne éteinte: case sans émission, grossi autour de la lanterne pour couvrir le verre du décor. */
+    darkGlassCell: 'shadow' as const,
+    darkGlassGrow: 1.04,
+    /** En dessous de cet allumage, la lanterne montre son verre éteint. */
+    darkGlassBelow: 0.35,
+    /** Flamme qui grandit (s) si le moment ne le dit pas; un lampadaire sans heure dans la vague (le réverbère du chemin). */
+    flameGrowSeconds: 0.6,
+    unscheduledLampAt: 4,
+    /** Flamme allumée seule: elle prend en `flameCatchSeconds`, vacille, s'éteint en `flameOutSeconds`. */
+    flameCatchSeconds: 0.25,
+    flameOutSeconds: 0.3,
+    aloneFlame: 0.8,
+    aloneFlicker: 0.35,
+    aloneFlickerHz: 7,
+    /** Marelle à la craie: point de la carte, cases (m), rangées du sud au nord, traits. */
+    hopscotch: {
+      point: 'hopscotch',
+      square: 0.42,
+      rows: [1, 1, 2, 1, 2] as readonly number[],
+      line: 0.035,
+      thickness: 0.006,
+      lift: 0.004,
+      skySegments: 7,
+      chalk: 'white_paint' as const,
+      sky: 'flower_pink' as const,
+    },
+  },
+
   house: {
     /** Lumière chaude de la maisonnette le soir (lampe, réchaud): couleur, intensité à la nuit, portée. */
     lampColor: '#ffb563',
@@ -543,7 +624,70 @@ export const RENDER_SETTINGS = {
     lampHeight: 1.9,
     /** La lampe ne s'allume qu'une fois la maison réparée (toit et porte). */
     lampNeedsRepair: true as boolean,
+    /**
+     * Murs coupés quand on est dedans (retour R12): on garde leur pied jusqu'à cette hauteur
+     * (m, repère du modèle; le plancher est à 0,14 m). Le tour de la pièce reste lisible et la
+     * porte, sans maçonnerie sous elle, reste une brèche nette entre ses jambages.
+     */
+    cutWallHeight: 0.5,
+    /** Seuil de la porte dans ce pied de mur (m, repère du modèle): juste au-dessus du plancher. */
+    doorSillHeight: 0.17,
   },
+
+  /**
+   * Prise des outils (retour R08, `prise.ts`), par type d'outil (`tool_kind`, sinon nom du
+   * modèle). Points dans le repère de l'outil (origine de l'artiste: sa prise de geste; manche
+   * le long de Y, bout du manche vers +Y). Ports dans le repère du personnage (avant +Z).
+   * Les bras font 0,55 m: une prise à deux mains au milieu du manche ne tient pas dans les
+   * clips de geste actuels; la main droite garde la prise de geste de l'artiste.
+   */
+  toolHolds: {
+    // Houe de 1,25 m: au repos et en marche, portée sur l'épaule droite, main au milieu du
+    // manche (0,65 m du bout), lame derrière l'épaule tournée vers le bas, bout du manche devant.
+    hoe: {
+      grip: [0, -0.4, 0],
+      gestureGrip: [0, 0, 0],
+      gestures: ['hoe'],
+      carry: { hand: [-0.24, 1.1, 0.2], axis: [0.12, -0.6, 0.79], front: [0, 1, 0] },
+    },
+    // Hache: tenue à 20 cm du bout du manche (8 cm dans le modèle), tête en bas, au repos comme
+    // pendant le geste; la tête reste à 25 cm du sol bras ballant.
+    axe: { grip: [0, -0.12, 0], gestureGrip: [0, -0.12, 0], gestures: ['chop'], carry: null },
+    // Arrosoir: par l'anse (origine de l'artiste, au sommet de l'anse).
+    watering_can: { grip: [0, 0, 0], gestureGrip: [0, 0, 0], gestures: ['water'], carry: null },
+    // Canne: par la poignée, au-dessus du talon (origine de l'artiste).
+    fishing_rod: {
+      grip: [0, 0, 0],
+      gestureGrip: [0, 0, 0],
+      gestures: ['fish_cast', 'fish_wait', 'fish_strike'],
+      carry: null,
+    },
+  } satisfies Record<string, ToolHoldSpec>,
+  /**
+   * Plaque tournante au pied de chaque voie de garage (R20, `voie.ts`): rayon (m, assez pour la
+   * draisine de 1,4 x 1,6 m), largeur du cercle de pierre, hauteurs (m au-dessus du sol de la
+   * voie: ballast à 0,12, traverses de 0,12 à 0,22), planches du tablier, segments du cercle.
+   */
+  railway: {
+    turntableRadius: 1.3,
+    turntableRim: 0.14,
+    rimTop: 0.14,
+    deckTop: 0.17,
+    plankHeight: 0.03,
+    plankWidth: 0.26,
+    turntableSegments: 28,
+  },
+  /** Passage d'une prise à l'autre (demi-vie, s), le temps du fondu des clips. */
+  toolHoldBlendHalfLife: 0.06,
+
+  /**
+   * Retouches des modèles au chargement (`retouches.ts`), en attendant un réexport de l'artiste.
+   * Ponton (R21): l'escalier du bout sud (marches et limons, x de -0,45 à 0,45, z de 1,5 à 2,15
+   * dans le modèle) descendait dans l'eau sans rien desservir: retiré.
+   */
+  modelTrims: [
+    { node: 'pontoon', min: [-0.55, -0.2, 1.5], max: [0.55, 0.7, 2.4] },
+  ] satisfies readonly ModelTrim[],
 
   budgets: {
     drawCalls: 150,
@@ -609,8 +753,10 @@ export const RENDER_SETTINGS = {
   /**
    * Repli automatique vers le mode léger (risque 1 du gauntlet): quand le
    * dernier palier de la résolution dynamique ne suffit plus, à chaud, sans
-   * recréer le contexte WebGL (ombres coupées, résolution du mode léger;
-   * l'antialiasing, la végétation et les effets restent ceux du départ).
+   * recréer le contexte WebGL (ombres coupées; la résolution reste celle du
+   * dernier palier, jamais celle du mode léger demandé des tests, qui rendait
+   * l'image floue sur le PC: retour R07; l'antialiasing, la végétation et les
+   * effets restent ceux du départ).
    * Un seul retour par séance: s'il faut se replier de nouveau, c'est définitif.
    */
   autoLight: {
@@ -657,6 +803,17 @@ export const RENDER_SETTINGS = {
       halfWidth: 0.75,
       halfHeight: 1.0,
       nearer: 0.6,
+    },
+    /**
+     * Trou sur l'eau des étoiles de l'Aubrune (tour 9): les arbres de la rive sud cachent les
+     * reflets au sud du ponton en orientation 0. Ellipse autour du milieu des reflets, à la surface.
+     */
+    water: {
+      moments: ['falling_stars'],
+      phases: ['waiting', 'climax'],
+      halfWidth: 5,
+      halfHeight: 3.6,
+      nearer: 1,
     },
     /*
      * Pas de trou pour la chevrette ni de trous élargis pour la brume (tour 7): la forêt du

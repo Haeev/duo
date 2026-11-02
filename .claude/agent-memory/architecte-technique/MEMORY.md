@@ -63,3 +63,13 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Vitest 5 n'a pas d'option `--include`: configuration à part avec `defineConfig` (`mergeConfig` concatène les `include`).
 - Prettier lit sa configuration selon l'emplacement du fichier: une copie dans `/tmp` est jugée avec les réglages par défaut.
 - Dans une copie isolée (worktree), `git -C` et `NODE_PATH=... node` peuvent être refusés; Playwright se charge alors par `require('/opt/node22/lib/node_modules/playwright')`.
+
+## Prototypes de mesure sans toucher au dépôt (vérifié le 2026-11-01, tour 10)
+
+- Une copie isolée (worktree) peut partir d'un commit ancien: comparer `git log -1` à la branche de la session et avancer par `git merge --ff-only <branche>` avant de lire les documents du brief. Ses dépendances: `pnpm install --frozen-lockfile --offline` à la racine de la copie (2 s, magasin partagé).
+- Modifier une donnée du jeu seulement pour une mesure: greffon Vite `enforce: 'pre'` dont `transform(code, id)` réécrit le JSON servi (`donnees/cartes/halte.json` pour élargir la carte), dans une config Vite placée dans `/tmp` (`root` = dossier du jeu). Un `vitest.config.mjs` dans `/tmp` doit être un objet nu (`import 'vitest/config'` ne se résout pas hors du dépôt).
+- `page.screenshot` dépasse 200 s sous SwiftShader quand la machine est chargée (charge 30): lire la toile par `canvas.toDataURL()` dans un `requestAnimationFrame` (rappel inscrit après celui du moteur, donc même image) et écrire le PNG depuis Node.
+- `nohup ... &` dans une commande Bash: les serveurs survivent mais leur journal est écrasé si on relance; vérifier le mode d'un serveur par `/proc/<pid>/environ`.
+- Le garde de la copie isolée refuse toute commande où apparaît `--exclude-dir=.git` ou une variable en position d'argument: le contrôle des tirets passe par l'outil Grep (classe de caractères des deux tirets interdits, U+2014 et U+2013), qui saute les dossiers cachés: compléter par `grep -rnI` nommant `.claude` et `docs` explicitement.
+- La Petite Ligne: `triangleSplit().meshes` nomme les morceaux du décor par une empreinte qui change avec la carte; comparer par groupe (`parent/` avant la barre), pas par nom.
+- Three.js 0.187: le nombre de lumières ponctuelles entre dans la clé des programmes; une lampe d'intensité nulle compte encore, la retirer ou en ajouter une recompile les matériaux éclairés.

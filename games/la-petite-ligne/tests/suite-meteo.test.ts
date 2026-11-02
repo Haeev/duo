@@ -13,7 +13,7 @@ import { mistAmount, weatherSeries } from '../src/etat/meteo';
 import { evaluate, NO_CONTEXT } from '../src/simulation/conditions';
 import { morning } from '../src/simulation/horloge';
 import { weatherOf } from '../src/simulation/meteo';
-import { contentAndMap, newSim, SEED } from './aides';
+import { contentAndMap, newSim, SEED, withPace } from './aides';
 
 const { content } = contentAndMap();
 const s = content.settings;
@@ -55,12 +55,15 @@ describe('calendrier (T8-07, section 2.1)', () => {
     expect(catalogueWindow(s, 23).delivery.day).toBe(29);
   });
 
-  it("rythme de l'horloge par jour (D1): 0,35 s partout; un pas au jour 24 ne change que les jours suivants", () => {
+  it("rythme de l'horloge par jour (D1): 0,7 s partout (R14, journées deux fois plus longues); un pas au jour 24 ne change que les jours suivants", () => {
+    // Les aides des tests jouent au rythme vif (l'ancienne journée); le rythme livré est normal.
+    const shipped = withPace(content, 'normal').settings;
+    expect(secondsPerGameMinuteOn(shipped, 1)).toBe(0.7);
+    expect(secondsPerGameMinuteOn(shipped, 40)).toBe(0.7);
     expect(secondsPerGameMinuteOn(s, 1)).toBe(0.35);
-    expect(secondsPerGameMinuteOn(s, 40)).toBe(0.35);
     const slow = {
       clock: {
-        ...s.clock,
+        ...shipped.clock,
         schedule: [
           { fromDay: 1, secondsPerGameMinute: 0.35 },
           { fromDay: 24, secondsPerGameMinute: 0.8 },

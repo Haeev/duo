@@ -9,7 +9,17 @@ import type { UiContext } from './contexte';
 import type { UiSoundId } from './sons';
 
 /** Onglet ou partie d'un panneau à montrer à l'ouverture. */
-export type PanelTab = 'quests' | 'mail' | 'bag' | 'memories' | 'buy' | 'sell';
+export type PanelTab =
+  | 'quests'
+  | 'mail'
+  | 'bag'
+  | 'memories'
+  | 'needs'
+  | 'buy'
+  | 'sell'
+  | 'catalogue'
+  | 'annonces'
+  | 'chantiers';
 
 export interface UiHost {
   readonly ctx: UiContext;
@@ -31,6 +41,8 @@ export interface UiHost {
   now(): number;
   /** Son d'interface, filtré contre les rafales (rien si `main.ts` n'a pas donné l'audio). */
   sound(id: UiSoundId): void;
+  /** Ouvre le panneau du chantier de la pièce (invite de la maison, tour 10): un panneau local, sans menu du jeu. */
+  openRoomPanel(): void;
   /** Symboles des profils Duo des deux joueurs (`orb`, `crescent`...). */
   symbol(player: 'self' | 'other'): string;
 }

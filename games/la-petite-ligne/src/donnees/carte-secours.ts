@@ -6,6 +6,7 @@
  */
 import type { GameMap, GroundKind, MapProp, MapTree, Rect } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
+import { houseBuilding } from './carte-interieurs';
 
 const WIDTH = 64;
 const HEIGHT = 48;
@@ -113,6 +114,8 @@ export function buildFallbackMap(): GameMap {
     { id: 'notice_board', model: 'notice_board', pos: p(32.5, 5.5), rotation: 0, rect: null, height: 0, category: 'decor' },
   ];
 
+  // Tour 10: la maisonnette seule est visitable; ni ru ni rue Haute sur cette carte de 64 m.
+  const house = { room: { x: 6, y: 9, w: 5, h: 4 }, door: { cx: 8, cy: 13 }, spawn: p(8.5, 11.5) };
   return {
     id: 'aubrune_secours',
     name: "Halte d'Aubrune (carte de secours)",
@@ -129,9 +132,11 @@ export function buildFallbackMap(): GameMap {
       notice_board: p(32.5, 5.5),
       handcar_shed: p(43.5, 5.5),
       house_door: p(8.5, 14.5),
+      house_spawn: p(8.5, 11.5),
       house_beam_spot: p(13.5, 11.5),
       house_attic: p(10.5, 9.5),
       beam_pickup: p(16.5, 6.5),
+      basile_by_beam: p(17.5, 4.8),
       water_barrel: p(12.5, 14.5),
       chicken_coop: p(14, 18),
       hen_feeder: p(12.5, 17.5),
@@ -142,6 +147,7 @@ export function buildFallbackMap(): GameMap {
       grocery_terrace: p(37.5, 25.5),
       firmin_house: p(21.5, 15.5),
       sawmill_workbench: p(52.5, 30.5),
+      basile_at_workbench: p(54.1, 29.5),
       sawmill_yard: p(56.5, 32.5),
       riverbank: p(26.5, 42.5),
       river_ford: p(30.5, 43.5),
@@ -158,7 +164,10 @@ export function buildFallbackMap(): GameMap {
       house_interior: { x: 6, y: 9, w: 5, h: 4 },
       hen_pen: { x: 11, y: 17, w: 5, h: 3 },
     },
-    house: { room: { x: 6, y: 9, w: 5, h: 4 }, door: { cx: 8, cy: 13 }, spawn: p(8.5, 11.5) },
+    buildings: { house: houseBuilding('house', house, 'house_spawn', 'house_door') },
+    stream: null,
+    crossings: [],
+    house,
     garden,
     trees,
     props,

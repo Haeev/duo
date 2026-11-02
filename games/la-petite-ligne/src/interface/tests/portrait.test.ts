@@ -9,7 +9,7 @@ describe('portraits', () => {
   });
 
   it('refuse une couleur de foulard invalide et échappe le nom accessible', () => {
-    const colors = playerColors('p2', { hair: 9, outfit: 9, scarf: '"><script>' });
+    const colors = playerColors('p2', { hair: 99, outfit: 9, scarf: '"><script>' });
     expect(colors.scarf).toBe('#5CE1E6');
     expect(colors.style).toBe('short');
     const svg = portraitSvg(colors, 'low', 'a "b" <c>');

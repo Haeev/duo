@@ -42,3 +42,29 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Captures: `npx vite --port <libre> --strictPort` dans `games/la-petite-ligne`, puis Playwright sur `rendu.html?stats=0&rendu=leger&vie=0&x=..&y=..&zoom=0|2&orientation=0..3&heure=11`, attente de `window.lplRendu.ready` puis 2,5 s. La première page après le démarrage de Vite reste parfois sur « Chargement »: faire une capture de chauffe.
 - Un changement « juste » peut casser une règle: tourner le banc du quai déplace son dossier et fait échouer le test d'ombre de l'énigme (`src/rendu/lumiere.test.ts`). Toujours relancer toute la suite du jeu, pas seulement `valider_carte.py`.
 - Le constructeur reproduit le JSON à l'octet près: le relancer avant de modifier pour que le diff ne contienne que ses propres changements.
+
+## Agrandir une carte existante (tour 10, vérifié le 2026-11-01)
+
+- Les identifiants automatiques (`bush_41`, `tree_oak_01`) sont cités par les données et le code: changer une boucle de décor (bornes, cases sautées) les décale tous. Garder les boucles d'avant à l'identique et créer les ajouts après; comparer l'avant et l'après (terrain, grille, objets, points) par un script, à l'ouest de la zone ajoutée rien ne doit bouger sans raison.
+- Tout ce qui était écrit contre l'ancien bord (haie à x 63, point « dans la haie du bord », sortie au bout d'un chemin) est à relire: le bord a déménagé, la raison d'être aussi.
+- Un objet dont le modèle n'existe pas se dessine en caisse rayée (`substituts.ts`); un nom qui contient un mot-clé prend un substitut (`*house*` maison, `*shop*` épicerie, `*rail*` rails, `*stone*` rocher). Ponts et passages: codes de terrain plus une liste `ouvrages`, pas d'objet posé sur la voie ou sur un tablier.
+- Un ru de deux cases d'eau (`water`) est dessiné par le rendu actuel en lit de sable avec un filet d'eau: le vérifier en jeu avant de croire qu'il se lit comme de l'eau.
+
+## Caméra et portes (tour 10)
+
+- En isométrique, une porte de façade ne se voit de face que depuis les deux orientations de son côté. « Vue dans trois orientations sur quatre » ne se tient qu'en excluant le bâtiment de la porte (le jeu le coupe ou le rend transparent): l'écrire, et dire de quel côté elle est vraiment vue. Deux portes face à face sur une rue nord-sud: l'une tourne le dos à la caméra par défaut.
+- Avec la caméra à 35,264 degrés, le rayon monte de 1 m par mètre parcouru sur chaque axe: un volume de hauteur H cache un point à h jusqu'à H - h cases au sud-est. Un toit à deux pans se contrôle par échantillonnage le long du rayon (`toit` du type: égout et sens du faîtage); le volume plein jusqu'au faîte cache une rue entière qu'un vrai toit laisse voir.
+
+## Environnement de travail
+
+- Copie isolée (worktree): la copie peut partir d'un commit ancien; vérifier que la branche de session contient les documents cités, puis avance rapide (`git merge --ff-only`), sans commit.
+- Le garde-fou refuse les commandes qui citent `.git` (même `--exclude-dir=.git`) ou les scripts Python en ligne trop longs: contrôle des tirets avec l'outil Grep, scripts dans `/tmp` lancés avec `python3 -I`.
+- Port de Vite: un autre membre peut déjà servir son jeu sur le même port, et Playwright capture alors sa copie à lui sans erreur. Vérifier que le processus du port tourne dans sa propre copie (`readlink /proc/<pid>/cwd`).
+
+## Retouches de la Halte (vérifié le 2026-11-02)
+
+- Le rendu tire la variante d'un `bush` ou d'un `rock` du hachage de l'identifiant (`MODEL_VARIANTS`, `textHash` de `src/rendu/modeles.ts`): `bush_11` est un noisetier, `rock_02` un `rock_small`. Pour changer le dessin d'un objet sans toucher au code, échanger sa place avec un objet du même type dont l'identifiant donne la bonne variante. `MODEL_BY_PROP` force un modèle par identifiant (`bush_41` sureau): un retrait d'objet plus haut dans la liste le fait glisser ailleurs.
+- Places et cases de l'artiste dans un bâtiment (`interior_spots`, `interior_blocked`, repère glTF x, z): carte x = cx + gx cos a + gz sin a, y = cy - gx sin a + gz cos a (a = rotation x PI/2, centre de l'emprise). Lire les extras et les sommets du GLB avec un petit script Node (en-tête GLB, morceau JSON), et faire une vue de dessus orthographique dans Chromium (Three.js de `node_modules`, serveur `python3 -m http.server`) pour voir le mobilier.
+- Des tests de robots qui marchent au hasard (`moments-tour7.test.ts`, la chevrette) dépendent des cases bloquées autour de leur point de départ: un buisson posé au bord du pré les a fait échouer. Après un déplacement de décor, relancer ces tests seuls, puis toute la suite; ne jamais réécrire `halte.json` pendant que la suite tourne (elle lit le fichier au fil des tests).
+- `src/rendu/gue.test.ts` fige le bout nord de la route du gué en y 36 (une rangée au-dessus de la berge, gué en eau dès y 38): ne pas raccourcir ni élargir la route là.
+- Machine partagée (charge 20 et plus sur 4 cœurs): la suite complète dure plus de 25 minutes; la lancer en tâche de fond sans `timeout` court, et ne pas tuer `vitest` par nom (d'autres membres en font tourner).

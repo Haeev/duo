@@ -208,81 +208,220 @@ def _berry(g, loc, r, color, seed):
              rot=(0, 0, seed * 37))
 
 
-def blackberry(A):
-    """Mûres: un brin de ronce cueilli, sept fruits (cinq noirs, deux encore rouges) de 5 cm (deux fois et demie le
-    réel) sur trois folioles. Posé à plat: point le plus bas à 0, sur le dessus du roncier (extra berry_spots de
-    bramble) ou au sol. Emprise 0,30 x 0,16 m."""
+# Tour 9 (tour-09-conception.md, 5.1): cueillettes lisibles au zoom 1 (14 x 14 px au moins, contraste de
+# luminance de 3 pour 1 avec le feuillage), posées contre leur support et jamais à plus de 0,6 m de son pied.
+
+def _host_hits(build, A, pts):
+    """Points de la face sud (-Y Blender, +Z glTF) d'un hôte (roncier, sureau), par lancer de rayons
+    horizontaux venus du sud: pts = [(x, hauteur)]. L'hôte est reconstruit à l'identique (graines fixes) dans
+    un maillage jetable: le fruit (ferme.glb) et l'hôte (bourg.glb) sont faits par deux scripts."""
+    from mathutils.bvhtree import BVHTree
+    g = build(A)
+    g.bm.normal_update()
+    tree = BVHTree.FromBMesh(g.bm)
+    out = []
+    for (x, z) in pts:
+        hit = tree.ray_cast(Vector((x, -3.0, z)), Vector((0, 1, 0)))
+        out.append(Vector((x, hit[0].y, z)))
+    g.bm.free()
+    return out
+
+
+# grappes de mûres sur la face sud du roncier (x, hauteur): 0,35 à 0,6 m, de part et d'autre du milieu
+BLACKBERRY_XZ = ((-0.26, 0.4), (0.02, 0.5), (0.2, 0.37))
+# ombelles de sureau sur la face sud du sureau: 0,6 à 1,1 m
+ELDER_XZ = ((-0.34, 0.8), (0.02, 1.0), (0.32, 0.74))
+
+
+def host_spot(hits):
+    """Point de pose commun (le milieu, enfoncé de 2 cm dans le feuillage), repère glTF du nœud hôte."""
+    c = hits[1]
+    return [round(c.x, 3), round(c.z, 3), round(-(c.y + 0.02), 3)]
+
+
+def _grappe(g, attach, seed):
+    """Une grappe de mûres de 0,12 m: tige qui sort du feuillage, neuf baies de 2,4 cm (cinq noires, trois
+    rouges pas encore mûres, une noire au bout), un reflet blanc sur la baie la plus haute. Elle pend devant le
+    feuillage, un peu en avant (-Y): elle dépasse du roncier."""
+    rnd = random.Random(seed)
+    top = attach + Vector((0, -0.06, -0.01))
+    tube(g, bezier(attach + Vector((0, 0.04, 0.02)), attach + Vector((0, -0.02, 0.01)), top, 4), 0.007, 0.006,
+         "coach_brown", segs=4)
+    r = 0.024
+    rows = ((0.0, 3), (-0.04, 3), (-0.078, 2), (-0.105, 1))
+    k = 0
+    reds = {1, 4, 6}
+    for dz, n in rows:
+        for i in range(n):
+            dx = (i - (n - 1) / 2) * 0.042 + rnd.uniform(-0.004, 0.004)
+            dy = -0.012 * ((i + k) % 2) + rnd.uniform(-0.004, 0.004)
+            p = top + Vector((dx, dy - 0.01, dz - 0.012))
+            _berry(g, p, r, "flower_red" if k in reds else "blackberry", seed * 10 + k)
+            k += 1
+    # reflet: un petit éclat clair à la surface de la baie du haut au milieu (point de lumière)
+    g.sphere(0.009, loc=top + Vector((0.004, -0.032, 0.002)), color="white_paint", ico=0, segs=5, rings=3)
+    # sépales verts entre la tige et la grappe
+    g.sphere(0.022, loc=top + Vector((0, 0.008, 0.012)), color="leaf_crop", ico=1, jitter=0.1, seed=seed,
+             scale=(1.2, 1.0, 0.45))
+
+
+def blackberry_on_bramble(A):
+    """Mûres du tour 9: trois grappes de 0,12 m posées sur la face sud du roncier (côté chemin), à 0,38, 0,53 et
+    0,40 m de haut. Origine au point de pose commun (extra berry_spots de bramble, la grappe du milieu): les deux
+    autres grappes sont à leur place sur le roncier, calculée par lancer de rayons sur le même roncier."""
+    hits = _host_hits(bramble, A, BLACKBERRY_XZ)
+    sp = host_spot(hits)
+    origin = Vector((sp[0], -sp[2], sp[1]))
     g = A.geo()
-    # tige du brin, couchée, de l'arrière (+Y Blender) vers les fruits
-    tube(g, bezier((0.0, 0.11, 0.012), (0.01, 0.04, 0.02), (0.0, -0.02, 0.03), 4), 0.008, 0.006, "coach_brown")
-    for (yaw, ln, w) in ((90, 0.12, 0.07), (35, 0.10, 0.06), (145, 0.10, 0.06)):
-        blade(g, (0.0, 0.075, 0.012), yaw, 10, -4, ln, w, "leaf_bush", "ivy", fold=0.25, thick=0.006,
-              widths=(1.0, 0.7))
-    berries = [((0.0, -0.035, 0.026), "blackberry"), ((0.048, -0.02, 0.026), "blackberry"),
-               ((-0.048, -0.025, 0.026), "blackberry"), ((0.025, -0.075, 0.026), "blackberry"),
-               ((-0.028, -0.078, 0.026), "comb_red"), ((0.012, -0.045, 0.068), "blackberry"),
-               ((-0.022, -0.02, 0.062), "comb_red")]
-    for i, (p, c) in enumerate(berries):
-        _berry(g, p, 0.027, c, 11 + i)
+    for i, h in enumerate(hits):
+        _grappe(g, h + Vector((0, 0.015, 0)) - origin, 21 + i)
     return g
+
+
+def _umbel(g, attach, seed, spread=0.075):
+    """Une ombelle de sureau: tige rouge qui sort du feuillage et retombe, six rayons rouges et six bouquets de
+    baies noires (dômes de 3,4 cm), 0,17 m de large. Les tiges rouges portent la lecture."""
+    rnd = random.Random(seed)
+    knee = attach + Vector((0, -0.07, 0.03))
+    hub = attach + Vector((0, -0.11, -0.05))
+    tube(g, bezier(attach + Vector((0, 0.05, 0.02)), knee, hub, 4), 0.009, 0.007, "elder_stem", segs=4)
+    for k in range(6):
+        a = math.radians(k * 60 + rnd.uniform(-12, 12))
+        tip = hub + Vector((math.cos(a) * spread, math.sin(a) * spread * 0.7 - 0.02, -0.05 - 0.02 * (k % 2)))
+        tube(g, [hub, hub.lerp(tip, 0.5) + Vector((0, 0, 0.012)), tip], 0.005, 0.004, "elder_stem", segs=4)
+        g.sphere(0.034, loc=tip + Vector((0, 0, -0.016)), color="blackberry", ico=1, jitter=0.18, seed=seed * 7 + k,
+                 scale=(1.0, 1.0, 0.7))
+
+
+def elderberry_on_elder(A):
+    """Grappes de sureau: trois ombelles de baies noires sur tiges rouges retombantes, sur la face sud du sureau
+    (bush_elder), à 0,74, 0,86 et 1,02 m. Origine au point de pose commun (extra berry_spots de bush_elder)."""
+    hits = _host_hits(bush_elder, A, ELDER_XZ)
+    sp = host_spot(hits)
+    origin = Vector((sp[0], -sp[2], sp[1]))
+    g = A.geo()
+    for i, h in enumerate(hits):
+        _umbel(g, h + Vector((0, 0.02, 0)) - origin, 31 + i)
+    return g
+
+
+def bush_elder(A):
+    """Sureau noir (bush_41, à la lisière au soleil): grand buisson de 2,2 m, cinq tiges claires et droites qui
+    partent du pied (le sureau rejette de la souche), feuillage en quatre masses dont une basse au sud, de 0,45 à
+    1,3 m, où pendent les ombelles. Écorce gris clair liégeuse: on ne le confond pas avec le noisetier."""
+    g = A.geo()
+    # tiges: on n'en voit que le pied (0,25 m), le feuillage descend presque au sol, comme un buisson
+    for (deg, lean, ln) in ((-80, 14, 0.9), (20, 18, 1.3), (110, 16, 1.35), (200, 20, 1.1), (290, 10, 1.5)):
+        a = math.radians(deg)
+        g.cyl(0.04, ln, loc=(0.07 * math.cos(a), 0.07 * math.sin(a), 0.0), color="wood_old", segs=5, cap=False,
+              base=True, r2=0.026, rot=(-lean * math.sin(a), lean * math.cos(a), 0))
+    g.sphere(0.6, loc=(0.0, 0.1, 1.42), color="leaf_bush", ico=2, jitter=0.12, seed=91, scale=(1.25, 1.1, 0.8),
+             rot=(0, 0, 15))
+    g.sphere(0.5, loc=(0.0, -0.2, 0.72), color="leaf_oak", ico=1, jitter=0.1, seed=92, scale=(1.3, 0.8, 0.95))
+    g.sphere(0.42, loc=(-0.52, 0.16, 0.66), color="leaf_bush", ico=1, jitter=0.1, seed=93, scale=(1.0, 1.0, 1.0))
+    g.sphere(0.42, loc=(0.52, 0.22, 0.74), color="leaf_bush", ico=1, jitter=0.1, seed=94, scale=(1.0, 1.0, 1.0))
+    g.sphere(0.4, loc=(0.05, 0.42, 0.62), color="leaf_oak", ico=1, jitter=0.1, seed=95, scale=(1.1, 0.9, 1.0))
+    return g
+
+
+def cep(A):
+    """Cèpes: trois serrés (0,25 m en tout), sortis au pied d'un chêne. Chapeau brun châtaigne bombé, bord un
+    peu plus clair, dessous en éponge jaune pâle; pied clair et ventru (le clair se détache de l'herbe), plus
+    large en bas qu'en haut. Grossis deux fois, comme les girolles."""
+    g = A.geo()
+    for (x, y, s, seed, tilt) in ((0.0, 0.0, 1.0, 1, (3, -4, 0)), (-0.085, 0.045, 0.72, 2, (-12, -8, 30)),
+                                  (0.075, 0.05, 0.55, 3, (10, 12, 70))):
+        M = Matrix.Translation((x, y, 0.0)) @ lpl._rot(tilt) @ Matrix.Scale(s, 4)
+        # pied ventru: plus large au tiers bas, resserré sous le chapeau, enfoncé de 1 cm dans le sol
+        vs = g.lathe([(0.032, -0.01), (0.046, 0.03), (0.042, 0.075), (0.03, 0.115), (0.026, 0.13)],
+                     colors="cep_stem", segs=8, phase=seed * 9)
+        g.transform(vs, M)
+        # chapeau: éponge plate dessous, bord arrondi, dôme brun
+        vs = g.lathe([(0.024, 0.118), (0.075, 0.122), (0.088, 0.135), (0.082, 0.158), (0.058, 0.182),
+                      (0.0, 0.192)], colors=["straw", "straw", "cep_cap", "cep_cap", "cep_cap"], segs=10,
+                     phase=seed * 7)
+        g.transform(vs, M)
+    return g
+
+
+def nut_spots():
+    """Point de pose du tas de noisettes sous le noisetier (repère glTF de bush_hazel: x, hauteur, z vers le sud):
+    0,48 m au sud du pied, sous la couronne (rayon 0,72 m); les brins partent du pied à 0,06 m et ne touchent pas
+    la jonchée (son bord nord est à 0,2 m du pied)."""
+    return [[0.0, 0.0, 0.48]]
 
 
 def _nut(g, M, seed):
     """Une noisette de 5 cm (deux fois et demie le réel): coque brune, cicatrice pâle à la base, pointe."""
     vs = g.lathe([(0.017, 0.0), (0.026, 0.016), (0.02, 0.038), (0.0, 0.053)],
-                 colors=by_normal("leather", "leather", "log_end", thr=0.9), segs=6, phase=seed * 13)
+                 colors=by_normal("hazel_shell", "hazel_shell", "log_end", thr=0.9), segs=6, phase=seed * 13)
     g.transform(vs, M)
     return vs
 
 
 def hazelnut(A):
-    """Noisettes: petit tas de huit, dont une encore dans son involucre frangé, sur deux feuilles de noisetier
-    tombées (jaunes à l'automne, comme le noisetier). Emprise 0,33 x 0,23 m, hauteur 0,13 m (agrandi x 1,3)."""
+    """Noisettes du tour 9: tas de sept noisettes, plus trois encore dans leur collerette vert pâle, posé sur une
+    jonchée de feuilles mortes ocre de 0,6 m (douze feuilles qui se chevauchent sur un fond de litière): les
+    feuilles ocre font lire « sous un arbre » et portent le contraste avec l'herbe, les coques brun foncé se
+    détachent des feuilles claires (contraste de luminance de 3,9 pour 1). Posé au point nut_spots de bush_hazel,
+    sous la couronne, à 0,48 m du pied. Origine au centre, au sol; 0,6 m de large, 0,1 m de haut."""
     g = A.geo()
-    flat_leaf(g, (-0.12, -0.03, 0.0), 10, 0.15, 0.11, "leaf_hazel")
-    flat_leaf(g, (0.13, 0.05, 0.0), 200, 0.14, 0.10, "leaf_hazel", tilt=(0, 2))
-    rnd = random.Random(5)
+    rnd = random.Random(7)
+    # fond de litière: disque irrégulier très plat (les feuilles le débordent), puis feuilles couchées
+    bot, top = [], []
+    for k in range(9):
+        a = 2 * math.pi * k / 9
+        r = 0.24 * rnd.uniform(0.85, 1.08)
+        bot.append((r * math.cos(a), r * math.sin(a), 0.0))
+        top.append((r * math.cos(a), r * math.sin(a), 0.004))
+    faces = [list(range(9, 18)), list(range(8, -1, -1))]
+    faces += [[i, (i + 1) % 9, 9 + (i + 1) % 9, 9 + i] for i in range(9)]
+    _closed(g, bot + top, faces, "wood")
+    for k in range(12):
+        a = math.radians(k * 30 + rnd.uniform(-10, 10))
+        rr = 0.12 if k % 2 else 0.17
+        ln = rnd.uniform(0.15, 0.19)
+        # feuille couchée, pointe vers l'extérieur: le contour du tas se lit en feuilles et non en disque
+        c = (rr * math.cos(a) - math.cos(a) * ln * 0.35, rr * math.sin(a) - math.sin(a) * ln * 0.35,
+             0.004 + 0.003 * (k % 3))
+        flat_leaf(g, c, math.degrees(a), ln, ln * 0.72, "leaf_litter" if k % 3 else "wood", thick=0.004,
+                  tilt=(rnd.uniform(-3, 3), 0))
+    # noisettes: couchées sur la jonchée, en tas serré au milieu (0,2 m)
     r = 0.025
-    low = [(-0.045, -0.02), (0.01, -0.045), (0.05, 0.0), (0.0, 0.03), (-0.06, 0.04)]
+    base_z = 0.012
+    low = [(-0.05, -0.02), (0.0, -0.05), (0.05, -0.01), (0.02, 0.04), (-0.035, 0.035)]
     centers = []
     for (x, y) in low:
-        # couchée sur le flanc: axe horizontal, cicatrice tournée au hasard
-        yaw = rnd.uniform(0, 360)
-        M = (Matrix.Translation((x, y, r + 0.004)) @ lpl._rot((0, 0, yaw)) @ lpl._rot((0, 90, 0))
+        M = (Matrix.Translation((x, y, base_z + r)) @ lpl._rot((0, 0, rnd.uniform(0, 360))) @ lpl._rot((0, 90, 0))
              @ Matrix.Translation((0, 0, -0.026)))
         _nut(g, M, len(centers))
-        centers.append(Vector((x, y, r + 0.004)))
-    for (x, y) in ((-0.015, -0.005), (0.028, 0.012)):
-        # posées sur celles du dessous, enfoncées de 8 % (elles se calent, sans flotter)
-        z = r + 0.004
+        centers.append(Vector((x, y, base_z + r)))
+    # deux noisettes posées sur celles du dessous, enfoncées de 8 % (elles se calent sans flotter)
+    for (x, y) in ((-0.01, -0.005), (0.03, 0.012)):
+        z = base_z + r
         for c in centers:
             d = math.hypot(c.x - x, c.y - y)
             reach = 2 * r * 0.92
             if d < reach:
                 z = max(z, c.z + math.sqrt(reach ** 2 - d ** 2))
-        yaw = rnd.uniform(0, 360)
-        M = (Matrix.Translation((x, y, z)) @ lpl._rot((0, 0, yaw)) @ lpl._rot((20, 90, 0))
+        M = (Matrix.Translation((x, y, z)) @ lpl._rot((0, 0, rnd.uniform(0, 360))) @ lpl._rot((20, 90, 0))
              @ Matrix.Translation((0, 0, -0.026)))
         _nut(g, M, len(centers))
         centers.append(Vector((x, y, z)))
-    # une noisette encore dans son involucre: trois bractées frangées qui l'enveloppent à moitié, debout
-    cx, cy = 0.088, -0.062
-    _nut(g, Matrix.Translation((cx, cy, 0.004)), 9)
-    for k in range(3):
-        yaw = k * 120 + 15
-        a = math.radians(yaw)
-        blade(g, (cx + 0.008 * math.cos(a), cy + 0.008 * math.sin(a), 0.002), yaw, 72, 52, 0.06, 0.05,
-              "leaf_hazel", "leaf_hazel", fold=-0.45, thick=0.004, widths=(1.0, 0.8), roll=0.0)
-    # tas agrandi d'un tiers (0,33 m): à 0,26 m, il tenait en 12 pixels bruns sur l'herbe d'automne au zoom 1
-    g.transform(list(g.bm.verts), Matrix.Scale(1.3, 4))
+    # trois noisettes encore dans leur collerette vert pâle (involucre frangé), debout au bord du tas
+    for i, (cx, cy) in enumerate(((0.095, -0.055), (-0.1, 0.06), (0.07, 0.085))):
+        _nut(g, Matrix.Translation((cx, cy, base_z)), 9 + i)
+        for k in range(3):
+            yaw = k * 120 + 15 + i * 40
+            a = math.radians(yaw)
+            blade(g, (cx + 0.008 * math.cos(a), cy + 0.008 * math.sin(a), base_z - 0.002), yaw, 72, 50, 0.055,
+                  0.05, "hazel_husk", "hazel_husk", fold=-0.45, thick=0.004, widths=(1.0, 0.8), roll=0.0)
     return g
 
 
 # Décor de la lisière (bourg.glb) ----------------------------------------------------------------
 
 BRAMBLE_SIZE = (1.2, 0.8, 0.7)
-# fruits: points du dessus du roncier, calculés par lancer de rayons (voir berry_spots)
-BERRY_XY = ((-0.2, -0.06), (0.07, -0.05), (-0.07, -0.14))
 
 
 def bezier3(p0, p1, p2, p3, n):
@@ -372,20 +511,15 @@ def bramble(A):
     return g
 
 
-def berry_spots(ob, sink=0.015):
-    """Points de pose des mûres sur le dessus du roncier, en coordonnées glTF (x, y, z) du nœud: lancer de
-    rayons vers le bas, puis enfoncés de sink pour que le brin, posé à plat sur un dessus bombé, s'y cale."""
-    from mathutils.bvhtree import BVHTree
-    bm = bmesh.new()
-    bm.from_mesh(ob.data)
-    tree = BVHTree.FromBMesh(bm)
-    out = []
-    for (x, y) in BERRY_XY:
-        hit = tree.ray_cast(Vector((x, y, 3.0)), Vector((0, 0, -1)))
-        z = hit[0].z - sink
-        out.append([round(x, 3), round(z, 3), round(-y, 3)])
-    bm.free()
-    return out
+def berry_spots(A):
+    """Extra berry_spots du roncier (tour 9): un seul point, sur la face sud (côté chemin), où se pose le modèle
+    blackberry (trois grappes à leur place); même calcul que blackberry_on_bramble (ferme.py)."""
+    return [host_spot(_host_hits(bramble, A, BLACKBERRY_XZ))]
+
+
+def elder_spots(A):
+    """Extra berry_spots du sureau: point de pose du modèle elderberry (trois ombelles, face sud)."""
+    return [host_spot(_host_hits(bush_elder, A, ELDER_XZ))]
 
 
 def bush_hazel(A):

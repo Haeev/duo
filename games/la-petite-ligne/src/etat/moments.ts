@@ -29,6 +29,20 @@ export function activeWatch(def: MomentDef, today: DeepReadonly<MomentToday>): M
   return today.origin === 'quest' && def.questWatch !== null ? def.questWatch : def.watch;
 }
 
+/**
+ * Cases fermées par les barrières baissées (tour 9, le salut du mécanicien, `watch.arm`): de
+ * l'armement jusqu'à la remontée des lisses (`liftAt` secondes après le début de l'apogée), sinon
+ * `null`.
+ */
+export function armedCells(content: Pick<Content, 'moments'>, today: DeepReadonly<MomentToday> | null): { x: number; y: number; w: number; h: number } | null {
+  if (today === null || (today.armedTick ?? null) === null) return null;
+  const def = content.moments.find((m) => m.id === today.id);
+  const arm = def?.watch.arm ?? null;
+  if (arm === null) return null;
+  if (today.phase === 'waiting' || (today.phase === 'climax' && today.elapsed < arm.liftAt)) return arm.cells;
+  return null;
+}
+
 export function momentDef(content: Content, id: string): MomentDef | null {
   return content.moments.find((m) => m.id === id) ?? null;
 }

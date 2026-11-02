@@ -82,9 +82,18 @@ function missingPose(
   const vars = keyTokens(ctx.key);
   const d = Math.hypot(target.x - c.pos.x, target.y - c.pos.y);
   if (d > w.radius + UI_SETTINGS.watchNearMargin) return null;
-  if (w.hold !== null && (c.holding === null || !w.hold.includes(c.holding))) return ctx.t(pose.hold, vars);
+  const messages = ctx.texts.messages;
+  if (w.hold !== null && (c.holding === null || !w.hold.includes(c.holding))) {
+    // Le salut du mécanicien (tour 9): la manivelle d'une barrière, pas une place quelconque.
+    const crank = w.arm === null ? undefined : messages.moment_crank_take;
+    return ctx.t(crank ?? pose.hold, vars);
+  }
   if (d > w.radius) return ctx.t(pose.close);
   if (d < w.minRadius) return ctx.t(pose.tooClose);
+  // La dame blanche (tour 9): côte à côte, à moins de `closeTogether` l'un de l'autre.
+  if (w.closeTogether !== null && Math.hypot(other.pos.x - c.pos.x, other.pos.y - c.pos.y) > w.closeTogether) {
+    return ctx.t(messages.moment_side_by_side ?? pose.close, partner);
+  }
   if (w.seated && c.seat?.bench !== w.bench) return ctx.t(pose.seated, vars);
   const moving = w.still && c.speed >= ctx.content.settings.moments.stillSpeed;
   const turned = !w.facing || d < 0.5 || angleGap(Math.atan2(target.y - c.pos.y, target.x - c.pos.x), c.facing) <= UI_SETTINGS.lookCone;
@@ -185,10 +194,19 @@ export function watchModel(world: ReadonlyWorld, ctx: UiContext): WatchModel | n
       return { key: 'opposite:same', tone: 'pose', line: ctx.t(messages.moment_opposite_same_bank ?? '', partner), detail: null, ring: null };
     }
   }
+  if (w.syncPress !== null) {
+    // Les lanternes (tour 9): chacun à sa lanterne, allumer au même instant; ni anneau ni pose. Loin
+    // d'une lanterne, rien: la simulation dit où est l'autre après un allumage seul.
+    if (!selfOk) return null;
+    const line = ctx.t(messages.moment_lantern_take ?? '', { ...keyTokens(ctx.key), ...partner });
+    const detail = partnerOk ? ctx.t(m.partnerReady, partner) : waitingFor();
+    return { key: `lantern|${detail}`, tone: partnerOk ? 'together' : 'partner', line, detail, ring: null };
+  }
   if (!selfOk) {
     const line = missingPose(ctx, me, other, w, target, partner);
     if (line === null) return null;
-    const detail = partnerOk ? ctx.t(m.partnerReady, partner) : null;
+    const crankPartner = w.arm === null ? undefined : messages.moment_crank_partner;
+    const detail = partnerOk ? ctx.t(crankPartner ?? m.partnerReady, partner) : null;
     return { key: `pose:${line}|${detail ?? ''}`, tone: 'pose', line, detail, ring: null };
   }
   if (!partnerOk) return { key: otherHere ? 'partner:here' : 'partner', tone: 'partner', line: waitingFor(), detail: null, ring: null };

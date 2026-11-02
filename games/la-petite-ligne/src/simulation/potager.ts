@@ -8,7 +8,8 @@ import type { Cell, Character, GardenCell, Quality, Tree } from '../etat/types';
 import { type Sim, bump, emit, say, secondsToTicks, notifyKey } from './contexte';
 import { queueHint } from './astuces';
 import { durationMultiplier, spend } from './besoins';
-import { giveToCharacter, heldStack, takeFromBag } from './sac';
+import { giveToCharacter, heldItem, heldStack, takeFromBag } from './sac';
+import { capacityOf } from './catalogue';
 import { ITEM } from './ids';
 import { updateQuests } from './quetes';
 
@@ -36,6 +37,8 @@ function toolUsed(sim: Sim, c: Character): void {
 export function till(sim: Sim, c: Character, g: GardenCell): void {
   if (g.soil !== 'grass') return;
   g.soil = 'tilled';
+  // Jour de pluie: la terre fraîchement bêchée est mouillée comme le reste du potager (R13).
+  if (sim.world.weather === 'rain') g.wet = true;
   spend(sim, c, 'till');
   gesture(sim, c, 'till', actionSeconds(sim, 'till'), centre(g.cell));
   bump(sim, 'tilled', c.id);
@@ -142,8 +145,8 @@ export function rainWaters(sim: Sim): void {
 }
 
 export function refill(sim: Sim, c: Character, at: string): void {
-  const capacity = Object.values(sim.content.items).find((i) => i.capacity !== null)?.capacity ?? 0;
-  c.water = capacity;
+  // La contenance de l'arrosoir tenu (tour 9: l'arrosoir de cuivre porte 20).
+  c.water = capacityOf(sim, heldItem(c));
   gesture(sim, c, 'refill', actionSeconds(sim, 'refill'), null);
   emit(sim, { type: 'refilled', by: c.id, at });
 }
@@ -156,7 +159,9 @@ export function chop(sim: Sim, c: Character, tree: Tree): void {
   spend(sim, c, 'chop');
   gesture(sim, c, 'chop', actionSeconds(sim, 'chop'), { x: tree.pos.x, y: tree.pos.y });
   toolUsed(sim, c);
-  const felled = tree.hits >= s.chopsPerTree;
+  // Coups de la hache tenue (tour 9: la hache de la forge abat en deux).
+  const chops = sim.content.items[heldItem(c) ?? '']?.tool?.chops ?? s.chopsPerTree;
+  const felled = tree.hits >= chops;
   if (felled) {
     tree.felled = true;
     tree.felledDay = sim.world.clock.day;

@@ -6,12 +6,15 @@
  * halte, à l'heure du jeu.
  */
 import type { Object3D } from 'three';
-import { AnimationMixer, Group, Matrix4 } from 'three';
+import { AnimationMixer, Group, Matrix4, Mesh } from 'three';
+import type { Content, MomentDef } from '../donnees/types';
 import type { GameMap, MapProp } from '../etat/carte';
-import type { TrainPhase } from '../etat/types';
+import { armedCells, resolveTrack, sampleResolved, type TrackSample, type Vec3 } from '../etat/moments';
+import { SIM_HZ, type DeepReadonly, type MomentToday, type TrainPhase } from '../etat/types';
 import { smoothFactor } from './camera';
 import { yawFromFacing, type FrameContext } from './contexte';
 import { propHints, propMatrix, type ClockHand } from './decor';
+import { ShapeBuilder } from './geometrie';
 import { InstancedBatches } from './lots';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -57,6 +60,72 @@ const MINUTES_PER_DIAL = 720;
  * accélère en s'éloignant du même côté, sans saut). `NaN` quand il est parti.
  */
 /** Les lisses barrent la route pendant que le train roule (arrivée et départ), pas à quai ni absent. */
+/** Rangées de la ligne (plus de la moitié de la largeur en voie) et axe de la voie (y, m). */
+export function mainLine(map: GameMap): { rows: Set<number>; trackY: number } {
+  const railRows: number[] = [];
+  for (let cy = 0; cy < map.height; cy += 1) {
+    let rails = 0;
+    for (let cx = 0; cx < map.width; cx += 1) {
+      if (map.ground[cy * map.width + cx] === 'rail') {
+        rails += 1;
+      }
+    }
+    if (rails > map.width / 2) {
+      railRows.push(cy);
+    }
+  }
+  const first = railRows[0] ?? 0;
+  const last = railRows[railRows.length - 1] ?? first;
+  return { rows: new Set(railRows), trackY: (first + last + 1) / 2 };
+}
+
+/** Plaque tournante au pied d'une voie de garage (centre sur l'axe de la ligne, m). */
+export interface Turntable {
+  x: number;
+  y: number;
+  radius: number;
+  /** Côté de la voie de garage: -1 au nord de la ligne, 1 au sud. */
+  side: -1 | 1;
+}
+
+/**
+ * Retour R20 (2026-11-01): la voie de garage de la remise, perpendiculaire à la ligne, semblait
+ * filer sous la halte (vue orientée 1, sa jonction tombe derrière le toit). Une voie de garage
+ * à angle droit se raccorde à la ligne par une plaque tournante: la draisine y sort de la
+ * remise vers le sud, y pivote, et repart vers l'ouest sur la ligne (trajet de la simulation,
+ * `carry.handcar.path`). Une plaque par colonne de voie de garage qui touche la ligne.
+ */
+export function sidingTurntables(map: GameMap): Turntable[] {
+  const { rows, trackY } = mainLine(map);
+  if (rows.size === 0) return [];
+  const isRail = (cx: number, cy: number): boolean =>
+    cx >= 0 &&
+    cy >= 0 &&
+    cx < map.width &&
+    cy < map.height &&
+    map.ground[cy * map.width + cx] === 'rail';
+  const first = Math.min(...rows);
+  const last = Math.max(...rows);
+  const plates: Turntable[] = [];
+  for (let cx = 0; cx < map.width; cx += 1) {
+    for (const [row, side] of [
+      [first - 1, -1],
+      [last + 1, 1],
+    ] as const) {
+      // Colonne de voie hors de la ligne, sans voisine de voie à l'ouest ni à l'est.
+      if (isRail(cx, row) && !isRail(cx - 1, row) && !isRail(cx + 1, row)) {
+        plates.push({
+          x: cx + 0.5,
+          y: trackY,
+          radius: RENDER_SETTINGS.railway.turntableRadius,
+          side,
+        });
+      }
+    }
+  }
+  return plates;
+}
+
 export function gateClosed(phase: TrainPhase): boolean {
   return phase === 'arriving' || phase === 'departing';
 }
@@ -95,6 +164,31 @@ function easeIn(t: number): number {
   return t * t * t;
 }
 
+/**
+ * Le salut du mécanicien (tour 9, section 4.2): le moment armé par les manivelles (`watch.arm`),
+ * la piste de la cabine (`driver`) et l'écart entre la cabine et l'arrêt du train
+ * (`render.trainOffsetFromCab`): au départ au pas (`train.slow`), le train suit la cabine.
+ */
+interface SaluteTrack {
+  def: MomentDef;
+  frames: MomentDef['climax']['keyframes'][string];
+  points: Vec3[];
+  fromCab: number;
+}
+
+function saluteTrack(content: Content | null): SaluteTrack | null {
+  const def = content?.moments.find((m) => m.watch.arm !== null) ?? null;
+  const frames = def?.climax.keyframes[RENDER_SETTINGS.salute.cabActor];
+  const fromCab = def?.render.trainOffsetFromCab;
+  if (def === null || frames === undefined || typeof fromCab !== 'number') return null;
+  return { def, frames, points: resolveTrack(frames, { x: 0, y: 0, z: 0 }), fromCab };
+}
+
+/** Lisses baissées pour le salut: de l'armement (`armedTick`) à leur remontée (`liftAt`). */
+function saluteGateTarget(content: Content | null, today: DeepReadonly<MomentToday> | null): boolean {
+  return content !== null && armedCells(content, today) !== null;
+}
+
 export class RailwayPart implements EventfulPart {
   readonly group = new Group();
   /** Rails par tronçons de `chunkSize`: ceux hors du cadre sont éliminés. */
@@ -128,6 +222,15 @@ export class RailwayPart implements EventfulPart {
   }
 
   private moving = false;
+  private readonly salute: SaluteTrack | null;
+  private readonly cab: TrackSample = { x: 0, y: 0, z: 0, clip: null, clipSince: 0 };
+  /** Décalage du train à cette image (m depuis son arrêt), `NaN` s'il est parti. */
+  private shownOffset = Number.NaN;
+
+  /** Décalage du train depuis son arrêt à l'image courante (m), `NaN` quand il n'est pas là. */
+  currentOffset(): number {
+    return this.shownOffset;
+  }
 
   constructor(
     private readonly map: GameMap,
@@ -136,28 +239,18 @@ export class RailwayPart implements EventfulPart {
     private readonly terrain: Terrain,
     resources: ResourceTracker,
     private readonly clockHands: readonly ClockHand[],
+    /** Contenu (tour 9: le salut du mécanicien), `null` dans les essais. */
+    private readonly content: Content | null = null,
   ) {
     this.group.name = 'voie';
-    const railRows: number[] = [];
-    for (let cy = 0; cy < map.height; cy += 1) {
-      let rails = 0;
-      for (let cx = 0; cx < map.width; cx += 1) {
-        if (map.ground[cy * map.width + cx] === 'rail') {
-          rails += 1;
-        }
-      }
-      if (rails > map.width / 2) {
-        railRows.push(cy);
-      }
-    }
-    const first = railRows[0] ?? 0;
-    const last = railRows[railRows.length - 1] ?? first;
-    this.trackY = (first + last + 1) / 2;
+    this.salute = saluteTrack(content);
+    const line = mainLine(map);
+    this.trackY = line.trackY;
     this.stopX = map.points.train_stop?.x ?? map.width / 2;
     const top = library.extras(RAIL_MODEL).rail_top;
     this.railTop = typeof top === 'number' ? top : DEFAULT_RAIL_TOP;
 
-    if (railRows.length > 0) {
+    if (line.rows.size > 0) {
       this.layRails(materials, resources);
     }
 
@@ -311,6 +404,8 @@ export class RailwayPart implements EventfulPart {
     );
     const matrix = new Matrix4();
     const turn = new Matrix4().makeRotationY(Math.PI / 2);
+    const plates = sidingTurntables(map);
+    this.layTurntables(plates, materials, resources, ground);
     let any = false;
     batch.begin();
     for (let cx = 0; cx < map.width; cx += 1) {
@@ -329,9 +424,11 @@ export class RailwayPart implements EventfulPart {
         while (isRail(cx, end + 1) && !rows.has(end + 1)) {
           end += 1;
         }
-        // Jusqu'au bord de la ligne; un module plus long que la colonne déborde sous la remise.
+        // Jusqu'au bord de la ligne, ou de sa plaque tournante; un module plus long que la colonne
+        // déborde sous la remise.
+        const plate = plates.find((candidate) => candidate.x === cx + 0.5 && candidate.side < 0);
         const from = cy;
-        const to = end + 1;
+        const to = plate === undefined ? end + 1 : plate.y - plate.radius;
         for (
           let z = from + RAIL_MODULE_LENGTH / 2;
           z - RAIL_MODULE_LENGTH / 2 < to - 1e-3;
@@ -352,10 +449,71 @@ export class RailwayPart implements EventfulPart {
     }
   }
 
+  /**
+   * Plaques tournantes (R20): fosse cerclée de pierre au ras du ballast, tablier de planches
+   * (posées nord-sud, comme la voie de garage) sous les traverses de la ligne, pivot de fonte.
+   * Un seul maillage pour toutes, matériau palette (aucun programme de plus).
+   */
+  private layTurntables(
+    plates: readonly Turntable[],
+    materials: SharedMaterials,
+    resources: ResourceTracker,
+    ground: number,
+  ): void {
+    if (plates.length === 0) return;
+    const look = RENDER_SETTINGS.railway;
+    const shape = new ShapeBuilder();
+    for (const plate of plates) {
+      const r = plate.radius;
+      const deck = r - look.turntableRim;
+      shape.cylinder(r, r, look.rimTop, [plate.x, ground, plate.y], 'stone_dark', {
+        base: true,
+        segments: look.turntableSegments,
+      });
+      shape.cylinder(deck, deck, look.deckTop, [plate.x, ground, plate.y], 'wood_dark', {
+        base: true,
+        segments: look.turntableSegments,
+      });
+      const count = Math.floor((2 * deck) / look.plankWidth);
+      for (let i = 0; i < count; i += 1) {
+        const x = -deck + (i + 0.5) * ((2 * deck) / count);
+        const length = 2 * Math.sqrt(Math.max(0, deck * deck - x * x)) - look.plankWidth * 0.5;
+        if (length <= 0) continue;
+        shape.box(
+          [((2 * deck) / count) * 0.9, look.plankHeight, length],
+          [plate.x + x, ground + look.deckTop, plate.y],
+          i % 3 === 1 ? 'wood_old' : 'wood',
+          { base: true },
+        );
+      }
+      shape.cylinder(
+        0.12,
+        0.12,
+        look.deckTop + look.plankHeight + 0.015,
+        [plate.x, ground, plate.y],
+        'iron',
+        {
+          base: true,
+        },
+      );
+    }
+    const mesh = new Mesh(resources.track(shape.build()), materials.palette);
+    mesh.name = 'plaques tournantes';
+    mesh.receiveShadow = true;
+    this.group.add(mesh);
+  }
+
   update(context: FrameContext): void {
     const state = context.world.train;
     const progress = state.prevProgress + (state.progress - state.prevProgress) * context.alpha;
-    const offset = trainOffset(state.phase, progress);
+    let offset = trainOffset(state.phase, progress);
+    if (state.phase === 'departing' && state.slow === true && this.salute !== null) {
+      // Départ au pas: la cabine suit la piste du mécanicien, le train suit la cabine.
+      const seconds = this.salute.def.climax.seconds;
+      sampleResolved(this.salute.frames, this.salute.points, (1 - progress) * seconds, this.cab);
+      offset = this.cab.x + this.salute.fromCab;
+    }
+    this.shownOffset = offset;
     const visible = !Number.isNaN(offset);
     this.train.visible = visible;
     const moving = visible && state.phase !== 'stopped';
@@ -380,8 +538,19 @@ export class RailwayPart implements EventfulPart {
       this.trainX = Number.NaN;
     }
 
+    const today = context.world.moments.today;
+    const armed = saluteGateTarget(this.content, today);
+    const armedTick = today?.armedTick ?? null;
+    const lowering = armed && armedTick !== null ? (context.world.tick - armedTick + context.alpha) / SIM_HZ : Number.NaN;
+    const downSeconds = this.salute?.def.watch.arm?.seconds ?? 1;
     for (const gate of this.gates) {
-      gate.angle = gateAngleStep(gate.angle, state.phase, context.dt, context.reducedMotion);
+      if (armed && lowering < downSeconds) {
+        // Baissées à la main: les lisses suivent la manivelle, du haut en bas pendant `arm.seconds`.
+        const u = Math.min(1, Math.max(0, lowering / downSeconds));
+        gate.angle = GATE_OPEN + (GATE_CLOSED - GATE_OPEN) * u * u * (3 - 2 * u);
+      } else {
+        gate.angle = gateAngleStep(gate.angle, armed ? 'departing' : state.phase, context.dt, context.reducedMotion);
+      }
       if (gate.arm !== null) {
         gate.arm.rotation.z = gate.angle;
       }

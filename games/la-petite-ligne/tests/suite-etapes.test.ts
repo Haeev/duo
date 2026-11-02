@@ -171,7 +171,7 @@ describe('sauvegarde du jour 15 du format 4 (T8-02, section 1.6)', () => {
       SIM_HZ * 60 * 20,
     );
     const letter = w.letters.find((l) => l.id === 'coop_order_generated@22');
-    expect(letter?.title).toBe('La commande du samedi 22');
+    expect(letter?.title).toBe('Commande pour samedi 22');
     expect(w.clock.day).toBe(15);
     expect(w.clock.minutes).toBeGreaterThanOrEqual(18 * HOUR);
     expect(letter?.text).not.toContain('{');
@@ -198,12 +198,12 @@ describe('sauvegarde du jour 15 du format 4 (T8-02, section 1.6)', () => {
   });
 });
 
-describe('limite provisoire du samedi 43 (T8-05, section 1.4)', () => {
-  it('commande payée, scène de Firmin, écran « Six semaines » sans « Rester »; avec une limite au jour 50, la partie va au jour 44', () => {
+describe('étape du samedi 43 (T8-05, devenue T9-16 au tour 9)', () => {
+  it('commande payée, scène de Firmin, écran « Six semaines » qui propose « Rester », texte réécrit; « Rester » chez les deux mène au jour 44', () => {
     const sim = load('format-5-ete-jour-25.json');
     play(
       sim,
-      createRobot({ stages: 'stay' }),
+      createRobot({ stages: 'finish' }),
       (s) => s.world.phase === 'ended',
       SIM_HZ * 60 * 60 * 30,
     );
@@ -214,35 +214,23 @@ describe('limite provisoire du samedi 43 (T8-05, section 1.4)', () => {
     expect(w.dialoguesDone).toContain('firmin_stage_summer');
     expect(w.letters.some((l) => l.id === 'coop_recap_generated@43')).toBe(true);
     const screen = stageScreen(w, sim.content);
-    expect(screen?.canStay).toBe(false);
+    expect(screen?.canStay).toBe(true);
     expect(screen?.title).toBe("Six semaines à la Halte d'Aubrune");
-    expect(screen?.next).toBe(
-      '« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.',
-    );
-    // « Rester » refusé dans cette version: le choix ne s'enregistre pas.
-    send(sim, [['p1', choose('stay')]]);
-    expect(w.stages.choice.p1).toBeNull();
+    expect(screen?.text).toBe("Restez pour l'automne: le bois roussit, les noisettes tombent, et le bourg a des projets pour vous.");
     expect(w.session.highlights).toContain('Six semaines à la Halte');
-    // Une version future qui prolonge la partie: « Rester » apparaît et la partie reprend au départ du train.
-    const longer = structuredClone(sim.content);
-    longer.settings.clock.lastDay = { day: 50, end: 16 * HOUR };
-    const next = restoreWorld(
-      longer,
-      sim.map,
-      structuredClone(snapshotOf(sim).data),
-      snapshotOf(sim).dataSchema,
-      [A, B],
-    );
-    expect(stageScreen(next.world, longer)?.canStay).toBe(true);
+    send(sim, [
+      ['p1', choose('stay')],
+      ['p2', choose('stay')],
+    ]);
     play(
-      next,
+      sim,
       createRobot({ stages: 'stay' }),
       (s) => s.world.clock.day === 44,
       SIM_HZ * 60 * 60 * 2,
     );
-    expect(next.world.clock.day).toBe(44);
-    expect(next.world.stages.passed).toEqual(['demo', 'summer_end']);
-    expect(next.world.order.generated?.train).toBe(50);
+    expect(sim.world.clock.day).toBe(44);
+    expect(sim.world.stages.passed).toEqual(['demo', 'summer_end']);
+    expect(sim.world.order.generated?.train).toBe(50);
   }, 600_000);
 });
 

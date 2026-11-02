@@ -62,6 +62,23 @@
    "beak_socket": "socket_kingfisher_beak",
    "tris": 416
   },
+  "barn_owl": {
+   "kind": "animal",
+   "origin": "pattes sur le perchoir (rocher rock_02) ou au sol",
+   "height": 0.35,
+   "wingspan": 0.9,
+   "beak_socket": "socket_barn_owl_beak",
+   "note": "vol: owl_glide, owl_flap; surplace: owl_hover; owl_look tourne la tête de 120 degrés vers sa gauche et y reste (LoopOnce, clampWhenFinished)",
+   "tris": 658
+  },
+  "vole": {
+   "kind": "item",
+   "socket": "socket_barn_owl_beak",
+   "carried_by": "barn_owl",
+   "length": 0.08,
+   "note": "en travers du bec, tête vers la gauche de l'oiseau",
+   "tris": 158
+  },
   "ladder_wood": {
    "kind": "prop",
    "lean_deg": 75.0,
@@ -349,7 +366,49 @@
     "seconds": 0.5,
     "loop": false
    }
+  ],
+  "barn_owl": [
+   {
+    "name": "owl_glide",
+    "seconds": 1.0,
+    "loop": true
+   },
+   {
+    "name": "owl_hover",
+    "seconds": 0.4,
+    "loop": true
+   },
+   {
+    "name": "owl_strike",
+    "seconds": 0.4,
+    "loop": false
+   },
+   {
+    "name": "owl_mantle",
+    "seconds": 1.6,
+    "loop": true
+   },
+   {
+    "name": "owl_flap",
+    "seconds": 0.5,
+    "loop": true
+   },
+   {
+    "name": "owl_land",
+    "seconds": 0.6,
+    "loop": false
+   },
+   {
+    "name": "owl_look",
+    "seconds": 2.0,
+    "loop": false
+   },
+   {
+    "name": "owl_perch",
+    "seconds": 2.0,
+    "loop": true
+   }
   ]
  },
- "file_bytes": 1107020
+ "file_bytes": 1256064
 }

@@ -40,7 +40,342 @@
     "gatekeeper_house_ruin",
     "gatekeeper_house_repaired"
    ],
-   "tris": 7108
+   "tris": 8256
+  },
+  "gatekeeper_cellar": {
+   "room": "room_cellar",
+   "attach": "gatekeeper_house (même origine, même rotation)",
+   "footprint_world": {
+    "x": [
+     2,
+     5
+    ],
+    "y": [
+     21,
+     27
+    ]
+   },
+   "interior": {
+    "x": [
+     -5.5,
+     -2.8
+    ],
+    "z": [
+     -2.0,
+     2.0
+    ],
+    "floor_y": 0.12
+   },
+   "elements": [
+    {
+     "id_hint": "post_1",
+     "nodes": [
+      "gatekeeper_cellar_post_1"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "post_2",
+     "nodes": [
+      "gatekeeper_cellar_post_2"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "plate",
+     "nodes": [
+      "gatekeeper_cellar_plate"
+     ],
+     "planks": 3,
+     "nails": 2,
+     "needs": [
+      "post_1",
+      "post_2"
+     ]
+    },
+    {
+     "id_hint": "wall_1",
+     "nodes": [
+      "gatekeeper_cellar_wall_left"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate"
+     ]
+    },
+    {
+     "id_hint": "wall_2",
+     "nodes": [
+      "gatekeeper_cellar_wall_back",
+      "gatekeeper_cellar_wall_front"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate"
+     ]
+    },
+    {
+     "id_hint": "roof",
+     "nodes": [
+      "gatekeeper_cellar_roof_frame"
+     ],
+     "planks": 3,
+     "nails": 2,
+     "needs": [
+      "wall_1",
+      "wall_2"
+     ]
+    }
+   ],
+   "built_nodes": [
+    "gatekeeper_cellar_roof",
+    "gatekeeper_cellar_door"
+   ],
+   "site_nodes": [
+    "gatekeeper_cellar_floor"
+   ],
+   "cut_nodes": [
+    "gatekeeper_cellar_roof",
+    "gatekeeper_cellar_roof_frame"
+   ],
+   "rack_spots": [
+    {
+     "x": -5.0,
+     "z": -1.0,
+     "facing": "+x",
+     "cells": [
+      [
+       3,
+       22
+      ],
+      [
+       3,
+       23
+      ]
+     ]
+    },
+    {
+     "x": -5.0,
+     "z": 1.0,
+     "facing": "+x",
+     "cells": [
+      [
+       3,
+       24
+      ],
+      [
+       3,
+       25
+      ]
+     ]
+    }
+   ],
+   "note": "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_left_door à la place de gatekeeper_house_repaired_wall_left. rack_spots: les deux places d'étagère haute, dos au pignon ouest (cases de la carte pour la maisonnette en (8,5 ; 24), rotation 0)",
+   "tris": 1332
+  },
+  "gatekeeper_bedroom": {
+   "room": "room_bedroom",
+   "attach": "gatekeeper_house (même origine, même rotation)",
+   "footprint_world": {
+    "x": [
+     5,
+     12
+    ],
+    "y": [
+     16,
+     22
+    ]
+   },
+   "interior": {
+    "x": [
+     -2.5,
+     2.5
+    ],
+    "z": [
+     -7.0,
+     -2.3
+    ],
+    "floor_y": 0.12
+   },
+   "elements": [
+    {
+     "id_hint": "post_1",
+     "nodes": [
+      "gatekeeper_bedroom_post_1"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "post_2",
+     "nodes": [
+      "gatekeeper_bedroom_post_2"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "post_3",
+     "nodes": [
+      "gatekeeper_bedroom_post_3"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "post_4",
+     "nodes": [
+      "gatekeeper_bedroom_post_4"
+     ],
+     "planks": 2,
+     "nails": 1
+    },
+    {
+     "id_hint": "plate_1",
+     "nodes": [
+      "gatekeeper_bedroom_plate_1"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "post_1",
+      "post_2",
+      "post_3",
+      "post_4"
+     ]
+    },
+    {
+     "id_hint": "plate_2",
+     "nodes": [
+      "gatekeeper_bedroom_plate_2"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "post_1",
+      "post_2",
+      "post_3",
+      "post_4"
+     ]
+    },
+    {
+     "id_hint": "wall_1",
+     "nodes": [
+      "gatekeeper_bedroom_wall_left"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate_1",
+      "plate_2"
+     ]
+    },
+    {
+     "id_hint": "wall_2",
+     "nodes": [
+      "gatekeeper_bedroom_wall_right"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate_1",
+      "plate_2"
+     ]
+    },
+    {
+     "id_hint": "wall_3",
+     "nodes": [
+      "gatekeeper_bedroom_wall_back"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate_1",
+      "plate_2"
+     ]
+    },
+    {
+     "id_hint": "wall_4",
+     "nodes": [
+      "gatekeeper_bedroom_wall_back_gable"
+     ],
+     "planks": 3,
+     "nails": 1,
+     "needs": [
+      "plate_1",
+      "plate_2"
+     ]
+    },
+    {
+     "id_hint": "truss_ridge",
+     "nodes": [
+      "gatekeeper_bedroom_truss"
+     ],
+     "planks": 4,
+     "nails": 2,
+     "needs": [
+      "wall_1",
+      "wall_2",
+      "wall_3",
+      "wall_4"
+     ],
+     "after_carry": "ridge_purlin"
+    },
+    {
+     "id_hint": "floor",
+     "nodes": [
+      "gatekeeper_bedroom_floor"
+     ],
+     "planks": 6,
+     "nails": 2
+    }
+   ],
+   "built_nodes": [
+    "gatekeeper_bedroom_roof",
+    "gatekeeper_bedroom_door"
+   ],
+   "site_nodes": [
+    "gatekeeper_bedroom_sill"
+   ],
+   "cut_nodes": [
+    "gatekeeper_bedroom_roof",
+    "gatekeeper_bedroom_truss",
+    "gatekeeper_bedroom_wall_back_gable"
+   ],
+   "ridge_purlin": {
+    "from": [
+     0.0,
+     3.52,
+     -2.78
+    ],
+    "to": [
+     0.0,
+     3.52,
+     -7.6
+    ],
+    "length": 4.82,
+    "note": "dessus de la panne posée (repère de la maisonnette): là où le porter à deux l'amène"
+   },
+   "furniture_spots": {
+    "double_bed": [
+     -1.25,
+     -5.9
+    ],
+    "dresser": [
+     1.75,
+     -6.65
+    ],
+    "armchair": [
+     1.9,
+     -3.4
+    ]
+   },
+   "note": "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_back_door à la place de gatekeeper_house_repaired_wall_back",
+   "tris": 2264
   },
   "ferrand_shop": {
    "footprint": [
@@ -49,7 +384,129 @@
    ],
    "door_cell": 2,
    "counter_cell": 6,
-   "tris": 4664
+   "cut_walls": true,
+   "cut_nodes": [
+    "ferrand_shop_roof",
+    "ferrand_shop_upper"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "shop",
+      "x": [
+       -4.0,
+       2.0
+      ],
+      "z": [
+       -3.0,
+       3.0
+      ]
+     },
+     {
+      "id": "dining",
+      "x": [
+       2.0,
+       4.0
+      ],
+      "z": [
+       -3.0,
+       3.0
+      ],
+      "walkable": false,
+      "note": "vue par la porte entrouverte de la cloison; pas de case jouable"
+     }
+    ]
+   },
+   "note": "façade à l'est sur la carte (rotation 1); murs du rez-de-chaussée coupés selon la caméra, ferrand_shop_upper et ferrand_shop_roof retirés en entier, ferrand_shop_floor jamais coupé",
+   "tris": 11536
+  },
+  "haberdashery": {
+   "footprint": [
+    7,
+    7
+   ],
+   "door_cell": 3,
+   "cut_walls": true,
+   "cut_nodes": [
+    "haberdashery_roof",
+    "haberdashery_attic"
+   ],
+   "interior": {
+    "x": [
+     -2.5,
+     2.5
+    ],
+    "z": [
+     -2.5,
+     2.5
+    ],
+    "floor_y": 0.12
+   },
+   "note": "façade à l'est sur la carte (rotation 1): +X glTF = nord. Murs coupés selon la caméra, haberdashery_roof et haberdashery_attic retirés en entier, haberdashery_floor jamais coupé",
+   "tris": 6252
+  },
+  "bakery": {
+   "footprint": [
+    7,
+    6
+   ],
+   "door_cell": 5,
+   "window_cell": 3,
+   "spots": {
+    "bakery_window": [
+     0.0,
+     3.0
+    ],
+    "bakery_door": [
+     1.9,
+     3.0
+    ],
+    "sacks_door": [
+     -3.6,
+     0.6
+    ],
+    "spot_hourglass": [
+     0.45,
+     2.7
+    ]
+   },
+   "note": "porte en case 5, guichet en case 3 (le point bakery_window se tient dehors, devant le guichet, sous l'auvent); porte des sacs au pignon ouest; four et cheminée côté voie (nord). spots: repère glTF x, z du bâtiment; spot_hourglass: rebord du guichet, où poser le sablier offert",
+   "tris": 4348
+  },
+  "lucie_house": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 2,
+   "spots": {
+    "lucie_house_door": [
+     -0.5,
+     3.2
+    ]
+   },
+   "note": "façade à l'ouest sur la carte (rotation 3); jardinet clos à l'arrière (est), dans l'emprise",
+   "tris": 3480
+  },
+  "school": {
+   "footprint": [
+    11,
+    5
+   ],
+   "door_cell": 3,
+   "spots": {
+    "school_gate": [
+     -2.0,
+     3.0
+    ],
+    "town_hall_door": [
+     2.7,
+     2.9
+    ]
+   },
+   "note": "portail de la cour en case 3 (dans l'axe de la rue Haute), porte de la mairie en case 8; la classe s'ouvre sur la cour",
+   "tris": 5044
   },
   "firmin_house": {
    "footprint": [
@@ -91,7 +548,8 @@
     2
    ],
    "water_point": true,
-   "tris": 686
+   "note": "puits ouvert; quand le chantier well_roof est bâti: poser well_roof à la même origine et cacher l'enfant well_gallows",
+   "tris": 658
   },
   "henhouse": {
    "footprint": [
@@ -103,7 +561,7 @@
     "henhouse_ruin",
     "henhouse_repaired"
    ],
-   "tris": 2392
+   "tris": 2468
   },
   "workbench": {
    "footprint": [
@@ -256,6 +714,82 @@
     1
    ],
    "tris": 820
+  },
+  "ford_bench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "seat_height": 0.45,
+   "seat_spots": [
+    [
+     -0.45,
+     0.0
+    ],
+    [
+     0.45,
+     0.0
+    ]
+   ],
+   "improvement": "ford_bench",
+   "tris": 448
+  },
+  "house_bench": {
+   "footprint": [
+    2,
+    1
+   ],
+   "seat_height": 0.45,
+   "seat_spots": [
+    [
+     -0.45,
+     0.0
+    ],
+    [
+     0.45,
+     0.0
+    ]
+   ],
+   "improvement": "house_bench",
+   "wall_back": 0.386,
+   "note": "dos au mur: le haut du dossier touche un mur à wall_back m derrière l'origine (-Z glTF)",
+   "tris": 536
+  },
+  "quay_planter": {
+   "footprint": [
+    1,
+    1
+   ],
+   "improvement": "quay_planters",
+   "seasons": {
+    "spring": "quay_planter_summer",
+    "summer": "quay_planter_summer",
+    "autumn": "quay_planter_autumn",
+    "winter": "quay_planter_winter"
+   },
+   "note": "une jardinière par case (trois posées); n'afficher que l'enfant de la saison",
+   "tris": 1196
+  },
+  "well_roof": {
+   "footprint": [
+    2,
+    2
+   ],
+   "improvement": "well_roof",
+   "ridge_height": 2.4,
+   "note": "à la même origine que well; cacher well_gallows",
+   "tris": 1040
+  },
+  "door_canopy": {
+   "improvement": "door_canopy",
+   "attach": "gatekeeper_house_repaired: façade avant, porte (u = 0)",
+   "note": "origine au nu du mur de façade au droit de la porte, au sol: (0, 0, 2,30) dans le repère de gatekeeper_house; abri de 1,15 m devant le mur, dessous à 1,93 m au bord",
+   "tris": 232
+  },
+  "level_crossing_crank": {
+   "anchor": "level_crossing_crank_n | level_crossing_crank_s (accroches des poteaux, 1,0 m)",
+   "note": "origine au point d'accroche sur le poteau; le volant level_crossing_crank_wheel tourne autour de son axe Z local (vers la place)",
+   "tris": 296
   },
   "ground_grass": {
    "footprint": [
@@ -423,7 +957,28 @@
     1,
     1
    ],
+   "nut_spots": [
+    [
+     0.0,
+     0.0,
+     0.48
+    ]
+   ],
    "tris": 160
+  },
+  "bush_elder": {
+   "footprint": [
+    1,
+    1
+   ],
+   "berry_spots": [
+    [
+     0.02,
+     1.0,
+     0.439
+    ]
+   ],
+   "tris": 210
   },
   "bramble": {
    "footprint": [
@@ -437,19 +992,9 @@
    ],
    "berry_spots": [
     [
-     -0.2,
-     0.497,
-     0.06
-    ],
-    [
-     0.07,
-     0.532,
-     0.05
-    ],
-    [
-     -0.07,
-     0.474,
-     0.14
+     0.02,
+     0.5,
+     0.11
     ]
    ],
    "tris": 860
@@ -561,6 +1106,47 @@
    "walk_height": 0.5,
    "tris": 906
   },
+  "culvert": {
+   "footprint": [
+    4,
+    3
+   ],
+   "flow_axis": "z",
+   "note": "ponceau sous la voie: têtes de pont arasées à 4 cm, voûte de 1,5 m, lit à -0,95 m; à poser sous rail_straight, centré sur le ru",
+   "tris": 336
+  },
+  "street_bridge": {
+   "footprint": [
+    4,
+    3
+   ],
+   "flow_axis": "z",
+   "walk_height": 0.02,
+   "deck_width": 2.2,
+   "note": "pont de la rue: tablier pavé au niveau de la rue (2,2 m entre parapets), parapets de 0,35 m hors des deux rangées de pavés",
+   "tris": 804
+  },
+  "footbridge": {
+   "footprint": [
+    4,
+    2
+   ],
+   "flow_axis": "z",
+   "walk_height": 0.16,
+   "deck_width": 1.5,
+   "note": "passerelle: platelage à 0,16 m, garde-corps au sud (+Z glTF, côté aval)",
+   "tris": 484
+  },
+  "ford_stones": {
+   "footprint": [
+    2,
+    1
+   ],
+   "flow_axis": "z",
+   "walk_height": -0.12,
+   "note": "gué de pierres plates: quatre dalles, dessus à -0,12 m",
+   "tris": 96
+  },
   "tree_oak": {
    "alias_of": "tree_oak_large",
    "tris": 358
@@ -589,5 +1175,5 @@
    "tris": 216
   }
  },
- "file_bytes": 3618400
+ "file_bytes": 6217336
 }

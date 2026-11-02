@@ -549,6 +549,9 @@ describe('moments: chorégraphies et temps à l’écran (M-02)', () => {
     const sim = newSim(1);
     const b = refreshBlockers(sim);
     for (const def of sim.content.moments) {
+      // Sans acteur (tour 9: les étoiles, les lanternes), le spectacle est un effet posé à la place
+      // des joueurs (l'eau au pied du ponton, la flamme à 1 m): rien ne sort du rayon.
+      if (def.actors.length === 0) continue;
       const today = newToday(sim, def, def.mode === 'ambient' ? 'ambient' : 'quest');
       for (const w of [def.watch, def.questWatch]) {
         if (w === null) continue;

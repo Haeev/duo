@@ -2,16 +2,20 @@
  * Application des intentions des joueurs. L'hôte les valide toutes (portée,
  * fonds, état): une intention impossible est ignorée ou donne un message.
  */
-import type { Intent } from '../etat/actions';
+import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
-import { actFront, actOnClick, getUp, openMenu, resolveClick } from './agir';
+import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
-import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture } from './amenagement';
-import { durationMultiplier, eat, spend } from './besoins';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, toggleCurtains, updatePlacement } from './amenagement';
+import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
-import { answerProposal, chestMove, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
+import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
+import { depositFamily, sortStorage, storageMove } from './rangement';
+import { roomDeposit } from './pieces';
+import { bringPlanks, payImprovement } from './chantiers';
+import { unstick } from './deblocage';
 import { footprintCells, goTo, stopPath } from './deplacement';
 import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
@@ -72,11 +76,18 @@ export function heldRepeat(sim: Sim, c: Character, held: boolean): void {
   const last = r.heldRepeat[c.id];
   const aim = c.aim;
   const verb = aim?.verb ?? null;
-  if (last === null || aim === null || verb === null || !REPEATED.has(verb) || !canAct(c, sim)) return;
+  // La visée de la souris n'enchaîne pas la rangée: ce n'est pas la case devant soi (R11).
+  if (last === null || aim === null || aim.source === 'pointer' || verb === null || !REPEATED.has(verb) || !canAct(c, sim)) return;
   if (aim.cell.cx === last.cx && aim.cell.cy === last.cy) return;
   if (sim.world.garden.every((g) => g.cell.cx !== aim.cell.cx || g.cell.cy !== aim.cell.cy)) return;
   if (sim.world.tick < last.endsAt + secondsToTicks(sim.content.settings.feel.heldRepeatSeconds)) return;
   actFront(sim, c);
+}
+
+/** Cible survolée reçue du réseau: un point du sol hors des nombres finis ne vise rien. */
+function validPointer(target: ClickTarget | null): ClickTarget | null {
+  if (target?.kind !== 'ground') return target;
+  return Number.isFinite(target.x) && Number.isFinite(target.y) ? target : null;
 }
 
 function createCharacter(sim: Sim, c: Character, name: string, hair: number, outfit: number): void {
@@ -141,15 +152,6 @@ export function updateCrafting(sim: Sim, c: Character): void {
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   emit(sim, { type: 'crafted', by: c.id, recipe: recipe.id, item: recipe.output.item, count: recipe.output.count });
   if (recipe.station === 'stove') emit(sim, { type: 'cooked', by: c.id, recipe: recipe.id });
-}
-
-function eatItem(sim: Sim, c: Character, item: string): void {
-  const def = sim.content.items[item];
-  if (def?.dish === null || def === undefined) return;
-  if (c.status !== 'active' && c.status !== 'menu') return;
-  if (takeFromBag(c, item, 1).length === 0) return;
-  eat(sim, c, item);
-  c.action = { kind: 'eat', since: sim.world.tick, duration: secondsToTicks(sim.content.settings.feel.actionSeconds.eat ?? 0), target: null };
 }
 
 function give(sim: Sim, c: Character, to: string, item: string, quality: Quality, count: number): void {
@@ -219,12 +221,27 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (goTo(sim, c, goal)) sim.runtime.pendingAct[c.id] = intent.act ? { target: intent.target, since: sim.world.tick } : null;
       return;
     }
-    case 'act':
-      if (c.status === 'dialogue' || c.status === 'scene') dialogueNext(sim, c);
-      else if (c.status === 'sleeping') getUp(sim, c);
+    case 'point_at':
+      sim.runtime.pointer[c.id] = validPointer(intent.target);
+      // L'aperçu du meuble suit la souris dès ce pas: un clic qui suit pose là où on le voit.
+      if (c.placement !== null) updatePlacement(sim, c);
+      return;
+    case 'act': {
+      if (c.status === 'dialogue' || c.status === 'scene') {
+        dialogueNext(sim, c);
+        return;
+      }
+      if (c.status === 'sleeping') {
+        getUp(sim, c);
+        return;
+      }
+      // Espace prend la cible survolée et mise en évidence, comme le clic: les deux ne se contredisent pas.
+      const pointed = c.status === 'active' ? pointerTarget(sim, c) : null;
+      if (pointed !== null) applyIntent(sim, by, { type: 'move_to', target: pointed.click, act: true });
       else if (canAct(c, sim)) actFront(sim, c);
       else bufferAct(sim, c, intent);
       return;
+    }
     case 'examine':
       examine(sim, c);
       return;
@@ -296,6 +313,12 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
     case 'catalogue_order':
       purchase(sim, c, { source: 'catalogue', item: intent.item, count: 1 });
       return;
+    case 'improvement_pay':
+      payImprovement(sim, c, intent.improvement, intent.amount === null ? null : Math.floor(intent.amount));
+      return;
+    case 'improvement_planks':
+      bringPlanks(sim, c, intent.improvement, Math.floor(intent.count));
+      return;
     case 'proposal_answer':
       answerProposal(sim, c, intent.proposal, intent.accept);
       return;
@@ -308,13 +331,26 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'chest_deposit':
     case 'chest_take':
-      if (nearChest(sim, c)) chestMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'chest_deposit');
+      // Tour 10: rangement à cases et râtelier (`rangement.ts`).
+      if (nearChest(sim, c)) storageMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'chest_deposit');
+      return;
+    case 'storage_deposit_family':
+      if (nearChest(sim, c)) depositFamily(sim, c, intent.family);
+      return;
+    case 'storage_sort':
+      if (nearChest(sim, c)) sortStorage(sim);
+      return;
+    case 'room_deposit':
+      roomDeposit(sim, c, intent.room, intent.item, Math.floor(intent.count));
+      return;
+    case 'curtains':
+      if (canAct(c, sim)) toggleCurtains(sim, c, intent.furniture);
       return;
     case 'craft':
       craft(sim, c, intent.recipe);
       return;
     case 'eat':
-      eatItem(sim, c, intent.item);
+      eatFromBag(sim, c, intent.item);
       return;
     case 'give':
       give(sim, c, intent.to, intent.item, intent.quality, Math.floor(intent.count));
@@ -337,6 +373,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       nightChoice(sim, c.id, intent.choice);
       return;
     case 'hint_seen':
+      return;
+    case 'unstick':
+      unstick(sim, c);
       return;
     case 'pin': {
       if (!c.created || !Number.isFinite(intent.x) || !Number.isFinite(intent.y)) return;

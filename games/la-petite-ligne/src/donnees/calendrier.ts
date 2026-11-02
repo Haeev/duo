@@ -3,7 +3,7 @@
  * rythme de l'horloge et étapes. Pur (ni DOM ni Three.js): la simulation, l'interface, le rendu
  * et le son lisent les mêmes règles.
  */
-import type { Season, Settings, StageDef, StageId } from './types';
+import type { ClockPace, Content, Season, Settings, StageDef, StageId } from './types';
 
 /** Saisons dans l'ordre du calendrier (le jour 1 ouvre le printemps de l'année 1). */
 export const SEASONS: readonly Season[] = ['spring', 'summer', 'autumn', 'winter'];
@@ -53,12 +53,17 @@ export function nextTrainDay(settings: Pick<Settings, 'train'>, from: number): n
   return last + k * t.repeatEveryDays;
 }
 
-/** Secondes réelles par minute de jeu ce jour-là (D1, `clock.schedule`). */
+/** Le même contenu à un autre rythme de journée (R14): robots des tests, page de démonstration. */
+export function withClockPace(content: Content, pace: ClockPace): Content {
+  return { ...content, settings: { ...content.settings, clock: { ...content.settings.clock, pace } } };
+}
+
+/** Secondes réelles par minute de jeu ce jour-là (D1, `clock.schedule`), au rythme choisi (R14). */
 export function secondsPerGameMinuteOn(settings: Pick<Settings, 'clock'>, day: number): number {
   let value = settings.clock.secondsPerGameMinute;
   for (const step of settings.clock.schedule)
     if (day >= step.fromDay) value = step.secondsPerGameMinute;
-  return value;
+  return value * settings.clock.paces[settings.clock.pace];
 }
 
 export function stageDef(settings: Pick<Settings, 'stages'>, id: StageId): StageDef | null {

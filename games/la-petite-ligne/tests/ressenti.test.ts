@@ -173,7 +173,11 @@ describe('tape de pavé tactile', () => {
     // La vue n'est lue que par `world`, `localCharacter` et `send`.
     controls.step(view as unknown as GameView);
     keys.endStep();
-    expect(sent).toEqual([{ type: 'move_to', target: { kind: 'ground', x: 8.5, y: 30.5 }, act: true }]);
+    // La case survolée part d'abord vers l'hôte (R11), puis le clic sur elle.
+    expect(sent).toEqual([
+      { type: 'point_at', target: { kind: 'ground', x: 8.5, y: 30.5 } },
+      { type: 'move_to', target: { kind: 'ground', x: 8.5, y: 30.5 }, act: true },
+    ]);
   });
 });
 

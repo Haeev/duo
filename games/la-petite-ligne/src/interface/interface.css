@@ -272,7 +272,13 @@
   --lpl-panel-top-band: 7.5rem;
 }
 
-.lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])[data-train='soon']) {
+.lpl-ui:has(
+  .lpl-clock:is(
+      [data-state='stopped'],
+      [data-state='evening'],
+      [data-state='waiting']
+    )[data-train='soon']
+) {
   --lpl-panel-top-band: 9.25rem;
 }
 
@@ -308,12 +314,20 @@
     --lpl-panel-top-band: 4.75rem;
   }
 
-  .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])) .lpl-panel,
+  .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting']))
+    .lpl-panel,
   .lpl-ui:has(.lpl-clock[data-train='soon']) .lpl-panel {
     --lpl-panel-top-band: 6.5rem;
   }
 
-  .lpl-ui:has(.lpl-clock:is([data-state='stopped'], [data-state='evening'], [data-state='waiting'])[data-train='soon']) .lpl-panel {
+  .lpl-ui:has(
+      .lpl-clock:is(
+          [data-state='stopped'],
+          [data-state='evening'],
+          [data-state='waiting']
+        )[data-train='soon']
+    )
+    .lpl-panel {
     --lpl-panel-top-band: 8.25rem;
   }
 
@@ -479,7 +493,9 @@
 /* La bête regarde: on se fige. Le trait d'encre dit l'urgence sans couleur d'alarme. */
 .lpl-watch__pill[data-tone='alert'] {
   border-color: var(--lpl-color-ink);
-  box-shadow: 0 0 0 var(--lpl-border) var(--lpl-color-ink), var(--lpl-shadow-1);
+  box-shadow:
+    0 0 0 var(--lpl-border) var(--lpl-color-ink),
+    var(--lpl-shadow-1);
 }
 
 .lpl-watch__pill[data-tone='early'] {
@@ -495,7 +511,9 @@
   border-color: var(--lpl-color-brass);
   background: var(--lpl-color-night);
   color: var(--lpl-color-on-night);
-  box-shadow: 0 0 0 0.125rem var(--lpl-color-ink), var(--lpl-shadow-1);
+  box-shadow:
+    0 0 0 0.125rem var(--lpl-color-ink),
+    var(--lpl-shadow-1);
 }
 
 /* Ce qui n'est dit qu'à toi: un billet au trait pointillé. */
@@ -1179,4 +1197,794 @@
   .lpl-sheet:has(> .lpl-season-card:not([hidden])) .lpl-quest {
     padding-block: var(--lpl-space-1);
   }
+}
+
+/* ------------------------------------------------------------------ */
+/* Tour 9: tableau du quai, établi de Basile, courrier à titres        */
+/* ------------------------------------------------------------------ */
+
+/* Courrier (section 5.2): le titre d'abord, sur une ligne, coupé par des points de suspension; l'expéditeur et le jour en petit. */
+.lpl-mail {
+  grid-template-columns: minmax(15rem, 19rem) minmax(0, 1fr);
+}
+
+.lpl-letter-item {
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.lpl-letter-item__title,
+.lpl-letter-item__meta {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-letter-item__title {
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Non lue: titre plus gras et pastille, sans texte ajouté qui serait coupé avec le titre. */
+.lpl-letter-item[data-state='unread'] strong::after {
+  content: none;
+}
+
+.lpl-letter-item[data-state='unread'] .lpl-letter-item__title {
+  padding-right: 0.875rem;
+  font-weight: 850;
+}
+
+.lpl-letter-item[data-state='unread']::after {
+  position: absolute;
+  top: 50%;
+  right: var(--lpl-space-2);
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--lpl-color-stamp);
+  content: '';
+  transform: translateY(-50%);
+}
+
+/* Tableau du quai: trois onglets, la bourse et le bouton de fermeture tiennent dans l'en-tête à 150 %. */
+.lpl-board .lpl-panel__header {
+  flex-wrap: wrap;
+  row-gap: var(--lpl-space-1);
+}
+
+.lpl-board .lpl-panel__header > div:first-of-type {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.lpl-board__tabs {
+  order: 5;
+  flex: 1 0 100%;
+  margin-left: 0;
+}
+
+/* Fenêtre basse (150 %): l'en-tête du tableau a deux rangées, le sous-titre laisse la place au contenu. */
+@container lpl-ui (max-height: 36rem) {
+  .lpl-board .lpl-panel__subtitle {
+    display: none;
+  }
+}
+
+.lpl-product__copies {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* Annonce: une feuille épinglée, le mot de l'habitant écrit à la main. */
+.lpl-annonce {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-annonce--previous {
+  padding-block: var(--lpl-space-2);
+  box-shadow: none;
+}
+
+.lpl-annonce[data-state='expired'] {
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-annonce__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-3);
+}
+
+.lpl-annonce__title {
+  flex: 1 1 12rem;
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-annonce__text {
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.lpl-annonce__lines .lpl-order__line {
+  min-height: 2.75rem;
+  padding-block: var(--lpl-space-1);
+}
+
+.lpl-annonce__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-1) var(--lpl-space-4);
+  margin: 0;
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-annonce__meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.lpl-annonce__help {
+  margin: 0;
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Tampon « Fait » à la couleur de qui a remis l'annonce; « Retirée » en gris. */
+.lpl-annonce__stamp[data-player='self'] {
+  border-color: var(--lpl-player-self);
+}
+
+.lpl-annonce__stamp[data-player='other'] {
+  border-color: var(--lpl-player-other);
+}
+
+.lpl-annonce__stamp[data-state='expired'] {
+  border-color: var(--lpl-color-line);
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Chantier: progression, puis les versements. */
+.lpl-chantier {
+  display: grid;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-chantier__head {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-chantier__title {
+  margin: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-chantier__progress {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.lpl-chantier__progress .lpl-order__bar {
+  width: 100%;
+}
+
+.lpl-chantier__note,
+.lpl-chantier__missing {
+  margin: 0;
+}
+
+.lpl-chantier__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-chantier__home {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: var(--lpl-space-3);
+}
+
+.lpl-chantier__planks {
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-built {
+  display: grid;
+  gap: var(--lpl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-built__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 var(--lpl-space-2);
+}
+
+.lpl-built__name {
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-built__when {
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-built__text {
+  grid-column: 2 / -1;
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Carnet: annonce retirée en gris (sans la rature d'une quête faite: elle n'a pas été faite). */
+.lpl-quest[data-state='withdrawn'] {
+  background: transparent;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-quest[data-state='withdrawn'] .lpl-quest__title {
+  color: var(--lpl-color-ink-muted);
+}
+
+/* Écran d'étape: quatre compteurs (chantiers bâtis, tour 9); celui des commandes, qui a un détail, prend plus de place. */
+.lpl-screen--stage .lpl-counters {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr) minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/*
+ * Avancée de l'action en cours (R10): pastille au-dessus de la barre d'outils, chez les deux pour un
+ * chantier. La jauge suit le pas de la simulation; la transition lisse les pas reçus par l'invité.
+ */
+.lpl-progress {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  justify-content: start;
+  gap: 0.125rem var(--lpl-space-2);
+  min-width: 14rem;
+  max-width: min(28rem, 100%);
+  padding: 0.25rem var(--lpl-space-3) 0.375rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-2);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.25;
+}
+
+.lpl-progress[hidden] {
+  display: none;
+}
+
+.lpl-progress > .lpl-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-progress__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-progress__bar {
+  grid-column: 1 / -1;
+  height: 0.625rem;
+  overflow: hidden;
+  border: 0.125rem solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-shade);
+}
+
+.lpl-progress__fill {
+  display: block;
+  width: var(--lpl-value, 0%);
+  height: 100%;
+  background: var(--lpl-color-primary);
+  transition: width 120ms linear;
+}
+
+/* À deux: le bois neuf du chantier (le libellé le dit aussi, « à deux »). */
+.lpl-progress[data-state='together'] .lpl-progress__fill {
+  background: var(--lpl-color-wood-light);
+}
+
+/* Invite du survol à la souris (R11): ce que fera le clic sur la cible mise en évidence. */
+.lpl-aim {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  padding: 0.25rem var(--lpl-space-3);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  font-weight: var(--lpl-weight-bold);
+  white-space: nowrap;
+}
+
+.lpl-aim[hidden],
+.lpl-hud[data-state='build'] .lpl-aim {
+  display: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Tour 10: besoins doux, rangement à cases, chantier d'une pièce,     */
+/* rideaux, sieste, coiffures                                          */
+/* ------------------------------------------------------------------ */
+
+/* Besoins: trois icônes à trois états (la forme dit l'état, la couleur l'appuie). */
+.lpl-needs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.lpl-need {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0.125rem solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-need > .lpl-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-need[data-tone='good'] {
+  border-color: var(--lpl-color-primary);
+  color: var(--lpl-color-primary);
+}
+
+.lpl-need[data-tone='low'],
+.lpl-need[data-tone='empty'] {
+  border-color: var(--lpl-color-stamp);
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+  color: var(--lpl-color-stamp);
+}
+
+.lpl-needs__note {
+  flex-basis: 100%;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.2;
+}
+
+.lpl-needs__note[data-tone='empty'] {
+  color: var(--lpl-color-stamp);
+}
+
+.lpl-needs__note[hidden] {
+  display: none;
+}
+
+/* En petit, sur la carte de l'autre: on voit quand l'autre a faim. */
+.lpl-needs--small {
+  flex-wrap: nowrap;
+  gap: 0.125rem;
+}
+
+.lpl-needs--small .lpl-need {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-width: 0.0625rem;
+}
+
+.lpl-needs--small .lpl-need > .lpl-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-partner__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lpl-space-2);
+  min-width: 0;
+}
+
+/* Invite de la maison (rideaux, chantier): même pastille que l'invite du survol, mais cliquable. */
+.lpl-invite {
+  cursor: pointer;
+  color: var(--lpl-color-ink);
+  font: inherit;
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-invite:hover {
+  background: var(--lpl-color-paper);
+}
+
+.lpl-invite:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: var(--lpl-focus-width);
+}
+
+.lpl-hud[data-state='build'] .lpl-invite,
+.lpl-hud[data-state='dialogue'] .lpl-invite {
+  display: none;
+}
+
+/* Rêverie de la sieste: le portrait dort, le carnet reste à portée. */
+.lpl-nap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-3);
+  max-width: min(40rem, 100%);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-night);
+  box-shadow: var(--lpl-shadow-2);
+  color: var(--lpl-color-on-night);
+}
+
+.lpl-nap[hidden] {
+  display: none;
+}
+
+.lpl-nap__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--lpl-color-brass);
+}
+
+.lpl-nap__body {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.lpl-nap__title {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+}
+
+.lpl-nap__text {
+  font-size: var(--lpl-text-sm);
+}
+
+.lpl-nap__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--lpl-space-2);
+}
+
+/* Écran de nuit: « Vous avez éteint la lampe en même temps. » */
+.lpl-night__together {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  margin: 0;
+  color: var(--lpl-color-night);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+}
+
+.lpl-night__together > .lpl-icon {
+  color: var(--lpl-color-stamp);
+}
+
+.lpl-night__together[hidden] {
+  display: none;
+}
+
+/* Carnet, page des besoins: les chiffres, et l'aide « Besoins en sourdine ». */
+.lpl-needs-page {
+  display: grid;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-needs-page__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--lpl-space-1) var(--lpl-space-3);
+  margin: 0;
+}
+
+.lpl-needs-page__list {
+  display: grid;
+  gap: var(--lpl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-needs-page__row {
+  display: grid;
+  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  align-items: center;
+  gap: 0.25rem var(--lpl-space-3);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-needs-page__row:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: var(--lpl-focus-width);
+}
+
+.lpl-need--large {
+  width: 2.5rem;
+  height: 2.5rem;
+  grid-row: span 2;
+}
+
+.lpl-need--large > .lpl-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.lpl-needs-page__name {
+  display: grid;
+}
+
+.lpl-needs-page__name > span {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-needs-page__value {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  white-space: nowrap;
+}
+
+.lpl-needs-page__help {
+  grid-column: 2 / -1;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lpl-space-2);
+  cursor: pointer;
+}
+
+.lpl-check > span {
+  display: grid;
+}
+
+.lpl-check__input {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--lpl-color-primary);
+}
+
+.lpl-check__input:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: var(--lpl-focus-width);
+}
+
+/* Rangement à cases: la grille des cases et le râtelier à gauche, la case choisie et le sac à droite. */
+.lpl-storage {
+  display: grid;
+  grid-template-columns: auto minmax(16rem, 1fr);
+  gap: var(--lpl-space-4);
+  align-items: start;
+}
+
+.lpl-storage__summary .lpl-button {
+  margin-left: auto;
+}
+
+.lpl-storage__cells,
+.lpl-storage__rack {
+  --lpl-slot-size: 2.75rem;
+}
+
+.lpl-storage__rack {
+  background: var(--lpl-color-wood-light);
+}
+
+.lpl-storage__rack .lpl-slot--empty {
+  background: transparent;
+}
+
+.lpl-storage__rack-count {
+  color: var(--lpl-color-ink-muted);
+  font-weight: var(--lpl-weight-bold);
+}
+
+/* En trop (sauvegarde qui déborde): hachures et bord rouge, on reprend seulement. */
+.lpl-slot[data-state='over'] {
+  border-color: var(--lpl-color-stamp);
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--lpl-color-paper) 0 0.25rem,
+    var(--lpl-color-paper-sunken) 0.25rem 0.5rem
+  );
+}
+
+.lpl-slot[aria-pressed='true'] {
+  border-color: var(--lpl-color-ink);
+  border-width: var(--lpl-border-thick);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-storage__side {
+  display: grid;
+  gap: var(--lpl-space-3);
+  min-width: 0;
+}
+
+.lpl-storage__families {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-storage__bag .lpl-order__action {
+  min-width: 0;
+}
+
+/* Chantier d'une pièce: la caisse, les deux dépôts, les éléments et leurs supports. */
+.lpl-room__summary {
+  flex-wrap: wrap;
+}
+
+.lpl-room__bar {
+  flex: 1 0 100%;
+  width: 100%;
+}
+
+.lpl-room__deposits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+  margin-top: var(--lpl-space-3);
+}
+
+.lpl-room__beam {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  margin: var(--lpl-space-3) 0 0;
+}
+
+.lpl-room__beam > span {
+  display: grid;
+}
+
+.lpl-order__line.lpl-room__element {
+  grid-template-columns: 2.5rem minmax(0, 1fr) auto;
+}
+
+.lpl-room__element[data-state='built'] {
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-room__element[data-state='blocked'] .lpl-order__icon {
+  color: var(--lpl-color-ink-disabled);
+}
+
+.lpl-room__element:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: calc(var(--lpl-focus-width) * -1);
+}
+
+/* Création: les choix nombreux du tour 10 (12 coupes, 8 couleurs, 4 barbes) tiennent en peu de place. */
+.lpl-choice-group__options--compact {
+  gap: var(--lpl-space-1);
+}
+
+.lpl-choice-group__options--compact .lpl-option {
+  width: 4.75rem;
+  min-width: 0;
+  padding: 0.25rem;
+  font-size: 0.8125rem;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.lpl-choice-group__options--compact .lpl-option:has(input:checked) {
+  padding: calc(0.25rem - 0.0625rem);
+}
+
+.lpl-choice-group__options--compact .lpl-option svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.lpl-choice-group__options--compact .lpl-option__swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+@media (max-width: 70rem) {
+  .lpl-storage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Bouton de fermeture des panneaux: le mot, et la croix seulement dans le carnet à cinq onglets. */
+.lpl-panel__close-icon {
+  display: none;
+}
+
+.lpl-notebook .lpl-panel__close-icon {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Le nom accessible du bouton reste son `aria-label` (« Fermer le carnet »). */
+.lpl-notebook .lpl-panel__close-label {
+  display: none;
+}
+
+.lpl-notebook .lpl-panel__header > .lpl-tabs .lpl-tab {
+  padding-inline: var(--lpl-space-3);
+}
+
+/* Création: la couleur et la barbe sous l'aperçu, alignées à gauche dans la colonne. */
+.lpl-creation__preview > .lpl-choice-group {
+  justify-self: stretch;
+}
+
+/* L'aperçu se resserre un peu: la couleur et la barbe tiennent dessous sans faire défiler l'écran. */
+.lpl-creation__preview > .lpl-portrait {
+  --lpl-portrait-size: clamp(5rem, 17vh, 8rem);
+}
+
+.lpl-storage__summary[data-state='overflow'] > strong {
+  color: var(--lpl-color-stamp);
+}
+
+/* Sieste: la rêverie seule en bas, l'objectif et la barre d'outils attendent le réveil. */
+.lpl-hud[data-nap] .lpl-objective,
+.lpl-hud[data-nap] .lpl-tip {
+  display: none;
+}
+
+/* La barre d'outils garde sa place: la rêverie reste au-dessus, entre le portrait et les commandes. */
+.lpl-hud[data-nap] .lpl-toolbar {
+  visibility: hidden;
 }

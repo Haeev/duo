@@ -38,6 +38,11 @@ export const UI_SETTINGS = {
   partnerPlaceRadius: 4,
   /** Achat groupé au comptoir (graines, clous). */
   shopBulk: 4,
+  /** Barre de progression (R10): un geste plus court que cette durée n'en a pas (s). */
+  progressMinSeconds: 1,
+  /** Un arbre entamé montre ses coups ce temps après le dernier (s), à cette distance au plus (m). */
+  chopProgressSeconds: 2.5,
+  chopProgressRadius: 3,
   /** Pas de l'horloge affichée (minutes de jeu). */
   clockStepMinutes: 10,
   /**
@@ -173,6 +178,15 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   crystal_radio: 'crystal-radio',
   wood_stove: 'wood-stove',
   picture_frame: 'picture-frame',
+  // Tour 9: les outils améliorés gardent le dessin de leur verbe, les poules commandées celui de la poule.
+  watering_can_copper: 'watering-can',
+  axe_forged: 'axe',
+  fishing_rod_bamboo: 'fishing-rod',
+  hen_extra: 'hen',
+  hen_extra_2: 'hen',
+  wicker_armchair: 'chair',
+  pressed_flowers: 'picture-frame',
+  jeanne_drawing: 'picture-frame',
 };
 
 /** Icône de secours par catégorie (objet sans dessin propre). */
@@ -189,6 +203,8 @@ export const CATEGORY_ICONS: Readonly<Record<string, string>> = {
   fish: 'fish',
   decoration: 'flower-pot',
   furniture: 'parcel',
+  gift: 'gift',
+  animal_order: 'hen',
 };
 
 /** Expression du portrait pour chaque niveau de forme (`ui-maquettes`: low, ok, good, great, radiant). */
@@ -201,7 +217,29 @@ export const FORM_EXPRESSIONS: Readonly<Record<FormLevel, Expression>> = {
 };
 
 export type Expression = 'low' | 'ok' | 'good' | 'great' | 'radiant';
-export type HairStyle = 'short' | 'bob' | 'bun' | 'cap' | 'villager_bun' | 'beard' | 'braids';
+export type HairStyle =
+  | 'short'
+  | 'bob'
+  | 'bun'
+  | 'crop'
+  | 'curls'
+  | 'ponytail'
+  | 'braid'
+  | 'pigtails'
+  | 'wavy'
+  | 'long'
+  | 'fringe'
+  | 'quiff'
+  | 'cloud'
+  | 'crown'
+  | 'bob_long'
+  | 'cap'
+  | 'villager_bun'
+  | 'beard'
+  | 'braids';
+
+/** Barbe ou moustache des portraits (index `appearance.beard`). */
+export type BeardStyle = 'none' | 'short' | 'full' | 'moustache';
 
 export interface PortraitColors {
   skin: string;
@@ -212,6 +250,8 @@ export interface PortraitColors {
   scarf: string;
   style: HairStyle;
   bg: string;
+  /** Barbe ou moustache d'un joueur (tour 10); absent: aucune. */
+  beard?: BeardStyle;
 }
 
 /**
@@ -225,8 +265,37 @@ export const VILLAGER_PORTRAITS: Readonly<Record<string, PortraitColors>> = {
   jeanne: { skin: '#F1C8A3', shade: '#DBA684', hair: '#B5652F', top: '#F2D46B', trim: '#557FB0', scarf: '#D9584F', style: 'braids', bg: '#F3EAC8' },
 };
 
-/** Coiffures des joueurs (index `appearance.hair`), comme les modèles du rendu (court, carré, chignon). */
-export const PLAYER_HAIRS: readonly HairStyle[] = ['short', 'bob', 'bun'];
+/**
+ * Coiffures des joueurs (index `appearance.hair`), dans l'ordre de la table 2.1 du tour 10 et des
+ * maillages `player_hair_<id>`: les 12 de la création, puis les 3 du salon seulement.
+ */
+export const PLAYER_HAIRS: readonly HairStyle[] = [
+  'short',
+  'bob',
+  'bun',
+  'crop',
+  'curls',
+  'ponytail',
+  'braid',
+  'pigtails',
+  'wavy',
+  'long',
+  'fringe',
+  'quiff',
+  'cloud',
+  'crown',
+  'bob_long',
+];
+
+/**
+ * Couleurs des cheveux (index `appearance.hairColor`, section 2.2): noir, brun, châtain, auburn,
+ * roux, blond paille, gris, blanc. Provisoires, d'après la palette de la bible (cheveux), en
+ * attendant les valeurs du directeur artistique; le brun et le noir sont ceux des portraits d'avant.
+ */
+export const PLAYER_HAIR_COLORS: readonly string[] = ['#2E2622', '#6B4A33', '#8A5F3C', '#7E3B2A', '#B5652F', '#C9A267', '#9A948C', '#E2DCD0'];
+
+/** Barbes des joueurs (index `appearance.beard`): aucune, courte, fournie, moustache. */
+export const PLAYER_BEARDS: readonly BeardStyle[] = ['none', 'short', 'full', 'moustache'];
 
 /** Tenues des joueurs (index `appearance.outfit`): couleurs de `src/rendu/apparence.ts` (`OUTFITS`). */
 export const PLAYER_OUTFITS: readonly { top: string; trim: string; bg: string }[] = [

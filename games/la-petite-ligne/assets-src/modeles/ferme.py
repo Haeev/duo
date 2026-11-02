@@ -16,7 +16,7 @@ import os
 import sys
 
 import bpy  # noqa: I001
-from mathutils import Vector
+from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cueillette  # noqa: E402
@@ -196,8 +196,9 @@ def tool_watering_can(A):
     g.box((0.025, 0.16, 0.022), loc=(0, 0.02, 0.0), color="tin_paint")
     for y in (-0.06, 0.1):
         g.box((0.022, 0.022, 0.14), loc=(0, y, -0.07), color="tin_paint")
-    g.cyl(0.016, 0.3, loc=(0, -0.17, -0.22), color="tin_paint", segs=6, r2=0.012, rot=(-50, 0, 0))
-    g.cyl(0.018, 0.04, loc=(0, -0.29, -0.12), color="tin", segs=7, r2=0.04, rot=(-50, 0, 0))
+    # bec qui monte du bas du corps vers l'avant, pomme au bout (tour 9: il pendait vers le bas, pomme en l'air)
+    g.cyl(0.016, 0.3, loc=(0, -0.17, -0.22), color="tin_paint", segs=6, r2=0.012, rot=(50, 0, 0))
+    g.cyl(0.018, 0.04, loc=(0, -0.29, -0.12), color="tin", segs=7, r2=0.04, rot=(50, 0, 0))
     return g
 
 
@@ -245,6 +246,136 @@ def tool_fishing_rod(A):
     return g
 
 
+# Outils de la Halte (tour 9, catalogue, rayon Outillage): même prise, même pente et même bout que l'outil de
+# départ (les clips et ROD_TIP du rendu restent justes), une autre matière et un geste qui se devine.
+
+def tool_watering_can_copper(A):
+    """Arrosoir de cuivre de 20 litres (deux fois l'arrosoir peint): plus haut et plus large, cerclé de laiton,
+    pomme d'arrosage en cuivre clair. L'anse reste à l'origine (point de prise), le bec part devant (-Y)."""
+    g = A.geo()
+    # corps en tonneau à 10 pans: 0,26 m de haut, 0,125 m de rayon au ventre (0,11 et 0,20 pour l'ancien)
+    g.lathe([(0.112, -0.42), (0.126, -0.33), (0.12, -0.2), (0.1, -0.165)], colors="copper", segs=10, phase=18)
+    for z in (-0.405, -0.19):
+        g.cyl(0.124 if z < -0.3 else 0.116, 0.018, loc=(0, 0, z), color="brass", segs=10)
+    g.cyl(0.05, 0.03, loc=(0, 0.05, -0.15), color="copper_light", segs=8, base=True)
+    # anse en arceau du goulot à l'arrière: tenue à l'origine, deux montants posés sur le dessus
+    g.box((0.026, 0.19, 0.024), loc=(0, 0.02, 0.0), color="copper", bevel=0.006)
+    for y in (-0.065, 0.105):
+        g.box((0.024, 0.024, 0.165), loc=(0, y, -0.085), color="copper")
+    # bec long (le cuivre se martèle) et pomme large: on arrose plus loin
+    g.cyl(0.018, 0.36, loc=(0, -0.215, -0.265), color="copper", segs=6, r2=0.012, rot=(45, 0, 0))
+    g.cyl(0.02, 0.05, loc=(0, -0.352, -0.128), color="copper_light", segs=8, r2=0.05, rot=(45, 0, 0))
+    return g
+
+
+def tool_axe_forged(A):
+    """Hache de la forge: manche de frêne foncé en légère courbe, garde de cuir sous la tête, tête d'acier bleui
+    plus longue que la hache de départ, tranchant affûté clair (on voit qu'il coupe). Même prise et même tête."""
+    g = A.geo()
+    g.cyl(0.021, 0.74, loc=(0, 0.004, 0.08 - 0.37), color="wood_dark", segs=6, r2=0.017, rot=(1.5, 0, 0))
+    g.cyl(0.024, 0.09, loc=(0, 0.002, 0.03), color="leather", segs=6)
+    g.cyl(0.023, 0.05, loc=(0, 0.006, -0.52), color="leather", segs=6)
+    # douille et joue de la tête, biseau en éventail vers le tranchant
+    g.box((0.044, 0.1, 0.09), loc=(0, -0.01, -0.6), color="steel_forged", bevel=0.008)
+    # lame qui s'évase de l'oeil (9 cm) au tranchant (17 cm), en arc
+    blade = [(0.0, -0.04), (-0.07, -0.06), (-0.115, -0.085), (-0.13, -0.05), (-0.135, 0.0), (-0.13, 0.05),
+             (-0.115, 0.085), (-0.07, 0.06), (0.0, 0.04)]
+    g.prism(blade, 0.024, loc=(0, -0.05, -0.6), color="steel_forged", rot=(0, 0, 90))
+    g.prism([(-0.128, -0.082), (-0.142, -0.05), (-0.147, 0.0), (-0.142, 0.05), (-0.128, 0.082), (-0.122, 0.0)],
+            0.012, loc=(0, -0.05, -0.6), color="iron_light", rot=(0, 0, 90))
+    g.box((0.034, 0.05, 0.06), loc=(0, 0.06, -0.6), color="steel_forged", bevel=0.006)
+    return g
+
+
+def tool_fishing_rod_bamboo(A):
+    """Canne en bambou refendu: même pente (42 degrés) et même longueur (2 m) que la canne de départ, donc le
+    même bout de ligne (fishing_rod_bamboo_tip = fishing_rod_tip). Bambou clair à nœuds sombres, poignée de
+    liège, quatre ligatures rouges (les fils qui tiennent les brins collés), moulinet de laiton."""
+    g = A.geo()
+    a = math.radians(42)
+    L = 2.0
+    d = Vector((0, -math.cos(a), math.sin(a)))
+    rot = (90 - 42, 0, 0)
+    g.cyl(0.021, 0.3, loc=tuple(d * 0.04), color="straw_dark", segs=6, rot=rot)
+    g.cyl(0.024, 0.03, loc=tuple(d * 0.2), color="brass", segs=6, rot=rot)
+    g.cyl(0.013, L - 0.2, loc=tuple(d * (0.2 + (L - 0.2) / 2)), color="bamboo", segs=6, r2=0.005, rot=rot)
+    for k, t in enumerate((0.42, 0.72, 1.02, 1.32, 1.6, 1.84)):
+        r = 0.013 - (0.008 * (t - 0.2) / (L - 0.2))
+        g.cyl(r + 0.0035, 0.018, loc=tuple(d * t), color="bamboo_node", segs=6, rot=rot)
+    for t in (0.58, 0.88, 1.18, 1.48):
+        r = 0.013 - (0.008 * (t - 0.2) / (L - 0.2))
+        g.cyl(r + 0.003, 0.03, loc=tuple(d * t), color="paint_red", segs=6, rot=rot)
+    g.cyl(0.034, 0.024, loc=(0.03, -0.06, -0.02), color="brass", segs=8, rot=(0, 90, 0))
+    g.box((0.03, 0.012, 0.012), loc=(0.055, -0.06, -0.02), color="wood_dark")
+    tip = d * L
+    g.cyl(0.008, 0.03, loc=tuple(tip), color="brass", segs=5)
+    return g
+
+
+def lamp_pole(A):
+    """Perche d'allumeur de réverbères (moment des lanternes du quai): 2,2 m de frêne, crochet de laiton pour
+    ouvrir la porte de la lanterne et porte-mèche au bout. Portée en main (socket_hand_r): prise à l'origine,
+    perche à l'horizontale vers l'avant au repos du bras (bout à 1,2 m devant la main, talon à 1,0 m derrière),
+    comme on porte une perche le long du corps. pole_raise la dresse devant la poitrine puis l'incline de 20
+    degrés vers l'avant jusqu'à la lanterne (bout à 2,8 m, 0,9 m devant le personnage; flamme du lampadaire à
+    2,75 m); la flamme et le halo sont au technical artist (nœud lamp_pole_tip)."""
+    g = A.geo()
+    g.cyl(0.018, 2.12, loc=(0, 0, 0.06), color="wood", segs=6, r2=0.014)
+    g.cyl(0.021, 0.05, loc=(0, 0, -0.98), color="iron", segs=6)
+    g.cyl(0.02, 0.2, loc=(0, 0, 0.0), color="leather", segs=6)
+    # virole et crochet: tige qui part du bout, se recourbe vers l'avant (-Y) puis redescend
+    g.cyl(0.02, 0.06, loc=(0, 0, 1.13), color="brass", segs=6)
+    g.cyl(0.006, 0.12, loc=(0, -0.03, 1.2), color="brass", segs=5, rot=(-30, 0, 0))
+    g.cyl(0.006, 0.07, loc=(0, -0.075, 1.24), color="brass", segs=5, rot=(90, 0, 0))
+    g.cyl(0.006, 0.05, loc=(0, -0.11, 1.22), color="brass", segs=5)
+    # porte-mèche: petit tube droit dans l'axe, mèche de coton au-dessus
+    g.cyl(0.012, 0.05, loc=(0, 0, 1.185), color="brass", segs=6)
+    g.cyl(0.006, 0.02, loc=(0, 0, 1.22), color="rope", segs=5)
+    # construite dressée (+Z), couchée vers l'avant (-Y): le crochet regarde vers le bas au repos, vers la
+    # lanterne une fois la perche levée
+    g.transform(list(g.bm.verts), Matrix.Rotation(math.radians(90), 4, "X"))
+    return g
+
+
+def hen_crate(A):
+    """Cage de transport d'une poule (livrée par le train, posée devant le poulailler): 0,62 x 0,44 m et 0,5 m de
+    haut, fond et toit de planches, barreaux de noisetier sur les quatre faces (la poule se voit dedans: place
+    intérieure de 0,54 x 0,36 x 0,40 m pour une poule de 0,42 m tête baissée), porte coulissante à l'avant (-Y),
+    poignée de corde sur le toit, étiquette de la coopérative. Origine au sol, au centre."""
+    g = A.geo()
+    W, D, H = 0.62, 0.44, 0.5
+    g.box((W, D, 0.04), color="wood", base=True, bevel=0.01)
+    g.box((W + 0.02, D + 0.02, 0.035), loc=(0, 0, H - 0.035), color="wood_new", base=True, bevel=0.01)
+    for sx in (1, -1):
+        for sy in (1, -1):
+            g.box((0.04, 0.04, H - 0.075), loc=(sx * (W / 2 - 0.02), sy * (D / 2 - 0.02), 0.04), color="wood_dark",
+                  base=True)
+    # barreaux ronds, du fond au toit: 6 en façade et à l'arrière, 4 sur les côtés
+    for k in range(6):
+        x = -W / 2 + 0.07 + k * (W - 0.14) / 5
+        for y in (-D / 2 + 0.02, D / 2 - 0.02):
+            if y < 0 and k in (2, 3):
+                continue
+            g.cyl(0.008, H - 0.075, loc=(x, y, 0.04), color="wood_new", segs=5, base=True)
+    for k in range(4):
+        y = -D / 2 + 0.07 + k * (D - 0.14) / 3
+        for x in (-W / 2 + 0.02, W / 2 - 0.02):
+            g.cyl(0.008, H - 0.075, loc=(x, y, 0.04), color="wood_new", segs=5, base=True)
+    # porte coulissante (deux barreaux sur une traverse), glissée dans ses guides
+    for x in (-0.04, 0.04):
+        g.cyl(0.008, 0.36, loc=(x, -D / 2 - 0.004, 0.04), color="wood_new", segs=5, base=True)
+    g.box((0.16, 0.016, 0.03), loc=(0, -D / 2 - 0.004, 0.4), color="wood")
+    for x in (-0.09, 0.09):
+        g.box((0.016, 0.02, 0.425), loc=(x, -D / 2 - 0.006, 0.04), color="wood_dark", base=True)
+    # poignée de corde et étiquette
+    for x in (-0.12, 0.12):
+        g.cyl(0.01, 0.06, loc=(x, 0, H + 0.03), color="rope", segs=5)
+    g.cyl(0.01, 0.24, loc=(0, 0, H + 0.06), color="rope", segs=5, rot=(0, 90, 0))
+    g.box((0.12, 0.006, 0.07), loc=(0.17, -D / 2 - 0.02, 0.25), color="paper", rot=(0, 4, 0))
+    g.box((0.07, 0.008, 0.012), loc=(0.17, -D / 2 - 0.022, 0.265), color="paint_green")
+    return g
+
+
 def fishing_float(A):
     g = A.geo()
     g.sphere(0.03, loc=(0, 0, 0.0), color="flower_red", segs=8, rings=5, scale=(1, 1, 0.9))
@@ -280,6 +411,18 @@ def item_beam(A):
         g.box((0.13, 0.006, 0.13), loc=(0, s * 2.25, 0.08), color="log_end")
     for y in (-1.2, 0.4, 1.6):
         g.box((0.004, 0.5, 0.004), loc=(0.081, y, 0.1), color="wood_dark")
+    return g
+
+
+def item_ridge_purlin(A):
+    """Panne faîtière de chêne équarrie, 16 x 20 cm, 4,9 m, tenons aux deux bouts (ferme et poinçon du pignon)."""
+    g = A.geo()
+    g.box((0.16, 4.9, 0.2), color="wood", base=True, bevel=0.015)
+    for s in (1, -1):
+        g.box((0.14, 0.006, 0.18), loc=(0, s * 2.45, 0.1), color="log_end")
+        g.box((0.06, 0.1, 0.12), loc=(0, s * 2.5, 0.1), color="wood")
+    for y in (-1.6, -0.2, 1.1, 2.0):
+        g.box((0.004, 0.6, 0.004), loc=(0.081, y, 0.12), color="wood_dark")
     return g
 
 
@@ -467,9 +610,19 @@ def main():
     # cueillette du tour 8 (cueillette.py): grossies comme le pissenlit, 0,25 m au moins (lisibles au zoom 1)
     A.add("wild_garlic", cueillette.wild_garlic(A), {"kind": "item", "size_m": 0.41})
     A.add("chanterelle", cueillette.chanterelle(A), {"kind": "item", "size_m": 0.3})
-    A.add("blackberry", cueillette.blackberry(A),
-          {"kind": "item", "size_m": 0.3, "note": "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol"})
-    A.add("hazelnut", cueillette.hazelnut(A), {"kind": "item", "size_m": 0.33})
+    # tour 9 (5.1 de tour-09-conception.md): mûres en trois grappes sur la face sud du roncier, noisettes sur
+    # une jonchée de feuilles sous le noisetier, cèpes, ombelles de sureau sur la face sud du sureau
+    A.add("blackberry", cueillette.blackberry_on_bramble(A),
+          {"kind": "item", "size_m": 0.66, "posed_on": "bramble",
+           "note": "trois grappes: origine au point berry_spots de bramble, même lacet que le roncier (pas de lacet "
+                   "au hasard), jamais au sol"})
+    A.add("hazelnut", cueillette.hazelnut(A),
+          {"kind": "item", "size_m": 0.6, "posed_on": "bush_hazel",
+           "note": "jonchée de feuilles et tas: origine au point nut_spots de bush_hazel, au sol"})
+    A.add("cep", cueillette.cep(A), {"kind": "item", "size_m": 0.25, "note": "au pied d'un chêne, côté sud"})
+    A.add("elderberry", cueillette.elderberry_on_elder(A),
+          {"kind": "item", "size_m": 0.7, "posed_on": "bush_elder",
+           "note": "trois ombelles: origine au point berry_spots de bush_elder, même lacet que le sureau, jamais au sol"})
     for crop in ("radish", "lettuce", "carrot"):
         A.add("seed_packet_" + crop, seed_packet(A, crop), {"kind": "item"})
     for name, fn in (("hoe", tool_hoe), ("watering_can", tool_watering_can), ("axe", tool_axe), ("saw", tool_saw),
@@ -478,10 +631,26 @@ def main():
         if name == "fishing_rod":
             a = math.radians(42)
             lpl.empty("fishing_rod_tip", parent=ob, loc=(0, -2.0 * math.cos(a), 2.0 * math.sin(a)))
+    # outils de la Halte (tour 9): même toolKind, même prise et même bout que l'outil de départ
+    for name, fn, kind in (("watering_can_copper", tool_watering_can_copper, "watering_can"),
+                           ("axe_forged", tool_axe_forged, "axe"),
+                           ("fishing_rod_bamboo", tool_fishing_rod_bamboo, "fishing_rod")):
+        ob = A.add(name, fn(A), {"kind": "tool", "socket": "socket_hand_r", "tool_kind": kind})
+        if kind == "fishing_rod":
+            a = math.radians(42)
+            lpl.empty("fishing_rod_bamboo_tip", parent=ob, loc=(0, -2.0 * math.cos(a), 2.0 * math.sin(a)))
+    pole = A.add("lamp_pole", lamp_pole(A), {"kind": "tool", "socket": "socket_hand_r", "length_m": 2.2,
+                                             "note": "perche couchée vers l'avant (+Z glTF) au repos; clips pole_raise et pole_lower"})
+    lpl.empty("lamp_pole_tip", parent=pole, loc=(0, -1.235, 0))
+    A.add("hen_crate", hen_crate(A), {"footprint": [1, 1], "note": "cage de transport: posée devant le poulailler, "
+                                                                   "poule à l'origine, dedans"})
     A.add("fishing_float", fishing_float(A), {"kind": "item", "note": "bouchon: origine au niveau de l'eau"})
     A.add("log", item_log(A), {"kind": "item"})
     A.add("plank", item_plank(A), {"kind": "item"})
     A.add("beam", item_beam(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78})
+    # tour 10: la panne faîtière de la chambre (4,9 m), portée à deux comme la poutre du jour 1
+    A.add("ridge_purlin", item_ridge_purlin(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78,
+                                                 "length_m": 4.9})
     A.add("nail_box", item_nail_box(A), {"kind": "item"})
     for kind in ("gudgeon", "chub", "trout"):
         A.add("fish_" + kind, fish(A, kind), {"kind": "item"})

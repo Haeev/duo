@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
 from bourg import Face, door, slab, window  # noqa: E402
+import maison_t9 as T9  # noqa: E402
+import maison_t10 as T10  # noqa: E402
 
 
 def straw_mattress(A):
@@ -434,7 +436,34 @@ def main():
     furn.append(A.add("crystal_radio", crystal_radio(A), {"footprint": [1, 1]}))
     furn.append(A.add("wood_stove", wood_stove(A), {"footprint": [1, 1], "tier": "P1"}))
     furn.append(A.add("picture_frame", picture_frame(A), {"footprint": [1, 1], "wall": True, "tier": "P1"}))
+    # tour 9 (maison_t9.py): objets muraux du catalogue, fauteuil, cadeaux, gelée de sureau
+    wall = {"footprint": [1, 1], "wall": True}
+    for name, fn in (("straw_hat", T9.straw_hat), ("pressed_flowers", T9.pressed_flowers),
+                     ("autumn_wreath", T9.autumn_wreath), ("jeanne_drawing", T9.jeanne_drawing)):
+        furn.append(A.add(name, fn(A), dict(wall)))
+    cal = A.add("coop_calendar", T9.coop_calendar(A), dict(wall, seasons={
+        s: "coop_calendar_" + s for s in ("spring", "summer", "autumn", "winter")},
+        note="n'afficher que la gravure de la saison (enfant coop_calendar_<saison>)"))
+    for s in ("spring", "summer", "autumn", "winter"):
+        A.add("coop_calendar_" + s, T9.calendar_engraving(A, s), parent=cal)
+    furn.append(cal)
+    clock = A.add("wall_clock", T9.wall_clock(A), dict(wall, note=(
+        "wall_clock_hour et wall_clock_minute: tourner autour de leur axe Z local (vers la pièce) selon l'heure du "
+        "jeu, sens horaire vu de face; wall_clock_pendulum: pivot en haut, osciller de +-8 degrés autour de Z, "
+        "une seconde par battement (tic-tac)")))
+    yc, zc = 0.46, 1.75
+    A.add("wall_clock_hour", T9.clock_hand(A, 0.07, 0.014), parent=clock, loc=(0, yc - 0.048, zc))
+    A.add("wall_clock_minute", T9.clock_hand(A, 0.1, 0.009), parent=clock, loc=(0, yc - 0.052, zc))
+    A.add("wall_clock_pendulum", T9.clock_pendulum(A), parent=clock, loc=(0, 0.47, zc - 0.16))
+    furn.append(clock)
+    furn.append(A.add("wicker_armchair", T9.wicker_armchair(A), {"footprint": [1, 1], "seat_height": 0.42}))
+    # tour 10 (maison_t10.py): rangement à cases, râtelier, rideaux aux fenêtres
+    t10_furn, _ = T10.build(A)
+    furn += t10_furn
     items = []
+    for name, fn in (("chalk_box", T9.chalk_box), ("coffee_mill", T9.coffee_mill), ("elder_jelly", T9.elder_jelly),
+                     ("leather_apron", T9.leather_apron), ("wool_scarf", T9.wool_scarf)):
+        items.append(A.add(name, fn(A), {"kind": "item"}))
     for name, fn in (("bread", bread), ("dish_radishes", dish_radishes), ("dish_omelette", dish_omelette),
                      ("dish_soup", dish_soup), ("parcel", parcel), ("iron_box", iron_box), ("riddle_card", riddle_card),
                      ("shed_key", shed_key), ("old_photo", old_photo), ("jay_feather", jay_feather)):

@@ -31,8 +31,10 @@ import {
   type PlacementPreview,
 } from '../etat/types';
 import type { Content } from '../donnees/types';
+import { seasonOfDay } from '../donnees/calendrier';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
+import { lowWallGeometry, matrixToAncestor, type WallOpening } from './coupe-murs';
 import { bakeGeometry, propHints, propMatrix } from './decor';
 import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
@@ -201,6 +203,8 @@ class StagedBuilding {
   private readonly parts: BuildPart[] = [];
   private readonly fixed: Object3D[] = [];
   private readonly merges: FixedMerge[] = [];
+  /** Pied de chaque mur, montré quand le mur est coupé (R12). */
+  private readonly stubs: { part: BuildPart; stub: Object3D }[] = [];
   private readonly centre = new Vector3();
   private readonly worldFacing = new Vector3();
 
@@ -306,6 +310,77 @@ class StagedBuilding {
         this.merges.push({ model, pieces, meshes });
       }
     }
+    // Après la fusion: les pieds de mur restent hors des pièces fusionnées. Les portes des
+    // murs (éléments non toits) y deviennent des baies: les murs de l'artiste sont pleins.
+    const doors = this.elements
+      .filter((element) => !element.roof && element.facing !== null)
+      .map((element) => ({ facing: element.facing, box: this.boxInModel(element.node) }));
+    for (const part of this.parts) {
+      if (part.roof || part.facing === null) continue;
+      const model = part.owner === 'ruin' ? this.ruin : this.repaired;
+      const facing = part.facing;
+      const openings: WallOpening[] = doors
+        .filter((door) => door.facing?.equals(facing) === true && !door.box.isEmpty())
+        .map((door) => {
+          const axis = facing.x !== 0 ? 'z' : 'x';
+          return {
+            axis,
+            low: door.box.min[axis],
+            high: door.box.max[axis],
+            sill: RENDER_SETTINGS.house.doorSillHeight,
+          };
+        });
+      const stub = this.wallStub(part.node, model, openings);
+      if (stub !== null) {
+        model.add(stub);
+        this.stubs.push({ part, stub });
+      }
+    }
+  }
+
+  /** Boîte d'un nœud du modèle réparé, dans le repère du modèle (matrices locales). */
+  private boxInModel(node: Object3D): Box3 {
+    const box = new Box3();
+    const matrix = new Matrix4();
+    node.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      const geometry = object.geometry as BufferGeometry;
+      geometry.computeBoundingBox();
+      if (geometry.boundingBox === null) return;
+      matrixToAncestor(object, this.repaired, matrix);
+      box.union(geometry.boundingBox.clone().applyMatrix4(matrix));
+    });
+    return box;
+  }
+
+  /** Pied d'un mur (`coupe-murs.ts`), dans le repère du modèle; `null` s'il n'a rien de bas. */
+  private wallStub(
+    wall: Object3D,
+    model: Object3D,
+    openings: readonly WallOpening[],
+  ): Object3D | null {
+    const group = new Group();
+    group.name = `${wall.name}_pied`;
+    const toModel = new Matrix4();
+    wall.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      matrixToAncestor(object, model, toModel);
+      const geometry = lowWallGeometry(
+        object.geometry as BufferGeometry,
+        toModel,
+        RENDER_SETTINGS.house.cutWallHeight,
+        openings,
+      );
+      if (geometry === null) return;
+      const mesh = new Mesh(this.resources.track(geometry), object.material);
+      mesh.matrixAutoUpdate = false;
+      mesh.matrix.copy(toModel);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    });
+    group.visible = false;
+    return group.children.length > 0 ? group : null;
   }
 
   center(): Vector3 {
@@ -369,6 +444,10 @@ class StagedBuilding {
         part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
       part.node.visible = base && !this.cutAway(part, state);
     }
+    for (const { part, stub } of this.stubs) {
+      const base = part.owner === 'ruin' ? true : state.repaired;
+      stub.visible = base && this.cutAway(part, state);
+    }
     const pulse =
       Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
     for (const part of this.elements) {
@@ -431,6 +510,47 @@ export class HousePart implements EventfulPart {
     2,
   );
   private readonly tmp = new Vector3();
+  private readonly wallFacing = new Vector3();
+
+  /**
+   * Quart de tour d'un objet mural posé sur la case (cx, cy): dos au mur de la pièce que touche la
+   * case (le modèle a son dos à -Z, au bord de la case). La rotation choisie par le joueur est
+   * gardée si elle met déjà le dos contre un mur; sinon le premier mur touché (nord, ouest, est, sud).
+   */
+  private wallRotation(cx: number, cy: number, wanted: number): number {
+    const room = this.map.house.room;
+    const walls: number[] = [];
+    // Quart 0: devant vers le sud, dos au nord; 1: dos à l'ouest; 3: dos à l'est; 2: dos au sud.
+    if (cy === room.y) walls.push(0);
+    if (cx === room.x) walls.push(1);
+    if (cx === room.x + room.w - 1) walls.push(3);
+    if (cy === room.y + room.h - 1) walls.push(2);
+    const turn = ((wanted % 4) + 4) % 4;
+    return walls.includes(turn) ? turn : (walls[0] ?? turn);
+  }
+
+  /** Le personnage local était dedans à la dernière image (murs face à la caméra coupés). */
+  private cutInside = false;
+
+  /**
+   * Le mur de la maisonnette tourné vers `facing` (repère du monde, au sol) est-il coupé à cette
+   * image ? Lu par ce qui s'y accroche dehors (l'auvent du tour 9) ou dedans (objets muraux).
+   */
+  wallCut(facing: Vector3): boolean {
+    return this.cutInside && facing.dot(this.toCamera) > WALL_FACES_CAMERA;
+  }
+
+  /** La maisonnette est-elle réparée (toit et porte faits) à cette image ? */
+  isRepaired(): boolean {
+    return this.repairedNow;
+  }
+
+  private repairedNow = false;
+
+  /** Le toit est-il coupé à cette image (personnage local dedans) ? */
+  roofCut(): boolean {
+    return this.cutInside;
+  }
 
   constructor(
     private readonly map: GameMap,
@@ -522,6 +642,7 @@ export class HousePart implements EventfulPart {
     const world = context.world;
     const local = world.characters.find((character) => character.id === context.local);
     const inside = local?.inHouse === true;
+    this.cutInside = inside;
     this.toCamera.set(-Math.cos(context.shownYaw), 0, -Math.sin(context.shownYaw));
     const find = (id: string): DeepReadonly<ConstructionState> | undefined =>
       world.constructions.find((construction) => construction.id === id);
@@ -530,8 +651,9 @@ export class HousePart implements EventfulPart {
     const lit =
       !RENDER_SETTINGS.house.lampNeedsRepair || (done('house_roof') && done('house_door'));
     this.lamp.intensity = lit ? context.night * RENDER_SETTINGS.house.lampIntensity : 0;
+    this.repairedNow = done('house_roof') && done('house_door');
     this.house?.apply({
-      repaired: done('house_roof') && done('house_door'),
+      repaired: this.repairedNow,
       hideRuinRoof: find('house_roof')?.status !== 'locked',
       constructions: world.constructions,
       time: context.time,
@@ -552,7 +674,7 @@ export class HousePart implements EventfulPart {
     }
     // Sous le toit réparé, les meubles ne se voient que de l'intérieur: inutile de les dessiner.
     const roofed = done('house_roof') && !inside;
-    this.updateFurniture(world.furniture, roofed);
+    this.updateFurniture(world.furniture, roofed, context);
     this.updateGhosts(context);
     this.updateCorners(context, roofed);
   }
@@ -646,7 +768,7 @@ export class HousePart implements EventfulPart {
     return object;
   }
 
-  private updateFurniture(placed: readonly DeepReadonly<PlacedFurniture>[], hidden: boolean): void {
+  private updateFurniture(placed: readonly DeepReadonly<PlacedFurniture>[], hidden: boolean, context: FrameContext): void {
     const seen = new Set<string>();
     for (const piece of placed) {
       seen.add(piece.id);
@@ -664,8 +786,13 @@ export class HousePart implements EventfulPart {
         this.group.add(view.object);
         this.furniture.set(piece.id, view);
       }
-      this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, piece.rotation);
-      view.object.visible = !hidden;
+      const wall = this.content.items[piece.item]?.wall === true;
+      const rotation = wall ? this.wallRotation(piece.cell.cx, piece.cell.cy, piece.rotation) : piece.rotation;
+      this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, rotation);
+      // Un objet mural suit son mur: caché avec lui quand la coupe l'efface.
+      this.wallFacing.set(Math.sin(yawFromQuarter(rotation)), 0, Math.cos(yawFromQuarter(rotation))).negate();
+      view.object.visible = !hidden && !(wall && this.wallCut(this.wallFacing));
+      if (view.object.visible) dressFurniture(view.object, context, this.content);
       const size = this.footprint(piece.item, piece.rotation);
       const ground = view.object.position.y;
       view.pick.box.min.set(
@@ -751,5 +878,40 @@ export class HousePart implements EventfulPart {
     this.ghosts.clear();
     this.corners.clear();
     this.group.removeFromParent();
+  }
+}
+
+/** Heures par tour de cadran et minutes par jour (horloge murale du tour 9). */
+const DIAL_HOURS = 12;
+const MINUTES_PER_HOUR = 60;
+/** Balancier de l'horloge murale: amplitude (degrés) et battements par seconde (un tic-tac par seconde). */
+const PENDULUM_DEGREES = 8;
+const PENDULUM_HZ = 0.5;
+
+/**
+ * Ce qui bouge sur un objet de la maison (tour 9): les aiguilles de l'horloge à l'heure du jeu et
+ * son balancier, la gravure du calendrier de la saison. Rien pour les autres objets.
+ */
+function dressFurniture(object: Object3D, context: FrameContext, content: Content): void {
+  const hour = object.getObjectByName('wall_clock_hour');
+  if (hour !== undefined) {
+    const minutes = context.world.clock.minutes;
+    hour.rotation.z = -((minutes / MINUTES_PER_HOUR) % DIAL_HOURS) / DIAL_HOURS * Math.PI * 2;
+    const minute = object.getObjectByName('wall_clock_minute');
+    if (minute !== undefined) minute.rotation.z = -((minutes % MINUTES_PER_HOUR) / MINUTES_PER_HOUR) * Math.PI * 2;
+    const pendulum = object.getObjectByName('wall_clock_pendulum');
+    if (pendulum !== undefined) {
+      const swing = context.reducedMotion ? 0 : Math.sin(context.time * Math.PI * 2 * PENDULUM_HZ);
+      pendulum.rotation.z = swing * PENDULUM_DEGREES * (Math.PI / 180);
+    }
+  }
+  const seasons = object.userData.seasons as unknown;
+  if (typeof seasons === 'object' && seasons !== null) {
+    const byName = seasons as Record<string, unknown>;
+    const shown = byName[seasonOfDay(content.settings, context.world.clock.day)];
+    for (const key in byName) {
+      const child = typeof byName[key] === 'string' ? object.getObjectByName(byName[key]) : undefined;
+      if (child !== undefined) child.visible = child.name === shown;
+    }
   }
 }

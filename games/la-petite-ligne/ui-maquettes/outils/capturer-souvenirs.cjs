@@ -7,8 +7,9 @@
 
   Usage, depuis la racine du dépôt, le serveur Vite du jeu lancé
   (cd games/la-petite-ligne && npx vite --port 5197):
-    node games/la-petite-ligne/ui-maquettes/outils/capturer-souvenirs.cjs [http://127.0.0.1:5197/] [filtre]
-  Sorties: docs/jeux/jeu-1/gauntlet/captures/tour-07/souvenirs-*.png
+    node games/la-petite-ligne/ui-maquettes/outils/capturer-souvenirs.cjs [http://127.0.0.1:5197/] [filtre] [dossier] [préfixe]
+  Sorties: docs/jeux/jeu-1/gauntlet/captures/<dossier>/<préfixe>-*.png (par défaut tour-07 et souvenirs;
+  tour 9, vignettes définitives: dossier tour-09, préfixe vignettes).
   Format CommonJS: playwright est installé hors du dépôt, résolu par require.
 */
 const { chromium } = require('playwright');
@@ -17,6 +18,8 @@ const path = require('path');
 
 const BASE = process.argv[2] ?? 'http://127.0.0.1:5197/';
 const FILTRE = process.argv[3] ?? '';
+const DOSSIER = process.argv[4] ?? 'tour-07';
+const PREFIXE = process.argv[5] ?? 'souvenirs';
 const SORTIE = path.join(
   __dirname,
   '..',
@@ -28,7 +31,7 @@ const SORTIE = path.join(
   'jeu-1',
   'gauntlet',
   'captures',
-  'tour-07',
+  DOSSIER,
 );
 
 // [nom, scénario, joueur, attente (sélecteur visible), défiler jusqu'au bas de la page]
@@ -117,7 +120,7 @@ function controles() {
         });
         await page.waitForTimeout(150);
       }
-      const fichier = path.join(SORTIE, `souvenirs-${nom}-${taille}.png`);
+      const fichier = path.join(SORTIE, `${PREFIXE}-${nom}-${taille}.png`);
       await page.screenshot({ path: fichier });
       const d = await page.evaluate(controles);
       for (const p of [...d, ...erreurs]) problemes.push(`${nom} ${taille} %: ${p}`);

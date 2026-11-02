@@ -7,22 +7,24 @@ import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Tree, Vec
 import { AIM_CONE, AIM_DISTANCE } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
-import { ghostNear } from './construction';
+import { ghostAt, ghostNear } from './construction';
 import { footprintCells } from './deplacement';
 import { talkTo } from './dialogues';
 import { nearPoint, shopOpen } from './economie';
 import { isBlockedCell } from './grille';
 import { refreshBlockers } from './deplacement';
 import { ITEM, POINT } from './ids';
-import { freeSeatsNear, fullBenchNear, sitDown, slotTaken, villagerSeated } from './bancs';
-import { benchById, standPlace } from '../etat/bancs';
+import { freeSeatsNear, fullBenchNear, playerBench, sitDown, slotTaken, villagerSeated } from './bancs';
+import { standPlace } from '../etat/bancs';
 import { fishAct, holdsRod, waterAhead } from './peche';
+import { toolKindOf } from './catalogue';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { placeFurniture } from './amenagement';
+import { beginNapIfAfternoon, eatFromBag } from './besoins';
 import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
-import { holdPlaceNear, takeHold } from './moments';
+import { holdPlaceNear, lanternTargetNear, lightLantern, takeHold } from './moments';
 import { callableHen, callHen } from './secrets';
 import { refuseChop, treeStage } from './lisiere';
 
@@ -44,7 +46,9 @@ export type Target =
   /** Place de l'échelle de Basile (geste « tenir »); `taken`: l'autre la tient déjà. */
   | { kind: 'hold'; point: string; taken: boolean; pos: Vec2 }
   /** Une poule à appeler par son nom (« Les noms des poules »). */
-  | { kind: 'hen'; id: string; pos: Vec2 };
+  | { kind: 'hen'; id: string; pos: Vec2 }
+  /** Une place d'allumage des lanternes (tour 9), le moment du jour à sa fenêtre. */
+  | { kind: 'lantern'; place: string; pos: Vec2 };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
@@ -55,6 +59,8 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
 };
 /** Un clic au sol à moins de tant d'une place libre (m) vise le banc. */
 const BENCH_CLICK_RADIUS = 1.2;
+/** Un clic au sol à moins de tant du point d'un chantier (m) vise le chantier (la porte, le poulailler). */
+const GHOST_CLICK_RADIUS = 1.5;
 const ACT_POINTS = [POINT.well, POINT.waterBarrel, POINT.groceryCounter, POINT.noticeBoard, POINT.coopCrate, POINT.workbench, POINT.henFeeder];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
@@ -96,7 +102,7 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
     case 'station':
       return 'open';
     case 'point':
-      if (t.point === POINT.well || t.point === POINT.waterBarrel) return held?.item === ITEM.wateringCan ? 'refill' : null;
+      if (t.point === POINT.well || t.point === POINT.waterBarrel) return toolKindOf(sim, held?.item) === 'watering_can' ? 'refill' : null;
       if (t.point === POINT.henFeeder) return sim.world.hens.length > 0 ? 'feed' : null;
       if (t.point === POINT.groceryCounter) return shopOpen(sim) ? 'open' : null;
       return 'open';
@@ -104,7 +110,7 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return 'build';
     case 'tree': {
       const tree = sim.world.trees.find((x) => x.id === t.id);
-      return tree !== undefined && !tree.felled && held?.item === ITEM.axe ? 'chop' : null;
+      return tree !== undefined && !tree.felled && toolKindOf(sim, held?.item) === 'axe' ? 'chop' : null;
     }
     case 'partner':
       return held !== null && heldDef?.category !== 'tool' ? 'give' : null;
@@ -114,8 +120,10 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return t.taken ? null : 'hold';
     case 'hen':
       return 'call';
+    case 'lantern':
+      return 'light';
     case 'bench': {
-      const prop = benchById(sim.map, t.bench);
+      const prop = playerBench(sim, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
       const free = sim.world.phase === 'day' && c.seat === null && !c.inHouse && prop !== null && !slotTaken(sim, prop, t.slot);
       return free ? 'sit' : null;
@@ -134,7 +142,7 @@ function gardenVerb(sim: Sim, g: GardenCell, held: string | null): AimVerb | nul
   const heldDef = held === null ? undefined : sim.content.items[held];
   if (g.soil === 'grass') return held === ITEM.hoe ? 'till' : null;
   if (heldDef?.category === 'seed' && g.crop === null) return 'sow';
-  if (held === ITEM.wateringCan) return 'water';
+  if (toolKindOf(sim, held) === 'watering_can') return 'water';
   return null;
 }
 
@@ -142,6 +150,7 @@ function gardenVerb(sim: Sim, g: GardenCell, held: string | null): AimVerb | nul
 const TIER: Record<Target['kind'], number> = {
   // Pendant l'étape de l'échelle, Basile se tient juste entre les deux places: tenir passe avant lui.
   hold: -1,
+  lantern: -1,
   villager: 0,
   // Pendant la quête des noms seulement (avant la mangeoire et la porte du poulailler).
   hen: 3,
@@ -166,6 +175,9 @@ const TIER: Record<Target['kind'], number> = {
  * le potager au nord, le poulailler est juste à l'est.
  */
 const GARDEN_TIER = TIER.partner;
+
+/** Objets qu'un habitant ne masque pas quand on les vise de plus près que lui. */
+const OBJECT_KINDS: ReadonlySet<Target['kind']> = new Set<Target['kind']>(['point', 'station', 'beam']);
 
 /**
  * Un habitant assis sur un banc passe après la place libre à côté de lui: Espace devant le banc
@@ -197,7 +209,7 @@ function inCone(c: Character, pos: Vec2): boolean {
 
 /** Une place libre de banc, en cible (avec le point où se lever, devant elle). */
 function benchTarget(sim: Sim, seat: { bench: string; slot: number; pos: Vec2 }): Target | null {
-  const prop = benchById(sim.map, seat.bench);
+  const prop = playerBench(sim, seat.bench);
   if (prop === null) return null;
   const stand = standPlace(prop, seat.slot, sim.content.settings.benches, { x: 0, y: 0, facing: 0 });
   return { kind: 'bench', bench: seat.bench, slot: seat.slot, pos: seat.pos, stand: { x: stand.x, y: stand.y } };
@@ -254,6 +266,8 @@ export function candidates(sim: Sim, c: Character): Target[] {
   if (hold !== null) out.push({ kind: 'hold', point: hold.point, taken: hold.taken, pos: point(sim, hold.point) });
   const hen = callableHen(sim, c);
   if (hen !== null) out.push({ kind: 'hen', id: hen.id, pos: hen.pos });
+  const lantern = lanternTargetNear(sim, c);
+  if (lantern !== null) out.push({ kind: 'lantern', place: lantern, pos: point(sim, lantern) });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
@@ -263,31 +277,62 @@ export function candidates(sim: Sim, c: Character): Target[] {
 /** La meilleure cible devant soi (Espace), avec son verbe. */
 export function bestTarget(sim: Sim, c: Character): { target: Target; verb: AimVerb | null } | null {
   const front = frontPoint(c, { x: 0, y: 0 });
-  let best: { target: Target; verb: AimVerb | null; tier: number; d: number } | null = null;
+  const scored: { target: Target; verb: AimVerb | null; tier: number; d: number }[] = [];
   for (const t of candidates(sim, c)) {
     // Un chantier se vise comme le reste, dans le regard (son point peut être derrière soi).
     // Une place de l'échelle à portée se prend sans viser: on y est déjà presque.
-    if (t.kind !== 'cell' && t.kind !== 'place' && t.kind !== 'hold' && !inCone(c, t.pos)) continue;
+    if (t.kind !== 'cell' && t.kind !== 'place' && t.kind !== 'hold' && t.kind !== 'lantern' && !inCone(c, t.pos)) continue;
     const verb = verbOf(sim, c, t);
     if (verb === null && t.kind !== 'cell') continue;
     if (c.seat !== null && verb !== null && !SEATED_VERBS.has(verb)) continue;
-    const tier = verb === null ? 99 : tierOf(sim, c, t);
-    const d = distance(front, t.pos);
-    if (best === null || tier < best.tier || (tier === best.tier && d < best.d)) best = { target: t, verb, tier, d };
+    scored.push({ target: t, verb, tier: verb === null ? 99 : tierOf(sim, c, t), d: distance(front, t.pos) });
+  }
+  // Un habitant ne vole pas la touche à l'objet qu'on vise de plus près (R06: Basile devant son
+  // établi, ou à côté de la poutre): l'objet passe avant lui; tourné vers lui, on lui parle.
+  const nearestObject = Math.min(...scored.filter((e) => e.verb !== null && OBJECT_KINDS.has(e.target.kind)).map((e) => e.d));
+  let best: (typeof scored)[number] | null = null;
+  for (const e of scored) {
+    if (e.target.kind === 'villager' && e.tier === TIER.villager && nearestObject < e.d) e.tier = TIER.partner;
+    if (best === null || e.tier < best.tier || (e.tier === best.tier && e.d < best.d)) best = e;
   }
   return best === null ? null : { target: best.target, verb: best.verb };
 }
 
-/** Case surlignée devant le personnage (pour le rendu) et astuces de visée. */
+/**
+ * Bêcher l'herbe hors du potager vaut partout où l'on tient la houe: le simple survol du pré ne
+ * le met pas en évidence (Espace garderait sinon la case sous une souris oubliée sur le jeu).
+ * Le clic y va et bêche toujours, comme avant.
+ */
+const POINTER_IGNORED: ReadonlySet<AimVerb> = new Set<AimVerb>(['dig']);
+
+/**
+ * Ce que survole la souris (R11), s'il y a quelque chose à y faire: la cible et son verbe, tels
+ * qu'un clic les prendrait. `null` sans survol, pendant l'aménagement (la souris place alors
+ * l'aperçu) ou sur une cible sans geste: la visée revient à la case devant soi.
+ */
+export function pointerTarget(sim: Sim, c: Character): { click: ClickTarget; target: Target; verb: AimVerb } | null {
+  const click = sim.runtime.pointer[c.id];
+  if (click === null || c.placement !== null) return null;
+  const target = resolveClick(sim, c, click);
+  if (target === null) return null;
+  const verb = verbOf(sim, c, target);
+  return verb === null || POINTER_IGNORED.has(verb) ? null : { click, target, verb };
+}
+
+/** Case surlignée (pour le rendu): la cible survolée à la souris, sinon devant le personnage; astuces de visée. */
 export function updateAim(sim: Sim, c: Character): void {
   if (c.status !== 'active' || !c.created) {
     if (c.aim !== null) c.aim = null;
     return;
   }
-  const best = bestTarget(sim, c);
+  const pointed = pointerTarget(sim, c);
+  const best = pointed === null ? bestTarget(sim, c) : null;
   let aim: AimInfo | null = null;
-  const water = holdsRod(c) && c.seat === null ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
-  if (water !== null) {
+  const water = pointed === null && holdsRod(sim, c) && c.seat === null ? (c.fishing?.bobber ?? waterAhead(sim, c)) : null;
+  if (pointed !== null) {
+    const pos = pointed.target.kind === 'cell' ? { x: pointed.target.cell.cx + 0.5, y: pointed.target.cell.cy + 0.5 } : pointed.target.pos;
+    aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: pointed.verb, blocked: null, source: 'pointer' };
+  } else if (water !== null) {
     aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
   } else if (best !== null) {
     const pos = best.target.kind === 'cell' ? { x: best.target.cell.cx + 0.5, y: best.target.cell.cy + 0.5 } : best.target.pos;
@@ -304,7 +349,7 @@ export function updateAim(sim: Sim, c: Character): void {
         queueHint(sim, c.id, {
           on: 'aim_cell',
           cellState: g.soil,
-          tool: held?.item ?? null,
+          tool: toolKindOf(sim, held?.item) ?? held?.item ?? null,
           holding: held === null ? null : (sim.content.items[held.item]?.category ?? null),
         });
       }
@@ -313,7 +358,12 @@ export function updateAim(sim: Sim, c: Character): void {
   const before = c.aim;
   const same =
     (before === null && aim === null) ||
-    (before !== null && aim !== null && before.cell.cx === aim.cell.cx && before.cell.cy === aim.cell.cy && before.verb === aim.verb);
+    (before !== null &&
+      aim !== null &&
+      before.cell.cx === aim.cell.cx &&
+      before.cell.cy === aim.cell.cy &&
+      before.verb === aim.verb &&
+      before.source === aim.source);
   if (!same) {
     c.aim = aim;
     sim.runtime.changed = true;
@@ -397,7 +447,10 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       queueHint(sim, c.id, { on: 'near_construction' });
       return;
     case 'sleep':
-      if (t.kind === 'bed') goToBed(sim, c, t.furniture);
+      if (t.kind === 'bed') {
+        goToBed(sim, c, t.furniture);
+        beginNapIfAfternoon(sim, c);
+      }
       return;
     case 'open':
       if (t.kind === 'station') openMenu(sim, c, t.menu);
@@ -424,6 +477,9 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       return;
     case 'hold':
       if (t.kind === 'hold') takeHold(sim, c, t.point);
+      return;
+    case 'light':
+      if (t.kind === 'lantern') lightLantern(sim, c, t.place);
       return;
     case 'call': {
       const hen = t.kind === 'hen' ? sim.world.hens.find((h) => h.id === t.id) : undefined;
@@ -459,7 +515,7 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
 
 /** Espace: agir sur ce qui est devant soi. */
 export function actFront(sim: Sim, c: Character): void {
-  if (c.seat === null && holdsRod(c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
+  if (c.seat === null && holdsRod(sim, c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
     fishAct(sim, c);
     return;
   }
@@ -481,10 +537,13 @@ export function actFront(sim: Sim, c: Character): void {
   }
   // La hache devant une souche ou un rejet: on dit pourquoi rien ne se coupe (tour 8, section 9).
   const young = youngTreeAhead(sim, c);
-  if (young !== null && heldStack(c)?.item === ITEM.axe && c.seat === null) {
+  if (young !== null && toolKindOf(sim, heldStack(c)?.item) === 'axe' && c.seat === null) {
     refuseChop(sim, c, young);
     return;
   }
+  // Un plat en main, rien à faire devant soi: on le mange (R04, le pain ne se mangeait qu'au carnet).
+  const held = heldStack(c);
+  if (held !== null && eatFromBag(sim, c, held.item)) return;
   if (best !== null && takenByPartner(sim, c, best.target, sim.world.tick)) return;
   const reach = sim.content.settings.ranges.action;
   pickupTakenNear(sim, c, (pos) => distance(c.pos, pos) <= reach && inCone(c, pos));
@@ -509,7 +568,7 @@ export function actOnClick(sim: Sim, c: Character, click: ClickTarget, target: T
   }
   const verb = verbOf(sim, c, target);
   if (verb !== null) perform(sim, c, target, verb);
-  else if (target.kind === 'tree' && heldStack(c)?.item === ITEM.axe) {
+  else if (target.kind === 'tree' && toolKindOf(sim, heldStack(c)?.item) === 'axe') {
     const tree = sim.world.trees.find((x) => x.id === target.id);
     if (tree?.felled === true) refuseChop(sim, c, tree);
   } else takenByPartner(sim, c, target, since);
@@ -572,6 +631,8 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       // Un clic sur un banc (le sol juste sous ou derrière lui): sa place libre la plus proche,
       // sauf si la case cliquée a son geste (bêcher au pied du banc, comme à la touche).
       if (verbOf(sim, c, cellTarget) !== null) return cellTarget;
+      const ghost = ghostAt(sim, at, GHOST_CLICK_RADIUS);
+      if (ghost !== null) return { kind: 'construction', id: ghost.state.id, pos: point(sim, ghost.def.point) };
       const seat = c.inHouse ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
       return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }

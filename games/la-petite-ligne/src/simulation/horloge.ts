@@ -7,7 +7,8 @@ import type { CharacterStatus, ClockStop } from '../etat/types';
 import { SECONDS_PER_MINUTE, SIM_HZ } from './constantes';
 import { type Sim, character, emit, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
-import { applyForm, settleNight } from './besoins';
+import { applyForm, napClockFactor, settleNight } from './besoins';
+import { isNapping } from '../etat/maison';
 import { deliverScheduledLetters } from './courrier';
 import { cancelProposalsAtNight } from './economie';
 import { pickEnvies } from './envies';
@@ -22,6 +23,9 @@ import { morningForage, morningTrees } from './lisiere';
 import { pruneLetters } from './semaine';
 import { tidyGround } from './rangement';
 import { foldOldHeard } from './dialogues';
+import { morningBoard } from './annonces';
+import { morningImprovements } from './chantiers';
+import { catalogueClock } from './catalogue';
 import { secondsPerGameMinuteOn, seasonStartingOn } from '../donnees/calendrier';
 
 const BUSY: ReadonlySet<CharacterStatus> = new Set(['menu', 'dialogue', 'scene', 'breakfast']);
@@ -102,7 +106,8 @@ export function updateClock(sim: Sim, dt: number): void {
   if (!running) return;
   const before = clock.minutes;
   // Rythme du jour (D1, `clock.schedule`): il change à l'aube, jamais au milieu d'une journée.
-  let after = before + dt / secondsPerGameMinuteOn(sim.content.settings, clock.day);
+  // Sieste à deux (tour 10, section 3.4): le temps file `togetherClockFactor` fois plus vite.
+  let after = before + (dt * napClockFactor(sim)) / secondsPerGameMinuteOn(sim.content.settings, clock.day);
   if (clock.day >= s.lastDay.day) after = Math.min(after, s.lastDay.end);
   after = Math.min(after, s.dayEnd);
   clock.minutes = after;
@@ -112,6 +117,7 @@ export function updateClock(sim: Sim, dt: number): void {
 function timeTriggers(sim: Sim, before: number, after: number): void {
   const s = sim.content.settings.clock;
   trainClock(sim, before, after);
+  catalogueClock(sim, before, after);
   deliverScheduledLetters(sim);
   for (const hint of sim.content.hints) {
     if (hint.trigger.on === 'time_reached' && crossed(before, after, hint.trigger.time)) {
@@ -130,7 +136,7 @@ function timeTriggers(sim: Sim, before: number, after: number): void {
 export function checkNight(sim: Sim): void {
   const { world } = sim;
   if (world.phase !== 'day' || world.scene !== null) return;
-  if (!world.characters.every((c) => c.status === 'sleeping')) return;
+  if (!world.characters.every((c) => c.status === 'sleeping' && !isNapping(c))) return;
   world.phase = 'night';
   for (const c of world.characters) {
     c.status = 'night';
@@ -154,9 +160,9 @@ export function nightChoice(sim: Sim, id: 'p1' | 'p2', choice: 'continue' | 'fin
   if (finish) emit(sim, { type: 'session_finish' });
 }
 
+/** L'aube: rien de gagné depuis (`countersToday`); les compteurs eux-mêmes ne bougent pas. */
 function copyCounters(sim: Sim): void {
-  const c = sim.world.counters;
-  sim.world.countersAtDawn = { duo: { ...c.duo }, p1: { ...c.p1 }, p2: { ...c.p2 } };
+  sim.world.countersToday = { duo: {}, p1: {}, p2: {} };
 }
 
 /** Le matin (TE-04): besoins de la nuit, pousse, œufs, courrier, envies, petit-déjeuner. */
@@ -199,6 +205,9 @@ export function morning(sim: Sim): void {
   pruneLetters(sim);
   foldOldHeard(sim);
   deliverScheduledLetters(sim);
+  // Tour 9: ce que Basile a bâti dans la nuit, puis l'annonce du jour (dimanche, mercredi).
+  morningImprovements(sim);
+  morningBoard(sim);
   placeVillagers(sim);
   // Après la météo et les rencontres de la veille: le moment du jour et sa confidence.
   morningMoments(sim);

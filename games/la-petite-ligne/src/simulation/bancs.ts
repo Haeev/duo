@@ -5,7 +5,7 @@
  * places par banc, jamais deux corps sur la même (un habitant arrêté sur le
  * banc en tient une, comme le dessine le rendu).
  */
-import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, benchForPoint, seatPlace, standPlace } from '../etat/bancs';
+import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, benchesWithBuilt, benchForPoint, seatPlace, standPlace } from '../etat/bancs';
 import type { GameMap, MapProp } from '../etat/carte';
 import type { BenchSettings } from '../donnees/types';
 import type { Character, VillagerState, Vec2 } from '../etat/types';
@@ -22,6 +22,20 @@ export interface FreeSeat {
 }
 
 const seating = new BenchSeating();
+
+/** Chantiers bâtis, dans l'ordre de `chantiers.json` (leurs bancs s'ajoutent à ceux de la carte). */
+function builtImprovements(sim: Sim): string[] {
+  return sim.content.improvements.filter((x) => (sim.world.improvements[x.id]?.builtDay ?? null) !== null).map((x) => x.id);
+}
+
+/** Les bancs où un joueur peut s'asseoir: ceux de la carte, ses sièges, et les bancs des chantiers bâtis (tour 9). */
+export function playerBenches(sim: Sim): readonly MapProp[] {
+  return benchesWithBuilt(sim.map, builtImprovements(sim));
+}
+
+export function playerBench(sim: Sim, id: string): MapProp | null {
+  return playerBenches(sim).find((b) => b.id === id) ?? null;
+}
 const scratch: BenchPlace = { x: 0, y: 0, facing: 0 };
 
 /** La place `slot` du banc est-elle prise (par un joueur assis ou un habitant arrêté dessus) ? */
@@ -49,7 +63,7 @@ export function benchFull(sim: Sim, prop: MapProp): boolean {
 export function freeSeatsNear(sim: Sim, at: Vec2, range: number): FreeSeat[] {
   const s = sim.content.settings.benches;
   const out: (FreeSeat & { d: number })[] = [];
-  for (const prop of benchesOf(sim.map)) {
+  for (const prop of playerBenches(sim)) {
     for (let slot = 0; slot < s.slots.length; slot++) {
       const place = seatPlace(prop, slot, s, scratch);
       const d = distance(at, place);
@@ -64,7 +78,7 @@ export function freeSeatsNear(sim: Sim, at: Vec2, range: number): FreeSeat[] {
 /** Un banc plein à portée de ce personnage (pour dire pourquoi Espace ne fait rien). */
 export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
   const s = sim.content.settings.benches;
-  for (const prop of benchesOf(sim.map)) {
+  for (const prop of playerBenches(sim)) {
     for (let slot = 0; slot < s.slots.length; slot++) {
       if (distance(c.pos, seatPlace(prop, slot, s, scratch)) <= s.sitRange && benchFull(sim, prop)) return prop;
     }
@@ -74,7 +88,7 @@ export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
 
 /** S'assoit à la place `slot` du banc (libre: vérifié par l'appelant ou ici). Vrai si c'est fait. */
 export function sitDown(sim: Sim, c: Character, benchId: string, slot: number): boolean {
-  const prop = benchById(sim.map, benchId);
+  const prop = playerBench(sim, benchId);
   // Hors de la journée de jeu (nuit, écran de fin), `updateSeats` relèverait au même pas.
   if (sim.world.phase !== 'day' || prop === null || c.seat !== null || c.inHouse || slotTaken(sim, prop, slot)) return false;
   const place = seatPlace(prop, slot, sim.content.settings.benches, scratch);
@@ -99,7 +113,7 @@ export function sitDown(sim: Sim, c: Character, benchId: string, slot: number): 
  */
 export function standingSpot(sim: Sim, c: Character, out: Vec2): boolean {
   const seat = c.seat;
-  const prop = seat === null ? null : benchById(sim.map, seat.bench);
+  const prop = seat === null ? null : playerBench(sim, seat.bench);
   if (seat === null || prop === null) return false;
   const s = sim.content.settings.benches;
   const b = refreshBlockers(sim);
@@ -160,7 +174,7 @@ export function updateSeats(sim: Sim): void {
   for (const c of sim.world.characters) {
     const seat = c.seat;
     if (seat === null) continue;
-    const prop = benchById(sim.map, seat.bench);
+    const prop = playerBench(sim, seat.bench);
     const place = prop === null ? null : seatPlace(prop, seat.slot, s, scratch);
     const away = place === null || Math.abs(place.x - c.pos.x) > 1e-6 || Math.abs(place.y - c.pos.y) > 1e-6;
     const asleep = c.status === 'sleeping' || c.status === 'night' || c.status === 'breakfast';

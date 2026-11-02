@@ -26,7 +26,8 @@ const LoopSchema = v.object({
 
 const SoundSchema = v.object({
   event: v.optional(v.string()),
-  bus: v.picklist(['effects', 'ui', 'ambience']),
+  // `music`: motif court et accordé (étoiles, vers luisants, saisons), réglé avec la musique (son.md, S3).
+  bus: v.picklist(['effects', 'ui', 'ambience', 'music']),
   priority: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(4)),
   files: v.pipe(v.array(v.string()), v.minLength(1)),
   pick: v.picklist(['shuffle-no-repeat', 'single']),
@@ -115,6 +116,19 @@ const CatalogueSchema = v.object({
     musicByMoment: v.array(v.object({ moment: v.string(), music: v.string(), rest: v.optional(v.boolean()), once: v.optional(v.boolean()) })),
     ambienceByTime: v.array(AmbienceRuleSchema),
     morningMist: v.optional(MorningMistSchema),
+    // Tour 9: cris lointains du soir (l'effraie, `owl-far`), une fois par soir à un instant tiré.
+    eveningCalls: v.optional(
+      v.array(
+        v.object({
+          sound: v.string(),
+          seasons: v.array(v.picklist(['spring', 'summer', 'autumn', 'winter'])),
+          hours: v.tuple([Finite, Finite]),
+          timesPerEvening: v.pipe(Finite, v.minValue(0)),
+          notWhen: v.optional(v.string()),
+          notWithMoment: v.optional(v.string()),
+        }),
+      ),
+    ),
     interior: v.object({ ambienceLowpassHz: v.pipe(Finite, v.minValue(10)), ambienceDb: Finite, rampMs: NonNegative }),
     peer: v.object({ peerWorldSoundsDb: Finite }),
     sequences: v.record(v.string(), v.object({ steps: v.array(StepSchema) })),
@@ -124,7 +138,7 @@ const CatalogueSchema = v.object({
 // ---------------------------------------------------------------------------
 // Types du moteur
 
-export type SoundBus = 'effects' | 'ui' | 'ambience';
+export type SoundBus = 'effects' | 'ui' | 'ambience' | 'music';
 export type Priority = 1 | 2 | 3 | 4;
 
 export interface SpatialDef {
@@ -227,9 +241,23 @@ export interface Catalogue {
   restingMusic: ReadonlySet<string>;
   ambienceRules: readonly AmbienceRule[];
   morningMist: MorningMistRule | null;
+  /** Tour 9: un cri lointain par soir (`plan.eveningCalls`): heures en minutes de jeu. */
+  eveningCalls: readonly EveningCall[];
   interior: { lowpassHz: number; ambienceDb: number; rampSeconds: number };
   peerDb: number;
   sequences: ReadonlyMap<string, readonly SequenceStep[]>;
+}
+
+export interface EveningCall {
+  sound: string;
+  seasons: readonly string[];
+  from: number;
+  to: number;
+  times: number;
+  /** Jamais sous la pluie (`notWhen` qui parle de pluie). */
+  notInRain: boolean;
+  /** Jamais le soir de ce moment. */
+  notWithMoment: string | null;
 }
 
 export class CatalogueError extends Error {
@@ -387,6 +415,18 @@ export function parseCatalogue(raw: unknown): Catalogue {
     restingMusic,
     ambienceRules,
     morningMist,
+    eveningCalls: (data.plan.eveningCalls ?? []).map((e) => {
+      if (!sounds.has(e.sound)) throw new CatalogueError(`sons.json: plan.eveningCalls: son inconnu « ${e.sound} »`);
+      return {
+        sound: e.sound,
+        seasons: e.seasons,
+        from: e.hours[0] * 60,
+        to: e.hours[1] * 60,
+        times: e.timesPerEvening,
+        notInRain: e.notWhen !== undefined && RAIN_WORDS.test(e.notWhen),
+        notWithMoment: e.notWithMoment ?? null,
+      };
+    }),
     interior: {
       lowpassHz: data.plan.interior.ambienceLowpassHz,
       ambienceDb: data.plan.interior.ambienceDb,

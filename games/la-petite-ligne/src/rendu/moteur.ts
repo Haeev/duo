@@ -37,7 +37,7 @@ import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from
 import { ModelLibrary } from './modeles';
 import { ShadowCasterCulling } from './ombre-tri';
 import { PerfMonitor } from './perf';
-import { AdaptiveQuality, type QualityChange } from './qualite';
+import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
@@ -46,6 +46,8 @@ import { Vegetation } from './vegetation';
 import { WorldParts } from './monde';
 import { CharactersPart } from './personnages';
 import { HousePart } from './maison';
+import { ImprovementsPart } from './chantiers';
+import { LampBoard } from './lampes';
 import { GardenPart } from './potager';
 import { FarmLifePart } from './vie';
 import { EffectsPart } from './effets';
@@ -114,6 +116,10 @@ export class RenderEngine implements Renderer {
   private readonly perf: PerfMonitor;
   private readonly picks = new PickRegistry();
   private readonly resizeObserver: ResizeObserver;
+  /** Taille exacte du conteneur en pixels physiques, si le navigateur la donne. */
+  private devicePixels: { width: number; height: number } | null = null;
+  /** Rapport de pixels effectif du rendu (pixels du tampon par point CSS). */
+  private effectiveRatio = 1;
   private readonly unsubscribe: () => void;
   private readonly pendingEvents: WorldEvent[] = [];
   private readonly parts: RenderPart[] = [];
@@ -139,6 +145,8 @@ export class RenderEngine implements Renderer {
   private vegetation: Vegetation | null = null;
   private moments: MomentsPart | null = null;
   private readonly shadowCulling = new ShadowCasterCulling();
+  /** Allumage des lampadaires (tour 9), écrit par les chantiers, lu par l'ambiance. */
+  private readonly lamps = new LampBoard();
   /** Saison montée (palette et lumière), `null` avant la première image. */
   private season: Season | null = null;
 
@@ -177,10 +185,24 @@ export class RenderEngine implements Renderer {
       this.container,
       options.showStats ?? (import.meta.env.DEV && !this.light),
     );
-    this.resizeObserver = new ResizeObserver(() => {
+    // Boîte en pixels physiques: taille exacte de l'écran sous le canevas, et
+    // nouvel appel quand la mise à l'échelle change (fenêtre glissée sur un
+    // autre écran, réglage de Windows modifié en cours de partie).
+    this.resizeObserver = new ResizeObserver((entries) => {
+      // Absent des navigateurs qui ne connaissent pas cette boîte (le type DOM le dit toujours là).
+      const entry = entries[0];
+      const box =
+        entry !== undefined && 'devicePixelContentBoxSize' in entry
+          ? entry.devicePixelContentBoxSize[0]
+          : undefined;
+      this.devicePixels = box === undefined ? null : { width: box.inlineSize, height: box.blockSize };
       this.resize();
     });
-    this.resizeObserver.observe(this.container);
+    try {
+      this.resizeObserver.observe(this.container, { box: 'device-pixel-content-box' });
+    } catch {
+      this.resizeObserver.observe(this.container);
+    }
     this.resize();
     this.unsubscribe = this.view.onEvent((event) => {
       this.pendingEvents.push(event);
@@ -198,25 +220,28 @@ export class RenderEngine implements Renderer {
     };
   }
 
-  /** Taille du canevas: rapport de pixels plafonné à 2, et à 1920x1080 pixels physiques. */
+  /**
+   * Taille du tampon de rendu (`renderPixelSize` de `qualite.ts`): rapport
+   * plafonné à 2 et à 1920x1080 pixels physiques, jamais sous le plancher de
+   * netteté, pixels physiques exacts à pleine résolution. Le tampon est donné
+   * en pixels (rapport 1 pour Three.js), le CSS l'étend au conteneur.
+   */
   private resize(): void {
     const width = Math.max(1, this.container.clientWidth);
     const height = Math.max(1, this.container.clientHeight);
-    const settings = RENDER_SETTINGS.renderer;
-    if (this.light || this.quality?.isLight() === true) {
-      const light = RENDER_SETTINGS.light;
-      const lightBudget = Math.sqrt(light.maxPhysicalPixels / (width * height));
-      this.renderer.setPixelRatio(Math.min(light.pixelRatio, lightBudget));
-      this.renderer.setSize(width, height, false);
-      this.rig.setAspect(width / height);
-      return;
-    }
-    const budgetRatio = Math.sqrt(settings.maxPhysicalPixels / (width * height));
-    const scale = this.resolutionScale();
-    const ratio =
-      Math.min(window.devicePixelRatio || 1, settings.maxPixelRatio, budgetRatio) * scale;
-    this.renderer.setPixelRatio(ratio);
-    this.renderer.setSize(width, height, false);
+    const size = renderPixelSize(
+      {
+        cssWidth: width,
+        cssHeight: height,
+        devicePixelRatio: window.devicePixelRatio || 1,
+        devicePixels: this.devicePixels,
+      },
+      this.resolutionScale(),
+      this.light,
+    );
+    this.effectiveRatio = size.ratio;
+    this.renderer.setPixelRatio(1);
+    this.renderer.setSize(size.width, size.height, false);
     this.rig.setAspect(width / height);
   }
 
@@ -279,6 +304,7 @@ export class RenderEngine implements Renderer {
       content,
       benchesOf(map),
       map.points,
+      map,
     );
     const house = new HousePart(
       map,
@@ -317,6 +343,10 @@ export class RenderEngine implements Renderer {
     world.add(house);
     world.add(garden);
     world.add(farm);
+    // Tour 9: chantiers bâtis, marelle, allumage des lampadaires (après la maisonnette: l'auvent suit sa coupe).
+    const improvements = new ImprovementsPart(map, content, library, materials, terrain, this.resources, house, this.lamps);
+    this.scene.add(improvements.group);
+    world.add(improvements);
     // Moments rares (après les personnages: Basile y est mené par la chorégraphie de l'échelle).
     const moments = new MomentsPart(
       map,
@@ -374,9 +404,12 @@ export class RenderEngine implements Renderer {
       terrain,
       this.resources,
       decor.clockHands,
+      content,
     );
     this.scene.add(railway.group);
     world.add(railway);
+    // L'équipage du salut se tient dans la cabine du train, où qu'il soit.
+    moments.setTrainProbe(() => railway.currentOffset());
     // Points d'accroche du technical artist (`extensions.ts`): eau, panache, ciel...
     const hooks: RenderHooks = {
       renderer: this.renderer,
@@ -392,6 +425,7 @@ export class RenderEngine implements Renderer {
       smokeEmitter: () => railway.smokeEmitter(),
       trainState: () => railway.trainState(),
       resources: this.resources,
+      lamps: this.lamps,
     };
     for (const extension of RENDER_EXTENSIONS) {
       const part = extension(hooks);
@@ -569,6 +603,7 @@ export class RenderEngine implements Renderer {
     }
     this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     this.pushActorHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
+    this.pushWaterHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
     materials.setSeeThrough(this.holes);
   }
 
@@ -605,6 +640,57 @@ export class RenderEngine implements Renderer {
     if (towardCamera <= 0) {
       return;
     }
+    this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
+    this.probe.project(camera);
+    this.holes.push({
+      x: (this.probe.x * HALF + HALF) * this.bufferSize.x,
+      y: (this.probe.y * HALF + HALF) * this.bufferSize.y,
+      radiusX: settings.halfWidth * pixelsPerMeter,
+      radiusY: settings.halfHeight * Math.cos(elevation) * pixelsPerMeter,
+      depth: -this.viewPoint.z - settings.nearer,
+      depthPerPixel,
+      ground,
+    });
+  }
+
+  /**
+   * Trou sur l'eau d'un moment qui s'y joue (les étoiles de l'Aubrune, tour 9): les arbres de la
+   * rive sud cachent l'eau au sud du ponton en orientation 0. Centre: le milieu des reflets, à la
+   * surface; voir `momentSeeThrough.water`.
+   */
+  private pushWaterHole(
+    world: ReadonlyWorld,
+    terrain: Terrain,
+    pixelsPerMeter: number,
+    elevation: number,
+    depthPerPixel: number,
+  ): void {
+    const settings = RENDER_SETTINGS.momentSeeThrough.water;
+    const today = world.moments.today;
+    if (
+      today === null ||
+      !(settings.moments as readonly string[]).includes(today.id) ||
+      !(settings.phases as readonly string[]).includes(today.phase)
+    ) {
+      return;
+    }
+    const def = this.view.content.moments.find((m) => m.id === today.id);
+    const reflection = def?.render.reflection as { x?: unknown; y?: unknown } | undefined;
+    const xs = reflection?.x;
+    const ys = reflection?.y;
+    if (!Array.isArray(xs) || !Array.isArray(ys)) {
+      return;
+    }
+    const [x0, x1] = xs as unknown[];
+    const [y0, y1] = ys as unknown[];
+    if (typeof x0 !== 'number' || typeof x1 !== 'number' || typeof y0 !== 'number' || typeof y1 !== 'number') {
+      return;
+    }
+    const x = (x0 + x1) / 2;
+    const y = (y0 + y1) / 2;
+    const camera = this.rig.camera;
+    const ground = terrain.waterLevelAt(x, y) ?? terrain.heightAt(x, y);
+    this.probe.set(x, ground, y);
     this.viewPoint.copy(this.probe).applyMatrix4(camera.matrixWorldInverse);
     this.probe.project(camera);
     this.holes.push({
@@ -702,9 +788,16 @@ export class RenderEngine implements Renderer {
         final: change.kind === 'light' && change.final,
         averageFrameMs: Math.round(this.quality?.averageFrameMs() ?? 0),
         refreshMs: Math.round(this.quality?.refreshMs() ?? 0),
-        pixelRatio: this.renderer.getPixelRatio(),
+        pixelRatio: this.effectiveRatio,
       },
     );
+  }
+
+  /** Repli automatique imposé (page de démonstration, `adaptatif=1&repli=1`). */
+  forceQualityFallback(): void {
+    if (this.quality !== null) {
+      this.applyQuality(this.quality.forceFallback());
+    }
   }
 
   /**
@@ -733,7 +826,7 @@ export class RenderEngine implements Renderer {
 
   /** Rapport de pixels du rendu (résolution interne), pour les tests. */
   pixelRatio(): number {
-    return this.renderer.getPixelRatio();
+    return this.effectiveRatio;
   }
 
   /** Qualité en vigueur: mode léger demandé ou automatique, sinon normale. */
@@ -766,6 +859,35 @@ export class RenderEngine implements Renderer {
   }
 
   pick(clientX: number, clientY: number): PickResult | null {
+    const ndc = this.toNdc(clientX, clientY);
+    if (ndc === null) {
+      return null;
+    }
+    const ray = this.rig.ray(ndc.x, ndc.y).ray;
+    const entity = this.picks.nearest(ray);
+    const ground = this.groundPoint(ndc.x, ndc.y);
+    const groundDistance =
+      ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
+    if (entity !== null && entity.distance <= groundDistance) {
+      return entity.result;
+    }
+    if (ground === null || !this.onMap(ground.x, ground.z)) {
+      return null;
+    }
+    return { kind: 'ground', x: ground.x, y: ground.z };
+  }
+
+  pickGround(clientX: number, clientY: number): { x: number; y: number } | null {
+    const ndc = this.toNdc(clientX, clientY);
+    const ground = ndc === null ? null : this.groundPoint(ndc.x, ndc.y);
+    if (ground === null || !this.onMap(ground.x, ground.z)) {
+      return null;
+    }
+    return { x: ground.x, y: ground.z };
+  }
+
+  /** Coordonnées normalisées du canevas, ou `null` avant le chargement. */
+  private toNdc(clientX: number, clientY: number): { x: number; y: number } | null {
     if (!this.loaded || this.terrain === null) {
       return null;
     }
@@ -773,28 +895,25 @@ export class RenderEngine implements Renderer {
     if (rect.width === 0 || rect.height === 0) {
       return null;
     }
-    const ndcX = ((clientX - rect.left) / rect.width) * 2 - 1;
-    const ndcY = -(((clientY - rect.top) / rect.height) * 2 - 1);
-    const ray = this.rig.ray(ndcX, ndcY).ray;
-    const entity = this.picks.nearest(ray);
-    // Le sol: deux passes pour tenir compte de la hauteur du terrain (quai, berges).
+    return {
+      x: ((clientX - rect.left) / rect.width) * 2 - 1,
+      y: -(((clientY - rect.top) / rect.height) * 2 - 1),
+    };
+  }
+
+  /** Le sol: deux passes pour tenir compte de la hauteur du terrain (quai, berges). */
+  private groundPoint(ndcX: number, ndcY: number): Vector3 | null {
+    const terrain = this.terrain;
     let ground = this.rig.groundAt(ndcX, ndcY, 0);
-    if (ground !== null) {
-      ground = this.rig.groundAt(ndcX, ndcY, this.terrain.heightAt(ground.x, ground.z));
+    if (ground !== null && terrain !== null) {
+      ground = this.rig.groundAt(ndcX, ndcY, terrain.heightAt(ground.x, ground.z));
     }
-    const groundDistance =
-      ground === null ? Number.POSITIVE_INFINITY : ground.distanceTo(ray.origin);
-    if (entity !== null && entity.distance <= groundDistance) {
-      return entity.result;
-    }
-    if (ground === null) {
-      return null;
-    }
+    return ground;
+  }
+
+  private onMap(x: number, y: number): boolean {
     const map = this.view.map;
-    if (ground.x < 0 || ground.z < 0 || ground.x >= map.width || ground.z >= map.height) {
-      return null;
-    }
-    return { kind: 'ground', x: ground.x, y: ground.z };
+    return x >= 0 && y >= 0 && x < map.width && y < map.height;
   }
 
   stats(): { drawCalls: number; triangles: number } {

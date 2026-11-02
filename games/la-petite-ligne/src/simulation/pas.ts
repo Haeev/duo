@@ -9,13 +9,15 @@ import { type Sim, distance } from './contexte';
 import { updateAim } from './agir';
 import { standUp, updateSeats } from './bancs';
 import { updatePlacement } from './amenagement';
+import { updateNeeds } from './besoins';
+import { roomBeamPlaced, updateRoomWork } from './pieces';
 import { loadPlaced, spawnLoads } from './portages';
 import { queueHint, pumpHints } from './astuces';
 import { updateConstructions, completeConstruction } from './construction';
 import { autoStartScenes } from './dialogues';
 import { pumpScripts } from './effets';
 import { envieStayPoints, updateEnvies, updateStays } from './envies';
-import { clearHandcarSpot, moveCharacter, refreshBlockers, updateBeam, updateInside } from './deplacement';
+import { clearHandcarSpot, moveCharacter, refreshBlockers, updateBeam, updateInside, updateVillagerInside } from './deplacement';
 import { updateVillagers } from './habitants';
 import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
@@ -26,6 +28,8 @@ import { updateTrain } from './train';
 import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
 import { updateHenCalls } from './secrets';
 import { forageHints } from './lisiere';
+import { boardHints, updateBoard } from './annonces';
+import { updateGifts } from './catalogue';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -128,6 +132,7 @@ export function step(sim: Sim, input: StepInput): void {
     if (placed !== null) {
       if (placed.construction !== null) completeConstruction(sim, placed.construction);
       loadPlaced(sim, placed);
+      roomBeamPlaced(sim, placed);
       if (placed.purpose === 'handcar') clearHandcarSpot(sim);
       for (const c of world.characters) c.heartToday.gesture = true;
       world.session.togetherMoments += 1;
@@ -141,26 +146,33 @@ export function step(sim: Sim, input: StepInput): void {
       updateFishing(sim, c);
     }
     updateConstructions(sim, controls, dt);
+    updateRoomWork(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
   updateHolds(sim);
   updateSeats(sim);
   updateVillagers(sim, dt);
+  for (const v of world.villagers) updateVillagerInside(sim, v);
   wanderHens(sim, dt);
   updateTrain(sim, dt);
   updateAbsence(sim);
+  const minutesBefore = world.clock.minutes;
   updateClock(sim, dt);
+  updateNeeds(sim, minutesBefore);
   updateMoments(sim);
   updateHenCalls(sim);
 
   autoStartScenes(sim);
   pumpScripts(sim);
   updateQuests(sim);
+  updateBoard(sim);
+  updateGifts(sim);
   if (world.phase === 'day') {
     updateStays(sim, stayPointsOf(sim), dt);
     updateEnvies(sim);
     nearHints(sim);
     forageHints(sim);
+    boardHints(sim);
   }
   for (const c of world.characters) {
     updatePlacement(sim, c);

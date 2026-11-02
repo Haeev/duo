@@ -50,6 +50,11 @@ export interface MapProp {
  * Petit objet accroché à un objet de la carte (`accroches` de la carte: nichoir, chicot, pieu): sans
  * emprise ni collision, posé par le rendu sur son support.
  */
+export interface MapImprovement extends MapProp {
+  /** Cases occupées une fois bâti (vide: sans emprise au sol). */
+  cells: Cell[];
+}
+
 export interface MapHook {
   id: string;
   model: string;
@@ -63,6 +68,107 @@ export interface MapHook {
   tiltDeg: number;
   /** Échelle du modèle (le pieu allongé jusqu'au lit de la rivière), 1 sinon. */
   scale: number;
+}
+
+/**
+ * Bâtiment visitable (ADR 0016): `interieurs[].id` de la carte. Une chaîne et non une liste fermée:
+ * ajouter un intérieur ne demande que des données. Ceux de la carte du tour 10: `house`
+ * (la maisonnette), `grocery` (l'épicerie-pension d'Odette), `salon` (la mercerie-coiffure de Solange).
+ */
+export type BuildingId = string;
+
+/** La maisonnette des joueurs, toujours présente (« chez soi »: aménagement, coucher, minuit). */
+export const HOUSE_BUILDING: BuildingId = 'house';
+
+/** Côté d'un mur ou d'une fenêtre (convention de la carte: `nord`, `est`, `sud`, `ouest`). */
+export type WallSide = 'north' | 'east' | 'south' | 'west';
+
+/** Ce qu'il faut savoir d'une pièce à bâtir (tour 10, section 4: cellier et chambre). */
+export interface MapRoomBuild {
+  /** Identifiant de la pièce dans `donnees/pieces.json` (`room_cellar`, `room_bedroom`), clé de `WorldState.rooms`. */
+  room: string;
+  /** Emprise du chantier, murs compris, sans le mur commun (bloquée une fois bâtie, sauf la pièce et sa porte). */
+  footprint: Rect;
+  /** Mur partagé avec la pièce d'où l'on entre. */
+  sharedWall: WallSide;
+  /** Porte percée à la place d'une fenêtre, et la pièce d'où l'on entre. */
+  door: { cell: Cell; from: string };
+  /** Point du chantier (panneau et caisse). */
+  site: PointId;
+  /** Places des étagères hautes (cellier), vide sinon. */
+  shelves: Rect[];
+  /** Fenêtres de la pièce une fois bâtie (chambre), vide sinon. */
+  windows: WallSide[];
+}
+
+/** Une pièce d'un bâtiment visitable: rectangle de cases franchissables, dans l'emprise. */
+export interface MapRoom {
+  id: string;
+  /** Nom lisible (documentation de la carte, pas un texte du jeu). */
+  name: string;
+  rect: Rect;
+  /** Pièce à bâtir, comptée seulement une fois bâtie; `null`: toujours là. */
+  build: MapRoomBuild | null;
+}
+
+/** Porte d'un bâtiment visitable, sur son pourtour. */
+export interface MapDoor {
+  id: string;
+  /** Case de la porte (franchissable, sauf porte fermée par la couche dynamique, lot L3). */
+  cell: Cell;
+  /** Case libre du dehors, juste devant. */
+  outside: Cell;
+  /** Point de la carte devant la porte (`house_door`, `grocery_door`, `salon_door`). */
+  point: PointId;
+}
+
+/** Mobilier fixe d'un intérieur (comptoir, fauteuil, banc d'attente): cases déjà bloquées dans `blocked`. */
+export interface MapFixture {
+  id: string;
+  cells: Cell[];
+  rotation: number;
+}
+
+export interface MapBuilding {
+  id: BuildingId;
+  /** Objet de la carte qui le porte (`gatekeeper_house`, `ferrand_shop`, `salon_shop`). */
+  prop: string;
+  name: string;
+  /** Pièces, la principale en premier; les pièces à bâtir à la suite. */
+  rooms: MapRoom[];
+  /** Parties où l'on n'entre pas (salle à manger de la pension), pour le rendu. */
+  closedParts: { id: string; rect: Rect }[];
+  /** Au moins une porte. */
+  doors: MapDoor[];
+  /** Point d'apparition dedans (retour de minuit pour la maisonnette), dans une pièce toujours là. */
+  spawn: Vec2;
+  spawnPoint: PointId;
+  /** Clé de premier niveau de `reglages.json` qui donne les heures (`grocer`, `salon`); `null`: toujours ouvert. */
+  hours: string | null;
+  /** Ambiance sonore de l'intérieur (`room-tone-shop`, `room-tone-salon`); `null`: aucune. */
+  ambience: string | null;
+  fixtures: MapFixture[];
+}
+
+/** Le lit du ru de la Côte (tour 10): colonnes d'eau vive, du nord au sud. */
+export interface MapStream {
+  columns: number[];
+  fromY: number;
+  toY: number;
+}
+
+export type CrossingKind = 'culvert' | 'bridge' | 'footbridge' | 'ford';
+
+/** Passage sur le ru (ponceau, pont, passerelle, gué de pierres), posé par le rendu. */
+export interface MapCrossing {
+  id: string;
+  kind: CrossingKind;
+  /** Ce qu'il franchit (`ru`). */
+  crosses: string;
+  rect: Rect;
+  model: string;
+  /** Largeur utile en mètres, `null` si la carte ne la donne pas. */
+  widthM: number | null;
 }
 
 export interface GameMap {
@@ -86,6 +192,19 @@ export interface GameMap {
   hooks: MapHook[];
   /** Zones nommées (`garden`, `forest_edge`, `quay`, `square`, `river`...). */
   zones: Record<string, Rect>;
+  /**
+   * Bâtiments visitables (ADR 0016), par identifiant; `house` toujours présent. Intérieurs sur la
+   * carte, à leur place: aucune géométrie ne passe sur le réseau.
+   */
+  buildings: Record<BuildingId, MapBuilding>;
+  /** Le ru de la Côte, `null` sur une carte qui n'en a pas (carte de secours). */
+  stream: MapStream | null;
+  /** Passages du ru (`ouvrages`), vide sans ru. */
+  crossings: MapCrossing[];
+  /**
+   * La maisonnette, lue depuis `buildings.house` (pièce principale, première porte, apparition),
+   * gardée le temps de migrer ses lecteurs (lot L3).
+   */
   house: {
     /** Pièce jouable de la maisonnette (5x4 cases). */
     room: Rect;
@@ -100,6 +219,16 @@ export interface GameMap {
   props: MapProp[];
   /** Meubles déjà posés au début (paillasses, coffre, réchaud): coin nord-ouest et quarts de tour. */
   startFurniture: { item: string; cell: Cell; rotation: number }[];
+  /**
+   * Sièges sans modèle (tour 9: le bord du ponton): des bancs où s'asseoir, sans objet dessiné ni
+   * emprise. Absent: aucun.
+   */
+  seats?: MapProp[];
+  /**
+   * Chantiers (tour 9), par identifiant de `chantiers.json`: le modèle posé une fois bâti, sa place,
+   * ses cases (qui bloquent alors le passage). Rien n'est posé ni bloqué avant. Absent: aucun.
+   */
+  improvements?: Record<string, MapImprovement>;
 }
 
 /** Index d'une case dans les tableaux `ground` et `blocked`. */
@@ -115,4 +244,25 @@ export function inMap(map: GameMap, cx: number, cy: number): boolean {
 /** Vrai si le point est dans le rectangle. */
 export function inRect(rect: Rect, x: number, y: number): boolean {
   return x >= rect.x && y >= rect.y && x < rect.x + rect.w && y < rect.y + rect.h;
+}
+
+/**
+ * Bâtiment visitable dont une pièce contient le point, ou `null` dehors. Une pièce à bâtir ne compte
+ * qu'une fois bâtie (`rooms`: `WorldState.rooms`). Une dizaine de rectangles, sans allocation.
+ */
+export function buildingAt(
+  map: GameMap,
+  rooms: Readonly<Record<string, { readonly builtDay: number | null } | undefined>>,
+  x: number,
+  y: number,
+): BuildingId | null {
+  for (const id in map.buildings) {
+    const b = map.buildings[id];
+    if (b === undefined) continue;
+    for (const room of b.rooms) {
+      if (room.build !== null && (rooms[room.build.room]?.builtDay ?? null) === null) continue;
+      if (inRect(room.rect, x, y)) return id;
+    }
+  }
+  return null;
 }

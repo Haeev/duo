@@ -54,6 +54,8 @@ import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 import { GlowwormLights } from './vers-luisants';
+import { StarReflections } from './etoiles';
+import { CHARACTERS_FILE } from './modeles';
 
 const FAUNA_FILE = 'faune.glb';
 /** Clips de `faune.glb` joués une fois (figés sur leur dernière pose), d'après la fiche de l'artiste. */
@@ -80,6 +82,10 @@ const ONCE_CLIPS: ReadonlySet<string> = new Set([
   'kf_dive',
   'kf_beat',
   'kf_swallow',
+  // Tour 9 (fiche de l'artiste): la dame blanche plonge, se pose, tourne la tête et la garde tournée.
+  'owl_strike',
+  'owl_land',
+  'owl_look',
 ]);
 /**
  * Pseudo-clips des données joués figés: le faon couché dans l'herbe haute (`fawn_bed`) est la
@@ -87,9 +93,20 @@ const ONCE_CLIPS: ReadonlySet<string> = new Set([
  */
 const STILL_CLIPS: ReadonlyMap<string, readonly [string, number]> = new Map([['fawn_bed', ['fawn_rustle', 0]]]);
 /** Prises du bec (mousse de la mésange, ablette du martin-pêcheur), d'après les extras `beak_socket`. */
-const BEAK_SOCKETS = ['socket_blue_tit_beak', 'socket_kingfisher_beak'] as const;
+const BEAK_SOCKETS = ['socket_blue_tit_beak', 'socket_kingfisher_beak', 'socket_barn_owl_beak'] as const;
 /** Porté par tout le repère de la prise (l'ablette suit la tête qui frappe), pas seulement sa position. */
 const CARRIED_WHOLE: ReadonlySet<string> = new Set(['small_fish']);
+/** Équipage du train (tour 9): bustes de `personnages.glb`, posés dans la cabine du train. */
+const CREW_MODELS: ReadonlySet<string> = new Set(RENDER_SETTINGS.salute.crewModels);
+const CHARACTER_RIG = 'rig';
+/** Dame blanche (tour 9): elle quadrille le pré pendant l'attente, tourne la tête vers les joueurs. */
+const OWL_MODEL = 'barn_owl';
+const OWL_LOOK = 'owl_look';
+/** Clips où la dame blanche est posée sur le rocher (pattes au dessus du rocher dessiné). */
+const OWL_PERCHED: ReadonlySet<string> = new Set(['owl_land', 'owl_look', 'owl_perch']);
+const ROCK_MODEL = 'rock';
+const OWL_ACTOR = 'barn_owl';
+const OWL_SPEED = 2.2;
 /** Brume de l'Aubrune: effet procédural (`brume.ts`). */
 const MIST_MODEL = 'mist_bank';
 /** Martin-pêcheur timide: il file au ras de l'eau (s), à cette hauteur au-dessus de l'eau (m), puis disparaît. */
@@ -317,6 +334,8 @@ interface MomentScene {
   arrive: Map<string, Track>;
   glow: GlowwormLights | null;
   mist: MistBank | null;
+  /** Reflets des étoiles sur l'eau (tour 9, `falling_stars`). */
+  stars: StarReflections | null;
 }
 
 /** Hachage stable vers [0, 1[ (attentes des bêtes, mêmes tirages d'une image à l'autre). */
@@ -367,6 +386,18 @@ export class MomentsPart implements EventfulPart {
   private nestBottom: Vector3 | null = null;
   private readonly reachPoint = new Vector3();
   private readonly reachTarget: HandReach = { x: 0, y: 0, z: 0, weight: 0 };
+  /** Clips du squelette des personnages (l'équipage du train). */
+  private readonly characterClips = new Map<string, AnimationClip>();
+  /** Volants des manivelles du passage à niveau (accroches de la carte). */
+  private readonly crankWheels: Object3D[] = [];
+  /** Décalage du train depuis son arrêt à cette image (`voie.ts`), `NaN` quand il n'est pas là. */
+  private trainProbe: () => number = () => Number.NaN;
+
+  /** L'équipage du salut se tient dans la cabine: le décalage du train vient de `RailwayPart`. */
+  setTrainProbe(probe: () => number): void {
+    this.trainProbe = probe;
+  }
+
   /** Dernière pose imposée par une chorégraphie (habitant, position, hauteur, image), lue par le moteur. */
   private readonly directed = { villager: '', x: 0, y: 0, z: 0, time: Number.NaN };
 
@@ -387,6 +418,9 @@ export class MomentsPart implements EventfulPart {
     for (const clip of library.animations(FAUNA_FILE)) {
       this.clips.set(clip.name, clip);
     }
+    for (const clip of library.animations(CHARACTERS_FILE)) {
+      this.characterClips.set(clip.name, clip);
+    }
     const rungExtra = library.extras(LADDER_MODEL).rung_step;
     this.rung = typeof rungExtra === 'number' && rungExtra > 0 ? rungExtra : DEFAULT_RUNG;
     for (const hook of map.hooks) {
@@ -404,6 +438,8 @@ export class MomentsPart implements EventfulPart {
       const entry = { hook, object };
       this.hooks.push(entry);
       if (hook.model === NEST_MODEL) this.nest = entry;
+      const wheel = hook.model === RENDER_SETTINGS.salute.crankModel ? object.getObjectByName(RENDER_SETTINGS.salute.crankWheel) : undefined;
+      if (wheel !== undefined) this.crankWheels.push(wheel);
     }
     characters.setVillagerDirector((villager, context) => this.direct(villager, context));
   }
@@ -447,6 +483,8 @@ export class MomentsPart implements EventfulPart {
     const views: ActorView[] = [];
     let glow: GlowwormLights | null = null;
     let mist: MistBank | null = null;
+    const stars = typeof def.render.reflection === 'object' && def.render.reflection !== null ? new StarReflections(def, this.terrain, world.seed, this.resources) : null;
+    if (stars !== null) group.add(stars.mesh);
     for (const actor of def.actors) {
       if (actor.villager !== null || actor.model === NEST_MODEL) continue;
       if (actor.model === MIST_MODEL) {
@@ -460,9 +498,11 @@ export class MomentsPart implements EventfulPart {
         continue;
       }
       for (let member = 0; member < Math.max(1, actor.count); member += 1) {
-        const animal = this.library.cloneAnimal(actor.model);
+        // L'équipage du train: des bustes sur le squelette des personnages, avec leurs clips.
+        const crew = CREW_MODELS.has(actor.model) ? this.library.cloneRig(CHARACTER_RIG, [actor.model]) : null;
+        const animal = crew ?? this.library.cloneAnimal(actor.model);
         const model = animal ?? this.library.instantiate(actor.model);
-        const view = new ActorView(actor, member, model, this.clips, animal !== null);
+        const view = new ActorView(actor, member, model, crew !== null ? this.characterClips : this.clips, animal !== null);
         views.push(view);
         group.add(view.root);
       }
@@ -490,6 +530,7 @@ export class MomentsPart implements EventfulPart {
       arrive,
       glow,
       mist,
+      stars,
     };
     this.scenes.set(def.id, scene);
     this.group.add(group);
@@ -522,12 +563,18 @@ export class MomentsPart implements EventfulPart {
       if (current?.def.id === scene.def.id) continue;
       for (const view of scene.views) view.hide();
       scene.glow?.update({ phase: 'off', t: 0 }, context.time, context.dt, context.reducedMotion);
+      scene.stars?.update({ phase: 'off', t: 0 }, context.time, context.dt, context.reducedMotion, context.night);
       scene.mist?.update({ phase: 'off', t: 0 }, context.time, context.reducedMotion, this.lit, this.shade, this.lightView, this.gradeColor, 0);
     }
+    this.updateCranks(current?.def ?? null, current?.today ?? null, context);
     if (current === null) return;
     const { def, today } = current;
     const scene = this.scene(def, world);
     const t = this.phaseTime(today, context);
+    if (scene.stars !== null) {
+      const phase = today.phase === 'waiting' || today.phase === 'climax' ? today.phase : 'off';
+      scene.stars.update({ phase, t }, context.time, context.dt, context.reducedMotion, context.night);
+    }
     if (scene.glow !== null) {
       const phase = today.phase === 'waiting' || today.phase === 'climax' || today.phase === 'after' ? today.phase : 'off';
       scene.glow.update({ phase, t }, context.time, context.dt, context.reducedMotion);
@@ -541,6 +588,22 @@ export class MomentsPart implements EventfulPart {
     for (const view of scene.views) {
       this.updateView(scene, view, today, t, context);
     }
+  }
+
+  /**
+   * Volants des manivelles du passage à niveau (salut du mécanicien): ils tournent pendant la
+   * descente des lisses (`arm.seconds` depuis `armedTick`), au rythme des joueurs (`crank_turn`).
+   */
+  private updateCranks(def: MomentDef | null, today: DeepReadonly<MomentToday> | null, context: FrameContext): void {
+    if (this.crankWheels.length === 0) return;
+    const arm = def?.watch.arm ?? null;
+    const armedTick = today?.armedTick ?? null;
+    let angle = 0;
+    if (arm !== null && armedTick !== null) {
+      const since = Math.min(arm.seconds, Math.max(0, (context.world.tick - armedTick + context.alpha) / SIM_HZ));
+      angle = (since / RENDER_SETTINGS.salute.crankTurnSeconds) * Math.PI * 2;
+    }
+    for (const wheel of this.crankWheels) wheel.rotation.z = angle;
   }
 
   /** Lumière des bouffées (brume, gerbes): soleil et ciel de l'heure, direction vue de la caméra. */
@@ -649,6 +712,8 @@ export class MomentsPart implements EventfulPart {
         break;
       }
     }
+    if (CREW_MODELS.has(actor.model)) this.crewFrame(scene, view, today, t);
+    if (actor.model === OWL_MODEL) this.owlFrame(scene, today, t, context);
     if (f.clip === HIDDEN || f.clip === INSIDE) f.visible = false;
     if (f.clip === TIT_ENTER && f.clipTime > ENTER_SECONDS) f.visible = false;
     if (!f.visible) {
@@ -688,6 +753,78 @@ export class MomentsPart implements EventfulPart {
     view.pose(f.clip, f.clipTime, context.dt);
     if (actor.model === LADDER_MODEL) this.shakeLadder(scene, view, today, t, context);
     if (actor.model === KINGFISHER_MODEL) this.kingfisherEffects(scene, view, f, context);
+  }
+
+  /**
+   * L'équipage du salut (tour 9): toujours dans la cabine du train, à sa place dans la piste de
+   * l'apogée (les fenêtres de la cabine), décalé comme le train; caché quand le train n'est pas là.
+   * Pendant l'attente, accoudé (`driver_lean`); à l'apogée, les clips de la chorégraphie.
+   */
+  private crewFrame(scene: MomentScene, view: ActorView, today: DeepReadonly<MomentToday>, t: number): void {
+    const f = this.frame;
+    const offset = this.trainProbe();
+    const track = scene.climax.get(view.actor.id);
+    const first = track?.points[0];
+    if (Number.isNaN(offset) || first === undefined || track === undefined) {
+      f.visible = false;
+      return;
+    }
+    f.x = first.x + offset;
+    f.y = first.y;
+    // Racine au plancher de la cabine (fiche de l'artiste): à 1,6 m (données), les bustes
+    // dépassaient du toit de la cabine.
+    f.z = RENDER_SETTINGS.salute.crewRootZ;
+    f.facing = view.actor.facing;
+    f.visible = true;
+    if (today.phase === 'climax') {
+      sampleResolved(track.frames, track.points, t, this.sample);
+      const clip = this.sample.clip;
+      // `train_depart` n'est pas un clip: l'équipage reste accoudé jusqu'au salut.
+      f.clip = clip !== null && this.characterClips.has(clip) ? clip : view.actor.idle;
+      f.clipTime = t - this.sample.clipSince;
+    } else {
+      f.clip = view.actor.idle;
+    }
+  }
+
+  /**
+   * La dame blanche (tour 9, section 4.3): pendant l'attente, elle quadrille le pré en boucles
+   * lentes autour de l'ancre (`quarterRadius`, entre les hauteurs de `quarterHeight`), sans se
+   * poser; à `owl_look`, son corps se tourne pour que sa tête (tournée de `lookTurnDeg` vers sa
+   * gauche) regarde les deux joueurs.
+   */
+  private owlFrame(scene: MomentScene, today: DeepReadonly<MomentToday>, t: number, context: FrameContext): void {
+    const f = this.frame;
+    const def = scene.def;
+    if (today.phase === 'waiting') {
+      const anchor = this.map.points[def.anchor] ?? { x: f.x, y: f.y };
+      const radius = typeof def.render.quarterRadius === 'number' ? def.render.quarterRadius : 3;
+      const heights = Array.isArray(def.render.quarterHeight) ? (def.render.quarterHeight as unknown[]) : [];
+      const low = typeof heights[0] === 'number' ? heights[0] : 2.5;
+      const high = typeof heights[1] === 'number' ? heights[1] : 3;
+      // Une boucle en huit allongé: elle passe et repasse au-dessus du pré, jamais immobile.
+      const a = (t * OWL_SPEED) / radius;
+      f.x = anchor.x + Math.sin(a) * radius;
+      f.y = anchor.y + Math.sin(a * 2) * radius * 0.45;
+      f.z = low + (high - low) * (0.5 + 0.5 * Math.sin(a * 0.7));
+      f.facing = Math.atan2(Math.cos(a * 2) * 2 * radius * 0.45, Math.cos(a) * radius);
+      f.clipTime = context.time;
+      return;
+    }
+    // Posée: les pattes sur le dessus du rocher dessiné (la chorégraphie dit 0,8 m, le rocher du pré
+    // en fait 0,3 à 0,5 selon sa variante: elle ne flotte pas au-dessus). L'écart est rattrapé en
+    // douceur depuis l'image clé d'avant la pose et rendu jusqu'à celle d'après l'envol.
+    const track = today.phase === 'climax' ? scene.climax.get(OWL_ACTOR) : undefined;
+    if (track !== undefined) this.perchOffset(track, t, f);
+    if (today.phase === 'climax' && f.clip === OWL_LOOK) {
+      const [a, b] = context.world.characters;
+      if (a === undefined || b === undefined) return;
+      const mx = (a.pos.x + b.pos.x) / 2;
+      const my = (a.pos.y + b.pos.y) / 2;
+      const turn = (typeof def.render.lookTurnDeg === 'number' ? def.render.lookTurnDeg : 120) * DEGREE;
+      // La tête tourne vers la gauche de l'oiseau: le corps regarde d'autant à droite des joueurs.
+      f.facing = Math.atan2(my - f.y, mx - f.x) + turn;
+    }
   }
 
   /** Traînée bleue au ras de l'eau et éclats de l'ablette frappée contre le pieu. */
@@ -1125,6 +1262,51 @@ export class MomentsPart implements EventfulPart {
     return this.terrain.heightAt(x, y);
   }
 
+  /** Dessus (m au-dessus du sol) du rocher de la carte sous ce point, ou `null` (lu une fois par rocher). */
+  private perchTop(x: number, y: number): number | null {
+    const prop = this.map.props.find((p) => p.model === ROCK_MODEL && p.rect !== null && x >= p.rect.x && x < p.rect.x + p.rect.w && y >= p.rect.y && y < p.rect.y + p.rect.h);
+    if (prop === undefined) return null;
+    let top = this.perchTops.get(prop.id);
+    if (top === undefined) {
+      const box = new Box3();
+      for (const part of this.library.parts(prop.model, {}, prop.id)) {
+        part.geometry.computeBoundingBox();
+        const local = part.geometry.boundingBox;
+        if (local !== null) box.union(local.clone().applyMatrix4(part.matrix));
+      }
+      top = box.isEmpty() ? 0 : box.max.y;
+      this.perchTops.set(prop.id, top);
+    }
+    return top;
+  }
+
+  private readonly perchTops = new Map<string, number>();
+
+  /** Abaisse la dame blanche posée sur son rocher (voir `owlFrame`), avec des rampes aux images voisines. */
+  private perchOffset(track: Track, t: number, f: ActorFrame): void {
+    let first = -1;
+    let last = -1;
+    track.frames.forEach((frame, index) => {
+      if (frame[4] !== null && OWL_PERCHED.has(frame[4])) {
+        if (first < 0) first = index;
+        last = index;
+      }
+    });
+    const start = track.frames[first];
+    const end = track.frames[last];
+    const point = track.points[first];
+    if (start === undefined || end === undefined || point === undefined) return;
+    const top = this.perchTop(point.x, point.y);
+    if (top === null) return;
+    const before = track.frames[first - 1]?.[0] ?? start[0];
+    const after = track.frames[last + 1]?.[0] ?? end[0];
+    let weight = 0;
+    if (t >= start[0] && t <= end[0]) weight = 1;
+    else if (t > before && t < start[0]) weight = (t - before) / (start[0] - before);
+    else if (t > end[0] && t < after) weight = 1 - (t - end[0]) / (after - end[0]);
+    f.z -= (point.z - top) * weight;
+  }
+
   /** L'échelle vibre de 1 cm pendant que Basile grimpe. */
   private shakeLadder(scene: MomentScene, view: ActorView, today: DeepReadonly<MomentToday>, t: number, context: FrameContext): void {
     if (today.phase !== 'climax' || today.paused || context.reducedMotion) return;
@@ -1270,6 +1452,7 @@ export class MomentsPart implements EventfulPart {
       for (const view of scene.views) view.dispose();
       scene.glow?.dispose();
       scene.mist?.dispose();
+      scene.stars?.dispose();
     }
     this.splashes.dispose();
     this.scenes.clear();

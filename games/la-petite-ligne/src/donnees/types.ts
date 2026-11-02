@@ -3,6 +3,16 @@
  * `donnees/contenu.ts`. Les noms de champs suivent les fichiers JSON.
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
+import type {
+  AppearanceSettings,
+  BakerySettings,
+  GrocerSettings,
+  HomeContent,
+  RoomsSettings,
+  SalonSettings,
+  SoftNeedsSettings,
+  StorageSettings,
+} from './maison';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -79,6 +89,10 @@ export type Condition = { label?: string } & (
    * `choice:<dialogue>:<choix>` ou `choice:<dialogue>:correct` (un choix juste).
    */
   | { type: 'choice_made'; key: string; count: number; since: Since; who: Who }
+  // Tour 9: annonce au tableau en cours (de ce gabarit), chantier bâti, article du catalogue acheté
+  | { type: 'annonce_active'; gabarit: string | null; step: string | null }
+  | { type: 'improvement_built'; id: string }
+  | { type: 'bought'; item: string }
 );
 
 export type Effect =
@@ -119,9 +133,27 @@ export type ItemCategory =
   | 'quest'
   | 'fish'
   | 'decoration'
-  | 'furniture';
+  | 'furniture'
+  /** Livré en animal (une poule commandée au catalogue, tour 9). */
+  | 'animal_order'
+  /** Cadeau pour un habitant (rayon « Pour offrir », tour 9). */
+  | 'gift';
 
 export type DishKind = 'bread' | 'simple' | 'stew';
+
+/** Verbe d'un outil (tour 9, section 2.4): un outil amélioré garde celui de l'outil de départ. */
+export type ToolKind = 'hoe' | 'watering_can' | 'axe' | 'fishing_rod';
+
+/** Valeurs propres d'un outil (`null`: celles des réglages, comme l'outil de départ). */
+export interface ToolStats {
+  toolKind: ToolKind;
+  /** Coups pour abattre un arbre (hache). */
+  chops: number | null;
+  /** Attente avant la touche multipliée par ce facteur (canne). */
+  biteWaitFactor: number | null;
+  /** Fenêtre pour ferrer, en secondes (canne). */
+  hookWindowSeconds: number | null;
+}
 
 export interface ItemDef {
   id: string;
@@ -160,6 +192,8 @@ export interface ItemDef {
   light: boolean;
   /** Se porte à deux (la poutre). */
   carriedByTwo: boolean;
+  /** Outil (tour 9): son verbe et ses valeurs, ou `null` pour un objet qui n'en est pas un. */
+  tool: ToolStats | null;
 }
 
 export interface RecipeDef {
@@ -361,6 +395,16 @@ export interface MomentWatch {
   opposite: { axis: 'x' | 'y'; at: number; gap: number } | null;
   /** « Un, deux, trois, soleil » (la chevrette): le compteur ne tourne que pendant un regard. */
   freeze: MomentFreeze | null;
+  /** Tour 9 (la dame blanche): les deux joueurs à au plus cette distance l'un de l'autre (m), ou `null`. */
+  closeTogether: number | null;
+  /** Tour 9 (les lanternes): deux allumages, un à chaque place, à moins de `gapSeconds` l'un de l'autre. */
+  syncPress: { places: string[]; gapSeconds: number } | null;
+  /**
+   * Tour 9 (le salut du mécanicien): les places tenues `holdSeconds` arment le moment (`seconds` de
+   * descente des lisses, cases `cells` fermées, joueur poussé vers `pushToward`), puis l'apogée part
+   * à l'heure `climaxAt`.
+   */
+  arm: { seconds: number; climaxAt: number; liftAt: number; cells: { x: number; y: number; w: number; h: number }; pushToward: [number, number] } | null;
 }
 
 /**
@@ -465,6 +509,8 @@ export interface MomentDef {
   maxPerSeason: number | null;
   /** Fenêtre propre en jours (`null`: `moments.cooldownDays`, puis `cooldownDaysLong`). */
   cooldownDays: number | null;
+  /** Fenêtre propre à partir de `moments.longFromDay` (tour 9: le héron et le renard), sinon la règle commune. */
+  longCooldownDays: number | null;
   /** `only`: seulement les jours du train (le salut du mécanicien); `never`: jamais ces jours-là. */
   trainDays: 'never' | 'only';
   availableWhen: Condition[];
@@ -533,7 +579,9 @@ export type HintTrigger =
   /** Tour 8: une cueillette posée à moins de 6 m (`forage_hint`). */
   | { on: 'near_forage' }
   /** Tour 8: on vise un rejet ou un jeune sapin (`sapling_hint`). */
-  | { on: 'aim_sapling' };
+  | { on: 'aim_sapling' }
+  /** Tour 9: une annonce au tableau, à moins de 6 m du tableau du quai (`board_hint`). */
+  | { on: 'near_board_annonce' };
 
 export interface HintDef {
   id: string;
@@ -578,7 +626,7 @@ export interface OrderDef {
 }
 
 /** Étapes de la partie (tour 8, section 1.1). */
-export type StageId = 'demo' | 'summer_end';
+export type StageId = 'demo' | 'summer_end' | 'autumn_end';
 export interface StageDef {
   id: StageId;
   day: number;
@@ -587,6 +635,9 @@ export interface StageDef {
   /** Bloc de `textes.stages`. */
   texts: StageId;
 }
+/** Rythme de la journée (R14): vif (l'ancienne journée), normal, paisible. */
+export type ClockPace = 'vif' | 'normal' | 'paisible';
+
 /** Rythme de l'horloge à partir d'un jour (D1), appliqué à l'aube. */
 export interface ClockStep {
   fromDay: number;
@@ -649,6 +700,19 @@ export interface GeneratedOrderSettings {
   paymentPerWorkWeek: number;
   noSharedBase: Record<string, readonly string[]>;
   products: readonly OrderProduct[];
+  /** Tour 9 (section 2.11): coût d'un poisson selon la saison de la commande, tiré des poids des poissons. */
+  fishCostFromWeights: boolean;
+  fishCostReferenceSeason: Season;
+  /** Quantités arrondies au rendement d'une case (radis, carottes). */
+  roundTo: Record<string, number>;
+  /** Plafond de chaque ligne. */
+  lineMax: Record<string, number>;
+  /** Part perdue au plafond au-delà de laquelle la commande gagne une ligne (`null`: jamais). */
+  extraLineMinShare: number | null;
+  /** Lignes au plus d'une commande (ligne ajoutée comprise). */
+  maxLines: number;
+  /** Œufs d'une poule par semaine de commande (la capacité suit le nombre de poules); `null`: `resources.eggs`. */
+  eggsPerHenPerWeek: number | null;
 }
 export interface ForagePoint {
   point: string;
@@ -657,6 +721,8 @@ export interface ForagePoint {
 export interface ForageItem {
   item: string;
   seasons: readonly Season[];
+  /** Jours de saison où elle pousse (tour 9, le sureau: 1 à 14), `null`: toute la saison. */
+  days: readonly [number, number] | null;
   weight: number;
   count: readonly [number, number];
 }
@@ -665,7 +731,8 @@ export interface ForageSettings {
   fromDay: number;
   spawnChance: number;
   unseenFactor: number;
-  rainBoost: { item: string; factor: number } | null;
+  /** Coups de pouce du lendemain de pluie (girolles, cèpes). */
+  rainBoost: readonly { item: string; factor: number }[];
   points: readonly ForagePoint[];
   items: readonly ForageItem[];
 }
@@ -725,6 +792,9 @@ export interface Settings {
     secondsPerGameMinute: number;
     /** Rythme par jour (D1), dans l'ordre des jours. */
     schedule: ClockStep[];
+    /** Rythme choisi (R14): multiplie les secondes par minute de jeu de `schedule` par `paces[pace]`. */
+    pace: ClockPace;
+    paces: Record<ClockPace, number>;
     dayStart: number;
     dayEnd: number;
     veilleeFrom: number;
@@ -768,7 +838,11 @@ export interface Settings {
   trees: TreeSettings;
   /** Cueillette (tour 8), ou `null`. */
   forage: ForageSettings | null;
-  hens: { eggsPerHenPerDay: number; feedRequired: boolean };
+  hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number };
+  /** Tableau des annonces (tour 9, section 1); `null`: pas de tableau. */
+  board: BoardSettings | null;
+  /** Chantiers (tour 9, section 2.6); `null`: pas de chantiers. */
+  improvements: ImprovementSettings | null;
   endurance: {
     base: number;
     perFormPoint: number;
@@ -783,7 +857,18 @@ export interface Settings {
     heart: { base: number; envie: number; sharedEnvie: number; ateTogether: number; gestureTogether: number; max: number };
     formWeights: { belly: number; sleep: number; heart: number };
     formLevels: { level: string; below: number }[];
+    /** Tour 10 (section 3): besoins doux, lus sous les mêmes clés de `reglages.needs`. */
+    soft: SoftNeedsSettings;
   };
+  /** Tour 10 (section 4): pièces à bâtir; `null`: aucune. */
+  rooms: RoomsSettings | null;
+  /** Tour 10 (section 5): rangement à cases et râtelier; `null`: coffre sans limite, comme avant. */
+  storage: StorageSettings | null;
+  /** Tour 10 (sections 1.5, 1.6, 2): fournil, salon, épicerie et apparence (règles du lot L3). */
+  bakery: BakerySettings | null;
+  salon: SalonSettings | null;
+  grocer: GrocerSettings | null;
+  appearance: AppearanceSettings | null;
   movement: { walkSpeed: number; carrySpeedTogether: number; carrySpeedOneMoving: number };
   ranges: {
     action: number;
@@ -827,6 +912,14 @@ export interface Settings {
   benches: BenchSettings;
   fishing: {
     castRange: number;
+    /**
+     * Distance visée du lancer (m, retour R09 du 2026-11-01): le bouchon se pose aussi loin
+     * dans l'eau, sans dépasser la rive d'en face (marge `castShoreMargin`); à défaut, au
+     * premier point d'eau. Sans valeur: le premier point d'eau (avant R09).
+     */
+    castDistance: number | null;
+    /** Distance gardée entre le bouchon et la fin de l'eau sur la ligne du lancer (m). */
+    castShoreMargin: number;
     biteWaitSeconds: [number, number];
     hookWindowSeconds: number;
     /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */
@@ -840,6 +933,38 @@ export interface Settings {
   memories: MemorySettings;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
+}
+
+export interface BoardSettings {
+  fromDay: number;
+  /** Affiches: jour de la semaine (index de `weekdayOf`, 0 samedi) et sorte. */
+  post: readonly { weekday: number; kind: AnnonceKind }[];
+  postTime: number;
+  /** Jours de l'annonce, jour de l'affiche compris (échéance à `deadlineTime` du dernier). */
+  deadlineDays: number;
+  deadlineTime: number;
+  noRepeatDays: number;
+  weights: { neverPosted: number; sameGiver: number };
+  reward: Record<AnnonceKind, AnnonceReward>;
+  keepDone: number;
+}
+
+/** Récompense d'une annonce (section 1.4): facteur x valeur + ajout, arrondi, bornée; Cœur à deux. */
+export interface AnnonceReward {
+  factor: number;
+  add: number;
+  min: number;
+  max: number;
+  round: number;
+  heart: number;
+}
+
+export interface ImprovementSettings {
+  queues: Record<ImprovementQueue, { opensFromDay: number }>;
+  /** Versements proposés au tableau (en plus de « le reste »). */
+  steps: readonly number[];
+  plankDiscount: number;
+  plankDiscountMax: number;
 }
 
 export interface MomentSettings {
@@ -947,6 +1072,61 @@ export interface FeelSettings {
   fishWeightsBySeason: Partial<Record<Season, Record<string, number>>>;
 }
 
+export type AnnonceKind = 'help' | 'together';
+
+/** Une ligne demandée par une annonce. */
+export interface AnnonceLine {
+  item: string;
+  count: number;
+}
+
+/** Gabarit d'annonce (`annonces.json`, tour 9, table 1.3). */
+export interface AnnonceDef {
+  id: string;
+  kind: AnnonceKind;
+  giver: string;
+  seasons: readonly Season[];
+  /** Jours de saison où elle peut s'afficher (`odette_elder`: 1 à 10), `null`: toute la saison. */
+  seasonDays: readonly [number, number] | null;
+  /** Variantes (une seule pour la plupart): la ligne de `odette_shelf` est tirée parmi les obtenues. */
+  variants: readonly (readonly AnnonceLine[])[];
+  /** Scène à deux qui finit l'annonce (après les dons), ou `null`. */
+  scene: string | null;
+  /** Objet unique donné la première fois (au coffre), ou `null`. */
+  unique: string | null;
+  /** Scène jouée la première fois en plus (le dessin de Jeanne), ou `null`. */
+  uniqueScene: string | null;
+}
+
+export type ImprovementQueue = 'bourg' | 'maisonnette';
+
+/** Chantier (`chantiers.json`, tour 9, table 2.6). */
+export interface ImprovementDef {
+  id: string;
+  queue: ImprovementQueue;
+  order: number;
+  price: number;
+  model: string;
+  /** Cases occupées une fois bâti (vide: sans emprise au sol, l'auvent). */
+  cells: readonly { cx: number; cy: number }[];
+  /** Cap en degrés (convention de la conception: 0 nord, 90 est, 180 sud). */
+  rotation: number;
+  /** Drapeau posé à la construction (`<id>_built`). */
+  flag: string;
+  /** Point où le chantier se paie: le tableau du quai (bourg) ou l'établi de Basile (maisonnette, planches acceptées). */
+  payAt: 'board' | 'basile';
+}
+
+/** Le catalogue de la semaine (`catalogue.json`, tour 9, section 2.3). */
+export interface CatalogueDef {
+  pages: readonly { season: Season; week: number; items: readonly string[] }[];
+  gifts: readonly { item: string; villager: string; wish: string; thanks: string; quest: string }[];
+  copies: Record<string, number>;
+  seasonal: Record<string, Season>;
+  /** Poules commandées (`hen_extra`...): nom, variante, réplique de Jeanne qui la nomme. */
+  hens: Record<string, { name: string; variant: string; naming: string }>;
+}
+
 export interface Content {
   settings: Settings;
   items: Record<string, ItemDef>;
@@ -972,4 +1152,10 @@ export interface Content {
   texts: Texts;
   /** Moments rares (`moments.json`), vide si le fichier manque. */
   moments: MomentDef[];
+  /** Tour 9: gabarits d'annonces, chantiers, catalogue de la semaine (absents: rien de tout cela). */
+  annonces: AnnonceDef[];
+  improvements: ImprovementDef[];
+  catalogue: CatalogueDef | null;
+  /** Tour 10: pièces à bâtir et fenêtres de la maisonnette (`pieces.json`), vides si le fichier manque. */
+  home: HomeContent;
 }

@@ -19,8 +19,20 @@ import {
   DEFAULT_WEATHER,
 } from './defauts';
 import { ContentError, Reader } from './lecteur';
+import {
+  EMPTY_HOME,
+  parseAppearance,
+  parseBakery,
+  parseGrocer,
+  parseHome,
+  parseRoomsSettings,
+  parseSalon,
+  parseSoftNeeds,
+  parseStorageSettings,
+} from './maison';
 import type {
   AnimalDef,
+  ClockPace,
   Condition,
   ConstructionDef,
   Content,
@@ -36,6 +48,14 @@ import type {
   HintTrigger,
   ItemCategory,
   ItemDef,
+  AnnonceDef,
+  AnnonceKind,
+  AnnonceReward,
+  CatalogueDef,
+  ImprovementDef,
+  ImprovementQueue,
+  ToolKind,
+  ToolStats,
   OrderDef,
   CatalogueWindow,
   LetterDef,
@@ -76,6 +96,12 @@ export interface RawContentFiles {
   reglages: unknown;
   /** Moments rares (tour 6); absent: aucun moment (le reste de la partie ne change pas, M-11). */
   moments?: unknown;
+  /** Tour 9: gabarits d'annonces, chantiers, catalogue de la semaine; absents: rien de tout cela. */
+  annonces?: unknown;
+  chantiers?: unknown;
+  catalogue?: unknown;
+  /** Tour 10: pièces à bâtir et fenêtres (`pieces.json`); absent: ni pièce ni fenêtre. */
+  pieces?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -99,9 +125,14 @@ const CATEGORIES: readonly ItemCategory[] = [
   'fish',
   'decoration',
   'furniture',
+  'animal_order',
+  'gift',
 ];
 const DISHES: readonly DishKind[] = ['bread', 'simple', 'stew'];
-const STAGE_IDS: readonly StageId[] = ['demo', 'summer_end'];
+const STAGE_IDS: readonly StageId[] = ['demo', 'summer_end', 'autumn_end'];
+const TOOL_KINDS: readonly ToolKind[] = ['hoe', 'watering_can', 'axe', 'fishing_rod'];
+const ANNONCE_KINDS: readonly AnnonceKind[] = ['help', 'together'];
+const QUEUES: readonly ImprovementQueue[] = ['bourg', 'maisonnette'];
 const TENDERNESS: readonly Tenderness[] = ['none', 'accomplices', 'gentle'];
 const FAMILIES: readonly OrderFamily[] = ['potager', 'basse-cour', 'cuisine', 'rivière', 'bois', 'lisière'];
 const RESOURCES: readonly OrderResource[] = ['garden', 'eggs', 'river', 'wood', 'forage'];
@@ -392,6 +423,15 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return counter(r, `picked${suffix(r, 'item')}`, since);
     case 'witnessed':
       return counter(r, `witnessed:${r.at('event').string()}`, since);
+    // Tour 9: une scène à deux d'annonce jouée (`scene:<dialogue>`).
+    case 'scene_played':
+      return counter(r, `scene:${r.at('dialogue').string()}`, since);
+    case 'annonce_active':
+      return { type, gabarit: optString(r, 'gabarit'), step: optString(r, 'step') };
+    case 'improvement_built':
+      return { type, id: r.at('id').string() };
+    case 'bought':
+      return { type, item: r.at('item').string() };
     case 'nights_passed':
       return counter(r, 'nights', since);
     default:
@@ -530,9 +570,30 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       seat: optBoolean(it, 'seat', false),
       light: optBoolean(it, 'light', false),
       carriedByTwo: optBoolean(it, 'carriedByTwo', false),
+      tool: parseTool(it, id),
     };
   }
   return items;
+}
+
+/**
+ * Outil (tour 9, section 2.4): `toolKind` écrit, sinon celui de l'outil de départ du même nom
+ * (`hoe`, `watering_can`, `axe`, `fishing_rod`); `null` pour un objet qui n'est pas un outil.
+ */
+function parseTool(it: Reader, id: string): ToolStats | null {
+  const written = it.opt('toolKind');
+  const kind = written === null ? (TOOL_KINDS as readonly string[]).includes(id) ? (id as ToolKind) : null : written.oneOf(TOOL_KINDS);
+  if (kind === null) {
+    for (const key of ['chops', 'biteWaitFactor', 'hookWindowSeconds']) if (it.has(key)) it.at(key).fail('valeur d\'outil sans « toolKind »');
+    return null;
+  }
+  const opt = (key: string): number | null => (it.has(key) ? positive(it.at(key)) : null);
+  return {
+    toolKind: kind,
+    chops: it.has('chops') ? it.at('chops').integer(1, 9) : null,
+    biteWaitFactor: opt('biteWaitFactor'),
+    hookWindowSeconds: opt('hookWindowSeconds'),
+  };
 }
 
 function stacks(r: Reader): { item: string; count: number }[] {
@@ -906,10 +967,35 @@ function watch(r: Reader): MomentWatch {
     bench: bench === null || bench.isNull() ? null : bench.string(),
     hold: hold === null || hold.isNull() ? null : hold.stringList(),
     target: optString(r, 'target') ?? 'anchor',
+    closeTogether: r.has('closeTogether') && !r.at('closeTogether').isNull() ? positive(r.at('closeTogether')) : null,
+    syncPress: parseSyncPress(r.opt('syncPress')),
+    arm: parseArm(r.opt('arm')),
   };
   if (w.minRadius > w.radius) r.at('minRadius').fail('minRadius au plus égal à radius');
   if (w.seated && w.bench === null) r.at('bench').fail('banc attendu quand « seated » est vrai');
   return w;
+}
+
+/** Allumages à deux (tour 9, les lanternes): deux places, un écart permis. */
+function parseSyncPress(r: Reader | null): MomentWatch['syncPress'] {
+  if (r === null || r.isNull()) return null;
+  const places = r.at('places').stringList();
+  if (places.length !== 2 || places[0] === places[1]) r.at('places').fail('deux places différentes attendues');
+  return { places, gapSeconds: positive(r.at('gapSeconds')) };
+}
+
+/** Armement (tour 9, le salut du mécanicien): descente des lisses, heure de l'apogée, cases fermées. */
+function parseArm(r: Reader | null): MomentWatch['arm'] {
+  if (r === null || r.isNull()) return null;
+  const cells = r.at('cells');
+  const toward = pair(r.at('pushToward'));
+  return {
+    seconds: positive(r.at('seconds')),
+    climaxAt: r.at('climaxAt').time(),
+    liftAt: positive(r.at('liftAt')),
+    cells: { x: cells.at('x').integer(0), y: cells.at('y').integer(0), w: cells.at('w').integer(1), h: cells.at('h').integer(1) },
+    pushToward: toward,
+  };
 }
 
 function span(r: Reader): { from: number; to: number } {
@@ -990,6 +1076,7 @@ function parseMoment(m: Reader): MomentDef {
     weight: m.at('weight').integer(0),
     maxPerSeason: max === null || max.isNull() ? null : max.integer(1),
     cooldownDays: m.has('cooldownDays') && !m.at('cooldownDays').isNull() ? m.at('cooldownDays').integer(1) : null,
+    longCooldownDays: m.has('longCooldownDays') && !m.at('longCooldownDays').isNull() ? m.at('longCooldownDays').integer(1) : null,
     trainDays: m.has('trainDays') ? m.at('trainDays').oneOf(['never', 'only'] as const) : 'never',
     availableWhen: conditions(m.opt('availableWhen'), 'game_start'),
     present,
@@ -1101,6 +1188,7 @@ function parseTrigger(r: Reader): HintTrigger {
     case 'letter_received':
     case 'near_forage':
     case 'aim_sapling':
+    case 'near_board_annonce':
       return { on };
     case 'near_point':
       return { on, point: r.at('point').string() };
@@ -1360,6 +1448,8 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
   if (wait.length !== 2 || min === undefined || max === undefined || min > max) return r.at('biteWaitSeconds').fail('[min, max] attendu');
   return {
     castRange: r.at('castRange').number(),
+    castDistance: r.has('castDistance') ? r.at('castDistance').number() : null,
+    castShoreMargin: r.has('castShoreMargin') ? r.at('castShoreMargin').number() : 0.5,
     biteWaitSeconds: [min, max],
     hookWindowSeconds: r.at('hookWindowSeconds').number(),
     flag: r.at('flag').string(),
@@ -1421,6 +1511,23 @@ function parseCalendar(r: Reader): Settings['calendar'] {
     seasonsPerYear: from?.has('seasonsPerYear') === true ? from.at('seasonsPerYear').integer(1) : d.seasonsPerYear,
   };
 }
+
+/** Rythme de la journée (`clock.pace`, R14); absent: normal, sans facteur. */
+function parsePace(clock: Reader): Pick<Settings['clock'], 'pace' | 'paces'> {
+  const r = clock.opt('paces');
+  const paces: Record<ClockPace, number> = { vif: 1, normal: 1, paisible: 1 };
+  if (r !== null) {
+    for (const id of CLOCK_PACES) {
+      const factor = r.at(id).number();
+      if (factor <= 0) r.at(id).fail('facteur positif attendu');
+      paces[id] = factor;
+    }
+  }
+  const pace = clock.opt('pace')?.oneOf(CLOCK_PACES) ?? 'normal';
+  return { pace, paces };
+}
+
+const CLOCK_PACES = ['vif', 'normal', 'paisible'] as const;
 
 /** Rythme par jour (`clock.schedule`, D1); absent: le rythme du jour 1 partout. */
 function parseSchedule(clock: Reader, base: number): Settings['clock']['schedule'] {
@@ -1553,6 +1660,13 @@ function parseGenerated(r: Reader | null, written: number): Settings['order']['g
     });
   if (new Set(products.map((p) => p.item)).size !== products.length) r.at('products').fail('produit en double');
   const minLines = r.at('minLines').integer(1);
+  const numbers = (key: string, min: number): Record<string, number> => {
+    const out: Record<string, number> = {};
+    for (const [k, v] of r.opt(key)?.entries() ?? []) out[k] = v.integer(min);
+    return out;
+  };
+  const extra = r.opt('extraLineMinShare');
+  const reference = r.opt('fishCostReferenceSeason');
   return {
     fromOrder,
     linesByOrder,
@@ -1586,6 +1700,13 @@ function parseGenerated(r: Reader | null, written: number): Settings['order']['g
     paymentPerWorkWeek: r.at('paymentPerWorkWeek').number(),
     noSharedBase: noShared,
     products,
+    fishCostFromWeights: optBoolean(r, 'fishCostFromWeights', false),
+    fishCostReferenceSeason: reference === null ? 'spring' : reference.oneOf(SEASONS),
+    roundTo: numbers('roundTo', 1),
+    lineMax: numbers('lineMax', 1),
+    extraLineMinShare: extra === null || extra.isNull() ? null : probability(extra),
+    maxLines: r.has('maxLines') ? r.at('maxLines').integer(minLines, 12) : 6,
+    eggsPerHenPerWeek: res.has('eggsPerHenPerWeek') ? positive(res.at('eggsPerHenPerWeek')) : null,
   };
 }
 
@@ -1599,7 +1720,14 @@ function parseForage(r: Reader | null): Settings['forage'] {
       const count = i.at('count').numberList();
       const [lo, hi] = count;
       if (count.length !== 2 || lo === undefined || hi === undefined || lo < 1 || hi < lo) return i.at('count').fail('[min, max] attendu');
-      return { item: i.at('item').string(), seasons: seasonList(i.at('seasons')), weight: i.at('weight').number(), count: [lo, hi] as const };
+      const days = i.opt('days');
+      let window: readonly [number, number] | null = null;
+      if (days !== null && !days.isNull()) {
+        const [a, b] = days.numberList();
+        if (a === undefined || b === undefined || a < 1 || b < a) return days.fail('[premier, dernier] jour de saison attendu');
+        window = [a, b];
+      }
+      return { item: i.at('item').string(), seasons: seasonList(i.at('seasons')), days: window, weight: i.at('weight').number(), count: [lo, hi] as const };
     });
   const known = new Set(items.map((i) => i.item));
   const points = r
@@ -1614,9 +1742,62 @@ function parseForage(r: Reader | null): Settings['forage'] {
     fromDay: r.at('fromDay').integer(1),
     spawnChance: probability(r.at('spawnChance')),
     unseenFactor: r.at('unseenFactor').number(),
-    rainBoost: boost === null ? null : { item: boost.at('item').string(), factor: boost.at('factor').number() },
+    // Un objet (tour 8) ou une liste (tour 9): le validateur accepte encore les deux formes.
+    rainBoost:
+      boost === null || boost.isNull()
+        ? []
+        : (boost.isObject() ? [boost] : boost.items()).map((b) => ({ item: b.at('item').string(), factor: b.at('factor').number() })),
     points,
     items,
+  };
+}
+
+const WEEKDAY_INDEX: Readonly<Record<string, number>> = Object.fromEntries(WEEKDAYS.map((w, i) => [w, i]));
+
+/** Tableau des annonces (tour 9, section 6.1). */
+function parseBoard(r: Reader | null): Settings['board'] {
+  if (r === null || r.isNull()) return null;
+  const weights = r.at('weights');
+  const reward = r.at('reward');
+  const kind = (k: AnnonceKind): AnnonceReward => {
+    const x = reward.at(k);
+    return {
+      factor: positive(x.at('factor')),
+      add: x.at('add').number(),
+      min: x.at('min').integer(0),
+      max: x.at('max').integer(0),
+      round: x.at('round').integer(1),
+      heart: optNumber(x, 'heart', 0),
+    };
+  };
+  return {
+    fromDay: r.at('fromDay').integer(1),
+    post: r
+      .at('post')
+      .items()
+      .map((p) => ({ weekday: WEEKDAY_INDEX[p.at('weekday').oneOf(WEEKDAYS)] ?? 0, kind: p.at('kind').oneOf(ANNONCE_KINDS) })),
+    postTime: r.at('postTime').time(),
+    deadlineDays: r.at('deadlineDays').integer(1, 6),
+    deadlineTime: r.at('deadlineTime').time(),
+    noRepeatDays: r.at('noRepeatDays').integer(0),
+    weights: { neverPosted: positive(weights.at('neverPosted')), sameGiver: positive(weights.at('sameGiver')) },
+    reward: { help: kind('help'), together: kind('together') },
+    keepDone: r.at('keepDone').integer(0),
+  };
+}
+
+/** Chantiers (tour 9, section 6.1). */
+function parseImprovementSettings(r: Reader | null): Settings['improvements'] {
+  if (r === null || r.isNull()) return null;
+  const queues = r.at('queues');
+  return {
+    queues: {
+      bourg: { opensFromDay: queues.at('bourg').at('opensFromDay').integer(1) },
+      maisonnette: { opensFromDay: queues.at('maisonnette').at('opensFromDay').integer(1) },
+    },
+    steps: r.at('steps').numberList(),
+    plankDiscount: r.at('plankDiscount').integer(0),
+    plankDiscountMax: r.at('plankDiscountMax').integer(0),
   };
 }
 
@@ -1661,6 +1842,7 @@ function parseSettings(r: Reader): Settings {
     clock: {
       secondsPerGameMinute: base,
       schedule: parseSchedule(clock, base),
+      ...parsePace(clock),
       dayStart: clock.at('dayStart').time(),
       dayEnd: clock.at('dayEnd').time(),
       veilleeFrom: clock.at('veilleeFrom').time(),
@@ -1701,7 +1883,10 @@ function parseSettings(r: Reader): Settings {
     hens: {
       eggsPerHenPerDay: r.at('hens').at('eggsPerHenPerDay').integer(0),
       feedRequired: r.at('hens').at('feedRequired').boolean(),
+      max: r.at('hens').has('max') ? r.at('hens').at('max').integer(1) : 5,
     },
+    board: parseBoard(r.opt('board')),
+    improvements: parseImprovementSettings(r.opt('improvements')),
     endurance: {
       base: endurance.at('base').number(),
       perFormPoint: endurance.at('perFormPoint').number(),
@@ -1732,7 +1917,14 @@ function parseSettings(r: Reader): Settings {
         .at('formLevels')
         .items()
         .map((l) => ({ level: l.at('level').string(), below: l.at('below').number() })),
+      soft: parseSoftNeeds(needs),
     },
+    rooms: parseRoomsSettings(r.opt('rooms')),
+    storage: parseStorageSettings(r.opt('storage')),
+    bakery: parseBakery(r.opt('bakery')),
+    salon: parseSalon(r.opt('salon')),
+    grocer: parseGrocer(r.opt('grocer')),
+    appearance: parseAppearance(r.opt('appearance')),
     movement: {
       walkSpeed: movement.at('walkSpeed').number(),
       carrySpeedTogether: movement.at('carrySpeedTogether').number(),
@@ -1787,6 +1979,7 @@ function checkReferences(content: Content): void {
     for (const line of o.lines) item(line.item, `reglages.json: order.trains[${i}].lines`);
   });
   checkWeeklyReferences(content, fail, item);
+  checkTour9References(content, fail, item);
   const questIds = new Set(content.quests.map((q) => q.id));
   const walkEffects = (list: Effect[], where: string): void => {
     for (const e of list) {
@@ -1861,6 +2054,244 @@ function checkReferences(content: Content): void {
     }
     if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);
     walkEffects(m.effects, where);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tour 9: annonces, chantiers, catalogue de la semaine
+
+function lineList(r: Reader): { item: string; count: number }[] {
+  return r.items().map((l) => ({ item: l.at('item').string(), count: l.at('count').integer(1) }));
+}
+
+function parseAnnonces(r: Reader): AnnonceDef[] {
+  if (r.at('version').integer() !== 1) r.at('version').fail('« version » doit valoir 1');
+  const out = r
+    .at('annonces')
+    .items()
+    .map((a) => {
+      const days = a.opt('seasonDays');
+      let seasonDays: readonly [number, number] | null = null;
+      if (days !== null && !days.isNull()) {
+        const [x, y] = days.numberList();
+        if (x === undefined || y === undefined || x < 1 || y < x) return days.fail('[premier, dernier] jour de saison attendu');
+        seasonDays = [x, y];
+      }
+      const variants = a.opt('variants');
+      const lines = a.opt('lines');
+      if ((variants === null) === (lines === null)) a.fail('« lines » ou « variants » attendu (un des deux)');
+      const list = variants === null ? [lineList(lines ?? a)] : variants.items().map(lineList);
+      const scene = optString(a, 'scene');
+      if (scene === null && list.some((v) => v.length === 0)) a.fail('une annonce sans demande finit par une scène');
+      return {
+        id: a.at('id').string(),
+        kind: a.at('kind').oneOf(ANNONCE_KINDS),
+        giver: a.at('giver').string(),
+        seasons: cropSeasons(a.at('seasons')),
+        seasonDays,
+        variants: list,
+        scene,
+        unique: optString(a, 'unique'),
+        uniqueScene: optString(a, 'uniqueScene'),
+      };
+    });
+  if (new Set(out.map((a) => a.id)).size !== out.length) r.at('annonces').fail('gabarit en double');
+  return out;
+}
+
+function parseImprovements(r: Reader): ImprovementDef[] {
+  if (r.at('version').integer() !== 1) r.at('version').fail('« version » doit valoir 1');
+  const out = r
+    .at('improvements')
+    .items()
+    .map((x) => {
+      const id = x.at('id').string();
+      return {
+        id,
+        queue: x.at('queue').oneOf(QUEUES),
+        order: x.at('order').integer(1),
+        price: x.at('price').integer(1),
+        model: x.at('model').string(),
+        cells: x.at('cells').items().map((c) => ({ cx: c.at('cx').integer(0), cy: c.at('cy').integer(0) })),
+        rotation: x.at('rotation').integer(0, 359),
+        flag: optString(x, 'flag') ?? `${id}_built`,
+        payAt: x.at('payAt').oneOf(['board', 'basile'] as const),
+      };
+    });
+  if (new Set(out.map((x) => x.id)).size !== out.length) r.at('improvements').fail('chantier en double');
+  for (const q of QUEUES) {
+    const orders = out.filter((x) => x.queue === q).map((x) => x.order);
+    if (new Set(orders).size !== orders.length) r.at('improvements').fail(`deux chantiers au même rang dans la file « ${q} »`);
+  }
+  return out;
+}
+
+function parseCatalogue(r: Reader): CatalogueDef {
+  if (r.at('version').integer() !== 1) r.at('version').fail('« version » doit valoir 1');
+  const copies: Record<string, number> = {};
+  for (const [k, v] of r.at('copies').entries()) copies[k] = v.integer(1, 9);
+  const seasonal: Record<string, Season> = {};
+  for (const [k, v] of r.at('seasonal').entries()) seasonal[k] = v.oneOf(SEASONS);
+  const hens: CatalogueDef['hens'] = {};
+  for (const [k, v] of r.opt('hens')?.entries() ?? []) hens[k] = { name: v.at('name').string(), variant: v.at('variant').string(), naming: v.at('naming').string() };
+  return {
+    pages: r
+      .at('pages')
+      .items()
+      .map((p) => ({ season: p.at('season').oneOf(SEASONS), week: p.at('week').integer(1, 3), items: p.at('items').stringList() })),
+    gifts: r
+      .at('gifts')
+      .items()
+      .map((g) => {
+        const villager = g.at('villager').string();
+        return { item: g.at('item').string(), villager, wish: g.at('wish').string(), thanks: g.at('thanks').string(), quest: optString(g, 'quest') ?? `gift_${villager}` };
+      }),
+    copies,
+    seasonal,
+    hens,
+  };
+}
+
+/** Un texte de `textes.json` sous `section.<id>.<key>` (annonces, chantiers), ou `null`. */
+export function rawText(texts: Texts, section: string, id: string, key: string): string | null {
+  const block = texts.raw[section];
+  const entry = typeof block === 'object' && block !== null ? (block as Record<string, unknown>)[id] : undefined;
+  const value = typeof entry === 'object' && entry !== null ? (entry as Record<string, unknown>)[key] : undefined;
+  return typeof value === 'string' ? value : null;
+}
+
+/** Remplace les `{clé}` connues (les autres restent, pour l'interface). */
+function fill(text: string, vars: Record<string, string>): string {
+  return text.replace(/\{(\w+)\}/g, (all, key: string) => vars[key] ?? all);
+}
+
+/** Identifiant de la quête d'une annonce (une par variante quand il y en a plusieurs). */
+export function annonceQuestId(def: Pick<AnnonceDef, 'id' | 'variants'>, variant: number): string {
+  return def.variants.length > 1 ? `annonce_${def.id}_${String(variant + 1)}` : `annonce_${def.id}`;
+}
+
+/**
+ * Les quêtes des annonces et des cadeaux (tour 9), écrites ici plutôt que dans `quetes.json`: une
+ * par gabarit et par variante, groupe « Annonces » du carnet (`kind: side`). Étapes: les dons à
+ * l'habitant (conditions `given` depuis le début de l'étape), puis la scène à deux s'il y en a une.
+ */
+function annonceQuests(content: Content): QuestDef[] {
+  const out: QuestDef[] = [];
+  const name = (item: string, count: number): string => {
+    const def = content.items[item];
+    return `${String(count)} ${count > 1 ? (def?.plural ?? item) : (def?.name ?? item)}`;
+  };
+  const step = (id: string, objective: string, conds: Condition[]): QuestDef['steps'][number] => ({
+    id,
+    objective,
+    objectiveByRole: null,
+    conditions: conds,
+    effects: [],
+    resolve: 'on_conditions',
+    deadline: null,
+    onDeadline: [],
+    failText: null,
+  });
+  const quest = (id: string, title: string, giver: string, steps: QuestDef['steps']): QuestDef => ({
+    id,
+    kind: 'side',
+    tier: 'P0',
+    title,
+    giver,
+    start: { when: [], byEffect: true, effects: [] },
+    steps,
+    completionEffects: [],
+    completionText: '',
+    secret: null,
+    repeat: null,
+  });
+  for (const a of content.annonces) {
+    const title = rawText(content.texts, 'annonces', a.id, 'title') ?? a.id;
+    const text = rawText(content.texts, 'annonces', a.id, 'text') ?? title;
+    a.variants.forEach((lines, v) => {
+      const steps: QuestDef['steps'] = [];
+      const first = lines[0];
+      const objective = first === undefined ? text : fill(text, { count: String(first.count), item: first.count > 1 ? (content.items[first.item]?.plural ?? first.item) : (content.items[first.item]?.name ?? first.item) });
+      if (lines.length > 0) {
+        steps.push(
+          step(
+            'give',
+            objective,
+            lines.map((l) => ({ type: 'counter', key: `given:${a.giver}:${l.item}`, count: l.count, since: 'step_start', who: 'either', label: name(l.item, l.count) })),
+          ),
+        );
+      }
+      if (a.scene !== null) steps.push(step('scene', objective, [{ type: 'counter', key: `scene:${a.scene}`, count: 1, since: 'step_start', who: 'either' }]));
+      out.push(quest(annonceQuestId(a, v), title, a.giver, steps));
+    });
+  }
+  const gifts = content.catalogue?.gifts ?? [];
+  const giftTitle = rawText(content.texts, 'catalogue', 'gift', 'title') ?? 'Un cadeau pour {villager}';
+  const giftObjective = rawText(content.texts, 'catalogue', 'gift', 'objective') ?? '{item}';
+  for (const g of gifts) {
+    const villager = content.villagers.find((v) => v.id === g.villager)?.label ?? g.villager;
+    const item = content.items[g.item];
+    const article = item?.indefinite ?? item?.name ?? g.item;
+    const vars = { villager, item: article };
+    out.push(
+      quest(g.quest, fill(giftTitle, vars), g.villager, [
+        step('give', fill(giftObjective, vars), [{ type: 'counter', key: `given:${g.villager}:${g.item}`, count: 1, since: 'game_start', who: 'either', label: item?.name ?? g.item }]),
+      ]),
+    );
+  }
+  return out;
+}
+
+/** Renvois du tour 9: annonces, chantiers, catalogue. */
+function checkTour9References(content: Content, fail: (message: string) => never, item: (id: string, where: string) => void): void {
+  const villager = (id: string, where: string): void => {
+    if (!content.villagers.some((v) => v.id === id)) fail(`${where}: habitant inconnu « ${id} »`);
+  };
+  for (const a of content.annonces) {
+    const where = `annonces.json: ${a.id}`;
+    villager(a.giver, where);
+    for (const lines of a.variants) for (const l of lines) item(l.item, where);
+    if (a.unique !== null) item(a.unique, where);
+    for (const scene of [a.scene, a.uniqueScene]) {
+      if (scene === null) continue;
+      const d = content.dialogues[scene];
+      if (d === undefined) fail(`${where}: scène inconnue « ${scene} »`);
+      else if (!d.shared || d.kind !== 'scene') fail(`${where}: « ${scene} » n'est pas une scène à deux`);
+    }
+    for (const key of ['title', 'text', 'thanks']) {
+      if (a.scene !== null && key === 'thanks') continue;
+      if (rawText(content.texts, 'annonces', a.id, key) === null) fail(`textes.json: annonces.${a.id}.${key} manquant`);
+    }
+    if (a.seasonDays !== null && a.seasonDays[1] > content.settings.calendar.seasonDays) fail(`${where}: « seasonDays » au-delà de la saison`);
+  }
+  for (const x of content.improvements) {
+    if (rawText(content.texts, 'chantiers', x.id, 'name') === null) fail(`textes.json: chantiers.${x.id}.name manquant`);
+  }
+  const cat = content.catalogue;
+  if (cat === null) return;
+  const where = 'catalogue.json';
+  const listed = new Set<string>();
+  for (const p of cat.pages) {
+    for (const id of p.items) {
+      item(id, where);
+      const def = content.items[id];
+      if (def !== undefined && (def.shop !== 'catalogue' || def.buyPrice === null)) fail(`${where}: « ${id} » n'est pas en vente au catalogue (shop, buyPrice)`);
+      if (listed.has(id)) fail(`${where}: « ${id} » sur deux pages`);
+      listed.add(id);
+    }
+  }
+  for (const g of cat.gifts) {
+    item(g.item, where);
+    villager(g.villager, where);
+    if (!(g.wish in content.dialogues)) fail(`${where}: souhait inconnu « ${g.wish} »`);
+    if (!(g.thanks in content.texts.messages)) fail(`${where}: remerciement inconnu « ${g.thanks} »`);
+    if (content.items[g.item]?.category !== 'gift') fail(`${where}: « ${g.item} » doit être de catégorie « gift »`);
+  }
+  for (const id of [...Object.keys(cat.copies), ...Object.keys(cat.seasonal)]) item(id, where);
+  for (const [id, hen] of Object.entries(cat.hens)) {
+    item(id, where);
+    if (content.items[id]?.category !== 'animal_order') fail(`${where}: « ${id} » doit être de catégorie « animal_order »`);
+    if (!(hen.naming in content.texts.messages)) fail(`${where}: réplique inconnue « ${hen.naming} »`);
   }
 }
 
@@ -1942,7 +2373,13 @@ export function loadContent(files: RawContentFiles): Content {
     sharedEnvieSchedule: envieData.schedule,
     texts: parseTexts(textes),
     moments: files.moments === undefined ? [] : parseMoments(root('moments.json', files.moments)),
+    annonces: files.annonces === undefined ? [] : parseAnnonces(root('annonces.json', files.annonces)),
+    improvements: files.chantiers === undefined ? [] : parseImprovements(root('chantiers.json', files.chantiers)),
+    catalogue: files.catalogue === undefined ? null : parseCatalogue(root('catalogue.json', files.catalogue)),
+    home: files.pieces === undefined ? EMPTY_HOME : parseHome(root('pieces.json', files.pieces)),
   };
+  content.quests.push(...annonceQuests(content));
+  if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
   return content;
 }

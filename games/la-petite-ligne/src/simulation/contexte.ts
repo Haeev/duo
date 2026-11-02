@@ -58,6 +58,8 @@ export interface Runtime {
   bufferedAct: Record<CharacterId, { intent: Intent; tick: number } | null>;
   /** Espace tenu: case du dernier geste et fin de ce geste, pour passer à la case suivante de la rangée. */
   heldRepeat: Record<CharacterId, { cx: number; cy: number; endsAt: number } | null>;
+  /** Ce que survole la souris de chaque joueur (intention `point_at`, R11), ou `null`: visée au clavier. */
+  pointer: Record<CharacterId, ClickTarget | null>;
 }
 
 export interface Sim {
@@ -84,6 +86,7 @@ export function createRuntime(map: GameMap): Runtime {
     holdForTool: { p1: false, p2: false },
     bufferedAct: { p1: null, p2: null },
     heldRepeat: { p1: null, p2: null },
+    pointer: { p1: null, p2: null },
   };
 }
 
@@ -215,6 +218,9 @@ export function bump(sim: Sim, key: string, by: CharacterId | null, amount = 1):
   const counters = sim.world.counters;
   counters.duo[key] = (counters.duo[key] ?? 0) + amount;
   if (by !== null) counters[by][key] = (counters[by][key] ?? 0) + amount;
+  const today = sim.world.countersToday;
+  today.duo[key] = (today.duo[key] ?? 0) + amount;
+  if (by !== null) today[by][key] = (today[by][key] ?? 0) + amount;
   sim.runtime.changed = true;
 }
 

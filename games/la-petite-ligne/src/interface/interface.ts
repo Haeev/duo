@@ -25,7 +25,10 @@ import { directionOf, spatialNeighbour } from './focus';
 import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
 import { type ScreenKind, hudState, screenOf } from './modele';
-import { CataloguePanel, ChestPanel, CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { RoomPanel, StoragePanel } from './maison';
+import { isNapping } from '../etat/maison';
+import { BoardPanel } from './tableau';
 import { ProposalCards } from './proposition';
 import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } from './sons';
 import { loadUiTexts } from './textes';
@@ -64,6 +67,11 @@ class GameUi implements GameInterface, UiHost {
   private readonly claimed = new Map<string, number>();
   private pendingMenu: { menu: MenuKind | null; at: number; tab: PanelTab | undefined } | null = null;
   private panelTab: PanelTab | undefined;
+  /**
+   * Panneau local, sans menu du jeu (tour 10): le chantier d'une pièce, ou le carnet pendant la
+   * sieste (la simulation ne prend pas de menu chez qui dort; le carnet reste ouvert quand même).
+   */
+  private local: 'room' | 'notebook' | null = null;
   private reading: string | null = null;
   private knownReadables: Set<string> | null = null;
   private titleDone: boolean;
@@ -180,11 +188,19 @@ class GameUi implements GameInterface, UiHost {
   }
 
   toggleMenu(menu: MenuKind): void {
-    const open = this.displayedMenu(this.view.world(), this.now()) === menu;
+    const open = this.displayedMenu(this.view.world(), this.now()) === menu || (menu === 'notebook' && this.local === 'notebook');
     this.setMenu(open ? null : menu);
   }
 
   setMenu(menu: MenuKind | null, tab?: PanelTab): void {
+    const me = characterOf(this.view.world(), this.ctx.me);
+    if ((menu === 'notebook' || menu === 'letter') && me !== null && isNapping(me)) {
+      this.local = 'notebook';
+      this.panelTab = menu === 'letter' ? 'mail' : tab;
+      this.dirty = true;
+      return;
+    }
+    this.local = null;
     this.pendingMenu = { menu, at: this.now(), tab };
     this.panelTab = tab;
     this.view.send({ type: 'menu', menu });
@@ -192,6 +208,11 @@ class GameUi implements GameInterface, UiHost {
   }
 
   invalidate(): void {
+    this.dirty = true;
+  }
+
+  openRoomPanel(): void {
+    this.local = 'room';
     this.dirty = true;
   }
 
@@ -236,6 +257,7 @@ class GameUi implements GameInterface, UiHost {
     const world = this.view.world();
     const now = this.now();
     this.hud.updateClockOnly(world);
+    this.hud.updateProgress(world);
     const revisionChanged = world.revision !== this.lastRevision;
     const since = now - this.lastRefresh;
     if (this.dirty || since >= UI_SETTINGS.refreshMaxMs || (revisionChanged && since >= UI_SETTINGS.refreshMinMs)) {
@@ -356,6 +378,16 @@ class GameUi implements GameInterface, UiHost {
           kind = 'panel';
           key = `panel:${menu}`;
           build = panel;
+          this.local = null;
+        } else if (this.local === 'notebook' && !isNapping(me)) {
+          // Réveillé le carnet ouvert: il devient le menu du jeu, comme d'habitude.
+          this.setMenu('notebook', this.panelTab);
+        } else if (this.local !== null) {
+          const local = this.local;
+          const tab = this.panelTab;
+          kind = 'panel';
+          key = `local:${local}`;
+          build = () => (local === 'room' ? new RoomPanel(this) : new NotebookPanel(this, tab));
         }
       }
     }
@@ -393,7 +425,7 @@ class GameUi implements GameInterface, UiHost {
       case 'shop':
         return () => new ShopPanel(this, tab);
       case 'catalogue':
-        return () => new CataloguePanel(this);
+        return () => new BoardPanel(this, tab);
       case 'crate':
         return () => new CratePanel(this);
       case 'workbench':
@@ -401,7 +433,7 @@ class GameUi implements GameInterface, UiHost {
       case 'stove':
         return () => new StationPanel(this, 'stove');
       case 'chest':
-        return () => new ChestPanel(this);
+        return () => new StoragePanel(this);
       case 'proposal':
         return null;
     }
@@ -535,6 +567,11 @@ class GameUi implements GameInterface, UiHost {
         active.click();
         return true;
       }
+      if (active instanceof HTMLInputElement && active.type === 'checkbox') {
+        // Une case à cocher (aides du carnet): le clic la bascule et prévient son écouteur.
+        active.click();
+        return true;
+      }
       if (active instanceof HTMLInputElement && active.type === 'radio') {
         active.checked = true;
         active.dispatchEvent(new Event('change', { bubbles: true }));
@@ -552,11 +589,13 @@ class GameUi implements GameInterface, UiHost {
     if (me === null) return false;
     switch (code) {
       case 'Tab':
-        if (me.status === 'active' || me.status === 'menu') this.setMenu('notebook');
+        if (me.status === 'active' || me.status === 'menu' || isNapping(me)) this.setMenu('notebook');
         return true;
       case 'Enter':
       case 'NumpadEnter':
         if (!info.repeat && this.proposals.hasReceived()) return this.proposals.focusDefault();
+        // L'invite de la maison: rideaux, chantier de la pièce.
+        if (!info.repeat && me.status === 'active') return this.hud.activateInvite();
         return false;
       case 'Backspace':
         if (me.placement !== null) {

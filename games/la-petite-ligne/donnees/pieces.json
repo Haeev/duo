@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "document": "Pièces de la maisonnette bâties à deux (tour 10, section 4) et fenêtres de la maisonnette (section 6). Les emprises, portes et places d'étagère sont dans la carte (`interieurs`, pièces `a_batir`); ici les prix, les éléments et leurs supports. Les fenêtres portent le nom du nœud vide `window_<n>` du modèle `gatekeeper_house` (et des pièces bâties): centre en coordonnées de la carte, côté du mur, largeur utile. Lot L4.",
+  "rooms": [
+    {
+      "id": "room_cellar",
+      "mapRoom": "house_cellar",
+      "price": 450,
+      "doorWindow": "window_4",
+      "beam": null,
+      "elements": [
+        { "id": "post_south", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "post_north", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "wall_plate", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 2 }], "seconds": 8, "requires": ["post_south", "post_north"] },
+        { "id": "wall_west", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["post_south", "post_north"] },
+        { "id": "wall_north", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["post_north"] },
+        { "id": "roof", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 2 }], "seconds": 12, "requires": ["wall_plate", "wall_west", "wall_north"] }
+      ]
+    },
+    {
+      "id": "room_bedroom",
+      "mapRoom": "house_bedroom",
+      "price": 1200,
+      "doorWindow": "window_3",
+      "beam": { "from": "beam_pickup", "item": "beam" },
+      "elements": [
+        { "id": "post_nw", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "post_ne", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "post_sw", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "post_se", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 6 },
+        { "id": "plate_west", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["post_nw", "post_sw"] },
+        { "id": "plate_east", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["post_ne", "post_se"] },
+        { "id": "wall_north", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["post_nw", "post_ne"] },
+        { "id": "wall_west", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["plate_west"] },
+        { "id": "wall_east", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["plate_east"] },
+        { "id": "wall_gable", "inputs": [{ "item": "plank", "count": 3 }, { "item": "nail", "count": 1 }], "seconds": 8, "requires": ["wall_north"] },
+        { "id": "truss_ridge", "inputs": [{ "item": "plank", "count": 4 }, { "item": "nail", "count": 1 }], "seconds": 12, "requires": ["plate_west", "plate_east"], "needsBeam": true },
+        { "id": "floor", "inputs": [{ "item": "plank", "count": 2 }, { "item": "nail", "count": 1 }], "seconds": 12, "requires": ["post_nw", "post_ne", "post_sw", "post_se"] }
+      ]
+    }
+  ],
+  "windows": [
+    { "id": "window_1", "room": "house_main", "side": "south", "x": 10.2, "y": 26, "width": 0.75, "curtains": true, "role": "sud, à l'est de la porte (modèle: façade avant, u 1,7)" },
+    { "id": "window_2", "room": "house_main", "side": "south", "x": 6.8, "y": 26, "width": 0.75, "curtains": true, "role": "sud, à l'ouest de la porte, la jardinière (u -1,7)" },
+    { "id": "window_3", "room": "house_main", "side": "north", "x": 9.5, "y": 22, "width": 0.7, "curtains": true, "role": "nord (mur arrière, u -1): devient la porte de la chambre (case 9, 21)" },
+    { "id": "window_4", "room": "house_main", "side": "west", "x": 6, "y": 24.3, "width": 0.7, "curtains": true, "role": "ouest (mur gauche, u 0,3): devient la porte du cellier (case 5, 24)" },
+    { "id": "window_5", "room": "house_main", "side": "east", "x": 11, "y": 24, "width": 0.7, "curtains": true, "role": "est, côté voie: le garde-barrière surveille les trains (u 0, à cheval sur deux cases)" },
+    { "id": "window_7", "room": "house_bedroom", "side": "north", "x": 8.5, "y": 17, "width": 0.75, "curtains": true, "role": "chambre, au nord: la voie et la lisière" },
+    { "id": "window_8", "room": "house_bedroom", "side": "east", "x": 11, "y": 19, "width": 0.75, "curtains": true, "role": "chambre, à l'est: le sentier du jardin" },
+    { "id": "window_6", "room": "house_cellar", "side": "north", "x": 4, "y": 22, "width": 0.4, "curtains": false, "role": "le fenestron du cellier: le cellier aime le noir" }
+  ]
+}

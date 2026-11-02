@@ -87,6 +87,18 @@ function near(sim: Sim, id: CharacterId, point: string, dx = 0.9, dy = 0.4): voi
 // graine de la démo, p1 est l'informé des poules, p2 celui du mot de Lucie; `joueur=p1` et
 // `joueur=p2` montrent les deux écrans d'une même situation.
 
+/** Jour 1, scène d'arrivée jouée par le robot, l'horloge en marche, personne en conversation ni dans un menu. */
+function firstDay(sim: Sim): void {
+  playUntil(
+    sim,
+    (s) =>
+      s.world.phase === 'day' &&
+      s.world.scene === null &&
+      s.world.clock.running &&
+      s.world.characters.every((c) => c.status === 'active' && c.dialogue === null && c.menu === null),
+  );
+}
+
 /** Quelques pas sans entrée (personne ne bouge): la simulation recalcule ce que chacun remplit. */
 function idle(sim: Sim, ticks: number): void {
   for (let i = 0; i < ticks; i++) step(sim, { controls: {}, intents: [] });
@@ -220,8 +232,12 @@ function deerScene(sim: Sim, p2Distance: number): { today: MomentToday; deer: { 
 // format 5 (`tests/donnees/sauvegardes`): la fin de la démo (jour 15, écran d'étape) et l'été
 // (jour 25). `scenarioSave` dit laquelle charger; la page la restaure au lieu d'une partie neuve.
 
-/** Sauvegarde de référence d'où part un scénario du tour 8, ou `null` (partie neuve). */
+/** Sauvegarde de référence d'où part un scénario du tour 8 ou 9, ou `null` (partie neuve). */
 export function scenarioSave(name: string): string | null {
+  const t10 = TOUR10_SAVES[name];
+  if (t10 !== undefined) return t10;
+  const t9 = TOUR9_SAVES[name];
+  if (t9 !== undefined) return t9;
   if (name.startsWith('etape-43') || ['ete-hud', 'ete-carnet', 'ete-caisse', 'ete-courrier', 'ete-nuit', 'brume-matin'].includes(name)) return 'format-5-ete-jour-25.json';
   if (name.startsWith('etape') || name === 'saison-ete' || name === 'reprise') return 'format-5-fin-de-la-demo.json';
   return null;
@@ -246,13 +262,350 @@ function pastTitle(sim: Sim): void {
   apply(sim, 'p2', [{ type: 'title_ready', ready: true }]);
 }
 
-/** L'écran d'étape du samedi 43: les robots restent à chaque étape jusqu'à la fin de l'été. */
+/** L'écran d'étape suivant (samedi 43, ou 64 depuis l'automne): les robots restent à chaque étape jusque-là. */
 function summerEnd(sim: Sim): void {
   const robot = createRobot({ stages: 'stay' });
   let ticks = 0;
   while (sim.world.phase !== 'ended' && ticks < 30 * MAX_TICKS) {
     step(sim, robot.decide(sim));
     ticks++;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tour 9: tableau du quai (catalogue par rayons, annonces, chantiers), établi de Basile, courrier à
+// titres, carnet, écran du jour 64. Ces situations partent des références du format 6: l'été
+// (jour 25: le banc du gué bâti, les jardinières à 600 sur 700, une planche apportée pour le banc
+// du pignon) et l'automne (jour 62: tout est bâti, une vingtaine de lettres).
+
+const SUMMER_25 = 'format-6-ete-jour-25.json';
+const AUTUMN_62 = 'format-6-automne-jour-62.json';
+
+const TOUR9_SAVES: Readonly<Record<string, string>> = {
+  'tableau-catalogue': SUMMER_25,
+  'tableau-catalogue-ferme': SUMMER_25,
+  'tableau-annonces': SUMMER_25,
+  'tableau-annonce-faite': SUMMER_25,
+  'tableau-annonce-retiree': SUMMER_25,
+  'tableau-chantiers': SUMMER_25,
+  'tableau-chantiers-accord': SUMMER_25,
+  'tableau-chantiers-tous': AUTUMN_62,
+  'etabli-basile': SUMMER_25,
+  'courrier-titres': AUTUMN_62,
+  'carnet-tour9': AUTUMN_62,
+  'etape-64': AUTUMN_62,
+};
+
+/** Onglet du tableau du quai qu'ouvre un scénario du tour 9, ou `null`. */
+export function scenarioBoardTab(name: string): 'catalogue' | 'annonces' | 'chantiers' | null {
+  if (name.startsWith('tableau-catalogue')) return 'catalogue';
+  if (name.startsWith('tableau-annonce')) return 'annonces';
+  if (name.startsWith('tableau-chantiers')) return 'chantiers';
+  return null;
+}
+
+/** Devant le tableau du quai, le tableau ouvert. */
+function atBoard(sim: Sim, id: CharacterId): void {
+  near(sim, id, 'notice_board');
+  apply(sim, id, [{ type: 'menu', menu: 'catalogue' }]);
+}
+
+/** L'annonce à deux du mercredi 26 vient d'être épinglée (la veille, celle du dimanche est faite). */
+function wednesdayAnnonce(sim: Sim): void {
+  playUntil(sim, (s) => s.world.board.current?.posted === 26 && free(s) && at(s, 26, 7 * HOUR));
+}
+
+/** Le catalogue du dimanche 30: deux pages d'été parues, un outil commandé par l'autre, le moulin d'Odette souhaité. */
+function catalogueSunday(sim: Sim, other: CharacterId): void {
+  const w = sim.world;
+  // La livraison du samedi 29 est passée: les arrosoirs et le chapeau sont arrivés.
+  w.clock.day = 30;
+  w.clock.minutes = 10 * HOUR;
+  w.catalogueOrders = ['axe_forged'];
+  w.catalogueOrderBy = [other];
+  w.catalogueBought = { ...w.catalogueBought, axe_forged: 1 };
+  if (!w.dialoguesDone.includes('odette_wish')) w.dialoguesDone.push('odette_wish');
+}
+
+/** Après le premier pas (qui rattrape la journée posée à la main): la bourse d'un dimanche d'été. */
+function catalogueSundayPurse(sim: Sim): void {
+  sim.world.purse = 640;
+  sim.world.proposals = [];
+}
+
+function tour9(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
+  switch (name) {
+    case 'tableau-catalogue':
+      catalogueSunday(sim, other);
+      atBoard(sim, me);
+      catalogueSundayPurse(sim);
+      return undefined;
+    case 'tableau-catalogue-ferme':
+      // Samedi 29 au matin: les commandes sont parties avec la poste, rien ne se commande avant 10 h.
+      sim.world.clock.day = 29;
+      sim.world.clock.minutes = 8 * HOUR;
+      atBoard(sim, me);
+      return undefined;
+    case 'tableau-annonces': {
+      // Le coup de main du dimanche 30 (des produits à donner, une liste à cocher).
+      playUntil(sim, (s) => s.world.board.current?.posted === 30 && free(s) && at(s, 30, 7 * HOUR));
+      // Une partie des dons est faite (comme si l'un des deux était déjà passé chez l'habitant).
+      const a = sim.world.board.current;
+      const def = sim.content.annonces.find((x) => x.id === a?.gabarit);
+      const line = def?.variants[a?.variant ?? 0]?.[0];
+      if (def !== undefined && line !== undefined) {
+        const key = `given:${def.giver}:${line.item}`;
+        sim.world.counters.duo[key] = (sim.world.counters.duo[key] ?? 0) + Math.floor(line.count / 2);
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-annonce-faite': {
+      wednesdayAnnonce(sim);
+      const a = sim.world.board.current;
+      if (a !== null) {
+        a.state = 'done';
+        a.by = me;
+        a.closedDay = 26;
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-annonce-retiree': {
+      wednesdayAnnonce(sim);
+      const a = sim.world.board.current;
+      if (a !== null) {
+        a.state = 'expired';
+        a.closedDay = 28;
+      }
+      atBoard(sim, me);
+      return undefined;
+    }
+    case 'tableau-chantiers':
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      sim.world.purse = Math.max(sim.world.purse, 320);
+      atBoard(sim, me);
+      return undefined;
+    case 'tableau-chantiers-accord':
+      // p1 propose de verser le reste (100 sous, l'accord de l'autre); chacun devant le tableau.
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      sim.world.purse = Math.max(sim.world.purse, 320);
+      atBoard(sim, 'p1');
+      near(sim, 'p2', 'notice_board', -0.9, 0.4);
+      apply(sim, 'p2', [{ type: 'menu', menu: 'catalogue' }]);
+      apply(sim, 'p1', [{ type: 'improvement_pay', improvement: 'quay_planters', amount: null }]);
+      return undefined;
+    case 'tableau-chantiers-tous':
+      atBoard(sim, me);
+      return undefined;
+    case 'etabli-basile':
+      playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
+      fillBag(sim, me);
+      sim.world.purse = Math.max(sim.world.purse, 520);
+      near(sim, me, 'sawmill_workbench');
+      apply(sim, me, [{ type: 'menu', menu: 'workbench' }]);
+      return undefined;
+    case 'courrier-titres':
+      // Les deux dernières lettres de la coopérative pas encore lues chez ce joueur.
+      for (const l of sim.world.letters.slice(-2)) l.read = l.read.filter((id) => id !== me);
+      apply(sim, me, [{ type: 'menu', menu: 'letter' }]);
+      return undefined;
+    case 'carnet-tour9': {
+      // L'annonce d'avant n'a pas été faite: elle est « Retirée » au carnet, en gris.
+      const prev = sim.world.board.previous;
+      if (prev !== null) {
+        prev.state = 'expired';
+        prev.by = null;
+      }
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    }
+    case 'etape-64':
+      summerEnd(sim);
+      return undefined;
+    default:
+      return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tour 10 (lot L6): besoins doux, rangement à cases, pièces bâties, rideaux, sieste, nuit, lieu de
+// l'autre. Ces situations partent de la référence du format 7 de l'été (mardi 25 à midi: coffre et
+// étagère dans la maison, ni pièce ni rideaux).
+
+const SUMMER_25_V7 = 'format-7-ete-jour-25.json';
+
+const TOUR10_SAVES: Readonly<Record<string, string>> = {
+  'besoins-hud': SUMMER_25_V7,
+  'besoins-carnet': SUMMER_25_V7,
+  rangement: SUMMER_25_V7,
+  'rangement-deborde': SUMMER_25_V7,
+  'etabli-pieces': SUMMER_25_V7,
+  chantier: SUMMER_25_V7,
+  'chantier-chambre': SUMMER_25_V7,
+  rideaux: SUMMER_25_V7,
+  'rideaux-refus': SUMMER_25_V7,
+  sieste: SUMMER_25_V7,
+  'nuit-ensemble': SUMMER_25_V7,
+  'autre-epicerie': SUMMER_25_V7,
+};
+
+/** Création du tour 10 (12 coupes, 8 couleurs, barbe): partie neuve, les deux ont passé l'écran titre. */
+export const CREATION_T10 = 'creation-coiffure';
+
+/** Besoins de la page: soi au petit creux et fatigué, l'autre au ventre plein et loin depuis longtemps. */
+function setNeeds(sim: Sim, me: CharacterId, other: CharacterId): void {
+  const self = character(sim, me);
+  self.needs.belly = 18;
+  self.endurance = Math.round(self.enduranceMax * 0.2);
+  self.needs.heart = 76;
+  self.needs.apartMinutes = 0;
+  const o = character(sim, other);
+  o.needs.belly = 72;
+  o.endurance = Math.round(o.enduranceMax * 0.6);
+  o.needs.heart = 40;
+  o.needs.apartMinutes = 200;
+}
+
+/** Les mains vides et le sac garni pour le rangement (des familles à « Tout déposer »). */
+function storageBag(sim: Sim, id: CharacterId): void {
+  const c = character(sim, id);
+  const items: (ItemStack | null)[] = [
+    stack('hoe', 1),
+    stack('watering_can', 1),
+    stack('axe', 1),
+    stack('radish', 7),
+    stack('carrot', 4, 'fine'),
+    stack('gudgeon', 2),
+    stack('dandelion', 3),
+    stack('omelette', 1),
+    stack('plank', 6),
+    null,
+    stack('nail', 4),
+    stack('log', 2),
+  ];
+  c.bag = c.bag.map((_, i) => items[i] ?? null);
+  c.selected = 9;
+}
+
+/** Près du coffre de la maison (case 6, 25), le rangement ouvert. */
+function atChest(sim: Sim, id: CharacterId): void {
+  teleport(sim, id, 7.5, 25.3);
+  apply(sim, id, [{ type: 'menu', menu: 'chest' }]);
+}
+
+/** p1 a commandé `room` la veille (le site est là ce matin), deux éléments bâtis, la caisse entamée. */
+function roomSite(sim: Sim, me: CharacterId, room: 'room_cellar' | 'room_bedroom'): void {
+  const day = sim.world.clock.day;
+  const built = room === 'room_cellar' ? ['post_south', 'post_north'] : ['post_nw', 'post_ne', 'post_sw', 'post_se', 'plate_west'];
+  sim.world.rooms[room] = { ordered: day - 1, crate: [stack('plank', 5), stack('nail', 1)], elementsBuilt: built, beamPlaced: false, builtDay: null };
+  const r = sim.map.buildings.house?.rooms.find((x) => x.build?.room === room);
+  const site = r?.build === null || r === undefined ? undefined : sim.map.points[r.build.site];
+  if (site !== undefined) teleport(sim, me, site.x, site.y);
+  const c = character(sim, me);
+  c.bag = c.bag.map((s, i) => (i === 10 ? stack('plank', 8) : i === 11 ? stack('nail', 3) : s));
+  c.selected = 9;
+  c.bag[9] = null;
+  idle(sim, 1);
+}
+
+/** Des rideaux à la fenêtre est (`window_5`), et `me` devant, les mains vides. */
+function curtainsEast(sim: Sim, me: CharacterId): void {
+  sim.world.furniture.push({ id: 'f-rideaux', item: 'curtains', cell: { cx: 10, cy: 24 }, rotation: 3, placedBy: me, window: 'window_5' });
+  teleport(sim, me, 9.6, 24.5);
+  const c = character(sim, me);
+  c.facing = 0;
+  c.bag[9] = null;
+  c.selected = 9;
+  // Un pas: la simulation recalcule le bâtiment où l'on est (`inside`).
+  idle(sim, 1);
+}
+
+function tour10(sim: Sim, name: string, me: CharacterId, other: CharacterId): (() => void) | undefined | null {
+  switch (name) {
+    case 'besoins-hud':
+      setNeeds(sim, me, other);
+      return undefined;
+    case 'besoins-carnet':
+      setNeeds(sim, me, other);
+      character(sim, me).needs.apartMinutes = 45;
+      apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    case 'rangement':
+      storageBag(sim, me);
+      sim.world.cellar = [stack('radish', 12), stack('lettuce', 3, 'fine'), stack('vegetable_soup', 2), stack('jay_feather', 1), stack('crystal_radio', 1), stack('egg', 6), stack('plank', 120)];
+      sim.world.rack = [stack('axe', 1), stack('hoe', 1)];
+      atChest(sim, me);
+      return undefined;
+    case 'rangement-deborde': {
+      storageBag(sim, me);
+      const items = Object.keys(sim.content.items).filter((id) => {
+        const cat = sim.content.items[id]?.category;
+        return cat === 'crop' || cat === 'forage' || cat === 'material' || cat === 'food' || cat === 'fish' || cat === 'seed' || cat === 'decoration';
+      });
+      sim.world.cellar = items.slice(0, 30).map((item) => stack(item, 3));
+      atChest(sim, me);
+      return undefined;
+    }
+    case 'etabli-pieces':
+      sim.world.purse = 1600;
+      near(sim, me, 'sawmill_workbench');
+      apply(sim, me, [{ type: 'menu', menu: 'workbench' }]);
+      return undefined;
+    case 'chantier':
+      roomSite(sim, me, 'room_cellar');
+      return undefined;
+    case 'chantier-chambre':
+      roomSite(sim, me, 'room_bedroom');
+      return undefined;
+    case 'rideaux':
+      curtainsEast(sim, me);
+      return undefined;
+    case 'rideaux-refus': {
+      // Les rideaux en main, tourné vers le mur sud entre les deux fenêtres: aucune fenêtre visée.
+      teleport(sim, me, 8.5, 24.6);
+      const c = character(sim, me);
+      c.facing = Math.PI / 2;
+      c.bag[9] = stack('curtains', 1);
+      c.selected = 9;
+      idle(sim, 1);
+      return undefined;
+    }
+    case 'sieste': {
+      // 13 h: les deux font la sieste sur leur paillasse (le temps file à deux).
+      sim.world.clock.minutes = 13 * HOUR;
+      const beds = sim.world.furniture.filter((f) => f.item === 'straw_mattress');
+      [me, other].forEach((id, i) => {
+        const c = character(sim, id);
+        const bed = beds[i];
+        if (bed !== undefined) teleport(sim, id, bed.cell.cx + 0.5, bed.cell.cy + 0.5);
+        c.status = 'sleeping';
+        c.menu = null;
+        c.bedId = bed?.id ?? null;
+        c.needs.napStart = sim.world.clock.day * 1440 + 13 * HOUR;
+        c.action = { kind: 'sleep', since: sim.world.tick, duration: 0, target: null };
+      });
+      return undefined;
+    }
+    case 'nuit-ensemble': {
+      playUntil(sim, (s) => s.world.phase === 'night');
+      const since = sim.world.tick;
+      for (const c of sim.world.characters) c.action = { kind: 'sleep', since, duration: 0, target: null };
+      return undefined;
+    }
+    case CREATION_T10:
+      apply(sim, me, [{ type: 'title_ready', ready: true }]);
+      apply(sim, other, [{ type: 'title_ready', ready: true }]);
+      return undefined;
+    case 'autre-epicerie': {
+      setNeeds(sim, me, other);
+      const shop = sim.map.buildings.grocery?.rooms[0]?.rect;
+      if (shop !== undefined) teleport(sim, other, shop.x + 2.5, shop.y + 3.5);
+      idle(sim, 1);
+      return undefined;
+    }
+    default:
+      return null;
   }
 }
 
@@ -333,6 +686,10 @@ function tour8(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
  */
 export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => void) | undefined {
   const other: CharacterId = me === 'p1' ? 'p2' : 'p1';
+  const t10 = tour10(sim, name, me, other);
+  if (t10 !== null) return t10;
+  const later = tour9(sim, name, me, other);
+  if (later !== null) return later;
   const suite = tour8(sim, name, me, other);
   if (suite !== null) return suite;
   const day5 = (): void => {
@@ -423,6 +780,69 @@ export function setupScenario(sim: Sim, name: string, me: CharacterId): (() => v
       near(sim, other, 'grocery_counter');
       apply(sim, other, [{ type: 'menu', menu: 'shop' }, { type: 'buy', item: 'mattress', count: 1 }, { type: 'menu', menu: null }]);
       return;
+    // Souris (R11): le potager en herbe, la bêche en main, l'autre au comptoir.
+    case 'souris': {
+      firstDay(sim);
+      for (const g of sim.world.garden) {
+        g.soil = 'grass';
+        g.crop = null;
+      }
+      near(sim, other, 'grocery_counter');
+      teleport(sim, me, 4.5, 31.5);
+      const c = character(sim, me);
+      c.selected = Math.max(0, c.bag.findIndex((x, i) => x?.item === 'hoe' && i < 10));
+      c.facing = Math.PI;
+      idle(sim, 1);
+      return;
+    }
+    // Souris (R11): dans la pièce débarrassée de ses tables, chaises et étagères, une chaise en main.
+    case 'souris-maison': {
+      firstDay(sim);
+      sim.world.furniture = sim.world.furniture.filter((f) => !['table', 'chair', 'shelf'].includes(f.item));
+      sim.runtime.dynamicDirty = true;
+      const room = sim.map.house.room;
+      teleport(sim, me, room.x + 2.5, room.y + 0.5);
+      teleport(sim, other, room.x + 0.5, room.y + 1.5);
+      for (const id of [me, other]) character(sim, id).inHouse = true;
+      const c = character(sim, me);
+      const free = c.bag.findIndex((x, i) => x === null && i < 8);
+      c.bag[free < 0 ? 0 : free] = stack('chair', 1);
+      c.selected = free < 0 ? 0 : free;
+      c.facing = Math.PI / 2;
+      idle(sim, 1);
+      return;
+    }
+    // Barre de progression (R10): des planches sciées à l'établi, à mi-chemin (avec `temps=arrete` pour la figer).
+    case 'progression-etabli': {
+      day5();
+      near(sim, me, 'sawmill_workbench', 0, 0);
+      const c = character(sim, me);
+      const free = c.bag.findIndex((x, i) => x === null && i < 10);
+      c.bag[free < 0 ? 9 : free] = stack('log', 1);
+      apply(sim, me, [{ type: 'craft', recipe: 'saw_plank' }]);
+      idle(sim, Math.floor(c.action.duration * 0.45));
+      return;
+    }
+    // Barre de progression (R10): la porte bâtie à deux, mains libres (avec `temps=arrete` pour la figer).
+    case 'progression-chantier': {
+      firstDay(sim);
+      const door = sim.map.points.house_door;
+      if (door === undefined) return;
+      teleport(sim, me, door.x - 0.4, door.y + 1.2);
+      teleport(sim, other, door.x + 0.6, door.y + 1.2);
+      for (const id of [me, other]) {
+        const c = character(sim, id);
+        c.selected = Math.max(0, c.bag.findIndex((x, i) => x === null && i < 10));
+        c.facing = -Math.PI / 2;
+      }
+      for (let i = 0; i < 100; i++) {
+        step(sim, {
+          controls: { [me]: { seq: i, moveX: 0, moveY: 0, actHeld: true }, [other]: { seq: i, moveX: 0, moveY: 0, actHeld: true } },
+          intents: [],
+        });
+      }
+      return;
+    }
     case 'amenagement': {
       playUntil(sim, (s) => s.world.clock.day >= 4 && s.world.clock.veillee && s.world.phase === 'day');
       const c = character(sim, me);

@@ -74,6 +74,7 @@ export class MomentSounds {
     const def = today === null ? undefined : this.content.moments.find((m) => m.id === today.id);
     this.needed.clear();
     this.duck = 0;
+    this.objectFiles(world);
     // Hors de la journée (écran de nuit, fin), la simulation n'avance plus les moments: leurs sons
     // se taisent comme l'ambiance, même si le moment est encore « là » jusqu'à 23 h 30 (QA6-05).
     if (today === null || def === undefined || today.phase === 'gone' || world.phase !== 'day') {
@@ -87,7 +88,9 @@ export class MomentSounds {
     this.idle(world, def, today, gameTime, shots, loops);
     this.reactions(world, def, today, shots);
     const choreography = today.phase === 'climax' ? def.climax : today.phase === 'left' ? def.leave : null;
-    if (today.phase === 'climax') this.duck = this.content.settings.moments.musicDuckDb;
+    // Un moment peut baisser la musique plus fort (les étoiles: `render.musicDuckDb`, -9 dB, tour 9).
+    const own = def.render.musicDuckDb;
+    if (today.phase === 'climax') this.duck = typeof own === 'number' ? own : this.content.settings.moments.musicDuckDb;
     if (choreography === null) {
       this.stopFollowed(syncs);
       return;
@@ -100,6 +103,27 @@ export class MomentSounds {
     }
     this.fire(world, def, today, choreography, shots);
     this.follow(def, today, syncs);
+  }
+
+  /**
+   * Sons du dossier `objets/` (tour 9, `decodeWhen` de `sons.json`): décodés quand l'objet qui les
+   * porte peut sonner (chantier payé, cadeau dans un sac, moulin offert, horloge posée, arrosoir de
+   * cuivre dans un sac), pour que le premier son ne manque pas.
+   */
+  private objectFiles(world: ReadonlyWorld): void {
+    const inBags = (test: (item: string) => boolean): boolean =>
+      world.characters.some((c) => c.bag.some((s) => s !== null && test(s.item)));
+    const want = (id: string, yes: boolean): void => {
+      if (!yes) return;
+      const s = this.catalogue.sounds.get(id);
+      if (s !== undefined) for (const file of s.files) this.needed.add(file);
+    };
+    const day = world.clock.day;
+    want('chantier-built', Object.values(world.improvements).some((x) => x.funded && (x.builtDay === null || x.builtDay >= day)));
+    want('gift-give', inBags((item) => this.content.items[item]?.category === 'gift'));
+    want('coffee-grind', 'odette' in world.giftsGiven);
+    want('clock-tick', world.furniture.some((f) => f.item === 'wall_clock'));
+    want('water-pour-copper', inBags((item) => item === 'watering_can_copper'));
   }
 
   /** Sons datés passés depuis l'image d'avant. */

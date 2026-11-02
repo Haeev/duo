@@ -3,14 +3,16 @@
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
 import type { ControlFrame } from '../etat/actions';
-import { inRect } from '../etat/carte';
-import type { Beam, Character, CharacterId, Vec2 } from '../etat/types';
+import { buildingAt, inRect } from '../etat/carte';
+import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
 import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
 import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { ZONE } from './ids';
 import { treeBlocks } from './lisiere';
+import { armedCells } from '../etat/moments';
+import { walkFactor } from './besoins';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
@@ -29,9 +31,19 @@ export function refreshBlockers(sim: Sim): Blockers {
       }
     }
     for (const cell of handcarCells(sim)) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    // Tour 9: les chantiers bâtis occupent leurs cases; les barrières baissées ferment la traversée.
+    for (const x of sim.content.improvements) {
+      if ((sim.world.improvements[x.id]?.builtDay ?? null) === null) continue;
+      for (const cell of x.cells) if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    }
+    const gates = armedCells(sim.content, sim.world.moments.today);
+    if (gates !== null) {
+      for (let cy = gates.y; cy < gates.y + gates.h; cy++) for (let cx = gates.x; cx < gates.x + gates.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
+    }
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
-      if (def?.footprint === null || def === undefined || def.floor || def.bed !== null) continue;
+      // Tapis, lits et objets muraux (rideaux, cadres: R02) ne barrent pas le passage.
+      if (def?.footprint === null || def === undefined || def.floor || def.wall || def.bed !== null) continue;
       for (const cell of footprintCells(def.footprint, f.cell, f.rotation)) {
         if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) {
           rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
@@ -155,7 +167,7 @@ export function stopPath(sim: Sim, c: Character): void {
 
 /** Déplace un personnage selon son entrée du pas; renvoie vrai s'il est arrivé au bout d'un trajet. */
 export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | undefined, dt: number): boolean {
-  const speed = sim.content.settings.movement.walkSpeed;
+  const speed = sim.content.settings.movement.walkSpeed * walkFactor(sim, c);
   c.speed = 0;
   if (!canWalk(sim, c)) return false;
   const b = refreshBlockers(sim);
@@ -198,8 +210,9 @@ export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | unde
   return false;
 }
 
-/** Après les déplacements: dans la maison ou non, la porte qui grince. */
+/** Après les déplacements: dans la maison ou non, la porte qui grince; le bâtiment visitable (ADR 0016). */
 export function updateInside(sim: Sim, c: Character): void {
+  c.inside = buildingAt(sim.map, sim.world.rooms, c.pos.x, c.pos.y);
   const inside = inRect(sim.map.house.room, c.pos.x, c.pos.y);
   if (inside !== c.inHouse) {
     c.inHouse = inside;
@@ -207,6 +220,11 @@ export function updateInside(sim: Sim, c: Character): void {
     if (doorBuilt) emit(sim, { type: 'door', by: c.id, entering: inside });
   }
   if (c.speed === 0 && c.action.kind === 'walk') c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
+}
+
+/** Le bâtiment visitable où se trouve un habitant (ADR 0016), `null` hors de la carte jouée. */
+export function updateVillagerInside(sim: Sim, v: VillagerState): void {
+  v.inside = v.visible ? buildingAt(sim.map, sim.world.rooms, v.pos.x, v.pos.y) : null;
 }
 
 /** Place un personnage (téléportation derrière un fondu). */
@@ -218,6 +236,7 @@ export function placeCharacter(sim: Sim, c: Character, at: Vec2): void {
   c.speed = 0;
   stopPath(sim, c);
   c.inHouse = inRect(sim.map.house.room, at.x, at.y);
+  c.inside = buildingAt(sim.map, sim.world.rooms, at.x, at.y);
 }
 
 function release(sim: Sim, c: Character): void {

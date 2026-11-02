@@ -291,12 +291,17 @@ export class Terrain {
     if (look.kind === 'water') {
       return 'water';
     }
-    return look.kind === 'gravel' ? 'bank' : 'land';
+    if (look.kind === 'gravel') {
+      return 'bank';
+    }
+    // Un chemin qui longe la grève (promenade, R22): le sable va jusqu'à lui, sans liseré d'herbe.
+    return look.kind === 'path' ? 'path' : 'land';
   }
 
   /** Vrai si la case appartient au lit de la rivière (eau, gué, berge), dessiné à part. */
   private inRiverBed(cx: number, cy: number): boolean {
-    return this.riverCell(cx, cy) !== 'land';
+    const cell = this.riverCell(cx, cy);
+    return cell !== 'land' && cell !== 'path';
   }
 
   /** Lit de la rivière sur les rangées qui en contiennent (toute la largeur de la bande). */

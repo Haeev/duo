@@ -26,6 +26,7 @@
  */
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
+import type { BuildingId } from './carte';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -132,6 +133,8 @@ export interface WorldState {
   crate: ItemStack[];
   /** Commandes au catalogue, livrées par le train du jour 8. */
   catalogueOrders: ItemId[];
+  /** Qui a commandé chaque colis de `catalogueOrders` (même ordre; tour 9: l'outil, la poule, le cadeau vont à l'acheteur). */
+  catalogueOrderBy: CharacterId[];
   /** Draisine sortie de la remise et posée au bout de la voie (position, orientation); `null`: dans la remise. */
   handcarAt: { pos: Vec2; facing: number } | null;
   /** Colis lourds livrés par le train, en attente d'être portés à deux (objets `carriedByTwo` du catalogue). */
@@ -152,14 +155,25 @@ export interface WorldState {
    * Absent des sauvegardes d'avant: rempli à vide à la reprise.
    */
   heard: Record<CharacterId, Record<string, number>>;
+  /**
+   * Tour 9 (section 3.8, recommandation retenue): les répliques entendues il y a plus de
+   * `dialogues.datedRepeatDays` jours quittent `heard` pour un ensemble de bits par joueur (une
+   * réplique par bit, dans l'ordre des identifiants du contenu, `key`: empreinte de cette liste),
+   * toutes à égalité pour le tirage « la moins récente ». La taille ne dépend plus du temps de jeu.
+   */
+  heardOld: { key: string; p1: string; p2: string };
   /** Dialogues déjà vus: `once: duo` (clé = id) et `once: player` (clé = `id@p1`). */
   dialoguesDone: string[];
   /** Scène à deux en cours (dialogue partagé), ou `null`. */
   scene: SceneState | null;
   /** Compteurs d'actions, par personnage et pour le duo (conditions des quêtes). */
   counters: Counters;
-  /** Les mêmes compteurs au début de la journée (conditions « depuis ce matin » des envies). */
-  countersAtDawn: Counters;
+  /**
+   * Ce que les compteurs ont gagné depuis l'aube (conditions « depuis ce matin » des envies), clés
+   * touchées aujourd'hui seulement. Tour 9 (section 3.8): remplace la copie complète des compteurs
+   * prise à l'aube (`countersAtDawn`, 5 Ko), relue et convertie à la reprise.
+   */
+  countersToday: Counters;
   /** Suites d'effets en cours (une scène les suspend jusqu'à sa fin). */
   scripts: ScriptState[];
   /** Prochain identifiant unique (meubles, objets au sol, propositions, notifications). */
@@ -193,6 +207,82 @@ export interface WorldState {
    * Absent des sauvegardes d'avant: rempli à vide à la reprise.
    */
   sharedEnvieRecent: { id: EnvieId; day: number }[];
+  /** Tableau des annonces (tour 9, section 1): l'annonce en cours, la précédente, la mémoire du tirage. */
+  board: BoardState;
+  /** Chantiers (tour 9, section 2.6), par identifiant de `chantiers.json`: versé, planches, jour bâti. */
+  improvements: Record<string, ImprovementState>;
+  /** Articles du catalogue de la semaine achetés (tour 9, section 2.3), par objet: exemplaires commandés. */
+  catalogueBought: Record<ItemId, number>;
+  /** Cadeaux offerts (tour 9, section 2.7), par habitant: jour de la remise. */
+  giftsGiven: Record<VillagerId, number>;
+  /**
+   * Pièces de la maisonnette à bâtir (tour 10, section 4), par identifiant de `pieces.json`
+   * (`room_cellar`, `room_bedroom`): une entrée dès la commande. Vide au départ et dans les
+   * sauvegardes d'avant.
+   */
+  rooms: Record<string, RoomState>;
+  /**
+   * Le râtelier près de la porte (tour 10, section 5.3): les outils rangés, hors des cases du
+   * rangement (`cellar` reste le contenu du rangement commun). Vide au départ.
+   */
+  rack: ItemStack[];
+}
+
+/** Une pièce commandée à Basile (tour 10, section 4.3). */
+export interface RoomState {
+  /** Jour de la commande (le site paraît au matin suivant), `null` si pas encore commandée. */
+  ordered: number | null;
+  /** Ce qui a été déposé à la caisse du chantier (rien ne se perd). */
+  crate: ItemStack[];
+  /** Éléments bâtis (identifiants des éléments de `pieces.json`). */
+  elementsBuilt: string[];
+  /** Panne faîtière portée à deux jusqu'au faîte (chambre). */
+  beamPlaced: boolean;
+  /** Jour où la pièce est à vous (tuiles posées, porte percée), `null` avant. */
+  builtDay: number | null;
+}
+
+/** Une annonce affichée au tableau du quai (tour 9, section 1). */
+export interface BoardAnnonce {
+  /** Gabarit (`annonces.json`). */
+  gabarit: string;
+  /** Variante tirée (index de `variants`: la ligne de la vitrine d'Odette). */
+  variant: number;
+  /** Quête du carnet qui la porte (`annonce_<gabarit>`). */
+  quest: QuestId;
+  /** Jour de l'affiche. */
+  posted: number;
+  /** Échéance: elle se retire à cette heure si elle n'est pas faite. */
+  deadline: { day: number; time: number };
+  /** Récompense en sous (section 1.4), fixée à l'affiche. */
+  reward: number;
+  state: 'open' | 'done' | 'expired';
+  /** Qui l'a remise (dernier don ou scène à deux: `null`). */
+  by: CharacterId | null;
+  /** Jour où elle a été faite ou retirée. */
+  closedDay: number | null;
+}
+
+export interface BoardState {
+  current: BoardAnnonce | null;
+  previous: BoardAnnonce | null;
+  /** Les derniers gabarits affichés et leur jour (règle des 10 jours), 4 au plus. */
+  recent: { gabarit: string; day: number }[];
+  /** Gabarits déjà affichés une fois (poids x 2 aux jamais affichés). */
+  posted: string[];
+  /** Objets uniques déjà donnés (le dessin de Jeanne, la gelée de sureau). */
+  uniquesGiven: ItemId[];
+}
+
+export interface ImprovementState {
+  /** Sous versés (souscription du bourg, ou paiement à Basile). */
+  paid: number;
+  /** Planches apportées à Basile (chacune retire `plankDiscount` sous du prix). */
+  planks: number;
+  /** Payé en entier: Basile bâtit dans la nuit. */
+  funded: boolean;
+  /** Jour où il paraît bâti (le matin qui suit le paiement), `null` sinon. */
+  builtDay: number | null;
 }
 
 /**
@@ -251,8 +341,18 @@ export type ClockStop =
 // Personnages
 
 export interface Appearance {
-  /** Coiffure, de 0 à 2. */
+  /**
+   * Coiffure, de 0 à 14 (tour 10, section 2.1, dans l'ordre de la table: 0 à 2 les trois d'avant,
+   * 3 à 11 les nouvelles de la création, 12 à 14 celles du salon seulement).
+   */
   hair: number;
+  /**
+   * Couleur des cheveux, de 0 à 7 (section 2.2): noir, brun, châtain, auburn, roux, blond paille,
+   * gris, blanc. Défaut: celle des portraits d'avant (p1 brun, p2 noir).
+   */
+  hairColor: number;
+  /** Barbe ou moustache (réponse du client du 2026-11-01): 0 aucune, 1 barbe courte, 2 barbe fournie, 3 moustache. */
+  beard: number;
   /** Couleur de la tenue, de 0 à 3. */
   outfit: number;
   /** Couleur du foulard: celle du profil Duo du joueur (CSS, `#rrggbb`). */
@@ -276,8 +376,18 @@ export interface Character {
   facing: number;
   /** Vitesse au sol à ce pas (m/s), pour caler l'animation de marche. */
   speed: number;
-  /** Dans la pièce de la maisonnette. */
+  /** Dans la pièce de la maisonnette (gardé jusqu'à la migration du lot L3 vers `inside`). */
   inHouse: boolean;
+  /**
+   * Bâtiment visitable où il se trouve (ADR 0016), `null` dehors. Recalculé à chaque pas par
+   * `updateInside` et à chaque `placeCharacter`. « À l'abri »: `inside !== null`; « chez soi »:
+   * `inside === HOUSE_BUILDING`.
+   */
+  inside: BuildingId | null;
+  /** Jour du dernier changement de coiffure (salon, section 2.3), `null` si jamais. */
+  hairChangedDay: number | null;
+  /** Qui a remarqué ce changement (Cœur +10 une fois), `null` tant que personne. */
+  hairNoticedBy: CharacterId | null;
   /** Ce que fait le personnage (animation et barre de progression). */
   action: CharacterAction;
   /** Ce qui occupe son joueur (arrêt de l'horloge si les deux sont occupés). */
@@ -413,7 +523,9 @@ export type ActionKind =
   | 'cook'
   | 'feed'
   | 'pickup'
-  | 'refill';
+  | 'refill'
+  /** Lever la perche et allumer une lanterne (tour 9, `pole_raise`). */
+  | 'light';
 
 export interface CharacterAction {
   kind: ActionKind;
@@ -432,6 +544,18 @@ export interface Needs {
   sleep: number;
   /** Cœur, recalculé chaque nuit (0 à 100). */
   heart: number;
+  /** Tour 10 (section 3.5): minutes de jeu de suite à plus de `needs.heart.reunion.apartRadius` de l'autre. */
+  apartMinutes: number;
+  /** Retrouvailles comptées aujourd'hui (`needs.heart.reunion.maxPerDay` au plus). */
+  reunionsToday: number;
+  /** Sieste faite aujourd'hui (une par jour, section 3.4). */
+  nappedToday: boolean;
+  /** Début de la sieste en cours (heure de jeu absolue: jour x 1440 + minutes), `null` hors sieste. */
+  napStart: number | null;
+  /** Premiers rideaux ouverts du matin déjà comptés aujourd'hui (Cœur +2, section 6.2). */
+  curtainsMorningDone: boolean;
+  /** Ligne `heart_missing` déjà montrée aujourd'hui (une fois par jour). */
+  missingShown: boolean;
 }
 
 export type FormLevel = 'low' | 'okay' | 'good' | 'great' | 'radiant';
@@ -453,6 +577,11 @@ export interface AimInfo {
   verb: AimVerb | null;
   /** L'action est impossible: raison affichable (« Il faut de l'eau. »). */
   blocked: string | null;
+  /**
+   * `pointer`: la cible survolée à la souris (R11), que le clic gauche et Espace prennent;
+   * absent: la case devant le personnage. Recalculé à chaque pas, jamais relu d'une sauvegarde.
+   */
+  source?: 'pointer';
 }
 
 export type AimVerb =
@@ -478,7 +607,9 @@ export type AimVerb =
   /** Tenir l'échelle de Basile (geste « tenir », moment rare). */
   | 'hold'
   /** Appeler une poule par son nom (R16, « Les noms des poules »). */
-  | 'call';
+  | 'call'
+  /** Allumer une lanterne (tour 9, les lanternes du quai). */
+  | 'light';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -518,6 +649,13 @@ export interface PlacedFurniture {
   rotation: number;
   /** Qui l'a posé en dernier (`null` pour les meubles de départ). */
   placedBy: CharacterId | null;
+  /**
+   * Rideaux seulement (tour 10, section 6): la fenêtre où ils pendent (nom du nœud `window_<n>` du
+   * modèle). Absent pour les autres meubles et dans les sauvegardes d'avant (lot L4: migration).
+   */
+  window?: string;
+  /** Rideaux seulement: fermés. Absent: ouverts. */
+  closed?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -606,6 +744,8 @@ export interface Hen {
   nameKnownBy: CharacterId[];
   /** Qui l'a appelée par son bon nom, ou `null`. */
   namedBy: CharacterId | null;
+  /** Poule commandée au catalogue (tour 9): jour d'arrivée; Jeanne la nomme à 10 h 30. Absent pour les trois premières. */
+  arrivedDay?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -647,6 +787,15 @@ export interface MomentToday {
   hintTo: CharacterId | null;
   /** Timidité: l'animal se redresse jusqu'à ce tick (un joueur trop près), 0 au calme. */
   shyUntil: number;
+  /**
+   * Tour 9, le salut du mécanicien (`watch.arm`): tick où les deux ont armé les barrières, `null`
+   * avant. Absent des sauvegardes d'avant: comme `null`.
+   */
+  armedTick?: number | null;
+  /** Tour 9, les lanternes (`watch.syncPress`): dernier allumage de chacun (tick et place), `null` sans. */
+  presses?: { p1: { tick: number; place: PointId } | null; p2: { tick: number; place: PointId } | null };
+  /** Lignes d'aide déjà dites une fois pendant ce moment (`take:p1`, `where:p2`...). Absent: aucune. */
+  told?: string[];
 }
 
 export interface MomentMemory {
@@ -776,6 +925,8 @@ export interface VillagerState {
   talkingWith: CharacterId[];
   /** Le duo lui a parlé (rencontre faite par au moins un des deux). */
   met: boolean;
+  /** Bâtiment visitable où il se trouve (ADR 0016, son et interface), `null` dehors ou hors de la carte. */
+  inside: BuildingId | null;
 }
 
 export interface DialogueLineView {
@@ -824,6 +975,8 @@ export interface TrainState {
   /** 0 à 1 pendant l'entrée ou le départ (glissement), 1 à quai. */
   progress: number;
   prevProgress: number;
+  /** Départ au pas du salut du mécanicien (tour 9, `train.saluteSlowRoll`): absent ou faux sinon. */
+  slow?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -839,7 +992,8 @@ export interface Proposal {
 }
 
 export interface PurchaseRequest {
-  source: 'grocery' | 'catalogue';
+  /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en sous. */
+  source: 'grocery' | 'catalogue' | 'improvement';
   item: ItemId;
   count: number;
 }
@@ -1084,4 +1238,22 @@ export type WorldEvent =
   // Informations propres (R16)
   | { type: 'hen_called'; hen: string; name: string; correct: boolean; by: CharacterId }
   | { type: 'dialogue_choice'; dialogue: DialogueId; choice: string; correct: boolean | null; by: CharacterId }
-  | { type: 'secret_revealed'; quest: QuestId; to: CharacterId | 'both' };
+  | { type: 'secret_revealed'; quest: QuestId; to: CharacterId | 'both' }
+  // Tour 9: tableau des annonces
+  | { type: 'annonce_posted'; gabarit: string; quest: QuestId }
+  | { type: 'annonce_done'; gabarit: string; by: CharacterId | null; amount: number }
+  | { type: 'annonce_expired'; gabarit: string }
+  // Tour 9: chantiers (versement au tableau ou à Basile, payé en entier, bâti au matin)
+  | { type: 'improvement_paid'; by: CharacterId; improvement: string; amount: number; planks: number }
+  | { type: 'improvement_funded'; improvement: string }
+  | { type: 'improvement_built'; improvement: string }
+  // Tour 9: catalogue de la semaine, outils, poules, cadeaux
+  | { type: 'catalogue_page'; season: Season; week: number; items: ItemId[] }
+  | { type: 'tool_upgraded'; by: CharacterId; item: ItemId; previous: ItemId | null }
+  | { type: 'hen_delivered'; hen: string; item: ItemId; by: CharacterId | null }
+  | { type: 'hen_named'; hen: string; name: string; by: CharacterId | null }
+  | { type: 'gift_given'; by: CharacterId; villager: VillagerId; item: ItemId }
+  // Tour 9: moments (barrières armées, lanternes)
+  | { type: 'moment_armed'; moment: string }
+  | { type: 'lantern_lit'; by: CharacterId; place: PointId }
+  | { type: 'lantern_out'; by: CharacterId; place: PointId };

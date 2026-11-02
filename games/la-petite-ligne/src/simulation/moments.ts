@@ -13,9 +13,9 @@ import type { Condition, MomentDef, MomentWatch, Season } from '../donnees/types
 import { activeWatch, allGoneAfterClimax, drawnPose, freezeState, momentDef, restPosition, startleTicks, watchTarget, type FreezeState } from '../etat/moments';
 import { MOVE_DEADZONE, SIM_DT, SIM_HZ } from './constantes';
 import { evaluate, evaluateAll, LOOK_CONE, NO_CONTEXT, variantOf } from './conditions';
-import { type Sim, bump, character, distance, emit, message, notifyKey, partnerName, partnerOf, point, say } from './contexte';
+import { type Sim, bump, character, distance, emit, message, notifyKey, partnerName, partnerOf, point, say, sayIfWritten } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
-import { type Blockers, moveBody } from './grille';
+import { type Blockers, moveBody, nearestFreeCell } from './grille';
 import { runEffects } from './effets';
 import { unitDraw } from '../etat/tirage';
 import { recordMoment } from './souvenirs';
@@ -89,7 +89,8 @@ function isTrainDay(sim: Sim): boolean {
  */
 export function cooldownOf(sim: Sim, def: MomentDef): number {
   const s = sim.content.settings.moments;
-  return def.cooldownDays ?? (sim.world.clock.day >= s.longFromDay ? s.cooldownDaysLong : s.cooldownDays);
+  // Tour 9 (section 4.5): le héron et le renard ont leur propre fenêtre longue (`longCooldownDays`).
+  return def.cooldownDays ?? (sim.world.clock.day >= s.longFromDay ? (def.longCooldownDays ?? s.cooldownDaysLong) : s.cooldownDays);
 }
 
 /** Un moment d'ambiance peut-il sortir ce matin (section 1.2, étape 4) ? */
@@ -265,9 +266,31 @@ function free(sim: Sim, c: Character): boolean {
   return c.created && !c.inHouse && c.menu === null && c.dialogue === null && c.status === 'active' && !c.absent && sim.world.scene === null;
 }
 
+/** Place d'allumage (`watch.syncPress`) à portée de ce joueur, ou `null`. */
+export function lanternPlaceNear(sim: Sim, c: Character, w: MomentWatch): string | null {
+  const sp = w.syncPress;
+  if (sp === null) return null;
+  const range = sim.content.settings.moments.holdRange;
+  let best: string | null = null;
+  let bestD = Infinity;
+  for (const id of sp.places) {
+    const at = sim.map.points[id];
+    if (at === undefined) continue;
+    const d = distance(c.pos, at);
+    if (d <= range && d < bestD) {
+      best = id;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
 /** Ce joueur remplit-il sa part (rayon, immobilité, regard, banc, place tenue) ? */
 export function watchPart(sim: Sim, c: Character, w: MomentWatch, target: { x: number; y: number }): boolean {
   if (!free(sim, c)) return false;
+  // Les lanternes (tour 9): chacun à une place d'allumage, loin de l'autre (ni rayon ni cible).
+  if (w.syncPress !== null) return lanternPlaceNear(sim, c, w) !== null;
+  if (w.closeTogether !== null && distance(c.pos, character(sim, partnerOf(c.id)).pos) > w.closeTogether) return false;
   const d = distance(c.pos, target);
   if (d > w.radius || d < w.minRadius) return false;
   if (w.still && c.speed >= sim.content.settings.moments.stillSpeed) return false;
@@ -406,10 +429,116 @@ function leaveNow(sim: Sim, def: MomentDef, today: MomentToday): void {
   enter(sim, today, 'gone');
 }
 
+/** Une ligne d'aide, une fois par moment et par joueur (`today.told`). */
+function tellOnce(sim: Sim, today: MomentToday, who: CharacterId, key: string, text: string): void {
+  const told = (today.told ??= []);
+  const id = `${key}:${who}`;
+  if (told.includes(id)) return;
+  told.push(id);
+  say(sim, who, text, { partner: partnerName(sim, who) });
+}
+
+/**
+ * Les lanternes (tour 9, section 4.4): une flamme allumée seule s'éteint au bout de `gapSeconds`;
+ * deux allumages, un à chaque place, à moins de `gapSeconds` l'un de l'autre, font l'apogée.
+ */
+function updateLanterns(sim: Sim, today: MomentToday, w: MomentWatch): void {
+  const sp = w.syncPress;
+  if (sp === null) return;
+  const presses = (today.presses ??= { p1: null, p2: null });
+  const gap = Math.round(sp.gapSeconds * SIM_HZ);
+  for (const c of sim.world.characters) {
+    const p = presses[c.id];
+    if (p === null || sim.world.tick - p.tick <= gap) continue;
+    presses[c.id] = null;
+    sim.runtime.changed = true;
+    emit(sim, { type: 'lantern_out', by: c.id, place: p.place });
+    say(sim, c.id, 'moment_lantern_alone', { partner: partnerName(sim, c.id) });
+  }
+  // L'un à une place, l'autre à aucune: où est l'autre lanterne (une fois par moment).
+  for (const c of sim.world.characters) {
+    const mine = lanternPlaceNear(sim, c, w);
+    const theirs = lanternPlaceNear(sim, character(sim, partnerOf(c.id)), w);
+    if (mine === null || theirs !== null) continue;
+    const other = sp.places.find((x) => x !== mine);
+    if (other === undefined) continue;
+    const key = other === 'lantern_square' ? 'moment_lantern_where_square' : 'moment_lantern_where_quay';
+    if (Object.hasOwn(sim.content.texts.messages, key)) tellOnce(sim, today, c.id, 'where', key);
+  }
+}
+
+/** Allumer la lanterne de cette place (Espace à portée): l'apogée si l'autre vient d'allumer la sienne. */
+export function lightLantern(sim: Sim, c: Character, place: string): void {
+  const today = sim.world.moments.today;
+  const def = today === null ? null : momentDef(sim.content, today.id);
+  if (today?.phase !== 'waiting' || def === null) return;
+  const w = activeWatch(def, today);
+  const sp = w.syncPress;
+  const m = minutes(sim);
+  if (sp === null || !sp.places.includes(place) || m < def.window.from || m >= def.window.to) return;
+  const presses = (today.presses ??= { p1: null, p2: null });
+  presses[c.id] = { tick: sim.world.tick, place };
+  c.action = { kind: 'light', since: sim.world.tick, duration: Math.round(0.6 * SIM_HZ), target: { ...point(sim, place) } };
+  sim.runtime.changed = true;
+  emit(sim, { type: 'lantern_lit', by: c.id, place });
+  const other = presses[partnerOf(c.id)];
+  if (other !== null && other.place !== place && sim.world.tick - other.tick <= Math.round(sp.gapSeconds * SIM_HZ)) {
+    today.presses = { p1: null, p2: null };
+    startClimax(sim, def, today);
+  }
+}
+
+/** Le moment du jour peut-il s'allumer à cette place maintenant ? (verbe « allumer » de la visée) */
+export function lanternTargetNear(sim: Sim, c: Character): string | null {
+  const today = sim.world.moments.today;
+  if (today?.phase !== 'waiting' || !free(sim, c)) return null;
+  const def = momentDef(sim.content, today.id);
+  if (def === null) return null;
+  const m = minutes(sim);
+  if (m < def.window.from || m >= def.window.to) return null;
+  return lanternPlaceNear(sim, c, activeWatch(def, today));
+}
+
+/**
+ * Le salut du mécanicien (tour 9, section 4.2, `watch.arm`): les deux ont tenu les manivelles, les
+ * lisses descendent et se verrouillent; les cases de la traversée se ferment et qui s'y trouve est
+ * poussé vers le quai. L'apogée attend l'heure du départ (`climaxAt`).
+ */
+function armMoment(sim: Sim, def: MomentDef, today: MomentToday, w: MomentWatch): void {
+  const arm = w.arm;
+  if (arm === null) return;
+  today.armedTick = sim.world.tick;
+  today.watchTicks = 0;
+  sim.runtime.dynamicDirty = true;
+  sim.runtime.changed = true;
+  emit(sim, { type: 'moment_armed', moment: def.id });
+  sayIfWritten(sim, 'both', 'moment_gates_down');
+  const b = refreshBlockers(sim);
+  const cells = arm.cells;
+  for (const c of sim.world.characters) {
+    const cx = Math.floor(c.pos.x);
+    const cy = Math.floor(c.pos.y);
+    if (cx < cells.x || cx >= cells.x + cells.w || cy < cells.y || cy >= cells.y + cells.h) continue;
+    stopPath(sim, c);
+    const to = nearestFreeCell(b, { x: Math.min(Math.max(c.pos.x, cells.x + 0.5), cells.x + cells.w - 0.5), y: arm.pushToward[1] });
+    const at = to ?? { x: arm.pushToward[0], y: arm.pushToward[1] };
+    c.pos.x = at.x;
+    c.pos.y = at.y;
+    c.prev.x = at.x;
+    c.prev.y = at.y;
+  }
+}
+
 /** Retours pendant l'attente: la part de chacun, l'invitation à appeler l'autre, la timidité. */
 function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
   const { world } = sim;
   const w = activeWatch(def, today);
+  if (w.syncPress !== null) updateLanterns(sim, today, w);
+  // Le salut armé: on peut lâcher les manivelles; l'apogée part avec le train.
+  if (w.arm !== null && (today.armedTick ?? null) !== null) {
+    if (minutes(sim) >= w.arm.climaxAt) startClimax(sim, def, today);
+    return;
+  }
   const target = watchTarget(sim.map, def, w.target, today);
   const [a, b] = world.characters;
   if (a === undefined || b === undefined) return;
@@ -434,8 +563,8 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     today.early = early;
     sim.runtime.changed = true;
   }
-  // Aux aguets (la chevrette): le compteur ne tourne que pendant un regard.
-  if (both && inWindow && !hidden && (freeze === null || freeze.kind === 'look')) {
+  // Aux aguets (la chevrette): le compteur ne tourne que pendant un regard. Les lanternes: pas de compteur.
+  if (both && inWindow && !hidden && w.syncPress === null && (freeze === null || freeze.kind === 'look')) {
     today.watchTicks += 1;
     sim.runtime.changed = true;
   } else if (today.watchTicks !== 0) {
@@ -443,7 +572,8 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     sim.runtime.changed = true;
   }
   if (today.watchTicks >= Math.max(1, Math.round(w.holdSeconds * SIM_HZ))) {
-    startClimax(sim, def, today);
+    if (w.arm !== null) armMoment(sim, def, today, w);
+    else startClimax(sim, def, today);
     return;
   }
   const s = sim.content.settings.moments;
@@ -622,14 +752,24 @@ export function updateMoments(sim: Sim): void {
       }
       break;
     }
-    case 'waiting':
+    case 'waiting': {
+      // Lanternes et salut (tour 9): sans apogée à la fin de la fenêtre, Firmin allume lui-même, le train part comme d'habitude.
+      const w = activeWatch(def, today);
+      const closesAtWindow = w.syncPress !== null || (w.arm !== null && (today.armedTick ?? null) === null);
       if (today.origin === 'quest' && questState(sim, def.quest)?.status !== 'active') enter(sim, today, 'gone');
-      else if (m >= def.present.to) leaveNow(sim, def, today);
+      else if (m >= def.present.to || (closesAtWindow && m >= def.window.to)) leaveNow(sim, def, today);
       else updateWaiting(sim, def, today);
       break;
-    case 'climax':
+    }
+    case 'climax': {
+      const arm = activeWatch(def, today).arm;
+      const before = today.elapsed;
       updateClimax(sim, def, today);
+      // Les lisses remontent seules (`liftAt`): les cases de la traversée se rouvrent.
+      const phase: string = today.phase;
+      if (arm !== null && (before < arm.liftAt) !== (phase === 'climax' && today.elapsed < arm.liftAt)) sim.runtime.dynamicDirty = true;
       break;
+    }
     case 'after':
       if (m >= def.present.to) leaveNow(sim, def, today);
       break;

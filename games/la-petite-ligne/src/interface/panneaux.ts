@@ -4,19 +4,16 @@
  * maison (maquettes `caisse.html`, `catalogue.html`; les trois derniers
  * reprennent les mêmes composants, README des maquettes, section 5).
  */
-import { catalogueWindow, currentOrder } from '../donnees/commandes';
+import { currentOrder } from '../donnees/commandes';
 import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, el, icon, keysLine, token } from './dom';
+import { button, chip, el, icon } from './dom';
 import { defaultCrateLine, defaultProduct } from './focus';
 import { countIn, hourLabel, itemName, lowerFirst } from './format';
-import { linesText, orderFullAmount, orderLines, purseModel, splitAmount } from './modele';
+import { linesText, orderFullAmount, orderLines } from './modele';
 import {
-  catalogueDelivered,
-  catalogueOpen,
-  catalogueProducts,
   foodEntries,
   grocerBudget,
   missingText,
@@ -27,27 +24,12 @@ import {
   shopSellEntries,
   stackEntries,
 } from './modele-panneaux';
-import { Panel } from './panneau';
+import { type BasileModel, basileModel } from './modele-tableau';
+import { basileRoomsModel } from './modele-maison';
+import { basileRoomsSection } from './maison';
+import { Panel, backKeys, price } from './panneau';
+import { builtList, chantierCard } from './tableau';
 import { SOUND_ATTR } from './sons';
-
-function purseBadge(host: UiHost, world: ReadonlyWorld): HTMLSpanElement {
-  const { ctx } = host;
-  const unit = splitAmount(ctx.texts.game.ui.hud.purse);
-  return el('span', { class: 'lpl-purse', 'aria-label': ctx.texts.extra.hud.purseLabel }, [
-    icon('ui-coin'),
-    el('span', { class: 'lpl-purse__amount', text: String(purseModel(world).amount) }),
-    el('span', { class: 'lpl-purse__unit', text: unit.after.trim() }),
-  ]);
-}
-
-function price(host: UiHost, amount: number): HTMLSpanElement {
-  return el('span', { class: 'lpl-product__price' }, [icon('ui-coin'), host.ctx.t(host.ctx.texts.game.ui.shop.price, { price: amount })]);
-}
-
-function backKeys(host: UiHost, extra: readonly { keys: readonly string[]; text: string }[]): HTMLSpanElement {
-  const { ctx } = host;
-  return keysLine([...extra, { keys: [ctx.key('Backspace')], text: ctx.texts.extra.notebook.keysClose }]);
-}
 
 // ---------------------------------------------------------------------------
 // Caisse de la coopérative
@@ -190,156 +172,6 @@ export class CratePanel extends Panel {
         );
       });
       return [summary, list];
-    });
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Catalogue
-
-export class CataloguePanel extends Panel {
-  private readonly purseSlot: HTMLSpanElement;
-  private readonly partnerNote: HTMLSpanElement;
-
-  constructor(host: UiHost) {
-    const { ctx } = host;
-    super(host, {
-      icon: 'ui-notebook',
-      title: ctx.t(ctx.texts.game.ui.catalogue.title),
-      subtitle: ctx.t(ctx.texts.game.ui.catalogue.subtitle),
-      closeKeyLabel: ctx.key('Backspace'),
-      closeAria: `${ctx.texts.extra.common.close} (${ctx.key('Backspace')})`,
-    });
-    this.purseSlot = el('span', { class: 'lpl-panel__close' });
-    this.closeButton.classList.remove('lpl-panel__close');
-    this.header.insertBefore(this.purseSlot, this.closeButton);
-    this.partnerNote = el('span');
-    const a = ctx.texts.extra.keys.arrows;
-    this.setFooter([
-      backKeys(host, [
-        { keys: [a[2], a[3]], text: ctx.texts.extra.notebook.keysChoose },
-        { keys: [ctx.key('Enter')], text: ctx.texts.extra.catalogue.keysOrder },
-      ]),
-      this.partnerNote,
-    ]);
-  }
-
-  update(world: ReadonlyWorld): void {
-    const { ctx } = this.host;
-    const k = ctx.texts.extra.catalogue;
-    const products = catalogueProducts(world, ctx);
-    const open = catalogueOpen(world, ctx);
-    const delivered = catalogueDelivered(world, ctx);
-    const partnerName = nameOf(world, ctx.partner);
-    const amount = purseModel(world).amount;
-    if (this.purseSlot.dataset.amount !== String(amount)) {
-      this.purseSlot.dataset.amount = String(amount);
-      this.purseSlot.replaceChildren(purseBadge(this.host, world));
-    }
-    this.partnerNote.textContent = open ? ctx.t(k.partnerSees, { partner: partnerName }) : '';
-    const inChest = products.filter((p) => p.state === 'delivered').length;
-    this.setSubtitle(
-      delivered && inChest > 0 ? ctx.t(k.deliveredSubtitle) : open ? ctx.t(ctx.texts.game.ui.catalogue.subtitle) : ctx.t(k.closedSubtitle),
-    );
-    const sig = JSON.stringify([products, open, delivered, partnerName, world.purse]);
-    this.renderBody(sig, () => {
-      let summary: HTMLElement;
-      if (delivered && inChest > 0) {
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', {}, [icon('parcel'), ' ', inChest === 1 ? ctx.t(k.deliveredOne) : ctx.t(k.delivered, { count: inChest })]),
-          el('span', { text: ctx.t(k.deliveredText) }),
-        ]);
-      } else if (!open) {
-        const time = hourLabel(catalogueWindow(ctx.content.settings, world.clock.day).delivery.time, ctx.texts.game.ui.hud.time);
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', {}, [icon('ui-lock'), ' ', ctx.t(k.closed)]),
-          el('span', { text: ctx.t(k.closedText, { time }) }),
-        ]);
-      } else {
-        const ordered = products.filter((p) => p.state === 'ordered');
-        const list = ordered.map((p) => `${itemName(ctx.content.items[p.item], 1, p.item)}, ${ctx.t(ctx.texts.game.ui.shop.price, { price: p.price })}`).join(' · ');
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', { text: ordered.length === 0 ? ctx.t(k.orderedNone) : ctx.t(k.ordered, { list }) }),
-          el('span', { text: ctx.t(k.bigPurchase, { amount: ctx.content.settings.economy.bigPurchaseThreshold }) }),
-        ]);
-      }
-      const focusIndex = defaultProduct(products);
-      const grid = el('div', { class: 'lpl-catalog', 'data-nav': 'grid' });
-      products.forEach((p, i) => {
-        const status = el('span', { class: 'lpl-product__status' });
-        let stamp: HTMLElement | null = null;
-        let pressed = false;
-        let disabled = false;
-        let waiting = false;
-        switch (p.state) {
-          case 'ordered':
-            pressed = true;
-            status.append(price(this.host, p.price), ` · ${ctx.t(k.statusOrdered)}`);
-            stamp = el('span', { class: 'lpl-stamp lpl-stamp--green', text: ctx.t(k.stampOrdered) });
-            break;
-          case 'delivered':
-            status.append(ctx.t(k.inChest));
-            stamp = el('span', { class: 'lpl-stamp', text: ctx.t(k.stampDelivered) });
-            break;
-          case 'waiting':
-            waiting = true;
-            status.append(
-              el('span', { class: 'lpl-product__price' }, [icon('ui-coin'), ctx.t(k.reserved, { amount: p.price })]),
-              el('br'),
-              chip(ctx.t(k.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass'),
-            );
-            break;
-          case 'partner_waiting':
-            disabled = true;
-            status.append(price(this.host, p.price), el('br'), chip(ctx.t(k.proposedBy, { partner: partnerName }), 'waiting', 'ui-hourglass'));
-            break;
-          case 'too_expensive':
-            disabled = true;
-            status.append(price(this.host, p.price), el('br'), el('span', { class: 'lpl-text-alert', text: ctx.t(ctx.texts.extra.common.missingMoney, { missing: p.missing }) }));
-            break;
-          case 'closed':
-            disabled = true;
-            status.append(price(this.host, p.price), ` · ${ctx.t(k.closedStatus)}`);
-            break;
-          case 'orderable':
-            status.append(price(this.host, p.price));
-            if (p.big) {
-              const askChip = chip(ctx.t(k.askPartner, { partner: partnerName }));
-              askChip.prepend(token('other', this.host.symbol('other'), 'small'));
-              status.append(el('br'), askChip);
-            } else {
-              status.append(` · ${ctx.t(k.enterToOrder, { key: ctx.key('Enter') })}`);
-            }
-            break;
-        }
-        const product = button(
-          [icon(p.icon, 'lpl-product__icon'), el('span', { class: 'lpl-product__name', text: p.name }), el('span', { class: 'lpl-product__effect', text: p.effect }), status, stamp],
-          () => {
-            if (p.state === 'orderable') this.host.send({ type: 'catalogue_order', item: p.item });
-          },
-          {
-            class: 'lpl-product',
-            attrs: {
-              'data-nav-item': true,
-              'data-key': `product:${p.item}`,
-              'aria-pressed': pressed ? 'true' : 'false',
-              'aria-disabled': disabled ? 'true' : null,
-              'data-state': waiting ? 'waiting' : null,
-              'data-autofocus': i === focusIndex,
-            },
-          },
-        );
-        grid.append(product);
-      });
-      const mine = products.some((p) => p.state === 'waiting');
-      const withdraw = mine
-        ? el('div', { class: 'lpl-sheet__actions', style: 'margin-top: 0.75rem' }, [
-            button(ctx.t(k.withdraw), () => {
-              this.host.send({ type: 'proposal_withdraw' });
-            }, { attrs: { 'data-nav-item': true, 'data-key': 'withdraw' } }),
-          ])
-        : null;
-      return [summary, grid, withdraw];
     });
   }
 }
@@ -541,7 +373,12 @@ export class StationPanel extends Panel {
     const { entries, locked } = recipeEntries(world, ctx, this.station);
     const food = this.station === 'stove' ? foodEntries(world, ctx) : [];
     const together = partnerAtHome(world, ctx);
-    const sig = JSON.stringify([entries, locked, food, together]);
+    // Tour 9: la commande des chantiers de la maisonnette, à l'établi de Basile (dès la lettre `basile_works`).
+    const basile = this.station === 'workbench' ? basileModel(world, ctx) : null;
+    // Tour 10: « Agrandir la maisonnette » (cellier, chambre) et le grand coffre de chêne.
+    const rooms = this.station === 'workbench' ? basileRoomsModel(world, ctx) : null;
+    const partnerName = nameOf(world, ctx.partner);
+    const sig = JSON.stringify([entries, locked, food, together, basile, rooms, partnerName, world.purse]);
     this.renderBody(sig, () => {
       const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
       const focusIndex = defaultProduct(entries);
@@ -579,6 +416,8 @@ export class StationPanel extends Panel {
       if (this.station === 'stove') nodes.push(el('h3', { class: 'lpl-section-title', text: ctx.t(ctx.texts.extra.stove.cookSection) }));
       nodes.push(entries.length === 0 ? el('div', { class: 'lpl-empty', text: ctx.t(w.noRecipes) }) : list);
       if (locked > 0 && this.station === 'workbench') nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(w.lockedPlans) }));
+      if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
+      if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
       if (this.station === 'stove') {
         nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.stove.eatSection) }));
         if (food.length === 0) nodes.push(el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.stove.nothingToEat) }));
@@ -683,4 +522,36 @@ export class ChestPanel extends Panel {
       ];
     });
   }
+}
+
+/**
+ * « Commander à Basile » (tour 9, section 2.6): le chantier de la maisonnette ouvert, les planches
+ * apportées (10 sous de moins chacune, 20 au plus), la commande payée d'un coup.
+ */
+function basileSection(host: UiHost, m: BasileModel, partnerName: string): HTMLElement[] {
+  const { ctx } = host;
+  const k = ctx.texts.extra.basile;
+  const nodes: HTMLElement[] = [el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.game.ui.basile.order) })];
+  const c = m.chantier;
+  if (c === null) {
+    nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(m.allBuilt ? k.allBuilt : ctx.texts.extra.board.nextTomorrow) }));
+  } else {
+    const extra: (HTMLElement | null)[] = [];
+    if (!c.funded && c.pending === null) {
+      const label = m.planksFull ? k.planksFull : m.bring === 0 ? k.noPlanks : m.bring === 1 ? k.bringOne : k.bring;
+      extra.push(
+        button(ctx.t(label, { count: m.bring }), () => {
+          if (m.bring > 0) host.send({ type: 'improvement_planks', improvement: c.id, count: m.bring });
+        }, { class: 'lpl-button', attrs: { 'data-nav-item': true, 'data-key': `planks:${c.id}`, 'aria-disabled': m.bring > 0 ? null : 'true' } }),
+      );
+    }
+    const discount = ctx.content.settings.improvements?.plankDiscount ?? 0;
+    const max = ctx.content.settings.improvements?.plankDiscountMax ?? 1;
+    nodes.push(
+      chantierCard(host, c, partnerName, false, extra, { title: m.priceLine, progress: m.planksLine, percent: Math.round((c.planks / Math.max(1, max)) * 100) }),
+      el('p', { class: 'lpl-field__help', text: `${ctx.t(k.subtitle)} ${ctx.t(k.help, { discount })}` }),
+    );
+  }
+  if (m.built.length > 0) nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.board.builtTitle) }), builtList(m.built));
+  return nodes;
 }

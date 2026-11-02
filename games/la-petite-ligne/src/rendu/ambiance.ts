@@ -514,7 +514,11 @@ export class AmbiancePart implements ExtensionPart {
         light.position.z,
         light.radius,
       );
-      u.uLampColors.value[count]?.set(kind.color).multiplyScalar(kind.intensity * fade * flicker);
+      const lit = this.hooks.lamps?.factor(light.lamp) ?? 1;
+      if (lit <= 0) {
+        continue;
+      }
+      u.uLampColors.value[count]?.set(kind.color).multiplyScalar(kind.intensity * fade * flicker * lit);
       count += 1;
     }
     u.uLampCount.value = count;
@@ -589,6 +593,7 @@ export class AmbiancePart implements ExtensionPart {
       this.lightView,
       day.morningMist,
     );
+    if (this.hooks.lamps !== undefined) this.sky.updateLamps(this.hooks.lamps);
     if (!context.reducedMotion) {
       this.updateSteam(context);
     }

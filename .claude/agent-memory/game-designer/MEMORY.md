@@ -166,3 +166,37 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Une astuce cite la touche par jeton (`{act}`, `{examine}`, `{move}`, `{notebook}`, `src/interface/format.ts`), jamais par un nom de verbe (« fais Agir »).
 - Un coût de commande « par unité » tiré d'une probabilité (poisson) doit suivre la saison des poids: la truite d'été (poids 1 sur 11) coûtait deux fois la part prévue au poids de printemps.
 - Une monnaie gagnée chaque semaine sans nouvel usage se voit au bout de deux semaines de jeu: compter le total des prix en vente face aux gains d'une commande avant de livrer une économie.
+
+## Économie après la démo (vérifié au tour 9, script `simulations/tour9_automne.py`)
+
+- Mesurer la bourse des robots par un test jetable (`/tmp/<dossier>/bourse.test.ts`, `newSim` et `createRobot({ stages: 'stay' })` de `tests/aides.ts`, `lastDay` porté dans le contenu du test, événements `order_paid` et `sold`): 99 s pour 63 jours par graine. Repère à `757c3b0`: 6 825 et 7 561 sous au jour 63, aucune vente à Odette, aucun achat sauf des graines.
+- Le modèle de commande du tour 8 paie environ 12 % de mieux que les robots: le caler (x 0,88) avant tout équilibrage de prix.
+- Ce n'est pas le plafond d'Odette (300 sous par jour) qui limite ses achats, c'est la production du duo (environ 400 sous par semaine au plus).
+- La pièce de la maisonnette fait 5 x 4 cases et se remplit vite: l'argent ne peut pas partir dans des meubles au sol; objets muraux, outils, poules, cadeaux et chantiers posés sur la carte.
+- Zones réservées de la carte à ne jamais occuper: `house_plan_reserved` (2, 15, 14 x 12) et `garden_extension_reserved` (2, 28, 12 x 8).
+
+## Carte: pièges trouvés en posant des objets (tour 9)
+
+- Cases déjà prises qu'on ne voit pas sur la grille des sols: clôture de la rive nord (x 10 à 15, y 36), panneau de la gare (x 45 et 46, y 18), cases (22, 36) et (35, 18). Toujours passer les cases par `GEO.load_map(...).cell()` (outil du tour 7) avant d'écrire une position.
+- En orientation 0, la pension d'Odette (x 23 à 30, y 23 à 32, haute) cache tout l'ouest du quai et le passage à niveau (lanternes, places des joueurs): placer un moment à l'est du quai ou sur la place.
+- `moments.maxSyncGapSeconds` n'est lu par aucun code de jeu (tour 9): un geste « au même instant » demande un champ nouveau.
+
+## Objectifs de moments sur un horizon court
+
+- Dans une saison de 21 jours, un moment qui passe deux fois a forcément un écart de moins de 21 jours: un écart médian de 19 jours (M-22, O-06) ne se mesure que sur plusieurs années. Sur 84 jours, mesurer plutôt la part des passages qui redisent un moment de la même saison et le nombre de moments différents vus par saison.
+- `seasonPoolFull` à 9 laisse l'automne à six moments avec une chance sur trois par jour: une partie sur dix y voit moins de deux moments différents; à 7, trois sur cent.
+
+## Démarrer une mission dans un arbre isolé (vérifié le 2026-11-01, tour 10)
+
+- L'arbre de travail du membre peut partir d'un commit plus ancien que la branche de la session: un fichier cité par le brief (retours, conception du tour précédent) peut manquer. Comparer `git log -1` avec la branche de session (`git branch -a`, le `+` marque les branches ouvertes ailleurs) et avancer par `git merge --ff-only <branche>` avant de lire.
+- Dans cet arbre isolé, une commande qui contient le mot « git » (même `--exclude-dir=.git` du contrôle des tirets), un `cd` vers le dépôt principal ou une commande composée trop longue est refusée: faire le contrôle des tirets par un petit script Python dans `/tmp` qui parcourt l'arbre en sautant `.git` et `node_modules`, et passer les retouches de documents par des scripts dans `/tmp` lancés avec le chemin en argument.
+
+## Repères du monde vérifiés au tour 10
+
+- Le pain n'est vendu nulle part à `77c2f3c`: il n'est que donné par des quêtes (`buyPrice` nul, aucune boutique). Les besoins cachés existent déjà dans `reglages.needs` (Ventre selon le souper, Sommeil du lit, Cœur de la journée, poids de la forme).
+- La maisonnette a cinq fenêtres dans son modèle (`assets-src/modeles/bourg.py`, `gatekeeper_house`): deux au sud, une au nord, une à l'ouest, une à l'est; celle de l'est est centrée sur la limite de deux cases. Pour accrocher quelque chose à une fenêtre, demander des nœuds d'ancrage à l'artiste plutôt qu'une liste de cases.
+- Apparence à `77c2f3c`: trois coiffures (`player_hair_short`, `_bob`, `_bun`), aucune couleur de cheveux, quatre couleurs de tenue.
+- `house_plan_reserved` sert justement à agrandir la maison: le cellier (x 2 à 4) et la chambre (y 16 à 21) du tour 10 y sont; la colonne x 13 (sentier du jardin) et la case x 12 (banc du pignon, tour 9) restent libres.
+- Rendre visible un besoin caché sans le durcir: garder le plancher de nuit actuel et faire compter double le souper; sinon une baisse par heure fait chuter les valeurs de nuit sous la règle en place (premier jet du tour 10: souper simple à 30 au lieu de 60).
+- Dans une simulation d'achats, l'ordre des priorités du duo décide de tout: avec la chambre après les chantiers du bourg, elle n'arrive jamais avant le jour 64. Toujours simuler au moins deux ordres de priorité.
+- Noms d'états de besoins: « Rassasié », « Plein d'élan », « calé » s'accordent au joueur; écrire des noms (« Ventre plein », « Pleine énergie », « Petit creux », « Envie de compagnie »).

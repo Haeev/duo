@@ -4,8 +4,9 @@
  * touches. Le jeu continue derrière (PA-02).
  */
 import type { ReadonlyWorld } from '../etat/types';
+import { purseModel, splitAmount } from './modele';
 import type { KeyInfo, Layer, UiHost } from './composant';
-import { button, clear, el, focusElement, focusables, icon, keycap, setText } from './dom';
+import { button, clear, el, focusElement, focusables, icon, keycap, keysLine, setText } from './dom';
 import { SOUND_ATTR } from './sons';
 
 export interface PanelOptions {
@@ -41,7 +42,8 @@ export abstract class Panel implements Layer {
     this.titleEl = el('h2', { class: 'lpl-panel__title', id: titleId, text: options.title });
     this.subtitleEl = el('p', { class: 'lpl-panel__subtitle', text: options.subtitle ?? '', hidden: options.subtitle === undefined });
     this.titleBlock = el('div', {}, [this.titleEl, this.subtitleEl]);
-    this.closeButton = button([host.ctx.texts.extra.common.close, ' ', keycap(options.closeKeyLabel)], () => {
+    // Le mot « Fermer » peut s'effacer (carnet à cinq onglets): la croix et la touche restent, le nom accessible aussi.
+    this.closeButton = button([icon('ui-cross', 'lpl-icon lpl-panel__close-icon'), el('span', { class: 'lpl-panel__close-label', text: host.ctx.texts.extra.common.close }), ' ', keycap(options.closeKeyLabel)], () => {
       this.close();
     }, { class: 'lpl-button lpl-button--on-dark lpl-panel__close', attrs: { 'aria-label': options.closeAria, [SOUND_ATTR]: 'none' } });
     this.header = el('header', { class: 'lpl-panel__header' }, [icon(options.icon), this.titleBlock, this.closeButton]);
@@ -95,4 +97,26 @@ export abstract class Panel implements Layer {
   }
 
   key?(code: string, info: KeyInfo): boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Éléments communs des panneaux d'échange
+
+export function purseBadge(host: UiHost, world: ReadonlyWorld): HTMLSpanElement {
+  const { ctx } = host;
+  const unit = splitAmount(ctx.texts.game.ui.hud.purse);
+  return el('span', { class: 'lpl-purse', 'aria-label': ctx.texts.extra.hud.purseLabel }, [
+    icon('ui-coin'),
+    el('span', { class: 'lpl-purse__amount', text: String(purseModel(world).amount) }),
+    el('span', { class: 'lpl-purse__unit', text: unit.after.trim() }),
+  ]);
+}
+
+export function price(host: UiHost, amount: number): HTMLSpanElement {
+  return el('span', { class: 'lpl-product__price' }, [icon('ui-coin'), host.ctx.t(host.ctx.texts.game.ui.shop.price, { price: amount })]);
+}
+
+export function backKeys(host: UiHost, extra: readonly { keys: readonly string[]; text: string }[]): HTMLSpanElement {
+  const { ctx } = host;
+  return keysLine([...extra, { keys: [ctx.key('Backspace')], text: ctx.texts.extra.notebook.keysClose }]);
 }

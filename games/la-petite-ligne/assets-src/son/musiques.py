@@ -487,6 +487,32 @@ def fin() -> Morceau:
     )
 
 
+def halte_soir() -> Morceau:
+    """Les lanternes du quai (tour 9, P1): le motif de la Halte au célesta, une octave au-dessus du
+    jour, sur une harpe qui arpège doucement et des cordes lentes. Une fois, à 72 (plus lent que le
+    jour): la Halte s'éveille le soir. Le célesta est la voix de la nuit dans le jeu (la nuit, les
+    étoiles, les vers luisants)."""
+    rng = _rng(21)
+    tempo = 72.0  # mesure de 2,5 s
+    t_a = 1 * M68
+    t_fin = 9 * M68
+    acc = grille("G", 0.0, M68) + grille(G_A, t_a, M68) + grille("C/G | G", t_fin, M68)
+    celesta = mel(HALTE_A + " " + HALTE_FIN_A, t_a, 70, M68, transpo=12) + \
+        mel("E5:1.5 C5:1.5 | G4:3 |", t_fin, 62, M68, transpo=12)
+    harpe = humaniser(arpege(acc[:-1], ARPEGE_68, vel=46, bas=40, haut_v=(52, 67)), rng, tempo=tempo)
+    harpe += [Note(acc[-1].t + 0.1 * k, 4.0, p, 50 - 2 * k) for k, p in enumerate([43, 50, 55, 59, 62, 67])]
+    cordes = nappe(acc, vel=42, nb=3, bas=50, haut=69)
+    return Morceau(
+        accords=acc, id="halte-evening", titre="La Halte, le soir", tempo=tempo, signature=(6, 8), mesures=11,
+        temps_par_mesure=M68, boucle=False, queue_s=5.0, graine=10, rt60=2.0, sonie_cible=-18.0,
+        pistes=[
+            Piste("celesta", CELESTA, humaniser(celesta, rng, 0.006, 3, tempo), sonie_lu=0.0, pan=60, reverbe=0.38),
+            Piste("harpe", HARPE, harpe, sonie_lu=-6.0, pan=78, reverbe=0.34),
+            Piste("cordes", CORDES_LENTES, cordes, sonie_lu=-11.0, pan=50, reverbe=0.45, souffle=True, passe_haut=90),
+        ],
+    )
+
+
 MORCEAUX = {
     "halte-matin": halte_matin,
     "halte-apres-midi": halte_apres_midi,
@@ -498,4 +524,5 @@ MORCEAUX = {
     "titre": titre,
     "fanfare-train": fanfare_train,
     "fin": fin,
+    "halte-evening": halte_soir,
 }

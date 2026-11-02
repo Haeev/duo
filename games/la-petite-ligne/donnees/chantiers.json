@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "Chantiers du bourg (souscription au tableau du quai) et de la maisonnette (commande à Basile), tour 9, table 2.6. Cases et places: cartes/halte.json, section chantiers (construire_carte_halte.py). Noms: textes.json, chantiers.<id>.name. rotation: cap en degrés (0 nord, 90 est, 180 sud).",
+  "improvements": [
+    { "id": "ford_bench", "queue": "bourg", "order": 1, "price": 600, "model": "bench", "cells": [{ "cx": 23, "cy": 36 }, { "cx": 24, "cy": 36 }], "rotation": 180, "payAt": "board" },
+    { "id": "quay_planters", "queue": "bourg", "order": 2, "price": 700, "model": "quay_planter", "cells": [{ "cx": 25, "cy": 18 }, { "cx": 34, "cy": 18 }, { "cx": 49, "cy": 18 }], "rotation": 180, "payAt": "board" },
+    { "id": "well_roof", "queue": "bourg", "order": 3, "price": 950, "model": "well_roof", "cells": [], "rotation": 0, "payAt": "board" },
+    { "id": "path_lamp", "queue": "bourg", "order": 4, "price": 1300, "model": "lamp_post", "cells": [{ "cx": 14, "cy": 26 }], "rotation": 0, "payAt": "board" },
+    { "id": "house_bench", "queue": "maisonnette", "order": 1, "price": 700, "model": "bench", "cells": [{ "cx": 12, "cy": 22 }, { "cx": 12, "cy": 23 }], "rotation": 90, "payAt": "basile" },
+    { "id": "door_canopy", "queue": "maisonnette", "order": 2, "price": 800, "model": "door_canopy", "cells": [], "rotation": 180, "payAt": "basile" }
+  ]
+}

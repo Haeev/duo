@@ -16,7 +16,9 @@
  * `vue=x,y` pose la caméra sur un point sans déplacer les joueurs; `noms=1`: Camille connaît le nom
  * des poules (étiquettes au-dessus d'elles, chez elle seule). `jour=<n>` ou
  * `saison=printemps|ete|automne|hiver` (tour 8: palette et lumière de la saison; le même jour de
- * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Touches: G repère, J lancer,
+ * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Tour 9:
+ * `chantiers=tous|<ids>`, `cadeaux=1`, `outil=<objet>`, `maison9=1`, `cueillette9=1`,
+ * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
@@ -29,12 +31,14 @@ import type { CharacterId, WorldEvent } from '../../etat/types';
 import type { GameView } from '../../etat/vue';
 import { RenderEngine } from '../moteur';
 import {
+  DEMO_ACTIONS,
   DEMO_SCENES,
   animateExampleWorld,
   createExampleWorld,
   type DemoOptions,
 } from './etat-exemple';
 import { applyEdgeExample } from './lisiere-exemple';
+import { applyTour9Example } from './tour9-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { WorldState } from '../../etat/types';
 
@@ -177,11 +181,17 @@ async function main(): Promise<void> {
     corners: params.get('coins') === '1',
     handcarParked: params.get('draisine') === 'posee',
     moment,
+    bedRotation: Number(params.get('lit') ?? '0') || 0,
+    fishingSpot: params.get('peche_lieu') ?? undefined,
+    tool: params.get('outil') ?? undefined,
+    toolAction: DEMO_ACTIONS.find((action) => action === params.get('geste')),
   };
   const world = createExampleWorld(map, content, options);
   // `lisiere=1` (tour 8): souche, rejets et cueillettes posées un jour d'été.
   if (params.get('lisiere') === '1') applyEdgeExample(world, map, content);
   applyDemoDay(world, params, content);
+  // Tour 9: chantiers, cadeaux, outils, objets de maison, cueillettes, assis (`tour9-exemple.ts`).
+  applyTour9Example(world, map, content, params);
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
     world.hens.forEach((hen, index) => {
@@ -261,6 +271,10 @@ async function main(): Promise<void> {
   window.lplRendu = handle;
   await engine.load(() => undefined);
   loading?.remove();
+  if (params.get('repli') === '1') {
+    // `adaptatif=1&repli=1`: image d'un PC à la peine (dernier palier, ombres coupées).
+    engine.forceQualityFallback();
+  }
   const focus = /^(-?[\d.]+),(-?[\d.]+)$/.exec(params.get('vue') ?? '');
   if (focus !== null) {
     // `vue=x,y`: caméra posée sur ce point (gros plans), les joueurs restent où ils sont.

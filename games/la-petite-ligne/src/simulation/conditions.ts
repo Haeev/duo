@@ -42,7 +42,7 @@ function counterValue(sim: Sim, scope: Scope, key: string, since: Since, ctx: Co
     case 'game_start':
       return now;
     case 'day_start':
-      return now - (sim.world.countersAtDawn[scope][key] ?? 0);
+      return sim.world.countersToday[scope][key] ?? 0;
     case 'step_start':
       return ctx.baselines === null ? now : now - (ctx.baselines[`${scope}:${key}`] ?? 0);
   }
@@ -226,6 +226,17 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       if (condition.who === 'either') return world.hens.filter((h) => h.namedBy !== null).length >= condition.count;
       return byCharacter(sim, condition.who, ctx, (id) => world.hens.filter((h) => h.namedBy === id).length >= condition.count);
     }
+    case 'annonce_active': {
+      const a = world.board.current;
+      if (a?.state !== 'open' || (condition.gabarit !== null && a.gabarit !== condition.gabarit)) return false;
+      if (condition.step === null) return true;
+      const q = world.quests.find((x) => x.id === a.quest);
+      return q?.status === 'active' && q.step === stepIndex(sim, a.quest, condition.step);
+    }
+    case 'improvement_built':
+      return (world.improvements[condition.id]?.builtDay ?? null) !== null;
+    case 'bought':
+      return (world.catalogueBought[condition.item] ?? 0) > 0;
   }
 }
 

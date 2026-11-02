@@ -10,8 +10,9 @@ import type { Content } from '../donnees/types';
 import type { GameMap, Rect } from '../etat/carte';
 import type { CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
-import { seasonOfDay } from '../donnees/calendrier';
+import { seasonOfDay, secondsPerGameMinuteOn } from '../donnees/calendrier';
 import { mistAmount } from '../etat/meteo';
+import { unitDraw } from '../etat/tirage';
 import { type Catalogue, type SequenceStep, sequenceOf, stepTime, stopTime } from './catalogue';
 import { type EventSignals, type LoopWish, type SoundRequest, StateWatcher, type TriggerContext, noSignals, soundsForEvent } from './declencheurs';
 import { distanceBetween, distanceToRect, earPosition } from './espace';
@@ -129,6 +130,8 @@ export class AudioBrain {
   private nearSaturday = false;
   private musicNow = 0;
   private lastDoorAt = Number.NEGATIVE_INFINITY;
+  /** Tour 9: jour du dernier cri lointain du soir, par son (`plan.eveningCalls`). */
+  private readonly eveningDone = new Map<string, number>();
 
   private readonly frame: BrainFrame;
   private readonly shotsBuffer: SequenceShot[] = [];
@@ -174,7 +177,7 @@ export class AudioBrain {
       arrival: content.settings.train.arrival,
       departure: content.settings.train.departure,
       firstDay: clock.firstDay.day,
-      secondsPerGameMinute: clock.secondsPerGameMinute,
+      secondsPerGameMinute: secondsPerGameMinuteOn(content.settings, clock.firstDay.day),
       slideSeconds: content.settings.feel.trainSlideSeconds,
       arrivalStopAt,
       departureMoveAt,
@@ -240,6 +243,28 @@ export class AudioBrain {
     };
   }
 
+  /**
+   * Les cris lointains du soir (tour 9, `plan.eveningCalls`: l'effraie les soirs d'automne sans la
+   * dame blanche): une fois par soir, à un instant tiré par la graine et le jour, le même chez les
+   * deux; non placés.
+   */
+  private eveningCalls(world: ReadonlyWorld, shots: SoundRequest[]): void {
+    if (world.phase !== 'day') return;
+    const { content, catalogue } = this.options;
+    const day = world.clock.day;
+    for (const call of catalogue.eveningCalls) {
+      if (call.times < 1 || this.eveningDone.get(call.sound) === day) continue;
+      if (!call.seasons.includes(seasonOfDay(content.settings, day))) continue;
+      if (call.notInRain && world.weather === 'rain') continue;
+      if (call.notWithMoment !== null && world.moments.today?.id === call.notWithMoment) continue;
+      const at = call.from + unitDraw(world.seed, `evening:${call.sound}`, day) * (call.to - call.from);
+      const m = world.clock.minutes;
+      if (m < at || m >= call.to) continue;
+      this.eveningDone.set(call.sound, day);
+      shots.push({ sound: call.sound, at: null, gainDb: 0, delay: 0, offset: 0, tag: null });
+    }
+  }
+
   /** Une image. Le résultat est réutilisé d'une image à l'autre: le lire tout de suite. */
   update(input: BrainInput): BrainFrame {
     const { world, local } = input;
@@ -283,6 +308,7 @@ export class AudioBrain {
     this.watcher.update(ctx, input.dt, input.gameTime, f.shots, f.loops);
     this.moments.update(world, input.gameTime, f.shots, f.loops, f.syncs);
     f.momentDuck.db = this.moments.duckDb();
+    this.eveningCalls(world, f.shots);
 
     // Réveil et coucher.
     // La musique qui suit est connue d'avance: on la décode pendant le coq ou l'endormissement.

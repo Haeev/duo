@@ -36,10 +36,22 @@ export type Intent =
   // Écran d'étape (tour 8): « Rester à la Halte », « Finir la séance », ou revenir sur son choix (`null`)
   | { type: 'stage_choice'; choice: 'stay' | 'finish' | null }
   // Création (PE-01, version démo)
-  | { type: 'create_character'; name: string; hair: number; outfit: number }
+  // Tour 10 (section 2): couleur des cheveux (0 à 7) et barbe (0 à 3), facultatives; appliquées par
+  // les règles de la création à partir du lot L3 (bornes de `reglages.appearance`).
+  | {
+      type: 'create_character';
+      name: string;
+      hair: number;
+      outfit: number;
+      hairColor?: number;
+      beard?: number;
+    }
   // Déplacement à la souris: aller là (et agir si `act`)
   | { type: 'move_to'; target: ClickTarget; act: boolean }
-  // Agir une fois sur ce qui est devant soi (Espace pressé)
+  // Ce que survole la souris (R11): la cible mise en évidence, ou l'aperçu du meuble en main.
+  // Envoyée quand la cible change; `null` rend la visée au clavier (souris sortie, Z Q S D).
+  | { type: 'point_at'; target: ClickTarget | null }
+  // Agir une fois sur ce qui est visé (Espace pressé): la cible survolée, sinon ce qui est devant soi
   | { type: 'act' }
   // Examiner, ou reprendre un meuble posé (X, clic droit)
   | { type: 'examine' }
@@ -66,12 +78,22 @@ export type Intent =
   | { type: 'buy'; item: ItemId; count: number }
   | { type: 'sell'; item: ItemId; quality: Quality; count: number }
   | { type: 'catalogue_order'; item: ItemId }
+  // Chantiers (tour 9): verser au chantier ouvert (`amount` sous, ou le reste: `null`), apporter des planches à Basile
+  | { type: 'improvement_pay'; improvement: string; amount: number | null }
+  | { type: 'improvement_planks'; improvement: string; count: number }
   | { type: 'proposal_answer'; proposal: string; accept: boolean }
   | { type: 'proposal_withdraw' }
   | { type: 'crate_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'crate_take'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_take'; item: ItemId; quality: Quality; count: number }
+  // Tour 10 (section 5): rangement à cases, « Tout déposer » par famille (catégorie d'objet), « Ranger »
+  | { type: 'storage_deposit_family'; family: string }
+  | { type: 'storage_sort' }
+  // Tour 10 (section 4.3): déposer planches et clous à la caisse du chantier d'une pièce
+  | { type: 'room_deposit'; room: string; item: ItemId; count: number }
+  // Tour 10 (section 6.2): ouvrir ou fermer des rideaux accrochés à une fenêtre
+  | { type: 'curtains'; furniture: string }
   // Fabrication, cuisine, repas
   | { type: 'craft'; recipe: RecipeId }
   | { type: 'eat'; item: ItemId }
@@ -87,7 +109,9 @@ export type Intent =
   // Repère (G ou clic molette): une épingle à sa couleur, visible chez les deux (GE-07)
   | { type: 'pin'; x: number; y: number }
   // Astuce vue (l'interface l'a affichée)
-  | { type: 'hint_seen'; hint: string };
+  | { type: 'hint_seen'; hint: string }
+  /** « Débloquer mon personnage » (R01): l'hôte le replace sur la case libre atteignable la plus proche. */
+  | { type: 'unstick' };
 
 export type IntentType = Intent['type'];
 

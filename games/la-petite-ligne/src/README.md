@@ -12,7 +12,7 @@ Démo d'une heure (`docs/jeux/jeu-1/demo.md`). Ce fichier dit qui possède quoi 
 | `reseau/` | hôte qui fait autorité, invité qui envoie ses intentions, prédiction du déplacement de l'invité, schémas des messages | dev gameplay | `etat/`, `donnees/`, `simulation/`, `plateforme/` |
 | `sauvegarde/` | sérialisation, contrôle et migration de l'état sauvegardé | dev gameplay | `etat/`, `donnees/`, `simulation/` |
 | `plateforme/` | interface de secours (tant que `interface/` n'est pas livrée) | dev gameplay | `etat/`, `donnees/` |
-| `entrees/` | clavier et souris vers `ControlFrame` et `Intent` (Z Q S D tournés selon la caméra, clic au sol, molette) | dev gameplay | `etat/` |
+| `entrees/` | clavier et souris vers `ControlFrame` et `Intent` (Z Q S D tournés selon la caméra, clic au sol, molette, survol envoyé à l'hôte par `point_at`) | dev gameplay | `etat/` |
 | `rendu/` | rendu Three.js: scène, modèles, animations, caméra, effets, son spatial éventuel | dev rendu 3D | `etat/`, `donnees/types.ts`, `three` |
 | `interface/` | HUD, menus, dialogues, carnet, astuces, écrans (création, petit-déjeuner, nuit, fin) | dev interface | `etat/`, `donnees/types.ts` |
 | `audio/` | sons et musiques, branchés sur les événements et l'état | dev audio | `etat/`, `donnees/types.ts`, `@duo/sdk` (module `audio`) |

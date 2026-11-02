@@ -1,4 +1,5 @@
 /** Aides des tests de l'interface: contenu, carte, monde neuf et contexte d'interface. */
+import { withClockPace } from '../../donnees/calendrier';
 import { loadContent } from '../../donnees/contenu';
 import { CONTENT_FILES } from '../../donnees/fichiers';
 import { loadMap } from '../../donnees/carte';
@@ -17,7 +18,8 @@ import { loadUiTexts } from '../textes';
 let cached: { content: Content; map: GameMap } | null = null;
 
 export function contentAndMap(): { content: Content; map: GameMap } {
-  cached ??= { content: loadContent(CONTENT_FILES), map: loadMap(MAP_FILES).map };
+  // Au rythme vif, comme la page de démonstration (`demo/main.ts`): mêmes situations des deux côtés.
+  cached ??= { content: withClockPace(loadContent(CONTENT_FILES), 'vif'), map: loadMap(MAP_FILES).map };
   return cached;
 }
 

@@ -3,12 +3,14 @@
  * personnages sur le quai (encore à créer), la maisonnette en ruine.
  */
 import { createRandom } from '@duo/sdk/sim';
-import type { GameMap } from '../etat/carte';
+import { type GameMap, buildingAt } from '../etat/carte';
 import type {
+  Appearance,
   Character,
   CharacterId,
   ConstructionState,
   Counters,
+  Needs,
   PlacedFurniture,
   VillagerState,
   WorldState,
@@ -20,12 +22,25 @@ import { ITEM, SPAWN_POINTS } from './ids';
 import { emptyMemories } from './souvenirs';
 import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
+import { emptyBoard } from './annonces';
+import { emptyImprovements } from './chantiers';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
 export interface PlayerInfo {
   id: string;
   name: string;
   color: string;
+}
+
+/**
+ * Couleur des cheveux d'avant le tour 10, celle des portraits (`PLAYER_BODIES` de l'interface):
+ * p1 brun (1), p2 noir (0), dans l'ordre de la section 2.2.
+ */
+const DEFAULT_HAIR_COLOR: Readonly<Record<CharacterId, number>> = { p1: 1, p2: 0 };
+
+/** Besoins du tour 10 (section 3) au repos: rien de compté aujourd'hui, personne loin de l'autre. */
+function tour10Needs(): Pick<Needs, 'apartMinutes' | 'reunionsToday' | 'nappedToday' | 'napStart' | 'curtainsMorningDone' | 'missingShown'> {
+  return { apartMinutes: 0, reunionsToday: 0, nappedToday: false, napStart: null, curtainsMorningDone: false, missingShown: false };
 }
 
 export function emptyCounters(): Counters {
@@ -40,16 +55,17 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
   const startBed = map.startFurniture
     .map((f) => content.items[f.item]?.bed?.sleep)
     .find((sleep) => sleep !== undefined);
-  const needs = {
+  const needs: Needs = {
     belly: content.settings.needs.belly.simple,
     sleep: startBed ?? content.settings.needs.heart.base,
     heart: content.settings.needs.heart.base,
+    ...tour10Needs(),
   };
   return {
     id,
     playerId: player.id,
     name: player.name,
-    appearance: { hair: 0, outfit: id === 'p1' ? 0 : 1, scarf: player.color },
+    appearance: { hair: 0, hairColor: DEFAULT_HAIR_COLOR[id], beard: 0, outfit: id === 'p1' ? 0 : 1, scarf: player.color },
     created: false,
     titleReady: false,
     endReady: false,
@@ -58,6 +74,9 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     facing: Math.PI / 2,
     speed: 0,
     inHouse: false,
+    inside: buildingAt(map, {}, pos.x, pos.y),
+    hairChangedDay: null,
+    hairNoticedBy: null,
     action: { kind: 'idle', since: 0, duration: 0, target: null },
     status: 'active',
     menu: null,
@@ -133,6 +152,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
       activity: 'absent',
       talkingWith: [],
       met: false,
+      inside: null,
     };
   });
 
@@ -193,6 +213,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     cellar: [],
     crate: [],
     catalogueOrders: [],
+    catalogueOrderBy: [],
     heavyDeliveries: [],
     handcarAt: null,
     grocerSoldToday: 0,
@@ -207,10 +228,11 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     dialoguesDone: [],
     scene: null,
     counters: emptyCounters(),
-    countersAtDawn: emptyCounters(),
+    countersToday: emptyCounters(),
     scripts: [],
     nextId,
     heard: { p1: {}, p2: {} },
+    heardOld: { key: '', p1: '', p2: '' },
     orderIndex: 0,
     orderResult: null,
     orderHistory: [],
@@ -224,6 +246,12 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     secrets: { turn: s.secrets.firstInformed, entries: [] },
     memories: emptyMemories(),
     sharedEnvieRecent: [],
+    board: emptyBoard(),
+    improvements: emptyImprovements({ content }),
+    catalogueBought: {},
+    giftsGiven: {},
+    rooms: {},
+    rack: [],
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.
@@ -237,4 +265,29 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     c.water = can?.capacity ?? 0;
   }
   return sim;
+}
+
+/**
+ * Champs du tour 10 absents d'une sauvegarde écrite avant (format 6, inchangé jusqu'au lot L4):
+ * valeurs par défaut, et `inside` recalculé depuis la position. Rien n'est écrasé s'il est déjà là.
+ */
+export function fillTour10Fields(map: GameMap, world: WorldState): void {
+  const w = world as Omit<WorldState, 'rooms' | 'rack'> & Partial<Pick<WorldState, 'rooms' | 'rack'>>;
+  w.rooms ??= {};
+  w.rack ??= [];
+  const rooms = w.rooms;
+  for (const c of world.characters) {
+    const old = c as Omit<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy'> &
+      Partial<Pick<Character, 'inside' | 'hairChangedDay' | 'hairNoticedBy'>>;
+    old.inside = buildingAt(map, rooms, c.pos.x, c.pos.y);
+    old.hairChangedDay ??= null;
+    old.hairNoticedBy ??= null;
+    const look: Partial<Appearance> = c.appearance;
+    look.hairColor ??= DEFAULT_HAIR_COLOR[c.id];
+    look.beard ??= 0;
+    c.needs = { ...tour10Needs(), ...c.needs };
+  }
+  for (const v of world.villagers) {
+    v.inside = v.visible ? buildingAt(map, rooms, v.pos.x, v.pos.y) : null;
+  }
 }

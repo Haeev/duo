@@ -1285,6 +1285,19 @@ def main():
     kf.socket("socket_kingfisher_beak", "kf_head", Vector(_ks((0, -0.064, 0.0615))))
     anims["kingfisher"] = kingfisher_clips(kf)
 
+    # tour 9: dame blanche du pré de l'est et son campagnol (chouette.py)
+    import chouette
+    owl = Rig("barn_owl", chouette.OWL_BONES)
+    A._register(owl.arm, {"kind": "animal", "origin": "pattes sur le perchoir (rocher rock_02) ou au sol",
+                          "height": 0.35, "wingspan": 0.9, "beak_socket": "socket_barn_owl_beak",
+                          "note": "vol: owl_glide, owl_flap; surplace: owl_hover; owl_look tourne la tête de 120 degrés "
+                                  "vers sa gauche et y reste (LoopOnce, clampWhenFinished)"})
+    owl.skin(A, "barn_owl_mesh", chouette.owl_mesh(A))
+    owl.socket("socket_barn_owl_beak", "owl_head", chouette.BEAK)
+    anims["barn_owl"] = chouette.owl_clips(owl)
+    A.add("vole", chouette.vole(A), {"kind": "item", "socket": "socket_barn_owl_beak", "carried_by": "barn_owl",
+                                     "length": 0.08, "note": "en travers du bec, tête vers la gauche de l'oiseau"})
+
     a = math.radians(LADDER_ANGLE)
     A.add("ladder_wood", ladder_wood(A), {"kind": "prop", "lean_deg": LADDER_ANGLE, "length": LADDER_LENGTH,
                                           "rung_step": RUNG_STEP, "rungs": 10,

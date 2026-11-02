@@ -52,6 +52,8 @@
     "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
     "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur, le meuble tourné vers la pièce.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",
+    "placement_blocks_way": "Ça fermerait le passage vers la porte: laisse un chemin libre.",
+    "unstuck": "Te revoilà sur une case libre: tu peux de nouveau marcher.",
     "fish_escaped": "Il s'est échappé.",
     "stump_hint": "Rien à couper ici: dans quelques jours, un jeune arbre poussera à la place.",
     "tree_too_young": "Trop jeune pour la hache. Laisse-le grandir.",
@@ -89,7 +91,7 @@
     "moment_fox_climax": "Le renard s'arrête, vous regarde, jappe deux fois, et file le long de la voie.",
     "moment_fox_memory": "Le renard de la voie, un {weekday} soir.",
     "moment_fox_rumor": "qu'un renard suit la voie, à la tombée du jour.",
-    "moment_fox_vignette": "Le renard assis sur le ballast, la queue autour des pattes.",
+    "moment_fox_vignette": "Le renard qui mulote, en plein bond, près du ballast.",
     "moment_glowworms_hint": "Odette te l'a dit hier: « Par une nuit douce, les vers luisants s'allument dans le pré de l'est. Après neuf heures du soir ! »",
     "moment_glowworms_climax": "Une à une, de petites lanternes vertes s'allument dans l'herbe haute. Le pré tout entier scintille.",
     "moment_glowworms_memory": "Les vers luisants du pré, un {weekday} soir.",
@@ -129,7 +131,51 @@
     "riddle_card_2_text": "Chaque matin, quand le train approchait, je baissais la barrière et j'attendais à son pied. Ce que je gardais pour la suite de la ligne y dort encore. É. L.",
     "riddle2_found": "Au pied de la barrière, une boîte à biscuits rouillée: le carnet de route d'Émile.",
     "emile_logbook_text": "Voie des Vergers: six kilomètres, trois ponts, un tunnel. Pour la draisine: deux bras devant, deux bras derrière, et de la patience. Le jour où quelqu'un lira ceci, la ligne aura de nouveau du monde. É. L.",
-    "stage_continue": "La Halte continue. Prochain train: samedi {day}, 10 h."
+    "stage_continue": "La Halte continue. Prochain train: samedi {day}, 10 h.",
+    "annonce_posted": "Nouvelle annonce au tableau du quai: {title}.",
+    "annonce_done": "Annonce faite: {amount} sous.",
+    "annonce_expired": "Annonce retirée: {giver} a trouvé une autre solution. Rien de perdu.",
+    "villager_says": "{villager}: « {text} »",
+    "chantier_built": "Basile a fini dans la nuit: {name}.",
+    "improvement_funded": "Le chantier est payé: Basile s'y met cette nuit.",
+    "improvement_proposal": "{partner} propose de verser {price} sous pour {name}. D'accord ?",
+    "tool_upgrade_hint": "{item}: même geste qu'avant, en mieux. L'ancien t'attend au coffre.",
+    "hen_named_brioche": "Celle-là, c'est Brioche. Elle a la couleur d'une brioche. Je ne discute pas.",
+    "hen_named_pervenche": "Celle-là, c'est Pervenche. Elle a un air de fleur qui pousse dans les fossés.",
+    "gift_thanks_jeanne": "Des craies ! Toutes les couleurs, même le vert qui ne sert à rien. Demain, il y aura une marelle sur la place.",
+    "gift_thanks_odette": "Un moulin neuf ! L'ancien ira au grenier, avec les souvenirs qui grincent.",
+    "gift_thanks_basile": "Un tablier. Du bon cuir. Je ne dis pas merci, je le mets.",
+    "gift_thanks_firmin": "Une écharpe ! Émile en avait une pareille. Je la porterai le soir, sur le quai, et je penserai à lui. Et à vous.",
+    "moment_falling_stars_hint": "Basile te l'a dit hier: « En été, des étoiles tombent dans l'Aubrune. Gamin, je les regardais du bout du ponton, assis, sans un mot. »",
+    "moment_falling_stars_climax": "Des étoiles filent dans l'eau noire. La plus grosse éclaire l'Aubrune d'un coup; vous levez la tête, trop tard.",
+    "moment_falling_stars_memory": "Les étoiles de l'Aubrune, une nuit d'été, les pieds au-dessus de l'eau.",
+    "moment_falling_stars_rumor": "que des étoiles tombent dans l'Aubrune, les nuits d'été.",
+    "moment_falling_stars_vignette": "Une étoile filante dans l'eau noire, au bout du ponton.",
+    "moment_seat_edge": "Assieds-toi au bout du ponton ({act}).",
+    "moment_train_salute_hint": "Firmin te l'a dit hier: « Samedi, une fois la caisse remplie, baissez les barrières à la main pour le départ de quatre heures, une de chaque côté de la voie. Le mécanicien salue toujours les gardes-barrières. »",
+    "moment_train_salute_climax": "Le train sort au pas. Au passage à niveau, le mécanicien et le chauffeur agitent leur casquette, deux coups de sifflet, et un nuage de vapeur roule sur la route.",
+    "moment_train_salute_memory": "Le salut du mécanicien, au train d'un samedi.",
+    "moment_train_salute_rumor": "que les mécaniciens saluent quand on tourne la manivelle à la main.",
+    "moment_train_salute_vignette": "Une casquette agitée à la fenêtre de la locomotive, au passage à niveau.",
+    "moment_crank_take": "Le train part à 16 h. Prends la manivelle d'une barrière ({act}).",
+    "moment_crank_partner": "{partner} tient l'autre barrière.",
+    "moment_gates_down": "Barrières baissées. Le train part à 16 h.",
+    "moment_crank_too_early": "Trop tôt: on baisse les barrières à partir de 15 h 20.",
+    "moment_barn_owl_hint": "Jeanne te l'a dit hier: « Le soir, une chouette toute blanche chasse au-dessus du pré de l'est. Si vous restez côte à côte sans bouger, elle vous prend pour un buisson. »",
+    "moment_barn_owl_climax": "Une chouette blanche glisse sans un bruit au-dessus du pré, fait du surplace, plonge dans l'herbe. Posée sur le rocher, une proie au bec, elle tourne vers vous sa face en cœur. Puis elle repart vers la remise.",
+    "moment_barn_owl_memory": "La dame blanche du pré de l'est, un {weekday} soir.",
+    "moment_barn_owl_rumor": "qu'une chouette blanche chasse au-dessus du pré de l'est, les soirs d'automne.",
+    "moment_barn_owl_vignette": "Une face blanche en cœur, posée sur le rocher du pré.",
+    "moment_side_by_side": "Mets-toi tout près de {partner} et ne bouge plus.",
+    "moment_quay_lanterns_hint": "Firmin te l'a dit hier: « Du temps d'Émile, on allumait la lanterne du quai et celle de la place à la même seconde. De là-haut, aux Vergers, on voyait la Halte s'éveiller d'un coup. Demain soir, je vous les laisse, si le cœur vous en dit. »",
+    "moment_quay_lanterns_climax": "Les deux lanternes s'allument au même instant. Autour de vous, les lampadaires prennent le relais un à un, et la cloche du quai sonne une fois: la Halte veille.",
+    "moment_quay_lanterns_memory": "Les lanternes du quai et de la place, allumées ensemble un {weekday} soir.",
+    "moment_quay_lanterns_rumor": "qu'autrefois, on allumait les lanternes de la Halte d'un seul coup.",
+    "moment_quay_lanterns_vignette": "Deux lanternes allumées à la même seconde, de part et d'autre de la pension.",
+    "moment_lantern_take": "Lève la perche et allume ({act}), au même instant que {partner}.",
+    "moment_lantern_alone": "Ta flamme vacille et s'éteint: il faut allumer au même instant que {partner}. Comptez ensemble.",
+    "moment_lantern_where_square": "L'autre lanterne est celle de la place, au nord, près de l'épicerie.",
+    "moment_lantern_where_quay": "L'autre lanterne est au bout est du quai."
   },
   "orderFormat": {
     "line": "{count} {item}",
@@ -149,7 +195,8 @@
     "spring": ["Bon printemps à la Halte !"],
     "summer": ["Bel été à la Halte !", "Les journées sont longues, et nos listes aussi."],
     "autumn": ["Bel automne à la Halte !"],
-    "winter": []
+    "winter": [],
+    "improvements": { "quay_planters": ["Le chef de train a remarqué vos fleurs sur le quai."] }
   },
   "orderTips": {
     "carrot": "Les carottes demandent quatre jours de pousse: ne tardez pas trop.",
@@ -167,7 +214,9 @@
     "gudgeon": "Les goujons mordent au gué à toute heure.",
     "chub": "Le chevesne est plus rare que le goujon: prévoyez quelques lancers.",
     "trout": "Par temps de pluie, ça mord plus vite, dit Firmin.",
-    "plank": "Basile prête son établi: un rondin fait quatre planches."
+    "plank": "Basile prête son établi: un rondin fait quatre planches.",
+    "cep": "Les cèpes sortent sous les chênes, au lendemain des pluies.",
+    "elderberry": "Le sureau ne donne que deux semaines: profitez-en."
   },
   "stages": {
     "demo": {
@@ -179,10 +228,49 @@
     "summer_end": {
       "title": "Six semaines à la Halte d'Aubrune",
       "subtitle": "Du premier train au premier matin d'automne.",
-      "text": "L'automne arrive à la Halte, et la suite de votre histoire est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici.",
+      "text": "Restez pour l'automne: le bois roussit, les noisettes tombent, et le bourg a des projets pour vous.",
       "next": "« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.",
       "highlight": "Six semaines à la Halte"
+    },
+    "autumn_end": {
+      "title": "Neuf semaines à la Halte d'Aubrune",
+      "subtitle": "Du premier train au premier matin d'hiver.",
+      "text": "L'hiver arrive à la Halte, et la suite de votre histoire est en préparation. Votre partie s'arrête au départ de ce train: rien n'est perdu, elle reprendra ici.",
+      "next": "« Rester à la Halte » reviendra avec la prochaine mise à jour du jeu.",
+      "highlight": "Neuf semaines à la Halte"
     }
+  },
+  "annonces": {
+    "odette_shelf": { "title": "La vitrine d'Odette", "text": "Ma vitrine a l'air d'une étagère de pension un lundi matin. Il me faudrait {count} {item}, frais si possible. Odette", "thanks": "Les voilà ! Ma vitrine reprend des couleurs." },
+    "firmin_trout": { "title": "Une truite pour Firmin", "text": "Ce soir, le chef de halte aimerait une truite. Une seule: il n'est pas glouton. Firmin", "thanks": "Une truite ! Émile la faisait au beurre. Je vais essayer de faire pareil, en moins bien." },
+    "basile_planks": { "title": "Des planches pour Basile", "text": "Commande de la ville: une caisse à outils. Il me manque 6 planches. Je paie. B.", "thanks": "Six. Le compte est bon." },
+    "jeanne_chub": { "title": "Le chevesne de Jeanne", "text": "Je voudrais voir un chevesne de près, un vrai. Je le dessine, et après on le remet à l'eau. Jeanne", "thanks": "Il a les yeux rouges ! Je le dessine vite, et il retourne à la rivière. Promis." },
+    "odette_eggs": { "title": "Les crêpes de la pension", "text": "Crêpes de dimanche prochain à la pension: il me faut 6 œufs. Vos poules pondent mieux que les miennes, qui n'existent pas. Odette", "thanks": "Six beaux œufs. Gardez-vous une place pour les crêpes." },
+    "firmin_soup": { "title": "Une soupe pour le chef de halte", "text": "Les soirées de garde fraîchissent. Une soupe chaude ferait un chef de halte heureux. Firmin", "thanks": "Encore chaude ! Je la garde pour ce soir. Le quai sera moins froid." },
+    "basile_tisane": { "title": "La tisane de Basile", "text": "Ma tisane du soir: 6 pissenlits, les feuilles surtout. Les fleurs, gardez-les pour les vœux de Jeanne. B.", "thanks": "Ça ira pour la semaine." },
+    "basile_nuts": { "title": "Les noisettes de Basile", "text": "L'hiver, je casse des noisettes au coin du poêle. Il m'en faut 8 pour commencer. B.", "thanks": "Huit. Le poêle sera content. Moi aussi." },
+    "odette_blackberries": { "title": "Les confitures d'Odette", "text": "Confitures de mûres à la pension: il me faut 10 mûres. Elles griffent, je sais. Odette", "thanks": "Dix belles mûres. Vous goûterez la confiture, c'est la moindre des choses." },
+    "odette_elder": { "title": "La gelée de sureau", "text": "La gelée de sureau ne se fait qu'une semaine par an. Il me faut 6 grappes, sans les tiges. Odette", "thanks": "Parfaites. Le sureau, il faut le prendre quand il passe." },
+    "jeanne_mushroom": { "title": "L'herbier de Jeanne", "text": "Je fais un herbier des champignons. Il me manque une girolle. (On ne mange pas l'herbier.) Jeanne", "thanks": "Elle sent l'abricot ! C'est la plus belle page de mon herbier." },
+    "firmin_omelettes": { "title": "Le pique-nique du jeudi", "text": "Jeudi, pique-nique du chef de halte et du scieur. Il nous faut 2 omelettes: Basile ne sait pas cuisiner, moi non plus. Firmin", "thanks": "Deux omelettes ! Basile dira qu'elles sont trop cuites. C'est sa façon de dire merci." },
+    "odette_basket": { "title": "Le panier du samedi", "text": "Le panier des voyageurs du samedi: 3 carottes et 3 œufs. Un passage au potager, un au poulailler, et le tour est joué. Odette", "thanks": "Un panier complet ! Les voyageurs ne sauront jamais d'où vient tout ça. Moi, si." },
+    "firmin_supper": { "title": "Le souper de Firmin", "text": "Souper du chef de halte: une truite et une laitue. Une ligne à lancer, un rang à cueillir, et Firmin dit merci. Firmin", "thanks": "Truite et salade ! Je me croirais en ville, un dimanche." },
+    "basile_fence": { "title": "La barrière de Basile", "text": "La barrière de ma cour penche. Apportez 4 planches, puis venez à deux: une paire de mains pour tenir, une autre pour me passer les clous. B." },
+    "jeanne_poem": { "title": "Le spectacle de Jeanne", "text": "Spectacle sur la place, n'importe quel soir jusqu'à vendredi, entre 17 h et 19 h. Venez à deux, sinon je ne commence pas. Jeanne" },
+    "jeanne_snack": { "title": "Le goûter de Jeanne", "text": "Je fais un goûter au bord de l'eau. Il me faut 2 œufs et 4 mûres. Après, venez le manger avec moi sur le banc de la berge, à deux, l'après-midi. Jeanne" },
+    "jeanne_snack_nuts": { "title": "Le goûter d'automne", "text": "Goûter d'automne ! Il me faut 2 œufs et 4 noisettes. Après l'école, venez le manger avec moi sur la margelle du puits, à deux. Jeanne" },
+    "odette_preserves": { "title": "Les bocaux de l'hiver", "text": "Les bocaux de l'hiver: 6 noisettes et 6 radis. Si vous vous partagez le travail, ce sera fait avant le café. Odette", "thanks": "Tout y est. Prenez ce pot de gelée de sureau: il est de cette année, comme vous.", "thanksAgain": "Tout y est. L'hiver peut venir, mes bocaux l'attendent." }
+  },
+  "chantiers": {
+    "ford_bench": { "name": "un banc au gué", "done": "Le banc du gué attend ses premiers pêcheurs." },
+    "quay_planters": { "name": "des jardinières au quai", "done": "Des fleurs de saison au bord du quai." },
+    "well_roof": { "name": "un toit pour le puits", "done": "Le puits a son toit de tuiles." },
+    "path_lamp": { "name": "le réverbère du chemin", "done": "Le chemin de la maisonnette a sa lumière." },
+    "house_bench": { "name": "un banc au pignon", "done": "Un banc contre le pignon, au soleil du matin." },
+    "door_canopy": { "name": "un auvent sur la porte", "done": "La porte de la maisonnette a son auvent." }
+  },
+  "catalogue": {
+    "gift": { "title": "Un cadeau pour {villager}", "objective": "Offre {item} à {villager}." }
   },
   "seasonCards": {
     "summer": {
@@ -197,8 +285,8 @@
       "title": "Premier jour de l'automne",
       "lines": [
         "Le soir tombe plus tôt, vers 19 h 30.",
-        "À la lisière: des noisettes, et toujours des girolles après la pluie.",
-        "À la rivière, les truites reviennent en nombre."
+        "À la lisière: noisettes, baies de sureau, et des cèpes après la pluie.",
+        "Jeanne a repris l'école: on la croise le soir et le mercredi."
       ]
     },
     "winter": {
@@ -240,6 +328,27 @@
     "workbench": { "title": "L'établi de Basile", "craft": "Fabriquer", "missing": "Il manque: {missing}" },
     "stove": { "title": "Le réchaud", "cook": "Cuisiner", "eat": "Manger", "eatTogether": "Manger ensemble" },
     "give": "Donner {count} {item}",
+    "offer": "Offrir {item}",
+    "board": {
+      "annonces": "Annonces",
+      "chantiers": "Chantiers",
+      "chantiersTitle": "Chantiers du bourg",
+      "progress": "{name}: {paid} sur {price} sous",
+      "pay50": "Verser 50 sous",
+      "pay100": "Verser 100 sous",
+      "payRest": "Verser le reste ({amount} sous)",
+      "funded": "Le chantier est payé: Basile s'y met cette nuit.",
+      "until": "jusqu'à {weekday}, {time}",
+      "reward": "Merci: {amount} sous",
+      "done": "Fait",
+      "expired": "Retirée"
+    },
+    "basile": {
+      "order": "Commander à Basile",
+      "price": "{name}: {price} sous",
+      "planks": "Apporter des planches: {n} sur 20 ({discount} sous de moins)"
+    },
+    "stage": { "chantiers": "{n} chantiers" },
     "proposal": { "accept": "D'accord", "decline": "Pas maintenant", "withdraw": "Retirer" },
     "breakfast": { "title": "Bonjour !", "envie": "Ton envie du jour", "sharedEnvie": "Votre envie à deux", "weather": "Le temps aujourd'hui", "start": "Commencer ma journée" },
     "creation": {
@@ -278,7 +387,7 @@
     "fresh": "Nouveau souvenir",
     "secrets": {
       "hen_names": {
-        "vignette": "Trois poules au pied de la mangeoire.",
+        "vignette": "Trois poules qui accourent: la rousse, la blanche et la noire.",
         "informed": "Odette te les avait confiés; {partner} les a appelées.",
         "doer": "{partner} te les a soufflés; tu les as appelées."
       },

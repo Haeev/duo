@@ -5,9 +5,11 @@
  */
 import { isTrainDay } from '../donnees/calendrier';
 import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
+import { rawText } from '../donnees/contenu';
 import { linePay, productPrice } from '../etat/commande-generee';
 import { hudSeason, questTitleOf, weatherLabel } from '../etat/semaine';
-import { inRect } from '../etat/carte';
+import { HOUSE_BUILDING, inRect } from '../etat/carte';
+import { houseRoomAt, isNapping } from '../etat/maison';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
 import { henLabel, objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
@@ -225,9 +227,28 @@ function watchingLabel(world: ReadonlyWorld, ctx: UiContext, id: CharacterId): s
   return ctx.texts.extra.partner.watching[today.id] ?? ctx.texts.extra.partner.watchingAny;
 }
 
-function placeOf(ctx: UiContext, c: ReadonlyCharacter): string {
+/**
+ * Où est un personnage qui est dans un bâtiment (ADR 0016, `Character.inside`): la pièce bâtie de
+ * la maisonnette (« Dans le cellier »), sinon le bâtiment (« Au salon de Solange »), sinon « À
+ * l'intérieur ». `null` dehors.
+ */
+export function buildingPlace(world: ReadonlyWorld, ctx: UiContext, c: ReadonlyCharacter): string | null {
+  const inside = c.inside;
+  if (inside === null) return null;
   const places = ctx.texts.extra.partner.places;
-  if (c.inHouse) return places.house_interior ?? ctx.texts.extra.partner.elsewhere;
+  if (inside === HOUSE_BUILDING) {
+    const room = houseRoomAt(ctx.map, world.rooms, c.pos.x, c.pos.y);
+    const built = room?.build ?? null;
+    const label = built === null || room === null ? undefined : places[`room:${room.id}`];
+    if (label !== undefined) return label;
+  }
+  return places[`building:${inside}`] ?? ctx.texts.extra.partner.inside;
+}
+
+function placeOf(world: ReadonlyWorld, ctx: UiContext, c: ReadonlyCharacter): string {
+  const places = ctx.texts.extra.partner.places;
+  const building = buildingPlace(world, ctx, c);
+  if (building !== null) return building;
   const radius = UI_SETTINGS.partnerPlaceRadius;
   for (const id of PARTNER_POINTS) {
     const at = ctx.map.points[id];
@@ -268,7 +289,7 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
     state,
   });
   if (p.status === 'night') return make(txt.night, 'ui-moon', 'asleep');
-  if (p.status === 'sleeping') return make(txt.asleep, 'ui-moon', 'asleep');
+  if (p.status === 'sleeping') return make(isNapping(p) ? txt.napping : txt.asleep, 'ui-moon', 'asleep');
   if (p.status === 'breakfast') return make(txt.breakfast, 'bread');
   if (awayMinutes !== null) return make(ctx.t(txt.away, { minutes: awayMinutes }), 'ui-hourglass', 'away');
   if (p.status === 'scene' && world.scene !== null) {
@@ -296,7 +317,7 @@ export function partnerModel(world: ReadonlyWorld, ctx: UiContext, awayMinutes: 
   if (running && actionText !== undefined && kind !== 'walk' && kind !== 'idle' && kind !== 'talk') {
     return make(actionText, ACTION_ICONS[kind] ?? 'ui-pin');
   }
-  return make(placeOf(ctx, p), 'ui-pin');
+  return make(placeOf(world, ctx, p), p.inside === null ? 'ui-pin' : 'ui-house');
 }
 
 // ---------------------------------------------------------------------------
@@ -469,6 +490,8 @@ export interface QuestModel {
    * l'autre, le secret chez les deux à la fin; `null` pour une quête sans secret.
    */
   secret: SecretView | null;
+  /** Annonce retirée à son échéance (tour 9): ligne grise au carnet. */
+  withdrawn: boolean;
 }
 
 function questText(world: ReadonlyWorld, ctx: UiContext, def: QuestDef, step: number, done: boolean): string {
@@ -519,9 +542,88 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
       progress,
       lines,
       secret: secretViewOf(world, ctx, def.id, done, cards),
+      withdrawn: false,
     });
   }
   return out;
+}
+
+export interface NotebookQuests {
+  main: QuestModel[];
+  side: QuestModel[];
+  /** Groupe « Annonces » (tour 9, section 1.6): l'annonce ouverte, puis les deux dernières closes. */
+  annonces: QuestModel[];
+}
+
+function isAnnonceQuest(id: string): boolean {
+  return id.startsWith('annonce_');
+}
+
+/**
+ * Les quêtes du carnet, rangées (tour 9, section 5.3): parmi les commandes faites, seulement les
+ * deux dernières, avec leur résultat (« 5 lignes sur 5, 1137 sous »); les annonces à part, la
+ * dernière faite ou retirée gardée au plus deux fois.
+ */
+export function notebookQuests(world: ReadonlyWorld, ctx: UiContext): NotebookQuests {
+  const all = questModels(world, ctx);
+  const n = ctx.texts.extra.notebook;
+  const recent = world.orderHistory.slice(-2);
+  const orderDayOf = (id: string): number | null => {
+    const def = ctx.content.quests.find((q) => q.id === id);
+    if (def?.repeat !== null) return null;
+    return def.steps.find((st) => st.resolve === 'at_deadline')?.deadline?.day ?? null;
+  };
+  const kept = new Set<number>();
+  const main: QuestModel[] = [];
+  for (const q of all) {
+    if (q.kind !== 'main') continue;
+    const day = q.done ? orderDayOf(q.id) : null;
+    if (day !== null) {
+      if (!recent.some((o) => o.day === day)) continue;
+      kept.add(day);
+    }
+    main.push(q);
+  }
+  const weekly = ctx.content.quests.find((q) => q.repeat === 'each_train');
+  for (const o of recent) {
+    if (kept.has(o.day) || weekly === undefined) continue;
+    main.push({
+      id: `order:${String(o.day)}`,
+      kind: 'main',
+      optional: false,
+      title: ctx.t(weekly.title, { day: o.day }),
+      text: ctx.t(n.orderResult, { lines: linesText(ctx, o.linesDone, o.linesTotal), amount: o.amount }),
+      done: true,
+      progress: '',
+      lines: [],
+      secret: null,
+      withdrawn: false,
+    });
+  }
+  const annonces = all.filter((q) => isAnnonceQuest(q.id));
+  const keep = ctx.content.settings.board?.keepDone ?? 2;
+  const closed = [world.board.current, world.board.previous].filter((a) => a !== null && a.state !== 'open').slice(0, keep);
+  for (const a of closed) {
+    if (a === null) continue;
+    const def = ctx.content.annonces.find((x) => x.id === a.gabarit);
+    const giver = ctx.content.villagers.find((v) => v.id === def?.giver)?.label ?? '';
+    annonces.push({
+      id: `annonce:${a.gabarit}:${String(a.posted)}`,
+      kind: 'side',
+      optional: false,
+      title: ctx.t(rawText(ctx.content.texts, 'annonces', a.gabarit, 'title') ?? a.gabarit),
+      text:
+        a.state === 'expired'
+          ? ctx.t(ctx.texts.extra.board.expiredText, { giver })
+          : ctx.t(ctx.texts.game.ui.board.reward, { amount: a.reward }),
+      done: true,
+      progress: '',
+      lines: [],
+      secret: null,
+      withdrawn: a.state === 'expired',
+    });
+  }
+  return { main, side: all.filter((q) => q.kind === 'side' && !isAnnonceQuest(q.id)), annonces };
 }
 
 /**
@@ -559,6 +661,10 @@ export interface LetterModel {
   day: string;
   text: string;
   unread: boolean;
+  /** Ligne sous le titre dans la liste: « La coopérative de la ligne · samedi 22 » (section 5.2). */
+  meta: string;
+  /** Nom accessible de l'entrée: « {titre}, de {expéditeur}, {jour}, non lue ». */
+  label: string;
 }
 
 /** Lettres, la plus récente d'abord. */
@@ -566,14 +672,23 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
   return world.letters
     .map((l, index) => ({ l, index }))
     .sort((a, b) => b.l.day - a.l.day || b.index - a.index)
-    .map(({ l }) => ({
-      id: l.id,
-      from: ctx.t(capitalize(l.from)),
-      title: ctx.t(l.title),
-      day: capitalize(`${weekdayOf(l.day, ctx.texts.weekdays)} ${l.day}`),
-      text: ctx.t(l.text),
-      unread: !l.read.includes(ctx.me),
-    }));
+    .map(({ l }) => {
+      const n = ctx.texts.extra.notebook;
+      const from = ctx.t(capitalize(l.from));
+      const title = ctx.t(l.title);
+      const day = `${weekdayOf(l.day, ctx.texts.weekdays)} ${l.day}`;
+      const unread = !l.read.includes(ctx.me);
+      return {
+        id: l.id,
+        from,
+        title,
+        day: capitalize(day),
+        text: ctx.t(l.text),
+        unread,
+        meta: ctx.t(n.letterMeta, { from, day }),
+        label: ctx.t(unread ? n.letterUnread : n.letterLabel, { title, from, day }),
+      };
+    });
 }
 
 // ---------------------------------------------------------------------------

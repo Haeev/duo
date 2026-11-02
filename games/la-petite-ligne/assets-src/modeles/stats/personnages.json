@@ -7,6 +7,21 @@
   "player_hair_short": 316,
   "player_hair_bob": 352,
   "player_hair_bun": 380,
+  "player_hair_crop": 148,
+  "player_hair_curls": 388,
+  "player_hair_ponytail": 328,
+  "player_hair_braid": 396,
+  "player_hair_pigtails": 432,
+  "player_hair_wavy": 352,
+  "player_hair_long": 400,
+  "player_hair_fringe": 280,
+  "player_hair_quiff": 236,
+  "player_hair_cloud": 432,
+  "player_hair_crown": 432,
+  "player_hair_bob_long": 380,
+  "player_beard_short": 224,
+  "player_beard_full": 308,
+  "player_mustache": 72,
   "player_scarf_orb": 212,
   "player_scarf_crescent": 256,
   "player_scarf_star": 204,
@@ -17,7 +32,12 @@
   "villager_odette": 1950,
   "villager_basile": 2166,
   "villager_jeanne": 2054,
-  "villager_lucie": 1986
+  "villager_lucie": 1986,
+  "villager_achille": 1854,
+  "villager_solange": 2050,
+  "villager_firmin_scarf": 232,
+  "rail_crew_driver": 1470,
+  "rail_crew_stoker": 1514
  },
  "animations": [
   {
@@ -154,8 +174,53 @@
    "name": "hold_ladder",
    "seconds": 2.0,
    "loop": true
+  },
+  {
+   "name": "sit_edge",
+   "seconds": 4.0,
+   "loop": true
+  },
+  {
+   "name": "look_up",
+   "seconds": 1.5,
+   "loop": false
+  },
+  {
+   "name": "crank_hold",
+   "seconds": 2.0,
+   "loop": true
+  },
+  {
+   "name": "crank_turn",
+   "seconds": 1.0,
+   "loop": true
+  },
+  {
+   "name": "wave_back",
+   "seconds": 1.2,
+   "loop": true
+  },
+  {
+   "name": "pole_raise",
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "pole_lower",
+   "seconds": 0.5,
+   "loop": false
+  },
+  {
+   "name": "driver_lean",
+   "seconds": 3.0,
+   "loop": true
+  },
+  {
+   "name": "driver_wave",
+   "seconds": 1.067,
+   "loop": true
   }
  ],
- "file_bytes": 2276536,
+ "file_bytes": 3858024,
  "player_example_tris": 2006
 }

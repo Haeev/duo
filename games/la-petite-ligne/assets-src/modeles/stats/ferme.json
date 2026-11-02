@@ -149,14 +149,30 @@
   },
   "blackberry": {
    "kind": "item",
-   "size_m": 0.3,
-   "note": "posée à plat (point bas à 0): sur un point berry_spots de bramble, ou au sol",
-   "tris": 224
+   "size_m": 0.66,
+   "posed_on": "bramble",
+   "note": "trois grappes: origine au point berry_spots de bramble, même lacet que le roncier (pas de lacet au hasard), jamais au sol",
+   "tris": 744
   },
   "hazelnut": {
    "kind": "item",
-   "size_m": 0.33,
-   "tris": 392
+   "size_m": 0.6,
+   "posed_on": "bush_hazel",
+   "note": "jonchée de feuilles et tas: origine au point nut_spots de bush_hazel, au sol",
+   "tris": 948
+  },
+  "cep": {
+   "kind": "item",
+   "size_m": 0.25,
+   "note": "au pied d'un chêne, côté sud",
+   "tris": 522
+  },
+  "elderberry": {
+   "kind": "item",
+   "size_m": 0.7,
+   "posed_on": "bush_elder",
+   "note": "trois ombelles: origine au point berry_spots de bush_elder, même lacet que le sureau, jamais au sol",
+   "tris": 804
   },
   "seed_packet_radish": {
    "kind": "item",
@@ -200,6 +216,39 @@
    "socket": "socket_hand_r",
    "tris": 80
   },
+  "watering_can_copper": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tool_kind": "watering_can",
+   "tris": 292
+  },
+  "axe_forged": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tool_kind": "axe",
+   "tris": 200
+  },
+  "fishing_rod_bamboo": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "tool_kind": "fishing_rod",
+   "tris": 316
+  },
+  "lamp_pole": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "length_m": 2.2,
+   "note": "perche couchée vers l'avant (+Z glTF) au repos; clips pole_raise et pole_lower",
+   "tris": 164
+  },
+  "hen_crate": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "cage de transport: posée devant le poulailler, poule à l'origine, dedans",
+   "tris": 564
+  },
   "fishing_float": {
    "kind": "item",
    "note": "bouchon: origine au niveau de l'eau",
@@ -218,6 +267,13 @@
    "length_axis": "z",
    "carry_height": 1.78,
    "tris": 104
+  },
+  "ridge_purlin": {
+   "kind": "carried",
+   "length_axis": "z",
+   "carry_height": 1.78,
+   "length_m": 4.9,
+   "tris": 140
   },
   "nail_box": {
    "kind": "item",
@@ -268,5 +324,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 786424
+ "file_bytes": 1098152
 }
