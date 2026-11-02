@@ -1,4 +1,4 @@
-import { InstancedMesh, MeshBasicMaterial, Raycaster, Vector3, type Color } from 'three';
+import { Mesh, MeshBasicMaterial, Raycaster, Vector3, type Color } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
@@ -25,7 +25,7 @@ interface Target {
   h: number;
 }
 
-function setup(): { map: GameMap; terrain: Terrain; forest: InstancedMesh[] } {
+function setup(): { map: GameMap; terrain: Terrain; forest: Mesh[]; trees: number } {
   // Le terrain et la végétation ne lisent que ces membres; pas de texture ni de WebGL dans Node.
   const materials = {
     palette: new MeshBasicMaterial(),
@@ -39,10 +39,10 @@ function setup(): { map: GameMap; terrain: Terrain; forest: InstancedMesh[] } {
   const vegetation = new Vegetation(map, terrain, materials, resources);
   vegetation.group.updateMatrixWorld(true);
   const forest = vegetation.group.children.filter(
-    (child): child is InstancedMesh =>
-      child instanceof InstancedMesh && child.name.startsWith('foret'),
+    (child): child is Mesh =>
+      child instanceof Mesh && child.name.startsWith('foret'),
   );
-  return { map, terrain, forest };
+  return { map, terrain, forest, trees: vegetation.forestTrees };
 }
 
 /** Direction vers la caméra pour une orientation (0: caméra au sud-est, 1: au sud-ouest). */
@@ -142,7 +142,7 @@ describe('forêt du pourtour: éclaircies des moments du tour 7', () => {
   });
 
   it('garde la forêt partout ailleurs (la lisière recule, elle ne disparaît pas)', () => {
-    const trees = scene.forest.reduce((sum, mesh) => sum + mesh.count, 0);
+    const trees = scene.trees;
     // 702 arbres sans éclaircie, 679 avec: la lisière recule, le bois reste aussi profond.
     expect(trees).toBeGreaterThan(650);
   });

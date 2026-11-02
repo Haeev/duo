@@ -75,6 +75,17 @@ export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
   locomotive: ['train_locomotive', 'locomotive'],
   coach: ['train_coach', 'coach'],
   van: ['train_van', 'van'],
+  // Tour 10: types de la carte (level designer) et nœuds de l'artiste (`bourg.glb`).
+  salon_shop: ['haberdashery'],
+  bakehouse: ['bakery'],
+  // La cour et l'école-mairie ne font qu'un modèle (`school`, 11 x 5): posé par la cour, l'école-mairie ne dessine rien.
+  school_yard: ['school'],
+  ru_culvert: ['culvert'],
+  ru_road_bridge: ['street_bridge'],
+  ru_footbridge: ['footbridge'],
+  ru_stepping_stones: ['ford_stones'],
+  // Pas de modèle de pommier (non demandé au lot des modèles): le petit chêne en attendant.
+  tree_apple: ['tree_oak_small'],
 };
 
 /**

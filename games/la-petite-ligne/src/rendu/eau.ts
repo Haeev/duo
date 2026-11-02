@@ -44,6 +44,11 @@ export interface WaterUniforms {
   uBankParams: { value: Vector2 };
   /** Reflets doux du ciel qui glissent avec le courant: force, seuil. */
   uSheen: { value: Vector2 };
+  /**
+   * Eau vive hors du lit de la rivière (le ru de la Côte, tour 10): courant vif minimal et
+   * profondeur minimale vue par le shader. Nuls pour la rivière (rien ne change pour elle).
+   */
+  uStreamParams: { value: Vector2 };
 }
 
 const VERTEX_PARS = /* glsl */ `
@@ -76,6 +81,7 @@ uniform vec3 uGlintParams; // finesse, vitesse, seuil
 uniform vec3 uBankShade;
 uniform vec2 uBankParams;  // largeur, force
 uniform vec2 uSheen;       // force, seuil
+uniform vec2 uStreamParams; // courant vif minimal, profondeur minimale (ru de la Côte)
 `;
 
 /** Après `color_fragment`: couleur de l'eau, reflet, écume, transparence. */
@@ -96,8 +102,8 @@ diffuseColor.rgb = mix(diffuseColor.rgb, uReflection * 1.12, smoothstep(uSheen.y
 // les pierres du gué qui crèvent la surface. Hors du lit, une estimation par la distance à la berge.
 vec4 waterBed = ambRiver(vAmbWorld.xz);
 float waterBedHeight = uRiverParams.y + waterBed.r * uRiverParams.z;
-float waterTrue = waterBed.a > 0.0 ? uRiverParams.x - waterBedHeight : waterDepth * 0.3;
-float waterRiffle = waterBed.g;
+float waterTrue = waterBed.a > 0.0 ? uRiverParams.x - waterBedHeight : max(waterDepth * 0.3, uStreamParams.y);
+float waterRiffle = max(waterBed.g, uStreamParams.x);
 // Sous la berge, l'eau s'assombrit et verdit (ombre et reflet du talus): le bord prend du relief.
 float bankShade = (1.0 - smoothstep(0.0, uBankParams.x * 0.3, waterTrue)) * uBankParams.y * (1.0 - waterRiffle);
 diffuseColor.rgb = mix(diffuseColor.rgb, uBankShade, bankShade);
@@ -148,12 +154,16 @@ reflectedLight.directDiffuse += ambGlowLight(vAmbWorld, vec3(0.0, 1.0, 0.0)) * m
 totalEmissiveRadiance += uGlintColor * waterGlint * waterCloud;
 `;
 
-/** Matériau de la rivière et du gué (une seule surface). */
+/**
+ * Matériau de la rivière et du gué (une seule surface). `stream`: le ru de la Côte, même programme
+ * (mêmes sources, autres uniformes): courant vers le sud, eau vive partout.
+ */
 export function createWaterMaterial(
   field: TerrainField,
   surfaces: SurfaceUniforms,
   opacity: number,
   foamAmount: number,
+  stream: { flow: readonly [number, number]; riffle: number; depth: number } | null = null,
 ): { material: MeshStandardMaterial; uniforms: WaterUniforms } {
   const w = AMBIANCE_SETTINGS.water;
   // Transparence du bord à l'échelle de celle du large (lame d'eau du gué plus claire).
@@ -164,7 +174,12 @@ export function createWaterMaterial(
     uShallow: { value: new Color(w.shallow) },
     uDeep: { value: new Color(w.deep) },
     uFoam: { value: new Color(w.foam) },
-    uFlow: { value: new Vector2(w.flow[0] / w.rippleSize, w.flow[1] / w.rippleSize) },
+    uFlow: {
+      value:
+        stream === null
+          ? new Vector2(w.flow[0] / w.rippleSize, w.flow[1] / w.rippleSize)
+          : new Vector2(stream.flow[0] / w.rippleSize, stream.flow[1] / w.rippleSize),
+    },
     uWaterParams: {
       value: new Vector4(1 / w.rippleSize, w.reflection, w.reflectionRipple, shallowOpacity),
     },
@@ -176,9 +191,10 @@ export function createWaterMaterial(
     uBankShade: { value: new Color(w.bankShade) },
     uBankParams: { value: new Vector2(w.bankShadeWidth, w.bankShadeAmount) },
     uSheen: { value: new Vector2(w.sheen, w.sheenThreshold) },
+    uStreamParams: { value: new Vector2(stream?.riffle ?? 0, stream?.depth ?? 0) },
   };
   const material = new MeshStandardMaterial({
-    name: 'lpl_water',
+    name: stream === null ? 'lpl_water' : 'lpl_water_stream',
     color: new Color(w.deep),
     roughness: w.roughness,
     metalness: 0,

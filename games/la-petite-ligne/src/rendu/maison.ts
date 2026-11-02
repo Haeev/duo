@@ -6,27 +6,22 @@
  * et du toit quand le personnage local est à l'intérieur.
  */
 import {
-  Box3,
-  Color,
   Group,
-  InstancedMesh,
   Matrix4,
   Mesh,
   MeshBasicMaterial,
   PointLight,
-  SkinnedMesh,
   Vector3,
   type BufferGeometry,
-  type Material,
   type Object3D,
 } from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import type { GameMap, MapProp } from '../etat/carte';
+import { HOUSE_BUILDING, type GameMap } from '../etat/carte';
 import {
   CORNER_SIZE,
   type CharacterId,
   type ConstructionState,
   type DeepReadonly,
+  type ItemStack,
   type PlacedFurniture,
   type PlacementPreview,
 } from '../etat/types';
@@ -34,8 +29,16 @@ import type { Content } from '../donnees/types';
 import { seasonOfDay } from '../donnees/calendrier';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
-import { lowWallGeometry, matrixToAncestor, type WallOpening } from './coupe-murs';
-import { bakeGeometry, propHints, propMatrix } from './decor';
+import { propMatrix } from './decor';
+import {
+  GHOST_PULSE,
+  HouseRoom,
+  mergePieces,
+  roomStage,
+  StagedBuilding,
+  WALL_FACES_CAMERA,
+  type RoomView,
+} from './interieurs';
 import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -47,10 +50,6 @@ import type { Terrain } from './terrain';
 
 const HOUSE_PROP = 'gatekeeper_house';
 const COOP_PROP = 'henhouse';
-const GHOST_TINT = '#fff1cf';
-const GHOST_BASE_OPACITY = 0.22;
-const GHOST_PROGRESS_OPACITY = 0.5;
-const GHOST_PULSE = 0.08;
 const INVALID_TINT = '#d9584f';
 const PLACEMENT_OPACITY = 0.55;
 /** Cadre du coin à soi: baguettes fines posées au sol, en retrait du bord des cases (m). */
@@ -63,427 +62,74 @@ const CORNER_LIFT = 0.03;
 const CORNER_PEG_SIZE = 0.07;
 const CORNER_PEG_HEIGHT = 0.3;
 const CORNER_OPACITY = 0.5;
-/** Seuil du produit scalaire: un mur qui regarde la caméra au-delà est coupé. */
-const WALL_FACES_CAMERA = 0.25;
 const FURNITURE_PICK_HEIGHT = 1;
 const FURNITURE_PICK_INSET = 0.05;
 
-/** Une pièce de bâtiment: mur ou toit (coupés quand on est dedans), ou élément à construire. */
-interface BuildPart {
-  node: Object3D;
-  /** Appartient à la ruine ou au modèle réparé. */
-  owner: 'ruin' | 'repaired';
-  /** Direction (au sol, repère du modèle) vers laquelle regarde un mur; `null` pour le reste. */
-  facing: Vector3 | null;
-  roof: boolean;
-}
-
-interface ElementPart {
-  construction: string;
-  element: string;
-  node: Object3D;
-  ghost: Mesh[];
-  material: MeshBasicMaterial;
-  roof: boolean;
-  facing: Vector3 | null;
-}
-
-/**
- * Pièces fixes d'un modèle (murs, gravats, sol) fusionnées en un maillage par
- * matériau et par réglage d'ombre: dessinées d'un seul appel tant qu'elles
- * sont toutes visibles; dès que l'une est coupée (personnage dedans), on
- * revient aux pièces séparées. Les éléments à construire et les toits qui
- * s'effacent pendant le chantier restent à part.
- */
-interface FixedMerge {
-  model: Object3D;
-  /** Enfants directs du modèle couverts par la fusion. */
-  pieces: Object3D[];
-  meshes: Mesh[];
-}
-
-/** Fusionne les maillages sous `pieces` (repère du modèle), ou `null` si leurs attributs diffèrent. */
-function mergePieces(
-  model: Object3D,
-  pieces: readonly Object3D[],
-  resources: ResourceTracker,
-): Mesh[] | null {
-  model.updateMatrixWorld(true);
-  const toModel = new Matrix4().copy(model.matrixWorld).invert();
-  const local = new Matrix4();
-  const buckets = new Map<
-    string,
-    { material: Material; cast: boolean; receive: boolean; geometries: BufferGeometry[] }
-  >();
-  let invalid = false;
-  for (const piece of pieces) {
-    piece.traverse((object) => {
-      if (!(object instanceof Mesh) || object instanceof InstancedMesh || invalid) {
-        return;
-      }
-      if (Array.isArray(object.material) || object instanceof SkinnedMesh) {
-        invalid = true;
-        return;
-      }
-      const material = object.material as Material;
-      const key = `${material.uuid}|${String(object.castShadow)}|${String(object.receiveShadow)}`;
-      let bucket = buckets.get(key);
-      if (bucket === undefined) {
-        bucket = {
-          material,
-          cast: object.castShadow,
-          receive: object.receiveShadow,
-          geometries: [],
-        };
-        buckets.set(key, bucket);
-      }
-      local.multiplyMatrices(toModel, object.matrixWorld);
-      bucket.geometries.push(bakeGeometry(object.geometry as BufferGeometry, local));
-    });
-  }
-  const meshes: Mesh[] = [];
-  for (const bucket of buckets.values()) {
-    const merged = invalid ? null : mergeGeometries(bucket.geometries, false);
-    for (const geometry of bucket.geometries) {
-      geometry.dispose();
-    }
-    if (merged === null) {
-      invalid = true;
-      continue;
-    }
-    merged.computeBoundingBox();
-    merged.computeBoundingSphere();
-    const mesh = new Mesh(resources.track(merged), bucket.material);
-    mesh.name = `${model.name} (pièces fixes)`;
-    mesh.castShadow = bucket.cast;
-    mesh.receiveShadow = bucket.receive;
-    mesh.visible = false;
-    meshes.push(mesh);
-  }
-  if (invalid) {
-    for (const mesh of meshes) {
-      mesh.geometry.dispose();
-    }
-    return null;
-  }
-  return meshes;
-}
-
-export interface StagedState {
-  repaired: boolean;
-  /** La construction a commencé: les restes du vieux toit laissent place aux fantômes. */
-  hideRuinRoof: boolean;
-  constructions: readonly DeepReadonly<ConstructionState>[];
-  time: number;
-  cut: boolean;
-  toCamera: Vector3;
-}
-
-function ghostCopies(source: Object3D, material: Material): Mesh[] {
-  const copies: Mesh[] = [];
-  source.updateMatrixWorld(true);
-  source.traverse((object) => {
-    if (object instanceof Mesh) {
-      const ghost = new Mesh(object.geometry as BufferGeometry, material);
-      ghost.matrixAutoUpdate = false;
-      ghost.matrix.copy(object.matrixWorld);
-      ghost.renderOrder = 2;
-      copies.push(ghost);
-    }
-  });
-  return copies;
-}
-
-/** Bâtiment à deux états (ruine, réparé) et à éléments construits un par un. */
-class StagedBuilding {
-  readonly group = new Group();
-  readonly ruin: Object3D;
-  readonly repaired: Object3D;
-  private readonly elements: ElementPart[] = [];
-  private readonly parts: BuildPart[] = [];
-  private readonly fixed: Object3D[] = [];
-  private readonly merges: FixedMerge[] = [];
-  /** Pied de chaque mur, montré quand le mur est coupé (R12). */
-  private readonly stubs: { part: BuildPart; stub: Object3D }[] = [];
-  private readonly centre = new Vector3();
-  private readonly worldFacing = new Vector3();
-
-  constructor(
-    prop: MapProp,
-    ground: number,
-    library: ModelLibrary,
-    private readonly resources: ResourceTracker,
-    private readonly materials: SharedMaterials,
-    names: { ruin: string; repaired: string },
-    host: Group,
-  ) {
-    this.group.name = prop.model;
-    propMatrix(prop, ground, this.group.matrix);
-    this.group.matrix.decompose(this.group.position, this.group.quaternion, this.group.scale);
-    this.ruin = library.instantiate(
-      library.has(names.ruin) ? names.ruin : prop.model,
-      propHints(prop),
-    );
-    this.repaired = library.has(names.repaired)
-      ? library.instantiate(names.repaired, propHints(prop))
-      : this.ruin;
-    for (const model of new Set([this.ruin, this.repaired])) {
-      applyShadows(model);
-      this.group.add(model);
-    }
-    host.add(this.group);
-    this.group.updateMatrixWorld(true);
-    new Box3().setFromObject(this.repaired).getCenter(this.centre);
-  }
-
-  /** Associe un élément de construction à un nœud du modèle réparé (un élément peut en montrer plusieurs). */
-  bindElement(construction: string, element: string, nodeName: string, roof: boolean): void {
-    const node = this.repaired.getObjectByName(nodeName);
-    if (node === undefined || this.repaired === this.ruin) {
-      return;
-    }
-    const material = this.resources.track(
-      new MeshBasicMaterial({
-        map: this.materials.paletteTexture,
-        color: new Color(GHOST_TINT),
-        transparent: true,
-        opacity: GHOST_BASE_OPACITY,
-        depthWrite: false,
-      }),
-    );
-    const ghost = ghostCopies(node, material);
-    for (const mesh of ghost) {
-      this.group.parent?.add(mesh);
-    }
-    this.elements.push({ construction, element, node, ghost, material, roof, facing: null });
-  }
-
-  /** Après les liaisons: repère les murs et le toit (coupe) et les pièces fixes du modèle réparé. */
-  finish(roofPattern: RegExp, wallPattern: RegExp): void {
-    const box = new Box3();
-    const centre = new Vector3();
-    const origin = new Vector3();
-    this.group.getWorldPosition(origin);
-    const inverse = this.group.quaternion.clone().invert();
-    const elementNodes = new Set(this.elements.map((element) => element.node));
-    const facingOf = (object: Object3D): Vector3 => {
-      box.setFromObject(object).getCenter(centre).sub(origin).applyQuaternion(inverse);
-      return Math.abs(centre.x) > Math.abs(centre.z)
-        ? new Vector3(Math.sign(centre.x), 0, 0)
-        : new Vector3(0, 0, Math.sign(centre.z));
-    };
-    for (const element of this.elements) {
-      element.facing = element.roof ? null : facingOf(element.node);
-    }
-    const containsElement = (object: Object3D): boolean => {
-      let found = false;
-      object.traverse((child) => {
-        found ||= elementNodes.has(child);
-      });
-      return found;
-    };
-    for (const [owner, model] of [
-      ['ruin', this.ruin],
-      ['repaired', this.repaired],
-    ] as const) {
-      if (owner === 'repaired' && model === this.ruin) {
-        continue;
-      }
-      for (const child of model.children) {
-        if (owner === 'repaired' && !containsElement(child)) {
-          this.fixed.push(child);
-        }
-        if (roofPattern.test(child.name)) {
-          this.parts.push({ node: child, owner, facing: null, roof: true });
-        } else if (wallPattern.test(child.name)) {
-          this.parts.push({ node: child, owner, facing: facingOf(child), roof: false });
-        }
-      }
-      const pieces = model.children.filter(
-        (child) => !roofPattern.test(child.name) && !containsElement(child),
-      );
-      const meshes = pieces.length > 1 ? mergePieces(model, pieces, this.resources) : null;
-      if (meshes !== null) {
-        for (const mesh of meshes) {
-          model.add(mesh);
-        }
-        this.merges.push({ model, pieces, meshes });
-      }
-    }
-    // Après la fusion: les pieds de mur restent hors des pièces fusionnées. Les portes des
-    // murs (éléments non toits) y deviennent des baies: les murs de l'artiste sont pleins.
-    const doors = this.elements
-      .filter((element) => !element.roof && element.facing !== null)
-      .map((element) => ({ facing: element.facing, box: this.boxInModel(element.node) }));
-    for (const part of this.parts) {
-      if (part.roof || part.facing === null) continue;
-      const model = part.owner === 'ruin' ? this.ruin : this.repaired;
-      const facing = part.facing;
-      const openings: WallOpening[] = doors
-        .filter((door) => door.facing?.equals(facing) === true && !door.box.isEmpty())
-        .map((door) => {
-          const axis = facing.x !== 0 ? 'z' : 'x';
-          return {
-            axis,
-            low: door.box.min[axis],
-            high: door.box.max[axis],
-            sill: RENDER_SETTINGS.house.doorSillHeight,
-          };
-        });
-      const stub = this.wallStub(part.node, model, openings);
-      if (stub !== null) {
-        model.add(stub);
-        this.stubs.push({ part, stub });
-      }
-    }
-  }
-
-  /** Boîte d'un nœud du modèle réparé, dans le repère du modèle (matrices locales). */
-  private boxInModel(node: Object3D): Box3 {
-    const box = new Box3();
-    const matrix = new Matrix4();
-    node.traverse((object) => {
-      if (!(object instanceof Mesh)) return;
-      const geometry = object.geometry as BufferGeometry;
-      geometry.computeBoundingBox();
-      if (geometry.boundingBox === null) return;
-      matrixToAncestor(object, this.repaired, matrix);
-      box.union(geometry.boundingBox.clone().applyMatrix4(matrix));
-    });
-    return box;
-  }
-
-  /** Pied d'un mur (`coupe-murs.ts`), dans le repère du modèle; `null` s'il n'a rien de bas. */
-  private wallStub(
-    wall: Object3D,
-    model: Object3D,
-    openings: readonly WallOpening[],
-  ): Object3D | null {
-    const group = new Group();
-    group.name = `${wall.name}_pied`;
-    const toModel = new Matrix4();
-    wall.traverse((object) => {
-      if (!(object instanceof Mesh)) return;
-      matrixToAncestor(object, model, toModel);
-      const geometry = lowWallGeometry(
-        object.geometry as BufferGeometry,
-        toModel,
-        RENDER_SETTINGS.house.cutWallHeight,
-        openings,
-      );
-      if (geometry === null) return;
-      const mesh = new Mesh(this.resources.track(geometry), object.material);
-      mesh.matrixAutoUpdate = false;
-      mesh.matrix.copy(toModel);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      group.add(mesh);
-    });
-    group.visible = false;
-    return group.children.length > 0 ? group : null;
-  }
-
-  center(): Vector3 {
-    return this.centre;
-  }
-
-  elementCenter(element: string, out: Vector3): Vector3 {
-    const part = this.elements.find((candidate) => candidate.element === element);
-    if (part === undefined) {
-      return out.copy(this.centre);
-    }
-    return new Box3().setFromObject(part.node).getCenter(out);
-  }
-
-  private cutAway(part: { roof: boolean; facing: Vector3 | null }, state: StagedState): boolean {
-    if (!state.cut) {
-      return false;
-    }
-    if (part.roof) {
-      return true;
-    }
-    if (part.facing === null) {
-      return false;
-    }
-    this.worldFacing.copy(part.facing).applyQuaternion(this.group.quaternion);
-    return this.worldFacing.dot(state.toCamera) > WALL_FACES_CAMERA;
-  }
-
-  apply(state: StagedState): void {
-    // Pièces fixes visibles par défaut; la fusion ne reprend la main qu'à la fin, si rien n'est coupé.
-    for (const merge of this.merges) {
-      for (const piece of merge.pieces) {
-        piece.visible = true;
-      }
-    }
-    this.applyParts(state);
-    for (const merge of this.merges) {
-      let whole = true;
-      for (const piece of merge.pieces) {
-        whole &&= piece.visible;
-      }
-      if (whole) {
-        for (const piece of merge.pieces) {
-          piece.visible = false;
-        }
-      }
-      for (const mesh of merge.meshes) {
-        mesh.visible = whole;
-      }
-    }
-  }
-
-  private applyParts(state: StagedState): void {
-    const separate = this.repaired !== this.ruin;
-    this.ruin.visible = !separate || !state.repaired;
-    for (const node of this.fixed) {
-      node.visible = state.repaired;
-    }
-    for (const part of this.parts) {
-      const base =
-        part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
-      part.node.visible = base && !this.cutAway(part, state);
-    }
-    for (const { part, stub } of this.stubs) {
-      const base = part.owner === 'ruin' ? true : state.repaired;
-      stub.visible = base && this.cutAway(part, state);
-    }
-    const pulse =
-      Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;
-    for (const part of this.elements) {
-      const construction = state.constructions.find(
-        (candidate) => candidate.id === part.construction,
-      );
-      const element = construction?.elements.find((candidate) => candidate.id === part.element);
-      const status = construction?.status ?? 'locked';
-      const solid = status === 'done' || element?.done === true;
-      const ghost = status === 'ghost' && !solid;
-      const hidden = this.cutAway(part, state);
-      part.node.visible = solid && !hidden;
-      for (const mesh of part.ghost) {
-        mesh.visible = ghost && !hidden;
-      }
-      if (ghost) {
-        part.material.opacity =
-          GHOST_BASE_OPACITY + GHOST_PROGRESS_OPACITY * (element?.progress ?? 0) + pulse;
-      }
-    }
-  }
-
-  dispose(): void {
-    for (const part of this.elements) {
-      for (const mesh of part.ghost) {
-        mesh.removeFromParent();
-      }
-    }
-    this.group.removeFromParent();
-  }
-}
-
 interface FurnitureView {
   item: string;
+  /** Rideaux: la fenêtre où ils pendent (`window_<n>`), `null` pour le reste. */
+  window: string | null;
   object: Object3D;
+  /** Rideaux: les deux états de l'article (`<article>_open`, `<article>_closed`). */
+  curtain: { open: Object3D; closed: Object3D } | null;
   pick: PickTarget;
+  /** Râtelier: les outils pendus (clé: liste des outils), refaits quand elle change. */
+  rack: { key: string; tools: Object3D[] } | null;
+}
+
+/** Une fenêtre de la maisonnette ou de ses pièces (extra `windows` du modèle, repère de la maisonnette). */
+interface WindowSpec {
+  centre: Vector3;
+  /** Vers la pièce, au sol. */
+  inward: Vector3;
+  width: number;
+  height: number;
+  /** Pièce: `main`, `cellar`, `bedroom`. */
+  room: string;
+}
+
+/** Modèle des rideaux à une fenêtre (`maison.glb`) et son gabarit (0,75 x 0,9 m). */
+const CURTAIN_MODEL = 'curtains_window';
+const CURTAIN_ROD = 'curtains_rod';
+const CURTAIN_SIZE = { width: 0.75, height: 0.9 } as const;
+/** Pièce de la maisonnette d'une fenêtre, et la pièce à bâtir qui la porte (rien pour `main`). */
+const WINDOW_ROOMS: Readonly<Record<string, string>> = { cellar: 'room_cellar', bedroom: 'room_bedroom' };
+/** Râtelier (tour 10, section 5.3) et le nombre de crochets entre deux outils pendus (lisibles). */
+const RACK_MODEL = 'tool_rack';
+const RACK_HOOK_STEP = 3;
+/** Un outil pendu par le bout du manche: son origine (la prise) sous le crochet (m). */
+const RACK_HANG_DROP = 0.18;
+
+function readWindows(value: unknown): Map<string, WindowSpec> {
+  const out = new Map<string, WindowSpec>();
+  if (!Array.isArray(value)) return out;
+  for (const entry of value as unknown[]) {
+    if (typeof entry !== 'object' || entry === null) continue;
+    const w = entry as Record<string, unknown>;
+    const centre = w.center;
+    const inward = w.inward;
+    if (
+      typeof w.node !== 'string' ||
+      !Array.isArray(centre) ||
+      !Array.isArray(inward) ||
+      typeof w.width !== 'number' ||
+      typeof w.height !== 'number'
+    ) {
+      continue;
+    }
+    const [cx, cy, cz] = centre as unknown[];
+    const [ix, , iz] = inward as unknown[];
+    if (typeof cx !== 'number' || typeof cy !== 'number' || typeof cz !== 'number') continue;
+    if (typeof ix !== 'number' || typeof iz !== 'number') continue;
+    out.set(w.node, {
+      centre: new Vector3(cx, cy, cz),
+      inward: new Vector3(ix, 0, iz),
+      width: w.width,
+      height: w.height,
+      room: typeof w.room === 'string' ? w.room : 'main',
+    });
+  }
+  return out;
 }
 
 export class HousePart implements EventfulPart {
@@ -547,10 +193,38 @@ export class HousePart implements EventfulPart {
 
   private repairedNow = false;
 
+  /** Pièces bâties à deux (tour 10): leur vue, leur mur percé une fois bâties, le site. */
+  private readonly rooms: {
+    view: HouseRoom;
+    def: { model: string; wall: string; doorWall: string; site: string; elements: Readonly<Record<string, string>> };
+    swapped: boolean;
+    site: Object3D[];
+  }[] = [];
+
+  /** Caisse et planches au point du chantier d'une pièce (montrées pendant le site). */
+  private siteProps(point: string): Object3D[] {
+    const at = this.map.points[point];
+    if (at === undefined) return [];
+    return RENDER_SETTINGS.interiors.siteProps.map((name, index) => {
+      const object = this.library.instantiate(name);
+      applyShadows(object);
+      // Côte à côte, en travers du point (la caisse à l'ouest, les planches à l'est).
+      const x = at.x + (index - 0.5) * 0.9;
+      object.position.set(x, this.terrain.heightAt(x, at.y), at.y);
+      object.visible = false;
+      this.group.add(object);
+      return object;
+    });
+  }
+
   /** Le toit est-il coupé à cette image (personnage local dedans) ? */
   roofCut(): boolean {
     return this.cutInside;
   }
+
+  private readonly up = new Vector3(0, 1, 0);
+  private lastWorldRooms: DeepReadonly<Record<string, RoomView>> = {};
+  private lastDay = 0;
 
   constructor(
     private readonly map: GameMap,
@@ -562,6 +236,10 @@ export class HousePart implements EventfulPart {
     private readonly picks: PickRegistry,
   ) {
     this.group.name = 'maisonnette';
+    this.windows = readWindows(library.extras(HOUSE_PROP).windows);
+    const houseAt = map.props.find((prop) => prop.model === HOUSE_PROP);
+    this.houseYaw = yawFromQuarter(houseAt?.rotation ?? 0);
+    if (houseAt !== undefined) propMatrix(houseAt, 0, this.housePose);
     const room = map.house.room;
     this.lamp.position.set(
       room.x + room.w / 2,
@@ -603,6 +281,16 @@ export class HousePart implements EventfulPart {
       }
       house.finish(/_roof$|_attic$/, /_wall_/);
       this.house = house;
+      // Tour 10: cellier et chambre, bâtis à deux (même origine que la maisonnette).
+      for (const [room, def] of Object.entries(RENDER_SETTINGS.interiors.houseRooms)) {
+        if (!library.has(def.model)) continue;
+        this.rooms.push({
+          view: new HouseRoom(room, def.model, def.elements, houseProp, library, resources, materials, this.group),
+          def,
+          swapped: false,
+          site: this.siteProps(def.site),
+        });
+      }
     }
     const coopProp = map.props.find((prop) => prop.model === COOP_PROP);
     if (coopProp !== undefined) {
@@ -641,7 +329,8 @@ export class HousePart implements EventfulPart {
   update(context: FrameContext): void {
     const world = context.world;
     const local = world.characters.find((character) => character.id === context.local);
-    const inside = local?.inHouse === true;
+    // ADR 0016: « chez soi », c'est être dans le bâtiment `house` (cellier et chambre compris).
+    const inside = local?.inside === HOUSE_BUILDING;
     this.cutInside = inside;
     this.toCamera.set(-Math.cos(context.shownYaw), 0, -Math.sin(context.shownYaw));
     const find = (id: string): DeepReadonly<ConstructionState> | undefined =>
@@ -672,9 +361,21 @@ export class HousePart implements EventfulPart {
       // Pendant le chantier du poulailler, la ruine s'efface derrière les fantômes.
       this.coop.ruin.visible = find('chicken_coop')?.status === 'locked';
     }
+    this.lastWorldRooms = world.rooms;
+    this.lastDay = world.clock.day;
+    for (const room of this.rooms) {
+      const stage = room.view.apply(world.rooms[room.view.room], world.clock.day, inside, this.toCamera, context.time);
+      for (const object of room.site) object.visible = stage === 'site';
+      if (stage === 'built' && !room.swapped && this.house !== null) {
+        // La fenêtre devient porte (conception 4.2): le mur percé remplace le mur plein, une fois.
+        this.house.swapPiece(room.def.wall, this.library.instantiate(room.def.doorWall));
+        room.swapped = true;
+      }
+    }
     // Sous le toit réparé, les meubles ne se voient que de l'intérieur: inutile de les dessiner.
     const roofed = done('house_roof') && !inside;
     this.updateFurniture(world.furniture, roofed, context);
+    this.mergeStillFurniture(world.furniture);
     this.updateGhosts(context);
     this.updateCorners(context, roofed);
   }
@@ -745,8 +446,25 @@ export class HousePart implements EventfulPart {
   }
 
   private footprint(item: string, rotation: number): { w: number; d: number } {
-    const size = this.content.items[item]?.footprint ?? { w: 1, d: 1 };
+    const size = this.content.items[item]?.footprint ?? this.modelFootprint(item);
     return rotation % 2 === 0 ? size : { w: size.d, d: size.w };
+  }
+
+  /**
+   * Emprise lue dans le modèle (extra `footprint` [w, d]) pour un meuble absent de `objets.json`
+   * (tour 10: le grand coffre, l'étagère haute du cellier, posés par la simulation).
+   */
+  private modelFootprint(item: string): { w: number; d: number } {
+    const raw = this.library.extras(item).footprint;
+    if (Array.isArray(raw) && typeof raw[0] === 'number' && typeof raw[1] === 'number') return { w: raw[0], d: raw[1] };
+    return { w: 1, d: 1 };
+  }
+
+  /** Objet mural (`wall` de l'objet, sinon extra `wall` du modèle). */
+  private isWallItem(item: string): boolean {
+    const definition = this.content.items[item];
+    if (definition !== undefined) return definition.wall;
+    return this.library.extras(item).wall === true;
   }
 
   private place(object: Object3D, item: string, cx: number, cy: number, rotation: number): void {
@@ -755,6 +473,84 @@ export class HousePart implements EventfulPart {
     const y = cy + size.d / 2;
     object.position.set(x, this.terrain.heightAt(x, y), y);
     object.rotation.y = yawFromQuarter(rotation);
+  }
+
+  /** Fenêtres de la maisonnette (lues une fois dans le modèle, jamais dans une liste écrite à la main). */
+  private readonly windows: Map<string, WindowSpec>;
+  private readonly housePose = new Matrix4();
+  private readonly houseYaw: number;
+
+  /** Rideaux d'un article: la tringle et ses deux états (couleur de l'article, écru si inconnu). */
+  private curtainModel(item: string): { object: Object3D; open: Object3D; closed: Object3D } | null {
+    const states = (this.library.extras(CURTAIN_MODEL).states ?? {}) as Record<string, unknown>;
+    const article = typeof states[item] === 'object' ? item : 'curtains';
+    const names = states[article] as { open?: unknown; closed?: unknown } | undefined;
+    const openName = typeof names?.open === 'string' ? names.open : `${article}_open`;
+    const closedName = typeof names?.closed === 'string' ? names.closed : `${article}_closed`;
+    if (!this.library.has(openName) || !this.library.has(closedName)) return null;
+    const object = new Group();
+    object.name = `rideaux ${item}`;
+    const open = this.library.instantiate(openName);
+    const closed = this.library.instantiate(closedName);
+    object.add(open, closed);
+    if (this.library.has(CURTAIN_ROD)) object.add(this.library.instantiate(CURTAIN_ROD));
+    applyShadows(object);
+    return { object, open, closed };
+  }
+
+  /**
+   * Rideaux à leur fenêtre (conception 6.1): centrés, la pièce vers +Z du modèle, à l'échelle de la
+   * fenêtre; cachés avec leur mur quand la coupe l'efface, et tant que leur pièce n'est pas bâtie.
+   * Vus aussi du dehors, à travers la vitre.
+   */
+  private updateCurtain(view: FurnitureView, windowName: string, closed: boolean): void {
+    const spec = this.windows.get(windowName);
+    const curtain = view.curtain;
+    if (spec === undefined || curtain === null) {
+      view.object.visible = false;
+      view.pick.enabled = false;
+      return;
+    }
+    const room = WINDOW_ROOMS[spec.room];
+    const built = room === undefined || roomStage(this.lastWorldRooms[room], this.lastDay) === 'built';
+    view.object.position.copy(spec.centre).applyMatrix4(this.housePose);
+    view.object.rotation.set(0, this.houseYaw + Math.atan2(spec.inward.x, spec.inward.z), 0);
+    view.object.scale.set(spec.width / CURTAIN_SIZE.width, spec.height / CURTAIN_SIZE.height, 1);
+    curtain.open.visible = !closed;
+    curtain.closed.visible = closed;
+    this.wallFacing.copy(spec.inward).negate().applyAxisAngle(this.up, this.houseYaw);
+    view.object.visible = built && this.repairedNow && !this.wallCut(this.wallFacing);
+    const half = Math.max(spec.width, 0.5) / 2;
+    const p = view.object.position;
+    view.pick.box.min.set(p.x - half, p.y - spec.height / 2, p.z - half);
+    view.pick.box.max.set(p.x + half, p.y + spec.height / 2, p.z + half);
+    view.pick.enabled = view.object.visible && this.cutInside;
+  }
+
+  /**
+   * Outils du râtelier (`WorldState.rack`): pendus aux crochets du modèle (`hook_spots`), un tous
+   * les `RACK_HOOK_STEP` crochets, par le bout du manche, tête en bas.
+   */
+  private dressRack(view: FurnitureView, rack: readonly DeepReadonly<ItemStack>[]): void {
+    let key = '';
+    for (const stack of rack) key += `${stack.item};`;
+    if (view.rack?.key === key) return;
+    for (const tool of view.rack?.tools ?? []) tool.removeFromParent();
+    const hooks = this.library.extras(RACK_MODEL).hook_spots;
+    const spots = Array.isArray(hooks) ? (hooks as unknown[]) : [];
+    const tools: Object3D[] = [];
+    rack.forEach((stack, index) => {
+      const spot = spots[index * RACK_HOOK_STEP];
+      if (!Array.isArray(spot)) return;
+      const [x, y, z] = spot as unknown[];
+      if (typeof x !== 'number' || typeof y !== 'number' || typeof z !== 'number') return;
+      const tool = this.library.instantiate(this.content.items[stack.item]?.model ?? stack.item);
+      applyShadows(tool);
+      tool.position.set(x, y - RACK_HANG_DROP, z + 0.04);
+      view.object.add(tool);
+      tools.push(tool);
+    });
+    view.rack = { key, tools };
   }
 
   private modelFor(item: string): Object3D {
@@ -768,31 +564,97 @@ export class HousePart implements EventfulPart {
     return object;
   }
 
+  /** Meubles immobiles fusionnés (tour 10): leur empreinte et leur fusion. */
+  private stillKey = Number.NaN;
+  private stillMeshes: Mesh[] = [];
+  private readonly stillObjects: Object3D[] = [];
+
+  /**
+   * Les meubles visibles qui ne bougent pas (ni horloge, ni gravure de saison, ni rideaux, ni
+   * râtelier garni) fusionnés en un maillage par matériau: une pièce meublée coûte un appel au
+   * lieu d'un par meuble. Refait quand un meuble est posé, déplacé, tourné, montré ou caché
+   * (empreinte numérique, rien d'alloué tant que rien ne change).
+   */
+  private mergeStillFurniture(placed: readonly DeepReadonly<PlacedFurniture>[]): void {
+    let key = 0;
+    let count = 0;
+    for (const piece of placed) {
+      const view = this.furniture.get(piece.id);
+      if (view === undefined || !this.isStill(view)) continue;
+      key = (key * 31 + (view.object.visible ? 1 : 2)) | 0;
+      for (let i = 0; i < piece.id.length; i += 1) key = (key * 31 + piece.id.charCodeAt(i)) | 0;
+      key = (key * 31 + piece.cell.cx * 101 + piece.cell.cy * 7 + piece.rotation) | 0;
+      if (view.object.visible) count += 1;
+    }
+    if (key !== this.stillKey) {
+      this.stillKey = key;
+      for (const mesh of this.stillMeshes) {
+        mesh.removeFromParent();
+        mesh.geometry.dispose();
+      }
+      this.stillMeshes = [];
+      this.stillObjects.length = 0;
+      for (const piece of placed) {
+        const view = this.furniture.get(piece.id);
+        if (view !== undefined && this.isStill(view) && view.object.visible) this.stillObjects.push(view.object);
+      }
+      if (count > 1) {
+        this.group.updateMatrixWorld(true);
+        this.stillMeshes = mergePieces(this.group, this.stillObjects, this.resources) ?? [];
+        for (const mesh of this.stillMeshes) this.group.add(mesh);
+      }
+    }
+    if (this.stillMeshes.length === 0) return;
+    for (const object of this.stillObjects) object.visible = false;
+    for (const mesh of this.stillMeshes) mesh.visible = true;
+  }
+
+  private isStill(view: FurnitureView): boolean {
+    if (view.curtain !== null || (view.rack?.tools.length ?? 0) > 0) return false;
+    const data = view.object.userData as { still?: boolean };
+    data.still ??= view.object.getObjectByName('wall_clock_hour') === undefined && view.object.userData.seasons === undefined;
+    return data.still;
+  }
+
   private updateFurniture(placed: readonly DeepReadonly<PlacedFurniture>[], hidden: boolean, context: FrameContext): void {
     const seen = new Set<string>();
     for (const piece of placed) {
       seen.add(piece.id);
       let view = this.furniture.get(piece.id);
-      if (view?.item !== piece.item) {
+      const windowName = piece.window ?? null;
+      if (view?.item !== piece.item || view.window !== windowName) {
         if (view !== undefined) {
           view.object.removeFromParent();
           this.picks.remove(view.pick);
         }
+        const curtain = windowName === null ? null : this.curtainModel(piece.item);
         view = {
           item: piece.item,
-          object: this.modelFor(piece.item),
+          window: windowName,
+          object: curtain?.object ?? this.modelFor(piece.item),
+          curtain: curtain === null ? null : { open: curtain.open, closed: curtain.closed },
           pick: this.picks.add({ kind: 'furniture', furniture: piece.id }),
+          rack: null,
         };
         this.group.add(view.object);
         this.furniture.set(piece.id, view);
       }
-      const wall = this.content.items[piece.item]?.wall === true;
+      if (view.curtain !== null && windowName !== null) {
+        this.updateCurtain(view, windowName, piece.closed === true);
+        continue;
+      }
+      const wall = this.isWallItem(piece.item);
       const rotation = wall ? this.wallRotation(piece.cell.cx, piece.cell.cy, piece.rotation) : piece.rotation;
       this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, rotation);
       // Un objet mural suit son mur: caché avec lui quand la coupe l'efface.
       this.wallFacing.set(Math.sin(yawFromQuarter(rotation)), 0, Math.cos(yawFromQuarter(rotation))).negate();
       view.object.visible = !hidden && !(wall && this.wallCut(this.wallFacing));
-      if (view.object.visible) dressFurniture(view.object, context, this.content);
+      if (view.object.visible) {
+        dressFurniture(view.object, context, this.content);
+        if (this.library.resolve(this.content.items[piece.item]?.model ?? piece.item) === RACK_MODEL) {
+          this.dressRack(view, context.world.rack);
+        }
+      }
       const size = this.footprint(piece.item, piece.rotation);
       const ground = view.object.position.y;
       view.pick.box.min.set(
@@ -869,6 +731,7 @@ export class HousePart implements EventfulPart {
   }
 
   dispose(): void {
+    for (const room of this.rooms) room.view.dispose();
     this.house?.dispose();
     this.coop?.dispose();
     for (const view of this.furniture.values()) {

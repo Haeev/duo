@@ -192,10 +192,57 @@ export const RENDER_SETTINGS = {
      * bâtiments, peu d'appels de dessin pour les lampadaires et les clôtures.
      */
     chunkSize: 12,
+    // ADR 0016: un bloc regroupé déborde peu du cadre. Sans regroupement (bloc de 1), la vue de la
+    // place passe de 147 à 174 appels; on garde des blocs de 2 x 2 morceaux, mais seuls les morceaux
+    // de moins de 1 500 triangles s'y regroupent (un bloc pèse au plus 6 000 triangles, contre 12 000).
     chunkMergeBlock: 2,
-    chunkMergeBelow: 3000,
+    chunkMergeBelow: 1500,
+    /**
+     * Sol, eau, semis et arbres de la lisière (ADR 0016, tour 10): morceaux de `surfaceChunk` m,
+     * éliminés hors du cadre (aucun maillage ne grandit avec la carte). Mesuré à 12 m: 21 morceaux
+     * de sol, 14 de touffes et 12 de fleurs dans la vue de la place (187 appels, budget 150);
+     * sol, eau et lisière à 32 m (moins d'appels, presque les mêmes triangles); les semis par 24 m
+     * (à 48 m: 37 000 triangles de végétation au lieu de 25 000 dans la même vue).
+     */
+    surfaceChunk: 32,
+    scatterChunk: 24,
+    /** Arbres de la lisière (une trentaine, trois modèles): par morceaux de 48 m (deux lots par modèle au plus en vue). */
+    edgeTreeChunk: 48,
+    /** Galets des berges (1 200 triangles pour toute la carte) et fleurs: par grands morceaux. */
+    pebbleChunk: 48,
+    /** Tronçons de la forêt du pourtour (m): à 24 m, +12 000 triangles dans la vue de la place. */
+    forestSegment: 12,
     /** Tronçons de la forêt du pourtour et des rails (m): éliminés hors du cadre. */
     stripSegment: 12,
+    /**
+     * Ru de la Côte (tour 10, `ru.ts`): creux à berges raides, eau vive peu profonde (1,3 à 1,5 m
+     * d'eau entre les berges, 30 cm de fond). Parts de la demi-largeur du creux: `crest` (fin de la
+     * crête arrondie, `crestDrop` m sous le haut), `toe` (pied de la berge, `toeRise` m au-dessus du
+     * fond). Le creux ondule (`wobbleScale` m) en largeur et en axe. Géométrie par pas de `step` m
+     * le long du ru et `across` points en travers; surface de l'eau à la hauteur de la rivière (le
+     * ru s'y jette sans marche).
+     */
+    stream: {
+      bed: -0.46,
+      crest: 0.78,
+      crestDrop: 0.1,
+      toe: 0.5,
+      toeRise: 0.06,
+      edgeBlend: 0.06,
+      wobbleScale: 3.5,
+      widthWobble: 0.05,
+      axisWobble: 0.07,
+      step: 0.5,
+      across: 17,
+      /** Galets du fond: un tous les `pebbleSpacing` m environ, une part affleure (écume autour). */
+      pebbleSpacing: 0.7,
+      pebbleSize: [0.1, 0.22] as const,
+      /** Courant vif (traînées et facettes du shader de l'eau) et profondeur vue par l'eau (m). */
+      riffle: 0.75,
+      shaderDepth: 0.16,
+      /** Vitesse du courant du ru par rapport à celle de l'Aubrune (eau vive: plus vite). */
+      flowFactor: 1.6,
+    },
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
     /**
@@ -439,7 +486,23 @@ export const RENDER_SETTINGS = {
    */
   floorProps: { platform: 0.4, pontoon: 0.5 } as Readonly<Record<string, number>>,
 
+  /**
+   * Tour 10: objets de la carte posés à côté du centre de leur emprise (m, x et y de la carte), et
+   * types sans dessin. La cour de l'école porte le modèle `school` (cour et école-mairie, 11 x 5):
+   * décalé de 2 m vers l'est, son portail (x -2 du modèle) tombe dans l'axe de la rue Haute (x 77,
+   * portail de la carte). L'école-mairie de la carte est alors déjà dessinée.
+   */
+  propOffsets: { school_yard: [2, 0] } as Readonly<Record<string, readonly [number, number]>>,
+  propsDrawnElsewhere: ['school_house'] as readonly string[],
+
   characters: {
+    /**
+     * Coupes longues couchées (tour 10, `HAIR_FLATTENED_ASLEEP`): profondeur (z de la pose de
+     * liaison, m) au-delà de laquelle la chevelure est ramenée: derrière la tête (au-dessus de
+     * `headFromY`), celle du chignon (-0,226, mesurée: ne s'enfonce pas); dans le dos, 3,5 cm
+     * derrière le dos du corps (-0,164).
+     */
+    asleepHair: { headFromY: 1.35, headDepth: -0.226, backDepth: -0.2 },
     crossFadeSeconds: 0.22,
     /** Vitesse à laquelle l'animation de marche joue à son rythme d'origine (m/s). */
     walkReferenceSpeed: 3.2,
@@ -632,6 +695,75 @@ export const RENDER_SETTINGS = {
     cutWallHeight: 0.5,
     /** Seuil de la porte dans ce pied de mur (m, repère du modèle): juste au-dessus du plancher. */
     doorSillHeight: 0.17,
+  },
+
+  /**
+   * Bâtiments visitables (tour 10, ADR 0016, `interieurs.ts`). La lampe unique de la maisonnette
+   * se déplace dans le bâtiment où est le joueur local: couleur, intensité (de jour au plancher
+   * `dayShare` de celle de la nuit: une boutique est plus sombre que la rue), hauteur. Les portes
+   * s'ouvrent vers l'intérieur devant un personnage à moins de `doorReach` m, en `doorSeconds` s.
+   */
+  interiors: {
+    lamps: {
+      grocery: { color: '#ffc27a', intensity: 7, height: 2.2, dayShare: 0.35 },
+      salon: { color: '#ffe1b8', intensity: 6, height: 2.2, dayShare: 0.35 },
+    } as Readonly<Record<string, { color: string; intensity: number; height: number; dayShare: number }>>,
+    doorReach: 1.25,
+    doorSeconds: 0.3,
+    doorOpenDeg: 80,
+    /** Pied des murs coupés (comme la maisonnette), repère du modèle; plancher à 0,12 m. */
+    cutWallHeight: 0.5,
+    doorSillHeight: 0.15,
+    /**
+     * Pièces de la maisonnette (conception 4.2): modèle de la pièce, mur de la maisonnette qui
+     * reçoit la porte percée (à la place de l'ancienne fenêtre) une fois la pièce bâtie, et ce qui
+     * attend au point du chantier pendant le site (caisse, planches).
+     */
+    houseRooms: {
+      room_cellar: {
+        model: 'gatekeeper_cellar',
+        wall: 'gatekeeper_house_repaired_wall_left',
+        doorWall: 'gatekeeper_house_wall_left_door',
+        site: 'room_cellar_site',
+        // Éléments de `pieces.json` (lot L4) vers les `id_hint` du modèle, vérifiés à la géométrie
+        // (le poteau 1 du modèle est au nord, le 2 au sud; le mur 2 porte les pans nord et sud).
+        elements: {
+          post_south: 'post_2',
+          post_north: 'post_1',
+          wall_plate: 'plate',
+          wall_west: 'wall_1',
+          wall_north: 'wall_2',
+          roof: 'roof',
+        },
+      },
+      room_bedroom: {
+        model: 'gatekeeper_bedroom',
+        wall: 'gatekeeper_house_repaired_wall_back',
+        doorWall: 'gatekeeper_house_wall_back_door',
+        site: 'room_bedroom_site',
+        // Poteaux 1 à 4 du modèle: nord-ouest, nord-est, sud-ouest, sud-est; sablière 1 à l'ouest.
+        elements: {
+          post_nw: 'post_1',
+          post_ne: 'post_2',
+          post_sw: 'post_3',
+          post_se: 'post_4',
+          plate_west: 'plate_1',
+          plate_east: 'plate_2',
+          wall_west: 'wall_1',
+          wall_east: 'wall_2',
+          wall_north: 'wall_3',
+          wall_gable: 'wall_4',
+          truss_ridge: 'truss_ridge',
+          floor: 'floor',
+        },
+      },
+    } as Readonly<
+      Record<
+        string,
+        { model: string; wall: string; doorWall: string; site: string; elements: Readonly<Record<string, string>> }
+      >
+    >,
+    siteProps: ['crate', 'plank_stack'] as readonly string[],
   },
 
   /**

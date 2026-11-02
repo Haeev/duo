@@ -12,7 +12,8 @@
 import { currentOrder } from '../donnees/commandes';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
-import type { GameMap } from '../etat/carte';
+import { inRect, type GameMap } from '../etat/carte';
+import { seasonOfDay, weekdayOf } from '../donnees/calendrier';
 import type { Cell, CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import type { AudioSettings } from './reglages';
 import { isRefusal, refusalTexts } from '../interface/refus';
@@ -29,6 +30,10 @@ export interface SoundRequest {
   offset: number;
   /** Long son recalé sur une séquence: son étiquette. */
   tag: string | null;
+  /** Tour 10: entendu à travers les murs (l'autre joueur dans un autre bâtiment visitable). */
+  muffled?: boolean;
+  /** Variante imposée (index du fichier: rideaux ouverts 0, fermés 1), sinon tirée. */
+  variant?: number;
 }
 
 /** Boucle d'effet voulue à cette image (le moteur démarre, déplace ou arrête). */
@@ -86,17 +91,89 @@ function pointAt(map: GameMap, id: string): Vec2 | null {
   return p === undefined ? null : { x: p.x, y: p.y };
 }
 
+/** Tour 10: lieux et objets des sons de la rue Haute et de la maison (`sons.json`, son.md 4.8). */
+const BAKERY_WINDOW = 'bakery_window';
+const BAKERY_ITEMS: ReadonlySet<string> = new Set(['bread', 'warm_bread', 'brioche']);
+const WARM_BREAD = 'warm_bread';
+const BAKERY_REACH_M = 4;
+const BREAD_CRACK_DELAY_S = 0.3;
+const SALON = 'salon';
+const RACK_MODEL = 'tool_rack';
+const RACK_DELAY_S = 0.25;
+const FOOTBRIDGE_STEPS = 'footbridge-steps';
+/** Récréation de l'école (son.md 4.8): jours d'école d'automne (lundi à vendredi), 10 h 30 et 15 h, au milieu de la cour. */
+const RECESS_MINUTES: readonly number[] = [10 * 60 + 30, 15 * 60];
+const SCHOOL_WEEKDAYS: ReadonlySet<number> = new Set([2, 3, 4, 5, 6]);
+const SCHOOL_YARD: Vec2 = { x: 79, y: 16 };
+/**
+ * Petit creux: le Ventre passe sous ce seuil (règle du lot L4 à venir, `needs`); le gargouillis
+ * ne joue qu'une fois, chez soi seulement (`localOnly`), jusqu'à ce que le Ventre remonte.
+ */
+const PECKISH_BELOW = 40;
+/** Coupe au salon: coups de ciseaux espacés (s), puis la révélation, chez la personne au fauteuil. */
+const SNIP_TIMES: readonly number[] = [0, 0.28, 0.55];
+const REVEAL_DELAY_S = 0.85;
+/** Rideaux: variante du fichier `curtain-draw` pour ouvrir et pour fermer. */
+const CURTAIN_OPEN_VARIANT = 0;
+const CURTAIN_CLOSE_VARIANT = 1;
+const NAP_LOOP_KEY = 'nap';
+/** Une porte de bâtiment visitable est celle de qui passe à moins de tant (m). */
+const DOOR_REACH_M = 2.5;
+
+/** Porte d'un bâtiment visitable la plus proche du point (à `DOOR_REACH_M` au plus), ou `null`. */
+function nearestDoor(map: GameMap, at: Vec2 | null): { at: Vec2; building: string } | null {
+  if (at === null) return null;
+  let best: { at: Vec2; building: string } | null = null;
+  let bestDistance = DOOR_REACH_M;
+  for (const id in map.buildings) {
+    for (const door of map.buildings[id]?.doors ?? []) {
+      const centre = cellCenter(door.cell);
+      const distance = Math.hypot(centre.x - at.x, centre.y - at.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = { at: centre, building: id };
+      }
+    }
+  }
+  return best;
+}
+
+/** Le râtelier de la maison (meuble posé dont le modèle est `tool_rack`), ou `null`. */
+function rackAt(world: ReadonlyWorld, content: Content): Vec2 | null {
+  const rack = world.furniture.find((f) => (content.items[f.item]?.model ?? f.item) === RACK_MODEL);
+  return rack === undefined ? null : cellCenter(rack.cell);
+}
+
 class Emitter {
   constructor(
     private readonly ctx: TriggerContext,
     private readonly out: SoundRequest[],
   ) {}
 
-  /** Son du monde, placé; `by` donne le niveau (l'autre joueur plus bas). */
-  world(sound: string, at: Vec2 | null, by: CharacterId | null, delay = 0): void {
+  /**
+   * Son du monde, placé; `by` donne le niveau (l'autre joueur plus bas). L'autre joueur dans un
+   * autre bâtiment visitable que moi s'entend à travers les murs (ADR 0016): plus bas, étouffé.
+   */
+  world(sound: string, at: Vec2 | null, by: CharacterId | null, delay = 0, variant?: number): void {
     if (!this.ctx.hasSound(sound)) return;
-    const gainDb = by !== null && by !== this.ctx.local ? this.ctx.peerDb : 0;
-    this.out.push({ sound, at, gainDb, delay, offset: 0, tag: null });
+    const peer = by !== null && by !== this.ctx.local;
+    const walled = peer && this.walledOff(by);
+    // L'étouffement (passe-bas et niveau de `otherPlayerInside`) est appliqué par le moteur.
+    const gainDb = peer ? this.ctx.peerDb : 0;
+    const request: SoundRequest = { sound, at, gainDb, delay, offset: 0, tag: null };
+    if (walled) request.muffled = true;
+    if (variant !== undefined) request.variant = variant;
+    this.out.push(request);
+  }
+
+  private walledOff(by: CharacterId): boolean {
+    let mine: string | null = null;
+    let theirs: string | null = null;
+    for (const c of this.ctx.world.characters) {
+      if (c.id === this.ctx.local) mine = c.inside;
+      if (c.id === by) theirs = c.inside;
+    }
+    return theirs !== null && theirs !== mine;
   }
 
   /** Son d'interface, chez son auteur seulement (`both`: chez les deux). */
@@ -200,7 +277,9 @@ export function soundsForEvent(
     }
     case 'furniture_placed': {
       const f = world.furniture.find((k) => k.id === event.furniture);
-      emit.world('furniture-place', f === undefined ? characterAt(world, event.by) : cellCenter(f.cell), event.by);
+      // Tour 10 (son.md 4.8): des rideaux accrochés à une fenêtre ont leur son, à la place du meuble posé.
+      const hung = f?.window !== undefined && ctx.hasSound('curtain-hang');
+      emit.world(hung ? 'curtain-hang' : 'furniture-place', f === undefined ? characterAt(world, event.by) : cellCenter(f.cell), event.by);
       break;
     }
     case 'sat_down':
@@ -233,7 +312,17 @@ export function soundsForEvent(
       emit.world('bag', characterAt(world, event.by), event.by);
       if (event.type === 'fed_hens') signals.hensFed = true;
       break;
-    case 'bought':
+    case 'bought': {
+      emit.ui('coins', event.by);
+      // Tour 10: au guichet du fournil, la clochette; le pain chaud craque dans les mains.
+      const window = pointAt(map, BAKERY_WINDOW);
+      const buyer = characterAt(world, event.by);
+      if (window !== null && buyer !== null && BAKERY_ITEMS.has(event.item) && Math.hypot(buyer.x - window.x, buyer.y - window.y) <= BAKERY_REACH_M) {
+        emit.world('bakery-bell', window, event.by);
+        if (event.item === WARM_BREAD) emit.world('bread-crack', buyer, event.by, BREAD_CRACK_DELAY_S);
+      }
+      break;
+    }
     case 'sold':
       emit.ui('coins', event.by);
       break;
@@ -267,9 +356,13 @@ export function soundsForEvent(
       if (event.by === local) signals.wentToBed = true;
       break;
     case 'door': {
-      const at = cellCenter(map.house.door);
+      // Tour 10: la porte la plus proche de celui qui passe (tous les bâtiments visitables).
+      const near = nearestDoor(map, characterAt(world, event.by));
+      const at = near?.at ?? cellCenter(map.house.door);
       emit.world('door-open', at, event.by);
       emit.world('door-close', at, event.by, d.doorCloseSeconds);
+      // La mercerie a sa sonnette de porte, à l'entrée (son.md 4.8).
+      if (event.entering && near?.building === SALON) emit.world('salon-bell', at, event.by);
       break;
     }
     case 'eggs_laid':
@@ -364,6 +457,8 @@ export function soundsForEvent(
       break;
     case 'tool_upgraded':
       emit.world('pickup', characterAt(world, event.by), event.by);
+      // Tour 10 (section 5.3): l'ancien outil va au râtelier.
+      if (event.previous !== null) emit.world('rack-hang', rackAt(world, content) ?? characterAt(world, event.by), event.by, RACK_DELAY_S);
       break;
     case 'moment_armed':
       // Les deux manivelles tournent, puis chaque lisse se verrouille (fin des 2,5 s de l'armement).
@@ -434,6 +529,15 @@ export class StateWatcher {
   private readonly henNext = new Map<string, number>();
   private hensExcitedUntil = -1;
   private readonly orderTotals = new Map<string, number>();
+  /** Tour 10: ce qui s'est vu à l'image d'avant (coupes, siestes, retrouvailles, rideaux, pièces). */
+  private readonly looks = new Map<CharacterId, string>();
+  private readonly napping = new Set<CharacterId>();
+  private reunions = -1;
+  private peckish = false;
+  private readonly curtains = new Map<string, boolean>();
+  private readonly roomsBuilt = new Set<string>();
+  private readonly beamsPlaced = new Set<string>();
+  private lastMinutes = -1;
 
   constructor(
     private readonly settings: AudioSettings,
@@ -477,7 +581,7 @@ export class StateWatcher {
         track.stepPhase += (dt * s.steps.stepsPerCycle * scale) / cycle;
         if (track.stepPhase >= 1) {
           track.stepPhase -= Math.floor(track.stepPhase);
-          emit.world(this.stepSound(map, c.inHouse, at), at, c.id);
+          emit.world(this.stepSound(map, c.inside !== null || c.inHouse, at), at, c.id);
         }
       } else {
         track.stepPhase = s.steps.firstStepPhase;
@@ -563,6 +667,76 @@ export class StateWatcher {
     }
 
     this.hens(ctx, now, emit);
+    this.tour10(ctx, emit, loops, first);
+  }
+
+  /**
+   * Sons du tour 10 qui se lisent dans l'état (son.md 4.8): coupe au salon, sieste, sieste à deux,
+   * retrouvailles, petit creux, rideaux ouverts et fermés, pièce bâtie, panne faîtière au faîte,
+   * récréation de l'école. À la première image, rien ne sonne (on prend l'état comme il est).
+   */
+  private tour10(ctx: TriggerContext, emit: Emitter, loops: LoopWish[], first: boolean): void {
+    const { world, local, map, content } = ctx;
+    let asleep = 0;
+    for (const c of world.characters) {
+      const look = `${c.appearance.hair}|${c.appearance.hairColor}|${c.appearance.beard}`;
+      const before = this.looks.get(c.id);
+      this.looks.set(c.id, look);
+      if (!first && before !== undefined && before !== look && c.inside === SALON) {
+        const at = { x: c.pos.x, y: c.pos.y };
+        SNIP_TIMES.forEach((delay, index) => {
+          emit.world('scissors-snip', at, c.id, delay, index % 3);
+        });
+        const me = world.characters.find((k) => k.id === local);
+        emit.ui('hair-reveal', me?.inside === SALON ? 'both' : c.id, REVEAL_DELAY_S);
+      }
+      const napping = c.needs.napStart !== null;
+      if (napping) asleep += 1;
+      if (napping && !this.napping.has(c.id) && !first) emit.world('yawn-soft', { x: c.pos.x, y: c.pos.y }, c.id);
+      if (napping) this.napping.add(c.id);
+      else this.napping.delete(c.id);
+    }
+    // Sieste à deux: l'horloge file, le tic-tac doux chez les deux.
+    if (asleep >= 2) loops.push({ key: NAP_LOOP_KEY, sound: 'nap-tick', at: null, gainDb: 0 });
+    const me = world.characters.find((c) => c.id === local);
+    if (me !== undefined) {
+      const reunions = me.needs.reunionsToday;
+      if (!first && this.reunions >= 0 && reunions > this.reunions) emit.ui('reunion-chime', local);
+      this.reunions = reunions;
+      const peckish = me.needs.belly < PECKISH_BELOW && world.phase === 'day';
+      if (peckish && !this.peckish && !first) emit.ui('belly-rumble', local);
+      this.peckish = peckish;
+    }
+    for (const f of world.furniture) {
+      if (f.window === undefined) continue;
+      const closed = f.closed === true;
+      const before = this.curtains.get(f.id);
+      this.curtains.set(f.id, closed);
+      if (!first && before !== undefined && before !== closed) {
+        emit.world('curtain-draw', cellCenter(f.cell), null, 0, closed ? CURTAIN_CLOSE_VARIANT : CURTAIN_OPEN_VARIANT);
+      }
+    }
+    for (const [id, room] of Object.entries(world.rooms)) {
+      const built = room.builtDay !== null;
+      if (built && !this.roomsBuilt.has(id) && !first) emit.ui('room-built', 'both');
+      if (built) this.roomsBuilt.add(id);
+      if (room.beamPlaced && !this.beamsPlaced.has(id) && !first) {
+        const rect = Object.values(map.buildings)
+          .flatMap((b) => b.rooms)
+          .find((r) => r.build?.room === id)?.rect;
+        emit.world('beam-ridge', rect === undefined ? null : { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 }, null);
+      }
+      if (room.beamPlaced) this.beamsPlaced.add(id);
+    }
+    const minutes = world.clock.minutes;
+    const day = world.clock.day;
+    const schoolDay = seasonOfDay(content.settings, day) === 'autumn' && SCHOOL_WEEKDAYS.has(weekdayOf(day));
+    if (!first && schoolDay && world.phase === 'day' && this.lastMinutes >= 0) {
+      for (const at of RECESS_MINUTES) {
+        if (this.lastMinutes < at && minutes >= at) emit.world('school-recess', SCHOOL_YARD, null);
+      }
+    }
+    this.lastMinutes = minutes;
   }
 
   private stepSound(map: GameMap, inHouse: boolean, at: Vec2): string {
@@ -570,6 +744,10 @@ export class StateWatcher {
     if (inHouse) return s.indoor;
     const cx = Math.floor(at.x);
     const cy = Math.floor(at.y);
+    // Tour 10: les planches de la passerelle du ru ont leurs pas à elles (son.md 4.8).
+    for (const crossing of map.crossings) {
+      if (crossing.kind === 'footbridge' && inRect(crossing.rect, at.x, at.y)) return FOOTBRIDGE_STEPS;
+    }
     const ground = cx >= 0 && cy >= 0 && cx < map.width && cy < map.height ? map.ground[cy * map.width + cx] : undefined;
     return ground === undefined ? s.byGround.grass : s.byGround[ground];
   }

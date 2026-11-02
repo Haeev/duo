@@ -145,6 +145,14 @@ export class IsoCameraRig {
     return MathUtils.euclideanModulo(this.orientation, 4);
   }
 
+  /** Page de démonstration (gros plan des captures): largeur de vue imposée (m), sans animation. */
+  inspect(width: number): void {
+    this.widthFrom = width;
+    this.widthTo = width;
+    this.widthShown = width;
+    this.applyProjection();
+  }
+
   /** Largeur de vue affichée (m). */
   viewWidth(): number {
     return this.widthShown;

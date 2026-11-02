@@ -11,6 +11,7 @@ import type { GameMap, MapProp } from '../etat/carte';
 import { DYNAMIC_PROP_MODELS, propHints, propMatrix } from './decor';
 import type { ModelLibrary } from './modeles';
 import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
+import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import type { Terrain } from './terrain';
 import { LAMP_MODELS } from './lampes';
@@ -145,7 +146,7 @@ export function collectGlowSources(
   // Tour 9: le réverbère du chemin (chantier) a ses lueurs, éteintes tant qu'il n'est pas bâti.
   const lamps: readonly MapProp[] = Object.values(map.improvements ?? {}).filter((x) => LAMP_MODELS.has(x.model));
   for (const prop of [...map.props, ...lamps]) {
-    if (DYNAMIC_PROP_MODELS.has(prop.model)) {
+    if (DYNAMIC_PROP_MODELS.has(prop.model) || RENDER_SETTINGS.propsDrawnElsewhere.includes(prop.model)) {
       continue;
     }
     const ground = prop.category === FLOOR_CATEGORY ? 0 : terrain.heightAt(prop.pos.x, prop.pos.y);

@@ -55,7 +55,30 @@ export function propHints(prop: MapProp): SubstituteHints {
 /** Matrice de pose d'un objet de la carte (centre de l'emprise, au sol, tourné par quarts). */
 export function propMatrix(prop: MapProp, ground: number, out: Matrix4): Matrix4 {
   const rotation = new Quaternion().setFromAxisAngle(Y_AXIS, yawFromQuarter(prop.rotation));
-  return out.compose(new Vector3(prop.pos.x, ground, prop.pos.y), rotation, new Vector3(1, 1, 1));
+  const offset = RENDER_SETTINGS.propOffsets[prop.model] ?? [0, 0];
+  return out.compose(
+    new Vector3(prop.pos.x + offset[0], ground, prop.pos.y + offset[1]),
+    rotation,
+    new Vector3(1, 1, 1),
+  );
+}
+
+/**
+ * Ouvrages du ru (tour 10: ponceau, pont, passerelle, gué de pierres) vus comme des objets de la
+ * carte posés au sol, au centre de leur emprise. Le ru coule le long de Z dans les modèles
+ * (`flow_axis`), le long de y sur la carte: quart 0. La passerelle est tournée d'un demi-tour:
+ * la carte veut son garde-corps côté amont (nord), pour ne rien masquer à la caméra par défaut.
+ */
+export function crossingProps(map: GameMap): MapProp[] {
+  return map.crossings.map((crossing) => ({
+    id: crossing.id,
+    model: crossing.model,
+    pos: { x: crossing.rect.x + crossing.rect.w / 2, y: crossing.rect.y + crossing.rect.h / 2 },
+    rotation: crossing.kind === 'footbridge' ? 2 : 0,
+    rect: crossing.rect,
+    height: 0,
+    category: 'sol',
+  }));
 }
 
 /** Copie d'une géométrie réduite aux attributs communs, sans index, placée par `matrix`. */
@@ -104,8 +127,15 @@ export class StaticDecor {
     const cellTriangles = new Map<string, number>();
     const placement = new Matrix4();
     const world = new Matrix4();
-    for (const prop of map.props) {
-      if (DYNAMIC_PROP_MODELS.has(prop.model)) {
+    const drawnElsewhere = new Set(RENDER_SETTINGS.propsDrawnElsewhere);
+    // Bâtiments visitables (ADR 0016): dessinés par `interieurs.ts` (coupe, contenu, portes).
+    const visitable = new Set(Object.values(map.buildings).map((building) => building.prop));
+    for (const prop of [...map.props, ...crossingProps(map)]) {
+      if (
+        DYNAMIC_PROP_MODELS.has(prop.model) ||
+        drawnElsewhere.has(prop.model) ||
+        visitable.has(prop.id)
+      ) {
         continue;
       }
       const floor = prop.category === 'sol' || FLOOR_MODELS.has(prop.model);

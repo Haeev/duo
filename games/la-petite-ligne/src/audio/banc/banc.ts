@@ -142,7 +142,7 @@ function setupOf(scenario: Scenario): Setup {
 
 function emptyFrame(): BrainFrame {
   return {
-    listener: { at: { x: 30, y: 25 }, ear: { x: 30, y: 25 }, yaw: AUDIO_SETTINGS.listener.defaultYaw, inHouse: false },
+    listener: { at: { x: 30, y: 25 }, ear: { x: 30, y: 25 }, yaw: AUDIO_SETTINGS.listener.defaultYaw, inHouse: false, inside: null },
     shots: [],
     loops: [],
     music: [],

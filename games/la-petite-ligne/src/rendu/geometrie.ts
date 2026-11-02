@@ -74,9 +74,10 @@ export class ShapeBuilder {
     height: number,
     at: Triple,
     paint: Paint,
-    options: PartOptions & { segments?: number } = {},
+    options: PartOptions & { segments?: number; open?: boolean } = {},
   ): this {
-    const geometry = new ConeGeometry(radius, height, options.segments ?? DEFAULT_SEGMENTS);
+    // `open`: sans le disque du dessous (brins d'herbe posés au sol: jamais vu, des triangles en moins).
+    const geometry = new ConeGeometry(radius, height, options.segments ?? DEFAULT_SEGMENTS, 1, options.open === true);
     return this.add(geometry, paint, at, options, height);
   }
 

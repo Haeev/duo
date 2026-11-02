@@ -189,8 +189,20 @@ export class AmbiancePart implements ExtensionPart {
       waterSettings.foamAmount,
     );
     resources.track(river.material);
-    hooks.water.material = river.material;
+    for (const mesh of hooks.water) mesh.material = river.material;
     this.water.push(river.uniforms);
+    if (hooks.streamWater.length > 0) {
+      // Le ru de la Côte: même programme, courant vers le sud (il descend du coteau), eau vive.
+      const s = RENDER_SETTINGS.terrain.stream;
+      const stream = createWaterMaterial(this.field, this.surfaces, waterSettings.opacityDeep, waterSettings.foamAmount, {
+        flow: [0, Math.hypot(waterSettings.flow[0], waterSettings.flow[1]) * s.flowFactor],
+        riffle: s.riffle,
+        depth: s.shaderDepth,
+      });
+      resources.track(stream.material);
+      for (const mesh of hooks.streamWater) mesh.material = stream.material;
+      this.water.push(stream.uniforms);
+    }
 
     const glows = collectGlowSources(hooks.map, hooks.library, hooks.terrain);
     this.lights = groundLights(glows);

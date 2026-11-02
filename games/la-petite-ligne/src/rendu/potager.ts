@@ -133,6 +133,9 @@ export class GardenPart implements EventfulPart {
       materials,
       resources,
       TREE_CAPACITY,
+      true,
+      // Par morceaux: hors du cadre, ni triangles ni ombre (ADR 0016).
+      RENDER_SETTINGS.terrain.edgeTreeChunk,
     );
     this.library = library;
   }
