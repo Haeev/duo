@@ -19,6 +19,7 @@ import type { GameMap } from '../etat/carte';
 import type { WorldEvent } from '../etat/types';
 import type { FrameContext, RenderPart } from './contexte';
 import { createAmbiance } from './ambiance';
+import type { LampBoard } from './lampes';
 import type { DaylightRig } from './lumiere';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
@@ -45,6 +46,8 @@ export interface RenderHooks {
   trainState(): { visible: boolean; moving: boolean };
   /** Suivi des géométries, matériaux et textures créés: libérés avec le rendu. */
   resources: ResourceTracker;
+  /** Allumage des lampadaires (tour 9: réverbère à bâtir, lanternes allumées à la perche). */
+  lamps?: LampBoard;
 }
 
 /** Une partie ajoutée par une extension. */

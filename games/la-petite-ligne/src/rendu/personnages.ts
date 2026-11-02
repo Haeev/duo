@@ -37,8 +37,9 @@ import { SIM_HZ } from '../etat/types';
 import { BoneOffsets, poseEnvelope, stableUnit, termAngle } from './attentes';
 import { ArmReach } from './portee';
 import type { Content } from '../donnees/types';
-import type { MapProp } from '../etat/carte';
-import { BenchSeating, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
+import { seasonOfDay } from '../donnees/calendrier';
+import type { GameMap, MapProp } from '../etat/carte';
+import { BenchSeating, benchesWithBuilt, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
 import {
   BODY_COLORS,
   HAIR_MESHES,
@@ -137,9 +138,35 @@ const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
   feed: 'sow',
   pickup: 'harvest',
   refill: 'water',
-  // Tour 9 (les lanternes): la perche levée (`pole_raise` quand l'artiste l'aura livré).
-  light: 'give',
+  // Tour 9 (les lanternes): la perche levée vers la lanterne, puis rabaissée.
+  light: 'pole_raise',
 };
+/** Perche de l'allumeur, en main le temps d'allumer une lanterne (tour 9). */
+const LAMP_POLE = 'lamp_pole';
+const POLE_RAISE = 'pole_raise';
+const POLE_LOWER = 'pole_lower';
+/**
+ * Tour 9 (section 2.7): ce qu'un habitant porte une fois son cadeau reçu. L'écharpe de Firmin,
+ * dès le lendemain de la remise, en automne et en hiver.
+ */
+const VILLAGER_WORN: Readonly<Record<string, { model: string; when: (world: ReadonlyWorld, content: Content) => boolean }>> = {
+  firmin: {
+    model: 'villager_firmin_scarf',
+    when: (world, content) => {
+      const given = world.giftsGiven.firmin ?? null;
+      const season = seasonOfDay(content.settings, world.clock.day);
+      return given !== null && given < world.clock.day && (season === 'autumn' || season === 'winter');
+    },
+  },
+};
+function isSkinned(object: Object3D | undefined): object is SkinnedMesh {
+  return object instanceof SkinnedMesh;
+}
+
+/** Catégorie des sièges sans modèle de la carte (`sieges`: le bord du ponton). */
+const EDGE_SEAT_CATEGORY = 'siege';
+/** Sorte d'outil de la canne (`toolKind`): l'outil de départ ou la canne en bambou. */
+const ROD_KIND = 'fishing_rod';
 
 /** Actions pendant lesquelles l'outil reste rangé. */
 const HANDS_FREE: ReadonlySet<ActionKind> = new Set([
@@ -505,7 +532,8 @@ class CharacterFigure {
     if (this.tool === null) {
       return false;
     }
-    const anchor = this.tool.getObjectByName(node);
+    // Le bout d'un outil de remplacement porte le nom de son modèle (`fishing_rod_bamboo_tip`).
+    const anchor = this.tool.getObjectByName(node) ?? this.tool.getObjectByName(`${this.toolName}_tip`);
     if (anchor !== undefined) {
       anchor.getWorldPosition(out);
       return true;
@@ -730,25 +758,33 @@ export class CharactersPart implements EventfulPart {
     private readonly picks: PickRegistry,
     private readonly content: Content,
     /** Bancs de la carte (places des joueurs assis par choix et des habitants arrêtés dessus). */
-    private readonly benches: readonly MapProp[] = [],
+    private benches: readonly MapProp[] = [],
     /** Points de la carte: un habitant s'assoit sur le banc qui est le point de son emploi du temps. */
     private readonly points: Readonly<Record<string, { x: number; y: number }>> = {},
+    /** Carte (tour 9: bancs des chantiers bâtis, `benchesWithBuilt`), `null` dans les essais. */
+    private readonly map: GameMap | null = null,
   ) {
     this.group.name = 'personnages';
     for (const clip of library.animations(CHARACTERS_FILE)) {
       this.clips.set(clip.name, clip);
     }
-    // Un clic sur une moitié de banc vise sa place (sol au milieu de l'assise): la simulation y
-    // mène et y assoit. Sans cette boîte, le rayon touchait le sol derrière le banc.
+    this.addBenchPicks(benches);
+  }
+
+  /**
+   * Un clic sur une moitié de banc vise sa place (sol au milieu de l'assise): la simulation y
+   * mène et y assoit. Sans cette boîte, le rayon touchait le sol derrière le banc.
+   */
+  private addBenchPicks(benches: readonly MapProp[]): void {
     const place: BenchPlace = { x: 0, y: 0, facing: 0 };
     for (const prop of benches) {
-      for (let slot = 0; slot < content.settings.benches.slots.length; slot += 1) {
-        seatPlace(prop, slot, content.settings.benches, place);
-        const target = picks.add({ kind: 'ground', x: place.x, y: place.y });
+      for (let slot = 0; slot < this.content.settings.benches.slots.length; slot += 1) {
+        seatPlace(prop, slot, this.content.settings.benches, place);
+        const target = this.picks.add({ kind: 'ground', x: place.x, y: place.y });
         setStandingBox(
           target.box,
           place.x,
-          terrain.heightAt(place.x, place.y),
+          this.terrain.heightAt(place.x, place.y),
           place.y,
           BENCH_PICK_RADIUS,
           BENCH_PICK_HEIGHT,
@@ -756,6 +792,29 @@ export class CharactersPart implements EventfulPart {
         target.enabled = true;
       }
     }
+  }
+
+  /** Signature des chantiers bâtis vus à l'image d'avant (aucune allocation tant qu'elle ne change pas). */
+  private builtSignature = 0;
+  private readonly builtIds: string[] = [];
+
+  /** Bancs des chantiers bâtis (banc du gué, banc du pignon), dans l'ordre de la simulation. */
+  private refreshBenches(world: ReadonlyWorld): void {
+    if (this.map === null) return;
+    let signature = 0;
+    for (const def of this.content.improvements) {
+      const day = world.improvements[def.id]?.builtDay ?? null;
+      signature = (Math.imul(signature, 31) + (day === null ? 0 : day + 1)) | 0;
+    }
+    if (signature === this.builtSignature) return;
+    this.builtSignature = signature;
+    this.builtIds.length = 0;
+    for (const def of this.content.improvements) {
+      if ((world.improvements[def.id]?.builtDay ?? null) !== null) this.builtIds.push(def.id);
+    }
+    const before = new Set(this.benches);
+    this.benches = benchesWithBuilt(this.map, this.builtIds);
+    this.addBenchPicks(this.benches.filter((bench) => !before.has(bench)));
   }
 
   /** Geste de pêche joué une fois par joueur (lancer, ferrer), avec son début. */
@@ -948,7 +1007,82 @@ export class CharactersPart implements EventfulPart {
       return false;
     }
     seatPlace(prop, slot, this.content.settings.benches, this.benchPlace);
+    this.benchIsEdge = prop.category === EDGE_SEAT_CATEGORY;
     return true;
+  }
+
+  /** Perche de chaque joueur: allumait-il à l'image d'avant, et quand il a commencé à la rabaisser. */
+  private readonly poles = new Map<CharacterId, { lighting: boolean; lowerAt: number }>();
+
+  /**
+   * Allumer une lanterne (action `light`, tour 9): la perche levée au rythme de la simulation
+   * (`pole_raise` calé sur `action.since`, donc le même instant chez les deux), puis rabaissée
+   * (`pole_lower`) une fois l'action finie. `null` hors de ces deux gestes.
+   */
+  private poleRequest(character: DeepReadonly<Character>, kind: ActionKind, context: FrameContext): ClipRequest | null {
+    let state = this.poles.get(character.id);
+    if (state === undefined) {
+      state = { lighting: false, lowerAt: Number.NEGATIVE_INFINITY };
+      this.poles.set(character.id, state);
+    }
+    if (kind === 'light') {
+      state.lighting = true;
+      const raise = this.clips.get(POLE_RAISE);
+      if (raise === undefined) return null;
+      const t = (context.world.tick - character.action.since + context.alpha) / SIM_HZ;
+      return { name: raise.name, timeScale: 0, exactTime: Math.min(raise.duration - 1e-3, Math.max(0, t)), fade: SETTINGS.crossFadeSeconds };
+    }
+    if (state.lighting) {
+      state.lighting = false;
+      state.lowerAt = context.time;
+    }
+    const lower = this.clips.get(POLE_LOWER);
+    const since = context.time - state.lowerAt;
+    if (lower === undefined || since < 0 || since >= lower.duration) return null;
+    return { name: lower.name, timeScale: 0, exactTime: since, fade: SETTINGS.crossFadeSeconds };
+  }
+
+  /** Le dernier banc lu par `benchSeat` est-il un siège sans modèle (le bord du ponton) ? */
+  private benchIsEdge = false;
+
+  /**
+   * Clip d'un joueur pendant un moment du tour 9, ou `null`: assis au bord du ponton (et le
+   * regard levé vers la grande étoile filante), la manivelle du passage à niveau tenue puis
+   * tournée pendant que les lisses descendent, la main levée au salut du mécanicien.
+   */
+  private momentRequest(character: DeepReadonly<Character>, world: ReadonlyWorld, onBench: boolean, alpha: number): ClipRequest | null {
+    const today = world.moments.today;
+    const def = today === null ? undefined : this.content.moments.find((m) => m.id === today.id);
+    if (onBench && this.benchIsEdge) {
+      const lookAt = def?.render.lookUpAt;
+      const look = this.clips.get(SETTINGS.edge.lookClip);
+      if (today?.phase === 'climax' && typeof lookAt === 'number' && look !== undefined) {
+        const t = today.elapsed + (today.paused ? 0 : alpha / SIM_HZ) - lookAt;
+        if (t >= 0 && t < look.duration) {
+          return { name: look.name, timeScale: 0, exactTime: t, fade: SETTINGS.crossFadeSeconds };
+        }
+      }
+      return { name: SETTINGS.edge.clip, timeScale: 1 };
+    }
+    const arm = def?.watch.arm ?? null;
+    if (today === null || def === undefined || arm === null) return null;
+    const cranks = def.watch.hold ?? [];
+    const armedTick = today.armedTick ?? null;
+    if (character.holding !== null && cranks.includes(character.holding)) {
+      const since = armedTick === null ? -1 : (world.tick - armedTick + alpha) / SIM_HZ;
+      if (since >= 0 && since < arm.seconds) {
+        const turn = SETTINGS.crank.turnSeconds;
+        return { name: SETTINGS.crank.turn, timeScale: 0, exactTime: since % turn, fade: SETTINGS.crossFadeSeconds };
+      }
+      return { name: SETTINGS.crank.hold, timeScale: 1 };
+    }
+    const waveAt = def.render.waveBackAt;
+    const waveFor = def.render.waveBackSeconds;
+    if (today.phase === 'climax' && typeof waveAt === 'number' && typeof waveFor === 'number' && character.speed <= SETTINGS.walkThreshold) {
+      const t = today.elapsed - waveAt;
+      if (t >= 0 && t < waveFor) return { name: SETTINGS.crank.wave, timeScale: 1, fade: SETTINGS.crossFadeSeconds };
+    }
+    return null;
   }
 
   private seatAt(world: ReadonlyWorld, x: number, y: number): { clip: string; lift: number } {
@@ -1144,7 +1278,25 @@ export class CharactersPart implements EventfulPart {
     const definition = this.content.villagers.find((candidate) => candidate.id === villager.id);
     const modelName = definition?.model ?? `villager_${villager.id}`;
     const node = this.library.source(modelName)?.node ?? modelName;
-    const model = this.library.cloneRig(RIG_NODE, [node]) ?? this.library.instantiate(modelName);
+    // Pièces portées selon l'état (tour 9: l'écharpe de Firmin), sur le même squelette.
+    const worn = VILLAGER_WORN[villager.id];
+    const keep = worn !== undefined && this.library.has(worn.model) ? [node, worn.model] : [node];
+    const model = this.library.cloneRig(RIG_NODE, keep) ?? this.library.instantiate(modelName);
+    if (worn !== undefined) {
+      // La pièce portée rejoint le corps (`mergeOutfit`, cibles de morphose nulles): ni appel de
+      // dessin ni programme de plus. On échange la géométrie du corps quand elle est portée.
+      const piece = model.getObjectByName(worn.model);
+      const body = model.getObjectByName(node);
+      if (isSkinned(piece) && isSkinned(body)) {
+        const plain = body.geometry;
+        const dressed = mergeOutfit(plain, [piece.geometry]);
+        piece.removeFromParent();
+        if (dressed !== null) {
+          this.resources.track(dressed);
+          this.wornPieces.set(villager.id, { body, plain, dressed });
+        }
+      }
+    }
     const pick = this.picks.add({ kind: 'villager', villager: villager.id });
     const figure = new CharacterFigure(
       villager.id,
@@ -1157,9 +1309,13 @@ export class CharactersPart implements EventfulPart {
     return figure;
   }
 
+  /** Corps de chaque habitant qui porte une pièce (l'écharpe de Firmin): sa géométrie sans et avec. */
+  private readonly wornPieces = new Map<string, { body: SkinnedMesh; plain: BufferGeometry; dressed: BufferGeometry }>();
+
   update(context: FrameContext): void {
     this.time = context.time;
     const world: ReadonlyWorld = context.world;
+    this.refreshBenches(world);
     if (this.highFivePending) {
       this.resolveHighFive(world);
     }
@@ -1193,8 +1349,13 @@ export class CharactersPart implements EventfulPart {
         Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
       );
       const gesture = this.gestureRequest(character, context);
+      const edge = onBench && this.benchIsEdge;
+      const pole = this.poleRequest(character, kind, context);
+      const scripted = pole ?? this.momentRequest(character, world, onBench, context.alpha);
       let request: ClipRequest;
-      if (onBench) {
+      if (scripted !== null && (onBench || !moving)) {
+        request = scripted;
+      } else if (onBench) {
         request = { name: kind === 'eat' ? SIT_EAT : SIT_CHAIR, timeScale: 1 };
       } else if (character.holding !== null && !moving) {
         // Tenir l'échelle: la simulation l'a posé à sa place, face au montant.
@@ -1236,7 +1397,7 @@ export class CharactersPart implements EventfulPart {
         asleep ?? glided ?? (onBench ? this.benchPlace : character.pos),
         asleep?.facing ?? facing,
         request,
-        asleep?.lift ?? (onBench ? benchLift : (seat?.lift ?? 0)),
+        asleep?.lift ?? (edge ? SETTINGS.edge.lift : onBench ? benchLift : (seat?.lift ?? 0)),
         this.henInFront(character, world) ? PLAYER_VARIANTS_HEN : PLAYER_VARIANTS,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
@@ -1247,10 +1408,18 @@ export class CharactersPart implements EventfulPart {
         definition !== undefined &&
         !HANDS_FREE.has(kind) &&
         (definition.category === 'tool' || (definition.category === 'seed' && kind === 'sow'));
-      const rod = this.content.items[ROD_ITEM]?.model ?? ROD_ITEM;
+      // La canne en main est celle du sac (la canne en bambou du tour 9), sinon celle de départ.
+      const heldRod = definition?.tool?.toolKind === ROD_KIND ? definition.model : null;
+      const rod = heldRod ?? this.content.items[ROD_ITEM]?.model ?? ROD_ITEM;
       entry.figure.setTool(
         this.library,
-        fishing && !moving ? rod : showTool ? definition.model : null,
+        pole !== null
+          ? LAMP_POLE
+          : fishing && !moving
+            ? rod
+            : showTool
+              ? definition.model
+              : null,
         this.materials,
       );
     }
@@ -1299,6 +1468,8 @@ export class CharactersPart implements EventfulPart {
       }
       figure.setTool(this.library, null);
       figure.setReach(null);
+      const worn = this.wornPieces.get(villager.id);
+      if (worn !== undefined) worn.body.geometry = VILLAGER_WORN[villager.id]?.when(world, this.content) === true ? worn.dressed : worn.plain;
       figure.root.visible = villager.visible;
       figure.pick.enabled = villager.visible;
       if (!villager.visible) {

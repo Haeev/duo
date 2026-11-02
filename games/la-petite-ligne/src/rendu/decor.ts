@@ -28,6 +28,12 @@ export const DYNAMIC_PROP_MODELS: ReadonlySet<string> = new Set([
   'level_crossing_gate',
 ]);
 
+/**
+ * Pièces d'un modèle du décor laissées à une autre partie (tour 9: l'arceau du puits ouvert,
+ * caché quand le toit du puits est bâti, `chantiers.ts`).
+ */
+export const DYNAMIC_PART_NODES: ReadonlySet<string> = new Set(['well_gallows']);
+
 /** Sols posés: leur base est au niveau du terrain, pas sur le sol surélevé qu'ils créent. */
 /** Suffixe des morceaux de décor hors de la passe d'ombre. */
 const SHADOWLESS = ':sans-ombre';
@@ -114,6 +120,9 @@ export class StaticDecor {
       const cell = `${cx}:${cy}${suffix}`;
       const blockKey = `${Math.floor(cx / block)}:${Math.floor(cy / block)}+${suffix}`;
       for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
+        if (DYNAMIC_PART_NODES.has(part.name)) {
+          continue;
+        }
         world.multiplyMatrices(placement, part.matrix);
         const hand = CLOCK_HAND.exec(part.name);
         if (hand !== null) {

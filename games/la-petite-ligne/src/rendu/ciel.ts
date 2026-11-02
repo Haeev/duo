@@ -8,6 +8,7 @@ import { Color, type Mesh, type Vector3 } from 'three';
 import type { GameMap } from '../etat/carte';
 import { hash2 } from './bruit';
 import type { TerrainField } from './champs';
+import type { LampBoard } from './lampes';
 import type { GlowSource } from './lueurs';
 import {
   PARTICLE_MODE,
@@ -49,6 +50,10 @@ export class SkyLayer {
   private readonly mist: number;
   private readonly halos: number;
   private readonly morning: number;
+  /** Halos des lampadaires (tour 9: allumés un à un): index, lampadaire, opacité allumée. */
+  private readonly lampHalos: { index: number; lamp: string; opacity: number }[] = [];
+  private readonly colors: ParticleBuffers['color'];
+  private lampVersion = -1;
 
   constructor(
     map: GameMap,
@@ -68,6 +73,7 @@ export class SkyLayer {
     const built = createParticleMesh('ciel', Math.max(1, total), material, resources, false);
     this.mesh = built.mesh;
     const b = built.buffers;
+    this.colors = b.color;
     let index = 0;
     index = this.fillClouds(b, index);
     index = this.fillMist(b, index, map, terrain);
@@ -184,9 +190,20 @@ export class SkyLayer {
       b.accel.setXYZW(index, 0, 0, 0, GROUP_HALO);
       b.size.setXYZW(index, kind.halo, kind.halo, PARTICLE_SHAPE.glow, 0);
       b.color.setXYZW(index, color.r, color.g, color.b, kind.haloOpacity);
+      if (glow.lamp !== null) this.lampHalos.push({ index, lamp: glow.lamp, opacity: kind.haloOpacity });
       index += 1;
     }
     return index;
+  }
+
+  /** Opacité des halos des lampadaires selon leur allumage (relue seulement quand il change). */
+  updateLamps(board: LampBoard): void {
+    if (board.version === this.lampVersion) return;
+    this.lampVersion = board.version;
+    for (const halo of this.lampHalos) {
+      this.colors.setW(halo.index, halo.opacity * board.factor(halo.lamp));
+    }
+    this.colors.needsUpdate = true;
   }
 
   /**

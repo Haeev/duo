@@ -7,17 +7,18 @@
  * (`surfaces.ts`).
  */
 import { Matrix4, Vector3, type BufferGeometry } from 'three';
-import type { GameMap } from '../etat/carte';
+import type { GameMap, MapProp } from '../etat/carte';
 import { DYNAMIC_PROP_MODELS, propHints, propMatrix } from './decor';
 import type { ModelLibrary } from './modeles';
 import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import type { Terrain } from './terrain';
+import { LAMP_MODELS } from './lampes';
 
 export type GlowKind = keyof typeof AMBIANCE_SETTINGS.glow.kinds;
 
 /** Cases lumineuses de la palette (émission de nuit, bible section 2) et la lueur qu'elles donnent. */
-const GLOWING_CELLS: Readonly<Partial<Record<PaletteCell, GlowKind>>> = {
+export const GLOWING_CELLS: Readonly<Partial<Record<PaletteCell, GlowKind>>> = {
   glass: 'window',
   glass_lamp: 'lantern',
   flame: 'flame',
@@ -31,6 +32,8 @@ export interface GlowSource {
   position: Vector3;
   normal: Vector3;
   kind: GlowKind;
+  /** Lampadaire d'où vient la lueur (`lampes.ts`: allumé ou non), `null` pour le reste. */
+  lamp: string | null;
 }
 
 /** Une normale moyenne plus courte que cela: la lueur rayonne de tous côtés (lanterne). */
@@ -41,7 +44,7 @@ const UV_SIZE = 2;
 const FLOOR_CATEGORY = 'sol';
 
 /** Case de la palette pointée par une coordonnée de texture. */
-function cellAt(u: number, v: number): PaletteCell | undefined {
+export function cellAt(u: number, v: number): PaletteCell | undefined {
   const column = Math.min(PALETTE_GRID - 1, Math.max(0, Math.floor(u * PALETTE_GRID)));
   const row = Math.min(PALETTE_GRID - 1, Math.max(0, Math.floor(v * PALETTE_GRID)));
   return PALETTE_CELLS[row * PALETTE_GRID + column];
@@ -90,7 +93,7 @@ function glowingFaces(geometry: BufferGeometry, matrix: Matrix4, out: Face[]): v
 }
 
 /** Regroupe des faces proches en lueurs (moyenne des centres et des normales). */
-function cluster(faces: readonly Face[], radius: number): GlowSource[] {
+function cluster(faces: readonly Face[], radius: number, lamp: string | null): GlowSource[] {
   const groups: { sum: Vector3; normal: Vector3; count: number; votes: Map<GlowKind, number> }[] =
     [];
   for (const face of faces) {
@@ -121,6 +124,7 @@ function cluster(faces: readonly Face[], radius: number): GlowSource[] {
       position: group.sum.divideScalar(group.count),
       normal: normal.length() < OMNI_BELOW ? new Vector3() : normal.normalize(),
       kind,
+      lamp,
     };
   });
 }
@@ -138,7 +142,9 @@ export function collectGlowSources(
   const sources: GlowSource[] = [];
   const placement = new Matrix4();
   const world = new Matrix4();
-  for (const prop of map.props) {
+  // Tour 9: le réverbère du chemin (chantier) a ses lueurs, éteintes tant qu'il n'est pas bâti.
+  const lamps: readonly MapProp[] = Object.values(map.improvements ?? {}).filter((x) => LAMP_MODELS.has(x.model));
+  for (const prop of [...map.props, ...lamps]) {
     if (DYNAMIC_PROP_MODELS.has(prop.model)) {
       continue;
     }
@@ -149,7 +155,7 @@ export function collectGlowSources(
       world.multiplyMatrices(placement, part.matrix);
       glowingFaces(part.geometry, world, faces);
     }
-    sources.push(...cluster(faces, settings.clusterRadius));
+    sources.push(...cluster(faces, settings.clusterRadius, LAMP_MODELS.has(prop.model) ? prop.id : null));
   }
   return sources;
 }
@@ -159,6 +165,8 @@ export interface GroundLight {
   position: Vector3;
   radius: number;
   kind: GlowKind;
+  /** Lampadaire d'où vient la lumière (`lampes.ts`), `null` pour une façade ou une flamme. */
+  lamp: string | null;
   /** Phase du scintillement (flammes), stable d'un chargement à l'autre. */
   phase: number;
 }
@@ -181,6 +189,7 @@ export function groundLights(sources: readonly GlowSource[]): GroundLight[] {
       position: source.position.clone().addScaledVector(source.normal, kind.push),
       radius: kind.radius,
       kind: source.kind,
+      lamp: source.lamp,
       phase: lights.length,
     });
   }
@@ -205,7 +214,7 @@ export function groundLights(sources: readonly GlowSource[]): GroundLight[] {
       .divideScalar(facade.count)
       .addScaledVector(facade.normal, window.push);
     position.y += settings.windowDrop;
-    lights.push({ position, radius: window.radius, kind: 'window', phase: lights.length });
+    lights.push({ position, radius: window.radius, kind: 'window', lamp: null, phase: lights.length });
   }
   return lights;
 }
