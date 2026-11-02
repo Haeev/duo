@@ -45,8 +45,8 @@
     { "id": "window_3", "room": "house_main", "side": "north", "x": 9.5, "y": 22, "width": 0.7, "curtains": true, "role": "nord (mur arrière, u -1): devient la porte de la chambre (case 9, 21)" },
     { "id": "window_4", "room": "house_main", "side": "west", "x": 6, "y": 24.3, "width": 0.7, "curtains": true, "role": "ouest (mur gauche, u 0,3): devient la porte du cellier (case 5, 24)" },
     { "id": "window_5", "room": "house_main", "side": "east", "x": 11, "y": 24, "width": 0.7, "curtains": true, "role": "est, côté voie: le garde-barrière surveille les trains (u 0, à cheval sur deux cases)" },
-    { "id": "window_6", "room": "house_bedroom", "side": "north", "x": 8.5, "y": 17, "width": 0.75, "curtains": true, "role": "chambre, au nord: la voie et la lisière" },
-    { "id": "window_7", "room": "house_bedroom", "side": "east", "x": 11, "y": 19, "width": 0.75, "curtains": true, "role": "chambre, à l'est: le sentier du jardin" },
-    { "id": "window_8", "room": "house_cellar", "side": "north", "x": 4, "y": 22, "width": 0.4, "curtains": false, "role": "le fenestron du cellier: le cellier aime le noir" }
+    { "id": "window_7", "room": "house_bedroom", "side": "north", "x": 8.5, "y": 17, "width": 0.75, "curtains": true, "role": "chambre, au nord: la voie et la lisière" },
+    { "id": "window_8", "room": "house_bedroom", "side": "east", "x": 11, "y": 19, "width": 0.75, "curtains": true, "role": "chambre, à l'est: le sentier du jardin" },
+    { "id": "window_6", "room": "house_cellar", "side": "north", "x": 4, "y": 22, "width": 0.4, "curtains": false, "role": "le fenestron du cellier: le cellier aime le noir" }
   ]
 }

@@ -427,7 +427,7 @@ describe('Sommeil et forme (T10-17, T10-18)', () => {
     settleNight(sim, a);
     expect(a.needs.sleep).toBe(90);
     // Rideaux à la fenêtre nord de la chambre, fermés.
-    sim.world.furniture.push({ id: 'f_cur', item: 'curtains', cell: { cx: 8, cy: 17 }, rotation: 0, placedBy: 'p1', window: 'window_6', closed: true });
+    sim.world.furniture.push({ id: 'f_cur', item: 'curtains', cell: { cx: 8, cy: 17 }, rotation: 0, placedBy: 'p1', window: 'window_7', closed: true });
     goToBed(sim, b, 'f_bed');
     b.status = 'night';
     settleNight(sim, b);
@@ -441,7 +441,7 @@ describe('Sommeil et forme (T10-17, T10-18)', () => {
     const capped = autumn({ ...sim.content, items });
     capped.world.rooms.room_bedroom = { ordered: 50, crate: [], elementsBuilt: [], beamPlaced: true, builtDay: 52 };
     capped.world.furniture.push({ id: 'f_bed', item: 'double_bed', cell: { cx: 6, cy: 17 }, rotation: 0, placedBy: 'p1' });
-    capped.world.furniture.push({ id: 'f_cur', item: 'curtains', cell: { cx: 8, cy: 17 }, rotation: 0, placedBy: 'p1', window: 'window_6', closed: true });
+    capped.world.furniture.push({ id: 'f_cur', item: 'curtains', cell: { cx: 8, cy: 17 }, rotation: 0, placedBy: 'p1', window: 'window_7', closed: true });
     const c = at(capped, 'p1', 7, 18);
     goToBed(capped, c, 'f_bed');
     settleNight(capped, c);
@@ -611,7 +611,7 @@ describe('pièces bâties à deux (T10-20, T10-21)', () => {
     expect(sim.world.flags).toContain('room_cellar_built');
     // La fenêtre ouest n'existe plus; ses rideaux sont rangés; la chaise a quitté le seuil.
     expect(windowsNow(sim.content, sim.map, sim.world.rooms).map((w) => w.id)).not.toContain('window_4');
-    expect(windowsNow(sim.content, sim.map, sim.world.rooms).map((w) => w.id)).toContain('window_8');
+    expect(windowsNow(sim.content, sim.map, sim.world.rooms).map((w) => w.id)).toContain('window_6');
     expect(sim.world.furniture.some((f) => f.window === 'window_4')).toBe(false);
     expect(countInStacks(sim.world.cellar, 'curtains') + sim.world.groundItems.filter((g) => g.item === 'curtains').length).toBe(curtainsBefore + 1);
     const chair = sim.world.furniture.find((f) => f.id === 'f_seat');
