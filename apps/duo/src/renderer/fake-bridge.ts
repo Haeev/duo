@@ -206,6 +206,7 @@ export function createFakeBridge(scenario: string | null): DuoApi {
         case 'match:stop':
         case 'app:quit-confirm':
         case 'window:toggle-fullscreen':
+        case 'library:install-file':
           break;
       }
       return Promise.resolve(ok);

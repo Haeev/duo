@@ -1,0 +1,30 @@
+{
+  "name": "@duo/paquet",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Paquets de jeux .duogame (ADR 0010): création, vérification de la signature et des empreintes, extraction, catalogue. Node seul, sans Electron.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "valibot": "catalog:",
+    "yauzl": "catalog:",
+    "yazl": "catalog:"
+  },
+  "devDependencies": {
+    "@duo/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/yauzl": "3.4.0",
+    "@types/yazl": "3.3.1",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}

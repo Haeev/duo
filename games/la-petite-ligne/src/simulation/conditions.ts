@@ -237,6 +237,8 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return (world.improvements[condition.id]?.builtDay ?? null) !== null;
     case 'bought':
       return (world.catalogueBought[condition.item] ?? 0) > 0;
+    case 'inside':
+      return byCharacter(sim, condition.who, ctx, (id) => character(sim, id).inside === condition.building);
   }
 }
 

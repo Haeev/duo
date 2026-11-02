@@ -9,6 +9,7 @@ import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, be
 import type { GameMap, MapProp } from '../etat/carte';
 import type { BenchSettings } from '../donnees/types';
 import type { Character, VillagerState, Vec2 } from '../etat/types';
+import { isSheltered } from '../etat/interieurs';
 import { SIM_HZ } from './constantes';
 import { type Sim, distance, emit } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
@@ -90,7 +91,7 @@ export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
 export function sitDown(sim: Sim, c: Character, benchId: string, slot: number): boolean {
   const prop = playerBench(sim, benchId);
   // Hors de la journée de jeu (nuit, écran de fin), `updateSeats` relèverait au même pas.
-  if (sim.world.phase !== 'day' || prop === null || c.seat !== null || c.inHouse || slotTaken(sim, prop, slot)) return false;
+  if (sim.world.phase !== 'day' || prop === null || c.seat !== null || isSheltered(c) || slotTaken(sim, prop, slot)) return false;
   const place = seatPlace(prop, slot, sim.content.settings.benches, scratch);
   stopPath(sim, c);
   c.pos.x = place.x;
@@ -178,7 +179,7 @@ export function updateSeats(sim: Sim): void {
     const place = prop === null ? null : seatPlace(prop, seat.slot, s, scratch);
     const away = place === null || Math.abs(place.x - c.pos.x) > 1e-6 || Math.abs(place.y - c.pos.y) > 1e-6;
     const asleep = c.status === 'sleeping' || c.status === 'night' || c.status === 'breakfast';
-    if (away || asleep || c.inHouse || sim.world.phase !== 'day') {
+    if (away || asleep || isSheltered(c) || sim.world.phase !== 'day') {
       // Encore sur sa place (la nuit tombe, la démo finit): reposé devant, sur une case libre,
       // jamais laissé dans l'emprise du banc. Déplacé par un effet, il reste où l'effet l'a mis.
       if (!away) {

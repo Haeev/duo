@@ -432,6 +432,8 @@ function sceneChoice(sim: Sim, c: Character, choice: string): void {
   };
   say('p1', a);
   if (b !== a) say('p2', b);
+  const agreed = a === b ? def.agreement?.same : def.agreement?.different;
+  for (const line of agreed ?? []) scene.lines.push({ speaker: line.speaker, text: line.text });
   scene.choices = [];
   scene.line = start;
   scene.ready = [];

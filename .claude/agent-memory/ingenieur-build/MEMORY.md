@@ -63,3 +63,10 @@ Apprentissages durables et vérifiés. Ni avancement ni secret.
 - Logique bash d'un workflow: l'extraire du YAML (PyYAML est installé) et la jouer avec un faux `gh` qui journalise ses arguments.
 - typescript-eslint strict sur du JavaScript vérifié: un `import()` dynamique est `any`, le typer `unknown` puis valider; une variable `let` affectée dans un rappel reste vue `null` (la ranger dans un objet).
 - Copie isolée (worktree): elle peut partir d'un vieux commit; avancer d'abord sa branche (`git merge --ff-only`) sur la pointe de la branche de session. Le garde-fou de l'isolation refuse les commandes trop composées ou qui citent `.git`: les découper, écrire les scripts avec l'outil d'écriture.
+
+## Publication des jeux (jeux.yml)
+
+- `concurrency` de GitHub ne garde qu'un seul job en attente par groupe: un troisième lancé pendant qu'un premier tourne annule le deuxième en attente, même avec `cancel-in-progress: false` (règle documentée par GitHub, pas relue le 2026-11-02). D'où le recours « catalogue seul » de jeux.yml.
+- Un tag ou une release créés avec `GITHUB_TOKEN` ne déclenchent aucun workflow: un `gh release create --target` lancé à la main ne relance pas jeux.yml.
+- `gh release download` d'un fichier absent échoue: lister d'abord les fichiers (`--json assets --jq '.assets[].name'`) pour distinguer « absent » d'une panne, sinon le catalogue serait réécrit sans les autres jeux.
+- Garde-fou de l'isolation: un chemin qui contient `.github` dans une commande est pris pour une commande git; passer par un script écrit dans le dossier de travail temporaire.

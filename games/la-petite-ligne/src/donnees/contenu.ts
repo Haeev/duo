@@ -30,6 +30,7 @@ import {
   parseSoftNeeds,
   parseStorageSettings,
 } from './maison';
+import { townFrom } from './bourg';
 import type {
   AnimalDef,
   ClockPace,
@@ -432,6 +433,22 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return { type, id: r.at('id').string() };
     case 'bought':
       return { type, item: r.at('item').string() };
+    // Tour 10 (lot L4): sieste commencée, repas pris ensemble, pièce bâtie, rideaux ouverts.
+    case 'napped':
+      return counter(r, 'napped', since);
+    case 'needs_ate_together':
+      return counter(r, 'needs_ate_together', since);
+    case 'room_built':
+      return counter(r, `room_built${suffix(r, 'room')}`, since);
+    case 'curtains_opened':
+      return counter(r, 'curtains_opened', since);
+    // Tour 10: passages au fauteuil de Solange (`salon_chair`, « Garder ma coiffure » compris), ou coupes qui changent quelque chose.
+    case 'haircut':
+      return counter(r, r.opt('changed')?.boolean() === true ? 'haircut_changed' : 'salon_chair', since);
+    case 'inside': {
+      const who = r.opt('who');
+      return { type, building: r.at('building').string(), who: who === null ? 'either' : who.oneOf(WHO) };
+    }
     case 'nights_passed':
       return counter(r, 'nights', since);
     default:
@@ -701,10 +718,16 @@ function parseLines(r: Reader): DialogueLineDef[] {
 function parseDialogue(r: Reader, villager: string): DialogueDef {
   const lines: DialogueLineDef[] = [];
   let choices: DialogueChoiceDef[] = [];
+  let agreement: DialogueDef['agreement'];
   const all = r.at('lines').items();
   all.forEach((line, index) => {
     if (line.has('choices')) {
       if (index !== all.length - 1) line.fail('un bloc de choix ne peut venir qu’en dernier');
+      const same = line.opt('same');
+      const different = line.opt('different');
+      if (same !== null || different !== null) {
+        agreement = { same: same === null ? [] : parseLines(same), different: different === null ? [] : parseLines(different) };
+      }
       choices = line
         .at('choices')
         .items()
@@ -739,6 +762,7 @@ function parseDialogue(r: Reader, villager: string): DialogueDef {
     lines,
     choices,
     effects: effects(r.opt('effects')),
+    ...(agreement === undefined ? {} : { agreement }),
   };
 }
 
@@ -1948,6 +1972,7 @@ function parseSettings(r: Reader): Settings {
     tidy: parseTidySettings(r.opt('tidy')),
     fishing: parseFishing(r.opt('fishing')),
     benches: parseBenches(r.opt('benches')),
+    town: townFrom(parseBakery(r.opt('bakery')), parseSalon(r.opt('salon')), parseGrocer(r.opt('grocer')), parseAppearance(r.opt('appearance'))),
     moments: parseMomentSettings(r.opt('moments')),
     secrets: parseSecretSettings(r.opt('secrets')),
     memories: parseMemorySettings(r.opt('memories'), parseCalendar(r)),

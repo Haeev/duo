@@ -330,7 +330,7 @@ describe("habitants d'été et samedis (T8-09, section 2.4)", () => {
       expect(t.firmin, `jour ${String(day)}`).toBe('train_stop:vu');
       expect(t.basile, `jour ${String(day)}`).toBe('train_stop:vu');
       expect(t.jeanne, `jour ${String(day)}`).toBe('train_stop:vu');
-      expect(t.odette, `jour ${String(day)}`).toBe('grocery_counter:vu');
+      expect(t.odette, `jour ${String(day)}`).toBe('grocery_inside_counter:vu');
     }
     expect(at(20, 13 * HOUR, 'rain').jeanne).toBe('quay_bench:vu');
     expect(at(20, 13 * HOUR, 'sunny').jeanne).toBe('riverbank:vu');

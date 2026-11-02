@@ -6,6 +6,7 @@
 import { drawForage, forageInSeason } from '../etat/cueillette';
 import { treeGrowth } from '../etat/repousse';
 import type { Character, Tree, Vec2 } from '../etat/types';
+import { isSheltered } from '../etat/interieurs';
 import { type Sim, distance, emit, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
 import { weatherOf } from './meteo';
@@ -111,7 +112,7 @@ export function forageHints(sim: Sim): void {
   if (forage === null || sim.world.phase !== 'day' || sim.world.clock.day < forage.fromDay) return;
   const items = new Set(forage.items.map((i) => i.item));
   for (const c of sim.world.characters) {
-    if (c.inHouse || !c.created) continue;
+    if (isSheltered(c) || !c.created) continue;
     const near = sim.world.groundItems.some(
       (g) => items.has(g.item) && distance(c.pos, g.pos) <= FORAGE_HINT_RADIUS,
     );

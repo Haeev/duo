@@ -3,6 +3,7 @@
 // de la cloche, passage des oies) et en pleine poussée de la draisine; les vraies sauvegardes du
 // format 1 sont jouées jusqu'au jour 15. À chaque pas contrôlé: places des bancs cohérentes, personne
 // debout dans l'emprise d'un banc, jamais deux corps assis l'un dans l'autre, draisine hors du train.
+import { isSheltered } from '../src/etat/interieurs';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -81,7 +82,7 @@ function checkBenches(sim: Sim, seating: BenchSeating, report: Report): void {
     const key = `${c.seat.bench}#${c.seat.slot}`;
     if (taken.has(key)) violation(`deux joueurs sur ${key}`);
     taken.add(key);
-    if (w.phase !== 'day' || c.inHouse || c.status === 'sleeping' || c.status === 'night') violation(`${c.id} assis en ${w.phase}/${c.status}`);
+    if (w.phase !== 'day' || isSheltered(c) || c.status === 'sleeping' || c.status === 'night') violation(`${c.id} assis en ${w.phase}/${c.status}`);
     const prop = benches.find((b) => b.id === c.seat?.bench);
     if (prop === undefined) {
       violation(`banc inconnu ${key}`);
@@ -93,7 +94,7 @@ function checkBenches(sim: Sim, seating: BenchSeating, report: Report): void {
   // Corps tels que le rendu les pose: les habitants assis à leur place, les autres où ils sont.
   seating.update(benches, s, sim.map.points, w.characters, w.villagers);
   const bodies: Body[] = [];
-  for (const c of w.characters) if (c.created && !c.inHouse) bodies.push({ id: c.id, x: c.pos.x, y: c.pos.y, seated: c.seat !== null });
+  for (const c of w.characters) if (c.created && !isSheltered(c)) bodies.push({ id: c.id, x: c.pos.x, y: c.pos.y, seated: c.seat !== null });
   w.villagers.forEach((v, i) => {
     if (!v.visible) return;
     const prop = seating.bench[i] ?? null;

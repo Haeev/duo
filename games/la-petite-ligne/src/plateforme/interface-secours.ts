@@ -197,6 +197,16 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         }
         for (const s of bag) el('div', 'font-size:13px;', panel).textContent = itemLabel(view, s);
         break;
+      // Tour 10: le guichet du fournil et le fauteuil de Solange, au plus simple (garder sa coiffure).
+      case 'bakery':
+        button(row(), 'pain', { type: 'bakery_buy', item: 'bread' });
+        button(row(), 'brioche', { type: 'bakery_buy', item: 'brioche' });
+        break;
+      case 'salon': {
+        const a = me.appearance;
+        button(row(), 'ok', { type: 'haircut', hair: a.hair, hairColor: a.hairColor, beard: a.beard });
+        break;
+      }
     }
     for (const p of w.proposals) {
       if (p.by === me.id) continue;

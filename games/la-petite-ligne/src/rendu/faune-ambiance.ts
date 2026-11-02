@@ -11,6 +11,7 @@
  * Positions tirées de la graine de la partie (mêmes buissons, même pré chez les deux joueurs).
  * Hors du cadre de la caméra, rien n'est animé ni dessiné: seules les minuteries avancent.
  */
+import { isSheltered } from '../etat/interieurs';
 import {
   AnimationMixer,
   BufferGeometry,
@@ -448,7 +449,7 @@ export class AmbientFaunaPart implements EventfulPart {
   nearestPlayer(context: FrameContext, x: number, y: number): number {
     let best = Infinity;
     for (const c of context.world.characters) {
-      if (c.inHouse) continue;
+      if (isSheltered(c)) continue;
       best = Math.min(best, Math.hypot(c.pos.x - x, c.pos.y - y));
     }
     return best;

@@ -3,7 +3,7 @@
 // Les textes s'écrivent avec des espaces ordinaires; `fr` pose les espaces
 // insécables, l'apostrophe typographique et les points de suspension (UX 0.3).
 // Les noms variables (pseudos) ne sont jamais retouchés.
-import type { GameMode, ToastKind } from '../shared/state';
+import type { GameMode, GameToastKind, ToastKind } from '../shared/state';
 
 const NBSP = String.fromCharCode(0xa0);
 const NNBSP = String.fromCharCode(0x202f);
@@ -208,6 +208,7 @@ export const t = {
     sousTitreAbsent: (name: string): string =>
       fr`${name} n'est pas visible : tu peux ouvrir le salon, l'invitation partira dès que ${name} sera là.`,
     vide: fr`Aucun jeu n'est installé pour l'instant.`,
+    installerFichier: 'Installer un jeu depuis un fichier',
     retour: 'Retour',
   },
   salon: {
@@ -345,6 +346,29 @@ export function toastText(kind: ToastKind, name: string): string {
       return `${name} a arrêté la partie.`;
     case 'quit-duo':
       return `${name} a quitté Duo.`;
+  }
+}
+
+/**
+ * Notifications des jeux installés (UX 7.4). La mise à jour s'écrit sans accord
+ * avec le nom du jeu, dont le genre n'est pas connu (« La Petite Ligne », « Jeu témoin »).
+ */
+export function gameToastText(kind: GameToastKind, game: string, version: string): string {
+  switch (kind) {
+    case 'game-updated':
+      return fr`${game} : mise à jour installée (version ${version}).`;
+    case 'game-installed':
+      return fr`Nouveau jeu : ${game} est dans la bibliothèque.`;
+    case 'install-invalid':
+      return fr`Ce fichier n'est pas un jeu Duo valide : rien n'a été installé.`;
+    case 'install-not-newer':
+      return fr`Tu as déjà ${game} en version ${version}, rien à installer.`;
+    case 'install-unsupported':
+      return fr`${game} demande une version plus récente de Duo.`;
+    case 'install-busy':
+      return fr`Ferme le salon ou termine la partie avant d'installer un jeu.`;
+    case 'install-failed':
+      return fr`L'installation n'a pas abouti. Vérifie la place sur le disque, puis réessaie.`;
   }
 }
 

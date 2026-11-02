@@ -60,6 +60,9 @@ export function capacityOf(sim: Pick<Sim, 'content'>, item: string | null): numb
   return Object.values(sim.content.items).find((i) => i.capacity !== null)?.capacity ?? 0;
 }
 
+/** Où la poule commandée est posée, par rapport au point `chicken_coop` (m). */
+export const HEN_DROP = { x: -1.2, y: 0.7 } as const;
+
 /** Une poule commandée: elle arrive devant le poulailler, pas encore nommée. */
 function deliverHen(sim: Sim, item: string, by: CharacterId | null): void {
   const def = sim.content.catalogue?.hens[item];
@@ -69,7 +72,8 @@ function deliverHen(sim: Sim, item: string, by: CharacterId | null): void {
     return;
   }
   const at = point(sim, POINT.chickenCoop);
-  const pos = { x: at.x + 0.6, y: at.y + 0.9 };
+  // Là où la cage est dessinée, devant le poulailler (le décalage d'avant tombait dans la clôture `fence_15`).
+  const pos = { x: at.x + HEN_DROP.x, y: at.y + HEN_DROP.y };
   const hen: Hen = {
     id: newId(sim, 'h'),
     name: def.name,

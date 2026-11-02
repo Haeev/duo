@@ -8,6 +8,7 @@
  * Page: `/src/audio/banc/index.html` du serveur de Vite du jeu; Playwright
  * appelle `window.lplAudioBanc.run(scénario)`.
  */
+import { isHome } from '../../etat/interieurs';
 import type { AudioBus } from '@duo/sdk';
 import { createRandom } from '@duo/sdk/sim';
 import soundsFile from '../../../assets/son/sons.json';
@@ -111,7 +112,7 @@ function setupOf(scenario: Scenario): Setup {
     case 'matin':
       return { sim: fastForward((s) => s.world.clock.day === 2 && s.world.phase === 'night'), seconds: 24 };
     case 'nuit':
-      return { sim: fastForward((s) => s.world.clock.day === 3 && s.world.clock.minutes >= 19 * 60 && s.world.characters.every((c) => c.inHouse)), seconds: 30 };
+      return { sim: fastForward((s) => s.world.clock.day === 3 && s.world.clock.minutes >= 19 * 60 && s.world.characters.every((c) => isHome(c))), seconds: 30 };
     case 'pluie':
       return { sim: fastForward((s) => s.world.clock.day === 4 && s.world.phase === 'day' && s.world.clock.minutes >= 8 * 60), seconds: 30 };
     case 'interieur':

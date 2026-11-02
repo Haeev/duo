@@ -40,7 +40,7 @@ function world(day: number, minutes: number, slowRoll = true): Sim {
     ch.menu = null;
     ch.dialogue = null;
     ch.seat = null;
-    ch.inHouse = false;
+    ch.inside = null;
     ch.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   }
   return sim;

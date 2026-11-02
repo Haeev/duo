@@ -7,17 +7,33 @@ import type { GameMap } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
 import { BODY_RADIUS, CORNER_NUDGE_MAX, CORNER_NUDGE_STEP } from './constantes';
 
-/** Ce qui bloque: la carte, plus une couche dynamique (arbres debout, meubles). */
+/**
+ * Ce qui bloque: la carte, plus une couche dynamique (arbres debout, meubles, murs des pièces
+ * bâties: 1; portes fermées: code de leur bâtiment, 2 et plus, voir `simulation/interieurs.ts`;
+ * porte percée d'une pièce bâtie: `OPENED_CELL`, ouverte malgré la carte).
+ */
 export interface Blockers {
   readonly map: GameMap;
   readonly dynamic: Uint8Array;
+  /**
+   * Porte fermée qu'on passe quand même: celle du bâtiment où l'on est (sortie toujours permise),
+   * -1 pour toutes (habitants). Absent ou 0: aucune.
+   */
+  readonly door?: number;
 }
+
+/** Couche dynamique: case ouverte malgré la carte (porte percée d'une pièce bâtie, tour 10). */
+export const OPENED_CELL = 255;
 
 export function isBlockedCell(b: Blockers, cx: number, cy: number): boolean {
   const { map } = b;
   if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return true;
   const i = cy * map.width + cx;
-  return map.blocked[i] === true || b.dynamic[i] === 1;
+  const d = b.dynamic[i] ?? 0;
+  if (d === OPENED_CELL) return false;
+  if (map.blocked[i] === true) return true;
+  if (d <= 1) return d === 1;
+  return b.door !== -1 && b.door !== d;
 }
 
 /** Le disque du corps en (x, y) touche-t-il une case bloquée ? */

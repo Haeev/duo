@@ -8,7 +8,9 @@ import {
   Menu,
   app,
   crashReporter,
+  dialog,
   ipcMain,
+  net,
   session,
   type IpcMainInvokeEvent,
 } from 'electron';
@@ -21,7 +23,10 @@ import {
 import { parseCommandLine } from './args';
 import { LocalSaves } from './data/local-saves';
 import { MachineStore } from './data/store';
-import { scanGames, type GameEntry, type GameRoot } from './games/catalog';
+import { scanGames, type Catalog, type GameEntry, type GameRoot } from './games/catalog';
+import { GameInstaller, type InstallOutcome } from './games/installer';
+import { trustedKeys } from './games/trusted-keys';
+import { CATALOGUE_URL, GameUpdater } from './games/updater';
 import { bridgeCodec } from './game-host/bridge';
 import { GameHost } from './game-host/game-host';
 import { checkIntent } from './ipc-schemas';
@@ -61,9 +66,28 @@ function gameRoots(): GameRoot[] {
     // Développement: jeux construits du dépôt (apps/duo/out/main vers la racine).
     roots.push({ source: 'dev', dir: path.resolve(outDir, '../../../games') });
   }
-  roots.push({ source: 'installed', dir: path.join(app.getPath('userData'), 'games') });
+  roots.push({ source: 'installed', dir: installedGamesDir() });
   roots.push({ source: 'bundled', dir: path.join(process.resourcesPath, 'games') });
   return roots;
+}
+
+function installedGamesDir(): string {
+  return path.join(app.getPath('userData'), 'games');
+}
+
+/**
+ * Adresse du catalogue. Une version de test ne lit que `DUO_TEST_CATALOGUE_URL`
+ * (faux catalogue local), et ne cherche rien sans elle: tests reproductibles.
+ */
+function catalogueUrl(): string | null {
+  if (DUO_TEST) return process.env.DUO_TEST_CATALOGUE_URL ?? null;
+  return CATALOGUE_URL;
+}
+
+/** Paquets téléchargés en https; une version de test admet aussi la boucle locale. */
+function allowPackageUrl(url: string): boolean {
+  if (url.startsWith('https://')) return true;
+  return DUO_TEST && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(url);
 }
 
 function platformName(): 'darwin' | 'win32' | 'linux' {
@@ -136,19 +160,24 @@ async function start(): Promise<void> {
   }
   for (const file of loaded.recovered) journal.write('warn', 'data', 'file-recovered', { file });
 
-  const catalog = await scanGames(gameRoots());
-  for (const problem of catalog.problems) {
-    journal.write('warn', 'games', 'manifest-invalid', {
-      folder: problem.folder,
-      problems: problem.problems,
+  let gameRootById = new Map<string, string>();
+  const loadCatalog = async (): Promise<Catalog> => {
+    const scanned = await scanGames(gameRoots());
+    for (const problem of scanned.problems) {
+      journal.write('warn', 'games', 'manifest-invalid', {
+        folder: problem.folder,
+        problems: problem.problems,
+      });
+    }
+    journal.write('info', 'games', 'catalog', {
+      games: scanned.games.map(
+        (game: GameEntry) => `${game.manifest.id}@${game.manifest.version} (${game.source})`,
+      ),
     });
-  }
-  journal.write('info', 'games', 'catalog', {
-    games: catalog.games.map(
-      (game: GameEntry) => `${game.manifest.id}@${game.manifest.version} (${game.source})`,
-    ),
-  });
-  const gameRootById = new Map(catalog.games.map((game) => [game.manifest.id, game.root]));
+    gameRootById = new Map(scanned.games.map((game) => [game.manifest.id, game.root]));
+    return scanned;
+  };
+  const catalog = await loadCatalog();
 
   const defaultSession = session.defaultSession;
   const gameSession = session.fromPartition(GAME_PARTITION);
@@ -176,6 +205,67 @@ async function start(): Promise<void> {
     arch: process.arch,
   });
 
+  const gamesDir = installedGamesDir();
+  const installer = new GameInstaller({
+    gamesDir,
+    trustedKeys: trustedKeys(),
+    effectiveVersion: (id) => platform.gameVersion(id),
+  });
+  /** Installation réussie: catalogue relu (Duo est au repos), puis bibliothèque publiée. */
+  const afterInstall = async (outcome: InstallOutcome): Promise<void> => {
+    if (outcome.ok) await platform.setGames((await loadCatalog()).games);
+  };
+  const pickPackage = async (): Promise<string | null> => {
+    // Version de test: fichier désigné par l'essai, sans boîte de dialogue.
+    if (DUO_TEST && process.env.DUO_TEST_FICHIER_JEU !== undefined) {
+      return process.env.DUO_TEST_FICHIER_JEU;
+    }
+    const parent = appWindow?.window;
+    const options: Electron.OpenDialogOptions = {
+      title: 'Installer un jeu depuis un fichier',
+      filters: [{ name: 'Jeu Duo', extensions: ['duogame'] }],
+      properties: ['openFile'],
+    };
+    const chosen =
+      parent === undefined
+        ? await dialog.showOpenDialog(options)
+        : await dialog.showOpenDialog(parent, options);
+    return chosen.canceled ? null : (chosen.filePaths[0] ?? null);
+  };
+  const installFromFile = async (): Promise<InstallOutcome | null> => {
+    const file = await pickPackage();
+    if (file === null) return null;
+    const outcome = await installer.install({ archive: file, move: false });
+    journal.write(outcome.ok ? 'info' : 'warn', 'games', 'import', {
+      ok: outcome.ok,
+      ...(outcome.ok
+        ? { id: outcome.id, version: outcome.version }
+        : { reason: outcome.reason, ...('detail' in outcome ? { detail: outcome.detail } : {}) }),
+    });
+    await afterInstall(outcome);
+    return outcome;
+  };
+  const url = catalogueUrl();
+  const updater =
+    url === null
+      ? null
+      : new GameUpdater({
+          catalogueUrl: url,
+          // `net.fetch`: pile réseau de Chromium, avec le mandataire du système.
+          fetch: (target, init) => net.fetch(target, { signal: init.signal }),
+          incomingDir: path.join(gamesDir, '.incoming'),
+          install: (request) => installer.install(request),
+          effectiveVersion: (id) => platform.gameVersion(id),
+          isIdle: () => platform.isIdle(),
+          allowUrl: allowPackageUrl,
+          onInstalled: async (outcome) => {
+            await afterInstall(outcome);
+            platform.announceInstalled(outcome);
+          },
+          journal,
+        });
+  let updaterStarted = false;
+
   const platform = new Platform({
     journal,
     store,
@@ -187,6 +277,11 @@ async function start(): Promise<void> {
     profile: loaded.profile,
     settings: loaded.settings,
     games: catalog.games,
+    installFromFile,
+    onIdleChange: (idle) => {
+      if (idle) updater?.resume();
+      else updater?.suspend();
+    },
     requestQuit: () => {
       app.quit();
     },
@@ -230,6 +325,11 @@ async function start(): Promise<void> {
       },
       onLauncherLoaded: () => {
         journal.write('info', 'app', 'launcher-ready');
+        // Recherche des jeux une fois le lanceur affiché (CA-PF-088), une seule fois par lancement.
+        if (!updaterStarted) {
+          updaterStarted = true;
+          updater?.start();
+        }
       },
       onFullscreenChange: (fullscreen) => {
         platform.onFullscreenChange(fullscreen);
@@ -273,6 +373,7 @@ async function start(): Promise<void> {
     event.preventDefault();
     // ⌘Q pendant une partie: même confirmation que la fermeture de la fenêtre (M-15).
     if (platform.interceptClose()) return;
+    updater?.stop();
     void platform.shutdown().finally(() => {
       shutdownDone = true;
       app.quit();
@@ -285,6 +386,7 @@ async function start(): Promise<void> {
       state: () => platform.snapshot(),
       liaison: () => liaison.stats(),
       dataDir: userData,
+      checkGames: () => updater?.check() ?? null,
       platformView: () => ({
         visible: appWindow?.platformView.getVisible() ?? null,
         bounds: appWindow?.platformView.getBounds() ?? null,

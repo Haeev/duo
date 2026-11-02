@@ -9,6 +9,7 @@
  */
 import type { ControlFrame } from '../etat/actions';
 import type { Character, CharacterId, MomentToday, Vec2 } from '../etat/types';
+import { isSheltered } from '../etat/interieurs';
 import type { Condition, MomentDef, MomentWatch, Season } from '../donnees/types';
 import { activeWatch, allGoneAfterClimax, drawnPose, freezeState, momentDef, restPosition, startleTicks, watchTarget, type FreezeState } from '../etat/moments';
 import { MOVE_DEADZONE, SIM_DT, SIM_HZ } from './constantes';
@@ -263,7 +264,7 @@ function questStepReady(sim: Sim, def: MomentDef, today: MomentToday): boolean {
 
 /** Dehors, libre, éveillé, présent: ce joueur peut regarder (condition 3). */
 function free(sim: Sim, c: Character): boolean {
-  return c.created && !c.inHouse && c.menu === null && c.dialogue === null && c.status === 'active' && !c.absent && sim.world.scene === null;
+  return c.created && !isSheltered(c) && c.menu === null && c.dialogue === null && c.status === 'active' && !c.absent && sim.world.scene === null;
 }
 
 /** Place d'allumage (`watch.syncPress`) à portée de ce joueur, ou `null`. */
@@ -600,7 +601,7 @@ function updateFreeze(sim: Sim, def: MomentDef, today: MomentToday, w: MomentWat
   if (state.kind === 'startled') return state;
   const s = sim.content.settings.moments;
   const startles = world.characters.some((c) => {
-    if (c.inHouse || !c.created) return false;
+    if (isSheltered(c) || !c.created) return false;
     const d = distance(c.pos, target);
     if (d < w.minRadius) return true;
     return state.kind === 'look' && d <= s.noticeRadius && c.speed >= s.stillSpeed;
@@ -618,7 +619,7 @@ function updateShy(sim: Sim, def: MomentDef, today: MomentToday): void {
   for (const actor of def.actors) {
     if (actor.shy === null) continue;
     const at = restPosition(sim.map, actor);
-    const near = sim.world.characters.some((c) => !c.inHouse && distance(c.pos, at) < (actor.shy?.distance ?? 0));
+    const near = sim.world.characters.some((c) => !isSheltered(c) && distance(c.pos, at) < (actor.shy?.distance ?? 0));
     if (!near) continue;
     const until = sim.world.tick + Math.round(actor.shy.returnAfterSeconds * SIM_HZ);
     // Prolongée une fois par seconde au plus: l'état ne change pas à chaque pas.
@@ -650,7 +651,7 @@ function pushOut(sim: Sim, def: MomentDef, today: MomentToday): void {
       // effarouché recule jusqu'à `shy.stepTo`. La zone repoussée couvre ces déplacements.
       const stepTo = actor.shy?.stepTo ?? null;
       for (const c of world.characters) {
-        if (c.inHouse) continue;
+        if (isSheltered(c)) continue;
         const from = stepTo === null ? rest : closestOnSegment(c.pos, rest, { x: stepTo[0], y: stepTo[1] });
         radialPush(blockers, c.pos, from, reach + actor.roam);
       }
@@ -664,7 +665,7 @@ function pushOut(sim: Sim, def: MomentDef, today: MomentToday): void {
     const vy = prev === null ? 0 : at.y - prev.y;
     const speed = Math.hypot(vx, vy);
     for (const c of world.characters) {
-      if (c.inHouse || distance(c.pos, at) >= reach) continue;
+      if (isSheltered(c) || distance(c.pos, at) >= reach) continue;
       if (speed > MOVING && sideStep(blockers(), c.pos, at, vx / speed, vy / speed, reach)) continue;
       radialPush(blockers, c.pos, at, reach);
     }
@@ -801,7 +802,7 @@ function holdMoment(sim: Sim): { def: MomentDef; today: MomentToday; places: str
 /** Place de l'échelle à portée de ce joueur (libre ou prise par l'autre), la plus proche. */
 export function holdPlaceNear(sim: Sim, c: Character): { point: string; taken: boolean } | null {
   const hm = holdMoment(sim);
-  if (hm === null || c.holding !== null || c.inHouse || c.seat !== null) return null;
+  if (hm === null || c.holding !== null || isSheltered(c) || c.seat !== null) return null;
   const range = sim.content.settings.moments.holdRange;
   let best: { point: string; taken: boolean; d: number } | null = null;
   for (const id of hm.places) {

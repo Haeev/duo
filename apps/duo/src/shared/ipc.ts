@@ -24,6 +24,7 @@ export interface IntentArgs {
   'app:quit-confirm': null;
   'app:quit-cancel': null;
   'window:toggle-fullscreen': null;
+  'library:install-file': null;
 }
 
 export type IntentChannel = keyof IntentArgs;
@@ -47,6 +48,7 @@ export const INTENT_CHANNELS = [
   'app:quit-confirm',
   'app:quit-cancel',
   'window:toggle-fullscreen',
+  'library:install-file',
 ] as const satisfies readonly IntentChannel[];
 
 // Garde de compilation: chaque canal de IntentArgs figure dans la liste.

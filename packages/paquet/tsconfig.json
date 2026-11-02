@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@duo/config/tsconfig.node.json",
+  "compilerOptions": {
+    // Imports en `.ts` et syntaxe effaçable: Node 22 exécute les sources telles quelles
+    // (outil `outils/paquet-jeu.mjs`), et electron-vite les regroupe pour le principal.
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true
+  },
+  "include": ["src", "tests", "*.ts"]
+}

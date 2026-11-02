@@ -4,6 +4,8 @@
 // Un manifeste invalide rend le jeu illisible sans toucher aux autres (M-12).
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
+import { compareVersions } from '@duo/paquet';
+import { readCurrentPointer } from './installer';
 import { bridgeCovers, checkManifest, type GameManifest } from './manifest';
 
 export type GameSource = 'extra' | 'dev' | 'installed' | 'bundled';
@@ -72,6 +74,14 @@ async function locate(
   root: GameRoot,
   folder: string,
 ): Promise<{ manifestFile: string; served: string } | null> {
+  if (root.source === 'installed') {
+    // Paquet installé (ADR 0010, point 5): `<id>/current.json` désigne `<id>/<version>/`.
+    const pointer = await readCurrentPointer(path.join(root.dir, folder));
+    if (pointer === null) return null;
+    const served = path.join(root.dir, folder, pointer.version);
+    const manifestFile = path.join(served, 'duo-game.json');
+    return (await isFile(manifestFile)) ? { manifestFile, served } : null;
+  }
   const base = path.join(root.dir, folder);
   const dist = path.join(base, 'dist');
   const distManifest = path.join(dist, 'duo-game.json');
@@ -134,19 +144,29 @@ async function readEntry(
   };
 }
 
-/** Parcourt les dossiers dans l'ordre donné: le premier jeu trouvé pour un identifiant l'emporte. */
+/**
+ * Un jeu par identifiant. Les dossiers de développement (`extra`, `dev`)
+ * l'emportent dans l'ordre donné; sinon la version la plus récente entre
+ * l'installée et l'embarquée (ADR 0010, point 8), l'installée à égalité.
+ */
 export async function scanGames(roots: readonly GameRoot[]): Promise<Catalog> {
   const games = new Map<string, GameEntry>();
   const problems: CatalogProblem[] = [];
   for (const root of roots) {
     for (const folder of await listFolders(root.dir)) {
-      if (games.has(folder)) continue;
+      const known = games.get(folder);
+      if (known !== undefined && (known.source === 'extra' || known.source === 'dev')) continue;
       const entry = await readEntry(root, folder);
       if (entry === null) continue;
-      if ('manifest' in entry) {
-        games.set(folder, entry);
-      } else {
+      if (!('manifest' in entry)) {
         problems.push(entry);
+        continue;
+      }
+      if (
+        known === undefined ||
+        compareVersions(entry.manifest.version, known.manifest.version) > 0
+      ) {
+        games.set(folder, entry);
       }
     }
   }
