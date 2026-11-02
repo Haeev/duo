@@ -7,7 +7,7 @@ import iconesSvg from '../../../../../design/identite/b/icones/icones.svg?raw';
 import logoUrl from '../../../../../design/identite/b/logo/logo.svg';
 import { PLAYER_APPEARANCES, PLAYER_COLORS, type PlayerColor } from '../../shared/players';
 import type { GameAction, Profile, Toast } from '../../shared/state';
-import { MOUSE_NAMES, keyLabel, t, toastText } from '../textes';
+import { MOUSE_NAMES, gameToastText, keyLabel, t, toastText } from '../textes';
 import { readKeyboardLayout, useEscape, useFocusTrap, useInitialFocus } from './keyboard';
 
 export type IconName =
@@ -257,8 +257,21 @@ export function Toasts({ toasts }: { toasts: readonly Toast[] }): JSX.Element {
     <div class="notifications" aria-live="polite" role="status">
       {toasts.map((toast) => (
         <div class="notification" key={toast.id} data-testid="notification">
-          <Icon name={toast.kind === 'joined' || toast.kind === 'back' ? 'success' : 'info'} />
-          <span>{toastText(toast.kind, toast.name)}</span>
+          <Icon
+            name={
+              toast.kind === 'joined' ||
+              toast.kind === 'back' ||
+              toast.kind === 'game-updated' ||
+              toast.kind === 'game-installed'
+                ? 'success'
+                : 'info'
+            }
+          />
+          <span>
+            {'game' in toast
+              ? gameToastText(toast.kind, toast.game, toast.version)
+              : toastText(toast.kind, toast.name)}
+          </span>
         </div>
       ))}
     </div>

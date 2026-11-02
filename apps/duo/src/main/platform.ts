@@ -8,6 +8,7 @@ import type {
   AppState,
   EndView,
   GameSummary,
+  GameToastKind,
   InvitationView,
   MatchView,
   NoticeView,
@@ -21,6 +22,9 @@ import type {
 import type { LocalSaves } from './data/local-saves';
 import { publicSettings, type MachineStore, type SettingsFile } from './data/store';
 import type { GameEntry } from './games/catalog';
+import type { InstallOutcome } from './games/installer';
+
+type InstallSuccess = Extract<InstallOutcome, { ok: true }>;
 import {
   BRIDGE_VERSION,
   type GameSettings,
@@ -61,6 +65,10 @@ export interface PlatformDeps {
   readonly profile: Profile | null;
   readonly settings: SettingsFile;
   readonly games: readonly GameEntry[];
+  /** Boîte de dialogue du système puis installation (`null`: rien choisi). */
+  readonly installFromFile: () => Promise<InstallOutcome | null>;
+  /** Passage au repos (bibliothèque) ou en activité (salon, invitation, partie). */
+  readonly onIdleChange: (idle: boolean) => void;
   /** Quitter Duo après confirmation (M-15). */
   readonly requestQuit: () => void;
 }
@@ -108,6 +116,7 @@ export class Platform {
   private window: AppWindow | null = null;
   private gameHost: GameHost | null = null;
   private publishQueued = false;
+  private lastIdle = true;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private autosaveTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -333,7 +342,81 @@ export class Platform {
       case 'window:toggle-fullscreen':
         this.window?.toggleFullscreen();
         return { ok: true };
+      case 'library:install-file':
+        return this.installFromFile();
     }
+  }
+
+  // Jeux installés (ADR 0010) ----------------------------------------------------
+
+  /** Au repos: ni salon (le sien ou celui de l'autre), ni invitation, ni partie. */
+  isIdle(): boolean {
+    return (
+      this.running === null &&
+      this.stopping === null &&
+      this.active() === null &&
+      this.invitationView() === null
+    );
+  }
+
+  /** Version que Duo fait tourner pour ce jeu, `null` s'il est absent. */
+  gameVersion(id: string): string | null {
+    return this.games.get(id)?.manifest.version ?? null;
+  }
+
+  /** Catalogue relu après une installation: appelé seulement au repos. */
+  async setGames(games: readonly GameEntry[]): Promise<void> {
+    this.games = new Map(games.map((game) => [game.manifest.id, game]));
+    await this.refreshSaveSummaries();
+    this.publish();
+  }
+
+  /** Notification d'un jeu téléchargé et installé. */
+  announceInstalled(outcome: InstallSuccess): void {
+    this.gameToast(
+      outcome.previous === null ? 'game-installed' : 'game-updated',
+      outcome.name,
+      outcome.version,
+    );
+  }
+
+  private async installFromFile(): Promise<IntentResult> {
+    if (!this.isIdle()) {
+      this.gameToast('install-busy', '', '');
+      return { ok: true };
+    }
+    const outcome = await this.deps.installFromFile();
+    if (outcome === null) return { ok: true };
+    if (outcome.ok) {
+      this.announceInstalled(outcome);
+      return { ok: true };
+    }
+    switch (outcome.reason) {
+      case 'invalid':
+        this.gameToast('install-invalid', '', '');
+        break;
+      case 'not-newer':
+        this.gameToast('install-not-newer', outcome.name, outcome.version);
+        break;
+      case 'unsupported':
+        this.gameToast('install-unsupported', outcome.name, '');
+        break;
+      case 'io':
+        this.gameToast('install-failed', '', '');
+        break;
+    }
+    return { ok: true };
+  }
+
+  private gameToast(kind: GameToastKind, game: string, version: string): void {
+    this.toastId += 1;
+    const id = this.toastId;
+    this.toasts = [...this.toasts, { id, kind, game, version }].slice(-3);
+    setTimeout(() => {
+      this.toasts = this.toasts.filter((item) => item.id !== id);
+      this.publish();
+    }, TOAST_MS);
+    this.publish();
   }
 
   onFullscreenChange(fullscreen: boolean): void {
@@ -350,6 +433,11 @@ export class Platform {
     queueMicrotask(() => {
       this.publishQueued = false;
       try {
+        const idle = this.isIdle();
+        if (idle !== this.lastIdle) {
+          this.lastIdle = idle;
+          this.deps.onIdleChange(idle);
+        }
         this.window?.publish(this.snapshot());
         this.applyLayer();
       } catch (error) {

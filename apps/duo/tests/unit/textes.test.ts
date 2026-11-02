@@ -4,6 +4,7 @@ import {
   de,
   durationRange,
   fr,
+  gameToastText,
   keyLabel,
   playedDuration,
   t,
@@ -11,7 +12,7 @@ import {
   typo,
   when,
 } from '../../src/renderer/textes';
-import type { ToastKind } from '../../src/shared/state';
+import type { GameToastKind, ToastKind } from '../../src/shared/state';
 
 const NBSP = String.fromCharCode(0xa0);
 const NNBSP = String.fromCharCode(0x202f);
@@ -41,6 +42,16 @@ function allTexts(): string[] {
     'quit-duo',
   ];
   for (const kind of kinds) out.push(toastText(kind, 'Sacha'));
+  const gameKinds: GameToastKind[] = [
+    'game-updated',
+    'game-installed',
+    'install-invalid',
+    'install-not-newer',
+    'install-unsupported',
+    'install-busy',
+    'install-failed',
+  ];
+  for (const kind of gameKinds) out.push(gameToastText(kind, 'La Petite Ligne', '0.2.0'));
   return out;
 }
 
