@@ -48,7 +48,7 @@ function escapeAttr(text: string): string {
 }
 
 /** Couleurs du portrait d'un joueur selon son apparence. */
-export function playerColors(id: CharacterId, appearance: Readonly<Appearance>): PortraitColors {
+export function playerColors(id: CharacterId, appearance: Readonly<Pick<Appearance, 'hair' | 'outfit' | 'scarf'>>): PortraitColors {
   const body = PLAYER_BODIES[id];
   const outfit = PLAYER_OUTFITS[appearance.outfit] ?? PLAYER_OUTFITS[0] ?? { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' };
   return {

@@ -36,7 +36,16 @@ export type Intent =
   // Écran d'étape (tour 8): « Rester à la Halte », « Finir la séance », ou revenir sur son choix (`null`)
   | { type: 'stage_choice'; choice: 'stay' | 'finish' | null }
   // Création (PE-01, version démo)
-  | { type: 'create_character'; name: string; hair: number; outfit: number }
+  // Tour 10 (section 2): couleur des cheveux (0 à 7) et barbe (0 à 3), facultatives; appliquées par
+  // les règles de la création à partir du lot L3 (bornes de `reglages.appearance`).
+  | {
+      type: 'create_character';
+      name: string;
+      hair: number;
+      outfit: number;
+      hairColor?: number;
+      beard?: number;
+    }
   // Déplacement à la souris: aller là (et agir si `act`)
   | { type: 'move_to'; target: ClickTarget; act: boolean }
   // Ce que survole la souris (R11): la cible mise en évidence, ou l'aperçu du meuble en main.

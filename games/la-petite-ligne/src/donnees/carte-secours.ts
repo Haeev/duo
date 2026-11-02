@@ -6,6 +6,7 @@
  */
 import type { GameMap, GroundKind, MapProp, MapTree, Rect } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
+import { houseBuilding } from './carte-interieurs';
 
 const WIDTH = 64;
 const HEIGHT = 48;
@@ -113,6 +114,8 @@ export function buildFallbackMap(): GameMap {
     { id: 'notice_board', model: 'notice_board', pos: p(32.5, 5.5), rotation: 0, rect: null, height: 0, category: 'decor' },
   ];
 
+  // Tour 10: la maisonnette seule est visitable; ni ru ni rue Haute sur cette carte de 64 m.
+  const house = { room: { x: 6, y: 9, w: 5, h: 4 }, door: { cx: 8, cy: 13 }, spawn: p(8.5, 11.5) };
   return {
     id: 'aubrune_secours',
     name: "Halte d'Aubrune (carte de secours)",
@@ -129,6 +132,7 @@ export function buildFallbackMap(): GameMap {
       notice_board: p(32.5, 5.5),
       handcar_shed: p(43.5, 5.5),
       house_door: p(8.5, 14.5),
+      house_spawn: p(8.5, 11.5),
       house_beam_spot: p(13.5, 11.5),
       house_attic: p(10.5, 9.5),
       beam_pickup: p(16.5, 6.5),
@@ -160,7 +164,10 @@ export function buildFallbackMap(): GameMap {
       house_interior: { x: 6, y: 9, w: 5, h: 4 },
       hen_pen: { x: 11, y: 17, w: 5, h: 3 },
     },
-    house: { room: { x: 6, y: 9, w: 5, h: 4 }, door: { cx: 8, cy: 13 }, spawn: p(8.5, 11.5) },
+    buildings: { house: houseBuilding('house', house, 'house_spawn', 'house_door') },
+    stream: null,
+    crossings: [],
+    house,
     garden,
     trees,
     props,
