@@ -93,3 +93,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Une boucle dont une attaque tombe à moins de 0,05 s du début sort « niveau au raccord centile 100 » dans `controler.py` (contrôle réussi quand même): placer les attaques à égale distance du raccord (tic-tac à 0,5 et 1,5 s; coups encadrant le raccord de 0,25 s).
 - Cinq notes « dans l'ordre »: cinq identifiants (`star-chime-1` à `-5`, champ `order`), comme les tournants de saison; do pentatonique (do, ré, mi, sol, la) est juste à la fois sur fa, sol et do majeur.
 - Une suite vitest complète prend environ 8 minutes dans le worktree; `npx vitest run src/audio src/interface/tests/sons.test.ts` (20 s) suffit pour itérer sur les sons.
+
+## La Petite Ligne: tour 10 (vérifié le 2026-11-01)
+
+- Worktree parti d'un commit ancien: la conception du tour courant peut manquer. Vérifier `git log HEAD..<branche de session>` et avancer en avance rapide (`git merge --ff-only`) si rien n'est modifié localement.
+- Plafond des sons permanents plein (29,3 Mo sur 30): un tour entier de sons va dans des dossiers non résidents par thème (`rue-haute/`, `besoins/`, `maison/`) avec `decodeWhen`; les motifs d'habitants nouveaux aussi (le moteur les trouve par l'identifiant `talk-<id>`, pas par le dossier).
+- Une règle par bâtiment pour le moteur (étouffement, ambiance de pièce) se met dans une clé à part du plan (`plan.interiorByBuilding`), comme `plan.stream` pour les sources du ru: le schéma Valibot l'ignore, le dev audio la lit.
+- `dsp.sonie_integree` plante sur un son de moins de 0,4 s (fenêtre plus longue que le son): ne la calculer que pour les sons plus longs.
+- Un script d'essai hors du dépôt (`/tmp/.../essai.py`) qui appelle `generer.traiter(son, v)` pour un module donne sonie, centroïde et part sous 300 Hz en quelques secondes, sans encoder: itérer là avant la génération complète.

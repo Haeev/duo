@@ -5,7 +5,8 @@
 Options: --seulement musiques|sons|planche (plusieurs possibles), --sans-controle.
 
 Produit:
-- games/la-petite-ligne/assets/son/: musique/, ambiance/, effets/, train/, interface/, habitants/, moments/
+- games/la-petite-ligne/assets/son/: musique/, ambiance/, effets/, train/, interface/, habitants/, moments/,
+  saisons/, objets/, rue-haute/, besoins/, maison/
   (Ogg Vorbis, 48 kHz) et sons.json (définitions lues par le moteur);
 - games/la-petite-ligne/assets-src/son/midi/: les partitions MIDI (sources de vérité des musiques);
 - design/son/la-petite-ligne/: copies M4A des musiques et planche d'écoute ecoute.m4a, pour le client;
@@ -46,6 +47,7 @@ import moments_tour9  # noqa: E402
 import musiques  # noqa: E402
 import partition  # noqa: E402
 import saisons  # noqa: E402
+import tour10  # noqa: E402
 import train  # noqa: E402
 from catalogue import SPATIAL, Son  # noqa: E402
 
@@ -230,7 +232,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 def tous_les_sons() -> list[Son]:
     return (effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
-            + moments_tour9.sons() + bourg.sons())
+            + moments_tour9.sons() + bourg.sons() + tour10.sons())
 
 
 PLAN = {
@@ -296,6 +298,10 @@ PLAN = {
     ],
     "interior": {"description": "Dans la maisonnette: les ambiances du dehors passent derrière les murs.",
                  "ambienceLowpassHz": 900, "ambienceDb": -10.0, "rampMs": 600},
+    # Tour 10: étouffement et ambiance de pièce par bâtiment, sources du ru. Clés à part, ignorées par
+    # le schéma de sons.json tant que le dev audio (lot L5) ne les lit pas.
+    "interiorByBuilding": tour10.INTERIEURS,
+    "stream": tour10.PLAN_RU,
     "peer": {"description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués "
                             "un peu plus bas que les siens; ses sons d'interface ne s'entendent pas chez soi, "
                             "sauf le repère (ping-peer) et la proposition d'achat.",
@@ -443,6 +449,11 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["owl-screech", "grass-strike", "owl-far"],
         ["lantern-light", "lantern-out", "quay-bell-once"],
         ["coins-drop", "chantier-built", "gift-give", "coffee-grind", "clock-tick", "water-pour-copper"],
+        ["door-locked", "bakery-bell", "bread-crack", "salon-bell", "chair-creak", "scissors-snip", "hair-reveal",
+         "cup-sip", "footbridge-steps", "talk-achille", "talk-solange"],
+        ["belly-rumble", "eat-together", "yawn-soft", "nap-tick", "reunion-chime", "hair-noticed"],
+        ["beam-ridge", "room-built", "chest-full", "rack-hang", "curtain-hang", "curtain-draw"],
+        ["school-recess"],
     ]
     for groupe in groupes:
         for nom in groupe:
@@ -450,21 +461,26 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
             while f"{nom}/{k}" in apercus:
                 x = apercus[f"{nom}/{k}"]
                 if nom.endswith("loop") or nom in ("geese-rest", "crickets-night", "mist-ambience", "night-water",
-                                                   "train-slow-roll", "clock-tick"):
+                                                   "train-slow-roll", "clock-tick", "nap-tick"):
                     x = np.concatenate([x, x])[: dsp.n_ech(min(5.0, 2 * len(x) / dsp.SR))]
                     x = dsp.fondu(x, 0.01, 0.3)
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]
                 k += 1
         morceaux.append(blanc(1.2))
     for nom in ("river", "wind", "birds-morning", "crickets", "village", "rain", "rain-roof", "mist-morning",
-                "swifts", "crickets-summer", "wind-leaves", "crows"):
+                "swifts", "crickets-summer", "wind-leaves", "crows", "stream-ru", "room-tone-shop", "room-tone-salon"):
         x = apercus.get(f"{nom}/0")
         if x is None:
             continue
         extrait = dsp.fondu(np.concatenate([x[-dsp.n_ech(4):], x[:dsp.n_ech(6)]]), 0.8, 1.2)
         morceaux += [_st(extrait), blanc(0.8)]
     tout = np.concatenate(morceaux)
-    tp = dsp.crete_vraie_db(tout)
+    del morceaux
+    # Crête vraie par tranches de 10 s qui se chevauchent: le suréchantillonnage de la planche
+    # entière (15 min) demandait plusieurs gigaoctets et faisait tuer le processus.
+    pas = dsp.n_ech(10.0)
+    marge = dsp.n_ech(0.01)
+    tp = max(dsp.crete_vraie_db(tout[max(0, i - marge):i + pas + marge]) for i in range(0, len(tout), pas))
     if tp > PLAFOND_DBTP:
         tout *= 10 ** ((PLAFOND_DBTP - tp) / 20)
     wav = tmp / "ecoute.wav"
