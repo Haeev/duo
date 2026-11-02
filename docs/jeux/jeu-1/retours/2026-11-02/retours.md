@@ -28,4 +28,6 @@ Version jouée: Duo 0.2.0 avec La Petite Ligne 0.11.1, nouvelle partie.
 - S09. Plus de variété de poissons, avec une rareté en cinq niveaux: commun, rare, épique, légendaire et mythique.
 - S10. Des ombres de poissons visibles dans l'eau aux endroits où l'on peut pêcher, avec une indication discrète quand une zone a plus de chances de donner un poisson rare.
 
+- S11. Un mode plein écran pour la version Windows. Constat du manager: la touche F11 bascule déjà le plein écran sous Windows (et le choix est retenu), mais rien ne le dit à l'écran et aucun bouton ne le propose. À ajouter: un bouton ou une case « Plein écran » dans les réglages de Duo, et la touche F11 indiquée.
+
 La suite des retours arrive.
