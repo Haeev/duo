@@ -227,7 +227,7 @@
   "memories": { "maxBytes": 1536 },
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
-  "fishing": { "tier": "P1", "castRange": 6, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
+  "fishing": { "tier": "P1", "castRange": 6, "castDistance": 4, "castShoreMargin": 0.3, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
   "feel": {
     "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 },
     "fishWeightsBySeason": {

@@ -33,6 +33,7 @@ import {
 import type { Content } from '../donnees/types';
 import { safeColor } from './apparence';
 import { yawFromQuarter, type FrameContext, type PickRegistry, type PickTarget } from './contexte';
+import { lowWallGeometry, matrixToAncestor, type WallOpening } from './coupe-murs';
 import { bakeGeometry, propHints, propMatrix } from './decor';
 import { ShapeBuilder } from './geometrie';
 import type { SharedMaterials } from './materiaux';
@@ -201,6 +202,8 @@ class StagedBuilding {
   private readonly parts: BuildPart[] = [];
   private readonly fixed: Object3D[] = [];
   private readonly merges: FixedMerge[] = [];
+  /** Pied de chaque mur, montré quand le mur est coupé (R12). */
+  private readonly stubs: { part: BuildPart; stub: Object3D }[] = [];
   private readonly centre = new Vector3();
   private readonly worldFacing = new Vector3();
 
@@ -306,6 +309,77 @@ class StagedBuilding {
         this.merges.push({ model, pieces, meshes });
       }
     }
+    // Après la fusion: les pieds de mur restent hors des pièces fusionnées. Les portes des
+    // murs (éléments non toits) y deviennent des baies: les murs de l'artiste sont pleins.
+    const doors = this.elements
+      .filter((element) => !element.roof && element.facing !== null)
+      .map((element) => ({ facing: element.facing, box: this.boxInModel(element.node) }));
+    for (const part of this.parts) {
+      if (part.roof || part.facing === null) continue;
+      const model = part.owner === 'ruin' ? this.ruin : this.repaired;
+      const facing = part.facing;
+      const openings: WallOpening[] = doors
+        .filter((door) => door.facing?.equals(facing) === true && !door.box.isEmpty())
+        .map((door) => {
+          const axis = facing.x !== 0 ? 'z' : 'x';
+          return {
+            axis,
+            low: door.box.min[axis],
+            high: door.box.max[axis],
+            sill: RENDER_SETTINGS.house.doorSillHeight,
+          };
+        });
+      const stub = this.wallStub(part.node, model, openings);
+      if (stub !== null) {
+        model.add(stub);
+        this.stubs.push({ part, stub });
+      }
+    }
+  }
+
+  /** Boîte d'un nœud du modèle réparé, dans le repère du modèle (matrices locales). */
+  private boxInModel(node: Object3D): Box3 {
+    const box = new Box3();
+    const matrix = new Matrix4();
+    node.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      const geometry = object.geometry as BufferGeometry;
+      geometry.computeBoundingBox();
+      if (geometry.boundingBox === null) return;
+      matrixToAncestor(object, this.repaired, matrix);
+      box.union(geometry.boundingBox.clone().applyMatrix4(matrix));
+    });
+    return box;
+  }
+
+  /** Pied d'un mur (`coupe-murs.ts`), dans le repère du modèle; `null` s'il n'a rien de bas. */
+  private wallStub(
+    wall: Object3D,
+    model: Object3D,
+    openings: readonly WallOpening[],
+  ): Object3D | null {
+    const group = new Group();
+    group.name = `${wall.name}_pied`;
+    const toModel = new Matrix4();
+    wall.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      matrixToAncestor(object, model, toModel);
+      const geometry = lowWallGeometry(
+        object.geometry as BufferGeometry,
+        toModel,
+        RENDER_SETTINGS.house.cutWallHeight,
+        openings,
+      );
+      if (geometry === null) return;
+      const mesh = new Mesh(this.resources.track(geometry), object.material);
+      mesh.matrixAutoUpdate = false;
+      mesh.matrix.copy(toModel);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      group.add(mesh);
+    });
+    group.visible = false;
+    return group.children.length > 0 ? group : null;
   }
 
   center(): Vector3 {
@@ -368,6 +442,10 @@ class StagedBuilding {
       const base =
         part.owner === 'ruin' ? !(part.roof && state.hideRuinRoof && separate) : state.repaired;
       part.node.visible = base && !this.cutAway(part, state);
+    }
+    for (const { part, stub } of this.stubs) {
+      const base = part.owner === 'ruin' ? true : state.repaired;
+      stub.visible = base && this.cutAway(part, state);
     }
     const pulse =
       Math.sin(state.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) * GHOST_PULSE;

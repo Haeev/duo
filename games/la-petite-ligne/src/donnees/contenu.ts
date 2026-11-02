@@ -1434,6 +1434,8 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
   if (wait.length !== 2 || min === undefined || max === undefined || min > max) return r.at('biteWaitSeconds').fail('[min, max] attendu');
   return {
     castRange: r.at('castRange').number(),
+    castDistance: r.has('castDistance') ? r.at('castDistance').number() : null,
+    castShoreMargin: r.has('castShoreMargin') ? r.at('castShoreMargin').number() : 0.5,
     biteWaitSeconds: [min, max],
     hookWindowSeconds: r.at('hookWindowSeconds').number(),
     flag: r.at('flag').string(),

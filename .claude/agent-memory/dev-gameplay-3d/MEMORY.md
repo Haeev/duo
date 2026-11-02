@@ -211,6 +211,23 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Les sorties de `pnpm test:longue-vie` (`test-results/`) ne sont pas versionnées; tailles par profil dans le tableau « Taille de l'état (L-03) ».
 - Un `pnpm test` lancé avant d'ajouter un fichier de test ne l'inclut pas: relancer à la fin.
 
+## Retours de la première soirée du client (La Petite Ligne, vérifié le 2026-11-01)
+
+- Flou sous Windows (R07): le repli automatique reprenait la résolution du mode léger des tests (rapport 0,5, 640x360 au plus): image étirée deux fois sur le PC. Un tampon de rendu sous le pixel physique se voit tout de suite à 1366x768; plancher de netteté `min(dpr, 1,5)` et taille exacte par `ResizeObserver` en `device-pixel-content-box` (se redéclenche aussi quand la mise à l'échelle change). `setPixelRatio(1)` et `setSize` en pixels: tout ce qui lit la taille passe par `getDrawingBufferSize`, rien d'autre à changer.
+- Rendu logiciel: la qualité adaptative ignore les images de plus de 250 ms, donc ne se déclenche jamais sous SwiftShader. Pour voir l'état d'un PC à la peine: `rendu.html?adaptatif=1&repli=1` (`forceQualityFallback`).
+- Clip `sleep`: tête vers -Z, bassin à 0,59 m; lits de `maison.glb` tête à -Z aussi. La simulation ne tourne pas le dormeur (il garde le cap de sa marche): le rendu tire la pose du lit (`coucher.ts`).
+- Bras des personnages: 0,55 m (épaule 1,33 m). Une prise à deux mains au milieu d'un manche est hors d'atteinte dans les clips de geste de l'artiste (main gauche à 0,9 m de l'épaule): port hors geste seulement (`prise.ts`, houe sur l'épaule par `ArmReach`).
+- Sonde des os d'un clip: page temporaire dans le dossier du jeu (GLTFLoader, `SkeletonUtils.clone`, `mixer.setTime`), lue par Playwright sans WebGL; la supprimer à la fin.
+- Greffon Vite de gros plan: un `transform` sans `enforce: 'pre'` ne voyait pas le texte d'origine de `reglages.ts`; avec `enforce: 'pre'` et une expression souple (`/viewWidths:\s*\[16,/`), oui. Vérifier par `curl` du module servi.
+- Copie « avant » pour comparer: `git archive HEAD <dossiers> | tar -x -C /tmp/...`, lien du `node_modules` du jeu vers celui du worktree, serveur Vite avec `fs.strict: false`. Les ports 5191 à 5391 sont souvent pris par d'autres membres: prendre 64xx.
+- Contrôles de cohérence de la carte (`src/rendu/coherence-carte.test.ts`): pavés par le miroir processeur du shader (`paves.ts`, union douce: le raccord arrondi entre l'anneau du puits et une allée mord sur des cases qu'on croirait en terre), rails sous les bâtiments, sols posés qui débordent de leur emprise (lecture du GLB dans Node).
+- Un massif déplacé peut couper un trajet d'habitant: `python3 outils/valider_carte.py` après chaque retouche de la carte.
+- Chromium sans tête avec `deviceScaleFactor` émulé: `devicePixelContentBoxSize` reste en points CSS (1093 au lieu de 1366 à 125 %). Ne garder la boîte physique que si elle concorde avec CSS x dpr.
+- Murs de la maisonnette (`bourg.glb`): dalles pleines, la porte n'est qu'un panneau peint sur la face extérieure. Toute coupe ou pied de mur doit ouvrir la baie lui-même (bornes du nœud `…_repaired_door`).
+- Le matériau palette efface tout ce qui est devant un personnage (trou tramé), y compris l'outil qu'il tient: les outils prennent `materials.held` (même programme, `uCutCount` à 0).
+- Sable de la rivière (`riviere.ts`): il recule près de la terre ferme et laisse voir l'herbe; un chemin qui longe la grève doit être `path`, pas `land`, sinon un liseré vert apparaît.
+- `pnpm test` sous la charge des autres membres (charge 15 à 25): `beforeAll` de 120 s, tests minutés (100 ms réseau) et Chromium dépassent; relancer ces fichiers seuls avant de conclure.
+
 ## Tour 9: annonces, chantiers, catalogue (La Petite Ligne, vérifié le 2026-11-01)
 
 - Outil isolé: un heredoc qui écrit dans `/tmp` est refusé, mais `python3 - <<'EOF'` qui ouvre des fichiers relatifs du jeu passe; pour un gros script, l'écrire avec Write dans le scratchpad et le lancer avec la racine en argument. Le petit module `r.py` du scratchpad (`F(chemin).sub(ancien, nouveau)` puis `done()`, tout ou rien) évite les éditions à moitié faites.

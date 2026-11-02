@@ -19,6 +19,7 @@ import {
   type AnimationAction,
   type AnimationClip,
   type BufferGeometry,
+  type Material,
   type Object3D,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
@@ -65,6 +66,8 @@ import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 import type { EventfulPart } from './monde';
 import { ShapeBuilder } from './geometrie';
+import { sleepPose, type SleepPose } from './coucher';
+import { holdSpecFor, ToolHolder } from './prise';
 
 const SETTINGS = RENDER_SETTINGS.characters;
 /** Nom du groupe animé (squelette et maillages) dans `personnages.glb`. */
@@ -259,6 +262,9 @@ class CharacterFigure {
   /** Main droite amenée sur un point (habitant mené par une chorégraphie). */
   private readonly reach: ArmReach;
   private readonly reachTarget = new Vector3();
+  /** Prise de l'outil tenu (R08): port hors geste, prise de l'artiste pendant le geste. */
+  private readonly holder = new ToolHolder();
+  private readonly carryTarget = new Vector3();
   private reachWeight = 0;
   private idleFor = 0;
   private idleRank = 0;
@@ -510,7 +516,11 @@ class CharacterFigure {
     return true;
   }
 
-  setTool(library: ModelLibrary, model: string | null): void {
+  setTool(
+    library: ModelLibrary,
+    model: string | null,
+    swap: { palette: Material; held: Material } | null = null,
+  ): void {
     const name = model ?? '';
     if (name === this.toolName || this.hand === null) {
       return;
@@ -519,11 +529,16 @@ class CharacterFigure {
     this.tool = model === null ? null : library.instantiate(model);
     this.tool?.traverse((object) => {
       object.castShadow = true;
+      // Copie propre à l'outil: le modèle partagé de la bibliothèque garde son matériau.
+      if (swap !== null && object instanceof Mesh && object.material === swap.palette) {
+        object.material = swap.held;
+      }
     });
     if (this.tool !== null) {
       this.hand.add(this.tool);
     }
     this.toolName = name;
+    this.holder.set(model === null ? null : holdSpecFor(model, library.extras(model)));
   }
 
   private setMorph(target: string, weight: number): void {
@@ -581,7 +596,16 @@ class CharacterFigure {
       this.applyOffsets(context.time, context.dt);
       if (this.reachWeight > 0) {
         this.reach.apply(this.root, this.reachTarget, this.reachWeight);
+      } else if (this.tool !== null) {
+        // Port de l'outil hors geste: la main droite va à sa place (houe sur l'épaule).
+        const carry = this.holder.handTarget(this.root, this.currentName, context.dt, this.carryTarget);
+        if (carry > 0) {
+          this.reach.apply(this.root, this.carryTarget, carry);
+        }
       }
+    }
+    if (this.tool !== null && this.hand !== null) {
+      this.holder.place(this.root, this.hand, this.tool);
     }
     setStandingBox(
       this.pick.box,
@@ -951,6 +975,29 @@ export class CharactersPart implements EventfulPart {
     return { clip: SIT_GROUND, lift: 0 };
   }
 
+  /** Pose couchée lue par l'appelant tout de suite (réutilisée, aucune allocation). */
+  private readonly sleepPoint: SleepPose = { x: 0, y: 0, facing: 0, lift: 0 };
+
+  /** Couché dans son lit (R05): pose tirée du lit (`coucher.ts`), ou `null` s'il ne dort pas. */
+  private sleepingPose(character: DeepReadonly<Character>, world: ReadonlyWorld): SleepPose | null {
+    if (character.status !== 'sleeping' || character.bedId === null) {
+      return null;
+    }
+    const bed = world.furniture.find((piece) => piece.id === character.bedId);
+    if (bed === undefined) {
+      return null;
+    }
+    const definition = this.content.items[bed.item];
+    return sleepPose(
+      bed,
+      definition?.footprint ?? { w: 1, d: 1 },
+      this.library.extras(definition?.model ?? bed.item),
+      character.pos,
+      SETTINGS.sleepClipBackHeight,
+      this.sleepPoint,
+    );
+  }
+
   /** Position affichée pendant le glissement vers l'assise ou depuis elle, ou `null` hors glissement. */
   private readonly glidePoint = { x: 0, y: 0 };
 
@@ -1181,14 +1228,15 @@ export class CharactersPart implements EventfulPart {
           ? character.facing
           : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
       const glided = this.glide(entry, onBench, onBench ? this.benchPlace : character.pos, context);
+      const asleep = this.sleepingPose(character, world);
       entry.figure.update(
         context,
         this.terrain,
-        glided ?? (onBench ? this.benchPlace : character.prev),
-        glided ?? (onBench ? this.benchPlace : character.pos),
-        facing,
+        asleep ?? glided ?? (onBench ? this.benchPlace : character.prev),
+        asleep ?? glided ?? (onBench ? this.benchPlace : character.pos),
+        asleep?.facing ?? facing,
         request,
-        onBench ? benchLift : (seat?.lift ?? 0),
+        asleep?.lift ?? (onBench ? benchLift : (seat?.lift ?? 0)),
         this.henInFront(character, world) ? PLAYER_VARIANTS_HEN : PLAYER_VARIANTS,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
@@ -1203,6 +1251,7 @@ export class CharactersPart implements EventfulPart {
       entry.figure.setTool(
         this.library,
         fishing && !moving ? rod : showTool ? definition.model : null,
+        this.materials,
       );
     }
     // Habitants sur les bancs: la place libre la plus proche, après les joueurs assis.

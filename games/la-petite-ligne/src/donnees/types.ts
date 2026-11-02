@@ -885,6 +885,14 @@ export interface Settings {
   benches: BenchSettings;
   fishing: {
     castRange: number;
+    /**
+     * Distance visée du lancer (m, retour R09 du 2026-11-01): le bouchon se pose aussi loin
+     * dans l'eau, sans dépasser la rive d'en face (marge `castShoreMargin`); à défaut, au
+     * premier point d'eau. Sans valeur: le premier point d'eau (avant R09).
+     */
+    castDistance: number | null;
+    /** Distance gardée entre le bouchon et la fin de l'eau sur la ligne du lancer (m). */
+    castShoreMargin: number;
     biteWaitSeconds: [number, number];
     hookWindowSeconds: number;
     /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */

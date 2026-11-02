@@ -82,6 +82,12 @@ async function loadTexture(
 export interface SharedMaterials {
   /** Décor, terrain, objets, substituts: texture palette, rugosité et métal, lueur de nuit. */
   palette: MeshStandardMaterial;
+  /**
+   * Outils tenus en main (R08): la palette sans trou de visibilité. Un outil devant le corps de
+   * son porteur était effacé comme un mur qui le cache (le manche et le fer de la hache pendant
+   * le geste). Même code et même clé de programme que `palette`: aucun programme de plus.
+   */
+  held: MeshStandardMaterial;
   /** Fantômes (meuble en main, éléments à construire) et surbrillances: sans lumière, transparent. */
   ghost: MeshBasicMaterial;
   /** Eau animée de la rivière. */
@@ -355,9 +361,18 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
       );
   };
   palette.customProgramCacheKey = (): string => 'lpl_palette_cut';
+  // Lu à la compilation: suit les ajouts faits plus tard au patron de la palette (ambiance).
+  const held = resources.track(palette.clone());
+  held.name = 'palette des outils tenus';
+  held.onBeforeCompile = (shader, renderer): void => {
+    palette.onBeforeCompile(shader, renderer);
+    shader.uniforms.uCutCount = { value: 0 };
+  };
+  held.customProgramCacheKey = (): string => palette.customProgramCacheKey();
 
   return {
     palette,
+    held,
     ghost,
     water,
     silhouette,
@@ -386,6 +401,7 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
     },
     setNight(night: number): void {
       palette.emissiveIntensity = night * RENDER_SETTINGS.nightGlow;
+      held.emissiveIntensity = palette.emissiveIntensity;
     },
     setSeeThrough(holes: readonly SeeThroughHole[]): void {
       const count = Math.min(SEE_THROUGH_SLOTS, holes.length);

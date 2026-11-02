@@ -29,6 +29,8 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { preparePaletteTexture, type SharedMaterials } from './materiaux';
 import type { ResourceTracker } from './ressources';
 import { buildSubstitute, type SubstituteHints } from './substituts';
+import { RENDER_SETTINGS } from './reglages';
+import { trimGeometry } from './retouches';
 
 const MODEL_URLS = import.meta.glob<string>('../../assets/modeles/*.glb', {
   query: '?url',
@@ -166,6 +168,12 @@ export class ModelLibrary {
         nodes.set(object.name, object);
       }
       if (object instanceof Mesh) {
+        const trim = RENDER_SETTINGS.modelTrims.find((candidate) => candidate.node === object.name);
+        if (trim !== undefined) {
+          const original = object.geometry as BufferGeometry;
+          object.geometry = trimGeometry(original, trim);
+          if (object.geometry !== original) original.dispose();
+        }
         this.resources.track(object.geometry as BufferGeometry);
         object.material = this.adoptMaterial(object.material as Material);
       }

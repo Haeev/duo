@@ -136,9 +136,100 @@ export class AdaptiveQuality {
     return { kind: 'normal' };
   }
 
+  /**
+   * Dernier palier et repli définitif, sans attendre de lenteur: page de
+   * démonstration (`repli=1`), pour voir l'image d'un PC à la peine.
+   */
+  forceFallback(): QualityChange {
+    this.step = this.settings.dynamicResolution.steps.length - 1;
+    this.light = true;
+    this.returns = this.settings.autoLight.maxReturns;
+    this.changed();
+    return { kind: 'light', final: true };
+  }
+
   private changed(): void {
     this.sinceChange = 0;
     this.slowFor = 0;
     this.comfortFor = 0;
   }
 }
+
+/** Ce que le moteur sait de la surface d'affichage, pour `renderPixelSize`. */
+export interface DisplaySurface {
+  /** Taille du conteneur en points CSS. */
+  readonly cssWidth: number;
+  readonly cssHeight: number;
+  readonly devicePixelRatio: number;
+  /**
+   * Taille exacte en pixels physiques (`devicePixelContentBoxSize` du
+   * `ResizeObserver`), ou `null` si le navigateur ne la donne pas.
+   */
+  readonly devicePixels: { readonly width: number; readonly height: number } | null;
+}
+
+export interface RenderSizeSettings {
+  readonly renderer: {
+    readonly maxPixelRatio: number;
+    readonly maxPhysicalPixels: number;
+    readonly minCrispRatio: number;
+  };
+  readonly light: { readonly pixelRatio: number; readonly maxPhysicalPixels: number };
+}
+
+/**
+ * Taille du tampon de rendu (pixels), selon l'écran et la qualité.
+ *
+ * - `requestedLight`: mode léger des tests en rendu logiciel, basse résolution voulue.
+ * - Sinon: rapport plafonné (2, budget de pixels), réduit par le palier de la
+ *   résolution dynamique sans descendre sous le plancher de netteté. Le repli
+ *   automatique (ombres coupées) garde cette résolution.
+ *
+ * À la pleine résolution de l'écran, la taille est celle des pixels physiques
+ * exacts quand on la connaît: un écart d'un pixel entre le tampon et l'écran
+ * (arrondi d'une largeur CSS fractionnaire à 125 %) suffit à rééchantillonner
+ * toute l'image, donc à l'adoucir.
+ */
+export function renderPixelSize(
+  surface: DisplaySurface,
+  scale: number,
+  requestedLight: boolean,
+  settings: RenderSizeSettings = RENDER_SETTINGS,
+): { width: number; height: number; ratio: number } {
+  const cssWidth = Math.max(1, surface.cssWidth);
+  const cssHeight = Math.max(1, surface.cssHeight);
+  const dpr = surface.devicePixelRatio > 0 ? surface.devicePixelRatio : 1;
+  const area = cssWidth * cssHeight;
+  let ratio: number;
+  if (requestedLight) {
+    ratio = Math.min(settings.light.pixelRatio, Math.sqrt(settings.light.maxPhysicalPixels / area));
+  } else {
+    const r = settings.renderer;
+    const cap = Math.min(dpr, r.maxPixelRatio, Math.sqrt(r.maxPhysicalPixels / area));
+    const crisp = Math.min(cap, r.minCrispRatio);
+    ratio = Math.max(crisp, cap * scale);
+  }
+  // Boîte physique gardée seulement si elle concorde avec la taille CSS x dpr (au pixel d'arrondi
+  // près): sous Chromium sans tête, l'échelle émulée n'y est pas appliquée.
+  const native =
+    surface.devicePixels !== null &&
+    Math.abs(surface.devicePixels.width - cssWidth * dpr) <= NATIVE_SLACK &&
+    Math.abs(surface.devicePixels.height - cssHeight * dpr) <= NATIVE_SLACK
+      ? surface.devicePixels
+      : null;
+  // Pleine résolution de l'écran (à un millième près): pixels physiques exacts.
+  if (native !== null && ratio >= dpr * NATIVE_TOLERANCE) {
+    const width = Math.max(1, Math.round(native.width));
+    const height = Math.max(1, Math.round(native.height));
+    return { width, height, ratio: width / cssWidth };
+  }
+  return {
+    width: Math.max(1, Math.round(cssWidth * ratio)),
+    height: Math.max(1, Math.round(cssHeight * ratio)),
+    ratio,
+  };
+}
+
+const NATIVE_TOLERANCE = 0.999;
+/** Écart toléré entre la boîte physique et la taille CSS x dpr (pixels d'arrondi). */
+const NATIVE_SLACK = 2;
