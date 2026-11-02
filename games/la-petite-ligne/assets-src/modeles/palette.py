@@ -301,7 +301,22 @@ CHAR_ROWS = {
         "extra_a": "#3C362F", "extra_b": "#4A443D", "metal": "#8F8A82", "cheek": "#8E7A6A",
     },
 }
-CHAR_ROW_ORDER = ["player_a", "player_b", "firmin", "odette", "basile", "jeanne", "lucie", "driver", "stoker"]
+# Tour 10: Achille Pradel (boulanger: chemise blanche, tablier fariné, calot de mitron) et Solange Mérigot
+# (coiffeuse et mercière: blouse sauge à poches, jupe prune, ciseaux à la ceinture, lunettes au cou)
+CHAR_ROWS["achille"] = {
+    "skin": "#E6B892", "skin_shade": "#CB9874", "hair": "#4E3A2C", "hair_dark": "#35271E",
+    "eye": "#2A2522", "mouth": "#86453E", "top": "#EEE8DC", "top_trim": "#D9D1C2",
+    "bottom": "#55606E", "shoes": "#3B302A", "scarf": "#B5483C", "scarf_mark": "#EEE8DC",
+    "extra_a": "#F2EEE4", "extra_b": "#E2DACB", "metal": "#C8A150", "cheek": "#E3907E",
+}
+CHAR_ROWS["solange"] = {
+    "skin": "#EDC3A0", "skin_shade": "#D4A080", "hair": "#9A4A2C", "hair_dark": "#6E331E",
+    "eye": "#2A2522", "mouth": "#A3434A", "top": "#7FA595", "top_trim": "#F1EAD9",
+    "bottom": "#5B3F5A", "shoes": "#3A2E2A", "scarf": "#E7C05A", "scarf_mark": "#5B3F5A",
+    "extra_a": "#B33E3A", "extra_b": "#2E2A28", "metal": "#B9BEC2", "cheek": "#E99289",
+}
+CHAR_ROW_ORDER = ["player_a", "player_b", "firmin", "odette", "basile", "jeanne", "lucie", "driver", "stoker",
+                  "achille", "solange"]
 
 # Choix proposés à la création du personnage (démo: quatre tenues).
 PLAYER_PRESETS = {
@@ -313,6 +328,18 @@ PLAYER_PRESETS = {
     },
     "skins": ["#F2CDB0", "#E8BE9A", "#D29E78", "#B9825C", "#8E5C3E", "#6A4430"],
     "hairs": ["#2E2622", "#4F3626", "#6B4A33", "#A0663A", "#C9A267", "#B8B2AA"],
+    # Tour 10 (conception 2.2): huit couleurs de cheveux, `hairColor` 0 à 7, (cheveux, cheveux sombres); valeurs
+    # proposées par l'artiste 3D, à arrêter par le directeur artistique (lisibles sur les quatre saisons et la nuit)
+    "hair_colors": [
+        {"id": "black", "hair": "#2B2522", "hair_dark": "#1A1614"},
+        {"id": "brown", "hair": "#4F3626", "hair_dark": "#36251A"},
+        {"id": "chestnut", "hair": "#7A5236", "hair_dark": "#563823"},
+        {"id": "auburn", "hair": "#8E3F28", "hair_dark": "#652B1B"},
+        {"id": "red", "hair": "#C2622E", "hair_dark": "#93461E"},
+        {"id": "straw_blond", "hair": "#D8B46A", "hair_dark": "#B08A48"},
+        {"id": "grey", "hair": "#9A958E", "hair_dark": "#75706A"},
+        {"id": "white", "hair": "#E8E4DC", "hair_dark": "#C4BEB4"},
+    ],
     # Couleurs de profil Duo (design/identite/b/joueurs.json): foulard, et symbole en « on ».
     "scarves": {
         "orb": "#5CE1E6", "crescent": "#8D6CFF", "star": "#D4F27A",

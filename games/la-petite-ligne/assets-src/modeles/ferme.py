@@ -414,6 +414,18 @@ def item_beam(A):
     return g
 
 
+def item_ridge_purlin(A):
+    """Panne faîtière de chêne équarrie, 16 x 20 cm, 4,9 m, tenons aux deux bouts (ferme et poinçon du pignon)."""
+    g = A.geo()
+    g.box((0.16, 4.9, 0.2), color="wood", base=True, bevel=0.015)
+    for s in (1, -1):
+        g.box((0.14, 0.006, 0.18), loc=(0, s * 2.45, 0.1), color="log_end")
+        g.box((0.06, 0.1, 0.12), loc=(0, s * 2.5, 0.1), color="wood")
+    for y in (-1.6, -0.2, 1.1, 2.0):
+        g.box((0.004, 0.6, 0.004), loc=(0.081, y, 0.12), color="wood_dark")
+    return g
+
+
 def item_nail_box(A):
     g = A.geo()
     g.box((0.14, 0.09, 0.05), color="wood_new", base=True, bevel=0.004)
@@ -636,6 +648,9 @@ def main():
     A.add("log", item_log(A), {"kind": "item"})
     A.add("plank", item_plank(A), {"kind": "item"})
     A.add("beam", item_beam(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78})
+    # tour 10: la panne faîtière de la chambre (4,9 m), portée à deux comme la poutre du jour 1
+    A.add("ridge_purlin", item_ridge_purlin(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78,
+                                                 "length_m": 4.9})
     A.add("nail_box", item_nail_box(A), {"kind": "item"})
     for kind in ("gudgeon", "chub", "trout"):
         A.add("fish_" + kind, fish(A, kind), {"kind": "item"})

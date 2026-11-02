@@ -8,8 +8,8 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 
 | Fichier | Contenu | Animations |
 |---|---|---|
-| `personnages.glb` | squelette `rig`, pièces des joueurs, quatre habitants de la démo et Lucie (hors démo) | 27 clips sur le squelette |
-| `bourg.glb` | bâtiments, voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière | aucune (pièces mobiles en nœuds à part) |
+| `personnages.glb` | squelette `rig`, pièces des joueurs (15 coupes, barbes et moustache), quatre habitants de la démo, Lucie (hors démo), Achille et Solange (tour 10) | clips sur le squelette |
+| `bourg.glb` | bâtiments (tour 10: rue Haute, intérieurs de l'épicerie et de la mercerie, cellier et chambre), voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière, passages du ru | aucune (pièces mobiles en nœuds à part) |
 | `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poissons, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
@@ -184,10 +184,74 @@ Palette: cases ajoutées en fin de liste (`palette.py` et `src/rendu/palette.ts`
 
 Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas le jeu): de jour, mûres, sureau et cèpes dépassent 3 pour 1 vus du sud, noisettes autour de 2,3; au soleil couchant simulé, 1,6 à 2,3. Les grappes et les ombelles sont sur la face sud (consigne de la conception): vues du nord, elles sont cachées par le buisson. Le jugement final se fait sur captures du jeu (directeur artistique).
 
+## Tour 10: rue Haute, intérieurs, pièces de la maison, rangement, rideaux, coiffures (`docs/jeux/jeu-1/tour-10-conception.md`)
+
+Sources: `interieurs.py` (épicerie et mercerie, appelé par `bourg.py`), `rue_haute.py` (fournil, maison de Lucie, école-mairie, passages du ru), `pieces.py` (cellier, chambre, fenêtres, murs à porte percée), `maison_t10.py` (par `maison.py`), `coiffures.py` (par `personnages.py`), `ferme.py` (panne faîtière). Contrôles: `verifier/vue_interieur.py` (bâtiment vu comme par le joueur qui est dedans: `cut_nodes` retirés, murs côté caméra coupés), `verifier/vue_pieces.py` (maisonnette et pièces: `--etat bati | chantier | site | coupe`), `verifier/quatre_tour10.sh`, `verifier/quatre_maison_t10.sh`, `planche_coiffures.py <dossier> coupes | poses | habitants`, `verifier/coiffures_couche.py` (coupes en pose `sleep`, mesure), `verifier/nettoyer_tour10.sh`. Planches: `docs/jeux/jeu-1/gauntlet/captures/tour-10/modeles/`.
+
+### Bâtiments visitables (ADR 0016)
+
+Règle commune des nœuds (sous la racine du bâtiment, enfants directs): `<id>_floor` (sol, jamais coupé), `<id>_wall_front | back | left | right` (murs du rez-de-chaussée, coupés quand ils regardent la caméra: le jeu calcule le côté par la boîte englobante, comme la maisonnette), les nœuds de l'extra `cut_nodes` (toit, étage ou comble: retirés en entier quand le joueur local est dedans), `<id>_interior` (tout le contenu fixe en un maillage, masqué tant que le joueur local n'est pas dans ce bâtiment), `<id>_door` (vantail, pivot sur le jambage gauche vu de dehors, dans le plan intérieur du mur, tourner autour de Y pour l'ouvrir vers l'intérieur). Les murs sont vraiment percés (fenêtres vitrées vues des deux côtés, portes ouvertes).
+
+Extras: `interior` (pièces en repère glTF du bâtiment: x le long de la façade, z vers la façade), `interior_spots` (points de jeu, repère glTF x, z, à tourner avec l'objet de la carte), `interior_blocked` (cases occupées par le mobilier fixe: coin [x, z] le plus petit de chaque case, repère glTF), `seat_height`, `bench_seat_height`.
+
+- `ferrand_shop` (épicerie-pension d'Odette, 10 x 8, rotation 1 sur la carte): repris avec un intérieur. Pour que la boutique tienne ses 6 x 6 cases, la façade avance de 0,75 m (nu extérieur en x 30,35 sur la carte) et les murs tiennent dans les cases du pourtour; l'aspect extérieur ne change pas (store, étal, enseigne, étage et toit repris). Boutique: glTF x -4 à 2, z -3 à 3, soit **y 26 à 31** sur la carte (la conception dit 27 à 31: décalée d'une rangée pour que la case 6 de la façade, le guichet `grocery_counter` en y 26,5, soit dans la boutique); salle à manger de la pension: y 24 et 25 (glTF x 2 à 4), vue par la porte entrouverte de la cloison, non jouable. Contenu: comptoir en retour perpendiculaire à la façade (Odette entre lui et la cloison, au guichet de la vitrine), présentoir de bocaux sous la vitrine, balance, panière d'Achille au bout du comptoir, rayonnages au fond, au sud et sur la cloison, sacs de graines près de la porte (hors du battant), poêle de fonte et son tuyau, petite table ronde et deux chaises (`grocery_table`), escalier de 15 marches de 18,5 cm sur 23 cm le long de la cloison vers les chambres (placard fermé dessous, main courante), deux tables et quatre chaises sous des draps dans la salle à manger. `cut_nodes`: `ferrand_shop_roof`, `ferrand_shop_upper` (étage, avec le plafond du rez-de-chaussée). Porte de derrière (`ferrand_shop_back_door`) côté salle à manger. Lucarnes refaites: joues et toit prolongés jusqu'au pan (leur toit flottait de 10 à 20 cm au-dessus du pan à l'arrière).
+- `haberdashery` (mercerie-coiffure de Solange, 7 x 7, rotation 1, porte en case 3 sur la rue Haute): un niveau, faîtage à 4,7 m, tuiles, crépi rose, menuiseries bleues. Vitrine sur la rue Haute et vitrine au nord sur la rue de la halte, enseigne peinte (MERCERIE, COIFFURE) sur le pignon nord, vue en arrivant de la halte. Intérieur de 5 x 5 m: coin coiffure au sud (grand miroir, tablette avec flacons, ciseaux et la place du peigne `spot_horn_comb`, dans le nœud du mur sud: coupé avec lui, il ne reste pas en l'air), fauteuil de coiffure à pied tourné vers le miroir (`salon_chair`, assise à 0,5 m), banc d'attente à deux places au fond qui voit le fauteuil de biais (`salon_bench`, assise 0,45), comptoir de mercerie au nord (Solange côté fond, `salon_counter`), rayonnage de tissus en rouleaux sur le mur nord, mannequin habillé et rouleaux dans la vitrine nord, chaise de couture de Solange tournée vers cette vitrine (`salon_window`, le lundi), présentoir de chapeaux dans la vitrine de la rue Haute, porte-manteau, plante. Solange loge sous le toit (la conception dit « derrière la boutique »: l'emprise de 7 x 7 n'a pas de place derrière): échelle de meunier de 12 marches contre le mur du fond vers une trappe du comble, lucarne de sa chambre sur le pan arrière. `cut_nodes`: `haberdashery_roof`, `haberdashery_attic`.
+
+### Rue Haute et passages du ru (non visitables à ce tour)
+
+- `bakery` (fournil, 7 x 6, rotation 0): pierre, tuiles, porte en case 5, guichet en case 3 (tablette de chêne dehors, volet rabattu, deux miches en vitrine, `spot_hourglass` pour le sablier), auvent sur consoles au-dessus des deux (dessous à 2,3 m), porte des sacs au pignon ouest (côté halte et quai), enseigne peinte (BOULANGERIE) sur ce pignon (en façade, la rive du toit descend à 2,77 m juste au-dessus de l'auvent), miche de fer forgé au coin. Le four du grand-père dépasse à l'arrière côté voie sous un toit à un pan, avec sa cheminée de 6,4 m et un tas de fagots; logement d'Achille sous le toit (lucarne au sud, volets).
+- `lucie_house` (6 x 6, rotation 3, porte en case 2): un niveau, faîtage à 4,0 m, crépi crème, volets verts, boîte aux lettres jaune de la factrice; jardinet clos derrière dans l'emprise (palissade blanche, fleurs, rang de salades), porte de derrière.
+- `school` (école-mairie, 11 x 5, rotation 0): cour à l'ouest (5,4 x 5 m, murs de 1,8 m chaperonnés, portail de 2,4 m en case 3, dans l'axe de la rue Haute, vantaux ouverts le jour, tilleul et banc), mairie-école à l'est en retrait de 0,9 m (perron de trois marches de 15 x 28 cm, plaque MAIRIE, porte de la classe sur la cour avec plaque ECOLE, hautes fenêtres, clocheton sur le faîtage côté cour). Un retour de mur ferme la cour jusqu'à l'angle de la mairie.
+- Passages (le ru coule le long de Z glTF; extra `flow_axis` "z"): `culvert` (ponceau sous la voie: voûte de 1,5 m, têtes arasées à 4 cm, rien dans le gabarit du train, lit à -0,95 m), `street_bridge` (tablier pavé au niveau de la rue, 2,2 m entre parapets de 0,65 m, arche de 2 m, dés en bout), `footbridge` (passerelle de 1,6 m hors tout, platelage à 0,16 m sur deux poutres et dés de pierre, abouts en pente, garde-corps côté aval au sud, +Z glTF), `ford_stones` (quatre dalles à un pas de saut, dessus à -0,12 m). Les culées et le lit descendent à -0,95 m: le terrain du jeu doit laisser le creux du ru.
+- Pas de modèle de pommier (verger derrière la maison de Lucie): non demandé à ce lot, à faire si le level designer le veut.
+
+### Maison qui grandit (`bourg.glb`)
+
+- `gatekeeper_cellar` et `gatekeeper_bedroom`: même origine et même rotation que `gatekeeper_house`. Extras: `elements` (dans l'ordre de la conception 4.3: nœuds, planches, clous, supports `needs`), `site_nodes` (dès le matin du site), `built_nodes` (tuiles et porte, au matin de `room_built`), `cut_nodes`, `interior`, `footprint_world`. Fantôme = nœuds des éléments en transparence (règle de la maisonnette).
+  - Cellier: appentis de planches contre le pignon ouest, emprise x 2 à 4 et y 21 à 26, pièce x 3 et 4, y 22 à 25, sol de dalles à 0,12 m (au niveau du plancher). **Toit à deux petits pans, faîtage à 2,6 m perpendiculaire au pignon**, et non à un pan: un pan unique de 2,6 m sur toute la largeur passe par-dessus les coins de la rive ouest du toit de la maison (dessous à 2,1 m aux angles); abaissé dessous, il devient trop plat pour la tuile et trop bas pour la tête (1,71 m libres dans l'allée). Égouts à 1,95 m au nord et au sud, pignon de planches à l'ouest; fenestron au nord (0,4 x 0,3 m). Éléments: 2 poteaux, sablières (nord et sud, un élément), pignon ouest, murs nord et sud (un élément, deux nœuds), charpente du toit (panne, chevrons, voliges); tuiles (`gatekeeper_cellar_roof`) et porte de planches dans l'ancienne fenêtre ouest la nuit suivante. `rack_spots`: deux places d'étagère haute dos au pignon ouest (cases (3, 22-23) et (3, 24-25)).
+  - Chambre: aile nord à pans de bois et bardage, emprise x 5 à 11 et y 16 à 21, pièce x 6 à 10 et y 17 à 20, plancher. Toit de lauzes (comme la maison) à deux pans perpendiculaire à celui de la maison, raccordé à son pan nord par deux noues; **égouts à 2,0 m**: les sablières et les murs passent sous le débord nord du toit de la maison (dessous à 2,03 m au bord) sans le toucher, et l'aile se glisse sous l'avant-toit vers l'égout. Fenêtres au nord et à l'est. La ferme est juste au nord du débord (y 2,78 du repère); la panne faîtière va d'elle au poinçon du pignon nord (4,8 m; extra `ridge_purlin`, dessus de la panne posée). Éléments: 4 poteaux, 2 sablières, 4 pans (ouest, est, nord, pignon nord), la ferme et la panne (après le porter), le plancher; solin de pierre au matin du site. `furniture_spots`: lit double (tête au nord), commode, fauteuil.
+- `gatekeeper_house_wall_left_door`, `gatekeeper_house_wall_back_door` (enfants de `gatekeeper_house`, hors des états): murs ouest et nord de la maisonnette réparée, fenêtre devenue porte (0,9 x 2,05 m au droit de l'ancienne fenêtre, linteau gardé, jambages de pierre). À montrer à la place de `gatekeeper_house_repaired_wall_left` ou `_back` une fois la pièce bâtie.
+- Maisonnette: la fenêtre ouest est déplacée de 20 cm (centrée sur la case y 24 de la future porte du cellier); les cinq fenêtres de la pièce réparée se voient aussi de dedans (embrasure, vitre, dormant, tablette), pour y accrocher les rideaux.
+- `window_1` à `window_8` (nœuds vides sous `gatekeeper_house`, centre de la fenêtre au nu intérieur du mur, repère de la maisonnette), et l'extra `windows` de la racine avec, pour chacun: `room`, `side`, `width`, `height`, `sill_y`, `inward`, `curtains`, `becomes_door` (3 devient la porte de la chambre, 4 celle du cellier), `refusal` (fenestron du cellier). 1 et 2 au sud, 3 au nord, 4 à l'ouest, 5 à l'est, 6 fenestron du cellier, 7 et 8 chambre (nord, est).
+- `ridge_purlin` (`ferme.glb`): panne faîtière de 4,9 m, portée à deux comme `beam` (extra `carry_height` 1,78).
+
+### Rangement et rideaux (`maison.glb`)
+
+- `oak_chest` (1 x 1, 0,85 m, 32 cases), `cellar_rack` (2 x 1 dos au mur, 1,68 m sous les chevrons du cellier, 12 cases), `tool_rack` (râtelier mural, 12 crochets, extra `hook_spots`).
+- `curtains_window`: `curtains_rod` et, pour chaque article de la mercerie (`curtains`, `curtains_blue`, `curtains_red`, `curtains_yellow`, `curtains_green`, `curtains_gingham`), `<article>_open` (pans plissés retenus par une embrasse) et `<article>_closed`. Origine au centre de la fenêtre (`window_<n>`), la pièce vers +Z glTF; faits pour 0,75 x 0,9 m: échelle X = width / 0,75, Y = height / 0,9. Une couleur par paire de nœuds (un seul matériau par fichier). L'ancien `curtains` mural reste tel quel tant que le rendu l'utilise.
+
+### Personnages (`personnages.glb`)
+
+- `villager_achille` (rangée `achille`): boulanger rond et lent, chemise blanche aux manches retroussées, grand tablier fariné à bavette, calot de mitron, moustache, pantalon de toile. `villager_solange` (rangée `solange`): blouse sauge à deux poches sur une jupe prune, chignon roux de théâtre, ciseaux pendus au côté droit, lunettes au cou sur leur cordon. Squelette commun, mêmes expressions et clips.
+- Coupes: `player_hair_crop`, `curls`, `ponytail`, `braid`, `pigtails`, `wavy`, `long`, `fringe`, `quiff`, `cloud`, `crown`, `bob_long` (avec les trois existantes, 15). Pilosité, au choix de chacun, couleur des cheveux: `player_beard_short`, `player_beard_full`, `player_mustache` (une pièce de plus à montrer avec la coupe). La tresse et la queue de cheval descendent sur l'os `neck`; la tresse et le pan du long dans le dos passent à droite du pan du foulard.
+- Couleurs: `PLAYER_PRESETS["hair_colors"]` de `palette.py` (`hairColor` 0 à 7: noir, brun, châtain, auburn, roux, blond paille, gris, blanc), une paire (`hair`, `hair_dark`) à écrire dans la rangée du joueur, comme les autres couleurs. Valeurs proposées, à arrêter par le directeur artistique; non reportées dans `src/` (hors du lot).
+- Couché (`sleep`, mesuré par `verifier/coiffures_couche.py`): la plupart des coupes nouvelles restent à moins de 1,5 cm des coupes existantes sous la tête; `cloud` (-10 cm sous `short`), `long` et `ponytail` (-8 cm) et `braid` (-7 cm) s'enfoncent dans l'oreiller. À traiter au rendu (voir le compte rendu du tour 10) ou par un clip de coucher propre aux coupes longues.
+
+### Budgets du tour 10 (bible 8.8; contenu des intérieurs compté à part, invisible hors de l'intérieur)
+
+| Nœud | Triangles | Plafond | Remarque |
+|---|---|---|---|
+| `ferrand_shop` (coque) | 4 976 | 5 000 | contenu `ferrand_shop_interior` 6 560 |
+| `haberdashery` (coque) | 3 288 | 5 000 (boutique) | contenu 2 964 |
+| `bakery` | 4 348 | 5 000 | four et cheminée compris |
+| `lucie_house` | 3 480 | 3 000 | jardinet clos compris (520): au-dessus du plafond d'un petit bâtiment, signalé |
+| `school` | 5 044 | 5 000 | cour, murs, tilleul et portail compris (912): 44 au-dessus, signalé |
+| `culvert`, `street_bridge`, `footbridge`, `ford_stones` | 336, 804, 484, 96 | 900 | |
+| `gatekeeper_cellar` | 1 332 | 3 000 | |
+| `gatekeeper_bedroom` | 2 264 | 3 000 | |
+| `gatekeeper_house` (deux états, murs à porte, fenêtres de dedans) | 8 256 | 3 000 par état | état réparé 4 188 (3 768 avant les fenêtres vues de dedans), murs à porte 728 à part: déjà au-dessus avant ce tour, signalé |
+| `oak_chest`, `cellar_rack`, `tool_rack` | 276, 840, 352 | 900 | |
+| un état de rideaux (une couleur) | 190 à 430 | 900 | `curtains_window` entier: 5 636 |
+| `ridge_purlin` | 140 | 900 | |
+| `villager_achille`, `villager_solange` | 1 854, 2 050 | 3 600 | |
+| coupes nouvelles | 148 à 432 | celles de la conception 2.1 | joueur complet au plus 2 006 - 316 + 432 + 308 (barbe) = 2 430 < 3 200 |
+
+Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `personnages.glb` 3,9 Mo (2,8), `maison.glb` 1,4 Mo (0,9). Le total dépasse 13 Mo: la compression Meshopt (README, Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
+
 ## Fiche par modèle
 
 
-### `personnages.glb` (2706 Ko)
+### `personnages.glb` (3768 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -198,6 +262,21 @@ Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas 
 | `player_hair_short` | 316 |
 | `player_hair_bob` | 352 |
 | `player_hair_bun` | 380 |
+| `player_hair_crop` | 148 |
+| `player_hair_curls` | 388 |
+| `player_hair_ponytail` | 328 |
+| `player_hair_braid` | 396 |
+| `player_hair_pigtails` | 432 |
+| `player_hair_wavy` | 352 |
+| `player_hair_long` | 400 |
+| `player_hair_fringe` | 280 |
+| `player_hair_quiff` | 236 |
+| `player_hair_cloud` | 432 |
+| `player_hair_crown` | 432 |
+| `player_hair_bob_long` | 380 |
+| `player_beard_short` | 224 |
+| `player_beard_full` | 308 |
+| `player_mustache` | 72 |
 | `player_scarf_orb` | 212 |
 | `player_scarf_crescent` | 256 |
 | `player_scarf_star` | 204 |
@@ -209,6 +288,8 @@ Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas 
 | `villager_basile` | 2166 |
 | `villager_jeanne` | 2054 |
 | `villager_lucie` | 1986 |
+| `villager_achille` | 1854 |
+| `villager_solange` | 2050 |
 | `villager_firmin_scarf` | 232 |
 | `rail_crew_driver` | 1470 |
 | `rail_crew_stoker` | 1514 |
@@ -252,7 +333,7 @@ Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas 
 | `driver_lean` | 3.0 | oui |
 | `driver_wave` | 1.067 | oui |
 
-### `ferme.glb` (1066 Ko)
+### `ferme.glb` (1076 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -300,6 +381,7 @@ Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas 
 | `log` |  | 216 | kind: "item" |
 | `plank` |  | 68 | kind: "item" |
 | `beam` |  | 104 | kind: "carried", length_axis: "z", carry_height: 1.78 |
+| `ridge_purlin` |  | 140 | kind: "carried", length_axis: "z", carry_height: 1.78, length_m: 4.9 |
 | `nail_box` |  | 356 | kind: "item" |
 | `fish_gudgeon` |  | 284 | kind: "item" |
 | `fish_chub` |  | 140 | kind: "item" |
@@ -311,14 +393,20 @@ Lisibilité mesurée (`captures/tour-09/modeles-zoom1.json`, rendu Blender, pas 
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (3814 Ko)
+### `bourg.glb` (6029 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
 | `station` | 10 x 6 | 4016 | door_cell: 4 |
 | `platform` | 30 x 4 | 3328 | walk_height: 0.4, track_side: "-z", note: "bord côté voie vers -Z (arrière); marquise centrée sur 10 m" |
-| `gatekeeper_house` | 7 x 6 | 7108 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
-| `ferrand_shop` | 10 x 8 | 4664 | door_cell: 2, counter_cell: 6 |
+| `gatekeeper_house` | 7 x 6 | 8256 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
+| `gatekeeper_cellar` |  | 1332 | room: "room_cellar", attach: "gatekeeper_house (même origine, même rotation)", footprint_world: {"x": [2, 5], "y": [21, 27]}, interior: {"x": [-5.5, -2.8], "z": [-2.0, 2.0], "floor_y": 0.12}, elements: [{"id_hint": "post_1", "nodes": ["gatekeeper_cellar_post_1"], "planks": 2, "nails": 1}, {"id_hint": "post_2", "nodes": ["gatekeeper_cellar_post_2"], "planks": 2, "nails": 1}, {"id_hint": "plate", "nodes": ["gatekeeper_cellar_plate"], "planks": 3, "nails": 2, "needs": ["post_1", "post_2"]}, {"id_hint": "wall_1", "nodes": ["gatekeeper_cellar_wall_left"], "planks": 3, "nails": 1, "needs": ["plate"]}, {"id_hint": "wall_2", "nodes": ["gatekeeper_cellar_wall_back", "gatekeeper_cellar_wall_front"], "planks": 3, "nails": 1, "needs": ["plate"]}, {"id_hint": "roof", "nodes": ["gatekeeper_cellar_roof_frame"], "planks": 3, "nails": 2, "needs": ["wall_1", "wall_2"]}], built_nodes: ["gatekeeper_cellar_roof", "gatekeeper_cellar_door"], site_nodes: ["gatekeeper_cellar_floor"], cut_nodes: ["gatekeeper_cellar_roof", "gatekeeper_cellar_roof_frame"], rack_spots: [{"x": -5.0, "z": -1.0, "facing": "+x", "cells": [[3, 22], [3, 23]]}, {"x": -5.0, "z": 1.0, "facing": "+x", "cells": [[3, 24], [3, 25]]}], note: "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_left_door à la place de gatekeeper_house_repaired_wall_left. rack_spots: les deux places d'étagère haute, dos au pignon ouest (cases de la carte pour la maisonnette en (8,5 ; 24), rotation 0)" |
+| `gatekeeper_bedroom` |  | 2264 | room: "room_bedroom", attach: "gatekeeper_house (même origine, même rotation)", footprint_world: {"x": [5, 12], "y": [16, 22]}, interior: {"x": [-2.5, 2.5], "z": [-7.0, -2.3], "floor_y": 0.12}, elements: [{"id_hint": "post_1", "nodes": ["gatekeeper_bedroom_post_1"], "planks": 2, "nails": 1}, {"id_hint": "post_2", "nodes": ["gatekeeper_bedroom_post_2"], "planks": 2, "nails": 1}, {"id_hint": "post_3", "nodes": ["gatekeeper_bedroom_post_3"], "planks": 2, "nails": 1}, {"id_hint": "post_4", "nodes": ["gatekeeper_bedroom_post_4"], "planks": 2, "nails": 1}, {"id_hint": "plate_1", "nodes": ["gatekeeper_bedroom_plate_1"], "planks": 3, "nails": 1, "needs": ["post_1", "post_2", "post_3", "post_4"]}, {"id_hint": "plate_2", "nodes": ["gatekeeper_bedroom_plate_2"], "planks": 3, "nails": 1, "needs": ["post_1", "post_2", "post_3", "post_4"]}, {"id_hint": "wall_1", "nodes": ["gatekeeper_bedroom_wall_left"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_2", "nodes": ["gatekeeper_bedroom_wall_right"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_3", "nodes": ["gatekeeper_bedroom_wall_back"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_4", "nodes": ["gatekeeper_bedroom_wall_back_gable"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "truss_ridge", "nodes": ["gatekeeper_bedroom_truss"], "planks": 4, "nails": 2, "needs": ["wall_1", "wall_2", "wall_3", "wall_4"], "after_carry": "ridge_purlin"}, {"id_hint": "floor", "nodes": ["gatekeeper_bedroom_floor"], "planks": 6, "nails": 2}], built_nodes: ["gatekeeper_bedroom_roof", "gatekeeper_bedroom_door"], site_nodes: ["gatekeeper_bedroom_sill"], cut_nodes: ["gatekeeper_bedroom_roof", "gatekeeper_bedroom_truss", "gatekeeper_bedroom_wall_back_gable"], ridge_purlin: {"from": [0.0, 3.52, -2.78], "to": [0.0, 3.52, -7.6], "length": 4.82, "note": "dessus de la panne posée (repère de la maisonnette): là où le porter à deux l'amène"}, furniture_spots: {"double_bed": [-1.25, -5.9], "dresser": [1.75, -6.65], "armchair": [1.9, -3.4]}, note: "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_back_door à la place de gatekeeper_house_repaired_wall_back" |
+| `ferrand_shop` | 10 x 8 | 11536 | door_cell: 2, counter_cell: 6, cut_walls: true, cut_nodes: ["ferrand_shop_roof", "ferrand_shop_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "shop", "x": [-4.0, 2.0], "z": [-3.0, 3.0]}, {"id": "dining", "x": [2.0, 4.0], "z": [-3.0, 3.0], "walkable": false, "note": "vue par la porte entrouverte de la cloison; pas de case jouable"}]}, note: "façade à l'est sur la carte (rotation 1); murs du rez-de-chaussée coupés selon la caméra, ferrand_shop_upper et ferrand_shop_roof retirés en entier, ferrand_shop_floor jamais coupé" |
+| `haberdashery` | 7 x 7 | 6252 | door_cell: 3, cut_walls: true, cut_nodes: ["haberdashery_roof", "haberdashery_attic"], interior: {"x": [-2.5, 2.5], "z": [-2.5, 2.5], "floor_y": 0.12}, note: "façade à l'est sur la carte (rotation 1): +X glTF = nord. Murs coupés selon la caméra, haberdashery_roof et haberdashery_attic retirés en entier, haberdashery_floor jamais coupé" |
+| `bakery` | 7 x 6 | 4348 | door_cell: 5, window_cell: 3, spots: {"bakery_window": [0.0, 3.0], "bakery_door": [1.9, 3.0], "sacks_door": [-3.6, 0.6], "spot_hourglass": [0.45, 2.7]}, note: "porte en case 5, guichet en case 3 (le point bakery_window se tient dehors, devant le guichet, sous l'auvent); porte des sacs au pignon ouest; four et cheminée côté voie (nord). spots: repère glTF x, z du bâtiment; spot_hourglass: rebord du guichet, où poser le sablier offert" |
+| `lucie_house` | 6 x 6 | 3480 | door_cell: 2, spots: {"lucie_house_door": [-0.5, 3.2]}, note: "façade à l'ouest sur la carte (rotation 3); jardinet clos à l'arrière (est), dans l'emprise" |
+| `school` | 11 x 5 | 5044 | door_cell: 3, spots: {"school_gate": [-2.0, 3.0], "town_hall_door": [2.7, 2.9]}, note: "portail de la cour en case 3 (dans l'axe de la rue Haute), porte de la mairie en case 8; la classe s'ouvre sur la cour" |
 | `firmin_house` | 7 x 6 | 4524 | door_cell: 3 |
 | `sawmill` | 10 x 8 | 1944 | door_cell: 5 |
 | `handcar_shed` | 6 x 5 | 1480 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
@@ -389,6 +477,10 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `river_ford` | 4 x 8 | 340 | flow_axis: "x", water_y: -0.3, note: "module de 4 m le long de X; l'eau est le nœud *_water (animable à part)" |
 | `river_curve` | 10 x 10 | 160 | water_y: -0.3, radius: 6.0 |
 | `pontoon` | 2 x 3 | 906 | walk_height: 0.5 |
+| `culvert` | 4 x 3 | 336 | flow_axis: "z", note: "ponceau sous la voie: têtes de pont arasées à 4 cm, voûte de 1,5 m, lit à -0,95 m; à poser sous rail_straight, centré sur le ru" |
+| `street_bridge` | 4 x 3 | 804 | flow_axis: "z", walk_height: 0.02, deck_width: 2.2, note: "pont de la rue: tablier pavé au niveau de la rue (2,2 m entre parapets), parapets de 0,35 m hors des deux rangées de pavés" |
+| `footbridge` | 4 x 2 | 484 | flow_axis: "z", walk_height: 0.16, deck_width: 1.5, note: "passerelle: platelage à 0,16 m, garde-corps au sud (+Z glTF, côté aval)" |
+| `ford_stones` | 2 x 1 | 96 | flow_axis: "z", walk_height: -0.12, note: "gué de pierres plates: quatre dalles, dessus à -0,12 m" |
 | `tree_oak` |  | 358 | alias_of: "tree_oak_large" |
 | `tree_fir` |  | 174 | alias_of: "tree_fir_large" |
 | `bush` |  | 100 | alias_of: "bush_round" |
@@ -406,7 +498,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
 Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 
-### `maison.glb` (890 Ko)
+### `maison.glb` (1329 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -432,6 +524,10 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `coop_calendar` | 1 x 1 | 832 | wall: true, seasons: {"spring": "coop_calendar_spring", "summer": "coop_calendar_summer", "autumn": "coop_calendar_autumn", "winter": "coop_calendar_winter"}, note: "n'afficher que la gravure de la saison (enfant coop_calendar_<saison>)" |
 | `wall_clock` | 1 x 1 | 608 | wall: true, note: "wall_clock_hour et wall_clock_minute: tourner autour de leur axe Z local (vers la pièce) selon l'heure du jeu, sens horaire vu de face; wall_clock_pendulum: pivot en haut, osciller de +-8 degrés autour de Z, une seconde par battement (tic-tac)" |
 | `wicker_armchair` | 1 x 1 | 748 | seat_height: 0.42 |
+| `oak_chest` | 1 x 1 | 276 | storage_cells: 32 |
+| `cellar_rack` | 2 x 1 | 840 | wall: true, storage_cells: 12, note: "seulement aux deux places du cellier (rack_spots de gatekeeper_cellar), dos au pignon ouest" |
+| `tool_rack` | 2 x 1 | 352 | wall: true, hook_spots: [[-0.715, 1.5, -0.37], [-0.585, 1.5, -0.37], [-0.455, 1.5, -0.37], [-0.325, 1.5, -0.37], [-0.195, 1.5, -0.37], [-0.065, 1.5, -0.37], [0.065, 1.5, -0.37], [0.195, 1.5, -0.37], [0.325, 1.5, -0.37], [0.455, 1.5, -0.37], [0.585, 1.5, -0.37], [0.715, 1.5, -0.37]], note: "outils pendus à hook_spots (12 crochets), près de la porte" |
+| `curtains_window` |  | 5636 | rod: "curtains_rod", states: {"curtains": {"open": "curtains_open", "closed": "curtains_closed"}, "curtains_blue": {"open": "curtains_blue_open", "closed": "curtains_blue_closed"}, "curtains_red": {"open": "curtains_red_open", "closed": "curtains_red_closed"}, "curtains_yellow": {"open": "curtains_yellow_open", "closed": "curtains_yellow_closed"}, "curtains_green": {"open": "curtains_green_open", "closed": "curtains_green_closed"}, "curtains_gingham": {"open": "curtains_gingham_open", "closed": "curtains_gingham_closed"}}, window_size: [0.75, 0.9], note: "origine au centre de la fenêtre (window_<n>), au nu intérieur du mur; la pièce vers +Z glTF. Montrer curtains_rod et l'état de l'article posé; échelle X = width / 0,75, Y = height / 0,9" |
 | `chalk_box` |  | 176 | kind: "item" |
 | `coffee_mill` |  | 248 | kind: "item" |
 | `elder_jelly` |  | 190 | kind: "item" |

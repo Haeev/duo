@@ -27,6 +27,66 @@
   "file": "personnages.glb",
   "tris": 380
  },
+ "player_hair_crop": {
+  "file": "personnages.glb",
+  "tris": 148
+ },
+ "player_hair_curls": {
+  "file": "personnages.glb",
+  "tris": 388
+ },
+ "player_hair_ponytail": {
+  "file": "personnages.glb",
+  "tris": 328
+ },
+ "player_hair_braid": {
+  "file": "personnages.glb",
+  "tris": 396
+ },
+ "player_hair_pigtails": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_wavy": {
+  "file": "personnages.glb",
+  "tris": 352
+ },
+ "player_hair_long": {
+  "file": "personnages.glb",
+  "tris": 400
+ },
+ "player_hair_fringe": {
+  "file": "personnages.glb",
+  "tris": 280
+ },
+ "player_hair_quiff": {
+  "file": "personnages.glb",
+  "tris": 236
+ },
+ "player_hair_cloud": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_crown": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_bob_long": {
+  "file": "personnages.glb",
+  "tris": 380
+ },
+ "player_beard_short": {
+  "file": "personnages.glb",
+  "tris": 224
+ },
+ "player_beard_full": {
+  "file": "personnages.glb",
+  "tris": 308
+ },
+ "player_mustache": {
+  "file": "personnages.glb",
+  "tris": 72
+ },
  "player_scarf_orb": {
   "file": "personnages.glb",
   "tris": 212
@@ -70,6 +130,14 @@
  "villager_lucie": {
   "file": "personnages.glb",
   "tris": 1986
+ },
+ "villager_achille": {
+  "file": "personnages.glb",
+  "tris": 1854
+ },
+ "villager_solange": {
+  "file": "personnages.glb",
+  "tris": 2050
  },
  "villager_firmin_scarf": {
   "file": "personnages.glb",
@@ -364,6 +432,10 @@
   "file": "ferme.glb",
   "tris": 104
  },
+ "ridge_purlin": {
+  "file": "ferme.glb",
+  "tris": 140
+ },
  "nail_box": {
   "file": "ferme.glb",
   "tris": 356
@@ -427,7 +499,7 @@
  },
  "gatekeeper_house": {
   "file": "bourg.glb",
-  "tris": 7108,
+  "tris": 8256,
   "footprint": [
    7,
    6
@@ -437,12 +509,52 @@
    "gatekeeper_house_repaired"
   ]
  },
+ "gatekeeper_cellar": {
+  "file": "bourg.glb",
+  "tris": 1332
+ },
+ "gatekeeper_bedroom": {
+  "file": "bourg.glb",
+  "tris": 2264
+ },
  "ferrand_shop": {
   "file": "bourg.glb",
-  "tris": 4664,
+  "tris": 11536,
   "footprint": [
    10,
    8
+  ]
+ },
+ "haberdashery": {
+  "file": "bourg.glb",
+  "tris": 6252,
+  "footprint": [
+   7,
+   7
+  ]
+ },
+ "bakery": {
+  "file": "bourg.glb",
+  "tris": 4348,
+  "footprint": [
+   7,
+   6
+  ]
+ },
+ "lucie_house": {
+  "file": "bourg.glb",
+  "tris": 3480,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "school": {
+  "file": "bourg.glb",
+  "tris": 5044,
+  "footprint": [
+   11,
+   5
   ]
  },
  "firmin_house": {
@@ -1001,6 +1113,38 @@
    3
   ]
  },
+ "culvert": {
+  "file": "bourg.glb",
+  "tris": 336,
+  "footprint": [
+   4,
+   3
+  ]
+ },
+ "street_bridge": {
+  "file": "bourg.glb",
+  "tris": 804,
+  "footprint": [
+   4,
+   3
+  ]
+ },
+ "footbridge": {
+  "file": "bourg.glb",
+  "tris": 484,
+  "footprint": [
+   4,
+   2
+  ]
+ },
+ "ford_stones": {
+  "file": "bourg.glb",
+  "tris": 96,
+  "footprint": [
+   2,
+   1
+  ]
+ },
  "tree_oak": {
   "file": "bourg.glb",
   "tris": 358,
@@ -1217,6 +1361,60 @@
    1,
    1
   ]
+ },
+ "oak_chest": {
+  "file": "maison.glb",
+  "tris": 276,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cellar_rack": {
+  "file": "maison.glb",
+  "tris": 840,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "tool_rack": {
+  "file": "maison.glb",
+  "tris": 352,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "curtains_window": {
+  "file": "maison.glb",
+  "tris": 5636,
+  "states": {
+   "curtains": {
+    "open": "curtains_open",
+    "closed": "curtains_closed"
+   },
+   "curtains_blue": {
+    "open": "curtains_blue_open",
+    "closed": "curtains_blue_closed"
+   },
+   "curtains_red": {
+    "open": "curtains_red_open",
+    "closed": "curtains_red_closed"
+   },
+   "curtains_yellow": {
+    "open": "curtains_yellow_open",
+    "closed": "curtains_yellow_closed"
+   },
+   "curtains_green": {
+    "open": "curtains_green_open",
+    "closed": "curtains_green_closed"
+   },
+   "curtains_gingham": {
+    "open": "curtains_gingham_open",
+    "closed": "curtains_gingham_closed"
+   }
+  }
  },
  "chalk_box": {
   "file": "maison.glb",

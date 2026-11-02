@@ -121,3 +121,16 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Garde-fou: refuse une variable shell devant duo-python, `grep --exclude-dir` et les heredocs vers des fichiers hors du dépôt; passer par un script (`verifier/controle_tirets.sh`, `verifier/planches_quatre_tour9.sh`).
 - Vitest avec node_modules liés vers l'arbre principal: les tests d'interface sous Chromium échouent sur des 403 des polices `@fontsource` (Vite refuse les fichiers hors racine); artefact du lien, pas des modèles.
 - `verifier/quatre_tour9.sh` envoie tout nœud inconnu vers `bourg.glb`: y ajouter chaque nouveau nœud de ferme ou de maison. `verifier.cjs` écrit `planches/threejs-*.png`: retirer ceux qu'on ne livre pas.
+
+## Tour 10: intérieurs, pièces, coiffures (vérifié le 2026-11-02)
+
+- Le worktree isolé peut partir d'un vieux commit: comparer `git log` à la branche de session et faire `git merge --ff-only <branche>` (arbre propre) avant de lire la conception.
+- Le garde-fou refuse les heredocs Python longs ou « python3 - <<EOF » enchaînés: écrire le patch dans /tmp/patchN.py avec Write, puis `python3 /tmp/patchN.py` seul.
+- Caméra créée par `lpl.iso_camera`: `matrix_world` n'est pas à jour tout de suite; prendre `cam.location` (sinon on coupe les mauvais murs).
+- Bâtiment visitable: murs du rez-de-chaussée percés pour de bon (`interieurs.pierced_wall`, `glazed`, `door_frame`), enfants directs `<id>_wall_<côté>`, `cut_nodes` en extra, `<id>_interior` d'un seul maillage. Deux boîtes coplanaires qui se recouvrent (jambage et linteau pleine largeur) font des carrés noirs aux angles dans Cycles: linteau entre les jambages.
+- Meuble mural (miroir, tablette) dans le nœud du mur, pas dans l'intérieur: coupé avec le mur, il ne reste pas en l'air.
+- Ne pas ajouter de case à `palette.py` WORLD dans un lot qui ne touche pas `src/` (test palette.test.ts). Rangées de personnages: ajout en fin de CHAR_ROW_ORDER sans risque (16 au plus).
+- Raccords de toits: vérifier les débords de rive et d'égout du toit existant avant de poser une annexe (un appentis à un pan de 2,6 m contre le pignon de la maisonnette passe par-dessus les coins de la rive). Noue: polygone du pan arrêté sur l'intersection avec le dessus du toit voisin abaissé de 6 cm (`pieces.poly_slab`, sens remis automatiquement).
+- Tête ronde du joueur: bouche haute (hc - 0,02 à - 0,065), nez à hc - 0,016: moustache juste sous le nez; tout ce qui pend derrière la tête (queue, tresse, nuage) s'enfonce dans l'oreiller en pose `sleep`: mesurer avec `verifier/coiffures_couche.py`.
+- Vitest sans TTY n'écrit rien avant la fin (environ 30 min ici): lancer en arrière-plan sans `timeout`.
+- Contrôle d'emprise: `interieurs.blocked_cells` calcule les cases occupées depuis les boîtes des meubles posés (`Footprints`).

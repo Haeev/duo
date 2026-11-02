@@ -188,6 +188,130 @@
    "seat_height": 0.42,
    "tris": 748
   },
+  "oak_chest": {
+   "footprint": [
+    1,
+    1
+   ],
+   "storage_cells": 32,
+   "tris": 276
+  },
+  "cellar_rack": {
+   "footprint": [
+    2,
+    1
+   ],
+   "wall": true,
+   "storage_cells": 12,
+   "note": "seulement aux deux places du cellier (rack_spots de gatekeeper_cellar), dos au pignon ouest",
+   "tris": 840
+  },
+  "tool_rack": {
+   "footprint": [
+    2,
+    1
+   ],
+   "wall": true,
+   "hook_spots": [
+    [
+     -0.715,
+     1.5,
+     -0.37
+    ],
+    [
+     -0.585,
+     1.5,
+     -0.37
+    ],
+    [
+     -0.455,
+     1.5,
+     -0.37
+    ],
+    [
+     -0.325,
+     1.5,
+     -0.37
+    ],
+    [
+     -0.195,
+     1.5,
+     -0.37
+    ],
+    [
+     -0.065,
+     1.5,
+     -0.37
+    ],
+    [
+     0.065,
+     1.5,
+     -0.37
+    ],
+    [
+     0.195,
+     1.5,
+     -0.37
+    ],
+    [
+     0.325,
+     1.5,
+     -0.37
+    ],
+    [
+     0.455,
+     1.5,
+     -0.37
+    ],
+    [
+     0.585,
+     1.5,
+     -0.37
+    ],
+    [
+     0.715,
+     1.5,
+     -0.37
+    ]
+   ],
+   "note": "outils pendus à hook_spots (12 crochets), près de la porte",
+   "tris": 352
+  },
+  "curtains_window": {
+   "rod": "curtains_rod",
+   "states": {
+    "curtains": {
+     "open": "curtains_open",
+     "closed": "curtains_closed"
+    },
+    "curtains_blue": {
+     "open": "curtains_blue_open",
+     "closed": "curtains_blue_closed"
+    },
+    "curtains_red": {
+     "open": "curtains_red_open",
+     "closed": "curtains_red_closed"
+    },
+    "curtains_yellow": {
+     "open": "curtains_yellow_open",
+     "closed": "curtains_yellow_closed"
+    },
+    "curtains_green": {
+     "open": "curtains_green_open",
+     "closed": "curtains_green_closed"
+    },
+    "curtains_gingham": {
+     "open": "curtains_gingham_open",
+     "closed": "curtains_gingham_closed"
+    }
+   },
+   "window_size": [
+    0.75,
+    0.9
+   ],
+   "note": "origine au centre de la fenêtre (window_<n>), au nu intérieur du mur; la pièce vers +Z glTF. Montrer curtains_rod et l'état de l'article posé; échelle X = width / 0,75, Y = height / 0,9",
+   "tris": 5636
+  },
   "chalk_box": {
    "kind": "item",
    "tris": 176
@@ -293,5 +417,5 @@
    "tris": 24
   }
  },
- "file_bytes": 916376
+ "file_bytes": 1389700
 }
