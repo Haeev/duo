@@ -119,16 +119,25 @@ jobs:
         working-directory: apps/duo
         run: node scripts/test-demarrage.mjs /Applications/Duo.app/Contents/MacOS/Duo --jeux-embarques --delai 120
 
-      - name: Dépôt des installateurs
+      # Deux artefacts: le joueur ne télécharge que l'image disque (moitié moins lourde);
+      # le zip sert à la publication (motif duo-* de publication.yml).
+      - name: Dépôt de l'image disque
         uses: actions/upload-artifact@v7
         with:
           name: duo-macos
-          path: |
-            apps/duo/dist/Duo-macOS.dmg
-            apps/duo/dist/Duo-macOS.zip
+          path: apps/duo/dist/Duo-macOS.dmg
           if-no-files-found: error
           retention-days: ${{ inputs.conservation }}
-          # Fichiers déjà compressés.
+          # Fichier déjà compressé.
+          compression-level: 0
+
+      - name: Dépôt du zip (publication)
+        uses: actions/upload-artifact@v7
+        with:
+          name: duo-macos-zip
+          path: apps/duo/dist/Duo-macOS.zip
+          if-no-files-found: error
+          retention-days: ${{ inputs.conservation }}
           compression-level: 0
 
   windows:
