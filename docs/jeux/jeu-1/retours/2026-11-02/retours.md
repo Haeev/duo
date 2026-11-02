@@ -23,4 +23,9 @@ Version jouée: Duo 0.2.0 avec La Petite Ligne 0.11.1, nouvelle partie.
 
 - S08. `barriere-lisses-dans-le-vide.png`: à l'ouverture de la barrière du pré, les deux lisses de gauche s'arrêtent dans le vide sans poteau pour les porter, et une touffe d'herbe transparente flotte dans le passage. Une barrière finit sur un poteau; l'ouverture doit être un vrai passage (poteaux de part et d'autre).
 
+## Demandes de contenu
+
+- S09. Plus de variété de poissons, avec une rareté en cinq niveaux: commun, rare, épique, légendaire et mythique.
+- S10. Des ombres de poissons visibles dans l'eau aux endroits où l'on peut pêcher, avec une indication discrète quand une zone a plus de chances de donner un poisson rare.
+
 La suite des retours arrive.
