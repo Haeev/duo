@@ -42,7 +42,8 @@ export abstract class Panel implements Layer {
     this.titleEl = el('h2', { class: 'lpl-panel__title', id: titleId, text: options.title });
     this.subtitleEl = el('p', { class: 'lpl-panel__subtitle', text: options.subtitle ?? '', hidden: options.subtitle === undefined });
     this.titleBlock = el('div', {}, [this.titleEl, this.subtitleEl]);
-    this.closeButton = button([host.ctx.texts.extra.common.close, ' ', keycap(options.closeKeyLabel)], () => {
+    // Le mot « Fermer » peut s'effacer (carnet à cinq onglets): la croix et la touche restent, le nom accessible aussi.
+    this.closeButton = button([icon('ui-cross', 'lpl-icon lpl-panel__close-icon'), el('span', { class: 'lpl-panel__close-label', text: host.ctx.texts.extra.common.close }), ' ', keycap(options.closeKeyLabel)], () => {
       this.close();
     }, { class: 'lpl-button lpl-button--on-dark lpl-panel__close', attrs: { 'aria-label': options.closeAria, [SOUND_ATTR]: 'none' } });
     this.header = el('header', { class: 'lpl-panel__header' }, [icon(options.icon), this.titleBlock, this.closeButton]);

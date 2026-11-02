@@ -13,11 +13,13 @@ import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, notebookQuests, slotModel, type QuestModel } from './modele';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
+import { type NeedsPageModel, needsPage } from './modele-maison';
 import { Panel } from './panneau';
+import { needsMuted, setNeedsMuted } from './preferences';
 import { SOUND_ATTR } from './sons';
 
-type NotebookTab = 'quests' | 'mail' | 'bag' | 'memories';
-const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'memories'];
+type NotebookTab = 'quests' | 'mail' | 'bag' | 'memories' | 'needs';
+const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'memories', 'needs'];
 
 /** Dernier onglet ouvert, gardé d'une ouverture à l'autre. */
 let lastTab: NotebookTab = 'quests';
@@ -72,7 +74,7 @@ export class NotebookPanel extends Panel {
       },
       'Tab',
     );
-    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'memories' ? tab : lastTab;
+    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
@@ -84,6 +86,8 @@ export class NotebookPanel extends Panel {
       mail: make('mail', ctx.t(g.mail), 'ui-letter', this.badge),
       bag: make('bag', ctx.t(g.bag), 'grain-sack', null),
       memories: make('memories', ctx.t(g.memories), 'ui-heart', null),
+      // Tour 10: les besoins en chiffres (réponse du client: icônes au HUD, chiffres au carnet).
+      needs: make('needs', ctx.t(ctx.texts.extra.needs.tab), 'need-belly-full', null),
     };
     const tabs = el('div', { class: 'lpl-tabs', role: 'tablist', 'aria-label': n.tabsLabel }, [
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyQ') }),
@@ -91,9 +95,12 @@ export class NotebookPanel extends Panel {
       this.tabButtons.mail,
       this.tabButtons.bag,
       this.tabButtons.memories,
+      this.tabButtons.needs,
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyE') }),
     ]);
     this.header.insertBefore(tabs, this.closeButton);
+    // Cinq onglets (tour 10): le bouton de fermeture se resserre pour tenir sur la même rangée.
+    this.root.classList.add('lpl-notebook');
     const a = ctx.texts.extra.keys.arrows;
     this.setFooter([
       keysLine([
@@ -228,7 +235,56 @@ export class NotebookPanel extends Panel {
     if (this.tab === 'quests') this.renderQuests(world);
     else if (this.tab === 'mail') this.renderMail(letters);
     else if (this.tab === 'bag') this.renderBag(world);
+    else if (this.tab === 'needs') this.renderNeeds(world);
     else this.renderMemories(world);
+  }
+
+  /**
+   * Besoins (tour 10, section 3): la forme du jour, les trois besoins avec leurs chiffres, et les
+   * aides personnelles (« Besoins en sourdine »), invisibles pour l'autre.
+   */
+  private renderNeeds(world: ReadonlyWorld): void {
+    const page = needsPage(world, this.host.ctx, needsMuted());
+    if (page === null) return;
+    const sig = JSON.stringify(['needs', page]);
+    this.renderBody(sig, () => this.needsNodes(page));
+  }
+
+  private needsNodes(page: NeedsPageModel): HTMLElement[] {
+    const { ctx } = this.host;
+    const n = ctx.texts.extra.needs;
+    const list = el('ul', { class: 'lpl-needs-page__list', 'data-nav': 'list' });
+    for (const row of page.rows) {
+      list.append(
+        el('li', { class: 'lpl-needs-page__row', tabindex: '0', 'data-nav-item': true, 'data-key': `need:${row.need}`, 'data-autofocus': row.need === 'belly' }, [
+          el('span', { class: 'lpl-need lpl-need--large', 'data-tone': row.icon.tone, 'aria-hidden': 'true' }, [icon(row.icon.icon)]),
+          el('span', { class: 'lpl-needs-page__name' }, [el('strong', { text: row.title }), el('span', { text: row.icon.state })]),
+          el('span', { class: 'lpl-needs-page__value' }, [
+            el('span', { class: 'lpl-order__bar' }, [el('span', { style: `--lpl-value: ${Math.round(row.ratio * 100)}%` })]),
+            el('strong', { text: row.value }),
+          ]),
+          el('small', { class: 'lpl-needs-page__help', text: row.help }),
+        ]),
+      );
+    }
+    const mute = el('input', { type: 'checkbox', class: 'lpl-check__input', 'data-nav-item': true, 'data-key': 'mute-needs' });
+    mute.checked = page.muted;
+    mute.addEventListener('change', () => {
+      setNeedsMuted(mute.checked);
+      this.host.invalidate();
+    });
+    return [
+      el('div', { class: 'lpl-needs-page', role: 'region', 'aria-label': ctx.t(n.pageLabel) }, [
+        el('p', { class: 'lpl-needs-page__form' }, [el('span', { class: 'lpl-overline', text: ctx.t(n.form) }), el('strong', { text: page.form }), el('span', { text: page.formText })]),
+        list,
+        el('p', { class: 'lpl-field__help' }, [page.apart, page.napped ? ` · ${ctx.t(n.napped)}` : '']),
+        el('section', { class: 'lpl-needs-page__aids' }, [
+          el('h3', { class: 'lpl-section-title', text: ctx.t(n.aids) }),
+          el('label', { class: 'lpl-check' }, [mute, el('span', {}, [el('strong', { text: ctx.t(n.mute) }), el('small', { text: ctx.t(n.muteHelp) })])]),
+          el('p', { class: 'lpl-field__help', text: ctx.t(n.aidsHelp, { partner: page.partner }) }),
+        ]),
+      ]),
+    ];
   }
 
   /**

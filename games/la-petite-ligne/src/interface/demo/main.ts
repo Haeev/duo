@@ -68,7 +68,7 @@ const players = [
 ] as const;
 const scenario = params.get('scenario') ?? 'titre';
 // Les scénarios de la suite partent d'une sauvegarde de référence: format 5 (tour 8), format 6 (tour 9).
-const SAVES = import.meta.glob<{ dataSchema: number; data: unknown }>('../../../tests/donnees/sauvegardes/format-[56]-*.json', { eager: true, import: 'default' });
+const SAVES = import.meta.glob<{ dataSchema: number; data: unknown }>('../../../tests/donnees/sauvegardes/format-[567]-*.json', { eager: true, import: 'default' });
 const saveName = scenarioSave(scenario);
 const save = saveName === null ? undefined : SAVES[`../../../tests/donnees/sauvegardes/${saveName}`];
 if (saveName !== null && save === undefined) throw new Error(`sauvegarde de référence absente: ${saveName}`);
@@ -78,6 +78,7 @@ const sim =
     : restoreWorld(content, map, decodeSave(structuredClone(save.data)), save.dataSchema, players);
 const afterMount = setupScenario(sim, scenario, me);
 if (params.get('onglet') === 'souvenirs') rememberNotebookTab('memories');
+if (params.get('onglet') === 'besoins' || scenario === 'besoins-carnet') rememberNotebookTab('needs');
 const boardTab = scenarioBoardTab(scenario);
 if (boardTab !== null) rememberBoardTab(boardTab);
 
