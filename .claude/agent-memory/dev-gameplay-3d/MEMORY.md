@@ -264,3 +264,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Copie isolée: `cat >> fichier <<EOF` et les heredocs Python longs dans Bash sont refusés par le contrôle de la copie; écrire les scripts avec l'outil Write dans `/tmp/...` puis `python3 script.py .` depuis le dossier du jeu (remplacements exacts, échec si l'ancien texte manque).
 - La sauvegarde de référence du jour 62 (`format-6-automne-jour-62.json`) fait 46 177 octets: avec les champs du tour 10, une journée en cours monte à environ 46 800 (borne 52 000).
 - Arrivées au coffre: tout `addStack(world.cellar, ...)` hors d'un dépôt de joueur passe par `storeAtHome` (`rangement.ts`): outils au râtelier, plein: au pied du coffre.
+
+## Rendu et son du tour 10 (lot L5, vérifié le 2026-11-02)
+
+- Découper en morceaux coûte des appels: à 12 m, la vue de la place (zoom 2) voit 21 morceaux de sol, 14 de touffes, 12 de fleurs (187 appels). Sol, eau et lisière à 24 m, semis à 24 m (à 48 m: +12 000 triangles de semis), forêt du pourtour à 12 m (à 24 m: +12 000). Mesurer chaque réglage, les deux budgets bougent en sens contraire.
+- Un bâtiment ouvert (coupe) dessiné pièce par pièce coûte des dizaines d'appels: fusionner les pièces visibles par jeu de visibilité (masque de bits, une fusion par orientation, faite au premier besoin: `VisibleMerges` d'`interieurs.ts`), et le modèle réparé entier une fois bâti (`StagedBuilding.applyComplete`).
+- `warmUp` rend tout visible pour compiler, puis remet `visible = false`: un état mis en cache (« déjà montré ») ne doit pas sauter la remise à jour de la visibilité, sinon le contenu reste caché.
+- Second matériau d'eau sans programme de plus: même `onBeforeCompile` et même `customProgramCacheKey`, autres uniformes (ru de la Côte: courant vers le sud, `uStreamParams`).
+- Nœuds du GLB sans translation (géométrie cuite): positions des pièces lues dans les sommets (min/max de l'accesseur `POSITION`, script `cheveux.py` du scratchpad) pour relier les éléments de `pieces.json` aux `id_hint` du modèle (poteau 1 du cellier au nord).
+- Construire la page figée et la servir détachée: `setsid nohup python3 -m http.server ... < /dev/null &` dans un script; sans `setsid`, l'outil attend le serveur (tâche coupée au bout de 30 min, serveur compris).
+- `lplRendu.missing()` de la page de démonstration était un bouchon (toujours vide): il lit maintenant `RenderEngine.missingModels()`. Types de carte sans nœud du même nom: les relier dans `MODEL_VARIANTS` (`salon_shop` vers `haberdashery`...); tout collecteur qui parcourt `map.props` (cheminées, lueurs) doit passer par `library.resolve`.
+- Près de la rivière, le shader des surfaces mêle le sable aux faces de chemin (`ambSand`): une géométrie de chemin posée sur la grève y est peinte en sable. Un coin de chemin contre le sable se corrige dans le champ du lit (`riviere.ts`), pas par de la géométrie.
+- Question S4 (sons `besoins/` permanents): refusé par l'essai du pic d'un samedi (`memoire.test.ts`: la seconde musique du fondu est refusée à 128 Mo); décodés au lancement sans être tenus.

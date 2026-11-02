@@ -153,7 +153,7 @@ function setup(): { ctx: FakeContext; engine: AudioEngine; buses: Map<AudioBus, 
 
 function frame(over: Partial<BrainFrame>): BrainFrame {
   return {
-    listener: { at: { x: 0, y: 0 }, ear: { x: 0, y: 0 }, yaw: 0, inHouse: false },
+    listener: { at: { x: 0, y: 0 }, ear: { x: 0, y: 0 }, yaw: 0, inHouse: false, inside: null },
     shots: [],
     loops: [],
     music: [],

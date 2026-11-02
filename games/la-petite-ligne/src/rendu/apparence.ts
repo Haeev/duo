@@ -7,8 +7,58 @@
 import type { CharacterId } from '../etat/types';
 import type { CharacterSlot } from './palette';
 
-/** Coiffures proposées à la création (index `appearance.hair`). */
-export const HAIR_MESHES = ['player_hair_short', 'player_hair_bob', 'player_hair_bun'] as const;
+/**
+ * Coiffures (index `appearance.hair`, tour 10, conception 2.1, dans l'ordre de sa table): 0 à 2
+ * les trois d'avant, 3 à 11 les nouvelles de la création, 12 à 14 celles du salon seulement.
+ */
+export const HAIR_MESHES = [
+  'player_hair_short',
+  'player_hair_bob',
+  'player_hair_bun',
+  'player_hair_crop',
+  'player_hair_curls',
+  'player_hair_ponytail',
+  'player_hair_braid',
+  'player_hair_pigtails',
+  'player_hair_wavy',
+  'player_hair_long',
+  'player_hair_fringe',
+  'player_hair_quiff',
+  'player_hair_cloud',
+  'player_hair_crown',
+  'player_hair_bob_long',
+] as const;
+
+/**
+ * Coupes qui s'enfoncent dans l'oreiller au coucher (mesure de l'artiste, `coiffures_couche.py`:
+ * nuage -10 cm, long et queue de cheval -8 cm, tresse -7 cm sous la coupe courte): le rendu les
+ * aplatit derrière la tête pendant le sommeil (`personnages.ts`).
+ */
+export const HAIR_FLATTENED_ASLEEP: ReadonlySet<string> = new Set([
+  'player_hair_cloud',
+  'player_hair_long',
+  'player_hair_ponytail',
+  'player_hair_braid',
+]);
+
+/** Barbe ou moustache (index `appearance.beard`): 0 aucune, puis barbe courte, fournie, moustache. */
+export const BEARD_MESHES = [null, 'player_beard_short', 'player_beard_full', 'player_mustache'] as const;
+
+/**
+ * Couleurs des cheveux (index `appearance.hairColor`, conception 2.2): noir, brun, châtain, auburn,
+ * roux, blond paille, gris, blanc (`PLAYER_PRESETS["hair_colors"]` de `palette.py`). La barbe et la
+ * moustache prennent la couleur des cheveux.
+ */
+export const HAIR_COLORS: readonly { hair: string; hair_dark: string }[] = [
+  { hair: '#2b2522', hair_dark: '#1a1614' },
+  { hair: '#4f3626', hair_dark: '#36251a' },
+  { hair: '#7a5236', hair_dark: '#563823' },
+  { hair: '#8e3f28', hair_dark: '#652b1b' },
+  { hair: '#c2622e', hair_dark: '#93461e' },
+  { hair: '#d8b46a', hair_dark: '#b08a48' },
+  { hair: '#9a958e', hair_dark: '#75706a' },
+  { hair: '#e8e4dc', hair_dark: '#c4beb4' },
+];
 
 export interface OutfitLook {
   mesh: string;

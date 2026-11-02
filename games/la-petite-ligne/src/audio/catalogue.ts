@@ -130,6 +130,35 @@ const CatalogueSchema = v.object({
       ),
     ),
     interior: v.object({ ambienceLowpassHz: v.pipe(Finite, v.minValue(10)), ambienceDb: Finite, rampMs: NonNegative }),
+    // Tour 10 (ADR 0016, son.md 4.8): le dehors entendu de chaque bâtiment visitable, son ambiance de pièce.
+    interiorByBuilding: v.optional(
+      v.object({
+        rampMs: NonNegative,
+        buildings: v.record(
+          v.string(),
+          v.object({
+            roomTone: v.nullable(v.string()),
+            roomToneDb: v.optional(Finite),
+            outdoorLowpassHz: v.pipe(Finite, v.minValue(10)),
+            outdoorDb: Finite,
+            rain: v.optional(v.string()),
+          }),
+        ),
+        otherPlayerInside: v.optional(v.object({ lowpassHz: v.pipe(Finite, v.minValue(10)), db: Finite })),
+      }),
+    ),
+    // Tour 10: le ru de la Côte, des sources placées tous les `spacingM` m.
+    stream: v.optional(
+      v.object({
+        sound: v.string(),
+        x: Finite,
+        fromY: Finite,
+        toY: Finite,
+        spacingM: v.pipe(Finite, v.minValue(1)),
+        fordPoint: v.optional(v.object({ x: Finite, y: Finite })),
+        fordBoostDb: v.optional(Finite),
+      }),
+    ),
     peer: v.object({ peerWorldSoundsDb: Finite }),
     sequences: v.record(v.string(), v.object({ steps: v.array(StepSchema) })),
   }),
@@ -244,8 +273,31 @@ export interface Catalogue {
   /** Tour 9: un cri lointain par soir (`plan.eveningCalls`): heures en minutes de jeu. */
   eveningCalls: readonly EveningCall[];
   interior: { lowpassHz: number; ambienceDb: number; rampSeconds: number };
+  /**
+   * Tour 10: étouffement du dehors et ambiance de pièce par bâtiment visitable (`listener.inside`);
+   * un bâtiment absent prend `interior`. `peer`: l'autre joueur dans un autre bâtiment.
+   */
+  interiors: {
+    rampSeconds: number;
+    buildings: ReadonlyMap<string, InteriorSound>;
+    peer: { lowpassHz: number; db: number } | null;
+  };
+  /** Tour 10: sources du ru de la Côte (`plan.stream`), `null` sans ru. */
+  stream: StreamPlan | null;
   peerDb: number;
   sequences: ReadonlyMap<string, readonly SequenceStep[]>;
+}
+
+export interface InteriorSound {
+  roomTone: string | null;
+  roomToneDb: number;
+  lowpassHz: number;
+  outdoorDb: number;
+}
+
+export interface StreamPlan {
+  sound: string;
+  sources: readonly { at: { x: number; y: number }; gainDb: number }[];
 }
 
 export interface EveningCall {
@@ -432,9 +484,59 @@ export function parseCatalogue(raw: unknown): Catalogue {
       ambienceDb: data.plan.interior.ambienceDb,
       rampSeconds: data.plan.interior.rampMs / 1000,
     },
+    interiors: parseInteriors(data.plan.interiorByBuilding, data.plan.interior, sounds),
+    stream: parseStream(data.plan.stream, sounds),
     peerDb: data.plan.peer.peerWorldSoundsDb,
     sequences,
   };
+}
+
+type PlanData = v.InferOutput<typeof CatalogueSchema>['plan'];
+
+function parseInteriors(
+  data: PlanData['interiorByBuilding'],
+  fallback: PlanData['interior'],
+  sounds: ReadonlyMap<string, SoundDef>,
+): Catalogue['interiors'] {
+  const buildings = new Map<string, InteriorSound>();
+  for (const [id, b] of Object.entries(data?.buildings ?? {})) {
+    if (b.roomTone !== null && !sounds.has(b.roomTone)) {
+      throw new CatalogueError(`sons.json: plan.interiorByBuilding.${id}: ambiance inconnue « ${b.roomTone} »`);
+    }
+    buildings.set(id, {
+      roomTone: b.roomTone,
+      roomToneDb: b.roomToneDb ?? 0,
+      lowpassHz: b.outdoorLowpassHz,
+      outdoorDb: b.outdoorDb,
+    });
+  }
+  return {
+    rampSeconds: (data?.rampMs ?? fallback.rampMs) / 1000,
+    buildings,
+    peer: data?.otherPlayerInside === undefined ? null : { lowpassHz: data.otherPlayerInside.lowpassHz, db: data.otherPlayerInside.db },
+  };
+}
+
+/** Sources du ru, du nord au sud, tous les `spacingM` m; la plus proche du gué renforcée. */
+function parseStream(data: PlanData['stream'], sounds: ReadonlyMap<string, SoundDef>): StreamPlan | null {
+  if (data === undefined) return null;
+  if (!sounds.has(data.sound)) throw new CatalogueError(`sons.json: plan.stream: son inconnu « ${data.sound} »`);
+  const sources: { at: { x: number; y: number }; gainDb: number }[] = [];
+  for (let y = data.fromY; y <= data.toY + 1e-6; y += data.spacingM) {
+    sources.push({ at: { x: data.x, y }, gainDb: 0 });
+  }
+  const ford = data.fordPoint;
+  if (ford !== undefined && sources.length > 0) {
+    let best = sources[0];
+    for (const source of sources) {
+      if (best === undefined || Math.abs(source.at.y - ford.y) < Math.abs(best.at.y - ford.y)) best = source;
+    }
+    if (best !== undefined) {
+      best.at = { x: ford.x, y: ford.y };
+      best.gainDb = data.fordBoostDb ?? 0;
+    }
+  }
+  return { sound: data.sound, sources };
 }
 
 /** Pas d'une séquence, ou erreur si `sons.json` ne la contient pas. */

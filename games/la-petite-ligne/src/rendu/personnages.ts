@@ -44,6 +44,9 @@ import {
   BODY_COLORS,
   HAIR_MESHES,
   OUTFITS,
+  BEARD_MESHES,
+  HAIR_COLORS,
+  HAIR_FLATTENED_ASLEEP,
   SCARF_MARK,
   SCARF_SYMBOLS,
   safeColor,
@@ -664,8 +667,8 @@ class PlayerTexture {
     preparePaletteTexture(this.texture, true);
   }
 
-  paint(id: CharacterId, outfit: number, scarf: string): void {
-    const key = `${id}|${outfit}|${scarf}`;
+  paint(id: CharacterId, outfit: number, scarf: string, hairColor: number): void {
+    const key = `${id}|${outfit}|${scarf}|${hairColor}`;
     if (key === this.key) {
       return;
     }
@@ -677,6 +680,7 @@ class PlayerTexture {
     context.drawImage(this.source, 0, 0);
     const colors: Partial<Record<CharacterSlot, string>> = {
       ...BODY_COLORS[id],
+      ...(HAIR_COLORS[hairColor] ?? {}),
       ...(OUTFITS[outfit]?.colors ?? OUTFITS[0]?.colors),
       scarf: safeColor(scarf),
       scarf_mark: SCARF_MARK,
@@ -740,6 +744,7 @@ function mergeOutfit(
 const PLAYER_MESHES = [
   'player_base',
   ...HAIR_MESHES,
+  ...BEARD_MESHES.filter((name): name is NonNullable<typeof name> => name !== null),
   ...new Set(OUTFITS.map((outfit) => outfit.mesh)),
   ...SCARF_SYMBOLS.map((symbol) => symbol.mesh),
 ];
@@ -853,6 +858,22 @@ export class CharactersPart implements EventfulPart {
   private readonly directedPoint = { x: 0, y: 0 };
 
   /** Chorégraphies des moments rares qui mènent un habitant (Basile) ou tournent sa tête. */
+  /** Bâtiment visitable où est le joueur local (`interieurs.ts`), lu à chaque image. */
+  private interiorProbe: () => string | null = () => null;
+
+  /** Tour 10 (ADR 0016): branche la lecture du bâtiment où est le joueur local. */
+  setInteriorProbe(probe: () => string | null): void {
+    this.interiorProbe = probe;
+  }
+
+  /**
+   * Un personnage dans un autre bâtiment visitable que celui du joueur local est caché par les murs
+   * (le bâtiment reste entier chez moi, son contenu masqué): on ne le dessine pas.
+   */
+  private walledOff(inside: string | null): boolean {
+    return inside !== null && inside !== this.interiorProbe();
+  }
+
   setVillagerDirector(director: VillagerDirector | null): void {
     this.director = director;
   }
@@ -1234,24 +1255,33 @@ export class CharactersPart implements EventfulPart {
   }
 
   private dress(entry: PlayerEntry, character: DeepReadonly<Character>): void {
-    const { hair, outfit, scarf } = character.appearance;
-    const look = `${hair}|${outfit}|${scarf}`;
+    const { hair, hairColor, beard, outfit, scarf } = character.appearance;
+    const hairMesh = HAIR_MESHES[hair] ?? HAIR_MESHES[0];
+    // Couché, les coupes longues sont aplaties derrière la tête (pas dans l'oreiller).
+    const flat = character.status === 'sleeping' && HAIR_FLATTENED_ASLEEP.has(hairMesh);
+    const look = `${hair}|${hairColor}|${beard}|${outfit}|${scarf}|${flat ? 'couche' : ''}`;
     if (look === entry.look) {
       return;
     }
     entry.look = look;
     const wanted = new Set([
       'player_base',
-      HAIR_MESHES[hair] ?? HAIR_MESHES[0],
+      hairMesh,
       OUTFITS[outfit]?.mesh ?? OUTFITS[0]?.mesh ?? '',
       scarfMeshFor(scarf),
+      BEARD_MESHES[beard] ?? '',
     ]);
+    wanted.delete('');
     const base = entry.meshes.get('player_base');
     const parts = [...wanted]
       .filter((name) => name !== 'player_base')
-      .map((name) => entry.meshes.get(name))
-      .filter((mesh): mesh is SkinnedMesh => mesh instanceof SkinnedMesh)
-      .map((mesh) => mesh.geometry);
+      .map((name) => {
+        const mesh = entry.meshes.get(name);
+        if (!(mesh instanceof SkinnedMesh)) return null;
+        const geometry = mesh.geometry as BufferGeometry;
+        return flat && name === hairMesh ? this.flattenedHair(name, geometry) : geometry;
+      })
+      .filter((geometry): geometry is BufferGeometry => geometry !== null);
     const merged =
       base instanceof SkinnedMesh && entry.baseGeometry !== null
         ? mergeOutfit(entry.baseGeometry, parts)
@@ -1271,7 +1301,31 @@ export class CharactersPart implements EventfulPart {
         mesh.visible = wanted.has(name);
       }
     }
-    entry.texture?.paint(character.id, outfit, scarf);
+    entry.texture?.paint(character.id, outfit, scarf, hairColor);
+  }
+
+  /** Coupes aplaties pour le sommeil, faites une fois par coupe. */
+  private readonly flatHair = new Map<string, BufferGeometry>();
+
+  /**
+   * Coupe longue couchée: dans la pose de liaison (debout, nuque vers -Z), rien de la chevelure
+   * ne dépasse derrière la tête plus loin que le chignon (que l'oreiller reçoit sans s'y enfoncer),
+   * ni plus loin que `backDepth` dans le dos (sous les épaules, contre le matelas).
+   */
+  private flattenedHair(name: string, source: BufferGeometry): BufferGeometry {
+    const known = this.flatHair.get(name);
+    if (known !== undefined) return known;
+    const settings = SETTINGS.asleepHair;
+    const copy = this.resources.track(source.clone());
+    const position = copy.getAttribute('position');
+    for (let i = 0; i < position.count; i += 1) {
+      const limit = position.getY(i) > settings.headFromY ? settings.headDepth : settings.backDepth;
+      if (position.getZ(i) < limit) position.setZ(i, limit);
+    }
+    position.needsUpdate = true;
+    copy.computeBoundingSphere();
+    this.flatHair.set(name, copy);
+    return copy;
   }
 
   private createVillager(villager: DeepReadonly<VillagerState>): CharacterFigure {
@@ -1401,7 +1455,9 @@ export class CharactersPart implements EventfulPart {
         this.henInFront(character, world) ? PLAYER_VARIANTS_HEN : PLAYER_VARIANTS,
       );
       entry.figure.updateFace(context.time, FORM_EXPRESSION[character.form]);
-      entry.figure.pick.enabled = true;
+      const walled = this.walledOff(character.inside);
+      entry.figure.root.visible = !walled;
+      entry.figure.pick.enabled = !walled;
       const held = character.bag[character.selected] ?? null;
       const definition = held === null ? undefined : this.content.items[held.item];
       const showTool =
@@ -1470,9 +1526,10 @@ export class CharactersPart implements EventfulPart {
       figure.setReach(null);
       const worn = this.wornPieces.get(villager.id);
       if (worn !== undefined) worn.body.geometry = VILLAGER_WORN[villager.id]?.when(world, this.content) === true ? worn.dressed : worn.plain;
-      figure.root.visible = villager.visible;
-      figure.pick.enabled = villager.visible;
-      if (!villager.visible) {
+      const shown = villager.visible && !this.walledOff(villager.inside);
+      figure.root.visible = shown;
+      figure.pick.enabled = shown;
+      if (!shown) {
         continue;
       }
       // Arrêté sur un banc (Jeanne au quai le matin): assis, à sa place, dos au dossier.

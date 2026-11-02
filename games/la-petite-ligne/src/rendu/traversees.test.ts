@@ -1,4 +1,4 @@
-import { Mesh, MeshBasicMaterial, type BufferGeometry } from 'three';
+import { Mesh, MeshBasicMaterial } from 'three';
 import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
@@ -42,13 +42,21 @@ function terrain(): Terrain {
 }
 
 function groundTriangles(t: Terrain): Triangle[] {
-  const ground = t.group.getObjectByName('sol');
+  // Le sol est en morceaux de 12 m (`sol <i>:<j>`, ADR 0016): on les lit tous.
+  const chunks = t.group.children.filter(
+    (child): child is Mesh => child instanceof Mesh && child.name.startsWith('sol '),
+  );
   const triangles: Triangle[] = [];
-  expect(ground).toBeInstanceOf(Mesh);
-  if (!(ground instanceof Mesh)) {
-    return triangles;
+  expect(chunks.length).toBeGreaterThan(1);
+  for (const ground of chunks) {
+    triangles.push(...meshTriangles(ground));
   }
-  const geometry = ground.geometry as BufferGeometry;
+  return triangles;
+}
+
+function meshTriangles(ground: Mesh): Triangle[] {
+  const triangles: Triangle[] = [];
+  const geometry = ground.geometry;
   const position = geometry.getAttribute('position');
   const normal = geometry.getAttribute('normal');
   const uv = geometry.getAttribute('uv');

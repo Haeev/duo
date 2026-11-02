@@ -36,6 +36,8 @@ import { DaylightRig } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
 import { ShadowCasterCulling } from './ombre-tri';
+import { InteriorsPart, readInteriorHooks } from './interieurs';
+import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { PerfMonitor } from './perf';
 import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
 import { RENDER_SETTINGS } from './reglages';
@@ -265,6 +267,10 @@ export class RenderEngine implements Renderer {
       return prop.category === 'sol' && prop.height > 0
         ? prop.height
         : RENDER_SETTINGS.floorProps[prop.model];
+    }, (crossing) => {
+      // Ouvrages du ru: on marche sur le tablier, le platelage ou les pierres du modèle.
+      const walk = library.extras(crossing.model).walk_height;
+      return typeof walk === 'number' ? walk : undefined;
     });
     this.terrain = terrain;
     this.scene.add(terrain.group);
@@ -341,6 +347,11 @@ export class RenderEngine implements Renderer {
     );
     world.add(characters);
     world.add(house);
+    // Tour 10: épicerie et mercerie (coupe, contenu, portes), la lampe unique déplacée (après la maisonnette).
+    const interiors = new InteriorsPart(map, library, this.resources, house, readInteriorHooks(MAP_FILES));
+    this.scene.add(interiors.group);
+    world.add(interiors);
+    characters.setInteriorProbe(() => interiors.localInside());
     world.add(garden);
     world.add(farm);
     // Tour 9: chantiers bâtis, marelle, allumage des lampadaires (après la maisonnette: l'auvent suit sa coupe).
@@ -421,6 +432,7 @@ export class RenderEngine implements Renderer {
       library,
       terrain,
       water: terrain.water,
+      streamWater: terrain.streamWater,
       daylight: this.daylight,
       smokeEmitter: () => railway.smokeEmitter(),
       trainState: () => railway.trainState(),
@@ -442,6 +454,7 @@ export class RenderEngine implements Renderer {
       this.rig.snapTo(map.width / 2, map.height / 2);
     }
     this.perf.setMissingModels(library.missingModels());
+    this.missing = library.missingModels();
     await this.warmUp();
     this.loaded = true;
     onProgress(1);
@@ -584,7 +597,10 @@ export class RenderEngine implements Renderer {
     // Monter d'un pixel sur le corps, c'est monter de 1 / (cos e) pixel-mètres, donc se rapprocher de tan e.
     const depthPerPixel = Math.tan(elevation) / pixelsPerMeter;
     this.holes.length = 0;
+    const localInside = world.characters.find((c) => c.id === this.view.localCharacter())?.inside ?? null;
     for (const character of world.characters) {
+      // Dans un autre bâtiment que le joueur local: caché par les murs, pas de trou (ADR 0016).
+      if (character.inside !== null && character.inside !== localInside) continue;
       const x = character.prev.x + (character.pos.x - character.prev.x) * alpha;
       const y = character.prev.y + (character.pos.y - character.prev.y) * alpha;
       const ground = terrain.heightAt(x, y);
@@ -850,6 +866,18 @@ export class RenderEngine implements Renderer {
 
   camera(command: CameraCommand): void {
     this.rig.command(command);
+  }
+
+  /** Modèles remplacés par un substitut (absents des GLB), lus après le chargement. */
+  private missing: string[] = [];
+
+  missingModels(): string[] {
+    return this.missing;
+  }
+
+  /** Page de démonstration: gros plan (largeur de vue en mètres). */
+  inspect(width: number): void {
+    this.rig.inspect(width);
   }
 
   /** Réduction des animations (réglage de la plateforme, peut changer en cours de partie). */

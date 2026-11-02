@@ -39,6 +39,7 @@ import {
 } from './etat-exemple';
 import { applyEdgeExample } from './lisiere-exemple';
 import { applyTour9Example } from './tour9-exemple';
+import { applyTour10Example } from './tour10-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { WorldState } from '../../etat/types';
 
@@ -212,6 +213,8 @@ async function main(): Promise<void> {
     p1.pos = { x: focusX, y: focusY };
     p1.prev = { x: focusX, y: focusY };
   }
+  // Tour 10: intérieurs, ru, pièces, rideaux, rangement, coiffures (`tour10-exemple.ts`), après `x` et `y`.
+  applyTour10Example(world, map, content, params);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const view: GameView = {
@@ -253,7 +256,7 @@ async function main(): Promise<void> {
   const handle: DemoHandle = {
     ready: false,
     stats: () => engine.detailedStats(),
-    missing: () => [],
+    missing: () => engine.missingModels(),
     breakdown: (detail?: boolean) => engine.breakdown(detail === true),
     programs: () => engine.programList(),
     programsInUse: () => engine.programsInUse(),
@@ -289,6 +292,11 @@ async function main(): Promise<void> {
     engine.camera('zoom_in');
   } else if (zoom === 2) {
     engine.camera('zoom_out');
+  }
+  // `largeur=<m>` (tour 10): gros plan des captures (coiffures, rideaux), de 2 à 36 m.
+  const inspect = Number(params.get('largeur'));
+  if (params.has('largeur') && Number.isFinite(inspect) && inspect >= 2 && inspect <= 36) {
+    engine.inspect(inspect);
   }
 
   const hourInput = document.getElementById('heure') as HTMLInputElement | null;

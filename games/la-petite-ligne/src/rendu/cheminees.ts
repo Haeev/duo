@@ -107,7 +107,8 @@ export function collectChimneys(
       continue;
     }
     const house = prop.model === HOUSE_MODEL;
-    const model = house ? `${prop.model}${REPAIRED_SUFFIX}` : prop.model;
+    // Types de la carte du tour 10 (`salon_shop`, `bakehouse`...): le nœud de l'artiste qui les dessine.
+    const model = house ? `${prop.model}${REPAIRED_SUFFIX}` : library.resolve(prop.model, prop.id);
     if (!library.has(model)) {
       continue;
     }
