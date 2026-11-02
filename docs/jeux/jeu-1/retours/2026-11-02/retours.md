@@ -13,4 +13,12 @@ Version jouée: Duo 0.2.0 avec La Petite Ligne 0.11.1, nouvelle partie.
 - S03. On ne peut pas poser de petite déco sur les tables ou les meubles (plumes de geai, fleurs dans un vase).
 - `epicerie-ouverte.webp`: vue de l'épicerie ouverte, pour contexte.
 
+- S04. Achille traverse la rivière à pied quand il se déplace (son trajet passe dans l'eau au lieu d'un pont ou du gué).
+- S05. Il pleut dans la maisonnette alors que le toit est bâti (`pluie-maison.webp`), et aussi dans la mercerie (`pluie-mercerie.webp`): la pluie doit s'arrêter dans tout intérieur couvert.
+- S06. Dans les répliques d'Odette sur les poules, on lit des identifiants bruts (« hencolor2 ») au lieu des couleurs ou des noms.
+- S07. On ne peut pas s'asseoir sur les chaises fabriquées et posées dans la maison.
+- Vu sur les captures (manager):
+  - `pluie-mercerie.webp`: un trait fin, comme un fil tendu entre deux points, flotte sur le mur du fond de la mercerie, sans objet qui le porte.
+  - `barriere-et-herbes.png`: une touffe d'herbe à moitié transparente flotte au milieu du pré, et l'ombre du personnage se dessine en tache tramée sur la barrière.
+
 La suite des retours arrive.
