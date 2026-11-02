@@ -21,4 +21,6 @@ Version jouée: Duo 0.2.0 avec La Petite Ligne 0.11.1, nouvelle partie.
   - `pluie-mercerie.webp`: un trait fin, comme un fil tendu entre deux points, flotte sur le mur du fond de la mercerie, sans objet qui le porte.
   - `barriere-et-herbes.png`: une touffe d'herbe à moitié transparente flotte au milieu du pré, et l'ombre du personnage se dessine en tache tramée sur la barrière.
 
+- S08. `barriere-lisses-dans-le-vide.png`: à l'ouverture de la barrière du pré, les deux lisses de gauche s'arrêtent dans le vide sans poteau pour les porter, et une touffe d'herbe transparente flotte dans le passage. Une barrière finit sur un poteau; l'ouverture doit être un vrai passage (poteaux de part et d'autre).
+
 La suite des retours arrive.
