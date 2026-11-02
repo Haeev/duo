@@ -87,8 +87,9 @@ describe('carte élargie: bâtiments visitables', () => {
     expect(
       map.buildings.grocery?.fixtures.find((f) => f.id === 'grocery_inner_counter')?.cells,
     ).toEqual([
-      { cx: 28, cy: 26 },
-      { cx: 28, cy: 27 },
+      { cx: 29, cy: 26 },
+      { cx: 29, cy: 27 },
+      { cx: 29, cy: 28 },
     ]);
     expect(map.buildings.salon).toMatchObject({
       prop: 'salon_shop',

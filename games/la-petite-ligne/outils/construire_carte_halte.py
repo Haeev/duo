@@ -156,6 +156,33 @@ TYPES = {
 OBJETS: list[dict] = []
 _COMPTEURS: dict[str, int] = {}
 
+# L'épicerie-pension: case nord-ouest de l'emprise et rotation (façade à l'est). Les places et les cases
+# de mobilier de l'artiste (`interior_spots`, `interior_blocked` du nœud `ferrand_shop`, repère glTF) se
+# tournent avec elle. Tour 10, reprise de l'artiste: la façade avance de 0,75 m, son nu extérieur est en
+# x 30,35 (dans la colonne 30, celle du mur); perron et étal vont jusqu'à x 30,97 et seul le store, au-dessus
+# de 2,34 m, déborde sur les pavés de la place (x 31,86). L'emprise reste donc de 8 x 10 cases.
+EPICERIE = {"x0": 23, "y0": 23, "rotation": 1}
+
+
+def glb_vers_carte(gx: float, gz: float, o: dict = EPICERIE, type_: str = "ferrand_shop") -> tuple[float, float]:
+    """Point (x, z) du repère glTF d'un bâtiment vers la carte, comme le rendu (rotation.y = rotation x PI/2)."""
+    larg, prof = TYPES[type_]["emprise"]
+    w, h = (larg, prof) if o["rotation"] % 2 == 0 else (prof, larg)
+    cx, cy = o["x0"] + w / 2, o["y0"] + h / 2
+    a = o["rotation"] * math.pi / 2
+    x = cx + gx * math.cos(a) + gz * math.sin(a)
+    y = cy - gx * math.sin(a) + gz * math.cos(a)
+    return round(x, 3), round(y, 3)
+
+
+def cases_glb(*coins: tuple[int, int]) -> list[list[int]]:
+    """Cases de la carte des cases glTF de l'artiste (coin [x, z] le plus petit de chaque case)."""
+    cases = []
+    for gx, gz in coins:
+        x, y = glb_vers_carte(gx + 0.5, gz + 0.5)
+        cases.append([math.floor(x), math.floor(y)])
+    return cases
+
 
 def objet(type_: str, x0: int, y0: int, rotation: int = 0, ident: str | None = None, **extra: object) -> None:
     """Pose un objet par la case nord-ouest de son emprise; le fichier garde le centre."""
@@ -256,6 +283,11 @@ def construire_terrain() -> None:
     # les deux (y 36) faisait une bande étroite qui coupait la berge en long, sans raison: un
     # chemin de halage longe directement la grève. Le jardin du garde-barrière (à l'ouest de la
     # route) garde son herbe et sa clôture.
+    # Le bout de la route du gué (x 17 à 19, y 36) avance d'une rangée dans la grève et le rendu en dessine
+    # le coin sud-est carré, contre (20, 36). Il reste ainsi (2026-11-02): les pierres du gué s'alignent sur
+    # ce bout de chemin, une rangée au-dessus de la berge (`src/rendu/gue.test.ts`); finir la route sur la
+    # promenade casse cet alignement, l'élargir déplace seulement le coin. C'est au rendu d'arrondir l'angle
+    # d'un chemin contre le sable, comme il le fait contre l'herbe.
     peindre("b", 20, 36, 42, 1)
     peindre("g", 16, 37, 5, 7)       # le gué, sur toute la largeur
     peindre(":", 17, 44, 3, 4)       # la vieille route continue au sud (fermée par le bord)
@@ -396,7 +428,7 @@ def construire_objets() -> None:
     objet("rock", 3, 33)
 
     # La place du bourg
-    objet("ferrand_shop", 23, 23, rotation=1, ident="ferrand_shop")
+    objet("ferrand_shop", EPICERIE["x0"], EPICERIE["y0"], rotation=EPICERIE["rotation"], ident="ferrand_shop")
     objet("arbor", 32, 28, ident="grocery_arbor")
     objet("barrel", 31, 23)
     objet("barrel", 31, 32)
@@ -413,7 +445,19 @@ def construire_objets() -> None:
     # raccord arrondi de l'allée et de l'anneau: deux pas plus loin, sur la terre battue et hors
     # du trajet de Jeanne (x 37,5), ils bordent encore l'allée (contrôle automatique:
     # `src/rendu/coherence-carte.test.ts`).
-    for x, y in ((48, 23), (48, 24), (47, 23), (48, 33), (48, 32), (43, 25), (36, 25)):
+    # Retouche du 2026-11-02: la grille dit pavés ('+') sur toute la place, terre battue comprise;
+    # un massif n'y a pas sa place (le validateur en fait une erreur). Les sept quittent la place,
+    # dans le même ordre (mêmes identifiants, donc mêmes variantes au rendu):
+    # - bush_11 (noisetier), bush_12 et bush_16 (ronciers): ce sont des plantes de sous-bois, pas des
+    #   massifs de place. Ils rejoignent le bord du bois clair au nord de la voie, entre la maison de
+    #   Firmin et la remise (48, 8), (47, 9), (46, 9), hors de son chemin (x 44 et 45) et loin du
+    #   chêne au nichoir. Posés d'abord au bord ouest du pré (x 50), ils changeaient la marche des
+    #   robots du test de la chevrette (`moments-tour7.test.ts`), qui ne voyaient plus « elle regarde ».
+    # - bush_13 et bush_17 (massifs ronds): de part et d'autre de l'accès pavé est du quai (x 43 et
+    #   44), sur le terre-plein fleuri, comme les massifs qui l'entourent déjà (37 et 38, 46 et 47).
+    # - bush_14 (massif rond) et bush_15 (noisetier): angle sud-est, sur l'herbe entre la place et
+    #   le pré (x 49 et 50), hors de tout trajet (Jeanne tourne en y 30,5).
+    for x, y in ((48, 8), (47, 9), (42, 20), (49, 33), (50, 32), (46, 9), (45, 20)):
         objet("bush", x, y)
     objet("bench", 42, 28, rotation=3, ident="square_bench_east")
 
@@ -422,8 +466,15 @@ def construire_objets() -> None:
     objet("bush", 53, 26)
     objet("bush", 58, 29)
     objet("bush", 52, 32)
-    objet("rock", 56, 27)
+    # Le rocher du pré (56, 27) est le perchoir de la dame blanche (tour 9: `owl_land`, `owl_look` en
+    # 56,6 ; 27,5); le rendu la pose sur son dessus. Le rendu tire la variante d'un `rock` de son
+    # identifiant (`MODEL_VARIANTS`): `rock_02` est un `rock_small` (0,31 m, la chouette au ras de
+    # l'herbe haute), `rock_03` un `rock_medium` (0,50 m, 1,3 x 0,9 m, il tient dans sa case). Les
+    # deux rochers du pré échangent donc leur place (retouche du 2026-11-02): le perchoir est
+    # `rock_03`. `rock_large` (1,08 m) aurait été aussi loin des 0,8 m de la chorégraphie, mais déborde
+    # de 0,7 m de sa case (2,4 x 1,5 m) sur l'herbe où l'on marche.
     objet("rock", 60, 32)
+    objet("rock", 56, 27)
     objet("barrel", 52, 23)
 
     # La berge
@@ -452,7 +503,13 @@ def construire_objets() -> None:
 
     # Sous-bois de la lisière: sureaux, ronces, quelques rochers (ni arbres ni obstacles en ligne).
     # Tour 8: le sureau de (35, 8) passe en (33, 8) pour laisser la place au roncier du coin 04.
-    for x, y in ((17, 3), (19, 7), (23, 5), (27, 8), (29, 7), (33, 3), (33, 8), (37, 4), (39, 7)):
+    # Retouche du 2026-11-02: le rendu dessine en sureau le buisson `bush_41` (`MODEL_BY_PROP` de
+    # src/rendu/modeles.ts), qui porte les grappes du coin 06. Depuis le retrait des deux massifs de
+    # l'angle sud-ouest de la place (R22), la numérotation a glissé de deux: le buisson de (33, 8) était
+    # `bush_39` et `bush_41` celui de (39, 7), à 6,3 m du coin (grappes posées par terre). Les deux
+    # dernières places de la liste sont donc échangées: `bush_41` revient en (33, 8), au pied du coin 06
+    # (contrôle: `controler_hotes_cueillette` du validateur).
+    for x, y in ((17, 3), (19, 7), (23, 5), (27, 8), (29, 7), (33, 3), (39, 7), (37, 4), (33, 8)):
         objet("bush", x, y)
     # Tour 8 (section 5.2): un roncier contre la lisière, au nord de chaque coin au soleil
     # (forage_edge_03 à _05, y 9,5), face avant (+Z, rotation 0) tournée vers le coin, d'où l'on
@@ -682,8 +739,12 @@ POINTS = [
       "il en part et y revient", cap_degres=315),
     p("fox_track_west", 0.2, 13.5, "moment du renard: bout ouest de la voie, d'où il vient en suivant le ballast",
       moment="fox", portee=4.0),
-    p("fox_mousing", 7.5, 17.0, "moment du renard: il mulote dans l'herbe non fauchée entre la voie et la "
-      "maisonnette, à 4 m de son mur nord", moment="fox"),
+    # Retouche du 2026-11-02: en (7,5 ; 17,0), il tombait dans la chambre une fois bâtie (emprise x 5 à 11,
+    # y 16 à 20). Il mulote maintenant dans la bande d'herbe à l'ouest de la réserve (x 2 à 4), entre la
+    # voie et le futur cellier: à 2 m du site du cellier, 1,5 m du ballast, 2 m de l'aile de la chambre;
+    # au sud-est, rien de plus haut que l'égout de la chambre (2 m) ne le cache en orientation 0.
+    p("fox_mousing", 3.0, 16.5, "moment du renard: il mulote dans l'herbe non fauchée entre la voie et le "
+      "pignon ouest de la maisonnette, à l'ouest de la chambre et au nord du cellier", moment="fox"),
     p("meadow_glow", 56.5, 29.5, "moment des vers luisants: herbes hautes du pré, à plus de 9 m des lampadaires",
       moment="glowworms"),
     # Tour 7 (docs/jeux/jeu-1/tour-07-conception.md, section 1.5). La chevrette quitte la lisière nord (cachée
@@ -735,7 +796,7 @@ POINTS = [
     # Tour 9: chantiers (points des envies et des répliques).
     p("ford_bench", 24.0, 36.5, "le banc du gué (chantier `ford_bench`), rive nord, tourné vers l'eau",
       portee=1.5),
-    p("house_bench", 12.5, 23.0, "le banc contre le pignon est de la maisonnette (chantier `house_bench`), "
+    p("house_bench", 11.72, 23.0, "le banc contre le pignon est de la maisonnette (chantier `house_bench`), "
       "tourné vers l'est", portee=1.5),
     p("path_lamp", 14.5, 27.5, "sur le chemin, au pied du réverbère (chantier `path_lamp`, case 14, 26)"),
     # Tour 9: les étoiles de l'Aubrune (fiche 1.4.10 du tour 7): l'eau calme au pied du ponton et ses deux
@@ -791,16 +852,27 @@ POINTS += [
       objet="salon_shop", portee=1.5, interieur=True),
     p("salon_window", 73.5, 26.5, "Solange coud derrière la vitrine (lundi), vue de la rue Haute",
       objet="salon_shop", interieur=True),
-    # Dans l'épicerie-pension (boutique de 6 x 6, x 24 à 29, y 26 à 31; porte en 30, 30)
+    # Dans l'épicerie-pension (boutique de 6 x 6, x 24 à 29, y 26 à 31; porte en 30, 30). Retouche du
+    # 2026-11-02: les places de l'artiste (`interior_spots` de `ferrand_shop`, repère glTF x, z), tournées
+    # avec l'objet (rotation 1, centre 27 ; 28): x = 27 + z, y = 28 - x (`glb_vers_carte`).
     p("grocery_inside", 27.5, 28.5, "dans la boutique d'Odette (apparition)", objet="ferrand_shop", interieur=True),
-    p("grocery_inside_counter", 28.5, 27.0, "le comptoir intérieur (le même que le guichet de la place, vu de "
-      "dedans): on y achète et vend depuis la boutique", objet="ferrand_shop", portee=1.5, interieur=True),
-    p("grocery_table", 26.5, 30.5, "la petite table et ses deux chaises, près du poêle: chocolat chaud, repas",
+    p("grocery_inside_counter", *glb_vers_carte(1.5, 2.5), "le comptoir intérieur, la place d'Odette au guichet "
+      "(entre le retour du comptoir et la cloison; le même comptoir sert la place): on y achète et vend depuis la "
+      "boutique", objet="ferrand_shop", portee=1.5, interieur=True),
+    p("grocery_customer", *glb_vers_carte(0.05, 2.05), "la place du client au comptoir intérieur, au bout du "
+      "retour, face à Odette", objet="ferrand_shop", portee=1.0, interieur=True),
+    p("grocery_table", *glb_vers_carte(-2.35, -1.35), "la petite table ronde et ses deux chaises: chocolat chaud, "
+      "repas", objet="ferrand_shop", portee=1.5, interieur=True),
+    p("grocery_table_seat_east", *glb_vers_carte(-2.35, -0.75), "la chaise est de la petite table (vers la porte)",
+      objet="ferrand_shop", portee=1.0, interieur=True),
+    p("grocery_table_seat_west", *glb_vers_carte(-2.35, -1.95), "la chaise ouest de la petite table (vers les "
+      "rayonnages du fond)", objet="ferrand_shop", portee=1.0, interieur=True),
+    p("grocery_stove", *glb_vers_carte(-3.55, -0.4), "le poêle de fonte, contre le mur sud (se chauffer)",
       objet="ferrand_shop", portee=1.5, interieur=True),
-    p("grocery_dining_door", 27.5, 26.5, "la porte entrouverte de la salle à manger de la pension (examiner)",
-      objet="ferrand_shop", cap_degres=0, interieur=True),
-    p("grocery_stairs", 25.0, 26.5, "le pied de l'escalier des chambres de la pension (examiner)",
-      objet="ferrand_shop", portee=1.5, interieur=True),
+    p("grocery_dining_door", *glb_vers_carte(1.6, 1.0), "la porte entrouverte de la salle à manger de la pension "
+      "(examiner)", objet="ferrand_shop", cap_degres=0, interieur=True),
+    p("grocery_stairs", *glb_vers_carte(1.55, 0.95), "le pied de l'escalier des chambres de la pension, devant la "
+      "porte de la salle à manger (examiner)", objet="ferrand_shop", portee=1.5, interieur=True),
     # Sites des pièces à bâtir de la maisonnette (section 4.3: panneau et caisse du chantier)
     p("room_cellar_site", 3.5, 18.5, "chantier du cellier: panneau et caisse, au nord du pignon ouest, hors de "
       "l'emprise de l'appentis (x 2 à 4, y 21 à 26) et hors du chemin"),
@@ -902,10 +974,16 @@ CHANTIERS = [
      "rect": {"x": 14, "y": 26, "w": 1, "h": 1}, "cases": [[14, 26]],
      "role": "réverbère au bord nord du chemin de la maisonnette: le tronçon le plus sombre du retour de la "
              "place (le lampadaire du passage à niveau est à 9 m); à 31 m du ponton, qui reste sombre"},
-    {"id": "house_bench", "type": "bench", "x": 12.5, "y": 23.0, "rotation": 1,
-     "rect": {"x": 12, "y": 22, "w": 1, "h": 2}, "cases": [[12, 22], [12, 23]],
-     "role": "banc contre le pignon est de la maisonnette, tourné vers l'est: entre le mur (x 11) et le chemin "
-             "(x 13), sans le toucher; soleil du matin, chemin du quai, passage des trains"},
+    # Retouche du 2026-11-02: origine en x 11,72, fixée par l'artiste (`house_bench`, `wall_back` 0,386 m):
+    # le haut du dossier touche le soubassement du pignon (nu en x 11,33). Le banc tient alors tout entier
+    # dans la colonne du mur (x 11,34 à 11,97), déjà infranchissable: il ne bloque aucune case de plus. Les
+    # cases (12, 22) et (12, 23), devant les deux places, restent libres: on s'y relève (`standForward`
+    # 0,85 m de `reglages.json`, soit x 12,57), à un pas du chemin (x 13).
+    {"id": "house_bench", "type": "bench", "x": 11.72, "y": 23.0, "rotation": 1,
+     "rect": {"x": 11, "y": 22, "w": 1, "h": 2}, "cases": [],
+     "role": "banc à dossier contre le pignon est de la maisonnette, tourné vers l'est, le dossier contre le "
+             "soubassement; on s'assoit et on se relève depuis les cases (12, 22) et (12, 23); soleil du "
+             "matin, chemin du quai, passage des trains"},
     {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": None, "cases": [],
      "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
 ]
@@ -965,17 +1043,45 @@ INTERIEURS = [
                      "entrouverte (`grocery_dining_door`), on n'y entre pas (étape 3 de l'histoire d'Odette)"},
         ],
         "apparition": "grocery_inside", "heures": "grocer", "ambiance": "room-tone-shop",
+        # Retouche du 2026-11-02: les cases de `interior_blocked` de l'artiste, tournées avec l'objet, sauf
+        # une. Le rayonnage du mur ouest (x 24 à 24,35) couvre y 28,07 à 30,42; l'artiste bloque (24, 28) et
+        # (24, 29) et laisse (24, 30), où il entre aussi de 0,35 m. Avec (24, 29) bloquée, la table (25, 30) et
+        # le poêle (26, 31) enferment le coin (24, 30), (24, 31), (25, 31) et la chaise ouest: on ne passe
+        # pas en biais entre deux cases pleines. (24, 29) reste donc libre, comme (24, 30) (à reporter dans
+        # le GLB par l'artiste).
         "mobilier": [
-            {"id": "grocery_inner_counter", "cases": [[28, 26], [28, 27]], "rotation": 3,
-             "role": "le comptoir intérieur, Odette derrière (x 29), le guichet de la place dans son dos (30, 26)"},
-            {"id": "grocery_stairs", "cases": [[24, 26], [25, 26]], "rotation": 2,
-             "role": "l'escalier des chambres, contre la cloison de la salle à manger"},
-            {"id": "grocery_shelves", "cases": [[24, 27], [24, 28]], "rotation": 1,
-             "role": "rayonnages, bocaux et sacs de graines contre le mur ouest (qui reste debout pour la caméra)"},
-            {"id": "grocery_stove", "cases": [[24, 30]], "rotation": 1,
-             "role": "le poêle de fonte, son tuyau contre le mur ouest"},
-            {"id": "grocery_small_table", "cases": [[26, 30]], "rotation": 0,
-             "role": "la petite table près du poêle; ses deux chaises en (25, 30) et (27, 30), cases libres"},
+            {"id": "grocery_inner_counter", "cases": cases_glb((1, 2), (0, 2), (-1, 2)), "rotation": 3,
+             "role": "le comptoir: le présentoir de bocaux sous la vitrine (29, 27 et 28), son retour "
+                     "perpendiculaire à la façade (y 26,9 à 27,5, de x 28,6 à la vitrine) avec la balance et la panière d'Achille, et la "
+                     "place d'Odette au guichet (29, 26), entre le retour et la cloison, où l'on n'entre pas; "
+                     "elle y passe par le palier (28, 26)"},
+            {"id": "grocery_stairs", "cases": cases_glb((1, -3), (1, -2), (1, -1), (1, 0)), "rotation": 1,
+             "role": "l'escalier des chambres (15 marches) le long de la cloison, pied à l'est sur le palier "
+                     "(28, 26), devant la porte de la salle à manger"},
+            {"id": "grocery_shelves", "cases": cases_glb((-1, -3)), "rotation": 1,
+             "role": "le rayonnage de bocaux du mur ouest (qui reste debout pour la caméra), x 24 à 24,35, "
+                     "y 28,07 à 30,42; les cases (24, 29) et (24, 30) restent libres (voir plus haut)"},
+            {"id": "grocery_small_table", "cases": cases_glb((-3, -2)), "rotation": 0,
+             "role": "la petite table ronde (25,65 ; 30,35); ses deux chaises de part et d'autre, à l'est "
+                     "(26,25) et à l'ouest (25,05)"},
+            {"id": "grocery_stove", "cases": cases_glb((-4, -1)), "rotation": 2,
+             "role": "le poêle de fonte et son tuyau contre le mur sud (placé là par l'artiste; ce mur est coupé "
+                     "pour la caméra par défaut, le poêle reste debout devant)"},
+            {"id": "grocery_south_shelves", "cases": cases_glb((-4, 0), (-4, 2)), "rotation": 2,
+             "role": "le rayonnage du mur sud (27, 31) et les sacs de graines près de la porte, hors du "
+                     "battant (29, 31); (28, 31), où le rayonnage n'a que 0,35 m de fond, reste libre comme "
+                     "chez l'artiste"},
+        ],
+        # Petits objets posés sur le mobilier, dessinés avec l'intérieur (masqués tant que le joueur local
+        # n'est pas dans le bâtiment, comme `ferrand_shop_interior`), et seulement quand `visible_si` est
+        # vrai (mêmes conditions que les répliques de `habitants.json`). Le jeu ne les lit pas encore.
+        "accroches": [
+            {"id": "grocery_coffee_mill", "modele": "coffee_mill", "sur": "grocery_inner_counter",
+             "x": glb_vers_carte(1.3, 2.75)[0], "y": glb_vers_carte(1.3, 2.75)[1], "z": 0.95, "regarde": "est",
+             "visible_si": [{"type": "given", "villager": "odette", "item": "coffee_mill"}],
+             "role": "le moulin neuf d'Odette (cadeau du tour 9), sur la tablette du guichet (dessus à 0,94 m), "
+                     "entre le retour du comptoir et la cloison, à portée de main d'Odette; on le voit de la "
+                     "place par le guichet. Origine du modèle sous la caisse"},
         ],
     },
     {
@@ -1083,8 +1189,9 @@ TRAJETS = [
      "note": "dimanche, la promenade de la berge avec Jeanne"},
     {"id": "solange_salon_to_grocery_table", "habitant": "solange", "de": "salon_counter", "a": "grocery_table",
      "par": [[71.0, 26.5], [73.5, 26.5], [73.5, 28.5], [75.5, 28.5], [75.5, 23.5], [62.0, 22.5], [49.5, 22.5],
-             [33.5, 22.5], [31.5, 24.5], [31.5, 30.5], [29.5, 30.5], [27.5, 29.5]],
-     "note": "dimanche, 14 h: sa mise en plis chez Odette, par la porte de l'épicerie"},
+             [33.5, 22.5], [31.5, 24.5], [31.5, 30.5], [29.5, 30.5], [26.25, 30.35]],
+     "note": "dimanche, 14 h: sa mise en plis chez Odette, par la porte de l'épicerie, jusqu'à la chaise est de "
+             "la petite table"},
 ]
 
 HABITANTS = {

@@ -646,6 +646,8 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     controler_interieurs(carte, rapport, libre, lieux, depart, reglages, resultats)
     controler_ru(carte, rapport, libre, lieux, resultats)
     controler_details(carte, rapport)
+    controler_bancs(carte, rapport, libre, lieux, depart, reglages)
+    controler_hotes_cueillette(carte, rapport, reglages)
 
     # Potager
     if "garden" in zones:
@@ -991,6 +993,18 @@ def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]],
         for (x, y), mid in mobilier.items():
             if (x, y) not in pieces_actives:
                 rapport.erreur(f"intérieur {bid}: mobilier {mid} hors des pièces en ({x}, {y})")
+        # Petits objets posés sur le mobilier (moulin d'Odette): sur une case du meuble qui les porte, à une
+        # hauteur de meuble, avec un modèle et une condition d'apparition bien formée.
+        meubles = {m["id"]: {tuple(c) for c in m["cases"]} for m in b.get("mobilier", [])}
+        for a in b.get("accroches", []):
+            case = (math.floor(a["x"]), math.floor(a["y"]))
+            if case not in meubles.get(a.get("sur", ""), set()):
+                rapport.erreur(f"intérieur {bid}: accroche {a['id']} pas sur le meuble {a.get('sur')!r} ({case})")
+            if not a.get("modele") or not 0.0 < a.get("z", -1) < 2.5:
+                rapport.erreur(f"intérieur {bid}: accroche {a['id']}: modèle manquant ou hauteur hors du mobilier")
+            cond = a.get("visible_si", [])
+            if not isinstance(cond, list) or not all(isinstance(c, dict) and "type" in c for c in cond):
+                rapport.erreur(f"intérieur {bid}: accroche {a['id']}: `visible_si` doit être une liste de conditions")
         # Parties fermées: dans l'emprise, hors des pièces, bloquées.
         for f in b.get("fermees", []):
             for x, y in cases_rect(f["rect"]):
@@ -1134,7 +1148,11 @@ def controler_ru(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: 
 
 
 def controler_details(carte: dict, rapport: Rapport) -> None:
-    """Cohérence du monde (retour R22): ni buisson, ni rocher, ni arbre planté sur un sol de passage."""
+    """Cohérence du monde (retour R22): ni buisson, ni rocher, ni arbre planté sur un sol de passage.
+
+    Erreur depuis le 2026-11-02 (c'était un avertissement): la place est pavée dans la grille, terre battue
+    comprise; un massif y est toujours mal placé, quel que soit le dessin du rendu.
+    """
     types = carte["types"]
     lignes = carte["terrain"]["lignes"]
     for o in carte["objets"]:
@@ -1143,8 +1161,79 @@ def controler_details(carte: dict, rapport: Rapport) -> None:
             x0, y0, w, h = emprise_monde(o, types)
             for x, y in cases_rect({"x": x0, "y": y0, "w": w, "h": h}):
                 if lignes[y][x] in "+:qPYj":
-                    rapport.avert(f"{o['id']} ({o['type']}) planté sur un sol de passage {lignes[y][x]!r} en "
-                                  f"({x}, {y})")
+                    rapport.erreur(f"{o['id']} ({o['type']}) planté sur un sol de passage {lignes[y][x]!r} en "
+                                   f"({x}, {y})")
+
+
+# Bancs (`reglages.json`, `benches`; calcul de `src/etat/bancs.ts`): valeurs par défaut si le fichier manque.
+BANCS_DEFAUT = {"slots": [-0.5, 0.5], "seatForward": 0.0, "standForward": 0.85}
+
+
+def places_banc(x: float, y: float, rotation: int, reglage: dict) -> list[list[tuple[float, float]]]:
+    """Pour chaque place d'un banc: où l'on se relève, devant (à `standForward`), puis derrière."""
+    a = rotation * math.pi / 2
+    res = []
+    for offset in reglage["slots"]:
+        sx = x + math.cos(a) * offset + math.sin(a) * reglage["seatForward"]
+        sy = y - math.sin(a) * offset + math.cos(a) * reglage["seatForward"]
+        pas = reglage["standForward"]
+        res.append([(sx + math.sin(a) * sens * pas, sy + math.cos(a) * sens * pas) for sens in (1, -1)])
+    return res
+
+
+def controler_bancs(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: Lieux, depart: list[str],
+                    reglages: Any) -> None:
+    """Chaque place de banc (carte, chantiers bâtis) a devant elle une case libre et atteignable où se relever,
+    tous les chantiers bâtis. Le jeu (`standingSpot`) essaie ensuite derrière, puis la case libre la plus
+    proche: derrière un banc adossé, c'est de l'autre côté du mur (dans la maisonnette pour le banc du
+    pignon). Seuls les sièges sans modèle (le bord du ponton) se quittent par derrière, comme prévu."""
+    reglage = dict(BANCS_DEFAUT)
+    if isinstance(reglages, dict) and isinstance(reglages.get("benches"), dict):
+        reglage.update({k: v for k, v in reglages["benches"].items() if k in BANCS_DEFAUT})
+    bati = [ligne[:] for ligne in libre]
+    for ch in carte.get("chantiers", []):
+        for x, y in ch.get("cases", []):
+            bati[y][x] = False
+    atteint = dijkstra(bati, [c for pid in depart for c in lieux.cases(pid, bati)])
+    # Dernier champ: combien d'endroits essayer (1: devant seulement; 2: devant puis derrière).
+    bancs = [(o["id"], o["x"], o["y"], o["rotation"], 1) for o in carte["objets"] if o["type"] == "bench"]
+    bancs += [(s["id"], s["x"], s["y"], s["rotation"], 2) for s in carte.get("sieges", [])]
+    bancs += [(c["id"], c["x"], c["y"], c["rotation"], 1) for c in carte.get("chantiers", []) if c["type"] == "bench"]
+    haut, larg = len(bati), len(bati[0])
+    for ident, x, y, rotation, essais in bancs:
+        for n, endroits in enumerate(places_banc(x, y, rotation, reglage)):
+            cases = [(math.floor(fx), math.floor(fy)) for fx, fy in endroits[:essais]]
+            if not any(0 <= cx < larg and 0 <= cy < haut and bati[cy][cx] and (cx, cy) in atteint for cx, cy in cases):
+                rapport.erreur(f"banc {ident}: place {n}, pas de case libre et atteignable où se relever "
+                               f"({' ni '.join(str(c) for c in cases)})")
+
+
+# Cueillettes posées sur un hôte par le rendu (`POSED_ON` et `HOST_REACH` de `src/rendu/vie.ts`): l'hôte le plus
+# proche à moins de 1,6 m du coin. Hôte désigné par son type, ou par l'identifiant d'un objet dont le rendu
+# change le modèle (`MODEL_BY_PROP` de `src/rendu/modeles.ts`: `bush_41` est le sureau).
+HOTES_CUEILLETTE = {"hazelnut": ("type", "bush_hazel"), "blackberry": ("type", "bramble"),
+                    "elderberry": ("id", "bush_41")}
+PORTEE_HOTE = 1.6
+
+
+def controler_hotes_cueillette(carte: dict, rapport: Rapport, reglages: Any) -> None:
+    """Chaque coin de cueillette qui donne une noisette, une mûre ou des grappes de sureau a son hôte à portée."""
+    if not isinstance(reglages, dict) or not isinstance(reglages.get("forage"), dict):
+        return
+    points = {p["id"]: p for p in carte["points"]}
+    for coin in reglages["forage"].get("points", []):
+        p = points.get(coin.get("point"))
+        if p is None:
+            continue
+        for item in coin.get("items", []):
+            if item not in HOTES_CUEILLETTE:
+                continue
+            cle, valeur = HOTES_CUEILLETTE[item]
+            hotes = [o for o in carte["objets"] if o.get(cle) == valeur]
+            d = min((math.hypot(o["x"] - p["x"], o["y"] - p["y"]) for o in hotes), default=math.inf)
+            if d > PORTEE_HOTE + 1e-9:
+                rapport.erreur(f"cueillette {p['id']}: {item} sans hôte ({valeur}) à moins de {PORTEE_HOTE} m "
+                               f"(le plus proche à {d:.1f} m): le rendu la laisse par terre")
 
 
 def _charger(dossier: Path | None, nom: str) -> Any:
