@@ -19,6 +19,7 @@ from mathutils import Matrix, Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
+import coiffures  # noqa: E402
 import palette as P  # noqa: E402
 
 FPS = 30
@@ -562,6 +563,8 @@ def fringe(g, hc, k=1.0, color="hair", z=0.105, w=0.25, h=0.055, tilt=8, parts=1
 def hair_style(g, style, hc, k=1.0):
     if ROUND and style in ("short", "bob", "bun"):
         return hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
+    if ROUND and style in coiffures.NEW_CUTS:
+        return coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
     if style == "short":
         hair_cap(g, hc, k)
         hair_back(g, hc, k, z_bot=-0.05)
@@ -1035,6 +1038,57 @@ def build_npc_round(g, who, expr):
         hands_round(g)
         g.box((0.07, 0.012, 0.06), loc=(0.0, torso_front_y(1.13, torso_rings(0.33, 0.30, 0.20)) - 0.006, 1.13),
               color="extra_b", bevel=0.005, bone="spine")
+    elif who == "achille":
+        # boulanger, lent et rond: chemise blanche aux manches retroussées (farine aux avant-bras), grand tablier
+        # fariné à bavette, calot de mitron, pantalon de toile, moustache tombante
+        rings = torso_rings(0.41, 0.37, 0.24, belly=0.08)
+        hc = head_round_face(g, expr, brow_k=1.3, cheek_base=0.4)
+        hair_round(g, "sides", hc)
+        mustache_round(g, hc)
+        top = hat_top(hc, 1.0, 0.07)
+        g.lathe([(0.168, top - 0.01), (0.172, top + 0.035)], loc=(0, 0.01, 0), colors="extra_a", segs=12, bone="head")
+        g.sphere(1.0, loc=(0, 0.01, top + 0.04), color="extra_a", segs=10, rings=4, scale=(0.15, 0.17, 0.045),
+                 bone="head")
+        g.box((0.012, 0.3, 0.035), loc=(0, 0.01, top + 0.07), color="extra_b", bone="head")
+        neck(g)
+        torso_round(g, w_top=0.41, w_bot=0.37, d=0.24, belly=0.08)
+        pelvis_round(g, w=0.33, d=0.23)
+        collar(g, color="top_trim")
+        apron(g, z_top=1.0, z_bot=0.45, w_top=0.28, w_bot=0.36, color="extra_a", bib_to=1.3, front_r=0.24, rings=rings)
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="rolled", top="top", trim="top_trim", skin="skin", puff=1.1)
+            leg_round(g, side, thigh="bottom", cuff="bottom", r=0.09)
+        hands_round(g)
+    elif who == "solange":
+        # coiffeuse et mercière, vive: blouse à deux poches sur une jupe, ciseaux pendus à la ceinture, lunettes
+        # au cou sur leur cordon, chignon de théâtre
+        rings = torso_rings(0.36, 0.30, 0.21)
+        hc = head_round_face(g, expr, cheek_base=0.25, brow_k=1.1)
+        hair_round(g, "bun", hc)
+        neck(g)
+        torso_round(g, w_top=0.36, w_bot=0.30, d=0.21)
+        collar(g, color="top_trim", w=0.17)
+        skirt(g, z_top=0.99, z_bot=0.42, r_top=0.19, r_bot=0.29, color="bottom", segs=10)
+        coat_skirt_round(g, 0.165, 0.124, 0.8, 0.98)
+        buttons(g, n=4, z0=0.86, z1=1.3, y=-0.11, color="top_trim", rings=rings)
+        for sx in (1, -1):
+            g.box((0.08, 0.012, 0.075), loc=(sx * 0.085, -0.13, 0.86), color="top_trim", bone="hips")
+        # ciseaux au côté droit: cordon de la ceinture, anneaux rouges, lames d'acier vers le bas
+        g.box((0.008, 0.008, 0.08), loc=(-0.17, -0.06, 0.9), color="extra_b", bone="hips")
+        for k, dx in enumerate((-0.012, 0.012)):
+            g.cyl(0.018, 0.008, loc=(-0.172 + dx, -0.075, 0.84), color="extra_a", segs=6, rot=(0, 90, 0), bone="hips")
+            g.box((0.008, 0.012, 0.09), loc=(-0.172 + dx * 0.4, -0.08, 0.78), color="metal", rot=(0, dx * 300, 0),
+                  bone="hips")
+        # lunettes au cou: cordon et deux verres ronds sur la poitrine
+        yl = torso_front_y(1.25, rings) - 0.012
+        for sx in (1, -1):
+            g.cyl(0.022, 0.006, loc=(sx * 0.03, yl, 1.25), color="metal", segs=8, rot=(90, 0, 0), bone="chest")
+            g.box((0.005, 0.005, 0.14), loc=(sx * 0.065, yl + 0.03, 1.31), color="extra_b", rot=(20, 0, sx * 20),
+                  bone="chest")
+        for side in ("l", "r"):
+            arm_round(g, side, sleeve="long", top="top", trim="top_trim")
+            leg_round(g, side, thigh="skin", shin="skin", r=0.075)
+        hands_round(g)
     elif who == "lucie":
         hc = head_round_face(g, expr)
         hair_round(g, "ponytail", hc)
@@ -1603,8 +1657,8 @@ def bake_actions(arm, A):
 
 # Programme -----------------------------------------------------------------
 
-NPCS = ["firmin", "odette", "basile", "jeanne", "lucie"]
-HAIRS = ["short", "bob", "bun"]
+NPCS = ["firmin", "odette", "basile", "jeanne", "lucie", "achille", "solange"]
+HAIRS = ["short", "bob", "bun"] + coiffures.NEW_CUTS
 OUTFITS = ["work", "smock", "overalls"]
 SYMBOLS = ["orb", "crescent", "star", "sun", "planet", "comet"]
 
@@ -1630,6 +1684,10 @@ def main():
         add("player_outfit_" + o, "player_a", rounded(lambda g, e, o=o: build_outfit(g, o)), False)
     for h in HAIRS:
         add("player_hair_" + h, "player_a", rounded(lambda g, e, h=h: hair_style(g, h, PHC, PK)), False)
+    # tour 10: barbe courte, barbe fournie, moustache (pièces des joueurs au choix, couleur des cheveux)
+    for f in coiffures.FACIAL:
+        name = "player_" + f if f == "mustache" else "player_" + f
+        add(name, "player_a", rounded(lambda g, e, f=f: coiffures.facial(g, f, PHC)), False)
     for s in SYMBOLS:
         add("player_scarf_" + s, "player_a", rounded(lambda g, e, s=s: scarf(g, s)), False)
     for n in NPCS:

@@ -17,6 +17,7 @@ import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
 from bourg import Face, door, slab, window  # noqa: E402
 import maison_t9 as T9  # noqa: E402
+import maison_t10 as T10  # noqa: E402
 
 
 def straw_mattress(A):
@@ -456,6 +457,9 @@ def main():
     A.add("wall_clock_pendulum", T9.clock_pendulum(A), parent=clock, loc=(0, 0.47, zc - 0.16))
     furn.append(clock)
     furn.append(A.add("wicker_armchair", T9.wicker_armchair(A), {"footprint": [1, 1], "seat_height": 0.42}))
+    # tour 10 (maison_t10.py): rangement à cases, râtelier, rideaux aux fenêtres
+    t10_furn, _ = T10.build(A)
+    furn += t10_furn
     items = []
     for name, fn in (("chalk_box", T9.chalk_box), ("coffee_mill", T9.coffee_mill), ("elder_jelly", T9.elder_jelly),
                      ("leather_apron", T9.leather_apron), ("wool_scarf", T9.wool_scarf)):
