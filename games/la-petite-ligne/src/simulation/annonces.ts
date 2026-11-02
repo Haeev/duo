@@ -15,7 +15,8 @@ import { type Sim, character, distance, emit, format, notifyKey } from './contex
 import { queueHint } from './astuces';
 import { POINT } from './ids';
 import { startQuest } from './quetes';
-import { addStack, countInBag, countInStacks } from './sac';
+import { countInBag, countInStacks } from './sac';
+import { storeAtHome } from './rangement';
 import { runEffects } from './effets';
 
 /** Gabarits gardés pour la règle des 10 jours (deux annonces par semaine: 4 couvrent 14 jours). */
@@ -193,7 +194,7 @@ function complete(sim: Sim, a: BoardAnnonce): void {
   const first = def.unique !== null && !world.board.uniquesGiven.includes(def.unique);
   if (first && def.unique !== null) {
     world.board.uniquesGiven.push(def.unique);
-    addStack(world.cellar, def.unique, 'ordinary', 1);
+    storeAtHome(sim, def.unique, 'ordinary', 1);
   }
   const thanks = rawText(sim.content.texts, 'annonces', def.id, first ? 'thanks' : 'thanksAgain') ?? rawText(sim.content.texts, 'annonces', def.id, 'thanks');
   if (def.scene === null && thanks !== null) villagerSays(sim, a.by, def.giver, thanks);

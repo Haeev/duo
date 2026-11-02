@@ -3,10 +3,17 @@
  * fantôme devant soi; on le tourne, on le pose, on le reprend.
  * Coin à soi (MA-06 de la démo): chacun désigne un carré de 2x2 cases de la
  * pièce où lui seul pose et reprend des meubles.
+ * Tour 10 (lot L4): on pose dans toute pièce de la maisonnette (le cellier, la chambre une fois
+ * bâtis); les étagères hautes aux places du cellier; les rideaux seulement à une fenêtre libre
+ * (`pieces.json`, nœuds `window_<n>` du modèle), qu'on ouvre et qu'on ferme.
  */
-import { type GameMap, inRect } from '../etat/carte';
-import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacementPreview } from '../etat/types';
+import { type GameMap, HOUSE_BUILDING, type MapRoom, type Rect, inRect } from '../etat/carte';
+import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacedFurniture, type PlacementPreview } from '../etat/types';
 import type { ItemDef } from '../donnees/types';
+import type { WindowDef, WindowSide } from '../donnees/maison';
+import { activeHouseRooms, curtainsAt, houseRoomAt, windowsNow } from '../etat/maison';
+import { addHeart } from './besoins';
+import { removalOverflows, storeAtHome } from './rangement';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, emit, message, newId, partnerName, partnerOf, say } from './contexte';
 import { queueHint } from './astuces';
@@ -56,7 +63,7 @@ export function previewCell(c: Character, size: { w: number; d: number }): Cell 
  */
 export function pointerCell(sim: Sim, c: Character, size: { w: number; d: number }): Cell | null {
   const target = sim.runtime.pointer[c.id];
-  if (target?.kind !== 'ground' || !inRect(sim.map.house.room, target.x, target.y)) return null;
+  if (target?.kind !== 'ground' || houseRoomAt(sim.map, sim.world.rooms, target.x, target.y) === null) return null;
   return { cx: Math.round(target.x - size.w / 2), cy: Math.round(target.y - size.d / 2) };
 }
 
@@ -79,7 +86,17 @@ function problemKey(sim: Sim, problem: PlacementProblem): string {
   return problem === 'back_wall' && !Object.hasOwn(sim.content.texts.messages, key) ? PROBLEM_KEYS.wall : key;
 }
 
-export type PlacementProblem = 'outside' | 'wall' | 'back_wall' | 'not_yours' | 'overlap' | 'occupied' | 'blocks_way';
+export type PlacementProblem =
+  | 'outside'
+  | 'wall'
+  | 'back_wall'
+  | 'not_yours'
+  | 'overlap'
+  | 'occupied'
+  | 'blocks_way'
+  | 'not_window'
+  | 'fenestron'
+  | 'rack_place';
 
 const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   outside: 'placement_outside',
@@ -89,6 +106,9 @@ const PROBLEM_KEYS: Record<PlacementProblem, string> = {
   overlap: 'placement_overlap',
   occupied: 'placement_occupied',
   blocks_way: 'placement_blocks_way',
+  not_window: 'placement_not_window',
+  fenestron: 'placement_fenestron',
+  rack_place: 'placement_rack_place',
 };
 
 /**
@@ -110,9 +130,14 @@ export function placementProblem(
 ): PlacementProblem | null {
   const def = sim.content.items[item];
   if (def?.footprint === null || def === undefined) return 'outside';
-  const room = sim.map.house.room;
+  if (isCurtains(def)) return curtainsProblem(sim, cell);
   const cells = footprintCells(def.footprint, cell, rotation);
-  if (!cells.every((k) => inRect(room, k.cx + 0.5, k.cy + 0.5))) return 'outside';
+  const first = cells[0];
+  const home = first === undefined ? null : houseRoomAt(sim.map, sim.world.rooms, first.cx + 0.5, first.cy + 0.5);
+  if (home === null || !cells.every((k) => inRect(home.rect, k.cx + 0.5, k.cy + 0.5))) return 'outside';
+  const room = home.rect;
+  // L'étagère haute du cellier: seulement à l'une de ses deux places (section 5.2).
+  if (sim.content.settings.storage !== null && item === RACK_ITEM && !onShelfPlace(home, cells)) return 'rack_place';
   if (def.wall) {
     const onEdge = cells.some(
       (k) => k.cx === room.x || k.cy === room.y || k.cx === room.x + room.w - 1 || k.cy === room.y + room.h - 1,
@@ -145,16 +170,22 @@ export function placementProblem(
 export function updatePlacement(sim: Sim, c: Character): void {
   const item = heldItem(c);
   const def = item === null ? undefined : sim.content.items[item];
-  if (item === null || !isPlaceable(def) || def.footprint === null || !c.inHouse || c.status !== 'active') {
+  if (item === null || !isPlaceable(def) || def.footprint === null || c.inside !== HOUSE_BUILDING || c.status !== 'active') {
     if (c.placement !== null) {
       c.placement = null;
       sim.runtime.changed = true;
     }
     return;
   }
-  const rotation = c.placement?.item === item ? c.placement.rotation : 0;
+  let rotation = c.placement?.item === item ? c.placement.rotation : 0;
   const size = rotatedSize(def.footprint, rotation);
-  const cell = pointerCell(sim, c, size) ?? previewCell(c, size);
+  let cell = pointerCell(sim, c, size) ?? previewCell(c, size);
+  // Les rideaux s'accrochent à la fenêtre visée: l'aperçu se cale dessus.
+  const win = isCurtains(def) ? windowNear(sim, c, cell) : null;
+  if (win !== null) {
+    cell = windowCell(win);
+    rotation = SIDE_ROTATION[win.side];
+  }
   const problem = placementProblem(sim, item, cell, rotation, null, c.id);
   const valid = problem === null;
   // Sans texte dans `textes.json`, la clé: l'interface la traduit, sinon montre son message général.
@@ -185,18 +216,30 @@ export function rotatePlacement(sim: Sim, c: Character, delta: number): void {
 /** Pose le meuble tenu (à l'aperçu, ou à la case donnée par un clic). */
 export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotation: number | null): boolean {
   const item = heldItem(c);
-  if (item === null || !c.inHouse) return false;
+  if (item === null || c.inside !== HOUSE_BUILDING) return false;
   const def = sim.content.items[item];
   if (!isPlaceable(def) || def.footprint === null) return false;
-  const r = rotation ?? c.placement?.rotation ?? 0;
-  const at = cell ?? c.placement?.cell ?? null;
+  let r = rotation ?? c.placement?.rotation ?? 0;
+  let at = cell ?? c.placement?.cell ?? null;
   if (at === null) return false;
+  const win = isCurtains(def) ? windowNear(sim, c, at) : null;
+  if (isCurtains(def)) {
+    const problem = win === null ? curtainsProblem(sim, at) : null;
+    if (win === null) {
+      say(sim, c.id, problemKey(sim, problem ?? 'not_window'));
+      return false;
+    }
+    at = windowCell(win);
+    r = SIDE_ROTATION[win.side];
+  }
   const problem = placementProblem(sim, item, at, r, null, c.id);
   if (problem === 'not_yours') say(sim, c.id, PROBLEM_KEYS.not_yours, { partner: partnerName(sim, c.id) });
   if (problem !== null) return false;
   if (takeFromBag(c, item, 1).length === 0) return false;
   const id = newId(sim, 'f');
-  sim.world.furniture.push({ id, item, cell: { cx: at.cx, cy: at.cy }, rotation: r, placedBy: c.id });
+  const placed: PlacedFurniture = { id, item, cell: { cx: at.cx, cy: at.cy }, rotation: r, placedBy: c.id };
+  if (win !== null) placed.window = win.id;
+  sim.world.furniture.push(placed);
   c.placement = null;
   sim.runtime.dynamicDirty = true;
   bump(sim, 'placed', c.id);
@@ -211,6 +254,11 @@ export function takeFurniture(sim: Sim, c: Character, furnitureId: string): bool
   const f = sim.world.furniture[index];
   if (f === undefined) return false;
   if (sim.world.characters.some((ch) => ch.bedId === f.id)) return false;
+  // Jamais de débordement provoqué: le reste du rangement doit tout contenir (section 5.3).
+  if (removalOverflows(sim, f.id)) {
+    say(sim, c.id, 'storage_remove_refused');
+    return false;
+  }
   const def = sim.content.items[f.item];
   const owner = def === undefined || def.footprint === null ? null : cornerOwnerOf(sim, footprintCells(def.footprint, f.cell, f.rotation), c.id);
   if (owner !== null) {
@@ -338,3 +386,153 @@ export function sanitizeCorner(map: GameMap, value: unknown): Cell | null {
   const cell = { cx, cy };
   return cornerFits(map, cell) ? cell : null;
 }
+
+// ---------------------------------------------------------------------------
+// Étagères hautes et rideaux (tour 10, sections 5.2 et 6)
+
+/** L'étagère haute du cellier (`reglages.storage`): elle ne tient qu'aux places de la carte. */
+const RACK_ITEM = 'cellar_rack';
+
+function onShelfPlace(room: MapRoom, cells: readonly Cell[]): boolean {
+  const places: readonly Rect[] = room.build?.shelves ?? [];
+  return places.some(
+    (p) => p.w * p.h === cells.length && cells.every((k) => k.cx >= p.x && k.cy >= p.y && k.cx < p.x + p.w && k.cy < p.y + p.h),
+  );
+}
+
+/** Des rideaux (toutes couleurs): le même modèle à deux états (section 6.3). */
+export function isCurtains(def: ItemDef | undefined): boolean {
+  return def?.model === 'curtains';
+}
+
+/** Rotation d'un meuble posé dos à ce mur (convention de `backAgainstWall`). */
+export const SIDE_ROTATION: Readonly<Record<WindowSide, number>> = { north: 0, west: 1, south: 2, east: 3 };
+
+/** La case de la pièce au pied de la fenêtre (le bord du mur où elle s'ouvre). */
+export function windowCell(w: WindowDef): Cell {
+  switch (w.side) {
+    case 'north':
+      return { cx: Math.floor(w.x), cy: Math.round(w.y) };
+    case 'south':
+      return { cx: Math.floor(w.x), cy: Math.round(w.y) - 1 };
+    case 'west':
+      return { cx: Math.round(w.x), cy: Math.floor(w.y) };
+    case 'east':
+      return { cx: Math.round(w.x) - 1, cy: Math.floor(w.y) };
+  }
+}
+
+/** Portée (m) à laquelle une fenêtre se vise depuis la case de l'aperçu. */
+const WINDOW_AIM = 1.6;
+
+function windowsOfRoom(sim: Sim, room: MapRoom): WindowDef[] {
+  return windowsNow(sim.content, sim.map, sim.world.rooms).filter((w) => w.room === room.id);
+}
+
+/** La fenêtre libre à rideaux la plus proche du point visé, dans la pièce où l'on est, ou `null`. */
+function windowNear(sim: Sim, c: Character, cell: Cell): WindowDef | null {
+  const room = houseRoomAt(sim.map, sim.world.rooms, c.pos.x, c.pos.y);
+  if (room === null) return null;
+  let best: WindowDef | null = null;
+  let bestD = WINDOW_AIM;
+  for (const w of windowsOfRoom(sim, room)) {
+    if (!w.curtains || curtainsAt(sim.world, w.id) !== null) continue;
+    const d = Math.hypot(w.x - (cell.cx + 0.5), w.y - (cell.cy + 0.5));
+    if (d <= bestD) {
+      best = w;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/** Pourquoi des rideaux ne vont pas là: aucune fenêtre libre visée, ou le fenestron du cellier. */
+function curtainsProblem(sim: Sim, cell: Cell): PlacementProblem | null {
+  const room = houseRoomAt(sim.map, sim.world.rooms, cell.cx + 0.5, cell.cy + 0.5);
+  if (room === null) return 'outside';
+  const near = windowsOfRoom(sim, room).filter((w) => Math.hypot(w.x - (cell.cx + 0.5), w.y - (cell.cy + 0.5)) <= WINDOW_AIM);
+  if (near.some((w) => w.curtains && curtainsAt(sim.world, w.id) === null)) return null;
+  return near.some((w) => !w.curtains) ? 'fenestron' : 'not_window';
+}
+
+/**
+ * Ouvrir ou fermer des rideaux (Agir, de dedans). Les premiers rideaux ouverts du matin donnent
+ * Cœur +2 à qui les ouvre, une fois par jour (section 6.2).
+ */
+export function toggleCurtains(sim: Sim, c: Character, furnitureId: string): boolean {
+  const f = sim.world.furniture.find((x) => x.id === furnitureId);
+  if (f?.window === undefined || c.inside !== HOUSE_BUILDING) return false;
+  const reach = sim.content.settings.ranges.action + 1;
+  if (Math.hypot(c.pos.x - (f.cell.cx + 0.5), c.pos.y - (f.cell.cy + 0.5)) > reach) return false;
+  const closing = f.closed !== true;
+  if (closing) f.closed = true;
+  else delete f.closed;
+  sim.runtime.changed = true;
+  bump(sim, closing ? 'curtains_closed' : 'curtains_opened', c.id);
+  if (!closing && !c.needs.curtainsMorningDone && sim.world.clock.minutes < MORNING_UNTIL) {
+    c.needs.curtainsMorningDone = true;
+    addHeart(sim, c, sim.content.settings.needs.soft.heart.curtainsMorning);
+    say(sim, c.id, 'curtains_morning');
+  }
+  return true;
+}
+
+/** « Le matin » des rideaux ouverts: jusqu'à midi. */
+const MORNING_UNTIL = 12 * 60;
+
+/**
+ * Rideaux à replacer (migration du format 6, fenêtre devenue porte): à la fenêtre libre la plus
+ * proche de la même pièce, sinon au rangement. Renvoie ce qui a bougé: `hung` (accrochés ailleurs)
+ * et `stored` (rangés).
+ */
+export function rehangCurtains(sim: Sim, f: PlacedFurniture): 'hung' | 'stored' {
+  const room = houseRoomAt(sim.map, sim.world.rooms, f.cell.cx + 0.5, f.cell.cy + 0.5) ?? activeHouseRooms(sim.map, sim.world.rooms)[0] ?? null;
+  const free = room === null ? [] : windowsOfRoom(sim, room).filter((w) => w.curtains && curtainsAt(sim.world, w.id) === null);
+  free.sort((a, b) => Math.hypot(a.x - f.cell.cx - 0.5, a.y - f.cell.cy - 0.5) - Math.hypot(b.x - f.cell.cx - 0.5, b.y - f.cell.cy - 0.5));
+  const win = free[0];
+  if (win !== undefined) {
+    f.window = win.id;
+    f.cell = windowCell(win);
+    f.rotation = SIDE_ROTATION[win.side];
+    return 'hung';
+  }
+  sim.world.furniture = sim.world.furniture.filter((x) => x !== f);
+  storeAtHome(sim, f.item, 'ordinary', 1);
+  return 'stored';
+}
+
+/**
+ * Un meuble sur la case devant une porte percée cette nuit (section 4.3): sur la case libre la plus
+ * proche de la même pièce, sinon rangé. Renvoie les objets déplacés.
+ */
+export function clearDoorway(sim: Sim, cell: Cell, roomId: string): string[] {
+  const room = activeHouseRooms(sim.map, sim.world.rooms).find((r) => r.id === roomId);
+  if (room === undefined) return [];
+  const moved: string[] = [];
+  for (const f of [...sim.world.furniture]) {
+    const def = sim.content.items[f.item];
+    if (def?.footprint === null || def === undefined || def.wall || isCurtains(def)) continue;
+    const cells = footprintCells(def.footprint, f.cell, f.rotation);
+    if (!cells.some((k) => k.cx === cell.cx && k.cy === cell.cy)) continue;
+    moved.push(f.item);
+    const spots: Cell[] = [];
+    for (let cy = room.rect.y; cy < room.rect.y + room.rect.h; cy++) {
+      for (let cx = room.rect.x; cx < room.rect.x + room.rect.w; cx++) spots.push({ cx, cy });
+    }
+    spots.sort((a, b) => Math.hypot(a.cx - f.cell.cx, a.cy - f.cell.cy) - Math.hypot(b.cx - f.cell.cx, b.cy - f.cell.cy));
+    const spot = spots.find((k) => {
+      const taken = footprintCells(def.footprint ?? { w: 1, d: 1 }, k, f.rotation);
+      return !taken.some((t) => t.cx === cell.cx && t.cy === cell.cy) && placementProblem(sim, f.item, k, f.rotation, f.id) === null;
+    });
+    if (spot !== undefined) f.cell = spot;
+    else {
+      sim.world.furniture = sim.world.furniture.filter((x) => x !== f);
+      for (const ch of sim.world.characters) if (ch.bedId === f.id) ch.bedId = null;
+      storeAtHome(sim, f.item, 'ordinary', 1);
+    }
+  }
+  if (moved.length > 0) sim.runtime.dynamicDirty = true;
+  return moved;
+}
+
+

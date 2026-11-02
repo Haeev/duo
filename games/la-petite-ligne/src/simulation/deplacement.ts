@@ -12,6 +12,7 @@ import { type Blockers, bodyCollides, findPath, isBlockedCell, moveBody, nearest
 import { ZONE } from './ids';
 import { treeBlocks } from './lisiere';
 import { armedCells } from '../etat/moments';
+import { walkFactor } from './besoins';
 
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
@@ -166,7 +167,7 @@ export function stopPath(sim: Sim, c: Character): void {
 
 /** Déplace un personnage selon son entrée du pas; renvoie vrai s'il est arrivé au bout d'un trajet. */
 export function moveCharacter(sim: Sim, c: Character, frame: ControlFrame | undefined, dt: number): boolean {
-  const speed = sim.content.settings.movement.walkSpeed;
+  const speed = sim.content.settings.movement.walkSpeed * walkFactor(sim, c);
   c.speed = 0;
   if (!canWalk(sim, c)) return false;
   const b = refreshBlockers(sim);

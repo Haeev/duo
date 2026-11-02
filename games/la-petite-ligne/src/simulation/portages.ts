@@ -6,7 +6,7 @@
  */
 import type { Beam } from '../etat/types';
 import { type Sim, itemWithArticle, sayIfWritten } from './contexte';
-import { addStack } from './sac';
+import { storeAtHome } from './rangement';
 
 function load(
   sim: Sim,
@@ -71,7 +71,7 @@ export function loadPlaced(sim: Sim, beam: Beam): void {
   } else if (beam.purpose === 'parcel' && beam.contents !== null) {
     const index = world.heavyDeliveries.indexOf(beam.contents);
     if (index >= 0) world.heavyDeliveries.splice(index, 1);
-    addStack(world.cellar, beam.contents, 'ordinary', 1);
+    storeAtHome(sim, beam.contents, 'ordinary', 1);
     sayIfWritten(sim, 'both', 'parcel_delivered', { item: itemWithArticle(sim, beam.contents, 1) });
   }
   sim.runtime.changed = true;

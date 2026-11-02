@@ -7,7 +7,8 @@
 import type { Character, CharacterId, Hen } from '../etat/types';
 import { type Sim, character, emit, message, newId, notify, notifyKey, point } from './contexte';
 import { POINT } from './ids';
-import { addStack, countInBag, giveToCharacter, takeFromBag } from './sac';
+import { countInBag, giveToCharacter, takeFromBag } from './sac';
+import { storeAtHome } from './rangement';
 import { startQuest } from './quetes';
 import { crossed } from './train';
 import { catalogueWindow } from '../donnees/commandes';
@@ -35,7 +36,7 @@ function deliverTool(sim: Sim, c: Character, item: string): void {
   if (previous !== null) {
     const slot = c.bag.findIndex((s) => s?.item === previous);
     const taken = takeFromBag(c, previous, countInBag(c, previous));
-    for (const s of taken) addStack(sim.world.cellar, s.item, s.quality, s.count);
+    for (const s of taken) storeAtHome(sim, s.item, s.quality, s.count);
     giveToCharacter(sim, c, item, 'ordinary', 1);
     // L'outil neuf prend la case de l'ancien dans la barre d'outils, si elle est libre.
     const now = c.bag.findIndex((s) => s?.item === item);
@@ -64,7 +65,7 @@ function deliverHen(sim: Sim, item: string, by: CharacterId | null): void {
   const def = sim.content.catalogue?.hens[item];
   const s = sim.content.settings.hens;
   if (def === undefined || sim.world.hens.length >= s.max) {
-    addStack(sim.world.cellar, item, 'ordinary', 1);
+    storeAtHome(sim, item, 'ordinary', 1);
     return;
   }
   const at = point(sim, POINT.chickenCoop);

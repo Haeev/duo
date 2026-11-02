@@ -173,9 +173,27 @@
   },
   "snacks": { "bread": 10, "simple": 20, "stew": 35 },
   "needs": {
-    "belly": { "none": 30, "bread": 50, "simple": 60, "stew": 80, "stewPlusDish": 100 },
-    "sleep": { "fromBed": true, "midnightPenalty": -30 },
-    "heart": { "base": 40, "envie": 15, "sharedEnvie": 25, "ateTogether": 5, "gestureTogether": 10, "max": 100 },
+    "belly": {
+      "none": 30, "bread": 50, "simple": 60, "stew": 80, "stewPlusDish": 100,
+      "morning": 65, "decayPerHour": 4, "supperFromHour": 18, "supperFactor": 2, "together": 10, "togetherMinutes": 10,
+      "fullAt": 60, "lowBelow": 25, "nightFloor": 30, "fullCostMultiplier": 0.8, "rumbleEveryMinutes": 60,
+      "foods": { "bread": 15, "warm_bread": 20, "crunchy_radishes": 20, "omelette": 30, "vegetable_soup": 35, "elder_jelly": 20, "brioche": 25, "hot_chocolate": 15 },
+      "byDish": { "bread": 15, "simple": 30, "stew": 35 }
+    },
+    "rest": {
+      "sitPerMinute": 1, "comfortSeatFactor": 1.5, "comfortSeatMin": 3,
+      "nap": { "from": "12:00", "to": "16:00", "perMinute": 1.5, "maxMinutes": 60, "bellyDecayFactor": 0.5, "togetherClockFactor": 4, "togetherHeart": 5, "wakeBeforeEventMinutes": 10 },
+      "levels": { "high": 0.75, "low": 0.25 }
+    },
+    "sleep": { "fromBed": true, "midnightPenalty": -30, "bedroomBonus": 5, "curtainsClosedBonus": 5, "togetherHeart": 5, "togetherMinutes": 10 },
+    "heart": {
+      "base": 40, "envie": 15, "sharedEnvie": 25, "ateTogether": 5, "gestureTogether": 10, "max": 100,
+      "comfortDivisor": 10, "comfortMax": 20,
+      "nearPartner": { "radius": 8, "perHour": 2, "maxPerDay": 12 },
+      "reunion": { "apartRadius": 30, "apartMinutes": 180, "meetRadius": 3, "gain": 5, "maxPerDay": 2 },
+      "lightAt": 70, "lightWalkFactor": 1.1,
+      "hairNoticed": 10, "hairNoticedRadius": 4, "chocolateTogether": 5, "curtainsMorning": 2
+    },
     "formWeights": { "belly": 0.35, "sleep": 0.35, "heart": 0.30 },
     "formLevels": [
       { "level": "low", "below": 40 },
@@ -192,6 +210,12 @@
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7, "unseenFactor": 4, "sharedFromDay": 16, "sharedEveryDays": 3, "sharedNoRepeatDays": 14 },
   "dialogues": { "datedRepeatDays": 28, "datedRepeatFromDay": 16 },
   "tidy": { "fromDay": 16 },
+  "rooms": { "opensFromDay": 23, "letter": "basile_rooms", "oneAtATime": true },
+  "storage": { "chest": 20, "shelf": 6, "oak_chest": 32, "cellar_rack": 12, "rackHooks": 12, "stackSize": 99, "oakChestPrice": 250 },
+  "bakery": { "warmFrom": "06:00", "warmTo": "09:00", "breadUntil": "12:00", "closedWeekdays": ["monday"], "breadPrice": 5, "briochePrice": 12, "briocheWeekdays": ["sunday"], "dailyCapPerPlayer": { "bread": 4, "brioche": 2 }, "warmBecomesBreadAt": "12:00" },
+  "salon": { "open": [["09:00", "12:00"], ["14:00", "18:00"]], "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday"], "saturdayFrom": "10:45", "cutPrice": 15, "colorPrice": 10, "bothPrice": 20 },
+  "grocer": { "hours": ["07:00", "19:00"], "chocolate": { "price": 5, "belly": 15, "until": "18:00", "seasons": ["autumn", "winter"], "rainAnySeason": true, "perPlayerPerDay": 1 } },
+  "appearance": { "hairStyles": 15, "creationHairStyles": 12, "hairColors": 8 },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
   "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0, "eatTogether": 3.0, "stayAt": 4.0 },
   "building": { "twoPlayersSpeedMultiplier": 2 },

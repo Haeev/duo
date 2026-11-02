@@ -143,7 +143,8 @@ export function duoOwns(sim: Sim, item: string): number {
   return (
     countInBag(character(sim, 'p1'), item) +
     countInBag(character(sim, 'p2'), item) +
-    countInStacks(sim.world.cellar, item)
+    countInStacks(sim.world.cellar, item) +
+    countInStacks(sim.world.rack, item)
   );
 }
 

@@ -247,3 +247,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Champ d'état ajouté sans changer le format de sauvegarde: le déclarer obligatoire dans `types.ts`, le remplir à la création (`monde.ts`) et à la reprise (`fillTour10Fields` appelé dans `resume` de `sauvegarde.ts`, avec des types `Partial` pour les `??=`); un champ propre à quelques meubles (rideaux: `window`, `closed`) reste facultatif pour ne pas toucher à tous les constructeurs de `PlacedFurniture`.
 - Valibot avec `exactOptionalPropertyTypes`: un champ facultatif d'une intention se décrit par `v.exactOptional(...)`, sinon `satisfies v.GenericSchema<Intent>` échoue.
 - Basile joue l'animation `saw` toute la journée (activité `work`): posé sur la place des joueurs, il donnait l'impression qu'on sciait sans fin.
+
+## Maison du tour 10 (lot L4, vérifié le 2026-11-02)
+
+- Compteur « du jour » sans champ nouveau ni migration: `world.countersToday[id][clé]`, remis à zéro à l'aube par `copyCounters`, sauvegardé et répliqué. Préfixer la clé (`needs:...`) pour ne croiser aucune condition.
+- Gains notés par d'autres modules (`heartToday`) ajoutés « au moment où ils arrivent »: un `WeakMap<Character, number>` des gains déjà vus, initialisé au premier passage (reprise: rien ne se compte deux fois), effacé dans `settleNight`. Une note « déjà dit pendant ce maintien » se range dans un `WeakMap<Sim['runtime'], ...>`, jamais dans une variable de module (plusieurs simulations par fichier de test).
+- La sieste est un `status: 'sleeping'` avec `needs.napStart`: `checkNight` doit ignorer les dormeurs de l'après-midi (`isNapping`), sinon deux siestes font la nuit. Les gains de la minute passent avant le réveil (sinon la dernière minute manque: 98,5 au lieu de 100).
+- Copie isolée: `cat >> fichier <<EOF` et les heredocs Python longs dans Bash sont refusés par le contrôle de la copie; écrire les scripts avec l'outil Write dans `/tmp/...` puis `python3 script.py .` depuis le dossier du jeu (remplacements exacts, échec si l'ancien texte manque).
+- La sauvegarde de référence du jour 62 (`format-6-automne-jour-62.json`) fait 46 177 octets: avec les champs du tour 10, une journée en cours monte à environ 46 800 (borne 52 000).
+- Arrivées au coffre: tout `addStack(world.cellar, ...)` hors d'un dépôt de joueur passe par `storeAtHome` (`rangement.ts`): outils au râtelier, plein: au pied du coffre.

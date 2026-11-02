@@ -237,19 +237,19 @@ describe('catalogue de la semaine, outils, poules, cadeaux (T9-07 à T9-10)', ()
     expect(catalogueOffers(s, content, sim.world).find((o) => o.item === 'watering_can_copper')?.left).toBe(1);
   });
 
-  it('T9-08: arrosoir de cuivre (20), hache de la forge (2 coups), canne en bambou (attente x 0,8, 2 s pour ferrer); l’ancien outil va au coffre; les conditions de l’outil d’origine marchent', () => {
+  it('T9-08: arrosoir de cuivre (20), hache de la forge (2 coups), canne en bambou (attente x 0,8, 2 s pour ferrer); l’ancien outil va au râtelier (tour 10); les conditions de l’outil d’origine marchent', () => {
     const sim = at(30);
     const c = sim.world.characters[0];
     if (c === undefined) return;
     expect(content.items.watering_can_copper?.capacity).toBe(20);
     expect(content.items.axe_forged?.tool).toMatchObject({ toolKind: 'axe', chops: 2 });
     expect(content.items.fishing_rod_bamboo?.tool).toMatchObject({ toolKind: 'fishing_rod', biteWaitFactor: 0.8, hookWindowSeconds: 2 });
-    const before = countInStacks(sim.world.cellar, 'axe');
+    const before = countInStacks(sim.world.rack, 'axe');
     expect(countInBag(c, 'axe')).toBe(1);
     deliverWeeklyItem(sim, 'axe_forged', c.id);
     expect(countInBag(c, 'axe')).toBe(0);
     expect(countInBag(c, 'axe_forged')).toBe(1);
-    expect(countInStacks(sim.world.cellar, 'axe')).toBe(before + 1);
+    expect(countInStacks(sim.world.rack, 'axe')).toBe(before + 1);
     // Abattre en deux coups.
     const tree = sim.world.trees.find((t) => !t.felled);
     if (tree === undefined) return;

@@ -11,6 +11,7 @@ import { orderSatisfied } from './conditions';
 import { type Sim, character, distance, emit, itemName, itemWithArticle, newId, notifyKey, partnerOf, point, say } from './contexte';
 import { queueHint } from './astuces';
 import { addStack, countInBag, countInStacks, giveToCharacter, takeFromBag, takeFromStacks } from './sac';
+import { storeAtHome } from './rangement';
 import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
 import { deliverWeeklyItem } from './catalogue';
 import { creditImprovement, improvementName } from './chantiers';
@@ -259,7 +260,7 @@ export function payOrder(sim: Sim): void {
     const price = sim.content.items[stack.item]?.sellPrice ?? null;
     if (price === null) {
       // Rien n'est perdu: ce que la coopérative n'achète pas revient au cellier.
-      addStack(world.cellar, stack.item, stack.quality, stack.count);
+      storeAtHome(sim, stack.item, stack.quality, stack.count);
     } else {
       extras += stack.count * price * rate;
     }
@@ -299,7 +300,7 @@ export function deliverCatalogue(sim: Sim): void {
   sim.world.catalogueOrders.forEach((item, i) => {
     if (deliverWeeklyItem(sim, item, sim.world.catalogueOrderBy[i] ?? null)) return;
     if (sim.content.items[item]?.carriedByTwo === true && sim.content.settings.carry.parcel !== null) sim.world.heavyDeliveries.push(item);
-    else addStack(sim.world.cellar, item, 'ordinary', 1);
+    else storeAtHome(sim, item, 'ordinary', 1);
   });
   sim.world.catalogueOrders = [];
   sim.world.catalogueOrderBy = [];

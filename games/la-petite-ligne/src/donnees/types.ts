@@ -3,6 +3,16 @@
  * `donnees/contenu.ts`. Les noms de champs suivent les fichiers JSON.
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
+import type {
+  AppearanceSettings,
+  BakerySettings,
+  GrocerSettings,
+  HomeContent,
+  RoomsSettings,
+  SalonSettings,
+  SoftNeedsSettings,
+  StorageSettings,
+} from './maison';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -847,7 +857,18 @@ export interface Settings {
     heart: { base: number; envie: number; sharedEnvie: number; ateTogether: number; gestureTogether: number; max: number };
     formWeights: { belly: number; sleep: number; heart: number };
     formLevels: { level: string; below: number }[];
+    /** Tour 10 (section 3): besoins doux, lus sous les mêmes clés de `reglages.needs`. */
+    soft: SoftNeedsSettings;
   };
+  /** Tour 10 (section 4): pièces à bâtir; `null`: aucune. */
+  rooms: RoomsSettings | null;
+  /** Tour 10 (section 5): rangement à cases et râtelier; `null`: coffre sans limite, comme avant. */
+  storage: StorageSettings | null;
+  /** Tour 10 (sections 1.5, 1.6, 2): fournil, salon, épicerie et apparence (règles du lot L3). */
+  bakery: BakerySettings | null;
+  salon: SalonSettings | null;
+  grocer: GrocerSettings | null;
+  appearance: AppearanceSettings | null;
   movement: { walkSpeed: number; carrySpeedTogether: number; carrySpeedOneMoving: number };
   ranges: {
     action: number;
@@ -1135,4 +1156,6 @@ export interface Content {
   annonces: AnnonceDef[];
   improvements: ImprovementDef[];
   catalogue: CatalogueDef | null;
+  /** Tour 10: pièces à bâtir et fenêtres de la maisonnette (`pieces.json`), vides si le fichier manque. */
+  home: HomeContent;
 }
