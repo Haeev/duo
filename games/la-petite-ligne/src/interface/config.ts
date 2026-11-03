@@ -252,6 +252,10 @@ export interface PortraitColors {
   bg: string;
   /** Barbe ou moustache d'un joueur (tour 10); absent: aucune. */
   beard?: BeardStyle;
+  /** Veste portée par-dessus le haut (0.12): pans et revers. */
+  outer?: { main: string; second: string };
+  /** Badge brodé à la couleur du profil Duo (joueurs, 0.12), à la place du foulard. */
+  badge?: string;
 }
 
 /**

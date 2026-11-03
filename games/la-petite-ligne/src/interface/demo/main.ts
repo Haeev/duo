@@ -33,6 +33,7 @@ import { SIM_DT } from '../../simulation/constantes';
 import { rememberNotebookTab } from '../carnet';
 import { createInterface } from '../index';
 import { scenarioBoardTab, scenarioSave, setupScenario } from './scenarios';
+import { dressDemo, withDemoClothes } from './vetements-exemple';
 import { rememberBoardTab } from '../tableau';
 
 declare global {
@@ -60,7 +61,7 @@ const params = new URLSearchParams(location.search);
 const me: CharacterId = params.get('joueur') === 'p2' ? 'p2' : 'p1';
 const partnerId: CharacterId = me === 'p1' ? 'p2' : 'p1';
 // Rythme vif (R14): les situations préparées par les robots restent dans leurs budgets de pas.
-const content = withClockPace(loadContent(CONTENT_FILES), 'vif');
+const content = withDemoClothes(withClockPace(loadContent(CONTENT_FILES), 'vif'));
 const map = loadMap(MAP_FILES).map;
 const players = [
   { id: 'membre-a', name: 'Camille', color: '#5CE1E6' },
@@ -77,6 +78,7 @@ const sim =
     ? createWorld(content, map, 20261031, players)
     : restoreWorld(content, map, decodeSave(structuredClone(save.data)), save.dataSchema, players);
 const afterMount = setupScenario(sim, scenario, me);
+dressDemo(sim);
 if (params.get('onglet') === 'souvenirs') rememberNotebookTab('memories');
 if (params.get('onglet') === 'besoins' || scenario === 'besoins-carnet') rememberNotebookTab('needs');
 const boardTab = scenarioBoardTab(scenario);

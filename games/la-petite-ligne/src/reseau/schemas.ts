@@ -27,7 +27,7 @@ const Count = v.pipe(Int, v.minValue(0), v.maxValue(999));
 const QualitySchema = v.picklist(['ordinary', 'fine']);
 const CharacterIdSchema = v.picklist(['p1', 'p2']);
 const MenuSchema = v.nullable(
-  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery']),
+  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop']),
 );
 const CellSchema = v.strictObject({ cx: Int, cy: Int });
 

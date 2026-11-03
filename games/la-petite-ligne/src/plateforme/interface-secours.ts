@@ -208,6 +208,9 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         button(row(), 'ok', { type: 'haircut', hair: a.hair, hairColor: a.hairColor, beard: a.beard });
         break;
       }
+      // 0.12: la mercerie n'a que le bouton de fermeture dans l'interface de secours.
+      case 'clothes_shop':
+        break;
     }
     for (const p of w.proposals) {
       if (p.by === me.id) continue;

@@ -43,6 +43,8 @@ export interface UiHost {
   sound(id: UiSoundId): void;
   /** Ouvre le panneau du chantier de la pièce (invite de la maison, tour 10): un panneau local, sans menu du jeu. */
   openRoomPanel(): void;
+  /** Ouvre la garde-robe (bouton du rangement de la maison, 0.12): un panneau local, sans menu du jeu. */
+  openWardrobe(): void;
   /** Symboles des profils Duo des deux joueurs (`orb`, `crescent`...). */
   symbol(player: 'self' | 'other'): string;
 }

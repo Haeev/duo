@@ -536,7 +536,9 @@ export type MenuKind =
   /** Le fauteuil de Solange (tour 10, section 2.3): coupe, couleur, barbe, proposition reçue. */
   | 'salon'
   /** Le guichet du fournil d'Achille (section 1.5): pain, pain chaud, brioche. */
-  | 'bakery';
+  | 'bakery'
+  /** Mercerie et confection de Solange (0.12, `garde-robe-0-12.md`): vêtements, essayage. */
+  | 'clothes_shop';
 
 export type ActionKind =
   | 'idle'

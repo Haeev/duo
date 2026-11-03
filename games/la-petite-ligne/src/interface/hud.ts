@@ -33,6 +33,7 @@ import { henWrongAside } from './modele-secrets';
 import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
+import { portraitClothes } from './modele-garde-robe';
 import { typographier } from './typographie';
 
 /** Une icône de besoin du HUD (à côté du portrait, ou en petit sur la carte de l'autre). */
@@ -456,7 +457,7 @@ export class Hud {
     const p = partnerModel(world, ctx, partnerChar === null ? null : absenceMinutes(world, partnerChar));
     setHidden(this.partner, p === null);
     if (p !== null && partnerChar !== null) {
-      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance), p.expression, ''));
+      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance, portraitClothes(ctx, partnerChar.appearance)), p.expression, ''));
       setText(this.partnerName, p.name);
       setAttr(this.partner, 'aria-label', p.name);
       setIcon(this.partnerIcon, p.icon);
@@ -488,7 +489,7 @@ export class Hud {
 
     // Soi.
     const form = formModel(ctx, me);
-    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance), form.expression, form.name));
+    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance, portraitClothes(ctx, me.appearance)), form.expression, form.name));
     setText(this.selfName, me.name);
     setAttr(this.self, 'aria-label', ctx.t(ctx.texts.extra.hud.selfLabel, { name: me.name }));
     setText(this.selfMood, form.name);

@@ -18,6 +18,7 @@ import {
   roomSiteModel,
   storageModel,
 } from './modele-maison';
+import { wearOf } from './modele-garde-robe';
 import { Panel, backKeys } from './panneau';
 
 // ---------------------------------------------------------------------------
@@ -70,9 +71,11 @@ export class StoragePanel extends Panel {
     )
       this.selected = null;
     this.selected ??= all.find((x) => x.c.item !== null)?.key ?? null;
-    const sig = JSON.stringify([model, inBag, this.selected]);
+    // 0.12: la garde-robe se range ici (armoire ou coffre de la maison), dès qu'on a une tenue.
+    const wardrobe = wearOf(me.appearance) !== null;
+    const sig = JSON.stringify([model, inBag, this.selected, wardrobe]);
     this.renderBody(sig, () =>
-      this.nodes(model, inBag, all.find((x) => x.key === this.selected)?.c ?? null),
+      this.nodes(model, inBag, all.find((x) => x.key === this.selected)?.c ?? null, wardrobe),
     );
   }
 
@@ -80,6 +83,7 @@ export class StoragePanel extends Panel {
     model: StorageModel,
     inBag: ReturnType<typeof stackEntries>,
     selected: StorageCellModel | null,
+    wardrobe: boolean,
   ): HTMLElement[] {
     const { ctx } = this.host;
     const s = ctx.texts.extra.storage;
@@ -102,6 +106,15 @@ export class StoragePanel extends Panel {
             attrs: { 'data-nav-item': true, 'data-key': 'sort', title: ctx.t(s.sortHelp) },
           },
         ),
+        wardrobe
+          ? button(
+              [icon('chest'), ctx.t(ctx.texts.extra.clothes.open)],
+              () => {
+                this.host.openWardrobe();
+              },
+              { attrs: { 'data-nav-item': true, 'data-key': 'wardrobe' } },
+            )
+          : null,
       ],
     );
     const grid = el('div', {

@@ -13,6 +13,7 @@ import { newToday } from '../../simulation/moments';
 import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { benchById, seatPlace } from '../../etat/bancs';
+import { dressDemo } from './vetements-exemple';
 
 const HOUR = 60;
 const MAX_TICKS = 400_000;
@@ -449,6 +450,10 @@ const TOUR10_SAVES: Readonly<Record<string, string>> = {
   sieste: SUMMER_25_V7,
   'nuit-ensemble': SUMMER_25_V7,
   'autre-epicerie': SUMMER_25_V7,
+  // 0.12: mercerie et garde-robe (été: le chapeau de paille et le pantacourt sont en vente).
+  mercerie: SUMMER_25_V7,
+  'mercerie-court': SUMMER_25_V7,
+  'garde-robe': SUMMER_25_V7,
 };
 
 /** Création du tour 10 (12 coupes, 8 couleurs, barbe): partie neuve, les deux ont passé l'écran titre. */
@@ -531,6 +536,18 @@ function tour10(sim: Sim, name: string, me: CharacterId, other: CharacterId): ((
       setNeeds(sim, me, other);
       character(sim, me).needs.apartMinutes = 45;
       apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    case 'mercerie':
+    case 'mercerie-court': {
+      dressDemo(sim, { [me]: ['gilet_prune', 'casquette_bleue'] });
+      sim.world.purse = name === 'mercerie' ? 30 : 9;
+      teleport(sim, me, 71.0, 27.6);
+      apply(sim, me, [{ type: 'menu', menu: 'clothes_shop' }]);
+      return undefined;
+    }
+    case 'garde-robe':
+      dressDemo(sim, { [me]: ['pull_moutarde', 'gilet_prune', 'casquette_bleue', 'chapeau_paille', 'bottes_vertes', 'short_bleu', 'chemise_ecru'] });
+      atChest(sim, me);
       return undefined;
     case 'rangement':
       storageBag(sim, me);

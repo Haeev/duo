@@ -19,6 +19,10 @@ import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type ReadonlyCharacter, type UiContext, characterOf, createUiContext } from './contexte';
 import { type BakeryPort, BakeryPanel, type SalonPort, SalonPanel } from './salon';
+import { FigurePreview } from './apercu';
+import { type ClothesPort, ClothesPanel } from './garde-robe';
+import { clothesCatalogue, clothesViewOf } from './modele-garde-robe';
+import { seasonOfDay } from '../donnees/calendrier';
 import { atSalonChair, bakeryBoughtToday, firstCutFree } from '../etat/interieurs';
 import { DialogueBox, type DialogueSource } from './dialogue';
 import { el, focusElement, focusables, isVisible, setStyleVar } from './dom';
@@ -41,6 +45,10 @@ const ACTIVATION = new Set(['Enter', 'NumpadEnter', 'Space']);
 const CAMERA_KEYS = new Set(['KeyQ', 'KeyE', 'KeyR', 'KeyF']);
 
 type LayerKind = 'screen' | 'dialogue' | 'panel';
+
+type ClothesIntent =
+  | { type: 'clothes_buy'; item: string }
+  | { type: 'wear'; slot: Parameters<ClothesPort['wear']>[0]; item: string | null };
 
 interface Mounted {
   key: string;
@@ -73,7 +81,7 @@ class GameUi implements GameInterface, UiHost {
    * Panneau local, sans menu du jeu (tour 10): le chantier d'une pièce, ou le carnet pendant la
    * sieste (la simulation ne prend pas de menu chez qui dort; le carnet reste ouvert quand même).
    */
-  private local: 'room' | 'notebook' | null = null;
+  private local: 'room' | 'notebook' | 'wardrobe' | null = null;
   private reading: string | null = null;
   private knownReadables: Set<string> | null = null;
   private titleDone: boolean;
@@ -215,6 +223,14 @@ class GameUi implements GameInterface, UiHost {
 
   openRoomPanel(): void {
     this.local = 'room';
+    this.dirty = true;
+  }
+
+  openWardrobe(): void {
+    // Le rangement (menu du jeu) se ferme, la garde-robe s'ouvre à sa place, en local.
+    this.pendingMenu = { menu: null, at: this.now(), tab: undefined };
+    this.view.send({ type: 'menu', menu: null });
+    this.local = 'wardrobe';
     this.dirty = true;
   }
 
@@ -389,7 +405,11 @@ class GameUi implements GameInterface, UiHost {
           const tab = this.panelTab;
           kind = 'panel';
           key = `local:${local}`;
-          build = () => (local === 'room' ? new RoomPanel(this) : new NotebookPanel(this, tab));
+          build = () => {
+            if (local === 'room') return new RoomPanel(this);
+            if (local === 'wardrobe') return new ClothesPanel(this, this.clothesPort(), 'wardrobe');
+            return new NotebookPanel(this, tab);
+          };
         }
       }
     }
@@ -439,6 +459,25 @@ class GameUi implements GameInterface, UiHost {
     };
   }
 
+  private clothesPort(): ClothesPort {
+    return {
+      view: (world) =>
+        clothesViewOf(this.ctx, world, characterOf(world, this.ctx.me), seasonOfDay(this.ctx.content.settings, world.clock.day)),
+      buy: (item) => {
+        this.sendClothes({ type: 'clothes_buy', item });
+      },
+      wear: (slot, item) => {
+        this.sendClothes({ type: 'wear', slot, item });
+      },
+      createPreview: () => new FigurePreview(clothesCatalogue(this.ctx)),
+    };
+  }
+
+  /** Intentions de la garde-robe (contrat 0.12, section 3). */
+  private sendClothes(intent: ClothesIntent): void {
+    this.send(intent as unknown as Intent);
+  }
+
   private bakeryPort(): BakeryPort {
     return {
       bought: (world) => bakeryBoughtToday(world, this.ctx.me),
@@ -472,6 +511,9 @@ class GameUi implements GameInterface, UiHost {
         return () => new SalonPanel(this, this.salonPort());
       case 'bakery':
         return () => new BakeryPanel(this, this.bakeryPort());
+      // 0.12: mercerie et confection (contrat `garde-robe-0-12.md`).
+      case 'clothes_shop':
+        return () => new ClothesPanel(this, this.clothesPort(), 'shop');
     }
   }
 
