@@ -10,7 +10,7 @@ import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, el, icon } from './dom';
+import { button, chip, el, icon, setText } from './dom';
 import { defaultCrateLine, defaultProduct } from './focus';
 import { countIn, hourLabel, itemName, lowerFirst } from './format';
 import { linesText, orderFullAmount, orderLines } from './modele';
@@ -20,6 +20,8 @@ import {
   missingText,
   partnerAtHome,
   recipeEntries,
+  counterShop,
+  haberdasheryIsOpen,
   shopBuyEntries,
   shopIsOpen,
   shopSellEntries,
@@ -182,6 +184,8 @@ export class CratePanel extends Panel {
 
 export class ShopPanel extends Panel {
   private tab: 'buy' | 'sell';
+  /** Le comptoir ouvert: l'épicerie d'Odette, ou la mercerie de Solange (achats seulement). */
+  private shop: 'grocery' | 'haberdashery' = 'grocery';
   private readonly tabs: HTMLDivElement;
   private readonly tabButtons: Record<'buy' | 'sell', HTMLButtonElement>;
 
@@ -220,6 +224,20 @@ export class ShopPanel extends Panel {
     this.markTabs();
   }
 
+  /**
+   * Le comptoir où l'on est: dans sa boutique, la mercerie de Solange (titre à elle, achats
+   * seulement: Solange vend, elle n'achète pas), sinon l'épicerie d'Odette.
+   */
+  private chooseShop(shop: 'grocery' | 'haberdashery'): void {
+    if (shop === this.shop) return;
+    this.shop = shop;
+    const { ctx } = this.host;
+    setText(this.titleEl, ctx.t(shop === 'haberdashery' ? ctx.texts.extra.shop.haberdasheryTitle : ctx.texts.game.ui.shop.title));
+    this.tabs.hidden = shop === 'haberdashery';
+    if (shop === 'haberdashery') this.tab = 'buy';
+    this.markTabs();
+  }
+
   private markTabs(): void {
     for (const id of ['buy', 'sell'] as const) {
       const b = this.tabButtons[id];
@@ -237,7 +255,7 @@ export class ShopPanel extends Panel {
   }
 
   override key(code: string): boolean {
-    if (code === 'KeyQ' || code === 'KeyE') {
+    if ((code === 'KeyQ' || code === 'KeyE') && this.shop === 'grocery') {
       this.select(this.tab === 'buy' ? 'sell' : 'buy');
       return true;
     }
@@ -247,10 +265,11 @@ export class ShopPanel extends Panel {
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
     const k = ctx.texts.extra.shop;
-    const open = shopIsOpen(world, ctx);
+    this.chooseShop(counterShop(world, ctx));
+    const open = this.shop === 'haberdashery' ? haberdasheryIsOpen(world, ctx) : shopIsOpen(world, ctx);
     const partnerName = nameOf(world, ctx.partner);
     if (this.tab === 'buy') {
-      const entries = shopBuyEntries(world, ctx);
+      const entries = shopBuyEntries(world, ctx, this.shop);
       const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName]);
       this.renderBody(sig, () => {
         const focusIndex = defaultProduct(entries);
@@ -288,7 +307,8 @@ export class ShopPanel extends Panel {
             ]),
           );
         });
-        const notice = open ? null : el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(k.closedNotice) })]);
+        const closed = this.shop === 'haberdashery' ? k.haberdasheryClosed : k.closedNotice;
+        const notice = open ? null : el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(closed) })]);
         const big = el('p', { class: 'lpl-field__help', text: ctx.t(ctx.texts.extra.catalogue.bigPurchase, { amount: ctx.content.settings.economy.bigPurchaseThreshold }) });
         return [notice, list, big];
       });
@@ -407,7 +427,11 @@ export class StationPanel extends Panel {
         list.append(
           el('li', { class: 'lpl-order__line lpl-shop__line' }, [
             icon(r.icon, 'lpl-order__icon'),
-            el('span', { class: 'lpl-order__name' }, [r.name, el('small', { text: r.makes })]),
+            el('span', { class: 'lpl-order__name' }, [
+              r.name,
+              el('small', { text: r.makes }),
+              r.fromChest === null ? null : el('small', { class: 'lpl-order__chest', text: r.fromChest }),
+            ]),
             el('span'),
             el('span', { class: 'lpl-order__action' }, [action]),
           ]),

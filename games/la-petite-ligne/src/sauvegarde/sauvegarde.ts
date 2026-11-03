@@ -17,7 +17,7 @@ import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
 import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
-import { isCurtains, rehangCurtains } from '../simulation/amenagement';
+import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt } from '../etat/carte';
 import { isTool } from '../etat/maison';
@@ -132,6 +132,7 @@ function checkWorld(data: unknown): WorldState {
   checkTour9(data);
   checkTour10(data);
   checkLetters(data.letters as unknown[]);
+  checkDecor(data);
   return data as unknown as WorldState;
 }
 
@@ -151,6 +152,24 @@ function checkLetters(letters: unknown[]): void {
       (legacy === undefined || (isRecord(legacy) && typeof legacy.title === 'string' && typeof legacy.from === 'string' && typeof legacy.text === 'string'));
     if (!ok) throw new SaveError('sauvegarde: lettre invalide');
   }
+}
+
+/** Format 9 (S03): petits objets posés sur un meuble, chacun avec son meuble porteur et sa place. */
+function checkDecor(data: Record<string, unknown>): void {
+  const list = data.decor;
+  const ok =
+    Array.isArray(list) &&
+    list.every(
+      (d) =>
+        isRecord(d) &&
+        typeof d.id === 'string' &&
+        typeof d.item === 'string' &&
+        typeof d.on === 'string' &&
+        typeof d.place === 'number' &&
+        Number.isInteger(d.place) &&
+        (d.placedBy === null || d.placedBy === 'p1' || d.placedBy === 'p2'),
+    );
+  if (!ok) throw new SaveError('sauvegarde: petits objets posés invalides');
 }
 
 /** Champs du format 7 (tour 10): pièces commandées, râtelier, besoins doux des personnages. */
@@ -443,6 +462,8 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
   if (dataSchema < 7 && isRecord(data) && tour10Fillable(data)) fillTour10Fields(map, data as unknown as WorldState);
   if (dataSchema < 8 && isRecord(data)) migrateToFormat8(data, content);
+  // Format 9 (0.11.2, S03): les petits objets posés sur les meubles; aucun avant.
+  if (dataSchema < 9 && isRecord(data)) data.decor = [];
   return data;
 }
 
@@ -631,7 +652,7 @@ function resume(
     // L'échelle se reprend à la main; la confidence du matin reste.
     c.holding = null;
     // Assis sur un banc (après le tour 5): absent des sauvegardes d'avant, comme debout.
-    c.seat = sanitizeSeat(map, content.settings.benches, c);
+    c.seat = sanitizeSeat(map, content.settings.benches, c, { furniture: world.furniture, items: content.items });
     if (c.seat === null && c.action.kind === 'sit') c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
   }
@@ -645,6 +666,8 @@ function resume(
   world.scene = null;
   const sim = wrapWorld(content, map, world);
   if (dataSchema < 7) migrateToTour10(sim);
+  // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
+  settleDecor(sim);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

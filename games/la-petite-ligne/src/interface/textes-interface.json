@@ -234,6 +234,7 @@
     "shopChoicesLabel": "Que faire ?",
     "shopBuy": "Acheter des graines et des clous",
     "shopSell": "Vendre des récoltes",
+    "shopHaberdashery": "Voir ses rideaux",
     "goodbye": "Au revoir",
     "goodbyeKey": "au revoir",
     "readTitle": "{item}"
@@ -391,10 +392,13 @@
     "nothingToSell": "Rien à vendre dans ton sac pour l'instant.",
     "rate": "Odette paie {percent} % du prix de la coopérative.",
     "seedInfo": "Pousse en {days} jours, {yield} par case.",
-    "keysBuy": "acheter"
+    "keysBuy": "acheter",
+    "haberdasheryTitle": "Le comptoir de Solange",
+    "haberdasheryClosed": "Solange n'est pas à son comptoir pour l'instant."
   },
   "workbench": {
     "makes": "{inputs} pour {output}",
+    "fromChest": "{count} {item}, dont {chest} au coffre",
     "have": "Tu as : {list}",
     "fromCellar": "Le sac d'abord, puis le coffre de la maison.",
     "inProgress": "En cours…",

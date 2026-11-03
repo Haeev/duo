@@ -5,11 +5,26 @@
  * places par banc, jamais deux corps sur la même (un habitant arrêté sur le
  * banc en tient une, comme le dessine le rendu).
  */
-import { type BenchPlace, type BenchSeat, BenchSeating, benchById, benchesOf, benchesWithBuilt, benchForPoint, seatPlace, standPlace } from '../etat/bancs';
+import {
+  type BenchPlace,
+  type BenchSeat,
+  BenchSeating,
+  FurnitureSeats,
+  type SeatProp,
+  benchById,
+  benchesOf,
+  benchesWithBuilt,
+  benchForPoint,
+  isFurnitureSeat,
+  seatPlace,
+  slotsOf,
+  standPlace,
+} from '../etat/bancs';
 import type { GameMap, MapProp } from '../etat/carte';
 import type { BenchSettings } from '../donnees/types';
-import type { Character, VillagerState, Vec2 } from '../etat/types';
-import { isSheltered } from '../etat/interieurs';
+import type { Character, DeepReadonly, PlacedFurniture, VillagerState, Vec2 } from '../etat/types';
+import type { ItemDef } from '../donnees/types';
+import { isHome, isSheltered } from '../etat/interieurs';
 import { SIM_HZ } from './constantes';
 import { type Sim, distance, emit } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
@@ -29,13 +44,39 @@ function builtImprovements(sim: Sim): string[] {
   return sim.content.improvements.filter((x) => (sim.world.improvements[x.id]?.builtDay ?? null) !== null).map((x) => x.id);
 }
 
-/** Les bancs où un joueur peut s'asseoir: ceux de la carte, ses sièges, et les bancs des chantiers bâtis (tour 9). */
-export function playerBenches(sim: Sim): readonly MapProp[] {
-  return benchesWithBuilt(sim.map, builtImprovements(sim));
+/** Sièges des meubles posés, par simulation (plusieurs simulations par fichier de test). */
+const furnitureSeats = new WeakMap<Sim['world'], FurnitureSeats>();
+
+/** Les sièges posés dans la maison (chaises, fauteuils: S07), du même identifiant que le meuble. */
+export function homeSeats(sim: Sim): readonly SeatProp[] {
+  let seats = furnitureSeats.get(sim.world);
+  if (seats === undefined) {
+    seats = new FurnitureSeats();
+    furnitureSeats.set(sim.world, seats);
+  }
+  return seats.update(sim.world.furniture, sim.content.items);
 }
 
-export function playerBench(sim: Sim, id: string): MapProp | null {
+/**
+ * Les bancs où un joueur peut s'asseoir: ceux de la carte, ses sièges, les bancs des chantiers
+ * bâtis (tour 9) et les sièges posés dans la maison (0.11.2).
+ */
+export function playerBenches(sim: Sim): readonly SeatProp[] {
+  const outdoor = benchesWithBuilt(sim.map, builtImprovements(sim));
+  const home = homeSeats(sim);
+  return home.length === 0 ? outdoor : [...outdoor, ...home];
+}
+
+export function playerBench(sim: Sim, id: string): SeatProp | null {
   return playerBenches(sim).find((b) => b.id === id) ?? null;
+}
+
+/**
+ * Ce siège est-il à la portée de ce personnage, du bon côté des murs ? Les sièges de la maison de
+ * dedans seulement, les bancs du dehors pas d'un bâtiment à l'abri.
+ */
+export function seatReachable(c: Character, prop: MapProp): boolean {
+  return isFurnitureSeat(prop) ? isHome(c) : !isSheltered(c);
 }
 const scratch: BenchPlace = { x: 0, y: 0, facing: 0 };
 
@@ -51,21 +92,24 @@ export function slotTaken(sim: Sim, prop: MapProp, slot: number): boolean {
 }
 
 /** Places du banc toutes prises ? */
-export function benchFull(sim: Sim, prop: MapProp): boolean {
-  const slots = sim.content.settings.benches.slots.length;
+export function benchFull(sim: Sim, prop: SeatProp): boolean {
+  const slots = slotsOf(prop, sim.content.settings.benches).length;
   for (let i = 0; i < slots; i++) if (!slotTaken(sim, prop, i)) return false;
   return true;
 }
 
 /**
  * Les places libres à portée (`benches.sitRange`) d'un point, de la plus
- * proche à la plus loin. Personne ne s'assoit dans la maison (aucun banc).
+ * proche à la plus loin. Avec `c`: seulement celles qu'il atteint de là où il
+ * est (`seatReachable`: une chaise de la maison ne se prend pas à travers le mur).
  */
-export function freeSeatsNear(sim: Sim, at: Vec2, range: number): FreeSeat[] {
+export function freeSeatsNear(sim: Sim, at: Vec2, range: number, c?: Character): FreeSeat[] {
   const s = sim.content.settings.benches;
   const out: (FreeSeat & { d: number })[] = [];
   for (const prop of playerBenches(sim)) {
-    for (let slot = 0; slot < s.slots.length; slot++) {
+    if (c !== undefined && !seatReachable(c, prop)) continue;
+    const slots = slotsOf(prop, s);
+    for (let slot = 0; slot < slots.length; slot++) {
       const place = seatPlace(prop, slot, s, scratch);
       const d = distance(at, place);
       if (d > range || slotTaken(sim, prop, slot)) continue;
@@ -80,7 +124,9 @@ export function freeSeatsNear(sim: Sim, at: Vec2, range: number): FreeSeat[] {
 export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
   const s = sim.content.settings.benches;
   for (const prop of playerBenches(sim)) {
-    for (let slot = 0; slot < s.slots.length; slot++) {
+    if (!seatReachable(c, prop)) continue;
+    const slots = slotsOf(prop, s).length;
+    for (let slot = 0; slot < slots; slot++) {
       if (distance(c.pos, seatPlace(prop, slot, s, scratch)) <= s.sitRange && benchFull(sim, prop)) return prop;
     }
   }
@@ -91,7 +137,8 @@ export function fullBenchNear(sim: Sim, c: Character): MapProp | null {
 export function sitDown(sim: Sim, c: Character, benchId: string, slot: number): boolean {
   const prop = playerBench(sim, benchId);
   // Hors de la journée de jeu (nuit, écran de fin), `updateSeats` relèverait au même pas.
-  if (sim.world.phase !== 'day' || prop === null || c.seat !== null || isSheltered(c) || slotTaken(sim, prop, slot)) return false;
+  if (sim.world.phase !== 'day' || prop === null || c.seat !== null || !seatReachable(c, prop) || slotTaken(sim, prop, slot)) return false;
+  if (slot < 0 || slot >= slotsOf(prop, sim.content.settings.benches).length) return false;
   const place = seatPlace(prop, slot, sim.content.settings.benches, scratch);
   stopPath(sim, c);
   c.pos.x = place.x;
@@ -179,7 +226,7 @@ export function updateSeats(sim: Sim): void {
     const place = prop === null ? null : seatPlace(prop, seat.slot, s, scratch);
     const away = place === null || Math.abs(place.x - c.pos.x) > 1e-6 || Math.abs(place.y - c.pos.y) > 1e-6;
     const asleep = c.status === 'sleeping' || c.status === 'night' || c.status === 'breakfast';
-    if (away || asleep || isSheltered(c) || sim.world.phase !== 'day') {
+    if (away || asleep || prop === null || !seatReachable(c, prop) || sim.world.phase !== 'day') {
       // Encore sur sa place (la nuit tombe, la démo finit): reposé devant, sur une case libre,
       // jamais laissé dans l'emprise du banc. Déplacé par un effet, il reste où l'effet l'a mis.
       if (!away) {
@@ -211,14 +258,21 @@ export function updateSeats(sim: Sim): void {
  * le personnage est bien dessus; sinon `null` (absente des sauvegardes
  * d'avant les bancs: debout).
  */
-export function sanitizeSeat(map: GameMap, s: BenchSettings, c: { pos: Vec2; seat?: unknown }): BenchSeat | null {
+export function sanitizeSeat(
+  map: GameMap,
+  s: BenchSettings,
+  c: { pos: Vec2; seat?: unknown },
+  home?: { furniture: readonly DeepReadonly<PlacedFurniture>[]; items: Readonly<Record<string, ItemDef>> },
+): BenchSeat | null {
   const raw = c.seat;
   if (typeof raw !== 'object' || raw === null) return null;
   const { bench, slot, since } = raw as Record<string, unknown>;
   if (typeof bench !== 'string' || typeof slot !== 'number' || typeof since !== 'number') return null;
-  if (!Number.isInteger(slot) || slot < 0 || slot >= s.slots.length || !Number.isFinite(since)) return null;
-  const prop = benchById(map, bench);
+  // Un siège posé dans la maison (0.11.2) se retrouve parmi les meubles relus.
+  const seats = home === undefined ? [] : new FurnitureSeats().update(home.furniture, home.items);
+  const prop: SeatProp | null = benchById(map, bench) ?? seats.find((x) => x.id === bench) ?? null;
   if (prop === null) return null;
+  if (!Number.isInteger(slot) || slot < 0 || slot >= slotsOf(prop, s).length || !Number.isFinite(since)) return null;
   const place = seatPlace(prop, slot, s, scratch);
   if (Math.abs(place.x - c.pos.x) > 1e-6 || Math.abs(place.y - c.pos.y) > 1e-6) return null;
   return { bench, slot, since };

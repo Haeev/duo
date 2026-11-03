@@ -48,7 +48,7 @@ export const MINUTES_PER_DAY = 1440;
  * rangement à cases et râtelier, rideaux aux fenêtres, `inside`). 8: lettres sans leur texte
  * rendu (variante et variables, texte reconstitué depuis les données).
  */
-export const DATA_SCHEMA = 8;
+export const DATA_SCHEMA = 9;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';
