@@ -389,8 +389,10 @@ def outer(g, pp, style):
         g.lathe([(0.29, 0.62), (0.3, 0.645), (0.25, 0.8), (0.215, 0.92), (0.205, 0.99)],
                 colors=["outer_s", "outer_p", "outer_p", "outer_p"], segs=12, weights=w, scale=(1.0, 0.84, 1.0),
                 close_bottom=False, close_top=False)
-        # capuche roulée dans le dos, brandebourgs
-        g.sphere(1.0, loc=(0, 0.14, 1.36), color="outer_p", segs=8, rings=5, scale=(0.13, 0.05, 0.06), bone="chest")
+        # capuche roulée dans le dos, brandebourgs. 0.12.2: roulée plus serrée contre le col (3 cm de moins vers
+        # l'arrière), pour que les coupes longues tombent dessus sans s'écarter du dos
+        g.sphere(1.0, loc=(0, 0.125, 1.36), color="outer_p", segs=8, rings=5, scale=(0.12, 0.042, 0.045),
+                 bone="chest")
         for z in (0.9, 1.02, 1.14, 1.25):
             w2 = (lambda co: {"spine": 1.0}) if z > 0.97 else w
             y = (_outer_front_y(pp, z) if z > 0.97 else -0.215 * 0.84) - 0.005

@@ -69,13 +69,22 @@ def build_world_textures():
     return paths
 
 
-def build_char_texture():
+def build_char_texture(paint=None):
+    """personnages.png: une rangée de cases par personnage; paint(img) peint ensuite les vignettes (yeux) sous
+    la rangée P.CHAR_ROWS_MAX."""
+    assert len(P.CHAR_ROW_ORDER) <= P.CHAR_ROWS_MAX
     cells = {}
     for r, row in enumerate(P.CHAR_ROW_ORDER):
         for c, slot in enumerate(P.CHAR_SLOTS):
             cells[(c, r)] = P.hex_to_rgb(P.CHAR_ROWS[row][slot])
     for d in (TEX_SRC, TEX_OUT):
-        _write_png(os.path.join(d, "personnages.png"), cells, P.GRID, P.CHAR_GRID_H)
+        path = os.path.join(d, "personnages.png")
+        _write_png(path, cells, P.GRID, P.CHAR_GRID_H)
+        if paint is not None:
+            from PIL import Image
+            img = Image.open(path).convert("RGB")
+            paint(img)
+            img.save(path, optimize=True)
     return os.path.join(TEX_SRC, "personnages.png")
 
 
@@ -111,14 +120,27 @@ def _img(path, non_color=False):
     return img
 
 
-def palette_material(name, base_path, mr_path=None, emit_path=None, emit_strength=1.0):
+def palette_material(name, base_path, mr_path=None, emit_path=None, emit_strength=1.0, vcol=None):
+    """vcol: nom d'un attribut de couleur de sommet multiplié à la palette (occlusion et peinture cuites des
+    personnages, exporté en COLOR_0: Three.js le multiplie de lui-même)."""
     mat = bpy.data.materials.new(name)
     nt = mat.node_tree
     bsdf = nt.nodes.get("Principled BSDF")
     t = nt.nodes.new("ShaderNodeTexImage")
     t.image = _img(base_path)
     t.interpolation = "Closest"
-    nt.links.new(t.outputs["Color"], bsdf.inputs["Base Color"])
+    if vcol:
+        ca = nt.nodes.new("ShaderNodeVertexColor")
+        ca.layer_name = vcol
+        mix = nt.nodes.new("ShaderNodeMix")
+        mix.data_type = "RGBA"
+        mix.blend_type = "MULTIPLY"
+        mix.inputs["Factor"].default_value = 1.0
+        nt.links.new(t.outputs["Color"], mix.inputs[6])
+        nt.links.new(ca.outputs["Color"], mix.inputs[7])
+        nt.links.new(mix.outputs[2], bsdf.inputs["Base Color"])
+    else:
+        nt.links.new(t.outputs["Color"], bsdf.inputs["Base Color"])
     if mr_path:
         m = nt.nodes.new("ShaderNodeTexImage")
         m.image = _img(mr_path, non_color=True)
@@ -453,7 +475,7 @@ def tree_tris(ob):
 
 # Export ----------------------------------------------------------------
 
-def export_glb(path, objects, animation_mode="ACTIONS", animations=True):
+def export_glb(path, objects, animation_mode="ACTIONS", animations=True, vertex_color="NONE"):
     bpy.ops.object.select_all(action="DESELECT") if bpy.context.view_layer.objects.active else None
     for ob in bpy.context.view_layer.objects:
         ob.select_set(False)
@@ -468,7 +490,7 @@ def export_glb(path, objects, animation_mode="ACTIONS", animations=True):
         export_texcoords=True, export_normals=True, export_tangents=False,
         export_materials="EXPORT", export_image_format="AUTO", export_cameras=False,
         export_lights=False, export_force_sampling=True, export_optimize_animation_size=True,
-        export_reset_pose_bones=True, export_anim_slide_to_zero=True, export_vertex_color="NONE",
+        export_reset_pose_bones=True, export_anim_slide_to_zero=True, export_vertex_color=vertex_color,
         export_shared_accessors=True,
     )
     return os.path.getsize(path)

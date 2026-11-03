@@ -657,7 +657,7 @@
     2,
     1
    ],
-   "tris": 424
+   "tris": 900
   },
   "arbor": {
    "footprint": [
@@ -1175,5 +1175,5 @@
    "tris": 216
   }
  },
- "file_bytes": 6859692
+ "file_bytes": 6881752
 }

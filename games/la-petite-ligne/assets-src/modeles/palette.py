@@ -10,7 +10,9 @@ Source unique des couleurs: la bible artistique de la démo les reprend.
 
 CELL = 4          # pixels par case
 GRID = 16         # cases par côté (texture de 64 x 64)
-CHAR_GRID_H = 32  # rangées de la texture des personnages (64 x 128 depuis la 0.13: 21 habitants)
+CHAR_GRID_H = 64  # rangées de la texture des personnages (64 x 256 depuis la qualité visuelle: 32 rangées de
+                  # cases, puis les vignettes peintes des yeux, `visages.py`, à partir de la rangée 32)
+CHAR_ROWS_MAX = 32  # rangées de cases utilisables (au-delà: vignettes peintes)
 
 # nom: (hex, rugosité, métal, lueur de nuit en hex ou None)
 # Ordre = ordre des cases (de gauche à droite, de haut en bas).

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Témoins de la qualité visuelle</title>
+<style>html,body{margin:0;background:#a7b98a}canvas{display:block}</style>
+<script type="importmap">
+{"imports": {"three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/"}}
+</script>
+</head>
+<body>
+<script type="module">
+// Témoins dans Three.js, comme le jeu: matériau du GLB (couleurs de sommets multipliées par GLTFLoader), texture
+// au plus proche, gabarit posé par l'extra `bone_rest` (translations de repos des os), pose de repos `idle_clip`.
+// Modes: vues (avant et après, de face, de trois quarts, de dos), visages (gros plans, expressions), zoom1
+// (caméra du jeu au zoom 1: vue de 24 m de large, élévation 35,264 degrés, à 1366 x 768).
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+
+const q = new URLSearchParams(location.search);
+const mode = q.get('mode') || 'vues';
+const W = Number(q.get('w') || 1600), H = Number(q.get('h') || 900);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.shadowMap.enabled = true;
+renderer.setScissorTest(true);
+document.body.appendChild(renderer.domElement);
+const report = { errors: [], cells: 0, triangles: {}, boneRest: {}, vertexColors: null };
+window.addEventListener('error', (e) => report.errors.push(String(e.message)));
+
+const WITNESSES = {
+  colette: ['villager_colette'],
+  firmin: ['villager_firmin'],
+  joueur: ['player_base', 'wear_top_chemise', 'wear_bottom_pantalon', 'wear_shoes_bottines', 'player_hair_short', 'player_badge_orb'],
+};
+
+// tenue d'aperçu du joueur (preset « bleu de travail »), écrite dans la rangée 1 comme le fait le jeu (PlayerTexture)
+const OUTFIT = ['#5C7FA6', '#EDE6D3', '#EDE6D3', '#4A5D78', '#3A4A60', '#3A4A60', '#5A4636', '#3A2E24'];
+function paintOutfit(map) {
+  if (!map || map.userData.painted) return;
+  const img = map.image;
+  const c = document.createElement('canvas');
+  c.width = img.width; c.height = img.height;
+  const x = c.getContext('2d');
+  x.drawImage(img, 0, 0);
+  OUTFIT.forEach((col, i) => { x.fillStyle = col; x.fillRect(i * 4, 4, 4, 4); });
+  map.image = c;
+  map.userData.painted = true;
+  map.needsUpdate = true;
+}
+
+async function load(url) {
+  const gltf = await new GLTFLoader().loadAsync(url);
+  gltf.scene.traverse((o) => {
+    if (o.isMesh) {
+      const m = o.material;
+      paintOutfit(m.map);
+      if (m.map) { m.map.magFilter = THREE.NearestFilter; m.map.minFilter = THREE.NearestFilter; m.map.generateMipmaps = false; m.map.needsUpdate = true; }
+      m.emissiveIntensity = 0;
+      o.castShadow = true;
+      if (report.vertexColors === null) report.vertexColors = m.vertexColors;
+    }
+  });
+  return gltf;
+}
+
+function figure(gltf, who, expr, after, t) {
+  const parts = WITNESSES[who];
+  const inst = SkeletonUtils.clone(gltf.scene);
+  inst.traverse((o) => { if (o.isMesh) o.visible = parts.includes(o.name); });
+  const body = inst.getObjectByName(parts[0]);
+  const rest = body && body.userData && body.userData.bone_rest;
+  if (rest && after) {
+    inst.traverse((o) => { if (o.isBone && rest[o.name]) o.position.fromArray(rest[o.name]); });
+    report.boneRest[who] = Object.keys(rest).length;
+  }
+  if (body && body.morphTargetDictionary) {
+    for (const k of Object.keys(body.morphTargetDictionary)) body.morphTargetInfluences[body.morphTargetDictionary[k]] = k === expr ? 1 : 0;
+  }
+  let tri = 0;
+  inst.traverse((o) => { if (o.isMesh && o.visible) tri += o.geometry.index.count / 3; });
+  report.triangles[(after ? 'apres_' : 'avant_') + who] = tri;
+  const clipName = (after && body && body.userData.idle_clip) || 'idle';
+  const clip = gltf.animations.find((a) => a.name === clipName) || gltf.animations.find((a) => a.name === 'idle');
+  const mixer = new THREE.AnimationMixer(inst);
+  mixer.clipAction(clip).play();
+  mixer.update(t);
+  const s = body && body.userData.scale ? body.userData.scale : 1;
+  inst.scale.setScalar(s);
+  return inst;
+}
+
+function lights(scene, target) {
+  scene.add(new THREE.HemisphereLight(0xeaf2ff, 0x8a9a6a, 1.25));
+  const sun = new THREE.DirectionalLight(0xfff1dc, 2.4);
+  sun.position.set(target.x - 6, target.y + 10, target.z + 8);
+  sun.target.position.copy(target);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  const c = sun.shadow.camera; c.left = -8; c.right = 8; c.top = 8; c.bottom = -8; c.far = 60;
+  sun.shadow.bias = -0.0005;
+  scene.add(sun, sun.target);
+}
+
+function ground(scene, size) {
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(size, size), new THREE.MeshStandardMaterial({ color: '#a7b98a', roughness: 1 }));
+  g.rotation.x = -Math.PI / 2;
+  g.receiveShadow = true;
+  scene.add(g);
+}
+
+function isoCamera(target, halfH, aspect, az = 45, el = 35.264) {
+  const cam = new THREE.OrthographicCamera(-halfH * aspect, halfH * aspect, halfH, -halfH, 0.1, 200);
+  const a = THREE.MathUtils.degToRad(az), e = THREE.MathUtils.degToRad(el);
+  cam.position.set(target.x + Math.sin(a) * Math.cos(e) * 50, target.y + Math.sin(e) * 50, target.z + Math.cos(a) * Math.cos(e) * 50);
+  cam.lookAt(target);
+  return cam;
+}
+
+function cell(scene, cam, x, y, w, h) {
+  renderer.setViewport(x, H - y - h, w, h);
+  renderer.setScissor(x, H - y - h, w, h);
+  renderer.render(scene, cam);
+  report.cells += 1;
+}
+
+const after = await load(q.get('a'));
+const before = q.get('b') ? await load(q.get('b')) : null;
+renderer.setClearColor('#a7b98a');
+
+if (mode === 'vues') {
+  const rows = before ? [[before, false], [after, true]] : [[after, true]];
+  const views = [0, -40, 180];
+  const cw = Math.floor(W / 9), ch = Math.floor(H / rows.length);
+  rows.forEach(([g, isAfter], r) => {
+    Object.keys(WITNESSES).forEach((who, i) => {
+      views.forEach((rz, j) => {
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#dce6ee');
+        const f = figure(g, who, 'neutral', isAfter, 0.05);
+        // caméra à l'azimut 45 (+X et +Z): le personnage tourné de 45 degrés la regarde
+        f.rotation.y = THREE.MathUtils.degToRad(45 + rz);
+        scene.add(f);
+        ground(scene, 20);
+        const target = new THREE.Vector3(0, 0.9, 0);
+        lights(scene, target);
+        cell(scene, isoCamera(target, 1.05, cw / ch), (i * 3 + j) * cw, r * ch, cw, ch);
+      });
+    });
+  });
+} else if (mode === 'visages') {
+  const exprs = ['neutral', 'happy', 'delighted', 'tired', 'hungry', 'blink'];
+  const cw = Math.floor(W / exprs.length), ch = Math.floor(H / 3);
+  Object.keys(WITNESSES).forEach((who, r) => {
+    exprs.forEach((e, j) => {
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#dce6ee');
+      const f = figure(after, who, e, true, 0.05);
+      f.rotation.y = THREE.MathUtils.degToRad(45);
+      scene.add(f);
+      f.updateMatrixWorld(true);
+      const head = new THREE.Vector3();
+      f.getObjectByName('head').getWorldPosition(head);
+      head.y += 0.1;
+      lights(scene, head);
+      cell(scene, isoCamera(head, 0.24, cw / ch, 45, 12), j * cw, r * ch, cw, ch);
+    });
+  });
+} else {
+  // zoom 1: avant (rangée du fond) et après (devant), 1,4 m entre les personnages
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#a7b98a');
+  ground(scene, 80);
+  const sets = before ? [[before, false, 1.6], [after, true, -0.4]] : [[after, true, 0]];
+  for (const [g, isAfter, dz] of sets) {
+    Object.keys(WITNESSES).forEach((who, i) => {
+      const f = figure(g, who, 'neutral', isAfter, 0.05);
+      // rangée perpendiculaire à la direction de vue (azimut 45)
+      const s = (i - 1) * 1.4;
+      f.position.set(s * Math.cos(Math.PI / 4) - dz * Math.sin(Math.PI / 4), 0, -s * Math.sin(Math.PI / 4) - dz * Math.cos(Math.PI / 4));
+      f.rotation.y = THREE.MathUtils.degToRad(45 + (i - 1) * 20);
+      scene.add(f);
+    });
+  }
+  const target = new THREE.Vector3(0, 0.8, 0);
+  lights(scene, target);
+  const aspect = W / H;
+  cell(scene, isoCamera(target, 12 / aspect, aspect), 0, 0, W, H);
+}
+window.__report = report;
+</script>
+</body>
+</html>
