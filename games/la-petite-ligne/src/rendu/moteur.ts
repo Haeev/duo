@@ -28,7 +28,8 @@ import {
 } from 'three';
 import type { Season } from '../donnees/types';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
-import type { GameView, PickResult, Renderer, RendererOptions } from '../etat/vue';
+import type { GameView, OutfitPreview, OutfitPreviewOptions, PickResult, Renderer, RendererOptions } from '../etat/vue';
+import { createOutfitPreview } from './apercu-tenue';
 import { IsoCameraRig, type CameraCommand } from './camera';
 import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
@@ -130,6 +131,8 @@ export class RenderEngine implements Renderer {
   private readonly pendingEvents: WorldEvent[] = [];
   private readonly parts: RenderPart[] = [];
   private materials: SharedMaterials | null = null;
+  /** Modèles chargés (aperçu de la boutique), `null` avant `load`. */
+  private library: ModelLibrary | null = null;
   private terrain: Terrain | null = null;
   private world: WorldParts | null = null;
   private reducedMotion: boolean;
@@ -261,6 +264,7 @@ export class RenderEngine implements Renderer {
     await library.load((ratio) => {
       onProgress(ratio * LOAD_MODELS_SHARE);
     });
+    this.library = library;
     if (this.disposed) {
       return;
     }
@@ -1075,6 +1079,16 @@ export class RenderEngine implements Renderer {
       }
     }
     return totals;
+  }
+
+  /** Aperçu 3D d'une tenue (boutique de vêtements de la 0.12): sa propre petite scène. */
+  createOutfitPreview(options: OutfitPreviewOptions): OutfitPreview | null {
+    if (this.library === null || this.disposed) return null;
+    const settings = RENDER_SETTINGS.renderer;
+    return createOutfitPreview(
+      { library: this.library, clothes: this.view.content.clothes, toneMapping: toneMapping(settings.toneMapping), exposure: settings.exposure },
+      options,
+    );
   }
 
   dispose(): void {

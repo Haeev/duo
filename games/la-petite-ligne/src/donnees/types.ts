@@ -15,6 +15,7 @@ import type {
 } from './maison';
 import type { TownSettings } from './bourg';
 import type { FishDef, FishingRules } from './poissons';
+import type { ClothesContent } from './vetements';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -1251,4 +1252,6 @@ export interface Content {
   catalogue: CatalogueDef | null;
   /** Tour 10: pièces à bâtir et fenêtres de la maisonnette (`pieces.json`), vides si le fichier manque. */
   home: HomeContent;
+  /** 0.12: vêtements (`vetements.json`) et réglages de la garde-robe (`reglages.json`: `wardrobe`). */
+  clothes: ClothesContent;
 }

@@ -43,7 +43,7 @@ import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
 import { createPeche12Demo } from './peche12-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
-import type { WorldState } from '../../etat/types';
+import type { Wear, WorldState } from '../../etat/types';
 
 const MINUTES_PER_HOUR = 60;
 const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
@@ -219,6 +219,17 @@ async function main(): Promise<void> {
   }
   // Tour 10: intérieurs, ru, pièces, rideaux, rangement, coiffures (`tour10-exemple.ts`), après `x` et `y`.
   applyTour10Example(world, map, content, params);
+  // 0.12: `tenue=complete`, les deux joueurs habillés de pied en cap (mesure du budget de triangles).
+  if (params.get('tenue') === 'complete') {
+    const full: Wear[] = [
+      { top: 'pull_moutarde', bottom: 'pantalon_bleu', shoes: 'bottes_jaunes', outer: 'cire_marine', hat: 'bonnet_rouge' },
+      { top: 'chemise_lin', bottom: 'jupe_prune', shoes: 'bottines_brunes', outer: 'veste_brune', hat: 'paille_ruban_rouge' },
+    ];
+    world.characters.forEach((c, i) => {
+      const wear = full[i];
+      if (wear !== undefined) c.appearance.wear = wear;
+    });
+  }
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const peche12 = createPeche12Demo(params, local);

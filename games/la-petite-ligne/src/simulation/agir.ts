@@ -30,6 +30,7 @@ import { callableHen, callHen } from './secrets';
 import { refuseChop, treeStage } from './lisiere';
 import { TOWN, canDrinkChocolate, drinkChocolate, openBakery } from './bourg';
 import { SALON, chairTaken, openSalon, sitAtChair } from './salon';
+import { CLOTHES, openClothesShop } from './vetements';
 import { buildingOpen } from './interieurs';
 
 /** Ce sur quoi on peut agir. */
@@ -83,6 +84,8 @@ const ACT_POINTS = [
   TOWN.window,
   SALON.chair,
   SALON.bench,
+  // 0.12: la place du client au comptoir de mercerie (boutique de vêtements).
+  CLOTHES.counter,
 ];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
@@ -132,6 +135,7 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       if (t.point === TOWN.window) return sim.world.flags.includes(TOWN.bakeryOpen) && !isSheltered(c) ? 'open' : null;
       if (t.point === SALON.chair) return c.inside === SALON.building && c.menu === null ? 'sit' : null;
       if (t.point === SALON.bench) return c.inside === SALON.building && c.menu === null && chairTaken(sim, c) ? 'open' : null;
+      if (t.point === CLOTHES.counter) return c.inside === SALON.building && c.menu === null ? 'open' : null;
       return 'open';
     case 'construction':
       return 'build';
@@ -501,6 +505,7 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       if (t.kind === 'station') openMenu(sim, c, t.menu);
       else if (t.kind === 'point' && t.point === TOWN.window) openBakery(sim, c);
       else if (t.kind === 'point' && t.point === SALON.bench) openSalon(sim, c);
+      else if (t.kind === 'point' && t.point === CLOTHES.counter) openClothesShop(sim, c);
       else if (t.kind === 'point') {
         const menu = POINT_MENUS[t.point];
         if (menu !== undefined) openMenu(sim, c, menu);

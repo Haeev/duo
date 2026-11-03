@@ -384,10 +384,25 @@ export interface Appearance {
   hairColor: number;
   /** Barbe ou moustache (réponse du client du 2026-11-01): 0 aucune, 1 barbe courte, 2 barbe fournie, 3 moustache. */
   beard: number;
-  /** Couleur de la tenue, de 0 à 3. */
-  outfit: number;
-  /** Couleur du foulard: celle du profil Duo du joueur (CSS, `#rrggbb`). */
+  /** Vêtements portés (0.12, identifiants de `vetements.json`), un par emplacement. */
+  wear: Wear;
+  /**
+   * Couleur du profil Duo du joueur (CSS, `#rrggbb`): badge brodé sur le haut depuis la 0.12 (les
+   * foulards sont retirés), portraits de l'interface. Le nom reste celui du format de sauvegarde.
+   */
   scarf: string;
+}
+
+/** Emplacements de vêtement (0.12): haut, par-dessus, bas, chaussures, tête. */
+export type ClothingSlot = 'top' | 'outer' | 'bottom' | 'shoes' | 'hat';
+
+/** Tenue portée: haut, bas et chaussures toujours; par-dessus et tête facultatifs. */
+export interface Wear {
+  top: string;
+  bottom: string;
+  shoes: string;
+  outer: string | null;
+  hat: string | null;
 }
 
 export interface Character {
@@ -396,6 +411,8 @@ export interface Character {
   playerId: PlayerId;
   name: string;
   appearance: Appearance;
+  /** Vêtements possédés (0.12), ceux de départ compris, dans l'ordre d'arrivée. */
+  wardrobe: string[];
   /** Création terminée. */
   created: boolean;
   /** Écran titre: ce joueur est prêt (remis à faux à chaque reprise de partie). */
@@ -548,7 +565,11 @@ export type MenuKind =
   /** Le fauteuil de Solange (tour 10, section 2.3): coupe, couleur, barbe, proposition reçue. */
   | 'salon'
   /** Le guichet du fournil d'Achille (section 1.5): pain, pain chaud, brioche. */
-  | 'bakery';
+  | 'bakery'
+  /** 0.12: la boutique de vêtements, au comptoir de la mercerie de Solange (essayer, acheter, se changer en cabine). */
+  | 'clothes_shop'
+  /** 0.12: se changer chez soi, au coffre (vêtements de sa garde-robe). */
+  | 'wardrobe';
 
 export type ActionKind =
   | 'idle'
