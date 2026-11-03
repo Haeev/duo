@@ -200,3 +200,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Rendre visible un besoin caché sans le durcir: garder le plancher de nuit actuel et faire compter double le souper; sinon une baisse par heure fait chuter les valeurs de nuit sous la règle en place (premier jet du tour 10: souper simple à 30 au lieu de 60).
 - Dans une simulation d'achats, l'ordre des priorités du duo décide de tout: avec la chambre après les chantiers du bourg, elle n'arrive jamais avant le jour 64. Toujours simuler au moins deux ordres de priorité.
 - Noms d'états de besoins: « Rassasié », « Plein d'élan », « calé » s'accordent au joueur; écrire des noms (« Ventre plein », « Pleine énergie », « Petit creux », « Envie de compagnie »).
+
+## Pêche (conception 0.12, vérifié le 2026-11-03)
+
+- Rythme réel de la pêche: environ 12 s par prise (lancer, attente moyenne de 9 s, prise), soit 17 minutes de jeu à 0,7 s par minute: une heure de jeu fait 3,5 prises par joueur. Raisonner les fenêtres d'un poisson en secondes réelles (une fenêtre de 3 h de jeu = 2 min).
+- Les cases du gué (`g`) sont du gravier: on n'y lance pas; seules les cases `water` (rivière `~`, ru `r`) se pêchent.
+- La partie s'arrête au jour 64 à 16 h (premier jour de l'hiver): tout contenu d'hiver est injouable tant que la limite ne bouge pas.
+- `fishCost` des commandes se rapporte à la saison de référence: un poisson absent de cette saison aurait un coût nul. Avec beaucoup d'espèces, la part de chacune chute (goujon de 54 % à 10 %): revoir minimums, plafonds et ressource rivière des commandes.
+- R10 sur une collection à épiques saisonniers: le coup de pouce par espèce (x8) ne suffit pas, il faut aussi un bonus sur la rareté quand un épique possible ici manque (x1,5). Mesurer sur 400 duos: à 100, le 90e centile bruite de plusieurs heures.
