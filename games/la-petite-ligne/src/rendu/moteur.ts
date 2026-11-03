@@ -59,6 +59,7 @@ import { FishingPart } from './peche';
 import { SignsPart } from './signes';
 import { MomentsPart } from './moments';
 import { AmbientFaunaPart } from './faune-ambiance';
+import { CatPart, NO_CAT, type CatSource } from './chat';
 import { HenLabels } from './etiquettes';
 import { FishShadowsPart } from './ombres-poissons';
 import { createStateFishingSource, type FishingSource } from './peche-vue';
@@ -112,6 +113,8 @@ export interface EngineOptions extends RendererOptions {
   adaptive?: boolean;
   /** Pêche de la 0.12 (ombres, coin qui frémit, guet): l'état, sauf la page de démonstration. */
   fishing?: FishingSource;
+  /** Le chat du bourg (0.13, `chat.ts`): aucun tant que la simulation n'en a pas (lot H7). */
+  cat?: CatSource;
 }
 
 export class RenderEngine implements Renderer {
@@ -161,6 +164,7 @@ export class RenderEngine implements Renderer {
   /** Saison montée (palette et lumière), `null` avant la première image. */
   private season: Season | null = null;
   private readonly fishingSource: FishingSource;
+  private readonly catSource: CatSource;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -170,6 +174,7 @@ export class RenderEngine implements Renderer {
     this.quality = this.light || options.adaptive === false ? null : new AdaptiveQuality();
     this.log = options.log;
     this.fishingSource = options.fishing ?? createStateFishingSource();
+    this.catSource = options.cat ?? NO_CAT;
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
       antialias: settings.antialias && !this.light,
@@ -400,6 +405,11 @@ export class RenderEngine implements Renderer {
     const fauna = new AmbientFaunaPart(map, library, materials, terrain, this.resources, this.rig.camera, this.light);
     this.scene.add(fauna.group);
     world.add(fauna);
+    // 0.13: le chat du bourg (vue fournie par `EngineOptions.cat`).
+    const cat = new CatPart(library, terrain, this.catSource);
+    cat.setInteriorProbe(() => interiors.localInside());
+    this.scene.add(cat.group);
+    world.add(cat);
     if (await this.interrupted()) {
       return;
     }

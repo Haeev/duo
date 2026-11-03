@@ -19,7 +19,8 @@
  * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Tour 9:
  * `chantiers=tous|<ids>`, `cadeaux=1`, `outil=<objet>`, `maison9=1`, `cueillette9=1`,
  * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Pêche de la 0.12: `peche12=1`, avec
- * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Touches: G repère, J lancer,
+ * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Habitants de la 0.13:
+ * `habitants13=1|messe`, `chat=`, `loupe=oeil` (voir `habitants13-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import { applyBreedingExample } from './elevage-exemple';
@@ -43,6 +44,7 @@ import { applyEdgeExample } from './lisiere-exemple';
 import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
 import { createPeche12Demo } from './peche12-exemple';
+import { applyHabitants13Example } from './habitants13-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { Wear, WorldState } from '../../etat/types';
 
@@ -254,6 +256,8 @@ async function main(): Promise<void> {
   // 0.12: l'élevage (`elevage=1`, ou `elevage=mene` pour la chèvre menée), après `x` et `y`.
   const breeding = params.get('elevage');
   if (breeding !== null) applyBreedingExample(world, map, breeding);
+  // 0.13: les 21 habitants alignés ou à la sortie de la messe, et le chat (`habitants13-exemple.ts`).
+  const habitants13 = applyHabitants13Example(world, params);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const peche12 = createPeche12Demo(params, local);
@@ -293,6 +297,7 @@ async function main(): Promise<void> {
     // Captures reproductibles: qualité fixe, sauf `adaptatif=1` (essai du repli automatique).
     adaptive: params.get('adaptatif') === '1',
     ...(peche12 === null ? {} : { fishing: peche12.source }),
+    ...(habitants13 === null ? {} : { cat: habitants13.cat }),
   });
   const handle: DemoHandle = {
     ready: false,
@@ -465,7 +470,7 @@ async function main(): Promise<void> {
       world,
       map,
       seconds,
-      lifeInput?.checked !== false && !steering,
+      lifeInput?.checked !== false && !steering && habitants13 === null,
       options,
     )) {
       emit(event);
@@ -500,6 +505,7 @@ async function main(): Promise<void> {
       me.action = { kind: 'idle', since: 0, duration: 0, target: null };
     }
     peche12?.step(world, dt);
+    habitants13?.step(world, seconds);
     engine.frame(dt);
     handle.frames += 1;
   };

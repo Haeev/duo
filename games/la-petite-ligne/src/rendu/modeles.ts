@@ -378,6 +378,7 @@ export class ModelLibrary {
     for (const part of buildSubstitute(name, hints)) {
       const mesh = new Mesh(this.resources.track(part.geometry), this.materials.palette);
       mesh.name = part.name;
+      if (part.position !== undefined) mesh.position.set(...part.position);
       mesh.castShadow = part.castShadow;
       mesh.receiveShadow = true;
       group.add(mesh);

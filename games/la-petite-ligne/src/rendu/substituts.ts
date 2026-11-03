@@ -22,6 +22,8 @@ export interface SubstitutePart {
   name: string;
   geometry: BufferGeometry;
   castShadow: boolean;
+  /** Place de la pièce dans le modèle (une roue de vélo à son axe), à l'origine sinon. */
+  position?: Triple;
 }
 
 type Builder = (b: ShapeBuilder, w: number, d: number) => void;
@@ -741,7 +743,159 @@ const ANIMALS: Record<string, Builder> = {
   hen_rooster: rooster,
   hen_chick: hen('paint_yellow'),
   goat,
+  cat,
 };
+
+/**
+ * Chat du bourg (0.13, `faune.glb`, nœud `cat`): tigré gris à plastron blanc, 0,46 m de corps,
+ * 0,25 m au garrot, assis sur son derrière comme `cat_idle`, la tête vers +Z, la queue au sol.
+ */
+function cat(b: ShapeBuilder): void {
+  b.ball(0.11, [0, 0.13, -0.04], 'heron_grey', { scale: [0.8, 1.1, 1.5] });
+  b.ball(0.07, [0, 0.21, 0.08], 'feather_white', { scale: [0.9, 1.1, 0.7] });
+  b.ball(0.075, [0, 0.31, 0.12], 'heron_grey', { detail: 1 });
+  b.ball(0.03, [0, 0.29, 0.19], 'feather_white');
+  for (const x of [-0.035, 0.035]) {
+    b.cone(0.025, 0.05, [x, 0.36, 0.11], 'heron_grey_dark', { segments: 4 });
+    b.box([0.03, 0.14, 0.03], [x, 0, 0.1], 'heron_grey', { base: true });
+    b.box([0.035, 0.03, 0.05], [x, 0, 0.12], 'feather_white', { base: true });
+  }
+  b.box([0.035, 0.03, 0.3], [0.05, 0, -0.26], 'heron_grey_dark', { base: true, rotation: [0, 25, 0] });
+}
+
+// ---------------------------------------------------------------------------
+// Habitants de la 0.13 et leurs accessoires (lot H6): silhouettes aux couleurs de leur fiche
+// (section 2.3 de `v0-13-habitants.md`), 1,75 m, l'échelle de chacun appliquée par le rendu.
+
+interface VillagerLook {
+  top: PaletteCell;
+  bottom: PaletteCell;
+  hair: PaletteCell;
+  skin?: PaletteCell;
+  apron?: PaletteCell;
+  hat?: PaletteCell;
+}
+
+function villagerFigure(look: VillagerLook): Builder {
+  return (b) => {
+    for (const x of [-0.1, 0.1]) {
+      b.cylinder(0.07, 0.065, 0.8, [x, 0, 0], look.bottom, { base: true, segments: 6 });
+      b.box([0.12, 0.07, 0.22], [x, 0, 0.03], 'leather', { base: true });
+      b.cylinder(0.055, 0.06, 0.6, [x * 2.7, 0.82, 0], look.top, { base: true, segments: 6 });
+    }
+    b.cylinder(0.2, 0.22, 0.64, [0, 0.8, 0], look.top, { base: true, segments: 8 });
+    if (look.apron !== undefined) b.box([0.34, 0.6, 0.03], [0, 0.55, 0.21], look.apron, { base: true });
+    b.ball(0.15, [0, 1.6, 0], look.skin ?? 'plaster_rose', { detail: 1 });
+    b.ball(0.155, [0, 1.65, -0.02], look.hair, { scale: [1, 0.7, 1] });
+    if (look.hat !== undefined) {
+      b.cylinder(0.24, 0.24, 0.03, [0, 1.71, 0], look.hat, { base: true, segments: 10 });
+      b.cylinder(0.13, 0.14, 0.12, [0, 1.73, 0], look.hat, { base: true, segments: 8 });
+    }
+  };
+}
+
+const VILLAGER_LOOKS: Readonly<Record<string, VillagerLook>> = {
+  firmin: { top: 'fabric_blue', bottom: 'black', hair: 'stone_light', hat: 'black' },
+  odette: { top: 'fabric_rose', bottom: 'fabric_rose', hair: 'stone_light', apron: 'fabric_cream' },
+  basile: { top: 'fabric_cream', bottom: 'wood_dark', hair: 'feather_white', apron: 'leather' },
+  jeanne: { top: 'fabric_red', bottom: 'fabric_blue', hair: 'bark' },
+  achille: { top: 'white_paint', bottom: 'stone', hair: 'bark', apron: 'fabric_cream' },
+  solange: { top: 'fabric_green', bottom: 'fabric_green', hair: 'black' },
+  lucie: { top: 'fabric_blue', bottom: 'fabric_blue', hair: 'bark', hat: 'paint_blue' },
+  armand: { top: 'wood', bottom: 'stone', hair: 'bark_dark' },
+  berthe: { top: 'fabric_cream', bottom: 'wood_dark', hair: 'stone_light', apron: 'fabric_green' },
+  martial: { top: 'black', bottom: 'black', hair: 'stone_light', hat: 'black' },
+  marthe: { top: 'stone_light', bottom: 'stone_light', hair: 'feather_white', apron: 'paint_blue', hat: 'black' },
+  honorine: { top: 'fabric_cream', bottom: 'fabric_blue', hair: 'feather_white' },
+  ines: { top: 'leaf_fir', bottom: 'wood_dark', hair: 'black', skin: 'bread_crust', hat: 'leaf_fir' },
+  barnabe: { top: 'paint_red', bottom: 'wood_dark', hair: 'black', apron: 'leather', hat: 'bark' },
+  mado: { top: 'fabric_cream', bottom: 'stone', hair: 'rust', apron: 'tar' },
+  paulin: { top: 'stone', bottom: 'wood_dark', hair: 'bark_dark', hat: 'straw' },
+  margot: { top: 'grass_light', bottom: 'grass_light', hair: 'bark', apron: 'fabric_blue' },
+  leon: { top: 'white_paint', bottom: 'wood_dark', hair: 'black', hat: 'paint_red' },
+  ambroise: { top: 'stone', bottom: 'black', hair: 'feather_white', apron: 'black' },
+  nour: { top: 'grass_dry', bottom: 'grass_dry', hair: 'black', skin: 'bread_crust' },
+  colette: { top: 'brick', bottom: 'brick', hair: 'black', apron: 'black' },
+};
+
+const VILLAGERS: Record<string, Builder> = Object.fromEntries(
+  Object.entries(VILLAGER_LOOKS).map(([id, look]) => [`villager_${id}`, villagerFigure(look)]),
+);
+
+/** Objets portés par les habitants: origine à la prise, ils pendent sous la main (`socket_hand_r`). */
+const VILLAGER_PROPS: Record<string, Builder> = {
+  school_satchel: (b) => {
+    b.box([0.34, 0.24, 0.1], [0, -0.3, 0], 'leather', { base: true });
+    b.box([0.04, 0.06, 0.02], [0, -0.06, 0], 'leather', { base: true });
+  },
+  felling_axe: (b) => {
+    b.cylinder(0.02, 0.022, 0.86, [0, -0.78, 0], 'wood', { base: true, segments: 5 });
+    b.box([0.04, 0.12, 0.2], [0, -0.74, 0.07], 'iron', {});
+  },
+  // Origine au centre: tenu devant la poitrine, soufflet le long de X.
+  accordion: (b) => {
+    b.box([0.12, 0.3, 0.18], [0, 0, 0], 'paper', {});
+    for (const x of [-0.12, 0.12]) b.box([0.12, 0.32, 0.2], [x, 0, 0], 'loco_red', {});
+  },
+};
+
+/** Vélos poussés (0.13): cadre et roues à part (enfants `_wheel_front`, `_wheel_rear`, origine à l'axe). */
+interface BikeLook {
+  frame: PaletteCell;
+  /** Porte-bagages et sacoches (Lucie), panier (Nour), ou rien (le vélo de course de l'abbé). */
+  load: 'bags' | 'basket' | null;
+}
+
+const BIKES: Readonly<Record<string, BikeLook>> = {
+  bicycle_lucie: { frame: 'black', load: 'bags' },
+  bicycle_martial: { frame: 'loco_green', load: null },
+  bicycle_nour: { frame: 'black', load: 'basket' },
+};
+/** Cotes de la fiche de l'artiste: axe à x 0,56 m, roues de 0,335 m, à 0,62 m devant et 0,42 m derrière. */
+const BIKE_X = 0.56;
+const WHEEL_RADIUS = 0.335;
+const WHEEL_FRONT = 0.62;
+const WHEEL_REAR = -0.42;
+
+function bikeFrame(look: BikeLook): Builder {
+  return (b) => {
+    b.box([0.04, 0.04, 1.0], [BIKE_X, 0.7, 0.1], look.frame, {});
+    b.box([0.04, 0.5, 0.04], [BIKE_X, 0.35, -0.05], look.frame, { base: true, rotation: [-12, 0, 0] });
+    b.box([0.12, 0.04, 0.2], [BIKE_X, 0.86, -0.12], 'leather', { base: true });
+    b.box([0.04, 0.55, 0.04], [BIKE_X, 0.4, WHEEL_FRONT - 0.18], look.frame, { base: true, rotation: [18, 0, 0] });
+    // Cintre: poignée gauche sous la main gauche du pousseur (extra `hand_l`, x 0,31 m).
+    b.box([0.52, 0.03, 0.03], [BIKE_X, 0.98, 0.37], 'black', {});
+    if (look.load === 'bags') {
+      b.box([0.22, 0.03, 0.32], [BIKE_X, 0.8, WHEEL_REAR], 'iron', { base: true });
+      for (const x of [-0.13, 0.13]) b.box([0.08, 0.26, 0.28], [BIKE_X + x, 0.56, WHEEL_REAR], 'leather', { base: true });
+    } else if (look.load === 'basket') {
+      b.box([0.3, 0.2, 0.26], [BIKE_X, 0.86, WHEEL_FRONT + 0.06], 'straw', { base: true });
+    }
+  };
+}
+
+function bikeWheel(b: ShapeBuilder): void {
+  b.cylinder(WHEEL_RADIUS, WHEEL_RADIUS, 0.04, [0, 0, 0], 'black', { rotation: [0, 0, 90], segments: 14 });
+  // Deux rayons en croix: on voit la roue tourner.
+  b.box([0.05, WHEEL_RADIUS * 1.9, 0.03], [0, 0, 0], 'iron_light', {});
+  b.box([0.05, 0.03, WHEEL_RADIUS * 1.9], [0, 0, 0], 'iron_light', {});
+}
+
+/** Pièces d'un vélo poussé: le cadre, puis les deux roues posées à leur axe. */
+function bikeSubstitute(name: string, look: BikeLook): SubstitutePart[] {
+  const frame = new ShapeBuilder();
+  bikeFrame(look)(frame, 1, 1);
+  const parts: SubstitutePart[] = [{ name, geometry: frame.build(), castShadow: true }];
+  for (const [suffix, z] of [
+    ['_wheel_front', WHEEL_FRONT],
+    ['_wheel_rear', WHEEL_REAR],
+  ] as const) {
+    const wheel = new ShapeBuilder();
+    bikeWheel(wheel);
+    parts.push({ name: `${name}${suffix}`, geometry: wheel.build(), castShadow: true, position: [BIKE_X, WHEEL_RADIUS, z] });
+  }
+  return parts;
+}
 
 // ---------------------------------------------------------------------------
 // Train (avant vers l'est, +X, une fois posé sur la voie)
@@ -1077,6 +1231,8 @@ const EXACT: Record<string, Builder> = {
   ...ITEMS,
   ...FURNITURE,
   ...ANIMALS,
+  ...VILLAGERS,
+  ...VILLAGER_PROPS,
   ...TRAIN,
   ...DECOR,
   garden_cell_tilled: (b) => {
@@ -1141,6 +1297,8 @@ function sizeOf(name: string, hints: SubstituteHints): { w: number; d: number } 
 
 /** Pièces du substitut d'un modèle (une seule pièce, sauf exceptions). */
 export function buildSubstitute(name: string, hints: SubstituteHints = {}): SubstitutePart[] {
+  const bike = BIKES[name];
+  if (bike !== undefined) return bikeSubstitute(name, bike);
   const builder =
     EXACT[name] ?? KEYWORDS.find(([pattern]) => pattern.test(name))?.[1] ?? unknownBuilder;
   const { w, d } = sizeOf(name, hints);
@@ -1152,7 +1310,7 @@ export function buildSubstitute(name: string, hints: SubstituteHints = {}): Subs
 
 /** Vrai si un substitut dédié existe pour ce nom (sinon caisse rayée). */
 export function hasDedicatedSubstitute(name: string): boolean {
-  return name in EXACT || KEYWORDS.some(([pattern]) => pattern.test(name));
+  return name in EXACT || name in BIKES || KEYWORDS.some(([pattern]) => pattern.test(name));
 }
 
 export type { Triple };
