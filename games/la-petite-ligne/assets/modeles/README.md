@@ -10,11 +10,13 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 |---|---|---|
 | `personnages.glb` | squelette `rig`, pièces des joueurs (15 coupes, barbes et moustache), quatre habitants de la démo, Lucie (hors démo), Achille et Solange (tour 10) | clips sur le squelette |
 | `bourg.glb` | bâtiments (tour 10: rue Haute, intérieurs de l'épicerie et de la mercerie, cellier et chambre), voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière, passages du ru | aucune (pièces mobiles en nœuds à part) |
-| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
+| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poule (0.12: six robes, coq, poussin), cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
 | `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 41 clips, chacun sur le squelette de sa bête |
 | `poissons.glb` | les 22 poissons de la pêche (0.12) et la vieille épuisette du ponton | aucune |
+| `elevage.glb` | 0.12: chèvre (deux robes), clochette, piquet, chevrerie, poulailler agrandi, mangeoire à trémie, bidon de lait, fromage frais, panier d'œufs | `goat_idle`, `goat_walk`, `goat_trot`, `goat_graze`, `goat_milk_stand`, `goat_lie`, `goat_bell` |
+| `marche.glb` | 0.12: étal du dimanche (déplié, replié), cagette, balance, halle du marché, pot de confiture de mûres, bocal, sacoche de Lucie | aucune |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
@@ -294,6 +296,42 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `carry_one` | 0,533 s | oui | | marcher en portant seul devant la poitrine (mêmes pas que `walk`) |
 | `carry_one_idle` | 3,0 s | oui | | à l'arrêt avec l'objet porté seul |
 
+## 0.12: élevage, basse-cour et marché du dimanche (`docs/jeux/jeu-1/v0-12-conception.md`, sections 2.3 à 2.7, 4 et 6)
+
+Sources: `assets-src/modeles/elevage.py` (`elevage.glb`), `marche.py` (`marche.glb`), robes des poules dans `ferme.py`. Reconstruire ces trois fichiers seuls (GLB nettoyés comme `construire.sh`): `bash games/la-petite-ligne/assets-src/modeles/verifier/construire_v012.sh`. Planches: `planche_v012.py <dossier>` (poses de la chèvre, robes des poules, objets, étal garni sous la halle, mannequin de 1,80 m), quatre angles: `verifier/quatre_v012.sh <dossier>`, sonde des clips (contact au sol, mufle dans l'herbe): `verifier/sonde_v012.py`. Captures livrées: `docs/jeux/jeu-1/gauntlet/captures/v0-12/modeles/`. Fichiers `.blend` ouvrables: `assets-src/modeles/blend/elevage.blend`, `marche.blend`.
+
+### Basse-cour (`ferme.glb`, squelette `hen`)
+
+- Robes, enfants du squelette `hen` comme les trois premières (n'en montrer qu'une): `hen_white`, `hen_red`, `hen_black` (inchangées), `hen_golden` (dorée), `hen_ash` (cendrée, gris-bleu), `hen_cuckoo` (coucou: rangs de facettes gris et blancs en alternance sur le corps, les ailes et la tête), `hen_rooster` (le coq doré), `hen_chick` (le poussin). Mêmes clips `hen_idle`, `hen_walk`, `hen_peck` pour toutes.
+- `hen_rooster`: plus grand que la poule (crête à 0,47 m, faucilles à 0,53 m, poule 0,41 m), camail doré, dos rouge, poitrail noir, trois faucilles larges noir bleuté, grande crête et barbillons. Il ne demande rien au jeu de plus qu'une poule.
+- `hen_chick`: modelé à la taille de la poule pour garder les pivots du squelette (les clips lui vont tels quels), extra `scale` 0,4 sur la robe: poser la racine `hen` à l'échelle 0,4 (0,12 m).
+- Budgets (bible 8.8, poule 500, plafonds relevés de moitié le 2026-11-03): 498 triangles par robe (coucou 496; les poules se répètent jusqu'à neuf, gardées au plafond d'avant), coq 686 (un seul, plus rond: corps de 11 pans, deux lancettes dorées), poussin 250. Aucune case de palette ajoutée (dorée `leaf_litter` et `copper`, cendrée `lauze_light` et `lauze`, coucou `heron_grey` et `feather_white`, coq `fox_red`, `fox_red_dark`, `fox_black`, `jay_stripe`, `leaf_litter`).
+
+### Chèvre (`elevage.glb`, squelette `goat`)
+
+- Squelette `goat` (os préfixés `goat_`, même construction que la chevrette du pré), deux robes enfants: `goat_chamois` (chamoisée: pelage brun, bas des pattes, mufle et barbiche noirs, petites cornes vers l'arrière) et `goat_white` (blanche, sans cornes, mufle rose). Oreilles portées de côté, presque à plat, collier de cuir. 0,72 m au garrot, 1,0 m de long, tête portée à 0,95 m (cornes à 1,05 m).
+- `socket_goat_neck`: nœud vide sous la gorge, au collier (os `goat_neck`): la corde du piquet y finit et la clochette `goat_bell` s'y accroche sans transformation.
+- Clips sur place: `goat_idle` (rumine, oreilles, queue, coup d'œil), `goat_walk` (0,8 s pour environ 0,6 m: `timeScale = vitesse / 0,78`), `goat_trot` (0,4 s pour environ 1,1 m, pour suivre celui qui tient la corde: `timeScale = vitesse / 2,8`), `goat_graze` (mufle dans l'herbe, de 0,7 à 1,8 cm du sol aux bouchées), `goat_milk_stand` (immobile, pattes arrière reculées, tête tenue un peu haute; seules oreilles et queue bougent), `goat_lie` (couchée, pattes repliées sous le corps, tête haute qui rumine: la nuit à la chevrerie), `goat_bell` (lève la tête et secoue la clochette, une fois: `LoopOnce`, quand le train passe). Sonde: point le plus bas entre -0,04 et +0,04 m en marche et au trot (sabot qui frôle l'herbe), -0,01 m couchée.
+- `goat_stake`: piquet de 0,5 m, deux tours de corde et un anneau; la corde part de l'extra `rope_anchor` (repère glTF, à 0,405 m) vers `socket_goat_neck` (dessinée par le jeu, comme la ligne de pêche).
+- Budgets: 1 278 triangles (chamoisée), 1 206 (blanche), corps de 12 pans sur 7 rangs (plafonds relevés de la bible); une ou deux chèvres à l'écran, cornes, barbiche, pis et collier compris.
+
+### Bâtiments et objets de l'élevage (`elevage.glb`)
+
+- `goat_shed` (chevrerie, 2 x 2): cabane de planches sur soubassement de pierres sèches, porte coupée à mi-hauteur sur la case de gauche vue de dehors (`door_cell` 0), toit d'une pente qui descend vers l'arrière (-Z): poser l'arrière contre le talus, la pluie tombe derrière et non devant la porte. Vantaux `goat_shed_door_low` (fermé la nuit) et `goat_shed_door_high`, pivots sur les gonds de gauche: tourner autour de Y pour ouvrir. Baquet `goat_shed_tub` à droite de la porte, son eau `goat_shed_tub_water` à montrer quand le seau y a été versé. Dedans: paille, râtelier à foin contre le mur du fond (on le voit par la porte), jour d'aération haut sur le côté droit. 1 504 triangles (petit bâtiment: 3 000 avant le relèvement).
+- `henhouse_extended` (poulailler agrandi, chantier `coop_extension`, 3 x 3): le poulailler réparé de `bourg.py` (nœuds renommés `henhouse_extended_*`), un pondoir en appentis contre le pignon droit (trois nids paillés, toit d'une pente sous la rive du toit et au-dessus de la clôture) et un second perchoir plus bas: dix places de 0,3 m pour neuf poules. Même origine et même emprise que `henhouse`: le montrer à la place de `henhouse_repaired`. 1 828 triangles.
+- `hen_feeder_hopper` (mangeoire à trémie): trémie de 0,4 m sur tasseaux, couvercle en pente, auget vers +Z; le grain `hen_feeder_hopper_grain` est un enfant à cacher quand il n'y a plus de rations. 188 triangles.
+- Objets (origine au centre de la base): `milk_can` (bidon de 0,33 m), `fresh_cheese` (palet de chèvre sur feuille et planchette, 0,18 m), `egg_basket` (panier d'osier à anse, six œufs, 0,32 m; 520 triangles), `goat_bell`.
+
+### Marché du dimanche (`marche.glb`)
+
+- `market_stall` (2 x 1): planche de 2 m, dessus à 0,85 m (extra `top`), deux tréteaux en A (quatre pieds au sol chacun), bandeau de toile rayée devant et sur les côtés, ardoise de prix pendue au milieu du bandeau, caisse à monnaie côté marchand. Clients devant (+Z), marchand derrière (-Z). Cagettes et balance sont des nœuds à part, posés aux places des extras: `crate_spots` (repère glTF: les quatre premières devant, les deux dernières derrière avec la quête `market_crates`), `scale_spot`; les produits vont dans les cagettes (fond à `goods_height` 0,012 m au-dessus de la place).
+- `market_stall_stored`: l'étal replié, dos (-Z) contre le mur de l'épicerie: planche dressée sur son chant, tréteaux rabattus, deux cagettes empilées; 0,45 m de profondeur.
+- `market_crate` (cagette 0,42 x 0,30 x 0,16 m, aussi l'objet de l'établi), `market_scale` (balance de Roberval, posée à `scale_spot`).
+- `market_hall` (4 x 3, chantier du bourg): quatre poteaux de chêne sur dés de pierre, sablières de 2,2 à 2,4 m posées sur les poteaux, entraits dessus, aisseliers, poinçons et arbalétriers aux pignons, toit de tuiles à deux pans (faîtage selon la longueur, à 3,4 m). Même origine que l'étal: poser l'un sur l'autre sans décalage; passage libre de 2,2 m sous les sablières. 1 364 triangles.
+- `blackberry_jam` (même bocal que `elder_jelly`, coiffe bleue pour les distinguer sur l'étal), `jar` (bocal vide, couvercle de fer-blanc), `mail_bag` (sacoche de cuir de Lucie avec ses plis qui dépassent et sa bandoulière lovée; extra `rest_height` 0,455: sur l'assise du banc du quai).
+- Étal garni (six cagettes, balance, trois pots, fromage, panier) sous la halle: 544 + 6 x 156 + 316 + 3 x 190 + 134 + 520 + 1 364 = 4 384 triangles, en un appel de dessin par fichier si le jeu fusionne (critère CA-R1: +6 000 triangles et +4 appels au plus).
+- Pas fait à ce lot: ardoise d'Odette sur pied, fanions, lettres et colis des plis (`mail_letter`, `mail_parcel`, `mail_heavy`), litière qui change de couleur (le jeu peut teinter la paille du poulailler).
+
 ## Fiche par modèle
 
 
@@ -432,7 +470,7 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `pickup` | 1.0 | non (jouer une fois) |
 | `feed` | 1.2 | oui |
 
-### `ferme.glb` (1023 Ko)
+### `ferme.glb` (1303 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -485,11 +523,11 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `hen_feeder` | 1 x 1 | 84 |  |
 | `grain_sack` |  | 144 | kind: "item" |
 | `water_barrel` | 1 x 1 | 356 |  |
-| `hen` |  | 1494 | variants: ["hen_white", "hen_red", "hen_black"], tris_each_variant: 498 |
+| `hen` |  | 3922 | variants: ["hen_white", "hen_red", "hen_black", "hen_golden", "hen_ash", "hen_cuckoo", "hen_rooster", "hen_chick"], note: "une robe visible à la fois; hen_rooster: le coq (mêmes clips); hen_chick: le poussin, racine à l'échelle 0,4 (extra scale de la robe)", tris_each_variant: {"hen_white": 498, "hen_red": 498, "hen_black": 498, "hen_golden": 498, "hen_ash": 498, "hen_cuckoo": 496, "hen_rooster": 686, "hen_chick": 250} |
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (6029 Ko)
+### `bourg.glb` (5933 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -498,11 +536,11 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `gatekeeper_house` | 7 x 6 | 8256 | door_cell: 3, cut_walls: true, interior: {"x": [-2.5, 2.5], "z": [-2.0, 2.0], "floor_y": 0.12}, states: ["gatekeeper_house_ruin", "gatekeeper_house_repaired"] |
 | `gatekeeper_cellar` |  | 1332 | room: "room_cellar", attach: "gatekeeper_house (même origine, même rotation)", footprint_world: {"x": [2, 5], "y": [21, 27]}, interior: {"x": [-5.5, -2.8], "z": [-2.0, 2.0], "floor_y": 0.12}, elements: [{"id_hint": "post_1", "nodes": ["gatekeeper_cellar_post_1"], "planks": 2, "nails": 1}, {"id_hint": "post_2", "nodes": ["gatekeeper_cellar_post_2"], "planks": 2, "nails": 1}, {"id_hint": "plate", "nodes": ["gatekeeper_cellar_plate"], "planks": 3, "nails": 2, "needs": ["post_1", "post_2"]}, {"id_hint": "wall_1", "nodes": ["gatekeeper_cellar_wall_left"], "planks": 3, "nails": 1, "needs": ["plate"]}, {"id_hint": "wall_2", "nodes": ["gatekeeper_cellar_wall_back", "gatekeeper_cellar_wall_front"], "planks": 3, "nails": 1, "needs": ["plate"]}, {"id_hint": "roof", "nodes": ["gatekeeper_cellar_roof_frame"], "planks": 3, "nails": 2, "needs": ["wall_1", "wall_2"]}], built_nodes: ["gatekeeper_cellar_roof", "gatekeeper_cellar_door"], site_nodes: ["gatekeeper_cellar_floor"], cut_nodes: ["gatekeeper_cellar_roof", "gatekeeper_cellar_roof_frame"], rack_spots: [{"x": -5.0, "z": -1.0, "facing": "+x", "cells": [[3, 22], [3, 23]]}, {"x": -5.0, "z": 1.0, "facing": "+x", "cells": [[3, 24], [3, 25]]}], note: "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_left_door à la place de gatekeeper_house_repaired_wall_left. rack_spots: les deux places d'étagère haute, dos au pignon ouest (cases de la carte pour la maisonnette en (8,5 ; 24), rotation 0)" |
 | `gatekeeper_bedroom` |  | 2264 | room: "room_bedroom", attach: "gatekeeper_house (même origine, même rotation)", footprint_world: {"x": [5, 12], "y": [16, 22]}, interior: {"x": [-2.5, 2.5], "z": [-7.0, -2.3], "floor_y": 0.12}, elements: [{"id_hint": "post_1", "nodes": ["gatekeeper_bedroom_post_1"], "planks": 2, "nails": 1}, {"id_hint": "post_2", "nodes": ["gatekeeper_bedroom_post_2"], "planks": 2, "nails": 1}, {"id_hint": "post_3", "nodes": ["gatekeeper_bedroom_post_3"], "planks": 2, "nails": 1}, {"id_hint": "post_4", "nodes": ["gatekeeper_bedroom_post_4"], "planks": 2, "nails": 1}, {"id_hint": "plate_1", "nodes": ["gatekeeper_bedroom_plate_1"], "planks": 3, "nails": 1, "needs": ["post_1", "post_2", "post_3", "post_4"]}, {"id_hint": "plate_2", "nodes": ["gatekeeper_bedroom_plate_2"], "planks": 3, "nails": 1, "needs": ["post_1", "post_2", "post_3", "post_4"]}, {"id_hint": "wall_1", "nodes": ["gatekeeper_bedroom_wall_left"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_2", "nodes": ["gatekeeper_bedroom_wall_right"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_3", "nodes": ["gatekeeper_bedroom_wall_back"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "wall_4", "nodes": ["gatekeeper_bedroom_wall_back_gable"], "planks": 3, "nails": 1, "needs": ["plate_1", "plate_2"]}, {"id_hint": "truss_ridge", "nodes": ["gatekeeper_bedroom_truss"], "planks": 4, "nails": 2, "needs": ["wall_1", "wall_2", "wall_3", "wall_4"], "after_carry": "ridge_purlin"}, {"id_hint": "floor", "nodes": ["gatekeeper_bedroom_floor"], "planks": 6, "nails": 2}], built_nodes: ["gatekeeper_bedroom_roof", "gatekeeper_bedroom_door"], site_nodes: ["gatekeeper_bedroom_sill"], cut_nodes: ["gatekeeper_bedroom_roof", "gatekeeper_bedroom_truss", "gatekeeper_bedroom_wall_back_gable"], ridge_purlin: {"from": [0.0, 3.52, -2.78], "to": [0.0, 3.52, -7.6], "length": 4.82, "note": "dessus de la panne posée (repère de la maisonnette): là où le porter à deux l'amène"}, furniture_spots: {"double_bed": [-1.25, -5.9], "dresser": [1.75, -6.65], "armchair": [1.9, -3.4]}, note: "repère de gatekeeper_house. site_nodes dès le matin du site; éléments en fantôme puis bâtis; built_nodes au matin de room_built, avec gatekeeper_house_wall_back_door à la place de gatekeeper_house_repaired_wall_back" |
-| `ferrand_shop` | 10 x 8 | 11536 | door_cell: 2, counter_cell: 6, cut_walls: true, cut_nodes: ["ferrand_shop_roof", "ferrand_shop_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "shop", "x": [-4.0, 2.0], "z": [-3.0, 3.0]}, {"id": "dining", "x": [2.0, 4.0], "z": [-3.0, 3.0], "walkable": false, "note": "vue par la porte entrouverte de la cloison; pas de case jouable"}]}, note: "façade à l'est sur la carte (rotation 1); murs du rez-de-chaussée coupés selon la caméra, ferrand_shop_upper et ferrand_shop_roof retirés en entier, ferrand_shop_floor jamais coupé" |
-| `haberdashery` | 7 x 7 | 6252 | door_cell: 3, cut_walls: true, cut_nodes: ["haberdashery_roof", "haberdashery_attic"], interior: {"x": [-2.5, 2.5], "z": [-2.5, 2.5], "floor_y": 0.12}, note: "façade à l'est sur la carte (rotation 1): +X glTF = nord. Murs coupés selon la caméra, haberdashery_roof et haberdashery_attic retirés en entier, haberdashery_floor jamais coupé" |
-| `bakery` | 7 x 6 | 4348 | door_cell: 5, window_cell: 3, spots: {"bakery_window": [0.0, 3.0], "bakery_door": [1.9, 3.0], "sacks_door": [-3.6, 0.6], "spot_hourglass": [0.45, 2.7]}, note: "porte en case 5, guichet en case 3 (le point bakery_window se tient dehors, devant le guichet, sous l'auvent); porte des sacs au pignon ouest; four et cheminée côté voie (nord). spots: repère glTF x, z du bâtiment; spot_hourglass: rebord du guichet, où poser le sablier offert" |
+| `ferrand_shop` | 10 x 8 | 11266 | door_cell: 2, counter_cell: 6, cut_walls: true, cut_nodes: ["ferrand_shop_roof", "ferrand_shop_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "shop", "x": [-4.0, 2.0], "z": [-3.0, 3.0]}, {"id": "dining", "x": [2.0, 4.0], "z": [-3.0, 3.0], "walkable": false, "note": "vue par la porte entrouverte de la cloison; pas de case jouable"}]}, note: "façade à l'est sur la carte (rotation 1); murs du rez-de-chaussée coupés selon la caméra, ferrand_shop_upper et ferrand_shop_roof retirés en entier, ferrand_shop_floor jamais coupé" |
+| `haberdashery` | 7 x 7 | 5852 | door_cell: 3, cut_walls: true, cut_nodes: ["haberdashery_roof", "haberdashery_attic"], interior: {"x": [-2.5, 2.5], "z": [-2.5, 2.5], "floor_y": 0.12}, note: "façade à l'est sur la carte (rotation 1): +X glTF = nord. Murs coupés selon la caméra, haberdashery_roof et haberdashery_attic retirés en entier, haberdashery_floor jamais coupé" |
+| `bakery` | 7 x 6 | 4070 | door_cell: 5, window_cell: 3, spots: {"bakery_window": [0.0, 3.0], "bakery_door": [1.9, 3.0], "sacks_door": [-3.6, 0.6], "spot_hourglass": [0.45, 2.7]}, note: "porte en case 5, guichet en case 3 (le point bakery_window se tient dehors, devant le guichet, sous l'auvent); porte des sacs au pignon ouest; four et cheminée côté voie (nord). spots: repère glTF x, z du bâtiment; spot_hourglass: rebord du guichet, où poser le sablier offert" |
 | `lucie_house` | 6 x 6 | 3480 | door_cell: 2, spots: {"lucie_house_door": [-0.5, 3.2]}, note: "façade à l'ouest sur la carte (rotation 3); jardinet clos à l'arrière (est), dans l'emprise" |
-| `school` | 11 x 5 | 5044 | door_cell: 3, spots: {"school_gate": [-2.0, 3.0], "town_hall_door": [2.7, 2.9]}, note: "portail de la cour en case 3 (dans l'axe de la rue Haute), porte de la mairie en case 8; la classe s'ouvre sur la cour" |
+| `school` | 11 x 5 | 4742 | door_cell: 3, spots: {"school_gate": [-2.0, 3.0], "town_hall_door": [2.7, 2.9]}, note: "portail de la cour en case 3 (dans l'axe de la rue Haute), porte de la mairie en case 8; la classe s'ouvre sur la cour" |
 | `firmin_house` | 7 x 6 | 4524 | door_cell: 3 |
 | `sawmill` | 10 x 8 | 1944 | door_cell: 5 |
 | `handcar_shed` | 6 x 5 | 1480 | door_cell: 2, note: "portes battantes: tourner handcar_shed_door_l de -100 degrés et _r de +100 autour de Y" |
@@ -744,3 +782,40 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `fish_golden_trout` |  | 596 | kind: "fish", rarity: "mythic", length_m: 0.45, length_cm: [42, 48], hold_tail: [0.0, 0.0, -0.1845], mouth: [0.0, 0.0, 0.1764] |
 | `fish_moon_pike` |  | 588 | kind: "fish", rarity: "mythic", length_m: 1.175, length_cm: [110, 125], hold_tail: [0.0, 0.0, -0.517], mouth: [0.0, 0.0, 0.4606] |
 | `landing_net` |  | 704 | kind: "tool", socket: "socket_hand_r", length_m: 1.75, hoop_diameter_m: 0.6, note: "manche couché vers l'avant (+Z glTF), cercle à plat, filet qui pend; origine à la main arrière, landing_net_hand_l = main avant, landing_net_hoop = centre du cercle" |
+
+### `elevage.glb` (735 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `goat` |  | 2484 | kind: "animal", origin: "sol entre les pattes", withers: 0.72, head_up: 0.95, length: 1.0, collision_radius: 0.45, variants: ["goat_chamois", "goat_white"], neck_socket: "socket_goat_neck", note: "deux robes (goat_chamois, goat_white): n'en montrer qu'une. Corde et clochette au collier (socket_goat_neck). goat_walk: timeScale = vitesse / 0,78; goat_trot: vitesse / 2,8; goat_bell une fois (LoopOnce)", tris_each_variant: {"goat_chamois": 1278, "goat_white": 1206} |
+| `goat_bell` |  | 92 | kind: "item", socket: "socket_goat_neck", note: "accrocher sous socket_goat_neck sans transformation" |
+| `goat_stake` |  | 152 | kind: "prop", rope_anchor: [0.0, 0.405, 0.0], rope_length: 2.5, note: "corde dessinée par le jeu de rope_anchor à socket_goat_neck" |
+| `goat_shed` | 2 x 2 | 1504 | door_cell: 0, doors: ["goat_shed_door_low", "goat_shed_door_high"], inside: [0.25, 0.0, -0.1], tub: "goat_shed_tub_water", note: "porte coupée à mi-hauteur sur la case de gauche (vue de dehors), toit qui descend vers l'arrière (-Z): dos au talus; baquet à droite de la porte, eau (goat_shed_tub_water) à montrer quand il est plein" |
+| `henhouse_extended` | 3 x 3 | 1828 | door_cell: 1, replaces: "henhouse_repaired", note: "même origine et même emprise que henhouse: montrer ce nœud à la place de henhouse_repaired une fois le chantier fini" |
+| `hen_feeder_hopper` | 1 x 1 | 188 | grain: "hen_feeder_hopper_grain", note: "auget vers +Z: les poules picorent devant" |
+| `milk_can` |  | 340 | kind: "item", size_m: 0.33 |
+| `fresh_cheese` |  | 134 | kind: "item", size_m: 0.18 |
+| `egg_basket` |  | 520 | kind: "item", size_m: 0.32 |
+
+| Bête | Animation | Durée (s) | Boucle |
+|---|---|---|---|
+| `goat` | `goat_idle` | 4.0 | oui |
+| `goat` | `goat_walk` | 0.8 | oui |
+| `goat` | `goat_trot` | 0.4 | oui |
+| `goat` | `goat_graze` | 4.0 | oui |
+| `goat` | `goat_milk_stand` | 3.0 | oui |
+| `goat` | `goat_lie` | 4.0 | oui |
+| `goat` | `goat_bell` | 1.2 | non (jouer une fois) |
+
+### `marche.glb` (237 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `market_stall` | 2 x 1 | 544 | top: 0.85, crate_spots: [[-0.69, 0.85, 0.17], [-0.23, 0.85, 0.17], [0.23, 0.85, 0.17], [0.69, 0.85, 0.17], [-0.46, 0.85, -0.17], [0.46, 0.85, -0.17]], scale_spot: [0.0, 0.85, -0.2], crate_model: "market_crate", seller_side: "-z", note: "clients devant (+Z), marchand derrière (-Z); 4 cagettes aux quatre premières places, 6 avec market_crates; balance à scale_spot" |
+| `market_stall_stored` | 2 x 1 | 500 | against_wall: "-z", note: "dos (-Z) contre le mur de l'épicerie" |
+| `market_crate` |  | 156 | kind: "item", goods_height: 0.012, size: [0.42, 0.3, 0.16], note: "cagette (objet de l'établi et place de l'étal)" |
+| `market_scale` |  | 316 | kind: "prop", on: "market_stall.scale_spot" |
+| `market_hall` | 4 x 3 | 1364 | same_origin_as: "market_stall", clear_height: 2.2, note: "poteaux aux quatre coins, hors des pieds de l'étal et du passage devant; sablières de 2,2 à 2,4 m (au-dessus des têtes)" |
+| `blackberry_jam` |  | 190 | kind: "item", size_m: 0.09 |
+| `jar` |  | 112 | kind: "item", size_m: 0.09 |
+| `mail_bag` |  | 280 | kind: "prop", rest_height: 0.455, note: "sur l'assise du banc du quai (quay_bench), à plat" |

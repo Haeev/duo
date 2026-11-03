@@ -493,6 +493,134 @@ def hen_mesh(A, body):
     return g
 
 
+# Robes de la 0.12 (v0-12-conception.md 4.2): dorée, cendrée, coucou (rayée), le coq doré et le poussin.
+# Même squelette et mêmes clips que les trois robes d'origine; une seule robe visible à la fois.
+HEN_VARIANTS = [("hen_white", "chicken_white"), ("hen_red", "chicken_russet"), ("hen_black", "chicken_black"),
+                ("hen_golden", "golden"), ("hen_ash", "ash"), ("hen_cuckoo", "cuckoo"), ("hen_rooster", "rooster"),
+                ("hen_chick", "chick")]
+CHICK_SCALE = 0.4   # le poussin est modelé à la taille de la poule (mêmes pivots), à poser à l'échelle 0,4
+
+
+def _bands(zc, rz, rings, a, b):
+    """Rayures de la poule coucou: une couleur par rang de facettes (rangs de même latitude), en alternance."""
+    def f(face):
+        z = face.calc_center_median().z
+        lat = math.acos(max(-1.0, min(1.0, (z - zc) / rz)))
+        return a if int(lat / (math.pi / rings)) % 2 == 0 else b
+    return f
+
+
+def hen_robe(A, robe):
+    """Poules dorée, cendrée et coucou: la silhouette de hen_mesh, couleurs propres (rayures pour la coucou)."""
+    g = A.geo()
+    body, wing, tail, neck = {"golden": ("leaf_litter", "copper", "copper", "leaf_litter"),
+                              "ash": ("lauze_light", "lauze", "lauze_dark", "lauze_light"),
+                              "cuckoo": (None, None, "heron_grey_dark", "heron_grey")}[robe]
+    barred = robe == "cuckoo"
+    if barred:
+        g.sphere(0.13, loc=(0, 0.02, 0.21), color=_bands(0.21, 0.117, 7, "heron_grey", "feather_white"), segs=9,
+                 rings=7, scale=(0.85, 1.25, 0.9), bone="hen_body")
+    else:
+        g.sphere(0.13, loc=(0, 0.02, 0.21), color=body, segs=9, rings=6, scale=(0.85, 1.25, 0.9), bone="hen_body")
+    for a in (-25, 0, 25):
+        g.sphere(1.0, loc=(math.sin(math.radians(a)) * 0.03, 0.16, 0.29), color=tail, segs=4 if barred else 5,
+                 rings=3, scale=(0.014, 0.045, 0.08), rot=(-35, a, 0), bone="hen_body")
+    for s in (1, -1):
+        wc = _bands(0.22, 0.06, 4, "feather_white", "heron_grey") if barred else wing
+        g.sphere(0.08, loc=(s * 0.1, 0.03, 0.22), color=wc, segs=7, rings=4, scale=(0.35, 1.2, 0.75), bone="hen_body")
+    head = _bands(0.33, 0.0605, 5, "heron_grey", "feather_white") if barred else neck
+    g.sphere(0.055, loc=(0, -0.1, 0.33), color=head, segs=7 if barred else 8, rings=5, scale=(0.9, 1.0, 1.1), bone="hen_head")
+    g.cyl(0.045, 0.1, loc=(0, -0.085, 0.27), color=neck, segs=7, r2=0.04, bone="hen_head")
+    _hen_face_and_legs(g)
+    return g
+
+
+def _hen_face_and_legs(g, comb=None, wattle=(0.012, 0.018, 0.03), head_z=0.0):
+    g.prism(comb or [(-0.03, 0.0), (0.035, 0.0), (0.03, 0.035), (0.01, 0.025), (-0.005, 0.04), (-0.02, 0.025)],
+            0.014, loc=(0, -0.11, 0.375 + head_z), color="comb_red", rot=(0, 0, 90), bone="hen_head")
+    g.box(wattle, loc=(0, -0.152, 0.30 + head_z - (wattle[2] - 0.03) / 2), color="comb_red", bone="hen_head")
+    g.cyl(0.014, 0.04, loc=(0, -0.165, 0.33 + head_z), color="beak", segs=5, r2=0.002, rot=(90, 0, 0), bone="hen_head")
+    for s in (1, -1):
+        g.box((0.004, 0.012, 0.012), loc=(s * 0.048, -0.125, 0.345 + head_z), color="black", bone="hen_head")
+        side = "hen_leg_l" if s > 0 else "hen_leg_r"
+        g.cyl(0.009, 0.13, loc=(s * 0.045, 0.01, 0.075), color="beak", segs=5, bone=side)
+        for a in (-30, 0, 30):
+            g.box((0.01, 0.055, 0.008), loc=(s * 0.045 + math.sin(math.radians(a)) * 0.02,
+                                             0.01 - math.cos(math.radians(a)) * 0.025, 0.004),
+                  color="beak", rot=(0, 0, a), bone=side)
+
+
+def _sickle(g, p0, p1, p2, p3, w0, w1, color, yaw, x, ts=(0.0, 0.33, 0.66, 1.0)):
+    """Faucille de la queue du coq: plume plate courbe (Bézier dans le plan de profil), épaisse de 1,2 cm."""
+    def bez(t):
+        u = 1 - t
+        return tuple(u ** 3 * a + 3 * u * u * t * b + 3 * u * t * t * c + t ** 3 * d for a, b, c, d in zip(p0, p1, p2, p3))
+    cs = [bez(t) for t in ts]
+    last = len(ts) - 1
+    out, inn = [], []
+    for i, t in enumerate(ts):
+        a = cs[max(i - 1, 0)]
+        b = cs[min(i + 1, last)]
+        dx, dz = b[0] - a[0], b[1] - a[1]
+        n = math.hypot(dx, dz) or 1.0
+        nx, nz = -dz / n, dx / n
+        w = (w0 + (w1 - w0) * t) / 2
+        out.append((cs[i][0] + nx * w, cs[i][1] + nz * w))
+        inn.append((cs[i][0] - nx * w, cs[i][1] - nz * w))
+    g.prism(out + list(reversed(inn)), 0.012, loc=(x, 0, 0), color=color, rot=(0, 0, 90 + yaw), bone="hen_body")
+
+
+def hen_rooster_mesh(A):
+    """Coq doré (plafonds relevés de la bible: plus rond que la poule, 700 triangles; un seul coq): plus grand que la poule (0,52 m à la pointe de la queue, crête à 0,47 m), camail doré, dos
+    rouge, poitrail noir, queue en faucilles noir bleuté, grande crête et barbillons; mêmes os que la poule."""
+    g = A.geo()
+
+    def body(face):
+        n = face.normal
+        if n.y < -0.35 and n.z < 0.45:
+            return "fox_black"       # poitrail
+        if n.z > 0.55:
+            return "fox_red"         # dos et lancettes
+        return "fox_red_dark"
+    g.sphere(0.14, loc=(0, 0.02, 0.225), color=body, segs=11, rings=7, scale=(0.85, 1.2, 0.95), bone="hen_body")
+    for s in (1, -1):
+        g.sphere(0.085, loc=(s * 0.108, 0.04, 0.235), color="fox_red_dark", segs=7, rings=5, scale=(0.35, 1.2, 0.75),
+                 bone="hen_body")
+    # faucilles: la grande au milieu, deux plus courtes écartées
+    # plumes larges (5 à 8 cm à la base): fines, elles se lisaient comme des tiges
+    _sickle(g, (0.11, 0.27), (0.14, 0.53), (0.31, 0.53), (0.33, 0.33), 0.085, 0.03, "jay_stripe", 0, 0.0)
+    for s in (1, -1):
+        _sickle(g, (0.1, 0.26), (0.12, 0.45), (0.26, 0.45), (0.28, 0.29), 0.075, 0.025, "fox_black", s * 16,
+                s * 0.025)
+        # lancettes de la selle: deux petites faucilles dorées qui retombent sur la queue
+        _sickle(g, (0.07, 0.31), (0.12, 0.40), (0.2, 0.39), (0.22, 0.3), 0.05, 0.015, "leaf_litter", s * 28,
+                s * 0.035)
+    g.sphere(0.06, loc=(0, -0.105, 0.36), color="leaf_litter", segs=9, rings=6, scale=(0.9, 1.0, 1.1), bone="hen_head")
+    g.cyl(0.056, 0.125, loc=(0, -0.088, 0.285), color="leaf_litter", segs=7, r2=0.042, bone="hen_head")
+    comb = [(-0.04, 0.0), (0.045, 0.0), (0.045, 0.04), (0.03, 0.03), (0.02, 0.062), (0.005, 0.038), (-0.008, 0.066),
+            (-0.022, 0.036), (-0.035, 0.05)]
+    _hen_face_and_legs(g, comb=comb, wattle=(0.016, 0.022, 0.055), head_z=0.03)
+    return g
+
+
+def hen_chick_mesh(A):
+    """Poussin (0,12 m une fois posé à CHICK_SCALE): boule de duvet jaune, tête ronde, bec orangé; modelé à la
+    taille de la poule pour garder les pivots de son squelette (peck, walk et idle lui vont tels quels)."""
+    g = A.geo()
+    g.sphere(0.105, loc=(0, 0.02, 0.17), color="tit_yellow", segs=8, rings=5, scale=(0.95, 1.1, 0.92), bone="hen_body")
+    for s in (1, -1):
+        g.sphere(0.05, loc=(s * 0.09, 0.04, 0.18), color="flower_yellow", segs=6, rings=3, scale=(0.35, 1.0, 0.6),
+                 bone="hen_body")
+    g.sphere(0.078, loc=(0, -0.085, 0.29), color="tit_yellow", segs=7, rings=4, bone="hen_head")
+    g.cyl(0.022, 0.05, loc=(0, -0.175, 0.29), color="goose_bill", segs=5, r2=0.003, rot=(90, 0, 0), bone="hen_head")
+    for s in (1, -1):
+        g.box((0.012, 0.016, 0.022), loc=(s * 0.058, -0.14, 0.31), color="black", bone="hen_head")
+        side = "hen_leg_l" if s > 0 else "hen_leg_r"
+        g.cyl(0.014, 0.09, loc=(s * 0.045, 0.01, 0.045), color="goose_bill", segs=5, bone=side)
+        g.box((0.04, 0.06, 0.014), loc=(s * 0.045, -0.015, 0.007), color="goose_bill", bone=side)
+    return g
+
+
 def hen_actions(arm):
     from bpy_extras import anim_utils
     arm.animation_data_create()
@@ -634,9 +762,19 @@ def main():
     A.add("water_barrel", water_barrel(A), {"footprint": [1, 1]})
     # poule: squelette + trois robes
     arm = hen_rig()
-    A._register(arm, {"variants": ["hen_white", "hen_red", "hen_black"]})
-    for vname, body in (("hen_white", "chicken_white"), ("hen_red", "chicken_russet"), ("hen_black", "chicken_black")):
-        ob = A.add(vname, hen_mesh(A, body), parent=arm)
+    A._register(arm, {"variants": [v for v, _ in HEN_VARIANTS],
+                      "note": "une robe visible à la fois; hen_rooster: le coq (mêmes clips); hen_chick: le poussin, "
+                              "racine à l'échelle 0,4 (extra scale de la robe)"})
+    for vname, body in HEN_VARIANTS:
+        if body.startswith("chicken_"):
+            g = hen_mesh(A, body)
+        elif body == "rooster":
+            g = hen_rooster_mesh(A)
+        elif body == "chick":
+            g = hen_chick_mesh(A)
+        else:
+            g = hen_robe(A, body)
+        ob = A.add(vname, g, parent=arm, extras={"scale": CHICK_SCALE} if body == "chick" else None)
         ob.modifiers.new("rig", "ARMATURE").object = arm
     clips = hen_actions(arm)
 
@@ -644,14 +782,14 @@ def main():
     path = os.path.join(lpl.OUT, "ferme.glb")
     size = lpl.export_glb(path, objs, animation_mode="ACTIONS")
     st = A.stats()
-    st["hen"]["tris_each_variant"] = lpl.tri_count_obj(bpy.data.objects["hen_white"])
+    st["hen"]["tris_each_variant"] = {v: lpl.tri_count_obj(bpy.data.objects[v]) for v, _ in HEN_VARIANTS}
     lpl.write_stats("ferme", {"nodes": st, "animations": clips, "file_bytes": size})
     print("FERME", size, {k: v["tris"] for k, v in st.items()})
 
     # planche
     roots = [r for r in A.roots if r.name != "hen"]
     hens = []
-    for i, v in enumerate(("hen_white", "hen_red", "hen_black")):
+    for v, _ in HEN_VARIANTS:
         e = lpl.empty("planche_" + v)
         h2 = bpy.data.objects["hen"].copy()
         bpy.context.scene.collection.objects.link(h2)
@@ -662,7 +800,7 @@ def main():
         m.modifiers["rig"].object = h2
         hens.append(e)
     bpy.data.objects["hen"].hide_render = True
-    for v in ("hen_white", "hen_red", "hen_black"):
+    for v, _ in HEN_VARIANTS:
         bpy.data.objects[v].hide_render = True
 
     def spacing(r):

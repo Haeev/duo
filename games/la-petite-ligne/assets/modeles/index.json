@@ -638,11 +638,16 @@
  },
  "hen": {
   "file": "ferme.glb",
-  "tris": 1494,
+  "tris": 3922,
   "variants": [
    "hen_white",
    "hen_red",
-   "hen_black"
+   "hen_black",
+   "hen_golden",
+   "hen_ash",
+   "hen_cuckoo",
+   "hen_rooster",
+   "hen_chick"
   ]
  },
  "station": {
@@ -683,7 +688,7 @@
  },
  "ferrand_shop": {
   "file": "bourg.glb",
-  "tris": 11536,
+  "tris": 11266,
   "footprint": [
    10,
    8
@@ -691,7 +696,7 @@
  },
  "haberdashery": {
   "file": "bourg.glb",
-  "tris": 6252,
+  "tris": 5852,
   "footprint": [
    7,
    7
@@ -699,7 +704,7 @@
  },
  "bakery": {
   "file": "bourg.glb",
-  "tris": 4348,
+  "tris": 4070,
   "footprint": [
    7,
    6
@@ -715,7 +720,7 @@
  },
  "school": {
   "file": "bourg.glb",
-  "tris": 5044,
+  "tris": 4742,
   "footprint": [
    11,
    5
@@ -1896,5 +1901,110 @@
  "landing_net": {
   "file": "poissons.glb",
   "tris": 704
+ },
+ "goat": {
+  "file": "elevage.glb",
+  "tris": 2484,
+  "variants": [
+   "goat_chamois",
+   "goat_white"
+  ],
+  "animations": [
+   "goat_idle",
+   "goat_walk",
+   "goat_trot",
+   "goat_graze",
+   "goat_milk_stand",
+   "goat_lie",
+   "goat_bell"
+  ]
+ },
+ "goat_bell": {
+  "file": "elevage.glb",
+  "tris": 92
+ },
+ "goat_stake": {
+  "file": "elevage.glb",
+  "tris": 152
+ },
+ "goat_shed": {
+  "file": "elevage.glb",
+  "tris": 1504,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "henhouse_extended": {
+  "file": "elevage.glb",
+  "tris": 1828,
+  "footprint": [
+   3,
+   3
+  ]
+ },
+ "hen_feeder_hopper": {
+  "file": "elevage.glb",
+  "tris": 188,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "milk_can": {
+  "file": "elevage.glb",
+  "tris": 340
+ },
+ "fresh_cheese": {
+  "file": "elevage.glb",
+  "tris": 134
+ },
+ "egg_basket": {
+  "file": "elevage.glb",
+  "tris": 520
+ },
+ "market_stall": {
+  "file": "marche.glb",
+  "tris": 544,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "market_stall_stored": {
+  "file": "marche.glb",
+  "tris": 500,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "market_crate": {
+  "file": "marche.glb",
+  "tris": 156
+ },
+ "market_scale": {
+  "file": "marche.glb",
+  "tris": 316
+ },
+ "market_hall": {
+  "file": "marche.glb",
+  "tris": 1364,
+  "footprint": [
+   4,
+   3
+  ]
+ },
+ "blackberry_jam": {
+  "file": "marche.glb",
+  "tris": 190
+ },
+ "jar": {
+  "file": "marche.glb",
+  "tris": 112
+ },
+ "mail_bag": {
+  "file": "marche.glb",
+  "tris": 280
  }
 }

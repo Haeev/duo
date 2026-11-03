@@ -301,10 +301,25 @@
    "variants": [
     "hen_white",
     "hen_red",
-    "hen_black"
+    "hen_black",
+    "hen_golden",
+    "hen_ash",
+    "hen_cuckoo",
+    "hen_rooster",
+    "hen_chick"
    ],
-   "tris": 1494,
-   "tris_each_variant": 498
+   "note": "une robe visible à la fois; hen_rooster: le coq (mêmes clips); hen_chick: le poussin, racine à l'échelle 0,4 (extra scale de la robe)",
+   "tris": 3922,
+   "tris_each_variant": {
+    "hen_white": 498,
+    "hen_red": 498,
+    "hen_black": 498,
+    "hen_golden": 498,
+    "hen_ash": 498,
+    "hen_cuckoo": 496,
+    "hen_rooster": 686,
+    "hen_chick": 250
+   }
   }
  },
  "animations": [
@@ -312,5 +327,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 1045520
+ "file_bytes": 1326552
 }
