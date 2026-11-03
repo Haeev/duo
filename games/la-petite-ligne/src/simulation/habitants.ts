@@ -49,7 +49,7 @@ function routeTo(sim: Sim, v: VillagerState, pointId: string): void {
   const goal = goalOf(sim, v, pointId);
   // Déjà rendu (apparu à sa place): aucun pas, sinon il se dessinerait un instant debout.
   const there = goal !== undefined && distance(v.pos, goal) < 1e-6;
-  const path = goal === undefined || there ? null : findPath(villagerBlockers(sim), v.pos, goal);
+  const path = goal === undefined || there ? null : findPath(villagerBlockers(sim, v.id), v.pos, goal);
   // Derrière un meuble (Odette au guichet): le dernier pas va sur la case même.
   const last = path?.[path.length - 1];
   if (path !== null && goal !== undefined && VILLAGER_BEHIND_POINTS.has(pointId) && (last === undefined || distance(last, goal) > 1e-6)) path.push({ x: goal.x, y: goal.y });
@@ -121,7 +121,7 @@ export function updateVillagers(sim: Sim, dt: number): void {
     // (un corps resté dans un obstacle, comme une ancienne sauvegarde au milieu d'un banc, y est posé).
     if (sim.runtime.villagerPaths[v.id] === undefined && v.visible) {
       const goal = goalOf(sim, v, v.target);
-      const stuck = bodyCollides(villagerBlockers(sim), v.pos.x, v.pos.y);
+      const stuck = bodyCollides(villagerBlockers(sim, v.id), v.pos.x, v.pos.y);
       if (goal !== undefined && stuck) teleport(v, goal.x, goal.y);
       routeTo(sim, v, v.target);
     }

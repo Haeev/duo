@@ -531,11 +531,11 @@ describe('pièces bâties à deux (T10-20, T10-21)', () => {
     return p;
   }
 
-  /** Les deux maintiennent Agir au site jusqu'à ce que `done` soit vrai. */
-  function buildUntil(sim: Sim, room: string, done: () => boolean, max = 30 * 300): number {
+  /** Les deux maintiennent Agir au site (`dy` m au sud du point) jusqu'à ce que `done` soit vrai. */
+  function buildUntil(sim: Sim, room: string, done: () => boolean, max = 30 * 300, dy = 0.5): number {
     const site = siteOf(sim, room);
-    at(sim, 'p1', site.x, site.y + 0.5);
-    at(sim, 'p2', site.x + 0.5, site.y + 0.5);
+    at(sim, 'p1', site.x, site.y + dy);
+    at(sim, 'p2', site.x + 0.5, site.y + dy);
     let n = 0;
     while (!done() && n < max) {
       send(sim, [], { p1: hold(n), p2: hold(n) });
@@ -639,7 +639,8 @@ describe('pièces bâties à deux (T10-20, T10-21)', () => {
     if (s === undefined) throw new Error('chambre commandée attendue');
     s.elementsBuilt = (roomDef(sim, 'room_bedroom')?.elements ?? []).filter((e) => !e.needsBeam).map((e) => e.id);
     expect(buildableElements(sim, 'room_bedroom')).toEqual([]);
-    buildUntil(sim, 'room_bedroom', () => keys(character(sim, 'p1')).includes('room_beam'), 10);
+    // Au nord du site: au sud, on serait contre la panne couchée, qu'Espace tenu soulèverait (S01).
+    buildUntil(sim, 'room_bedroom', () => keys(character(sim, 'p1')).includes('room_beam'), 10, -0.5);
     expect(keys(character(sim, 'p1'))).toContain('room_beam');
     const beam = sim.world.beam;
     if (beam === null) throw new Error('panne');

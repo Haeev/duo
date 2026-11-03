@@ -10,6 +10,7 @@ import {
   DEFAULT_DIALOGUES,
   DEFAULT_TIDY,
   DEFAULT_ENVIES,
+  DEFAULT_CARRY_GRIP,
   DEFAULT_FEEL,
   DEFAULT_MEMORIES,
   DEFAULT_MOMENTS,
@@ -210,6 +211,16 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             return [xy[0] ?? 0, xy[1] ?? 0];
           });
   if (handcar !== null && path.length === 0) handcar.at('path').fail('au moins un point de passage');
+  const lengths: Record<string, number> = {};
+  const lengthsReader = r?.opt('lengths') ?? null;
+  const grip = r?.opt('grip') ?? null;
+  if (lengthsReader !== null) {
+    for (const [item, value] of lengthsReader.entries()) {
+      const m = value.number();
+      if (m < 0) value.fail('longueur positive attendue');
+      lengths[item] = m;
+    }
+  }
   return {
     handcar:
       handcar === null
@@ -225,6 +236,15 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             flag: handcar.at('flag').string(),
           },
     parcel: parcel === null ? null : { item: parcel.at('item').string(), from: parcel.at('from').string(), to: parcel.at('to').string() },
+    lengths,
+    grip:
+      grip === null
+        ? { ...DEFAULT_CARRY_GRIP }
+        : {
+            side: optNumber(grip, 'side', DEFAULT_CARRY_GRIP.side),
+            fromEnd: optNumber(grip, 'fromEnd', DEFAULT_CARRY_GRIP.fromEnd),
+            reach: optNumber(grip, 'reach', DEFAULT_CARRY_GRIP.reach),
+          },
   };
 }
 
@@ -1296,6 +1316,7 @@ function parseFeel(r: Reader | null): FeelSettings {
     actionSeconds: { ...DEFAULT_FEEL.actionSeconds },
     fishWeights: { ...DEFAULT_FEEL.fishWeights },
     fishWeightsBySeason: {},
+    steppingStoneVillagers: [...DEFAULT_FEEL.steppingStoneVillagers],
   };
   if (r === null) return feel;
   const actions = r.opt('actionSeconds');
@@ -1318,7 +1339,9 @@ function parseFeel(r: Reader | null): FeelSettings {
       if (key !== undefined) feel.fishWeightsBySeason[key] = table;
     }
   }
-  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights' | 'fishWeightsBySeason'>)[] = [
+  const stones = r.opt('steppingStoneVillagers');
+  if (stones !== null) feel.steppingStoneVillagers = stones.stringList();
+  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights' | 'fishWeightsBySeason' | 'steppingStoneVillagers'>)[] = [
     'trainSlideSeconds',
     'pointRadius',
     'beamGrabRange',

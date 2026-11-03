@@ -14,7 +14,7 @@ export type TextVars = Readonly<Record<string, string | number>>;
 
 /** Remplace `{nom}`; un nom inconnu reste tel quel. */
 export function fill(template: string, vars: TextVars = {}): string {
-  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+  return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });

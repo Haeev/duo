@@ -280,7 +280,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 ## Tour 10, lot L3: intérieurs et rue Haute (La Petite Ligne, vérifié le 2026-11-02)
 
 - « Chez soi » contre « à l'abri »: `isHome(c)` et `isSheltered(c)` de `src/etat/interieurs.ts` remplacent l'ancien booléen `inHouse` (retiré). Aménagement, coucher, minuit, veillée, réchaud, astuces de l'heure: `isHome`; bancs du dehors, bêche, moments rares, lisière, tableau, poules: `isSheltered`.
-- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
+- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim, id)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
 - Un habitant ajouté au contenu n'existe pas dans une sauvegarde d'avant: `ensureVillagers` (habitants.ts) lui crée son état au premier pas, sans toucher à `sauvegarde.ts`.
 - Le robot pousse une charge à deux le long du chemin de son centre, qui ignore la largeur des porteurs: un coin de rocher le bloquait pour toujours. Écart de biais après une demi-seconde immobile (`beamDodge`).
 - Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
@@ -294,3 +294,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Omettre les champs à leur valeur par défaut (`exactOptionalPropertyTypes` est actif: champ optionnel, jamais `undefined` écrit).
 - Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD.
 
+## Patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Gabarits de texte: `format` (`simulation/contexte.ts`), `fill` (`interface/format.ts`) et celui de `etat/semaine.ts` ne lisaient que `[a-zA-Z]+`: `{henColor1}` restait brut. Nom de paramètre: `[a-zA-Z][a-zA-Z0-9]*` partout. Contrôle de toutes les répliques et lettres: `tests/textes-remplis.test.ts` (faire apparaître les poules d'abord, sinon `henVars` est vide).
+- Charge longue (poutre, 4,5 m): portée comptée jusqu'à son axe (`beamDistance`, `carry.lengths`, `carry.grip.reach`), pas jusqu'au centre; soulevée, elle garde son orientation et chaque porteur se range contre elle (`gripOffset`). Espace tenu contre une poutre couchée près d'un chantier la soulève.
+- Le gué de pierres du ru (`crossings` de nature `ford`) est réservé à `feel.steppingStoneVillagers` (Jeanne): un adulte y semble marcher dans l'eau. `Blockers.avoid` porte ces cases. Test: `tests/trajets-habitants.test.ts` (toutes les paires de points de chaque emploi du temps).
+- Vitest de ce jeu n'affiche pas le `console.log` d'un test: une sonde écrit dans un fichier du scratchpad (`writeFileSync`).
+- Outil isolé: une commande qui contient « .git » (même `--exclude-dir=.git`) ou plusieurs commandes git enchaînées est refusée; le contrôle des tirets passe par l'outil Grep (`[\x{2013}\x{2014}]`), une commande git par appel.
+- Un trajet d'habitant calculé avant l'arrivée du train n'est pas recalculé quand `train_at_platform` se bloque: Basile traverse le train à quai (samedi 10 h, vu le 2026-11-03, non corrigé).
