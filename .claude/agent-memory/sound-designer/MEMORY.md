@@ -101,3 +101,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Une règle par bâtiment pour le moteur (étouffement, ambiance de pièce) se met dans une clé à part du plan (`plan.interiorByBuilding`), comme `plan.stream` pour les sources du ru: le schéma Valibot l'ignore, le dev audio la lit.
 - `dsp.sonie_integree` plante sur un son de moins de 0,4 s (fenêtre plus longue que le son): ne la calculer que pour les sons plus longs.
 - Un script d'essai hors du dépôt (`/tmp/.../essai.py`) qui appelle `generer.traiter(son, v)` pour un module donne sonie, centroïde et part sous 300 Hz en quelques secondes, sans encoder: itérer là avant la génération complète.
+
+## La Petite Ligne: 0.13 (vérifié le 2026-11-03)
+
+- Le dossier de brouillon (scratchpad) est partagé avec d'autres agents et contient des fichiers Python homonymes de la bibliothèque standard (`socket.py`) ou des modules du jeu (`train.py`, `bourg.py`): y ranger ses scripts dans un sous-dossier à soi et lancer `duo-python -I`, sinon les imports partent ailleurs.
+- `dsp.poser(y, a + b)` sur deux sons de longueurs différentes plante (broadcast): additionner par `dsp.somme(a, b)`.
+- Un fond d'ambiance très lisse (bruit passe-bas sous 2 kHz, pièce réverbérée et silencieuse) fait sortir la seconde différence au raccord au centile 99,8 après encodage Vorbis, alors que la boucle brute est parfaite: le bruit de codage domine ce fond. Ni la qualité Vorbis (2 à 8) ni une amorce de 1 s n'y changent rien; un souffle aigu très faible (2,5 à 9 kHz, environ -22 dB sous le fond) suffit. Tester un raccord sans tout régénérer: encoder la boucle amorcée et appeler `controler.raccord` sur le décodé.
+- Un tuba seul (sol 2) met 91 % de l'énergie sous 300 Hz, même transposé d'une octave (sol 3 = 196 Hz): le doubler deux octaves plus haut au cor, tuba 5 dB sous le cor (35 %).
+- `cerveau.test.ts` (robot sur toute la démo) a un délai fixe de 120 s dans son `beforeAll` (l'option `--hookTimeout` ne le remplace pas); avec une charge de 28 sur 4 cœurs il passe en 103 à 119 s et peut expirer: le relancer seul avant de soupçonner le catalogue.
+- Le poids du jeu approche le plafond de `controler.py` (19,7 Mo sur 20 après la 0.13): compter environ 0,2 Mo par ambiance de 30 à 40 s et 50 Ko par motif stéréo de 4 s.

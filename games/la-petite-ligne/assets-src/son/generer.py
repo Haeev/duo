@@ -6,7 +6,7 @@ Options: --seulement musiques|sons|planche (plusieurs possibles), --sans-control
 
 Produit:
 - games/la-petite-ligne/assets/son/: musique/, ambiance/, effets/, train/, interface/, habitants/, moments/,
-  saisons/, objets/, rue-haute/, besoins/, maison/
+  saisons/, objets/, rue-haute/, besoins/, maison/, eglise/, metiers/, decor/, carnet/, voisins/
   (Ogg Vorbis, 48 kHz) et sons.json (définitions lues par le moteur);
 - games/la-petite-ligne/assets-src/son/midi/: les partitions MIDI (sources de vérité des musiques);
 - design/son/la-petite-ligne/: copies M4A des musiques et planche d'écoute ecoute.m4a, pour le client;
@@ -49,6 +49,7 @@ import partition  # noqa: E402
 import saisons  # noqa: E402
 import tour10  # noqa: E402
 import train  # noqa: E402
+import v0_13  # noqa: E402
 from catalogue import SPATIAL, Son  # noqa: E402
 
 QUALITE_MUSIQUE = 3  # Vorbis VBR, environ 110 kbit/s en stéréo
@@ -232,7 +233,7 @@ def produire_musiques(tmp: Path, ids: list[str] | None = None) -> tuple[dict, di
 
 def tous_les_sons() -> list[Son]:
     return (effets.sons() + train.sons() + ambiances.sons() + habitants.sons() + moments.sons() + saisons.sons()
-            + moments_tour9.sons() + bourg.sons() + tour10.sons())
+            + moments_tour9.sons() + bourg.sons() + tour10.sons() + v0_13.sons())
 
 
 PLAN = {
@@ -300,8 +301,14 @@ PLAN = {
                  "ambienceLowpassHz": 900, "ambienceDb": -10.0, "rampMs": 600},
     # Tour 10: étouffement et ambiance de pièce par bâtiment, sources du ru. Clés à part, ignorées par
     # le schéma de sons.json tant que le dev audio (lot L5) ne les lit pas.
-    "interiorByBuilding": tour10.INTERIEURS,
+    "interiorByBuilding": {**tour10.INTERIEURS,
+                           "buildings": {**tour10.INTERIEURS["buildings"], **v0_13.INTERIEURS_NEUFS}},
     "stream": tour10.PLAN_RU,
+    # 0.13 (lots H8 et L4 bis): l'angélus, les boucles placées des métiers, les ambiances par région.
+    # Clés à part, ignorées par le schéma de sons.json tant que le dev audio ne les lit pas.
+    "angelus": v0_13.ANGELUS,
+    "placedLoops": v0_13.BOUCLES_PLACEES,
+    "ambienceByRegion": v0_13.AMBIANCES_REGION,
     "peer": {"description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués "
                             "un peu plus bas que les siens; ses sons d'interface ne s'entendent pas chez soi, "
                             "sauf le repère (ping-peer) et la proposition d'achat.",
@@ -335,6 +342,7 @@ PLAN = {
                               {"at": 3.5, "play": "petit-dejeuner", "kind": "music"}]},
         "go-to-bed": {"steps": [{"at": 0.0, "play": "sleep"}, {"at": 0.0, "stopMusic": "veillee", "fadeMs": 2000},
                                 {"at": 2.5, "play": "nuit", "kind": "music", "when": "les deux couchés"}]},
+        "angelus": v0_13.SEQUENCE_ANGELUS,
     },
 }
 
@@ -454,6 +462,11 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
         ["belly-rumble", "eat-together", "yawn-soft", "nap-tick", "reunion-chime", "hair-noticed"],
         ["beam-ridge", "room-built", "chest-full", "rack-hang", "curtain-hang", "curtain-draw"],
         ["school-recess"],
+        ["angelus-toll", "bell-peal", "harmonium-note", "harmonium-chord"],
+        ["anvil-strike", "forge-loop", "sluice-open", "mill-wheel", "millstone", "washboard-beat"],
+        ["plic", "well-drop", "well-echo", "lookout-echo", "lookout-echo-far", "step-leaves", "cat-purr", "cat-meow"],
+        ["pencil-note", "bond-chime", "bond-level", "birthday-chime", "decision-agree"],
+        [f"talk-{id_}" for id_ in v0_13.MOTIFS],
     ]
     for groupe in groupes:
         for nom in groupe:
@@ -461,14 +474,16 @@ def planche(apercus: dict[str, np.ndarray], tmp: Path) -> None:
             while f"{nom}/{k}" in apercus:
                 x = apercus[f"{nom}/{k}"]
                 if nom.endswith("loop") or nom in ("geese-rest", "crickets-night", "mist-ambience", "night-water",
-                                                   "train-slow-roll", "clock-tick", "nap-tick"):
+                                                   "train-slow-roll", "clock-tick", "nap-tick", "forge-loop",
+                                                   "mill-wheel", "millstone"):
                     x = np.concatenate([x, x])[: dsp.n_ech(min(5.0, 2 * len(x) / dsp.SR))]
                     x = dsp.fondu(x, 0.01, 0.3)
                 morceaux += [_st(x), blanc(0.35 if nom.startswith("step") else 0.7)]
                 k += 1
         morceaux.append(blanc(1.2))
     for nom in ("river", "wind", "birds-morning", "crickets", "village", "rain", "rain-roof", "mist-morning",
-                "swifts", "crickets-summer", "wind-leaves", "crows", "stream-ru", "room-tone-shop", "room-tone-salon"):
+                "swifts", "crickets-summer", "wind-leaves", "crows", "stream-ru", "room-tone-shop", "room-tone-salon", "forest-deep", "farm",
+                "church-inside", "room-tone-cafe"):
         x = apercus.get(f"{nom}/0")
         if x is None:
             continue

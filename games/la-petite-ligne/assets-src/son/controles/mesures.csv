@@ -1,14 +1,18 @@
 fichier,canaux,duree_s,sonie_m_max_lufs,sonie_integree_lufs,crete_vraie_dbtp,echantillons_ecretes,silence_tete_ms,taille_ko,raccord
 ambiance/birds-morning.ogg,1,37.0,-23.9,-31.2,-18.2,0,0.0,95.1,"saut au centile 44.3, seconde différence au centile 54.4, continuation 0.0003, niveau au raccord -11.5 dB (centile 55)"
+ambiance/church-inside.ogg,1,31.0,-34.5,-40.2,-22.2,0,0.02,235.9,"saut au centile 72.8, seconde différence au centile 88.8, continuation 0.0051, niveau au raccord +0.1 dB (centile 20)"
 ambiance/crickets-summer.ogg,1,21.0,-31.6,-33.3,-19.7,0,0.02,130.8,"saut au centile 97.5, seconde différence au centile 95.3, continuation 0.0000, niveau au raccord -0.0 dB (centile 3)"
 ambiance/crickets.ogg,1,21.0,-32.8,-34.4,-18.9,0,0.0,144.8,"saut au centile 36.2, seconde différence au centile 42.7, continuation 0.0000, niveau au raccord -1.9 dB (centile 62)"
 ambiance/crows.ogg,1,41.0,-26.4,-37.2,-14.2,0,0.0,277.9,"saut au centile 42.1, seconde différence au centile 68.5, continuation 0.0034, niveau au raccord +0.6 dB (centile 60)"
+ambiance/farm.ogg,1,41.0,-27.7,-34.2,-12.7,0,0.0,307.9,"saut au centile 56.7, seconde différence au centile 98.5, continuation 0.0081, niveau au raccord +0.3 dB (centile 27)"
+ambiance/forest-deep.ogg,1,41.0,-26.9,-33.3,-12.7,0,0.0,309.2,"saut au centile 71.4, seconde différence au centile 98.8, continuation 0.0096, niveau au raccord -1.0 dB (centile 68)"
 ambiance/mist-morning.ogg,1,25.0,-32.5,-34.3,-19.3,0,0.0,165.8,"saut au centile 41.4, seconde différence au centile 36.4, continuation 0.0000, niveau au raccord -0.1 dB (centile 22)"
 ambiance/owl-far-1.ogg,1,3.299,-33.4,-35.2,-23.5,0,0.48,22.6,
 ambiance/owl-far-2.ogg,1,3.38,-33.5,-35.0,-22.4,0,0.48,23.2,
 ambiance/rain-roof.ogg,1,17.0,-31.5,-32.3,-19.3,0,0.0,128.0,"saut au centile 69.3, seconde différence au centile 69.6, continuation 0.0000, niveau au raccord -0.2 dB (centile 38)"
 ambiance/rain.ogg,1,17.0,-29.1,-30.3,-17.8,0,0.0,134.2,"saut au centile 13.5, seconde différence au centile 74.9, continuation 0.0032, niveau au raccord -0.3 dB (centile 73)"
 ambiance/river.ogg,1,25.0,-27.5,-29.3,-15.8,0,0.0,194.3,"saut au centile 90.8, seconde différence au centile 69.3, continuation 0.0000, niveau au raccord +0.7 dB (centile 66)"
+ambiance/room-tone-cafe.ogg,1,31.0,-32.1,-38.3,-11.6,0,0.0,210.1,"saut au centile 47.4, seconde différence au centile 61.2, continuation 0.0000, niveau au raccord -0.2 dB (centile 21)"
 ambiance/room-tone-salon.ogg,1,31.0,-36.6,-39.3,-18.4,0,0.0,232.0,"saut au centile 20.7, seconde différence au centile 87.7, continuation 0.0068, niveau au raccord -0.3 dB (centile 44)"
 ambiance/room-tone-shop.ogg,1,31.0,-36.2,-39.3,-19.9,0,0.0,227.8,"saut au centile 89.6, seconde différence au centile 46.8, continuation 0.0000, niveau au raccord -1.1 dB (centile 92)"
 ambiance/stream-ru.ogg,1,21.0,-29.9,-31.4,-16.8,0,0.0,164.5,"saut au centile 92.2, seconde différence au centile 99.1, continuation 0.0390, niveau au raccord +1.4 dB (centile 97)"
@@ -23,6 +27,30 @@ besoins/hair-noticed.ogg,2,1.23,-21.0,-24.3,-13.6,0,0.0,9.2,
 besoins/nap-tick.ogg,1,3.0,-36.1,-37.4,-11.5,0,0.0,28.3,"saut au centile 31.0, seconde différence au centile 63.7, continuation 0.0000, niveau au raccord +1.8 dB (centile 100)"
 besoins/reunion-chime.ogg,2,3.0,-19.0,-20.4,-13.0,0,0.08,35.2,
 besoins/yawn-soft.ogg,1,2.045,-27.9,-30.2,-23.0,0,0.4,17.8,
+carnet/birthday-chime.ogg,2,3.8,-19.0,-20.1,-10.7,0,0.0,47.3,
+carnet/bond-chime-1.ogg,2,0.996,-24.0,-27.6,-14.6,0,0.0,8.1,
+carnet/bond-chime-2.ogg,2,0.881,-24.1,-28.4,-13.5,0,0.0,7.9,
+carnet/bond-level.ogg,2,3.2,-19.0,-21.3,-11.4,0,0.0,29.2,
+carnet/decision-agree.ogg,2,2.482,-18.9,-22.4,-9.5,0,0.0,29.5,
+carnet/pencil-note-1.ogg,2,0.596,-27.5,-30.0,-13.0,0,0.02,9.9,
+carnet/pencil-note-2.ogg,2,0.663,-27.5,-29.0,-11.9,0,0.04,11.9,
+decor/cat-meow-1.ogg,1,0.316,-28.0,-30.0,-16.6,0,0.44,6.0,
+decor/cat-meow-2.ogg,1,0.616,-28.0,-29.7,-20.0,0,0.48,7.8,
+decor/cat-purr-1.ogg,1,2.574,-30.3,-33.3,-13.6,0,0.29,24.1,
+decor/cat-purr-2.ogg,1,2.57,-30.4,-33.0,-14.2,0,0.42,26.7,
+decor/lookout-echo-1.ogg,1,3.717,-22.9,-29.5,-15.1,0,0.31,18.9,
+decor/lookout-echo-2.ogg,1,3.667,-22.9,-29.3,-17.2,0,0.31,18.2,
+decor/lookout-echo-far.ogg,1,4.329,-32.9,-38.6,-25.8,0,0.48,17.6,
+decor/plic-1.ogg,1,0.159,-29.6,-29.6,-7.3,0,0.0,5.1,
+decor/plic-2.ogg,1,0.191,-29.5,-32.1,-7.4,0,0.0,5.4,
+decor/plic-3.ogg,1,0.171,-29.3,-32.1,-7.2,0,0.0,5.5,
+decor/step-leaves-1.ogg,1,0.298,-31.9,-33.2,-12.0,0,0.0,7.1,
+decor/step-leaves-2.ogg,1,0.3,-32.0,-34.1,-13.8,0,0.0,6.9,
+decor/step-leaves-3.ogg,1,0.3,-31.9,-34.4,-12.3,0,0.31,7.4,
+decor/step-leaves-4.ogg,1,0.302,-32.1,-35.2,-10.6,0,0.15,7.3,
+decor/well-drop-1.ogg,1,1.997,-27.1,-33.1,-10.2,0,0.0,11.4,
+decor/well-drop-2.ogg,1,2.203,-27.1,-30.2,-11.1,0,0.0,12.8,
+decor/well-echo.ogg,1,2.406,-24.9,-28.7,-17.3,0,0.38,12.5,
 effets/axe-chop-1.ogg,1,0.411,-26.0,-26.0,-1.7,0,0.0,6.0,
 effets/axe-chop-2.ogg,1,0.312,-24.6,-24.6,-2.1,0,0.0,4.9,
 effets/axe-chop-3.ogg,1,0.393,-25.2,-25.2,-2.1,0,0.0,5.7,
@@ -123,6 +151,18 @@ effets/water-2.ogg,1,1.497,-28.4,-29.5,-17.6,0,0.42,16.6,
 effets/water-empty.ogg,1,0.593,-27.0,-31.5,-8.3,0,0.0,5.5,
 effets/water-fill-1.ogg,1,1.693,-27.2,-28.4,-13.5,0,0.25,18.1,
 effets/water-fill-2.ogg,1,1.695,-27.2,-28.6,-15.2,0,0.38,18.1,
+eglise/angelus-toll-1.ogg,1,6.274,-21.0,-28.9,-11.8,0,0.0,17.8,
+eglise/angelus-toll-2.ogg,1,6.156,-21.0,-27.1,-10.5,0,0.0,17.3,
+eglise/bell-peal.ogg,1,14.517,-19.0,-23.1,-6.3,0,0.0,70.7,
+eglise/harmonium-chord-1.ogg,1,4.2,-24.0,-25.1,-13.7,0,0.4,35.2,
+eglise/harmonium-chord-2.ogg,1,4.2,-24.1,-25.1,-13.0,0,0.44,35.6,
+eglise/harmonium-chord-3.ogg,1,4.2,-24.1,-25.2,-13.4,0,0.46,34.2,
+eglise/harmonium-chord-4.ogg,1,4.2,-24.0,-25.2,-13.4,0,0.38,35.4,
+eglise/harmonium-note-1.ogg,1,3.6,-25.0,-26.2,-17.6,0,0.08,29.5,
+eglise/harmonium-note-2.ogg,1,3.6,-25.0,-26.1,-17.6,0,0.44,29.1,
+eglise/harmonium-note-3.ogg,1,3.6,-25.0,-26.3,-17.1,0,0.4,27.8,
+eglise/harmonium-note-4.ogg,1,3.6,-25.0,-26.2,-17.7,0,0.46,27.2,
+eglise/harmonium-note-5.ogg,1,3.6,-25.0,-26.1,-17.4,0,0.0,26.3,
 habitants/talk-basile.ogg,2,4.0,-19.5,-22.2,-9.6,0,0.0,56.1,
 habitants/talk-firmin.ogg,2,3.288,-19.1,-20.4,-8.1,0,0.0,45.2,
 habitants/talk-jeanne.ogg,2,2.135,-19.0,-20.4,-11.7,0,0.38,30.7,
@@ -181,6 +221,16 @@ maison/curtain-hang.ogg,1,1.138,-28.2,-30.8,-7.7,0,0.0,11.0,
 maison/rack-hang-1.ogg,1,0.481,-27.5,-32.9,-9.5,0,0.0,6.0,
 maison/rack-hang-2.ogg,1,0.424,-27.1,-31.6,-9.9,0,0.06,5.7,
 maison/room-built.ogg,2,5.0,-18.0,-20.9,-7.2,0,0.0,70.2,
+metiers/anvil-strike-1.ogg,1,0.305,-24.3,-24.3,-4.0,0,0.0,7.0,
+metiers/anvil-strike-2.ogg,1,1.232,-24.0,-28.7,-9.9,0,0.0,7.5,
+metiers/anvil-strike-3.ogg,1,1.383,-24.1,-26.7,-10.8,0,0.02,10.5,
+metiers/forge-loop.ogg,1,13.0,-24.6,-33.5,-8.9,0,0.0,131.0,"saut au centile 44.6, seconde différence au centile 18.6, continuation 0.0000, niveau au raccord +0.0 dB (centile 0)"
+metiers/mill-wheel.ogg,1,17.0,-29.1,-30.4,-16.9,0,0.0,150.3,"saut au centile 52.0, seconde différence au centile 88.6, continuation 0.0000, niveau au raccord -1.0 dB (centile 76)"
+metiers/millstone.ogg,1,13.0,-30.2,-32.1,-12.5,0,0.0,117.7,"saut au centile 90.0, seconde différence au centile 96.9, continuation 0.0000, niveau au raccord +1.5 dB (centile 72)"
+metiers/sluice-open.ogg,1,7.0,-22.4,-24.6,-10.9,0,0.0,60.8,
+metiers/washboard-beat-1.ogg,1,0.333,-26.5,-30.4,-6.3,0,0.0,5.8,
+metiers/washboard-beat-2.ogg,1,0.312,-26.1,-26.1,-2.6,0,0.0,5.0,
+metiers/washboard-beat-3.ogg,1,0.273,-26.4,-28.8,-7.0,0,0.0,5.4,
 moments/blackbird-wake-1.ogg,1,2.322,-29.0,-30.9,-22.9,0,0.29,12.1,
 moments/blackbird-wake-2.ogg,1,2.3,-29.0,-30.7,-23.7,0,0.4,11.6,
 moments/blackbird-wake-3.ogg,1,2.282,-29.1,-30.5,-23.6,0,0.42,12.4,
@@ -319,7 +369,21 @@ train/train-idle-loop.ogg,1,9.0,-29.8,-33.4,-16.6,0,0.0,83.3,"saut au centile 57
 train/train-steam.ogg,1,3.4,-22.3,-26.1,-13.6,0,0.12,34.3,
 train/train-whistle-far.ogg,2,6.457,-19.0,-21.6,-11.0,0,0.35,61.0,
 train/train-whistle.ogg,1,3.724,-17.0,-18.5,-7.9,0,0.04,31.6,
-design/son/la-petite-ligne/ecoute.m4a,2,1085.611,-13.8,-21.8,-1.5,0,22.19,10034.5,
+voisins/talk-ambroise.ogg,2,2.478,-19.0,-19.8,-10.6,0,0.0,37.9,
+voisins/talk-armand.ogg,2,3.868,-19.0,-21.9,-11.8,0,0.33,50.6,
+voisins/talk-barnabe.ogg,2,4.6,-19.0,-21.0,-8.7,0,0.0,76.1,
+voisins/talk-berthe.ogg,2,4.0,-18.9,-20.6,-10.6,0,0.0,55.2,
+voisins/talk-colette.ogg,2,4.2,-19.0,-21.1,-11.4,0,0.0,64.4,
+voisins/talk-honorine.ogg,2,3.6,-19.0,-20.3,-10.6,0,0.0,45.6,
+voisins/talk-ines.ogg,2,3.8,-19.0,-21.1,-13.8,0,0.0,45.4,
+voisins/talk-leon.ogg,2,2.301,-19.0,-20.8,-9.8,0,0.04,32.0,
+voisins/talk-mado.ogg,2,2.949,-19.0,-21.1,-11.7,0,0.0,36.6,
+voisins/talk-margot.ogg,2,2.986,-19.0,-21.3,-12.5,0,0.31,51.0,
+voisins/talk-marthe.ogg,2,3.6,-19.0,-21.7,-10.1,0,0.0,47.8,
+voisins/talk-martial.ogg,2,2.86,-19.1,-21.2,-11.1,0,0.19,39.3,
+voisins/talk-nour.ogg,2,1.859,-19.1,-20.6,-11.3,0,0.0,28.1,
+voisins/talk-paulin.ogg,2,3.6,-19.0,-21.7,-12.8,0,0.0,51.6,
+design/son/la-petite-ligne/ecoute.m4a,2,1348.395,-13.8,-22.0,-1.5,0,22.19,12503.8,
 design/son/la-petite-ligne/musiques/fanfare-train.m4a,2,13.227,-15.8,-17.1,-6.5,0,0.0,158.0,
 design/son/la-petite-ligne/musiques/fin.m4a,2,44.139,-14.5,-18.1,-7.3,0,0.0,527.1,
 design/son/la-petite-ligne/musiques/halte-apres-midi.m4a,2,96.0,-14.9,-18.1,-7.9,0,0.0,1150.4,
