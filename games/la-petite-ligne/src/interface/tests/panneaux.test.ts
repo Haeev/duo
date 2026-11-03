@@ -72,7 +72,8 @@ describe('comptoir d’Odette', () => {
       ['radish', 'ordinary', 9, 50],
       ['radish', 'fine', 2, 17],
     ]);
-    expect(grocerBudget(sim.world, ctx)).toEqual({ buys: false, room: 300 });
+    // 0.12: plafond du jour à 400 aubrins (section 2.2), pas d'ardoise sans les achats d'Odette.
+    expect(grocerBudget(sim.world, ctx)).toEqual({ buys: false, room: 400, ardoise: null });
   });
 });
 
@@ -109,7 +110,7 @@ describe('établi, réchaud, coffre, sac', () => {
     expect(bread.actions).toEqual(['eat']);
     expect(bread.eatAmount).toBe(10);
     const fine = itemDetail(ctx, { item: 'radish', quality: 'fine', count: 9 });
-    expect(plain(fine.text)).toBe('Vaut 1,5 fois le prix : 11 sous pièce à la coopérative.');
+    expect(plain(fine.text)).toBe('Vaut 1,5 fois le prix : 11 aubrins pièce à la coopérative.');
     expect(itemDetail(ctx, { item: 'riddle_card', quality: 'ordinary', count: 1 }).actions).toContain('read');
     expect(itemDetail(ctx, { item: 'table', quality: 'ordinary', count: 1 }).actions).toContain('hold');
     expect(bagFull(character(sim, 'p1'))).toBe(false);
@@ -136,10 +137,10 @@ describe('établi, réchaud, coffre, sac', () => {
     const ctx = uiContext();
     const p = ctx.texts.extra.proposal;
     expect(plain(ctx.t(p.acceptedCatalogue, { item: indefiniteItem(ctx, 'curtains'), price: 30 }))).toBe(
-      'Commandé : des rideaux, livraison au train de samedi. 30 sous dépensés.',
+      'Commandé : des rideaux, livraison au train de samedi. 30 aubrins dépensés.',
     );
     expect(plain(ctx.t(p.acceptedGrocery, { item: indefiniteItem(ctx, 'mattress'), buyer: 'Sacha', price: 120 }))).toBe(
-      'Dans le sac de Sacha : un matelas. 120 sous dépensés.',
+      'Dans le sac de Sacha : un matelas. 120 aubrins dépensés.',
     );
   });
 });

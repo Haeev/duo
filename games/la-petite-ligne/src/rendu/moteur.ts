@@ -62,6 +62,7 @@ import { AmbientFaunaPart } from './faune-ambiance';
 import { HenLabels } from './etiquettes';
 import { FishShadowsPart } from './ombres-poissons';
 import { createStateFishingSource, type FishingSource } from './peche-vue';
+import { MarketPart } from './marche';
 import { BreedingPart } from './elevage';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
@@ -374,6 +375,10 @@ export class RenderEngine implements Renderer {
     const improvements = new ImprovementsPart(map, content, library, materials, terrain, this.resources, house, this.lamps);
     this.scene.add(improvements.group);
     world.add(improvements);
+    // 0.12: l'étal du dimanche, ses cagettes et la sacoche de Lucie (lot L-économie).
+    const market = new MarketPart(map, content, library, terrain);
+    this.scene.add(market.group);
+    world.add(market);
     // Moments rares (après les personnages: Basile y est mené par la chorégraphie de l'échelle).
     const moments = new MomentsPart(
       map,

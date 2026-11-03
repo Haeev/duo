@@ -12,11 +12,15 @@ import { villagerBlockers } from './deplacement';
 import { bodyCollides, findPath } from './grille';
 import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
 import { newVillagerState } from './monde';
+import { marketEntry, marketPoint } from './marche';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
 const HIDDEN_ACTIVITIES = new Set(['home', 'absent']);
 
 function currentEntry(sim: Sim, def: VillagerDef): { point: string; activity: string } {
+  // 0.12: un client du marché du dimanche va à sa place devant l'étal, puis reprend sa journée.
+  const market = marketEntry(sim, def.id);
+  if (market !== null) return market;
   const m = Math.min(sim.world.clock.minutes, MINUTES_PER_DAY - 1);
   for (const entry of def.schedule) {
     if (m < entry.from || m >= entry.to) continue;
@@ -38,7 +42,7 @@ function teleport(v: VillagerState, x: number, y: number): void {
  * c'est un banc, l'endroit d'où il s'y assoit (jamais dans l'emprise du banc).
  */
 function goalOf(sim: Sim, v: VillagerState, pointId: string): Vec2 | undefined {
-  const at = sim.map.points[pointId];
+  const at = sim.map.points[pointId] ?? marketPoint(sim, pointId) ?? undefined;
   if (at === undefined) return undefined;
   const spot = { x: at.x, y: at.y };
   villagerRestSpot(sim, v, pointId, spot);

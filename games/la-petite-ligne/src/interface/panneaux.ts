@@ -326,6 +326,7 @@ export class ShopPanel extends Panel {
         summary = el('div', { class: 'lpl-order__summary' }, [
           el('strong', { text: budget.room > 0 ? ctx.t(k.room, { amount: budget.room }) : ctx.t(k.roomNone) }),
           el('span', { text: ctx.t(k.rate, { percent: rate }) }),
+          budget.ardoise === null ? null : el('span', { class: 'lpl-shop__ardoise', text: ctx.t(k.ardoiseBoard, { item: budget.ardoise }) }),
         ]);
       }
       if (entries.length === 0) return [summary, el('div', { class: 'lpl-empty', text: ctx.t(k.nothingToSell) })];
@@ -349,7 +350,10 @@ export class ShopPanel extends Panel {
               e.quality === 'fine' ? el('span', { class: 'lpl-shop__fine' }, [icon('ui-star'), ctx.texts.extra.common.fine]) : null,
               el('small', { text: ctx.t(ctx.texts.extra.common.inBag, { count: e.count }) }),
             ]),
-            el('span', { class: 'lpl-order__count' }, [el('small', { text: ctx.t(k.unitPrice, { price: e.unit }) })]),
+            el('span', { class: 'lpl-order__count' }, [
+              el('small', { text: ctx.t(k.unitPrice, { price: e.unit }) }),
+              e.word === null ? null : el('small', { class: `lpl-shop__word lpl-shop__word--${e.word}`, text: ctx.t(k[GROCER_WORD_KEYS[e.word]]) }),
+            ]),
             el('span', { class: 'lpl-order__action lpl-shop__actions' }, [sellOne, sellAll]),
           ]),
         );
@@ -361,6 +365,9 @@ export class ShopPanel extends Panel {
 
 // ---------------------------------------------------------------------------
 // Établi et réchaud
+
+/** Clé de `textes-interface.json` (`shop`) de chaque mot du panneau de vente. */
+const GROCER_WORD_KEYS = { ardoise: 'ardoiseLine', plenty: 'plenty', wanted: 'wanted' } as const;
 
 export class StationPanel extends Panel {
   private readonly station: 'workbench' | 'stove';
@@ -554,7 +561,7 @@ export class ChestPanel extends Panel {
 
 /**
  * « Commander à Basile » (tour 9, section 2.6): le chantier de la maisonnette ouvert, les planches
- * apportées (10 sous de moins chacune, 20 au plus), la commande payée d'un coup.
+ * apportées (10 aubrins de moins chacune, 20 au plus), la commande payée d'un coup.
  */
 function basileSection(host: UiHost, m: BasileModel, partnerName: string, labels: { title: string; allBuilt: string } | null = null): HTMLElement[] {
   const { ctx } = host;

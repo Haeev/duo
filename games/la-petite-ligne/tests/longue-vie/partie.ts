@@ -259,7 +259,7 @@ function goalsOf(sim: Sim): string[] {
   return out;
 }
 
-/** Un but d'épargne (O-12): un article en vente ou un chantier ouvert coûte plus que la bourse moins 150 sous. */
+/** Un but d'épargne (O-12): un article en vente ou un chantier ouvert coûte plus que la bourse moins 150 aubrins. */
 function savingGoalOf(sim: Sim): boolean {
   const room = sim.world.purse - 150;
   if (catalogueOffers(sim.content.settings, sim.content, sim.world).some((o) => o.price > room)) return true;
@@ -364,7 +364,7 @@ export function playLong(options: LongOptions): LongRun {
         const planks = entry.payments.reduce((n, x) => n + x.planks, 0);
         const discount = content.settings.improvements?.plankDiscount ?? 0;
         if (entry.builtDays.length > 1) run.economyProblems.push(`${e.improvement} bâti deux fois`);
-        if (def !== undefined && paid + planks * discount !== def.price) run.economyProblems.push(`${e.improvement}: ${String(paid)} sous et ${String(planks)} planches pour ${String(def.price)}`);
+        if (def !== undefined && paid + planks * discount !== def.price) run.economyProblems.push(`${e.improvement}: ${String(paid)} aubrins et ${String(planks)} planches pour ${String(def.price)}`);
         continue;
       }
       if (e.type === 'money' || e.type === 'sold') {

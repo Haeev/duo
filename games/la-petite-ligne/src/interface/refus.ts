@@ -1,6 +1,6 @@
 /**
  * Refus: une action du joueur qui n'a pas pu se faire (« Déjà pris par
- * Sacha. », « Il manque 40 sous. », sac plein, meuble qui ne passe pas, coin
+ * Sacha. », « Il manque 40 aubrins. », sac plein, meuble qui ne passe pas, coin
  * de l'autre). La simulation les envoie comme des messages ordinaires; on les
  * reconnaît à leur clé de `textes.json` (ou, pour les matériaux manquants, au
  * gabarit `ui.workbench.missing`), pour les montrer en erreur et ne pas leur

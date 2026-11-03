@@ -227,7 +227,7 @@
         { "type": "reveal_secret", "quest": "hen_names" },
         { "type": "give_money", "amount": 15 }
       ],
-      "completionText": "Bichette, Cocotte et la Duchesse répondent à leur nom. 15 sous d'Odette."
+      "completionText": "Bichette, Cocotte et la Duchesse répondent à leur nom. 15 aubrins d'Odette."
     },
     {
       "id": "planks",
@@ -380,7 +380,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 25 }],
-      "completionText": "Une salade pour Odette. 25 sous."
+      "completionText": "Une salade pour Odette. 25 aubrins."
     },
     {
       "id": "odette_parcels",
@@ -403,7 +403,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 30 }],
-      "completionText": "Colis livrés. 30 sous de la part d'Odette."
+      "completionText": "Colis livrés. 30 aubrins de la part d'Odette."
     },
     {
       "id": "firmin_chub",
@@ -420,7 +420,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 30 }],
-      "completionText": "Firmin a son souper. 30 sous."
+      "completionText": "Firmin a son souper. 30 aubrins."
     },
     {
       "id": "jeanne_notebook",
@@ -440,7 +440,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "Jeanne a retrouvé ses quarante galets. 20 sous."
+      "completionText": "Jeanne a retrouvé ses quarante galets. 20 aubrins."
     },
     {
       "id": "heron_watch",
@@ -457,7 +457,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "Vous avez vu le héron s'envoler. 20 sous de Jeanne, pour le spectacle."
+      "completionText": "Vous avez vu le héron s'envoler. 20 aubrins de Jeanne, pour le spectacle."
     },
     {
       "id": "basile_lost",
@@ -479,7 +479,7 @@
         }
       ],
       "completionEffects": [{ "type": "set_flag", "flag": "nest_box_straight" }, { "type": "give_money", "amount": 30 }],
-      "completionText": "Le nichoir est droit. 30 sous de Basile."
+      "completionText": "Le nichoir est droit. 30 aubrins de Basile."
     },
     {
       "id": "wild_geese",
@@ -496,7 +496,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "Les oies sont passées. 20 sous de Firmin, pour la compagnie."
+      "completionText": "Les oies sont passées. 20 aubrins de Firmin, pour la compagnie."
     },
     {
       "id": "jeanne_challenge",
@@ -513,7 +513,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "Défi relevé. 20 sous de Jeanne."
+      "completionText": "Défi relevé. 20 aubrins de Jeanne."
     },
     {
       "id": "second_order",
@@ -698,7 +698,7 @@
         { "type": "give_money", "amount": 40 },
         { "type": "give_item", "item": "bread", "count": 1, "to": "each" }
       ],
-      "completionText": "40 sous et du pain frais."
+      "completionText": "40 aubrins et du pain frais."
     },
     {
       "id": "basile_omelette",
@@ -715,7 +715,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 30 }],
-      "completionText": "Basile a mangé chaud. 30 sous."
+      "completionText": "Basile a mangé chaud. 30 aubrins."
     },
     {
       "id": "lucie_note",
@@ -783,7 +783,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 20 }],
-      "completionText": "L'argent de poche de Jeanne: 20 sous."
+      "completionText": "L'argent de poche de Jeanne: 20 aubrins."
     },
     {
       "id": "firmin_flowers",
@@ -800,7 +800,7 @@
         }
       ],
       "completionEffects": [{ "type": "give_money", "amount": 50 }],
-      "completionText": "Le quai est fleuri. 50 sous."
+      "completionText": "Le quai est fleuri. 50 aubrins."
     },
     {"id": "achille_basket", "kind": "side", "tier": "P0", "title": "La panière d'Achille", "giver": "achille", "start": {"when": [{"type": "flag", "flag": "achille_here"}], "effects": [{"type": "show_text", "text": "achille_late"}]}, "steps": [{"id": "go_bakery", "objective": "Monter au fournil, rue Haute, avant 11 h.", "conditions": [{"type": "dialogue_done", "dialogue": "achille_basket_ask"}]}, {"id": "carry", "objective": "Porter la panière à deux jusqu'à la porte d'Odette.", "conditions": [{"type": "flag", "flag": "basket_carried"}]}], "completionEffects": [{"type": "give_item", "item": "warm_bread", "count": 2, "to": "each"}, {"type": "set_flag", "flag": "bakery_open"}, {"type": "show_text", "text": "basket_achille"}], "completionText": "Le guichet du fournil est ouvert."},
     {"id": "solange_first_cut", "kind": "side", "tier": "P0", "title": "Une coupe chez Solange", "giver": "solange", "start": {"when": [{"type": "flag", "flag": "solange_note_sent"}]}, "steps": [{"id": "enter", "objective": "Entrer chez Solange, à l'angle de la rue Haute.", "conditions": [{"type": "inside", "building": "salon"}]}, {"id": "chairs", "objective": "Passer chacun au fauteuil de Solange.", "conditions": [{"type": "haircut", "count": 1, "since": "step_start", "who": "both", "label": "chacun son tour"}]}, {"id": "mirror", "objective": "Se regarder devant le miroir, à deux.", "conditions": [{"type": "dialogue_done", "dialogue": "solange_mirror"}]}], "completionEffects": [{"type": "set_flag", "flag": "salon_open"}], "completionText": "Le salon et la mercerie sont ouverts."},

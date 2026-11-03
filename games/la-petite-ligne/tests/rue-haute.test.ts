@@ -489,7 +489,7 @@ describe('le guichet du fournil (T10-07)', () => {
     return sim;
   }
 
-  it('pain chaud de 6 h à 9 h, pain jusqu’à midi, 5 sous, quatre au plus par joueur et par jour', () => {
+  it('pain chaud de 6 h à 9 h, pain jusqu’à midi, 5 aubrins, quatre au plus par joueur et par jour', () => {
     const sim = window(TUESDAY, 7 * H);
     const c = character(sim, 'p1');
     const purse = sim.world.purse;
@@ -548,7 +548,7 @@ describe('le salon de Solange (T10-08 à T10-10)', () => {
     send(sim, id, { type: 'menu', menu: 'salon' });
   }
 
-  it('15 coupes, 8 couleurs, 4 barbes; 15, 10 et 20 sous; « Garder ma coiffure » gratuit; un seul au fauteuil', () => {
+  it('15 coupes, 8 couleurs, 4 barbes; 15, 10 et 20 aubrins; « Garder ma coiffure » gratuit; un seul au fauteuil', () => {
     const sim = salon();
     const c = character(sim, 'p1');
     sitChair(sim, 'p1');
@@ -757,7 +757,7 @@ describe('retouches de la carte (décisions du manager)', () => {
 });
 
 describe('chocolat chaud, souhaits et création (sections 1.5, 1.6, 2.2)', () => {
-  it("chocolat chaud à la petite table: l'automne ou la pluie, jusqu'à 18 h, une tasse par jour, 5 sous", () => {
+  it("chocolat chaud à la petite table: l'automne ou la pluie, jusqu'à 18 h, une tasse par jour, 5 aubrins", () => {
     const sim = town(AUTUMN_MONDAY, 15 * H);
     const c = character(sim, 'p1');
     placeCharacter(sim, c, { x: 26.5, y: 29.5 });

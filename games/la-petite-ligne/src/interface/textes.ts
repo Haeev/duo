@@ -73,7 +73,6 @@ const SupplementSchema = v.object({
     waitingFor: str,
     close: str,
     next: str,
-    sous: str,
     countOf: str,
     outOf: str,
     itemCountOf: str,
@@ -313,6 +312,10 @@ const SupplementSchema = v.object({
     'rate',
     'seedInfo',
     'keysBuy',
+    'ardoiseBoard',
+    'ardoiseLine',
+    'plenty',
+    'wanted',
     'haberdasheryTitle',
     'haberdasheryClosed',
   ] as const),
@@ -359,6 +362,8 @@ const SupplementSchema = v.object({
   workbench: strings(['makes', 'fromChest', 'have', 'fromCellar', 'inProgress', 'lockedPlans', 'noRecipes', 'keysCraft'] as const),
   stove: strings(['cookSection', 'eatSection', 'nothingToEat', 'portions'] as const),
   chest: strings(['title', 'subtitle', 'inChest', 'inBag', 'take', 'takeAll', 'store', 'emptyChest', 'emptyBag'] as const),
+  /** 0.12: l'étal du dimanche (section 2.3). */
+  market: strings(['title', 'subtitle', 'levelLabel', 'soft', 'fair', 'strong', 'slots', 'onStall', 'inBag', 'emptyStall', 'emptyBag', 'put', 'takeBack', 'unitPrice', 'noBuyer', 'buyer'] as const),
   proposal: strings([
     'from',
     'mine',

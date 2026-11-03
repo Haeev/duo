@@ -85,9 +85,9 @@ export interface SalonPriceModel {
   color: boolean;
   price: number;
   free: boolean;
-  /** Libellé du bouton « Valider »: « Valider: 15 sous », « Valider: offert », ou rien n'a changé. */
+  /** Libellé du bouton « Valider »: « Valider: 15 aubrins », « Valider: offert », ou rien n'a changé. */
   confirm: string;
-  /** Ligne des prix: « Coupe: 15 sous », « Les deux: 20 sous ». */
+  /** Ligne des prix: « Coupe: 15 aubrins », « Les deux: 20 aubrins ». */
   line: string;
   missing: number;
 }

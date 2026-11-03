@@ -76,6 +76,10 @@ GENDERED_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Ancienne monnaie (0.12, section 1.3): un nombre ou un espace réservé suivi de « sou(s) ». La monnaie
+# s'appelle `economy.currency` (l'aubrin); « sous la pluie » (préposition) n'est pas visé.
+OLD_CURRENCY_RE = re.compile(r"[0-9}](?: |\u00a0)sous?\b(?!-)")
+
 # Paramètres de chaque condition: obligatoires, facultatifs. Le type de chaque référence est vérifié plus bas.
 CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "all": ({"conditions"}, set()),
@@ -217,6 +221,8 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 "giver", "text", "name", "paid", "time", "discount",
                 # Tour 10: pièces bâties et rangement (lot L4).
                 "room", "planks", "nails", "used", "total",
+                # 0.12 (lot L-économie): liste d'un client du marché, articles vendus à l'étal.
+                "list", "items",
                 # Pêche 0.12: prises, carnet des poissons, regard sur l'eau.
                 "fish", "Fish", "cm", "definite", "pronoun", "at", "Zone"}
 # Tour 8: étapes, niveaux de tendresse (D7), modes de continuation (D4), saisons, familles et ressources des commandes.
@@ -420,6 +426,9 @@ def walk_strings(node: Any, where: str, report: Report) -> None:
                 report.error(where, f"espace réservé inconnu {{{name}}}")
         if "TODO" in node:
             report.error(where, "« TODO » dans un texte")
+        old_money = OLD_CURRENCY_RE.search(node)
+        if old_money:
+            report.warn(where, f"ancienne monnaie « {old_money.group(0)} » dans {node[:60]!r} (écrire aubrins)")
         found = GENDERED_RE.search(node)
         if found:
             report.warn(where, f"accord au genre possible « {found.group(0)} » dans {node[:60]!r} (rédaction neutre)")

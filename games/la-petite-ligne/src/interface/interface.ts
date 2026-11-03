@@ -29,6 +29,7 @@ import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
 import { type ScreenKind, hudState, screenOf } from './modele';
 import { CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { StallPanel } from './marche';
 import { RoomPanel, StoragePanel } from './maison';
 import { isNapping } from '../etat/maison';
 import { BoardPanel } from './tableau';
@@ -473,6 +474,8 @@ class GameUi implements GameInterface, UiHost {
         return () => new SalonPanel(this, this.salonPort());
       case 'bakery':
         return () => new BakeryPanel(this, this.bakeryPort());
+      case 'stall':
+        return () => new StallPanel(this);
       // 0.12: boutique de vêtements et garde-robe (panneaux du lot de l'interface, en parallèle).
       case 'clothes_shop':
       case 'wardrobe':

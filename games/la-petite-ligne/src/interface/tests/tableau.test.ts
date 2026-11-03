@@ -1,6 +1,6 @@
 // Tour 9, interface du tableau du quai et de l'établi de Basile: catalogue par rayons (seuls les
 // articles parus), annonces (échéance, récompense, liste à cocher, tampon à la couleur de qui l'a
-// remise), chantiers (versements par 50, 100 ou le reste, accord de l'autre à partir de 100 sous),
+// remise), chantiers (versements par 50, 100 ou le reste, accord de l'autre à partir de 100 aubrins),
 // commande à Basile (planches), courrier à titres, carnet borné, écran d'étape à quatre compteurs.
 // Chaque modèle est lu chez les deux joueurs.
 import { readFileSync } from 'node:fs';
@@ -181,7 +181,7 @@ describe('annonces', () => {
       expect(plain(a?.title ?? '')).toBe("La vitrine d'Odette");
       expect(plain(a?.text ?? '')).toContain('Il me faudrait 6 radis, frais si possible.');
       expect(plain(a?.deadline ?? '')).toBe("jusqu'à mardi, 20 h");
-      expect(plain(a?.reward ?? '')).toBe('Merci : 80 sous');
+      expect(plain(a?.reward ?? '')).toBe('Merci : 80 aubrins');
       expect(a?.lines).toHaveLength(1);
       expect(a?.lines[0]).toMatchObject({ item: 'radish', have: 2, need: 6, done: false });
       expect(plain(a?.help ?? '')).toBe("Parle à Odette pour donner ce qu'il faut.");
@@ -236,19 +236,21 @@ describe('chantiers', () => {
     }
   });
 
-  it('propose de verser 50 sous ou le reste; le reste de 100 sous demande l’accord de l’autre', () => {
+  it('propose de verser 50 aubrins ou le reste; le reste de 100 aubrins demande l’accord de l’autre', () => {
     const sim = summer25();
     for (const id of PLAYERS) {
       const page = chantiersPage(sim.world, uiContext(id));
       expect(page.open?.id).toBe('quay_planters');
-      expect(plain(page.open?.progress ?? '')).toBe('Des jardinières au quai : 600 sur 700 sous');
+      expect(plain(page.open?.progress ?? '')).toBe(
+        'Des jardinières au quai : 600 sur 700 aubrins',
+      );
       expect(page.open?.options.map((o) => [o.amount, o.sum, o.big])).toEqual([
         [50, 50, false],
         [null, 100, true],
       ]);
       expect(page.open?.options.map((o) => plain(o.label))).toEqual([
-        'Verser 50 sous',
-        'Verser le reste (100 sous)',
+        'Verser 50 aubrins',
+        'Verser le reste (100 aubrins)',
       ]);
       expect(page.built.map((b) => b.id)).toEqual(['ford_bench']);
       expect(plain(page.home)).toBe(
@@ -267,7 +269,7 @@ describe('chantiers', () => {
     expect(options.map((o) => o.big)).toEqual([false, true, true]);
   });
 
-  it("un versement de 100 sous passe par l'accord de l'autre, vu des deux côtés, puis paie le chantier", () => {
+  it("un versement de 100 aubrins passe par l'accord de l'autre, vu des deux côtés, puis paie le chantier", () => {
     const sim = summer25();
     sim.world.purse = 400;
     bothAtBoard(sim);
@@ -301,7 +303,7 @@ describe('chantiers', () => {
     expect(sim.world.purse).toBe(300);
   });
 
-  it("un versement de 50 sous se fait sans attendre l'autre", () => {
+  it("un versement de 50 aubrins se fait sans attendre l'autre", () => {
     const sim = summer25();
     sim.world.purse = 400;
     bothAtBoard(sim);
@@ -309,7 +311,7 @@ describe('chantiers', () => {
     expect(sim.world.proposals).toHaveLength(0);
     const open = chantiersPage(sim.world, uiContext('p1')).open;
     expect(open?.remaining).toBe(50);
-    // Il reste 50 sous: seul « le reste » est proposé, sans accord.
+    // Il reste 50 aubrins: seul « le reste » est proposé, sans accord.
     expect(open?.options.map((o) => [o.amount, o.big])).toEqual([[null, false]]);
   });
 
@@ -334,16 +336,16 @@ describe('établi de Basile: chantiers de la maisonnette', () => {
     expect(basileModel(sim.world, uiContext())).toBeNull();
   });
 
-  it('les planches apportées retirent 10 sous chacune, chez les deux', () => {
+  it('les planches apportées retirent 10 aubrins chacune, chez les deux', () => {
     const sim = summer25();
     const p1 = character(sim, 'p1');
     p1.bag[12] = { item: 'plank', quality: 'ordinary', count: 4 };
     const before = basileModel(sim.world, uiContext('p1'));
     expect(before?.chantier?.id).toBe('house_bench');
     expect(before?.bring).toBe(4);
-    expect(plain(before?.priceLine ?? '')).toBe('Un banc au pignon : 690 sous');
+    expect(plain(before?.priceLine ?? '')).toBe('Un banc au pignon : 690 aubrins');
     expect(plain(before?.planksLine ?? '')).toBe(
-      'Apporter des planches : 1 sur 20 (10 sous de moins)',
+      'Apporter des planches : 1 sur 20 (10 aubrins de moins)',
     );
     const bench = sim.map.points.sawmill_workbench;
     if (bench === undefined) throw new Error('établi');
@@ -357,7 +359,7 @@ describe('établi de Basile: chantiers de la maisonnette', () => {
     });
     for (const id of PLAYERS) {
       const after = basileModel(sim.world, uiContext(id));
-      expect(plain(after?.priceLine ?? '')).toBe('Un banc au pignon : 650 sous');
+      expect(plain(after?.priceLine ?? '')).toBe('Un banc au pignon : 650 aubrins');
       expect(after?.chantier?.options.map((o) => [o.amount, o.sum, o.big])).toEqual([
         [null, 650, true],
       ]);
@@ -406,7 +408,7 @@ describe('carnet borné (section 5.3)', () => {
         'La commande du samedi 50',
         'La commande du samedi 57',
       ]);
-      expect(plain(done[1]?.text ?? '')).toBe('5 lignes sur 5, 1333 sous');
+      expect(plain(done[1]?.text ?? '')).toBe('5 lignes sur 5, 1333 aubrins');
       // Les commandes de la démo ne s'affichent plus.
       expect(groups.main.some((q) => q.id === 'saturday_order' || q.id === 'second_order')).toBe(
         false,

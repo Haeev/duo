@@ -328,6 +328,16 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Hauteur d'un dessus de meuble: rayon tiré d'en haut sur une instance du modèle (`Raycaster` ignore `visible`), mis en cache par place; les extras `top_height` et `seat_height` de `maison.glb` donnent table 0,78 m, chaise 0,47 m (le clip `sit` est calé sur 0,47 m), fauteuil 0,42 m.
 - Étagère (`shelf`): planches à 0,59, 1,09 et 1,65 m, 0,46 m de jour entre deux: ni la plume (0,47 m) ni le pot (0,66 m) n'y tiennent; le dessus à 1,65 m plus un pot touche l'égout du toit (mur à 2,4 m).
 - Générateur des références: le test unique dépasse 600 s (timeout signalé) mais écrit tous les fichiers; vérifier leur `dataSchema` et leur jour plutôt que le statut.
+
+## 0.12, monnaie et économie (La Petite Ligne, vérifié le 2026-11-03)
+
+- Monnaie: tout gabarit rempli passe par `agreeMoney` (`src/donnees/monnaie.ts`); un remplisseur de `{nom}` nouveau doit l'appeler aussi, sinon « 1 aubrins ». Les textes rendus gardés dans l'état (notifications, lettres `legacy`) se renomment à la reprise; une migration qui retrouve un gabarit depuis un texte rendu doit renommer avant de comparer.
+- Remplacer un mot qui est aussi une préposition (« sous »): script qui ne touche que nombre ou espace réservé suivi du mot, et jamais quand un article ou une majuscule suit; compter les prépositions avant et après.
+- Un habitant peut être envoyé à un lieu hors carte: identifiant de point préfixé (`market_spot:0`) résolu dans `goalOf` d'`habitants.ts`, et une entrée prioritaire dans `currentEntry`.
+- Robot jusqu'au jour 64: environ 11 min par graine sur machine partagée; une règle de tirage se teste plutôt par une boucle de jours qui appelle la fonction directement.
+- Fusion de la branche de session pendant le travail: commit temporaire, `git merge`, conflits résolus par script (`objets.json`: garder les objets de la branche, ajouter les siens sans doublon d'identifiant), commit, puis `git reset --mixed <branche>`: le travail redevient non commité au-dessus de la branche.
+- `villagerBlockers(sim, habitant)` prend l'habitant depuis le format 9.
+
 ## Défauts de rendu du patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
 
 - Pied des murs coupés (`coupe-murs.ts`): tout enfant du nœud de mur passe dans le pied (étal, cagettes de l'épicerie). Une face qui traverse la coupe est écrasée à la hauteur de coupe: une pièce accrochée à la façade devenait une plaque grise posée à plat. La section se calcule sur la seule maçonnerie (faces qui montent à plus de 1 m au-dessus de la coupe), et les faces qui traversent la coupe y sont rognées.

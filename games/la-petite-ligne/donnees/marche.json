@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "note": "Le marché du dimanche (0.12, section 2.3 de v0-12-conception.md). L'étal se déplie sur la place quand le drapeau enabledFlag est posé (quête market_stall). Heures de jeu. Les habitants viennent chacun une fois, à une heure tirée par la graine, avec une liste tirée parmi wants (seulement ce que le duo a déjà eu); likes: ce qu'ils prennent à la place d'un article manquant. Répliques: textes.json, messages market_*.",
+  "enabledFlag": "market_open",
+  "weekday": "sunday",
+  "opens": "08:00",
+  "closes": "13:00",
+  "arrivals": { "from": "08:15", "to": "12:30", "minGapMinutes": 20 },
+  "slots": 4,
+  "slotsWithCrates": 6,
+  "cratesFlag": "stall_six_slots",
+  "crateItem": "crate",
+  "levels": {
+    "soft": { "factor": 1.0, "accept": 1.0, "bond": 2 },
+    "fair": { "factor": 1.25, "accept": 0.9, "bond": 0 },
+    "strong": { "factor": 1.5, "accept": 0.6, "bond": 0 }
+  },
+  "defaultLevel": "fair",
+  "list": { "minLines": 1, "maxLines": 3, "minCount": 1, "maxCount": 3 },
+  "waitMinutes": 30,
+  "returnAfterMinutes": 40,
+  "serveRange": 1.5,
+  "stallRange": 2.0,
+  "rainStayHome": 0.3,
+  "hallImprovement": "market_hall",
+  "garlandFlag": "market_garland",
+  "scaleItem": "market_scale",
+  "scaleCategories": ["crop", "forage"],
+  "stall": { "point": "market_stall", "fallbackPoint": "village_square", "fallbackOffset": [-1, 3], "length": 2.0, "facing": 90 },
+  "buyers": [
+    { "villager": "odette", "wants": ["lettuce", "carrot", "egg"], "likes": "elder_jelly" },
+    { "villager": "firmin", "wants": ["trout", "chub", "fresh_cheese"], "likes": "roasted_hazelnuts" },
+    { "villager": "basile", "wants": ["radish", "cep", "omelette"], "likes": "blackberry_jam" },
+    { "villager": "jeanne", "wants": ["blackberry", "hazelnut", "blackberry_jam"], "likes": "egg" },
+    { "villager": "achille", "wants": ["egg", "milk_can", "hazelnut"], "likes": "fresh_cheese" },
+    { "villager": "solange", "wants": ["lettuce", "elder_jelly", "fresh_cheese"], "likes": "dandelion" }
+  ]
+}

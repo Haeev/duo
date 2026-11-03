@@ -272,7 +272,7 @@ export function canDrinkChocolate(sim: Sim, c: Character): boolean {
   return atSmallTable(sim, c) && chocolateOn(sim) && (sim.world.countersToday[c.id][TOWN.chocolate] ?? 0) < ch.perPlayerPerDay;
 }
 
-/** Une tasse, 5 sous, bue à la petite table: un plat pour le Ventre; à deux dans la demi-heure, Cœur +5. */
+/** Une tasse, 5 aubrins, bue à la petite table: un plat pour le Ventre; à deux dans la demi-heure, Cœur +5. */
 export function drinkChocolate(sim: Sim, c: Character): void {
   const ch = sim.content.settings.town.grocer.chocolate;
   if (!atSmallTable(sim, c)) return;

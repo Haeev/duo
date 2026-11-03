@@ -555,7 +555,7 @@ describe('pièces bâties à deux (T10-20, T10-21)', () => {
     sim.world.purse = 5000;
     atBasile(sim);
     send(sim, [['p1', { type: 'improvement_pay', improvement: 'room_cellar', amount: null }]]);
-    // 450 sous: l'autre doit accepter (EC-04); rien n'est commandé avant.
+    // 450 aubrins: l'autre doit accepter (EC-04); rien n'est commandé avant.
     expect(sim.world.rooms.room_cellar).toBeUndefined();
     const proposal = sim.world.proposals.find((p) => p.purchase.item === 'room_cellar');
     expect(proposal?.price).toBe(450);

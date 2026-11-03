@@ -326,7 +326,7 @@
           "kind": "quest",
           "priority": 23,
           "when": [{ "type": "step_active", "quest": "firmin_chub", "step": "bring" }],
-          "lines": [{ "speaker": "firmin", "text": "Un chevesne pour mon souper, ce serait un luxe. Ça se pêche au gué, ou au bout du ponton. Je vous paie en sous, pas en chaussettes." }]
+          "lines": [{ "speaker": "firmin", "text": "Un chevesne pour mon souper, ce serait un luxe. Ça se pêche au gué, ou au bout du ponton. Je vous paie en aubrins, pas en chaussettes." }]
         },
         {
           "id": "firmin_chub_done",
@@ -776,7 +776,7 @@
           "once": "duo",
           "priority": 41,
           "when": [{ "type": "day_at_least", "day": 9 }, { "type": "dialogue_done", "dialogue": "odette_meeting" }],
-          "lines": [{ "speaker": "odette", "text": "Le dimanche, chez moi, c'était friture. Ça me manque. Rapportez-moi quatre goujons du gué, et je vous paie en sous et en pain frais." }]
+          "lines": [{ "speaker": "odette", "text": "Le dimanche, chez moi, c'était friture. Ça me manque. Rapportez-moi quatre goujons du gué, et je vous paie en aubrins et en pain frais." }]
         },
         {
           "id": "odette_fry_reminder",
@@ -1069,7 +1069,7 @@
         {"id": "odette_ls9_1", "kind": "daily", "priority": 1, "when": [{"type": "day_at_least", "day": 16}, {"type": "season_is", "seasons": ["summer"], "fromSeasonDay": 15}], "lines": [{"speaker": "odette", "text": "Fin d'été: les mûres se font rares et les guêpes nombreuses. Prenez les premières, laissez les secondes."}]},
         {"id": "odette_ls9_2", "kind": "daily", "priority": 1, "when": [{"type": "day_at_least", "day": 16}, {"type": "season_is", "seasons": ["summer"], "fromSeasonDay": 15}], "lines": [{"speaker": "odette", "text": "J'ai rangé les chapeaux de paille. Sauf un. On ne sait jamais."}]},
         {"id": "odette_autumn1", "kind": "daily", "priority": 6, "once": "player", "when": [{"type": "season_is", "seasons": ["autumn"], "fromSeasonDay": 2}], "lines": [{"speaker": "odette", "text": "Vous voilà pour l'automne ! Je vous préviens: ici, on parle de confitures jusqu'à la neige."}]},
-        {"id": "odette_au1", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Les bocaux de l'automne prennent toute l'étagère. Je les compte le soir, comme d'autres comptent leurs sous."}]},
+        {"id": "odette_au1", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Les bocaux de l'automne prennent toute l'étagère. Je les compte le soir, comme d'autres comptent leurs aubrins."}]},
         {"id": "odette_au2", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "La gelée de sureau, c'est noir comme de l'encre et doux comme un dimanche."}]},
         {"id": "odette_au3", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Le soir tombe tôt. J'allume la lampe du comptoir à sept heures, et le bourg vient voir ce qui brille."}]},
         {"id": "odette_au4", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Les cèpes, on les coupe au couteau, on ne les arrache pas. Sinon, le bois vous en veut."}]},
@@ -1080,7 +1080,7 @@
         {"id": "odette_au9", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Quand il pleut à l'automne, la pension sent le bois mouillé et la confiture. Si vous connaissez une meilleure odeur, dites-la-moi."}]},
         {"id": "odette_au10", "kind": "daily", "priority": 1, "when": [{"type": "season_is", "seasons": ["autumn"]}], "lines": [{"speaker": "odette", "text": "Les jours raccourcissent, alors je parle plus vite. C'est une question d'organisation."}]},
         {"id": "odette_rain_au", "kind": "daily", "priority": 5, "when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weather_is", "weather": "rain"}], "lines": [{"speaker": "odette", "text": "Pluie d'automne. Le comptoir est plein de parapluies qui attendent leur propriétaire. Ils attendent bien, les parapluies."}]},
-        {"id": "odette_chocolate", "kind": "daily", "priority": 2, "once": "player", "when": [{"type": "any", "conditions": [{"type": "season_is", "seasons": ["autumn", "winter"]}, {"type": "weather_is", "weather": "rain"}]}, {"type": "time_is", "from": "07:00", "to": "18:00"}, {"type": "flag", "flag": "achille_here"}], "lines": [{"speaker": "odette", "text": "Un chocolat chaud ? Cinq sous, et la chaise est à côté du poêle."}]},
+        {"id": "odette_chocolate", "kind": "daily", "priority": 2, "once": "player", "when": [{"type": "any", "conditions": [{"type": "season_is", "seasons": ["autumn", "winter"]}, {"type": "weather_is", "weather": "rain"}]}, {"type": "time_is", "from": "07:00", "to": "18:00"}, {"type": "flag", "flag": "achille_here"}], "lines": [{"speaker": "odette", "text": "Un chocolat chaud ? Cinq aubrins, et la chaise est à côté du poêle."}]},
         {"id": "odette_wish", "kind": "daily", "priority": 3, "once": "player", "when": [{"type": "day_at_least", "day": 22}], "lines": [{"speaker": "odette", "text": "Mon moulin à café grince comme la porte de Basile. Le catalogue de la coopérative en vend des neufs, paraît-il."}]},
         {"id": "odette_after_gift", "kind": "daily", "priority": 3, "once": "player", "when": [{"type": "given", "villager": "odette", "item": "coffee_mill"}], "lines": [{"speaker": "odette", "text": "Mon moulin neuf ronronne comme un chat. Enfin, j'imagine: il n'y a pas de chat au bourg."}]},
         {"id": "odette_quay_planters_built", "kind": "daily", "priority": 3, "once": "player", "when": [{"type": "flag", "flag": "quay_planters_built"}], "lines": [{"speaker": "odette", "text": "Les jardinières du quai ! Je les arroserai quand il ne pleut pas. Donc pas si souvent."}]},

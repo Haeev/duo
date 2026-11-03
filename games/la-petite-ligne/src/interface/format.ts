@@ -3,6 +3,7 @@
  * quantités, noms d'objets, touches. Fonctions pures, testées dans Node.
  */
 import { currentOrder } from '../donnees/commandes';
+import { agreeMoney } from '../donnees/monnaie';
 import type { Content, ItemDef } from '../donnees/types';
 import type { ItemStack, Quality } from '../etat/types';
 import { PROFILE_SYMBOLS, UI_SETTINGS } from './config';
@@ -14,10 +15,11 @@ export type TextVars = Readonly<Record<string, string | number>>;
 
 /** Remplace `{nom}`; un nom inconnu reste tel quel. */
 export function fill(template: string, vars: TextVars = {}): string {
-  return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
+  const filled = template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });
+  return agreeMoney(filled);
 }
 
 export function capitalize(text: string): string {

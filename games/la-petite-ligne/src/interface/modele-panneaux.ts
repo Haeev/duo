@@ -2,6 +2,7 @@
  * Modèles des panneaux (comptoir, catalogue, établi, réchaud, coffre, sac):
  * fonctions pures sur l'état, testées dans Node.
  */
+import { type GrocerWord, ardoiseItem, grocerTotal, grocerWord } from '../etat/epicerie';
 import { HOUSE_BUILDING } from '../etat/carte';
 import { catalogueWindow, onSale } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
@@ -143,17 +144,19 @@ export interface SellEntry {
   icon: string;
   name: string;
   count: number;
-  /** Prix d'une pièce chez Odette (arrondi), et du lot entier. */
+  /** Prix de la prochaine pièce chez Odette, et du lot entier (0.12: l'offre baisse à chaque pièce). */
   unit: number;
   total: number;
+  /** Mot du panneau (0.12, section 2.2): ardoise du jour, « Odette en a déjà beaucoup », « Recherché ». */
+  word: GrocerWord;
 }
 
-/** Ce que paie Odette pour `count` pièces (même calcul que la simulation). */
-export function grocerPrice(ctx: UiContext, item: string, quality: Quality, count: number): number {
-  const def = ctx.content.items[item];
-  if (def?.sellPrice === null || def === undefined) return 0;
-  const unit = def.sellPrice * ctx.content.qualities[quality].priceMultiplier * ctx.content.settings.economy.grocer.buyRate;
-  return Math.round(unit * count);
+/** Monde lu par les prix d'Odette (une partie de la démo sans monde: prix du tour 9). */
+const NO_SALES = { clock: { day: 1 }, grocerSupply: {}, ardoise: null, grocerSoldToday: 0 } as const;
+
+/** Ce que paie Odette pour `count` pièces (même calcul que la simulation, `etat/epicerie.ts`). */
+export function grocerPrice(ctx: UiContext, item: string, quality: Quality, count: number, world?: ReadonlyWorld): number {
+  return grocerTotal(ctx.content, world ?? (NO_SALES as unknown as ReadonlyWorld), item, quality, count);
 }
 
 export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry[] {
@@ -178,13 +181,15 @@ export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry
       count: stack.count,
       unit: 0,
       total: 0,
+      word: null,
     });
   }
   const out = [...seen.values()];
   for (const e of out) {
     e.name = itemTitle(ctx.content.items[e.item], e.count, e.item);
-    e.unit = grocerPrice(ctx, e.item, e.quality, 1);
-    e.total = grocerPrice(ctx, e.item, e.quality, e.count);
+    e.unit = grocerPrice(ctx, e.item, e.quality, 1, world);
+    e.total = grocerPrice(ctx, e.item, e.quality, e.count, world);
+    e.word = grocerWord(ctx.content, world, e.item);
   }
   return out;
 }
@@ -192,11 +197,15 @@ export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry
 export interface GrocerBudget {
   buys: boolean;
   room: number;
+  /** L'ardoise du jour (nom de l'article au pluriel), ou `null`. */
+  ardoise: string | null;
 }
 
 export function grocerBudget(world: ReadonlyWorld, ctx: UiContext): GrocerBudget {
   const g = ctx.content.settings.economy.grocer;
-  return { buys: world.flags.includes(g.buysAfterFlag), room: Math.max(0, g.dailyCap - world.grocerSoldToday) };
+  const item = ardoiseItem(world);
+  const def = item === null ? undefined : ctx.content.items[item];
+  return { buys: world.flags.includes(g.buysAfterFlag), room: Math.max(0, g.dailyCap - world.grocerSoldToday), ardoise: def === undefined ? null : def.plural };
 }
 
 // ---------------------------------------------------------------------------

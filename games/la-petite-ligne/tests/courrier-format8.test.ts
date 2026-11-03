@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { letterFrom, letterFromRendered, letterText, letterTitle, type RenderedLetter } from '../src/etat/courrier';
 import { dialogueDone } from '../src/etat/dialogues-faits';
+import { renameOldCurrency } from '../src/donnees/monnaie';
 import { letterModels } from '../src/interface/modele';
 import { uiContext } from '../src/interface/tests/aides';
 import { decodeSave, restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
@@ -49,14 +50,15 @@ describe('courrier du format 8', () => {
         if (before === undefined) throw new Error('lettre absente');
         // Toutes retrouvées depuis les données: aucune ne garde son texte d'origine.
         expect(l.legacy, l.id).toBeUndefined();
-        expect(letterTitle(content, l), l.id).toBe(before.title);
+        // 0.12: mêmes mots, sauf la monnaie (« sous » devient « aubrins »).
+        expect(letterTitle(content, l), l.id).toBe(renameOldCurrency(before.title));
         expect(letterFrom(content, l), l.id).toBe(before.from);
-        expect(letterText(content, l), l.id).toBe(before.text);
+        expect(letterText(content, l), l.id).toBe(renameOldCurrency(before.text));
       }
       // Ce que le carnet affiche (onglet Courrier), comparé au rendu des textes d'avant.
       const ctx = uiContext();
       const shown = letterModels(sim.world, ctx);
-      const oldWorld = { ...sim.world, letters: old.map((l) => ({ id: l.id, day: l.day, read: l.read, legacy: { title: l.title, from: l.from, text: l.text } })) };
+      const oldWorld = { ...sim.world, letters: old.map((l) => ({ id: l.id, day: l.day, read: l.read, legacy: { title: renameOldCurrency(l.title), from: l.from, text: renameOldCurrency(l.text) } })) };
       expect(shown).toEqual(letterModels(oldWorld, ctx));
       // Le courrier pèse bien moins dans l'état sauvegardé.
       expect(bytes(snapshotOf(sim).data.letters)).toBeLessThan(bytes(old) / 2);

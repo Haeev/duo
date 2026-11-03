@@ -1090,7 +1090,7 @@ export const WISH_ORDER: readonly string[] = [
 ];
 /** Ce que le duo garde pour ses graines (section 2.9). */
 const PURSE_RESERVE = 150;
-/** Au-delà de cette bourse, le surplus va au chantier ouvert, par versements de 100 sous. */
+/** Au-delà de cette bourse, le surplus va au chantier ouvert, par versements de 100 aubrins. */
 const IMPROVEMENT_KEEP = 300;
 const IMPROVEMENT_STEP = 100;
 
@@ -1177,7 +1177,7 @@ function shopCatalogue(sim: Sim, c: Character, m: Memory, out: Intent[]): boolea
 }
 
 /**
- * Chantiers: au-delà de `IMPROVEMENT_KEEP` sous, verser 100 sous au chantier du bourg ouvert (au
+ * Chantiers: au-delà de `IMPROVEMENT_KEEP` aubrins, verser 100 aubrins au chantier du bourg ouvert (au
  * tableau); payer d'un coup celui de la maisonnette chez Basile quand la bourse le permet, après
  * lui avoir apporté les planches de trop (p2, qui coupe le bois).
  */
