@@ -21,6 +21,9 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 - R13. Sur Windows, il n'y a pas d'ombres, contrairement au Mac.
 - R14. Portage à deux: le colis flotte dans le vide au-dessus et à côté des deux joueurs, bras levés, qui ne le touchent pas (capture du client, non versionnée car elle montre les deux profils).
 
+- R15. Dans la maisonnette, un élément accroché au mur (le râtelier à outils, une barre à crochets sur deux montants) chevauche la fenêtre (`r15-ratelier-fenetre.png`).
+- R16. La porte de la maisonnette n'apparaît toujours pas vue de l'intérieur.
+
 ## Décisions du manager
 
 - Patch 0.12.2, en ligne le 4 novembre avant 21 h: R01 à R08, R10 à R14, à partir de `main` (0.12.1), sans le travail de la 0.13.
