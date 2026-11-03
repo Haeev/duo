@@ -383,9 +383,21 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 - Chat du bourg (`faune.glb`, nœud `cat`, maillage `cat_mesh`, 1156 triangles): tigré gris à plastron, museau et chaussettes blancs, yeux vert-jaune; 0,46 m de corps, 0,25 m au garrot. Clips: `cat_idle` (assis, la queue qui bat, regards, oreille qui frémit; 7,3 s), `cat_walk` (pas en quatre temps, queue dressée en crosse, 0,8 s pour 0,35 m/s: `timeScale = vitesse / 0,35`), `cat_sleep` (couché en rond, pattes repliées, queue autour de lui, il respire; 3 s), `cat_roll` (il se roule sur le dos, pattes en l'air, et revient; 2,7 s). Les poses assises et couchées sont posées au sol par calcul (point le plus bas du maillage déformé). Noms préfixés comme les autres bêtes de `faune.glb` (`cat_idle` pour `idle`).
 - Poids: `personnages.glb` passe de 6,4 à 10,8 Mo (environ 330 Ko par habitant: ombrage en aplats, sommets non partagés). La compression Meshopt (Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
 
+## Patch 0.12.2: coupes longues et panneau de quai (retours R01 et R07 du 2026-11-03)
+
+Sources: `coiffures.py` (coupes et `settle`), `personnages.py` (`bob`), `garde_robe.py` (capuche du ciré), `bourg.py` (`station_sign`, `text_shapes`), `polices/` (Jost Bold, OFL). Contrôles: `verifier/traversees_coiffures.py` (profondeur de pénétration coupe contre corps et vêtements, toutes les coupes, avec et sans chapeau, tous les clips, 12 images par clip; résultat dans `stats/traversees_coiffures.json`), `planche_coupes_longues.py <sortie.png> veste | variantes`, `verifier/capture_panneau.cjs` (panneau à la caméra du jeu), `verifier/nettoyer_0122.sh` (nettoyage de `bourg.glb` seul). Planches: `docs/jeux/jeu-1/gauntlet/captures/v0-12-2/modeles/`.
+
+- Coupes longues (`bob`, `ponytail`, `braid`, `pigtails`, `wavy`, `long`, `bob_long`): rien ne pend plus devant les épaules. `pigtails`: deux nattes attachées derrière les oreilles (touffe posée sur le crâne, lien sombre), qui tombent derrière les épaules sur le haut du dos. `long`: mèches des côtés arrêtées au-dessus des épaules, rideau de lobes larges dans le dos, raccordé à la nuque. `wavy`, `bob`, `bob_long`: côtés et nuque arrêtés au-dessus des épaules et du col (`bob_long` incliné vers l'avant, pointes devant). `braid`: tresse d'aplomb à 0,2 m derrière l'axe.
+- Peau: ce qui pend sous le crâne suit le buste (poids glissant de `head` au-dessus de 1,45 m à `chest` sous 1,36 m), pour toutes ces coupes et leurs variantes `_hat`. La tresse et la queue de cheval ne sont plus sur `neck`.
+- Pose au repos: tout sommet d'une coupe longue qui entrerait dans le corps ou un vêtement du buste (5 hauts, salopette, 3 par-dessus) ressort à 4 mm de sa surface. La coupe repose donc sur l'enveloppe la plus épaisse (par-dessus): sur un tee-shirt seul, le bas d'une natte peut rester à 1,5 à 2 cm du dos (1 pixel au zoom 1).
+- Capuche roulée du ciré (`wear_outer_cire`): plus serrée contre le col (dos à 0,167 m au lieu de 0,19, sommet à 1,405 m), pour que les coupes tombent dessus sans s'écarter du dos.
+- Mesure (`stats/traversees_coiffures.json`, seuil 3 mm): au repos, en `idle` et en `walk`, aucune traversée pour les 15 coupes, avec et sans chapeau, avec chaque haut et chaque par-dessus. Restent, comme avant le patch et aussi pour les coupes courtes: la tête renversée en arrière (`look_up`, `hold_ladder`, `pole_raise`, `pole_lower`, `reach_up`, `climb_ladder`, et `drink` à 18 degrés) qui pousse la nuque dans le col du ciré (jusqu'à 37 mm, 28 mm pour la coupe rase), les bras levés au-dessus de la tête (`carry_two`: les avant-bras entrent dans le crâne, toutes coupes), et le bras levé le long de la tête (`hoe`, `chop`, `high_five`, `wave`) qui entre dans les côtés volumineux de `bob`, `bob_long` et `wavy`.
+- Budget: `pigtails` 840, `wavy` 804, `long` 748 triangles; joueur au pire cas 4 762 (plafond 4 800).
+- `station_sign` (900 triangles): plaque émaillée bleue (`ceramic_blue`) à filet et lettres blanches (`ceramic`), sertie dans un cadre de fer, sur deux poteaux de fonte à 6 pans (pied évasé à moulure, bague et pomme en ogive, colliers qui tiennent le cadre). Cadre de 1,8 x 0,56 m, bas à 1,78 m; poteaux à x +-0,93, pomme à 2,49 m. Lettres « AUBRUNE » en géométrie: contours de la police Jost Bold (OFL, `polices/jost-latin-700-normal.woff`) triangulés, 1,5 mm devant l'émail, nettes à tout zoom. Le panneau est au fond du quai (y 18,5), parallèle à la voie: la face nord (+Y Blender, -Z glTF) regarde la voie et les voyageurs, la face sud (vers la place) porte aussi le nom, et chaque face se lit de gauche à droite depuis son côté. Nom de nœud et emprise inchangés.
+
 ## Fiche par modèle
 
-### `personnages.glb` (10849 Ko)
+### `personnages.glb` (10919 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -400,9 +412,9 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 | `player_hair_curls` | 388 |
 | `player_hair_ponytail` | 580 |
 | `player_hair_braid` | 648 |
-| `player_hair_pigtails` | 720 |
-| `player_hair_wavy` | 676 |
-| `player_hair_long` | 688 |
+| `player_hair_pigtails` | 840 |
+| `player_hair_wavy` | 804 |
+| `player_hair_long` | 748 |
 | `player_hair_fringe` | 604 |
 | `player_hair_quiff` | 416 |
 | `player_hair_cloud` | 432 |
@@ -451,9 +463,9 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 | `player_hair_curls_hat` | 388 |
 | `player_hair_ponytail_hat` | 328 |
 | `player_hair_braid_hat` | 396 |
-| `player_hair_pigtails_hat` | 432 |
-| `player_hair_wavy_hat` | 352 |
-| `player_hair_long_hat` | 400 |
+| `player_hair_pigtails_hat` | 552 |
+| `player_hair_wavy_hat` | 480 |
+| `player_hair_long_hat` | 460 |
 | `player_hair_fringe_hat` | 280 |
 | `player_hair_quiff_hat` | 236 |
 | `player_hair_cloud_hat` | 432 |
@@ -599,7 +611,7 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 
 Animations: `hen_idle`, `hen_walk`, `hen_peck`
 
-### `bourg.glb` (6646 Ko)
+### `bourg.glb` (6671 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -631,7 +643,7 @@ Animations: `hen_idle`, `hen_walk`, `hen_peck`
 | `lamp_post` | 1 x 1 | 248 |  |
 | `coop_crate` | 1 x 1 | 168 |  |
 | `notice_board` | 1 x 1 | 364 |  |
-| `station_sign` | 2 x 1 | 424 |  |
+| `station_sign` | 2 x 1 | 900 |  |
 | `arbor` | 3 x 2 | 876 |  |
 | `mailbox` | 1 x 1 | 104 |  |
 | `barrel` | 1 x 1 | 276 |  |

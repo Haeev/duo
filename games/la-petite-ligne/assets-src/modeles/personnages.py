@@ -27,6 +27,7 @@ import palette as P  # noqa: E402
 
 PP = sys.modules[__name__]
 H13.PP = PP
+coiffures.PP = PP
 
 FPS = 30
 HC = 1.58          # centre de la tête
@@ -433,10 +434,11 @@ def hair_round(g, style, hc, s=1.0):
         for sx in (1, -1):
             lobe((sx * 0.168, 0.03, 0.075), (0.035, 0.08, 0.06), segs=6, rings=4)
     elif style == "bob":
-        lobe((0, 0.08, -0.06), (0.19, 0.11, 0.13))
+        # 0.12.2: nuque et côtés arrêtés au-dessus du col et des épaules (ils y entraient de 3 cm)
+        lobe((0, 0.08, -0.035), (0.19, 0.11, 0.105))
         lobe((0, -0.1, 0.162), (0.14, 0.034, 0.04), segs=8, rings=4, rot=(15, 0, 0))
         for sx in (1, -1):
-            lobe((sx * 0.172, 0.0, -0.035), (0.05, 0.115, 0.115), segs=6, rings=5)
+            lobe((sx * 0.168, -0.005, -0.03), (0.05, 0.115, 0.112), segs=6, rings=5)
     else:  # bun
         lobe((0, 0.09, -0.01), (0.15, 0.1, 0.09))
         lobe((0, 0.15, 0.14), (0.085, 0.08, 0.08), segs=8, rings=5)
@@ -577,9 +579,12 @@ def hair_style(g, style, hc, k=1.0):
     if ROUND and style in ("short", "bob", "bun"):
         hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
         coiffures.strands(g, hc, style)
+        coiffures.settle(g, style, hc)  # 0.12.2: posée sur les vêtements, ce qui pend suit le buste
         return
     if ROUND and style in coiffures.NEW_CUTS:
-        return coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
+        coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
+        coiffures.settle(g, style, hc)
+        return
     if style == "short":
         hair_cap(g, hc, k)
         hair_back(g, hc, k, z_bot=-0.05)

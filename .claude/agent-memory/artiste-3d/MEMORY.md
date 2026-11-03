@@ -173,4 +173,14 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `controle_geometrie.py` ignore personnages.glb par défaut: lui passer le chemin absolu avec `--peaux` pour contrôler les habitants.
 - faune.py: la ligne `a = math.radians(LADDER_ANGLE)` existe deux fois (fonction ladder_wood et main): insérer avant `A.add("ladder_wood"`.
 - Le scratchpad est partagé avec d'autres sessions: travailler dans un sous-dossier à soi (un dossier `r1` existait déjà; un module Python du scratchpad peut masquer ceux des modèles).
-- Essai rapide d'habitants: un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
+- Essai rapide d'habitants (voir aussi la section 0.12.2): un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
+
+## Patch 0.12.2: coupes longues, texte en géométrie (vérifié le 2026-11-03)
+
+- Coupe qui pend sous le crâne: la lier au buste (poids glissant `head` au-dessus de 1,45 m, `chest` sous 1,36 m, `coiffures.settle`), sinon elle balaie dos et épaules dès que la tête tourne. Pas sur les coupes courtes: la peau de la nuque ressortirait quand la tête se renverse.
+- Contrôle coupe contre vêtements: `verifier/traversees_coiffures.py` (îlots, tous clips, 12 images). Pour un lobe convexe, tester « derrière tous les plans des faces »: le test par la normale du point le plus proche donne de faux dedans près des arêtes vives des lobes aplatis (54 mm fantômes).
+- Les clips qui renversent la tête (`look_up`, `hold_ladder`, `pole_*`, `reach_up`, `climb_ladder`, `drink`) et `carry_two` (avant-bras dans le crâne) traversent même avec la coupe rase: comparer à `crop` avant d'accuser une coupe.
+- Essai rapide de coupes: script qui construit squelette, corps, hauts, par-dessus, chapeaux et coupes seulement (2 s), puis le contrôle sur ce .blend (option `--blend`).
+- Texte net en géométrie: courbe FONT de Blender sur une police OFL (WOFF lu directement par bpy), `new_from_object` donne des triangles plats (environ 230 pour AUBRUNE en Jost Bold, `resolution_u` 2). Hauteur mesurée sur un E, largeur bornée. Au dos d'un panneau: rotation de 180 degrés autour de Z, même sens de faces.
+- Planches depuis personnages.blend: cacher toutes les sources (vélos et accessoires de la 0.13 posés à l'origine), pas seulement `player_*`.
+- bourg.py lancé seul rend aussi ses planches: `LPL_SANS_PLANCHES=1`, ou arrêter la tâche après « Saved as bourg.blend ». Vite en arrière-plan: timeout long (coupé à 30 min sinon). Capture SwiftShader de rendu.html: 5 à 15 min par vue; gltf-validator absent des node_modules: l'installer dans le scratchpad et passer `NODE_PATH`.

@@ -45,15 +45,15 @@
  },
  "player_hair_pigtails": {
   "file": "personnages.glb",
-  "tris": 720
+  "tris": 840
  },
  "player_hair_wavy": {
   "file": "personnages.glb",
-  "tris": 676
+  "tris": 804
  },
  "player_hair_long": {
   "file": "personnages.glb",
-  "tris": 688
+  "tris": 748
  },
  "player_hair_fringe": {
   "file": "personnages.glb",
@@ -249,15 +249,15 @@
  },
  "player_hair_pigtails_hat": {
   "file": "personnages.glb",
-  "tris": 432
+  "tris": 552
  },
  "player_hair_wavy_hat": {
   "file": "personnages.glb",
-  "tris": 352
+  "tris": 480
  },
  "player_hair_long_hat": {
   "file": "personnages.glb",
-  "tris": 400
+  "tris": 460
  },
  "player_hair_fringe_hat": {
   "file": "personnages.glb",
@@ -970,7 +970,7 @@
  },
  "station_sign": {
   "file": "bourg.glb",
-  "tris": 424,
+  "tris": 900,
   "footprint": [
    2,
    1
