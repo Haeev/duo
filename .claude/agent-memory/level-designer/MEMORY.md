@@ -68,3 +68,8 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Des tests de robots qui marchent au hasard (`moments-tour7.test.ts`, la chevrette) dépendent des cases bloquées autour de leur point de départ: un buisson posé au bord du pré les a fait échouer. Après un déplacement de décor, relancer ces tests seuls, puis toute la suite; ne jamais réécrire `halte.json` pendant que la suite tourne (elle lit le fichier au fil des tests).
 - `src/rendu/gue.test.ts` fige le bout nord de la route du gué en y 36 (une rangée au-dessus de la berge, gué en eau dès y 38): ne pas raccourcir ni élargir la route là.
 - Machine partagée (charge 20 et plus sur 4 cœurs): la suite complète dure plus de 25 minutes; la lancer en tâche de fond sans `timeout` court, et ne pas tuer `vitest` par nom (d'autres membres en font tourner).
+
+## Clôtures et gros plans (vérifié le 2026-11-03)
+
+- Le segment `fence` (`fence_wood`) ne porte qu'un poteau, à son x local -0,5: ouest en rotation 0, sud en 1, est en 2, nord en 3. Une file de n segments a n poteaux: le constructeur ajoute le dernier en accroche `fence_post` (sans emprise, `poteaux_de_cloture` dans `valider_carte.py`). Deux files posées au milieu des cases (y + 0,5, x + 0,5) ne se rejoignent jamais en angle: fermer le coin par un buisson ou un autre élément, jamais par un trou.
+- Page `rendu.html`: `zoom=2` éloigne (zoom arrière) et `zoom=0` rapproche; pour un vrai gros plan, `largeur=<m>` (2 à 36). La caméra suit Camille, posée en `x, y` sans collision: la décaler de l'objet regardé, sinon elle se tient dedans.
