@@ -1,0 +1,434 @@
+{
+ "nodes": {
+  "church": {
+   "footprint": [
+    21,
+    12
+   ],
+   "door_cell": 10,
+   "cut_walls": true,
+   "cut_nodes": [
+    "church_roof"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "church_nave",
+      "x": [
+       -5.5,
+       6.5
+      ],
+      "z": [
+       -5.0,
+       5.0
+      ]
+     },
+     {
+      "id": "church_choir",
+      "x": [
+       6.5,
+       9.5
+      ],
+      "z": [
+       -2.0,
+       2.0
+      ]
+     }
+    ]
+   },
+   "note": "portail sud en case 10 (x 0); nef de 12 x 10 m, chœur et abside à l'est; clocher-porche à l'ouest dans church_wall_left (coupé avec le mur ouest quand la caméra regarde de l'ouest); cloches visibles dans les baies sud et est du beffroi; clocher centré sur l'axe de la nef (0,5 m au sud de la case de la carte)",
+   "tower_top": 20.0,
+   "tris": 15412
+  },
+  "presbytery_house": {
+   "footprint": [
+    7,
+    7
+   ],
+   "door_cell": 3,
+   "note": "porte au milieu (case 3); le pignon gauche (-X) regarde le jardin du curé, au sud",
+   "tris": 5224
+  },
+  "village_house_a": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 2,
+   "note": "porte en case 2",
+   "tris": 3660
+  },
+  "village_house_a_shuttered": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 2,
+   "note": "porte en case 2; volets clos, porte fermée: maison inhabitée",
+   "tris": 2632
+  },
+  "village_house_b": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 2,
+   "note": "porte en case 2; glycine sur la façade",
+   "tris": 4076
+  },
+  "lineman_house": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 3,
+   "note": "porte en case 3 (x 0,5); la fenêtre à gauche de la porte (x -1,5) est ouverte sur l'établi d'Ambroise",
+   "tris": 3428
+  },
+  "lineman_house_shuttered": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 3,
+   "note": "porte en case 3; volets clos (maison vide)",
+   "tris": 3268
+  },
+  "forester_house": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 3,
+   "note": "porte en case 3 (x 0,5); plaque MAISON FORESTIÈRE, bois de cerf",
+   "tris": 3662
+  },
+  "cafe_house": {
+   "footprint": [
+    7,
+    6
+   ],
+   "door_cell": 3,
+   "cut_walls": true,
+   "cut_nodes": [
+    "cafe_house_roof",
+    "cafe_house_upper"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "cafe_room",
+      "x": [
+       -2.5,
+       2.5
+      ],
+      "z": [
+       -2.0,
+       2.0
+      ]
+     }
+    ]
+   },
+   "note": "porte en case 3 (x 0); salle du rez-de-chaussée (comptoir au nord, poêle à l'ouest, deux tables), salle du bal à l'étage (fenêtres hautes, balconnet); store vert sur la terrasse (ouest de la façade), ardoise à droite de la porte",
+   "tris": 8414
+  },
+  "forge_shop": {
+   "footprint": [
+    6,
+    6
+   ],
+   "door_cell": 3,
+   "cut_walls": true,
+   "cut_nodes": [
+    "forge_shop_roof",
+    "forge_shop_attic"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "forge_workshop",
+      "x": [
+       -2.0,
+       2.0
+      ],
+      "z": [
+       -2.0,
+       2.0
+      ]
+     }
+    ]
+   },
+   "note": "grande porte au sud (cases 2 et 3): vantail fixe à gauche, vantail ouvrant à droite (forge_shop_door); foyer et soufflet au mur nord sous la hotte, cheminée de brique noircie au nord; logis sous le toit (lucarne au sud); écriteau à droite de la porte",
+   "tris": 3436
+  },
+  "joinery_shop": {
+   "footprint": [
+    6,
+    7
+   ],
+   "door_cell": 2,
+   "cut_walls": true,
+   "cut_nodes": [
+    "joinery_shop_roof",
+    "joinery_shop_attic"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "joinery_workshop",
+      "x": [
+       -2.0,
+       2.0
+      ],
+      "z": [
+       -2.5,
+       2.5
+      ]
+     }
+    ]
+   },
+   "note": "pignon sur la cour (porte en case 2, x -0,5); grenier aux planches sous le toit (porte haute et potence); établi au mur droit (nord de la carte), râtelier au mur du fond (ouest); menuiserie fermée: poussière, copeaux, une chaise commencée",
+   "tris": 4392
+  },
+  "farm_house": {
+   "footprint": [
+    9,
+    6
+   ],
+   "door_cell": 4,
+   "cut_walls": true,
+   "cut_nodes": [
+    "farm_house_roof",
+    "farm_house_upper"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "farmhouse_hall",
+      "x": [
+       -3.5,
+       3.5
+      ],
+      "z": [
+       -2.0,
+       2.0
+      ]
+     }
+    ]
+   },
+   "note": "façade au midi sur la cour (porte en case 4, x 0), le dos à la route; salle commune: cheminée au mur ouest, grande table et bancs; treille sur la façade, banc de pierre",
+   "tris": 6434
+  },
+  "farm_barn": {
+   "footprint": [
+    7,
+    7
+   ],
+   "door_cell": 3,
+   "note": "pignon sur la cour (porte de l'étable en case 3, x 0, porte coupée en deux); fenil au-dessus, sa porte ouverte sur le foin et sa potence; bardage de planches au pignon",
+   "tris": 3064
+  },
+  "washhouse": {
+   "footprint": [
+    5,
+    3
+   ],
+   "door_cell": 2,
+   "note": "mur haut au nord (porte de la carte, case 2), toit à un pan qui descend vers la rivière sur une sablière et deux poteaux; bassin au sud, pierres à laver au bord nord du bassin (on lave tourné vers la rivière et la caméra), trop-plein vers l'Aubrune",
+   "tris": 1758
+  },
+  "watermill": {
+   "footprint": [
+    7,
+    7
+   ],
+   "door_cell": 3,
+   "cut_walls": true,
+   "cut_nodes": [
+    "watermill_roof",
+    "watermill_upper"
+   ],
+   "interior": {
+    "floor_y": 0.12,
+    "rooms": [
+     {
+      "id": "mill_millstones",
+      "x": [
+       -2.5,
+       2.5
+      ],
+      "z": [
+       -2.5,
+       2.5
+      ]
+     }
+    ]
+   },
+   "note": "façade (porte, porte à sacs, potence) sur le pignon est de la carte; le mur gauche (-X) est le mur sud, le long du bief: l'axe de la roue (mill_wheel) y entre à 0,95 m; le rouet et la lanterne tournent dans la salle, contre ce mur (nœud mill_wheel)",
+   "tris": 6888
+  },
+  "mill_wheel": {
+   "footprint": [
+    2,
+    1
+   ],
+   "animation": "mill_wheel_turn",
+   "period_s": 8.0,
+   "gear_ratio": 3.0,
+   "note": "roue à aubes de 2,5 m, axe selon X du modèle, le moulin du côté +X: posée à la rotation 1 de la carte (comme le moulin), l'axe entre dans le mur sud et porte le rouet, qui mène la lanterne de l'arbre vertical dans la salle des meules. L'eau du bief (vers l'est de la carte, -Z du modèle) pousse le bas de la roue: mill_wheel_turn tourne dans ce sens (boucle de 8 s). Palier extérieur sur une pile de pierre de la rive sud du bief",
+   "tris": 1012
+  },
+  "sluice_footbridge": {
+   "footprint": [
+    2,
+    2
+   ],
+   "flow_axis": "x",
+   "walk_axis": "z",
+   "walk_height": 0.16,
+   "gate_lift": 0.5,
+   "note": "à poser à la rotation 0 (le bief coule d'ouest en est); vanne baissée au repos",
+   "tris": 816
+  },
+  "tailrace_planks": {
+   "footprint": [
+    2,
+    1
+   ],
+   "flow_axis": "z",
+   "walk_axis": "x",
+   "walk_height": 0.065,
+   "note": "à poser à la rotation 0 (le canal de fuite coule vers le sud)",
+   "tris": 272
+  }
+ },
+ "parts": {
+  "church": {
+   "church_floor": 208,
+   "church_interior": 3630,
+   "church_left_door": 108,
+   "church_right_door": 108,
+   "church_roof": 1764,
+   "church_wall_back": 1800,
+   "church_wall_front": 2492,
+   "church_wall_left": 4942,
+   "church_wall_right": 360
+  },
+  "presbytery_house": {
+   "presbytery_house_body": 3648,
+   "presbytery_house_roof": 1576
+  },
+  "village_house_a": {
+   "village_house_a_body": 2840,
+   "village_house_a_roof": 820
+  },
+  "village_house_a_shuttered": {
+   "village_house_a_shuttered_body": 1812,
+   "village_house_a_shuttered_roof": 820
+  },
+  "village_house_b": {
+   "village_house_b_body": 3256,
+   "village_house_b_roof": 820
+  },
+  "lineman_house": {
+   "lineman_house_body": 2468,
+   "lineman_house_roof": 960
+  },
+  "lineman_house_shuttered": {
+   "lineman_house_shuttered_body": 2332,
+   "lineman_house_shuttered_roof": 936
+  },
+  "forester_house": {
+   "forester_house_body": 2794,
+   "forester_house_roof": 868
+  },
+  "cafe_house": {
+   "cafe_house_door": 60,
+   "cafe_house_floor": 104,
+   "cafe_house_interior": 1556,
+   "cafe_house_roof": 1248,
+   "cafe_house_upper": 2690,
+   "cafe_house_wall_back": 1092,
+   "cafe_house_wall_front": 1352,
+   "cafe_house_wall_left": 60,
+   "cafe_house_wall_right": 252
+  },
+  "forge_shop": {
+   "forge_shop_attic": 28,
+   "forge_shop_door": 120,
+   "forge_shop_floor": 24,
+   "forge_shop_interior": 370,
+   "forge_shop_roof": 1052,
+   "forge_shop_wall_back": 428,
+   "forge_shop_wall_front": 922,
+   "forge_shop_wall_left": 312,
+   "forge_shop_wall_right": 180
+  },
+  "joinery_shop": {
+   "joinery_shop_attic": 732,
+   "joinery_shop_door": 60,
+   "joinery_shop_floor": 384,
+   "joinery_shop_interior": 344,
+   "joinery_shop_roof": 868,
+   "joinery_shop_wall_back": 660,
+   "joinery_shop_wall_front": 624,
+   "joinery_shop_wall_left": 540,
+   "joinery_shop_wall_right": 180
+  },
+  "farm_house": {
+   "farm_house_door": 60,
+   "farm_house_floor": 136,
+   "farm_house_interior": 466,
+   "farm_house_roof": 868,
+   "farm_house_upper": 1248,
+   "farm_house_wall_back": 1000,
+   "farm_house_wall_front": 1984,
+   "farm_house_wall_left": 420,
+   "farm_house_wall_right": 252
+  },
+  "farm_barn": {
+   "farm_barn_body": 2360,
+   "farm_barn_roof": 704
+  },
+  "washhouse": {
+   "washhouse_body": 1674,
+   "washhouse_roof": 84
+  },
+  "watermill": {
+   "watermill_door": 60,
+   "watermill_floor": 156,
+   "watermill_interior": 824,
+   "watermill_roof": 964,
+   "watermill_upper": 2412,
+   "watermill_wall_back": 540,
+   "watermill_wall_front": 1116,
+   "watermill_wall_left": 564,
+   "watermill_wall_right": 252
+  },
+  "mill_wheel": {
+   "mill_wheel_frame": 52,
+   "mill_wheel_lantern": 156,
+   "mill_wheel_rotor": 804
+  },
+  "sluice_footbridge": {
+   "sluice_footbridge_frame": 624,
+   "sluice_footbridge_gate": 192
+  },
+  "tailrace_planks": {}
+ },
+ "file_bytes": 5508976,
+ "animations": {
+  "mill_wheel": [
+   {
+    "name": "mill_wheel_turn",
+    "seconds": 8.0,
+    "loop": true
+   }
+  ]
+ }
+}

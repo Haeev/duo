@@ -5,7 +5,7 @@ const path = require('path');
 const validator = require('gltf-validator');
 
 const dossier = path.join(__dirname, '..', '..', '..', 'assets', 'modeles');
-const noms = process.argv.slice(2).length ? process.argv.slice(2) : ['bourg', 'ferme', 'maison', 'personnages', 'train', 'faune', 'poissons', 'elevage', 'marche'];
+const noms = process.argv.slice(2).length ? process.argv.slice(2) : ['bourg', 'ferme', 'maison', 'personnages', 'train', 'faune', 'poissons', 'elevage', 'marche', 'village013'];
 
 (async () => {
   let erreurs = 0;

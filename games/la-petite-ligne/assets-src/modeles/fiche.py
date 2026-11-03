@@ -16,7 +16,7 @@ def ko(n):
 def index():
     """Écrit assets/modeles/index.json: nœud racine -> fichier, emprise, triangles."""
     out = {}
-    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013", "village013"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         if f == "personnages":
             for k, v in st["meshes"].items():
@@ -39,7 +39,7 @@ def index():
 
 
 def main():
-    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013", "village013"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         taille = os.path.getsize(os.path.join(SORTIE, f + ".glb"))
         print(f"\n### `{f}.glb` ({ko(taille)})\n")
@@ -59,7 +59,8 @@ def main():
             ex = ", ".join(f"{kk}: {json.dumps(vv, ensure_ascii=False)}" for kk, vv in extra.items())
             print(f"| `{k}` | {fp} | {v['tris']} | {ex} |")
         if isinstance(st.get("animations"), dict):
-            print("\n| Bête | Animation | Durée (s) | Boucle |\n|---|---|---|---|")
+            col = "Nœud" if f == "village013" else "Bête"
+            print(f"\n| {col} | Animation | Durée (s) | Boucle |\n|---|---|---|---|")
             for beast, clips in st["animations"].items():
                 for a in clips:
                     print(f"| `{beast}` | `{a['name']}` | {a['seconds']} | {'oui' if a['loop'] else 'non (jouer une fois)'} |")

@@ -186,3 +186,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Cases `soil_wet*` brillantes (rugosité 0,32): sur un tas (fumier) une facette renvoie un reflet blanc. Prendre des cases mates.
 - `planche_*.py`: appeler `view_layer.update()` avant de cadrer sur les `bound_box` des copies (sinon cadrage faux). Planche 2200 x 1200 à 10 échantillons: environ 3 min ici; bosquet 1366 x 768: 1 min la vue.
 - Le scratchpad partagé a vu un de mes scripts de patch (`p2.py`) remplacé par une autre session: toujours un sous-dossier à soi, dès le premier fichier.
+## Village de la 0.13 (village_013.py, vérifié le 2026-11-03)
+
+- `interieurs.pierced_wall` ne gère pas deux ouvertures superposées dans une même travée (porte sous une baie de clocher, meurtrière sous le beffroi): il laisse des fentes noires de toute la hauteur. `village_013.pierced_wall` les accepte (bandes pleines entre elles); une ouverture qui dépasse la longueur du mur déborde dans l'angle.
+- Étage d'un bâtiment coupé en nœuds: les chaînes d'angle de l'étage partent de `h1` (`quoins_side(..., z0=h1)`), sinon elles doublent celles du rez-de-chaussée (z-fighting et 1 000 triangles perdus). Chaîne d'angle: seule l'arête d'angle chanfreinée (20 triangles au lieu de 28); c'est le premier poste de triangles d'un bâtiment de pierre.
+- Vantail à droite (gond sur le jambage droit vu de dehors): le rendu tourne toujours de +80 degrés autour de Y glTF. Modeler le vantail tête en bas (z négatif) et tourner le nœud de 180 degrés autour de Y Blender: il s'ouvre alors vers l'intérieur. Contrôle sans Blender: `verifier/vantaux_013.py`.
+- Planche d'un intérieur: couper les murs qui regardent la caméra par défaut du monde, ramenée dans le repère du modèle (azimut 45 - 90 x rotation de la carte): pour une rotation 1, murs avant et gauche.
+- Décor sous une rive: mesurer la rive (à 0,3 m du mur, un toit à 45 degrés descend déjà de 0,3 m plus l'épaisseur): une glycine à 2,7 m sous un égout à 3 m traversait le toit.
+- Le scratchpad est partagé: un `p2.py` d'une autre session existait. Travailler dans `scratchpad/a3d013/` (ou un dossier à soi).
+- Plafonds de la 0.13 (carte 11.3, jusqu'à 1,5 fois): compter les nœuds hors `_interior` (le contenu n'est dessiné que dedans); ce qui est accroché aux murs (bouteilles, vaisselier) compte dehors, car le mur est toujours dessiné.
