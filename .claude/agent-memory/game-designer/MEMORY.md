@@ -200,3 +200,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Rendre visible un besoin caché sans le durcir: garder le plancher de nuit actuel et faire compter double le souper; sinon une baisse par heure fait chuter les valeurs de nuit sous la règle en place (premier jet du tour 10: souper simple à 30 au lieu de 60).
 - Dans une simulation d'achats, l'ordre des priorités du duo décide de tout: avec la chambre après les chantiers du bourg, elle n'arrive jamais avant le jour 64. Toujours simuler au moins deux ordres de priorité.
 - Noms d'états de besoins: « Rassasié », « Plein d'élan », « calé » s'accordent au joueur; écrire des noms (« Ventre plein », « Pleine énergie », « Petit creux », « Envie de compagnie »).
+
+## Économie et monnaie (vérifié le 2026-11-03, conception 0.12)
+
+- Renommer la monnaie « sou »: « sous » est aussi la préposition (« sous la pluie »). Ne remplacer que `[0-9}] sous`, les nombres en lettres et les tournures monétaires relues une à une; compter les prépositions avant et après.
+- Les données disent « le garde-barrière » (masculin) pour l'ancien occupant de la maisonnette, sans nom: ne pas lui inventer un nom ni un genre contraire.
+- Habitants: `habitants.json` n'a pas de goûts (`likes`) en données; les goûts sont dans les fiches de conception (tour 10, 1.4).
+- Dans une simulation d'achats, laisser plusieurs achats par jour: un seul achat par jour fait gonfler la bourse artificiellement (premier jet de `v0_12_economie.py`).
+- Un duo médian achète tout ce qui est en vente vers le jour 50 à 57 même avec 16 000 aubrins de puits: après le jour 50, seul du contenu nouveau redonne un but à l'argent.
