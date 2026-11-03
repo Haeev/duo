@@ -225,3 +225,12 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Script `simulations/v0_13_habitants.py`: plannings en données Python, contrôle de couverture minute par minute, export JSON, relecture du document (`--croise`). Sans cache, `entry_at` rend la simulation 10 fois trop lente: cache par (habitant, jour de semaine, saison, temps, jours spéciaux, drapeaux, minute). Environ 10 minutes quand la machine est chargée: lancer en arrière-plan.
 - Les textes des objectifs de quête sont des textes du jeu: y bannir « tous les deux » et « chacun » (écrire « à deux », « chaque joueur »), comme dans les répliques.
 - La démo affirme « il n'y a pas de chat au bourg » (`odette_after_gift`): tout chat ajouté doit conditionner cette réplique.
+
+## Données des habitants 0.13 (lot H4, vérifié le 2026-11-03)
+
+- `habitants-0-13.json` se fusionne par identifiant avec `habitants.json` (README 2.12 du dev): sortes d'habitudes en anglais dans les données (`routine`, `home`, `rain`, `season`, `day`, `after_quest`, `market`, `birthday`), le document garde les noms français; le lecteur ignore les champs qu'il ne connaît pas (`age`, `tastes`...).
+- Le code fait de chaque `reveals[]` à `by` une réplique de `by` (identifiant réservé `habit_<habitant>_<habitude>_<rang>`), sans condition: une rumeur sur une habitude née d'un drapeau ou d'une décision serait dite trop tôt. Le signaler à chaque nouvelle habitude conditionnée.
+- `--croise FICHIER.json` relit les données contre le script; `--maj FICHIER.json` y reporte plannings et habitudes sans toucher aux textes.
+- Le validateur avertit de « toutes les deux » même pour deux habitantes (« Nous le savons, elle et moi »), et le script refuse « chacun » même pour des dahlias: écrire « par pied », « l'un et l'autre ».
+- Garde de l'arbre isolé: une commande avec une variable shell en argument de `python3` est refusée; écrire le chemin en entier.
+- Le nom de l'église est Saint-Aubin (carte, Q4); une affiche « Notre-Dame-du-Gué » avait glissé dans les écriteaux.
