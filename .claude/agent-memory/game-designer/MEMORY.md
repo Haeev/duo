@@ -208,3 +208,10 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - La partie s'arrête au jour 64 à 16 h (premier jour de l'hiver): tout contenu d'hiver est injouable tant que la limite ne bouge pas.
 - `fishCost` des commandes se rapporte à la saison de référence: un poisson absent de cette saison aurait un coût nul. Avec beaucoup d'espèces, la part de chacune chute (goujon de 54 % à 10 %): revoir minimums, plafonds et ressource rivière des commandes.
 - R10 sur une collection à épiques saisonniers: le coup de pouce par espèce (x8) ne suffit pas, il faut aussi un bonus sur la rareté quand un épique possible ici manque (x1,5). Mesurer sur 400 duos: à 100, le 90e centile bruite de plusieurs heures.
+## Économie et monnaie (vérifié le 2026-11-03, conception 0.12)
+
+- Renommer la monnaie « sou »: « sous » est aussi la préposition (« sous la pluie »). Ne remplacer que `[0-9}] sous`, les nombres en lettres et les tournures monétaires relues une à une; compter les prépositions avant et après.
+- Les données disent « le garde-barrière » (masculin) pour l'ancien occupant de la maisonnette, sans nom: ne pas lui inventer un nom ni un genre contraire.
+- Habitants: `habitants.json` n'a pas de goûts (`likes`) en données; les goûts sont dans les fiches de conception (tour 10, 1.4).
+- Dans une simulation d'achats, laisser plusieurs achats par jour: un seul achat par jour fait gonfler la bourse artificiellement (premier jet de `v0_12_economie.py`).
+- Un duo médian achète tout ce qui est en vente vers le jour 50 à 57 même avec 16 000 aubrins de puits: après le jour 50, seul du contenu nouveau redonne un but à l'argent.
