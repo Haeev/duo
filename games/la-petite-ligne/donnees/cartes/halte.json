@@ -584,7 +584,8 @@
     {"id": "bush_102", "type": "bush", "x": 88.5, "y": 47.5, "rotation": 0, "rect": {"x": 88, "y": 47, "w": 1, "h": 1}},
     {"id": "bush_103", "type": "bush", "x": 91.5, "y": 47.5, "rotation": 0, "rect": {"x": 91, "y": 47, "w": 1, "h": 1}},
     {"id": "bush_104", "type": "bush", "x": 94.5, "y": 47.5, "rotation": 0, "rect": {"x": 94, "y": 47, "w": 1, "h": 1}},
-    {"id": "bush_105", "type": "bush", "x": 97.5, "y": 47.5, "rotation": 0, "rect": {"x": 97, "y": 47, "w": 1, "h": 1}}
+    {"id": "bush_105", "type": "bush", "x": 97.5, "y": 47.5, "rotation": 0, "rect": {"x": 97, "y": 47, "w": 1, "h": 1}},
+    {"id": "bush_106", "type": "bush", "x": 16.5, "y": 36.5, "rotation": 0, "rect": {"x": 16, "y": 36, "w": 1, "h": 1}}
   ],
   "points": [
     {"id": "train_stop", "x": 38.5, "y": 17.5, "role": "porte de la voiture: Firmin y attend le train, les joueurs y apparaissent", "rotation": 2, "rayon": 2.5, "important": true},
@@ -740,7 +741,9 @@
     {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 50.915, "y": 4.996, "z": 2.67, "regarde": "est", "role": "chicot de 0,6 m sur la face nord-est du chêne, sous le houppier, au-dessus du nichoir (il entre dans l'écorce vers 2,3 m, 7 cm au nord du nichoir penché): perchoir des mésanges"},
     {"id": "kingfisher_post", "modele": "mooring_post", "sur": "pontoon", "x": 46.1, "y": 39.9, "z": 1.11, "echelle": 1.168, "role": "pieu d'amarrage dans l'eau au coin est du bout du ponton, sommet 0,45 m au-dessus du plancher (1,11 m au-dessus de l'eau)"},
     {"id": "level_crossing_crank_n", "modele": "level_crossing_crank", "sur": "level_crossing_gate_north", "x": 16.3, "y": 11.5, "z": 1.0, "regarde": "ouest", "role": "manivelle de la barrière nord, face ouest du poteau (16,5 ; 11,5), vers la place `gate_north_crank`"},
-    {"id": "level_crossing_crank_s", "modele": "level_crossing_crank", "sur": "level_crossing_gate_south", "x": 20.7, "y": 15.5, "z": 1.0, "regarde": "est", "role": "manivelle de la barrière sud, face est du poteau (20,5 ; 15,5), vers la place `gate_south_crank`"}
+    {"id": "level_crossing_crank_s", "modele": "level_crossing_crank", "sur": "level_crossing_gate_south", "x": 20.7, "y": 15.5, "z": 1.0, "regarde": "est", "role": "manivelle de la barrière sud, face est du poteau (20,5 ; 15,5), vers la place `gate_south_crank`"},
+    {"id": "fence_end_post_01", "modele": "fence_post", "sur": "fence_14", "x": 16.0, "y": 36.5, "z": 0.0, "role": "poteau qui porte le bout des lisses de `fence_14` (une barrière finit sur un poteau)"},
+    {"id": "fence_end_post_02", "modele": "fence_post", "sur": "fence_15", "x": 16.5, "y": 32.0, "z": 0.0, "role": "poteau qui porte le bout des lisses de `fence_15` (une barrière finit sur un poteau)"}
   ],
   "sieges": [
     {"id": "pontoon_edge", "x": 45.0, "y": 39.8, "rotation": 0, "places": ["pontoon_seat_west", "pontoon_seat_east"], "role": "le bord du ponton (étoiles de l'Aubrune): deux places tournées vers le sud, assis à 0,5 m, jambes au-dessus de l'eau; on se relève vers le nord, sur le plancher"}
@@ -954,7 +957,7 @@
       "##.#............#.....#..........................#............###.....#...........#...............##",
       "##..............#.........................................................................#.......##",
       "##..............#.................................................................................##",
-      "################......#....##.........#...................#....##.##..............................##",
+      "#################.....#....##.........#...................#....##.##..............................##",
       "##.............................................................##.................................##",
       "##......########.....######........#########..########........###################........###########",
       "################.....#######################..######################################################",

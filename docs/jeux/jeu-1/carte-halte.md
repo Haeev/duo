@@ -294,6 +294,8 @@ Hauteurs au faîtage et toits des bâtiments du tour 10 (contrôle de la caméra
 
 Décor: lampadaires, bancs de la place et des berges, tonneaux, boîte aux lettres, panneau « Aubrune » (facultatif), tas de bois, clôture du jardin, buissons, rochers, arbres (dont 12 à couper). Le détail est dans le fichier.
 
+Clôture du jardin (retours du 2026-11-02, S08): chaque file finit sur un poteau. Le segment `fence` ne porte qu'un poteau (à son bout ouest en rotation 0, sud en rotation 1); le constructeur pose le poteau qui manque au bout de chaque file (accroche `fence_post`, sans emprise) et `valider_carte.py` refuse toute lisse qui finit dans le vide. Le long de la rivière, la file va de x 2 à 16 (poteau final en 16 ; 36,5); le long de la route du gué, de y 32 à 36. Les deux lignes passent au milieu des cases et ne peuvent pas se rejoindre en angle: un buisson (`bush_106`, case 16 ; 36) ferme le coin au lieu du faux passage d'avant, qui ne menait nulle part. Seule ouverture: la case (16 ; 31), entre le poteau nord (16,5 ; 32) et l'enclos du poulailler, un vrai passage de la route du gué à la porte du poulailler (`chicken_coop`).
+
 ### Points
 
 | Point | x, y | Rôle |

@@ -28,7 +28,7 @@ ICI = Path(__file__).resolve().parent
 SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
 
 sys.path.insert(0, str(ICI))
-from valider_carte import calculer_infranchissable, emprise_monde, ouvertures  # noqa: E402
+from valider_carte import calculer_infranchissable, emprise_monde, ouvertures, poteaux_de_cloture  # noqa: E402
 
 LARGEUR, HAUTEUR = 100, 48
 # Le ru de la Côte (tour 10): deux colonnes d'eau vive qui bornent le bourg ancien et la rue Haute.
@@ -624,6 +624,20 @@ def construire_objets_est() -> None:
         objet(t, x, 0 if bruit(x, 1, 8) < 50 else 1)
     for x in range(64, LARGEUR, 3):
         objet("bush", x, 47)
+    # Retours du 2026-11-02 (S08): le coin sud-est du jardin du garde-barrière. Les lignes des deux
+    # clôtures passent au milieu des cases (y 36,5 et x 16,5): elles ne se rejoignent jamais en un angle.
+    # Chacune finit sur son poteau (16 ; 36,5) et (16,5 ; 36), et un buisson ferme l'angle entre les
+    # deux, au lieu d'un faux passage qui ne menait nulle part. Posé ici, en dernier, pour ne décaler
+    # aucun identifiant `bush_NN` cité ailleurs (`bush_106`, buisson rond).
+    objet("bush", 16, 36)
+
+
+def accroches_poteaux_finaux() -> list[dict]:
+    """Un poteau (`fence_post`, accroche sans emprise) au bout de chaque file de clôture qui n'en a pas."""
+    _, sans = poteaux_de_cloture(OBJETS)
+    return [{"id": f"fence_end_post_{n:02d}", "modele": "fence_post", "sur": seg, "x": x, "y": y, "z": 0.0,
+             "role": f"poteau qui porte le bout des lisses de `{seg}` (une barrière finit sur un poteau)"}
+            for n, (seg, (x, y)) in enumerate(sorted(sans, key=lambda e: e[0]), start=1)]
 
 
 # ---------------------------------------------------------------------------
@@ -1339,7 +1353,7 @@ def main() -> int:
         "interieurs": INTERIEURS,
         "ru": RU,
         "ouvrages": OUVRAGES,
-        "accroches": ACCROCHES,
+        "accroches": ACCROCHES + accroches_poteaux_finaux(),
         "sieges": SIEGES,
         "chantiers": CHANTIERS,
         "habitants": HABITANTS,
