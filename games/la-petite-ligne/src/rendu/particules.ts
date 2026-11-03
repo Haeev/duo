@@ -36,6 +36,7 @@ import {
   type Texture,
 } from 'three';
 import type { ResourceTracker } from './ressources';
+import { SHELTER_SLOTS } from './abri';
 
 /** Formes dessinées par le shader de fragment. */
 export const PARTICLE_SHAPE = {
@@ -77,6 +78,8 @@ uniform vec4 uGroupAlpha; // nuages, brume, halos, nappe de la brume du matin
 uniform vec2 uCloudFade;  // rayon (écran) où les nuages sont invisibles, puis pleins
 uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra
 uniform float uGroundFade; // hauteur (m) au-dessus du sol sur laquelle un sprite fondu apparaît
+uniform vec4 uShelters[${SHELTER_SLOTS}]; // abri du joueur local (abri.ts): x, z minimaux puis maximaux
+uniform int uShelterCount;
 
 attribute vec4 aOrigin;   // position, naissance (bouffées) ou phase
 attribute vec4 aVelocity; // vitesse, durée de vie
@@ -108,6 +111,16 @@ float ambGround(vec4 field) {
 /** Enroule x autour de c dans une fenêtre de demi-côté h (la pluie reste fixe dans le monde). */
 float ambWrap(float x, float c, float h) {
   return c - h + mod(x - (c - h), 2.0 * h);
+}
+
+/** Vrai si le point du sol est dans l'abri du joueur local (pas de pluie sur la pièce). */
+bool ambSheltered(vec2 xz) {
+  for (int i = 0; i < ${SHELTER_SLOTS}; i++) {
+    if (i >= uShelterCount) break;
+    vec4 r = uShelters[i];
+    if (xz.x > r.x && xz.y > r.y && xz.x < r.z && xz.y < r.w) return true;
+  }
+  return false;
 }
 
 void hideInstance() {
@@ -162,6 +175,12 @@ void main() {
       vec4 field = ambField(xz);
       if (field.b > 0.5) { hideInstance(); return; }
       centre = vec3(xz.x, ambGround(field) + drop, xz.y);
+      // Vu de dedans, une goutte qui passe devant la pièce coupée se lirait comme de la pluie
+      // dans la pièce: on la cache si elle est au-dessus de l'abri ou si elle le masque à l'écran
+      // (projetée au sol le long du regard).
+      vec3 toCamera = vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]);
+      vec2 seen = xz - toCamera.xz * (drop / max(toCamera.y, 0.05));
+      if (ambSheltered(xz) || ambSheltered(seen)) { hideInstance(); return; }
       axis = normalize(uFall);
       size = uRainShape.y;
       vAge = phase;
@@ -172,7 +191,7 @@ void main() {
       uint id = uint(gl_InstanceID);
       vec2 xz = uFocus.xz + (vec2(ambRandom(n, id), ambRandom(n, id + 7919u)) * 2.0 - 1.0) * h;
       vec4 field = ambField(xz);
-      if (field.b > 0.5) { hideInstance(); return; }
+      if (field.b > 0.5 || ambSheltered(xz)) { hideInstance(); return; }
       float t = fract(cycle);
       bool water = field.a > 0.5;
       centre = vec3(xz.x, ambGround(field) + 0.03, xz.y);
@@ -318,6 +337,8 @@ export interface ParticleUniforms {
   uShadeColor: IUniform<Color>;
   uSelfLight: IUniform<Vector4>;
   uGroundFade: IUniform<number>;
+  uShelters: IUniform<Vector4[]>;
+  uShelterCount: IUniform<number>;
 }
 
 /** Matériau des particules dans un mode donné. Tous partagent le même programme. */
@@ -345,6 +366,8 @@ export function createParticleMaterial(
     uShadeColor: { value: new Color(1, 1, 1) },
     uSelfLight: { value: new Vector4(1, 1, 1, 0) },
     uGroundFade: { value: 0.25 },
+    uShelters: { value: Array.from({ length: SHELTER_SLOTS }, () => new Vector4()) },
+    uShelterCount: { value: 0 },
   };
   const material = new ShaderMaterial({
     name: 'lpl_ambiance',

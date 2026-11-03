@@ -90,6 +90,18 @@ describe('pied des murs coupés (R12)', () => {
     expect(Math.max(...points(low).map((p) => p.z))).toBeLessThanOrEqual(0.2 + 0.011);
   });
 
+  it('un étal accroché à la façade, plus haut que la coupe, ne laisse aucune plaque écrasée devant le pied (S02)', () => {
+    // Étal de l'épicerie: caisson de 0,86 m devant la façade (z = 0,2), plateau et cagette au-dessus.
+    const stall = new BoxGeometry(2, 0.86, 0.5).translate(-0.9, 0.43, 0.47);
+    const shelf = new BoxGeometry(2, 0.06, 0.6).translate(-0.9, 0.92, 0.5);
+    const wall = mergeGeometries([wallWithDoor(), stall, shelf]);
+    const low = lowWallGeometry(wall, new Matrix4(), HEIGHT) ?? new BufferGeometry();
+    // Le dessous du caisson, posé au sol, reste (il est tout entier sous la coupe et ne se voit pas).
+    const raised = points(low).filter((p) => p.y > 0.01);
+    expect(Math.max(...raised.map((p) => p.z))).toBeLessThanOrEqual(0.2 + 0.011);
+    expect(Math.max(...raised.map((p) => p.y))).toBeLessThanOrEqual(HEIGHT + 0.004);
+  });
+
   it('dalle pleine (porte peinte sur la façade): la baie est ouverte jusqu’au seuil, entre deux jambages', () => {
     const slab = new BoxGeometry(4, 2.4, 0.4).translate(0, 1.2, 0);
     const sill = 0.17;

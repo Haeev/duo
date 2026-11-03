@@ -584,6 +584,13 @@ export const AMBIANCE_SETTINGS = {
     splashRadius: 0.16,
     rippleRadius: 0.42,
     splashOpacity: 0.5,
+    /**
+     * Abri du joueur local (`abri.ts`): sous cette hauteur au-dessus du sol (m), la pièce où il
+     * se trouve reste sèche (plafond des intérieurs, sous le toit et l'étage).
+     */
+    shelterCeiling: 2.4,
+    /** Relecture de l'abri (s), en plus de chaque entrée ou sortie: un toit posé pendant qu'on est dedans. */
+    shelterRefreshSeconds: 1,
   },
 
   /** Panache de la locomotive et petites particules du potager (GPU, une seule passe). */

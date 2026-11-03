@@ -286,3 +286,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
 - Outil isolé: une boucle `for` avec `sed -n "${a},${b}p"` est refusée; un heredoc qui écrit dans `/tmp` aussi. Écrire le script avec Write, puis `python3 /tmp/<moi>/script.py` depuis le dossier du jeu.
 - `valider_donnees.py`: les drapeaux posés par le code (et non par un effet) vont dans `FLAGS_SET_BY_CODE`, sinon un avertissement.
+
+## Défauts de rendu du patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Pied des murs coupés (`coupe-murs.ts`): tout enfant du nœud de mur passe dans le pied (étal, cagettes de l'épicerie). Une face qui traverse la coupe est écrasée à la hauteur de coupe: une pièce accrochée à la façade devenait une plaque grise posée à plat. La section se calcule sur la seule maçonnerie (faces qui montent à plus de 1 m au-dessus de la coupe), et les faces qui traversent la coupe y sont rognées.
+- Trou de visibilité: son bord en trame de Bayer, posé sur un objet bas (rail, lisse de barrière), se lit comme « l'ombre du personnage en tache tramée ». Hauteur minimale par trou (`uCutDepths.w`): 1 m pour les personnages, 0,45 m pour les lieux des moments.
+- PCF de Three.js 0.187: rotation des 5 échantillons par bruit IGN par pixel, trame visible sur les ombres fines. `ShaderChunk.shadowmap_pars_fragment` modifié une fois avant toute compilation (`stabilizeShadowFilter` de `lumiere.ts`), aucun programme de plus.
+- Pluie vue de dedans: le champ du terrain (canal B) ne connaît que l'emprise des bâtiments de la carte, et les gouttes devant la pièce coupée se lisent comme de la pluie dedans. Abri du joueur local (`abri.ts`) lu par la pluie (goutte projetée au sol le long du regard) et par le sol mouillé des surfaces.
+- Objet sous un pixel de la page de démonstration: exposer le moteur un temps (`window.__engineDebug = engine`, à retirer), puis `engine.rig.ray(ndcX, ndcY).intersectObject(engine.scene, true)` en filtrant les ancêtres invisibles. Le pied de mur se reconnaît à son nom (`…_wall_front_pied`).
+- Captures avant et après sans second arbre: copier ses fichiers modifiés dans le scratchpad, écrire ceux de `HEAD` (`git show HEAD:<chemin> > <chemin>`), capturer, recopier (script `bascule.sh`). Vite recharge seul.
+- Caméra tournée (`orientation=`) en rendu logiciel: la rotation dure plusieurs images; attendre une dizaine d'images (`frames`) avant la capture, sinon le cadrage change d'une capture à l'autre.
+- Reconstruire `bourg.glb` seul: `LPL_SANS_PLANCHES=1 duo-python bourg.py`, puis dedup, weld, prune de gltf-transform comme `construire.sh` (1 min). Les octets changent à chaque construction (ordre des index) même sans modification du script.
+- Ombre « sans objet » devant la porte de la maisonnette: c'est celle de l'auvent (`door_canopy`), hors du cadre dans une capture serrée. La couverture s'arrêtait à 0,22 m du mur: un jour de lumière entre le mur et l'ombre.
