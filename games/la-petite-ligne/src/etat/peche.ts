@@ -39,19 +39,22 @@ export interface FishShadow {
   pos: Vec2;
   /** Rayon (m) du disque autour de `pos` où le rendu la fait nager; 0 sous un bouchon. */
   roam: number;
-  /** Cap au repos (radians, convention de `facing`: 0 vers l'est, PI/2 vers le sud). */
+  /** Cap au repos (radians, convention de `facing`: 0 vers l'est, PI/2 vers le sud), au millième. */
   heading: number;
-  /** Déplacement en cours, en ligne droite de `from` à `pos`, du pas `since` au pas `until`. */
-  move: { from: Vec2; since: number; until: number } | null;
+  /**
+   * Déplacement en cours, en ligne droite de `from` à `pos`, du pas `since` au pas `until`.
+   * Absent sans déplacement (0.12.1, taille de l'état transmis: plutôt que `null`).
+   */
+  move?: { from: Vec2; since: number; until: number };
   state: ShadowState;
-  /** Ligne qui la réserve (`approach`, `under`), sinon `null`. */
-  line: CharacterId | null;
+  /** Ligne qui la réserve (`approach`, `under`); absente sinon. */
+  line?: CharacterId;
   /** Pas d'apparition: fondu d'entrée de `fadeSeconds` à partir de là. */
   born: number;
   /** `free`: fin de vie prévue; `leaving` et `fleeing`: pas où elle a fini de s'effacer. */
   ends: number;
-  /** Mythique: seuls les guetteurs la voient (section 7.2). */
-  watchOnly: boolean;
+  /** Mythique: seuls les guetteurs la voient (section 7.2). Absent: visible de tous. */
+  watchOnly?: true;
 }
 
 /** Guet d'un joueur (section 7.2): immobile au bord depuis `since`; `active` après `stillSeconds`. */
@@ -136,7 +139,7 @@ export function emptyFishing(): FishingState {
 /** Position de l'ancre d'une ombre au pas `tick` (fractionnaire pour l'interpolation du rendu). */
 export function shadowPosAt(shadow: Readonly<Pick<FishShadow, 'pos' | 'move'>>, tick: number, out: Vec2 = { x: 0, y: 0 }): Vec2 {
   const m = shadow.move;
-  if (m === null || tick >= m.until || m.until <= m.since) {
+  if (m === undefined || tick >= m.until || m.until <= m.since) {
     out.x = shadow.pos.x;
     out.y = shadow.pos.y;
     return out;
@@ -149,7 +152,7 @@ export function shadowPosAt(shadow: Readonly<Pick<FishShadow, 'pos' | 'move'>>, 
 
 /** Le joueur voit-il cette ombre ? Les mythiques ne se montrent qu'à un guetteur. */
 export function shadowVisibleTo(fishing: Readonly<Pick<FishingState, 'watch'>>, shadow: Readonly<Pick<FishShadow, 'watchOnly'>>, viewer: CharacterId): boolean {
-  return !shadow.watchOnly || fishing.watch[viewer]?.active === true;
+  return shadow.watchOnly !== true || fishing.watch[viewer]?.active === true;
 }
 
 /** Le joueur fait-il le guet (éclats des rares et plus, lueur des mythiques) ? */

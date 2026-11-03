@@ -714,7 +714,7 @@ export class Hud {
       clear(this.tip);
       const vars = { ...contentVars(ctx.content, null, ctx.texts.orderFormat), ...keyTokens(ctx.key) };
       this.tip.append(typographier(fill(hint.text, vars)));
-      if (hint.hint !== null) this.host.send({ type: 'hint_seen', hint: hint.hint });
+      if (hint.hint !== undefined) this.host.send({ type: 'hint_seen', hint: hint.hint });
     }
     setHidden(this.tip, now >= this.tipUntil);
 

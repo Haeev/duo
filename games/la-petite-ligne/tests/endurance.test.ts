@@ -26,6 +26,8 @@ const MAX_STATE_BYTES = 64 * 1024;
 // avec l'architecte (le gros de l'état: `counters` et `countersAtDawn`, 7 Kio à eux deux).
 // Tour 9: relevé de 34 à 35 Kio (tableau, chantiers, catalogue de la semaine: environ 0,5 Kio de
 // champs vides dès le jour 1); plafond dur de 64 Kio inchangé.
+// 0.12.1: seuil gardé à 35 Kio; le format 13 n'écrit plus les valeurs par défaut (de 36 969 à
+// 39 424 octets en 0.12.0, 32 395 à 34 270 en 0.12.1 sur les dix graines de ce fichier).
 const ALERT_STATE_BYTES = 35 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
@@ -149,7 +151,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
-  expect(run.maxBytes, `état transmis sous 32 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
+  expect(run.maxBytes, `état transmis sous 35 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
   expectMomentsAndSecrets(sim);
 }

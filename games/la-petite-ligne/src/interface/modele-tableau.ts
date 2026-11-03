@@ -7,6 +7,7 @@
  * sont recalculés comme dans `simulation/chantiers.ts` (`openImprovement`,
  * `improvementRemaining`), avec un test d'égalité.
  */
+import { questBaselines } from '../etat/quete';
 import { onSale } from '../donnees/commandes';
 import { queueOpen } from '../etat/files-chantiers';
 import { rawText } from '../donnees/contenu';
@@ -258,7 +259,7 @@ export function annonceModel(
     const given =
       quest === undefined
         ? 0
-        : (world.counters.duo[key] ?? 0) - (quest.baselines[`duo:${key}`] ?? 0);
+        : (world.counters.duo[key] ?? 0) - (questBaselines(quest)[`duo:${key}`] ?? 0);
     const have = giveDone ? l.count : Math.max(0, Math.min(l.count, given));
     return {
       item: l.item,

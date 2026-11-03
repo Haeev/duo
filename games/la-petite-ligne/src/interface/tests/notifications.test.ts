@@ -4,7 +4,7 @@ import { dedupeToasts, messageKeyOf, toastVisual, visibleToasts } from '../notif
 import { contentAndMap } from './aides';
 
 function note(text: string, key: string | null = null, kind: GameNotification['kind'] = 'message'): GameNotification {
-  return { id: 1, kind, text, hint: null, proposal: null, key, tick: 0 };
+  return { id: 1, kind, text, key, tick: 0 };
 }
 
 describe('notifications', () => {

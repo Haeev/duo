@@ -14,12 +14,23 @@ import { POINT } from './ids';
 import { queueOpen } from '../etat/files-chantiers';
 import { confirmOrder, isRoomOrder, morningRooms, orderAtBasile, roomName } from './pieces';
 
-export function emptyImprovements(sim: Pick<Sim, 'content'>): Record<string, ImprovementState> {
-  const out: Record<string, ImprovementState> = {};
-  for (const x of sim.content.improvements) out[x.id] = { paid: 0, planks: 0, funded: false, builtDay: null };
-  return out;
+/**
+ * Chantiers au départ: aucune entrée. Format 13 (taille de l'état transmis): un chantier qui n'a
+ * encore rien reçu n'est pas écrit; `improvementView` le lit à zéro, `improvementState` l'ajoute
+ * au premier versement.
+ */
+export function emptyImprovements(): Record<string, ImprovementState> {
+  return {};
 }
 
+const UNTOUCHED: Readonly<ImprovementState> = Object.freeze({ paid: 0, planks: 0, funded: false, builtDay: null });
+
+/** Lecture seule: l'état du chantier, à zéro s'il n'a encore rien reçu (rien n'est ajouté). */
+export function improvementView(sim: Pick<Sim, 'world'>, id: string): Readonly<ImprovementState> {
+  return sim.world.improvements[id] ?? UNTOUCHED;
+}
+
+/** L'état du chantier à modifier (ajouté à zéro s'il n'existait pas). */
 export function improvementState(sim: Sim, id: string): ImprovementState {
   let state = sim.world.improvements[id];
   if (state === undefined) {
@@ -43,7 +54,7 @@ export function improvementName(sim: Sim, id: string): string {
 /** Prix restant: prix, moins ce qui est versé, moins les planches apportées. */
 export function improvementRemaining(sim: Sim, def: ImprovementDef): number {
   const s = sim.content.settings.improvements;
-  const state = improvementState(sim, def.id);
+  const state = improvementView(sim, def.id);
   return Math.max(0, def.price - state.paid - state.planks * (s?.plankDiscount ?? 0));
 }
 
@@ -156,8 +167,8 @@ export function creditImprovement(sim: Sim, c: Character, id: string, sum: numbe
 }
 
 function settleFunded(sim: Sim, def: ImprovementDef): void {
+  if (improvementView(sim, def.id).funded || improvementRemaining(sim, def) > 0) return;
   const state = improvementState(sim, def.id);
-  if (state.funded || improvementRemaining(sim, def) > 0) return;
   state.funded = true;
   say(sim, 'both', 'improvement_funded', { name: improvementName(sim, def.id) });
   emit(sim, { type: 'improvement_funded', improvement: def.id });

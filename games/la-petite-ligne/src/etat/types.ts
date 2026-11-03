@@ -519,7 +519,7 @@ export interface Character {
   hintQueue: HintId[];
   /** Tick de la dernière astuce montrée. */
   lastHintTick: number;
-  /** Secondes passées d'affilée près de chaque point suivi (envies « rester à »). */
+  /** Secondes passées d'affilée près de chaque point suivi (envies « rester à »); absent: 0 (format 13). */
   stays: Record<PointId, number>;
   /** Dernier plat mangé ce soir (repas pris ensemble). */
   lastMeal: { item: ItemId; tick: number } | null;
@@ -1262,15 +1262,27 @@ export interface OrderBook {
 // ---------------------------------------------------------------------------
 // Quêtes, courrier, notifications
 
+/** Un sous-objectif d'étape (condition munie d'un `label`). */
+export interface QuestChecklistItem {
+  label: string;
+  done: boolean;
+}
+
 export interface QuestState {
   id: QuestId;
   status: 'active' | 'done';
   /** Étape en cours (index dans `quetes.json`); égal au nombre d'étapes une fois finie. */
   step: number;
-  /** Sous-objectifs de l'étape en cours (conditions munies d'un `label`). */
-  checklist: { label: string; done: boolean }[];
-  /** Valeurs des compteurs au début de l'étape (conditions « depuis le début de l'étape »). */
-  baselines: Record<string, number>;
+  /**
+   * Sous-objectifs de l'étape en cours. Format 13: absent quand il n'y en a aucun (lecture par
+   * `questChecklist` d'`etat/quete.ts`).
+   */
+  checklist?: QuestChecklistItem[];
+  /**
+   * Valeurs des compteurs au début de l'étape (conditions « depuis le début de l'étape »).
+   * Format 13: absent quand il n'y en a aucune (lecture par `questBaselines`).
+   */
+  baselines?: Record<string, number>;
   startedDay: number;
   /** Quête répétée à chaque train (`repeat: each_train`): jour du train de cette fois-ci. Absent sinon. */
   train?: number;
@@ -1313,12 +1325,16 @@ export interface MarketBuyer {
   servedAt?: number;
 }
 
-/** Un pli de la sacoche de Lucie: la sorte, le destinataire, pris au banc, livré. */
+/**
+ * Un pli de la sacoche de Lucie: la sorte, le destinataire, pris au banc, livré. Format 13
+ * (taille de l'état): la sorte ne s'écrit que pour un paquet (absente: une lettre, lue par
+ * `pliKind` de `simulation/plis.ts`); `taken` et `delivered` ne s'écrivent qu'une fois vrais.
+ */
 export interface MailPli {
-  kind: MailKind;
+  kind?: Exclude<MailKind, 'letter'>;
   to: string;
-  taken: boolean;
-  delivered: boolean;
+  taken?: true;
+  delivered?: true;
 }
 
 export interface MailState {
@@ -1346,10 +1362,10 @@ export interface GameNotification {
    * les libellés réels du clavier.
    */
   text: string;
-  /** Astuce d'origine, pour les astuces. */
-  hint: HintId | null;
-  /** Proposition d'achat liée, pour les propositions. */
-  proposal: string | null;
+  /** Astuce d'origine, pour les astuces (format 13: absente sinon, plutôt que `null`). */
+  hint?: HintId;
+  /** Proposition d'achat liée, pour les propositions (format 13: absente sinon). */
+  proposal?: string;
   /** Clé du message dans `textes.json` (`already_taken`...) ou identifiant de l'astuce; `null` pour un texte composé. */
   key: string | null;
   tick: number;

@@ -57,6 +57,10 @@ Règles:
 | `format-12-milieu-semaine-2.json` | 12 | mardi, jour 11, midi (0.12) | 7 | `generer.ts` (0.12) |
 | `format-12-fin-de-la-demo.json` | 12 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
 | `format-12-ete-jour-25.json` | 12 | mardi 25 à midi (0.12; sans référence du jeudi 62, la plus longue à fabriquer) | 7 | `generer.ts` (0.12) |
+| `format-13-fin-semaine-1.json` | 13 | jour 8 à 16 h, commande 1 payée; plus de valeurs par défaut écrites (plis, quêtes, notifications, séjours, chantiers) (0.12.1) | 42 | `generer.ts` (0.12.1) |
+| `format-13-milieu-semaine-2.json` | 13 | mardi, jour 11, midi (0.12.1) | 7 | `generer.ts` (0.12.1) |
+| `format-13-fin-de-la-demo.json` | 13 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12.1) | 42 | `generer.ts` (0.12.1) |
+| `format-13-ete-jour-25.json` | 13 | mardi 25 à midi (0.12.1; sans référence du jeudi 62, comme le format 12) | 7 | `generer.ts` (0.12.1) |
 
 ## Format en cours
 

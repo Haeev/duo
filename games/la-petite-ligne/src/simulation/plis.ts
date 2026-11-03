@@ -48,18 +48,20 @@ function drawPlis(sim: Sim, day: number): MailPli[] {
   // La première tournée (quête `lucie_round`): trois plis au moins, dont une lettre en tête.
   const first = firstRound(sim);
   if (first) count = Math.max(count, 3);
-  return Array.from({ length: count }, (_, i) => ({
-    kind:
-      (first && i === 0) || unitDraw(seed, `plis:sorte:${String(i)}`, day) >= r.parcelShare
-        ? 'letter'
-        : 'parcel',
-    to:
+  return Array.from({ length: count }, (_, i): MailPli => {
+    const letter =
+      (first && i === 0) || unitDraw(seed, `plis:sorte:${String(i)}`, day) >= r.parcelShare;
+    const to =
       people[Math.floor(unitDraw(seed, `plis:pour:${String(i)}`, day) * people.length)] ??
       people[0] ??
-      '',
-    taken: false,
-    delivered: false,
-  }));
+      '';
+    return letter ? { to } : { kind: 'parcel', to };
+  });
+}
+
+/** Sorte du pli: absente de l'état pour une lettre (format 13). */
+export function pliKind(p: Readonly<MailPli>): MailKind {
+  return p.kind ?? 'letter';
 }
 
 function itemOf(sim: Sim, kind: MailKind): string {
@@ -75,7 +77,10 @@ export function mailClock(sim: Sim, before: number, after: number): void {
   if (roundToday(sim) && after >= r.from && after < r.until && world.mail?.day !== day) {
     // Les plis repris hier par Firmin reviennent en tête de la sacoche.
     const back =
-      world.mail?.items.filter((p) => !p.delivered).map((p) => ({ ...p, taken: false })) ?? [];
+      world.mail?.items
+        .filter((p) => p.delivered !== true)
+        .map((p): MailPli => (p.kind === undefined ? { to: p.to } : { kind: p.kind, to: p.to })) ??
+      [];
     world.mail = { day, items: [...back, ...drawPlis(sim, day)], carryOver: 0 };
     say(sim, 'both', 'mail_ready', { count: world.mail.items.length });
     emit(sim, { type: 'mail_ready', count: world.mail.items.length });
@@ -83,7 +88,7 @@ export function mailClock(sim: Sim, before: number, after: number): void {
   }
   const mail = world.mail;
   if (mail?.day !== day || !crossed(before, after, r.until)) return;
-  const left = mail.items.filter((p) => !p.delivered);
+  const left = mail.items.filter((p) => p.delivered !== true);
   // Firmin reprend les plis non livrés (sacs, cellier, caisse): il les portera lui-même.
   for (const kind of ['letter', 'parcel'] as const) {
     const item = itemOf(sim, kind);
@@ -110,7 +115,7 @@ export function mailWaiting(sim: Sim, c: Character): boolean {
     r === null ||
     mail?.day !== sim.world.clock.day ||
     sim.world.clock.minutes >= r.until ||
-    !mail.items.some((p) => !p.taken)
+    !mail.items.some((p) => p.taken !== true)
   )
     return false;
   const at = sim.map.points[r.point];
@@ -124,10 +129,10 @@ export function takeMail(sim: Sim, c: Character): void {
     if (mail !== null && mail.day === sim.world.clock.day) say(sim, c.id, 'mail_empty');
     return;
   }
-  const taken = mail.items.filter((p) => !p.taken);
+  const taken = mail.items.filter((p) => p.taken !== true);
   for (const p of taken) {
     p.taken = true;
-    giveToCharacter(sim, c, itemOf(sim, p.kind), 'ordinary', 1);
+    giveToCharacter(sim, c, itemOf(sim, pliKind(p)), 'ordinary', 1);
   }
   say(sim, c.id, 'mail_taken', { list: plisText(sim, taken) });
   sim.runtime.changed = true;
@@ -144,8 +149,8 @@ export function deliverMail(sim: Sim, c: Character, villager: string): boolean {
     return false;
   const delivered: MailPli[] = [];
   for (const p of mail.items) {
-    if (p.to !== villager || !p.taken || p.delivered) continue;
-    const item = itemOf(sim, p.kind);
+    if (p.to !== villager || p.taken !== true || p.delivered === true) continue;
+    const item = itemOf(sim, pliKind(p));
     if (countInBag(c, item) < 1) continue;
     takeFromBag(c, item, 1);
     p.delivered = true;
@@ -153,7 +158,7 @@ export function deliverMail(sim: Sim, c: Character, villager: string): boolean {
   }
   if (delivered.length === 0) return false;
   const early = sim.world.clock.minutes < r.earlyBefore;
-  const amount = delivered.reduce((n, p) => n + r.pay[p.kind] + (early ? r.earlyBonus : 0), 0);
+  const amount = delivered.reduce((n, p) => n + r.pay[pliKind(p)] + (early ? r.earlyBonus : 0), 0);
   sim.world.purse += amount;
   const name = sim.content.villagers.find((v) => v.id === villager)?.firstName ?? villager;
   say(sim, 'both', 'mail_delivered', { name, amount });
@@ -170,7 +175,7 @@ export function deliverMail(sim: Sim, c: Character, villager: string): boolean {
 function plisText(sim: Sim, plis: readonly MailPli[]): string {
   const f = sim.content.texts.orderFormat;
   const parts = plis.map((p) =>
-    message(sim, p.kind === 'letter' ? 'mail_letter_for' : 'mail_parcel_for', {
+    message(sim, pliKind(p) === 'letter' ? 'mail_letter_for' : 'mail_parcel_for', {
       name: sim.content.villagers.find((v) => v.id === p.to)?.firstName ?? p.to,
     }),
   );

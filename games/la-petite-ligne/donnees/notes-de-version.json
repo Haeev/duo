@@ -2,6 +2,13 @@
   "version": 1,
   "notes": [
     {
+      "version": "0.12.1",
+      "titre": "Corrections",
+      "changements": [
+        "Corrections: la partie envoie un état plus léger à l'autre ordinateur, pour garder de la marge les jours chargés; tes sauvegardes de la 0.12.0 se rechargent telles quelles."
+      ]
+    },
+    {
       "version": "0.12.0",
       "titre": "L'aubrin, le marché, la pêche et la garde-robe",
       "changements": [

@@ -53,7 +53,7 @@ export const MINUTES_PER_DAY = 1440;
  * litière, grain entamé, chèvres, noms à choisir). L'économie de la 0.12 ne change pas le format:
  * ses champs prennent leur valeur de départ à la reprise (`fillEconomyFields`).
  */
-export const DATA_SCHEMA = 12;
+export const DATA_SCHEMA = 13;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';

@@ -13,8 +13,6 @@ const note = (text: string, key: string | null, kind: GameNotification['kind'] =
   id,
   kind,
   text,
-  hint: null,
-  proposal: null,
   key,
   tick: 0,
 });

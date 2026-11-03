@@ -3,6 +3,7 @@
  * DOM), testées dans Node. Les composants comparent ces modèles d'une image à
  * l'autre et ne touchent le DOM que s'ils changent.
  */
+import { questChecklist } from '../etat/quete';
 import { agreeMoney } from '../donnees/monnaie';
 import { isTrainDay } from '../donnees/calendrier';
 import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
@@ -541,12 +542,13 @@ export function questModels(world: ReadonlyWorld, ctx: UiContext): QuestModel[] 
         text: ctx.t(ctx.texts.extra.common.itemCountOf, { item: l.name, have: Math.min(l.inCrate, l.need), need: l.need }),
         done: l.done,
       }));
-    } else if (!done && state.checklist.length > 1) {
+    } else if (!done && questChecklist(state).length > 1) {
+      const checklist = questChecklist(state);
       progress = ctx.t(ctx.texts.extra.common.countOf, {
-        have: state.checklist.filter((i) => i.done).length,
-        need: state.checklist.length,
+        have: checklist.filter((i) => i.done).length,
+        need: checklist.length,
       });
-      lines = state.checklist.map((i) => ({ icon: null, text: ctx.t(i.label), done: i.done }));
+      lines = checklist.map((i) => ({ icon: null, text: ctx.t(i.label), done: i.done }));
     }
     out.push({
       id: def.id,

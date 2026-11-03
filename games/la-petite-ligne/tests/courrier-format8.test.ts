@@ -1,6 +1,7 @@
 // Format 8 (tour 11): les lettres ne gardent plus leur texte rendu, seulement la variante et les
 // variables; le texte se reconstitue depuis les données. Migration depuis les références du
 // format 7, mêmes mots dans le carnet qu'avant, et taille de l'état le plus lourd mesuré.
+import { questBaselines } from '../src/etat/quete';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -70,7 +71,8 @@ describe('courrier du format 8', () => {
       const questsBefore = ref.data.quests as { id: string; status: string; baselines: Record<string, number> }[];
       for (const q of sim.world.quests) {
         const before = questsBefore.find((x) => x.id === q.id);
-        expect(q.baselines, q.id).toEqual(q.status === 'done' ? {} : before?.baselines);
+        // Format 13: des valeurs de départ vides ne s'écrivent plus (lecture par `questBaselines`).
+        expect(questBaselines(q), q.id).toEqual(q.status === 'done' ? {} : before?.baselines);
       }
     });
   }

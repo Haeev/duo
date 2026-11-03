@@ -509,7 +509,58 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 11 && isRecord(data)) migrateToWardrobe(data, content.clothes);
   // Format 12 (0.12, après la garde-robe au format 11): l'élevage. L'économie n'a pas de format (`fillEconomyFields`).
   if (dataSchema < 12 && isRecord(data)) migrateToBreeding(data, content);
+  // Format 13 (0.12.1, taille de l'état transmis à l'invité): plus de valeurs par défaut écrites.
+  if (dataSchema < 13 && isRecord(data)) migrateToFormat13(data);
   return data;
+}
+
+/**
+ * Format 13 (0.12.1): l'état transmis à l'invité dépassait l'alerte de 35 Kio. Les champs à leur
+ * valeur par défaut ne s'écrivent plus, et la lecture retrouve ces défauts: plis de Lucie sans
+ * sorte pour une lettre ni `taken` et `delivered` faux, chantiers jamais commencés absents
+ * (`improvementView`), quêtes sans liste à cocher ni valeurs de départ vides
+ * (`etat/quete.ts`), notifications sans `hint` ni `proposal` nuls, séjours près des points sans
+ * zéro (lus `?? 0`). Rien de ce que les règles lisent ne change.
+ */
+export function migrateToFormat13(world: Record<string, unknown>): void {
+  const mail = world.mail;
+  if (isRecord(mail) && Array.isArray(mail.items)) {
+    for (const p of mail.items) {
+      if (!isRecord(p)) continue;
+      if (p.kind === 'letter') delete p.kind;
+      if (p.taken === false) delete p.taken;
+      if (p.delivered === false) delete p.delivered;
+    }
+  }
+  if (Array.isArray(world.quests)) {
+    for (const q of world.quests) {
+      if (!isRecord(q)) continue;
+      if (Array.isArray(q.checklist) && q.checklist.length === 0) delete q.checklist;
+      if (isRecord(q.baselines) && Object.keys(q.baselines).length === 0) delete q.baselines;
+    }
+  }
+  if (Array.isArray(world.characters)) {
+    for (const c of world.characters) {
+      if (!isRecord(c)) continue;
+      if (Array.isArray(c.notifications)) {
+        for (const n of c.notifications) {
+          if (!isRecord(n)) continue;
+          if (n.hint === null) delete n.hint;
+          if (n.proposal === null) delete n.proposal;
+        }
+      }
+      const stays = c.stays;
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- clé de point relue: l'absence vaut zéro.
+      if (isRecord(stays)) for (const [id, seconds] of Object.entries(stays)) if (seconds === 0) delete stays[id];
+    }
+  }
+  const improvements = world.improvements;
+  if (isRecord(improvements)) {
+    for (const [id, s] of Object.entries(improvements)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- chantier relu: l'absence vaut « rien reçu ».
+      if (isRecord(s) && s.paid === 0 && s.planks === 0 && s.funded === false && s.builtDay === null) delete improvements[id];
+    }
+  }
 }
 
 /**
@@ -609,7 +660,7 @@ function ownedCatalogueItems(world: Record<string, unknown>, content: Content): 
  */
 function migrateToTour9(world: Record<string, unknown>, content: Content): void {
   world.board = emptyBoard();
-  world.improvements = emptyImprovements({ content });
+  world.improvements = emptyImprovements();
   world.catalogueBought = ownedCatalogueItems(world, content);
   world.giftsGiven = {};
   const orders = Array.isArray(world.catalogueOrders) ? world.catalogueOrders : [];

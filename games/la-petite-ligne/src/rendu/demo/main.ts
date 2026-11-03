@@ -216,7 +216,7 @@ async function main(): Promise<void> {
       buyers: [],
     };
     world.cellar.push({ item: 'market_scale', quality: 'ordinary', count: 1 });
-    world.mail = { day: world.clock.day, items: [{ kind: 'letter', to: 'basile', taken: false, delivered: false }], carryOver: 0 };
+    world.mail = { day: world.clock.day, items: [{ to: 'basile' }], carryOver: 0 };
   }
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).

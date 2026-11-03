@@ -26,7 +26,7 @@ export interface ConditionContext {
   /** Le joueur concerné (celui qui parle, agit, ou a l'envie). */
   actor: CharacterId | null;
   /** Valeurs des compteurs au début de l'étape de quête (`step_start`). */
-  baselines: Record<string, number> | null;
+  baselines: Readonly<Record<string, number>> | null;
   /** Événement d'outil en cours (`used_tool_at`). */
   toolEvent: ToolEvent | null;
   /** Quête dont on évalue l'étape (rôles `informed` et `doer` d'une quête à secret). */
@@ -50,7 +50,7 @@ function counterValue(sim: Sim, scope: Scope, key: string, since: Since, ctx: Co
 }
 
 /** Ce qu'il manque à un compteur d'une étape de quête (même lecture que la condition). */
-export function counterRemaining(sim: Sim, baselines: Record<string, number>, key: string, count: number, since: Since): number {
+export function counterRemaining(sim: Sim, baselines: Readonly<Record<string, number>>, key: string, count: number, since: Since): number {
   return count - counterValue(sim, 'duo', key, since, { ...NO_CONTEXT, baselines });
 }
 

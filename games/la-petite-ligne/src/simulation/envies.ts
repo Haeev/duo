@@ -118,7 +118,10 @@ export function updateStays(sim: Sim, points: readonly string[], dt: number): vo
     for (const id of points) {
       const at = sim.map.points[id];
       if (at === undefined) continue;
-      c.stays[id] = distance(c.pos, at) <= range ? (c.stays[id] ?? 0) + dt : 0;
+      // Format 13 (taille de l'état): loin du point, rien d'écrit plutôt qu'un zéro (lu `?? 0`).
+      if (distance(c.pos, at) <= range) c.stays[id] = (c.stays[id] ?? 0) + dt;
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete -- clé de point suivi: l'absence vaut zéro.
+      else if (c.stays[id] !== undefined) delete c.stays[id];
     }
   }
 }

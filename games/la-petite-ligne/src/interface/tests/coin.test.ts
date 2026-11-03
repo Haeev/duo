@@ -18,7 +18,7 @@ const KEYS = [
 ];
 
 function note(text: string, key: string | null): GameNotification {
-  return { id: 1, kind: 'message', text, hint: null, proposal: null, key, tick: 0 };
+  return { id: 1, kind: 'message', text, key, tick: 0 };
 }
 
 describe('coin à soi (interface)', () => {

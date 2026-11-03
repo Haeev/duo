@@ -4,6 +4,7 @@
  * par le train (objet du catalogue `carriedByTwo`), porté du quai à la maison.
  * Une seule charge à la fois (`world.beam`).
  */
+import { questBaselines } from '../etat/quete';
 import type { Beam } from '../etat/types';
 import { type Sim, itemWithArticle, sayIfWritten } from './contexte';
 import { storeAtHome } from './rangement';
@@ -81,7 +82,7 @@ function spawnQuestLoad(sim: Sim): void {
     const step = sim.content.quests.find((q) => q.id === def.quest)?.steps[state.step];
     const to = sim.map.points[def.to];
     if (step?.id !== def.step || to === undefined) continue;
-    if (!evaluateAll(sim, def.when, { ...NO_CONTEXT, baselines: state.baselines, quest: state.id })) continue;
+    if (!evaluateAll(sim, def.when, { ...NO_CONTEXT, baselines: questBaselines(state), quest: state.id })) continue;
     load(sim, def.item, 'quest', def.from, to, null);
     return;
   }

@@ -4,6 +4,7 @@
  */
 import type { CharacterId, QuestState } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
+import { questBaselines, questChecklist, setQuestBaselines, setQuestChecklist } from '../etat/quete';
 import {
   captureBaselines,
   evaluate,
@@ -29,14 +30,8 @@ export function startQuest(sim: Sim, id: string): void {
   const quest = def(sim, id);
   if (quest === undefined || world.quests.some((q) => q.id === id)) return;
   const first = quest.steps[0];
-  const state: QuestState = {
-    id,
-    status: 'active',
-    step: 0,
-    checklist: [],
-    baselines: first === undefined ? {} : captureBaselines(sim, first.conditions),
-    startedDay: world.clock.day,
-  };
+  const state: QuestState = { id, status: 'active', step: 0, startedDay: world.clock.day };
+  setQuestBaselines(state, first === undefined ? {} : captureBaselines(sim, first.conditions));
   if (quest.repeat === 'each_train') state.train = currentOrder(sim.content.settings, world).day;
   world.quests.push(state);
   // Quête à secret (R16): l'informé et l'autre sont fixés dès le démarrage.
@@ -52,22 +47,23 @@ export function startQuest(sim: Sim, id: string): void {
 function refreshChecklist(sim: Sim, state: QuestState, quest: QuestDef): void {
   const step = quest.steps[state.step];
   if (step === undefined) {
-    state.checklist = [];
+    setQuestChecklist(state, []);
     return;
   }
-  const ctx: ConditionContext = { ...NO_CONTEXT, baselines: state.baselines, quest: state.id };
+  const ctx: ConditionContext = { ...NO_CONTEXT, baselines: questBaselines(state), quest: state.id };
   const items: { label: string; done: boolean }[] = [];
   for (const c of step.conditions) {
     if (c.label !== undefined) items.push({ label: c.label, done: evaluate(sim, c, ctx) });
   }
+  const before = questChecklist(state);
   const same =
-    items.length === state.checklist.length &&
+    items.length === before.length &&
     items.every((item, i) => {
-      const previous = state.checklist[i];
+      const previous = before[i];
       return item.label === previous?.label && item.done === previous.done;
     });
   if (!same) {
-    state.checklist = items;
+    setQuestChecklist(state, items);
     sim.runtime.changed = true;
   }
 }
@@ -80,9 +76,9 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
   const next = quest.steps[state.step];
   if (next === undefined) {
     state.status = 'done';
-    state.checklist = [];
+    setQuestChecklist(state, []);
     // Les valeurs de départ ne servent qu'aux étapes en cours (format 8: rien de gardé une fois finie).
-    state.baselines = {};
+    setQuestBaselines(state, {});
     // Une annonce (tour 9) a son propre message, avec la récompense (`annonces.ts`).
     if (quest.completionText !== '') notify(sim, 'both', 'quest', format(quest.completionText, { ...textVars(sim), day: state.train ?? '' }), { key: 'quest_done' });
     emit(sim, { type: 'quest_done', quest: quest.id });
@@ -93,7 +89,7 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
     if (quest.repeat === 'each_train') restartForNextTrain(sim, state, quest);
     return;
   }
-  state.baselines = captureBaselines(sim, next.conditions);
+  setQuestBaselines(state, captureBaselines(sim, next.conditions));
   notifyKey(sim, 'both', 'quest', 'quest_step_done', { quest: questTitle(sim, state, quest) });
 }
 
@@ -105,8 +101,8 @@ function restartForNextTrain(sim: Sim, state: QuestState, quest: QuestDef): void
   const first = quest.steps[0];
   state.status = 'active';
   state.step = 0;
-  state.checklist = [];
-  state.baselines = first === undefined ? {} : captureBaselines(sim, first.conditions);
+  setQuestChecklist(state, []);
+  setQuestBaselines(state, first === undefined ? {} : captureBaselines(sim, first.conditions));
   state.startedDay = sim.world.clock.day;
   state.train = next;
   notifyKey(sim, 'both', 'quest', 'quest_started', { quest: questTitle(sim, state, quest) });
@@ -164,7 +160,7 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
         refreshChecklist(sim, state, quest);
         break;
       }
-      const ctx: ConditionContext = { actor: toolEvent?.by ?? null, baselines: state.baselines, toolEvent, quest: state.id };
+      const ctx: ConditionContext = { actor: toolEvent?.by ?? null, baselines: questBaselines(state), toolEvent, quest: state.id };
       if (evaluateAll(sim, step.conditions, ctx)) {
         if (needsTool) toolConsumed = true;
         advance(sim, state, quest, toolEvent?.by ?? null);
