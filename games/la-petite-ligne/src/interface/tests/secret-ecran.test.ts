@@ -60,7 +60,8 @@ describe.skipIf(executable === undefined)("l'écran de l'autre ne montre jamais 
 
   async function textOf(scenario: string, me: CharacterId): Promise<string> {
     const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
-    await page.goto(`${base}src/interface/demo/index.html?scenario=${scenario}&joueur=${me}&autre=fige&rendu=0&temps=arrete`);
+    // Le premier chargement dépasse les 30 s par défaut de Playwright (Vite compile tout le jeu à la demande).
+    await page.goto(`${base}src/interface/demo/index.html?scenario=${scenario}&joueur=${me}&autre=fige&rendu=0&temps=arrete`, { timeout: PAGE_MS });
     await page.waitForFunction(() => window.lplInterface?.ready === true, null, { timeout: PAGE_MS });
     await page.waitForTimeout(600);
     // Tout le texte de l'interface, éléments cachés compris, et les libellés lus par les lecteurs d'écran.

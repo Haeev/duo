@@ -6,6 +6,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { farmBoard, farmModel } from '../modele-elevage';
+import { questBoard } from '../modele-quetes';
 import { firstSentence, fishBoard, itemFacts, recipeCards } from '../modele-vitrine';
 import { character, started, uiContext } from './aides';
 
@@ -106,5 +107,37 @@ describe('carnet des poissons en icônes', () => {
   it('garde une seule phrase de la description', () => {
     expect(firstSentence('Petit, moustachu, toujours au fond sur les galets: le premier poisson.')).toBe('Petit, moustachu, toujours au fond sur les galets.');
     expect(firstSentence('Grand comme un doigt. Au printemps, son ventre rougit.')).toBe('Grand comme un doigt.');
+  });
+});
+
+describe('quêtes du carnet en cartes', () => {
+  it('compte les conditions « faites / requises », dit chez qui aller et la récompense', () => {
+    const sim = started();
+    const ctx = uiContext();
+    sim.world.quests.push({ id: 'jeanne_shuttlecock', status: 'active', step: 0, startedDay: 1, baselines: { 'duo:given:jeanne:hen_feather': 1 } });
+    sim.world.counters.duo['given:jeanne:hen_feather'] = 3;
+    const card = questBoard(sim.world, ctx).cards.find((c) => c.id === 'jeanne_shuttlecock');
+    expect(card?.needs).toEqual([expect.objectContaining({ kind: 'count', icon: 'hen-feather', have: 2, need: 4, done: false })]);
+    expect(plain(card?.needs[0]?.label ?? '')).toBe('4 plumes : 2 sur 4');
+    expect(card?.place).toMatchObject({ villager: 'jeanne' });
+    expect(card?.rewards).toEqual([expect.objectContaining({ icon: 'ui-coin', text: '30', tone: 'price' })]);
+    expect(card?.giver).toBe('jeanne');
+    expect(card?.step.endsWith('.')).toBe(true);
+  });
+
+  it('ne montre jamais le lieu d’une énigme, et résume les longues listes sur la carte', () => {
+    const sim = started();
+    const ctx = uiContext();
+    sim.world.quests.push({ id: 'emile_riddle', status: 'active', step: 0, startedDay: 1 });
+    sim.world.quests.push({ id: 'meet_village', status: 'active', step: 0, startedDay: 1 });
+    const board = questBoard(sim.world, ctx);
+    expect(board.cards.find((c) => c.id === 'emile_riddle')?.place).toBeNull();
+    const village = board.cards.find((c) => c.id === 'meet_village');
+    expect(village?.needs.length).toBe(4);
+    expect(village?.needs.every((n) => n.kind === 'check')).toBe(true);
+    expect(village?.cardNeeds).toEqual([expect.objectContaining({ kind: 'count', icon: 'ui-check', need: 4, have: village?.needs.filter((n) => n.done).length })]);
+    // Les quêtes en cours d'abord, les finies ensuite.
+    const firstDone = board.cards.findIndex((c) => c.done);
+    expect(firstDone < 0 || board.cards.slice(firstDone).every((c) => c.done)).toBe(true);
   });
 });

@@ -2,7 +2,8 @@
 /*
   Captures de l'interface imagée du patch 0.12.2 (`docs/jeux/jeu-1/interface-imagee-0-12-2.md`) sur
   la page de démonstration: comptoir d'Odette (acheter, vendre, bourse vide), mercerie, catalogue,
-  réchaud (garni, vide), établi, basse-cour (garnie, début), carnet (poissons, sac), coffre.
+  réchaud (garni, vide), établi, basse-cour (garnie, début), carnet (poissons, sac, quêtes, avec la
+  confidence du matin, avec un secret), rangement (garni, plein, qui déborde).
   En 1366x768 et 1920x1080, facteur d'échelle 1 (et 2 avec « x2 »). Contrôles: rien hors de la
   fenêtre, aucun défilement du corps du panneau, aucun texte hors de sa boîte, aucune variable vide,
   aucun identifiant brut (`hen_white`), aucune erreur en console.
@@ -38,7 +39,13 @@ const ECRANS = [
   ['basse-cour-debut', 'basse-cour-0122-debut', '.lpl-panel'],
   ['carnet-poissons', 'poissons-0122', '.lpl-panel'],
   ['carnet-sac', 'sac-0122', '.lpl-panel'],
+  ['carnet-quetes', 'quetes-0122', '.lpl-panel'],
+  // Les quêtes avec la confidence du matin (carte « Aujourd'hui ») et avec la fiche d'un secret au détail.
+  ['carnet-quetes-confidence', 'carnet-confidence', '.lpl-panel'],
+  ['carnet-quetes-secret', 'poules-carnet', '.lpl-panel'],
   ['coffre', 'coffre-0122', '.lpl-panel'],
+  ['coffre-plein', 'coffre-0122-plein', '.lpl-panel'],
+  ['coffre-deborde', 'rangement-deborde', '.lpl-panel'],
   ['salon', 'salon-0122', '.lpl-panel', undefined, '&rendu=leger'],
   ['salon-choix', 'salon-0122', '.lpl-panel', 'ArrowRight', '&rendu=leger'],
   ['salon-secours', 'salon-0122', '.lpl-panel'],
