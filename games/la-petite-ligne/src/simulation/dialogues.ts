@@ -3,10 +3,10 @@
  * `habitants.json` et la section 2.3 du README des données.
  */
 import { dialogueDone } from '../etat/dialogues-faits';
-import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
+import type { Character, CharacterId, DialogueChoiceView, DialogueLineView, VillagerState } from '../etat/types';
 import type { Condition, Content, DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
-import { type Sim, bump, character, distance, emit, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
+import { type Sim, bump, character, distance, emit, faceToward, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';
@@ -284,6 +284,19 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
   return out;
 }
 
+/** L'habitant se tourne vers qui lui parle; son cap d'avant est gardé pour la fin de la conversation. */
+function turnToTalk(sim: Sim, v: VillagerState, at: { x: number; y: number }): void {
+  if (v.talkingWith.length === 0) sim.runtime.villagerFacing.set(v.id, v.facing);
+  faceToward(v, at);
+}
+
+/** Fin de conversation: l'habitant reprend le cap qu'il avait (son poste le lui redonne s'il en a un). */
+function resumeFacing(sim: Sim, v: VillagerState): void {
+  const before = sim.runtime.villagerFacing.get(v.id);
+  if (before !== undefined) v.facing = before;
+  sim.runtime.villagerFacing.delete(v.id);
+}
+
 /** Ouvre la conversation d'un joueur avec un habitant (portée vérifiée par l'appelant). */
 export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const v = sim.world.villagers.find((x) => x.id === villager);
@@ -299,8 +312,8 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   c.menu = null;
   c.placement = null;
   c.action = { kind: 'talk', since: sim.world.tick, duration: 0, target: { x: v.pos.x, y: v.pos.y } };
-  c.facing = Math.atan2(v.pos.y - c.pos.y, v.pos.x - c.pos.x);
-  v.facing = Math.atan2(c.pos.y - v.pos.y, c.pos.x - v.pos.x);
+  faceToward(c, v.pos);
+  turnToTalk(sim, v, c.pos);
   if (!v.talkingWith.includes(c.id)) v.talkingWith.push(c.id);
   v.met = true;
   bump(sim, `talked:${villager}`, c.id);
@@ -315,7 +328,10 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
   c.status = 'active';
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   const v = sim.world.villagers.find((x) => x.id === d.villager);
-  if (v !== undefined) v.talkingWith = v.talkingWith.filter((id) => id !== c.id);
+  if (v !== undefined) {
+    v.talkingWith = v.talkingWith.filter((id) => id !== c.id);
+    if (v.talkingWith.length === 0) resumeFacing(sim, v);
+  }
   if (!completed) return;
   const def = sim.content.dialogues[d.dialogue];
   if (def === undefined) return;
@@ -370,6 +386,13 @@ export function startScene(sim: Sim, dialogueId: string): void {
   }
   const v = sim.world.villagers.find((x) => x.id === def.villager);
   if (v !== undefined) {
+    // Chacun se tourne vers l'habitant, et lui vers le milieu des deux.
+    const [a, b] = sim.world.characters;
+    if (a !== undefined && b !== undefined && v.visible) {
+      faceToward(a, v.pos);
+      faceToward(b, v.pos);
+      turnToTalk(sim, v, { x: (a.pos.x + b.pos.x) / 2, y: (a.pos.y + b.pos.y) / 2 });
+    }
     v.talkingWith = ['p1', 'p2'];
     v.met = true;
   }
@@ -401,7 +424,10 @@ function endScene(sim: Sim): void {
     c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   }
   const v = sim.world.villagers.find((x) => x.id === scene.villager);
-  if (v !== undefined) v.talkingWith = [];
+  if (v !== undefined) {
+    v.talkingWith = [];
+    resumeFacing(sim, v);
+  }
   if (!sim.world.dialoguesDone.includes(scene.dialogue)) sim.world.dialoguesDone.push(scene.dialogue);
   if (annonceSceneIds(sim.content).has(scene.dialogue)) bump(sim, `scene:${scene.dialogue}`, null);
   emit(sim, { type: 'scene_ended', dialogue: scene.dialogue });

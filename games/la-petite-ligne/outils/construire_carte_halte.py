@@ -887,13 +887,13 @@ POINTS += [
     p("salon_clothes", 71.0, 28.5, "la place du client devant le comptoir de mercerie, face à Solange (boutique de "
       "vêtements)", objet="salon_shop", rotation=0, portee=1.2, interieur=True),
     p("salon_chair", 69.5, 29.5, "le fauteuil de coiffure, face au miroir du mur ouest (un joueur à la fois)",
-      objet="salon_shop", portee=1.5, interieur=True),
+      objet="salon_shop", portee=1.5, rotation=3, interieur=True),
     p("salon_stylist", 70.5, 29.5, "Solange derrière le fauteuil quand elle coupe", objet="salon_shop",
       cap_degres=270, interieur=True),
     p("salon_bench", 72.0, 30.5, "le banc d'attente à deux places, tourné vers le comptoir et le fauteuil",
       objet="salon_shop", portee=1.5, interieur=True),
     p("salon_window", 73.5, 26.5, "Solange coud derrière la vitrine (lundi), vue de la rue Haute",
-      objet="salon_shop", interieur=True),
+      objet="salon_shop", rotation=2, interieur=True),
     # Dans l'épicerie-pension (boutique de 6 x 6, x 24 à 29, y 26 à 31; porte en 30, 30). Retouche du
     # 2026-11-02: les places de l'artiste (`interior_spots` de `ferrand_shop`, repère glTF x, z), tournées
     # avec l'objet (rotation 1, centre 27 ; 28): x = 27 + z, y = 28 - x (`glb_vers_carte`).

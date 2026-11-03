@@ -203,6 +203,8 @@ export function createGuest(
       correction.y = 0;
     }
     predicted = next;
+    // Plus aucun pas en attente: le cap de l'hôte fait foi (il tourne le personnage vers ce qu'il fait, sans marcher).
+    if (pendingFrames.every((f) => f.moveX === 0 && f.moveY === 0)) predictedFacing = auth.f;
   });
 
   const offEvents = channels.events.onMessage((message) => {

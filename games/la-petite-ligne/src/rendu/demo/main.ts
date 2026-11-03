@@ -131,6 +131,8 @@ interface DemoHandle {
   pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
   destination(): { x: number; y: number } | null;
   frames: number;
+  /** Monde affiché, pour les planches d'animation (mode `manuel=1`). */
+  world(): WorldState;
 }
 
 declare global {
@@ -312,6 +314,7 @@ async function main(): Promise<void> {
     pick: (x: number, y: number) => engine.pick(x, y),
     destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
+    world: () => world,
   };
   window.lplRendu = handle;
   await engine.load(() => undefined);

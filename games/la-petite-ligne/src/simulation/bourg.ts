@@ -8,7 +8,7 @@
 import { weekdayOf, seasonOfDay } from '../donnees/calendrier';
 import type { Character, CharacterId, ItemStack, WorldState } from '../etat/types';
 import { villagerSays } from './annonces';
-import { type Sim, bump, character, distance, emit, message, partnerOf, say, sayIfWritten } from './contexte';
+import { type Sim, bump, character, distance, emit, message, partnerOf, say, sayIfWritten, secondsToTicks } from './contexte';
 import { sendLetter } from './courrier';
 import { addHeart, eat } from './besoins';
 import { giveToCharacter } from './sac';
@@ -292,7 +292,9 @@ export function drinkChocolate(sim: Sim, c: Character): void {
   bump(sim, TOWN.chocolate, c.id);
   emit(sim, { type: 'bought', by: c.id, item: TOWN.chocolate, count: 1, price: ch.price });
   eat(sim, c, TOWN.chocolate);
-  c.action = { kind: 'eat', since: sim.world.tick, duration: 0, target: sim.map.points[TOWN.table] ?? null };
+  // Le geste de boire dure comme un repas, puis on repose la tasse (une durée nulle le faisait boire sans fin).
+  const sip = secondsToTicks(sim.content.settings.feel.actionSeconds.eat ?? 0);
+  c.action = { kind: 'eat', since: sim.world.tick, duration: sip, target: sim.map.points[TOWN.table] ?? null };
   const now = sim.world.clock.minutes;
   const other = character(sim, partnerOf(c.id));
   const last = sim.runtime.chocolateAt[other.id];

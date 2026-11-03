@@ -134,6 +134,9 @@ export function updateVillagers(sim: Sim, dt: number): void {
     const route = sim.runtime.villagerPaths[v.id];
     const next = route?.path[0];
     if (route === undefined || next === undefined) {
+      // Rendu à son poste: il regarde où le poste le dit (`rotation` de la carte), pas dans le sens de son dernier pas.
+      const post = sim.map.pointFacings[v.target];
+      if (post !== undefined && v.visible) v.facing = post;
       const hidden = HIDDEN_ACTIVITIES.has(v.activity);
       if (hidden && v.visible) {
         v.visible = false;

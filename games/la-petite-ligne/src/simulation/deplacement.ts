@@ -7,7 +7,7 @@ import { type GameMap, buildingAt } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
-import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
+import { type Sim, character, distance, emit, faceToward, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
 import { type Blockers, OPENED_CELL, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { builtRoomCells } from './pieces';
@@ -464,6 +464,9 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
     // Une poutre garde son orientation: chacun la soulève là où il la tient, sans qu'elle pivote
     // vers la ligne des deux porteurs (retour S01). Une charge ramassée se tourne entre eux.
     if (beamHalfLength(sim, beam) <= 0) beam.facing = Math.atan2(b.pos.y - a.pos.y, b.pos.x - a.pos.x);
+    // À l'arrêt, on se fait face pour soulever (la draisine: on se tourne vers elle); en marche, on regarde où l'on va.
+    faceToward(a, beam.purpose === 'handcar' ? beam.pos : b.pos);
+    faceToward(b, beam.purpose === 'handcar' ? beam.pos : a.pos);
     emit(sim, { type: 'beam_lifted' });
   }
   const ia = inputOf(frames[a.id]);

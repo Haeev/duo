@@ -381,3 +381,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le scratchpad de session peut être partagé avec d'autres membres: un `tirets.sh` à moi a été réécrit vers un autre worktree. Noms de fichiers préfixés par le lot, et le script affiche `pwd`.
 - Fusion finale sans commit: `git add -A`, diff binaire vers un fichier, `git reset -q`, `git checkout -- .` et retrait des nouveaux fichiers, `merge --ff-only`, `git apply -3` du diff, `git reset -q`; puis résoudre les conflits (notes: garder les deux côtés) et relancer le générateur de carte plutôt que de garder `halte.json` fusionné.
 
+## Animations et orientation des personnages (La Petite Ligne, vérifié le 2026-11-03)
+
+- Les clips de marche de l'artiste ne sont pas à vitesse de pied constante, et la fiche ne suit pas les retouches: la cheville posée de `walk` reculait à 4,0 m/s (clips d'avant la 0.12) puis à 2,8 m/s (0.12), `carry_two` 1,95 puis 1,3, quand la fiche dit 3,5 et 1,8. Le rythme se règle sur la vitesse du pied posé (`foulee.ts`, mesurée au chargement sur un squelette nu `cloneRig('rig', [])`), et pas sur la référence de la fiche: l'ancienne valeur 3,2 faisait patiner les joueurs.
+- Sonde rapide d'un clip sans navigateur: cinématique directe en Python (nœuds TRS, canaux LINEAR et STEP, slerp) sur le bloc JSON et binaire du GLB; planche visuelle: page temporaire `sonde-clips.html` (GLTFLoader, viewports en ciseaux), à supprimer.
+- Points de la carte: `rotation` (quarts, 0 vers le sud) dit où regarde un habitant posté; `carte-niveau.ts` la verse dans `pointFacings` quand il n'y a pas de `cap_degres`. `facing = PI / 2 - quart * PI / 2`.
+- Le point `sawmill_workbench` est la place devant l'établi: pour regarder l'établi, viser l'objet de la carte du même nom (`map.props`).
+- Invité: `predictedFacing` restait celui de la dernière marche tant que le joueur ne bougeait pas; l'hôte qui tourne le personnage vers une action n'était pas vu chez lui. Reprendre le cap de l'hôte quand plus aucun pas en attente ne bouge.
+- Page de rendu: `lplRendu.world()` et `lplRendu.emit()` permettent de poser une action (`since` recalé après le premier `advance`) et de faire des planches par action en mode `manuel=1`. Avec `vie=0`, la page remet une marche à l'arrêt: pour la marche, laisser la promenade (`vie=1`).

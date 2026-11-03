@@ -68,6 +68,8 @@ import type { EventfulPart } from './monde';
 import { ShapeBuilder } from './geometrie';
 import { sleepPose, type SleepPose } from './coucher';
 import { holdSpecFor, ToolHolder } from './prise';
+import { plantedFootSpeed } from './foulee';
+import { CLIP_FOR_ACTION } from './gestes';
 
 const SETTINGS = RENDER_SETTINGS.characters;
 /** Nom du groupe animé (squelette et maillages) dans `personnages.glb`. */
@@ -76,8 +78,10 @@ const HAND_SOCKET = 'socket_hand_r';
 const PICK_RADIUS = 0.42;
 const PICK_HEIGHT = 1.8;
 const GROUND_HALF_LIFE = 0.06;
-const WALK_SCALE_MIN = 0.55;
-const WALK_SCALE_MAX = 1.7;
+/** Chevilles du squelette commun, pour mesurer la foulée des clips de marche (`foulee.ts`). */
+const FEET: readonly string[] = ['foot_l', 'foot_r'];
+const WALK = 'walk';
+const CARRY = 'carry_two';
 /** Bout de la canne à pêche de l'artiste: nœud vide, et sa place dans le repère de la prise s'il manque. */
 const ROD_TIP_NODE = 'fishing_rod_tip';
 const ROD_TIP = new Vector3(0, 1.34, 1.49);
@@ -117,30 +121,6 @@ const GESTURE_START_MAX = 0.9;
 const BODY_CENTER = 0.9;
 const BODY_RADIUS = 1.3;
 
-/** Animation jouée pour chaque action de la simulation. */
-const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
-  idle: 'idle',
-  walk: 'walk',
-  carry: 'carry_two',
-  till: 'hoe',
-  sow: 'sow',
-  water: 'water',
-  harvest: 'harvest',
-  chop: 'chop',
-  saw: 'saw',
-  hammer: 'hammer',
-  talk: 'talk',
-  sit: 'sit',
-  eat: 'eat',
-  sleep: 'sleep',
-  // Cuisiner: la main tendue au-dessus du réchaud, qui va et vient (remuer, servir).
-  cook: 'give',
-  feed: 'sow',
-  pickup: 'harvest',
-  refill: 'water',
-  // Tour 9 (les lanternes): la perche levée vers la lanterne, puis rabaissée.
-  light: 'pole_raise',
-};
 /** Perche de l'allumeur, en main le temps d'allumer une lanterne (tour 9). */
 const LAMP_POLE = 'lamp_pole';
 const POLE_RAISE = 'pole_raise';
@@ -191,7 +171,7 @@ const EXPRESSIONS = ['happy', 'tired', 'hungry', 'delighted'] as const;
 const BLINK_TARGET = 'blink';
 const TALK_EXPRESSION_WEIGHT = 0.4;
 
-/** Ce qu'un habitant fait selon son activité d'emploi du temps. */
+/** Ce qu'un habitant fait selon son activité d'emploi du temps (et son poste, pour le travail). */
 function villagerClip(villager: DeepReadonly<VillagerState>): string {
   if (villager.speed > SETTINGS.walkThreshold) {
     return 'walk';
@@ -201,7 +181,7 @@ function villagerClip(villager: DeepReadonly<VillagerState>): string {
   }
   switch (villager.activity) {
     case 'work':
-      return 'saw';
+      return SETTINGS.villagerWork[villager.target] ?? SETTINGS.villagerWorkDefault;
     case 'play':
       return 'wave';
     default:
@@ -701,6 +681,82 @@ export class CharactersPart implements EventfulPart {
       this.clips.set(clip.name, clip);
     }
     this.addBenchPicks(benches);
+    const rig = library.cloneRig(RIG_NODE, []);
+    this.walkReference = this.footSpeed(rig, WALK) ?? SETTINGS.walkReferenceSpeed;
+    this.carryReference = this.footSpeed(rig, CARRY) ?? SETTINGS.carryReferenceSpeed;
+    this.carryOneReference = this.footSpeed(rig, SETTINGS.carryOne.walk) ?? this.walkReference;
+  }
+
+  private readonly carryOneReference: number;
+
+  /** Assis ou debout à l'image d'avant, par personnage, et le clip de passage en cours. */
+  private readonly postures = new Map<string, { seated: boolean; clip: string | null; start: number }>();
+
+  /**
+   * S'asseoir et se lever: au changement, `sit_down` ou `stand_up` joué une fois à la place de la
+   * demande (pas de lever qui glisse: en marchant, on part tout de suite), puis la demande avec un
+   * fondu court (les clips finissent sur la pose de `sit` ou debout).
+   */
+  private posture(key: string, seated: boolean, moving: boolean, request: ClipRequest): ClipRequest {
+    const state = this.postures.get(key);
+    if (state === undefined) {
+      this.postures.set(key, { seated, clip: null, start: this.time });
+      return request;
+    }
+    const settings = SETTINGS.posture;
+    if (state.seated !== seated) {
+      state.seated = seated;
+      state.clip = seated ? settings.sitDown : moving ? null : settings.standUp;
+      state.start = this.time;
+    }
+    if (state.clip === null) return request;
+    const clip = this.clips.get(state.clip);
+    if (clip !== undefined && this.time - state.start < clip.duration && (seated || !moving)) {
+      return { name: clip.name, timeScale: 1, once: true, token: state.start, fade: settings.fadeSeconds };
+    }
+    state.clip = null;
+    return { ...request, fade: settings.fadeSeconds };
+  }
+
+  /** Vitesse du pied posé (m/s) des clips de marche, mesurée au chargement (`foulee.ts`). */
+  private readonly walkReference: number;
+  private readonly carryReference: number;
+
+  private footSpeed(rig: Object3D | null, name: string): number | null {
+    const clip = this.clips.get(name);
+    return rig === null || clip === undefined ? null : plantedFootSpeed(rig, clip, FEET);
+  }
+
+  /** Rythme d'un clip de marche pour que le pied posé ne glisse pas (`scale`: taille du personnage). */
+  private strideScale(speed: number, reference: number, scale: number): number {
+    return Math.min(SETTINGS.walkScaleMax, Math.max(SETTINGS.walkScaleMin, speed / (reference * scale)));
+  }
+
+  /** Ce joueur trait-il une chèvre, ou la tient-il pour l'autre ? */
+  private milking(character: DeepReadonly<Character>, world: ReadonlyWorld): boolean {
+    return world.breeding.goats.some(
+      (goat) => goat.milking !== null && (goat.milking.by === character.id || goat.milking.holder === character.id),
+    );
+  }
+
+  /** Main droite posée sur la draisine poussée, réutilisée d'une image à l'autre. */
+  private readonly pushPoint: HandReach = { x: 0, y: 0, z: 0, weight: 0 };
+
+  /** Où pose la main celui qui pousse la draisine en marchant, ou `null` si elle n'est pas devant lui. */
+  private pushReach(character: DeepReadonly<Character>, world: ReadonlyWorld): HandReach | null {
+    const beam = world.beam;
+    if (beam === null) return null;
+    const dx = beam.pos.x - character.pos.x;
+    const dy = beam.pos.y - character.pos.y;
+    const distance = Math.hypot(dx, dy);
+    const ahead = dx * Math.cos(character.facing) + dy * Math.sin(character.facing);
+    if (distance > SETTINGS.push.reach || ahead <= 0) return null;
+    const point = this.pushPoint;
+    point.x = beam.pos.x;
+    point.y = beam.pos.y;
+    point.z = this.terrain.heightAt(beam.pos.x, beam.pos.y) + SETTINGS.push.handHeight;
+    point.weight = SETTINGS.push.weight;
+    return point;
   }
 
   /**
@@ -856,6 +912,10 @@ export class CharactersPart implements EventfulPart {
     const kind = character.action.kind;
     if (kind === 'eat' && this.seatAt(world, character.pos.x, character.pos.y).clip === SIT_CHAIR) {
       return SIT_EAT;
+    }
+    // Le chocolat d'Odette se boit (l'action `eat` vise la petite table); un plat du sac se mange.
+    if (kind === 'eat' && character.action.target !== null && this.clips.has(SETTINGS.drinkClip)) {
+      return SETTINGS.drinkClip;
     }
     return CLIP_FOR_ACTION[kind];
   }
@@ -1267,13 +1327,18 @@ export class CharactersPart implements EventfulPart {
       if (shown !== undefined) {
         shown.seat = onBench ? benchSeat : null;
       }
+      // Assis au fauteuil du salon: la simulation donne le fauteuil (`target`) et l'y tourne.
+      const chair = kind === 'sit' && !onBench ? character.action.target : null;
       const seat =
-        kind === 'sit' && !onBench ? this.seatAt(world, character.pos.x, character.pos.y) : null;
+        chair !== null
+          ? { clip: SIT_CHAIR, lift: SETTINGS.salonChairSeatHeight - SETTINGS.sitClipSeatHeight }
+          : kind === 'sit' && !onBench
+            ? this.seatAt(world, character.pos.x, character.pos.y)
+            : null;
+      const seatPlace = onBench ? this.benchPlace : chair;
       const benchLift = this.seatLift;
-      const walkScale = Math.min(
-        WALK_SCALE_MAX,
-        Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
-      );
+      const walkScale = this.strideScale(character.speed, this.walkReference, 1);
+      const pushing = kind === 'carry' && world.beam?.purpose === 'handcar';
       const gesture = this.gestureRequest(character, context);
       const edge = onBench && this.benchIsEdge;
       const pole = this.poleRequest(character, kind, context);
@@ -1286,8 +1351,25 @@ export class CharactersPart implements EventfulPart {
       } else if (character.holding !== null && !moving) {
         // Tenir l'échelle: la simulation l'a posé à sa place, face au montant.
         request = { name: HOLD_LADDER, timeScale: 1 };
+      } else if (!moving && this.milking(character, world)) {
+        // Traire la chèvre ou la tenir (pas de clip de traite): accroupi près d'elle, tourné vers elle.
+        request = { name: SETTINGS.milkClip, timeScale: 1 };
+      } else if (pushing) {
+        // La draisine reste au sol: on la pousse, bras en avant, au lieu de la porter bras levés.
+        request = moving
+          ? { name: WALK, timeScale: walkScale, fade: SETTINGS.walkFadeSeconds }
+          : { name: SETTINGS.push.stillClip, timeScale: 1 };
+      } else if (character.placement !== null && kind !== 'carry' && this.clips.has(SETTINGS.carryOne.walk)) {
+        // Un meuble tenu pour l'aménagement: porté seul devant la poitrine.
+        request = moving
+          ? {
+              name: SETTINGS.carryOne.walk,
+              timeScale: this.strideScale(character.speed, this.carryOneReference, 1),
+              fade: SETTINGS.walkFadeSeconds,
+            }
+          : { name: SETTINGS.carryOne.idle, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
       } else if (moving && kind !== 'carry') {
-        request = { name: 'walk', timeScale: walkScale, fade: SETTINGS.walkFadeSeconds };
+        request = { name: WALK, timeScale: walkScale, fade: SETTINGS.walkFadeSeconds };
       } else if (shotActive) {
         request = { name: shot.clip, timeScale: 1, once: true, token: shot.start, fade: FISH_FADE };
       } else if (character.fishing !== null) {
@@ -1302,11 +1384,13 @@ export class CharactersPart implements EventfulPart {
         request = { name: 'idle', timeScale: 1, fade: SETTINGS.walkFadeSeconds };
       } else {
         const name = kind === 'sleep' ? CLIP_FOR_ACTION.sleep : this.clipFor(character, world);
-        request = { name, timeScale: kind === 'carry' ? (moving ? walkScale : 0) : 1 };
+        const carryScale = this.strideScale(character.speed, this.carryReference, 1);
+        request = { name, timeScale: kind === 'carry' ? (moving ? carryScale : 0) : 1 };
       }
-      // Tape dans la main: face à l'autre le temps du geste (rendu seul).
+      request = this.posture(character.id, (onBench && !edge) || seat?.clip === SIT_CHAIR, moving, request);
+      // Tape dans la main: face à l'autre le temps du geste (rendu seul), jamais en marchant (en crabe).
       const partner =
-        shotActive && shot.clip === HIGH_FIVE
+        shotActive && shot.clip === HIGH_FIVE && !moving
           ? world.characters.find((other) => other.id !== character.id)
           : undefined;
       const facing = onBench
@@ -1314,13 +1398,14 @@ export class CharactersPart implements EventfulPart {
         : partner === undefined
           ? character.facing
           : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
-      const glided = this.glide(entry, onBench, onBench ? this.benchPlace : character.pos, context);
+      const glided = this.glide(entry, seatPlace !== null, seatPlace ?? character.pos, context);
       const asleep = this.sleepingPose(character, world);
+      entry.figure.setReach(pushing && moving ? this.pushReach(character, world) : null);
       entry.figure.update(
         context,
         this.terrain,
-        asleep ?? glided ?? (onBench ? this.benchPlace : character.prev),
-        asleep ?? glided ?? (onBench ? this.benchPlace : character.pos),
+        asleep ?? glided ?? seatPlace ?? character.prev,
+        asleep ?? glided ?? seatPlace ?? character.pos,
         asleep?.facing ?? facing,
         request,
         asleep?.lift ?? (edge ? SETTINGS.edge.lift : onBench ? benchLift : (seat?.lift ?? 0)),
@@ -1402,6 +1487,8 @@ export class CharactersPart implements EventfulPart {
       figure.root.visible = shown;
       figure.pick.enabled = shown;
       if (!shown) {
+        // Il réapparaît déjà assis ou debout, sans se lever ni s'asseoir devant nous.
+        this.postures.delete(`habitant ${villager.id}`);
         continue;
       }
       // Arrêté sur un banc (Jeanne au quai le matin): assis, à sa place, dos au dossier.
@@ -1416,19 +1503,17 @@ export class CharactersPart implements EventfulPart {
         figure.lookAt(direction);
       }
       const timeScale =
-        clip === 'walk'
-          ? Math.min(
-              WALK_SCALE_MAX,
-              Math.max(WALK_SCALE_MIN, villager.speed / SETTINGS.walkReferenceSpeed),
-            )
-          : 1;
+        clip === WALK ? this.strideScale(villager.speed, this.walkReference, figure.root.scale.x) : 1;
       figure.update(
         context,
         this.terrain,
         onBench ? this.benchPlace : villager.prev,
         onBench ? this.benchPlace : villager.pos,
         onBench ? this.benchPlace.facing : villager.facing,
-        { name: clip, timeScale },
+        this.posture(`habitant ${villager.id}`, clip === SIT_CHAIR, villager.speed > SETTINGS.walkThreshold, {
+          name: clip,
+          timeScale,
+        }),
         onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : 0,
         SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
       );

@@ -91,6 +91,8 @@ export function sitAtChair(sim: Sim, c: Character): boolean {
   c.hairOffer = null;
   if (c.status === 'active') c.status = 'menu';
   const at = sim.map.points[SALON.chair];
+  // Le rendu l'assoit au fauteuil (`target`), tourné comme lui: face au miroir.
+  c.facing = sim.map.pointFacings[SALON.chair] ?? c.facing;
   c.action = { kind: 'sit', since: sim.world.tick, duration: 0, target: at === undefined ? null : { x: at.x, y: at.y } };
   emit(sim, { type: 'salon_seated', by: c.id });
   return true;
