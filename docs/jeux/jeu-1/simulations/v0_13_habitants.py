@@ -7,6 +7,11 @@ Lancer (bibliothèque standard seule, graine fixe, moins de 30 s):
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --tableaux      tableaux Markdown des plannings
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --json FICHIER  plannings au format de habitants.json
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --croise DOC    relit les tableaux du document
+  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --croise FICHIER.json
+      relit games/la-petite-ligne/donnees/habitants-0-13.json: plannings et habitudes identiques
+      à la sortie --json, rumeurs, modèles et échelles, goûts, quotidien minimal, typographie
+  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --maj FICHIER.json
+      reporte plannings, habitudes et anniversaires du script dans ce fichier (textes gardés)
 
 Contrôles: chaque point cité est dans la liste des lieux; chaque habitant a une entrée
 pour chaque minute de 6 h à 24 h, chaque jour, chaque saison et chaque temps; chaque
@@ -534,14 +539,14 @@ H(v, "birthday", "anniv", "Le 4 de l'automne, son anniversaire: il joue de l'har
   [("tous", "18:00-19:00", "church_nave", "stand", {"birthday": True})])
 H(v, "mass", "jour", "Le dimanche, à l'harmonium de la messe, de 10 h 15 à 11 h 30",
   [("dit", "martial", "Armand tient l'harmonium à la messe de 10 h 30. Il arrive à 10 h 15 pour l'accorder, et il l'accorde mal."),
-   ("ecriteau", "church_sign", "Notre-Dame-du-Gué. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu.")],
+   ("ecriteau", "church_sign", "Église Saint-Aubin. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu.")],
   [("di", "10:15-11:30", "church_nave", "stand")])
 H(v, "chronicle", "apres", "Le dimanche, chez Honorine pour sa chronique, de 14 h à 16 h (depuis « La chronique d'Honorine »)",
   [("dit", "honorine", "Le dimanche à 2 h, le petit maître vient m'écouter sous ma glycine. Il écrit tout ce que je dis, même quand j'invente.")],
   [("di", "14:00-16:00", "honorine_doorstep", "stand", {"flag": "armand_chronicle", **DRY})])
 H(v, "chorale", "routine", "Le vendredi, il dirige la chorale à l'église de 20 h à 21 h 30",
   [("dit", "armand", "Chorale le vendredi à 20 h, à l'église. Tout le monde peut venir, même ceux qui chantent comme des portes."),
-   ("ecriteau", "church_sign", "Notre-Dame-du-Gué. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu.")],
+   ("ecriteau", "church_sign", "Église Saint-Aubin. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu.")],
   [("ve", "20:00-21:30", "church_nave", "stand")])
 H(v, "mairie", "routine", "La mairie: mardi et vendredi de 17 h à 19 h, samedi de 9 h à 12 h",
   [("ecriteau", "mairie_sign", "MAIRIE. Le mardi et le vendredi de 17 h à 19 h, le samedi de 9 h à 12 h. Le secrétaire est aussi le maître: patience."),
@@ -631,7 +636,7 @@ H(v, "sunday_parvis", "jour", "Le dimanche, il accueille sur le parvis de 10 h �
   [("dit", "martial", "Le dimanche, je suis sur le parvis à 10 h pour serrer les mains. Après la messe aussi, pour les compter.")],
   [("di", "10:00-10:30,11:30-12:00", "church_square", "stand")])
 H(v, "mass", "jour", "Le dimanche, la messe de 10 h 30 à 11 h 30",
-  [("ecriteau", "church_sign", "Notre-Dame-du-Gué. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu."),
+  [("ecriteau", "church_sign", "Église Saint-Aubin. Messe le dimanche à 10 h 30. Chorale le vendredi à 20 h, tout le monde est bienvenu."),
    ("dit", "marthe", "Messe à 10 h 30, le dimanche. L'abbé commence à l'heure, je l'y oblige.")],
   [("di", "10:30-11:30", "church_nave", "host")])
 H(v, "sunday_hamlets", "jour", "Le dimanche après-midi, il pédale vers les hameaux, de 14 h à 18 h",
@@ -1134,6 +1139,109 @@ H(v, "home", "maison", "Chez elle, à l'étage du café, le reste du temps",
   [("tous", "06:00-24:00", "cafe_door", "home")])
 
 # ---------------------------------------------------------------------------
+# 3 bis. Rumeurs (lot H4)
+# ---------------------------------------------------------------------------
+# Pour les quinze habitants qui arrivent en 0.13 (Lucie et les quatorze nouveaux), chaque
+# habitude a au moins une réplique dite par un autre habitant: c'est elle que le rattrapage
+# (section 4.8) fait dire. Gardées à part des tableaux 3.2 pour ne pas changer la simulation de
+# la découverte (section 8); l'export JSON les ajoute à la suite des `reveals` de l'habitude.
+RUMEURS: dict[tuple[str, str], list[tuple[str, str]]] = {
+    ("lucie", "round"): [("odette", "Du lundi au vendredi, Lucie part aux hameaux à 8 h et revient pour midi. Le samedi, c'est après le train, jusqu'à 4 h. Elle rapporte plus de nouvelles que de lettres.")],
+    ("lucie", "photo_lookout"): [("armand", "Le lundi et le mercredi après-midi, Lucie monte au belvédère avec son appareil, s'il ne pleut pas. Le mercredi, elle me trouve à mes fleurs. Je cache mon carnet, elle me photographie quand même.")],
+    ("lucie", "sunday_garden"): [("solange", "Le dimanche matin, Lucie bêche son jardinet. Je la regarde de ma fenêtre: elle plante tout de travers, et ça pousse quand même.")],
+    ("lucie", "home"): [("jeanne", "Tante Lucie habite en face de la mercerie de Solange. C'est chez moi aussi, cette année.")],
+    ("armand", "chorale"): [("margot", "Le vendredi à 8 h du soir, Armand dirige la chorale à l'église. Il bat la mesure avec un crayon. Quand on chante trop fort, il le casse.")],
+    ("armand", "mairie"): [("odette", "La mairie ouvre le mardi et le vendredi de 5 h à 7 h du soir, et le samedi matin. C'est Armand qui tient le bureau, entre deux cahiers à corriger.")],
+    ("armand", "recess"): [("leon", "À la récré de 10 h et de 2 h et demie, le maître surveille la cour. Il compte les genoux écorchés. Les miens comptent double.")],
+    ("armand", "class"): [("leon", "Les jours d'école, le maître fait la classe de 8 h et demie à 4 h et demie. Le mercredi, non. Et l'été, jamais !")],
+    ("armand", "wednesday_archives"): [("honorine", "Le mercredi matin, le petit maître range les archives de la mairie. Il en ressort avec de la poussière jusqu'aux sourcils et l'air d'avoir trouvé un trésor.")],
+    ("armand", "home"): [("colette", "Armand loge au-dessus de l'école, juste à côté de chez moi. Sa lampe reste allumée tard: il corrige, ou il écrit, il ne veut pas dire quoi.")],
+    ("berthe", "mass"): [("martial", "Berthe vient à la messe le dimanche à 10 h 30, au troisième rang. Elle s'endort au sermon, et elle ronfle juste.")],
+    ("berthe", "sunday_bief"): [("margot", "Le dimanche après-midi, Berthe s'assoit au bord du bief, s'il ne pleut pas. Elle regarde l'eau comme d'autres regardent le feu.")],
+    ("berthe", "monday_dress"): [("mado", "Le lundi matin, la meunière pique sa meule dans la cour du moulin. Un coup, une rainure: on l'entend jusqu'à la friche.")],
+    ("berthe", "sluice"): [("basile", "Berthe lève la vanne du bief à 6 h et la baisse à 5 h du soir. Sauf le dimanche: l'eau aussi a droit au repos.")],
+    ("berthe", "grind"): [("achille", "Le matin, jusqu'à midi, Berthe ensache à la porte du moulin. Si tu passes par là, salue-la de ma part. Moi, à cette heure-là, je suis au guichet.")],
+    ("berthe", "afternoon"): [("margot", "L'après-midi, Berthe est dedans, aux meules, jusqu'à 5 h. Ne frappe pas: crie. Elle criera plus fort.")],
+    ("berthe", "home"): [("colette", "Berthe vit à l'étage du moulin, au bout du chemin de la maisonnette. Elle dit que le bruit de l'eau l'endort. Moi, il me tiendrait éveillée toute la nuit.")],
+    ("martial", "sunday_parvis"): [("honorine", "Le dimanche, l'abbé est sur son parvis dès 10 h pour serrer les mains, et encore à la sortie, jusqu'à midi. Il les compte, je crois. Il en manque toujours une ou deux.")],
+    ("martial", "wednesday_bike"): [("mado", "Le mercredi matin, l'abbé graisse son vélo devant le presbytère. Il me demande conseil, et il ne le suit jamais.")],
+    ("martial", "vintage"): [("colette", "À l'automne, le samedi matin, l'abbé vendange sa vigne, s'il fait sec. Il paie en vin. Personne ne le boit, et tout le monde y va.")],
+    ("martial", "garden"): [("marthe", "L'abbé est à son jardin de graines le matin avant sa tournée et le soir en rentrant, plus le mercredi après-midi et le samedi matin. Il parle à ses sachets. Moi, je parle aux morts. Nous sommes quittes.")],
+    ("martial", "home"): [("odette", "Le presbytère, c'est la maison au bord du parvis, côté ouest. L'abbé n'y est presque jamais: frappe, puis va voir au fond du jardin.")],
+    ("marthe", "lumignons"): [("honorine", "Au Dimanche des lumignons, ma sœur se tient à la grille du cimetière de 5 h à 8 h du soir, et elle donne un lumignon à qui passe. Elle ne m'en a jamais donné. Je le prends quand même.")],
+    ("marthe", "angelus"): [("firmin", "Marthe sonne l'angélus à 7 h, à midi et à 7 h du soir, vingt minutes à la corde. Ma pendule et sa cloche ne sont jamais d'accord.")],
+    ("marthe", "sunday_bench"): [("martial", "Le dimanche, de 2 h à 5 h, Marthe s'assoit sur le banc du cimetière. Elle donne des nouvelles à tout le monde, et elle n'oublie personne.")],
+    ("marthe", "rain"): [("odette", "Quand il pleut, Marthe cire les bancs de l'église toute la matinée. Ça sent la cire jusqu'au carrefour.")],
+    ("marthe", "garden"): [("solange", "L'après-midi, s'il ne pleut pas, Marthe est dans son jardin de dahlias, derrière sa maison. Elle les taille comme moi les cheveux: à la règle.")],
+    ("marthe", "home"): [("firmin", "Marthe habite la maison du sacristain, au pied de l'église. Elle ouvre la porte avant qu'on frappe. Je n'ai jamais su comment.")],
+    ("honorine", "lumignons"): [("marthe", "Au Dimanche des lumignons, ma sœur va voir Octave de 5 h à 7 h. Elle porte une bougie trop grosse. Elle a toujours tout fait trop gros.")],
+    ("honorine", "mass"): [("martial", "Honorine est à la messe chaque dimanche, au premier banc. Elle répond avant moi: elle connaît le texte depuis quatre-vingts ans.")],
+    ("honorine", "winter"): [("odette", "L'hiver, Honorine ne sort plus sur son seuil: elle tricote derrière sa fenêtre. Fais-lui signe en passant, elle te répondra avec ses aiguilles.")],
+    ("honorine", "summer"): [("lucie", "L'été, Honorine sort sur son seuil de bonne heure, rentre à 11 h et ressort à 5 h du soir. Je lui laisse son journal sur la chaise, elle me laisse un biscuit.")],
+    ("honorine", "doorstep"): [("nour", "Honorine est sur sa chaise, sous la glycine, de 8 h et demie à midi et de 2 h à 6 h. Je passe devant dix fois par jour. Elle compte, j'en suis sûre.")],
+    ("honorine", "home"): [("odette", "Honorine habite la dernière maison du hameau, celle à la glycine. De midi à 2 h, elle fait la sieste: ne frappe pas, elle ferait semblant de ne pas avoir dormi.")],
+    ("ines", "sunday_dawn"): [("barnabe", "Le dimanche, à 6 h, Inès est déjà au belvédère. Elle compte les oiseaux jusqu'à 9 h. Une fois, elle m'a compté aussi.")],
+    ("ines", "patrol_clearing"): [("basile", "Le lundi et le jeudi matin, la garde fait sa tournée à la clairière du Vieux Chêne. Elle salue le vieux chêne. Moi aussi, d'ailleurs.")],
+    ("ines", "patrol_coupe"): [("barnabe", "Le mercredi et le samedi matin, Inès marque les arbres de la coupe. Un trait de peinture, et l'arbre est sauvé. Ou c'est le contraire: je ne sais jamais.")],
+    ("ines", "lunch"): [("nour", "À midi, du lundi au samedi, Inès déjeune sur le banc devant la maison forestière, jusqu'à 1 h et demie. Elle partage son pain avec les mésanges.")],
+    ("ines", "rain"): [("barnabe", "Quand il pleut, l'après-midi, Inès reste chez elle à dessiner ses cartes. Elle dit que le bois se garde tout seul sous la pluie.")],
+    ("ines", "home"): [("odette", "La garde forestière habite la maison forestière, au bout du chemin forestier, celle au toit rouge. Elle descend chez moi deux fois par semaine, et c'est tout ce que je sais d'elle. Ça m'agace.")],
+    ("barnabe", "rain"): [("mado", "Quand il pleut, Barnabé descend à la forge de 7 h à 5 h du soir et tire mon soufflet. Il chante pour garder le rythme. Le soufflet et lui, c'est la même basse.")],
+    ("barnabe", "coupe"): [("ines", "Du lundi au samedi, le matin, Barnabé abat à la parcelle de coupe. Ce que j'ai marqué, rien de plus. Il chante, pour s'excuser auprès des arbres.")],
+    ("barnabe", "kiln"): [("leon", "Le lundi, le mercredi, le vendredi et le samedi après-midi, Barnabé monte sa meule de charbon. Il m'a laissé poser une bûche. Une seule, mais quand même !")],
+    ("barnabe", "home"): [("colette", "Barnabé habite avec Mado sous le toit de la forge. Le soir, on l'entend chanter par la lucarne. Mes clients se taisent pour écouter.")],
+    ("mado", "train"): [("firmin", "Le samedi à 10 h, Mado vient prendre ses barres de fer au train. Elle les soulève comme du pain. Je préfère regarder ailleurs.")],
+    ("mado", "sunday_quilles"): [("colette", "Le dimanche, de 3 h à 6 h, quilles devant mon café, s'il ne pleut pas. Mado gagne, les autres paient la tournée. C'est la règle.")],
+    ("mado", "summer_siesta"): [("basile", "L'été, Mado ferme la forge de 1 h et demie à 3 h. Entre le feu et le soleil, même le fer souffle. Elle aussi, mais elle ne le dira pas.")],
+    ("mado", "yard"): [("barnabe", "À 6 h du soir, Mado range la cour de la forge, jusqu'à 7 h. Je l'aide à porter. Elle me dit où poser. Je pose à côté.")],
+    ("mado", "home"): [("honorine", "Mado et son grand mari vivent sous le toit de la forge. À midi, elle remonte déjeuner jusqu'à 1 h et demie: ça s'entend, elle chante dans l'escalier.")],
+    ("paulin", "harvest"): [("margot", "Le 17 et le 18 de l'été, Paulin moissonne au champ du Haut de 6 h à 8 h du soir. Il ne mange presque rien. Je lui porte la soupe quand même.")],
+    ("paulin", "weighing"): [("firmin", "Le samedi à 9 h, Paulin pèse son blé avec la meunière sur ma bascule. Ils annoncent les chiffres comme des atouts à la manille.")],
+    ("paulin", "milking"): [("leon", "Papa trait les vaches à 6 h du matin et à 6 h du soir. Tous les jours, même le dimanche. Les vaches ne savent pas que le dimanche existe.")],
+    ("paulin", "winter"): [("margot", "L'hiver, Paulin ne va plus au champ: il passe ses journées à la grange. Il range les outils, puis il les range encore.")],
+    ("paulin", "lunch"): [("margot", "À midi, du lundi au samedi, on mange dans la cour sous le noyer, jusqu'à 1 h et demie. Paulin se tait, Léon parle pour trois.")],
+    ("paulin", "home"): [("nour", "Les Delmas habitent le logis du Pré-Long, la ferme qui tourne le dos à la route. Le soir, Paulin y est: il ouvre, il dit bonjour, il referme. Un homme efficace.")],
+    ("margot", "threshing"): [("leon", "Le 19 de l'été, maman prépare le repas de moisson dès 9 h et elle le sert jusqu'à 10 h du soir. Il y a des tartes partout. Partout !")],
+    ("margot", "harvest"): [("paulin", "Le 17 et le 18 de l'été, Margot lie les gerbes derrière moi, de 7 h à 6 h du soir. Elle va plus vite que moi. Je ne le dis pas.")],
+    ("margot", "sunday_quilles"): [("mado", "Le dimanche, de 3 h à 6 h, Margot compte les points aux quilles devant le café. Elle triche pour Paulin. Je gagne quand même, c'est dire.")],
+    ("margot", "milking"): [("paulin", "La traite, à 6 h et à 6 h du soir, avec Margot. Elle a les meilleures mains pour ça. Ça non plus, je ne le dis pas.")],
+    ("margot", "poultry"): [("nour", "De 7 h à 9 h, du lundi au samedi, Margot soigne sa basse-cour. Ses poules sont les plus bavardes de la vallée. Je les ai auscultées: elles vont très bien, elles parlent beaucoup, c'est tout.")],
+    ("margot", "garden"): [("odette", "Margot est à son courtil de 10 h à midi et de 3 h à 6 h, s'il ne pleut pas. Ses carottes, je les vends sans les peser: personne ne discute.")],
+    ("margot", "home"): [("colette", "Le soir, Margot est chez elle, au Pré-Long. Il y a toujours une casserole sur son feu, même quand personne n'a faim.")],
+    ("leon", "harvest"): [("jeanne", "Pendant la moisson, du 17 au 19 de l'été, Léon aide au champ toute la journée. Il revient tout jaune de poussière et il dit qu'il a tout fait.")],
+    ("leon", "recess"): [("jeanne", "À la récré de 10 h et de 2 h et demie, Léon court partout dans la cour. Il gagne au loup parce qu'il ne s'arrête jamais. Ce n'est pas du jeu.")],
+    ("leon", "affut"): [("margot", "Le mercredi, de 2 h à 5 h, Léon est à son affût au bout de la pâture. Il revient avec des taches d'herbe et des histoires d'oiseaux.")],
+    ("leon", "wednesday_birds"): [("ines", "Le mercredi après-midi, Léon vient à l'orée avec Jeanne, de 2 h à 5 h, sauf l'hiver et les jours de pluie. Il compte les corbeaux. Je les compte aussi, pour lui faire plaisir.")],
+    ("leon", "mass"): [("honorine", "Le dimanche, le petit Delmas est à la messe avec sa mère. Il dort au troisième rang, la bouche ouverte. Ça me rappelle mon Octave.")],
+    ("leon", "quilles"): [("colette", "Le dimanche après-midi, Léon ramasse les quilles devant le café, de 3 h à 6 h. Je lui donne une limonade par partie. Il est très bien payé.")],
+    ("leon", "summer_fishing"): [("achille", "L'été, l'après-midi, le petit Delmas pêche au bout de la pâture. Il attrape les loches à la main. Moi, avec une canne, j'en attrape moins.")],
+    ("leon", "milking"): [("margot", "À 6 h du soir, Léon vient traire avec nous, jusqu'à 7 h. Il fait plus de bruit que les vaches, et elles l'aiment bien quand même.")],
+    ("leon", "home"): [("jeanne", "Léon habite la ferme du Pré-Long, au bout de la route. Sa chambre sent la vache. Il dit que c'est la meilleure odeur du monde. Il est bizarre.")],
+    ("ambroise", "monday_forest"): [("solange", "Le lundi, l'atelier d'Ambroise est fermé: il cueille à la lisière toute la matinée, s'il ne pleut pas. Il revient avec trois champignons et l'heure exacte.")],
+    ("ambroise", "home"): [("firmin", "L'horloger habite la maison de cheminots de l'ouest. La compagnie la lui a laissée. Quarante pendules là-dedans, et pas une à l'heure, si tu veux mon avis.")],
+    ("nour", "duo_visit"): [("odette", "Le jeudi à 8 h, la vétérinaire passe voir tes bêtes. Elle me l'a dit en déjeunant, la bouche pleine. Prépare-lui un café.")],
+    ("nour", "consult_morning"): [("margot", "Le jeudi et le samedi matin, Nour reçoit à son cabinet, dès 8 h le samedi. Ces matins-là, la file des chiens commence au carrefour.")],
+    ("nour", "yard"): [("honorine", "À 7 h, Nour soigne ses pensionnaires dans l'enclos, à côté de chez elle. Je vois tout de ma fenêtre: un hérisson, un geai, et une vétérinaire qui leur parle comme à des enfants.")],
+    ("nour", "consult"): [("colette", "Du lundi au samedi, de 2 h à 5 h, Nour consulte à son cabinet. Les chiens du hameau attendent sur la route comme on attend au café.")],
+    ("nour", "walk"): [("lucie", "À 5 h, Nour marche une heure sur la berge, s'il ne pleut pas. C'est la seule heure de la journée où elle ne court pas.")],
+    ("nour", "market"): [("odette", "Le dimanche, la vétérinaire fait un tour à ton étal dans la matinée. Garde-lui du fromage, sinon elle boude jusqu'au lundi.")],
+    ("nour", "home"): [("lucie", "Nour habite la première maison du hameau, après la menuiserie: l'ancienne maison du notaire. Certains matins, on part ensemble, elle et moi.")],
+    ("colette", "tuesday_garden"): [("margot", "Le mardi, le café est fermé: Colette bêche son carré aux jardins de la Rive, de 9 h à midi. Elle y chante faux. C'est son jour de repos, elle a le droit.")],
+    ("colette", "manille"): [("firmin", "Le mercredi soir, de 8 h à 10 h, Colette sert la manille. Elle sait qui triche, et elle ne dit rien. La meilleure arbitre de la vallée.")],
+    ("colette", "sunday_terrace"): [("odette", "Le dimanche, Colette ouvre sa terrasse à la sortie de la messe jusqu'à 2 h, puis pendant les quilles, de 3 h à 7 h. Elle me prend mes clients. Je les reprends le lundi.")],
+    ("colette", "sunday_rest"): [("martial", "Le dimanche matin, le café de la Côte reste fermé jusqu'à la sortie de la messe. Colette dit que c'est par respect. Je crois que c'est pour dormir.")],
+    ("colette", "summer_terrace"): [("barnabe", "L'été, Colette sort les tables sur la terrasse de 6 h à 11 h du soir. Quand il fait doux, je chante un peu. Elle ne me fait pas payer.")],
+    ("colette", "counter"): [("basile", "Le café ouvre à 7 h et ferme à 11 h du soir, avec un trou entre midi et 4 h. Colette dort l'après-midi, comme Achille. Le bourg est plein de dormeurs.")],
+    ("colette", "home"): [("odette", "Colette habite au-dessus de son café, la fenêtre sur le carrefour. Elle voit tout, comme moi, mais elle ne dit rien. Ce n'est pas une vie.")],
+}
+
+
+def rumeurs_de(v: Villager, hid: str) -> list[tuple[str, str]]:
+    """Rumeurs de l'habitude `hid` (identifiant complet) de l'habitant v."""
+    return RUMEURS.get((v.id, hid[len(v.id) + 1:]), [])
+
+
+# ---------------------------------------------------------------------------
 # 4. Évaluation d'un planning (même règle que habitants.ts: première entrée vraie)
 # ---------------------------------------------------------------------------
 
@@ -1255,6 +1363,8 @@ def iter_texts():
             yield v.id, h.id, h.label
             for r in h.reveals:
                 yield v.id, h.id, r[2]
+            for _by, text in rumeurs_de(v, h.id):
+                yield v.id, h.id, text
 
 
 def controles() -> list[str]:
@@ -1273,6 +1383,9 @@ def controles() -> list[str]:
             for r in h.reveals:
                 if r[0] == "dit" and r[1] not in ids:
                     errors.append(f"{h.id}: locuteur inconnu {r[1]}")
+            for by, _text in rumeurs_de(v, h.id):
+                if by not in ids or by == v.id:
+                    errors.append(f"{h.id}: rumeur d'un locuteur inconnu ou de l'habitant lui-même ({by})")
         # Couverture: une entrée pour chaque minute, tous scénarios, avec et sans drapeaux.
         for flags in (frozenset(), frozenset({"lucie_back", "clocks_reconciled", "mouture_settled", "valley_flour", "nour_visits", "armand_chronicle", "mill_running", "sisters_reconciled", "bird_hide_built", "barnabe_choir"})):
             for ctx in scenarios(100, flags):
@@ -1280,6 +1393,10 @@ def controles() -> list[str]:
                     if entry_at(v, ctx, minute) is None:
                         errors.append(f"{v.id}: trou {ctx.weekday} {ctx.season} {ctx.weather} {minute // 60} h")
                         break
+    known_keys = {(v.id, h.id[len(v.id) + 1:]) for v in VILLAGERS for h in v.habits.values()}
+    for key in RUMEURS:
+        if key not in known_keys:
+            errors.append(f"rumeur pour une habitude inconnue: {key}")
     for vid, hid, text in iter_texts():
         for d in DASHES:
             if d in text:
@@ -1421,7 +1538,12 @@ def to_json_conditions(cond: dict) -> list:
     return out
 
 
-def export_json(path: str) -> None:
+# Sortes d'habitudes dans les données (donnees/README.md, section 2.12); le document garde les noms français.
+KIND_JSON = {"routine": "routine", "maison": "home", "pluie": "rain", "saison": "season", "jour": "day",
+             "apres": "after_quest", "marche": "market", "anniv": "birthday"}
+
+
+def export_data() -> dict:
     data = []
     for v in VILLAGERS:
         sched = []
@@ -1435,12 +1557,17 @@ def export_json(path: str) -> None:
                 if when:
                     item = {"when": when, **item}
                 sched.append(item)
-        habits = [{"id": short_habit(v, h.id), "kind": h.kind, "label": h.label,
-                   "reveals": [{"by": r[1], "text": r[2]} if r[0] == "dit" else {"sign": r[1], "text": r[2]} for r in h.reveals]}
+        habits = [{"id": short_habit(v, h.id), "kind": KIND_JSON[h.kind], "label": h.label,
+                   "reveals": [{"by": r[1], "text": r[2]} if r[0] == "dit" else {"sign": r[1], "text": r[2]} for r in h.reveals]
+                   + [{"by": by, "text": text} for by, text in rumeurs_de(v, h.id)]}
                   for h in v.habits.values()]
         data.append({"id": v.id, "birthday": {"season": v.birthday[0], "day": v.birthday[1]}, "schedule": sched, "habits": habits})
+    return {"villagers": data}
+
+
+def export_json(path: str) -> None:
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"villagers": data}, f, ensure_ascii=False, indent=1)
+        json.dump(export_data(), f, ensure_ascii=False, indent=1)
 
 
 # ---------------------------------------------------------------------------
@@ -1788,8 +1915,156 @@ def croise(doc: str) -> list[str]:
     return errors
 
 
+# Échelles des modèles livrés par l'artiste 3D (assets/modeles/README.md, habitants de la 0.13).
+ECHELLES = {"armand": 1.035, "ines": 1.03, "barnabe": 1.10, "marthe": 0.92, "honorine": 0.86, "ambroise": 0.94,
+            "leon": 0.78, "paulin": 0.97, "margot": 0.97}
+# Quotidien minimal d'un habitant de la 0.13 (lot H4): rencontre, premier niveau, temps, saisons jouables.
+QUOTIDIEN = {"meeting": 1, "base": 8, "sunny": 3, "cloudy": 3, "rain": 3, "spring": 2, "summer": 2, "autumn": 2}
+# Même règle que GENDERED_RE de games/la-petite-ligne/outils/valider_donnees.py (avertissement à relire).
+GENRE_RE = re.compile(
+    r"\b(?:tu es|tu étais|tu seras|vous êtes|vous étiez|vous serez|sois|soyez) "
+    r"(?:fatigu|prêt|content|épuis|ravi|arrivé|parti|seul|occupé|installé|venu|perdu|les premi|les derni|tous|toutes"
+    r"|nouveaux|nouvelles)"
+    r"|\b(?:tous|toutes) les deux\b(?! (?:jours|nuits|heures|minutes|semaines|mois|ans)\b)"
+    r"|\bles nouveaux\b|\bdes débutant|^(?:cher|chère|chers|chères) ",
+    re.IGNORECASE,
+)
+
+
+def croise_json(path: str) -> list[str]:
+    """Relit un fichier de données des habitants (habitants-0-13.json) et le compare au script."""
+    errors: list[str] = []
+    data = json.load(open(path, encoding="utf-8"))
+    donnees = os.path.dirname(os.path.abspath(path))
+    jeu = os.path.dirname(donnees)
+    exported = {v["id"]: v for v in export_data()["villagers"]}
+    items = {i["id"] for i in json.load(open(os.path.join(donnees, "objets.json"), encoding="utf-8"))["items"]}
+    models = set(json.load(open(os.path.join(jeu, "assets", "modeles", "index.json"), encoding="utf-8")))
+    old = json.load(open(os.path.join(donnees, "habitants.json"), encoding="utf-8"))["villagers"]
+    old_ids = {v["id"] for v in old}
+    seen_dialogues = {d["id"] for v in old for d in v["dialogues"]}
+    all_ids = {v.id for v in VILLAGERS}
+    texts: list[tuple[str, str]] = []
+    for v in data["villagers"]:
+        vid = v["id"]
+        if vid not in exported:
+            errors.append(f"{vid}: habitant absent du script")
+            continue
+        if vid in old_ids:
+            errors.append(f"{vid}: déjà dans habitants.json")
+        ref = exported[vid]
+        if v["schedule"] != ref["schedule"]:
+            errors.append(f"{vid}: planning différent de la sortie --json")
+        if v["habits"] != ref["habits"]:
+            errors.append(f"{vid}: habitudes différentes de la sortie --json")
+        if v["birthday"] != ref["birthday"]:
+            errors.append(f"{vid}: anniversaire différent du script")
+        if v["model"] != f"villager_{vid}" or v["model"] not in models:
+            errors.append(f"{vid}: modèle {v['model']} absent de assets/modeles/index.json")
+        if abs(v["scale"] - ECHELLES.get(vid, 1.0)) > 1e-9:
+            errors.append(f"{vid}: échelle {v['scale']} au lieu de {ECHELLES.get(vid, 1.0)}")
+        tastes = v["tastes"]
+        listed = tastes["adore"] + tastes["aime"] + [d["item"] for d in tastes["deteste"]]
+        for item in listed:
+            if item not in items:
+                errors.append(f"{vid}: goût pour un objet inconnu ({item})")
+        if len(listed) != len(set(listed)):
+            errors.append(f"{vid}: un objet dans deux listes de goûts")
+        texts += [(f"{vid}.tastes", d["reply"]) for d in tastes["deteste"]]
+        for h in v["habits"]:
+            texts.append((f"{vid}.{h['id']}", h["label"]))
+            for r in h["reveals"]:
+                texts.append((f"{vid}.{h['id']}", r["text"]))
+            if not any(r.get("by") not in (None, vid) for r in h["reveals"]):
+                errors.append(f"{vid}.{h['id']}: aucune rumeur (réplique d'un autre habitant) pour le rattrapage")
+        counts = {k: 0 for k in QUOTIDIEN}
+        for d in v["dialogues"]:
+            if d["id"] in seen_dialogues:
+                errors.append(f"{vid}: identifiant de dialogue en double ({d['id']})")
+            seen_dialogues.add(d["id"])
+            for ln in d["lines"]:
+                if ln["speaker"] != vid or ln["speaker"] not in all_ids:
+                    errors.append(f"{d['id']}: locuteur {ln['speaker']}")
+                texts.append((d["id"], ln["text"]))
+            if d["kind"] == "meeting":
+                counts["meeting"] += 1
+            elif d["kind"] == "daily" and not d["when"]:
+                counts["base"] += 1
+            elif d["kind"] == "daily" and len(d["when"]) == 1 and d["when"][0]["type"] == "weather_is":
+                counts[d["when"][0]["weather"]] += 1
+            elif d["kind"] == "daily" and len(d["when"]) == 1 and d["when"][0]["type"] == "season_is":
+                for s in d["when"][0]["seasons"]:
+                    counts[s] = counts.get(s, 0) + 1
+        for k, n in QUOTIDIEN.items():
+            if counts.get(k, 0) < n:
+                errors.append(f"{vid}: {counts.get(k, 0)} répliques « {k} » au lieu de {n}")
+    seen_texts: dict[str, str] = {}
+    for where, text in texts:
+        for d in DASHES:
+            if d in text:
+                errors.append(f"{where}: tiret interdit")
+        found = GENRE_RE.search(text)
+        if found:
+            errors.append(f"{where}: tournure à relire « {found.group(0)} »")
+        if " :" in text or " ;" in text:
+            errors.append(f"{where}: espace avant un deux-points ou un point-virgule")
+        if re.search(r"\{[a-zA-Z]+\}", text):
+            errors.append(f"{where}: espace réservé dans un texte d'habitant")
+        if re.search(r"\bmois\b", text):
+            errors.append(f"{where}: « mois » (le bourg compte en saisons)")
+        if re.search(r"[0-9](?: | )sous?\b", text):
+            errors.append(f"{where}: ancienne monnaie")
+        if "." in where:
+            continue  # libellés, révélations et goûts: une même phrase peut servir plusieurs habitudes
+        if text in seen_texts:
+            errors.append(f"{where}: même texte que {seen_texts[text]}")
+        seen_texts.setdefault(text, where)
+    reveal_texts = {text for where, text in texts if "." in where}
+    for text, where in seen_texts.items():
+        if text in reveal_texts:
+            errors.append(f"{where}: réplique du quotidien identique à une révélation")
+    return errors
+
+
+def dump_villagers(data: dict) -> str:
+    """Mise en forme de habitants-0-13.json: un élément par ligne pour les plannings, habitudes, dialogues."""
+    def one(x) -> str:
+        return json.dumps(x, ensure_ascii=False)
+    parts = ["{", f'  "version": {data.get("version", 1)},', '  "villagers": [']
+    vs = data["villagers"]
+    for vi, v in enumerate(vs):
+        parts.append("    {")
+        keys = list(v)
+        for ki, k in enumerate(keys):
+            comma = "," if ki < len(keys) - 1 else ""
+            if k in ("schedule", "habits", "dialogues"):
+                parts.append(f'      "{k}": [')
+                parts += ["        " + one(item) + ("," if ii < len(v[k]) - 1 else "") for ii, item in enumerate(v[k])]
+                parts.append("      ]" + comma)
+            else:
+                parts.append(f'      "{k}": {one(v[k])}{comma}')
+        parts.append("    }" + ("," if vi < len(vs) - 1 else ""))
+    parts += ["  ]", "}"]
+    return "\n".join(parts) + "\n"
+
+
+def maj_json(path: str) -> None:
+    """Reporte plannings, habitudes et anniversaires du script dans un fichier existant, textes inchangés."""
+    data = json.load(open(path, encoding="utf-8"))
+    exported = {v["id"]: v for v in export_data()["villagers"]}
+    for v in data["villagers"]:
+        ref = exported[v["id"]]
+        for k in ("birthday", "schedule", "habits"):
+            v[k] = ref[k]
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write(dump_villagers(data))
+
+
 def main() -> None:
     args = sys.argv[1:]
+    if "--maj" in args:
+        maj_json(args[args.index("--maj") + 1])
+        return
     if "--tableaux" in args:
         print(tableaux())
         return
@@ -1797,7 +2072,12 @@ def main() -> None:
         export_json(args[args.index("--json") + 1])
         return
     if "--croise" in args:
-        errs = croise(args[args.index("--croise") + 1])
+        cible = args[args.index("--croise") + 1]
+        if cible.endswith(".json"):
+            errs = croise_json(cible)
+            print("\n".join(errs) if errs else "Données des habitants conformes au script (plannings, habitudes, rumeurs, goûts, quotidien, typographie).")
+            sys.exit(1 if errs else 0)
+        errs = croise(cible)
         print("\n".join(errs) if errs else "Tableaux du document identiques aux données du script.")
         sys.exit(1 if errs else 0)
     errs = controles()
