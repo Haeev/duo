@@ -25,6 +25,8 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 - R16. La porte de la maisonnette n'apparaît toujours pas vue de l'intérieur.
 - R17. Un cadre ne se pose pas sur les murs de la maison: l'aperçu reste rouge dès qu'un objet occupe la case de sol au pied du mur, alors que le mur est libre. Et posé sur une fenêtre, il la recouvre.
 - R18. Question du client sur l'étal: des produits semblent partir quand personne n'est derrière, sans rien rapporter. Selon le code, rien ne se vend sans joueur derrière l'étal; à 13 h, le reste retourne au cellier ou au coffre (message « L'étal est rangé »). À vérifier avec le client; la fermeture doit se voir mieux.
+- R19. Les arbres ne repoussent pas: en réalité, rien ne repousse avant le jour 16, puis 4 jours de souche et 6 de rejet. Décision: repousse dès le jour 1, 2 jours de souche, 4 jours de rejet.
+- R20. Quête « Où est passé Basile ? »: les joueurs ont suivi Basile pour tenir son échelle, et il a disparu en arrivant près de son établi.
 
 ## Décisions du manager
 
