@@ -12,6 +12,7 @@ import { step } from '../src/simulation/pas';
 import { gardenCellAt, harvest, sow, till, water } from '../src/simulation/potager';
 import { addStack, addToBag, countInBag } from '../src/simulation/sac';
 import { newSim } from './aides';
+import { letterTextOf } from './aides';
 
 /** Monde au jour 1, les deux personnages créés, scène d'arrivée passée. */
 function started(): Sim {
@@ -44,7 +45,7 @@ describe('règles', () => {
     expect(Math.floor(sim.world.clock.minutes)).toBe(600);
     expect(sim.world.purse).toBe(200);
     expect(sim.world.quests.find((q) => q.id === 'first_train')?.status).toBe('done');
-    expect(sim.world.letters[0]?.text).toContain('12 radis, 3 laitues, 6 œufs, 10 planches');
+    expect(letterTextOf(sim, sim.world.letters[0])).toContain('12 radis, 3 laitues, 6 œufs, 10 planches');
   });
 
   it('potager: une culture arrosée pousse au matin et donne « belle »; sans eau, elle attend', () => {

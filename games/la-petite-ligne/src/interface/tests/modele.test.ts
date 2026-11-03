@@ -217,8 +217,8 @@ describe('commande et quêtes', () => {
     const sim = started();
     const ctx = uiContext();
     sim.world.letters.push(
-      { id: 'a', day: 1, title: 'Bienvenue', from: 'La coopérative de la ligne', text: 'Bonjour', read: ['p1'] },
-      { id: 'b', day: 3, title: 'Un mot de Basile', from: 'Basile', text: "L'établi", read: [] },
+      { id: 'a', day: 1, read: ['p1'], legacy: { title: 'Bienvenue', from: 'La coopérative de la ligne', text: 'Bonjour' } },
+      { id: 'b', day: 3, read: [], legacy: { title: 'Un mot de Basile', from: 'Basile', text: "L'établi" } },
     );
     const letters = letterModels(sim.world, ctx);
     expect(letters.map((l) => [l.id, l.day, l.unread])).toEqual([

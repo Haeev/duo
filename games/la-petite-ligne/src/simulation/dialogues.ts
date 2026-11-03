@@ -2,6 +2,7 @@
  * Conversations (chacun la sienne, SI-06) et scènes à deux (HA-08), d'après
  * `habitants.json` et la section 2.3 du README des données.
  */
+import { dialogueDone } from '../etat/dialogues-faits';
 import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
 import type { Condition, Content, DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
@@ -84,7 +85,7 @@ function lineViews(sim: Sim, def: DialogueDef, who: CharacterId | null): Dialogu
 
 function doneFor(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
   const done = sim.world.dialoguesDone;
-  if (def.once === 'duo') return done.includes(def.id);
+  if (def.once === 'duo') return dialogueDone(done, def.id);
   if (def.once === 'player') return done.includes(`${def.id}@${who}`);
   return false;
 }
@@ -314,8 +315,8 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
   // Une réplique du quotidien répétable ne se garde que dans `heard` (tirage « la moins récente »):
   // l'écrire aussi ici ferait grossir la sauvegarde de trois entrées par réplique (tour 8, I-06).
   if (def.kind !== 'daily' || def.once !== null) {
+    // `<id>@<joueur>` suffit: « fini par l'un des deux » se lit aussi dessus (`dialogueDone`, format 8).
     const done = sim.world.dialoguesDone;
-    if (!done.includes(def.id)) done.push(def.id);
     if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
   }
   hearDialogue(sim, c.id, def);
@@ -450,7 +451,7 @@ export function autoStartScenes(sim: Sim): void {
   const range = sim.content.settings.ranges.talk;
   for (const def of Object.values(sim.content.dialogues)) {
     if (!def.shared || def.kind !== 'scene' || def.point === null) continue;
-    if (def.once === 'duo' && world.dialoguesDone.includes(def.id)) continue;
+    if (def.once === 'duo' && dialogueDone(world.dialoguesDone, def.id)) continue;
     const at = point(sim, def.point);
     if (!world.characters.every((c) => distance(c.pos, at) <= range)) continue;
     if (!evaluateAll(sim, def.when, NO_CONTEXT) || !sceneVillagerHere(sim, def)) continue;

@@ -12,6 +12,7 @@ import { payOrder } from '../src/simulation/economie';
 import { addStack } from '../src/simulation/sac';
 import { drawNextOrder, emptyOrderBook } from '../src/simulation/semaine';
 import { contentAndMap, newSim } from './aides';
+import { letterTextOf, letterTitleOf } from './aides';
 
 const { content } = contentAndMap();
 const s = content.settings;
@@ -200,9 +201,9 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
       expect(result?.amount).toBe(Math.round(expected * 1.25));
       sendLetter(sim, 'coop_recap_generated');
       const letter = sim.world.letters.find((l) => l.id === 'coop_recap_generated@22');
-      expect(letter?.title).toBe('Bilan du samedi 22');
-      expect(letter?.text).toContain(`${String(result?.amount)} sous`);
-      expect(letter?.text).not.toContain('{');
+      expect(letterTitleOf(sim, letter)).toBe('Bilan du samedi 22');
+      expect(letterTextOf(sim, letter)).toContain(`${String(result?.amount)} sous`);
+      expect(letterTextOf(sim, letter)).not.toContain('{');
       // La commande suivante est tirée au départ du train, pour samedi 29, avec un budget plus grand.
       expect(sim.world.order.generated?.train).toBe(29);
       expect(sim.world.order.budget).toBeCloseTo(g.budget.start + g.budget.stepOnComplete, 9);
@@ -222,7 +223,7 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
     expect(sim.world.order.budget).toBe(g.budget.start);
     expect(sim.world.order.misses).toBe(1);
     sendLetter(sim, 'coop_recap_generated');
-    const text = sim.world.letters.find((l) => l.id === 'coop_recap_generated@22')?.text ?? '';
+    const text = letterTextOf(sim, sim.world.letters.find((l) => l.id === 'coop_recap_generated@22'));
     expect(text).not.toMatch(/\b1 lignes\b/);
     expect(text).not.toContain('{');
   });
@@ -240,8 +241,8 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
           (l) => l.id === `coop_order_generated@${String(order.train)}`,
         );
         expect(letter, `graine ${String(seed)}, semaine ${String(week)}`).toBeDefined();
-        const text = letter?.text ?? '';
-        expect(letter?.title).toBe(`Commande pour samedi ${String(order.train)}`);
+        const text = letterTextOf(sim, letter);
+        expect(letterTitleOf(sim, letter)).toBe(`Commande pour samedi ${String(order.train)}`);
         expect(text).not.toContain('{');
         expect(text).toContain(`samedi ${String(order.train)}`);
         for (const line of order.lines) expect(text).toContain(String(line.count));

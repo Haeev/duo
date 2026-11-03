@@ -1,6 +1,7 @@
 // Endurance (qa-testeur, recette de la démo du 2026-10-31): les robots jouent la démo entière sur
 // plusieurs graines. Chaque partie doit finir (commande payée), sans blocage de l'horloge, sans
 // état incohérent, et l'état doit toujours tenir dans un message de 64 Kio (ADR 0007).
+import { dialogueDone } from '../src/etat/dialogues-faits';
 import { describe, expect, it } from 'vitest';
 import type { WorldState } from '../src/etat/types';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
@@ -129,7 +130,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   if (!keyExpected) {
     expect(status('handcar'), 'draisine après le rattrapage du jour 12').toBe('done');
     expect(w.dialoguesDone, 'scène de la draisine').toContain('basile_handcar_scene');
-    expect(w.dialoguesDone, 'Basile force la serrure').toContain('basile_force_lock');
+    expect(dialogueDone(w.dialoguesDone, 'basile_force_lock'), 'Basile force la serrure').toBe(true);
   }
   expect(w.phase, 'la démo se termine').toBe('ended');
   expect(run.ticks).toBeLessThan(MAX_TICKS);

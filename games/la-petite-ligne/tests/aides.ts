@@ -6,6 +6,8 @@ import { MAP_FILES } from '../src/donnees/cartes-fichiers';
 import type { Content } from '../src/donnees/types';
 import { withClockPace } from '../src/donnees/calendrier';
 import type { GameMap } from '../src/etat/carte';
+import { letterText, letterTitle } from '../src/etat/courrier';
+import type { Letter } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
 import { createWorld } from '../src/simulation/monde';
 import { step } from '../src/simulation/pas';
@@ -71,3 +73,13 @@ export function demoLastDay(content: Content = contentAndMap().content): number 
 }
 
 export { createRobot };
+
+/** Texte d'une lettre tel que le carnet l'affiche (format 8: reconstitué depuis les données); `''` si absente. */
+export function letterTextOf(sim: Sim, letter: Letter | undefined): string {
+  return letter === undefined ? '' : letterText(sim.content, letter);
+}
+
+/** Titre d'une lettre tel que le carnet l'affiche; `''` si absente. */
+export function letterTitleOf(sim: Sim, letter: Letter | undefined): string {
+  return letter === undefined ? '' : letterTitle(sim.content, letter);
+}
