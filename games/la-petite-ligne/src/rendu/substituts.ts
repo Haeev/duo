@@ -541,9 +541,9 @@ const FURNITURE: Record<string, Builder> = {
     b.ball(0.05, [0.06, 0.42, 0.04], 'flower_red');
     b.ball(0.05, [-0.06, 0.4, -0.03], 'flower_pink');
   },
-  small_vase: (b) => smallVase(b, 'white_paint'),
-  small_vase_blue: (b) => smallVase(b, 'ceramic_blue'),
-  small_vase_terracotta: (b) => smallVase(b, 'brick'),
+  small_vase: (b) => { smallVase(b, 'white_paint'); },
+  small_vase_blue: (b) => { smallVase(b, 'ceramic_blue'); },
+  small_vase_terracotta: (b) => { smallVase(b, 'brick'); },
   oil_lamp: (b) => {
     b.cylinder(0.1, 0.12, 0.1, [0, 0, 0], 'brass', { base: true, segments: 8 });
     b.cylinder(0.07, 0.07, 0.22, [0, 0.1, 0], 'glass_lamp', { base: true, segments: 8 });
