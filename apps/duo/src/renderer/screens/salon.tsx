@@ -2,7 +2,7 @@
 // quand c'est dit des deux côtés, puis le compte à rebours (UX section 2).
 import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
-import type { AppState, Profile, SalonView } from '../../shared/state';
+import type { AppState, Profile, SalonNews, SalonView } from '../../shared/state';
 import { send } from '../bridge';
 import { durationRange, t, when } from '../textes';
 import { ActionList, Chip, Dialog, Icon, PlayerCard, Sky, useCountdown } from '../ui/components';
@@ -66,6 +66,72 @@ function SaveBlock({ salon, hostName }: { salon: SalonView; hostName: string }):
   );
 }
 
+// Encadré discret sous la sauvegarde: la version installée ici, le `whatsNew` du
+// manifeste et, si le jeu fournit ses notes, le lien vers leur liste complète.
+function NewsBlock({
+  news,
+  onOpenNotes,
+}: {
+  news: SalonNews;
+  onOpenNotes: () => void;
+}): JSX.Element | null {
+  const summary = news.whatsNew !== '' ? news.whatsNew : (news.notes?.[0]?.title ?? '');
+  return (
+    <div class="carte carte-nouveautes" data-testid="salon-nouveautes">
+      <div class="nouveautes-entete">
+        <h2 class="surtitre">{t.salon.nouveautes.titre}</h2>
+        {news.isNew && (
+          <span class="pastille-nouveau" data-testid="salon-nouveau">
+            {t.salon.nouveautes.nouveau}
+          </span>
+        )}
+      </div>
+      <p class="petit texte-second">{t.salon.nouveautes.version(news.version)}</p>
+      {summary !== '' && <p class="petit">{summary}</p>}
+      {news.notes !== null && news.notes.length > 0 && (
+        <button
+          type="button"
+          class="lien petit"
+          data-testid="salon-toutes-les-notes"
+          onClick={onOpenNotes}
+        >
+          {t.salon.nouveautes.toutesLesNotes}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function NotesDialog({
+  game,
+  news,
+  onClose,
+}: {
+  game: string;
+  news: SalonNews;
+  onClose: () => void;
+}): JSX.Element {
+  return (
+    <Dialog
+      title={t.salon.nouveautes.fenetreTitre(game)}
+      back={{ label: t.salon.nouveautes.fermer, testId: 'notes-fermer', onClick: onClose }}
+    >
+      <div class="notes-liste" data-testid="notes-liste" tabIndex={0}>
+        {(news.notes ?? []).map((note) => (
+          <section key={note.version} class="note-version">
+            <h3 class="titre-3">{t.salon.nouveautes.versionTitre(note.version, note.title)}</h3>
+            <ul>
+              {note.changes.map((change, index) => (
+                <li key={index}>{change}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </Dialog>
+  );
+}
+
 export function Salon({
   state,
   salon,
@@ -79,6 +145,7 @@ export function Salon({
   const peerName = peer?.pseudo ?? '';
   const host = salon.role === 'host';
   const [confirmLeave, setConfirmLeave] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const seconds = useCountdown(salon.countdownEndsAt);
   const main = useInitialFocus<HTMLButtonElement>(
     `${salon.game.id}:${seconds === null ? 'salon' : 'decompte'}`,
@@ -93,7 +160,7 @@ export function Salon({
     else setConfirmLeave(true);
   };
   useEscape(
-    confirmLeave
+    confirmLeave || notesOpen
       ? null
       : seconds !== null
         ? () => {
@@ -194,6 +261,12 @@ export function Salon({
             <h2 class="surtitre">{t.salon.sauvegarde}</h2>
             <SaveBlock salon={salon} hostName={host ? profile.pseudo : peerName} />
           </div>
+          <NewsBlock
+            news={salon.news}
+            onOpenNotes={() => {
+              setNotesOpen(true);
+            }}
+          />
         </aside>
       </main>
       {seconds !== null && (
@@ -214,6 +287,15 @@ export function Salon({
             {t.salon.pasEncore} <kbd class="touche">{t.salon.echap}</kbd>
           </button>
         </div>
+      )}
+      {notesOpen && seconds === null && (
+        <NotesDialog
+          game={salon.game.name}
+          news={salon.news}
+          onClose={() => {
+            setNotesOpen(false);
+          }}
+        />
       )}
       {confirmLeave && (
         <Dialog
