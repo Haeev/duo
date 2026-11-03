@@ -11,6 +11,7 @@ import os
 import sys
 
 import bpy  # noqa: I001
+from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
@@ -180,6 +181,40 @@ def flower_pot(A):
         r = 0.12 if k else 0.0
         g.sphere(0.06, loc=(r * math.cos(a), r * math.sin(a), 0.56 + (0.04 if k == 0 else 0)), color="flower_red", segs=5,
                  rings=3)
+    return g
+
+
+def small_vase(A, body="white_paint", band="paint_blue", flowers=("flower_red", "flower_yellow", "flower_white")):
+    """0.12: petit vase de fleurs à poser sur une table ou un meuble (15 cm de diamètre, 25 cm de haut avec les
+    fleurs). Panse ronde de faïence, col resserré à lèvre, filet de couleur; six tiges qui sortent du col en
+    gerbe, fleurs en boules à cœur jaune, trois feuilles. Origine au centre du pied, sur le plateau."""
+    g = A.geo()
+    prof = [(0.042, 0.0), (0.058, 0.012), (0.074, 0.045), (0.072, 0.075), (0.052, 0.105), (0.034, 0.125),
+            (0.036, 0.138), (0.044, 0.148), (0.04, 0.152)]
+    cols = [body, body, band, body, body, body, band, band]
+    g.lathe(prof, colors=cols, segs=12, close_top=False)
+    g.cyl(0.036, 0.004, loc=(0, 0, 0.138), color="water_deep", segs=12)
+    import random
+    rnd = random.Random(3)
+    heads = []
+    for k in range(6):
+        a = math.radians(k * 60 + rnd.uniform(-12, 12))
+        lean = 0.035 + 0.02 * (k % 2)
+        top = (lean * math.cos(a), lean * math.sin(a), 0.205 + 0.03 * ((k * 7) % 3) / 2)
+        heads.append((top, flowers[k % len(flowers)]))
+        p0 = Vector((0.01 * math.cos(a), 0.01 * math.sin(a), 0.11))
+        p1 = Vector(top)
+        d = p1 - p0
+        rot = d.to_track_quat("Z", "Y").to_euler()
+        g.cyl(0.0035, d.length, loc=tuple((p0 + p1) / 2), color="leaf_bush", segs=5,
+              rot=tuple(math.degrees(r) for r in rot))
+    for (x, y, z), c in heads:
+        g.sphere(0.024, loc=(x, y, z), color=c, segs=7, rings=4, scale=(1.0, 1.0, 0.62))
+        g.sphere(0.009, loc=(x, y, z + 0.012), color="flower_center", segs=5, rings=3)
+    for k in range(3):
+        a = math.radians(30 + k * 120)
+        g.sphere(0.03, loc=(0.035 * math.cos(a), 0.035 * math.sin(a), 0.165), color="leaf_bush", segs=6, rings=3,
+                 scale=(1.0, 0.45, 0.25), rot=(0, -30, math.degrees(a)))
     return g
 
 
@@ -420,6 +455,7 @@ def main():
     lpl.AUTO_ROUND = True
     lpl.AUTO_MIN = (0.3, 0.03)
     furn = []
+    items = []
     furn.append(A.add("straw_mattress", straw_mattress(A), {"footprint": [1, 2], "sleep_height": 0.15}))
     furn.append(A.add("double_bed", double_bed(A), {"footprint": [2, 2], "sleep_height": 0.5,
                                                      "sleep_spots": [[-0.36, 0.0], [0.36, 0.0]]}))
@@ -430,6 +466,13 @@ def main():
     furn.append(A.add("shelf", shelf(A), {"footprint": [2, 1], "wall": True}))
     furn.append(A.add("stove", stove(A), {"footprint": [1, 1], "station": "stove"}))
     furn.append(A.add("flower_pot", flower_pot(A), {"footprint": [1, 1]}))
+    # 0.12: petit vase de fleurs à poser sur une table ou un meuble (trois couleurs de faïence)
+    vase_extra = {"kind": "decor", "surface": True, "size": [0.15, 0.25],
+                  "note": "se pose sur un plateau (table top_height 0,78): origine au centre du pied"}
+    for name, args in (("small_vase", ("white_paint", "paint_blue", ("flower_red", "flower_yellow", "flower_white"))),
+                       ("small_vase_blue", ("paint_blue", "white_paint", ("flower_white", "flower_yellow", "flower_pink"))),
+                       ("small_vase_terracotta", ("tile", "tile_dark", ("flower_violet", "flower_white", "flower_blue")))):
+        items.append(A.add(name, small_vase(A, *args), dict(vase_extra)))
     furn.append(oil_lamp(A))
     furn.append(A.add("rug", rug(A), {"footprint": [2, 2], "floor": True}))
     furn.append(A.add("curtains", curtains(A), {"footprint": [1, 1], "wall": True}))
@@ -460,7 +503,6 @@ def main():
     # tour 10 (maison_t10.py): rangement à cases, râtelier, rideaux aux fenêtres
     t10_furn, _ = T10.build(A)
     furn += t10_furn
-    items = []
     for name, fn in (("chalk_box", T9.chalk_box), ("coffee_mill", T9.coffee_mill), ("elder_jelly", T9.elder_jelly),
                      ("leather_apron", T9.leather_apron), ("wool_scarf", T9.wool_scarf)):
         items.append(A.add(name, fn(A), {"kind": "item"}))

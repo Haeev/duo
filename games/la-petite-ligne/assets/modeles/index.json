@@ -647,7 +647,7 @@
  },
  "station": {
   "file": "bourg.glb",
-  "tris": 4016,
+  "tris": 6024,
   "footprint": [
    10,
    6
@@ -663,7 +663,7 @@
  },
  "gatekeeper_house": {
   "file": "bourg.glb",
-  "tris": 8256,
+  "tris": 10608,
   "footprint": [
    7,
    6
@@ -683,7 +683,7 @@
  },
  "ferrand_shop": {
   "file": "bourg.glb",
-  "tris": 11536,
+  "tris": 13954,
   "footprint": [
    10,
    8
@@ -691,7 +691,7 @@
  },
  "haberdashery": {
   "file": "bourg.glb",
-  "tris": 6252,
+  "tris": 7788,
   "footprint": [
    7,
    7
@@ -699,7 +699,7 @@
  },
  "bakery": {
   "file": "bourg.glb",
-  "tris": 4348,
+  "tris": 5038,
   "footprint": [
    7,
    6
@@ -707,7 +707,7 @@
  },
  "lucie_house": {
   "file": "bourg.glb",
-  "tris": 3480,
+  "tris": 3684,
   "footprint": [
    6,
    6
@@ -715,7 +715,7 @@
  },
  "school": {
   "file": "bourg.glb",
-  "tris": 5044,
+  "tris": 4742,
   "footprint": [
    11,
    5
@@ -723,7 +723,7 @@
  },
  "firmin_house": {
   "file": "bourg.glb",
-  "tris": 4524,
+  "tris": 4668,
   "footprint": [
    7,
    6
@@ -1421,6 +1421,18 @@
    1,
    1
   ]
+ },
+ "small_vase": {
+  "file": "maison.glb",
+  "tris": 786
+ },
+ "small_vase_blue": {
+  "file": "maison.glb",
+  "tris": 786
+ },
+ "small_vase_terracotta": {
+  "file": "maison.glb",
+  "tris": 786
  },
  "oil_lamp": {
   "file": "maison.glb",
