@@ -124,3 +124,32 @@ export const AMBIENT_FAUNA: AmbientFaunaSettings = {
     weathers: ['sunny'],
   },
 };
+
+/** Le chat du bourg (0.13, section 7.4 de `v0-13-habitants.md`; `chat.ts`). */
+export interface CatSettings {
+  /** Nœud de `faune.glb` (squelette et maillage `cat_mesh`). */
+  model: string;
+  /** Clips de l'artiste par pose. */
+  clips: { idle: string; walk: string; sleep: string; roll: string };
+  /** Vitesse du clip de marche à son rythme (m/s, fiche de l'artiste: 0,8 s pour 0,35 m/s). */
+  walkReference: number;
+  /** Bornes du rythme de la marche. */
+  walkScaleMin: number;
+  walkScaleMax: number;
+  /** Demi-vie du virage (s). */
+  turnHalfLife: number;
+  crossFadeSeconds: number;
+  /** Sphère d'élimination hors champ autour du corps (m). */
+  boundsRadius: number;
+}
+
+export const CAT_SETTINGS: CatSettings = {
+  model: 'cat',
+  clips: { idle: 'cat_idle', walk: 'cat_walk', sleep: 'cat_sleep', roll: 'cat_roll' },
+  walkReference: 0.35,
+  walkScaleMin: 0.3,
+  walkScaleMax: 3,
+  turnHalfLife: 0.12,
+  crossFadeSeconds: 0.25,
+  boundsRadius: 0.5,
+};

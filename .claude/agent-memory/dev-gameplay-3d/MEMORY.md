@@ -399,6 +399,16 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `generer.ts` saute un fichier existant: un fichier vide à la place de la référence la plus longue (jour 62) la saute sans toucher au script; le supprimer après. Quatre références du format 12: 3 min 30 (charge 8 à 15).
 - `nextObjective` (`interface/modele.ts`): la commande du samedi ne passe devant les quêtes principales qu'à partir de la veille (`day >= lastDay - 1`); une quête principale ajoutée au contenu change le « prochain objectif » des tests d'écran.
 - Filtre de références par préfixe: `startsWith('format-1')` prend aussi les formats 10 et suivants; écrire `format-1-`.
+
+## Habitants de la 0.13, rendu (La Petite Ligne, vérifié le 2026-11-03)
+
+- Un maillage fixe (sans squelette) avec le matériau des personnages compile un programme de plus (12 pour un budget de 12). Accessoires peints dans `personnages.png`: copie du matériau `held` (même clé de programme que la palette) avec la texture des personnages, rugosité et métal en texture d'un pixel, lueur de nuit en pixel noir (`accessoryMaterial` de `accessoires.ts`). Vérifier par `lplRendu.programs()` avant et après.
+- Regard d'un habitant (`lookAt`): le buste et le cou tournent, donc les mains bougent; une main posée sur un guidon ou un accordéon partait en l'air. Tête seule quand les mains tiennent quelque chose (`setLookBody`).
+- Lire un champ que le lot d'un autre ajoutera à l'état sans toucher au type: `if ('habit' in villager) { const h: unknown = villager.habit; ... }` (pas de transtypage).
+- `cloneRig` d'un nœud absent rend un squelette invisible: tester `library.has(node)` avant, sinon `instantiate` (substitut), et pas de clips pour un substitut (pistes sans cible).
+- Page de rendu, gros plan d'un personnage en orientation 0: le haut de l'écran est -x -y; pour cadrer un corps debout en (X, Y) avec `largeur=3`, `vue=X-0.9,Y-0.9`. `largeur` refuse moins de 2. Les gros plans près de l'épicerie ont un voile clair (présent sans mes changements).
+- Le port 5391 sert au serveur Vite d'une autre séance (copie principale): prendre un port à soi (5947) et le vérifier par `ss -ltnp`.
+- Position d'une main pendant un clip sans navigateur: cinématique directe en Python sur le JSON et le binaire du GLB (TRS, slerp), du nœud jusqu'à la racine; `push_bike` pose `socket_hand_l` à (0,31; 0,98; 0,37), l'extra `hand_l` des vélos.
 - Un test qui joue « toute la démo » doit le vérifier (`phase === 'ended'`, `stages.current === 'demo'`): une borne de pas trop courte (journée doublée le 2026-11-01, 0,7 s par minute) ou un robot coincé coupe la mesure en silence.
 - Robot et charge à deux: le chemin de la grille ignore la largeur de la charge, qui garde son orientation; l'étal du marché porté de travers restait coincé devant l'établi de Basile jusqu'à minuit (horloge arrêtée `midnight`, partie bloquée). Détour du robot après 20 s sans rapprochement (`beamDetour`). Sonde: rejouer jusqu'au pas, puis sur des copies (`wrapWorld(content, map, structuredClone(world))`) pousser 3 s dans chacune des huit directions.
 

@@ -70,6 +70,16 @@ import { sleepPose, type SleepPose } from './coucher';
 import { holdSpecFor, ToolHolder } from './prise';
 import { plantedFootSpeed } from './foulee';
 import { CLIP_FOR_ACTION } from './gestes';
+import {
+  VillagerCarry,
+  accessoryMaterial,
+  chooseProp,
+  villagerHabit,
+  villagerScale,
+  type MaterialSwap,
+  type PropSituation,
+  type VillagerPropRule,
+} from './accessoires';
 
 const SETTINGS = RENDER_SETTINGS.characters;
 /** Nom du groupe animé (squelette et maillages) dans `personnages.glb`. */
@@ -139,6 +149,32 @@ const VILLAGER_WORN: Readonly<Record<string, { model: string; when: (world: Read
     },
   },
 };
+const NO_PROPS: readonly VillagerPropRule[] = [];
+const NO_CLIPS: ReadonlyMap<string, AnimationClip> = new Map();
+
+/** Pièces portées d'un habitant, fusionnées au corps: celle de `VILLAGER_WORN`, puis les règles `worn`. */
+function wornModels(id: string): string[] {
+  const models: string[] = [];
+  const scarf = VILLAGER_WORN[id]?.model;
+  if (scarf !== undefined) models.push(scarf);
+  for (const rule of SETTINGS.villagerProps[id] ?? NO_PROPS) {
+    if (rule.mount === 'worn' && !models.includes(rule.model)) models.push(rule.model);
+  }
+  return models;
+}
+
+/** Ce que le rendu garde d'un habitant d'une image à l'autre pour ses accessoires (0.13). */
+interface VillagerProps {
+  carry: VillagerCarry;
+  /** Positions des deux mains (objet tenu devant soi), fonction créée une fois. */
+  hands: (left: Vector3, right: Vector3) => boolean;
+  carried: VillagerPropRule | null;
+  worn: VillagerPropRule | null;
+  /** Habitude d'avant la marche en cours (`PropSituation.left`). */
+  left: string | null;
+  situation: PropSituation;
+}
+
 function isSkinned(object: Object3D | undefined): object is SkinnedMesh {
   return object instanceof SkinnedMesh;
 }
@@ -284,6 +320,8 @@ class CharacterFigure {
   private readonly lookPoint = { x: 0, y: 0 };
   private lookTarget: { x: number; y: number } | null = null;
   private lookYaw = 0;
+  /** Le buste tourne avec le regard (faux: la tête seule, mains posées sur un vélo ou un accordéon). */
+  private lookBody = true;
 
   constructor(
     readonly id: string,
@@ -326,6 +364,11 @@ class CharacterFigure {
   }
 
   /** Regard vers ce point de la carte (habitant attentif), ou droit devant (`null`). */
+  /** Regard du buste et du cou en plus de la tête (vrai), ou de la tête seule. */
+  setLookBody(enabled: boolean): void {
+    this.lookBody = enabled;
+  }
+
   lookAt(target: DeepReadonly<{ x: number; y: number }> | null): void {
     if (target === null) {
       this.lookTarget = null;
@@ -453,8 +496,10 @@ class CharacterFigure {
     this.lookYaw += (wanted - this.lookYaw) * smoothFactor(dt, SETTINGS.lookHalfLife);
     if (Math.abs(this.lookYaw) > 1e-3) {
       const shares = SETTINGS.lookShares;
-      this.offsets.add('chest', 'up', this.lookYaw * shares.chest);
-      this.offsets.add('neck', 'up', this.lookYaw * shares.neck);
+      if (this.lookBody) {
+        this.offsets.add('chest', 'up', this.lookYaw * shares.chest);
+        this.offsets.add('neck', 'up', this.lookYaw * shares.neck);
+      }
       this.offsets.add('head', 'up', this.lookYaw * shares.head);
     }
     this.offsets.apply(this.root);
@@ -685,9 +730,19 @@ export class CharactersPart implements EventfulPart {
     this.walkReference = this.footSpeed(rig, WALK) ?? SETTINGS.walkReferenceSpeed;
     this.carryReference = this.footSpeed(rig, CARRY) ?? SETTINGS.carryReferenceSpeed;
     this.carryOneReference = this.footSpeed(rig, SETTINGS.carryOne.walk) ?? this.walkReference;
+    this.bikeReference = this.footSpeed(rig, SETTINGS.bikes.walkClip) ?? this.walkReference;
+    const shared = library.sharedCharacterMaterial();
+    this.propSwap = shared === null ? null : { palette: shared, held: accessoryMaterial(materials.held, shared, resources) };
   }
 
+  /** Accessoires des habitants peints dans la texture des personnages, sans programme de plus (`accessoryMaterial`). */
+  private readonly propSwap: MaterialSwap | null;
+
   private readonly carryOneReference: number;
+  /** Vitesse du pied posé de `push_bike` (vélo poussé, 0.13). */
+  private readonly bikeReference: number;
+  /** Accessoires des habitants (0.13, `accessoires.ts`). */
+  private readonly villagerProps = new Map<string, VillagerProps>();
 
   /** Assis ou debout à l'image d'avant, par personnage, et le clip de passage en cours. */
   private readonly postures = new Map<string, { seated: boolean; clip: string | null; start: number }>();
@@ -1258,39 +1313,107 @@ export class CharactersPart implements EventfulPart {
     const definition = this.content.villagers.find((candidate) => candidate.id === villager.id);
     const modelName = definition?.model ?? `villager_${villager.id}`;
     const node = this.library.source(modelName)?.node ?? modelName;
-    // Pièces portées selon l'état (tour 9: l'écharpe de Firmin), sur le même squelette.
-    const worn = VILLAGER_WORN[villager.id];
-    const keep = worn !== undefined && this.library.has(worn.model) ? [node, worn.model] : [node];
-    const model = this.library.cloneRig(RIG_NODE, keep) ?? this.library.instantiate(modelName);
-    if (worn !== undefined) {
-      // La pièce portée rejoint le corps (`mergeOutfit`, cibles de morphose nulles): ni appel de
-      // dessin ni programme de plus. On échange la géométrie du corps quand elle est portée.
-      const piece = model.getObjectByName(worn.model);
-      const body = model.getObjectByName(node);
-      if (isSkinned(piece) && isSkinned(body)) {
-        const plain = body.geometry;
-        const dressed = mergeOutfit(plain, [piece.geometry]);
+    // Pièces portées selon l'état (tour 9: l'écharpe de Firmin; 0.13: la loupe d'Ambroise), sur le même squelette.
+    const worn = wornModels(villager.id).filter((name) => this.library.has(name));
+    // Sans son nœud dans `personnages.glb`, le squelette seul serait invisible: substitut (`substituts.ts`).
+    const rigged = this.library.has(node) ? this.library.cloneRig(RIG_NODE, [node, ...worn]) : null;
+    const model = rigged ?? this.library.instantiate(modelName);
+    const body = model.getObjectByName(node);
+    if (rigged !== null && isSkinned(body)) {
+      // Chaque pièce portée rejoint le corps (`mergeOutfit`, cibles de morphose nulles): ni appel
+      // de dessin ni programme de plus. On échange la géométrie du corps selon la pièce portée.
+      const plain = body.geometry;
+      const dressed = new Map<string, BufferGeometry>();
+      for (const name of worn) {
+        const piece = model.getObjectByName(name);
+        if (!isSkinned(piece)) continue;
+        const merged = mergeOutfit(plain, [piece.geometry]);
         piece.removeFromParent();
-        if (dressed !== null) {
-          this.resources.track(dressed);
-          this.wornPieces.set(villager.id, { body, plain, dressed });
-        }
+        if (merged !== null) dressed.set(name, this.resources.track(merged));
       }
+      if (dressed.size > 0) this.wornPieces.set(villager.id, { body, plain, dressed });
     }
     const pick = this.picks.add({ kind: 'villager', villager: villager.id });
     const figure = new CharacterFigure(
       villager.id,
       model,
-      this.clips,
+      // Un substitut n'a pas d'os: aucun clip (le mélangeur se plaindrait de pistes sans cible).
+      rigged === null ? NO_CLIPS : this.clips,
       pick,
-      definition?.scale ?? 1,
+      villagerScale(definition?.scale, this.library.extras(modelName)),
     );
     this.group.add(figure.root);
+    const carry = new VillagerCarry(figure.root, this.library, SETTINGS.bikes, this.propSwap);
+    this.villagerProps.set(villager.id, {
+      carry,
+      hands: (left, right) => figure.handPoint('left', left) && figure.handPoint('right', right),
+      carried: null,
+      worn: null,
+      left: null,
+      situation: { moving: false, activity: '', habit: null, left: null, talking: false },
+    });
     return figure;
   }
 
-  /** Corps de chaque habitant qui porte une pièce (l'écharpe de Firmin): sa géométrie sans et avec. */
-  private readonly wornPieces = new Map<string, { body: SkinnedMesh; plain: BufferGeometry; dressed: BufferGeometry }>();
+  /** Corps de chaque habitant qui porte une pièce: sa géométrie sans, et avec chacune des pièces. */
+  private readonly wornPieces = new Map<
+    string,
+    { body: SkinnedMesh; plain: BufferGeometry; dressed: ReadonlyMap<string, BufferGeometry> }
+  >();
+
+  /**
+   * Accessoires d'un habitant à cette image (0.13): pièce portée sur le corps, objet en main,
+   * devant soi ou vélo poussé. Rend le clip à jouer à la place de `clip`.
+   */
+  private villagerAccessories(
+    figure: CharacterFigure,
+    villager: DeepReadonly<VillagerState>,
+    world: ReadonlyWorld,
+    onBench: boolean,
+    clip: string,
+  ): ClipRequest {
+    const props = this.villagerProps.get(villager.id);
+    const moving = villager.speed > SETTINGS.walkThreshold;
+    const scale = figure.root.scale.x;
+    const walk = { name: clip, timeScale: clip === WALK ? this.strideScale(villager.speed, this.walkReference, scale) : 1 };
+    if (props === undefined) return walk;
+    const rules = SETTINGS.villagerProps[villager.id] ?? NO_PROPS;
+    const habit = villagerHabit(villager);
+    const situation = props.situation;
+    situation.moving = moving;
+    situation.activity = villager.activity;
+    situation.habit = habit;
+    situation.left = props.left;
+    situation.talking = villager.talkingWith.length > 0;
+    // Assis sur un banc, rien en main ni vélo à côté.
+    props.carried = onBench ? null : chooseProp(rules, situation, false, props.carried);
+    props.worn = chooseProp(rules, situation, true, props.worn);
+    if (!moving) props.left = habit;
+    const worn = this.wornPieces.get(villager.id);
+    if (worn !== undefined) {
+      const scarf = VILLAGER_WORN[villager.id];
+      const piece = scarf?.when(world, this.content) === true ? scarf.model : (props.worn?.model ?? null);
+      worn.body.geometry = (piece === null ? undefined : worn.dressed.get(piece)) ?? worn.plain;
+    }
+    const carried = props.carried;
+    // Mains posées sur le guidon ou l'accordéon: il tourne la tête, pas le buste (la main resterait en l'air).
+    figure.setLookBody(carried === null || carried.mount === 'hand');
+    figure.setTool(this.library, carried?.mount === 'hand' ? carried.model : null, this.propSwap);
+    props.carry.setBike(carried?.mount === 'bike' ? carried.model : null);
+    props.carry.setChest(carried?.mount === 'chest' ? carried.model : null);
+    if (carried === null || onBench) return walk;
+    if (carried.mount === 'bike') {
+      return moving
+        ? { name: SETTINGS.bikes.walkClip, timeScale: this.strideScale(villager.speed, this.bikeReference, scale), fade: SETTINGS.walkFadeSeconds }
+        : { name: carried.stillClip ?? SETTINGS.bikes.idleClip, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
+    }
+    if (carried.mount === 'chest') {
+      return moving
+        ? { name: SETTINGS.carryOne.walk, timeScale: this.strideScale(villager.speed, this.carryOneReference, scale), fade: SETTINGS.walkFadeSeconds }
+        : { name: carried.stillClip ?? SETTINGS.carryOne.idle, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
+    }
+    return moving || situation.talking || carried.stillClip === null ? walk : { name: carried.stillClip, timeScale: 1 };
+  }
 
   update(context: FrameContext): void {
     this.time = context.time;
@@ -1477,18 +1600,22 @@ export class CharactersPart implements EventfulPart {
         );
         figure.setTool(this.library, direction.tool);
         figure.updateFace(context.time, null);
+        const props = this.villagerProps.get(villager.id);
+        props?.carry.setBike(null);
+        props?.carry.setChest(null);
+        figure.setLookBody(true);
         continue;
       }
-      figure.setTool(this.library, null);
       figure.setReach(null);
-      const worn = this.wornPieces.get(villager.id);
-      if (worn !== undefined) worn.body.geometry = VILLAGER_WORN[villager.id]?.when(world, this.content) === true ? worn.dressed : worn.plain;
       const shown = villager.visible && !this.walledOff(villager.inside);
       figure.root.visible = shown;
       figure.pick.enabled = shown;
       if (!shown) {
         // Il réapparaît déjà assis ou debout, sans se lever ni s'asseoir devant nous.
         this.postures.delete(`habitant ${villager.id}`);
+        // Hors de vue (tournée, chez lui): l'habitude qu'il quittera en réapparaissant.
+        const props = this.villagerProps.get(villager.id);
+        if (props !== undefined) props.left = villagerHabit(villager);
         continue;
       }
       // Arrêté sur un banc (Jeanne au quai le matin): assis, à sa place, dos au dossier.
@@ -1502,21 +1629,19 @@ export class CharactersPart implements EventfulPart {
       if (direction?.kind === 'look' && villager.talkingWith.length === 0) {
         figure.lookAt(direction);
       }
-      const timeScale =
-        clip === WALK ? this.strideScale(villager.speed, this.walkReference, figure.root.scale.x) : 1;
+      const request = this.villagerAccessories(figure, villager, world, onBench, clip);
       figure.update(
         context,
         this.terrain,
         onBench ? this.benchPlace : villager.prev,
         onBench ? this.benchPlace : villager.pos,
         onBench ? this.benchPlace.facing : villager.facing,
-        this.posture(`habitant ${villager.id}`, clip === SIT_CHAIR, villager.speed > SETTINGS.walkThreshold, {
-          name: clip,
-          timeScale,
-        }),
+        this.posture(`habitant ${villager.id}`, clip === SIT_CHAIR, villager.speed > SETTINGS.walkThreshold, request),
         onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : 0,
         SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
       );
+      const props = this.villagerProps.get(villager.id);
+      props?.carry.update(SETTINGS.teleportDistance, props.hands);
       figure.updateFace(
         context.time,
         villager.talkingWith.length > 0
@@ -1580,7 +1705,9 @@ export class CharactersPart implements EventfulPart {
     for (const figure of this.villagers.values()) {
       figure.dispose();
     }
+    for (const props of this.villagerProps.values()) props.carry.dispose();
     this.players.clear();
     this.villagers.clear();
+    this.villagerProps.clear();
   }
 }

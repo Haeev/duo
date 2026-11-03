@@ -8,6 +8,7 @@
  * degrés, durées en secondes, distances en mètres (une case = 1 m).
  */
 
+import type { BikeSettings, VillagerPropRule } from './accessoires';
 import type { IdlePose } from './attentes';
 import type { ToolHoldSpec } from './prise';
 import type { ModelTrim } from './retouches';
@@ -36,6 +37,23 @@ export interface ForestClearing {
 export type SquareShape =
   | { kind: 'ring'; model: string; radius: number }
   | { kind: 'band'; a: readonly [number, number]; b: readonly [number, number]; half: number };
+
+/** Règle d'accessoire d'un habitant (`accessoires.ts`), champs absents à leur valeur neutre. */
+function villagerProp(
+  model: string,
+  mount: VillagerPropRule['mount'],
+  rule: Partial<Omit<VillagerPropRule, 'model' | 'mount'>>,
+): VillagerPropRule {
+  return {
+    model,
+    mount,
+    walking: rule.walking ?? false,
+    activities: rule.activities ?? [],
+    habits: rule.habits ?? [],
+    untracked: rule.untracked ?? false,
+    stillClip: rule.stillClip ?? null,
+  };
+}
 
 export const RENDER_SETTINGS = {
   renderer: {
@@ -538,6 +556,70 @@ export const RENDER_SETTINGS = {
     posture: { sitDown: 'sit_down', standUp: 'stand_up', fadeSeconds: 0.08 },
     /** Porter seul devant soi (meuble tenu pour l'aménagement): en marchant, et à l'arrêt. */
     carryOne: { walk: 'carry_one', idle: 'carry_one_idle' },
+    /**
+     * Habitants de la 0.13 (lot H6, `accessoires.ts`): ce que chacun porte et quand, d'après la
+     * fiche (section 2.3 de `v0-13-habitants.md`) et ses habitudes (section 3.2). La première règle
+     * qui s'applique l'emporte; en conversation, l'habitant garde ce qu'il avait. Avant le lot H1
+     * (pas encore d'habitude dans l'état), seules les règles `untracked` se montrent.
+     * Pourquoi: Lucie, l'abbé et Nour poussent leur vélo dans le bourg en partant en tournée et en
+     * revenant; Armand a son cartable entre l'école et chez lui, au portail aussi; Margot porte le
+     * pot à lait de la traite et du beurre; Barnabé a la hache à l'épaule entre la coupe, la
+     * charbonnière et la clairière; Colette sort l'accordéon le mardi soir et à son anniversaire;
+     * Ambroise a la loupe à l'oeil à l'établi, relevée sur le front ailleurs.
+     */
+    villagerProps: {
+      lucie: [
+        villagerProp('bicycle_lucie', 'bike', { walking: true, habits: ['round', 'train', 'sorting'], untracked: true }),
+        villagerProp('bicycle_lucie', 'bike', { activities: ['wait_train'], habits: ['train'], stillClip: 'push_bike_idle' }),
+      ],
+      martial: [
+        villagerProp('bicycle_martial', 'bike', {
+          walking: true,
+          habits: ['rounds', 'sunday_hamlets', 'birthday', 'wednesday_bike'],
+          untracked: true,
+        }),
+        villagerProp('bicycle_martial', 'bike', {
+          activities: ['work', 'stand'],
+          habits: ['wednesday_bike', 'birthday'],
+          stillClip: 'push_bike_idle',
+        }),
+      ],
+      nour: [villagerProp('bicycle_nour', 'bike', { walking: true, habits: ['rounds'], untracked: true })],
+      armand: [
+        villagerProp('school_satchel', 'hand', { walking: true, habits: ['gate', 'class', 'recess', 'mairie'], untracked: true }),
+        villagerProp('school_satchel', 'hand', { activities: ['stand'], habits: ['gate'], stillClip: 'idle' }),
+      ],
+      margot: [
+        villagerProp('milk_can', 'hand', { walking: true, habits: ['butter', 'milking'], untracked: true }),
+        villagerProp('milk_can', 'hand', { activities: ['work'], habits: ['butter'], stillClip: 'idle' }),
+      ],
+      barnabe: [
+        villagerProp('felling_axe', 'hand', {
+          walking: true,
+          habits: ['coupe', 'with_ines', 'kiln', 'cuite', 'lunch'],
+          untracked: true,
+        }),
+        villagerProp('felling_axe', 'hand', { activities: ['stand'], habits: ['lunch'], stillClip: 'idle' }),
+      ],
+      colette: [
+        villagerProp('accordion', 'chest', {
+          activities: ['stand', 'host'],
+          habits: ['tuesday_accordion', 'birthday'],
+          stillClip: 'carry_one_idle',
+        }),
+      ],
+      ambroise: [
+        villagerProp('villager_ambroise_loupe', 'worn', { activities: ['work'], habits: ['shop'], untracked: true }),
+        villagerProp('villager_ambroise_loupe_up', 'worn', { walking: true, activities: ['*'], untracked: true }),
+      ],
+    } as Readonly<Record<string, readonly VillagerPropRule[]>>,
+    /** Vélos poussés à la main (fiche de l'artiste: roues `_wheel_front` et `_wheel_rear`, rayon 0,335 m). */
+    bikes: {
+      wheelRadius: 0.335,
+      wheels: ['_wheel_front', '_wheel_rear'],
+      walkClip: 'push_bike',
+      idleClip: 'push_bike_idle',
+    } satisfies BikeSettings,
     /** Boire (le chocolat à la petite table d'Odette: action `eat` qui vise la table). */
     drinkClip: 'drink',
     /** Traire la chèvre ou la tenir pour l'autre: pas encore de clip de traite, celui de la caresse (accroupi). */
@@ -830,6 +912,14 @@ export const RENDER_SETTINGS = {
     // Hache: tenue à 20 cm du bout du manche (8 cm dans le modèle), tête en bas, au repos comme
     // pendant le geste; la tête reste à 25 cm du sol bras ballant.
     axe: { grip: [0, -0.12, 0], gestureGrip: [0, -0.12, 0], gestures: ['chop'], carry: null },
+    // Hache de Barnabé (0.13, `felling_axe`, 0,88 m): à l'épaule droite hors geste, comme la houe;
+    // main près du bout du manche, fer derrière l'épaule, tranchant vers le haut.
+    felling_axe: {
+      grip: [0, -0.04, 0],
+      gestureGrip: [0, -0.12, 0],
+      gestures: ['chop'],
+      carry: { hand: [-0.22, 1.18, 0.22], axis: [0.1, -0.72, 0.69], front: [0, 1, 0] },
+    },
     // Arrosoir: par l'anse (origine de l'artiste, au sommet de l'anse).
     watering_can: { grip: [0, 0, 0], gestureGrip: [0, 0, 0], gestures: ['water'], carry: null },
     // Canne: par la poignée, au-dessus du talon (origine de l'artiste).
