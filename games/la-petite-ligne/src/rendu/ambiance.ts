@@ -43,6 +43,7 @@ import {
   GROUND_CELLS,
   createSurfaceUniforms,
   patchSurface,
+  type SurfacePatchOptions,
   type SurfaceUniforms,
 } from './surfaces';
 
@@ -232,17 +233,27 @@ export class AmbiancePart implements ExtensionPart {
     this.hooks.scene.add(mesh);
   }
 
+  /**
+   * Ajouts au shader des personnages; style `lisse` (`characters.style`): rampe, ombres teintées
+   * selon la matière et liseré net, dans le même programme (autre clé, pas un de plus).
+   */
+  private get characterPatch(): SurfacePatchOptions {
+    const smooth = this.hooks.characterStyle === 'lisse';
+    return {
+      puddles: false,
+      wind: false,
+      ground: false,
+      rim: true,
+      ramp: smooth,
+      key: smooth ? 'characters_lisse' : 'characters',
+    };
+  }
+
   /** Les personnages reçoivent nuages, pluie et lumières de sol (pas de flaques sur eux). */
   private patchCharacters(): void {
     const shared = this.hooks.characterMaterial;
     if (shared !== null) {
-      patchSurface(shared, this.surfaces, {
-        puddles: false,
-        wind: false,
-        ground: false,
-        rim: true,
-        key: 'characters',
-      });
+      patchSurface(shared, this.surfaces, this.characterPatch);
     }
     this.hooks.scene.traverse((object) => {
       if (!(object instanceof Mesh)) {
@@ -256,13 +267,7 @@ export class AmbiancePart implements ExtensionPart {
           continue;
         }
         if (material.name.includes(CHARACTER_MATERIAL)) {
-          patchSurface(material, this.surfaces, {
-            puddles: false,
-            wind: false,
-            ground: false,
-            rim: true,
-            key: 'characters',
-          });
+          patchSurface(material, this.surfaces, this.characterPatch);
         } else if (material.name.startsWith(PALETTE_MATERIAL)) {
           // Copie de la palette (foulard, substitut): mêmes ajouts que le décor, sans flaques.
           patchSurface(material, this.surfaces, { puddles: false, wind: false, ground: false, key: 'decor_copy' });

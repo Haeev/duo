@@ -20,7 +20,8 @@
  * `chantiers=tous|<ids>`, `cadeaux=1`, `outil=<objet>`, `maison9=1`, `cueillette9=1`,
  * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Pêche de la 0.12: `peche12=1`, avec
  * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Habitants de la 0.13:
- * `habitants13=1|messe`, `chat=`, `loupe=oeil` (voir `habitants13-exemple.ts`). Touches: G repère, J lancer,
+ * `habitants13=1|messe`, `chat=`, `loupe=oeil` (voir `habitants13-exemple.ts`). `style=lisse` (ou
+ * `facettes`): style des personnages, pour comparer (plan de qualité visuelle, décision D1). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import { applyBreedingExample } from './elevage-exemple';
@@ -135,6 +136,10 @@ interface DemoHandle {
   frames: number;
   /** Monde affiché, pour les planches d'animation (mode `manuel=1`). */
   world(): WorldState;
+  /** Caméra posée sur un point (comme `vue=x,y`), `null` la rend au joueur; zoom de 0 à 2 (planches). */
+  view(focus: { x: number; y: number } | null, zoom?: number): void;
+  /** Gros plan de `width` m de large (comme `largeur=`). */
+  inspect(width: number): void;
 }
 
 declare global {
@@ -288,6 +293,7 @@ async function main(): Promise<void> {
     return;
   }
 
+  const characterStyle = params.get('style');
   const engine = new RenderEngine({
     view,
     container,
@@ -298,6 +304,8 @@ async function main(): Promise<void> {
     adaptive: params.get('adaptatif') === '1',
     ...(peche12 === null ? {} : { fishing: peche12.source }),
     ...(habitants13 === null ? {} : { cat: habitants13.cat }),
+    // `style=lisse|facettes`: style des personnages (étape A du plan de qualité visuelle, D1).
+    ...(characterStyle === 'lisse' || characterStyle === 'facettes' ? { characterStyle } : {}),
   });
   const handle: DemoHandle = {
     ready: false,
@@ -320,6 +328,15 @@ async function main(): Promise<void> {
     destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
     world: () => world,
+    view: (focus, zoom) => {
+      engine.setFocusOverride(focus);
+      if (zoom === undefined) return;
+      for (let i = 0; i < 2; i += 1) engine.camera('zoom_out');
+      for (let i = 0; i < 2 - zoom; i += 1) engine.camera('zoom_in');
+    },
+    inspect: (width) => {
+      engine.inspect(width);
+    },
   };
   window.lplRendu = handle;
   await engine.load(() => undefined);

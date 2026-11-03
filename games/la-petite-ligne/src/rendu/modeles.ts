@@ -29,7 +29,8 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { preparePaletteTexture, type SharedMaterials } from './materiaux';
 import type { ResourceTracker } from './ressources';
 import { buildSubstitute, type SubstituteHints } from './substituts';
-import { RENDER_SETTINGS } from './reglages';
+import { RENDER_SETTINGS, type CharacterStyle } from './reglages';
+import { smoothCharacterNormals } from './lisse';
 import { trimGeometry } from './retouches';
 
 const MODEL_URLS = import.meta.glob<string>('../../assets/modeles/*.glb', {
@@ -147,10 +148,14 @@ export class ModelLibrary {
   private readonly substitutes = new Map<string, Object3D>();
   private readonly missing = new Set<string>();
   private characterMaterial: MeshStandardMaterial | null = null;
+  /** Géométries de personnages déjà lissées (style `lisse`). */
+  private readonly smoothed = new WeakSet<BufferGeometry>();
 
   constructor(
     private readonly materials: SharedMaterials,
     private readonly resources: ResourceTracker,
+    /** Style des personnages: `lisse` lisse leurs normales au chargement (`lisse.ts`). */
+    private readonly characterStyle: CharacterStyle = RENDER_SETTINGS.characters.style,
   ) {}
 
   /** Charge tous les GLB présents. Un fichier illisible est ignoré (ses modèles auront un substitut). */
@@ -198,6 +203,17 @@ export class ModelLibrary {
         }
         this.resources.track(object.geometry as BufferGeometry);
         object.material = this.adoptMaterial(object.material as Material);
+        const geometry = object.geometry as BufferGeometry;
+        if (
+          this.characterStyle === 'lisse' &&
+          object instanceof SkinnedMesh &&
+          object.material === this.characterMaterial &&
+          !this.smoothed.has(geometry)
+        ) {
+          // Personnages lisses (décision D1, version témoin): le décor garde ses facettes.
+          smoothCharacterNormals(geometry, RENDER_SETTINGS.characters.smooth.creaseDegrees);
+          this.smoothed.add(geometry);
+        }
       }
     });
     this.files.set(file, { file, gltf, nodes });
