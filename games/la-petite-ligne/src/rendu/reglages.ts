@@ -515,6 +515,13 @@ export const RENDER_SETTINGS = {
     blinkSeconds: 0.12,
     /** Silhouette du joueur vue derrière un mur. */
     silhouetteOpacity: 0.38,
+    /**
+     * Trou de visibilité d'un personnage: rien ne s'efface sous cette hauteur au-dessus de ses
+     * pieds (m). Une barrière (lisses à 0,8 m, poteaux à 0,95 m), un rail ou un banc ne le cachent
+     * pas: on le voit par-dessus. Plus bas (0,45 m avant le retour S02 du 2026-11-02), leur coupe
+     * tramée au bord du trou se lisait comme une ombre en tache tramée à côté des pieds.
+     */
+    seeThroughMinHeight: 1,
     /** Fondu entre la marche et l'attente: court, pour que les pieds ne glissent pas au départ et à l'arrêt. */
     walkFadeSeconds: 0.1,
     /** Fondu d'entrée et de sortie d'un geste d'outil joué une fois. */

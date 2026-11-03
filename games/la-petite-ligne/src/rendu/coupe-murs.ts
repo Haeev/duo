@@ -28,6 +28,8 @@ const UPWARD = 0.5;
 const TRIANGLE = 3;
 /** Marge autour de la section du mur pour garder une face écrasée (m). */
 const SECTION_SLACK = 0.01;
+/** Une face de maçonnerie monte au moins de tant au-dessus de la coupe (m): mur, jambage. */
+const MASONRY_RISE = 1;
 
 /** Un sommet de sortie: position dans le repère du modèle et valeurs de chaque attribut. */
 interface Corner {
@@ -172,9 +174,17 @@ export function lowWallGeometry(
     return null;
   }
 
-  // Section du mur à la coupe (faces qui la traversent) et tronçons porteurs le long du mur.
+  // Section du mur à la coupe et tronçons porteurs le long du mur: seules les faces de la
+  // maçonnerie (qui montent bien au-dessus de la coupe) la définissent. Ce qui est accroché à la
+  // façade et plus bas (étal de l'épicerie, cagettes) n'élargit pas la section: écrasé à la
+  // hauteur de coupe, il formait des plaques posées à plat devant le mur (retour S02 du 2026-11-02).
+  const crossing = low.filter((triangle) => triangle.some((corner) => corner.p.y > height));
+  const tall = crossing.filter((triangle) =>
+    triangle.some((corner) => corner.p.y >= height + MASONRY_RISE),
+  );
+  const masonry = tall.length > 0 ? tall : crossing;
   const section = { minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity };
-  for (const triangle of low) {
+  for (const triangle of masonry) {
     for (const corner of triangle) {
       if (corner.p.y < height) continue;
       section.minX = Math.min(section.minX, corner.p.x);
@@ -186,7 +196,7 @@ export function lowWallGeometry(
   const along: 'x' | 'z' = section.maxX - section.minX >= section.maxZ - section.minZ ? 'x' : 'z';
   const across: 'x' | 'z' = along === 'x' ? 'z' : 'x';
   const spans = mergeSpans(
-    low
+    masonry
       .filter((triangle) => triangle.some((corner) => corner.p.y >= height))
       .map((triangle) => {
         const values = triangle.map((corner) => corner.p[along]);
@@ -199,8 +209,14 @@ export function lowWallGeometry(
   const bays = openings.filter((opening) => opening.axis === along);
   const output: Face[] = [];
   for (const triangle of low) {
+    // Une face qui traverse la coupe n'est gardée que dans la section du mur; ce qui reste
+    // entièrement sous la coupe (marche, soubassement) est gardé tel quel.
+    const polygon = triangle.some((corner) => corner.p.y > height)
+      ? clipAlong(triangle, across, acrossLow, acrossHigh)
+      : triangle;
+    if (polygon.length < TRIANGLE) continue;
     // Dans une baie, le pied descend au seuil.
-    let pieces: { polygon: Corner[]; limit: number }[] = [{ polygon: triangle, limit: height }];
+    let pieces: { polygon: Corner[]; limit: number }[] = [{ polygon, limit: height }];
     for (const bay of bays) {
       pieces = pieces.flatMap((piece) => {
         if (piece.limit !== height) return [piece];

@@ -37,6 +37,10 @@ const STONE_CUSHION = 0.2;
 const STONE_CUSHION_DROP = 1.2;
 /** Passes du flou des distances signées (deux boîtes: une cloche). */
 const BLUR_PASSES = 2;
+/** Le sable le long d'un chemin est plein dès ce rapport à la distance au bord (m): bord net, coin arrondi. */
+const PATH_SAND_GAIN = 8;
+/** Canal A de la texture: présent partout (> 0); la moitié marque le côté d'un chemin (`pathSide`). */
+const PATH_SIDE_ALPHA = 128;
 /** Hauteurs codées dans le canal R de la texture: de `BED_MIN` à `BED_MIN + BED_RANGE` (m). */
 export const RIVER_BED_MIN = -0.5;
 export const RIVER_BED_RANGE = 0.75;
@@ -69,6 +73,11 @@ export interface RiverField {
   sand: Float32Array;
   /** Part du courant vif (gué). */
   riffle: Float32Array;
+  /**
+   * Nœuds loin de toute herbe (le long d'un chemin, R22): là où le bord du sable recule (coin
+   * arrondi), c'est le chemin qui paraît, pas l'herbe (canal A de la texture).
+   */
+  pathSide: Uint8Array;
   /** Hauteur du lit au point (x, y), interpolée entre les nœuds; `null` hors de la grille. */
   bedAt(x: number, y: number): number | null;
   /** Texture pour les shaders (R: lit et pierres, G: courant vif, B: sable); voir `riverTexture`. */
@@ -280,6 +289,17 @@ export function createRiverField(
   const toFord = distanceField(ford, width, height, step);
   const toLand = distanceField(land, width, height, step);
   const toGrass = distanceField(grass, width, height, step);
+  // Loin de toute herbe (le long d'un chemin, R22), le sable ne recule pas: le bord du lit touche
+  // le chemin sans liseré vert. Zone en distance signée arrondie (comme le reste du sable): un
+  // angle de chemin contre la grève s'arrondit au lieu de garder le coin carré de la case (retour
+  // du 2026-11-02, case 20, 36).
+  const pathSide = new Uint8Array(count);
+  const nearPath = new Uint8Array(count);
+  for (let i = 0; i < count; i += 1) {
+    pathSide[i] = (toGrass[i] ?? 0) > RIVER.sandWobble + RIVER.roundRadius ? 1 : 0;
+    nearPath[i] = bankNode[i] === 1 && pathSide[i] === 1 ? 1 : 0;
+  }
+  const pathSand = signedDistance(nearPath, width, height, step, RIVER.roundRadius);
 
   const bed = new Float32Array(count);
   const sand = new Float32Array(count);
@@ -307,10 +327,8 @@ export function createRiverField(
       bed[index] = h;
       const wobble = (valueNoise(x, y, RIVER.sandNoise, SEED_SAND) - 0.5) * 2 * RIVER.sandWobble;
       sand[index] = (sandDistance[index] ?? 0) + wobble;
-      // Loin de toute herbe (le long d'un chemin, R22), le sable ne recule pas: le bord du lit
-      // touche le chemin sans liseré vert.
-      if (bankNode[index] === 1 && (toGrass[index] ?? 0) > RIVER.sandWobble + RIVER.roundRadius) {
-        sand[index] = Math.max(sand[index] ?? 0, RIVER_SAND_RANGE);
+      if (nearPath[index] === 1) {
+        sand[index] = Math.max(sand[index] ?? 0, Math.min(RIVER_SAND_RANGE, (pathSand[index] ?? 0) * PATH_SAND_GAIN));
       }
       riffle[index] = 1 - smoothstep(0, RIVER.riffleReach, fordDistance);
     }
@@ -340,6 +358,7 @@ export function createRiverField(
     bed,
     sand,
     riffle,
+    pathSide,
     bedAt,
     texture: null,
     // Le centre du texel i est le nœud i: origine décalée d'un demi-pas.
@@ -383,7 +402,7 @@ export function riverTexture(field: RiverField, stones: readonly RiverStone[]): 
     data[index * RGBA] = Math.round(Math.min(1, Math.max(0, h)) * BYTE);
     data[index * RGBA + 1] = Math.round(Math.min(1, Math.max(0, field.riffle[index] ?? 0)) * BYTE);
     data[index * RGBA + 2] = Math.round(Math.min(1, Math.max(0, s)) * BYTE);
-    data[index * RGBA + 3] = BYTE;
+    data[index * RGBA + 3] = field.pathSide[index] === 1 ? PATH_SIDE_ALPHA : BYTE;
   }
   const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
   texture.magFilter = LinearFilter;

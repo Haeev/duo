@@ -133,6 +133,11 @@ export interface SeeThroughHole {
   depth: number;
   depthPerPixel: number;
   ground: number;
+  /**
+   * Hauteur au-dessus de `ground` sous laquelle rien ne s'efface (m); par défaut
+   * `SEE_THROUGH_MIN_HEIGHT` (le sol, les mottes).
+   */
+  minHeight?: number;
 }
 
 /**
@@ -354,7 +359,7 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
   float reach = length(offset);
   // Profondeur du corps à cette hauteur de l'écran: on ne coupe que ce qui est devant lui.
   float bodyDepth = body.x - (gl_FragCoord.y - hole.y) * body.z;
-  if (reach < 1.0 && vViewPosition.z < bodyDepth - ${SEE_THROUGH_DEPTH_MARGIN.toFixed(2)} && vCutY > body.y + ${SEE_THROUGH_MIN_HEIGHT.toFixed(2)}) {
+  if (reach < 1.0 && vViewPosition.z < bodyDepth - ${SEE_THROUGH_DEPTH_MARGIN.toFixed(2)} && vCutY > body.y + body.w) {
     if (cutBayer(gl_FragCoord.xy) < smoothstep(1.0, ${SEE_THROUGH_EDGE.toFixed(2)}, reach)) discard;
   }
 }`,
@@ -409,7 +414,12 @@ for (int i = 0; i < ${SEE_THROUGH_SLOTS}; i++) {
         const hole = holes[i];
         if (hole !== undefined) {
           cutUniforms.uCutHoles.value[i]?.set(hole.x, hole.y, hole.radiusX, hole.radiusY);
-          cutUniforms.uCutDepths.value[i]?.set(hole.depth, hole.ground, hole.depthPerPixel, 0);
+          cutUniforms.uCutDepths.value[i]?.set(
+            hole.depth,
+            hole.ground,
+            hole.depthPerPixel,
+            hole.minHeight ?? SEE_THROUGH_MIN_HEIGHT,
+          );
         }
       }
       cutUniforms.uCutCount.value = count;

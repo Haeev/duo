@@ -36,6 +36,7 @@ import type { DaylightRig } from './lumiere';
 import { PALETTE_CELLS, PALETTE_GRID } from './palette';
 import { PARTICLE_MODE, PARTICLE_SHAPE, PuffPool, createParticleMaterial } from './particules';
 import { RainLayer } from './pluie';
+import { SHELTER_SLOTS, shelterRects } from './abri';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import {
@@ -108,6 +109,9 @@ export class AmbiancePart implements ExtensionPart {
   private scanClock = 0;
   private frameAverageMs = 0;
   private slowFor = 0;
+  /** Bâtiment où était le joueur local à la dernière relecture de l'abri, et compte à rebours. */
+  private shelterInside: string | null = null;
+  private shelterClock = 0;
   private light: boolean;
   private time = 0;
 
@@ -553,6 +557,31 @@ export class AmbiancePart implements ExtensionPart {
     }
   }
 
+  /**
+   * Abri du joueur local (retour S05): relu à chaque entrée ou sortie, et chaque seconde (un toit
+   * posé pendant qu'on est dedans), pas à chaque image.
+   */
+  private updateShelter(context: FrameContext): void {
+    const inside = context.world.characters.find((character) => character.id === context.local)?.inside ?? null;
+    this.shelterClock -= context.dt;
+    if (inside === this.shelterInside && this.shelterClock > 0) return;
+    this.shelterInside = inside;
+    this.shelterClock = AMBIANCE_SETTINGS.rain.shelterRefreshSeconds;
+    const rects = shelterRects(context.world, this.hooks.map, context.local);
+    this.rain.setShelter(rects);
+    const u = this.surfaces;
+    const count = Math.min(rects.length, SHELTER_SLOTS);
+    let top = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < count; i += 1) {
+      const r = rects[i];
+      if (r === undefined) continue;
+      u.uShelters.value[i]?.set(r.x, r.y, r.x + r.w, r.y + r.h);
+      top = Math.max(top, this.hooks.terrain.heightAt(r.x + r.w / 2, r.y + r.h / 2));
+    }
+    u.uShelterCount.value = count;
+    u.uShelterTop.value = top + AMBIANCE_SETTINGS.rain.shelterCeiling;
+  }
+
   update(context: FrameContext): void {
     this.time = context.time;
     this.watchFrames(context.dt);
@@ -584,6 +613,7 @@ export class AmbiancePart implements ExtensionPart {
       water.uGlintLevel.value = glint;
     }
 
+    this.updateShelter(context);
     this.rain.update(
       context.time,
       day.focus,

@@ -156,22 +156,58 @@ def floor_tiles(g, x0, x1, y0, y1, z, a="tile", b="tile_dark", cell=0.5):
                     (xa, ya + dy - 0.008, z + 0.002)], a)
 
 
-def fake_letters(g, f, u, d, z, n, w=0.16, h=0.22, gap=0.07, color="paint_red", seed=3):
-    """Lettres peintes lues comme un mot à distance (barres verticales et traverses, sans texte réel)."""
-    rnd = random.Random(seed)
-    total = n * w + (n - 1) * gap
-    for k in range(n):
-        cu = u - total / 2 + w / 2 + k * (w + gap)
-        f.box(g, (0.035, 0.012, h), cu - w / 2 + 0.02, d, z, color)
-        style = rnd.randint(0, 3)
-        if style in (0, 2):
-            f.box(g, (0.035, 0.012, h), cu + w / 2 - 0.02, d, z, color)
-        if style in (0, 1, 3):
-            f.box(g, (w - 0.02, 0.012, 0.035), cu, d, z + h / 2 - 0.02, color)
-        if style in (1, 2):
-            f.box(g, (w - 0.04, 0.012, 0.03), cu, d, z, color)
-        if style in (1, 3):
-            f.box(g, (w - 0.02, 0.012, 0.035), cu, d, z - h / 2 + 0.02, color)
+# Police des enseignes peintes: 5 rangées, pavés carrés, traits d'un pavé (lisible à la distance de jeu).
+SIGN_FONT = {
+    "A": ("0110", "1001", "1111", "1001", "1001"),
+    "B": ("1110", "1001", "1110", "1001", "1110"),
+    "C": ("0111", "1000", "1000", "1000", "0111"),
+    "E": ("1111", "1000", "1110", "1000", "1111"),
+    "F": ("1111", "1000", "1110", "1000", "1000"),
+    "G": ("0111", "1000", "1011", "1001", "0111"),
+    "I": ("111", "010", "010", "010", "111"),
+    "L": ("1000", "1000", "1000", "1000", "1111"),
+    "M": ("10001", "11011", "10101", "10001", "10001"),
+    "N": ("1001", "1101", "1011", "1001", "1001"),
+    "O": ("0110", "1001", "1001", "1001", "0110"),
+    "P": ("1110", "1001", "1110", "1000", "1000"),
+    "R": ("1110", "1001", "1110", "1010", "1001"),
+    "U": ("1001", "1001", "1001", "1001", "0110"),
+}
+
+
+def sign_word_width(word, px):
+    """Largeur (m) d'un mot de la police des enseignes, un pavé d'espace entre les lettres."""
+    letters = [SIGN_FONT[ch.replace("É", "E")] for ch in word]
+    return (sum(len(rows[0]) for rows in letters) + len(letters) - 1) * px
+
+
+def painted_word(g, f, u, d, z, word, px, color):
+    """Mot peint sur une enseigne (face f, centré en u, milieu des lettres à la hauteur z, à d du mur):
+    un quad par trait horizontal de pavés, tourné vers la rue (2 triangles par trait). É porte son accent."""
+    x = u - sign_word_width(word, px) / 2
+    for ch in word:
+        rows = SIGN_FONT[ch.replace("É", "E")]
+        w = len(rows[0])
+        for r, row in enumerate(rows):
+            za = z + (2.5 - r - 1) * px
+            c = 0
+            while c < w:
+                if row[c] != "1":
+                    c += 1
+                    continue
+                c2 = c
+                while c2 + 1 < w and row[c2 + 1] == "1":
+                    c2 += 1
+                ua, ub = x + c * px, x + (c2 + 1) * px
+                g.quad([f.p(ua, d, za), f.p(ub, d, za), f.p(ub, d, za + px), f.p(ua, d, za + px)], color)
+                c = c2 + 1
+        if ch == "É":
+            # accent aigu: un pavé penché au-dessus de la lettre, vers la droite
+            zb = z + 2.5 * px + 0.25 * px
+            ua = x + 1.4 * px
+            g.quad([f.p(ua, d, zb), f.p(ua + px, d, zb), f.p(ua + 1.8 * px, d, zb + 0.9 * px),
+                    f.p(ua + 0.8 * px, d, zb + 0.9 * px)], color)
+        x += (w + 1) * px
 
 
 # Mobilier (pièces posées dans le Geo du contenu) --------------------------------------------------
@@ -416,7 +452,7 @@ def ferrand_shop(A):
         g.prism([(-hy, ze), (hy, ze), (0, zr - 0.25)], 0.3, loc=(x + s * 0.15, 0, 0), color=color_out, rot=(0, 0, 90))
     f = B.Face("front", hx, hy)
     f.box(g, (4.0, 0.08, 0.45), 0, 0.06, 3.45, "paint_cream")
-    fake_letters(g, f, 0.0, 0.105, 3.45, 9, w=0.24, h=0.26, gap=0.08, color="paint_green", seed=11)
+    painted_word(g, f, 0.0, 0.104, 3.43, "ÉPICERIE", 0.06, "paint_green")
     for u in (-3.0, -1.0, 1.0, 3.0):
         B.window(g, f, u, 3.85, 0.8, 1.05, shutter="paint_green", box_flowers=(u in (-1.0, 1.0)), mullion=False)
     fb = B.Face("back", hx, hy)
@@ -674,9 +710,9 @@ def haberdashery(A):
         if side == "right":
             # enseigne peinte sur le pignon nord, vue de la rue de la halte: MERCERIE, et COIFFURE dessous
             f.box(g, (2.6, 0.04, 0.42), 0.0, 0.02, 3.3, "paint_cream")
-            fake_letters(g, f, 0.0, 0.045, 3.3, 8, w=0.22, h=0.26, gap=0.08, color="paint_red", seed=21)
+            painted_word(g, f, 0.0, 0.044, 3.3, "MERCERIE", 0.05, "paint_red")
             f.box(g, (1.8, 0.04, 0.3), 0.0, 0.02, 2.93, "paint_cream")
-            fake_letters(g, f, 0.0, 0.045, 2.93, 7, w=0.16, h=0.18, gap=0.06, color="paint_blue", seed=22)
+            painted_word(g, f, 0.0, 0.044, 2.93, "COIFFURE", 0.04, "paint_blue")
         A.add("haberdashery_wall_" + side, g, parent=root)
     door_leaf(A, "haberdashery_door", root, B.Face("front", hx, hy), 0.0, 1.0, 2.2, t, color="paint_blue", glass=True)
     # plafond et comble (retirés en entier quand on entre): plancher du comble sur solives, trappe de l'échelle
@@ -839,7 +875,7 @@ def salon_interior(A, root):
 def _miller_stair(g, z, ze):
     """Échelle de meunier (62 degrés) contre le mur du fond, du sud (bas, à côté du banc) vers le nord (haut),
     sous la trappe du comble: 12 marches de 22 cm de haut et 12 cm de giron, limons pleins, main courante de
-    corde tenue au mur par deux pitons."""
+    bois côté pièce sur trois potelets."""
     n = 12
     x0, x1 = -0.35, 1.05
     y = SALON["iy"] - 0.33
@@ -855,12 +891,20 @@ def _miller_stair(g, z, ze):
     for s in (1, -1):
         verts += g.box((L + 0.05, 0.05, 0.2), loc=((x0 + x1) / 2, y + s * (w / 2 - 0.025), (z + ze) / 2 - 0.02),
                        color="wood_dark", rot=(0, -ang, 0))
-    # corde: du pied (0,9 m au-dessus de la 1re marche) à 2,5 m, sous le plafond
-    fa, fb = 0.05, (2.5 - 0.9 - z) / (ze - z)
-    pa = Vector((x0 + (x1 - x0) * fa, y + w / 2 + 0.035, z + (ze - z) * fa + 0.9))
-    pb = Vector((x0 + (x1 - x0) * fb, y + w / 2 + 0.035, z + (ze - z) * fb + 0.9))
-    mid = (pa + pb) / 2
-    g.cyl(0.015, (pb - pa).length, loc=tuple(mid), color="rope", segs=5, rot=(0, 90 - ang, 0))
-    for p in (pa, pb):
-        g.box((0.04, 0.06, 0.04), loc=(p.x, p.y + 0.01, p.z), color="iron")
+    # main courante de bois côté pièce, portée par trois potelets plantés dans le limon (retour du
+    # 2026-11-02: la corde au mur, à 0,9 m au-dessus des marches, se lisait comme un fil tendu dans
+    # le vide); elle s'arrête sous la trémie du comble
+    ys = y - (w / 2 - 0.025)
+    over = 0.1 / math.cos(math.radians(ang))
+    hand = 0.85
+    ta, tb = 0.06, (ze - z - hand - 0.1) / (ze - z)
+
+    def on_stair(t, dz):
+        return Vector((x0 + (x1 - x0) * t, ys, z + (ze - z) * t - 0.02 + dz))
+
+    pa, pb = on_stair(ta, hand), on_stair(tb, hand)
+    g.box(((pb - pa).length + 0.04, 0.045, 0.045), loc=tuple((pa + pb) / 2), color="wood_dark", rot=(0, -ang, 0))
+    for t in (ta, (ta + tb) / 2, tb):
+        lo, hi = on_stair(t, over), on_stair(t, hand)
+        g.box((0.035, 0.035, hi.z - lo.z), loc=(lo.x, ys, lo.z), color="wood_dark", base=True)
     return verts
