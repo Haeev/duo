@@ -16,7 +16,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import type { GameMap, GroundKind, MapCrossing, MapProp } from '../etat/carte';
+import type { GameMap, GroundKind, MapCrossing, MapProp, Rect } from '../etat/carte';
 import { cellIndex, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import { isFord } from './champs';
@@ -36,6 +36,21 @@ import {
   type RiverStone,
 } from './riviere';
 import { isStreamCell, streamHeight, streamLayout, type StreamLayout } from './ru';
+import { mainLine } from './voie';
+
+const TRACK_WALK = RENDER_SETTINGS.railway.walk;
+
+
+/**
+ * Hauteur des pieds au-dessus du sol d'une case de voie, à `across` m de l'axe des rails (retour
+ * R05): sur les traverses au milieu, en pente sur le talus du ballast, au sol au-delà.
+ */
+export function trackBedLift(across: number): number {
+  const v = Math.abs(across);
+  if (v <= TRACK_WALK.sleeperHalf) return TRACK_WALK.sleeperTop;
+  if (v >= TRACK_WALK.shoulderHalf) return 0;
+  return (TRACK_WALK.sleeperTop * (TRACK_WALK.shoulderHalf - v)) / (TRACK_WALK.shoulderHalf - TRACK_WALK.sleeperHalf);
+}
 
 const SETTINGS = RENDER_SETTINGS.terrain;
 const NOISE_SEED_GRASS = 1;
@@ -253,6 +268,13 @@ export class Terrain {
     crossingHeight: (crossing: MapCrossing) => number | undefined = () => undefined,
   ) {
     this.group.name = 'terrain';
+    this.line = mainLine(map);
+    for (const building of Object.values(map.buildings)) {
+      for (const room of building.rooms) {
+        const top = SETTINGS.roomFloors[room.id];
+        if (top !== undefined) this.roomFloors.push({ rect: room.rect, top, build: room.build?.room ?? null });
+      }
+    }
     this.stream = streamLayout(map, this.ext);
     for (let cy = 0; cy < map.height; cy += 1) {
       for (let cx = 0; cx < map.width; cx += 1) {
@@ -272,6 +294,13 @@ export class Terrain {
       // Le ponceau ne porte rien: on marche sur le remblai de la voie.
       if (height !== undefined && crossing.kind !== 'culvert') {
         this.floorRects.push({ ...crossing.rect, height });
+      }
+    }
+    for (const rect of this.floorRects) {
+      for (let cy = rect.y; cy < rect.y + rect.h; cy += 1) {
+        for (let cx = rect.x; cx < rect.x + rect.w; cx += 1) {
+          if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) this.underProp.add(cellIndex(map, cx, cy));
+        }
       }
     }
     this.findCrossings();
@@ -679,6 +708,59 @@ export class Terrain {
       : null;
   }
 
+  /** Rangées de la ligne et axe de la voie (pour poser les pieds sur les traverses). */
+  private readonly line: { rows: Set<number>; trackY: number };
+  /** Cases sous un sol posé (index de la grille), lues une fois. */
+  private readonly underProp = new Set<number>();
+  /** Planchers des pièces visitables (`roomFloors`), et pièces à bâtir déjà bâties. */
+  private readonly roomFloors: { rect: Rect; top: number; build: string | null }[] = [];
+  private readonly builtRooms = new Set<string>();
+
+  /**
+   * Case entièrement couverte par un sol posé (quai, ponton, pont de la rue): le terrain n'y dessine
+   * pas son dessus (R02). Le bout du quai pose le pied de ses rampes à 0, au ras des pavés dessous:
+   * les deux surfaces se battaient à chaque image. Le modèle couvre toute son emprise.
+   */
+  coveredByFloorProp(cx: number, cy: number): boolean {
+    const inside = cx >= 0 && cy >= 0 && cx < this.map.width && cy < this.map.height;
+    return inside && this.underProp.has(cellIndex(this.map, cx, cy));
+  }
+
+  /** Pièces à bâtir déjà bâties (`WorldState.rooms`), relues à chaque image par le moteur. */
+  syncRooms(rooms: Readonly<Record<string, { readonly builtDay: number | null } | undefined>>): void {
+    for (const room of this.roomFloors) {
+      if (room.build === null) continue;
+      if ((rooms[room.build]?.builtDay ?? null) !== null) this.builtRooms.add(room.build);
+      else this.builtRooms.delete(room.build);
+    }
+  }
+
+  /** Plancher de la pièce visitable sous le point (bâtie), ou `null` dehors. */
+  private roomFloorAt(x: number, y: number): number | null {
+    for (const room of this.roomFloors) {
+      if (inRect(room.rect, x, y) && (room.build === null || this.builtRooms.has(room.build))) return room.top;
+    }
+    return null;
+  }
+
+  /**
+   * Hauteur où se posent des pieds (personnages, habitants, bêtes, objets lâchés): le sol, sauf sur
+   * la voie, où l'on marche sur les traverses (retour R05). Les rails, le train et le décor gardent
+   * `heightAt`.
+   */
+  standHeight(x: number, y: number): number {
+    const floor = this.roomFloorAt(x, y);
+    if (floor !== null) return floor;
+    const ground = this.heightAt(x, y);
+    const cx = Math.floor(x);
+    const cy = Math.floor(y);
+    if (cx < 0 || cy < 0 || cx >= this.map.width || cy >= this.map.height) return ground;
+    if (this.map.ground[cellIndex(this.map, cx, cy)] !== 'rail') return ground;
+    // Ligne (est-ouest): écart à son axe; voie de garage (une colonne nord-sud): écart au milieu de la colonne.
+    const across = this.line.rows.has(cy) ? y - this.line.trackY : x - (cx + 0.5);
+    return ground + trackBedLift(across);
+  }
+
   /** Hauteur du sol sous un point (pour poser personnages, objets et décor). */
   heightAt(x: number, y: number): number {
     for (const rect of this.floorRects) {
@@ -1019,11 +1101,13 @@ export class Terrain {
         const atEnd = cx === this.map.width + this.ext;
         const raw = atEnd ? null : this.look(cx, cy);
         // Les traversées en planches (`buildCrossing`), le lit de la rivière et le ru sont dessinés à part.
+        // Sous un sol posé, rien: son modèle couvre la case (R02).
         const look =
           raw !== null &&
           ((raw.kind === 'wood' && !this.isStream(cx, cy)) ||
             this.inRiverBed(cx, cy) ||
-            this.isStream(cx, cy))
+            this.isStream(cx, cy) ||
+            this.coveredByFloorProp(cx, cy))
             ? null
             : raw;
         const cell = look === null ? null : this.topCell(look, cx, cy);

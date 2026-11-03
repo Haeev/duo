@@ -41,7 +41,14 @@ export const VILLAGER_BEHIND_POINTS: ReadonlySet<string> = new Set([POINT.grocer
  * Le râtelier des outils (tour 10, section 5): au mur sud de la pièce, entre la porte (8, 26) et la
  * fenêtre sud-est (`window_1`, case 10, 25), à portée de main en entrant. Place fixe, jamais reprise.
  */
-export const TOOL_RACK = { id: 'f_rack', item: 'tool_rack', cell: { cx: 9, cy: 25 }, rotation: 2 } as const;
+/**
+ * Le râtelier (1,6 m de large) au mur ouest de la pièce, entre le coin nord et la fenêtre (R15,
+ * 2026-11-03): à sa place d'avant, au mur sud près de la porte, il passait devant la fenêtre est de
+ * la façade; aucun pan du mur sud n'a sa largeur entre la porte et les fenêtres.
+ */
+export const TOOL_RACK = { id: 'f_rack', item: 'tool_rack', cell: { cx: 6, cy: 23 }, rotation: 1 } as const;
+/** Place du râtelier avant la 0.12.2, déplacé à la reprise d'une sauvegarde. */
+export const OLD_TOOL_RACK_CELL = { cx: 9, cy: 25 } as const;
 
 /** Points d'apparition de chaque personnage à la descente du train (sinon le point de `reglages.spawn`). */
 export const SPAWN_POINTS = { p1: 'spawn_1', p2: 'spawn_2' } as const;

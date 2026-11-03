@@ -226,8 +226,15 @@ export interface ItemDef {
   storage: string | null;
   /** Se pose au sol sous les autres meubles (tapis). */
   floor: boolean;
-  /** Se pose contre un mur (rideaux). */
+  /** Se pose contre un mur (rideaux, cadres, horloge, râtelier). */
   wall: boolean;
+  /**
+   * Objet mural (R15, R17): largeur qu'il prend sur le mur (m, celle du modèle). Il ne recouvre ni
+   * fenêtre ni porte, ni un autre objet mural (`etat/murs.ts`).
+   */
+  wallWidth: number;
+  /** Meuble plus haut que la hauteur de pose des objets muraux (étagère, poêle et son tuyau): le mur au-dessus est pris. */
+  blocksWall: boolean;
   /** Meuble à tuyau (poêle): se pose dos à un mur, tourné vers la pièce. */
   backToWall: boolean;
   /** Table: le souper pris ensemble à côté compte comme souper partagé. */
@@ -1011,8 +1018,10 @@ export interface Settings {
      * `reach`: portée (m) jusqu'à l'axe d'une charge longue, plus courte que `feel.beamGrabRange`
      * (comptée depuis le centre d'une charge ramassée): Espace tenu au chantier voisin ne soulève
      * pas la poutre couchée à côté.
+     * `apart` (retour R14): charge courte (colis, caisse, panière), les deux porteurs se mettent face
+     * à face de part et d'autre, à cette distance l'un de l'autre (m): leurs mains tiennent ses côtés.
      */
-    grip: { side: number; fromEnd: number; reach: number };
+    grip: { side: number; fromEnd: number; reach: number; apart: number };
     /**
      * 0.12: charges de quête, portées à deux de `from` à `to` pendant l'étape `step` de `quest`, quand
      * `when` est vrai (conditions évaluées dans l'étape); posées, elles lèvent `flag`.

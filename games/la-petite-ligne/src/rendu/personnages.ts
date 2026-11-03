@@ -70,11 +70,14 @@ import { sleepPose, type SleepPose } from './coucher';
 import { holdSpecFor, ToolHolder } from './prise';
 import { plantedFootSpeed } from './foulee';
 import { CLIP_FOR_ACTION } from './gestes';
+import { loadShape, type CarrierHands } from './portage-deux';
 
 const SETTINGS = RENDER_SETTINGS.characters;
 /** Nom du groupe animé (squelette et maillages) dans `personnages.glb`. */
 const RIG_NODE = 'rig';
 const HAND_SOCKET = 'socket_hand_r';
+/** Porteur d'une charge courte qui recule: son pas va à plus de 100° de son regard (cosinus). */
+const BACKWARD_COS = 0.17;
 const PICK_RADIUS = 0.42;
 const PICK_HEIGHT = 1.8;
 const GROUND_HALF_LIFE = 0.06;
@@ -318,6 +321,15 @@ class CharacterFigure {
     this.offsets = new BoneOffsets(model);
     this.reach = new ArmReach(model, 'chest', 'upper_arm_r', 'forearm_r', HAND_SOCKET);
     this.idleNextAt = this.idleDelay();
+  }
+
+  /** Mains (prises des outils) dans le repère du monde, après l'animation de cette image. Faux sans squelette. */
+  handsWorld(left: Vector3, right: Vector3): boolean {
+    if (this.hand === null || this.leftHand === null) return false;
+    this.root.updateMatrixWorld(true);
+    this.leftHand.getWorldPosition(left);
+    this.hand.getWorldPosition(right);
+    return true;
   }
 
   private idleDelay(): number {
@@ -591,7 +603,7 @@ class CharacterFigure {
   ): void {
     const teleport = Math.hypot(pos.x - prev.x, pos.y - prev.y) > SETTINGS.teleportDistance;
     const at = teleport ? pos : interpolate(prev, pos, context.alpha, this.position);
-    const targetGround = terrain.heightAt(at.x, at.y);
+    const targetGround = terrain.standHeight(at.x, at.y);
     this.ground =
       this.ground === null || teleport
         ? targetGround
@@ -858,6 +870,26 @@ export class CharactersPart implements EventfulPart {
   private interiorProbe: () => string | null = () => null;
 
   /** Tour 10 (ADR 0016): branche la lecture du bâtiment où est le joueur local. */
+  /**
+   * Mains des deux porteurs de la charge à cette image (R14), dans `out`; faux si la charge n'est pas
+   * portée par deux personnages dessinés. À appeler après la mise à jour des personnages.
+   */
+  carrierHands(holders: readonly CharacterId[], out: CarrierHands): boolean {
+    const [first, second] = holders;
+    const a = first === undefined ? undefined : this.players.get(first);
+    const b = second === undefined ? undefined : this.players.get(second);
+    if (a === undefined || b === undefined) return false;
+    if (!a.figure.handsWorld(this.handA.left, this.handA.right) || !b.figure.handsWorld(this.handB.left, this.handB.right)) return false;
+    out.a.left = this.handA.left;
+    out.a.right = this.handA.right;
+    out.b.left = this.handB.left;
+    out.b.right = this.handB.right;
+    return true;
+  }
+
+  private readonly handA = { left: new Vector3(), right: new Vector3() };
+  private readonly handB = { left: new Vector3(), right: new Vector3() };
+
   setInteriorProbe(probe: () => string | null): void {
     this.interiorProbe = probe;
   }
@@ -1339,6 +1371,12 @@ export class CharactersPart implements EventfulPart {
       const benchLift = this.seatLift;
       const walkScale = this.strideScale(character.speed, this.walkReference, 1);
       const pushing = kind === 'carry' && world.beam?.purpose === 'handcar';
+      // Charge courte portée à deux (R14): face à l'autre porteur, bras devant la poitrine.
+      const load = kind === 'carry' && world.beam?.carried === true ? world.beam : null;
+      const carryPartner =
+        load !== null && load.holders.includes(character.id) && loadShape(this.content, this.library, load) === 'short'
+          ? world.characters.find((other) => other.id !== character.id && load.holders.includes(other.id))
+          : undefined;
       const gesture = this.gestureRequest(character, context);
       const edge = onBench && this.benchIsEdge;
       const pole = this.poleRequest(character, kind, context);
@@ -1359,6 +1397,17 @@ export class CharactersPart implements EventfulPart {
         request = moving
           ? { name: WALK, timeScale: walkScale, fade: SETTINGS.walkFadeSeconds }
           : { name: SETTINGS.push.stillClip, timeScale: 1 };
+      } else if (carryPartner !== undefined && this.clips.has(SETTINGS.carryOne.walk)) {
+        // On avance face à l'autre: celui qui recule joue la marche à l'envers.
+        const toward = Math.atan2(carryPartner.pos.y - character.pos.y, carryPartner.pos.x - character.pos.x);
+        const backward = Math.cos(character.facing - toward) < -BACKWARD_COS;
+        request = moving
+          ? {
+              name: SETTINGS.carryOne.walk,
+              timeScale: this.strideScale(character.speed, this.carryOneReference, 1) * (backward ? -1 : 1),
+              fade: SETTINGS.walkFadeSeconds,
+            }
+          : { name: SETTINGS.carryOne.idle, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
       } else if (character.placement !== null && kind !== 'carry' && this.clips.has(SETTINGS.carryOne.walk)) {
         // Un meuble tenu pour l'aménagement: porté seul devant la poitrine.
         request = moving
@@ -1393,11 +1442,12 @@ export class CharactersPart implements EventfulPart {
         shotActive && shot.clip === HIGH_FIVE && !moving
           ? world.characters.find((other) => other.id !== character.id)
           : undefined;
+      const facingTo = partner ?? carryPartner;
       const facing = onBench
         ? this.benchPlace.facing
-        : partner === undefined
+        : facingTo === undefined
           ? character.facing
-          : Math.atan2(partner.pos.y - character.pos.y, partner.pos.x - character.pos.x);
+          : Math.atan2(facingTo.pos.y - character.pos.y, facingTo.pos.x - character.pos.x);
       const glided = this.glide(entry, seatPlace !== null, seatPlace ?? character.pos, context);
       const asleep = this.sleepingPose(character, world);
       entry.figure.setReach(pushing && moving ? this.pushReach(character, world) : null);

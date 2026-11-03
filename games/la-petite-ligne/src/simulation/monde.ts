@@ -21,7 +21,7 @@ import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
 import { emptyFishing } from '../etat/peche';
 import { type Sim, wrapWorld } from './contexte';
-import { ITEM, SPAWN_POINTS, TOOL_RACK } from './ids';
+import { ITEM, OLD_TOOL_RACK_CELL, SPAWN_POINTS, TOOL_RACK } from './ids';
 import { emptyMemories } from './souvenirs';
 import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
@@ -44,6 +44,19 @@ const DEFAULT_HAIR_COLOR: Readonly<Record<CharacterId, number>> = { p1: 1, p2: 0
 /** Besoins du tour 10 (section 3) au repos: rien de compté aujourd'hui, personne loin de l'autre. */
 function tour10Needs(): Pick<Needs, 'apartMinutes' | 'reunionsToday' | 'nappedToday' | 'napStart' | 'curtainsMorningDone' | 'missingShown'> {
   return { apartMinutes: 0, reunionsToday: 0, nappedToday: false, napStart: null, curtainsMorningDone: false, missingShown: false };
+}
+
+/**
+ * 0.12.2 (R15): à la reprise, le râtelier quitte sa place d'avant (mur sud, devant la fenêtre) pour
+ * le mur ouest. Sans changer le format: seule sa case et sa rotation changent.
+ */
+export function moveToolRack(world: WorldState): void {
+  for (const f of world.furniture) {
+    if (f.item === TOOL_RACK.item && f.cell.cx === OLD_TOOL_RACK_CELL.cx && f.cell.cy === OLD_TOOL_RACK_CELL.cy) {
+      f.cell = { cx: TOOL_RACK.cell.cx, cy: TOOL_RACK.cell.cy };
+      f.rotation = TOOL_RACK.rotation;
+    }
+  }
 }
 
 /** Le râtelier posé à sa place fixe (`ids.ts`, `TOOL_RACK`). */
