@@ -3,7 +3,7 @@
 | Champ | Valeur |
 |---|---|
 | Jeu | `jeu-1`, La Petite Ligne |
-| Statut | conception, à produire après la 0.12; rien n'est encore changé dans `halte.json` ni dans le générateur |
+| Statut | lot L1 produit (section 17): carte agrandie écrite par `construire_carte_halte.py --0.13` dans `games/la-petite-ligne/donnees/cartes-0-13/halte.json`, en attente du lot L0 (le jeu ne lit pas encore l'origine de grille); `halte.json` inchangé |
 | Version du document | 1 |
 | Date | 2026-11-03 |
 | Rédaction | level-designer, sur brief du manager (demande du client: agrandir le village; église, cimetière, forêt explorable, habitations, lieux de métiers, plus de cultures et de récoltes; une vingtaine d'habitants) |
@@ -534,6 +534,56 @@ Pour l'architecte (technique, pas pour le client): option A ou B de la section 2
 Pour le game designer: identifiants des lieux (7.3 et 8) à aligner avec `v0-13-habitants.md`; règles des parcelles (6); ce que donnent cueillette, champignons, bois mort, secrets et tombes; les cultures de plein champ sans arrosage.
 
 Hors périmètre de ce document: relief (le coteau se lit par la végétation, les murets et les marches; un vrai relief demanderait un ADR), étages visitables, rive sud, les Vergers.
+
+## 17. Production du lot L1 (2026-11-03)
+
+**Où est la carte.** `python3 games/la-petite-ligne/outils/construire_carte_halte.py --0.13` écrit `donnees/cartes-0-13/halte.json` (le jeu ne charge que `donnees/cartes/`); sans option, le script réécrit la carte du tour 10 à l'octet près. Les régions neuves sont composées dans `outils/carte_halte_0_13.py`. Le jour où L0 est intégré: écrire la carte agrandie dans `donnees/cartes/halte.json` (changer `SORTIE`) et retirer le refus de l'origine dans `src/donnees/carte-niveau.ts` (test `tests/carte-origine.test.ts`).
+
+**Contrôles** (`valider_carte.py donnees/cartes-0-13/halte.json`, 0 erreur): ceux d'avant, en coordonnées de la carte, plus: aire du bourg d'avant inchangée hors des retouches et des 29 objets déplacés déclarés (`agrandissement`, comparée à `donnees/cartes/halte.json`); bouts de sentier de forêt seulement aux impasses déclarées (ligne médiane du réseau, les clairières comptent); 12 arbres et 4 500 triangles au plus par morceau de 12 m; parcelles (sol cultivable, libres, bord atteignable, eau à 25 m sauf plein champ); passages à niveau (planches sur toute la voie, un panneau de chaque côté); distances plafonds de CA-C5; A* du jeu pour chaque trajet de la carte (erreur au-delà de 4 000 nœuds, avertissement au-delà de 3 000) et, avec `--plannings`, pour chaque paire de points de chaque planning; hôtes de cueillette à portée; volumes du clocher et forêt du pourtour dans la caméra. Chaque règle neuve a été éprouvée sur une carte cassée exprès.
+
+**Écarts avec les sections 4 à 8** (tous dans le générateur, avec leur raison):
+
+| Élément | Conception | Produit | Pourquoi |
+|---|---|---|---|
+| Forge | grande porte à l'est sur la cour | grande porte au sud, sur la route (un vantail ouvrant, l'autre fixe); la cour reste à l'est | depuis la coupe, l'A* du jeu tournait autour de la forge et dépassait 4 000 nœuds; une forge ouvre sur la rue où l'on mène les chevaux |
+| Menuiserie | x 107 à 113, cour x 114 à 116 | x 108 à 114, cour x 115 à 117 | depuis la porte de la forge, son toit cachait le point à la caméra par défaut |
+| Hameau | chemin de la ferme x 125 et 126, maison B x 128 à 133 | cour de soins de Nour x 124 et 125 (barrière basse), chemin et passage x 127 et 128, maison B x 130 à 135 | la cour de soins demandée par les habitants (1.3) à l'est de la maison A |
+| Verger communal | x 127 à 135 | arbres en x 130, 133, 136 | le chemin de la ferme passe en x 127 et 128 |
+| Cimetière | grille sud seule | grille sud et petite grille ouest face au chevet, allée de gravier du tour du chevet (x 106 et 107) | sans elle, on fait le tour par l'est et l'A* du jeu s'épuise (6 058 nœuds de la coupe à la tombe Cornu) |
+| Bief | passerelle de la vanne seule | plus les planches du halage sur le canal de fuite | la rive sud du bief (où l'on regarde la roue) se rejoint aussi par l'est |
+| Friche | x -8 à 1, allée x -4 | x -8 à -1, allée y 32; deux buissons ferment l'angle de la haie du jardin et de sa clôture sud | la haie du jardin du garde-barrière est en x 0 (anciens buissons du bord) |
+| Maison du sacristain | porte (92, 5) | porte (92, 6) | même modèle que la maison B du hameau (porte à 2 m du coin) |
+| Logement du maître | porte au pignon est | porte sur la route, à côté de celle de la mairie | le café touche le pignon est (mitoyens) |
+| `school_yard`, `mairie_desk` | dans la cour murée, dans le bureau | devant le portail, à la porte de la mairie | la cour et l'école sont bloquées: un habitant posté là ne repartait plus |
+| Vigne | point entre deux rangs | point au bas des rangs (106,5 ; 10,5) | entre les rangs de 1,5 m, on ne voit plus qu'une tête |
+| Tilleul de la place | non prévu | `square_lime_tree` (tree_lime) au coin de la place et de la cour de la halte, sur l'herbe | demandé par les plannings (`square_lime_tree`), pas sur les pavés (règle R22) |
+| Cueillette | règles de 5.3 | coins posés par règle; les châtaigniers à 3 m au nord de leur coin, noisetiers et ronces à 1 m | un houppier au-dessus du coin le cachait à la caméra |
+| Objets déplacés | 27 | 29 (`bush_88`, jardin de dahlias; `tree_oak_27`, son houppier dans le toit du sacristain) | |
+| Zones | noms de 8.2 | suffixe `_area` quand un point porte le même nom | points et zones partagent un espace de noms |
+
+**Budgets mesurés sur le blockout** (jeu actuel, carte translatée de +24, +30 dans une copie temporaire, Chromium et SwiftShader, 1366 x 768, zoom 2, 11 h, sans habitants; `triangleSplit()` et `programsInUse()`). « Estimé »: la mesure plus les modèles qui manquent au poids des plafonds de 11.3, ombre comprise (borne haute: les substituts mesurés restent comptés). Plafonds de la 0.13: 350 000 triangles, 200 appels.
+
+| Vue | Triangles mesurés | Appels | Programmes | Estimé avec les modèles |
+|---|---|---|---|---|
+| place (orientation 2, référence) | 157 340 | 80 | 6 | 158 540 |
+| lisière actuelle | 192 059 | 109 | 6 | 192 791 |
+| clairière du Vieux Chêne (0 et 2) | 116 697 | 58 | 6 | 119 829 |
+| source | 92 362 | 49 | 6 | 103 090 |
+| mare | 109 035 | 51 | 6 | 114 163 |
+| coupe | 82 084 | 44 | 6 | 103 312 |
+| parvis et église | 72 381 | 44 | 6 | 118 991 |
+| cimetière | 56 686 | 38 | 6 | 82 146 |
+| rue de l'Église au passage à niveau | 94 661 | 52 | 6 | 152 061 |
+| carrefour du café (orientation 2) | 118 031 | 60 | 6 | 158 831 |
+| forge et menuiserie | 86 683 | 54 | 6 | 149 893 |
+| jardins de la Rive | 101 283 | 59 | 6 | 149 683 |
+| ferme | 74 391 | 55 | 6 | 116 231 |
+| moulin | 66 534 | 49 | 6 | 91 666 |
+| cheminots et friche | 93 795 | 78 | 6 | 119 227 |
+
+La vue la plus chargée reste la lisière actuelle (le bois neuf derrière elle): 192 000 triangles et 109 appels. Le semis de la forêt a été densifié après la mesure (de 65 à 80 arbres semés, 140 à 154 arbres dans le bois); les vues du bois prennent au plus une dizaine d'arbres de plus (moins de 10 000 triangles).
+
+**Ce qui reste hors de la carte, signalé:** l'A* du jeu abandonne encore à 4 000 nœuds sur une paire des plannings (Barnabé, de la coupe à l'atelier de la forge: 4 354; 3 538 avec une heuristique octile); deux trajets de la messe dépassent 3 000 (Berthe 3 321, Ambroise 3 097). La règle des 6 départs par minute n'est pas tenue par les plannings (jusqu'à 14 départs à midi; `docs/jeux/jeu-1/simulations/v0_13_departs.py`): c'est l'étalement prévu au lot H1.
 
 ## Annexe A. Grille de la maquette (1 m par caractère)
 
