@@ -242,10 +242,12 @@
     <path class="lpl-ik" d="M3 8 12 4.5 21 8l-9 11.5z" fill="#ba554c"/>
     <path d="M7.4 8.8 12 7l4.6 1.8L12 14.4z" fill="#e2b95b" stroke="#2a2522" stroke-width="1"/>
   </symbol>
+  <!-- Rideaux du catalogue: écrus, comme le modèle de la maison (les rideaux de couleur viennent de la mercerie). -->
   <symbol id="curtains" viewBox="0 0 24 24">
     <path class="lpl-ikf" d="M3 4.5h18"/>
-    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5z" fill="#6b87b1"/>
-    <path class="lpl-ik" d="M19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#6b87b1"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5z" fill="#f0e4ca"/>
+    <path class="lpl-ik" d="M19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#f0e4ca"/>
+    <path d="M7.4 5.4c-.2 4.4 0 9 .4 13.4M16.6 5.4c.2 4.4 0 9-.4 13.4" stroke="#cdbb9c" stroke-width="1.1" fill="none"/>
   </symbol>
   <symbol id="crystal-radio" viewBox="0 0 24 24">
     <path class="lpl-ik" d="M3.5 9h17v11h-17z" fill="#8b6f56"/>
@@ -460,6 +462,1310 @@
   <symbol id="ui-minus" viewBox="0 0 24 24">
     <path class="lpl-iu" d="M5 12h14" stroke-width="2.4"/>
   </symbol>
+
+  <!-- Objets de la 0.12.2: une icône par chose (séance du client du 3 novembre). Même grille, même encre. -->
+  <!-- Cueillette -->
+  <!-- Ail des ours: deux grandes feuilles en lance et l'ombelle d'étoiles blanches. -->
+  <symbol id="wild-garlic" viewBox="0 0 24 24">
+    <path d="M11.8 21 13.6 7.4" stroke="#5e9a3e" stroke-width="1.4" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M8.6 21C5.4 17 5.2 10.4 7.6 5.4c2.6 3.6 3.6 10.2 1 15.6z" fill="#6faa47"/>
+    <path class="lpl-ik" d="M10.6 21c.4-5.2 3-9.6 7.8-11.6.4 4.8-2.4 9.4-7.8 11.6z" fill="#a3cf63"/>
+    <path class="lpl-ikf" d="M8.4 20.2 7.9 8.4M11.4 19.8l5.6-8.4"/>
+    <g fill="#f6f2e7" stroke="#2a2522" stroke-width=".9"><circle cx="14" cy="3.4" r="1.5"/><circle cx="16.4" cy="5.2" r="1.5"/><circle cx="11.6" cy="5.2" r="1.5"/><circle cx="14" cy="6.8" r="1.5"/></g>
+  </symbol>
+  <!-- Girolle: chapeau en entonnoir jaune d'or au bord ondulé, plis qui descendent sur le pied. -->
+  <symbol id="chanterelle" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.5 7.5c2.4-2.4 6-3 8.5-3s6.1.6 8.5 3c-1.2 2.4-4.6 3.2-6 4.6l-.6 7.6c-.1 1.2-3.7 1.2-3.8 0l-.6-7.6c-1.4-1.4-4.8-2.2-6-4.6z" fill="#e2b95b"/>
+    <path d="M5.6 7.3c2-1.3 4.2-1.7 6.4-1.7s4.4.4 6.4 1.7c-2 .9-4.2 1.2-6.4 1.2s-4.4-.3-6.4-1.2z" fill="#f2c74e"/>
+    <path d="M8.4 10.2l2.4 5.6M12 10.8v6.4M15.6 10.2l-2.4 5.6" stroke="#d9a04a" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+  <!-- Mûre: grappe de grains noirs à reflets, une feuille de ronce. -->
+  <symbol id="blackberry" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M11.6 9 10.4 3.6"/>
+    <path class="lpl-ik" d="M11.8 8.6c.8-2.8 3.2-4.4 6.6-4.2-.4 3.4-2.8 5.2-6.6 4.2z" fill="#5e8b45"/>
+    <g fill="#2e2136" stroke="#2a2522" stroke-width="1"><circle cx="9.6" cy="11.4" r="2.1"/><circle cx="13.6" cy="11.2" r="2.1"/><circle cx="7.6" cy="14.8" r="2.1"/><circle cx="11.6" cy="14.6" r="2.1"/><circle cx="15.6" cy="14.6" r="2.1"/><circle cx="9.6" cy="18" r="2.1"/><circle cx="13.6" cy="18" r="2.1"/><circle cx="11.6" cy="20.6" r="1.6"/></g>
+    <g fill="#f6f2e7"><circle cx="8.9" cy="10.7" r=".55"/><circle cx="12.9" cy="10.5" r=".55"/><circle cx="6.9" cy="14.1" r=".55"/><circle cx="10.9" cy="13.9" r=".55"/><circle cx="14.9" cy="13.9" r=".55"/><circle cx="8.9" cy="17.3" r=".55"/><circle cx="12.9" cy="17.3" r=".55"/></g>
+  </symbol>
+  <!-- Cèpe: gros chapeau brun bombé sur un pied ventru crème. -->
+  <symbol id="cep" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M8.4 12c-1.2 2.8-1.4 5.8-.4 8 1 1.2 7 1.2 8 0 1-2.2.8-5.2-.4-8z" fill="#ede2c2"/>
+    <path d="M10 15.8h4M10.4 18h3.2" stroke="#d9ccab" stroke-width="1.1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M2.8 11.6C2.8 6.4 7 3.4 12 3.4s9.2 3 9.2 8.2c0 1-2.4 1.4-9.2 1.4s-9.2-.4-9.2-1.4z" fill="#6e3f22"/>
+    <path d="M6.2 7.6c1.2-1.4 3-2.3 4.8-2.5" stroke="#8a5a3a" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Grappe de sureau: ombelle de baies noir violacé sur des tiges rouges, une foliole. -->
+  <symbol id="elderberry" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M12 19.4c-2.6.6-4.8-.4-6-2.6 2.6-.8 4.8.2 6 2.6z" fill="#5e8b45"/>
+    <path d="M12 21.2v-7M12 14.2 5.6 10.4M12 14.2 8.4 8.2M12 14.2V7M12 14.2l3.6-6M12 14.2l6.4-3.8" stroke="#b0303f" stroke-width="1.3" stroke-linecap="round"/>
+    <g fill="#2e2136" stroke="#2a2522" stroke-width=".9"><circle cx="9.4" cy="5.4" r="1.4"/><circle cx="12" cy="5" r="1.4"/><circle cx="14.6" cy="5.4" r="1.4"/><circle cx="6.8" cy="7.6" r="1.4"/><circle cx="17.2" cy="7.6" r="1.4"/><circle cx="4.8" cy="10.2" r="1.4"/><circle cx="19.2" cy="10.2" r="1.4"/><circle cx="9.6" cy="8" r="1.3"/><circle cx="14.4" cy="8" r="1.3"/></g>
+  </symbol>
+  <!-- Noisette: la coque brune pointue, l'involucre vert pâle frangé autour de sa base. -->
+  <symbol id="hazelnut" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M12 3.8c3.4 1.4 5.6 5 5.6 8.8 0 3.6-2.4 6.2-5.6 6.2s-5.6-2.6-5.6-6.2c0-3.8 2.2-7.4 5.6-8.8z" fill="#a97749"/>
+    <path d="M9.4 8.4c.6-1.2 1.4-2 2.4-2.6" stroke="#d3a66d" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M4.4 14.8c1.4-.6 2.6-.2 3.4.8.6-1.2 2.2-1.6 4.2-1.4 2-.2 3.6.2 4.2 1.4.8-1 2-1.4 3.4-.8-.4 2.8-2.4 5.2-5 6-1.6.5-3.6.5-5.2 0-2.6-.8-4.6-3.2-5-6z" fill="#d2dc92"/>
+    <path d="M9 18.2l.8 1.8M12 17.6v2.4M15 18.2l-.8 1.8" stroke="#7ea24c" stroke-width="1" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- Plats et produits -->
+  <!-- Radis à la croque-au-sel: trois radis sur l'assiette à filet bleu, un tas de sel. -->
+  <symbol id="crunchy-radishes" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="12" cy="15.6" rx="10" ry="4.6" fill="#eee7da"/>
+    <ellipse cx="12" cy="15.6" rx="7.4" ry="3.1" fill="none" stroke="#5d7fb0" stroke-width="1"/>
+    <path class="lpl-ik" d="M8 11.6C6.8 9.8 5 9.2 3.8 9.8c.6 1.6 2.2 2.2 4.2 1.8zM12.4 10.2c-.2-2.2 1-3.8 2.6-4.2.2 1.8-.8 3.4-2.6 4.2zM16.2 12c1-1.8 2.8-2.6 4.2-2-.6 1.6-2.2 2.4-4.2 2z" fill="#6faa47"/>
+    <circle class="lpl-ik" cx="8" cy="14.2" r="2.6" fill="#d44b5d"/>
+    <circle class="lpl-ik" cx="12.4" cy="12.8" r="2.6" fill="#d44b5d"/>
+    <circle class="lpl-ik" cx="16.2" cy="14.6" r="2.6" fill="#d44b5d"/>
+    <path d="M7 13.4a1.2 1.2 0 0 1 .9-.9M11.4 12a1.2 1.2 0 0 1 .9-.9M15.2 13.8a1.2 1.2 0 0 1 .9-.9" stroke="#f2dcdf" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <path d="M10.8 19l1.4-2 1.4 2z" fill="#f6f2e7" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Omelette: demi-lune dorée pliée sur l'assiette, herbes dessus. -->
+  <symbol id="omelette" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="12" cy="15.6" rx="10" ry="4.4" fill="#eee7da"/>
+    <path class="lpl-ik" d="M4.6 15c0-4.4 3.4-7.4 7.4-7.4s7.4 3 7.4 7.4c-2.2 1.2-4.8 1.6-7.4 1.6S6.8 16.2 4.6 15z" fill="#f2c74e"/>
+    <path d="M6.8 14.4c1.7.6 3.4.8 5.2.8s3.5-.2 5.2-.8" stroke="#d49248" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path d="M8.8 11.2h1.4M11.8 10.2h1.4M14.6 11.4h1.4" stroke="#6faa47" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <!-- Fromage frais de chèvre: palet blanc sur une feuille de châtaignier, sur une planchette ronde. -->
+  <symbol id="fresh-cheese" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="12" cy="17.4" rx="9.6" ry="3.4" fill="#d3a66d"/>
+    <path class="lpl-ik" d="M1.8 14.6c4.4-3.6 14-4.2 20.4-.8-4 3.4-14.8 4-20.4.8z" fill="#6c9944"/>
+    <path d="M3.6 14.4c5.4-.8 11.4-.8 16.8-.4" stroke="#8db556" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7 10.6v2.8c0 1.3 2.2 2.2 5 2.2s5-.9 5-2.2v-2.8z" fill="#eee7da"/>
+    <ellipse class="lpl-ik" cx="12" cy="10.6" rx="5" ry="2.2" fill="#f6f2e7"/>
+    <path d="M9.2 12.8h.1M12.6 13.4h.1M14.8 12.6h.1" stroke="#c0b4a1" stroke-width="1.1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Pot de gelée de sureau: bocal de gelée noir violacé, coiffe à carreaux ROUGES (comme sur l'étal), étiquette à l'ombelle. -->
+  <symbol id="elder-jelly" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.5 9h11v9.5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="#2e2136"/>
+    <path d="M8.2 11v6.6" stroke="#6f5b45" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M9.6 12.6h6v4.2h-6z" fill="#f3ebd4" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M12.6 16.2v-1.6M12.6 14.6l-1.4-.8M12.6 14.6l1.4-.8" stroke="#b0303f" stroke-width=".8" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M4.8 9.6c0-2.6 3-4.4 7.2-4.4s7.2 1.8 7.2 4.4l-1.2 1.4-1.6-.9-1.4 1-1.5-1-1.5 1-1.5-1-1.4 1-1.6-.9z" fill="#ba554c"/>
+    <path d="M7.4 6.8v3.6M10.4 5.6v4.6M13.6 5.6v4.6M16.6 6.8v3.6M5.6 8.4h12.8" stroke="#f0e4ca" stroke-width=".9"/>
+    <path d="M5.4 9.8c4.4.8 8.8.8 13.2 0" stroke="#cab58b" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Pot de confiture de mûres: même bocal, confiture violet noir, coiffe à carreaux BLEUS, étiquette à la mûre. -->
+  <symbol id="blackberry-jam" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.5 9h11v9.5a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="#2e2136"/>
+    <path d="M8.2 11v6.6" stroke="#6f5b45" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M9.6 12.6h6v4.2h-6z" fill="#f3ebd4" stroke="#2a2522" stroke-width=".8"/>
+    <g fill="#2e2136"><circle cx="11.9" cy="14" r=".8"/><circle cx="13.3" cy="14" r=".8"/><circle cx="12.6" cy="15.3" r=".8"/></g>
+    <path class="lpl-ik" d="M4.8 9.6c0-2.6 3-4.4 7.2-4.4s7.2 1.8 7.2 4.4l-1.2 1.4-1.6-.9-1.4 1-1.5-1-1.5 1-1.5-1-1.4 1-1.6-.9z" fill="#6b87b1"/>
+    <path d="M7.4 6.8v3.6M10.4 5.6v4.6M13.6 5.6v4.6M16.6 6.8v3.6M5.6 8.4h12.8" stroke="#f0e4ca" stroke-width=".9"/>
+    <path d="M5.4 9.8c4.4.8 8.8.8 13.2 0" stroke="#cab58b" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Bocal vide: verre clair, couvercle de fer-blanc, reflets. -->
+  <symbol id="jar" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.5 8.5h11v10a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2z" fill="#d4eceb"/>
+    <path d="M9 11v7" stroke="#f6f2e7" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M15 11.4v3.4" stroke="#6caab9" stroke-width="1.2" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M6.8 5h10.4v3.5H6.8z" fill="#9aa3a8"/>
+    <path d="M7.6 6.8h8.8" stroke="#6c7179" stroke-width="1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Paquet de sucre: la boîte bleue de l'épicerie, deux morceaux de sucre dessinés devant. -->
+  <symbol id="sugar" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M13.5 9.5 19.5 7v11l-6 2.5z" fill="#5d7fb0"/>
+    <path class="lpl-ik" d="M4.5 9.5h9v11h-9z" fill="#6b87b1"/>
+    <path class="lpl-ik" d="M4.5 9.5 10.5 7h9l-6 2.5z" fill="#f0ece3"/>
+    <path d="M6.2 13h3.2v3.2H6.2zM10 14.4h2.6V17H10z" fill="#f6f2e7" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Cornet de noisettes grillées: cornet de papier, noisettes brunes qui débordent. -->
+  <symbol id="roasted-hazelnuts" viewBox="0 0 24 24">
+    <g fill="#b1773a" stroke="#2a2522" stroke-width="1"><circle cx="8.4" cy="8.4" r="2.2"/><circle cx="15.6" cy="8.4" r="2.2"/><circle cx="12" cy="6.8" r="2.3"/><circle cx="10.4" cy="9.4" r="2"/><circle cx="13.8" cy="9.6" r="2"/></g>
+    <path d="M11.2 5.8a1.2 1.2 0 0 1 1-.6M7.6 7.6a1 1 0 0 1 .8-.5M14.8 7.6a1 1 0 0 1 .8-.5" stroke="#e3c18a" stroke-width=".9" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M4.8 10h14.4L12 21.6z" fill="#d9ccab"/>
+    <path class="lpl-ikf" d="M8.8 10l3.2 11.4"/>
+  </symbol>
+  <!-- Poêlée de girolles: poêle de fonte, girolles dorées et persil, queue de bois. -->
+  <symbol id="chanterelle-pan" viewBox="0 0 24 24">
+    <path d="M18.4 13.4 22.6 10.8" stroke="#2a2522" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M18.4 13.4 22.6 10.8" stroke="#765130" stroke-width="1.8" stroke-linecap="round"/>
+    <ellipse class="lpl-ik" cx="10.4" cy="14.4" rx="9" ry="5.2" fill="#44484e"/>
+    <ellipse cx="10.4" cy="13.9" rx="7" ry="3.7" fill="#6c7179"/>
+    <path d="M4.6 13.2c1.2-1.6 3.8-1.6 5 0l-1.8 1.2-.2 1.8H6.6l-.2-1.8zM10 11.2c1.2-1.6 3.8-1.6 5 0l-1.8 1.2-.2 1.8h-1l-.2-1.8zM10.8 15.4c1.2-1.6 3.8-1.6 5 0L14 16.6l-.2 1.4h-1l-.2-1.4z" fill="#f2c74e" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+    <path d="M9.6 16.4h.9M14.8 13.8h.9M8.6 11.8h.9" stroke="#6faa47" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <!-- Pain chaud: miche ronde à croûte foncée, entaillée en croix, qui fume (le pain long, lui, est froid). -->
+  <symbol id="warm-bread" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M8 7.4c-.9-1.1.9-2.2 0-3.4M12 6.8c-.9-1.1.9-2.2 0-3.4M16 7.4c-.9-1.1.9-2.2 0-3.4"/>
+    <path class="lpl-ik" d="M3.5 16.6c0-4.6 3.8-7.6 8.5-7.6s8.5 3 8.5 7.6c0 2.2-3.4 3.4-8.5 3.4s-8.5-1.2-8.5-3.4z" fill="#b1773a"/>
+    <path d="M9 12.8l6 3M15 12.8l-6 3" stroke="#e3c18a" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <!-- Brioche à tête: pied cannelé, dôme doré et sa petite tête ronde. -->
+  <symbol id="brioche" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4.6 13.4h14.8l-2 7.1H6.6z" fill="#d49248"/>
+    <path d="M8.2 13.8l.6 6.4M12 13.8v6.4M15.8 13.8l-.6 6.4" stroke="#b1773a" stroke-width="1.1"/>
+    <path class="lpl-ik" d="M4.2 13.6c0-3 3.4-5 7.8-5s7.8 2 7.8 5c-2.2.8-5 1-7.8 1s-5.6-.2-7.8-1z" fill="#d59b56"/>
+    <circle class="lpl-ik" cx="12" cy="6.4" r="3" fill="#d59b56"/>
+    <path d="M10.6 5.4a1.6 1.6 0 0 1 1.4-.8M7.4 11.2c1.1-.7 2.3-1 3.3-1" stroke="#e3c18a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Chocolat chaud: tasse de faïence bleue sur sa soucoupe, chocolat brun, vapeur. -->
+  <symbol id="hot-chocolate" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="11" cy="19.4" rx="8.6" ry="2.4" fill="#eee7da"/>
+    <path class="lpl-ikf" d="M16.8 12.2c2.4-.6 3.8.6 3.4 2-.4 1.4-2 1.8-3.8 1.6"/>
+    <path class="lpl-ik" d="M5 10.5h12v4.6c0 2.8-2.6 4.6-6 4.6s-6-1.8-6-4.6z" fill="#5d7fb0"/>
+    <path d="M5.6 13.6c3.4 1 7.4 1 10.8 0" stroke="#f0ece3" stroke-width="1.2" fill="none"/>
+    <ellipse class="lpl-ik" cx="11" cy="10.5" rx="6" ry="1.6" fill="#614835"/>
+    <path class="lpl-ikf" d="M9 7.4c-.8-1 .8-2 0-3M13 7.4c-.8-1 .8-2 0-3"/>
+  </symbol>
+  <!-- Bidon de lait: fer-blanc, épaules et anses, couvercle, cerclage. -->
+  <symbol id="milk-can" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M7.4 10.6c-1.8.2-2.4 1.8-1.6 3M16.6 10.6c1.8.2 2.4 1.8 1.6 3"/>
+    <path class="lpl-ik" d="M7 11.6c0-1.4 1.6-2.4 3-2.8V6.6h4v2.2c1.4.4 3 1.4 3 2.8V19c0 1-2.2 1.8-5 1.8S7 20 7 19z" fill="#9aa3a8"/>
+    <path d="M7.4 14.6c3 .8 6.2.8 9.2 0" stroke="#6c7179" stroke-width="1.2" fill="none"/>
+    <path d="M9.2 12.2v5.6" stroke="#f0ece3" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M9 4.6h6v2H9z" fill="#6c7179"/>
+    <path class="lpl-ikf" d="M11 4.6V3.4h2v1.2"/>
+  </symbol>
+  <!-- Panière d'Achille: osier tressé, miches rondes et deux baguettes qui dépassent. -->
+  <symbol id="bread-basket" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6 12 14.4 3.6c1.2-.6 2.2.4 1.6 1.6L8 13.4zM10.2 12.4l8.4-6.8c1.2-.4 2 .6 1.4 1.6l-8 6.6z" fill="#d59b56"/>
+    <circle class="lpl-ik" cx="7" cy="11.4" r="2.6" fill="#b1773a"/>
+    <circle class="lpl-ik" cx="17" cy="11.6" r="2.4" fill="#b1773a"/>
+    <path class="lpl-ik" d="M3 11.6h18l-1.8 8.4c-.2.8-1 1.2-1.8 1.2H6.6c-.8 0-1.6-.4-1.8-1.2z" fill="#e2c47c"/>
+    <path d="M4.4 14.8h15.2M5 17.8h14" stroke="#c5a45f" stroke-width="1.2"/>
+    <path d="M8 12.2v8.6M12 12.2v8.6M16 12.2v8.6" stroke="#c5a45f" stroke-width="1"/>
+    <path class="lpl-ik" d="M2.4 10.6h19.2v2H2.4z" fill="#c5a45f"/>
+  </symbol>
+  <!-- Outils améliorés: le même dessin que l'outil de départ, dans leur matière (cuivre, acier forgé, bambou). -->
+  <!-- Arrosoir de cuivre: le corps et la pomme de cuivre, une rangée de rivets, reflet clair. -->
+  <symbol id="watering-can-copper" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M14 12.5 20.5 7.5l1 1.2-6 6" fill="#b8693a"/>
+    <path class="lpl-ikf" d="M6.5 10a3.6 3.6 0 0 1 6 0"/>
+    <path class="lpl-ik" d="M4.5 10.5h10v8a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2z" fill="#b8693a"/>
+    <path d="M6.5 13.2h6" stroke="#de9a62" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M6.6 17.6h.1M9.5 17.6h.1M12.4 17.6h.1" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M19.6 6.2l2.6 2.8 1-1.6-2-2.2z" fill="#de9a62"/>
+  </symbol>
+  <!-- Hache de la forge: fer d'acier sombre plus large, au tranchant clair, manche brun foncé. -->
+  <symbol id="axe-forged" viewBox="0 0 24 24">
+    <path d="M6.6 21.4 15.4 4.2" stroke="#2a2522" stroke-width="3.8" stroke-linecap="round"/>
+    <path d="M6.6 21.4 15.4 4.2" stroke="#765130" stroke-width="2" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M12 5.2c2.6-3.4 7-3.4 9.6-.2-1 3.6-3.8 5.8-7.8 5.6z" fill="#3b4652"/>
+    <path d="M19.4 2.8c1 .6 1.7 1.4 2.1 2.2-.6 1.8-1.6 3.2-3 4.2" stroke="#beb9ad" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Canne en bambou refendu: tige de bambou clair à nœuds, moulinet, ligne et bouchon. -->
+  <symbol id="fishing-rod-bamboo" viewBox="0 0 24 24">
+    <path d="M16.8 3.8c1.9 2.8 2.7 6 2.7 9.6" stroke="#2a2522" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M3.8 20.6 16.6 3.6" stroke="#2a2522" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M3.8 20.6 16.6 3.6" stroke="#d9c27e" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M7.4 14.6l1.4 1M10.4 10.6l1.4 1M13.2 6.9l1.3 1" stroke="#9e8343" stroke-width="1.4" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="6.2" cy="19.6" r="1.8" fill="#9aa3a8"/>
+    <circle cx="19.5" cy="15.8" r="2.4" fill="#fbf6e9"/>
+    <path d="M17.1 15.8a2.4 2.4 0 0 1 4.8 0z" fill="#d9584f"/>
+    <circle class="lpl-ikf" cx="19.5" cy="15.8" r="2.4"/>
+    <path d="M16 19.8c1.4.7 5.6.7 7 0" stroke="#4c899a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  </symbol>
+
+  <!-- Matériaux, ferme et basse-cour -->
+  <!-- Brassée de paille: tiges évasées aux deux bouts, liées d'une ficelle au milieu. -->
+  <symbol id="straw-armful" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2.5 6.5 10 10.2h4l7.5-3.7v11L14 13.8h-4l-7.5 3.7z" fill="#e2c47c"/>
+    <path d="M4 9.2 10 11M4 14.8l6-1.8M20 9.2 14 11M20 14.8 14 13M3.6 12h6.4M20.4 12H14" stroke="#c5a45f" stroke-width="1.1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M9.8 9.4h4.4v5.2H9.8z" fill="#cab58b"/>
+    <path d="M10.6 10.6h2.8M10.6 13.4h2.8" stroke="#9e8459" stroke-width=".9"/>
+  </symbol>
+  <!-- Seau d'eau: seau de bois cerclé de fer, anse, eau claire au bord. -->
+  <symbol id="water-pail" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M5.4 9.6C5.8 4.4 18.2 4.4 18.6 9.6"/>
+    <path class="lpl-ik" d="M4.5 9.5h15l-1.6 10.4c-.1.7-.7 1.1-1.4 1.1H7.5c-.7 0-1.3-.4-1.4-1.1z" fill="#a97749"/>
+    <path d="M8.6 10.4v10.2M12 10.4V21M15.4 10.4v10.2" stroke="#765130" stroke-width="1"/>
+    <path d="M5 12.6h14M5.8 18.2h12.4" stroke="#6c7179" stroke-width="1.6"/>
+    <ellipse class="lpl-ik" cx="12" cy="9.5" rx="7.5" ry="1.9" fill="#6caab9"/>
+    <path d="M8.4 9.2h3" stroke="#d4eceb" stroke-width="1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Cagette: deux lattes claires par côté entre quatre coins, le fond sombre entre les lattes. -->
+  <symbol id="crate" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6 5.6h12.6v3H6z" fill="#c89d64"/>
+    <path class="lpl-ik" d="M3.5 8.4h17v11.2h-17z" fill="#765130"/>
+    <path class="lpl-ik" d="M3.5 9.6h17v3.2h-17zM3.5 15.2h17v3.2h-17z" fill="#d3a66d"/>
+    <path class="lpl-ik" d="M3 8h2.6v12.2H3zM18.4 8H21v12.2h-2.6z" fill="#a97749"/>
+  </symbol>
+  <!-- Coupon de toile: une pièce de lin rayé pliée en trois, nouée d'un ruban rouge. -->
+  <symbol id="cloth-coupon" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.5 15h15.4a2.2 2.2 0 0 1 0 4.4H3.5z" fill="#e4dcc8"/>
+    <path class="lpl-ik" d="M3.5 10.4h15.4a2.3 2.3 0 0 1 0 4.6H3.5z" fill="#f0e4ca"/>
+    <path class="lpl-ik" d="M3.5 5.6h15.4a2.4 2.4 0 0 1 0 4.8H3.5z" fill="#f0e4ca"/>
+    <path d="M4.6 7.4h13.6M4.6 12.2h13.6M4.6 16.8h13.6" stroke="#6b87b1" stroke-width="1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M9.6 4.8h2.8v15.4H9.6z" fill="#ba554c"/>
+  </symbol>
+  <!-- Plume de poule: plume rousse courbe, tige claire, duvet à la base. -->
+  <symbol id="hen-feather" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.4 20.2C6 12.8 10 6 17.6 3.4c1.4 4.8-1.2 10.8-6.4 14.6-2 1.4-3.8 2-5.8 2.2z" fill="#b5693c"/>
+    <path d="M7.2 18.4c.2-1.4.8-2.6 1.6-3.6" stroke="#d8ae72" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path d="M4 21.4c3.6-5.4 8-11 13.2-17.4" stroke="#f3ebd4" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ikf" d="M11.4 13.8l2.2.2M13.6 9.2l2 .4"/>
+  </symbol>
+  <!-- Plume de geai: barres bleu vif, noires et blanches, tige sombre. -->
+  <symbol id="jay-feather" viewBox="0 0 24 24">
+    <path d="M6.2 19.8C6.8 13.8 9.8 7.6 15.8 3.6c2.2 1.6 2 5.6-1 9.8-2.4 3.2-5.2 5.2-8.6 6.4z" fill="#4f80ca"/>
+    <path d="M7.4 16.2l4.6 1.4M8.8 13l5.2 1.2M10.6 9.8l5 .9M13 6.6l3.6.5" stroke="#1f2b45" stroke-width="1.3"/>
+    <path d="M8.2 14.6l5 1.2M9.6 11.4l5.2 1M11.8 8.2l4.4.6" stroke="#f6f2e7" stroke-width=".9"/>
+    <path class="lpl-ikf" d="M6.2 19.8C6.8 13.8 9.8 7.6 15.8 3.6c2.2 1.6 2 5.6-1 9.8-2.4 3.2-5.2 5.2-8.6 6.4z"/>
+    <path d="M4.6 21.4C8.4 15.6 11.6 10 15.8 4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Mangeoire à trémie: trémie de planches à couvercle en pente, auget plein de grain devant. -->
+  <symbol id="hopper-feeder" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.5 7.4h11v8.6h-11z" fill="#d3a66d"/>
+    <path d="M12 8v8M6.8 11.6h10.4" stroke="#a97749" stroke-width="1"/>
+    <path class="lpl-ik" d="M4.8 8 12 3.6 19.2 8z" fill="#a97749"/>
+    <path class="lpl-ik" d="M3.5 15.4h17l-1.4 4.2H4.9z" fill="#a97749"/>
+    <path d="M5 15.6c2.4-1.6 11.6-1.6 14 0" fill="#e0c56f" stroke="#2a2522" stroke-width=".9"/>
+    <path class="lpl-ikf" d="M6.2 19.6v1.8M17.8 19.6v1.8"/>
+  </symbol>
+  <!-- Balance de marché: balance de Roberval, socle de bois, fléau de fonte, deux plateaux de laiton, deux poids. -->
+  <symbol id="market-scale" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 17.4h18v3.1H3z" fill="#765130"/>
+    <path class="lpl-ik" d="M7 13.8h10v3.6H7z" fill="#44484e"/>
+    <path class="lpl-ikf" d="M12 13.8V8.2"/>
+    <circle class="lpl-ik" cx="12" cy="13.4" r="1.1" fill="#c8a150"/>
+    <path class="lpl-ik" d="M15.4 7.6h2.6v3.2h-2.6zM18.6 8.6h1.8v2.2h-1.8z" fill="#6c7179"/>
+    <circle class="lpl-ik" cx="6.4" cy="8.8" r="2.2" fill="#d44b5d"/>
+    <path class="lpl-ik" d="M2.4 10.8h8l-.9 2.2c-.2.5-.7.8-1.2.8H4.5c-.5 0-1-.3-1.2-.8zM13.6 10.8h8l-.9 2.2c-.2.5-.7.8-1.2.8h-3.8c-.5 0-1-.3-1.2-.8z" fill="#c8a150"/>
+  </symbol>
+  <!-- Râtelier: planche murale sur ses crochets, houe, pelle et râteau pendus. -->
+  <symbol id="tool-rack" viewBox="0 0 24 24">
+    <path d="M6 7.6v12M12 7.6v10.4M18 7.6v11" stroke="#2a2522" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M6 7.6v12M12 7.6v10.4M18 7.6v11" stroke="#a97749" stroke-width="1.6" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M3.6 19.4h4.8l-.6 2.2H4.2z" fill="#9aa3a8"/>
+    <path class="lpl-ik" d="M10 17.4h4v2.4c0 1.2-.9 2-2 2s-2-.8-2-2z" fill="#9aa3a8"/>
+    <path class="lpl-ik" d="M15 18.4h6v1.6h-6z" fill="#6c7179"/>
+    <path class="lpl-ikf" d="M15.8 20v1.4M18 20v1.4M20.2 20v1.4"/>
+    <path class="lpl-ik" d="M2 4h20v3.2H2z" fill="#765130"/>
+  </symbol>
+  <!-- Étagère haute du cellier: deux montants, trois tablettes, bocaux, sac et pommes de terre. -->
+  <symbol id="cellar-rack" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4 2.6h2v19H4zM18 2.6h2v19h-2z" fill="#a97749"/>
+    <path d="M7.4 3.6h2.4v3H7.4zM10.6 3.6H13v3h-2.4zM14.2 4.4h2.2v2.2h-2.2z" fill="#d4eceb" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M14.2 4.4h2.2v1.2h-2.2z" fill="#b0303f"/>
+    <path d="M7.4 12V9.8c0-1 .6-1.4 1.6-1.6l.6-.6.6.6c1 .2 1.6.6 1.6 1.6V12z" fill="#c1a577" stroke="#2a2522" stroke-width=".8"/>
+    <g fill="#caa76e" stroke="#2a2522" stroke-width=".8"><circle cx="14" cy="11" r="1.1"/><circle cx="16.2" cy="11" r="1.1"/><circle cx="15.1" cy="9.4" r="1.1"/></g>
+    <path d="M7.4 17.4v-2.8h3v2.8zM11.4 17.4v-2.2h2.4v2.2zM14.6 17.4v-2.8h2.6v2.8z" fill="#b86b4f" stroke="#2a2522" stroke-width=".8"/>
+    <path class="lpl-ik" d="M3 6.6h18v1.6H3zM3 12h18v1.6H3zM3 17.4h18v1.6H3z" fill="#d3a66d"/>
+  </symbol>
+  <!-- Grand coffre de chêne: plus long et plus sombre que le coffre, couvercle bombé, ferrures et panneaux. -->
+  <symbol id="oak-chest" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2.5 11h19v8.4h-19z" fill="#765130"/>
+    <path d="M9.2 12.8h5.6v4.8H9.2z" fill="none" stroke="#554230" stroke-width="1.1"/>
+    <path class="lpl-ik" d="M2.5 11c0-3.4 2.6-5 9.5-5s9.5 1.6 9.5 5z" fill="#a97749"/>
+    <path d="M6.4 6.8v12.6M17.6 6.8v12.6" stroke="#44484e" stroke-width="1.7"/>
+    <path class="lpl-ik" d="M2 19.2h20v1.8H2z" fill="#554230"/>
+    <path class="lpl-ik" d="M11 10.2h2v2.4h-2z" fill="#6c7179"/>
+  </symbol>
+  <!-- Étal du marché: auvent rayé rouge et crème, planche sur tréteaux, bandeau de toile, légumes. -->
+  <symbol id="market-stall" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M4.2 9.6V21M19.8 9.6V21"/>
+    <path class="lpl-ik" d="M2.5 8.6 4.6 3.6h14.8l2.1 5z" fill="#f1e5c9"/>
+    <path d="M7.6 3.8l-1 4.6M12 3.8v4.6M16.4 3.8l1 4.6" stroke="#c65b4b" stroke-width="2.2"/>
+    <path class="lpl-ik" d="M2.5 8.6 4.6 3.6h14.8l2.1 5z" fill="none"/>
+    <path class="lpl-ik" d="M2.5 8.6h19v1a1.6 1.6 0 0 1-3.2 0 1.6 1.6 0 0 1-3.2 0 1.6 1.6 0 0 1-3.1 0 1.6 1.6 0 0 1-3.2 0 1.6 1.6 0 0 1-3.1 0 1.6 1.6 0 0 1-3.2 0z" fill="#c65b4b"/>
+    <path class="lpl-ik" d="M6 13.8l2-2.6h2.4l1.6 2.6z" fill="#e98a3b"/>
+    <circle class="lpl-ik" cx="15.6" cy="12.6" r="1.8" fill="#98c95d"/>
+    <path class="lpl-ik" d="M2.5 13.8h19v2.4h-19z" fill="#d3a66d"/>
+    <path class="lpl-ik" d="M3.6 16.2h16.8v2.6H3.6z" fill="#f1e5c9"/>
+    <path d="M6.4 16.6v1.8M10.2 16.6v1.8M13.8 16.6v1.8M17.6 16.6v1.8" stroke="#c65b4b" stroke-width="1.6"/>
+  </symbol>
+  <!-- Caisse de briques: caisse de planches claires, briques rouges rangées qui dépassent. -->
+  <symbol id="brick-crate" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.4 4.4h4.8v2.8H7.4zM12.2 4.4H17v2.8h-4.8z" fill="#985541"/>
+    <path class="lpl-ik" d="M4.6 7.2h4.8v2.8H4.6zM9.4 7.2h5v2.8h-5zM14.4 7.2h4.8v2.8h-4.8z" fill="#a95f49"/>
+    <path class="lpl-ik" d="M3.5 9.8h17v9.8h-17z" fill="#d3a66d"/>
+    <path d="M4 13h16M4 16.4h16" stroke="#a97749" stroke-width="1.1"/>
+    <path class="lpl-ik" d="M3 9.4h2.6v10.8H3zM18.4 9.4H21v10.8h-2.6z" fill="#a97749"/>
+  </symbol>
+  <!-- Caisse à chèvre: caisse à claire-voie, la tête de la chevrette et ses cornes passent au-dessus. -->
+  <symbol id="goat-crate" viewBox="0 0 24 24">
+    <path d="M9.8 4.8c-1-.8-1.6-2-1.4-3.2M12.2 4.8c1-.8 1.6-2 1.4-3.2" stroke="#2a2522" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M9.8 4.8c-1-.8-1.6-2-1.4-3.2M12.2 4.8c1-.8 1.6-2 1.4-3.2" stroke="#6e5743" stroke-width=".9" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M8.2 10.6c-.6-2.6-.2-5 1.2-6.2h3.4c1.6 1.2 2 3.4 1.4 6.2z" fill="#d8ae72"/>
+    <path class="lpl-ik" d="M8.4 6.6 5.6 5.8l1 1.8zM13.8 6.6l2.8-.8-1 1.8z" fill="#d8ae72"/>
+    <path d="M10 6.8h.1M12.2 6.8h.1" stroke="#2a2522" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M10.2 9.6h2l-1 1.2z" fill="#d9ccab"/>
+    <path class="lpl-ik" d="M2.5 10.4h19v9.8h-19z" fill="#e3c18a"/>
+    <path d="M6.4 10.8v9M10 10.8v9M13.6 10.8v9M17.2 10.8v9" stroke="#765130" stroke-width="1.6"/>
+    <path class="lpl-ik" d="M2.5 10.4h19v2h-19zM2.5 18.2h19v2h-19z" fill="#a97749"/>
+  </symbol>
+  <!-- Cage à coq: cage de transport à barreaux de noisetier, le coq doré à crête rouge et queue verte dedans. -->
+  <symbol id="rooster-crate" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M16.4 10.2c2.6-1.4 4.4.6 4 3.6-.6-1-1.4-1.6-2.4-1.6" fill="#3f6453"/>
+    <path class="lpl-ik" d="M7.4 10.6c-.4-2 .6-3.6 2.2-3.6s2.4 1.2 2.4 2.8c0 .8.2 1.4.6 1.8 1.4-1 3.2-1.4 4.4-.6.4 2.6-.8 5.4-3.6 6.2-2.8.8-5.8-.4-6.4-3-.2-1.2.2-2.4.4-3.6z" fill="#d8ae72"/>
+    <path class="lpl-ik" d="M8.2 7c-.4-1.4.6-2.2 1.6-1.6.4-1 1.8-.8 1.8.4 1-.2 1.4.8.6 1.6z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M7.6 8.6 5.8 9.4l1.9.6z" fill="#e9b13f"/>
+    <path d="M9.4 8.4h.1" stroke="#2a2522" stroke-width="1.3" stroke-linecap="round"/>
+    <path d="M5.6 5.4v13.4M9.2 5.4v13.4M12.8 5.4v13.4M16.4 5.4v13.4M20 5.4v13.4" stroke="#7ea24c" stroke-width="1.1"/>
+    <path class="lpl-ik" d="M3 3.4h18v2.2H3zM3 18.6h18v2.2H3z" fill="#a97749"/>
+    <path class="lpl-ikf" d="M10 3.4c.4-1.4 3.6-1.4 4 0"/>
+  </symbol>
+  <!-- Draisine: plateau sur roues, sur le rail, balancier à deux poignées sur son chevalet. -->
+  <symbol id="handcar" viewBox="0 0 24 24">
+    <path d="M1.5 21h21" stroke="#8c8e91" stroke-width="1.8" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M9 14.6 12 8.6l3 6"/>
+    <path d="M4.2 10.6 19.8 6.6" stroke="#2a2522" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M4.2 10.6 19.8 6.6" stroke="#765130" stroke-width="1.8" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M4.2 10.6 3.8 8.8M19.8 6.6l-.4-1.8"/>
+    <circle class="lpl-ik" cx="12" cy="8.6" r="1.1" fill="#c8a150"/>
+    <path class="lpl-ik" d="M3 14.4h18v2.6H3z" fill="#a97749"/>
+    <circle class="lpl-ik" cx="7" cy="18.4" r="2.4" fill="#44484e"/>
+    <circle class="lpl-ik" cx="17" cy="18.4" r="2.4" fill="#44484e"/>
+    <path d="M7 18.4h.1M17 18.4h.1" stroke="#9aa3a8" stroke-width="1.3" stroke-linecap="round"/>
+  </symbol>
+  <!-- Gros colis: grande caisse de papier kraft ficelée en croix, une étiquette pendue. -->
+  <symbol id="parcel-heavy" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2.5 8.5h14v12h-14z" fill="#c1a577"/>
+    <path class="lpl-ik" d="M16.5 8.5l5-3.5v12l-5 3.5z" fill="#9e8459"/>
+    <path class="lpl-ik" d="M2.5 8.5 7.5 5h14l-5 3.5z" fill="#d9ccab"/>
+    <path d="M9.5 8.6v11.8M2.8 14.4h13.4M9.5 8.4l5-3.4M16.7 14.4l4.6-3.2" stroke="#cab58b" stroke-width="2"/>
+    <path d="M9.5 8.6v11.8M2.8 14.4h13.4" stroke="#2a2522" stroke-width=".6"/>
+    <path d="M3.4 16.8h4l1.2 1.4-1.2 1.4h-4z" fill="#f3ebd4" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Colis d'Odette: paquet plat de papier kraft, ficelle nouée en boucle, étiquette prune (la couleur d'Odette). -->
+  <symbol id="parcel-odette" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 9.5h18v10H3z" fill="#cfb489"/>
+    <path d="M12 9.6v9.8M3.2 14.5h17.6" stroke="#b1773a" stroke-width="1.2"/>
+    <path class="lpl-ik" d="M12 9.4C10.4 6.4 7.4 6.2 7.4 8c0 1.4 2.4 1.8 4.6 1.4zM12 9.4c1.6-3 4.6-3.2 4.6-1.4 0 1.4-2.4 1.8-4.6 1.4z" fill="#cfb489"/>
+    <path d="M14 15.8h5v2.6h-5z" fill="#9c4f67" stroke="#2a2522" stroke-width=".8"/>
+  </symbol>
+  <!-- Paquet de la tournée: petit paquet de papier gris-bleu, timbre jaune de la poste et cachet ondulé. -->
+  <symbol id="parcel-mail" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4 7.5h16v11H4z" fill="#d9ccab"/>
+    <path d="M4.2 11.2h15.6" stroke="#4e6f8f" stroke-width="1.6"/>
+    <path d="M14.6 13.2h3.6v3.6h-3.6z" fill="#e0c25a" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M6 14.4c.8-.6 1.6.6 2.4 0s1.6.6 2.4 0M6 16.4c.8-.6 1.6.6 2.4 0s1.6.6 2.4 0" stroke="#4e6f8f" stroke-width=".9" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Chèvre (commande du catalogue): la chevrette de profil, tournée vers la gauche comme la poule, robe chamois, cornes, barbiche, collier et clochette. -->
+  <symbol id="goat" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M9.4 15.6v5M11.8 16v4.6M16.6 16v4.6M19 15.4v5"/>
+    <path class="lpl-ik" d="M8 10.2c2-1.4 5.4-1.6 9.2-1 2.6.4 3.8 2 3.6 4.2-.2 2-1.6 3-4 3.2-3.2.2-6 0-8-.6-1.4-.4-1.8-2.2-.8-5.8z" fill="#d8ae72"/>
+    <path class="lpl-ik" d="M20.4 9.6l1.4-1.4.2 2.2z" fill="#d8ae72"/>
+    <path d="M6.6 5.2c.4-1.8 1.8-3 3.6-3.2M5.6 5.4c.2-2 1.4-3.4 3-3.8" stroke="#2a2522" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+    <path d="M6.6 5.2c.4-1.8 1.8-3 3.6-3.2M5.6 5.4c.2-2 1.4-3.4 3-3.8" stroke="#6e5743" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M9.6 12c-.8-2.6-1.6-5.4-3-6.8-1.4 0-2.6 1.4-3.8 3.8-.4.8 0 1.6.8 1.8l1.6.4c.6 1 1.4 1.8 2.4 2.4z" fill="#d8ae72"/>
+    <path class="lpl-ik" d="M7.6 6.8l2.8.2-1.6 1.6z" fill="#d8ae72"/>
+    <path d="M5.4 8h.1" stroke="#2a2522" stroke-width="1.4" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M4.4 10.8c-.2 1.2.2 2.2.8 2.8.4-.8.4-1.8.2-2.6z" fill="#d9ccab"/>
+    <path d="M7.4 11.2c.8.8 1.8 1.4 2.8 1.6" stroke="#8a5a3a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <circle class="lpl-ik" cx="8.6" cy="13.2" r="1" fill="#c8a150"/>
+  </symbol>
+  <!-- Cadeaux du catalogue -->
+  <!-- Boîte de craies (pour Jeanne): boîte de bois ouverte, six craies de couleur debout, dont la verte. -->
+  <symbol id="chalk-box" viewBox="0 0 24 24">
+    <path d="M5.6 11V6.4M8.4 11V5.6M11.2 11V6.6M14 11V5.4M16.8 11V6.2M19.4 11V7" stroke="#2a2522" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M5.6 11V6.4" stroke="#f6f2e7" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M8.4 11V5.6" stroke="#f2c74e" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M11.2 11V6.6" stroke="#d9584f" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M14 11V5.4" stroke="#7191d9" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M16.8 11V6.2" stroke="#6faa47" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M19.4 11V7" stroke="#e89cb6" stroke-width="1.6" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M3.5 10.6h17v8.8h-17z" fill="#d3a66d"/>
+    <path class="lpl-ik" d="M2.8 19.2h18.4v1.8H2.8z" fill="#a97749"/>
+    <path d="M6.4 14.6h11.2" stroke="#a97749" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+  <!-- Moulin à café (pour Odette): caisse de bois, tiroir à bouton de laiton, trémie de laiton, manivelle à boule. -->
+  <symbol id="coffee-mill" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M12 7.6V5.4l6-1.6"/>
+    <circle class="lpl-ik" cx="18.6" cy="3.8" r="1.5" fill="#765130"/>
+    <path class="lpl-ik" d="M5.6 11c0-2.4 2.8-3.6 6.4-3.6s6.4 1.2 6.4 3.6z" fill="#c8a150"/>
+    <path class="lpl-ik" d="M6 11h12v9.6H6z" fill="#a97749"/>
+    <path class="lpl-ik" d="M8 15h8v3.4H8z" fill="#765130"/>
+    <circle cx="12" cy="16.7" r=".9" fill="#c8a150" stroke="#2a2522" stroke-width=".7"/>
+  </symbol>
+  <!-- Tablier de cuir (pour Basile): bavette, cordon de cou, liens de taille, poche cousue. -->
+  <symbol id="leather-apron" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M8.6 6.4C8.6 3 15.4 3 15.4 6.4M6.4 12 2.6 13.6M17.6 12l3.8 1.6"/>
+    <path class="lpl-ik" d="M8.4 5.6h7.2v5.4l2.6 1v8.8c0 .4-.4.8-.8.8H6.6c-.4 0-.8-.4-.8-.8V12l2.6-1z" fill="#8a5a3a"/>
+    <path class="lpl-ik" d="M9 13.8h6v4.2H9z" fill="#6e5743"/>
+    <path d="M7.2 20.2h9.6M9.6 7.2v3M14.4 7.2v3" stroke="#e8ddc4" stroke-width=".8" stroke-dasharray="1 1"/>
+  </symbol>
+  <!-- Écharpe de laine (pour Firmin): rouleau rouge à rayures crème, un pan à frange qui pend. -->
+  <symbol id="wool-scarf" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M14.4 12.6h4.2v6.8h-4.2z" fill="#ba554c"/>
+    <path d="M14.6 15.4h3.8" stroke="#f0e4ca" stroke-width="1.3"/>
+    <path class="lpl-ikf" d="M15 19.4v2.2M16.5 19.4v2.2M18 19.4v2.2"/>
+    <path class="lpl-ik" d="M6 5.6h10.4v8H6z" fill="#ba554c"/>
+    <path d="M8.6 5.8v7.6M13.6 5.8v7.6" stroke="#f0e4ca" stroke-width="1.5"/>
+    <ellipse class="lpl-ik" cx="6" cy="9.6" rx="2.6" ry="4" fill="#ba554c"/>
+    <path d="M6 8.2c1 0 1.2 1.4.4 1.8-1 .4-1.8-.6-1.4-1.6.4-1.2 2.4-1 2.6.6" stroke="#2a2522" stroke-width=".8" stroke-linecap="round" fill="none"/>
+    <ellipse class="lpl-ik" cx="16.4" cy="9.6" rx="2.6" ry="4" fill="#ba554c"/>
+  </symbol>
+  <!-- Sablier (cadeau): deux plateaux de bois, quatre colonnettes, le sable qui coule. -->
+  <symbol id="sand-timer" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7 4.8c0 4 4 5.4 4 7.2s-4 3.2-4 7.2h10c0-4-4-5.4-4-7.2s4-3.2 4-7.2z" fill="#d4eceb"/>
+    <path d="M8.8 18.6c.6-2 2.2-2.6 3.2-2.6s2.6.6 3.2 2.6zM9.4 7.4h5.2c-.6 1.4-2 2.2-2.6 2.8-.6-.6-2-1.4-2.6-2.8z" fill="#dccaa2"/>
+    <path d="M12 10.4v6" stroke="#c5a45f" stroke-width=".9" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M6.4 5v14M17.6 5v14"/>
+    <path class="lpl-ik" d="M4.6 2.6h14.8v2.4H4.6zM4.6 19h14.8v2.4H4.6z" fill="#a97749"/>
+  </symbol>
+  <!-- Peigne de corne: dos arrondi, dents fines, corne blonde marbrée. -->
+  <symbol id="horn-comb" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 9.2c0-1.6 1.4-2.8 3-2.8h12c1.6 0 3 1.2 3 2.8v2.4H3z" fill="#b59c79"/>
+    <path d="M7.4 8.2c1.4.4 2.6.2 3.6-.4M14.4 8.6c1 .4 2 .2 2.8-.2" stroke="#6f5b45" stroke-width="1" stroke-linecap="round" fill="none"/>
+    <path d="M4.6 11.6v7M7 11.6v7M9.4 11.6v7M11.8 11.6v7M14.2 11.6v7M16.6 11.6v7M19 11.6v7" stroke="#2a2522" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M4.6 11.6v7M7 11.6v7M9.4 11.6v7M11.8 11.6v7M14.2 11.6v7M16.6 11.6v7M19 11.6v7" stroke="#b59c79" stroke-width=".9" stroke-linecap="round"/>
+  </symbol>
+  <!-- Clochette de la chèvre: cloche de laiton, son battant, pendue à un collier de cuir. -->
+  <symbol id="goat-bell" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3.6 6.8C7 3.6 17 3.6 20.4 6.8"/>
+    <path d="M3.6 6.8C7 3.6 17 3.6 20.4 6.8" stroke="#8a5a3a" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M10.4 4.6h3.2v2.6h-3.2z" fill="#9aa3a8"/>
+    <path class="lpl-ik" d="M7.6 17.6c.4-4.6 1-9.6 4.4-10.4 3.4.8 4 5.8 4.4 10.4z" fill="#c8a150"/>
+    <path class="lpl-ik" d="M5.8 17.6h12.4v2H5.8z" fill="#c8a150"/>
+    <circle class="lpl-ik" cx="12" cy="20.8" r="1.4" fill="#6c7179"/>
+    <path d="M10 15c.1-2 .5-3.6 1.2-4.6" stroke="#f2e4b6" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+
+  <!-- Décoration de la maison -->
+  <!-- Chapeau de paille: large bord, calotte bombée, ruban rouge. -->
+  <symbol id="straw-hat" viewBox="0 0 24 24">
+    <ellipse class="lpl-ik" cx="12" cy="15.4" rx="10.4" ry="4.4" fill="#e2c47c"/>
+    <path class="lpl-ik" d="M6.8 14.6c0-4.6 2.2-7.4 5.2-7.4s5.2 2.8 5.2 7.4c-1.6.8-3.4 1.2-5.2 1.2s-3.6-.4-5.2-1.2z" fill="#e2c47c"/>
+    <path d="M6.9 12.6c1.6.8 3.4 1.2 5.1 1.2s3.5-.4 5.1-1.2" stroke="#ba554c" stroke-width="2" fill="none"/>
+    <path d="M9.6 9.4c.4-.6.8-1 1.4-1.2M4.4 16.4c1.6 1 3.4 1.4 5.2 1.6M14.8 18c1.8-.2 3.4-.6 4.8-1.4" stroke="#c5a45f" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Herbier encadré: cadre de bois sombre, papier, trois fleurs pressées à plat (rouge, bleue, jaune). -->
+  <symbol id="pressed-flowers" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M7 6 12 2.8 17 6"/>
+    <path class="lpl-ik" d="M4 5.6h16v15.6H4z" fill="#765130"/>
+    <path d="M6.2 7.8h11.6v11.2H6.2z" fill="#f3ebd4" stroke="#2a2522" stroke-width="1"/>
+    <path d="M8.6 18v-5.4M12 18v-6.4M15.4 18v-5" stroke="#6faa47" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M12 15.4l1.6-1M8.6 15.6l-1.2-.8" stroke="#6faa47" stroke-width="1.1" stroke-linecap="round"/>
+    <circle cx="8.6" cy="11.6" r="1.5" fill="#d9584f" stroke="#2a2522" stroke-width=".7"/>
+    <circle cx="12" cy="10.4" r="1.5" fill="#7191d9" stroke="#2a2522" stroke-width=".7"/>
+    <circle cx="15.4" cy="12" r="1.5" fill="#f2c74e" stroke="#2a2522" stroke-width=".7"/>
+  </symbol>
+  <!-- Calendrier de la coopérative: bandeau vert, gravure de la saison, grille des jours, un jour marqué. -->
+  <symbol id="coop-calendar" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M8.4 4.6 12 2.4l3.6 2.2"/>
+    <path class="lpl-ik" d="M5 4.4h14v17H5z" fill="#f3ebd4"/>
+    <path d="M5.8 5.2h12.4v2.6H5.8z" fill="#7f9c79"/>
+    <path d="M9.4 6.5h5.2" stroke="#e8ddc4" stroke-width="1" stroke-linecap="round"/>
+    <path d="M6.6 8.8h10.8v4.6H6.6z" fill="#b59c79"/>
+    <circle cx="14.6" cy="10.4" r="1" fill="#f3ebd4"/>
+    <path d="M6.6 13.4l3-2.2 2.2 1.4 1.8-1 3.8 1.8z" fill="#6f5b45"/>
+    <path d="M7 15.6h1.6M9.6 15.6h1.6M12.6 15.6h1.6M15.4 15.6h1.6M7 17.6h1.6M9.6 17.6h1.6M12.6 17.6h1.6M15.4 17.6h1.6M7 19.6h1.6M9.6 19.6h1.6" stroke="#d9ccab" stroke-width="1.2"/>
+    <path d="M12.6 19.6h1.6" stroke="#ba554c" stroke-width="1.4"/>
+  </symbol>
+  <!-- Horloge murale: caisse de bois sombre, cadran à traits et aiguilles, fenêtre du balancier. -->
+  <symbol id="wall-clock" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.6 9h10.8v12.4H6.6z" fill="#765130"/>
+    <path d="M9 12.6h6v7H9z" fill="#5f7d8c" stroke="#2a2522" stroke-width=".9"/>
+    <path d="M12 12.6v4.4" stroke="#c8a150" stroke-width=".9"/>
+    <circle cx="12" cy="17.6" r="1.3" fill="#c8a150" stroke="#2a2522" stroke-width=".7"/>
+    <circle class="lpl-ik" cx="12" cy="7.4" r="5.4" fill="#765130"/>
+    <circle cx="12" cy="7.4" r="3.8" fill="#f3ebd4" stroke="#2a2522" stroke-width=".9"/>
+    <path d="M12 4.1v.8M15.3 7.4h-.8M12 10.7v-.8M8.7 7.4h.8" stroke="#2a2522" stroke-width=".8" stroke-linecap="round"/>
+    <path d="M12 7.4V5.4M12 7.4l1.4.9" stroke="#2a2522" stroke-width="1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Couronne de feuilles: anneau de feuilles rousses et or, deux glands, ruban rouge noué en bas. -->
+  <symbol id="autumn-wreath" viewBox="0 0 24 24">
+    <circle cx="12" cy="11.6" r="6.6" fill="none" stroke="#2a2522" stroke-width="4.6"/>
+    <circle cx="12" cy="11.6" r="6.6" fill="none" stroke="#c5a45f" stroke-width="2.4"/>
+    <g stroke="#2a2522" stroke-width="1" stroke-linejoin="round">
+      <path d="M12 3.2c1.6.6 2.6 2 2.4 3.6-1.6-.4-2.6-1.8-2.4-3.6z" fill="#d9a04a"/>
+      <path d="M17.6 5.4c.4 1.6-.2 3.2-1.6 4-.6-1.6 0-3.2 1.6-4z" fill="#c7652f"/>
+      <path d="M20.2 11.2c-.8 1.4-2.4 2.2-4 1.8.8-1.4 2.4-2.2 4-1.8z" fill="#d9a04a"/>
+      <path d="M6.4 5.4c1.6.4 2.4 1.8 2 3.4-1.6-.4-2.4-1.8-2-3.4z" fill="#b8693a"/>
+      <path d="M3.8 11.2c1.6-.4 3.2.4 3.8 1.8-1.6.4-3.2-.4-3.8-1.8z" fill="#c7652f"/>
+      <path d="M5.4 15.8c1.2-1.2 3-1.4 4.2-.4-1.2 1.2-3 1.4-4.2.4z" fill="#d9a04a"/>
+      <path d="M18.6 15.8c-1.2-1.2-3-1.4-4.2-.4 1.2 1.2 3 1.4 4.2.4z" fill="#b8693a"/>
+    </g>
+    <path class="lpl-ik" d="M12 18.4c-1.6-1.6-4-1.6-4-.2 0 1.2 2.2 1.4 4 .2zM12 18.4c1.6-1.6 4-1.6 4-.2 0 1.2-2.2 1.4-4 .2zM11 18.6l-1.6 3.4M13 18.6l1.6 3.4" fill="#ba554c"/>
+  </symbol>
+  <!-- Dessin de Jeanne: feuille de cahier punaisée de rouge, un train vert et un soleil, lignes d'écriture bleues. -->
+  <symbol id="jeanne-drawing" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 5h18v14.4H3z" fill="#fbf6e9"/>
+    <circle cx="16.8" cy="8.4" r="1.6" fill="#f2c74e" stroke="#e9aa3c" stroke-width=".8"/>
+    <path d="M5.6 13.4V10.6h3v-1.4h1.4v1.4h4.4v2.8z" fill="#507b65" stroke="#3f6453" stroke-width=".8" stroke-linejoin="round"/>
+    <path d="M7 14.2h.1M12.6 14.2h.1" stroke="#2a2522" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M5.6 16.4h12.8" stroke="#557fb0" stroke-width=".9" stroke-linecap="round"/>
+    <circle cx="4.4" cy="6.4" r="1" fill="#d3423c"/>
+    <circle cx="19.6" cy="6.4" r="1" fill="#d3423c"/>
+    <circle cx="4.4" cy="18" r="1" fill="#d3423c"/>
+    <circle cx="19.6" cy="18" r="1" fill="#d3423c"/>
+  </symbol>
+  <!-- Dessin de poussines: la même feuille punaisée, deux poussines jaunes dans l'herbe. -->
+  <symbol id="jeanne-chick-drawing" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 5h18v14.4H3z" fill="#fbf6e9"/>
+    <path d="M5 16.4c2-.8 4-.8 6.6 0s4.6.8 7.4 0" stroke="#6faa47" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+    <circle cx="8.6" cy="13" r="2.4" fill="#efcb45" stroke="#e9aa3c" stroke-width=".8"/>
+    <circle cx="7.8" cy="10.4" r="1.5" fill="#efcb45" stroke="#e9aa3c" stroke-width=".8"/>
+    <path d="M6.3 10.4l-1 .4 1 .4z" fill="#e98a3b"/>
+    <circle cx="15.4" cy="13.2" r="2.2" fill="#efcb45" stroke="#e9aa3c" stroke-width=".8"/>
+    <circle cx="16.4" cy="10.8" r="1.4" fill="#efcb45" stroke="#e9aa3c" stroke-width=".8"/>
+    <path d="M17.8 10.8l1 .4-1 .4z" fill="#e98a3b"/>
+    <circle cx="4.4" cy="6.4" r="1" fill="#d3423c"/>
+    <circle cx="19.6" cy="6.4" r="1" fill="#d3423c"/>
+    <circle cx="4.4" cy="18" r="1" fill="#d3423c"/>
+    <circle cx="19.6" cy="18" r="1" fill="#d3423c"/>
+  </symbol>
+  <!-- Guirlande de fanions: une ficelle qui retombe, fanions rouge, jaune, bleu, vert et crème. -->
+  <symbol id="garland" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M1.6 5.4c6 4.4 14.8 4.4 20.8 0"/>
+    <path d="M2.6 6.4 7 7.9l-2.4 5.9z" fill="#d9584f" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M7.8 8.1l4.2.5-2.2 6.4z" fill="#f2c74e" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M12.8 8.6l4.2-.5-1.8 6.6z" fill="#7191d9" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M17.8 7.8l3.8-1.6-.4 6.4z" fill="#6faa47" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Nichoir: caisse de planches, trou rond, toit goudronné débordant, planche de dos clouée qui dépasse. -->
+  <symbol id="nest-box" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M10.4 1.8h3.2v4h-3.2z" fill="#a97749"/>
+    <circle cx="12" cy="3.4" r=".7" fill="#2a2522"/>
+    <path class="lpl-ik" d="M6.4 9.4h11.2v11.4H6.4z" fill="#d3a66d"/>
+    <circle class="lpl-ik" cx="12" cy="13.4" r="2" fill="#2a2522"/>
+    <path class="lpl-ikf" d="M12 16.8v1.8"/>
+    <path class="lpl-ik" d="M3.6 10.6 12 5l8.4 5.6-1 1.4L12 7.2 4.6 12z" fill="#3c3835"/>
+  </symbol>
+  <!-- Fauteuil d'osier: cuve ronde tressée de bandes claires et sombres, coussin de lin, pieds courts. -->
+  <symbol id="wicker-armchair" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M7 19v2.4M17 19v2.4"/>
+    <path class="lpl-ik" d="M3.2 11.4C3 6.4 7 3.6 12 3.6s9 2.8 8.8 7.8l-.6 6.6c0 .8-.6 1.2-1.4 1.2H5.2c-.8 0-1.4-.4-1.4-1.2z" fill="#e2c47c"/>
+    <path d="M4.2 8.4c5-2 10.6-2 15.6 0M3.6 12c5.4-1.4 11.4-1.4 16.8 0M3.8 15.6c5.4-.8 11-.8 16.4 0" stroke="#c5a45f" stroke-width="1.3" fill="none"/>
+    <path class="lpl-ik" d="M6.4 13.6c0-1.6 2.6-2.4 5.6-2.4s5.6.8 5.6 2.4v1.8c0 .6-.6 1-1.4 1H7.8c-.8 0-1.4-.4-1.4-1z" fill="#f0e4ca"/>
+  </symbol>
+  <!-- Petits vases de l'épicerie: même faïence, trois robes (blanc à filet bleu, bleu à filet blanc, terre cuite). -->
+  <symbol id="small-vase" viewBox="0 0 24 24">
+    <path d="M12 12 8.4 6.4M12 12l3.6-5.6M12 12V5.4" stroke="#5e9a3e" stroke-width="1.3" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="8" cy="5.6" r="2" fill="#d9584f"/>
+    <circle class="lpl-ik" cx="12" cy="4.2" r="2" fill="#f2c74e"/>
+    <circle class="lpl-ik" cx="16" cy="5.6" r="2" fill="#f6f2e7"/>
+    <path class="lpl-ik" d="M10 11.2h4v1.4c2.6.8 4 2.6 4 4.8 0 2.4-2.6 3.8-6 3.8s-6-1.4-6-3.8c0-2.2 1.4-4 4-4.8z" fill="#f0ece3"/>
+    <path d="M6.6 16.4c3.6 1 7.2 1 10.8 0" stroke="#7090a5" stroke-width="1.6" fill="none"/>
+  </symbol>
+  <symbol id="small-vase-blue" viewBox="0 0 24 24">
+    <path d="M12 12 8.4 6.4M12 12l3.6-5.6M12 12V5.4" stroke="#5e9a3e" stroke-width="1.3" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="8" cy="5.6" r="2" fill="#f6f2e7"/>
+    <circle class="lpl-ik" cx="12" cy="4.2" r="2" fill="#f2c74e"/>
+    <circle class="lpl-ik" cx="16" cy="5.6" r="2" fill="#e89cb6"/>
+    <path class="lpl-ik" d="M10 11.2h4v1.4c2.6.8 4 2.6 4 4.8 0 2.4-2.6 3.8-6 3.8s-6-1.4-6-3.8c0-2.2 1.4-4 4-4.8z" fill="#7090a5"/>
+    <path d="M6.6 16.4c3.6 1 7.2 1 10.8 0" stroke="#f0ece3" stroke-width="1.6" fill="none"/>
+  </symbol>
+  <symbol id="small-vase-terracotta" viewBox="0 0 24 24">
+    <path d="M12 12 8.4 6.4M12 12l3.6-5.6M12 12V5.4" stroke="#5e9a3e" stroke-width="1.3" stroke-linecap="round"/>
+    <circle class="lpl-ik" cx="8" cy="5.6" r="2" fill="#a685d0"/>
+    <circle class="lpl-ik" cx="12" cy="4.2" r="2" fill="#f6f2e7"/>
+    <circle class="lpl-ik" cx="16" cy="5.6" r="2" fill="#7191d9"/>
+    <path class="lpl-ik" d="M10 11.2h4v1.4c2.6.8 4 2.6 4 4.8 0 2.4-2.6 3.8-6 3.8s-6-1.4-6-3.8c0-2.2 1.4-4 4-4.8z" fill="#b86b4f"/>
+    <path d="M6.6 16.4c3.6 1 7.2 1 10.8 0" stroke="#985541" stroke-width="1.6" fill="none"/>
+  </symbol>
+  <!-- Rideaux de la mercerie: le dessin des rideaux, une couleur par article (comme dans la maison). -->
+  <symbol id="curtains-blue" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3 4.5h18"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#6b87b1"/>
+    <path d="M7.4 5.4c-.2 4.4 0 9 .4 13.4M16.6 5.4c.2 4.4 0 9-.4 13.4" stroke="#5f7d8c" stroke-width="1.1" fill="none"/>
+  </symbol>
+  <symbol id="curtains-red" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3 4.5h18"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#ba554c"/>
+    <path d="M7.4 5.4c-.2 4.4 0 9 .4 13.4M16.6 5.4c.2 4.4 0 9-.4 13.4" stroke="#9b4c3b" stroke-width="1.1" fill="none"/>
+  </symbol>
+  <symbol id="curtains-yellow" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3 4.5h18"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#e2b95b"/>
+    <path d="M7.4 5.4c-.2 4.4 0 9 .4 13.4M16.6 5.4c.2 4.4 0 9-.4 13.4" stroke="#c5a45f" stroke-width="1.1" fill="none"/>
+  </symbol>
+  <symbol id="curtains-green" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3 4.5h18"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#80a172"/>
+    <path d="M7.4 5.4c-.2 4.4 0 9 .4 13.4M16.6 5.4c.2 4.4 0 9-.4 13.4" stroke="#5e8b45" stroke-width="1.1" fill="none"/>
+  </symbol>
+  <!-- Vichy: carreaux rouges sur écru (les carreaux suivent le tombé, sans se soucier des plis). -->
+  <symbol id="curtains-gingham" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M3 4.5h18"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="#f0e4ca"/>
+    <path d="M5.4 8.2h4.4M5.2 12.2h4.6M5.6 16.2h4.8M14.2 8.2h4.4M14.2 12.2h4.6M13.6 16.2h4.8" stroke="#ba554c" stroke-width="1.6"/>
+    <path d="M7.4 5.4v13.6M16.6 5.4v13.6" stroke="#ba554c" stroke-width="1.6"/>
+    <path class="lpl-ik" d="M4.5 4.5h6c-1 5-.8 10 .5 15h-6.5zM19.5 4.5h-6c1 5 .8 10-.5 15h6.5z" fill="none"/>
+  </symbol>
+
+  <!-- Papiers de l'histoire -->
+  <!-- Deuxième carte d'Émile: la carte penchée de l'autre côté, papier plus vieux, deux points au coin. -->
+  <symbol id="riddle-card-2" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4.5 5h15v14h-15z" fill="#e8ddc4" transform="rotate(6 12 12)"/>
+    <path class="lpl-ikf" d="M7.6 8.4l8 .8M7.4 11.2l8 .8M7.2 14l5 .5"/>
+    <circle cx="15.2" cy="16.4" r="1" fill="#2a2522"/>
+    <circle cx="17.6" cy="16.6" r="1" fill="#2a2522"/>
+  </symbol>
+  <!-- Carnet de route d'Émile: carnet de cuir usé, élastique, signet rouge, une voie gravée sur la couverture. -->
+  <symbol id="logbook" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M14 19.6v2.4l1.2-1 1.2 1v-2.4z" fill="#ba554c"/>
+    <path class="lpl-ik" d="M5 3.5h12.6a1.4 1.4 0 0 1 1.4 1.4v13.4a1.4 1.4 0 0 1-1.4 1.4H5z" fill="#8a5a3a"/>
+    <path d="M7.4 3.6v15.6" stroke="#6e5743" stroke-width="1.2"/>
+    <path d="M10.4 7.4v8.8M14.8 7.4v8.8M9.6 9h6M9.6 11.8h6M9.6 14.6h6" stroke="#c8a150" stroke-width=".9"/>
+    <path d="M5.2 6h13.6" stroke="#2c2e31" stroke-width="1.4"/>
+  </symbol>
+  <!-- Carnet de galets de Jeanne: cahier bleu (sa salopette), trois galets dessinés sur la couverture. -->
+  <symbol id="jeanne-notebook" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5 3.5h12.6a1.4 1.4 0 0 1 1.4 1.4v14.6a1.4 1.4 0 0 1-1.4 1.4H5z" fill="#557fb0"/>
+    <path d="M7.4 3.6v16.8" stroke="#3e6f9e" stroke-width="1.2"/>
+    <path d="M9.8 9.4c0-1.6 1.6-2.4 3.2-2.4s2.6.8 2.6 2c0 1.4-1.6 2-3.2 2s-2.6-.4-2.6-1.6z" fill="#beb9ad" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M9.4 14.6c0-1.2 1-1.8 2-1.8s1.8.6 1.8 1.6c0 1-1 1.6-2 1.6s-1.8-.4-1.8-1.4z" fill="#a09c92" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M14 15c0-1.4 1.2-2.2 2.4-2.2.8 0 1.4.6 1.4 1.4 0 1.2-1 2-2.2 2-1 0-1.6-.4-1.6-1.2z" fill="#dad0be" stroke="#2a2522" stroke-width=".8"/>
+  </symbol>
+  <!-- Lettre de Lucie: enveloppe crème fermée d'un cachet de cire rouge (une lettre à elle, pas du courrier). -->
+  <symbol id="letter-lucie" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 6.5h18v12H3z" fill="#f3ebd4"/>
+    <path class="lpl-ikf" d="M3 6.5l9 6.4 9-6.4"/>
+    <circle class="lpl-ik" cx="12" cy="12.6" r="2.4" fill="#ba554c"/>
+    <path d="M11 12.4c.2-.8 1-.8 1 0 0-.8.8-.8 1 0 0 .6-.6 1-1 1.4-.4-.4-1-.8-1-1.4z" fill="#f2dcdf"/>
+  </symbol>
+  <!-- Lettre du courrier: enveloppe ouverte à plat, timbre jaune, cachet ondulé, lignes d'adresse. -->
+  <symbol id="mail-letter" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 6h18v12.5H3z" fill="#fbf6e9"/>
+    <path d="M15.6 7.6h3.6v4h-3.6z" fill="#e0c25a" stroke="#2a2522" stroke-width=".8"/>
+    <path d="M11 9c.8-.6 1.6.6 2.4 0M11 10.8c.8-.6 1.6.6 2.4 0" stroke="#4e6f8f" stroke-width=".9" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ikf" d="M7 14h8M7 16.4h5.4"/>
+  </symbol>
+  <!-- Icônes d'information (0.12.2): ce que les fiches disaient en phrases (saisons, heures, coins de pêche, prix,
+       record, déjà pris, soins des poules). En couleur et cernées d'encre, comme les objets: lisibles sur le papier
+       du carnet et sur son bois. -->
+  <!-- Printemps: une fleur de cerisier rose à cœur jaune, deux feuilles tendres. -->
+  <symbol id="info-season-spring" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M12 15c-1.6 3-4.4 4.6-7.6 4.4.8-3.2 3.8-5 7.6-4.4zM12 15c1.6 3 4.4 4.6 7.6 4.4-.8-3.2-3.8-5-7.6-4.4z" fill="#a3cf63"/>
+    <path class="lpl-ikf" d="M12 21.4V14"/>
+    <g fill="#e89cb6" stroke="#2a2522" stroke-width="1.2" stroke-linejoin="round">
+      <circle cx="12" cy="4.8" r="2.8"/><circle cx="16.4" cy="8" r="2.8"/><circle cx="14.7" cy="13" r="2.8"/><circle cx="9.3" cy="13" r="2.8"/><circle cx="7.6" cy="8" r="2.8"/>
+    </g>
+    <circle cx="12" cy="9.4" r="2.6" fill="#f2c74e" stroke="#2a2522" stroke-width="1.2"/>
+  </symbol>
+  <!-- Été: trois épis de blé mûr, le soleil derrière. -->
+  <symbol id="info-season-summer" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="16.6" cy="7" r="4.4" fill="#f2c74e"/>
+    <path class="lpl-ikf" d="M12 21.4V11M12 21.4 7 10.4M12 21.4l4.8-8"/>
+    <g fill="#d9b65b" stroke="#2a2522" stroke-width="1.1" stroke-linejoin="round">
+      <path d="M12 3.6c1.4 1.4 1.6 4.4 0 7.8-1.6-3.4-1.4-6.4 0-7.8z"/>
+      <path d="M6.2 3.8c1.6.8 2.6 3.6 1.6 7.2-2.2-2.8-2.6-5.8-1.6-7.2z"/>
+      <path d="M18.6 8c.6 1.8-.6 4.6-2.8 6.4-.6-3.6.8-6.2 2.8-6.4z"/>
+    </g>
+  </symbol>
+  <!-- Automne: une feuille de chêne rousse et un gland. -->
+  <symbol id="info-season-autumn" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M10.4 20.6c-3.2-.4-5.6-2.4-6.4-5.2 1.2-.2 1.8-1 1.4-2-1.2-.4-1.6-1.6-.8-2.4 1-.2 1.4-1 1.2-2-.8-.8-.4-2 .8-2.2 1.4.4 2.2-.2 2.4-1.4.8-1 2.2-.8 2.6.4 0 1.2 1 1.8 2 1.4 1.2.2 1.4 1.6.6 2.4-.8.8-.4 1.8.6 2.2 1 .6.8 2-.4 2.4-1 .2-1.4 1.2-.8 2 .4 1.2-.6 2.2-1.8 1.8-.6 1-1 2.2-1.4 2.2z" fill="#c7652f"/>
+    <path class="lpl-ikf" d="M11.4 21.6 8.6 6.8M9.8 13.2l2.6-2.2M9.2 10l-2.2-1.4M10.6 16.8l2.8-1.4M10 14.4l-3.2-.2"/>
+    <path class="lpl-ik" d="M15 14.4h5l-.4 1.2h-4.2z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M15.4 15.6h4.2c0 2.6-.8 4.4-2.1 4.4s-2.1-1.8-2.1-4.4z" fill="#b1773a"/>
+    <path class="lpl-ikf" d="M17.5 14.4v-1.4"/>
+  </symbol>
+  <!-- Hiver: un flocon à six branches, blanc cerné d'encre. -->
+  <symbol id="info-season-winter" viewBox="0 0 24 24">
+    <path d="M12 2.6v18.8M3.9 7.3l16.2 9.4M3.9 16.7l16.2-9.4M12 5.6l-2 -2M12 5.6l2-2M12 18.4l-2 2M12 18.4l2 2M6.5 8.8l-2.7.7M6.5 8.8l-.7-2.7M17.5 15.2l2.7-.7M17.5 15.2l.7 2.7M6.5 15.2l-2.7-.7M6.5 15.2l-.7 2.7M17.5 8.8l2.7.7M17.5 8.8l.7-2.7" stroke="#2a2522" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+    <path d="M12 2.6v18.8M3.9 7.3l16.2 9.4M3.9 16.7l16.2-9.4M12 5.6l-2 -2M12 5.6l2-2M12 18.4l-2 2M12 18.4l2 2M6.5 8.8l-2.7.7M6.5 8.8l-.7-2.7M17.5 15.2l2.7-.7M17.5 15.2l.7 2.7M6.5 15.2l-2.7-.7M6.5 15.2l-.7 2.7M17.5 8.8l2.7.7M17.5 8.8l.7-2.7" stroke="#d4eceb" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <circle cx="12" cy="12" r="2.2" fill="#6caab9" stroke="#2a2522" stroke-width="1.2"/>
+  </symbol>
+
+  <!-- Moments du jour: le soleil sur l'horizon, monté ou couché, et la lune. -->
+  <!-- Matin: le soleil pâle qui se lève, rayons, une flèche qui monte. -->
+  <symbol id="info-time-morning" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.6 17a6.4 6.4 0 0 1 12.8 0z" fill="#f2c74e"/>
+    <path class="lpl-ikf" d="M12 7.2V5.2M6.4 10.2 5 8.8M17.6 10.2 19 8.8M3.6 14.2H2.2M20.4 14.2h1.4"/>
+    <path class="lpl-ikf" d="M2 17h20"/>
+    <path class="lpl-ikf" d="M9.6 21.4 12 19.2l2.4 2.2"/>
+  </symbol>
+  <!-- Midi: le soleil tout en haut, un piquet au sol et son ombre courte. -->
+  <symbol id="info-time-noon" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="12" cy="6.6" r="3.8" fill="#f2c74e"/>
+    <path class="lpl-ikf" d="M12 1.2v.8M17.4 6.6h.8M6.6 6.6h-.8M15.8 2.8l.6-.6M8.2 2.8l-.6-.6M15.8 10.4l.6.6M8.2 10.4l-.6.6"/>
+    <path d="M10.8 20.4h2.4" stroke="#7f786e" stroke-width="2" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M12 20.4v-6"/>
+    <path class="lpl-ikf" d="M3 20.6h18"/>
+  </symbol>
+  <!-- Soir: le soleil orangé à moitié couché, sans rayons, une flèche qui descend. -->
+  <symbol id="info-time-evening" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.6 14a6.4 6.4 0 0 1 12.8 0z" fill="#c7652f"/>
+    <path d="M7.2 11.2h3.6" stroke="#e98a3b" stroke-width="1.2" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M2 14h20M5 17h3.4M11 17h8"/>
+    <path class="lpl-ikf" d="M9.6 19.4 12 21.6l2.4-2.2"/>
+  </symbol>
+  <!-- Nuit: le croissant de lune et deux étoiles. -->
+  <symbol id="info-time-night" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M13.4 3.4a8 8 0 1 0 7.2 11.4 6.4 6.4 0 0 1-7.2-11.4z" fill="#f2e4b6"/>
+    <path d="M18 3.2l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6zM20.6 9l.4 1 1 .4-1 .4-.4 1-.4-1-1-.4 1-.4z" fill="#ffd27a" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Coins de pêche (carte, peche.coins): un pictogramme par coin, l'eau toujours du même bleu. -->
+  <!-- Le gué: courant peu profond, une rangée de galets qui traverse. -->
+  <symbol id="info-spot-ford" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 6.5h20v11H2z" fill="#6caab9"/>
+    <path d="M3.6 9.4c1.2-.8 2.4.8 3.6 0M15.6 15c1.2-.8 2.4.8 3.6 0" stroke="#d4eceb" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+    <g fill="#beb9ad" stroke="#2a2522" stroke-width="1.2"><ellipse cx="4.6" cy="13.6" rx="2" ry="1.5"/><ellipse cx="9.2" cy="12.6" rx="2.1" ry="1.6"/><ellipse cx="14" cy="11.4" rx="2" ry="1.5"/><ellipse cx="18.8" cy="10.4" rx="2" ry="1.5"/></g>
+  </symbol>
+  <!-- Les sables: l'eau lente entre deux bancs de sable. -->
+  <symbol id="info-spot-sands" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 5h20v14H2z" fill="#6caab9"/>
+    <path class="lpl-ik" d="M2 5h20v2.6c-3 1.6-6.4 1.8-9.8 1C9 8 5.4 8.4 2 9.2z" fill="#dccaa2"/>
+    <path class="lpl-ik" d="M2 19h20v-3.4c-3.2-1.2-6.6-1.2-10-.2-3.4 1-6.8 1-10 .4z" fill="#dccaa2"/>
+    <path d="M5 12.2c1.4-.6 2.8.6 4.2 0M14 12c1.4-.6 2.8.6 4.2 0" stroke="#d4eceb" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Le ponton: l'eau profonde, le plancher qui avance dessus sur ses pieux. -->
+  <symbol id="info-spot-pontoon" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 5h20v14H2z" fill="#4c899a"/>
+    <path d="M14.6 9c1.2-.8 2.4.8 3.6 0M15.6 15.4c1.2-.8 2.4.8 3.6 0" stroke="#6caab9" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M5.2 14.4h2v4.8h-2zM10.8 14.4h2v4.8h-2z" fill="#765130"/>
+    <path class="lpl-ik" d="M2 9.4h13.4v5H2z" fill="#d3a66d"/>
+    <path d="M5.4 9.8v4.2M8.8 9.8v4.2M12.2 9.8v4.2" stroke="#a97749" stroke-width="1.1"/>
+  </symbol>
+  <!-- Le confluent: le ru étroit qui descend rejoindre la rivière large. -->
+  <symbol id="info-spot-confluence" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 12.6h7.4c1.6 0 2.8-1 3.6-2.4l3.4-7.2h3.4l-3.8 8.6c-.4.8 0 1 .6 1H22v8H2z" fill="#6caab9"/>
+    <path d="M17.4 4.8l-2.6 5.6" stroke="#d4eceb" stroke-width="1.1" stroke-linecap="round"/>
+    <path d="M4.4 16.6c1.4-.6 2.8.6 4.2 0M13.6 17.2c1.4-.6 2.8.6 4.2 0" stroke="#d4eceb" stroke-width="1.1" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <!-- Le ru: eau vive étroite entre deux rives herbues, une pierre plate. -->
+  <symbol id="info-spot-ru" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 2.5h20v19H2z" fill="#93b45e"/>
+    <path class="lpl-ik" d="M10.4 2.5h3.6c-.6 2.6.8 4.6.6 7-.2 2.2-1.6 3.4-1.4 5.8.2 2.2 1.4 3.8 1.4 6.2h-3.8c.2-2.4-1-4-1.2-6.2-.2-2.6 1.2-3.8 1.4-5.8.2-2.4-1.2-4.4-.6-7z" fill="#6caab9"/>
+    <path d="M11.8 5v2M11.2 17v2" stroke="#d4eceb" stroke-width="1.1" stroke-linecap="round"/>
+    <ellipse cx="12" cy="12" rx="2.4" ry="1.4" fill="#beb9ad" stroke="#2a2522" stroke-width="1.2"/>
+    <path d="M5 7l.8-1.6M6.6 7l-.2-1.8M17.6 17l.8-1.6M19.2 17l-.2-1.8" stroke="#6f9148" stroke-width="1.1" stroke-linecap="round"/>
+  </symbol>
+  <!-- L'amont: la rivière vue de la rive, étroite au loin (en haut) et large devant; le courant descend; la marque rouge en haut, d'où vient l'eau. -->
+  <symbol id="info-spot-upstream" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 3.5h20v17H2z" fill="#93b45e"/>
+    <path class="lpl-ik" d="M10.8 3.5h2.4l5.4 17H5.4z" fill="#6caab9"/>
+    <path d="M10.6 9.6l1.4 1.4 1.4-1.4M10.2 14.2l1.8 1.8 1.8-1.8" stroke="#d4eceb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M4.2 7l.8-1.6M5.8 7l-.2-1.8M19 15.6l.8-1.6M20.6 15.6l-.2-1.8" stroke="#6f9148" stroke-width="1.1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M16.4 10.6s-2.8-2.6-2.8-4.8a2.8 2.8 0 0 1 5.6 0c0 2.2-2.8 4.8-2.8 4.8z" fill="#d9584f"/>
+    <circle cx="16.4" cy="5.8" r="1" fill="#f6f2e7"/>
+  </symbol>
+  <!-- L'aval: la même rivière, la marque rouge en bas, là où l'eau s'en va en s'élargissant. -->
+  <symbol id="info-spot-downstream" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 3.5h20v17H2z" fill="#93b45e"/>
+    <path class="lpl-ik" d="M10.8 3.5h2.4l5.4 17H5.4z" fill="#6caab9"/>
+    <path d="M10.6 9.6l1.4 1.4 1.4-1.4M10.2 14.2l1.8 1.8 1.8-1.8" stroke="#d4eceb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M4.2 7l.8-1.6M5.8 7l-.2-1.8M19 15.6l.8-1.6M20.6 15.6l-.2-1.8" stroke="#6f9148" stroke-width="1.1" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M7.6 21s-2.8-2.6-2.8-4.8a2.8 2.8 0 0 1 5.6 0c0 2.2-2.8 4.8-2.8 4.8z" fill="#d9584f"/>
+    <circle cx="7.6" cy="16.2" r="1" fill="#f6f2e7"/>
+  </symbol>
+
+  <!-- Fiche du poisson -->
+  <!-- Prix: une étiquette de papier à œillet et ficelle, la pièce d'aubrin dessus. -->
+  <symbol id="info-price" viewBox="0 0 24 24">
+    <path class="lpl-ikf" d="M5.4 5.4C4 4 2.4 3.6 1.6 4.4"/>
+    <path class="lpl-ik" d="M4 6.4 9.4 3l11.2 11.2-6.4 6.4L3 9.4z" fill="#d9ccab"/>
+    <circle cx="7" cy="6.8" r="1.1" fill="#f3ebd4" stroke="#2a2522" stroke-width=".9"/>
+    <circle cx="12.6" cy="12.4" r="3.6" fill="#c8a150" stroke="#2a2522" stroke-width="1.2"/>
+    <circle cx="12.6" cy="12.4" r="1" fill="#d9ccab" stroke="#2a2522" stroke-width=".8"/>
+  </symbol>
+  <!-- Record: la règle graduée de bois clair, traits courts et longs, charnière de laiton. -->
+  <symbol id="info-record" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 14.6 17.8 4.8l2.2 3.6L4.2 18.2z" fill="#d3a66d"/>
+    <path d="M5 14.8l-.8-1.4M7.6 13.2l-1.4-2.2M10.2 11.6l-.8-1.4M12.8 10l-1.4-2.2M15.4 8.4l-.8-1.4M18 6.8l-1.4-2.2" stroke="#2a2522" stroke-width=".9" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M4.2 18.2 20 8.4l1.2 2-15.8 9.8z" fill="#a97749"/>
+    <circle cx="11.6" cy="14.6" r="1" fill="#c8a150" stroke="#2a2522" stroke-width=".8"/>
+  </symbol>
+  <!-- Déjà pris: l'épuisette avec un poisson dedans, la coche verte au coin. -->
+  <symbol id="info-caught" viewBox="0 0 24 24">
+    <path d="M14.6 13.6 21.6 21" stroke="#2a2522" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M14.6 13.6 21.6 21" stroke="#a97749" stroke-width="1.6" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M3.6 8.4c0 4.6 2.4 8.4 5.2 8.4s5.6-3.6 5.6-8.4z" fill="#e4dcc8"/>
+    <path d="M5.4 10.6l6.8 4M4.6 13l4.8 2.8M12.4 10.4l-5 5M9 9.2l-3.4 3.6" stroke="#9b907f" stroke-width=".8"/>
+    <path class="lpl-ik" d="M5.6 9.4c1.4-1.8 3.4-2.4 5.4-1.6l1.4-1.6.2 2.8-1.4 1.4c-1.8.8-4 .6-5.6-1z" fill="#bac4c7"/>
+    <ellipse class="lpl-ikf" cx="9" cy="8.4" rx="5.4" ry="1.8"/>
+    <circle class="lpl-ik" cx="18" cy="6" r="4.4" fill="#3f6453"/>
+    <path d="M15.8 6.1l1.6 1.6 3-3" stroke="#f3ebd4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+
+  <!-- Soins des poules (fiche de la basse-cour) -->
+  <!-- A mangé: l'écuelle de bois pleine de grain. -->
+  <symbol id="info-hen-fed" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M4.4 12.8c1.6-3.2 13.6-3.2 15.2 0z" fill="#e0c56f"/>
+    <path d="M8.6 10.6h.1M11.4 9.8h.1M14.2 10.4h.1M10 11.8h.1M13 11.8h.1" stroke="#b1773a" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M3 12.6h18c0 4-3.6 6.6-9 6.6s-9-2.6-9-6.6z" fill="#a97749"/>
+    <path d="M5.4 15.4c4 1.2 9.2 1.2 13.2 0" stroke="#765130" stroke-width="1.2" fill="none"/>
+  </symbol>
+  <!-- A faim: la même écuelle vide, trois grains tombés à côté. -->
+  <symbol id="info-hen-hungry" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3 12.6h18c0 4-3.6 6.6-9 6.6s-9-2.6-9-6.6z" fill="#a97749"/>
+    <ellipse cx="12" cy="12.6" rx="9" ry="1.6" fill="#765130" stroke="#2a2522" stroke-width="1.5"/>
+    <path d="M17.8 21.2h.1M20.2 20.4h.1M21.6 21.6h.1" stroke="#e0c56f" stroke-width="1.6" stroke-linecap="round"/>
+  </symbol>
+  <!-- Repos: la poule en boule sur son perchoir, l'œil fermé, la lune au-dessus. -->
+  <symbol id="info-hen-rest" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M17.4 2.6a3.6 3.6 0 1 0 4 4.8 2.8 2.8 0 0 1-4-4.8z" fill="#f2e4b6"/>
+    <path d="M2 19h20" stroke="#2a2522" stroke-width="3.4" stroke-linecap="round"/>
+    <path d="M2 19h20" stroke="#a97749" stroke-width="1.8" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M17.6 12.4c1.6-.6 2.6.4 2.4 2.2"/>
+    <ellipse class="lpl-ik" cx="12.6" cy="14.4" rx="6.2" ry="3.8" fill="#f2ede1"/>
+    <circle class="lpl-ik" cx="7.6" cy="11.4" r="3" fill="#f2ede1"/>
+    <path class="lpl-ik" d="M6.4 8.6c-.4-1.2.6-1.8 1.4-1.2.4-.9 1.8-.7 1.8.4" fill="#d3423c"/>
+    <path class="lpl-ik" d="M4.8 11 3 11.8l1.9.5z" fill="#e9b13f"/>
+    <path class="lpl-ikf" d="M6.4 11.2c.4.5 1.1.5 1.5 0M11.2 14.6c1.6 1 3.6 1 5.2 0"/>
+  </symbol>
+  <!-- Litière propre: paille blonde et fraîche, un éclat. -->
+  <symbol id="info-litter-clean" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 20.6c0-3.6 2.4-6.4 5.6-7.2 1.6-2.2 7.2-2.2 8.8 0 3.2.8 5.6 3.6 5.6 7.2z" fill="#e2c47c"/>
+    <path d="M5 18.4l3-3M9.6 18.4l1.4-4M14.2 18.6l-1-4M18.6 18.6l-2.8-3" stroke="#c5a45f" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M17.6 2.6l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z" fill="#f6f2e7" stroke="#2a2522" stroke-width="1" stroke-linejoin="round"/>
+    <path d="M7.6 6.4l.5 1.3 1.3.5-1.3.5-.5 1.3-.5-1.3-1.3-.5 1.3-.5z" fill="#f6f2e7" stroke="#2a2522" stroke-width=".8" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Litière sale: paille terne et tassée, des taches, l'odeur qui monte. -->
+  <symbol id="info-litter-dirty" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M2 20.6c0-3 2.6-5.4 6-6 1.8-1.6 6.2-1.6 8 0 3.4.6 6 3 6 6z" fill="#958b7d"/>
+    <path d="M5.4 18.6l2.4-2.4M14.4 18.8l-.8-2.8M18.4 18.8l-2-2.2" stroke="#6f685e" stroke-width="1.2" stroke-linecap="round"/>
+    <g fill="#614835"><ellipse cx="10.4" cy="17.6" rx="1.4" ry=".9"/><ellipse cx="16.2" cy="16.4" rx="1.1" ry=".7"/><ellipse cx="7.2" cy="19.4" rx="1" ry=".7"/></g>
+    <path class="lpl-ikf" d="M8 11.4c-1-1.2 1-2.2 0-3.6s1-2.4 0-3.6M12 10.6c-1-1.2 1-2.2 0-3.6s1-2.4 0-3.6M16 11.4c-1-1.2 1-2.2 0-3.6s1-2.4 0-3.6"/>
+  </symbol>
+  <!-- Œuf du jour: l'œuf dans son nid de paille, le petit soleil du jour au-dessus. -->
+  <symbol id="info-egg-today" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="18.4" cy="5.4" r="2.6" fill="#f2c74e"/>
+    <path class="lpl-ikf" d="M18.4 1.2v.6M22.6 5.4H22M15 2l.4.4M21.8 2l-.4.4M21.8 8.8l-.4-.4"/>
+    <path class="lpl-ik" d="M10.6 5.6c2.8 0 5 4 5 7.4a5 5 0 0 1-10 0c0-3.4 2.2-7.4 5-7.4z" fill="#f3e7d0"/>
+    <path d="M8.4 11.2c.3-1.2.9-2.2 1.6-2.8" stroke="#f6f2e7" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <path class="lpl-ik" d="M2 15.6c1.6 3.6 5 5.6 8.6 5.6s7-2 8.6-5.6c-2.8 1-5.6 1.4-8.6 1.4S4.8 16.6 2 15.6z" fill="#e2c47c"/>
+    <path d="M5 18.4l1.6-1M9.4 19.6l.6-1.6M14.4 19l-.8-1.4" stroke="#c5a45f" stroke-width="1.1" stroke-linecap="round"/>
+  </symbol>
+  <!-- Couvée: la poussine qui sort de sa coquille fêlée. -->
+  <symbol id="info-brood" viewBox="0 0 24 24">
+    <circle class="lpl-ik" cx="12" cy="8.4" r="4.2" fill="#efcb45"/>
+    <path class="lpl-ik" d="M8.4 8.6 6 9.6l2.4.8z" fill="#e98a3b"/>
+    <circle cx="10.4" cy="7.6" r=".9" fill="#2a2522"/>
+    <path class="lpl-ik" d="M5.2 13.4l2.2 1.6 2-2 2.6 2 2.4-2 2.2 1.8 2.2-1.4c.4 4.4-2.6 7.6-6.8 7.6s-7.2-3.2-6.8-7.6z" fill="#f3e7d0"/>
+  </symbol>
+  <!-- Cœur d'amitié de poule: un cœur rouge, une petite plume blanche posée contre lui. -->
+  <symbol id="info-hen-heart" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M10.6 19.8S3 15.2 3 9.6a4.2 4.2 0 0 1 7.6-2.6 4.2 4.2 0 0 1 7.6 2.6c0 5.6-7.6 10.2-7.6 10.2z" fill="#d9584f"/>
+    <path d="M6.6 8.4a1.8 1.8 0 0 1 1.6-1.2" stroke="#e89cb6" stroke-width="1.3" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M14.2 21.4c.4-3.8 2.8-7.2 6.6-8.6.6 2.6-.6 5.6-3.2 7.4-1 .8-2.2 1.2-3.4 1.2z" fill="#f2ede1"/>
+    <path class="lpl-ikf" d="M13.6 22.2l5.6-7.6"/>
+  </symbol>
+  <!-- Familles générées: début (outils/familles-icones.mjs, ne pas retoucher à la main) -->
+  <!-- Poissons (0.12.2): tournés vers la droite, comme le poisson générique; une silhouette et des couleurs par espèce. -->
+  <!-- Goujon: petit, tête ronde, deux moustaches au coin de la bouche, une rangée de taches sombres. -->
+  <symbol id="fish-gudgeon" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M8 11.5L2.8 9.2L5 12.6L2.8 16L8 13.7z" fill="#b59c79"/>
+    <path class="lpl-ik" d="M14.8 10.91L14.8 9.51L11.2 6.91L12 9.74L12 11.14z" fill="#b59c79"/>
+    <path class="lpl-ik" d="M12.8 14.12L12.8 15.52L10 17.32L11 15.17L11 13.77z" fill="#b59c79"/>
+    <path d="M20.6 13.2C18.4 8.6 12.7 8.6 7.2 11.5L7.2 13.7C12.2 16.4 19 16.4 20.6 13.2z" fill="#beb9ad"/>
+    <path d="M20.6 13.2C18.4 8.6 12.7 8.6 7.2 11.5L7.2 12.44C12.7 12.12 18.4 12.12 20.6 13.2z" fill="#6f5b45"/>
+    <path d="M7.2 13.7C12.2 16.4 19 16.4 20.6 13.2C19 14.5 12.2 14.5 7.2 13.15z" fill="#eae6d7"/>
+    <circle cx="9.6" cy="12.4" r="0.75" fill="#554230"/><circle cx="11.6" cy="12.6" r="0.85" fill="#554230"/><circle cx="13.7" cy="12.8" r="0.85" fill="#554230"/><circle cx="15.6" cy="12.8" r="0.7" fill="#554230"/>
+    <path class="lpl-ikf" d="M20.6 13.2C18.4 8.6 12.7 8.6 7.2 11.5L7.2 13.7C12.2 16.4 19 16.4 20.6 13.2z"/>
+    <path d="M17.2 10.7Q15.7 12.71 17.2 14.73" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.6 13.2l-1 .5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M19.7 13.9c-.2 1.2-.8 2-1.8 2.6" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.2 13.8c.3 1.1.1 2.1-.4 2.9" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="18.4" cy="11.6" r="1" fill="#2a2522"/>
+  </symbol>
+  <!-- Vairon: grand comme un doigt, fuselé, des taches sombres en barreaux et le ventre rouge du printemps. -->
+  <symbol id="fish-minnow" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M8.4 11.6L3.6 9.7L5.4 12.5L3.6 15.3L8.4 13.4z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M13 11.79L13 10.39L10.4 8.39L11 10.68L11 12.08z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M12 12.98L12 14.38L9.5 15.98L10.5 14.15L10.5 12.75z" fill="#7e8553"/>
+    <path d="M20 12.4C17.4 9.8 13 9.8 7.6 11.6L7.6 13.4C12.6 15 17.6 15 20 12.4z" fill="#bac4c7"/>
+    <path d="M20 12.4C17.4 9.8 13 9.8 7.6 11.6L7.6 12.37C13 12.18 17.4 12.18 20 12.4z" fill="#7e8553"/>
+    <path d="M7.6 13.4C12.6 15 17.6 15 20 12.4C17.6 13.38 12.6 13.38 7.6 12.95z" fill="#d9584f"/>
+    <path d="M9.9 11.4L9.3 12.62" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M11.9 10.98L11.3 12.64" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M13.9 10.75L13.3 12.63" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M15.9 10.81L15.3 12.6" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M20 12.4C17.4 9.8 13 9.8 7.6 11.6L7.6 13.4C12.6 15 17.6 15 20 12.4z"/>
+    <path d="M17 11.38Q15.5 12.4 17 13.42" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20 12.4l-1 .3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="18.2" cy="11.8" r="0.9" fill="#2a2522"/>
+  </symbol>
+  <!-- Loche franche: corps de cigare, queue droite, trois barbillons sous le museau, marbrures brunes. -->
+  <symbol id="fish-stone-loach" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.4 11L2.2 10Q3 12.6 2.2 15.2L6.4 14.2z" fill="#b59c79"/>
+    <path class="lpl-ik" d="M14 11.97L14 10.57C13.82 8.68 10.8 8.67 11.2 10.56L11.2 11.96z" fill="#b59c79"/>
+    <path class="lpl-ik" d="M11.4 13.52L11.4 14.92C11.22 16.54 9.2 16.4 9.6 14.78L9.6 13.38z" fill="#b59c79"/>
+    <path d="M21.6 13C20.2 10.2 11.6 10.2 5.6 11L5.6 14.2C11.6 15.4 20.4 15.4 21.6 13z" fill="#c5a45f"/>
+    <path d="M21.6 13C20.2 10.2 11.6 10.2 5.6 11L5.6 12.36C11.6 11.88 20.2 11.88 21.6 13z" fill="#6e5743"/>
+    <path d="M5.6 14.2C11.6 15.4 20.4 15.4 21.6 13C20.4 14 11.6 14 5.6 13.4z" fill="#eae6d7"/>
+    <circle cx="8" cy="12.1" r="0.9" fill="#554230"/><circle cx="10.4" cy="11.6" r="1" fill="#554230"/><circle cx="10.8" cy="13.4" r="0.7" fill="#554230"/><circle cx="13" cy="12.2" r="1" fill="#554230"/><circle cx="15.4" cy="11.8" r="0.9" fill="#554230"/><circle cx="15" cy="13.6" r="0.6" fill="#554230"/><circle cx="17.4" cy="12.4" r="0.7" fill="#554230"/>
+    <path class="lpl-ikf" d="M21.6 13C20.2 10.2 11.6 10.2 5.6 11L5.6 14.2C11.6 15.4 20.4 15.4 21.6 13z"/>
+    <path d="M18.6 11.86Q17.1 12.87 18.6 13.88" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.4 13.4c.4.8.4 1.6 0 2.4" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.6 13.9c0 .9-.3 1.6-.9 2.2" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.8 13.1c.9.3 1.4.9 1.6 1.7" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.6" cy="11.8" r="0.8" fill="#2a2522"/>
+  </symbol>
+  <!-- Ablette: lame d'argent, bouche relevée, ventre en carène, queue très fourchue; un trait de lumière sur le flanc. -->
+  <symbol id="fish-bleak" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.4 11.5L2.2 9L5 12.4L2.2 15.8L7.4 13.3z" fill="#bac4c7"/>
+    <path class="lpl-ik" d="M11.6 11.97L11.6 10.57L9.4 8.37L10 10.77L10 12.17z" fill="#bac4c7"/>
+    <path class="lpl-ik" d="M11.8 13.37L11.8 14.77L8.2 16.37L8.6 14.1L8.6 12.7z" fill="#bac4c7"/>
+    <path d="M21.8 11.6C18.8 10 12 10 6.6 11.5L6.6 13.3C11.2 15.6 18.4 15.6 21.8 11.6z" fill="#bac4c7"/>
+    <path d="M21.8 11.6C18.8 10 12 10 6.6 11.5L6.6 12.27C12 12.11 18.8 12.11 21.8 11.6z" fill="#6e807b"/>
+    <path d="M6.6 13.3C11.2 15.6 18.4 15.6 21.8 11.6C18.4 14 11.2 14 6.6 12.85z" fill="#eae6d7"/>
+    <path d="M9 12.4c3-.5 7-.6 10.4-.2" stroke="#eeece4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ikf" d="M21.8 11.6C18.8 10 12 10 6.6 11.5L6.6 13.3C11.2 15.6 18.4 15.6 21.8 11.6z"/>
+    <path d="M18 11.26Q16.5 12.34 18 13.43" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.8 11.6l-1.4 1" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.2" cy="11.7" r="1.15" fill="#2a2522"/>
+  </symbol>
+  <!-- Gardon: corps haut d'argent, nageoires rouges, l'œil rouge (son signe). -->
+  <symbol id="fish-roach" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.6 11.3L2.6 8.8L4.8 12.4L2.6 16L7.6 13.5z" fill="#c7652f"/>
+    <path class="lpl-ik" d="M14 10.08L14 8.68L10.6 6.28L11.4 9.07L11.4 10.47z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M13.6 14.59L13.6 15.99L11 18.19L12 15.78L12 14.38z" fill="#d9584f"/>
+    <path class="lpl-ik" d="M10.4 13.96L10.4 15.36L7.6 17.16L8.6 14.63L8.6 13.23z" fill="#d9584f"/>
+    <path d="M21.2 12.6C18.8 7.6 11.8 7.6 6.8 11.3L6.8 13.5C11.4 17 19 17 21.2 12.6z" fill="#bac4c7"/>
+    <path d="M21.2 12.6C18.8 7.6 11.8 7.6 6.8 11.3L6.8 12.24C11.8 11.82 18.8 11.82 21.2 12.6z" fill="#6e807b"/>
+    <path d="M6.8 13.5C11.4 17 19 17 21.2 12.6C19 14.7 11.4 14.7 6.8 12.95z" fill="#eae6d7"/>
+    <path class="lpl-ikf" d="M21.2 12.6C18.8 7.6 11.8 7.6 6.8 11.3L6.8 13.5C11.4 17 19 17 21.2 12.6z"/>
+    <path d="M17.6 9.95Q16.1 12.39 17.6 14.84" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.2 12.6l-1.1.2" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="18.9" cy="11.6" r="1.45" fill="#d3423c" stroke="#2a2522" stroke-width=".7"/><circle cx="19.05" cy="11.6" r="0.65" fill="#2a2522"/>
+  </symbol>
+  <!-- Chevesne: grosse tête ronde, large bouche, écailles cernées de sombre, nageoires du ventre orangées. -->
+  <symbol id="fish-chub" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.4 10.9L2.6 9.1L4.4 12.5L2.6 15.9L7.4 14.1z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M13 10.83L13 9.43L10.2 7.23L10.8 9.73L10.8 11.13z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M13 14.33L13 15.73L10.4 17.73L11.4 15.52L11.4 14.12z" fill="#c7652f"/>
+    <path class="lpl-ik" d="M10 13.83L10 15.23L7.4 17.03L8.4 14.79L8.4 13.39z" fill="#c7652f"/>
+    <path d="M21.9 12.6C20.7 8.6 12.6 8.6 6.6 10.9L6.6 14.1C12.2 16.6 20.7 16.6 21.9 12.6z" fill="#bac4c7"/>
+    <path d="M21.9 12.6C20.7 8.6 12.6 8.6 6.6 10.9L6.6 12.26C12.6 12.03 20.7 12.03 21.9 12.6z" fill="#7e8553"/>
+    <path d="M6.6 14.1C12.2 16.6 20.7 16.6 21.9 12.6C20.7 14.55 12.2 14.55 6.6 13.3z" fill="#eae6d7"/>
+    <path d="M9.4 10.6a1.2 1.2 0 0 0 0 2.2M12 10.2a1.2 1.2 0 0 0 0 2.2M14.6 10.2a1.2 1.2 0 0 0 0 2.2M10.7 12.8a1.2 1.2 0 0 0 0 2.2M13.3 12.8a1.2 1.2 0 0 0 0 2.2" stroke="#6e807b" stroke-width="0.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ikf" d="M21.9 12.6C20.7 8.6 12.6 8.6 6.6 10.9L6.6 14.1C12.2 16.6 20.7 16.6 21.9 12.6z"/>
+    <path d="M17.4 10.25Q15.9 12.58 17.4 14.91" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.9 12.6l-2.2.7" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.4" cy="11.5" r="1" fill="#2a2522"/>
+  </symbol>
+  <!-- Truite: points rouges cerclés de blanc et points noirs, petite nageoire adipeuse, queue presque droite. -->
+  <symbol id="fish-trout" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.2 11.1L2.2 8.9Q3.4 12.5 2.2 16.1L7.2 13.9z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M14.2 10.94L14.2 9.54L11 7.14L11.8 9.7L11.8 11.1z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M8.6 11.75L8.6 10.35C8.42 8.73 7.4 8.97 7.8 10.59L7.8 11.99z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M12.6 14.01L12.6 15.41L10 17.21L11 15.21L11 13.81z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M9.4 13.48L9.4 14.88L7 16.48L8 14.49L8 13.09z" fill="#7e8553"/>
+    <path d="M21.8 12.8C19.8 8.8 12 8.8 6.4 11.1L6.4 13.9C11.8 16.2 20 16.2 21.8 12.8z" fill="#deba80"/>
+    <path d="M21.8 12.8C19.8 8.8 12 8.8 6.4 11.1L6.4 12.29C12 12.06 19.8 12.06 21.8 12.8z" fill="#7e8553"/>
+    <path d="M6.4 13.9C11.8 16.2 20 16.2 21.8 12.8C20 14.35 11.8 14.35 6.4 13.2z" fill="#eae6d7"/>
+    <circle cx="9.2" cy="11.4" r="0.6" fill="#2c2e31"/><circle cx="12.6" cy="10.6" r="0.6" fill="#2c2e31"/><circle cx="16.2" cy="10.8" r="0.55" fill="#2c2e31"/><circle cx="10.6" cy="12.7" r="0.85" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="14" cy="12.4" r="0.85" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="12.2" cy="14.2" r="0.7" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="16" cy="13.4" r="0.7" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/>
+    <path class="lpl-ikf" d="M21.8 12.8C19.8 8.8 12 8.8 6.4 11.1L6.4 13.9C11.8 16.2 20 16.2 21.8 12.8z"/>
+    <path d="M17.6 10.62Q16.1 12.58 17.6 14.54" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.8 12.8l-1.8.5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.2" cy="11.7" r="1" fill="#2a2522"/>
+  </symbol>
+  <!-- Perche: dos bossu, nageoire épineuse, bandes sombres sur fond vert-jaune, nageoires du ventre rouges. -->
+  <symbol id="fish-perch" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.6 11.4L2.8 9.2L4.6 12.6L2.8 16L7.6 13.8z" fill="#c7652f"/>
+    <path class="lpl-ik" d="M17 10.58L17 9.18L11.2 5.47L12.6 8.47L12.6 9.87z" fill="#7e8553"/><path d="M16.12 8.84l-0.5 -2.4M15.24 8.61l-0.5 -2.4M14.36 8.47l-0.5 -2.4M13.48 8.43l-0.5 -2.4" stroke="#2a2522" stroke-width=".7" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M11.8 9.99L11.8 8.59L8.6 6.59L9 9.65L9 11.05z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M14.2 14.56L14.2 15.96L11.6 18.16L12.6 15.84L12.6 14.44z" fill="#c7652f"/>
+    <path class="lpl-ik" d="M10.6 14.04L10.6 15.44L7.8 17.44L8.8 14.85L8.8 13.45z" fill="#c7652f"/>
+    <path d="M21.2 13C17.6 7.2 10.8 7.2 6.8 11.4L6.8 13.8C11.4 16.8 19.2 16.8 21.2 13z" fill="#c9be78"/>
+    <path d="M21.2 13C17.6 7.2 10.8 7.2 6.8 11.4L6.8 12.42C10.8 11.95 17.6 11.95 21.2 13z" fill="#3f6c4d"/>
+    <path d="M6.8 13.8C11.4 16.8 19.2 16.8 21.2 13C19.2 14.7 11.4 14.7 6.8 13.2z" fill="#eae6d7"/>
+    <path d="M9.1 10.18L8.5 13.43" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M11.3 9.2L10.7 13.66" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M13.6 8.83L13 13.81" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/><path d="M15.9 9.09L15.3 13.89" stroke="#3f6c4d" stroke-width="1.3" stroke-linecap="round"/>
+    <path class="lpl-ikf" d="M21.2 13C17.6 7.2 10.8 7.2 6.8 11.4L6.8 13.8C11.4 16.8 19.2 16.8 21.2 13z"/>
+    <path d="M17.8 10.3Q16.3 12.55 17.8 14.81" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.2 13l-1.4.3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.2" cy="11.8" r="1.05" fill="#2a2522"/>
+  </symbol>
+  <!-- Vandoise: fine et pressée, petite tête pointue, nageoires jaune pâle, l'œil jaune. -->
+  <symbol id="fish-dace" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.4 11.6L2.2 9.3L4.8 12.5L2.2 15.7L7.4 13.4z" fill="#e2c47c"/>
+    <path class="lpl-ik" d="M13.2 11.76L13.2 10.36L10.6 7.96L11 10.54L11 11.94z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M13 13.24L13 14.64L10.6 16.44L11.6 14.55L11.6 13.15z" fill="#e2c47c"/>
+    <path class="lpl-ik" d="M9.8 12.89L9.8 14.29L7.2 15.89L8.2 13.93L8.2 12.53z" fill="#e2c47c"/>
+    <path d="M22 12.5C18.4 9.8 11.4 9.8 6.6 11.6L6.6 13.4C11.2 15.2 18.4 15.2 22 12.5z" fill="#bac4c7"/>
+    <path d="M22 12.5C18.4 9.8 11.4 9.8 6.6 11.6L6.6 12.37C11.4 12.18 18.4 12.18 22 12.5z" fill="#5d646f"/>
+    <path d="M6.6 13.4C11.2 15.2 18.4 15.2 22 12.5C18.4 13.85 11.2 13.85 6.6 12.95z" fill="#eae6d7"/>
+    <path class="lpl-ikf" d="M22 12.5C18.4 9.8 11.4 9.8 6.6 11.6L6.6 13.4C11.2 15.2 18.4 15.2 22 12.5z"/>
+    <path d="M18.4 11.58Q16.9 12.5 18.4 13.41" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M22 12.5l-1.2.3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.7" cy="12" r="1.1" fill="#d9b65b" stroke="#2a2522" stroke-width=".7"/><circle cx="19.85" cy="12" r="0.5" fill="#2a2522"/>
+  </symbol>
+  <!-- Chabot: tête énorme et plate, yeux sur le dessus, corps qui s'effile, grande nageoire en éventail. -->
+  <symbol id="fish-bullhead" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.6 12.1L4.2 10.6C2.3 11.56 2.3 14.44 4.2 15.4L7.6 13.9z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M15.6 10.27L15.6 8.87C15.42 6.98 13.2 7.43 13.6 9.32L13.6 10.72z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M13 10.9L13 9.5C12.82 7.07 8.2 8.81 8.6 11.24L8.6 12.64z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M11.6 13.86L11.6 15.26C11.42 17.02 8 16.16 8.4 14.41L8.4 13.01z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M17.4 14.46L17.4 15.86C16.92 19.91 11 19.48 12.4 15.43L12.4 14.03z" fill="#b59c79"/>
+    <path d="M21.6 13.6C21 7.4 16.4 7.4 6.8 12.1L6.8 13.9C14.8 16.6 20.4 16.6 21.6 13.6z" fill="#a09c92"/>
+    <path d="M21.6 13.6C21 7.4 16.4 7.4 6.8 12.1L6.8 12.87C16.4 11.6 21 11.6 21.6 13.6z" fill="#6e5743"/>
+    <path d="M6.8 13.9C14.8 16.6 20.4 16.6 21.6 13.6C20.4 14.8 14.8 14.8 6.8 13.45z" fill="#eae6d7"/>
+    <circle cx="9.4" cy="12.6" r="0.7" fill="#554230"/><circle cx="11.6" cy="13.4" r="0.8" fill="#554230"/><circle cx="13.6" cy="12.2" r="0.8" fill="#554230"/>
+    <path class="lpl-ikf" d="M21.6 13.6C21 7.4 16.4 7.4 6.8 12.1L6.8 13.9C14.8 16.6 20.4 16.6 21.6 13.6z"/>
+    <path d="M18 9.51Q16.5 12.31 18 15.1" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.6 13.6l-2.2.5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.4" cy="10.6" r="1.05" fill="#2a2522"/>
+  </symbol>
+  <!-- Tanche: épaisse, vert de vieux bronze, ventre doré, nageoires rondes, petit œil rouge. -->
+  <symbol id="fish-tench" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.6 10.5L3 8.9Q3.6 12.5 3 16.1L7.6 14.5z" fill="#3f6c4d"/>
+    <path class="lpl-ik" d="M13.8 10.53L13.8 9.13C13.62 5.89 10.6 6.11 11 9.35L11 10.75z" fill="#3f6c4d"/>
+    <path class="lpl-ik" d="M14 14.51L14 15.91C13.82 18.88 11.2 18.71 11.6 15.74L11.6 14.34z" fill="#3f6c4d"/>
+    <path class="lpl-ik" d="M10.6 14.2L10.6 15.6C10.42 18.03 8.2 17.56 8.6 15.13L8.6 13.73z" fill="#3f6c4d"/>
+    <path d="M21.4 12.8C19.6 8.4 12 8.4 6.8 10.5L6.8 14.5C11.8 16.6 19.8 16.6 21.4 12.8z" fill="#7e8553"/>
+    <path d="M21.4 12.8C19.6 8.4 12 8.4 6.8 10.5L6.8 12.2C12 11.48 19.6 11.48 21.4 12.8z" fill="#3f6c4d"/>
+    <path d="M6.8 14.5C11.8 16.6 19.8 16.6 21.4 12.8C19.8 14.55 11.8 14.55 6.8 13.5z" fill="#c8a150"/>
+    <path class="lpl-ikf" d="M21.4 12.8C19.6 8.4 12 8.4 6.8 10.5L6.8 14.5C11.8 16.6 19.8 16.6 21.4 12.8z"/>
+    <path d="M17.6 10.35Q16.1 12.58 17.6 14.82" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.4 12.8l-1 .4" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.6 13.3c0 .7-.3 1.2-.8 1.5" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.2" cy="11.7" r="1.2" fill="#d3423c" stroke="#2a2522" stroke-width=".7"/><circle cx="19.35" cy="11.7" r="0.54" fill="#2a2522"/>
+  </symbol>
+  <!-- Barbeau: long corps de lutteur, museau pointu vers le fond, quatre barbillons, flanc bronze et nageoires rouille. -->
+  <symbol id="fish-barbel" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.2 11.5L1.8 9.6L3.6 12.6L1.8 15.6L6.2 13.7z" fill="#8f5c40"/>
+    <path class="lpl-ik" d="M14.6 11.57L14.6 10.17L11.6 7.54L12.4 10.14L12.4 11.54z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M13 13.5L13 14.9L10.4 16.7L11.4 14.78L11.4 13.38z" fill="#8f5c40"/>
+    <path class="lpl-ik" d="M9 13.08L9 14.48L6.6 16.08L7.6 14.23L7.6 12.83z" fill="#8f5c40"/>
+    <path d="M22.4 13.6C19 9.4 11.4 9.4 5.4 11.5L5.4 13.7C11.4 15.4 19.8 15.4 22.4 13.6z" fill="#c8a150"/>
+    <path d="M22.4 13.6C19 9.4 11.4 9.4 5.4 11.5L5.4 12.44C11.4 12.22 19 12.22 22.4 13.6z" fill="#7e8553"/>
+    <path d="M5.4 13.7C11.4 15.4 19.8 15.4 22.4 13.6C19.8 14 11.4 14 5.4 13.15z" fill="#eae6d7"/>
+    <path class="lpl-ikf" d="M22.4 13.6C19 9.4 11.4 9.4 5.4 11.5L5.4 13.7C11.4 15.4 19.8 15.4 22.4 13.6z"/>
+    <path d="M18.6 11.68Q17.1 12.87 18.6 14.05" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M22 13.9l-1.4.2" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.6 14.1c.2 1 0 1.8-.6 2.4" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.8 14.1c-.2.9-.7 1.6-1.4 2" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M22.3 13.8c.8.4 1.2 1 1.3 1.8" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.8" cy="11.7" r="0.95" fill="#2a2522"/>
+  </symbol>
+  <!-- Brochet: très long, museau en bec de canard, dorsale tout près de la queue, taches claires sur vert. -->
+  <symbol id="fish-pike" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.6 11.3L1.4 9.4L3 12.6L1.4 15.8L5.6 13.9z" fill="#8f5c40"/>
+    <path class="lpl-ik" d="M8.6 12.37L8.6 10.97C8.48 7.46 5.8 7.66 6 11.17L6 12.57z" fill="#8f5c40"/>
+    <path class="lpl-ik" d="M8.6 12.92L8.6 14.32C8.42 17.29 5.8 17.06 6.2 14.09L6.2 12.69z" fill="#8f5c40"/>
+    <path class="lpl-ik" d="M13.6 13.07L13.6 14.47L11.2 15.87L12.2 14.47L12.2 13.07z" fill="#8f5c40"/>
+    <path d="M23 12.8C18.4 10.6 10.8 10.6 4.8 11.3L4.8 13.9C10.8 14.8 19.4 14.8 23 12.8z" fill="#7e8553"/>
+    <path d="M23 12.8C18.4 10.6 10.8 10.6 4.8 11.3L4.8 12.41C10.8 12.1 18.4 12.1 23 12.8z" fill="#3f6c4d"/>
+    <path d="M4.8 13.9C10.8 14.8 19.4 14.8 23 12.8C19.4 13.7 10.8 13.7 4.8 13.25z" fill="#eae6d7"/>
+    <circle cx="8.2" cy="12.2" r="0.55" fill="#aec874"/><circle cx="10.2" cy="11.8" r="0.6" fill="#aec874"/><circle cx="12.4" cy="12.4" r="0.6" fill="#aec874"/><circle cx="14.4" cy="11.9" r="0.55" fill="#aec874"/><circle cx="11.2" cy="13.4" r="0.5" fill="#aec874"/><circle cx="13.6" cy="13.5" r="0.5" fill="#aec874"/>
+    <path class="lpl-ikf" d="M23 12.8C18.4 10.6 10.8 10.6 4.8 11.3L4.8 13.9C10.8 14.8 19.4 14.8 23 12.8z"/>
+    <path d="M17.4 11.95Q15.9 12.75 17.4 13.55" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M23 12.8l-5 .6" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="18.6" cy="11.6" r="0.95" fill="#2a2522"/>
+  </symbol>
+  <!-- Ombre commun: une grande dorsale en voile, violette tachetée de rouge; petite tête, flanc gris piqué de noir. -->
+  <symbol id="fish-grayling" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.2 11.9L2.2 9.7L4.4 12.9L2.2 16.1L7.2 13.9z" fill="#7f888e"/>
+    <path class="lpl-ik" d="M16 12.4L16 11L15.4 5.6C14 4.8 11.1 6.34 9.8 7.96L9.6 11.2L9.6 12.6z" fill="#a685d0"/>
+    <path class="lpl-ik" d="M13.2 13.95L13.2 15.35L10.6 17.15L11.6 15.22L11.6 13.82z" fill="#a685d0"/>
+    <path class="lpl-ik" d="M9.6 13.48L9.6 14.88L7.2 16.48L8.2 14.53L8.2 13.13z" fill="#a685d0"/>
+    <path d="M21.6 13C18.8 10.4 11.4 10.4 6.4 11.9L6.4 13.9C11.4 16 19.2 16 21.6 13z" fill="#bac4c7"/>
+    <path d="M21.6 13C18.8 10.4 11.4 10.4 6.4 11.9L6.4 12.75C11.4 12.6 18.8 12.6 21.6 13z" fill="#6e807b"/>
+    <path d="M6.4 13.9C11.4 16 19.2 16 21.6 13C19.2 14.45 11.4 14.45 6.4 13.4z" fill="#eae6d7"/>
+    <circle cx="15.4" cy="12" r="0.45" fill="#2c2e31"/><circle cx="16.6" cy="13" r="0.45" fill="#2c2e31"/><circle cx="14.6" cy="13.2" r="0.4" fill="#2c2e31"/>
+    <path class="lpl-ikf" d="M21.6 13C18.8 10.4 11.4 10.4 6.4 11.9L6.4 13.9C11.4 16 19.2 16 21.6 13z"/>
+    <path d="M18.2 12.08Q16.7 13.15 18.2 14.21" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.6 13l-.9.3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.6" cy="12.2" r="0.95" fill="#2a2522"/>
+    <circle cx="14.4" cy="7.4" r="0.55" fill="#c3473d"/><circle cx="12.2" cy="7.2" r="0.55" fill="#c3473d"/><circle cx="10.6" cy="8.6" r="0.5" fill="#c3473d"/>
+  </symbol>
+  <!-- Lamproie de Planer: corps d'anguille, une ventouse ronde au bout, sept petits trous derrière l'œil, nageoire basse vers la queue. -->
+  <symbol id="fish-brook-lamprey" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M8.6 10.6c-2.4.4-4.4 1.8-6.8 4.2 2.4.8 4.4.4 6.6-.6z" fill="#6f685e"/>
+    <path d="M2.4 14.4C5 12 7 9.8 9.6 10.2c2.4.4 3.8 2.2 6 2 2-.2 3.4-2.2 5.2-2.2 1.6 0 2.2 1.2 2 2.4-.2 1.2-1.4 1.6-2.6 1.4-1.6-.2-2.6 1.6-4.8 1.8-2.6.2-3.8-2.2-5.8-2.2-2.2 0-4.2 2-7.2 1z" fill="#beb9ad"/>
+    <path d="M2.4 14.4C5 12 7 9.8 9.6 10.2c2.4.4 3.8 2.2 6 2 2-.2 3.4-2.2 5.2-2.2 1.6 0 2.2 1.2 2 2.4" stroke="#6f685e" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ikf" d="M2.4 14.4C5 12 7 9.8 9.6 10.2c2.4.4 3.8 2.2 6 2 2-.2 3.4-2.2 5.2-2.2 1.6 0 2.2 1.2 2 2.4-.2 1.2-1.4 1.6-2.6 1.4-1.6-.2-2.6 1.6-4.8 1.8-2.6.2-3.8-2.2-5.8-2.2-2.2 0-4.2 2-7.2 1z"/>
+    <circle cx="19.4" cy="12.2" r="0.32" fill="#2a2522"/><circle cx="18.7" cy="12.5" r="0.32" fill="#2a2522"/><circle cx="18" cy="12.9" r="0.32" fill="#2a2522"/><circle cx="17.3" cy="13.2" r="0.32" fill="#2a2522"/><circle cx="16.6" cy="13.5" r="0.32" fill="#2a2522"/><circle cx="15.9" cy="13.7" r="0.32" fill="#2a2522"/><circle cx="15.2" cy="13.9" r="0.32" fill="#2a2522"/>
+    <circle cx="22.1" cy="12.6" r="1.2" fill="#f2dcdf" stroke="#2a2522" stroke-width=".8"/>
+    <circle cx="20.6" cy="11.4" r=".8" fill="#2a2522"/>
+  </symbol>
+  <!-- Bouvière: toute petite et haute, ventre rose irisé, un trait turquoise vers la queue, nageoires rouges. -->
+  <symbol id="fish-bitterling" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M8.8 11.4L4.4 9.4L6.2 12.4L4.4 15.4L8.8 13.4z" fill="#7e8553"/>
+    <path class="lpl-ik" d="M14.2 9.91L14.2 8.51L10.4 6.31L11 9.26L11 10.66z" fill="#d9584f"/>
+    <path class="lpl-ik" d="M13.6 14.72L13.6 16.12L9.8 17.92L10.8 15.38L10.8 13.98z" fill="#d9584f"/>
+    <path d="M19.6 12.4C17.4 7.4 12 7.4 8 11.4L8 13.4C11.8 17.2 17.6 17.2 19.6 12.4z" fill="#bac4c7"/>
+    <path d="M19.6 12.4C17.4 7.4 12 7.4 8 11.4L8 12.25C12 11.8 17.4 11.8 19.6 12.4z" fill="#7e8553"/>
+    <path d="M8 13.4C11.8 17.2 17.6 17.2 19.6 12.4C17.6 13.84 11.8 13.84 8 12.9z" fill="#e89cb6"/>
+    <path d="M8.6 12.4h5.6" stroke="#2bb5c8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ikf" d="M19.6 12.4C17.4 7.4 12 7.4 8 11.4L8 13.4C11.8 17.2 17.6 17.2 19.6 12.4z"/>
+    <path d="M16.8 9.88Q15.3 12.35 16.8 14.82" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M19.6 12.4l-.9.3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="17.8" cy="11.4" r="1.1" fill="#d9584f" stroke="#2a2522" stroke-width=".7"/><circle cx="17.95" cy="11.4" r="0.5" fill="#2a2522"/>
+  </symbol>
+  <!-- Alose: haute et argentée comme un hareng, dos bleu, une grande tache noire derrière l'ouïe, puis d'autres plus petites. -->
+  <symbol id="fish-shad" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.2 11.6L2 8.9L4.8 12.5L2 16.1L7.2 13.4z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M14.6 10.67L14.6 9.27L11.6 6.87L12.2 9.46L12.2 10.86z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M12.6 14.47L12.6 15.87L8.6 17.27L9 14.94L9 13.54z" fill="#6e807b"/>
+    <path d="M22 12.2C19 8.4 11.4 8.4 6.4 11.6L6.4 13.4C10.8 17 19.4 17 22 12.2z" fill="#bac4c7"/>
+    <path d="M22 12.2C19 8.4 11.4 8.4 6.4 11.6L6.4 12.37C11.4 12.01 19 12.01 22 12.2z" fill="#5f7d8c"/>
+    <path d="M6.4 13.4C10.8 17 19.4 17 22 12.2C19.4 14.75 10.8 14.75 6.4 12.95z" fill="#eae6d7"/>
+    <circle cx="16.2" cy="10.9" r="1.05" fill="#2c2e31"/><circle cx="14" cy="11" r="0.55" fill="#2c2e31"/><circle cx="12.2" cy="11.2" r="0.5" fill="#2c2e31"/><circle cx="10.6" cy="11.4" r="0.45" fill="#2c2e31"/>
+    <path class="lpl-ikf" d="M22 12.2C19 8.4 11.4 8.4 6.4 11.6L6.4 13.4C10.8 17 19.4 17 22 12.2z"/>
+    <path d="M17.8 10.36Q16.3 12.55 17.8 14.74" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M22 12.2l-1.8 1.1" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.4" cy="11.8" r="1.1" fill="#2a2522"/>
+  </symbol>
+  <!-- Carpe miroir: corps haut et épais, longue dorsale, quelques grandes écailles comme des miroirs, deux barbillons. -->
+  <symbol id="fish-mirror-carp" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.2 10.8L2.2 8.8L4 12.6L2.2 16.4L7.2 14.4z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M15 9.53L15 8.13L8.2 5.93L8.6 9.32L8.6 10.72z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M14 15.12L14 16.52L11.4 18.52L12.4 16.42L12.4 15.02z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M10.2 14.61L10.2 16.01L7.4 17.81L8.4 15.43L8.4 14.03z" fill="#6e5743"/>
+    <path d="M21.4 13.2C19 6.8 11 6.8 6.4 10.8L6.4 14.4C11 17.4 19.4 17.4 21.4 13.2z" fill="#c8a150"/>
+    <path d="M21.4 13.2C19 6.8 11 6.8 6.4 10.8L6.4 12.33C11 11.9 19 11.9 21.4 13.2z" fill="#6e5743"/>
+    <path d="M6.4 14.4C11 17.4 19.4 17.4 21.4 13.2C19.4 15 11 15 6.4 13.5z" fill="#eae6d7"/>
+    <g fill="#de9a62" stroke="#2a2522" stroke-width=".6"><circle cx="10.4" cy="10.6" r="1.5"/><circle cx="13.6" cy="10.2" r="1.7"/><circle cx="12.2" cy="13.6" r="1.4"/><circle cx="15.6" cy="13.2" r="1.2"/></g><path d="M13 9.5a1 1 0 0 1 1-.4M9.9 10a.9.9 0 0 1 .8-.3" stroke="#eeece4" stroke-width="0.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ikf" d="M21.4 13.2C19 6.8 11 6.8 6.4 10.8L6.4 14.4C11 17.4 19.4 17.4 21.4 13.2z"/>
+    <path d="M18 9.82Q16.5 12.53 18 15.23" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.4 13.2l-.9.3" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.8 13.6c.2.8 0 1.4-.6 1.8" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.2" cy="11.8" r="0.95" fill="#2a2522"/>
+  </symbol>
+  <!-- Saumon: grand fuseau d'argent au dos bleu, croix noires sur le haut, mâchoire en crochet, nageoire adipeuse. -->
+  <symbol id="fish-salmon" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M6.4 11.3L1.6 8.9Q3 12.5 1.6 16.1L6.4 13.7z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M14.4 10.96L14.4 9.56L11.2 7.16L12 9.69L12 11.09z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M7.8 11.92L7.8 10.52C7.62 9.04 6.6 9.3 7 10.78L7 12.18z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M12.4 13.83L12.4 15.23L9.8 17.03L10.8 15.06L10.8 13.66z" fill="#6e807b"/>
+    <path class="lpl-ik" d="M8.8 13.29L8.8 14.69L6.4 16.29L7.4 14.33L7.4 12.93z" fill="#6e807b"/>
+    <path d="M22.6 12.6C19.8 8.8 11.6 8.8 5.6 11.3L5.6 13.7C11.2 16 20 16 22.6 12.6z" fill="#bac4c7"/>
+    <path d="M22.6 12.6C19.8 8.8 11.6 8.8 5.6 11.3L5.6 12.32C11.6 12.06 19.8 12.06 22.6 12.6z" fill="#5f7d8c"/>
+    <path d="M5.6 13.7C11.2 16 20 16 22.6 12.6C20 14.25 11.2 14.25 5.6 13.1z" fill="#eae6d7"/>
+    <path d="M9 10.8l1.2 1.2M10.2 10.8 9 12M12.6 10l1.2 1.2M13.8 10l-1.2 1.2M16 10.2l1.1 1.1M17.1 10.2 16 11.3M11 12.8l1 1M12 12.8l-1 1" stroke="#2c2e31" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ikf" d="M22.6 12.6C19.8 8.8 11.6 8.8 5.6 11.3L5.6 13.7C11.2 16 20 16 22.6 12.6z"/>
+    <path d="M18.6 10.8Q17.1 12.47 18.6 14.14" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M22.6 12.6c-.4.8-1.4 1-2.4.7" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.9" cy="11.6" r="1" fill="#2a2522"/>
+    <path d="M22.6 12.6c.3.6.1 1.2-.5 1.5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+  <!-- Lote: longue et ronde, tête large, un seul barbillon au menton, longues nageoires du dos et du ventre, marbrée. -->
+  <symbol id="fish-burbot" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.8 11.2L2.6 9.8C0.7 10.92 0.7 14.28 2.6 15.4L5.8 14z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M15.8 11.81L15.8 10.41C15.62 8.52 13.8 8.42 14.2 10.31L14.2 11.71z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M13.6 11.7L13.6 10.3C13.42 8.41 5.6 9.11 6 11L6 12.4z" fill="#6e5743"/>
+    <path class="lpl-ik" d="M12.4 13.65L12.4 15.05C12.22 16.8 5.6 15.98 6 14.23L6 12.83z" fill="#6e5743"/>
+    <path d="M21.8 12.9C20 9.8 11.6 9.8 5 11.2L5 14C11.6 15.6 20.2 15.6 21.8 12.9z" fill="#7e8553"/>
+    <path d="M21.8 12.9C20 9.8 11.6 9.8 5 11.2L5 12.39C11.6 11.62 20 11.62 21.8 12.9z" fill="#6e5743"/>
+    <path d="M5 14C11.6 15.6 20.2 15.6 21.8 12.9C20.2 14.1 11.6 14.1 5 13.3z" fill="#eae6d7"/>
+    <circle cx="8.4" cy="12" r="0.9" fill="#554230"/><circle cx="10.8" cy="12.8" r="0.8" fill="#554230"/><circle cx="12.6" cy="11.6" r="1" fill="#554230"/><circle cx="15" cy="12.6" r="0.9" fill="#554230"/><circle cx="9.6" cy="13.6" r="0.6" fill="#554230"/><circle cx="17" cy="11.8" r="0.7" fill="#554230"/>
+    <path class="lpl-ikf" d="M21.8 12.9C20 9.8 11.6 9.8 5 11.2L5 14C11.6 15.6 20.2 15.6 21.8 12.9z"/>
+    <path d="M18 11.45Q16.5 12.76 18 14.08" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.8 12.9l-2 .5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M20.6 14c.2.9 0 1.7-.6 2.3" stroke="#2a2522" stroke-width="0.85" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19.8" cy="11.4" r="0.95" fill="#2a2522"/>
+  </symbol>
+  <!-- La Dorée: une truite couleur de miel, points rouges, et des éclats (mythique). -->
+  <symbol id="fish-golden-trout" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M7.4 11.4L2.6 9.4Q3.8 12.8 2.6 16.2L7.4 14.2z" fill="#efcb45"/>
+    <path class="lpl-ik" d="M14.2 11.31L14.2 9.91L11 7.51L11.8 10.07L11.8 11.47z" fill="#efcb45"/>
+    <path class="lpl-ik" d="M8.8 12.07L8.8 10.67C8.62 9.05 7.6 9.28 8 10.9L8 12.3z" fill="#efcb45"/>
+    <path class="lpl-ik" d="M12.6 14.24L12.6 15.64L10 17.44L11 15.43L11 14.03z" fill="#efcb45"/>
+    <path class="lpl-ik" d="M9.4 13.7L9.4 15.1L7 16.7L8 14.71L8 13.31z" fill="#efcb45"/>
+    <path d="M21.4 13C19.4 9.2 12.2 9.2 6.6 11.4L6.6 14.2C12 16.4 19.6 16.4 21.4 13z" fill="#d9b65b"/>
+    <path d="M21.4 13C19.4 9.2 12.2 9.2 6.6 11.4L6.6 12.59C12.2 12.37 19.4 12.37 21.4 13z" fill="#c8a150"/>
+    <path d="M6.6 14.2C12 16.4 19.6 16.4 21.4 13C19.6 14.6 12 14.6 6.6 13.5z" fill="#eae6d7"/>
+    <circle cx="10.6" cy="12.8" r="0.8" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="13.8" cy="12.4" r="0.8" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="12.2" cy="14.4" r="0.65" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="16" cy="13.4" r="0.65" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="9.4" cy="11.6" r="0.55" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/><circle cx="13" cy="10.9" r="0.55" fill="#c3473d" stroke="#eae6d7" stroke-width=".6"/>
+    <path class="lpl-ikf" d="M21.4 13C19.4 9.2 12.2 9.2 6.6 11.4L6.6 14.2C12 16.4 19.6 16.4 21.4 13z"/>
+    <path d="M17.6 11.02Q16.1 12.86 17.6 14.7" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M21.4 13l-1.8.5" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="19" cy="12" r="1" fill="#2a2522"/>
+    <path d="M12.4 3Q12.76 4.64 14.4 5Q12.76 5.36 12.4 7Q12.04 5.36 10.4 5Q12.04 4.64 12.4 3z" fill="#ffd27a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Le Brochet de lune: un brochet pâle comme la lune, taches claires; un croissant de lune au-dessus de lui (mythique). -->
+  <symbol id="fish-moon-pike" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M5.6 12.1L1.4 10.2L3 13.4L1.4 16.6L5.6 14.7z" fill="#7f888e"/>
+    <path class="lpl-ik" d="M8.6 13.17L8.6 11.77C8.48 8.26 5.8 8.46 6 11.97L6 13.37z" fill="#7f888e"/>
+    <path class="lpl-ik" d="M8.6 13.72L8.6 15.12C8.42 18.09 5.8 17.86 6.2 14.89L6.2 13.49z" fill="#7f888e"/>
+    <path class="lpl-ik" d="M13.6 13.87L13.6 15.27L11.2 16.67L12.2 15.27L12.2 13.87z" fill="#7f888e"/>
+    <path d="M23 13.6C18.4 11.4 10.8 11.4 4.8 12.1L4.8 14.7C10.8 15.6 19.4 15.6 23 13.6z" fill="#eeece4"/>
+    <path d="M23 13.6C18.4 11.4 10.8 11.4 4.8 12.1L4.8 13.21C10.8 12.9 18.4 12.9 23 13.6z" fill="#7f888e"/>
+    <path d="M4.8 14.7C10.8 15.6 19.4 15.6 23 13.6C19.4 14.5 10.8 14.5 4.8 14.05z" fill="#eeece4"/>
+    <circle cx="8.4" cy="13" r="0.55" fill="#dad0be"/><circle cx="10.4" cy="12.6" r="0.6" fill="#dad0be"/><circle cx="12.6" cy="13.2" r="0.6" fill="#dad0be"/><circle cx="14.6" cy="12.7" r="0.55" fill="#dad0be"/><circle cx="11.4" cy="14.2" r="0.5" fill="#dad0be"/>
+    <path class="lpl-ikf" d="M23 13.6C18.4 11.4 10.8 11.4 4.8 12.1L4.8 14.7C10.8 15.6 19.4 15.6 23 13.6z"/>
+    <path d="M17.4 12.75Q15.9 13.55 17.4 14.35" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M23 13.6l-5 .6" stroke="#2a2522" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="18.6" cy="12.4" r="0.95" fill="#2a2522"/>
+    <path class="lpl-ik" d="M12.6 2.2a2.8 2.8 0 1 0 1.4 3.8 2.3 2.3 0 0 1-1.4-3.8z" fill="#f2e4b6"/>
+  </symbol>
+  <!-- Raretés des poissons (0.12.2): fond et liseré à poser derrière l'icône du poisson (deux <use> superposés). -->
+  <!-- commun: pierre claire, liseré simple -->
+  <symbol id="rarity-common" viewBox="0 0 24 24">
+    <rect x=".9" y=".9" width="22.2" height="22.2" rx="4" fill="#dad0be" stroke="#9b907f" stroke-width="1.5"/>
+  </symbol>
+  <!-- rare: eau claire, liseré d'eau profonde, un point à chaque angle -->
+  <symbol id="rarity-rare" viewBox="0 0 24 24">
+    <rect x=".9" y=".9" width="22.2" height="22.2" rx="4" fill="#d4eceb" stroke="#4c899a" stroke-width="1.5"/><circle cx="3.4" cy="3.4" r="0.9" fill="#4c899a"/><circle cx="20.6" cy="3.4" r="0.9" fill="#4c899a"/><circle cx="3.4" cy="20.6" r="0.9" fill="#4c899a"/><circle cx="20.6" cy="20.6" r="0.9" fill="#4c899a"/>
+  </symbol>
+  <!-- épique: rose pâle, double liseré violet -->
+  <symbol id="rarity-epic" viewBox="0 0 24 24">
+    <rect x=".9" y=".9" width="22.2" height="22.2" rx="4" fill="#f2dcdf" stroke="#a685d0" stroke-width="1.5"/><rect x="2.6" y="2.6" width="18.8" height="18.8" rx="2.8" fill="none" stroke="#a685d0" stroke-width=".8"/>
+  </symbol>
+  <!-- légendaire: bronze, liseré cuivre, angles en équerre -->
+  <symbol id="rarity-legendary" viewBox="0 0 24 24">
+    <rect x=".9" y=".9" width="22.2" height="22.2" rx="4" fill="#e3c18a" stroke="#b8693a" stroke-width="1.5"/><path d="M2.4 6.4V2.4h4M17.6 2.4h4v4M21.6 17.6v4h-4M6.4 21.6h-4v-4" stroke="#b8693a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </symbol>
+  <!-- mythique: lueur dorée, liseré laiton, une étoile à chaque angle -->
+  <symbol id="rarity-mythic" viewBox="0 0 24 24">
+    <rect x=".9" y=".9" width="22.2" height="22.2" rx="4" fill="#f2e4b6" stroke="#c8a150" stroke-width="1.5"/><path d="M3.6 1.4Q4 3.2 5.8 3.6Q4 4 3.6 5.8Q3.2 4 1.4 3.6Q3.2 3.2 3.6 1.4z" fill="#ffd27a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/><path d="M20.4 1.4Q20.8 3.2 22.6 3.6Q20.8 4 20.4 5.8Q20 4 18.2 3.6Q20 3.2 20.4 1.4z" fill="#ffd27a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/><path d="M3.6 18.2Q4 20 5.8 20.4Q4 20.8 3.6 22.6Q3.2 20.8 1.4 20.4Q3.2 20 3.6 18.2z" fill="#ffd27a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/><path d="M20.4 18.2Q20.8 20 22.6 20.4Q20.8 20.8 20.4 22.6Q20 20.8 18.2 20.4Q20 20 20.4 18.2z" fill="#ffd27a" stroke="#2a2522" stroke-width=".6" stroke-linejoin="round"/>
+  </symbol>
+  <!-- Robes de poule (0.12.2): portraits de profil, tournés vers la gauche comme l'icône « hen ». -->
+  <!-- la blanche -->
+  <symbol id="hen-white" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#f2ede1"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#eeece4" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#f2ede1"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#eeece4" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#2a2522" stroke-width=".6"/>
+  </symbol>
+  <!-- la rousse -->
+  <symbol id="hen-red" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#b5693c"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#c7652f" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#b5693c"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#c7652f" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#2a2522" stroke-width=".6"/>
+  </symbol>
+  <!-- la noire, reflet vert sur le camail -->
+  <symbol id="hen-black" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#3d3b3b"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#3f6453" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#3d3b3b"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#3f6453" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#eeece4" stroke-width=".6"/>
+  </symbol>
+  <!-- la dorée, camail cuivré -->
+  <symbol id="hen-golden" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#d8ae72"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#b8693a" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#d8ae72"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#b8693a" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#2a2522" stroke-width=".6"/>
+  </symbol>
+  <!-- la cendrée -->
+  <symbol id="hen-ash" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#8f887c"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#625b52" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#8f887c"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#625b52" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#eeece4" stroke-width=".6"/>
+  </symbol>
+  <!-- la coucou, grise rayée de blanc -->
+  <symbol id="hen-cuckoo" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#7f888e"/>
+    <path d="M8.8 12c1.8 1.6 4.2 2.4 6.8 2.4" stroke="#5f676d" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+    <path d="M5.8 16.4c2.8.8 5.6 1 8.2.6M4.6 19.4c3.2.8 6.8 1 10.4.4M11.6 13.6c1.4.6 3 .8 4.6.6" stroke="#eeece4" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M9.2 17c2.6-1.4 6.2-1 8.8 1.4" stroke="#2a2522" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#7f888e"/>
+    <path d="M13.8 7.8c.4 1.8-.6 3.4-.4 5.4" stroke="#5f676d" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#d3423c"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#e9b13f"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#d3423c"/>
+    <circle cx="8.6" cy="7" r="1" fill="#2a2522" stroke="#eeece4" stroke-width=".6"/>
+  </symbol>
+  <!-- robe à trouver: la silhouette grise, sans œil ni couleur -->
+  <symbol id="hen-unknown" viewBox="0 0 24 24">
+    <path class="lpl-ik" d="M3.4 21.6c-.4-4.4 1.6-8 4.8-9.8 4-.6 9 .8 11.6 4 1.4 1.8 1.6 3.8 1.2 5.8z" fill="#beb9ad"/>
+    <path class="lpl-ik" d="M6.6 13.6c-1.6-3-1.8-6.4 0-8.6 1.6-1.8 4.6-2 6.4-.2 1.6 1.6 1.8 4 1 6.2-.4 1.4-.2 2.6.6 3.6-2.6 1-5.8.8-8-1z" fill="#beb9ad"/>
+    <path class="lpl-ik" d="M7.4 4.6c-.6-1.6.6-2.8 1.8-2 .4-1.4 2.2-1.4 2.4 0 1.2-.4 2 .8 1.2 2z" fill="#a09c92"/>
+    <path class="lpl-ik" d="M6.2 7.2 3.2 8.4l3 1z" fill="#a09c92"/>
+    <path class="lpl-ik" d="M6.2 9.6c-.8 1-.6 2.4.4 2.6.6-.6.6-1.8 0-2.6z" fill="#a09c92"/>
+  </symbol>
+  <!-- Familles générées: fin -->
 
   <!-- Vignettes des souvenirs (onglet Souvenirs du carnet), définitives (artiste 2D, tour 9).
        Grille de 40: disque de 36 (rayon 18) d'un ton de la palette du décor, un ton par moment.

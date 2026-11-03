@@ -1,0 +1,1514 @@
+/*
+  Interface imagée du patch 0.12.2 (`docs/jeux/jeu-1/interface-imagee-0-12-2.md`): vitrine (grille
+  de vignettes paginée et détail de la sélection), pastilles, jauges, compteurs « possédés /
+  requis », cartes de recettes, basse-cour et carnet des poissons. Jetons de `jeton.css`; aucune
+  ombre floue ni filtre (PC de référence); animations de transform et d'opacité seulement, coupées
+  par la réduction des animations (`composants.css`, fin).
+*/
+
+/* ------------------------------------------------------------------ */
+/* Pastilles                                                           */
+/* ------------------------------------------------------------------ */
+
+.lpl-pastille {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.75rem;
+  padding: 0.125rem 0.5rem 0.125rem 0.3125rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-sm);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.lpl-pastille:not(:has(.lpl-pastille__text)) {
+  padding-right: 0.3125rem;
+}
+
+.lpl-pastille__icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-pastille--price {
+  background: #f6e3a8;
+}
+
+.lpl-pastille--count {
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-pastille--ok {
+  border-color: var(--lpl-color-success);
+  background: #dfe9dc;
+}
+
+.lpl-pastille--wait {
+  background: var(--lpl-color-waiting);
+}
+
+.lpl-pastille--missing {
+  border-style: dashed;
+  border-color: var(--lpl-color-error);
+  background: var(--lpl-color-paper-sunken);
+  color: var(--lpl-color-error);
+}
+
+/* Barrée: un trait en travers de l'icône, en plus de la couleur et du pointillé. */
+.lpl-pastille[data-crossed='true'] .lpl-pastille__icon,
+.lpl-need-count[data-missing='true'] .lpl-need-count__icon,
+.lpl-icon-row__item[data-on='false'] .lpl-icon {
+  opacity: 0.45;
+}
+
+.lpl-pastille[data-crossed='true']::after,
+.lpl-need-count[data-missing='true']::after,
+.lpl-icon-row__item[data-on='false']::after {
+  position: absolute;
+  top: 50%;
+  left: 0.125rem;
+  width: 1.5rem;
+  height: var(--lpl-border);
+  background: var(--lpl-color-error);
+  content: '';
+  transform: rotate(-35deg);
+}
+
+.lpl-icon-row__item[data-on='false']::after {
+  left: 0.1875rem;
+  width: 1.625rem;
+  background: var(--lpl-color-ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Jauges                                                              */
+/* ------------------------------------------------------------------ */
+
+.lpl-gauge {
+  display: inline-grid;
+  grid-template-columns: auto minmax(2.5rem, 1fr) auto;
+  align-items: center;
+  gap: 0.3125rem;
+  min-width: 0;
+}
+
+/* Sans icône (la tuile qui porte la jauge a déjà la sienne): la piste prend la première colonne. */
+.lpl-gauge:not(:has(.lpl-gauge__icon)) {
+  grid-template-columns: minmax(2.5rem, 1fr) auto;
+}
+
+.lpl-gauge__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-gauge__track {
+  position: relative;
+  height: 0.625rem;
+  overflow: hidden;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-gauge__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--lpl-value);
+  background: var(--lpl-color-primary);
+  transform-origin: left center;
+  animation: lpl-gauge-fill var(--lpl-duration-slow) var(--lpl-ease) both;
+  animation-duration: calc(var(--lpl-duration-slow) * 2.5);
+}
+
+.lpl-gauge--heart .lpl-gauge__fill {
+  background: #b5473f;
+}
+
+.lpl-gauge--food .lpl-gauge__fill {
+  background: #b9852f;
+}
+
+.lpl-gauge--fresh .lpl-gauge__fill {
+  background: #6f8d3a;
+}
+
+/* Jauge basse: des hachures, pour ne pas dire l'état par la seule couleur. */
+.lpl-gauge[data-level='low'] .lpl-gauge__fill {
+  background-image: repeating-linear-gradient(-45deg, transparent 0 0.1875rem, rgb(251 246 233 / 0.55) 0.1875rem 0.3125rem);
+}
+
+.lpl-gauge__text {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-display);
+}
+
+@keyframes lpl-gauge-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Compteur « possédés / requis » et rangée d'icônes                   */
+/* ------------------------------------------------------------------ */
+
+.lpl-need-count {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 2.25rem;
+  color: var(--lpl-color-ink);
+}
+
+.lpl-need-count__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.lpl-need-count__text {
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.lpl-need-count[data-missing='true'] .lpl-need-count__text {
+  color: var(--lpl-color-error);
+}
+
+.lpl-need-count[data-missing='true']::after {
+  top: 0.875rem;
+  left: 0.25rem;
+  width: 1.75rem;
+}
+
+.lpl-icon-row {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.lpl-icon-row__item {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-icon-row__item[data-on='false'] {
+  border-style: dashed;
+  border-color: var(--lpl-color-ink-disabled);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-icon-row__item .lpl-icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Vitrine                                                             */
+/* ------------------------------------------------------------------ */
+
+.lpl-panel--vitrine .lpl-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-vitrine {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
+  gap: var(--lpl-space-4);
+}
+
+.lpl-vitrine__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-vitrine__grid {
+  --lpl-tile-size: 5.25rem;
+  display: grid;
+  grid-template-columns: repeat(var(--lpl-tile-cols, 5), var(--lpl-tile-size));
+  grid-auto-rows: var(--lpl-tile-size);
+  gap: var(--lpl-space-2);
+}
+
+.lpl-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+  color: var(--lpl-color-ink);
+  cursor: pointer;
+  transition:
+    transform var(--lpl-duration-fast) var(--lpl-ease),
+    background-color var(--lpl-duration-fast) linear;
+}
+
+.lpl-tile:hover {
+  background: var(--lpl-color-paper);
+  transform: translateY(-0.0625rem);
+}
+
+.lpl-tile[data-selected] {
+  border-color: var(--lpl-color-ink);
+  border-width: var(--lpl-border-thick);
+  background: #fff9e6;
+}
+
+.lpl-tile__figure {
+  display: grid;
+  place-items: center;
+}
+
+.lpl-tile__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+/* Rebond de la vignette choisie. */
+.lpl-tile[data-selected] .lpl-tile__figure {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-tile[data-state='missing'] .lpl-tile__figure,
+.lpl-tile[data-state='locked'] .lpl-tile__figure {
+  opacity: 0.42;
+}
+
+.lpl-tile[data-state='missing'],
+.lpl-tile[data-state='locked'] {
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-tile[data-state='wait'] {
+  background: #f3e3b3;
+}
+
+.lpl-tile__badge {
+  position: absolute;
+  top: -0.5rem;
+  right: -0.375rem;
+  z-index: 1;
+}
+
+.lpl-tile__badge .lpl-pastille {
+  min-height: 1.5rem;
+  padding: 0.0625rem 0.375rem;
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-tile__corner {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.25rem;
+  display: grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-tile__corner .lpl-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.lpl-tile__below {
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+}
+
+.lpl-tile__below .lpl-pastille {
+  min-height: 1.375rem;
+  padding: 0.0625rem 0.375rem 0.0625rem 0.25rem;
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-tile__below .lpl-pastille__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/*
+  Le nom: au survol seulement, en étiquette sous la vignette (la sélection le montre en grand dans
+  le détail). Il peut déborder de la vignette, jamais être coupé.
+*/
+.lpl-tile__name {
+  position: absolute;
+  top: calc(100% - 0.375rem);
+  left: 50%;
+  z-index: 2;
+  width: max-content;
+  max-width: 12rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--lpl-radius-s);
+  background: var(--lpl-color-wood-deep);
+  color: var(--lpl-color-on-wood);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.25;
+  text-align: center;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity var(--lpl-duration-fast) linear;
+  pointer-events: none;
+}
+
+.lpl-tile:hover .lpl-tile__name {
+  opacity: 1;
+}
+
+/* Le pied des pages: ◀ A  ● ○  E ▶ */
+.lpl-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-pager__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2rem;
+  padding: 0.125rem 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink);
+  cursor: pointer;
+}
+
+.lpl-pager__button[aria-disabled='true'] {
+  border-style: dashed;
+  border-color: var(--lpl-color-ink-disabled);
+  color: var(--lpl-color-ink-disabled);
+  cursor: default;
+}
+
+.lpl-pager__back {
+  transform: scaleX(-1);
+}
+
+.lpl-pager__dots {
+  display: inline-flex;
+  gap: 0.375rem;
+}
+
+.lpl-pager__dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-round);
+  background: transparent;
+}
+
+.lpl-pager__dot[data-on] {
+  width: 1.375rem;
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-ink);
+}
+
+/* Le détail de la sélection: grand dessin, nom, une ligne, pastilles, boutons. */
+.lpl-vitrine__detail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--lpl-space-2);
+  min-height: 100%;
+  padding: var(--lpl-space-3) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-detail__figure {
+  display: grid;
+  place-items: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-hairline);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+  animation: lpl-detail-in var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-detail__icon {
+  width: 4rem;
+  height: 4rem;
+}
+
+.lpl-detail__name {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: var(--lpl-leading-tight);
+}
+
+.lpl-detail__line {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.35;
+}
+
+.lpl-detail__pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-1) var(--lpl-space-2);
+}
+
+.lpl-detail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+  margin-top: auto;
+  padding-top: var(--lpl-space-2);
+}
+
+.lpl-detail__actions .lpl-token {
+  margin-right: 0.125rem;
+}
+
+.lpl-detail__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+@keyframes lpl-detail-in {
+  from {
+    opacity: 0.4;
+    transform: scale(0.82);
+  }
+}
+
+/* Avis d'une ligne (boutique fermée) et rangée de pastilles au-dessus de la grille. */
+.lpl-vitrine__notice {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) dashed var(--lpl-color-line);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-sunken);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-vitrine__notice--quiet {
+  border-style: dotted;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-vitrine__strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-vitrine__row-title {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-vitrine__together {
+  display: inline-flex;
+  gap: 0.125rem;
+}
+
+/* Pièce qui vole entre la bourse et la vignette (achat, vente). */
+.lpl-coin-flight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--lpl-layer-toast);
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.875rem 0 0 -0.875rem;
+  pointer-events: none;
+}
+
+.lpl-coin-flight .lpl-icon {
+  width: 100%;
+  height: 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* Recettes (réchaud, établi) et « Manger »                            */
+/* ------------------------------------------------------------------ */
+
+.lpl-vitrine--recipes {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lpl-vitrine--recipes .lpl-vitrine__grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-recipe {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  justify-items: center;
+  gap: 0.375rem;
+  min-height: 10.25rem;
+  padding: 0.5rem 0.5rem 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-recipe:focus-within,
+.lpl-recipe:hover {
+  border-color: var(--lpl-color-ink);
+  background: #fff9e6;
+}
+
+.lpl-recipe[data-state='missing'],
+.lpl-recipe[data-state='locked'] {
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-recipe__name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--lpl-duration-fast) linear;
+}
+
+.lpl-recipe:focus-within .lpl-recipe__name,
+.lpl-recipe:hover .lpl-recipe__name {
+  opacity: 1;
+}
+
+.lpl-recipe__dish {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 3.5rem;
+}
+
+.lpl-recipe__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.lpl-recipe:focus-within .lpl-recipe__icon {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-recipe[data-state='missing'] .lpl-recipe__icon {
+  opacity: 0.5;
+}
+
+.lpl-recipe__yield {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.875rem;
+}
+
+.lpl-recipe__yield .lpl-pastille,
+.lpl-recipe__chest .lpl-pastille {
+  min-height: 1.375rem;
+  padding: 0.0625rem 0.3125rem;
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-recipe__chest {
+  position: absolute;
+  bottom: -0.25rem;
+  left: -0.875rem;
+}
+
+.lpl-recipe__inputs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 0.375rem;
+}
+
+.lpl-recipe__arrow {
+  display: grid;
+  align-content: start;
+}
+
+.lpl-recipe__button {
+  position: relative;
+  width: 100%;
+  min-height: 2.25rem;
+  overflow: hidden;
+  padding: 0.25rem 0.5rem;
+  font-size: var(--lpl-text-sm);
+}
+
+.lpl-recipe__progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--lpl-value);
+  background: rgb(63 100 83 / 0.25);
+}
+
+.lpl-recipe--locked {
+  align-content: center;
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-recipe--locked .lpl-recipe__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.lpl-recipe__locked-count {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-food {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-food__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-3);
+  padding-bottom: 0.5rem;
+}
+
+.lpl-tile--food {
+  width: 4.5rem;
+  height: 4.5rem;
+}
+
+.lpl-tile--food .lpl-tile__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.lpl-tile--food:focus-visible .lpl-tile__name {
+  opacity: 1;
+}
+
+/* Sans panneau de détail, la vignette de la rangée « Manger » garde son nom au focus. */
+
+.lpl-tile--food:focus-visible .lpl-tile__figure {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+/* Catalogue: six colonnes, 24 vignettes par page. */
+.lpl-vitrine--catalog .lpl-vitrine__grid {
+  --lpl-tile-cols: 6;
+}
+
+/* ------------------------------------------------------------------ */
+/* Basse-cour                                                          */
+/* ------------------------------------------------------------------ */
+
+/* Robes: couleurs du décor (`assets-src/modeles/palette.py`), pour le dessin provisoire de la poule. */
+[data-robe='hen_white'] {
+  --lpl-hen: #f2ede1;
+}
+
+[data-robe='hen_red'] {
+  --lpl-hen: #b5693c;
+}
+
+[data-robe='hen_black'] {
+  --lpl-hen: #3d3b3b;
+}
+
+[data-robe='hen_golden'],
+[data-robe='rooster_golden'] {
+  --lpl-hen: #d8ae72;
+}
+
+[data-robe='hen_ash'] {
+  --lpl-hen: #8f887c;
+}
+
+[data-robe='hen_cuckoo'] {
+  --lpl-hen: #a29c90;
+}
+
+.lpl-farm__naming {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-3);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-waiting);
+}
+
+.lpl-farm__naming-mark {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper-raised);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-xl);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-farm__naming p {
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-farm__names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-farm__status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-farm__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  min-height: 2.75rem;
+  padding: 0.25rem 0.625rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-farm__stat[data-state='missing'] {
+  border-style: dashed;
+  border-color: var(--lpl-color-error);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-farm__stat .lpl-gauge {
+  width: 7rem;
+}
+
+.lpl-farm__stat-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.lpl-farm__stat-count {
+  font-family: var(--lpl-font-display);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-farm__places {
+  display: inline-flex;
+  gap: 0.125rem;
+}
+
+.lpl-farm__place {
+  display: grid;
+  place-items: center;
+  width: 1.375rem;
+  height: 1.375rem;
+  border: var(--lpl-border) dashed var(--lpl-color-ink-disabled);
+  border-radius: var(--lpl-radius-round);
+  opacity: 0.6;
+}
+
+.lpl-farm__place .lpl-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.lpl-farm__place[data-used] {
+  border-style: solid;
+  border-color: var(--lpl-color-ink);
+  background: var(--lpl-color-paper);
+  opacity: 1;
+}
+
+.lpl-farm__place[data-used] .lpl-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-farm__check {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-success);
+  color: var(--lpl-color-on-primary);
+}
+
+.lpl-farm__check[data-on='false'] {
+  background: var(--lpl-color-error);
+}
+
+.lpl-farm__check .lpl-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* La trémie pas encore achetée: une icône discrète, avec le carnet du catalogue en petit. */
+.lpl-farm__hint {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  opacity: 0.55;
+}
+
+.lpl-farm__hint-badge {
+  position: absolute;
+  right: -0.25rem;
+  bottom: -0.25rem;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.lpl-farm__needs {
+  display: inline-flex;
+  gap: 0.25rem;
+}
+
+.lpl-vitrine--farm {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lpl-vitrine--farm .lpl-vitrine__grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-farm__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.lpl-farm__card-face {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  gap: 0.125rem var(--lpl-space-2);
+  min-height: 5.25rem;
+  padding: 0.375rem 0.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-farm__card-face:focus-visible,
+.lpl-farm__card-face:hover {
+  border-color: var(--lpl-color-ink);
+  background: #fff9e6;
+}
+
+.lpl-farm__card-face:focus-visible .lpl-farm__portrait-icon {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-farm__portrait {
+  position: relative;
+  display: grid;
+  grid-row: span 3;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-round);
+  background: #dfe9dc;
+}
+
+.lpl-farm__card[data-kind='chick'] .lpl-farm__portrait {
+  width: 2.75rem;
+  height: 2.75rem;
+  background: #f6e3a8;
+}
+
+.lpl-farm__card[data-kind='goat'] .lpl-farm__portrait {
+  background: #e9dcc3;
+}
+
+.lpl-farm__portrait-icon {
+  width: 72%;
+  height: 72%;
+}
+
+.lpl-farm__initial {
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-2xl);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1;
+}
+
+.lpl-farm__name {
+  overflow: hidden;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-md);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-farm__card-face .lpl-gauge {
+  width: 100%;
+}
+
+.lpl-farm__marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.lpl-farm__marks .lpl-pastille {
+  min-height: 1.5rem;
+  padding: 0.0625rem 0.25rem;
+}
+
+.lpl-farm__marks .lpl-pastille__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-farm__marks .lpl-pastille[data-crossed='true']::after {
+  left: 0.125rem;
+  width: 1.25rem;
+}
+
+.lpl-farm__brood {
+  min-height: 2rem;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--lpl-text-sm);
+}
+
+.lpl-farm__brood .lpl-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-farm__collection {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-3);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  border: var(--lpl-border) dotted var(--lpl-color-line);
+  border-radius: var(--lpl-radius-l);
+}
+
+.lpl-farm__robes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lpl-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-farm__robe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+  width: 4rem;
+}
+
+.lpl-farm__portrait--small {
+  width: 2.75rem;
+  height: 2.75rem;
+  grid-row: auto;
+}
+
+.lpl-farm__robe[data-have='false'] .lpl-farm__portrait {
+  border-style: dashed;
+  border-color: var(--lpl-color-ink-disabled);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-farm__robe[data-have='false'] .lpl-farm__portrait-icon {
+  opacity: 0.85;
+}
+
+.lpl-farm__unknown {
+  position: absolute;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-weight: var(--lpl-weight-display);
+  color: var(--lpl-color-ink-muted);
+}
+
+.lpl-farm__robe-name {
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-farm__robe[data-have='false'] .lpl-farm__robe-name {
+  color: var(--lpl-color-ink-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Carnet: les poissons                                                */
+/* ------------------------------------------------------------------ */
+
+.lpl-vitrine--fish .lpl-vitrine__grid {
+  --lpl-tile-cols: 7;
+  --lpl-tile-size: 4.5rem;
+  row-gap: 0.75rem;
+}
+
+/*
+  Liseré de rareté: une couleur par rareté, et une épaisseur, un double trait et des écailles
+  (◆ à ◆◆◆◆◆) pour ne pas dépendre de la seule couleur.
+*/
+.lpl-rarity--common {
+  --lpl-rarity: #6b5d4f;
+}
+
+.lpl-rarity--rare {
+  --lpl-rarity: #2f6b9a;
+}
+
+.lpl-rarity--epic {
+  --lpl-rarity: #7a4a9a;
+}
+
+.lpl-rarity--legendary {
+  --lpl-rarity: #a8741c;
+}
+
+.lpl-rarity--mythic {
+  --lpl-rarity: #2f3f5c;
+}
+
+.lpl-tile--fish {
+  border-color: var(--lpl-rarity, var(--lpl-color-line));
+}
+
+.lpl-tile--fish.lpl-rarity--rare,
+.lpl-tile--fish.lpl-rarity--epic {
+  border-width: var(--lpl-border-thick);
+}
+
+.lpl-tile--fish.lpl-rarity--legendary,
+.lpl-tile--fish.lpl-rarity--mythic {
+  border-width: 0.25rem;
+  border-style: double;
+}
+
+.lpl-tile--fish[data-selected] {
+  outline: var(--lpl-border) solid var(--lpl-color-ink);
+  outline-offset: 0.0625rem;
+}
+
+.lpl-tile--fish:focus-visible {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: var(--lpl-focus-width);
+}
+
+.lpl-tile--fish .lpl-tile__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+.lpl-tile--fish[data-state='locked'] {
+  border-style: dashed;
+}
+
+.lpl-tile--fish[data-state='locked'] .lpl-tile__figure {
+  opacity: 1;
+}
+
+.lpl-fish__scales {
+  display: inline-block;
+  padding: 0 0.25rem;
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper);
+  color: var(--lpl-rarity, var(--lpl-color-ink));
+  font-size: 0.5625rem;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.lpl-tile--fish .lpl-tile__below {
+  bottom: -0.4375rem;
+}
+
+.lpl-fish-silhouette {
+  width: 2.75rem;
+  height: 2.75rem;
+  fill: #9a9184;
+}
+
+.lpl-fish-silhouette__eye {
+  fill: var(--lpl-color-paper-sunken);
+}
+
+.lpl-fish-silhouette__mark {
+  fill: var(--lpl-color-paper-raised);
+  font-family: var(--lpl-font-display);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.lpl-detail__figure--fish {
+  border-width: var(--lpl-border-thick);
+  border-color: var(--lpl-rarity, var(--lpl-color-hairline));
+}
+
+.lpl-detail__figure--fish .lpl-fish-silhouette {
+  width: 4rem;
+  height: 4rem;
+}
+
+.lpl-fish__rarity {
+  margin-top: -0.25rem;
+  color: var(--lpl-rarity, var(--lpl-color-ink));
+  font-size: var(--lpl-text-sm);
+  letter-spacing: 0.1em;
+}
+
+.lpl-fish__rarity[data-rarity='common'] {
+  --lpl-rarity: #6b5d4f;
+}
+
+.lpl-fish__rarity[data-rarity='rare'] {
+  --lpl-rarity: #2f6b9a;
+}
+
+.lpl-fish__rarity[data-rarity='epic'] {
+  --lpl-rarity: #7a4a9a;
+}
+
+.lpl-fish__rarity[data-rarity='legendary'] {
+  --lpl-rarity: #a8741c;
+}
+
+.lpl-fish__rarity[data-rarity='mythic'] {
+  --lpl-rarity: #2f3f5c;
+}
+
+.lpl-river-map {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  width: 100%;
+}
+
+.lpl-river-map__pin {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-river-map__svg {
+  flex: 1;
+  height: 3rem;
+  border: var(--lpl-border) solid var(--lpl-color-hairline);
+  border-radius: var(--lpl-radius-m);
+  background: #dfe6c9;
+}
+
+.lpl-river-map__zone {
+  fill: #c9d6dc;
+  stroke: var(--lpl-color-paper-raised);
+  stroke-width: 0.4;
+}
+
+.lpl-river-map__zone[data-on='true'] {
+  fill: #2f6b9a;
+}
+
+/* ------------------------------------------------------------------ */
+/* Le fauteuil de Solange (0.12.2): aperçu 3D à gauche, choix en vignettes à droite */
+/* ------------------------------------------------------------------ */
+
+.lpl-salon {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  align-items: start;
+  gap: var(--lpl-space-4);
+}
+
+.lpl-salon__left {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-salon__stage {
+  position: relative;
+}
+
+.lpl-salon__viewport {
+  display: grid;
+  place-items: center;
+  height: min(16.25rem, 34vh);
+  overflow: hidden;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+  cursor: grab;
+  touch-action: none;
+}
+
+.lpl-salon__viewport > .lpl-figure,
+.lpl-salon__viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Mode secours: un petit portrait, jamais en plein panneau. */
+.lpl-salon__viewport:not([data-3d]) {
+  height: auto;
+  padding: var(--lpl-space-3) 0;
+  cursor: default;
+}
+
+.lpl-salon__viewport:not([data-3d]) .lpl-portrait {
+  width: 6.5rem;
+  height: 6.5rem;
+}
+
+.lpl-salon__turns {
+  position: absolute;
+  right: 0.375rem;
+  bottom: 0.375rem;
+  left: 0.375rem;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.lpl-salon__turns .lpl-button {
+  min-height: 2rem;
+  padding: 0.125rem 0.375rem;
+  pointer-events: auto;
+}
+
+.lpl-salon__viewport:not([data-3d]) + .lpl-salon__turns {
+  display: none;
+}
+
+.lpl-salon__who {
+  text-align: center;
+}
+
+.lpl-salon__left .lpl-detail__pastilles {
+  justify-content: center;
+}
+
+.lpl-salon__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-salon__choices {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-salon__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.lpl-salon__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  margin-bottom: 0.25rem;
+  padding: 0;
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-md);
+  font-variation-settings: var(--lpl-display-soft);
+  font-weight: var(--lpl-weight-display);
+}
+
+.lpl-salon__chosen {
+  color: var(--lpl-color-ink-muted);
+  font-family: var(--lpl-font-text);
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-salon__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.lpl-salon__option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-raised);
+  cursor: pointer;
+}
+
+.lpl-salon__options--hairColor .lpl-salon__option {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--lpl-radius-round);
+}
+
+.lpl-salon__option:hover {
+  background: var(--lpl-color-paper);
+}
+
+.lpl-salon__option:hover .lpl-tile__name {
+  opacity: 1;
+}
+
+.lpl-salon__option:has(.lpl-salon__radio:checked) {
+  border-width: var(--lpl-border-thick);
+  border-color: var(--lpl-color-ink);
+  background: #fff9e6;
+}
+
+.lpl-salon__option:has(.lpl-salon__radio:checked) > .lpl-portrait,
+.lpl-salon__option:has(.lpl-salon__radio:checked) > .lpl-salon__swatch {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-salon__option:has(.lpl-salon__radio:focus-visible) {
+  outline: var(--lpl-focus-width) solid var(--lpl-color-focus);
+  outline-offset: var(--lpl-focus-width);
+  box-shadow: 0 0 0 var(--lpl-focus-width) var(--lpl-color-focus-halo);
+}
+
+.lpl-salon__option:has(.lpl-salon__radio:focus-visible) .lpl-tile__name {
+  opacity: 1;
+}
+
+/* Coche de la vignette choisie: la forme dit le choix, pas seulement la bordure. */
+.lpl-salon__option:has(.lpl-salon__radio:checked)::after {
+  position: absolute;
+  top: -0.4375rem;
+  right: -0.4375rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: var(--lpl-border) solid var(--lpl-color-paper-raised);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-success);
+  content: '';
+}
+
+.lpl-salon__radio {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lpl-salon__option .lpl-portrait {
+  width: 2.875rem;
+  height: 2.875rem;
+}
+
+.lpl-salon__swatch {
+  width: 1.875rem;
+  height: 1.875rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-swatch);
+}
+
+.lpl-salon__new {
+  position: absolute;
+  top: 0.0625rem;
+  left: 0.0625rem;
+  display: grid;
+  place-items: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-brass);
+}
+
+.lpl-salon__new .lpl-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.lpl-salon__proposal {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2);
+  width: auto;
+  transform: none;
+}

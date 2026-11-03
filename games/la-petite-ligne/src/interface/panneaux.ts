@@ -1,25 +1,27 @@
 /**
  * Panneaux d'échange: caisse de la coopérative et commande du samedi,
- * catalogue, comptoir d'Odette, établi de Basile, réchaud, coffre de la
- * maison (maquettes `caisse.html`, `catalogue.html`; les trois derniers
- * reprennent les mêmes composants, README des maquettes, section 5).
+ * comptoir d'Odette et mercerie de Solange, établi de Basile, réchaud, coffre de la
+ * maison. Patch 0.12.2: comptoir, établi et réchaud en vignettes (`vitrine.ts`,
+ * `docs/jeux/jeu-1/interface-imagee-0-12-2.md`).
  */
 import { currentOrder } from '../donnees/commandes';
+import { CURRENCY } from '../donnees/monnaie';
 import { letterText } from '../etat/courrier';
 import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, el, icon, setText } from './dom';
+import { button, chip, el, focusElement, icon, setText, token } from './dom';
 import { defaultCrateLine, defaultProduct } from './focus';
 import { countIn, hourLabel, itemName, lowerFirst } from './format';
 import { linesText, orderFullAmount, orderLines } from './modele';
 import {
+  type BuyEntry,
+  type FoodEntry,
+  type SellEntry,
   foodEntries,
   grocerBudget,
-  missingText,
   partnerAtHome,
-  recipeEntries,
   counterShop,
   haberdasheryIsOpen,
   shopBuyEntries,
@@ -27,12 +29,14 @@ import {
   shopSellEntries,
   stackEntries,
 } from './modele-panneaux';
+import { type RecipeCardModel, ingredientLabel, itemFacts, recipeCards } from './modele-vitrine';
 import { type BasileModel, basileModel } from './modele-tableau';
 import { basileRoomsModel } from './modele-maison';
 import { basileRoomsSection } from './maison';
-import { Panel, backKeys, price } from './panneau';
+import { Panel, backKeys } from './panneau';
 import { builtList, chantierCard } from './tableau';
 import { SOUND_ATTR } from './sons';
+import { type VitrineItem, Vitrine, detailActions, detailHead, flyCoin, need, pastille, pastilles } from './vitrine';
 
 // ---------------------------------------------------------------------------
 // Caisse de la coopérative
@@ -180,7 +184,12 @@ export class CratePanel extends Panel {
 }
 
 // ---------------------------------------------------------------------------
-// Comptoir d'Odette
+// Comptoir d'Odette et mercerie de Solange (0.12.2: grille de vignettes, détail de la sélection)
+
+/** Les touches A et E: page précédente ou suivante (`KeyQ` est le A d'un clavier AZERTY). */
+function pageDelta(code: string): number {
+  return code === 'KeyQ' ? -1 : code === 'KeyE' ? 1 : 0;
+}
 
 export class ShopPanel extends Panel {
   private tab: 'buy' | 'sell';
@@ -188,6 +197,7 @@ export class ShopPanel extends Panel {
   private shop: 'grocery' | 'haberdashery' = 'grocery';
   private readonly tabs: HTMLDivElement;
   private readonly tabButtons: Record<'buy' | 'sell', HTMLButtonElement>;
+  private readonly vitrines: Record<'buy' | 'sell', Vitrine>;
 
   constructor(host: UiHost, tab: PanelTab | undefined) {
     const { ctx } = host;
@@ -196,11 +206,16 @@ export class ShopPanel extends Panel {
       icon: 'ui-coin',
       title: ctx.t(s.title),
       narrow: true,
-      width: '46rem',
+      width: UI_SETTINGS.vitrine.shopWidth,
       closeKeyLabel: ctx.key('Backspace'),
       closeAria: `${ctx.texts.extra.common.close} (${ctx.key('Backspace')})`,
     });
     this.tab = tab === 'sell' ? 'sell' : 'buy';
+    const v = ctx.texts.extra.vitrine;
+    this.vitrines = {
+      buy: new Vitrine(host, { perPage: UI_SETTINGS.vitrine.shopPerPage, label: ctx.t(v.goods) }),
+      sell: new Vitrine(host, { perPage: UI_SETTINGS.vitrine.shopPerPage, label: ctx.t(v.goods) }),
+    };
     const make = (id: 'buy' | 'sell', label: string, iconId: string): HTMLButtonElement =>
       button([icon(iconId), label], () => {
         this.select(id);
@@ -213,15 +228,19 @@ export class ShopPanel extends Panel {
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyE') }),
     ]);
     this.header.insertBefore(this.tabs, this.closeButton);
-    const a = ctx.texts.extra.keys.arrows;
-    this.setFooter([
-      backKeys(host, [
-        { keys: [ctx.key('KeyQ'), ctx.key('KeyE')], text: ctx.texts.extra.notebook.keysPages },
-        { keys: [a[0], a[1]], text: ctx.texts.extra.notebook.keysChoose },
-        { keys: [ctx.key('Enter')], text: ctx.texts.extra.notebook.keysActivate },
-      ]),
-    ]);
+    this.root.classList.add('lpl-panel--vitrine');
     this.markTabs();
+  }
+
+  /** Pied: A et E à l'épicerie (pages et onglets), Entrée « acheter » ou « vendre » selon l'onglet. */
+  private footerFor(): void {
+    const { ctx } = this.host;
+    const a = ctx.texts.extra.keys.arrows;
+    const groups: { keys: readonly string[]; text: string }[] = [];
+    if (this.shop === 'grocery') groups.push({ keys: [ctx.key('KeyQ'), ctx.key('KeyE')], text: ctx.texts.extra.notebook.keysPages });
+    groups.push({ keys: [...a], text: ctx.texts.extra.notebook.keysChoose });
+    groups.push({ keys: [ctx.key('Enter')], text: this.tab === 'sell' ? ctx.texts.extra.vitrine.keysSell : ctx.texts.extra.shop.keysBuy });
+    this.setFooter([backKeys(this.host, groups)]);
   }
 
   /**
@@ -244,6 +263,7 @@ export class ShopPanel extends Panel {
       b.setAttribute('aria-selected', String(id === this.tab));
       b.tabIndex = id === this.tab ? 0 : -1;
     }
+    this.footerFor();
   }
 
   private select(tab: 'buy' | 'sell'): void {
@@ -252,14 +272,23 @@ export class ShopPanel extends Panel {
     this.tab = tab;
     this.markTabs();
     this.host.invalidate();
+    window.requestAnimationFrame(() => {
+      focusElement(this.defaultFocus());
+    });
   }
 
+  /** A et E: les pages de l'onglet, puis l'onglet voisin (le pied dit « pages » pour les deux). */
   override key(code: string): boolean {
-    if ((code === 'KeyQ' || code === 'KeyE') && this.shop === 'grocery') {
-      this.select(this.tab === 'buy' ? 'sell' : 'buy');
-      return true;
+    const delta = pageDelta(code);
+    if (delta === 0) return false;
+    const vitrine = this.vitrines[this.tab];
+    if (vitrine.turn(delta)) return true;
+    if (this.shop === 'grocery') {
+      const next = this.tab === 'buy' ? 'sell' : 'buy';
+      this.vitrines[next].page = delta > 0 ? 0 : Number.MAX_SAFE_INTEGER;
+      this.select(next);
     }
-    return false;
+    return true;
   }
 
   update(world: ReadonlyWorld): void {
@@ -270,107 +299,175 @@ export class ShopPanel extends Panel {
     const partnerName = nameOf(world, ctx.partner);
     if (this.tab === 'buy') {
       const entries = shopBuyEntries(world, ctx, this.shop);
-      const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName]);
+      const me = characterOf(world, ctx.me);
+      const owned = Object.fromEntries(entries.map((e) => [e.item, me === null ? 0 : countIn(me.bag, e.item)]));
+      const vitrine = this.vitrines.buy;
+      const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName, owned, vitrine.page]);
       this.renderBody(sig, () => {
-        const focusIndex = defaultProduct(entries);
-        const list = el('ul', { class: 'lpl-order', 'data-nav': 'list' });
-        entries.forEach((e, i) => {
-          const actions: HTMLElement[] = [];
-          if (e.waiting) {
-            actions.push(chip(ctx.t(ctx.texts.extra.catalogue.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass'));
-          } else if (e.missing > 0) {
-            actions.push(button(ctx.t(ctx.texts.extra.common.missingMoney, { missing: e.missing }), () => undefined, {
-              class: 'lpl-button lpl-button--wide',
-              attrs: { 'aria-disabled': 'true', 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'data-autofocus': i === focusIndex },
-            }));
-          } else if (e.big) {
-            actions.push(button(ctx.t(k.propose, { partner: partnerName }), () => {
-              this.host.send({ type: 'buy', item: e.item, count: 1 });
-            }, { class: 'lpl-button lpl-button--primary lpl-button--wide', attrs: { 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'data-autofocus': i === focusIndex } }));
-          } else {
-            actions.push(button(ctx.t(k.buyCount, { count: 1 }), () => {
-              this.host.send({ type: 'buy', item: e.item, count: 1 });
-            }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'data-autofocus': i === focusIndex } }));
-            const bulk = UI_SETTINGS.shopBulk;
-            if (e.price * bulk <= world.purse && (ctx.content.items[e.item]?.stack ?? 1) >= bulk) {
-              actions.push(button(ctx.t(k.buyCount, { count: bulk }), () => {
-                this.host.send({ type: 'buy', item: e.item, count: bulk });
-              }, { attrs: { 'data-nav-item': true, 'data-key': `bulk:${e.item}` } }));
-            }
-          }
-          list.append(
-            el('li', { class: 'lpl-order__line lpl-shop__line' }, [
-              icon(e.icon, 'lpl-order__icon'),
-              el('span', { class: 'lpl-order__name' }, [e.name, e.info === '' ? null : el('small', { text: e.info })]),
-              el('span', { class: 'lpl-order__count' }, [price(this.host, e.price)]),
-              el('span', { class: 'lpl-order__action lpl-shop__actions' }, actions),
-            ]),
-          );
-        });
+        const focus = entries[defaultProduct(entries)]?.item ?? null;
+        const items = entries.map((e) => this.buyItem(e, world.purse, partnerName, owned[e.item] ?? 0));
         const closed = this.shop === 'haberdashery' ? k.haberdasheryClosed : k.closedNotice;
-        const notice = open ? null : el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(closed) })]);
-        const big = el('p', { class: 'lpl-field__help', text: ctx.t(ctx.texts.extra.catalogue.bigPurchase, { amount: ctx.content.settings.economy.bigPurchaseThreshold }) });
-        return [notice, list, big];
+        const notice = open ? null : el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(closed)]);
+        return [notice, vitrine.build(items, focus === null ? null : `item:${focus}`)];
       });
       return;
     }
     const entries = shopSellEntries(world, ctx);
     const budget = grocerBudget(world, ctx);
-    const sig = JSON.stringify(['sell', entries, budget, open]);
+    const vitrine = this.vitrines.sell;
+    const sig = JSON.stringify(['sell', entries, budget, open, vitrine.page]);
     this.renderBody(sig, () => {
+      const v = ctx.texts.extra.vitrine;
       const rate = Math.round(ctx.content.settings.economy.grocer.buyRate * 100);
-      let summary: HTMLElement;
-      if (!budget.buys) {
-        summary = el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(ctx.texts.messages.grocer_not_buying ?? '') })]);
-      } else {
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', { text: budget.room > 0 ? ctx.t(k.room, { amount: budget.room }) : ctx.t(k.roomNone) }),
-          el('span', { text: ctx.t(k.rate, { percent: rate }) }),
-          budget.ardoise === null ? null : el('span', { class: 'lpl-shop__ardoise', text: ctx.t(k.ardoiseBoard, { item: budget.ardoise }) }),
-        ]);
-      }
-      if (entries.length === 0) return [summary, el('div', { class: 'lpl-empty', text: ctx.t(k.nothingToSell) })];
-      const list = el('ul', { class: 'lpl-order', 'data-nav': 'list' });
-      entries.forEach((e, i) => {
-        const canSell = budget.buys && budget.room >= e.unit && open;
-        const sellOne = button(ctx.t(k.sellOne), () => {
-          this.host.send({ type: 'sell', item: e.item, quality: e.quality, count: 1 });
-        }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `sell:${e.item}:${e.quality}`, 'aria-disabled': canSell ? null : 'true', 'data-autofocus': i === 0 } });
-        const sellAll =
-          e.count > 1
-            ? button(ctx.t(k.sellAll, { amount: e.total }), () => {
-                this.host.send({ type: 'sell', item: e.item, quality: e.quality, count: e.count });
-              }, { attrs: { 'data-nav-item': true, 'data-key': `sellall:${e.item}:${e.quality}`, 'aria-disabled': canSell ? null : 'true' } })
-            : null;
-        list.append(
-          el('li', { class: 'lpl-order__line lpl-shop__line' }, [
-            icon(e.icon, 'lpl-order__icon'),
-            el('span', { class: 'lpl-order__name' }, [
-              e.name,
-              e.quality === 'fine' ? el('span', { class: 'lpl-shop__fine' }, [icon('ui-star'), ctx.texts.extra.common.fine]) : null,
-              el('small', { text: ctx.t(ctx.texts.extra.common.inBag, { count: e.count }) }),
-            ]),
-            el('span', { class: 'lpl-order__count' }, [
-              el('small', { text: ctx.t(k.unitPrice, { price: e.unit }) }),
-              e.word === null ? null : el('small', { class: `lpl-shop__word lpl-shop__word--${e.word}`, text: ctx.t(k[GROCER_WORD_KEYS[e.word]]) }),
-            ]),
-            el('span', { class: 'lpl-order__action lpl-shop__actions' }, [sellOne, sellAll]),
+      const strip: (HTMLElement | null)[] = [];
+      if (!budget.buys) strip.push(el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(ctx.texts.messages.grocer_not_buying ?? '')]));
+      else {
+        strip.push(
+          el('div', { class: 'lpl-vitrine__strip' }, [
+            pastille({ icon: CURRENCY.icon, text: String(budget.room), tone: budget.room > 0 ? 'price' : 'missing', crossed: budget.room === 0, label: budget.room > 0 ? ctx.t(v.room, { amount: budget.room }) : ctx.t(k.roomNone) }),
+            pastille({ icon: 'ui-coin', text: `${String(rate)} %`, tone: 'info', label: ctx.t(k.rate, { percent: rate }) }),
+            budget.ardoise === null ? null : pastille({ icon: 'ui-notice', text: '×1,5', tone: 'ok', label: ctx.t(k.ardoiseBoard, { item: budget.ardoise }) }),
           ]),
         );
-      });
-      return [summary, list];
+      }
+      if (!open) strip.push(el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(k.closedNotice)]));
+      if (entries.length === 0) return [...strip, el('div', { class: 'lpl-empty', text: ctx.t(k.nothingToSell) })];
+      const canSell = (e: SellEntry): boolean => budget.buys && budget.room >= e.unit && open;
+      const items = entries.map((e) => this.sellItem(e, canSell(e)));
+      return [...strip, vitrine.build(items, entries[0] === undefined ? null : `item:${entries[0].item}:${entries[0].quality}`)];
     });
+  }
+
+  private buyItem(e: BuyEntry, purse: number, partnerName: string, owned: number): VitrineItem {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const k = ctx.texts.extra.shop;
+    const bulk = UI_SETTINGS.shopBulk;
+    const canBulk = (ctx.content.items[e.item]?.stack ?? 1) >= bulk && !e.big;
+    // Un gros achat part en proposition à l'autre: pas encore de pièce qui vole.
+    const buy = (count: number, from: Element | null): boolean => {
+      if (e.waiting || e.price * count > purse) return false;
+      this.host.send({ type: 'buy', item: e.item, count });
+      if (from !== null) flyCoin(from, 'buy');
+      return true;
+    };
+    const label = e.waiting
+      ? ctx.t(v.waitingLabel, { name: e.name, partner: partnerName })
+      : e.missing > 0
+        ? ctx.t(v.missingLabel, { name: e.name, price: e.price, missing: e.missing })
+        : e.big
+          ? ctx.t(v.bigLabel, { name: e.name, price: e.price, partner: partnerName })
+          : ctx.t(v.priceLabel, { name: e.name, price: e.price });
+    const isSeed = ctx.content.items[e.item]?.plants !== null;
+    return {
+      key: `item:${e.item}`,
+      tile: {
+        icon: e.icon,
+        name: e.name,
+        label,
+        badge: { icon: null, text: String(e.price), tone: e.missing > 0 ? 'missing' : 'price' },
+        corner: e.waiting ? 'ui-hourglass' : e.big ? token('other', this.host.symbol('other'), 'small') : null,
+        state: e.waiting ? 'wait' : e.missing > 0 ? 'missing' : null,
+      },
+      detail: () => {
+        const actions: (HTMLElement | null)[] = [];
+        if (e.waiting) actions.push(chip(ctx.t(ctx.texts.extra.catalogue.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass'));
+        else if (e.big) {
+          actions.push(
+            button([token('other', this.host.symbol('other'), 'small'), ctx.t(k.propose, { partner: partnerName })], () => {
+              buy(1, null);
+            }, { class: 'lpl-button lpl-button--primary lpl-button--wide', attrs: { 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'aria-disabled': e.missing > 0 ? 'true' : null } }),
+          );
+        } else {
+          const one = button(ctx.t(k.buyCount, { count: 1 }), () => {
+            buy(1, one);
+          }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'aria-disabled': e.missing > 0 ? 'true' : null } });
+          actions.push(one);
+          if (canBulk) {
+            const four = button(ctx.t(k.buyCount, { count: bulk }), () => {
+              buy(bulk, four);
+            }, { attrs: { 'data-nav-item': true, 'data-key': `bulk:${e.item}`, 'aria-disabled': e.price * bulk > purse ? 'true' : null } });
+            actions.push(four);
+          }
+        }
+        return [
+          ...detailHead(e.icon, e.name, isSeed ? null : e.info),
+          pastilles([
+            e.missing > 0
+              ? { icon: CURRENCY.icon, text: `${String(purse)}/${String(e.price)}`, tone: 'missing', crossed: true, label: ctx.t(ctx.texts.extra.common.missingMoney, { missing: e.missing }) }
+              : { icon: CURRENCY.icon, text: String(e.price), tone: 'price', label: ctx.t(ctx.texts.game.ui.shop.price, { price: e.price }) },
+            ...itemFacts(ctx, e.item),
+            owned > 0 ? { icon: 'grain-sack', text: `×${String(owned)}`, tone: 'count', label: ctx.t(ctx.texts.extra.common.inBag, { count: owned }) } : null,
+          ]),
+          detailActions(actions),
+        ];
+      },
+      act: (tile) => buy(1, e.big ? null : tile),
+    };
+  }
+
+  private sellItem(e: SellEntry, canSell: boolean): VitrineItem {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const k = ctx.texts.extra.shop;
+    const sell = (count: number, from: Element): boolean => {
+      if (!canSell) return false;
+      this.host.send({ type: 'sell', item: e.item, quality: e.quality, count });
+      flyCoin(from, 'sell');
+      return true;
+    };
+    const fine = e.quality === 'fine';
+    const name = fine ? `${e.name} (${ctx.texts.extra.common.fine})` : e.name;
+    const word = e.word === null ? null : ctx.t(k[GROCER_WORD_KEYS[e.word]]);
+    return {
+      key: `item:${e.item}:${e.quality}`,
+      tile: {
+        icon: e.icon,
+        name,
+        label: ctx.t(v.sellLabel, { name, count: e.count, price: e.unit }),
+        badge: { icon: null, text: `×${String(e.count)}`, tone: 'count' },
+        corner: fine ? 'ui-star' : e.word === 'ardoise' || e.word === 'wanted' ? 'ui-notice' : null,
+        state: canSell ? null : 'missing',
+      },
+      detail: () => {
+        const one = button(ctx.t(k.sellOne), () => {
+          sell(1, one);
+        }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `sell:${e.item}:${e.quality}`, 'aria-disabled': canSell ? null : 'true' } });
+        const all =
+          e.count > 1
+            ? button([icon(CURRENCY.icon), ctx.t(k.sellAll, { amount: e.total })], () => {
+                sell(e.count, all ?? one);
+              }, { attrs: { 'data-nav-item': true, 'data-key': `sellall:${e.item}:${e.quality}`, 'aria-disabled': canSell ? null : 'true' } })
+            : null;
+        return [
+          ...detailHead(e.icon, name, word),
+          pastilles([
+            { icon: CURRENCY.icon, text: String(e.unit), tone: 'price', label: ctx.t(k.unitPrice, { price: e.unit }) },
+            { icon: 'grain-sack', text: `×${String(e.count)}`, tone: 'count', label: ctx.t(ctx.texts.extra.common.inBag, { count: e.count }) },
+            fine ? { icon: 'ui-star', text: '', tone: 'ok', label: ctx.texts.extra.common.fineQuality } : null,
+          ]),
+          detailActions([one, all]),
+        ];
+      },
+      act: (tile) => sell(1, tile),
+    };
   }
 }
 
 // ---------------------------------------------------------------------------
-// Établi et réchaud
+// Établi et réchaud (0.12.2: une carte par recette, ingrédients en icônes « possédés / requis »)
 
 /** Clé de `textes-interface.json` (`shop`) de chaque mot du panneau de vente. */
 const GROCER_WORD_KEYS = { ardoise: 'ardoiseLine', plenty: 'plenty', wanted: 'wanted' } as const;
 
 export class StationPanel extends Panel {
   private readonly station: 'workbench' | 'stove';
+  /** Établi: « Fabriquer », puis les commandes de Basile (chantiers, abris, pièces) dès qu'il y en a. */
+  private tab: 'craft' | 'basile' = 'craft';
+  private readonly tabs: HTMLDivElement;
+  private readonly tabButtons: Record<'craft' | 'basile', HTMLButtonElement>;
+  private withBasile: boolean | null = null;
+  private readonly recipesPage: Vitrine;
 
   constructor(host: UiHost, station: 'workbench' | 'stove') {
     const { ctx } = host;
@@ -378,27 +475,80 @@ export class StationPanel extends Panel {
     super(host, {
       icon: station === 'workbench' ? 'plank' : 'stove',
       title: ctx.t(title),
-      subtitle: station === 'workbench' ? ctx.t(ctx.texts.extra.workbench.fromCellar) : '',
       narrow: true,
-      width: '46rem',
+      width: UI_SETTINGS.vitrine.stationWidth,
       closeKeyLabel: ctx.key('Backspace'),
       closeAria: `${ctx.texts.extra.common.close} (${ctx.key('Backspace')})`,
     });
     this.station = station;
-    if (station === 'stove') this.setSubtitle('');
-    const a = ctx.texts.extra.keys.arrows;
-    this.setFooter([
-      backKeys(host, [
-        { keys: [a[0], a[1]], text: ctx.texts.extra.notebook.keysChoose },
-        { keys: [ctx.key('Enter')], text: station === 'workbench' ? ctx.texts.extra.workbench.keysCraft : lowerFirst(ctx.texts.game.ui.stove.cook) },
-      ]),
+    const v = ctx.texts.extra.vitrine;
+    // Les cartes de recettes portent leur bouton: la vitrine ne sert ici qu'aux pages.
+    this.recipesPage = new Vitrine(host, { perPage: UI_SETTINGS.vitrine.recipesPerPage, label: ctx.t(v.recipes), noDetail: true });
+    const make = (id: 'craft' | 'basile', label: string, iconId: string): HTMLButtonElement =>
+      button([icon(iconId), label], () => {
+        this.selectTab(id);
+      }, { class: 'lpl-tab', attrs: { role: 'tab', 'aria-selected': 'false', tabindex: '-1', [SOUND_ATTR]: 'none' } });
+    this.tabButtons = { craft: make('craft', ctx.t(v.craftTab), 'ui-hammer'), basile: make('basile', ctx.t(v.basileTab), 'ui-house') };
+    this.tabs = el('div', { class: 'lpl-tabs', role: 'tablist', hidden: true }, [
+      el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyQ') }),
+      this.tabButtons.craft,
+      this.tabButtons.basile,
+      el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyE') }),
     ]);
+    this.header.insertBefore(this.tabs, this.closeButton);
+    this.root.classList.add('lpl-panel--vitrine');
+    this.markTabs();
+  }
+
+  private footerPages: boolean | null = null;
+
+  /** Pied: A et E seulement quand il y a des pages ou l'onglet de Basile. */
+  private footerFor(pages: boolean): void {
+    if (pages === this.footerPages) return;
+    this.footerPages = pages;
+    const { ctx } = this.host;
+    const a = ctx.texts.extra.keys.arrows;
+    const groups: { keys: readonly string[]; text: string }[] = [];
+    if (pages) groups.push({ keys: [ctx.key('KeyQ'), ctx.key('KeyE')], text: ctx.texts.extra.notebook.keysPages });
+    groups.push({ keys: [...a], text: ctx.texts.extra.notebook.keysChoose });
+    groups.push({ keys: [ctx.key('Enter')], text: this.station === 'workbench' ? ctx.texts.extra.workbench.keysCraft : lowerFirst(ctx.texts.game.ui.stove.cook) });
+    this.setFooter([backKeys(this.host, groups)]);
+  }
+
+  private markTabs(): void {
+    for (const id of ['craft', 'basile'] as const) {
+      const b = this.tabButtons[id];
+      b.setAttribute('aria-selected', String(id === this.tab));
+      b.tabIndex = id === this.tab ? 0 : -1;
+    }
+  }
+
+  private selectTab(tab: 'craft' | 'basile'): void {
+    if (tab === this.tab || this.withBasile !== true) return;
+    this.host.sound('ui-tab');
+    this.tab = tab;
+    this.markTabs();
+    this.host.invalidate();
+    window.requestAnimationFrame(() => {
+      focusElement(this.defaultFocus());
+    });
+  }
+
+  override key(code: string): boolean {
+    const delta = pageDelta(code);
+    if (delta === 0) return false;
+    if (this.tab === 'craft' && this.recipesPage.turn(delta)) return true;
+    if (this.withBasile === true) {
+      const next = this.tab === 'craft' ? 'basile' : 'craft';
+      if (next === 'craft') this.recipesPage.page = delta > 0 ? 0 : Number.MAX_SAFE_INTEGER;
+      this.selectTab(next);
+    }
+    return true;
   }
 
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
-    const w = ctx.texts.extra.workbench;
-    const { entries, locked } = recipeEntries(world, ctx, this.station);
+    const { cards, locked } = recipeCards(world, ctx, this.station);
     const food = this.station === 'stove' ? foodEntries(world, ctx) : [];
     const together = partnerAtHome(world, ctx);
     // Tour 9: la commande des chantiers de la maisonnette, à l'établi de Basile (dès la lettre `basile_works`).
@@ -407,76 +557,133 @@ export class StationPanel extends Panel {
     const animals = this.station === 'workbench' ? basileModel(world, ctx, 'elevage') : null;
     // Tour 10: « Agrandir la maisonnette » (cellier, chambre) et le grand coffre de chêne.
     const rooms = this.station === 'workbench' ? basileRoomsModel(world, ctx) : null;
+    const withBasile = basile !== null || animals !== null || rooms !== null;
+    if (withBasile !== this.withBasile) {
+      this.withBasile = withBasile;
+      this.tabs.toggleAttribute('hidden', !withBasile);
+      if (!withBasile) this.tab = 'craft';
+      this.markTabs();
+    }
+    this.footerFor(withBasile || this.recipesPage.pagesFor(cards.length + (locked > 0 && this.station === 'workbench' ? 1 : 0)) > 1);
     const partnerName = nameOf(world, ctx.partner);
-    const sig = JSON.stringify([entries, locked, food, together, basile, animals, rooms, partnerName, world.purse]);
-    this.renderBody(sig, () => {
-      const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
-      const focusIndex = defaultProduct(entries);
-      const list = el('ul', { class: 'lpl-order', 'data-nav': 'list' });
-      entries.forEach((r, i) => {
-        let action: HTMLElement;
-        if (r.progress !== null) {
-          action = el('span', { class: 'lpl-order__progress' }, [
-            el('span', { class: 'lpl-order__count' }, [el('small', { text: ctx.t(w.inProgress) })]),
-            el('span', { class: 'lpl-order__bar' }, [el('span', { style: `--lpl-value: ${Math.round(r.progress * 100)}%` })]),
-          ]);
-        } else if (r.missing.length > 0) {
-          action = button(ctx.t(ctx.texts.game.ui.workbench.missing, { missing: missingText(ctx, r.missing) }), () => undefined, {
-            class: 'lpl-button lpl-button--wide',
-            attrs: { 'aria-disabled': 'true', 'data-nav-item': true, 'data-key': `craft:${r.id}`, 'data-autofocus': i === focusIndex },
-          });
-        } else {
-          action = button(ctx.t(craftLabel), () => {
-            this.host.send({ type: 'craft', recipe: r.id });
-          }, {
-            class: 'lpl-button lpl-button--primary lpl-button--wide',
-            attrs: { 'aria-disabled': r.available ? null : 'true', 'data-nav-item': true, 'data-key': `craft:${r.id}`, 'data-autofocus': i === focusIndex },
-          });
-        }
-        list.append(
-          el('li', { class: 'lpl-order__line lpl-shop__line' }, [
-            icon(r.icon, 'lpl-order__icon'),
-            el('span', { class: 'lpl-order__name' }, [
-              r.name,
-              el('small', { text: r.makes }),
-              r.fromChest === null ? null : el('small', { class: 'lpl-order__chest', text: r.fromChest }),
-            ]),
-            el('span'),
-            el('span', { class: 'lpl-order__action' }, [action]),
-          ]),
-        );
+    if (this.tab === 'basile') {
+      const sig = JSON.stringify(['basile', basile, animals, rooms, partnerName, world.purse]);
+      this.renderBody(sig, () => {
+        const nodes: HTMLElement[] = [];
+        if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
+        if (animals !== null) nodes.push(...basileSection(this.host, animals, partnerName, { title: ctx.texts.extra.farm.basileTitle, allBuilt: ctx.texts.extra.farm.basileAllBuilt }));
+        if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
+        // La première section n'a pas d'écart au-dessus d'elle.
+        nodes[0]?.classList.remove('lpl-section-gap');
+        return nodes;
       });
+      return;
+    }
+    const sig = JSON.stringify([cards, locked, food, together, this.recipesPage.page]);
+    this.renderBody(sig, () => {
       const nodes: (Node | null)[] = [];
-      if (this.station === 'stove') nodes.push(el('h3', { class: 'lpl-section-title', text: ctx.t(ctx.texts.extra.stove.cookSection) }));
-      nodes.push(entries.length === 0 ? el('div', { class: 'lpl-empty', text: ctx.t(w.noRecipes) }) : list);
-      if (locked > 0 && this.station === 'workbench') nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(w.lockedPlans) }));
-      if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
-      if (animals !== null) nodes.push(...basileSection(this.host, animals, partnerName, { title: ctx.texts.extra.farm.basileTitle, allBuilt: ctx.texts.extra.farm.basileAllBuilt }));
-      if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
-      if (this.station === 'stove') {
-        nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.stove.eatSection) }));
-        if (food.length === 0) nodes.push(el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.stove.nothingToEat) }));
-        else {
-          const eat = el('ul', { class: 'lpl-order', 'data-nav': 'list' });
-          for (const f of food) {
-            eat.append(
-              el('li', { class: 'lpl-order__line lpl-shop__line' }, [
-                icon(f.icon, 'lpl-order__icon'),
-                el('span', { class: 'lpl-order__name' }, [f.name, el('small', { text: ctx.t(ctx.texts.extra.common.inBag, { count: f.count }) })]),
-                el('span'),
-                el('span', { class: 'lpl-order__action' }, [
-                  button(ctx.t(together ? ctx.texts.game.ui.stove.eatTogether : ctx.texts.game.ui.stove.eat), () => {
-                    this.host.send({ type: 'eat', item: f.item });
-                  }, { class: 'lpl-button lpl-button--wide', attrs: { 'data-nav-item': true, 'data-key': `eat:${f.item}` } }),
-                ]),
-              ]),
-            );
-          }
-          nodes.push(eat);
+      if (cards.length === 0) nodes.push(el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.workbench.noRecipes) }));
+      else {
+        const focus = cards[defaultProduct(cards)]?.id ?? null;
+        const items: VitrineItem[] = cards.map((r) => ({ key: `recipe:${r.id}`, tile: { icon: r.icon, name: r.name, label: r.name }, detail: () => [] }));
+        // La vitrine choisit la page et la carte du focus; les cartes, plus riches que des vignettes, sont construites ici.
+        const page = this.recipesPage.build(items, focus === null ? null : `recipe:${focus}`);
+        const grid = page.querySelector('.lpl-vitrine__grid');
+        if (grid !== null) {
+          const shown = new Set([...grid.querySelectorAll<HTMLElement>('[data-key]')].map((t) => t.dataset.key));
+          const chosen = this.recipesPage.selection;
+          grid.replaceChildren(...cards.filter((r) => shown.has(`recipe:${r.id}`)).map((r) => this.recipeCard(r, `recipe:${r.id}` === chosen)));
+          if (locked > 0 && this.station === 'workbench') grid.append(this.lockedCard(locked));
         }
+        page.classList.add('lpl-vitrine--recipes');
+        nodes.push(page);
       }
+      if (this.station === 'stove') nodes.push(this.foodRow(food, together));
       return nodes;
     });
+  }
+
+  /** Une recette: le plat en grand, ses ingrédients « possédés / requis », un seul bouton. */
+  private recipeCard(r: RecipeCardModel, autofocus: boolean): HTMLElement {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
+    const busy = r.progress !== null;
+    const state = busy ? 'busy' : r.ready ? (r.available ? 'ready' : 'wait') : 'missing';
+    const label = busy ? ctx.t(v.recipeBusy, { name: r.name }) : r.ready ? ctx.t(v.recipeReady, { name: r.name }) : ctx.t(v.recipeMissing, { name: r.name, count: r.missingKinds });
+    const ingredients = el(
+      'span',
+      { class: 'lpl-recipe__inputs' },
+      r.inputs.map((i) => need({ icon: i.icon, have: i.have, need: i.need, label: ingredientLabel(ctx, i) })),
+    );
+    const action = button(
+      busy ? [el('span', { class: 'lpl-recipe__progress', style: `--lpl-value: ${String(Math.round((r.progress ?? 0) * 100))}%` }), ctx.t(ctx.texts.extra.workbench.inProgress)] : ctx.t(craftLabel),
+      () => {
+        if (r.available) this.host.send({ type: 'craft', recipe: r.id });
+      },
+      {
+        class: `lpl-button lpl-recipe__button${r.available ? ' lpl-button--primary' : ''}`,
+        attrs: { 'data-nav-item': true, 'data-key': `craft:${r.id}`, 'aria-disabled': r.available ? null : 'true', 'data-autofocus': autofocus, 'aria-label': `${ctx.t(craftLabel)} : ${label}` },
+      },
+    );
+    return el('div', { class: 'lpl-recipe', 'data-state': state }, [
+      el('span', { class: 'lpl-recipe__name', 'aria-hidden': 'true', text: r.name }),
+      el('span', { class: 'lpl-recipe__dish', 'aria-hidden': 'true' }, [
+        icon(r.icon, 'lpl-recipe__icon'),
+        el('span', { class: 'lpl-recipe__yield' }, [pastille({ icon: null, text: `×${String(r.output.count)}`, tone: 'count', label: '' })]),
+        r.fromChest === null ? null : el('span', { class: 'lpl-recipe__chest' }, [pastille({ icon: 'chest', tone: 'info', label: r.fromChest })]),
+      ]),
+      el('span', { class: 'lpl-recipe__arrow', 'aria-hidden': 'true' }, [ingredients]),
+      action,
+    ]);
+  }
+
+  /** Les plans encore à venir de Basile: une carte au cadenas, « +3 ». */
+  private lockedCard(count: number): HTMLElement {
+    const { ctx } = this.host;
+    return el('div', { class: 'lpl-recipe lpl-recipe--locked', 'data-state': 'locked', tabindex: '0', 'data-nav-item': true, 'data-key': 'recipe:locked', role: 'img', 'aria-label': ctx.t(ctx.texts.extra.workbench.lockedPlans) }, [
+      el('span', { class: 'lpl-recipe__dish', 'aria-hidden': 'true' }, [icon('ui-lock', 'lpl-recipe__icon')]),
+      el('span', { class: 'lpl-recipe__locked-count', 'aria-hidden': 'true', text: `+${String(count)}` }),
+    ]);
+  }
+
+  /** « Manger »: une rangée de vignettes; un clic ou Entrée mange. */
+  private foodRow(food: readonly FoodEntry[], together: boolean): HTMLElement {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const st = ctx.texts.game.ui.stove;
+    const head = el('h3', { class: 'lpl-vitrine__row-title' }, [
+      icon('bread'),
+      el('span', { text: ctx.t(ctx.texts.extra.stove.eatSection) }),
+      together ? el('span', { class: 'lpl-vitrine__together' }, [token('self', this.host.symbol('self'), 'small'), token('other', this.host.symbol('other'), 'small')]) : null,
+    ]);
+    if (food.length === 0) return el('section', { class: 'lpl-food' }, [head, el('p', { class: 'lpl-vitrine__notice lpl-vitrine__notice--quiet', text: ctx.t(ctx.texts.extra.stove.nothingToEat) })]);
+    const row = el(
+      'div',
+      { class: 'lpl-food__row', 'data-nav': 'grid' },
+      food.map((f) =>
+        button(
+          [
+            el('span', { class: 'lpl-tile__figure', 'aria-hidden': 'true' }, [icon(f.icon, 'lpl-tile__icon')]),
+            el('span', { class: 'lpl-tile__badge', 'aria-hidden': 'true' }, [pastille({ icon: null, text: `×${String(f.count)}`, tone: 'count', label: '' })]),
+            el('span', { class: 'lpl-tile__below', 'aria-hidden': 'true' }, [pastille({ icon: 'ui-stamina', text: `+${String(f.snack)}`, tone: 'ok', label: '' })]),
+            el('span', { class: 'lpl-tile__name', 'aria-hidden': 'true', text: f.name }),
+          ],
+          () => {
+            this.host.send({ type: 'eat', item: f.item });
+          },
+          {
+            class: 'lpl-tile lpl-tile--food',
+            attrs: {
+              'data-nav-item': true,
+              'data-key': `eat:${f.item}`,
+              'aria-label': `${ctx.t(together ? st.eatTogether : st.eat)} : ${ctx.t(v.eatLabel, { name: f.name, count: f.count, snack: f.snack })}`,
+            },
+          },
+        ),
+      ),
+    );
+    return el('section', { class: 'lpl-food' }, [head, row]);
   }
 }
 
