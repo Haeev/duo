@@ -2,6 +2,26 @@
   "version": 1,
   "notes": [
     {
+      "version": "0.12.0",
+      "titre": "L'aubrin, le marché, la pêche et la garde-robe",
+      "changements": [
+        "La monnaie de la vallée change: le sou devient l'aubrin. Firmin t'écrit pour l'annoncer.",
+        "Odette fait varier ses prix selon la saison et ce qu'on lui a déjà vendu, avec une ardoise du jour mieux payée.",
+        "Le marché du dimanche: garnissez l'étal à deux, choisissez vos prix, servez les habitants qui viennent avec leur liste.",
+        "Les plis de Lucie: chaque matin, une sacoche de lettres à livrer dans le bourg.",
+        "Confitures, gelée de sureau, noisettes grillées, poêlée de girolles, fromage frais et nichoir à fabriquer, deux fois plus vite à deux.",
+        "La basse-cour: poules heureuses, grain et litière, un coq, des couvées et six robes à collectionner; une chèvre au piquet, à traire à deux.",
+        "La pêche refaite: 22 poissons du commun au mythique, leurs ombres dans l'eau, un coin qui frémit chaque jour et le guet à deux; les mythiques se prennent à l'épuisette et retournent à l'eau.",
+        "Un onglet Poissons dans le carnet, avec les records.",
+        "La mercerie et confection de Solange: 73 vêtements (hauts, vestes, bas, chaussures, chapeaux) à essayer sur ton personnage avant de les acheter, et une garde-robe au coffre.",
+        "Plus de foulard: l'écusson de ton profil Duo est brodé sur ton haut.",
+        "Une trame de cinq quêtes, Le marché d'Aubrune, et neuf coups de main, dont plusieurs à deux.",
+        "Des personnages plus vivants: coiffures à mèches, marche et attente plus naturelles, gestes d'outil plus amples, et chacun se tourne vers ce qu'il fait ou vers qui lui parle.",
+        "On s'assoit sur les chaises posées dans la maison, et la petite déco (plume, vase de fleurs) se pose sur les tables.",
+        "Corrections: la poutre se prend bien à deux, Achille ne traverse plus la rivière, les répliques d'Odette sur les poules sont complètes, les enseignes sont lisibles, il ne pleut plus dans les maisons, plus d'ombres parasites, et la barrière du jardin finit sur ses poteaux."
+      ]
+    },
+    {
       "version": "0.11.1",
       "titre": "Nouvelles tenues",
       "changements": [

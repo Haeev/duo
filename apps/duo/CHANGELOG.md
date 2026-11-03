@@ -14,6 +14,7 @@ Duo propose le plein écran dans ses réglages et montre, dans le salon, ce qui 
 
 - Un onglet Réglages avec la case « Plein écran », qui suit l'état de la fenêtre; la touche est indiquée (F11 sur le PC, Ctrl+Cmd+F sur le Mac) et Duo retient ton choix.
 - Dans le salon, un encadré « Quoi de neuf » donne la version installée du jeu et ses nouveautés, avec « Toutes les notes » quand le jeu les fournit, et une pastille « Nouveau » après une mise à jour.
+- La Petite Ligne 0.12.0: l'aubrin, le marché du dimanche, la basse-cour, la pêche refaite, la mercerie et ses vêtements; toutes les notes sont dans le salon du jeu.
 
 ### Corrigé
 

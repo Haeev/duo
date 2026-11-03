@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "la-petite-ligne",
   "name": "La Petite Ligne",
-  "version": "0.11.1",
+  "version": "0.12.0",
   "sdk": "1.0",
   "view": "iso",
   "engine": "three",
@@ -16,7 +16,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "Six semaines à deux à la Halte d'Aubrune, du printemps au premier jour de l'automne: retaper la maisonnette, faire pousser le potager et remplir la caisse du train chaque samedi.",
-  "whatsNew": "La rue Haute s'anime: Achille, Solange et Jeanne, le fournil, le salon de coiffure (coupes, couleurs, barbes), le chocolat chaud chez Odette, des boutiques avec leurs heures et deux missions. Duo installe désormais seul les nouvelles versions du jeu. Toutes les notes sont sur l'écran titre.",
+  "whatsNew": "L'aubrin remplace le sou; prix d'Odette qui varient, marché du dimanche, plis de Lucie, conserves; basse-cour et chèvre; la pêche refaite (22 poissons, ombres, guet); la mercerie de Solange et ses 73 vêtements; une trame de quêtes au marché; des personnages plus vivants.",
   "actions": [
     {
       "id": "up",
