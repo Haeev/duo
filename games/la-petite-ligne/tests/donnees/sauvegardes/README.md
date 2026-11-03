@@ -48,6 +48,11 @@ Règles:
 | `format-10-milieu-semaine-2.json` | 10 | mardi, jour 11, midi (pêche 0.12) | 7 | `generer.ts` (0.12) |
 | `format-10-fin-de-la-demo.json` | 10 | jour 15 à 16 h, écran d'étape « Deux semaines » (pêche 0.12) | 42 | `generer.ts` (0.12) |
 | `format-10-ete-jour-25.json` | 10 | mardi 25 à midi, coin qui frémit et grands du jour (pêche 0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-fin-semaine-1.json` | 11 | jour 8 à 16 h, commande 1 payée; garde-robe (0.12) | 42 | `generer.ts` (0.12) |
+| `format-11-milieu-semaine-2.json` | 11 | mardi, jour 11, midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-fin-de-la-demo.json` | 11 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
+| `format-11-ete-jour-25.json` | 11 | mardi 25 à midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-automne-jour-62.json` | 11 | jeudi 62 à midi, automne, garde-robe (`wear`, `wardrobe`) (0.12) | 7 | `generer.ts` (0.12) |
 
 ## Format en cours
 

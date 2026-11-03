@@ -347,3 +347,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le dossier de travail temporaire de la session (scratchpad) est partagé par tous les membres: un `capture.cjs` et un `dist/` à la racine ont été écrasés en cours de mission. Tout mettre dans un sous-dossier à son nom, serveur sur un port à soi.
 - Ombres de poissons sans programme de plus: sprites couchés du programme des particules (groupe 2, `uGroupAlpha` à 1), tournés par `aAccel.z` = 1 et le cap dans `aVelocity.y`; forme `fish` dessinée dans le fragment (corps en fuseau, queue, sillage). Un seul appel pour toutes les ombres et leurs lueurs de guet.
 - Contrat des ombres avec la simulation (`etat/peche.ts` du lot 1): l'état ne change qu'aux événements; le rendu fait nager l'ombre dans le disque `roam` autour de `pos`, et lit un déplacement décidé par la simulation par `move` (`shadowPosAt`). Lecture concentrée dans `rendu/peche-vue.ts`.
+
+## Garde-robe de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- `personnages.glb` depuis la 0.12: `player_base` est un corps nu-neutre sans pieds (sous-vêtement `wear_under`), chaussures obligatoires; vêtements `wear_<slot>_<style>`, écusson `player_badge_<symbole>[_outer]`, coupes sous chapeau `player_hair_<coupe>_hat`. Couleurs des vêtements: rangée 1 de la texture (ordre `WEAR_SLOTS` de `garde_robe.py`), écrite par `habillage.ts`.
+- Les poids de peau du GLB ne sont pas triés: l'os principal d'un sommet est celui du plus grand des quatre poids, pas `skinIndex.x`.
+- Gonfler une pièce à facettes (une normale par face, sommets dédoublés) selon ses normales l'ouvre en fentes: gonfler depuis un axe (direction horizontale depuis le centre) pour que les sommets confondus bougent ensemble.
+- Aperçu 3D d'un panneau: second `WebGLRenderer` rendu à la demande (la lecture de pixels d'une cible du rendu principal donne du linéaire sans tone mapping). Ne jamais `dispose` les géométries du GLB depuis l'aperçu (elles servent au jeu): seulement ses copies, son matériau cloné et sa texture.
+- Capture avec Vite lancé par `npx vite &`: `kill $!` tue `npx`, pas Vite, qui garde le port; la capture suivante échoue en silence sur l'ancien serveur. Lancer `node_modules/.bin/vite` directement.
+- Le dossier scratchpad est partagé par tous les membres de la séance: un autre a réécrit mes `run.sh` et `capture.cjs`. Travailler dans un sous-dossier à soi (`scratchpad/dg3d/`).

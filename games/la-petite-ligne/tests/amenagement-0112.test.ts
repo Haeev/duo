@@ -168,7 +168,7 @@ describe('format 9', () => {
     // Un objet dont le meuble a disparu (sauvegarde abîmée) revient au rangement, rien ne se perd.
     sim.world.decor.push({ id: 'd-d', item: 'jay_feather', on: 'f-disparu', place: 0, placedBy: 'p2' });
     const snap = snapshotOf(sim);
-    expect(snap.dataSchema).toBe(9);
+    expect(snap.dataSchema).toBe(DATA_SCHEMA);
     const before = countInStacks(sim.world.cellar, 'jay_feather');
     const back = restoreWorld(sim.content, sim.map, JSON.parse(JSON.stringify(snap.data)) as unknown, snap.dataSchema, [A, B]);
     expect(back.world.decor).toEqual([{ id: 'd-c', item: 'flower_pot', on: table, place: 1, placedBy: 'p2' }]);

@@ -7,7 +7,9 @@ import type { Character, CharacterId, Quality } from '../etat/types';
 import { isHome } from '../etat/interieurs';
 import { bakeryBuy, openBakery } from './bourg';
 import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
-import { OUTFIT_COUNT, TOOLBAR_SLOTS } from './constantes';
+import { starterWardrobe, starterWear } from '../etat/garde-robe';
+import { clothesBuy, openClothesShop, openWardrobe, wearClothing } from './vetements';
+import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
@@ -116,7 +118,11 @@ function createCharacter(
   c.appearance.hair = pick(hair, look.creationHairStyles, 0);
   c.appearance.hairColor = pick(intent.hairColor, look.hairColors, c.appearance.hairColor);
   c.appearance.beard = pick(intent.beard, look.beards, c.appearance.beard);
-  c.appearance.outfit = Math.max(0, Math.min(OUTFIT_COUNT - 1, Math.round(outfit)));
+  // 0.12: la tenue de départ choisie, portée et rangée dans la garde-robe (seule à la création).
+  const starters = sim.content.clothes.settings.starters.length;
+  const wear = starterWear(sim.content.clothes, pick(outfit, starters, 0));
+  c.appearance.wear = wear;
+  c.wardrobe = starterWardrobe(wear);
   c.created = true;
   sim.runtime.changed = true;
   startGame(sim);
@@ -331,6 +337,8 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       // Le fauteuil et le guichet ont leurs règles (portée, heures, un seul au fauteuil).
       if (intent.menu === 'salon') openSalon(sim, c);
       else if (intent.menu === 'bakery') openBakery(sim, c);
+      else if (intent.menu === 'clothes_shop') openClothesShop(sim, c);
+      else if (intent.menu === 'wardrobe') openWardrobe(sim, c);
       else openMenu(sim, c, intent.menu);
       return;
     case 'bakery_buy':
@@ -344,6 +352,12 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'hair_offer_answer':
       answerHairOffer(sim, c, intent.accept);
+      return;
+    case 'clothes_buy':
+      if (c.status === 'active' || c.status === 'menu') clothesBuy(sim, c, intent.item);
+      return;
+    case 'wear':
+      if (c.status === 'active' || c.status === 'menu') wearClothing(sim, c, intent.slot, intent.item);
       return;
     case 'dialogue_next':
       dialogueNext(sim, c);

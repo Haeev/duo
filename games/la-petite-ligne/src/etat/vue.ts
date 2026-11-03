@@ -10,7 +10,7 @@
 import type { Audio } from '@duo/sdk';
 import type { Intent } from './actions';
 import type { GameMap } from './carte';
-import type { CharacterId, ReadonlyWorld, WorldEvent } from './types';
+import type { Appearance, CharacterId, DeepReadonly, ReadonlyWorld, WorldEvent } from './types';
 import type { Content } from '../donnees/types';
 
 export interface GameView {
@@ -85,6 +85,45 @@ export interface Renderer {
   pickGround?(clientX: number, clientY: number): { x: number; y: number } | null;
   /** Statistiques de dessin pour l'indicateur de développement. */
   stats(): { drawCalls: number; triangles: number };
+  /**
+   * Aperçu 3D d'une tenue pour la boutique de vêtements (0.12): une petite scène à part, le
+   * personnage seul. `null` avant `load` ou sans modèle des personnages.
+   */
+  createOutfitPreview?(options: OutfitPreviewOptions): OutfitPreview | null;
+  dispose(): void;
+}
+
+/** Ce que montre l'aperçu: un joueur (peau par défaut, coiffure, barbe) et la tenue essayée. */
+export interface OutfitPreviewLook {
+  character: CharacterId;
+  /** L'apparence du personnage, `wear` remplacé par la tenue essayée (identifiants de `vetements.json`). */
+  appearance: DeepReadonly<Pick<Appearance, 'hair' | 'hairColor' | 'beard' | 'wear' | 'scarf'>>;
+}
+
+export interface OutfitPreviewOptions {
+  /** Taille du canevas en points CSS (les pixels suivent l'écran, rapport 2 au plus). */
+  width: number;
+  height: number;
+  /** Fond uni (CSS `#rrggbb`); par défaut le papier des panneaux. */
+  background?: string;
+}
+
+/**
+ * Aperçu 3D (boutique de vêtements): son propre canevas, à placer dans le panneau. Rendu à la
+ * demande (changement de tenue, rotation, taille), jamais à chaque image: rien ne coûte tant que
+ * rien ne bouge. Un seul aperçu à la fois; le créer à l'ouverture du panneau, `dispose` à la fermeture.
+ */
+export interface OutfitPreview {
+  readonly canvas: HTMLCanvasElement;
+  /** Montre ce personnage dans cette tenue (redessiné seulement si quelque chose change). */
+  show(look: OutfitPreviewLook): void;
+  /** Tourne le personnage autour de la verticale (radians; positif: vers la gauche de l'écran). A et E, glisser de la souris. */
+  rotate(radians: number): void;
+  /** Angle absolu (radians, 0: de face). */
+  setAngle(radians: number): void;
+  /** Nouvelle taille en points CSS. */
+  resize(width: number, height: number): void;
+  /** Libère le contexte WebGL de l'aperçu et ses ressources (pas celles du jeu). */
   dispose(): void;
 }
 
@@ -104,6 +143,8 @@ export interface InterfaceOptions {
   camera?: (command: CameraCommand) => void;
   /** Sons de l'interface (`ui-confirm`, `ui-focus`...): joués par l'audio du jeu, bus interface, non placés (facultatif). */
   sound?: (id: string) => void;
+  /** 0.12: aperçu 3D d'une tenue pour la boutique (`Renderer.createOutfitPreview`), `null` sans rendu 3D (facultatif). */
+  outfitPreview?: (options: OutfitPreviewOptions) => OutfitPreview | null;
 }
 
 export interface GameInterface {

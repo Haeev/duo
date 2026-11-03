@@ -14,6 +14,7 @@ import { houseRoomAt, isNapping } from '../etat/maison';
 import type { CharacterId, ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import type { QuestDef } from '../donnees/types';
 import { henLabel, objectiveTemplate, secretCards, secretVars } from '../etat/secrets';
+import { starterIndexOf } from '../etat/garde-robe';
 import {
   ACTION_ICONS,
   CATEGORY_ICONS,
@@ -277,6 +278,9 @@ const MENU_ICONS: Readonly<Record<MenuKind, string>> = {
   // Tour 10 (lot L6): icônes à choisir avec l'interface du salon et du guichet.
   salon: 'ui-notebook',
   bakery: 'ui-coin',
+  // 0.12: icônes à choisir avec l'interface de la boutique de vêtements.
+  clothes_shop: 'ui-coin',
+  wardrobe: 'chest',
 };
 
 /** Ce que fait l'autre joueur, en mots. `awayMinutes`: minutes sans entrée (mesurées par l'interface), ou `null`. */
@@ -721,7 +725,7 @@ export function hudState(layer: 'screen' | 'dialogue' | 'panel' | null, placing:
  */
 export function outfitTakenByPartner(world: ReadonlyWorld, ctx: UiContext): number | null {
   const other = characterOf(world, ctx.partner);
-  return other?.created === true ? other.appearance.outfit : null;
+  return other?.created === true ? starterIndexOf(ctx.content.clothes, other.appearance.wear) : null;
 }
 
 // ---------------------------------------------------------------------------

@@ -205,6 +205,15 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-11-03, 0.12: garde-robe, boutique de vêtements, format de sauvegarde 11 (dev gameplay 3D)
+
+- Contrat: `docs/jeux/jeu-1/garde-robe-0-12.md` (section 5.1 pour les conventions, 5.2 pour l'API de l'aperçu).
+- Données: `donnees/vetements.json` de l'artiste (73 pièces, généré par `assets-src/modeles/vetements_donnees.py`), lu par `src/donnees/vetements.ts`; réglages facultatifs `wardrobe` de `reglages.json`.
+- État: `appearance.wear` et `wardrobe` (plus d'`outfit`); règles pures dans `src/etat/garde-robe.ts` (`visiblePieces`, `starterWear`, `clothesStock`), intentions `wear` et `clothes_buy` dans `src/simulation/vetements.ts`. Le stock ne dépend que de la graine et du jour: rien dans l'état.
+- Carte: point `salon_clothes` (place du client devant le comptoir de mercerie), ajouté dans `outils/construire_carte_halte.py`.
+- Rendu: habillage commun à la scène et à l'aperçu (`src/rendu/habillage.ts`: pièces, écusson, coupes sous chapeau, rangée 1 des couleurs), aperçu `src/rendu/apercu-tenue.ts` (second contexte WebGL, rendu à la demande). Plus de foulard. Page de rendu: `tenue=complete` habille les deux joueurs de pied en cap.
+- Sauvegarde: format 11, après la pêche au format 10 (`src/sauvegarde/garde-robe.ts`: migration, contrôle de forme, remise d'aplomb si un vêtement porté disparaît de `vetements.json`). Test: `tests/garde-robe.test.ts`.
+
 ## 2026-11-03, 0.12: la pêche, lot 1 « simulation » (dev gameplay 3D)
 
 - Conception: `docs/jeux/jeu-1/peche-0-12-conception.md`. État partagé: `WorldState.fishing` (`src/etat/peche.ts`, types et lectures pures pour le rendu et l'interface: `shadowPosAt`, `shadowVisibleTo`, `isWatching`, `rarityScales`).

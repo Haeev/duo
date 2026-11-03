@@ -472,6 +472,10 @@ class GameUi implements GameInterface, UiHost {
         return () => new SalonPanel(this, this.salonPort());
       case 'bakery':
         return () => new BakeryPanel(this, this.bakeryPort());
+      // 0.12: boutique de vêtements et garde-robe (panneaux du lot de l'interface, en parallèle).
+      case 'clothes_shop':
+      case 'wardrobe':
+        return null;
     }
   }
 

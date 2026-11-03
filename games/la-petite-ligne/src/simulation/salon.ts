@@ -36,7 +36,7 @@ function near(sim: Sim, c: Character, pointId: string): boolean {
 }
 
 /** Solange tient son salon (dans la boutique, visible). */
-function solangeHere(sim: Sim): boolean {
+export function solangeHere(sim: Sim): boolean {
   const v = sim.world.villagers.find((x) => x.id === TOWN.solange);
   return v !== undefined && v.visible && v.inside === SALON.building;
 }

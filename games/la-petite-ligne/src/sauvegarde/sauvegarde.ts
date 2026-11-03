@@ -31,6 +31,7 @@ import { startQuest } from '../simulation/quetes';
 import { emptyBoard } from '../simulation/annonces';
 import { emptyImprovements } from '../simulation/chantiers';
 import { freeStuck } from '../simulation/deblocage';
+import { migrateToWardrobe, settleWardrobe, wardrobeShapeOk } from './garde-robe';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -145,6 +146,7 @@ function checkWorld(data: unknown): WorldState {
   checkLetters(data.letters as unknown[]);
   checkDecor(data);
   checkFishing(data.fishing);
+  if (!wardrobeShapeOk(characters)) throw new SaveError('sauvegarde: garde-robe invalide');
   return data as unknown as WorldState;
 }
 
@@ -499,6 +501,8 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   // Format 9 (0.11.2, S03): les petits objets posés sur les meubles; aucun avant.
   if (dataSchema < 9 && isRecord(data)) data.decor = [];
   if (dataSchema < 10 && isRecord(data)) migrateToFormat10(data, content);
+  // Format 11 (0.12, après la pêche au format 10): la tenue (`outfit`) devient des vêtements portés et une garde-robe.
+  if (dataSchema < 11 && isRecord(data)) migrateToWardrobe(data, content.clothes);
   return data;
 }
 
@@ -713,6 +717,8 @@ function resume(
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
     // Pêche 0.12: les ombres renaissent au chargement, la ligne se relance.
     c.fishing = null;
+    // 0.12: un vêtement porté retiré de `vetements.json` depuis la sauvegarde.
+    settleWardrobe(content.clothes, c, c.id === 'p1' ? 0 : 1);
   }
   world.fishing = withoutTransientFishing({ fishing: world.fishing } as WorldState).fishing;
   for (const v of world.villagers) v.talkingWith = [];

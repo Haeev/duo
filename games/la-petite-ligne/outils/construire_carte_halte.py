@@ -858,6 +858,10 @@ POINTS += [
       interieur=True),
     p("salon_counter", 71.0, 26.5, "Solange derrière le comptoir de mercerie (rouleaux de tissu au mur nord)",
       objet="salon_shop", rotation=0, interieur=True),
+    # 0.12: la boutique de vêtements se tient au même comptoir; le client se place devant, face à
+    # Solange (une case au sud du comptoir, qui occupe y 27), loin du fauteuil et du banc d'attente.
+    p("salon_clothes", 71.0, 28.5, "la place du client devant le comptoir de mercerie, face à Solange (boutique de "
+      "vêtements)", objet="salon_shop", rotation=0, portee=1.2, interieur=True),
     p("salon_chair", 69.5, 29.5, "le fauteuil de coiffure, face au miroir du mur ouest (un joueur à la fois)",
       objet="salon_shop", portee=1.5, interieur=True),
     p("salon_stylist", 70.5, 29.5, "Solange derrière le fauteuil quand elle coupe", objet="salon_shop",

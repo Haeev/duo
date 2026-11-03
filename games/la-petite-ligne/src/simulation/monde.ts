@@ -4,6 +4,7 @@
  */
 import { createRandom } from '@duo/sdk/sim';
 import { type GameMap, buildingAt } from '../etat/carte';
+import { starterWardrobe, starterWear } from '../etat/garde-robe';
 import type {
   Appearance,
   Character,
@@ -86,11 +87,14 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
     heart: content.settings.needs.heart.base,
     ...tour10Needs(),
   };
+  // 0.12: avant la création, la tenue de départ d'avant (p1 la première, p2 la deuxième).
+  const wear = starterWear(content.clothes, id === 'p1' ? 0 : 1);
   return {
     id,
     playerId: player.id,
     name: player.name,
-    appearance: { hair: 0, hairColor: DEFAULT_HAIR_COLOR[id], beard: 0, outfit: id === 'p1' ? 0 : 1, scarf: player.color },
+    appearance: { hair: 0, hairColor: DEFAULT_HAIR_COLOR[id], beard: 0, wear, scarf: player.color },
+    wardrobe: starterWardrobe(wear),
     created: false,
     titleReady: false,
     endReady: false,

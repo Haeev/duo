@@ -5,7 +5,9 @@
  */
 import { letterTitle } from '../etat/courrier';
 import { currentOrder } from '../donnees/commandes';
-import type { CharacterId, ReadonlyWorld } from '../etat/types';
+import type { CharacterId, ReadonlyWorld, Wear } from '../etat/types';
+import type { ClothesContent } from '../donnees/vetements';
+import { starterIndexOf, starterWear } from '../etat/garde-robe';
 import type { Layer, UiHost } from './composant';
 import { type Expression, PLAYER_BEARDS, PLAYER_HAIR_COLORS, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
 import { characterOf, nameOf } from './contexte';
@@ -69,9 +71,17 @@ class PlayerCard {
   }
 }
 
-function svgOf(world: ReadonlyWorld, id: CharacterId, expression: Expression): string {
+/** Couleur du haut (ou de la salopette) de la tenue de départ `index` (0.12), pour la pastille de l'écran. */
+function starterSwatch(clothes: ClothesContent, index: number): string | null {
+  const wear = starterWear(clothes, index);
+  const bottom = clothes.byId[wear.bottom];
+  const piece = bottom?.couvre.includes('top') === true ? bottom : clothes.byId[wear.top];
+  return piece?.couleurs.principale ?? null;
+}
+
+function svgOf(world: ReadonlyWorld, id: CharacterId, expression: Expression, clothes: ClothesContent): string {
   const c = characterOf(world, id);
-  return c === null ? '' : portraitSvg(playerColors(id, c.appearance), expression, '');
+  return c === null ? '' : portraitSvg(playerColors(id, c.appearance, clothes), expression, '');
 }
 
 // ---------------------------------------------------------------------------
@@ -225,7 +235,7 @@ export class CreationScreen implements Layer {
     this.hair = me?.appearance.hair ?? 0;
     this.hairColor = me?.appearance.hairColor ?? 0;
     this.beard = me?.appearance.beard ?? 0;
-    this.outfit = me?.appearance.outfit ?? 0;
+    this.outfit = (me === null ? null : starterIndexOf(ctx.content.clothes, me.appearance.wear)) ?? 0;
     this.scarf = me?.appearance.scarf ?? this.scarf;
     if (me?.created === true) this.mode = 'done';
     const titleId = uid('creation');
@@ -320,7 +330,7 @@ export class CreationScreen implements Layer {
       this.outfitTaken.push(taken);
       this.outfitTakenText.push(takenText);
       outfitOptions.append(
-        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${o.top}` }), x.outfits[i] ?? '', taken]),
+        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${starterSwatch(ctx.content.clothes, i) ?? o.top}` }), x.outfits[i] ?? '', taken]),
       );
     });
     outfitGroup.append(outfitOptions);
@@ -393,19 +403,21 @@ export class CreationScreen implements Layer {
     this.render();
   }
 
-  private appearance(): { hair: number; hairColor: number; beard: number; outfit: number; scarf: string } {
-    return { hair: this.hair, hairColor: this.hairColor, beard: this.beard, outfit: this.outfit, scarf: this.scarf };
+  private appearance(): { hair: number; hairColor: number; beard: number; wear: Wear; scarf: string } {
+    const wear = starterWear(this.host.ctx.content.clothes, this.outfit);
+    return { hair: this.hair, hairColor: this.hairColor, beard: this.beard, wear, scarf: this.scarf };
   }
 
   private refreshPreview(): void {
     const { ctx } = this.host;
     const a = this.appearance();
-    setPortrait(this.preview, portraitSvg(playerColors(ctx.me, a), 'great', ''));
+    const clothes = ctx.content.clothes;
+    setPortrait(this.preview, portraitSvg(playerColors(ctx.me, a, clothes), 'great', ''));
     this.hairPortraits.forEach((face, i) => {
-      setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, hair: i }), 'good', ''));
+      setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, hair: i }, clothes), 'good', ''));
     });
     this.beardPortraits.forEach((face, i) => {
-      setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, beard: i }), 'good', ''));
+      setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, beard: i }, clothes), 'good', ''));
     });
     const name = cleanName(this.input.value);
     setText(this.previewName, name === '' ? ctx.texts.extra.creation.noName : name);
@@ -466,7 +478,7 @@ export class CreationScreen implements Layer {
       setText(this.outfitTakenText[i] ?? mark, ctx.t(x.creation.outfitTaken, { partner: partnerName }));
     });
     if (other !== null) {
-      setPortrait(this.otherPortrait, portraitSvg(playerColors(other.id, other.appearance), 'good', ''));
+      setPortrait(this.otherPortrait, portraitSvg(playerColors(other.id, other.appearance, ctx.content.clothes), 'good', ''));
       setText(this.otherName, other.name);
       setAttr(this.otherCard, 'aria-label', other.name);
       const sig = other.created ? 'ready' : 'choosing';
@@ -569,7 +581,7 @@ export class BreakfastScreen implements Layer {
     if (sig === this.sig) return;
     this.sig = sig;
 
-    setPortrait(this.face, portraitSvg(playerColors(me.id, me.appearance), form.expression, form.name));
+    setPortrait(this.face, portraitSvg(playerColors(me.id, me.appearance, ctx.content.clothes), form.expression, form.name));
     clear(this.overline);
     const at = b.overline.indexOf('{weather}');
     const vars = { day: dayLabel(ctx, world.clock.day), time };
@@ -961,8 +973,8 @@ export class EndScreen implements Layer {
 
     const chipOf = (p: StageModel['self']): HTMLElement =>
       p.choice === null ? chip(p.chip, '', 'ui-hourglass') : chip(p.chip, 'ready', p.choice === 'stay' ? 'ui-check' : 'ui-moon');
-    this.self.set(m.self.name, ctx.texts.extra.common.you, chipOf(m.self), svgOf(world, ctx.me, 'radiant'));
-    this.other.set(m.other.name, null, chipOf(m.other), svgOf(world, ctx.partner, 'great'));
+    this.self.set(m.self.name, ctx.texts.extra.common.you, chipOf(m.self), svgOf(world, ctx.me, 'radiant', ctx.content.clothes));
+    this.other.set(m.other.name, null, chipOf(m.other), svgOf(world, ctx.partner, 'great', ctx.content.clothes));
 
     clear(this.text);
     this.text.append(el('strong', { text: m.text }));

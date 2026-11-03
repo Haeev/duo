@@ -1,6 +1,6 @@
 /**
- * Personnages: les deux joueurs (foulard à la couleur de leur profil, coiffure
- * et tenue choisies) et les habitants, sur le squelette commun de
+ * Personnages: les deux joueurs (coiffure et vêtements portés, `habillage.ts`;
+ * plus de foulard depuis la 0.12) et les habitants, sur le squelette commun de
  * `personnages.glb`. Animations par `AnimationMixer` avec fondus enchaînés,
  * positions interpolées (`prev` vers `pos`), orientation lissée, outil en
  * main, clignement des yeux et expression selon la forme.
@@ -10,8 +10,6 @@ import {
   AnimationMixer,
   LoopOnce,
   LoopRepeat,
-  CanvasTexture,
-  Float32BufferAttribute,
   Group,
   Mesh,
   SkinnedMesh,
@@ -23,7 +21,6 @@ import {
   type Material,
   type Object3D,
 } from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type {
   WorldEvent,
   ActionKind,
@@ -50,18 +47,8 @@ import {
   type BenchSeat,
   type SeatProp,
 } from '../etat/bancs';
-import {
-  BODY_COLORS,
-  HAIR_MESHES,
-  OUTFITS,
-  BEARD_MESHES,
-  HAIR_COLORS,
-  HAIR_FLATTENED_ASLEEP,
-  SCARF_MARK,
-  SCARF_SYMBOLS,
-  safeColor,
-  scarfMeshFor,
-} from './apparence';
+import { safeColor } from './apparence';
+import { type DressedFigure, PlayerDresser, PlayerTexture, mergeOutfit, playerMeshNames } from './habillage';
 import { smoothFactor } from './camera';
 import {
   dampAngle,
@@ -72,9 +59,8 @@ import {
   type PickRegistry,
   type PickTarget,
 } from './contexte';
-import { preparePaletteTexture, type SharedMaterials } from './materiaux';
+import type { SharedMaterials } from './materiaux';
 import { CHARACTERS_FILE, textHash, type ModelLibrary } from './modeles';
-import { PALETTE_CELL_PIXELS, characterSlotColumn, type CharacterSlot } from './palette';
 import { IDLE_POSES, RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -92,8 +78,6 @@ const PICK_HEIGHT = 1.8;
 const GROUND_HALF_LIFE = 0.06;
 const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
-const PLAYER_ROW = 0;
-const VECTOR_SIZE = 3;
 /** Bout de la canne à pêche de l'artiste: nœud vide, et sa place dans le repère de la prise s'il manque. */
 const ROD_TIP_NODE = 'fishing_rod_tip';
 const ROD_TIP = new Vector3(0, 1.34, 1.49);
@@ -677,106 +661,24 @@ class CharacterFigure {
   }
 }
 
-/** Texture d'un joueur: celle des personnages, rangée 0 réécrite à ses couleurs. */
-class PlayerTexture {
-  readonly canvas = document.createElement('canvas');
-  readonly texture: CanvasTexture;
-  private key = '';
-
-  constructor(private readonly source: CanvasImageSource & { width: number; height: number }) {
-    this.canvas.width = source.width;
-    this.canvas.height = source.height;
-    this.texture = new CanvasTexture(this.canvas);
-    preparePaletteTexture(this.texture, true);
-  }
-
-  paint(id: CharacterId, outfit: number, scarf: string, hairColor: number): void {
-    const key = `${id}|${outfit}|${scarf}|${hairColor}`;
-    if (key === this.key) {
-      return;
-    }
-    this.key = key;
-    const context = this.canvas.getContext('2d');
-    if (context === null) {
-      return;
-    }
-    context.drawImage(this.source, 0, 0);
-    const colors: Partial<Record<CharacterSlot, string>> = {
-      ...BODY_COLORS[id],
-      ...(HAIR_COLORS[hairColor] ?? {}),
-      ...(OUTFITS[outfit]?.colors ?? OUTFITS[0]?.colors),
-      scarf: safeColor(scarf),
-      scarf_mark: SCARF_MARK,
-    };
-    for (const [slot, color] of Object.entries(colors) as [CharacterSlot, string][]) {
-      context.fillStyle = color;
-      context.fillRect(
-        characterSlotColumn(slot) * PALETTE_CELL_PIXELS,
-        PLAYER_ROW * PALETTE_CELL_PIXELS,
-        PALETTE_CELL_PIXELS,
-        PALETTE_CELL_PIXELS,
-      );
-    }
-    this.texture.needsUpdate = true;
-  }
-}
-
 interface PlayerEntry {
   figure: CharacterFigure;
   /** Assis au dernier rendu (place affichée), pour le glissement d'entrée et de sortie. */
   seated: boolean;
   /** Écart restant à résorber entre la position affichée et la cible (m), et son départ. */
   glide: { x: number; y: number; start: number };
-  texture: PlayerTexture | null;
-  meshes: Map<string, Object3D>;
-  look: string;
-  /** Géométrie d'origine du corps (partagée avec le GLB), et la fusion courante corps et vêtements. */
-  baseGeometry: BufferGeometry | null;
-  merged: BufferGeometry | null;
+  /** Corps, coiffure et vêtements fusionnés (`habillage.ts`), `null` pour le substitut sans modèle. */
+  dressed: DressedFigure | null;
 }
-
-/**
- * Fusionne le corps et les vêtements choisis en une seule géométrie animée:
- * un appel de dessin par joueur et un seul programme de shader pour tous les
- * personnages. Les pièces sans cibles de morphose en reçoivent des nulles,
- * pour avoir les mêmes attributs que le corps. `null` si c'est impossible.
- */
-function mergeOutfit(
-  base: BufferGeometry,
-  parts: readonly BufferGeometry[],
-): BufferGeometry | null {
-  const morphs = base.morphAttributes.position ?? [];
-  const prepared = parts.map((part) => {
-    const copy = part.clone();
-    const count = copy.getAttribute('position').count;
-    if (copy.morphAttributes.position === undefined && morphs.length > 0) {
-      copy.morphAttributes.position = morphs.map(
-        () => new Float32BufferAttribute(new Float32Array(count * VECTOR_SIZE), VECTOR_SIZE),
-      );
-    }
-    copy.morphTargetsRelative = base.morphTargetsRelative;
-    return copy;
-  });
-  const merged = mergeGeometries([base, ...prepared], false);
-  for (const copy of prepared) {
-    copy.dispose();
-  }
-  return merged;
-}
-
-const PLAYER_MESHES = [
-  'player_base',
-  ...HAIR_MESHES,
-  ...BEARD_MESHES.filter((name): name is NonNullable<typeof name> => name !== null),
-  ...new Set(OUTFITS.map((outfit) => outfit.mesh)),
-  ...SCARF_SYMBOLS.map((symbol) => symbol.mesh),
-];
 
 export class CharactersPart implements EventfulPart {
   readonly group = new Group();
   private readonly clips = new Map<string, AnimationClip>();
   private readonly players = new Map<CharacterId, PlayerEntry>();
   private readonly villagers = new Map<string, CharacterFigure>();
+  /** Habillage des joueurs (vêtements de la 0.12), partagé par les deux. */
+  private readonly dresser: PlayerDresser;
+  private readonly playerMeshes: string[];
 
   constructor(
     private readonly library: ModelLibrary,
@@ -793,6 +695,8 @@ export class CharactersPart implements EventfulPart {
     private readonly map: GameMap | null = null,
   ) {
     this.group.name = 'personnages';
+    this.dresser = new PlayerDresser(content.clothes, resources);
+    this.playerMeshes = playerMeshNames(content.clothes);
     for (const clip of library.animations(CHARACTERS_FILE)) {
       this.clips.set(clip.name, clip);
     }
@@ -1260,24 +1164,19 @@ export class CharactersPart implements EventfulPart {
   }
 
   private createPlayer(character: DeepReadonly<Character>): PlayerEntry {
-    const model = this.library.cloneRig(RIG_NODE, PLAYER_MESHES);
+    const model = this.library.cloneRig(RIG_NODE, this.playerMeshes);
     const pick = this.picks.add({ kind: 'character', character: character.id });
-    const meshes = new Map<string, Object3D>();
-    let texture: PlayerTexture | null = null;
+    let dressed: DressedFigure | null = null;
     const shared = this.library.sharedCharacterMaterial();
     if (model !== null && shared?.map?.image !== undefined) {
-      texture = new PlayerTexture(
-        shared.map.image as CanvasImageSource & { width: number; height: number },
-      );
+      const texture = new PlayerTexture(shared.map.image as CanvasImageSource & { width: number; height: number });
       this.resources.track(texture.texture);
       const material = this.resources.trackMaterial(shared.clone());
       material.map = texture.texture;
       model.traverse((object) => {
-        if (object instanceof SkinnedMesh) {
-          object.material = material;
-          meshes.set(object.name, object);
-        }
+        if (object instanceof SkinnedMesh) object.material = material;
       });
+      dressed = this.dresser.prepare(model, texture);
     }
     const figure = new CharacterFigure(
       character.id,
@@ -1287,100 +1186,12 @@ export class CharactersPart implements EventfulPart {
       1,
     );
     this.group.add(figure.root);
-    const base = meshes.get('player_base');
-    const baseGeometry = base instanceof SkinnedMesh ? (base.geometry as BufferGeometry) : null;
-    if (baseGeometry !== null) {
-      // Les vêtements sont fusionnés dans le corps: leurs maillages sortent de la scène (ni dessin ni programme).
-      for (const [name, mesh] of meshes) {
-        if (name !== 'player_base') {
-          mesh.removeFromParent();
-        }
-      }
-    }
-    return {
-      figure,
-      texture,
-      meshes,
-      look: '',
-      baseGeometry,
-      merged: null,
-      seated: false,
-      glide: { x: 0, y: 0, start: 0 },
-    };
+    return { figure, dressed, seated: false, glide: { x: 0, y: 0, start: 0 } };
   }
 
   private dress(entry: PlayerEntry, character: DeepReadonly<Character>): void {
-    const { hair, hairColor, beard, outfit, scarf } = character.appearance;
-    const hairMesh = HAIR_MESHES[hair] ?? HAIR_MESHES[0];
-    // Couché, les coupes longues sont aplaties derrière la tête (pas dans l'oreiller).
-    const flat = character.status === 'sleeping' && HAIR_FLATTENED_ASLEEP.has(hairMesh);
-    const look = `${hair}|${hairColor}|${beard}|${outfit}|${scarf}|${flat ? 'couche' : ''}`;
-    if (look === entry.look) {
-      return;
-    }
-    entry.look = look;
-    const wanted = new Set([
-      'player_base',
-      hairMesh,
-      OUTFITS[outfit]?.mesh ?? OUTFITS[0]?.mesh ?? '',
-      scarfMeshFor(scarf),
-      BEARD_MESHES[beard] ?? '',
-    ]);
-    wanted.delete('');
-    const base = entry.meshes.get('player_base');
-    const parts = [...wanted]
-      .filter((name) => name !== 'player_base')
-      .map((name) => {
-        const mesh = entry.meshes.get(name);
-        if (!(mesh instanceof SkinnedMesh)) return null;
-        const geometry = mesh.geometry as BufferGeometry;
-        return flat && name === hairMesh ? this.flattenedHair(name, geometry) : geometry;
-      })
-      .filter((geometry): geometry is BufferGeometry => geometry !== null);
-    const merged =
-      base instanceof SkinnedMesh && entry.baseGeometry !== null
-        ? mergeOutfit(entry.baseGeometry, parts)
-        : null;
-    if (merged !== null && base instanceof SkinnedMesh) {
-      entry.merged?.dispose();
-      entry.merged = merged;
-      base.geometry = merged;
-      for (const [name, mesh] of entry.meshes) {
-        mesh.visible = name === 'player_base';
-      }
-    } else {
-      for (const [name, mesh] of entry.meshes) {
-        if (mesh.parent === null && base?.parent !== null && base?.parent !== undefined) {
-          base.parent.add(mesh);
-        }
-        mesh.visible = wanted.has(name);
-      }
-    }
-    entry.texture?.paint(character.id, outfit, scarf, hairColor);
-  }
-
-  /** Coupes aplaties pour le sommeil, faites une fois par coupe. */
-  private readonly flatHair = new Map<string, BufferGeometry>();
-
-  /**
-   * Coupe longue couchée: dans la pose de liaison (debout, nuque vers -Z), rien de la chevelure
-   * ne dépasse derrière la tête plus loin que le chignon (que l'oreiller reçoit sans s'y enfoncer),
-   * ni plus loin que `backDepth` dans le dos (sous les épaules, contre le matelas).
-   */
-  private flattenedHair(name: string, source: BufferGeometry): BufferGeometry {
-    const known = this.flatHair.get(name);
-    if (known !== undefined) return known;
-    const settings = SETTINGS.asleepHair;
-    const copy = this.resources.track(source.clone());
-    const position = copy.getAttribute('position');
-    for (let i = 0; i < position.count; i += 1) {
-      const limit = position.getY(i) > settings.headFromY ? settings.headDepth : settings.backDepth;
-      if (position.getZ(i) < limit) position.setZ(i, limit);
-    }
-    position.needsUpdate = true;
-    copy.computeBoundingSphere();
-    this.flatHair.set(name, copy);
-    return copy;
+    if (entry.dressed === null) return;
+    this.dresser.dress(entry.dressed, { id: character.id, appearance: character.appearance, asleep: character.status === 'sleeping' });
   }
 
   private createVillager(villager: DeepReadonly<VillagerState>): CharacterFigure {
@@ -1679,7 +1490,7 @@ export class CharactersPart implements EventfulPart {
   dispose(): void {
     for (const entry of this.players.values()) {
       entry.figure.dispose();
-      entry.merged?.dispose();
+      entry.dressed?.merged?.dispose();
     }
     for (const figure of this.villagers.values()) {
       figure.dispose();

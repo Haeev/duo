@@ -33,6 +33,7 @@ import {
 } from './maison';
 import { townFrom } from './bourg';
 import { parseFishDef, parseFishingRules } from './poissons';
+import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import type {
   AnimalDef,
   ClockPace,
@@ -105,6 +106,8 @@ export interface RawContentFiles {
   catalogue?: unknown;
   /** Tour 10: pièces à bâtir et fenêtres (`pieces.json`); absent: ni pièce ni fenêtre. */
   pieces?: unknown;
+  /** 0.12: vêtements de la garde-robe (`vetements.json`); absent: aucun vêtement (essais seulement). */
+  vetements?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2507,6 +2510,10 @@ export function loadContent(files: RawContentFiles): Content {
     improvements: files.chantiers === undefined ? [] : parseImprovements(root('chantiers.json', files.chantiers)),
     catalogue: files.catalogue === undefined ? null : parseCatalogue(root('catalogue.json', files.catalogue)),
     home: files.pieces === undefined ? EMPTY_HOME : parseHome(root('pieces.json', files.pieces)),
+    clothes:
+      files.vetements === undefined
+        ? EMPTY_CLOTHES
+        : parseClothes(files.vetements, parseWardrobeSettings(reglages.opt('wardrobe'))),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');

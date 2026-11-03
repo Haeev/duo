@@ -3,7 +3,9 @@
  * lisibles en 48 px, le foulard à la couleur du profil Duo. Le jeu pourra les
  * remplacer par des vignettes tirées des modèles 3D sans toucher au reste.
  */
-import type { Appearance, CharacterId } from '../etat/types';
+import type { ClothesContent } from '../donnees/vetements';
+import { visiblePieces } from '../etat/garde-robe';
+import type { Appearance, CharacterId, Wear } from '../etat/types';
 import {
   type BeardStyle,
   type Expression,
@@ -125,14 +127,39 @@ const BEARDS: Readonly<Record<BeardStyle, (c: string) => string>> = {
   moustache: (c) => `<path d="M41 59q9 -6 18 0q-9 3 -18 0z" fill="${c}"/>`,
 };
 
-/** Couleurs du portrait d'un joueur selon son apparence (couleur et barbe absentes: celles d'avant le tour 10). */
-export function playerColors(
-  id: CharacterId,
-  appearance: Readonly<Pick<Appearance, 'hair' | 'outfit' | 'scarf'> & Partial<Pick<Appearance, 'hairColor' | 'beard'>>>,
-): PortraitColors {
+/** Apparence lue par le portrait: la tenue (`wear`) n'est lue qu'avec les vêtements du contenu. */
+export type PortraitAppearance = Readonly<
+  Pick<Appearance, 'hair' | 'scarf'> & Partial<Pick<Appearance, 'hairColor' | 'beard'>> & { wear?: Readonly<Wear> }
+>;
+
+/** Mêle une couleur `#rrggbb` au blanc (`share` de blanc), pour le fond du portrait. */
+function towardWhite(hex: string, share: number): string {
+  const v = Number.parseInt(hex.slice(1), 16);
+  if (Number.isNaN(v)) return '#EEEEEE';
+  const mix = (c: number): string => Math.round(c + (255 - c) * share).toString(16).padStart(2, '0');
+  return `#${mix((v >> 16) & 0xff)}${mix((v >> 8) & 0xff)}${mix(v & 0xff)}`;
+}
+
+/**
+ * Le haut vu dans le portrait (0.12): le par-dessus s'il y en a un, sinon le haut, ou le bas qui le
+ * couvre (salopette); couleurs principale et secondaire. `null` sans tenue lisible.
+ */
+function torsoColors(clothes: ClothesContent | undefined, wear: Readonly<Wear> | undefined): { top: string; trim: string; bg: string } | null {
+  if (clothes === undefined || wear === undefined) return null;
+  const shown = visiblePieces(clothes, wear);
+  const piece = shown.find((p) => p.slot === 'outer') ?? shown.find((p) => p.slot === 'top') ?? shown.find((p) => p.slot === 'bottom');
+  if (piece === undefined) return null;
+  return { top: piece.couleurs.principale, trim: piece.couleurs.secondaire, bg: towardWhite(piece.couleurs.principale, 0.78) };
+}
+
+/**
+ * Couleurs du portrait d'un joueur selon son apparence (couleur et barbe absentes: celles d'avant le
+ * tour 10; tenue lue dans `clothes`, sinon la première tenue d'avant la 0.12).
+ */
+export function playerColors(id: CharacterId, appearance: PortraitAppearance, clothes?: ClothesContent): PortraitColors {
   const body = PLAYER_BODIES[id];
   const hairColor = appearance.hairColor === undefined ? undefined : PLAYER_HAIR_COLORS[appearance.hairColor];
-  const outfit = PLAYER_OUTFITS[appearance.outfit] ?? PLAYER_OUTFITS[0] ?? { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' };
+  const outfit = torsoColors(clothes, appearance.wear) ?? PLAYER_OUTFITS[0] ?? { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' };
   return {
     skin: body.skin,
     shade: body.shade,
