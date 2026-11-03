@@ -215,3 +215,13 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Habitants: `habitants.json` n'a pas de goûts (`likes`) en données; les goûts sont dans les fiches de conception (tour 10, 1.4).
 - Dans une simulation d'achats, laisser plusieurs achats par jour: un seul achat par jour fait gonfler la bourse artificiellement (premier jet de `v0_12_economie.py`).
 - Un duo médian achète tout ce qui est en vente vers le jour 50 à 57 même avec 16 000 aubrins de puits: après le jour 50, seul du contenu nouveau redonne un but à l'argent.
+
+## Habitants et plannings (conception 0.13, 2026-11-03)
+
+- Une année de jeu fait 84 jours (4 saisons de 21); chaque saison commence un samedi, donc le jour de la semaine d'un jour de saison est fixe: dimanches = jours 2, 9 et 16. Utile pour caler anniversaires et fêtes (éviter samedis de train et jours de fête).
+- Le scratchpad est partagé entre membres: un autre agent a écrasé mon `sortie.txt`. Toujours écrire dans un sous-dossier à soi (`scratchpad/gd013/`).
+- Un document conçu en parallèle (carte du level designer) se lit dans son arbre: `/home/user/duo/.claude/worktrees/<agent>/docs/...`, avant même la fusion; ses identifiants priment (consigne du manager), aligner tôt.
+- Carte 0.13: la ferme est à l'est, entre la route des hameaux et la rivière (pas de gué à passer pour l'école); le bief est au moulin, à l'ouest: une querelle d'eau entre meunière et fermier y est impossible (remplacée par « la part du meunier »).
+- Script `simulations/v0_13_habitants.py`: plannings en données Python, contrôle de couverture minute par minute, export JSON, relecture du document (`--croise`). Sans cache, `entry_at` rend la simulation 10 fois trop lente: cache par (habitant, jour de semaine, saison, temps, jours spéciaux, drapeaux, minute). Environ 10 minutes quand la machine est chargée: lancer en arrière-plan.
+- Les textes des objectifs de quête sont des textes du jeu: y bannir « tous les deux » et « chacun » (écrire « à deux », « chaque joueur »), comme dans les répliques.
+- La démo affirme « il n'y a pas de chat au bourg » (`odette_after_gift`): tout chat ajouté doit conditionner cette réplique.
