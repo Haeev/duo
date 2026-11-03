@@ -17,4 +17,11 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 - R10. Les pages des magasins en liste obligent à faire défiler: interfaces à refaire. Trop d'icônes identiques (même caisse pour les trois vases, même planche pour le sac de grain, le coupon de toile, le sucre et le bocal): on n'identifie pas l'objet au premier regard (capture du comptoir d'Odette, non versionnée car elle montre un prénom).
 - R11. La petite déco se pose toujours sous la table et non dessus.
 
-La suite des retours arrive dans un troisième message.
+- R12. Le menu du réchaud est trop lourd et complexe (`r12-rechaud.png`: phrases de recette, « Il manque : ... » en toutes lettres, même icône de pain pour cinq recettes). Il faut refaire toutes les interfaces: moins de texte, plus d'images et d'animation.
+- R13. Sur Windows, il n'y a pas d'ombres, contrairement au Mac.
+- R14. Portage à deux: le colis flotte dans le vide au-dessus et à côté des deux joueurs, bras levés, qui ne le touchent pas (capture du client, non versionnée car elle montre les deux profils).
+
+## Décisions du manager
+
+- Patch 0.12.2, en ligne le 4 novembre avant 21 h: R01 à R08, R10 à R14, à partir de `main` (0.12.1), sans le travail de la 0.13.
+- R09 (parcelles libres, 6 au départ puis de plus en plus) va dans la 0.13, avec les parcelles de la carte agrandie: c'est le même système.
