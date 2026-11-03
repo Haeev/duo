@@ -13,6 +13,9 @@ import type { IdlePose } from './attentes';
 import type { ToolHoldSpec } from './prise';
 import type { ModelTrim } from './retouches';
 
+/** Style des personnages: ombrage par face (validé), ou lisse avec rampe et contour (témoin, D1). */
+export type CharacterStyle = 'facettes' | 'lisse';
+
 /**
  * Éclaircie de la forêt du pourtour: sur le côté `side` de la carte, entre `from` et `to`
  * (cases le long de ce côté: y pour l'est et l'ouest, x pour le nord et le sud), la lisière
@@ -514,6 +517,74 @@ export const RENDER_SETTINGS = {
   propsDrawnElsewhere: ['school_house'] as readonly string[],
 
   characters: {
+    /**
+     * Style des personnages (étape A du plan de qualité visuelle, décision D1 en attente du
+     * client): `facettes`, l'ombrage par face validé le 31 octobre; `lisse`, la version témoin
+     * (`lisse.ts`, `contour.ts`): normales lissées, rampe d'ombrage douce, ombres teintées
+     * chaudes sur la peau et froides sur les tissus, liseré côté soleil et contour coloré. Le
+     * décor garde ses facettes dans les deux cas. Page de rendu: `style=lisse` pour comparer.
+     */
+    style: 'facettes' as CharacterStyle,
+    /** Style `lisse`: ombrage des personnages (chantier 1 du plan). */
+    smooth: {
+      /**
+       * Angle de lissage (degrés): deux faces voisines plus ouvertes que cela gardent leur arête
+       * (bord de chapeau, semelle, ourlet à 90 degrés). Mesuré sur `personnages.glb` le
+       * 2026-11-03: les membres à 6 pans font 60 degrés entre faces, les têtes et les torses 30 à
+       * 45; les vraies arêtes 80 à 100. À 65, tout ce qui est rond devient lisse.
+       */
+      creaseDegrees: 65,
+      /**
+       * Rampe de la lumière directe selon N.L: ombre, demi-teinte, lumière. Seuil ombre vers
+       * demi-teinte, seuil demi-teinte vers lumière, valeur de la demi-teinte (part de la pleine
+       * lumière), demi-largeur des transitions (en N.L: 0,06 donne des bords doux de 10 à 15 %).
+       */
+      ramp: { shadowEdge: 0.04, lightEdge: 0.42, halftone: 0.45, softness: 0.07 },
+      /**
+       * Teinte de la lumière du ciel à l'ombre sur la peau (luminance ramenée à 1): brique, pas
+       * gris (fiche de style 4.7). Les tissus prennent la teinte froide du décor (`look.shadeTint`).
+       * Part de la teinte appliquée à l'ombre pleine.
+       */
+      skinShadeTint: '#e0866a',
+      skinShadeAmount: 0.55,
+      clothShadeAmount: 0.45,
+      /**
+       * Liseré côté soleil: bande au bord de la silhouette (part du bord, 0,15 dans le plan),
+       * douceur de son bord, force (le reste du réglage dans `look.rim` de l'ambiance).
+       */
+      rim: { width: 0.14, softness: 0.05, strength: 0.22 },
+    },
+    /**
+     * Style `lisse`: contour coloré par coque inversée (chantier 3 du plan, `contour.ts`).
+     * Épaisseur à l'écran: `widthPerHeight` x hauteur du tampon (1,4 px à 768, 2 px à 1080), au
+     * moins `minWidth` px. Couleur: celle de la pièce, assombrie (`darken`, en linéaire: L* perd
+     * 55 à 60 %), saturée (`saturation`), suivie de la lumière du moment.
+     * Coût borné: seuls les personnages à moins de `maxDistance` m du centre de la vue (le point
+     * que regarde la caméra, à leur hauteur) sont contourés, les plus proches d'abord, au plus
+     * `maxCount` et `maxTriangles` triangles de coque; en mode léger, `lightMaxCount`.
+     * Les petites îles du maillage (yeux, sourcils, joues, bouche, nez, boutons: diagonale sous
+     * `skipIslandsBelow` m) n'ont pas de coque: leur contour ferait des taches sur le visage.
+     */
+    outline: {
+      widthPerHeight: 1 / 540,
+      minWidth: 1,
+      darken: 0.16,
+      saturation: 1.25,
+      maxDistance: 14,
+      /**
+       * Avance (m) gardée par un personnage déjà contouré, à la limite de distance comme dans le
+       * classement: un habitant qui passe la limite ou deux voisins à égalité ne clignotent pas.
+       */
+      hysteresis: 1,
+      maxCount: 12,
+      maxTriangles: 26_000,
+      lightMaxCount: 4,
+      skipIslandsBelow: 0.08,
+      /** Part du soleil dans la lumière qui éclaire le contour (le ciel compte entier). */
+      sunShare: 0.5,
+      /** Le contour ne descend pas sous cette part de sa couleur de midi (nuit). */
+      minLight: 0.12,
+    },
     /**
      * Coupes longues couchées (tour 10, `HAIR_FLATTENED_ASLEEP`): profondeur (z de la pose de
      * liaison, m) au-delà de laquelle la chevelure est ramenée: derrière la tête (au-dessus de

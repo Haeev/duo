@@ -19,10 +19,12 @@ import type { GameMap } from '../etat/carte';
 import type { WorldEvent } from '../etat/types';
 import type { FrameContext, RenderPart } from './contexte';
 import { createAmbiance } from './ambiance';
+import { createCharacterOutline } from './contour';
 import type { LampBoard } from './lampes';
 import type { DaylightRig } from './lumiere';
 import type { SharedMaterials } from './materiaux';
 import type { ModelLibrary } from './modeles';
+import type { CharacterStyle } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
 
@@ -35,6 +37,10 @@ export interface RenderHooks {
   materials: SharedMaterials;
   /** Matériau partagé des habitants (`lpl_characters`); les joueurs en ont chacun une copie. */
   characterMaterial: MeshStandardMaterial | null;
+  /** Style des personnages de cette séance (`characters.style`, ou `style=` de la page de rendu). */
+  characterStyle: CharacterStyle;
+  /** Groupe des personnages (`CharactersPart.group`), `null` sans personnages. */
+  characters: Object3D | null;
   library: ModelLibrary;
   terrain: Terrain;
   /** Surface de la rivière, en morceaux (`terrain.water`). */
@@ -66,4 +72,6 @@ export type RenderExtension = (hooks: RenderHooks) => ExtensionPart | null;
 export const RENDER_EXTENSIONS: readonly RenderExtension[] = [
   // Lumière, eau, pluie, nuages, brume, lueurs de nuit, panache et particules du potager.
   createAmbiance,
+  // Style `lisse` des personnages: contour coloré par coque inversée (rien en style `facettes`).
+  createCharacterOutline,
 ];

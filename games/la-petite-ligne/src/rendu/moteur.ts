@@ -42,7 +42,7 @@ import { InteriorsPart, readInteriorHooks } from './interieurs';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { PerfMonitor } from './perf';
 import { AdaptiveQuality, renderPixelSize, type QualityChange } from './qualite';
-import { RENDER_SETTINGS } from './reglages';
+import { RENDER_SETTINGS, type CharacterStyle } from './reglages';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
@@ -116,6 +116,8 @@ export interface EngineOptions extends RendererOptions {
   fishing?: FishingSource;
   /** Le chat du bourg (0.13, `chat.ts`): aucun tant que la simulation n'en a pas (lot H7). */
   cat?: CatSource;
+  /** Style des personnages (par défaut `characters.style`); la page de rendu le change par `style=`. */
+  characterStyle?: CharacterStyle;
 }
 
 export class RenderEngine implements Renderer {
@@ -145,6 +147,8 @@ export class RenderEngine implements Renderer {
   private time = 0;
   private loaded = false;
   private disposed = false;
+  /** Style des personnages de la séance (`characters.style`): fixé à la construction. */
+  private readonly characterStyle: CharacterStyle;
   private readonly context: FrameContext;
   private readonly focus = new Vector3();
   private readonly gradeColor = new Color();
@@ -180,6 +184,7 @@ export class RenderEngine implements Renderer {
     this.log = options.log;
     this.fishingSource = options.fishing ?? createStateFishingSource();
     this.catSource = options.cat ?? NO_CAT;
+    this.characterStyle = options.characterStyle ?? RENDER_SETTINGS.characters.style;
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
       antialias: settings.antialias && !this.light,
@@ -272,7 +277,7 @@ export class RenderEngine implements Renderer {
   async load(onProgress: (ratio: number) => void): Promise<void> {
     const materials = await createSharedMaterials(this.resources);
     this.materials = materials;
-    const library = new ModelLibrary(materials, this.resources);
+    const library = new ModelLibrary(materials, this.resources, this.characterStyle);
     await library.load((ratio) => {
       onProgress(ratio * LOAD_MODELS_SHARE);
     });
@@ -476,6 +481,8 @@ export class RenderEngine implements Renderer {
       map,
       materials,
       characterMaterial: library.sharedCharacterMaterial(),
+      characterStyle: this.characterStyle,
+      characters: characters.group,
       library,
       terrain,
       water: terrain.water,

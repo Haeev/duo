@@ -14,6 +14,7 @@
  */
 import {
   Color,
+  ShaderChunk,
   Vector2,
   Vector3,
   Vector4,
@@ -22,7 +23,7 @@ import {
   type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
-import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
+import { CHARACTER_SLOTS, PALETTE_CELLS, PALETTE_GRID, characterSlotColumn, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import { RIVER_BED_MIN, RIVER_BED_RANGE, RIVER_SAND_RANGE } from './riviere';
@@ -47,6 +48,14 @@ export const GROUND_CELLS = [
   'rock_light',
   'rock_dark',
 ] as const satisfies readonly PaletteCell[];
+
+/** Texture des personnages: 16 cases par rangée, 32 rangées (`CHAR_GRID_H` de `palette.py`). */
+const CHARACTER_SLOT_COUNT = CHARACTER_SLOTS.length;
+const CHARACTER_ROW_COUNT = 32;
+/** Rangée des vêtements dans la copie de la texture de chaque joueur (`habillage.ts`). */
+const PLAYER_WEAR_ROW = 1;
+const MOUTH_COLUMN = characterSlotColumn('mouth');
+const CHEEK_COLUMN = characterSlotColumn('cheek');
 
 /** Coefficients de luminance (Rec. 709, linéaire). */
 const LUMA = [0.2126, 0.7152, 0.0722] as const;
@@ -138,6 +147,15 @@ export interface SurfaceUniforms {
   /** Bord des personnages: force (0: coupé), exposant, part du côté opposé au soleil. */
   uRim: { value: Vector3 };
   uRimColor: { value: Color };
+  /**
+   * Style `lisse` des personnages (`characters.smooth`): rampe de la lumière directe (seuil
+   * ombre, seuil lumière, demi-teinte, douceur), teinte chaude des ombres de la peau, parts de la
+   * teinte sur la peau et les tissus, liseré (largeur, douceur, force).
+   */
+  uRamp: { value: Vector4 };
+  uRampSkinTint: { value: Color };
+  uRampShade: { value: Vector2 };
+  uRampRim: { value: Vector3 };
   /** Étalonnage: saturation, contraste, relevé des noirs, allumé (1) ou non (0). */
   uGrade: { value: Vector4 };
   uGradeBalance: { value: Vector3 };
@@ -157,6 +175,8 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
   const w = AMBIANCE_SETTINGS.wind;
   const look = AMBIANCE_SETTINGS.look;
   const square = RENDER_SETTINGS.terrain.square;
+  const smooth = RENDER_SETTINGS.characters.smooth;
+  const ramp = smooth.ramp;
   return {
     uAmbTime: { value: 0 },
     uAmbNoise: { value: noise },
@@ -236,6 +256,10 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
     uShadeParams: { value: new Vector2(0, look.shadeLift) },
     uRim: { value: new Vector3(0, look.rimPower, look.rimBackSide) },
     uRimColor: { value: new Color() },
+    uRamp: { value: new Vector4(ramp.shadowEdge, ramp.lightEdge, ramp.halftone, ramp.softness) },
+    uRampSkinTint: { value: unitLuminance(new Color(smooth.skinShadeTint)) },
+    uRampShade: { value: new Vector2(smooth.skinShadeAmount, smooth.clothShadeAmount) },
+    uRampRim: { value: new Vector3(smooth.rim.width, smooth.rim.softness, smooth.rim.strength) },
     uGrade: { value: new Vector4(look.saturation, look.contrast, look.lift, 0) },
     uGradeBalance: {
       value: new Vector3(look.gradeBalance[0], look.gradeBalance[1], look.gradeBalance[2]),
@@ -350,6 +374,17 @@ uniform vec3 uShadeTint;
 uniform vec2 uShadeParams; // part, éclaircissement
 uniform vec3 uRim;         // force, exposant, part du côté opposé au soleil
 uniform vec3 uRimColor;
+#ifdef LPL_RAMP
+uniform vec4 uRamp;        // seuil ombre, seuil lumière, demi-teinte, douceur (en N.L)
+uniform vec3 uRampSkinTint;
+uniform vec2 uRampShade;   // part de la teinte à l'ombre: peau, tissus
+uniform vec3 uRampRim;     // largeur du liseré, douceur, force
+// Rampe à trois tons de la lumière directe: ombre, demi-teinte, lumière (style lisse, D1).
+float lplRamp(float nDotL) {
+  return uRamp.z * smoothstep(uRamp.x - uRamp.w, uRamp.x + uRamp.w, nDotL)
+    + (1.0 - uRamp.z) * smoothstep(uRamp.y - uRamp.w, uRamp.y + uRamp.w, nDotL);
+}
+#endif
 uniform vec4 uGrade;       // saturation, contraste, relevé des noirs, allumé
 uniform vec3 uGradeBalance;
 uniform vec4 uVignette;    // force, début, 1 / largeur, 1 / hauteur
@@ -767,12 +802,34 @@ if (uShadeParams.x > 0.0) {
   // L'ombre prend alors la teinte froide du ciel (ombres colorées), à clarté égale.
   const vec3 lookLuma = vec3(0.2126, 0.7152, 0.0722);
   float lookNdotL = dot(ambNormal, uLightDir);
-  float lookSunWanted = dot(uSunRadiance * material.diffuseContribution, lookLuma) * RECIPROCAL_PI * max(lookNdotL, 0.0);
+  #ifdef LPL_RAMP
+  // Style lisse: le soleil attendu suit la rampe, l'ombre gagne avec elle (demi-teinte à moitié teintée).
+  float lookSunShape = lplRamp(lookNdotL);
+  #else
+  float lookSunShape = max(lookNdotL, 0.0);
+  #endif
+  float lookSunWanted = dot(uSunRadiance * material.diffuseContribution, lookLuma) * RECIPROCAL_PI * lookSunShape;
   float lookSunGot = dot(reflectedLight.directDiffuse, lookLuma);
   float lookCast = 1.0 - clamp(lookSunGot / max(lookSunWanted, 1e-5), 0.0, 1.0);
+  #ifdef LPL_RAMP
+  float lookShade = max(lookCast * step(1e-3, lookSunShape), 1.0 - lookSunShape);
+  #else
   float lookShade = max(lookCast * smoothstep(0.0, 0.08, lookNdotL), 1.0 - smoothstep(0.0, 0.2, lookNdotL));
+  #endif
   float lookLift = 1.0 + lookShade * uShadeParams.y;
-  vec3 lookSky = reflectedLight.indirectDiffuse * mix(vec3(1.0), uShadeTint, lookShade * uShadeParams.x) * lookLift;
+  vec3 lookTint = uShadeTint;
+  float lookTintPart = uShadeParams.x;
+  #if defined(LPL_RAMP) && defined(USE_MAP)
+  {
+    // Peau (cases peau, ombre de peau, bouche, joue des rangées de personnage; la rangée 1 des
+    // joueurs porte leurs vêtements): ombre brique. Tissus: la teinte froide du décor, plus franche.
+    ivec2 rampCell = ivec2(floor(vMapUv * vec2(${CHARACTER_SLOT_COUNT}.0, ${CHARACTER_ROW_COUNT}.0)));
+    bool rampSkin = rampCell.y != ${PLAYER_WEAR_ROW} && (rampCell.x <= 1 || rampCell.x == ${MOUTH_COLUMN} || rampCell.x == ${CHEEK_COLUMN});
+    lookTint = rampSkin ? uRampSkinTint : uShadeTint;
+    lookTintPart = (rampSkin ? uRampShade.x : uRampShade.y) * step(1e-4, uShadeParams.x);
+  }
+  #endif
+  vec3 lookSky = reflectedLight.indirectDiffuse * mix(vec3(1.0), lookTint, lookShade * lookTintPart) * lookLift;
   #if defined(AMB_GROUND) && defined(USE_MAP)
   {
     // Cases déjà froides (lauzes): le bleu du ciel et de la teinte s'ajouterait au leur.
@@ -799,8 +856,16 @@ reflectedLight.directDiffuse *= mix(1.0, lookOcc, uLookOcc.y);
 if (uRim.x > 0.0) {
   // Lumière de bord: les faces presque de profil s'éclairent, surtout côté soleil (silhouette détachée du sol).
   float lookFacing = clamp(dot(normal, geometryViewDir), 0.0, 1.0);
+  #ifdef LPL_RAMP
+  // Style lisse: un liseré net au bord, de largeur fixe, au lieu d'un dégradé.
+  // Côté soleil seulement: à l'ombre, un bord clair ferait un halo autour des mains et des bras.
+  float lookRim = smoothstep(1.0 - uRampRim.x - uRampRim.y, 1.0 - uRampRim.x + uRampRim.y, 1.0 - lookFacing)
+    * uRampRim.z / max(uRim.x, 1e-3);
+  float lookSide = smoothstep(0.05, 0.45, dot(ambNormal, uLightDir));
+  #else
   float lookRim = pow(1.0 - lookFacing, uRim.y);
   float lookSide = mix(uRim.z, 1.0, clamp(dot(ambNormal, uLightDir) * 0.5 + 0.5, 0.0, 1.0));
+  #endif
   reflectedLight.directDiffuse += uRimColor * (lookRim * lookSide * uRim.x) * material.diffuseContribution;
 }
 #endif
@@ -841,6 +906,11 @@ export interface SurfacePatchOptions {
   ground: boolean;
   /** Lumière de bord (personnages). */
   rim?: boolean;
+  /**
+   * Style `lisse` des personnages: rampe à trois tons de la lumière directe, ombres teintées
+   * selon la matière, liseré net (même programme que sans: seule sa clé change).
+   */
+  ramp?: boolean;
   /** Suffixe de la clé de programme (un programme par variante). */
   key: string;
 }
@@ -864,6 +934,22 @@ export function injectAfter(source: string, anchor: string, code: string, label:
     throw new Error(`Ambiance: repère « ${anchor} » absent du shader (${label}).`);
   }
   return source.replace(anchor, `${anchor}\n${code}`);
+}
+
+/** Ligne de la lumière directe de Three.js (0.187) que la rampe remplace. */
+const DIRECT_IRRADIANCE = 'vec3 irradiance = dotNL * directLight.color;';
+const PHYSICAL_LIGHTS = '#include <lights_physical_pars_fragment>';
+
+/** Déplie le morceau des lumières physiques et y met la rampe à la place de N.L. */
+function injectRamp(source: string, label: string): string {
+  const chunk = ShaderChunk.lights_physical_pars_fragment;
+  if (!source.includes(PHYSICAL_LIGHTS) || chunk.split(DIRECT_IRRADIANCE).length !== 2) {
+    throw new Error(`Style lisse: repère de la lumière directe absent du shader (${label}).`);
+  }
+  return source.replace(
+    PHYSICAL_LIGHTS,
+    chunk.replace(DIRECT_IRRADIANCE, 'vec3 irradiance = lplRamp( dot( geometryNormal, directLight.direction ) ) * directLight.color;'),
+  );
 }
 
 /** Ajoute nuages, sol mouillé et lumières de sol au shader d'un matériau standard (sans changer le nombre de programmes). */
@@ -904,7 +990,13 @@ export function patchSurface(
     const defines =
       (options.puddles ? '#define AMB_PUDDLES\n' : '') +
       (options.ground ? '#define AMB_GROUND\n#define AMB_LOOK_OCC\n' : '') +
-      (options.rim === true ? '#define AMB_RIM\n' : '');
+      (options.rim === true ? '#define AMB_RIM\n' : '') +
+      (options.ramp === true ? '#define LPL_RAMP\n' : '');
+    if (options.ramp === true) {
+      // La rampe remplace N.L dans la lumière directe de chaque source (soleil, lampe): le
+      // morceau de Three.js est déplié ici pour y changer une ligne.
+      shader.fragmentShader = injectRamp(shader.fragmentShader, label);
+    }
     shader.fragmentShader = injectAfter(
       shader.fragmentShader,
       '#include <common>',
