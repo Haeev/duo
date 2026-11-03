@@ -440,18 +440,6 @@
   "file": "ferme.glb",
   "tris": 356
  },
- "fish_gudgeon": {
-  "file": "ferme.glb",
-  "tris": 284
- },
- "fish_chub": {
-  "file": "ferme.glb",
-  "tris": 140
- },
- "fish_trout": {
-  "file": "ferme.glb",
-  "tris": 284
- },
  "hen_feeder": {
   "file": "ferme.glb",
   "tris": 84,
@@ -1640,5 +1628,97 @@
  "mooring_post": {
   "file": "faune.glb",
   "tris": 162
+ },
+ "fish_gudgeon": {
+  "file": "poissons.glb",
+  "tris": 496
+ },
+ "fish_minnow": {
+  "file": "poissons.glb",
+  "tris": 436
+ },
+ "fish_stone_loach": {
+  "file": "poissons.glb",
+  "tris": 528
+ },
+ "fish_bleak": {
+  "file": "poissons.glb",
+  "tris": 376
+ },
+ "fish_roach": {
+  "file": "poissons.glb",
+  "tris": 376
+ },
+ "fish_chub": {
+  "file": "poissons.glb",
+  "tris": 380
+ },
+ "fish_trout": {
+  "file": "poissons.glb",
+  "tris": 600
+ },
+ "fish_perch": {
+  "file": "poissons.glb",
+  "tris": 564
+ },
+ "fish_dace": {
+  "file": "poissons.glb",
+  "tris": 424
+ },
+ "fish_bullhead": {
+  "file": "poissons.glb",
+  "tris": 532
+ },
+ "fish_tench": {
+  "file": "poissons.glb",
+  "tris": 444
+ },
+ "fish_barbel": {
+  "file": "poissons.glb",
+  "tris": 476
+ },
+ "fish_pike": {
+  "file": "poissons.glb",
+  "tris": 520
+ },
+ "fish_grayling": {
+  "file": "poissons.glb",
+  "tris": 516
+ },
+ "fish_brook_lamprey": {
+  "file": "poissons.glb",
+  "tris": 384
+ },
+ "fish_bitterling": {
+  "file": "poissons.glb",
+  "tris": 408
+ },
+ "fish_shad": {
+  "file": "poissons.glb",
+  "tris": 496
+ },
+ "fish_mirror_carp": {
+  "file": "poissons.glb",
+  "tris": 584
+ },
+ "fish_salmon": {
+  "file": "poissons.glb",
+  "tris": 560
+ },
+ "fish_burbot": {
+  "file": "poissons.glb",
+  "tris": 544
+ },
+ "fish_golden_trout": {
+  "file": "poissons.glb",
+  "tris": 596
+ },
+ "fish_moon_pike": {
+  "file": "poissons.glb",
+  "tris": 588
+ },
+ "landing_net": {
+  "file": "poissons.glb",
+  "tris": 704
  }
 }

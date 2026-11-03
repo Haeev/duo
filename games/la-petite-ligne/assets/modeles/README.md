@@ -10,10 +10,11 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 |---|---|---|
 | `personnages.glb` | squelette `rig`, pièces des joueurs (15 coupes, barbes et moustache), quatre habitants de la démo, Lucie (hors démo), Achille et Solange (tour 10) | clips sur le squelette |
 | `bourg.glb` | bâtiments (tour 10: rue Haute, intérieurs de l'épicerie et de la mercerie, cellier et chambre), voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière, passages du ru | aucune (pièces mobiles en nœuds à part) |
-| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poissons, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
+| `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
 | `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 41 clips, chacun sur le squelette de sa bête |
+| `poissons.glb` | les 22 poissons de la pêche (0.12) et la vieille épuisette du ponton | aucune |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
@@ -81,10 +82,17 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 - Longueurs hors tampons (extra `length_over_buffers`): locomotive 7,4 m, voiture 9,0 m, fourgon 7,0 m.
 - `locomotive_smoke`: nœud vide au sommet de la cheminée, point d'émission du panache (technical artist).
 
-## Pêche (`ferme.glb`)
+## Pêche (`ferme.glb`, `poissons.glb`)
 
 - `fishing_rod`: origine à la prise; la canne monte à 42 degrés devant la main (bout à x 0, y 1,34, z 1,49 dans le repère de la prise), nœud vide `fishing_rod_tip` au bout pour accrocher la ligne. Ligne et bouchon ne font pas partie du modèle: le jeu dessine la ligne jusqu'au bouchon `fishing_float` (origine au niveau de l'eau).
-- Poissons `fish_gudgeon`, `fish_chub`, `fish_trout` pour la prise qui saute au sac.
+- Poissons (0.12, `poissons.glb`, source `assets-src/modeles/poissons.py`): un nœud `fish_<id>` par espèce de `objets.json` (`fish_gudgeon`, `fish_minnow`, `fish_stone_loach`, `fish_bleak`, `fish_roach`, `fish_chub`, `fish_trout`, `fish_perch`, `fish_dace`, `fish_bullhead`, `fish_tench`, `fish_barbel`, `fish_pike`, `fish_grayling`, `fish_brook_lamprey`, `fish_bitterling`, `fish_shad`, `fish_mirror_carp`, `fish_salmon`, `fish_burbot`, `fish_golden_trout`, `fish_moon_pike`). Les trois poissons de la 0.11 (`fish_gudgeon`, `fish_chub`, `fish_trout`) gardent leur nom mais quittent `ferme.glb`: refaits au même gabarit que les autres.
+  - Un seul constructeur paramétrique (corps lofté en super-ellipse, opercule en ressaut, nageoires en plaques au contour arrondi, yeux, barbillons, taches et écailles plaquées sur les facettes par lancer de rayons, rayures portées par des anneaux du corps). Couleurs unies de la palette existante (aucune case ajoutée). 376 à 600 triangles par poisson.
+  - Repère: tête vers +Z glTF, dos vers +Y. Longueur du modèle = milieu de la fourchette de la conception (extra `length_m`, fourchette `length_cm`): mettre le nœud à l'échelle `longueur tirée (m) / length_m`, uniformément, autour de l'origine.
+  - Origine = prise d'une main (`socket_hand_r` ou `socket_hand_l`), sur l'axe du corps à 38 % de la longueur depuis le museau, juste derrière les pectorales. Enfants vides: `fish_<id>_tail` (deuxième main, au pédoncule de la queue, pour `fish_show` et la prise à deux) et `fish_<id>_mouth` (bout du museau: là où la ligne tient le poisson qui pend). Mêmes points en coordonnées glTF dans les extras `hold_tail` et `mouth`. Ces points suivent la mise à l'échelle puisqu'ils sont des enfants du nœud.
+  - Mythiques: `fish_golden_trout` (la Dorée, miel: dos `bread_crust`, flancs `flower_center`, quelques points rouges cerclés de crème et paillettes `brass` métalliques) et `fish_moon_pike` (Brochet de lune, dos bleuté `mattress_stripe`, flancs argent, taches blanches, œil pâle). Leur lueur relève du rendu (tech-artist).
+  - Signes de reconnaissance demandés (conception M1): grande dorsale violette de l'ombre, barbillons du barbeau (4) et du goujon (2), rayures de la perche, points de la truite, écailles miroir de la carpe; aussi six barbillons de la loche, tête plate et pectorales en éventail du chabot, ventouse et sept pores de la lamproie, barbillon du menton de la lote, nageoire adipeuse des salmonidés.
+- `landing_net` (épuisette du ponton, `poissons.glb`): manche de 1,5 m couché vers l'avant (+Z glTF), cercle de fer de 0,6 m à plat au bout, filet de corde de 0,46 m qui pend dessous. Origine à la main arrière (bout du manche, sous `socket_hand_r`), enfants vides `landing_net_hand_l` (main avant, 0,55 m devant) et `landing_net_hoop` (centre du cercle, là où entre le poisson). 704 triangles.
+- Planches: `docs/jeux/jeu-1/gauntlet/captures/v0-12/poissons.webp` (de près, profil et dos) et `poissons-echelle.webp` (taille réelle, mannequin de 1,80 m); `duo-python poissons.py` puis `duo-python verifier/planche_poissons.py`.
 
 ## Maison
 
@@ -250,7 +258,6 @@ Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `person
 
 ## Fiche par modèle
 
-
 ### `personnages.glb` (3768 Ko)
 
 | Nœud | Triangles |
@@ -333,7 +340,7 @@ Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `person
 | `driver_lean` | 3.0 | oui |
 | `driver_wave` | 1.067 | oui |
 
-### `ferme.glb` (1076 Ko)
+### `ferme.glb` (1023 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -383,9 +390,6 @@ Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `person
 | `beam` |  | 104 | kind: "carried", length_axis: "z", carry_height: 1.78 |
 | `ridge_purlin` |  | 140 | kind: "carried", length_axis: "z", carry_height: 1.78, length_m: 4.9 |
 | `nail_box` |  | 356 | kind: "item" |
-| `fish_gudgeon` |  | 284 | kind: "item" |
-| `fish_chub` |  | 140 | kind: "item" |
-| `fish_trout` |  | 284 | kind: "item" |
 | `hen_feeder` | 1 x 1 | 84 |  |
 | `grain_sack` |  | 144 | kind: "item" |
 | `water_barrel` | 1 x 1 | 356 |  |
@@ -620,3 +624,31 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `barn_owl` | `owl_land` | 0.6 | non (jouer une fois) |
 | `barn_owl` | `owl_look` | 2.0 | non (jouer une fois) |
 | `barn_owl` | `owl_perch` | 2.0 | oui |
+
+### `poissons.glb` (808 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `fish_gudgeon` |  | 496 | kind: "fish", rarity: "common", length_m: 0.115, length_cm: [8, 15], hold_tail: [0.0, 0.0, -0.0448], mouth: [0.0, 0.0, 0.0451] |
+| `fish_minnow` |  | 436 | kind: "fish", rarity: "common", length_m: 0.075, length_cm: [5, 10], hold_tail: [0.0, 0.0, -0.0292], mouth: [0.0, 0.0, 0.0294] |
+| `fish_stone_loach` |  | 528 | kind: "fish", rarity: "common", length_m: 0.09, length_cm: [6, 12], hold_tail: [0.0, 0.0, -0.0396], mouth: [0.0, 0.0, 0.0353] |
+| `fish_bleak` |  | 376 | kind: "fish", rarity: "common", length_m: 0.14, length_cm: [10, 18], hold_tail: [0.0, 0.0, -0.0546], mouth: [0.0, 0.0049, 0.0549] |
+| `fish_roach` |  | 376 | kind: "fish", rarity: "common", length_m: 0.21, length_cm: [12, 30], hold_tail: [0.0, 0.0, -0.0819], mouth: [0.0, 0.0, 0.0823] |
+| `fish_chub` |  | 380 | kind: "fish", rarity: "common", length_m: 0.35, length_cm: [20, 50], hold_tail: [0.0, 0.0, -0.1365], mouth: [0.0, 0.0, 0.1372] |
+| `fish_trout` |  | 600 | kind: "fish", rarity: "rare", length_m: 0.325, length_cm: [20, 45], hold_tail: [0.0, 0.0, -0.1332], mouth: [0.0, 0.0, 0.1274] |
+| `fish_perch` |  | 564 | kind: "fish", rarity: "rare", length_m: 0.25, length_cm: [15, 35], hold_tail: [0.0, 0.0, -0.0975], mouth: [0.0, 0.0, 0.098] |
+| `fish_dace` |  | 424 | kind: "fish", rarity: "rare", length_m: 0.215, length_cm: [15, 28], hold_tail: [0.0, 0.0, -0.0838], mouth: [0.0, 0.0, 0.0843] |
+| `fish_bullhead` |  | 532 | kind: "fish", rarity: "rare", length_m: 0.115, length_cm: [8, 15], hold_tail: [0.0, 0.0, -0.0518], mouth: [0.0, 0.0, 0.0451] |
+| `fish_tench` |  | 444 | kind: "fish", rarity: "rare", length_m: 0.325, length_cm: [20, 45], hold_tail: [0.0, 0.0, -0.1268], mouth: [0.0, 0.0, 0.1274] |
+| `fish_barbel` |  | 476 | kind: "fish", rarity: "epic", length_m: 0.525, length_cm: [35, 70], hold_tail: [0.0, -0.0, -0.2048], mouth: [0.0, -0.0052, 0.2058] |
+| `fish_pike` |  | 520 | kind: "fish", rarity: "epic", length_m: 0.725, length_cm: [50, 95], hold_tail: [0.0, 0.0, -0.319], mouth: [0.0, 0.0, 0.2842] |
+| `fish_grayling` |  | 516 | kind: "fish", rarity: "epic", length_m: 0.35, length_cm: [25, 45], hold_tail: [0.0, 0.0, -0.1365], mouth: [0.0, 0.0, 0.1372] |
+| `fish_brook_lamprey` |  | 384 | kind: "fish", rarity: "epic", length_m: 0.13, length_cm: [10, 16], hold_tail: [0.0, 0.0, -0.0624], mouth: [0.0, 0.0, 0.0494] |
+| `fish_bitterling` |  | 408 | kind: "fish", rarity: "epic", length_m: 0.065, length_cm: [5, 8], hold_tail: [0.0, 0.0, -0.0254], mouth: [0.0, 0.0, 0.0255] |
+| `fish_shad` |  | 496 | kind: "fish", rarity: "legendary", length_m: 0.45, length_cm: [35, 55], hold_tail: [0.0, 0.0, -0.1755], mouth: [0.0, 0.0, 0.1764] |
+| `fish_mirror_carp` |  | 584 | kind: "fish", rarity: "legendary", length_m: 0.7, length_cm: [55, 85], hold_tail: [0.0, 0.0, -0.273], mouth: [0.0, 0.0, 0.2744] |
+| `fish_salmon` |  | 560 | kind: "fish", rarity: "legendary", length_m: 0.85, length_cm: [70, 100], hold_tail: [0.0, -0.0, -0.3315], mouth: [0.0, -0.0102, 0.3332] |
+| `fish_burbot` |  | 544 | kind: "fish", rarity: "legendary", length_m: 0.475, length_cm: [35, 60], hold_tail: [0.0, 0.0, -0.228], mouth: [0.0, 0.0, 0.1862] |
+| `fish_golden_trout` |  | 596 | kind: "fish", rarity: "mythic", length_m: 0.45, length_cm: [42, 48], hold_tail: [0.0, 0.0, -0.1845], mouth: [0.0, 0.0, 0.1764] |
+| `fish_moon_pike` |  | 588 | kind: "fish", rarity: "mythic", length_m: 1.175, length_cm: [110, 125], hold_tail: [0.0, 0.0, -0.517], mouth: [0.0, 0.0, 0.4606] |
+| `landing_net` |  | 704 | kind: "tool", socket: "socket_hand_r", length_m: 1.75, hoop_diameter_m: 0.6, note: "manche couché vers l'avant (+Z glTF), cercle à plat, filet qui pend; origine à la main arrière, landing_net_hand_l = main avant, landing_net_hoop = centre du cercle" |

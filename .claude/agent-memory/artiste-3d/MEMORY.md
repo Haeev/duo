@@ -134,3 +134,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Tête ronde du joueur: bouche haute (hc - 0,02 à - 0,065), nez à hc - 0,016: moustache juste sous le nez; tout ce qui pend derrière la tête (queue, tresse, nuage) s'enfonce dans l'oreiller en pose `sleep`: mesurer avec `verifier/coiffures_couche.py`.
 - Vitest sans TTY n'écrit rien avant la fin (environ 30 min ici): lancer en arrière-plan sans `timeout`.
 - Contrôle d'emprise: `interieurs.blocked_cells` calcule les cases occupées depuis les boîtes des meubles posés (`Footprints`).
+
+## Poissons 0.12 (vérifié le 2026-11-03)
+
+- Corps lofté triangulé à la main: colorier par quadrilatère (centre des 4 sommets), pas par triangle, sinon la limite dos et flanc fait des dents de scie.
+- Taches plaquées: lancer de rayons sur les triangles du corps (`BVHTree.FromPolygons` sur mes propres listes), polygone dans le plan du triangle touché, rétréci jusqu'à tenir dedans, décalé de 0,3 % de la longueur.
+- `lpl.board(..., mannequin=True)` pose le mannequin hors du cadrage (calculé sur les seules copies): mettre un mannequin comme premier nœud de la grille.
+- Rendus Cycles ici: 1800 x 1125 à 12 échantillons, environ 3 min par planche (machine partagée); deux Blender en parallèle ont fini tués (code 137).
+- Import de `personnages.glb` pour une vue « en main »: `rig.data.pose_position = "REST"`, sinon une pose importée reste. Main droite = côté -X Blender: caméra de ce côté.
