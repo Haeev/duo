@@ -207,7 +207,12 @@
     "handcar": { "item": "handcar", "from": "handcar_shed", "path": [[0, 4], [-2.5, 4]], "size": [1.4, 1.6], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
     "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" },
     "lengths": { "beam": 4.5 },
-    "grip": { "side": 0.45, "fromEnd": 0.3, "reach": 1.2 }
+    "grip": { "side": 0.45, "fromEnd": 0.3, "reach": 1.2 },
+    "quests": [
+      {"item": "market_stall", "from": "sawmill_workbench", "to": "market_stall", "quest": "market_stall", "step": "carry", "flag": "stall_carried", "placedText": "stall_placed"},
+      {"item": "brick_crate", "from": "train_stop", "to": "bakery_door", "quest": "achille_oven", "step": "unload", "when": [{"type": "weekday_is", "weekdays": ["saturday"]}, {"type": "time_is", "from": "10:00", "to": "24:00"}, {"type": "nights_passed", "count": 1}], "flag": "bricks_unloaded", "placedText": "bricks_placed"},
+      {"item": "goat_crate", "from": "train_stop", "to": "goat_shed", "quest": "goat_talus", "step": "lead", "when": [{"type": "weekday_is", "weekdays": ["saturday"]}, {"type": "time_is", "from": "10:00", "to": "24:00"}, {"type": "nights_passed", "count": 1}], "flag": "goat_arrived", "placedText": "goat_placed"}
+    ]
   },
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7, "unseenFactor": 4, "sharedFromDay": 16, "sharedEveryDays": 3, "sharedNoRepeatDays": 14 },
   "dialogues": { "datedRepeatDays": 28, "datedRepeatFromDay": 16 },

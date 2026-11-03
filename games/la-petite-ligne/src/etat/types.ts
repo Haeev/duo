@@ -741,7 +741,8 @@ export interface Tree {
 }
 
 /** Ce qu'on porte à deux: la poutre, la draisine poussée, le colis lourd du train. */
-export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket';
+/** `quest` (0.12): une charge de quête (`reglages.carry.quests`), retrouvée par son objet. */
+export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket' | 'quest';
 
 export interface Beam {
   /** Objet porté (modèle de `objets.json`): `beam`, `handcar`, `heavy_parcel`. */

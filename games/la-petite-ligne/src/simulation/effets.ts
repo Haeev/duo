@@ -89,6 +89,11 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       world.purse += effect.amount;
       emit(sim, { type: 'money', amount: effect.amount });
       return;
+    case 'take_money':
+      // Comme un achat: rien sous zéro (le choix payant a vérifié la bourse avant).
+      world.purse -= Math.min(world.purse, effect.amount);
+      sim.runtime.changed = true;
+      return;
     case 'set_flag':
       if (!world.flags.includes(effect.flag)) world.flags.push(effect.flag);
       return;

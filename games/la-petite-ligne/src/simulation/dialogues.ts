@@ -248,6 +248,11 @@ function uiText(sim: Sim, key: string): string | null {
   return typeof value === 'string' ? value : null;
 }
 
+/** Les conditions d'une liste, celles des `all` et `any` comprises. */
+function flatConditions(list: readonly Condition[]): Condition[] {
+  return list.flatMap((c) => (c.type === 'all' || c.type === 'any' ? [c, ...flatConditions(c.conditions)] : [c]));
+}
+
 /** Choix « Donner » quand une étape active attend un objet pour cet habitant. */
 function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceView[] {
   const out: DialogueChoiceView[] = [];
@@ -260,7 +265,8 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
     if (state.status !== 'active') continue;
     const step = sim.content.quests.find((q) => q.id === state.id)?.steps[state.step];
     if (step === undefined) continue;
-    for (const cond of step.conditions) {
+    // Dons au choix (`any`, 0.12: trois coupons de toile ou six plumes): chaque objet a sa ligne « Donner ».
+    for (const cond of flatConditions(step.conditions)) {
       if (cond.type !== 'counter') continue;
       const parts = cond.key.split(':');
       if (parts[0] !== 'given' || parts[1] !== villager || parts[2] === undefined) continue;

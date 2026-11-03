@@ -236,7 +236,12 @@
     "moment_lantern_take": "Lève la perche et allume ({act}), au même instant que {partner}.",
     "moment_lantern_alone": "Ta flamme vacille et s'éteint: il faut allumer au même instant que {partner}. Comptez ensemble.",
     "moment_lantern_where_square": "L'autre lanterne est celle de la place, au nord, près de l'épicerie.",
-    "moment_lantern_where_quay": "L'autre lanterne est au bout est du quai."
+    "moment_lantern_where_quay": "L'autre lanterne est au bout est du quai.",
+    "achille_eggs_late": "Achille a fait sa brioche aux œufs d'Odette. Une autre fois !",
+    "stall_placed": "L'étal est posé sur la place, dos à l'épicerie.",
+    "bricks_placed": "La caisse de briques est devant le fournil. Achille vous attend au guichet.",
+    "goat_placed": "La chevrette sort de sa caisse et file dans la chevrerie.",
+    "rooster_crate_arrived": "Une cage est descendue du train: le coq du cousin d'Odette attend sur le quai."
   },
   "orderFormat": {
     "line": "{count} {item}",

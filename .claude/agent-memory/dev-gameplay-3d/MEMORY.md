@@ -302,3 +302,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Vitest de ce jeu n'affiche pas le `console.log` d'un test: une sonde écrit dans un fichier du scratchpad (`writeFileSync`).
 - Outil isolé: une commande qui contient « .git » (même `--exclude-dir=.git`) ou plusieurs commandes git enchaînées est refusée; le contrôle des tirets passe par l'outil Grep (`[\x{2013}\x{2014}]`), une commande git par appel.
 - Un trajet d'habitant calculé avant l'arrivée du train n'est pas recalculé quand `train_at_platform` se bloque: Basile traverse le train à quai (samedi 10 h, vu le 2026-11-03, non corrigé).
+
+## Quêtes de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Les fichiers de `donnees/` ont une mise en forme à la main (un objet par ligne dans les tableaux): ne jamais les réécrire par `json.dumps` (diff énorme, conflits avec les lots parallèles). Insérer des lignes avant la fermeture du tableau, puis relire le JSON.
+- `ranges.stayAt` vaut 4 m: deux conditions `stayed_at` « un joueur à chaque bout » demandent plus de 8 m entre les points, sinon un seul joueur les remplit.
+- Une charge à deux garde les décalages des porteurs pris au moment de la lever: côte à côte, elle se coince entre les buissons du quai (x 45 à 49, y 19-20). Les tests portent l'un devant l'autre, reposent et reprennent quand ça bloque, et passent par le passage pavé x 43-44.
+- Payer dans un dialogue: choix à `correct: money_at_least`, effet `take_money`, dialogue sans `once` (le validateur refuse `"once": null`): il se rejoue tant que l'étape dure.
+- Validateur: `indefinite` commence par « un », « une » ou « des » suivi du nom exact; un objet `food` veut un `dish`; `day_at_least` reste dans les jours de la démo (1 à 8).
+- Avancer l'horloge à la main au-delà du départ d'un train (16 h) paie la commande: comparer la bourse juste avant le changement attendu, pas au début du test.
