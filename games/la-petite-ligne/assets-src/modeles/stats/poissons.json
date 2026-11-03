@@ -1,0 +1,454 @@
+{
+ "nodes": {
+  "fish_gudgeon": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.115,
+   "length_cm": [
+    8,
+    15
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0448
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0451
+   ],
+   "tris": 496
+  },
+  "fish_minnow": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.075,
+   "length_cm": [
+    5,
+    10
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0292
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0294
+   ],
+   "tris": 436
+  },
+  "fish_stone_loach": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.09,
+   "length_cm": [
+    6,
+    12
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0396
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0353
+   ],
+   "tris": 528
+  },
+  "fish_bleak": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.14,
+   "length_cm": [
+    10,
+    18
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0546
+   ],
+   "mouth": [
+    0.0,
+    0.0049,
+    0.0549
+   ],
+   "tris": 376
+  },
+  "fish_roach": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.21,
+   "length_cm": [
+    12,
+    30
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0819
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0823
+   ],
+   "tris": 376
+  },
+  "fish_chub": {
+   "kind": "fish",
+   "rarity": "common",
+   "length_m": 0.35,
+   "length_cm": [
+    20,
+    50
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1365
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1372
+   ],
+   "tris": 380
+  },
+  "fish_trout": {
+   "kind": "fish",
+   "rarity": "rare",
+   "length_m": 0.325,
+   "length_cm": [
+    20,
+    45
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1332
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1274
+   ],
+   "tris": 600
+  },
+  "fish_perch": {
+   "kind": "fish",
+   "rarity": "rare",
+   "length_m": 0.25,
+   "length_cm": [
+    15,
+    35
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0975
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.098
+   ],
+   "tris": 564
+  },
+  "fish_dace": {
+   "kind": "fish",
+   "rarity": "rare",
+   "length_m": 0.215,
+   "length_cm": [
+    15,
+    28
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0838
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0843
+   ],
+   "tris": 424
+  },
+  "fish_bullhead": {
+   "kind": "fish",
+   "rarity": "rare",
+   "length_m": 0.115,
+   "length_cm": [
+    8,
+    15
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0518
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0451
+   ],
+   "tris": 532
+  },
+  "fish_tench": {
+   "kind": "fish",
+   "rarity": "rare",
+   "length_m": 0.325,
+   "length_cm": [
+    20,
+    45
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1268
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1274
+   ],
+   "tris": 444
+  },
+  "fish_barbel": {
+   "kind": "fish",
+   "rarity": "epic",
+   "length_m": 0.525,
+   "length_cm": [
+    35,
+    70
+   ],
+   "hold_tail": [
+    0.0,
+    -0.0,
+    -0.2048
+   ],
+   "mouth": [
+    0.0,
+    -0.0052,
+    0.2058
+   ],
+   "tris": 476
+  },
+  "fish_pike": {
+   "kind": "fish",
+   "rarity": "epic",
+   "length_m": 0.725,
+   "length_cm": [
+    50,
+    95
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.319
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.2842
+   ],
+   "tris": 520
+  },
+  "fish_grayling": {
+   "kind": "fish",
+   "rarity": "epic",
+   "length_m": 0.35,
+   "length_cm": [
+    25,
+    45
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1365
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1372
+   ],
+   "tris": 516
+  },
+  "fish_brook_lamprey": {
+   "kind": "fish",
+   "rarity": "epic",
+   "length_m": 0.13,
+   "length_cm": [
+    10,
+    16
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0624
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0494
+   ],
+   "tris": 384
+  },
+  "fish_bitterling": {
+   "kind": "fish",
+   "rarity": "epic",
+   "length_m": 0.065,
+   "length_cm": [
+    5,
+    8
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.0254
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.0255
+   ],
+   "tris": 408
+  },
+  "fish_shad": {
+   "kind": "fish",
+   "rarity": "legendary",
+   "length_m": 0.45,
+   "length_cm": [
+    35,
+    55
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1755
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1764
+   ],
+   "tris": 496
+  },
+  "fish_mirror_carp": {
+   "kind": "fish",
+   "rarity": "legendary",
+   "length_m": 0.7,
+   "length_cm": [
+    55,
+    85
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.273
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.2744
+   ],
+   "tris": 584
+  },
+  "fish_salmon": {
+   "kind": "fish",
+   "rarity": "legendary",
+   "length_m": 0.85,
+   "length_cm": [
+    70,
+    100
+   ],
+   "hold_tail": [
+    0.0,
+    -0.0,
+    -0.3315
+   ],
+   "mouth": [
+    0.0,
+    -0.0102,
+    0.3332
+   ],
+   "tris": 560
+  },
+  "fish_burbot": {
+   "kind": "fish",
+   "rarity": "legendary",
+   "length_m": 0.475,
+   "length_cm": [
+    35,
+    60
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.228
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1862
+   ],
+   "tris": 544
+  },
+  "fish_golden_trout": {
+   "kind": "fish",
+   "rarity": "mythic",
+   "length_m": 0.45,
+   "length_cm": [
+    42,
+    48
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.1845
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.1764
+   ],
+   "tris": 596
+  },
+  "fish_moon_pike": {
+   "kind": "fish",
+   "rarity": "mythic",
+   "length_m": 1.175,
+   "length_cm": [
+    110,
+    125
+   ],
+   "hold_tail": [
+    0.0,
+    0.0,
+    -0.517
+   ],
+   "mouth": [
+    0.0,
+    0.0,
+    0.4606
+   ],
+   "tris": 588
+  },
+  "landing_net": {
+   "kind": "tool",
+   "socket": "socket_hand_r",
+   "length_m": 1.75,
+   "hoop_diameter_m": 0.6,
+   "note": "manche couché vers l'avant (+Z glTF), cercle à plat, filet qui pend; origine à la main arrière, landing_net_hand_l = main avant, landing_net_hoop = centre du cercle",
+   "tris": 704
+  }
+ },
+ "animations": [],
+ "file_bytes": 830368
+}
