@@ -86,12 +86,17 @@
       "weights": { "absentFamily": 3, "neverOrdered": 2, "twoOrdersAgo": 0.5 },
       "budget": { "start": 1.9, "stepOnComplete": 0.15, "max": 3.1, "afterMiss": 0, "afterTwoMisses": -0.25, "floor": 1.52 },
       "size": { "current": "normale", "factors": { "petite": 0.7, "normale": 1.0, "grande": 1.3 } },
-      "resources": { "garden": 54, "eggs": 16.2, "eggsPerHenPerWeek": 5.4, "river": 1, "wood": 1, "resourceCap": 0.85, "minLineShare": 0.6, "forageCap": 0.6, "forageShare": 0.5, "woodPlanksPerTree": 8, "woodCap": 0.6, "woodMinTrees": 2 },
+      "resources": { "garden": 54, "eggs": 16.2, "eggsPerHenPerWeek": 5.4, "river": 2, "wood": 1, "resourceCap": 0.85, "minLineShare": 0.6, "forageCap": 0.6, "forageShare": 0.5, "woodPlanksPerTree": 8, "woodCap": 0.6, "woodMinTrees": 2 },
       "paymentPerWorkWeek": 380,
-      "fishCostFromWeights": true,
-      "fishCostReferenceSeason": "spring",
+      "riverUnitCost": 0.0454,
+      "fishShareBySeason": {
+        "spring": { "gudgeon": 0.096, "roach": 0.206, "chub": 0.293, "trout": 0.092, "perch": 0.095, "dace": 0.042 },
+        "summer": { "gudgeon": 0.083, "roach": 0.179, "chub": 0.267, "trout": 0.109, "perch": 0.090, "tench": 0.059 },
+        "autumn": { "gudgeon": 0.096, "roach": 0.170, "chub": 0.264, "trout": 0.089, "perch": 0.091, "dace": 0.037, "tench": 0.053 },
+        "winter": { "gudgeon": 0.106, "roach": 0.213, "chub": 0.291, "perch": 0.082, "dace": 0.074 }
+      },
       "roundTo": { "radish": 3, "carrot": 3 },
-      "lineMax": { "radish": 18, "carrot": 18, "lettuce": 8, "crunchy_radishes": 8, "vegetable_soup": 6, "omelette": 8, "egg": 12, "gudgeon": 12, "chub": 6, "trout": 3, "plank": 20, "dandelion": 12, "wild_garlic": 6, "chanterelle": 6, "blackberry": 12, "hazelnut": 12, "cep": 4, "elderberry": 10 },
+      "lineMax": { "radish": 18, "carrot": 18, "lettuce": 8, "crunchy_radishes": 8, "vegetable_soup": 6, "omelette": 8, "egg": 12, "gudgeon": 4, "chub": 8, "trout": 3, "roach": 6, "perch": 3, "tench": 2, "dace": 2, "plank": 20, "dandelion": 12, "wild_garlic": 6, "chanterelle": 6, "blackberry": 12, "hazelnut": 12, "cep": 4, "elderberry": 10 },
       "extraLineMinShare": 0.2,
       "maxLines": 6,
       "noSharedBase": { "omelette": ["egg"], "crunchy_radishes": ["radish"], "vegetable_soup": ["radish", "carrot", "lettuce"] },
@@ -103,9 +108,13 @@
         { "item": "omelette", "family": "cuisine", "resource": "eggs", "cost": 1.5, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "crafted:cook_omelette", "leadDays": 1 },
         { "item": "crunchy_radishes", "family": "cuisine", "resource": "garden", "cost": 1.5, "min": 4, "price": 16, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_crunchy_radishes", "leadDays": 3 },
         { "item": "vegetable_soup", "family": "cuisine", "resource": "garden", "cost": 4.67, "min": 2, "price": 60, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_vegetable_soup", "leadDays": 5 },
-        { "item": "gudgeon", "family": "rivière", "resource": "river", "cost": 0.0833, "min": 4, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:gudgeon", "leadDays": 1 },
-        { "item": "chub", "family": "rivière", "resource": "river", "cost": 0.1667, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:chub", "leadDays": 1 },
-        { "item": "trout", "family": "rivière", "resource": "river", "cost": 0.3333, "min": 2, "seasons": ["spring", "summer", "autumn"], "obtained": "caught:trout", "leadDays": 1 },
+        { "item": "gudgeon", "family": "rivière", "resource": "river", "cost": 0.0833, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:gudgeon", "leadDays": 1 },
+        { "item": "chub", "family": "rivière", "resource": "river", "cost": 0.1667, "min": 3, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:chub", "leadDays": 1 },
+        { "item": "trout", "family": "rivière", "resource": "river", "cost": 0.3333, "min": 1, "seasons": ["spring", "summer", "autumn"], "obtained": "caught:trout", "leadDays": 1 },
+        { "item": "roach", "family": "rivière", "resource": "river", "cost": 0.22, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:roach", "leadDays": 1 },
+        { "item": "perch", "family": "rivière", "resource": "river", "cost": 0.48, "min": 1, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:perch", "leadDays": 1 },
+        { "item": "tench", "family": "rivière", "resource": "river", "cost": 0.77, "min": 1, "seasons": ["summer", "autumn"], "obtained": "caught:tench", "leadDays": 1 },
+        { "item": "dace", "family": "rivière", "resource": "river", "cost": 1.08, "min": 1, "seasons": ["autumn", "winter", "spring"], "obtained": "caught:dace", "leadDays": 1 },
         { "item": "plank", "family": "bois", "resource": "wood", "cost": 0.03125, "min": 6, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "crafted:saw_plank", "leadDays": 1 },
         { "item": "dandelion", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 6, "seasons": ["spring"], "obtained": "picked:dandelion", "leadDays": 2 },
         { "item": "wild_garlic", "family": "lisière", "resource": "forage", "cost": 1.0, "min": 3, "seasons": ["spring"], "obtained": "picked:wild_garlic", "leadDays": 2 },
@@ -205,7 +214,14 @@
   },
   "carry": {
     "handcar": { "item": "handcar", "from": "handcar_shed", "path": [[0, 4], [-2.5, 4]], "size": [1.4, 1.6], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
-    "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" }
+    "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" },
+    "lengths": { "beam": 4.5 },
+    "grip": { "side": 0.45, "fromEnd": 0.3, "reach": 1.2 },
+    "quests": [
+      {"item": "market_stall", "from": "sawmill_workbench", "to": "market_stall", "quest": "market_stall", "step": "carry", "flag": "stall_carried", "placedText": "stall_placed"},
+      {"item": "brick_crate", "from": "train_stop", "to": "bakery_door", "quest": "achille_oven", "step": "unload", "when": [{"type": "weekday_is", "weekdays": ["saturday"]}, {"type": "time_is", "from": "10:00", "to": "24:00"}, {"type": "nights_passed", "count": 1}], "flag": "bricks_unloaded", "placedText": "bricks_placed"},
+      {"item": "goat_crate", "from": "train_stop", "to": "goat_shed", "quest": "goat_talus", "step": "lead", "when": [{"type": "weekday_is", "weekdays": ["saturday"]}, {"type": "time_is", "from": "10:00", "to": "24:00"}, {"type": "nights_passed", "count": 1}], "flag": "goat_arrived", "placedText": "goat_placed"}
+    ]
   },
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7, "unseenFactor": 4, "sharedFromDay": 16, "sharedEveryDays": 3, "sharedNoRepeatDays": 14 },
   "dialogues": { "datedRepeatDays": 28, "datedRepeatFromDay": 16 },
@@ -253,8 +269,52 @@
   "memories": { "maxBytes": 1536 },
 
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
-  "fishing": { "tier": "P1", "castRange": 6, "castDistance": 4, "castShoreMargin": 0.3, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
+  "fishing": {
+    "tier": "P1", "castRange": 6, "castDistance": 4, "castShoreMargin": 0.3,
+    "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled",
+    "priceScale": 1,
+    "togetherRadius": 15,
+    "rarity": {
+      "tierWeights": { "common": 72, "rare": 24, "epic": 4 },
+      "hotSpot": { "rare": 1.6, "epic": 2.5 },
+      "rain": { "rare": 1.15, "epic": 1.0 },
+      "mist": { "rare": 1.0, "epic": 1.3, "until": "10:30" },
+      "goldenHours": { "rare": 1.2, "epic": 1.2, "ranges": [["06:00", "09:00"], ["17:00", "21:00"]] },
+      "together": { "rare": 1.2, "epic": 1.25, "maxBobberGap": 10 },
+      "maxShare": { "rare": 0.40, "epic": 0.15 },
+      "favoriteFactor": 2,
+      "unseenFactor": { "common": 4, "rare": 4, "epic": 8 },
+      "unseenEpicTier": 1.5,
+      "streak": { "length": 3, "factor": 0.3333 },
+      "maxSameSpecies": 2,
+      "pityAfterCommons": 10
+    },
+    "shadows": {
+      "perZone": { "ford": 3, "sands": 3, "pontoon": 4, "confluence": 3, "ru": 2, "upstream": 3, "downstream": 3 },
+      "wakeRadius": 12, "sleepRadius": 16, "sleepAfterSeconds": 30,
+      "lifeSeconds": [60, 120], "respawnSeconds": [6, 10], "fadeSeconds": 2,
+      "minShoreDistance": 0.4, "minBobberDistance": 2,
+      "attractRadius": 1.5, "attractRadiusSmallWater": 1.0, "approachSpeed": 0.4,
+      "minBiteAfterArrival": 1.5, "noShadowSpawnDistance": 3, "noShadowWaitFactor": 1.5,
+      "fleeSpeed": 2, "fleeSeconds": 1,
+      "assistConeDegrees": 20, "assistOffset": 0.5,
+      "sizes": { "small": 0.30, "medium": 0.50, "large": 0.80, "huge": 1.20 }
+    },
+    "hotSpot": {
+      "drawKey": "coin_peche", "notSameAsYesterday": true,
+      "ringEverySeconds": [5, 9], "ringElsewhereSeconds": [20, 40], "maxRings": 3,
+      "bubbleEverySeconds": [8, 15], "birdEverySeconds": [40, 80], "signsRadius": 20
+    },
+    "watch": { "stillSeconds": 1.5, "waterRadius": 3, "glintRadius": 8 },
+    "grands": {
+      "fromDay": 16, "maxLegendaryPerDay": 1,
+      "unseenPresenceFactor": 1.5, "presenceMax": 0.6,
+      "attractRadius": 1.0, "biteWaitSeconds": [8, 20],
+      "mythic": { "presence": 0.25, "watchRange": 6, "biteWaitSeconds": [6, 12], "netSeconds": 5, "netSecondsEasy": 10, "netRange": 2.5 }
+    }
+  },
   "feel": {
+    "steppingStoneVillagers": ["jeanne"],
     "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 },
     "fishWeightsBySeason": {
       "spring": { "gudgeon": 6, "chub": 3, "trout": 2 },

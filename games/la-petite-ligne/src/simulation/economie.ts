@@ -15,6 +15,7 @@ import { storeAtHome } from './rangement';
 import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
 import { deliverWeeklyItem } from './catalogue';
 import { creditImprovement, improvementName } from './chantiers';
+import { buildingOpen } from './interieurs';
 
 /** Un habitant tient la boutique (activité `serve` au comptoir). */
 export function shopOpen(sim: Sim): boolean {
@@ -30,7 +31,32 @@ export function nearPoint(sim: Sim, c: Character, id: string, range: number): bo
 }
 
 function canShop(sim: Sim, c: Character): boolean {
+  if (c.inside === HABERDASHERY.building) return false;
   return c.menu === 'shop' || nearPoint(sim, c, 'grocery_counter', sim.content.settings.ranges.talk);
+}
+
+/** La mercerie de Solange (0.11.2): son comptoir, dans sa boutique. */
+export const HABERDASHERY = { building: 'salon', counter: 'salon_counter', keeper: 'solange' } as const;
+
+/**
+ * Solange tient le comptoir de sa mercerie (activité `serve` au comptoir, boutique ouverte): les
+ * rideaux de couleur s'y achètent. Même règle que l'épicerie d'Odette.
+ */
+export function haberdasheryOpen(sim: Sim): boolean {
+  const counter = sim.map.points[HABERDASHERY.counter];
+  const b = sim.map.buildings[HABERDASHERY.building];
+  if (counter === undefined || b === undefined || !buildingOpen(sim, b)) return false;
+  return sim.world.villagers.some(
+    (v) =>
+      v.id === HABERDASHERY.keeper &&
+      v.visible &&
+      v.activity === 'serve' &&
+      distance(v.pos, counter) <= sim.content.settings.feel.pointRadius * 2,
+  );
+}
+
+function canHaberdash(c: Character): boolean {
+  return c.menu === 'shop' && c.inside === HABERDASHERY.building;
 }
 
 function canUseCatalogue(sim: Sim, c: Character): boolean {
@@ -81,6 +107,7 @@ export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void
   const cat = sim.content.catalogue;
   if (request.source === 'catalogue' && cat !== null && request.item in cat.copies && copiesLeft(cat, sim.world, request.item) < request.count) return;
   if (request.source === 'grocery' && (!canShop(sim, c) || !shopOpen(sim))) return;
+  if (request.source === 'haberdashery' && (!canHaberdash(c) || !haberdasheryOpen(sim))) return;
   if (request.source === 'catalogue') {
     if (!canUseCatalogue(sim, c)) return;
     if (!catalogueOpen(sim)) {

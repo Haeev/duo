@@ -279,18 +279,6 @@
    "kind": "item",
    "tris": 356
   },
-  "fish_gudgeon": {
-   "kind": "item",
-   "tris": 284
-  },
-  "fish_chub": {
-   "kind": "item",
-   "tris": 140
-  },
-  "fish_trout": {
-   "kind": "item",
-   "tris": 284
-  },
   "hen_feeder": {
    "footprint": [
     1,
@@ -339,5 +327,5 @@
   "hen_walk",
   "hen_peck"
  ],
- "file_bytes": 1379168
+ "file_bytes": 1326552
 }

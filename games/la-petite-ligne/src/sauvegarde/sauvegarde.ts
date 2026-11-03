@@ -4,6 +4,7 @@
  * stable des joueurs (jamais au rôle d'hôte ou d'invité).
  */
 import { compactDialoguesDone } from '../etat/dialogues-faits';
+import { emptyFishing } from '../etat/peche';
 import type { GameMap } from '../etat/carte';
 import type { CharacterId, Tree, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
@@ -17,7 +18,7 @@ import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
 import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
-import { isCurtains, rehangCurtains } from '../simulation/amenagement';
+import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt } from '../etat/carte';
 import { isTool } from '../etat/maison';
@@ -86,8 +87,18 @@ export function snapshotOf(sim: Sim): WorldSnapshot {
     label: saveLabel(sim),
     progress: progressOf(sim),
     dataSchema: DATA_SCHEMA,
-    data: structuredClone(sim.world),
+    data: withoutTransientFishing(structuredClone(sim.world)),
   };
+}
+
+/** Les ombres, les coins éveillés, le guet et l'épuisette ne se sauvegardent pas (pêche 0.12, section 5.5). */
+function withoutTransientFishing(world: WorldState): WorldState {
+  const f = world.fishing;
+  f.shadows = [];
+  f.zones = {};
+  f.watch = { p1: null, p2: null };
+  f.landing = null;
+  return world;
 }
 
 export class SaveError extends Error {
@@ -132,7 +143,31 @@ function checkWorld(data: unknown): WorldState {
   checkTour9(data);
   checkTour10(data);
   checkLetters(data.letters as unknown[]);
+  checkDecor(data);
+  checkFishing(data.fishing);
   return data as unknown as WorldState;
+}
+
+/** Pêche du format 10: carnet des poissons, grands pris, séries (le reste se recalcule). */
+function checkFishing(fishing: unknown): void {
+  const bad = (what: string): never => {
+    throw new SaveError(`sauvegarde: pêche, ${what} invalide`);
+  };
+  if (!isRecord(fishing)) return bad('objet');
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const who = (v: unknown): boolean => v === 'p1' || v === 'p2';
+  if (!isRecord(fishing.log)) bad('carnet');
+  for (const e of Object.values(fishing.log as Record<string, unknown>)) {
+    if (!isRecord(e) || !num(e.count) || !isRecord(e.first) || !isRecord(e.record)) bad('page du carnet');
+    const first = (e as { first: Record<string, unknown> }).first;
+    const record = (e as { record: Record<string, unknown> }).record;
+    if (!num(first.day) || !who(first.by) || typeof first.zone !== 'string' || typeof first.together !== 'boolean') bad('première prise');
+    if (!num(record.cm) || !who(record.by) || !num(record.day)) bad('record');
+  }
+  if (!isRecord(fishing.grandsCaught) || !Object.values(fishing.grandsCaught).every(num)) bad('grands pris');
+  if (!isRecord(fishing.streak)) bad('séries');
+  if (!num(fishing.commonsInRow) || !num(fishing.nextShadow)) bad('compteurs');
+  if (!isRecord(fishing.grands) || !Array.isArray(fishing.grands.list)) bad('grands du jour');
 }
 
 /** Lettres du format 8: identifiant, jour, variante, variables, lecteurs (texte d'origine si migrée). */
@@ -151,6 +186,24 @@ function checkLetters(letters: unknown[]): void {
       (legacy === undefined || (isRecord(legacy) && typeof legacy.title === 'string' && typeof legacy.from === 'string' && typeof legacy.text === 'string'));
     if (!ok) throw new SaveError('sauvegarde: lettre invalide');
   }
+}
+
+/** Format 9 (S03): petits objets posés sur un meuble, chacun avec son meuble porteur et sa place. */
+function checkDecor(data: Record<string, unknown>): void {
+  const list = data.decor;
+  const ok =
+    Array.isArray(list) &&
+    list.every(
+      (d) =>
+        isRecord(d) &&
+        typeof d.id === 'string' &&
+        typeof d.item === 'string' &&
+        typeof d.on === 'string' &&
+        typeof d.place === 'number' &&
+        Number.isInteger(d.place) &&
+        (d.placedBy === null || d.placedBy === 'p1' || d.placedBy === 'p2'),
+    );
+  if (!ok) throw new SaveError('sauvegarde: petits objets posés invalides');
 }
 
 /** Champs du format 7 (tour 10): pièces commandées, râtelier, besoins doux des personnages. */
@@ -443,6 +496,9 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
   if (dataSchema < 7 && isRecord(data) && tour10Fillable(data)) fillTour10Fields(map, data as unknown as WorldState);
   if (dataSchema < 8 && isRecord(data)) migrateToFormat8(data, content);
+  // Format 9 (0.11.2, S03): les petits objets posés sur les meubles; aucun avant.
+  if (dataSchema < 9 && isRecord(data)) data.decor = [];
+  if (dataSchema < 10 && isRecord(data)) migrateToFormat10(data, content);
   return data;
 }
 
@@ -463,6 +519,27 @@ function migrateToFormat8(world: Record<string, unknown>, content: Content): voi
     const read = l.read.filter((id): id is CharacterId => id === 'p1' || id === 'p2');
     return letterFromRendered(content, { id: l.id, day: l.day, title: l.title, from: l.from, text: l.text, read });
   });
+}
+
+/**
+ * Format 10 (pêche 0.12): l'état de la pêche, vide, et le carnet des poissons rempli d'après les
+ * compteurs `caught:<poisson>` (nombre de prises; jour, coin et record exacts inconnus: le jour de la
+ * reprise, le gué, la plus petite taille de l'espèce).
+ */
+function migrateToFormat10(world: Record<string, unknown>, content: Content): void {
+  const fishing = emptyFishing();
+  const counters = isRecord(world.counters) ? world.counters : {};
+  const day = isRecord(world.clock) && typeof world.clock.day === 'number' ? world.clock.day : 1;
+  const duo = isRecord(counters.duo) ? counters.duo : {};
+  for (const [id, def] of Object.entries(content.items)) {
+    const count = duo[`caught:${id}`];
+    if (def.fish === null || typeof count !== 'number' || count <= 0) continue;
+    const p2 = isRecord(counters.p2) ? counters.p2[`caught:${id}`] : undefined;
+    const p1 = isRecord(counters.p1) ? counters.p1[`caught:${id}`] : undefined;
+    const by: CharacterId = typeof p2 === 'number' && p2 > (typeof p1 === 'number' ? p1 : 0) ? 'p2' : 'p1';
+    fishing.log[id] = { count, first: { day, by, zone: 'ford', together: false }, record: { cm: def.fish.lengthCm[0], by, day } };
+  }
+  world.fishing = fishing;
 }
 
 /** Assez de forme pour poser les défauts du tour 10 (le contrôle complet suit, `checkWorld`). */
@@ -631,10 +708,13 @@ function resume(
     // L'échelle se reprend à la main; la confidence du matin reste.
     c.holding = null;
     // Assis sur un banc (après le tour 5): absent des sauvegardes d'avant, comme debout.
-    c.seat = sanitizeSeat(map, content.settings.benches, c);
+    c.seat = sanitizeSeat(map, content.settings.benches, c, { furniture: world.furniture, items: content.items });
     if (c.seat === null && c.action.kind === 'sit') c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
+    // Pêche 0.12: les ombres renaissent au chargement, la ligne se relance.
+    c.fishing = null;
   }
+  world.fishing = withoutTransientFishing({ fishing: world.fishing } as WorldState).fishing;
   for (const v of world.villagers) v.talkingWith = [];
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
@@ -645,6 +725,8 @@ function resume(
   world.scene = null;
   const sim = wrapWorld(content, map, world);
   if (dataSchema < 7) migrateToTour10(sim);
+  // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
+  settleDecor(sim);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

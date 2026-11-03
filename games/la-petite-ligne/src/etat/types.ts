@@ -27,6 +27,7 @@
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
 import type { BuildingId } from './carte';
+import type { FishingState, FishRarity } from './peche';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -118,6 +119,8 @@ export interface WorldState {
   constructions: ConstructionState[];
   /** Meubles posés dans la pièce de la maisonnette. */
   furniture: PlacedFurniture[];
+  /** Petits objets posés sur le dessus d'un meuble porteur (format 9, S03). */
+  decor: PlacedDecor[];
   /** Objets posés au sol (boîte en fer, œufs, piles tombées d'un sac plein). */
   groundItems: GroundItem[];
   villagers: VillagerState[];
@@ -232,6 +235,8 @@ export interface WorldState {
    * souhaits) s'échelonnent à partir de là, un par journée (`simulation/bourg.ts`, `townDays`).
    */
   upperStreetSince: number;
+  /** Pêche de la 0.12 (format 9): ombres, coin qui frémit, guet, grands, carnet des poissons (`etat/peche.ts`). */
+  fishing: FishingState;
 }
 
 /** Une coupe proposée depuis le banc du salon: coiffure, couleur et barbe (bornes de `town.appearance`). */
@@ -502,7 +507,14 @@ export interface Character {
    */
   seat: BenchSeat | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
-  fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
+  fishing: {
+    phase: 'waiting' | 'bite';
+    bobber: Vec2;
+    biteAt: number;
+    until: number;
+    /** Ombre réservée par cette ligne (`world.fishing.shadows[].id`), absente si aucune encore. */
+    shadow?: number;
+  } | null;
   /**
    * Confidence du matin (moments rares): où et quand voir le moment du jour, pour ce joueur seul.
    * Affichée au petit-déjeuner et au carnet jusqu'à l'apogée ou au départ du moment.
@@ -657,6 +669,10 @@ export interface PlacementPreview {
   valid: boolean;
   /** Pourquoi ce n'est pas possible (texte de `textes.json`, clés `placement_*`), ou `null`. Toujours rempli par la simulation. */
   blocked?: string | null;
+  /** Petit objet (S03): l'aperçu peut se poser sur un meuble porteur que vise la souris. */
+  small?: boolean;
+  /** Petit objet visé sur le dessus d'un meuble: le meuble porteur et la place (`cell` est alors celle du meuble). */
+  on?: { furniture: string; place: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -693,6 +709,21 @@ export interface PlacedFurniture {
   window?: string;
   /** Rideaux seulement: fermés. Absent: ouverts. */
   closed?: boolean;
+}
+
+/**
+ * Petit objet posé sur le dessus d'un meuble porteur (0.11.2, S03): il suit son meuble, et revient au
+ * sac (ou au rangement) quand on reprend le meuble.
+ */
+export interface PlacedDecor {
+  /** Identifiant unique (`d1`, `d2`...). */
+  id: string;
+  item: ItemId;
+  /** Le meuble porteur (`PlacedFurniture.id`). */
+  on: string;
+  /** Rang de la place dans `surface` du meuble porteur. */
+  place: number;
+  placedBy: CharacterId | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -741,7 +772,8 @@ export interface Tree {
 }
 
 /** Ce qu'on porte à deux: la poutre, la draisine poussée, le colis lourd du train. */
-export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket';
+/** `quest` (0.12): une charge de quête (`reglages.carry.quests`), retrouvée par son objet. */
+export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket' | 'quest';
 
 export interface Beam {
   /** Objet porté (modèle de `objets.json`): `beam`, `handcar`, `heavy_parcel`. */
@@ -1030,7 +1062,7 @@ export interface Proposal {
 
 export interface PurchaseRequest {
   /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en sous. */
-  source: 'grocery' | 'catalogue' | 'improvement';
+  source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   item: ItemId;
   count: number;
 }
@@ -1269,7 +1301,11 @@ export type WorldEvent =
   | { type: 'pin'; by: CharacterId; pos: Vec2 }
   | { type: 'cast'; by: CharacterId; at: Vec2 }
   | { type: 'bite'; by: CharacterId }
-  | { type: 'caught'; by: CharacterId; item: ItemId }
+  /**
+   * Prise (0.12): longueur tirée, rareté, remis à l'eau, première prise de l'espèce, record battu.
+   * Le son d'une prise ne joue que chez le pêcheur, sauf celui d'un mythique (section 7.1).
+   */
+  | { type: 'caught'; by: CharacterId; item: ItemId; cm?: number; rarity?: FishRarity; released?: boolean; first?: boolean; record?: boolean; zone?: string }
   | { type: 'escaped'; by: CharacterId }
   | { type: 'absence'; who: CharacterId; absent: boolean }
   // Moments rares (tour 6)

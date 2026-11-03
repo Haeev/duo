@@ -438,30 +438,6 @@ def item_nail_box(A):
     return g
 
 
-# Poissons ---------------------------------------------------------------------
-
-def fish(A, kind):
-    g = A.geo()
-    L, H, W, back, side, spots = {"gudgeon": (0.14, 0.035, 0.03, "fish_back", "fish_silver", "rock_dark"),
-                                  "chub": (0.3, 0.075, 0.055, "fish_back", "fish_silver", None),
-                                  "trout": (0.32, 0.075, 0.05, "fish_olive", "fish_belly", "trout_spot")}[kind]
-    zc = H / 2 + 0.005
-    col = lpl.by_height([(zc - H * 0.25, "fish_belly"), (zc + H * 0.2, side), (1.0, back)])
-    g.sphere(0.5, loc=(0, 0, zc), color=col, segs=10, rings=6, scale=(W, L, H))
-    g.prism([(0.0, 0.0), (H * 0.9, H * 0.55), (H * 0.9, -H * 0.55)], 0.008, loc=(0, L * 0.45, zc),
-            color=back, rot=(0, 0, 90))
-    g.prism([(-L * 0.12, 0.0), (L * 0.1, 0.0), (L * 0.02, H * 0.45)], 0.006, loc=(0, -L * 0.02, zc + H * 0.42),
-            color=back, rot=(0, 0, 90))
-    for s in (1, -1):
-        g.box((0.004, 0.008, 0.008), loc=(s * W * 0.38, -L * 0.36, zc + H * 0.12), color="black")
-    if spots:
-        for k in range(6):
-            y = -L * 0.2 + k * L * 0.08
-            for s in (1, -1):
-                g.box((0.004, 0.012, 0.01), loc=(s * W * 0.47, y, zc + (0.15 if k % 2 else -0.05) * H), color=spots)
-    return g
-
-
 # Poule ---------------------------------------------------------------------
 
 HEN_BONES = [("hen_root", (0, 0, 0), (0, 0, 0.08), None),
@@ -780,8 +756,7 @@ def main():
     A.add("ridge_purlin", item_ridge_purlin(A), {"kind": "carried", "length_axis": "z", "carry_height": 1.78,
                                                  "length_m": 4.9})
     A.add("nail_box", item_nail_box(A), {"kind": "item"})
-    for kind in ("gudgeon", "chub", "trout"):
-        A.add("fish_" + kind, fish(A, kind), {"kind": "item"})
+    # poissons: poissons.glb depuis la 0.12 (poissons.py, 22 espèces au même gabarit)
     A.add("hen_feeder", hen_feeder(A), {"footprint": [1, 1]})
     A.add("grain_sack", grain_sack(A), {"kind": "item"})
     A.add("water_barrel", water_barrel(A), {"footprint": [1, 1]})

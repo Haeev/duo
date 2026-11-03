@@ -33,7 +33,7 @@ def _nape(g, hc, z=-0.03, w=0.15, h=0.1, segs=8, rings=4):
     _lobe(g, hc, (0, 0.085, z), (w, 0.1, h), segs=segs, rings=rings)
 
 
-def hair_cut(g, style, hc):
+def _hair_cut_base(g, style, hc):
     if style == "crop":
         # ras: un centimètre de volume, ligne de nuque nette
         _cap(g, hc, thick=0.008, segs=10, rings=6, back=0.035, up=0.05, rz=0.135)
@@ -138,6 +138,60 @@ def hair_cut(g, style, hc):
             _lobe(g, hc, (sx * 0.16, -0.12, -0.16), (0.035, 0.035, 0.04), segs=6, rings=4, color="hair_dark")
     else:
         raise ValueError(style)
+
+
+# 0.12: mèches et volume (demande du client). Des mèches en lobes allongés couchées sur la calotte, du sommet
+# vers la nuque, les tempes ou le front, une sur deux en `hair_dark`: la coupe se lit en mèches et non plus en
+# casque, et gagne 6 à 8 mm de volume. Pas de mèches sur les variantes sous chapeau (cachées par la calotte du
+# chapeau): `STRANDS` est mis à faux pendant leur construction.
+STRANDS = True
+_BACK = (-150, -110, -70, 70, 110, 150, 180)
+STRAND_SETS = {
+    # coupe: (azimuts en degrés, 0 devant et 90 à gauche; latitude; longueur; balayage vers la droite)
+    "short": ((-145, -105, -65, -30, 5, 40, 75, 110, 150, 180), 40, 0.12, 18),
+    "bob": ((-150, -115, -80, -45, 45, 80, 115, 150, 180), 32, 0.14, 0),
+    "bun": ((-120, -80, -40, 0, 40, 80, 120), 38, 0.13, 0),
+    "ponytail": ((-120, -80, -40, 0, 40, 80, 120), 38, 0.13, 0),
+    "braid": ((-120, -80, -40, 0, 40, 80, 120), 38, 0.13, 0),
+    "pigtails": ((-150, -110, -70, -30, 30, 70, 110, 150), 34, 0.13, 0),
+    "wavy": ((-150, -110, -70, -30, 15, 55, 95, 135, 175), 34, 0.14, 22),
+    "long": ((-150, -110, -70, -30, 30, 70, 110, 150), 34, 0.14, 0),
+
+    "quiff": ((-120, -75, 75, 120, 180), 22, 0.09, 0),
+    "crown": ((-120, -60, 0, 60, 120, 180), 62, 0.08, 0),
+    "bob_long": ((-150, -115, -80, -45, 45, 80, 115, 150, 180), 32, 0.14, 14),
+}
+STRAND_SETS["fringe"] = (_BACK + (-35, 35), 38, 0.12, 0)
+
+
+def strands(g, hc, style, back=0.04, up=0.06, rz=0.13, thick=0.014):
+    from mathutils import Matrix, Vector
+    cfg = STRAND_SETS.get(style)
+    if not STRANDS or cfg is None:
+        return
+    thetas, lat, length, sweep = cfg
+    A, B, C = RX + thick, RY + thick + 0.002, rz
+    for i, th in enumerate(thetas):
+        t, f = math.radians(th), math.radians(lat + (6 if abs(th) < 45 else 0))
+        p = Vector((A * math.cos(f) * math.sin(t), back - B * math.cos(f) * math.cos(t), hc + up + C * math.sin(f)))
+        n = Vector((p.x / A ** 2, (p.y - back) / B ** 2, (p.z - hc - up) / C ** 2)).normalized()
+        up_t = Vector((-A * math.sin(f) * math.sin(t), B * math.sin(f) * math.cos(t), C * math.cos(f))).normalized()
+        side = up_t.cross(n).normalized()
+        sw = math.radians(sweep)
+        along = (up_t * math.cos(sw) + side * math.sin(sw)).normalized()
+        across = n.cross(along).normalized()  # repère direct (sinon la mèche sort retournée)
+        R = Matrix((across, n, along)).transposed().to_4x4()
+        # mèche droite posée sur la calotte courbe: le milieu affleure de 1 à 1,2 cm, les bouts rentrent dans la
+        # calotte (flèche de la corde); une sur trois plus sombre pour séparer les mèches
+        c = p + n * 0.004
+        vs = g.sphere(1.0, color="hair_dark" if i % 3 == 1 else "hair", segs=6, rings=4,
+                      scale=(0.03 + 0.004 * (i % 2), 0.008, length / 2), bone="head")
+        g.transform(vs, Matrix.Translation(c) @ R)
+
+
+def hair_cut(g, style, hc):
+    _hair_cut_base(g, style, hc)
+    strands(g, hc, style)
 
 
 def facial(g, kind, hc):

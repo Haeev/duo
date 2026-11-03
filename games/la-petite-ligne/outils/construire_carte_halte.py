@@ -894,6 +894,22 @@ POINTS += [
       "pignon et le sentier du jardin (la panne attend à `beam_pickup`)"),
 ]
 
+# 0.12 (lot L-quêtes, conception `v0-12-conception.md`, section 5): les points de la trame « Le marché d'Aubrune ».
+POINTS += [
+    # L'étal du dimanche: sur les pavés de la place, côté soleil du matin, dos à l'épicerie (façade en x 31, à 3 m),
+    # hors des deux passages du quai (x 30-31 et 43-44); planche de 2 m nord-sud, vendeurs à l'ouest, clients à l'est.
+    p("market_stall", 34.0, 26.5, "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)",
+      portee=1.5),
+    # Les fanions: une guirlande tendue entre les lampadaires nord et est de la place (13 m, deux appuis réels),
+    # au-dessus de l'étal; une échelle au pied de chaque lampadaire, côté place. Plus de 8 m entre les deux
+    # places: un seul joueur ne peut pas tenir les deux (`ranges.stayAt` 4 m).
+    p("garland_west", 34.5, 25.5, "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"),
+    p("garland_east", 47.5, 25.5, "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"),
+    # La chevrerie: à l'est de la maisonnette, dans l'herbe entre le sentier (x 13) et le chemin (x 17 à 19),
+    # au pied du talus de la voie; devant sa porte, côté maison (sud).
+    p("goat_shed", 15.0, 20.0, "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"),
+]
+
 ZONES = [
     {"id": "garden", "rect": {"x": 7, "y": 28, "w": 4, "h": 3},
      "role": "les 12 cases du potager de la démo, devant la porte; ordre des cases: ligne par ligne, "
@@ -1013,6 +1029,28 @@ MOBILIER_DEPART = [
 
 def rect(x: int, y: int, w: int, h: int) -> dict:
     return {"x": x, "y": y, "w": w, "h": h}
+
+
+# Pêche 0.12 (docs/jeux/jeu-1/peche-0-12-conception.md, section 2): sept coins de pêche. Chaque case d'eau
+# appartient à un seul coin (contrôle de valider_carte.py); le coin d'une prise est celui de la case où
+# tombe le bouchon. Les rectangles couvrent aussi des cases qui ne sont pas de l'eau (gravier du gué,
+# berges): seules les cases `water` comptent.
+COINS_PECHE = [
+    {"id": "upstream", "a": "à l'amont", "nom": "l'amont", "rects": [rect(0, 38, 11, 5)],
+     "pourquoi": "eau lente devant le bourg ancien, le coin le plus proche du jardin"},
+    {"id": "ford", "a": "au gué", "nom": "le gué", "rects": [rect(11, 38, 13, 5)],
+     "pourquoi": "courant sur galets, peu profond: les poissons de courant et de fond"},
+    {"id": "sands", "a": "aux sables", "nom": "les sables", "rects": [rect(24, 38, 14, 5)],
+     "pourquoi": "eau lente et tiède entre les deux bancs de sable"},
+    {"id": "pontoon", "a": "au ponton", "nom": "le ponton", "rects": [rect(38, 38, 20, 5)],
+     "pourquoi": "eau profonde et calme, les poissons guettent à l'abri des pieux"},
+    {"id": "confluence", "a": "au confluent", "nom": "le confluent", "rects": [rect(58, 38, 13, 5), rect(63, 36, 2, 2)],
+     "pourquoi": "l'eau froide du ru se mêle à l'Aubrune: les poissons qui remontent y attendent"},
+    {"id": "ru", "a": "au ru", "nom": "le ru", "rects": [rect(63, 0, 2, 36)],
+     "pourquoi": "eau vive et froide, 1 à 1,5 m de large: la truite et les petits poissons d'eau vive"},
+    {"id": "downstream", "a": "à l'aval", "nom": "l'aval", "rects": [rect(71, 38, 29, 5)],
+     "pourquoi": "rivière large et bancs de sable, devant la promenade de la rue Haute"},
+]
 
 
 # Tour 10: bâtiments visitables (ADR 0016, section 1). Une entrée par bâtiment: l'objet qui le porte, ses
@@ -1353,6 +1391,7 @@ def main() -> int:
         "interieurs": INTERIEURS,
         "ru": RU,
         "ouvrages": OUVRAGES,
+        "peche": {"coins": COINS_PECHE},
         "accroches": ACCROCHES + accroches_poteaux_finaux(),
         "sieges": SIEGES,
         "chantiers": CHANTIERS,

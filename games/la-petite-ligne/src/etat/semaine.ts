@@ -29,7 +29,7 @@ function text(content: Content, path: readonly string[]): string | null {
 }
 
 function fill(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+  return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });

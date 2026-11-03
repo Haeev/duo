@@ -39,6 +39,15 @@ Règles:
 | `format-8-fin-de-la-demo.json` | 8 | jour 15 à 16 h, écran d'étape « Deux semaines » (tour 11) | 42 | `generer.ts` (tour 11) |
 | `format-8-ete-jour-25.json` | 8 | mardi 25 à midi (tour 11) | 7 | `generer.ts` (tour 11) |
 | `format-8-automne-jour-62.json` | 8 | jeudi 62 à midi, automne, lettres sans texte rendu (tour 11) | 7 | `generer.ts` (tour 11) |
+| `format-9-fin-semaine-1.json` | 9 | jour 8 à 16 h, commande 1 payée; `decor` vide (0.11.2) | 42 | `generer.ts` (0.11.2) |
+| `format-9-milieu-semaine-2.json` | 9 | mardi, jour 11, midi (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-9-fin-de-la-demo.json` | 9 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.11.2) | 42 | `generer.ts` (0.11.2) |
+| `format-9-ete-jour-25.json` | 9 | mardi 25 à midi (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-9-automne-jour-62.json` | 9 | jeudi 62 à midi, automne (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-10-fin-semaine-1.json` | 10 | jour 8 à 16 h, commande 1 payée; carnet des poissons (pêche 0.12) | 42 | `generer.ts` (0.12) |
+| `format-10-milieu-semaine-2.json` | 10 | mardi, jour 11, midi (pêche 0.12) | 7 | `generer.ts` (0.12) |
+| `format-10-fin-de-la-demo.json` | 10 | jour 15 à 16 h, écran d'étape « Deux semaines » (pêche 0.12) | 42 | `generer.ts` (0.12) |
+| `format-10-ete-jour-25.json` | 10 | mardi 25 à midi, coin qui frémit et grands du jour (pêche 0.12) | 7 | `generer.ts` (0.12) |
 
 ## Format en cours
 

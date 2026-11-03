@@ -147,3 +147,18 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Faucilles du coq: plumes plates de 5 à 8 cm à la base; à 1,4 cm elles se lisaient comme des tiges.
 - `inotifywait` n'est pas installé: attendre un fichier avec `until [ -f ... ]; do sleep 5; done` en arrière-plan.
 - Le garde-fou refuse un `python3 -c` contenant des `\'`: passer par un script écrit avec Write.
+
+## Garde-robe de la 0.12 (vérifié le 2026-11-03)
+
+- Vêtements modulaires des joueurs: couleurs dans la rangée 1 de `personnages.png` (`garde_robe.WEAR_SLOTS`), la rangée 0 reste au corps et à l'écusson du profil. Une seule texture par joueur, les pièces se fusionnent comme avant.
+- Enveloppes emboîtées par emplacement (corps x 0,9, hauts = `torso_rings`, par-dessus x 1,10 / 1,14): chaque pièce suit le même os que la partie du corps dessous, rien ne traverse dans les clips sans recalculer de poids.
+- Pièce plaquée sur une pente (écusson): `rot=(atan(-pente), 0, 0)` couche le haut vers +Y (l'arrière); le signe inverse l'enfonce à moitié dans la poitrine (vu sur la première planche).
+- Coupe ramenée sous un chapeau par écrasement radial: une masse plus large que la tête (nuage) se replie et sort inversée (`--peaux`). `recalc_face_normals` ne suffit pas; retourner chaque îlot de volume signé négatif.
+- Planches Cycles: ne jamais laisser deux rendus en arrière-plan en même temps (le premier `planche_*.py` lancé garde le CPU); 6 échantillons suffisent pour des planches de contrôle de 260 à 420 px (environ 10 s la vue).
+## Poissons 0.12 (vérifié le 2026-11-03)
+
+- Corps lofté triangulé à la main: colorier par quadrilatère (centre des 4 sommets), pas par triangle, sinon la limite dos et flanc fait des dents de scie.
+- Taches plaquées: lancer de rayons sur les triangles du corps (`BVHTree.FromPolygons` sur mes propres listes), polygone dans le plan du triangle touché, rétréci jusqu'à tenir dedans, décalé de 0,3 % de la longueur.
+- `lpl.board(..., mannequin=True)` pose le mannequin hors du cadrage (calculé sur les seules copies): mettre un mannequin comme premier nœud de la grille.
+- Rendus Cycles ici: 1800 x 1125 à 12 échantillons, environ 3 min par planche (machine partagée); deux Blender en parallèle ont fini tués (code 137).
+- Import de `personnages.glb` pour une vue « en main »: `rig.data.pose_position = "REST"`, sinon une pose importée reste. Main droite = côté -X Blender: caméra de ce côté.

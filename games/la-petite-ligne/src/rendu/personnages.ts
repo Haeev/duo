@@ -5,7 +5,7 @@
  * positions interpolées (`prev` vers `pos`), orientation lissée, outil en
  * main, clignement des yeux et expression selon la forme.
  */
-import { isSheltered } from '../etat/interieurs';
+import { isHome, isSheltered } from '../etat/interieurs';
 import {
   AnimationMixer,
   LoopOnce,
@@ -40,7 +40,16 @@ import { ArmReach } from './portee';
 import type { Content } from '../donnees/types';
 import { seasonOfDay } from '../donnees/calendrier';
 import type { GameMap, MapProp } from '../etat/carte';
-import { BenchSeating, benchesWithBuilt, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
+import {
+  BenchSeating,
+  FurnitureSeats,
+  benchesWithBuilt,
+  isFurnitureSeat,
+  seatPlace,
+  type BenchPlace,
+  type BenchSeat,
+  type SeatProp,
+} from '../etat/bancs';
 import {
   BODY_COLORS,
   HAIR_MESHES,
@@ -1022,16 +1031,35 @@ export class CharactersPart implements EventfulPart {
     return character.seat;
   }
 
-  /** Écrit dans `benchPlace` la place `slot` du banc `id`; faux si le banc n'existe pas. */
-  private benchSeat(id: string, slot: number): boolean {
-    const prop = this.benches.find((bench) => bench.id === id);
+  /** Sièges posés dans la maison (chaises, fauteuils: S07), refaits quand un siège bouge. */
+  private readonly furnitureSeats = new FurnitureSeats();
+  private homeSeats: readonly SeatProp[] = [];
+
+  /**
+   * Écrit dans `benchPlace` la place `slot` du banc `id` (ou du siège posé de ce nom) et dans
+   * `seatLift` la hauteur où poser le corps; faux si le banc n'existe pas ou n'est pas atteint d'où
+   * est le personnage (une chaise de la maison, de dedans; un banc du dehors, pas d'un abri).
+   */
+  private benchSeat(id: string, slot: number, character: Parameters<typeof isHome>[0]): boolean {
+    const prop = this.benches.find((bench) => bench.id === id) ?? this.homeSeats.find((seat) => seat.id === id);
     if (prop === undefined) {
+      return false;
+    }
+    const home = isFurnitureSeat(prop);
+    if (home ? !isHome(character) : isSheltered(character)) {
       return false;
     }
     seatPlace(prop, slot, this.content.settings.benches, this.benchPlace);
     this.benchIsEdge = prop.category === EDGE_SEAT_CATEGORY;
+    // Assise du modèle (`seat_height` de l'artiste: 0,47 m la chaise, 0,42 m le fauteuil), le clip
+    // `sit` étant calé sur 0,47 m; un banc de la carte garde son réglage.
+    const height = home ? this.library.extras(prop.model).seat_height : undefined;
+    this.seatLift = (typeof height === 'number' ? height : SETTINGS.bench.seatHeight) - SETTINGS.sitClipSeatHeight;
     return true;
   }
+
+  /** Hauteur où poser le corps assis, lue par l'appelant juste après `benchSeat`. */
+  private seatLift = 0;
 
   /** Perche de chaque joueur: allumait-il à l'image d'avant, et quand il a commencé à la rabaisser. */
   private readonly poles = new Map<CharacterId, { lighting: boolean; lowerAt: number }>();
@@ -1370,6 +1398,7 @@ export class CharactersPart implements EventfulPart {
   update(context: FrameContext): void {
     this.time = context.time;
     const world: ReadonlyWorld = context.world;
+    this.homeSeats = this.furnitureSeats.update(world.furniture, this.content.items);
     this.refreshBenches(world);
     if (this.highFivePending) {
       this.resolveHighFive(world);
@@ -1390,15 +1419,14 @@ export class CharactersPart implements EventfulPart {
       // Assis sur un banc par choix (place réservée par la simulation): posé à sa place, tourné
       // comme le banc, dos au dossier (`benchPlace`). Il y mange aussi (`sit_eat`).
       const benchSeat = this.seatOf(character);
-      const onBench =
-        benchSeat !== null && !isSheltered(character) && this.benchSeat(benchSeat.bench, benchSeat.slot);
+      const onBench = benchSeat !== null && this.benchSeat(benchSeat.bench, benchSeat.slot, character);
       const shown = this.shownSeats[character.id === 'p1' ? 0 : 1];
       if (shown !== undefined) {
         shown.seat = onBench ? benchSeat : null;
       }
       const seat =
         kind === 'sit' && !onBench ? this.seatAt(world, character.pos.x, character.pos.y) : null;
-      const benchLift = SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight;
+      const benchLift = this.seatLift;
       const walkScale = Math.min(
         WALK_SCALE_MAX,
         Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
@@ -1538,7 +1566,7 @@ export class CharactersPart implements EventfulPart {
       const onBench =
         benchProp !== null &&
         villager.talkingWith.length === 0 &&
-        this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0);
+        this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0, villager);
       const clip = onBench ? SIT_CHAIR : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
       if (direction?.kind === 'look' && villager.talkingWith.length === 0) {

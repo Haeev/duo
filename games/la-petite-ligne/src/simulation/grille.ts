@@ -20,6 +20,8 @@ export interface Blockers {
    * -1 pour toutes (habitants). Absent ou 0: aucune.
    */
   readonly door?: number;
+  /** Cases passables que ce corps évite quand même (1): le gué de pierres du ru pour un habitant adulte. */
+  readonly avoid?: Uint8Array;
 }
 
 /** Couche dynamique: case ouverte malgré la carte (porte percée d'une pièce bâtie, tour 10). */
@@ -29,6 +31,7 @@ export function isBlockedCell(b: Blockers, cx: number, cy: number): boolean {
   const { map } = b;
   if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return true;
   const i = cy * map.width + cx;
+  if (b.avoid?.[i] === 1) return true;
   const d = b.dynamic[i] ?? 0;
   if (d === OPENED_CELL) return false;
   if (map.blocked[i] === true) return true;

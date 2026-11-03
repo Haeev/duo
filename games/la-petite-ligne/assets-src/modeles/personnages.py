@@ -20,7 +20,11 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
 import coiffures  # noqa: E402
+import animations_012  # noqa: E402
+import garde_robe as GR  # noqa: E402
 import palette as P  # noqa: E402
+
+PP = sys.modules[__name__]
 
 FPS = 30
 HC = 1.58          # centre de la tête
@@ -272,6 +276,12 @@ def pelvis(g, w=0.31, d=0.21, color="bottom", z0=0.80, z1=1.0):
 
 
 def collar(g, color="top_trim", w=0.17, d=0.16):
+    if ROUND:
+        # 0.12: rabats arrondis couchés sur le haut du torse (plus de plaquettes à angles vifs)
+        for s in (1, -1):
+            g.sphere(1.0, loc=(s * (w / 4 + 0.006), torso_front_y(1.372) - 0.004, 1.372), color=color, segs=8, rings=4,
+                     scale=(w / 4 + 0.012, 0.012, 0.036), rot=(-38, 0, s * 24), bone="chest")
+        return
     for s in (1, -1):
         g.box((w / 2, 0.07, 0.03), loc=(s * w / 4, -d / 2 + 0.015, 1.385), color=color, rot=(-25, 0, s * 18),
               bone="chest")
@@ -437,8 +447,9 @@ def hands_round(g, color="skin"):
     """Moufles: une boule facettée et le pouce."""
     for s, side in ((1, "l"), (-1, "r")):
         b = "hand_" + side
-        g.sphere(1.0, loc=(s * 0.242, 0, 0.782), color=color, segs=6, rings=4, scale=(0.036, 0.05, 0.06), bone=b)
-        g.sphere(1.0, loc=(s * 0.222, -0.043, 0.805), color=color, segs=5, rings=3, scale=(0.017, 0.021, 0.03),
+        # 0.12: main plus franche (on la lit au zoom de jeu), pouce détaché
+        g.sphere(1.0, loc=(s * 0.243, 0, 0.78), color=color, segs=8, rings=5, scale=(0.041, 0.055, 0.066), bone=b)
+        g.sphere(1.0, loc=(s * 0.221, -0.047, 0.803), color=color, segs=6, rings=4, scale=(0.019, 0.024, 0.033),
                  rot=(-20, 0, 0), bone=b)
 
 
@@ -484,8 +495,8 @@ def leg_round(g, side, thigh="bottom", shin=None, shoe="shoes", cuff=None, r=0.0
     elif cuff:
         g.lathe([(r * 0.66, 0.105), (r * 0.7, 0.155)], loc=(x, 0, 0), colors=cuff, segs=6, bone=sh)
     # chaussure en galet, semelle à plat (arête au sol vive)
-    vs = g.sphere(1.0, loc=(x, -0.045, 0.055), color=lpl.by_normal(shoe, shoe, "hair_dark" if shoe == "shoes" else shoe),
-                  segs=8, rings=5, scale=(0.064, 0.135, 0.062), bone=ft)
+    vs = g.sphere(1.0, loc=(x, -0.047, 0.057), color=lpl.by_normal(shoe, shoe, "hair_dark" if shoe == "shoes" else shoe),
+                  segs=10, rings=6, scale=(0.068, 0.142, 0.064), bone=ft)
     for v in vs:
         if v.co.z < 0.0:
             v.co.z = 0.0
@@ -562,7 +573,9 @@ def fringe(g, hc, k=1.0, color="hair", z=0.105, w=0.25, h=0.055, tilt=8, parts=1
 
 def hair_style(g, style, hc, k=1.0):
     if ROUND and style in ("short", "bob", "bun"):
-        return hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
+        hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
+        coiffures.strands(g, hc, style)
+        return
     if ROUND and style in coiffures.NEW_CUTS:
         return coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
     if style == "short":
@@ -912,7 +925,7 @@ def head_round_face(g, expr, s=1.0, **face_kw):
     mouth_dy = face_kw.pop("mouth_dy", None)
     if mouth_dy is not None:
         face_kw["mouth_y"] = -hy / 2 + mouth_dy
-    face_features(g, hc + 0.03 * s, hy, expr, k=s, eye_k=0.8 * face_kw.pop("eye_k", 1.0), eye_x=0.048, **face_kw)
+    face_features(g, hc + 0.03 * s, hy, expr, k=s, eye_k=0.9 * face_kw.pop("eye_k", 1.0), eye_x=0.05, **face_kw)
     project_on_head(g, start, hx, hy, hz, hc)
     return hc
 
@@ -996,6 +1009,7 @@ def build_npc_round(g, who, expr):
     elif who == "odette":
         hc = head_round_face(g, expr, cheek_base=0.55)
         hair_round(g, "bun", hc)
+        coiffures.strands(g, hc, "bun")
         neck(g)
         torso_round(g, w_top=0.39, w_bot=0.35, d=0.23, belly=0.06)
         collar(g, color="top_trim", w=0.19)
@@ -1065,6 +1079,7 @@ def build_npc_round(g, who, expr):
         rings = torso_rings(0.36, 0.30, 0.21)
         hc = head_round_face(g, expr, cheek_base=0.25, brow_k=1.1)
         hair_round(g, "bun", hc)
+        coiffures.strands(g, hc, "bun")
         neck(g)
         torso_round(g, w_top=0.36, w_bot=0.30, d=0.21)
         collar(g, color="top_trim", w=0.17)
@@ -1176,6 +1191,8 @@ def build_player_base(g, expr):
         project_on_head(g, start, hx, hy, hz, hc)
         neck(g)
         hands_round(g)
+        # 0.12: corps nu-neutre sous les vêtements modulaires (garde_robe.py)
+        GR.body(g, PP)
         return
     hc, hx, hy, hz = head_block(g)
     face_features(g, hc, hy, expr)
@@ -1216,9 +1233,9 @@ def build_outfit(g, kind):
 
 # Maillages avec clés de forme ---------------------------------------------------
 
-def make_mesh(name, row, builder, mat, arm, with_face):
+def make_mesh(name, row, builder, mat, arm, with_face, cells=None):
     """builder(g, expr) construit le maillage; même topologie pour chaque expression."""
-    cells = lpl.char_cells(row)
+    cells = cells or lpl.char_cells(row)
     g = lpl.Geo(cells)
     builder(g, "neutral")
     tris = g.tri_count()
@@ -1443,6 +1460,8 @@ def anims():
     A["sit_ground"] = (True, {0: ground, 45: ground_b, 90: ground})
     A.update(ladder_anims())
     A.update(tour9_anims())
+    # 0.12: gestes plus vivants et clips nouveaux (animations_012.py), mêmes noms et mêmes contacts
+    animations_012.anims_012(A, SIT_LEGS)
     return A
 
 
@@ -1673,13 +1692,13 @@ def main():
     objs = [arm] + sockets
     stats = {"meshes": {}}
 
-    def add(name, row, builder, face):
-        ob, tris = make_mesh(name, row, builder, mat, arm, face)
+    def add(name, row, builder, face, cells=None):
+        ob, tris = make_mesh(name, row, builder, mat, arm, face, cells)
         objs.append(ob)
         stats["meshes"][name] = tris
         return ob
 
-    add("player_base", "player_a", rounded(build_player_base), True)
+    add("player_base", "player_a", rounded(build_player_base), True, GR.wear_cells())
     for o in OUTFITS:
         add("player_outfit_" + o, "player_a", rounded(lambda g, e, o=o: build_outfit(g, o)), False)
     for h in HAIRS:
@@ -1688,8 +1707,31 @@ def main():
     for f in coiffures.FACIAL:
         name = "player_" + f if f == "mustache" else "player_" + f
         add(name, "player_a", rounded(lambda g, e, f=f: coiffures.facial(g, f, PHC)), False)
+    # 0.12 (garde-robe): plus de foulard; vêtements modulaires, badge du profil, coupes sous un chapeau
+    wc = GR.wear_cells()
+    for slot, styles in GR.STYLES.items():
+        for st in styles:
+            if slot == "hat":
+                fn = (lambda g, e, st=st: GR.hat(g, PP, st, PHC))
+            else:
+                fn = (lambda g, e, slot=slot, st=st: getattr(GR, slot)(g, PP, st))
+            ob = add(f"wear_{slot}_{st}", "player_a", rounded(fn), False, wc)
+            ob["slot"] = slot
+            if (slot, st) in GR.COVERS:
+                ob["covers"] = GR.COVERS[(slot, st)]
     for s in SYMBOLS:
-        add("player_scarf_" + s, "player_a", rounded(lambda g, e, s=s: scarf(g, s)), False)
+        add("player_badge_" + s, "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s)), False)
+        add("player_badge_" + s + "_outer", "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s, True)), False)
+
+    def hair_hat(g, e, h):
+        coiffures.STRANDS = False
+        try:
+            hair_style(g, h, PHC, PK)
+        finally:
+            coiffures.STRANDS = True
+        GR.flatten_under_hat(g, PHC, *PHEAD)
+    for h in HAIRS:
+        add("player_hair_" + h + "_hat", "player_a", rounded(lambda g, e, h=h: hair_hat(g, e, h)), False)
     for n in NPCS:
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
@@ -1708,7 +1750,22 @@ def main():
     stats["file_bytes"] = size
     # personnage complet d'un joueur: base + tenue + coiffure + foulard
     m = stats["meshes"]
-    stats["player_example_tris"] = m["player_base"] + m["player_outfit_work"] + m["player_hair_short"] + m["player_scarf_orb"]
+    stats["player_example_tris"] = (m["player_base"] + m["wear_top_chemise"] + m["wear_bottom_pantalon"]
+                                    + m["wear_shoes_bottines"] + m["player_hair_short"] + m["player_badge_orb"])
+    # pire cas: le style le plus lourd de chaque emplacement, la coupe la plus lourde et sa barbe
+    worst = m["player_base"] + max(m["player_badge_" + s + "_outer"] for s in SYMBOLS)
+    for slot, styles in GR.STYLES.items():
+        if slot not in ("top", "bottom"):
+            worst += max(m[f"wear_{slot}_{st}"] for st in styles)
+    # la salopette couvre le haut: le haut n'est pas dessiné avec elle
+    top_max = max(m["wear_top_" + st] for st in GR.STYLES["top"])
+    worst += max(m["wear_bottom_" + st] + (0 if ("bottom", st) in GR.COVERS else top_max) for st in GR.STYLES["bottom"])
+    # sans chapeau, la coupe la plus lourde garde ses mèches; avec chapeau, sa variante aplatie
+    hat_max = max(m["wear_hat_" + st] for st in GR.STYLES["hat"])
+    worst -= hat_max
+    worst += max(hat_max + max(m["player_hair_" + h + "_hat"] for h in HAIRS),
+                 max(m["player_hair_" + h] for h in HAIRS)) + m["player_beard_full"]
+    stats["player_worst_tris"] = worst
     lpl.write_stats("personnages", stats)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(lpl.HERE, "blend", "personnages.blend"), compress=True)
     print("STATS", stats)

@@ -13,7 +13,7 @@ import { itemTitle } from './format';
 import { itemIcon } from './modele';
 import { type HenCallModel, henCallModel } from './modele-secrets';
 import { HEN_COLORS } from './config';
-import { shopIsOpen } from './modele-panneaux';
+import { haberdasheryIsOpen, shopIsOpen } from './modele-panneaux';
 import { portraitSvg, villagerColors } from './portrait';
 import { SOUND_ATTR } from './sons';
 
@@ -276,7 +276,8 @@ export class DialogueBox implements Layer {
     }
     const atEnd = dlg.line >= dlg.lines.length - 1;
     const odetteShop = atEnd && dlg.choices.length === 0 && this.isShopKeeper(world, dlg.villager);
-    const sig = JSON.stringify([dlg.dialogue, dlg.line, dlg.lines.length, dlg.choices, odetteShop]);
+    const solangeShop = atEnd && dlg.choices.length === 0 && dlg.villager === 'solange' && haberdasheryIsOpen(world, ctx);
+    const sig = JSON.stringify([dlg.dialogue, dlg.line, dlg.lines.length, dlg.choices, odetteShop, solangeShop]);
     if (sig === this.sig) return;
     this.sig = sig;
     setHidden(this.sceneChip, true);
@@ -306,6 +307,19 @@ export class DialogueBox implements Layer {
       views = [
         { id: 'shop:buy', text: ctx.t(d.shopBuy), pressed: false, disabled: false, partner: false, action: () => { openShop('buy'); } },
         { id: 'shop:sell', text: ctx.t(d.shopSell), pressed: false, disabled: false, partner: false, action: () => { openShop('sell'); } },
+        { id: 'shop:bye', text: ctx.t(d.goodbye), pressed: false, disabled: false, partner: false, action: () => { this.host.send({ type: 'dialogue_next' }); } },
+      ];
+      setAttr(this.choices, 'aria-label', d.shopChoicesLabel);
+    } else if (solangeShop) {
+      // La mercerie de Solange (0.11.2): ses rideaux de couleur, au comptoir.
+      const openShop = (): void => {
+        if (this.shopRequested) return;
+        this.shopRequested = true;
+        this.host.send({ type: 'dialogue_next' });
+        this.host.setMenu('shop', 'buy');
+      };
+      views = [
+        { id: 'shop:haberdashery', text: ctx.t(d.shopHaberdashery), pressed: false, disabled: false, partner: false, action: openShop },
         { id: 'shop:bye', text: ctx.t(d.goodbye), pressed: false, disabled: false, partner: false, action: () => { this.host.send({ type: 'dialogue_next' }); } },
       ];
       setAttr(this.choices, 'aria-label', d.shopChoicesLabel);
@@ -363,7 +377,8 @@ export class DialogueBox implements Layer {
 
   private isShopKeeper(world: ReadonlyWorld, villager: string): boolean {
     const v = world.villagers.find((x) => x.id === villager);
-    return v?.activity === 'serve' && shopIsOpen(world, this.host.ctx);
+    // Odette seulement: Solange aussi « sert », à sa mercerie (choix à part).
+    return villager === 'odette' && v?.activity === 'serve' && shopIsOpen(world, this.host.ctx);
   }
 
   defaultFocus(): HTMLElement | null {

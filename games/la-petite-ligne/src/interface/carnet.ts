@@ -1,5 +1,5 @@
 /**
- * Carnet (maquette `carnet.html`): onglets Quêtes, Courrier, Sac et Souvenirs.
+ * Carnet (maquette `carnet.html`): onglets Quêtes, Courrier, Sac, Poissons (0.12), Souvenirs et Besoins.
  * A et E changent d'onglet (la caméra ne tourne pas pendant le carnet), Tab ou
  * Retour arrière le ferment.
  */
@@ -14,12 +14,13 @@ import { letterModels, nextObjective, notebookQuests, slotModel, type QuestModel
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { type NeedsPageModel, needsPage } from './modele-maison';
+import { type FishPageModel, fishPageModel } from './modele-poissons';
 import { Panel } from './panneau';
 import { needsMuted, setNeedsMuted } from './preferences';
 import { SOUND_ATTR } from './sons';
 
-type NotebookTab = 'quests' | 'mail' | 'bag' | 'memories' | 'needs';
-const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'memories', 'needs'];
+type NotebookTab = 'quests' | 'mail' | 'bag' | 'fish' | 'memories' | 'needs';
+const TABS: readonly NotebookTab[] = ['quests', 'mail', 'bag', 'fish', 'memories', 'needs'];
 
 /** Dernier onglet ouvert, gardé d'une ouverture à l'autre. */
 let lastTab: NotebookTab = 'quests';
@@ -74,7 +75,7 @@ export class NotebookPanel extends Panel {
       },
       'Tab',
     );
-    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
+    this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'fish' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
@@ -85,6 +86,8 @@ export class NotebookPanel extends Panel {
       quests: make('quests', ctx.t(g.quests), 'ui-flag', null),
       mail: make('mail', ctx.t(g.mail), 'ui-letter', this.badge),
       bag: make('bag', ctx.t(g.bag), 'grain-sack', null),
+      // Pêche 0.12: le carnet des poissons, entre « Sac » et « Souvenirs » (section 7.4).
+      fish: make('fish', ctx.t(ctx.texts.extra.fish.tab), 'fish', null),
       memories: make('memories', ctx.t(g.memories), 'ui-heart', null),
       // Tour 10: les besoins en chiffres (réponse du client: icônes au HUD, chiffres au carnet).
       needs: make('needs', ctx.t(ctx.texts.extra.needs.tab), 'need-belly-full', null),
@@ -94,6 +97,7 @@ export class NotebookPanel extends Panel {
       this.tabButtons.quests,
       this.tabButtons.mail,
       this.tabButtons.bag,
+      this.tabButtons.fish,
       this.tabButtons.memories,
       this.tabButtons.needs,
       el('span', { class: 'lpl-key lpl-tabs__key', 'aria-hidden': 'true', text: ctx.key('KeyE') }),
@@ -236,6 +240,7 @@ export class NotebookPanel extends Panel {
     else if (this.tab === 'mail') this.renderMail(letters);
     else if (this.tab === 'bag') this.renderBag(world);
     else if (this.tab === 'needs') this.renderNeeds(world);
+    else if (this.tab === 'fish') this.renderFish(world);
     else this.renderMemories(world);
   }
 
@@ -285,6 +290,41 @@ export class NotebookPanel extends Panel {
         ]),
       ]),
     ];
+  }
+
+  /** Poissons (pêche 0.12): en tête le compte, puis une rangée par rareté, silhouette et indice avant la prise. */
+  private renderFish(world: ReadonlyWorld): void {
+    const page = fishPageModel(world, this.host.ctx);
+    const sig = JSON.stringify(['fish', page]);
+    this.renderBody(sig, () => this.fishNodes(page));
+  }
+
+  private fishNodes(page: FishPageModel): HTMLElement[] {
+    const { ctx } = this.host;
+    const t = ctx.texts.extra.fish;
+    const nodes: HTMLElement[] = [el('p', { class: 'lpl-fish-page__count' }, [el('strong', { text: page.count }), page.here === null ? null : el('span', { text: ` ${page.here}` })])];
+    let first = true;
+    for (const row of page.rows) {
+      const list = el('ul', { class: 'lpl-fish-page__list', 'data-nav': 'list' });
+      for (const entry of row.entries) {
+        list.append(
+          el('li', { class: 'lpl-fish-page__entry', tabindex: '0', 'data-nav-item': true, 'data-key': `fish:${entry.id}`, 'data-caught': entry.caught, 'data-autofocus': first }, [
+            el('span', { class: 'lpl-fish-page__shadow', 'aria-hidden': 'true', style: `--lpl-fish-length: ${String(entry.shadowLength)}` }),
+            el('strong', { class: 'lpl-fish-page__name', text: entry.name }),
+            entry.text === '' ? null : el('span', { class: 'lpl-fish-page__text', text: entry.text }),
+            ...entry.facts.map((f) => el('small', { class: 'lpl-fish-page__fact', text: f })),
+          ]),
+        );
+        first = false;
+      }
+      nodes.push(
+        el('section', { class: 'lpl-fish-page__row', 'data-rarity': row.rarity }, [
+          el('h3', { class: 'lpl-section-title' }, [row.title, ' ', el('span', { class: 'lpl-fish-page__scales', role: 'img', 'aria-label': row.scalesLabel, text: '◆'.repeat(row.scales) })]),
+          list,
+        ]),
+      );
+    }
+    return [el('div', { class: 'lpl-fish-page', role: 'region', 'aria-label': ctx.t(t.pageLabel) }, nodes)];
   }
 
   /**

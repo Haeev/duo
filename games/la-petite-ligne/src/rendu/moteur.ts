@@ -32,7 +32,7 @@ import type { GameView, PickResult, Renderer, RendererOptions } from '../etat/vu
 import { IsoCameraRig, type CameraCommand } from './camera';
 import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
-import { DaylightRig } from './lumiere';
+import { DaylightRig, stabilizeShadowFilter } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
 import { ShadowCasterCulling } from './ombre-tri';
@@ -171,6 +171,7 @@ export class RenderEngine implements Renderer {
     // Mode léger: aucune carte d'ombre (ni passe d'ombre, ni échantillonnage dans les shaders).
     this.renderer.shadowMap.enabled = !this.light;
     this.renderer.shadowMap.type = PCFShadowMap;
+    stabilizeShadowFilter();
     const canvas = this.renderer.domElement;
     canvas.style.display = 'block';
     canvas.style.width = '100%';
@@ -615,6 +616,7 @@ export class RenderEngine implements Renderer {
         depth: -this.viewPoint.z,
         depthPerPixel,
         ground,
+        minHeight: RENDER_SETTINGS.characters.seeThroughMinHeight,
       });
     }
     this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);

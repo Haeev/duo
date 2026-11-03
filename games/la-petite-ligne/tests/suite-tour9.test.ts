@@ -102,11 +102,12 @@ describe('le tableau des annonces (T9-01 à T9-05)', () => {
   });
 
   it('T9-03: graine 20261030, jours 16 à 61: la suite du script `tour9_automne.py` (même unitDraw)', () => {
-    // python3 -I seq.py (scratchpad), même modèle d'obtention que la partie 5 du script.
+    // python3 -I seq.py (scratchpad), même modèle d'obtention que la partie 5 du script. Pêche 0.12: trois
+    // annonces de pêche en plus (conception de la pêche, section 8.3) changent le tirage; suite relevée sur la partie.
     const script = [
-      [16, 'odette_eggs'], [19, 'firmin_supper'], [23, 'basile_planks'], [26, 'jeanne_poem'], [30, 'odette_blackberries'],
-      [33, 'jeanne_snack'], [37, 'firmin_omelettes'], [40, 'odette_basket'], [44, 'jeanne_mushroom'], [47, 'odette_preserves'],
-      [51, 'odette_eggs'], [54, 'jeanne_poem'], [58, 'firmin_soup'], [61, 'odette_basket'],
+      [16, 'odette_eggs'], [19, 'odette_basket'], [23, 'basile_planks'], [26, 'basile_fence'], [30, 'jeanne_mushroom'],
+      [33, 'jeanne_poem'], [37, 'odette_blackberries'], [40, 'firmin_supper'], [44, 'odette_eggs'], [47, 'jeanne_snack_nuts'],
+      [51, 'firmin_soup'], [54, 'jeanne_poem'], [58, 'odette_eggs'], [61, 'odette_friture'],
     ];
     expect(sequence(20261030, scriptObtainable, 61).map((x) => [x.day, x.gabarit])).toEqual(script);
   });
@@ -116,6 +117,8 @@ describe('le tableau des annonces (T9-01 à T9-05)', () => {
       odette_shelf: [80, 110, 110], firmin_trout: [40], basile_planks: [70], jeanne_chub: [40], odette_eggs: [85], firmin_soup: [105],
       basile_tisane: [55], basile_nuts: [55], odette_blackberries: [65], odette_elder: [55], jeanne_mushroom: [40], firmin_omelettes: [75],
       odette_basket: [140], firmin_supper: [95], basile_fence: [75], jeanne_poem: [60], jeanne_snack: [80], jeanne_snack_nuts: [80], odette_preserves: [125],
+      // Pêche 0.12 (section 8.3).
+      jeanne_school_tank: [40], achille_perch: [40], odette_friture: [65],
     };
     for (const a of content.annonces) {
       expect(a.variants.map((v) => annonceReward(board.reward[a.kind], v, sell)), a.id).toEqual(expected[a.id]);
@@ -374,15 +377,17 @@ describe('chantiers (T9-11)', () => {
 });
 
 describe('correctifs de la commande (T9-14, T9-15)', () => {
-  it('T9-14: coût des poissons par saison (table 2.11); jamais de truite l’hiver', () => {
+  it('T9-14: coût des poissons par saison (pêche 0.12, section 8.2: riverUnitCost / part); jamais de truite l’hiver', () => {
     const g = s.order.generated;
     if (g === null) return;
     const p = (item: string) => g.products.find((x) => x.item === item);
     const trains: Record<string, number> = { spring: 15, summer: 36, autumn: 57, winter: 78 };
+    // 0,0454 divisé par la part du poisson dans les prises de la saison (`fishShareBySeason` de la conception).
     const expected: Record<string, Record<string, number | null>> = {
-      gudgeon: { spring: 0.083, summer: 0.083, autumn: 0.1, winter: 0.061 },
-      chub: { spring: 0.167, summer: 0.125, autumn: 0.167, winter: 0.182 },
-      trout: { spring: 0.333, summer: 0.667, autumn: 0.222, winter: null },
+      gudgeon: { spring: 0.473, summer: 0.547, autumn: 0.473, winter: 0.428 },
+      chub: { spring: 0.155, summer: 0.17, autumn: 0.172, winter: 0.156 },
+      trout: { spring: 0.493, summer: 0.417, autumn: 0.51, winter: null },
+      tench: { spring: null, summer: 0.769, autumn: 0.857, winter: null },
     };
     for (const [fish, bySeason] of Object.entries(expected)) {
       const product = p(fish);

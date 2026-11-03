@@ -90,10 +90,31 @@ export function shopIsOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
   );
 }
 
-export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext): BuyEntry[] {
+/** Le comptoir où l'on est: la mercerie de Solange dans sa boutique, sinon l'épicerie d'Odette. */
+export function counterShop(world: ReadonlyWorld, ctx: UiContext): 'grocery' | 'haberdashery' {
+  return characterOf(world, ctx.me)?.inside === HABERDASHERY_BUILDING ? 'haberdashery' : 'grocery';
+}
+
+const HABERDASHERY_BUILDING = 'salon';
+
+/** Solange tient le comptoir de sa mercerie (comme le vérifie la simulation, `haberdasheryOpen`). */
+export function haberdasheryIsOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
+  const counter = ctx.map.points.salon_counter;
+  const radius = ctx.content.settings.feel.pointRadius * 2;
+  return world.villagers.some(
+    (v) =>
+      v.id === 'solange' &&
+      v.visible &&
+      v.activity === 'serve' &&
+      counter !== undefined &&
+      Math.hypot(v.pos.x - counter.x, v.pos.y - counter.y) <= radius,
+  );
+}
+
+export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext, shop: 'grocery' | 'haberdashery' = 'grocery'): BuyEntry[] {
   const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
   return Object.values(ctx.content.items)
-    .filter((def) => def.shop === 'grocery' && def.buyPrice !== null && onSale(def, world.clock.day))
+    .filter((def) => def.shop === shop && def.buyPrice !== null && onSale(def, world.clock.day))
     .map((def) => {
       const price = def.buyPrice ?? 0;
       const crop = def.plants === null ? undefined : ctx.content.crops[def.plants];
@@ -101,7 +122,7 @@ export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext): BuyEntry[]
         crop === undefined
           ? effectOf(ctx, def)
           : ctx.t(ctx.texts.extra.shop.seedInfo, { days: crop.growthDays, yield: crop.yieldPerCell });
-      const waiting = world.proposals.some((p) => p.purchase.source === 'grocery' && p.purchase.item === def.id);
+      const waiting = world.proposals.some((p) => p.purchase.source === shop && p.purchase.item === def.id);
       return {
         item: def.id,
         icon: itemIcon(ctx, def.id),
@@ -187,6 +208,8 @@ export interface RecipeEntry {
   name: string;
   /** « 1 rondin : 4 planches » */
   makes: string;
+  /** Ce qui sera pris au coffre de la maison (« 3 rondins, dont 2 au coffre »), ou `null` si tout est dans le sac. */
+  fromChest: string | null;
   missing: { item: string; count: number }[];
   available: boolean;
   /** Fabrication en cours chez ce joueur (0 à 1), ou `null`. */
@@ -214,6 +237,21 @@ export function recipeEntries(world: ReadonlyWorld, ctx: UiContext, station: 'wo
       ctx.texts.orderFormat,
     );
     const output = `${r.output.count} ${itemName(ctx.content.items[r.output.item], r.output.count, r.output.item)}`;
+    // Le sac d'abord, puis le coffre (comme `payMaterials`): on dit ce que la recette y prendra.
+    const chestParts =
+      me === null
+        ? []
+        : r.inputs
+            .map((i) => ({ input: i, chest: Math.min(countIn(world.cellar, i.item), Math.max(0, i.count - countIn(me.bag, i.item))) }))
+            .filter((x) => x.chest > 0)
+            .map(({ input, chest }) =>
+              ctx.t(ctx.texts.extra.workbench.fromChest, {
+                count: input.count,
+                item: itemName(ctx.content.items[input.item], input.count, input.item),
+                chest,
+              }),
+            );
+    const fromChest = chestParts.length === 0 ? null : joinList(chestParts, ctx.texts.orderFormat);
     let progress: number | null = null;
     const job = me?.crafting ?? null;
     if (job !== null && job.recipe === r.id && me !== null) {
@@ -226,6 +264,7 @@ export function recipeEntries(world: ReadonlyWorld, ctx: UiContext, station: 'wo
       icon: itemIcon(ctx, r.output.item),
       name: ctx.t(capitalize(r.name)),
       makes: ctx.t(ctx.texts.extra.workbench.makes, { inputs, output }),
+      fromChest: missing.length === 0 ? fromChest : null,
       missing,
       available: missing.length === 0 && (me?.crafting ?? null) === null,
       progress,
@@ -379,7 +418,7 @@ export interface ProposalModel {
   itemText: string;
   price: number;
   /** `improvement` (tour 9): un versement à un chantier, `item` est le chantier. */
-  source: 'grocery' | 'catalogue' | 'improvement';
+  source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   by: string;
   byName: string;
 }

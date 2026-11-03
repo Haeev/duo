@@ -17,6 +17,7 @@ import type {
 } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { BAG_SLOTS, DATA_SCHEMA } from './constantes';
+import { emptyFishing } from '../etat/peche';
 import { type Sim, wrapWorld } from './contexte';
 import { ITEM, SPAWN_POINTS, TOOL_RACK } from './ids';
 import { emptyMemories } from './souvenirs';
@@ -215,6 +216,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
           },
     constructions,
     furniture,
+    decor: [],
     groundItems: [],
     villagers,
     hens: [],
@@ -264,6 +266,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     rooms: {},
     rack: [],
     upperStreetSince: 1,
+    fishing: emptyFishing(),
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

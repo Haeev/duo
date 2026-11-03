@@ -10,6 +10,7 @@ import {
   DEFAULT_DIALOGUES,
   DEFAULT_TIDY,
   DEFAULT_ENVIES,
+  DEFAULT_CARRY_GRIP,
   DEFAULT_FEEL,
   DEFAULT_MEMORIES,
   DEFAULT_MOMENTS,
@@ -31,6 +32,7 @@ import {
   parseStorageSettings,
 } from './maison';
 import { townFrom } from './bourg';
+import { parseFishDef, parseFishingRules } from './poissons';
 import type {
   AnimalDef,
   ClockPace,
@@ -210,6 +212,16 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             return [xy[0] ?? 0, xy[1] ?? 0];
           });
   if (handcar !== null && path.length === 0) handcar.at('path').fail('au moins un point de passage');
+  const lengths: Record<string, number> = {};
+  const lengthsReader = r?.opt('lengths') ?? null;
+  const grip = r?.opt('grip') ?? null;
+  if (lengthsReader !== null) {
+    for (const [item, value] of lengthsReader.entries()) {
+      const m = value.number();
+      if (m < 0) value.fail('longueur positive attendue');
+      lengths[item] = m;
+    }
+  }
   return {
     handcar:
       handcar === null
@@ -225,6 +237,25 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             flag: handcar.at('flag').string(),
           },
     parcel: parcel === null ? null : { item: parcel.at('item').string(), from: parcel.at('from').string(), to: parcel.at('to').string() },
+    lengths,
+    grip:
+      grip === null
+        ? { ...DEFAULT_CARRY_GRIP }
+        : {
+            side: optNumber(grip, 'side', DEFAULT_CARRY_GRIP.side),
+            fromEnd: optNumber(grip, 'fromEnd', DEFAULT_CARRY_GRIP.fromEnd),
+            reach: optNumber(grip, 'reach', DEFAULT_CARRY_GRIP.reach),
+          },
+    quests: (r?.opt('quests')?.items() ?? []).map((q) => ({
+      item: q.at('item').string(),
+      from: q.at('from').string(),
+      to: q.at('to').string(),
+      quest: q.at('quest').string(),
+      step: q.at('step').string(),
+      when: conditions(q.opt('when'), 'step_start'),
+      flag: q.at('flag').string(),
+      placedText: optString(q, 'placedText'),
+    })),
   };
 }
 
@@ -419,6 +450,17 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return counter(r, `bed${suffix(r, 'item')}`, since);
     case 'caught':
       return counter(r, `caught${suffix(r, 'item')}`, since);
+    // Pêche 0.12 (section 8.4): rare ou plus, au coin qui frémit, record battu, rendu à l'eau, guet pour l'autre.
+    case 'caught_rare':
+      return counter(r, 'caught_rare', since);
+    case 'caught_hot_spot':
+      return counter(r, 'caught_hot_spot', since);
+    case 'fish_record':
+      return counter(r, 'fish_record', since);
+    case 'released_fish':
+      return counter(r, 'released', since);
+    case 'watched_for_other':
+      return counter(r, 'watched_for_other', since);
     // Tour 8: cueillettes ramassées (`picked:<objet>`; sans objet, toutes les cueillettes).
     case 'picked':
       return counter(r, `picked${suffix(r, 'item')}`, since);
@@ -451,6 +493,32 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     }
     case 'nights_passed':
       return counter(r, 'nights', since);
+    // 0.12 (lot L-quêtes): compteur nommé, pour un système qui compte sans condition à lui (README, section 3.1).
+    case 'counter':
+      return counter(r, r.at('key').string(), since);
+    // 0.12: compteurs tenus par la basse-cour, la chèvre, le marché et les plis (README, section 3.1).
+    case 'animal_released':
+      return counter(r, `animal_released:${r.at('animal').string()}`, since);
+    case 'animal_named':
+      return counter(r, `animal_named:${r.at('animal').string()}`, since);
+    case 'brood_started':
+      return counter(r, 'brood_started', since);
+    case 'brood_hatched':
+      return counter(r, 'brood_hatched', since);
+    case 'milked':
+      return counter(r, 'milked', since);
+    case 'goat_grazed_spots':
+      return counter(r, 'goat_grazed_spot', since);
+    case 'delivered':
+      return counter(r, 'mail_delivered', since);
+    case 'stall_stocked':
+      return counter(r, 'stall_kind', since);
+    case 'given_to_stall':
+      return counter(r, `stall_given${suffix(r, 'item')}`, since);
+    case 'market_served':
+      return counter(r, optBoolean(r, 'together', false) ? 'market_served_together' : 'market_served', since);
+    case 'money_at_least':
+      return { type, amount: r.at('amount').integer(0) };
     default:
       return r.at('type').fail(`type de condition inconnu « ${type} »`);
   }
@@ -478,6 +546,7 @@ export function parseEffect(r: Reader): Effect {
         from: r.at('from').oneOf(['actor', 'either', 'cellar'] as const),
       };
     case 'give_money':
+    case 'take_money':
       return { type, amount: r.at('amount').integer(0) };
     case 'set_flag':
       return { type, flag: r.at('flag').string() };
@@ -561,7 +630,7 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       stack: it.at('stack').integer(1, 999),
       buyPrice: buy === null || buy.isNull() ? null : buy.integer(0),
       sellPrice: sell === null || sell.isNull() ? null : sell.integer(0),
-      shop: shop === null || shop.isNull() ? null : shop.oneOf(['grocery', 'catalogue'] as const),
+      shop: shop === null || shop.isNull() ? null : shop.oneOf(['grocery', 'catalogue', 'haberdashery'] as const),
       model: it.at('model').string(),
       tier: tier(it),
       plants: optString(it, 'plants'),
@@ -585,9 +654,13 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       backToWall: optBoolean(it, 'backToWall', false),
       dining: optBoolean(it, 'dining', false),
       seat: optBoolean(it, 'seat', false),
+      seatSlots: it.has('seatSlots') ? it.at('seatSlots').items().map((x) => x.number()) : [0],
+      small: optBoolean(it, 'small', false),
+      surface: it.has('surface') ? it.at('surface').items().map((x) => ({ x: x.at('x').number(), z: x.at('z').number() })) : [],
       light: optBoolean(it, 'light', false),
       carriedByTwo: optBoolean(it, 'carriedByTwo', false),
       tool: parseTool(it, id),
+      fish: it.has('fish') ? parseFishDef(it.at('fish')) : null,
     };
   }
   return items;
@@ -850,8 +923,15 @@ function parseQuests(r: Reader): QuestDef[] {
         completionText: q.at('completionText').string(),
         secret: parseSecret(q.opt('secret')),
         repeat: q.has('repeat') ? q.at('repeat').oneOf(['each_train'] as const) : null,
+        expire: parseExpire(q.opt('expire')),
       };
     });
+}
+
+/** 0.12: retrait sans reproche d'une quête au premier jour de la semaine et à l'heure donnés après son démarrage. */
+function parseExpire(r: Reader | null): QuestDef['expire'] {
+  if (r === null) return null;
+  return { weekday: WEEKDAYS.indexOf(r.at('weekday').oneOf(WEEKDAYS)), time: r.at('time').time(), text: r.at('text').string() };
 }
 
 function parseSecret(r: Reader | null): QuestSecretDef | null {
@@ -1213,6 +1293,8 @@ function parseTrigger(r: Reader): HintTrigger {
     case 'near_forage':
     case 'aim_sapling':
     case 'near_board_annonce':
+    case 'fishing_hot_spot':
+    case 'fishing_watch':
       return { on };
     case 'near_point':
       return { on, point: r.at('point').string() };
@@ -1296,6 +1378,7 @@ function parseFeel(r: Reader | null): FeelSettings {
     actionSeconds: { ...DEFAULT_FEEL.actionSeconds },
     fishWeights: { ...DEFAULT_FEEL.fishWeights },
     fishWeightsBySeason: {},
+    steppingStoneVillagers: [...DEFAULT_FEEL.steppingStoneVillagers],
   };
   if (r === null) return feel;
   const actions = r.opt('actionSeconds');
@@ -1318,7 +1401,9 @@ function parseFeel(r: Reader | null): FeelSettings {
       if (key !== undefined) feel.fishWeightsBySeason[key] = table;
     }
   }
-  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights' | 'fishWeightsBySeason'>)[] = [
+  const stones = r.opt('steppingStoneVillagers');
+  if (stones !== null) feel.steppingStoneVillagers = stones.stringList();
+  const numeric: (keyof Omit<FeelSettings, 'actionSeconds' | 'fishWeights' | 'fishWeightsBySeason' | 'steppingStoneVillagers'>)[] = [
     'trainSlideSeconds',
     'pointRadius',
     'beamGrabRange',
@@ -1477,6 +1562,7 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
     biteWaitSeconds: [min, max],
     hookWindowSeconds: r.at('hookWindowSeconds').number(),
     flag: r.at('flag').string(),
+    rules: parseFishingRules(r),
   };
 }
 
@@ -1726,6 +1812,13 @@ function parseGenerated(r: Reader | null, written: number): Settings['order']['g
     products,
     fishCostFromWeights: optBoolean(r, 'fishCostFromWeights', false),
     fishCostReferenceSeason: reference === null ? 'spring' : reference.oneOf(SEASONS),
+    riverUnitCost: r.has('riverUnitCost') ? positive(r.at('riverUnitCost')) : null,
+    fishShareBySeason: Object.fromEntries(
+      (r.opt('fishShareBySeason')?.entries() ?? []).map(([season, table]) => [
+        (SEASONS as readonly string[]).includes(season) ? season : r.at('fishShareBySeason').fail(`saison inconnue « ${season} »`),
+        Object.fromEntries(table.entries().map(([item, share]) => [item, probability(share)])),
+      ]),
+    ),
     roundTo: numbers('roundTo', 1),
     lineMax: numbers('lineMax', 1),
     extraLineMinShare: extra === null || extra.isNull() ? null : probability(extra),
@@ -2040,6 +2133,7 @@ function checkReferences(content: Content): void {
           if ((content.quests.find((q) => q.id === e.quest)?.secret ?? null) === null) fail(`${where}: quête sans secret « ${e.quest} »`);
           break;
         case 'give_money':
+        case 'take_money':
         case 'set_flag':
         case 'set_need':
         case 'gather_players':
@@ -2065,7 +2159,17 @@ function checkReferences(content: Content): void {
       walkEffects(choice.effectsWrong, `habitants.json: ${dialogue.id}.${choice.id}`);
     }
   }
+  for (const load of content.settings.carry.quests) {
+    const where = `reglages.json: carry.quests (${load.item})`;
+    item(load.item, where);
+    const steps = content.quests.find((q) => q.id === load.quest)?.steps ?? null;
+    if (steps === null) fail(`${where}: quête inconnue « ${load.quest} »`);
+    else if (!steps.some((s) => s.id === load.step)) fail(`${where}: étape inconnue « ${load.step} »`);
+    if (load.placedText !== null && !(load.placedText in content.texts.messages)) fail(`${where}: message inconnu « ${load.placedText} »`);
+  }
   for (const quest of content.quests) {
+    const expire = quest.expire?.text ?? null;
+    if (expire !== null && !(expire in content.texts.messages)) fail(`quetes.json: ${quest.id}: message inconnu « ${expire} »`);
     const nudge = quest.secret?.nudge ?? null;
     if (nudge !== null && !(nudge in content.texts.messages)) fail(`quetes.json: ${quest.id}: message inconnu « ${nudge} »`);
   }
@@ -2229,6 +2333,7 @@ function annonceQuests(content: Content): QuestDef[] {
     completionText: '',
     secret: null,
     repeat: null,
+    expire: null,
   });
   for (const a of content.annonces) {
     const title = rawText(content.texts, 'annonces', a.id, 'title') ?? a.id;
@@ -2406,5 +2511,12 @@ export function loadContent(files: RawContentFiles): Content {
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
+  // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.
+  const scale = content.settings.fishing?.rules.priceScale ?? 1;
+  if (scale !== 1) {
+    for (const def of Object.values(content.items)) {
+      if (def.fish !== null && def.sellPrice !== null) def.sellPrice = Math.max(1, Math.round(def.sellPrice * scale));
+    }
+  }
   return content;
 }

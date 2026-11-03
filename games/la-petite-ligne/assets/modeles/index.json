@@ -1,31 +1,31 @@
 {
  "player_base": {
   "file": "personnages.glb",
-  "tris": 436
+  "tris": 1094
  },
  "player_outfit_work": {
   "file": "personnages.glb",
-  "tris": 1042
+  "tris": 1186
  },
  "player_outfit_smock": {
   "file": "personnages.glb",
-  "tris": 1098
+  "tris": 1242
  },
  "player_outfit_overalls": {
   "file": "personnages.glb",
-  "tris": 1042
+  "tris": 1186
  },
  "player_hair_short": {
   "file": "personnages.glb",
-  "tris": 316
+  "tris": 676
  },
  "player_hair_bob": {
   "file": "personnages.glb",
-  "tris": 352
+  "tris": 676
  },
  "player_hair_bun": {
   "file": "personnages.glb",
-  "tris": 380
+  "tris": 632
  },
  "player_hair_crop": {
   "file": "personnages.glb",
@@ -37,31 +37,31 @@
  },
  "player_hair_ponytail": {
   "file": "personnages.glb",
-  "tris": 328
+  "tris": 580
  },
  "player_hair_braid": {
   "file": "personnages.glb",
-  "tris": 396
+  "tris": 648
  },
  "player_hair_pigtails": {
   "file": "personnages.glb",
-  "tris": 432
+  "tris": 720
  },
  "player_hair_wavy": {
   "file": "personnages.glb",
-  "tris": 352
+  "tris": 676
  },
  "player_hair_long": {
   "file": "personnages.glb",
-  "tris": 400
+  "tris": 688
  },
  "player_hair_fringe": {
   "file": "personnages.glb",
-  "tris": 280
+  "tris": 604
  },
  "player_hair_quiff": {
   "file": "personnages.glb",
-  "tris": 236
+  "tris": 416
  },
  "player_hair_cloud": {
   "file": "personnages.glb",
@@ -69,11 +69,11 @@
  },
  "player_hair_crown": {
   "file": "personnages.glb",
-  "tris": 432
+  "tris": 648
  },
  "player_hair_bob_long": {
   "file": "personnages.glb",
-  "tris": 380
+  "tris": 704
  },
  "player_beard_short": {
   "file": "personnages.glb",
@@ -87,57 +87,225 @@
   "file": "personnages.glb",
   "tris": 72
  },
- "player_scarf_orb": {
+ "wear_top_tshirt": {
+  "file": "personnages.glb",
+  "tris": 346
+ },
+ "wear_top_chemise": {
+  "file": "personnages.glb",
+  "tris": 670
+ },
+ "wear_top_pull": {
+  "file": "personnages.glb",
+  "tris": 514
+ },
+ "wear_top_debardeur": {
+  "file": "personnages.glb",
+  "tris": 180
+ },
+ "wear_top_mariniere": {
+  "file": "personnages.glb",
+  "tris": 506
+ },
+ "wear_bottom_pantalon": {
+  "file": "personnages.glb",
+  "tris": 476
+ },
+ "wear_bottom_short": {
+  "file": "personnages.glb",
+  "tris": 332
+ },
+ "wear_bottom_salopette": {
+  "file": "personnages.glb",
+  "tris": 826
+ },
+ "wear_bottom_jupe": {
+  "file": "personnages.glb",
+  "tris": 168
+ },
+ "wear_bottom_pantacourt": {
+  "file": "personnages.glb",
+  "tris": 364
+ },
+ "wear_shoes_bottines": {
+  "file": "personnages.glb",
+  "tris": 368
+ },
+ "wear_shoes_bottes": {
+  "file": "personnages.glb",
+  "tris": 320
+ },
+ "wear_shoes_sabots": {
+  "file": "personnages.glb",
+  "tris": 184
+ },
+ "wear_shoes_espadrilles": {
+  "file": "personnages.glb",
+  "tris": 200
+ },
+ "wear_shoes_baskets": {
+  "file": "personnages.glb",
+  "tris": 344
+ },
+ "wear_outer_veste": {
+  "file": "personnages.glb",
+  "tris": 834
+ },
+ "wear_outer_gilet": {
+  "file": "personnages.glb",
+  "tris": 666
+ },
+ "wear_outer_cire": {
+  "file": "personnages.glb",
+  "tris": 774
+ },
+ "wear_hat_casquette": {
+  "file": "personnages.glb",
+  "tris": 192
+ },
+ "wear_hat_paille": {
   "file": "personnages.glb",
   "tris": 212
  },
- "player_scarf_crescent": {
+ "wear_hat_bonnet": {
   "file": "personnages.glb",
-  "tris": 256
+  "tris": 196
  },
- "player_scarf_star": {
+ "player_badge_orb": {
   "file": "personnages.glb",
-  "tris": 204
+  "tris": 108
  },
- "player_scarf_sun": {
+ "player_badge_orb_outer": {
   "file": "personnages.glb",
-  "tris": 276
+  "tris": 108
  },
- "player_scarf_planet": {
+ "player_badge_crescent": {
   "file": "personnages.glb",
-  "tris": 224
+  "tris": 152
  },
- "player_scarf_comet": {
+ "player_badge_crescent_outer": {
   "file": "personnages.glb",
-  "tris": 220
+  "tris": 152
+ },
+ "player_badge_star": {
+  "file": "personnages.glb",
+  "tris": 108
+ },
+ "player_badge_star_outer": {
+  "file": "personnages.glb",
+  "tris": 108
+ },
+ "player_badge_sun": {
+  "file": "personnages.glb",
+  "tris": 172
+ },
+ "player_badge_sun_outer": {
+  "file": "personnages.glb",
+  "tris": 172
+ },
+ "player_badge_planet": {
+  "file": "personnages.glb",
+  "tris": 120
+ },
+ "player_badge_planet_outer": {
+  "file": "personnages.glb",
+  "tris": 120
+ },
+ "player_badge_comet": {
+  "file": "personnages.glb",
+  "tris": 116
+ },
+ "player_badge_comet_outer": {
+  "file": "personnages.glb",
+  "tris": 116
+ },
+ "player_hair_short_hat": {
+  "file": "personnages.glb",
+  "tris": 316
+ },
+ "player_hair_bob_hat": {
+  "file": "personnages.glb",
+  "tris": 352
+ },
+ "player_hair_bun_hat": {
+  "file": "personnages.glb",
+  "tris": 380
+ },
+ "player_hair_crop_hat": {
+  "file": "personnages.glb",
+  "tris": 148
+ },
+ "player_hair_curls_hat": {
+  "file": "personnages.glb",
+  "tris": 388
+ },
+ "player_hair_ponytail_hat": {
+  "file": "personnages.glb",
+  "tris": 328
+ },
+ "player_hair_braid_hat": {
+  "file": "personnages.glb",
+  "tris": 396
+ },
+ "player_hair_pigtails_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_wavy_hat": {
+  "file": "personnages.glb",
+  "tris": 352
+ },
+ "player_hair_long_hat": {
+  "file": "personnages.glb",
+  "tris": 400
+ },
+ "player_hair_fringe_hat": {
+  "file": "personnages.glb",
+  "tris": 280
+ },
+ "player_hair_quiff_hat": {
+  "file": "personnages.glb",
+  "tris": 236
+ },
+ "player_hair_cloud_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_crown_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_bob_long_hat": {
+  "file": "personnages.glb",
+  "tris": 380
  },
  "villager_firmin": {
   "file": "personnages.glb",
-  "tris": 1806
+  "tris": 2038
  },
  "villager_odette": {
   "file": "personnages.glb",
-  "tris": 1950
+  "tris": 2434
  },
  "villager_basile": {
   "file": "personnages.glb",
-  "tris": 2166
+  "tris": 2398
  },
  "villager_jeanne": {
   "file": "personnages.glb",
-  "tris": 2054
+  "tris": 2286
  },
  "villager_lucie": {
   "file": "personnages.glb",
-  "tris": 1986
+  "tris": 2218
  },
  "villager_achille": {
   "file": "personnages.glb",
-  "tris": 1854
+  "tris": 2086
  },
  "villager_solange": {
   "file": "personnages.glb",
-  "tris": 2050
+  "tris": 2534
  },
  "villager_firmin_scarf": {
   "file": "personnages.glb",
@@ -145,11 +313,11 @@
  },
  "rail_crew_driver": {
   "file": "personnages.glb",
-  "tris": 1470
+  "tris": 1630
  },
  "rail_crew_stoker": {
   "file": "personnages.glb",
-  "tris": 1514
+  "tris": 1674
  },
  "rig": {
   "file": "personnages.glb",
@@ -189,7 +357,15 @@
    "pole_raise",
    "pole_lower",
    "driver_lean",
-   "driver_wave"
+   "driver_wave",
+   "sit_down",
+   "stand_up",
+   "drink",
+   "carry_one",
+   "carry_one_idle",
+   "cook",
+   "pickup",
+   "feed"
   ]
  },
  "garden_cell_grass": {
@@ -440,18 +616,6 @@
   "file": "ferme.glb",
   "tris": 356
  },
- "fish_gudgeon": {
-  "file": "ferme.glb",
-  "tris": 284
- },
- "fish_chub": {
-  "file": "ferme.glb",
-  "tris": 140
- },
- "fish_trout": {
-  "file": "ferme.glb",
-  "tris": 284
- },
  "hen_feeder": {
   "file": "ferme.glb",
   "tris": 84,
@@ -524,7 +688,7 @@
  },
  "ferrand_shop": {
   "file": "bourg.glb",
-  "tris": 11536,
+  "tris": 11266,
   "footprint": [
    10,
    8
@@ -532,7 +696,7 @@
  },
  "haberdashery": {
   "file": "bourg.glb",
-  "tris": 6252,
+  "tris": 5852,
   "footprint": [
    7,
    7
@@ -540,7 +704,7 @@
  },
  "bakery": {
   "file": "bourg.glb",
-  "tris": 4348,
+  "tris": 4070,
   "footprint": [
    7,
    6
@@ -556,7 +720,7 @@
  },
  "school": {
   "file": "bourg.glb",
-  "tris": 5044,
+  "tris": 4742,
   "footprint": [
    11,
    5
@@ -1645,6 +1809,98 @@
  "mooring_post": {
   "file": "faune.glb",
   "tris": 162
+ },
+ "fish_gudgeon": {
+  "file": "poissons.glb",
+  "tris": 496
+ },
+ "fish_minnow": {
+  "file": "poissons.glb",
+  "tris": 436
+ },
+ "fish_stone_loach": {
+  "file": "poissons.glb",
+  "tris": 528
+ },
+ "fish_bleak": {
+  "file": "poissons.glb",
+  "tris": 376
+ },
+ "fish_roach": {
+  "file": "poissons.glb",
+  "tris": 376
+ },
+ "fish_chub": {
+  "file": "poissons.glb",
+  "tris": 380
+ },
+ "fish_trout": {
+  "file": "poissons.glb",
+  "tris": 600
+ },
+ "fish_perch": {
+  "file": "poissons.glb",
+  "tris": 564
+ },
+ "fish_dace": {
+  "file": "poissons.glb",
+  "tris": 424
+ },
+ "fish_bullhead": {
+  "file": "poissons.glb",
+  "tris": 532
+ },
+ "fish_tench": {
+  "file": "poissons.glb",
+  "tris": 444
+ },
+ "fish_barbel": {
+  "file": "poissons.glb",
+  "tris": 476
+ },
+ "fish_pike": {
+  "file": "poissons.glb",
+  "tris": 520
+ },
+ "fish_grayling": {
+  "file": "poissons.glb",
+  "tris": 516
+ },
+ "fish_brook_lamprey": {
+  "file": "poissons.glb",
+  "tris": 384
+ },
+ "fish_bitterling": {
+  "file": "poissons.glb",
+  "tris": 408
+ },
+ "fish_shad": {
+  "file": "poissons.glb",
+  "tris": 496
+ },
+ "fish_mirror_carp": {
+  "file": "poissons.glb",
+  "tris": 584
+ },
+ "fish_salmon": {
+  "file": "poissons.glb",
+  "tris": 560
+ },
+ "fish_burbot": {
+  "file": "poissons.glb",
+  "tris": 544
+ },
+ "fish_golden_trout": {
+  "file": "poissons.glb",
+  "tris": 596
+ },
+ "fish_moon_pike": {
+  "file": "poissons.glb",
+  "tris": 588
+ },
+ "landing_net": {
+  "file": "poissons.glb",
+  "tris": 704
  },
  "goat": {
   "file": "elevage.glb",

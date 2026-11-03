@@ -1,0 +1,925 @@
+{
+  "version": 1,
+  "note": "Garde-robe de la 0.12 (docs/jeux/jeu-1/garde-robe-0-12.md). Généré par games/la-petite-ligne/assets-src/modeles/vetements_donnees.py: modifier le script, pas ce fichier. Couleurs 'principale', 'secondaire', 'motif' (facultatif, sinon la secondaire): rangée 1 de personnages.png, colonnes <slot>_p, <slot>_s, <slot>_m (garde_robe.WEAR_SLOTS).",
+  "vetements": [
+    {
+      "id": "tshirt_blanc",
+      "slot": "top",
+      "style": "tshirt",
+      "nom": "T-shirt blanc",
+      "modele": "wear_top_tshirt",
+      "couleurs": {
+        "principale": "#F1ECE2",
+        "secondaire": "#D8D0C2"
+      },
+      "prix": 70
+    },
+    {
+      "id": "tshirt_rose",
+      "slot": "top",
+      "style": "tshirt",
+      "nom": "T-shirt rose poudré",
+      "modele": "wear_top_tshirt",
+      "couleurs": {
+        "principale": "#E3A1B4",
+        "secondaire": "#F4E6EC"
+      },
+      "prix": 75
+    },
+    {
+      "id": "tshirt_sauge",
+      "slot": "top",
+      "style": "tshirt",
+      "nom": "T-shirt vert sauge",
+      "modele": "wear_top_tshirt",
+      "couleurs": {
+        "principale": "#8BA37B",
+        "secondaire": "#EDE6D3"
+      },
+      "prix": 85
+    },
+    {
+      "id": "tshirt_ocre",
+      "slot": "top",
+      "style": "tshirt",
+      "nom": "T-shirt ocre",
+      "modele": "wear_top_tshirt",
+      "couleurs": {
+        "principale": "#C98E3A",
+        "secondaire": "#F1E4C8"
+      },
+      "prix": 70
+    },
+    {
+      "id": "chemise_blanche",
+      "slot": "top",
+      "style": "chemise",
+      "nom": "Chemise blanche",
+      "modele": "wear_top_chemise",
+      "couleurs": {
+        "principale": "#EEE9DF",
+        "secondaire": "#C9C1B2"
+      },
+      "prix": 120
+    },
+    {
+      "id": "chemise_bleu_travail",
+      "slot": "top",
+      "style": "chemise",
+      "nom": "Chemise bleu de travail",
+      "modele": "wear_top_chemise",
+      "couleurs": {
+        "principale": "#5C7FA6",
+        "secondaire": "#EDE6D3"
+      },
+      "prix": 130
+    },
+    {
+      "id": "chemise_lin",
+      "slot": "top",
+      "style": "chemise",
+      "nom": "Chemise de lin",
+      "modele": "wear_top_chemise",
+      "couleurs": {
+        "principale": "#D8C9A8",
+        "secondaire": "#8C6A48"
+      },
+      "prix": 145
+    },
+    {
+      "id": "chemise_rouille",
+      "slot": "top",
+      "style": "chemise",
+      "nom": "Chemise rouille",
+      "modele": "wear_top_chemise",
+      "couleurs": {
+        "principale": "#B5663F",
+        "secondaire": "#EDE6D3"
+      },
+      "prix": 120
+    },
+    {
+      "id": "pull_moutarde",
+      "slot": "top",
+      "style": "pull",
+      "nom": "Pull moutarde",
+      "modele": "wear_top_pull",
+      "couleurs": {
+        "principale": "#D4A746",
+        "secondaire": "#B68A30",
+        "motif": "#E9D08A"
+      },
+      "prix": 150
+    },
+    {
+      "id": "pull_rouille",
+      "slot": "top",
+      "style": "pull",
+      "nom": "Pull rouille",
+      "modele": "wear_top_pull",
+      "couleurs": {
+        "principale": "#B5663F",
+        "secondaire": "#94502F",
+        "motif": "#D9946C"
+      },
+      "prix": 165
+    },
+    {
+      "id": "pull_vert_bouteille",
+      "slot": "top",
+      "style": "pull",
+      "nom": "Pull vert bouteille",
+      "modele": "wear_top_pull",
+      "couleurs": {
+        "principale": "#2F5A45",
+        "secondaire": "#244736",
+        "motif": "#5C8A6F"
+      },
+      "prix": 180
+    },
+    {
+      "id": "pull_creme",
+      "slot": "top",
+      "style": "pull",
+      "nom": "Pull crème",
+      "modele": "wear_top_pull",
+      "couleurs": {
+        "principale": "#EDE3CC",
+        "secondaire": "#D3C6A8",
+        "motif": "#F7F0E0"
+      },
+      "prix": 150
+    },
+    {
+      "id": "pull_bleu_nuit",
+      "slot": "top",
+      "style": "pull",
+      "nom": "Pull bleu nuit",
+      "modele": "wear_top_pull",
+      "couleurs": {
+        "principale": "#2F3A5A",
+        "secondaire": "#232B45",
+        "motif": "#5A6C99"
+      },
+      "prix": 165
+    },
+    {
+      "id": "debardeur_blanc",
+      "slot": "top",
+      "style": "debardeur",
+      "nom": "Débardeur blanc",
+      "modele": "wear_top_debardeur",
+      "couleurs": {
+        "principale": "#F1ECE2",
+        "secondaire": "#C2563F"
+      },
+      "prix": 60,
+      "saison": "summer"
+    },
+    {
+      "id": "debardeur_corail",
+      "slot": "top",
+      "style": "debardeur",
+      "nom": "Débardeur corail",
+      "modele": "wear_top_debardeur",
+      "couleurs": {
+        "principale": "#E8735E",
+        "secondaire": "#F4E2D6"
+      },
+      "prix": 65,
+      "saison": "summer"
+    },
+    {
+      "id": "debardeur_bleu_ciel",
+      "slot": "top",
+      "style": "debardeur",
+      "nom": "Débardeur bleu ciel",
+      "modele": "wear_top_debardeur",
+      "couleurs": {
+        "principale": "#8DB7D9",
+        "secondaire": "#F1ECE2"
+      },
+      "prix": 70,
+      "saison": "summer"
+    },
+    {
+      "id": "mariniere_marine",
+      "slot": "top",
+      "style": "mariniere",
+      "nom": "Marinière bleu marine",
+      "modele": "wear_top_mariniere",
+      "couleurs": {
+        "principale": "#F2EDE1",
+        "secondaire": "#2F4A78"
+      },
+      "prix": 130
+    },
+    {
+      "id": "mariniere_rouge",
+      "slot": "top",
+      "style": "mariniere",
+      "nom": "Marinière rouge",
+      "modele": "wear_top_mariniere",
+      "couleurs": {
+        "principale": "#F2EDE1",
+        "secondaire": "#B33A33"
+      },
+      "prix": 145
+    },
+    {
+      "id": "mariniere_vert_eau",
+      "slot": "top",
+      "style": "mariniere",
+      "nom": "Marinière vert d'eau",
+      "modele": "wear_top_mariniere",
+      "couleurs": {
+        "principale": "#F2EDE1",
+        "secondaire": "#5E9C8F"
+      },
+      "prix": 155
+    },
+    {
+      "id": "pantalon_bleu",
+      "slot": "bottom",
+      "style": "pantalon",
+      "nom": "Pantalon de toile bleu",
+      "modele": "wear_bottom_pantalon",
+      "couleurs": {
+        "principale": "#4A5D78",
+        "secondaire": "#6B4A33"
+      },
+      "prix": 140
+    },
+    {
+      "id": "pantalon_beige",
+      "slot": "bottom",
+      "style": "pantalon",
+      "nom": "Pantalon de toile beige",
+      "modele": "wear_bottom_pantalon",
+      "couleurs": {
+        "principale": "#C9B79A",
+        "secondaire": "#6B4A33"
+      },
+      "prix": 155
+    },
+    {
+      "id": "pantalon_kaki",
+      "slot": "bottom",
+      "style": "pantalon",
+      "nom": "Pantalon de toile kaki",
+      "modele": "wear_bottom_pantalon",
+      "couleurs": {
+        "principale": "#6E7253",
+        "secondaire": "#4A3A2E"
+      },
+      "prix": 170
+    },
+    {
+      "id": "pantalon_brun",
+      "slot": "bottom",
+      "style": "pantalon",
+      "nom": "Pantalon de toile brun",
+      "modele": "wear_bottom_pantalon",
+      "couleurs": {
+        "principale": "#6B5541",
+        "secondaire": "#3E2F25"
+      },
+      "prix": 140
+    },
+    {
+      "id": "short_marine",
+      "slot": "bottom",
+      "style": "short",
+      "nom": "Short bleu marine",
+      "modele": "wear_bottom_short",
+      "couleurs": {
+        "principale": "#3D4B52",
+        "secondaire": "#2B3439"
+      },
+      "prix": 90,
+      "saison": "summer"
+    },
+    {
+      "id": "short_kaki",
+      "slot": "bottom",
+      "style": "short",
+      "nom": "Short kaki",
+      "modele": "wear_bottom_short",
+      "couleurs": {
+        "principale": "#7C7A55",
+        "secondaire": "#4A3A2E"
+      },
+      "prix": 100,
+      "saison": "summer"
+    },
+    {
+      "id": "short_ecru",
+      "slot": "bottom",
+      "style": "short",
+      "nom": "Short écru",
+      "modele": "wear_bottom_short",
+      "couleurs": {
+        "principale": "#E2D7BF",
+        "secondaire": "#8C6A48"
+      },
+      "prix": 110,
+      "saison": "summer"
+    },
+    {
+      "id": "salopette_jean",
+      "slot": "bottom",
+      "style": "salopette",
+      "nom": "Salopette en jean",
+      "modele": "wear_bottom_salopette",
+      "couleurs": {
+        "principale": "#4E6A8E",
+        "secondaire": "#F1EBDB",
+        "motif": "#C8A150"
+      },
+      "prix": 220,
+      "couvre": [
+        "top"
+      ]
+    },
+    {
+      "id": "salopette_verte",
+      "slot": "bottom",
+      "style": "salopette",
+      "nom": "Salopette verte",
+      "modele": "wear_bottom_salopette",
+      "couleurs": {
+        "principale": "#5E6A55",
+        "secondaire": "#F1EBDB",
+        "motif": "#C8A150"
+      },
+      "prix": 240,
+      "couvre": [
+        "top"
+      ]
+    },
+    {
+      "id": "salopette_rouille",
+      "slot": "bottom",
+      "style": "salopette",
+      "nom": "Salopette rouille",
+      "modele": "wear_bottom_salopette",
+      "couleurs": {
+        "principale": "#A65A37",
+        "secondaire": "#EFE6D2",
+        "motif": "#C8A150"
+      },
+      "prix": 265,
+      "couvre": [
+        "top"
+      ]
+    },
+    {
+      "id": "salopette_moutarde",
+      "slot": "bottom",
+      "style": "salopette",
+      "nom": "Salopette moutarde",
+      "modele": "wear_bottom_salopette",
+      "couleurs": {
+        "principale": "#C99A3C",
+        "secondaire": "#F3ECDA",
+        "motif": "#8C6A48"
+      },
+      "prix": 220,
+      "couvre": [
+        "top"
+      ]
+    },
+    {
+      "id": "jupe_prune",
+      "slot": "bottom",
+      "style": "jupe",
+      "nom": "Jupe prune",
+      "modele": "wear_bottom_jupe",
+      "couleurs": {
+        "principale": "#6E3F5E",
+        "secondaire": "#3E2338"
+      },
+      "prix": 130
+    },
+    {
+      "id": "jupe_brune",
+      "slot": "bottom",
+      "style": "jupe",
+      "nom": "Jupe brune",
+      "modele": "wear_bottom_jupe",
+      "couleurs": {
+        "principale": "#6B5541",
+        "secondaire": "#3E2F25"
+      },
+      "prix": 145
+    },
+    {
+      "id": "jupe_vert_sapin",
+      "slot": "bottom",
+      "style": "jupe",
+      "nom": "Jupe vert sapin",
+      "modele": "wear_bottom_jupe",
+      "couleurs": {
+        "principale": "#2F5A45",
+        "secondaire": "#1F3D2F"
+      },
+      "prix": 155
+    },
+    {
+      "id": "jupe_bleu_ardoise",
+      "slot": "bottom",
+      "style": "jupe",
+      "nom": "Jupe bleu ardoise",
+      "modele": "wear_bottom_jupe",
+      "couleurs": {
+        "principale": "#4F6475",
+        "secondaire": "#2F3E4A"
+      },
+      "prix": 130
+    },
+    {
+      "id": "pantacourt_beige",
+      "slot": "bottom",
+      "style": "pantacourt",
+      "nom": "Pantacourt beige",
+      "modele": "wear_bottom_pantacourt",
+      "couleurs": {
+        "principale": "#C9B79A",
+        "secondaire": "#8C7A60"
+      },
+      "prix": 110
+    },
+    {
+      "id": "pantacourt_bleu",
+      "slot": "bottom",
+      "style": "pantacourt",
+      "nom": "Pantacourt bleu",
+      "modele": "wear_bottom_pantacourt",
+      "couleurs": {
+        "principale": "#5C7FA6",
+        "secondaire": "#3E5A7A"
+      },
+      "prix": 120
+    },
+    {
+      "id": "pantacourt_olive",
+      "slot": "bottom",
+      "style": "pantacourt",
+      "nom": "Pantacourt olive",
+      "modele": "wear_bottom_pantacourt",
+      "couleurs": {
+        "principale": "#7C7F4A",
+        "secondaire": "#55583A"
+      },
+      "prix": 130
+    },
+    {
+      "id": "bottines_brunes",
+      "slot": "shoes",
+      "style": "bottines",
+      "nom": "Bottines brunes",
+      "modele": "wear_shoes_bottines",
+      "couleurs": {
+        "principale": "#5A4636",
+        "secondaire": "#2E2622"
+      },
+      "prix": 160
+    },
+    {
+      "id": "bottines_noires",
+      "slot": "shoes",
+      "style": "bottines",
+      "nom": "Bottines noires",
+      "modele": "wear_shoes_bottines",
+      "couleurs": {
+        "principale": "#2E2A27",
+        "secondaire": "#1A1715"
+      },
+      "prix": 175
+    },
+    {
+      "id": "bottines_fauves",
+      "slot": "shoes",
+      "style": "bottines",
+      "nom": "Bottines fauves",
+      "modele": "wear_shoes_bottines",
+      "couleurs": {
+        "principale": "#A8703F",
+        "secondaire": "#4A3324"
+      },
+      "prix": 190
+    },
+    {
+      "id": "bottes_vertes",
+      "slot": "shoes",
+      "style": "bottes",
+      "nom": "Bottes de pluie vertes",
+      "modele": "wear_shoes_bottes",
+      "couleurs": {
+        "principale": "#2F6F5E",
+        "secondaire": "#1E3D35"
+      },
+      "prix": 140,
+      "saison": "autumn"
+    },
+    {
+      "id": "bottes_jaunes",
+      "slot": "shoes",
+      "style": "bottes",
+      "nom": "Bottes de pluie jaunes",
+      "modele": "wear_shoes_bottes",
+      "couleurs": {
+        "principale": "#E8B93A",
+        "secondaire": "#3A3530"
+      },
+      "prix": 155,
+      "saison": "autumn"
+    },
+    {
+      "id": "bottes_rouges",
+      "slot": "shoes",
+      "style": "bottes",
+      "nom": "Bottes de pluie rouges",
+      "modele": "wear_shoes_bottes",
+      "couleurs": {
+        "principale": "#B33A33",
+        "secondaire": "#3A3530"
+      },
+      "prix": 170,
+      "saison": "autumn"
+    },
+    {
+      "id": "sabots_clairs",
+      "slot": "shoes",
+      "style": "sabots",
+      "nom": "Sabots de bois clair",
+      "modele": "wear_shoes_sabots",
+      "couleurs": {
+        "principale": "#C9A06A",
+        "secondaire": "#8A6A44"
+      },
+      "prix": 80
+    },
+    {
+      "id": "sabots_bleus",
+      "slot": "shoes",
+      "style": "sabots",
+      "nom": "Sabots peints en bleu",
+      "modele": "wear_shoes_sabots",
+      "couleurs": {
+        "principale": "#4E6F9E",
+        "secondaire": "#C9A06A"
+      },
+      "prix": 90
+    },
+    {
+      "id": "sabots_fonces",
+      "slot": "shoes",
+      "style": "sabots",
+      "nom": "Sabots de bois foncé",
+      "modele": "wear_shoes_sabots",
+      "couleurs": {
+        "principale": "#7A5A38",
+        "secondaire": "#4A3524"
+      },
+      "prix": 95
+    },
+    {
+      "id": "espadrilles_ecrues",
+      "slot": "shoes",
+      "style": "espadrilles",
+      "nom": "Espadrilles écrues",
+      "modele": "wear_shoes_espadrilles",
+      "couleurs": {
+        "principale": "#E6DCC6",
+        "secondaire": "#B39A6A"
+      },
+      "prix": 90,
+      "saison": "summer"
+    },
+    {
+      "id": "espadrilles_marine",
+      "slot": "shoes",
+      "style": "espadrilles",
+      "nom": "Espadrilles bleu marine",
+      "modele": "wear_shoes_espadrilles",
+      "couleurs": {
+        "principale": "#2F3F5C",
+        "secondaire": "#B39A6A"
+      },
+      "prix": 100,
+      "saison": "summer"
+    },
+    {
+      "id": "espadrilles_rouges",
+      "slot": "shoes",
+      "style": "espadrilles",
+      "nom": "Espadrilles rouges",
+      "modele": "wear_shoes_espadrilles",
+      "couleurs": {
+        "principale": "#B8463C",
+        "secondaire": "#B39A6A"
+      },
+      "prix": 110,
+      "saison": "summer"
+    },
+    {
+      "id": "baskets_blanches",
+      "slot": "shoes",
+      "style": "baskets",
+      "nom": "Baskets de toile blanches",
+      "modele": "wear_shoes_baskets",
+      "couleurs": {
+        "principale": "#E9E4D8",
+        "secondaire": "#F7F4EC"
+      },
+      "prix": 120
+    },
+    {
+      "id": "baskets_rouges",
+      "slot": "shoes",
+      "style": "baskets",
+      "nom": "Baskets de toile rouges",
+      "modele": "wear_shoes_baskets",
+      "couleurs": {
+        "principale": "#C2453B",
+        "secondaire": "#F4F0E6"
+      },
+      "prix": 130
+    },
+    {
+      "id": "baskets_bleues",
+      "slot": "shoes",
+      "style": "baskets",
+      "nom": "Baskets de toile bleues",
+      "modele": "wear_shoes_baskets",
+      "couleurs": {
+        "principale": "#4E6F9E",
+        "secondaire": "#F4F0E6"
+      },
+      "prix": 145
+    },
+    {
+      "id": "veste_bleue",
+      "slot": "outer",
+      "style": "veste",
+      "nom": "Veste de travail bleue",
+      "modele": "wear_outer_veste",
+      "couleurs": {
+        "principale": "#3E5A86",
+        "secondaire": "#2F4466"
+      },
+      "prix": 320
+    },
+    {
+      "id": "veste_vert_bouteille",
+      "slot": "outer",
+      "style": "veste",
+      "nom": "Veste de travail vert bouteille",
+      "modele": "wear_outer_veste",
+      "couleurs": {
+        "principale": "#3F6F6A",
+        "secondaire": "#2B4A47"
+      },
+      "prix": 350
+    },
+    {
+      "id": "veste_brune",
+      "slot": "outer",
+      "style": "veste",
+      "nom": "Veste de travail brune",
+      "modele": "wear_outer_veste",
+      "couleurs": {
+        "principale": "#6E5136",
+        "secondaire": "#4A3524"
+      },
+      "prix": 385
+    },
+    {
+      "id": "veste_moutarde",
+      "slot": "outer",
+      "style": "veste",
+      "nom": "Veste de travail moutarde",
+      "modele": "wear_outer_veste",
+      "couleurs": {
+        "principale": "#C2933A",
+        "secondaire": "#8C6A2A"
+      },
+      "prix": 320
+    },
+    {
+      "id": "gilet_moutarde",
+      "slot": "outer",
+      "style": "gilet",
+      "nom": "Gilet tricoté moutarde",
+      "modele": "wear_outer_gilet",
+      "couleurs": {
+        "principale": "#D4A746",
+        "secondaire": "#8C6A48"
+      },
+      "prix": 240
+    },
+    {
+      "id": "gilet_ecru",
+      "slot": "outer",
+      "style": "gilet",
+      "nom": "Gilet tricoté écru",
+      "modele": "wear_outer_gilet",
+      "couleurs": {
+        "principale": "#E6DCC6",
+        "secondaire": "#9C8A6A"
+      },
+      "prix": 265
+    },
+    {
+      "id": "gilet_prune",
+      "slot": "outer",
+      "style": "gilet",
+      "nom": "Gilet tricoté prune",
+      "modele": "wear_outer_gilet",
+      "couleurs": {
+        "principale": "#7A4A63",
+        "secondaire": "#4E2E40"
+      },
+      "prix": 290
+    },
+    {
+      "id": "gilet_mousse",
+      "slot": "outer",
+      "style": "gilet",
+      "nom": "Gilet tricoté vert mousse",
+      "modele": "wear_outer_gilet",
+      "couleurs": {
+        "principale": "#6E7F4A",
+        "secondaire": "#4A5733"
+      },
+      "prix": 240
+    },
+    {
+      "id": "cire_jaune",
+      "slot": "outer",
+      "style": "cire",
+      "nom": "Ciré jaune",
+      "modele": "wear_outer_cire",
+      "couleurs": {
+        "principale": "#E8B93A",
+        "secondaire": "#2F3A52"
+      },
+      "prix": 380,
+      "saison": "autumn"
+    },
+    {
+      "id": "cire_marine",
+      "slot": "outer",
+      "style": "cire",
+      "nom": "Ciré bleu marine",
+      "modele": "wear_outer_cire",
+      "couleurs": {
+        "principale": "#2F3F5C",
+        "secondaire": "#E8B93A"
+      },
+      "prix": 400,
+      "saison": "autumn"
+    },
+    {
+      "id": "cire_rouge",
+      "slot": "outer",
+      "style": "cire",
+      "nom": "Ciré rouge",
+      "modele": "wear_outer_cire",
+      "couleurs": {
+        "principale": "#B33A33",
+        "secondaire": "#F1ECE2"
+      },
+      "prix": 400,
+      "saison": "autumn"
+    },
+    {
+      "id": "casquette_marine",
+      "slot": "hat",
+      "style": "casquette",
+      "nom": "Casquette bleu marine",
+      "modele": "wear_hat_casquette",
+      "couleurs": {
+        "principale": "#2F3F5C",
+        "secondaire": "#C8A150"
+      },
+      "prix": 80
+    },
+    {
+      "id": "casquette_rouge",
+      "slot": "hat",
+      "style": "casquette",
+      "nom": "Casquette rouge",
+      "modele": "wear_hat_casquette",
+      "couleurs": {
+        "principale": "#B33A33",
+        "secondaire": "#F1ECE2"
+      },
+      "prix": 90
+    },
+    {
+      "id": "casquette_kaki",
+      "slot": "hat",
+      "style": "casquette",
+      "nom": "Casquette kaki",
+      "modele": "wear_hat_casquette",
+      "couleurs": {
+        "principale": "#6E7253",
+        "secondaire": "#4A3A2E"
+      },
+      "prix": 95
+    },
+    {
+      "id": "paille_naturel",
+      "slot": "hat",
+      "style": "paille",
+      "nom": "Chapeau de paille",
+      "modele": "wear_hat_paille",
+      "couleurs": {
+        "principale": "#E3C77E",
+        "secondaire": "#8C6A48"
+      },
+      "prix": 110,
+      "saison": "summer"
+    },
+    {
+      "id": "paille_ruban_bleu",
+      "slot": "hat",
+      "style": "paille",
+      "nom": "Chapeau de paille à ruban bleu",
+      "modele": "wear_hat_paille",
+      "couleurs": {
+        "principale": "#E3C77E",
+        "secondaire": "#3E5A86"
+      },
+      "prix": 120,
+      "saison": "summer"
+    },
+    {
+      "id": "paille_ruban_rouge",
+      "slot": "hat",
+      "style": "paille",
+      "nom": "Chapeau de paille à ruban rouge",
+      "modele": "wear_hat_paille",
+      "couleurs": {
+        "principale": "#E3C77E",
+        "secondaire": "#B33A33"
+      },
+      "prix": 130,
+      "saison": "summer"
+    },
+    {
+      "id": "bonnet_rouge",
+      "slot": "hat",
+      "style": "bonnet",
+      "nom": "Bonnet rouge",
+      "modele": "wear_hat_bonnet",
+      "couleurs": {
+        "principale": "#A63A34",
+        "secondaire": "#EDE6D3"
+      },
+      "prix": 70,
+      "saison": "winter"
+    },
+    {
+      "id": "bonnet_gris",
+      "slot": "hat",
+      "style": "bonnet",
+      "nom": "Bonnet gris",
+      "modele": "wear_hat_bonnet",
+      "couleurs": {
+        "principale": "#8F8A84",
+        "secondaire": "#E4DED2"
+      },
+      "prix": 75,
+      "saison": "winter"
+    },
+    {
+      "id": "bonnet_moutarde",
+      "slot": "hat",
+      "style": "bonnet",
+      "nom": "Bonnet moutarde",
+      "modele": "wear_hat_bonnet",
+      "couleurs": {
+        "principale": "#C99A3C",
+        "secondaire": "#F3ECDA"
+      },
+      "prix": 85,
+      "saison": "winter"
+    },
+    {
+      "id": "bonnet_bleu",
+      "slot": "hat",
+      "style": "bonnet",
+      "nom": "Bonnet bleu",
+      "modele": "wear_hat_bonnet",
+      "couleurs": {
+        "principale": "#3E5A86",
+        "secondaire": "#E4DED2"
+      },
+      "prix": 70,
+      "saison": "winter"
+    }
+  ]
+}

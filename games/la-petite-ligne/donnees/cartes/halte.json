@@ -689,7 +689,11 @@
     {"id": "grocery_dining_door", "x": 28.0, "y": 26.4, "role": "la porte entrouverte de la salle à manger de la pension (examiner)", "objet": "ferrand_shop", "cap_degres": 0, "interieur": true},
     {"id": "grocery_stairs", "x": 27.95, "y": 26.45, "role": "le pied de l'escalier des chambres de la pension, devant la porte de la salle à manger (examiner)", "objet": "ferrand_shop", "portee": 1.5, "interieur": true},
     {"id": "room_cellar_site", "x": 3.5, "y": 18.5, "role": "chantier du cellier: panneau et caisse, au nord du pignon ouest, hors de l'emprise de l'appentis (x 2 à 4, y 21 à 26) et hors du chemin"},
-    {"id": "room_bedroom_site", "x": 12.5, "y": 17.5, "role": "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son pignon et le sentier du jardin (la panne attend à `beam_pickup`)"}
+    {"id": "room_bedroom_site", "x": 12.5, "y": 17.5, "role": "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son pignon et le sentier du jardin (la panne attend à `beam_pickup`)"},
+    {"id": "market_stall", "x": 34.0, "y": 26.5, "role": "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)", "portee": 1.5},
+    {"id": "garland_west", "x": 34.5, "y": 25.5, "role": "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"},
+    {"id": "garland_east", "x": 47.5, "y": 25.5, "role": "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"},
+    {"id": "goat_shed", "x": 15.0, "y": 20.0, "role": "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"}
   ],
   "zones": [
     {"id": "garden", "rect": {"x": 7, "y": 28, "w": 4, "h": 3}, "role": "les 12 cases du potager de la démo, devant la porte; ordre des cases: ligne par ligne, d'ouest en est, du nord au sud"},
@@ -736,6 +740,17 @@
     {"id": "ru_footbridge", "nature": "passerelle", "franchit": "ru", "rect": {"x": 63, "y": 34, "w": 2, "h": 2}, "modele": "ru_footbridge", "largeur_m": 1.6, "role": "planches sur deux poutres, 1,6 m (on y croise un habitant), centrée en y 35; garde-corps côté amont (nord) seulement, pour ne rien masquer à la caméra par défaut"},
     {"id": "ru_stepping_stones", "nature": "gue", "franchit": "ru", "rect": {"x": 63, "y": 30, "w": 2, "h": 1}, "modele": "ru_stepping_stones", "role": "trois pierres plates dans l'eau vive, que Jeanne passe en sautant: le raccourci du pré de l'est vers l'arrière de la mercerie"}
   ],
+  "peche": {
+    "coins": [
+      {"id": "upstream", "a": "à l'amont", "nom": "l'amont", "rects": [{"x": 0, "y": 38, "w": 11, "h": 5}], "pourquoi": "eau lente devant le bourg ancien, le coin le plus proche du jardin"},
+      {"id": "ford", "a": "au gué", "nom": "le gué", "rects": [{"x": 11, "y": 38, "w": 13, "h": 5}], "pourquoi": "courant sur galets, peu profond: les poissons de courant et de fond"},
+      {"id": "sands", "a": "aux sables", "nom": "les sables", "rects": [{"x": 24, "y": 38, "w": 14, "h": 5}], "pourquoi": "eau lente et tiède entre les deux bancs de sable"},
+      {"id": "pontoon", "a": "au ponton", "nom": "le ponton", "rects": [{"x": 38, "y": 38, "w": 20, "h": 5}], "pourquoi": "eau profonde et calme, les poissons guettent à l'abri des pieux"},
+      {"id": "confluence", "a": "au confluent", "nom": "le confluent", "rects": [{"x": 58, "y": 38, "w": 13, "h": 5}, {"x": 63, "y": 36, "w": 2, "h": 2}], "pourquoi": "l'eau froide du ru se mêle à l'Aubrune: les poissons qui remontent y attendent"},
+      {"id": "ru", "a": "au ru", "nom": "le ru", "rects": [{"x": 63, "y": 0, "w": 2, "h": 36}], "pourquoi": "eau vive et froide, 1 à 1,5 m de large: la truite et les petits poissons d'eau vive"},
+      {"id": "downstream", "a": "à l'aval", "nom": "l'aval", "rects": [{"x": 71, "y": 38, "w": 29, "h": 5}], "pourquoi": "rivière large et bancs de sable, devant la promenade de la rue Haute"}
+    ]
+  },
   "accroches": [
     {"id": "nest_box", "modele": "nest_box", "sur": "tree_oak_01", "x": 50.732, "y": 5.4, "z": 2.425, "regarde": "est", "penche_degres": 25, "role": "nichoir de Basile pendu de travers à un seul clou dès le jour 1 (axe est-ouest); redressé par le moment de l'échelle (drapeau `nest_box_straight`). x, y, z: le clou, sur l'écorce (rayon du tronc 0,21 à 0,23 m à cette hauteur); le centre de la caisse est 0,09 m devant (x 50,822) et 0,175 m dessous (2,25 m)"},
     {"id": "oak_branch_stub", "modele": "oak_branch_stub", "sur": "tree_oak_01", "x": 50.915, "y": 4.996, "z": 2.67, "regarde": "est", "role": "chicot de 0,6 m sur la face nord-est du chêne, sous le houppier, au-dessus du nichoir (il entre dans l'écorce vers 2,3 m, 7 cm au nord du nichoir penché): perchoir des mésanges"},

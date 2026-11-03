@@ -14,6 +14,8 @@
  * - `rideaux=1`: rideaux de couleur aux fenêtres de la pièce, certains fermés (`rideaux=fermes`:
  *   tous fermés); `rangement=1`: grand coffre, étagère, étagères hautes du cellier, râtelier et ses
  *   outils;
+ * - `deco=1`: une plume de geai et un pot de fleurs posés sur la table, Camille assise sur une
+ *   chaise posée au sud de la table (S03, S07);
  * - `habitants=0`: aucun habitant à l'écran (mesures « sans habitants » de l'ADR 0016);
  * - `coiffure=<0..14>`, `couleur=<0..7>`, `barbe=<0..3>` pour Camille, `coiffure2=`,
  *   `couleur2=`, `barbe2=` pour Sacha.
@@ -203,6 +205,8 @@ export function applyTour10Example(
       ...(beard === null ? {} : { beard }),
     };
   }
+  // `deco=1` (0.11.2): une plume et un pot de fleurs sur la table, Camille assise sur une chaise posée.
+  if (params.get('deco') === '1') applyDecorExample(world);
   // `habitants=0`: aucun habitant à l'écran (mesures des budgets de l'ADR 0016, « sans habitants »).
   if (params.get('habitants') === '0') {
     for (const v of world.villagers) v.visible = false;
@@ -210,4 +214,26 @@ export function applyTour10Example(
   for (const c of world.characters) {
     c.inside = buildingAt(map, world.rooms, c.pos.x, c.pos.y);
   }
+}
+
+/** Petits objets sur la table et une chaise posée où Camille est assise (0.11.2, S03 et S07). */
+function applyDecorExample(world: WorldState): void {
+  const table = world.furniture.find((piece) => piece.item === 'table');
+  const p1 = world.characters[0];
+  if (table === undefined || p1 === undefined) return;
+  world.decor = [
+    { id: 'deco_plume', item: 'jay_feather', on: table.id, place: 0, placedBy: 'p1' },
+    { id: 'deco_fleurs', item: 'flower_pot', on: table.id, place: 1, placedBy: 'p2' },
+  ];
+  // Chaise au sud de la table, tournée vers elle (rotation 2: dossier au sud, assise vers le nord).
+  const cell = { cx: table.cell.cx + 1, cy: table.cell.cy + 1 };
+  world.furniture = world.furniture.filter((piece) => piece.id !== 'deco_chaise');
+  world.furniture.push({ id: 'deco_chaise', item: 'chair', cell, rotation: 2, placedBy: 'p1' });
+  p1.pos = { x: cell.cx + 0.5, y: cell.cy + 0.5 };
+  p1.prev = { ...p1.pos };
+  p1.facing = -Math.PI / 2;
+  p1.aim = null;
+  p1.placement = null;
+  p1.seat = { bench: 'deco_chaise', slot: 0, since: 0 };
+  p1.action = { kind: 'sit', since: 0, duration: 0, target: null };
 }
