@@ -204,6 +204,139 @@ describe.skipIf(executable === undefined)('interface imagée 0.12.2 au clavier (
   );
 
   it(
+    'rangement: rangement et sac côte à côte, Entrée prend ou dépose d’un geste, le râtelier à part, sans défiler',
+    async () => {
+      const errors: string[] = [];
+      const page = await open('coffre-0122-plein', errors);
+      expect(await noScroll(page)).toBe(true);
+      const storeName = (): Promise<string> => page.locator('.lpl-storage__detail .lpl-detail__name').innerText();
+      expect(await page.locator('.lpl-storage__strip .lpl-pastille').first().getAttribute('aria-label')).toMatch(/18 cases prises sur 26/);
+      expect(await page.locator('.lpl-vitrine--store .lpl-tile[data-key]').count()).toBe(18);
+      expect(await page.locator('.lpl-vitrine--store .lpl-tile--free').count()).toBe(8);
+      expect(await page.locator('.lpl-vitrine--rack .lpl-tile[data-key]').count()).toBe(2);
+      expect(await focusKey(page)).toBe('cell:0');
+      expect(await storeName()).toBe('Plume de geai');
+      await page.keyboard.press('ArrowRight');
+      expect(await focusKey(page)).toBe('cell:1');
+      expect(await storeName()).toBe('Poste à galène');
+      // Entrée sur la vignette choisie: la case entière revient dans le sac.
+      await page.keyboard.press('Enter');
+      await expect.poll(() => intents(page, 'chest_take')).toBe(1);
+      // Vers la droite, au bout du rangement: le sac; Entrée y dépose la pile.
+      for (let i = 0; i < 6; i++) await page.keyboard.press('ArrowRight');
+      expect(await focusKey(page)).toMatch(/^bag:/);
+      expect(await page.locator('.lpl-storage__column[data-side="bag"][data-active]').count()).toBe(1);
+      expect(await page.locator('.lpl-storage__detail [data-key="deposit"]').count()).toBe(1);
+      await page.keyboard.press('Enter');
+      await expect.poll(() => intents(page, 'chest_deposit')).toBe(1);
+      // À la souris: un premier clic choisit, un second sur la même vignette dépose.
+      const tile = page.locator('.lpl-vitrine--store-bag .lpl-tile[data-key="bag:3"]');
+      await tile.click();
+      await page.waitForTimeout(200);
+      expect(await intents(page, 'chest_deposit')).toBe(1);
+      await tile.click();
+      await expect.poll(() => intents(page, 'chest_deposit')).toBe(2);
+      // Le râtelier, sous les grilles.
+      for (let i = 0; i < 6; i++) await page.keyboard.press('ArrowDown');
+      expect(await focusKey(page)).toMatch(/^(hook:|take|deposit)/);
+      expect(await noScroll(page)).toBe(true);
+      expect(errors).toEqual([]);
+      await page.close();
+    },
+    SETUP_MS,
+  );
+
+  it(
+    'sac du carnet: vignettes avec quantités et belle qualité, détail en icônes, second clic qui mange',
+    async () => {
+      const errors: string[] = [];
+      const page = await open('sac-0122', errors);
+      expect(await noScroll(page)).toBe(true);
+      expect(await page.locator('.lpl-tile--bag').count()).toBe(24);
+      expect(await page.locator('.lpl-tile--bag .lpl-tile__badge').count()).toBeGreaterThan(6);
+      expect(await page.locator('.lpl-tile--bag[data-quality="fine"] .lpl-tile__corner--fine').count()).toBe(1);
+      expect(await focusKey(page)).toBe('slot:0');
+      await page.keyboard.press('ArrowRight');
+      expect(await focusKey(page)).toBe('slot:1');
+      // Le focus est la sélection: le détail suit les flèches.
+      await expect.poll(() => page.locator('.lpl-bag__detail .lpl-detail__name').innerText()).toBe('Arrosoir');
+      // La belle qualité: étoile, prix chez Odette et ce qu'on en fait, en pastilles.
+      await page.locator('[data-slot="10"]').click();
+      await expect.poll(() => page.locator('.lpl-bag__detail .lpl-detail__name').innerText()).toBe('Radis');
+      expect(await page.locator('.lpl-bag__detail .lpl-pastille--price').count()).toBe(2);
+      expect(await page.locator('.lpl-bag__detail .lpl-pastille[aria-label^="Odette en donne"]').count()).toBe(1);
+      expect(await page.locator('.lpl-bag__detail .lpl-pastille[aria-label^="Sert à fabriquer"]').count()).toBe(1);
+      // Le pain: un clic choisit, un second clic sur la même case le mange.
+      const bread = page.locator('[data-slot="7"]');
+      await bread.click();
+      await page.waitForTimeout(200);
+      expect(await intents(page, 'eat')).toBe(0);
+      await bread.click();
+      await expect.poll(() => intents(page, 'eat')).toBe(1);
+      // Espace prend la case, Espace sur une autre la pose (déplacer).
+      await page.keyboard.press('Space');
+      await page.keyboard.press('ArrowRight');
+      await page.keyboard.press('Space');
+      await expect.poll(() => intents(page, 'swap_slots')).toBe(1);
+      expect(errors).toEqual([]);
+      await page.close();
+    },
+    SETUP_MS,
+  );
+
+  it(
+    'quêtes du carnet: cartes à l’habitant, conditions en compteurs, A et E tournent les pages, sans défiler',
+    async () => {
+      const errors: string[] = [];
+      const page = await open('quetes-0122', errors);
+      expect(await noScroll(page)).toBe(true);
+      // Les sept quêtes en cours tiennent sur une page: A et E restent aux onglets.
+      const cards = page.locator('.lpl-tile--quest');
+      expect(await cards.count()).toBe(7);
+      expect(await page.locator('.lpl-tile--quest[data-state="done"]').count()).toBe(0);
+      expect(await page.locator('.lpl-pager').count()).toBe(0);
+      expect(await focusKey(page)).toBe('quest:market_first');
+      expect(await detailName(page)).toBe('Le premier marché');
+      expect(await page.locator('.lpl-vitrine__detail .lpl-quest-detail__text').innerText()).toMatch(/3 sortes/);
+      expect(await page.locator('.lpl-tile--quest .lpl-need-count').count()).toBeGreaterThan(3);
+      expect(await page.locator('.lpl-tile--quest .lpl-portrait').count()).toBeGreaterThan(3);
+      expect(await page.getByText(/Il manque/).count()).toBe(0);
+      // Le volant de Jeanne: une plume sur quatre, chez Jeanne, 30 aubrins.
+      const shuttle = page.locator('.lpl-tile--quest[data-key="quest:jeanne_shuttlecock"]');
+      expect(await shuttle.locator('.lpl-need-count[data-missing="true"]').innerText()).toMatch(/1\s*\/4/);
+      expect(await shuttle.locator('.lpl-quest-place').count()).toBe(1);
+      expect(await shuttle.locator('.lpl-quest-card__reward').innerText()).toMatch(/30/);
+      await page.keyboard.press('ArrowRight');
+      expect(await focusKey(page)).toMatch(/^quest:/);
+      expect(await focusKey(page)).not.toBe('quest:market_first');
+      // Au clic, la carte choisie montre son texte complet au détail.
+      await shuttle.click();
+      expect(await detailName(page)).toBe('Le jeu de volant de Jeanne');
+      // Les terminées: flèche vers le haut jusqu'à leur pastille, Entrée; A et E tournent leurs pages.
+      for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowUp');
+      expect(await focusKey(page)).toMatch(/^filter:/);
+      if ((await focusKey(page)) === 'filter:open') await page.keyboard.press('ArrowRight');
+      expect(await focusKey(page)).toBe('filter:done');
+      await page.keyboard.press('Enter');
+      await expect.poll(() => page.locator('[data-key="filter:done"]').getAttribute('aria-pressed')).toBe('true');
+      expect(await cards.count()).toBe(8);
+      expect(await page.locator('.lpl-tile--quest[data-state="done"]').count()).toBe(8);
+      const pageLabel = (): Promise<string | null> => page.locator('.lpl-pager__dots').getAttribute('aria-label');
+      expect(await pageLabel()).toMatch(/^Page 1 sur/);
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press('KeyE');
+      await expect.poll(pageLabel).toMatch(/^Page 2 sur/);
+      expect(await focusKey(page)).toMatch(/^quest:/);
+      await page.keyboard.press('KeyQ');
+      await expect.poll(pageLabel).toMatch(/^Page 1 sur/);
+      expect(await noScroll(page)).toBe(true);
+      expect(errors).toEqual([]);
+      await page.close();
+    },
+    SETUP_MS,
+  );
+
+  it(
     'fauteuil de Solange: tout tient sans défiler, une flèche change la coupe et le prix s’affiche',
     async () => {
       const errors: string[] = [];

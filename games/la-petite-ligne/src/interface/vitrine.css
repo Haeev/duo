@@ -1512,3 +1512,663 @@
   width: auto;
   transform: none;
 }
+
+/* ------------------------------------------------------------------ */
+/* Rangement de la maison: rangement et sac côte à côte, râtelier     */
+/* ------------------------------------------------------------------ */
+
+.lpl-storage-v {
+  display: grid;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-storage__strip {
+  min-height: 2.5rem;
+}
+
+.lpl-storage__spacer {
+  flex: 1 1 auto;
+}
+
+.lpl-storage__alert {
+  display: flex;
+  flex: 0 1 26rem;
+  align-items: center;
+  gap: var(--lpl-space-1);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.25;
+}
+
+.lpl-storage__alert[data-state='overflow'] {
+  color: var(--lpl-color-error);
+}
+
+.lpl-storage__alert .lpl-icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-storage__grids {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--lpl-space-4);
+}
+
+.lpl-storage__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lpl-space-3);
+  min-height: 1.75rem;
+}
+
+.lpl-storage__head .lpl-pager {
+  gap: var(--lpl-space-2);
+}
+
+.lpl-storage__head .lpl-pager__button {
+  min-height: 1.75rem;
+  padding-block: 0;
+}
+
+.lpl-storage__column,
+.lpl-storage__rack-row {
+  display: grid;
+  align-content: start;
+  gap: var(--lpl-space-2);
+  padding: var(--lpl-space-2) var(--lpl-space-3) var(--lpl-space-3);
+  border: var(--lpl-border) solid transparent;
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-shade);
+}
+
+/* Le côté du focus: un liseré d'encre, pour savoir où va Entrée (prendre ou déposer). */
+.lpl-storage__column[data-active],
+.lpl-storage__rack-row[data-active] {
+  border-color: var(--lpl-color-ink);
+}
+
+.lpl-storage__column .lpl-vitrine__row-title,
+.lpl-storage__rack-row .lpl-vitrine__row-title {
+  font-size: var(--lpl-text-md);
+}
+
+.lpl-storage-v .lpl-vitrine__row-title .lpl-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lpl-vitrine--store,
+.lpl-vitrine--store-bag,
+.lpl-vitrine--rack {
+  grid-template-columns: max-content;
+}
+
+.lpl-vitrine--store .lpl-vitrine__grid,
+.lpl-vitrine--store-bag .lpl-vitrine__grid {
+  --lpl-tile-size: 3.25rem;
+  row-gap: 0.625rem;
+}
+
+.lpl-vitrine--store .lpl-vitrine__grid {
+  --lpl-tile-cols: 7;
+}
+
+.lpl-vitrine--store-bag .lpl-vitrine__grid {
+  --lpl-tile-cols: 6;
+}
+
+.lpl-vitrine--rack .lpl-vitrine__grid {
+  --lpl-tile-cols: 12;
+  --lpl-tile-size: 2.75rem;
+}
+
+.lpl-tile--store .lpl-tile__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.lpl-vitrine--rack .lpl-tile__icon {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+/* La vignette choisie hors du côté du focus reste marquée, plus discrètement. */
+[data-side]:not([data-active]) .lpl-tile[data-selected]:not([data-state]) {
+  border-width: var(--lpl-border);
+  border-style: solid;
+  background: var(--lpl-color-paper-raised);
+}
+
+/* Une case libre: pointillé, rien à choisir. */
+.lpl-tile--free {
+  border-style: dashed;
+  border-color: var(--lpl-color-line);
+  background: transparent;
+  box-shadow: none;
+  cursor: default;
+}
+
+.lpl-tile--free:hover {
+  transform: none;
+}
+
+.lpl-vitrine--rack .lpl-tile--free {
+  border-color: var(--lpl-color-wood-light, var(--lpl-color-line));
+}
+
+.lpl-storage__rack-row {
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: var(--lpl-space-3);
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+}
+
+/* « Tout déposer » par famille: l'icône de la famille et le nombre. */
+.lpl-storage__families {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-1) var(--lpl-space-2);
+}
+
+.lpl-storage__families-title {
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  font-weight: var(--lpl-weight-bold);
+}
+
+.lpl-storage__family {
+  gap: 0.25rem;
+  min-height: 2.25rem;
+  padding: 0.125rem 0.5rem 0.125rem 0.375rem;
+}
+
+.lpl-storage__family .lpl-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lpl-storage__family-count {
+  font-size: var(--lpl-text-sm);
+}
+
+/* Le détail sous les grilles: dessin, nom, pastilles, boutons, sur une rangée. */
+.lpl-storage__detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-4);
+  min-height: 4rem;
+  padding: var(--lpl-space-2) var(--lpl-space-4);
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-l);
+  background: var(--lpl-color-paper-raised);
+  box-shadow: var(--lpl-shadow-1);
+}
+
+.lpl-storage__detail .lpl-detail__figure {
+  width: 3rem;
+  height: 3rem;
+}
+
+.lpl-storage__detail .lpl-detail__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.lpl-storage__detail-name {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-storage__detail .lpl-detail__actions {
+  margin: 0 0 0 auto;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Carnet: le sac en vignettes                                         */
+/* ------------------------------------------------------------------ */
+
+.lpl-bag-grid {
+  --lpl-tile-size: 3.25rem;
+  display: grid;
+  grid-template-columns: repeat(var(--lpl-columns, 10), var(--lpl-tile-size));
+  grid-auto-rows: var(--lpl-tile-size);
+  gap: 0.625rem 0.375rem;
+  padding: 0.625rem 0.5rem 0.5rem;
+  border-radius: var(--lpl-radius-m);
+  background: var(--lpl-color-paper-shade);
+}
+
+.lpl-bag-grid--toolbar {
+  background: var(--lpl-color-wood-deep);
+}
+
+.lpl-tile--bag .lpl-tile__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.lpl-tile--empty {
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+  box-shadow: none;
+}
+
+.lpl-bag-grid--toolbar .lpl-tile--empty {
+  border-color: var(--lpl-color-brass);
+  background: rgb(251 246 233 / 0.18);
+}
+
+/* Case prise pour un déplacement (Espace): pointillé épais et léger soulèvement. */
+.lpl-tile--moving {
+  border-style: dashed;
+  border-width: var(--lpl-border-thick);
+  border-color: var(--lpl-color-focus);
+  transform: translateY(-0.1875rem);
+}
+
+/* Belle qualité: une étoile dorée en coin, en plus du nom accessible. */
+.lpl-tile__corner--fine,
+.lpl-tile--fine .lpl-tile__corner {
+  background: #f6e3a8;
+}
+
+/* Niveau d'eau de l'arrosoir: barre verticale à gauche. */
+.lpl-tile__gauge {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 0.1875rem;
+  width: 0.3125rem;
+  height: 70%;
+  overflow: hidden;
+  border: 0.0625rem solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+}
+
+.lpl-tile__gauge::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--lpl-value, 100%);
+  background: var(--lpl-color-focus);
+  content: '';
+}
+
+.lpl-bag {
+  flex-wrap: nowrap;
+}
+
+.lpl-bag__detail {
+  flex: 1 1 15rem;
+  align-self: stretch;
+  min-width: 0;
+}
+
+.lpl-bag__detail .lpl-detail__actions .lpl-button {
+  min-height: 2.5rem;
+}
+
+.lpl-detail__figure--empty .lpl-detail__icon {
+  opacity: 0.4;
+}
+
+/* ------------------------------------------------------------------ */
+/* Carnet: les quêtes en cartes                                        */
+/* ------------------------------------------------------------------ */
+
+.lpl-vitrine--quests {
+  grid-template-columns: minmax(0, 1fr) 19.5rem;
+}
+
+.lpl-vitrine--quests .lpl-vitrine__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 5rem;
+  gap: var(--lpl-space-2);
+}
+
+.lpl-tile--quest {
+  display: block;
+  padding: 0.375rem 0.5rem 0.375rem 0.5rem;
+  text-align: left;
+}
+
+/* Chromium aligne aussi les blocs: sans « normal », la carte se rétrécit au centre de la vignette. */
+.lpl-tile--quest,
+.lpl-tile--quest .lpl-tile__figure {
+  place-items: normal;
+}
+
+.lpl-tile--quest .lpl-tile__figure {
+  display: block;
+  height: 100%;
+}
+
+/* La carte entière ne rebondit pas: seul le visage, à la sélection. */
+.lpl-tile--quest[data-selected] .lpl-tile__figure {
+  animation: none;
+}
+
+.lpl-tile--quest[data-selected] .lpl-quest-card__face {
+  animation: lpl-pop var(--lpl-duration-base) var(--lpl-ease);
+}
+
+.lpl-tile--quest .lpl-tile__name {
+  display: none;
+}
+
+.lpl-tile--quest .lpl-tile__corner {
+  top: auto;
+  bottom: 0.25rem;
+  left: 0.25rem;
+  z-index: 1;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+}
+
+.lpl-tile--quest[data-state='done'] {
+  border-style: dashed;
+  background: var(--lpl-color-paper-sunken);
+  box-shadow: none;
+}
+
+.lpl-tile--quest[data-state='done'] .lpl-tile__corner {
+  border-color: var(--lpl-color-success);
+  background: #dfe9dc;
+}
+
+/* L'objectif du HUD: un filet de laiton à gauche, en plus du nom accessible. */
+.lpl-tile--quest[data-current='true'] {
+  box-shadow: inset 0.3125rem 0 0 var(--lpl-color-brass), var(--lpl-shadow-1);
+}
+
+.lpl-quest-card {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  /* max-content: une ligne coupée par des points de suspension garde sa hauteur face au 1fr. */
+  grid-template-rows: max-content max-content 1fr;
+  column-gap: 0.5rem;
+  height: 100%;
+}
+
+.lpl-quest-card__face {
+  display: grid;
+  grid-row: 1 / span 3;
+  align-self: start;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: var(--lpl-border) solid var(--lpl-color-hairline);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-quest-card__face .lpl-portrait {
+  --lpl-portrait-size: 2.625rem;
+  border-width: 0;
+}
+
+.lpl-quest-card__icon {
+  width: 1.875rem;
+  height: 1.875rem;
+}
+
+.lpl-quest-card__face--large {
+  flex: none;
+  width: 2.875rem;
+  height: 2.875rem;
+}
+
+.lpl-quest-card__face--large .lpl-portrait {
+  --lpl-portrait-size: 2.625rem;
+}
+
+.lpl-vitrine--quests .lpl-vitrine__detail {
+  gap: var(--lpl-space-1) var(--lpl-space-2);
+  padding: 0.375rem var(--lpl-space-3);
+}
+
+.lpl-quest-card__face--large .lpl-quest-card__icon {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.lpl-quest-card__title,
+.lpl-quest-card__step {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lpl-quest-card__title {
+  grid-column: 2 / span 2;
+  font-size: var(--lpl-text-sm);
+  font-weight: var(--lpl-weight-bold);
+  line-height: 1.3;
+}
+
+.lpl-quest-card__step {
+  grid-column: 2 / span 2;
+  color: var(--lpl-color-ink-muted);
+  font-size: var(--lpl-text-xs);
+  line-height: 1.3;
+}
+
+.lpl-quest-card__facts {
+  display: flex;
+  grid-column: 2;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lpl-quest-card__reward {
+  grid-column: 3;
+  align-self: end;
+}
+
+.lpl-quest-card__reward .lpl-pastille {
+  min-height: 1.5rem;
+  padding: 0.0625rem 0.375rem 0.0625rem 0.25rem;
+  font-size: var(--lpl-text-xs);
+}
+
+.lpl-quest-card__reward .lpl-pastille__icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Sur la carte, compteurs et lieu en petit: icône et « 1/4 » sur une ligne. */
+.lpl-quest-card .lpl-need-count {
+  flex-direction: row;
+  gap: 0.0625rem;
+  min-width: 0;
+}
+
+.lpl-quest-card .lpl-need-count__icon {
+  width: 1.375rem;
+  height: 1.375rem;
+}
+
+.lpl-quest-card .lpl-need-count[data-missing='true']::after {
+  top: 0.6875rem;
+  left: 0;
+  width: 1.375rem;
+}
+
+.lpl-quest-check {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: var(--lpl-border) dashed var(--lpl-color-ink-disabled);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-quest-check[data-done='true'] {
+  border-style: solid;
+  border-color: var(--lpl-color-success);
+  background: #dfe9dc;
+}
+
+.lpl-quest-check .lpl-portrait {
+  --lpl-portrait-size: 1.5rem;
+  border-width: 0;
+}
+
+.lpl-quest-check__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-quest-check[data-done='false'] > .lpl-portrait,
+.lpl-quest-check[data-done='false'] > .lpl-quest-check__icon {
+  opacity: 0.6;
+}
+
+.lpl-quest-check__mark {
+  position: absolute;
+  right: -0.3125rem;
+  bottom: -0.3125rem;
+  display: grid;
+  place-items: center;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-success);
+  color: var(--lpl-color-paper-raised);
+}
+
+.lpl-quest-check__mark .lpl-icon {
+  width: 0.6875rem;
+  height: 0.6875rem;
+}
+
+.lpl-quest-place {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin-left: 0.25rem;
+  border: var(--lpl-border) solid var(--lpl-color-line);
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper);
+}
+
+.lpl-quest-place .lpl-portrait {
+  --lpl-portrait-size: 1.5rem;
+  border-width: 0;
+}
+
+.lpl-quest-place__icon {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.lpl-quest-place__pin {
+  position: absolute;
+  top: -0.375rem;
+  left: -0.375rem;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  border-radius: var(--lpl-radius-round);
+  background: var(--lpl-color-paper-raised);
+}
+
+/* En cours, terminées: deux pastilles à presser; la pressée en encre pleine (forme et contraste, pas seulement la teinte). */
+.lpl-quest-filter {
+  min-height: 1.75rem;
+  cursor: pointer;
+}
+
+.lpl-quest-filter[aria-pressed='true'] {
+  border-color: var(--lpl-color-ink);
+  background: var(--lpl-color-ink);
+  color: var(--lpl-color-paper-raised);
+}
+
+.lpl-quest-filter[aria-pressed='false'] {
+  background: var(--lpl-color-paper-sunken);
+}
+
+.lpl-quest-filter[aria-disabled='true'] {
+  border-style: dashed;
+  color: var(--lpl-color-ink-muted);
+  cursor: default;
+}
+
+/* Le détail de la quête: visage et titre, texte complet, conditions en grand. */
+.lpl-quest-detail__head {
+  display: flex;
+  align-items: center;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-quest-detail__head .lpl-detail__name {
+  font-size: var(--lpl-text-lg);
+  line-height: 1.2;
+}
+
+.lpl-quest-detail__text {
+  font-size: var(--lpl-text-xs);
+  line-height: 1.35;
+}
+
+.lpl-quest-detail__needs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--lpl-space-2) var(--lpl-space-3);
+}
+
+.lpl-quest-detail__needs .lpl-quest-check {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.lpl-quest-detail__needs .lpl-quest-check .lpl-portrait {
+  --lpl-portrait-size: 2rem;
+}
+
+/* La fiche du secret au détail: pleine largeur, lignes plus petites qu'en liste (le détail tient sans défiler). */
+.lpl-vitrine--quests .lpl-vitrine__detail .lpl-secret {
+  max-width: 100%;
+  margin-top: 0;
+  padding: var(--lpl-space-1) var(--lpl-space-2);
+}
+
+.lpl-vitrine--quests .lpl-vitrine__detail .lpl-secret__line {
+  font-size: var(--lpl-text-sm);
+  line-height: 1.25;
+}
+
+.lpl-vitrine--quests .lpl-vitrine__detail .lpl-secret__help {
+  font-size: var(--lpl-text-xs);
+  line-height: 1.3;
+}
+
+.lpl-vitrine--quests .lpl-vitrine__detail .lpl-confidence {
+  margin: 0;
+  padding: var(--lpl-space-2) var(--lpl-space-3);
+  box-shadow: none;
+}
+
+.lpl-vitrine--quests .lpl-vitrine__detail .lpl-confidence__text {
+  font-size: var(--lpl-text-md);
+}
+
+/* La confidence du jour en carte: un filet rouge à gauche, comme la fiche d'un secret (« Rien que pour toi »). */
+.lpl-tile--quest[data-group='hint'] {
+  background: #fff9e6;
+  box-shadow: inset 0.3125rem 0 0 var(--lpl-color-error), var(--lpl-shadow-1);
+}

@@ -70,3 +70,10 @@ Apprentissages durables (conventions, pièges, astuces vérifiées). Pas d'avanc
 - Scénarios de démonstration qui partent de la référence d'été du format 13 (poules, poissons au carnet): `src/interface/demo/scenarios-0-12-2.ts`; `rendu=leger` pour l'aperçu 3D du personnage (salon, mercerie), 4 s d'attente de plus.
 - Garde de l'arbre isolé: une commande `cd ... && python3 - <<EOF` est refusée; écrire le script dans le bloc-notes avec Write, puis `python3 chemin`.
 - `@typescript-eslint/no-unnecessary-condition` ne suit pas une variable booléenne modifiée dans une fermeture: utiliser un objet (`{ taken: false }`).
+- Chromium aligne aussi les blocs (`justify-items` en flux normal): une vignette `.lpl-tile` passée en `display: block` garde le `place-items: center` hérité et rétrécit son contenu au centre. Remettre `place-items: normal` (cartes de quêtes).
+- Grille `auto auto 1fr` avec des lignes en `overflow: hidden` et points de suspension: les rangées `auto` tombent à 0 face au `1fr` et les textes se chevauchent. Utiliser `max-content`.
+- Le port 5231 peut être pris par le Vite d'un autre arbre (autre code servi!): lancer le sien sur un autre port et le passer en `[base]` au capteur.
+- Le capteur réécrit toutes les captures « après » quand on ne filtre pas: restaurer celles des autres écrans (`git checkout -- <fichiers>`, arguments littéraux: la garde refuse `xargs git`).
+- `souvenirs-ecran.test.ts` (scénario `souvenirs-plusieurs`) attend que E passe d'onglet en onglet depuis les Quêtes: un onglet ne doit pas avoir de pages dans ce cas. D'où, aux quêtes, « en cours » et « terminées » séparées.
+- `secret-ecran.test.ts` veut lire la fiche du secret chez l'informé à l'ouverture du carnet: au détail d'une vitrine, la quête au secret « mine » doit être choisie d'emblée.
+- Sac et rangement: Vitrine ne gère ni case vide ni glisser-déposer; le sac garde ses cases à lui avec les classes `.lpl-tile`, le rangement assemble trois `Vitrine` sans détail (`noDetail`) et un détail commun mis à jour sur `focusin`.

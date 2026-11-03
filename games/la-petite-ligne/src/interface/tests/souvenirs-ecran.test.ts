@@ -71,8 +71,10 @@ describe.skipIf(executable === undefined)(
 
     async function open(scenario: string, me: CharacterId, extra = ''): Promise<Page> {
       const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+      // Le premier chargement dépasse les 30 s par défaut de Playwright (Vite compile tout le jeu à la demande).
       await page.goto(
         `${base}src/interface/demo/index.html?scenario=${scenario}&joueur=${me}&autre=fige&rendu=0&temps=arrete${extra}`,
+        { timeout: PAGE_MS },
       );
       await page.waitForFunction(() => window.lplInterface?.ready === true, null, {
         timeout: PAGE_MS,

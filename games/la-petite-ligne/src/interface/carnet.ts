@@ -7,18 +7,35 @@ import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
-import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText, secretStamp, token } from './dom';
-import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
-import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
-import { letterModels, nextObjective, notebookQuests, slotModel, type QuestModel } from './modele';
+import { button, el, focusElement, icon, keycap, keysLine, portrait, setAttr, setText, secretStamp, token } from './dom';
+import { defaultBagSlot, defaultLetter } from './focus';
+import { itemDetail, bagEmpty, bagFull, grocerPrice } from './modele-panneaux';
+import { letterModels, slotModel } from './modele';
+import { type QuestCardModel, type QuestNeedModel, type QuestPlaceModel, questBoard } from './modele-quetes';
+import type { SecretView } from './modele-secrets';
+import { portraitSvg, villagerColors } from './portrait';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { type NeedsPageModel, needsPage } from './modele-maison';
 import { CURRENCY } from '../donnees/monnaie';
-import { capitalize } from './format';
+import { capitalize, itemTitle } from './format';
 import { infoIcon, rarityClass, rarityIcon } from './icones';
-import { type FishBoardModel, type FishCardModel, fishBoard } from './modele-vitrine';
-import { type VitrineItem, Vitrine, detailHead, fishSilhouette, iconRow, layeredIcon, pastille, riverMap } from './vitrine';
+import { type FishBoardModel, type FishCardModel, fishBoard, itemFacts } from './modele-vitrine';
+import {
+  type PastilleSpec,
+  type VitrineItem,
+  Vitrine,
+  detailActions,
+  detailFigure,
+  detailHead,
+  fishSilhouette,
+  iconRow,
+  layeredIcon,
+  need,
+  pastille,
+  pastilles,
+  riverMap,
+} from './vitrine';
 import { Panel } from './panneau';
 import { needsMuted, setNeedsMuted } from './preferences';
 import { SOUND_ATTR } from './sons';
@@ -65,6 +82,15 @@ export class NotebookPanel extends Panel {
   private freshMemories: Set<string> | null = null;
   /** Patch 0.12.2: les poissons en vignettes, avec le détail de la sélection. */
   private readonly fishPage: Vitrine;
+  /**
+   * Patch 0.12.2: les quêtes en cartes, deux colonnes, le détail de la carte choisie. Les quêtes en
+   * cours d'un côté, les finies de l'autre (deux pastilles à presser): les finies s'accumulent, et
+   * A et E ne tournent des pages que s'il y en a, avant de passer à l'onglet voisin.
+   */
+  private readonly questPages: Record<'open' | 'done', Vitrine>;
+  private questView: 'open' | 'done' = 'open';
+  /** La case du sac était déjà choisie au moment du clic (un second clic fait l'action principale). */
+  private readonly pressed = { selected: false };
 
   constructor(host: UiHost, tab: PanelTab | undefined) {
     const { ctx } = host;
@@ -83,6 +109,8 @@ export class NotebookPanel extends Panel {
     );
     this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'fish' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
     this.fishPage = new Vitrine(host, { perPage: UI_SETTINGS.vitrine.fishPerPage, label: ctx.t(ctx.texts.extra.fish.pageLabel), variant: 'lpl-vitrine--fish' });
+    const questOptions = { perPage: UI_SETTINGS.vitrine.questsPerPage, label: ctx.t(ctx.texts.extra.vitrine.questsLabel), variant: 'lpl-vitrine--quests' };
+    this.questPages = { open: new Vitrine(host, questOptions), done: new Vitrine(host, questOptions) };
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
@@ -168,8 +196,9 @@ export class NotebookPanel extends Panel {
 
   override key(code: string, info: KeyInfo): boolean {
     if (code === 'KeyQ' || code === 'KeyE') {
-      // Poissons: les pages d'abord (au-delà de 28 poissons), puis l'onglet voisin.
+      // Poissons et quêtes: les pages d'abord (au-delà de 28 poissons, de 8 quêtes), puis l'onglet voisin.
       if (this.tab === 'fish' && this.fishPage.turn(code === 'KeyQ' ? -1 : 1)) return true;
+      if (this.tab === 'quests' && this.questPages[this.questView].turn(code === 'KeyQ' ? -1 : 1)) return true;
       const index = TABS.indexOf(this.tab);
       const next = TABS[(index + (code === 'KeyQ' ? -1 : 1) + TABS.length) % TABS.length] ?? 'quests';
       this.select(next, true);
@@ -445,58 +474,149 @@ export class NotebookPanel extends Panel {
     );
   }
 
+  /**
+   * Quêtes (patch 0.12.2): une carte par quête (l'habitant ou le thème, le titre, l'étape en une
+   * ligne, les conditions en compteurs, le lieu et la récompense en pastilles), deux colonnes en
+   * pages, et le texte complet de l'étape au détail de la carte choisie, avec la fiche du secret.
+   */
   private renderQuests(world: ReadonlyWorld): void {
     const { ctx } = this.host;
-    const groups = notebookQuests(world, ctx);
-    const current = nextObjective(world, ctx)?.id ?? null;
+    const board = questBoard(world, ctx);
     const hint = momentHintModel(world, ctx);
-    const sig = JSON.stringify(['quests', groups, current, hint]);
+    // Rien en cours: les finies d'emblée (et inversement).
+    if (this.questView === 'open' && board.open === 0 && board.done > 0) this.questView = 'done';
+    if (this.questView === 'done' && board.done === 0) this.questView = 'open';
+    const view = this.questView;
+    const vitrine = this.questPages[view];
+    const sig = JSON.stringify(['quests', board, hint, view, vitrine.page]);
     this.renderBody(sig, () => {
-      const byDone = (list: readonly QuestModel[]): QuestModel[] => [...list].sort((a, b) => Number(a.done) - Number(b.done));
-      // Ordre d'affichage: la semaine, les coups de main, puis les annonces (tour 9), les quêtes finies en bas de chacun.
-      // Le focus va à la première quête encore ouverte, en haut de la liste: le carnet s'ouvre sans défiler.
-      const lists = { main: byDone(groups.main), side: byDone(groups.side), annonces: byDone(groups.annonces) };
-      const shown = [...lists.main, ...lists.side, ...lists.annonces];
-      const focusId = shown[defaultQuest(shown, null)]?.id ?? null;
-      let first = true;
-      const section = (kind: 'main' | 'side' | 'annonces'): HTMLElement[] => {
-        const list = lists[kind];
-        if (list.length === 0) return [];
-        const ul = el('ul', { class: 'lpl-quests', 'data-nav': 'list' });
-        for (const q of list) ul.append(this.questItem(q, q.id === current, q.id === focusId));
-        // Une section par bloc: son titre collé en haut au défilement s'en va avec elle.
-        const label = kind === 'annonces' ? ctx.texts.extra.notebook.annonces : ctx.texts.game.ui.questKinds[kind];
-        const title = el('h3', { class: 'lpl-section-title', text: ctx.t(label) });
-        const gap = first ? '' : ' lpl-section-gap';
-        first = false;
-        return [el('section', { class: `lpl-quest-section${gap}`, 'data-group': kind }, [title, ul])];
-      };
-      const nodes = [...(hint === null ? [] : [this.hintCard(hint)]), ...section('main'), ...section('side'), ...section('annonces')];
-      return nodes.length === 0 ? [el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.notebook.noQuests) })] : nodes;
+      if (board.cards.length === 0 && hint === null) return [el('div', { class: 'lpl-empty', text: ctx.t(ctx.texts.extra.notebook.noQuests) })];
+      const v = ctx.texts.extra.vitrine;
+      const filter = (id: 'open' | 'done', iconId: string, count: number, label: string): HTMLButtonElement =>
+        button([icon(iconId, 'lpl-icon lpl-pastille__icon'), el('span', { class: 'lpl-pastille__text', text: String(count) })], () => {
+          if (this.questView === id) return;
+          this.questView = id;
+          this.host.sound('ui-tab');
+          this.host.invalidate();
+        }, {
+          class: `lpl-pastille lpl-pastille--${id === 'open' ? 'count' : 'ok'} lpl-quest-filter`,
+          attrs: { 'data-nav-item': true, 'data-key': `filter:${id}`, 'aria-pressed': String(view === id), 'aria-label': label, title: label, 'aria-disabled': count === 0 ? 'true' : null, [SOUND_ATTR]: 'none' },
+        });
+      const strip = el('div', { class: 'lpl-vitrine__strip', role: 'group', 'aria-label': ctx.t(v.questsLabel) }, [
+        filter('open', 'ui-flag', board.open, ctx.t(v.questsOpen, { count: board.open })),
+        filter('done', 'ui-check', board.done, ctx.t(v.questsDone, { count: board.done })),
+      ]);
+      const shown = board.cards.filter((c) => c.done === (view === 'done'));
+      // La confidence du jour, en tête des quêtes en cours: une carte, son texte au détail; choisie d'emblée (elle ne vaut qu'aujourd'hui).
+      const hintItem = hint !== null && view === 'open' ? this.hintItem(hint) : null;
+      const focus = hintItem !== null ? 'hint:today' : shown.some((c) => c.id === board.focus) ? `quest:${board.focus ?? ''}` : shown[0] === undefined ? null : `quest:${shown[0].id}`;
+      const questItems = shown.map((c): VitrineItem => ({
+        key: `quest:${c.id}`,
+        tile: {
+          icon: this.questCard(c),
+          name: c.title,
+          label: this.questLabel(c),
+          corner: c.withdrawn ? 'ui-cross' : c.done ? 'ui-check' : c.secret !== null ? 'ui-whisper' : null,
+          state: c.done ? 'done' : null,
+          className: 'lpl-tile--quest',
+          attrs: { 'data-group': c.group, 'data-current': c.current ? 'true' : null, 'data-withdrawn': c.withdrawn ? 'true' : null },
+        },
+        detail: () => this.questDetail(c),
+      }));
+      const items = hintItem === null ? questItems : [hintItem, ...questItems];
+      return [strip, vitrine.build(items, focus)];
     });
   }
 
-  private questItem(q: QuestModel, current: boolean, autofocus: boolean): HTMLLIElement {
+  /** La confidence du matin en carte de quête: « Aujourd'hui », le début du texte, le tampon « Rien que pour toi ». */
+  private hintItem(hint: MomentHintModel): VitrineItem {
     const { ctx } = this.host;
-    let side: HTMLElement;
-    if (q.withdrawn) side = chip(ctx.t(ctx.texts.extra.notebook.annonceExpired));
-    else if (q.done) side = chip(ctx.t(ctx.texts.game.ui.questDone), 'ready', 'ui-check');
-    else if (q.progress !== '') side = chip(q.progress);
-    else side = el('span');
-    const open = q.id.startsWith('annonce_') ? 'ui-notice' : q.kind === 'main' ? 'ui-flag' : 'ui-heart';
-    const lead = q.withdrawn ? icon('ui-cross') : q.done ? icon('ui-check', 'lpl-icon lpl-quest__done') : icon(open);
-    return el(
-      'li',
-      {
-        class: 'lpl-quest',
-        tabindex: '0',
-        'data-nav-item': true,
-        'data-key': `quest:${q.id}`,
-        'data-state': q.withdrawn ? 'withdrawn' : q.done ? 'done' : current ? 'current' : null,
-        'data-autofocus': autofocus,
-      },
-      [lead, el('span', { class: 'lpl-quest__title', text: q.title }), side, el('span', { class: 'lpl-quest__text', text: q.text }), ...this.secretCard(q)],
-    );
+    const title = ctx.t(ctx.texts.game.ui.momentHint);
+    const card = el('span', { class: 'lpl-quest-card' }, [
+      el('span', { class: 'lpl-quest-card__face lpl-quest-card__face--small', 'aria-hidden': 'true' }, [icon('ui-whisper', 'lpl-icon lpl-quest-card__icon')]),
+      el('span', { class: 'lpl-quest-card__title', text: title }),
+      el('span', { class: 'lpl-quest-card__step', text: hint.text }),
+      el('span', { class: 'lpl-quest-card__facts' }, [secretStamp(hint.chip)]),
+    ]);
+    return {
+      key: 'hint:today',
+      tile: { icon: card, name: title, label: `${title}, ${hint.chip}, ${hint.text}`, className: 'lpl-tile--quest', attrs: { 'data-group': 'hint' } },
+      detail: () => [this.hintCard(hint)],
+    };
+  }
+
+  /** Nom accessible d'une carte: titre, étape, conditions, état. */
+  private questLabel(c: QuestCardModel): string {
+    const { ctx } = this.host;
+    const parts = [c.title, c.step, ...c.needs.map((n) => n.label)];
+    if (c.withdrawn) parts.push(ctx.t(ctx.texts.extra.notebook.annonceExpired));
+    else if (c.done) parts.push(ctx.t(ctx.texts.game.ui.questDone));
+    if (c.current) parts.push(ctx.t(ctx.texts.extra.vitrine.questCurrent));
+    if (c.secret !== null) parts.push(ctx.t(ctx.texts.extra.vitrine.questSecret));
+    return parts.filter((p) => p !== '').join(', ');
+  }
+
+  /** Visage de la quête: le portrait de l'habitant, sinon l'icône de son métier ou du thème. */
+  private questFace(c: QuestCardModel, size: 'small' | 'large'): HTMLElement {
+    const colors = c.giver === null ? null : villagerColors(c.giver);
+    const inner = colors === null || c.giver === null ? icon(c.icon, 'lpl-icon lpl-quest-card__icon') : portrait(portraitSvg(colors, 'good', '', c.giver), size === 'small' ? 'small' : '');
+    return el('span', { class: `lpl-quest-card__face lpl-quest-card__face--${size}`, 'aria-hidden': 'true' }, [inner]);
+  }
+
+  private questNeed(n: QuestNeedModel): HTMLElement {
+    if (n.kind === 'count') return need({ icon: n.icon, have: n.have, need: n.need, label: n.label });
+    const colors = n.villager === null ? null : villagerColors(n.villager);
+    const figure = colors === null || n.villager === null ? icon(n.icon, 'lpl-icon lpl-quest-check__icon') : portrait(portraitSvg(colors, 'good', '', n.villager), 'small');
+    return el('span', { class: 'lpl-quest-check', 'data-done': n.done ? 'true' : 'false', role: 'img', 'aria-label': n.label, title: n.label }, [
+      figure,
+      n.done ? el('span', { class: 'lpl-quest-check__mark', 'aria-hidden': 'true' }, [icon('ui-check')]) : null,
+    ]);
+  }
+
+  private questPlace(p: QuestPlaceModel): HTMLElement {
+    const colors = p.villager === null ? null : villagerColors(p.villager);
+    const figure = colors === null || p.villager === null ? icon(p.icon, 'lpl-icon lpl-quest-place__icon') : portrait(portraitSvg(colors, 'good', '', p.villager), 'small');
+    return el('span', { class: 'lpl-quest-place', role: 'img', 'aria-label': p.label, title: p.label }, [icon('ui-pin', 'lpl-icon lpl-quest-place__pin'), figure]);
+  }
+
+  /** Le corps d'une carte de quête (dans la vignette de la vitrine). */
+  private questCard(c: QuestCardModel): HTMLElement {
+    const facts: (HTMLElement | null)[] = [...c.cardNeeds.map((n) => this.questNeed(n)), c.place === null ? null : this.questPlace(c.place)];
+    const reward = c.rewards[0];
+    return el('span', { class: 'lpl-quest-card' }, [
+      this.questFace(c, 'small'),
+      el('span', { class: 'lpl-quest-card__title', text: c.title }),
+      el('span', { class: 'lpl-quest-card__step', text: c.step }),
+      c.done ? null : el('span', { class: 'lpl-quest-card__facts' }, facts),
+      c.done || reward === undefined ? null : el('span', { class: 'lpl-quest-card__reward' }, [pastille({ icon: reward.icon, text: reward.text, tone: reward.tone, label: '' })]),
+    ]);
+  }
+
+  /** Détail de la quête choisie: le visage en grand, le texte complet, les conditions, le lieu, la récompense, le secret. */
+  private questDetail(c: QuestCardModel): (Node | null)[] {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const status = c.withdrawn
+      ? pastille({ icon: 'ui-cross', text: ctx.t(ctx.texts.extra.notebook.annonceExpired), tone: 'info' })
+      : c.done
+        ? pastille({ icon: 'ui-check', text: ctx.t(ctx.texts.game.ui.questDone), tone: 'ok' })
+        : c.current
+          ? pastille({ icon: 'ui-pin', text: ctx.t(v.questCurrent), tone: 'wait' })
+          : null;
+    return [
+      el('div', { class: 'lpl-quest-detail__head' }, [this.questFace(c, 'large'), el('h3', { class: 'lpl-detail__name', text: c.title })]),
+      status,
+      c.text === '' ? null : el('p', { class: 'lpl-quest-detail__text', text: c.text }),
+      // Conditions, lieu et récompense sur une même rangée (qui passe à la ligne s'il le faut).
+      c.needs.length === 0 && c.place === null && c.rewards.length === 0
+        ? null
+        : el('div', { class: 'lpl-quest-detail__needs' }, [
+            ...c.needs.map((n) => this.questNeed(n)),
+            c.place === null ? null : pastille({ icon: 'ui-pin', text: c.place.label, tone: 'info', label: c.place.label }),
+            ...c.rewards.map((r) => pastille({ icon: r.icon, text: r.text, tone: r.tone, label: r.label })),
+          ]),
+      ...this.secretCard(c.secret),
+    ];
   }
 
   /**
@@ -504,8 +624,7 @@ export class NotebookPanel extends Panel {
    * l'informé (« Rien que pour toi »), une invitation à demander chez l'autre, le secret chez
    * les deux à la fin. Le contenu vient de `secretViewOf`, qui ne le donne qu'à qui peut le lire.
    */
-  private secretCard(q: QuestModel): HTMLElement[] {
-    const view = q.secret;
+  private secretCard(view: SecretView | null): HTMLElement[] {
     if (view === null) return [];
     const head = el('span', { class: 'lpl-secret__head' }, [
       icon('ui-whisper'),
@@ -586,6 +705,11 @@ export class NotebookPanel extends Panel {
     });
   }
 
+  /**
+   * Sac (patch 0.12.2): les cases en vignettes (quantité et belle qualité en pastilles), et le
+   * détail de la case choisie en icônes: usage, prix chez Odette, ce qu'on en fait. La barre
+   * d'outils garde sa rangée; Espace ou le glisser-déposer déplacent, Entrée fait l'action principale.
+   */
   private renderBag(world: ReadonlyWorld): void {
     const { ctx } = this.host;
     const n = ctx.texts.extra.notebook;
@@ -596,10 +720,11 @@ export class NotebookPanel extends Panel {
     const slots = me.bag.map((_, i) => slotModel(ctx, me, i));
     const checkedStack = me.bag[this.checked] ?? null;
     const detail = checkedStack === null ? null : itemDetail(ctx, checkedStack);
-    const sig = JSON.stringify(['bag', slots, this.checked, this.moving, detail]);
+    const price = checkedStack === null || (ctx.content.items[checkedStack.item]?.sellPrice ?? null) === null ? null : grocerPrice(ctx, checkedStack.item, checkedStack.quality, 1, world);
+    const sig = JSON.stringify(['bag', slots, this.checked, this.moving, detail, price]);
     this.renderBody(sig, () => {
-      const toolbar = el('div', { class: 'lpl-inventory lpl-inventory--toolbar', 'aria-label': ctx.t(n.toolbar) });
-      const rest = el('div', { class: 'lpl-inventory', 'aria-label': ctx.t(n.bag, { count: me.bag.length - UI_SETTINGS.toolbarSlots }), style: `--lpl-columns: ${UI_SETTINGS.bagColumns}` });
+      const toolbar = el('div', { class: 'lpl-bag-grid lpl-bag-grid--toolbar', role: 'group', 'aria-label': ctx.t(n.toolbar) });
+      const rest = el('div', { class: 'lpl-bag-grid', role: 'group', 'aria-label': ctx.t(n.bag, { count: me.bag.length - UI_SETTINGS.toolbarSlots }), style: `--lpl-columns: ${UI_SETTINGS.bagColumns}` });
       slots.forEach((s, i) => {
         (i < UI_SETTINGS.toolbarSlots ? toolbar : rest).append(this.bagSlot(s, i));
       });
@@ -611,37 +736,14 @@ export class NotebookPanel extends Panel {
       ]);
       let aside: HTMLElement;
       if (bagEmpty(me)) {
-        aside = el('div', { class: 'lpl-empty', style: 'flex: 1 1 14rem' }, [icon('grain-sack', 'lpl-icon lpl-empty__icon'), ctx.t(n.bagEmpty)]);
+        aside = el('div', { class: 'lpl-empty lpl-bag__detail' }, [icon('grain-sack', 'lpl-icon lpl-empty__icon'), ctx.t(n.bagEmpty)]);
       } else if (detail === null || checkedStack === null) {
-        aside = el('aside', { class: 'lpl-item-detail', 'aria-label': n.detailLabel }, [el('p', { class: 'lpl-item-detail__meta', text: ctx.t(ctx.texts.extra.common.emptySlot) })]);
-      } else {
-        const index = this.checked ?? 0;
-        const actions = el('div', { class: 'lpl-item-detail__actions' });
-        detail.actions.forEach((a, i) => {
-          const label = a === 'eat' ? ctx.t(n.eat, { amount: detail.eatAmount }) : a === 'read' ? ctx.t(n.read) : ctx.t(n.hold);
-          actions.append(
-            button(i === 0 ? [label, ' ', keycap(ctx.key('Enter'))] : label, () => {
-              this.runAction(a, index, checkedStack.item);
-            }, { class: `lpl-button${i === 0 ? ' lpl-button--primary' : ''}`, attrs: { 'data-key': `action:${a}` } }),
-          );
-        });
-        actions.append(
-          button([this.moving === null ? ctx.t(n.move) : ctx.t(n.moving, { key: ctx.key('Space') }), ' ', keycap(ctx.key('Space'))], () => {
-            this.toggleMove(index);
-            focusElement(this.body.querySelector<HTMLElement>(`[data-slot="${index}"]`));
-          }, { attrs: { 'data-key': 'action:move', 'aria-pressed': this.moving === null ? 'false' : 'true' } }),
-        );
-        aside = el('aside', { class: 'lpl-item-detail', 'aria-label': n.detailLabel }, [
-          el('div', { class: 'lpl-item-detail__head' }, [
-            icon(detail.icon, ''),
-            el('div', {}, [
-              el('p', { class: 'lpl-item-detail__name', text: detail.name }),
-              el('p', { class: 'lpl-item-detail__meta' }, [detail.fine ? icon('ui-star') : null, detail.fine ? ' ' : null, detail.meta]),
-            ]),
-          ]),
-          detail.text === '' ? null : el('p', { text: detail.text }),
-          actions,
+        aside = el('aside', { class: 'lpl-vitrine__detail lpl-bag__detail', 'aria-label': n.detailLabel }, [
+          detailFigure('grain-sack', 'lpl-detail__figure--empty'),
+          el('p', { class: 'lpl-detail__line', text: ctx.t(ctx.texts.extra.common.emptySlot) }),
         ]);
+      } else {
+        aside = el('aside', { class: 'lpl-vitrine__detail lpl-bag__detail', 'aria-label': n.detailLabel }, this.bagDetail(checkedStack, detail, price));
       }
       const nodes: (Node | null)[] = [el('div', { class: 'lpl-bag' }, [slotsBox, aside])];
       if (bagFull(me)) {
@@ -651,30 +753,81 @@ export class NotebookPanel extends Panel {
     });
   }
 
+  /** Détail de la case choisie: dessin, nom, une ligne, puis tout en pastilles, et les boutons. */
+  private bagDetail(stack: NonNullable<ReadonlyWorld['characters'][number]['bag'][number]>, detail: ReturnType<typeof itemDetail>, price: number | null): (Node | null)[] {
+    const { ctx } = this.host;
+    const n = ctx.texts.extra.notebook;
+    const v = ctx.texts.extra.vitrine;
+    const index = this.checked ?? 0;
+    const facts = itemFacts(ctx, stack.item);
+    const list: (PastilleSpec | null)[] = [
+      detail.fine ? { icon: 'ui-star', text: '', tone: 'price', label: ctx.t(v.fineLabel) } : null,
+      stack.count > 1 ? { icon: 'grain-sack', text: `×${String(stack.count)}`, tone: 'count', label: ctx.t(ctx.texts.extra.common.inBag, { count: stack.count }) } : null,
+      price === null
+        ? { icon: CURRENCY.icon, text: '', tone: 'missing', crossed: true, label: ctx.t(v.odetteNo) }
+        : { icon: CURRENCY.icon, text: String(price), tone: 'price', label: ctx.t(v.odettePrice, { price }) },
+      ...facts.map((f): PastilleSpec => ({ icon: f.icon, text: f.text, tone: f.tone, label: f.label })),
+    ];
+    const buttons: HTMLElement[] = detail.actions.map((a, i) => {
+      const label = a === 'eat' ? ctx.t(n.eat, { amount: detail.eatAmount }) : a === 'read' ? ctx.t(n.read) : ctx.t(n.hold);
+      return button(i === 0 ? [label, ' ', keycap(ctx.key('Enter'))] : label, () => {
+        this.runAction(a, index, stack.item);
+      }, { class: `lpl-button${i === 0 ? ' lpl-button--primary' : ''}`, attrs: { 'data-key': `action:${a}`, 'data-nav-item': true } });
+    });
+    buttons.push(
+      button([this.moving === null ? ctx.t(n.move) : ctx.t(n.moving, { key: ctx.key('Space') }), ' ', keycap(ctx.key('Space'))], () => {
+        this.toggleMove(index);
+        focusElement(this.body.querySelector<HTMLElement>(`[data-slot="${index}"]`));
+      }, { attrs: { 'data-key': 'action:move', 'data-nav-item': true, 'aria-pressed': this.moving === null ? 'false' : 'true' } }),
+    );
+    return [...detailHead(detail.icon, capitalize(itemTitle(ctx.content.items[stack.item], 1, stack.item)), detail.meta), pastilles(list), detailActions(buttons)];
+  }
+
   private bagSlot(s: ReturnType<typeof slotModel>, index: number): HTMLButtonElement {
+    const selected = index === this.checked;
     const b = button([], () => {
       if (this.moving !== null) {
         this.toggleMove(index);
         return;
       }
+      // Vitrine: un premier clic choisit la case, un clic sur la case déjà choisie fait l'action principale.
+      const again = this.pressed.selected;
+      this.pressed.selected = false;
+      if (again && s.item !== null) {
+        this.primary(index);
+        return;
+      }
       this.checked = index;
       this.host.invalidate();
     }, {
-      class: `lpl-slot${s.item === null ? ' lpl-slot--empty' : ''}${this.moving === index ? ' lpl-slot--moving' : ''}`,
+      class: `lpl-tile lpl-tile--bag${s.item === null ? ' lpl-tile--empty' : ''}${this.moving === index ? ' lpl-tile--moving' : ''}`,
       attrs: {
         'data-nav-item': true,
         'data-slot': String(index),
         'data-key': `slot:${index}`,
         'aria-label': s.label,
-        'aria-checked': String(index === this.checked),
-        'data-autofocus': index === this.checked,
+        'aria-current': selected ? 'true' : null,
+        'data-selected': selected ? 'true' : null,
+        'data-autofocus': selected,
+        'data-quality': s.fine ? 'fine' : null,
         draggable: s.item === null ? null : 'true',
+        [SOUND_ATTR]: 'none',
       },
     });
-    if (s.icon !== null) b.append(icon(s.icon, 'lpl-slot__icon'));
-    if (s.count > 1) b.append(el('span', { class: 'lpl-slot__count', text: String(s.count) }));
-    if (s.fine) b.append(icon('ui-star', 'lpl-slot__quality'));
-    if (s.gauge !== null) b.append(el('span', { class: 'lpl-slot__gauge', 'aria-hidden': 'true', style: `--lpl-value: ${Math.round(s.gauge * 100)}%` }));
+    if (s.icon !== null) b.append(el('span', { class: 'lpl-tile__figure', 'aria-hidden': 'true' }, [icon(s.icon, 'lpl-tile__icon')]));
+    if (s.count > 1) b.append(el('span', { class: 'lpl-tile__badge', 'aria-hidden': 'true' }, [pastille({ icon: null, text: `×${String(s.count)}`, tone: 'count' })]));
+    if (s.fine) b.append(el('span', { class: 'lpl-tile__corner lpl-tile__corner--fine', 'aria-hidden': 'true' }, [icon('ui-star')]));
+    if (s.gauge !== null) b.append(el('span', { class: 'lpl-tile__gauge', 'aria-hidden': 'true', style: `--lpl-value: ${Math.round(s.gauge * 100)}%` }));
+    if (s.item !== null) b.append(el('span', { class: 'lpl-tile__name', 'aria-hidden': 'true', text: capitalize(itemTitle(this.host.ctx.content.items[s.item], 1, s.item)) }));
+    b.addEventListener('pointerdown', () => {
+      this.pressed.selected = this.checked === index;
+    });
+    // Le focus est la sélection (règle de la vitrine): le détail suit les flèches.
+    b.addEventListener('focus', () => {
+      if (this.checked === index) return;
+      this.checked = index;
+      this.host.invalidate();
+    });
     // Glisser-déposer entre deux cases.
     b.addEventListener('dragstart', (e) => {
       this.dragFrom = index;

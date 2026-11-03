@@ -53,6 +53,12 @@ export const UI_SETTINGS = {
     farmWidth: '54rem',
     animalsPerPage: 8,
     fishPerPage: 28,
+    /** Rangement: 7 colonnes sur 4 rangées de cases, le sac à côté (6 sur 4), le râtelier dessous. */
+    storageWidth: '60rem',
+    storagePerPage: 28,
+    storageBagPerPage: 24,
+    /** Quêtes du carnet: deux colonnes de cartes sur quatre rangées, le détail à droite. */
+    questsPerPage: 8,
   },
   /** Barre de progression (R10): un geste plus court que cette durée n'en a pas (s). */
   progressMinSeconds: 1,
@@ -542,4 +548,53 @@ export const WEATHER_ICONS: Readonly<Record<string, string>> = {
   sunny: 'weather-sun',
   cloudy: 'weather-cloud',
   rain: 'weather-rain',
+};
+
+/** « Tout déposer » au rangement (0.12.2): l'icône de chaque famille, à côté du nombre. */
+export const STORAGE_FAMILY_ICONS: Readonly<Record<string, string>> = {
+  crop: 'radish',
+  fish: 'fish',
+  forage: 'blackberry',
+  food: 'soup',
+  material: 'plank',
+};
+
+/** Quêtes du carnet (0.12.2): les habitants sans portrait dessiné prennent l'icône de leur métier. */
+export const QUEST_GIVER_ICONS: Readonly<Record<string, string>> = {
+  achille: 'bread-basket',
+  solange: 'horn-comb',
+};
+
+/**
+ * Lieu d'une étape de quête: l'icône et le libellé de `partner.places`. Seulement les lieux où
+ * l'on attend (`stayed_at`) et les bâtiments (`inside`): le lieu d'une énigme (`used_tool_at`,
+ * l'ombre de la cloche) est la réponse elle-même, il ne s'affiche jamais.
+ */
+export const QUEST_PLACES: Readonly<Record<string, { icon: string; place: string }>> = {
+  chicken_coop: { icon: 'hen', place: 'hen_pen' },
+  garland_west: { icon: 'garland', place: 'square' },
+  garland_east: { icon: 'garland', place: 'square' },
+  coop_crate: { icon: 'crate', place: 'coop_crate' },
+  'building:salon': { icon: 'horn-comb', place: 'building:salon' },
+};
+
+/**
+ * Icône d'un compteur d'étape sans objet (`nights`, `stall_kind`...), par début de clé. Un compteur
+ * d'objet (`given:<habitant>:<objet>`, `caught:<objet>`...) prend l'icône de l'objet.
+ */
+export const QUEST_COUNTER_ICONS: Readonly<Record<string, string>> = {
+  nights: 'ui-moon',
+  stall_kind: 'market-stall',
+  market_served: 'market-scale',
+  market_served_together: 'market-scale',
+  milked: 'milk-can',
+  goat_grazed_spot: 'goat',
+  mail_delivered: 'mail-letter',
+  brood_started: 'nest-box',
+  brood_hatched: 'nest-box',
+  chopped: 'log',
+  watered: 'watering-can',
+  salon_chair: 'horn-comb',
+  haircut_changed: 'horn-comb',
+  moment_seen: 'ui-eye',
 };

@@ -25,6 +25,8 @@ export const PATCH_0122_SCENARIOS: readonly string[] = [
   'poissons-0122',
   'sac-0122',
   'coffre-0122',
+  'coffre-0122-plein',
+  'quetes-0122',
   'salon-0122',
   'salon-0122-banc',
 ];
@@ -78,6 +80,33 @@ const KITCHEN_BAG: readonly (ItemStack | null)[] = [
   stack('log', 3),
   stack('plank', 2),
   stack('nail', 5),
+];
+
+/** Le rangement d'un été avancé: 18 cases, dont deux piles qui débordent sur une seconde case. */
+const FULL_CELLAR: readonly ItemStack[] = [
+  stack('jay_feather', 1),
+  stack('crystal_radio', 1),
+  stack('vegetable_soup', 4),
+  stack('radish', 120),
+  stack('radish', 6, 'fine'),
+  stack('lettuce', 14),
+  stack('carrot', 9),
+  stack('egg', 11),
+  stack('milk_can', 3),
+  stack('blackberry', 22),
+  stack('hazelnut', 17),
+  stack('log', 130),
+  stack('plank', 26),
+  stack('nail', 40),
+  stack('sugar', 2),
+  stack('jar', 5),
+];
+
+/** Compteurs posés pour le scénario des quêtes (lignes de base à zéro dans la sauvegarde). */
+const QUEST_COUNTERS: readonly (readonly [string, number])[] = [
+  ['given:jeanne:hen_feather', 1],
+  ['crafted:craft_crate', 2],
+  ['stall_kind', 1],
 ];
 
 /** Une basse-cour fournie: coq, poule au nid, poussine, chèvre, grain entamé, litière d'avant-hier. */
@@ -183,8 +212,19 @@ export function setupPatch0122(sim: Sim, name: string, me: CharacterId): boolean
       return true;
     }
     case 'coffre-0122':
+    case 'coffre-0122-plein':
       bag(sim, me, KITCHEN_BAG);
+      if (name === 'coffre-0122-plein') {
+        // Un rangement bien rempli: 18 cases sur 26, deux outils au râtelier.
+        w.cellar = FULL_CELLAR.map((x) => ({ ...x }));
+        w.rack = [stack('axe', 1), stack('fishing_rod', 1)];
+      }
       openMenu(sim, me, 'chest');
+      return true;
+    case 'quetes-0122':
+      // Des quêtes en cours avec leurs compteurs entamés: 1 plume sur 4, 2 cagettes sur 4, 1 sorte sur 3.
+      for (const [key, count] of QUEST_COUNTERS) w.counters.duo[key] = count;
+      openMenu(sim, me, 'notebook');
       return true;
     default:
       return false;
@@ -192,8 +232,9 @@ export function setupPatch0122(sim: Sim, name: string, me: CharacterId): boolean
 }
 
 /** Onglet du carnet qu'ouvre un scénario de ce lot, ou `null`. */
-export function patch0122NotebookTab(name: string): 'fish' | 'bag' | null {
+export function patch0122NotebookTab(name: string): 'fish' | 'bag' | 'quests' | null {
   if (name === 'poissons-0122') return 'fish';
+  if (name === 'quetes-0122') return 'quests';
   if (name === 'sac-0122') return 'bag';
   return null;
 }
