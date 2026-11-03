@@ -507,13 +507,13 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 10 && isRecord(data)) migrateToFormat10(data, content);
   // Format 11 (0.12, après la pêche au format 10): la tenue (`outfit`) devient des vêtements portés et une garde-robe.
   if (dataSchema < 11 && isRecord(data)) migrateToWardrobe(data, content.clothes);
-  // Formats 10 à 12: pêche, garde-robe, économie (autres lots de la 0.12). 13: élevage.
-  if (dataSchema < 13 && isRecord(data)) migrateToBreeding(data, content);
+  // Format 12 (0.12, après la garde-robe au format 11): l'élevage. L'économie n'a pas de format (`fillEconomyFields`).
+  if (dataSchema < 12 && isRecord(data)) migrateToBreeding(data, content);
   return data;
 }
 
 /**
- * Format 13 (0.12, élevage, conception section 4.6): chaque poule prend le bonheur de la migration
+ * Format 12 (0.12, élevage, conception section 4.6): chaque poule prend le bonheur de la migration
  * (60, « Tranquille »: rien ne change pour qui ne fait que nourrir), l'élevage part vide (ni coq, ni
  * chèvre, ni couvée), et les recettes sans condition parues depuis (fromage frais) sont connues.
  */
@@ -527,7 +527,7 @@ function migrateToBreeding(world: Record<string, unknown>, content: Content): vo
   }
 }
 
-/** L'élevage relu (format 13): assez de forme pour ne pas planter sur une sauvegarde abîmée. */
+/** L'élevage relu (format 12): assez de forme pour ne pas planter sur une sauvegarde abîmée. */
 function checkBreeding(data: Record<string, unknown>): void {
   const b = data.breeding;
   if (!isRecord(b) || !Array.isArray(b.chicks) || !Array.isArray(b.goats) || !Array.isArray(b.naming) || !Array.isArray(b.namesUsed) || typeof b.grainRations !== 'number' || !isRecord(b.grazed)) {
@@ -766,9 +766,9 @@ function resume(
   if (dataSchema < 7) migrateToTour10(sim);
   // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
   settleDecor(sim);
-  // Format 13 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
+  // Format 12 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
   const grain = content.settings.hens.care?.grain.item;
-  if (dataSchema < 13 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
+  if (dataSchema < 12 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

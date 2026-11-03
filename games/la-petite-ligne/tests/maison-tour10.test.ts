@@ -784,10 +784,14 @@ describe('rideaux aux fenêtres (T10-25)', () => {
 });
 
 describe('format 7 et migration du format 6 (T10-24, T10-25, 7.2)', () => {
-  it('écrit le format 7', () => {
-    expect(DATA_SCHEMA).toBe(7);
+  it('écrit le format courant, qui contient le 7 (pièces, râtelier, besoins)', () => {
+    expect(DATA_SCHEMA).toBeGreaterThanOrEqual(7);
     const sim = autumn();
-    expect(snapshotOf(sim).dataSchema).toBe(7);
+    const snap = snapshotOf(sim);
+    expect(snap.dataSchema).toBe(DATA_SCHEMA);
+    expect(snap.data.rooms).toEqual(sim.world.rooms);
+    expect(snap.data.rack).toEqual(sim.world.rack);
+    for (const c of snap.data.characters) expect(c.needs).toEqual(character(sim, c.id).needs);
   });
 
   it('format 6: coffre de 30 piles relu sans perte (« Ça déborde »), outils au râtelier, rideaux hors fenêtre replacés, besoins du réveil', () => {
@@ -829,16 +833,16 @@ describe('format 7 et migration du format 6 (T10-24, T10-25, 7.2)', () => {
       expect('inHouse' in ch).toBe(false);
     }
     expect(sim.world.rooms).toEqual({});
-    // Écrit au format 7, relu tel quel.
+    // Écrit au format courant, relu tel quel.
     const snap = snapshotOf(sim);
-    expect(snap.dataSchema).toBe(7);
-    const again = restoreWorld(content, map, structuredClone(snap.data), 7, [A, B]);
+    expect(snap.dataSchema).toBe(DATA_SCHEMA);
+    const again = restoreWorld(content, map, structuredClone(snap.data), snap.dataSchema, [A, B]);
     expect(again.world.rack).toEqual(sim.world.rack);
     expect(again.world.cellar).toEqual(sim.world.cellar);
     expect(again.world.furniture.find((f) => f.id === 'f_old_curtains')?.window).toBe('window_4');
   });
 
-  it('chaque référence du format 6 se relit et se joue; une sauvegarde abîmée du format 7 est refusée', () => {
+  it('chaque référence du format 6 se relit et se joue; une sauvegarde aux pièces abîmées (champ du format 7) est refusée', () => {
     const { content, map } = contentAndMap();
     for (const file of ['format-6-fin-de-la-demo.json', 'format-6-ete-jour-25.json', 'format-6-milieu-semaine-2.json']) {
       const ref = reference(file);
@@ -846,9 +850,11 @@ describe('format 7 et migration du format 6 (T10-24, T10-25, 7.2)', () => {
       for (let i = 0; i < 300; i++) step(sim, { controls: {}, intents: [] });
       expect(sim.world.rack.length + sim.world.cellar.length).toBeGreaterThanOrEqual(0);
     }
-    const bad = snapshotOf(autumn()).data as unknown as Record<string, unknown>;
+    // Écrite au format courant (aucune migration ne passe avant le contrôle), seules les pièces abîmées.
+    const snap = snapshotOf(autumn());
+    const bad = snap.data as unknown as Record<string, unknown>;
     bad.rooms = { room_cellar: { ordered: 'hier' } };
-    expect(() => restoreWorld(content, map, bad, 7, [A, B])).toThrow(/pièce/);
+    expect(() => restoreWorld(content, map, bad, snap.dataSchema, [A, B])).toThrow(/sauvegarde: pièce invalide/);
   });
 
   it('état sous 52 000 octets: jour 62 migré, cellier et chambre bâtis, chantier en cours, besoins du jour', () => {

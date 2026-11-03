@@ -8,6 +8,7 @@ import { character } from '../src/simulation/contexte';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { payOrder } from '../src/simulation/economie';
 import { morning } from '../src/simulation/horloge';
+import { fishingZoneAt, fishPossible } from '../src/simulation/ombres';
 import { step } from '../src/simulation/pas';
 import { gardenCellAt, harvest, sow, till, water } from '../src/simulation/potager';
 import { addStack, addToBag, countInBag } from '../src/simulation/sac';
@@ -203,14 +204,31 @@ describe('règles', () => {
     c.facing = Math.atan2(water.y - ford.y, water.x - ford.x);
     const rodSlot = c.bag.findIndex((s) => s?.item === 'fishing_rod');
     expect(rodSlot).toBeGreaterThanOrEqual(0);
+    // Pêche 0.12: la table des poissons (`objets.json`, 22 espèces) dit où, quand et par quel temps
+    // chacun mord. Le sac gagne un poisson, et un poisson que ce coin donne à cette heure.
+    const fishCounts = (): Map<string, number> => {
+      const out = new Map<string, number>();
+      for (const s of c.bag) if (s !== null && (sim.content.items[s.item]?.fish ?? null) !== null) out.set(s.item, (out.get(s.item) ?? 0) + s.count);
+      return out;
+    };
+    const fishBefore = fishCounts();
     act(sim, 'p1', { type: 'select_slot', slot: rodSlot });
     act(sim, 'p1', { type: 'act' });
     expect(c.fishing?.phase).toBe('waiting');
     for (let i = 0; i < 30 * 16 && c.fishing?.phase !== 'bite'; i++) step(sim, { controls: {}, intents: [] });
     expect(c.fishing?.phase).toBe('bite');
+    const bobber = c.fishing?.bobber;
+    if (bobber === undefined) throw new Error('bouchon absent');
+    const zone = fishingZoneAt(sim, bobber.x, bobber.y)?.id;
+    expect(zone).toBe('ford');
     act(sim, 'p1', { type: 'act' });
     expect(c.fishing).toBeNull();
-    expect(['gudgeon', 'chub', 'trout'].reduce((n, fish) => n + countInBag(c, fish), 0)).toBe(1);
+    const gained = [...fishCounts()].flatMap(([item, n]) => Array.from({ length: n - (fishBefore.get(item) ?? 0) }, () => item));
+    expect(gained).toHaveLength(1);
+    const caught = gained[0] ?? '';
+    const def = sim.content.items[caught]?.fish ?? null;
+    if (def === null) throw new Error(`${caught}: pas un poisson`);
+    expect(fishPossible(sim, def, 'ford'), caught).toBe(true);
     // Trop tard: le poisson s'échappe, et on le dit.
     act(sim, 'p1', { type: 'act' });
     for (let i = 0; i < 30 * 20 && c.fishing !== null; i++) step(sim, { controls: {}, intents: [] });

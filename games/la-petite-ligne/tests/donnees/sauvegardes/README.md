@@ -53,6 +53,10 @@ Règles:
 | `format-11-fin-de-la-demo.json` | 11 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
 | `format-11-ete-jour-25.json` | 11 | mardi 25 à midi (0.12) | 7 | `generer.ts` (0.12) |
 | `format-11-automne-jour-62.json` | 11 | jeudi 62 à midi, automne, garde-robe (`wear`, `wardrobe`) (0.12) | 7 | `generer.ts` (0.12) |
+| `format-12-fin-semaine-1.json` | 12 | jour 8 à 16 h, commande 1 payée; élevage (bonheur des poules, `breeding`) et champs de l'économie (0.12) | 42 | `generer.ts` (0.12) |
+| `format-12-milieu-semaine-2.json` | 12 | mardi, jour 11, midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-12-fin-de-la-demo.json` | 12 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
+| `format-12-ete-jour-25.json` | 12 | mardi 25 à midi (0.12; sans référence du jeudi 62, la plus longue à fabriquer) | 7 | `generer.ts` (0.12) |
 
 ## Format en cours
 

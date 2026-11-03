@@ -130,7 +130,7 @@ export interface WorldState {
   /** La mangeoire a été remplie aujourd'hui (les œufs viennent le lendemain matin). */
   feederFilled: boolean;
   /**
-   * Élevage (0.12, format 9, conception section 4): coq, poussines, couvée, litière, grain entamé,
+   * Élevage (0.12, format 12, conception section 4): coq, poussines, couvée, litière, grain entamé,
    * chèvres, pâtures broutées et noms à choisir. Vides ou nuls au départ et à la migration.
    */
   breeding: BreedingState;
@@ -252,7 +252,7 @@ export interface WorldState {
    * souhaits) s'échelonnent à partir de là, un par journée (`simulation/bourg.ts`, `townDays`).
    */
   upperStreetSince: number;
-  /** Pêche de la 0.12 (format 9): ombres, coin qui frémit, guet, grands, carnet des poissons (`etat/peche.ts`). */
+  /** Pêche de la 0.12 (format 10): ombres, coin qui frémit, guet, grands, carnet des poissons (`etat/peche.ts`). */
   fishing: FishingState;
 }
 

@@ -56,6 +56,12 @@ interface Memory {
    */
   beamStill?: number;
   beamDodge?: { until: number; side: number };
+  /**
+   * Charge qui ne se rapproche plus de son but (l'étal du marché, de travers devant un passage
+   * étroit): meilleure distance et son pas, puis le détour en cours (fin, essai).
+   */
+  beamBest?: { d: number; tick: number };
+  beamDetour?: { until: number; tries: number };
 }
 
 export interface Robot {
@@ -925,6 +931,8 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
   if (b === null) return false;
   const spot = b.to;
   if (!b.carried) {
+    delete m.beamBest;
+    delete m.beamDetour;
     if (beamDistance(sim, b, c.pos) > beamGrabRange(sim, b) - 0.4) {
       return goTo(sim, c, m, 'poutre', b.pos, 0.5, out) || true;
     }
@@ -954,6 +962,22 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
     const angle = Math.atan2(f.my, f.mx) + m.beamDodge.side * BEAM_DODGE_ANGLE;
     f.mx = Math.cos(angle);
     f.my = Math.sin(angle);
+  }
+  // Le chemin ignore la largeur de la charge: si elle ne s'est pas rapprochée du but depuis
+  // `BEAM_DETOUR_AFTER`, détour de `BEAM_DETOUR_FOR` dans une direction qui tourne à chaque essai
+  // (135° de plus: les huit directions passent), puis le chemin repart de là. Mêmes calculs chez
+  // les deux robots, qui poussent donc dans le même sens.
+  const far = Math.hypot(spot.x - b.pos.x, spot.y - b.pos.y);
+  if (m.beamBest === undefined || far < m.beamBest.d - BEAM_PROGRESS) m.beamBest = { d: far, tick };
+  if (b.route === null && tick - m.beamBest.tick > BEAM_DETOUR_AFTER && (m.beamDetour === undefined || tick >= m.beamDetour.until)) {
+    m.beamDetour = { until: tick + BEAM_DETOUR_FOR, tries: (m.beamDetour?.tries ?? 0) + 1 };
+  }
+  if (b.route === null && m.beamDetour !== undefined && tick < m.beamDetour.until) {
+    const angle = Math.atan2(spot.y - b.pos.y, spot.x - b.pos.x) + m.beamDetour.tries * BEAM_DETOUR_TURN;
+    f.mx = Math.cos(angle);
+    f.my = Math.sin(angle);
+    // Le détour fini, le chemin a de nouveau tout son temps depuis la nouvelle place.
+    if (tick + 1 >= m.beamDetour.until) m.beamBest = { d: far, tick: tick + 1 };
   }
   m.job = 'porter la poutre';
   return true;
@@ -1039,6 +1063,12 @@ function town(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 
 /** Angle de biais pour dégager une charge à deux bloquée (radians). */
 const BEAM_DODGE_ANGLE = (75 * Math.PI) / 180;
+/** Détour d'une charge qui ne se rapproche plus de son but (`beam`): après 20 s, pendant 4 s. */
+const BEAM_DETOUR_AFTER = SIM_HZ * 20;
+const BEAM_DETOUR_FOR = SIM_HZ * 4;
+const BEAM_DETOUR_TURN = (135 * Math.PI) / 180;
+/** Rapprochement (m) qui compte comme un progrès de la charge. */
+const BEAM_PROGRESS = 0.5;
 
 function buildHouse(sim: Sim, c: Character, m: Memory, f: { held: boolean }, out: Intent[]): boolean {
   if (built(sim, 'house_roof') && built(sim, 'house_door')) return false;
