@@ -4,13 +4,14 @@
  * n'est pas un mode de jeu. `p1` s'occupe surtout du potager, `p2` du bois;
  * les rendez-vous se font à deux.
  */
+import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
 import { isHome } from '../etat/interieurs';
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
-import { blockersFor, refreshBlockers } from './deplacement';
+import { beamDistance, beamGrabRange, blockersFor, refreshBlockers } from './deplacement';
 import { findPath, isBlockedCell } from './grille';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
@@ -55,6 +56,12 @@ interface Memory {
    */
   beamStill?: number;
   beamDodge?: { until: number; side: number };
+  /**
+   * Charge qui ne se rapproche plus de son but (l'étal du marché, de travers devant un passage
+   * étroit): meilleure distance et son pas, puis le détour en cours (fin, essai).
+   */
+  beamBest?: { d: number; tick: number };
+  beamDetour?: { until: number; tries: number };
 }
 
 export interface Robot {
@@ -290,6 +297,10 @@ function hens(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const egg = sim.world.groundItems.find((g) => g.item === ITEM.egg);
   if (egg !== undefined) return goAct(sim, c, m, 'oeufs', { kind: 'ground_item', groundItem: egg.id }, egg.pos, 1.2, out);
   if (sim.world.hens.length > 0 && !sim.world.feederFilled) {
+    // 0.12: après la démo, le grain se paie (un sac de 30 rations chez Odette, le premier offert).
+    const care = sim.content.settings.hens.care;
+    const short = care !== null && sim.world.clock.day >= care.grain.fromDay && sim.world.flags.includes(GRAIN_GIFT_FLAG) && sim.world.breeding.grainRations < rationsNeeded(sim);
+    if (care !== null && short && countInBag(c, care.grain.item) === 0) return buy(sim, c, m, [{ item: care.grain.item, count: 1 }], out);
     const feeder = pt(sim, POINT.henFeeder);
     return goAct(sim, c, m, 'nourrir', ground(feeder), feeder, 1.2, out);
   }
@@ -632,17 +643,24 @@ function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   return false;
 }
 
-/** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
+/**
+ * Poissons de la commande, des quêtes et des annonces: au gué, ou au ponton pour ceux qui n'y
+ * mordent pas (pêche 0.12: gardon, perche, tanche, ablette); lancer, attendre la touche, ferrer.
+ */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
+  const others = Object.values(sim.content.items).filter((d) => d.fish !== null && !d.fish.released && d.fish.grand === null && !['trout', 'gudgeon', 'chub'].includes(d.id));
+  const missing = others.filter((d) => reserved(sim, d.id) + (afterDemo(sim) ? annonceNeed(sim, d.id) : 0) > inBags(sim, d.id));
   const wanted =
     wantedOf(sim, 'trout') > inBags(sim, 'trout') ||
     reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') ||
     reserved(sim, 'chub') + (afterDemo(sim) ? annonceNeed(sim, 'chub') : 0) > inBags(sim, 'chub') ||
+    missing.length > 0 ||
     questWantsFish(sim);
   if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   if (toolIn(sim, c, 'fishing_rod') === null) return false;
-  const ford = pt(sim, 'river_ford');
-  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, 'gue', ford, 0.4, out) || true;
+  const atPontoon = missing.length > 0 && missing.every((d) => d.fish?.zones.includes('ford') !== true) && sim.map.points.fishing_pontoon !== undefined;
+  const ford = pt(sim, atPontoon ? 'fishing_pontoon' : 'river_ford');
+  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, atPontoon ? 'ponton' : 'gue', ford, 0.4, out) || true;
   if (!holdsRod(sim, c)) return selectItem(c, toolIn(sim, c, 'fishing_rod') ?? ITEM.fishingRod, out) || true;
   m.job = 'pêcher';
   if (c.fishing?.phase === 'bite') {
@@ -913,7 +931,9 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
   if (b === null) return false;
   const spot = b.to;
   if (!b.carried) {
-    if (distance(c.pos, b.pos) > sim.content.settings.feel.beamGrabRange - 0.4) {
+    delete m.beamBest;
+    delete m.beamDetour;
+    if (beamDistance(sim, b, c.pos) > beamGrabRange(sim, b) - 0.4) {
       return goTo(sim, c, m, 'poutre', b.pos, 0.5, out) || true;
     }
     f.held = true;
@@ -942,6 +962,22 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
     const angle = Math.atan2(f.my, f.mx) + m.beamDodge.side * BEAM_DODGE_ANGLE;
     f.mx = Math.cos(angle);
     f.my = Math.sin(angle);
+  }
+  // Le chemin ignore la largeur de la charge: si elle ne s'est pas rapprochée du but depuis
+  // `BEAM_DETOUR_AFTER`, détour de `BEAM_DETOUR_FOR` dans une direction qui tourne à chaque essai
+  // (135° de plus: les huit directions passent), puis le chemin repart de là. Mêmes calculs chez
+  // les deux robots, qui poussent donc dans le même sens.
+  const far = Math.hypot(spot.x - b.pos.x, spot.y - b.pos.y);
+  if (m.beamBest === undefined || far < m.beamBest.d - BEAM_PROGRESS) m.beamBest = { d: far, tick };
+  if (b.route === null && tick - m.beamBest.tick > BEAM_DETOUR_AFTER && (m.beamDetour === undefined || tick >= m.beamDetour.until)) {
+    m.beamDetour = { until: tick + BEAM_DETOUR_FOR, tries: (m.beamDetour?.tries ?? 0) + 1 };
+  }
+  if (b.route === null && m.beamDetour !== undefined && tick < m.beamDetour.until) {
+    const angle = Math.atan2(spot.y - b.pos.y, spot.x - b.pos.x) + m.beamDetour.tries * BEAM_DETOUR_TURN;
+    f.mx = Math.cos(angle);
+    f.my = Math.sin(angle);
+    // Le détour fini, le chemin a de nouveau tout son temps depuis la nouvelle place.
+    if (tick + 1 >= m.beamDetour.until) m.beamBest = { d: far, tick: tick + 1 };
   }
   m.job = 'porter la poutre';
   return true;
@@ -1027,6 +1063,12 @@ function town(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
 
 /** Angle de biais pour dégager une charge à deux bloquée (radians). */
 const BEAM_DODGE_ANGLE = (75 * Math.PI) / 180;
+/** Détour d'une charge qui ne se rapproche plus de son but (`beam`): après 20 s, pendant 4 s. */
+const BEAM_DETOUR_AFTER = SIM_HZ * 20;
+const BEAM_DETOUR_FOR = SIM_HZ * 4;
+const BEAM_DETOUR_TURN = (135 * Math.PI) / 180;
+/** Rapprochement (m) qui compte comme un progrès de la charge. */
+const BEAM_PROGRESS = 0.5;
 
 function buildHouse(sim: Sim, c: Character, m: Memory, f: { held: boolean }, out: Intent[]): boolean {
   if (built(sim, 'house_roof') && built(sim, 'house_door')) return false;
@@ -1078,7 +1120,7 @@ export const WISH_ORDER: readonly string[] = [
 ];
 /** Ce que le duo garde pour ses graines (section 2.9). */
 const PURSE_RESERVE = 150;
-/** Au-delà de cette bourse, le surplus va au chantier ouvert, par versements de 100 sous. */
+/** Au-delà de cette bourse, le surplus va au chantier ouvert, par versements de 100 aubrins. */
 const IMPROVEMENT_KEEP = 300;
 const IMPROVEMENT_STEP = 100;
 
@@ -1165,7 +1207,7 @@ function shopCatalogue(sim: Sim, c: Character, m: Memory, out: Intent[]): boolea
 }
 
 /**
- * Chantiers: au-delà de `IMPROVEMENT_KEEP` sous, verser 100 sous au chantier du bourg ouvert (au
+ * Chantiers: au-delà de `IMPROVEMENT_KEEP` aubrins, verser 100 aubrins au chantier du bourg ouvert (au
  * tableau); payer d'un coup celui de la maisonnette chez Basile quand la bourse le permet, après
  * lui avoir apporté les planches de trop (p2, qui coupe le bois).
  */

@@ -2,7 +2,9 @@
  * Apparence des deux joueurs: pièces du modèle (`personnages.glb`) et
  * couleurs écrites dans leur rangée de la texture des personnages. Les
  * couleurs reprennent `assets-src/modeles/palette.py` (`PLAYER_PRESETS` et les
- * rangées `player_a`, `player_b`); le foulard prend la couleur du profil Duo.
+ * rangées `player_a`, `player_b`). Depuis la 0.12, les vêtements viennent de
+ * `vetements.json` (`habillage.ts`) et les joueurs n'ont plus de foulard: la
+ * couleur du profil Duo va au badge brodé; les symboles servent aux signes.
  */
 import type { CharacterId } from '../etat/types';
 import type { CharacterSlot } from './palette';
@@ -58,47 +60,6 @@ export const HAIR_COLORS: readonly { hair: string; hair_dark: string }[] = [
   { hair: '#d8b46a', hair_dark: '#b08a48' },
   { hair: '#9a958e', hair_dark: '#75706a' },
   { hair: '#e8e4dc', hair_dark: '#c4beb4' },
-];
-
-export interface OutfitLook {
-  mesh: string;
-  colors: Partial<Record<CharacterSlot, string>>;
-}
-
-/** Tenues proposées à la création (index `appearance.outfit`): coupe et couleurs. */
-export const OUTFITS: readonly OutfitLook[] = [
-  {
-    mesh: 'player_outfit_work',
-    colors: { top: '#5c7fa6', top_trim: '#ede6d3', bottom: '#4a5d78', shoes: '#5a4636' },
-  },
-  {
-    mesh: 'player_outfit_smock',
-    colors: { top: '#b5663f', top_trim: '#ede6d3', bottom: '#6b5541', shoes: '#4a3a2e' },
-  },
-  {
-    mesh: 'player_outfit_overalls',
-    colors: { top: '#8ba37b', top_trim: '#f1ebdb', bottom: '#5e6a55', shoes: '#4f3f31' },
-  },
-  {
-    mesh: 'player_outfit_work',
-    colors: { top: '#d4a746', top_trim: '#f3ecda', bottom: '#6e5b48', shoes: '#4a3a2e' },
-  },
-  {
-    mesh: 'player_outfit_smock',
-    colors: { top: '#8c4a5e', top_trim: '#efe4d6', bottom: '#4f4450', shoes: '#463830' },
-  },
-  {
-    mesh: 'player_outfit_overalls',
-    colors: { top: '#3f6f6a', top_trim: '#ece6d5', bottom: '#3d4b52', shoes: '#4a3a2e' },
-  },
-  {
-    mesh: 'player_outfit_work',
-    colors: { top: '#c9b79a', top_trim: '#5f4b3a', bottom: '#5a5048', shoes: '#3f3229' },
-  },
-  {
-    mesh: 'player_outfit_smock',
-    colors: { top: '#6b7fb0', top_trim: '#f2ead8', bottom: '#2f3a52', shoes: '#4a3a2e' },
-  },
 ];
 
 /** Peau et cheveux par défaut de chaque personnage (la démo ne les fait pas choisir). */

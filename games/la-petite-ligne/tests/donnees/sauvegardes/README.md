@@ -29,6 +29,34 @@ Règles:
 | `format-6-fin-de-la-demo.json` | 6 | jour 15 à 16 h, écran d'étape « Deux semaines » (tour 9) | 42 | `generer.ts` (tour 9) |
 | `format-6-ete-jour-25.json` | 6 | mardi 25 à midi, tableau des annonces, achats et chantiers du robot (tour 9) | 7 | `generer.ts` (tour 9) |
 | `format-6-automne-jour-62.json` | 6 | jeudi 62 à midi, automne, commande du samedi 64 en cours (T9-16) | 7 | `generer.ts` (tour 9) |
+| `format-7-fin-semaine-1.json` | 7 | jour 8 à 16 h, commande 1 payée (tour 10) | 42 | `generer.ts` (tour 10) |
+| `format-7-milieu-semaine-2.json` | 7 | mardi, jour 11, midi (tour 10) | 7 | `generer.ts` (tour 10) |
+| `format-7-fin-de-la-demo.json` | 7 | jour 15 à 16 h, écran d'étape « Deux semaines » (tour 10) | 42 | `generer.ts` (tour 10) |
+| `format-7-ete-jour-25.json` | 7 | mardi 25 à midi (tour 10) | 7 | `generer.ts` (tour 10) |
+| `format-7-automne-jour-62.json` | 7 | jeudi 62 à midi, automne (tour 10) | 7 | `generer.ts` (tour 10) |
+| `format-8-fin-semaine-1.json` | 8 | jour 8 à 16 h, commande 1 payée (tour 11) | 42 | `generer.ts` (tour 11) |
+| `format-8-milieu-semaine-2.json` | 8 | mardi, jour 11, midi (tour 11) | 7 | `generer.ts` (tour 11) |
+| `format-8-fin-de-la-demo.json` | 8 | jour 15 à 16 h, écran d'étape « Deux semaines » (tour 11) | 42 | `generer.ts` (tour 11) |
+| `format-8-ete-jour-25.json` | 8 | mardi 25 à midi (tour 11) | 7 | `generer.ts` (tour 11) |
+| `format-8-automne-jour-62.json` | 8 | jeudi 62 à midi, automne, lettres sans texte rendu (tour 11) | 7 | `generer.ts` (tour 11) |
+| `format-9-fin-semaine-1.json` | 9 | jour 8 à 16 h, commande 1 payée; `decor` vide (0.11.2) | 42 | `generer.ts` (0.11.2) |
+| `format-9-milieu-semaine-2.json` | 9 | mardi, jour 11, midi (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-9-fin-de-la-demo.json` | 9 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.11.2) | 42 | `generer.ts` (0.11.2) |
+| `format-9-ete-jour-25.json` | 9 | mardi 25 à midi (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-9-automne-jour-62.json` | 9 | jeudi 62 à midi, automne (0.11.2) | 7 | `generer.ts` (0.11.2) |
+| `format-10-fin-semaine-1.json` | 10 | jour 8 à 16 h, commande 1 payée; carnet des poissons (pêche 0.12) | 42 | `generer.ts` (0.12) |
+| `format-10-milieu-semaine-2.json` | 10 | mardi, jour 11, midi (pêche 0.12) | 7 | `generer.ts` (0.12) |
+| `format-10-fin-de-la-demo.json` | 10 | jour 15 à 16 h, écran d'étape « Deux semaines » (pêche 0.12) | 42 | `generer.ts` (0.12) |
+| `format-10-ete-jour-25.json` | 10 | mardi 25 à midi, coin qui frémit et grands du jour (pêche 0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-fin-semaine-1.json` | 11 | jour 8 à 16 h, commande 1 payée; garde-robe (0.12) | 42 | `generer.ts` (0.12) |
+| `format-11-milieu-semaine-2.json` | 11 | mardi, jour 11, midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-fin-de-la-demo.json` | 11 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
+| `format-11-ete-jour-25.json` | 11 | mardi 25 à midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-11-automne-jour-62.json` | 11 | jeudi 62 à midi, automne, garde-robe (`wear`, `wardrobe`) (0.12) | 7 | `generer.ts` (0.12) |
+| `format-12-fin-semaine-1.json` | 12 | jour 8 à 16 h, commande 1 payée; élevage (bonheur des poules, `breeding`) et champs de l'économie (0.12) | 42 | `generer.ts` (0.12) |
+| `format-12-milieu-semaine-2.json` | 12 | mardi, jour 11, midi (0.12) | 7 | `generer.ts` (0.12) |
+| `format-12-fin-de-la-demo.json` | 12 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12) | 42 | `generer.ts` (0.12) |
+| `format-12-ete-jour-25.json` | 12 | mardi 25 à midi (0.12; sans référence du jeudi 62, la plus longue à fabriquer) | 7 | `generer.ts` (0.12) |
 
 ## Format en cours
 

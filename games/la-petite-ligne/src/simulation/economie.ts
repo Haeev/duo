@@ -15,6 +15,9 @@ import { storeAtHome } from './rangement';
 import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
 import { deliverWeeklyItem } from './catalogue';
 import { creditImprovement, improvementName } from './chantiers';
+import { grocerAffordable } from '../etat/epicerie';
+import { recordGrocerSale } from './epicerie';
+import { buildingOpen } from './interieurs';
 
 /** Un habitant tient la boutique (activité `serve` au comptoir). */
 export function shopOpen(sim: Sim): boolean {
@@ -30,7 +33,32 @@ export function nearPoint(sim: Sim, c: Character, id: string, range: number): bo
 }
 
 function canShop(sim: Sim, c: Character): boolean {
+  if (c.inside === HABERDASHERY.building) return false;
   return c.menu === 'shop' || nearPoint(sim, c, 'grocery_counter', sim.content.settings.ranges.talk);
+}
+
+/** La mercerie de Solange (0.11.2): son comptoir, dans sa boutique. */
+export const HABERDASHERY = { building: 'salon', counter: 'salon_counter', keeper: 'solange' } as const;
+
+/**
+ * Solange tient le comptoir de sa mercerie (activité `serve` au comptoir, boutique ouverte): les
+ * rideaux de couleur s'y achètent. Même règle que l'épicerie d'Odette.
+ */
+export function haberdasheryOpen(sim: Sim): boolean {
+  const counter = sim.map.points[HABERDASHERY.counter];
+  const b = sim.map.buildings[HABERDASHERY.building];
+  if (counter === undefined || b === undefined || !buildingOpen(sim, b)) return false;
+  return sim.world.villagers.some(
+    (v) =>
+      v.id === HABERDASHERY.keeper &&
+      v.visible &&
+      v.activity === 'serve' &&
+      distance(v.pos, counter) <= sim.content.settings.feel.pointRadius * 2,
+  );
+}
+
+function canHaberdash(c: Character): boolean {
+  return c.menu === 'shop' && c.inside === HABERDASHERY.building;
 }
 
 function canUseCatalogue(sim: Sim, c: Character): boolean {
@@ -81,6 +109,7 @@ export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void
   const cat = sim.content.catalogue;
   if (request.source === 'catalogue' && cat !== null && request.item in cat.copies && copiesLeft(cat, sim.world, request.item) < request.count) return;
   if (request.source === 'grocery' && (!canShop(sim, c) || !shopOpen(sim))) return;
+  if (request.source === 'haberdashery' && (!canHaberdash(c) || !haberdasheryOpen(sim))) return;
   if (request.source === 'catalogue') {
     if (!canUseCatalogue(sim, c)) return;
     if (!catalogueOpen(sim)) {
@@ -146,11 +175,10 @@ export function cancelProposalsAtNight(sim: Sim): void {
   for (const p of [...sim.world.proposals]) withdraw(sim, p.by, false);
 }
 
-function qualityMultiplier(sim: Sim, quality: Quality): number {
-  return sim.content.qualities[quality].priceMultiplier;
-}
-
-/** Vendre à Odette: 80 % du prix, plafond quotidien (EC-02). */
+/**
+ * Vendre à Odette (EC-02; 0.12, section 2.2): prix selon la saison, l'offre et l'ardoise, unité
+ * par unité (`etat/epicerie.ts`), plafond quotidien.
+ */
 export function sell(sim: Sim, c: Character, item: string, quality: Quality, count: number): void {
   const s = sim.content.settings.economy.grocer;
   const def = sim.content.items[item];
@@ -159,19 +187,16 @@ export function sell(sim: Sim, c: Character, item: string, quality: Quality, cou
     say(sim, c.id, 'grocer_not_buying');
     return;
   }
-  const unit = def.sellPrice * qualityMultiplier(sim, quality) * s.buyRate;
-  const room = s.dailyCap - sim.world.grocerSoldToday;
   const have = countInBag(c, item, quality);
-  let n = Math.min(count, have);
-  while (n > 0 && Math.round(unit * n) > room) n--;
+  const { count: n, price } = grocerAffordable(sim.content, sim.world, item, quality, Math.min(count, have));
   if (n === 0) {
     if (have > 0) say(sim, c.id, 'grocer_daily_cap');
     return;
   }
   takeFromBag(c, item, n, quality);
-  const price = Math.round(unit * n);
   sim.world.purse += price;
   sim.world.grocerSoldToday += price;
+  recordGrocerSale(sim, item, n);
   emit(sim, { type: 'sold', by: c.id, item, count: n, price });
   if (n < count && have > n) say(sim, c.id, 'grocer_daily_cap');
 }

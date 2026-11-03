@@ -3,9 +3,13 @@
  * en JSON, contrôlé et migré à la lecture, personnages liés à l'identifiant
  * stable des joueurs (jamais au rôle d'hôte ou d'invité).
  */
+import { compactDialoguesDone } from '../etat/dialogues-faits';
+import { emptyFishing } from '../etat/peche';
 import type { GameMap } from '../etat/carte';
 import type { CharacterId, Tree, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
+import { letterFromRendered } from '../etat/courrier';
+import { renameOldCurrency } from '../donnees/monnaie';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
@@ -15,7 +19,7 @@ import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
 import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
-import { isCurtains, rehangCurtains } from '../simulation/amenagement';
+import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt } from '../etat/carte';
 import { isTool } from '../etat/maison';
@@ -28,6 +32,9 @@ import { startQuest } from '../simulation/quetes';
 import { emptyBoard } from '../simulation/annonces';
 import { emptyImprovements } from '../simulation/chantiers';
 import { freeStuck } from '../simulation/deblocage';
+import { migrateToWardrobe, settleWardrobe, wardrobeShapeOk } from './garde-robe';
+import { emptyBreeding } from '../etat/elevage';
+import { storeAtHome } from '../simulation/rangement';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -84,8 +91,18 @@ export function snapshotOf(sim: Sim): WorldSnapshot {
     label: saveLabel(sim),
     progress: progressOf(sim),
     dataSchema: DATA_SCHEMA,
-    data: structuredClone(sim.world),
+    data: withoutTransientFishing(structuredClone(sim.world)),
   };
+}
+
+/** Les ombres, les coins éveillés, le guet et l'épuisette ne se sauvegardent pas (pêche 0.12, section 5.5). */
+function withoutTransientFishing(world: WorldState): WorldState {
+  const f = world.fishing;
+  f.shadows = [];
+  f.zones = {};
+  f.watch = { p1: null, p2: null };
+  f.landing = null;
+  return world;
 }
 
 export class SaveError extends Error {
@@ -129,7 +146,70 @@ function checkWorld(data: unknown): WorldState {
   checkWeekly(data);
   checkTour9(data);
   checkTour10(data);
+  checkLetters(data.letters as unknown[]);
+  checkDecor(data);
+  checkFishing(data.fishing);
+  if (!wardrobeShapeOk(characters)) throw new SaveError('sauvegarde: garde-robe invalide');
+  checkBreeding(data);
   return data as unknown as WorldState;
+}
+
+/** Pêche du format 10: carnet des poissons, grands pris, séries (le reste se recalcule). */
+function checkFishing(fishing: unknown): void {
+  const bad = (what: string): never => {
+    throw new SaveError(`sauvegarde: pêche, ${what} invalide`);
+  };
+  if (!isRecord(fishing)) return bad('objet');
+  const num = (v: unknown): boolean => typeof v === 'number' && Number.isFinite(v);
+  const who = (v: unknown): boolean => v === 'p1' || v === 'p2';
+  if (!isRecord(fishing.log)) bad('carnet');
+  for (const e of Object.values(fishing.log as Record<string, unknown>)) {
+    if (!isRecord(e) || !num(e.count) || !isRecord(e.first) || !isRecord(e.record)) bad('page du carnet');
+    const first = (e as { first: Record<string, unknown> }).first;
+    const record = (e as { record: Record<string, unknown> }).record;
+    if (!num(first.day) || !who(first.by) || typeof first.zone !== 'string' || typeof first.together !== 'boolean') bad('première prise');
+    if (!num(record.cm) || !who(record.by) || !num(record.day)) bad('record');
+  }
+  if (!isRecord(fishing.grandsCaught) || !Object.values(fishing.grandsCaught).every(num)) bad('grands pris');
+  if (!isRecord(fishing.streak)) bad('séries');
+  if (!num(fishing.commonsInRow) || !num(fishing.nextShadow)) bad('compteurs');
+  if (!isRecord(fishing.grands) || !Array.isArray(fishing.grands.list)) bad('grands du jour');
+}
+
+/** Lettres du format 8: identifiant, jour, variante, variables, lecteurs (texte d'origine si migrée). */
+function checkLetters(letters: unknown[]): void {
+  const value = (v: unknown): boolean => typeof v === 'string' || (typeof v === 'number' && Number.isFinite(v));
+  for (const l of letters) {
+    const legacy = isRecord(l) ? l.legacy : undefined;
+    const ok =
+      isRecord(l) &&
+      typeof l.id === 'string' &&
+      typeof l.day === 'number' &&
+      (l.variant === undefined || (typeof l.variant === 'number' && Number.isInteger(l.variant) && l.variant >= 0)) &&
+      (l.vars === undefined || (isRecord(l.vars) && Object.values(l.vars).every(value))) &&
+      Array.isArray(l.read) &&
+      l.read.every((id) => id === 'p1' || id === 'p2') &&
+      (legacy === undefined || (isRecord(legacy) && typeof legacy.title === 'string' && typeof legacy.from === 'string' && typeof legacy.text === 'string'));
+    if (!ok) throw new SaveError('sauvegarde: lettre invalide');
+  }
+}
+
+/** Format 9 (S03): petits objets posés sur un meuble, chacun avec son meuble porteur et sa place. */
+function checkDecor(data: Record<string, unknown>): void {
+  const list = data.decor;
+  const ok =
+    Array.isArray(list) &&
+    list.every(
+      (d) =>
+        isRecord(d) &&
+        typeof d.id === 'string' &&
+        typeof d.item === 'string' &&
+        typeof d.on === 'string' &&
+        typeof d.place === 'number' &&
+        Number.isInteger(d.place) &&
+        (d.placedBy === null || d.placedBy === 'p1' || d.placedBy === 'p2'),
+    );
+  if (!ok) throw new SaveError('sauvegarde: petits objets posés invalides');
 }
 
 /** Champs du format 7 (tour 10): pièces commandées, râtelier, besoins doux des personnages. */
@@ -421,7 +501,80 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 5 && isRecord(data)) migrateToStages(data, content);
   if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
   if (dataSchema < 7 && isRecord(data) && tour10Fillable(data)) fillTour10Fields(map, data as unknown as WorldState);
+  if (dataSchema < 8 && isRecord(data)) migrateToFormat8(data, content);
+  // Format 9 (0.11.2, S03): les petits objets posés sur les meubles; aucun avant.
+  if (dataSchema < 9 && isRecord(data)) data.decor = [];
+  if (dataSchema < 10 && isRecord(data)) migrateToFormat10(data, content);
+  // Format 11 (0.12, après la pêche au format 10): la tenue (`outfit`) devient des vêtements portés et une garde-robe.
+  if (dataSchema < 11 && isRecord(data)) migrateToWardrobe(data, content.clothes);
+  // Format 12 (0.12, après la garde-robe au format 11): l'élevage. L'économie n'a pas de format (`fillEconomyFields`).
+  if (dataSchema < 12 && isRecord(data)) migrateToBreeding(data, content);
   return data;
+}
+
+/**
+ * Format 12 (0.12, élevage, conception section 4.6): chaque poule prend le bonheur de la migration
+ * (60, « Tranquille »: rien ne change pour qui ne fait que nourrir), l'élevage part vide (ni coq, ni
+ * chèvre, ni couvée), et les recettes sans condition parues depuis (fromage frais) sont connues.
+ */
+function migrateToBreeding(world: Record<string, unknown>, content: Content): void {
+  const start = content.settings.hens.care?.happiness.migration ?? 60;
+  if (Array.isArray(world.hens)) for (const h of world.hens) if (isRecord(h) && typeof h.happiness !== 'number') h.happiness = start;
+  if (!isRecord(world.breeding)) world.breeding = emptyBreeding();
+  if (Array.isArray(world.unlockedRecipes)) {
+    const known = new Set(world.unlockedRecipes);
+    for (const r of Object.values(content.recipes)) if (!r.requiresUnlock && !known.has(r.id)) world.unlockedRecipes.push(r.id);
+  }
+}
+
+/** L'élevage relu (format 12): assez de forme pour ne pas planter sur une sauvegarde abîmée. */
+function checkBreeding(data: Record<string, unknown>): void {
+  const b = data.breeding;
+  if (!isRecord(b) || !Array.isArray(b.chicks) || !Array.isArray(b.goats) || !Array.isArray(b.naming) || !Array.isArray(b.namesUsed) || typeof b.grainRations !== 'number' || !isRecord(b.grazed)) {
+    throw new SaveError('sauvegarde: élevage invalide');
+  }
+  for (const h of data.hens as unknown[]) if (!isRecord(h) || typeof h.happiness !== 'number') throw new SaveError('sauvegarde: poule sans bonheur');
+}
+
+/**
+ * Format 8 (taille de l'état): une lettre ne garde plus son texte rendu (environ 4 Ko sur une longue
+ * partie), mais la variante et les variables retrouvées dans ce texte, et le carnet affiche les mêmes
+ * mots; les dialogues finis perdent le `<id>` seul que redit `<id>@<joueur>`; une quête finie perd ses
+ * valeurs de départ. Rien de ce que les règles lisent ne change.
+ */
+function migrateToFormat8(world: Record<string, unknown>, content: Content): void {
+  if (Array.isArray(world.dialoguesDone) && world.dialoguesDone.every((d): d is string => typeof d === 'string')) world.dialoguesDone = compactDialoguesDone(world.dialoguesDone);
+  if (Array.isArray(world.quests)) for (const q of world.quests) if (isRecord(q) && q.status === 'done') q.baselines = {};
+  const list = world.letters;
+  if (!Array.isArray(list)) return;
+  const str = (v: unknown): v is string => typeof v === 'string';
+  world.letters = list.map((l: unknown) => {
+    if (!isRecord(l) || !str(l.id) || typeof l.day !== 'number' || !str(l.title) || !str(l.from) || !str(l.text) || !Array.isArray(l.read)) throw new SaveError('sauvegarde: lettre invalide');
+    const read = l.read.filter((id): id is CharacterId => id === 'p1' || id === 'p2');
+    // Textes d'avant la 0.12: l'ancienne monnaie renommée d'abord, pour retrouver le gabarit d'aujourd'hui.
+    return letterFromRendered(content, { id: l.id, day: l.day, title: renameOldCurrency(l.title), from: l.from, text: renameOldCurrency(l.text), read });
+  });
+}
+
+/**
+ * Format 10 (pêche 0.12): l'état de la pêche, vide, et le carnet des poissons rempli d'après les
+ * compteurs `caught:<poisson>` (nombre de prises; jour, coin et record exacts inconnus: le jour de la
+ * reprise, le gué, la plus petite taille de l'espèce).
+ */
+function migrateToFormat10(world: Record<string, unknown>, content: Content): void {
+  const fishing = emptyFishing();
+  const counters = isRecord(world.counters) ? world.counters : {};
+  const day = isRecord(world.clock) && typeof world.clock.day === 'number' ? world.clock.day : 1;
+  const duo = isRecord(counters.duo) ? counters.duo : {};
+  for (const [id, def] of Object.entries(content.items)) {
+    const count = duo[`caught:${id}`];
+    if (def.fish === null || typeof count !== 'number' || count <= 0) continue;
+    const p2 = isRecord(counters.p2) ? counters.p2[`caught:${id}`] : undefined;
+    const p1 = isRecord(counters.p1) ? counters.p1[`caught:${id}`] : undefined;
+    const by: CharacterId = typeof p2 === 'number' && p2 > (typeof p1 === 'number' ? p1 : 0) ? 'p2' : 'p1';
+    fishing.log[id] = { count, first: { day, by, zone: 'ford', together: false }, record: { cm: def.fish.lengthCm[0], by, day } };
+  }
+  world.fishing = fishing;
 }
 
 /** Assez de forme pour poser les défauts du tour 10 (le contrôle complet suit, `checkWorld`). */
@@ -590,11 +743,18 @@ function resume(
     // L'échelle se reprend à la main; la confidence du matin reste.
     c.holding = null;
     // Assis sur un banc (après le tour 5): absent des sauvegardes d'avant, comme debout.
-    c.seat = sanitizeSeat(map, content.settings.benches, c);
+    c.seat = sanitizeSeat(map, content.settings.benches, c, { furniture: world.furniture, items: content.items });
     if (c.seat === null && c.action.kind === 'sit') c.action = { kind: 'idle', since: world.tick, duration: 0, target: null };
     if (c.status === 'menu' || c.status === 'dialogue') c.status = 'active';
+    // Pêche 0.12: les ombres renaissent au chargement, la ligne se relance.
+    c.fishing = null;
+    // 0.12: un vêtement porté retiré de `vetements.json` depuis la sauvegarde.
+    settleWardrobe(content.clothes, c, c.id === 'p1' ? 0 : 1);
   }
+  world.fishing = withoutTransientFishing({ fishing: world.fishing } as WorldState).fishing;
   for (const v of world.villagers) v.talkingWith = [];
+  renameSavedCurrency(world);
+  fillEconomyFields(world);
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
   // Tour 10: `inside` se déduit de la position (pièces bâties comprises), quel que soit le format.
@@ -604,6 +764,11 @@ function resume(
   world.scene = null;
   const sim = wrapWorld(content, map, world);
   if (dataSchema < 7) migrateToTour10(sim);
+  // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
+  settleDecor(sim);
+  // Format 12 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
+  const grain = content.settings.hens.care?.grain.item;
+  if (dataSchema < 12 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état
@@ -621,6 +786,30 @@ function resume(
  * du jour 16 (`trees.catchUpDays`, comme un arbre abattu tôt); abattu après, il redevient une
  * souche d'aujourd'hui (son jour est perdu).
  */
+/**
+ * 0.12 (section 1): les textes déjà rendus que garde une sauvegarde (notifications, lettres
+ * migrées) disaient « 30 sous ». Même format: on renomme au chargement, sans toucher aux sommes.
+ */
+function renameSavedCurrency(world: WorldState): void {
+  for (const c of world.characters) {
+    for (const n of c.notifications) n.text = renameOldCurrency(n.text);
+  }
+  for (const letter of world.letters) {
+    if (letter.legacy !== undefined) letter.legacy = { ...letter.legacy, text: renameOldCurrency(letter.legacy.text), title: renameOldCurrency(letter.legacy.title) };
+  }
+}
+
+/** 0.12 (lot L-économie): champs absents des sauvegardes d'avant, même format (valeurs de départ). */
+function fillEconomyFields(world: WorldState): void {
+  type Added = 'grocerSupply' | 'ardoise' | 'goodsSeen' | 'market' | 'mail';
+  const w = world as Omit<WorldState, Added> & Partial<Pick<WorldState, Added>>;
+  w.grocerSupply ??= {};
+  w.ardoise ??= null;
+  w.goodsSeen ??= [];
+  w.market ??= null;
+  w.mail ??= null;
+}
+
 /** `countersToday` d'une sauvegarde qui n'a que `countersAtDawn`: la différence, clé par clé. */
 function fillCountersToday(world: WorldState): void {
   const raw = world as Partial<WorldState> & { countersAtDawn?: Record<string, Record<string, number> | undefined> };

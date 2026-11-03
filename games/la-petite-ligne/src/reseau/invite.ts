@@ -3,6 +3,7 @@
  * l'état de l'hôte, interpole les autres et prédit son propre déplacement pour
  * rester fluide, corrigé en douceur par les positions de l'hôte.
  */
+import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
 import type { GameMap } from '../etat/carte';
@@ -202,6 +203,8 @@ export function createGuest(
       correction.y = 0;
     }
     predicted = next;
+    // Plus aucun pas en attente: le cap de l'hôte fait foi (il tourne le personnage vers ce qu'il fait, sans marcher).
+    if (pendingFrames.every((f) => f.moveX === 0 && f.moveY === 0)) predictedFacing = auth.f;
   });
 
   const offEvents = channels.events.onMessage((message) => {
@@ -289,7 +292,7 @@ export function createGuest(
           if (pa === undefined || pb === undefined) continue;
           setMover(v, lerp(pa.x, pb.x), lerp(pa.y, pb.y), lerpAngle(pa.f, pb.f, t), lerp(pa.s, pb.s));
         }
-        for (const h of world.hens) {
+        for (const h of movingAnimals(world)) {
           const pa = a.snap.hens.find((x) => x.id === h.id);
           const pb = b.snap.hens.find((x) => x.id === h.id);
           if (pa === undefined || pb === undefined) continue;

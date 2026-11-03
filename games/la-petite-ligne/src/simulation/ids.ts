@@ -24,6 +24,9 @@ export const POINT = {
   workbench: 'sawmill_workbench',
   henFeeder: 'hen_feeder',
   chickenCoop: 'chicken_coop',
+  /** 0.12: la botte de paille de la litière, la porte de la chevrerie. */
+  strawBale: 'straw_bale',
+  goatShed: 'goat_shed',
   trainStop: 'train_stop',
   offstage: 'offstage',
 } as const;

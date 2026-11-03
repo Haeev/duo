@@ -28,7 +28,7 @@ ICI = Path(__file__).resolve().parent
 SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
 
 sys.path.insert(0, str(ICI))
-from valider_carte import calculer_infranchissable, emprise_monde, ouvertures  # noqa: E402
+from valider_carte import calculer_infranchissable, emprise_monde, ouvertures, poteaux_de_cloture  # noqa: E402
 
 LARGEUR, HAUTEUR = 100, 48
 # Le ru de la Côte (tour 10): deux colonnes d'eau vive qui bornent le bourg ancien et la rue Haute.
@@ -112,6 +112,13 @@ TYPES = {
     "barrel": {"categorie": "decor", "nom": "tonneau", "emprise": [1, 1], "hauteur": 1.0},
     "water_barrel": {"categorie": "equipement", "nom": "tonneau d'eau de la maisonnette", "emprise": [1, 1],
                      "hauteur": 1.1},
+    # 0.12 (élevage): la botte de paille de la litière, et les deux chantiers de la file `elevage`.
+    "straw_bale": {"categorie": "equipement", "nom": "botte de paille de la litière des poules", "emprise": [1, 1],
+                   "hauteur": 0.6},
+    "goat_shed": {"categorie": "batiment", "nom": "chevrerie (cabane de planches, toit à une pente vers la voie)",
+                  "emprise": [2, 2], "hauteur": 2.2},
+    "henhouse_extended": {"categorie": "batiment", "nom": "poulailler agrandi (pondoir en appentis), à la place du "
+                          "poulailler réparé", "emprise": [3, 3], "hauteur": 3.0},
     "mailbox": {"categorie": "decor", "nom": "boîte aux lettres", "emprise": [1, 1], "hauteur": 1.3,
                 "occultation": [0.4, 0.0, 1.3]},
     "workbench": {"categorie": "equipement", "nom": "établi de Basile sous son auvent", "emprise": [2, 2],
@@ -417,6 +424,9 @@ def construire_objets() -> None:
     objet("water_barrel", 12, 26, ident="water_barrel")
     objet("henhouse", 14, 28, ident="henhouse")
     objet("mailbox", 16, 26, ident="mailbox")
+    # 0.12: la paille de la litière, rangée au bord du chemin, à deux pas de la porte du poulailler (on la
+    # prend en passant, sans traverser le bourg jusqu'à la remise de la draisine).
+    objet("straw_bale", 12, 28, ident="straw_bale")
     for x in range(2, 16):
         objet("fence", x, 36, rotation=0)
     for y in range(32, 36):
@@ -624,6 +634,20 @@ def construire_objets_est() -> None:
         objet(t, x, 0 if bruit(x, 1, 8) < 50 else 1)
     for x in range(64, LARGEUR, 3):
         objet("bush", x, 47)
+    # Retours du 2026-11-02 (S08): le coin sud-est du jardin du garde-barrière. Les lignes des deux
+    # clôtures passent au milieu des cases (y 36,5 et x 16,5): elles ne se rejoignent jamais en un angle.
+    # Chacune finit sur son poteau (16 ; 36,5) et (16,5 ; 36), et un buisson ferme l'angle entre les
+    # deux, au lieu d'un faux passage qui ne menait nulle part. Posé ici, en dernier, pour ne décaler
+    # aucun identifiant `bush_NN` cité ailleurs (`bush_106`, buisson rond).
+    objet("bush", 16, 36)
+
+
+def accroches_poteaux_finaux() -> list[dict]:
+    """Un poteau (`fence_post`, accroche sans emprise) au bout de chaque file de clôture qui n'en a pas."""
+    _, sans = poteaux_de_cloture(OBJETS)
+    return [{"id": f"fence_end_post_{n:02d}", "modele": "fence_post", "sur": seg, "x": x, "y": y, "z": 0.0,
+             "role": f"poteau qui porte le bout des lisses de `{seg}` (une barrière finit sur un poteau)"}
+            for n, (seg, (x, y)) in enumerate(sorted(sans, key=lambda e: e[0]), start=1)]
 
 
 # ---------------------------------------------------------------------------
@@ -678,6 +702,20 @@ POINTS = [
     p("chicken_coop", 15.5, 31.5, "devant le poulailler: chantier, poules", objet="henhouse", rayon=2.0,
       important=True),
     p("hen_feeder", 13.5, 31.5, "la mangeoire des poules", important=True),
+    # 0.12 (élevage, conception section 4): paille, chevrerie et pâtures de la chèvre. Les cinq places sont
+    # à 3,5 m au moins de toute case de la voie (ballast et passage à niveau): avec une corde de 2,5 m, la
+    # chèvre reste à plus d'un mètre de la voie (CA-L5, `tests/elevage.test.ts`).
+    p("straw_bale", 12.5, 27.5, "la botte de paille: prendre une brassée pour la litière du poulailler",
+      objet="straw_bale", portee=1.5),
+    # La porte de l'artiste est sur la case de gauche vue de dehors (`door_cell` 0): la case nord quand la
+    # porte regarde l'ouest; le baquet est à sa droite (case sud), à portée du même point.
+    p("goat_shed", 14.4, 21.6, "devant la porte de la chevrerie (chantier `goat_shed`), tournée vers la maison: "
+      "le baquet, le retour du soir", rotation=1),
+    p("goat_graze_01", 15.5, 18.8, "pâture du talus, au nord de la chevrerie, entre le sentier et la route"),
+    p("goat_graze_02", 15.5, 24.8, "pâture entre la chevrerie et la boîte aux lettres"),
+    p("goat_graze_03", 4.5, 31.5, "pâture du pré, à l'ouest du potager"),
+    p("goat_graze_04", 8.5, 33.5, "pâture du pré, au sud du potager"),
+    p("goat_graze_05", 11.5, 32.5, "pâture du pré, près des poules"),
     # La place
     p("village_square", 38.5, 30.5, "la place, près du puits (Jeanne le soir)", rayon=3.0, important=True),
     p("well", 40.0, 28.0, "le puits: remplir l'arrosoir", objet="well", portee=1.5, important=True),
@@ -844,14 +882,18 @@ POINTS += [
       interieur=True),
     p("salon_counter", 71.0, 26.5, "Solange derrière le comptoir de mercerie (rouleaux de tissu au mur nord)",
       objet="salon_shop", rotation=0, interieur=True),
+    # 0.12: la boutique de vêtements se tient au même comptoir; le client se place devant, face à
+    # Solange (une case au sud du comptoir, qui occupe y 27), loin du fauteuil et du banc d'attente.
+    p("salon_clothes", 71.0, 28.5, "la place du client devant le comptoir de mercerie, face à Solange (boutique de "
+      "vêtements)", objet="salon_shop", rotation=0, portee=1.2, interieur=True),
     p("salon_chair", 69.5, 29.5, "le fauteuil de coiffure, face au miroir du mur ouest (un joueur à la fois)",
-      objet="salon_shop", portee=1.5, interieur=True),
+      objet="salon_shop", portee=1.5, rotation=3, interieur=True),
     p("salon_stylist", 70.5, 29.5, "Solange derrière le fauteuil quand elle coupe", objet="salon_shop",
       cap_degres=270, interieur=True),
     p("salon_bench", 72.0, 30.5, "le banc d'attente à deux places, tourné vers le comptoir et le fauteuil",
       objet="salon_shop", portee=1.5, interieur=True),
     p("salon_window", 73.5, 26.5, "Solange coud derrière la vitrine (lundi), vue de la rue Haute",
-      objet="salon_shop", interieur=True),
+      objet="salon_shop", rotation=2, interieur=True),
     # Dans l'épicerie-pension (boutique de 6 x 6, x 24 à 29, y 26 à 31; porte en 30, 30). Retouche du
     # 2026-11-02: les places de l'artiste (`interior_spots` de `ferrand_shop`, repère glTF x, z), tournées
     # avec l'objet (rotation 1, centre 27 ; 28): x = 27 + z, y = 28 - x (`glb_vers_carte`).
@@ -878,6 +920,20 @@ POINTS += [
       "l'emprise de l'appentis (x 2 à 4, y 21 à 26) et hors du chemin"),
     p("room_bedroom_site", 12.5, 17.5, "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son "
       "pignon et le sentier du jardin (la panne attend à `beam_pickup`)"),
+]
+
+# 0.12 (lot L-quêtes, conception `v0-12-conception.md`, section 5): les points de la trame « Le marché d'Aubrune ».
+POINTS += [
+    # L'étal du dimanche: sur les pavés de la place, côté soleil du matin, dos à l'épicerie (façade en x 31, à 3 m),
+    # hors des deux passages du quai (x 30-31 et 43-44); planche de 2 m nord-sud, vendeurs à l'ouest, clients à l'est.
+    p("market_stall", 34.0, 26.5, "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)",
+      portee=1.5),
+    # Les fanions: une guirlande tendue entre les lampadaires nord et est de la place (13 m, deux appuis réels),
+    # au-dessus de l'étal; une échelle au pied de chaque lampadaire, côté place. Plus de 8 m entre les deux
+    # places: un seul joueur ne peut pas tenir les deux (`ranges.stayAt` 4 m).
+    p("garland_west", 34.5, 25.5, "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"),
+    p("garland_east", 47.5, 25.5, "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"),
+    # La chevrerie (`goat_shed`): son point est posé avec le lot L-élevage, devant sa porte ouest (14,4 ; 22).
 ]
 
 ZONES = [
@@ -986,6 +1042,16 @@ CHANTIERS = [
              "matin, chemin du quai, passage des trains"},
     {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": None, "cases": [],
      "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
+    # 0.12, file `elevage` (conception section 4.3).
+    {"id": "goat_shed", "type": "goat_shed", "x": 16.0, "y": 22.0, "rotation": 3,
+     "rect": {"x": 15, "y": 21, "w": 2, "h": 2}, "cases": [[15, 21], [16, 21], [15, 22], [16, 22]],
+     "role": "chevrerie de 2 x 2 m à l'est de la maisonnette, porte à l'ouest tournée vers la maison (on la voit de "
+             "la fenêtre est), sur l'herbe entre le sentier du jardin (x 13) et la route du gué (x 17 à 19); le toit "
+             "descend vers l'arrière (est, côté route): la pluie tombe derrière et non devant la porte"},
+    {"id": "coop_extension", "type": "henhouse_extended", "x": 15.5, "y": 29.5, "rotation": 0,
+     "rect": {"x": 14, "y": 28, "w": 3, "h": 3}, "cases": [],
+     "role": "poulailler agrandi (`henhouse_extended` de l'artiste, pondoir en appentis): même origine et même "
+             "emprise que le poulailler, qu'il remplace une fois bâti; quatre places de plus, rien ne bouge autour"},
 ]
 
 # Meubles déjà posés dans la maisonnette (objets.json, startingInventory.houseFurniture).
@@ -999,6 +1065,28 @@ MOBILIER_DEPART = [
 
 def rect(x: int, y: int, w: int, h: int) -> dict:
     return {"x": x, "y": y, "w": w, "h": h}
+
+
+# Pêche 0.12 (docs/jeux/jeu-1/peche-0-12-conception.md, section 2): sept coins de pêche. Chaque case d'eau
+# appartient à un seul coin (contrôle de valider_carte.py); le coin d'une prise est celui de la case où
+# tombe le bouchon. Les rectangles couvrent aussi des cases qui ne sont pas de l'eau (gravier du gué,
+# berges): seules les cases `water` comptent.
+COINS_PECHE = [
+    {"id": "upstream", "a": "à l'amont", "nom": "l'amont", "rects": [rect(0, 38, 11, 5)],
+     "pourquoi": "eau lente devant le bourg ancien, le coin le plus proche du jardin"},
+    {"id": "ford", "a": "au gué", "nom": "le gué", "rects": [rect(11, 38, 13, 5)],
+     "pourquoi": "courant sur galets, peu profond: les poissons de courant et de fond"},
+    {"id": "sands", "a": "aux sables", "nom": "les sables", "rects": [rect(24, 38, 14, 5)],
+     "pourquoi": "eau lente et tiède entre les deux bancs de sable"},
+    {"id": "pontoon", "a": "au ponton", "nom": "le ponton", "rects": [rect(38, 38, 20, 5)],
+     "pourquoi": "eau profonde et calme, les poissons guettent à l'abri des pieux"},
+    {"id": "confluence", "a": "au confluent", "nom": "le confluent", "rects": [rect(58, 38, 13, 5), rect(63, 36, 2, 2)],
+     "pourquoi": "l'eau froide du ru se mêle à l'Aubrune: les poissons qui remontent y attendent"},
+    {"id": "ru", "a": "au ru", "nom": "le ru", "rects": [rect(63, 0, 2, 36)],
+     "pourquoi": "eau vive et froide, 1 à 1,5 m de large: la truite et les petits poissons d'eau vive"},
+    {"id": "downstream", "a": "à l'aval", "nom": "l'aval", "rects": [rect(71, 38, 29, 5)],
+     "pourquoi": "rivière large et bancs de sable, devant la promenade de la rue Haute"},
+]
 
 
 # Tour 10: bâtiments visitables (ADR 0016, section 1). Une entrée par bâtiment: l'objet qui le porte, ses
@@ -1339,7 +1427,8 @@ def main() -> int:
         "interieurs": INTERIEURS,
         "ru": RU,
         "ouvrages": OUVRAGES,
-        "accroches": ACCROCHES,
+        "peche": {"coins": COINS_PECHE},
+        "accroches": ACCROCHES + accroches_poteaux_finaux(),
         "sieges": SIEGES,
         "chantiers": CHANTIERS,
         "habitants": HABITANTS,

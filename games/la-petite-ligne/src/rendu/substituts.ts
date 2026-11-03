@@ -35,6 +35,14 @@ const STRIPE_COUNT = 5;
 // ---------------------------------------------------------------------------
 // Potager et cultures
 
+/** Petit vase de fleurs posé sur un meuble: faïence ou terre cuite, quelques fleurs. */
+function smallVase(b: ShapeBuilder, glaze: PaletteCell): void {
+  b.cylinder(0.06, 0.05, 0.14, [0, 0, 0], glaze, { base: true, segments: 8 });
+  b.ball(0.035, [0.02, 0.2, 0.01], 'flower_red');
+  b.ball(0.035, [-0.02, 0.19, -0.02], 'flower_blue');
+  b.ball(0.03, [0, 0.22, 0.02], 'flower_white');
+}
+
 function mound(b: ShapeBuilder, soil: PaletteCell, ridge: PaletteCell): void {
   b.box([0.92, 0.05, 0.92], [0, 0, 0], soil, { base: true });
   for (const z of [-0.28, 0, 0.28]) {
@@ -249,6 +257,24 @@ const ITEMS: Record<string, Builder> = {
     b.cylinder(0.01, 0.022, 1.7, [0, 0, 0], 'straw', { base: true, segments: 4 });
     for (const y of [0.4, 0.8, 1.2]) b.cylinder(0.026, 0.026, 0.03, [0, y, 0], 'wood_dark', { base: true, segments: 4 });
   },
+  grain_sack: (b) => {
+    b.box([0.34, 0.42, 0.24], [0, 0, 0], 'burlap', { base: true });
+    b.box([0.24, 0.06, 0.16], [0, 0.42, 0], 'burlap_dark', { base: true });
+  },
+  straw_armful: (b) => b.blob(0.18, [0, 0.12, 0], 'straw', { scale: [1.4, 0.6, 1] }),
+  water_pail: (b) => {
+    b.cylinder(0.13, 0.11, 0.26, [0, 0, 0], 'wood', { base: true, segments: 10 });
+    b.cylinder(0.12, 0.12, 0.01, [0, 0.24, 0], 'water', { base: true, segments: 10 });
+  },
+  milk_can: (b) => {
+    b.cylinder(0.12, 0.12, 0.34, [0, 0, 0], 'tin', { base: true, segments: 10 });
+    b.cylinder(0.06, 0.08, 0.08, [0, 0.34, 0], 'tin', { base: true, segments: 8 });
+  },
+  fresh_cheese: (b) => b.cylinder(0.07, 0.07, 0.05, [0, 0, 0], 'fabric_cream', { base: true, segments: 10 }),
+  goat_stake: (b) => {
+    b.cylinder(0.03, 0.025, 0.5, [0, 0, 0], 'wood_old', { base: true, segments: 6 });
+    b.box([0.08, 0.04, 0.08], [0, 0.4, 0], 'rope', { base: true });
+  },
   hen_crate: (b) => {
     b.box([0.6, 0.45, 0.45], [0, 0, 0], 'wood_new', { base: true });
     b.box([0.5, 0.3, 0.02], [0, 0.08, 0.23], 'straw', { base: true });
@@ -339,6 +365,26 @@ const ITEMS: Record<string, Builder> = {
   fish_gudgeon: (b) => b.ball(0.08, [0, 0.04, 0], 'rock_light', { scale: [1.6, 0.5, 0.6] }),
   fish_chub: (b) => b.ball(0.1, [0, 0.05, 0], 'stone_dark', { scale: [1.7, 0.55, 0.65] }),
   fish_trout: (b) => b.ball(0.11, [0, 0.05, 0], 'rock', { scale: [1.8, 0.55, 0.6] }),
+  // Pêche 0.12: substituts des 19 poissons nouveaux, à la taille de leur ombre, en attendant les modèles.
+  fish_minnow: (b) => b.ball(0.05, [0, 0.025, 0], 'rock_light', { scale: [1.6, 0.5, 0.6] }),
+  fish_stone_loach: (b) => b.ball(0.06, [0, 0.03, 0], 'stone_dark', { scale: [1.9, 0.45, 0.55] }),
+  fish_bleak: (b) => b.ball(0.07, [0, 0.035, 0], 'rock_light', { scale: [1.7, 0.45, 0.5] }),
+  fish_roach: (b) => b.ball(0.09, [0, 0.045, 0], 'rock', { scale: [1.6, 0.6, 0.6] }),
+  fish_perch: (b) => b.ball(0.1, [0, 0.05, 0], 'stone_dark', { scale: [1.6, 0.65, 0.6] }),
+  fish_dace: (b) => b.ball(0.09, [0, 0.045, 0], 'rock_light', { scale: [1.8, 0.5, 0.55] }),
+  fish_bullhead: (b) => b.ball(0.06, [0, 0.03, 0], 'stone_dark', { scale: [1.5, 0.5, 0.7] }),
+  fish_tench: (b) => b.ball(0.11, [0, 0.055, 0], 'stone_dark', { scale: [1.7, 0.6, 0.65] }),
+  fish_barbel: (b) => b.ball(0.16, [0, 0.07, 0], 'rock', { scale: [1.9, 0.5, 0.6] }),
+  fish_pike: (b) => b.ball(0.2, [0, 0.07, 0], 'stone_dark', { scale: [2.2, 0.45, 0.5] }),
+  fish_grayling: (b) => b.ball(0.12, [0, 0.06, 0], 'rock', { scale: [1.8, 0.6, 0.55] }),
+  fish_brook_lamprey: (b) => b.ball(0.05, [0, 0.025, 0], 'stone_dark', { scale: [2.6, 0.4, 0.4] }),
+  fish_bitterling: (b) => b.ball(0.035, [0, 0.02, 0], 'rock_light', { scale: [1.5, 0.7, 0.5] }),
+  fish_shad: (b) => b.ball(0.14, [0, 0.07, 0], 'rock_light', { scale: [1.8, 0.6, 0.55] }),
+  fish_mirror_carp: (b) => b.ball(0.2, [0, 0.1, 0], 'brass', { scale: [1.6, 0.7, 0.7] }),
+  fish_salmon: (b) => b.ball(0.25, [0, 0.1, 0], 'rock_light', { scale: [1.9, 0.55, 0.55] }),
+  fish_burbot: (b) => b.ball(0.15, [0, 0.06, 0], 'stone_dark', { scale: [2.1, 0.45, 0.5] }),
+  fish_golden_trout: (b) => b.ball(0.13, [0, 0.06, 0], 'brass', { scale: [1.8, 0.55, 0.6] }),
+  fish_moon_pike: (b) => b.ball(0.35, [0, 0.12, 0], 'paper', { scale: [2.2, 0.45, 0.5] }),
   jay_feather: (b) => b.box([0.03, 0.01, 0.26], [0, 0, 0], 'paint_blue', { base: true }),
 };
 
@@ -351,6 +397,131 @@ function seedPacket(crop: PaletteCell): Builder {
 ITEMS.seed_packet_radish = seedPacket('radish');
 ITEMS.seed_packet_lettuce = seedPacket('lettuce');
 ITEMS.seed_packet_carrot = seedPacket('carrot');
+
+// 0.12, lot L-économie (section 2.5 et 2.4): ingrédients, conserves, produits de la chèvre, artisanat,
+// plis de Lucie. Formes simples en attendant les modèles de l'artiste.
+Object.assign(ITEMS, {
+  sugar_packet: (b) => b.box([0.1, 0.14, 0.06], [0, 0, 0], 'paper', { base: true }),
+  jar: (b) => {
+    b.cylinder(0.05, 0.05, 0.1, [0, 0, 0], 'glass', { base: true, segments: 8 });
+    b.cylinder(0.052, 0.052, 0.015, [0, 0.1, 0], 'tin', { base: true, segments: 8 });
+  },
+  blackberry_jam: (b) => {
+    b.cylinder(0.05, 0.05, 0.1, [0, 0, 0], 'glass', { base: true, segments: 8 });
+    b.cylinder(0.045, 0.045, 0.08, [0, 0.005, 0], 'blackberry', { base: true, segments: 8 });
+    b.cylinder(0.055, 0.055, 0.02, [0, 0.1, 0], 'fabric_blue', { base: true, segments: 8 });
+  },
+  hazelnuts_roasted: (b) => {
+    b.cylinder(0.02, 0.06, 0.14, [0, 0, 0], 'paper_dark', { base: true, segments: 6 });
+    b.cylinder(0.055, 0.055, 0.03, [0, 0.13, 0], 'bark', { base: true, segments: 6 });
+  },
+  dish_chanterelle: (b) => {
+    b.cylinder(0.12, 0.1, 0.03, [0, 0, 0], 'iron', { base: true, segments: 10 });
+    b.cylinder(0.1, 0.1, 0.02, [0, 0.025, 0], 'paint_yellow', { base: true, segments: 10 });
+  },
+  milk_can: (b) => {
+    b.cylinder(0.09, 0.1, 0.3, [0, 0, 0], 'tin', { base: true, segments: 10 });
+    b.cylinder(0.04, 0.06, 0.08, [0, 0.3, 0], 'tin', { base: true, segments: 8 });
+  },
+  fresh_cheese: (b) => b.cylinder(0.06, 0.06, 0.05, [0, 0, 0], 'fabric_cream', { base: true, segments: 10 }),
+  nest_box: (b) => {
+    b.box([0.2, 0.26, 0.18], [0, 0, 0], 'wood_new', { base: true });
+    b.box([0.24, 0.03, 0.22], [0, 0.26, 0], 'wood', { base: true });
+    b.cylinder(0.03, 0.03, 0.01, [0, 0.15, 0.095], 'black', { base: true, segments: 8 });
+  },
+  parcel_small: (b) => {
+    b.box([0.3, 0.2, 0.22], [0, 0, 0], 'paper_dark', { base: true });
+    b.box([0.31, 0.02, 0.03], [0, 0.2, 0], 'burlap', { base: true });
+  },
+  market_scale: (b) => {
+    b.box([0.3, 0.04, 0.16], [0, 0, 0], 'iron', { base: true });
+    b.cylinder(0.012, 0.012, 0.22, [0, 0.04, 0], 'brass', { base: true, segments: 6 });
+    for (const x of [-0.12, 0.12]) b.cylinder(0.07, 0.06, 0.02, [x, 0.2, 0], 'brass', { base: true, segments: 10 });
+  },
+} satisfies Record<string, Builder>);
+
+// ---------------------------------------------------------------------------
+// Poissons de la 0.12 (en attendant les modèles de l'artiste): couchés sur le flanc au sol, la
+// tête vers +X, à la longueur moyenne de l'espèce (`lengthCm` de la conception, section 3.1).
+
+interface FishLook {
+  /** Longueur (m), demi-hauteur et demi-épaisseur du corps (part de la longueur). */
+  length: number;
+  height: number;
+  width: number;
+  back: PaletteCell;
+  flank: PaletteCell;
+  belly: PaletteCell;
+  fins: PaletteCell;
+  /** Nageoire du dos: hauteur (part de la longueur) et place (part, 0 au milieu, négatif vers la queue). */
+  dorsal?: { height: number; at: number; length?: number };
+  /** Barbillons (goujon, barbeau, loche, lote) et taches, rayures ou grandes écailles sur le flanc. */
+  barbels?: number;
+  marks?: { cell: PaletteCell; count: number; kind: 'spots' | 'bands' | 'scales' };
+  /** Tête plus grosse que le corps (chabot), ou sans nageoire de queue (lamproie). */
+  bigHead?: boolean;
+  noTail?: boolean;
+}
+
+function fishSubstitute(look: FishLook): Builder {
+  return (b) => {
+    const L = look.length;
+    const hh = L * look.height;
+    const wh = L * look.width;
+    const paint: Paint = { top: look.back, side: look.flank, bottom: look.belly };
+    b.ball(1, [0, hh, 0], paint, { scale: [L * 0.4, hh, wh], detail: 1 });
+    if (look.bigHead === true) b.ball(1, [L * 0.28, hh, 0], paint, { scale: [L * 0.18, hh * 1.1, wh * 1.5] });
+    if (look.noTail !== true) {
+      b.box([L * 0.16, hh * 1.7, 0.004], [-L * 0.44, hh, 0], look.fins);
+    }
+    const dorsal = look.dorsal ?? { height: 0.08, at: 0 };
+    b.box([L * (dorsal.length ?? 0.16), L * dorsal.height, 0.004], [L * dorsal.at, hh * 1.9, 0], look.fins, { base: true });
+    for (let i = 0; i < (look.barbels ?? 0); i += 1) {
+      const side = i % 2 === 0 ? 1 : -1;
+      b.box([L * 0.08, 0.003, 0.003], [L * 0.42, hh * 0.6, side * wh * 0.5], look.fins, { rotation: [0, side * 25, 0] });
+    }
+    const marks = look.marks;
+    if (marks !== undefined) {
+      for (let i = 0; i < marks.count; i += 1) {
+        const x = L * (0.22 - (0.46 * (i + 0.5)) / marks.count);
+        const y = hh * (marks.kind === 'spots' ? (i % 2 === 0 ? 1.3 : 0.8) : 1);
+        for (const z of [wh * 0.98, -wh * 0.98]) {
+          if (marks.kind === 'bands') {
+            b.box([L * 0.025, hh * 1.4, 0.004], [x, y, z], marks.cell);
+          } else {
+            const s = marks.kind === 'scales' ? L * 0.07 : L * 0.025;
+            b.box([s, s, 0.004], [x, y, z], marks.cell);
+          }
+        }
+      }
+    }
+  };
+}
+
+const FISH_LOOKS: Record<string, FishLook> = {
+  fish_minnow: { length: 0.075, height: 0.1, width: 0.07, back: 'fish_olive', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_olive' },
+  fish_stone_loach: { length: 0.09, height: 0.08, width: 0.07, back: 'bark', flank: 'rock', belly: 'fish_belly', fins: 'bark', barbels: 4, marks: { cell: 'bark_dark', count: 4, kind: 'spots' } },
+  fish_bleak: { length: 0.14, height: 0.09, width: 0.05, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_silver' },
+  fish_roach: { length: 0.21, height: 0.14, width: 0.06, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'paint_red' },
+  fish_perch: { length: 0.25, height: 0.15, width: 0.07, back: 'fish_olive', flank: 'moss', belly: 'fish_belly', fins: 'paint_red', dorsal: { height: 0.12, at: 0.05, length: 0.3 }, marks: { cell: 'stone_dark', count: 5, kind: 'bands' } },
+  fish_dace: { length: 0.21, height: 0.11, width: 0.05, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_silver' },
+  fish_bullhead: { length: 0.11, height: 0.1, width: 0.1, back: 'bark', flank: 'rock_dark', belly: 'fish_belly', fins: 'bark', bigHead: true, dorsal: { height: 0.08, at: -0.05, length: 0.4 } },
+  fish_tench: { length: 0.32, height: 0.15, width: 0.08, back: 'leaf_fir', flank: 'fish_olive', belly: 'brass', fins: 'leaf_fir' },
+  fish_barbel: { length: 0.52, height: 0.11, width: 0.07, back: 'fish_olive', flank: 'brass', belly: 'fish_belly', fins: 'rust', barbels: 4 },
+  fish_pike: { length: 0.72, height: 0.08, width: 0.06, back: 'leaf_fir', flank: 'fish_olive', belly: 'fish_belly', fins: 'rust', dorsal: { height: 0.06, at: -0.3, length: 0.1 }, marks: { cell: 'grass_light', count: 7, kind: 'spots' } },
+  fish_grayling: { length: 0.35, height: 0.1, width: 0.06, back: 'fish_back', flank: 'heron_grey', belly: 'fish_belly', fins: 'flower_violet', dorsal: { height: 0.14, at: 0.02, length: 0.34 } },
+  fish_brook_lamprey: { length: 0.13, height: 0.05, width: 0.045, back: 'bark', flank: 'rock_light', belly: 'fish_belly', fins: 'rock_light', noTail: true, dorsal: { height: 0.03, at: -0.25, length: 0.2 } },
+  fish_bitterling: { length: 0.065, height: 0.16, width: 0.06, back: 'fish_olive', flank: 'fish_silver', belly: 'flower_pink', fins: 'paint_red', marks: { cell: 'kingfisher_teal', count: 3, kind: 'bands' } },
+  fish_shad: { length: 0.45, height: 0.13, width: 0.06, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_back', marks: { cell: 'black', count: 1, kind: 'spots' } },
+  fish_mirror_carp: { length: 0.7, height: 0.18, width: 0.09, back: 'bark', flank: 'brass', belly: 'fish_belly', fins: 'bark', dorsal: { height: 0.07, at: 0, length: 0.36 }, marks: { cell: 'copper_light', count: 4, kind: 'scales' } },
+  fish_salmon: { length: 0.85, height: 0.12, width: 0.07, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_back', marks: { cell: 'black', count: 6, kind: 'spots' } },
+  fish_burbot: { length: 0.47, height: 0.08, width: 0.07, back: 'bark', flank: 'fish_olive', belly: 'fish_belly', fins: 'bark', barbels: 1, dorsal: { height: 0.04, at: -0.15, length: 0.5 }, marks: { cell: 'bark_dark', count: 6, kind: 'spots' } },
+  fish_golden_trout: { length: 0.45, height: 0.12, width: 0.06, back: 'brass', flank: 'paint_yellow', belly: 'fish_belly', fins: 'tit_yellow', marks: { cell: 'trout_spot', count: 6, kind: 'spots' } },
+  fish_moon_pike: { length: 1.17, height: 0.08, width: 0.06, back: 'heron_grey', flank: 'feather_white', belly: 'feather_white', fins: 'heron_grey', dorsal: { height: 0.06, at: -0.3, length: 0.1 }, marks: { cell: 'stone_light', count: 7, kind: 'spots' } },
+};
+for (const [name, look] of Object.entries(FISH_LOOKS)) {
+  ITEMS[name] = fishSubstitute(look);
+}
 
 // ---------------------------------------------------------------------------
 // Meubles (empreinte en cases, avant +Z)
@@ -430,6 +601,9 @@ const FURNITURE: Record<string, Builder> = {
     b.ball(0.05, [0.06, 0.42, 0.04], 'flower_red');
     b.ball(0.05, [-0.06, 0.4, -0.03], 'flower_pink');
   },
+  small_vase: (b) => { smallVase(b, 'white_paint'); },
+  small_vase_blue: (b) => { smallVase(b, 'ceramic_blue'); },
+  small_vase_terracotta: (b) => { smallVase(b, 'brick'); },
   oil_lamp: (b) => {
     b.cylinder(0.1, 0.12, 0.1, [0, 0, 0], 'brass', { base: true, segments: 8 });
     b.cylinder(0.07, 0.07, 0.22, [0, 0.1, 0], 'glass_lamp', { base: true, segments: 8 });
@@ -514,11 +688,59 @@ function hen(feather: PaletteCell): Builder {
   };
 }
 
+/** Poule coucou: plumage gris rayé de blanc (0.12). */
+function cuckooHen(b: ShapeBuilder, w: number, d: number): void {
+  hen('heron_grey')(b, w, d);
+  for (const z of [-0.12, 0, 0.12]) b.box([0.3, 0.025, 0.035], [0, 0.36, z], 'feather_white', {});
+}
+
+/**
+ * Élevage de la 0.12 (conception section 4, lot L-rendu-modèles): substituts en attendant les modèles
+ * de l'artiste, mêmes noms de nœuds (`hen_rooster`, `hen_chick`, `goat`, `goat_stake`, `goat_shed`;
+ * `straw_bale` n'a pas encore de modèle). Le coq est plus grand que la poule (crête, queue en faucille), la
+ * poussine fait 0,12 m, la chèvre 0,75 m au garrot avec son collier et sa clochette.
+ */
+function rooster(b: ShapeBuilder): void {
+  b.ball(0.2, [0, 0.3, 0], 'owl_buff', { scale: [1, 0.9, 1.25] });
+  b.ball(0.1, [0, 0.52, 0.17], 'owl_buff');
+  b.box([0.03, 0.12, 0.12], [0, 0.64, 0.17], 'comb_red', {});
+  b.box([0.03, 0.06, 0.04], [0, 0.44, 0.26], 'comb_red', {});
+  b.cone(0.03, 0.07, [0, 0.52, 0.28], 'beak', { rotation: [90, 0, 0], segments: 4 });
+  // Queue en faucille: plumes vert sombre qui retombent derrière.
+  b.box([0.05, 0.3, 0.06], [0, 0.42, -0.26], 'loco_green', { rotation: [-25, 0, 0] });
+  b.box([0.05, 0.26, 0.06], [0, 0.4, -0.32], 'black', { rotation: [-50, 0, 0] });
+  b.box([0.02, 0.15, 0.02], [0.07, 0, 0], 'beak', { base: true });
+  b.box([0.02, 0.15, 0.02], [-0.07, 0, 0], 'beak', { base: true });
+}
+
+function goat(b: ShapeBuilder): void {
+  b.ball(0.26, [0, 0.56, 0], 'owl_buff', { scale: [0.72, 0.78, 1.45] });
+  for (const x of [-0.11, 0.11]) {
+    for (const z of [-0.24, 0.26]) b.box([0.06, 0.44, 0.06], [x, 0, z], 'bark_dark', { base: true });
+  }
+  b.box([0.13, 0.3, 0.13], [0, 0.66, 0.36], 'owl_buff', { rotation: [-35, 0, 0] });
+  b.box([0.15, 0.16, 0.27], [0, 0.8, 0.5], 'owl_buff', { rotation: [20, 0, 0] });
+  b.box([0.1, 0.06, 0.1], [0, 0.73, 0.62], 'paper_dark', { rotation: [20, 0, 0] });
+  for (const x of [-0.05, 0.05]) b.cone(0.022, 0.16, [x, 0.92, 0.42], 'bark', { rotation: [-35, 0, 0], segments: 5 });
+  for (const x of [-0.1, 0.1]) b.box([0.12, 0.03, 0.05], [x, 0.85, 0.44], 'owl_buff', { rotation: [0, 0, x > 0 ? -25 : 25] });
+  b.box([0.04, 0.1, 0.03], [0, 0.66, -0.37], 'owl_buff', { rotation: [30, 0, 0] });
+  // Collier de cuir et clochette, sous la gorge (`socket_goat_neck`).
+  b.box([0.16, 0.035, 0.16], [0, 0.66, 0.4], 'leather', { rotation: [-35, 0, 0] });
+  b.ball(0.03, [0, 0.6, 0.47], 'brass');
+}
+
 const ANIMALS: Record<string, Builder> = {
   hen_white: hen('chicken_white'),
   hen_red: hen('chicken_russet'),
   hen_black: hen('chicken_black'),
+  hen_golden: hen('owl_buff'),
+  hen_ash: hen('goose_grey'),
+  hen_cuckoo: cuckooHen,
   hen: hen('chicken_russet'),
+  // Le coq et le poussin sont des robes du squelette des poules (le poussin réduit à 0,4 par le rendu).
+  hen_rooster: rooster,
+  hen_chick: hen('paint_yellow'),
+  goat,
 };
 
 // ---------------------------------------------------------------------------
@@ -750,6 +972,25 @@ const DECOR: Record<string, Builder> = {
   grocery: cottage('plaster_ochre', 'tile', 'paint_red'),
   firmin_house: cottage('plaster_rose', 'tile_dark', 'paint_blue'),
   sawmill: cottage('wood_old', 'lauze_dark', 'wood_dark'),
+  // Chevrerie (0.12): 2 x 2 m, porte à mi-hauteur à l'avant (+Z, vers la maison une fois posée), toit à
+  // une pente qui descend vers -X (la voie, au nord, une fois tournée d'un quart vers l'ouest), baquet
+  // sous l'avancée du toit. Cotes fixes: l'emprise de la carte est de 2 x 2.
+  goat_shed: (b) => {
+    b.box([1.9, 1.75, 1.55], [0, 0, -0.18], 'wood_old', { base: true });
+    // Pignon en pente sous le toit (même inclinaison), le bas noyé dans les murs.
+    b.box([1.9, 0.5, 1.55], [0, 1.7, -0.18], 'wood_old', { rotation: [0, 0, 12] });
+    b.box([2.1, 0.08, 2.0], [0, 1.98, 0], 'wood_old_dark', { rotation: [0, 0, 12] });
+    b.box([0.08, 1.76, 0.08], [-0.88, 0, 0.88], 'wood_dark', { base: true });
+    b.box([0.08, 2.12, 0.08], [0.88, 0, 0.88], 'wood_dark', { base: true });
+    b.box([0.7, 0.75, 0.05], [0, 0, 0.6], 'wood_dark', { base: true });
+    b.box([0.7, 0.75, 0.05], [0, 0.8, 0.6], 'wood', { base: true });
+    b.box([0.55, 0.22, 0.28], [-0.6, 0, 0.75], 'wood', { base: true });
+    b.box([0.47, 0.02, 0.2], [-0.6, 0.2, 0.75], 'water', { base: true });
+  },
+  straw_bale: (b) => {
+    b.box([0.9, 0.45, 0.5], [0, 0, 0], 'straw', { base: true });
+    for (const x of [-0.25, 0.25]) b.box([0.03, 0.46, 0.51], [x, 0, 0], 'straw_dark', { base: true });
+  },
   shed: (b, w, d) => {
     b.box([w * 0.92, 2.4, d * 0.85], [0, 0, 0], 'wood_old_dark', { base: true });
     b.box([w * 0.98, 0.15, d * 0.95], [0, 2.4, 0], 'lauze_dark', {

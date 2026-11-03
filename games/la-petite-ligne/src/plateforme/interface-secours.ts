@@ -5,6 +5,7 @@
  * travaillé; elle disparaît dès que l'interface du jeu est livrée.
  */
 import type { Intent } from '../etat/actions';
+import { letterText, letterTitle } from '../etat/courrier';
 import type { ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import { TOOLBAR_SLOTS } from '../etat/types';
 import type { CreateInterface, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
@@ -164,7 +165,7 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
           if (item.shop !== 'catalogue' || item.buyPrice === null) continue;
           button(row(), `${item.name} (${item.buyPrice})`, { type: 'catalogue_order', item: item.id });
         }
-        for (const l of w.letters) el('p', 'margin:4px 0;font-size:13px;', panel).textContent = `${l.title}: ${l.text}`;
+        for (const l of w.letters) el('p', 'margin:4px 0;font-size:13px;', panel).textContent = `${letterTitle(view.content, l)}: ${letterText(view.content, l)}`;
         break;
       case 'crate':
         for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'crate_deposit', item: s.item, quality: s.quality, count: s.count });
@@ -173,6 +174,10 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
       case 'chest':
         for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'chest_deposit', item: s.item, quality: s.quality, count: s.count });
         for (const s of w.cellar) button(row(), `< ${itemLabel(view, s)}`, { type: 'chest_take', item: s.item, quality: s.quality, count: s.count });
+        break;
+      case 'stall':
+        for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'stall_deposit', item: s.item, quality: s.quality, count: s.count });
+        for (const s of w.market?.stall ?? []) button(row(), `< ${itemLabel(view, s)}`, { type: 'stall_take', item: s.item, quality: s.quality, count: s.count });
         break;
       case 'workbench':
       case 'stove':
@@ -207,6 +212,16 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         button(row(), 'ok', { type: 'haircut', hair: a.hair, hairColor: a.hairColor, beard: a.beard });
         break;
       }
+      // 0.12: la basse-cour, au plus simple (le nom à choisir quand c'est son tour).
+      case 'farm': {
+        const request = w.breeding.naming[0];
+        if (request?.by === me.id) for (const name of request.options) button(row(), name, { type: 'animal_name', animal: request.animal, name });
+        break;
+      }
+      // 0.12: la mercerie et la garde-robe n'ont que le bouton de fermeture dans l'interface de secours.
+      case 'clothes_shop':
+      case 'wardrobe':
+        break;
     }
     for (const p of w.proposals) {
       if (p.by === me.id) continue;

@@ -42,6 +42,8 @@ function matches(trigger: HintTrigger, signal: HintSignal): boolean {
     case 'near_forage':
     case 'aim_sapling':
     case 'near_board_annonce':
+    case 'fishing_hot_spot':
+    case 'fishing_watch':
       return true;
   }
 }

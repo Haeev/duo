@@ -1,7 +1,7 @@
 /**
  * Les chantiers (tour 9, section 2.6): deux files, un chantier ouvert à la fois par file. Ceux du
- * bourg se paient par souscription au tableau du quai (par 50 ou 100 sous, ou « le reste »), ceux
- * de la maisonnette d'un coup à l'établi de Basile, 10 sous de moins par planche apportée. Un
+ * bourg se paient par souscription au tableau du quai (par 50 ou 100 aubrins, ou « le reste »), ceux
+ * de la maisonnette d'un coup à l'établi de Basile, 10 aubrins de moins par planche apportée. Un
  * chantier payé est bâti par Basile dans la nuit: il paraît au matin suivant. Rien n'est perdu: ce
  * qui est versé reste au chantier.
  */
@@ -11,6 +11,7 @@ import type { Character, ImprovementState } from '../etat/types';
 import { type Sim, distance, emit, newId, notifyKey, partnerOf, say } from './contexte';
 import { countInBag, takeFromBag } from './sac';
 import { POINT } from './ids';
+import { queueOpen } from '../etat/files-chantiers';
 import { confirmOrder, isRoomOrder, morningRooms, orderAtBasile, roomName } from './pieces';
 
 export function emptyImprovements(sim: Pick<Sim, 'content'>): Record<string, ImprovementState> {
@@ -53,7 +54,7 @@ export function improvementRemaining(sim: Sim, def: ImprovementDef): number {
  */
 export function openImprovement(sim: Sim, queue: ImprovementQueue): ImprovementDef | null {
   const s = sim.content.settings.improvements;
-  if (s === null || sim.world.clock.day < s.queues[queue].opensFromDay) return null;
+  if (s === null || !queueOpen(s, sim.world, queue)) return null;
   const list = sim.content.improvements.filter((x) => x.queue === queue).sort((a, b) => a.order - b.order);
   for (const def of list) {
     const state = sim.world.improvements[def.id];
@@ -67,7 +68,7 @@ export function openImprovement(sim: Sim, queue: ImprovementQueue): ImprovementD
 /** Les chantiers ouverts des deux files. */
 export function openImprovements(sim: Sim): ImprovementDef[] {
   const out: ImprovementDef[] = [];
-  for (const q of ['bourg', 'maisonnette'] as const) {
+  for (const q of ['bourg', 'maisonnette', 'elevage'] as const) {
     const def = openImprovement(sim, q);
     if (def !== null) out.push(def);
   }
@@ -102,7 +103,7 @@ export function bringPlanks(sim: Sim, c: Character, id: string, count: number): 
 }
 
 /**
- * Verser au chantier `id`: `amount` sous, ou le reste (`null`). À Basile, seulement le reste (d'un
+ * Verser au chantier `id`: `amount` aubrins, ou le reste (`null`). À Basile, seulement le reste (d'un
  * coup). Au-delà de `bigPurchaseThreshold`, l'autre doit d'abord accepter (EC-04).
  */
 export function payImprovement(sim: Sim, c: Character, id: string, amount: number | null): void {

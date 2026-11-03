@@ -121,6 +121,8 @@ async function main(): Promise<void> {
       sound: (id) => {
         sound?.ui?.(id);
       },
+      // 0.12: aperçu 3D de la boutique de vêtements (petite scène à part, rendue à la demande).
+      outfitPreview: (options) => r.createOutfitPreview?.(options) ?? null,
     });
     const createAudio = await pickAudio();
     if (createAudio !== null) {

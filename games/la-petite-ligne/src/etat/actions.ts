@@ -7,7 +7,7 @@
  * état) avant de les appliquer: une intention impossible est ignorée ou donne
  * un message au joueur, jamais une erreur.
  */
-import type { Cell, CharacterId, ItemId, MenuKind, Quality, RecipeId, VillagerId } from './types';
+import type { Cell, CharacterId, ClothingSlot, ItemId, MenuKind, Quality, RecipeId, VillagerId } from './types';
 
 /** Commandes continues d'un pas (déplacement et action maintenue), après traduction des touches. */
 export interface ControlFrame {
@@ -38,6 +38,8 @@ export type Intent =
   // Création (PE-01, version démo)
   // Tour 10 (section 2): couleur des cheveux (0 à 7) et barbe (0 à 3), facultatives; appliquées par
   // les règles de la création à partir du lot L3 (bornes de `reglages.appearance`).
+  // 0.12: `outfit` est le rang de la tenue de départ (`reglages.wardrobe.starters`), portée et
+  // rangée dans la garde-robe.
   | {
       type: 'create_character';
       name: string;
@@ -86,7 +88,11 @@ export type Intent =
   | { type: 'hair_offer'; hair: number; hairColor: number; beard: number }
   // Tour 10: au fauteuil, répondre à la proposition reçue (« Essayer » ou « Non merci »)
   | { type: 'hair_offer_answer'; accept: boolean }
-  // Chantiers (tour 9): verser au chantier ouvert (`amount` sous, ou le reste: `null`), apporter des planches à Basile
+  // 0.12: acheter un vêtement au comptoir de la mercerie (achat personnel, sans accord à deux)
+  | { type: 'clothes_buy'; item: string }
+  // 0.12: porter un vêtement de sa garde-robe (`null`: ôter le par-dessus ou le chapeau), au coffre ou en cabine
+  | { type: 'wear'; slot: ClothingSlot; item: string | null }
+  // Chantiers (tour 9): verser au chantier ouvert (`amount` aubrins, ou le reste: `null`), apporter des planches à Basile
   | { type: 'improvement_pay'; improvement: string; amount: number | null }
   | { type: 'improvement_planks'; improvement: string; count: number }
   | { type: 'proposal_answer'; proposal: string; accept: boolean }
@@ -95,6 +101,11 @@ export type Intent =
   | { type: 'crate_take'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_take'; item: ItemId; quality: Quality; count: number }
+  // 0.12, marché du dimanche: garnir l'étal, reprendre, le prix de tout l'étal, servir un client (aussi par Espace sur lui)
+  | { type: 'stall_deposit'; item: ItemId; quality: Quality; count: number }
+  | { type: 'stall_take'; item: ItemId; quality: Quality; count: number }
+  | { type: 'market_level'; level: 'soft' | 'fair' | 'strong' }
+  | { type: 'market_serve'; villager: string }
   // Tour 10 (section 5): rangement à cases, « Tout déposer » par famille (catégorie d'objet), « Ranger »
   | { type: 'storage_deposit_family'; family: string }
   | { type: 'storage_sort' }
@@ -102,6 +113,9 @@ export type Intent =
   | { type: 'room_deposit'; room: string; item: ItemId; count: number }
   // Tour 10 (section 6.2): ouvrir ou fermer des rideaux accrochés à une fenêtre
   | { type: 'curtains'; furniture: string }
+  // 0.12 (élevage): choisir le nom d'une bête parmi les trois proposés; mettre une poule à couver
+  | { type: 'animal_name'; animal: string; name: string }
+  | { type: 'brood_start'; hen: string }
   // Fabrication, cuisine, repas
   | { type: 'craft'; recipe: RecipeId }
   | { type: 'eat'; item: ItemId }

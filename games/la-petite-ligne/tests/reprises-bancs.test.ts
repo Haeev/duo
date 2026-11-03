@@ -195,7 +195,8 @@ describe('reprises à chaque aube et en pleine journée, bancs compris', () => {
       expect(r.midSaves.some((m) => m.endsWith('draisine en poussée')), 'reprise en pleine poussée').toBe(true);
     }, 300_000);
   }
-  for (const file of readdirSync(SAVES_DIR).filter((f) => f.startsWith('format-1'))) {
+  // Le format 1 seul (fin de démo au jour 8): `format-1` prendrait aussi les formats 10 et suivants.
+  for (const file of readdirSync(SAVES_DIR).filter((f) => f.startsWith('format-1-'))) {
     it(`sauvegarde réelle ${file} jouée jusqu'au jour 15, reprises comprises`, () => {
       const raw = JSON.parse(readFileSync(join(SAVES_DIR, file), 'utf8')) as { dataSchema: number; data: unknown };
       expect(raw.dataSchema).toBe(1);

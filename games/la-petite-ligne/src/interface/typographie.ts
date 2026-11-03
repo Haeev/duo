@@ -9,10 +9,18 @@
  * les points de suspension en plus. Idempotente.
  */
 
+import { CURRENCY } from '../donnees/monnaie';
+
 /** Espace insécable. */
 export const NBSP = '\u00a0';
 /** Espace fine insécable. */
 export const NNBSP = '\u202f';
+
+/** Unités qui ne se séparent pas de leur nombre: heures, minutes, secondes, monnaie (`monnaie.ts`). */
+const UNITS = new RegExp(
+  `(\\d) (h|min|s|${CURRENCY.plural}|${CURRENCY.singular})(?![\\p{L}\\d])`,
+  'gu',
+);
 
 const COUNTED =
   /(\d) (radis|laitues?|œufs?|planches?|clous?|carottes?|lignes?|jours?|journées|places|arrosages|rondins?|colis|meubles?|sachets?)(?![\p{L}\d])/gu;
@@ -42,8 +50,8 @@ export function typographier(text: string): string {
   );
   // Pourcentage.
   t = t.replace(/(\d)[ \u00a0]+%/g, `$1${NNBSP}%`);
-  // Unités et heures: 21 h 40, 3 min, 120 sous.
-  t = t.replace(/(\d) (h|min|s|sous)(?![\p{L}\d])/gu, `$1${NBSP}$2`);
+  // Unités et heures: 21 h 40, 3 min, 120 aubrins.
+  t = t.replace(UNITS, `$1${NBSP}$2`);
   // Un nombre ne se sépare pas de l'objet compté (3 œufs, 12 radis).
   t = t.replace(COUNTED, `$1${NBSP}$2`);
   t = t.replace(/(\d\u00a0h) (\d)/g, `$1${NBSP}$2`);

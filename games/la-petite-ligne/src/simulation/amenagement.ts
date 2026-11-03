@@ -6,11 +6,13 @@
  * Tour 10 (lot L4): on pose dans toute pièce de la maisonnette (le cellier, la chambre une fois
  * bâtis); les étagères hautes aux places du cellier; les rideaux seulement à une fenêtre libre
  * (`pieces.json`, nœuds `window_<n>` du modèle), qu'on ouvre et qu'on ferme.
+ * 0.11.2 (S03): un petit objet (plume de geai, pot de fleurs) se pose aussi sur le dessus d'un
+ * meuble porteur (table, coffre), à l'une de ses places (`surface` de `objets.json`).
  */
 import { type GameMap, HOUSE_BUILDING, type MapRoom, type Rect, inRect } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import { TOOL_RACK } from './ids';
-import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacedFurniture, type PlacementPreview } from '../etat/types';
+import { CORNER_SIZE, type Cell, type Character, type CharacterId, type PlacedDecor, type PlacedFurniture, type PlacementPreview, type Vec2 } from '../etat/types';
 import type { ItemDef } from '../donnees/types';
 import type { WindowDef, WindowSide } from '../donnees/maison';
 import { activeHouseRooms, curtainsAt, houseRoomAt, windowsNow } from '../etat/maison';
@@ -21,7 +23,7 @@ import { type Sim, bump, emit, message, newId, partnerName, partnerOf, say } fro
 import { queueHint } from './astuces';
 import { closesRoom } from './deblocage';
 import { footprintCells, rotatedSize, touchesCell } from './deplacement';
-import { giveToCharacter, heldItem, takeFromBag } from './sac';
+import { addToBag, giveToCharacter, heldItem, takeFromBag } from './sac';
 
 function quarterOf(facing: number): number {
   // 0 est, 1 sud, 2 ouest, 3 nord.
@@ -179,7 +181,18 @@ export function updatePlacement(sim: Sim, c: Character): void {
     }
     return;
   }
-  let rotation = c.placement?.item === item ? c.placement.rotation : 0;
+  const on = def.small ? surfaceAim(sim, c) : null;
+  if (on !== null) {
+    const host = sim.world.furniture.find((f) => f.id === on.furniture);
+    const before = c.placement;
+    if (host !== undefined && (before?.on?.furniture !== on.furniture || before.on.place !== on.place || before.item !== item)) {
+      c.placement = { item, cell: { cx: host.cell.cx, cy: host.cell.cy }, rotation: host.rotation, valid: true, blocked: null, small: true, on };
+      sim.runtime.changed = true;
+      if (before === null) queueHint(sim, c.id, { on: 'holding_furniture' });
+    }
+    if (host !== undefined) return;
+  }
+  let rotation = c.placement?.item === item && c.placement.on === undefined ? c.placement.rotation : 0;
   const size = rotatedSize(def.footprint, rotation);
   let cell = pointerCell(sim, c, size) ?? previewCell(c, size);
   // Les rideaux s'accrochent à la fenêtre visée: l'aperçu se cale dessus.
@@ -195,6 +208,7 @@ export function updatePlacement(sim: Sim, c: Character): void {
   const before = c.placement;
   if (
     before?.item !== item ||
+    before.on !== undefined ||
     before.cell.cx !== cell.cx ||
     before.cell.cy !== cell.cy ||
     before.rotation !== rotation ||
@@ -202,6 +216,7 @@ export function updatePlacement(sim: Sim, c: Character): void {
     before.blocked !== blocked
   ) {
     c.placement = { item, cell, rotation, valid, blocked };
+    if (def.small) c.placement.small = true;
     sim.runtime.changed = true;
     if (before === null) queueHint(sim, c.id, { on: 'holding_furniture' });
   }
@@ -209,7 +224,8 @@ export function updatePlacement(sim: Sim, c: Character): void {
 
 export function rotatePlacement(sim: Sim, c: Character, delta: number): void {
   const p: PlacementPreview | null = c.placement;
-  if (p === null) return;
+  // Sur un meuble porteur, le petit objet suit le meuble: rien à tourner.
+  if (p === null || p.on !== undefined) return;
   p.rotation = (((p.rotation + Math.sign(delta)) % 4) + 4) % 4;
   updatePlacement(sim, c);
   sim.runtime.changed = true;
@@ -221,6 +237,8 @@ export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotati
   if (item === null || !isHome(c)) return false;
   const def = sim.content.items[item];
   if (!isPlaceable(def) || def.footprint === null) return false;
+  const on = cell === null ? (c.placement?.on ?? null) : null;
+  if (on !== null && def.small) return placeDecor(sim, c, item, on);
   let r = rotation ?? c.placement?.rotation ?? 0;
   let at = cell ?? c.placement?.cell ?? null;
   if (at === null) return false;
@@ -252,6 +270,8 @@ export function placeFurniture(sim: Sim, c: Character, cell: Cell | null, rotati
 
 /** Reprend un meuble posé dans le sac (X, clic droit). */
 export function takeFurniture(sim: Sim, c: Character, furnitureId: string): boolean {
+  // Un petit objet posé sur un meuble se vise et se reprend comme un meuble (même clic droit).
+  if (sim.world.decor.some((d) => d.id === furnitureId)) return takeDecor(sim, c, furnitureId);
   const index = sim.world.furniture.findIndex((f) => f.id === furnitureId);
   const f = sim.world.furniture[index];
   if (f === undefined) return false;
@@ -274,9 +294,183 @@ export function takeFurniture(sim: Sim, c: Character, furnitureId: string): bool
   // Le meuble repris passe en main, prêt à être reposé.
   const slot = c.bag.findIndex((s) => s?.item === f.item);
   if (slot >= 0 && slot < TOOLBAR_SLOTS) c.selected = slot;
+  // Ce qu'il portait revient au sac, sinon au rangement: rien ne se perd (S03).
+  returnDecorOf(sim, f.id, c);
   sim.runtime.dynamicDirty = true;
   emit(sim, { type: 'furniture_taken', by: c.id, item: f.item });
   return true;
+}
+
+// ---------------------------------------------------------------------------
+// Petits objets sur les meubles (0.11.2, S03)
+
+/** Milieu de l'empreinte d'un meuble posé. */
+function furnitureMiddle(def: ItemDef, f: PlacedFurniture): Vec2 {
+  const size = rotatedSize(def.footprint ?? { w: 1, d: 1 }, f.rotation);
+  return { x: f.cell.cx + size.w / 2, y: f.cell.cy + size.d / 2 };
+}
+
+/**
+ * Où est une place du dessus, au sol (même repère que les bancs: le modèle tourné d'un quart de
+ * tour par rotation, X le long, Z vers l'avant). Le rendu lit la hauteur dans le modèle.
+ */
+export function surfacePlacePos(sim: Sim, f: PlacedFurniture, place: number): Vec2 | null {
+  const def = sim.content.items[f.item];
+  const at = def?.surface[place];
+  if (def === undefined || at === undefined) return null;
+  const middle = furnitureMiddle(def, f);
+  const a = f.rotation * (Math.PI / 2);
+  return { x: middle.x + Math.cos(a) * at.x + Math.sin(a) * at.z, y: middle.y - Math.sin(a) * at.x + Math.cos(a) * at.z };
+}
+
+/** Les places libres du dessus de ce meuble. */
+export function freeSurfacePlaces(sim: Sim, f: PlacedFurniture): number[] {
+  const places = sim.content.items[f.item]?.surface ?? [];
+  const out: number[] = [];
+  for (let i = 0; i < places.length; i++) if (!sim.world.decor.some((d) => d.on === f.id && d.place === i)) out.push(i);
+  return out;
+}
+
+/** Ce meuble porte-t-il quelque chose, et peut-on y toucher (dans la maison, hors du coin de l'autre) ? */
+function surfaceUsable(sim: Sim, c: Character, f: PlacedFurniture): boolean {
+  const def = sim.content.items[f.item];
+  if (def === undefined || def.footprint === null || def.surface.length === 0 || f.window !== undefined) return false;
+  if (!furnitureAtHome(sim, f)) return false;
+  return cornerOwnerOf(sim, footprintCells(def.footprint, f.cell, f.rotation), c.id) === null;
+}
+
+function furnitureAtHome(sim: Sim, f: PlacedFurniture): boolean {
+  return houseRoomAt(sim.map, sim.world.rooms, f.cell.cx + 0.5, f.cell.cy + 0.5) !== null;
+}
+
+/** La place libre de ce meuble la plus proche de `from`, ou `null`. */
+function nearestFreePlace(sim: Sim, f: PlacedFurniture, from: Vec2): number | null {
+  let best: number | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const place of freeSurfacePlaces(sim, f)) {
+    const at = surfacePlacePos(sim, f, place);
+    const d = at === null ? Number.POSITIVE_INFINITY : Math.hypot(at.x - from.x, at.y - from.y);
+    if (d < bestD) {
+      best = place;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+/**
+ * Le meuble porteur visé pour un petit objet en main: celui que survole la souris, sinon celui qui
+ * couvre la case devant soi; et sa place libre la plus proche de soi. `null`: on pose au sol.
+ */
+export function surfaceAim(sim: Sim, c: Character): { furniture: string; place: number } | null {
+  if (!isHome(c)) return null;
+  const pointer = sim.runtime.pointer[c.id];
+  let host: PlacedFurniture | undefined;
+  if (pointer?.kind === 'furniture') {
+    // Survoler un petit objet déjà posé vise son meuble.
+    const id = sim.world.decor.find((d) => d.id === pointer.furniture)?.on ?? pointer.furniture;
+    host = sim.world.furniture.find((f) => f.id === id);
+  }
+  else if (pointer?.kind === 'ground') host = undefined;
+  else {
+    const front = { cx: Math.floor(c.pos.x + Math.cos(c.facing)), cy: Math.floor(c.pos.y + Math.sin(c.facing)) };
+    host = sim.world.furniture.find((f) => {
+      const def = sim.content.items[f.item];
+      return def !== undefined && def.footprint !== null && def.surface.length > 0 && footprintCells(def.footprint, f.cell, f.rotation).some((k) => k.cx === front.cx && k.cy === front.cy);
+    });
+  }
+  // Comme au sol, la souris vise dans toute la pièce; le clavier, le meuble juste devant soi.
+  if (host === undefined || !surfaceUsable(sim, c, host)) return null;
+  const place = nearestFreePlace(sim, host, c.pos);
+  return place === null ? null : { furniture: host.id, place };
+}
+
+/** Pose le petit objet tenu sur le meuble porteur, à la place visée. */
+function placeDecor(sim: Sim, c: Character, item: string, on: { furniture: string; place: number }): boolean {
+  const host = sim.world.furniture.find((f) => f.id === on.furniture);
+  if (host === undefined || !surfaceUsable(sim, c, host) || !freeSurfacePlaces(sim, host).includes(on.place)) {
+    c.placement = null;
+    sim.runtime.changed = true;
+    return false;
+  }
+  if (takeFromBag(c, item, 1).length === 0) return false;
+  const id = newId(sim, 'd');
+  const placed: PlacedDecor = { id, item, on: host.id, place: on.place, placedBy: c.id };
+  sim.world.decor.push(placed);
+  c.placement = null;
+  sim.runtime.changed = true;
+  bump(sim, 'placed', c.id);
+  bump(sim, `placed:${item}`, c.id);
+  emit(sim, { type: 'furniture_placed', by: c.id, furniture: id, item });
+  return true;
+}
+
+/** Reprend un petit objet posé sur un meuble (X devant le meuble, clic droit sur l'objet). */
+export function takeDecor(sim: Sim, c: Character, decorId: string): boolean {
+  const index = sim.world.decor.findIndex((d) => d.id === decorId);
+  const d = sim.world.decor[index];
+  const host = d === undefined ? undefined : sim.world.furniture.find((f) => f.id === d.on);
+  if (d === undefined) return false;
+  if (host !== undefined) {
+    const def = sim.content.items[host.item];
+    const owner = def === undefined || def.footprint === null ? null : cornerOwnerOf(sim, footprintCells(def.footprint, host.cell, host.rotation), c.id);
+    if (owner !== null) {
+      say(sim, c.id, 'corner_not_yours', { partner: owner.name });
+      return false;
+    }
+  }
+  sim.world.decor.splice(index, 1);
+  giveToCharacter(sim, c, d.item, 'ordinary', 1);
+  const slot = c.bag.findIndex((s) => s?.item === d.item);
+  if (slot >= 0 && slot < TOOLBAR_SLOTS) c.selected = slot;
+  sim.runtime.changed = true;
+  emit(sim, { type: 'furniture_taken', by: c.id, item: d.item });
+  return true;
+}
+
+/** Le dernier petit objet posé sur ce meuble, ou `null` (X reprend d'abord ce qui est dessus). */
+export function topDecorOf(sim: Sim, furnitureId: string): PlacedDecor | null {
+  for (let i = sim.world.decor.length - 1; i >= 0; i--) {
+    const d = sim.world.decor[i];
+    if (d?.on === furnitureId) return d;
+  }
+  return null;
+}
+
+/**
+ * Le meuble porteur s'en va (repris, rangé): ce qu'il porte revient au sac de `c` s'il y a de la
+ * place, sinon au rangement de la maison (`storeAtHome`, au pied du coffre s'il est plein).
+ */
+export function returnDecorOf(sim: Sim, furnitureId: string, c: Character | null): void {
+  const carried = sim.world.decor.filter((d) => d.on === furnitureId);
+  if (carried.length === 0) return;
+  sim.world.decor = sim.world.decor.filter((d) => d.on !== furnitureId);
+  for (const d of carried) {
+    const left = c === null ? 1 : addToBag(sim, c, d.item, 'ordinary', 1);
+    if (left > 0) storeAtHome(sim, d.item, 'ordinary', left);
+  }
+  sim.runtime.changed = true;
+}
+
+/**
+ * Petits objets relus d'une sauvegarde: ceux dont le meuble porteur ou la place n'existe plus (ou
+ * qu'une autre occupe déjà) reviennent au rangement. Renvoie le nombre d'objets rendus.
+ */
+export function settleDecor(sim: Sim): number {
+  const kept: PlacedDecor[] = [];
+  let returned = 0;
+  for (const d of sim.world.decor) {
+    const host = sim.world.furniture.find((f) => f.id === d.on);
+    const places = host === undefined ? 0 : (sim.content.items[host.item]?.surface.length ?? 0);
+    const taken = kept.some((k) => k.on === d.on && k.place === d.place);
+    if (host !== undefined && d.place >= 0 && d.place < places && !taken && sim.content.items[d.item] !== undefined) kept.push(d);
+    else {
+      returned += 1;
+      if (sim.content.items[d.item] !== undefined) storeAtHome(sim, d.item, 'ordinary', 1);
+    }
+  }
+  sim.world.decor = kept;
+  return returned;
 }
 
 // ---------------------------------------------------------------------------
@@ -534,6 +728,7 @@ export function clearDoorway(sim: Sim, cell: Cell, roomId: string): string[] {
       sim.world.furniture = sim.world.furniture.filter((x) => x !== f);
       for (const ch of sim.world.characters) if (ch.bedId === f.id) ch.bedId = null;
       storeAtHome(sim, f.item, 'ordinary', 1);
+      returnDecorOf(sim, f.id, null);
     }
   }
   if (moved.length > 0) sim.runtime.dynamicDirty = true;

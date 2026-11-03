@@ -504,8 +504,44 @@ export const RENDER_SETTINGS = {
      */
     asleepHair: { headFromY: 1.35, headDepth: -0.226, backDepth: -0.2 },
     crossFadeSeconds: 0.22,
-    /** Vitesse à laquelle l'animation de marche joue à son rythme d'origine (m/s). */
-    walkReferenceSpeed: 3.2,
+    /**
+     * Vitesse du pied posé dans `walk` et `carry_two` à leur rythme d'origine (m/s): le clip joue à
+     * `vitesse / référence` pour que le pied ne glisse pas. Mesurée sur les clips au chargement
+     * (`foulee.ts`); ces valeurs servent si la mesure échoue, et à la marche à reculons de Basile
+     * (`moments.ts`). Mesurées le 2026-11-03 sur les clips de la 0.12: 2,8 et 1,3 (4,0 et 1,95 avant
+     * eux); la fiche dit 3,5. L'ancienne référence de 3,2 faisait patiner les joueurs.
+     */
+    walkReferenceSpeed: 2.8,
+    carryReferenceSpeed: 1.3,
+    /** Bornes du rythme de la marche (les habitants à 1,6 m/s jouent la marche à 0,57). */
+    walkScaleMin: 0.2,
+    walkScaleMax: 1.7,
+    /**
+     * Pousser la draisine (pas de clip de poussée): à l'arrêt, `stillClip` (mains en avant sur le
+     * levier); en marche, la marche avec la main droite posée sur la draisine, à `handHeight` m au-dessus
+     * du sol, si elle est devant soi à moins de `reach` m.
+     */
+    push: { stillClip: 'crank_hold', handHeight: 0.95, reach: 1.5, weight: 0.85 },
+    /**
+     * Habitants au travail (activité `work`): le geste selon le poste (point de l'emploi du temps),
+     * `saw` ailleurs. Solange coud assise derrière sa vitrine (chaise de couture, assise de `sit`);
+     * Basile répare à la remise de la draisine au marteau.
+     */
+    villagerWork: { salon_window: 'sit', handcar_shed: 'hammer' } as Readonly<Record<string, string>>,
+    villagerWorkDefault: 'saw',
+    /** Fauteuil de coiffure de Solange (`haberdashery`): assise à 0,5 m. */
+    salonChairSeatHeight: 0.5,
+    /**
+     * S'asseoir et se lever (clips `sit_down` et `stand_up` de 0,6 s, de la pose debout à celle de
+     * `sit` et retour) au lieu d'un fondu; fondu court à leurs bouts, qui partagent la pose voisine.
+     */
+    posture: { sitDown: 'sit_down', standUp: 'stand_up', fadeSeconds: 0.08 },
+    /** Porter seul devant soi (meuble tenu pour l'aménagement): en marchant, et à l'arrêt. */
+    carryOne: { walk: 'carry_one', idle: 'carry_one_idle' },
+    /** Boire (le chocolat à la petite table d'Odette: action `eat` qui vise la table). */
+    drinkClip: 'drink',
+    /** Traire la chèvre ou la tenir pour l'autre: pas encore de clip de traite, celui de la caresse (accroupi). */
+    milkClip: 'pet',
     /** En dessous de cette vitesse, on attend au lieu de marcher. */
     walkThreshold: 0.15,
     turnHalfLife: 0.06,
@@ -515,6 +551,13 @@ export const RENDER_SETTINGS = {
     blinkSeconds: 0.12,
     /** Silhouette du joueur vue derrière un mur. */
     silhouetteOpacity: 0.38,
+    /**
+     * Trou de visibilité d'un personnage: rien ne s'efface sous cette hauteur au-dessus de ses
+     * pieds (m). Une barrière (lisses à 0,8 m, poteaux à 0,95 m), un rail ou un banc ne le cachent
+     * pas: on le voit par-dessus. Plus bas (0,45 m avant le retour S02 du 2026-11-02), leur coupe
+     * tramée au bord du trou se lisait comme une ombre en tache tramée à côté des pieds.
+     */
+    seeThroughMinHeight: 1,
     /** Fondu entre la marche et l'attente: court, pour que les pieds ne glissent pas au départ et à l'arrêt. */
     walkFadeSeconds: 0.1,
     /** Fondu d'entrée et de sortie d'un geste d'outil joué une fois. */
@@ -525,7 +568,9 @@ export const RENDER_SETTINGS = {
      * la hache touche le tronc à mi-descente). Le clip démarre juste avant, pour
      * que le coup tombe avec le son et la terre, émis au pas de l'appui.
      */
-    gestureImpact: { hoe: 0.53, chop: 0.62, harvest: 0.34, sow: 0.4, hammer: 0.27 } as Readonly<
+    // Clips de la 0.12 (`verifier/contacts_gestes.py`): récolte à 0,30, ramasser 0,43, nourrir 0,4.
+    // Boire et cuisiner n'en ont pas ici: ils partent du début (lever la tasse, prendre la cuillère).
+    gestureImpact: { hoe: 0.53, chop: 0.62, harvest: 0.3, sow: 0.4, hammer: 0.27, pickup: 0.43, feed: 0.4 } as Readonly<
       Record<string, number>
     >,
     /** Le contact tombe au plus ce délai après l'appui (s). */

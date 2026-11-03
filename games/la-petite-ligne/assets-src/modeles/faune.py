@@ -1298,6 +1298,16 @@ def main():
     A.add("vole", chouette.vole(A), {"kind": "item", "socket": "socket_barn_owl_beak", "carried_by": "barn_owl",
                                      "length": 0.08, "note": "en travers du bec, tête vers la gauche de l'oiseau"})
 
+    # 0.13: le chat du bourg (chat.py)
+    import chat
+    cat = Rig("cat", chat.CAT_BONES)
+    A._register(cat.arm, {"kind": "animal", "origin": "sol entre les pattes", "withers": 0.25, "length": 0.46,
+                          "tail": 0.3, "collision_radius": 0.25,
+                          "note": "cat_idle assis, cat_walk 0,35 m/s (timeScale = vitesse / 0,35), cat_sleep couché "
+                                  "en rond, cat_roll sur le dos (caresse à deux); la racine ne bouge pas"})
+    cat_ob = cat.skin(A, "cat_mesh", chat.cat_mesh(A))
+    anims["cat"] = chat.cat_clips(cat, cat_ob)
+
     a = math.radians(LADDER_ANGLE)
     A.add("ladder_wood", ladder_wood(A), {"kind": "prop", "lean_deg": LADDER_ANGLE, "length": LADDER_LENGTH,
                                           "rung_step": RUNG_STEP, "rungs": 10,

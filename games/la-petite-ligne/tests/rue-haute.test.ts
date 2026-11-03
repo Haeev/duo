@@ -2,6 +2,7 @@
 // portes et heures des intérieurs, porter à deux, emplois du temps d'Achille, de Solange et de
 // Jeanne (T10-05), la panière (T10-06), le guichet du fournil (T10-07), la première coupe et le
 // salon (T10-08 à T10-10), le chocolat chaud, les souhaits et les départs un par journée (T10-27).
+import { dialogueDone } from '../src/etat/dialogues-faits';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -410,7 +411,7 @@ describe('la panière d’Achille (T10-06) et les départs un par journée (T10-
     send(sim, 'p1', { type: 'move_to', target: { kind: 'villager', villager: 'achille' }, act: true });
     for (let i = 0; i < 10 && c.dialogue !== null; i++) send(sim, 'p1', { type: 'dialogue_next' });
     walk(sim, {}, 0.2);
-    expect(sim.world.dialoguesDone).toContain('achille_basket_ask');
+    expect(dialogueDone(sim.world.dialoguesDone, 'achille_basket_ask')).toBe(true);
     const load = (): Beam | null => sim.world.beam;
     expect(load()?.purpose).toBe('basket');
     // Seul, on ne la soulève pas.
@@ -488,7 +489,7 @@ describe('le guichet du fournil (T10-07)', () => {
     return sim;
   }
 
-  it('pain chaud de 6 h à 9 h, pain jusqu’à midi, 5 sous, quatre au plus par joueur et par jour', () => {
+  it('pain chaud de 6 h à 9 h, pain jusqu’à midi, 5 aubrins, quatre au plus par joueur et par jour', () => {
     const sim = window(TUESDAY, 7 * H);
     const c = character(sim, 'p1');
     const purse = sim.world.purse;
@@ -547,7 +548,7 @@ describe('le salon de Solange (T10-08 à T10-10)', () => {
     send(sim, id, { type: 'menu', menu: 'salon' });
   }
 
-  it('15 coupes, 8 couleurs, 4 barbes; 15, 10 et 20 sous; « Garder ma coiffure » gratuit; un seul au fauteuil', () => {
+  it('15 coupes, 8 couleurs, 4 barbes; 15, 10 et 20 aubrins; « Garder ma coiffure » gratuit; un seul au fauteuil', () => {
     const sim = salon();
     const c = character(sim, 'p1');
     sitChair(sim, 'p1');
@@ -655,7 +656,7 @@ describe('le salon de Solange (T10-08 à T10-10)', () => {
       }
     }
     walk(s, {}, 0.2);
-    expect(s.world.dialoguesDone).toContain('solange_mirror');
+    expect(dialogueDone(s.world.dialoguesDone, 'solange_mirror')).toBe(true);
     expect(s.world.quests.find((q) => q.id === TOWN.cutQuest)?.status).toBe('done');
     expect(s.world.flags).toContain(TOWN.salonOpen);
   });
@@ -756,7 +757,7 @@ describe('retouches de la carte (décisions du manager)', () => {
 });
 
 describe('chocolat chaud, souhaits et création (sections 1.5, 1.6, 2.2)', () => {
-  it("chocolat chaud à la petite table: l'automne ou la pluie, jusqu'à 18 h, une tasse par jour, 5 sous", () => {
+  it("chocolat chaud à la petite table: l'automne ou la pluie, jusqu'à 18 h, une tasse par jour, 5 aubrins", () => {
     const sim = town(AUTUMN_MONDAY, 15 * H);
     const c = character(sim, 'p1');
     placeCharacter(sim, c, { x: 26.5, y: 29.5 });

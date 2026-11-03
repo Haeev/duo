@@ -2,10 +2,11 @@
  * Conversations (chacun la sienne, SI-06) et scènes à deux (HA-08), d'après
  * `habitants.json` et la section 2.3 du README des données.
  */
-import type { Character, CharacterId, DialogueChoiceView, DialogueLineView } from '../etat/types';
+import { dialogueDone } from '../etat/dialogues-faits';
+import type { Character, CharacterId, DialogueChoiceView, DialogueLineView, VillagerState } from '../etat/types';
 import type { Condition, Content, DialogueDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT, type ConditionContext } from './conditions';
-import { type Sim, bump, character, distance, emit, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
+import { type Sim, bump, character, distance, emit, faceToward, format, itemName, partnerName, partnerOf, point, notifyKey } from './contexte';
 import { textVars } from './courrier';
 import { pumpScripts, runEffects } from './effets';
 import { countInBag, takeFromBag } from './sac';
@@ -40,7 +41,8 @@ function sceneVillagerHere(sim: Sim, def: DialogueDef): boolean {
   return v !== undefined && v.visible && distance(v.pos, point(sim, def.point)) <= sim.content.settings.ranges.talk + 2;
 }
 
-function vars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
+/** Paramètres des répliques (`{partner}`, `{henColor1}`...), exportés pour le contrôle des textes. */
+export function dialogueVars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
   // Les couleurs des poules (`{henColor1}`...): seul l'informé entend le dialogue qui les cite.
   const base = { ...textVars(sim), ...henVars(sim.world, sim.content) };
   return who === null ? base : { ...base, partner: partnerName(sim, who) };
@@ -78,13 +80,13 @@ function retryable(def: DialogueDef): boolean {
 }
 
 function lineViews(sim: Sim, def: DialogueDef, who: CharacterId | null): DialogueLineView[] {
-  const v = vars(sim, who);
+  const v = dialogueVars(sim, who);
   return def.lines.map((l) => ({ speaker: l.speaker, text: format(l.text, v) }));
 }
 
 function doneFor(sim: Sim, def: DialogueDef, who: CharacterId): boolean {
   const done = sim.world.dialoguesDone;
-  if (def.once === 'duo') return done.includes(def.id);
+  if (def.once === 'duo') return dialogueDone(done, def.id);
   if (def.once === 'player') return done.includes(`${def.id}@${who}`);
   return false;
 }
@@ -246,6 +248,11 @@ function uiText(sim: Sim, key: string): string | null {
   return typeof value === 'string' ? value : null;
 }
 
+/** Les conditions d'une liste, celles des `all` et `any` comprises. */
+function flatConditions(list: readonly Condition[]): Condition[] {
+  return list.flatMap((c) => (c.type === 'all' || c.type === 'any' ? [c, ...flatConditions(c.conditions)] : [c]));
+}
+
 /** Choix « Donner » quand une étape active attend un objet pour cet habitant. */
 function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceView[] {
   const out: DialogueChoiceView[] = [];
@@ -258,7 +265,8 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
     if (state.status !== 'active') continue;
     const step = sim.content.quests.find((q) => q.id === state.id)?.steps[state.step];
     if (step === undefined) continue;
-    for (const cond of step.conditions) {
+    // Dons au choix (`any`, 0.12: trois coupons de toile ou six plumes): chaque objet a sa ligne « Donner ».
+    for (const cond of flatConditions(step.conditions)) {
       if (cond.type !== 'counter') continue;
       const parts = cond.key.split(':');
       if (parts[0] !== 'given' || parts[1] !== villager || parts[2] === undefined) continue;
@@ -276,6 +284,19 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
   return out;
 }
 
+/** L'habitant se tourne vers qui lui parle; son cap d'avant est gardé pour la fin de la conversation. */
+function turnToTalk(sim: Sim, v: VillagerState, at: { x: number; y: number }): void {
+  if (v.talkingWith.length === 0) sim.runtime.villagerFacing.set(v.id, v.facing);
+  faceToward(v, at);
+}
+
+/** Fin de conversation: l'habitant reprend le cap qu'il avait (son poste le lui redonne s'il en a un). */
+function resumeFacing(sim: Sim, v: VillagerState): void {
+  const before = sim.runtime.villagerFacing.get(v.id);
+  if (before !== undefined) v.facing = before;
+  sim.runtime.villagerFacing.delete(v.id);
+}
+
 /** Ouvre la conversation d'un joueur avec un habitant (portée vérifiée par l'appelant). */
 export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const v = sim.world.villagers.find((x) => x.id === villager);
@@ -283,7 +304,7 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const def = pickDialogue(sim, villager, c.id);
   if (def === null) return false;
   const choices: DialogueChoiceView[] = [
-    ...def.choices.map((ch) => ({ id: ch.id, text: format(ch.text, vars(sim, c.id)) })),
+    ...def.choices.map((ch) => ({ id: ch.id, text: format(ch.text, dialogueVars(sim, c.id)) })),
     ...giveChoices(sim, c, villager),
   ];
   c.dialogue = { dialogue: def.id, villager, lines: lineViews(sim, def, c.id), line: 0, choices };
@@ -291,8 +312,8 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   c.menu = null;
   c.placement = null;
   c.action = { kind: 'talk', since: sim.world.tick, duration: 0, target: { x: v.pos.x, y: v.pos.y } };
-  c.facing = Math.atan2(v.pos.y - c.pos.y, v.pos.x - c.pos.x);
-  v.facing = Math.atan2(c.pos.y - v.pos.y, c.pos.x - v.pos.x);
+  faceToward(c, v.pos);
+  turnToTalk(sim, v, c.pos);
   if (!v.talkingWith.includes(c.id)) v.talkingWith.push(c.id);
   v.met = true;
   bump(sim, `talked:${villager}`, c.id);
@@ -307,15 +328,18 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
   c.status = 'active';
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   const v = sim.world.villagers.find((x) => x.id === d.villager);
-  if (v !== undefined) v.talkingWith = v.talkingWith.filter((id) => id !== c.id);
+  if (v !== undefined) {
+    v.talkingWith = v.talkingWith.filter((id) => id !== c.id);
+    if (v.talkingWith.length === 0) resumeFacing(sim, v);
+  }
   if (!completed) return;
   const def = sim.content.dialogues[d.dialogue];
   if (def === undefined) return;
   // Une réplique du quotidien répétable ne se garde que dans `heard` (tirage « la moins récente »):
   // l'écrire aussi ici ferait grossir la sauvegarde de trois entrées par réplique (tour 8, I-06).
   if (def.kind !== 'daily' || def.once !== null) {
+    // `<id>@<joueur>` suffit: « fini par l'un des deux » se lit aussi dessus (`dialogueDone`, format 8).
     const done = sim.world.dialoguesDone;
-    if (!done.includes(def.id)) done.push(def.id);
     if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
   }
   hearDialogue(sim, c.id, def);
@@ -362,6 +386,13 @@ export function startScene(sim: Sim, dialogueId: string): void {
   }
   const v = sim.world.villagers.find((x) => x.id === def.villager);
   if (v !== undefined) {
+    // Chacun se tourne vers l'habitant, et lui vers le milieu des deux.
+    const [a, b] = sim.world.characters;
+    if (a !== undefined && b !== undefined && v.visible) {
+      faceToward(a, v.pos);
+      faceToward(b, v.pos);
+      turnToTalk(sim, v, { x: (a.pos.x + b.pos.x) / 2, y: (a.pos.y + b.pos.y) / 2 });
+    }
     v.talkingWith = ['p1', 'p2'];
     v.met = true;
   }
@@ -393,7 +424,10 @@ function endScene(sim: Sim): void {
     c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
   }
   const v = sim.world.villagers.find((x) => x.id === scene.villager);
-  if (v !== undefined) v.talkingWith = [];
+  if (v !== undefined) {
+    v.talkingWith = [];
+    resumeFacing(sim, v);
+  }
   if (!sim.world.dialoguesDone.includes(scene.dialogue)) sim.world.dialoguesDone.push(scene.dialogue);
   if (annonceSceneIds(sim.content).has(scene.dialogue)) bump(sim, `scene:${scene.dialogue}`, null);
   emit(sim, { type: 'scene_ended', dialogue: scene.dialogue });
@@ -450,7 +484,7 @@ export function autoStartScenes(sim: Sim): void {
   const range = sim.content.settings.ranges.talk;
   for (const def of Object.values(sim.content.dialogues)) {
     if (!def.shared || def.kind !== 'scene' || def.point === null) continue;
-    if (def.once === 'duo' && world.dialoguesDone.includes(def.id)) continue;
+    if (def.once === 'duo' && dialogueDone(world.dialoguesDone, def.id)) continue;
     const at = point(sim, def.point);
     if (!world.characters.every((c) => distance(c.pos, at) <= range)) continue;
     if (!evaluateAll(sim, def.when, NO_CONTEXT) || !sceneVillagerHere(sim, def)) continue;
@@ -501,9 +535,9 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
   const quest = secretQuestOf(def);
   const correct = picked.correct === null ? null : evaluate(sim, picked.correct, { actor: c.id, baselines: null, toolEvent: null, quest });
   const start = d.lines.length;
-  d.lines.push({ speaker: c.id, text: format(picked.text, vars(sim, c.id)) });
+  d.lines.push({ speaker: c.id, text: format(picked.text, dialogueVars(sim, c.id)) });
   const reply = correct === false ? picked.replyWrong : picked.reply;
-  for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, vars(sim, c.id)) });
+  for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, dialogueVars(sim, c.id)) });
   d.choices = d.choices.filter((ch) => ch.id.startsWith(GIVE_PREFIX));
   d.line = start;
   // Compteurs des conditions `choice_made` (n'importe quel choix, ce choix, un choix juste), seulement

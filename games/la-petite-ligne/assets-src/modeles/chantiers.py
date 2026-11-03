@@ -266,13 +266,15 @@ def well_roof(A):
 def door_canopy(A):
     """Auvent sur la porte de la maisonnette, sans emprise au sol. Origine au nu du mur de façade, au droit de la
     porte, au sol; l'auvent avance vers -Y (dehors). La rive du toit de la maisonnette ne couvre que 0,33 m devant
-    le mur (dessous à 2,20 m à 0,1 m du mur, 2,12 m au bord): l'auvent se glisse sous elle (son haut à 2,08 m à
-    0,25 m du mur) et porte la couverture jusqu'à 1,15 m, en pente douce (bas du bord à 1,93 m, une personne de
+    le mur (dessous à 2,20 m à 0,1 m du mur, 2,12 m au bord): l'auvent se glisse sous elle (son haut à 2,06 m au
+    nu du mur, sans jour entre le mur et la couverture) et porte la couverture jusqu'à 1,15 m, en pente douce (bas du bord à 1,93 m, une personne de
     1,74 m passe). Deux consoles et deux jambes de force scellées au mur à x = +-0,80 (hors du chambranle de la
     porte et de la lampe), couverture de lauzes comme le toit, bord avant arrondi."""
     g = A.geo()
     X = 0.8
-    d0, d1 = 0.22, 1.15
+    # couverture du nu du mur au bord (retour du 2026-11-02): arrêtée à 0,22 m du mur, elle laissait un jour
+    # entre le mur et son ombre au sol, qu'on prenait pour l'ombre de la porte décalée du mur
+    d0, d1 = 0.02, 1.15
     z_back, z_front = 2.06, 1.98
     slope = math.degrees(math.atan2(z_back - z_front, d1 - d0))
     T = 0.05   # épaisseur de la couverture

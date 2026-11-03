@@ -24,9 +24,12 @@
  * - Tout l'état est du JSON pur (ni Map, ni Set, ni classe): il se sauvegarde
  *   et se transmet tel quel.
  */
+import type { MarketLevel } from '../donnees/marche';
+import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
 import type { BuildingId } from './carte';
+import type { FishingState, FishRarity } from './peche';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -118,14 +121,21 @@ export interface WorldState {
   constructions: ConstructionState[];
   /** Meubles posés dans la pièce de la maisonnette. */
   furniture: PlacedFurniture[];
+  /** Petits objets posés sur le dessus d'un meuble porteur (format 9, S03). */
+  decor: PlacedDecor[];
   /** Objets posés au sol (boîte en fer, œufs, piles tombées d'un sac plein). */
   groundItems: GroundItem[];
   villagers: VillagerState[];
   hens: Hen[];
   /** La mangeoire a été remplie aujourd'hui (les œufs viennent le lendemain matin). */
   feederFilled: boolean;
+  /**
+   * Élevage (0.12, format 12, conception section 4): coq, poussines, couvée, litière, grain entamé,
+   * chèvres, pâtures broutées et noms à choisir. Vides ou nuls au départ et à la migration.
+   */
+  breeding: BreedingState;
   train: TrainState;
-  /** Bourse commune, en sous, jamais négative. */
+  /** Bourse commune, en aubrins, jamais négative. */
   purse: number;
   /** Coffre de la maisonnette (cellier commun). */
   cellar: ItemStack[];
@@ -141,6 +151,16 @@ export interface WorldState {
   heavyDeliveries: ItemId[];
   /** Ventes du jour à l'épicerie (plafond quotidien). */
   grocerSoldToday: number;
+  /** 0.12 (section 2.2): unités vendues à Odette par article, oubliées de moitié à chaque aube (l'offre). */
+  grocerSupply: Record<ItemId, number>;
+  /** 0.12: l'ardoise du jour d'Odette (article à prix et demi, `sold` unités déjà vendues à ce prix), ou `null`. */
+  ardoise: { day: number; item: ItemId; sold: number } | null;
+  /** 0.12: articles vendables que le duo a déjà eus (ardoise, listes du marché: jamais un produit jamais vu). */
+  goodsSeen: ItemId[];
+  /** 0.12 (section 2.3): l'étal du dimanche (ce qu'il porte, son prix, les clients du jour), `null` avant la quête. */
+  market: MarketState | null;
+  /** 0.12 (section 2.4): la sacoche de Lucie du jour, `null` hors tournée. */
+  mail: MailState | null;
   proposals: Proposal[];
   quests: QuestState[];
   letters: Letter[];
@@ -232,6 +252,8 @@ export interface WorldState {
    * souhaits) s'échelonnent à partir de là, un par journée (`simulation/bourg.ts`, `townDays`).
    */
   upperStreetSince: number;
+  /** Pêche de la 0.12 (format 10): ombres, coin qui frémit, guet, grands, carnet des poissons (`etat/peche.ts`). */
+  fishing: FishingState;
 }
 
 /** Une coupe proposée depuis le banc du salon: coiffure, couleur et barbe (bornes de `town.appearance`). */
@@ -280,7 +302,7 @@ export interface BoardAnnonce {
   posted: number;
   /** Échéance: elle se retire à cette heure si elle n'est pas faite. */
   deadline: { day: number; time: number };
-  /** Récompense en sous (section 1.4), fixée à l'affiche. */
+  /** Récompense en aubrins (section 1.4), fixée à l'affiche. */
   reward: number;
   state: 'open' | 'done' | 'expired';
   /** Qui l'a remise (dernier don ou scène à deux: `null`). */
@@ -379,10 +401,25 @@ export interface Appearance {
   hairColor: number;
   /** Barbe ou moustache (réponse du client du 2026-11-01): 0 aucune, 1 barbe courte, 2 barbe fournie, 3 moustache. */
   beard: number;
-  /** Couleur de la tenue, de 0 à 3. */
-  outfit: number;
-  /** Couleur du foulard: celle du profil Duo du joueur (CSS, `#rrggbb`). */
+  /** Vêtements portés (0.12, identifiants de `vetements.json`), un par emplacement. */
+  wear: Wear;
+  /**
+   * Couleur du profil Duo du joueur (CSS, `#rrggbb`): badge brodé sur le haut depuis la 0.12 (les
+   * foulards sont retirés), portraits de l'interface. Le nom reste celui du format de sauvegarde.
+   */
   scarf: string;
+}
+
+/** Emplacements de vêtement (0.12): haut, par-dessus, bas, chaussures, tête. */
+export type ClothingSlot = 'top' | 'outer' | 'bottom' | 'shoes' | 'hat';
+
+/** Tenue portée: haut, bas et chaussures toujours; par-dessus et tête facultatifs. */
+export interface Wear {
+  top: string;
+  bottom: string;
+  shoes: string;
+  outer: string | null;
+  hat: string | null;
 }
 
 export interface Character {
@@ -391,6 +428,8 @@ export interface Character {
   playerId: PlayerId;
   name: string;
   appearance: Appearance;
+  /** Vêtements possédés (0.12), ceux de départ compris, dans l'ordre d'arrivée. */
+  wardrobe: string[];
   /** Création terminée. */
   created: boolean;
   /** Écran titre: ce joueur est prêt (remis à faux à chaque reprise de partie). */
@@ -502,7 +541,14 @@ export interface Character {
    */
   seat: BenchSeat | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
-  fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
+  fishing: {
+    phase: 'waiting' | 'bite';
+    bobber: Vec2;
+    biteAt: number;
+    until: number;
+    /** Ombre réservée par cette ligne (`world.fishing.shadows[].id`), absente si aucune encore. */
+    shadow?: number;
+  } | null;
   /**
    * Confidence du matin (moments rares): où et quand voir le moment du jour, pour ce joueur seul.
    * Affichée au petit-déjeuner et au carnet jusqu'à l'apogée ou au départ du moment.
@@ -536,7 +582,15 @@ export type MenuKind =
   /** Le fauteuil de Solange (tour 10, section 2.3): coupe, couleur, barbe, proposition reçue. */
   | 'salon'
   /** Le guichet du fournil d'Achille (section 1.5): pain, pain chaud, brioche. */
-  | 'bakery';
+  | 'bakery'
+  /** 0.12: l'étal du dimanche (garnir, choisir le prix). */
+  | 'stall'
+  /** 0.12: la boutique de vêtements, au comptoir de la mercerie de Solange (essayer, acheter, se changer en cabine). */
+  | 'clothes_shop'
+  /** 0.12: se changer chez soi, au coffre (vêtements de sa garde-robe). */
+  | 'wardrobe'
+  /** La basse-cour (0.12, section 4): état des bêtes, couvée, noms à choisir, collection des couleurs. */
+  | 'farm';
 
 export type ActionKind =
   | 'idle'
@@ -615,6 +669,8 @@ export interface AimInfo {
    * absent: la case devant le personnage. Recalculé à chaque pas, jamais relu d'une sauvegarde.
    */
   source?: 'pointer';
+  /** Bête visée (poule, poussine, coq, chèvre): l'interface montre son nom et son humeur. */
+  animal?: string;
 }
 
 export type AimVerb =
@@ -646,7 +702,18 @@ export type AimVerb =
   /** Boire un chocolat chaud à la petite table d'Odette (tour 10, section 1.6). */
   | 'drink'
   /** Ouvrir ou fermer des rideaux accrochés à une fenêtre (tour 10, section 6.2). */
-  | 'curtains';
+  | 'curtains'
+  // Élevage (0.12, section 4): caresser, paille, seau, piquet, brosse, traite, tenir la chèvre.
+  | 'pet'
+  | 'take_straw'
+  | 'straw'
+  | 'fill_pail'
+  | 'pour'
+  | 'lead'
+  | 'plant'
+  | 'brush'
+  | 'milk'
+  | 'goat_hold';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -657,6 +724,10 @@ export interface PlacementPreview {
   valid: boolean;
   /** Pourquoi ce n'est pas possible (texte de `textes.json`, clés `placement_*`), ou `null`. Toujours rempli par la simulation. */
   blocked?: string | null;
+  /** Petit objet (S03): l'aperçu peut se poser sur un meuble porteur que vise la souris. */
+  small?: boolean;
+  /** Petit objet visé sur le dessus d'un meuble: le meuble porteur et la place (`cell` est alors celle du meuble). */
+  on?: { furniture: string; place: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -693,6 +764,21 @@ export interface PlacedFurniture {
   window?: string;
   /** Rideaux seulement: fermés. Absent: ouverts. */
   closed?: boolean;
+}
+
+/**
+ * Petit objet posé sur le dessus d'un meuble porteur (0.11.2, S03): il suit son meuble, et revient au
+ * sac (ou au rangement) quand on reprend le meuble.
+ */
+export interface PlacedDecor {
+  /** Identifiant unique (`d1`, `d2`...). */
+  id: string;
+  item: ItemId;
+  /** Le meuble porteur (`PlacedFurniture.id`). */
+  on: string;
+  /** Rang de la place dans `surface` du meuble porteur. */
+  place: number;
+  placedBy: CharacterId | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -741,7 +827,8 @@ export interface Tree {
 }
 
 /** Ce qu'on porte à deux: la poutre, la draisine poussée, le colis lourd du train. */
-export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket';
+/** `quest` (0.12): une charge de quête (`reglages.carry.quests`), retrouvée par son objet. */
+export type LoadPurpose = 'construction' | 'handcar' | 'parcel' | 'basket' | 'quest';
 
 export interface Beam {
   /** Objet porté (modèle de `objets.json`): `beam`, `handcar`, `heavy_parcel`. */
@@ -783,6 +870,90 @@ export interface Hen {
   namedBy: CharacterId | null;
   /** Poule commandée au catalogue (tour 9): jour d'arrivée; Jeanne la nomme à 10 h 30. Absent pour les trois premières. */
   arrivedDay?: number;
+  /** Bonheur (0.12, section 4.2): de `care.happiness.floor` à 100. */
+  happiness: number;
+  /** Jour de son dernier œuf (un œuf un jour sur deux sous 40, ou sans grain l'été). Absent: jamais. */
+  lastEggDay?: number;
+}
+
+/** Une bête de la basse-cour qui ne pond pas: le coq, une poussine qui suit sa mère. */
+export interface Fowl {
+  id: string;
+  /** Vide tant que les joueurs ne l'ont pas nommée. */
+  name: string;
+  variant: string;
+  pos: Vec2;
+  prev: Vec2;
+  facing: number;
+  wander: Vec2;
+}
+
+export interface Chick extends Fowl {
+  /** Poule qu'elle suit (identifiant de `hens`). */
+  mother: string;
+  /** Jour de l'éclosion: poule à l'aube `bornDay + growNights`. */
+  bornDay: number;
+  /** Un coquelet: le cousin d'Odette le reprend à la première aube. */
+  roosterling?: true;
+}
+
+/** La couvée en cours: la poule au nid, les œufs, le jour où elle s'y est mise. */
+export interface BroodState {
+  hen: string;
+  eggs: number;
+  startDay: number;
+  by: CharacterId;
+}
+
+/** Une chèvre (0.12, section 4.3). */
+export interface Goat {
+  id: string;
+  name: string;
+  pos: Vec2;
+  prev: Vec2;
+  facing: number;
+  wander: Vec2;
+  happiness: number;
+  /** Place de pâture où est planté son piquet (`goat_graze_0n`). */
+  stake: string;
+  /** Qui la mène par la corde (piquet en main), ou `null`. */
+  led: CharacterId | null;
+  /** Rentrée à la chevrerie (le soir, la nuit et à l'aube jusqu'à `outAt`). */
+  home: boolean;
+  milkedDay: number | null;
+  /** Jour où l'eau a été versée dans son baquet. */
+  wateredDay: number | null;
+  /** Elle a brouté aujourd'hui une place fraîche (non broutée depuis `freshDays` jours). */
+  freshToday?: true;
+  /** Traite en cours: qui trait, l'avancée (0 à 1) et qui tient la tête. */
+  milking: { by: CharacterId; progress: number; holder: CharacterId | null } | null;
+}
+
+/** Un nom à choisir parmi trois, par un joueur, visible des deux. */
+export interface NamingRequest {
+  animal: string;
+  kind: 'rooster' | 'chick' | 'goat';
+  by: CharacterId;
+  options: string[];
+}
+
+export interface BreedingState {
+  rooster: Fowl | null;
+  chicks: Chick[];
+  brood: BroodState | null;
+  /** Jour où la litière du poulailler a été changée, `null`: jamais. */
+  strawDay: number | null;
+  /** Rations du sac de grain entamé à la mangeoire. */
+  grainRations: number;
+  goats: Goat[];
+  /** Dernier jour brouté par place de pâture. */
+  grazed: Record<string, number>;
+  /** Noms à choisir, dans l'ordre (le premier se choisit). */
+  naming: NamingRequest[];
+  /** Noms déjà donnés (tirages sans redite). */
+  namesUsed: string[];
+  /** Prochain joueur qui nomme une poussine (à tour de rôle). */
+  nextNamer: CharacterId;
 }
 
 // ---------------------------------------------------------------------------
@@ -1029,8 +1200,8 @@ export interface Proposal {
 }
 
 export interface PurchaseRequest {
-  /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en sous. */
-  source: 'grocery' | 'catalogue' | 'improvement';
+  /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en aubrins. */
+  source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   item: ItemId;
   count: number;
 }
@@ -1105,17 +1276,65 @@ export interface QuestState {
   train?: number;
 }
 
+/**
+ * Lettre reçue (format 8): titre, expéditeur et texte se reconstituent depuis les données
+ * (`etat/courrier.ts`, `letterTitle`, `letterText`, `letterFrom`).
+ */
 export interface Letter {
   id: LetterId;
   day: number;
-  title: string;
-  from: string;
-  /** Texte final, variables remplacées. */
-  text: string;
+  /** Variante retenue (index dans `variants` de la définition); absente pour le texte de base. */
+  variant?: number;
+  /** Valeurs des variables citées par le titre et le texte, figées à l'envoi; absentes s'il n'y en a pas. */
+  vars?: Record<string, string | number>;
   read: CharacterId[];
+  /** Lettre migrée que les données ne redonnent plus à l'identique: titre, expéditeur et texte d'origine. */
+  legacy?: { title: string; from: string; text: string };
 }
 
 export type NotificationKind = 'hint' | 'message' | 'quest' | 'letter' | 'proposal' | 'envie';
+
+/** Un client du marché du dimanche (section 2.3). */
+export interface MarketBuyer {
+  villager: string;
+  /** Minute de jeu de son arrivée (ou de son retour, après un premier départ). */
+  at: number;
+  list: { item: ItemId; count: number }[];
+  /** `coming`: pas encore là; `walking`: en route vers sa place; `waiting`: devant l'étal; `served`, `gone`: fini. */
+  status: 'coming' | 'walking' | 'waiting' | 'served' | 'gone';
+  /** Sa place dans la file (0 ou 1), quand il y est ou s'y rend. */
+  spot: number | null;
+  /** Minute du début de son attente devant l'étal. */
+  since: number;
+  /** Déjà reparti une fois (« Je repasse tout à l'heure »). */
+  returned: boolean;
+  /** Qui l'a servi, et à quelle minute (« servis à deux », compteur `market_served_together`). */
+  servedBy?: CharacterId;
+  servedAt?: number;
+}
+
+/** Un pli de la sacoche de Lucie: la sorte, le destinataire, pris au banc, livré. */
+export interface MailPli {
+  kind: MailKind;
+  to: string;
+  taken: boolean;
+  delivered: boolean;
+}
+
+export interface MailState {
+  day: number;
+  items: MailPli[];
+  /** Plis repris par Firmin à 18 h: ils reviennent dans la sacoche de la prochaine tournée (rien n'est perdu). */
+  carryOver: number;
+}
+
+export interface MarketState {
+  /** Dernier dimanche ouvert (les clients sont ceux de ce jour). */
+  day: number;
+  level: MarketLevel;
+  stall: ItemStack[];
+  buyers: MarketBuyer[];
+}
 
 export interface GameNotification {
   /** Identifiant unique (ordre d'arrivée). */
@@ -1211,6 +1430,18 @@ export type WorldEvent =
   | { type: 'bag_full'; by: CharacterId }
   | { type: 'bought'; by: CharacterId; item: ItemId; count: number; price: number }
   | { type: 'sold'; by: CharacterId; item: ItemId; count: number; price: number }
+  /** 0.12: l'ardoise d'Odette change (7 h). */
+  | { type: 'ardoise_posted'; item: ItemId }
+  /** 0.12, marché du dimanche: l'étal s'ouvre, un client arrive, une vente, un refus, l'étal se range. */
+  | { type: 'market_opened' }
+  | { type: 'market_buyer_arrived'; villager: string }
+  | { type: 'market_sale'; by: CharacterId; villager: string; items: { item: ItemId; count: number }[]; amount: number }
+  | { type: 'market_refused'; by: CharacterId; villager: string }
+  | { type: 'market_closed' }
+  /** 0.12, plis de Lucie: la sacoche est posée, un pli livré, Firmin reprend le reste à 18 h. */
+  | { type: 'mail_ready'; count: number }
+  | { type: 'mail_delivered'; by: CharacterId; villager: string; amount: number }
+  | { type: 'mail_returned' }
   | { type: 'deposited'; by: CharacterId; item: ItemId; count: number }
   | { type: 'money'; amount: number }
   | { type: 'order_paid'; amount: number; linesDone: number }
@@ -1263,7 +1494,11 @@ export type WorldEvent =
   | { type: 'pin'; by: CharacterId; pos: Vec2 }
   | { type: 'cast'; by: CharacterId; at: Vec2 }
   | { type: 'bite'; by: CharacterId }
-  | { type: 'caught'; by: CharacterId; item: ItemId }
+  /**
+   * Prise (0.12): longueur tirée, rareté, remis à l'eau, première prise de l'espèce, record battu.
+   * Le son d'une prise ne joue que chez le pêcheur, sauf celui d'un mythique (section 7.1).
+   */
+  | { type: 'caught'; by: CharacterId; item: ItemId; cm?: number; rarity?: FishRarity; released?: boolean; first?: boolean; record?: boolean; zone?: string }
   | { type: 'escaped'; by: CharacterId }
   | { type: 'absence'; who: CharacterId; absent: boolean }
   // Moments rares (tour 6)
@@ -1291,6 +1526,23 @@ export type WorldEvent =
   | { type: 'catalogue_page'; season: Season; week: number; items: ItemId[] }
   | { type: 'tool_upgraded'; by: CharacterId; item: ItemId; previous: ItemId | null }
   | { type: 'hen_delivered'; hen: string; item: ItemId; by: CharacterId | null }
+  // Élevage (0.12, section 4)
+  | { type: 'animal_petted'; by: CharacterId; animal: string }
+  | { type: 'straw_taken'; by: CharacterId }
+  | { type: 'coop_strawed'; by: CharacterId }
+  | { type: 'brood_started'; by: CharacterId; hen: string }
+  | { type: 'brood_hatched'; count: number; pullets: number }
+  | { type: 'roosterling_left' }
+  | { type: 'rooster_crowed' }
+  | { type: 'animal_arrived'; animal: string; kind: 'rooster' | 'goat' }
+  | { type: 'naming_requested'; animal: string; by: CharacterId }
+  | { type: 'animal_named'; by: CharacterId; animal: string; name: string }
+  | { type: 'goat_led'; by: CharacterId; goat: string }
+  | { type: 'goat_staked'; by: CharacterId; goat: string; spot: string }
+  | { type: 'goat_brushed'; by: CharacterId; goat: string }
+  | { type: 'goat_milked'; by: CharacterId; goat: string; count: number; together: boolean }
+  | { type: 'pail_filled'; by: CharacterId }
+  | { type: 'goat_watered'; by: CharacterId }
   | { type: 'hen_named'; hen: string; name: string; by: CharacterId | null }
   | { type: 'gift_given'; by: CharacterId; villager: VillagerId; item: ItemId }
   // Tour 9: moments (barrières armées, lanternes)

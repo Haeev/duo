@@ -18,9 +18,11 @@
  * `saison=printemps|ete|automne|hiver` (tour 8: palette et lumière de la saison; le même jour de
  * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Tour 9:
  * `chantiers=tous|<ids>`, `cadeaux=1`, `outil=<objet>`, `maison9=1`, `cueillette9=1`,
- * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Touches: G repère, J lancer,
+ * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Pêche de la 0.12: `peche12=1`, avec
+ * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
+import { applyBreedingExample } from './elevage-exemple';
 import type { CameraCommand } from '../camera';
 import { loadContent } from '../../donnees/contenu';
 import { MAP_FILES } from '../../donnees/cartes-fichiers';
@@ -40,8 +42,9 @@ import {
 import { applyEdgeExample } from './lisiere-exemple';
 import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
+import { createPeche12Demo } from './peche12-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
-import type { WorldState } from '../../etat/types';
+import type { Wear, WorldState } from '../../etat/types';
 
 const MINUTES_PER_HOUR = 60;
 const DEFAULT_MINUTES = 10.5 * MINUTES_PER_HOUR;
@@ -123,9 +126,13 @@ interface DemoHandle {
   quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
   advance(dt: number): void;
+  /** Envoie un événement au rendu comme la simulation (captures: prise d'un poisson). */
+  emit(event: WorldEvent): void;
   pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
   destination(): { x: number; y: number } | null;
   frames: number;
+  /** Monde affiché, pour les planches d'animation (mode `manuel=1`). */
+  world(): WorldState;
 }
 
 declare global {
@@ -193,6 +200,24 @@ async function main(): Promise<void> {
   applyDemoDay(world, params, content);
   // Tour 9: chantiers, cadeaux, outils, objets de maison, cueillettes, assis (`tour9-exemple.ts`).
   applyTour9Example(world, map, content, params);
+  if (params.get('marche') === '1') {
+    // `marche=1` (0.12): l'étal posé et garni, la balance achetée, la sacoche de Lucie au banc du quai.
+    world.flags.push('market_open', 'stall_six_slots');
+    world.market = {
+      day: world.clock.day,
+      level: 'fair',
+      stall: [
+        { item: 'radish', quality: 'ordinary', count: 6 },
+        { item: 'egg', quality: 'ordinary', count: 4 },
+        { item: 'blackberry_jam', quality: 'ordinary', count: 2 },
+        { item: 'fresh_cheese', quality: 'ordinary', count: 2 },
+        { item: 'carrot', quality: 'ordinary', count: 3 },
+      ],
+      buyers: [],
+    };
+    world.cellar.push({ item: 'market_scale', quality: 'ordinary', count: 1 });
+    world.mail = { day: world.clock.day, items: [{ kind: 'letter', to: 'basile', taken: false, delivered: false }], carryOver: 0 };
+  }
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
     world.hens.forEach((hen, index) => {
@@ -215,8 +240,23 @@ async function main(): Promise<void> {
   }
   // Tour 10: intérieurs, ru, pièces, rideaux, rangement, coiffures (`tour10-exemple.ts`), après `x` et `y`.
   applyTour10Example(world, map, content, params);
+  // 0.12: `tenue=complete`, les deux joueurs habillés de pied en cap (mesure du budget de triangles).
+  if (params.get('tenue') === 'complete') {
+    const full: Wear[] = [
+      { top: 'pull_moutarde', bottom: 'pantalon_bleu', shoes: 'bottes_jaunes', outer: 'cire_marine', hat: 'bonnet_rouge' },
+      { top: 'chemise_lin', bottom: 'jupe_prune', shoes: 'bottines_brunes', outer: 'veste_brune', hat: 'paille_ruban_rouge' },
+    ];
+    world.characters.forEach((c, i) => {
+      const wear = full[i];
+      if (wear !== undefined) c.appearance.wear = wear;
+    });
+  }
+  // 0.12: l'élevage (`elevage=1`, ou `elevage=mene` pour la chèvre menée), après `x` et `y`.
+  const breeding = params.get('elevage');
+  if (breeding !== null) applyBreedingExample(world, map, breeding);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
+  const peche12 = createPeche12Demo(params, local);
   const view: GameView = {
     content,
     map,
@@ -252,6 +292,7 @@ async function main(): Promise<void> {
     quality: params.get('rendu') === 'leger' ? 'light' : 'normal',
     // Captures reproductibles: qualité fixe, sauf `adaptatif=1` (essai du repli automatique).
     adaptive: params.get('adaptatif') === '1',
+    ...(peche12 === null ? {} : { fishing: peche12.source }),
   });
   const handle: DemoHandle = {
     ready: false,
@@ -267,9 +308,13 @@ async function main(): Promise<void> {
       pixelRatio: engine.pixelRatio(),
     }),
     advance: () => undefined,
+    emit: (event: WorldEvent) => {
+      emit(event);
+    },
     pick: (x: number, y: number) => engine.pick(x, y),
     destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
+    world: () => world,
   };
   window.lplRendu = handle;
   await engine.load(() => undefined);
@@ -362,7 +407,9 @@ async function main(): Promise<void> {
           emit({ type: 'cast', by: 'p2', at: { ...line.bobber } });
         } else if (event.code === 'KeyK') {
           angler.fishing = null;
-          emit({ type: 'caught', by: 'p2', item: 'trout' });
+          // 0.12: la longueur tirée (`cm`), lue par le rendu du poisson tenu.
+          const caught = { type: 'caught', by: 'p2', item: 'trout', cm: 38 } as const;
+          emit(caught);
         } else {
           angler.fishing = null;
           emit({ type: 'escaped', by: 'p2' });
@@ -452,6 +499,7 @@ async function main(): Promise<void> {
     ) {
       me.action = { kind: 'idle', since: 0, duration: 0, target: null };
     }
+    peche12?.step(world, dt);
     engine.frame(dt);
     handle.frames += 1;
   };

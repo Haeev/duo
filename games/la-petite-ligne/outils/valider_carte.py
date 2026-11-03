@@ -18,6 +18,7 @@ Contrôles:
    mur commun, carte entière atteignable une fois bâties); le ru de la Côte franchissable aux seuls
    passages prévus, chacun reliant les deux rives; portes des lieux vues dans trois orientations sur
    quatre; rue de la halte jamais cachée par les maisons basses du sud; rien de planté sur un passage.
+10. clôtures (retours du 2026-11-02): chaque bout de file et chaque bord d'ouverture finit sur un poteau.
 
 Usage: python3 games/la-petite-ligne/outils/valider_carte.py [carte.json]
 Bibliothèque standard uniquement. Code de sortie 1 s'il reste une erreur.
@@ -87,6 +88,46 @@ class Rapport:
 def taille_monde(type_def: dict, rotation: int) -> tuple[int, int]:
     larg, prof = type_def["emprise"]
     return (larg, prof) if rotation % 2 == 0 else (prof, larg)
+
+
+def poteaux_de_cloture(objets: list[dict]) -> tuple[set, list[tuple[str, tuple[float, float]]]]:
+    """Poteaux des segments `fence` et bouts de segment sans poteau.
+
+    Le segment du modèle (`fence_wood`, 1 m le long de son x) ne porte qu'un poteau, à x = -0,5:
+    une file de n segments a n poteaux et il lui en faut n + 1. Le constructeur pose un poteau
+    (accroche `fence_post`) à chaque bout rendu ici; le contrôle des clôtures s'en sert aussi.
+    """
+    poteaux: set = set()
+    bouts: list[tuple[str, tuple[float, float]]] = []
+    for o in objets:
+        if o["type"] != "fence":
+            continue
+        a = o["rotation"] * math.pi / 2
+        c, s = round(math.cos(a)), round(math.sin(a))
+        # Repère du rendu (rotation.y = rotation x PI/2): le x local -0,5 va en (-0,5 cos ; +0,5 sin).
+        poteaux.add((o["x"] - 0.5 * c, o["y"] + 0.5 * s))
+        bouts.append((o["id"], (o["x"] + 0.5 * c, o["y"] - 0.5 * s)))
+    return poteaux, [(i, b) for i, b in bouts if b not in poteaux]
+
+
+def controler_clotures(carte: dict, rapport: Rapport) -> None:
+    """Toute clôture finit sur un poteau, et chaque bord d'ouverture aussi (retours du 2026-11-02, S08).
+
+    Un bout de lisse est porté par le poteau d'un segment voisin ou par une accroche `fence_post` posée
+    exactement là. Un bord d'ouverture est un bout de file: le même contrôle le couvre.
+    """
+    poteaux, sans = poteaux_de_cloture(carte["objets"])
+    accroches = {(a["x"], a["y"]) for a in carte.get("accroches", []) if a.get("modele") == "fence_post"}
+    fences = {o["id"] for o in carte["objets"] if o["type"] == "fence"}
+    for a in carte.get("accroches", []):
+        if a.get("modele") == "fence_post" and a.get("sur") not in fences:
+            rapport.erreur(f"poteau {a['id']}: porté par {a.get('sur')!r}, qui n'est pas une clôture")
+    for seg, (x, y) in sans:
+        if (x, y) not in accroches:
+            rapport.erreur(f"clôture {seg}: les lisses finissent dans le vide en ({x}, {y}), sans poteau")
+    for x, y in accroches - {b for _, b in sans}:
+        if (x, y) not in poteaux:
+            rapport.erreur(f"poteau de clôture en ({x}, {y}): aucun bout de lisse à porter")
 
 
 def emprise_monde(o: dict, types: dict) -> tuple[int, int, int, int]:
@@ -456,6 +497,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         rect = o.get("rect")
         if rect != {"x": rx0, "y": ry0, "w": w, "h": h}:
             rapport.erreur(f"objet {o['id']}: `rect` ne correspond pas au centre et à la rotation")
+    controler_clotures(carte, rapport)
     for p in carte["points"]:
         if not (0 <= p["x"] < larg and 0 <= p["y"] < haut):
             rapport.erreur(f"point {p['id']}: hors de la carte")
@@ -752,6 +794,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                 break
 
     # 6. Pêche, cueillette
+    controler_coins_peche(carte, rapport, libre)
     eau = [(x + 0.5, y + 0.5) for y in range(haut) for x in range(larg) if lignes[y][x] == "~"]
     for p in carte["points"]:
         if p.get("peche") or p["id"] == "river_ford":
@@ -851,6 +894,42 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     if chr(0x2014) in texte or chr(0x2013) in texte:
         rapport.erreur("typographie: tiret cadratin ou demi-cadratin dans la carte")
     return resultats
+
+
+def controler_coins_peche(carte: dict, rapport: Rapport, libre: list[list[bool]]) -> None:
+    """Pêche 0.12 (C1): chaque case d'eau dans un seul coin, et chaque coin pêchable depuis une case libre."""
+    coins = carte.get("peche", {}).get("coins")
+    if coins is None:
+        return
+    legende = carte["terrain"]["legende"]
+    lignes = carte["terrain"]["lignes"]
+    haut, larg = len(lignes), len(lignes[0])
+    proprio: dict[tuple[int, int], str] = {}
+    for coin in coins:
+        cases_eau = []
+        for r in coin["rects"]:
+            for x, y in cases_rect(r):
+                if not (0 <= x < larg and 0 <= y < haut) or legende[lignes[y][x]].get("sol") != "water":
+                    continue
+                if (x, y) in proprio:
+                    rapport.erreur(f"coin de pêche {coin['id']}: case d'eau ({x}, {y}) déjà dans {proprio[(x, y)]}")
+                proprio[(x, y)] = coin["id"]
+                cases_eau.append((x, y))
+        if not cases_eau:
+            rapport.erreur(f"coin de pêche {coin['id']}: aucune case d'eau")
+            continue
+        portee = any(
+            0 <= ex + dx < larg and 0 <= ey + dy < haut and libre[ey + dy][ex + dx]
+            for ex, ey in cases_eau
+            for dy in range(-6, 7) for dx in range(-6, 7)
+            if dx * dx + dy * dy <= 36
+        )
+        if not portee:
+            rapport.erreur(f"coin de pêche {coin['id']}: aucune case libre à moins de 6 m")
+    for y in range(haut):
+        for x in range(larg):
+            if legende[lignes[y][x]].get("sol") == "water" and (x, y) not in proprio:
+                rapport.erreur(f"coins de pêche: case d'eau ({x}, {y}) hors de tout coin")
 
 
 def _composantes(cases: set[tuple[int, int]]) -> list[set[tuple[int, int]]]:

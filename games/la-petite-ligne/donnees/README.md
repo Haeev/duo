@@ -65,7 +65,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `indefinite` | texte | le nom au singulier avec son article indéfini (« une laitue », « un œuf », « des rideaux »), pour les phrases du type « Sacha propose d'acheter un matelas »; le validateur demande « un », « une » ou « des » suivi exactement de `name` |
 | `category` | texte | `seed`, `crop`, `forage`, `animal_product`, `material`, `carried`, `tool`, `food`, `quest`, `fish`, `decoration`, `furniture` |
 | `stack` | entier ≥ 1 | taille d'une pile dans le sac (1 pour les outils et les meubles) |
-| `buyPrice` | entier ou `null` | prix d'achat en boutique, en sous; `null` si l'objet ne s'achète pas |
+| `buyPrice` | entier ou `null` | prix d'achat en boutique, en aubrins; `null` si l'objet ne s'achète pas |
 | `sellPrice` | entier ou `null` | prix de base, qualité ordinaire; `null` si l'objet ne se vend pas. Odette paie `buyRate` fois ce prix, la caisse du train ce prix exact |
 | `shop` | `"grocery"`, `"catalogue"` ou `null` | où l'acheter; le catalogue livre au train suivant (jour 8 ou 15) |
 | `availableFromDay` | entier, facultatif | en vente à partir de ce jour seulement (les nouveautés de la semaine 2: 9) |
@@ -163,6 +163,8 @@ Les dialogues `scene` partagés et `ending` ne se déclenchent pas par l'action 
 
 Quête de la semaine (tour 8): `repeat: "each_train"` sur la quête. Une étape `at_deadline` sans `deadline` échoit au départ du train de la commande en cours (`train.departure`); la quête finie redémarre aussitôt pour le train suivant (étapes et compteurs remis à zéro). `{day}` dans `title`, `objective` et `completionText`: le jour de ce train. C'est `weekly_order`, démarrée par `second_order`.
 
+Retrait sans reproche (0.12): `expire: { weekday, time, text }` sur la quête. Si elle est encore active au premier `weekday` à `time` après son démarrage (le jour même ne compte pas), elle quitte l'état sans récompense, `text` (clé de `textes.messages`) s'affiche chez les deux, et elle peut redémarrer quand ses conditions de départ redeviennent vraies. C'est `achille_eggs` (dimanche 6 h).
+
 Les conditions d'une étape sont évaluées à chaque changement d'état et à chaque événement. Une condition d'événement (`used_tool_at`) est vraie à l'instant de l'événement, et les autres conditions de la liste sont vérifiées à ce même instant.
 
 ### 2.5 `courrier.json`
@@ -190,7 +192,7 @@ Lettres hebdomadaires (tour 8): `delivery.instance: "train"`. Une instance par t
 | `time_reached` | `time` | est dehors quand l'horloge atteint cette heure |
 | `veillee_started` | | commence une veillée |
 | `holding_furniture` | | tient un meuble à poser |
-| `big_purchase_attempt` | | lance un achat d'au moins `bigPurchaseThreshold` sous |
+| `big_purchase_attempt` | | lance un achat d'au moins `bigPurchaseThreshold` aubrins |
 | `letter_received` | | reçoit du courrier |
 | `near_forage` | | passe à moins de 6 m d'une cueillette posée à la lisière (tour 8, à partir de `forage.fromDay`) |
 | `aim_sapling` | | vise un rejet de chêne ou un jeune sapin (tour 8) |
@@ -225,7 +227,7 @@ Après la démo (tour 8, `reglages.envies`): à partir de `sharedFromDay` (16), 
 | `forage` | tour 8, cueillette de la lisière: `fromDay`, `spawnChance`, `unseenFactor`, `rainBoost`, `points` (coins et leurs cueillettes), `items` (saisons, poids, quantité); lue par la commande générée (capacité de la lisière). Chaque matin à partir de `fromDay`, les cueillettes hors de saison posées sur un coin s'en vont (sans message), puis chaque coin vide (aucun objet à moins de 0,75 m) se garnit avec la chance `spawnChance`, d'une cueillette de saison du coin tirée au prorata des poids (`unseenFactor` pour une cueillette jamais ramassée, `rainBoost` le lendemain d'une pluie); règle pure dans `src/etat/cueillette.ts`. On la ramasse comme un objet au sol |
 | `spawn` | point d'apparition des deux joueurs |
 | `economy` | bourse de départ, monnaie, seuil des gros achats (accord de l'autre), Odette (taux, plafond par jour, drapeau qui l'autorise à acheter), catalogue (`windows`: une fenêtre par semaine, date limite et livraison; celle du moment est la première dont la livraison n'est pas passée; puis `repeatWeekly`: commande jusqu'au `deadlineWeekday` à `deadlineTime`, livraison le lendemain à `deliveryTime`) |
-| `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train). `generated` (tour 8, sections 4.2 à 4.7 de la conception): commandes tirées à partir de `fromOrder` (3), au départ du train précédent: lignes par commande (`linesByOrder`), familles, reprises, poids, budget et sa progression, taille du duo (`size`), capacités des ressources (`resources`), paie minimale d'une ligne (`paymentPerWorkWeek` sous par semaine de travail), produits de base partagés (`noSharedBase`), et `products` (`item`, `family`, `resource`, `cost`, `min`, `price` facultatif, `seasons`, `obtained`: le compteur du duo qui dit que le produit est obtenu, `leadDays`) |
+| `order` | `trains`: une commande par train qui emporte la caisse (`day`, jour du train; `lines`; `linePremium` et `fullBonus` facultatifs, sinon ceux de `order`); prime par ligne remplie, prime de commande complète; `crateAcceptsAnyItem` (la caisse prend aussi le reste, payé `extraItemsRate` fois le prix de base au départ du train). `generated` (tour 8, sections 4.2 à 4.7 de la conception): commandes tirées à partir de `fromOrder` (3), au départ du train précédent: lignes par commande (`linesByOrder`), familles, reprises, poids, budget et sa progression, taille du duo (`size`), capacités des ressources (`resources`), paie minimale d'une ligne (`paymentPerWorkWeek` aubrins par semaine de travail), produits de base partagés (`noSharedBase`), et `products` (`item`, `family`, `resource`, `cost`, `min`, `price` facultatif, `seasons`, `obtained`: le compteur du duo qui dit que le produit est obtenu, `leadDays`) |
 | `garden`, `quality`, `trees`, `hens` | potager (12 cases, zone de carte), qualité, arbres (nombre, zone, coups de hache, rondins; tour 8: `regrow`, `regrowFromDay` 16, `catchUpDays` 6, `stumpDays` 4, `saplingDays` 6, `saplingScale` `{ first, perDay, max }`: un arbre abattu est une souche, puis un rejet, puis de nouveau un arbre; rien ne pousse avant `regrowFromDay`, où une souche de la démo compte au plus `catchUpDays` jours; règle dans `src/etat/repousse.ts`), poules |
 | `endurance` | `base + perFormPoint x forme`; coûts par action, multipliés par `costMultiplier`; à 0, les actions durent `atZeroDurationMultiplier` fois plus longtemps (jamais de blocage) |
 | `snacks`, `needs` | endurance rendue par un en-cas; Ventre selon le souper, Sommeil (celui du lit, pénalité de minuit), Cœur, poids de la forme, seuils des niveaux de forme (`below`: le niveau vaut tant que la forme est inférieure à ce nombre) |
@@ -238,7 +240,7 @@ Après la démo (tour 8, `reglages.envies`): à partir de `sharedFromDay` (16), 
 | `memories` | souvenirs du carnet (tour 7): `maxBytes` (1536: borne de `world.memories` vérifiée par les tests, S-14); les saisons sont celles de `calendar` |
 | `secrets` | informations propres (R16): `firstInformed` (`p1`), `nudgeAfterErrors` (coup de coude à l'informé), `firstTryHeart`, `henChoiceRange` (portée de l'appel d'une poule), `henChoiceKeepOpen` (le choix reste ouvert tant que la poule est à moins de tant), `hideFromGuestSnapshot` (P1, pas encore lu), `knownHensFlag` (drapeau posé à la reprise d'une sauvegarde où les poules avaient déjà leurs noms) |
 
-Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 sous, la commande 2 990 sous.
+Paiement de la commande au départ du train (effet `pay_order`): chaque ligne remplie rapporte `count x sellPrice x linePremium`; si toutes les lignes sont remplies, le total gagne `fullBonus` en plus; les produits d'une ligne incomplète et tout le reste de la caisse sont payés `extraItemsRate x sellPrice`. `pay_order` paie la commande du train qui part; la commande suivante devient aussitôt celle de `{order}`, et la caisse vidée rouvre pour elle au matin suivant. Avec les valeurs actuelles, la commande 1 complète rapporte 540 aubrins, la commande 2 990 aubrins.
 
 Commande générée (tour 8): une ligne remplie rapporte le plus grand de `count x prix x linePremium` (le prix de `products[].price`, sinon `sellPrice`) et de `part x paymentPerWorkWeek`; la prime `fullBonus` et le paiement du reste ne changent pas. Au départ du train, la coopérative tire la commande suivante (`world.order.generated`) pour le samedi qui suit: le budget monte de `stepOnComplete` après une commande complète, ne bouge pas après un échec, baisse de `afterTwoMisses` après deux échecs de suite, entre `floor` et `max`.
 
@@ -325,6 +327,32 @@ Paramètres communs des conditions qui comptent:
 | `bought` | `item` | cet article du catalogue a été acheté au moins une fois |
 | `scene_played` | `dialogue`, `since` | cette scène à deux d'annonce a été jouée depuis `since` |
 | `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande en cours, celle du prochain train, comme `firmin_crate_full_week`); après le départ de ce train (`pay_order`), garde la réponse du moment du départ |
+| `counter` | `key`, comptage | 0.12: le compteur nommé `key` (`world.counters`) atteint `count`; pour un système qui compte sans condition à lui (section 3.1) |
+| `money_at_least` | `amount` | 0.12: la bourse commune a au moins cette somme; sert de `correct` à un choix payant (section 4.2) |
+| `animal_released`, `animal_named` | `animal` (`rooster`, `goat`), comptage | 0.12: compteurs `animal_released:<bête>`, `animal_named:<bête>` (section 3.1) |
+| `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spots`, `delivered`, `stall_stocked` | comptage | 0.12: compteurs `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spot`, `mail_delivered`, `stall_kind` (section 3.1) |
+| `given_to_stall` | `item` facultatif, comptage | 0.12: compteur `stall_given:<objet>` (`stall_given` sans objet) |
+| `market_served` | `together` facultatif, comptage | 0.12: compteur `market_served` (un habitant servi), ou `market_served_together` (deux servis au même pas, chacun le sien) |
+
+### 3.1 Compteurs tenus par les systèmes de la 0.12
+
+Les quêtes de la trame « Le marché d'Aubrune » (lot L-quêtes) lisent ces compteurs. Le système qui fait l'action les pose par `bump(sim, clé, joueur)` (`simulation/contexte.ts`), une unité par action: rien d'autre à brancher, la quête avance seule et le carnet coche ses lignes.
+
+| Clé | Posée par | Quand |
+|---|---|---|
+| `stall_kind` | marché (L-économie) | une sorte d'objet posée sur l'étal qui n'y était pas encore ce marché-là |
+| `stall_given:<objet>`, `stall_given` | marché | chaque unité posée sur l'étal (les cagettes de `market_crates`) |
+| `market_served` | marché | chaque habitant servi à l'étal (par le joueur qui sert) |
+| `market_served_together` | marché | deux habitants servis au même pas par les deux joueurs, chacun le sien |
+| `mail_delivered` | plis (L-économie) | chaque pli livré (donné ou glissé à la porte) |
+| `animal_named:rooster`, `animal_named:goat` | basse-cour, chèvre (L-élevage) | le nom choisi à deux |
+| `animal_released:<bête>` | basse-cour (facultatif) | une bête lâchée à son abri; la quête du coq ne l'attend pas (elle lâche le coq elle-même, drapeau `rooster_arrived`) |
+| `brood_started`, `brood_hatched` | basse-cour | une poule mise à couver, une couvée éclose |
+| `milked` | chèvre | chaque traite |
+| `goat_grazed_spot` | chèvre | le piquet planté à une place différente de la veille (une fois par jour au plus) |
+| `crafted:craft_crate` | établi (existant) | chaque cagette fabriquée |
+
+Drapeaux posés par les quêtes pour ces systèmes: `market_open` (l'étal est sur la place), `stall_six_slots`, `market_garland` (une unité de plus par habitant), `market_brioche`, `achille_buys_produce`, `rooster_arrived` (le coq entre au poulailler), `brood_enabled`, `goat_arrived` (la chevrette sort de sa caisse à la chevrerie), `mail_round_open` (la sacoche chaque matin). Lu par les quêtes: `goat_shed_built` (posé par le chantier `goat_shed`). Pendant `lucie_round`, la sacoche doit être au banc du quai dès l'étape `bag`, avant `mail_round_open`.
 
 ## 4. Effets
 
@@ -333,6 +361,7 @@ Paramètres communs des conditions qui comptent:
 | `give_item` | `item`, `count`, `to` | donne l'objet: `actor` (le joueur concerné), `each` (un exemplaire à chacun), `cellar` (le cellier commun) |
 | `take_item` | `item`, `count`, `from` | retire l'objet: `actor`, `either` (d'abord le sac de celui qui agit, puis l'autre), `cellar` |
 | `give_money` | `amount` | ajoute à la bourse commune |
+| `take_money` | `amount` | 0.12: retire de la bourse commune, jamais sous zéro (choix payant, section 4.2) |
 | `set_flag` | `flag` | pose un drapeau (un drapeau ne s'enlève pas) |
 | `start_quest` | `quest` | démarre une quête `byEffect` |
 | `send_letter` | `letter` | envoie une lettre `byEffect` |
@@ -352,6 +381,11 @@ Paramètres communs des conditions qui comptent:
 | `reveal_secret` | `quest` | le secret de la quête devient visible des deux joueurs (fin d'une quête secrète: les noms des poules chez les deux) |
 
 `give_item` accepte aussi `to: "informed"` et `to: "doer"` (le rôle dans le secret de la quête en cours); `spawn_animals` accepte `shuffleVariantsBy` (groupe de variante: qui porte quelle couleur suit la permutation tirée par la graine, `hen_names`). Dans les conditions qui comptent, `who` accepte `"informed"` et `"doer"` dans une quête à secret; `looked_at` accepte `minDistance` (m) et `still` (immobile).
+
+### 4.2 Choix payants et charges de quête (0.12)
+
+- Payer un habitant dans un dialogue: un choix avec `correct: { "type": "money_at_least", "amount": n }`, `effects: [{ "type": "take_money", "amount": n }]`, et une `replyWrong` sans reproche; l'étape attend `choice_made` avec `correct: true`. Le dialogue n'a pas de `once`: il reste proposé tant que l'étape dure (une réponse refusée se rejoue aussitôt). C'est `firmin_bricks_order` (40) et `firmin_goat_buy` (250).
+- Charge de quête portée à deux: `reglages.carry.quests[]`, `{ item, from, to, quest, step, when?, flag, placedText? }`. Pendant l'étape `step` de `quest`, quand `when` est vrai (conditions lues dans l'étape: `nights_passed` y compte depuis le début de l'étape, à condition que l'étape la cite aussi), l'objet `item` (`carriedByTwo`) apparaît au point `from`; posé à `to`, il lève `flag` et affiche `placedText`. Une charge non portée reste où elle est, jusqu'à ce qu'on vienne. Une seule charge à la fois: la poutre, la draisine, la panière et le colis passent avant.
 
 ### 4.1 Quêtes à secret (R16) et choix justes
 
@@ -391,6 +425,8 @@ Les données renvoient à ces points et zones nommés. Le level designer les cr�
 | `river_ford` | point | le gué: pêche (P1) et astuce de la pêche |
 
 Moments rares (`moments.json`, `actors[].at`, `after`, `watch.hold`) et quêtes du tour 6: `heron_stand`, `heron_rest_far`, `geese_rest`, `nest_box`, `ladder_foot`, `ladder_hold_east`, `ladder_hold_west`, `nest_oak_basile` (Basile au chêne pendant « Où est passé Basile ? »), `fox_track_west`, `fox_mousing`, `meadow_glow`; en P1, `roe_deer_edge`, `roe_deer_graze`, `kingfisher_post`, `notebook_spot_pontoon`, `notebook_spot_bench`, `notebook_spot_rock`. Les petits objets accrochés (nichoir, chicot, pieu) sont dans `accroches` de la carte.
+
+0.12 (lot L-quêtes): `market_stall` (l'étal, sur la place, dos à l'épicerie), `garland_west` et `garland_east` (au pied des lampadaires nord et est de la place, 13 m d'écart: les deux bouts de la guirlande), `goat_shed` (devant la porte de la chevrerie, à l'est de la maisonnette).
 
 Points aussi nécessaires au code, sans renvoi dans ces données: `well` (puits, remplir l'arrosoir), `water_barrel` (tonneau de la maisonnette), `notice_board` (tableau: commande, catalogue, courrier), `handcar_shed` (remise de la draisine), `house_interior` (zone: la pièce, pour la veillée et l'aménagement).
 

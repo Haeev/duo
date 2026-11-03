@@ -82,8 +82,8 @@ describe('fauteuil de Solange', () => {
       expect(salonPrice(sim.world, ctx, cur, { ...cur, hairColor: 4 }, false).price).toBe(10);
       const both = salonPrice(sim.world, ctx, cur, { hair: 12, hairColor: 4, beard: 0 }, false);
       expect(both.price).toBe(20);
-      expect(plain(both.line)).toBe('Les deux : 20 sous');
-      expect(plain(both.confirm)).toBe('Valider : 20 sous');
+      expect(plain(both.line)).toBe('Les deux : 20 aubrins');
+      expect(plain(both.confirm)).toBe('Valider : 20 aubrins');
       const free = salonPrice(sim.world, ctx, cur, { hair: 12, hairColor: 4, beard: 0 }, true);
       expect(free.price).toBe(0);
       expect(plain(free.confirm)).toBe('Valider : offert');
@@ -152,7 +152,7 @@ describe('guichet du fournil et chocolat chaud', () => {
     sim.world.weather = 'sunny';
     const autumn = chocolateModel(sim.world, ctx, 'autumn', 0);
     expect(autumn?.available).toBe(true);
-    expect(plain(autumn?.action ?? '')).toBe('Boire : 5 sous');
+    expect(plain(autumn?.action ?? '')).toBe('Boire : 5 aubrins');
     expect(chocolateModel(sim.world, ctx, 'autumn', 1)?.done).toBe(true);
     sim.world.clock.minutes = 18 * HOUR + 30;
     expect(chocolateModel(sim.world, ctx, 'autumn', 0)?.available).toBe(false);

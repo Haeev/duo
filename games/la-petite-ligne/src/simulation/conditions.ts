@@ -2,6 +2,7 @@
  * Évaluation des conditions des données (quêtes, dialogues, envies, emplois du
  * temps, courrier). README des données, section 3.
  */
+import { dialogueDone } from '../etat/dialogues-faits';
 import { currentOrder } from '../donnees/commandes';
 import type { CharacterId, SecretEntry, Vec2 } from '../etat/types';
 import type { Condition, Since, Who } from '../donnees/types';
@@ -169,7 +170,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return index >= 0 && (q.status === 'done' || q.step > index);
     }
     case 'dialogue_done':
-      return world.dialoguesDone.includes(condition.dialogue);
+      return dialogueDone(world.dialoguesDone, condition.dialogue);
     case 'item_owned':
       return duoOwns(sim, condition.item) >= condition.count;
     case 'item_in_bag':
@@ -239,6 +240,8 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return (world.catalogueBought[condition.item] ?? 0) > 0;
     case 'inside':
       return byCharacter(sim, condition.who, ctx, (id) => character(sim, id).inside === condition.building);
+    case 'money_at_least':
+      return world.purse >= condition.amount;
   }
 }
 

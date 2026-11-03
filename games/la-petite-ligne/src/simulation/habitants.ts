@@ -12,11 +12,15 @@ import { villagerBlockers } from './deplacement';
 import { bodyCollides, findPath } from './grille';
 import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
 import { newVillagerState } from './monde';
+import { marketEntry, marketPoint } from './marche';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
 const HIDDEN_ACTIVITIES = new Set(['home', 'absent']);
 
 function currentEntry(sim: Sim, def: VillagerDef): { point: string; activity: string } {
+  // 0.12: un client du marché du dimanche va à sa place devant l'étal, puis reprend sa journée.
+  const market = marketEntry(sim, def.id);
+  if (market !== null) return market;
   const m = Math.min(sim.world.clock.minutes, MINUTES_PER_DAY - 1);
   for (const entry of def.schedule) {
     if (m < entry.from || m >= entry.to) continue;
@@ -38,7 +42,7 @@ function teleport(v: VillagerState, x: number, y: number): void {
  * c'est un banc, l'endroit d'où il s'y assoit (jamais dans l'emprise du banc).
  */
 function goalOf(sim: Sim, v: VillagerState, pointId: string): Vec2 | undefined {
-  const at = sim.map.points[pointId];
+  const at = sim.map.points[pointId] ?? marketPoint(sim, pointId) ?? undefined;
   if (at === undefined) return undefined;
   const spot = { x: at.x, y: at.y };
   villagerRestSpot(sim, v, pointId, spot);
@@ -49,7 +53,7 @@ function routeTo(sim: Sim, v: VillagerState, pointId: string): void {
   const goal = goalOf(sim, v, pointId);
   // Déjà rendu (apparu à sa place): aucun pas, sinon il se dessinerait un instant debout.
   const there = goal !== undefined && distance(v.pos, goal) < 1e-6;
-  const path = goal === undefined || there ? null : findPath(villagerBlockers(sim), v.pos, goal);
+  const path = goal === undefined || there ? null : findPath(villagerBlockers(sim, v.id), v.pos, goal);
   // Derrière un meuble (Odette au guichet): le dernier pas va sur la case même.
   const last = path?.[path.length - 1];
   if (path !== null && goal !== undefined && VILLAGER_BEHIND_POINTS.has(pointId) && (last === undefined || distance(last, goal) > 1e-6)) path.push({ x: goal.x, y: goal.y });
@@ -121,7 +125,7 @@ export function updateVillagers(sim: Sim, dt: number): void {
     // (un corps resté dans un obstacle, comme une ancienne sauvegarde au milieu d'un banc, y est posé).
     if (sim.runtime.villagerPaths[v.id] === undefined && v.visible) {
       const goal = goalOf(sim, v, v.target);
-      const stuck = bodyCollides(villagerBlockers(sim), v.pos.x, v.pos.y);
+      const stuck = bodyCollides(villagerBlockers(sim, v.id), v.pos.x, v.pos.y);
       if (goal !== undefined && stuck) teleport(v, goal.x, goal.y);
       routeTo(sim, v, v.target);
     }
@@ -130,6 +134,9 @@ export function updateVillagers(sim: Sim, dt: number): void {
     const route = sim.runtime.villagerPaths[v.id];
     const next = route?.path[0];
     if (route === undefined || next === undefined) {
+      // Rendu à son poste: il regarde où le poste le dit (`rotation` de la carte), pas dans le sens de son dernier pas.
+      const post = sim.map.pointFacings[v.target];
+      if (post !== undefined && v.visible) v.facing = post;
       const hidden = HIDDEN_ACTIVITIES.has(v.activity);
       if (hidden && v.visible) {
         v.visible = false;

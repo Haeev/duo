@@ -5,6 +5,7 @@
  * L'interface lit l'état et envoie des intentions; elle ne modifie jamais
  * l'état.
  */
+import { FarmPanel } from './basse-cour';
 import '@fontsource-variable/fraunces/soft.css';
 import '@fontsource-variable/nunito-sans/wght.css';
 import '../../ui-maquettes/jeton.css';
@@ -19,6 +20,9 @@ import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { type ReadonlyCharacter, type UiContext, characterOf, createUiContext } from './contexte';
 import { type BakeryPort, BakeryPanel, type SalonPort, SalonPanel } from './salon';
+import { type OutfitPreviewFactory, createPanelPreview } from './apercu';
+import { type ClothesPort, ClothesPanel } from './garde-robe';
+import { clothesViewOf } from './modele-garde-robe';
 import { atSalonChair, bakeryBoughtToday, firstCutFree } from '../etat/interieurs';
 import { DialogueBox, type DialogueSource } from './dialogue';
 import { el, focusElement, focusables, isVisible, setStyleVar } from './dom';
@@ -28,6 +32,7 @@ import { profileSymbol, safeColor } from './format';
 import { Hud } from './hud';
 import { type ScreenKind, hudState, screenOf } from './modele';
 import { CratePanel, ShopPanel, StationPanel } from './panneaux';
+import { StallPanel } from './marche';
 import { RoomPanel, StoragePanel } from './maison';
 import { isNapping } from '../etat/maison';
 import { BoardPanel } from './tableau';
@@ -36,11 +41,14 @@ import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } fro
 import { loadUiTexts } from './textes';
 
 const SPRITE_ID = 'lpl-icones';
+/** Taille de départ de l'aperçu 3D des vêtements (points CSS), ajustée ensuite à sa place. */
+const PREVIEW_SIZE = { width: 240, height: 300 };
 const ACTIVATION = new Set(['Enter', 'NumpadEnter', 'Space']);
 /** Touches de la caméra laissées au jeu pendant un dialogue ou un panneau (sauf le carnet, où A et E changent d'onglet). */
 const CAMERA_KEYS = new Set(['KeyQ', 'KeyE', 'KeyR', 'KeyF']);
 
 type LayerKind = 'screen' | 'dialogue' | 'panel';
+
 
 interface Mounted {
   key: string;
@@ -55,6 +63,8 @@ class GameUi implements GameInterface, UiHost {
   private readonly hud: Hud;
   private readonly proposals: ProposalCards;
   private readonly cameraCommand: ((command: CameraCommand) => void) | null;
+  /** Aperçu 3D des tenues (rendu), `null` sans rendu 3D: la silhouette 2D le remplace. */
+  readonly outfitPreview: OutfitPreviewFactory | null;
   private readonly sounds: UiSoundGate;
   private readonly cleanups: (() => void)[] = [];
   private readonly insertedSprite: HTMLElement | null;
@@ -85,6 +95,7 @@ class GameUi implements GameInterface, UiHost {
   constructor(options: InterfaceOptions) {
     this.view = options.view;
     this.cameraCommand = options.camera ?? null;
+    this.outfitPreview = options.outfitPreview ?? null;
     this.sounds = new UiSoundGate(options.sound ?? null);
     const texts = loadUiTexts(options.view.content);
     this.ctx = createUiContext(options.view.content, options.view.map, texts, options.view.localCharacter(), (code) =>
@@ -216,6 +227,11 @@ class GameUi implements GameInterface, UiHost {
   openRoomPanel(): void {
     this.local = 'room';
     this.dirty = true;
+  }
+
+  openWardrobe(): void {
+    // Le rangement laisse la place à la garde-robe (menu `wardrobe`, au coffre de la maison).
+    this.setMenu('wardrobe');
   }
 
   camera(command: CameraCommand): void {
@@ -389,7 +405,10 @@ class GameUi implements GameInterface, UiHost {
           const tab = this.panelTab;
           kind = 'panel';
           key = `local:${local}`;
-          build = () => (local === 'room' ? new RoomPanel(this) : new NotebookPanel(this, tab));
+          build = () => {
+            if (local === 'room') return new RoomPanel(this);
+            return new NotebookPanel(this, tab);
+          };
         }
       }
     }
@@ -439,6 +458,24 @@ class GameUi implements GameInterface, UiHost {
     };
   }
 
+  private clothesPort(): ClothesPort {
+    return {
+      view: (world) => clothesViewOf(this.ctx, world, characterOf(world, this.ctx.me)),
+      buy: (item) => {
+        this.send({ type: 'clothes_buy', item });
+      },
+      wear: (slot, item) => {
+        this.send({ type: 'wear', slot, item });
+      },
+      createPreview: () => createPanelPreview(this.outfitPreview, this.ctx.content.clothes, PREVIEW_SIZE),
+      upgradePreview: () => {
+        const preview = this.outfitPreview === null ? null : createPanelPreview(this.outfitPreview, this.ctx.content.clothes, PREVIEW_SIZE);
+        return preview?.is3d === true ? preview : null;
+      },
+    };
+  }
+
+
   private bakeryPort(): BakeryPort {
     return {
       bought: (world) => bakeryBoughtToday(world, this.ctx.me),
@@ -472,6 +509,16 @@ class GameUi implements GameInterface, UiHost {
         return () => new SalonPanel(this, this.salonPort());
       case 'bakery':
         return () => new BakeryPanel(this, this.bakeryPort());
+      case 'stall':
+        return () => new StallPanel(this);
+      // 0.12: mercerie et confection (contrat `garde-robe-0-12.md`).
+      case 'clothes_shop':
+        return () => new ClothesPanel(this, this.clothesPort(), 'shop');
+      case 'wardrobe':
+        return () => new ClothesPanel(this, this.clothesPort(), 'wardrobe');
+      // 0.12: la basse-cour (poulailler, chevrerie).
+      case 'farm':
+        return () => new FarmPanel(this);
     }
   }
 

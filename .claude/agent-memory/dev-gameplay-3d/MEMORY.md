@@ -280,9 +280,124 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 ## Tour 10, lot L3: intérieurs et rue Haute (La Petite Ligne, vérifié le 2026-11-02)
 
 - « Chez soi » contre « à l'abri »: `isHome(c)` et `isSheltered(c)` de `src/etat/interieurs.ts` remplacent l'ancien booléen `inHouse` (retiré). Aménagement, coucher, minuit, veillée, réchaud, astuces de l'heure: `isHome`; bancs du dehors, bêche, moments rares, lisière, tableau, poules: `isSheltered`.
-- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
+- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim, id)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
 - Un habitant ajouté au contenu n'existe pas dans une sauvegarde d'avant: `ensureVillagers` (habitants.ts) lui crée son état au premier pas, sans toucher à `sauvegarde.ts`.
 - Le robot pousse une charge à deux le long du chemin de son centre, qui ignore la largeur des porteurs: un coin de rocher le bloquait pour toujours. Écart de biais après une demi-seconde immobile (`beamDodge`).
 - Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
 - Outil isolé: une boucle `for` avec `sed -n "${a},${b}p"` est refusée; un heredoc qui écrit dans `/tmp` aussi. Écrire le script avec Write, puis `python3 /tmp/<moi>/script.py` depuis le dossier du jeu.
 - `valider_donnees.py`: les drapeaux posés par le code (et non par un effet) vont dans `FLAGS_SET_BY_CODE`, sinon un avertissement.
+
+## Taille de l'état (La Petite Ligne, vérifié le 2026-11-03)
+
+- Mesurer avant de compacter: le robot longue vie écrit pour chaque aube `bytes` et `keys` (octets par champ) dans `test-results/longue-vie/parties/<partie>.json`; une partie de 84 jours prend environ 4 min 30. Comparer les relevés avant et après hors tailles (`ms`, `bytes`, `chars`, `keys`, `detail`) prouve que le gameplay n'a pas bougé.
+- Ne pas garder de texte rendu dans l'état: un identifiant, la variante et les variables suffisent. Pour migrer un texte rendu, transformer le gabarit en expression régulière (`{nom}` en groupe paresseux) et vérifier que le rendu redonne exactement le texte, sinon garder l'original.
+- Omettre les champs à leur valeur par défaut (`exactOptionalPropertyTypes` est actif: champ optionnel, jamais `undefined` écrit).
+- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD. Si la branche descend de HEAD et ne touche aucun fichier modifié, `git merge --ff-only` suffit, sans commit.
+
+## Pêche 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- L'état complet part vers l'invité à chaque changement (`runtime.changed`, au plus 5 fois par seconde, environ 45 Ko): un état qui bouge à chaque pas (nage des ombres) le ferait partir sans arrêt. Ne changer l'état qu'aux événements et laisser le rendu animer (disque `roam` garanti dans l'eau, déplacement `move` lu par `shadowPosAt`).
+- Les identifiants des annonces partagent l'espace des quêtes (`annonceQuests`): une annonce `odette_fry` aurait heurté la quête du même nom. Chercher l'identifiant dans `quetes.json` avant d'en créer un.
+- Ajouter une annonce change toute la suite tirée du tableau (T9-03 de `suite-tour9.test.ts`) et la table des récompenses (T9-04): mettre ces deux attendus à jour avec la raison.
+- Environnement très chargé (charge 45): les tests du robot de la démo dépassent leur délai de 300 s sans être faux. Preuve par une sonde jetable (partie entière, relevé dans le scratchpad) ou `--testTimeout`; `generer.ts` peut dépasser 50 min pour la référence du jour 62.
+- Un réglage de texte d'interface nouveau demande sa clé dans `textes.ts` (Valibot) en plus de `textes-interface.json`; le prix d'un objet s'écrit avec le gabarit `ui.hud.purse` de `textes.json` pour suivre le nom de la monnaie.
+- Outil isolé: un heredoc Python qui contient `\"` est refusé; écrire le script avec Write dans le scratchpad.
+
+## Patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Gabarits de texte: `format` (`simulation/contexte.ts`), `fill` (`interface/format.ts`) et celui de `etat/semaine.ts` ne lisaient que `[a-zA-Z]+`: `{henColor1}` restait brut. Nom de paramètre: `[a-zA-Z][a-zA-Z0-9]*` partout. Contrôle de toutes les répliques et lettres: `tests/textes-remplis.test.ts` (faire apparaître les poules d'abord, sinon `henVars` est vide).
+- Charge longue (poutre, 4,5 m): portée comptée jusqu'à son axe (`beamDistance`, `carry.lengths`, `carry.grip.reach`), pas jusqu'au centre; soulevée, elle garde son orientation et chaque porteur se range contre elle (`gripOffset`). Espace tenu contre une poutre couchée près d'un chantier la soulève.
+- Le gué de pierres du ru (`crossings` de nature `ford`) est réservé à `feel.steppingStoneVillagers` (Jeanne): un adulte y semble marcher dans l'eau. `Blockers.avoid` porte ces cases. Test: `tests/trajets-habitants.test.ts` (toutes les paires de points de chaque emploi du temps).
+- Vitest de ce jeu n'affiche pas le `console.log` d'un test: une sonde écrit dans un fichier du scratchpad (`writeFileSync`).
+- Outil isolé: une commande qui contient « .git » (même `--exclude-dir=.git`) ou plusieurs commandes git enchaînées est refusée; le contrôle des tirets passe par l'outil Grep (`[\x{2013}\x{2014}]`), une commande git par appel.
+- Un trajet d'habitant calculé avant l'arrivée du train n'est pas recalculé quand `train_at_platform` se bloque: Basile traverse le train à quai (samedi 10 h, vu le 2026-11-03, non corrigé).
+
+## Quêtes de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Les fichiers de `donnees/` ont une mise en forme à la main (un objet par ligne dans les tableaux): ne jamais les réécrire par `json.dumps` (diff énorme, conflits avec les lots parallèles). Insérer des lignes avant la fermeture du tableau, puis relire le JSON.
+- `ranges.stayAt` vaut 4 m: deux conditions `stayed_at` « un joueur à chaque bout » demandent plus de 8 m entre les points, sinon un seul joueur les remplit.
+- Une charge à deux garde les décalages des porteurs pris au moment de la lever: côte à côte, elle se coince entre les buissons du quai (x 45 à 49, y 19-20). Les tests portent l'un devant l'autre, reposent et reprennent quand ça bloque, et passent par le passage pavé x 43-44.
+- Payer dans un dialogue: choix à `correct: money_at_least`, effet `take_money`, dialogue sans `once` (le validateur refuse `"once": null`): il se rejoue tant que l'étape dure.
+- Validateur: `indefinite` commence par « un », « une » ou « des » suivi du nom exact; un objet `food` veut un `dish`; `day_at_least` reste dans les jours de la démo (1 à 8).
+- Avancer l'horloge à la main au-delà du départ d'un train (16 h) paie la commande: comparer la bourse juste avant le changement attendu, pas au début du test.
+
+## Patch 0.11.2: sièges posés et petits objets sur les meubles (La Petite Ligne, vérifié le 2026-11-03)
+
+- Sièges des meubles (chaise, fauteuil): `FurnitureSeats` d'`etat/bancs.ts` en fait des `SeatProp` (id du meuble, `slots` de `seatSlots`), mêlés aux bancs par `playerBenches`; `seatReachable` (dedans pour une chaise, dehors pour un banc) remplace les anciens `!isSheltered(c)`. `seatComfortFactor` (besoins) lisait déjà `seat.bench` comme un id de meuble.
+- Visée: le banc a le rang 9 (après tout geste dehors); une chaise de la maison doit avoir le rang des meubles (4), sinon la paillasse voisine prend Espace pour une sieste à midi.
+- Hauteur d'un dessus de meuble: rayon tiré d'en haut sur une instance du modèle (`Raycaster` ignore `visible`), mis en cache par place; les extras `top_height` et `seat_height` de `maison.glb` donnent table 0,78 m, chaise 0,47 m (le clip `sit` est calé sur 0,47 m), fauteuil 0,42 m.
+- Étagère (`shelf`): planches à 0,59, 1,09 et 1,65 m, 0,46 m de jour entre deux: ni la plume (0,47 m) ni le pot (0,66 m) n'y tiennent; le dessus à 1,65 m plus un pot touche l'égout du toit (mur à 2,4 m).
+- Générateur des références: le test unique dépasse 600 s (timeout signalé) mais écrit tous les fichiers; vérifier leur `dataSchema` et leur jour plutôt que le statut.
+
+## 0.12, monnaie et économie (La Petite Ligne, vérifié le 2026-11-03)
+
+- Monnaie: tout gabarit rempli passe par `agreeMoney` (`src/donnees/monnaie.ts`); un remplisseur de `{nom}` nouveau doit l'appeler aussi, sinon « 1 aubrins ». Les textes rendus gardés dans l'état (notifications, lettres `legacy`) se renomment à la reprise; une migration qui retrouve un gabarit depuis un texte rendu doit renommer avant de comparer.
+- Remplacer un mot qui est aussi une préposition (« sous »): script qui ne touche que nombre ou espace réservé suivi du mot, et jamais quand un article ou une majuscule suit; compter les prépositions avant et après.
+- Un habitant peut être envoyé à un lieu hors carte: identifiant de point préfixé (`market_spot:0`) résolu dans `goalOf` d'`habitants.ts`, et une entrée prioritaire dans `currentEntry`.
+- Robot jusqu'au jour 64: environ 11 min par graine sur machine partagée; une règle de tirage se teste plutôt par une boucle de jours qui appelle la fonction directement.
+- Fusion de la branche de session pendant le travail: commit temporaire, `git merge`, conflits résolus par script (`objets.json`: garder les objets de la branche, ajouter les siens sans doublon d'identifiant), commit, puis `git reset --mixed <branche>`: le travail redevient non commité au-dessus de la branche.
+- `villagerBlockers(sim, habitant)` prend l'habitant depuis le format 9.
+
+## Défauts de rendu du patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Pied des murs coupés (`coupe-murs.ts`): tout enfant du nœud de mur passe dans le pied (étal, cagettes de l'épicerie). Une face qui traverse la coupe est écrasée à la hauteur de coupe: une pièce accrochée à la façade devenait une plaque grise posée à plat. La section se calcule sur la seule maçonnerie (faces qui montent à plus de 1 m au-dessus de la coupe), et les faces qui traversent la coupe y sont rognées.
+- Trou de visibilité: son bord en trame de Bayer, posé sur un objet bas (rail, lisse de barrière), se lit comme « l'ombre du personnage en tache tramée ». Hauteur minimale par trou (`uCutDepths.w`): 1 m pour les personnages, 0,45 m pour les lieux des moments.
+- PCF de Three.js 0.187: rotation des 5 échantillons par bruit IGN par pixel, trame visible sur les ombres fines. `ShaderChunk.shadowmap_pars_fragment` modifié une fois avant toute compilation (`stabilizeShadowFilter` de `lumiere.ts`), aucun programme de plus.
+- Pluie vue de dedans: le champ du terrain (canal B) ne connaît que l'emprise des bâtiments de la carte, et les gouttes devant la pièce coupée se lisent comme de la pluie dedans. Abri du joueur local (`abri.ts`) lu par la pluie (goutte projetée au sol le long du regard) et par le sol mouillé des surfaces.
+- Objet sous un pixel de la page de démonstration: exposer le moteur un temps (`window.__engineDebug = engine`, à retirer), puis `engine.rig.ray(ndcX, ndcY).intersectObject(engine.scene, true)` en filtrant les ancêtres invisibles. Le pied de mur se reconnaît à son nom (`…_wall_front_pied`).
+- Captures avant et après sans second arbre: copier ses fichiers modifiés dans le scratchpad, écrire ceux de `HEAD` (`git show HEAD:<chemin> > <chemin>`), capturer, recopier (script `bascule.sh`). Vite recharge seul.
+- Caméra tournée (`orientation=`) en rendu logiciel: la rotation dure plusieurs images; attendre une dizaine d'images (`frames`) avant la capture, sinon le cadrage change d'une capture à l'autre.
+- Reconstruire `bourg.glb` seul: `LPL_SANS_PLANCHES=1 duo-python bourg.py`, puis dedup, weld, prune de gltf-transform comme `construire.sh` (1 min). Les octets changent à chaque construction (ordre des index) même sans modification du script.
+- Ombre « sans objet » devant la porte de la maisonnette: c'est celle de l'auvent (`door_canopy`), hors du cadre dans une capture serrée. La couverture s'arrêtait à 0,22 m du mur: un jour de lumière entre le mur et l'ombre.
+## Pêche 0.12, rendu (La Petite Ligne, vérifié le 2026-11-03)
+
+- `RenderEngine.frame` borne l'image à 0,1 s (`MAX_FRAME_SECONDS`): `lplRendu.advance(0.5)` n'avance le temps du rendu que de 0,1 s. Fondus (2 s) et éclats se capturent avec `dt` 0,1 et assez de pas (30 pas = 3 s).
+- Une bouffée émise pendant l'image où l'on capture est invisible (fondu d'entrée des formes sur 8 % de leur vie): un éclat de 0,35 s ne se voit qu'aux images suivantes, donc pas avec des pas de 0,5 s.
+- Sous forte charge (charge moyenne 40 à 50), `page.screenshot` d'une page 3D dépasse 5 min: lire le canevas (`toDataURL`) dans le même `evaluate` que `advance(dt)`, sans `preserveDrawingBuffer`.
+- Le dossier de travail temporaire de la session (scratchpad) est partagé par tous les membres: un `capture.cjs` et un `dist/` à la racine ont été écrasés en cours de mission. Tout mettre dans un sous-dossier à son nom, serveur sur un port à soi.
+- Ombres de poissons sans programme de plus: sprites couchés du programme des particules (groupe 2, `uGroupAlpha` à 1), tournés par `aAccel.z` = 1 et le cap dans `aVelocity.y`; forme `fish` dessinée dans le fragment (corps en fuseau, queue, sillage). Un seul appel pour toutes les ombres et leurs lueurs de guet.
+- Contrat des ombres avec la simulation (`etat/peche.ts` du lot 1): l'état ne change qu'aux événements; le rendu fait nager l'ombre dans le disque `roam` autour de `pos`, et lit un déplacement décidé par la simulation par `move` (`shadowPosAt`). Lecture concentrée dans `rendu/peche-vue.ts`.
+
+## Garde-robe de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- `personnages.glb` depuis la 0.12: `player_base` est un corps nu-neutre sans pieds (sous-vêtement `wear_under`), chaussures obligatoires; vêtements `wear_<slot>_<style>`, écusson `player_badge_<symbole>[_outer]`, coupes sous chapeau `player_hair_<coupe>_hat`. Couleurs des vêtements: rangée 1 de la texture (ordre `WEAR_SLOTS` de `garde_robe.py`), écrite par `habillage.ts`.
+- Les poids de peau du GLB ne sont pas triés: l'os principal d'un sommet est celui du plus grand des quatre poids, pas `skinIndex.x`.
+- Gonfler une pièce à facettes (une normale par face, sommets dédoublés) selon ses normales l'ouvre en fentes: gonfler depuis un axe (direction horizontale depuis le centre) pour que les sommets confondus bougent ensemble.
+- Aperçu 3D d'un panneau: second `WebGLRenderer` rendu à la demande (la lecture de pixels d'une cible du rendu principal donne du linéaire sans tone mapping). Ne jamais `dispose` les géométries du GLB depuis l'aperçu (elles servent au jeu): seulement ses copies, son matériau cloné et sa texture.
+- Capture avec Vite lancé par `npx vite &`: `kill $!` tue `npx`, pas Vite, qui garde le port; la capture suivante échoue en silence sur l'ancien serveur. Lancer `node_modules/.bin/vite` directement.
+- Le dossier scratchpad est partagé par tous les membres de la séance: un autre a réécrit mes `run.sh` et `capture.cjs`. Travailler dans un sous-dossier à soi (`scratchpad/dg3d/`).
+
+
+## Élevage de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Worktree neuf: `node_modules` absent, `tsc` ne trouve pas les types; `pnpm install --frozen-lockfile --prefer-offline` à la racine du worktree (quelques secondes).
+- Outil isolé: un `python3 - <<'EOF'` contenant des accents graves (gabarits TypeScript, `{rations}`) est refusé; l'écrire avec Write dans le scratchpad et le lancer avec la racine en argument.
+- `ModelLibrary.cloneRig('hen', [variante])` avec une variante absente du GLB rend un squelette sans maillage (invisible, aucune erreur): tester `library.node(variante)` d'abord, sinon `instantiate` (substitut).
+- Soin « une fois par joueur et par jour » sans champ: une clé `care:<geste>:<bête>` posée directement dans `world.countersToday[joueur]` (remis à zéro à l'aube), sans `bump` (qui ferait grossir `counters` pour toujours).
+- Un nouveau verbe sur une bête qui bouge vole la touche aux points voisins (la poule qui picore près de la mangeoire): rang de visée après les points (4,5), et au clic, les points d'action passent avant la bête.
+- Un article `shop: "catalogue"` absent de toute page de `catalogue.json` est en vente dès le jour 1 (articles d'avant le tour 9): toujours le poser sur sa page.
+- Comparer un test qui échoue au commit de départ: `git archive <commit> games/la-petite-ligne packages | tar -x` dans le scratchpad, liens vers les `node_modules` du worktree. Au 2026-11-03, les trois tests « format 7 » de `maison-tour10.test.ts` échouent déjà au départ.
+- Sous forte charge (charge 40), une capture de la page de rendu prend plusieurs minutes et `pnpm test` dépasse 40 min. Au 2026-11-03, ces tests longs échouent aussi au commit de départ sous cette charge (vérifié dans la copie « avant »): marcheurs de `moments-tour7`, robots sourds de `secrets`, Jeanne de `rue-haute`, démo au rythme normal de `retours-soiree`, reprise de `moments-tour7-recette`, et le test « format 7 » d'`interieurs-carte`.
+- Le scratchpad de session peut être partagé avec d'autres membres: un `tirets.sh` à moi a été réécrit vers un autre worktree. Noms de fichiers préfixés par le lot, et le script affiche `pwd`.
+- Fusion finale sans commit: `git add -A`, diff binaire vers un fichier, `git reset -q`, `git checkout -- .` et retrait des nouveaux fichiers, `merge --ff-only`, `git apply -3` du diff, `git reset -q`; puis résoudre les conflits (notes: garder les deux côtés) et relancer le générateur de carte plutôt que de garder `halte.json` fusionné.
+
+## Animations et orientation des personnages (La Petite Ligne, vérifié le 2026-11-03)
+
+- Les clips de marche de l'artiste ne sont pas à vitesse de pied constante, et la fiche ne suit pas les retouches: la cheville posée de `walk` reculait à 4,0 m/s (clips d'avant la 0.12) puis à 2,8 m/s (0.12), `carry_two` 1,95 puis 1,3, quand la fiche dit 3,5 et 1,8. Le rythme se règle sur la vitesse du pied posé (`foulee.ts`, mesurée au chargement sur un squelette nu `cloneRig('rig', [])`), et pas sur la référence de la fiche: l'ancienne valeur 3,2 faisait patiner les joueurs.
+- Sonde rapide d'un clip sans navigateur: cinématique directe en Python (nœuds TRS, canaux LINEAR et STEP, slerp) sur le bloc JSON et binaire du GLB; planche visuelle: page temporaire `sonde-clips.html` (GLTFLoader, viewports en ciseaux), à supprimer.
+- Points de la carte: `rotation` (quarts, 0 vers le sud) dit où regarde un habitant posté; `carte-niveau.ts` la verse dans `pointFacings` quand il n'y a pas de `cap_degres`. `facing = PI / 2 - quart * PI / 2`.
+- Le point `sawmill_workbench` est la place devant l'établi: pour regarder l'établi, viser l'objet de la carte du même nom (`map.props`).
+- Invité: `predictedFacing` restait celui de la dernière marche tant que le joueur ne bougeait pas; l'hôte qui tourne le personnage vers une action n'était pas vu chez lui. Reprendre le cap de l'hôte quand plus aucun pas en attente ne bouge.
+- Page de rendu: `lplRendu.world()` et `lplRendu.emit()` permettent de poser une action (`since` recalé après le premier `advance`) et de faire des planches par action en mode `manuel=1`. Avec `vie=0`, la page remet une marche à l'arrêt: pour la marche, laisser la promenade (`vie=1`).
+
+## Tests de format de sauvegarde (La Petite Ligne, vérifié le 2026-11-03)
+
+- Un test de migration compare à `DATA_SCHEMA` (jamais un numéro en dur) et relit l'instantané avec `snap.dataSchema`: relire une sauvegarde du format courant en déclarant un ancien format rejoue les migrations (celle du 8 refuse alors les lettres sans texte: « sauvegarde: lettre invalide »).
+- Sauvegarde volontairement abîmée: l'écrire au format courant (aucune migration ne passe avant `checkWorld`) et attendre le message exact du contrôle visé (`/sauvegarde: pièce invalide/`).
+- Gain de taille d'un format: le mesurer sur les seuls champs qu'il change, le reste tel que la référence d'origine; les formats suivants ajoutent aussi du poids dans des champs anciens (garde-robe dans `characters`).
+- Une migration testée depuis le format juste avant elle, et depuis un plus ancien pour la chaîne entière (`it.each` sur les deux références).
+- `generer.ts` saute un fichier existant: un fichier vide à la place de la référence la plus longue (jour 62) la saute sans toucher au script; le supprimer après. Quatre références du format 12: 3 min 30 (charge 8 à 15).
+- `nextObjective` (`interface/modele.ts`): la commande du samedi ne passe devant les quêtes principales qu'à partir de la veille (`day >= lastDay - 1`); une quête principale ajoutée au contenu change le « prochain objectif » des tests d'écran.
+- Filtre de références par préfixe: `startsWith('format-1')` prend aussi les formats 10 et suivants; écrire `format-1-`.
+- Un test qui joue « toute la démo » doit le vérifier (`phase === 'ended'`, `stages.current === 'demo'`): une borne de pas trop courte (journée doublée le 2026-11-01, 0,7 s par minute) ou un robot coincé coupe la mesure en silence.
+- Robot et charge à deux: le chemin de la grille ignore la largeur de la charge, qui garde son orientation; l'étal du marché porté de travers restait coincé devant l'établi de Basile jusqu'à minuit (horloge arrêtée `midnight`, partie bloquée). Détour du robot après 20 s sans rapprochement (`beamDetour`). Sonde: rejouer jusqu'au pas, puis sur des copies (`wrapWorld(content, map, structuredClone(world))`) pousser 3 s dans chacune des huit directions.

@@ -2,10 +2,10 @@
   "version": 1,
   "note": "Le catalogue de la semaine (tour 9, section 2.3): une page par saison et semaine de saison, parue le samedi à l'heure de la livraison; les articles restent tant qu'il en reste, ceux de `seasonal` s'en vont à la fin de leur saison. Les cadeaux paraissent une fois le souhait entendu. Prix et textes: objets.json.",
   "pages": [
-    { "season": "summer", "week": 1, "items": ["watering_can_copper", "axe_forged", "straw_hat"] },
-    { "season": "summer", "week": 2, "items": ["fishing_rod_bamboo", "hen_extra", "pressed_flowers"] },
+    { "season": "summer", "week": 1, "items": ["watering_can_copper", "axe_forged", "straw_hat", "market_scale"] },
+    { "season": "summer", "week": 2, "items": ["fishing_rod_bamboo", "hen_extra", "pressed_flowers", "hopper_feeder"] },
     { "season": "summer", "week": 3, "items": ["wicker_armchair"] },
-    { "season": "autumn", "week": 1, "items": ["hen_extra_2", "coop_calendar"] },
+    { "season": "autumn", "week": 1, "items": ["hen_extra_2", "coop_calendar", "goat_extra"] },
     { "season": "autumn", "week": 2, "items": ["wall_clock"] },
     { "season": "autumn", "week": 3, "items": ["autumn_wreath"] }
   ],

@@ -10,6 +10,8 @@ import { seasonIndexOf, seasonOfDay } from '../../src/donnees/calendrier';
 import type { Content } from '../../src/donnees/types';
 import { clashes, inSeason } from '../../src/etat/commande-generee';
 import { forageAvailableOn, postKindOn } from '../../src/etat/annonces';
+import { letterText, letterTitle } from '../../src/etat/courrier';
+import { dialogueDone } from '../../src/etat/dialogues-faits';
 import { catalogueOffers } from '../../src/etat/catalogue';
 import { improvementRemaining, openImprovements } from '../../src/simulation/chantiers';
 import { weekdayOf } from '../../src/donnees/calendrier';
@@ -190,8 +192,8 @@ function checkScreens(run: LongRun, sim: Sim): void {
   const w = sim.world;
   const day = String(w.clock.day);
   for (const l of w.letters) {
-    checkText(run, `lettre ${l.id} (jour ${day})`, l.title);
-    checkText(run, `lettre ${l.id} (jour ${day})`, l.text);
+    checkText(run, `lettre ${l.id} (jour ${day})`, letterTitle(sim.content, l));
+    checkText(run, `lettre ${l.id} (jour ${day})`, letterText(sim.content, l));
   }
   for (const q of w.quests) if (q.status === 'active') checkText(run, `quête ${q.id} (jour ${day})`, questTitleOf(sim.content, q));
   checkText(run, `HUD saison (jour ${day})`, hudSeason(w, sim.content));
@@ -251,13 +253,13 @@ function goalsOf(sim: Sim): string[] {
   if (w.order.generated !== null) out.push(`commande:${String(w.order.generated.train)}`);
   for (const x of openImprovements(sim)) out.push(`chantier:${x.id}`);
   for (const g of sim.content.catalogue?.gifts ?? []) {
-    if (w.dialoguesDone.includes(g.wish) && !(g.villager in w.giftsGiven)) out.push(`cadeau:${g.item}`);
+    if (dialogueDone(w.dialoguesDone, g.wish) && !(g.villager in w.giftsGiven)) out.push(`cadeau:${g.item}`);
   }
   for (const o of catalogueOffers(sim.content.settings, sim.content, w)) out.push(`article:${o.item}`);
   return out;
 }
 
-/** Un but d'épargne (O-12): un article en vente ou un chantier ouvert coûte plus que la bourse moins 150 sous. */
+/** Un but d'épargne (O-12): un article en vente ou un chantier ouvert coûte plus que la bourse moins 150 aubrins. */
 function savingGoalOf(sim: Sim): boolean {
   const room = sim.world.purse - 150;
   if (catalogueOffers(sim.content.settings, sim.content, sim.world).some((o) => o.price > room)) return true;
@@ -362,7 +364,7 @@ export function playLong(options: LongOptions): LongRun {
         const planks = entry.payments.reduce((n, x) => n + x.planks, 0);
         const discount = content.settings.improvements?.plankDiscount ?? 0;
         if (entry.builtDays.length > 1) run.economyProblems.push(`${e.improvement} bâti deux fois`);
-        if (def !== undefined && paid + planks * discount !== def.price) run.economyProblems.push(`${e.improvement}: ${String(paid)} sous et ${String(planks)} planches pour ${String(def.price)}`);
+        if (def !== undefined && paid + planks * discount !== def.price) run.economyProblems.push(`${e.improvement}: ${String(paid)} aubrins et ${String(planks)} planches pour ${String(def.price)}`);
         continue;
       }
       if (e.type === 'money' || e.type === 'sold') {
@@ -440,8 +442,8 @@ export function playLong(options: LongOptions): LongRun {
       if (e.type === 'letter') {
         const letter = w.letters.find((l) => l.id === e.letter);
         if (letter !== undefined) {
-          checkText(run, `lettre ${letter.id}`, letter.title);
-          checkText(run, `lettre ${letter.id}`, letter.text);
+          checkText(run, `lettre ${letter.id}`, letterTitle(sim.content, letter));
+          checkText(run, `lettre ${letter.id}`, letterText(sim.content, letter));
         }
         if (e.letter.startsWith('coop_order_generated') && w.order.generated !== null) {
           const fresh = w.order.generated.lines.filter((l) => !orderedEver.has(l.item));

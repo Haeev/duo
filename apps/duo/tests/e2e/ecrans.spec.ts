@@ -109,3 +109,40 @@ for (const scenario of SCENARIOS) {
     await page.close();
   });
 }
+
+test('salon: quoi de neuf, pastille et toutes les notes', async () => {
+  // Animations réduites: la capture montre la fenêtre des notes posée, pas en fondu.
+  const page = await browser.newPage({
+    viewport: { width: 1366, height: 768 },
+    reducedMotion: 'reduce',
+  });
+  await page.goto(`${origin}/?scenario=salon-hote`);
+  const news = page.getByTestId('salon-nouveautes');
+  await expect(news).toContainText('Version 1.0.0 installée');
+  await expect(page.getByTestId('salon-nouveau')).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: path.join(SCREENSHOTS, 'ecran-salon-nouveautes.png') });
+  await page.getByTestId('salon-toutes-les-notes').click();
+  await expect(page.getByTestId('notes-liste')).toContainText('Première version');
+  await page.screenshot({ path: path.join(SCREENSHOTS, 'ecran-salon-notes.png') });
+  // Échap ferme la liste sans quitter le salon.
+  await page.keyboard.press('Escape');
+  await expect(page.getByTestId('notes-liste')).toBeHidden();
+  await expect(page.getByTestId('ecran-salon-hote')).toBeVisible();
+  await page.close();
+});
+
+test('réglages: la case Plein écran et sa touche', async () => {
+  const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
+  await page.goto(`${origin}/?scenario=accueil`);
+  await page.getByTestId('onglet-reglages').click();
+  const box = page.getByTestId('reglages-plein-ecran');
+  await expect(box).not.toBeChecked();
+  // Le faux pont se présente comme un Mac.
+  await expect(page.getByTestId('ecran-reglages')).toContainText('Ctrl+Cmd+F');
+  await box.check();
+  await expect(box).toBeChecked();
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: path.join(SCREENSHOTS, 'ecran-reglages.png') });
+  await page.close();
+});

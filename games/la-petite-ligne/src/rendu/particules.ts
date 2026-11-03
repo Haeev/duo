@@ -14,6 +14,9 @@
  * carré couché à plat au lieu de tourné vers la caméra (bancs et nappes de brume), et fondu du
  * bas selon la hauteur au-dessus du sol lue dans le champ du terrain (aucun bord net là où le sol
  * coupe le carré). `aSize.y` y donne la demi-longueur du second axe (bouffée étirée).
+ * Carré couché tourné (`aAccel.z` à 1, groupe 2): cap `aVelocity.y` (radians, sens du sol); la
+ * forme `fish` lit en plus l'ondulation (`aVelocity.x`), le sillage (`aVelocity.z`), le flou
+ * (`aVelocity.w`) et la phase (`aOrigin.w`).
  */
 import {
   BufferAttribute,
@@ -36,6 +39,7 @@ import {
   type Texture,
 } from 'three';
 import type { ResourceTracker } from './ressources';
+import { SHELTER_SLOTS } from './abri';
 
 /** Formes dessinées par le shader de fragment. */
 export const PARTICLE_SHAPE = {
@@ -51,6 +55,11 @@ export const PARTICLE_SHAPE = {
   glow: 4,
   /** Gouttelette ronde et nette (arrosage). */
   droplet: 5,
+  /**
+   * Ombre de poisson vue d'en haut (pêche de la 0.12), tête vers +x du carré tourné: corps en
+   * fuseau, queue qui ondule, sillage clair la nuit. Sprites couchés et tournés seulement.
+   */
+  fish: 6,
 } as const;
 
 export const PARTICLE_MODE = { puffs: 0, rain: 1, sprites: 2 } as const;
@@ -77,6 +86,8 @@ uniform vec4 uGroupAlpha; // nuages, brume, halos, nappe de la brume du matin
 uniform vec2 uCloudFade;  // rayon (écran) où les nuages sont invisibles, puis pleins
 uniform vec3 uLightView;  // direction de la lumière dans le repère de la caméra
 uniform float uGroundFade; // hauteur (m) au-dessus du sol sur laquelle un sprite fondu apparaît
+uniform vec4 uShelters[${SHELTER_SLOTS}]; // abri du joueur local (abri.ts): x, z minimaux puis maximaux
+uniform int uShelterCount;
 
 attribute vec4 aOrigin;   // position, naissance (bouffées) ou phase
 attribute vec4 aVelocity; // vitesse, durée de vie
@@ -91,6 +102,7 @@ varying float vAge;
 varying float vLight;
 varying vec3 vWorld;
 flat varying int vGroundFade;
+varying vec4 vFish;
 
 uint ambHash(uint x) {
   x ^= x >> 16u; x *= 0x7feb352du; x ^= x >> 15u; x *= 0x846ca68bu; x ^= x >> 16u;
@@ -110,6 +122,16 @@ float ambWrap(float x, float c, float h) {
   return c - h + mod(x - (c - h), 2.0 * h);
 }
 
+/** Vrai si le point du sol est dans l'abri du joueur local (pas de pluie sur la pièce). */
+bool ambSheltered(vec2 xz) {
+  for (int i = 0; i < ${SHELTER_SLOTS}; i++) {
+    if (i >= uShelterCount) break;
+    vec4 r = uShelters[i];
+    if (xz.x > r.x && xz.y > r.y && xz.x < r.z && xz.y < r.w) return true;
+  }
+  return false;
+}
+
 void hideInstance() {
   gl_Position = vec4(0.0, 0.0, 2.0, 1.0);
 }
@@ -122,6 +144,8 @@ void main() {
   vAge = 0.0;
   vLight = 1.0;
   vGroundFade = 0;
+  vFish = vec4(0.0);
+  float turn = 0.0;
   vec3 centre = aOrigin.xyz;
   float size = aSize.x;
   vec2 stretch = vec2(1.0);
@@ -162,6 +186,12 @@ void main() {
       vec4 field = ambField(xz);
       if (field.b > 0.5) { hideInstance(); return; }
       centre = vec3(xz.x, ambGround(field) + drop, xz.y);
+      // Vu de dedans, une goutte qui passe devant la pièce coupée se lirait comme de la pluie
+      // dans la pièce: on la cache si elle est au-dessus de l'abri ou si elle le masque à l'écran
+      // (projetée au sol le long du regard).
+      vec3 toCamera = vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]);
+      vec2 seen = xz - toCamera.xz * (drop / max(toCamera.y, 0.05));
+      if (ambSheltered(xz) || ambSheltered(seen)) { hideInstance(); return; }
       axis = normalize(uFall);
       size = uRainShape.y;
       vAge = phase;
@@ -172,7 +202,7 @@ void main() {
       uint id = uint(gl_InstanceID);
       vec2 xz = uFocus.xz + (vec2(ambRandom(n, id), ambRandom(n, id + 7919u)) * 2.0 - 1.0) * h;
       vec4 field = ambField(xz);
-      if (field.b > 0.5) { hideInstance(); return; }
+      if (field.b > 0.5 || ambSheltered(xz)) { hideInstance(); return; }
       float t = fract(cycle);
       bool water = field.a > 0.5;
       centre = vec3(xz.x, ambGround(field) + 0.03, xz.y);
@@ -196,6 +226,10 @@ void main() {
     if (groupAlpha <= 0.0) { hideInstance(); return; }
     vColor.a *= groupAlpha;
     onGround = aAccel.x > 0.5;
+    if (aAccel.z > 0.5) {
+      turn = aVelocity.y;
+      vFish = vec4(aVelocity.x, uTime * 6.0 + aOrigin.w * 6.2831853, aVelocity.z, aVelocity.w);
+    }
     vGroundFade = aAccel.y > 0.5 ? 1 : 0;
     stretch.y = aSize.y / max(aSize.x, 0.0001);
     if (shape == 4) {
@@ -209,7 +243,11 @@ void main() {
   vec3 forward = -vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]);
   vec3 world;
   if (onGround) {
-    world = centre + vec3(position.x * stretch.x, 0.0, position.y * stretch.y) * size;
+    vec2 flat2 = position.xy * stretch;
+    float ct = cos(turn);
+    float st = sin(turn);
+    flat2 = vec2(flat2.x * ct - flat2.y * st, flat2.x * st + flat2.y * ct);
+    world = centre + vec3(flat2.x, 0.0, flat2.y) * size;
   } else if (dot(axis, axis) > 0.0) {
     vec3 side = normalize(cross(axis, forward));
     // Trait de pluie à sa longueur réglée; gouttelette d'arrosage quatre fois plus longue que large.
@@ -251,6 +289,7 @@ varying float vAge;
 varying float vLight;
 varying vec3 vWorld;
 flat varying int vGroundFade;
+varying vec4 vFish;
 
 void main() {
   float r = length(vCorner);
@@ -278,6 +317,27 @@ void main() {
   } else if (vShape == 4) {
     alpha = exp(-r * r * 4.0) * (1.0 - smoothstep(0.7, 1.0, r));
     additive = 1.0;
+  } else if (vShape == 6) {
+    // Longueur du poisson = 1 (carré de deux longueurs sur une), tête vers +x.
+    vec2 q = vec2(vCorner.x, vCorner.y * 0.5);
+    q.y -= sin(vFish.y - q.x * 8.0) * vFish.x * (0.5 - q.x) * 0.1;
+    float soft = 0.025 + vFish.w * 0.07;
+    vec2 radii = vec2(0.4, 0.11);
+    float body = (length((q - vec2(0.06, 0.0)) / radii) - 1.0) * radii.y;
+    float tailWidth = mix(0.02, 0.1, clamp((-0.28 - q.x) / 0.22, 0.0, 1.0));
+    float tail = max(abs(q.y) - tailWidth, max(q.x + 0.28, -0.5 - q.x));
+    float fishD = min(body, tail);
+    float bodyA = (1.0 - smoothstep(-soft, soft, fishD)) * mix(0.7, 1.0, smoothstep(0.0, -0.06, fishD));
+    // Sillage: deux traits fins qui partent de la tête et s'écartent derrière elle.
+    float behind = 0.44 - q.x;
+    float wakeD = abs(abs(q.y) - behind * 0.3);
+    // Assez large pour deux pixels au zoom 1 (ombre de 0,5 m), plus un liseré clair autour du corps.
+    float wakeA = (1.0 - smoothstep(0.02, 0.05 + soft * 0.3, wakeD)) * step(0.0, behind)
+      * (1.0 - smoothstep(0.0, 1.5, behind)) * vFish.z;
+    wakeA = max(wakeA, (1.0 - smoothstep(0.0, 0.03 + soft, abs(fishD))) * vFish.z * 0.6);
+    vec3 wakeColor = vec3(0.8, 0.88, 0.95) * max(uShadeColor + uLitColor * 0.6, vec3(0.7));
+    alpha = bodyA + wakeA * (1.0 - bodyA);
+    color = (vColor.rgb * bodyA + wakeColor * wakeA * (1.0 - bodyA)) / max(alpha, 0.0001);
   } else {
     alpha = smoothstep(1.0, 0.7, r);
     color *= uShadeColor + uLitColor * 0.8;
@@ -318,6 +378,8 @@ export interface ParticleUniforms {
   uShadeColor: IUniform<Color>;
   uSelfLight: IUniform<Vector4>;
   uGroundFade: IUniform<number>;
+  uShelters: IUniform<Vector4[]>;
+  uShelterCount: IUniform<number>;
 }
 
 /** Matériau des particules dans un mode donné. Tous partagent le même programme. */
@@ -345,6 +407,8 @@ export function createParticleMaterial(
     uShadeColor: { value: new Color(1, 1, 1) },
     uSelfLight: { value: new Vector4(1, 1, 1, 0) },
     uGroundFade: { value: 0.25 },
+    uShelters: { value: Array.from({ length: SHELTER_SLOTS }, () => new Vector4()) },
+    uShelterCount: { value: 0 },
   };
   const material = new ShaderMaterial({
     name: 'lpl_ambiance',

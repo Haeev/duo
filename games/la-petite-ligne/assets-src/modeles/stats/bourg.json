@@ -6,7 +6,7 @@
     6
    ],
    "door_cell": 4,
-   "tris": 4016
+   "tris": 6024
   },
   "platform": {
    "footprint": [
@@ -40,7 +40,7 @@
     "gatekeeper_house_ruin",
     "gatekeeper_house_repaired"
    ],
-   "tris": 8256
+   "tris": 10608
   },
   "gatekeeper_cellar": {
    "room": "room_cellar",
@@ -419,7 +419,7 @@
     ]
    },
    "note": "façade à l'est sur la carte (rotation 1); murs du rez-de-chaussée coupés selon la caméra, ferrand_shop_upper et ferrand_shop_roof retirés en entier, ferrand_shop_floor jamais coupé",
-   "tris": 11536
+   "tris": 13954
   },
   "haberdashery": {
    "footprint": [
@@ -444,7 +444,7 @@
     "floor_y": 0.12
    },
    "note": "façade à l'est sur la carte (rotation 1): +X glTF = nord. Murs coupés selon la caméra, haberdashery_roof et haberdashery_attic retirés en entier, haberdashery_floor jamais coupé",
-   "tris": 6252
+   "tris": 7788
   },
   "bakery": {
    "footprint": [
@@ -472,7 +472,7 @@
     ]
    },
    "note": "porte en case 5, guichet en case 3 (le point bakery_window se tient dehors, devant le guichet, sous l'auvent); porte des sacs au pignon ouest; four et cheminée côté voie (nord). spots: repère glTF x, z du bâtiment; spot_hourglass: rebord du guichet, où poser le sablier offert",
-   "tris": 4348
+   "tris": 5038
   },
   "lucie_house": {
    "footprint": [
@@ -487,7 +487,7 @@
     ]
    },
    "note": "façade à l'ouest sur la carte (rotation 3); jardinet clos à l'arrière (est), dans l'emprise",
-   "tris": 3480
+   "tris": 3684
   },
   "school": {
    "footprint": [
@@ -506,7 +506,7 @@
     ]
    },
    "note": "portail de la cour en case 3 (dans l'axe de la rue Haute), porte de la mairie en case 8; la classe s'ouvre sur la cour",
-   "tris": 5044
+   "tris": 4742
   },
   "firmin_house": {
    "footprint": [
@@ -514,7 +514,7 @@
     6
    ],
    "door_cell": 3,
-   "tris": 4524
+   "tris": 4668
   },
   "sawmill": {
    "footprint": [
@@ -1175,5 +1175,5 @@
    "tris": 216
   }
  },
- "file_bytes": 6217336
+ "file_bytes": 6859692
 }

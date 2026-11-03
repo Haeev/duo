@@ -18,7 +18,7 @@
     { "id": "hint_workbench", "text": "À l'établi, un rondin donne quatre planches, et un plan devient un meuble.", "trigger": { "on": "near_point", "point": "sawmill_workbench" }, "tier": "P0" },
     { "id": "hint_furniture", "text": "La molette tourne le meuble, {act} le pose, {examine} le reprend.", "trigger": { "on": "holding_furniture" }, "tier": "P0" },
     { "id": "hint_crate", "text": "Dépose ici les produits de la commande. Ils partent samedi à 16 h.", "trigger": { "on": "near_point", "point": "coop_crate" }, "tier": "P0" },
-    { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} sous, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
+    { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} aubrins, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
     { "id": "hint_notebook", "text": "{notebook} ouvre le carnet: quêtes, courrier, sac.", "trigger": { "on": "letter_received" }, "tier": "P0" },
     { "id": "hint_fishing", "text": "Canne en main et face à l'eau, {act} lance la ligne. Le bouchon plonge ? {act}, vite !", "trigger": { "on": "near_point", "point": "river_ford" }, "tier": "P1" },
     { "id": "hint_handcar_push", "text": "Réparée, la draisine se pousse à deux: un de chaque côté, maintenez {act} ensemble et avancez.", "trigger": { "on": "near_point", "point": "handcar_shed" }, "tier": "P0" },
@@ -26,6 +26,8 @@
     { "id": "hint_omelette", "text": "Au réchaud de la maison, trois œufs font deux omelettes.", "trigger": { "on": "quest_started", "quest": "basile_omelette" }, "tier": "P0" },
     { "id": "forage_hint", "text": "Quelque chose se cueille à la lisière: approche-toi, puis {act} ou un clic pour le ramasser.", "trigger": { "on": "near_forage" }, "tier": "P0" },
     { "id": "sapling_hint", "text": "Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir.", "trigger": { "on": "aim_sapling" }, "tier": "P0" },
-    { "id": "board_hint", "text": "Le tableau du quai a de nouvelles annonces: approche-toi, puis {act} pour les lire.", "trigger": { "on": "near_board_annonce" }, "tier": "P0" }
+    { "id": "board_hint", "text": "Le tableau du quai a de nouvelles annonces: approche-toi, puis {act} pour les lire.", "trigger": { "on": "near_board_annonce" }, "tier": "P0" },
+    { "id": "fishing_hot_spot_hint", "text": "Tu vois ces ronds dans l'eau ? Ça gobe: c'est le coin qui frémit aujourd'hui. Les beaux poissons y sont plus nombreux.", "trigger": { "on": "fishing_hot_spot" }, "tier": "P1" },
+    { "id": "fishing_watch_hint", "text": "Reste immobile au bord de l'eau sans pêcher: tu verras briller les beaux poissons. Dis à l'autre où lancer.", "trigger": { "on": "fishing_watch" }, "tier": "P1" }
   ]
 }

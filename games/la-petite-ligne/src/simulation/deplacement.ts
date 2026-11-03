@@ -3,11 +3,11 @@
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
 import type { ControlFrame } from '../etat/actions';
-import { buildingAt } from '../etat/carte';
+import { type GameMap, buildingAt } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
-import { type Sim, character, distance, emit, partnerName, point, say } from './contexte';
+import { type Sim, character, distance, emit, faceToward, partnerName, point, say } from './contexte';
 import { abortConversation } from './dialogues';
 import { type Blockers, OPENED_CELL, bodyCollides, findPath, isBlockedCell, moveBody, nearestFreeCell } from './grille';
 import { builtRoomCells } from './pieces';
@@ -78,9 +78,34 @@ export function blockersFor(sim: Sim, pos: Vec2): Blockers {
   return blockersAt(sim, refreshBlockers(sim), pos);
 }
 
-/** Collisions des habitants: ils ont leurs clés, toutes les portes s'ouvrent devant eux. */
-export function villagerBlockers(sim: Sim): Blockers {
-  return withDoor(sim, refreshBlockers(sim), ALL_DOORS);
+const stoneCells = new WeakMap<GameMap, Uint8Array>();
+
+/** Cases du gué de pierres du ru (`ouvrages` de nature `ford`), calculées une fois par carte. */
+function steppingStones(map: GameMap): Uint8Array {
+  let cells = stoneCells.get(map);
+  if (cells !== undefined) return cells;
+  cells = new Uint8Array(map.width * map.height);
+  for (const c of map.crossings) {
+    if (c.kind !== 'ford') continue;
+    for (let cy = c.rect.y; cy < c.rect.y + c.rect.h; cy++) {
+      for (let cx = c.rect.x; cx < c.rect.x + c.rect.w; cx++) {
+        if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) cells[cy * map.width + cx] = 1;
+      }
+    }
+  }
+  stoneCells.set(map, cells);
+  return cells;
+}
+
+/**
+ * Collisions des habitants: ils ont leurs clés, toutes les portes s'ouvrent devant eux. Seuls ceux
+ * de `feel.steppingStoneVillagers` sautent le ru au gué de pierres: les autres y auraient l'air de
+ * marcher dans l'eau (retour S04), ils passent par le pont, la passerelle ou le ponceau.
+ */
+export function villagerBlockers(sim: Sim, villager: string): Blockers {
+  const b = withDoor(sim, refreshBlockers(sim), ALL_DOORS);
+  if (sim.content.settings.feel.steppingStoneVillagers.includes(villager)) return b;
+  return { ...b, avoid: steppingStones(sim.map) };
 }
 
 /**
@@ -321,6 +346,60 @@ export function midnightReturn(sim: Sim): void {
 // ---------------------------------------------------------------------------
 // La poutre, portée à deux (GE-01, GE-02)
 
+/** Demi-longueur d'une charge longue (`carry.lengths`), 0 pour une charge ramassée. */
+function beamHalfLength(sim: Sim, beam: Beam): number {
+  return (sim.content.settings.carry.lengths[beam.item] ?? 0) / 2;
+}
+
+/** Position, le long de l'axe de la charge, du point le plus proche de `pos` (de -demi-longueur à +demi-longueur). */
+function alongBeam(sim: Sim, beam: Beam, pos: Vec2): number {
+  const half = beamHalfLength(sim, beam);
+  if (half <= 0) return 0;
+  const t = (pos.x - beam.pos.x) * Math.cos(beam.facing) + (pos.y - beam.pos.y) * Math.sin(beam.facing);
+  return Math.max(-half, Math.min(half, t));
+}
+
+/**
+ * Point de la charge où ce personnage la prend: sur l'axe d'une poutre, le plus près de lui (un
+ * bout chacun, retour S01); le centre d'une charge ramassée (colis, panière, draisine).
+ */
+export function beamGrip(sim: Sim, beam: Beam, pos: Vec2): Vec2 {
+  const t = alongBeam(sim, beam, pos);
+  return { x: beam.pos.x + Math.cos(beam.facing) * t, y: beam.pos.y + Math.sin(beam.facing) * t };
+}
+
+/** Distance de ce point à la charge (à son axe pour une poutre), sans allocation. */
+export function beamDistance(sim: Sim, beam: Beam, pos: Vec2): number {
+  const t = alongBeam(sim, beam, pos);
+  return Math.hypot(pos.x - (beam.pos.x + Math.cos(beam.facing) * t), pos.y - (beam.pos.y + Math.sin(beam.facing) * t));
+}
+
+/** Portée de prise: jusqu'à l'axe d'une poutre (`carry.grip.reach`), jusqu'au centre d'une charge ramassée. */
+export function beamGrabRange(sim: Sim, beam: Beam): number {
+  return beamHalfLength(sim, beam) > 0 ? sim.content.settings.carry.grip.reach : sim.content.settings.feel.beamGrabRange;
+}
+
+/**
+ * Décalage d'un porteur par rapport au centre de la charge, en la soulevant. Poutre: il se range
+ * contre elle, là où il la tient, du côté où il était (`carry.grip`), pour que ses mains soient sur
+ * le bois; s'il n'y a pas la place (mur), il garde sa position. Charge ramassée: sa position.
+ */
+function gripOffset(sim: Sim, beam: Beam, c: Character, blockers: Blockers): Vec2 {
+  const here = { x: c.pos.x - beam.pos.x, y: c.pos.y - beam.pos.y };
+  const half = beamHalfLength(sim, beam);
+  if (half <= 0) return here;
+  const { side, fromEnd } = sim.content.settings.carry.grip;
+  const ux = Math.cos(beam.facing);
+  const uy = Math.sin(beam.facing);
+  const room = Math.max(0, half - fromEnd);
+  const t = Math.max(-room, Math.min(room, here.x * ux + here.y * uy));
+  const across = -here.x * uy + here.y * ux;
+  const sign = across < 0 ? -1 : 1;
+  const x = ux * t - uy * side * sign;
+  const y = uy * t + ux * side * sign;
+  return bodyCollides(blockers, beam.pos.x + x, beam.pos.y + y) ? here : { x, y };
+}
+
 /** Vecteur d'entrée (borné à 1). */
 function inputOf(frame: ControlFrame | undefined): Vec2 {
   if (frame === undefined) return { x: 0, y: 0 };
@@ -338,12 +417,12 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
   const beam = sim.world.beam;
   if (beam === null) return null;
   const s = sim.content.settings;
-  const grab = s.feel.beamGrabRange;
+  const grab = beamGrabRange(sim, beam);
   const holders = sim.world.characters.filter(
     (c) =>
       frames[c.id]?.actHeld === true &&
       (c.status === 'active' || c.status === 'gesture') &&
-      distance(c.pos, beam.pos) <= (beam.carried ? grab * 2 : grab),
+      beamDistance(sim, beam, c.pos) <= (beam.carried ? grab * 2 : grab),
   );
   beam.holders = holders.map((c) => c.id);
   if (holders.length === 1 && !beam.carried) {
@@ -372,14 +451,22 @@ export function updateBeam(sim: Sim, frames: Partial<Record<CharacterId, Control
   const [a, b] = holders as [Character, Character];
   if (!beam.carried) {
     beam.carried = true;
+    const lifting = refreshBlockers(sim);
     for (const c of holders) {
-      sim.runtime.beamOffsets[c.id] = { x: c.pos.x - beam.pos.x, y: c.pos.y - beam.pos.y };
+      sim.runtime.beamOffsets[c.id] = gripOffset(sim, beam, c, lifting);
+      c.pos.x = beam.pos.x + sim.runtime.beamOffsets[c.id].x;
+      c.pos.y = beam.pos.y + sim.runtime.beamOffsets[c.id].y;
       c.status = 'gesture';
       c.action = { kind: 'carry', since: sim.world.tick, duration: 0, target: null };
       stopPath(sim, c);
       c.menu = null;
     }
-    beam.facing = Math.atan2(b.pos.y - a.pos.y, b.pos.x - a.pos.x);
+    // Une poutre garde son orientation: chacun la soulève là où il la tient, sans qu'elle pivote
+    // vers la ligne des deux porteurs (retour S01). Une charge ramassée se tourne entre eux.
+    if (beamHalfLength(sim, beam) <= 0) beam.facing = Math.atan2(b.pos.y - a.pos.y, b.pos.x - a.pos.x);
+    // À l'arrêt, on se fait face pour soulever (la draisine: on se tourne vers elle); en marche, on regarde où l'on va.
+    faceToward(a, beam.purpose === 'handcar' ? beam.pos : b.pos);
+    faceToward(b, beam.purpose === 'handcar' ? beam.pos : a.pos);
     emit(sim, { type: 'beam_lifted' });
   }
   const ia = inputOf(frames[a.id]);

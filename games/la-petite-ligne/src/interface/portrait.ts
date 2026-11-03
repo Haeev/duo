@@ -1,9 +1,13 @@
 /**
  * Portraits en SVG (provisoires, repris des maquettes): cinq expressions
- * lisibles en 48 px, le foulard à la couleur du profil Duo. Le jeu pourra les
- * remplacer par des vignettes tirées des modèles 3D sans toucher au reste.
+ * lisibles en 48 px. Depuis la 0.12, les joueurs n'ont plus de foulard: le haut
+ * porté (et la veste par-dessus) donne ses couleurs, un petit badge brodé garde
+ * la couleur du profil Duo. Le jeu pourra les remplacer par des vignettes tirées
+ * des modèles 3D sans toucher au reste.
  */
-import type { Appearance, CharacterId } from '../etat/types';
+import type { ClothesContent } from '../donnees/vetements';
+import { visiblePieces } from '../etat/garde-robe';
+import type { Appearance, CharacterId, Wear } from '../etat/types';
 import {
   type BeardStyle,
   type Expression,
@@ -125,25 +129,65 @@ const BEARDS: Readonly<Record<BeardStyle, (c: string) => string>> = {
   moustache: (c) => `<path d="M41 59q9 -6 18 0q-9 3 -18 0z" fill="${c}"/>`,
 };
 
-/** Couleurs du portrait d'un joueur selon son apparence (couleur et barbe absentes: celles d'avant le tour 10). */
-export function playerColors(
-  id: CharacterId,
-  appearance: Readonly<Pick<Appearance, 'hair' | 'outfit' | 'scarf'> & Partial<Pick<Appearance, 'hairColor' | 'beard'>>>,
-): PortraitColors {
+/** Apparence lue par le portrait: la tenue (`wear`) n'est lue qu'avec les vêtements du contenu. */
+export type PortraitAppearance = Readonly<
+  Pick<Appearance, 'hair' | 'scarf'> & Partial<Pick<Appearance, 'hairColor' | 'beard'>> & { wear?: Readonly<Wear> }
+>;
+
+/** Mêle une couleur `#rrggbb` au blanc (`share` de blanc), pour le fond du portrait. */
+function towardWhite(hex: string, share: number): string {
+  const v = Number.parseInt(hex.slice(1), 16);
+  if (Number.isNaN(v)) return '#EEEEEE';
+  const mix = (c: number): string => Math.round(c + (255 - c) * share).toString(16).padStart(2, '0');
+  return `#${mix((v >> 16) & 0xff)}${mix((v >> 8) & 0xff)}${mix(v & 0xff)}`;
+}
+
+/**
+ * Le haut vu dans le portrait (0.12): le haut, ou le bas qui le couvre (salopette), et à part le
+ * par-dessus (veste ouverte sur le haut). `null` sans tenue lisible.
+ */
+function torsoColors(
+  clothes: ClothesContent | undefined,
+  wear: Readonly<Wear> | undefined,
+): { top: string; trim: string; bg: string; outer: { main: string; second: string } | null } | null {
+  if (clothes === undefined || wear === undefined) return null;
+  const shown = visiblePieces(clothes, wear);
+  const piece = shown.find((p) => p.slot === 'top') ?? shown.find((p) => p.slot === 'bottom' && p.couvre.includes('top')) ?? shown.find((p) => p.slot === 'outer');
+  if (piece === undefined) return null;
+  const outer = piece.slot === 'outer' ? undefined : shown.find((p) => p.slot === 'outer');
+  return {
+    top: safeColor(piece.couleurs.principale),
+    trim: safeColor(piece.couleurs.secondaire),
+    bg: towardWhite(safeColor(piece.couleurs.principale), 0.78),
+    outer: outer === undefined ? null : { main: safeColor(outer.couleurs.principale), second: safeColor(outer.couleurs.secondaire) },
+  };
+}
+
+/**
+ * Couleurs du portrait d'un joueur selon son apparence (couleur et barbe absentes: celles d'avant le
+ * tour 10; tenue lue dans `clothes`, sinon la première tenue d'avant la 0.12). Plus de foulard chez
+ * les joueurs (0.12): la couleur du profil Duo passe au badge brodé.
+ */
+export function playerColors(id: CharacterId, appearance: PortraitAppearance, clothes?: ClothesContent): PortraitColors {
   const body = PLAYER_BODIES[id];
   const hairColor = appearance.hairColor === undefined ? undefined : PLAYER_HAIR_COLORS[appearance.hairColor];
-  const outfit = PLAYER_OUTFITS[appearance.outfit] ?? PLAYER_OUTFITS[0] ?? { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' };
-  return {
+  const torso = torsoColors(clothes, appearance.wear);
+  const outfit = torso ?? PLAYER_OUTFITS[0] ?? { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' };
+  const colors: PortraitColors = {
     skin: body.skin,
     shade: body.shade,
     hair: hairColor ?? body.hair,
     top: outfit.top,
     trim: outfit.trim,
-    scarf: safeColor(appearance.scarf),
+    scarf: '',
+    badge: safeColor(appearance.scarf),
     style: PLAYER_HAIRS[appearance.hair] ?? 'short',
     bg: outfit.bg,
     beard: PLAYER_BEARDS[appearance.beard ?? 0] ?? 'none',
   };
+  const outer = torso?.outer ?? null;
+  if (outer !== null) colors.outer = outer;
+  return colors;
 }
 
 export function villagerColors(id: string): PortraitColors | null {
@@ -155,6 +199,17 @@ export function villagerColors(id: string): PortraitColors | null {
  * portrait décoratif. Toutes les couleurs viennent de la configuration ou
  * passent par `safeColor`.
  */
+/**
+ * La tête seule d'un joueur, dans le repère du portrait (centre 50, 50), pour la silhouette en pied
+ * de l'aperçu des vêtements. `back`: vue de dos (la chevelure couvre le visage).
+ */
+export function playerHeadSvg(p: PortraitColors, expression: Expression, back: boolean): string {
+  const ears = `<ellipse cx="31" cy="53" rx="3.5" ry="5" fill="${p.shade}"/><ellipse cx="69" cy="53" rx="3.5" ry="5" fill="${p.shade}"/>`;
+  const head = `<ellipse cx="50" cy="50" rx="19" ry="21" fill="${p.skin}"/>`;
+  if (back) return `${ears}${head}<ellipse cx="50" cy="48" rx="19.5" ry="21" fill="${p.hair}"/>${HAIRS[p.style](p.hair)}`;
+  return `${ears}${head}${HAIRS[p.style](p.hair)}${FACES[expression]}${BEARDS[p.beard ?? 'none'](p.hair)}`;
+}
+
 export function portraitSvg(p: PortraitColors, expression: Expression, label: string, villagerId = ''): string {
   const beard =
     p.style === 'beard'
@@ -165,13 +220,30 @@ export function portraitSvg(p: PortraitColors, expression: Expression, label: st
     villagerId === 'jeanne'
       ? '<g fill="#B5652F" opacity="0.6"><circle cx="38" cy="57" r="1"/><circle cx="41" cy="59" r="1"/><circle cx="62" cy="57" r="1"/><circle cx="59" cy="59" r="1"/></g>'
       : '';
-  const scarf = `<path d="M33 79c5 4 11 6 17 6s12-2 17-6l3 7c-6 4-13 6-20 6s-14-2-20-6z" fill="${p.scarf}" stroke="${INK}" stroke-width="1.6"/>`;
+  const scarf =
+    p.scarf === ''
+      ? ''
+      : `<path d="M33 79c5 4 11 6 17 6s12-2 17-6l3 7c-6 4-13 6-20 6s-14-2-20-6z" fill="${p.scarf}" stroke="${INK}" stroke-width="1.6"/>`;
+  // Veste ouverte par-dessus le haut: deux pans et leurs revers, le col du haut visible au milieu.
+  const outer =
+    p.outer === undefined
+      ? ''
+      : `<path d="M14 104c2-18 16-28 36-28l-8 28z" fill="${p.outer.main}"/><path d="M86 104c-2-18-16-28-36-28l8 28z" fill="${p.outer.main}"/>` +
+        `<path d="M40 77l-4 10 7 4zM60 77l4 10-7 4z" fill="${p.outer.second}"/>`;
+  // Badge brodé à la couleur du profil Duo, sur la poitrine (sur le pan de la veste s'il y en a une).
+  const bx = p.outer === undefined ? 64 : 72;
+  const badge =
+    p.badge === undefined
+      ? ''
+      : `<circle cx="${bx}" cy="93" r="4.4" fill="${p.badge}" stroke="${INK}" stroke-width="1.2"/><circle cx="${bx}" cy="93" r="1.7" fill="#FFF8EA" opacity="0.85"/>`;
   const role = label === '' ? 'aria-hidden="true"' : `role="img" aria-label="${escapeAttr(label)}"`;
   return (
     `<svg viewBox="0 0 100 100" ${role}>` +
     `<rect width="100" height="100" fill="${p.bg}"/>` +
     `<path d="M14 104c2-18 16-28 36-28s34 10 36 28z" fill="${p.top}"/>` +
     `<path d="M40 76h20l-2 10H42z" fill="${p.trim}"/>` +
+    outer +
+    badge +
     `<rect x="44" y="64" width="12" height="14" fill="${p.shade}"/>` +
     `<ellipse cx="50" cy="50" rx="19" ry="21" fill="${p.skin}"/>` +
     `<ellipse cx="31" cy="53" rx="3.5" ry="5" fill="${p.shade}"/><ellipse cx="69" cy="53" rx="3.5" ry="5" fill="${p.shade}"/>` +

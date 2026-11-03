@@ -13,6 +13,7 @@ import { SIM_HZ } from '../src/simulation/constantes';
 import { placeVillagers } from '../src/simulation/habitants';
 import { step } from '../src/simulation/pas';
 import { contentAndMap, createRobot, newSim, play, SEED } from './aides';
+import { letterTextOf, letterTitleOf } from './aides';
 
 const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
@@ -171,10 +172,10 @@ describe('sauvegarde du jour 15 du format 4 (T8-02, section 1.6)', () => {
       SIM_HZ * 60 * 20,
     );
     const letter = w.letters.find((l) => l.id === 'coop_order_generated@22');
-    expect(letter?.title).toBe('Commande pour samedi 22');
+    expect(letterTitleOf(sim, letter)).toBe('Commande pour samedi 22');
     expect(w.clock.day).toBe(15);
     expect(w.clock.minutes).toBeGreaterThanOrEqual(18 * HOUR);
-    expect(letter?.text).not.toContain('{');
+    expect(letterTextOf(sim, letter)).not.toContain('{');
     // Au matin du jour 16, la caisse rouvre pour la commande 3.
     play(
       sim,

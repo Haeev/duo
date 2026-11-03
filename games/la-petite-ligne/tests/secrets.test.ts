@@ -248,7 +248,7 @@ describe('secrets: une erreur ne coûte jamais rien', () => {
     expect(nudges('p1')).toBe(1);
   });
 
-  it('du premier coup: « Du premier coup ! » et un peu de Cœur pour chacun; 15 sous d’Odette', () => {
+  it('du premier coup: « Du premier coup ! » et un peu de Cœur pour chacun; 15 aubrins d’Odette', () => {
     const sim = henNamesSim();
     finishListen(sim);
     const purse = sim.world.purse;

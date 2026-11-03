@@ -4,6 +4,8 @@
  * barre d'aménagement, commandes de la caméra et du carnet à la souris.
  * Le DOM n'est touché que si une valeur affichée change.
  */
+import { CURRENCY, groupDigits } from '../donnees/monnaie';
+import { animalCardModel } from './modele-elevage';
 import { isHome } from '../etat/interieurs';
 import type { GameNotification, ReadonlyWorld } from '../etat/types';
 import type { UiHost } from './composant';
@@ -34,6 +36,7 @@ import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from '.
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
+import { isWatching } from '../etat/peche';
 
 /** Une icône de besoin du HUD (à côté du portrait, ou en petit sur la carte de l'autre). */
 interface NeedView {
@@ -86,6 +89,7 @@ export class Hud {
   private watchSig = '';
 
   private readonly purseAmount: HTMLSpanElement;
+  private readonly purseUnit: HTMLSpanElement;
   private readonly purseNote: HTMLSpanElement;
   private readonly purseDelta: HTMLSpanElement;
   private lastPurse: number | null = null;
@@ -113,6 +117,8 @@ export class Hud {
 
   private readonly self: HTMLDivElement;
   private readonly selfPortrait: HTMLSpanElement;
+  /** Pastille « Au guet » (pêche 0.12, section 7.2): chez le seul guetteur. */
+  private readonly watchBadge: HTMLSpanElement;
   private readonly selfName: HTMLSpanElement;
   private readonly selfMood: HTMLSpanElement;
   /** Besoins doux (tour 10): trois icônes à trois états, sans chiffre; l'état bas en un mot. */
@@ -126,6 +132,9 @@ export class Hud {
   private readonly invite: HTMLButtonElement;
   private readonly inviteText: HTMLSpanElement;
   private inviteModel: InviteModel | null = null;
+  /** Fiche de la bête visée (0.12): nom, humeur en un mot, soin du jour. */
+  private readonly animalCard: HTMLElement;
+  private animalSig = '';
   /** Rêverie de la sieste: le carnet reste ouvert, « Se lever » à tout moment. */
   private readonly nap: HTMLElement;
   private readonly napTitle: HTMLElement;
@@ -193,13 +202,14 @@ export class Hud {
 
     const unit = splitAmount(ctx.texts.game.ui.hud.purse);
     this.purseAmount = el('span', { class: 'lpl-purse__amount' });
+    this.purseUnit = el('span', { class: 'lpl-purse__unit', text: unit.after.trim() });
     this.purseNote = el('span', { class: 'lpl-purse__note', hidden: true });
     this.purseDelta = el('span', { class: 'lpl-purse__delta', hidden: true });
     const purse = el('div', { class: 'lpl-purse', 'aria-label': x.hud.purseLabel }, [
-      icon('ui-coin'),
+      icon(CURRENCY.icon),
       unit.before.trim() === '' ? null : el('span', { class: 'lpl-purse__unit', text: unit.before.trim() }),
       this.purseAmount,
-      el('span', { class: 'lpl-purse__unit', text: unit.after.trim() }),
+      this.purseUnit,
       this.purseNote,
       this.purseDelta,
     ]);
@@ -248,9 +258,10 @@ export class Hud {
       ...this.selfNeedViews.map((v) => v.box),
       this.selfNeedNote,
     ]);
+    this.watchBadge = el('span', { class: 'lpl-watch-badge', hidden: true, 'data-key': 'watching' }, [icon('ui-eye'), x.fish.watching]);
     this.self = el('div', { class: 'lpl-self' }, [
       this.selfPortrait,
-      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.selfNeeds]),
+      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.selfNeeds, this.watchBadge]),
     ]);
 
     // Bas centre: avancée de l'action, invite du survol, astuce, barre d'outils, barre d'aménagement.
@@ -264,6 +275,7 @@ export class Hud {
     this.aimText = el('span');
     this.aimPrompt = el('p', { class: 'lpl-aim', role: 'status', 'aria-label': x.aim.label, hidden: true }, [keycap(x.aim.click), this.aimText]);
     this.tip = el('p', { class: 'lpl-tip', role: 'status', hidden: true });
+    this.animalCard = el('p', { class: 'lpl-aim lpl-animal', role: 'status', hidden: true });
     this.inviteText = el('span');
     this.invite = button([keycap(ctx.key('Enter')), this.inviteText], () => {
       this.activateInvite();
@@ -357,7 +369,7 @@ export class Hud {
       el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
-      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
+      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.animalCard, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
       el('div', { class: 'lpl-hud__bottom-right' }, [shortcuts]),
     ]);
   }
@@ -434,7 +446,8 @@ export class Hud {
 
     // Bourse.
     const purse = purseModel(world);
-    setText(this.purseAmount, String(purse.amount));
+    setText(this.purseAmount, groupDigits(purse.amount));
+    setText(this.purseUnit, splitAmount(ctx.texts.game.ui.hud.purse, purse.amount).after.trim());
     setHidden(this.purseNote, purse.reserved === 0);
     setText(this.purseNote, ctx.t(ctx.texts.extra.hud.reserved, { amount: purse.reserved }));
     if (this.lastPurse !== null && purse.amount > this.lastPurse) {
@@ -456,7 +469,7 @@ export class Hud {
     const p = partnerModel(world, ctx, partnerChar === null ? null : absenceMinutes(world, partnerChar));
     setHidden(this.partner, p === null);
     if (p !== null && partnerChar !== null) {
-      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance), p.expression, ''));
+      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance, ctx.content.clothes), p.expression, ''));
       setText(this.partnerName, p.name);
       setAttr(this.partner, 'aria-label', p.name);
       setIcon(this.partnerIcon, p.icon);
@@ -488,10 +501,11 @@ export class Hud {
 
     // Soi.
     const form = formModel(ctx, me);
-    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance), form.expression, form.name));
+    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance, ctx.content.clothes), form.expression, form.name));
     setText(this.selfName, me.name);
     setAttr(this.self, 'aria-label', ctx.t(ctx.texts.extra.hud.selfLabel, { name: me.name }));
     setText(this.selfMood, form.name);
+    setHidden(this.watchBadge, !isWatching(world.fishing, me.id));
     this.updateNeeds(world);
     this.updateNap(world);
 
@@ -500,6 +514,15 @@ export class Hud {
     this.inviteModel = invite;
     setHidden(this.invite, invite === null);
     setText(this.inviteText, invite?.text ?? '');
+
+    // Fiche de la bête visée (0.12).
+    const card = animalCardModel(world, ctx);
+    const cardText = card === null ? '' : [card.mood === '' ? card.name : `${card.name}: ${card.mood}`, ...card.notes].join(', ');
+    if (cardText !== this.animalSig) {
+      this.animalSig = cardText;
+      setHidden(this.animalCard, card === null);
+      setText(this.animalCard, ctx.t(cardText));
+    }
 
     // Invite de la cible survolée à la souris.
     const prompt = aimPromptModel(world, ctx);

@@ -3,6 +3,7 @@
  * applique les intentions des deux joueurs dans leur ordre d'arrivée et
  * envoie à l'invité l'état, les positions et les événements.
  */
+import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
 import type { CharacterId, WorldEvent } from '../etat/types';
@@ -106,7 +107,7 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
       minutes: w.clock.minutes,
       characters: w.characters.map((c) => ({ id: c.id, x: c.pos.x, y: c.pos.y, f: c.facing, s: c.speed })),
       villagers: w.villagers.map((v) => ({ id: v.id, x: v.pos.x, y: v.pos.y, f: v.facing, s: v.speed })),
-      hens: w.hens.map((h) => ({ id: h.id, x: h.pos.x, y: h.pos.y, f: h.facing, s: 0 })),
+      hens: movingAnimals(w).map((h) => ({ id: h.id, x: h.pos.x, y: h.pos.y, f: h.facing, s: 0 })),
       beam: w.beam === null ? null : { x: w.beam.pos.x, y: w.beam.pos.y, f: w.beam.facing },
       train: w.train.progress,
     };

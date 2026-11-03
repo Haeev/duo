@@ -16,6 +16,7 @@ import { buildingAt, HOUSE_BUILDING } from '../src/etat/carte';
 import { IntentSchema } from '../src/reseau/schemas';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { character } from '../src/simulation/contexte';
+import { DATA_SCHEMA } from '../src/simulation/constantes';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { step } from '../src/simulation/pas';
 import { contentAndMap, newSim } from './aides';
@@ -247,7 +248,7 @@ describe('état du tour 10: valeurs par défaut', () => {
     expect(sim.world.villagers.every((villager) => villager.inside === null)).toBe(true);
   });
 
-  it('sauvegarde du format 6 (écrite avant le tour 10): champs remplis, `inside` recalculé, état sous la borne, relue au format 7', () => {
+  it('sauvegarde du format 6 (écrite avant le tour 10): champs remplis, `inside` recalculé, état sous la borne, relue au format courant', () => {
     const { content, map } = contentAndMap();
     const file = new URL('./donnees/sauvegardes/format-6-automne-jour-62.json', import.meta.url);
     const ref = JSON.parse(readFileSync(fileURLToPath(file), 'utf8')) as {
@@ -267,8 +268,9 @@ describe('état du tour 10: valeurs par défaut', () => {
     expect(sim.world.rooms).toEqual({});
     // Lot L4 (format 7): les outils du coffre passent au râtelier.
     expect(sim.world.rack.map((s) => s.item).sort()).toEqual(['axe', 'fishing_rod', 'watering_can']);
+    // Écrite au format courant (le 7 et les suivants), puis relue à ce format.
     const snap = snapshotOf(sim);
-    expect(snap.dataSchema).toBe(7);
+    expect(snap.dataSchema).toBe(DATA_SCHEMA);
     const bytes = new TextEncoder().encode(JSON.stringify(snap.data)).length;
     expect(bytes).toBeLessThan(MAX_STATE_BYTES);
     const again = restoreWorld(content, map, structuredClone(snap.data), snap.dataSchema, [A, B]);

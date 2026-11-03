@@ -9,6 +9,7 @@ import {
   seasonStartingOn,
   stageCanContinue,
 } from '../donnees/calendrier';
+import { agreeMoney } from '../donnees/monnaie';
 import type { Content, Season, StageId } from '../donnees/types';
 import type { CharacterId, DeepReadonly, QuestState, StageChoice, WorldState } from './types';
 
@@ -29,10 +30,11 @@ function text(content: Content, path: readonly string[]): string | null {
 }
 
 function fill(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+  const filled = template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });
+  return agreeMoney(filled);
 }
 
 export interface StageScreen {

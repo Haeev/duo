@@ -6,11 +6,13 @@
  * et du toit quand le personnage local est à l'intérieur.
  */
 import {
+  Box3,
   Group,
   Matrix4,
   Mesh,
   MeshBasicMaterial,
   PointLight,
+  Raycaster,
   Vector3,
   type BufferGeometry,
   type Object3D,
@@ -22,6 +24,7 @@ import {
   type ConstructionState,
   type DeepReadonly,
   type ItemStack,
+  type PlacedDecor,
   type PlacedFurniture,
   type PlacementPreview,
 } from '../etat/types';
@@ -50,6 +53,8 @@ import type { Terrain } from './terrain';
 
 const HOUSE_PROP = 'gatekeeper_house';
 const COOP_PROP = 'henhouse';
+/** Chantier du poulailler agrandi (0.12), qui remplace le poulailler réparé une fois bâti. */
+const COOP_EXTENSION = 'coop_extension';
 const INVALID_TINT = '#d9584f';
 const PLACEMENT_OPACITY = 0.55;
 /** Cadre du coin à soi: baguettes fines posées au sol, en retrait du bord des cases (m). */
@@ -64,6 +69,17 @@ const CORNER_PEG_HEIGHT = 0.3;
 const CORNER_OPACITY = 0.5;
 const FURNITURE_PICK_HEIGHT = 1;
 const FURNITURE_PICK_INSET = 0.05;
+
+/** Un petit objet posé sur le dessus d'un meuble (S03). */
+interface DecorView {
+  item: string;
+  object: Object3D;
+  pick: PickTarget;
+}
+
+/** Marge (m) au-dessus d'un petit objet posé pour la viser à la souris. */
+const DECOR_PICK_MARGIN = 0.05;
+const DOWN = new Vector3(0, -1, 0);
 
 interface FurnitureView {
   item: string;
@@ -137,6 +153,13 @@ export class HousePart implements EventfulPart {
   private house: StagedBuilding | null = null;
   private coop: StagedBuilding | null = null;
   private readonly furniture = new Map<string, FurnitureView>();
+  private readonly decor = new Map<string, DecorView>();
+  /** Hauteur du dessus de chaque place (`modèle:x:z`), lue une fois dans la géométrie du modèle. */
+  private readonly topHeights = new Map<string, number>();
+  private readonly raycaster = new Raycaster();
+  private readonly decorBox = new Box3();
+  private readonly decorPoint = new Vector3();
+  private readonly probeFrom = new Vector3();
   private readonly ghosts = new Map<
     CharacterId,
     { item: string; object: Object3D; material: MeshBasicMaterial }
@@ -360,6 +383,9 @@ export class HousePart implements EventfulPart {
     if (this.coop !== null) {
       // Pendant le chantier du poulailler, la ruine s'efface derrière les fantômes.
       this.coop.ruin.visible = find('chicken_coop')?.status === 'locked';
+      // 0.12: le poulailler agrandi (chantier `coop_extension`) est dessiné par les chantiers
+      // (`henhouse_extended`, même origine et même emprise): le poulailler réparé s'efface.
+      this.coop.group.visible = (world.improvements[COOP_EXTENSION]?.builtDay ?? null) === null;
     }
     this.lastWorldRooms = world.rooms;
     this.lastDay = world.clock.day;
@@ -376,6 +402,7 @@ export class HousePart implements EventfulPart {
     const roofed = done('house_roof') && !inside;
     this.updateFurniture(world.furniture, roofed, context);
     this.mergeStillFurniture(world.furniture);
+    this.updateDecor(world.decor, roofed);
     this.updateGhosts(context);
     this.updateCorners(context, roofed);
   }
@@ -678,6 +705,77 @@ export class HousePart implements EventfulPart {
     }
   }
 
+  /**
+   * Hauteur (m, repère du modèle) du dessus d'un meuble à une place: un rayon tiré d'en haut sur la
+   * géométrie du modèle (le plateau de la table à 0,78 m, le couvercle du coffre), une fois par place.
+   * Le petit objet y pose sa base: ni flottant, ni enfoncé.
+   */
+  private topHeight(item: string, x: number, z: number): number {
+    const model = this.content.items[item]?.model ?? item;
+    const key = `${model}:${x}:${z}`;
+    const known = this.topHeights.get(key);
+    if (known !== undefined) return known;
+    const probe = this.library.instantiate(model);
+    probe.updateMatrixWorld(true);
+    this.decorBox.setFromObject(probe);
+    this.raycaster.set(this.probeFrom.set(x, this.decorBox.max.y + 1, z), DOWN);
+    const hit = this.raycaster.intersectObject(probe, true)[0];
+    const extra = this.library.extras(model).top_height;
+    const height = hit?.point.y ?? (typeof extra === 'number' ? extra : this.decorBox.max.y);
+    this.topHeights.set(key, height);
+    return height;
+  }
+
+  /** Écrit dans `out` où poser un petit objet: la place `place` du dessus du meuble `host`. Faux sans meuble. */
+  private decorSpot(hostId: string, place: number, out: Vector3): { yaw: number } | null {
+    const host = this.furniture.get(hostId);
+    const at = host === undefined ? undefined : this.content.items[host.item]?.surface[place];
+    if (host === undefined || at === undefined) return null;
+    const yaw = host.object.rotation.y;
+    const h = this.topHeight(host.item, at.x, at.z);
+    out.set(
+      host.object.position.x + Math.cos(yaw) * at.x + Math.sin(yaw) * at.z,
+      host.object.position.y + h,
+      host.object.position.z - Math.sin(yaw) * at.x + Math.cos(yaw) * at.z,
+    );
+    return { yaw };
+  }
+
+  /** Petits objets posés sur les meubles (S03): sur le dessus de leur meuble, tournés comme lui. */
+  private updateDecor(placed: readonly DeepReadonly<PlacedDecor>[], hidden: boolean): void {
+    const seen = new Set<string>();
+    for (const d of placed) {
+      seen.add(d.id);
+      let view = this.decor.get(d.id);
+      if (view?.item !== d.item) {
+        if (view !== undefined) {
+          view.object.removeFromParent();
+          this.picks.remove(view.pick);
+        }
+        view = { item: d.item, object: this.modelFor(d.item), pick: this.picks.add({ kind: 'furniture', furniture: d.id }) };
+        this.group.add(view.object);
+        this.decor.set(d.id, view);
+      }
+      const spot = this.decorSpot(d.on, d.place, this.decorPoint);
+      const host = this.furniture.get(d.on);
+      view.object.visible = spot !== null && !hidden && host !== undefined;
+      view.pick.enabled = view.object.visible;
+      if (spot === null) continue;
+      view.object.position.copy(this.decorPoint);
+      view.object.rotation.set(0, spot.yaw, 0);
+      view.object.updateMatrixWorld(true);
+      view.pick.box.setFromObject(view.object);
+      view.pick.box.expandByScalar(DECOR_PICK_MARGIN);
+    }
+    for (const [id, view] of this.decor) {
+      if (!seen.has(id)) {
+        view.object.removeFromParent();
+        this.picks.remove(view.pick);
+        this.decor.delete(id);
+      }
+    }
+  }
+
   /** Aperçu fantôme du meuble en main de chaque joueur, à sa couleur (rouge s'il ne peut pas être posé). */
   private updateGhosts(context: FrameContext): void {
     for (const character of context.world.characters) {
@@ -721,7 +819,13 @@ export class HousePart implements EventfulPart {
         PLACEMENT_OPACITY +
         Math.sin(context.time * Math.PI * 2 * RENDER_SETTINGS.effects.highlightPulseHz) *
           GHOST_PULSE;
-      this.place(ghost.object, preview.item, preview.cell.cx, preview.cell.cy, preview.rotation);
+      const on = preview.on;
+      const spot = on === undefined ? null : this.decorSpot(on.furniture, on.place, this.tmp);
+      if (spot !== null) {
+        // Sur le dessus du meuble visé (S03), à la place même où il sera posé.
+        ghost.object.position.copy(this.tmp);
+        ghost.object.rotation.y = spot.yaw;
+      } else this.place(ghost.object, preview.item, preview.cell.cx, preview.cell.cy, preview.rotation);
     }
   }
 
@@ -738,6 +842,8 @@ export class HousePart implements EventfulPart {
       this.picks.remove(view.pick);
     }
     this.furniture.clear();
+    for (const view of this.decor.values()) this.picks.remove(view.pick);
+    this.decor.clear();
     this.ghosts.clear();
     this.corners.clear();
     this.group.removeFromParent();

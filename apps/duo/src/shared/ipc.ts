@@ -24,6 +24,7 @@ export interface IntentArgs {
   'app:quit-confirm': null;
   'app:quit-cancel': null;
   'window:toggle-fullscreen': null;
+  'window:set-fullscreen': { fullscreen: boolean };
   'library:install-file': null;
 }
 
@@ -48,6 +49,7 @@ export const INTENT_CHANNELS = [
   'app:quit-confirm',
   'app:quit-cancel',
   'window:toggle-fullscreen',
+  'window:set-fullscreen',
   'library:install-file',
 ] as const satisfies readonly IntentChannel[];
 

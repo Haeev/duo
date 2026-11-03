@@ -249,7 +249,7 @@ function orderCellar(sim: Sim): void {
   place(sim, 'p1', bench.x + 0.6, bench.y + 0.4);
   send(sim, 'p1', { type: 'menu', menu: 'workbench' });
   send(sim, 'p1', { type: 'improvement_pay', improvement: 'room_cellar', amount: null });
-  // Au-delà de 100 sous, l'accord de l'autre.
+  // Au-delà de 100 aubrins, l'accord de l'autre.
   const proposal = sim.world.proposals.find((p) => p.purchase.item === 'room_cellar');
   if (proposal !== undefined)
     send(sim, 'p2', { type: 'proposal_answer', proposal: proposal.id, accept: true });
@@ -308,17 +308,19 @@ describe('pièces bâties à deux: commande à Basile et chantier', () => {
       expect(m).not.toBeNull();
       if (m === null) return;
       expect(m.rooms.map((r) => r.id)).toEqual(['room_cellar', 'room_bedroom']);
-      expect(plain(m.rooms[0]?.line ?? '')).toBe('Le cellier : 450 sous, 16 planches, 8 clous');
-      expect(plain(m.rooms[1]?.line ?? '')).toBe('La chambre : 1200 sous, 30 planches, 12 clous');
-      // 323 sous: le cellier manque de 127 sous.
+      expect(plain(m.rooms[0]?.line ?? '')).toBe('Le cellier : 450 aubrins, 16 planches, 8 clous');
+      expect(plain(m.rooms[1]?.line ?? '')).toBe(
+        'La chambre : 1200 aubrins, 30 planches, 12 clous',
+      );
+      // 323 aubrins: le cellier manque de 127 aubrins.
       expect(m.rooms[0]?.state).toBe('too_expensive');
       expect(m.oakChest?.state).toBe('orderable');
-      expect(plain(m.oakChest?.text ?? '')).toContain('250 sous');
+      expect(plain(m.oakChest?.text ?? '')).toContain('250 aubrins');
     }
     sim.world.purse = 2000;
     const before = basileRoomsModel(sim.world, uiContext('p1'));
     expect(before?.rooms[0]?.big).toBe(true);
-    expect(plain(before?.rooms[0]?.text ?? '')).toBe('Proposer à Sacha : 450 sous');
+    expect(plain(before?.rooms[0]?.text ?? '')).toBe('Proposer à Sacha : 450 aubrins');
     orderCellar(sim);
     for (const me of PLAYERS) {
       const m = basileRoomsModel(sim.world, uiContext(me));

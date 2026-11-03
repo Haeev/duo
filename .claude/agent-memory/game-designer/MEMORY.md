@@ -200,3 +200,28 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Rendre visible un besoin caché sans le durcir: garder le plancher de nuit actuel et faire compter double le souper; sinon une baisse par heure fait chuter les valeurs de nuit sous la règle en place (premier jet du tour 10: souper simple à 30 au lieu de 60).
 - Dans une simulation d'achats, l'ordre des priorités du duo décide de tout: avec la chambre après les chantiers du bourg, elle n'arrive jamais avant le jour 64. Toujours simuler au moins deux ordres de priorité.
 - Noms d'états de besoins: « Rassasié », « Plein d'élan », « calé » s'accordent au joueur; écrire des noms (« Ventre plein », « Pleine énergie », « Petit creux », « Envie de compagnie »).
+
+## Pêche (conception 0.12, vérifié le 2026-11-03)
+
+- Rythme réel de la pêche: environ 12 s par prise (lancer, attente moyenne de 9 s, prise), soit 17 minutes de jeu à 0,7 s par minute: une heure de jeu fait 3,5 prises par joueur. Raisonner les fenêtres d'un poisson en secondes réelles (une fenêtre de 3 h de jeu = 2 min).
+- Les cases du gué (`g`) sont du gravier: on n'y lance pas; seules les cases `water` (rivière `~`, ru `r`) se pêchent.
+- La partie s'arrête au jour 64 à 16 h (premier jour de l'hiver): tout contenu d'hiver est injouable tant que la limite ne bouge pas.
+- `fishCost` des commandes se rapporte à la saison de référence: un poisson absent de cette saison aurait un coût nul. Avec beaucoup d'espèces, la part de chacune chute (goujon de 54 % à 10 %): revoir minimums, plafonds et ressource rivière des commandes.
+- R10 sur une collection à épiques saisonniers: le coup de pouce par espèce (x8) ne suffit pas, il faut aussi un bonus sur la rareté quand un épique possible ici manque (x1,5). Mesurer sur 400 duos: à 100, le 90e centile bruite de plusieurs heures.
+## Économie et monnaie (vérifié le 2026-11-03, conception 0.12)
+
+- Renommer la monnaie « sou »: « sous » est aussi la préposition (« sous la pluie »). Ne remplacer que `[0-9}] sous`, les nombres en lettres et les tournures monétaires relues une à une; compter les prépositions avant et après.
+- Les données disent « le garde-barrière » (masculin) pour l'ancien occupant de la maisonnette, sans nom: ne pas lui inventer un nom ni un genre contraire.
+- Habitants: `habitants.json` n'a pas de goûts (`likes`) en données; les goûts sont dans les fiches de conception (tour 10, 1.4).
+- Dans une simulation d'achats, laisser plusieurs achats par jour: un seul achat par jour fait gonfler la bourse artificiellement (premier jet de `v0_12_economie.py`).
+- Un duo médian achète tout ce qui est en vente vers le jour 50 à 57 même avec 16 000 aubrins de puits: après le jour 50, seul du contenu nouveau redonne un but à l'argent.
+
+## Habitants et plannings (conception 0.13, 2026-11-03)
+
+- Une année de jeu fait 84 jours (4 saisons de 21); chaque saison commence un samedi, donc le jour de la semaine d'un jour de saison est fixe: dimanches = jours 2, 9 et 16. Utile pour caler anniversaires et fêtes (éviter samedis de train et jours de fête).
+- Le scratchpad est partagé entre membres: un autre agent a écrasé mon `sortie.txt`. Toujours écrire dans un sous-dossier à soi (`scratchpad/gd013/`).
+- Un document conçu en parallèle (carte du level designer) se lit dans son arbre: `/home/user/duo/.claude/worktrees/<agent>/docs/...`, avant même la fusion; ses identifiants priment (consigne du manager), aligner tôt.
+- Carte 0.13: la ferme est à l'est, entre la route des hameaux et la rivière (pas de gué à passer pour l'école); le bief est au moulin, à l'ouest: une querelle d'eau entre meunière et fermier y est impossible (remplacée par « la part du meunier »).
+- Script `simulations/v0_13_habitants.py`: plannings en données Python, contrôle de couverture minute par minute, export JSON, relecture du document (`--croise`). Sans cache, `entry_at` rend la simulation 10 fois trop lente: cache par (habitant, jour de semaine, saison, temps, jours spéciaux, drapeaux, minute). Environ 10 minutes quand la machine est chargée: lancer en arrière-plan.
+- Les textes des objectifs de quête sont des textes du jeu: y bannir « tous les deux » et « chacun » (écrire « à deux », « chaque joueur »), comme dans les répliques.
+- La démo affirme « il n'y a pas de chat au bourg » (`odette_after_gift`): tout chat ajouté doit conditionner cette réplique.

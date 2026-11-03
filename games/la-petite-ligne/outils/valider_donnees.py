@@ -36,7 +36,7 @@ ITEM_CATEGORIES = {"seed", "crop", "forage", "animal_product", "material", "carr
                    "animal_order", "gift"}
 # Tour 9: verbes des outils (`toolKind`), outils améliorés compris.
 TOOL_KINDS = {"hoe", "watering_can", "axe", "fishing_rod"}
-SHOPS = {"grocery", "catalogue"}
+SHOPS = {"grocery", "catalogue", "haberdashery"}
 DISHES = {"bread", "simple", "stew"}
 STATIONS = {"workbench", "stove"}
 TIERS = {"P0", "P1"}
@@ -75,6 +75,10 @@ GENDERED_RE = re.compile(
     r"|\bles nouveaux\b|\bdes débutant|^(?:cher|chère|chers|chères) ",
     re.IGNORECASE,
 )
+
+# Ancienne monnaie (0.12, section 1.3): un nombre ou un espace réservé suivi de « sou(s) ». La monnaie
+# s'appelle `economy.currency` (l'aubrin); « sous la pluie » (préposition) n'est pas visé.
+OLD_CURRENCY_RE = re.compile(r"[0-9}](?: |\u00a0)sous?\b(?!-)")
 
 # Paramètres de chaque condition: obligatoires, facultatifs. Le type de chaque référence est vérifié plus bas.
 CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
@@ -115,6 +119,10 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "ate_together": (set(), {"atFurniture", "since"}),
     "went_to_bed": (set(), {"item", "who"}),
     "caught": ({"item"}, {"count", "who", "since"}),
+    # Pêche 0.12: prise rare ou plus, au coin qui frémit, record, rendu à l'eau, guet pour l'autre.
+    "caught_rare": (set(), {"count", "who", "since"}), "caught_hot_spot": (set(), {"count", "who", "since"}),
+    "fish_record": (set(), {"count", "who", "since"}), "released_fish": (set(), {"count", "who", "since"}),
+    "watched_for_other": (set(), {"count", "who", "since"}),
     # Tour 8: cueillettes ramassées (sans objet: toutes).
     "picked": (set(), {"item", "count", "who", "since"}),
     "used_tool_at": ({"tool", "point"}, {"radius", "who"}),
@@ -144,6 +152,20 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "room_built": (set(), {"room", "count", "since"}),
     "curtains_opened": (set(), {"count", "who", "since"}),
     "scene_played": ({"dialogue"}, {"count", "who", "since"}),
+    # 0.12 (lot L-quêtes): compteur nommé, compteurs de la basse-cour, de la chèvre, des plis et du marché,
+    # bourse commune (README, section 3.1).
+    "counter": ({"key"}, {"count", "who", "since"}),
+    "animal_released": ({"animal"}, {"count", "who", "since", "point"}),
+    "animal_named": ({"animal"}, {"count", "who", "since"}),
+    "brood_started": (set(), {"count", "who", "since"}),
+    "brood_hatched": (set(), {"count", "who", "since"}),
+    "milked": (set(), {"count", "who", "since"}),
+    "goat_grazed_spots": (set(), {"count", "who", "since"}),
+    "delivered": (set(), {"count", "who", "since"}),
+    "stall_stocked": (set(), {"count", "who", "since"}),
+    "given_to_stall": (set(), {"item", "count", "who", "since"}),
+    "market_served": (set(), {"together", "count", "who", "since"}),
+    "money_at_least": ({"amount"}, set()),
 }
 COMMON_CONDITION_KEYS = {"type", "label"}
 
@@ -151,6 +173,7 @@ EFFECTS: dict[str, tuple[set[str], set[str]]] = {
     "give_item": ({"item", "count", "to"}, set()),
     "take_item": ({"item", "count", "from"}, set()),
     "give_money": ({"amount"}, set()),
+    "take_money": ({"amount"}, set()),
     "set_flag": ({"flag"}, set()),
     "start_quest": ({"quest"}, set()),
     "send_letter": ({"letter"}, set()),
@@ -179,12 +202,16 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "near_forage": set(), "aim_sapling": set(),
     # Tour 9: une annonce au tableau, près du tableau du quai.
     "near_board_annonce": set(),
+    # Pêche 0.12: première prise au coin qui frémit, premier guet.
+    "fishing_hot_spot": set(), "fishing_watch": set(),
 }
 
 PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
                 "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
+                # 0.12 (élevage): qui a nommé la bête (message aux deux).
+                "player",
                 "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
                 "villager", "season", "year", "times", "seasonOf",
@@ -193,7 +220,11 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 # Tour 9: annonces, chantiers, établi de Basile, paroles d'un habitant en notification.
                 "giver", "text", "name", "paid", "time", "discount",
                 # Tour 10: pièces bâties et rangement (lot L4).
-                "room", "planks", "nails", "used", "total"}
+                "room", "planks", "nails", "used", "total",
+                # 0.12 (lot L-économie): liste d'un client du marché, articles vendus à l'étal.
+                "list", "items",
+                # Pêche 0.12: prises, carnet des poissons, regard sur l'eau.
+                "fish", "Fish", "cm", "definite", "pronoun", "at", "Zone"}
 # Tour 8: étapes, niveaux de tendresse (D7), modes de continuation (D4), saisons, familles et ressources des commandes.
 STAGE_IDS = {"demo", "summer_end", "autumn_end"}
 TENDERNESS = ["none", "accomplices", "gentle"]
@@ -208,7 +239,9 @@ ICONS_SOURCE = Path(__file__).resolve().parent.parent / "ui-maquettes" / "outils
 
 # Drapeaux posés par la simulation elle-même (tour 10, `simulation/bourg.ts`): départs de la rue Haute.
 FLAGS_SET_BY_CODE = {"achille_here", "solange_here", "solange_note_sent", "achille_wish_open", "solange_wish_open",
-                     "achille_cart_said", "basket_carried"}
+                     "achille_cart_said", "basket_carried",
+                     # 0.12: posé par le chantier `goat_shed` de la file `elevage` (`<id>_built`, lot L-économie).
+                     "goat_shed_built"}
 
 # Points de carte demandés par les données. Le level designer les crée dans donnees/cartes/ (voir README).
 NAMED_POINTS_OUTSIDE_MAP = {"offstage"}
@@ -317,7 +350,7 @@ def check_tour9(data: dict[str, Any], reg: Registry, report: Report) -> None:
                 report.error(w, f"textes.annonces.{a.get('id')}.{key} manquant")
         if not a.get("scene") and not any(variants):
             report.error(w, "une annonce sans demande finit par une scène")
-    queues = {"bourg", "maisonnette"}
+    queues = {"bourg", "maisonnette", "elevage"}
     for ch in data.get("chantiers", {}).get("improvements", []):
         w = f"chantiers.{ch.get('id')}"
         check_id(ch.get("id"), w, report)
@@ -393,6 +426,9 @@ def walk_strings(node: Any, where: str, report: Report) -> None:
                 report.error(where, f"espace réservé inconnu {{{name}}}")
         if "TODO" in node:
             report.error(where, "« TODO » dans un texte")
+        old_money = OLD_CURRENCY_RE.search(node)
+        if old_money:
+            report.warn(where, f"ancienne monnaie « {old_money.group(0)} » dans {node[:60]!r} (écrire aubrins)")
         found = GENDERED_RE.search(node)
         if found:
             report.warn(where, f"accord au genre possible « {found.group(0)} » dans {node[:60]!r} (rédaction neutre)")
@@ -620,6 +656,9 @@ def check_objets(data: dict[str, Any], reg: Registry, report: Report) -> None:
             if key not in item:
                 report.error(w, f"champ « {key} » manquant")
         indefinite, name = item.get("indefinite"), item.get("name")
+        # Les mythiques ont un nom propre (« la Dorée »), jamais d'article indéfini.
+        if isinstance(item.get("fish"), dict) and item["fish"].get("rarity") == "mythic":
+            continue
         if not isinstance(indefinite, str):
             report.error(w, "champ « indefinite » manquant (le nom avec son article indéfini: « un matelas »)")
         elif isinstance(name, str) and not (
@@ -828,6 +867,13 @@ def check_quetes(data: dict[str, Any], reg: Registry, report: Report) -> None:
             elif "resolve" in step:
                 report.error(ws, f"« resolve » inconnu {step['resolve']!r}")
         check_effects(quest.get("completionEffects", []), f"{w}.completionEffects", reg, report)
+        expire = quest.get("expire")
+        if expire is not None:
+            if not isinstance(expire, dict) or expire.get("weekday") not in WEEKDAYS:
+                report.error(w, "« expire »: « weekday » de saturday à friday attendu")
+            else:
+                check_time(expire.get("time"), f"{w}.expire", report)
+                ref("text", expire.get("text"), f"{w}.expire", reg, report)
         if "repeat" in quest and quest["repeat"] != "each_train":
             report.error(w, f"« repeat » inconnu {quest['repeat']!r} (each_train)")
         if not quest.get("completionText"):
@@ -1106,6 +1152,82 @@ def check_moments(folder: Path, reg: Registry, report: Report, map_objects: set[
     return data
 
 
+FISH_RARITIES = ("common", "rare", "epic", "legendary", "mythic")
+FISH_SEASONS = ("spring", "summer", "autumn", "winter")
+FISH_WEATHERS = ("sunny", "cloudy", "rain")
+
+
+def fish_minutes(value: Any) -> int | None:
+    if not isinstance(value, str) or len(value) != 5 or value[2] != ":" or not (value[:2] + value[3:]).isdigit():
+        return None
+    h, m = int(value[:2]), int(value[3:])
+    return h * 60 + m if (h < 24 and m < 60) or (h == 24 and m == 0) else None
+
+
+def check_poissons(reg: Registry, report: Report, folder: Path) -> None:
+    """Pêche 0.12 (S1): fiche `fish` de chaque poisson, et au moins un commun possible partout, tout le temps."""
+    zones: set[str] = set()
+    for path in sorted((folder / "cartes").glob("*.json")) if (folder / "cartes").is_dir() else []:
+        try:
+            carte = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        zones.update(z.get("id") for z in carte.get("peche", {}).get("coins", []) if isinstance(z, dict))
+    fishes: dict[str, dict[str, Any]] = {}
+    for item_id, item in reg.items.items():
+        if item.get("category") != "fish":
+            continue
+        w = f"objets.{item_id}.fish"
+        fish = item.get("fish")
+        if not isinstance(fish, dict):
+            report.error(w, "fiche « fish » manquante")
+            continue
+        if fish.get("rarity") not in FISH_RARITIES:
+            report.error(w, f"rareté inconnue {fish.get('rarity')!r}")
+        for z in fish.get("zones") or [None]:
+            if zones and z not in zones:
+                report.error(w, f"coin de pêche inconnu {z!r}")
+        if not fish.get("seasons") or any(s not in FISH_SEASONS for s in fish["seasons"]):
+            report.error(w, "saisons attendues (spring, summer, autumn, winter)")
+        if not fish.get("weather") or any(m not in FISH_WEATHERS for m in fish["weather"]):
+            report.error(w, "météos attendues (sunny, cloudy, rain)")
+        hours = fish.get("hours")
+        ranges: list[tuple[int, int]] = []
+        if not isinstance(hours, list) or not hours:
+            report.error(w, "heures attendues (liste de [début, fin] en HH:MM)")
+        else:
+            for r in hours:
+                a = fish_minutes(r[0]) if isinstance(r, list) and len(r) == 2 else None
+                b = fish_minutes(r[1]) if isinstance(r, list) and len(r) == 2 else None
+                if a is None or b is None or b <= a:
+                    report.error(w, f"heure mal formée {r!r}")
+                else:
+                    ranges.append((a, b))
+        for key in ("shadow", "lengthCm", "released", "description", "hint"):
+            if key not in fish:
+                report.error(w, f"champ « {key} » manquant")
+        grand = fish.get("rarity") in ("legendary", "mythic")
+        if grand != ("presence" in fish):
+            report.error(w, "« presence » pour un légendaire ou un mythique, et pour eux seuls")
+        if fish.get("released") and item.get("sellPrice") is not None:
+            report.error(w, "un poisson remis à l'eau n'a pas de prix")
+        fishes[item_id] = {**fish, "_ranges": ranges}
+    # Au moins un commun possible pour chaque coin, saison, heure de 6 h à 24 h et météo (0 trou).
+    for z in sorted(zones):
+        for season in FISH_SEASONS:
+            for weather in FISH_WEATHERS:
+                for minute in range(6 * 60, 24 * 60, 30):
+                    ok = any(
+                        f.get("rarity") == "common" and z in f.get("zones", []) and season in f.get("seasons", [])
+                        and weather in f.get("weather", [])
+                        and (any(a <= minute < b for a, b in f["_ranges"]) or (f.get("rainAnyHour") and weather == "rain"))
+                        for f in fishes.values()
+                    )
+                    if not ok:
+                        report.error(f"poissons.{z}", f"aucun commun possible en {season}, {weather}, à {minute // 60} h {minute % 60:02d}")
+                        break
+
+
 def map_objects(folder: Path) -> set[str] | None:
     maps = sorted((folder / "cartes").glob("*.json")) if (folder / "cartes").is_dir() else []
     found: set[str] = set()
@@ -1240,6 +1362,21 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
             if day not in reg.order_days:
                 report.error(where, f"order_complete: aucune commande pour le train du jour {day}")
     ref("point", settings.get("spawn", {}).get("point"), "reglages.spawn", reg, report)
+    # 0.12: charges de quête portées à deux (l'étal, les briques, la chevrette), drapeau levé à la pose.
+    for i, load in enumerate(settings.get("carry", {}).get("quests", [])):
+        w = f"reglages.carry.quests[{i}]"
+        ref("item", load.get("item"), w, reg, report)
+        if load.get("item") in reg.items and not reg.items[load["item"]].get("carriedByTwo"):
+            report.error(w, f"{load.get('item')!r} ne se porte pas à deux (« carriedByTwo »)")
+        ref("point", load.get("from"), w, reg, report)
+        ref("point", load.get("to"), w, reg, report)
+        ref("quest", load.get("quest"), w, reg, report)
+        if load.get("quest") in reg.quests and load.get("step") not in reg.quests[load["quest"]]:
+            report.error(w, f"étape inconnue {load.get('step')!r} de la quête {load.get('quest')!r}")
+        check_conditions(load.get("when", []), f"{w}.when", reg, report)
+        if "placedText" in load:
+            ref("text", load["placedText"], w, reg, report)
+        reg.flags_set.add(load.get("flag", ""))
     ref("point", settings.get("garden", {}).get("zone"), "reglages.garden", reg, report)
     ref("point", settings.get("trees", {}).get("zone"), "reglages.trees", reg, report)
     grocer_flag = settings.get("economy", {}).get("grocer", {}).get("buysAfterFlag")
@@ -1492,6 +1629,7 @@ def main() -> int:
     reg = Registry()
     collect(data, reg, report)
     check_objets(data, reg, report)
+    check_poissons(reg, report, folder)
     check_cultures(data, reg, report)
     check_habitants(data, reg, report)
     check_quetes(data, reg, report)

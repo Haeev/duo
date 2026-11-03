@@ -2,6 +2,7 @@
  * Modèles des panneaux (comptoir, catalogue, établi, réchaud, coffre, sac):
  * fonctions pures sur l'état, testées dans Node.
  */
+import { type GrocerWord, ardoiseItem, grocerTotal, grocerWord } from '../etat/epicerie';
 import { HOUSE_BUILDING } from '../etat/carte';
 import { catalogueWindow, onSale } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
@@ -90,10 +91,31 @@ export function shopIsOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
   );
 }
 
-export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext): BuyEntry[] {
+/** Le comptoir où l'on est: la mercerie de Solange dans sa boutique, sinon l'épicerie d'Odette. */
+export function counterShop(world: ReadonlyWorld, ctx: UiContext): 'grocery' | 'haberdashery' {
+  return characterOf(world, ctx.me)?.inside === HABERDASHERY_BUILDING ? 'haberdashery' : 'grocery';
+}
+
+const HABERDASHERY_BUILDING = 'salon';
+
+/** Solange tient le comptoir de sa mercerie (comme le vérifie la simulation, `haberdasheryOpen`). */
+export function haberdasheryIsOpen(world: ReadonlyWorld, ctx: UiContext): boolean {
+  const counter = ctx.map.points.salon_counter;
+  const radius = ctx.content.settings.feel.pointRadius * 2;
+  return world.villagers.some(
+    (v) =>
+      v.id === 'solange' &&
+      v.visible &&
+      v.activity === 'serve' &&
+      counter !== undefined &&
+      Math.hypot(v.pos.x - counter.x, v.pos.y - counter.y) <= radius,
+  );
+}
+
+export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext, shop: 'grocery' | 'haberdashery' = 'grocery'): BuyEntry[] {
   const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
   return Object.values(ctx.content.items)
-    .filter((def) => def.shop === 'grocery' && def.buyPrice !== null && onSale(def, world.clock.day))
+    .filter((def) => def.shop === shop && def.buyPrice !== null && onSale(def, world.clock.day))
     .map((def) => {
       const price = def.buyPrice ?? 0;
       const crop = def.plants === null ? undefined : ctx.content.crops[def.plants];
@@ -101,7 +123,7 @@ export function shopBuyEntries(world: ReadonlyWorld, ctx: UiContext): BuyEntry[]
         crop === undefined
           ? effectOf(ctx, def)
           : ctx.t(ctx.texts.extra.shop.seedInfo, { days: crop.growthDays, yield: crop.yieldPerCell });
-      const waiting = world.proposals.some((p) => p.purchase.source === 'grocery' && p.purchase.item === def.id);
+      const waiting = world.proposals.some((p) => p.purchase.source === shop && p.purchase.item === def.id);
       return {
         item: def.id,
         icon: itemIcon(ctx, def.id),
@@ -122,17 +144,19 @@ export interface SellEntry {
   icon: string;
   name: string;
   count: number;
-  /** Prix d'une pièce chez Odette (arrondi), et du lot entier. */
+  /** Prix de la prochaine pièce chez Odette, et du lot entier (0.12: l'offre baisse à chaque pièce). */
   unit: number;
   total: number;
+  /** Mot du panneau (0.12, section 2.2): ardoise du jour, « Odette en a déjà beaucoup », « Recherché ». */
+  word: GrocerWord;
 }
 
-/** Ce que paie Odette pour `count` pièces (même calcul que la simulation). */
-export function grocerPrice(ctx: UiContext, item: string, quality: Quality, count: number): number {
-  const def = ctx.content.items[item];
-  if (def?.sellPrice === null || def === undefined) return 0;
-  const unit = def.sellPrice * ctx.content.qualities[quality].priceMultiplier * ctx.content.settings.economy.grocer.buyRate;
-  return Math.round(unit * count);
+/** Monde lu par les prix d'Odette (une partie de la démo sans monde: prix du tour 9). */
+const NO_SALES = { clock: { day: 1 }, grocerSupply: {}, ardoise: null, grocerSoldToday: 0 } as const;
+
+/** Ce que paie Odette pour `count` pièces (même calcul que la simulation, `etat/epicerie.ts`). */
+export function grocerPrice(ctx: UiContext, item: string, quality: Quality, count: number, world?: ReadonlyWorld): number {
+  return grocerTotal(ctx.content, world ?? (NO_SALES as unknown as ReadonlyWorld), item, quality, count);
 }
 
 export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry[] {
@@ -157,13 +181,15 @@ export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry
       count: stack.count,
       unit: 0,
       total: 0,
+      word: null,
     });
   }
   const out = [...seen.values()];
   for (const e of out) {
     e.name = itemTitle(ctx.content.items[e.item], e.count, e.item);
-    e.unit = grocerPrice(ctx, e.item, e.quality, 1);
-    e.total = grocerPrice(ctx, e.item, e.quality, e.count);
+    e.unit = grocerPrice(ctx, e.item, e.quality, 1, world);
+    e.total = grocerPrice(ctx, e.item, e.quality, e.count, world);
+    e.word = grocerWord(ctx.content, world, e.item);
   }
   return out;
 }
@@ -171,11 +197,15 @@ export function shopSellEntries(world: ReadonlyWorld, ctx: UiContext): SellEntry
 export interface GrocerBudget {
   buys: boolean;
   room: number;
+  /** L'ardoise du jour (nom de l'article au pluriel), ou `null`. */
+  ardoise: string | null;
 }
 
 export function grocerBudget(world: ReadonlyWorld, ctx: UiContext): GrocerBudget {
   const g = ctx.content.settings.economy.grocer;
-  return { buys: world.flags.includes(g.buysAfterFlag), room: Math.max(0, g.dailyCap - world.grocerSoldToday) };
+  const item = ardoiseItem(world);
+  const def = item === null ? undefined : ctx.content.items[item];
+  return { buys: world.flags.includes(g.buysAfterFlag), room: Math.max(0, g.dailyCap - world.grocerSoldToday), ardoise: def === undefined ? null : def.plural };
 }
 
 // ---------------------------------------------------------------------------
@@ -187,6 +217,8 @@ export interface RecipeEntry {
   name: string;
   /** « 1 rondin : 4 planches » */
   makes: string;
+  /** Ce qui sera pris au coffre de la maison (« 3 rondins, dont 2 au coffre »), ou `null` si tout est dans le sac. */
+  fromChest: string | null;
   missing: { item: string; count: number }[];
   available: boolean;
   /** Fabrication en cours chez ce joueur (0 à 1), ou `null`. */
@@ -214,6 +246,21 @@ export function recipeEntries(world: ReadonlyWorld, ctx: UiContext, station: 'wo
       ctx.texts.orderFormat,
     );
     const output = `${r.output.count} ${itemName(ctx.content.items[r.output.item], r.output.count, r.output.item)}`;
+    // Le sac d'abord, puis le coffre (comme `payMaterials`): on dit ce que la recette y prendra.
+    const chestParts =
+      me === null
+        ? []
+        : r.inputs
+            .map((i) => ({ input: i, chest: Math.min(countIn(world.cellar, i.item), Math.max(0, i.count - countIn(me.bag, i.item))) }))
+            .filter((x) => x.chest > 0)
+            .map(({ input, chest }) =>
+              ctx.t(ctx.texts.extra.workbench.fromChest, {
+                count: input.count,
+                item: itemName(ctx.content.items[input.item], input.count, input.item),
+                chest,
+              }),
+            );
+    const fromChest = chestParts.length === 0 ? null : joinList(chestParts, ctx.texts.orderFormat);
     let progress: number | null = null;
     const job = me?.crafting ?? null;
     if (job !== null && job.recipe === r.id && me !== null) {
@@ -226,6 +273,7 @@ export function recipeEntries(world: ReadonlyWorld, ctx: UiContext, station: 'wo
       icon: itemIcon(ctx, r.output.item),
       name: ctx.t(capitalize(r.name)),
       makes: ctx.t(ctx.texts.extra.workbench.makes, { inputs, output }),
+      fromChest: missing.length === 0 ? fromChest : null,
       missing,
       available: missing.length === 0 && (me?.crafting ?? null) === null,
       progress,
@@ -379,7 +427,7 @@ export interface ProposalModel {
   itemText: string;
   price: number;
   /** `improvement` (tour 9): un versement à un chantier, `item` est le chantier. */
-  source: 'grocery' | 'catalogue' | 'improvement';
+  source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   by: string;
   byName: string;
 }

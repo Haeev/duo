@@ -28,6 +28,8 @@ import type {
   WorldState,
 } from '../../etat/types';
 import type { Content } from '../../donnees/types';
+import type { ClothesContent } from '../../donnees/vetements';
+import { starterWardrobe, starterWear } from '../../etat/garde-robe';
 
 /** Couleurs de profil Duo des deux joueurs de l'exemple (astre aqua, croissant mauve). */
 const SCARF_P1 = '#5ce1e6';
@@ -50,10 +52,13 @@ function dress(
   scarf: string,
   hair: number,
   outfit: number,
+  clothes: ClothesContent,
 ): Character {
   c.name = name;
   c.created = true;
-  c.appearance = { ...c.appearance, hair, outfit, scarf };
+  const wear = starterWear(clothes, outfit);
+  c.appearance = { ...c.appearance, hair, wear, scarf };
+  c.wardrobe = starterWardrobe(wear);
   c.pos = { x, y };
   c.prev = { x, y };
   c.facing = Math.PI / 2;
@@ -186,9 +191,9 @@ export function createExampleWorld(
     return world;
   }
   const p1 = options.inside
-    ? dress(first, 'Camille', room.x + 1.5, room.y + 2.5, SCARF_P1, 0, 0)
-    : dress(first, 'Camille', door.x + 0.5, door.y + 2.2, SCARF_P1, 0, 0);
-  const p2 = dress(second, 'Sacha', door.x - 1.5, door.y + 3.5, SCARF_P2, 1, 2);
+    ? dress(first, 'Camille', room.x + 1.5, room.y + 2.5, SCARF_P1, 0, 0, content.clothes)
+    : dress(first, 'Camille', door.x + 0.5, door.y + 2.2, SCARF_P1, 0, 0, content.clothes);
+  const p2 = dress(second, 'Sacha', door.x - 1.5, door.y + 3.5, SCARF_P2, 1, 2, content.clothes);
   p1.inside = options.inside ? HOUSE_BUILDING : null;
   // Case visée (surlignage): une culture mûre du potager.
   const aimed = map.garden[4];
@@ -238,6 +243,7 @@ export function createExampleWorld(
       wander: { ...at },
       nameKnownBy: [],
       namedBy: null,
+      happiness: 60 + index * 15,
     };
   });
 

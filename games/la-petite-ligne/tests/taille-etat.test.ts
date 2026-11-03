@@ -113,7 +113,7 @@ describe('mémoire des répliques compactée (QA8-02)', () => {
 
 describe('courrier hebdomadaire borné (QA8-02)', () => {
   function letter(id: string, day: number, read: ('p1' | 'p2')[]): Sim['world']['letters'][number] {
-    return { id, day, title: id, from: 'coop', text: '', read };
+    return { id, day, read };
   }
 
   it('les vieilles lettres de la semaine partent, même lues par un seul; une récente non lue reste', () => {

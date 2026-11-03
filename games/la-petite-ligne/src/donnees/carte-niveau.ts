@@ -72,7 +72,10 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     points[id] = { x: p.at('x').number(), y: p.at('y').number() };
     // Cap de boussole (0 nord, 90 est) vers le `facing` de la simulation (0 est, y vers le sud).
     const heading = p.opt('cap_degres');
+    // Sinon, `rotation` (quarts de tour, 0 vers le sud comme les objets): où regarde un habitant posté là.
+    const quarter = p.opt('rotation');
     if (heading !== null) pointFacings[id] = (heading.number() - 90) * DEGREES;
+    else if (quarter !== null) pointFacings[id] = Math.PI / 2 - quarter.number() * (Math.PI / 2);
   }
   const zones: Record<string, Rect> = {};
   for (const z of r.at('zones').items()) {
@@ -221,5 +224,11 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     startFurniture,
     seats,
     improvements,
+    fishingZones: (r.opt('peche')?.opt('coins')?.items() ?? []).map((z) => ({
+      id: z.at('id').string(),
+      name: z.at('nom').string(),
+      at: z.at('a').string(),
+      rects: z.at('rects').items().map(rect),
+    })),
   };
 }

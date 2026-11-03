@@ -174,6 +174,44 @@ describe('substituts', () => {
     }
   });
 
+  it('a un substitut pour chacun des 22 poissons de la 0.12', () => {
+    const fish = [
+      'gudgeon',
+      'minnow',
+      'stone_loach',
+      'bleak',
+      'roach',
+      'chub',
+      'trout',
+      'perch',
+      'dace',
+      'bullhead',
+      'tench',
+      'barbel',
+      'pike',
+      'grayling',
+      'brook_lamprey',
+      'bitterling',
+      'shad',
+      'mirror_carp',
+      'salmon',
+      'burbot',
+      'golden_trout',
+      'moon_pike',
+    ];
+    for (const id of fish) {
+      expect(hasDedicatedSubstitute(`fish_${id}`), id).toBe(true);
+      const [part] = buildSubstitute(`fish_${id}`);
+      part?.geometry.computeBoundingBox();
+      const box = part?.geometry.boundingBox;
+      // Couché sur le flanc, la longueur le long de x: plus long que haut et que large.
+      expect((box?.max.x ?? 0) - (box?.min.x ?? 0), id).toBeGreaterThan(
+        (box?.max.y ?? 0) - (box?.min.y ?? 0),
+      );
+      part?.geometry.dispose();
+    }
+  });
+
   it('montre une caisse rayée pour un nom inconnu, sans erreur', () => {
     expect(hasDedicatedSubstitute('objet_inconnu_42')).toBe(false);
     const [part] = buildSubstitute('objet_inconnu_42');

@@ -68,3 +68,18 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Des tests de robots qui marchent au hasard (`moments-tour7.test.ts`, la chevrette) dépendent des cases bloquées autour de leur point de départ: un buisson posé au bord du pré les a fait échouer. Après un déplacement de décor, relancer ces tests seuls, puis toute la suite; ne jamais réécrire `halte.json` pendant que la suite tourne (elle lit le fichier au fil des tests).
 - `src/rendu/gue.test.ts` fige le bout nord de la route du gué en y 36 (une rangée au-dessus de la berge, gué en eau dès y 38): ne pas raccourcir ni élargir la route là.
 - Machine partagée (charge 20 et plus sur 4 cœurs): la suite complète dure plus de 25 minutes; la lancer en tâche de fond sans `timeout` court, et ne pas tuer `vitest` par nom (d'autres membres en font tourner).
+
+## Concevoir un agrandissement (0.13, vérifié sur maquette le 2026-11-03)
+
+- Grandir vers le nord ou l'ouest décale toutes les coordonnées (environ 270 littéraux dans `src/` et `tests/`, positions des sauvegardes, `moments.json`): proposer une origine de grille (`taille.origine`, coordonnées négatives) plutôt qu'un décalage, et le faire trancher par l'architecte avant tout générateur.
+- Une maquette Python (bibliothèque standard) qui pose `halte.json` dans la grille élargie, dessine les régions en rectangles, ellipses et sentiers, puis calcule Dijkstra, A* (nœuds), lignes de vue et triangles par vue, tranche en une seconde; garder ses sorties comme preuves du document (`docs/jeux/jeu-1/simulations/v0_13_carte_maquette.py`).
+- Forêt sous la caméra isométrique: clairières allongées sur la diagonale nord-ouest et sud-est, cônes de 10 m sans houppier vers le sud-est et le nord-ouest de chaque lieu; un grand arbre repère au bord latéral (nord-est) d'une clairière, jamais au bout de la diagonale. La forêt du pourtour cache, depuis les orientations du nord, ce qui est à moins de 8 m du bord nord.
+- Cour d'un atelier: à l'est du bâtiment (au sud-est d'un volume, on est vu), et son point au bord de la route; une cour à l'ouest ou un point au milieu d'une cour entre deux ateliers est caché depuis la caméra par défaut. Même raison pour une ferme tournée au midi (cour au sud-est du logis et de la grange) et pour un cimetière à l'est du chevet plutôt qu'au nord de la nef.
+- Rue nord-sud: maisons côté ouest, côté est bas (vigne, jardin, haie); une rue à l'est d'un volume reste vue, à l'ouest elle est cachée.
+- Estimer le coût d'une vue: objets dans le cadre (deux fois pour l'ombre) plus une base déduite d'une vue mesurée (place: 201 830 moins ses objets, environ 123 600); la méthode surestime (la rue Haute actuelle sort au-dessus de sa cible): s'en servir pour comparer des vues, pas comme mesure.
+- Le garde-fou refuse aussi les `python3 - <<EOF` et les commandes enchaînées par `cd ... && python3 ...` avec un heredoc: faire les retouches de script avec l'outil Edit, ou un script dans le dossier de travail temporaire lancé avec `python3 -I`.
+
+## Clôtures et gros plans (vérifié le 2026-11-03)
+
+- Le segment `fence` (`fence_wood`) ne porte qu'un poteau, à son x local -0,5: ouest en rotation 0, sud en 1, est en 2, nord en 3. Une file de n segments a n poteaux: le constructeur ajoute le dernier en accroche `fence_post` (sans emprise, `poteaux_de_cloture` dans `valider_carte.py`). Deux files posées au milieu des cases (y + 0,5, x + 0,5) ne se rejoignent jamais en angle: fermer le coin par un buisson ou un autre élément, jamais par un trou.
+- Page `rendu.html`: `zoom=2` éloigne (zoom arrière) et `zoom=0` rapproche; pour un vrai gros plan, `largeur=<m>` (2 à 36). La caméra suit Camille, posée en `x, y` sans collision: la décaler de l'objet regardé, sinon elle se tient dedans.

@@ -5,11 +5,12 @@
  * reprennent les mêmes composants, README des maquettes, section 5).
  */
 import { currentOrder } from '../donnees/commandes';
+import { letterText } from '../etat/courrier';
 import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf, nameOf } from './contexte';
-import { button, chip, el, icon } from './dom';
+import { button, chip, el, icon, setText } from './dom';
 import { defaultCrateLine, defaultProduct } from './focus';
 import { countIn, hourLabel, itemName, lowerFirst } from './format';
 import { linesText, orderFullAmount, orderLines } from './modele';
@@ -19,6 +20,8 @@ import {
   missingText,
   partnerAtHome,
   recipeEntries,
+  counterShop,
+  haberdasheryIsOpen,
   shopBuyEntries,
   shopIsOpen,
   shopSellEntries,
@@ -95,7 +98,7 @@ export class CratePanel extends Panel {
     const nextComing = result !== null && coming > result.day;
     this.takeBackHint.toggleAttribute('hidden', result !== null);
     this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
-    const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));
+    const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && letterText(ctx.content, l).includes(String(result.amount)));
     const sig = JSON.stringify([lines, result, world.clock.day, recap?.id]);
     this.renderBody(sig, () => {
       const done = lines.filter((l) => l.done).length;
@@ -110,7 +113,7 @@ export class CratePanel extends Panel {
           el('strong', { text: ctx.t(c.gone) }),
           el('span', { class: 'lpl-stamp', text: ctx.t(c.shipped) }),
           el('span', { text: ctx.t(c.shippedResult, { lines: linesText(ctx, result.linesDone, result.linesTotal), amount: result.amount }) }),
-          recap === undefined ? null : el('span', { text: ctx.t(`« ${recap.text} »`) }),
+          recap === undefined ? null : el('span', { text: ctx.t(`« ${letterText(ctx.content, recap)} »`) }),
         ]);
         return [summary, nextComing ? el('p', { class: 'lpl-field__help', text: ctx.t(c.nextOrder) }) : null];
       } else if (done === total) {
@@ -181,6 +184,8 @@ export class CratePanel extends Panel {
 
 export class ShopPanel extends Panel {
   private tab: 'buy' | 'sell';
+  /** Le comptoir ouvert: l'épicerie d'Odette, ou la mercerie de Solange (achats seulement). */
+  private shop: 'grocery' | 'haberdashery' = 'grocery';
   private readonly tabs: HTMLDivElement;
   private readonly tabButtons: Record<'buy' | 'sell', HTMLButtonElement>;
 
@@ -219,6 +224,20 @@ export class ShopPanel extends Panel {
     this.markTabs();
   }
 
+  /**
+   * Le comptoir où l'on est: dans sa boutique, la mercerie de Solange (titre à elle, achats
+   * seulement: Solange vend, elle n'achète pas), sinon l'épicerie d'Odette.
+   */
+  private chooseShop(shop: 'grocery' | 'haberdashery'): void {
+    if (shop === this.shop) return;
+    this.shop = shop;
+    const { ctx } = this.host;
+    setText(this.titleEl, ctx.t(shop === 'haberdashery' ? ctx.texts.extra.shop.haberdasheryTitle : ctx.texts.game.ui.shop.title));
+    this.tabs.hidden = shop === 'haberdashery';
+    if (shop === 'haberdashery') this.tab = 'buy';
+    this.markTabs();
+  }
+
   private markTabs(): void {
     for (const id of ['buy', 'sell'] as const) {
       const b = this.tabButtons[id];
@@ -236,7 +255,7 @@ export class ShopPanel extends Panel {
   }
 
   override key(code: string): boolean {
-    if (code === 'KeyQ' || code === 'KeyE') {
+    if ((code === 'KeyQ' || code === 'KeyE') && this.shop === 'grocery') {
       this.select(this.tab === 'buy' ? 'sell' : 'buy');
       return true;
     }
@@ -246,10 +265,11 @@ export class ShopPanel extends Panel {
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
     const k = ctx.texts.extra.shop;
-    const open = shopIsOpen(world, ctx);
+    this.chooseShop(counterShop(world, ctx));
+    const open = this.shop === 'haberdashery' ? haberdasheryIsOpen(world, ctx) : shopIsOpen(world, ctx);
     const partnerName = nameOf(world, ctx.partner);
     if (this.tab === 'buy') {
-      const entries = shopBuyEntries(world, ctx);
+      const entries = shopBuyEntries(world, ctx, this.shop);
       const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName]);
       this.renderBody(sig, () => {
         const focusIndex = defaultProduct(entries);
@@ -287,7 +307,8 @@ export class ShopPanel extends Panel {
             ]),
           );
         });
-        const notice = open ? null : el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(k.closedNotice) })]);
+        const closed = this.shop === 'haberdashery' ? k.haberdasheryClosed : k.closedNotice;
+        const notice = open ? null : el('div', { class: 'lpl-order__summary' }, [el('strong', { text: ctx.t(closed) })]);
         const big = el('p', { class: 'lpl-field__help', text: ctx.t(ctx.texts.extra.catalogue.bigPurchase, { amount: ctx.content.settings.economy.bigPurchaseThreshold }) });
         return [notice, list, big];
       });
@@ -305,6 +326,7 @@ export class ShopPanel extends Panel {
         summary = el('div', { class: 'lpl-order__summary' }, [
           el('strong', { text: budget.room > 0 ? ctx.t(k.room, { amount: budget.room }) : ctx.t(k.roomNone) }),
           el('span', { text: ctx.t(k.rate, { percent: rate }) }),
+          budget.ardoise === null ? null : el('span', { class: 'lpl-shop__ardoise', text: ctx.t(k.ardoiseBoard, { item: budget.ardoise }) }),
         ]);
       }
       if (entries.length === 0) return [summary, el('div', { class: 'lpl-empty', text: ctx.t(k.nothingToSell) })];
@@ -328,7 +350,10 @@ export class ShopPanel extends Panel {
               e.quality === 'fine' ? el('span', { class: 'lpl-shop__fine' }, [icon('ui-star'), ctx.texts.extra.common.fine]) : null,
               el('small', { text: ctx.t(ctx.texts.extra.common.inBag, { count: e.count }) }),
             ]),
-            el('span', { class: 'lpl-order__count' }, [el('small', { text: ctx.t(k.unitPrice, { price: e.unit }) })]),
+            el('span', { class: 'lpl-order__count' }, [
+              el('small', { text: ctx.t(k.unitPrice, { price: e.unit }) }),
+              e.word === null ? null : el('small', { class: `lpl-shop__word lpl-shop__word--${e.word}`, text: ctx.t(k[GROCER_WORD_KEYS[e.word]]) }),
+            ]),
             el('span', { class: 'lpl-order__action lpl-shop__actions' }, [sellOne, sellAll]),
           ]),
         );
@@ -340,6 +365,9 @@ export class ShopPanel extends Panel {
 
 // ---------------------------------------------------------------------------
 // Établi et réchaud
+
+/** Clé de `textes-interface.json` (`shop`) de chaque mot du panneau de vente. */
+const GROCER_WORD_KEYS = { ardoise: 'ardoiseLine', plenty: 'plenty', wanted: 'wanted' } as const;
 
 export class StationPanel extends Panel {
   private readonly station: 'workbench' | 'stove';
@@ -375,10 +403,12 @@ export class StationPanel extends Panel {
     const together = partnerAtHome(world, ctx);
     // Tour 9: la commande des chantiers de la maisonnette, à l'établi de Basile (dès la lettre `basile_works`).
     const basile = this.station === 'workbench' ? basileModel(world, ctx) : null;
+    // 0.12: les abris des bêtes, une file à part chez Basile.
+    const animals = this.station === 'workbench' ? basileModel(world, ctx, 'elevage') : null;
     // Tour 10: « Agrandir la maisonnette » (cellier, chambre) et le grand coffre de chêne.
     const rooms = this.station === 'workbench' ? basileRoomsModel(world, ctx) : null;
     const partnerName = nameOf(world, ctx.partner);
-    const sig = JSON.stringify([entries, locked, food, together, basile, rooms, partnerName, world.purse]);
+    const sig = JSON.stringify([entries, locked, food, together, basile, animals, rooms, partnerName, world.purse]);
     this.renderBody(sig, () => {
       const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
       const focusIndex = defaultProduct(entries);
@@ -406,7 +436,11 @@ export class StationPanel extends Panel {
         list.append(
           el('li', { class: 'lpl-order__line lpl-shop__line' }, [
             icon(r.icon, 'lpl-order__icon'),
-            el('span', { class: 'lpl-order__name' }, [r.name, el('small', { text: r.makes })]),
+            el('span', { class: 'lpl-order__name' }, [
+              r.name,
+              el('small', { text: r.makes }),
+              r.fromChest === null ? null : el('small', { class: 'lpl-order__chest', text: r.fromChest }),
+            ]),
             el('span'),
             el('span', { class: 'lpl-order__action' }, [action]),
           ]),
@@ -417,6 +451,7 @@ export class StationPanel extends Panel {
       nodes.push(entries.length === 0 ? el('div', { class: 'lpl-empty', text: ctx.t(w.noRecipes) }) : list);
       if (locked > 0 && this.station === 'workbench') nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(w.lockedPlans) }));
       if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
+      if (animals !== null) nodes.push(...basileSection(this.host, animals, partnerName, { title: ctx.texts.extra.farm.basileTitle, allBuilt: ctx.texts.extra.farm.basileAllBuilt }));
       if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
       if (this.station === 'stove') {
         nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.stove.eatSection) }));
@@ -526,15 +561,15 @@ export class ChestPanel extends Panel {
 
 /**
  * « Commander à Basile » (tour 9, section 2.6): le chantier de la maisonnette ouvert, les planches
- * apportées (10 sous de moins chacune, 20 au plus), la commande payée d'un coup.
+ * apportées (10 aubrins de moins chacune, 20 au plus), la commande payée d'un coup.
  */
-function basileSection(host: UiHost, m: BasileModel, partnerName: string): HTMLElement[] {
+function basileSection(host: UiHost, m: BasileModel, partnerName: string, labels: { title: string; allBuilt: string } | null = null): HTMLElement[] {
   const { ctx } = host;
   const k = ctx.texts.extra.basile;
-  const nodes: HTMLElement[] = [el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.game.ui.basile.order) })];
+  const nodes: HTMLElement[] = [el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(labels?.title ?? ctx.texts.game.ui.basile.order) })];
   const c = m.chantier;
   if (c === null) {
-    nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(m.allBuilt ? k.allBuilt : ctx.texts.extra.board.nextTomorrow) }));
+    nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(m.allBuilt ? (labels?.allBuilt ?? k.allBuilt) : ctx.texts.extra.board.nextTomorrow) }));
   } else {
     const extra: (HTMLElement | null)[] = [];
     if (!c.funded && c.pending === null) {

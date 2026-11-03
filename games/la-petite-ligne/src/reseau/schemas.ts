@@ -27,7 +27,7 @@ const Count = v.pipe(Int, v.minValue(0), v.maxValue(999));
 const QualitySchema = v.picklist(['ordinary', 'fine']);
 const CharacterIdSchema = v.picklist(['p1', 'p2']);
 const MenuSchema = v.nullable(
-  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery']),
+  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop', 'wardrobe', 'farm', 'stall']),
 );
 const CellSchema = v.strictObject({ cx: Int, cy: Int });
 
@@ -86,6 +86,8 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('haircut'), hair: Int, hairColor: Int, beard: Int }),
   v.strictObject({ type: v.literal('hair_offer'), hair: Int, hairColor: Int, beard: Int }),
   v.strictObject({ type: v.literal('hair_offer_answer'), accept: v.boolean() }),
+  v.strictObject({ type: v.literal('clothes_buy'), item: Id }),
+  v.strictObject({ type: v.literal('wear'), slot: v.picklist(['top', 'outer', 'bottom', 'shoes', 'hat']), item: v.nullable(Id) }),
   v.strictObject({ type: v.literal('improvement_pay'), improvement: Id, amount: v.nullable(v.pipe(Int, v.minValue(0), v.maxValue(100_000))) }),
   v.strictObject({ type: v.literal('improvement_planks'), improvement: Id, count: Count }),
   v.strictObject({ type: v.literal('proposal_answer'), proposal: Id, accept: v.boolean() }),
@@ -94,10 +96,16 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('crate_take'), ...stack }),
   v.strictObject({ type: v.literal('chest_deposit'), ...stack }),
   v.strictObject({ type: v.literal('chest_take'), ...stack }),
+  v.strictObject({ type: v.literal('stall_deposit'), ...stack }),
+  v.strictObject({ type: v.literal('stall_take'), ...stack }),
+  v.strictObject({ type: v.literal('market_level'), level: v.picklist(['soft', 'fair', 'strong']) }),
+  v.strictObject({ type: v.literal('market_serve'), villager: Id }),
   v.strictObject({ type: v.literal('storage_deposit_family'), family: Id }),
   v.strictObject({ type: v.literal('storage_sort') }),
   v.strictObject({ type: v.literal('room_deposit'), room: Id, item: Id, count: Count }),
   v.strictObject({ type: v.literal('curtains'), furniture: Id }),
+  v.strictObject({ type: v.literal('animal_name'), animal: Id, name: v.pipe(v.string(), v.maxLength(40)) }),
+  v.strictObject({ type: v.literal('brood_start'), hen: Id }),
   v.strictObject({ type: v.literal('craft'), recipe: Id }),
   v.strictObject({ type: v.literal('eat'), item: Id }),
   v.strictObject({ type: v.literal('give'), to: Id, ...stack }),
@@ -127,7 +135,8 @@ export const FastSnapshotSchema = v.strictObject({
   minutes: Finite,
   characters: v.pipe(v.array(MoverSchema), v.maxLength(2)),
   villagers: v.pipe(v.array(MoverSchema), v.maxLength(16)),
-  hens: v.pipe(v.array(MoverSchema), v.maxLength(16)),
+  // Poules, puis (0.12) poussines, chèvres et coq: 9 + 2 + 1 au plus, marge comprise.
+  hens: v.pipe(v.array(MoverSchema), v.maxLength(24)),
   beam: v.nullable(v.strictObject({ x: Finite, y: Finite, f: Finite })),
   train: Finite,
 });

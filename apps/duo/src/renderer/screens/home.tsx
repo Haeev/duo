@@ -4,11 +4,17 @@ import type { JSX } from 'preact';
 import { useRef } from 'preact/hooks';
 import type { AppState, GameSummary, InvitationView, Profile } from '../../shared/state';
 import { send } from '../bridge';
-import { durationRange, t, when } from '../textes';
+import { durationRange, fullscreenKey, t, when } from '../textes';
 import { Icon, Logo, PlayerName, PlayerSymbol, Sky } from '../ui/components';
 import { markScreenChange, useEscape, useInitialFocus } from '../ui/keyboard';
 
-export type Tab = 'home' | 'library';
+export type Tab = 'home' | 'library' | 'settings';
+
+const TABS: readonly { readonly name: Tab; readonly label: string; readonly testId: string }[] = [
+  { name: 'home', label: t.nav.accueil, testId: 'onglet-accueil' },
+  { name: 'library', label: t.nav.bibliotheque, testId: 'onglet-bibliotheque' },
+  { name: 'settings', label: t.nav.reglages, testId: 'onglet-reglages' },
+];
 export const tab = signal<Tab>('home');
 
 /** Invitation mise de côté par « Plus tard »: elle reste dans le bloc Rejoindre. */
@@ -35,18 +41,18 @@ function TopBar({ state, profile }: { state: AppState; profile: Profile }): JSX.
     <header class="barre-haut">
       <Logo />
       <nav class="onglets" aria-label={t.nav.principale}>
-        {(['home', 'library'] as const).map((name) => (
+        {TABS.map(({ name, label, testId }) => (
           <button
             key={name}
             type="button"
             class={`onglet${tab.value === name ? ' onglet-actif' : ''}`}
             aria-current={tab.value === name ? 'page' : undefined}
-            data-testid={`onglet-${name === 'home' ? 'accueil' : 'bibliotheque'}`}
+            data-testid={testId}
             onClick={() => {
               select(name);
             }}
           >
-            {name === 'home' ? t.nav.accueil : t.nav.bibliotheque}
+            {label}
           </button>
         ))}
       </nav>
@@ -239,6 +245,42 @@ function Library({ state }: { state: AppState }): JSX.Element {
   );
 }
 
+// Réglages (E16), réduits pour l'instant à l'affichage: la case suit l'état réel de la
+// fenêtre, que le changement vienne d'ici, de F11 ou du menu de macOS.
+function SettingsScreen({ state }: { state: AppState }): JSX.Element {
+  const box = useInitialFocus<HTMLInputElement>('reglages');
+  useEscape(() => {
+    markScreenChange();
+    tab.value = 'home';
+  });
+  const key = fullscreenKey(state.platform);
+  return (
+    <section class="reglages" data-testid="ecran-reglages">
+      <h1 class="titre-1">{t.reglages.titre}</h1>
+      <div class="carte">
+        <h2 class="surtitre">{t.reglages.affichage}</h2>
+        <label class="case-a-cocher">
+          <input
+            type="checkbox"
+            ref={box}
+            checked={state.fullscreen}
+            aria-describedby="plein-ecran-aide"
+            data-testid="reglages-plein-ecran"
+            onChange={(event) => {
+              void send('window:set-fullscreen', { fullscreen: event.currentTarget.checked });
+            }}
+          />
+          <span>{t.reglages.pleinEcran}</span>
+          <kbd class="touche">{key}</kbd>
+        </label>
+        <p id="plein-ecran-aide" class="petit texte-second">
+          {t.reglages.pleinEcranAide(key)}
+        </p>
+      </div>
+    </section>
+  );
+}
+
 export function InvitationBanner({
   invitation,
 }: {
@@ -310,8 +352,10 @@ export function Launcher({ state, profile }: { state: AppState; profile: Profile
       <main class="contenu">
         {tab.value === 'home' ? (
           <Home state={state} profile={profile} />
-        ) : (
+        ) : tab.value === 'library' ? (
           <Library state={state} />
+        ) : (
+          <SettingsScreen state={state} />
         )}
       </main>
       {state.invitation !== null && <InvitationBanner invitation={state.invitation} />}

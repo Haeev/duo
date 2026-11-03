@@ -14,6 +14,33 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { Currency } from './monnaie';
+import type { MarketSettings } from './marche';
+import type { MailRoundSettings } from './plis';
+
+/** Comptoir d'Odette (0.12, section 2.2 de `v0-12-conception.md`). */
+export interface GrocerPricing {
+  buyRate: number;
+  dailyCap: number;
+  buysAfterFlag: string;
+  /** Avant ce jour, prix fixes (`buyRate`, sans saison, offre ni ardoise): la démo reste celle du tour 9. */
+  pricesFromDay: number;
+  supply: {
+    floor: number;
+    slope: number;
+    /** Chaque aube, le compteur d'unités vendues de chaque article est multiplié par ce facteur (arrondi vers le bas). */
+    dawnDecay: number;
+    saturation: Record<string, number>;
+    categorySaturation: Record<string, number>;
+    defaultSaturation: number;
+  };
+  /** Facteur de saison par article (printemps, été, automne, hiver); absent: 1. */
+  seasonFactor: Record<string, readonly [number, number, number, number]>;
+  ardoise: { factor: number; max: number; time: number };
+  words: { plentyAtMost: number; wantedFrom: number };
+}
+import type { FishDef, FishingRules } from './poissons';
+import type { ClothesContent } from './vetements';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -96,12 +123,16 @@ export type Condition = { label?: string } & (
   | { type: 'bought'; item: string }
   // Tour 10: dans un bâtiment visitable (ADR 0016), le joueur concerné ou l'un des deux.
   | { type: 'inside'; building: string; who: Who }
+  // 0.12 (lot L-quêtes): la bourse commune a au moins cette somme (choix payants d'un dialogue).
+  | { type: 'money_at_least'; amount: number }
 );
 
 export type Effect =
   | { type: 'give_item'; item: string; count: number; to: 'each' | 'actor' | 'cellar' | SecretRole }
   | { type: 'take_item'; item: string; count: number; from: 'actor' | 'either' | 'cellar' }
   | { type: 'give_money'; amount: number }
+  /** 0.12: retire de la bourse commune (jamais sous zéro: un choix payant vérifie `money_at_least`). */
+  | { type: 'take_money'; amount: number }
   | { type: 'set_flag'; flag: string }
   | { type: 'start_quest'; quest: string }
   | { type: 'send_letter'; letter: string }
@@ -158,6 +189,15 @@ export interface ToolStats {
   hookWindowSeconds: number | null;
 }
 
+/** Boutiques où s'achète un objet. */
+export type ShopId = 'grocery' | 'catalogue' | 'haberdashery';
+
+/** Une place sur le dessus d'un meuble porteur (repère du modèle, mètres). */
+export interface SurfacePlace {
+  x: number;
+  z: number;
+}
+
 export interface ItemDef {
   id: string;
   name: string;
@@ -170,7 +210,8 @@ export interface ItemDef {
   stack: number;
   buyPrice: number | null;
   sellPrice: number | null;
-  shop: 'grocery' | 'catalogue' | null;
+  /** Où il se vend: épicerie d'Odette, catalogue de la coopérative, mercerie de Solange (0.11.2). */
+  shop: ShopId | null;
   model: string;
   tier: 'P0' | 'P1';
   plants: string | null;
@@ -191,12 +232,28 @@ export interface ItemDef {
   backToWall: boolean;
   /** Table: le souper pris ensemble à côté compte comme souper partagé. */
   dining: boolean;
+  /** Siège (chaise, fauteuil, banc): on s'y assoit comme sur les bancs du bourg (S07). */
   seat: boolean;
+  /**
+   * Places d'un siège, en mètres le long du meuble depuis son milieu (repère du modèle, X), comme
+   * `reglages.benches.slots`; une place au milieu par défaut.
+   */
+  seatSlots: readonly number[];
+  /** Petit objet décoratif (S03): se pose aussi sur le dessus d'un meuble porteur. */
+  small: boolean;
+  /**
+   * Dessus d'un meuble porteur (S03): les places où poser un petit objet, en mètres dans le repère du
+   * modèle (X le long, Z vers l'avant), au milieu de l'empreinte. La hauteur se lit dans le modèle.
+   * Vide: rien ne s'y pose.
+   */
+  surface: readonly SurfacePlace[];
   light: boolean;
   /** Se porte à deux (la poutre). */
   carriedByTwo: boolean;
   /** Outil (tour 9): son verbe et ses valeurs, ou `null` pour un objet qui n'en est pas un. */
   tool: ToolStats | null;
+  /** Poisson (0.12, `category: "fish"`): rareté, coins, saisons, heures, ombre, textes du carnet. */
+  fish: FishDef | null;
 }
 
 export interface RecipeDef {
@@ -334,6 +391,19 @@ export interface QuestStepDef {
   failText: string | null;
 }
 
+/** Charge de quête portée à deux (`reglages.carry.quests`). */
+export interface QuestLoadDef {
+  item: string;
+  from: string;
+  to: string;
+  quest: string;
+  step: string;
+  when: Condition[];
+  flag: string;
+  /** Message de `textes.messages` à la pose, chez les deux (`null`: aucun). */
+  placedText: string | null;
+}
+
 export interface QuestDef {
   id: string;
   kind: 'main' | 'side';
@@ -352,6 +422,11 @@ export interface QuestDef {
    * `at_deadline` sans `deadline` échoit au départ de ce train. `{day}`: le jour de ce train.
    */
   repeat: 'each_train' | null;
+  /**
+   * 0.12: la quête se retire d'elle-même, sans reproche, au premier `weekday` à `time` après son
+   * démarrage (message `text` de `textes.messages`); elle peut redémarrer plus tard. `null`: jamais.
+   */
+  expire: { weekday: number; time: number; text: string } | null;
 }
 
 /**
@@ -589,7 +664,10 @@ export type HintTrigger =
   /** Tour 8: on vise un rejet ou un jeune sapin (`sapling_hint`). */
   | { on: 'aim_sapling' }
   /** Tour 9: une annonce au tableau, à moins de 6 m du tableau du quai (`board_hint`). */
-  | { on: 'near_board_annonce' };
+  | { on: 'near_board_annonce' }
+  /** Pêche 0.12: première prise au coin qui frémit, premier guet (`fishing_hot_spot`, `fishing_watch`). */
+  | { on: 'fishing_hot_spot' }
+  | { on: 'fishing_watch' };
 
 export interface HintDef {
   id: string;
@@ -711,6 +789,12 @@ export interface GeneratedOrderSettings {
   /** Tour 9 (section 2.11): coût d'un poisson selon la saison de la commande, tiré des poids des poissons. */
   fishCostFromWeights: boolean;
   fishCostReferenceSeason: Season;
+  /**
+   * Pêche 0.12 (section 8.2): coût d'une ligne de poisson = `riverUnitCost / part`, la part du poisson
+   * dans les prises de la saison de production (`fishShareBySeason`); `null`: la règle du tour 9.
+   */
+  riverUnitCost: number | null;
+  fishShareBySeason: Partial<Record<Season, Record<string, number>>>;
   /** Quantités arrondies au rendement d'une case (radis, carottes). */
   roundTo: Record<string, number>;
   /** Plafond de chaque ligne. */
@@ -823,10 +907,14 @@ export interface Settings {
   /** D7. */
   tenderness: Tenderness;
   spawn: { point: string };
+  /** 0.12: les plis de Lucie (section 2.4), `null` sans tournée. */
+  mailRound: MailRoundSettings | null;
   economy: {
     startPurse: number;
+    /** La monnaie (0.12): nom, accord et icône, lus par `monnaie.ts`. */
+    currency: Currency;
     bigPurchaseThreshold: number;
-    grocer: { buyRate: number; dailyCap: number; buysAfterFlag: string };
+    grocer: GrocerPricing;
     /**
      * Une fenêtre de commande par semaine, dans l'ordre (la livraison arrive par le train); après
      * la dernière, une fenêtre par semaine (`repeatWeekly`, tour 8), ou aucune (`null`).
@@ -846,7 +934,9 @@ export interface Settings {
   trees: TreeSettings;
   /** Cueillette (tour 8), ou `null`. */
   forage: ForageSettings | null;
-  hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number };
+  hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number; care: HenCareSettings | null };
+  /** La chèvre au piquet (0.12, section 4.3); `null`: pas de chèvre. */
+  goats: GoatSettings | null;
   /** Tableau des annonces (tour 9, section 1); `null`: pas de tableau. */
   board: BoardSettings | null;
   /** Chantiers (tour 9, section 2.6); `null`: pas de chantiers. */
@@ -889,7 +979,8 @@ export interface Settings {
     /** « Rester à un point »: rayon (défaut dans `defauts.ts`). */
     stayAt: number;
   };
-  building: { twoPlayersSpeedMultiplier: number };
+  /** `twoPlayersRecipes` (0.12, section 2.5): recettes faites deux fois plus vite à deux devant le même poste. */
+  building: { twoPlayersSpeedMultiplier: number; twoPlayersRecipes: string[] };
   hints: { durationSeconds: number };
   absence: { minutes: number };
   /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
@@ -909,6 +1000,24 @@ export interface Settings {
       flag: string;
     } | null;
     parcel: { item: string; from: string; to: string } | null;
+    /**
+     * Longueur (m) des charges longues, par objet (la poutre): on les prend n'importe où le long de
+     * leur axe, un bout chacun (retour S01). Absente: charge ramassée, prise depuis son centre.
+     */
+    lengths: Record<string, number>;
+    /**
+     * Où se met chaque porteur d'une charge longue en la soulevant: à `side` m de son axe, du côté
+     * où il était, et à `fromEnd` m au moins de chaque bout (les mains sur le bois, pas dans le vide).
+     * `reach`: portée (m) jusqu'à l'axe d'une charge longue, plus courte que `feel.beamGrabRange`
+     * (comptée depuis le centre d'une charge ramassée): Espace tenu au chantier voisin ne soulève
+     * pas la poutre couchée à côté.
+     */
+    grip: { side: number; fromEnd: number; reach: number };
+    /**
+     * 0.12: charges de quête, portées à deux de `from` à `to` pendant l'étape `step` de `quest`, quand
+     * `when` est vrai (conditions évaluées dans l'étape); posées, elles lèvent `flag`.
+     */
+    quests: QuestLoadDef[];
   };
   /** Envies (HA-07, tour 8 section 5.4). */
   envies: EnvieSettings;
@@ -934,6 +1043,8 @@ export interface Settings {
     hookWindowSeconds: number;
     /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */
     flag: string;
+    /** Pêche de la 0.12: raretés, ombres, coin qui frémit, guet, grands (`poissons.ts`). */
+    rules: FishingRules;
   } | null;
   /** Moments rares (`reglages.moments`, tour 6). */
   moments: MomentSettings;
@@ -970,7 +1081,8 @@ export interface AnnonceReward {
 }
 
 export interface ImprovementSettings {
-  queues: Record<ImprovementQueue, { opensFromDay: number }>;
+  /** `quest` (0.12): la file n'ouvre qu'une fois cette quête commencée (la chevrerie avec la trame). */
+  queues: Record<ImprovementQueue, { opensFromDay: number; quest?: string }>;
   /** Versements proposés au tableau (en plus de « le reste »). */
   steps: readonly number[];
   plankDiscount: number;
@@ -1060,6 +1172,11 @@ export interface FeelSettings {
   beamDropRadius: number;
   /** Vitesse de marche des habitants (m/s). */
   villagerSpeed: number;
+  /**
+   * Habitants qui passent le ru au gué de pierres, en sautant (Jeanne, `carte-halte.md`). Les autres
+   * prennent le pont, la passerelle ou le ponceau (retour S04: Achille semblait marcher dans l'eau).
+   */
+  steppingStoneVillagers: string[];
   /** Vitesse des poules (m/s). */
   henSpeed: number;
   /** Fenêtre de « Déjà pris par... » après une récolte (s). */
@@ -1108,7 +1225,109 @@ export interface AnnonceDef {
   uniqueScene: string | null;
 }
 
-export type ImprovementQueue = 'bourg' | 'maisonnette';
+export type ImprovementQueue = 'bourg' | 'maisonnette' | 'elevage';
+
+/** Bonheur d'une bête (0.12, sections 4.2 et 4.3): points sur 100, jamais sous `floor`. */
+export interface HappinessSettings {
+  start: number;
+  /** Par aube. */
+  drift: number;
+  floor: number;
+  max: number;
+  /** Seuils des mots: « Ravie » à partir de `happy`, « Tranquille » à partir de `calm`, sinon « Ébouriffée ». */
+  happy: number;
+  calm: number;
+}
+
+/** Soins de la basse-cour (0.12, section 4.2), dans `reglages.hens.care`. */
+export interface HenCareSettings {
+  happiness: HappinessSettings & {
+    /** Bonheur des poules d'une partie reprise (migration). */
+    migration: number;
+    fed: number;
+    straw: number;
+    /** La litière compte fraîche tant qu'elle a au plus tant de jours. */
+    strawDays: number;
+    pet: number;
+    callByName: number;
+    /** En dessous: un œuf un jour sur deux. */
+    everyOtherBelow: number;
+    /** À partir de: bel œuf (`fine`). */
+    fineFrom: number;
+    /** À partir de: la poule veut couver. */
+    broodFrom: number;
+  };
+  /** Capacité du poulailler agrandi (chantier `coop_extension`). */
+  maxExtended: number;
+  extensionImprovement: string;
+  grain: {
+    item: string;
+    rations: number;
+    perHen: number;
+    /** Avant ce jour, le grain de la mangeoire est fourni (démo inchangée). */
+    fromDay: number;
+    /** Sans grain, en ces saisons, un œuf un jour sur deux (« elles picorent le pré »). */
+    forageSeasons: readonly Season[];
+    /** Article du catalogue qui nourrit à l'aube tant qu'il reste des rations. */
+    hopper: string;
+  };
+  petRange: number;
+  straw: { item: string; seconds: number };
+  brood: {
+    eggs: number;
+    nights: number;
+    hatchChance: number;
+    roosterlingChance: number;
+    seasons: readonly Season[];
+    lastSeasonDay: number;
+    growNights: number;
+    colorMother: number;
+    colorGolden: number;
+  };
+  /** Les six couleurs de la collection, dans l'ordre du carnet. */
+  colors: readonly string[];
+  goldenColor: string;
+  roosterVariant: string;
+  /** Noms proposés (trois tirés sans redite). */
+  roosterNames: readonly string[];
+  chickNames: readonly string[];
+}
+
+/** La chèvre (0.12, section 4.3), `reglages.goats`. */
+export interface GoatSettings {
+  happiness: HappinessSettings & {
+    freshGraze: number;
+    /** Une place est fraîche si elle n'a pas été broutée depuis tant de jours. */
+    freshDays: number;
+    water: number;
+    brush: number;
+    heldMilking: number;
+    milkNoneBelow: number;
+    milkTwoFrom: number;
+  };
+  max: number;
+  shedImprovement: string;
+  milkItem: string;
+  /** Traite de `milkFrom` à `milkUntil` (minutes du jour). */
+  milkFrom: number;
+  milkUntil: number;
+  milkSeconds: number;
+  heldMilkSeconds: number;
+  ropeLength: number;
+  followDistance: number;
+  followSpeedFactor: number;
+  homeAt: number;
+  outAt: number;
+  speed: number;
+  pailItem: string;
+  /** Places de pâture (points de la carte). */
+  spots: readonly string[];
+  /** Distance minimale d'une place au rail le plus proche (m). */
+  railClearance: number;
+  names: readonly string[];
+  /** Article du catalogue de la deuxième chèvre. */
+  extraItem: string;
+}
 
 /** Chantier (`chantiers.json`, tour 9, table 2.6). */
 export interface ImprovementDef {
@@ -1168,4 +1387,8 @@ export interface Content {
   catalogue: CatalogueDef | null;
   /** Tour 10: pièces à bâtir et fenêtres de la maisonnette (`pieces.json`), vides si le fichier manque. */
   home: HomeContent;
+  /** 0.12: le marché du dimanche (`marche.json`), `null` si le fichier manque. */
+  market: MarketSettings | null;
+  /** 0.12: vêtements (`vetements.json`) et réglages de la garde-robe (`reglages.json`: `wardrobe`). */
+  clothes: ClothesContent;
 }

@@ -14,6 +14,7 @@ import type {
   WorldEvent,
   WorldState,
 } from '../etat/types';
+import { agreeMoney } from '../donnees/monnaie';
 import type { Content } from '../donnees/types';
 import type { BuildingId } from '../etat/carte';
 import type { Blockers } from './grille';
@@ -74,6 +75,11 @@ export interface Runtime {
   doorCarryNotified: boolean;
   /** Minute de jeu du dernier chocolat chaud de chacun (bu ensemble dans la demi-heure: Cœur +5). */
   chocolateAt: Record<CharacterId, number | null>;
+  /**
+   * Cap d'un habitant juste avant qu'on lui parle (il se tourne vers son interlocuteur), rendu à
+   * la fin de la conversation. Hors sauvegarde: au pire, il garde le cap de la conversation.
+   */
+  villagerFacing: Map<string, number>;
 }
 
 export interface Sim {
@@ -107,6 +113,7 @@ export function createRuntime(map: GameMap): Runtime {
     doorKnocked: { p1: null, p2: null },
     doorCarryNotified: false,
     chocolateAt: { p1: null, p2: null },
+    villagerFacing: new Map(),
   };
 }
 
@@ -123,6 +130,13 @@ export function character(sim: Sim, id: CharacterId): Character {
   const found = sim.world.characters.find((c) => c.id === id);
   if (found === undefined) throw new Error(`personnage inconnu: ${id}`);
   return found;
+}
+
+/** Tourne un personnage ou un habitant vers un point (rien s'il est dessus). */
+export function faceToward(who: { pos: Vec2; facing: number }, at: Readonly<Vec2>): void {
+  const dx = at.x - who.pos.x;
+  const dy = at.y - who.pos.y;
+  if (Math.hypot(dx, dy) > 1e-6) who.facing = Math.atan2(dy, dx);
 }
 
 export function partnerOf(id: CharacterId): CharacterId {
@@ -145,10 +159,11 @@ export function newId(sim: Sim, prefix: string): string {
 
 /** Remplace `{nom}` dans un texte. Un nom absent reste tel quel (jetons de touches). */
 export function format(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+  const filled = template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });
+  return agreeMoney(filled);
 }
 
 export function message(sim: Sim, key: string, vars: Record<string, string | number> = {}): string {

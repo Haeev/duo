@@ -325,6 +325,8 @@ export function soundsForEvent(
       break;
     }
     case 'sold':
+    case 'market_sale':
+    case 'mail_delivered':
       emit.ui('coins', event.by);
       break;
     case 'deposited':
@@ -439,6 +441,13 @@ export function soundsForEvent(
     case 'midnight':
     case 'night':
     case 'letter':
+    case 'ardoise_posted':
+    case 'market_opened':
+    case 'market_buyer_arrived':
+    case 'market_refused':
+    case 'market_closed':
+    case 'mail_ready':
+    case 'mail_returned':
     case 'save_point':
     case 'session_finish':
     case 'absence':
@@ -471,6 +480,28 @@ export function soundsForEvent(
       break;
     case 'hen_delivered':
       emit.world('hen', pointAt(map, 'chicken_coop'), null);
+      break;
+    // Élevage (0.12): sons existants en attendant ceux du sound-designer (`hen-cluck-happy`, `goat-bleat`, `milk-squirt`, `straw-rustle`, `rooster-crow`).
+    case 'animal_petted':
+    case 'brood_hatched':
+    case 'animal_arrived':
+      emit.world('hen', pointAt(map, 'chicken_coop'), null);
+      break;
+    case 'straw_taken':
+    case 'coop_strawed':
+    case 'pail_filled':
+    case 'goat_watered':
+    case 'goat_brushed':
+    case 'goat_milked':
+    case 'goat_led':
+    case 'goat_staked':
+    case 'brood_started':
+      emit.world('bag', characterAt(world, event.by), event.by);
+      break;
+    case 'roosterling_left':
+    case 'rooster_crowed':
+    case 'naming_requested':
+    case 'animal_named':
       break;
     case 'tool_upgraded':
       emit.world('pickup', characterAt(world, event.by), event.by);
@@ -673,7 +704,7 @@ export class StateWatcher {
       for (const n of me.notifications) {
         if (n.id > this.lastNotification) {
           newest = Math.max(newest, n.id);
-          // Un refus (« Déjà pris », sac plein, « Il manque 40 sous ») n'a pas le carillon des bonnes nouvelles (revue S2):
+          // Un refus (« Déjà pris », sac plein, « Il manque 40 aubrins ») n'a pas le carillon des bonnes nouvelles (revue S2):
           // il a son son à lui, feutré, 600 ms au moins entre deux (`minIntervalMs` de `sons.json`).
           if (isRefusal(n, refusal)) refused = true;
           else if (NOTIFY_KINDS.has(n.kind)) notify = true;

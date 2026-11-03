@@ -6,6 +6,7 @@
 import { seasonOfDay } from '../donnees/calendrier';
 import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import type { LetterDef } from '../donnees/types';
+import { citedVars, letterOf, letterTitle } from '../etat/courrier';
 import { unitDraw } from '../etat/tirage';
 import { evaluateAll, NO_CONTEXT } from './conditions';
 import { type Sim, emit, format, itemName, notifyKey } from './contexte';
@@ -126,7 +127,7 @@ function deliver(
   const matching = def.variants
     .map((v, i) => ({ v, i }))
     .filter(({ v }) => evaluateAll(sim, v.when, NO_CONTEXT));
-  let text = def.text;
+  let variant: number | null;
   if (def.variantsNoRepeat && matching.length > 0) {
     const index = drawNoRepeat(
       sim,
@@ -134,19 +135,19 @@ function deliver(
       matching.map((m) => m.i),
       sim.world.clock.day,
     );
-    text = (index === null ? undefined : def.variants[index]?.text) ?? text;
+    variant = index !== null && def.variants[index] !== undefined ? index : null;
   } else {
-    text = matching[0]?.v.text ?? text;
+    variant = matching[0]?.i ?? null;
   }
-  const title = format(def.title, vars);
-  sim.world.letters.push({
-    id,
-    day: sim.world.clock.day,
-    title,
-    from: sim.content.senders[def.from] ?? def.from,
-    text: format(text, vars).trim(),
-    read: [],
-  });
+  // Seules les valeurs citées sont gardées: le texte se reconstitue depuis les données (format 8).
+  const kept: Record<string, string | number> = {};
+  for (const name of citedVars(def, variant)) {
+    const value = vars[name];
+    if (value !== undefined) kept[name] = value;
+  }
+  const letter = letterOf({ id, day: sim.world.clock.day, read: [] }, variant, kept);
+  sim.world.letters.push(letter);
+  const title = letterTitle(sim.content, letter);
   notifyKey(sim, 'both', 'letter', 'letter_received', { title });
   queueHint(sim, 'p1', { on: 'letter_received' });
   queueHint(sim, 'p2', { on: 'letter_received' });

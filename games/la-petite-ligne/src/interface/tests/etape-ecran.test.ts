@@ -119,9 +119,9 @@ describe.skipIf(executable === undefined)(
         await page.locator('.lpl-screen--stage').waitFor({ state: 'detached' });
         await page.locator('.lpl-toast', { hasText: 'La Halte continue' }).waitFor();
         expect(await page.locator('.lpl-clock__season').innerText()).toBe('Printemps · jour 15');
-        expect(await page.locator('.lpl-objective').innerText()).toMatch(
-          /La commande du samedi 22/,
-        );
+        // Jour 15: la commande du samedi 22 ne passe devant qu'à partir du vendredi 21
+        // (`nextObjective`); d'ici là, la quête principale ouverte (0.12, marché d'Odette) d'abord.
+        expect(await page.locator('.lpl-objective').innerText()).toMatch(/L’étal du dimanche/);
         expect(errors).toEqual([]);
         await page.close();
       },

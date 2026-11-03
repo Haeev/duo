@@ -8,6 +8,7 @@
  * `improvementRemaining`), avec un test d'égalité.
  */
 import { onSale } from '../donnees/commandes';
+import { queueOpen } from '../etat/files-chantiers';
 import { rawText } from '../donnees/contenu';
 import type { ImprovementDef, ImprovementQueue } from '../donnees/types';
 import { type ShelfKind, catalogueOffers, copiesOf } from '../etat/catalogue';
@@ -205,7 +206,7 @@ export interface AnnonceModel {
   scene: string | null;
   /** « jusqu'à mardi, 20 h » */
   deadline: string;
-  /** « Merci : 110 sous » */
+  /** « Merci : 110 aubrins » */
   reward: string;
   state: BoardAnnonce['state'];
   /** Le tampon « Fait » à la couleur de qui l'a remise (`null`: scène à deux). */
@@ -334,7 +335,7 @@ export function openChantier(
   queue: ImprovementQueue,
 ): ImprovementDef | null {
   const s = ctx.content.settings.improvements;
-  if (s === null || world.clock.day < s.queues[queue].opensFromDay) return null;
+  if (s === null || !queueOpen(s, world, queue)) return null;
   const list = ctx.content.improvements
     .filter((x) => x.queue === queue)
     .sort((a, b) => a.order - b.order);
@@ -382,7 +383,7 @@ export interface ChantierModel {
   paid: number;
   planks: number;
   remaining: number;
-  /** « Un banc au gué : 450 sur 950 sous » (planches comptées à leur valeur). */
+  /** « Un banc au gué : 450 sur 950 aubrins » (planches comptées à leur valeur). */
   progress: string;
   /** Part payée (0 à 100). */
   percent: number;
@@ -519,9 +520,9 @@ export function chantiersPage(world: ReadonlyWorld, ctx: UiContext): ChantiersPa
 export interface BasileModel {
   /** Le chantier à commander, ou `null` (tous bâtis, ou le suivant ouvre demain). */
   chantier: ChantierModel | null;
-  /** « Un banc au pignon : 690 sous » */
+  /** « Un banc au pignon : 690 aubrins » */
   priceLine: string;
-  /** « Apporter des planches : 3 sur 20 (30 sous de moins) » */
+  /** « Apporter des planches : 3 sur 20 (30 aubrins de moins) » */
   planksLine: string;
   /** Planches que ce joueur peut apporter maintenant (sac et place restante). */
   bring: number;
@@ -531,12 +532,19 @@ export interface BasileModel {
   built: BuiltChantier[];
 }
 
-/** La commande à Basile, ou `null` tant que la file de la maisonnette n'est pas ouverte (lettre `basile_works`). */
-export function basileModel(world: ReadonlyWorld, ctx: UiContext): BasileModel | null {
+/**
+ * La commande à Basile, ou `null` tant que la file n'est pas ouverte (lettre `basile_works` pour la
+ * maisonnette; 0.12: file `elevage`, chevrerie et poulailler agrandi, présentée à part).
+ */
+export function basileModel(
+  world: ReadonlyWorld,
+  ctx: UiContext,
+  queue: 'maisonnette' | 'elevage' = 'maisonnette',
+): BasileModel | null {
   const s = ctx.content.settings.improvements;
-  if (s === null || world.clock.day < s.queues.maisonnette.opensFromDay) return null;
-  const def = openChantier(world, ctx, 'maisonnette');
-  const list = ctx.content.improvements.filter((x) => x.queue === 'maisonnette');
+  if (s === null || world.clock.day < s.queues[queue].opensFromDay) return null;
+  const def = openChantier(world, ctx, queue);
+  const list = ctx.content.improvements.filter((x) => x.queue === queue);
   const allBuilt =
     list.length > 0 && list.every((x) => (world.improvements[x.id]?.builtDay ?? null) !== null);
   const built = builtList(world, ctx).filter((x) => list.some((d) => d.id === x.id));

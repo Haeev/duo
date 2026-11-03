@@ -26,6 +26,7 @@ import { PALETTE_CELLS, PALETTE_GRID, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import { RIVER_BED_MIN, RIVER_BED_RANGE, RIVER_SAND_RANGE } from './riviere';
+import { SHELTER_SLOTS } from './abri';
 
 /**
  * Cases du sol dont la teinte devient continue, dans l'ordre des couleurs de
@@ -73,6 +74,11 @@ export interface SurfaceUniforms {
   uWetParams: { value: Vector4 };
   uWetSheen: { value: number };
   uPuddleParams: { value: Vector4 };
+  /** Abri du joueur local (`abri.ts`): sol sec sous le toit; x, z minimaux puis maximaux. */
+  uShelters: { value: Vector4[] };
+  uShelterCount: { value: number };
+  /** Hauteur (m, monde) sous laquelle l'abri est sec: le plafond de la pièce. */
+  uShelterTop: { value: number };
   uReflection: { value: Color };
   uGlow: { value: number };
   uLamps: { value: Vector4[] };
@@ -166,6 +172,9 @@ export function createSurfaceUniforms(noise: Texture, windMask: Texture): Surfac
     uPuddleParams: {
       value: new Vector4(1 / s.puddleSize, s.puddleThreshold, s.puddleDarken, s.puddleMaxHeight),
     },
+    uShelters: { value: Array.from({ length: SHELTER_SLOTS }, () => new Vector4()) },
+    uShelterCount: { value: 0 },
+    uShelterTop: { value: 0 },
     uReflection: { value: new Color() },
     uGlow: { value: 0 },
     uLamps: { value: Array.from({ length: GLOW_SLOTS }, () => new Vector4()) },
@@ -323,6 +332,9 @@ uniform float uWet;
 uniform vec4 uWetParams;   // assombrissement, rugosité, part des murs, reflet des flaques
 uniform float uWetSheen;
 uniform vec4 uPuddleParams;
+uniform vec4 uShelters[${SHELTER_SLOTS}];
+uniform int uShelterCount;
+uniform float uShelterTop;
 uniform vec3 uReflection;
 uniform float uGlow;
 uniform vec4 uLamps[${GLOW_SLOTS}];
@@ -636,9 +648,11 @@ const FRAGMENT_GROUND = /* glsl */ `
     bool grassFace = groundIndex == ${cellIndex('grass_dark')} || groundIndex == ${cellIndex('grass')} || groundIndex == ${cellIndex('grass_light')};
     bool pathFace = groundIndex == ${cellIndex('path')} || groundIndex == ${cellIndex('path_dark')};
     if (bedFace && river.a > 0.0) {
-      // Lit de la rivière; l'herbe y avance là où le bord du sable recule.
+      // Lit de la rivière; l'herbe y avance là où le bord du sable recule, ou le chemin le long
+      // d'une promenade (canal A à moitié, \`riviere.ts\`): un coin de chemin arrondi reste en terre.
       vec3 bed = ambBed(vAmbWorld, river, patchNoise, groundPixel);
-      diffuseColor.rgb = mix(ambGreen(patchNoise), bed, ambSand(river, vAmbWorld.xz, groundPixel));
+      vec3 under = mix(ambPathColor(patchNoise), ambGreen(patchNoise), smoothstep(0.6, 0.9, river.a));
+      diffuseColor.rgb = mix(under, bed, ambSand(river, vAmbWorld.xz, groundPixel));
     } else if (groundFace && grassFace) {
       vec3 green = ambGreen(patchNoise);
       float sand = ambSand(river, vAmbWorld.xz, groundPixel);
@@ -698,10 +712,17 @@ const FRAGMENT_GROUND = /* glsl */ `
 const FRAGMENT_WET = /* glsl */ `
 vec3 ambNormal = transformNormalByInverseViewMatrix(normal, viewMatrix);
 float ambUp = smoothstep(0.55, 0.9, ambNormal.y);
-float ambWet = uWet * mix(uWetParams.z, 1.0, ambUp);
+float ambDry = 0.0;
+for (int i = 0; i < ${SHELTER_SLOTS}; i++) {
+  if (i >= uShelterCount) break;
+  vec4 r = uShelters[i];
+  if (vAmbWorld.y < uShelterTop && vAmbWorld.x > r.x && vAmbWorld.z > r.y && vAmbWorld.x < r.z && vAmbWorld.z < r.w) ambDry = 1.0;
+}
+// Sous le toit de l'abri (vu de dedans): ni sol mouillé ni flaques sur le plancher.
+float ambWet = uWet * mix(uWetParams.z, 1.0, ambUp) * (1.0 - ambDry);
 float ambPuddle = 0.0;
 #ifdef AMB_PUDDLES
-if (uWet > 0.0) {
+if (uWet > 0.0 && ambDry < 0.5) {
   float puddleNoise = texture(uAmbNoise, vAmbWorld.xz * uPuddleParams.x).r;
   // Terre, chemins et pavés (le rouge l'emporte sur le vert), pas l'herbe; seulement au sol.
   float bare = step(diffuseColor.g, diffuseColor.r * 1.04);

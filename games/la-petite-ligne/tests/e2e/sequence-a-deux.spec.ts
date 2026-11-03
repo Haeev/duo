@@ -39,7 +39,8 @@ test('séquence à deux: création, arrivée, déplacement, potager, pause et re
     await press(guestGame.getByRole('button', { name: /^C’est parti/ }));
     let w = await probe.until('les deux personnages créés', (s) => s.characters.every((c) => c.created));
     expect(characterOf(w, HOST).appearance.hair).toBe(2);
-    expect(characterOf(w, GUEST).appearance.outfit).toBe(2);
+    // 0.12: la tenue de départ 2 (la salopette), portée et seule dans la garde-robe.
+    expect(characterOf(w, GUEST).wardrobe).toHaveLength(3);
     expect(characterOf(w, GUEST).name).toBe(GUEST);
 
     // Arrivée: scène à deux avec Firmin, l'horloge arrêtée tant qu'elle dure.

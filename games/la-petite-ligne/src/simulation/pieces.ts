@@ -1,6 +1,6 @@
 /**
  * La maison qui grandit (tour 10, section 4): le cellier et la chambre, bâtis à deux. On commande
- * la charpente à Basile (l'accord de l'autre au-delà de 100 sous); au matin, le site paraît (caisse,
+ * la charpente à Basile (l'accord de l'autre au-delà de 100 aubrins); au matin, le site paraît (caisse,
  * éléments fantômes, et pour la chambre la panne faîtière à `beam_pickup`); on dépose planches et
  * clous à la caisse; chaque élément se bâtit en maintenant Agir, ceux qui portent avant ceux qu'ils
  * portent; la panne se porte à deux jusqu'au faîte; la nuit d'après, Basile et Firmin posent les

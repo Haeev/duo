@@ -95,7 +95,7 @@ export class SalonPanel extends Panel {
     );
     setPortrait(
       this.preview,
-      portraitSvg(playerColors(sitter.id, { ...sitter.appearance, ...choice }), 'great', ''),
+      portraitSvg(playerColors(sitter.id, { ...sitter.appearance, ...choice }, ctx.content.clothes), 'great', ''),
     );
     const partner = nameOf(world, ctx.partner);
     const sig = JSON.stringify([current, choice, seat, received, priceModel, partner, world.purse]);
@@ -156,7 +156,7 @@ export class SalonPanel extends Panel {
                   class: 'lpl-option__swatch',
                   style: `--lpl-swatch: ${o.color ?? 'transparent'}`,
                 })
-              : portrait(portraitSvg(playerColors(sitter.id, look), 'good', ''), 'small');
+              : portrait(portraitSvg(playerColors(sitter.id, look, ctx.content.clothes), 'good', ''), 'small');
           box.append(
             el('label', { class: 'lpl-option', title: o.salonOnly ? ctx.t(s.salonOnly) : null }, [
               input,

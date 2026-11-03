@@ -20,6 +20,7 @@ import chantiers  # noqa: E402
 import cueillette  # noqa: E402
 import interieurs  # noqa: E402
 import rue_haute  # noqa: E402
+import details_012 as D  # noqa: E402
 import pieces  # noqa: E402
 import lpl  # noqa: E402
 from lpl import by_normal  # noqa: E402
@@ -72,10 +73,7 @@ def window(g, f, u, z0, w=0.8, h=1.0, shutter="paint_green", frame="stone_light"
                   "wood_old_dark" if ruin else "wood_dark")
     if box_flowers and not ruin:
         f.box(g, (w + 0.1, 0.2, 0.16), u, 0.16, z0 + 0.02, "wood", **kb)
-        for k in range(5):
-            c = ["flower_red", "flower_pink", "flower_white", "flower_red", "flower_yellow"][k]
-            f.box(g, (0.12, 0.12, 0.1), u - w / 2 + 0.1 + k * (w - 0.2) / 4, 0.16, z0 + 0.14, c, rot=(0, 0, 20 * k))
-        f.box(g, (w + 0.05, 0.16, 0.06), u, 0.16, z0 + 0.1, "leaf_bush")
+        D.box_flowers(f, g, u, 0.16, z0 + 0.05, w)
 
 
 def door(g, f, u, w=0.95, h=2.05, color="paint_red", frame="stone_light", absent=False, step=True, leaf=True,
@@ -410,6 +408,14 @@ def gatekeeper_house(A, ruin, parent):
     A.add(name + "_floor", g, parent=root)
     walls = {}
     color_out, color_in = "stone", "plaster_shade" if ruin else "plaster_cream"
+    # 0.12: gouttières et descentes (état réparé): égouts mesurés sur un toit d'essai identique
+    if not ruin:
+        tmp = A.geo()
+        gable_roof(tmp, -hx, hx, -hy, hy, ze, zr, "lauze", edge="lauze_dark", strips=5, ridge_color="lauze_dark")
+        eaves = {sd: D.eave(tmp.bm.verts, sd) for sd in (-1, 1)}
+        tmp.bm.free()
+        gut = {sd: D.gutter_line(eaves[sd][0], eaves[sd][1], sd) for sd in (-1, 1)}
+        pipe_x = (-(hx - 0.1), hx - 0.1)
     for side in ("front", "back", "left", "right"):
         g = A.geo()
         f = Face(side, hx, hy)
@@ -457,6 +463,13 @@ def gatekeeper_house(A, ruin, parent):
         if side in ("left", "right"):
             # chaînes d'angle: elles suivent les murs de côté
             quoins(g, hx, hy, ze, sxs=(-1,) if side == "left" else (1,))
+        if not ruin and side in ("front", "back"):
+            sd = -1 if side == "front" else 1
+            for x in pipe_x:
+                D.pipe_wall(g, sd, x, sd * hy, *gut[sd])
+            if side == "front":
+                D.flower_pot(g, -0.98, -hy - 0.3, 0.95, seed=1)
+                D.flower_pot(g, 0.98, -hy - 0.3, 0.85, ("flower_yellow", "flower_white", "flower_red"), seed=2)
         walls[side] = A.add(name + "_wall_" + side, g, parent=root)
     # toit: 5 bandes par pan + faîtage = 11 éléments (chantier guidé: 11 + la porte = 12)
     roof = lpl.empty(name + "_roof", parent=root)
@@ -472,6 +485,18 @@ def gatekeeper_house(A, ruin, parent):
                rafters=ruin, ridge_color="lauze_dark")
     if not ruin:
         chimney(parts[9], 1.9, 1.0, 2.8, 4.6)
+        # gouttière en tronçons, un par bande de toit (elle se pose avec sa bande au chantier); col de cygne avec
+        # la bande qui le surplombe
+        xa, xb = eaves[-1][2], eaves[-1][3]
+        xs = [xa + (xb - xa) * i / 5 for i in range(6)]
+        for sd, k0 in ((-1, 0), (1, 5)):
+            y_e, z_u = eaves[sd][0], eaves[sd][1]
+            for i in range(5):
+                D.gutter(parts[k0 + i], sd, y_e, z_u, xs[i], xs[i + 1], trim=(0.04 if i == 0 else 0.0,
+                                                                          0.04 if i == 4 else 0.0))
+            for x in pipe_x:
+                i = min(4, max(0, int((x - xa) / (xb - xa) * 5)))
+                D.pipe_neck(parts[k0 + i], sd, x, sd * hy, *gut[sd])
     else:
         chimney(parts[9], 1.9, 1.0, 2.8, 4.3)
         for x in (-1.6, 0.9):
@@ -548,9 +573,24 @@ def station(A):
             window(g, ff, 0.0, 1.0, 0.75, 1.2, shutter="paint_red")
         ff.box(g, (0.62, 0.06, 0.62), 0.0, 0.06, 3.55, "stone_light")
         ff.box(g, (0.44, 0.07, 0.44), 0.0, 0.08, 3.55, "glass", rot=(0, 45, 0))
+    # 0.12: descentes d'eau aux quatre coins (en avant de la corniche rouge), pots de part et d'autre de la porte
+    tmp = A.geo()
+    gable_roof(tmp, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", over=0.45, ridge_color="tile_dark")
+    eaves = {sd: D.eave(tmp.bm.verts, sd) for sd in (-1, 1)}
+    tmp.bm.free()
+    gut = {sd: D.gutter_line(eaves[sd][0], eaves[sd][1], sd) for sd in (-1, 1)}
+    for sd in (-1, 1):
+        for x in (-(hx - 0.1), hx - 0.1):
+            D.pipe_wall(g, sd, x, sd * hy, *gut[sd], d=0.14)
+    D.flower_pot(g, -1.42, -hy - 0.32, 1.0, seed=3)
+    D.flower_pot(g, 0.42, -hy - 0.32, 0.9, ("flower_blue", "flower_white", "flower_yellow"), seed=4)
     A.add("station_body", g, parent=root)
     r = A.geo()
     gable_roof(r, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", over=0.45, ridge_color="tile_dark")
+    for sd in (-1, 1):
+        D.gutter(r, sd, eaves[sd][0], eaves[sd][1], eaves[sd][2], eaves[sd][3])
+        for x in (-(hx - 0.1), hx - 0.1):
+            D.pipe_neck(r, sd, x, sd * hy, *gut[sd], d=0.14)
     chimney(r, -2.8, 0.9, 3.8, 5.4, color="brick", cap="stone_light")
     A.add("station_roof", r, parent=root)
     # horloge de façade: aiguilles à part, pivot au centre (à tourner selon l'heure du jeu)
