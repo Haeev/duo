@@ -1,29 +1,29 @@
 {
  "meshes": {
-  "player_base": 1006,
-  "player_outfit_work": 1042,
-  "player_outfit_smock": 1098,
-  "player_outfit_overalls": 1042,
-  "player_hair_short": 316,
-  "player_hair_bob": 352,
-  "player_hair_bun": 380,
+  "player_base": 1094,
+  "player_outfit_work": 1186,
+  "player_outfit_smock": 1242,
+  "player_outfit_overalls": 1186,
+  "player_hair_short": 676,
+  "player_hair_bob": 676,
+  "player_hair_bun": 632,
   "player_hair_crop": 148,
   "player_hair_curls": 388,
-  "player_hair_ponytail": 328,
-  "player_hair_braid": 396,
-  "player_hair_pigtails": 432,
-  "player_hair_wavy": 352,
-  "player_hair_long": 400,
-  "player_hair_fringe": 280,
-  "player_hair_quiff": 236,
+  "player_hair_ponytail": 580,
+  "player_hair_braid": 648,
+  "player_hair_pigtails": 720,
+  "player_hair_wavy": 676,
+  "player_hair_long": 688,
+  "player_hair_fringe": 604,
+  "player_hair_quiff": 416,
   "player_hair_cloud": 432,
-  "player_hair_crown": 432,
-  "player_hair_bob_long": 380,
+  "player_hair_crown": 648,
+  "player_hair_bob_long": 704,
   "player_beard_short": 224,
   "player_beard_full": 308,
   "player_mustache": 72,
   "wear_top_tshirt": 346,
-  "wear_top_chemise": 598,
+  "wear_top_chemise": 670,
   "wear_top_pull": 514,
   "wear_top_debardeur": 180,
   "wear_top_mariniere": 506,
@@ -70,21 +70,21 @@
   "player_hair_cloud_hat": 432,
   "player_hair_crown_hat": 432,
   "player_hair_bob_long_hat": 380,
-  "villager_firmin": 1806,
-  "villager_odette": 1950,
-  "villager_basile": 2166,
-  "villager_jeanne": 2054,
-  "villager_lucie": 1986,
-  "villager_achille": 1854,
-  "villager_solange": 2050,
+  "villager_firmin": 2038,
+  "villager_odette": 2434,
+  "villager_basile": 2398,
+  "villager_jeanne": 2286,
+  "villager_lucie": 2218,
+  "villager_achille": 2086,
+  "villager_solange": 2534,
   "villager_firmin_scarf": 232,
-  "rail_crew_driver": 1470,
-  "rail_crew_stoker": 1514
+  "rail_crew_driver": 1630,
+  "rail_crew_stoker": 1674
  },
  "animations": [
   {
    "name": "idle",
-   "seconds": 3.0,
+   "seconds": 6.0,
    "loop": true
   },
   {
@@ -261,9 +261,49 @@
    "name": "driver_wave",
    "seconds": 1.067,
    "loop": true
+  },
+  {
+   "name": "sit_down",
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "stand_up",
+   "seconds": 0.6,
+   "loop": false
+  },
+  {
+   "name": "drink",
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "carry_one",
+   "seconds": 0.533,
+   "loop": true
+  },
+  {
+   "name": "carry_one_idle",
+   "seconds": 3.0,
+   "loop": true
+  },
+  {
+   "name": "cook",
+   "seconds": 1.6,
+   "loop": true
+  },
+  {
+   "name": "pickup",
+   "seconds": 1.0,
+   "loop": false
+  },
+  {
+   "name": "feed",
+   "seconds": 1.2,
+   "loop": true
   }
  ],
- "file_bytes": 5594388,
- "player_example_tris": 2872,
- "player_worst_tris": 4406
+ "file_bytes": 6557852,
+ "player_example_tris": 3392,
+ "player_worst_tris": 4642
 }

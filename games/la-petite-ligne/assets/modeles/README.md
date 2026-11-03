@@ -271,41 +271,63 @@ Sources: `assets-src/modeles/garde_robe.py` (pièces), `personnages.py` (assembl
 - Couleurs: les vêtements lisent la rangée 1 de `personnages.png` (inutilisée jusqu'ici par les maillages), que le rendu écrit dans la texture de chaque joueur, à côté de sa rangée 0. Colonnes (`garde_robe.WEAR_SLOTS`): 0 `top_p`, 1 `top_s`, 2 `top_m`, 3 `bottom_p`, 4 `bottom_s`, 5 `bottom_m`, 6 `shoes_p`, 7 `shoes_s`, 8 `outer_p`, 9 `outer_s`, 10 `outer_m`, 11 `hat_p`, 12 `hat_s`, 13 `hat_m`, 14 `wear_metal` (boutons, boucles: `#C8A150`, fixe), 15 `wear_under` (sous-vêtement du corps: `#E4DCCB`, fixe). `_p` = `principale`, `_s` = `secondaire`, `_m` = `motif` (la secondaire s'il manque). Un seul matériau: les pièces portées se fusionnent avec `player_base` comme les tenues d'avant.
 - Coupes sous un chapeau: `player_hair_<coupe>_hat` pour les 15 coupes (ce qui monte au-dessus du bandeau rentre sous la calotte; les mèches du dessous et les tresses restent). Montrer la variante `_hat` dès qu'un `hat` est porté.
 - Les anciennes tenues `player_outfit_work`, `smock`, `overalls` restent dans le fichier le temps que le rendu passe aux vêtements (elles s'enfilent sur le nouveau corps): à retirer ensuite.
-- Budget (bible 8.8, plafond du joueur complet 3 200): tenue courante (chemise, pantalon, bottines, coupe courte, écusson) 2 872 triangles; pire cas (haut et bas les plus lourds, bottines, veste, chapeau de paille, coupe la plus lourde, barbe fournie) 4 406: au-dessus du plafond, signalé (le plafond du joueur habillé de pied en cap est à passer à 4 500, soit au plus 2 x 2 400 triangles de plus qu'avant pour les deux joueurs).
+- Budget (bible 8.8, plafond du joueur habillé de pied en cap 4 500 depuis le 2026-11-03): tenue courante (chemise, pantalon, bottines, coupe courte avec ses mèches, écusson) 3 392 triangles; pire cas sans chapeau (haut et bas les plus lourds, bottines, veste, coupe à mèches la plus lourde, barbe fournie, écusson soleil) 4 642, soit 142 au-dessus du plafond: signalé (dans les +50 % accordés aux personnages avec le plafond de scène à 350 000).
+
+## Passe beauté de la 0.12 (`personnages.glb`)
+
+Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`. Planches: `docs/jeux/jeu-1/gauntlet/captures/v0-12/beaute/beaute-*-avant-apres.webp` (`planche_beaute2.py` puis `planche_beaute2.sh`). Contacts mesurés par `verifier/contacts_gestes.py`.
+
+- Coupes: mèches en lobes allongés couchées sur la calotte, du sommet vers la nuque, les tempes ou le front (une sur trois en `hair_dark`), pour 12 des 15 coupes (ras, boucles et nuage gardent leur forme). Les variantes `_hat` n'ont pas de mèches (cachées par le chapeau). Mêmes mèches sur les chignons d'Odette et de Solange.
+- Habitants: yeux un peu plus grands et plus écartés, mains (moufles) plus franches pour tous, chaussures en galet plus rondes avec semelle, col arrondi en deux rabats couchés sur la poitrine. Aucun nœud renommé.
+- Clips refaits, mêmes noms et mêmes durées (sauf `idle`, qui passe de 3 à 6 s pour varier l'attente): marche en 8 clés (amorti, passage, poussée, balancier des bras avec l'avant-bras en retard, bassin qui tourne et penche, tête qui compense), `carry_two` sur la même base, attente qui respire (toutes les 2 s) avec appui sur une jambe, regard à gauche puis à droite et une main qui se lève, houe et hache avec anticipation, suspension, recul et retour, semis, arrosage qui balaie la rangée, récolte en deux temps, scie et marteau qui poussent avec le buste, parler avec les deux mains, donner, manger, assis, saluer, caresser.
+- Contacts conservés (`gestureImpact` de `src/rendu/reglages.ts`, main droite au plus bas): houe 0,533 s (0,533 avant), récolte 0,30 s (0,30), marteau 0,267 s (0,30 avant, 0,27 attendu), semis inchangé (jet à 0,4 s); hache: la pose de frappe tient de 0,567 à 0,767 s comme avant.
+- Clips nouveaux (pour le branchement action vers clip):
+
+| Clip | Durée | Boucle | Contact | Usage |
+|---|---|---|---|---|
+| `sit_down` | 0,6 s | non | | s'asseoir: de debout à la pose de `sit` (enchaîner sur `sit`) |
+| `stand_up` | 0,6 s | non | | se lever: de `sit` à debout (enchaîner sur `idle`) |
+| `pickup` | 1,0 s | non | 0,43 s | ramasser au sol, remonter l'objet à la poitrine |
+| `feed` | 1,2 s | oui | 0,4 s | nourrir les poules (grain jeté bas depuis un sac à la hanche) |
+| `cook` | 1,6 s | oui | 0,4 s | cuisiner: la droite remue, la gauche tient la casserole |
+| `drink` | 1,6 s | oui | 0,8 s | boire (tasse sous `socket_hand_r`) |
+| `carry_one` | 0,533 s | oui | | marcher en portant seul devant la poitrine (mêmes pas que `walk`) |
+| `carry_one_idle` | 3,0 s | oui | | à l'arrêt avec l'objet porté seul |
 
 ## Fiche par modèle
 
 
 
 
-### `personnages.glb` (5463 Ko)
+
+### `personnages.glb` (6404 Ko)
 
 | Nœud | Triangles |
 |---|---|
-| `player_base` | 1006 |
-| `player_outfit_work` | 1042 |
-| `player_outfit_smock` | 1098 |
-| `player_outfit_overalls` | 1042 |
-| `player_hair_short` | 316 |
-| `player_hair_bob` | 352 |
-| `player_hair_bun` | 380 |
+| `player_base` | 1094 |
+| `player_outfit_work` | 1186 |
+| `player_outfit_smock` | 1242 |
+| `player_outfit_overalls` | 1186 |
+| `player_hair_short` | 676 |
+| `player_hair_bob` | 676 |
+| `player_hair_bun` | 632 |
 | `player_hair_crop` | 148 |
 | `player_hair_curls` | 388 |
-| `player_hair_ponytail` | 328 |
-| `player_hair_braid` | 396 |
-| `player_hair_pigtails` | 432 |
-| `player_hair_wavy` | 352 |
-| `player_hair_long` | 400 |
-| `player_hair_fringe` | 280 |
-| `player_hair_quiff` | 236 |
+| `player_hair_ponytail` | 580 |
+| `player_hair_braid` | 648 |
+| `player_hair_pigtails` | 720 |
+| `player_hair_wavy` | 676 |
+| `player_hair_long` | 688 |
+| `player_hair_fringe` | 604 |
+| `player_hair_quiff` | 416 |
 | `player_hair_cloud` | 432 |
-| `player_hair_crown` | 432 |
-| `player_hair_bob_long` | 380 |
+| `player_hair_crown` | 648 |
+| `player_hair_bob_long` | 704 |
 | `player_beard_short` | 224 |
 | `player_beard_full` | 308 |
 | `player_mustache` | 72 |
 | `wear_top_tshirt` | 346 |
-| `wear_top_chemise` | 598 |
+| `wear_top_chemise` | 670 |
 | `wear_top_pull` | 514 |
 | `wear_top_debardeur` | 180 |
 | `wear_top_mariniere` | 506 |
@@ -352,20 +374,20 @@ Sources: `assets-src/modeles/garde_robe.py` (pièces), `personnages.py` (assembl
 | `player_hair_cloud_hat` | 432 |
 | `player_hair_crown_hat` | 432 |
 | `player_hair_bob_long_hat` | 380 |
-| `villager_firmin` | 1806 |
-| `villager_odette` | 1950 |
-| `villager_basile` | 2166 |
-| `villager_jeanne` | 2054 |
-| `villager_lucie` | 1986 |
-| `villager_achille` | 1854 |
-| `villager_solange` | 2050 |
+| `villager_firmin` | 2038 |
+| `villager_odette` | 2434 |
+| `villager_basile` | 2398 |
+| `villager_jeanne` | 2286 |
+| `villager_lucie` | 2218 |
+| `villager_achille` | 2086 |
+| `villager_solange` | 2534 |
 | `villager_firmin_scarf` | 232 |
-| `rail_crew_driver` | 1470 |
-| `rail_crew_stoker` | 1514 |
+| `rail_crew_driver` | 1630 |
+| `rail_crew_stoker` | 1674 |
 
 | Animation | Durée (s) | Boucle |
 |---|---|---|
-| `idle` | 3.0 | oui |
+| `idle` | 6.0 | oui |
 | `walk` | 0.533 | oui |
 | `carry_two` | 0.8 | oui |
 | `hoe` | 1.0 | oui |
@@ -401,6 +423,14 @@ Sources: `assets-src/modeles/garde_robe.py` (pièces), `personnages.py` (assembl
 | `pole_lower` | 0.5 | non (jouer une fois) |
 | `driver_lean` | 3.0 | oui |
 | `driver_wave` | 1.067 | oui |
+| `sit_down` | 0.6 | non (jouer une fois) |
+| `stand_up` | 0.6 | non (jouer une fois) |
+| `drink` | 1.6 | oui |
+| `carry_one` | 0.533 | oui |
+| `carry_one_idle` | 3.0 | oui |
+| `cook` | 1.6 | oui |
+| `pickup` | 1.0 | non (jouer une fois) |
+| `feed` | 1.2 | oui |
 
 ### `ferme.glb` (1023 Ko)
 
