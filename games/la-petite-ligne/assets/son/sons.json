@@ -5359,6 +5359,1161 @@
       "integratedLufs": -36.0,
       "note": "non placé, quand l'écouteur est dedans (plan.interiorByBuilding); fondu de 0,6 s à la porte",
       "decodeWhen": "l'écouteur est à moins de 6 m de la porte du salon"
+    },
+    "angelus-toll": {
+      "event": "Angélus: un coup du bourdon (sol 4); trois fois trois, puis la volée",
+      "bus": "effects",
+      "priority": 1,
+      "files": [
+        "eglise/angelus-toll-1.ogg",
+        "eglise/angelus-toll-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 5,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 15.0,
+        "rolloffFactor": 0.5,
+        "maxDistance": 400.0,
+        "cullBeyondM": 100000.0,
+        "minGainDb": -14.0
+      },
+      "durationMs": [
+        6274,
+        6156
+      ],
+      "momentaryMaxLufs": -18.0,
+      "note": "placé au clocher (x 87, y -12); séquence plan.sequences.angelus à 7 h, 12 h et 19 h; un coup par traction de corde dans « L'angélus à deux »; accordé, aucune variation de hauteur",
+      "decodeWhen": "à 6 h 55, 11 h 55 et 18 h 55 de jeu (cinq minutes avant chaque angélus), et dès que la corde des cloches est à moins de 10 m d'un joueur"
+    },
+    "bell-peal": {
+      "event": "La volée des trois cloches de Saint-Aubin (10 s, puis la résonance)",
+      "bus": "effects",
+      "priority": 1,
+      "files": [
+        "eglise/bell-peal.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -4.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 15.0,
+        "rolloffFactor": 0.5,
+        "maxDistance": 400.0,
+        "cullBeyondM": 100000.0,
+        "minGainDb": -14.0
+      },
+      "durationMs": [
+        14517
+      ],
+      "momentaryMaxLufs": -16.0,
+      "note": "placé au clocher; entendu partout (jamais sous -14 dB); fin de l'angélus et geste bell_rope_pull (une fois par jour, jamais à moins de 30 minutes d'un angélus); musique -4 dB",
+      "decodeWhen": "à 6 h 55, 11 h 55 et 18 h 55 de jeu (cinq minutes avant chaque angélus), et dès que la corde des cloches est à moins de 10 m d'un joueur"
+    },
+    "harmonium-note": {
+      "event": "Toucher l'harmonium de la nef: une note (pentatonique de sol)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "eglise/harmonium-note-1.ogg",
+        "eglise/harmonium-note-2.ogg",
+        "eglise/harmonium-note-3.ogg",
+        "eglise/harmonium-note-4.ogg",
+        "eglise/harmonium-note-5.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1000,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        3600,
+        3600,
+        3600,
+        3600,
+        3600
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "à l'harmonium; une note par seconde au plus (règle du geste 11); accordé, aucune variation de hauteur; hors messe et chorale",
+      "decodeWhen": "l'écouteur est à moins de 45 m de l'église (x 85 à 105, y -17 à -6) ou dedans"
+    },
+    "harmonium-chord": {
+      "event": "Les deux touchent l'harmonium ensemble: un accord doux (sol, mi mineur, do, ré)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "eglise/harmonium-chord-1.ogg",
+        "eglise/harmonium-chord-2.ogg",
+        "eglise/harmonium-chord-3.ogg",
+        "eglise/harmonium-chord-4.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        4200,
+        4200,
+        4200,
+        4200
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "à la place de harmonium-note quand les deux agissent à moins de 3 s; accordé",
+      "decodeWhen": "l'écouteur est à moins de 45 m de l'église (x 85 à 105, y -17 à -6) ou dedans"
+    },
+    "anvil-strike": {
+      "event": "Un coup sur l'enclume de Mado (sur le fer, à vide, ou avec le rebond)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "metiers/anvil-strike-1.ogg",
+        "metiers/anvil-strike-2.ogg",
+        "metiers/anvil-strike-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 150,
+      "maxVoices": 3,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        308,
+        1232,
+        1383
+      ],
+      "momentaryMaxLufs": -21.0,
+      "note": "gestes des quêtes de Mado (cercler la roue, la grille du père Joseph), coup par coup; la forge au travail est la boucle forge-loop",
+      "decodeWhen": "l'écouteur est à moins de 45 m de la forge (x 98 à 106, y 15 à 20)"
+    },
+    "forge-loop": {
+      "event": "La forge au travail: feu, soufflet, deux volées de coups d'enclume (boucle)",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "metiers/forge-loop.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.02,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        12000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 12.5,
+        "startSample": 24000,
+        "endSample": 600000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "placée à l'enclume de la cour (x 105, y 17) quand Mado y travaille (plan.placedLoops); fondu de 1 s",
+      "decodeWhen": "l'écouteur est à moins de 45 m de la forge (x 98 à 106, y 15 à 20)"
+    },
+    "mill-wheel": {
+      "event": "La roue à aubes du moulin sur le bief (boucle)",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "metiers/mill-wheel.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        16000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 16.5,
+        "startSample": 24000,
+        "endSample": 792000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -27.0,
+      "note": "placée à la roue (x -14, y 34,5) dès que le moulin tourne; c'est « la berceuse de Berthe » du geste millwheel_watch",
+      "decodeWhen": "le moulin tourne (après « La vanne coincée ») et l'écouteur est à moins de 45 m du moulin (x -17 à -11)"
+    },
+    "millstone": {
+      "event": "La salle des meules en marche: meule, rouet, auget, farine (boucle)",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "metiers/millstone.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        12000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 12.5,
+        "startSample": 24000,
+        "endSample": 600000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -29.0,
+      "note": "placée aux meules (x -15, y 31) quand le moulin moud (Berthe à l'ensachage, 6 h 30 à 12 h); dedans et de la cour",
+      "decodeWhen": "le moulin tourne (après « La vanne coincée ») et l'écouteur est à moins de 45 m du moulin (x -17 à -11)"
+    },
+    "sluice-open": {
+      "event": "La vanne du bief se lève: cliquet, bois, l'eau se rue, la roue démarre (7 s)",
+      "bus": "effects",
+      "priority": 2,
+      "files": [
+        "metiers/sluice-open.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        7000
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "à la vanne (x -12, y 34), fin du geste à deux de la quête; mill-wheel prend le relais en fondu de 1,5 s",
+      "decodeWhen": "la quête « La vanne coincée » est en cours"
+    },
+    "washboard-beat": {
+      "event": "Le battoir sur le linge mouillé, au lavoir",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "metiers/washboard-beat-1.ogg",
+        "metiers/washboard-beat-2.ogg",
+        "metiers/washboard-beat-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 350,
+      "maxVoices": 2,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        336,
+        315,
+        276
+      ],
+      "momentaryMaxLufs": -23.0,
+      "note": "au lavoir; un coup toutes les 0,6 à 0,8 s tant qu'Agir est maintenu (washhouse_scrub); aussi Margot et Colette le lundi de 9 h à 11 h, un coup toutes les 1,5 à 3 s",
+      "decodeWhen": "l'écouteur est à moins de 45 m du lavoir (x 99 à 103, y 35 à 37)"
+    },
+    "plic": {
+      "event": "Un rebond du galet sur l'eau (ricochet)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/plic-1.ogg",
+        "decor/plic-2.ogg",
+        "decor/plic-3.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.06,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 60,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        162,
+        170,
+        174
+      ],
+      "momentaryMaxLufs": -26.0,
+      "note": "un par rebond (0 à 7), au point du rebond; chaque rebond 1,5 dB plus bas et 12 % plus tôt que le précédent (au moteur, par gainDb et l'instant)",
+      "decodeWhen": "l'écouteur est à moins de 20 m de la berge, de la langue de sable ou du ponton"
+    },
+    "well-drop": {
+      "event": "Penché au puits: une goutte tombe au fond et résonne",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/well-drop-1.ogg",
+        "decor/well-drop-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 10000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        1997,
+        2203
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "au puits, geste well_peek; la seconde variante fait deux gouttes",
+      "decodeWhen": "l'écouteur est à moins de 20 m du puits de la place"
+    },
+    "well-echo": {
+      "event": "Maintenir au puits: le hululement dans les mains descend et revient (« hou… ou… »)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/well-echo.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 10000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        2406
+      ],
+      "momentaryMaxLufs": -22.0,
+      "note": "au puits; aucune voix: un son soufflé dans les mains jointes, comme un appeau",
+      "decodeWhen": "l'écouteur est à moins de 20 m du puits de la place"
+    },
+    "lookout-echo": {
+      "event": "Crier au belvédère: le hululement dans les mains et le double écho de la vallée",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/lookout-echo-1.ogg",
+        "decor/lookout-echo-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 60000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 3.0,
+        "rolloffFactor": 1.0,
+        "maxDistance": 45.0,
+        "cullBeyondM": 45.0
+      },
+      "durationMs": [
+        3717,
+        3667
+      ],
+      "momentaryMaxLufs": -20.0,
+      "note": "au belvédère, chez celui qui crie (et placé chez l'autre s'il est à moins de 45 m); une fois par minute",
+      "decodeWhen": "l'écouteur est à moins de 30 m du belvédère (6,5 ; -24,5)"
+    },
+    "lookout-echo-far": {
+      "event": "Le cri du belvédère entendu du bourg: un écho lointain, plus faible",
+      "bus": "effects",
+      "priority": 4,
+      "files": [
+        "decor/lookout-echo-far.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 60000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        4329
+      ],
+      "momentaryMaxLufs": -30.0,
+      "note": "non placé, chez l'autre seulement s'il est loin du belvédère",
+      "decodeWhen": "en même temps que lookout-echo, chez l'autre joueur quand il est à plus de 45 m"
+    },
+    "step-leaves": {
+      "event": "Pas dans les feuilles mortes (forêt, lisière en automne)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/step-leaves-1.ogg",
+        "decor/step-leaves-2.ogg",
+        "decor/step-leaves-3.ogg",
+        "decor/step-leaves-4.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.06,
+      "gainVariationDb": 1.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 120,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        301,
+        302,
+        303,
+        304
+      ],
+      "momentaryMaxLufs": -28.5,
+      "note": "à la place de step-path sur le sol « feuilles » de la carte (pas: feuilles, lot L1)",
+      "decodeWhen": "l'écouteur est dans la forêt (y < 2) ou à la lisière en automne"
+    },
+    "cat-purr": {
+      "event": "Caresser le chat: il ronronne",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/cat-purr-1.ogg",
+        "decor/cat-purr-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.04,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 10000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 28.0,
+        "cullBeyondM": 28.0
+      },
+      "durationMs": [
+        2574,
+        2570
+      ],
+      "momentaryMaxLufs": -27.0,
+      "note": "au chat, geste cat_pet; 10 s au moins entre deux (règle 7.0)",
+      "decodeWhen": "le chat est à moins de 20 m de l'écouteur"
+    },
+    "cat-meow": {
+      "event": "Le chat miaule doucement (il salue ou suit un joueur)",
+      "bus": "effects",
+      "priority": 3,
+      "files": [
+        "decor/cat-meow-1.ogg",
+        "decor/cat-meow-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.05,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 20000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 2.0,
+        "rolloffFactor": 1.3,
+        "maxDistance": 12.0,
+        "cullBeyondM": 12.0
+      },
+      "durationMs": [
+        319,
+        619
+      ],
+      "momentaryMaxLufs": -25.0,
+      "note": "au chat: variante 1 « mrrp » quand il commence à suivre un joueur, variante 2 quand il dépose sa trouvaille devant la maisonnette; jamais plus d'une fois par 20 s",
+      "decodeWhen": "le chat est à moins de 20 m de l'écouteur"
+    },
+    "pencil-note": {
+      "event": "Carnet: une habitude s'écrit au crayon (doux)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "carnet/pencil-note-1.ogg",
+        "carnet/pencil-note-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.03,
+      "gainVariationDb": 1.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 1500,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        577,
+        644
+      ],
+      "momentaryMaxLufs": -27.0,
+      "note": "chez les deux, avec la notification « Carnet: … »; aussi quand une habitude se barre et que la nouvelle s'écrit",
+      "decodeWhen": "au lancement de la partie (les découvertes tombent partout)"
+    },
+    "bond-chime": {
+      "event": "Amitié: la lanterne frémit (petit son de verre)",
+      "bus": "ui",
+      "priority": 3,
+      "files": [
+        "carnet/bond-chime-1.ogg",
+        "carnet/bond-chime-2.ogg"
+      ],
+      "pick": "shuffle-no-repeat",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.5,
+      "volumeDb": 0.0,
+      "minIntervalMs": 2000,
+      "maxVoices": 1,
+      "duckMusicDb": 0.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        976,
+        884
+      ],
+      "momentaryMaxLufs": -24.0,
+      "note": "au premier gain du jour avec un habitant, chez qui parle; ré 6 ou sol 6, sans variation de hauteur",
+      "decodeWhen": "au lancement de la partie (on parle à tout le monde)"
+    },
+    "bond-level": {
+      "event": "Amitié: un niveau passé, une lanterne s'allume (petite volée de clochettes)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "carnet/bond-level.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3200
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "chez les deux, avec la notification « Avec … : … »; sol majeur, sans variation",
+      "decodeWhen": "au lancement de la partie"
+    },
+    "birthday-chime": {
+      "event": "Souhaiter un anniversaire (boîte à musique, harpe, petit bouquet)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "carnet/birthday-chime.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3800
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "chez celui qui souhaite (choix « Bon anniversaire »), et chez l'autre s'il est à moins de 8 m; sol majeur",
+      "decodeWhen": "le jour d'un anniversaire (birthday_of), dès l'aube"
+    },
+    "decision-agree": {
+      "event": "Décision à deux: les deux choix se rejoignent (« Décidé ensemble »)",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "carnet/decision-agree.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 1,
+      "duckMusicDb": -6.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2482
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "chez les deux, 0,2 s après le tampon existant (order-stamp); aucun son pour un désaccord",
+      "decodeWhen": "à l'ouverture du panneau de décision à deux"
+    },
+    "forest-deep": {
+      "event": "La forêt profonde: cimes, feuilles, pic, geai, ramier, tronc qui grince (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/forest-deep.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        40000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 40.5,
+        "startSample": 24000,
+        "endSample": 1944000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -30.0,
+      "note": "non placé, réglé par la position (plan.ambienceByRegion): plein dans le bois, éteint en 8 m à la lisière; le vent du bourg baisse de 4 dB dedans",
+      "decodeWhen": "l'écouteur est à moins de 10 m de la forêt (y < 2, hors lisière du bourg)"
+    },
+    "farm": {
+      "event": "La ferme des Delmas: poules, vache, clochette, chaîne, seau, grange (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/farm.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": {
+        "distanceModel": "inverse",
+        "refDistance": 8.0,
+        "rolloffFactor": 0.7,
+        "maxDistance": 120.0,
+        "cullBeyondM": 160.0
+      },
+      "durationMs": [
+        40000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 40.5,
+        "startSample": 24000,
+        "endSample": 1944000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -31.0,
+      "note": "placée dans la cour (plan.ambienceByRegion), de 6 h à 21 h; la nuit, rien",
+      "decodeWhen": "l'écouteur est à moins de 45 m de la cour de la ferme (x 112, y 33)"
+    },
+    "church-inside": {
+      "event": "Dans la nef de Saint-Aubin: la pierre, l'horloge du clocher, un banc, les pigeons (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/church-inside.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        30000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 30.5,
+        "startSample": 24000,
+        "endSample": 1464000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -37.0,
+      "note": "non placé, quand l'écouteur est dans l'église (plan.interiorByBuilding); fondu de 0,6 s",
+      "decodeWhen": "l'écouteur est à moins de 6 m du portail de l'église"
+    },
+    "room-tone-cafe": {
+      "event": "Dans la salle du café: poêle, tasses, cuillère, zinc, chaise, cartes (boucle)",
+      "bus": "ambience",
+      "priority": 4,
+      "files": [
+        "ambiance/room-tone-cafe.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 0,
+      "maxVoices": 4,
+      "duckMusicDb": 0.0,
+      "channels": 1,
+      "spatial": null,
+      "durationMs": [
+        30000
+      ],
+      "loop": {
+        "startSeconds": 0.5,
+        "endSeconds": 30.5,
+        "startSample": 24000,
+        "endSample": 1464000,
+        "sampleRate": 48000
+      },
+      "playFromSeconds": 0.5,
+      "integratedLufs": -35.0,
+      "note": "non placé, quand l'écouteur est dans le café (plan.interiorByBuilding); fondu de 0,6 s",
+      "decodeWhen": "l'écouteur est à moins de 6 m de la porte du café"
+    },
+    "talk-armand": {
+      "event": "Motif de Armand Castagné, l'instituteur",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-armand.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3868
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (armand) est à moins de 20 m de l'écouteur"
+    },
+    "talk-berthe": {
+      "event": "Motif de Berthe Lavergne, la meunière",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-berthe.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4000
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (berthe) est à moins de 20 m de l'écouteur"
+    },
+    "talk-martial": {
+      "event": "Motif de Martial Roques, le curé",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-martial.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2860
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (martial) est à moins de 20 m de l'écouteur"
+    },
+    "talk-marthe": {
+      "event": "Motif de Marthe Bousquet, la sacristine et sonneuse",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-marthe.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3600
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (marthe) est à moins de 20 m de l'écouteur"
+    },
+    "talk-honorine": {
+      "event": "Motif de Honorine Valade, la doyenne",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-honorine.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3600
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (honorine) est à moins de 20 m de l'écouteur"
+    },
+    "talk-ines": {
+      "event": "Motif de Inès Garrigue, la garde forestière",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-ines.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3800
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (ines) est à moins de 20 m de l'écouteur"
+    },
+    "talk-barnabe": {
+      "event": "Motif de Barnabé Tixier, le bûcheron et charbonnier",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-barnabe.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4600
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (barnabe) est à moins de 20 m de l'écouteur"
+    },
+    "talk-mado": {
+      "event": "Motif de Madeleine « Mado » Cazals, la forgeronne",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-mado.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2949
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (mado) est à moins de 20 m de l'écouteur"
+    },
+    "talk-paulin": {
+      "event": "Motif de Paulin Delmas, le cultivateur",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-paulin.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        3600
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (paulin) est à moins de 20 m de l'écouteur"
+    },
+    "talk-margot": {
+      "event": "Motif de Margot Delmas, la cultivatrice",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-margot.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2986
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (margot) est à moins de 20 m de l'écouteur"
+    },
+    "talk-leon": {
+      "event": "Motif de Léon Delmas, l'écolier",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-leon.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2301
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (leon) est à moins de 20 m de l'écouteur"
+    },
+    "talk-ambroise": {
+      "event": "Motif de Ambroise Pélissier, l'horloger",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-ambroise.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        2478
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (ambroise) est à moins de 20 m de l'écouteur"
+    },
+    "talk-nour": {
+      "event": "Motif de Nour Belkacem, la vétérinaire",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-nour.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        1859
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (nour) est à moins de 20 m de l'écouteur"
+    },
+    "talk-colette": {
+      "event": "Motif de Colette Lafon, la cafetière",
+      "bus": "ui",
+      "priority": 2,
+      "files": [
+        "voisins/talk-colette.ogg"
+      ],
+      "pick": "single",
+      "pitchVariation": 0.0,
+      "gainVariationDb": 0.0,
+      "volumeDb": 0.0,
+      "minIntervalMs": 4000,
+      "maxVoices": 4,
+      "duckMusicDb": -8.0,
+      "channels": 2,
+      "spatial": null,
+      "durationMs": [
+        4200
+      ],
+      "momentaryMaxLufs": -19.0,
+      "note": "joué à l'ouverture d'une conversation, chez celui qui parle à l'habitant; musique atténuée",
+      "decodeWhen": "l'habitant (colette) est à moins de 20 m de l'écouteur"
     }
   },
   "music": {
@@ -5852,6 +7007,36 @@
           "outdoorDb": -8.0,
           "rain": "rain-roof",
           "note": "mercerie-coiffure de Solange: la vitrine laisse passer la rue"
+        },
+        "church": {
+          "roomTone": "church-inside",
+          "roomToneDb": 0.0,
+          "outdoorLowpassHz": 700,
+          "outdoorDb": -13.0,
+          "rain": "rain-roof",
+          "note": "la nef: murs de pierre épais, le dehors presque effacé; les cloches restent entendues (elles sont au-dessus)"
+        },
+        "cafe": {
+          "roomTone": "room-tone-cafe",
+          "roomToneDb": 0.0,
+          "outdoorLowpassHz": 1100,
+          "outdoorDb": -9.0,
+          "rain": "rain-roof",
+          "note": "la salle du café: porte vitrée sur la placette, comme l'épicerie"
+        },
+        "forge": {
+          "roomTone": null,
+          "outdoorLowpassHz": 1400,
+          "outdoorDb": -6.0,
+          "rain": "rain-roof",
+          "note": "l'atelier: la grande porte est ouverte, le feu et l'enclume sont dans la cour (forge-loop)"
+        },
+        "mill": {
+          "roomTone": null,
+          "outdoorLowpassHz": 900,
+          "outdoorDb": -10.0,
+          "rain": "rain-roof",
+          "note": "la salle des meules: millstone y est placée, la roue s'entend à travers le mur sud"
         }
       },
       "otherPlayerInside": {
@@ -5877,6 +7062,76 @@
         30
       ]
     },
+    "angelus": {
+      "description": "Marthe sonne l'angélus trois fois par jour (son planning: corde des cloches); le son ne dépend pas de sa présence (on l'entend aussi pendant une scène). Après « L'angélus à deux », la quête rejoue les coups un par un (angelus-toll à chaque traction), puis bell-peal.",
+      "hours": [
+        7,
+        12,
+        19
+      ],
+      "sequence": "angelus",
+      "at": {
+        "x": 87.0,
+        "y": -12.0
+      },
+      "pauseVillagersSeconds": 3
+    },
+    "placedLoops": [
+      {
+        "sound": "forge-loop",
+        "at": {
+          "x": 105.0,
+          "y": 17.0
+        },
+        "when": "Mado à son habitude de forge dans la cour (activité work au point forge_yard), hors dimanche",
+        "fadeMs": 1000
+      },
+      {
+        "sound": "mill-wheel",
+        "at": {
+          "x": -14.0,
+          "y": 34.5
+        },
+        "when": "le moulin tourne (drapeau mill_running, après « La vanne coincée »), jour et nuit",
+        "fadeMs": 1500
+      },
+      {
+        "sound": "millstone",
+        "at": {
+          "x": -15.0,
+          "y": 31.0
+        },
+        "when": "le moulin moud: Berthe à l'ensachage (6 h 30 à 12 h) une fois le moulin remis en marche",
+        "fadeMs": 1500
+      }
+    ],
+    "ambienceByRegion": [
+      {
+        "ambience": "forest-deep",
+        "region": "forêt (y < 2, hors lisière du bourg)",
+        "fadeInMeters": 8,
+        "volumeDb": 0.0,
+        "alsoLowerDb": {
+          "wind": -4.0,
+          "village": -6.0,
+          "birds-morning": -3.0
+        },
+        "description": "sous les houppiers: plein à 8 m dans le bois, éteint à la lisière"
+      },
+      {
+        "ambience": "farm",
+        "at": {
+          "x": 112.0,
+          "y": 33.0
+        },
+        "hours": [
+          6,
+          21
+        ],
+        "volumeDb": 0.0,
+        "description": "placée dans la cour de la ferme, préréglage loin"
+      }
+    ],
     "peer": {
       "description": "Les sons de l'autre joueur sont placés à sa position (PannerNode) et joués un peu plus bas que les siens; ses sons d'interface ne s'entendent pas chez soi, sauf le repère (ping-peer) et la proposition d'achat.",
       "peerWorldSoundsDb": -3.0
@@ -5988,6 +7243,51 @@
             "play": "nuit",
             "kind": "music",
             "when": "les deux couchés"
+          }
+        ]
+      },
+      "angelus": {
+        "description": "Angélus (7 h, 12 h, 19 h): trois fois trois coups du bourdon, puis la volée. Coups espacés de 1,6 s, 3,2 s entre deux séries; la volée part 3,5 s après le dernier coup.",
+        "steps": [
+          {
+            "at": 0.0,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 1.6,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 3.2,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 6.4,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 8.0,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 9.6,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 12.8,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 14.4,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 16.0,
+            "play": "angelus-toll"
+          },
+          {
+            "at": 19.5,
+            "play": "bell-peal"
           }
         ]
       }
