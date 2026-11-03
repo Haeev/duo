@@ -11,9 +11,9 @@
   "player_hair_curls": 388,
   "player_hair_ponytail": 580,
   "player_hair_braid": 648,
-  "player_hair_pigtails": 720,
-  "player_hair_wavy": 676,
-  "player_hair_long": 688,
+  "player_hair_pigtails": 840,
+  "player_hair_wavy": 804,
+  "player_hair_long": 748,
   "player_hair_fringe": 604,
   "player_hair_quiff": 416,
   "player_hair_cloud": 432,
@@ -62,9 +62,9 @@
   "player_hair_curls_hat": 388,
   "player_hair_ponytail_hat": 328,
   "player_hair_braid_hat": 396,
-  "player_hair_pigtails_hat": 432,
-  "player_hair_wavy_hat": 352,
-  "player_hair_long_hat": 400,
+  "player_hair_pigtails_hat": 552,
+  "player_hair_wavy_hat": 480,
+  "player_hair_long_hat": 460,
   "player_hair_fringe_hat": 280,
   "player_hair_quiff_hat": 236,
   "player_hair_cloud_hat": 432,
@@ -337,7 +337,7 @@
    "loop": true
   }
  ],
- "file_bytes": 11108900,
+ "file_bytes": 11180908,
  "player_example_tris": 3392,
- "player_worst_tris": 4642
+ "player_worst_tris": 4762
 }

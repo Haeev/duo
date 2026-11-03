@@ -1242,43 +1242,77 @@ def notice_board(A):
     return g
 
 
+POLICE_PANNEAU = os.path.join(os.path.dirname(os.path.abspath(__file__)), "polices", "jost-latin-700-normal.woff")
+
+
+def text_shapes(text, cap_h, max_w, tracking=1.0, res=2):
+    """Texte en capitales triangulé à plat (police Jost Bold, OFL, `polices/`), centré sur l'origine, en mètres:
+    (sommets (x, z), triangles). Capitales de cap_h de haut, ramenées à max_w de large si besoin."""
+    font = bpy.data.fonts.load(POLICE_PANNEAU, check_existing=True)
+    cu = bpy.data.curves.new("texte_" + text, "FONT")
+    cu.body, cu.font, cu.resolution_u, cu.space_character = text, font, res, tracking
+    cu.align_x, cu.align_y = "CENTER", "CENTER"
+    ob = bpy.data.objects.new("texte_" + text, cu)
+    bpy.context.scene.collection.objects.link(ob)
+    me = bpy.data.meshes.new_from_object(ob.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    # hauteur des capitales mesurée sur le E (sans dépassement des courbes)
+    cu.body = "E"
+    me_e = bpy.data.meshes.new_from_object(ob.evaluated_get(bpy.context.evaluated_depsgraph_get()))
+    ze = [v.co.y for v in me_e.vertices]
+    zs = [v.co.y for v in me.vertices]
+    xs = [v.co.x for v in me.vertices]
+    k = min(cap_h / (max(ze) - min(ze)), max_w / (max(xs) - min(xs)))
+    cx, cz = (max(xs) + min(xs)) / 2, (max(zs) + min(zs)) / 2
+    pts = [((v.co.x - cx) * k, (v.co.y - cz) * k) for v in me.vertices]
+    faces = [list(p.vertices) for p in me.polygons]
+    bpy.data.objects.remove(ob, do_unlink=True)
+    bpy.data.curves.remove(cu)
+    bpy.data.meshes.remove(me)
+    bpy.data.meshes.remove(me_e)
+    return pts, faces
+
+
+SIGN_POST_X = 0.93    # axe des poteaux
+SIGN_PLATE = (1.8, 0.56, 1.78)   # cadre: largeur, hauteur, bas
+
+
 def station_sign(A):
-    """Panneau « Aubrune » sur deux poteaux (lettres stylisées: aplats, pas de texte)."""
+    """Plaque de quai « AUBRUNE » (0.12.2, retour R07 du 2026-11-03): plaque émaillée bleue à lettres et
+    filet blancs, sertie dans un cadre de fer, entre deux poteaux de fonte à pied évasé. Le panneau est posé au fond
+    du quai, parallèle à la voie: la face +Y (glTF -Z, le nord à la rotation 0 de la carte) regarde la voie et les
+    voyageurs; la face -Y (le sud, vers la place) porte aussi le nom, comme les plaques double face des petites
+    gares, et c'est elle que voit la caméra par défaut. Chaque face se lit de gauche à droite depuis son côté.
+    Lettres: contours de la police Jost Bold (OFL) triangulés, en géométrie (pas de texture): nettes à tout zoom."""
     g = A.geo()
-    for x in (-0.85, 0.85):
-        g.box((0.1, 0.1, 2.3), loc=(x, 0, 0), color="iron", base=True)
-        g.box((0.2, 0.2, 0.1), loc=(x, 0, 0), color="stone", base=True)
-    g.box((1.9, 0.08, 0.5), loc=(0, 0, 1.95), color="white_paint", base=True, bevel=0.02)
-    g.box((1.96, 0.06, 0.56), loc=(0, 0.02, 1.92), color="paint_blue", base=True)
-    # lettres AUBRUNE en relief (police de 3 x 5 pavés), sur les deux faces (lisibles de chaque côté)
-    # police grasse de 4 x 5 pavés: B à deux panses, N à diagonale épaisse, lignes jointives
-    glyphs = {"A": ("0110", "1101", "1111", "1101", "1101"), "U": ("1101", "1101", "1101", "1101", "0110"),
-              "B": ("1110", "1101", "1110", "1101", "1110"), "R": ("1110", "1101", "1110", "1110", "1101"),
-              "N": ("1001", "1101", "1111", "1011", "1001"), "E": ("1111", "1100", "1110", "1100", "1111")}
-    px, word, gw = 0.052, "AUBRUNE", 4
-    x0 = -(len(word) * (gw + 1) - 1) * px / 2
-    for face, yy in ((1, -0.0415), (-1, 0.0515)):
-        for i, ch in enumerate(word):
-            for r, row in enumerate(glyphs[ch]):
-                c = 0
-                while c < gw:
-                    if row[c] == "1":
-                        c2 = c
-                        while c2 + 1 < gw and row[c2 + 1] == "1":
-                            c2 += 1
-                        xa = x0 + (i * (gw + 1) + c) * px
-                        xb = x0 + (i * (gw + 1) + c2 + 1) * px
-                        xc = (xa + xb) / 2 * face  # au dos, le mot se lit dans l'autre sens: miroir
-                        # lettres en aplat (2 triangles par pavé): face avant bleue sur blanc, dos blanc sur bleu
-                        hw, z = (xb - xa) / 2, 2.07 + (2 - r) * px
-                        za, zb = z - px / 2, z + px / 2
-                        quad = [(xc - hw, yy, za), (xc + hw, yy, za), (xc + hw, yy, zb), (xc - hw, yy, zb)]
-                        g.quad(quad if face > 0 else list(reversed(quad)), "paint_blue" if face > 0 else "white_paint")
-                        c = c2 + 1
-                    else:
-                        c += 1
-    for x in (-0.85, 0.85):
-        g.sphere(0.06, loc=(x, 0, 2.33), color="iron", segs=6, rings=4)
+    w, h, z0 = SIGN_PLATE
+    zc = z0 + h / 2
+    # poteaux de fonte (6 pans, bible 8.4): petit pied évasé à moulure posé sur le quai, fût de 8 à 7 cm
+    # légèrement conique, bague et pomme en ogive au sommet
+    prof = [(0.09, 0.0), (0.09, 0.03), (0.062, 0.1), (0.05, 0.15), (0.058, 0.16), (0.058, 0.19), (0.042, 0.21),
+            (0.036, 2.36), (0.048, 2.37), (0.048, 2.4), (0.03, 2.42), (0.0, 2.49)]
+    for x in (-SIGN_POST_X, SIGN_POST_X):
+        g.lathe(prof, loc=(x, 0, 0), colors="iron", segs=6, phase=30)
+        # colliers qui tiennent le cadre en haut et en bas
+        for z in (z0 + 0.06, z0 + h - 0.06):
+            g.cyl(0.05, 0.05, loc=(x, 0, z), color="iron", segs=6)
+            g.box((0.09, 0.02, 0.04), loc=(x - 0.045 * (1 if x > 0 else -1), 0, z), color="iron", no_round=True)
+    # cadre de fer (le bord), plaque émaillée bleue sur chaque face, filet blanc à 3 cm du bord
+    t = 0.034
+    g.box((w, t, h), loc=(0, 0, z0), color="iron", base=True, bevel=0.008, bseg=1)
+    inner_w, inner_h = w - 0.07, h - 0.07
+    pts, faces = text_shapes("AUBRUNE", 0.24, inner_w - 0.24, tracking=1.08)
+    for side in (-1, 1):
+        y_panel = side * (t / 2 + 0.002)
+        g.box((inner_w, 0.004, inner_h), loc=(0, y_panel, zc), color="ceramic_blue", no_round=True)
+        y_face = side * (t / 2 + 0.004 + 0.0015)
+        fw, fh, fb = inner_w - 0.07, inner_h - 0.07, 0.016
+        for (sx, sz, px, pz) in ((fw, fb, 0, fh / 2 - fb / 2), (fw, fb, 0, -fh / 2 + fb / 2),
+                                 (fb, fh - 2 * fb, fw / 2 - fb / 2, 0), (fb, fh - 2 * fb, -fw / 2 + fb / 2, 0)):
+            g.box((sx, 0.003, sz), loc=(px, y_face - side * 0.0015, zc + pz), color="ceramic", no_round=True)
+        # lettres à plat, 1,5 mm devant l'émail; au dos, tournées d'un demi-tour autour de la verticale (lisibles
+        # de ce côté, même sens de faces)
+        co = [(x * -side, y_face, zc + z) for x, z in pts]
+        g.mesh(co, faces, "ceramic")
     return g
 
 
