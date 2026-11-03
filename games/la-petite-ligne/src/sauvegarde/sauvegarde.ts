@@ -32,6 +32,8 @@ import { emptyBoard } from '../simulation/annonces';
 import { emptyImprovements } from '../simulation/chantiers';
 import { freeStuck } from '../simulation/deblocage';
 import { migrateToWardrobe, settleWardrobe, wardrobeShapeOk } from './garde-robe';
+import { emptyBreeding } from '../etat/elevage';
+import { storeAtHome } from '../simulation/rangement';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -147,6 +149,7 @@ function checkWorld(data: unknown): WorldState {
   checkDecor(data);
   checkFishing(data.fishing);
   if (!wardrobeShapeOk(characters)) throw new SaveError('sauvegarde: garde-robe invalide');
+  checkBreeding(data);
   return data as unknown as WorldState;
 }
 
@@ -503,7 +506,33 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 10 && isRecord(data)) migrateToFormat10(data, content);
   // Format 11 (0.12, après la pêche au format 10): la tenue (`outfit`) devient des vêtements portés et une garde-robe.
   if (dataSchema < 11 && isRecord(data)) migrateToWardrobe(data, content.clothes);
+  // Formats 10 à 12: pêche, garde-robe, économie (autres lots de la 0.12). 13: élevage.
+  if (dataSchema < 13 && isRecord(data)) migrateToBreeding(data, content);
   return data;
+}
+
+/**
+ * Format 13 (0.12, élevage, conception section 4.6): chaque poule prend le bonheur de la migration
+ * (60, « Tranquille »: rien ne change pour qui ne fait que nourrir), l'élevage part vide (ni coq, ni
+ * chèvre, ni couvée), et les recettes sans condition parues depuis (fromage frais) sont connues.
+ */
+function migrateToBreeding(world: Record<string, unknown>, content: Content): void {
+  const start = content.settings.hens.care?.happiness.migration ?? 60;
+  if (Array.isArray(world.hens)) for (const h of world.hens) if (isRecord(h) && typeof h.happiness !== 'number') h.happiness = start;
+  if (!isRecord(world.breeding)) world.breeding = emptyBreeding();
+  if (Array.isArray(world.unlockedRecipes)) {
+    const known = new Set(world.unlockedRecipes);
+    for (const r of Object.values(content.recipes)) if (!r.requiresUnlock && !known.has(r.id)) world.unlockedRecipes.push(r.id);
+  }
+}
+
+/** L'élevage relu (format 13): assez de forme pour ne pas planter sur une sauvegarde abîmée. */
+function checkBreeding(data: Record<string, unknown>): void {
+  const b = data.breeding;
+  if (!isRecord(b) || !Array.isArray(b.chicks) || !Array.isArray(b.goats) || !Array.isArray(b.naming) || !Array.isArray(b.namesUsed) || typeof b.grainRations !== 'number' || !isRecord(b.grazed)) {
+    throw new SaveError('sauvegarde: élevage invalide');
+  }
+  for (const h of data.hens as unknown[]) if (!isRecord(h) || typeof h.happiness !== 'number') throw new SaveError('sauvegarde: poule sans bonheur');
 }
 
 /**
@@ -733,6 +762,9 @@ function resume(
   if (dataSchema < 7) migrateToTour10(sim);
   // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
   settleDecor(sim);
+  // Format 13 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
+  const grain = content.settings.hens.care?.grain.item;
+  if (dataSchema < 13 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

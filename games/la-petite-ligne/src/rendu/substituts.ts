@@ -257,6 +257,24 @@ const ITEMS: Record<string, Builder> = {
     b.cylinder(0.01, 0.022, 1.7, [0, 0, 0], 'straw', { base: true, segments: 4 });
     for (const y of [0.4, 0.8, 1.2]) b.cylinder(0.026, 0.026, 0.03, [0, y, 0], 'wood_dark', { base: true, segments: 4 });
   },
+  grain_sack: (b) => {
+    b.box([0.34, 0.42, 0.24], [0, 0, 0], 'burlap', { base: true });
+    b.box([0.24, 0.06, 0.16], [0, 0.42, 0], 'burlap_dark', { base: true });
+  },
+  straw_armful: (b) => b.blob(0.18, [0, 0.12, 0], 'straw', { scale: [1.4, 0.6, 1] }),
+  water_pail: (b) => {
+    b.cylinder(0.13, 0.11, 0.26, [0, 0, 0], 'wood', { base: true, segments: 10 });
+    b.cylinder(0.12, 0.12, 0.01, [0, 0.24, 0], 'water', { base: true, segments: 10 });
+  },
+  milk_can: (b) => {
+    b.cylinder(0.12, 0.12, 0.34, [0, 0, 0], 'tin', { base: true, segments: 10 });
+    b.cylinder(0.06, 0.08, 0.08, [0, 0.34, 0], 'tin', { base: true, segments: 8 });
+  },
+  fresh_cheese: (b) => b.cylinder(0.07, 0.07, 0.05, [0, 0, 0], 'fabric_cream', { base: true, segments: 10 }),
+  goat_stake: (b) => {
+    b.cylinder(0.03, 0.025, 0.5, [0, 0, 0], 'wood_old', { base: true, segments: 6 });
+    b.box([0.08, 0.04, 0.08], [0, 0.4, 0], 'rope', { base: true });
+  },
   hen_crate: (b) => {
     b.box([0.6, 0.45, 0.45], [0, 0, 0], 'wood_new', { base: true });
     b.box([0.5, 0.3, 0.02], [0, 0.08, 0.23], 'straw', { base: true });
@@ -628,11 +646,59 @@ function hen(feather: PaletteCell): Builder {
   };
 }
 
+/** Poule coucou: plumage gris rayé de blanc (0.12). */
+function cuckooHen(b: ShapeBuilder, w: number, d: number): void {
+  hen('heron_grey')(b, w, d);
+  for (const z of [-0.12, 0, 0.12]) b.box([0.3, 0.025, 0.035], [0, 0.36, z], 'feather_white', {});
+}
+
+/**
+ * Élevage de la 0.12 (conception section 4, lot L-rendu-modèles): substituts en attendant les modèles
+ * de l'artiste, mêmes noms de nœuds (`hen_rooster`, `hen_chick`, `goat`, `goat_stake`, `goat_shed`;
+ * `straw_bale` n'a pas encore de modèle). Le coq est plus grand que la poule (crête, queue en faucille), la
+ * poussine fait 0,12 m, la chèvre 0,75 m au garrot avec son collier et sa clochette.
+ */
+function rooster(b: ShapeBuilder): void {
+  b.ball(0.2, [0, 0.3, 0], 'owl_buff', { scale: [1, 0.9, 1.25] });
+  b.ball(0.1, [0, 0.52, 0.17], 'owl_buff');
+  b.box([0.03, 0.12, 0.12], [0, 0.64, 0.17], 'comb_red', {});
+  b.box([0.03, 0.06, 0.04], [0, 0.44, 0.26], 'comb_red', {});
+  b.cone(0.03, 0.07, [0, 0.52, 0.28], 'beak', { rotation: [90, 0, 0], segments: 4 });
+  // Queue en faucille: plumes vert sombre qui retombent derrière.
+  b.box([0.05, 0.3, 0.06], [0, 0.42, -0.26], 'loco_green', { rotation: [-25, 0, 0] });
+  b.box([0.05, 0.26, 0.06], [0, 0.4, -0.32], 'black', { rotation: [-50, 0, 0] });
+  b.box([0.02, 0.15, 0.02], [0.07, 0, 0], 'beak', { base: true });
+  b.box([0.02, 0.15, 0.02], [-0.07, 0, 0], 'beak', { base: true });
+}
+
+function goat(b: ShapeBuilder): void {
+  b.ball(0.26, [0, 0.56, 0], 'owl_buff', { scale: [0.72, 0.78, 1.45] });
+  for (const x of [-0.11, 0.11]) {
+    for (const z of [-0.24, 0.26]) b.box([0.06, 0.44, 0.06], [x, 0, z], 'bark_dark', { base: true });
+  }
+  b.box([0.13, 0.3, 0.13], [0, 0.66, 0.36], 'owl_buff', { rotation: [-35, 0, 0] });
+  b.box([0.15, 0.16, 0.27], [0, 0.8, 0.5], 'owl_buff', { rotation: [20, 0, 0] });
+  b.box([0.1, 0.06, 0.1], [0, 0.73, 0.62], 'paper_dark', { rotation: [20, 0, 0] });
+  for (const x of [-0.05, 0.05]) b.cone(0.022, 0.16, [x, 0.92, 0.42], 'bark', { rotation: [-35, 0, 0], segments: 5 });
+  for (const x of [-0.1, 0.1]) b.box([0.12, 0.03, 0.05], [x, 0.85, 0.44], 'owl_buff', { rotation: [0, 0, x > 0 ? -25 : 25] });
+  b.box([0.04, 0.1, 0.03], [0, 0.66, -0.37], 'owl_buff', { rotation: [30, 0, 0] });
+  // Collier de cuir et clochette, sous la gorge (`socket_goat_neck`).
+  b.box([0.16, 0.035, 0.16], [0, 0.66, 0.4], 'leather', { rotation: [-35, 0, 0] });
+  b.ball(0.03, [0, 0.6, 0.47], 'brass');
+}
+
 const ANIMALS: Record<string, Builder> = {
   hen_white: hen('chicken_white'),
   hen_red: hen('chicken_russet'),
   hen_black: hen('chicken_black'),
+  hen_golden: hen('owl_buff'),
+  hen_ash: hen('goose_grey'),
+  hen_cuckoo: cuckooHen,
   hen: hen('chicken_russet'),
+  // Le coq et le poussin sont des robes du squelette des poules (le poussin réduit à 0,4 par le rendu).
+  hen_rooster: rooster,
+  hen_chick: hen('paint_yellow'),
+  goat,
 };
 
 // ---------------------------------------------------------------------------
@@ -864,6 +930,25 @@ const DECOR: Record<string, Builder> = {
   grocery: cottage('plaster_ochre', 'tile', 'paint_red'),
   firmin_house: cottage('plaster_rose', 'tile_dark', 'paint_blue'),
   sawmill: cottage('wood_old', 'lauze_dark', 'wood_dark'),
+  // Chevrerie (0.12): 2 x 2 m, porte à mi-hauteur à l'avant (+Z, vers la maison une fois posée), toit à
+  // une pente qui descend vers -X (la voie, au nord, une fois tournée d'un quart vers l'ouest), baquet
+  // sous l'avancée du toit. Cotes fixes: l'emprise de la carte est de 2 x 2.
+  goat_shed: (b) => {
+    b.box([1.9, 1.75, 1.55], [0, 0, -0.18], 'wood_old', { base: true });
+    // Pignon en pente sous le toit (même inclinaison), le bas noyé dans les murs.
+    b.box([1.9, 0.5, 1.55], [0, 1.7, -0.18], 'wood_old', { rotation: [0, 0, 12] });
+    b.box([2.1, 0.08, 2.0], [0, 1.98, 0], 'wood_old_dark', { rotation: [0, 0, 12] });
+    b.box([0.08, 1.76, 0.08], [-0.88, 0, 0.88], 'wood_dark', { base: true });
+    b.box([0.08, 2.12, 0.08], [0.88, 0, 0.88], 'wood_dark', { base: true });
+    b.box([0.7, 0.75, 0.05], [0, 0, 0.6], 'wood_dark', { base: true });
+    b.box([0.7, 0.75, 0.05], [0, 0.8, 0.6], 'wood', { base: true });
+    b.box([0.55, 0.22, 0.28], [-0.6, 0, 0.75], 'wood', { base: true });
+    b.box([0.47, 0.02, 0.2], [-0.6, 0.2, 0.75], 'water', { base: true });
+  },
+  straw_bale: (b) => {
+    b.box([0.9, 0.45, 0.5], [0, 0, 0], 'straw', { base: true });
+    for (const x of [-0.25, 0.25]) b.box([0.03, 0.46, 0.51], [x, 0, 0], 'straw_dark', { base: true });
+  },
   shed: (b, w, d) => {
     b.box([w * 0.92, 2.4, d * 0.85], [0, 0, 0], 'wood_old_dark', { base: true });
     b.box([w * 0.98, 0.15, d * 0.95], [0, 2.4, 0], 'lauze_dark', {

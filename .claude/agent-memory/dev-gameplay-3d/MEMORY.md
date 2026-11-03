@@ -356,3 +356,18 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Aperçu 3D d'un panneau: second `WebGLRenderer` rendu à la demande (la lecture de pixels d'une cible du rendu principal donne du linéaire sans tone mapping). Ne jamais `dispose` les géométries du GLB depuis l'aperçu (elles servent au jeu): seulement ses copies, son matériau cloné et sa texture.
 - Capture avec Vite lancé par `npx vite &`: `kill $!` tue `npx`, pas Vite, qui garde le port; la capture suivante échoue en silence sur l'ancien serveur. Lancer `node_modules/.bin/vite` directement.
 - Le dossier scratchpad est partagé par tous les membres de la séance: un autre a réécrit mes `run.sh` et `capture.cjs`. Travailler dans un sous-dossier à soi (`scratchpad/dg3d/`).
+
+
+## Élevage de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Worktree neuf: `node_modules` absent, `tsc` ne trouve pas les types; `pnpm install --frozen-lockfile --prefer-offline` à la racine du worktree (quelques secondes).
+- Outil isolé: un `python3 - <<'EOF'` contenant des accents graves (gabarits TypeScript, `{rations}`) est refusé; l'écrire avec Write dans le scratchpad et le lancer avec la racine en argument.
+- `ModelLibrary.cloneRig('hen', [variante])` avec une variante absente du GLB rend un squelette sans maillage (invisible, aucune erreur): tester `library.node(variante)` d'abord, sinon `instantiate` (substitut).
+- Soin « une fois par joueur et par jour » sans champ: une clé `care:<geste>:<bête>` posée directement dans `world.countersToday[joueur]` (remis à zéro à l'aube), sans `bump` (qui ferait grossir `counters` pour toujours).
+- Un nouveau verbe sur une bête qui bouge vole la touche aux points voisins (la poule qui picore près de la mangeoire): rang de visée après les points (4,5), et au clic, les points d'action passent avant la bête.
+- Un article `shop: "catalogue"` absent de toute page de `catalogue.json` est en vente dès le jour 1 (articles d'avant le tour 9): toujours le poser sur sa page.
+- Comparer un test qui échoue au commit de départ: `git archive <commit> games/la-petite-ligne packages | tar -x` dans le scratchpad, liens vers les `node_modules` du worktree. Au 2026-11-03, les trois tests « format 7 » de `maison-tour10.test.ts` échouent déjà au départ.
+- Sous forte charge (charge 40), une capture de la page de rendu prend plusieurs minutes et `pnpm test` dépasse 40 min. Au 2026-11-03, ces tests longs échouent aussi au commit de départ sous cette charge (vérifié dans la copie « avant »): marcheurs de `moments-tour7`, robots sourds de `secrets`, Jeanne de `rue-haute`, démo au rythme normal de `retours-soiree`, reprise de `moments-tour7-recette`, et le test « format 7 » d'`interieurs-carte`.
+- Le scratchpad de session peut être partagé avec d'autres membres: un `tirets.sh` à moi a été réécrit vers un autre worktree. Noms de fichiers préfixés par le lot, et le script affiche `pwd`.
+- Fusion finale sans commit: `git add -A`, diff binaire vers un fichier, `git reset -q`, `git checkout -- .` et retrait des nouveaux fichiers, `merge --ff-only`, `git apply -3` du diff, `git reset -q`; puis résoudre les conflits (notes: garder les deux côtés) et relancer le générateur de carte plutôt que de garder `halte.json` fusionné.
+

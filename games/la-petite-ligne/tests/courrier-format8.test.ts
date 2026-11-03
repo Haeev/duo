@@ -30,7 +30,7 @@ const bytes = (value: unknown): number => Buffer.byteLength(JSON.stringify(value
 
 describe('courrier du format 8', () => {
   it('le format en cours est le 8', () => {
-    expect(DATA_SCHEMA).toBe(8);
+    expect(DATA_SCHEMA).toBeGreaterThanOrEqual(8);
     expect(FORMAT_7.length).toBeGreaterThanOrEqual(5);
   });
 

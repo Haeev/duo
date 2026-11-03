@@ -217,6 +217,24 @@
       "emprise": [1, 1],
       "hauteur": 1.1
     },
+    "straw_bale": {
+      "categorie": "equipement",
+      "nom": "botte de paille de la litière des poules",
+      "emprise": [1, 1],
+      "hauteur": 0.6
+    },
+    "goat_shed": {
+      "categorie": "batiment",
+      "nom": "chevrerie (cabane de planches, toit à une pente vers la voie)",
+      "emprise": [2, 2],
+      "hauteur": 2.2
+    },
+    "henhouse_extended": {
+      "categorie": "batiment",
+      "nom": "poulailler agrandi (pondoir en appentis), à la place du poulailler réparé",
+      "emprise": [3, 3],
+      "hauteur": 3.0
+    },
     "mailbox": {
       "categorie": "decor",
       "nom": "boîte aux lettres",
@@ -344,6 +362,7 @@
     {"id": "water_barrel", "type": "water_barrel", "x": 12.5, "y": 26.5, "rotation": 0, "rect": {"x": 12, "y": 26, "w": 1, "h": 1}},
     {"id": "henhouse", "type": "henhouse", "x": 15.5, "y": 29.5, "rotation": 0, "rect": {"x": 14, "y": 28, "w": 3, "h": 3}},
     {"id": "mailbox", "type": "mailbox", "x": 16.5, "y": 26.5, "rotation": 0, "rect": {"x": 16, "y": 26, "w": 1, "h": 1}},
+    {"id": "straw_bale", "type": "straw_bale", "x": 12.5, "y": 28.5, "rotation": 0, "rect": {"x": 12, "y": 28, "w": 1, "h": 1}},
     {"id": "fence_01", "type": "fence", "x": 2.5, "y": 36.5, "rotation": 0, "rect": {"x": 2, "y": 36, "w": 1, "h": 1}},
     {"id": "fence_02", "type": "fence", "x": 3.5, "y": 36.5, "rotation": 0, "rect": {"x": 3, "y": 36, "w": 1, "h": 1}},
     {"id": "fence_03", "type": "fence", "x": 4.5, "y": 36.5, "rotation": 0, "rect": {"x": 4, "y": 36, "w": 1, "h": 1}},
@@ -608,6 +627,13 @@
     {"id": "mailbox", "x": 16.5, "y": 26.5, "role": "la boîte aux lettres du garde-barrière (décor dans la démo)", "objet": "mailbox", "portee": 1.5},
     {"id": "chicken_coop", "x": 15.5, "y": 31.5, "role": "devant le poulailler: chantier, poules", "objet": "henhouse", "rayon": 2.0, "important": true},
     {"id": "hen_feeder", "x": 13.5, "y": 31.5, "role": "la mangeoire des poules", "important": true},
+    {"id": "straw_bale", "x": 12.5, "y": 27.5, "role": "la botte de paille: prendre une brassée pour la litière du poulailler", "objet": "straw_bale", "portee": 1.5},
+    {"id": "goat_shed", "x": 14.4, "y": 21.6, "role": "devant la porte de la chevrerie (chantier `goat_shed`), tournée vers la maison: le baquet, le retour du soir", "rotation": 1},
+    {"id": "goat_graze_01", "x": 15.5, "y": 18.8, "role": "pâture du talus, au nord de la chevrerie, entre le sentier et la route"},
+    {"id": "goat_graze_02", "x": 15.5, "y": 24.8, "role": "pâture entre la chevrerie et la boîte aux lettres"},
+    {"id": "goat_graze_03", "x": 4.5, "y": 31.5, "role": "pâture du pré, à l'ouest du potager"},
+    {"id": "goat_graze_04", "x": 8.5, "y": 33.5, "role": "pâture du pré, au sud du potager"},
+    {"id": "goat_graze_05", "x": 11.5, "y": 32.5, "role": "pâture du pré, près des poules"},
     {"id": "village_square", "x": 38.5, "y": 30.5, "role": "la place, près du puits (Jeanne le soir)", "rayon": 3.0, "important": true},
     {"id": "well", "x": 40.0, "y": 28.0, "role": "le puits: remplir l'arrosoir", "objet": "well", "portee": 1.5, "important": true},
     {"id": "grocery_counter", "x": 30.5, "y": 26.5, "role": "Odette derrière son comptoir, ouvert sur la place", "objet": "ferrand_shop", "portee": 2.5, "rotation": 1, "dans_batiment": true, "important": true},
@@ -693,8 +719,7 @@
     {"id": "room_bedroom_site", "x": 12.5, "y": 17.5, "role": "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son pignon et le sentier du jardin (la panne attend à `beam_pickup`)"},
     {"id": "market_stall", "x": 34.0, "y": 26.5, "role": "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)", "portee": 1.5},
     {"id": "garland_west", "x": 34.5, "y": 25.5, "role": "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"},
-    {"id": "garland_east", "x": 47.5, "y": 25.5, "role": "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"},
-    {"id": "goat_shed", "x": 15.0, "y": 20.0, "role": "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"}
+    {"id": "garland_east", "x": 47.5, "y": 25.5, "role": "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"}
   ],
   "zones": [
     {"id": "garden", "rect": {"x": 7, "y": 28, "w": 4, "h": 3}, "role": "les 12 cases du potager de la démo, devant la porte; ordre des cases: ligne par ligne, d'ouest en est, du nord au sud"},
@@ -770,7 +795,9 @@
     {"id": "well_roof", "type": "well_roof", "x": 40.0, "y": 28.0, "rotation": 0, "rect": {"x": 39, "y": 27, "w": 2, "h": 2}, "cases": [], "role": "toit de tuiles à deux pans sur quatre poteaux, au-dessus de la margelle du puits (déjà infranchissable): faîte à 2,4 m, treuil; il ne déborde pas de la margelle"},
     {"id": "path_lamp", "type": "lamp_post", "x": 14.5, "y": 26.5, "rotation": 0, "rect": {"x": 14, "y": 26, "w": 1, "h": 1}, "cases": [[14, 26]], "role": "réverbère au bord nord du chemin de la maisonnette: le tronçon le plus sombre du retour de la place (le lampadaire du passage à niveau est à 9 m); à 31 m du ponton, qui reste sombre"},
     {"id": "house_bench", "type": "bench", "x": 11.72, "y": 23.0, "rotation": 1, "rect": {"x": 11, "y": 22, "w": 1, "h": 2}, "cases": [], "role": "banc à dossier contre le pignon est de la maisonnette, tourné vers l'est, le dossier contre le soubassement; on s'assoit et on se relève depuis les cases (12, 22) et (12, 23); soleil du matin, chemin du quai, passage des trains"},
-    {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": null, "cases": [], "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"}
+    {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": null, "cases": [], "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
+    {"id": "goat_shed", "type": "goat_shed", "x": 16.0, "y": 22.0, "rotation": 3, "rect": {"x": 15, "y": 21, "w": 2, "h": 2}, "cases": [[15, 21], [16, 21], [15, 22], [16, 22]], "role": "chevrerie de 2 x 2 m à l'est de la maisonnette, porte à l'ouest tournée vers la maison (on la voit de la fenêtre est), sur l'herbe entre le sentier du jardin (x 13) et la route du gué (x 17 à 19); le toit descend vers l'arrière (est, côté route): la pluie tombe derrière et non devant la porte"},
+    {"id": "coop_extension", "type": "henhouse_extended", "x": 15.5, "y": 29.5, "rotation": 0, "rect": {"x": 14, "y": 28, "w": 3, "h": 3}, "cases": [], "role": "poulailler agrandi (`henhouse_extended` de l'artiste, pondoir en appentis): même origine et même emprise que le poulailler, qu'il remplace une fois bâti; quatre places de plus, rien ne bouge autour"}
   ],
   "habitants": {
     "source": "games/la-petite-ligne/donnees/habitants.json fait foi pour les heures; ce résumé dit où",
@@ -965,7 +992,7 @@
       "##...#.....#...........########...............................###...#######.................#.....##",
       "##...###.####...#......#####.##......................#........###...#.....#....######.............##",
       "###....................#.....##........##...............#.....###...#.###.#....######..#.....#....##",
-      "##............###......##....##.###....##.#...................###...#..........######.............##",
+      "##..........#.###......##....##.###....##.#...................###...#..........######.............##",
       "##............###......#......#.###.......#...............#....##...##....#....######....#........##",
       "##............###......#.#..........................................#..##.##...######..........#..##",
       "##.....................#..##.##....##..........................##...########...######..#..........##",

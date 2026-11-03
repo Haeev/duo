@@ -56,6 +56,9 @@ import type {
   AnnonceKind,
   AnnonceReward,
   CatalogueDef,
+  GoatSettings,
+  HappinessSettings,
+  HenCareSettings,
   ImprovementDef,
   ImprovementQueue,
   ToolKind,
@@ -138,7 +141,7 @@ const DISHES: readonly DishKind[] = ['bread', 'simple', 'stew'];
 const STAGE_IDS: readonly StageId[] = ['demo', 'summer_end', 'autumn_end'];
 const TOOL_KINDS: readonly ToolKind[] = ['hoe', 'watering_can', 'axe', 'fishing_rod'];
 const ANNONCE_KINDS: readonly AnnonceKind[] = ['help', 'together'];
-const QUEUES: readonly ImprovementQueue[] = ['bourg', 'maisonnette'];
+const QUEUES: readonly ImprovementQueue[] = ['bourg', 'maisonnette', 'elevage'];
 const TENDERNESS: readonly Tenderness[] = ['none', 'accomplices', 'gentle'];
 const FAMILIES: readonly OrderFamily[] = ['potager', 'basse-cour', 'cuisine', 'rivière', 'bois', 'lisière'];
 const RESOURCES: readonly OrderResource[] = ['garden', 'eggs', 'river', 'wood', 'forage'];
@@ -1906,6 +1909,103 @@ function parseBoard(r: Reader | null): Settings['board'] {
   };
 }
 
+function parseHappiness(r: Reader): HappinessSettings {
+  return {
+    start: r.at('start').number(),
+    drift: r.at('drift').number(),
+    floor: r.at('floor').number(),
+    max: r.at('max').number(),
+    happy: r.at('happy').number(),
+    calm: r.at('calm').number(),
+  };
+}
+
+/** Soins de la basse-cour (0.12, section 4.2). */
+function parseHenCare(r: Reader | null): HenCareSettings | null {
+  if (r === null || r.isNull()) return null;
+  const h = r.at('happiness');
+  const grain = r.at('grain');
+  const brood = r.at('brood');
+  return {
+    happiness: {
+      ...parseHappiness(h),
+      migration: h.at('migration').number(),
+      fed: h.at('fed').number(),
+      straw: h.at('straw').number(),
+      strawDays: h.at('strawDays').integer(0),
+      pet: h.at('pet').number(),
+      callByName: h.at('callByName').number(),
+      everyOtherBelow: h.at('everyOtherBelow').number(),
+      fineFrom: h.at('fineFrom').number(),
+      broodFrom: h.at('broodFrom').number(),
+    },
+    maxExtended: r.at('maxExtended').integer(1),
+    extensionImprovement: r.at('extensionImprovement').string(),
+    grain: {
+      item: grain.at('item').string(),
+      rations: grain.at('rations').integer(1),
+      perHen: grain.at('perHen').integer(1),
+      fromDay: grain.at('fromDay').integer(1),
+      forageSeasons: grain.at('forageSeasons').items().map((s) => s.oneOf(SEASONS)),
+      hopper: grain.at('hopper').string(),
+    },
+    petRange: r.at('petRange').number(),
+    straw: { item: r.at('straw').at('item').string(), seconds: r.at('straw').at('seconds').number() },
+    brood: {
+      eggs: brood.at('eggs').integer(1),
+      nights: brood.at('nights').integer(1),
+      hatchChance: brood.at('hatchChance').number(),
+      roosterlingChance: brood.at('roosterlingChance').number(),
+      seasons: brood.at('seasons').items().map((s) => s.oneOf(SEASONS)),
+      lastSeasonDay: brood.at('lastSeasonDay').integer(1),
+      growNights: brood.at('growNights').integer(1),
+      colorMother: brood.at('colorMother').number(),
+      colorGolden: brood.at('colorGolden').number(),
+    },
+    colors: r.at('colors').stringList(),
+    goldenColor: r.at('goldenColor').string(),
+    roosterVariant: r.at('roosterVariant').string(),
+    roosterNames: r.at('roosterNames').stringList(),
+    chickNames: r.at('chickNames').stringList(),
+  };
+}
+
+/** La chèvre (0.12, section 4.3). */
+function parseGoats(r: Reader | null): GoatSettings | null {
+  if (r === null || r.isNull()) return null;
+  const h = r.at('happiness');
+  return {
+    happiness: {
+      ...parseHappiness(h),
+      freshGraze: h.at('freshGraze').number(),
+      freshDays: h.at('freshDays').integer(1),
+      water: h.at('water').number(),
+      brush: h.at('brush').number(),
+      heldMilking: h.at('heldMilking').number(),
+      milkNoneBelow: h.at('milkNoneBelow').number(),
+      milkTwoFrom: h.at('milkTwoFrom').number(),
+    },
+    max: r.at('max').integer(1),
+    shedImprovement: r.at('shedImprovement').string(),
+    milkItem: r.at('milkItem').string(),
+    milkFrom: r.at('milkFrom').time(),
+    milkUntil: r.at('milkUntil').time(),
+    milkSeconds: r.at('milkSeconds').number(),
+    heldMilkSeconds: r.at('heldMilkSeconds').number(),
+    ropeLength: r.at('ropeLength').number(),
+    followDistance: r.at('followDistance').number(),
+    followSpeedFactor: r.at('followSpeedFactor').number(),
+    homeAt: r.at('homeAt').time(),
+    outAt: r.at('outAt').time(),
+    speed: r.at('speed').number(),
+    pailItem: r.at('pailItem').string(),
+    spots: r.at('spots').stringList(),
+    railClearance: r.at('railClearance').number(),
+    names: r.at('names').stringList(),
+    extraItem: r.at('extraItem').string(),
+  };
+}
+
 /** Chantiers (tour 9, section 6.1). */
 function parseImprovementSettings(r: Reader | null): Settings['improvements'] {
   if (r === null || r.isNull()) return null;
@@ -1914,6 +2014,8 @@ function parseImprovementSettings(r: Reader | null): Settings['improvements'] {
     queues: {
       bourg: { opensFromDay: queues.at('bourg').at('opensFromDay').integer(1) },
       maisonnette: { opensFromDay: queues.at('maisonnette').at('opensFromDay').integer(1) },
+      // 0.12: la file des bêtes (chevrerie, poulailler agrandi); absente: jamais ouverte.
+      elevage: { opensFromDay: queues.has('elevage') ? queues.at('elevage').at('opensFromDay').integer(1) : Number.MAX_SAFE_INTEGER },
     },
     steps: r.at('steps').numberList(),
     plankDiscount: r.at('plankDiscount').integer(0),
@@ -2004,7 +2106,9 @@ function parseSettings(r: Reader): Settings {
       eggsPerHenPerDay: r.at('hens').at('eggsPerHenPerDay').integer(0),
       feedRequired: r.at('hens').at('feedRequired').boolean(),
       max: r.at('hens').has('max') ? r.at('hens').at('max').integer(1) : 5,
+      care: parseHenCare(r.at('hens').opt('care')),
     },
+    goats: parseGoats(r.opt('goats')),
     board: parseBoard(r.opt('board')),
     improvements: parseImprovementSettings(r.opt('improvements')),
     endurance: {

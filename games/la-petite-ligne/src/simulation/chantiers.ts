@@ -67,7 +67,7 @@ export function openImprovement(sim: Sim, queue: ImprovementQueue): ImprovementD
 /** Les chantiers ouverts des deux files. */
 export function openImprovements(sim: Sim): ImprovementDef[] {
   const out: ImprovementDef[] = [];
-  for (const q of ['bourg', 'maisonnette'] as const) {
+  for (const q of ['bourg', 'maisonnette', 'elevage'] as const) {
     const def = openImprovement(sim, q);
     if (def !== null) out.push(def);
   }

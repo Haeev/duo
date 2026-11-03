@@ -281,6 +281,7 @@ const MENU_ICONS: Readonly<Record<MenuKind, string>> = {
   // 0.12: icônes à choisir avec l'interface de la boutique de vêtements.
   clothes_shop: 'ui-coin',
   wardrobe: 'chest',
+  farm: 'egg',
 };
 
 /** Ce que fait l'autre joueur, en mots. `awayMinutes`: minutes sans entrée (mesurées par l'interface), ou `null`. */

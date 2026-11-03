@@ -22,6 +22,7 @@
  * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
+import { applyBreedingExample } from './elevage-exemple';
 import type { CameraCommand } from '../camera';
 import { loadContent } from '../../donnees/contenu';
 import { MAP_FILES } from '../../donnees/cartes-fichiers';
@@ -230,6 +231,9 @@ async function main(): Promise<void> {
       if (wear !== undefined) c.appearance.wear = wear;
     });
   }
+  // 0.12: l'élevage (`elevage=1`, ou `elevage=mene` pour la chèvre menée), après `x` et `y`.
+  const breeding = params.get('elevage');
+  if (breeding !== null) applyBreedingExample(world, map, breeding);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const peche12 = createPeche12Demo(params, local);

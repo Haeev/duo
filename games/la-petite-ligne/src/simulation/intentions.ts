@@ -2,6 +2,7 @@
  * Application des intentions des joueurs. L'hôte les valide toutes (portée,
  * fonds, état): une intention impossible est ignorée ou donne un message.
  */
+import { nameAnimal, startBrood } from './poules';
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
 import { isHome } from '../etat/interieurs';
@@ -410,6 +411,13 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'curtains':
       if (canAct(c, sim)) toggleCurtains(sim, c, intent.furniture);
+      return;
+    // 0.12: nommer une bête (à son tour, parmi les trois noms), mettre une poule à couver.
+    case 'animal_name':
+      nameAnimal(sim, c, intent.animal, intent.name);
+      return;
+    case 'brood_start':
+      if (canAct(c, sim)) startBrood(sim, c, intent.hen);
       return;
     case 'craft':
       craft(sim, c, intent.recipe);

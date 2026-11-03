@@ -26,7 +26,9 @@ import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
 import { updateFishing } from './peche';
 import { updateFishingWorld } from './ombres';
-import { wanderHens } from './poules';
+import { updateRoosterFlag, wanderHens } from './poules';
+import { updateGoatFlag, updateGoats } from './chevres';
+import { movingAnimals } from '../etat/elevage';
 import { updateQuests } from './quetes';
 import { updateTrain } from './train';
 import { releaseHoldsOnMove, updateHolds, updateMoments } from './moments';
@@ -107,7 +109,8 @@ export function step(sim: Sim, input: StepInput): void {
     v.prev.x = v.pos.x;
     v.prev.y = v.pos.y;
   }
-  for (const h of world.hens) {
+  // Poules, poussines, coq et chèvres (0.12).
+  for (const h of movingAnimals(world)) {
     h.prev.x = h.pos.x;
     h.prev.y = h.pos.y;
   }
@@ -151,6 +154,7 @@ export function step(sim: Sim, input: StepInput): void {
     }
     updateConstructions(sim, controls, dt);
     updateRoomWork(sim, controls, dt);
+    updateGoats(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
   updateFishingWorld(sim);
@@ -173,6 +177,9 @@ export function step(sim: Sim, input: StepInput): void {
   autoStartScenes(sim);
   pumpScripts(sim);
   updateQuests(sim);
+  // 0.12: le coq et la chevrette arrivent quand les quêtes posent leurs drapeaux.
+  updateRoosterFlag(sim);
+  updateGoatFlag(sim);
   updateBoard(sim);
   updateGifts(sim);
   if (world.phase === 'day') {

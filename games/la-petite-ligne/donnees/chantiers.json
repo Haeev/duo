@@ -7,6 +7,8 @@
     { "id": "well_roof", "queue": "bourg", "order": 3, "price": 950, "model": "well_roof", "cells": [], "rotation": 0, "payAt": "board" },
     { "id": "path_lamp", "queue": "bourg", "order": 4, "price": 1300, "model": "lamp_post", "cells": [{ "cx": 14, "cy": 26 }], "rotation": 0, "payAt": "board" },
     { "id": "house_bench", "queue": "maisonnette", "order": 1, "price": 700, "model": "bench", "cells": [{ "cx": 12, "cy": 22 }, { "cx": 12, "cy": 23 }], "rotation": 90, "payAt": "basile" },
-    { "id": "door_canopy", "queue": "maisonnette", "order": 2, "price": 800, "model": "door_canopy", "cells": [], "rotation": 180, "payAt": "basile" }
+    { "id": "door_canopy", "queue": "maisonnette", "order": 2, "price": 800, "model": "door_canopy", "cells": [], "rotation": 180, "payAt": "basile" },
+    { "id": "goat_shed", "queue": "elevage", "order": 1, "price": 600, "model": "goat_shed", "cells": [{ "cx": 15, "cy": 21 }, { "cx": 16, "cy": 21 }, { "cx": 15, "cy": 22 }, { "cx": 16, "cy": 22 }], "rotation": 270, "payAt": "basile" },
+    { "id": "coop_extension", "queue": "elevage", "order": 2, "price": 800, "model": "henhouse_extended", "cells": [], "rotation": 180, "payAt": "basile" }
   ]
 }

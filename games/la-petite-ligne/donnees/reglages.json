@@ -152,7 +152,49 @@
       { "item": "elderberry", "seasons": ["autumn"], "days": [1, 14], "weight": 6, "count": [2, 3] }
     ]
   },
-  "hens": { "eggsPerHenPerDay": 1, "feedRequired": true, "feedFree": true, "max": 5 },
+  "hens": {
+    "eggsPerHenPerDay": 1,
+    "feedRequired": true,
+    "feedFree": true,
+    "max": 5,
+    "care": {
+      "note": "0.12, conception section 4.2: bonheur sur 100, jamais sous le plancher; seuls les œufs en dépendent.",
+      "happiness": { "start": 55, "migration": 60, "drift": -6, "fed": 6, "straw": 4, "strawDays": 3, "pet": 3, "callByName": 2, "floor": 30, "max": 100, "happy": 80, "calm": 40, "everyOtherBelow": 40, "fineFrom": 80, "broodFrom": 70 },
+      "maxExtended": 9,
+      "extensionImprovement": "coop_extension",
+      "grain": { "item": "grain_sack", "rations": 30, "perHen": 1, "fromDay": 16, "forageSeasons": ["spring", "summer"], "hopper": "hopper_feeder" },
+      "petRange": 1.2,
+      "straw": { "item": "straw_armful", "seconds": 3 },
+      "brood": { "eggs": 3, "nights": 7, "hatchChance": 0.75, "roosterlingChance": 0.25, "seasons": ["spring", "summer", "autumn"], "lastSeasonDay": 14, "growNights": 10, "colorMother": 0.6, "colorGolden": 0.25 },
+      "colors": ["hen_white", "hen_red", "hen_black", "hen_golden", "hen_ash", "hen_cuckoo"],
+      "goldenColor": "hen_golden",
+      "roosterVariant": "rooster_golden",
+      "roosterNames": ["Gaspard", "Hector", "Fanfaron", "Cacahuète", "Sultan", "Panache"],
+      "chickNames": ["Praline", "Pâquerette", "Capucine", "Mirabelle", "Galette", "Tartine", "Brindille", "Plumette", "Cannelle", "Pépite", "Myrtille", "Pistache", "Clafoutis", "Coquelicot", "Marjolaine", "Prunelle", "Violette", "Bise", "Frisette", "Caramel", "Muscade", "Paprika", "Groseille", "Câpre", "Ficelle", "Bobine", "Dentelle", "Rosée", "Grêle", "Aubépine", "Églantine", "Chicorée", "Fauvette", "Perlette", "Nougatine", "Gaufrette", "Bergère", "Mésange", "Pivoine", "Câline"]
+    }
+  },
+  "goats": {
+    "note": "0.12, conception section 4.3: la chèvre au piquet sur le talus, corde de 2,5 m; places à plus de 3,5 m du rail le plus proche.",
+    "happiness": { "start": 55, "drift": -6, "floor": 30, "max": 100, "happy": 80, "calm": 40, "freshGraze": 6, "freshDays": 2, "water": 4, "brush": 3, "heldMilking": 2, "milkNoneBelow": 40, "milkTwoFrom": 80 },
+    "max": 2,
+    "shedImprovement": "goat_shed",
+    "milkItem": "milk_can",
+    "milkFrom": "06:00",
+    "milkUntil": "11:00",
+    "milkSeconds": 6,
+    "heldMilkSeconds": 3,
+    "ropeLength": 2.5,
+    "followDistance": 1.5,
+    "followSpeedFactor": 0.8,
+    "homeAt": "20:00",
+    "outAt": "07:00",
+    "speed": 0.5,
+    "pailItem": "water_pail",
+    "spots": ["goat_graze_01", "goat_graze_02", "goat_graze_03", "goat_graze_04", "goat_graze_05"],
+    "railClearance": 3.5,
+    "names": ["Noisette", "Bergamote", "Réglisse", "Châtaigne", "Quenotte", "Biscotte"],
+    "extraItem": "goat_extra"
+  },
   "board": {
     "fromDay": 16,
     "post": [{ "weekday": "sunday", "kind": "help" }, { "weekday": "wednesday", "kind": "together" }],
@@ -168,7 +210,7 @@
     "keepDone": 2
   },
   "improvements": {
-    "queues": { "bourg": { "opensFromDay": 16 }, "maisonnette": { "opensFromDay": 22 } },
+    "queues": { "bourg": { "opensFromDay": 16 }, "maisonnette": { "opensFromDay": 22 }, "elevage": { "opensFromDay": 9 } },
     "steps": [50, 100],
     "plankDiscount": 10,
     "plankDiscountMax": 20

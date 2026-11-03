@@ -4,6 +4,7 @@
  * barre d'aménagement, commandes de la caméra et du carnet à la souris.
  * Le DOM n'est touché que si une valeur affichée change.
  */
+import { animalCardModel } from './modele-elevage';
 import { isHome } from '../etat/interieurs';
 import type { GameNotification, ReadonlyWorld } from '../etat/types';
 import type { UiHost } from './composant';
@@ -129,6 +130,9 @@ export class Hud {
   private readonly invite: HTMLButtonElement;
   private readonly inviteText: HTMLSpanElement;
   private inviteModel: InviteModel | null = null;
+  /** Fiche de la bête visée (0.12): nom, humeur en un mot, soin du jour. */
+  private readonly animalCard: HTMLElement;
+  private animalSig = '';
   /** Rêverie de la sieste: le carnet reste ouvert, « Se lever » à tout moment. */
   private readonly nap: HTMLElement;
   private readonly napTitle: HTMLElement;
@@ -268,6 +272,7 @@ export class Hud {
     this.aimText = el('span');
     this.aimPrompt = el('p', { class: 'lpl-aim', role: 'status', 'aria-label': x.aim.label, hidden: true }, [keycap(x.aim.click), this.aimText]);
     this.tip = el('p', { class: 'lpl-tip', role: 'status', hidden: true });
+    this.animalCard = el('p', { class: 'lpl-aim lpl-animal', role: 'status', hidden: true });
     this.inviteText = el('span');
     this.invite = button([keycap(ctx.key('Enter')), this.inviteText], () => {
       this.activateInvite();
@@ -361,7 +366,7 @@ export class Hud {
       el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
-      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
+      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.animalCard, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
       el('div', { class: 'lpl-hud__bottom-right' }, [shortcuts]),
     ]);
   }
@@ -505,6 +510,15 @@ export class Hud {
     this.inviteModel = invite;
     setHidden(this.invite, invite === null);
     setText(this.inviteText, invite?.text ?? '');
+
+    // Fiche de la bête visée (0.12).
+    const card = animalCardModel(world, ctx);
+    const cardText = card === null ? '' : [card.mood === '' ? card.name : `${card.name}: ${card.mood}`, ...card.notes].join(', ');
+    if (cardText !== this.animalSig) {
+      this.animalSig = cardText;
+      setHidden(this.animalCard, card === null);
+      setText(this.animalCard, ctx.t(cardText));
+    }
 
     // Invite de la cible survolée à la souris.
     const prompt = aimPromptModel(world, ctx);

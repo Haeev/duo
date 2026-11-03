@@ -531,12 +531,19 @@ export interface BasileModel {
   built: BuiltChantier[];
 }
 
-/** La commande à Basile, ou `null` tant que la file de la maisonnette n'est pas ouverte (lettre `basile_works`). */
-export function basileModel(world: ReadonlyWorld, ctx: UiContext): BasileModel | null {
+/**
+ * La commande à Basile, ou `null` tant que la file n'est pas ouverte (lettre `basile_works` pour la
+ * maisonnette; 0.12: file `elevage`, chevrerie et poulailler agrandi, présentée à part).
+ */
+export function basileModel(
+  world: ReadonlyWorld,
+  ctx: UiContext,
+  queue: 'maisonnette' | 'elevage' = 'maisonnette',
+): BasileModel | null {
   const s = ctx.content.settings.improvements;
-  if (s === null || world.clock.day < s.queues.maisonnette.opensFromDay) return null;
-  const def = openChantier(world, ctx, 'maisonnette');
-  const list = ctx.content.improvements.filter((x) => x.queue === 'maisonnette');
+  if (s === null || world.clock.day < s.queues[queue].opensFromDay) return null;
+  const def = openChantier(world, ctx, queue);
+  const list = ctx.content.improvements.filter((x) => x.queue === queue);
   const allBuilt =
     list.length > 0 && list.every((x) => (world.improvements[x.id]?.builtDay ?? null) !== null);
   const built = builtList(world, ctx).filter((x) => list.some((d) => d.id === x.id));

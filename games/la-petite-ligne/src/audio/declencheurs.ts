@@ -472,6 +472,28 @@ export function soundsForEvent(
     case 'hen_delivered':
       emit.world('hen', pointAt(map, 'chicken_coop'), null);
       break;
+    // Élevage (0.12): sons existants en attendant ceux du sound-designer (`hen-cluck-happy`, `goat-bleat`, `milk-squirt`, `straw-rustle`, `rooster-crow`).
+    case 'animal_petted':
+    case 'brood_hatched':
+    case 'animal_arrived':
+      emit.world('hen', pointAt(map, 'chicken_coop'), null);
+      break;
+    case 'straw_taken':
+    case 'coop_strawed':
+    case 'pail_filled':
+    case 'goat_watered':
+    case 'goat_brushed':
+    case 'goat_milked':
+    case 'goat_led':
+    case 'goat_staked':
+    case 'brood_started':
+      emit.world('bag', characterAt(world, event.by), event.by);
+      break;
+    case 'roosterling_left':
+    case 'rooster_crowed':
+    case 'naming_requested':
+    case 'animal_named':
+      break;
     case 'tool_upgraded':
       emit.world('pickup', characterAt(world, event.by), event.by);
       // Tour 10 (section 5.3): l'ancien outil va au râtelier.

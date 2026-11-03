@@ -2,6 +2,7 @@
  * Création d'un monde neuf: jour 1, 10 h, le train à quai, les deux
  * personnages sur le quai (encore à créer), la maisonnette en ruine.
  */
+import { emptyBreeding } from '../etat/elevage';
 import { createRandom } from '@duo/sdk/sim';
 import { type GameMap, buildingAt } from '../etat/carte';
 import { starterWardrobe, starterWear } from '../etat/garde-robe';
@@ -225,6 +226,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     villagers,
     hens: [],
     feederFilled: false,
+    breeding: emptyBreeding(),
     train: { phase: 'stopped', progress: 1, prevProgress: 1 },
     purse: s.economy.startPurse,
     cellar: [],

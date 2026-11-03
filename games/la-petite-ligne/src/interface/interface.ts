@@ -5,6 +5,7 @@
  * L'interface lit l'état et envoie des intentions; elle ne modifie jamais
  * l'état.
  */
+import { FarmPanel } from './basse-cour';
 import '@fontsource-variable/fraunces/soft.css';
 import '@fontsource-variable/nunito-sans/wght.css';
 import '../../ui-maquettes/jeton.css';
@@ -476,6 +477,9 @@ class GameUi implements GameInterface, UiHost {
       case 'clothes_shop':
       case 'wardrobe':
         return null;
+      // 0.12: la basse-cour (poulailler, chevrerie).
+      case 'farm':
+        return () => new FarmPanel(this);
     }
   }
 

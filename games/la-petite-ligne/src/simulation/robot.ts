@@ -4,6 +4,7 @@
  * n'est pas un mode de jeu. `p1` s'occupe surtout du potager, `p2` du bois;
  * les rendez-vous se font à deux.
  */
+import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
 import { isHome } from '../etat/interieurs';
@@ -290,6 +291,10 @@ function hens(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const egg = sim.world.groundItems.find((g) => g.item === ITEM.egg);
   if (egg !== undefined) return goAct(sim, c, m, 'oeufs', { kind: 'ground_item', groundItem: egg.id }, egg.pos, 1.2, out);
   if (sim.world.hens.length > 0 && !sim.world.feederFilled) {
+    // 0.12: après la démo, le grain se paie (un sac de 30 rations chez Odette, le premier offert).
+    const care = sim.content.settings.hens.care;
+    const short = care !== null && sim.world.clock.day >= care.grain.fromDay && sim.world.flags.includes(GRAIN_GIFT_FLAG) && sim.world.breeding.grainRations < rationsNeeded(sim);
+    if (care !== null && short && countInBag(c, care.grain.item) === 0) return buy(sim, c, m, [{ item: care.grain.item, count: 1 }], out);
     const feeder = pt(sim, POINT.henFeeder);
     return goAct(sim, c, m, 'nourrir', ground(feeder), feeder, 1.2, out);
   }

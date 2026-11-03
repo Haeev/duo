@@ -52,6 +52,10 @@ const ITEM_PICK_HEIGHT = 0.5;
 const BEAM_GROUND_HEIGHT = 0.12;
 const DEFAULT_CARRY_HEIGHT = 1.6;
 const HEN_RADIUS = 0.3;
+const ROOSTER_VARIANT = 'hen_rooster';
+const CHICK_VARIANT = 'hen_chick';
+/** Échelle du poussin si la robe n'a pas d'extra `scale` (0,12 m pour une poule de 0,3 m). */
+const CHICK_SCALE = 0.4;
 /**
  * Cueillettes posées sur leur hôte (tour 8: les mûres sur le roncier; tour 9: les grappes sur le
  * sureau, les noisettes sous le noisetier): nœud de l'hôte et champ de ses points de pose. Une
@@ -87,6 +91,9 @@ interface HenView {
 export class FarmLifePart implements EventfulPart {
   readonly group = new Group();
   private readonly hens = new Map<string, HenView>();
+  /** Vues du coq et des poussines (0.12), rangées avec celles des poules. */
+  private readonly fowlIds = new Set<string>();
+  private readonly fowlSeen = new Set<string>();
   private readonly clips = new Map<string, AnimationClip>();
   private readonly items: InstancedBatches;
   private readonly itemPicks = new Map<string, PickTarget>();
@@ -132,7 +139,10 @@ export class FarmLifePart implements EventfulPart {
 
   private createHen(id: string, variant: string): HenView {
     const root = new Group();
-    const model = this.library.cloneRig(HEN_RIG, [variant]) ?? this.library.instantiate(variant);
+    // 0.12: une couleur sans maillage dans le modèle (dorée, cendrée, coucou) prend son substitut;
+    // sinon `cloneRig` rendrait un squelette seul, invisible.
+    const rigged = this.library.node(variant) === null ? null : this.library.cloneRig(HEN_RIG, [variant]);
+    const model = rigged ?? this.library.instantiate(variant);
     model.traverse((object) => {
       object.castShadow = castsVisibleShadow(object.name);
       if (object instanceof SkinnedMesh) {
@@ -150,6 +160,12 @@ export class FarmLifePart implements EventfulPart {
       facing: null,
       phase: (textHash(id) % 100) / 100,
     };
+  }
+
+  /** Échelle de la racine du poussin: l'extra `scale` de sa robe, sinon 0,4. */
+  private chickScale(): number {
+    const extra = this.library.extras(CHICK_VARIANT).scale;
+    return typeof extra === 'number' && extra > 0 ? extra : CHICK_SCALE;
   }
 
   private play(hen: HenView, name: string): void {
@@ -192,6 +208,44 @@ export class FarmLifePart implements EventfulPart {
       const cycle = (context.time / HEN_PECK_EVERY + view.phase) % 1;
       this.play(view, moving ? 'hen_walk' : cycle < HEN_PECK_SHARE ? 'hen_peck' : 'hen_idle');
       view.mixer?.update(context.dt);
+    }
+
+    // 0.12: le coq et les poussines, sur le squelette des poules (robes `hen_rooster`, `hen_chick`;
+    // le poussin a sa racine à l'échelle 0,4, extra `scale` de sa robe).
+    const b = world.breeding;
+    const fowl = b.rooster === null ? b.chicks : [...b.chicks, b.rooster];
+    const fowlSeen = this.fowlSeen;
+    fowlSeen.clear();
+    for (const f of fowl) {
+      const chick = f !== b.rooster;
+      const variant = chick ? CHICK_VARIANT : ROOSTER_VARIANT;
+      fowlSeen.add(f.id);
+      let view = this.hens.get(f.id);
+      if (view === undefined) {
+        view = this.createHen(f.id, variant);
+        if (chick) view.root.scale.setScalar(this.chickScale());
+        this.hens.set(f.id, view);
+        this.fowlIds.add(f.id);
+      }
+      view.root.visible = true;
+      const at = interpolate(f.prev, f.pos, context.alpha, this.point);
+      view.root.position.set(at.x, this.terrain.heightAt(at.x, at.y), at.y);
+      const yaw = yawFromFacing(f.facing);
+      view.facing = view.facing === null ? yaw : dampAngle(view.facing, yaw, smoothFactor(context.dt, HEN_TURN_HALF_LIFE));
+      view.root.rotation.y = view.facing;
+      const moving = Math.hypot(f.pos.x - f.prev.x, f.pos.y - f.prev.y) > HEN_MOVING * context.dt;
+      const cycle = (context.time / HEN_PECK_EVERY + view.phase) % 1;
+      this.play(view, moving ? 'hen_walk' : cycle < HEN_PECK_SHARE ? 'hen_peck' : 'hen_idle');
+      view.mixer?.update(context.dt);
+    }
+    // Une poussine devenue poule garde son identifiant: sa vue de poussin cède la place à une vue de poule.
+    for (const id of this.fowlIds) {
+      if (fowlSeen.has(id)) continue;
+      const view = this.hens.get(id);
+      view?.root.removeFromParent();
+      view?.mixer?.stopAllAction();
+      this.hens.delete(id);
+      this.fowlIds.delete(id);
     }
 
     this.updateCrate(anyCrated);
