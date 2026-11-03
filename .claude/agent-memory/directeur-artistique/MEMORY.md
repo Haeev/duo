@@ -89,3 +89,9 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Une saturation d'étalonnage qui « agit plus sur les teintes ternes » (`look.saturation`) resature d'abord les ombres: c'est elle, plus que la teinte d'ombre, qui fait virer une ombre froide au mauve le soir. Baisser la saturation avant de toucher à la teinte.
 - Un pan de toit entièrement à l'ombre sur une case déjà froide (lauzes) ne se règle pas par les valeurs globales de `look` (essais à 3 variantes: b\* -25 à -17 seulement): demander une part de teinte réduite sur les cases froides.
 - Essais de réglages sans toucher au dépôt: copie du jeu sans `node_modules` dans `/tmp` avec un lien vers le `node_modules` du jeu suffit (Vite résout les liens pnpm); donner à ce Vite son propre `cacheDir` et passer un `timeout` explicite à `page.goto` (30 s ne suffisent pas sous charge).
+
+## Captures sous forte charge et échelle des personnages (La Petite Ligne, 2026-11-03)
+
+- Charge de 20 sur 4 cœurs: une capture de `rendu.html` en mode continu a dépassé 480 s sur `page.screenshot`. Le mode `manuel=1` (attendre `lplRendu.ready`, `advance(1/30)` 40 fois, puis capturer) passe en 3 à 8 min par image en 1600 x 900: le préférer dès que la machine est chargée.
+- Zooms de la page de rendu: `zoom=0` est le plus proche, `zoom=2` le plus large. En 1600 x 900, un personnage adulte fait environ 160, 100 et 65 pixels de haut aux zooms 0, 1 et 2, son œil 2 à 3 pixels au zoom 0. À la distance de jeu, on lit d'abord la lumière sur le personnage, son bord, sa silhouette et le dessus de sa tête (caméra à 35 degrés): juger un visage dans les aperçus 3D et au zoom 0, pas au zoom 1.
+- Valeurs: une planche de personnages alignés sur la grève (L* 2,6 % sous 30) ne représente pas le bourg (17,6 % sous 30 à 15 h avec toits et forêt). Mesurer L* sur une capture du bourg avant de conclure à un étalonnage voilé.
