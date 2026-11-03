@@ -218,7 +218,7 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         if (request?.by === me.id) for (const name of request.options) button(row(), name, { type: 'animal_name', animal: request.animal, name });
         break;
       }
-      // 0.12: boutique de vêtements et garde-robe, sans version de secours (le lint exige les cas).
+      // 0.12: la mercerie et la garde-robe n'ont que le bouton de fermeture dans l'interface de secours.
       case 'clothes_shop':
       case 'wardrobe':
         break;

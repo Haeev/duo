@@ -20,6 +20,7 @@ import { releaseNotes } from './notes-version';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { type SeasonCard, seasonCard, weatherLabel } from '../etat/semaine';
 import { playerColors, portraitSvg } from './portrait';
+import { FigurePreview } from './apercu';
 
 
 function sheet(width: string, children: readonly (Node | null)[]): HTMLDivElement {
@@ -71,12 +72,25 @@ class PlayerCard {
   }
 }
 
-/** Couleur du haut (ou de la salopette) de la tenue de départ `index` (0.12), pour la pastille de l'écran. */
-function starterSwatch(clothes: ClothesContent, index: number): string | null {
+/**
+ * La tenue de départ `index` (0.12) dans son option: une pastille par pièce (haut ou salopette, bas,
+ * chaussures) et le nom de la pièce du dessus; sans vêtements, la couleur et le nom d'avant.
+ */
+function starterLook(clothes: ClothesContent, index: number, fallbackColor: string, fallbackName: string): HTMLElement[] {
   const wear = starterWear(clothes, index);
   const bottom = clothes.byId[wear.bottom];
-  const piece = bottom?.couvre.includes('top') === true ? bottom : clothes.byId[wear.top];
-  return piece?.couleurs.principale ?? null;
+  const covering = bottom?.couvre.includes('top') === true;
+  const pieces = (covering ? [bottom, clothes.byId[wear.shoes]] : [clothes.byId[wear.top], bottom, clothes.byId[wear.shoes]]).filter(
+    (d) => d !== undefined,
+  );
+  if (pieces.length === 0) return [el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${fallbackColor}` }), el('span', { text: fallbackName })];
+  const swatches = el(
+    'span',
+    { class: 'lpl-starter__swatches', 'aria-hidden': 'true' },
+    pieces.map((d) => el('span', { class: 'lpl-clothes__swatch', title: d.nom, style: `--lpl-swatch-a: ${d.couleurs.principale}; --lpl-swatch-b: ${d.couleurs.secondaire}` })),
+  );
+  const names = pieces.map((d) => d.nom).join(', ');
+  return [swatches, el('span', { class: 'lpl-starter__name', text: pieces[0]?.nom ?? fallbackName, title: names, 'aria-label': names })];
 }
 
 function svgOf(world: ReadonlyWorld, id: CharacterId, expression: Expression, clothes: ClothesContent): string {
@@ -225,6 +239,11 @@ export class CreationScreen implements Layer {
   private readonly otherName: HTMLSpanElement;
   private readonly otherStatus: HTMLSpanElement;
   private scarf = '#5CE1E6';
+  /**
+   * 0.12: silhouette habillée de la tenue de départ choisie (rang `create_character.outfit`: la
+   * simulation prend les vêtements les plus proches des couleurs visées, `starterWear`).
+   */
+  private readonly figure: FigurePreview | null;
 
   constructor(host: UiHost, world: ReadonlyWorld) {
     this.host = host;
@@ -236,6 +255,7 @@ export class CreationScreen implements Layer {
     this.hairColor = me?.appearance.hairColor ?? 0;
     this.beard = me?.appearance.beard ?? 0;
     this.outfit = (me === null ? null : starterIndexOf(ctx.content.clothes, me.appearance.wear)) ?? 0;
+    this.figure = ctx.content.clothes.list.length === 0 ? null : new FigurePreview(ctx.content.clothes);
     this.scarf = me?.appearance.scarf ?? this.scarf;
     if (me?.created === true) this.mode = 'done';
     const titleId = uid('creation');
@@ -314,10 +334,15 @@ export class CreationScreen implements Layer {
     });
     beardGroup.append(beardOptions);
 
-    const outfitGroup = el('fieldset', { class: 'lpl-choice-group' }, [el('legend', { text: g.outfit })]);
+    const outfitGroup = el('fieldset', { class: 'lpl-choice-group lpl-starter' }, [el('legend', { text: this.figure === null ? g.outfit : ctx.t(ctx.texts.extra.clothes.starter) })]);
     const outfitOptions = el('div', { class: 'lpl-choice-group__options', 'data-nav': 'row' });
     const outfitName = uid('tenue');
+    // Deux rangs qui donnent les mêmes vêtements (couleurs visées proches) ne s'affichent qu'une fois.
+    const seenLooks = new Set<string>();
     PLAYER_OUTFITS.forEach((o, i) => {
+      const look = ctx.content.clothes.list.length === 0 ? String(i) : JSON.stringify(starterWear(ctx.content.clothes, i));
+      const duplicate = seenLooks.has(look) && i !== this.outfit;
+      seenLooks.add(look);
       const input = el('input', { type: 'radio', name: outfitName, value: String(i), 'data-nav-item': true });
       input.checked = i === this.outfit;
       input.addEventListener('change', () => {
@@ -330,15 +355,16 @@ export class CreationScreen implements Layer {
       this.outfitTaken.push(taken);
       this.outfitTakenText.push(takenText);
       outfitOptions.append(
-        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${starterSwatch(ctx.content.clothes, i) ?? o.top}` }), x.outfits[i] ?? '', taken]),
+        el('label', { class: 'lpl-option lpl-starter__option', hidden: duplicate }, [input, ...starterLook(ctx.content.clothes, i, o.top, x.outfits[i] ?? ''), taken]),
       );
     });
     outfitGroup.append(outfitOptions);
 
     const symbol = host.symbol('self');
+    const c = ctx.texts.extra.clothes;
     const scarfNote = el('p', { class: 'lpl-field__help lpl-creation__scarf' }, [
       token('self', symbol),
-      ctx.t(x.scarf, { profile: x.profiles[profileSymbol(this.scarf)] ?? '' }),
+      ctx.t(this.figure === null ? x.scarf : c.badge, { profile: x.profiles[profileSymbol(this.scarf)] ?? '' }),
     ]);
     this.fields.push(field, hairGroup, colorGroup, beardGroup, outfitGroup, scarfNote);
 
@@ -372,6 +398,7 @@ export class CreationScreen implements Layer {
     });
 
     this.preview = portrait('', '', token('self', symbol, 'large'));
+    const figureBox = this.figure === null ? null : el('div', { class: 'lpl-creation__figure', role: 'img', 'aria-label': ctx.t(c.previewLabel) }, [this.figure.element, token('self', symbol, 'large')]);
     this.previewName = el('p', { class: 'lpl-display', style: 'font-size: var(--lpl-text-xl)' });
     this.submit = button(ctx.t(g.ready), () => {
       this.confirm();
@@ -388,7 +415,7 @@ export class CreationScreen implements Layer {
       el('div', { class: 'lpl-creation' }, [
         form,
         el('div', { class: 'lpl-creation__preview' }, [
-          this.preview,
+          figureBox ?? this.preview,
           this.previewName,
           // Tour 10: la couleur et la barbe à côté de l'aperçu (la colonne du formulaire garde les coupes).
           colorGroup,
@@ -413,6 +440,7 @@ export class CreationScreen implements Layer {
     const a = this.appearance();
     const clothes = ctx.content.clothes;
     setPortrait(this.preview, portraitSvg(playerColors(ctx.me, a, clothes), 'great', ''));
+    this.figure?.show({ character: ctx.me, appearance: a });
     this.hairPortraits.forEach((face, i) => {
       setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, hair: i }, clothes), 'good', ''));
     });

@@ -38,6 +38,16 @@ Apprentissages durables et vérifiés. Ni avancement ni secret. Voir aussi le ca
 - L'heredoc et `python3 - <<'EOF'` passent maintenant dans Bash (vérifié le 2026-11-01); seules les commandes composées avec `git` ou un `cd` hors du worktree sont refusées.
 - Précision (2026-11-01, tour 9): une commande qui contient `cd ../..`, un sous-shell `( ... )`, ou un heredoc suivi d'un `cd` est refusée; un heredoc seul passe. Pour ajouter du CSS: l'écrire dans `/tmp/<dossier à soi>/x.css` puis `cat x.css >> <chemin absolu>`. `/tmp/dg2d/` peut contenir des fichiers d'une autre séance: prendre un dossier neuf.
 
+## La Petite Ligne: garde-robe 0.12 (vérifié le 2026-11-03)
+
+- Worktree isolé: toute commande Bash avec `cd` suivi d'un heredoc ou d'un `python3 - <<` est refusée; `python3 -I -c "..."` après un `cd` passe, et les scripts plus longs vont dans le scratchpad (`python3 -I script.py <racine>`).
+- Un script de capture `.cjs` copié dans le paquet du jeu change de `__dirname`: ses chemins de sortie relatifs (`../../../..`) sortent du worktree. `capturer-garde-robe.cjs` lit `SORTIE` dans l'environnement.
+- `ctx.content` est figé par son type: un champ pas encore au contrat (vêtements) se lit par `(content as { clothes?: unknown }).clothes` puis un contrôle à l'exécution (`catalogueOf`), à remplacer par le champ typé à la fusion.
+- Le CSS du salon (`lpl-salon*`) n'existe pas: le panneau du fauteuil s'affiche avec les styles génériques.
+- Aperçu 3D des tenues (`InterfaceOptions.outfitPreview`): `null` tant que le rendu n'a pas chargé; le panneau retente toutes les 500 ms (`upgradePreview`). Captures avec le rendu: `rendu=leger` sur la page de démonstration (sinon SwiftShader bloque `page.screenshot` sur « waiting for fonts »), attentes par `waitForFunction` et clics à la souris (`page.mouse`), jamais `locator`.
+- Fusion de `interface.css` à conflits entrelacés: reconstruire (version de l'autre branche + sa propre section ajoutée en fin de fichier) plutôt que résoudre bloc à bloc, qui coupe des règles en deux.
+- Création 0.12: `wear` est refusé hors du coffre et de la mercerie; la tenue de départ passe par le rang `create_character.outfit` (`starterWear`).
+
 ## La Petite Ligne: tableau du quai et chantiers (tour 9)
 
 - Le tableau du quai est le menu `catalogue` (point `notice_board`): `BoardPanel` de `src/interface/tableau.ts`, onglets Catalogue, Annonces, Chantiers dès `settings.board.fromDay` (avant: le catalogue seul, sans onglets). Modèles purs dans `modele-tableau.ts` (`catalogueShelves`, `boardAnnonces`, `chantiersPage`, `basileModel`); la commande à Basile s'ajoute au panneau de l'établi (`StationPanel`, `basileSection`). Les aides communes des panneaux (`purseBadge`, `price`, `backKeys`) sont dans `panneau.ts` (évite un import circulaire entre `panneaux.ts` et `tableau.ts`).

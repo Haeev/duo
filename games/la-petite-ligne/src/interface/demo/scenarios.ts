@@ -449,6 +449,10 @@ const TOUR10_SAVES: Readonly<Record<string, string>> = {
   sieste: SUMMER_25_V7,
   'nuit-ensemble': SUMMER_25_V7,
   'autre-epicerie': SUMMER_25_V7,
+  // 0.12: mercerie et garde-robe (été: le chapeau de paille et le pantacourt sont en vente).
+  mercerie: SUMMER_25_V7,
+  'mercerie-court': SUMMER_25_V7,
+  'garde-robe': SUMMER_25_V7,
 };
 
 /** Création du tour 10 (12 coupes, 8 couleurs, barbe): partie neuve, les deux ont passé l'écran titre. */
@@ -487,6 +491,22 @@ function storageBag(sim: Sim, id: CharacterId): void {
   ];
   c.bag = c.bag.map((_, i) => items[i] ?? null);
   c.selected = 9;
+}
+
+/** 0.12: ces vêtements rejoignent la garde-robe de `id`. */
+function own(sim: Sim, id: CharacterId, items: readonly string[]): void {
+  const c = character(sim, id);
+  for (const item of items) if (!c.wardrobe.includes(item) && sim.content.clothes.byId[item] !== undefined) c.wardrobe.push(item);
+}
+
+/** 0.12: devant le comptoir de la mercerie (point `salon_clothes`), la boutique ouverte (Solange est là à midi). */
+function atClothesCounter(sim: Sim, id: CharacterId): void {
+  near(sim, id, 'salon_clothes', 0, 0);
+  idle(sim, 1);
+  apply(sim, id, [{ type: 'menu', menu: 'clothes_shop' }]);
+  // Hors des heures de Solange, l'état garde le menu pour la capture (page de démonstration seulement).
+  character(sim, id).menu = 'clothes_shop';
+  character(sim, id).status = 'menu';
 }
 
 /** Près du coffre de la maison (case 6, 25), le rangement ouvert. */
@@ -531,6 +551,19 @@ function tour10(sim: Sim, name: string, me: CharacterId, other: CharacterId): ((
       setNeeds(sim, me, other);
       character(sim, me).needs.apartMinutes = 45;
       apply(sim, me, [{ type: 'menu', menu: 'notebook' }]);
+      return undefined;
+    case 'mercerie':
+    case 'mercerie-court': {
+      own(sim, me, ['gilet_prune', 'casquette_marine']);
+      sim.world.purse = name === 'mercerie' ? 160 : 60;
+      atClothesCounter(sim, me);
+      apply(sim, me, [{ type: 'menu', menu: 'clothes_shop' }]);
+      return undefined;
+    }
+    case 'garde-robe':
+      own(sim, me, ['pull_moutarde', 'gilet_prune', 'casquette_marine', 'paille_ruban_bleu', 'bottes_vertes', 'short_ecru', 'chemise_lin']);
+      atChest(sim, me);
+      apply(sim, me, [{ type: 'menu', menu: 'wardrobe' }]);
       return undefined;
     case 'rangement':
       storageBag(sim, me);

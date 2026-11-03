@@ -7,16 +7,16 @@ import { playerColors, portraitSvg, villagerColors } from '../portrait';
 const clothes = loadContent(CONTENT_FILES).clothes;
 
 describe('portraits', () => {
-  it('peint le foulard à la couleur du profil Duo et suit la tenue choisie', () => {
+  it('peint le badge brodé à la couleur du profil Duo (plus de foulard) et suit la tenue choisie', () => {
     const wear = starterWear(clothes, 1);
     const colors = playerColors('p1', { hair: 2, wear, scarf: '#8D6CFF' }, clothes);
-    expect(colors).toMatchObject({ scarf: '#8d6cff', style: 'bun', top: clothes.byId[wear.top]?.couleurs.principale });
+    expect(colors).toMatchObject({ scarf: '', badge: '#8d6cff', style: 'bun', top: clothes.byId[wear.top]?.couleurs.principale.toLowerCase() });
     expect(portraitSvg(colors, 'great', 'Pleine forme')).toContain('fill="#8d6cff"');
   });
 
-  it('refuse une couleur de foulard invalide et échappe le nom accessible', () => {
+  it('refuse une couleur de profil invalide et échappe le nom accessible', () => {
     const colors = playerColors('p2', { hair: 99, scarf: '"><script>' });
-    expect(colors.scarf).toBe('#5CE1E6');
+    expect(colors.badge).toBe('#5CE1E6');
     expect(colors.style).toBe('short');
     const svg = portraitSvg(colors, 'low', 'a "b" <c>');
     expect(svg).toContain('aria-label="a &quot;b&quot; &lt;c&gt;"');

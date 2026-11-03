@@ -111,7 +111,8 @@ const overlay = document.getElementById('interface');
 if (container === null || overlay === null) throw new Error('page de démonstration incomplète');
 
 const withRender = params.get('rendu') !== '0';
-const renderer = withRender ? createRenderer({ view, container, reducedMotion: false }) : null;
+// `rendu=leger`: le mode léger du rendu (captures sous SwiftShader, aperçu 3D de la mercerie).
+const renderer = withRender ? createRenderer({ view, container, reducedMotion: false, quality: params.get('rendu') === 'leger' ? 'light' : 'normal' }) : null;
 const mountUi = (): GameInterface =>
   createInterface({
     view,
@@ -125,6 +126,7 @@ const mountUi = (): GameInterface =>
     sound: (id) => {
       log.sounds.push(id);
     },
+    outfitPreview: (options) => renderer?.createOutfitPreview?.(options) ?? null,
   });
 let ui = mountUi();
 
