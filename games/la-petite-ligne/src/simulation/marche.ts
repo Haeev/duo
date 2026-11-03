@@ -3,7 +3,7 @@
  * sac (les deux joueurs, le même étal), un prix pour tout l'étal (Doux, Juste, Fort), les six
  * habitants viennent chacun une fois avec leur liste, deux à la fois au plus (la file de deux),
  * un joueur derrière l'étal sert (Espace sur l'habitant). Sans personne derrière l'étal, rien ne
- * sort et rien n'entre. À 13 h, ce qui reste retourne au cellier. Tirages par la graine.
+ * sort et rien n'entre. À 13 h, ce qui reste rentre au coffre de la maisonnette. Tirages par la graine.
  */
 import { weekdayOf } from '../donnees/calendrier';
 import type { MarketLevel } from '../donnees/marche';
@@ -22,7 +22,7 @@ import type { Character, ItemStack, MarketBuyer, MarketState, Quality, Vec2 } fr
 import { crossed } from './train';
 import { type Sim, bump, emit, format, itemName, itemWithArticle, say } from './contexte';
 import { countInBag, takeFromBag } from './sac';
-import { storeAtHome } from './rangement';
+import { storeAtHome, storeStacksAtHome } from './rangement';
 import { noteGoodsSeen } from './epicerie';
 
 /** Identifiant de point des places de la file (résolu par `marketPoint`, pas dans la carte). */
@@ -416,17 +416,24 @@ export function marketClock(sim: Sim, before: number, after: number): void {
   }
 }
 
-/** 13 h: ce qui reste sur l'étal retourne au cellier; les clients qui n'ont pas été servis rentrent. */
+/**
+ * 13 h: ce qui reste sur l'étal rentre au coffre de la maisonnette (au pied du coffre s'il est
+ * plein); les clients qui n'ont pas été servis rentrent. R18 (0.12.2): le message dit combien
+ * d'objets rentrent et où, pour qu'on ne croie pas qu'ils sont partis sans être payés.
+ */
 function closeMarket(sim: Sim, market: MarketState): void {
-  for (const s of market.stall) storeAtHome(sim, s.item, s.quality, s.count);
-  const had = market.stall.length > 0;
+  const { stored, ground } = storeStacksAtHome(sim, market.stall);
+  const count = stored + ground;
   market.stall = [];
   for (const b of market.buyers) {
     if (b.status !== 'served') b.status = 'gone';
     b.spot = null;
   }
-  if (had) say(sim, 'both', 'market_closed');
-  emit(sim, { type: 'market_closed' });
+  if (ground > 0) say(sim, 'both', 'market_closed_ground', { count, ground });
+  else if (count === 1) say(sim, 'both', 'market_closed_one');
+  else if (count > 1) say(sim, 'both', 'market_closed', { count });
+  else if ((sim.world.countersToday.duo.market_earned ?? 0) > 0) say(sim, 'both', 'market_closed_sold_out');
+  emit(sim, { type: 'market_closed', returned: count });
   sim.runtime.changed = true;
 }
 

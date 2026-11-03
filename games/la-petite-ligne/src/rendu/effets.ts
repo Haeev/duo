@@ -20,6 +20,7 @@ import {
   type Object3D,
 } from 'three';
 import type { GameMap } from '../etat/carte';
+import { holdPlacesToMark } from '../etat/moments';
 import type { CharacterId, WorldEvent } from '../etat/types';
 import type { Content } from '../donnees/types';
 import type { IsoCameraRig } from './camera';
@@ -60,6 +61,11 @@ const BELL_FIRST_MINUTE = 17 * 60;
 const BELL_LAST_MINUTE = 17 * 60 + 45;
 const BELL_SPARKLE_EVERY = 0.45;
 const BELL_RING_OPACITY = 0.5;
+/** Places de l'échelle de Basile (R20): anneau au sol qui respire, couleur de la case visée. */
+const HOLD_RING_OPACITY = 0.55;
+const HOLD_RING_PULSE = 0.25;
+const HOLD_RING_HZ = 0.8;
+const HOLD_RING_SCALE = 1.25;
 const RIPPLE_POOL = 8;
 const RIPPLE_START = 0.6;
 const RIPPLE_GROWTH = 2.4;
@@ -332,6 +338,7 @@ export class EffectsPart implements EventfulPart {
   private markerStart = Number.NEGATIVE_INFINITY;
   private markerKey = '';
   private readonly bellRing: Mesh;
+  private readonly holdRings: { mesh: Mesh; material: MeshBasicMaterial }[] = [];
   private bellSparkle = 0;
   private readonly jumps: Jump[] = [];
   private readonly gardenCells: Set<string>;
@@ -418,6 +425,25 @@ export class EffectsPart implements EventfulPart {
     this.bellRing.visible = false;
 
     this.group.add(this.highlight, this.marker, this.bellRing);
+    // Les deux places de l'échelle (même programme que la destination: palette, transparent).
+    for (let i = 0; i < 2; i += 1) {
+      const material = resources.track(
+        new MeshBasicMaterial({
+          map: materials.paletteTexture,
+          color: new Color(HIGHLIGHT_READY),
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+        }),
+      );
+      const mesh = new Mesh(ring, material);
+      mesh.name = 'place de l’échelle';
+      mesh.renderOrder = 3;
+      mesh.visible = false;
+      mesh.scale.setScalar(HOLD_RING_SCALE);
+      this.holdRings.push({ mesh, material });
+      this.group.add(mesh);
+    }
     // Ronds dans l'eau et ondes au sol: une petite réserve d'anneaux réutilisés.
     for (let i = 0; i < RIPPLE_POOL; i += 1) {
       const material = resources.track(
@@ -582,7 +608,24 @@ export class EffectsPart implements EventfulPart {
     this.updateHighlight(context);
     this.updateMarker(context);
     this.updateBell(context);
+    this.updateHoldRings(context);
     this.particles.update(context.dt);
+  }
+
+  /** R20 (0.12.2): la quête de Basile marque au sol où tenir l'échelle, tant que la place est libre. */
+  private updateHoldRings(context: FrameContext): void {
+    const places = holdPlacesToMark(this.content, context.world);
+    const pulse = context.reducedMotion
+      ? 0
+      : Math.sin(context.time * Math.PI * 2 * HOLD_RING_HZ) * HOLD_RING_PULSE;
+    for (const [i, ring] of this.holdRings.entries()) {
+      const id = places[i];
+      const at = id === undefined ? undefined : this.map.points[id];
+      ring.mesh.visible = at !== undefined;
+      if (at === undefined) continue;
+      ring.mesh.position.set(at.x, this.terrain.heightAt(at.x, at.y) + HIGHLIGHT_LIFT, at.y);
+      ring.material.opacity = HOLD_RING_OPACITY * (1 + pulse);
+    }
   }
 
   private updateJumps(context: FrameContext): void {

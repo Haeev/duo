@@ -296,8 +296,15 @@
           "id": "firmin_basile_lost",
           "kind": "quest",
           "priority": 22,
-          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "12:00", "to": "18:00" }],
           "lines": [{ "speaker": "firmin", "text": "Basile est passé tout à l'heure, une échelle sur l'épaule. Il allait vers le grand chêne, près de la remise." }]
+        },
+        {
+          "id": "firmin_basile_lost_evening",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "18:00", "to": "24:00" }],
+          "lines": [{ "speaker": "firmin", "text": "Basile ? Il est rentré à la scierie avec son échelle. Demain matin, il sera à son établi." }]
         },
         {
           "id": "firmin_geese_ask",
@@ -797,8 +804,15 @@
           "id": "odette_basile_lost",
           "kind": "quest",
           "priority": 23,
-          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "12:00", "to": "18:00" }],
           "lines": [{ "speaker": "odette", "text": "Basile ? Je l'ai vu partir vers la remise avec une échelle sur l'épaule. À son âge !" }]
+        },
+        {
+          "id": "odette_basile_lost_evening",
+          "kind": "quest",
+          "priority": 23,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "18:00", "to": "24:00" }],
+          "lines": [{ "speaker": "odette", "text": "Basile ? À cette heure, il est chez lui. Demain, tu le trouveras à son établi." }]
         },
         {
           "id": "odette_dandelions_ask",
@@ -1285,15 +1299,45 @@
           "kind": "quest",
           "once": "duo",
           "priority": 47,
-          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }],
-          "lines": [{ "speaker": "basile", "text": "Ah, vous voilà. Un nichoir s'est mis de travers, là-haut. Tenez-moi l'échelle, à deux, que je le remette droit." }]
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "12:00", "to": "18:00" }],
+          "lines": [{ "speaker": "basile", "text": "Ah, vous voilà. Le nichoir du grand chêne s'est mis de travers. Venez me tenir l'échelle, à deux, que je le remette droit." }]
+        },
+        {
+          "id": "basile_lost_found_morning",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "00:00", "to": "12:00" }],
+          "lines": [{ "speaker": "basile", "text": "Ah, vous voilà. Le nichoir du grand chêne s'est mis de travers. À midi, je vous attends au chêne avec mon échelle: vous me la tiendrez à deux." }]
+        },
+        {
+          "id": "basile_lost_found_late",
+          "kind": "quest",
+          "once": "duo",
+          "priority": 47,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "find" }, { "type": "time_is", "from": "18:00", "to": "24:00" }],
+          "lines": [{ "speaker": "basile", "text": "Ah, vous voilà. Le nichoir du grand chêne s'est mis de travers, mais le jour baisse: pas question de grimper ce soir. Demain à midi, je vous attends au chêne avec mon échelle." }]
         },
         {
           "id": "basile_lost_help",
           "kind": "quest",
           "priority": 22,
-          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }],
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }, { "type": "time_is", "from": "12:00", "to": "18:00" }],
           "lines": [{ "speaker": "basile", "text": "Mettez-vous de part et d'autre de l'échelle, et tenez bon. Je monte." }]
+        },
+        {
+          "id": "basile_lost_help_noon",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }, { "type": "time_is", "from": "00:00", "to": "12:00" }],
+          "lines": [{ "speaker": "basile", "text": "À midi, au grand chêne près de la remise. J'apporte l'échelle, vous apportez vos quatre bras." }]
+        },
+        {
+          "id": "basile_lost_help_tomorrow",
+          "kind": "quest",
+          "priority": 22,
+          "when": [{ "type": "step_active", "quest": "basile_lost", "step": "help" }, { "type": "time_is", "from": "18:00", "to": "24:00" }],
+          "lines": [{ "speaker": "basile", "text": "Le jour baisse: on reprendra demain à midi, au grand chêne près de la remise." }]
         },
         {
           "id": "basile_lost_done",

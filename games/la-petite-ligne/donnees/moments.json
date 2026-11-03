@@ -210,7 +210,7 @@
       },
       "leave": null,
       "sounds": { "idle": [] },
-      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory", "vignette": "moment_ladder_vignette" },
+      "texts": { "hint": null, "climax": "moment_ladder_climax", "memory": "moment_ladder_memory", "vignette": "moment_ladder_vignette", "missed": "moment_ladder_missed" },
       "vignette": "memory-ladder",
       "hintFrom": null,
       "reward": { "heart": 10 }

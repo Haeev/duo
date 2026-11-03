@@ -1222,6 +1222,7 @@ function parseMoment(m: Reader): MomentDef {
       memory: texts.at('memory').string(),
       rumor: optString(texts, 'rumor'),
       vignette: optString(texts, 'vignette'),
+      missed: optString(texts, 'missed'),
     },
     vignette: optString(m, 'vignette'),
     hintFrom: optString(m, 'hintFrom'),
@@ -2329,7 +2330,7 @@ function checkReferences(content: Content): void {
     if (m.quest !== null && !questIds.has(m.quest)) fail(`${where}: quête inconnue « ${m.quest} »`);
     const steps = content.quests.find((q) => q.id === m.quest)?.steps ?? [];
     if (m.questStep !== null && !steps.some((s) => s.id === m.questStep)) fail(`${where}: étape inconnue « ${m.questStep} »`);
-    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory, m.texts.rumor, m.texts.vignette]) {
+    for (const key of [m.texts.hint, m.texts.climax, m.texts.memory, m.texts.rumor, m.texts.vignette, m.texts.missed]) {
       if (key !== null && !(key in content.texts.messages)) fail(`${where}: message inconnu « ${key} »`);
     }
     if (m.hintFrom !== null && !content.villagers.some((v) => v.id === m.hintFrom)) fail(`${where}: habitant inconnu « ${m.hintFrom} »`);

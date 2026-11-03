@@ -180,7 +180,7 @@
   },
   "garden": { "cells": 12, "layout": { "w": 4, "d": 3 }, "zone": "garden", "startState": "grass" },
   "quality": { "fineIfWateredEveryDay": true },
-  "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": true, "regrowFromDay": 16, "catchUpDays": 6, "stumpDays": 4, "saplingDays": 6, "saplingScale": { "first": 0.3, "perDay": 0.1, "max": 0.8 } },
+  "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": true, "regrowFromDay": 1, "catchUpDays": 0, "stumpDays": 2, "saplingDays": 4, "saplingScale": { "first": 0.3, "perDay": 0.15, "max": 0.8 } },
   "forage": {
     "fromDay": 16,
     "spawnChance": 0.6,

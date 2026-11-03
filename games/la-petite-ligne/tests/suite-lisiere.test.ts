@@ -21,10 +21,15 @@ import { addToBag } from '../src/simulation/sac';
 import { MINUTES_PER_DAY } from '../src/simulation/constantes';
 import { contentAndMap, newSim, SEED } from './aides';
 import summerSave from './donnees/sauvegardes/format-5-ete-jour-25.json';
+import midWeekSave from './donnees/sauvegardes/format-13-milieu-semaine-2.json';
 
 const { content, map } = contentAndMap();
 const s = content.settings;
 const HOUR = 60;
+const PLAYERS = [
+  { id: 'membre-a', name: 'Camille', color: '#e07a5f' },
+  { id: 'membre-b', name: 'Sacha', color: '#3d85c6' },
+] as const;
 
 /** Va au matin du jour `day` (les matins s'enchaînent depuis la création, comme la partie). */
 function dawnOf(sim: Sim, day: number): void {
@@ -60,36 +65,41 @@ function fell(sim: Sim, c: Character, tree: Tree): void {
 describe('repousse des arbres (T8-19, section 5.1)', () => {
   const at = (felledDay: number, day: number): string => {
     const g = treeGrowth(s.trees, { felled: true, felledDay }, day);
-    return g.stage === 'sapling' ? `rejet ${g.scale.toFixed(1)}` : g.stage;
+    return g.stage === 'sapling' ? `rejet ${g.scale.toFixed(2)}` : g.stage;
   };
 
-  it('souche 4 jours, rejet 6 jours (0,3 puis +0,1 par jour, 0,8 au plus), adulte ensuite', () => {
-    expect([20, 21, 22, 23].map((d) => at(20, d))).toEqual(['stump', 'stump', 'stump', 'stump']);
-    expect([24, 25, 26, 27, 28, 29].map((d) => at(20, d))).toEqual([
-      'rejet 0.3',
-      'rejet 0.4',
-      'rejet 0.5',
-      'rejet 0.6',
-      'rejet 0.7',
-      'rejet 0.8',
+  // R19 (0.12.2): souche 2 jours, rejet 4 jours, dès le jour 1 (avant: 4 et 6 jours, dès le jour 16).
+  it('souche 2 jours, rejet 4 jours (0,3 puis +0,15 par jour, 0,8 au plus), adulte ensuite', () => {
+    expect([20, 21].map((d) => at(20, d))).toEqual(['stump', 'stump']);
+    expect([22, 23, 24, 25].map((d) => at(20, d))).toEqual([
+      'rejet 0.30',
+      'rejet 0.45',
+      'rejet 0.60',
+      'rejet 0.75',
     ]);
-    expect(at(20, 30)).toBe('adult');
-    expect(adultAgainOn(s.trees, 20)).toBe(30);
+    expect(at(20, 26)).toBe('adult');
+    expect(adultAgainOn(s.trees, 20)).toBe(26);
   });
 
-  it('rien ne repousse avant le jour 16; rattrapage du jour 16 pour les arbres abattus pendant la démo', () => {
-    for (let d = 3; d <= 15; d++) expect(at(3, d), `jour ${d}`).toBe('stump');
-    // Abattu le 3: rejet le 16, adulte le 20. Abattu le 12: rejet (0,3) le 16, adulte le 22.
-    expect(at(3, 16)).toBe('rejet 0.5');
-    expect(adultAgainOn(s.trees, 3)).toBe(20);
-    expect(at(3, 20)).toBe('adult');
-    expect(at(12, 16)).toBe('rejet 0.3');
-    expect(adultAgainOn(s.trees, 12)).toBe(22);
-    expect(at(14, 16)).toBe('stump');
-    expect(adultAgainOn(s.trees, 14)).toBe(24);
+  it('repousse dès le jour 1: un arbre abattu pendant la démo n’attend plus le jour 16', () => {
+    expect(s.trees.regrowFromDay).toBe(1);
+    // Abattu le 1: rejet le 3, adulte le 7. Abattu le 3: rejet le 5, adulte le 9. Abattu le 12: adulte le 18.
+    expect([1, 2].map((d) => at(1, d))).toEqual(['stump', 'stump']);
+    expect(at(1, 3)).toBe('rejet 0.30');
+    expect(adultAgainOn(s.trees, 1)).toBe(7);
+    expect(at(1, 7)).toBe('adult');
+    expect(at(3, 5)).toBe('rejet 0.30');
+    expect(adultAgainOn(s.trees, 3)).toBe(9);
+    expect(at(3, 9)).toBe('adult');
+    expect(at(12, 16)).toBe('rejet 0.60');
+    expect(adultAgainOn(s.trees, 12)).toBe(18);
+    // Aucun arbre abattu ne reste plus de 6 jours à terre, quel que soit le jour.
+    for (let felled = 1; felled <= 80; felled++) {
+      expect(adultAgainOn(s.trees, felled), `abattu le ${felled}`).toBe(felled + 6);
+    }
   });
 
-  it("dans la partie: l'arbre abattu le jour 20 redevient abattable le 30; la souche se traverse, le rejet garde sa case", () => {
+  it("dans la partie: l'arbre abattu le jour 20 redevient abattable le 26; la souche se traverse, le rejet garde sa case", () => {
     const sim = newSim(SEED);
     dawnOf(sim, 20);
     const tree = firstTree(sim, 'oak');
@@ -99,13 +109,15 @@ describe('repousse des arbres (T8-19, section 5.1)', () => {
     const cell = { cx: Math.floor(tree.pos.x), cy: Math.floor(tree.pos.y) };
     sim.runtime.dynamicDirty = true;
     expect(isBlockedCell(refreshBlockers(sim), cell.cx, cell.cy)).toBe(false);
-    dawnOf(sim, 24);
+    dawnOf(sim, 21);
+    expect(treeStage(sim, tree)).toBe('stump');
+    dawnOf(sim, 22);
     expect(treeStage(sim, tree)).toBe('sapling');
     expect(isBlockedCell(refreshBlockers(sim), cell.cx, cell.cy)).toBe(true);
-    dawnOf(sim, 29);
+    dawnOf(sim, 25);
     expect(tree.felled).toBe(true);
     morning(sim);
-    expect(sim.world.clock.day).toBe(30);
+    expect(sim.world.clock.day).toBe(26);
     expect(tree.felled).toBe(false);
     expect(tree.hits).toBe(0);
     expect(tree.felledDay).toBeNull();
@@ -129,7 +141,9 @@ describe('repousse des arbres (T8-19, section 5.1)', () => {
       reason: 'stump',
     });
     expect(c.notifications.at(-1)?.text).toBe(content.texts.messages.stump_hint);
+    // Le rejet le plus grand (dernier jour avant l'arbre adulte) reste trop jeune.
     dawnOf(sim, 25);
+    expect(treeStage(sim, tree)).toBe('sapling');
     const d = axeman(sim, tree);
     sim.events.length = 0;
     actFront(sim, d);
@@ -158,6 +172,57 @@ describe('repousse des arbres (T8-19, section 5.1)', () => {
     const day = sim.world.clock.day;
     for (const t of sim.world.trees) expect(t.felledDay).toBe(t.felled ? day : null);
     expect(sim.world.sharedEnvieRecent).toEqual([]);
+  });
+
+  it('une sauvegarde de la 0.12.1 (jour 11): les souches des jours 2 et 3 se relèvent dès la reprise, la plus jeune repousse ensuite', () => {
+    const before = midWeekSave.data.trees.filter((t) => t.felled);
+    expect(before.map((t) => t.felledDay).sort((x, y) => (x ?? 0) - (y ?? 0))).toEqual([
+      2, 2, 2, 2, 2, 3, 3, 3, 10,
+    ]);
+    const sim = restoreWorld(
+      content,
+      map,
+      structuredClone(midWeekSave.data),
+      midWeekSave.dataSchema,
+      PLAYERS,
+    );
+    expect(sim.world.clock.day).toBe(11);
+    const young = sim.world.trees.filter((t) => t.felled);
+    expect(young.map((t) => t.felledDay)).toEqual([10]);
+    const tree = young[0];
+    if (tree === undefined) throw new Error('souche du jour 10 attendue');
+    expect(treeStage(sim, tree)).toBe('stump');
+    expect(sim.world.trees.filter((t) => !t.felled)).toHaveLength(sim.world.trees.length - 1);
+    morning(sim);
+    expect(treeStage(sim, tree)).toBe('sapling');
+    dawnOf(sim, 16);
+    expect(tree.felled).toBe(false);
+  });
+
+  it('la lisière ne se vide jamais pour de bon: abattue chaque jour pendant 20 jours, elle est entière 6 jours après', () => {
+    const sim = newSim(SEED);
+    dawnOf(sim, 1);
+    const total = sim.world.trees.length;
+    expect(total).toBe(12);
+    const felledOn = new Map<string, number>();
+    for (let day = 1; day <= 20; day++) {
+      dawnOf(sim, day);
+      for (const tree of sim.world.trees) {
+        // Personne ne reste à terre plus longtemps que souche et rejet réunis.
+        const since = felledOn.get(tree.id);
+        if (tree.felled && since !== undefined) {
+          expect(day - since, `${tree.id} abattu le ${since}`).toBeLessThan(
+            s.trees.stumpDays + s.trees.saplingDays,
+          );
+        }
+        if (tree.felled) continue;
+        fell(sim, axeman(sim, tree), tree);
+        felledOn.set(tree.id, day);
+      }
+      expect(sim.world.trees.every((t) => t.felled)).toBe(true);
+    }
+    dawnOf(sim, 20 + s.trees.stumpDays + s.trees.saplingDays);
+    expect(sim.world.trees.filter((t) => !t.felled)).toHaveLength(total);
   });
 });
 
