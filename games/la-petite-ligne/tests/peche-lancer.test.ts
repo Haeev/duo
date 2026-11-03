@@ -1,6 +1,7 @@
 // Retour R09 (soirée du 2026-11-01): « la canne à pêche doit lancer la ligne plus loin: on la
 // jette à nos pieds ». Le bouchon se pose loin dans l'eau, jamais sur la terre ni sur l'autre rive.
 import { describe, expect, it } from 'vitest';
+import { groundAt } from '../src/etat/carte';
 import { character } from '../src/simulation/contexte';
 import { waterAhead } from '../src/simulation/peche';
 import { contentAndMap, newSim } from './aides';
@@ -10,7 +11,7 @@ const FAR_ENOUGH = 2.5;
 
 function cellIsWater(x: number, y: number): boolean {
   const { map } = contentAndMap();
-  return map.ground[Math.floor(y) * map.width + Math.floor(x)] === 'water';
+  return groundAt(map, Math.floor(x), Math.floor(y)) === 'water';
 }
 
 describe('distance du lancer (R09)', () => {

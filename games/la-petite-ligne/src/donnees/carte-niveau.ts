@@ -3,7 +3,20 @@
  * décrit en section 9 de `docs/jeux/jeu-1/carte-halte.md`), contrôlée à
  * l'exécution et traduite en `GameMap`.
  */
-import type { GameMap, GroundKind, MapHook, MapImprovement, MapProp, MapTree, Rect } from '../etat/carte';
+import {
+  type GameMap,
+  type GroundKind,
+  type MapHook,
+  type MapImprovement,
+  type MapProp,
+  type MapTree,
+  type Rect,
+  cellIndex,
+  inMap,
+  mapMaxX,
+  mapMaxY,
+  offstagePoint,
+} from '../etat/carte';
 import { BENCH_MODEL } from '../etat/bancs';
 import type { Cell, Vec2 } from '../etat/types';
 import { houseBuilding, houseFromBuilding, parseBuildings, parseCrossings, parseStream } from './carte-interieurs';
@@ -34,13 +47,16 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   const size = r.at('taille');
   const width = size.at('largeur').integer(8, 512);
   const height = size.at('hauteur').integer(8, 512);
-  // 0.13 (v0-13-carte.md, section 2): une carte à origine de grille (coordonnées négatives) attend le lot L0,
-  // qui apprend la grille décalée au rendu et à la simulation. D'ici là, on la refuse franchement (carte de
-  // secours et raison au journal) plutôt que de la lire décalée de toute son origine.
+  // 0.13 (v0-13-carte.md, section 2): la grille commence en `origine` (x -24, y -30 pour la carte agrandie).
+  // Les coordonnées du monde ne bougent pas: la ligne 0 du terrain est la rangée `originY`.
   const origin = size.opt('origine');
-  if (origin !== null && (origin.at('x').integer() !== 0 || origin.at('y').integer() !== 0)) {
-    origin.fail('origine de grille pas encore prise en charge (lot L0 de la 0.13)');
-  }
+  const originX = origin === null ? 0 : origin.at('x').integer(-512, 512);
+  const originY = origin === null ? 0 : origin.at('y').integer(-512, 512);
+  const grid = { originX, originY, width, height };
+  const cellAt = (r: Reader): Cell => ({
+    cx: r.at('cx').integer(originX, mapMaxX(grid)),
+    cy: r.at('cy').integer(originY, mapMaxY(grid)),
+  });
 
   // Sol, d'après la légende du terrain.
   const terrain = r.at('terrain');
@@ -60,10 +76,10 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   });
 
   // Cases infranchissables, recalculées par le validateur du level designer.
-  const grid = r.at('infranchissable').at('grille').items();
-  if (grid.length !== height) r.at('infranchissable').at('grille').fail(`${height} lignes attendues`);
+  const blockedLines = r.at('infranchissable').at('grille').items();
+  if (blockedLines.length !== height) r.at('infranchissable').at('grille').fail(`${height} lignes attendues`);
   const blocked: boolean[] = [];
-  grid.forEach((line) => {
+  blockedLines.forEach((line) => {
     const text = line.string();
     if (text.length !== width) line.fail(`${width} cases attendues`);
     for (const code of text) {
@@ -110,7 +126,10 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     if (kind !== undefined && cuttable) {
       trees.push({ id, kind, pos });
       // Un arbre à couper bloque tant qu'il est debout: la couche dynamique s'en charge.
-      blocked[Math.floor(pos.y) * width + Math.floor(pos.x)] = false;
+      const cx = Math.floor(pos.x);
+      const cy = Math.floor(pos.y);
+      if (!inMap(grid, cx, cy)) o.fail('arbre hors de la carte');
+      blocked[cellIndex(grid, cx, cy)] = false;
       continue;
     }
     const area = o.opt('rect');
@@ -130,7 +149,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   const house = r.at('maison');
   const roomId = house.at('piece').string();
   const room = need(zones[roomId], house.at('piece'), `zone « ${roomId} » absente`);
-  const door: Cell = { cx: house.at('porte').at('cx').integer(0, width - 1), cy: house.at('porte').at('cy').integer(0, height - 1) };
+  const door: Cell = cellAt(house.at('porte'));
   const spawnId = house.at('retour_de_minuit').string();
   const spawn = need(points[spawnId], house.at('retour_de_minuit'), `point « ${spawnId} » absent`);
   const startFurniture = house
@@ -138,12 +157,12 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     .items()
     .map((f) => ({
       item: f.at('item').string(),
-      cell: { cx: f.at('cx').integer(0, width - 1), cy: f.at('cy').integer(0, height - 1) },
+      cell: cellAt(f),
       rotation: f.at('rotation').integer(0, 3),
     }));
 
   // Tour 10 (ADR 0016): bâtiments visitables, ru et passages. Une carte d'avant n'a que la maisonnette.
-  const frame = { width, height, points };
+  const frame = { ...grid, points };
   const list = r.opt('interieurs');
   const buildings =
     list === null
@@ -173,7 +192,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   }));
 
   // Hors de la carte: les habitants « chez eux » loin du bourg.
-  if (!('offstage' in points)) points.offstage = { x: -20, y: -20 };
+  if (!('offstage' in points)) points.offstage = offstagePoint(grid);
 
   // Tour 9: sièges sans modèle (des bancs sans objet) et chantiers (posés une fois bâtis).
   const seats: MapProp[] = (r.opt('sieges')?.items() ?? []).map((s) => ({
@@ -213,6 +232,8 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   return {
     id: r.at('id').string(),
     name: r.at('nom').string(),
+    originX,
+    originY,
     width,
     height,
     ground,

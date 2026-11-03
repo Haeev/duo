@@ -6,6 +6,7 @@ import { serveBuyer, setMarketLevel, stallMove } from './marche';
 import { nameAnimal, startBrood } from './poules';
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
+import { mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import { bakeryBuy, openBakery } from './bourg';
 import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
@@ -490,8 +491,8 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       return;
     case 'pin': {
       if (!c.created || !Number.isFinite(intent.x) || !Number.isFinite(intent.y)) return;
-      const x = Math.max(0, Math.min(sim.map.width, intent.x));
-      const y = Math.max(0, Math.min(sim.map.height, intent.y));
+      const x = Math.max(mapMinX(sim.map), Math.min(mapMaxX(sim.map) + 1, intent.x));
+      const y = Math.max(mapMinY(sim.map), Math.min(mapMaxY(sim.map) + 1, intent.y));
       // Une épingle par joueur: la nouvelle remplace l'ancienne.
       c.pin = { pos: { x, y }, since: sim.world.tick, until: sim.world.tick + secondsToTicks(sim.content.settings.feel.pinSeconds) };
       emit(sim, { type: 'pin', by: c.id, pos: { x, y } });

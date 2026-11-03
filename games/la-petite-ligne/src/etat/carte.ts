@@ -174,10 +174,16 @@ export interface MapCrossing {
 export interface GameMap {
   id: string;
   name: string;
+  /**
+   * Première case de la grille (`taille.origine`, 0.13): les cases vont de `originX` à
+   * `originX + width - 1`. Les coordonnées du monde ne dépendent pas de l'origine.
+   */
+  originX: number;
+  originY: number;
   /** Taille en cases (1 m). */
   width: number;
   height: number;
-  /** Nature du sol de chaque case, ligne par ligne: index = cy * width + cx. */
+  /** Nature du sol de chaque case, ligne par ligne, rangée par `cellIndex`. */
   ground: GroundKind[];
   /** Case infranchissable (murs, eau profonde, bâtiments, arbres debout). */
   blocked: boolean[];
@@ -244,14 +250,67 @@ export interface FishingZone {
   rects: Rect[];
 }
 
-/** Index d'une case dans les tableaux `ground` et `blocked`. */
-export function cellIndex(map: GameMap, cx: number, cy: number): number {
-  return cy * map.width + cx;
+/** Ce que les fonctions de la grille lisent de la carte (la carte elle-même, ou un cadre de lecture). */
+export interface GridFrame {
+  readonly originX: number;
+  readonly originY: number;
+  readonly width: number;
+  readonly height: number;
 }
 
-/** Vrai si la case est dans la carte. */
-export function inMap(map: GameMap, cx: number, cy: number): boolean {
-  return cx >= 0 && cy >= 0 && cx < map.width && cy < map.height;
+/**
+ * Index d'une case dans les tableaux `ground` et `blocked` (et toute couche de la taille de la
+ * grille). Seul calcul d'indice de la grille: aucun autre module ne multiplie par `width`.
+ */
+export function cellIndex(map: GridFrame, cx: number, cy: number): number {
+  return (cy - map.originY) * map.width + (cx - map.originX);
+}
+
+/** Abscisse de la case d'index `index` (inverse de `cellIndex`). */
+export function cellX(map: GridFrame, index: number): number {
+  return (index % map.width) + map.originX;
+}
+
+/** Ordonnée de la case d'index `index` (inverse de `cellIndex`). */
+export function cellY(map: GridFrame, index: number): number {
+  return Math.floor(index / map.width) + map.originY;
+}
+
+/** Bornes de la grille en cases: `minX` à `maxX` compris (de même en y). */
+export function mapMinX(map: GridFrame): number {
+  return map.originX;
+}
+export function mapMaxX(map: GridFrame): number {
+  return map.originX + map.width - 1;
+}
+export function mapMinY(map: GridFrame): number {
+  return map.originY;
+}
+export function mapMaxY(map: GridFrame): number {
+  return map.originY + map.height - 1;
+}
+
+/** Vrai si la case est dans la carte (`minX..maxX`, `minY..maxY`). */
+export function inMap(map: GridFrame, cx: number, cy: number): boolean {
+  return cx >= map.originX && cy >= map.originY && cx < map.originX + map.width && cy < map.originY + map.height;
+}
+
+/** Sol de la case, `undefined` hors de la carte. */
+export function groundAt(map: GameMap, cx: number, cy: number): GroundKind | undefined {
+  return inMap(map, cx, cy) ? map.ground[cellIndex(map, cx, cy)] : undefined;
+}
+
+/** Centre de la carte en mètres (caméra d'attente, repères par défaut). */
+export function mapCentre(map: GridFrame): Vec2 {
+  return { x: map.originX + map.width / 2, y: map.originY + map.height / 2 };
+}
+
+/**
+ * Point sûrement hors de la carte, quelle que soit son origine: là où vont les habitants
+ * « chez eux » (`offstage`), loin de toute case.
+ */
+export function offstagePoint(map: GridFrame): Vec2 {
+  return { x: map.originX - 20, y: map.originY - 20 };
 }
 
 /** Vrai si le point est dans le rectangle. */

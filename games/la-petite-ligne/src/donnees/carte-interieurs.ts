@@ -7,6 +7,7 @@ import {
   type BuildingId,
   type CrossingKind,
   type GameMap,
+  type GridFrame,
   HOUSE_BUILDING,
   type MapBuilding,
   type MapCrossing,
@@ -17,6 +18,10 @@ import {
   type Rect,
   type WallSide,
   inRect,
+  mapMaxX,
+  mapMaxY,
+  mapMinX,
+  mapMinY,
 } from '../etat/carte';
 import type { Cell, PointId, Vec2 } from '../etat/types';
 import type { Reader } from './lecteur';
@@ -34,29 +39,27 @@ const CROSSING_KINDS: Readonly<Record<string, CrossingKind>> = {
   gue: 'ford',
 };
 
-/** Ce dont la lecture a besoin du reste de la carte. */
-export interface MapFrame {
-  width: number;
-  height: number;
+/** Ce dont la lecture a besoin du reste de la carte: la grille (origine comprise) et les points. */
+export interface MapFrame extends GridFrame {
   points: Readonly<Record<PointId, Vec2>>;
 }
 
 function rectIn(r: Reader, frame: MapFrame): Rect {
   const rect = {
-    x: r.at('x').integer(0),
-    y: r.at('y').integer(0),
+    x: r.at('x').integer(mapMinX(frame)),
+    y: r.at('y').integer(mapMinY(frame)),
     w: r.at('w').integer(1),
     h: r.at('h').integer(1),
   };
-  if (rect.x + rect.w > frame.width || rect.y + rect.h > frame.height)
+  if (rect.x + rect.w > mapMaxX(frame) + 1 || rect.y + rect.h > mapMaxY(frame) + 1)
     r.fail('rectangle hors de la carte');
   return rect;
 }
 
 function cellIn(r: Reader, frame: MapFrame): Cell {
   return {
-    cx: r.at('cx').integer(0, frame.width - 1),
-    cy: r.at('cy').integer(0, frame.height - 1),
+    cx: r.at('cx').integer(mapMinX(frame), mapMaxX(frame)),
+    cy: r.at('cy').integer(mapMinY(frame), mapMaxY(frame)),
   };
 }
 
@@ -232,10 +235,10 @@ export function parseStream(r: Reader, frame: MapFrame): MapStream {
   const columns = r
     .at('colonnes')
     .items()
-    .map((c) => c.integer(0, frame.width - 1));
+    .map((c) => c.integer(mapMinX(frame), mapMaxX(frame)));
   if (columns.length === 0) r.at('colonnes').fail('au moins une colonne attendue');
-  const fromY = r.at('de_y').integer(0, frame.height - 1);
-  const toY = r.at('a_y').integer(fromY, frame.height - 1);
+  const fromY = r.at('de_y').integer(mapMinY(frame), mapMaxY(frame));
+  const toY = r.at('a_y').integer(fromY, mapMaxY(frame));
   return { columns, fromY, toY };
 }
 

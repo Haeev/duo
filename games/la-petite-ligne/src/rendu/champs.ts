@@ -23,7 +23,7 @@ import {
   Vector4,
 } from 'three';
 import type { GameMap } from '../etat/carte';
-import { cellIndex } from '../etat/carte';
+import { type GridFrame, cellIndex, cellX, cellY, groundAt, inMap, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { hash2 } from './bruit';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
@@ -113,10 +113,7 @@ export interface TerrainField {
  * si sa colonne n'a pas d'eau tout près (ce qui écarte les berges en avancée).
  */
 export function isFord(map: GameMap, cx: number, cy: number): boolean {
-  const kind = (x: number, y: number): string =>
-    x >= 0 && y >= 0 && x < map.width && y < map.height
-      ? (map.ground[cellIndex(map, x, y)] ?? 'grass')
-      : 'grass';
+  const kind = (x: number, y: number): string => groundAt(map, x, y) ?? 'grass';
   if (kind(cx, cy) !== 'gravel') {
     return false;
   }
@@ -137,17 +134,21 @@ export function isFord(map: GameMap, cx: number, cy: number): boolean {
 /** Champ du terrain: hauteur, profondeur de l'eau, bâtiments, eau (une case par pixel). */
 export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField {
   const ext = RENDER_SETTINGS.terrain.extension;
-  const width = map.width + 2 * ext;
-  const height = map.height + 2 * ext;
+  // Une case par pixel, carte et bande prolongée: une grille à elle, avec son origine.
+  const field: GridFrame = {
+    originX: map.originX - ext,
+    originY: map.originY - ext,
+    width: map.width + 2 * ext,
+    height: map.height + 2 * ext,
+  };
+  const { width, height } = field;
   const count = width * height;
   const water = new Uint8Array(count);
   const fordCells: { cx: number; cy: number }[] = [];
-  for (let py = 0; py < height; py += 1) {
-    for (let px = 0; px < width; px += 1) {
-      const cx = px - ext;
-      const cy = py - ext;
+  for (let cy = mapMinY(field); cy <= mapMaxY(field); cy += 1) {
+    for (let cx = mapMinX(field); cx <= mapMaxX(field); cx += 1) {
       if (terrain.look(cx, cy).kind === 'water') {
-        water[py * width + px] = 1;
+        water[cellIndex(field, cx, cy)] = 1;
       } else if (isFord(map, cx, cy)) {
         fordCells.push({ cx, cy });
       }
@@ -164,16 +165,16 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
   }
   // L'itérateur d'un tableau voit les cases ajoutées pendant le parcours (file d'attente).
   for (const index of queue) {
-    const x = index % width;
-    const y = Math.floor(index / width);
+    const x = cellX(field, index);
+    const y = cellY(field, index);
     const next = (distance[index] ?? 0) + 1;
     for (const [dx, dy] of NEIGHBOURS) {
       const nx = x + dx;
       const ny = y + dy;
-      if (nx < 0 || ny < 0 || nx >= width || ny >= height) {
+      if (!inMap(field, nx, ny)) {
         continue;
       }
-      const neighbour = ny * width + nx;
+      const neighbour = cellIndex(field, nx, ny);
       if (next < (distance[neighbour] ?? 0)) {
         distance[neighbour] = next;
         queue.push(neighbour);
@@ -185,11 +186,11 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
   );
   const depthCells = AMBIANCE_SETTINGS.water.depthCells;
   const data = new Uint8Array(count * RGBA);
-  for (let py = 0; py < height; py += 1) {
-    for (let px = 0; px < width; px += 1) {
-      const i = py * width + px;
-      const x = px - ext + HALF_CELL;
-      const y = py - ext + HALF_CELL;
+  for (let cy = mapMinY(field); cy <= mapMaxY(field); cy += 1) {
+    for (let cx = mapMinX(field); cx <= mapMaxX(field); cx += 1) {
+      const i = cellIndex(field, cx, cy);
+      const x = cx + HALF_CELL;
+      const y = cy + HALF_CELL;
       const ground = terrain.heightAt(x, y);
       const inBuilding = buildings.some(
         (prop) =>
@@ -209,7 +210,7 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
     }
   }
   for (const cell of fordCells) {
-    const i = (cell.cy + ext) * width + (cell.cx + ext);
+    const i = cellIndex(field, cell.cx, cell.cy);
     data[i * RGBA + 3] = BYTE;
   }
   const texture = new DataTexture(data, width, height, RGBAFormat, UnsignedByteType);
@@ -220,7 +221,7 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
   texture.needsUpdate = true;
   return {
     texture,
-    rect: new Vector4(-ext, -ext, 1 / width, 1 / height),
+    rect: new Vector4(field.originX, field.originY, 1 / width, 1 / height),
     height: new Vector2(FIELD_HEIGHT_MIN, FIELD_HEIGHT_RANGE),
     fordCells,
   };

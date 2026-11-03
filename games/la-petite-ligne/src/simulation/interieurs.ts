@@ -7,7 +7,7 @@
  * de son bâtiment (`blockersFor`): jamais coincé à la fermeture, jamais déplacé. La règle ne lit
  * que la carte et l'horloge du monde: l'hôte et la prédiction de l'invité voient la même porte.
  */
-import { type BuildingId, type GameMap, type MapBuilding, HOUSE_BUILDING, buildingAt } from '../etat/carte';
+import { type BuildingId, type GameMap, type MapBuilding, HOUSE_BUILDING, buildingAt, cellIndex, inMap } from '../etat/carte';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
 import { weekdayOf } from '../donnees/calendrier';
 import type { TownSettings } from '../donnees/bourg';
@@ -40,7 +40,7 @@ function doorsOf(map: GameMap): MapDoors {
   const doorCells = new Set<number>();
   list.forEach((b, i) => {
     codes[b.id] = FIRST_DOOR_CODE + i;
-    for (const d of b.doors) doorCells.add(d.cell.cy * map.width + d.cell.cx);
+    for (const d of b.doors) doorCells.add(cellIndex(map, d.cell.cx, d.cell.cy));
   });
   const built = { list, codes, doorCells };
   CACHE.set(map, built);
@@ -86,7 +86,7 @@ export function markClosedDoors(sim: Sim, dynamic: Uint8Array, mask: number): vo
     const b = list[i];
     if (b === undefined || (mask & (1 << i)) === 0) continue;
     for (const d of b.doors) {
-      const index = d.cell.cy * map.width + d.cell.cx;
+      const index = cellIndex(map, d.cell.cx, d.cell.cy);
       if (dynamic[index] === 0) dynamic[index] = codes[b.id] ?? FIRST_DOOR_CODE;
     }
   }
@@ -101,8 +101,8 @@ export function doorCode(map: GameMap, id: BuildingId): number {
 export function isDoorCell(map: GameMap, x: number, y: number): boolean {
   const cx = Math.floor(x);
   const cy = Math.floor(y);
-  if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return false;
-  return doorsOf(map).doorCells.has(cy * map.width + cx);
+  if (!inMap(map, cx, cy)) return false;
+  return doorsOf(map).doorCells.has(cellIndex(map, cx, cy));
 }
 
 /**

@@ -2,6 +2,7 @@
 // le colis lourd du train porté du quai à la maison. Mécanique de la poutre: seul on ne peut pas, à
 // deux ça avance, relâché la charge est posée là, sans dommage.
 import { describe, expect, it } from 'vitest';
+import { groundAt, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../src/etat/carte';
 import type { ControlFrame } from '../src/etat/actions';
 import type { CharacterId, WorldEvent } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
@@ -147,9 +148,9 @@ describe('draisine poussée à deux', () => {
 /** Axe de la ligne (m): milieu des rangées de voie, comme le rendu (`voie.ts`). */
 function trackAxis(sim: Sim): number {
   const rows: number[] = [];
-  for (let cy = 0; cy < sim.map.height; cy++) {
+  for (let cy = mapMinY(sim.map); cy <= mapMaxY(sim.map); cy++) {
     let rails = 0;
-    for (let cx = 0; cx < sim.map.width; cx++) if (sim.map.ground[cy * sim.map.width + cx] === 'rail') rails++;
+    for (let cx = mapMinX(sim.map); cx <= mapMaxX(sim.map); cx++) if (groundAt(sim.map, cx, cy) === 'rail') rails++;
     if (rails > sim.map.width / 2) rows.push(cy);
   }
   return ((rows[0] ?? 0) + (rows[rows.length - 1] ?? 0) + 1) / 2;
@@ -177,12 +178,17 @@ describe('draisine posée sur la voie', () => {
     const length = sim2.content.settings.carry.handcar?.size[0] ?? 0;
     expect(at?.pos.y).toBeCloseTo(axis, 6);
     const westEnd = (at?.pos.x ?? 0) - length / 2;
-    // Traversée de service: la colonne de planches de la voie la plus à l'est.
+    // Traversée de service: la colonne de planches de la voie la plus à l'est de celles qui sont à
+    // l'ouest de la draisine (0.13: d'autres passages à niveau sont plus loin à l'est).
     let service = -1;
-    for (let cx = 0; cx < sim2.map.width; cx++) {
-      if (sim2.map.ground[Math.floor(axis) * sim2.map.width + cx] === 'wood') service = cx;
+    for (let cx = mapMinX(sim2.map); cx <= mapMaxX(sim2.map) && cx < westEnd; cx++) {
+      if (groundAt(sim2.map, cx, Math.floor(axis)) === 'wood') service = cx;
     }
     expect(service).toBeGreaterThan(0);
+    // Ni sur un passage à niveau de l'est: aucune planche sous la draisine ni à 2 m devant elle.
+    for (let cx = Math.floor(westEnd); cx <= Math.floor(westEnd + length + 2); cx++) {
+      expect(groundAt(sim2.map, cx, Math.floor(axis)), `planches en x ${String(cx)}`).not.toBe('wood');
+    }
     expect(westEnd - (service + 1), 'à plus de 2 m de la traversée de service').toBeGreaterThan(2);
     const train = sim2.map.zones.train_at_platform;
     expect(train).toBeDefined();

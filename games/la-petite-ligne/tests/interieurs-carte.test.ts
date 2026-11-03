@@ -12,7 +12,7 @@ import { checkMap, loadMap } from '../src/donnees/carte';
 import { MAP_FILES } from '../src/donnees/cartes-fichiers';
 import { buildFallbackMap } from '../src/donnees/carte-secours';
 import { LEVEL_MAP_FILE } from '../src/donnees/carte-niveau';
-import { buildingAt, HOUSE_BUILDING } from '../src/etat/carte';
+import { buildingAt, cellIndex, HOUSE_BUILDING } from '../src/etat/carte';
 import { IntentSchema } from '../src/reseau/schemas';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { character } from '../src/simulation/contexte';
@@ -42,12 +42,15 @@ function rawBuildings(raw: Record<string, unknown>): RawBuilding[] {
 }
 
 describe('carte élargie: bâtiments visitables', () => {
-  it('lit les trois intérieurs de la carte, et la maisonnette depuis `buildings.house`', () => {
+  it('lit les intérieurs de la carte, et la maisonnette depuis `buildings.house`', () => {
     const result = loadMap(MAP_FILES);
     expect(result.source).toBe('level');
     const { map } = result;
-    expect(map.width).toBe(100);
-    expect(Object.keys(map.buildings).sort()).toEqual(['grocery', 'house', 'salon']);
+    // 0.13: la carte agrandie (164 m) ajoute six intérieurs aux trois du tour 10.
+    expect(map.width).toBe(164);
+    expect(Object.keys(map.buildings).sort()).toEqual(
+      ['cafe', 'church', 'farmhouse', 'forge', 'grocery', 'house', 'joinery', 'mill', 'salon'],
+    );
 
     const house = map.buildings.house;
     expect(house?.rooms.map((r) => [r.id, r.build?.room ?? null])).toEqual([
@@ -103,24 +106,28 @@ describe('carte élargie: bâtiments visitables', () => {
     // Une porte franchissable, devant une case libre du dehors; l'apparition, franchissable aussi.
     for (const b of Object.values(map.buildings)) {
       for (const d of b.doors) {
-        expect(map.blocked[d.cell.cy * map.width + d.cell.cx], `${b.id}: porte`).toBe(false);
-        expect(map.blocked[d.outside.cy * map.width + d.outside.cx], `${b.id}: dehors`).toBe(false);
+        expect(map.blocked[cellIndex(map, d.cell.cx, d.cell.cy)], `${b.id}: porte`).toBe(false);
+        expect(map.blocked[cellIndex(map, d.outside.cx, d.outside.cy)], `${b.id}: dehors`).toBe(false);
       }
       expect(
-        map.blocked[Math.floor(b.spawn.y) * map.width + Math.floor(b.spawn.x)],
+        map.blocked[cellIndex(map, Math.floor(b.spawn.x), Math.floor(b.spawn.y))],
         `${b.id}: apparition`,
       ).toBe(false);
     }
   });
 
-  it('lit le ru et ses quatre passages', () => {
+  it('lit le ru et ses passages', () => {
     const { map } = loadMap(MAP_FILES);
-    expect(map.stream).toEqual({ columns: [63, 64], fromY: 0, toY: 37 });
+    // 0.13: le ru naît à la source, dans le bois (y -21), au lieu du bord nord de la carte.
+    expect(map.stream).toEqual({ columns: [63, 64], fromY: -21, toY: 37 });
     expect(map.crossings.map((c) => [c.id, c.kind, c.model])).toEqual([
       ['ru_culvert', 'culvert', 'ru_culvert'],
       ['ru_road_bridge', 'bridge', 'ru_road_bridge'],
       ['ru_footbridge', 'footbridge', 'ru_footbridge'],
       ['ru_stepping_stones', 'ford', 'ru_stepping_stones'],
+      ['ru_spring_plank', 'footbridge', 'ru_footbridge'],
+      ['mill_sluice_footbridge', 'footbridge', 'sluice_footbridge'],
+      ['mill_tailrace_planks', 'footbridge', 'tailrace_planks'],
     ]);
     expect(map.crossings.find((c) => c.id === 'ru_road_bridge')?.widthM).toBe(3);
     expect(map.crossings.find((c) => c.id === 'ru_culvert')?.widthM).toBeNull();
@@ -146,7 +153,8 @@ describe('carte élargie: bâtiments visitables', () => {
 
     const outside = variant((raw) => {
       const salon = rawBuildings(raw).find((b) => b.id === 'salon');
-      if (salon?.pieces[0] !== undefined) salon.pieces[0].rect = { x: 98, y: 26, w: 5, h: 5 };
+      // Au bord est de la grille (x 139 au plus en 0.13): la pièce en déborde.
+      if (salon?.pieces[0] !== undefined) salon.pieces[0].rect = { x: 137, y: 26, w: 5, h: 5 };
     });
     expect(outside.warning).toContain('rectangle hors de la carte');
 

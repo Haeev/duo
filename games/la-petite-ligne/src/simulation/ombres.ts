@@ -6,7 +6,7 @@
  * L'état ne change qu'aux événements (apparition, réservation, départ): le rendu fait nager les
  * ombres dans leur disque `roam`, garanti dans l'eau par `spotsOf`.
  */
-import type { FishingZone, GameMap } from '../etat/carte';
+import { type FishingZone, type GameMap, cellIndex, groundAt, inMap, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import type { FishRarity, FishShadow, FishingState, ShadowSize } from '../etat/peche';
 import { emptyFishing, shadowPosAt } from '../etat/peche';
 import { unitDraw } from '../etat/tirage';
@@ -49,35 +49,35 @@ function geometry(map: GameMap, minShore: number, castRange: number): ZoneGeomet
   const known = GEOMETRY.get(map);
   if (known !== undefined) return known;
   const zones = map.fishingZones ?? [];
-  const { width, height } = map;
-  const zoneOfCell = new Int16Array(width * height).fill(-1);
+  const zoneOfCell = new Int16Array(map.width * map.height).fill(-1);
   zones.forEach((z, i) => {
     for (const r of z.rects) {
       for (let cy = r.y; cy < r.y + r.h; cy++) {
         for (let cx = r.x; cx < r.x + r.w; cx++) {
-          if (cx < 0 || cy < 0 || cx >= width || cy >= height) continue;
-          if (map.ground[cy * width + cx] === 'water' && zoneOfCell[cy * width + cx] === -1) zoneOfCell[cy * width + cx] = i;
+          if (!inMap(map, cx, cy)) continue;
+          const k = cellIndex(map, cx, cy);
+          if (map.ground[k] === 'water' && zoneOfCell[k] === -1) zoneOfCell[k] = i;
         }
       }
     }
   });
   // Ce qui n'est pas de l'eau libre: la terre, et ce qui couvre l'eau (ponton, ouvrages du ru, chantiers).
-  const covered = new Uint8Array(width * height);
+  const covered = new Uint8Array(map.width * map.height);
   const cover = (x0: number, y0: number, w: number, h: number): void => {
-    for (let cy = y0; cy < y0 + h; cy++) for (let cx = x0; cx < x0 + w; cx++) if (cx >= 0 && cy >= 0 && cx < width && cy < height) covered[cy * width + cx] = 1;
+    for (let cy = y0; cy < y0 + h; cy++) for (let cx = x0; cx < x0 + w; cx++) if (inMap(map, cx, cy)) covered[cellIndex(map, cx, cy)] = 1;
   };
   for (const p of map.props) if (p.rect !== null) cover(p.rect.x, p.rect.y, p.rect.w, p.rect.h);
   for (const c of map.crossings) cover(c.rect.x, c.rect.y, c.rect.w, c.rect.h);
   for (const imp of Object.values(map.improvements ?? {})) for (const c of imp.cells) cover(c.cx, c.cy, 1, 1);
   const openWater = (cx: number, cy: number): boolean =>
-    cx >= 0 && cy >= 0 && cx < width && cy < height && map.ground[cy * width + cx] === 'water' && covered[cy * width + cx] === 0;
+    inMap(map, cx, cy) && map.ground[cellIndex(map, cx, cy)] === 'water' && covered[cellIndex(map, cx, cy)] === 0;
   const standable = (cx: number, cy: number): boolean =>
-    cx >= 0 && cy >= 0 && cx < width && cy < height && !map.blocked[cy * width + cx] && map.ground[cy * width + cx] !== 'water';
+    inMap(map, cx, cy) && !map.blocked[cellIndex(map, cx, cy)] && map.ground[cellIndex(map, cx, cy)] !== 'water';
   const spots: Spot[][] = zones.map(() => []);
   const reach = Math.ceil(castRange);
-  for (let cy = 0; cy < height; cy++) {
-    for (let cx = 0; cx < width; cx++) {
-      const zi = zoneOfCell[cy * width + cx] ?? -1;
+  for (let cy = mapMinY(map); cy <= mapMaxY(map); cy++) {
+    for (let cx = mapMinX(map); cx <= mapMaxX(map); cx++) {
+      const zi = zoneOfCell[cellIndex(map, cx, cy)] ?? -1;
       if (zi < 0 || !openWater(cx, cy)) continue;
       for (const [ox, oy] of [[0, 0], [SPOT_STEP, 0], [0, SPOT_STEP], [SPOT_STEP, SPOT_STEP]] as const) {
         const x = cx + ox;
@@ -131,8 +131,8 @@ export function fishingZoneAt(sim: Sim, x: number, y: number): FishingZone | nul
   const g = geo(sim);
   const cx = Math.floor(x);
   const cy = Math.floor(y);
-  if (cx < 0 || cy < 0 || cx >= sim.map.width || cy >= sim.map.height) return null;
-  return g.zones[g.zoneOfCell[cy * sim.map.width + cx] ?? -1] ?? null;
+  if (!inMap(sim.map, cx, cy)) return null;
+  return g.zones[g.zoneOfCell[cellIndex(sim.map, cx, cy)] ?? -1] ?? null;
 }
 
 /** Places possibles d'un coin (tests, rendu de démonstration). */
@@ -502,7 +502,7 @@ export function fleeShadow(sim: Sim, id: number, from: Vec2): void {
   const wet = (d: number): boolean => {
     const cx = Math.floor(at.x + Math.cos(away) * d);
     const cy = Math.floor(at.y + Math.sin(away) * d);
-    return cx >= 0 && cy >= 0 && cx < sim.map.width && cy < sim.map.height && sim.map.ground[cy * sim.map.width + cx] === 'water';
+    return groundAt(sim.map, cx, cy) === 'water';
   };
   while (run > 0 && !wet(run)) run = Math.max(0, run - 0.25);
   s.move = { from: at, since: tick, until: tick + secondsToTicks(rules.shadows.fleeSeconds) };
@@ -606,7 +606,7 @@ export function assistedBobber(sim: Sim, c: Character): Vec2 | null {
   const water = (p: Vec2): boolean => {
     const cx = Math.floor(p.x);
     const cy = Math.floor(p.y);
-    return cx >= 0 && cy >= 0 && cx < sim.map.width && cy < sim.map.height && sim.map.ground[cy * sim.map.width + cx] === 'water';
+    return groundAt(sim.map, cx, cy) === 'water';
   };
   if (water(at)) return at;
   return water(best.pos) ? { x: best.pos.x, y: best.pos.y } : null;

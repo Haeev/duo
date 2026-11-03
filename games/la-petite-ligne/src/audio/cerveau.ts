@@ -8,7 +8,7 @@
 import { isHome } from '../etat/interieurs';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
-import type { GameMap, Rect } from '../etat/carte';
+import { type GameMap, type Rect, groundAt, mapCentre, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import type { CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import { type AmbienceInput, ambienceLevels, ambienceZones, type AmbienceZones } from './ambiances';
 import { seasonOfDay, secondsPerGameMinuteOn } from '../donnees/calendrier';
@@ -185,14 +185,14 @@ export class AudioBrain {
       departureMoveAt,
     };
     this.tracker = new TrainTracker(this.trainRules);
-    const stop = map.points[settings.train.stopPoint] ?? { x: map.width / 2, y: 0 };
+    const stop = map.points[settings.train.stopPoint] ?? { x: mapCentre(map).x, y: mapMinY(map) };
     this.stopPoint = { x: stop.x, y: stop.y };
     this.geometry = {
       stop: { x: stop.x + settings.train.locomotiveOffsetM, y: trackY(map) ?? stop.y },
       slideDistance: settings.train.slideDistanceM,
       departureDirection: settings.train.departureDirection,
-      offMapX: settings.train.offMapX,
-      maxX: map.width,
+      offMapX: mapMinX(map) + settings.train.offMapX,
+      maxX: mapMaxX(map) + 1,
     };
     this.zones = ambienceZones(map, settings.ambience);
     this.saturdayRects = settings.music.saturdayZones.map((z) => map.zones[z]).filter((r): r is Rect => r !== undefined);
@@ -517,9 +517,9 @@ export class AudioBrain {
 /** Milieu des rangées de rails de la carte (comme le rendu), ou `null`. */
 function trackY(map: GameMap): number | null {
   const rows: number[] = [];
-  for (let cy = 0; cy < map.height; cy += 1) {
+  for (let cy = mapMinY(map); cy <= mapMaxY(map); cy += 1) {
     let rails = 0;
-    for (let cx = 0; cx < map.width; cx += 1) if (map.ground[cy * map.width + cx] === 'rail') rails += 1;
+    for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) if (groundAt(map, cx, cy) === 'rail') rails += 1;
     if (rails > map.width / 2) rows.push(cy);
   }
   const first = rows[0];

@@ -9,6 +9,7 @@ import type { Object3D } from 'three';
 import { AnimationMixer, Group, Matrix4, Mesh } from 'three';
 import type { Content, MomentDef } from '../donnees/types';
 import type { GameMap, MapProp } from '../etat/carte';
+import { groundAt, mapCentre, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { armedCells, resolveTrack, sampleResolved, type TrackSample, type Vec3 } from '../etat/moments';
 import { SIM_HZ, type DeepReadonly, type MomentToday, type TrainPhase } from '../etat/types';
 import { smoothFactor } from './camera';
@@ -63,10 +64,10 @@ const MINUTES_PER_DIAL = 720;
 /** Rangées de la ligne (plus de la moitié de la largeur en voie) et axe de la voie (y, m). */
 export function mainLine(map: GameMap): { rows: Set<number>; trackY: number } {
   const railRows: number[] = [];
-  for (let cy = 0; cy < map.height; cy += 1) {
+  for (let cy = mapMinY(map); cy <= mapMaxY(map); cy += 1) {
     let rails = 0;
-    for (let cx = 0; cx < map.width; cx += 1) {
-      if (map.ground[cy * map.width + cx] === 'rail') {
+    for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) {
+      if (groundAt(map, cx, cy) === 'rail') {
         rails += 1;
       }
     }
@@ -98,16 +99,11 @@ export interface Turntable {
 export function sidingTurntables(map: GameMap): Turntable[] {
   const { rows, trackY } = mainLine(map);
   if (rows.size === 0) return [];
-  const isRail = (cx: number, cy: number): boolean =>
-    cx >= 0 &&
-    cy >= 0 &&
-    cx < map.width &&
-    cy < map.height &&
-    map.ground[cy * map.width + cx] === 'rail';
+  const isRail = (cx: number, cy: number): boolean => groundAt(map, cx, cy) === 'rail';
   const first = Math.min(...rows);
   const last = Math.max(...rows);
   const plates: Turntable[] = [];
-  for (let cx = 0; cx < map.width; cx += 1) {
+  for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) {
     for (const [row, side] of [
       [first - 1, -1],
       [last + 1, 1],
@@ -246,7 +242,7 @@ export class RailwayPart implements EventfulPart {
     this.salute = saluteTrack(content);
     const line = mainLine(map);
     this.trackY = line.trackY;
-    this.stopX = map.points.train_stop?.x ?? map.width / 2;
+    this.stopX = map.points.train_stop?.x ?? mapCentre(map).x;
     const top = library.extras(RAIL_MODEL).rail_top;
     this.railTop = typeof top === 'number' ? top : DEFAULT_RAIL_TOP;
 
@@ -351,11 +347,12 @@ export class RailwayPart implements EventfulPart {
     const ext = RENDER_SETTINGS.terrain.extension;
     const chunk = RENDER_SETTINGS.terrain.stripSegment;
     const matrix = new Matrix4();
-    const ground = this.terrain.heightAt(this.map.width / 2, this.trackY);
+    const ground = this.terrain.heightAt(mapCentre(this.map).x, this.trackY);
     let segment: InstancedBatches | null = null;
     let segmentIndex = -1;
-    for (let x = -ext + RAIL_MODULE_LENGTH / 2; x < this.map.width + ext; x += RAIL_MODULE_LENGTH) {
-      const index = Math.floor((x + ext) / chunk);
+    const west = mapMinX(this.map) - ext;
+    for (let x = west + RAIL_MODULE_LENGTH / 2; x < mapMaxX(this.map) + 1 + ext; x += RAIL_MODULE_LENGTH) {
+      const index = Math.floor((x - west) / chunk);
       if (segment === null || index !== segmentIndex) {
         segment?.end();
         segment = new InstancedBatches(
@@ -388,12 +385,7 @@ export class RailwayPart implements EventfulPart {
     for (let cy = Math.floor(this.trackY - 1.5); cy <= Math.ceil(this.trackY + 0.5); cy += 1) {
       rows.add(cy);
     }
-    const isRail = (cx: number, cy: number): boolean =>
-      cx >= 0 &&
-      cy >= 0 &&
-      cx < map.width &&
-      cy < map.height &&
-      map.ground[cy * map.width + cx] === 'rail';
+    const isRail = (cx: number, cy: number): boolean => groundAt(map, cx, cy) === 'rail';
     const batch = new InstancedBatches(
       'voies de garage',
       this.library,
@@ -408,8 +400,8 @@ export class RailwayPart implements EventfulPart {
     this.layTurntables(plates, materials, resources, ground);
     let any = false;
     batch.begin();
-    for (let cx = 0; cx < map.width; cx += 1) {
-      for (let cy = 0; cy < map.height; cy += 1) {
+    for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) {
+      for (let cy = mapMinY(map); cy <= mapMaxY(map); cy += 1) {
         // Début d'une colonne de voie hors de la ligne (ni case voisine de voie à l'ouest ni à l'est).
         if (
           rows.has(cy) ||

@@ -4,6 +4,7 @@
  * poisson de l'ombre sort de l'eau. Manqué, l'ombre file. Le mythique demande l'épuisette de
  * l'autre. Les ombres, le guet et le coin qui frémit vivent dans `ombres.ts`.
  */
+import { groundAt, inMap } from '../etat/carte';
 import type { FishRarity } from '../etat/peche';
 import type { Character, ItemId, Vec2 } from '../etat/types';
 import { type Sim, bump, character, distance, emit, message, notify, partnerOf, sayIfWritten, secondsToTicks } from './contexte';
@@ -54,8 +55,8 @@ export function waterAhead(sim: Sim, c: Character): Vec2 | null {
   for (let d = stepSize; d <= fishing.castRange; d += stepSize) {
     const cx = Math.floor(c.pos.x + dx * d);
     const cy = Math.floor(c.pos.y + dy * d);
-    if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) break;
-    const water = map.ground[cy * map.width + cx] === 'water';
+    if (!inMap(map, cx, cy)) break;
+    const water = groundAt(map, cx, cy) === 'water';
     if (first === null) {
       if (!water) continue;
       if (fishing.castDistance === null) return { x: cx + 0.5, y: cy + 0.5 };

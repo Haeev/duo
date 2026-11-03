@@ -7,7 +7,7 @@ import { createInputState } from '../../../packages/sdk/src/input-state';
 import manifest from '../duo-game.json';
 import { createControls } from '../src/entrees/commandes';
 import type { AuthoredIntent, ControlFrame, Intent } from '../src/etat/actions';
-import type { GameMap } from '../src/etat/carte';
+import { type GameMap, cellIndex } from '../src/etat/carte';
 import type { Vec2, WorldEvent } from '../src/etat/types';
 import type { GameView, Renderer } from '../src/etat/vue';
 import type { GameAction } from '../src/session';
@@ -187,9 +187,10 @@ describe('correction de coin', () => {
     const width = 12;
     const height = 12;
     const cells = new Array<boolean>(width * height).fill(false);
-    for (const [cx, cy] of blocked) cells[cy * width + cx] = true;
-    // `moveBody` ne lit de la carte que sa taille et ses cases bloquées.
-    const map = { width, height, blocked: cells } as unknown as GameMap;
+    const frame = { originX: 0, originY: 0, width, height };
+    for (const [cx, cy] of blocked) cells[cellIndex(frame, cx, cy)] = true;
+    // `moveBody` ne lit de la carte que sa grille et ses cases bloquées.
+    const map = { ...frame, blocked: cells } as unknown as GameMap;
     return { map, dynamic: new Uint8Array(width * height) };
   }
 

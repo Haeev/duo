@@ -16,7 +16,7 @@
  */
 import { Color, DataTexture, RGBAFormat, Vector2, Vector4, type Mesh, type Vector3 } from 'three';
 import type { MomentDef } from '../donnees/types';
-import type { GameMap } from '../etat/carte';
+import { type GameMap, inMap } from '../etat/carte';
 import {
   PARTICLE_MODE,
   PARTICLE_SHAPE,
@@ -348,7 +348,7 @@ export class MistBank {
     if (this.terrain.waterLevelAt(x, y) !== null) return 1;
     const cx = Math.floor(x);
     const cy = Math.floor(y);
-    if (cx < 0 || cy < 0 || cx >= this.map.width || cy >= this.map.height) return 0;
+    if (!inMap(this.map, cx, cy)) return 0;
     // Berge basse (sable et galets, au ras de l'eau): la brume y déborde, légère.
     return this.terrain.heightAt(x, y) < 0.05 ? s.bankOpacity / Math.max(0.01, s.waterOpacity) : 0;
   }

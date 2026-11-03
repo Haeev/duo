@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { groundAt } from '../src/etat/carte';
 import type { FishShadow } from '../src/etat/peche';
 import type { Character } from '../src/etat/types';
 import { decodeSave, restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
@@ -83,8 +84,7 @@ function clearance(sim: Sim, x: number, y: number): number {
     for (let dx = -4; dx <= 4; dx++) {
       const cx = Math.floor(x) + dx;
       const cy = Math.floor(y) + dy;
-      const inside = cx >= 0 && cy >= 0 && cx < map.width && cy < map.height;
-      if (inside && map.ground[cy * map.width + cx] === 'water' && !covered(cx, cy)) continue;
+      if (groundAt(map, cx, cy) === 'water' && !covered(cx, cy)) continue;
       best = Math.min(best, Math.hypot(Math.max(cx - x, 0, x - cx - 1), Math.max(cy - y, 0, y - cy - 1)));
     }
   }

@@ -10,7 +10,7 @@
  * la géométrie et la surface de l'eau.
  */
 import type { GameMap, GroundKind } from '../etat/carte';
-import { cellIndex } from '../etat/carte';
+import { cellIndex, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { valueNoise } from './bruit';
 import { RENDER_SETTINGS } from './reglages';
 
@@ -31,8 +31,8 @@ export interface StreamLayout {
 }
 
 function kindAt(map: GameMap, cx: number, cy: number): GroundKind {
-  const x = Math.min(map.width - 1, Math.max(0, cx));
-  const y = Math.min(map.height - 1, Math.max(0, cy));
+  const x = Math.min(mapMaxX(map), Math.max(mapMinX(map), cx));
+  const y = Math.min(mapMaxY(map), Math.max(mapMinY(map), cy));
   return map.ground[cellIndex(map, x, y)] ?? 'grass';
 }
 
@@ -63,7 +63,7 @@ export function streamLayout(map: GameMap, extension: number): StreamLayout | nu
     }
   }
   // Le ru vient du coteau: il continue dans la bande prolongée s'il touche le bord nord.
-  const fromY = stream.fromY <= 0 ? -extension : stream.fromY;
+  const fromY = stream.fromY <= mapMinY(map) ? mapMinY(map) - extension : stream.fromY;
   return { x0, x1, fromY, mouthY, embankment };
 }
 

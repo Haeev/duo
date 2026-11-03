@@ -2,6 +2,7 @@
  * Habitants: emploi du temps (`habitants.json`, première entrée vraie) et
  * trajets à pied d'un point à l'autre. Ils traversent les personnages (PE-09).
  */
+import { inMap } from '../etat/carte';
 import type { Vec2, VillagerState } from '../etat/types';
 import type { VillagerDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT } from './conditions';
@@ -115,7 +116,7 @@ export function updateVillagers(sim: Sim, dt: number): void {
           // Il arrive d'en dehors du bourg: il apparaît directement là où il va (sur un banc,
           // devant sa place, donc assis), jamais au milieu d'une emprise d'où il ressortirait.
           const at = goalOf(sim, v, entry.point);
-          if (at !== undefined && v.pos.x < 0) teleport(v, at.x, at.y);
+          if (at !== undefined && !inMap(sim.map, Math.floor(v.pos.x), Math.floor(v.pos.y))) teleport(v, at.x, at.y);
           v.visible = true;
         }
         routeTo(sim, v, entry.point);

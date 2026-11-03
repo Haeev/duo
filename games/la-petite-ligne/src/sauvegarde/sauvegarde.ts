@@ -21,7 +21,7 @@ import { variantOf } from '../simulation/conditions';
 import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
 import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
-import { buildingAt } from '../etat/carte';
+import { buildingAt, offstagePoint } from '../etat/carte';
 import { isTool } from '../etat/maison';
 import { addStack } from '../simulation/sac';
 import { type StepInput, step } from '../simulation/pas';
@@ -752,7 +752,15 @@ function resume(
     settleWardrobe(content.clothes, c, c.id === 'p1' ? 0 : 1);
   }
   world.fishing = withoutTransientFishing({ fishing: world.fishing } as WorldState).fishing;
-  for (const v of world.villagers) v.talkingWith = [];
+  // 0.13: hors du bourg, l'habitant attend au point `offstage` de cette carte (l'ancien, fixe en
+  // (-20, -20), tombe dans le bois de la carte agrandie).
+  const offstage = map.points.offstage ?? offstagePoint(map);
+  for (const v of world.villagers) {
+    v.talkingWith = [];
+    if (v.target !== 'offstage') continue;
+    v.pos = { x: offstage.x, y: offstage.y };
+    v.prev = { x: offstage.x, y: offstage.y };
+  }
   renameSavedCurrency(world);
   fillEconomyFields(world);
   world.stages.choice = { p1: null, p2: null };

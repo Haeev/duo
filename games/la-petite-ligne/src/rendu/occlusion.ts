@@ -25,7 +25,7 @@ import {
   type Object3D,
 } from 'three';
 import type { GameMap, MapProp } from '../etat/carte';
-import { cellIndex, inRect } from '../etat/carte';
+import { groundAt, inRect } from '../etat/carte';
 import { FIELD_HEIGHT_MIN, FIELD_HEIGHT_RANGE } from './champs';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
@@ -252,8 +252,8 @@ export function createOcclusionField(map: GameMap, terrain: Terrain, scene: Obje
   const ext = RENDER_SETTINGS.terrain.extension;
   const k = look.occlusionTexelsPerMeter;
   const grid: OcclusionGrid = {
-    originX: -ext,
-    originY: -ext,
+    originX: map.originX - ext,
+    originY: map.originY - ext,
     width: (map.width + 2 * ext) * k,
     height: (map.height + 2 * ext) * k,
     texelsPerMeter: k,
@@ -288,12 +288,7 @@ export function createOcclusionField(map: GameMap, terrain: Terrain, scene: Obje
       );
       const cx = Math.floor(x);
       const cy = Math.floor(y);
-      const stone =
-        cx >= 0 &&
-        cy >= 0 &&
-        cx < map.width &&
-        cy < map.height &&
-        map.ground[cellIndex(map, cx, cy)] === 'stone';
+      const stone = groundAt(map, cx, cy) === 'stone';
       data[i * RGBA + 2] = stone ? BYTE : 0;
       data[i * RGBA + 3] = stone && paved(x, y) ? BYTE : 0;
     }

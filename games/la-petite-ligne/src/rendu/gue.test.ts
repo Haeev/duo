@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
+import { groundAt, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { findPath } from '../simulation/grille';
 import { isFord } from './champs';
 import { layFordStones, type FordStone } from './gue';
@@ -9,8 +10,8 @@ import { RENDER_SETTINGS } from './reglages';
 const map = loadMap(MAP_FILES).map;
 const S = RENDER_SETTINGS.terrain.fordStones;
 const cells: { cx: number; cy: number }[] = [];
-for (let cy = 0; cy < map.height; cy += 1) {
-  for (let cx = 0; cx < map.width; cx += 1) {
+for (let cy = mapMinY(map); cy <= mapMaxY(map); cy += 1) {
+  for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) {
     if (isFord(map, cx, cy)) cells.push({ cx, cy });
   }
 }
@@ -68,7 +69,7 @@ describe('pierres du gué', () => {
     const pathXs = (cy: number): number[] => {
       const xs: number[] = [];
       for (let cx = minX; cx < maxX; cx += 1)
-        if (map.ground[cy * map.width + cx] === 'path') xs.push(cx + 0.5);
+        if (groundAt(map, cx, cy) === 'path') xs.push(cx + 0.5);
       return xs;
     };
     const north = pathXs(minY - 2);

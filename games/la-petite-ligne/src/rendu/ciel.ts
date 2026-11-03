@@ -124,11 +124,11 @@ export class SkyLayer {
     const color = new Color(sky.mistColor);
     let index = start;
     for (let bank = 0; bank < sky.mist; bank += 1) {
-      let x = map.width * HALF;
-      let y = map.height * HALF;
+      let x = map.originX + map.width * HALF;
+      let y = map.originY + map.height * HALF;
       for (let attempt = 0; attempt < MIST_TRIES; attempt += 1) {
-        x = hash2(bank, attempt * 2, SEED_MIST) * map.width;
-        y = hash2(bank, attempt * 2 + 1, SEED_MIST) * map.height;
+        x = map.originX + hash2(bank, attempt * 2, SEED_MIST) * map.width;
+        y = map.originY + hash2(bank, attempt * 2 + 1, SEED_MIST) * map.height;
         if (terrain.heightAt(x, y) < MIST_MAX_GROUND) {
           break;
         }
@@ -155,8 +155,8 @@ export class SkyLayer {
     for (let bank = 0; bank < this.morning; bank += 1) {
       const index = start + bank;
       const rect = rects[bank % Math.max(1, rects.length)];
-      let x = rect === undefined ? map.width * HALF : rect.x + rect.w * HALF;
-      let y = rect === undefined ? map.height * HALF : rect.y + rect.h * HALF;
+      let x = rect === undefined ? map.originX + map.width * HALF : rect.x + rect.w * HALF;
+      let y = rect === undefined ? map.originY + map.height * HALF : rect.y + rect.h * HALF;
       for (let attempt = 0; rect !== undefined && attempt < MIST_TRIES; attempt += 1) {
         x = rect.x + hash2(bank, attempt * 2, SEED_MORNING) * rect.w;
         y = rect.y + hash2(bank, attempt * 2 + 1, SEED_MORNING) * rect.h;

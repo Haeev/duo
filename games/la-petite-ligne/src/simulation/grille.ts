@@ -3,7 +3,7 @@
  * Déterministe: mêmes entrées, même résultat, dans Node comme dans Chromium.
  * Le même code sert à l'hôte et à la prédiction de l'invité.
  */
-import type { GameMap } from '../etat/carte';
+import { type GameMap, cellIndex, cellX, cellY, inMap } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
 import { BODY_RADIUS, CORNER_NUDGE_MAX, CORNER_NUDGE_STEP } from './constantes';
 
@@ -29,8 +29,8 @@ export const OPENED_CELL = 255;
 
 export function isBlockedCell(b: Blockers, cx: number, cy: number): boolean {
   const { map } = b;
-  if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return true;
-  const i = cy * map.width + cx;
+  if (!inMap(map, cx, cy)) return true;
+  const i = cellIndex(map, cx, cy);
   if (b.avoid?.[i] === 1) return true;
   const d = b.dynamic[i] ?? 0;
   if (d === OPENED_CELL) return false;
@@ -156,6 +156,50 @@ export function nearestFreeCell(b: Blockers, target: Vec2): Vec2 | null {
   return null;
 }
 
+/**
+ * Nœuds développés au plus par `findPath` (0.13: la carte agrandie demande jusqu'à 3 600 nœuds
+ * avec l'heuristique octile, de la coupe à l'atelier de la forge). Un but inatteignable coûte ce
+ * plafond: robots et habitants ne doivent pas viser une porte fermée en boucle.
+ */
+export const PATH_MAX_NODES = 12_000;
+
+/**
+ * Distance octile (pas droits de 1, diagonales de racine de 2): exacte sur une grille vide à
+ * 8 voisins, donc admissible et plus serrée que la distance euclidienne.
+ */
+function octile(dx: number, dy: number): number {
+  const ax = Math.abs(dx);
+  const ay = Math.abs(dy);
+  return ax > ay ? ax + (Math.SQRT2 - 1) * ay : ay + (Math.SQRT2 - 1) * ax;
+}
+
+/**
+ * Tableaux de travail de l'A*, gardés d'un appel à l'autre: la carte agrandie (12 792 cases) en
+ * aurait alloué 166 Ko par trajet. Une case n'a de valeur que si son tampon vaut celui de l'appel.
+ */
+interface PathScratch {
+  gScore: Float64Array;
+  came: Int32Array;
+  seen: Uint32Array;
+  closed: Uint32Array;
+  stamp: number;
+}
+
+let scratch: PathScratch | null = null;
+
+function pathScratch(size: number): PathScratch {
+  if (scratch === null || scratch.gScore.length < size) {
+    scratch = { gScore: new Float64Array(size), came: new Int32Array(size), seen: new Uint32Array(size), closed: new Uint32Array(size), stamp: 0 };
+  }
+  scratch.stamp += 1;
+  if (scratch.stamp >= 0xffffffff) {
+    scratch.seen.fill(0);
+    scratch.closed.fill(0);
+    scratch.stamp = 1;
+  }
+  return scratch;
+}
+
 const NEIGHBOURS: readonly [number, number, number][] = [
   [1, 0, 1],
   [-1, 0, 1],
@@ -173,9 +217,8 @@ const NEIGHBOURS: readonly [number, number, number][] = [
  * `null` si rien ne relie les deux. Si `to` est bloqué, vise la case libre la
  * plus proche.
  */
-export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = 4000): Vec2[] | null {
+export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = PATH_MAX_NODES): Vec2[] | null {
   const { map } = b;
-  const w = map.width;
   let goal = to;
   if (isBlockedCell(b, Math.floor(to.x), Math.floor(to.y))) {
     const free = nearestFreeCell(b, to);
@@ -188,16 +231,14 @@ export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = 4000): Ve
   const gy = Math.floor(goal.y);
   if (sx === gx && sy === gy) return [{ x: goal.x, y: goal.y }];
 
-  const size = w * map.height;
-  const gScore = new Float64Array(size).fill(Number.POSITIVE_INFINITY);
-  const came = new Int32Array(size).fill(-1);
-  const closed = new Uint8Array(size);
-  const start = sy * w + sx;
-  const goalIndex = gy * w + gx;
+  const { gScore, came, seen, closed, stamp } = pathScratch(map.width * map.height);
+  const start = cellIndex(map, sx, sy);
+  const goalIndex = cellIndex(map, gx, gy);
   gScore[start] = 0;
+  seen[start] = stamp;
   // Tas binaire minimal sur f = g + h.
   const heapNodes: number[] = [start];
-  const heapF: number[] = [Math.hypot(gx - sx, gy - sy)];
+  const heapF: number[] = [octile(gx - sx, gy - sy)];
   const push = (node: number, f: number): void => {
     heapNodes.push(node);
     heapF.push(f);
@@ -248,24 +289,25 @@ export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = 4000): Ve
       found = true;
       break;
     }
-    if (closed[current] === 1) continue;
-    closed[current] = 1;
+    if (closed[current] === stamp) continue;
+    closed[current] = stamp;
     expanded++;
-    const cx = current % w;
-    const cy = (current - cx) / w;
+    const cx = cellX(map, current);
+    const cy = cellY(map, current);
     const g = gScore[current] ?? 0;
     for (const [ox, oy, cost] of NEIGHBOURS) {
       const nx = cx + ox;
       const ny = cy + oy;
       if (isBlockedCell(b, nx, ny)) continue;
       if (ox !== 0 && oy !== 0 && (isBlockedCell(b, cx + ox, cy) || isBlockedCell(b, cx, cy + oy))) continue;
-      const ni = ny * w + nx;
-      if (closed[ni] === 1) continue;
+      const ni = cellIndex(map, nx, ny);
+      if (closed[ni] === stamp) continue;
       const tentative = g + cost;
-      if (tentative < (gScore[ni] ?? Number.POSITIVE_INFINITY)) {
+      if (seen[ni] !== stamp || tentative < (gScore[ni] ?? Number.POSITIVE_INFINITY)) {
         gScore[ni] = tentative;
+        seen[ni] = stamp;
         came[ni] = current;
-        push(ni, tentative + Math.hypot(gx - nx, gy - ny));
+        push(ni, tentative + octile(gx - nx, gy - ny));
       }
     }
   }
@@ -273,7 +315,7 @@ export function findPath(b: Blockers, from: Vec2, to: Vec2, maxNodes = 4000): Ve
   const cells: number[] = [];
   for (let n = goalIndex; n !== start && n !== -1; n = came[n] ?? -1) cells.push(n);
   cells.reverse();
-  const path = cells.map((n) => ({ x: (n % w) + 0.5, y: Math.floor(n / w) + 0.5 }));
+  const path = cells.map((n) => ({ x: cellX(map, n) + 0.5, y: cellY(map, n) + 0.5 }));
   const last = path[path.length - 1];
   if (last !== undefined) {
     last.x = goal.x;

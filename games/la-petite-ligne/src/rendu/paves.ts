@@ -5,7 +5,7 @@
  * nord, unies en douceur (même union que le shader). Hors de la place: toute case de pierre
  * (rue, cour, quai) est pavée.
  */
-import type { GameMap } from '../etat/carte';
+import { type GameMap, groundAt } from '../etat/carte';
 import { RENDER_SETTINGS } from './reglages';
 
 function smoothMax(a: number, b: number, k: number): number {
@@ -49,8 +49,7 @@ function inSquare(x: number, y: number): boolean {
 export function pavedAt(map: GameMap, x: number, y: number): boolean {
   const cx = Math.floor(x);
   const cy = Math.floor(y);
-  if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return false;
-  if (map.ground[cy * map.width + cx] !== 'stone') return false;
+  if (groundAt(map, cx, cy) !== 'stone') return false;
   return inSquare(x, y) ? squarePaveField(map, x, y) > 0 : true;
 }
 

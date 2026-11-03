@@ -5,6 +5,7 @@
  * habitants qui le sautent (`feel.steppingStoneVillagers`).
  */
 import { describe, expect, it } from 'vitest';
+import { cellIndex } from '../src/etat/carte';
 import type { Vec2 } from '../src/etat/types';
 import { villagerBlockers } from '../src/simulation/deplacement';
 import { findPath } from '../src/simulation/grille';
@@ -19,7 +20,7 @@ describe('trajets des habitants (S04)', () => {
   const stones = new Set<number>();
   for (const c of map.crossings) {
     if (c.kind !== 'ford') continue;
-    for (let y = c.rect.y; y < c.rect.y + c.rect.h; y++) for (let x = c.rect.x; x < c.rect.x + c.rect.w; x++) stones.add(y * map.width + x);
+    for (let y = c.rect.y; y < c.rect.y + c.rect.h; y++) for (let x = c.rect.x; x < c.rect.x + c.rect.w; x++) stones.add(cellIndex(map, x, y));
   }
 
   it('la carte a un gué de pierres sur le ru', () => {
@@ -52,7 +53,7 @@ describe('trajets des habitants (S04)', () => {
             for (let i = 0; i <= n; i++) {
               const cx = Math.floor(prev.x + ((p.x - prev.x) * i) / n);
               const cy = Math.floor(prev.y + ((p.y - prev.y) * i) / n);
-              const k = cy * map.width + cx;
+              const k = cellIndex(map, cx, cy);
               // L'eau sous un sol posé (ponton) est franchissable sur la carte: seule l'eau bloquée compte.
               if (map.ground[k] === 'water' && map.blocked[k] === true) wet.add(`eau ${String(cx)},${String(cy)}`);
               if (!hops && stones.has(k)) wet.add(`gué de pierres ${String(cx)},${String(cy)}`);

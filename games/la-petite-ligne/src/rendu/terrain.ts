@@ -17,7 +17,7 @@ import {
   Vector3,
 } from 'three';
 import type { GameMap, GroundKind, MapCrossing, MapProp } from '../etat/carte';
-import { cellIndex, inRect } from '../etat/carte';
+import { cellIndex, cellX, cellY, inMap, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import { isFord } from './champs';
 import { layFordStones } from './gue';
@@ -233,6 +233,11 @@ export class Terrain {
   /** Surface du ru de la Côte, en morceaux (même programme que la rivière, courant vers le sud). */
   readonly streamWater: Mesh[] = [];
   private readonly ext = SETTINGS.extension;
+  /** Bornes de la grille (première case comprise, `gridX1` et `gridY1` exclues). */
+  private readonly gridX0: number;
+  private readonly gridX1: number;
+  private readonly gridY0: number;
+  private readonly gridY1: number;
   private readonly floorRects: { x: number; y: number; w: number; h: number; height: number }[] =
     [];
   private readonly crossings: Crossing[] = [];
@@ -253,9 +258,13 @@ export class Terrain {
     crossingHeight: (crossing: MapCrossing) => number | undefined = () => undefined,
   ) {
     this.group.name = 'terrain';
+    this.gridX0 = map.originX;
+    this.gridX1 = map.originX + map.width;
+    this.gridY0 = map.originY;
+    this.gridY1 = map.originY + map.height;
     this.stream = streamLayout(map, this.ext);
-    for (let cy = 0; cy < map.height; cy += 1) {
-      for (let cx = 0; cx < map.width; cx += 1) {
+    for (let cy = this.gridY0; cy < this.gridY1; cy += 1) {
+      for (let cx = this.gridX0; cx < this.gridX1; cx += 1) {
         if (isFord(map, cx, cy) && !isStreamCell(this.stream, cx, cy)) {
           this.fords.add(cellIndex(map, cx, cy));
         }
@@ -389,8 +398,8 @@ export class Terrain {
   private buildRiverField(): RiverField {
     let y0 = Number.POSITIVE_INFINITY;
     let y1 = Number.NEGATIVE_INFINITY;
-    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
-      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+    for (let cy = this.gridY0 - this.ext; cy < this.gridY1 + this.ext; cy += 1) {
+      for (let cx = this.gridX0 - this.ext; cx < this.gridX1 + this.ext; cx += 1) {
         if (this.inRiverBed(cx, cy)) {
           y0 = Math.min(y0, cy);
           y1 = Math.max(y1, cy + 1);
@@ -400,13 +409,13 @@ export class Terrain {
     }
     if (!Number.isFinite(y0)) {
       // Carte sans rivière: une grille minuscule, jamais lue.
-      y0 = 0;
-      y1 = 1;
+      y0 = this.gridY0;
+      y1 = this.gridY0 + 1;
     }
     return createRiverField(
       (cx, cy) => this.riverCell(cx, cy),
-      -this.ext,
-      this.map.width + this.ext,
+      this.gridX0 - this.ext,
+      this.gridX1 + this.ext,
       y0,
       y1,
     );
@@ -471,8 +480,8 @@ export class Terrain {
     const scale = new Vector3();
     const surfacing: RiverStone[] = [];
     const cells = [...this.fords].map((index) => ({
-      cx: index % this.map.width,
-      cy: Math.floor(index / this.map.width),
+      cx: cellX(this.map, index),
+      cy: cellY(this.map, index),
     }));
     const downstream = Math.sign(AMBIANCE_SETTINGS.water.flow[0]) || 1;
     for (const stone of layFordStones(this.map, cells, downstream)) {
@@ -538,7 +547,7 @@ export class Terrain {
   /** Vrai si un point de la rive est assez loin du gué et des sols posés (on y passe). */
   private shoreClear(x: number, y: number, clearance: number): boolean {
     const margin = SETTINGS.river.stones.margin;
-    if (x < -margin || y < -margin || x > this.map.width + margin || y > this.map.height + margin) {
+    if (x < this.gridX0 - margin || y < this.gridY0 - margin || x > this.gridX1 + margin || y > this.gridY1 + margin) {
       return false;
     }
     for (const rect of this.floorRects) {
@@ -549,8 +558,8 @@ export class Terrain {
       }
     }
     for (const index of this.fords) {
-      const cx = index % this.map.width;
-      const cy = Math.floor(index / this.map.width);
+      const cx = cellX(this.map, index);
+      const cy = cellY(this.map, index);
       const dx = Math.max(cx - x, 0, x - (cx + 1));
       const dy = Math.max(cy - y, 0, y - (cy + 1));
       if (Math.hypot(dx, dy) < clearance) {
@@ -651,9 +660,9 @@ export class Terrain {
 
   /** Case de la carte ou de la bande prolongée (coordonnées rabattues sur le bord). */
   look(cx: number, cy: number): CellLook {
-    const inside = cx >= 0 && cy >= 0 && cx < this.map.width && cy < this.map.height;
-    const x = Math.min(this.map.width - 1, Math.max(0, cx));
-    const y = Math.min(this.map.height - 1, Math.max(0, cy));
+    const inside = inMap(this.map, cx, cy);
+    const x = Math.min(this.gridX1 - 1, Math.max(this.gridX0, cx));
+    const y = Math.min(this.gridY1 - 1, Math.max(this.gridY0, cy));
     const index = cellIndex(this.map, x, y);
     const raw = this.map.ground[index] ?? 'grass';
     const kind = inside ? raw : extendedKind(raw);
@@ -795,10 +804,10 @@ export class Terrain {
 
   private insideBand(cx: number, cy: number): boolean {
     return (
-      cx >= -this.ext &&
-      cy >= -this.ext &&
-      cx < this.map.width + this.ext &&
-      cy < this.map.height + this.ext
+      cx >= this.gridX0 - this.ext &&
+      cy >= this.gridY0 - this.ext &&
+      cx < this.gridX1 + this.ext &&
+      cy < this.gridY1 + this.ext
     );
   }
 
@@ -928,8 +937,8 @@ export class Terrain {
     const n = SETTINGS.river.subdivisions;
     const size = 1 / n;
     const ring = -SETTINGS.outerDrop;
-    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
-      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+    for (let cy = this.gridY0 - this.ext; cy < this.gridY1 + this.ext; cy += 1) {
+      for (let cx = this.gridX0 - this.ext; cx < this.gridX1 + this.ext; cx += 1) {
         if (!this.inRiverBed(cx, cy)) {
           continue;
         }
@@ -1009,14 +1018,14 @@ export class Terrain {
     const chunkColumn = (cx: number): number => Math.floor((cx + this.ext) / size);
     const up = [0, 1, 0] as const;
     const ringHeight = -SETTINGS.outerDrop;
-    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
+    for (let cy = this.gridY0 - this.ext; cy < this.gridY1 + this.ext; cy += 1) {
       // Dessus: les cases voisines de même aspect sont fusionnées en bandes (moins de triangles),
       // sans déborder de leur morceau.
-      let runStart = -this.ext;
+      let runStart = this.gridX0 - this.ext;
       let runCell: PaletteCell | null = null;
       let runHeight = 0;
-      for (let cx = -this.ext; cx <= this.map.width + this.ext; cx += 1) {
-        const atEnd = cx === this.map.width + this.ext;
+      for (let cx = this.gridX0 - this.ext; cx <= this.gridX1 + this.ext; cx += 1) {
+        const atEnd = cx === this.gridX1 + this.ext;
         const raw = atEnd ? null : this.look(cx, cy);
         // Les traversées en planches (`buildCrossing`), le lit de la rivière et le ru sont dessinés à part.
         const look =
@@ -1063,7 +1072,7 @@ export class Terrain {
         }
       }
       // Côtés: une marche là où le voisin est plus bas; au bord de la bande, on ferme vers le pourtour.
-      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+      for (let cx = this.gridX0 - this.ext; cx < this.gridX1 + this.ext; cx += 1) {
         const look = this.look(cx, cy);
         if (look.kind === 'wood' || this.inRiverBed(cx, cy) || this.isStream(cx, cy)) {
           continue;
@@ -1124,15 +1133,12 @@ export class Terrain {
     const map = this.map;
     const seen = new Set<number>();
     const isWood = (cx: number, cy: number): boolean =>
-      cx >= 0 &&
-      cy >= 0 &&
-      cx < map.width &&
-      cy < map.height &&
+      inMap(map, cx, cy) &&
       map.ground[cellIndex(map, cx, cy)] === 'wood' &&
       // La passerelle du ru est un modèle (`footbridge`), pas une traversée de voie.
       !this.isStream(cx, cy);
-    for (let cy = 0; cy < map.height; cy += 1) {
-      for (let cx = 0; cx < map.width; cx += 1) {
+    for (let cy = this.gridY0; cy < this.gridY1; cy += 1) {
+      for (let cx = this.gridX0; cx < this.gridX1; cx += 1) {
         if (!isWood(cx, cy) || seen.has(cellIndex(map, cx, cy))) {
           continue;
         }
@@ -1194,8 +1200,8 @@ export class Terrain {
     const up = [0, 1, 0] as const;
     const steps = SETTINGS.waterSubdivisions;
     const size = 1 / steps;
-    for (let cy = -this.ext; cy < this.map.height + this.ext; cy += 1) {
-      for (let cx = -this.ext; cx < this.map.width + this.ext; cx += 1) {
+    for (let cy = this.gridY0 - this.ext; cy < this.gridY1 + this.ext; cy += 1) {
+      for (let cx = this.gridX0 - this.ext; cx < this.gridX1 + this.ext; cx += 1) {
         const look = this.look(cx, cy);
         // Une seule surface pour la rivière et le gué (le lit monte au-dessus d'elle sur les berges).
         if ((look.kind !== 'water' && !look.ford) || this.isStream(cx, cy)) {
@@ -1373,12 +1379,12 @@ export class Terrain {
     const writer = new GeometryWriter();
     const up = [0, 1, 0] as const;
     const half = SETTINGS.outerSize / 2;
-    const cx = this.map.width / 2;
-    const cy = this.map.height / 2;
-    const x0 = -this.ext;
-    const x1 = this.map.width + this.ext;
-    const y0 = -this.ext;
-    const y1 = this.map.height + this.ext;
+    const cx = (this.gridX0 + this.gridX1) / 2;
+    const cy = (this.gridY0 + this.gridY1) / 2;
+    const x0 = this.gridX0 - this.ext;
+    const x1 = this.gridX1 + this.ext;
+    const y0 = this.gridY0 - this.ext;
+    const y1 = this.gridY1 + this.ext;
     const h = -SETTINGS.outerDrop;
     const rects: [number, number, number, number][] = [
       [cx - half, cy - half, cx + half, y0],

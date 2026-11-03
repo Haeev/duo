@@ -4,7 +4,7 @@
  * d'un point à la voie. Rien ici ne modifie l'état.
  */
 import type { Content, HappinessSettings } from '../donnees/types';
-import type { GameMap } from './carte';
+import { type GameMap, groundAt } from './carte';
 import type {
   BreedingState,
   CharacterId,
@@ -119,14 +119,13 @@ export function spotShorn(
 
 /** Une case de la voie: ballast, ou planches du passage à niveau entre deux cases de ballast. */
 function railCell(map: GameMap, cx: number, cy: number): boolean {
-  if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) return false;
-  const g = map.ground[cy * map.width + cx];
+  const g = groundAt(map, cx, cy);
   if (g === 'rail') return true;
   if (g !== 'wood') return false;
   // Le passage à niveau: une bande de planches dans la voie (ballast à l'ouest ou à l'est de la bande).
   for (const dir of [-1, 1]) {
     for (let k = 1; k <= 4; k++) {
-      const n = map.ground[cy * map.width + cx + dir * k];
+      const n = groundAt(map, cx + dir * k, cy);
       if (n === 'rail') return true;
       if (n !== 'wood') break;
     }

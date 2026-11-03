@@ -16,7 +16,7 @@ import {
   type InstancedMesh,
 } from 'three';
 import type { GameMap } from '../etat/carte';
-import { inRect } from '../etat/carte';
+import { inRect, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { hash2, valueNoise } from './bruit';
 import { ShapeBuilder } from './geometrie';
@@ -67,8 +67,8 @@ const JITTER = 0.7;
 /** Bord infranchissable de la carte (`bord` du level designer), en cases. */
 const PLAYABLE_BORDER = 2;
 const STRIPS = 4;
-/** Tronçons par côté au plus (côté prolongé divisé par `forestSegment`, large marge). */
-const FOREST_SEGMENTS_MAX = 16;
+/** Tronçons par côté au plus (côté prolongé divisé par `forestSegment`: 18 pour la carte de 164 m). */
+const FOREST_SEGMENTS_MAX = 32;
 
 function smoothstep(t: number): number {
   const u = Math.min(1, Math.max(0, t));
@@ -159,8 +159,8 @@ export class Vegetation {
     });
 
     const cells: { cx: number; cy: number }[] = [];
-    for (let cy = 0; cy < map.height; cy += 1) {
-      for (let cx = 0; cx < map.width; cx += 1) {
+    for (let cy = mapMinY(map); cy <= mapMaxY(map); cy += 1) {
+      for (let cx = mapMinX(map); cx <= mapMaxX(map); cx += 1) {
         cells.push({ cx, cy });
       }
     }
@@ -314,16 +314,17 @@ export class Vegetation {
     );
     const ext = SETTINGS.extension;
     const cells: { cx: number; cy: number; strip: number }[] = [];
-    const min = PLAYABLE_BORDER;
-    const maxX = map.width - PLAYABLE_BORDER;
-    const maxY = map.height - PLAYABLE_BORDER;
-    for (let cy = -ext; cy < map.height + ext; cy += 1) {
-      for (let cx = -ext; cx < map.width + ext; cx += 1) {
-        const dx = cx < min ? min - cx : cx >= maxX ? cx - maxX + 1 : 0;
-        const dy = cy < min ? min - cy : cy >= maxY ? cy - maxY + 1 : 0;
+    const minX = mapMinX(map) + PLAYABLE_BORDER;
+    const minY = mapMinY(map) + PLAYABLE_BORDER;
+    const maxX = mapMaxX(map) + 1 - PLAYABLE_BORDER;
+    const maxY = mapMaxY(map) + 1 - PLAYABLE_BORDER;
+    for (let cy = mapMinY(map) - ext; cy <= mapMaxY(map) + ext; cy += 1) {
+      for (let cx = mapMinX(map) - ext; cx <= mapMaxX(map) + ext; cx += 1) {
+        const dx = cx < minX ? minX - cx : cx >= maxX ? cx - maxX + 1 : 0;
+        const dy = cy < minY ? minY - cy : cy >= maxY ? cy - maxY + 1 : 0;
         // Distance à la lisière, reculée dans les éclaircies (les tronçons gardent la distance au bord).
-        const shiftX = dx === 0 ? 0 : clearingShift(cx < min ? 'west' : 'east', cy);
-        const shiftY = dy === 0 ? 0 : clearingShift(cy < min ? 'north' : 'south', cx);
+        const shiftX = dx === 0 ? 0 : clearingShift(cx < minX ? 'west' : 'east', cy);
+        const shiftY = dy === 0 ? 0 : clearingShift(cy < minY ? 'north' : 'south', cx);
         const distance = Math.max(dx - shiftX, dy - shiftY);
         if (
           distance < SETTINGS.outerTreeStart ||
@@ -339,9 +340,9 @@ export class Vegetation {
         if (hash2(cx, cy, SEED_TREE) >= density * this.share) {
           continue;
         }
-        const side = dy >= dx ? (cy < min ? 0 : 1) : cx < min ? 2 : 3;
+        const side = dy >= dx ? (cy < minY ? 0 : 1) : cx < minX ? 2 : 3;
         // Chaque côté coupé en tronçons: ceux hors du cadre sont éliminés (ni triangles ni appel).
-        const along = side < 2 ? cx : cy;
+        const along = side < 2 ? cx - mapMinX(map) : cy - mapMinY(map);
         const segment = Math.floor((along + ext) / RENDER_SETTINGS.terrain.forestSegment);
         cells.push({ cx, cy, strip: side * FOREST_SEGMENTS_MAX + segment });
       }
