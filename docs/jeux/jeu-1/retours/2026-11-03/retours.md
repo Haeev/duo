@@ -27,6 +27,8 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 - R18. Question du client sur l'étal: des produits semblent partir quand personne n'est derrière, sans rien rapporter. Selon le code, rien ne se vend sans joueur derrière l'étal; à 13 h, le reste retourne au cellier ou au coffre (message « L'étal est rangé »). À vérifier avec le client; la fermeture doit se voir mieux.
 - R19. Les arbres ne repoussent pas: en réalité, rien ne repousse avant le jour 16, puis 4 jours de souche et 6 de rejet. Décision: repousse dès le jour 1, 2 jours de souche, 4 jours de rejet.
 - R20. Quête « Où est passé Basile ? »: les joueurs ont suivi Basile pour tenir son échelle, et il a disparu en arrivant près de son établi.
+- R21. Économie: « plus il y a d'étapes d'acquisition, plus le prix est haut » (poule, sac de grain, œuf, omelette, et partout ailleurs). Confié au game designer: règle de marge par étape, script de calcul, données rééquilibrées, test.
+- R22. Le salon de Solange est très mal reçu: un portrait 2D plat géant remplit le panneau et oblige à défiler. Il faut l'aperçu 3D du vrai personnage et tout le menu visible sans défilement.
 
 ## Décisions du manager
 
