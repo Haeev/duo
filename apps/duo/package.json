@@ -1,7 +1,7 @@
 {
   "name": "duo",
   "productName": "Duo",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "type": "module",
   "description": "Application de bureau Duo: lanceur, salon et hébergement des jeux à deux (Electron).",

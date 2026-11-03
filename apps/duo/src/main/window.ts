@@ -136,6 +136,10 @@ export class AppWindow {
     this.window.setFullScreen(!this.window.isFullScreen());
   }
 
+  setFullscreen(fullscreen: boolean): void {
+    if (this.window.isFullScreen() !== fullscreen) this.window.setFullScreen(fullscreen);
+  }
+
   focusPlatform(): void {
     this.platformView.webContents.focus();
   }

@@ -103,6 +103,7 @@ export const t = {
   nav: {
     accueil: 'Accueil',
     bibliotheque: 'Bibliothèque',
+    reglages: 'Réglages',
     principale: 'Navigation principale',
   },
   joueurs: {
@@ -211,6 +212,13 @@ export const t = {
     installerFichier: 'Installer un jeu depuis un fichier',
     retour: 'Retour',
   },
+  reglages: {
+    titre: 'Réglages',
+    affichage: 'Affichage',
+    pleinEcran: 'Plein écran',
+    pleinEcranAide: (key: string): string =>
+      fr`La touche ${key} fait la même chose à tout moment, même en partie. Duo s'en souvient au prochain lancement.`,
+  },
   salon: {
     entete: (game: string): string => `Salon · ${game}`,
     fermer: 'Fermer le salon',
@@ -237,6 +245,16 @@ export const t = {
     sansSauvegarde: fr`Ce jeu ne garde pas de sauvegarde : chaque partie repart de zéro.`,
     commandes: 'Commandes',
     pause: 'Pause',
+    nouveautes: {
+      titre: 'Quoi de neuf',
+      version: (version: string): string => `Version ${version} installée`,
+      nouveau: 'Nouveau',
+      toutesLesNotes: 'Toutes les notes',
+      fenetreTitre: (game: string): string => `Notes de version · ${game}`,
+      versionTitre: (version: string, title: string): string =>
+        title === '' ? version : `${version} · ${title}`,
+      fermer: 'Fermer',
+    },
     decompte: (seconds: number): string => `La partie commence dans ${seconds}`,
     connexionPerdue: (name: string): string =>
       fr`Connexion perdue avec ${name}. Duo réessaie tout seul...`,
@@ -413,4 +431,9 @@ export function keyLabel(code: string, layout: ReadonlyMap<string, string> | nul
   if (letter !== undefined) return letter;
   const digit = /^Digit(\d)$/.exec(code)?.[1];
   return digit ?? code;
+}
+
+/** Raccourci du plein écran: celui du menu sur Mac, F11 ailleurs (fenêtre principale). */
+export function fullscreenKey(platform: 'darwin' | 'win32' | 'linux'): string {
+  return platform === 'darwin' ? 'Ctrl+Cmd+F' : 'F11';
 }

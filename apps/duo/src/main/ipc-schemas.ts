@@ -26,6 +26,7 @@ export const INTENT_SCHEMAS: {
   'app:quit-confirm': NoArgument,
   'app:quit-cancel': NoArgument,
   'window:toggle-fullscreen': NoArgument,
+  'window:set-fullscreen': v.object({ fullscreen: v.boolean() }),
   'library:install-file': NoArgument,
 };
 

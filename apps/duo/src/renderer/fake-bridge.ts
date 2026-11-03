@@ -34,6 +34,7 @@ const BASE: AppState = {
   profile: { pseudo: 'Camille', color: 'orb' },
   setup: { networkAccepted: true, done: true },
   settings: { reducedMotion: null, uiScale: 1 },
+  fullscreen: false,
   peer: { status: 'present', profile: { pseudo: 'Sacha', color: 'crescent' } },
   games: [GAME],
   salon: null,
@@ -48,6 +49,26 @@ const BASE: AppState = {
 const SALON: SalonView = {
   role: 'host',
   game: GAME,
+  news: {
+    version: GAME.version,
+    whatsNew: 'Deux nouvelles cartes et des touches plus faciles à retrouver dans le salon.',
+    notes: [
+      {
+        version: '1.0.0',
+        title: 'Deux cartes de plus',
+        changes: [
+          'La carte du Port et celle du Moulin rejoignent les trois premières.',
+          'Les touches du jeu s’affichent dans le salon selon ton clavier.',
+        ],
+      },
+      {
+        version: '0.9.0',
+        title: 'Première version',
+        changes: ['Trois cartes, la sauvegarde à l’aube et en quittant.'],
+      },
+    ],
+    isNew: true,
+  },
   saveChoice: 'continue',
   save: GAME.lastSave,
   selfReady: false,
@@ -205,6 +226,9 @@ export function createFakeBridge(scenario: string | null): DuoApi {
         case 'match:resume':
         case 'match:stop':
         case 'app:quit-confirm':
+        case 'window:set-fullscreen':
+          update({ ...state, fullscreen: (arg as { fullscreen: boolean }).fullscreen });
+          break;
         case 'window:toggle-fullscreen':
         case 'library:install-file':
           break;

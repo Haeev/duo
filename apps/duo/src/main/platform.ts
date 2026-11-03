@@ -14,6 +14,8 @@ import type {
   NoticeView,
   PeerView,
   Profile,
+  ReleaseNote,
+  SalonNews,
   SalonView,
   SaveSummary,
   Toast,
@@ -23,6 +25,7 @@ import type { LocalSaves } from './data/local-saves';
 import { publicSettings, type MachineStore, type SettingsFile } from './data/store';
 import type { GameEntry } from './games/catalog';
 import type { InstallOutcome } from './games/installer';
+import { readReleaseNotes } from './games/release-notes';
 
 type InstallSuccess = Extract<InstallOutcome, { ok: true }>;
 import {
@@ -119,6 +122,10 @@ export class Platform {
   private lastIdle = true;
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private autosaveTimer: ReturnType<typeof setInterval> | null = null;
+  /** Pastille « Nouveau » figée à l'entrée dans le salon, jusqu'à sa fermeture. */
+  private salonNews: { gameId: string; version: string; isNew: boolean } | null = null;
+  /** Notes de version par `id@version`; `null`: pas de notes; `loading`: lecture en cours. */
+  private readonly releaseNotes = new Map<string, readonly ReleaseNote[] | null | 'loading'>();
 
   constructor(private readonly deps: PlatformDeps) {
     this.profile = deps.profile;
@@ -242,6 +249,7 @@ export class Platform {
       profile: this.profile,
       setup: { networkAccepted: this.settings.networkAccepted, done: this.settings.setupDone },
       settings: publicSettings(this.settings),
+      fullscreen: this.settings.fullscreen,
       peer: this.peerView(),
       games: [...this.games.values()]
         .filter((game) => game.compatible)
@@ -342,6 +350,9 @@ export class Platform {
       case 'window:toggle-fullscreen':
         this.window?.toggleFullscreen();
         return { ok: true };
+      case 'window:set-fullscreen':
+        this.window?.setFullscreen((arg as IntentArgs['window:set-fullscreen']).fullscreen);
+        return { ok: true };
       case 'library:install-file':
         return this.installFromFile();
     }
@@ -420,7 +431,17 @@ export class Platform {
   }
 
   onFullscreenChange(fullscreen: boolean): void {
-    if (this.settings.fullscreen !== fullscreen) void this.updateSettings({ fullscreen });
+    if (this.settings.fullscreen === fullscreen) return;
+    void this.updateSettings({ fullscreen }).catch((error: unknown) => {
+      this.logSettingsError(error);
+    });
+    this.publish();
+  }
+
+  private logSettingsError(error: unknown): void {
+    this.deps.journal.write('warn', 'platform', 'settings-save-failed', {
+      message: error instanceof Error ? error.message : String(error),
+    });
   }
 
   onResize(bounds: Rectangle): void {
@@ -499,6 +520,8 @@ export class Platform {
 
   private salonView(): SalonView | null {
     const active = this.active();
+    // Plus de salon ni de partie: la prochaine ouverture recalcule la pastille.
+    if (active === null) this.salonNews = null;
     const salon = active?.session.salon ?? null;
     if (active === null || salon === null) return null;
     const game = this.games.get(salon.game.id);
@@ -509,6 +532,7 @@ export class Platform {
     return {
       role: self,
       game: this.summary(game),
+      news: this.newsFor(game),
       saveChoice: salon.game.saveChoice,
       save: salon.game.save,
       selfReady: salon.ready[self],
@@ -516,6 +540,45 @@ export class Platform {
       peerSeat: !joined ? 'waiting' : this.linkUp && this.peer !== null ? 'joined' : 'lost',
       countdownEndsAt: salon.countdownEndsAt,
     };
+  }
+
+  private newsFor(game: GameEntry): SalonNews {
+    const { id, version } = game.manifest;
+    if (this.salonNews?.gameId !== id || this.salonNews.version !== version) {
+      const seen = this.settings.seenGameVersions[id];
+      this.salonNews = { gameId: id, version, isNew: seen !== version };
+      if (seen !== version) {
+        void this.updateSettings({
+          seenGameVersions: { ...this.settings.seenGameVersions, [id]: version },
+        }).catch((error: unknown) => {
+          this.logSettingsError(error);
+        });
+      }
+      this.loadReleaseNotes(game);
+    }
+    const notes = this.releaseNotes.get(`${id}@${version}`);
+    return {
+      version,
+      whatsNew: game.manifest.whatsNew.trim(),
+      notes: notes === undefined || notes === 'loading' ? null : notes,
+      isNew: this.salonNews.isNew,
+    };
+  }
+
+  private loadReleaseNotes(game: GameEntry): void {
+    const key = `${game.manifest.id}@${game.manifest.version}`;
+    if (this.releaseNotes.has(key)) return;
+    this.releaseNotes.set(key, 'loading');
+    void readReleaseNotes(game.root).then((read) => {
+      this.releaseNotes.set(key, read.status === 'ok' ? read.notes : null);
+      if (read.status === 'invalid') {
+        this.deps.journal.write('warn', 'platform', 'release-notes-invalid', {
+          game: game.manifest.id,
+          reason: read.reason,
+        });
+      }
+      this.publish();
+    });
   }
 
   private invitationView(): InvitationView | null {

@@ -42,6 +42,11 @@ const SettingsFileSchema = v.object({
   networkAccepted: v.boolean(),
   setupDone: v.boolean(),
   fullscreen: v.boolean(),
+  /** Version de chaque jeu à la dernière ouverture de son salon (pastille « Nouveau »). */
+  seenGameVersions: v.optional(
+    v.record(v.pipe(v.string(), v.maxLength(64)), v.pipe(v.string(), v.maxLength(32))),
+    {},
+  ),
 });
 
 export type SettingsFile = v.InferOutput<typeof SettingsFileSchema>;
@@ -53,6 +58,7 @@ export const DEFAULT_SETTINGS: SettingsFile = {
   networkAccepted: false,
   setupDone: false,
   fullscreen: false,
+  seenGameVersions: {},
 };
 
 export interface MachineData {

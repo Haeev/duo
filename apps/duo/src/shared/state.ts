@@ -54,9 +54,29 @@ export type SaveChoice = 'continue' | 'new';
 
 export type PeerSeatState = 'waiting' | 'joined' | 'lost';
 
+/** Une version dans les notes fournies par le jeu (`donnees/notes-de-version.json`). */
+export interface ReleaseNote {
+  readonly version: string;
+  readonly title: string;
+  readonly changes: readonly string[];
+}
+
+/** Encadré « Quoi de neuf » du salon. */
+export interface SalonNews {
+  /** Version installée sur cet ordinateur. */
+  readonly version: string;
+  /** Champ `whatsNew` du manifeste (peut être vide). */
+  readonly whatsNew: string;
+  /** `null`: le jeu ne fournit pas de notes, ou le fichier est illisible. */
+  readonly notes: readonly ReleaseNote[] | null;
+  /** La version a changé depuis la dernière ouverture du salon de ce jeu. */
+  readonly isNew: boolean;
+}
+
 export interface SalonView {
   readonly role: 'host' | 'guest';
   readonly game: GameSummary;
+  readonly news: SalonNews;
   readonly saveChoice: SaveChoice;
   /** Sauvegarde reprise, vue de l'hôte (l'invité la voit aussi). */
   readonly save: SaveSummary | null;
@@ -162,6 +182,8 @@ export interface AppState {
   readonly profile: Profile | null;
   readonly setup: { readonly networkAccepted: boolean; readonly done: boolean };
   readonly settings: Settings;
+  /** État réel de la fenêtre, suivi par ses événements. */
+  readonly fullscreen: boolean;
   readonly peer: PeerView;
   readonly games: readonly GameSummary[];
   readonly salon: SalonView | null;
