@@ -79,6 +79,16 @@
    "note": "en travers du bec, tête vers la gauche de l'oiseau",
    "tris": 158
   },
+  "cat": {
+   "kind": "animal",
+   "origin": "sol entre les pattes",
+   "withers": 0.25,
+   "length": 0.46,
+   "tail": 0.3,
+   "collision_radius": 0.25,
+   "note": "cat_idle assis, cat_walk 0,35 m/s (timeScale = vitesse / 0,35), cat_sleep couché en rond, cat_roll sur le dos (caresse à deux); la racine ne bouge pas",
+   "tris": 1156
+  },
   "ladder_wood": {
    "kind": "prop",
    "lean_deg": 75.0,
@@ -408,7 +418,29 @@
     "seconds": 2.0,
     "loop": true
    }
+  ],
+  "cat": [
+   {
+    "name": "cat_walk",
+    "seconds": 0.8,
+    "loop": true
+   },
+   {
+    "name": "cat_idle",
+    "seconds": 7.333,
+    "loop": true
+   },
+   {
+    "name": "cat_sleep",
+    "seconds": 3.0,
+    "loop": true
+   },
+   {
+    "name": "cat_roll",
+    "seconds": 2.667,
+    "loop": true
+   }
   ]
  },
- "file_bytes": 1256064
+ "file_bytes": 1483692
 }

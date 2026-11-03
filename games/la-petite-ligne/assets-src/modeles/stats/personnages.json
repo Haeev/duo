@@ -77,10 +77,34 @@
   "villager_lucie": 2218,
   "villager_achille": 2086,
   "villager_solange": 2534,
+  "villager_armand": 2646,
+  "villager_berthe": 2186,
+  "villager_martial": 2230,
+  "villager_marthe": 2586,
+  "villager_honorine": 2828,
+  "villager_ines": 2338,
+  "villager_barnabe": 2378,
+  "villager_mado": 2570,
+  "villager_paulin": 2750,
+  "villager_margot": 3262,
+  "villager_leon": 2386,
+  "villager_ambroise": 2274,
+  "villager_nour": 2574,
+  "villager_colette": 2598,
+  "villager_ambroise_loupe": 92,
+  "villager_ambroise_loupe_up": 92,
+  "school_satchel": 248,
+  "milk_can": 330,
+  "felling_axe": 112,
+  "accordion": 240,
+  "bicycle_lucie": 1184,
+  "bicycle_martial": 880,
+  "bicycle_nour": 1026,
   "villager_firmin_scarf": 232,
   "rail_crew_driver": 1630,
   "rail_crew_stoker": 1674
  },
+ "push_bike_hand_error_m": 0.0061,
  "animations": [
   {
    "name": "idle",
@@ -301,9 +325,19 @@
    "name": "feed",
    "seconds": 1.2,
    "loop": true
+  },
+  {
+   "name": "push_bike",
+   "seconds": 0.533,
+   "loop": true
+  },
+  {
+   "name": "push_bike_idle",
+   "seconds": 3.0,
+   "loop": true
   }
  ],
- "file_bytes": 6557852,
+ "file_bytes": 11108900,
  "player_example_tris": 3392,
  "player_worst_tris": 4642
 }

@@ -162,3 +162,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `lpl.board(..., mannequin=True)` pose le mannequin hors du cadrage (calculé sur les seules copies): mettre un mannequin comme premier nœud de la grille.
 - Rendus Cycles ici: 1800 x 1125 à 12 échantillons, environ 3 min par planche (machine partagée); deux Blender en parallèle ont fini tués (code 137).
 - Import de `personnages.glb` pour une vue « en main »: `rig.data.pose_position = "REST"`, sinon une pose importée reste. Main droite = côté -X Blender: caméra de ce côté.
+
+## Habitants de la 0.13 (vérifié le 2026-11-03)
+
+- `personnages.png` fait 64 x 128 (`palette.CHAR_GRID_H` = 32 rangées): toute UV ou décalage de rangée des personnages divise par `CHAR_GRID_H`, pas par `GRID` (lpl.char_cells, garde_robe.wear_cells, rendus_personnages, scene_bourg). Le rendu copie la source à sa taille: Three.js colore juste (capture verifier.cjs).
+- Chez les habitants, `scarf` et `scarf_mark` sont libres (aucun foulard): deux couleurs de plus par rangée.
+- Bord de chapeau: relever le devant (rotation négative autour de X, autour du centre de la tête). Un bord plat de plus de 0,2 m devant cache les yeux à l'élévation de 35 degrés.
+- `g.mesh` colorie à la création: une couleur qui dépend de la normale doit être reposée (`g.recolor`) après `recalc_face_normals`, sinon le dos du chat sortait blanc (normales vers l'intérieur).
+- Pastille plaquée (fleurs, farine) sur une jupe en lathe: viser le milieu des facettes (12 pans: le devant -Y est un sommet, milieux à 15 + 30 k degrés) et donner à toute la pastille les poids du point de pose. Poids calculés sur des coordonnées locales avant `g.transform`: sommets partagés entre thigh_l et thigh_r, pastille retournée en pose (vu par controle_geometrie.py, qui évalue le GLB importé dans une pose de clip).
+- `controle_geometrie.py` ignore personnages.glb par défaut: lui passer le chemin absolu avec `--peaux` pour contrôler les habitants.
+- faune.py: la ligne `a = math.radians(LADDER_ANGLE)` existe deux fois (fonction ladder_wood et main): insérer avant `A.add("ladder_wood"`.
+- Le scratchpad est partagé avec d'autres sessions: travailler dans un sous-dossier à soi (un dossier `r1` existait déjà; un module Python du scratchpad peut masquer ceux des modèles).
+- Essai rapide d'habitants: un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.

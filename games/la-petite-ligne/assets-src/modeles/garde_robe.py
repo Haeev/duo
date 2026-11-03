@@ -47,7 +47,7 @@ HAT_BAND = 0.085      # bas du chapeau au-dessus du centre de la tête (les sour
 def wear_cells():
     cells = lpl.char_cells("player_a")
     for c, s in enumerate(WEAR_SLOTS):
-        cells[s] = ((c + 0.5) / P.GRID, 1.0 - (WEAR_ROW + 0.5) / P.GRID)
+        cells[s] = ((c + 0.5) / P.GRID, 1.0 - (WEAR_ROW + 0.5) / P.CHAR_GRID_H)
     return cells
 
 
