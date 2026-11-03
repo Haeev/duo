@@ -339,3 +339,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Caméra tournée (`orientation=`) en rendu logiciel: la rotation dure plusieurs images; attendre une dizaine d'images (`frames`) avant la capture, sinon le cadrage change d'une capture à l'autre.
 - Reconstruire `bourg.glb` seul: `LPL_SANS_PLANCHES=1 duo-python bourg.py`, puis dedup, weld, prune de gltf-transform comme `construire.sh` (1 min). Les octets changent à chaque construction (ordre des index) même sans modification du script.
 - Ombre « sans objet » devant la porte de la maisonnette: c'est celle de l'auvent (`door_canopy`), hors du cadre dans une capture serrée. La couverture s'arrêtait à 0,22 m du mur: un jour de lumière entre le mur et l'ombre.
+## Pêche 0.12, rendu (La Petite Ligne, vérifié le 2026-11-03)
+
+- `RenderEngine.frame` borne l'image à 0,1 s (`MAX_FRAME_SECONDS`): `lplRendu.advance(0.5)` n'avance le temps du rendu que de 0,1 s. Fondus (2 s) et éclats se capturent avec `dt` 0,1 et assez de pas (30 pas = 3 s).
+- Une bouffée émise pendant l'image où l'on capture est invisible (fondu d'entrée des formes sur 8 % de leur vie): un éclat de 0,35 s ne se voit qu'aux images suivantes, donc pas avec des pas de 0,5 s.
+- Sous forte charge (charge moyenne 40 à 50), `page.screenshot` d'une page 3D dépasse 5 min: lire le canevas (`toDataURL`) dans le même `evaluate` que `advance(dt)`, sans `preserveDrawingBuffer`.
+- Le dossier de travail temporaire de la session (scratchpad) est partagé par tous les membres: un `capture.cjs` et un `dist/` à la racine ont été écrasés en cours de mission. Tout mettre dans un sous-dossier à son nom, serveur sur un port à soi.
+- Ombres de poissons sans programme de plus: sprites couchés du programme des particules (groupe 2, `uGroupAlpha` à 1), tournés par `aAccel.z` = 1 et le cap dans `aVelocity.y`; forme `fish` dessinée dans le fragment (corps en fuseau, queue, sillage). Un seul appel pour toutes les ombres et leurs lueurs de guet.
+- Contrat des ombres avec la simulation (`etat/peche.ts` du lot 1): l'état ne change qu'aux événements; le rendu fait nager l'ombre dans le disque `roam` autour de `pos`, et lit un déplacement décidé par la simulation par `move` (`shadowPosAt`). Lecture concentrée dans `rendu/peche-vue.ts`.

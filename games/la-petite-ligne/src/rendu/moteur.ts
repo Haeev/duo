@@ -59,6 +59,8 @@ import { SignsPart } from './signes';
 import { MomentsPart } from './moments';
 import { AmbientFaunaPart } from './faune-ambiance';
 import { HenLabels } from './etiquettes';
+import { FishShadowsPart } from './ombres-poissons';
+import { createStateFishingSource, type FishingSource } from './peche-vue';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /**
@@ -105,6 +107,8 @@ export interface EngineOptions extends RendererOptions {
    * oui). Non pour des captures reproductibles en rendu logiciel.
    */
   adaptive?: boolean;
+  /** Pêche de la 0.12 (ombres, coin qui frémit, guet): l'état, sauf la page de démonstration. */
+  fishing?: FishingSource;
 }
 
 export class RenderEngine implements Renderer {
@@ -151,6 +155,7 @@ export class RenderEngine implements Renderer {
   private readonly lamps = new LampBoard();
   /** Saison montée (palette et lumière), `null` avant la première image. */
   private season: Season | null = null;
+  private readonly fishingSource: FishingSource;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -159,6 +164,7 @@ export class RenderEngine implements Renderer {
     this.light = options.quality === 'light';
     this.quality = this.light || options.adaptive === false ? null : new AdaptiveQuality();
     this.log = options.log;
+    this.fishingSource = options.fishing ?? createStateFishingSource();
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
       antialias: settings.antialias && !this.light,
@@ -404,11 +410,22 @@ export class RenderEngine implements Renderer {
       characters,
       effects,
       library,
+      content,
     );
     const signs = new SignsPart(materials, terrain, this.resources);
-    this.scene.add(fishing.group, signs.group);
+    const fishShadows = new FishShadowsPart(
+      map,
+      content,
+      materials,
+      terrain,
+      this.resources,
+      this.fishingSource,
+      this.daylight,
+    );
+    this.scene.add(fishing.group, signs.group, fishShadows.group);
     world.add(fishing);
     world.add(signs);
+    world.add(fishShadows);
     const railway = new RailwayPart(
       map,
       library,

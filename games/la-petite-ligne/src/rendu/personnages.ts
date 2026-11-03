@@ -102,6 +102,9 @@ const ROD_ITEM = 'fishing_rod';
 const FISH_CAST = 'fish_cast';
 const FISH_WAIT = 'fish_wait';
 const FISH_STRIKE = 'fish_strike';
+/** Montrer la prise à deux mains (2 s, R4 de la 0.12), joué après le ferrage s'il est livré. */
+export const FISH_SHOW = 'fish_show';
+const LEFT_HAND_SOCKET = 'socket_hand_l';
 const SIT_CHAIR = 'sit';
 const SIT_GROUND = 'sit_ground';
 const SIT_EAT = 'sit_eat';
@@ -111,7 +114,7 @@ const WAVE = 'wave';
 const PET = 'pet';
 /** Tenir l'échelle de Basile (geste « tenir » des moments rares). */
 const HOLD_LADDER = 'hold_ladder';
-const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE]);
+const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE, FISH_SHOW]);
 const NO_VARIANTS: readonly string[] = [];
 /** Attentes d'un joueur, et les mêmes avec la poule à caresser. */
 const PLAYER_VARIANTS = SETTINGS.idleVariants.players ?? NO_VARIANTS;
@@ -290,6 +293,7 @@ class CharacterFigure {
   private currentName = '';
   private readonly faces: Mesh[] = [];
   private readonly hand: Object3D | null;
+  private readonly leftHand: Object3D | null;
   private tool: Object3D | null = null;
   private toolName = '';
   private facing: number | null = null;
@@ -346,6 +350,7 @@ class CharacterFigure {
       }
     });
     this.hand = model.getObjectByName(HAND_SOCKET) ?? null;
+    this.leftHand = model.getObjectByName(LEFT_HAND_SOCKET) ?? null;
     this.offsets = new BoneOffsets(model);
     this.reach = new ArmReach(model, 'chest', 'upper_arm_r', 'forearm_r', HAND_SOCKET);
     this.idleNextAt = this.idleDelay();
@@ -554,6 +559,14 @@ class CharacterFigure {
     this.tool.updateWorldMatrix(true, false);
     out.copy(local);
     this.tool.localToWorld(out);
+    return true;
+  }
+
+  /** Position (monde) de la prise d'une main; `false` si le modèle n'a pas son accroche. */
+  handPoint(side: 'left' | 'right', out: Vector3): boolean {
+    const hand = side === 'left' ? this.leftHand : this.hand;
+    if (hand === null) return false;
+    hand.getWorldPosition(out);
     return true;
   }
 
@@ -837,13 +850,26 @@ export class CharactersPart implements EventfulPart {
     CharacterId,
     { clip: string; start: number; duration: number }
   >();
+  /** Geste à jouer une fois le geste en cours fini (montrer la prise après le ferrage). */
+  private readonly queuedShot = new Map<CharacterId, string>();
   private time = 0;
+
+  /** Le clip existe-t-il dans les animations de l'artiste ? */
+  hasClip(name: string): boolean {
+    return this.clips.has(name);
+  }
+
+  /** Prise d'une main d'un joueur (monde), `false` sans personnage ou sans accroche. */
+  handPoint(id: CharacterId, side: 'left' | 'right', out: Vector3): boolean {
+    return this.players.get(id)?.figure.handPoint(side, out) ?? false;
+  }
 
   handleEvent(event: WorldEvent): void {
     if (event.type === 'cast') {
       this.startOneShot(event.by, FISH_CAST);
     } else if (event.type === 'caught' || event.type === 'escaped') {
       this.startOneShot(event.by, FISH_STRIKE);
+      if (event.type === 'caught' && this.clips.has(FISH_SHOW)) this.queuedShot.set(event.by, FISH_SHOW);
     } else if (event.type === 'gave') {
       this.startOneShot(event.by, GIVE);
     } else if (event.type === 'sat_down') {
@@ -1413,6 +1439,12 @@ export class CharactersPart implements EventfulPart {
       const moving = character.speed > SETTINGS.walkThreshold;
       const kind: ActionKind = character.status === 'sleeping' ? 'sleep' : character.action.kind;
       // Pêche: lancer et ferrer joués une fois, attente en boucle, enchaînés par des fondus courts.
+      const queued = this.queuedShot.get(character.id);
+      const before = this.oneShot.get(character.id);
+      if (queued !== undefined && (before === undefined || context.time - before.start >= before.duration)) {
+        this.queuedShot.delete(character.id);
+        this.startOneShot(character.id, queued);
+      }
       const shot = this.oneShot.get(character.id);
       const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
       const fishing = character.fishing !== null || (shotActive && FISH_CLIPS.has(shot.clip));
