@@ -1,31 +1,31 @@
 {
  "player_base": {
   "file": "personnages.glb",
-  "tris": 1006
+  "tris": 1094
  },
  "player_outfit_work": {
   "file": "personnages.glb",
-  "tris": 1042
+  "tris": 1186
  },
  "player_outfit_smock": {
   "file": "personnages.glb",
-  "tris": 1098
+  "tris": 1242
  },
  "player_outfit_overalls": {
   "file": "personnages.glb",
-  "tris": 1042
+  "tris": 1186
  },
  "player_hair_short": {
   "file": "personnages.glb",
-  "tris": 316
+  "tris": 676
  },
  "player_hair_bob": {
   "file": "personnages.glb",
-  "tris": 352
+  "tris": 676
  },
  "player_hair_bun": {
   "file": "personnages.glb",
-  "tris": 380
+  "tris": 632
  },
  "player_hair_crop": {
   "file": "personnages.glb",
@@ -37,31 +37,31 @@
  },
  "player_hair_ponytail": {
   "file": "personnages.glb",
-  "tris": 328
+  "tris": 580
  },
  "player_hair_braid": {
   "file": "personnages.glb",
-  "tris": 396
+  "tris": 648
  },
  "player_hair_pigtails": {
   "file": "personnages.glb",
-  "tris": 432
+  "tris": 720
  },
  "player_hair_wavy": {
   "file": "personnages.glb",
-  "tris": 352
+  "tris": 676
  },
  "player_hair_long": {
   "file": "personnages.glb",
-  "tris": 400
+  "tris": 688
  },
  "player_hair_fringe": {
   "file": "personnages.glb",
-  "tris": 280
+  "tris": 604
  },
  "player_hair_quiff": {
   "file": "personnages.glb",
-  "tris": 236
+  "tris": 416
  },
  "player_hair_cloud": {
   "file": "personnages.glb",
@@ -69,11 +69,11 @@
  },
  "player_hair_crown": {
   "file": "personnages.glb",
-  "tris": 432
+  "tris": 648
  },
  "player_hair_bob_long": {
   "file": "personnages.glb",
-  "tris": 380
+  "tris": 704
  },
  "player_beard_short": {
   "file": "personnages.glb",
@@ -93,7 +93,7 @@
  },
  "wear_top_chemise": {
   "file": "personnages.glb",
-  "tris": 598
+  "tris": 670
  },
  "wear_top_pull": {
   "file": "personnages.glb",
@@ -281,31 +281,31 @@
  },
  "villager_firmin": {
   "file": "personnages.glb",
-  "tris": 1806
+  "tris": 2038
  },
  "villager_odette": {
   "file": "personnages.glb",
-  "tris": 1950
+  "tris": 2434
  },
  "villager_basile": {
   "file": "personnages.glb",
-  "tris": 2166
+  "tris": 2398
  },
  "villager_jeanne": {
   "file": "personnages.glb",
-  "tris": 2054
+  "tris": 2286
  },
  "villager_lucie": {
   "file": "personnages.glb",
-  "tris": 1986
+  "tris": 2218
  },
  "villager_achille": {
   "file": "personnages.glb",
-  "tris": 1854
+  "tris": 2086
  },
  "villager_solange": {
   "file": "personnages.glb",
-  "tris": 2050
+  "tris": 2534
  },
  "villager_firmin_scarf": {
   "file": "personnages.glb",
@@ -313,11 +313,11 @@
  },
  "rail_crew_driver": {
   "file": "personnages.glb",
-  "tris": 1470
+  "tris": 1630
  },
  "rail_crew_stoker": {
   "file": "personnages.glb",
-  "tris": 1514
+  "tris": 1674
  },
  "rig": {
   "file": "personnages.glb",
@@ -357,7 +357,15 @@
    "pole_raise",
    "pole_lower",
    "driver_lean",
-   "driver_wave"
+   "driver_wave",
+   "sit_down",
+   "stand_up",
+   "drink",
+   "carry_one",
+   "carry_one_idle",
+   "cook",
+   "pickup",
+   "feed"
   ]
  },
  "garden_cell_grass": {
