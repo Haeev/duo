@@ -134,3 +134,11 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Tête ronde du joueur: bouche haute (hc - 0,02 à - 0,065), nez à hc - 0,016: moustache juste sous le nez; tout ce qui pend derrière la tête (queue, tresse, nuage) s'enfonce dans l'oreiller en pose `sleep`: mesurer avec `verifier/coiffures_couche.py`.
 - Vitest sans TTY n'écrit rien avant la fin (environ 30 min ici): lancer en arrière-plan sans `timeout`.
 - Contrôle d'emprise: `interieurs.blocked_cells` calcule les cases occupées depuis les boîtes des meubles posés (`Footprints`).
+
+## Garde-robe de la 0.12 (vérifié le 2026-11-03)
+
+- Vêtements modulaires des joueurs: couleurs dans la rangée 1 de `personnages.png` (`garde_robe.WEAR_SLOTS`), la rangée 0 reste au corps et à l'écusson du profil. Une seule texture par joueur, les pièces se fusionnent comme avant.
+- Enveloppes emboîtées par emplacement (corps x 0,9, hauts = `torso_rings`, par-dessus x 1,10 / 1,14): chaque pièce suit le même os que la partie du corps dessous, rien ne traverse dans les clips sans recalculer de poids.
+- Pièce plaquée sur une pente (écusson): `rot=(atan(-pente), 0, 0)` couche le haut vers +Y (l'arrière); le signe inverse l'enfonce à moitié dans la poitrine (vu sur la première planche).
+- Coupe ramenée sous un chapeau par écrasement radial: une masse plus large que la tête (nuage) se replie et sort inversée (`--peaux`). `recalc_face_normals` ne suffit pas; retourner chaque îlot de volume signé négatif.
+- Planches Cycles: ne jamais laisser deux rendus en arrière-plan en même temps (le premier `planche_*.py` lancé garde le CPU); 6 échantillons suffisent pour des planches de contrôle de 260 à 420 px (environ 10 s la vue).
