@@ -20,7 +20,10 @@ from mathutils import Matrix, Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lpl  # noqa: E402
 import coiffures  # noqa: E402
+import garde_robe as GR  # noqa: E402
 import palette as P  # noqa: E402
+
+PP = sys.modules[__name__]
 
 FPS = 30
 HC = 1.58          # centre de la tête
@@ -1176,6 +1179,8 @@ def build_player_base(g, expr):
         project_on_head(g, start, hx, hy, hz, hc)
         neck(g)
         hands_round(g)
+        # 0.12: corps nu-neutre sous les vêtements modulaires (garde_robe.py)
+        GR.body(g, PP)
         return
     hc, hx, hy, hz = head_block(g)
     face_features(g, hc, hy, expr)
@@ -1216,9 +1221,9 @@ def build_outfit(g, kind):
 
 # Maillages avec clés de forme ---------------------------------------------------
 
-def make_mesh(name, row, builder, mat, arm, with_face):
+def make_mesh(name, row, builder, mat, arm, with_face, cells=None):
     """builder(g, expr) construit le maillage; même topologie pour chaque expression."""
-    cells = lpl.char_cells(row)
+    cells = cells or lpl.char_cells(row)
     g = lpl.Geo(cells)
     builder(g, "neutral")
     tris = g.tri_count()
@@ -1673,13 +1678,13 @@ def main():
     objs = [arm] + sockets
     stats = {"meshes": {}}
 
-    def add(name, row, builder, face):
-        ob, tris = make_mesh(name, row, builder, mat, arm, face)
+    def add(name, row, builder, face, cells=None):
+        ob, tris = make_mesh(name, row, builder, mat, arm, face, cells)
         objs.append(ob)
         stats["meshes"][name] = tris
         return ob
 
-    add("player_base", "player_a", rounded(build_player_base), True)
+    add("player_base", "player_a", rounded(build_player_base), True, GR.wear_cells())
     for o in OUTFITS:
         add("player_outfit_" + o, "player_a", rounded(lambda g, e, o=o: build_outfit(g, o)), False)
     for h in HAIRS:
@@ -1688,8 +1693,27 @@ def main():
     for f in coiffures.FACIAL:
         name = "player_" + f if f == "mustache" else "player_" + f
         add(name, "player_a", rounded(lambda g, e, f=f: coiffures.facial(g, f, PHC)), False)
+    # 0.12 (garde-robe): plus de foulard; vêtements modulaires, badge du profil, coupes sous un chapeau
+    wc = GR.wear_cells()
+    for slot, styles in GR.STYLES.items():
+        for st in styles:
+            if slot == "hat":
+                fn = (lambda g, e, st=st: GR.hat(g, PP, st, PHC))
+            else:
+                fn = (lambda g, e, slot=slot, st=st: getattr(GR, slot)(g, PP, st))
+            ob = add(f"wear_{slot}_{st}", "player_a", rounded(fn), False, wc)
+            ob["slot"] = slot
+            if (slot, st) in GR.COVERS:
+                ob["covers"] = GR.COVERS[(slot, st)]
     for s in SYMBOLS:
-        add("player_scarf_" + s, "player_a", rounded(lambda g, e, s=s: scarf(g, s)), False)
+        add("player_badge_" + s, "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s)), False)
+        add("player_badge_" + s + "_outer", "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s, True)), False)
+
+    def hair_hat(g, e, h):
+        hair_style(g, h, PHC, PK)
+        GR.flatten_under_hat(g, PHC, *PHEAD)
+    for h in HAIRS:
+        add("player_hair_" + h + "_hat", "player_a", rounded(lambda g, e, h=h: hair_hat(g, e, h)), False)
     for n in NPCS:
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
@@ -1708,7 +1732,18 @@ def main():
     stats["file_bytes"] = size
     # personnage complet d'un joueur: base + tenue + coiffure + foulard
     m = stats["meshes"]
-    stats["player_example_tris"] = m["player_base"] + m["player_outfit_work"] + m["player_hair_short"] + m["player_scarf_orb"]
+    stats["player_example_tris"] = (m["player_base"] + m["wear_top_chemise"] + m["wear_bottom_pantalon"]
+                                    + m["wear_shoes_bottines"] + m["player_hair_short"] + m["player_badge_orb"])
+    # pire cas: le style le plus lourd de chaque emplacement, la coupe la plus lourde et sa barbe
+    worst = m["player_base"] + max(m["player_badge_" + s + "_outer"] for s in SYMBOLS)
+    for slot, styles in GR.STYLES.items():
+        if slot not in ("top", "bottom"):
+            worst += max(m[f"wear_{slot}_{st}"] for st in styles)
+    # la salopette couvre le haut: le haut n'est pas dessiné avec elle
+    top_max = max(m["wear_top_" + st] for st in GR.STYLES["top"])
+    worst += max(m["wear_bottom_" + st] + (0 if ("bottom", st) in GR.COVERS else top_max) for st in GR.STYLES["bottom"])
+    worst += max(m["player_hair_" + h + "_hat"] for h in HAIRS) + m["player_beard_full"]
+    stats["player_worst_tris"] = worst
     lpl.write_stats("personnages", stats)
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(lpl.HERE, "blend", "personnages.blend"), compress=True)
     print("STATS", stats)

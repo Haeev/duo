@@ -44,7 +44,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 ## Personnages
 
 - Un seul squelette `rig` (18 os: `root`, `hips`, `spine`, `chest`, `neck`, `head`, `upper_arm_l`, `forearm_l`, `hand_l`, idem `_r`, `thigh_l`, `shin_l`, `foot_l`, idem `_r`) et des maillages à peau liés à ce squelette, à la racine du fichier.
-- Instancier un personnage: `SkeletonUtils.clone(gltf.scene)`, puis ne garder visibles que ses pièces. Un joueur = `player_base` + une tenue `player_outfit_work | smock | overalls` + une coiffure `player_hair_short | bob | bun` + un foulard `player_scarf_<symbole>` (`orb`, `crescent`, `star`, `sun`, `planet`, `comet`, comme les profils Duo). Les quatre pièces partagent le matériau: on peut les fusionner (même squelette) pour un seul appel de dessin.
+- Instancier un personnage: `SkeletonUtils.clone(gltf.scene)`, puis ne garder visibles que ses pièces. Un joueur = `player_base` + ses vêtements `wear_<slot>_<style>` + une coiffure (`player_hair_<coupe>`, ou `_hat` sous un chapeau) + l'écusson `player_badge_<symbole>` (`orb`, `crescent`, `star`, `sun`, `planet`, `comet`, comme les profils Duo); voir « Garde-robe de la 0.12 ». Les foulards sont retirés. Les quatre pièces partagent le matériau: on peut les fusionner (même squelette) pour un seul appel de dessin.
 - Couleurs d'un joueur: la texture `personnages.png` a une rangée de 16 cases (4 px) par personnage. Les pièces des joueurs lisent la rangée 0. Pour chaque joueur, cloner le matériau, peindre une CanvasTexture de 64 x 64 (copie de `personnages.png`) dont la rangée 0 reçoit ses couleurs, avec `flipY = false`, `NearestFilter`, `SRGBColorSpace`. Ordre des cases: peau, ombre de peau, cheveux, cheveux sombres, yeux, bouche, haut, liseré, bas, chaussures, foulard, symbole du foulard, accessoire A, accessoire B, métal, joues. Choix proposés (tenues, peaux, cheveux, foulards): `PLAYER_PRESETS` dans `assets-src/modeles/palette.py`.
 - Habitants: `villager_firmin`, `villager_odette`, `villager_basile`, `villager_jeanne` (et `villager_lucie`, hors démo). Jeanne se pose à l'échelle 0,75 (extra `scale`).
 - Expressions: clés de forme sur `player_base` et chaque `villager_*`: `happy` (contente), `delighted` (ravie), `tired` (fatiguée), `hungry` (affamée), `blink` (yeux fermés, pour dormir et cligner); toutes à 0 = neutre. Une seule à 1 à la fois (`morphTargetDictionary`).
@@ -248,14 +248,33 @@ Extras: `interior` (pièces en repère glTF du bâtiment: x le long de la façad
 
 Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `personnages.glb` 3,9 Mo (2,8), `maison.glb` 1,4 Mo (0,9). Le total dépasse 13 Mo: la compression Meshopt (README, Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
 
+## Garde-robe de la 0.12 (`personnages.glb`, contrat `docs/jeux/jeu-1/garde-robe-0-12.md`)
+
+Sources: `assets-src/modeles/garde_robe.py` (pièces), `personnages.py` (assemblage), `vetements_donnees.py` (écrit `donnees/vetements.json`, 73 vêtements), planches `planche_beaute.py`. Planches: `docs/jeux/jeu-1/gauntlet/captures/v0-12/beaute/`.
+
+- Foulards des joueurs retirés (plus de nœuds `player_scarf_*`). Le profil Duo se lit sur un écusson brodé de 8 cm au milieu de la poitrine, au-dessus de la bavette de la salopette: `player_badge_<symbole>` (sur le haut ou le tee-shirt de la salopette) ou `player_badge_<symbole>_outer` (quand un vêtement `outer` est porté). Fond `scarf` (couleur du profil), liseré et symbole `scarf_mark`, comme l'ancien foulard.
+- `player_base` devient un corps nu-neutre: tête, cou, mains, bras et jambes en peau, torse et bassin en sous-vêtement (`wear_under`). Pas de pieds: les chaussures sont obligatoires. Expressions inchangées.
+- Vêtements: un nœud par style, `wear_<slot>_<style>`, maillage à peau sur le squelette commun (mêmes os que le corps: rien qui traverse dans les clips, enveloppes emboîtées). Extras: `slot`, et `covers` sur la salopette (`["top"]`: ne pas dessiner le haut avec elle, elle a son tee-shirt).
+  - `top`: `tshirt`, `chemise`, `pull`, `debardeur`, `mariniere`
+  - `bottom`: `pantalon`, `short`, `salopette`, `jupe`, `pantacourt`
+  - `shoes`: `bottines`, `bottes`, `sabots`, `espadrilles`, `baskets`
+  - `outer`: `veste`, `gilet`, `cire`
+  - `hat`: `casquette`, `paille`, `bonnet`
+- Couleurs: les vêtements lisent la rangée 1 de `personnages.png` (inutilisée jusqu'ici par les maillages), que le rendu écrit dans la texture de chaque joueur, à côté de sa rangée 0. Colonnes (`garde_robe.WEAR_SLOTS`): 0 `top_p`, 1 `top_s`, 2 `top_m`, 3 `bottom_p`, 4 `bottom_s`, 5 `bottom_m`, 6 `shoes_p`, 7 `shoes_s`, 8 `outer_p`, 9 `outer_s`, 10 `outer_m`, 11 `hat_p`, 12 `hat_s`, 13 `hat_m`, 14 `wear_metal` (boutons, boucles: `#C8A150`, fixe), 15 `wear_under` (sous-vêtement du corps: `#E4DCCB`, fixe). `_p` = `principale`, `_s` = `secondaire`, `_m` = `motif` (la secondaire s'il manque). Un seul matériau: les pièces portées se fusionnent avec `player_base` comme les tenues d'avant.
+- Coupes sous un chapeau: `player_hair_<coupe>_hat` pour les 15 coupes (ce qui monte au-dessus du bandeau rentre sous la calotte; les mèches du dessous et les tresses restent). Montrer la variante `_hat` dès qu'un `hat` est porté.
+- Les anciennes tenues `player_outfit_work`, `smock`, `overalls` restent dans le fichier le temps que le rendu passe aux vêtements (elles s'enfilent sur le nouveau corps): à retirer ensuite.
+- Budget (bible 8.8, plafond du joueur complet 3 200): tenue courante (chemise, pantalon, bottines, coupe courte, écusson) 2 872 triangles; pire cas (haut et bas les plus lourds, bottines, veste, chapeau de paille, coupe la plus lourde, barbe fournie) 4 406: au-dessus du plafond, signalé (le plafond du joueur habillé de pied en cap est à passer à 4 500, soit au plus 2 x 2 400 triangles de plus qu'avant pour les deux joueurs).
+
 ## Fiche par modèle
 
 
-### `personnages.glb` (3768 Ko)
+
+
+### `personnages.glb` (5463 Ko)
 
 | Nœud | Triangles |
 |---|---|
-| `player_base` | 436 |
+| `player_base` | 1006 |
 | `player_outfit_work` | 1042 |
 | `player_outfit_smock` | 1098 |
 | `player_outfit_overalls` | 1042 |
@@ -277,12 +296,54 @@ Poids: `bourg.glb` 6,2 Mo (3,9 avant, environ 32 000 triangles de plus), `person
 | `player_beard_short` | 224 |
 | `player_beard_full` | 308 |
 | `player_mustache` | 72 |
-| `player_scarf_orb` | 212 |
-| `player_scarf_crescent` | 256 |
-| `player_scarf_star` | 204 |
-| `player_scarf_sun` | 276 |
-| `player_scarf_planet` | 224 |
-| `player_scarf_comet` | 220 |
+| `wear_top_tshirt` | 346 |
+| `wear_top_chemise` | 598 |
+| `wear_top_pull` | 514 |
+| `wear_top_debardeur` | 180 |
+| `wear_top_mariniere` | 506 |
+| `wear_bottom_pantalon` | 476 |
+| `wear_bottom_short` | 332 |
+| `wear_bottom_salopette` | 826 |
+| `wear_bottom_jupe` | 168 |
+| `wear_bottom_pantacourt` | 364 |
+| `wear_shoes_bottines` | 368 |
+| `wear_shoes_bottes` | 320 |
+| `wear_shoes_sabots` | 184 |
+| `wear_shoes_espadrilles` | 200 |
+| `wear_shoes_baskets` | 344 |
+| `wear_outer_veste` | 834 |
+| `wear_outer_gilet` | 666 |
+| `wear_outer_cire` | 774 |
+| `wear_hat_casquette` | 192 |
+| `wear_hat_paille` | 212 |
+| `wear_hat_bonnet` | 196 |
+| `player_badge_orb` | 108 |
+| `player_badge_orb_outer` | 108 |
+| `player_badge_crescent` | 152 |
+| `player_badge_crescent_outer` | 152 |
+| `player_badge_star` | 108 |
+| `player_badge_star_outer` | 108 |
+| `player_badge_sun` | 172 |
+| `player_badge_sun_outer` | 172 |
+| `player_badge_planet` | 120 |
+| `player_badge_planet_outer` | 120 |
+| `player_badge_comet` | 116 |
+| `player_badge_comet_outer` | 116 |
+| `player_hair_short_hat` | 316 |
+| `player_hair_bob_hat` | 352 |
+| `player_hair_bun_hat` | 380 |
+| `player_hair_crop_hat` | 148 |
+| `player_hair_curls_hat` | 388 |
+| `player_hair_ponytail_hat` | 328 |
+| `player_hair_braid_hat` | 396 |
+| `player_hair_pigtails_hat` | 432 |
+| `player_hair_wavy_hat` | 352 |
+| `player_hair_long_hat` | 400 |
+| `player_hair_fringe_hat` | 280 |
+| `player_hair_quiff_hat` | 236 |
+| `player_hair_cloud_hat` | 432 |
+| `player_hair_crown_hat` | 432 |
+| `player_hair_bob_long_hat` | 380 |
 | `villager_firmin` | 1806 |
 | `villager_odette` | 1950 |
 | `villager_basile` | 2166 |

@@ -1,7 +1,7 @@
 {
  "player_base": {
   "file": "personnages.glb",
-  "tris": 436
+  "tris": 1006
  },
  "player_outfit_work": {
   "file": "personnages.glb",
@@ -87,29 +87,197 @@
   "file": "personnages.glb",
   "tris": 72
  },
- "player_scarf_orb": {
+ "wear_top_tshirt": {
+  "file": "personnages.glb",
+  "tris": 346
+ },
+ "wear_top_chemise": {
+  "file": "personnages.glb",
+  "tris": 598
+ },
+ "wear_top_pull": {
+  "file": "personnages.glb",
+  "tris": 514
+ },
+ "wear_top_debardeur": {
+  "file": "personnages.glb",
+  "tris": 180
+ },
+ "wear_top_mariniere": {
+  "file": "personnages.glb",
+  "tris": 506
+ },
+ "wear_bottom_pantalon": {
+  "file": "personnages.glb",
+  "tris": 476
+ },
+ "wear_bottom_short": {
+  "file": "personnages.glb",
+  "tris": 332
+ },
+ "wear_bottom_salopette": {
+  "file": "personnages.glb",
+  "tris": 826
+ },
+ "wear_bottom_jupe": {
+  "file": "personnages.glb",
+  "tris": 168
+ },
+ "wear_bottom_pantacourt": {
+  "file": "personnages.glb",
+  "tris": 364
+ },
+ "wear_shoes_bottines": {
+  "file": "personnages.glb",
+  "tris": 368
+ },
+ "wear_shoes_bottes": {
+  "file": "personnages.glb",
+  "tris": 320
+ },
+ "wear_shoes_sabots": {
+  "file": "personnages.glb",
+  "tris": 184
+ },
+ "wear_shoes_espadrilles": {
+  "file": "personnages.glb",
+  "tris": 200
+ },
+ "wear_shoes_baskets": {
+  "file": "personnages.glb",
+  "tris": 344
+ },
+ "wear_outer_veste": {
+  "file": "personnages.glb",
+  "tris": 834
+ },
+ "wear_outer_gilet": {
+  "file": "personnages.glb",
+  "tris": 666
+ },
+ "wear_outer_cire": {
+  "file": "personnages.glb",
+  "tris": 774
+ },
+ "wear_hat_casquette": {
+  "file": "personnages.glb",
+  "tris": 192
+ },
+ "wear_hat_paille": {
   "file": "personnages.glb",
   "tris": 212
  },
- "player_scarf_crescent": {
+ "wear_hat_bonnet": {
   "file": "personnages.glb",
-  "tris": 256
+  "tris": 196
  },
- "player_scarf_star": {
+ "player_badge_orb": {
   "file": "personnages.glb",
-  "tris": 204
+  "tris": 108
  },
- "player_scarf_sun": {
+ "player_badge_orb_outer": {
   "file": "personnages.glb",
-  "tris": 276
+  "tris": 108
  },
- "player_scarf_planet": {
+ "player_badge_crescent": {
   "file": "personnages.glb",
-  "tris": 224
+  "tris": 152
  },
- "player_scarf_comet": {
+ "player_badge_crescent_outer": {
   "file": "personnages.glb",
-  "tris": 220
+  "tris": 152
+ },
+ "player_badge_star": {
+  "file": "personnages.glb",
+  "tris": 108
+ },
+ "player_badge_star_outer": {
+  "file": "personnages.glb",
+  "tris": 108
+ },
+ "player_badge_sun": {
+  "file": "personnages.glb",
+  "tris": 172
+ },
+ "player_badge_sun_outer": {
+  "file": "personnages.glb",
+  "tris": 172
+ },
+ "player_badge_planet": {
+  "file": "personnages.glb",
+  "tris": 120
+ },
+ "player_badge_planet_outer": {
+  "file": "personnages.glb",
+  "tris": 120
+ },
+ "player_badge_comet": {
+  "file": "personnages.glb",
+  "tris": 116
+ },
+ "player_badge_comet_outer": {
+  "file": "personnages.glb",
+  "tris": 116
+ },
+ "player_hair_short_hat": {
+  "file": "personnages.glb",
+  "tris": 316
+ },
+ "player_hair_bob_hat": {
+  "file": "personnages.glb",
+  "tris": 352
+ },
+ "player_hair_bun_hat": {
+  "file": "personnages.glb",
+  "tris": 380
+ },
+ "player_hair_crop_hat": {
+  "file": "personnages.glb",
+  "tris": 148
+ },
+ "player_hair_curls_hat": {
+  "file": "personnages.glb",
+  "tris": 388
+ },
+ "player_hair_ponytail_hat": {
+  "file": "personnages.glb",
+  "tris": 328
+ },
+ "player_hair_braid_hat": {
+  "file": "personnages.glb",
+  "tris": 396
+ },
+ "player_hair_pigtails_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_wavy_hat": {
+  "file": "personnages.glb",
+  "tris": 352
+ },
+ "player_hair_long_hat": {
+  "file": "personnages.glb",
+  "tris": 400
+ },
+ "player_hair_fringe_hat": {
+  "file": "personnages.glb",
+  "tris": 280
+ },
+ "player_hair_quiff_hat": {
+  "file": "personnages.glb",
+  "tris": 236
+ },
+ "player_hair_cloud_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_crown_hat": {
+  "file": "personnages.glb",
+  "tris": 432
+ },
+ "player_hair_bob_long_hat": {
+  "file": "personnages.glb",
+  "tris": 380
  },
  "villager_firmin": {
   "file": "personnages.glb",
