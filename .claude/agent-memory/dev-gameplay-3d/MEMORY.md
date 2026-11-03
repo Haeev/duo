@@ -311,3 +311,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Payer dans un dialogue: choix à `correct: money_at_least`, effet `take_money`, dialogue sans `once` (le validateur refuse `"once": null`): il se rejoue tant que l'étape dure.
 - Validateur: `indefinite` commence par « un », « une » ou « des » suivi du nom exact; un objet `food` veut un `dish`; `day_at_least` reste dans les jours de la démo (1 à 8).
 - Avancer l'horloge à la main au-delà du départ d'un train (16 h) paie la commande: comparer la bourse juste avant le changement attendu, pas au début du test.
+
+## Patch 0.11.2: sièges posés et petits objets sur les meubles (La Petite Ligne, vérifié le 2026-11-03)
+
+- Sièges des meubles (chaise, fauteuil): `FurnitureSeats` d'`etat/bancs.ts` en fait des `SeatProp` (id du meuble, `slots` de `seatSlots`), mêlés aux bancs par `playerBenches`; `seatReachable` (dedans pour une chaise, dehors pour un banc) remplace les anciens `!isSheltered(c)`. `seatComfortFactor` (besoins) lisait déjà `seat.bench` comme un id de meuble.
+- Visée: le banc a le rang 9 (après tout geste dehors); une chaise de la maison doit avoir le rang des meubles (4), sinon la paillasse voisine prend Espace pour une sieste à midi.
+- Hauteur d'un dessus de meuble: rayon tiré d'en haut sur une instance du modèle (`Raycaster` ignore `visible`), mis en cache par place; les extras `top_height` et `seat_height` de `maison.glb` donnent table 0,78 m, chaise 0,47 m (le clip `sit` est calé sur 0,47 m), fauteuil 0,42 m.
+- Étagère (`shelf`): planches à 0,59, 1,09 et 1,65 m, 0,46 m de jour entre deux: ni la plume (0,47 m) ni le pot (0,66 m) n'y tiennent; le dessus à 1,65 m plus un pot touche l'égout du toit (mur à 2,4 m).
+- Générateur des références: le test unique dépasse 600 s (timeout signalé) mais écrit tous les fichiers; vérifier leur `dataSchema` et leur jour plutôt que le statut.

@@ -15,7 +15,7 @@ import { nearPoint, shopOpen } from './economie';
 import { isBlockedCell } from './grille';
 import { refreshBlockers } from './deplacement';
 import { ITEM, POINT } from './ids';
-import { freeSeatsNear, fullBenchNear, playerBench, sitDown, slotTaken, villagerSeated } from './bancs';
+import { freeSeatsNear, fullBenchNear, homeSeats, playerBench, seatReachable, sitDown, slotTaken, villagerSeated } from './bancs';
 import { standPlace } from '../etat/bancs';
 import { fishAct, holdsRod, waterAhead } from './peche';
 import { toolKindOf } from './catalogue';
@@ -154,7 +154,7 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
     case 'bench': {
       const prop = playerBench(sim, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
-      const free = sim.world.phase === 'day' && c.seat === null && !isSheltered(c) && prop !== null && !slotTaken(sim, prop, t.slot);
+      const free = sim.world.phase === 'day' && c.seat === null && prop !== null && seatReachable(c, prop) && !slotTaken(sim, prop, t.slot);
       return free ? 'sit' : null;
     }
     case 'cell': {
@@ -225,6 +225,9 @@ const SEATED_PARTNER_TIER = TIER.bench + 1;
 function tierOf(sim: Sim, c: Character, t: Target): number {
   if (t.kind === 'villager' && villagerSeated(sim, t.id)) return SEATED_VILLAGER_TIER;
   if (t.kind === 'partner' && character(sim, partnerOf(c.id)).seat !== null) return SEATED_PARTNER_TIER;
+  // Une chaise de la maison (S07) se vise comme les autres meubles: la plus proche du regard passe
+  // (sinon la paillasse voisine prenait Espace pour une sieste).
+  if (t.kind === 'bench' && homeSeats(sim).some((x) => x.id === t.bench)) return TIER.station;
   return t.kind === 'cell' && gardenCellAt(sim, t.cell) !== null ? GARDEN_TIER : TIER[t.kind];
 }
 
@@ -253,10 +256,10 @@ export function candidates(sim: Sim, c: Character): Target[] {
   const s = sim.content.settings;
   const out: Target[] = [];
   const reach = s.ranges.action;
-  if (c.seat === null && !isSheltered(c)) {
-    // La place libre la plus proche de chaque banc à portée.
+  if (c.seat === null) {
+    // La place libre la plus proche de chaque banc à portée (dans la maison: ses chaises, S07).
     const seen = new Set<string>();
-    for (const seat of freeSeatsNear(sim, c.pos, s.benches.sitRange)) {
+    for (const seat of freeSeatsNear(sim, c.pos, s.benches.sitRange, c)) {
       if (seen.has(seat.bench)) continue;
       seen.add(seat.bench);
       const t = benchTarget(sim, seat);
@@ -582,7 +585,7 @@ export function actFront(sim: Sim, c: Character): void {
     return;
   }
   // Près d'un banc plein, Espace dit pourquoi on ne s'assoit pas (aucune touche morte).
-  if (c.seat === null && !isSheltered(c) && fullBenchNear(sim, c) !== null) {
+  if (c.seat === null && fullBenchNear(sim, c) !== null) {
     sayIfWritten(sim, c.id, 'bench_full');
     return;
   }
@@ -668,6 +671,11 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       if (f.window !== undefined && isCurtains(def)) return { kind: 'curtains', furniture: f.id, pos: centre };
       if (def.station === 'stove') return { kind: 'station', menu: 'stove', furniture: f.id, pos: centre };
       if (def.storage === 'cellar') return { kind: 'station', menu: 'chest', furniture: f.id, pos: centre };
+      // Une chaise, un fauteuil posés (S07): sa place libre la plus proche de soi.
+      if (def.seat) {
+        const seat = freeSeatsNear(sim, c.pos, Number.POSITIVE_INFINITY, c).find((x) => x.bench === f.id);
+        return seat === undefined ? null : benchTarget(sim, seat);
+      }
       return null;
     }
     case 'ground': {
@@ -685,7 +693,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       if (verbOf(sim, c, cellTarget) !== null) return cellTarget;
       const ghost = ghostAt(sim, at, GHOST_CLICK_RADIUS);
       if (ghost !== null) return { kind: 'construction', id: ghost.state.id, pos: point(sim, ghost.def.point) };
-      const seat = isSheltered(c) ? undefined : freeSeatsNear(sim, at, BENCH_CLICK_RADIUS)[0];
+      const seat = freeSeatsNear(sim, at, BENCH_CLICK_RADIUS, c)[0];
       return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }
   }

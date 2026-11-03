@@ -36,7 +36,7 @@ ITEM_CATEGORIES = {"seed", "crop", "forage", "animal_product", "material", "carr
                    "animal_order", "gift"}
 # Tour 9: verbes des outils (`toolKind`), outils améliorés compris.
 TOOL_KINDS = {"hoe", "watering_can", "axe", "fishing_rod"}
-SHOPS = {"grocery", "catalogue"}
+SHOPS = {"grocery", "catalogue", "haberdashery"}
 DISHES = {"bread", "simple", "stew"}
 STATIONS = {"workbench", "stove"}
 TIERS = {"P0", "P1"}

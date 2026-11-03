@@ -194,6 +194,7 @@ const SupplementSchema = v.object({
     'shopChoicesLabel',
     'shopBuy',
     'shopSell',
+    'shopHaberdashery',
     'goodbye',
     'goodbyeKey',
     'readTitle',
@@ -312,6 +313,8 @@ const SupplementSchema = v.object({
     'rate',
     'seedInfo',
     'keysBuy',
+    'haberdasheryTitle',
+    'haberdasheryClosed',
   ] as const),
   /** Tableau du quai (tour 9): onglets, annonces, chantiers du bourg. */
   board: v.object({
@@ -353,7 +356,7 @@ const SupplementSchema = v.object({
   }),
   /** Commande des chantiers de la maisonnette à l'établi de Basile (tour 9). */
   basile: strings(['subtitle', 'orderButton', 'bring', 'bringOne', 'noPlanks', 'planksFull', 'help', 'allBuilt'] as const),
-  workbench: strings(['makes', 'have', 'fromCellar', 'inProgress', 'lockedPlans', 'noRecipes', 'keysCraft'] as const),
+  workbench: strings(['makes', 'fromChest', 'have', 'fromCellar', 'inProgress', 'lockedPlans', 'noRecipes', 'keysCraft'] as const),
   stove: strings(['cookSection', 'eatSection', 'nothingToEat', 'portions'] as const),
   chest: strings(['title', 'subtitle', 'inChest', 'inBag', 'take', 'takeAll', 'store', 'emptyChest', 'emptyBag'] as const),
   proposal: strings([

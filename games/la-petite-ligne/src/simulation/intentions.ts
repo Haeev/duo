@@ -11,7 +11,7 @@ import { OUTFIT_COUNT, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
-import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, toggleCurtains, updatePlacement } from './amenagement';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDecor, takeFurniture, toggleCurtains, topDecorOf, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
@@ -135,7 +135,11 @@ function examine(sim: Sim, c: Character): void {
     return null;
   };
   const id = covering(front, false) ?? covering(front, true) ?? covering(here, true);
-  if (id !== null) takeFurniture(sim, c, id);
+  if (id === null) return;
+  // Ce qui est posé dessus d'abord (S03), puis le meuble.
+  const top = topDecorOf(sim, id);
+  if (top !== null) takeDecor(sim, c, top.id);
+  else takeFurniture(sim, c, id);
 }
 
 function craft(sim: Sim, c: Character, recipeId: string): void {
@@ -287,8 +291,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (canAct(c, sim)) placeFurniture(sim, c, intent.cell, intent.rotation);
       return;
     case 'take_furniture': {
-      const f = sim.world.furniture.find((x) => x.id === intent.furniture);
-      if (f !== undefined && canAct(c, sim) && isHome(c)) takeFurniture(sim, c, f.id);
+      // Un meuble posé, ou un petit objet posé sur un meuble (S03, même clic droit).
+      const known = sim.world.furniture.some((x) => x.id === intent.furniture) || sim.world.decor.some((x) => x.id === intent.furniture);
+      if (known && canAct(c, sim) && isHome(c)) takeFurniture(sim, c, intent.furniture);
       return;
     }
     case 'corner':
@@ -345,7 +350,8 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       dialogueClose(sim, c);
       return;
     case 'buy':
-      purchase(sim, c, { source: 'grocery', item: intent.item, count: Math.floor(intent.count) });
+      // Au comptoir: l'épicerie d'Odette, ou la mercerie de Solange pour ce qu'elle vend (rideaux).
+      purchase(sim, c, { source: sim.content.items[intent.item]?.shop === 'haberdashery' ? 'haberdashery' : 'grocery', item: intent.item, count: Math.floor(intent.count) });
       return;
     case 'sell':
       sell(sim, c, intent.item, intent.quality, Math.floor(intent.count));

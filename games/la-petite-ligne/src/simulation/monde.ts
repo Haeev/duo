@@ -215,6 +215,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
           },
     constructions,
     furniture,
+    decor: [],
     groundItems: [],
     villagers,
     hens: [],

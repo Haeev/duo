@@ -66,7 +66,8 @@ function pickPosition(view: GameView, pick: PickResult): { x: number; y: number 
 /**
  * Ce que survole la souris, et sa clé (une nouvelle clé seulement part vers l'hôte): l'entité par
  * son identifiant, le sol par case; en aménagement, le sol par demi-case (l'empreinte se centre sur
- * le point, son coin change aux cases entières et aux demi-cases).
+ * le point, son coin change aux cases entières et aux demi-cases). Un petit objet en main (S03)
+ * vise aussi le meuble porteur survolé (table, coffre), pour se poser sur son dessus.
  */
 export function hoverTarget(
   renderer: Pick<Renderer, 'pick' | 'pickGround'>,
@@ -74,7 +75,12 @@ export function hoverTarget(
   clientY: number,
   placing: boolean,
   self: string,
+  small = false,
 ): { key: string; target: ClickTarget } | null {
+  if (placing && small) {
+    const pick = renderer.pick(clientX, clientY);
+    if (pick?.kind === 'furniture') return { key: `furniture:${pick.furniture}`, target: { kind: 'furniture', furniture: pick.furniture } };
+  }
   if (placing) {
     const ground = renderer.pickGround?.(clientX, clientY) ?? null;
     if (ground === null) return null;
@@ -177,7 +183,7 @@ export function createControls(options: ControlsOptions): Controls {
       else if (pointerMoved || hoverKey !== null) {
         // Tant que la souris vise, on revise à chaque pas: un habitant passe sous elle, l'aperçu change de taille.
         const rect = options.canvasRect();
-        const hit = hoverTarget(renderer, rect.left + pointer.x, rect.top + pointer.y, placing, me.id);
+        const hit = hoverTarget(renderer, rect.left + pointer.x, rect.top + pointer.y, placing, me.id, me.placement?.small === true);
         if (hit === null) hovered = null;
         else if (hit.key !== hoverKey) {
           hoverKey = hit.key;

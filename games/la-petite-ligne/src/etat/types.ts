@@ -118,6 +118,8 @@ export interface WorldState {
   constructions: ConstructionState[];
   /** Meubles posés dans la pièce de la maisonnette. */
   furniture: PlacedFurniture[];
+  /** Petits objets posés sur le dessus d'un meuble porteur (format 9, S03). */
+  decor: PlacedDecor[];
   /** Objets posés au sol (boîte en fer, œufs, piles tombées d'un sac plein). */
   groundItems: GroundItem[];
   villagers: VillagerState[];
@@ -657,6 +659,10 @@ export interface PlacementPreview {
   valid: boolean;
   /** Pourquoi ce n'est pas possible (texte de `textes.json`, clés `placement_*`), ou `null`. Toujours rempli par la simulation. */
   blocked?: string | null;
+  /** Petit objet (S03): l'aperçu peut se poser sur un meuble porteur que vise la souris. */
+  small?: boolean;
+  /** Petit objet visé sur le dessus d'un meuble: le meuble porteur et la place (`cell` est alors celle du meuble). */
+  on?: { furniture: string; place: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -693,6 +699,21 @@ export interface PlacedFurniture {
   window?: string;
   /** Rideaux seulement: fermés. Absent: ouverts. */
   closed?: boolean;
+}
+
+/**
+ * Petit objet posé sur le dessus d'un meuble porteur (0.11.2, S03): il suit son meuble, et revient au
+ * sac (ou au rangement) quand on reprend le meuble.
+ */
+export interface PlacedDecor {
+  /** Identifiant unique (`d1`, `d2`...). */
+  id: string;
+  item: ItemId;
+  /** Le meuble porteur (`PlacedFurniture.id`). */
+  on: string;
+  /** Rang de la place dans `surface` du meuble porteur. */
+  place: number;
+  placedBy: CharacterId | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -1031,7 +1052,7 @@ export interface Proposal {
 
 export interface PurchaseRequest {
   /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en sous. */
-  source: 'grocery' | 'catalogue' | 'improvement';
+  source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   item: ItemId;
   count: number;
 }

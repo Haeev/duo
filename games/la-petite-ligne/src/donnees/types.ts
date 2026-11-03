@@ -162,6 +162,15 @@ export interface ToolStats {
   hookWindowSeconds: number | null;
 }
 
+/** Boutiques où s'achète un objet. */
+export type ShopId = 'grocery' | 'catalogue' | 'haberdashery';
+
+/** Une place sur le dessus d'un meuble porteur (repère du modèle, mètres). */
+export interface SurfacePlace {
+  x: number;
+  z: number;
+}
+
 export interface ItemDef {
   id: string;
   name: string;
@@ -174,7 +183,8 @@ export interface ItemDef {
   stack: number;
   buyPrice: number | null;
   sellPrice: number | null;
-  shop: 'grocery' | 'catalogue' | null;
+  /** Où il se vend: épicerie d'Odette, catalogue de la coopérative, mercerie de Solange (0.11.2). */
+  shop: ShopId | null;
   model: string;
   tier: 'P0' | 'P1';
   plants: string | null;
@@ -195,7 +205,21 @@ export interface ItemDef {
   backToWall: boolean;
   /** Table: le souper pris ensemble à côté compte comme souper partagé. */
   dining: boolean;
+  /** Siège (chaise, fauteuil, banc): on s'y assoit comme sur les bancs du bourg (S07). */
   seat: boolean;
+  /**
+   * Places d'un siège, en mètres le long du meuble depuis son milieu (repère du modèle, X), comme
+   * `reglages.benches.slots`; une place au milieu par défaut.
+   */
+  seatSlots: readonly number[];
+  /** Petit objet décoratif (S03): se pose aussi sur le dessus d'un meuble porteur. */
+  small: boolean;
+  /**
+   * Dessus d'un meuble porteur (S03): les places où poser un petit objet, en mètres dans le repère du
+   * modèle (X le long, Z vers l'avant), au milieu de l'empreinte. La hauteur se lit dans le modèle.
+   * Vide: rien ne s'y pose.
+   */
+  surface: readonly SurfacePlace[];
   light: boolean;
   /** Se porte à deux (la poutre). */
   carriedByTwo: boolean;
