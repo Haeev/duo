@@ -76,6 +76,36 @@
    ],
    "tris": 352
   },
+  "small_vase": {
+   "kind": "decor",
+   "surface": true,
+   "size": [
+    0.15,
+    0.25
+   ],
+   "note": "se pose sur un plateau (table top_height 0,78): origine au centre du pied",
+   "tris": 786
+  },
+  "small_vase_blue": {
+   "kind": "decor",
+   "surface": true,
+   "size": [
+    0.15,
+    0.25
+   ],
+   "note": "se pose sur un plateau (table top_height 0,78): origine au centre du pied",
+   "tris": 786
+  },
+  "small_vase_terracotta": {
+   "kind": "decor",
+   "surface": true,
+   "size": [
+    0.15,
+    0.25
+   ],
+   "note": "se pose sur un plateau (table top_height 0,78): origine au centre du pied",
+   "tris": 786
+  },
   "oil_lamp": {
    "footprint": [
     1,
@@ -417,5 +447,5 @@
    "tris": 24
   }
  },
- "file_bytes": 1389700
+ "file_bytes": 1561808
 }

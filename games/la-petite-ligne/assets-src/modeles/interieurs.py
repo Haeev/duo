@@ -19,6 +19,7 @@ import random
 
 from mathutils import Matrix, Vector
 
+import details_012 as D
 import lpl
 from lpl import by_normal
 
@@ -85,10 +86,7 @@ def glazed(g, f, u, w, zb, zt, t, frame="paint_cream", shutter=None, sill="stone
                 f.box(g, (w / 2 + 0.01, 0.045, 0.045), u + s * (w * 0.75 + 0.04), 0.025, zb + h * zz, "wood_dark")
     if box_flowers:
         f.box(g, (w + 0.06, 0.2, 0.16), u, 0.13, zb + 0.05, "wood")
-        for k in range(5):
-            c = ["flower_red", "flower_pink", "flower_white", "flower_red", "flower_yellow"][k]
-            f.box(g, (0.12, 0.12, 0.1), u - w / 2 + 0.1 + k * (w - 0.2) / 4, 0.13, zb + 0.17, c, rot=(0, 0, 20 * k))
-        f.box(g, (w + 0.02, 0.16, 0.06), u, 0.13, zb + 0.13, "leaf_bush")
+        D.box_flowers(f, g, u, 0.13, zb + 0.08, w)
 
 
 def door_frame(g, f, u, w, h, t, frame="paint_cream", step="stone_dark", glass_over=False):
@@ -371,6 +369,14 @@ def ferrand_shop(A):
     S = SHOP
     ix, iy, t, h1, ze, zr, fl = S["ix"], S["iy"], S["t"], S["h1"], S["ze"], S["zr"], S["fl"]
     hx, hy = ix + t, iy + t
+    # 0.12: gouttières et descentes, égouts mesurés sur un toit d'essai identique au vrai
+    tmp = A.geo()
+    B.gable_roof(tmp, -hx, hx, -hy, hy, ze, zr, "lauze", edge="lauze_dark", over=0.4, ridge_color="lauze_dark")
+    eaves = {sd: D.eave(tmp.bm.verts, sd) for sd in (-1, 1)}
+    tmp.bm.free()
+    gut = {sd: D.gutter_line(eaves[sd][0], eaves[sd][1], sd) for sd in (-1, 1)}
+    # devant: au ras du coin, hors du store; derrière: dans les coins
+    pipes = {-1: (-(hx - 0.035), hx - 0.035), 1: (-(hx - 0.12), hx - 0.12)}
     root = A.group("ferrand_shop", {
         "footprint": [10, 8], "door_cell": 2, "counter_cell": 6, "cut_walls": True,
         "cut_nodes": ["ferrand_shop_roof", "ferrand_shop_upper"],
@@ -441,6 +447,13 @@ def ferrand_shop(A):
             door_frame(g, f, -3.0, 0.9, 2.1, t, frame="paint_green")
         elif side == "right":
             glazed(g, f, 0.0, 0.9, 1.0, 2.2, t, frame="paint_green", shutter="paint_green")
+        if side in ("front", "back"):
+            sd = -1 if side == "front" else 1
+            for x in pipes[sd]:
+                D.pipe_wall(g, sd, x, sd * hy, *gut[sd], z_split=h1)
+            if side == "front":
+                D.flower_pot(g, -3.35, -hy - 0.3, 0.9, seed=5)
+                D.flower_pot(g, -1.75, -hy - 0.32, 0.8, ("flower_yellow", "flower_white", "flower_violet"), seed=6)
         A.add("ferrand_shop_wall_" + side, g, parent=root)
     door_leaf(A, "ferrand_shop_door", root, B.Face("front", hx, hy), -2.5, 1.0, 2.3, t, color="paint_green", glass=True)
     door_leaf(A, "ferrand_shop_back_door", root, B.Face("back", hx, hy), -3.0, 0.9, 2.1, t, color="paint_green")
@@ -462,9 +475,16 @@ def ferrand_shop(A):
         fs = B.Face(side, hx, hy)
         for u in (-1.2, 1.2):
             B.window(g, fs, u, 3.85, 0.7, 1.0, shutter="paint_green", mullion=False)
+    for sd in (-1, 1):
+        for x in pipes[sd]:
+            D.pipe_upper(g, sd, x, sd * hy, *gut[sd], h1)
     A.add("ferrand_shop_upper", g, parent=root)
     r = A.geo()
     B.gable_roof(r, -hx, hx, -hy, hy, ze, zr, "lauze", edge="lauze_dark", over=0.4, ridge_color="lauze_dark")
+    for sd in (-1, 1):
+        D.gutter(r, sd, eaves[sd][0], eaves[sd][1], eaves[sd][2], eaves[sd][3])
+        for x in pipes[sd]:
+            D.pipe_neck(r, sd, x, sd * hy, *gut[sd])
     B.chimney(r, -3.2, 1.6, 6.5, 8.2)
     B.chimney(r, 3.0, 0.4, 6.0, 8.0)
     for x in (-1.6, 1.6):
@@ -648,6 +668,13 @@ def haberdashery(A):
     S = SALON
     ix, iy, t, ze, zr, fl = S["ix"], S["iy"], S["t"], S["ze"], S["zr"], S["fl"]
     hx, hy = ix + t, iy + t
+    # 0.12: gouttières et descentes aux quatre coins, égouts mesurés sur un toit d'essai, pots à la porte
+    tmp = A.geo()
+    B.round_gable_roof(tmp, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", ridge_color="tile_dark")
+    eaves = {sd: D.eave(tmp.bm.verts, sd) for sd in (-1, 1)}
+    tmp.bm.free()
+    gut = {sd: D.gutter_line(eaves[sd][0], eaves[sd][1], sd) for sd in (-1, 1)}
+    pipes = (-(hx - 0.09), hx - 0.09)
     root = A.group("haberdashery", {
         "footprint": [7, 7], "door_cell": 3, "cut_walls": True, "cut_nodes": ["haberdashery_roof", "haberdashery_attic"],
         "interior": {"x": [-ix, ix], "z": [-iy, iy], "floor_y": fl},
@@ -713,6 +740,13 @@ def haberdashery(A):
             painted_word(g, f, 0.0, 0.044, 3.3, "MERCERIE", 0.05, "paint_red")
             f.box(g, (1.8, 0.04, 0.3), 0.0, 0.02, 2.93, "paint_cream")
             painted_word(g, f, 0.0, 0.044, 2.93, "COIFFURE", 0.04, "paint_blue")
+        if side in ("front", "back"):
+            sd = -1 if side == "front" else 1
+            for x in pipes:
+                D.pipe_wall(g, sd, x, sd * hy, *gut[sd])
+            if side == "front":
+                D.flower_pot(g, -0.8, -hy - 0.3, 0.85, ("flower_pink", "flower_white", "flower_violet"), seed=7)
+                D.flower_pot(g, 0.72, -hy - 0.3, 0.75, ("flower_blue", "flower_white", "flower_pink"), seed=8)
         A.add("haberdashery_wall_" + side, g, parent=root)
     door_leaf(A, "haberdashery_door", root, B.Face("front", hx, hy), 0.0, 1.0, 2.2, t, color="paint_blue", glass=True)
     # plafond et comble (retirés en entier quand on entre): plancher du comble sur solives, trappe de l'échelle
@@ -726,6 +760,10 @@ def haberdashery(A):
     A.add("haberdashery_attic", g, parent=root)
     r = A.geo()
     B.round_gable_roof(r, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", ridge_color="tile_dark")
+    for sd in (-1, 1):
+        D.gutter(r, sd, eaves[sd][0], eaves[sd][1], eaves[sd][2], eaves[sd][3])
+        for x in pipes:
+            D.pipe_neck(r, sd, x, sd * hy, *gut[sd])
     B.round_chimney(r, -1.4, 1.2, 3.6, 5.2)
     # lucarne du fond (la chambre de Solange sous le toit): front à 0,25 m en retrait du nu du mur, joues
     # et toit prolongés jusqu'au pan (le faîtage de la lucarne, à 4,0 m, reste sous celui du toit)

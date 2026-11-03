@@ -35,6 +35,14 @@ const STRIPE_COUNT = 5;
 // ---------------------------------------------------------------------------
 // Potager et cultures
 
+/** Petit vase de fleurs posé sur un meuble: faïence ou terre cuite, quelques fleurs. */
+function smallVase(b: ShapeBuilder, glaze: PaletteCell): void {
+  b.cylinder(0.06, 0.05, 0.14, [0, 0, 0], glaze, { base: true, segments: 8 });
+  b.ball(0.035, [0.02, 0.2, 0.01], 'flower_red');
+  b.ball(0.035, [-0.02, 0.19, -0.02], 'flower_blue');
+  b.ball(0.03, [0, 0.22, 0.02], 'flower_white');
+}
+
 function mound(b: ShapeBuilder, soil: PaletteCell, ridge: PaletteCell): void {
   b.box([0.92, 0.05, 0.92], [0, 0, 0], soil, { base: true });
   for (const z of [-0.28, 0, 0.28]) {
@@ -533,6 +541,9 @@ const FURNITURE: Record<string, Builder> = {
     b.ball(0.05, [0.06, 0.42, 0.04], 'flower_red');
     b.ball(0.05, [-0.06, 0.4, -0.03], 'flower_pink');
   },
+  small_vase: (b) => smallVase(b, 'white_paint'),
+  small_vase_blue: (b) => smallVase(b, 'ceramic_blue'),
+  small_vase_terracotta: (b) => smallVase(b, 'brick'),
   oil_lamp: (b) => {
     b.cylinder(0.1, 0.12, 0.1, [0, 0, 0], 'brass', { base: true, segments: 8 });
     b.cylinder(0.07, 0.07, 0.22, [0, 0.1, 0], 'glass_lamp', { base: true, segments: 8 });

@@ -17,6 +17,7 @@ import random
 
 from mathutils import Vector
 
+import details_012 as D
 import lpl
 from lpl import by_normal
 from interieurs import door_frame, glazed, painted_word, pierced_wall
@@ -77,6 +78,17 @@ def bakery(A):
     # corps décalé vers le sud (yc): le four occupe la bande nord de l'emprise
     g2 = A.geo()
     _walls(g2, B, hx, hy, ze, t, ops, "stone", "plaster_cream")
+    # 0.12: gouttière au nord seulement (au sud, la rive descend juste sur l'auvent), descentes aux coins nord,
+    # hors du toit du four; pot de fleurs à côté de la porte (hors des consoles de l'auvent)
+    tmp = A.geo()
+    B.round_gable_roof(tmp, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", ridge_color="tile_dark")
+    eave_n = D.eave(tmp.bm.verts, 1)
+    tmp.bm.free()
+    gut_n = D.gutter_line(eave_n[0], eave_n[1], 1)
+    pipes_n = (-(hx - 0.07), hx - 0.07)
+    for x in pipes_n:
+        D.pipe_wall(g2, 1, x, hy, *gut_n)
+    D.flower_pot(g2, 2.78, -hy - 0.3, 0.85, ("flower_red", "flower_yellow", "flower_white"), seed=9)
     _plinth(g2, B, hx, hy, ops, 0.45)
     fr = B.Face("front", hx, hy)
     glazed(g2, fr, -2.0, 0.85, 1.0, 2.1, t, frame="paint_cream", shutter="paint_red")
@@ -148,6 +160,9 @@ def bakery(A):
     A.add("bakery_oven", g, parent=root)
     r = A.geo()
     B.round_gable_roof(r, -hx, hx, -hy, hy, ze, zr, "tile", edge="tile_dark", ridge_color="tile_dark")
+    D.gutter(r, 1, eave_n[0], eave_n[1], eave_n[2], eave_n[3])
+    for x in pipes_n:
+        D.pipe_neck(r, 1, x, hy, *gut_n)
     B.round_chimney(r, -2.2, 0.5, 3.8, 5.4)
     # lucarne au sud: la chambre d'Achille (volets fermés l'après-midi: il dort)
     slope = (zr - ze) / hy
@@ -328,8 +343,10 @@ def school(A):
     for k in range(3):
         f.box(g, (1.7 - k * 0.2, 0.84 - k * 0.28, 0.15), 0.0, 0.42 - k * 0.14, 0.075 + 0.15 * k, "stone_light")
     # plaque MAIRIE au-dessus de la porte, plaque ECOLE sur le mur de la cour
-    f.box(g, (1.6, 0.05, 0.36), 0.0, 0.025, 3.15, "stone_light")
-    painted_word(g, f, 0.0, 0.054, 3.15, "MAIRIE", 0.044, "black")
+    # 0.12: plaque abaissée (centre 2,93 m, bas à 2,78 m, 3 cm au-dessus du chambranle): à 3,15 m, la rive du toit
+    # la cachait à moitié depuis la caméra du jeu
+    f.box(g, (1.6, 0.05, 0.3), 0.0, 0.025, 2.93, "stone_light")
+    painted_word(g, f, 0.0, 0.054, 2.93, "MAIRIE", 0.044, "black")
     fl = B.Face("left", hx, hy)
     door_frame(g, fl, 0.9, 1.0, 2.3, t, frame="stone_light", step="stone")
     fl.box(g, (0.86, 0.05, 2.19), 0.9, -t + 0.06, 1.1, "paint_blue")
