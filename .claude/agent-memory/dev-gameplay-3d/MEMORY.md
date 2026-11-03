@@ -311,3 +311,12 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Payer dans un dialogue: choix à `correct: money_at_least`, effet `take_money`, dialogue sans `once` (le validateur refuse `"once": null`): il se rejoue tant que l'étape dure.
 - Validateur: `indefinite` commence par « un », « une » ou « des » suivi du nom exact; un objet `food` veut un `dish`; `day_at_least` reste dans les jours de la démo (1 à 8).
 - Avancer l'horloge à la main au-delà du départ d'un train (16 h) paie la commande: comparer la bourse juste avant le changement attendu, pas au début du test.
+
+## Pêche 0.12, rendu (La Petite Ligne, vérifié le 2026-11-03)
+
+- `RenderEngine.frame` borne l'image à 0,1 s (`MAX_FRAME_SECONDS`): `lplRendu.advance(0.5)` n'avance le temps du rendu que de 0,1 s. Fondus (2 s) et éclats se capturent avec `dt` 0,1 et assez de pas (30 pas = 3 s).
+- Une bouffée émise pendant l'image où l'on capture est invisible (fondu d'entrée des formes sur 8 % de leur vie): un éclat de 0,35 s ne se voit qu'aux images suivantes, donc pas avec des pas de 0,5 s.
+- Sous forte charge (charge moyenne 40 à 50), `page.screenshot` d'une page 3D dépasse 5 min: lire le canevas (`toDataURL`) dans le même `evaluate` que `advance(dt)`, sans `preserveDrawingBuffer`.
+- Le dossier de travail temporaire de la session (scratchpad) est partagé par tous les membres: un `capture.cjs` et un `dist/` à la racine ont été écrasés en cours de mission. Tout mettre dans un sous-dossier à son nom, serveur sur un port à soi.
+- Ombres de poissons sans programme de plus: sprites couchés du programme des particules (groupe 2, `uGroupAlpha` à 1), tournés par `aAccel.z` = 1 et le cap dans `aVelocity.y`; forme `fish` dessinée dans le fragment (corps en fuseau, queue, sillage). Un seul appel pour toutes les ombres et leurs lueurs de guet.
+- Contrat des ombres avec la simulation (`etat/peche.ts` du lot 1): l'état ne change qu'aux événements; le rendu fait nager l'ombre dans le disque `roam` autour de `pos`, et lit un déplacement décidé par la simulation par `move` (`shadowPosAt`). Lecture concentrée dans `rendu/peche-vue.ts`.

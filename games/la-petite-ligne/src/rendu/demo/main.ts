@@ -18,7 +18,8 @@
  * `saison=printemps|ete|automne|hiver` (tour 8: palette et lumière de la saison; le même jour de
  * la saison, les âges des souches gardés), `brume=1` (brume du matin, levée de 9 h à 10 h 30). Tour 9:
  * `chantiers=tous|<ids>`, `cadeaux=1`, `outil=<objet>`, `maison9=1`, `cueillette9=1`,
- * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Touches: G repère, J lancer,
+ * `assis=gue|pignon|ponton` (voir `tour9-exemple.ts`). Pêche de la 0.12: `peche12=1`, avec
+ * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Touches: G repère, J lancer,
  * K poisson pris, L poisson échappé.
  */
 import type { CameraCommand } from '../camera';
@@ -40,6 +41,7 @@ import {
 import { applyEdgeExample } from './lisiere-exemple';
 import { applyTour9Example } from './tour9-exemple';
 import { applyTour10Example } from './tour10-exemple';
+import { createPeche12Demo } from './peche12-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { WorldState } from '../../etat/types';
 
@@ -123,6 +125,8 @@ interface DemoHandle {
   quality(): { mode: 'normal' | 'light'; scale: number; pixelRatio: number };
   /** Avance la page d'une image de `dt` secondes (mode `manuel=1`). */
   advance(dt: number): void;
+  /** Envoie un événement au rendu comme la simulation (captures: prise d'un poisson). */
+  emit(event: WorldEvent): void;
   pick(x: number, y: number): ReturnType<RenderEngine['pick']>;
   destination(): { x: number; y: number } | null;
   frames: number;
@@ -217,6 +221,7 @@ async function main(): Promise<void> {
   applyTour10Example(world, map, content, params);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
+  const peche12 = createPeche12Demo(params, local);
   const view: GameView = {
     content,
     map,
@@ -252,6 +257,7 @@ async function main(): Promise<void> {
     quality: params.get('rendu') === 'leger' ? 'light' : 'normal',
     // Captures reproductibles: qualité fixe, sauf `adaptatif=1` (essai du repli automatique).
     adaptive: params.get('adaptatif') === '1',
+    ...(peche12 === null ? {} : { fishing: peche12.source }),
   });
   const handle: DemoHandle = {
     ready: false,
@@ -267,6 +273,9 @@ async function main(): Promise<void> {
       pixelRatio: engine.pixelRatio(),
     }),
     advance: () => undefined,
+    emit: (event: WorldEvent) => {
+      emit(event);
+    },
     pick: (x: number, y: number) => engine.pick(x, y),
     destination: () => world.characters[0]?.destination ?? null,
     frames: 0,
@@ -362,7 +371,9 @@ async function main(): Promise<void> {
           emit({ type: 'cast', by: 'p2', at: { ...line.bobber } });
         } else if (event.code === 'KeyK') {
           angler.fishing = null;
-          emit({ type: 'caught', by: 'p2', item: 'trout' });
+          // 0.12: la longueur tirée (`cm`), lue par le rendu du poisson tenu.
+          const caught = { type: 'caught', by: 'p2', item: 'trout', cm: 38 } as const;
+          emit(caught);
         } else {
           angler.fishing = null;
           emit({ type: 'escaped', by: 'p2' });
@@ -452,6 +463,7 @@ async function main(): Promise<void> {
     ) {
       me.action = { kind: 'idle', since: 0, duration: 0, target: null };
     }
+    peche12?.step(world, dt);
     engine.frame(dt);
     handle.frames += 1;
   };

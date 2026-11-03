@@ -353,6 +353,89 @@ ITEMS.seed_packet_lettuce = seedPacket('lettuce');
 ITEMS.seed_packet_carrot = seedPacket('carrot');
 
 // ---------------------------------------------------------------------------
+// Poissons de la 0.12 (en attendant les modèles de l'artiste): couchés sur le flanc au sol, la
+// tête vers +X, à la longueur moyenne de l'espèce (`lengthCm` de la conception, section 3.1).
+
+interface FishLook {
+  /** Longueur (m), demi-hauteur et demi-épaisseur du corps (part de la longueur). */
+  length: number;
+  height: number;
+  width: number;
+  back: PaletteCell;
+  flank: PaletteCell;
+  belly: PaletteCell;
+  fins: PaletteCell;
+  /** Nageoire du dos: hauteur (part de la longueur) et place (part, 0 au milieu, négatif vers la queue). */
+  dorsal?: { height: number; at: number; length?: number };
+  /** Barbillons (goujon, barbeau, loche, lote) et taches, rayures ou grandes écailles sur le flanc. */
+  barbels?: number;
+  marks?: { cell: PaletteCell; count: number; kind: 'spots' | 'bands' | 'scales' };
+  /** Tête plus grosse que le corps (chabot), ou sans nageoire de queue (lamproie). */
+  bigHead?: boolean;
+  noTail?: boolean;
+}
+
+function fishSubstitute(look: FishLook): Builder {
+  return (b) => {
+    const L = look.length;
+    const hh = L * look.height;
+    const wh = L * look.width;
+    const paint: Paint = { top: look.back, side: look.flank, bottom: look.belly };
+    b.ball(1, [0, hh, 0], paint, { scale: [L * 0.4, hh, wh], detail: 1 });
+    if (look.bigHead === true) b.ball(1, [L * 0.28, hh, 0], paint, { scale: [L * 0.18, hh * 1.1, wh * 1.5] });
+    if (look.noTail !== true) {
+      b.box([L * 0.16, hh * 1.7, 0.004], [-L * 0.44, hh, 0], look.fins);
+    }
+    const dorsal = look.dorsal ?? { height: 0.08, at: 0 };
+    b.box([L * (dorsal.length ?? 0.16), L * dorsal.height, 0.004], [L * dorsal.at, hh * 1.9, 0], look.fins, { base: true });
+    for (let i = 0; i < (look.barbels ?? 0); i += 1) {
+      const side = i % 2 === 0 ? 1 : -1;
+      b.box([L * 0.08, 0.003, 0.003], [L * 0.42, hh * 0.6, side * wh * 0.5], look.fins, { rotation: [0, side * 25, 0] });
+    }
+    const marks = look.marks;
+    if (marks !== undefined) {
+      for (let i = 0; i < marks.count; i += 1) {
+        const x = L * (0.22 - (0.46 * (i + 0.5)) / marks.count);
+        const y = hh * (marks.kind === 'spots' ? (i % 2 === 0 ? 1.3 : 0.8) : 1);
+        for (const z of [wh * 0.98, -wh * 0.98]) {
+          if (marks.kind === 'bands') {
+            b.box([L * 0.025, hh * 1.4, 0.004], [x, y, z], marks.cell);
+          } else {
+            const s = marks.kind === 'scales' ? L * 0.07 : L * 0.025;
+            b.box([s, s, 0.004], [x, y, z], marks.cell);
+          }
+        }
+      }
+    }
+  };
+}
+
+const FISH_LOOKS: Record<string, FishLook> = {
+  fish_minnow: { length: 0.075, height: 0.1, width: 0.07, back: 'fish_olive', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_olive' },
+  fish_stone_loach: { length: 0.09, height: 0.08, width: 0.07, back: 'bark', flank: 'rock', belly: 'fish_belly', fins: 'bark', barbels: 4, marks: { cell: 'bark_dark', count: 4, kind: 'spots' } },
+  fish_bleak: { length: 0.14, height: 0.09, width: 0.05, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_silver' },
+  fish_roach: { length: 0.21, height: 0.14, width: 0.06, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'paint_red' },
+  fish_perch: { length: 0.25, height: 0.15, width: 0.07, back: 'fish_olive', flank: 'moss', belly: 'fish_belly', fins: 'paint_red', dorsal: { height: 0.12, at: 0.05, length: 0.3 }, marks: { cell: 'stone_dark', count: 5, kind: 'bands' } },
+  fish_dace: { length: 0.21, height: 0.11, width: 0.05, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_silver' },
+  fish_bullhead: { length: 0.11, height: 0.1, width: 0.1, back: 'bark', flank: 'rock_dark', belly: 'fish_belly', fins: 'bark', bigHead: true, dorsal: { height: 0.08, at: -0.05, length: 0.4 } },
+  fish_tench: { length: 0.32, height: 0.15, width: 0.08, back: 'leaf_fir', flank: 'fish_olive', belly: 'brass', fins: 'leaf_fir' },
+  fish_barbel: { length: 0.52, height: 0.11, width: 0.07, back: 'fish_olive', flank: 'brass', belly: 'fish_belly', fins: 'rust', barbels: 4 },
+  fish_pike: { length: 0.72, height: 0.08, width: 0.06, back: 'leaf_fir', flank: 'fish_olive', belly: 'fish_belly', fins: 'rust', dorsal: { height: 0.06, at: -0.3, length: 0.1 }, marks: { cell: 'grass_light', count: 7, kind: 'spots' } },
+  fish_grayling: { length: 0.35, height: 0.1, width: 0.06, back: 'fish_back', flank: 'heron_grey', belly: 'fish_belly', fins: 'flower_violet', dorsal: { height: 0.14, at: 0.02, length: 0.34 } },
+  fish_brook_lamprey: { length: 0.13, height: 0.05, width: 0.045, back: 'bark', flank: 'rock_light', belly: 'fish_belly', fins: 'rock_light', noTail: true, dorsal: { height: 0.03, at: -0.25, length: 0.2 } },
+  fish_bitterling: { length: 0.065, height: 0.16, width: 0.06, back: 'fish_olive', flank: 'fish_silver', belly: 'flower_pink', fins: 'paint_red', marks: { cell: 'kingfisher_teal', count: 3, kind: 'bands' } },
+  fish_shad: { length: 0.45, height: 0.13, width: 0.06, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_back', marks: { cell: 'black', count: 1, kind: 'spots' } },
+  fish_mirror_carp: { length: 0.7, height: 0.18, width: 0.09, back: 'bark', flank: 'brass', belly: 'fish_belly', fins: 'bark', dorsal: { height: 0.07, at: 0, length: 0.36 }, marks: { cell: 'copper_light', count: 4, kind: 'scales' } },
+  fish_salmon: { length: 0.85, height: 0.12, width: 0.07, back: 'fish_back', flank: 'fish_silver', belly: 'fish_belly', fins: 'fish_back', marks: { cell: 'black', count: 6, kind: 'spots' } },
+  fish_burbot: { length: 0.47, height: 0.08, width: 0.07, back: 'bark', flank: 'fish_olive', belly: 'fish_belly', fins: 'bark', barbels: 1, dorsal: { height: 0.04, at: -0.15, length: 0.5 }, marks: { cell: 'bark_dark', count: 6, kind: 'spots' } },
+  fish_golden_trout: { length: 0.45, height: 0.12, width: 0.06, back: 'brass', flank: 'paint_yellow', belly: 'fish_belly', fins: 'tit_yellow', marks: { cell: 'trout_spot', count: 6, kind: 'spots' } },
+  fish_moon_pike: { length: 1.17, height: 0.08, width: 0.06, back: 'heron_grey', flank: 'feather_white', belly: 'feather_white', fins: 'heron_grey', dorsal: { height: 0.06, at: -0.3, length: 0.1 }, marks: { cell: 'stone_light', count: 7, kind: 'spots' } },
+};
+for (const [name, look] of Object.entries(FISH_LOOKS)) {
+  ITEMS[name] = fishSubstitute(look);
+}
+
+// ---------------------------------------------------------------------------
 // Meubles (empreinte en cases, avant +Z)
 
 const FURNITURE: Record<string, Builder> = {
