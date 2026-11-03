@@ -12,8 +12,8 @@ import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
 import { starterWardrobe, starterWear } from '../etat/garde-robe';
 import { clothesBuy, openClothesShop, openWardrobe, wearClothing } from './vetements';
 import { TOOLBAR_SLOTS } from './constantes';
-import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
-import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
+import { type Sim, bump, character, distance, emit, faceToward, partnerOf, secondsToTicks } from './contexte';
+import { actFront, actOnClick, furnitureCentre, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
 import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDecor, takeFurniture, toggleCurtains, topDecorOf, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
@@ -173,8 +173,29 @@ function craft(sim: Sim, c: Character, recipeId: string): void {
   const ticks = secondsToTicks((recipe.seconds * durationMultiplier(sim, c)) / (together ? b.twoPlayersSpeedMultiplier : 1));
   c.crafting = { recipe: recipeId, endsAt: sim.world.tick + ticks };
   const kind = recipe.station === 'stove' ? 'cook' : recipe.inputs.some((i) => i.item === ITEM.log) ? 'saw' : 'hammer';
-  c.action = { kind, since: sim.world.tick, duration: ticks, target: null };
+  // Face à l'établi ou au réchaud le temps du travail (le menu s'ouvre souvent de biais).
+  // Le point de l'établi est la place devant lui: on regarde l'établi lui-même (l'objet de la carte).
+  const bench = sim.map.props.find((p) => p.id === POINT.workbench)?.pos ?? sim.map.points[POINT.workbench] ?? null;
+  const station = recipe.station === 'workbench' ? bench : nearestStove(sim, c);
+  if (station !== null) faceToward(c, station);
+  c.action = { kind, since: sim.world.tick, duration: ticks, target: station === null ? null : { x: station.x, y: station.y } };
   sim.runtime.changed = true;
+}
+
+/** Centre du réchaud le plus proche (chez soi), ou `null`. */
+function nearestStove(sim: Sim, c: Character): { x: number; y: number } | null {
+  let best: { x: number; y: number } | null = null;
+  let bestD = Infinity;
+  for (const f of sim.world.furniture) {
+    if (sim.content.items[f.item]?.station !== 'stove') continue;
+    const at = furnitureCentre(sim, f);
+    const d = distance(c.pos, at);
+    if (d < bestD) {
+      best = at;
+      bestD = d;
+    }
+  }
+  return best;
 }
 
 /** Fin d'une fabrication en cours. */
@@ -201,6 +222,7 @@ function give(sim: Sim, c: Character, to: string, item: string, quality: Quality
     if (other.id === c.id || distance(c.pos, other.pos) > s.action + 1) return;
     const taken = takeFromBag(c, item, count, quality).reduce((sum, x) => sum + x.count, 0);
     if (taken > 0) {
+      faceToward(c, other.pos);
       giveToCharacter(sim, other, item, quality, taken);
       emit(sim, { type: 'gave', by: c.id, to: other.id, item, count: taken });
     }
@@ -208,6 +230,7 @@ function give(sim: Sim, c: Character, to: string, item: string, quality: Quality
   }
   const v = sim.world.villagers.find((x) => x.id === to);
   if (v === undefined || !v.visible || distance(c.pos, v.pos) > s.talk) return;
+  faceToward(c, v.pos);
   giveToVillager(sim, c, to, item, count);
 }
 

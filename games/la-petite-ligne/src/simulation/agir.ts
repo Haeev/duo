@@ -115,7 +115,7 @@ function frontPoint(c: Character, out: Vec2): Vec2 {
   return out;
 }
 
-function furnitureCentre(sim: Sim, f: { item: string; cell: Cell; rotation: number }): Vec2 {
+export function furnitureCentre(sim: Sim, f: { item: string; cell: Cell; rotation: number }): Vec2 {
   const def = sim.content.items[f.item];
   const fp = def?.footprint ?? { w: 1, d: 1 };
   const cells = footprintCells(fp, f.cell, f.rotation);
