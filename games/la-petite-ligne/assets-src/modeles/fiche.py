@@ -16,7 +16,7 @@ def ko(n):
 def index():
     """Écrit assets/modeles/index.json: nœud racine -> fichier, emprise, triangles."""
     out = {}
-    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         if f == "personnages":
             for k, v in st["meshes"].items():
@@ -39,7 +39,7 @@ def index():
 
 
 def main():
-    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche"):
+    for f in ("personnages", "ferme", "bourg", "train", "maison", "faune", "poissons", "elevage", "marche", "foret013"):
         st = json.load(open(os.path.join(ICI, "stats", f + ".json"), encoding="utf-8"))
         taille = os.path.getsize(os.path.join(SORTIE, f + ".glb"))
         print(f"\n### `{f}.glb` ({ko(taille)})\n")

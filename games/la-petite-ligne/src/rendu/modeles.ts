@@ -66,6 +66,7 @@ export const MODEL_ALIASES: Readonly<Record<string, ModelSource>> = {
 export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
   tree_oak: ['tree_oak_large', 'tree_oak_large', 'tree_oak_small'],
   tree_fir: ['tree_fir_large', 'tree_fir_large', 'tree_fir_small'],
+  tree_birch: ['tree_birch_large', 'tree_birch_large', 'tree_birch_small'],
   bush: ['bush_round', 'bush_hazel', 'bush_bramble', 'bush_round'],
   rock: ['rock_medium', 'rock_small', 'rock_large', 'rock_small'],
   fence: ['fence_wood'],

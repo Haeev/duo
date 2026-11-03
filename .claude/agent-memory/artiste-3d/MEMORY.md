@@ -174,3 +174,15 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - faune.py: la ligne `a = math.radians(LADDER_ANGLE)` existe deux fois (fonction ladder_wood et main): insérer avant `A.add("ladder_wood"`.
 - Le scratchpad est partagé avec d'autres sessions: travailler dans un sous-dossier à soi (un dossier `r1` existait déjà; un module Python du scratchpad peut masquer ceux des modèles).
 - Essai rapide d'habitants: un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
+
+## Forêt et petits objets de la 0.13 (vérifié le 2026-11-03)
+
+- Vent du rendu (`createWindMask`, champs.ts): seules la première rangée de la palette (herbes, `leaf_*`, cultures), les `flower_*` et `ivy` se balancent. Un fruit posé sur un houppier doit prendre une de ces cases (cerises `flower_red`, prunes `flower_violet`, bogues `leaf_crop_light`), sinon il reste immobile pendant que le feuillage bouge. `vine_leaf` ne bouge pas.
+- Les arbres de la carte sont posés sans rotation ni échelle (propMatrix): toutes les instances d'une essence sont identiques; des variantes demandent une ligne `MODEL_VARIANTS` (code du rendu).
+- Le validateur de carte compte les triangles d'arbres par morceau de 12 m avec `triangles_par_type` du générateur (estimation), pas les modèles: recompter avec `verifier/morceaux_foret.py` et donner la table au level designer.
+- Houppier « généreux »: une grande masse centrale et des bosses enfoncées, dessus éclairci par la normale (`by_normal(clair, base, thr=0.55)`). Une boule centrée posée sur le dôme se lit comme un chapeau (pire avec le bicolore): décentrer les bosses hautes. Une pile de boules distinctes se lit comme un bonhomme de neige.
+- Bac creusé par `inset_individual` puis `extrude_face_region` et suppression de la face: les parois intérieures disparaissaient (seul le fond restait). Cycles dessine le dos des faces et ne montre rien; Three.js aurait montré des trous. Construire le volume à la main (anneaux extérieur et intérieur, `recalc_face_normals`) et vérifier par une liste des faces (normale, centre) du GLB importé.
+- `controle_geometrie.py` juge le contact par la distance des sommets: une pièce posée face contre face (chaperon sur un mur, eau qui affleure les parois) sort FLOTTE. Enfoncer de 2 à 5 mm. Les enfants fruits sont jugés seuls (tous FLOTTE): `verifier/fruits_contact.py` les juge avec leur arbre.
+- Cases `soil_wet*` brillantes (rugosité 0,32): sur un tas (fumier) une facette renvoie un reflet blanc. Prendre des cases mates.
+- `planche_*.py`: appeler `view_layer.update()` avant de cadrer sur les `bound_box` des copies (sinon cadrage faux). Planche 2200 x 1200 à 10 échantillons: environ 3 min ici; bosquet 1366 x 768: 1 min la vue.
+- Le scratchpad partagé a vu un de mes scripts de patch (`p2.py`) remplacé par une autre session: toujours un sous-dossier à soi, dès le premier fichier.
