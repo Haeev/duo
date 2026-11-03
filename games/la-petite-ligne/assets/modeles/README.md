@@ -275,14 +275,10 @@ Sources: `assets-src/modeles/garde_robe.py` (pièces), `personnages.py` (assembl
 
 ## Fiche par modèle
 
-<<<<<<< HEAD
 
 
 
 ### `personnages.glb` (5463 Ko)
-=======
-### `personnages.glb` (3768 Ko)
->>>>>>> worktree-agent-af772c2e74d9aa0d9
 
 | Nœud | Triangles |
 |---|---|
