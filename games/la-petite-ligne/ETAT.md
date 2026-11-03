@@ -205,6 +205,17 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-11-03, 0.12: la pêche, lot 1 « simulation » (dev gameplay 3D)
+
+- Conception: `docs/jeux/jeu-1/peche-0-12-conception.md`. État partagé: `WorldState.fishing` (`src/etat/peche.ts`, types et lectures pures pour le rendu et l'interface: `shadowPosAt`, `shadowVisibleTo`, `isWatching`, `rarityScales`).
+- Ombres (`src/simulation/ombres.ts`): coins éveillés à 12 m, endormis 30 s après 16 m; compte par coin, au plus une manquante pendant la réapparition; places sur un quadrillage de 0,5 m dans l'eau libre (ni ponton, ni ouvrage, ni chantier), marge `roam` garantie dans l'eau; le ru seulement au milieu du lit (x 64). L'état ne change qu'aux événements: le rendu fait nager l'ombre dans son disque `roam` et lit les déplacements décidés (`move`) par `shadowPosAt`.
+- Tirages par `unitDraw` (clés `ombre:<coin>:<numéro>:rarete|poisson|place|vie|cap`, `grand:<poisson>`, `coin_peche`, `longueur:<prises>`), jamais `sim.rng` sauf l'attente de touche (comme avant). Coin qui frémit: `hotSpotOn(sim, jour)`, recalculé depuis le jour 1.
+- Lancer assisté (cône de 20 degrés), attraction (1,5 m, 1 m au ru et pour un grand), ombre nouvelle à 3 m sinon (attente x 1,5), touche au plus tôt 1,5 s après l'arrivée. Mythique: touche seulement avec un guetteur à 6 m, puis épuisette de l'autre (`tryNet`, appelé en tête de `actFront`), décroché sans message si un joueur s'absente.
+- Carnet des poissons `fishing.log` (compte, première prise avec « ensemble » à 15 m, record), limites des grands `fishing.grandsCaught`, séries. Onglet « Poissons » du carnet (`src/interface/modele-poissons.ts`), pastille « Au guet » au HUD.
+- Sauvegarde: format 10 (`migrateToFormat10`: carnet rempli d'après les compteurs `caught:<poisson>`). Ombres, coins éveillés, guet et épuisette jamais écrits (`snapshotOf`), lignes relancées au chargement.
+- Commandes (section 8.2): `riverUnitCost` et `fishShareBySeason` remplacent `fishCostFromWeights`; sept poissons commandables. Le robot va au ponton pour ceux qui ne mordent pas au gué.
+- Carte: `peche.coins` dans `construire_carte_halte.py`, contrôlé par `valider_carte.py`; fiches `fish` contrôlées par `valider_donnees.py` (aucun trou de commun). Test: `tests/peche-0-12.test.ts`.
+
 ## 2026-11-03, 0.12 lot L-quêtes: « Le marché d'Aubrune » et neuf coups de main (dev gameplay 3D)
 
 Conception: `docs/jeux/jeu-1/v0-12-conception.md`, section 5 et lot L-quêtes de la section 6.

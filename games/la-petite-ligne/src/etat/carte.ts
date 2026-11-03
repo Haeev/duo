@@ -229,6 +229,19 @@ export interface GameMap {
    * ses cases (qui bloquent alors le passage). Rien n'est posé ni bloqué avant. Absent: aucun.
    */
   improvements?: Record<string, MapImprovement>;
+  /**
+   * Coins de pêche (0.12, `peche.coins` de la carte): chaque case d'eau dans un seul coin. Absent
+   * ou vide (carte de secours): pas d'ombres, la pêche tire comme avant dans les poissons du gué.
+   */
+  fishingZones?: FishingZone[];
+}
+
+/** Coin de pêche: identifiant, nom (« le gué »), forme après « à » (« au gué »), rectangles de cases. */
+export interface FishingZone {
+  id: string;
+  name: string;
+  at: string;
+  rects: Rect[];
 }
 
 /** Index d'une case dans les tableaux `ground` et `blocked`. */

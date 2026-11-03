@@ -17,7 +17,7 @@ import { refreshBlockers } from './deplacement';
 import { ITEM, POINT } from './ids';
 import { freeSeatsNear, fullBenchNear, homeSeats, playerBench, seatReachable, sitDown, slotTaken, villagerSeated } from './bancs';
 import { standPlace } from '../etat/bancs';
-import { fishAct, holdsRod, waterAhead } from './peche';
+import { fishAct, holdsRod, tryNet, waterAhead } from './peche';
 import { toolKindOf } from './catalogue';
 import { feedHens } from './poules';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
@@ -569,6 +569,8 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
 
 /** Espace: agir sur ce qui est devant soi. */
 export function actFront(sim: Sim, c: Character): void {
+  // Le mythique au bout de la ligne de l'autre: Espace près de lui tend l'épuisette (pêche 0.12).
+  if (tryNet(sim, c)) return;
   if (c.seat === null && holdsRod(sim, c) && (c.fishing !== null || waterAhead(sim, c) !== null)) {
     fishAct(sim, c);
     return;

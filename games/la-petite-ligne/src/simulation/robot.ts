@@ -632,17 +632,24 @@ function cookDishes(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   return false;
 }
 
-/** Truites de la commande: au gué, lancer, attendre la touche, ferrer. */
+/**
+ * Poissons de la commande, des quêtes et des annonces: au gué, ou au ponton pour ceux qui n'y
+ * mordent pas (pêche 0.12: gardon, perche, tanche, ablette); lancer, attendre la touche, ferrer.
+ */
 function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: number }, out: Intent[]): boolean {
+  const others = Object.values(sim.content.items).filter((d) => d.fish !== null && !d.fish.released && d.fish.grand === null && !['trout', 'gudgeon', 'chub'].includes(d.id));
+  const missing = others.filter((d) => reserved(sim, d.id) + (afterDemo(sim) ? annonceNeed(sim, d.id) : 0) > inBags(sim, d.id));
   const wanted =
     wantedOf(sim, 'trout') > inBags(sim, 'trout') ||
     reserved(sim, 'gudgeon') > inBags(sim, 'gudgeon') ||
     reserved(sim, 'chub') + (afterDemo(sim) ? annonceNeed(sim, 'chub') : 0) > inBags(sim, 'chub') ||
+    missing.length > 0 ||
     questWantsFish(sim);
   if (!wanted || sim.world.clock.minutes > GO_HOME_AT - HOUR) return false;
   if (toolIn(sim, c, 'fishing_rod') === null) return false;
-  const ford = pt(sim, 'river_ford');
-  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, 'gue', ford, 0.4, out) || true;
+  const atPontoon = missing.length > 0 && missing.every((d) => d.fish?.zones.includes('ford') !== true) && sim.map.points.fishing_pontoon !== undefined;
+  const ford = pt(sim, atPontoon ? 'fishing_pontoon' : 'river_ford');
+  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, atPontoon ? 'ponton' : 'gue', ford, 0.4, out) || true;
   if (!holdsRod(sim, c)) return selectItem(c, toolIn(sim, c, 'fishing_rod') ?? ITEM.fishingRod, out) || true;
   m.job = 'pêcher';
   if (c.fishing?.phase === 'bite') {

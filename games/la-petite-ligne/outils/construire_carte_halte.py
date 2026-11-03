@@ -1031,6 +1031,28 @@ def rect(x: int, y: int, w: int, h: int) -> dict:
     return {"x": x, "y": y, "w": w, "h": h}
 
 
+# Pêche 0.12 (docs/jeux/jeu-1/peche-0-12-conception.md, section 2): sept coins de pêche. Chaque case d'eau
+# appartient à un seul coin (contrôle de valider_carte.py); le coin d'une prise est celui de la case où
+# tombe le bouchon. Les rectangles couvrent aussi des cases qui ne sont pas de l'eau (gravier du gué,
+# berges): seules les cases `water` comptent.
+COINS_PECHE = [
+    {"id": "upstream", "a": "à l'amont", "nom": "l'amont", "rects": [rect(0, 38, 11, 5)],
+     "pourquoi": "eau lente devant le bourg ancien, le coin le plus proche du jardin"},
+    {"id": "ford", "a": "au gué", "nom": "le gué", "rects": [rect(11, 38, 13, 5)],
+     "pourquoi": "courant sur galets, peu profond: les poissons de courant et de fond"},
+    {"id": "sands", "a": "aux sables", "nom": "les sables", "rects": [rect(24, 38, 14, 5)],
+     "pourquoi": "eau lente et tiède entre les deux bancs de sable"},
+    {"id": "pontoon", "a": "au ponton", "nom": "le ponton", "rects": [rect(38, 38, 20, 5)],
+     "pourquoi": "eau profonde et calme, les poissons guettent à l'abri des pieux"},
+    {"id": "confluence", "a": "au confluent", "nom": "le confluent", "rects": [rect(58, 38, 13, 5), rect(63, 36, 2, 2)],
+     "pourquoi": "l'eau froide du ru se mêle à l'Aubrune: les poissons qui remontent y attendent"},
+    {"id": "ru", "a": "au ru", "nom": "le ru", "rects": [rect(63, 0, 2, 36)],
+     "pourquoi": "eau vive et froide, 1 à 1,5 m de large: la truite et les petits poissons d'eau vive"},
+    {"id": "downstream", "a": "à l'aval", "nom": "l'aval", "rects": [rect(71, 38, 29, 5)],
+     "pourquoi": "rivière large et bancs de sable, devant la promenade de la rue Haute"},
+]
+
+
 # Tour 10: bâtiments visitables (ADR 0016, section 1). Une entrée par bâtiment: l'objet qui le porte, ses
 # pièces (rectangles de cases franchissables, dans l'emprise et à l'intérieur des murs), ses portes (case
 # franchissable sur le pourtour, côté façade, et la case du dehors devant elle), le point d'apparition, la clé
@@ -1369,6 +1391,7 @@ def main() -> int:
         "interieurs": INTERIEURS,
         "ru": RU,
         "ouvrages": OUVRAGES,
+        "peche": {"coins": COINS_PECHE},
         "accroches": ACCROCHES + accroches_poteaux_finaux(),
         "sieges": SIEGES,
         "chantiers": CHANTIERS,

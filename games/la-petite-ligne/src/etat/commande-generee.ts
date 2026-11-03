@@ -59,6 +59,10 @@ function fishShare(feel: NonNullable<Rules['feel']>, season: Season, item: strin
 export function fishCost(settings: Rules & Pick<Settings, 'order'>, p: OrderProduct, train: number): number | null {
   const g = settings.order.generated;
   const feel = settings.feel;
+  if (g !== null && g.riverUnitCost !== null && p.resource === 'river') {
+    const share = g.fishShareBySeason[productionSeason(settings, train)]?.[p.item] ?? 0;
+    return share > 0 ? g.riverUnitCost / share : null;
+  }
   if (g === null || !g.fishCostFromWeights || p.resource !== 'river' || feel === undefined) return p.cost;
   const ref = fishShare(feel, g.fishCostReferenceSeason, p.item);
   const now = fishShare(feel, productionSeason(settings, train), p.item);

@@ -292,7 +292,16 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Mesurer avant de compacter: le robot longue vie écrit pour chaque aube `bytes` et `keys` (octets par champ) dans `test-results/longue-vie/parties/<partie>.json`; une partie de 84 jours prend environ 4 min 30. Comparer les relevés avant et après hors tailles (`ms`, `bytes`, `chars`, `keys`, `detail`) prouve que le gameplay n'a pas bougé.
 - Ne pas garder de texte rendu dans l'état: un identifiant, la variante et les variables suffisent. Pour migrer un texte rendu, transformer le gabarit en expression régulière (`{nom}` en groupe paresseux) et vérifier que le rendu redonne exactement le texte, sinon garder l'original.
 - Omettre les champs à leur valeur par défaut (`exactOptionalPropertyTypes` est actif: champ optionnel, jamais `undefined` écrit).
-- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD.
+- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD. Si la branche descend de HEAD et ne touche aucun fichier modifié, `git merge --ff-only` suffit, sans commit.
+
+## Pêche 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- L'état complet part vers l'invité à chaque changement (`runtime.changed`, au plus 5 fois par seconde, environ 45 Ko): un état qui bouge à chaque pas (nage des ombres) le ferait partir sans arrêt. Ne changer l'état qu'aux événements et laisser le rendu animer (disque `roam` garanti dans l'eau, déplacement `move` lu par `shadowPosAt`).
+- Les identifiants des annonces partagent l'espace des quêtes (`annonceQuests`): une annonce `odette_fry` aurait heurté la quête du même nom. Chercher l'identifiant dans `quetes.json` avant d'en créer un.
+- Ajouter une annonce change toute la suite tirée du tableau (T9-03 de `suite-tour9.test.ts`) et la table des récompenses (T9-04): mettre ces deux attendus à jour avec la raison.
+- Environnement très chargé (charge 45): les tests du robot de la démo dépassent leur délai de 300 s sans être faux. Preuve par une sonde jetable (partie entière, relevé dans le scratchpad) ou `--testTimeout`; `generer.ts` peut dépasser 50 min pour la référence du jour 62.
+- Un réglage de texte d'interface nouveau demande sa clé dans `textes.ts` (Valibot) en plus de `textes-interface.json`; le prix d'un objet s'écrit avec le gabarit `ui.hud.purse` de `textes.json` pour suivre le nom de la monnaie.
+- Outil isolé: un heredoc Python qui contient `\"` est refusé; écrire le script avec Write dans le scratchpad.
 
 ## Patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
 
