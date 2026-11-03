@@ -22,9 +22,11 @@ import lpl  # noqa: E402
 import coiffures  # noqa: E402
 import animations_012  # noqa: E402
 import garde_robe as GR  # noqa: E402
+import habitants_013 as H13  # noqa: E402
 import palette as P  # noqa: E402
 
 PP = sys.modules[__name__]
+H13.PP = PP
 
 FPS = 30
 HC = 1.58          # centre de la tête
@@ -1682,6 +1684,52 @@ OUTFITS = ["work", "smock", "overalls"]
 SYMBOLS = ["orb", "crescent", "star", "sun", "planet", "comet"]
 
 
+def build_props_013(mat, stats):
+    """Accessoires de la 0.13 (objets fixes, sans squelette, matériau des personnages): vélos poussés à la main
+    (roues en nœuds enfants), cartable, pot à lait, hache de bûcheron, accordéon."""
+    out = []
+
+    def static(name, row, fn, extras):
+        g = lpl.Geo(lpl.char_cells(row))
+        fn(g)
+        stats["meshes"][name] = g.tri_count()
+        ob = g.to_object(name, mat)
+        for k, v in extras.items():
+            ob[k] = v
+        out.append(ob)
+        return ob
+    held = "origine à la prise: accrocher sous socket_hand_r (ou socket_hand_l) sans transformation"
+    static("school_satchel", "props", H13.school_satchel, {"kind": "carried", "owner": "armand", "note": held})
+    static("milk_can", "props", H13.milk_can, {"kind": "carried", "owner": "margot", "note": held})
+    static("felling_axe", "props", H13.felling_axe, {"kind": "tool", "owner": "barnabe", "socket": "socket_hand_r",
+                                                     "note": held + "; fer en bas, tranchant vers l'avant"})
+    static("accordion", "props", H13.accordion, {"kind": "carried", "owner": "colette",
+                                                 "note": "origine au centre: tenir devant la poitrine (carry_one_idle), "
+                                                         "clavier côté main droite"})
+    hb = H13.HAND_ON_BAR
+    for who in ("lucie", "martial", "nour"):
+        name = "bicycle_" + who
+        g = H13.bicycle(lambda: lpl.Geo(lpl.char_cells("bicycles")), who)
+        tris = g.tri_count()
+        ob = g.to_object(name, mat)
+        ob["kind"] = "pushed"
+        ob["owner"] = who
+        ob["wheel_radius"] = H13.WHEEL_R
+        ob["hand_l"] = [round(hb.x, 3), round(hb.z, 3), round(-hb.y, 3)]
+        ob["note"] = ("poser avec la position et l'orientation de celui qui le pousse (clips push_bike et "
+                      "push_bike_idle): vélo à sa gauche, poignée sous sa main gauche (hand_l, repère glTF); "
+                      "roues: tourner les enfants _wheel_front et _wheel_rear autour de leur X local, "
+                      "angle = distance parcourue / wheel_radius")
+        out.append(ob)
+        for part, y in (("front", H13.AXLE_FRONT), ("rear", H13.AXLE_REAR)):
+            gw = H13.wheel(lpl.Geo(lpl.char_cells("bicycles")))
+            tris += gw.tri_count()
+            w = gw.to_object(name + "_wheel_" + part, mat, parent=ob, loc=(H13.BIKE_X, y, H13.WHEEL_R))
+            out.append(w)
+        stats["meshes"][name] = tris
+    return out
+
+
 def main():
     lpl.reset()
     tex = lpl.build_char_texture()
@@ -1736,6 +1784,15 @@ def main():
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
             ob["scale"] = 0.75
+    # 0.13 (lot H6): quatorze habitants nouveaux (habitants_013.py), même squelette et mêmes expressions
+    for n in H13.VILLAGERS:
+        ob = add("villager_" + n, n, rounded(lambda g, e, n=n: H13.build(g, n, e)), True)
+        ob["scale"] = H13.SCALES[n]
+    for name, raised in (("villager_ambroise_loupe", False), ("villager_ambroise_loupe_up", True)):
+        ob = add(name, "ambroise", rounded(lambda g, e, r=raised: H13.ambroise_loupe(g, e, r)), False)
+        ob["note"] = ("loupe d'horloger d'Ambroise, à montrer avec villager_ambroise: " +
+                      ("relevée sur le front (en marchant)" if raised else "à l'oeil gauche (au travail)"))
+    objs.extend(build_props_013(mat, stats))
     # tour 9: écharpe de Firmin (pièce à montrer avec villager_firmin en automne et en hiver), équipage du train
     add("villager_firmin_scarf", "firmin", rounded(firmin_scarf), False)
     for who in ("driver", "stoker"):
@@ -1743,6 +1800,7 @@ def main():
         ob["note"] = "buste (pas de jambes): racine au plancher de la cabine, clips driver_lean et driver_wave"
 
     A = anims()
+    stats["push_bike_hand_error_m"] = round(H13.push_bike_clips(A, arm), 4)
     names = bake_actions(arm, A)
     stats["animations"] = [{"name": n, "seconds": round(d, 3), "loop": lp} for n, d, lp in names]
     path = os.path.join(lpl.OUT, "personnages.glb")

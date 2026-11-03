@@ -307,6 +307,98 @@
   "file": "personnages.glb",
   "tris": 2534
  },
+ "villager_armand": {
+  "file": "personnages.glb",
+  "tris": 2646
+ },
+ "villager_berthe": {
+  "file": "personnages.glb",
+  "tris": 2186
+ },
+ "villager_martial": {
+  "file": "personnages.glb",
+  "tris": 2230
+ },
+ "villager_marthe": {
+  "file": "personnages.glb",
+  "tris": 2586
+ },
+ "villager_honorine": {
+  "file": "personnages.glb",
+  "tris": 2828
+ },
+ "villager_ines": {
+  "file": "personnages.glb",
+  "tris": 2338
+ },
+ "villager_barnabe": {
+  "file": "personnages.glb",
+  "tris": 2378
+ },
+ "villager_mado": {
+  "file": "personnages.glb",
+  "tris": 2570
+ },
+ "villager_paulin": {
+  "file": "personnages.glb",
+  "tris": 2750
+ },
+ "villager_margot": {
+  "file": "personnages.glb",
+  "tris": 3262
+ },
+ "villager_leon": {
+  "file": "personnages.glb",
+  "tris": 2386
+ },
+ "villager_ambroise": {
+  "file": "personnages.glb",
+  "tris": 2274
+ },
+ "villager_nour": {
+  "file": "personnages.glb",
+  "tris": 2574
+ },
+ "villager_colette": {
+  "file": "personnages.glb",
+  "tris": 2598
+ },
+ "villager_ambroise_loupe": {
+  "file": "personnages.glb",
+  "tris": 92
+ },
+ "villager_ambroise_loupe_up": {
+  "file": "personnages.glb",
+  "tris": 92
+ },
+ "school_satchel": {
+  "file": "personnages.glb",
+  "tris": 248
+ },
+ "milk_can": {
+  "file": "personnages.glb",
+  "tris": 330
+ },
+ "felling_axe": {
+  "file": "personnages.glb",
+  "tris": 112
+ },
+ "accordion": {
+  "file": "personnages.glb",
+  "tris": 240
+ },
+ "bicycle_lucie": {
+  "file": "personnages.glb",
+  "tris": 1184
+ },
+ "bicycle_martial": {
+  "file": "personnages.glb",
+  "tris": 880
+ },
+ "bicycle_nour": {
+  "file": "personnages.glb",
+  "tris": 1026
+ },
  "villager_firmin_scarf": {
   "file": "personnages.glb",
   "tris": 232
@@ -365,7 +457,9 @@
    "carry_one_idle",
    "cook",
    "pickup",
-   "feed"
+   "feed",
+   "push_bike",
+   "push_bike_idle"
   ]
  },
  "garden_cell_grass": {
@@ -1780,6 +1874,16 @@
  "vole": {
   "file": "faune.glb",
   "tris": 158
+ },
+ "cat": {
+  "file": "faune.glb",
+  "tris": 1156,
+  "animations": [
+   "cat_walk",
+   "cat_idle",
+   "cat_sleep",
+   "cat_roll"
+  ]
  },
  "ladder_wood": {
   "file": "faune.glb",

@@ -8,12 +8,12 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 
 | Fichier | Contenu | Animations |
 |---|---|---|
-| `personnages.glb` | squelette `rig`, pièces des joueurs (15 coupes, barbes et moustache), quatre habitants de la démo, Lucie (hors démo), Achille et Solange (tour 10) | clips sur le squelette |
+| `personnages.glb` | squelette `rig`, pièces des joueurs (15 coupes, barbes et moustache), quatre habitants de la démo, Lucie (hors démo), Achille et Solange (tour 10), quatorze habitants de la 0.13, leurs accessoires et trois vélos | clips sur le squelette |
 | `bourg.glb` | bâtiments (tour 10: rue Haute, intérieurs de l'épicerie et de la mercerie, cellier et chambre), voie, quai, mobilier, sols, clôtures, nature (dont roncier, noisetier, rejet du chêne et jeune sapin du tour 8), rivière, passages du ru | aucune (pièces mobiles en nœuds à part) |
 | `ferme.glb` | cases du potager, cultures (4 stades), récoltes, cueillette (pissenlit; tour 8: ail des ours, girolles; tour 9: mûres, noisettes, cèpes, sureau), sachets, outils (tour 9: outils de la Halte, perche d'allumeur), matériaux, poule, cage, mangeoire, tonneau d'eau | `hen_idle`, `hen_walk`, `hen_peck` |
 | `train.glb` | locomotive, voiture, fourgon | `locomotive_roll`, `coach_roll`, `van_roll` |
 | `maison.glb` | meubles, plats, objets de l'histoire, kit de modules (P1) | aucune |
-| `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 41 clips, chacun sur le squelette de sa bête |
+| `faune.glb` | bêtes des moments rares (héron, oie, mésange bleue, renard; tour 7: chevrette, faon, martin-pêcheur), chat du bourg (0.13), échelle, nichoir, chicot du chêne, brin de mousse, ablette, pieu d'amarrage | 53 clips, chacun sur le squelette de sa bête |
 | `poissons.glb` | les 22 poissons de la pêche (0.12) et la vieille épuisette du ponton | aucune |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
@@ -46,8 +46,8 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 
 - Un seul squelette `rig` (18 os: `root`, `hips`, `spine`, `chest`, `neck`, `head`, `upper_arm_l`, `forearm_l`, `hand_l`, idem `_r`, `thigh_l`, `shin_l`, `foot_l`, idem `_r`) et des maillages à peau liés à ce squelette, à la racine du fichier.
 - Instancier un personnage: `SkeletonUtils.clone(gltf.scene)`, puis ne garder visibles que ses pièces. Un joueur = `player_base` + ses vêtements `wear_<slot>_<style>` + une coiffure (`player_hair_<coupe>`, ou `_hat` sous un chapeau) + l'écusson `player_badge_<symbole>` (`orb`, `crescent`, `star`, `sun`, `planet`, `comet`, comme les profils Duo); voir « Garde-robe de la 0.12 ». Les foulards sont retirés. Les quatre pièces partagent le matériau: on peut les fusionner (même squelette) pour un seul appel de dessin.
-- Couleurs d'un joueur: la texture `personnages.png` a une rangée de 16 cases (4 px) par personnage. Les pièces des joueurs lisent la rangée 0. Pour chaque joueur, cloner le matériau, peindre une CanvasTexture de 64 x 64 (copie de `personnages.png`) dont la rangée 0 reçoit ses couleurs, avec `flipY = false`, `NearestFilter`, `SRGBColorSpace`. Ordre des cases: peau, ombre de peau, cheveux, cheveux sombres, yeux, bouche, haut, liseré, bas, chaussures, foulard, symbole du foulard, accessoire A, accessoire B, métal, joues. Choix proposés (tenues, peaux, cheveux, foulards): `PLAYER_PRESETS` dans `assets-src/modeles/palette.py`.
-- Habitants: `villager_firmin`, `villager_odette`, `villager_basile`, `villager_jeanne` (et `villager_lucie`, hors démo). Jeanne se pose à l'échelle 0,75 (extra `scale`).
+- Couleurs d'un joueur: la texture `personnages.png` a une rangée de 16 cases (4 px) par personnage. Les pièces des joueurs lisent la rangée 0. Pour chaque joueur, cloner le matériau, peindre une CanvasTexture de la taille de `personnages.png` (64 x 128 depuis la 0.13, copie de la source) dont la rangée 0 reçoit ses couleurs, avec `flipY = false`, `NearestFilter`, `SRGBColorSpace`. Ordre des cases: peau, ombre de peau, cheveux, cheveux sombres, yeux, bouche, haut, liseré, bas, chaussures, foulard, symbole du foulard, accessoire A, accessoire B, métal, joues. Choix proposés (tenues, peaux, cheveux, foulards): `PLAYER_PRESETS` dans `assets-src/modeles/palette.py`.
+- Habitants: `villager_firmin`, `villager_odette`, `villager_basile`, `villager_jeanne` (et `villager_lucie`, hors démo). Jeanne se pose à l'échelle 0,75 (extra `scale`). Habitants de la 0.13: voir la section qui leur est consacrée.
 - Expressions: clés de forme sur `player_base` et chaque `villager_*`: `happy` (contente), `delighted` (ravie), `tired` (fatiguée), `hungry` (affamée), `blink` (yeux fermés, pour dormir et cligner); toutes à 0 = neutre. Une seule à 1 à la fois (`morphTargetDictionary`).
 - Objets tenus: accrocher le nœud de l'objet sous `socket_hand_r` (ou `socket_hand_l`) sans transformation. Les outils de `ferme.glb` ont leur origine au point de prise et pendent comme dans une main au repos.
 - Animations sur place (la racine ne bouge pas, seul `hips` monte et descend):
@@ -106,7 +106,7 @@ Liste de contrôle de la bible (section 8.10): rien ne flotte, rien ne traverse,
 - Toute la carte de la démo (`donnees/cartes/halte.json`: 196 objets, dont 79 buissons et 51 arbres): environ 43 000 triangles de décor avant le low poly arrondi (les 30 chênes et 79 buissons arrondis en ajoutent environ 13 000, la maison de Firmin 2 300), plus 16 modules de voie (4 700), le potager (environ 4 000 avec ses cultures) et six personnages (environ 14 000): moins de 70 000 triangles, pour un plafond de 250 000.
 - Personnages: 2 160 à 2 590 triangles par habitant, 2 006 pour un joueur complet (base, tenue, coiffure, foulard). Accessoires: 40 à 650 triangles.
 - Appels de dessin: un matériau par fichier; décor statique à fusionner ou à instancier par le jeu (arbres, buissons, clôtures, cultures et cases du potager se prêtent à `InstancedMesh`).
-- Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 64: moins de 100 Ko de mémoire.
+- Textures: une palette de 64 x 64 (et ses compagnes), une texture de personnages de 64 x 128 (0.13): moins de 100 Ko de mémoire.
 
 ## Faune des moments rares (tour 6, `faune.glb`)
 
@@ -294,13 +294,40 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `carry_one` | 0,533 s | oui | | marcher en portant seul devant la poitrine (mêmes pas que `walk`) |
 | `carry_one_idle` | 3,0 s | oui | | à l'arrêt avec l'objet porté seul |
 
+## Habitants de la 0.13 (lot H6 de `docs/jeux/jeu-1/v0-13-habitants.md`)
+
+Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, vélos, clips `push_bike`), `chat.py` (appelé par `faune.py`). Planches: `planche_habitants_013.py <dossier> [habitants|rangee|accessoires|tout]` puis `planche_habitants_013.sh <dossier> <sortie>`, `verifier/planche_chat.py <dossier>`; livrées dans `docs/jeux/jeu-1/gauntlet/captures/v0-13/habitants/`.
+
+- Quatorze habitants sur le squelette commun `rig`, mêmes clips et mêmes clés de forme (`happy`, `delighted`, `tired`, `hungry`, `blink`) que les habitants de la démo. L'échelle de pose (extra `scale` du nœud) est à reporter dans `habitants.json` (champ `scale`, comme Jeanne à 0,75): os communs, les gabarits passent par l'échelle (Armand 1,035 pour ses 1,80 m, Inès 1,03).
+
+| Nœud | Échelle | Triangles | Ce qui le fait reconnaître |
+|---|---|---|---|
+| `villager_armand` | 1,035 | 2646 | veste de velours noisette ouverte sur une chemise blanche, noeud papillon bleu nuit, lunettes rondes, raie sur le côté, craie dans la poche |
+| `villager_berthe` | 1,0 | 2186 | gilet vert bouteille sur blouse écrue, avant-bras et mains farinés, jupe brune tachée de farine, sabots, cheveux gris frisés |
+| `villager_martial` | 1,0 | 2230 | soutane noire retroussée à mi-mollet, col romain, pinces à vélo de laiton aux chevilles, chapeau rond à larges bords relevé devant |
+| `villager_marthe` | 0,92 | 2586 | robe gris perle, tablier bleu ardoise à bavette et poches, gants de toile, trousseau de clés à droite, chapeau de paille noir à ruban, petit chignon |
+| `villager_honorine` | 0,86 | 2828 | pèlerine crème au dos rond (voûtée, tête en avant), robe bleu passé à fleurettes, chignon blanc minuscule, lunettes, canne de buis à la main droite |
+| `villager_ines` | 1,03 | 2338 | veste vert sapin à écusson et poches, velours brun, guêtres de cuir, chapeau de garde à bord rabattu, natte noire, marteau forestier à la ceinture |
+| `villager_barnabe` | 1,10 | 2378 | chemise à carreaux sous un gilet de cuir, barbe noire piquée de gris, bonnet brun à revers, joues de charbon |
+| `villager_mado` | 1,0 | 2570 | bras nus musclés, chemise écrue, tablier de cuir noirci court, cheveux châtain-roux frisés, lunettes de forge relevées sur le front, marteau à la ceinture |
+| `villager_paulin` | 0,97 | 2750 | chemise grise rayée, velours brun à bretelles, bottes, moustache épaisse, chapeau de paille cabossé |
+| `villager_margot` | 0,97 | 3262 | robe vert pomme à petits carreaux, tablier bleu-gris, sabots, joues rouges, chignon haut piqué d'un crayon |
+| `villager_leon` | 0,78 | 2386 | chemise blanche sortie, culottes de velours, bretelles, casquette de cheminot trop grande et de travers, épi, pansement au genou gauche, sifflet au cou sur un lacet |
+| `villager_ambroise` | 0,94 | 2274 | blouse grise d'atelier, gilet noir et chaîne de montre de laiton, manchettes de lustrine, crâne chauve, couronne blanche et favoris, gros sourcils |
+| `villager_nour` | 1,0 | 2574 | veste de toile kaki à quatre poches, pantalon fuselé, bottes de caoutchouc vertes, stéthoscope, grosse sacoche de cuir à la hanche gauche, boucles en queue |
+| `villager_colette` | 1,0 | 2598 | robe brique, manches retroussées, tablier noir court, carré noir à frange, torchon rayé sur l'épaule gauche (les boucles d'oreilles de la fiche restent cachées sous le carré) |
+
+- Texture `personnages.png`: 64 x 128 depuis la 0.13 (32 rangées de 16 cases, `palette.CHAR_GRID_H`). Rangées 0 à 10 inchangées (joueurs, démo, équipage, Achille, Solange), puis les quatorze habitants, puis `bicycles` et `props`. La copie peinte par joueur reprend la taille de la source (`PlayerTexture`), rien à changer côté rendu. Chez les habitants, les cases `scarf` et `scarf_mark` portent deux couleurs de plus (aucun ne porte de foulard).
+- Pièces portées d'Ambroise (à fusionner avec `villager_ambroise` comme l'écharpe de Firmin, `VILLAGER_WORN`): `villager_ambroise_loupe` (loupe vissée à l'oeil gauche, au travail, à sa fenêtre) et `villager_ambroise_loupe_up` (relevée sur le front, en marchant); une seule des deux à la fois. Le sifflet de Léon est dans son maillage.
+- Accessoires (objets fixes du même matériau, sans squelette): `school_satchel` (cartable d'Armand, 248 triangles), `milk_can` (pot à lait de Margot, 330), `felling_axe` (hache de Barnabé, 112), `accordion` (accordéon de Colette, P1, 240). Origine à la prise, ils pendent sous `socket_hand_r` comme les outils de `ferme.glb` (la hache se porte à l'épaule comme les autres outils hors geste); l'accordéon a son origine au centre, à tenir devant la poitrine avec `carry_one_idle`.
+- Vélos poussés à la main: `bicycle_lucie` (noir, porte-bagages, deux sacoches, plaque de la poste, 1184), `bicycle_martial` (vélo de course vert loco, cintre, pompe, 880), `bicycle_nour` (noir, panier d'osier, 1026). Origine sous celui qui pousse: poser le vélo avec la même position et la même orientation que lui; le vélo est à sa gauche (axe à x 0,56 m), la poignée gauche sous sa main gauche (extra `hand_l`, repère glTF). Roues: nœuds enfants `<vélo>_wheel_front` et `_wheel_rear`, origine à l'axe, tourner autour de leur X local de `distance / wheel_radius` (0,335 m). Ces trois vélos dépassent le plafond d'un accessoire (900): ce sont des véhicules vus de près dans le bourg, signalé.
+- Clips nouveaux sur le squelette commun: `push_bike` (0,533 s, boucle: mêmes pas que `walk`, main gauche posée sur la poignée, écart mesuré 6 mm) et `push_bike_idle` (3 s, boucle: arrêté à côté du vélo).
+- Chat du bourg (`faune.glb`, nœud `cat`, maillage `cat_mesh`, 1156 triangles): tigré gris à plastron, museau et chaussettes blancs, yeux vert-jaune; 0,46 m de corps, 0,25 m au garrot. Clips: `cat_idle` (assis, la queue qui bat, regards, oreille qui frémit; 7,3 s), `cat_walk` (pas en quatre temps, queue dressée en crosse, 0,8 s pour 0,35 m/s: `timeScale = vitesse / 0,35`), `cat_sleep` (couché en rond, pattes repliées, queue autour de lui, il respire; 3 s), `cat_roll` (il se roule sur le dos, pattes en l'air, et revient; 2,7 s). Les poses assises et couchées sont posées au sol par calcul (point le plus bas du maillage déformé). Noms préfixés comme les autres bêtes de `faune.glb` (`cat_idle` pour `idle`).
+- Poids: `personnages.glb` passe de 6,4 à 10,8 Mo (environ 330 Ko par habitant: ombrage en aplats, sommets non partagés). La compression Meshopt (Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
+
 ## Fiche par modèle
 
-
-
-
-
-### `personnages.glb` (6404 Ko)
+### `personnages.glb` (10849 Ko)
 
 | Nœud | Triangles |
 |---|---|
@@ -381,6 +408,29 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `villager_lucie` | 2218 |
 | `villager_achille` | 2086 |
 | `villager_solange` | 2534 |
+| `villager_armand` | 2646 |
+| `villager_berthe` | 2186 |
+| `villager_martial` | 2230 |
+| `villager_marthe` | 2586 |
+| `villager_honorine` | 2828 |
+| `villager_ines` | 2338 |
+| `villager_barnabe` | 2378 |
+| `villager_mado` | 2570 |
+| `villager_paulin` | 2750 |
+| `villager_margot` | 3262 |
+| `villager_leon` | 2386 |
+| `villager_ambroise` | 2274 |
+| `villager_nour` | 2574 |
+| `villager_colette` | 2598 |
+| `villager_ambroise_loupe` | 92 |
+| `villager_ambroise_loupe_up` | 92 |
+| `school_satchel` | 248 |
+| `milk_can` | 330 |
+| `felling_axe` | 112 |
+| `accordion` | 240 |
+| `bicycle_lucie` | 1184 |
+| `bicycle_martial` | 880 |
+| `bicycle_nour` | 1026 |
 | `villager_firmin_scarf` | 232 |
 | `rail_crew_driver` | 1630 |
 | `rail_crew_stoker` | 1674 |
@@ -431,6 +481,8 @@ Sources: `coiffures.py` (mèches), `animations_012.py` (clips), `personnages.py`
 | `cook` | 1.6 | oui |
 | `pickup` | 1.0 | non (jouer une fois) |
 | `feed` | 1.2 | oui |
+| `push_bike` | 0.533 | oui |
+| `push_bike_idle` | 3.0 | oui |
 
 ### `ferme.glb` (1023 Ko)
 
@@ -645,7 +697,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kit_window` | 1 x 1 | 72 | tier: "P1", note: "mur sur le bord arrière de la case (-Z glTF), 2,4 m" |
 | `kit_floor_wood` | 1 x 1 | 24 | tier: "P1" |
 
-### `faune.glb` (1187 Ko)
+### `faune.glb` (1403 Ko)
 
 | Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
 |---|---|---|---|
@@ -658,6 +710,7 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `kingfisher` |  | 416 | kind: "animal", origin: "pattes sur le perchoir", display_scale: 1.5, length: 0.255, wingspan: 0.375, beak_socket: "socket_kingfisher_beak" |
 | `barn_owl` |  | 658 | kind: "animal", origin: "pattes sur le perchoir (rocher rock_02) ou au sol", height: 0.35, wingspan: 0.9, beak_socket: "socket_barn_owl_beak", note: "vol: owl_glide, owl_flap; surplace: owl_hover; owl_look tourne la tête de 120 degrés vers sa gauche et y reste (LoopOnce, clampWhenFinished)" |
 | `vole` |  | 158 | kind: "item", socket: "socket_barn_owl_beak", carried_by: "barn_owl", length: 0.08, note: "en travers du bec, tête vers la gauche de l'oiseau" |
+| `cat` |  | 1156 | kind: "animal", origin: "sol entre les pattes", withers: 0.25, length: 0.46, tail: 0.3, collision_radius: 0.25, note: "cat_idle assis, cat_walk 0,35 m/s (timeScale = vitesse / 0,35), cat_sleep couché en rond, cat_roll sur le dos (caresse à deux); la racine ne bouge pas" |
 | `ladder_wood` |  | 176 | kind: "prop", lean_deg: 75.0, length: 3.0, rung_step: 0.28, rungs: 10, top: [0.0, 2.898, 0.776], note: "penchée vers +Z: la poser avec la rotation de celui qui grimpe" |
 | `nest_box` |  | 156 | kind: "prop", pivot: "clou", tilt_deg: 25, entrance: [0.0, -0.13, 0.181], roof_perch: [0.0, -0.048, 0.12], note: "penché: tourner de 25 degrés autour de Z glTF (le bas vers +X)" |
 | `oak_branch_stub` |  | 60 | kind: "prop", pivot: "bout du chicot (perchoir)" |
@@ -716,6 +769,10 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `barn_owl` | `owl_land` | 0.6 | non (jouer une fois) |
 | `barn_owl` | `owl_look` | 2.0 | non (jouer une fois) |
 | `barn_owl` | `owl_perch` | 2.0 | oui |
+| `cat` | `cat_walk` | 0.8 | oui |
+| `cat` | `cat_idle` | 7.333 | oui |
+| `cat` | `cat_sleep` | 3.0 | oui |
+| `cat` | `cat_roll` | 2.667 | oui |
 
 ### `poissons.glb` (808 Ko)
 

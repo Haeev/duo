@@ -10,6 +10,7 @@ Source unique des couleurs: la bible artistique de la démo les reprend.
 
 CELL = 4          # pixels par case
 GRID = 16         # cases par côté (texture de 64 x 64)
+CHAR_GRID_H = 32  # rangées de la texture des personnages (64 x 128 depuis la 0.13: 21 habitants)
 
 # nom: (hex, rugosité, métal, lueur de nuit en hex ou None)
 # Ordre = ordre des cases (de gauche à droite, de haut en bas).
@@ -315,8 +316,68 @@ CHAR_ROWS["solange"] = {
     "bottom": "#5B3F5A", "shoes": "#3A2E2A", "scarf": "#E7C05A", "scarf_mark": "#5B3F5A",
     "extra_a": "#B33E3A", "extra_b": "#2E2A28", "metal": "#B9BEC2", "cheek": "#E99289",
 }
+# 0.13 (docs/jeux/jeu-1/v0-13-habitants.md, section 2.3): les quatorze nouveaux habitants, puis deux rangées
+# d'accessoires (vélos; cartable, pot à lait, hache, accordéon). Les cases `scarf` et `scarf_mark` ne servent
+# à aucun foulard chez les habitants (bible: aucune couleur vive au cou): elles portent deux couleurs de plus.
+def _row(skin, shade, hair, hair_dark, mouth, top, trim, bottom, shoes, c1, c2, a, b, metal, cheek, eye="#2A2522"):
+    return dict(zip(CHAR_SLOTS, (skin, shade, hair, hair_dark, eye, mouth, top, trim, bottom, shoes, c1, c2, a, b,
+                                 metal, cheek)))
+
+
+CHAR_ROWS.update({
+    # veste de velours noisette, chemise blanche, noeud papillon bleu nuit; scarf: revers et coudières, scarf_mark: craie
+    "armand": _row("#E6BC98", "#CC9C7A", "#4A3326", "#31221A", "#8A4640", "#7A5A3F", "#F1ECE2", "#6E7178", "#3A2F29",
+                   "#5F4531", "#F4F1EA", "#8A5A35", "#2E3A5C", "#A8A8A2", "#E3948A"),
+    # blouse écrue, farine, gilet vert bouteille, jupe brune, sabots; scarf: avant-bras farinés
+    "berthe": _row("#E2B08A", "#C79270", "#A8A39C", "#827D76", "#8C4842", "#E7D8B6", "#F6F1E6", "#6B4E37", "#9C7650",
+                   "#EBD6C2", "#D9CCAB", "#3F5A45", "#5B4636", "#8F949A", "#E08878"),
+    # soutane noire, col blanc, pinces à vélo de laiton, chapeau rond
+    "martial": _row("#DDAA85", "#C08E6A", "#A9A6A0", "#7E7B76", "#86453E", "#35373C", "#F2EFE8", "#2B2C31", "#24221F",
+                    "#4A4C52", "#5C5E64", "#2A2B2F", "#43454B", "#C8A150", "#E08A7C"),
+    # robe gris perle, tablier bleu ardoise, chapeau de paille noir à ruban; scarf: gants de toile
+    "marthe": _row("#EBC2A2", "#D1A383", "#CFCAC2", "#A39E96", "#8E4A48", "#B9B4AC", "#D8D3CA", "#ADA8A0", "#2E2A27",
+                   "#A89A78", "#4A4E58", "#4A5A6A", "#2C2B2B", "#6F6B66", "#E4A091"),
+    # pèlerine crème, robe à petites fleurs bleu passé, chignon blanc, canne de buis
+    "honorine": _row("#EEC9AE", "#D6AC90", "#F0ECE4", "#CBC5BB", "#9A5055", "#F1E5C9", "#DDCDAA", "#8796BF",
+                     "#3B302A", "#F4F0E6", "#E8C76A", "#C9A766", "#A2724A", "#A8A8A2", "#EBA19A"),
+    # veste vert sapin à écusson, velours brun, guêtres de cuir, chapeau de garde
+    "ines": _row("#B9825C", "#9C6646", "#231C19", "#120E0C", "#7A3D37", "#3F5A45", "#556F59", "#6B4E37", "#4A3A2E",
+                 "#C9B48A", "#A77A45", "#7A5333", "#5E5A45", "#8F949A", "#C27A66"),
+    # chemise à carreaux rouge-brun, gilet de cuir, bonnet brun, joues de charbon; scarf_mark: gris de la barbe
+    "barnabe": _row("#D49F7A", "#B5805E", "#2B2522", "#1A1614", "#7E3F38", "#A4463B", "#6E2C26", "#3C3A36", "#2E2A27",
+                    "#5A4030", "#77716B", "#6B4A33", "#563A27", "#8F949A", "#9A8E86"),
+    # chemise écrue, tablier de cuir noirci, pantalon de toile, lunettes de forge
+    "mado": _row("#E0AA84", "#C48C66", "#8E4A2A", "#66331C", "#8C4540", "#E4DAC6", "#CFC3AB", "#6A6150", "#3A2F29",
+                 "#2C2E31", "#5B4A3B", "#4A3A30", "#6E5640", "#8C9096", "#E48A78"),
+    # chemise grise rayée, velours brun à bretelles, bottes, chapeau de paille cabossé
+    "paulin": _row("#D8A27A", "#BB845E", "#5A4636", "#3C2E23", "#80423A", "#A3A8AB", "#737A80", "#6B4E37", "#3A332C",
+                   "#D8BE7A", "#B89D5C", "#4A3A2E", "#5C3F2A", "#9AA0A6", "#DE8A76"),
+    # robe vert pomme passé à carreaux, tablier bleu-gris, sabots, crayon dans le chignon
+    "margot": _row("#EDC09C", "#D4A07D", "#5A3B28", "#3E281B", "#A04A4C", "#8BA37B", "#A9BE9B", "#7C946D", "#9C7650",
+                   "#D9B65B", "#3A3530", "#6E7F8E", "#F1EDE4", "#A9B0B4", "#E57B70"),
+    # chemise blanche, culottes de velours, bretelles, casquette rouge passé; scarf: pansement, scarf_mark: chaussettes
+    "leon": _row("#EFC5A2", "#D8A584", "#2B2522", "#17120F", "#A34A4E", "#F0ECE3", "#D9D3C6", "#6B4E37", "#5A4030",
+                 "#E8DCC4", "#9C9890", "#6B4A33", "#A65A4E", "#B5BABD", "#F08C86"),
+    # blouse grise d'atelier, gilet noir, manchettes de lustrine, chaîne de montre de laiton
+    "ambroise": _row("#E7BE9E", "#CDA080", "#EDEAE4", "#C3BEB6", "#8A4A45", "#8D8F94", "#7B7D82", "#3E3F44",
+                     "#242220", "#2E2D30", "#1F1E21", "#3A3B40", "#9DB2BE", "#C8A150", "#E39A8C"),
+    # veste de toile kaki à poches, pantalon fuselé, bottes de caoutchouc, sacoche, stéthoscope
+    "nour": _row("#B9825C", "#9C6646", "#231C19", "#120E0C", "#7A3D37", "#8C8556", "#A39B6B", "#4A4E57", "#3E5240",
+                 "#6F7378", "#B9BEC2", "#7A4B2C", "#5A3720", "#C8A150", "#C27A66"),
+    # robe brique foncé, tablier noir court, torchon rayé sur l'épaule, boucles d'oreilles de laiton
+    "colette": _row("#E8B993", "#CD9A75", "#221C1A", "#120F0E", "#9A3F42", "#8E3F35", "#7A352D", "#8E3F35", "#2E2A27",
+                    "#EDE6D6", "#5A7FA6", "#2E2B2A", "#3C3936", "#C8A150", "#E68A80"),
+    # vélos (Lucie, l'abbé, Nour): cadre noir, vert loco, pneus, chrome, cuir, laiton, osier, sacoches, poste
+    "bicycles": _row("#2C2E31", "#3F6453", "#232120", "#45423E", "#6B4A33", "#C8A150", "#8C6B3E", "#B08A55",
+                     "#7A4B2C", "#E0C25A", "#4E6F8F", "#F0ECE3", "#A4463B", "#8F949A", "#5B5E63", eye="#B9BEC2"),
+    # accessoires: cuir du cartable, bois, fer-blanc, acier, accordéon
+    "props": _row("#8A5A35", "#6B4428", "#A97749", "#765130", "#A9B0B4", "#C9CFD2", "#5E6468", "#8F949A", "#9C2F2A",
+                  "#F0ECE3", "#2C2E31", "#C8A150", "#E7D8B6", "#C8A150", "#3A3B40", eye="#2C2E31"),
+})
+NEW_VILLAGERS = ["armand", "berthe", "martial", "marthe", "honorine", "ines", "barnabe", "mado", "paulin", "margot",
+                 "leon", "ambroise", "nour", "colette"]
 CHAR_ROW_ORDER = ["player_a", "player_b", "firmin", "odette", "basile", "jeanne", "lucie", "driver", "stoker",
-                  "achille", "solange"]
+                  "achille", "solange"] + NEW_VILLAGERS + ["bicycles", "props"]
 
 # Choix proposés à la création du personnage (démo: quatre tenues).
 PLAYER_PRESETS = {

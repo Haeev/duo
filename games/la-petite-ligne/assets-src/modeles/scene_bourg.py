@@ -51,7 +51,7 @@ def row_material(base, row):
     tex = [n for n in nt.nodes if n.type == "TEX_IMAGE"][0]
     uv = nt.nodes.new("ShaderNodeUVMap")
     mp = nt.nodes.new("ShaderNodeMapping")
-    mp.inputs["Location"].default_value = (0, -r / P.GRID, 0)
+    mp.inputs["Location"].default_value = (0, -r / P.CHAR_GRID_H, 0)
     nt.links.new(uv.outputs["UV"], mp.inputs["Vector"])
     nt.links.new(mp.outputs["Vector"], tex.inputs["Vector"])
     return m

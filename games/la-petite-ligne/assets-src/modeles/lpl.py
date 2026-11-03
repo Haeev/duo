@@ -75,7 +75,7 @@ def build_char_texture():
         for c, slot in enumerate(P.CHAR_SLOTS):
             cells[(c, r)] = P.hex_to_rgb(P.CHAR_ROWS[row][slot])
     for d in (TEX_SRC, TEX_OUT):
-        _write_png(os.path.join(d, "personnages.png"), cells, P.GRID, P.GRID)
+        _write_png(os.path.join(d, "personnages.png"), cells, P.GRID, P.CHAR_GRID_H)
     return os.path.join(TEX_SRC, "personnages.png")
 
 
@@ -90,7 +90,7 @@ def world_cells():
 
 def char_cells(row_name):
     r = P.CHAR_ROW_ORDER.index(row_name)
-    return {s: ((c + 0.5) / P.GRID, 1.0 - (r + 0.5) / P.GRID) for c, s in enumerate(P.CHAR_SLOTS)}
+    return {s: ((c + 0.5) / P.GRID, 1.0 - (r + 0.5) / P.CHAR_GRID_H) for c, s in enumerate(P.CHAR_SLOTS)}
 
 
 # Scène et matériau --------------------------------------------------------
