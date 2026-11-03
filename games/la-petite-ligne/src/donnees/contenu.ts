@@ -225,6 +225,16 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             flag: handcar.at('flag').string(),
           },
     parcel: parcel === null ? null : { item: parcel.at('item').string(), from: parcel.at('from').string(), to: parcel.at('to').string() },
+    quests: (r?.opt('quests')?.items() ?? []).map((q) => ({
+      item: q.at('item').string(),
+      from: q.at('from').string(),
+      to: q.at('to').string(),
+      quest: q.at('quest').string(),
+      step: q.at('step').string(),
+      when: conditions(q.opt('when'), 'step_start'),
+      flag: q.at('flag').string(),
+      placedText: optString(q, 'placedText'),
+    })),
   };
 }
 
@@ -451,6 +461,32 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     }
     case 'nights_passed':
       return counter(r, 'nights', since);
+    // 0.12 (lot L-quêtes): compteur nommé, pour un système qui compte sans condition à lui (README, section 3.1).
+    case 'counter':
+      return counter(r, r.at('key').string(), since);
+    // 0.12: compteurs tenus par la basse-cour, la chèvre, le marché et les plis (README, section 3.1).
+    case 'animal_released':
+      return counter(r, `animal_released:${r.at('animal').string()}`, since);
+    case 'animal_named':
+      return counter(r, `animal_named:${r.at('animal').string()}`, since);
+    case 'brood_started':
+      return counter(r, 'brood_started', since);
+    case 'brood_hatched':
+      return counter(r, 'brood_hatched', since);
+    case 'milked':
+      return counter(r, 'milked', since);
+    case 'goat_grazed_spots':
+      return counter(r, 'goat_grazed_spot', since);
+    case 'delivered':
+      return counter(r, 'mail_delivered', since);
+    case 'stall_stocked':
+      return counter(r, 'stall_kind', since);
+    case 'given_to_stall':
+      return counter(r, `stall_given${suffix(r, 'item')}`, since);
+    case 'market_served':
+      return counter(r, optBoolean(r, 'together', false) ? 'market_served_together' : 'market_served', since);
+    case 'money_at_least':
+      return { type, amount: r.at('amount').integer(0) };
     default:
       return r.at('type').fail(`type de condition inconnu « ${type} »`);
   }
@@ -478,6 +514,7 @@ export function parseEffect(r: Reader): Effect {
         from: r.at('from').oneOf(['actor', 'either', 'cellar'] as const),
       };
     case 'give_money':
+    case 'take_money':
       return { type, amount: r.at('amount').integer(0) };
     case 'set_flag':
       return { type, flag: r.at('flag').string() };
@@ -850,8 +887,15 @@ function parseQuests(r: Reader): QuestDef[] {
         completionText: q.at('completionText').string(),
         secret: parseSecret(q.opt('secret')),
         repeat: q.has('repeat') ? q.at('repeat').oneOf(['each_train'] as const) : null,
+        expire: parseExpire(q.opt('expire')),
       };
     });
+}
+
+/** 0.12: retrait sans reproche d'une quête au premier jour de la semaine et à l'heure donnés après son démarrage. */
+function parseExpire(r: Reader | null): QuestDef['expire'] {
+  if (r === null) return null;
+  return { weekday: WEEKDAYS.indexOf(r.at('weekday').oneOf(WEEKDAYS)), time: r.at('time').time(), text: r.at('text').string() };
 }
 
 function parseSecret(r: Reader | null): QuestSecretDef | null {
@@ -2040,6 +2084,7 @@ function checkReferences(content: Content): void {
           if ((content.quests.find((q) => q.id === e.quest)?.secret ?? null) === null) fail(`${where}: quête sans secret « ${e.quest} »`);
           break;
         case 'give_money':
+        case 'take_money':
         case 'set_flag':
         case 'set_need':
         case 'gather_players':
@@ -2065,7 +2110,17 @@ function checkReferences(content: Content): void {
       walkEffects(choice.effectsWrong, `habitants.json: ${dialogue.id}.${choice.id}`);
     }
   }
+  for (const load of content.settings.carry.quests) {
+    const where = `reglages.json: carry.quests (${load.item})`;
+    item(load.item, where);
+    const steps = content.quests.find((q) => q.id === load.quest)?.steps ?? null;
+    if (steps === null) fail(`${where}: quête inconnue « ${load.quest} »`);
+    else if (!steps.some((s) => s.id === load.step)) fail(`${where}: étape inconnue « ${load.step} »`);
+    if (load.placedText !== null && !(load.placedText in content.texts.messages)) fail(`${where}: message inconnu « ${load.placedText} »`);
+  }
   for (const quest of content.quests) {
+    const expire = quest.expire?.text ?? null;
+    if (expire !== null && !(expire in content.texts.messages)) fail(`quetes.json: ${quest.id}: message inconnu « ${expire} »`);
     const nudge = quest.secret?.nudge ?? null;
     if (nudge !== null && !(nudge in content.texts.messages)) fail(`quetes.json: ${quest.id}: message inconnu « ${nudge} »`);
   }
@@ -2229,6 +2284,7 @@ function annonceQuests(content: Content): QuestDef[] {
     completionText: '',
     secret: null,
     repeat: null,
+    expire: null,
   });
   for (const a of content.annonces) {
     const title = rawText(content.texts, 'annonces', a.id, 'title') ?? a.id;

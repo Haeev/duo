@@ -689,7 +689,11 @@
     {"id": "grocery_dining_door", "x": 28.0, "y": 26.4, "role": "la porte entrouverte de la salle à manger de la pension (examiner)", "objet": "ferrand_shop", "cap_degres": 0, "interieur": true},
     {"id": "grocery_stairs", "x": 27.95, "y": 26.45, "role": "le pied de l'escalier des chambres de la pension, devant la porte de la salle à manger (examiner)", "objet": "ferrand_shop", "portee": 1.5, "interieur": true},
     {"id": "room_cellar_site", "x": 3.5, "y": 18.5, "role": "chantier du cellier: panneau et caisse, au nord du pignon ouest, hors de l'emprise de l'appentis (x 2 à 4, y 21 à 26) et hors du chemin"},
-    {"id": "room_bedroom_site", "x": 12.5, "y": 17.5, "role": "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son pignon et le sentier du jardin (la panne attend à `beam_pickup`)"}
+    {"id": "room_bedroom_site", "x": 12.5, "y": 17.5, "role": "chantier de la chambre: panneau et caisse, à l'est de l'aile nord, entre son pignon et le sentier du jardin (la panne attend à `beam_pickup`)"},
+    {"id": "market_stall", "x": 34.0, "y": 26.5, "role": "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)", "portee": 1.5},
+    {"id": "garland_west", "x": 34.5, "y": 25.5, "role": "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"},
+    {"id": "garland_east", "x": 47.5, "y": 25.5, "role": "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"},
+    {"id": "goat_shed", "x": 15.0, "y": 20.0, "role": "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"}
   ],
   "zones": [
     {"id": "garden", "rect": {"x": 7, "y": 28, "w": 4, "h": 3}, "role": "les 12 cases du potager de la démo, devant la porte; ordre des cases: ligne par ligne, d'ouest en est, du nord au sud"},

@@ -240,6 +240,8 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
       return (world.catalogueBought[condition.item] ?? 0) > 0;
     case 'inside':
       return byCharacter(sim, condition.who, ctx, (id) => character(sim, id).inside === condition.building);
+    case 'money_at_least':
+      return world.purse >= condition.amount;
   }
 }
 

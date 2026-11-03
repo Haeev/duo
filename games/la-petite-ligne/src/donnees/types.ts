@@ -96,12 +96,16 @@ export type Condition = { label?: string } & (
   | { type: 'bought'; item: string }
   // Tour 10: dans un bâtiment visitable (ADR 0016), le joueur concerné ou l'un des deux.
   | { type: 'inside'; building: string; who: Who }
+  // 0.12 (lot L-quêtes): la bourse commune a au moins cette somme (choix payants d'un dialogue).
+  | { type: 'money_at_least'; amount: number }
 );
 
 export type Effect =
   | { type: 'give_item'; item: string; count: number; to: 'each' | 'actor' | 'cellar' | SecretRole }
   | { type: 'take_item'; item: string; count: number; from: 'actor' | 'either' | 'cellar' }
   | { type: 'give_money'; amount: number }
+  /** 0.12: retire de la bourse commune (jamais sous zéro: un choix payant vérifie `money_at_least`). */
+  | { type: 'take_money'; amount: number }
   | { type: 'set_flag'; flag: string }
   | { type: 'start_quest'; quest: string }
   | { type: 'send_letter'; letter: string }
@@ -334,6 +338,19 @@ export interface QuestStepDef {
   failText: string | null;
 }
 
+/** Charge de quête portée à deux (`reglages.carry.quests`). */
+export interface QuestLoadDef {
+  item: string;
+  from: string;
+  to: string;
+  quest: string;
+  step: string;
+  when: Condition[];
+  flag: string;
+  /** Message de `textes.messages` à la pose, chez les deux (`null`: aucun). */
+  placedText: string | null;
+}
+
 export interface QuestDef {
   id: string;
   kind: 'main' | 'side';
@@ -352,6 +369,11 @@ export interface QuestDef {
    * `at_deadline` sans `deadline` échoit au départ de ce train. `{day}`: le jour de ce train.
    */
   repeat: 'each_train' | null;
+  /**
+   * 0.12: la quête se retire d'elle-même, sans reproche, au premier `weekday` à `time` après son
+   * démarrage (message `text` de `textes.messages`); elle peut redémarrer plus tard. `null`: jamais.
+   */
+  expire: { weekday: number; time: number; text: string } | null;
 }
 
 /**
@@ -909,6 +931,11 @@ export interface Settings {
       flag: string;
     } | null;
     parcel: { item: string; from: string; to: string } | null;
+    /**
+     * 0.12: charges de quête, portées à deux de `from` à `to` pendant l'étape `step` de `quest`, quand
+     * `when` est vrai (conditions évaluées dans l'étape); posées, elles lèvent `flag`.
+     */
+    quests: QuestLoadDef[];
   };
   /** Envies (HA-07, tour 8 section 5.4). */
   envies: EnvieSettings;

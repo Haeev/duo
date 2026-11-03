@@ -144,6 +144,20 @@ CONDITIONS: dict[str, tuple[set[str], set[str]]] = {
     "room_built": (set(), {"room", "count", "since"}),
     "curtains_opened": (set(), {"count", "who", "since"}),
     "scene_played": ({"dialogue"}, {"count", "who", "since"}),
+    # 0.12 (lot L-quêtes): compteur nommé, compteurs de la basse-cour, de la chèvre, des plis et du marché,
+    # bourse commune (README, section 3.1).
+    "counter": ({"key"}, {"count", "who", "since"}),
+    "animal_released": ({"animal"}, {"count", "who", "since", "point"}),
+    "animal_named": ({"animal"}, {"count", "who", "since"}),
+    "brood_started": (set(), {"count", "who", "since"}),
+    "brood_hatched": (set(), {"count", "who", "since"}),
+    "milked": (set(), {"count", "who", "since"}),
+    "goat_grazed_spots": (set(), {"count", "who", "since"}),
+    "delivered": (set(), {"count", "who", "since"}),
+    "stall_stocked": (set(), {"count", "who", "since"}),
+    "given_to_stall": (set(), {"item", "count", "who", "since"}),
+    "market_served": (set(), {"together", "count", "who", "since"}),
+    "money_at_least": ({"amount"}, set()),
 }
 COMMON_CONDITION_KEYS = {"type", "label"}
 
@@ -151,6 +165,7 @@ EFFECTS: dict[str, tuple[set[str], set[str]]] = {
     "give_item": ({"item", "count", "to"}, set()),
     "take_item": ({"item", "count", "from"}, set()),
     "give_money": ({"amount"}, set()),
+    "take_money": ({"amount"}, set()),
     "set_flag": ({"flag"}, set()),
     "start_quest": ({"quest"}, set()),
     "send_letter": ({"letter"}, set()),
@@ -208,7 +223,9 @@ ICONS_SOURCE = Path(__file__).resolve().parent.parent / "ui-maquettes" / "outils
 
 # Drapeaux posés par la simulation elle-même (tour 10, `simulation/bourg.ts`): départs de la rue Haute.
 FLAGS_SET_BY_CODE = {"achille_here", "solange_here", "solange_note_sent", "achille_wish_open", "solange_wish_open",
-                     "achille_cart_said", "basket_carried"}
+                     "achille_cart_said", "basket_carried",
+                     # 0.12: posé par le chantier `goat_shed` de la file `elevage` (`<id>_built`, lot L-économie).
+                     "goat_shed_built"}
 
 # Points de carte demandés par les données. Le level designer les crée dans donnees/cartes/ (voir README).
 NAMED_POINTS_OUTSIDE_MAP = {"offstage"}
@@ -828,6 +845,13 @@ def check_quetes(data: dict[str, Any], reg: Registry, report: Report) -> None:
             elif "resolve" in step:
                 report.error(ws, f"« resolve » inconnu {step['resolve']!r}")
         check_effects(quest.get("completionEffects", []), f"{w}.completionEffects", reg, report)
+        expire = quest.get("expire")
+        if expire is not None:
+            if not isinstance(expire, dict) or expire.get("weekday") not in WEEKDAYS:
+                report.error(w, "« expire »: « weekday » de saturday à friday attendu")
+            else:
+                check_time(expire.get("time"), f"{w}.expire", report)
+                ref("text", expire.get("text"), f"{w}.expire", reg, report)
         if "repeat" in quest and quest["repeat"] != "each_train":
             report.error(w, f"« repeat » inconnu {quest['repeat']!r} (each_train)")
         if not quest.get("completionText"):
@@ -1240,6 +1264,21 @@ def check_textes_reglages(data: dict[str, Any], reg: Registry, report: Report) -
             if day not in reg.order_days:
                 report.error(where, f"order_complete: aucune commande pour le train du jour {day}")
     ref("point", settings.get("spawn", {}).get("point"), "reglages.spawn", reg, report)
+    # 0.12: charges de quête portées à deux (l'étal, les briques, la chevrette), drapeau levé à la pose.
+    for i, load in enumerate(settings.get("carry", {}).get("quests", [])):
+        w = f"reglages.carry.quests[{i}]"
+        ref("item", load.get("item"), w, reg, report)
+        if load.get("item") in reg.items and not reg.items[load["item"]].get("carriedByTwo"):
+            report.error(w, f"{load.get('item')!r} ne se porte pas à deux (« carriedByTwo »)")
+        ref("point", load.get("from"), w, reg, report)
+        ref("point", load.get("to"), w, reg, report)
+        ref("quest", load.get("quest"), w, reg, report)
+        if load.get("quest") in reg.quests and load.get("step") not in reg.quests[load["quest"]]:
+            report.error(w, f"étape inconnue {load.get('step')!r} de la quête {load.get('quest')!r}")
+        check_conditions(load.get("when", []), f"{w}.when", reg, report)
+        if "placedText" in load:
+            ref("text", load["placedText"], w, reg, report)
+        reg.flags_set.add(load.get("flag", ""))
     ref("point", settings.get("garden", {}).get("zone"), "reglages.garden", reg, report)
     ref("point", settings.get("trees", {}).get("zone"), "reglages.trees", reg, report)
     grocer_flag = settings.get("economy", {}).get("grocer", {}).get("buysAfterFlag")

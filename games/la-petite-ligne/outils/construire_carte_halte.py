@@ -894,6 +894,22 @@ POINTS += [
       "pignon et le sentier du jardin (la panne attend à `beam_pickup`)"),
 ]
 
+# 0.12 (lot L-quêtes, conception `v0-12-conception.md`, section 5): les points de la trame « Le marché d'Aubrune ».
+POINTS += [
+    # L'étal du dimanche: sur les pavés de la place, côté soleil du matin, dos à l'épicerie (façade en x 31, à 3 m),
+    # hors des deux passages du quai (x 30-31 et 43-44); planche de 2 m nord-sud, vendeurs à l'ouest, clients à l'est.
+    p("market_stall", 34.0, 26.5, "l'étal du dimanche, sur la place, dos à l'épicerie (vendeurs côté épicerie)",
+      portee=1.5),
+    # Les fanions: une guirlande tendue entre les lampadaires nord et est de la place (13 m, deux appuis réels),
+    # au-dessus de l'étal; une échelle au pied de chaque lampadaire, côté place. Plus de 8 m entre les deux
+    # places: un seul joueur ne peut pas tenir les deux (`ranges.stayAt` 4 m).
+    p("garland_west", 34.5, 25.5, "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"),
+    p("garland_east", 47.5, 25.5, "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"),
+    # La chevrerie: à l'est de la maisonnette, dans l'herbe entre le sentier (x 13) et le chemin (x 17 à 19),
+    # au pied du talus de la voie; devant sa porte, côté maison (sud).
+    p("goat_shed", 15.0, 20.0, "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"),
+]
+
 ZONES = [
     {"id": "garden", "rect": {"x": 7, "y": 28, "w": 4, "h": 3},
      "role": "les 12 cases du potager de la démo, devant la porte; ordre des cases: ligne par ligne, "
