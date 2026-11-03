@@ -11,4 +11,10 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 - R05. Les jambes d'un personnage traversent la voie ferrée (traverses et rails passent devant les jambes, capture du client).
 - R06. Le samedi, le train repart à reculons au lieu de continuer tout droit: pas immersif.
 
-La suite des retours arrive dans un second message.
+- R07. Le panneau de la gare est laid: lettres pixelisées et baveuses, poteaux trop fins (`r07-panneau-gare.png`).
+- R08. Le menu de la basse-cour est trop textuel et affiche des identifiants bruts (`hen_white`, `hen_red`, `hen_black`) dans la collection (`r08-menu-basse-cour.png`). Il doit permettre de gérer la basse-cour par icônes et jauges, lisible presque par un enfant, tout en restant adulte.
+- R09. Cultures: commencer avec 6 parcelles, en gagner de plus en plus de façon assez linéaire pour cultiver vite en quantité, et les placer librement sur le terrain (les retirer pour les mettre ailleurs). Aujourd'hui, un bloc fixe de 12 carrés devant la maison (`r09-parcelles.webp`).
+- R10. Les pages des magasins en liste obligent à faire défiler: interfaces à refaire. Trop d'icônes identiques (même caisse pour les trois vases, même planche pour le sac de grain, le coupon de toile, le sucre et le bocal): on n'identifie pas l'objet au premier regard (capture du comptoir d'Odette, non versionnée car elle montre un prénom).
+- R11. La petite déco se pose toujours sous la table et non dessus.
+
+La suite des retours arrive dans un troisième message.
