@@ -234,3 +234,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - Le validateur avertit de « toutes les deux » même pour deux habitantes (« Nous le savons, elle et moi »), et le script refuse « chacun » même pour des dahlias: écrire « par pied », « l'un et l'autre ».
 - Garde de l'arbre isolé: une commande avec une variable shell en argument de `python3` est refusée; écrire le chemin en entier.
 - Le nom de l'église est Saint-Aubin (carte, Q4); une affiche « Notre-Dame-du-Gué » avait glissé dans les écriteaux.
+
+## Chaînes de production (0.12.2, vérifié le 2026-11-03)
+
+- Règle des marges en données: `reglages.economy.chains` (le lecteur du jeu lit par clé et ignore les clés qu'il ne connaît pas: on peut y ranger des paramètres de conception lus seulement par un test et un script). Contrôles: `tests/economie-chaines.test.ts` et `simulations/economie_chaines.py` (code 1 s'il signale). Toute recette nouvelle doit y passer.
+- Une recette rend toujours un produit « ordinaire » (`intentions.ts`, fin de fabrication) et `payMaterials` ignore la qualité: des intrants beaux y perdent leur x 1,5. Le dire à chaque recette nouvelle.
+- `order.generated.products[].price` prime sur `sellPrice` (commandes et annonces): un plat sans prix de vente n'était payé qu'à la commande. Donner un `sellPrice` le rend aussi vendable chez Odette, à l'étal, sur l'ardoise et en « extra » de la caisse.
+- « Une heure de jeu » dans les documents du studio = une heure de l'horloge du jeu (42 s réelles), comme la pêche (15 la monnaie l'heure, environ 12 chez Odette). Toujours préciser l'unité.
+- Pour un « avant » de comparaison, copier les données dans le scratchpad avant de les toucher: `git show <commit>:fichier` est refusé par la garde de l'arbre isolé. `tests/robot.test.ts` dépasse 10 minutes: le lancer en arrière-plan.

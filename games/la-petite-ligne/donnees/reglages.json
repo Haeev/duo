@@ -91,6 +91,15 @@
         { "orderDeadline": { "day": 14, "time": "24:00" }, "delivery": { "day": 15, "time": "10:00" } }
       ],
       "repeatWeekly": { "deadlineWeekday": "friday", "deadlineTime": "24:00", "deliveryTime": "10:00" }
+    },
+    "chains": {
+      "note": "0.12.2, docs/jeux/jeu-1/economie-chaines-0-12-2.md: règle des chaînes de production. Lue par tests/economie-chaines.test.ts et par simulations/economie_chaines.py, pas par la partie. Valeur d'Odette: sellPrice x buyRate, unité ordinaire; un intrant acheté vaut son buyPrice.",
+      "minMargin": 0.25,
+      "extraSourceMargin": 0.1,
+      "minuteValue": 0.2,
+      "handlingSeconds": 4,
+      "usageCategories": ["furniture"],
+      "paybackDays": { "min": 14, "max": 42 }
     }
   },
   "order": {
@@ -149,8 +158,8 @@
         { "item": "carrot", "family": "potager", "resource": "garden", "cost": 1.67, "min": 6, "seasons": ["spring", "summer", "autumn"], "obtained": "harvested:carrot", "leadDays": 5 },
         { "item": "egg", "family": "basse-cour", "resource": "eggs", "cost": 1.0, "min": 4, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "picked:egg", "leadDays": 1 },
         { "item": "omelette", "family": "cuisine", "resource": "eggs", "cost": 1.5, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "crafted:cook_omelette", "leadDays": 1 },
-        { "item": "crunchy_radishes", "family": "cuisine", "resource": "garden", "cost": 1.5, "min": 4, "price": 16, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_crunchy_radishes", "leadDays": 3 },
-        { "item": "vegetable_soup", "family": "cuisine", "resource": "garden", "cost": 4.67, "min": 2, "price": 60, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_vegetable_soup", "leadDays": 5 },
+        { "item": "crunchy_radishes", "family": "cuisine", "resource": "garden", "cost": 1.5, "min": 4, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_crunchy_radishes", "leadDays": 3 },
+        { "item": "vegetable_soup", "family": "cuisine", "resource": "garden", "cost": 4.67, "min": 2, "seasons": ["spring", "summer", "autumn"], "obtained": "crafted:cook_vegetable_soup", "leadDays": 5 },
         { "item": "gudgeon", "family": "rivière", "resource": "river", "cost": 0.0833, "min": 2, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:gudgeon", "leadDays": 1 },
         { "item": "chub", "family": "rivière", "resource": "river", "cost": 0.1667, "min": 3, "seasons": ["spring", "summer", "autumn", "winter"], "obtained": "caught:chub", "leadDays": 1 },
         { "item": "trout", "family": "rivière", "resource": "river", "cost": 0.3333, "min": 1, "seasons": ["spring", "summer", "autumn"], "obtained": "caught:trout", "leadDays": 1 },
