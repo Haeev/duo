@@ -27,6 +27,7 @@
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
 import type { BuildingId } from './carte';
+import type { FishingState, FishRarity } from './peche';
 
 // ---------------------------------------------------------------------------
 // Utilitaires de type
@@ -234,6 +235,8 @@ export interface WorldState {
    * souhaits) s'échelonnent à partir de là, un par journée (`simulation/bourg.ts`, `townDays`).
    */
   upperStreetSince: number;
+  /** Pêche de la 0.12 (format 9): ombres, coin qui frémit, guet, grands, carnet des poissons (`etat/peche.ts`). */
+  fishing: FishingState;
 }
 
 /** Une coupe proposée depuis le banc du salon: coiffure, couleur et barbe (bornes de `town.appearance`). */
@@ -504,7 +507,14 @@ export interface Character {
    */
   seat: BenchSeat | null;
   /** Ligne à l'eau (pêche, P1): le bouchon, l'attente (`waiting`) puis la touche (`bite`, à ferrer avant `until`). */
-  fishing: { phase: 'waiting' | 'bite'; bobber: Vec2; biteAt: number; until: number } | null;
+  fishing: {
+    phase: 'waiting' | 'bite';
+    bobber: Vec2;
+    biteAt: number;
+    until: number;
+    /** Ombre réservée par cette ligne (`world.fishing.shadows[].id`), absente si aucune encore. */
+    shadow?: number;
+  } | null;
   /**
    * Confidence du matin (moments rares): où et quand voir le moment du jour, pour ce joueur seul.
    * Affichée au petit-déjeuner et au carnet jusqu'à l'apogée ou au départ du moment.
@@ -1291,7 +1301,11 @@ export type WorldEvent =
   | { type: 'pin'; by: CharacterId; pos: Vec2 }
   | { type: 'cast'; by: CharacterId; at: Vec2 }
   | { type: 'bite'; by: CharacterId }
-  | { type: 'caught'; by: CharacterId; item: ItemId }
+  /**
+   * Prise (0.12): longueur tirée, rareté, remis à l'eau, première prise de l'espèce, record battu.
+   * Le son d'une prise ne joue que chez le pêcheur, sauf celui d'un mythique (section 7.1).
+   */
+  | { type: 'caught'; by: CharacterId; item: ItemId; cm?: number; rarity?: FishRarity; released?: boolean; first?: boolean; record?: boolean; zone?: string }
   | { type: 'escaped'; by: CharacterId }
   | { type: 'absence'; who: CharacterId; absent: boolean }
   // Moments rares (tour 6)

@@ -24,6 +24,7 @@ import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
 import { ITEM, POINT } from './ids';
 import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
+import { examineWater } from './peche';
 
 const NAME_MAX = 16;
 
@@ -122,7 +123,11 @@ function createCharacter(
 }
 
 function examine(sim: Sim, c: Character): void {
-  if (!canAct(c, sim) || !isHome(c)) return;
+  if (!canAct(c, sim)) return;
+  if (!isHome(c)) {
+    examineWater(sim, c);
+    return;
+  }
   const front = { cx: Math.floor(c.pos.x + Math.cos(c.facing)), cy: Math.floor(c.pos.y + Math.sin(c.facing)) };
   const here = { cx: Math.floor(c.pos.x), cy: Math.floor(c.pos.y) };
   // Le meuble devant soi d'abord, puis le tapis sous ses pieds.

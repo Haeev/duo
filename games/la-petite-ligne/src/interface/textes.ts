@@ -560,6 +560,13 @@ const SupplementSchema = v.object({
   bakery: strings(['title', 'subtitle', 'buy', 'left', 'cap', 'closed', 'warmOnly', 'sundayOnly', 'missing'] as const),
   /** Épicerie (section 1.6): le chocolat chaud. */
   grocer: strings(['chocolate', 'chocolateText', 'chocolateBuy', 'chocolateDone', 'chocolateSeason'] as const),
+  /** Pêche 0.12: onglet « Poissons » du carnet (section 7.4) et pastille du guet (section 7.2). */
+  fish: v.object({
+    ...strings(['tab', 'pageLabel', 'count', 'here', 'unknown', 'hintLocked', 'zones', 'seasons', 'hours', 'favorite', 'price', 'released', 'caught', 'record', 'first', 'together', 'watching', 'scalesLabel'] as const).entries,
+    rarities: strings(['common', 'rare', 'epic', 'legendary', 'mythic'] as const),
+    seasonNames: strings(['spring', 'summer', 'autumn', 'winter'] as const),
+    favorites: strings(['rain', 'mist', 'spring', 'summer', 'autumn', 'winter'] as const),
+  }),
 });
 
 export type GameUiTexts = v.InferOutput<typeof GameUiSchema>;

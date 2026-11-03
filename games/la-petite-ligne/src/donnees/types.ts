@@ -14,6 +14,7 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { FishDef, FishingRules } from './poissons';
 
 // ---------------------------------------------------------------------------
 // Conditions et effets (quêtes, dialogues, envies, emplois du temps)
@@ -225,6 +226,8 @@ export interface ItemDef {
   carriedByTwo: boolean;
   /** Outil (tour 9): son verbe et ses valeurs, ou `null` pour un objet qui n'en est pas un. */
   tool: ToolStats | null;
+  /** Poisson (0.12, `category: "fish"`): rareté, coins, saisons, heures, ombre, textes du carnet. */
+  fish: FishDef | null;
 }
 
 export interface RecipeDef {
@@ -635,7 +638,10 @@ export type HintTrigger =
   /** Tour 8: on vise un rejet ou un jeune sapin (`sapling_hint`). */
   | { on: 'aim_sapling' }
   /** Tour 9: une annonce au tableau, à moins de 6 m du tableau du quai (`board_hint`). */
-  | { on: 'near_board_annonce' };
+  | { on: 'near_board_annonce' }
+  /** Pêche 0.12: première prise au coin qui frémit, premier guet (`fishing_hot_spot`, `fishing_watch`). */
+  | { on: 'fishing_hot_spot' }
+  | { on: 'fishing_watch' };
 
 export interface HintDef {
   id: string;
@@ -757,6 +763,12 @@ export interface GeneratedOrderSettings {
   /** Tour 9 (section 2.11): coût d'un poisson selon la saison de la commande, tiré des poids des poissons. */
   fishCostFromWeights: boolean;
   fishCostReferenceSeason: Season;
+  /**
+   * Pêche 0.12 (section 8.2): coût d'une ligne de poisson = `riverUnitCost / part`, la part du poisson
+   * dans les prises de la saison de production (`fishShareBySeason`); `null`: la règle du tour 9.
+   */
+  riverUnitCost: number | null;
+  fishShareBySeason: Partial<Record<Season, Record<string, number>>>;
   /** Quantités arrondies au rendement d'une case (radis, carottes). */
   roundTo: Record<string, number>;
   /** Plafond de chaque ligne. */
@@ -998,6 +1010,8 @@ export interface Settings {
     hookWindowSeconds: number;
     /** Drapeau posé au début de la partie: il ouvre les dialogues et la quête de la pêche. */
     flag: string;
+    /** Pêche de la 0.12: raretés, ombres, coin qui frémit, guet, grands (`poissons.ts`). */
+    rules: FishingRules;
   } | null;
   /** Moments rares (`reglages.moments`, tour 6). */
   moments: MomentSettings;

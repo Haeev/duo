@@ -221,5 +221,11 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     startFurniture,
     seats,
     improvements,
+    fishingZones: (r.opt('peche')?.opt('coins')?.items() ?? []).map((z) => ({
+      id: z.at('id').string(),
+      name: z.at('nom').string(),
+      at: z.at('a').string(),
+      rects: z.at('rects').items().map(rect),
+    })),
   };
 }

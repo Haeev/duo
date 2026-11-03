@@ -32,6 +32,7 @@ import {
   parseStorageSettings,
 } from './maison';
 import { townFrom } from './bourg';
+import { parseFishDef, parseFishingRules } from './poissons';
 import type {
   AnimalDef,
   ClockPace,
@@ -449,6 +450,17 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
       return counter(r, `bed${suffix(r, 'item')}`, since);
     case 'caught':
       return counter(r, `caught${suffix(r, 'item')}`, since);
+    // Pêche 0.12 (section 8.4): rare ou plus, au coin qui frémit, record battu, rendu à l'eau, guet pour l'autre.
+    case 'caught_rare':
+      return counter(r, 'caught_rare', since);
+    case 'caught_hot_spot':
+      return counter(r, 'caught_hot_spot', since);
+    case 'fish_record':
+      return counter(r, 'fish_record', since);
+    case 'released_fish':
+      return counter(r, 'released', since);
+    case 'watched_for_other':
+      return counter(r, 'watched_for_other', since);
     // Tour 8: cueillettes ramassées (`picked:<objet>`; sans objet, toutes les cueillettes).
     case 'picked':
       return counter(r, `picked${suffix(r, 'item')}`, since);
@@ -648,6 +660,7 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       light: optBoolean(it, 'light', false),
       carriedByTwo: optBoolean(it, 'carriedByTwo', false),
       tool: parseTool(it, id),
+      fish: it.has('fish') ? parseFishDef(it.at('fish')) : null,
     };
   }
   return items;
@@ -1280,6 +1293,8 @@ function parseTrigger(r: Reader): HintTrigger {
     case 'near_forage':
     case 'aim_sapling':
     case 'near_board_annonce':
+    case 'fishing_hot_spot':
+    case 'fishing_watch':
       return { on };
     case 'near_point':
       return { on, point: r.at('point').string() };
@@ -1547,6 +1562,7 @@ function parseFishing(r: Reader | null): Settings['fishing'] {
     biteWaitSeconds: [min, max],
     hookWindowSeconds: r.at('hookWindowSeconds').number(),
     flag: r.at('flag').string(),
+    rules: parseFishingRules(r),
   };
 }
 
@@ -1796,6 +1812,13 @@ function parseGenerated(r: Reader | null, written: number): Settings['order']['g
     products,
     fishCostFromWeights: optBoolean(r, 'fishCostFromWeights', false),
     fishCostReferenceSeason: reference === null ? 'spring' : reference.oneOf(SEASONS),
+    riverUnitCost: r.has('riverUnitCost') ? positive(r.at('riverUnitCost')) : null,
+    fishShareBySeason: Object.fromEntries(
+      (r.opt('fishShareBySeason')?.entries() ?? []).map(([season, table]) => [
+        (SEASONS as readonly string[]).includes(season) ? season : r.at('fishShareBySeason').fail(`saison inconnue « ${season} »`),
+        Object.fromEntries(table.entries().map(([item, share]) => [item, probability(share)])),
+      ]),
+    ),
     roundTo: numbers('roundTo', 1),
     lineMax: numbers('lineMax', 1),
     extraLineMinShare: extra === null || extra.isNull() ? null : probability(extra),
@@ -2488,5 +2511,12 @@ export function loadContent(files: RawContentFiles): Content {
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
+  // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.
+  const scale = content.settings.fishing?.rules.priceScale ?? 1;
+  if (scale !== 1) {
+    for (const def of Object.values(content.items)) {
+      if (def.fish !== null && def.sellPrice !== null) def.sellPrice = Math.max(1, Math.round(def.sellPrice * scale));
+    }
+  }
   return content;
 }
