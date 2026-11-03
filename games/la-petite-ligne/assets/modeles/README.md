@@ -17,6 +17,7 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 | `poissons.glb` | les 22 poissons de la pêche (0.12) et la vieille épuisette du ponton | aucune |
 | `elevage.glb` | 0.12: chèvre (deux robes), clochette, piquet, chevrerie, poulailler agrandi, mangeoire à trémie, bidon de lait, fromage frais, panier d'œufs | `goat_idle`, `goat_walk`, `goat_trot`, `goat_graze`, `goat_milk_stand`, `goat_lie`, `goat_bell` |
 | `marche.glb` | 0.12: étal du dimanche (déplié, replié), cagette, balance, halle du marché, pot de confiture de mûres, bocal, sacoche de Lucie | aucune |
+| `foret013.glb` | 0.13: essences de la forêt et du verger (hêtre, châtaignier, tilleul, noyer, poirier, prunier, cerisier, Vieux Chêne, arbre mort), cimetière (tombes, mur, croix, fontaine), objets du bourg agrandi (croix de Saint-André, oratoire, vigne, enclume, pompe, abreuvoir, fumier, chablis, tourniquet, table du café, allée de quilles), sous-bois | aucune |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
@@ -382,6 +383,19 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 - Clips nouveaux sur le squelette commun: `push_bike` (0,533 s, boucle: mêmes pas que `walk`, main gauche posée sur la poignée, écart mesuré 6 mm) et `push_bike_idle` (3 s, boucle: arrêté à côté du vélo).
 - Chat du bourg (`faune.glb`, nœud `cat`, maillage `cat_mesh`, 1156 triangles): tigré gris à plastron, museau et chaussettes blancs, yeux vert-jaune; 0,46 m de corps, 0,25 m au garrot. Clips: `cat_idle` (assis, la queue qui bat, regards, oreille qui frémit; 7,3 s), `cat_walk` (pas en quatre temps, queue dressée en crosse, 0,8 s pour 0,35 m/s: `timeScale = vitesse / 0,35`), `cat_sleep` (couché en rond, pattes repliées, queue autour de lui, il respire; 3 s), `cat_roll` (il se roule sur le dos, pattes en l'air, et revient; 2,7 s). Les poses assises et couchées sont posées au sol par calcul (point le plus bas du maillage déformé). Noms préfixés comme les autres bêtes de `faune.glb` (`cat_idle` pour `idle`).
 - Poids: `personnages.glb` passe de 6,4 à 10,8 Mo (environ 330 Ko par habitant: ombrage en aplats, sommets non partagés). La compression Meshopt (Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
+
+## Forêt et petits objets de la 0.13 (lot L2 de `docs/jeux/jeu-1/v0-13-carte.md`, `foret013.glb`)
+
+Sources: `assets-src/modeles/foret_013.py` (dans `construire.sh`). Planches: `planche_foret_013.py <dossier> [arbres|objets|sousbois|cimetiere|bosquet|tout]`, vues de près `verifier/quatre_foret013.sh <dossier>`; livrées dans `docs/jeux/jeu-1/gauntlet/captures/v0-13/foret/`. Contrôles propres au lot: `verifier/fruits_contact.py` (chaque fruit touche son arbre), `verifier/morceaux_foret.py` (triangles d'arbres par morceau de 12 m de la carte 0.13, avec les vrais comptes), `verifier/nettoyer_foret013.sh` (dédoublonnage, soudure, élagage de ce seul fichier).
+
+- Chaque nœud porte le nom exact du type de la carte (`donnees/cartes-0-13/halte.json`). Le bouleau (`tree_birch`) reprend `tree_birch_large` et `tree_birch_small` de `bourg.glb` par `MODEL_VARIANTS` (`src/rendu/modeles.ts`).
+- Essences: houppier d'une grande masse centrale et de bosses enfoncées (icosphères de 80 faces, dessus éclairci par la normale), une silhouette par essence à la distance de jeu. Hêtre: grand dôme sur une jupe de trois étages plats, fût gris lisse. Châtaignier: large et bas, sombre, fût trapu à l'écorce en spirale (pans tournés de 40 degrés par mètre). Tilleul: oeuf pointu, vert tendre. Noyer: dôme aéré sur trois charpentières visibles, écorce claire. Poirier: fuseau dressé. Prunier: boule trapue, tronc penché. Cerisier: ovale, écorce brun rouge cerclée. Vieux Chêne: 10 m, houppier de 8 m, cinq contreforts, quatre charpentières, loge de l'écureuil au sud-est. Arbre mort: cassé en échardes, loge du pic à 4,3 m face au sud (extra `nest_hole`), deux amadouviers.
+- Fruits et fleurs: un enfant par arbre, extra `seasons` (saisons du jeu): `tree_chestnut_fruit` (bogues, automne), `tree_lime_flowers` (été), `tree_walnut_fruit` (noix dans leur brou, automne), `tree_pear_fruit` (été et automne), `tree_plum_fruit` (été), `tree_cherry_fruit` (été), `vine_row_grapes` (automne). Cases du vent (`flower_*`, première rangée de la palette): ils se balancent avec le feuillage. Tant que le rendu ne trie pas les saisons, ils se dessinent toute l'année (à faire au lot L3: ne pas fusionner l'enfant hors de ses saisons).
+- Extra `crown` des arbres: `[largeur, dessous, dessus]` du houppier mesurés sur le maillage, pour régler l'occultation de la carte (`occultation_arbre`).
+- Cimetière: `grave` (alias de `grave_a`, extra `variants`) et `grave_a` à `grave_d` (dalle et stèle cintrée, pleine terre et croix de fer, granit et croix de pierre, vieille stèle penchée et moussue), stèle à l'ouest (-X), pieds à l'est. `cemetery_wall`: tronçon d'un mètre le long de X, bouts au bord de la case (deux tronçons voisins se touchent bord à bord, sans jour ni recouvrement). `cemetery_wall_corner`: pile d'angle et deux demi-tronçons vers +X et +Z; rotation 0 angle nord-ouest, 1 sud-ouest, 2 sud-est, 3 nord-est. La carte pose aujourd'hui un tronçon droit dans les quatre angles (un bout de 0,3 m dépasse dehors et il reste un jour de 0,3 m dans l'angle): changer ces quatre objets en `cemetery_wall_corner` (générateur de la carte). `cemetery_cross`: 3 m, bras à 2,42 m, droite. `cemetery_tap`: bec au-dessus du milieu de l'évier (`water_point`).
+- `crossing_sign`: modèle français, deux planches blanches bordées de rouge croisées, centre à 2,15 m, face peinte vers +Z (vers qui arrive). `hand_pump`: bec au-dessus du milieu de l'auge (extra `spout`, repère glTF), levier sur le côté. `vine_row`: un échalas par cep, trois ceps au pas d'un mètre à 0,5 m des bouts: le pas reste d'un mètre d'un tronçon à l'autre. `skittles_alley`: 6 cm de haut (on marche dessus), neuf places de quilles (`pin_spots`) et la boule (`ball_spot`), modèles `skittle_pin` et `skittle_ball`.
+- Sous-bois (pour le semis du lot L3 ou des objets de la carte): `fern`, `fern_small`, `bilberry_bush` (type de la carte), `holly_bush` (type de la carte, baies toute l'année), `raspberry_bush` (aucun type sur la carte: les hôtes des framboises y sont des `bramble`), `mushroom_cluster` (amanites, décor qui ne se cueille pas), `deadwood_branch`, `black_trumpet` (trompettes, objet de cueillette comme `chanterelle`, `kind: "item"`). Myrtilliers et framboisier sans fruits: le fruit se cueille sur le point voisin.
+- Budgets: essences entre 484 et 600 triangles fruits compris (plafond de 11.3: 400, relevé de moitié au plus), Vieux Chêne 1 090 (unique). Avec les vrais comptes, le morceau de 12 m le plus chargé de la carte 0.13 porte 4 346 triangles d'arbres (plafond 4 500): la table `TRIANGLES` du générateur (`outils/carte_halte_0_13.py`) est à mettre à jour (`verifier/morceaux_foret.py` l'affiche). Objets répétés: tombe 60 à 84, tronçon de mur 72, rang de vigne 222 pour 3 m (150 x 1,5 = 225), fougère 120 et 80, myrtilliers 112, houx 144, framboisier 176, amanites 56, bois mort 42.
 
 ## Fiche par modèle
 
@@ -899,3 +913,46 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `blackberry_jam` |  | 190 | kind: "item", size_m: 0.09 |
 | `jar` |  | 112 | kind: "item", size_m: 0.09 |
 | `mail_bag` |  | 280 | kind: "prop", rest_height: 0.455, note: "sur l'assise du banc du quai (quay_bench), à plat" |
+### `foret013.glb` (867 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `tree_beech` | 1 x 1 | 494 | crown: [4.6, 2.8, 8.1] |
+| `tree_chestnut` | 1 x 1 | 600 | crown: [5.6, 3.1, 6.4] |
+| `tree_lime` | 1 x 1 | 590 | crown: [3.5, 3.0, 8.2] |
+| `tree_walnut` | 1 x 1 | 530 | crown: [5.3, 2.8, 7.4] |
+| `tree_pear` | 1 x 1 | 544 | crown: [2.4, 2.0, 5.1] |
+| `tree_plum` | 1 x 1 | 484 | crown: [3.3, 1.7, 4.0] |
+| `tree_cherry` | 1 x 1 | 564 | crown: [3.5, 2.3, 5.4] |
+| `tree_old_oak` | 1 x 1 | 1090 | crown: [8.0, 2.9, 10.1] |
+| `snag_tree` | 1 x 1 | 193 | nest_hole: [0.0, 4.3, 0.17], note: "loge du pic: nest_hole (repère glTF), face sud" |
+| `grave_a` | 2 x 1 | 80 | note: "stèle à l'ouest (-X), pieds à l'est" |
+| `grave_b` | 2 x 1 | 60 | note: "stèle à l'ouest (-X), pieds à l'est" |
+| `grave_c` | 2 x 1 | 84 | note: "stèle à l'ouest (-X), pieds à l'est" |
+| `grave_d` | 2 x 1 | 72 | note: "stèle à l'ouest (-X), pieds à l'est" |
+| `grave` | 2 x 1 | 80 | variants: ["grave_a", "grave_b", "grave_c", "grave_d"], alias_of: "grave_a" |
+| `cemetery_wall` | 1 x 1 | 72 | note: "tronçon de 1 m le long de X, bouts au bord de la case" |
+| `cemetery_wall_corner` | 1 x 1 | 148 | note: "bras vers +X et +Z (glTF); rotation 0 nord-ouest, 1 sud-ouest, 2 sud-est, 3 nord-est" |
+| `cemetery_cross` | 1 x 1 | 216 |  |
+| `cemetery_tap` | 1 x 1 | 350 | water_point: true |
+| `crossing_sign` | 1 x 1 | 124 | note: "face peinte vers +Z (qui arrive)" |
+| `oratory` | 1 x 1 | 304 | note: "niche et statue vers +Z" |
+| `vine_row` | 3 x 1 | 222 | note: "tronçon de 3 m le long de X, ceps à -1, 0, 1 m" |
+| `anvil` | 1 x 1 | 180 | work_height: 0.75 |
+| `hand_pump` | 1 x 1 | 286 | water_point: true, spout: [0.0, 0.74, 0.2], note: "bec au-dessus de l'auge (repère glTF)" |
+| `water_trough` | 2 x 1 | 80 | water_height: 0.5 |
+| `manure_heap` | 2 x 2 | 356 |  |
+| `fallen_trunk` | 3 x 1 | 226 | note: "racines à l'ouest (-X), coupe à l'est" |
+| `postcard_rack` | 1 x 1 | 412 |  |
+| `cafe_table` | 1 x 1 | 400 | seat_height: 0.47, table_height: 0.74 |
+| `skittles_alley` | 8 x 1 | 132 | walk_height: 0.04, pin_spots: [[3.03, 0.045, -0.22], [3.03, 0.045, 0.0], [3.03, 0.045, 0.22], [3.25, 0.045, -0.22], [3.25, 0.045, 0.0], [3.25, 0.045, 0.22], [3.47, 0.045, -0.22], [3.47, 0.045, 0.0], [3.47, 0.045, 0.22]], ball_spot: [-3.3, 0.04, 0.0], pin_model: "skittle_pin", ball_model: "skittle_ball" |
+| `skittle_pin` |  | 94 | kind: "prop", on: "skittles_alley.pin_spots" |
+| `skittle_ball` |  | 80 | kind: "prop", on: "skittles_alley.ball_spot" |
+| `fern` | 1 x 1 | 120 |  |
+| `fern_small` | 1 x 1 | 80 |  |
+| `bilberry_bush` | 1 x 1 | 112 |  |
+| `holly_bush` | 1 x 1 | 144 |  |
+| `raspberry_bush` | 1 x 1 | 176 |  |
+| `mushroom_cluster` | 1 x 1 | 56 | note: "décor, ne se cueille pas" |
+| `deadwood_branch` | 1 x 1 | 42 |  |
+| `black_trumpet` |  | 246 | kind: "item", size_m: 0.22 |

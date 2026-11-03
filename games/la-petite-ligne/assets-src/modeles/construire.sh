@@ -9,7 +9,7 @@ gt="npx --yes @gltf-transform/cli@4.5.1"
 cd "$ici"
 
 if [[ "${1:-}" == "--sans-planches" ]]; then export LPL_SANS_PLANCHES=1; fi
-for script in personnages.py ferme.py bourg.py train.py maison.py faune.py poissons.py elevage.py marche.py; do
+for script in personnages.py ferme.py bourg.py train.py maison.py faune.py poissons.py elevage.py marche.py foret_013.py; do
   echo "== $script"
   duo-python "$script" > /dev/null
 done
@@ -18,7 +18,7 @@ done
 # repères: prises des mains, panache, lumière de la lampe). Pas de quantification: elle range la
 # déquantification dans la transformation des nœuds, que le jeu écrase en posant position et échelle.
 tmp="$(mktemp -d)"
-for f in bourg ferme train maison faune poissons elevage marche; do
+for f in bourg ferme train maison faune poissons elevage marche foret013; do
   $gt dedup "$sortie/$f.glb" "$tmp/$f.1.glb" > /dev/null
   $gt weld "$tmp/$f.1.glb" "$tmp/$f.2.glb" > /dev/null
   $gt prune --keep-leaves true "$tmp/$f.2.glb" "$sortie/$f.glb" > /dev/null

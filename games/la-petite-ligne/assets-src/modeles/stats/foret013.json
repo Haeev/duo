@@ -1,0 +1,403 @@
+{
+ "nodes": {
+  "tree_beech": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    4.6,
+    2.8,
+    8.1
+   ],
+   "tris": 494
+  },
+  "tree_chestnut": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    5.6,
+    3.1,
+    6.4
+   ],
+   "tris": 600
+  },
+  "tree_lime": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    3.5,
+    3.0,
+    8.2
+   ],
+   "tris": 590
+  },
+  "tree_walnut": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    5.3,
+    2.8,
+    7.4
+   ],
+   "tris": 530
+  },
+  "tree_pear": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    2.4,
+    2.0,
+    5.1
+   ],
+   "tris": 544
+  },
+  "tree_plum": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    3.3,
+    1.7,
+    4.0
+   ],
+   "tris": 484
+  },
+  "tree_cherry": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    3.5,
+    2.3,
+    5.4
+   ],
+   "tris": 564
+  },
+  "tree_old_oak": {
+   "footprint": [
+    1,
+    1
+   ],
+   "crown": [
+    8.0,
+    2.9,
+    10.1
+   ],
+   "tris": 1090
+  },
+  "snag_tree": {
+   "footprint": [
+    1,
+    1
+   ],
+   "nest_hole": [
+    0.0,
+    4.3,
+    0.17
+   ],
+   "note": "loge du pic: nest_hole (repère glTF), face sud",
+   "tris": 193
+  },
+  "grave_a": {
+   "footprint": [
+    2,
+    1
+   ],
+   "note": "stèle à l'ouest (-X), pieds à l'est",
+   "tris": 80
+  },
+  "grave_b": {
+   "footprint": [
+    2,
+    1
+   ],
+   "note": "stèle à l'ouest (-X), pieds à l'est",
+   "tris": 60
+  },
+  "grave_c": {
+   "footprint": [
+    2,
+    1
+   ],
+   "note": "stèle à l'ouest (-X), pieds à l'est",
+   "tris": 84
+  },
+  "grave_d": {
+   "footprint": [
+    2,
+    1
+   ],
+   "note": "stèle à l'ouest (-X), pieds à l'est",
+   "tris": 72
+  },
+  "grave": {
+   "footprint": [
+    2,
+    1
+   ],
+   "variants": [
+    "grave_a",
+    "grave_b",
+    "grave_c",
+    "grave_d"
+   ],
+   "alias_of": "grave_a",
+   "tris": 80
+  },
+  "cemetery_wall": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "tronçon de 1 m le long de X, bouts au bord de la case",
+   "tris": 72
+  },
+  "cemetery_wall_corner": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "bras vers +X et +Z (glTF); rotation 0 nord-ouest, 1 sud-ouest, 2 sud-est, 3 nord-est",
+   "tris": 148
+  },
+  "cemetery_cross": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 216
+  },
+  "cemetery_tap": {
+   "footprint": [
+    1,
+    1
+   ],
+   "water_point": true,
+   "tris": 350
+  },
+  "crossing_sign": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "face peinte vers +Z (qui arrive)",
+   "tris": 124
+  },
+  "oratory": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "niche et statue vers +Z",
+   "tris": 304
+  },
+  "vine_row": {
+   "footprint": [
+    3,
+    1
+   ],
+   "note": "tronçon de 3 m le long de X, ceps à -1, 0, 1 m",
+   "tris": 222
+  },
+  "anvil": {
+   "footprint": [
+    1,
+    1
+   ],
+   "work_height": 0.75,
+   "tris": 180
+  },
+  "hand_pump": {
+   "footprint": [
+    1,
+    1
+   ],
+   "water_point": true,
+   "spout": [
+    0.0,
+    0.74,
+    0.2
+   ],
+   "note": "bec au-dessus de l'auge (repère glTF)",
+   "tris": 286
+  },
+  "water_trough": {
+   "footprint": [
+    2,
+    1
+   ],
+   "water_height": 0.5,
+   "tris": 80
+  },
+  "manure_heap": {
+   "footprint": [
+    2,
+    2
+   ],
+   "tris": 356
+  },
+  "fallen_trunk": {
+   "footprint": [
+    3,
+    1
+   ],
+   "note": "racines à l'ouest (-X), coupe à l'est",
+   "tris": 226
+  },
+  "postcard_rack": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 412
+  },
+  "cafe_table": {
+   "footprint": [
+    1,
+    1
+   ],
+   "seat_height": 0.47,
+   "table_height": 0.74,
+   "tris": 400
+  },
+  "skittles_alley": {
+   "footprint": [
+    8,
+    1
+   ],
+   "walk_height": 0.04,
+   "pin_spots": [
+    [
+     3.03,
+     0.045,
+     -0.22
+    ],
+    [
+     3.03,
+     0.045,
+     0.0
+    ],
+    [
+     3.03,
+     0.045,
+     0.22
+    ],
+    [
+     3.25,
+     0.045,
+     -0.22
+    ],
+    [
+     3.25,
+     0.045,
+     0.0
+    ],
+    [
+     3.25,
+     0.045,
+     0.22
+    ],
+    [
+     3.47,
+     0.045,
+     -0.22
+    ],
+    [
+     3.47,
+     0.045,
+     0.0
+    ],
+    [
+     3.47,
+     0.045,
+     0.22
+    ]
+   ],
+   "ball_spot": [
+    -3.3,
+    0.04,
+    0.0
+   ],
+   "pin_model": "skittle_pin",
+   "ball_model": "skittle_ball",
+   "tris": 132
+  },
+  "skittle_pin": {
+   "kind": "prop",
+   "on": "skittles_alley.pin_spots",
+   "tris": 94
+  },
+  "skittle_ball": {
+   "kind": "prop",
+   "on": "skittles_alley.ball_spot",
+   "tris": 80
+  },
+  "fern": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 120
+  },
+  "fern_small": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 80
+  },
+  "bilberry_bush": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 112
+  },
+  "holly_bush": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 144
+  },
+  "raspberry_bush": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 176
+  },
+  "mushroom_cluster": {
+   "footprint": [
+    1,
+    1
+   ],
+   "note": "décor, ne se cueille pas",
+   "tris": 56
+  },
+  "deadwood_branch": {
+   "footprint": [
+    1,
+    1
+   ],
+   "tris": 42
+  },
+  "black_trumpet": {
+   "kind": "item",
+   "size_m": 0.22,
+   "tris": 246
+  }
+ },
+ "file_bytes": 893608
+}

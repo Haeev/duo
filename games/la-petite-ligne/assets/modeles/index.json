@@ -2118,5 +2118,312 @@
  "mail_bag": {
   "file": "marche.glb",
   "tris": 280
+ },
+ "tree_beech": {
+  "file": "foret013.glb",
+  "tris": 494,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_chestnut": {
+  "file": "foret013.glb",
+  "tris": 600,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_lime": {
+  "file": "foret013.glb",
+  "tris": 590,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_walnut": {
+  "file": "foret013.glb",
+  "tris": 530,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_pear": {
+  "file": "foret013.glb",
+  "tris": 544,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_plum": {
+  "file": "foret013.glb",
+  "tris": 484,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_cherry": {
+  "file": "foret013.glb",
+  "tris": 564,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "tree_old_oak": {
+  "file": "foret013.glb",
+  "tris": 1090,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "snag_tree": {
+  "file": "foret013.glb",
+  "tris": 193,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "grave_a": {
+  "file": "foret013.glb",
+  "tris": 80,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "grave_b": {
+  "file": "foret013.glb",
+  "tris": 60,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "grave_c": {
+  "file": "foret013.glb",
+  "tris": 84,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "grave_d": {
+  "file": "foret013.glb",
+  "tris": 72,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "grave": {
+  "file": "foret013.glb",
+  "tris": 80,
+  "footprint": [
+   2,
+   1
+  ],
+  "alias_of": "grave_a",
+  "variants": [
+   "grave_a",
+   "grave_b",
+   "grave_c",
+   "grave_d"
+  ]
+ },
+ "cemetery_wall": {
+  "file": "foret013.glb",
+  "tris": 72,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cemetery_wall_corner": {
+  "file": "foret013.glb",
+  "tris": 148,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cemetery_cross": {
+  "file": "foret013.glb",
+  "tris": 216,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cemetery_tap": {
+  "file": "foret013.glb",
+  "tris": 350,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "crossing_sign": {
+  "file": "foret013.glb",
+  "tris": 124,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "oratory": {
+  "file": "foret013.glb",
+  "tris": 304,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "vine_row": {
+  "file": "foret013.glb",
+  "tris": 222,
+  "footprint": [
+   3,
+   1
+  ]
+ },
+ "anvil": {
+  "file": "foret013.glb",
+  "tris": 180,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "hand_pump": {
+  "file": "foret013.glb",
+  "tris": 286,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "water_trough": {
+  "file": "foret013.glb",
+  "tris": 80,
+  "footprint": [
+   2,
+   1
+  ]
+ },
+ "manure_heap": {
+  "file": "foret013.glb",
+  "tris": 356,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "fallen_trunk": {
+  "file": "foret013.glb",
+  "tris": 226,
+  "footprint": [
+   3,
+   1
+  ]
+ },
+ "postcard_rack": {
+  "file": "foret013.glb",
+  "tris": 412,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "cafe_table": {
+  "file": "foret013.glb",
+  "tris": 400,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "skittles_alley": {
+  "file": "foret013.glb",
+  "tris": 132,
+  "footprint": [
+   8,
+   1
+  ]
+ },
+ "skittle_pin": {
+  "file": "foret013.glb",
+  "tris": 94
+ },
+ "skittle_ball": {
+  "file": "foret013.glb",
+  "tris": 80
+ },
+ "fern": {
+  "file": "foret013.glb",
+  "tris": 120,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "fern_small": {
+  "file": "foret013.glb",
+  "tris": 80,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "bilberry_bush": {
+  "file": "foret013.glb",
+  "tris": 112,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "holly_bush": {
+  "file": "foret013.glb",
+  "tris": 144,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "raspberry_bush": {
+  "file": "foret013.glb",
+  "tris": 176,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "mushroom_cluster": {
+  "file": "foret013.glb",
+  "tris": 56,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "deadwood_branch": {
+  "file": "foret013.glb",
+  "tris": 42,
+  "footprint": [
+   1,
+   1
+  ]
+ },
+ "black_trumpet": {
+  "file": "foret013.glb",
+  "tris": 246
  }
 }
