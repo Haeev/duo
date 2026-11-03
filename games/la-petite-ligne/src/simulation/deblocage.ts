@@ -8,6 +8,7 @@
  * Les parcours se font de case en case (quatre voisins): le corps (rayon 0,3 m) passe par toute
  * case libre, et l'A* ne coupe jamais un coin entre deux cases bloquées.
  */
+import { type GridFrame, cellIndex, cellX, cellY } from '../etat/carte';
 import type { Cell, Character, Vec2 } from '../etat/types';
 import { type Sim, emit, say } from './contexte';
 import { standUp } from './bancs';
@@ -22,7 +23,7 @@ const STEPS: readonly [number, number][] = [
 ];
 
 function indexOf(b: Blockers, cx: number, cy: number): number {
-  return cy * b.map.width + cx;
+  return cellIndex(b.map, cx, cy);
 }
 
 /**
@@ -38,8 +39,8 @@ function reach(b: Blockers, from: Cell, extra: ReadonlySet<number>, inside: ((cx
   seen.add(queue[0] ?? 0);
   // La file grandit pendant le parcours: `for...of` lit aussi les cases ajoutées.
   for (const i of queue) {
-    const cx = i % b.map.width;
-    const cy = (i - cx) / b.map.width;
+    const cx = cellX(b.map, i);
+    const cy = cellY(b.map, i);
     for (const [dx, dy] of STEPS) {
       const nx = cx + dx;
       const ny = cy + dy;
@@ -76,18 +77,17 @@ export function closesRoom(sim: Sim, cells: readonly Cell[]): boolean {
 }
 
 /** Centre d'une case. */
-function centre(i: number, width: number): Vec2 {
-  const cx = i % width;
-  return { x: cx + 0.5, y: (i - cx) / width + 0.5 };
+function centre(i: number, grid: GridFrame): Vec2 {
+  return { x: cellX(grid, i) + 0.5, y: cellY(grid, i) + 0.5 };
 }
 
 /** La case de `cells` la plus proche de `pos` (à égalité, la première dans l'ordre des cases). */
-function nearest(cells: Iterable<number>, pos: Vec2, width: number): Vec2 | null {
+function nearest(cells: Iterable<number>, pos: Vec2, grid: GridFrame): Vec2 | null {
   let best: Vec2 | null = null;
   let bestD = Number.POSITIVE_INFINITY;
   let bestI = Number.POSITIVE_INFINITY;
   for (const i of cells) {
-    const at = centre(i, width);
+    const at = centre(i, grid);
     const d = (at.x - pos.x) ** 2 + (at.y - pos.y) ** 2;
     if (d < bestD - 1e-9 || (Math.abs(d - bestD) <= 1e-9 && i < bestI)) {
       best = at;
@@ -111,10 +111,10 @@ export function unstickSpot(sim: Sim, c: Character): Vec2 {
   if (inRoom) {
     const inside = inRoomOrDoor(sim);
     const cells = [...reach(b, door, new Set(), inside)].filter((i) => {
-      const at = centre(i, b.map.width);
+      const at = centre(i, b.map);
       return !(Math.floor(at.x) === door.cx && Math.floor(at.y) === door.cy);
     });
-    const spot = nearest(cells, c.pos, b.map.width);
+    const spot = nearest(cells, c.pos, b.map);
     if (spot !== null) return spot;
     // Pièce pleine: sur le seuil, sinon devant la maison.
     if (!isBlockedCell(b, door.cx, door.cy)) return { x: door.cx + 0.5, y: door.cy + 0.5 };
@@ -123,7 +123,7 @@ export function unstickSpot(sim: Sim, c: Character): Vec2 {
   const seed = isBlockedCell(b, Math.floor(front.x), Math.floor(front.y)) ? nearestFreeCell(b, front) : front;
   if (seed === null) return { x: front.x, y: front.y };
   const town = reach(b, { cx: Math.floor(seed.x), cy: Math.floor(seed.y) }, new Set(), null);
-  return nearest(town, c.pos, b.map.width) ?? { x: front.x, y: front.y };
+  return nearest(town, c.pos, b.map) ?? { x: front.x, y: front.y };
 }
 
 /** Le personnage est-il pris: dans un obstacle, ou dans la pièce sans chemin jusqu'à sa porte ? */

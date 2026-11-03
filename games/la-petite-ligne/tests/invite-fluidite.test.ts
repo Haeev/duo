@@ -6,6 +6,7 @@ import { createRandom } from '@duo/sdk/sim';
 import { startLocalDuo } from '@duo/sdk-dev';
 import * as v from 'valibot';
 import { describe, expect, it } from 'vitest';
+import { cellIndex, inMap, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../src/etat/carte';
 import manifest from '../duo-game.json';
 import { StateWatcher, type LoopWish, type SoundRequest } from '../src/audio/declencheurs';
 import { AUDIO_SETTINGS } from '../src/audio/reglages';
@@ -34,8 +35,8 @@ function laneIsFree(sim: Sim, cx: number, cy: number): boolean {
   const { map } = sim;
   for (let y = cy - LANE_HALF_WIDTH; y <= cy + LANE_HALF_WIDTH; y++) {
     for (let x = cx - 1; x <= cx + LANE_LENGTH; x++) {
-      if (x < 0 || y < 0 || x >= map.width || y >= map.height) return false;
-      const i = y * map.width + x;
+      if (!inMap(map, x, y)) return false;
+      const i = cellIndex(map, x, y);
       if (map.blocked[i] === true || sim.runtime.dynamicBlocked[i] === 1) return false;
     }
   }
@@ -45,8 +46,8 @@ function laneIsFree(sim: Sim, cx: number, cy: number): boolean {
 /** Deux couloirs libres, l'un sous l'autre sans se toucher. */
 function twoLanes(sim: Sim): [Vec2, Vec2] {
   const found: Vec2[] = [];
-  for (let cy = 2; cy < sim.map.height - 2 && found.length < 2; cy++) {
-    for (let cx = 2; cx < sim.map.width - LANE_LENGTH - 2 && found.length < 2; cx++) {
+  for (let cy = mapMinY(sim.map) + 2; cy <= mapMaxY(sim.map) - 2 && found.length < 2; cy++) {
+    for (let cx = mapMinX(sim.map) + 2; cx <= mapMaxX(sim.map) - LANE_LENGTH - 2 && found.length < 2; cx++) {
       if (!laneIsFree(sim, cx, cy)) continue;
       const other = found[0];
       if (other !== undefined && Math.abs(other.y - (cy + 0.5)) < 2 * LANE_HALF_WIDTH + 2) continue;

@@ -372,7 +372,7 @@ def terrain_est() -> None:
     r(":", 127, 11, 128, 20)                                       # chemin de la ferme vers les champs
     r("#", 127, 12, 128, 14)                                       # passage de la ferme
     r("l", 91, 24, 98, 34)                                         # jardins de la Rive (haie en x 99)
-    r(":", 94, 24, 94, 34)                                         # allées en croix
+    r(":", 94, 24, 94, 35)                                         # allées en croix
     r(":", 91, 29, 98, 29)
     r(":", 100, 23, 101, 34)                                       # chemin du lavoir
     r("c", 112, 33, 124, 36)                                       # la cour de ferme
@@ -1270,6 +1270,7 @@ RETOUCHES = [
     (rect(76, 2, 8, 8), "jardin du curé"),
     (rect(87, 3, 6, 8), "maison du sacristain et son jardin de dahlias"),
     (rect(94, 0, 3, 23), "rue de l'Église et son passage à niveau"),
+    (rect(94, 35, 1, 1), "bout de l'allée des jardins de la Rive, jusqu'à la grève (berge continue, R22)"),
     (rect(97, 11, 3, 1), "chemin des Champs, le long de la voie"),
     (rect(87, 15, 7, 6), "le café de la Côte"),
     (rect(85, 21, 13, 3), "placette du carrefour de l'Église (la route y reste pavée)"),

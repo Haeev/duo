@@ -6,7 +6,7 @@ import { BufferAttribute, BufferGeometry, Matrix4, Quaternion, Vector3 } from 't
 import { describe, expect, it } from 'vitest';
 import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
-import type { GameMap } from '../etat/carte';
+import { type GameMap, groundAt, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { pavedNear } from './paves';
 import { RENDER_SETTINGS } from './reglages';
 import { trimGeometry } from './retouches';
@@ -28,10 +28,10 @@ describe('végétation (R22)', () => {
   });
 
   it('la berge est continue: pas de bande d’herbe entre la promenade et la grève', () => {
-    const at = (x: number, y: number): string => map.ground[y * map.width + x] ?? '';
+    const at = (x: number, y: number): string => groundAt(map, x, y) ?? '';
     const strips: string[] = [];
-    for (let x = 0; x < map.width; x += 1) {
-      for (let y = 1; y < map.height - 1; y += 1) {
+    for (let x = mapMinX(map); x <= mapMaxX(map); x += 1) {
+      for (let y = mapMinY(map) + 1; y < mapMaxY(map); y += 1) {
         // Une seule case d'herbe entre un chemin (au nord) et la berge (au sud).
         if (at(x, y) === 'grass' && at(x, y - 1) === 'path' && at(x, y + 1) === 'gravel') {
           strips.push(`(${String(x)}, ${String(y)})`);
@@ -44,8 +44,7 @@ describe('végétation (R22)', () => {
 
 describe('voie (R20)', () => {
   const buildings = map.props.filter((prop) => prop.category === 'batiment' && prop.rect !== null);
-  const isRail = (x: number, y: number): boolean =>
-    x >= 0 && y >= 0 && x < map.width && y < map.height && map.ground[y * map.width + x] === 'rail';
+  const isRail = (x: number, y: number): boolean => groundAt(map, x, y) === 'rail';
   const inside = (x: number, y: number): string | null => {
     for (const b of buildings) {
       const r = b.rect;
@@ -56,8 +55,8 @@ describe('voie (R20)', () => {
 
   it('aucune case de voie sous un bâtiment', () => {
     const under: string[] = [];
-    for (let y = 0; y < map.height; y += 1) {
-      for (let x = 0; x < map.width; x += 1) {
+    for (let y = mapMinY(map); y <= mapMaxY(map); y += 1) {
+      for (let x = mapMinX(map); x <= mapMaxX(map); x += 1) {
         const id = isRail(x, y) ? inside(x, y) : null;
         if (id !== null) under.push(`${id} (${String(x)}, ${String(y)})`);
       }
@@ -111,6 +110,14 @@ interface Gltf {
     type: string;
   }[];
   bufferViews: { byteOffset?: number; byteStride?: number }[];
+}
+
+/** Noms des nœuds de `bourg.glb`. */
+function nodeNames(): Set<string> {
+  const data = readFileSync(fileURLToPath(new URL('../../assets/modeles/bourg.glb', import.meta.url)));
+  const length = data.readUInt32LE(GLB_HEADER);
+  const gltf = JSON.parse(data.subarray(GLB_HEADER + CHUNK_HEADER, GLB_HEADER + CHUNK_HEADER + length).toString('utf8')) as Gltf;
+  return new Set(gltf.nodes.map((node) => node.name ?? ''));
 }
 
 /** Triangles (repère du nœud) d'un nœud de `bourg.glb` et de ses enfants, retouches appliquées. */
@@ -207,7 +214,13 @@ describe('sols posés (R21)', () => {
     expect(floors).toContain('pontoon');
   });
 
+  const modelled = nodeNames();
   for (const model of floors) {
+    // 0.13: un sol neuf sans modèle encore (lot L2, dessiné en substitut) se contrôle à son arrivée.
+    if (!modelled.has(model)) {
+      it.todo(`${model}: modèle absent de bourg.glb (lot L2), à contrôler à son arrivée`);
+      continue;
+    }
     it(`${model}: rien ne déborde de l’emprise (escalier ou passerelle qui ne mène nulle part)`, () => {
       const prop = map.props.find((candidate) => candidate.model === model);
       const rect = prop?.rect ?? null;

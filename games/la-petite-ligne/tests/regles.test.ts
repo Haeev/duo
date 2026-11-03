@@ -1,6 +1,7 @@
 // Règles de la démo, une par une, sur la vraie carte et le vrai contenu.
 import { isHome } from '../src/etat/interieurs';
 import { describe, expect, it } from 'vitest';
+import { groundAt, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../src/etat/carte';
 import type { AuthoredIntent } from '../src/etat/actions';
 import type { CharacterId } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
@@ -193,10 +194,10 @@ describe('règles', () => {
     if (ford === undefined) throw new Error('gué absent');
     // Une case d'eau à portée de lancer depuis un point libre près du gué.
     let water: { x: number; y: number } | null = null;
-    for (let cy = 0; cy < sim.map.height && water === null; cy++) {
-      for (let cx = 0; cx < sim.map.width && water === null; cx++) {
+    for (let cy = mapMinY(sim.map); cy <= mapMaxY(sim.map) && water === null; cy++) {
+      for (let cx = mapMinX(sim.map); cx <= mapMaxX(sim.map) && water === null; cx++) {
         const d = Math.hypot(cx + 0.5 - ford.x, cy + 0.5 - ford.y);
-        if (sim.map.ground[cy * sim.map.width + cx] === 'water' && d < 4) water = { x: cx + 0.5, y: cy + 0.5 };
+        if (groundAt(sim.map, cx, cy) === 'water' && d < 4) water = { x: cx + 0.5, y: cy + 0.5 };
       }
     }
     if (water === null) throw new Error('pas d’eau près du gué');

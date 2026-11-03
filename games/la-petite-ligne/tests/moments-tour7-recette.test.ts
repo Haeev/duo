@@ -4,6 +4,7 @@
 // recette QA du tour 7. Un bug sans correctif est un `it.fails`: la
 // CI reste verte et le test échoue dès la correction (le passer alors en `it`).
 import { describe, expect, it } from 'vitest';
+import { cellIndex } from '../src/etat/carte';
 import type { ControlFrame } from '../src/etat/actions';
 import { actorPose, freezeState, momentDef, restPosition, sampleTrack, startlePose, type StartlePose } from '../src/etat/moments';
 import type { CharacterId, MomentToday, Vec2, WorldEvent } from '../src/etat/types';
@@ -241,7 +242,7 @@ describe('QA7-02: la chevrette et son faon traversent un joueur', () => {
     const deer = point(sim, 'roe_deer_graze');
     place(sim, 'p1', { x: 61.5, y: 27.5 }, deer);
     place(sim, 'p2', { x: 54.5, y: 27.5 }, deer);
-    expect(sim.map.blocked[27 * sim.map.width + 61], 'case libre').toBe(false);
+    expect(sim.map.blocked[cellIndex(sim.map, 61, 27)], 'case libre').toBe(false);
     untilClimax(sim, today);
     const near = { d: 99 };
     wait(sim, 10, closest(sim, near));

@@ -4,12 +4,13 @@
  * (`donnees/cartes/`). Elle a tous les points et zones que les données
  * attendent (README des données, section 5).
  */
-import type { GameMap, GroundKind, MapProp, MapTree, Rect } from '../etat/carte';
+import { type GameMap, type GridFrame, type GroundKind, type MapProp, type MapTree, type Rect, cellIndex, inMap } from '../etat/carte';
 import type { Vec2 } from '../etat/types';
 import { houseBuilding } from './carte-interieurs';
 
 const WIDTH = 64;
 const HEIGHT = 48;
+const GRID: GridFrame = { originX: 0, originY: 0, width: WIDTH, height: HEIGHT };
 
 interface Builder {
   ground: GroundKind[];
@@ -19,8 +20,8 @@ interface Builder {
 function fill(b: Builder, rect: Rect, ground: GroundKind | null, blocked: boolean | null): void {
   for (let cy = rect.y; cy < rect.y + rect.h; cy++) {
     for (let cx = rect.x; cx < rect.x + rect.w; cx++) {
-      if (cx < 0 || cy < 0 || cx >= WIDTH || cy >= HEIGHT) continue;
-      const i = cy * WIDTH + cx;
+      if (!inMap(GRID, cx, cy)) continue;
+      const i = cellIndex(GRID, cx, cy);
       if (ground !== null) b.ground[i] = ground;
       if (blocked !== null) b.blocked[i] = blocked;
     }
@@ -119,8 +120,7 @@ export function buildFallbackMap(): GameMap {
   return {
     id: 'aubrune_secours',
     name: "Halte d'Aubrune (carte de secours)",
-    width: WIDTH,
-    height: HEIGHT,
+    ...GRID,
     ground: b.ground,
     blocked: b.blocked,
     points: {

@@ -390,6 +390,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Invité: `predictedFacing` restait celui de la dernière marche tant que le joueur ne bougeait pas; l'hôte qui tourne le personnage vers une action n'était pas vu chez lui. Reprendre le cap de l'hôte quand plus aucun pas en attente ne bouge.
 - Page de rendu: `lplRendu.world()` et `lplRendu.emit()` permettent de poser une action (`since` recalé après le premier `advance`) et de faire des planches par action en mode `manuel=1`. Avec `vie=0`, la page remet une marche à l'arrêt: pour la marche, laisser la promenade (`vie=1`).
 
+## Grille à origine (La Petite Ligne 0.13, lot L0, vérifié le 2026-11-03)
+
+- Depuis la 0.13, la grille commence en `(map.originX, map.originY)` (-24, -30 pour la carte agrandie). Tout indice passe par `cellIndex`, `cellX`, `cellY`, toute borne par `inMap`, `mapMinX..mapMaxX` (comprises), tout sol lu par `groundAt` (`undefined` hors carte), tous dans `src/etat/carte.ts`. Jamais `cy * map.width + cx`, jamais une boucle `for (cx = 0; cx < map.width)`, jamais `x < 0` pour dire « hors de la carte ».
+- Une grille de texture qui couvre la carte (champ du terrain de `champs.ts`) se décrit en `GridFrame` avec son origine (`map.originX - ext`) et passe par les mêmes fonctions; l'uniforme `rect` reprend cette origine.
+- Le point `offstage` par défaut est `offstagePoint(map)` (hors de la grille quelle que soit l'origine); un habitant « arrive de dehors » s'il n'est pas `inMap`, pas s'il a un x négatif.
+- Preuve forte d'un oubli d'origine dans la simulation: la carte du jeu entourée de cases bloquées (origine reculée) doit donner exactement le même monde, pas à pas, avec le robot (`tests/carte-translation.test.ts`). Une seule couche dynamique indexée sans l'origine le fait échouer (vérifié par mutation).
+- La forêt du pourtour est découpée par côté en `FOREST_SEGMENTS_MAX` tronçons comptés depuis le bord de la grille: la carte de 164 m en a 18 par côté (au-delà du maximum, les tronçons d'un côté retombaient sur ceux du suivant).
+- Le générateur de la carte écrit la carte agrandie par défaut; `--tour-10` écrit la carte d'avant dans `donnees/cartes-tour-10/` (référence du contrôle d'agrandissement du validateur), octet pour octet.
+
 ## Tests de format de sauvegarde (La Petite Ligne, vérifié le 2026-11-03)
 
 - Un test de migration compare à `DATA_SCHEMA` (jamais un numéro en dur) et relit l'instantané avec `snap.dataSchema`: relire une sauvegarde du format courant en déclarant un ancien format rejoue les migrations (celle du 8 refuse alors les lettres sans texte: « sauvegarde: lettre invalide »).

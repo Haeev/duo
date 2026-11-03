@@ -9,7 +9,7 @@
  * s'ouvre autour des pierres qui crèvent la surface.
  */
 import type { GameMap } from '../etat/carte';
-import { cellIndex } from '../etat/carte';
+import { groundAt, mapMaxY, mapMinY } from '../etat/carte';
 import { hash2 } from './bruit';
 import { RENDER_SETTINGS } from './reglages';
 
@@ -77,10 +77,10 @@ function fordGroups(cells: readonly Cell[]): Cell[][] {
 function pathEnd(map: GameMap, cy: number, dir: 1 | -1, x0: number, x1: number): number {
   for (let k = 0; k < PATH_SEARCH; k += 1) {
     const row = cy + dir * k;
-    if (row < 0 || row >= map.height) break;
+    if (row < mapMinY(map) || row > mapMaxY(map)) break;
     const xs: number[] = [];
     for (let cx = x0; cx <= x1; cx += 1) {
-      if (map.ground[cellIndex(map, cx, row)] === 'path') xs.push(cx + 0.5);
+      if (groundAt(map, cx, row) === 'path') xs.push(cx + 0.5);
     }
     if (xs.length > 0) return xs.reduce((a, b) => a + b, 0) / xs.length;
   }

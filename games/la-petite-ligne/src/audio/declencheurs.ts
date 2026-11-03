@@ -13,7 +13,7 @@ import { isSheltered } from '../etat/interieurs';
 import { currentOrder } from '../donnees/commandes';
 import type { RandomSource } from '@duo/sdk/sim';
 import type { Content } from '../donnees/types';
-import { inRect, type GameMap } from '../etat/carte';
+import { groundAt, inRect, type GameMap } from '../etat/carte';
 import { seasonOfDay, weekdayOf } from '../donnees/calendrier';
 import type { Cell, CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import type { AudioSettings } from './reglages';
@@ -804,7 +804,7 @@ export class StateWatcher {
     for (const crossing of map.crossings) {
       if (crossing.kind === 'footbridge' && inRect(crossing.rect, at.x, at.y)) return FOOTBRIDGE_STEPS;
     }
-    const ground = cx >= 0 && cy >= 0 && cx < map.width && cy < map.height ? map.ground[cy * map.width + cx] : undefined;
+    const ground = groundAt(map, cx, cy);
     return ground === undefined ? s.byGround.grass : s.byGround[ground];
   }
 

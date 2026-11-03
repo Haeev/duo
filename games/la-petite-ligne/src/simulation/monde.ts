@@ -4,7 +4,7 @@
  */
 import { emptyBreeding } from '../etat/elevage';
 import { createRandom } from '@duo/sdk/sim';
-import { type GameMap, buildingAt } from '../etat/carte';
+import { type GameMap, buildingAt, offstagePoint } from '../etat/carte';
 import { starterWardrobe, starterWear } from '../etat/garde-robe';
 import type {
   Appearance,
@@ -54,7 +54,7 @@ function rackFurniture(): PlacedFurniture {
 
 /** Un habitant hors de la carte, avant sa première entrée d'emploi du temps. */
 export function newVillagerState(map: GameMap, id: string): VillagerState {
-  const start = map.points.offstage ?? { x: -20, y: -20 };
+  const start = map.points.offstage ?? offstagePoint(map);
   return {
     id,
     pos: { x: start.x, y: start.y },

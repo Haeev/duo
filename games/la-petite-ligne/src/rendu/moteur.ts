@@ -30,7 +30,8 @@ import type { Season } from '../donnees/types';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
 import type { GameView, OutfitPreview, OutfitPreviewOptions, PickResult, Renderer, RendererOptions } from '../etat/vue';
 import { createOutfitPreview } from './apercu-tenue';
-import { IsoCameraRig, type CameraCommand } from './camera';
+import { type Bounds, IsoCameraRig, type CameraCommand } from './camera';
+import { inMap, mapCentre, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
 import { DaylightRig, stabilizeShadowFilter } from './lumiere';
@@ -165,9 +166,13 @@ export class RenderEngine implements Renderer {
   private season: Season | null = null;
   private readonly fishingSource: FishingSource;
   private readonly catSource: CatSource;
+  /** Bords de la grille que la caméra ne dépasse pas (origine comprise), fixés une fois. */
+  private readonly cameraBounds: Bounds;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
+    const map = this.view.map;
+    this.cameraBounds = { minX: mapMinX(map), minY: mapMinY(map), maxX: mapMaxX(map) + 1, maxY: mapMaxY(map) + 1 };
     this.container = options.container;
     this.reducedMotion = options.reducedMotion;
     this.light = options.quality === 'light';
@@ -493,7 +498,8 @@ export class RenderEngine implements Renderer {
     if (local !== null) {
       this.rig.snapTo(local.pos.x, local.pos.y);
     } else {
-      this.rig.snapTo(map.width / 2, map.height / 2);
+      const centre = mapCentre(map);
+      this.rig.snapTo(centre.x, centre.y);
     }
     this.perf.setMissingModels(library.missingModels());
     this.missing = library.missingModels();
@@ -553,12 +559,7 @@ export class RenderEngine implements Renderer {
       const y = local.prev.y + (local.pos.y - local.prev.y) * alpha;
       const vx = Math.cos(local.facing) * local.speed;
       const vy = Math.sin(local.facing) * local.speed;
-      this.rig.update(dt, x, y, vx, vy, {
-        minX: 0,
-        minY: 0,
-        maxX: this.view.map.width,
-        maxY: this.view.map.height,
-      });
+      this.rig.update(dt, x, y, vx, vy, this.cameraBounds);
     } else {
       this.rig.update(dt, this.rig.focus.x, this.rig.focus.z, 0, 0, null);
     }
@@ -983,8 +984,7 @@ export class RenderEngine implements Renderer {
   }
 
   private onMap(x: number, y: number): boolean {
-    const map = this.view.map;
-    return x >= 0 && y >= 0 && x < map.width && y < map.height;
+    return inMap(this.view.map, Math.floor(x), Math.floor(y));
   }
 
   stats(): { drawCalls: number; triangles: number } {

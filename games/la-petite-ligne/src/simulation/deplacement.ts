@@ -3,7 +3,7 @@
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
 import type { ControlFrame } from '../etat/actions';
-import { type GameMap, buildingAt } from '../etat/carte';
+import { type GameMap, buildingAt, cellIndex, inMap } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import type { Beam, Character, CharacterId, Vec2, VillagerState } from '../etat/types';
 import { ARRIVE_DISTANCE, BODY_RADIUS, MOVE_DEADZONE } from './constantes';
@@ -17,6 +17,11 @@ import { armedCells } from '../etat/moments';
 import { walkFactor } from './besoins';
 import { ALL_DOORS, blockersAt, closedMask, isDoorCell, markClosedDoors, refuseDoorCarry, trackInside, withDoor } from './interieurs';
 
+/** Marque une case de la couche dynamique (rien hors de la carte). */
+function markCell(map: GameMap, layer: Uint8Array, cx: number, cy: number, value: number): void {
+  if (inMap(map, cx, cy)) layer[cellIndex(map, cx, cy)] = value;
+}
+
 /** Couche dynamique des collisions: arbres debout et meubles (hors tapis). */
 export function refreshBlockers(sim: Sim): Blockers {
   const rt = sim.runtime;
@@ -28,46 +33,39 @@ export function refreshBlockers(sim: Sim): Blockers {
   }
   if (rt.dynamicDirty) {
     const { map } = sim;
-    rt.dynamicBlocked.fill(0);
+    const layer = rt.dynamicBlocked;
+    layer.fill(0);
     for (const t of sim.world.trees) {
       // Le rejet garde la case de l'arbre; la souche se traverse (tour 8, section 5.1).
-      if (treeBlocks(sim, t)) rt.dynamicBlocked[Math.floor(t.pos.y) * map.width + Math.floor(t.pos.x)] = 1;
+      if (treeBlocks(sim, t)) markCell(map, layer, Math.floor(t.pos.x), Math.floor(t.pos.y), 1);
     }
     const platform = map.zones[ZONE.trainAtPlatform];
     if (platform !== undefined && sim.world.train.phase !== 'away') {
       for (let cy = platform.y; cy < platform.y + platform.h; cy++) {
-        for (let cx = platform.x; cx < platform.x + platform.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
+        for (let cx = platform.x; cx < platform.x + platform.w; cx++) markCell(map, layer, cx, cy, 1);
       }
     }
-    for (const cell of handcarCells(sim)) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+    for (const cell of handcarCells(sim)) markCell(map, layer, cell.cx, cell.cy, 1);
     // Tour 9: les chantiers bâtis occupent leurs cases; les barrières baissées ferment la traversée.
     for (const x of sim.content.improvements) {
       if ((sim.world.improvements[x.id]?.builtDay ?? null) === null) continue;
-      for (const cell of x.cells) if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
+      for (const cell of x.cells) markCell(map, layer, cell.cx, cell.cy, 1);
     }
     const gates = armedCells(sim.content, sim.world.moments.today);
     if (gates !== null) {
-      for (let cy = gates.y; cy < gates.y + gates.h; cy++) for (let cx = gates.x; cx < gates.x + gates.w; cx++) rt.dynamicBlocked[cy * map.width + cx] = 1;
+      for (let cy = gates.y; cy < gates.y + gates.h; cy++) for (let cx = gates.x; cx < gates.x + gates.w; cx++) markCell(map, layer, cx, cy, 1);
     }
     for (const f of sim.world.furniture) {
       const def = sim.content.items[f.item];
       // Tapis, lits et objets muraux (rideaux, cadres: R02) ne barrent pas le passage.
       if (def?.footprint === null || def === undefined || def.floor || def.wall || def.bed !== null) continue;
-      for (const cell of footprintCells(def.footprint, f.cell, f.rotation)) {
-        if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) {
-          rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
-        }
-      }
+      for (const cell of footprintCells(def.footprint, f.cell, f.rotation)) markCell(map, layer, cell.cx, cell.cy, 1);
     }
     // Tour 10 (lot L4): les murs d'une pièce bâtie bloquent, sa porte percée s'ouvre dans l'ancienne fenêtre.
     const built = builtRoomCells(sim);
-    for (const cell of built.walls) {
-      if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = 1;
-    }
-    for (const cell of built.doors) {
-      if (cell.cx >= 0 && cell.cy >= 0 && cell.cx < map.width && cell.cy < map.height) rt.dynamicBlocked[cell.cy * map.width + cell.cx] = OPENED_CELL;
-    }
-    markClosedDoors(sim, rt.dynamicBlocked, closed);
+    for (const cell of built.walls) markCell(map, layer, cell.cx, cell.cy, 1);
+    for (const cell of built.doors) markCell(map, layer, cell.cx, cell.cy, OPENED_CELL);
+    markClosedDoors(sim, layer, closed);
     rt.dynamicDirty = false;
   }
   return { map: sim.map, dynamic: rt.dynamicBlocked };
@@ -89,7 +87,7 @@ function steppingStones(map: GameMap): Uint8Array {
     if (c.kind !== 'ford') continue;
     for (let cy = c.rect.y; cy < c.rect.y + c.rect.h; cy++) {
       for (let cx = c.rect.x; cx < c.rect.x + c.rect.w; cx++) {
-        if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) cells[cy * map.width + cx] = 1;
+        markCell(map, cells, cx, cy, 1);
       }
     }
   }
@@ -127,7 +125,7 @@ export function handcarCells(sim: Sim): { cx: number; cy: number }[] {
   const edge = 1e-6;
   for (let cy = Math.floor(at.pos.y - halfY + edge); cy <= Math.floor(at.pos.y + halfY - edge); cy++) {
     for (let cx = Math.floor(at.pos.x - halfX + edge); cx <= Math.floor(at.pos.x + halfX - edge); cx++) {
-      if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) out.push({ cx, cy });
+      if (inMap(map, cx, cy)) out.push({ cx, cy });
     }
   }
   return out;

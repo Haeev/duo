@@ -31,20 +31,21 @@ from valider_carte import (  # noqa: E402
     Grille, calculer_infranchissable, emprise_monde, ouvertures, poteaux_de_cloture, taille_monde,
 )
 
-# 0.13 (docs/jeux/jeu-1/v0-13-carte.md, lot L1): `--0.13` compose la carte agrandie, 164 x 78 m. La grille
-# gagne une origine (`taille.origine`, x -24, y -30): rien de ce qui existe ne change de coordonnées, les
-# régions neuves sont en x et y négatifs ou au-delà de x 99. Le jeu ne lit pas encore l'origine (lot L0):
-# la carte agrandie s'écrit donc à part (`donnees/cartes-0-13/`, que le jeu ne charge pas) tant que L0 n'est
-# pas intégré; sans option, le script écrit la carte du tour 10, octet pour octet.
-ETENDUE = "--0.13" in sys.argv[1:]
+# 0.13 (docs/jeux/jeu-1/v0-13-carte.md, lots L1 et L0): le script compose la carte agrandie, 164 x 78 m, que
+# le jeu charge (`donnees/cartes/halte.json`). La grille a une origine (`taille.origine`, x -24, y -30): rien
+# de ce qui existe ne change de coordonnées, les régions neuves sont en x et y négatifs ou au-delà de x 99.
+# `--tour-10` écrit la carte du tour 10, octet pour octet, dans `donnees/cartes-tour-10/` (que le jeu ne
+# charge pas): c'est la référence du contrôle « aire du bourg d'avant inchangée » du validateur. `--0.13`,
+# l'ancienne option, reste acceptée et ne change rien.
+ETENDUE = "--tour-10" not in sys.argv[1:]
 # Le bourg du tour 10: les boucles de décor d'avant gardent ces bornes, pour garder leurs identifiants.
 LARGEUR, HAUTEUR = 100, 48
 if ETENDUE:
     OX, OY, LARGEUR_GRILLE, HAUTEUR_GRILLE = -24, -30, 164, 78
-    SORTIE = ICI.parent / "donnees" / "cartes-0-13" / "halte.json"
+    SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
 else:
     OX, OY, LARGEUR_GRILLE, HAUTEUR_GRILLE = 0, 0, LARGEUR, HAUTEUR
-    SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
+    SORTIE = ICI.parent / "donnees" / "cartes-tour-10" / "halte.json"
 X_FIN, Y_FIN = OX + LARGEUR_GRILLE, OY + HAUTEUR_GRILLE  # bornes exclues
 # Le ru de la Côte (tour 10): deux colonnes d'eau vive qui bornent le bourg ancien et la rue Haute.
 RU_X = (63, 64)

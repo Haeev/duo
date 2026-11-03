@@ -87,7 +87,7 @@ export interface AudioSettings {
     slideDistanceM: number;
     /** Départ: -1 vers l'ouest (la carte: le train arrive et repart par la voie de l'ouest). */
     departureDirection: -1 | 1;
-    /** Le train hors de la carte s'entend depuis son bord (x). */
+    /** Le train hors de la carte s'entend depuis son bord ouest, plus cet écart (m). */
     offMapX: number;
     /** Sous ce rayon autour du quai, le sifflet est placé; au-delà, sa version lointaine. */
     nearQuayM: number;

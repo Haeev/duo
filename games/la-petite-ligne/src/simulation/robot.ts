@@ -8,6 +8,7 @@ import { questBaselines, questChecklist } from '../etat/quete';
 import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
+import { groundAt } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
@@ -1015,9 +1016,9 @@ function nearestWater(sim: Sim, from: Vec2): Vec2 | null {
   const { map } = sim;
   let best: Vec2 | null = null;
   let bestD = Infinity;
-  for (let cy = Math.max(0, Math.floor(from.y) - 5); cy <= Math.min(map.height - 1, Math.floor(from.y) + 5); cy++) {
-    for (let cx = Math.max(0, Math.floor(from.x) - 5); cx <= Math.min(map.width - 1, Math.floor(from.x) + 5); cx++) {
-      if (map.ground[cy * map.width + cx] !== 'water') continue;
+  for (let cy = Math.floor(from.y) - 5; cy <= Math.floor(from.y) + 5; cy++) {
+    for (let cx = Math.floor(from.x) - 5; cx <= Math.floor(from.x) + 5; cx++) {
+      if (groundAt(map, cx, cy) !== 'water') continue;
       const d = Math.hypot(cx + 0.5 - from.x, cy + 0.5 - from.y);
       if (d < bestD) {
         bestD = d;

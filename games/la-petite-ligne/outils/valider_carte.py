@@ -37,6 +37,8 @@ from typing import Any
 ICI = Path(__file__).resolve().parent
 DONNEES = ICI.parent / "donnees"
 CARTE_PAR_DEFAUT = DONNEES / "cartes" / "halte.json"
+# La carte du tour 10 (`construire_carte_halte.py --tour-10`): l'aire d'avant l'agrandissement de la 0.13.
+CARTE_AVANT = DONNEES / "cartes-tour-10" / "halte.json"
 
 # Points et zones que le code et les données attendent (donnees/README.md, section 5).
 ATTENDUS = [
@@ -1519,10 +1521,20 @@ def controler_cueillette_bois(carte: dict, rapport: Rapport, p: dict) -> None:
             rapport.erreur(f"cueillette {p['id']}: hôte {hote} à {d:.1f} m (au plus {portee} m)")
 
 
+# Plafond de nœuds de l'A* du jeu (`PATH_MAX_NODES` de src/simulation/grille.ts, 0.13).
+MAX_NOEUDS_JEU = 12000
+
+
+def octile(dx: float, dy: float) -> float:
+    """Heuristique de l'A* du jeu (0.13): pas droits de 1, diagonales de racine de 2."""
+    ax, ay = abs(dx), abs(dy)
+    return ax + (math.sqrt(2) - 1) * ay if ax > ay else ay + (math.sqrt(2) - 1) * ax
+
+
 def astar_noeuds(ouvert: set[tuple[int, int]], a: tuple[float, float], c: tuple[float, float],
-                 max_noeuds: int = 4000) -> tuple[int, bool]:
+                 max_noeuds: int = MAX_NOEUDS_JEU) -> tuple[int, bool]:
     """Nœuds développés par l'A* du jeu (`findPath` de src/simulation/grille.ts: huit voisins sans couper les
-    angles, heuristique euclidienne, plafond `maxNodes`): (nœuds, trouvé). Si l'arrivée est bloquée, il vise la
+    angles, heuristique octile, plafond `maxNodes`): (nœuds, trouvé). Si l'arrivée est bloquée, il vise la
     case libre la plus proche, comme le jeu."""
     sx, sy = math.floor(a[0]), math.floor(a[1])
     gx, gy = math.floor(c[0]), math.floor(c[1])
@@ -1535,7 +1547,7 @@ def astar_noeuds(ouvert: set[tuple[int, int]], a: tuple[float, float], c: tuple[
     if (sx, sy) == (gx, gy):
         return 0, True
     g = {(sx, sy): 0.0}
-    tas = [(math.hypot(gx - sx, gy - sy), sx, sy)]
+    tas = [(octile(gx - sx, gy - sy), sx, sy)]
     fermes: set[tuple[int, int]] = set()
     developpes = 0
     while tas and developpes < max_noeuds:
@@ -1556,7 +1568,7 @@ def astar_noeuds(ouvert: set[tuple[int, int]], a: tuple[float, float], c: tuple[
             nd = d + cout
             if nd < g.get(n, math.inf):
                 g[n] = nd
-                heapq.heappush(tas, (nd + math.hypot(gx - n[0], gy - n[1]), n[0], n[1]))
+                heapq.heappush(tas, (nd + octile(gx - n[0], gy - n[1]), n[0], n[1]))
     return developpes, False
 
 
@@ -1745,14 +1757,14 @@ def controler_0_13(carte: dict, rapport: Rapport, libre: Grille, lieux: Lieux, r
         resultats["distances plafonds"] = tableau
 
     # g. A* du jeu: chaque trajet d'habitant de la carte, et toutes les paires de points de chaque planning. Le jeu
-    # abandonne à 4 000 nœuds (`maxNodes`): au-delà, l'habitant ne trouve pas son chemin (erreur); la conception
-    # visait 3 000 pour garder de la marge (CA-C10: avertissement entre les deux).
+    # abandonne à 12 000 nœuds (`maxNodes`, 0.13): au-delà, l'habitant ne trouve pas son chemin (erreur); la
+    # conception vise 3 000 pour garder de la marge (CA-C10: avertissement entre les deux).
 
     def juger(quoi: str, n: int, ok: bool) -> None:
         if not ok:
-            rapport.erreur(f"A*: {quoi}: chemin introuvable par le jeu (plus de 4 000 nœuds)")
+            rapport.erreur(f"A*: {quoi}: chemin introuvable par le jeu (plus de {MAX_NOEUDS_JEU} nœuds)")
         elif n > 3000:
-            rapport.avert(f"A*: {quoi}: {n} nœuds (3 000 visés, le jeu abandonne à 4 000)")
+            rapport.avert(f"A*: {quoi}: {n} nœuds (3 000 visés, le jeu abandonne à {MAX_NOEUDS_JEU})")
 
     pires = []
     for tr in carte.get("trajets", []):
@@ -1811,8 +1823,8 @@ def _references(noeud: Any) -> list[tuple[str, str]]:
 def main(argv: list[str]) -> int:
     """Usage: valider_carte.py [carte.json] [--avant carte_d_avant.json] [--plannings habitants.json]
 
-    `--avant`: la carte d'avant un agrandissement (par défaut donnees/cartes/halte.json, si la carte contrôlée a
-    une clé `agrandissement` et n'est pas celle-là); `--plannings`: des plannings au format de habitants.json
+    `--avant`: la carte d'avant un agrandissement (par défaut donnees/cartes-tour-10/halte.json, si la carte
+    contrôlée a une clé `agrandissement`); `--plannings`: des plannings au format de habitants.json
     (par exemple la sortie `--json` de docs/jeux/jeu-1/simulations/v0_13_habitants.py), dont on vérifie que chaque
     paire de points se rejoint sous 3 000 nœuds d'A*."""
     args = list(argv[1:])
@@ -1831,13 +1843,13 @@ def main(argv: list[str]) -> int:
     avant = plannings = None
     if "--avant" in options:
         avant = json.loads(options["--avant"].read_text(encoding="utf-8"))
-    elif "agrandissement" in carte and chemin.resolve() != CARTE_PAR_DEFAUT.resolve() and CARTE_PAR_DEFAUT.exists():
-        avant = json.loads(CARTE_PAR_DEFAUT.read_text(encoding="utf-8"))
+    elif "agrandissement" in carte and chemin.resolve() != CARTE_AVANT.resolve() and CARTE_AVANT.exists():
+        avant = json.loads(CARTE_AVANT.read_text(encoding="utf-8"))
     if "--plannings" in options:
         plannings = json.loads(options["--plannings"].read_text(encoding="utf-8"))
     rapport = Rapport()
-    # Les données du jeu sont deux dossiers au-dessus (`donnees/cartes/`, ou `donnees/cartes-0-13/` en attendant le
-    # lot L0 de la 0.13).
+    # Les données du jeu sont deux dossiers au-dessus (`donnees/cartes/`, ou `donnees/cartes-tour-10/` pour la carte
+    # d'avant la 0.13).
     dossier = chemin.resolve().parent
     donnees = dossier.parent if dossier.name.startswith("cartes") else None
     res = controler(carte, rapport, donnees, avant, plannings)
