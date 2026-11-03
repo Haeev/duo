@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import type { TrainPhase } from '../etat/types';
 import { RENDER_SETTINGS } from './reglages';
-import { GATE_ARM, GATE_CLOSED, GATE_OPEN, gateAngleStep, trainOffset } from './voie';
+import { GATE_ARM, GATE_CLOSED, GATE_OPEN, gateAngleStep, trainOffset, trainSlides } from './voie';
 
 const GLB_HEADER = 12;
 const CHUNK_HEADER = 8;
@@ -48,28 +48,27 @@ function positions(phase: 'arriving' | 'departing'): number[] {
   return out;
 }
 
-describe('glissement du train', () => {
-  const side = RENDER_SETTINGS.train.sideDirection;
+describe('glissement du train (retour R06: il ne repart jamais à reculons)', () => {
+  const travel = RENDER_SETTINGS.train.travel;
   const distance = RENDER_SETTINGS.train.slideDistance;
 
-  it('arrive du côté de la voie prévu et s’arrête au quai, sans revenir en arrière', () => {
+  it('arrive de l’amont et s’arrête au quai, en roulant toujours dans son sens de marche', () => {
     const xs = positions('arriving');
-    expect(xs[0]).toBeCloseTo(side * distance, 6);
+    expect(xs[0]).toBeCloseTo(-travel * distance, 6);
     expect(xs[xs.length - 1]).toBeCloseTo(0, 6);
     for (let i = 1; i < xs.length; i += 1) {
-      // Toujours vers le quai: la distance au quai ne fait que diminuer.
-      expect(Math.abs(xs[i] ?? 0)).toBeLessThanOrEqual(Math.abs(xs[i - 1] ?? 0) + 1e-9);
+      // Chaque pas avance dans le sens de marche (jamais de recul).
+      expect(((xs[i] ?? 0) - (xs[i - 1] ?? 0)) * travel).toBeGreaterThanOrEqual(-1e-9);
     }
   });
 
-  it('part du quai sans saut et s’éloigne de façon monotone, vers l’ouest comme le son', () => {
+  it('repart du quai sans saut et continue tout droit vers l’aval (l’ouest, comme le son)', () => {
     const xs = positions('departing');
+    expect(travel).toBe(-1);
     expect(xs[0]).toBeCloseTo(0, 6);
-    expect(xs[xs.length - 1]).toBeCloseTo(side * distance, 6);
-    expect(side).toBe(-1);
+    expect(xs[xs.length - 1]).toBeCloseTo(travel * distance, 6);
     for (let i = 1; i < xs.length; i += 1) {
-      expect(Math.abs(xs[i] ?? 0)).toBeGreaterThanOrEqual(Math.abs(xs[i - 1] ?? 0) - 1e-9);
-      expect(Math.sign(xs[i] ?? 0)).not.toBe(-side);
+      expect(((xs[i] ?? 0) - (xs[i - 1] ?? 0)) * travel).toBeGreaterThanOrEqual(-1e-9);
     }
     // Pas de saut: le premier pas est minuscule (le train démarre doucement), et aucun pas ne
     // dépasse la pente maximale d'une courbe cubique (trois fois le pas moyen).
@@ -79,6 +78,22 @@ describe('glissement du train', () => {
         (CUBIC_SLOPE * distance) / STEPS + 1e-9,
       );
     }
+  });
+
+  it('arrive et repart par les deux bouts opposés de la carte, entièrement dehors', () => {
+    // Le train de la carte: arrêt en x 38,5, queue 11,75 m derrière, tête 12,15 m devant.
+    const stop = 38.5;
+    const width = 100;
+    const slides = trainSlides(stop, -11.75, 12.15, width);
+    const clearance = RENDER_SETTINGS.train.offMapClearance;
+    const start = trainOffset('arriving', 0, slides);
+    const end = trainOffset('departing', 0, slides);
+    // Début de l'arrivée: la tête (vers l'ouest) est au-delà du bord est.
+    expect(stop + start + travel * 12.15).toBeGreaterThanOrEqual(width + clearance - 1e-6);
+    // Fin du départ: la queue est au-delà du bord ouest.
+    expect(stop + end + travel * -11.75).toBeLessThanOrEqual(-clearance + 1e-6);
+    expect(Math.sign(start)).toBe(-travel);
+    expect(Math.sign(end)).toBe(travel);
   });
 
   it('n’est pas dessiné une fois parti, et reste au quai à l’arrêt', () => {

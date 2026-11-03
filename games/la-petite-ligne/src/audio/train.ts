@@ -156,10 +156,12 @@ export function locomotivePosition(g: TrainGeometry, phase: TrainPhase, progress
   let offset: number;
   switch (phase) {
     case 'away':
-      offset = -g.slideDistance;
+      // Parti: là où il est sorti, dans son sens de marche (retour R06).
+      offset = g.departureDirection * g.slideDistance;
       break;
     case 'arriving':
-      offset = -g.slideDistance * (1 - easeOut(p));
+      // Il arrive par l'autre bout: il roule toujours dans le même sens (retour R06).
+      offset = -g.departureDirection * g.slideDistance * (1 - easeOut(p));
       break;
     case 'stopped':
       offset = 0;

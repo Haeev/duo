@@ -65,7 +65,22 @@ interface ElementPart {
   material: MeshBasicMaterial;
   roof: boolean;
   facing: Vector3 | null;
+  /**
+   * Porte (R16): sa copie sur la face intérieure du mur. La porte de l'artiste n'est peinte que
+   * dehors; de dedans, le mur restait nu quand la caméra le voit de face.
+   */
+  inner: Object3D | null;
 }
+
+/** Vantail d'une porte de mur (élément à construire `<…>_door`): copié sur la face intérieure. */
+const DOOR_SUFFIX = '_door';
+/** Jeu entre le vantail recopié dedans et la face intérieure du mur (m): aucune lutte entre les deux. */
+const INNER_DOOR_GAP = 0.005;
+/** Sommets à plus de cette profondeur sous le dos du vantail: côté pièce du mur (m). */
+const INNER_FACE_MIN_DEPTH = 0.15;
+/** Épaisseur de mur supposée sans sommet côté pièce (m), et arrondi au millimètre. */
+const DEFAULT_WALL_DEPTH = 0.36;
+const MM = 1000;
 
 /**
  * Pièces fixes d'un modèle (murs, gravats, sol) fusionnées en un maillage par
@@ -236,7 +251,7 @@ export class StagedBuilding {
     for (const mesh of ghost) {
       this.group.parent?.add(mesh);
     }
-    this.elements.push({ construction, element, node, ghost, material, roof, facing: null });
+    this.elements.push({ construction, element, node, ghost, material, roof, facing: null, inner: null });
   }
 
   /** Après les liaisons: repère les murs et le toit (coupe) et les pièces fixes du modèle réparé. */
@@ -256,6 +271,7 @@ export class StagedBuilding {
     for (const element of this.elements) {
       element.facing = element.roof ? null : facingOf(element.node);
     }
+    this.addInnerDoors(wallPattern);
     const containsElement = (object: Object3D): boolean => {
       let found = false;
       object.traverse((child) => {
@@ -317,6 +333,86 @@ export class StagedBuilding {
         this.stubs.push({ part, stub });
       }
     }
+  }
+
+  /**
+   * Porte vue de dedans (R16): chaque vantail de mur est recopié de l'autre côté du mur qui le
+   * porte, sur sa face intérieure. Même géométrie et
+   * même matériau (aucun programme de plus); montré et caché comme la porte elle-même.
+   */
+  private addInnerDoors(wallPattern: RegExp): void {
+    if (this.repaired === this.ruin) return;
+    const toModel = new Matrix4();
+    for (const element of this.elements) {
+      const facing = element.facing;
+      if (facing === null || !element.node.name.endsWith(DOOR_SUFFIX) || wallPattern.test(element.node.name)) continue;
+      const wall = this.repaired.children.find(
+        (child) => wallPattern.test(child.name) && !child.name.endsWith(DOOR_SUFFIX) && this.facesAs(child, facing),
+      );
+      if (wall === undefined) continue;
+      const leaf = this.boxInModel(element.node);
+      const door = leaf.getCenter(new Vector3());
+      const axis = facing.x !== 0 ? 'x' : 'z';
+      const sign = facing.x !== 0 ? facing.x : facing.z;
+      // Demi-tour autour d'un axe vertical (un miroir inverserait les faces): le dos du vantail,
+      // collé dehors à la face extérieure, vient contre la face intérieure du mur (la boîte du mur
+      // déborde dehors avec la marche du seuil: on ne lit que son côté intérieur).
+      const back = sign > 0 ? leaf.min[axis] : leaf.max[axis];
+      const face = this.innerFace(wall, axis, sign, back) - sign * INNER_DOOR_GAP;
+      const middle = (face + back) / 2;
+      const pivot = axis === 'x' ? new Vector3(middle, 0, door.z) : new Vector3(door.x, 0, middle);
+      const mirror = new Matrix4()
+        .makeTranslation(pivot.x, 0, pivot.z)
+        .multiply(new Matrix4().makeRotationY(Math.PI))
+        .multiply(new Matrix4().makeTranslation(-pivot.x, 0, -pivot.z));
+      matrixToAncestor(element.node, this.repaired, toModel);
+      const inner = element.node.clone(true);
+      inner.name = `${element.node.name}_dedans`;
+      inner.matrixAutoUpdate = false;
+      inner.matrix.multiplyMatrices(mirror, toModel);
+      inner.matrix.decompose(inner.position, inner.quaternion, inner.scale);
+      inner.visible = false;
+      this.repaired.add(inner);
+      element.inner = inner;
+    }
+  }
+
+  /**
+   * Face intérieure d'un mur le long de `axis` (repère du modèle): la coordonnée la plus fréquente
+   * de ses sommets du côté de la pièce. Sa boîte déborde (marche du seuil dehors, appuis de fenêtre
+   * dedans), ses grandes faces non.
+   */
+  private innerFace(wall: Object3D, axis: 'x' | 'z', sign: number, back: number): number {
+    const counts = new Map<number, number>();
+    const matrix = new Matrix4();
+    const point = new Vector3();
+    wall.traverse((object) => {
+      if (!(object instanceof Mesh)) return;
+      matrixToAncestor(object, this.repaired, matrix);
+      const position = (object.geometry as BufferGeometry).getAttribute('position');
+      for (let i = 0; i < position.count; i += 1) {
+        const v = point.fromBufferAttribute(position, i).applyMatrix4(matrix)[axis];
+        if (sign * (v - back) > -INNER_FACE_MIN_DEPTH) continue;
+        const key = Math.round(v * MM) / MM;
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+    });
+    let best = back - sign * DEFAULT_WALL_DEPTH;
+    let most = 0;
+    for (const [value, count] of counts) {
+      if (count > most) {
+        best = value;
+        most = count;
+      }
+    }
+    return best;
+  }
+
+  /** Le nœud regarde-t-il vers `facing` (centre de sa boîte par rapport au centre du modèle) ? */
+  private facesAs(node: Object3D, facing: Vector3): boolean {
+    const centre = this.boxInModel(node).getCenter(new Vector3());
+    const own = Math.abs(centre.x) > Math.abs(centre.z) ? new Vector3(Math.sign(centre.x), 0, 0) : new Vector3(0, 0, Math.sign(centre.z));
+    return own.equals(facing);
   }
 
   /** Boîte d'un nœud du modèle réparé, dans le repère du modèle (matrices locales). */
@@ -517,6 +613,7 @@ export class StagedBuilding {
       const ghost = status === 'ghost' && !solid;
       const hidden = this.cutAway(part, state);
       part.node.visible = solid && !hidden;
+      if (part.inner !== null) part.inner.visible = solid && !hidden;
       for (const mesh of part.ghost) {
         mesh.visible = ghost && !hidden;
       }

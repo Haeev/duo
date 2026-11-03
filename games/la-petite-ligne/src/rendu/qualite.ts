@@ -33,6 +33,7 @@ export interface AdaptiveSettings {
     readonly slowRatio: number;
   };
   readonly autoLight: {
+    readonly cutFrameMs: number;
     readonly slowSeconds: number;
     readonly comfortRatio: number;
     readonly returnSeconds: number;
@@ -62,7 +63,23 @@ export class AdaptiveQuality {
   private slowFor = 0;
   private comfortFor = 0;
 
-  constructor(private readonly settings: AdaptiveSettings = RENDER_SETTINGS) {}
+  /** Pourquoi les ombres ont été coupées (journal), `null` tant qu'elles sont là. */
+  private reason: ShadowCutReason | null = null;
+
+  /**
+   * `usefulSteps`: nombre de paliers de résolution qui changent vraiment l'image sur cet écran
+   * (`usefulResolutionSteps`). Sur le PC (1366x768 à 100, 125 ou 150 %), le plancher de netteté
+   * les rend tous égaux à la pleine résolution: un seul palier utile (retour R13).
+   */
+  constructor(
+    private readonly settings: AdaptiveSettings = RENDER_SETTINGS,
+    private readonly usefulSteps: () => number = () => settings.dynamicResolution.steps.length,
+  ) {}
+
+  /** Raison du dernier repli (moyenne et seuil), pour le journal de Duo. */
+  lastReason(): ShadowCutReason | null {
+    return this.reason;
+  }
 
   /** Palier de résolution dynamique courant (index dans `steps`). */
   resolutionStep(): number {
@@ -105,17 +122,30 @@ export class AdaptiveQuality {
   private considerSlow(dtSeconds: number): QualityChange | null {
     const s = this.settings.dynamicResolution;
     const slowMs = Math.max(s.slowFrameMs, this.refreshMs() * s.slowRatio);
-    if (this.averageMs <= slowMs) {
-      this.slowFor = 0;
-      return null;
-    }
-    if (this.step < s.steps.length - 1) {
+    const lastUseful = Math.min(s.steps.length, Math.max(1, this.usefulSteps())) - 1;
+    if (this.step < lastUseful && this.averageMs > slowMs) {
       this.step += 1;
       this.changed();
       return { kind: 'step', step: this.step };
     }
+    // Les ombres ne partent que si la machine peine vraiment (retour R13): sous 40 images par
+    // seconde tenues `slowSeconds`, au dernier palier qui change quelque chose. Entre 40 et 55
+    // images par seconde, le jeu reste fluide et garde ses ombres.
+    const cutMs = Math.max(this.settings.autoLight.cutFrameMs, slowMs);
+    if (this.averageMs <= cutMs) {
+      this.slowFor = 0;
+      return null;
+    }
     this.slowFor += dtSeconds;
     if (this.slowFor < this.settings.autoLight.slowSeconds) return null;
+    this.reason = {
+      averageFrameMs: this.averageMs,
+      thresholdMs: cutMs,
+      slowSeconds: this.slowFor,
+      refreshMs: this.refreshMs(),
+      resolutionStep: this.step,
+      usefulSteps: lastUseful + 1,
+    };
     this.light = true;
     this.changed();
     return { kind: 'light', final: this.returns >= this.settings.autoLight.maxReturns };
@@ -142,6 +172,14 @@ export class AdaptiveQuality {
    */
   forceFallback(): QualityChange {
     this.step = this.settings.dynamicResolution.steps.length - 1;
+    this.reason = {
+      averageFrameMs: this.averageMs,
+      thresholdMs: 0,
+      slowSeconds: 0,
+      refreshMs: this.refreshMs(),
+      resolutionStep: this.step,
+      usefulSteps: this.step + 1,
+    };
     this.light = true;
     this.returns = this.settings.autoLight.maxReturns;
     this.changed();
@@ -153,6 +191,76 @@ export class AdaptiveQuality {
     this.slowFor = 0;
     this.comfortFor = 0;
   }
+}
+
+/** Ce qui a fait couper les ombres (journal de Duo, retour R13). */
+export interface ShadowCutReason {
+  /** Moyenne glissante des images au moment du repli (ms). */
+  averageFrameMs: number;
+  /** Seuil dépassé (ms): `autoLight.cutFrameMs`, ou la période de l'écran x `slowRatio`. */
+  thresholdMs: number;
+  /** Durée de lenteur continue avant le repli (s). */
+  slowSeconds: number;
+  refreshMs: number;
+  resolutionStep: number;
+  usefulSteps: number;
+}
+
+/** Ce que le moteur sait de la carte graphique et du navigateur (journal seulement). */
+export interface GraphicsInfo {
+  readonly userAgent: string;
+  /** Rendu de la carte graphique (`UNMASKED_RENDERER_WEBGL`), ou chaîne vide si le navigateur le cache. */
+  readonly renderer: string;
+}
+
+/**
+ * Ligne du journal de Duo quand les ombres partent (retour R13): pourquoi, sur quel écran, avec
+ * quelle carte graphique. Rien ici ne décide: agent utilisateur, carte graphique et taille d'écran
+ * ne servent qu'au journal, la décision ne lit que la durée des images.
+ */
+export function shadowCutLog(
+  reason: ShadowCutReason,
+  surface: DisplaySurface,
+  buffer: { width: number; height: number },
+  graphics: GraphicsInfo,
+  final: boolean,
+): Record<string, string | number | boolean> {
+  return {
+    cause: reason.thresholdMs > 0 ? 'images trop lentes' : 'repli imposé (page de démonstration)',
+    moyenneImageMs: Math.round(reason.averageFrameMs * 10) / 10,
+    seuilMs: Math.round(reason.thresholdMs * 10) / 10,
+    lenteurSecondes: Math.round(reason.slowSeconds * 10) / 10,
+    periodeEcranMs: Math.round(reason.refreshMs * 10) / 10,
+    palier: reason.resolutionStep,
+    paliersUtiles: reason.usefulSteps,
+    ecranCss: `${String(Math.round(surface.cssWidth))}x${String(Math.round(surface.cssHeight))}`,
+    echelle: surface.devicePixelRatio,
+    tampon: `${String(buffer.width)}x${String(buffer.height)}`,
+    carteGraphique: graphics.renderer === '' ? 'inconnue' : graphics.renderer,
+    navigateur: graphics.userAgent,
+    definitif: final,
+  };
+}
+
+/**
+ * Paliers de la résolution dynamique qui donnent chacun une image plus petite que le précédent sur
+ * cette surface (au moins un: la pleine résolution). Un palier qui ne change rien ne doit pas
+ * compter comme un levier avant de couper les ombres.
+ */
+export function usefulResolutionSteps(
+  surface: DisplaySurface,
+  steps: readonly number[],
+  settings: RenderSizeSettings = RENDER_SETTINGS,
+): number {
+  let useful = 1;
+  let previous = renderPixelSize(surface, steps[0] ?? 1, false, settings);
+  for (let i = 1; i < steps.length; i += 1) {
+    const size = renderPixelSize(surface, steps[i] ?? 1, false, settings);
+    if (size.width * size.height >= previous.width * previous.height) break;
+    useful = i + 1;
+    previous = size;
+  }
+  return useful;
 }
 
 /** Ce que le moteur sait de la surface d'affichage, pour `renderPixelSize`. */

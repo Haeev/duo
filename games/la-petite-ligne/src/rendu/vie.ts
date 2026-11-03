@@ -5,6 +5,7 @@
  */
 import {
   AnimationMixer,
+  Box3,
   Group,
   Matrix4,
   Quaternion,
@@ -17,7 +18,7 @@ import {
 } from 'three';
 import type { Content } from '../donnees/types';
 import type { GameMap } from '../etat/carte';
-import type { Vec2 } from '../etat/types';
+import type { CharacterId, Vec2 } from '../etat/types';
 import { smoothFactor } from './camera';
 import {
   dampAngle,
@@ -34,6 +35,7 @@ import type { SharedMaterials } from './materiaux';
 import { textHash, type ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
 import { castsVisibleShadow } from './ombre-tri';
+import { loadPose, loadShape, type CarrierHands } from './portage-deux';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -78,6 +80,8 @@ const CRATE_MODEL = 'hen_crate';
 const COOP_POINT = 'chicken_coop';
 const CRATE_OFFSET = { x: -1.2, y: 0.7 };
 const CRATE_YAW = 0;
+/** Charge longue posée sur les mains levées (R14): les doigts la prennent de 2 cm par-dessous. */
+const LONG_LOAD_GRIP = 0.02;
 
 interface HenView {
   root: Group;
@@ -99,6 +103,30 @@ export class FarmLifePart implements EventfulPart {
   private readonly itemPicks = new Map<string, PickTarget>();
   private beam: Object3D | null = null;
   private beamModel = '';
+  /** Mains des porteurs (R14), lues dans les personnages après leur mise à jour. */
+  private carryProbe: (holders: readonly CharacterId[], out: CarrierHands) => boolean = () => false;
+  private readonly hands: CarrierHands = {
+    a: { left: { x: 0, y: 0, z: 0 }, right: { x: 0, y: 0, z: 0 } },
+    b: { left: { x: 0, y: 0, z: 0 }, right: { x: 0, y: 0, z: 0 } },
+  };
+  private readonly loadHeights = new Map<string, number>();
+  private readonly loadBox = new Box3();
+
+  /** Où sont les mains des porteurs (`CharactersPart.carrierHands`). */
+  setCarryProbe(probe: (holders: readonly CharacterId[], out: CarrierHands) => boolean): void {
+    this.carryProbe = probe;
+  }
+
+  /** Hauteur d'un modèle de charge (m), mesurée une fois sur sa boîte. */
+  private loadHeight(model: string): number {
+    const known = this.loadHeights.get(model);
+    if (known !== undefined) return known;
+    const probe = this.library.instantiate(model);
+    probe.updateMatrixWorld(true);
+    const height = this.loadBox.setFromObject(probe).max.y;
+    this.loadHeights.set(model, height);
+    return height;
+  }
   private readonly matrix = new Matrix4();
   private readonly quaternion = new Quaternion();
   private readonly up = new Vector3(0, 1, 0);
@@ -196,7 +224,7 @@ export class FarmLifePart implements EventfulPart {
       const crated = this.cratePoint !== null && hen.arrivedDay === world.clock.day && hen.nameKnownBy.length === 0;
       const at = crated ? this.cratePoint : interpolate(hen.prev, hen.pos, context.alpha, this.point);
       if (crated) anyCrated = true;
-      view.root.position.set(at.x, this.terrain.heightAt(at.x, at.y), at.y);
+      view.root.position.set(at.x, this.terrain.standHeight(at.x, at.y), at.y);
       const yaw = crated ? CRATE_YAW : yawFromFacing(hen.facing);
       view.facing =
         view.facing === null
@@ -229,7 +257,7 @@ export class FarmLifePart implements EventfulPart {
       }
       view.root.visible = true;
       const at = interpolate(f.prev, f.pos, context.alpha, this.point);
-      view.root.position.set(at.x, this.terrain.heightAt(at.x, at.y), at.y);
+      view.root.position.set(at.x, this.terrain.standHeight(at.x, at.y), at.y);
       const yaw = yawFromFacing(f.facing);
       view.facing = view.facing === null ? yaw : dampAngle(view.facing, yaw, smoothFactor(context.dt, HEN_TURN_HALF_LIFE));
       view.root.rotation.y = view.facing;
@@ -255,7 +283,7 @@ export class FarmLifePart implements EventfulPart {
       seen.add(item.id);
       const def = this.content.items[item.item];
       const model = def?.model ?? item.item;
-      let ground = this.terrain.heightAt(item.pos.x, item.pos.y);
+      let ground = this.terrain.standHeight(item.pos.x, item.pos.y);
       // Une cueillette de la lisière pousse là: posée, sans flotter; les mûres sur leur roncier.
       const grown = def?.category === 'forage';
       const bob =
@@ -316,6 +344,17 @@ export class FarmLifePart implements EventfulPart {
     }
     const carryHeight = this.library.extras(model).carry_height;
     const at = interpolate(beam.prev, beam.pos, context.alpha, this.point);
+    // Portée à deux (R14): dans les mains des porteurs, telles que l'animation les place.
+    const shape = loadShape(this.content, this.library, beam);
+    if (beam.carried && shape !== 'rolling' && this.carryProbe(beam.holders, this.hands)) {
+      const height = this.loadHeight(model);
+      const grip = shape === 'short' ? height / 2 : LONG_LOAD_GRIP;
+      const pose = loadPose(shape, this.hands, grip, { x: at.x, z: at.y }, yawFromFacing(beam.facing));
+      this.beam.visible = true;
+      this.beam.position.set(pose.x, pose.y, pose.z);
+      this.beam.rotation.y = pose.yaw;
+      return;
+    }
     // La draisine roule sur ses rails: elle reste au sol, portée ou non.
     const lift =
       beam.purpose === 'handcar'

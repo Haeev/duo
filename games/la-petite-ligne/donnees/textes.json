@@ -107,6 +107,7 @@
     "riddle_not_yet": "Rien ici... pour l'instant.",
     "placement_outside": "Ça dépasse de la pièce: rapproche-toi du milieu, ou tourne le meuble.",
     "placement_wall": "Ça s'accroche au mur: rapproche-toi d'un mur, le meuble tourné vers la pièce.",
+    "placement_wall_opening": "Pas sur une fenêtre ni sur une porte: choisis un pan de mur libre.",
     "placement_overlap": "Un autre meuble occupe la place: essaie juste à côté.",
     "placement_back_wall": "Ça se pose dos à un mur, pour le tuyau: approche-toi d'un mur, le meuble tourné vers la pièce.",
     "placement_occupied": "Quelqu'un se tient là: attends que la place se libère.",

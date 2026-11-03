@@ -5,6 +5,7 @@
  * les conditions qui comptent deviennent des conditions `counter`.
  */
 import type { CropStage, Quality, Weather } from '../etat/types';
+
 import {
   DEFAULT_BENCHES,
   DEFAULT_DIALOGUES,
@@ -92,6 +93,9 @@ import type {
   VillagerDef,
   Who,
 } from './types';
+
+/** Largeur d'un objet mural sans `wallWidth` (m): un cadre (R17). */
+const DEFAULT_WALL_WIDTH = 0.6;
 
 /** Les neuf fichiers, tels qu'importés (JSON brut). */
 export interface RawContentFiles {
@@ -256,6 +260,7 @@ function parseCarry(r: Reader | null): Settings['carry'] {
             side: optNumber(grip, 'side', DEFAULT_CARRY_GRIP.side),
             fromEnd: optNumber(grip, 'fromEnd', DEFAULT_CARRY_GRIP.fromEnd),
             reach: optNumber(grip, 'reach', DEFAULT_CARRY_GRIP.reach),
+            apart: optNumber(grip, 'apart', DEFAULT_CARRY_GRIP.apart),
           },
     quests: (r?.opt('quests')?.items() ?? []).map((q) => ({
       item: q.at('item').string(),
@@ -662,6 +667,8 @@ function parseItems(r: Reader): Record<string, ItemDef> {
       storage: optString(it, 'storage'),
       floor: optBoolean(it, 'floor', false),
       wall: optBoolean(it, 'wall', false),
+      wallWidth: optNumber(it, 'wallWidth', DEFAULT_WALL_WIDTH),
+      blocksWall: optBoolean(it, 'blocksWall', false),
       backToWall: optBoolean(it, 'backToWall', false),
       dining: optBoolean(it, 'dining', false),
       seat: optBoolean(it, 'seat', false),

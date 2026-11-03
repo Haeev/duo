@@ -80,12 +80,15 @@ export interface AudioSettings {
   /** Une ligne de la commande se coche: tampon chez qui est près de la caisse (m). */
   stampNearCrateM: number;
   train: {
-    /** Point de l'arrêt et décalage de la locomotive vers l'est (rendu: voitures dans l'axe X). */
+    /** Point de l'arrêt et décalage de la locomotive en x (en tête vers l'ouest: négatif, comme le rendu). */
     stopPoint: string;
     locomotiveOffsetM: number;
     /** Glissement d'entrée et de sortie (m), comme `RENDER_SETTINGS.train.slideDistance`. */
     slideDistanceM: number;
-    /** Départ: -1 vers l'ouest (la carte: le train arrive et repart par la voie de l'ouest). */
+    /**
+     * Sens de marche: -1 vers l'ouest. Le train arrive par l'est et repart vers l'ouest sans faire
+     * demi-tour (retour R06), comme `RENDER_SETTINGS.train.travel`.
+     */
     departureDirection: -1 | 1;
     /** Le train hors de la carte s'entend depuis son bord (x). */
     offMapX: number;
@@ -220,7 +223,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
   stampNearCrateM: 4,
   train: {
     stopPoint: 'train_stop',
-    locomotiveOffsetM: 8.45,
+    locomotiveOffsetM: -8.45,
     slideDistanceM: 70,
     departureDirection: -1,
     offMapX: 0,

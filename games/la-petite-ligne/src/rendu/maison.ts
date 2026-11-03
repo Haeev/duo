@@ -18,8 +18,10 @@ import {
   type Object3D,
 } from 'three';
 import { HOUSE_BUILDING, type GameMap } from '../etat/carte';
+import { wallSpanOf } from '../etat/murs';
 import {
   CORNER_SIZE,
+  type Cell,
   type CharacterId,
   type ConstructionState,
   type DeepReadonly,
@@ -27,6 +29,7 @@ import {
   type PlacedDecor,
   type PlacedFurniture,
   type PlacementPreview,
+  type ReadonlyWorld,
 } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { seasonOfDay } from '../donnees/calendrier';
@@ -233,7 +236,7 @@ export class HousePart implements EventfulPart {
       applyShadows(object);
       // Côte à côte, en travers du point (la caisse à l'ouest, les planches à l'est).
       const x = at.x + (index - 0.5) * 0.9;
-      object.position.set(x, this.terrain.heightAt(x, at.y), at.y);
+      object.position.set(x, this.terrain.standHeight(x, at.y), at.y);
       object.visible = false;
       this.group.add(object);
       return object;
@@ -438,7 +441,7 @@ export class HousePart implements EventfulPart {
       }
       const x = corner.cx + CORNER_SIZE / 2;
       const y = corner.cy + CORNER_SIZE / 2;
-      view.mesh.position.set(x, this.terrain.heightAt(x, y) + CORNER_LIFT, y);
+      view.mesh.position.set(x, this.terrain.standHeight(x, y) + CORNER_LIFT, y);
       view.mesh.visible = true;
     }
   }
@@ -494,11 +497,30 @@ export class HousePart implements EventfulPart {
     return this.library.extras(item).wall === true;
   }
 
+  /**
+   * Objet mural (R15, R17): à sa place sur le mur (`etat/murs.ts`, la règle de la simulation),
+   * glissé le long du mur hors des fenêtres et des portes. Renvoie le quart de rotation retenu.
+   */
+  private placeOnWall(object: Object3D, item: string, cell: DeepReadonly<Cell>, wanted: number, world: ReadonlyWorld): number {
+    const span = wallSpanOf(this.content, this.map, world, item, cell, wanted);
+    if (typeof span === 'string') {
+      const rotation = this.wallRotation(cell.cx, cell.cy, wanted);
+      this.place(object, item, cell.cx, cell.cy, rotation);
+      return rotation;
+    }
+    this.place(object, item, cell.cx, cell.cy, span.quarter);
+    const size = this.footprint(item, span.quarter);
+    if (span.quarter === 0 || span.quarter === 2) object.position.x = span.center + (size.w / 2 - 0.5);
+    else object.position.z = span.center + (size.d / 2 - 0.5);
+    return span.quarter;
+  }
+
   private place(object: Object3D, item: string, cx: number, cy: number, rotation: number): void {
     const size = this.footprint(item, rotation);
     const x = cx + size.w / 2;
     const y = cy + size.d / 2;
-    object.position.set(x, this.terrain.heightAt(x, y), y);
+    // Sur le plancher de la pièce (R02): ni enfoncé de 2 cm, ni tapis au ras des lames.
+    object.position.set(x, this.terrain.standHeight(x, y), y);
     object.rotation.y = yawFromQuarter(rotation);
   }
 
@@ -671,8 +693,10 @@ export class HousePart implements EventfulPart {
         continue;
       }
       const wall = this.isWallItem(piece.item);
-      const rotation = wall ? this.wallRotation(piece.cell.cx, piece.cell.cy, piece.rotation) : piece.rotation;
-      this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, rotation);
+      const rotation = wall
+        ? this.placeOnWall(view.object, piece.item, piece.cell, piece.rotation, context.world)
+        : piece.rotation;
+      if (!wall) this.place(view.object, piece.item, piece.cell.cx, piece.cell.cy, rotation);
       // Un objet mural suit son mur: caché avec lui quand la coupe l'efface.
       this.wallFacing.set(Math.sin(yawFromQuarter(rotation)), 0, Math.cos(yawFromQuarter(rotation))).negate();
       view.object.visible = !hidden && !(wall && this.wallCut(this.wallFacing));
@@ -825,6 +849,8 @@ export class HousePart implements EventfulPart {
         // Sur le dessus du meuble visé (S03), à la place même où il sera posé.
         ghost.object.position.copy(this.tmp);
         ghost.object.rotation.y = spot.yaw;
+      } else if (this.isWallItem(preview.item)) {
+        this.placeOnWall(ghost.object, preview.item, preview.cell, preview.rotation, context.world);
       } else this.place(ghost.object, preview.item, preview.cell.cx, preview.cell.cy, preview.rotation);
     }
   }

@@ -18,7 +18,7 @@ import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
-import { type PlayerInfo, fillTour10Fields } from '../simulation/monde';
+import { type PlayerInfo, fillTour10Fields, moveToolRack } from '../simulation/monde';
 import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenagement';
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt } from '../etat/carte';
@@ -818,6 +818,7 @@ function resume(
   if (dataSchema < 7) migrateToTour10(sim);
   // Un petit objet sans son meuble porteur (sauvegarde abîmée) revient au rangement (S03).
   settleDecor(sim);
+  moveToolRack(world);
   // Format 12 (0.12, élevage): un sac de grain au cellier, pour les jours où le grain compte.
   const grain = content.settings.hens.care?.grain.item;
   if (dataSchema < 12 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
