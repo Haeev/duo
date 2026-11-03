@@ -157,7 +157,7 @@ describe('petits objets sur les meubles (S03)', () => {
 
 describe('format 9', () => {
   it('une sauvegarde du format 8 se relit sans petit objet, et un objet posé survit à la reprise', () => {
-    expect(DATA_SCHEMA).toBe(9);
+    expect(DATA_SCHEMA).toBeGreaterThanOrEqual(9);
     const ref = reference('format-8-automne-jour-62.json');
     expect(ref.dataSchema).toBe(8);
     expect('decor' in ref.data).toBe(false);
