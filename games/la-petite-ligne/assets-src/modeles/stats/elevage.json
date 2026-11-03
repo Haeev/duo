@@ -1,0 +1,133 @@
+{
+ "nodes": {
+  "goat": {
+   "kind": "animal",
+   "origin": "sol entre les pattes",
+   "withers": 0.72,
+   "head_up": 0.95,
+   "length": 1.0,
+   "collision_radius": 0.45,
+   "variants": [
+    "goat_chamois",
+    "goat_white"
+   ],
+   "neck_socket": "socket_goat_neck",
+   "note": "deux robes (goat_chamois, goat_white): n'en montrer qu'une. Corde et clochette au collier (socket_goat_neck). goat_walk: timeScale = vitesse / 0,78; goat_trot: vitesse / 2,8; goat_bell une fois (LoopOnce)",
+   "tris": 2484,
+   "tris_each_variant": {
+    "goat_chamois": 1278,
+    "goat_white": 1206
+   }
+  },
+  "goat_bell": {
+   "kind": "item",
+   "socket": "socket_goat_neck",
+   "note": "accrocher sous socket_goat_neck sans transformation",
+   "tris": 92
+  },
+  "goat_stake": {
+   "kind": "prop",
+   "rope_anchor": [
+    0.0,
+    0.405,
+    0.0
+   ],
+   "rope_length": 2.5,
+   "note": "corde dessinée par le jeu de rope_anchor à socket_goat_neck",
+   "tris": 152
+  },
+  "goat_shed": {
+   "footprint": [
+    2,
+    2
+   ],
+   "door_cell": 0,
+   "doors": [
+    "goat_shed_door_low",
+    "goat_shed_door_high"
+   ],
+   "inside": [
+    0.25,
+    0.0,
+    -0.1
+   ],
+   "tub": "goat_shed_tub_water",
+   "note": "porte coupée à mi-hauteur sur la case de gauche (vue de dehors), toit qui descend vers l'arrière (-Z): dos au talus; baquet à droite de la porte, eau (goat_shed_tub_water) à montrer quand il est plein",
+   "tris": 1504
+  },
+  "henhouse_extended": {
+   "footprint": [
+    3,
+    3
+   ],
+   "door_cell": 1,
+   "replaces": "henhouse_repaired",
+   "note": "même origine et même emprise que henhouse: montrer ce nœud à la place de henhouse_repaired une fois le chantier fini",
+   "tris": 1828
+  },
+  "hen_feeder_hopper": {
+   "footprint": [
+    1,
+    1
+   ],
+   "grain": "hen_feeder_hopper_grain",
+   "note": "auget vers +Z: les poules picorent devant",
+   "tris": 188
+  },
+  "milk_can": {
+   "kind": "item",
+   "size_m": 0.33,
+   "tris": 340
+  },
+  "fresh_cheese": {
+   "kind": "item",
+   "size_m": 0.18,
+   "tris": 134
+  },
+  "egg_basket": {
+   "kind": "item",
+   "size_m": 0.32,
+   "tris": 520
+  }
+ },
+ "animations": {
+  "goat": [
+   {
+    "name": "goat_idle",
+    "seconds": 4.0,
+    "loop": true
+   },
+   {
+    "name": "goat_walk",
+    "seconds": 0.8,
+    "loop": true
+   },
+   {
+    "name": "goat_trot",
+    "seconds": 0.4,
+    "loop": true
+   },
+   {
+    "name": "goat_graze",
+    "seconds": 4.0,
+    "loop": true
+   },
+   {
+    "name": "goat_milk_stand",
+    "seconds": 3.0,
+    "loop": true
+   },
+   {
+    "name": "goat_lie",
+    "seconds": 4.0,
+    "loop": true
+   },
+   {
+    "name": "goat_bell",
+    "seconds": 1.2,
+    "loop": false
+   }
+  ]
+ },
+ "file_bytes": 763936
+}

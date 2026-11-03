@@ -1,0 +1,104 @@
+{
+ "nodes": {
+  "market_stall": {
+   "footprint": [
+    2,
+    1
+   ],
+   "top": 0.85,
+   "crate_spots": [
+    [
+     -0.69,
+     0.85,
+     0.17
+    ],
+    [
+     -0.23,
+     0.85,
+     0.17
+    ],
+    [
+     0.23,
+     0.85,
+     0.17
+    ],
+    [
+     0.69,
+     0.85,
+     0.17
+    ],
+    [
+     -0.46,
+     0.85,
+     -0.17
+    ],
+    [
+     0.46,
+     0.85,
+     -0.17
+    ]
+   ],
+   "scale_spot": [
+    0.0,
+    0.85,
+    -0.2
+   ],
+   "crate_model": "market_crate",
+   "seller_side": "-z",
+   "note": "clients devant (+Z), marchand derrière (-Z); 4 cagettes aux quatre premières places, 6 avec market_crates; balance à scale_spot",
+   "tris": 544
+  },
+  "market_stall_stored": {
+   "footprint": [
+    2,
+    1
+   ],
+   "against_wall": "-z",
+   "note": "dos (-Z) contre le mur de l'épicerie",
+   "tris": 500
+  },
+  "market_crate": {
+   "kind": "item",
+   "goods_height": 0.012,
+   "size": [
+    0.42,
+    0.3,
+    0.16
+   ],
+   "note": "cagette (objet de l'établi et place de l'étal)",
+   "tris": 156
+  },
+  "market_scale": {
+   "kind": "prop",
+   "on": "market_stall.scale_spot",
+   "tris": 316
+  },
+  "market_hall": {
+   "footprint": [
+    4,
+    3
+   ],
+   "same_origin_as": "market_stall",
+   "clear_height": 2.2,
+   "note": "poteaux aux quatre coins, hors des pieds de l'étal et du passage devant; sablières de 2,2 à 2,4 m (au-dessus des têtes)",
+   "tris": 1364
+  },
+  "blackberry_jam": {
+   "kind": "item",
+   "size_m": 0.09,
+   "tris": 190
+  },
+  "jar": {
+   "kind": "item",
+   "size_m": 0.09,
+   "tris": 112
+  },
+  "mail_bag": {
+   "kind": "prop",
+   "rest_height": 0.455,
+   "note": "sur l'assise du banc du quai (quay_bench), à plat",
+   "tris": 280
+  }
+ },
+ "file_bytes": 248592
+}
