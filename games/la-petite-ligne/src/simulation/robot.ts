@@ -4,6 +4,7 @@
  * n'est pas un mode de jeu. `p1` s'occupe surtout du potager, `p2` du bois;
  * les rendez-vous se font à deux.
  */
+import { questBaselines, questChecklist } from '../etat/quete';
 import { GRAIN_GIFT_FLAG, rationsNeeded } from './poules';
 import type { AuthoredIntent, ClickTarget, ControlFrame, Intent } from '../etat/actions';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
@@ -20,11 +21,12 @@ import { canPlace } from './amenagement';
 import { catalogueWindow, currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { unitDraw } from '../etat/tirage';
 import { holdsRod, waterAhead } from './peche';
+import { shadowVisibleTo } from '../etat/peche';
 import { toolKindOf } from './catalogue';
 import { inSowingSeason } from './potager';
 import { counterRemaining, evaluateAll, NO_CONTEXT, orderSatisfied } from './conditions';
 import { catalogueOffers } from '../etat/catalogue';
-import { improvementRemaining, improvementState, openImprovement } from './chantiers';
+import { improvementRemaining, improvementView, openImprovement } from './chantiers';
 import { freeSeatsNear, seatedSeconds } from './bancs';
 import type { Condition, MomentWatch } from '../donnees/types';
 import { benchById } from '../etat/bancs';
@@ -62,6 +64,10 @@ interface Memory {
    */
   beamBest?: { d: number; tick: number };
   beamDetour?: { until: number; tries: number };
+  /** Pas passés à se tourner vers une ombre avant de lancer (pêche visée d'une quête). */
+  aimTicks?: number;
+  /** Dernier pas où il a remonté sa ligne pour viser une autre ombre. */
+  reeledAt?: number;
 }
 
 export interface Robot {
@@ -548,7 +554,7 @@ function giveOdette(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
   const odette = sim.world.villagers.find((v) => v.id === 'odette');
   if (!odette?.visible) return false;
   const q = sim.world.quests.find((x) => x.id === 'welcome_supper');
-  const done = q?.checklist ?? [];
+  const done = q === undefined ? [] : questChecklist(q);
   const wants = [
     { item: 'radish', label: 0 },
     { item: 'lettuce', label: 1 },
@@ -660,15 +666,50 @@ function fishForOrder(sim: Sim, c: Character, m: Memory, f: { mx: number; my: nu
   if (toolIn(sim, c, 'fishing_rod') === null) return false;
   const atPontoon = missing.length > 0 && missing.every((d) => d.fish?.zones.includes('ford') !== true) && sim.map.points.fishing_pontoon !== undefined;
   const ford = pt(sim, atPontoon ? 'fishing_pontoon' : 'river_ford');
-  if (c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, atPontoon ? 'ponton' : 'gue', ford, 0.4, out) || true;
+  // Pêche 0.12: chaque ombre porte son poisson, et le gué n'a qu'une part des goujons (les autres
+  // nagent en amont et vers les sables). Une quête qui compte une espèce (le défi de Jeanne, trois
+  // goujons entre midi et 17 h) se fait comme un joueur: aller sur la berge face à une ombre de
+  // l'espèce, la viser, et remonter une ligne prise par une autre. À l'aveugle depuis le gué, le
+  // robot manquait la fenêtre (graine 31337, jours 13 et 14).
+  const species = questFishSpecies(sim);
+  const range = sim.content.settings.fishing?.castRange ?? 0;
+  const chase = c.fishing === null && species.size > 0 ? wantedShadowAnywhere(sim, c, species) : null;
+  let chasing = false;
+  if (chase !== null) {
+    if (distance(c.pos, chase.at) <= range - 1) chasing = true;
+    else if (goTo(sim, c, m, `ombre:${String(chase.id)}`, chase.stand, 0.4, out)) return true;
+  }
+  if (!chasing && c.fishing === null && distance(c.pos, ford) > 0.6) return goTo(sim, c, m, atPontoon ? 'ponton' : 'gue', ford, 0.4, out) || true;
   if (!holdsRod(sim, c)) return selectItem(c, toolIn(sim, c, 'fishing_rod') ?? ITEM.fishingRod, out) || true;
   m.job = 'pêcher';
   if (c.fishing?.phase === 'bite') {
     out.push({ type: 'act' });
     return true;
   }
-  if (c.fishing !== null) return true;
-  if (waterAhead(sim, c) === null) {
+  const target = species.size > 0 ? wantedShadowInReach(sim, c, species) : null;
+  if (c.fishing !== null) {
+    const hooked = c.fishing.shadow === undefined ? undefined : sim.world.fishing.shadows.find((s) => s.id === c.fishing?.shadow);
+    const calm = sim.world.tick - (m.reeledAt ?? -REEL_EVERY_TICKS) >= REEL_EVERY_TICKS;
+    if (calm && target !== null && hooked !== undefined && !species.has(hooked.fish)) {
+      // Remonter la ligne (rien n'est perdu) pour la relancer sur l'espèce cherchée; une fois par
+      // intervalle, sinon une autre ombre plus proche du bouchon ferait relancer sans fin.
+      out.push({ type: 'act' });
+      m.reeledAt = sim.world.tick;
+      m.waitUntil = sim.world.tick + 2;
+    }
+    return true;
+  }
+  const cone = ((sim.content.settings.fishing?.rules.shadows.assistConeDegrees ?? 20) * Math.PI) / 180;
+  if (target !== null && angleTo(c, target) > cone * 0.5 && (m.aimTicks ?? 0) < AIM_MAX_TICKS) {
+    // Un pas minuscule vers l'ombre suffit à se tourner vers elle (lancer assisté).
+    m.aimTicks = (m.aimTicks ?? 0) + 1;
+    const d = Math.max(1e-6, distance(c.pos, target));
+    f.mx = ((target.x - c.pos.x) / d) * 0.2;
+    f.my = ((target.y - c.pos.y) / d) * 0.2;
+    return true;
+  }
+  m.aimTicks = 0;
+  if (target === null && waterAhead(sim, c) === null) {
     // Un pas vers l'eau la plus proche suffit à se tourner vers elle.
     const water = nearestWater(sim, c.pos);
     if (water === null) return false;
@@ -694,7 +735,7 @@ interface OpenCounter {
 /** Les compteurs encore ouverts des étapes actives (et de leurs sous-conditions `all`). */
 function openCounters(sim: Sim): OpenCounter[] {
   const out: OpenCounter[] = [];
-  const walk = (conditions: readonly Condition[], baselines: Record<string, number>): void => {
+  const walk = (conditions: readonly Condition[], baselines: Readonly<Record<string, number>>): void => {
     for (const cond of conditions) {
       if (cond.type === 'all') walk(cond.conditions, baselines);
       if (cond.type !== 'counter') continue;
@@ -705,7 +746,7 @@ function openCounters(sim: Sim): OpenCounter[] {
   for (const q of sim.world.quests) {
     if (q.status !== 'active' || !AFTERNOON.has(q.id)) continue;
     const step = sim.content.quests.find((x) => x.id === q.id)?.steps[q.step];
-    if (step !== undefined) walk(step.conditions, q.baselines);
+    if (step !== undefined) walk(step.conditions, questBaselines(q));
   }
   return out;
 }
@@ -802,6 +843,67 @@ function wantsSeat(sim: Sim, c: Character): boolean {
 /** Un compteur ouvert attend-il ce poisson (`caught:<poisson>`, ou `caught` seul) ? */
 function questWantsFish(sim: Sim): boolean {
   return openCounters(sim).some((o) => o.key === 'caught' || o.key.startsWith('caught:'));
+}
+
+/** Pas au plus pour se tourner vers une ombre avant de lancer quand même. */
+const AIM_MAX_TICKS = SIM_HZ * 2;
+/** Au plus une ligne remontée par tel intervalle (pas) pour viser une autre ombre. */
+const REEL_EVERY_TICKS = SIM_HZ * 20;
+
+/** Les espèces que comptent les étapes ouvertes (`caught:gudgeon`), sans « n'importe quel poisson ». */
+function questFishSpecies(sim: Sim): Set<string> {
+  const out = new Set<string>();
+  for (const o of openCounters(sim)) if (o.key.startsWith('caught:')) out.add(o.key.slice('caught:'.length));
+  return out;
+}
+
+/**
+ * L'ombre libre d'une espèce cherchée la plus proche du robot, où qu'elle soit, et la case de
+ * berge la plus proche d'elle d'où la viser (à `castRange - 1,5` m au plus: le trajet s'arrête au
+ * centre d'une case). `null` sans ombre ni berge.
+ */
+function wantedShadowAnywhere(sim: Sim, c: Character, wanted: ReadonlySet<string>): { id: number; at: Vec2; stand: Vec2 } | null {
+  const range = (sim.content.settings.fishing?.castRange ?? 0) - 1.5;
+  const map = sim.map;
+  const b = blockersFor(sim, c.pos);
+  let best: { id: number; at: Vec2; stand: Vec2 } | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const s of sim.world.fishing.shadows) {
+    if (s.state !== 'free' || !wanted.has(s.fish) || !shadowVisibleTo(sim.world.fishing, s, c.id)) continue;
+    const d = distance(c.pos, s.pos);
+    if (d >= bestD) continue;
+    let stand: Vec2 | null = null;
+    let standD = range;
+    const r = Math.ceil(range);
+    for (let cy = Math.floor(s.pos.y) - r; cy <= Math.floor(s.pos.y) + r; cy++) {
+      for (let cx = Math.floor(s.pos.x) - r; cx <= Math.floor(s.pos.x) + r; cx++) {
+        if (isBlockedCell(b, cx, cy) || map.ground[cy * map.width + cx] === 'water') continue;
+        const sd = Math.hypot(cx + 0.5 - s.pos.x, cy + 0.5 - s.pos.y);
+        if (sd > standD) continue;
+        stand = { x: cx + 0.5, y: cy + 0.5 };
+        standD = sd;
+      }
+    }
+    if (stand === null) continue;
+    best = { id: s.id, at: s.pos, stand };
+    bestD = d;
+  }
+  return best;
+}
+
+/** Une ombre libre d'une espèce cherchée, à portée de lancer (la plus proche), visible du robot. */
+function wantedShadowInReach(sim: Sim, c: Character, wanted: ReadonlySet<string>): Vec2 | null {
+  const range = sim.content.settings.fishing?.castRange ?? 0;
+  let best: Vec2 | null = null;
+  let bestD = Number.POSITIVE_INFINITY;
+  for (const s of sim.world.fishing.shadows) {
+    if (s.state !== 'free' || !wanted.has(s.fish) || !shadowVisibleTo(sim.world.fishing, s, c.id)) continue;
+    const d = distance(c.pos, s.pos);
+    if (d < 0.5 || d > range || d >= bestD) continue;
+    best = s.pos;
+    bestD = d;
+  }
+  return best;
 }
 
 /** Donne à un habitant (intention `give`), en allant jusqu'à lui. */
@@ -1134,7 +1236,7 @@ function annonceNeed(sim: Sim, item: string): number {
   let need = 0;
   for (const cond of step.conditions) {
     if (cond.type !== 'counter' || !cond.key.endsWith(`:${item}`) || !cond.key.startsWith('given:')) continue;
-    need += Math.max(0, counterRemaining(sim, q.baselines, cond.key, cond.count, cond.since));
+    need += Math.max(0, counterRemaining(sim, questBaselines(q), cond.key, cond.count, cond.since));
   }
   return need;
 }
@@ -1218,8 +1320,8 @@ function fundImprovements(sim: Sim, c: Character, m: Memory, out: Intent[]): boo
   const s = sim.content.settings.improvements;
   if (s === null) return false;
   const home = openImprovement(sim, 'maisonnette');
-  if (home !== null && !improvementState(sim, home.id).funded && c.id === 'p2') {
-    const state = improvementState(sim, home.id);
+  if (home !== null && !improvementView(sim, home.id).funded && c.id === 'p2') {
+    const state = improvementView(sim, home.id);
     const spare = countInBag(c, 'plank') - Math.max(0, planksWanted(sim));
     const room = s.plankDiscountMax - state.planks;
     const remaining = improvementRemaining(sim, home);
@@ -1241,7 +1343,7 @@ function fundImprovements(sim: Sim, c: Character, m: Memory, out: Intent[]): boo
     }
   }
   const town = openImprovement(sim, 'bourg');
-  if (town === null || c.id !== 'p1' || improvementState(sim, town.id).funded) return false;
+  if (town === null || c.id !== 'p1' || improvementView(sim, town.id).funded) return false;
   const remaining = improvementRemaining(sim, town);
   const sum = Math.min(remaining, IMPROVEMENT_STEP);
   if (remaining <= 0 || sim.world.purse - IMPROVEMENT_KEEP < sum) return false;

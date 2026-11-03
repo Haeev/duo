@@ -350,9 +350,9 @@ export function updateFishing(sim: Sim, c: Character): void {
   }
   const tick = sim.world.tick;
   const shadow = line.shadow === undefined ? undefined : sim.world.fishing.shadows.find((s) => s.id === line.shadow);
-  if (shadow?.state === 'approach' && shadow.move !== null && tick >= shadow.move.until) {
+  if (shadow?.state === 'approach' && shadow.move !== undefined && tick >= shadow.move.until) {
     shadow.state = 'under';
-    shadow.move = null;
+    delete shadow.move;
     sim.runtime.changed = true;
   }
   if (line.phase === 'waiting' && tick >= line.biteAt) {

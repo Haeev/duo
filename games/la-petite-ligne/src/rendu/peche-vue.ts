@@ -121,10 +121,10 @@ export function createStateFishingSource(): FishingSource {
         shadow.roam = raw.roam;
         shadow.heading = raw.heading;
         shadow.phase = phase;
-        shadow.watchOnly = raw.watchOnly;
+        shadow.watchOnly = raw.watchOnly === true;
         shadowPosAt(raw, world.tick, shadow.pos);
         const line = raw.line;
-        const angler = line === null ? undefined : world.characters.find((c) => c.id === line);
+        const angler = line === undefined ? undefined : world.characters.find((c) => c.id === line);
         shadow.target = angler?.fishing?.bobber ?? null;
         shadows.push(shadow);
       }

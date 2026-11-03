@@ -200,8 +200,8 @@ export function notify(
       id: sim.world.nextId,
       kind,
       text,
-      hint: extra.hint ?? null,
-      proposal: extra.proposal ?? null,
+      ...(extra.hint === undefined ? {} : { hint: extra.hint }),
+      ...(extra.proposal === undefined ? {} : { proposal: extra.proposal }),
       key: extra.key ?? extra.hint ?? null,
       tick: sim.world.tick,
     };

@@ -45,6 +45,14 @@ const MIN_ROAM = 0.1;
 /** Deux ombres ne naissent pas plus près que ça l'une de l'autre (m). */
 const SHADOW_GAP = 1;
 
+/**
+ * Cap d'une ombre au millième de radian (0,06 degré): le rendu ne voit pas la différence, et
+ * l'état transmis à l'invité perd une douzaine de chiffres par ombre (0.12.1).
+ */
+function roundHeading(radians: number): number {
+  return Math.round(radians * 1000) / 1000;
+}
+
 function geometry(map: GameMap, minShore: number, castRange: number): ZoneGeometry {
   const known = GEOMETRY.get(map);
   if (known !== undefined) return known;
@@ -467,13 +475,11 @@ function spawnShadow(sim: Sim, zoneIndex: number, grand: ItemId | null, near: { 
     size: shadowSizeIn(zone.id, def.shadow),
     pos: { x: spot.x, y: spot.y },
     roam: Math.max(0, Math.min(rules.shadows.roam[rarity], spot.clear - rules.shadows.minShoreDistance)),
-    heading: unitDraw(world.seed, `${key}:cap`, world.clock.day) * Math.PI * 2,
-    move: null,
+    heading: roundHeading(unitDraw(world.seed, `${key}:cap`, world.clock.day) * Math.PI * 2),
     state: 'free',
-    line: null,
     born: tick,
     ends: grand !== null ? Number.MAX_SAFE_INTEGER : tick + secondsToTicks(draw(sim, `${key}:vie`, rules.shadows.lifeSeconds)),
-    watchOnly: rarity === 'mythic',
+    ...(rarity === 'mythic' ? { watchOnly: true as const } : {}),
   };
   world.fishing.shadows.push(shadow);
   sim.runtime.changed = true;
@@ -483,7 +489,7 @@ function spawnShadow(sim: Sim, zoneIndex: number, grand: ItemId | null, near: { 
 /** Fait partir une ombre (fin de vie: elle glisse vers le fond et s'efface). */
 function startLeaving(sim: Sim, s: FishShadow, seconds: number): void {
   s.state = 'leaving';
-  s.line = null;
+  delete s.line;
   s.ends = sim.world.tick + secondsToTicks(seconds);
   scheduleRespawn(sim, s.zone);
   sim.runtime.changed = true;
@@ -507,9 +513,9 @@ export function fleeShadow(sim: Sim, id: number, from: Vec2): void {
   while (run > 0 && !wet(run)) run = Math.max(0, run - 0.25);
   s.move = { from: at, since: tick, until: tick + secondsToTicks(rules.shadows.fleeSeconds) };
   s.pos = { x: at.x + Math.cos(away) * run, y: at.y + Math.sin(away) * run };
-  s.heading = away;
+  s.heading = roundHeading(away);
   s.state = 'fleeing';
-  s.line = null;
+  delete s.line;
   s.roam = 0;
   s.ends = s.move.until;
   scheduleRespawn(sim, s.zone);
@@ -539,14 +545,14 @@ export function releaseShadow(sim: Sim, id: number): void {
   let best: Spot | null = null;
   for (const sp of spots) if (best === null || Math.hypot(sp.x - at.x, sp.y - at.y) < Math.hypot(best.x - at.x, best.y - at.y)) best = sp;
   s.state = 'free';
-  s.line = null;
+  delete s.line;
   if (best !== null) {
     const d = Math.hypot(best.x - at.x, best.y - at.y);
     s.move = { from: at, since: tick, until: tick + secondsToTicks(d / rules.shadows.approachSpeed) };
     s.pos = { x: best.x, y: best.y };
     s.roam = Math.max(0, Math.min(rules.shadows.roam[s.rarity], best.clear - rules.shadows.minShoreDistance));
   }
-  if (s.watchOnly || s.rarity === 'legendary') s.ends = Number.MAX_SAFE_INTEGER;
+  if (s.watchOnly === true || s.rarity === 'legendary') s.ends = Number.MAX_SAFE_INTEGER;
   else s.ends = Math.max(s.ends, tick + secondsToTicks(rules.shadows.fadeSeconds * 5));
   sim.runtime.changed = true;
 }
@@ -646,7 +652,7 @@ export function attractShadow(sim: Sim, c: Character, bobber: Vec2): { shadow: F
   const d = Math.hypot(from.x - bobber.x, from.y - bobber.y);
   best.move = { from, since: tick, until: tick + secondsToTicks(d / rules.shadows.approachSpeed) };
   best.pos = { x: bobber.x, y: bobber.y };
-  best.heading = Math.atan2(bobber.y - from.y, bobber.x - from.x);
+  best.heading = roundHeading(Math.atan2(bobber.y - from.y, bobber.x - from.x));
   best.roam = 0;
   best.state = 'approach';
   best.line = c.id;
@@ -733,7 +739,7 @@ export function updateFishingWorld(sim: Sim): void {
     const z = f.zones[zone.id];
     if (near(rules.shadows.wakeRadius)) wakeZone(sim, zone.id);
     else if (z !== undefined && !near(rules.shadows.sleepRadius)) {
-      const busy = f.shadows.some((s) => s.zone === zone.id && s.line !== null);
+      const busy = f.shadows.some((s) => s.zone === zone.id && s.line !== undefined);
       if (busy) return;
       if (z.sleepAt === null) {
         z.sleepAt = tick + secondsToTicks(rules.shadows.sleepAfterSeconds);

@@ -94,7 +94,7 @@ export class MarketPart implements RenderPart {
     const world = context.world;
     if (this.bag !== null) {
       const mail = world.mail;
-      this.bag.visible = mail?.day === world.clock.day && mail.items.some((p) => !p.taken);
+      this.bag.visible = mail?.day === world.clock.day && mail.items.some((p) => p.taken !== true);
     }
     if (this.stall === null) return;
     const shown = stallSetUp(this.content, world);

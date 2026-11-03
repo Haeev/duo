@@ -205,6 +205,12 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-11-03, patch 0.12.1: taille de l'état, format de sauvegarde 13, robot du défi de Jeanne (dev gameplay 3D)
+
+- Taille de l'état transmis à l'invité (alerte de `tests/endurance.test.ts`, 35 Kio, non relevée): les valeurs par défaut ne s'écrivent plus. Plis de Lucie sans sorte pour une lettre (`pliKind`) ni `taken` et `delivered` faux; quêtes sans liste à cocher ni valeurs de départ vides (`etat/quete.ts`); notifications sans `hint` ni `proposal` nuls; séjours près des points sans zéro; chantiers jamais commencés absents (`improvementView`); ombres des poissons sans `move`, `line` ni `watchOnly` par défaut, cap au millième. Format de sauvegarde 13, migration `migrateToFormat13` (`tests/format-13.test.ts`, depuis les formats 12 et 11), 4 références `format-13-*.json`.
+- Défi de Jeanne (graine 31337): la quête restait possible; c'est le robot qui pêchait à l'aveugle au gué, où les goujons sont rares depuis la pêche 0.12. Il vise maintenant les ombres de l'espèce comptée par une étape ouverte (berge face à l'ombre, lancer assisté, ligne remontée si une autre espèce l'a prise).
+- Reste à surveiller: la sacoche de Lucie garde les plis non livrés d'un jour sur l'autre (30 plis au jour 13, 62 au jour 25 quand personne ne livre), premier poste qui grandit avec la partie.
+
 ## 2026-11-03, 0.12 lots L-monnaie et L-économie: l'aubrin, les prix d'Odette, le marché du dimanche, les plis de Lucie (dev gameplay 3D)
 
 Conception: `docs/jeux/jeu-1/v0-12-conception.md`, sections 1, 2, 3 et 6 (lots L-monnaie et L-économie).

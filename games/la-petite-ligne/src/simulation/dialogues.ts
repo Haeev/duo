@@ -2,6 +2,7 @@
  * Conversations (chacun la sienne, SI-06) et scènes à deux (HA-08), d'après
  * `habitants.json` et la section 2.3 du README des données.
  */
+import { questBaselines } from '../etat/quete';
 import { dialogueDone } from '../etat/dialogues-faits';
 import type { Character, CharacterId, DialogueChoiceView, DialogueLineView, VillagerState } from '../etat/types';
 import type { Condition, Content, DialogueDef } from '../donnees/types';
@@ -272,7 +273,7 @@ function giveChoices(sim: Sim, c: Character, villager: string): DialogueChoiceVi
       if (parts[0] !== 'given' || parts[1] !== villager || parts[2] === undefined) continue;
       const item = parts[2];
       const offer = sim.content.items[item]?.category === 'gift' ? uiText(sim, 'offer') : null;
-      const given = (sim.world.counters.duo[cond.key] ?? 0) - (state.baselines[`duo:${cond.key}`] ?? 0);
+      const given = (sim.world.counters.duo[cond.key] ?? 0) - (questBaselines(state)[`duo:${cond.key}`] ?? 0);
       const remaining = cond.count - given;
       const have = countInBag(c, item);
       const n = Math.min(remaining, have);

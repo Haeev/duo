@@ -271,7 +271,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     memories: emptyMemories(),
     sharedEnvieRecent: [],
     board: emptyBoard(),
-    improvements: emptyImprovements({ content }),
+    improvements: emptyImprovements(),
     catalogueBought: {},
     giftsGiven: {},
     rooms: {},

@@ -105,7 +105,7 @@ describe('ombres (S2)', () => {
     tick(sim, 1);
     for (let t = 0; t < 10 * 60 * SIM_HZ; t++) {
       tick(sim, 1);
-      const live = sim.world.fishing.shadows.filter((s) => s.zone === 'pontoon' && s.state !== 'leaving' && s.state !== 'fleeing' && s.rarity !== 'legendary' && !s.watchOnly);
+      const live = sim.world.fishing.shadows.filter((s) => s.zone === 'pontoon' && s.state !== 'leaving' && s.state !== 'fleeing' && s.rarity !== 'legendary' && s.watchOnly !== true);
       fewest = Math.min(fewest, live.length);
       if (live.length < want) {
         missingSince ??= sim.world.tick;

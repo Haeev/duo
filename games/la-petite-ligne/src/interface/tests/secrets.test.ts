@@ -170,7 +170,7 @@ describe('appeler une poule', () => {
 
 describe('style des notifications des moments et des secrets', () => {
   const ctx = uiContext('p1');
-  const n = (key: string): GameNotification => ({ id: 1, kind: 'message', text: ctx.texts.messages[key] ?? key, key, proposal: null, hint: null, tick: 0 });
+  const n = (key: string): GameNotification => ({ id: 1, kind: 'message', text: ctx.texts.messages[key] ?? key, key, tick: 0 });
   it('apogée vue à deux, confidence et coup de coude à voix basse', () => {
     expect(toastVisual(n('heron_seen'), ctx.texts.messages).variant).toBe('moment');
     expect(toastVisual(n('moment_tits_climax'), ctx.texts.messages).variant).toBe('moment');
