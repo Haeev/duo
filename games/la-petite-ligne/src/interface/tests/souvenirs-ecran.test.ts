@@ -134,10 +134,19 @@ describe.skipIf(executable === undefined)(
               null,
           );
         expect(await selected()).toBe('quests');
-        for (let i = 0; i < 3; i++) {
+        // E passe à l'onglet suivant, dans l'ordre de la page (0.12: « Poissons » avant « Souvenirs »).
+        const tabs = await page.evaluate(() =>
+          [...document.querySelectorAll('.lpl-tab')].map((t) => t.getAttribute('data-tab')),
+        );
+        const target = tabs.indexOf('memories');
+        expect(target).toBeGreaterThan(0);
+        const seen: (string | null)[] = [];
+        for (let i = 1; i <= target; i++) {
           await page.keyboard.press('KeyE');
           await page.waitForTimeout(150);
+          seen.push(await selected());
         }
+        expect(seen).toEqual(tabs.slice(1, target + 1));
         expect(await selected()).toBe('memories');
         await page.waitForTimeout(200);
         const focused = (): Promise<string | null> =>
@@ -149,9 +158,10 @@ describe.skipIf(executable === undefined)(
         const second = await focused();
         expect(second).toMatch(/^(moment|secret):/);
         expect(second).not.toBe(first);
+        // Q revient à l'onglet d'avant (0.12: « Poissons »).
         await page.keyboard.press('KeyQ');
         await page.waitForTimeout(150);
-        expect(await selected()).toBe('bag');
+        expect(await selected()).toBe(tabs[target - 1]);
         await page.click('.lpl-tab[data-tab="memories"]');
         await page.waitForTimeout(150);
         expect(await selected()).toBe('memories');

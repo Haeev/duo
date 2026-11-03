@@ -18,6 +18,11 @@ import { createRobot, newSim } from './aides';
 const MAX_REPEAT_SHARE = 0.1;
 /** Entrées et sorties de la maison par jour et par robot (la recette en relevait 900). */
 const MAX_DOOR_CROSSINGS = 60;
+/**
+ * Borne de la partie des robots (pas de simulation): la démo doit aller au bout. Depuis la journée
+ * doublée (0,7 s par minute de jeu), 15 jours dépassent 4 h de simulation; 2 h coupaient au jour 10.
+ */
+const MAX_TICKS = SIM_HZ * 60 * 60 * 8;
 
 interface Measure {
   conversations: number;
@@ -35,7 +40,7 @@ function measure(seed: number): Measure {
   const out: Measure = { conversations: 0, repeats: 0, avoidable: 0, doorPerDay: new Map(), sim };
   let talkedOn = 0;
   const inside = sim.world.characters.map((c) => isHome(c));
-  while (sim.world.phase !== 'ended' && sim.world.tick < SIM_HZ * 60 * 120) {
+  while (sim.world.phase !== 'ended' && sim.world.tick < MAX_TICKS) {
     step(sim, robot.decide(sim));
     const w = sim.world;
     w.characters.forEach((c, i) => {
@@ -68,6 +73,9 @@ describe('contenu et rythme', () => {
   const run = measure(20261030);
 
   it(`redites du quotidien sous ${String(MAX_REPEAT_SHARE * 100)} % (une conversation par habitant et par jour)`, () => {
+    // Mesure sur toute la démo, jusqu'à l'écran de fin du jour 15.
+    expect(run.sim.world.phase).toBe('ended');
+    expect(run.sim.world.stages.current).toBe('demo');
     expect(run.conversations).toBeGreaterThan(40);
     const share = run.repeats / run.conversations;
     expect(share, `${String(run.repeats)} redites sur ${String(run.conversations)}`).toBeLessThan(MAX_REPEAT_SHARE);

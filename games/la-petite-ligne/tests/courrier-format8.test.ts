@@ -30,7 +30,7 @@ function read(file: string): Snapshot {
 const bytes = (value: unknown): number => Buffer.byteLength(JSON.stringify(value), 'utf8');
 
 describe('courrier du format 8', () => {
-  it('le format en cours est le 8', () => {
+  it('le format en cours contient le 8 (lettres sans texte rendu)', () => {
     expect(DATA_SCHEMA).toBeGreaterThanOrEqual(8);
     expect(FORMAT_7.length).toBeGreaterThanOrEqual(5);
   });
@@ -80,12 +80,19 @@ describe('courrier du format 8', () => {
     const ref = read('format-7-automne-jour-62.json');
     const before = bytes(ref.data);
     const sim = restoreWorld(content, map, decodeSave(structuredClone(ref.data)), ref.dataSchema, [A, B]);
-    const after = bytes(snapshotOf(sim).data);
-    // Mesuré: 49 748 octets au format 7, 43 303 au format 8. Le pire du robot assidu (jour 71, borne
-    // I-06 de 52 000) est mesuré par le robot longue vie (`pnpm test:longue-vie`).
+    const now = snapshotOf(sim).data as unknown as Record<string, unknown>;
+    // Le gain du format 8 se mesure sur les seuls champs qu'il compacte, migrés, le reste tel qu'au
+    // format 7: les formats suivants ajoutent leur poids (petits objets du 9, pêche du 10, garde-robe
+    // des personnages du 11) sans rien dire du courrier.
+    const compacted = ['letters', 'dialoguesDone', 'quests'];
+    const after = bytes({ ...ref.data, ...Object.fromEntries(compacted.map((k) => [k, now[k]])) });
+    // Mesuré: 49 748 octets au format 7, 43 495 après le format 8 (lettres -4 302, dialogues -1 053,
+    // quêtes -898). État complet: 43 303 au format 8, 44 238 au format 11. Le pire du robot assidu
+    // (jour 71, borne I-06 de 52 000) est mesuré par le robot longue vie (`pnpm test:longue-vie`).
     expect(before).toBe(49_748);
     expect(before - after).toBeGreaterThan(6000);
     expect(after).toBeLessThan(44_000);
+    expect(bytes(now)).toBeLessThan(52_000);
   });
 
   it('une lettre que les données ne redonnent plus garde son texte d’origine', () => {

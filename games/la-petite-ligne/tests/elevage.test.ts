@@ -1,6 +1,6 @@
 // Élevage de la 0.12 (conception section 4, critères CA-L1 à CA-L8 du lot L-élevage): bonheur des
 // poules avec plancher, grain, couvée de sept nuits, chèvre au piquet loin de la voie, traite seul ou
-// à deux, noms à tour de rôle, migration du format 8 vers le format courant, contrat des quêtes.
+// à deux, noms à tour de rôle, migration des formats 8 et 11 vers le format courant, contrat des quêtes.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -28,8 +28,8 @@ const A = { id: 'membre-a', name: 'Camille', color: '#e07a5f' };
 const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
 const REFERENCE = 'format-8-ete-jour-25.json';
 
-function reference(): { dataSchema: number; data: unknown } {
-  const url = new URL(`./donnees/sauvegardes/${REFERENCE}`, import.meta.url);
+function reference(file = REFERENCE): { dataSchema: number; data: unknown } {
+  const url = new URL(`./donnees/sauvegardes/${file}`, import.meta.url);
   return JSON.parse(readFileSync(fileURLToPath(url), 'utf8')) as {
     dataSchema: number;
     data: unknown;
@@ -54,36 +54,50 @@ function frame(actHeld: boolean): ControlFrame {
 }
 
 describe('élevage de la 0.12', () => {
-  it('CA-L8: une sauvegarde du format 8 passe au 9 sans perte, poules à 60, un sac de grain au cellier', () => {
-    const ref = reference();
-    const before = ref.data as {
-      hens: { id: string; name: string }[];
-      purse: number;
-      cellar: { item: string }[];
-    };
-    const sim = load();
-    expect(DATA_SCHEMA).toBe(13);
-    expect(sim.world.hens.map((h) => [h.id, h.name])).toEqual(
-      before.hens.map((h) => [h.id, h.name]),
-    );
-    expect(sim.world.hens.every((h) => h.happiness === 60)).toBe(true);
-    expect(sim.world.purse).toBe(before.purse);
-    expect(sim.world.breeding.goats).toEqual([]);
-    expect(sim.world.breeding.rooster).toBeNull();
-    expect(sim.world.cellar.some((s) => s.item === 'grain_sack')).toBe(true);
-    expect(sim.world.unlockedRecipes).toContain('cook_fresh_cheese');
-    // Relue au format courant, elle redonne le même élevage.
-    const again = restoreWorld(
-      sim.content,
-      sim.map,
-      JSON.parse(JSON.stringify(snapshotOf(sim).data)) as unknown,
-      DATA_SCHEMA,
-      [A, B],
-    );
-    expect(again.world.hens.map((h) => h.happiness)).toEqual(
-      sim.world.hens.map((h) => h.happiness),
-    );
-  });
+  // Le format 11 précède l'élevage (format 12); le format 8 prouve la chaîne entière des migrations.
+  it.each([
+    [REFERENCE, 8],
+    ['format-11-ete-jour-25.json', 11],
+  ])(
+    'CA-L8: %s (format %i) passe au format courant sans perte, poules à 60, un sac de grain au cellier',
+    (file, schema) => {
+      const ref = reference(file);
+      expect(ref.dataSchema).toBe(schema);
+      const before = ref.data as {
+        hens: { id: string; name: string; happiness?: number }[];
+        purse: number;
+        cellar: { item: string }[];
+      };
+      expect('breeding' in (ref.data as Record<string, unknown>)).toBe(false);
+      expect(before.hens.length).toBeGreaterThan(0);
+      expect(before.hens.every((h) => h.happiness === undefined)).toBe(true);
+      const { content, map } = contentAndMap();
+      const sim = restoreWorld(content, map, decodeSave(ref.data), ref.dataSchema, [A, B]);
+      expect(DATA_SCHEMA).toBeGreaterThanOrEqual(12);
+      expect(sim.world.hens.map((h) => [h.id, h.name])).toEqual(
+        before.hens.map((h) => [h.id, h.name]),
+      );
+      expect(sim.world.hens.every((h) => h.happiness === 60)).toBe(true);
+      expect(sim.world.purse).toBe(before.purse);
+      expect(sim.world.breeding.goats).toEqual([]);
+      expect(sim.world.breeding.rooster).toBeNull();
+      expect(sim.world.cellar.some((s) => s.item === 'grain_sack')).toBe(true);
+      expect(sim.world.unlockedRecipes).toContain('cook_fresh_cheese');
+      // Écrite au format courant et relue à ce format, elle redonne le même élevage.
+      const snap = snapshotOf(sim);
+      expect(snap.dataSchema).toBe(DATA_SCHEMA);
+      const again = restoreWorld(
+        sim.content,
+        sim.map,
+        JSON.parse(JSON.stringify(snap.data)) as unknown,
+        snap.dataSchema,
+        [A, B],
+      );
+      expect(again.world.hens.map((h) => h.happiness)).toEqual(
+        sim.world.hens.map((h) => h.happiness),
+      );
+    },
+  );
 
   it('CA-L1 et CA-L2: nourrie seulement, une poule garde son bonheur; sans aucun soin, ni poule ni chèvre ne descend sous 30', () => {
     const sim = load();

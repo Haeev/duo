@@ -389,3 +389,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Le point `sawmill_workbench` est la place devant l'établi: pour regarder l'établi, viser l'objet de la carte du même nom (`map.props`).
 - Invité: `predictedFacing` restait celui de la dernière marche tant que le joueur ne bougeait pas; l'hôte qui tourne le personnage vers une action n'était pas vu chez lui. Reprendre le cap de l'hôte quand plus aucun pas en attente ne bouge.
 - Page de rendu: `lplRendu.world()` et `lplRendu.emit()` permettent de poser une action (`since` recalé après le premier `advance`) et de faire des planches par action en mode `manuel=1`. Avec `vie=0`, la page remet une marche à l'arrêt: pour la marche, laisser la promenade (`vie=1`).
+
+## Tests de format de sauvegarde (La Petite Ligne, vérifié le 2026-11-03)
+
+- Un test de migration compare à `DATA_SCHEMA` (jamais un numéro en dur) et relit l'instantané avec `snap.dataSchema`: relire une sauvegarde du format courant en déclarant un ancien format rejoue les migrations (celle du 8 refuse alors les lettres sans texte: « sauvegarde: lettre invalide »).
+- Sauvegarde volontairement abîmée: l'écrire au format courant (aucune migration ne passe avant `checkWorld`) et attendre le message exact du contrôle visé (`/sauvegarde: pièce invalide/`).
+- Gain de taille d'un format: le mesurer sur les seuls champs qu'il change, le reste tel que la référence d'origine; les formats suivants ajoutent aussi du poids dans des champs anciens (garde-robe dans `characters`).
+- Une migration testée depuis le format juste avant elle, et depuis un plus ancien pour la chaîne entière (`it.each` sur les deux références).
+- `generer.ts` saute un fichier existant: un fichier vide à la place de la référence la plus longue (jour 62) la saute sans toucher au script; le supprimer après. Quatre références du format 12: 3 min 30 (charge 8 à 15).
+- `nextObjective` (`interface/modele.ts`): la commande du samedi ne passe devant les quêtes principales qu'à partir de la veille (`day >= lastDay - 1`); une quête principale ajoutée au contenu change le « prochain objectif » des tests d'écran.
+- Filtre de références par préfixe: `startsWith('format-1')` prend aussi les formats 10 et suivants; écrire `format-1-`.
+- Un test qui joue « toute la démo » doit le vérifier (`phase === 'ended'`, `stages.current === 'demo'`): une borne de pas trop courte (journée doublée le 2026-11-01, 0,7 s par minute) ou un robot coincé coupe la mesure en silence.
+- Robot et charge à deux: le chemin de la grille ignore la largeur de la charge, qui garde son orientation; l'étal du marché porté de travers restait coincé devant l'établi de Basile jusqu'à minuit (horloge arrêtée `midnight`, partie bloquée). Détour du robot après 20 s sans rapprochement (`beamDetour`). Sonde: rejouer jusqu'au pas, puis sur des copies (`wrapWorld(content, map, structuredClone(world))`) pousser 3 s dans chacune des huit directions.
