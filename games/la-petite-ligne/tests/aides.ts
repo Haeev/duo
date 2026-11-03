@@ -9,6 +9,7 @@ import type { GameMap } from '../src/etat/carte';
 import { letterText, letterTitle } from '../src/etat/courrier';
 import type { Letter } from '../src/etat/types';
 import type { Sim } from '../src/simulation/contexte';
+import { placeVillagers } from '../src/simulation/habitants';
 import { createWorld } from '../src/simulation/monde';
 import { step } from '../src/simulation/pas';
 import { createRobot, type Robot } from '../src/simulation/robot';
@@ -82,4 +83,16 @@ export function letterTextOf(sim: Sim, letter: Letter | undefined): string {
 /** Titre d'une lettre tel que le carnet l'affiche; `''` si absente. */
 export function letterTitleOf(sim: Sim, letter: Letter | undefined): string {
   return letter === undefined ? '' : letterTitle(sim.content, letter);
+}
+
+/**
+ * R20 (0.12.2): l'échelle de Basile ne part que Basile arrêté à son point. Pour un monde truqué du
+ * jour 1 (quête `basile_lost` poussée à la main), le toit est posé, sans quoi son emploi du temps
+ * du jour 1 le garde à la poutre, puis chacun est placé à son point de l'heure.
+ */
+export function parkBasile(sim: Sim): void {
+  const roof = sim.world.constructions.find((k) => k.id === 'house_roof');
+  if (roof !== undefined) roof.status = 'done';
+  sim.runtime.dynamicDirty = true;
+  placeVillagers(sim);
 }

@@ -133,6 +133,27 @@ export function storeAtHome(sim: Sim, item: string, quality: Quality, count: num
 }
 
 /**
+ * Plusieurs piles rentrées d'un coup (fermeture de l'étal, R18): comme `storeAtHome`, rien ne se
+ * perd, mais sans message; l'appelant dit lui-même combien d'objets sont rentrés et où.
+ */
+export function storeStacksAtHome(sim: Sim, stacks: readonly ItemStack[]): { stored: number; ground: number } {
+  let stored = 0;
+  let ground = 0;
+  for (const s of stacks) {
+    if (s.count <= 0) continue;
+    const left = storeHere(sim, s.item, s.quality, s.count);
+    stored += s.count - left;
+    if (left > 0) {
+      const at = storageFoot(sim);
+      dropAt(sim, at.x, at.y, s.item, s.quality, left);
+      ground += left;
+    }
+  }
+  if (stored + ground > 0) sim.runtime.changed = true;
+  return { stored, ground };
+}
+
+/**
  * Déposer ou reprendre au rangement (panneau ouvert près d'un meuble de rangement): un outil va au
  * râtelier et en revient. Plein: refus doux `storage_full`; qui déborde: on reprend, on ne dépose
  * pas (`storage_overflow`). Renvoie le nombre d'unités déplacées.

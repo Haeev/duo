@@ -7,7 +7,7 @@
  */
 import type { Content, MomentActorDef, MomentChoreography, MomentDef, MomentFreeze, MomentKeyframe, MomentWatch } from '../donnees/types';
 import type { GameMap } from './carte';
-import { SIM_HZ, type DeepReadonly, type MomentToday } from './types';
+import { SIM_HZ, type DeepReadonly, type MomentToday, type ReadonlyWorld } from './types';
 import { unitDraw } from './tirage';
 
 export interface Vec3 {
@@ -45,6 +45,28 @@ export function armedCells(content: Pick<Content, 'moments'>, today: DeepReadonl
 
 export function momentDef(content: Content, id: string): MomentDef | null {
   return content.moments.find((m) => m.id === id) ?? null;
+}
+
+/**
+ * Places à tenir que le rendu marque au sol (R20, 0.12.2: l'échelle de Basile): le moment attend
+ * qu'on les tienne, dans sa fenêtre, et l'étape de quête qui l'attend est en cours. Une place
+ * déjà tenue n'est plus marquée.
+ */
+export function holdPlacesToMark(content: Content, world: ReadonlyWorld): string[] {
+  const today = world.moments.today;
+  if (today?.phase !== 'waiting') return [];
+  const def = momentDef(content, today.id);
+  if (def === null) return [];
+  const places = activeWatch(def, today).hold;
+  const m = world.clock.minutes;
+  if (places === null || m < def.window.from || m >= def.window.to) return [];
+  if (today.origin === 'quest' && def.quest !== null) {
+    const state = world.quests.find((q) => q.id === def.quest);
+    if (state?.status !== 'active') return [];
+    const step = content.quests.find((q) => q.id === def.quest)?.steps[state.step]?.id;
+    if (def.questStep !== null && step !== def.questStep) return [];
+  }
+  return places.filter((p) => !world.characters.some((c) => c.holding === p));
 }
 
 function catmull(p0: number, p1: number, p2: number, p3: number, u: number): number {

@@ -19,7 +19,7 @@ import { parseCatalogue } from '../src/audio/catalogue';
 import { MomentSounds } from '../src/audio/moments';
 import { AUDIO_SETTINGS } from '../src/audio/reglages';
 import { step } from '../src/simulation/pas';
-import { contentAndMap, createRobot, newSim, play } from './aides';
+import { contentAndMap, createRobot, newSim, parkBasile, play } from './aides';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -182,6 +182,9 @@ describe('QA6-06: l’échelle lâchée pour de bon ne fige pas l’apogée jusq
     const today = setMoment(sim, 'ladder', 13 * 60);
     today.origin = 'quest';
     sim.world.clock.running = false;
+    // R20 (0.12.2): Basile ne grimpe qu'arrêté au pied de son échelle. Le toit posé (le jour 1, il
+    // attend sinon à la poutre), son emploi du temps de la quête l'y met; placé là d'emblée.
+    parkBasile(sim);
     placeCharacter(sim, character(sim, 'p1'), { x: 50.5, y: 7.3 });
     placeCharacter(sim, character(sim, 'p2'), { x: 52.3, y: 5.5 });
     for (const by of ['p1', 'p2'] as const) step(sim, { controls: { p1: still(0), p2: still(0) }, intents: [{ by, intent: { type: 'act' } }] });

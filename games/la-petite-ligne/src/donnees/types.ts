@@ -609,9 +609,11 @@ export interface MomentDef {
   sounds: { idle: { id: string; everySeconds: [number, number]; range: number }[] };
   /**
    * Clés de `textes.json`. `rumor`: la rumeur du bourg (onglet Souvenirs), `null` si le moment
-   * n'en a pas (l'échelle); `vignette`: texte de remplacement de la vignette.
+   * n'en a pas (l'échelle); `vignette`: texte de remplacement de la vignette; `missed` (0.12.2):
+   * dit aux deux quand un moment de quête attendu (étape en cours) s'en va sans apogée, il
+   * revient le lendemain (`null`: rien).
    */
-  texts: { hint: string | null; climax: string; memory: string; rumor: string | null; vignette: string | null };
+  texts: { hint: string | null; climax: string; memory: string; rumor: string | null; vignette: string | null; missed: string | null };
   /** Vignette du souvenir: symbole du sprite des icônes (`null`: vignette générique). */
   vignette: string | null;
   hintFrom: string | null;

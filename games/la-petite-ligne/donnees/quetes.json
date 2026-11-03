@@ -470,11 +470,20 @@
         {
           "id": "find",
           "objective": "Basile n'est pas à la scierie cet après-midi. Le trouver.",
-          "conditions": [{ "type": "dialogue_done", "dialogue": "basile_lost_found" }]
+          "conditions": [
+            {
+              "type": "any",
+              "conditions": [
+                { "type": "dialogue_done", "dialogue": "basile_lost_found" },
+                { "type": "dialogue_done", "dialogue": "basile_lost_found_morning" },
+                { "type": "dialogue_done", "dialogue": "basile_lost_found_late" }
+              ]
+            }
+          ]
         },
         {
           "id": "help",
-          "objective": "Tenir à deux l'échelle de Basile, de part et d'autre, au grand chêne près de la remise.",
+          "objective": "Tenir à deux l'échelle de Basile, de part et d'autre, au grand chêne près de la remise. Il y grimpe entre midi et 18 h.",
           "conditions": [{ "type": "moment_seen", "moment": "ladder" }]
         }
       ],

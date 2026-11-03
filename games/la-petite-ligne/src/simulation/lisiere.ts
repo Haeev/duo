@@ -33,6 +33,15 @@ export function morningTrees(sim: Sim): void {
   if (changed) sim.runtime.dynamicDirty = true;
 }
 
+/**
+ * Au chargement (R19, 0.12.2): la repousse plus rapide rend adultes, dès la reprise, des souches
+ * d'une sauvegarde faite sous l'ancienne règle. Elles se relèvent tout de suite, comme au matin:
+ * sinon elles resteraient jusqu'au lendemain des souches qui bloquent leur case sans se couper.
+ */
+export function settleRegrownTrees(sim: Sim): void {
+  morningTrees(sim);
+}
+
 /** Une souche ou un rejet (un arbre abattu qui n'est pas redevenu adulte). */
 export function treeStage(sim: Sim, tree: Tree): 'adult' | 'stump' | 'sapling' {
   return treeGrowth(sim.content.settings.trees, tree, sim.world.clock.day).stage;

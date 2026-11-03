@@ -530,6 +530,28 @@ function armMoment(sim: Sim, def: MomentDef, today: MomentToday, w: MomentWatch)
   }
 }
 
+/** Écart toléré (m) entre un habitant acteur et son point d'attente: il y arrive exactement. */
+const VILLAGER_AT_REST = 0.05;
+
+/**
+ * Le premier habitant acteur du moment (Basile) qui n'est pas encore arrêté à son point
+ * d'attente, ou `null` quand tous y sont: l'apogée part de ce point. Un habitant que son emploi
+ * du temps envoie là mais qui ne peut plus avancer (trajet introuvable) ne bloque pas la quête.
+ */
+function villagerAway(sim: Sim, def: MomentDef): string | null {
+  for (const actor of def.actors) {
+    if (actor.villager === null) continue;
+    const v = sim.world.villagers.find((x) => x.id === actor.villager);
+    if (v === undefined) continue;
+    const rest = restPosition(sim.map, actor);
+    const route = sim.runtime.villagerPaths[v.id];
+    const walking = route === undefined || route.path.length > 0;
+    const there = Math.hypot(v.pos.x - rest.x, v.pos.y - rest.y) <= VILLAGER_AT_REST;
+    if (!v.visible || walking || (!there && v.target !== actor.at)) return v.id;
+  }
+  return null;
+}
+
 /** Retours pendant l'attente: la part de chacun, l'invitation à appeler l'autre, la timidité. */
 function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
   const { world } = sim;
@@ -564,8 +586,20 @@ function updateWaiting(sim: Sim, def: MomentDef, today: MomentToday): void {
     today.early = early;
     sim.runtime.changed = true;
   }
+  // R20 (0.12.2): Basile ne grimpe qu'une fois rendu au pied de son échelle; avant, il ne
+  // sautait pas de son trajet sur l'échelle, mais l'apogée le faisait apparaître là d'un coup.
+  const away = both && inWindow ? villagerAway(sim, def) : null;
+  if (away !== null) {
+    const told = (today.told ??= []);
+    const id = `wait:${away}`;
+    if (!told.includes(id)) {
+      told.push(id);
+      const villager = sim.content.villagers.find((v) => v.id === away)?.label ?? away;
+      sayIfWritten(sim, 'both', 'moment_wait_villager', { villager });
+    }
+  }
   // Aux aguets (la chevrette): le compteur ne tourne que pendant un regard. Les lanternes: pas de compteur.
-  if (both && inWindow && !hidden && w.syncPress === null && (freeze === null || freeze.kind === 'look')) {
+  if (both && inWindow && away === null && !hidden && w.syncPress === null && (freeze === null || freeze.kind === 'look')) {
     today.watchTicks += 1;
     sim.runtime.changed = true;
   } else if (today.watchTicks !== 0) {
@@ -758,8 +792,11 @@ export function updateMoments(sim: Sim): void {
       const w = activeWatch(def, today);
       const closesAtWindow = w.syncPress !== null || (w.arm !== null && (today.armedTick ?? null) === null);
       if (today.origin === 'quest' && questState(sim, def.quest)?.status !== 'active') enter(sim, today, 'gone');
-      else if (m >= def.present.to || (closesAtWindow && m >= def.window.to)) leaveNow(sim, def, today);
-      else updateWaiting(sim, def, today);
+      else if (m >= def.present.to || (closesAtWindow && m >= def.window.to)) {
+        // R20 (0.12.2): l'étape attendue reste ouverte, le moment revient demain; on le dit.
+        if (today.origin === 'quest' && questStepReady(sim, def, today) && def.texts.missed !== null) say(sim, 'both', def.texts.missed);
+        leaveNow(sim, def, today);
+      } else updateWaiting(sim, def, today);
       break;
     }
     case 'climax': {
