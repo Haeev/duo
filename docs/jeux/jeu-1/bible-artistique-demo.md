@@ -178,7 +178,7 @@ La grille de la simulation (cases d'un mètre franchissables ou non) ne change p
 
 ### 8.8 Budgets pour le PC de référence (Intel UHD 620)
 
-Mise à jour du 2026-11-03 (retour du client: la version Windows tourne très fluide sur le PC de référence, « on peut pousser les graphismes plus loin »): nouveaux plafonds du plan le plus chargé, **350 000 triangles et 200 appels de dessin**, programmes inchangés (12 au plus), la qualité adaptative (résolution puis ombres) restant le filet de sécurité. Le joueur habillé de pied en cap peut monter à 4 500 triangles. Les chiffres ci-dessous sont l'historique.
+Mise à jour du 2026-11-03 (retour du client: la version Windows tourne très fluide sur le PC de référence, « on peut pousser les graphismes plus loin »): nouveaux plafonds du plan le plus chargé, **350 000 triangles et 200 appels de dessin**, programmes inchangés (12 au plus), la qualité adaptative (résolution puis ombres) restant le filet de sécurité. Le joueur habillé de pied en cap peut monter à 4 800 triangles. Les chiffres ci-dessous sont l'historique.
 
 Plafond de la plateforme: 250 000 triangles et 150 appels de dessin à l'écran. Mesure du tour 1 du gauntlet: 130 000 à 207 000 triangles selon le plan, dont environ 70 000 pour les modèles de la carte et le reste pour le terrain et la végétation semée par le rendu. La marge est donc mince: le low poly arrondi doit tenir **225 000 triangles au plus dans le plan le plus chargé** (10 % de réserve).
 
