@@ -25,12 +25,27 @@ import sys
 from pathlib import Path
 
 ICI = Path(__file__).resolve().parent
-SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
 
 sys.path.insert(0, str(ICI))
-from valider_carte import calculer_infranchissable, emprise_monde, ouvertures, poteaux_de_cloture  # noqa: E402
+from valider_carte import (  # noqa: E402
+    Grille, calculer_infranchissable, emprise_monde, ouvertures, poteaux_de_cloture, taille_monde,
+)
 
+# 0.13 (docs/jeux/jeu-1/v0-13-carte.md, lot L1): `--0.13` compose la carte agrandie, 164 x 78 m. La grille
+# gagne une origine (`taille.origine`, x -24, y -30): rien de ce qui existe ne change de coordonnées, les
+# régions neuves sont en x et y négatifs ou au-delà de x 99. Le jeu ne lit pas encore l'origine (lot L0):
+# la carte agrandie s'écrit donc à part (`donnees/cartes-0-13/`, que le jeu ne charge pas) tant que L0 n'est
+# pas intégré; sans option, le script écrit la carte du tour 10, octet pour octet.
+ETENDUE = "--0.13" in sys.argv[1:]
+# Le bourg du tour 10: les boucles de décor d'avant gardent ces bornes, pour garder leurs identifiants.
 LARGEUR, HAUTEUR = 100, 48
+if ETENDUE:
+    OX, OY, LARGEUR_GRILLE, HAUTEUR_GRILLE = -24, -30, 164, 78
+    SORTIE = ICI.parent / "donnees" / "cartes-0-13" / "halte.json"
+else:
+    OX, OY, LARGEUR_GRILLE, HAUTEUR_GRILLE = 0, 0, LARGEUR, HAUTEUR
+    SORTIE = ICI.parent / "donnees" / "cartes" / "halte.json"
+X_FIN, Y_FIN = OX + LARGEUR_GRILLE, OY + HAUTEUR_GRILLE  # bornes exclues
 # Le ru de la Côte (tour 10): deux colonnes d'eau vive qui bornent le bourg ancien et la rue Haute.
 RU_X = (63, 64)
 BORD = 2  # anneau de décor lointain, jamais franchissable
@@ -206,18 +221,18 @@ def objet(type_: str, x0: int, y0: int, rotation: int = 0, ident: str | None = N
 # ---------------------------------------------------------------------------
 # Terrain
 
-T = [["." for _ in range(LARGEUR)] for _ in range(HAUTEUR)]
+T = Grille.pleine(OX, OY, LARGEUR_GRILLE, HAUTEUR_GRILLE, ".")
 
 
 def peindre(code: str, x0: int, y0: int, w: int, h: int) -> None:
-    for y in range(max(0, y0), min(HAUTEUR, y0 + h)):
-        for x in range(max(0, x0), min(LARGEUR, x0 + w)):
+    for y in range(max(OY, y0), min(Y_FIN, y0 + h)):
+        for x in range(max(OX, x0), min(X_FIN, x0 + w)):
             T[y][x] = code
 
 
 def peindre_si(code: str, x0: int, y0: int, w: int, h: int, seulement: str) -> None:
-    for y in range(max(0, y0), min(HAUTEUR, y0 + h)):
-        for x in range(max(0, x0), min(LARGEUR, x0 + w)):
+    for y in range(max(OY, y0), min(Y_FIN, y0 + h)):
+        for x in range(max(OX, x0), min(X_FIN, x0 + w)):
             if T[y][x] in seulement:
                 T[y][x] = code
 
@@ -370,13 +385,14 @@ def peindre_sols_batiments() -> None:
 
 
 def peindre_bord() -> None:
-    for y in range(HAUTEUR):
-        for x in range(LARGEUR):
-            dans_bord = x < BORD or y < BORD or x >= LARGEUR - BORD or y >= HAUTEUR - BORD
+    for y in T.ys:
+        for x in T.xs:
+            dans_bord = x < OX + BORD or y < OY + BORD or x >= X_FIN - BORD or y >= Y_FIN - BORD
             if not dans_bord:
                 continue
-            # La voie, la rivière, ses berges et les routes continuent dans le décor (rendu seulement).
-            if T[y][x] in "=~:bgr":
+            # La voie, la rivière, ses berges, les routes et le bief du moulin continuent dans le décor (rendu
+            # seulement).
+            if T[y][x] in "=~:bgrk":
                 continue
             T[y][x] = "X"
 
@@ -1348,8 +1364,18 @@ def formater(valeur: object, niveau: int = 0, dans_liste: bool = False) -> str:
 
 
 def main() -> int:
+    journal: list[dict] = []
+    if ETENDUE:
+        import carte_halte_0_13 as ext
+        ext.installer(sys.modules[__name__])
+        ext.preparer()
     construire_terrain()
+    if ETENDUE:
+        ext.terrain()
     construire_objets()
+    if ETENDUE:
+        journal = ext.objets()
+        ext.donnees()
     peindre_sols_batiments()
     peindre_bord()
 
@@ -1362,7 +1388,8 @@ def main() -> int:
         "document": "docs/jeux/jeu-1/carte-halte.md",
         "source": "games/la-petite-ligne/outils/construire_carte_halte.py (ne pas retoucher ce fichier à la main: "
                   "modifier le script et le relancer)",
-        "taille": {"largeur": LARGEUR, "hauteur": HAUTEUR, "bord": BORD},
+        "taille": {"largeur": LARGEUR_GRILLE, "hauteur": HAUTEUR_GRILLE, "bord": BORD,
+                   **({"origine": {"x": OX, "y": OY}} if ETENDUE else {})},
         "conventions": {
             "unite": "1 case = 1 m",
             "axes": "x vers l'est, y vers le sud; dans Three.js: x du monde vers +X, y du monde vers +Z",
@@ -1410,7 +1437,7 @@ def main() -> int:
         },
         "terrain": {
             "legende": LEGENDE,
-            "lignes": ["".join(row) for row in T],
+            "lignes": T.textes(),
         },
         "types": TYPES,
         "objets": OBJETS,
@@ -1450,6 +1477,8 @@ def main() -> int:
     # Portes des bâtiments visitables: les ouvertures `porte` de leur objet (une seule source de vérité).
     par_id = {o["id"]: o for o in OBJETS}
     points_porte = {"house": "house_door", "grocery": "grocery_door", "salon": "salon_door"}
+    if ETENDUE:
+        points_porte.update(ext.PORTES_POINTS)
     for b in INTERIEURS:
         portes = []
         for nom, ((cx, cy), (fx, fy)) in ouvertures(par_id[b["objet"]], TYPES).items():
@@ -1458,6 +1487,9 @@ def main() -> int:
                                "point": points_porte[b["id"]]})
         b["portes"] = portes
     carte["infranchissable"] = calculer_infranchissable(carte)
+    if ETENDUE:
+        ext.completer(carte, journal)
+        carte["trajets"] = TRAJETS + ext.trajets(carte)
 
     SORTIE.parent.mkdir(parents=True, exist_ok=True)
     SORTIE.write_text(formater(carte) + "\n", encoding="utf-8")

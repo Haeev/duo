@@ -82,6 +82,86 @@ class Rapport:
 
 
 # ---------------------------------------------------------------------------
+# Grille en coordonnées de la carte (0.13: origine de la grille, `taille.origine`)
+
+
+class Rangee:
+    """Une rangée de la grille, indexée par x de la carte (négatif à l'ouest de l'origine)."""
+
+    __slots__ = ("_v", "_ox")
+
+    def __init__(self, valeurs: list | str, ox: int) -> None:
+        self._v = valeurs
+        self._ox = ox
+
+    def _i(self, x: int) -> int:
+        i = x - self._ox
+        if i < 0 or i >= len(self._v):
+            # Une liste Python lirait silencieusement l'autre bout de la rangée pour un indice négatif.
+            raise IndexError(f"x {x} hors de la grille")
+        return i
+
+    def __getitem__(self, x: int):
+        return self._v[self._i(x)]
+
+    def __setitem__(self, x: int, valeur: object) -> None:
+        self._v[self._i(x)] = valeur  # type: ignore[index]
+
+    def __len__(self) -> int:
+        return len(self._v)
+
+
+class Grille:
+    """Grille de cases indexée `g[y][x]` en coordonnées de la carte, avec ses bornes (`xs`, `ys`, `dans`)."""
+
+    def __init__(self, ox: int, oy: int, rangees: list) -> None:
+        self.ox, self.oy = ox, oy
+        self.haut = len(rangees)
+        self.larg = len(rangees[0]) if rangees else 0
+        self._r = [Rangee(r, ox) for r in rangees]
+        self.xs = range(ox, ox + self.larg)
+        self.ys = range(oy, oy + self.haut)
+
+    @classmethod
+    def pleine(cls, ox: int, oy: int, larg: int, haut: int, valeur: object) -> "Grille":
+        return cls(ox, oy, [[valeur] * larg for _ in range(haut)])
+
+    def __getitem__(self, y: int) -> Rangee:
+        i = y - self.oy
+        if i < 0 or i >= self.haut:
+            raise IndexError(f"y {y} hors de la grille")
+        return self._r[i]
+
+    def __len__(self) -> int:
+        return self.haut
+
+    def dans(self, x: int, y: int) -> bool:
+        return self.ox <= x < self.ox + self.larg and self.oy <= y < self.oy + self.haut
+
+    def cases(self):
+        for y in self.ys:
+            for x in self.xs:
+                yield x, y
+
+    def copie(self) -> "Grille":
+        return Grille(self.ox, self.oy, [list(r._v) for r in self._r])
+
+    def textes(self) -> list[str]:
+        return ["".join(r._v) for r in self._r]
+
+
+def origine(carte: dict) -> tuple[int, int]:
+    """Case nord-ouest de la grille (0.13: x -24, y -30); (0, 0) sur les cartes d'avant."""
+    o = carte["taille"].get("origine") or {"x": 0, "y": 0}
+    return int(o["x"]), int(o["y"])
+
+
+def grille_terrain(carte: dict) -> Grille:
+    ox, oy = origine(carte)
+    return Grille(ox, oy, list(carte["terrain"]["lignes"]))
+
+
+# ---------------------------------------------------------------------------
 # Géométrie partagée avec le script de construction
 
 
@@ -190,16 +270,12 @@ def calculer_infranchissable(carte: dict, pieces_baties: bool = False) -> dict:
     toutes ses cases intérieures. `pieces_baties`: ajoute les pièces `a_batir` (cellier, chambre) comme si
     elles étaient bâties (emprise bloquée, pièce et porte du mur commun libres), pour les contrôles.
     """
-    larg = carte["taille"]["largeur"]
-    haut = carte["taille"]["hauteur"]
     bord = carte["taille"]["bord"]
     legende = carte["terrain"]["legende"]
-    lignes = carte["terrain"]["lignes"]
+    ox, oy = origine(carte)
+    g = Grille(ox, oy, [[bool(legende[c]["franchissable"]) for c in ligne] for ligne in carte["terrain"]["lignes"]])
     types = carte["types"]
-    g = [[bool(legende[lignes[y][x]]["franchissable"]) for x in range(larg)] for y in range(haut)]
-
-    def dans(x: int, y: int) -> bool:
-        return 0 <= x < larg and 0 <= y < haut
+    dans = g.dans
 
     interieurs = {b["objet"]: b for b in carte.get("interieurs", [])}
 
@@ -247,10 +323,9 @@ def calculer_infranchissable(carte: dict, pieces_baties: bool = False) -> dict:
             for x, y in m["cases"]:
                 if dans(x, y):
                     g[y][x] = False
-    for y in range(haut):
-        for x in range(larg):
-            if x < bord or y < bord or x >= larg - bord or y >= haut - bord:
-                g[y][x] = False
+    for x, y in g.cases():
+        if x < ox + bord or y < oy + bord or x >= ox + g.larg - bord or y >= oy + g.haut - bord:
+            g[y][x] = False
     return {
         "regles": {
             "terrain": "codes dont `franchissable` vaut false dans la légende (eau profonde, bord)",
@@ -261,7 +336,7 @@ def calculer_infranchissable(carte: dict, pieces_baties: bool = False) -> dict:
             "train": "en plus, la zone `train_at_platform` quand le train est à quai",
         },
         "legende": {"#": "infranchissable", ".": "franchissable"},
-        "grille": ["".join("." if g[y][x] else "#" for x in range(larg)) for y in range(haut)],
+        "grille": ["".join("." if g[y][x] else "#" for x in g.xs) for y in g.ys],
     }
 
 
@@ -269,16 +344,25 @@ def calculer_infranchissable(carte: dict, pieces_baties: bool = False) -> dict:
 # Marche
 
 
-def grille_bool(infr: dict) -> list[list[bool]]:
-    return [[c == "." for c in ligne] for ligne in infr["grille"]]
+def grille_bool(infr: dict, carte: dict) -> Grille:
+    ox, oy = origine(carte)
+    return Grille(ox, oy, [[c == "." for c in ligne] for ligne in infr["grille"]])
 
 
-def dijkstra(libre: list[list[bool]], sources: list[tuple[int, int]]) -> dict[tuple[int, int], float]:
-    haut, larg = len(libre), len(libre[0])
+def cases_libres(libre: Grille) -> set[tuple[int, int]]:
+    return {(x, y) for x, y in libre.cases() if libre[y][x]}
+
+
+def dijkstra(libre: Grille, sources: list[tuple[int, int]],
+             ouvert: set[tuple[int, int]] | None = None) -> dict[tuple[int, int], float]:
+    """Distances (m) depuis les sources, huit voisins sans couper les angles. `ouvert`: les cases libres de
+    `libre`, si on les a déjà (la grille de 164 x 78 m se relit sinon à chaque appel)."""
+    if ouvert is None:
+        ouvert = cases_libres(libre)
     dist: dict[tuple[int, int], float] = {}
     tas: list[tuple[float, int, int]] = []
     for x, y in sources:
-        if 0 <= x < larg and 0 <= y < haut and libre[y][x]:
+        if (x, y) in ouvert:
             dist[(x, y)] = 0.0
             heapq.heappush(tas, (0.0, x, y))
     while tas:
@@ -287,9 +371,9 @@ def dijkstra(libre: list[list[bool]], sources: list[tuple[int, int]]) -> dict[tu
             continue
         for dx, dy, c in VOISINS:
             nx, ny = x + dx, y + dy
-            if not (0 <= nx < larg and 0 <= ny < haut) or not libre[ny][nx]:
+            if (nx, ny) not in ouvert:
                 continue
-            if dx and dy and not (libre[y][nx] and libre[ny][x]):
+            if dx and dy and not ((nx, y) in ouvert and (x, ny) in ouvert):
                 continue  # on ne coupe pas les angles
             nd = d + c
             if nd < dist.get((nx, ny), math.inf):
@@ -307,18 +391,17 @@ class Lieux:
         self.zones = {z["id"]: z for z in carte["zones"]}
         self.objets = {o["id"]: o for o in carte["objets"]}
 
-    def cases(self, ident: str, libre: list[list[bool]]) -> list[tuple[int, int]]:
-        haut, larg = len(libre), len(libre[0])
+    def cases(self, ident: str, libre: Grille) -> list[tuple[int, int]]:
         if ident in self.points:
             p = self.points[ident]
             cx, cy = int(math.floor(p["x"])), int(math.floor(p["y"]))
-            if 0 <= cx < larg and 0 <= cy < haut and libre[cy][cx] and "portee" not in p:
+            if libre.dans(cx, cy) and libre[cy][cx] and "portee" not in p:
                 return [(cx, cy)]
             portee = p.get("portee", 1.5)
             res = []
             for y in range(cy - 4, cy + 5):
                 for x in range(cx - 4, cx + 5):
-                    if 0 <= x < larg and 0 <= y < haut and libre[y][x]:
+                    if libre.dans(x, y) and libre[y][x]:
                         if math.hypot(x + 0.5 - p["x"], y + 0.5 - p["y"]) <= portee + 1e-9:
                             res.append((x, y))
             # Petit objet de plusieurs cases (puits, tonnelle): on agit depuis une case qui le touche.
@@ -331,19 +414,18 @@ class Lieux:
         if ident in self.zones:
             r = self.zones[ident]["rect"]
             return [(x, y) for y in range(r["y"], r["y"] + r["h"]) for x in range(r["x"], r["x"] + r["w"])
-                    if libre[y][x]]
+                    if libre.dans(x, y) and libre[y][x]]
         if ident in self.objets:
             return self.autour(self.objets[ident], libre)
         return []
 
-    def autour(self, o: dict, libre: list[list[bool]]) -> list[tuple[int, int]]:
+    def autour(self, o: dict, libre: Grille) -> list[tuple[int, int]]:
         """Cases libres qui touchent l'emprise d'un objet (8 voisins)."""
-        haut, larg = len(libre), len(libre[0])
         x0, y0, w, h = emprise_monde(o, self.carte["types"])
         res = []
         for y in range(y0 - 1, y0 + h + 1):
             for x in range(x0 - 1, x0 + w + 1):
-                if 0 <= x < larg and 0 <= y < haut and libre[y][x]:
+                if libre.dans(x, y) and libre[y][x]:
                     if not (x0 <= x < x0 + w and y0 <= y < y0 + h):
                         res.append((x, y))
         return res
@@ -395,18 +477,100 @@ def boites_occultantes(carte: dict, avec_train: bool) -> list[tuple]:
         else:
             x0, y0, w, h = emprise_monde(o, types)
             boites.append((o["id"], x0, y0, x0 + w, y0 + h, 0.0, t["hauteur"], profil_toit(o, t)))
+            # 0.13: volumes plus hauts que le toit (le clocher-porche), décalés depuis la case nord-ouest.
+            for dx, dy, tw, th, tz in t.get("tours", []):
+                if o["rotation"] != 0:
+                    raise ValueError(f"{o['id']}: `tours` ne se lit qu'à la rotation 0")
+                boites.append((o["id"], x0 + dx, y0 + dy, x0 + dx + tw, y0 + dy + th, 0.0, tz, None))
     # Un poteau, un lampadaire ou un tronc plus fins que 0,6 m ne cachent pas tout un personnage.
     boites = [b for b in boites if b[3] - b[1] >= 0.6 or b[4] - b[2] >= 0.6]
     if avec_train:
         r = next(z for z in carte["zones"] if z["id"] == "train_at_platform")["rect"]
         boites.append(("train", r["x"], r["y"] + 0.15, r["x"] + r["w"], r["y"] + r["h"] - 0.15, 0.0, HAUTEUR_TRAIN,
                        None))
+    boites += boites_pourtour(carte)
+    return IndexBoites(boites)
+
+
+def boites_pourtour(carte: dict) -> list[tuple]:
+    """0.13: la forêt du pourtour, semée par le rendu au-delà du bord jouable (`camera.foret_pourtour`): elle
+    cache ce qui est près des bords nord, ouest et est. Ni sur la voie, ni sur la rivière, et en recul aux
+    éclaircies déclarées (le rendu suit la même règle, lot L3)."""
+    f = carte.get("camera", {}).get("foret_pourtour")
+    if not f:
+        return []
+    ox, oy = origine(carte)
+    x0, y0 = ox, oy
+    x1, y1 = ox + carte["taille"]["largeur"], oy + carte["taille"]["hauteur"]
+    bord, prof = carte["taille"]["bord"], f.get("profondeur", 10)
+    z0, z1 = f["hauteur"]
+    sans = [tuple(s) for s in f.get("sans_rangees", [])]
+
+    def segments(ya: int, yb: int) -> list[tuple[int, int]]:
+        """Rangées [ya, yb[ sans celles de la voie et de la rivière."""
+        res, debut = [], None
+        for y in range(ya, yb + 1):
+            libre = y < yb and not any(a <= y <= b for a, b in sans)
+            if libre and debut is None:
+                debut = y
+            elif not libre and debut is not None:
+                res.append((debut, y))
+                debut = None
+        return res
+
+    boites = []
+    if "nord" in f["cotes"]:
+        boites.append(("forêt du pourtour", x0 - prof, y0 - prof, x1 + prof, y0 + bord, z0, z1, None))
+    if "ouest" in f["cotes"]:
+        for a, b in segments(y0 + bord, y1):
+            boites.append(("forêt du pourtour", x0 - prof, a, x0 + bord, b, z0, z1, None))
+    if "est" in f["cotes"]:
+        ecl = [e for e in f.get("eclaircies", []) if e["cote"] == "est"]
+        for a, b in segments(y0 + bord, y1):
+            for y in range(a, b):
+                recul = max([e["recul"] for e in ecl if e["de_y"] <= y <= e["a_y"]], default=0)
+                boites.append(("forêt du pourtour", x1 - bord + recul, y, x1 + prof, y + 1, z0, z1, None))
     return boites
+
+
+class IndexBoites(list):
+    """Les volumes, rangés par carrés de 2 m: un rayon ne teste que ceux qu'il traverse (la carte de 164 x 78 m a
+    plus de mille volumes avec la forêt). Les grands volumes (forêt du pourtour, plus de 64 m²) sont toujours testés."""
+
+    PAS = 2.0
+
+    def __init__(self, boites: list[tuple]) -> None:
+        super().__init__(boites)
+        self.grandes: list[tuple] = []
+        self.seaux: dict[tuple[int, int], list[tuple]] = {}
+        self.zmax = max((bt[6] for bt in boites), default=0.0)
+        for bt in boites:
+            _, x0, y0, x1, y1 = bt[:5]
+            if (x1 - x0) * (y1 - y0) > 64:
+                self.grandes.append(bt)
+                continue
+            m = 0.5
+            for i in range(math.floor((x0 - m) / self.PAS), math.floor((x1 + m) / self.PAS) + 1):
+                for j in range(math.floor((y0 - m) / self.PAS), math.floor((y1 + m) / self.PAS) + 1):
+                    self.seaux.setdefault((i, j), []).append(bt)
+
+    def candidats(self, px: float, py: float, hp: float, ux: float, uy: float) -> list[tuple]:
+        longueur = max(0.0, (self.zmax - hp) / TAN_E)
+        vus: dict[int, tuple] = {}
+        s = 0.0
+        while s <= longueur + 0.5:
+            cle = (math.floor((px + ux * s) / self.PAS), math.floor((py + uy * s) / self.PAS))
+            for bt in self.seaux.get(cle, ()):
+                vus[id(bt)] = bt
+            s += 0.5
+        return self.grandes + list(vus.values())
 
 
 def cache_par(px: float, py: float, hp: float, direction: tuple[float, float], boites: list,
               exclus: set[str]) -> str | None:
     ux, uy = direction[0] / SQRT2, direction[1] / SQRT2
+    if isinstance(boites, IndexBoites):
+        boites = boites.candidats(px, py, hp, ux, uy)
     for boite in boites:
         ident, x0, y0, x1, y1, z0, z1, profil = boite
         if ident in exclus or z1 <= hp:
@@ -438,7 +602,8 @@ def cache_par(px: float, py: float, hp: float, direction: tuple[float, float], b
 # Contrôles
 
 
-def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dict[str, Any]:
+def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None, avant: dict | None = None,
+              plannings: dict | None = None) -> dict[str, Any]:
     resultats: dict[str, Any] = {}
     for cle in ("taille", "terrain", "types", "objets", "points", "zones", "infranchissable", "maison"):
         if cle not in carte:
@@ -453,10 +618,11 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     if len(lignes) != haut or any(len(lg) != larg for lg in lignes):
         rapport.erreur(f"terrain: {haut} lignes de {larg} caractères attendues")
         return resultats
+    ox, oy = origine(carte)
     for y, lg in enumerate(lignes):
         for x, c in enumerate(lg):
             if c not in legende:
-                rapport.erreur(f"terrain ({x}, {y}): code {c!r} absent de la légende")
+                rapport.erreur(f"terrain ({x + ox}, {y + oy}): code {c!r} absent de la légende")
     for code, d in legende.items():
         for champ in ("nom", "sol", "franchissable"):
             if champ not in d:
@@ -492,14 +658,14 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         if abs(x0 - round(x0)) > 1e-9 or abs(y0 - round(y0)) > 1e-9:
             rapport.erreur(f"objet {o['id']}: emprise hors de la grille (centre {o['x']}, {o['y']})")
         rx0, ry0, _, _ = emprise_monde(o, types)
-        if not (0 <= rx0 and 0 <= ry0 and rx0 + w <= larg and ry0 + h <= haut):
+        if not (ox <= rx0 and oy <= ry0 and rx0 + w <= ox + larg and ry0 + h <= oy + haut):
             rapport.erreur(f"objet {o['id']}: sort de la carte")
         rect = o.get("rect")
         if rect != {"x": rx0, "y": ry0, "w": w, "h": h}:
             rapport.erreur(f"objet {o['id']}: `rect` ne correspond pas au centre et à la rotation")
     controler_clotures(carte, rapport)
     for p in carte["points"]:
-        if not (0 <= p["x"] < larg and 0 <= p["y"] < haut):
+        if not (ox <= p["x"] < ox + larg and oy <= p["y"] < oy + haut):
             rapport.erreur(f"point {p['id']}: hors de la carte")
         if "rotation" in p and p["rotation"] not in (0, 1, 2, 3):
             rapport.erreur(f"point {p['id']}: rotation invalide")
@@ -507,8 +673,8 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
             rapport.erreur(f"point {p['id']}: objet {p['objet']!r} inconnu")
     for z in carte["zones"]:
         r = z.get("rect", {})
-        if not all(k in r for k in "xywh") or r["x"] < 0 or r["y"] < 0 or r["x"] + r["w"] > larg \
-                or r["y"] + r["h"] > haut or r["w"] <= 0 or r["h"] <= 0:
+        if not all(k in r for k in "xywh") or r["x"] < ox or r["y"] < oy or r["x"] + r["w"] > ox + larg \
+                or r["y"] + r["h"] > oy + haut or r["w"] <= 0 or r["h"] <= 0:
             rapport.erreur(f"zone {z['id']}: rectangle invalide")
     if rapport.erreurs:
         return resultats
@@ -516,6 +682,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     objets = {o["id"]: o for o in carte["objets"]}
     points = {p["id"]: p for p in carte["points"]}
     zones = {z["id"]: z["rect"] for z in carte["zones"]}
+    lignes = grille_terrain(carte)
 
     # 2. Cohérence du terrain
     sous_batiments: set[tuple[int, int]] = set()
@@ -523,13 +690,13 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         if types[o["type"]]["categorie"] == "batiment":
             x0, y0, w, h = emprise_monde(o, types)
             sous_batiments |= {(x, y) for y in range(y0, y0 + h) for x in range(x0, x0 + w)}
-    cases_s = {(x, y) for y in range(haut) for x in range(larg) if lignes[y][x] == "s"}
+    cases_s = {(x, y) for x, y in lignes.cases() if lignes[y][x] == "s"}
     if cases_s != sous_batiments:
         rapport.erreur(f"sol de bâtiment: {len(cases_s ^ sous_batiments)} cases ne correspondent pas aux bâtiments")
     if "platform" in objets:
         x0, y0, w, h = emprise_monde(objets["platform"], types)
         quai = {(x, y) for y in range(y0, y0 + h) for x in range(x0, x0 + w)}
-        cases_q = {(x, y) for y in range(haut) for x in range(larg) if lignes[y][x] == "q"}
+        cases_q = {(x, y) for x, y in lignes.cases() if lignes[y][x] == "q"}
         if quai != cases_q:
             rapport.erreur("quai: le code 'q' ne couvre pas exactement l'emprise du quai")
     recalcul = calculer_infranchissable(carte)
@@ -562,8 +729,8 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                         rapport.erreur(f"{o['id']}: posé sur un sol interdit {c!r} en ({x}, {y})")
 
     # 4. Marche
-    libre = grille_bool(recalcul)
-    libre_train = [ligne[:] for ligne in libre]
+    libre = grille_bool(recalcul, carte)
+    libre_train = libre.copie()
     if "train_at_platform" in zones:
         r = zones["train_at_platform"]
         for y in range(r["y"], r["y"] + r["h"]):
@@ -588,7 +755,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                 rapport.erreur(f"[{nom_cas}] point {p['id']}: aucune case franchissable pour s'y tenir")
             elif not any(c in atteint for c in cases):
                 rapport.erreur(f"[{nom_cas}] point {p['id']}: inatteignable à pied depuis l'apparition")
-        total_libre = {(x, y) for y in range(haut) for x in range(larg) if grille[y][x]}
+        total_libre = cases_libres(grille)
         poches = total_libre - set(atteint)
         if poches:
             rapport.erreur(f"[{nom_cas}] {len(poches)} cases franchissables isolées (poches sans issue), "
@@ -606,7 +773,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         for y in range(y0, y0 + h):
             for x in range(x0, x0 + w):
                 occupees[(x, y)] = o["id"]
-    bati = [ligne[:] for ligne in libre]
+    bati = libre.copie()
     for ch in chantiers:
         for x, y in ch.get("cases", []):
             if not libre[y][x]:
@@ -623,7 +790,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                 rapport.erreur(f"[chantiers bâtis] point {p['id']}: aucune case franchissable pour s'y tenir")
             elif not any(c in atteint for c in cases):
                 rapport.erreur(f"[chantiers bâtis] point {p['id']}: inatteignable à pied depuis l'apparition")
-        poches = {(x, y) for y in range(haut) for x in range(larg) if bati[y][x]} - set(atteint)
+        poches = cases_libres(bati) - set(atteint)
         if poches:
             rapport.erreur(f"[chantiers bâtis] {len(poches)} cases isolées, par exemple {sorted(poches)[:5]}")
         resultats["atteintes chantiers bâtis"] = len(atteint)
@@ -632,7 +799,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     for o in carte["objets"]:
         t = types[o["type"]]
         for nom, ((cx, cy), (fx, fy)) in ouvertures(o, types).items():
-            if not (0 <= fx < larg and 0 <= fy < haut) or not libre[fy][fx]:
+            if not libre.dans(fx, fy) or not libre[fy][fx]:
                 rapport.erreur(f"{o['id']}: {nom} bloquée (case devant ({fx}, {fy}) infranchissable)")
             if t.get("interieur") and est_porte(nom) and not libre[cy][cx]:
                 rapport.erreur(f"{o['id']}: {nom} ({cx}, {cy}) infranchissable alors que la pièce est jouable")
@@ -690,12 +857,13 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     controler_details(carte, rapport)
     controler_bancs(carte, rapport, libre, lieux, depart, reglages)
     controler_hotes_cueillette(carte, rapport, reglages)
+    controler_0_13(carte, rapport, libre, lieux, resultats, avant, plannings)
 
     # Potager
     if "garden" in zones:
         g = zones["garden"]
         cases_g = {(x, y) for y in range(g["y"], g["y"] + g["h"]) for x in range(g["x"], g["x"] + g["w"])}
-        cases_p = {(x, y) for y in range(haut) for x in range(larg) if lignes[y][x] == "p"}
+        cases_p = {(x, y) for x, y in lignes.cases() if lignes[y][x] == "p"}
         if cases_g != cases_p:
             rapport.erreur("potager: le code 'p' doit couvrir exactement la zone garden")
         if any(not libre[y][x] or (x, y) in occupe for x, y in cases_g):
@@ -756,9 +924,9 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     if portage:
         larg_min = portage.get("largeur_min", 3)
         rayon = (larg_min - 1) // 2
-        couloir = [[all(0 <= x + dx < larg and 0 <= y + dy < haut and libre[y + dy][x + dx]
-                        for dx in range(-rayon, rayon + 1) for dy in range(-rayon, rayon + 1))
-                    for x in range(larg)] for y in range(haut)]
+        couloir = Grille(ox, oy, [[all(libre.dans(x + dx, y + dy) and libre[y + dy][x + dx]
+                                       for dx in range(-rayon, rayon + 1) for dy in range(-rayon, rayon + 1))
+                                   for x in libre.xs] for y in libre.ys])
         sa = [c for c in lieux.cases(portage["de"], libre) if couloir[c[1]][c[0]]]
         sb = [c for c in lieux.cases(portage["a"], libre) if couloir[c[1]][c[0]]]
         dist = dijkstra(couloir, sa) if sa else {}
@@ -795,7 +963,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
 
     # 6. Pêche, cueillette
     controler_coins_peche(carte, rapport, libre)
-    eau = [(x + 0.5, y + 0.5) for y in range(haut) for x in range(larg) if lignes[y][x] == "~"]
+    eau = [(x + 0.5, y + 0.5) for x, y in lignes.cases() if lignes[y][x] == "~"]
     for p in carte["points"]:
         if p.get("peche") or p["id"] == "river_ford":
             if not lieux.cases(p["id"], libre):
@@ -803,7 +971,9 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
             d = min(math.hypot(p["x"] - ex, p["y"] - ey) for ex, ey in eau)
             if d > 6.0:
                 rapport.erreur(f"pêche {p['id']}: eau profonde à {d:.1f} m (6 m au plus)")
-        if p.get("cueillette") and "forest_edge" in zones:
+        if p.get("cueillette") == "bois":
+            controler_cueillette_bois(carte, rapport, p)
+        elif p.get("cueillette") and "forest_edge" in zones:
             fe = zones["forest_edge"]
             dx = max(fe["x"] - p["x"], 0, p["x"] - (fe["x"] + fe["w"]))
             dy = max(fe["y"] - p["y"], 0, p["y"] - (fe["y"] + fe["h"]))
@@ -857,9 +1027,9 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
         resultats[f"rue {regle['id']}"] = len(caches)
     parts = {}
     for nom, d in ORIENTATIONS.items():
-        cachees = sum(1 for y in range(haut) for x in range(larg) if libre[y][x]
-                      and cache_par(x + 0.5, y + 0.5, HAUTEUR_PERSONNAGE, d, boites, set()))
-        parts[nom] = cachees / max(1, sum(sum(r) for r in libre))
+        ouvert = cases_libres(libre)
+        cachees = sum(1 for x, y in ouvert if cache_par(x + 0.5, y + 0.5, HAUTEUR_PERSONNAGE, d, boites, set()))
+        parts[nom] = cachees / max(1, len(ouvert))
     resultats["cases_cachees"] = parts
 
     # 8. Données du jeu
@@ -902,14 +1072,13 @@ def controler_coins_peche(carte: dict, rapport: Rapport, libre: list[list[bool]]
     if coins is None:
         return
     legende = carte["terrain"]["legende"]
-    lignes = carte["terrain"]["lignes"]
-    haut, larg = len(lignes), len(lignes[0])
+    lignes = grille_terrain(carte)
     proprio: dict[tuple[int, int], str] = {}
     for coin in coins:
         cases_eau = []
         for r in coin["rects"]:
             for x, y in cases_rect(r):
-                if not (0 <= x < larg and 0 <= y < haut) or legende[lignes[y][x]].get("sol") != "water":
+                if not lignes.dans(x, y) or legende[lignes[y][x]].get("sol") != "water":
                     continue
                 if (x, y) in proprio:
                     rapport.erreur(f"coin de pêche {coin['id']}: case d'eau ({x}, {y}) déjà dans {proprio[(x, y)]}")
@@ -919,17 +1088,18 @@ def controler_coins_peche(carte: dict, rapport: Rapport, libre: list[list[bool]]
             rapport.erreur(f"coin de pêche {coin['id']}: aucune case d'eau")
             continue
         portee = any(
-            0 <= ex + dx < larg and 0 <= ey + dy < haut and libre[ey + dy][ex + dx]
+            libre.dans(ex + dx, ey + dy) and libre[ey + dy][ex + dx]
             for ex, ey in cases_eau
             for dy in range(-6, 7) for dx in range(-6, 7)
             if dx * dx + dy * dy <= 36
         )
         if not portee:
             rapport.erreur(f"coin de pêche {coin['id']}: aucune case libre à moins de 6 m")
-    for y in range(haut):
-        for x in range(larg):
-            if legende[lignes[y][x]].get("sol") == "water" and (x, y) not in proprio:
-                rapport.erreur(f"coins de pêche: case d'eau ({x}, {y}) hors de tout coin")
+    for x, y in lignes.cases():
+        # Eau dormante sans poisson à ce tour (mare du bois, bassin de la source): `peche` faux dans la légende.
+        d = legende[lignes[y][x]]
+        if d.get("sol") == "water" and d.get("peche", True) and (x, y) not in proprio:
+            rapport.erreur(f"coins de pêche: case d'eau ({x}, {y}) hors de tout coin")
 
 
 def _composantes(cases: set[tuple[int, int]]) -> list[set[tuple[int, int]]]:
@@ -975,7 +1145,6 @@ def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]],
     types = carte["types"]
     objets = {o["id"]: o for o in carte["objets"]}
     points = {p["id"]: p for p in carte["points"]}
-    haut, larg = len(libre), len(libre[0])
     vus_pieces: dict[tuple[int, int], str] = {}
     emprises: dict[str, dict] = {}
     ids: set[str] = set()
@@ -1032,7 +1201,7 @@ def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]],
             if ext & set(cases_rect(emprises[bid])):
                 rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} chevauche le bâtiment")
             for x, y in ext:
-                if not (0 <= x < larg and 0 <= y < haut) or not libre[y][x]:
+                if not libre.dans(x, y) or not libre[y][x]:
                     rapport.erreur(f"intérieur {bid}: emprise de {pc['id']} sur une case déjà bloquée ({x}, {y})")
                     break
             for oo in carte["objets"]:
@@ -1158,7 +1327,7 @@ def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]],
                 rapport.erreur(f"intérieurs {a} et {bk}: moins d'une case entre eux")
 
     # Toutes les pièces bâties: rien d'inatteignable, aucune poche, les pièces reliées (T10-21).
-    bati = grille_bool(calculer_infranchissable(carte, pieces_baties=True))
+    bati = grille_bool(calculer_infranchissable(carte, pieces_baties=True), carte)
     for ch in carte.get("chantiers", []):
         for x, y in ch.get("cases", []):
             bati[y][x] = False
@@ -1168,7 +1337,7 @@ def controler_interieurs(carte: dict, rapport: Rapport, libre: list[list[bool]],
         cases = lieux.cases(p["id"], bati)
         if cases and not any(c in atteint for c in cases):
             rapport.erreur(f"[pièces bâties] point {p['id']}: inatteignable")
-    poches = {(x, y) for y in range(haut) for x in range(larg) if bati[y][x]} - set(atteint)
+    poches = cases_libres(bati) - set(atteint)
     if poches:
         rapport.erreur(f"[pièces bâties] {len(poches)} cases isolées, par exemple {sorted(poches)[:5]}")
     for b in interieurs:
@@ -1184,7 +1353,7 @@ def controler_ru(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: 
     ru = carte.get("ru")
     if ru is None:
         return
-    lignes = carte["terrain"]["lignes"]
+    lignes = grille_terrain(carte)
     passages = [o for o in carte.get("ouvrages", []) if o.get("franchit") == "ru"]
     cases_passage: dict[tuple[int, int], str] = {}
     for o in passages:
@@ -1194,7 +1363,7 @@ def controler_ru(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: 
     for y in range(ru["de_y"], ru["a_y"] + 1):
         for x in ru["colonnes"]:
             if (x, y) in cases_passage:
-                if not libre[y][x] and y >= carte["taille"]["bord"]:
+                if not libre[y][x] and y >= origine(carte)[1] + carte["taille"]["bord"]:
                     rapport.erreur(f"ru: passage {cases_passage[(x, y)]} bloqué en ({x}, {y})")
             elif lignes[y][x] != "r" or libre[y][x]:
                 rapport.erreur(f"ru: case ({x}, {y}) ni eau du ru ni passage déclaré")
@@ -1207,15 +1376,21 @@ def controler_ru(carte: dict, rapport: Rapport, libre: list[list[bool]], lieux: 
         return
 
     def grille_sans(garder: str | None) -> list[list[bool]]:
-        g = [ligne[:] for ligne in libre]
+        g = libre.copie()
         for (x, y), oid in cases_passage.items():
             if oid != garder:
                 g[y][x] = False
         return g
 
     atteint = dijkstra(grille_sans(None), ouest)
+    # 0.13: le ru naît dans la carte (sa source, au nord du bois): on en fait le tour par là, c'est voulu.
+    source_dedans = ru["de_y"] > origine(carte)[1] + carte["taille"]["bord"]
     if any(c in atteint for c in est):
-        rapport.erreur("ru: la rue Haute est atteinte sans passer par un passage du ru (il fuit ailleurs)")
+        if source_dedans:
+            d = min((atteint[c] for c in est if c in atteint), default=math.inf)
+            resultats["ru contourné par la source"] = d
+        else:
+            rapport.erreur("ru: la rue Haute est atteinte sans passer par un passage du ru (il fuit ailleurs)")
     longueurs = {}
     for o in passages:
         atteint = dijkstra(grille_sans(o["id"]), ouest)
@@ -1233,13 +1408,13 @@ def controler_details(carte: dict, rapport: Rapport) -> None:
     comprise; un massif y est toujours mal placé, quel que soit le dessin du rendu.
     """
     types = carte["types"]
-    lignes = carte["terrain"]["lignes"]
+    lignes = grille_terrain(carte)
     for o in carte["objets"]:
         t = types[o["type"]]
-        if o["type"] in ("bush", "rock", "bramble", "bush_hazel") or t["categorie"] == "arbre":
+        if o["type"] in ("bush", "rock", "bramble", "bush_hazel") or t["categorie"] in ("arbre", "vegetation"):
             x0, y0, w, h = emprise_monde(o, types)
             for x, y in cases_rect({"x": x0, "y": y0, "w": w, "h": h}):
-                if lignes[y][x] in "+:qPYj":
+                if lignes[y][x] in "+:qPYj;c":
                     rapport.erreur(f"{o['id']} ({o['type']}) planté sur un sol de passage {lignes[y][x]!r} en "
                                    f"({x}, {y})")
 
@@ -1269,7 +1444,7 @@ def controler_bancs(carte: dict, rapport: Rapport, libre: list[list[bool]], lieu
     reglage = dict(BANCS_DEFAUT)
     if isinstance(reglages, dict) and isinstance(reglages.get("benches"), dict):
         reglage.update({k: v for k, v in reglages["benches"].items() if k in BANCS_DEFAUT})
-    bati = [ligne[:] for ligne in libre]
+    bati = libre.copie()
     for ch in carte.get("chantiers", []):
         for x, y in ch.get("cases", []):
             bati[y][x] = False
@@ -1278,11 +1453,10 @@ def controler_bancs(carte: dict, rapport: Rapport, libre: list[list[bool]], lieu
     bancs = [(o["id"], o["x"], o["y"], o["rotation"], 1) for o in carte["objets"] if o["type"] == "bench"]
     bancs += [(s["id"], s["x"], s["y"], s["rotation"], 2) for s in carte.get("sieges", [])]
     bancs += [(c["id"], c["x"], c["y"], c["rotation"], 1) for c in carte.get("chantiers", []) if c["type"] == "bench"]
-    haut, larg = len(bati), len(bati[0])
     for ident, x, y, rotation, essais in bancs:
         for n, endroits in enumerate(places_banc(x, y, rotation, reglage)):
             cases = [(math.floor(fx), math.floor(fy)) for fx, fy in endroits[:essais]]
-            if not any(0 <= cx < larg and 0 <= cy < haut and bati[cy][cx] and (cx, cy) in atteint for cx, cy in cases):
+            if not any(bati.dans(cx, cy) and bati[cy][cx] and (cx, cy) in atteint for cx, cy in cases):
                 rapport.erreur(f"banc {ident}: place {n}, pas de case libre et atteignable où se relever "
                                f"({' ni '.join(str(c) for c in cases)})")
 
@@ -1315,6 +1489,297 @@ def controler_hotes_cueillette(carte: dict, rapport: Rapport, reglages: Any) -> 
                                f"(le plus proche à {d:.1f} m): le rendu la laisse par terre")
 
 
+# ---------------------------------------------------------------------------
+# 0.13: la carte agrandie (docs/jeux/jeu-1/v0-13-carte.md, section 13: règles neuves du validateur)
+
+ZONES_DU_BOIS = ("forest_cote", "forest_cure", "forest_west")
+# Un buisson hôte porte ce qu'on cueille (à portée de main, `HOST_REACH` du rendu); un arbre hôte le laisse tomber
+# sous son houppier: le coin est alors à quelques mètres du tronc, hors du houppier pour la caméra.
+PORTEE_HOTE_ARBRE = 3.6
+
+
+def controler_cueillette_bois(carte: dict, rapport: Rapport, p: dict) -> None:
+    """Coins de cueillette du bois (5.3): dans le bois, hors des sentiers, l'hôte éventuel à portée."""
+    zones = {z["id"]: z["rect"] for z in carte["zones"]}
+    if not any(i in zones and _dans_rect(zones[i], p["x"], p["y"]) for i in ZONES_DU_BOIS):
+        rapport.erreur(f"cueillette {p['id']}: hors des zones du bois ({', '.join(ZONES_DU_BOIS)})")
+    lignes = grille_terrain(carte)
+    if lignes[math.floor(p["y"])][math.floor(p["x"])] in "+:;#cqPYj":
+        rapport.erreur(f"cueillette {p['id']}: sur un sentier (les coins sont hors des sentiers)")
+    hote = p.get("hote")
+    if hote:
+        o = next((ob for ob in carte["objets"] if ob["id"] == hote), None)
+        if o is None:
+            rapport.erreur(f"cueillette {p['id']}: hôte {hote!r} absent")
+            return
+        arbre = carte["types"][o["type"]]["categorie"] == "arbre"
+        portee = PORTEE_HOTE_ARBRE if arbre else PORTEE_HOTE
+        d = math.hypot(o["x"] - p["x"], o["y"] - p["y"])
+        if d > portee + 1e-9:
+            rapport.erreur(f"cueillette {p['id']}: hôte {hote} à {d:.1f} m (au plus {portee} m)")
+
+
+def astar_noeuds(ouvert: set[tuple[int, int]], a: tuple[float, float], c: tuple[float, float],
+                 max_noeuds: int = 4000) -> tuple[int, bool]:
+    """Nœuds développés par l'A* du jeu (`findPath` de src/simulation/grille.ts: huit voisins sans couper les
+    angles, heuristique euclidienne, plafond `maxNodes`): (nœuds, trouvé). Si l'arrivée est bloquée, il vise la
+    case libre la plus proche, comme le jeu."""
+    sx, sy = math.floor(a[0]), math.floor(a[1])
+    gx, gy = math.floor(c[0]), math.floor(c[1])
+    if (gx, gy) not in ouvert:
+        proches = sorted(((math.hypot(x + 0.5 - c[0], y + 0.5 - c[1]), x, y)
+                          for x in range(gx - 4, gx + 5) for y in range(gy - 4, gy + 5) if (x, y) in ouvert))
+        if not proches:
+            return 0, False
+        gx, gy = proches[0][1], proches[0][2]
+    if (sx, sy) == (gx, gy):
+        return 0, True
+    g = {(sx, sy): 0.0}
+    tas = [(math.hypot(gx - sx, gy - sy), sx, sy)]
+    fermes: set[tuple[int, int]] = set()
+    developpes = 0
+    while tas and developpes < max_noeuds:
+        _, x, y = heapq.heappop(tas)
+        if (x, y) == (gx, gy):
+            return developpes, True
+        if (x, y) in fermes:
+            continue
+        fermes.add((x, y))
+        developpes += 1
+        d = g[(x, y)]
+        for dx, dy, cout in VOISINS:
+            n = (x + dx, y + dy)
+            if n not in ouvert or n in fermes:
+                continue
+            if dx and dy and ((x + dx, y) not in ouvert or (x, y + dy) not in ouvert):
+                continue
+            nd = d + cout
+            if nd < g.get(n, math.inf):
+                g[n] = nd
+                heapq.heappush(tas, (nd + math.hypot(gx - n[0], gy - n[1]), n[0], n[1]))
+    return developpes, False
+
+
+def squelette(cases: set[tuple[int, int]]) -> set[tuple[int, int]]:
+    """Amincissement de Zhang et Suen: la ligne médiane d'un réseau de chemins de 1 à 3 m de large."""
+    s = set(cases)
+
+    def voisins(x: int, y: int) -> list[bool]:
+        # P2 à P9, dans le sens horaire depuis le nord.
+        return [(x, y - 1) in s, (x + 1, y - 1) in s, (x + 1, y) in s, (x + 1, y + 1) in s,
+                (x, y + 1) in s, (x - 1, y + 1) in s, (x - 1, y) in s, (x - 1, y - 1) in s]
+
+    change = True
+    while change:
+        change = False
+        for passe in (0, 1):
+            retirer = []
+            for x, y in s:
+                v = voisins(x, y)
+                n = sum(v)
+                if not 2 <= n <= 6:
+                    continue
+                transitions = sum(1 for i in range(8) if not v[i] and v[(i + 1) % 8])
+                if transitions != 1:
+                    continue
+                p2, p4, p6, p8 = v[0], v[2], v[4], v[6]
+                if passe == 0 and (p2 and p4 and p6 or p4 and p6 and p8):
+                    continue
+                if passe == 1 and (p2 and p4 and p8 or p2 and p6 and p8):
+                    continue
+                retirer.append((x, y))
+            if retirer:
+                change = True
+                s.difference_update(retirer)
+    return s
+
+
+def controler_0_13(carte: dict, rapport: Rapport, libre: Grille, lieux: Lieux, resultats: dict[str, Any],
+                   avant: dict | None, plannings: dict | None) -> None:
+    types = carte["types"]
+    lignes = grille_terrain(carte)
+    points = {p["id"]: p for p in carte["points"]}
+    objets = {o["id"]: o for o in carte["objets"]}
+    ouvert = cases_libres(libre)
+    ag = carte.get("agrandissement")
+
+    # a. L'aire du bourg d'avant ne change pas, hors des retouches et des déplacements déclarés (CA-C3).
+    if ag and avant:
+        aire = ag["ancienne_aire"]
+        retouches = [r["rect"] for r in ag.get("retouches", [])]
+        av = avant["terrain"]["lignes"]
+        changees = []
+        for x, y in cases_rect(aire):
+            if av[y][x] != lignes[y][x] and not any(_dans_rect(r, x + 0.5, y + 0.5) for r in retouches):
+                changees.append((x, y, av[y][x], lignes[y][x]))
+        if changees:
+            rapport.erreur(f"agrandissement: {len(changees)} cases du bourg d'avant changent hors des retouches "
+                           f"déclarées, par exemple {changees[:4]}")
+        deplaces = {d["id"]: d for d in ag.get("deplaces", [])}
+        for o in avant["objets"]:
+            n = objets.get(o["id"])
+            if n is None or n["type"] != o["type"]:
+                rapport.erreur(f"agrandissement: objet {o['id']} disparu ou changé de type")
+                continue
+            if (n["x"], n["y"], n["rotation"]) != (o["x"], o["y"], o["rotation"]):
+                d = deplaces.get(o["id"])
+                if d is None or [n["x"], n["y"]] != d["a"] or [o["x"], o["y"]] != d["de"]:
+                    rapport.erreur(f"agrandissement: objet {o['id']} déplacé sans être déclaré")
+        for d in deplaces:
+            if d not in {o["id"] for o in avant["objets"]}:
+                rapport.erreur(f"agrandissement: {d} déclaré déplacé mais absent du bourg d'avant")
+        pts_dep = {d["id"]: d for d in ag.get("points_deplaces", [])}
+        for p in avant["points"]:
+            n = points.get(p["id"])
+            if n is None:
+                rapport.erreur(f"agrandissement: point {p['id']} disparu")
+            elif (n["x"], n["y"]) != (p["x"], p["y"]) and (p["id"] not in pts_dep or [n["x"], n["y"]]
+                                                            != pts_dep[p["id"]]["a"]):
+                rapport.erreur(f"agrandissement: point {p['id']} déplacé sans être déclaré")
+        zones_avant = {z["id"]: z["rect"] for z in avant["zones"]}
+        for z in carte["zones"]:
+            if z["id"] in zones_avant and z["rect"] != zones_avant[z["id"]]:
+                rapport.erreur(f"agrandissement: zone {z['id']} changée")
+        resultats["agrandissement"] = (len(deplaces), len(changees))
+
+    # b. Sentiers de forêt sans impasse, hors des bouts déclarés (CA-C6): bouts de la ligne médiane du réseau des
+    # chemins qui tombent sur un sentier de forêt (`;`).
+    if ag:
+        reseau = {(x, y) for x, y in lignes.cases() if lignes[y][x] in ";:+#cqPYj"}
+        zs = {z["id"]: z["rect"] for z in carte["zones"]}
+        for zid in ag.get("clairieres", []):
+            reseau |= {(x, y) for x, y in cases_rect(zs[zid]) if lignes.dans(x, y) and lignes[y][x] in ",.b"}
+        sq = squelette(reseau)
+        bouts = []
+        for x, y in sq:
+            n = sum((x + dx, y + dy) in sq for dx in (-1, 0, 1) for dy in (-1, 0, 1) if dx or dy)
+            if n == 1 and lignes[y][x] == ";":
+                bouts.append((x, y))
+        permis = [points[i] for i in ag.get("impasses", []) if i in points]
+        for x, y in bouts:
+            if not any(math.hypot(x + 0.5 - p["x"], y + 0.5 - p["y"]) <= 4.0 for p in permis):
+                rapport.erreur(f"sentiers: impasse en ({x}, {y}) (hors des bouts déclarés: "
+                               f"{', '.join(ag.get('impasses', []))})")
+        resultats["bouts de sentier"] = len(bouts)
+
+    # c. Au plus 12 arbres et 4 500 triangles d'arbres par morceau de 12 m du rendu (ADR 0016).
+    tris = carte.get("triangles_par_type")
+    if tris is not None:
+        morceaux: dict[tuple[int, int], list[int]] = {}
+        for o in carte["objets"]:
+            if types[o["type"]]["categorie"] != "arbre":
+                continue
+            m = morceaux.setdefault((math.floor(o["x"] / 12), math.floor(o["y"] / 12)), [0, 0])
+            m[0] += 1
+            m[1] += tris.get(o["type"], 400)
+        for (i, j), (n, t) in sorted(morceaux.items()):
+            if n > 12 or t > 4500:
+                rapport.erreur(f"forêt: morceau ({i * 12}, {j * 12}): {n} arbres, {t} triangles (12 et 4 500 au "
+                               f"plus)")
+        resultats["arbres par morceau (max)"] = max((n for n, _ in morceaux.values()), default=0)
+
+    # d. Parcelles: sol cultivable, sans objet, bord atteignable, de l'eau à 25 m (sauf plein champ).
+    occupe = {}
+    for o in carte["objets"]:
+        if types[o["type"]]["categorie"] == "sol":
+            continue
+        x0, y0, w, h = emprise_monde(o, types)
+        for c in cases_rect({"x": x0, "y": y0, "w": w, "h": h}):
+            occupe[c] = o["id"]
+    eaux = [(x + 0.5, y + 0.5) for x, y in lignes.cases() if lignes[y][x] in "~rke"]
+    eaux += [(o["x"], o["y"]) for o in carte["objets"] if o["type"] in ("water_barrel", "well", "hand_pump")]
+    atteint = dijkstra(libre, [c for pid in ("spawn_1", "spawn_2") for c in lieux.cases(pid, libre)], ouvert)
+    ids_parcelles = set()
+    for pc in carte.get("parcelles", []):
+        if pc["id"] in ids_parcelles:
+            rapport.erreur(f"parcelle {pc['id']}: en double")
+        ids_parcelles.add(pc["id"])
+        attendu = [[x, y] for y in range(pc["rect"]["y"], pc["rect"]["y"] + pc["rect"]["h"])
+                   for x in range(pc["rect"]["x"], pc["rect"]["x"] + pc["rect"]["w"])]
+        if pc["cases"] != attendu:
+            rapport.erreur(f"parcelle {pc['id']}: `cases` différentes du rectangle, ou dans un autre ordre")
+        for x, y in attendu:
+            if lignes[y][x] not in "lf" or (x, y) in occupe or (x, y) not in ouvert:
+                rapport.erreur(f"parcelle {pc['id']}: case ({x}, {y}) pas cultivable, occupée ou bloquée")
+                break
+        if not any(c in atteint for x, y in attendu for c in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1))):
+            rapport.erreur(f"parcelle {pc['id']}: aucun bord atteignable")
+        if pc.get("arrosage", True):
+            cx = pc["rect"]["x"] + pc["rect"]["w"] / 2
+            cy = pc["rect"]["y"] + pc["rect"]["h"] / 2
+            d = min((math.hypot(ex - cx, ey - cy) for ex, ey in eaux), default=math.inf)
+            if d > 25:
+                rapport.erreur(f"parcelle {pc['id']}: eau à {d:.0f} m (25 m au plus, sauf plein champ)")
+
+    # e. Passages à niveau: des planches sur toute la voie, un panneau (ou une barrière) de chaque côté.
+    rangees_voie = [y for y in lignes.ys if sum(lignes[y][x] in "=#" for x in lignes.xs) > lignes.larg / 2]
+    for pn in carte.get("passages_a_niveau", []):
+        r = pn["rect"]
+        if list(range(r["y"], r["y"] + r["h"])) != rangees_voie:
+            rapport.erreur(f"passage à niveau {pn['id']}: ne couvre pas toutes les rangées de la voie {rangees_voie}")
+        if any(lignes[y][x] != "#" for x, y in cases_rect(r)):
+            rapport.erreur(f"passage à niveau {pn['id']}: des cases ne sont pas des planches")
+        cotes = set()
+        for pid in pn.get("panneaux", []):
+            o = objets.get(pid)
+            if o is None:
+                rapport.erreur(f"passage à niveau {pn['id']}: panneau {pid} absent")
+                continue
+            cotes.add("nord" if o["y"] < r["y"] else "sud" if o["y"] >= r["y"] + r["h"] else "voie")
+            if abs(o["x"] - (r["x"] + r["w"] / 2)) > r["w"] / 2 + 2:
+                rapport.erreur(f"passage à niveau {pn['id']}: panneau {pid} loin de la traversée")
+        if cotes != {"nord", "sud"}:
+            rapport.erreur(f"passage à niveau {pn['id']}: un panneau de chaque côté de la voie attendu ({cotes})")
+
+    # f. Distances plafonds depuis la maisonnette (CA-C5).
+    dp = carte.get("distances_plafonds")
+    if dp:
+        tableau = []
+        for de, a, max_s in dp["paires"]:
+            dist = dijkstra(libre, lieux.cases(de, libre), ouvert)
+            d = min((dist[c] for c in lieux.cases(a, libre) if c in dist), default=math.inf)
+            t = d / dp["vitesse"]
+            if t > max_s:
+                rapport.erreur(f"distance {de} -> {a}: {t:.1f} s (au plus {max_s} s)")
+            tableau.append((de, a, d, t, max_s))
+        resultats["distances plafonds"] = tableau
+
+    # g. A* du jeu: chaque trajet d'habitant de la carte, et toutes les paires de points de chaque planning. Le jeu
+    # abandonne à 4 000 nœuds (`maxNodes`): au-delà, l'habitant ne trouve pas son chemin (erreur); la conception
+    # visait 3 000 pour garder de la marge (CA-C10: avertissement entre les deux).
+
+    def juger(quoi: str, n: int, ok: bool) -> None:
+        if not ok:
+            rapport.erreur(f"A*: {quoi}: chemin introuvable par le jeu (plus de 4 000 nœuds)")
+        elif n > 3000:
+            rapport.avert(f"A*: {quoi}: {n} nœuds (3 000 visés, le jeu abandonne à 4 000)")
+
+    pires = []
+    for tr in carte.get("trajets", []):
+        a, c = points[tr["de"]], points[tr["a"]]
+        n, ok = astar_noeuds(ouvert, (a["x"], a["y"]), (c["x"], c["y"]))
+        pires.append((n, f"trajet {tr['id']}"))
+        juger(f"trajet {tr['id']}", n, ok)
+    if plannings:
+        manquants = set()
+        for v in plannings.get("villagers", []):
+            pts = sorted({e["point"] for e in v.get("schedule", []) if e["point"] not in HORS_CARTE})
+            for pid in pts:
+                if pid not in points:
+                    manquants.add(pid)
+            pts = [pid for pid in pts if pid in points]
+            for i, pa in enumerate(pts):
+                for pb in pts[i + 1:]:
+                    a, c = points[pa], points[pb]
+                    n, ok = astar_noeuds(ouvert, (a["x"], a["y"]), (c["x"], c["y"]))
+                    pires.append((n, f"{v['id']}: {pa} -> {pb}"))
+                    juger(f"{v['id']} {pa} -> {pb}", n, ok)
+        for pid in sorted(manquants):
+            rapport.erreur(f"plannings: le point {pid!r} n'est pas sur la carte")
+    resultats["A* (pires)"] = sorted(pires, reverse=True)[:5]
+    resultats["A* (trajets)"] = len(pires)
+
+
 def _charger(dossier: Path | None, nom: str) -> Any:
     if dossier is None:
         return None
@@ -1344,15 +1809,38 @@ def _references(noeud: Any) -> list[tuple[str, str]]:
 
 
 def main(argv: list[str]) -> int:
-    chemin = Path(argv[1]) if len(argv) > 1 else CARTE_PAR_DEFAUT
+    """Usage: valider_carte.py [carte.json] [--avant carte_d_avant.json] [--plannings habitants.json]
+
+    `--avant`: la carte d'avant un agrandissement (par défaut donnees/cartes/halte.json, si la carte contrôlée a
+    une clé `agrandissement` et n'est pas celle-là); `--plannings`: des plannings au format de habitants.json
+    (par exemple la sortie `--json` de docs/jeux/jeu-1/simulations/v0_13_habitants.py), dont on vérifie que chaque
+    paire de points se rejoint sous 3 000 nœuds d'A*."""
+    args = list(argv[1:])
+    options: dict[str, Path] = {}
+    for opt in ("--avant", "--plannings"):
+        if opt in args:
+            i = args.index(opt)
+            options[opt] = Path(args[i + 1])
+            del args[i:i + 2]
+    chemin = Path(args[0]) if args else CARTE_PAR_DEFAUT
     try:
         carte = json.loads(chemin.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         print(f"erreur: lecture de {chemin} impossible ({exc})")
         return 1
+    avant = plannings = None
+    if "--avant" in options:
+        avant = json.loads(options["--avant"].read_text(encoding="utf-8"))
+    elif "agrandissement" in carte and chemin.resolve() != CARTE_PAR_DEFAUT.resolve() and CARTE_PAR_DEFAUT.exists():
+        avant = json.loads(CARTE_PAR_DEFAUT.read_text(encoding="utf-8"))
+    if "--plannings" in options:
+        plannings = json.loads(options["--plannings"].read_text(encoding="utf-8"))
     rapport = Rapport()
-    donnees = chemin.resolve().parent.parent if chemin.resolve().parent.name == "cartes" else None
-    res = controler(carte, rapport, donnees)
+    # Les données du jeu sont deux dossiers au-dessus (`donnees/cartes/`, ou `donnees/cartes-0-13/` en attendant le
+    # lot L0 de la 0.13).
+    dossier = chemin.resolve().parent
+    donnees = dossier.parent if dossier.name.startswith("cartes") else None
+    res = controler(carte, rapport, donnees, avant, plannings)
 
     print(f"Carte {carte.get('id')} ({chemin})")
     if "trajets" in res:
@@ -1377,9 +1865,15 @@ def main(argv: list[str]) -> int:
         print("\nLe ru de la Côte, un seul passage ouvert à la fois (porte de la maisonnette -> rue Haute):")
         for pid, d in res["passages du ru"].items():
             print(f"  {pid:>20}: {d:5.1f} m")
-    for cle in ("atteintes pièces bâties", "rue rue_de_la_halte_est"):
+    for cle in ("atteintes pièces bâties", "rue rue_de_la_halte_est", "rue route_des_hameaux", "rue placette_eglise",
+                "ru contourné par la source", "agrandissement", "bouts de sentier", "arbres par morceau (max)",
+                "A* (trajets)", "A* (pires)"):
         if cle in res:
             print(f"\n{cle}: {res[cle]}")
+    if "distances plafonds" in res:
+        print("\nDistances plafonds (sans train):")
+        for de, a, d, t, m in res["distances plafonds"]:
+            print(f"  {de:>12} -> {a:<18} {d:6.1f} m {t:5.1f} s (au plus {m} s)")
     if "cases_cachees" in res:
         print("\nPart des cases franchissables où un personnage est caché (transparence nécessaire):")
         for n, v in res["cases_cachees"].items():

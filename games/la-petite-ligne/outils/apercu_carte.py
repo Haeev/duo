@@ -26,7 +26,7 @@ from xml.sax.saxutils import escape
 ICI = Path(__file__).resolve().parent
 sys.path.insert(0, str(ICI))
 from valider_carte import (  # noqa: E402
-    CARTE_PAR_DEFAUT, boites_occultantes, emprise_monde, est_porte, hauteur_toit, ouvertures,
+    CARTE_PAR_DEFAUT, boites_occultantes, emprise_monde, est_porte, hauteur_toit, origine, ouvertures,
 )
 
 COULEURS = {
@@ -34,7 +34,16 @@ COULEURS = {
     "~": "#4f8fc0", "g": "#8fc0dc", "b": "#e6d7aa", "=": "#9a9186", "#": "#b08657",
     "q": "#d3c9b8", "s": "#a8806a", "X": "#5d7650",
     "r": "#3f86c4", "P": "#b3a998", "Y": "#a77b4f", "j": "#b9c6cc",
+    # 0.13
+    "h": "#6f9a58", ";": "#c8ad7a", "c": "#d6d0c2", "l": "#86603d", "f": "#9aa35e", "v": "#a98a5a",
+    "e": "#5a9ab0", "k": "#3f7fb8",
 }
+# 0.13: les arbres du bois et des vergers (couleur, rayon du houppier dessiné en m).
+ARBRES = {"tree_oak": ("#3f7a34", 1.5), "tree_fir": ("#2c5a3a", 1.1), "tree_apple": ("#6f9a3a", 1.3),
+          "tree_beech": ("#4f8a3c", 1.7), "tree_chestnut": ("#5c7f2e", 1.6), "tree_birch": ("#8fb05a", 1.1),
+          "tree_old_oak": ("#2f6a2a", 2.6), "tree_pear": ("#7aa045", 1.3), "tree_plum": ("#7d6aa0", 1.2),
+          "tree_cherry": ("#a85a6a", 1.3), "tree_walnut": ("#4f7a3a", 1.6), "tree_lime": ("#6a9a4a", 1.5),
+          "snag_tree": ("#7a6a5a", 0.4)}
 BATIMENTS = {
     "station": ("#c9824f", "La halte"),
     "gatekeeper_house": ("#e0a35c", "Maisonnette"),
@@ -48,6 +57,20 @@ BATIMENTS = {
     "lucie_house": ("#d8b26e", "Maison de Lucie"),
     "school_house": ("#9fa7b5", "École-mairie"),
     "school_yard": ("#c9c2b0", "Cour de l'école"),
+    # 0.13
+    "church": ("#d9cfb8", "Église Saint-Aubin"),
+    "presbytery_house": ("#c8b48c", "Presbytère"),
+    "village_house_a": ("#d6b98a", "Maison"),
+    "village_house_b": ("#d2a878", "Maison"),
+    "cafe_house": ("#c98a6a", "Café de la Côte"),
+    "forge_shop": ("#8a7a6a", "Forge"),
+    "joinery_shop": ("#a8865a", "Menuiserie"),
+    "farm_house": ("#d8b88a", "Logis de la ferme"),
+    "farm_barn": ("#a8784a", "Grange-étable"),
+    "washhouse": ("#b8b0a0", "Lavoir"),
+    "watermill": ("#c0a080", "Moulin de la Vanne"),
+    "lineman_house": ("#c89a6a", "Cheminots"),
+    "forester_house": ("#b8644a", "Maison forestière"),
 }
 HABITANTS = {"firmin": "#2f5fa8", "odette": "#b33a3a", "basile": "#7a4a1f", "jeanne": "#7b3fa0",
              "achille": "#c27c0e", "solange": "#1f8a70"}
@@ -80,7 +103,8 @@ def vue_de_dessus(carte: dict, region: tuple[int, int, int, int] | None = None, 
                   titre: str = "") -> tuple[str, int]:
     """Vue de dessus; `region` (x0, y0, x1, y1, bornes exclues à droite) pour une vue rapprochée."""
     larg, haut = carte["taille"]["largeur"], carte["taille"]["hauteur"]
-    rx0, ry0, rx1, ry1 = region or (0, 0, larg, haut)
+    ox, oy = origine(carte)
+    rx0, ry0, rx1, ry1 = region or (ox, oy, ox + larg, oy + haut)
     marge_g, marge_h = 34, 92
     panneau = 430
     complete = region is None
@@ -108,10 +132,12 @@ def vue_de_dessus(carte: dict, region: tuple[int, int, int, int] | None = None, 
                f'height="{(ry1 - ry0) * c}"/></clipPath><g clip-path="url(#cadre)">')
 
     lignes = carte["terrain"]["lignes"]
-    for y, ligne in enumerate(lignes):
+    for j, ligne in enumerate(lignes):
+        y = j + oy
         if not ry0 - 1 <= y <= ry1:
             continue
-        for x, code in enumerate(ligne):
+        for i, code in enumerate(ligne):
+            x = i + ox
             if not rx0 - 1 <= x <= rx1:
                 continue
             out.append(f'<rect x="{X(x)}" y="{Y(y)}" width="{c}" height="{c}" fill="{COULEURS.get(code, "#f0f")}"/>')
@@ -131,7 +157,7 @@ def vue_de_dessus(carte: dict, region: tuple[int, int, int, int] | None = None, 
                 out.append(f'<line x1="{X(x)}" y1="{Y(y) + c}" x2="{X(x) + c}" y2="{Y(y)}" stroke="#4a6040" stroke-width="1"/>')
     # Bord jouable
     b = carte["taille"]["bord"]
-    out.append(f'<rect x="{X(b)}" y="{Y(b)}" width="{(larg - 2 * b) * c}" height="{(haut - 2 * b) * c}" '
+    out.append(f'<rect x="{X(ox + b)}" y="{Y(oy + b)}" width="{(larg - 2 * b) * c}" height="{(haut - 2 * b) * c}" '
                f'fill="none" stroke="#2b2b2b" stroke-width="1.5" stroke-dasharray="6 4"/>')
     # Grille légère
     for x in range(rx0, rx1 + 1):
@@ -195,9 +221,9 @@ def vue_de_dessus(carte: dict, region: tuple[int, int, int, int] | None = None, 
             out.append(f'<text x="{X(x0) + 6}" y="{Y(y0) + 12}" font-size="10" fill="#3a3329">Quai</text>')
         elif o["type"] == "pontoon":
             out.append(f'<rect x="{X(x0)}" y="{Y(y0)}" width="{w * c}" height="{h * c}" fill="#a77b4f" stroke="#5a3e22"/>')
-        elif o["type"] in ("tree_oak", "tree_fir", "tree_apple"):
-            coul = {"tree_oak": "#3f7a34", "tree_fir": "#2c5a3a", "tree_apple": "#6f9a3a"}[o["type"]]
-            rayon = {"tree_oak": 1.5, "tree_fir": 1.1, "tree_apple": 1.3}[o["type"]] * c
+        elif o["type"] in ARBRES:
+            coul, rayon = ARBRES[o["type"]]
+            rayon *= c
             out.append(f'<circle cx="{cx}" cy="{cy}" r="{rayon}" fill="{coul}" fill-opacity="0.85"/>')
             out.append(f'<circle cx="{cx}" cy="{cy}" r="3" fill="#5b3a1e"/>')
             if o.get("coupable"):
@@ -337,15 +363,17 @@ COS_E = math.cos(math.radians(35.264))
 
 def vue_iso(carte: dict) -> tuple[str, int]:
     larg, haut = carte["taille"]["largeur"], carte["taille"]["hauteur"]
+    ox, oy = origine(carte)
     k = 15.0
     r2 = math.sqrt(0.5)
     dx = haut * r2 * k + 30
 
     def P(x: float, y: float, z: float) -> tuple[float, float]:
+        x, y = x - ox, y - oy
         return (dx + (x - y) * r2 * k, 90 + 12 * k * COS_E + (x + y) * r2 * SIN_E * k - z * COS_E * k)
 
     W = int(dx + larg * r2 * k + 30)
-    H = int(P(larg, haut, 0)[1] + 50)
+    H = int(P(ox + larg, oy + haut, 0)[1] + 50)
     types = carte["types"]
     lignes = carte["terrain"]["lignes"]
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" '
@@ -365,10 +393,11 @@ def vue_iso(carte: dict) -> tuple[str, int]:
         r, g, b = int(hexa[1:3], 16), int(hexa[3:5], 16), int(hexa[5:7], 16)
         return "#%02x%02x%02x" % (min(255, int(r * f)), min(255, int(g * f)), min(255, int(b * f)))
 
-    for y in range(haut):
-        for x in range(larg):
+    for j in range(haut):
+        for i in range(larg):
+            x, y = i + ox, j + oy
             out.append(poly([P(x, y, 0), P(x + 1, y, 0), P(x + 1, y + 1, 0), P(x, y + 1, 0)],
-                            COULEURS.get(lignes[y][x], "#f0f"), "#000000", 0.15))
+                            COULEURS.get(lignes[j][i], "#f0f"), "#000000", 0.15))
 
     # Colonnes à dessiner: (profondeur, ordre, svg)
     elements: list[tuple[float, int, list[str]]] = []
@@ -394,13 +423,13 @@ def vue_iso(carte: dict) -> tuple[str, int]:
                     # Toit à deux pans (types à `toit`): chaque colonne monte à la hauteur du toit en son milieu.
                     z1 = hauteur_toit(volumes[o["id"]], xx + 0.5, yy + 0.5) if o["id"] in volumes else t["hauteur"]
                     elements.append((xx + yy, 0, colonne(xx, yy, xx + 1, yy + 1, 0, z1, coul, "#8c4b3a")))
-        elif o["type"] in ("tree_oak", "tree_fir", "tree_apple"):
+        elif o["type"] in ARBRES and "houppier" in t["occultation_arbre"]:
             cx, cy = o["x"], o["y"]
             occ = t["occultation_arbre"]
             tronc, houp = occ["tronc"], occ["houppier"]
             svg = colonne(cx - 0.2, cy - 0.2, cx + 0.2, cy + 0.2, 0, houp[1], "#6b4423")
             demi = houp[0] / 2 * 0.8
-            coul = {"tree_oak": "#3f7a34", "tree_fir": "#2c5a3a", "tree_apple": "#6f9a3a"}[o["type"]]
+            coul = ARBRES[o["type"]][0]
             if o.get("coupable"):
                 coul = "#5a9a3c" if o["type"] == "tree_oak" else "#3c7a4a"
             svg += colonne(cx - demi, cy - demi, cx + demi, cy + demi, houp[1], houp[2], coul)
@@ -455,6 +484,9 @@ def main(argv: list[str]) -> int:
     chemin = Path(argv[1]) if len(argv) > 1 else CARTE_PAR_DEFAUT
     carte = json.loads(chemin.read_text(encoding="utf-8"))
     base = chemin.with_suffix("")
+    if "origine" in carte["taille"]:
+        # 0.13: la carte agrandie attend le lot L0 hors de `donnees/cartes/`; ses aperçus vont avec les captures.
+        base = ICI.parents[2] / "docs" / "jeux" / "jeu-1" / "captures" / "apercu" / "v0-13-carte"
     svg, w = vue_de_dessus(carte)
     sortie = base.parent / f"{base.name}-apercu.png"
     svg_vers_png(svg, sortie, w)
@@ -463,10 +495,18 @@ def main(argv: list[str]) -> int:
     sortie = base.parent / f"{base.name}-apercu-iso.png"
     svg_vers_png(svg, sortie, w)
     print(f"aperçu écrit: {sortie}")
-    # Tour 10: vues rapprochées, pour regarder de près la rue Haute et les intérieurs.
-    for nom, region, titre in (("est", (58, 10, 100, 40), ": la rue Haute (vue rapprochée)"),
-                               ("interieurs", (0, 14, 34, 34), ": maisonnette et épicerie (vue rapprochée)")):
-        if region[2] > carte["taille"]["largeur"]:
+    # Tour 10: vues rapprochées, pour regarder de près la rue Haute et les intérieurs; 0.13: les régions neuves.
+    vues = [("est", (58, 10, 100, 40), ": la rue Haute (vue rapprochée)"),
+            ("interieurs", (0, 14, 34, 34), ": maisonnette et épicerie (vue rapprochée)")]
+    if "origine" in carte["taille"]:
+        vues += [("eglise", (72, -22, 128, 12), ": l'église, le cimetière, la vigne, les champs (vue rapprochée)"),
+                 ("carrefour", (84, 12, 140, 40), ": le carrefour, la ferme, le hameau (vue rapprochée)"),
+                 ("ouest", (-24, 12, 20, 40), ": les cheminots, la friche, le moulin (vue rapprochée)"),
+                 ("bois-ouest", (-24, -30, 22, 12), ": la coupe, la maison forestière, le belvédère (vue rapprochée)"),
+                 ("bois", (14, -30, 86, 2), ": la clairière, la mare, la source (vue rapprochée)")]
+    ox, oy = origine(carte)
+    for nom, region, titre in vues:
+        if region[2] > ox + carte["taille"]["largeur"] or region[0] < ox:
             continue
         svg, w = vue_de_dessus(carte, region=region, c=28, titre=titre)
         sortie = base.parent / f"{base.name}-apercu-{nom}.png"

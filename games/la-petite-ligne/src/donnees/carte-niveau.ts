@@ -34,6 +34,13 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   const size = r.at('taille');
   const width = size.at('largeur').integer(8, 512);
   const height = size.at('hauteur').integer(8, 512);
+  // 0.13 (v0-13-carte.md, section 2): une carte à origine de grille (coordonnées négatives) attend le lot L0,
+  // qui apprend la grille décalée au rendu et à la simulation. D'ici là, on la refuse franchement (carte de
+  // secours et raison au journal) plutôt que de la lire décalée de toute son origine.
+  const origin = size.opt('origine');
+  if (origin !== null && (origin.at('x').integer() !== 0 || origin.at('y').integer() !== 0)) {
+    origin.fail('origine de grille pas encore prise en charge (lot L0 de la 0.13)');
+  }
 
   // Sol, d'après la légende du terrain.
   const terrain = r.at('terrain');
