@@ -7,14 +7,18 @@ import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { KeyInfo, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { characterOf } from './contexte';
-import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText, secretStamp } from './dom';
+import { button, chip, el, focusElement, icon, keycap, keysLine, setAttr, setText, secretStamp, token } from './dom';
 import { defaultBagSlot, defaultLetter, defaultQuest } from './focus';
 import { itemDetail, bagEmpty, bagFull } from './modele-panneaux';
 import { letterModels, nextObjective, notebookQuests, slotModel, type QuestModel } from './modele';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { GENERIC_VIGNETTE, type MemoriesPageModel, type MemoryEntryModel, memoriesPageModel } from './modele-souvenirs';
 import { type NeedsPageModel, needsPage } from './modele-maison';
-import { type FishPageModel, fishPageModel } from './modele-poissons';
+import { CURRENCY } from '../donnees/monnaie';
+import { capitalize } from './format';
+import { infoIcon, rarityClass, rarityIcon } from './icones';
+import { type FishBoardModel, type FishCardModel, fishBoard } from './modele-vitrine';
+import { type VitrineItem, Vitrine, detailHead, fishSilhouette, iconRow, layeredIcon, pastille, riverMap } from './vitrine';
 import { Panel } from './panneau';
 import { needsMuted, setNeedsMuted } from './preferences';
 import { SOUND_ATTR } from './sons';
@@ -59,6 +63,8 @@ export class NotebookPanel extends Panel {
   private dragFrom: number | null = null;
   /** Souvenirs nouveaux pendant cette visite de l'onglet (filet de laiton), ou `null` hors de l'onglet. */
   private freshMemories: Set<string> | null = null;
+  /** Patch 0.12.2: les poissons en vignettes, avec le détail de la sélection. */
+  private readonly fishPage: Vitrine;
 
   constructor(host: UiHost, tab: PanelTab | undefined) {
     const { ctx } = host;
@@ -76,6 +82,7 @@ export class NotebookPanel extends Panel {
       'Tab',
     );
     this.tab = tab === 'quests' || tab === 'mail' || tab === 'bag' || tab === 'fish' || tab === 'memories' || tab === 'needs' ? tab : lastTab;
+    this.fishPage = new Vitrine(host, { perPage: UI_SETTINGS.vitrine.fishPerPage, label: ctx.t(ctx.texts.extra.fish.pageLabel), variant: 'lpl-vitrine--fish' });
     const g = ctx.texts.game.ui.notebookTabs;
     this.badge = el('span', { class: 'lpl-tab__badge', hidden: true });
     const make = (id: NotebookTab, label: string, iconId: string, extra: HTMLElement | null): HTMLButtonElement =>
@@ -161,6 +168,8 @@ export class NotebookPanel extends Panel {
 
   override key(code: string, info: KeyInfo): boolean {
     if (code === 'KeyQ' || code === 'KeyE') {
+      // Poissons: les pages d'abord (au-delà de 28 poissons), puis l'onglet voisin.
+      if (this.tab === 'fish' && this.fishPage.turn(code === 'KeyQ' ? -1 : 1)) return true;
       const index = TABS.indexOf(this.tab);
       const next = TABS[(index + (code === 'KeyQ' ? -1 : 1) + TABS.length) % TABS.length] ?? 'quests';
       this.select(next, true);
@@ -292,39 +301,80 @@ export class NotebookPanel extends Panel {
     ];
   }
 
-  /** Poissons (pêche 0.12): en tête le compte, puis une rangée par rareté, silhouette et indice avant la prise. */
+  /**
+   * Poissons (pêche 0.12; patch 0.12.2): une grille de vignettes au liseré de rareté, une silhouette
+   * grise pour ceux pas encore pris, et le détail de la sélection en icônes (saisons, moments, coins
+   * sur une petite carte de la rivière, prix, record, prises).
+   */
   private renderFish(world: ReadonlyWorld): void {
-    const page = fishPageModel(world, this.host.ctx);
-    const sig = JSON.stringify(['fish', page]);
-    this.renderBody(sig, () => this.fishNodes(page));
+    const board = fishBoard(world, this.host.ctx);
+    const sig = JSON.stringify(['fish', board, this.fishPage.page]);
+    this.renderBody(sig, () => this.fishNodes(board));
   }
 
-  private fishNodes(page: FishPageModel): HTMLElement[] {
+  private fishNodes(board: FishBoardModel): HTMLElement[] {
     const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
     const t = ctx.texts.extra.fish;
-    const nodes: HTMLElement[] = [el('p', { class: 'lpl-fish-page__count' }, [el('strong', { text: page.count }), page.here === null ? null : el('span', { text: ` ${page.here}` })])];
-    let first = true;
-    for (const row of page.rows) {
-      const list = el('ul', { class: 'lpl-fish-page__list', 'data-nav': 'list' });
-      for (const entry of row.entries) {
-        list.append(
-          el('li', { class: 'lpl-fish-page__entry', tabindex: '0', 'data-nav-item': true, 'data-key': `fish:${entry.id}`, 'data-caught': entry.caught, 'data-autofocus': first }, [
-            el('span', { class: 'lpl-fish-page__shadow', 'aria-hidden': 'true', style: `--lpl-fish-length: ${String(entry.shadowLength)}` }),
-            el('strong', { class: 'lpl-fish-page__name', text: entry.name }),
-            entry.text === '' ? null : el('span', { class: 'lpl-fish-page__text', text: entry.text }),
-            ...entry.facts.map((f) => el('small', { class: 'lpl-fish-page__fact', text: f })),
-          ]),
-        );
-        first = false;
-      }
-      nodes.push(
-        el('section', { class: 'lpl-fish-page__row', 'data-rarity': row.rarity }, [
-          el('h3', { class: 'lpl-section-title' }, [row.title, ' ', el('span', { class: 'lpl-fish-page__scales', role: 'img', 'aria-label': row.scalesLabel, text: '◆'.repeat(row.scales) })]),
-          list,
-        ]),
-      );
-    }
-    return [el('div', { class: 'lpl-fish-page', role: 'region', 'aria-label': ctx.t(t.pageLabel) }, nodes)];
+    const strip = el('div', { class: 'lpl-vitrine__strip' }, [
+      pastille({ icon: infoIcon('caught'), text: `${String(board.caught)}/${String(board.total)}`, tone: board.caught === board.total ? 'ok' : 'count', label: ctx.t(v.countLabel, { caught: board.caught, total: board.total }) }),
+      board.here === null ? null : pastille({ icon: 'ui-pin', text: board.here, tone: 'info', label: ctx.t(v.here, { zone: board.here }) }),
+    ]);
+    const items = board.cards.map((c): VitrineItem => {
+      // Le poisson pris sur le fond teinté de sa rareté (dessin de l'artiste); sinon sa silhouette grise.
+      const figure = c.caught ? layeredIcon([rarityIcon(c.rarity), c.icon], 'lpl-tile__icon') : fishSilhouette(c.shadowLength);
+      const scales = el('span', { class: 'lpl-fish__scales', 'aria-hidden': 'true', text: '◆'.repeat(c.scales) });
+      return {
+        key: `fish:${c.id}`,
+        tile: {
+          icon: figure,
+          name: c.name,
+          label: `${c.name}, ${ctx.t(t.rarities[c.rarity])}${c.caught ? `, ${ctx.t(v.catchesLabel, { count: c.count })}` : ''}`,
+          badge: c.caught ? { icon: null, text: `×${String(c.count)}`, tone: 'count' } : null,
+          state: c.caught ? null : 'locked',
+          below: scales,
+          className: `lpl-tile--fish ${rarityClass(c.rarity)}`,
+          attrs: { 'data-rarity': c.rarity, 'data-caught': c.caught ? 'true' : 'false' },
+        },
+        detail: () => this.fishDetail(c),
+      };
+    });
+    const first = board.cards[0]?.id ?? null;
+    return [strip, this.fishPage.build(items, first === null ? null : `fish:${first}`)];
+  }
+
+  private fishDetail(c: FishCardModel): (Node | null)[] {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const t = ctx.texts.extra.fish;
+    const head = detailHead(c.caught ? layeredIcon([rarityIcon(c.rarity), c.icon], 'lpl-detail__icon') : fishSilhouette(c.shadowLength), c.name, c.line, `lpl-detail__figure--fish ${rarityClass(c.rarity)}`);
+    const rarity = el('span', { class: 'lpl-fish__rarity', 'data-rarity': c.rarity, role: 'img', 'aria-label': `${ctx.t(t.rarities[c.rarity])}, ${ctx.t(t.scalesLabel, { count: c.scales })}` }, [el('span', { 'aria-hidden': 'true', text: '◆'.repeat(c.scales) })]);
+    if (!c.caught) return [...head, rarity];
+    const seasonNames = c.seasons.map((s) => ({ ...s, name: capitalize(t.seasonNames[s.id]) }));
+    const momentNames = c.moments.map((m) => ({ ...m, name: capitalize(v.momentNames[m.id]) }));
+    const onList = (list: readonly { on: boolean; name: string }[]): string =>
+      list
+        .filter((x) => x.on)
+        .map((x) => x.name)
+        .join(', ');
+    const zonesOn = c.zones.filter((z) => z.on).map((z) => z.name);
+    const record = c.record;
+    const recordPastille = record === null ? null : pastille({ icon: infoIcon('record'), text: `${String(record.cm)} cm`, tone: 'info', label: ctx.t(v.recordLabel, { cm: record.cm, name: record.name }) });
+    recordPastille?.append(token(record?.by ?? 'self', this.host.symbol(record?.by ?? 'self'), 'small'));
+    return [
+      ...head,
+      rarity,
+      el('div', { class: 'lpl-detail__row' }, [
+        iconRow(seasonNames.map((s) => ({ icon: infoIcon(s.id), on: s.on, label: s.name })), ctx.t(v.seasonsLabel, { list: onList(seasonNames) })),
+        iconRow(momentNames.map((m) => ({ icon: infoIcon(m.id), on: m.on, label: m.name })), ctx.t(v.momentsLabel, { list: onList(momentNames) })),
+      ]),
+      riverMap(c.zones, ctx.t(v.zonesLabel, { list: zonesOn.join(', ') })),
+      el('div', { class: 'lpl-detail__pastilles' }, [
+        pastille(c.price === null ? { icon: 'ui-heart', tone: 'ok', label: ctx.t(t.released) } : { icon: CURRENCY.icon, text: String(c.price), tone: 'price', label: ctx.t(t.price, { price: ctx.t(ctx.texts.game.ui.hud.purse, { amount: c.price }) }) }),
+        recordPastille,
+        pastille({ icon: infoIcon('caught'), text: `×${String(c.count)}`, tone: 'count', label: ctx.t(v.catchesLabel, { count: c.count }) }),
+      ]),
+    ];
   }
 
   /**

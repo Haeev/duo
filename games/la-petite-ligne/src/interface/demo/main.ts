@@ -31,6 +31,7 @@ import { step } from '../../simulation/pas';
 import { createRobot } from '../../simulation/robot';
 import { SIM_DT } from '../../simulation/constantes';
 import { rememberNotebookTab } from '../carnet';
+import { patch0122NotebookTab } from './scenarios-0-12-2';
 import { createInterface } from '../index';
 import { scenarioBoardTab, scenarioSave, setupScenario } from './scenarios';
 import { rememberBoardTab } from '../tableau';
@@ -68,7 +69,10 @@ const players = [
 ] as const;
 const scenario = params.get('scenario') ?? 'titre';
 // Les scénarios de la suite partent d'une sauvegarde de référence: format 5 (tour 8), format 6 (tour 9).
-const SAVES = import.meta.glob<{ dataSchema: number; data: unknown }>('../../../tests/donnees/sauvegardes/format-[567]-*.json', { eager: true, import: 'default' });
+const SAVES = import.meta.glob<{ dataSchema: number; data: unknown }>(['../../../tests/donnees/sauvegardes/format-[567]-*.json', '../../../tests/donnees/sauvegardes/format-13-ete-jour-25.json'], {
+  eager: true,
+  import: 'default',
+});
 const saveName = scenarioSave(scenario);
 const save = saveName === null ? undefined : SAVES[`../../../tests/donnees/sauvegardes/${saveName}`];
 if (saveName !== null && save === undefined) throw new Error(`sauvegarde de référence absente: ${saveName}`);
@@ -78,6 +82,8 @@ const sim =
     : restoreWorld(content, map, decodeSave(structuredClone(save.data)), save.dataSchema, players);
 const afterMount = setupScenario(sim, scenario, me);
 if (params.get('onglet') === 'souvenirs') rememberNotebookTab('memories');
+const patchTab = patch0122NotebookTab(scenario);
+if (patchTab !== null) rememberNotebookTab(patchTab);
 if (params.get('onglet') === 'besoins' || scenario === 'besoins-carnet') rememberNotebookTab('needs');
 const boardTab = scenarioBoardTab(scenario);
 if (boardTab !== null) rememberBoardTab(boardTab);

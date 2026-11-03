@@ -5,8 +5,10 @@
  * (`chantierActions`) sert aussi à l'établi de Basile.
  */
 import { catalogueWindow } from '../donnees/commandes';
+import { CURRENCY } from '../donnees/monnaie';
 import type { ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
+import { UI_SETTINGS } from './config';
 import { nameOf } from './contexte';
 import { button, chip, el, icon, token } from './dom';
 import { defaultProduct } from './focus';
@@ -25,7 +27,9 @@ import {
   catalogueShelves,
   chantiersPage,
 } from './modele-tableau';
-import { Panel, backKeys, price, purseBadge } from './panneau';
+import { Panel, backKeys, purseBadge } from './panneau';
+import { itemFacts } from './modele-vitrine';
+import { type VitrineItem, Vitrine, detailActions, detailHead, flyCoin, pastille, pastilles } from './vitrine';
 import { SOUND_ATTR } from './sons';
 
 /** Dernier onglet ouvert du tableau, gardé d'une ouverture à l'autre (`null`: les annonces, une fois le tableau ouvert). */
@@ -49,6 +53,9 @@ export class BoardPanel extends Panel {
   private readonly purseSlot: HTMLSpanElement;
   private readonly partnerNote: HTMLSpanElement;
   private withTabs: boolean | null = null;
+  /** Patch 0.12.2: le catalogue en vignettes, par pages de 24. */
+  private readonly catalogue: Vitrine;
+  private lastWorld: ReadonlyWorld | null = null;
 
   constructor(host: UiHost, tab: PanelTab | undefined) {
     const { ctx } = host;
@@ -111,7 +118,8 @@ export class BoardPanel extends Panel {
     this.header.insertBefore(this.tabs, this.closeButton);
     this.header.insertBefore(this.purseSlot, this.closeButton);
     this.partnerNote = el('span');
-    this.root.classList.add('lpl-board');
+    this.root.classList.add('lpl-board', 'lpl-panel--vitrine');
+    this.catalogue = new Vitrine(host, { perPage: UI_SETTINGS.vitrine.catalogPerPage, label: ctx.t(ctx.texts.extra.catalogue.shelvesLabel), variant: 'lpl-vitrine--catalog' });
   }
 
   /** Pied: touches de l'onglet (A et E pour les pages dès que le tableau a ses onglets). */
@@ -152,6 +160,8 @@ export class BoardPanel extends Panel {
   }
 
   override key(code: string): boolean {
+    // A et E: les pages du catalogue d'abord, puis l'onglet voisin.
+    if ((code === 'KeyQ' || code === 'KeyE') && this.currentTab(this.withTabs === true) === 'catalogue' && this.catalogue.turn(code === 'KeyQ' ? -1 : 1)) return true;
     if ((code === 'KeyQ' || code === 'KeyE') && this.withTabs === true) {
       const index = BOARD_TABS.indexOf(this.tab);
       const next =
@@ -165,6 +175,7 @@ export class BoardPanel extends Panel {
 
   update(world: ReadonlyWorld): void {
     const { ctx } = this.host;
+    this.lastWorld = world;
     const tabs = boardOpen(world, ctx);
     if (tabs !== this.withTabs) {
       this.withTabs = tabs;
@@ -206,183 +217,133 @@ export class BoardPanel extends Panel {
           ? ctx.t(ctx.texts.game.ui.catalogue.subtitle)
           : ctx.t(k.closedSubtitle),
     );
-    const sig = JSON.stringify(['catalogue', shelves, open, delivered, partnerName, world.purse]);
+    const vitrine = this.catalogue;
+    const sig = JSON.stringify(['catalogue', shelves, open, delivered, partnerName, world.purse, vitrine.page]);
     this.renderBody(sig, () => {
-      let summary: HTMLElement;
+      const strip: HTMLElement[] = [];
       if (delivered && inChest > 0) {
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', {}, [
-            icon('parcel'),
-            ' ',
-            inChest === 1 ? ctx.t(k.deliveredOne) : ctx.t(k.delivered, { count: inChest }),
-          ]),
-          el('span', { text: ctx.t(k.deliveredText) }),
-        ]);
+        strip.push(el('p', { class: 'lpl-vitrine__notice' }, [icon('parcel'), inChest === 1 ? ctx.t(k.deliveredOne) : ctx.t(k.delivered, { count: inChest })]));
       } else if (!open) {
-        const time = hourLabel(
-          catalogueWindow(ctx.content.settings, world.clock.day).delivery.time,
-          ctx.texts.game.ui.hud.time,
-        );
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', {}, [icon('ui-lock'), ' ', ctx.t(k.closed)]),
-          el('span', { text: ctx.t(k.closedText, { time }) }),
-        ]);
+        const time = hourLabel(catalogueWindow(ctx.content.settings, world.clock.day).delivery.time, ctx.texts.game.ui.hud.time);
+        strip.push(el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(k.closed), ' ', pastille({ icon: 'ui-train', text: time, tone: 'info', label: ctx.t(k.closedText, { time }) })]));
       } else {
         const ordered = products.filter((p) => p.ordered > 0);
-        const list = ordered
-          .map(
-            (p) =>
-              `${itemName(ctx.content.items[p.item], p.ordered, p.item)}, ${ctx.t(ctx.texts.game.ui.shop.price, { price: p.price * p.ordered })}`,
-          )
-          .join(' · ');
-        summary = el('div', { class: 'lpl-order__summary' }, [
-          el('strong', {
-            text: ordered.length === 0 ? ctx.t(k.orderedNone) : ctx.t(k.ordered, { list }),
-          }),
-          el('span', {
-            text: ctx.t(k.bigPurchase, {
-              amount: ctx.content.settings.economy.bigPurchaseThreshold,
-            }),
-          }),
-        ]);
+        const list = ordered.map((p) => `${itemName(ctx.content.items[p.item], p.ordered, p.item)}, ${ctx.t(ctx.texts.game.ui.shop.price, { price: p.price * p.ordered })}`).join(' · ');
+        const total = ordered.reduce((sum, p) => sum + p.price * p.ordered, 0);
+        const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
+        const big = pastille({ icon: null, text: `≥ ${String(threshold)}`, tone: 'info', label: ctx.t(k.bigPurchase, { amount: threshold }) });
+        big.prepend(token('other', this.host.symbol('other'), 'small'));
+        strip.push(
+          el('div', { class: 'lpl-vitrine__strip' }, [
+            pastille({ icon: 'parcel', text: ordered.length === 0 ? '0' : `${String(ordered.reduce((n, p) => n + p.ordered, 0))} · ${String(total)}`, tone: ordered.length === 0 ? 'count' : 'ok', label: ordered.length === 0 ? ctx.t(k.orderedNone) : ctx.t(k.ordered, { list }) }),
+            big,
+          ]),
+        );
       }
       const focusItem = products[defaultProduct(products)]?.item ?? null;
-      const sections = shelves.map((s, i) =>
-        el(
-          'section',
-          { class: `lpl-shelf${i > 0 ? ' lpl-section-gap' : ''}`, 'aria-label': s.title },
-          [
-            el('h3', { class: 'lpl-section-title', text: s.title }),
-            el(
-              'div',
-              { class: 'lpl-catalog', 'data-nav': 'grid' },
-              s.products.map((p) => this.product(p, partnerName, p.item === focusItem)),
-            ),
-          ],
-        ),
-      );
+      const items = products.map((p) => this.productItem(p, partnerName, shelves.find((s) => s.shelf === p.shelf)?.title ?? ''));
       const mine = products.some((p) => p.state === 'waiting');
       const withdraw = mine
-        ? el('div', { class: 'lpl-sheet__actions', style: 'margin-top: 0.75rem' }, [
-            button(
-              ctx.t(k.withdraw),
-              () => {
-                this.host.send({ type: 'proposal_withdraw' });
-              },
-              { attrs: { 'data-nav-item': true, 'data-key': 'withdraw' } },
-            ),
+        ? el('div', { class: 'lpl-sheet__actions' }, [
+            button(ctx.t(k.withdraw), () => {
+              this.host.send({ type: 'proposal_withdraw' });
+            }, { attrs: { 'data-nav-item': true, 'data-key': 'withdraw' } }),
           ])
         : null;
-      return [
-        summary,
-        el(
-          'div',
-          { class: 'lpl-shelves', role: 'region', 'aria-label': ctx.t(k.shelvesLabel) },
-          sections,
-        ),
-        withdraw,
-      ];
+      return [...strip, vitrine.build(items, focusItem === null ? null : `product:${focusItem}`), withdraw];
     });
   }
 
-  private product(p: ProductModel, partnerName: string, autofocus: boolean): HTMLButtonElement {
+  /** Une vignette du catalogue: le dessin, le prix en pastille, l'état en marque (coche, colis, sablier). */
+  private productItem(p: ProductModel, partnerName: string, shelfTitle: string): VitrineItem {
     const { ctx } = this.host;
     const k = ctx.texts.extra.catalogue;
-    const status = el('span', { class: 'lpl-product__status' });
-    let stamp: HTMLElement | null = null;
-    let pressed = false;
-    let disabled = false;
-    let waiting = false;
+    const v = ctx.texts.extra.vitrine;
+    const order = (from: Element | null): boolean => {
+      if (p.state !== 'orderable') return false;
+      this.host.send({ type: 'catalogue_order', item: p.item });
+      if (from !== null && !p.big) flyCoin(from, 'buy');
+      return true;
+    };
+    let corner: string | Node | null = null;
+    let state: 'missing' | 'done' | 'wait' | 'locked' | null = null;
+    let status: HTMLElement | null = null;
     switch (p.state) {
       case 'ordered':
-        pressed = true;
-        status.append(price(this.host, p.price), ` · ${ctx.t(k.statusOrdered)}`);
-        stamp = el('span', { class: 'lpl-stamp lpl-stamp--green', text: ctx.t(k.stampOrdered) });
+        corner = 'ui-check';
+        state = 'done';
+        status = el('span', { class: 'lpl-stamp lpl-stamp--green', text: ctx.t(k.stampOrdered) });
         break;
       case 'delivered':
-        status.append(ctx.t(k.inChest));
-        stamp = el('span', { class: 'lpl-stamp', text: ctx.t(k.stampDelivered) });
+        corner = 'parcel';
+        state = 'done';
+        status = el('span', { class: 'lpl-stamp', text: ctx.t(k.stampDelivered) });
         break;
       case 'waiting':
-        waiting = true;
-        status.append(
-          el('span', { class: 'lpl-product__price' }, [
-            icon('ui-coin'),
-            ctx.t(k.reserved, { amount: p.price }),
-          ]),
-          el('br'),
-          chip(ctx.t(k.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass'),
-        );
+        corner = 'ui-hourglass';
+        state = 'wait';
+        status = chip(ctx.t(k.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass');
         break;
       case 'partner_waiting':
-        disabled = true;
-        status.append(
-          price(this.host, p.price),
-          el('br'),
-          chip(ctx.t(k.proposedBy, { partner: partnerName }), 'waiting', 'ui-hourglass'),
-        );
+        corner = 'ui-hourglass';
+        state = 'locked';
+        status = chip(ctx.t(k.proposedBy, { partner: partnerName }), 'waiting', 'ui-hourglass');
         break;
       case 'too_expensive':
-        disabled = true;
-        status.append(
-          price(this.host, p.price),
-          el('br'),
-          el('span', {
-            class: 'lpl-text-alert',
-            text: ctx.t(ctx.texts.extra.common.missingMoney, { missing: p.missing }),
-          }),
-        );
+        state = 'missing';
         break;
       case 'closed':
-        disabled = true;
-        status.append(price(this.host, p.price), ` · ${ctx.t(k.closedStatus)}`);
+        corner = 'ui-lock';
+        state = 'locked';
         break;
       case 'orderable':
-        status.append(price(this.host, p.price));
-        if (p.big) {
-          const askChip = chip(ctx.t(k.askPartner, { partner: partnerName }));
-          askChip.prepend(token('other', this.host.symbol('other'), 'small'));
-          status.append(el('br'), askChip);
-        } else {
-          status.append(` · ${ctx.t(k.enterToOrder, { key: ctx.key('Enter') })}`);
-        }
+        corner = p.big ? token('other', this.host.symbol('other'), 'small') : null;
         break;
     }
-    // Outils (deux exemplaires, un par joueur): ce qu'il en reste, et ce qui part déjà au train.
-    const copies =
-      p.copies > 1 && p.state !== 'ordered'
-        ? el('span', { class: 'lpl-product__copies' }, [
-            ctx.t(k.copiesLeft, { left: p.left, copies: p.copies }),
-            p.ordered > 0 ? ` · ${ctx.t(k.orderedCount, { count: p.ordered })}` : '',
-          ])
-        : null;
-    return button(
-      [
-        icon(p.icon, 'lpl-product__icon'),
-        el('span', { class: 'lpl-product__name', text: p.name }),
-        el('span', { class: 'lpl-product__effect', text: p.effect }),
-        copies,
-        status,
-        stamp,
-      ],
-      () => {
-        if (p.state === 'orderable') this.host.send({ type: 'catalogue_order', item: p.item });
+    const label =
+      p.state === 'too_expensive'
+        ? ctx.t(v.missingLabel, { name: p.name, price: p.price, missing: p.missing })
+        : p.state === 'orderable' && p.big
+          ? ctx.t(v.bigLabel, { name: p.name, price: p.price, partner: partnerName })
+          : `${ctx.t(v.priceLabel, { name: p.name, price: p.price })}${status === null ? '' : `, ${status.textContent}`}`;
+    return {
+      key: `product:${p.item}`,
+      tile: {
+        icon: p.icon,
+        name: p.name,
+        label,
+        badge: { icon: null, text: String(p.price), tone: p.state === 'too_expensive' ? 'missing' : 'price' },
+        corner,
+        state,
+        attrs: { 'data-shelf': p.shelf },
       },
-      {
-        class: 'lpl-product',
-        attrs: {
-          'data-nav-item': true,
-          'data-key': `product:${p.item}`,
-          'data-shelf': p.shelf,
-          'aria-pressed': pressed ? 'true' : 'false',
-          'aria-disabled': disabled ? 'true' : null,
-          'data-state': waiting ? 'waiting' : null,
-          'data-autofocus': autofocus,
-        },
+      detail: () => {
+        const purse = this.lastWorld === null ? 0 : purseModel(this.lastWorld).amount;
+        const actions: (HTMLElement | null)[] = [status];
+        if (p.state === 'orderable' || p.state === 'too_expensive') {
+          const content = p.big ? [token('other', this.host.symbol('other'), 'small'), ctx.t(ctx.texts.extra.shop.propose, { partner: partnerName })] : [ctx.t(v.order)];
+          const orderButton = button(content, () => {
+            order(orderButton);
+          }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `order:${p.item}`, 'aria-disabled': p.state === 'orderable' ? null : 'true' } });
+          actions.push(orderButton);
+        }
+        return [
+          el('span', { class: 'lpl-overline', text: shelfTitle }),
+          ...detailHead(p.icon, p.name, p.effect),
+          pastilles([
+            p.state === 'too_expensive'
+              ? { icon: CURRENCY.icon, text: `${String(purse)}/${String(p.price)}`, tone: 'missing', crossed: true, label: ctx.t(ctx.texts.extra.common.missingMoney, { missing: p.missing }) }
+              : { icon: CURRENCY.icon, text: String(p.price), tone: 'price', label: ctx.t(ctx.texts.game.ui.shop.price, { price: p.price }) },
+            p.copies > 1 && p.state !== 'ordered' ? { icon: p.icon, text: `${String(p.left)}/${String(p.copies)}`, tone: 'count', label: ctx.t(k.copiesLeft, { left: p.left, copies: p.copies }) } : null,
+            p.ordered > 0 && p.copies > 1 ? { icon: 'parcel', text: `×${String(p.ordered)}`, tone: 'ok', label: ctx.t(k.orderedCount, { count: p.ordered }) } : null,
+            ...itemFacts(ctx, p.item),
+          ]),
+          detailActions(actions),
+        ];
       },
-    );
+      act: (tile) => order(tile),
+    };
   }
-
   // -------------------------------------------------------------------------
   // Annonces
 

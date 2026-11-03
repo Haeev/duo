@@ -39,6 +39,21 @@ export const UI_SETTINGS = {
   partnerPlaceRadius: 4,
   /** Achat groupé au comptoir (graines, clous). */
   shopBulk: 4,
+  /**
+   * Interface imagée (patch 0.12.2): largeur des panneaux et vignettes par page, choisies pour
+   * qu'une page tienne sans défiler à 1366x768 avec la taille d'interface à 100 % (`interface.css`,
+   * grilles de 5 colonnes pour le comptoir, 4 pour les recettes, 7 pour les poissons).
+   */
+  vitrine: {
+    shopWidth: '52rem',
+    shopPerPage: 20,
+    stationWidth: '52rem',
+    recipesPerPage: 8,
+    catalogPerPage: 24,
+    farmWidth: '54rem',
+    animalsPerPage: 8,
+    fishPerPage: 28,
+  },
   /** Barre de progression (R10): un geste plus court que cette durée n'en a pas (s). */
   progressMinSeconds: 1,
   /** Un arbre entamé montre ses coups ce temps après le dernier (s), à cette distance au plus (m). */
