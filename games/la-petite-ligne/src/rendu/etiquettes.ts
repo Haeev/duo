@@ -118,6 +118,33 @@ export class HenLabels {
       label.mesh.position.set(at.x, this.terrain.heightAt(at.x, at.y) + LIFT, at.y);
       label.mesh.quaternion.copy(this.camera.quaternion);
     }
+    // 0.12: le coq, les poussines et les chèvres, nommés par les joueurs (connus des deux).
+    const b = world.breeding;
+    const named: {
+      id: string;
+      name: string;
+      prev: { x: number; y: number };
+      pos: { x: number; y: number };
+      lift: number;
+    }[] = [];
+    if (b.rooster !== null) named.push({ ...b.rooster, lift: LIFT + 0.12 });
+    for (const c of b.chicks) named.push({ ...c, lift: 0.22 });
+    // Rentrée à la chevrerie, la chèvre n'a pas d'étiquette (elle attend à la porte ou dort dedans).
+    for (const g of b.goats) if (!g.home) named.push({ ...g, lift: 1.05 });
+    for (const a of named) {
+      if (a.name === '') continue;
+      seen.add(a.id);
+      let label = this.labels.get(a.id);
+      if (label === undefined) {
+        label = this.create();
+        this.labels.set(a.id, label);
+      }
+      if (label.text !== a.name) this.paint(label, a.name);
+      const at = interpolate(a.prev, a.pos, context.alpha, this.point);
+      label.mesh.visible = true;
+      label.mesh.position.set(at.x, this.terrain.heightAt(at.x, at.y) + a.lift, at.y);
+      label.mesh.quaternion.copy(this.camera.quaternion);
+    }
     for (const [id, label] of this.labels) {
       if (!seen.has(id)) label.mesh.visible = false;
     }

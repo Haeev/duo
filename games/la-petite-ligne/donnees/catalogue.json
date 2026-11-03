@@ -5,7 +5,7 @@
     { "season": "summer", "week": 1, "items": ["watering_can_copper", "axe_forged", "straw_hat"] },
     { "season": "summer", "week": 2, "items": ["fishing_rod_bamboo", "hen_extra", "pressed_flowers"] },
     { "season": "summer", "week": 3, "items": ["wicker_armchair"] },
-    { "season": "autumn", "week": 1, "items": ["hen_extra_2", "coop_calendar"] },
+    { "season": "autumn", "week": 1, "items": ["hen_extra_2", "coop_calendar", "goat_extra"] },
     { "season": "autumn", "week": 2, "items": ["wall_clock"] },
     { "season": "autumn", "week": 3, "items": ["autumn_wreath"] }
   ],

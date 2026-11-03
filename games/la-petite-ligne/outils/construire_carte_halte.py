@@ -112,6 +112,13 @@ TYPES = {
     "barrel": {"categorie": "decor", "nom": "tonneau", "emprise": [1, 1], "hauteur": 1.0},
     "water_barrel": {"categorie": "equipement", "nom": "tonneau d'eau de la maisonnette", "emprise": [1, 1],
                      "hauteur": 1.1},
+    # 0.12 (élevage): la botte de paille de la litière, et les deux chantiers de la file `elevage`.
+    "straw_bale": {"categorie": "equipement", "nom": "botte de paille de la litière des poules", "emprise": [1, 1],
+                   "hauteur": 0.6},
+    "goat_shed": {"categorie": "batiment", "nom": "chevrerie (cabane de planches, toit à une pente vers la voie)",
+                  "emprise": [2, 2], "hauteur": 2.2},
+    "henhouse_extended": {"categorie": "batiment", "nom": "poulailler agrandi (pondoir en appentis), à la place du "
+                          "poulailler réparé", "emprise": [3, 3], "hauteur": 3.0},
     "mailbox": {"categorie": "decor", "nom": "boîte aux lettres", "emprise": [1, 1], "hauteur": 1.3,
                 "occultation": [0.4, 0.0, 1.3]},
     "workbench": {"categorie": "equipement", "nom": "établi de Basile sous son auvent", "emprise": [2, 2],
@@ -417,6 +424,9 @@ def construire_objets() -> None:
     objet("water_barrel", 12, 26, ident="water_barrel")
     objet("henhouse", 14, 28, ident="henhouse")
     objet("mailbox", 16, 26, ident="mailbox")
+    # 0.12: la paille de la litière, rangée au bord du chemin, à deux pas de la porte du poulailler (on la
+    # prend en passant, sans traverser le bourg jusqu'à la remise de la draisine).
+    objet("straw_bale", 12, 28, ident="straw_bale")
     for x in range(2, 16):
         objet("fence", x, 36, rotation=0)
     for y in range(32, 36):
@@ -692,6 +702,20 @@ POINTS = [
     p("chicken_coop", 15.5, 31.5, "devant le poulailler: chantier, poules", objet="henhouse", rayon=2.0,
       important=True),
     p("hen_feeder", 13.5, 31.5, "la mangeoire des poules", important=True),
+    # 0.12 (élevage, conception section 4): paille, chevrerie et pâtures de la chèvre. Les cinq places sont
+    # à 3,5 m au moins de toute case de la voie (ballast et passage à niveau): avec une corde de 2,5 m, la
+    # chèvre reste à plus d'un mètre de la voie (CA-L5, `tests/elevage.test.ts`).
+    p("straw_bale", 12.5, 27.5, "la botte de paille: prendre une brassée pour la litière du poulailler",
+      objet="straw_bale", portee=1.5),
+    # La porte de l'artiste est sur la case de gauche vue de dehors (`door_cell` 0): la case nord quand la
+    # porte regarde l'ouest; le baquet est à sa droite (case sud), à portée du même point.
+    p("goat_shed", 14.4, 21.6, "devant la porte de la chevrerie (chantier `goat_shed`), tournée vers la maison: "
+      "le baquet, le retour du soir", rotation=1),
+    p("goat_graze_01", 15.5, 18.8, "pâture du talus, au nord de la chevrerie, entre le sentier et la route"),
+    p("goat_graze_02", 15.5, 24.8, "pâture entre la chevrerie et la boîte aux lettres"),
+    p("goat_graze_03", 4.5, 31.5, "pâture du pré, à l'ouest du potager"),
+    p("goat_graze_04", 8.5, 33.5, "pâture du pré, au sud du potager"),
+    p("goat_graze_05", 11.5, 32.5, "pâture du pré, près des poules"),
     # La place
     p("village_square", 38.5, 30.5, "la place, près du puits (Jeanne le soir)", rayon=3.0, important=True),
     p("well", 40.0, 28.0, "le puits: remplir l'arrosoir", objet="well", portee=1.5, important=True),
@@ -909,9 +933,7 @@ POINTS += [
     # places: un seul joueur ne peut pas tenir les deux (`ranges.stayAt` 4 m).
     p("garland_west", 34.5, 25.5, "au pied du lampadaire nord de la place: un bout de la guirlande de fanions"),
     p("garland_east", 47.5, 25.5, "au pied du lampadaire est de la place: l'autre bout de la guirlande de fanions"),
-    # La chevrerie: à l'est de la maisonnette, dans l'herbe entre le sentier (x 13) et le chemin (x 17 à 19),
-    # au pied du talus de la voie; devant sa porte, côté maison (sud).
-    p("goat_shed", 15.0, 20.0, "devant la porte de la chevrerie, à l'est de la maisonnette, au pied du talus"),
+    # La chevrerie (`goat_shed`): son point est posé avec le lot L-élevage, devant sa porte ouest (14,4 ; 22).
 ]
 
 ZONES = [
@@ -1020,6 +1042,16 @@ CHANTIERS = [
              "matin, chemin du quai, passage des trains"},
     {"id": "door_canopy", "type": "door_canopy", "x": 8.5, "y": 26.5, "rotation": 0, "rect": None, "cases": [],
      "role": "auvent au-dessus de la porte (case 8, 26), qui donne au sud sur le chemin: sans emprise au sol"},
+    # 0.12, file `elevage` (conception section 4.3).
+    {"id": "goat_shed", "type": "goat_shed", "x": 16.0, "y": 22.0, "rotation": 3,
+     "rect": {"x": 15, "y": 21, "w": 2, "h": 2}, "cases": [[15, 21], [16, 21], [15, 22], [16, 22]],
+     "role": "chevrerie de 2 x 2 m à l'est de la maisonnette, porte à l'ouest tournée vers la maison (on la voit de "
+             "la fenêtre est), sur l'herbe entre le sentier du jardin (x 13) et la route du gué (x 17 à 19); le toit "
+             "descend vers l'arrière (est, côté route): la pluie tombe derrière et non devant la porte"},
+    {"id": "coop_extension", "type": "henhouse_extended", "x": 15.5, "y": 29.5, "rotation": 0,
+     "rect": {"x": 14, "y": 28, "w": 3, "h": 3}, "cases": [],
+     "role": "poulailler agrandi (`henhouse_extended` de l'artiste, pondoir en appentis): même origine et même "
+             "emprise que le poulailler, qu'il remplace une fois bâti; quatre places de plus, rien ne bouge autour"},
 ]
 
 # Meubles déjà posés dans la maisonnette (objets.json, startingInventory.houseFurniture).

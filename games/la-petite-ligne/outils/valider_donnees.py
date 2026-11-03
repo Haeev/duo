@@ -206,6 +206,8 @@ PLACEHOLDERS = {"startPurse", "order", "linesDone", "linesTotal", "amount", "par
                 "count", "recipe", "envie", "quest", "title", "construction", "weekday", "day", "hours", "minutes",
                 "days", "furniture", "move", "act", "examine", "notebook", "bigPurchase",
                 # Tour 6 (R16): couleurs et noms des poules, ligne du secret (chez l'informé seul).
+                # 0.12 (élevage): qui a nommé la bête (message aux deux).
+                "player",
                 "henColor1", "henColor2", "henColor3", "henName", "henUnknown", "secret",
                 # Tour 7: onglet Souvenirs du carnet (`textes.souvenirs`).
                 "villager", "season", "year", "times", "seasonOf",
@@ -342,7 +344,7 @@ def check_tour9(data: dict[str, Any], reg: Registry, report: Report) -> None:
                 report.error(w, f"textes.annonces.{a.get('id')}.{key} manquant")
         if not a.get("scene") and not any(variants):
             report.error(w, "une annonce sans demande finit par une scène")
-    queues = {"bourg", "maisonnette"}
+    queues = {"bourg", "maisonnette", "elevage"}
     for ch in data.get("chantiers", {}).get("improvements", []):
         w = f"chantiers.{ch.get('id')}"
         check_id(ch.get("id"), w, report)

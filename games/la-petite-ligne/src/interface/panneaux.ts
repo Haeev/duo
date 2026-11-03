@@ -396,10 +396,12 @@ export class StationPanel extends Panel {
     const together = partnerAtHome(world, ctx);
     // Tour 9: la commande des chantiers de la maisonnette, à l'établi de Basile (dès la lettre `basile_works`).
     const basile = this.station === 'workbench' ? basileModel(world, ctx) : null;
+    // 0.12: les abris des bêtes, une file à part chez Basile.
+    const animals = this.station === 'workbench' ? basileModel(world, ctx, 'elevage') : null;
     // Tour 10: « Agrandir la maisonnette » (cellier, chambre) et le grand coffre de chêne.
     const rooms = this.station === 'workbench' ? basileRoomsModel(world, ctx) : null;
     const partnerName = nameOf(world, ctx.partner);
-    const sig = JSON.stringify([entries, locked, food, together, basile, rooms, partnerName, world.purse]);
+    const sig = JSON.stringify([entries, locked, food, together, basile, animals, rooms, partnerName, world.purse]);
     this.renderBody(sig, () => {
       const craftLabel = this.station === 'workbench' ? ctx.texts.game.ui.workbench.craft : ctx.texts.game.ui.stove.cook;
       const focusIndex = defaultProduct(entries);
@@ -442,6 +444,7 @@ export class StationPanel extends Panel {
       nodes.push(entries.length === 0 ? el('div', { class: 'lpl-empty', text: ctx.t(w.noRecipes) }) : list);
       if (locked > 0 && this.station === 'workbench') nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(w.lockedPlans) }));
       if (basile !== null) nodes.push(...basileSection(this.host, basile, partnerName));
+      if (animals !== null) nodes.push(...basileSection(this.host, animals, partnerName, { title: ctx.texts.extra.farm.basileTitle, allBuilt: ctx.texts.extra.farm.basileAllBuilt }));
       if (rooms !== null) nodes.push(...basileRoomsSection(this.host, rooms));
       if (this.station === 'stove') {
         nodes.push(el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.extra.stove.eatSection) }));
@@ -553,13 +556,13 @@ export class ChestPanel extends Panel {
  * « Commander à Basile » (tour 9, section 2.6): le chantier de la maisonnette ouvert, les planches
  * apportées (10 sous de moins chacune, 20 au plus), la commande payée d'un coup.
  */
-function basileSection(host: UiHost, m: BasileModel, partnerName: string): HTMLElement[] {
+function basileSection(host: UiHost, m: BasileModel, partnerName: string, labels: { title: string; allBuilt: string } | null = null): HTMLElement[] {
   const { ctx } = host;
   const k = ctx.texts.extra.basile;
-  const nodes: HTMLElement[] = [el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(ctx.texts.game.ui.basile.order) })];
+  const nodes: HTMLElement[] = [el('h3', { class: 'lpl-section-title lpl-section-gap', text: ctx.t(labels?.title ?? ctx.texts.game.ui.basile.order) })];
   const c = m.chantier;
   if (c === null) {
-    nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(m.allBuilt ? k.allBuilt : ctx.texts.extra.board.nextTomorrow) }));
+    nodes.push(el('p', { class: 'lpl-field__help', text: ctx.t(m.allBuilt ? (labels?.allBuilt ?? k.allBuilt) : ctx.texts.extra.board.nextTomorrow) }));
   } else {
     const extra: (HTMLElement | null)[] = [];
     if (!c.funded && c.pending === null) {

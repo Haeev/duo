@@ -19,11 +19,12 @@ import { freeSeatsNear, fullBenchNear, homeSeats, playerBench, seatReachable, si
 import { standPlace } from '../etat/bancs';
 import { fishAct, holdsRod, tryNet, waterAhead } from './peche';
 import { toolKindOf } from './catalogue';
-import { feedHens } from './poules';
+import { feedHens, petAnimal, pettableNear, strawCoop, takeStraw } from './poules';
+import { GOAT_REACH, fillPail, goatAct, goatLedBy, goatVerb, goatsThirsty, leadGoat, plantStake, pourPail, spotNear } from './chevres';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
 import { isCurtains, placeFurniture, toggleCurtains } from './amenagement';
 import { beginNapIfAfternoon, eatFromBag } from './besoins';
-import { addToBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
+import { addToBag, countInBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
 import { harvestTaken, pickupTaken, pickupTakenNear, rememberPickup } from './simultane';
 import { holdPlaceNear, lanternTargetNear, lightLantern, takeHold } from './moments';
 import { callableHen, callHen } from './secrets';
@@ -55,7 +56,13 @@ export type Target =
   /** Une place d'allumage des lanternes (tour 9), le moment du jour à sa fenêtre. */
   | { kind: 'lantern'; place: string; pos: Vec2 }
   /** Des rideaux à une fenêtre (tour 10): les ouvrir ou les fermer, de dedans. */
-  | { kind: 'curtains'; furniture: string; pos: Vec2 };
+  | { kind: 'curtains'; furniture: string; pos: Vec2 }
+  /** Une bête de l'élevage (0.12): poule, poussine, coq, chèvre. */
+  | { kind: 'animal'; id: string; pos: Vec2 }
+  /** Le piquet d'une chèvre (prendre la corde). */
+  | { kind: 'stake'; goat: string; pos: Vec2 }
+  /** Une place de pâture libre, pour qui mène la chèvre (planter le piquet). */
+  | { kind: 'spot'; spot: string; pos: Vec2 };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
@@ -65,6 +72,9 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
   [POINT.noticeBoard]: 'catalogue',
   [POINT.coopCrate]: 'crate',
   [POINT.workbench]: 'workbench',
+  // 0.12: la basse-cour (état des bêtes, couvée, noms), au poulailler et à la chevrerie.
+  [POINT.chickenCoop]: 'farm',
+  [POINT.goatShed]: 'farm',
 };
 /** Un clic au sol à moins de tant d'une place libre (m) vise le banc. */
 const BENCH_CLICK_RADIUS = 1.2;
@@ -86,6 +96,10 @@ const ACT_POINTS = [
   SALON.bench,
   // 0.12: la place du client au comptoir de mercerie (boutique de vêtements).
   CLOTHES.counter,
+  // 0.12: botte de paille, porte du poulailler, porte de la chevrerie.
+  POINT.strawBale,
+  POINT.chickenCoop,
+  POINT.goatShed,
 ];
 
 function frontPoint(c: Character, out: Vec2): Vec2 {
@@ -127,7 +141,25 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
     case 'station':
       return 'open';
     case 'point':
-      if (t.point === POINT.well || t.point === POINT.waterBarrel) return toolKindOf(sim, held?.item) === 'watering_can' ? 'refill' : null;
+      if (t.point === POINT.well || t.point === POINT.waterBarrel) {
+        if (toolKindOf(sim, held?.item) === 'watering_can') return 'refill';
+        const goats = sim.content.settings.goats;
+        return goats !== null && goatsThirsty(sim) && countInBag(c, goats.pailItem) === 0 ? 'fill_pail' : null;
+      }
+      if (t.point === POINT.strawBale) {
+        const care = sim.content.settings.hens.care;
+        return care !== null && sim.world.hens.length > 0 && countInBag(c, care.straw.item) === 0 ? 'take_straw' : null;
+      }
+      if (t.point === POINT.chickenCoop) {
+        if (sim.world.hens.length === 0) return null;
+        const care = sim.content.settings.hens.care;
+        return care !== null && countInBag(c, care.straw.item) > 0 ? 'straw' : 'open';
+      }
+      if (t.point === POINT.goatShed) {
+        const goats = sim.content.settings.goats;
+        if (goats === null || sim.world.breeding.goats.length === 0) return null;
+        return countInBag(c, goats.pailItem) > 0 ? 'pour' : 'open';
+      }
       if (t.point === POINT.henFeeder) return sim.world.hens.length > 0 ? 'feed' : null;
       if (t.point === POINT.groceryCounter) return shopOpen(sim) ? 'open' : null;
       if (t.point === POINT.groceryCustomer) return insideShopOpen(sim, c) ? 'open' : null;
@@ -155,6 +187,14 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return 'light';
     case 'curtains':
       return isHome(c) ? 'curtains' : null;
+    case 'animal': {
+      const goat = sim.world.breeding.goats.find((g) => g.id === t.id);
+      return goat === undefined ? 'pet' : goatVerb(sim, c, goat);
+    }
+    case 'stake':
+      return goatLedBy(sim, c.id) === null ? 'lead' : null;
+    case 'spot':
+      return 'plant';
     case 'bench': {
       const prop = playerBench(sim, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
@@ -162,6 +202,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return free ? 'sit' : null;
     }
     case 'cell': {
+      // Qui mène la chèvre plante le piquet là où il est (refusé hors des places, avec la raison).
+      if (goatLedBy(sim, c.id) !== null) return 'plant';
       const g = gardenCellAt(sim, t.cell);
       if (g !== null) return gardenVerb(sim, g, held?.item ?? null);
       if (held?.item === ITEM.hoe && !isSheltered(c) && !isBlockedCell(refreshBlockers(sim), t.cell.cx, t.cell.cy)) return 'dig';
@@ -188,6 +230,11 @@ const TIER: Record<Target['kind'], number> = {
   curtains: 4,
   // Pendant la quête des noms seulement (avant la mangeoire et la porte du poulailler).
   hen: 3,
+  // 0.12: après les points (la mangeoire passe avant la poule qui picore à côté), le piquet après la
+  // chèvre (on trait sans prendre la corde), la place de pâture avant tout (planter le piquet).
+  animal: 4.5,
+  stake: 5.5,
+  spot: 2,
   ground_item: 1,
   beam: 2,
   place: 3,
@@ -304,12 +351,34 @@ export function candidates(sim: Sim, c: Character): Target[] {
   if (hold !== null) out.push({ kind: 'hold', point: hold.point, taken: hold.taken, pos: point(sim, hold.point) });
   const hen = callableHen(sim, c);
   if (hen !== null) out.push({ kind: 'hen', id: hen.id, pos: hen.pos });
+  for (const t of breedingTargets(sim, c, hen?.id ?? null)) out.push(t);
   const lantern = lanternTargetNear(sim, c);
   if (lantern !== null) out.push({ kind: 'lantern', place: lantern, pos: point(sim, lantern) });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
   return out;
+}
+
+/** Bêtes, piquets et places de pâture à portée (0.12). */
+function breedingTargets(sim: Sim, c: Character, calledHen: string | null): Target[] {
+  const out: Target[] = [];
+  const pet = calledHen === null ? pettableNear(sim, c) : null;
+  if (pet !== null) out.push({ kind: 'animal', id: pet.id, pos: pet.pos });
+  const reach = sim.content.settings.ranges.action;
+  for (const goat of sim.world.breeding.goats) {
+    if (goat.led === null && distance(c.pos, goat.pos) <= GOAT_REACH) out.push({ kind: 'animal', id: goat.id, pos: goat.pos });
+    const stake = sim.map.points[goat.stake];
+    if (!goat.home && goat.led === null && stake !== undefined && distance(c.pos, stake) <= reach) out.push({ kind: 'stake', goat: goat.id, pos: stake });
+  }
+  const spot = spotNear(sim, c);
+  if (spot !== null) out.push({ kind: 'spot', spot, pos: point(sim, spot) });
+  return out;
+}
+
+/** La bête visée par une cible (pour l'interface), ou `undefined`. */
+function animalOf(t: Target): string | undefined {
+  return t.kind === 'animal' ? t.id : t.kind === 'hen' ? t.id : undefined;
 }
 
 /** La meilleure cible devant soi (Espace), avec son verbe. */
@@ -370,11 +439,15 @@ export function updateAim(sim: Sim, c: Character): void {
   if (pointed !== null) {
     const pos = pointed.target.kind === 'cell' ? { x: pointed.target.cell.cx + 0.5, y: pointed.target.cell.cy + 0.5 } : pointed.target.pos;
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: pointed.verb, blocked: null, source: 'pointer' };
+    const animal = animalOf(pointed.target);
+    if (animal !== undefined) aim.animal = animal;
   } else if (water !== null) {
     aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
   } else if (best !== null) {
     const pos = best.target.kind === 'cell' ? { x: best.target.cell.cx + 0.5, y: best.target.cell.cy + 0.5 } : best.target.pos;
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: best.verb, blocked: null };
+    const animal = animalOf(best.target);
+    if (animal !== undefined) aim.animal = animal;
     if (best.verb !== null) queueHint(sim, c.id, { on: 'near_interactable' });
     if (best.target.kind === 'cell' && sim.world.trees.some((t) => t.felled)) {
       const young = youngTreeAhead(sim, c);
@@ -401,7 +474,8 @@ export function updateAim(sim: Sim, c: Character): void {
       before.cell.cx === aim.cell.cx &&
       before.cell.cy === aim.cell.cy &&
       before.verb === aim.verb &&
-      before.source === aim.source);
+      before.source === aim.source &&
+      before.animal === aim.animal);
   if (!same) {
     c.aim = aim;
     sim.runtime.changed = true;
@@ -556,6 +630,36 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'fish':
       fishAct(sim, c);
       return;
+    case 'pet':
+      if (t.kind === 'animal') petAnimal(sim, c, t.id);
+      return;
+    case 'take_straw':
+      takeStraw(sim, c);
+      return;
+    case 'straw':
+      strawCoop(sim, c);
+      return;
+    case 'fill_pail':
+      if (t.kind === 'point') fillPail(sim, c, t.point);
+      return;
+    case 'pour':
+      pourPail(sim, c);
+      return;
+    case 'lead': {
+      const goat = t.kind === 'stake' ? sim.world.breeding.goats.find((g) => g.id === t.goat) : undefined;
+      if (goat !== undefined) leadGoat(sim, c, goat);
+      return;
+    }
+    case 'plant':
+      plantStake(sim, c);
+      return;
+    case 'brush':
+    case 'milk':
+    case 'goat_hold': {
+      const goat = t.kind === 'animal' ? sim.world.breeding.goats.find((g) => g.id === t.id) : undefined;
+      if (goat !== undefined) goatAct(sim, c, goat, verb);
+      return;
+    }
     case 'till':
     case 'sow':
     case 'water':
@@ -693,6 +797,9 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
         const p = sim.map.points[id];
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
       }
+      // 0.12: un clic sur une bête de l'élevage (ou tout près d'elle), après les points d'action.
+      const animal = animalAt(sim, at);
+      if (animal !== null) return animal;
       const cell = { cx: Math.floor(click.x), cy: Math.floor(click.y) };
       const cellTarget: Target = { kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } };
       // Un clic sur un banc (le sol juste sous ou derrière lui): sa place libre la plus proche,
@@ -704,6 +811,23 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       return (seat === undefined ? null : benchTarget(sim, seat)) ?? cellTarget;
     }
   }
+}
+
+/** La bête la plus proche d'un point cliqué (0,6 m au plus), en cible. */
+function animalAt(sim: Sim, at: Vec2): Target | null {
+  let best: Target | null = null;
+  let bestD = 0.6;
+  const b = sim.world.breeding;
+  const all: { id: string; pos: Vec2 }[] = [...sim.world.hens, ...b.chicks, ...b.goats.filter((g) => g.led === null)];
+  if (b.rooster !== null) all.push(b.rooster);
+  for (const a of all) {
+    const d = distance(a.pos, at);
+    if (d <= bestD) {
+      best = { kind: 'animal', id: a.id, pos: a.pos };
+      bestD = d;
+    }
+  }
+  return best;
 }
 
 /** Portée à laquelle on agit sur une cible. */

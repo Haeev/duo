@@ -62,6 +62,7 @@ import { AmbientFaunaPart } from './faune-ambiance';
 import { HenLabels } from './etiquettes';
 import { FishShadowsPart } from './ombres-poissons';
 import { createStateFishingSource, type FishingSource } from './peche-vue';
+import { BreedingPart } from './elevage';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /**
@@ -365,6 +366,10 @@ export class RenderEngine implements Renderer {
     characters.setInteriorProbe(() => interiors.localInside());
     world.add(garden);
     world.add(farm);
+    // 0.12: coq, poussines, chèvres, piquets et cordes, litière, herbe rase.
+    const breeding = new BreedingPart(map, content, library, materials, terrain, this.resources);
+    this.scene.add(breeding.group);
+    world.add(breeding);
     // Tour 9: chantiers bâtis, marelle, allumage des lampadaires (après la maisonnette: l'auvent suit sa coupe).
     const improvements = new ImprovementsPart(map, content, library, materials, terrain, this.resources, house, this.lamps);
     this.scene.add(improvements.group);

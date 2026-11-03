@@ -4,6 +4,9 @@
  * poulailler (Jeanne la nomme une demi-heure plus tard), un cadeau dans le sac de l'acheteur avec
  * sa quête « Un cadeau pour ... ». Le reste va au cellier, comme avant.
  */
+import { coopCapacity } from '../etat/elevage';
+import { coopHeadcount, newHenHappiness } from './poules';
+import { spawnGoat } from './chevres';
 import type { Character, CharacterId, Hen } from '../etat/types';
 import { type Sim, character, emit, message, newId, notify, notifyKey, point } from './contexte';
 import { POINT } from './ids';
@@ -66,8 +69,8 @@ export const HEN_DROP = { x: -1.2, y: 0.7 } as const;
 /** Une poule commandée: elle arrive devant le poulailler, pas encore nommée. */
 function deliverHen(sim: Sim, item: string, by: CharacterId | null): void {
   const def = sim.content.catalogue?.hens[item];
-  const s = sim.content.settings.hens;
-  if (def === undefined || sim.world.hens.length >= s.max) {
+  // 0.12: la place compte poules et poussines; 9 avec le poulailler agrandi.
+  if (def === undefined || coopHeadcount(sim) >= coopCapacity(sim.content, sim.world)) {
     storeAtHome(sim, item, 'ordinary', 1);
     return;
   }
@@ -85,6 +88,7 @@ function deliverHen(sim: Sim, item: string, by: CharacterId | null): void {
     nameKnownBy: [],
     namedBy: by,
     arrivedDay: sim.world.clock.day,
+    happiness: newHenHappiness(sim),
   };
   sim.world.hens.push(hen);
   sim.runtime.changed = true;
@@ -108,6 +112,11 @@ export function deliverWeeklyItem(sim: Sim, item: string, by: CharacterId | null
   const buyer = character(sim, by ?? 'p1');
   if (def.category === 'tool' && def.tool !== null) {
     deliverTool(sim, buyer, item);
+    return true;
+  }
+  // 0.12: la deuxième chèvre arrive à la chevrerie (à nommer).
+  if (item === sim.content.settings.goats?.extraItem) {
+    spawnGoat(sim);
     return true;
   }
   if (def.category === 'animal_order') {

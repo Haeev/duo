@@ -108,6 +108,9 @@ export type Intent =
   | { type: 'room_deposit'; room: string; item: ItemId; count: number }
   // Tour 10 (section 6.2): ouvrir ou fermer des rideaux accrochés à une fenêtre
   | { type: 'curtains'; furniture: string }
+  // 0.12 (élevage): choisir le nom d'une bête parmi les trois proposés; mettre une poule à couver
+  | { type: 'animal_name'; animal: string; name: string }
+  | { type: 'brood_start'; hen: string }
   // Fabrication, cuisine, repas
   | { type: 'craft'; recipe: RecipeId }
   | { type: 'eat'; item: ItemId }

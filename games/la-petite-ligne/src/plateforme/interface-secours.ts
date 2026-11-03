@@ -208,6 +208,16 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         button(row(), 'ok', { type: 'haircut', hair: a.hair, hairColor: a.hairColor, beard: a.beard });
         break;
       }
+      // 0.12: la basse-cour, au plus simple (le nom à choisir quand c'est son tour).
+      case 'farm': {
+        const request = w.breeding.naming[0];
+        if (request?.by === me.id) for (const name of request.options) button(row(), name, { type: 'animal_name', animal: request.animal, name });
+        break;
+      }
+      // 0.12: boutique de vêtements et garde-robe, sans version de secours (le lint exige les cas).
+      case 'clothes_shop':
+      case 'wardrobe':
+        break;
     }
     for (const p of w.proposals) {
       if (p.by === me.id) continue;

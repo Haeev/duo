@@ -905,7 +905,9 @@ export interface Settings {
   trees: TreeSettings;
   /** Cueillette (tour 8), ou `null`. */
   forage: ForageSettings | null;
-  hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number };
+  hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number; care: HenCareSettings | null };
+  /** La chèvre au piquet (0.12, section 4.3); `null`: pas de chèvre. */
+  goats: GoatSettings | null;
   /** Tableau des annonces (tour 9, section 1); `null`: pas de tableau. */
   board: BoardSettings | null;
   /** Chantiers (tour 9, section 2.6); `null`: pas de chantiers. */
@@ -1192,7 +1194,109 @@ export interface AnnonceDef {
   uniqueScene: string | null;
 }
 
-export type ImprovementQueue = 'bourg' | 'maisonnette';
+export type ImprovementQueue = 'bourg' | 'maisonnette' | 'elevage';
+
+/** Bonheur d'une bête (0.12, sections 4.2 et 4.3): points sur 100, jamais sous `floor`. */
+export interface HappinessSettings {
+  start: number;
+  /** Par aube. */
+  drift: number;
+  floor: number;
+  max: number;
+  /** Seuils des mots: « Ravie » à partir de `happy`, « Tranquille » à partir de `calm`, sinon « Ébouriffée ». */
+  happy: number;
+  calm: number;
+}
+
+/** Soins de la basse-cour (0.12, section 4.2), dans `reglages.hens.care`. */
+export interface HenCareSettings {
+  happiness: HappinessSettings & {
+    /** Bonheur des poules d'une partie reprise (migration). */
+    migration: number;
+    fed: number;
+    straw: number;
+    /** La litière compte fraîche tant qu'elle a au plus tant de jours. */
+    strawDays: number;
+    pet: number;
+    callByName: number;
+    /** En dessous: un œuf un jour sur deux. */
+    everyOtherBelow: number;
+    /** À partir de: bel œuf (`fine`). */
+    fineFrom: number;
+    /** À partir de: la poule veut couver. */
+    broodFrom: number;
+  };
+  /** Capacité du poulailler agrandi (chantier `coop_extension`). */
+  maxExtended: number;
+  extensionImprovement: string;
+  grain: {
+    item: string;
+    rations: number;
+    perHen: number;
+    /** Avant ce jour, le grain de la mangeoire est fourni (démo inchangée). */
+    fromDay: number;
+    /** Sans grain, en ces saisons, un œuf un jour sur deux (« elles picorent le pré »). */
+    forageSeasons: readonly Season[];
+    /** Article du catalogue qui nourrit à l'aube tant qu'il reste des rations. */
+    hopper: string;
+  };
+  petRange: number;
+  straw: { item: string; seconds: number };
+  brood: {
+    eggs: number;
+    nights: number;
+    hatchChance: number;
+    roosterlingChance: number;
+    seasons: readonly Season[];
+    lastSeasonDay: number;
+    growNights: number;
+    colorMother: number;
+    colorGolden: number;
+  };
+  /** Les six couleurs de la collection, dans l'ordre du carnet. */
+  colors: readonly string[];
+  goldenColor: string;
+  roosterVariant: string;
+  /** Noms proposés (trois tirés sans redite). */
+  roosterNames: readonly string[];
+  chickNames: readonly string[];
+}
+
+/** La chèvre (0.12, section 4.3), `reglages.goats`. */
+export interface GoatSettings {
+  happiness: HappinessSettings & {
+    freshGraze: number;
+    /** Une place est fraîche si elle n'a pas été broutée depuis tant de jours. */
+    freshDays: number;
+    water: number;
+    brush: number;
+    heldMilking: number;
+    milkNoneBelow: number;
+    milkTwoFrom: number;
+  };
+  max: number;
+  shedImprovement: string;
+  milkItem: string;
+  /** Traite de `milkFrom` à `milkUntil` (minutes du jour). */
+  milkFrom: number;
+  milkUntil: number;
+  milkSeconds: number;
+  heldMilkSeconds: number;
+  ropeLength: number;
+  followDistance: number;
+  followSpeedFactor: number;
+  homeAt: number;
+  outAt: number;
+  speed: number;
+  pailItem: string;
+  /** Places de pâture (points de la carte). */
+  spots: readonly string[];
+  /** Distance minimale d'une place au rail le plus proche (m). */
+  railClearance: number;
+  names: readonly string[];
+  /** Article du catalogue de la deuxième chèvre. */
+  extraItem: string;
+}
 
 /** Chantier (`chantiers.json`, tour 9, table 2.6). */
 export interface ImprovementDef {

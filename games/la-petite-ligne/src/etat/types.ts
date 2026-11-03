@@ -127,6 +127,11 @@ export interface WorldState {
   hens: Hen[];
   /** La mangeoire a été remplie aujourd'hui (les œufs viennent le lendemain matin). */
   feederFilled: boolean;
+  /**
+   * Élevage (0.12, format 9, conception section 4): coq, poussines, couvée, litière, grain entamé,
+   * chèvres, pâtures broutées et noms à choisir. Vides ou nuls au départ et à la migration.
+   */
+  breeding: BreedingState;
   train: TrainState;
   /** Bourse commune, en sous, jamais négative. */
   purse: number;
@@ -569,7 +574,9 @@ export type MenuKind =
   /** 0.12: la boutique de vêtements, au comptoir de la mercerie de Solange (essayer, acheter, se changer en cabine). */
   | 'clothes_shop'
   /** 0.12: se changer chez soi, au coffre (vêtements de sa garde-robe). */
-  | 'wardrobe';
+  | 'wardrobe'
+  /** La basse-cour (0.12, section 4): état des bêtes, couvée, noms à choisir, collection des couleurs. */
+  | 'farm';
 
 export type ActionKind =
   | 'idle'
@@ -648,6 +655,8 @@ export interface AimInfo {
    * absent: la case devant le personnage. Recalculé à chaque pas, jamais relu d'une sauvegarde.
    */
   source?: 'pointer';
+  /** Bête visée (poule, poussine, coq, chèvre): l'interface montre son nom et son humeur. */
+  animal?: string;
 }
 
 export type AimVerb =
@@ -679,7 +688,18 @@ export type AimVerb =
   /** Boire un chocolat chaud à la petite table d'Odette (tour 10, section 1.6). */
   | 'drink'
   /** Ouvrir ou fermer des rideaux accrochés à une fenêtre (tour 10, section 6.2). */
-  | 'curtains';
+  | 'curtains'
+  // Élevage (0.12, section 4): caresser, paille, seau, piquet, brosse, traite, tenir la chèvre.
+  | 'pet'
+  | 'take_straw'
+  | 'straw'
+  | 'fill_pail'
+  | 'pour'
+  | 'lead'
+  | 'plant'
+  | 'brush'
+  | 'milk'
+  | 'goat_hold';
 
 export interface PlacementPreview {
   item: ItemId;
@@ -836,6 +856,90 @@ export interface Hen {
   namedBy: CharacterId | null;
   /** Poule commandée au catalogue (tour 9): jour d'arrivée; Jeanne la nomme à 10 h 30. Absent pour les trois premières. */
   arrivedDay?: number;
+  /** Bonheur (0.12, section 4.2): de `care.happiness.floor` à 100. */
+  happiness: number;
+  /** Jour de son dernier œuf (un œuf un jour sur deux sous 40, ou sans grain l'été). Absent: jamais. */
+  lastEggDay?: number;
+}
+
+/** Une bête de la basse-cour qui ne pond pas: le coq, une poussine qui suit sa mère. */
+export interface Fowl {
+  id: string;
+  /** Vide tant que les joueurs ne l'ont pas nommée. */
+  name: string;
+  variant: string;
+  pos: Vec2;
+  prev: Vec2;
+  facing: number;
+  wander: Vec2;
+}
+
+export interface Chick extends Fowl {
+  /** Poule qu'elle suit (identifiant de `hens`). */
+  mother: string;
+  /** Jour de l'éclosion: poule à l'aube `bornDay + growNights`. */
+  bornDay: number;
+  /** Un coquelet: le cousin d'Odette le reprend à la première aube. */
+  roosterling?: true;
+}
+
+/** La couvée en cours: la poule au nid, les œufs, le jour où elle s'y est mise. */
+export interface BroodState {
+  hen: string;
+  eggs: number;
+  startDay: number;
+  by: CharacterId;
+}
+
+/** Une chèvre (0.12, section 4.3). */
+export interface Goat {
+  id: string;
+  name: string;
+  pos: Vec2;
+  prev: Vec2;
+  facing: number;
+  wander: Vec2;
+  happiness: number;
+  /** Place de pâture où est planté son piquet (`goat_graze_0n`). */
+  stake: string;
+  /** Qui la mène par la corde (piquet en main), ou `null`. */
+  led: CharacterId | null;
+  /** Rentrée à la chevrerie (le soir, la nuit et à l'aube jusqu'à `outAt`). */
+  home: boolean;
+  milkedDay: number | null;
+  /** Jour où l'eau a été versée dans son baquet. */
+  wateredDay: number | null;
+  /** Elle a brouté aujourd'hui une place fraîche (non broutée depuis `freshDays` jours). */
+  freshToday?: true;
+  /** Traite en cours: qui trait, l'avancée (0 à 1) et qui tient la tête. */
+  milking: { by: CharacterId; progress: number; holder: CharacterId | null } | null;
+}
+
+/** Un nom à choisir parmi trois, par un joueur, visible des deux. */
+export interface NamingRequest {
+  animal: string;
+  kind: 'rooster' | 'chick' | 'goat';
+  by: CharacterId;
+  options: string[];
+}
+
+export interface BreedingState {
+  rooster: Fowl | null;
+  chicks: Chick[];
+  brood: BroodState | null;
+  /** Jour où la litière du poulailler a été changée, `null`: jamais. */
+  strawDay: number | null;
+  /** Rations du sac de grain entamé à la mangeoire. */
+  grainRations: number;
+  goats: Goat[];
+  /** Dernier jour brouté par place de pâture. */
+  grazed: Record<string, number>;
+  /** Noms à choisir, dans l'ordre (le premier se choisit). */
+  naming: NamingRequest[];
+  /** Noms déjà donnés (tirages sans redite). */
+  namesUsed: string[];
+  /** Prochain joueur qui nomme une poussine (à tour de rôle). */
+  nextNamer: CharacterId;
 }
 
 // ---------------------------------------------------------------------------
@@ -1354,6 +1458,23 @@ export type WorldEvent =
   | { type: 'catalogue_page'; season: Season; week: number; items: ItemId[] }
   | { type: 'tool_upgraded'; by: CharacterId; item: ItemId; previous: ItemId | null }
   | { type: 'hen_delivered'; hen: string; item: ItemId; by: CharacterId | null }
+  // Élevage (0.12, section 4)
+  | { type: 'animal_petted'; by: CharacterId; animal: string }
+  | { type: 'straw_taken'; by: CharacterId }
+  | { type: 'coop_strawed'; by: CharacterId }
+  | { type: 'brood_started'; by: CharacterId; hen: string }
+  | { type: 'brood_hatched'; count: number; pullets: number }
+  | { type: 'roosterling_left' }
+  | { type: 'rooster_crowed' }
+  | { type: 'animal_arrived'; animal: string; kind: 'rooster' | 'goat' }
+  | { type: 'naming_requested'; animal: string; by: CharacterId }
+  | { type: 'animal_named'; by: CharacterId; animal: string; name: string }
+  | { type: 'goat_led'; by: CharacterId; goat: string }
+  | { type: 'goat_staked'; by: CharacterId; goat: string; spot: string }
+  | { type: 'goat_brushed'; by: CharacterId; goat: string }
+  | { type: 'goat_milked'; by: CharacterId; goat: string; count: number; together: boolean }
+  | { type: 'pail_filled'; by: CharacterId }
+  | { type: 'goat_watered'; by: CharacterId }
   | { type: 'hen_named'; hen: string; name: string; by: CharacterId | null }
   | { type: 'gift_given'; by: CharacterId; villager: VillagerId; item: ItemId }
   // Tour 9: moments (barrières armées, lanternes)

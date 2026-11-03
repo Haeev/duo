@@ -17,6 +17,7 @@ import { pickEnvies } from './envies';
 import { houseSpawn, midnightReturn, placeCharacter } from './deplacement';
 import { placeVillagers } from './habitants';
 import { morningEggs } from './poules';
+import { morningGoats } from './chevres';
 import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
 import { morningMoments } from './moments';
@@ -183,6 +184,7 @@ export function morning(sim: Sim): void {
   tidyGround(sim);
   morningForage(sim);
   morningEggs(sim);
+  morningGoats(sim);
   reopenCrate(sim);
   world.grocerSoldToday = 0;
   for (const c of world.characters) {

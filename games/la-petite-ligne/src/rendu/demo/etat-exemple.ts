@@ -243,6 +243,7 @@ export function createExampleWorld(
       wander: { ...at },
       nameKnownBy: [],
       namedBy: null,
+      happiness: 60 + index * 15,
     };
   });
 

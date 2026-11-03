@@ -53,6 +53,8 @@ import type { Terrain } from './terrain';
 
 const HOUSE_PROP = 'gatekeeper_house';
 const COOP_PROP = 'henhouse';
+/** Chantier du poulailler agrandi (0.12), qui remplace le poulailler réparé une fois bâti. */
+const COOP_EXTENSION = 'coop_extension';
 const INVALID_TINT = '#d9584f';
 const PLACEMENT_OPACITY = 0.55;
 /** Cadre du coin à soi: baguettes fines posées au sol, en retrait du bord des cases (m). */
@@ -381,6 +383,9 @@ export class HousePart implements EventfulPart {
     if (this.coop !== null) {
       // Pendant le chantier du poulailler, la ruine s'efface derrière les fantômes.
       this.coop.ruin.visible = find('chicken_coop')?.status === 'locked';
+      // 0.12: le poulailler agrandi (chantier `coop_extension`) est dessiné par les chantiers
+      // (`henhouse_extended`, même origine et même emprise): le poulailler réparé s'efface.
+      this.coop.group.visible = (world.improvements[COOP_EXTENSION]?.builtDay ?? null) === null;
     }
     this.lastWorldRooms = world.rooms;
     this.lastDay = world.clock.day;
