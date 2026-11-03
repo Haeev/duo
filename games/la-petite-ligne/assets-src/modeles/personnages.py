@@ -24,9 +24,19 @@ import animations_012  # noqa: E402
 import garde_robe as GR  # noqa: E402
 import habitants_013 as H13  # noqa: E402
 import palette as P  # noqa: E402
+import gabarits as GB  # noqa: E402
+import glb_post  # noqa: E402
+import temoins as TM  # noqa: E402
+import temoins_outils as TO  # noqa: E402
+import visages as VI  # noqa: E402
 
 PP = sys.modules[__name__]
 H13.PP = PP
+coiffures.PP = PP
+TM.PP, TM.GR, TM.CF = PP, GR, coiffures
+# Témoins de la qualité visuelle (temoins.py): construits à part, sautés dans les boucles générales
+TEMOINS = ["player_base", "wear_top_chemise", "wear_bottom_pantalon", "player_hair_short", "player_hair_short_hat",
+           "villager_colette", "villager_firmin", "villager_firmin_scarf"]
 
 FPS = 30
 HC = 1.58          # centre de la tête
@@ -433,10 +443,11 @@ def hair_round(g, style, hc, s=1.0):
         for sx in (1, -1):
             lobe((sx * 0.168, 0.03, 0.075), (0.035, 0.08, 0.06), segs=6, rings=4)
     elif style == "bob":
-        lobe((0, 0.08, -0.06), (0.19, 0.11, 0.13))
+        # 0.12.2: nuque et côtés arrêtés au-dessus du col et des épaules (ils y entraient de 3 cm)
+        lobe((0, 0.08, -0.035), (0.19, 0.11, 0.105))
         lobe((0, -0.1, 0.162), (0.14, 0.034, 0.04), segs=8, rings=4, rot=(15, 0, 0))
         for sx in (1, -1):
-            lobe((sx * 0.172, 0.0, -0.035), (0.05, 0.115, 0.115), segs=6, rings=5)
+            lobe((sx * 0.168, -0.005, -0.03), (0.05, 0.115, 0.112), segs=6, rings=5)
     else:  # bun
         lobe((0, 0.09, -0.01), (0.15, 0.1, 0.09))
         lobe((0, 0.15, 0.14), (0.085, 0.08, 0.08), segs=8, rings=5)
@@ -577,9 +588,12 @@ def hair_style(g, style, hc, k=1.0):
     if ROUND and style in ("short", "bob", "bun"):
         hair_round(g, style, hc)  # pièces des joueurs (tête de taille standard)
         coiffures.strands(g, hc, style)
+        coiffures.settle(g, style, hc)  # 0.12.2: posée sur les vêtements, ce qui pend suit le buste
         return
     if ROUND and style in coiffures.NEW_CUTS:
-        return coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
+        coiffures.hair_cut(g, style, hc)  # tour 10 (coiffures.py)
+        coiffures.settle(g, style, hc)
+        return
     if style == "short":
         hair_cap(g, hc, k)
         hair_back(g, hc, k, z_bot=-0.05)
@@ -1730,11 +1744,47 @@ def build_props_013(mat, stats):
     return out
 
 
+def gabarit_rest(gab, ref):
+    """Translations de repos (repère glTF du parent) des os du gabarit qui diffèrent du squelette commun: extra
+    `bone_rest` du personnage, que le jeu pose sur sa copie du squelette (gabarits.py)."""
+    import tempfile
+    ad = bpy.data.armatures.new("rig_" + gab)
+    ob = bpy.data.objects.new("rig_" + gab, ad)
+    bpy.context.scene.collection.objects.link(ob)
+    bpy.context.view_layer.objects.active = ob
+    bpy.ops.object.mode_set(mode="EDIT")
+    for name, h, t, par in GB.bones(gab):
+        eb = ad.edit_bones.new(name)
+        eb.head, eb.tail = h, t
+        if par:
+            eb.parent = ad.edit_bones[par]
+        eb.align_roll(Vector((0, 0, 1)) if name.startswith("foot") else Vector((0, -1, 0)))
+    bpy.ops.object.mode_set(mode="OBJECT")
+    path = os.path.join(tempfile.gettempdir(), f"lpl_gabarit_{gab}_{os.getpid()}.glb")
+    lpl.export_glb(path, [ob], animations=False)
+    tr = glb_post.node_translations(path)
+    os.remove(path)
+    bpy.data.objects.remove(ob, do_unlink=True)
+    out = {}
+    for name in BONE_NAMES:
+        a, b = tr[name], ref[name]
+        if max(abs(x - y) for x, y in zip(a, b)) > 1e-5:
+            out[name] = [round(x, 5) for x in a]
+    return out
+
+
 def main():
+    import tempfile
+    quick = os.environ.get("LPL_TEMOINS_SEUL")
     lpl.reset()
-    tex = lpl.build_char_texture()
-    mat = lpl.palette_material("lpl_characters", tex)
+    tex = lpl.build_char_texture(paint=VI.paint_tiles)
+    # couleurs de sommets (occlusion et peinture des témoins): tous les maillages en portent (blanc par défaut)
+    mat = lpl.palette_material("lpl_characters", tex, vcol="Col")
     arm = build_rig()
+    ref_path = os.path.join(tempfile.gettempdir(), f"lpl_rig_ref_{os.getpid()}.glb")
+    lpl.export_glb(ref_path, [arm], animations=False)
+    ref = glb_post.node_translations(ref_path)
+    os.remove(ref_path)
     sockets = [add_socket(arm, "socket_hand_r", "hand_r", Vector((-0.238, -0.004, 0.785))),
                add_socket(arm, "socket_hand_l", "hand_l", Vector((0.238, -0.004, 0.785)))]
     objs = [arm] + sockets
@@ -1746,13 +1796,43 @@ def main():
         stats["meshes"][name] = tris
         return ob
 
-    add("player_base", "player_a", rounded(build_player_base), True, GR.wear_cells())
-    for o in OUTFITS:
+    wc0 = GR.wear_cells()
+    rests = {}
+
+    def witness(name, row, builder, face, cells=None, who=None, context=None, extras=None):
+        gab = TM.GABARIT.get(who, "moyen")
+        ex = dict(extras or {})
+        if who in TM.IDLE:
+            ex["idle_clip"] = TM.IDLE[who]
+        if gab != "moyen":
+            if gab not in rests:
+                rests[gab] = gabarit_rest(gab, ref)
+            ex["bone_rest"] = rests[gab]
+        ob, tris = TM.make(name, row, rounded(builder), mat, arm, face, cells, gab=gab, context=context, lpl=lpl,
+                           extras=ex)
+        objs.append(ob)
+        stats["meshes"][name] = tris
+        return ob
+
+    pctx = TM.context_geo(lpl, wc0, rounded(TM.player_base), rounded(TM.chemise), rounded(TM.pantalon),
+                          rounded(lambda g, e: GR.shoes(g, PP, "bottines")), rounded(TM.player_hair_short))
+    witness("player_base", "player_a", TM.player_base, True, wc0, who="player")
+    witness("wear_top_chemise", "player_a", TM.chemise, False, wc0, context=pctx, extras={"slot": "top"})
+    witness("wear_bottom_pantalon", "player_a", TM.pantalon, False, wc0, context=pctx, extras={"slot": "bottom"})
+    witness("player_hair_short", "player_a", TM.player_hair_short, False, None, context=pctx)
+    witness("player_hair_short_hat", "player_a", TM.player_hair_short_hat, False, None, context=pctx)
+    witness("villager_colette", "colette", TM.colette, True, None, who="colette",
+            extras={"scale": H13.SCALES["colette"]})
+    witness("villager_firmin", "firmin", TM.firmin, True, None, who="firmin")
+    witness("villager_firmin_scarf", "firmin", TM.firmin_scarf, False, None, who="firmin_scarf")
+    for o in [] if quick else OUTFITS:
         add("player_outfit_" + o, "player_a", rounded(lambda g, e, o=o: build_outfit(g, o)), False)
     for h in HAIRS:
+        if "player_hair_" + h in TEMOINS or quick:
+            continue
         add("player_hair_" + h, "player_a", rounded(lambda g, e, h=h: hair_style(g, h, PHC, PK)), False)
     # tour 10: barbe courte, barbe fournie, moustache (pièces des joueurs au choix, couleur des cheveux)
-    for f in coiffures.FACIAL:
+    for f in [] if quick else coiffures.FACIAL:
         name = "player_" + f if f == "mustache" else "player_" + f
         add(name, "player_a", rounded(lambda g, e, f=f: coiffures.facial(g, f, PHC)), False)
     # 0.12 (garde-robe): plus de foulard; vêtements modulaires, badge du profil, coupes sous un chapeau
@@ -1763,11 +1843,13 @@ def main():
                 fn = (lambda g, e, st=st: GR.hat(g, PP, st, PHC))
             else:
                 fn = (lambda g, e, slot=slot, st=st: getattr(GR, slot)(g, PP, st))
+            if f"wear_{slot}_{st}" in TEMOINS or (quick and (slot, st) != ("shoes", "bottines")):
+                continue
             ob = add(f"wear_{slot}_{st}", "player_a", rounded(fn), False, wc)
             ob["slot"] = slot
             if (slot, st) in GR.COVERS:
                 ob["covers"] = GR.COVERS[(slot, st)]
-    for s in SYMBOLS:
+    for s in ["orb"] if quick else SYMBOLS:
         add("player_badge_" + s, "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s)), False)
         add("player_badge_" + s + "_outer", "player_a", rounded(lambda g, e, s=s: GR.badge(g, PP, s, True)), False)
 
@@ -1779,33 +1861,50 @@ def main():
             coiffures.STRANDS = True
         GR.flatten_under_hat(g, PHC, *PHEAD)
     for h in HAIRS:
+        if "player_hair_" + h + "_hat" in TEMOINS or quick:
+            continue
         add("player_hair_" + h + "_hat", "player_a", rounded(lambda g, e, h=h: hair_hat(g, e, h)), False)
-    for n in NPCS:
+    for n in [] if quick else NPCS:
+        if "villager_" + n in TEMOINS:
+            continue
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: build_npc_round(g, n, e)), True)
         if n == "jeanne":
             ob["scale"] = 0.75
     # 0.13 (lot H6): quatorze habitants nouveaux (habitants_013.py), même squelette et mêmes expressions
-    for n in H13.VILLAGERS:
+    for n in [] if quick else H13.VILLAGERS:
+        if "villager_" + n in TEMOINS:
+            continue
         ob = add("villager_" + n, n, rounded(lambda g, e, n=n: H13.build(g, n, e)), True)
         ob["scale"] = H13.SCALES[n]
-    for name, raised in (("villager_ambroise_loupe", False), ("villager_ambroise_loupe_up", True)):
+    for name, raised in () if quick else (("villager_ambroise_loupe", False), ("villager_ambroise_loupe_up", True)):
         ob = add(name, "ambroise", rounded(lambda g, e, r=raised: H13.ambroise_loupe(g, e, r)), False)
         ob["note"] = ("loupe d'horloger d'Ambroise, à montrer avec villager_ambroise: " +
                       ("relevée sur le front (en marchant)" if raised else "à l'oeil gauche (au travail)"))
-    objs.extend(build_props_013(mat, stats))
-    # tour 9: écharpe de Firmin (pièce à montrer avec villager_firmin en automne et en hiver), équipage du train
-    add("villager_firmin_scarf", "firmin", rounded(firmin_scarf), False)
-    for who in ("driver", "stoker"):
+    if not quick:
+        objs.extend(build_props_013(mat, stats))
+    # tour 9: équipage du train (l'écharpe de Firmin est construite avec les témoins)
+    for who in () if quick else ("driver", "stoker"):
         ob = add("rail_crew_" + who, who, rounded(lambda g, e, who=who: build_crew_round(g, who, e)), True)
         ob["note"] = "buste (pas de jambes): racine au plancher de la cabine, clips driver_lean et driver_wave"
 
+    for ob in objs:
+        if ob.type == "MESH":
+            TO.add_white_colors(ob)
     A = anims()
+    TM.idle_clips(A)
     stats["push_bike_hand_error_m"] = round(H13.push_bike_clips(A, arm), 4)
     names = bake_actions(arm, A)
     stats["animations"] = [{"name": n, "seconds": round(d, 3), "loop": lp} for n, d, lp in names]
-    path = os.path.join(lpl.OUT, "personnages.glb")
-    size = lpl.export_glb(path, objs, animation_mode="ACTIONS")
+    path = os.environ.get("LPL_SORTIE") or os.path.join(lpl.OUT, "personnages.glb")
+    lpl.export_glb(path, objs, animation_mode="ACTIONS", vertex_color="ACTIVE")
+    stats["post"] = glb_post.post_characters(path)
+    size = os.path.getsize(path)
     stats["file_bytes"] = size
+    stats["witness_tris"] = {k: stats["meshes"][k] for k in TEMOINS if k in stats["meshes"]}
+    if quick:
+        bpy.ops.wm.save_as_mainfile(filepath=path.replace(".glb", ".blend"), compress=True)
+        print("STATS", stats)
+        return
     # personnage complet d'un joueur: base + tenue + coiffure + foulard
     m = stats["meshes"]
     stats["player_example_tris"] = (m["player_base"] + m["wear_top_chemise"] + m["wear_bottom_pantalon"]

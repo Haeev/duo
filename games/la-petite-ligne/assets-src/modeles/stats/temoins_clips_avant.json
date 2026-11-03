@@ -1,0 +1,189 @@
+{
+ "villager_colette": {
+  "sit": {
+   "sol_min_mm": 21.8,
+   "sol_max_mm": 24.8,
+   "bras_buste_mm": 11.4,
+   "jambes_jupe_mm": 292.1,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "JAMBES"
+   ]
+  },
+  "harvest": {
+   "sol_min_mm": -16.6,
+   "sol_max_mm": 102.9,
+   "bras_buste_mm": 3.4,
+   "jambes_jupe_mm": 133.7,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE",
+    "JAMBES"
+   ]
+  },
+  "hoe": {
+   "sol_min_mm": -29.5,
+   "sol_max_mm": 5.4,
+   "bras_buste_mm": 41.5,
+   "jambes_jupe_mm": 67.8,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE",
+    "BRAS",
+    "JAMBES"
+   ]
+  },
+  "give": {
+   "sol_min_mm": -0.0,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 39.5,
+   "jambes_jupe_mm": 40.4,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "BRAS",
+    "JAMBES"
+   ]
+  },
+  "sow": {
+   "sol_min_mm": -15.0,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 42.6,
+   "jambes_jupe_mm": 40.4,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "BRAS",
+    "JAMBES"
+   ]
+  },
+  "walk": {
+   "sol_min_mm": -3.2,
+   "sol_max_mm": 42.7,
+   "bras_buste_mm": 2.1,
+   "jambes_jupe_mm": 126.5,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "FLOTTE",
+    "JAMBES"
+   ]
+  }
+ },
+ "villager_firmin": {
+  "sit": {
+   "sol_min_mm": 21.8,
+   "sol_max_mm": 24.8,
+   "bras_buste_mm": 7.6,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": []
+  },
+  "harvest": {
+   "sol_min_mm": -16.6,
+   "sol_max_mm": 102.9,
+   "bras_buste_mm": 0.0,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE"
+   ]
+  },
+  "hoe": {
+   "sol_min_mm": -29.5,
+   "sol_max_mm": 5.4,
+   "bras_buste_mm": 37.7,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE",
+    "BRAS"
+   ]
+  },
+  "give": {
+   "sol_min_mm": -0.0,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 34.1,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "BRAS"
+   ]
+  },
+  "sow": {
+   "sol_min_mm": -15.0,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 43.2,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "BRAS"
+   ]
+  },
+  "walk": {
+   "sol_min_mm": -3.2,
+   "sol_max_mm": 42.7,
+   "bras_buste_mm": 0.0,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "FLOTTE"
+   ]
+  }
+ },
+ "player_base": {
+  "sit": {
+   "sol_min_mm": 19.3,
+   "sol_max_mm": 22.4,
+   "bras_buste_mm": 0.0,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": []
+  },
+  "harvest": {
+   "sol_min_mm": -20.3,
+   "sol_max_mm": 97.4,
+   "bras_buste_mm": 0.0,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE"
+   ]
+  },
+  "hoe": {
+   "sol_min_mm": -44.5,
+   "sol_max_mm": 2.5,
+   "bras_buste_mm": 7.3,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE"
+   ]
+  },
+  "give": {
+   "sol_min_mm": -1.2,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 8.1,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": []
+  },
+  "sow": {
+   "sol_min_mm": -17.6,
+   "sol_max_mm": -0.0,
+   "bras_buste_mm": 8.2,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE"
+   ]
+  },
+  "walk": {
+   "sol_min_mm": -16.0,
+   "sol_max_mm": 17.9,
+   "bras_buste_mm": 0.0,
+   "jambes_jupe_mm": 0.0,
+   "cheveux_mm": 0.0,
+   "alertes": [
+    "ENFONCE"
+   ]
+  }
+ }
+}

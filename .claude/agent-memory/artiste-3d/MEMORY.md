@@ -173,7 +173,6 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - `controle_geometrie.py` ignore personnages.glb par défaut: lui passer le chemin absolu avec `--peaux` pour contrôler les habitants.
 - faune.py: la ligne `a = math.radians(LADDER_ANGLE)` existe deux fois (fonction ladder_wood et main): insérer avant `A.add("ladder_wood"`.
 - Le scratchpad est partagé avec d'autres sessions: travailler dans un sous-dossier à soi (un dossier `r1` existait déjà; un module Python du scratchpad peut masquer ceux des modèles).
-- Essai rapide d'habitants: un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
 
 ## Forêt et petits objets de la 0.13 (vérifié le 2026-11-03)
 
@@ -195,3 +194,25 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Décor sous une rive: mesurer la rive (à 0,3 m du mur, un toit à 45 degrés descend déjà de 0,3 m plus l'épaisseur): une glycine à 2,7 m sous un égout à 3 m traversait le toit.
 - Le scratchpad est partagé: un `p2.py` d'une autre session existait. Travailler dans `scratchpad/a3d013/` (ou un dossier à soi).
 - Plafonds de la 0.13 (carte 11.3, jusqu'à 1,5 fois): compter les nœuds hors `_interior` (le contenu n'est dessiné que dedans); ce qui est accroché aux murs (bouteilles, vaisselier) compte dehors, car le mur est toujours dessiné.
+- Essai rapide d'habitants (voir aussi la section 0.12.2): un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
+
+## Patch 0.12.2: coupes longues, texte en géométrie (vérifié le 2026-11-03)
+
+- Coupe qui pend sous le crâne: la lier au buste (poids glissant `head` au-dessus de 1,45 m, `chest` sous 1,36 m, `coiffures.settle`), sinon elle balaie dos et épaules dès que la tête tourne. Pas sur les coupes courtes: la peau de la nuque ressortirait quand la tête se renverse.
+- Contrôle coupe contre vêtements: `verifier/traversees_coiffures.py` (îlots, tous clips, 12 images). Pour un lobe convexe, tester « derrière tous les plans des faces »: le test par la normale du point le plus proche donne de faux dedans près des arêtes vives des lobes aplatis (54 mm fantômes).
+- Les clips qui renversent la tête (`look_up`, `hold_ladder`, `pole_*`, `reach_up`, `climb_ladder`, `drink`) et `carry_two` (avant-bras dans le crâne) traversent même avec la coupe rase: comparer à `crop` avant d'accuser une coupe.
+- Essai rapide de coupes: script qui construit squelette, corps, hauts, par-dessus, chapeaux et coupes seulement (2 s), puis le contrôle sur ce .blend (option `--blend`).
+- Texte net en géométrie: courbe FONT de Blender sur une police OFL (WOFF lu directement par bpy), `new_from_object` donne des triangles plats (environ 230 pour AUBRUNE en Jost Bold, `resolution_u` 2). Hauteur mesurée sur un E, largeur bornée. Au dos d'un panneau: rotation de 180 degrés autour de Z, même sens de faces.
+- Planches depuis personnages.blend: cacher toutes les sources (vélos et accessoires de la 0.13 posés à l'origine), pas seulement `player_*`.
+- bourg.py lancé seul rend aussi ses planches: `LPL_SANS_PLANCHES=1`, ou arrêter la tâche après « Saved as bourg.blend ». Vite en arrière-plan: timeout long (coupé à 30 min sinon). Capture SwiftShader de rendu.html: 5 à 15 min par vue; gltf-validator absent des node_modules: l'installer dans le scratchpad et passer `NODE_PATH`.
+
+## Qualité visuelle, étape A: témoins (vérifié le 2026-11-03)
+
+- Les clips de personnages.glb portaient translation et échelle de TOUS les os (échantillonnage de l'export): un gabarit à os plus longs était ramené au gabarit moyen par n'importe quel clip. `glb_post.strip_rest_channels` ne garde que les translations de `root` et `hips` (vérifie que les autres valent le repos). Three.js remet de lui-même le repos d'une propriété qu'aucun clip ne pilote.
+- Gabarit sans second squelette: modeler autour des os du gabarit, puis reculer chaque sommet de la somme pondérée des décalages de ses os (`gabarits.to_standard`), et donner au jeu les translations de repos (`bone_rest`, lues en exportant un squelette du gabarit seul). Dans Blender: translation de pose des os (`gabarits.apply_to_rig`). Hauteur des hanches commune (la piste du bassin est absolue).
+- COLOR_0: GLTFLoader active `vertexColors` sur le matériau partagé des personnages; un maillage sans COLOR_0 sortirait NOIR (attribut absent lu à 0). Tous les maillages du matériau en portent (`temoins_outils.add_white_colors`). Export `vertex_color="ACTIVE"` (entiers 16 bits), ramené à des octets par `glb_post.colors_to_bytes`. Le mode MATERIAL écrit des flottants VEC3.
+- Peinture qui garde la personnalisation sans shader: ce qui ne dépend pas de la couleur du joueur (yeux) dans une vignette de la texture; le reste en formes plaquées qui lisent une case (sourcils `hair_dark`, rides `skin_shade`) ou en couleurs de sommets multipliées (joues, plis, occlusion, surpiqûres ton sur ton). Une surpiqûre crème sur un tissu foncé fait du bruit au zoom 1: ton sur ton (`darken`).
+- `lpl.Geo` + `bmesh`: grille de décalque face à -Y: ordre (k, k+1 en x, puis rangée du dessus); polygone plan face à -Y: points dans le sens trigonométrique vu de devant (X à droite). Normales imposées (`normals_split_custom_set`) = normale lissée de la surface au point touché: le décalque prend la lumière de la peau.
+- Poses de repos par descente sur les angles (`verifier/poses_repos.py`, poignet, coude et bout de la main visés), plusieurs départs; l'avant-bras ne plie qu'en positif (sinon solution en hyperextension). Firmin mains dans le dos: upper_arm (39, 124, 32), forearm 59.
+- Une épaule en boule large sur un torse étroit se lit comme une épaulette au zoom 1: élargir le haut du torse, boule plus petite et plus basse.
+- Garde-fou: les heredocs qui écrivent dans un fichier du dépôt (`cat >> fichier`) et les patchs python avec `cd` puis git sont refusés; Edit ou un script dans le scratchpad. Une variable d'environnement devant `node` passe.

@@ -1,19 +1,25 @@
 {
  "meshes": {
-  "player_base": 1094,
+  "player_base": 1534,
+  "wear_top_chemise": 826,
+  "wear_bottom_pantalon": 598,
+  "player_hair_short": 1028,
+  "player_hair_short_hat": 384,
+  "villager_colette": 4838,
+  "villager_firmin": 4712,
+  "villager_firmin_scarf": 232,
   "player_outfit_work": 1186,
   "player_outfit_smock": 1242,
   "player_outfit_overalls": 1186,
-  "player_hair_short": 676,
   "player_hair_bob": 676,
   "player_hair_bun": 632,
   "player_hair_crop": 148,
   "player_hair_curls": 388,
   "player_hair_ponytail": 580,
   "player_hair_braid": 648,
-  "player_hair_pigtails": 720,
-  "player_hair_wavy": 676,
-  "player_hair_long": 688,
+  "player_hair_pigtails": 840,
+  "player_hair_wavy": 804,
+  "player_hair_long": 748,
   "player_hair_fringe": 604,
   "player_hair_quiff": 416,
   "player_hair_cloud": 432,
@@ -23,11 +29,9 @@
   "player_beard_full": 308,
   "player_mustache": 72,
   "wear_top_tshirt": 346,
-  "wear_top_chemise": 670,
   "wear_top_pull": 514,
   "wear_top_debardeur": 180,
   "wear_top_mariniere": 506,
-  "wear_bottom_pantalon": 476,
   "wear_bottom_short": 332,
   "wear_bottom_salopette": 826,
   "wear_bottom_jupe": 168,
@@ -55,22 +59,20 @@
   "player_badge_planet_outer": 120,
   "player_badge_comet": 116,
   "player_badge_comet_outer": 116,
-  "player_hair_short_hat": 316,
   "player_hair_bob_hat": 352,
   "player_hair_bun_hat": 380,
   "player_hair_crop_hat": 148,
   "player_hair_curls_hat": 388,
   "player_hair_ponytail_hat": 328,
   "player_hair_braid_hat": 396,
-  "player_hair_pigtails_hat": 432,
-  "player_hair_wavy_hat": 352,
-  "player_hair_long_hat": 400,
+  "player_hair_pigtails_hat": 552,
+  "player_hair_wavy_hat": 480,
+  "player_hair_long_hat": 460,
   "player_hair_fringe_hat": 280,
   "player_hair_quiff_hat": 236,
   "player_hair_cloud_hat": 432,
   "player_hair_crown_hat": 432,
   "player_hair_bob_long_hat": 380,
-  "villager_firmin": 2038,
   "villager_odette": 2434,
   "villager_basile": 2398,
   "villager_jeanne": 2286,
@@ -90,7 +92,6 @@
   "villager_leon": 2386,
   "villager_ambroise": 2274,
   "villager_nour": 2574,
-  "villager_colette": 2598,
   "villager_ambroise_loupe": 92,
   "villager_ambroise_loupe_up": 92,
   "school_satchel": 248,
@@ -100,7 +101,6 @@
   "bicycle_lucie": 1184,
   "bicycle_martial": 880,
   "bicycle_nour": 1026,
-  "villager_firmin_scarf": 232,
   "rail_crew_driver": 1630,
   "rail_crew_stoker": 1674
  },
@@ -327,6 +327,21 @@
    "loop": true
   },
   {
+   "name": "idle_player",
+   "seconds": 6.0,
+   "loop": true
+  },
+  {
+   "name": "idle_colette",
+   "seconds": 4.0,
+   "loop": true
+  },
+  {
+   "name": "idle_firmin",
+   "seconds": 8.0,
+   "loop": true
+  },
+  {
    "name": "push_bike",
    "seconds": 0.533,
    "loop": true
@@ -337,7 +352,23 @@
    "loop": true
   }
  ],
- "file_bytes": 11108900,
- "player_example_tris": 3392,
- "player_worst_tris": 4642
+ "post": {
+  "channels_removed": 1666,
+  "channels_kept_not_rest": 0,
+  "kept_examples": [],
+  "colors_converted": 109
+ },
+ "file_bytes": 11535644,
+ "witness_tris": {
+  "player_base": 1534,
+  "wear_top_chemise": 826,
+  "wear_bottom_pantalon": 598,
+  "player_hair_short": 1028,
+  "player_hair_short_hat": 384,
+  "villager_colette": 4838,
+  "villager_firmin": 4712,
+  "villager_firmin_scarf": 232
+ },
+ "player_example_tris": 4462,
+ "player_worst_tris": 5668
 }

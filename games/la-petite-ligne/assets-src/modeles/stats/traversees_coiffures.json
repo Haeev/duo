@@ -1,0 +1,732 @@
+{
+ "seuil_m": 0.003,
+ "images_par_clip": 12,
+ "clips": [
+  "repos",
+  "idle",
+  "walk"
+ ],
+ "pire_cas": {
+  "player_hair_short / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_short_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bun_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crop_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls_hat + wear_hat_paille / buste": {
+   "mm": 0.4,
+   "with": "wear_hat_paille",
+   "clip": "walk",
+   "frame": 10.2
+  },
+  "player_hair_curls_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_curls_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_ponytail_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_braid_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_pigtails_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy_hat + wear_hat_paille / buste": {
+   "mm": 1.0,
+   "with": "wear_hat_paille",
+   "clip": "walk",
+   "frame": 10.2
+  },
+  "player_hair_wavy_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_wavy_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_long / buste": {
+   "mm": 1.7,
+   "with": "wear_outer_cire",
+   "clip": "walk",
+   "frame": 5.8
+  },
+  "player_hair_long / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_long_hat + wear_hat_casquette / buste": {
+   "mm": 1.7,
+   "with": "wear_outer_cire",
+   "clip": "walk",
+   "frame": 5.8
+  },
+  "player_hair_long_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_long_hat + wear_hat_paille / buste": {
+   "mm": 1.7,
+   "with": "wear_outer_cire",
+   "clip": "walk",
+   "frame": 5.8
+  },
+  "player_hair_long_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_long_hat + wear_hat_bonnet / buste": {
+   "mm": 1.7,
+   "with": "wear_outer_cire",
+   "clip": "walk",
+   "frame": 5.8
+  },
+  "player_hair_long_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe_hat + wear_hat_paille / buste": {
+   "mm": 0.6,
+   "with": "wear_hat_paille",
+   "clip": "walk",
+   "frame": 13.1
+  },
+  "player_hair_fringe_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_fringe_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff_hat + wear_hat_paille / buste": {
+   "mm": 1.2,
+   "with": "wear_hat_paille",
+   "clip": "idle",
+   "frame": 98.2
+  },
+  "player_hair_quiff_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_quiff_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_cloud_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_paille / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_crown_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long_hat + wear_hat_casquette / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long_hat + wear_hat_casquette / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long_hat + wear_hat_paille / buste": {
+   "mm": 1.0,
+   "with": "wear_hat_paille",
+   "clip": "walk",
+   "frame": 10.2
+  },
+  "player_hair_bob_long_hat + wear_hat_paille / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long_hat + wear_hat_bonnet / buste": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  },
+  "player_hair_bob_long_hat + wear_hat_bonnet / bras": {
+   "mm": 0.0,
+   "with": "",
+   "clip": "",
+   "frame": 0
+  }
+ },
+ "depassements": []
+}
