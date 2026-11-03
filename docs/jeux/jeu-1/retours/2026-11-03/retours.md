@@ -23,6 +23,8 @@ Version jouée: Duo 0.2.x avec La Petite Ligne 0.12.1 (installée par la mise à
 
 - R15. Dans la maisonnette, un élément accroché au mur (le râtelier à outils, une barre à crochets sur deux montants) chevauche la fenêtre (capture du client, non enregistrée sur le disque).
 - R16. La porte de la maisonnette n'apparaît toujours pas vue de l'intérieur.
+- R17. Un cadre ne se pose pas sur les murs de la maison: l'aperçu reste rouge dès qu'un objet occupe la case de sol au pied du mur, alors que le mur est libre. Et posé sur une fenêtre, il la recouvre.
+- R18. Question du client sur l'étal: des produits semblent partir quand personne n'est derrière, sans rien rapporter. Selon le code, rien ne se vend sans joueur derrière l'étal; à 13 h, le reste retourne au cellier ou au coffre (message « L'étal est rangé »). À vérifier avec le client; la fermeture doit se voir mieux.
 
 ## Décisions du manager
 
