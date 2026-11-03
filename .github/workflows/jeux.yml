@@ -28,6 +28,10 @@ on:
         description: Catalogue seul (la release du jeu existe déjà, rien n'est reconstruit)
         type: boolean
         default: false
+      sans_tests:
+        description: Sans les tests du jeu (recours quand la suite vient de passer ailleurs et que le client attend; les types restent contrôlés)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -147,6 +151,7 @@ jobs:
         run: pnpm --filter "./games/$ID" run typecheck
 
       - name: Tests du jeu
+        if: github.event_name != 'workflow_dispatch' || !inputs.sans_tests
         run: pnpm --filter "./games/$ID" run test
 
       - name: Construction du jeu et de ses dépendances
