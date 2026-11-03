@@ -16,11 +16,12 @@ L'interface est une couche HTML et CSS posée sur la scène Three.js, dans la fe
 |---|---|---|
 | `jeton.css` | jetons: couleurs, polices, tailles, espacements, rayons, ombres sans flou, durées, couches | à importer |
 | `composants.css` | composants et leurs états, préfixe `lpl-` | à importer |
-| `icones.svg` | sprite de 74 symboles (objets, meubles, météo, interface, symboles des six profils Duo) | à importer avec `?raw` et à insérer une fois dans le DOM |
+| `icones.svg` | sprite de 239 symboles (0.12.2): une icône par objet et par plat, les 22 poissons (`fish-*`) et les fonds de leurs raretés (`rarity-*`), les six robes de poule et la robe à trouver (`hen-*`), les icônes d'information des fiches (`info-*`), meubles, météo, interface, vignettes des souvenirs, symboles des six profils Duo. Le code les nomme par `src/interface/config.ts` et `src/interface/icones.ts` | à importer avec `?raw` et à insérer une fois dans le DOM |
+| `planche-icones.png` | planche de contrôle de tout le sprite, 24 et 48 px, sur le papier et sur le bois sombre du carnet | non |
 | `titre.html`, `creation.html`, `petit-dejeuner.html`, `hud.html`, `dialogue.html`, `carnet.html`, `caisse.html`, `catalogue.html`, `achat.html`, `amenagement.html`, `nuit.html`, `fin.html` | une page par écran; l'état se choisit par l'ancre (`hud.html#veillee`) | référence |
 | `support/` | ce qui ne sert qu'aux maquettes: comportements de référence (`maquette.js`), portraits provisoires (`portraits.js`), injecteur du sprite (`icones.js`, généré), polices locales (`polices.css`), scènes provisoires (`scene-*.svg`, générées) | non |
 | `polices/` | copies des fichiers woff2 des deux polices et leurs licences OFL | non: le jeu prend les paquets npm |
-| `outils/` | `capturer.cjs` (captures et planche), `verifier.cjs` (mise en page, contrastes, clavier), `generer-icones.mjs`, `generer-scenes.mjs`, `typographier.py`, `icones-source.svg` | non |
+| `outils/` | `capturer.cjs` (captures et planche), `verifier.cjs` (mise en page, contrastes, clavier), `generer-icones.mjs`, `familles-icones.mjs` (poissons, raretés et robes de poule, dessinés par paramètres dans un bloc de `icones-source.svg`), `planche-icones.cjs` (planche et contrôle de palette), `generer-scenes.mjs`, `typographier.py`, `icones-source.svg` | non |
 | `captures/` | 88 captures PNG (voir section 9) | non |
 
 Ajouter `?taille=125` ou `?taille=150` à l'adresse d'une page simule la taille de l'interface; `?animations=reduites` coupe les animations.
@@ -293,7 +294,9 @@ Comportements propres:
 Depuis la racine du dépôt (Node 22, Playwright et Chromium de l'environnement):
 
 ```sh
+node games/la-petite-ligne/ui-maquettes/outils/familles-icones.mjs  # bloc des poissons, raretés et robes dans icones-source.svg
 node games/la-petite-ligne/ui-maquettes/outils/generer-icones.mjs   # icones.svg et support/icones.js
+node games/la-petite-ligne/ui-maquettes/outils/planche-icones.cjs   # palette et planche-icones.png
 node games/la-petite-ligne/ui-maquettes/outils/generer-scenes.mjs   # support/scene-*.svg
 python3 games/la-petite-ligne/ui-maquettes/outils/typographier.py games/la-petite-ligne/ui-maquettes/*.html
 node_modules/.bin/prettier --write games/la-petite-ligne/ui-maquettes

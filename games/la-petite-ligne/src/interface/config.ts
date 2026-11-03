@@ -2,6 +2,7 @@
  * Réglages de l'interface (durées, seuils, correspondances d'icônes et
  * couleurs des portraits). Les valeurs de jeu restent dans `donnees/`.
  */
+import type { FishRarity } from '../etat/peche';
 import { type ActionKind, type CharacterId, type FormLevel, type ItemId, TOOLBAR_SLOTS } from '../etat/types';
 
 export const UI_SETTINGS = {
@@ -131,7 +132,121 @@ export const ACTION_ICONS: Partial<Record<ActionKind, string>> = {
   sit: 'ui-house',
 };
 
-/** Symbole du sprite pour chaque objet (`ui-maquettes/icones.svg`). */
+/**
+ * Poissons (0.12.2): une silhouette et des couleurs par espèce (symboles `fish-*`, dessinés par
+ * `ui-maquettes/outils/familles-icones.mjs`). Le poisson générique `fish` ne sert plus que de repli.
+ */
+export const FISH_ICONS: Readonly<Record<string, string>> = {
+  gudgeon: 'fish-gudgeon',
+  minnow: 'fish-minnow',
+  stone_loach: 'fish-stone-loach',
+  bleak: 'fish-bleak',
+  roach: 'fish-roach',
+  chub: 'fish-chub',
+  trout: 'fish-trout',
+  perch: 'fish-perch',
+  dace: 'fish-dace',
+  bullhead: 'fish-bullhead',
+  tench: 'fish-tench',
+  barbel: 'fish-barbel',
+  pike: 'fish-pike',
+  grayling: 'fish-grayling',
+  brook_lamprey: 'fish-brook-lamprey',
+  bitterling: 'fish-bitterling',
+  shad: 'fish-shad',
+  mirror_carp: 'fish-mirror-carp',
+  salmon: 'fish-salmon',
+  burbot: 'fish-burbot',
+  golden_trout: 'fish-golden-trout',
+  moon_pike: 'fish-moon-pike',
+};
+
+/** Fond et liseré de chaque rareté (`rarity-*`), à poser derrière l'icône du poisson. */
+export const RARITY_ICONS: Readonly<Record<FishRarity, string>> = {
+  common: 'rarity-common',
+  rare: 'rarity-rare',
+  epic: 'rarity-epic',
+  legendary: 'rarity-legendary',
+  mythic: 'rarity-mythic',
+};
+
+/** Portrait de chaque robe de poule (`reglages.hens.care.colors`), et la silhouette d'une robe à trouver. */
+export const HEN_ROBE_ICONS: Readonly<Record<string, string>> = {
+  hen_white: 'hen-white',
+  hen_red: 'hen-red',
+  hen_black: 'hen-black',
+  hen_golden: 'hen-golden',
+  hen_ash: 'hen-ash',
+  hen_cuckoo: 'hen-cuckoo',
+};
+export const HEN_UNKNOWN_ICON = 'hen-unknown';
+
+/**
+ * Clés des icônes d'information des fiches (0.12.2): saisons et coins de pêche sous leurs identifiants
+ * du jeu (`spring`, `ford`...), moments du jour, prix, record, déjà pris, soins des poules.
+ */
+export type InfoIconKey =
+  | 'spring'
+  | 'summer'
+  | 'autumn'
+  | 'winter'
+  | 'morning'
+  | 'noon'
+  | 'evening'
+  | 'night'
+  | 'ford'
+  | 'sands'
+  | 'pontoon'
+  | 'confluence'
+  | 'ru'
+  | 'upstream'
+  | 'downstream'
+  | 'price'
+  | 'record'
+  | 'caught'
+  | 'hen_fed'
+  | 'hen_hungry'
+  | 'hen_rest'
+  | 'litter_clean'
+  | 'litter_dirty'
+  | 'egg_today'
+  | 'brood'
+  | 'hen_heart';
+
+export const INFO_ICONS: Readonly<Record<InfoIconKey, string>> = {
+  spring: 'info-season-spring',
+  summer: 'info-season-summer',
+  autumn: 'info-season-autumn',
+  winter: 'info-season-winter',
+  morning: 'info-time-morning',
+  noon: 'info-time-noon',
+  evening: 'info-time-evening',
+  night: 'info-time-night',
+  ford: 'info-spot-ford',
+  sands: 'info-spot-sands',
+  pontoon: 'info-spot-pontoon',
+  confluence: 'info-spot-confluence',
+  ru: 'info-spot-ru',
+  upstream: 'info-spot-upstream',
+  downstream: 'info-spot-downstream',
+  price: 'info-price',
+  record: 'info-record',
+  caught: 'info-caught',
+  hen_fed: 'info-hen-fed',
+  hen_hungry: 'info-hen-hungry',
+  hen_rest: 'info-hen-rest',
+  litter_clean: 'info-litter-clean',
+  litter_dirty: 'info-litter-dirty',
+  egg_today: 'info-egg-today',
+  brood: 'info-brood',
+  hen_heart: 'info-hen-heart',
+};
+
+/**
+ * Symbole du sprite pour chaque objet (`ui-maquettes/icones.svg`): une icône par chose (0.12.2). Deux
+ * objets ne partagent jamais un symbole; les variantes de couleur (vases, rideaux, poules) ont chacune
+ * le leur. Un test vérifie que chaque objet de `objets.json` a son entrée.
+ */
 export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   radish_seed: 'seed-radish',
   lettuce_seed: 'seed-lettuce',
@@ -140,30 +255,57 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   lettuce: 'lettuce',
   carrot: 'carrot',
   dandelion: 'dandelion',
+  wild_garlic: 'wild-garlic',
+  chanterelle: 'chanterelle',
+  blackberry: 'blackberry',
+  cep: 'cep',
+  elderberry: 'elderberry',
+  hazelnut: 'hazelnut',
   egg: 'egg',
   log: 'log',
   plank: 'plank',
   nail: 'nail',
   mattress: 'mattress',
   beam: 'beam',
+  handcar: 'handcar',
+  heavy_parcel: 'parcel-heavy',
   hoe: 'hoe',
   watering_can: 'watering-can',
   axe: 'axe',
+  fishing_rod: 'fishing-rod',
+  // Les outils améliorés gardent le dessin de leur outil, dans leur matière.
+  watering_can_copper: 'watering-can-copper',
+  axe_forged: 'axe-forged',
+  fishing_rod_bamboo: 'fishing-rod-bamboo',
+  grain_sack: 'grain-sack',
+  straw_armful: 'straw-armful',
+  water_pail: 'water-pail',
+  milk_can: 'milk-can',
+  fresh_cheese: 'fresh-cheese',
+  goat_extra: 'goat',
+  // Les poules commandées montrent leur robe (`catalogue.json`, hens): Brioche la rousse, Pervenche la blanche.
+  hen_extra: 'hen-red',
+  hen_extra_2: 'hen-white',
+  chalk_box: 'chalk-box',
+  coffee_mill: 'coffee-mill',
+  leather_apron: 'leather-apron',
+  wool_scarf: 'wool-scarf',
+  elder_jelly: 'elder-jelly',
   bread: 'bread',
-  crunchy_radishes: 'radish',
-  // Un plat, pas l'œuf de la ligne voisine de la commande.
-  omelette: 'soup',
+  crunchy_radishes: 'crunchy-radishes',
+  omelette: 'omelette',
   vegetable_soup: 'soup',
   iron_box: 'tin-box',
   riddle_card: 'riddle-card',
-  riddle_card_2: 'riddle-card',
-  emile_logbook: 'ui-notebook',
-  lucie_letter: 'ui-letter',
-  gudgeon: 'fish',
-  trout: 'fish',
-  fishing_rod: 'fishing-rod',
   shed_key: 'key',
   old_photo: 'photo',
+  riddle_card_2: 'riddle-card-2',
+  emile_logbook: 'logbook',
+  odette_parcel: 'parcel-odette',
+  jeanne_notebook: 'jeanne-notebook',
+  lucie_letter: 'letter-lucie',
+  ...FISH_ICONS,
+  jay_feather: 'jay-feather',
   straw_mattress: 'straw-bed',
   double_bed: 'double-bed',
   table: 'table',
@@ -172,21 +314,56 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   shelf: 'shelf',
   stove: 'stove',
   flower_pot: 'flower-pot',
+  small_vase: 'small-vase',
+  small_vase_blue: 'small-vase-blue',
+  small_vase_terracotta: 'small-vase-terracotta',
   oil_lamp: 'oil-lamp',
   rug: 'rug',
   curtains: 'curtains',
   crystal_radio: 'crystal-radio',
-  wood_stove: 'wood-stove',
   picture_frame: 'picture-frame',
-  // Tour 9: les outils améliorés gardent le dessin de leur verbe, les poules commandées celui de la poule.
-  watering_can_copper: 'watering-can',
-  axe_forged: 'axe',
-  fishing_rod_bamboo: 'fishing-rod',
-  hen_extra: 'hen',
-  hen_extra_2: 'hen',
-  wicker_armchair: 'chair',
-  pressed_flowers: 'picture-frame',
-  jeanne_drawing: 'picture-frame',
+  straw_hat: 'straw-hat',
+  pressed_flowers: 'pressed-flowers',
+  wicker_armchair: 'wicker-armchair',
+  coop_calendar: 'coop-calendar',
+  wall_clock: 'wall-clock',
+  autumn_wreath: 'autumn-wreath',
+  jeanne_drawing: 'jeanne-drawing',
+  wood_stove: 'wood-stove',
+  warm_bread: 'warm-bread',
+  brioche: 'brioche',
+  hot_chocolate: 'hot-chocolate',
+  bread_basket: 'bread-basket',
+  hourglass: 'sand-timer',
+  horn_comb: 'horn-comb',
+  oak_chest: 'oak-chest',
+  cellar_rack: 'cellar-rack',
+  curtains_blue: 'curtains-blue',
+  curtains_red: 'curtains-red',
+  curtains_yellow: 'curtains-yellow',
+  curtains_green: 'curtains-green',
+  curtains_gingham: 'curtains-gingham',
+  tool_rack: 'tool-rack',
+  market_stall: 'market-stall',
+  brick_crate: 'brick-crate',
+  goat_crate: 'goat-crate',
+  rooster_crate: 'rooster-crate',
+  garland: 'garland',
+  jeanne_chick_drawing: 'jeanne-chick-drawing',
+  cloth_coupon: 'cloth-coupon',
+  hen_feather: 'hen-feather',
+  crate: 'crate',
+  goat_bell: 'goat-bell',
+  mail_letter: 'mail-letter',
+  sugar: 'sugar',
+  jar: 'jar',
+  blackberry_jam: 'blackberry-jam',
+  roasted_hazelnuts: 'roasted-hazelnuts',
+  chanterelle_pan: 'chanterelle-pan',
+  nest_box: 'nest-box',
+  mail_parcel: 'parcel-mail',
+  hopper_feeder: 'hopper-feeder',
+  market_scale: 'market-scale',
 };
 
 /** Icône de secours par catégorie (objet sans dessin propre). */
@@ -332,11 +509,17 @@ export const PROFILE_SYMBOLS: readonly { id: string; color: string }[] = [
   { id: 'comet', color: '#22B07D' },
 ];
 
-/** Plumage de l'icône d'une poule, par variante (`animals.hen` de `objets.json`): blanche, rousse, noire. */
+/**
+ * Plumage de l'icône « hen » (appel d'une poule par son nom), par robe: blanche, rousse, noire, puis les
+ * robes nées des couvées (dorée, cendrée, coucou), comme le rendu (`owl_buff`, `goose_grey`, `heron_grey`).
+ */
 export const HEN_COLORS: Readonly<Record<string, string>> = {
   hen_white: '#f1ead9',
   hen_red: '#b5652f',
   hen_black: '#3b3430',
+  hen_golden: '#d8ae72',
+  hen_ash: '#8f887c',
+  hen_cuckoo: '#7f888e',
 };
 
 /** Icône de la météo. */
