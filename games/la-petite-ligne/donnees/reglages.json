@@ -205,7 +205,9 @@
   },
   "carry": {
     "handcar": { "item": "handcar", "from": "handcar_shed", "path": [[0, 4], [-2.5, 4]], "size": [1.4, 1.6], "quest": "handcar", "step": "push", "flag": "handcar_pushed" },
-    "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" }
+    "parcel": { "item": "heavy_parcel", "from": "train_stop", "to": "house_door" },
+    "lengths": { "beam": 4.5 },
+    "grip": { "side": 0.45, "fromEnd": 0.3, "reach": 1.2 }
   },
   "envies": { "personalPerDay": 1, "noRepeatForSamePlayer": true, "noRepeatWindowDays": 7, "unseenFactor": 4, "sharedFromDay": 16, "sharedEveryDays": 3, "sharedNoRepeatDays": 14 },
   "dialogues": { "datedRepeatDays": 28, "datedRepeatFromDay": 16 },
@@ -255,6 +257,7 @@
   "autosave": { "tier": "P1", "atDawn": true, "onExit": true, "slots": 1 },
   "fishing": { "tier": "P1", "castRange": 6, "castDistance": 4, "castShoreMargin": 0.3, "biteWaitSeconds": [3, 15], "hookWindowSeconds": 1.5, "flag": "fishing_enabled" },
   "feel": {
+    "steppingStoneVillagers": ["jeanne"],
     "fishWeights": { "gudgeon": 6, "chub": 3, "trout": 2 },
     "fishWeightsBySeason": {
       "spring": { "gudgeon": 6, "chub": 3, "trout": 2 },

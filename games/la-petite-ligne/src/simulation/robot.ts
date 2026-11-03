@@ -10,7 +10,7 @@ import { isHome } from '../etat/interieurs';
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE, SIM_HZ, TOOLBAR_SLOTS } from './constantes';
 import { type Sim, character, distance, partnerOf } from './contexte';
 import { pickDialogue } from './dialogues';
-import { blockersFor, refreshBlockers } from './deplacement';
+import { beamDistance, beamGrabRange, blockersFor, refreshBlockers } from './deplacement';
 import { findPath, isBlockedCell } from './grille';
 import { ITEM, POINT } from './ids';
 import { countInBag, countInStacks, heldStack } from './sac';
@@ -913,7 +913,7 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
   if (b === null) return false;
   const spot = b.to;
   if (!b.carried) {
-    if (distance(c.pos, b.pos) > sim.content.settings.feel.beamGrabRange - 0.4) {
+    if (beamDistance(sim, b, c.pos) > beamGrabRange(sim, b) - 0.4) {
       return goTo(sim, c, m, 'poutre', b.pos, 0.5, out) || true;
     }
     f.held = true;

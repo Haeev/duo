@@ -40,7 +40,8 @@ function sceneVillagerHere(sim: Sim, def: DialogueDef): boolean {
   return v !== undefined && v.visible && distance(v.pos, point(sim, def.point)) <= sim.content.settings.ranges.talk + 2;
 }
 
-function vars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
+/** Paramètres des répliques (`{partner}`, `{henColor1}`...), exportés pour le contrôle des textes. */
+export function dialogueVars(sim: Sim, who: CharacterId | null): Record<string, string | number> {
   // Les couleurs des poules (`{henColor1}`...): seul l'informé entend le dialogue qui les cite.
   const base = { ...textVars(sim), ...henVars(sim.world, sim.content) };
   return who === null ? base : { ...base, partner: partnerName(sim, who) };
@@ -78,7 +79,7 @@ function retryable(def: DialogueDef): boolean {
 }
 
 function lineViews(sim: Sim, def: DialogueDef, who: CharacterId | null): DialogueLineView[] {
-  const v = vars(sim, who);
+  const v = dialogueVars(sim, who);
   return def.lines.map((l) => ({ speaker: l.speaker, text: format(l.text, v) }));
 }
 
@@ -283,7 +284,7 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const def = pickDialogue(sim, villager, c.id);
   if (def === null) return false;
   const choices: DialogueChoiceView[] = [
-    ...def.choices.map((ch) => ({ id: ch.id, text: format(ch.text, vars(sim, c.id)) })),
+    ...def.choices.map((ch) => ({ id: ch.id, text: format(ch.text, dialogueVars(sim, c.id)) })),
     ...giveChoices(sim, c, villager),
   ];
   c.dialogue = { dialogue: def.id, villager, lines: lineViews(sim, def, c.id), line: 0, choices };
@@ -501,9 +502,9 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
   const quest = secretQuestOf(def);
   const correct = picked.correct === null ? null : evaluate(sim, picked.correct, { actor: c.id, baselines: null, toolEvent: null, quest });
   const start = d.lines.length;
-  d.lines.push({ speaker: c.id, text: format(picked.text, vars(sim, c.id)) });
+  d.lines.push({ speaker: c.id, text: format(picked.text, dialogueVars(sim, c.id)) });
   const reply = correct === false ? picked.replyWrong : picked.reply;
-  for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, vars(sim, c.id)) });
+  for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, dialogueVars(sim, c.id)) });
   d.choices = d.choices.filter((ch) => ch.id.startsWith(GIVE_PREFIX));
   d.line = start;
   // Compteurs des conditions `choice_made` (n'importe quel choix, ce choix, un choix juste), seulement

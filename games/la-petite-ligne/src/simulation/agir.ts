@@ -9,7 +9,7 @@ import { AIM_CONE, AIM_DISTANCE } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, point, sayIfWritten } from './contexte';
 import { queueHint } from './astuces';
 import { ghostAt, ghostNear } from './construction';
-import { footprintCells } from './deplacement';
+import { beamDistance, beamGrabRange, beamGrip, footprintCells } from './deplacement';
 import { talkTo } from './dialogues';
 import { nearPoint, shopOpen } from './economie';
 import { isBlockedCell } from './grille';
@@ -270,7 +270,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
     if (distance(c.pos, g.pos) <= reach) out.push({ kind: 'ground_item', id: g.id, pos: g.pos });
   }
   const beam = sim.world.beam;
-  if (beam !== null && !beam.carried && distance(c.pos, beam.pos) <= s.feel.beamGrabRange) out.push({ kind: 'beam', pos: beam.pos });
+  if (beam !== null && !beam.carried && beamDistance(sim, beam, c.pos) <= beamGrabRange(sim, beam)) out.push({ kind: 'beam', pos: beamGrip(sim, beam, c.pos) });
   if (c.placement !== null) out.push({ kind: 'place', pos: { x: c.placement.cell.cx + 0.5, y: c.placement.cell.cy + 0.5 } });
   for (const f of sim.world.furniture) {
     const def = sim.content.items[f.item];
@@ -673,7 +673,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
     case 'ground': {
       const at = { x: click.x, y: click.y };
       const beam = sim.world.beam;
-      if (beam !== null && distance(beam.pos, at) <= 1) return { kind: 'beam', pos: beam.pos };
+      if (beam !== null && beamDistance(sim, beam, at) <= 1) return { kind: 'beam', pos: beamGrip(sim, beam, at) };
       for (const id of ACT_POINTS) {
         const p = sim.map.points[id];
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
@@ -695,7 +695,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
 export function reachFor(sim: Sim, t: Target): number {
   const r = sim.content.settings.ranges;
   if (t.kind === 'bench') return sim.content.settings.benches.sitRange;
-  return t.kind === 'villager' ? r.talk - 0.3 : t.kind === 'beam' ? sim.content.settings.feel.beamGrabRange - 0.3 : r.action;
+  return t.kind === 'villager' ? r.talk - 0.3 : t.kind === 'beam' && sim.world.beam !== null ? beamGrabRange(sim, sim.world.beam) - 0.3 : r.action;
 }
 
 export function nearPointFor(sim: Sim, c: Character, id: string): boolean {

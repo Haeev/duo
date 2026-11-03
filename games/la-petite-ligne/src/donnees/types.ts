@@ -909,6 +909,19 @@ export interface Settings {
       flag: string;
     } | null;
     parcel: { item: string; from: string; to: string } | null;
+    /**
+     * Longueur (m) des charges longues, par objet (la poutre): on les prend n'importe où le long de
+     * leur axe, un bout chacun (retour S01). Absente: charge ramassée, prise depuis son centre.
+     */
+    lengths: Record<string, number>;
+    /**
+     * Où se met chaque porteur d'une charge longue en la soulevant: à `side` m de son axe, du côté
+     * où il était, et à `fromEnd` m au moins de chaque bout (les mains sur le bois, pas dans le vide).
+     * `reach`: portée (m) jusqu'à l'axe d'une charge longue, plus courte que `feel.beamGrabRange`
+     * (comptée depuis le centre d'une charge ramassée): Espace tenu au chantier voisin ne soulève
+     * pas la poutre couchée à côté.
+     */
+    grip: { side: number; fromEnd: number; reach: number };
   };
   /** Envies (HA-07, tour 8 section 5.4). */
   envies: EnvieSettings;
@@ -1060,6 +1073,11 @@ export interface FeelSettings {
   beamDropRadius: number;
   /** Vitesse de marche des habitants (m/s). */
   villagerSpeed: number;
+  /**
+   * Habitants qui passent le ru au gué de pierres, en sautant (Jeanne, `carte-halte.md`). Les autres
+   * prennent le pont, la passerelle ou le ponceau (retour S04: Achille semblait marcher dans l'eau).
+   */
+  steppingStoneVillagers: string[];
   /** Vitesse des poules (m/s). */
   henSpeed: number;
   /** Fenêtre de « Déjà pris par... » après une récolte (s). */
