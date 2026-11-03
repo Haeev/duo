@@ -3,6 +3,7 @@
  * nuit, fin de séance et fin de la démo (maquettes `titre.html`,
  * `creation.html`, `petit-dejeuner.html`, `nuit.html`, `fin.html`).
  */
+import { letterTitle } from '../etat/courrier';
 import { currentOrder } from '../donnees/commandes';
 import type { CharacterId, ReadonlyWorld } from '../etat/types';
 import type { Layer, UiHost } from './composant';
@@ -593,7 +594,7 @@ export class BreakfastScreen implements Layer {
       t.style.gridRow = 'span 2';
       this.list.append(questItem(t, ctx.t(`${g.sharedEnvie} : ${lowerFirst(shared.text)}`), secretStamp(ctx.t(b.shared)), ctx.t(b.sharedHelp)));
     }
-    const mail = todays.length === 0 ? b.mailNone : todays.map((l) => l.title).join(', ');
+    const mail = todays.length === 0 ? b.mailNone : todays.map((l) => letterTitle(ctx.content, l)).join(', ');
     const eggsText = eggs <= 0 ? '' : eggs === 1 ? ctx.t(b.egg) : ctx.t(b.eggs, { count: eggs });
     this.list.append(questItem(icon('ui-letter'), ctx.t(`${b.mail} : ${mail}`), null, eggsText));
 

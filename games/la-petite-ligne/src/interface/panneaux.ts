@@ -5,6 +5,7 @@
  * reprennent les mêmes composants, README des maquettes, section 5).
  */
 import { currentOrder } from '../donnees/commandes';
+import { letterText } from '../etat/courrier';
 import type { Quality, ReadonlyWorld } from '../etat/types';
 import type { PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
@@ -95,7 +96,7 @@ export class CratePanel extends Panel {
     const nextComing = result !== null && coming > result.day;
     this.takeBackHint.toggleAttribute('hidden', result !== null);
     this.setSubtitle(ctx.t(c.board, { day: orderDay, time: hourLabel(ctx.content.settings.train.departure, ctx.texts.game.ui.hud.time) }));
-    const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && l.text.includes(String(result.amount)));
+    const recap = world.letters.find((l) => l.day === world.clock.day && result !== null && letterText(ctx.content, l).includes(String(result.amount)));
     const sig = JSON.stringify([lines, result, world.clock.day, recap?.id]);
     this.renderBody(sig, () => {
       const done = lines.filter((l) => l.done).length;
@@ -110,7 +111,7 @@ export class CratePanel extends Panel {
           el('strong', { text: ctx.t(c.gone) }),
           el('span', { class: 'lpl-stamp', text: ctx.t(c.shipped) }),
           el('span', { text: ctx.t(c.shippedResult, { lines: linesText(ctx, result.linesDone, result.linesTotal), amount: result.amount }) }),
-          recap === undefined ? null : el('span', { text: ctx.t(`« ${recap.text} »`) }),
+          recap === undefined ? null : el('span', { text: ctx.t(`« ${letterText(ctx.content, recap)} »`) }),
         ]);
         return [summary, nextComing ? el('p', { class: 'lpl-field__help', text: ctx.t(c.nextOrder) }) : null];
       } else if (done === total) {

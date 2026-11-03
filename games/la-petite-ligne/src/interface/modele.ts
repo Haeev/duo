@@ -7,6 +7,7 @@ import { isTrainDay } from '../donnees/calendrier';
 import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
 import { linePay, productPrice } from '../etat/commande-generee';
+import { letterFrom, letterText, letterTitle } from '../etat/courrier';
 import { hudSeason, questTitleOf, weatherLabel } from '../etat/semaine';
 import { HOUSE_BUILDING, inRect } from '../etat/carte';
 import { houseRoomAt, isNapping } from '../etat/maison';
@@ -677,8 +678,8 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
     .sort((a, b) => b.l.day - a.l.day || b.index - a.index)
     .map(({ l }) => {
       const n = ctx.texts.extra.notebook;
-      const from = ctx.t(capitalize(l.from));
-      const title = ctx.t(l.title);
+      const from = ctx.t(capitalize(letterFrom(ctx.content, l)));
+      const title = ctx.t(letterTitle(ctx.content, l));
       const day = `${weekdayOf(l.day, ctx.texts.weekdays)} ${l.day}`;
       const unread = !l.read.includes(ctx.me);
       return {
@@ -686,7 +687,7 @@ export function letterModels(world: ReadonlyWorld, ctx: UiContext): LetterModel[
         from,
         title,
         day: capitalize(day),
-        text: ctx.t(l.text),
+        text: ctx.t(letterText(ctx.content, l)),
         unread,
         meta: ctx.t(n.letterMeta, { from, day }),
         label: ctx.t(unread ? n.letterUnread : n.letterLabel, { title, from, day }),

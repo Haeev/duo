@@ -286,3 +286,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
 - Outil isolé: une boucle `for` avec `sed -n "${a},${b}p"` est refusée; un heredoc qui écrit dans `/tmp` aussi. Écrire le script avec Write, puis `python3 /tmp/<moi>/script.py` depuis le dossier du jeu.
 - `valider_donnees.py`: les drapeaux posés par le code (et non par un effet) vont dans `FLAGS_SET_BY_CODE`, sinon un avertissement.
+
+## Taille de l'état (La Petite Ligne, vérifié le 2026-11-03)
+
+- Mesurer avant de compacter: le robot longue vie écrit pour chaque aube `bytes` et `keys` (octets par champ) dans `test-results/longue-vie/parties/<partie>.json`; une partie de 84 jours prend environ 4 min 30. Comparer les relevés avant et après hors tailles (`ms`, `bytes`, `chars`, `keys`, `detail`) prouve que le gameplay n'a pas bougé.
+- Ne pas garder de texte rendu dans l'état: un identifiant, la variante et les variables suffisent. Pour migrer un texte rendu, transformer le gabarit en expression régulière (`{nom}` en groupe paresseux) et vérifier que le rendu redonne exactement le texte, sinon garder l'original.
+- Omettre les champs à leur valeur par défaut (`exactOptionalPropertyTypes` est actif: champ optionnel, jamais `undefined` écrit).
+- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD.
+

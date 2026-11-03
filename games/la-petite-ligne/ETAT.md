@@ -205,6 +205,14 @@ Point d'avancement du dev interface (`src/interface/`), du plus récent au plus 
 - Vérifié: `pnpm --filter @duo/la-petite-ligne lint` et `typecheck`, `pnpm verifier`, tous les tests du jeu (200); captures Playwright de tous les écrans sur la page de démonstration (scène 3D derrière), parcours au clavier (titre, création, carnet, sac, scène à deux, proposition, nuit); vrai jeu (`main.ts`) dans les deux vues du faux hôte: écran titre chez l'hôte et l'invité, « Commencer la semaine » synchronisé, passage à la création chez les deux. Au-delà, le rendu logiciel de l'environnement cloud affame les deux vues (« Le jeu ne répond plus » du faux hôte, aussi sans action de l'interface).
 - Coût: un rafraîchissement complet de l'interface ≈ 0,8 ms (Chromium sans tête), au plus 11 par seconde; les autres images comparent seulement l'heure affichée. Dix démontages et remontages: même nombre de nœuds DOM, un seul sprite.
 
+## 2026-11-03, tour 11: taille de l'état, format de sauvegarde 8 (dev gameplay 3D)
+
+- Mesure (robot assidu, graine 99, 84 jours): pire état au jour 71, 53 846 octets avant (borne I-06: 52 000), 47 176 après. Gameplay identique: les relevés des 83 journées sont les mêmes hors tailles.
+- Lettres: l'état garde `id`, `day`, `read`, la variante tirée (`variant`, absente pour le texte de base) et les variables citées (`vars`, absentes s'il n'y en a pas). Titre, expéditeur et texte se reconstituent depuis `courrier.json` par `letterTitle`, `letterFrom`, `letterText` (`src/etat/courrier.ts`, pur). Toute lecture du texte passe par ces fonctions (carnet, petit-déjeuner, caisse, interface de secours, robot longue vie).
+- `dialoguesDone`: une conversation n'écrit plus que `<id>@<joueur>`; « fini par l'un des deux » se lit par `dialogueDone(done, id)` (`src/etat/dialogues-faits.ts`), à utiliser à la place de `dialoguesDone.includes(id)`. Les scènes à deux écrivent toujours `<id>`.
+- Quête finie: `baselines` vidées (elles ne servent qu'aux étapes en cours).
+- Sauvegarde: format 8, migration depuis le 7 et les plus anciens (`migrateToFormat8`): variante et variables retrouvées dans le texte rendu et vérifiées à l'identique; une lettre que les données ne redonnent plus (texte réécrit depuis) garde son texte d'origine dans `legacy`. Références `format-8-*.json` ajoutées. Test: `tests/courrier-format8.test.ts`.
+
 ## 2026-11-01, gauntlet tour 9: le rendu des chantiers, des cueillettes, des objets et des quatre moments (dev gameplay 3D)
 
 Conception: `docs/jeux/jeu-1/tour-09-conception.md` (section 9, ligne « Dev rendu et tech-artist »; sections 2 à 5). Tout se lit dans l'état (`improvements`, `giftsGiven`, `hens[].arrivedDay`, `moments.today`, `train.slow`): mêmes images chez l'hôte et chez l'invité, et après une reprise.

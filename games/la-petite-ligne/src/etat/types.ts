@@ -1105,14 +1105,20 @@ export interface QuestState {
   train?: number;
 }
 
+/**
+ * Lettre reçue (format 8): titre, expéditeur et texte se reconstituent depuis les données
+ * (`etat/courrier.ts`, `letterTitle`, `letterText`, `letterFrom`).
+ */
 export interface Letter {
   id: LetterId;
   day: number;
-  title: string;
-  from: string;
-  /** Texte final, variables remplacées. */
-  text: string;
+  /** Variante retenue (index dans `variants` de la définition); absente pour le texte de base. */
+  variant?: number;
+  /** Valeurs des variables citées par le titre et le texte, figées à l'envoi; absentes s'il n'y en a pas. */
+  vars?: Record<string, string | number>;
   read: CharacterId[];
+  /** Lettre migrée que les données ne redonnent plus à l'identique: titre, expéditeur et texte d'origine. */
+  legacy?: { title: string; from: string; text: string };
 }
 
 export type NotificationKind = 'hint' | 'message' | 'quest' | 'letter' | 'proposal' | 'envie';

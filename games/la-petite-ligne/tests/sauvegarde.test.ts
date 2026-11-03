@@ -1,4 +1,6 @@
 // Sauvegarde du monde: JSON complet, reprise quelle que soit la machine qui héberge (SV-04).
+import { letterFrom, letterText, letterTitle } from '../src/etat/courrier';
+import type { Letter } from '../src/etat/types';
 import { describe, expect, it } from 'vitest';
 import { restoreWorld, SaveError, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { hashState as hash } from '@duo/sdk/sim';
@@ -68,6 +70,9 @@ describe('sauvegarde', () => {
     const w = JSON.parse(JSON.stringify(world)) as Record<string, unknown>;
     delete w.orderIndex;
     delete w.orderHistory;
+    // Avant le format 8, une lettre gardait son titre, son expéditeur et son texte rendus.
+    const { content } = contentAndMap();
+    w.letters = (w.letters as Letter[]).map((l) => ({ id: l.id, day: l.day, title: letterTitle(content, l), from: letterFrom(content, l), text: letterText(content, l), read: l.read }));
     if (ended) {
       // L'ancienne version finissait la démo au départ du jour 8, sans la quête ni le drapeau de la semaine 2.
       w.phase = 'ended';

@@ -8,6 +8,7 @@
  * L'ancrage se fait par saison et semaine de saison: une partie reprise voit toutes les pages déjà
  * parues. Un cadeau (« Pour offrir ») ne paraît qu'une fois le souhait de l'habitant entendu.
  */
+import { dialogueDone } from './dialogues-faits';
 import { SEASONS, seasonIndexOf } from '../donnees/calendrier';
 import type { CatalogueDef, Content, Season, Settings } from '../donnees/types';
 
@@ -85,7 +86,7 @@ export function copiesLeft(cat: CatalogueDef, world: Pick<CatalogueWorld, 'catal
 
 /** Le souhait de cet habitant a-t-il été entendu par l'un des deux ? */
 export function wishHeard(world: Pick<CatalogueWorld, 'dialoguesDone'>, wish: string): boolean {
-  return world.dialoguesDone.includes(wish);
+  return dialogueDone(world.dialoguesDone, wish);
 }
 
 /** Les articles du catalogue de la semaine en vente maintenant, dans l'ordre des pages puis des cadeaux. */

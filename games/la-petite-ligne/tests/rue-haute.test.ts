@@ -2,6 +2,7 @@
 // portes et heures des intérieurs, porter à deux, emplois du temps d'Achille, de Solange et de
 // Jeanne (T10-05), la panière (T10-06), le guichet du fournil (T10-07), la première coupe et le
 // salon (T10-08 à T10-10), le chocolat chaud, les souhaits et les départs un par journée (T10-27).
+import { dialogueDone } from '../src/etat/dialogues-faits';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -410,7 +411,7 @@ describe('la panière d’Achille (T10-06) et les départs un par journée (T10-
     send(sim, 'p1', { type: 'move_to', target: { kind: 'villager', villager: 'achille' }, act: true });
     for (let i = 0; i < 10 && c.dialogue !== null; i++) send(sim, 'p1', { type: 'dialogue_next' });
     walk(sim, {}, 0.2);
-    expect(sim.world.dialoguesDone).toContain('achille_basket_ask');
+    expect(dialogueDone(sim.world.dialoguesDone, 'achille_basket_ask')).toBe(true);
     const load = (): Beam | null => sim.world.beam;
     expect(load()?.purpose).toBe('basket');
     // Seul, on ne la soulève pas.
@@ -655,7 +656,7 @@ describe('le salon de Solange (T10-08 à T10-10)', () => {
       }
     }
     walk(s, {}, 0.2);
-    expect(s.world.dialoguesDone).toContain('solange_mirror');
+    expect(dialogueDone(s.world.dialoguesDone, 'solange_mirror')).toBe(true);
     expect(s.world.quests.find((q) => q.id === TOWN.cutQuest)?.status).toBe('done');
     expect(s.world.flags).toContain(TOWN.salonOpen);
   });

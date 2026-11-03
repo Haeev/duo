@@ -5,6 +5,7 @@
  * travaillé; elle disparaît dès que l'interface du jeu est livrée.
  */
 import type { Intent } from '../etat/actions';
+import { letterText, letterTitle } from '../etat/courrier';
 import type { ItemStack, MenuKind, ReadonlyWorld } from '../etat/types';
 import { TOOLBAR_SLOTS } from '../etat/types';
 import type { CreateInterface, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
@@ -164,7 +165,7 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
           if (item.shop !== 'catalogue' || item.buyPrice === null) continue;
           button(row(), `${item.name} (${item.buyPrice})`, { type: 'catalogue_order', item: item.id });
         }
-        for (const l of w.letters) el('p', 'margin:4px 0;font-size:13px;', panel).textContent = `${l.title}: ${l.text}`;
+        for (const l of w.letters) el('p', 'margin:4px 0;font-size:13px;', panel).textContent = `${letterTitle(view.content, l)}: ${letterText(view.content, l)}`;
         break;
       case 'crate':
         for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'crate_deposit', item: s.item, quality: s.quality, count: s.count });

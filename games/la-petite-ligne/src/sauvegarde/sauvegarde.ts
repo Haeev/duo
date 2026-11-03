@@ -3,9 +3,11 @@
  * en JSON, contrôlé et migré à la lecture, personnages liés à l'identifiant
  * stable des joueurs (jamais au rôle d'hôte ou d'invité).
  */
+import { compactDialoguesDone } from '../etat/dialogues-faits';
 import type { GameMap } from '../etat/carte';
 import type { CharacterId, Tree, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
+import { letterFromRendered } from '../etat/courrier';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
@@ -129,7 +131,26 @@ function checkWorld(data: unknown): WorldState {
   checkWeekly(data);
   checkTour9(data);
   checkTour10(data);
+  checkLetters(data.letters as unknown[]);
   return data as unknown as WorldState;
+}
+
+/** Lettres du format 8: identifiant, jour, variante, variables, lecteurs (texte d'origine si migrée). */
+function checkLetters(letters: unknown[]): void {
+  const value = (v: unknown): boolean => typeof v === 'string' || (typeof v === 'number' && Number.isFinite(v));
+  for (const l of letters) {
+    const legacy = isRecord(l) ? l.legacy : undefined;
+    const ok =
+      isRecord(l) &&
+      typeof l.id === 'string' &&
+      typeof l.day === 'number' &&
+      (l.variant === undefined || (typeof l.variant === 'number' && Number.isInteger(l.variant) && l.variant >= 0)) &&
+      (l.vars === undefined || (isRecord(l.vars) && Object.values(l.vars).every(value))) &&
+      Array.isArray(l.read) &&
+      l.read.every((id) => id === 'p1' || id === 'p2') &&
+      (legacy === undefined || (isRecord(legacy) && typeof legacy.title === 'string' && typeof legacy.from === 'string' && typeof legacy.text === 'string'));
+    if (!ok) throw new SaveError('sauvegarde: lettre invalide');
+  }
 }
 
 /** Champs du format 7 (tour 10): pièces commandées, râtelier, besoins doux des personnages. */
@@ -421,7 +442,27 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 5 && isRecord(data)) migrateToStages(data, content);
   if (dataSchema < 6 && isRecord(data)) migrateToTour9(data, content);
   if (dataSchema < 7 && isRecord(data) && tour10Fillable(data)) fillTour10Fields(map, data as unknown as WorldState);
+  if (dataSchema < 8 && isRecord(data)) migrateToFormat8(data, content);
   return data;
+}
+
+/**
+ * Format 8 (taille de l'état): une lettre ne garde plus son texte rendu (environ 4 Ko sur une longue
+ * partie), mais la variante et les variables retrouvées dans ce texte, et le carnet affiche les mêmes
+ * mots; les dialogues finis perdent le `<id>` seul que redit `<id>@<joueur>`; une quête finie perd ses
+ * valeurs de départ. Rien de ce que les règles lisent ne change.
+ */
+function migrateToFormat8(world: Record<string, unknown>, content: Content): void {
+  if (Array.isArray(world.dialoguesDone) && world.dialoguesDone.every((d): d is string => typeof d === 'string')) world.dialoguesDone = compactDialoguesDone(world.dialoguesDone);
+  if (Array.isArray(world.quests)) for (const q of world.quests) if (isRecord(q) && q.status === 'done') q.baselines = {};
+  const list = world.letters;
+  if (!Array.isArray(list)) return;
+  const str = (v: unknown): v is string => typeof v === 'string';
+  world.letters = list.map((l: unknown) => {
+    if (!isRecord(l) || !str(l.id) || typeof l.day !== 'number' || !str(l.title) || !str(l.from) || !str(l.text) || !Array.isArray(l.read)) throw new SaveError('sauvegarde: lettre invalide');
+    const read = l.read.filter((id): id is CharacterId => id === 'p1' || id === 'p2');
+    return letterFromRendered(content, { id: l.id, day: l.day, title: l.title, from: l.from, text: l.text, read });
+  });
 }
 
 /** Assez de forme pour poser les défauts du tour 10 (le contrôle complet suit, `checkWorld`). */
