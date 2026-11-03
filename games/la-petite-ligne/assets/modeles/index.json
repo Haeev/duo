@@ -2118,5 +2118,152 @@
  "mail_bag": {
   "file": "marche.glb",
   "tris": 280
+ },
+ "church": {
+  "file": "village013.glb",
+  "tris": 15412,
+  "footprint": [
+   21,
+   12
+  ]
+ },
+ "presbytery_house": {
+  "file": "village013.glb",
+  "tris": 5224,
+  "footprint": [
+   7,
+   7
+  ]
+ },
+ "village_house_a": {
+  "file": "village013.glb",
+  "tris": 3660,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "village_house_a_shuttered": {
+  "file": "village013.glb",
+  "tris": 2632,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "village_house_b": {
+  "file": "village013.glb",
+  "tris": 4076,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "lineman_house": {
+  "file": "village013.glb",
+  "tris": 3428,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "lineman_house_shuttered": {
+  "file": "village013.glb",
+  "tris": 3268,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "forester_house": {
+  "file": "village013.glb",
+  "tris": 3662,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "cafe_house": {
+  "file": "village013.glb",
+  "tris": 8414,
+  "footprint": [
+   7,
+   6
+  ]
+ },
+ "forge_shop": {
+  "file": "village013.glb",
+  "tris": 3436,
+  "footprint": [
+   6,
+   6
+  ]
+ },
+ "joinery_shop": {
+  "file": "village013.glb",
+  "tris": 4392,
+  "footprint": [
+   6,
+   7
+  ]
+ },
+ "farm_house": {
+  "file": "village013.glb",
+  "tris": 6434,
+  "footprint": [
+   9,
+   6
+  ]
+ },
+ "farm_barn": {
+  "file": "village013.glb",
+  "tris": 3064,
+  "footprint": [
+   7,
+   7
+  ]
+ },
+ "washhouse": {
+  "file": "village013.glb",
+  "tris": 1758,
+  "footprint": [
+   5,
+   3
+  ]
+ },
+ "watermill": {
+  "file": "village013.glb",
+  "tris": 6888,
+  "footprint": [
+   7,
+   7
+  ]
+ },
+ "mill_wheel": {
+  "file": "village013.glb",
+  "tris": 1012,
+  "footprint": [
+   2,
+   1
+  ],
+  "animations": [
+   "mill_wheel_turn"
+  ]
+ },
+ "sluice_footbridge": {
+  "file": "village013.glb",
+  "tris": 816,
+  "footprint": [
+   2,
+   2
+  ]
+ },
+ "tailrace_planks": {
+  "file": "village013.glb",
+  "tris": 272,
+  "footprint": [
+   2,
+   1
+  ]
  }
 }

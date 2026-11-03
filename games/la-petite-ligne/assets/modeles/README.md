@@ -17,6 +17,7 @@ Tout reconstruire (environ 7 minutes, planches comprises): `bash games/la-petite
 | `poissons.glb` | les 22 poissons de la pêche (0.12) et la vieille épuisette du ponton | aucune |
 | `elevage.glb` | 0.12: chèvre (deux robes), clochette, piquet, chevrerie, poulailler agrandi, mangeoire à trémie, bidon de lait, fromage frais, panier d'œufs | `goat_idle`, `goat_walk`, `goat_trot`, `goat_graze`, `goat_milk_stand`, `goat_lie`, `goat_bell` |
 | `marche.glb` | 0.12: étal du dimanche (déplié, replié), cagette, balance, halle du marché, pot de confiture de mûres, bocal, sacoche de Lucie | aucune |
+| `village013.glb` | 0.13: église Saint-Aubin et son clocher, presbytère, café de la Côte, forge, menuiserie, logis et grange-étable de la ferme, lavoir, moulin de la Vanne et sa roue, maison forestière, maisons du village (deux variantes aux volets clos), passerelles du bief | `mill_wheel_turn` |
 | `textures/` | `palette.png` (déjà incluse dans les GLB), `palette-mr.png`, `palette-emission.png`, variantes de saison `palette-ete.png`, `palette-automne.png`, `palette-hiver.png`, `personnages.png` | |
 
 Chaque identifiant `model` des données du jeu (`donnees/*.json`, `donnees/cartes/halte.json`) est le nom exact d'un nœud de l'un de ces fichiers; `index.json` donne, pour chaque nœud racine, son fichier, son emprise et ses triangles.
@@ -382,6 +383,61 @@ Sources: `assets-src/modeles/habitants_013.py` (habitants, loupe, accessoires, v
 - Clips nouveaux sur le squelette commun: `push_bike` (0,533 s, boucle: mêmes pas que `walk`, main gauche posée sur la poignée, écart mesuré 6 mm) et `push_bike_idle` (3 s, boucle: arrêté à côté du vélo).
 - Chat du bourg (`faune.glb`, nœud `cat`, maillage `cat_mesh`, 1156 triangles): tigré gris à plastron, museau et chaussettes blancs, yeux vert-jaune; 0,46 m de corps, 0,25 m au garrot. Clips: `cat_idle` (assis, la queue qui bat, regards, oreille qui frémit; 7,3 s), `cat_walk` (pas en quatre temps, queue dressée en crosse, 0,8 s pour 0,35 m/s: `timeScale = vitesse / 0,35`), `cat_sleep` (couché en rond, pattes repliées, queue autour de lui, il respire; 3 s), `cat_roll` (il se roule sur le dos, pattes en l'air, et revient; 2,7 s). Les poses assises et couchées sont posées au sol par calcul (point le plus bas du maillage déformé). Noms préfixés comme les autres bêtes de `faune.glb` (`cat_idle` pour `idle`).
 - Poids: `personnages.glb` passe de 6,4 à 10,8 Mo (environ 330 Ko par habitant: ombrage en aplats, sommets non partagés). La compression Meshopt (Conventions) le diviserait par trois ou quatre si le poids devient un sujet.
+
+## Village agrandi de la 0.13, bâtiments neufs (`village013.glb`, lot L2 de `docs/jeux/jeu-1/v0-13-carte.md`)
+
+Source: `assets-src/modeles/village_013.py` (`duo-python village_013.py`, environ 30 s; `.blend` dans `blend/village013.blend`). Planches: `planche_batiments_013.py <dossier> [tout | nœud ...]` puis `planche_batiments_013.sh <dossier> <sortie>`, livrées dans `docs/jeux/jeu-1/gauntlet/captures/v0-13/batiments/`. Sens d'ouverture des vantaux: `python3 verifier/vantaux_013.py`.
+
+Noms des nœuds = types des objets et des ouvrages de `donnees/cartes-0-13/halte.json`. Repère habituel (porte vers +Z, origine au centre de l'emprise, au sol); les portes, comptoirs, foyers et bancs sont aux cases de la carte (sections 7.1 et 7.2, objets `interieurs`).
+
+| Nœud | Ce qu'on y voit |
+|---|---|
+| `church` | nef de pierre à contreforts et vitraux cintrés, portail sud à deux voussures, tympan à la croix et larmier, tableau des offices à gauche du portail; chœur et abside en demi-cercle (trois baies) à l'est; clocher-porche à l'ouest (porte ouest fermée, beffroi à quatre baies, deux cloches pendues dans les baies sud et est, abat-sons à l'ouest et au nord, flèche de lauzes à coyau, boule, croix et coq à 20 m). Dedans: dalles et tapis rouge, huit bancs à agenouilloir tournés vers le chœur, chaire à abat-voix (on y monte par la porte prise dans le mur nord), saint Aubin sur son socle, harmonium et tabouret, présentoir de cierges, autel isolé, frise peinte et chemin de croix au mur nord, corde des cloches et écriteau des sonneries contre le clocher |
+| `presbytery_house` | deux niveaux (étage sous le toit, deux lucarnes), enduit crème, chaînes de pierre, lauzes, gouttières; croix de fer et tirette de sonnette à la porte; pignon gauche (sud) tourné vers le jardin du curé, jardinière |
+| `village_house_a`, `village_house_a_shuttered` | maison de pierre à lauzes, volets rouges, banc de pierre, applique, fagots au pignon; variante aux volets clos et sans pots (maison B du hameau, « volets clos ») |
+| `village_house_b` | enduit ocre, tuiles, volets bleus, glycine qui monte au pied de la porte et court sur la façade sous la rive |
+| `lineman_house`, `lineman_house_shuttered` | maison de la compagnie: enduit crème, chaînes et bandeau de brique, lucarne, plaque émaillée au-dessus de la porte; la fenêtre à gauche de la porte (x -1,5 m, `rail_cottage_west_window`) est ouverte sur l'établi d'Ambroise (étau, outils, lampe); variante aux volets clos pour la maison vide |
+| `forester_house` | enduit crème, toit rouge, plaque MAISON FORESTIÈRE au-dessus de la porte, bois de cerf à gauche, stère sous son appentis au pignon est |
+| `cafe_house` | deux niveaux, enduit rose, store vert et crème sur la terrasse (ouest), enseigne CAFÉ DE LA CÔTE, salle du bal à l'étage (fenêtres hautes, balconnet), ardoise à droite de la porte (`cafe_sign`), applique. Dedans: tomettes, comptoir de zinc et repose-pied, percolateur, étagère à bouteilles et miroir, lambris vert, horloge, poêle et son tuyau, table de la manille (cartes), table à la carafe, portemanteau |
+| `forge_shop` | grande porte au sud (vantail fixe à gauche, `forge_shop_door` à droite), fers à cheval sur le linteau, écriteau FORGE (`forge_sign`), cheminée de brique au nord, haute et noircie, lucarne du logis. Dedans: foyer de brique et braises, bac de trempe, soufflet de cuir et sa perche, hotte noircie, râtelier des pinces au mur ouest |
+| `joinery_shop` | pignon sur la cour (bardage de planches, porte du grenier et potence), enseigne MENUISERIE. Dedans (fermée depuis la mort d'Hortense): établi au mur nord avec étau, rabot, chaise commencée, drap de poussière; râtelier des scies et rabots au mur ouest; planches debout, copeaux |
+| `farm_house` | façade au midi: arc de pierre sur la porte, banc de pierre, chapelet d'ail, treille de vigne et ses grappes. Dedans: cheminée au mur ouest (crémaillère, marmite, bûches, braises), grande table et bancs, miche, pichet, soupière; vaisselier mural |
+| `farm_barn` | pignon sur la cour: porte de l'étable coupée en deux, fenil ouvert sur le foin, potence et poulie, bardage; porte charretière au sud |
+| `washhouse` | mur haut au nord (entrée cintrée sur le chemin), toit à un pan sur sablière et poteaux vers la rivière, bassin, pierres à laver, garde-genoux, battoir, panier, seau, arrivée d'eau, trop-plein, linge sur la corde |
+| `watermill` | pignon est: porte, enseigne MOULIN, porte à sacs, potence et sac pendu, sacs au pied du mur; mur sud le long du bief (passage de l'axe, perré). Dedans: beffroi, meules sous leur archure, trémie, auget, sac sous la goulotte, sacs de farine contre le mur sud, poutre du plafond |
+| `mill_wheel` | roue à aubes de 2,5 m (10 aubes, 2 x 5 bras), axe, pile de pierre et palier sur la rive sud; dans la salle des meules, le rouet (15 alluchons) et la lanterne (5 fuseaux) de l'arbre vertical. Animation `mill_wheel_turn` (8 s en boucle, deux pistes: `mill_wheel_rotor` un tour, `mill_wheel_lantern` trois tours) |
+| `sluice_footbridge` | passerelle de la vanne: platelage à 0,16 m sur longrines et dés de pierre, garde-corps aval, vanne à l'amont (poteaux rainurés, chapeau, boîte du pignon, arbre et deux manivelles, une sur chaque rive: on la lève à deux); la vanne est le nœud `sluice_footbridge_gate`, baissée, à lever de `gate_lift` (0,5 m) |
+| `tailrace_planks` | planches du halage sur deux rondins, piquets aux abouts |
+
+À reporter côté carte et rendu (lot L3, level designer):
+
+- `mill_wheel` se pose à la rotation 1 de la carte, comme le moulin: son axe est selon X du modèle, le moulin du côté +X, et l'axe entre alors dans le mur sud. Son rectangle de carte (1 x 2, nord-sud) ne suit pas la roue (3 x 1, est-ouest): sans effet, ce sont des cases d'eau.
+- `sluice_footbridge` et `tailrace_planks` se posent à la rotation 0 (`flow_axis`, `walk_axis`, `walk_height` dans les extras). `crossingProps` tourne aujourd'hui toute « passerelle » d'un demi-tour (garde-corps du ru au nord): à ne pas appliquer aux passerelles du bief, sinon la vanne passe à l'aval.
+- Variantes: la maison B du hameau (« volets clos ») peut prendre `village_house_a_shuttered`, la maison de cheminots vide `lineman_house_shuttered` (types de la carte à changer).
+- Bâtiments visitables: mêmes conventions que l'épicerie (`cut_nodes`, murs `<type>_wall_*`, `<type>_interior`, `<type>_door`). L'église a deux vantaux (`church_left_door`, `church_right_door`); son clocher est dans `church_wall_left` (coupé avec le mur ouest quand la caméra regarde de l'ouest). Extras `interior_spots` et `interior_blocked` (repère glTF du bâtiment) comme chez l'épicerie; les cases de mobilier recoupent celles de la carte.
+- Clocher centré sur l'axe de la nef: 0,5 m au sud des cases `tours` de la carte (y -15 à -9), sans effet sur la caméra.
+
+Plafonds (carte 11.3, jusqu'à 1,5 fois quand cela se voit): contenu des intérieurs compté à part (invisible hors de l'intérieur); ce qui est fixé aux murs (bouteilles, vaisselier, râteliers) est compté dehors, le mur étant toujours dessiné.
+
+| Nœud | Plafond | Triangles hors intérieur | Rapport | Intérieur |
+|---|---|---|---|---|
+| `church` | 8 000 | 11 782 | 1,47 | 3 630 |
+| `presbytery_house` | 3 500 | 5 224 | 1,49 | |
+| `village_house_a` | 2 800 | 3 660 | 1,31 | |
+| `village_house_a_shuttered` | 2 800 | 2 632 | 0,94 | |
+| `village_house_b` | 2 800 | 4 076 | 1,46 | |
+| `lineman_house` | 2 800 | 3 428 | 1,22 | |
+| `lineman_house_shuttered` | 2 800 | 3 268 | 1,17 | |
+| `forester_house` | 2 500 | 3 662 | 1,46 | |
+| `cafe_house` | 5 000 | 6 858 | 1,37 | 1 556 |
+| `forge_shop` | 3 200 | 3 066 | 0,96 | 370 |
+| `joinery_shop` | 3 200 | 4 048 | 1,26 | 344 |
+| `farm_house` | 4 000 | 5 968 | 1,49 | 466 |
+| `farm_barn` | 3 200 | 3 064 | 0,96 | |
+| `washhouse` | 1 200 | 1 758 | 1,47 | |
+| `watermill` | 6 000 | 6 064 | 1,01 | 824 |
+| `mill_wheel` | 600 | 588 (roue, pile) | 0,98 | 424 (rouet et lanterne, dans la salle) |
+| `sluice_footbridge`, `tailrace_planks` | | 816 et 272 | | |
 
 ## Fiche par modèle
 
@@ -899,3 +955,30 @@ Animations: `locomotive_roll`, `coach_roll`, `van_roll`
 | `blackberry_jam` |  | 190 | kind: "item", size_m: 0.09 |
 | `jar` |  | 112 | kind: "item", size_m: 0.09 |
 | `mail_bag` |  | 280 | kind: "prop", rest_height: 0.455, note: "sur l'assise du banc du quai (quay_bench), à plat" |
+
+### `village013.glb` (5273 Ko)
+
+| Nœud | Emprise (cases) | Triangles | Données utiles (extras) |
+|---|---|---|---|
+| `church` | 21 x 12 | 15412 | door_cell: 10, cut_walls: true, cut_nodes: ["church_roof"], interior: {"floor_y": 0.12, "rooms": [{"id": "church_nave", "x": [-5.5, 6.5], "z": [-5.0, 5.0]}, {"id": "church_choir", "x": [6.5, 9.5], "z": [-2.0, 2.0]}]}, note: "portail sud en case 10 (x 0); nef de 12 x 10 m, chœur et abside à l'est; clocher-porche à l'ouest dans church_wall_left (coupé avec le mur ouest quand la caméra regarde de l'ouest); cloches visibles dans les baies sud et est du beffroi; clocher centré sur l'axe de la nef (0,5 m au sud de la case de la carte)", tower_top: 20.0 |
+| `presbytery_house` | 7 x 7 | 5224 | door_cell: 3, note: "porte au milieu (case 3); le pignon gauche (-X) regarde le jardin du curé, au sud" |
+| `village_house_a` | 6 x 6 | 3660 | door_cell: 2, note: "porte en case 2" |
+| `village_house_a_shuttered` | 6 x 6 | 2632 | door_cell: 2, note: "porte en case 2; volets clos, porte fermée: maison inhabitée" |
+| `village_house_b` | 6 x 6 | 4076 | door_cell: 2, note: "porte en case 2; glycine sur la façade" |
+| `lineman_house` | 6 x 6 | 3428 | door_cell: 3, note: "porte en case 3 (x 0,5); la fenêtre à gauche de la porte (x -1,5) est ouverte sur l'établi d'Ambroise" |
+| `lineman_house_shuttered` | 6 x 6 | 3268 | door_cell: 3, note: "porte en case 3; volets clos (maison vide)" |
+| `forester_house` | 6 x 6 | 3662 | door_cell: 3, note: "porte en case 3 (x 0,5); plaque MAISON FORESTIÈRE, bois de cerf" |
+| `cafe_house` | 7 x 6 | 8414 | door_cell: 3, cut_walls: true, cut_nodes: ["cafe_house_roof", "cafe_house_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "cafe_room", "x": [-2.5, 2.5], "z": [-2.0, 2.0]}]}, note: "porte en case 3 (x 0); salle du rez-de-chaussée (comptoir au nord, poêle à l'ouest, deux tables), salle du bal à l'étage (fenêtres hautes, balconnet); store vert sur la terrasse (ouest de la façade), ardoise à droite de la porte" |
+| `forge_shop` | 6 x 6 | 3436 | door_cell: 3, cut_walls: true, cut_nodes: ["forge_shop_roof", "forge_shop_attic"], interior: {"floor_y": 0.12, "rooms": [{"id": "forge_workshop", "x": [-2.0, 2.0], "z": [-2.0, 2.0]}]}, note: "grande porte au sud (cases 2 et 3): vantail fixe à gauche, vantail ouvrant à droite (forge_shop_door); foyer et soufflet au mur nord sous la hotte, cheminée de brique noircie au nord; logis sous le toit (lucarne au sud); écriteau à droite de la porte" |
+| `joinery_shop` | 6 x 7 | 4392 | door_cell: 2, cut_walls: true, cut_nodes: ["joinery_shop_roof", "joinery_shop_attic"], interior: {"floor_y": 0.12, "rooms": [{"id": "joinery_workshop", "x": [-2.0, 2.0], "z": [-2.5, 2.5]}]}, note: "pignon sur la cour (porte en case 2, x -0,5); grenier aux planches sous le toit (porte haute et potence); établi au mur droit (nord de la carte), râtelier au mur du fond (ouest); menuiserie fermée: poussière, copeaux, une chaise commencée" |
+| `farm_house` | 9 x 6 | 6434 | door_cell: 4, cut_walls: true, cut_nodes: ["farm_house_roof", "farm_house_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "farmhouse_hall", "x": [-3.5, 3.5], "z": [-2.0, 2.0]}]}, note: "façade au midi sur la cour (porte en case 4, x 0), le dos à la route; salle commune: cheminée au mur ouest, grande table et bancs; treille sur la façade, banc de pierre" |
+| `farm_barn` | 7 x 7 | 3064 | door_cell: 3, note: "pignon sur la cour (porte de l'étable en case 3, x 0, porte coupée en deux); fenil au-dessus, sa porte ouverte sur le foin et sa potence; bardage de planches au pignon" |
+| `washhouse` | 5 x 3 | 1758 | door_cell: 2, note: "mur haut au nord (porte de la carte, case 2), toit à un pan qui descend vers la rivière sur une sablière et deux poteaux; bassin au sud, pierres à laver au bord nord du bassin (on lave tourné vers la rivière et la caméra), trop-plein vers l'Aubrune" |
+| `watermill` | 7 x 7 | 6888 | door_cell: 3, cut_walls: true, cut_nodes: ["watermill_roof", "watermill_upper"], interior: {"floor_y": 0.12, "rooms": [{"id": "mill_millstones", "x": [-2.5, 2.5], "z": [-2.5, 2.5]}]}, note: "façade (porte, porte à sacs, potence) sur le pignon est de la carte; le mur gauche (-X) est le mur sud, le long du bief: l'axe de la roue (mill_wheel) y entre à 0,95 m; le rouet et la lanterne tournent dans la salle, contre ce mur (nœud mill_wheel)" |
+| `mill_wheel` | 2 x 1 | 1012 | animation: "mill_wheel_turn", period_s: 8.0, gear_ratio: 3.0, note: "roue à aubes de 2,5 m, axe selon X du modèle, le moulin du côté +X: posée à la rotation 1 de la carte (comme le moulin), l'axe entre dans le mur sud et porte le rouet, qui mène la lanterne de l'arbre vertical dans la salle des meules. L'eau du bief (vers l'est de la carte, -Z du modèle) pousse le bas de la roue: mill_wheel_turn tourne dans ce sens (boucle de 8 s). Palier extérieur sur une pile de pierre de la rive sud du bief" |
+| `sluice_footbridge` | 2 x 2 | 816 | flow_axis: "x", walk_axis: "z", walk_height: 0.16, gate_lift: 0.5, note: "à poser à la rotation 0 (le bief coule d'ouest en est); vanne baissée au repos" |
+| `tailrace_planks` | 2 x 1 | 272 | flow_axis: "z", walk_axis: "x", walk_height: 0.065, note: "à poser à la rotation 0 (le canal de fuite coule vers le sud)" |
+
+| Nœud | Animation | Durée (s) | Boucle |
+|---|---|---|---|
+| `mill_wheel` | `mill_wheel_turn` | 8.0 | oui |

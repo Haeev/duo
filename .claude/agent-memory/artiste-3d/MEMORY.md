@@ -174,3 +174,13 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - faune.py: la ligne `a = math.radians(LADDER_ANGLE)` existe deux fois (fonction ladder_wood et main): insérer avant `A.add("ladder_wood"`.
 - Le scratchpad est partagé avec d'autres sessions: travailler dans un sous-dossier à soi (un dossier `r1` existait déjà; un module Python du scratchpad peut masquer ceux des modèles).
 - Essai rapide d'habitants: un script qui ne construit que les nœuds voulus (make_mesh + quelques clips) dans un GLB jetable, et `LPL_GLB` pour la planche: 1 min au lieu de 2, sans toucher au GLB livré. Machine très chargée (charge 25): environ 45 s par habitant pour 3 vues à 8 échantillons.
+
+## Village de la 0.13 (village_013.py, vérifié le 2026-11-03)
+
+- `interieurs.pierced_wall` ne gère pas deux ouvertures superposées dans une même travée (porte sous une baie de clocher, meurtrière sous le beffroi): il laisse des fentes noires de toute la hauteur. `village_013.pierced_wall` les accepte (bandes pleines entre elles); une ouverture qui dépasse la longueur du mur déborde dans l'angle.
+- Étage d'un bâtiment coupé en nœuds: les chaînes d'angle de l'étage partent de `h1` (`quoins_side(..., z0=h1)`), sinon elles doublent celles du rez-de-chaussée (z-fighting et 1 000 triangles perdus). Chaîne d'angle: seule l'arête d'angle chanfreinée (20 triangles au lieu de 28); c'est le premier poste de triangles d'un bâtiment de pierre.
+- Vantail à droite (gond sur le jambage droit vu de dehors): le rendu tourne toujours de +80 degrés autour de Y glTF. Modeler le vantail tête en bas (z négatif) et tourner le nœud de 180 degrés autour de Y Blender: il s'ouvre alors vers l'intérieur. Contrôle sans Blender: `verifier/vantaux_013.py`.
+- Planche d'un intérieur: couper les murs qui regardent la caméra par défaut du monde, ramenée dans le repère du modèle (azimut 45 - 90 x rotation de la carte): pour une rotation 1, murs avant et gauche.
+- Décor sous une rive: mesurer la rive (à 0,3 m du mur, un toit à 45 degrés descend déjà de 0,3 m plus l'épaisseur): une glycine à 2,7 m sous un égout à 3 m traversait le toit.
+- Le scratchpad est partagé: un `p2.py` d'une autre session existait. Travailler dans `scratchpad/a3d013/` (ou un dossier à soi).
+- Plafonds de la 0.13 (carte 11.3, jusqu'à 1,5 fois): compter les nœuds hors `_interior` (le contenu n'est dessiné que dedans); ce qui est accroché aux murs (bouteilles, vaisselier) compte dehors, car le mur est toujours dessiné.
