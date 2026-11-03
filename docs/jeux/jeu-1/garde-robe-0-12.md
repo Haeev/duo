@@ -41,3 +41,31 @@ Au moins 5 styles par emplacement obligatoire et 3 pour les facultatifs, chacun 
 - Les maillages de vêtements sont des nœuds du GLB des personnages, nommés `wear_<slot>_<style>`, avec des emplacements de couleur (`principale`, `secondaire`) teintés au rendu comme les tenues actuelles; mêmes os que le corps (skinning).
 - Coiffures: les 15 coupes reprises (volume, mèches, bonne pose sur la tête et sous les chapeaux: variante aplatie quand un chapeau est porté).
 - Aperçu 3D de la boutique: une petite scène séparée (fond uni, lumière douce, personnage seul) rendue dans le panneau, sans toucher au budget de la scène principale plus qu'un appel de dessin par pièce.
+
+### 5.1 Précisions du rendu et de la simulation (dev gameplay 3D, 2026-11-03)
+
+Couleurs des pièces (convention de l'artiste, `WEAR_SLOTS` de `assets-src/modeles/garde_robe.py`): les pièces `wear_<slot>_<style>` lisent la rangée 1 de `personnages.png`, que le rendu réécrit dans la copie de texture de chaque joueur: colonnes 0 à 2 haut (`principale`, `secondaire`, `motif`), 3 à 5 bas, 6 et 7 chaussures (sans motif), 8 à 10 par-dessus, 11 à 13 chapeau, 14 `wear_metal` (#C8A150) et 15 `wear_under` (#E4DCCB) fixes; un motif absent prend la secondaire. L'écusson du profil (`player_badge_<symbole>`, ou `player_badge_<symbole>_outer` quand un par-dessus est porté) garde les cases `scarf` et `scarf_mark` de la rangée 0, à la couleur du profil Duo. Tout est fusionné avec `player_base` (un matériau, un appel de dessin par joueur).
+
+Coiffure sous un chapeau: le rendu prend le nœud `player_hair_<coupe>_hat` de l'artiste, sinon il aplatit la coupe sous le bas du chapeau. Couché, le chapeau est ôté.
+
+Substituts quand un nœud manque (aucun avec le modèle actuel): si le haut, le bas ou les chaussures n'ont pas leur nœud, l'ancienne tenue d'un tenant (`player_outfit_work`, ou `player_outfit_overalls` pour un bas qui couvre le haut) teinte aux couleurs des vêtements portés; un chapeau manquant devient un chapeau rond, un par-dessus manquant un gilet sans manches tiré du torse de l'ancienne tenue.
+
+État et intentions: `appearance.wear`, `wardrobe` (format de sauvegarde 11, après la pêche au 10), `wear { slot, item }` et `clothes_buy { item }`; menus `clothes_shop` (place du client devant le comptoir, point `salon_clothes`, aux heures du salon quand Solange est là) et `wardrobe` (au coffre de la maison). Se changer: au coffre (menu `wardrobe` ou à portée) ou dans la boutique (menu `clothes_shop`). Le stock du jour se lit par `clothesStock(content.clothes, content.settings, world.seed, world.clock.day)` (`src/etat/garde-robe.ts`), le même chez les deux sans rien dans l'état. Réglages `wardrobe` de `reglages.json` (facultatifs): `weeklyPieces`, `seasonalPieces`, `permanentPerSlot` (fonds permanent: les pièces hors saison les moins chères de chaque emplacement obligatoire) et `starters` (tenues de départ: couleurs visées, le vêtement le plus proche est pris, ce qui marche quels que soient les identifiants de `vetements.json`).
+
+### 5.2 API de l'aperçu 3D (pour le panneau de la boutique)
+
+Types dans `src/etat/vue.ts`; l'interface la reçoit par `InterfaceOptions.outfitPreview` (branchée par `main.ts` sur `Renderer.createOutfitPreview`).
+
+```ts
+const preview = options.outfitPreview?.({ width: 260, height: 360, background: '#f3ebd4' }) ?? null;
+if (preview !== null) {
+  panel.append(preview.canvas);
+  preview.show({ character: me.id, appearance: { ...me.appearance, wear: { ...me.appearance.wear, top: 'pull_moutarde' } } });
+  preview.rotate(-0.15);           // A et E, glisser de la souris (radians)
+  preview.setAngle(0);             // de face
+  preview.resize(300, 420);        // points CSS
+  preview.dispose();               // à la fermeture du panneau
+}
+```
+
+`null` sans rendu 3D (mode secours) ou avant le chargement: le panneau garde alors le portrait 2D. L'aperçu a son propre petit contexte WebGL et ne dessine qu'à la demande (nouvelle tenue, rotation, taille): rien ne coûte tant que rien ne bouge. Un seul aperçu à la fois.

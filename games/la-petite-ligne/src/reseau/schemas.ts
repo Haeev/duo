@@ -27,7 +27,7 @@ const Count = v.pipe(Int, v.minValue(0), v.maxValue(999));
 const QualitySchema = v.picklist(['ordinary', 'fine']);
 const CharacterIdSchema = v.picklist(['p1', 'p2']);
 const MenuSchema = v.nullable(
-  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop']),
+  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop', 'wardrobe']),
 );
 const CellSchema = v.strictObject({ cx: Int, cy: Int });
 
@@ -86,6 +86,8 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('haircut'), hair: Int, hairColor: Int, beard: Int }),
   v.strictObject({ type: v.literal('hair_offer'), hair: Int, hairColor: Int, beard: Int }),
   v.strictObject({ type: v.literal('hair_offer_answer'), accept: v.boolean() }),
+  v.strictObject({ type: v.literal('clothes_buy'), item: Id }),
+  v.strictObject({ type: v.literal('wear'), slot: v.picklist(['top', 'outer', 'bottom', 'shoes', 'hat']), item: v.nullable(Id) }),
   v.strictObject({ type: v.literal('improvement_pay'), improvement: Id, amount: v.nullable(v.pipe(Int, v.minValue(0), v.maxValue(100_000))) }),
   v.strictObject({ type: v.literal('improvement_planks'), improvement: Id, count: Count }),
   v.strictObject({ type: v.literal('proposal_answer'), proposal: Id, accept: v.boolean() }),

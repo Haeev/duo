@@ -1,38 +1,67 @@
 /**
  * Aperçu du personnage habillé, à gauche de la mercerie, de la garde-robe et de la création.
  * L'aperçu en 3D vient du rendu (`InterfaceOptions.outfitPreview`, petite scène séparée, contrat
- * section 5); sans lui (page de démonstration, rendu absent), une silhouette en pied dessinée en SVG
- * qui porte les mêmes pièces et se tourne de même (A et E, boutons, glisser à la souris).
+ * section 5.2); sans lui (mode secours, rendu pas encore chargé, page de démonstration sans rendu),
+ * une silhouette en pied dessinée en SVG qui porte les mêmes pièces et se tourne de même.
  */
-import type { CharacterId } from '../etat/types';
+import type { ClothesContent, ClothingDef } from '../donnees/vetements';
+import type { Wear } from '../etat/types';
+import type { OutfitPreview, OutfitPreviewLook, OutfitPreviewOptions } from '../etat/vue';
 import type { PortraitColors } from './config';
 import { el } from './dom';
 import { safeColor } from './format';
-import {
-  type ClothingCatalogue,
-  type ClothingDef,
-  type Wear,
-  coveredSlots,
-} from './modele-garde-robe';
-import { playerColors, playerHeadSvg, type PortraitLook } from './portrait';
+import { type ClothingCatalogue, catalogueOf, coveredSlots } from './modele-garde-robe';
+import { playerColors, playerHeadSvg } from './portrait';
 
-/** Ce que montre l'aperçu: qui, sa coiffure, ce qu'il porte. */
-export interface PreviewLook {
-  character: CharacterId;
-  appearance: Readonly<PortraitLook>;
-  wear: Wear;
-}
-
-/** Contrat de l'aperçu (3D du rendu, ou silhouette 2D de repli). */
-export interface OutfitPreview {
+/** L'aperçu tel que le panneau l'utilise: 3D du rendu ou silhouette 2D de repli. */
+export interface PanelPreview {
   readonly element: HTMLElement;
-  show(look: PreviewLook): void;
-  /** Angle de vue en radians (0: de face, positif: le personnage tourne vers sa gauche). */
+  /** Vrai pour l'aperçu 3D du rendu. */
+  readonly is3d: boolean;
+  show(look: OutfitPreviewLook): void;
+  /** Angle de vue en radians (0: de face, positif: vers la gauche de l'écran). */
   setAngle(radians: number): void;
+  /** Taille de la place disponible, en points CSS. */
+  fit(width: number, height: number): void;
   dispose(): void;
 }
 
-export type OutfitPreviewFactory = () => OutfitPreview;
+export type OutfitPreviewFactory = (options: OutfitPreviewOptions) => OutfitPreview | null;
+
+/** L'aperçu 3D s'il y en a un (rendu chargé), sinon la silhouette 2D. */
+export function createPanelPreview(
+  factory: OutfitPreviewFactory | null,
+  clothes: ClothesContent,
+  size: { width: number; height: number },
+): PanelPreview {
+  const preview = factory?.({ ...size, background: '#fbf6e9' }) ?? null;
+  if (preview === null) return new FigurePreview(clothes);
+  const element = el('span', { class: 'lpl-figure lpl-figure--3d' }, [preview.canvas]);
+  let width = size.width;
+  let height = size.height;
+  return {
+    element,
+    is3d: true,
+    show: (look) => {
+      preview.show(look);
+    },
+    setAngle: (radians) => {
+      preview.setAngle(radians);
+    },
+    fit: (w, h) => {
+      const nw = Math.max(1, Math.round(w));
+      const nh = Math.max(1, Math.round(h));
+      if (nw === width && nh === height) return;
+      width = nw;
+      height = nh;
+      preview.resize(nw, nh);
+    },
+    dispose: () => {
+      preview.dispose();
+      element.remove();
+    },
+  };
+}
 
 /** Pas de rotation à chaque appui sur A ou E, et à la souris (radians par pixel). */
 export const PREVIEW_STEP = Math.PI / 8;
@@ -63,7 +92,7 @@ function col(
  */
 export function figureSvg(
   p: PortraitColors,
-  wear: Wear,
+  wear: Readonly<Wear>,
   catalogue: ClothingCatalogue,
   angle: number,
 ): string {
@@ -121,7 +150,7 @@ export function figureSvg(
   // Haut: corps, manches, col; rayures d'une marinière.
   out += `<clipPath id="${clip}"><path d="${torso}"/></clipPath>`;
   out += `<path d="${torso}" fill="${topMain}"/>`;
-  if (top?.couleurs.motif !== undefined || has(top, 'mariniere', 'marinière')) {
+  if ((top?.couleurs.motif ?? null) !== null || has(top, 'mariniere', 'marinière')) {
     const stripe = safeColor(top?.couleurs.motif ?? topSecond);
     let stripes = '';
     for (let y = 80; y < 126; y += 8)
@@ -193,19 +222,21 @@ export function figureSvg(
 }
 
 /** Silhouette 2D de repli (sans aperçu 3D du rendu). */
-export class FigurePreview implements OutfitPreview {
+/** Silhouette 2D de repli (sans aperçu 3D du rendu). */
+export class FigurePreview implements PanelPreview {
   readonly element: HTMLElement;
-  private readonly catalogue: ClothingCatalogue;
-  private look: PreviewLook | null = null;
+  readonly is3d = false;
+  private readonly clothes: ClothesContent;
+  private look: OutfitPreviewLook | null = null;
   private angle = 0;
   private sig = '';
 
-  constructor(catalogue: ClothingCatalogue) {
-    this.catalogue = catalogue;
+  constructor(clothes: ClothesContent) {
+    this.clothes = clothes;
     this.element = el('span', { class: 'lpl-figure' });
   }
 
-  show(look: PreviewLook): void {
+  show(look: OutfitPreviewLook): void {
     this.look = look;
     this.draw();
   }
@@ -215,15 +246,24 @@ export class FigurePreview implements OutfitPreview {
     this.draw();
   }
 
+  fit(): void {
+    // Le SVG suit la taille de sa boîte (CSS).
+  }
+
   private draw(): void {
     const look = this.look;
     if (look === null) return;
     const sig = JSON.stringify([look, this.angle]);
     if (sig === this.sig) return;
     this.sig = sig;
-    const colors = playerColors(look.character, look.appearance);
+    const colors = playerColors(look.character, look.appearance, this.clothes);
     // SVG fabriqué ici à partir des données contrôlées (couleurs passées par `safeColor`).
-    this.element.innerHTML = figureSvg(colors, look.wear, this.catalogue, this.angle);
+    this.element.innerHTML = figureSvg(
+      colors,
+      look.appearance.wear,
+      catalogueOf(this.clothes),
+      this.angle,
+    );
   }
 
   dispose(): void {

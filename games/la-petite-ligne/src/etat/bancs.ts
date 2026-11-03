@@ -6,11 +6,75 @@
  *
  * Repère du banc: quart de tour de la carte (0 tourné vers le sud, +y), le
  * long du banc (X du modèle) et vers l'avant (Z du modèle, côté assise).
+ *
+ * 0.11.2 (S07): les sièges posés dans la maison (chaise, fauteuil) s'utilisent
+ * comme des bancs: même repère (le modèle a son dossier à -Z, comme le banc),
+ * leurs places viennent de `objets.json` (`seatSlots`).
  */
-import type { BenchSettings } from '../donnees/types';
+import type { BenchSettings, ItemDef } from '../donnees/types';
 import type { GameMap, MapProp } from './carte';
+import type { DeepReadonly, PlacedFurniture } from './types';
 
 export const BENCH_MODEL = 'bench';
+
+/** Catégorie des sièges tirés des meubles posés (ni la carte ni un chantier). */
+export const FURNITURE_SEAT_CATEGORY = 'furniture_seat';
+
+/** Un banc, ou un siège posé dans la maison (ses places à lui, `slots`). */
+export interface SeatProp extends MapProp {
+  /** Places propres au siège (mètres le long du modèle); absent: `reglages.benches.slots`. */
+  slots?: readonly number[];
+}
+
+/** Les places d'un banc ou d'un siège. */
+export function slotsOf(prop: SeatProp, s: BenchSettings): readonly number[] {
+  return prop.slots ?? s.slots;
+}
+
+/** Siège tiré d'un meuble posé (dans la maison, pas sur la carte) ? */
+export function isFurnitureSeat(prop: MapProp): boolean {
+  return prop.category === FURNITURE_SEAT_CATEGORY;
+}
+
+/**
+ * Sièges des meubles posés (le même identifiant que le meuble), refaits seulement quand un siège
+ * est posé, déplacé ou repris: aucune allocation d'une image à l'autre sinon.
+ */
+export class FurnitureSeats {
+  private signature = 0;
+  private list: SeatProp[] = [];
+
+  update(furniture: readonly DeepReadonly<PlacedFurniture>[], items: Readonly<Record<string, ItemDef>>): readonly SeatProp[] {
+    let signature = 1;
+    for (const f of furniture) {
+      const def = items[f.item];
+      if (def?.seat !== true || def.footprint === null) continue;
+      for (let i = 0; i < f.id.length; i++) signature = (Math.imul(signature, 31) + f.id.charCodeAt(i)) | 0;
+      signature = (Math.imul(signature, 31) + f.cell.cx * 101 + f.cell.cy * 7 + f.rotation) | 0;
+    }
+    if (signature === this.signature) return this.list;
+    this.signature = signature;
+    this.list = [];
+    for (const f of furniture) {
+      const def = items[f.item];
+      if (def?.seat !== true || def.footprint === null) continue;
+      const turned = f.rotation % 2 === 0;
+      const w = turned ? def.footprint.w : def.footprint.d;
+      const d = turned ? def.footprint.d : def.footprint.w;
+      this.list.push({
+        id: f.id,
+        model: def.model,
+        pos: { x: f.cell.cx + w / 2, y: f.cell.cy + d / 2 },
+        rotation: f.rotation,
+        rect: { x: f.cell.cx, y: f.cell.cy, w, h: d },
+        height: 0,
+        category: FURNITURE_SEAT_CATEGORY,
+        slots: def.seatSlots,
+      });
+    }
+    return this.list;
+  }
+}
 
 /** Une place: milieu de l'assise et orientation du corps assis (dos au dossier). */
 export interface BenchPlace {
@@ -74,9 +138,9 @@ function halfLength(prop: MapProp): number {
 }
 
 /** Écrit dans `out` la place `slot` du banc (sans allocation). */
-export function seatPlace(prop: MapProp, slot: number, s: BenchSettings, out: BenchPlace): BenchPlace {
+export function seatPlace(prop: SeatProp, slot: number, s: BenchSettings, out: BenchPlace): BenchPlace {
   const a = yaw(prop);
-  const offset = s.slots[slot] ?? 0;
+  const offset = slotsOf(prop, s)[slot] ?? 0;
   // Le long (cos, -sin) et vers l'avant (sin, cos), comme le modèle tourné par le rendu.
   out.x = prop.pos.x + Math.cos(a) * offset + Math.sin(a) * s.seatForward;
   out.y = prop.pos.y - Math.sin(a) * offset + Math.cos(a) * s.seatForward;
@@ -85,7 +149,7 @@ export function seatPlace(prop: MapProp, slot: number, s: BenchSettings, out: Be
 }
 
 /** Où l'on se relève: devant la place, à `standForward` m de l'assise (case libre). */
-export function standPlace(prop: MapProp, slot: number, s: BenchSettings, out: BenchPlace): BenchPlace {
+export function standPlace(prop: SeatProp, slot: number, s: BenchSettings, out: BenchPlace): BenchPlace {
   seatPlace(prop, slot, s, out);
   const a = yaw(prop);
   out.x += Math.sin(a) * s.standForward;

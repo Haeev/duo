@@ -301,7 +301,10 @@ export const PLAYER_HAIR_COLORS: readonly string[] = ['#2E2622', '#6B4A33', '#8A
 /** Barbes des joueurs (index `appearance.beard`): aucune, courte, fournie, moustache. */
 export const PLAYER_BEARDS: readonly BeardStyle[] = ['none', 'short', 'full', 'moustache'];
 
-/** Tenues des joueurs (index `appearance.outfit`): couleurs de `src/rendu/apparence.ts` (`OUTFITS`). */
+/**
+ * Tenues d'avant la 0.12: repli des portraits et des pastilles de la création quand `vetements.json`
+ * ne donne rien (les vraies couleurs viennent des vêtements de départ, `etat/garde-robe.ts`).
+ */
 export const PLAYER_OUTFITS: readonly { top: string; trim: string; bg: string }[] = [
   { top: '#5C7FA6', trim: '#EDE6D3', bg: '#D9E3EC' },
   { top: '#B5663F', trim: '#EDE6D3', bg: '#EADBCF' },

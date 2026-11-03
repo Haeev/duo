@@ -7,11 +7,13 @@ import type { Character, CharacterId, Quality } from '../etat/types';
 import { isHome } from '../etat/interieurs';
 import { bakeryBuy, openBakery } from './bourg';
 import { answerHairOffer, haircut, offerHaircut, openSalon } from './salon';
-import { OUTFIT_COUNT, TOOLBAR_SLOTS } from './constantes';
+import { starterWardrobe, starterWear } from '../etat/garde-robe';
+import { clothesBuy, openClothesShop, openWardrobe, wearClothing } from './vetements';
+import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, partnerOf, secondsToTicks } from './contexte';
 import { actFront, actOnClick, getUp, openMenu, pointerTarget, resolveClick } from './agir';
 import { standUp } from './bancs';
-import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeFurniture, toggleCurtains, updatePlacement } from './amenagement';
+import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDecor, takeFurniture, toggleCurtains, topDecorOf, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
 import { dialogueChoice, dialogueClose, dialogueNext, giveToVillager } from './dialogues';
 import { answerProposal, crateMove, nearChest, nearPoint, purchase, sell, withdraw } from './economie';
@@ -24,6 +26,7 @@ import { chooseAtStage } from './fin';
 import { nightChoice, startDay, startGame } from './horloge';
 import { ITEM, POINT } from './ids';
 import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
+import { examineWater } from './peche';
 
 const NAME_MAX = 16;
 
@@ -115,14 +118,22 @@ function createCharacter(
   c.appearance.hair = pick(hair, look.creationHairStyles, 0);
   c.appearance.hairColor = pick(intent.hairColor, look.hairColors, c.appearance.hairColor);
   c.appearance.beard = pick(intent.beard, look.beards, c.appearance.beard);
-  c.appearance.outfit = Math.max(0, Math.min(OUTFIT_COUNT - 1, Math.round(outfit)));
+  // 0.12: la tenue de départ choisie, portée et rangée dans la garde-robe (seule à la création).
+  const starters = sim.content.clothes.settings.starters.length;
+  const wear = starterWear(sim.content.clothes, pick(outfit, starters, 0));
+  c.appearance.wear = wear;
+  c.wardrobe = starterWardrobe(wear);
   c.created = true;
   sim.runtime.changed = true;
   startGame(sim);
 }
 
 function examine(sim: Sim, c: Character): void {
-  if (!canAct(c, sim) || !isHome(c)) return;
+  if (!canAct(c, sim)) return;
+  if (!isHome(c)) {
+    examineWater(sim, c);
+    return;
+  }
   const front = { cx: Math.floor(c.pos.x + Math.cos(c.facing)), cy: Math.floor(c.pos.y + Math.sin(c.facing)) };
   const here = { cx: Math.floor(c.pos.x), cy: Math.floor(c.pos.y) };
   // Le meuble devant soi d'abord, puis le tapis sous ses pieds.
@@ -135,7 +146,11 @@ function examine(sim: Sim, c: Character): void {
     return null;
   };
   const id = covering(front, false) ?? covering(front, true) ?? covering(here, true);
-  if (id !== null) takeFurniture(sim, c, id);
+  if (id === null) return;
+  // Ce qui est posé dessus d'abord (S03), puis le meuble.
+  const top = topDecorOf(sim, id);
+  if (top !== null) takeDecor(sim, c, top.id);
+  else takeFurniture(sim, c, id);
 }
 
 function craft(sim: Sim, c: Character, recipeId: string): void {
@@ -287,8 +302,9 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       if (canAct(c, sim)) placeFurniture(sim, c, intent.cell, intent.rotation);
       return;
     case 'take_furniture': {
-      const f = sim.world.furniture.find((x) => x.id === intent.furniture);
-      if (f !== undefined && canAct(c, sim) && isHome(c)) takeFurniture(sim, c, f.id);
+      // Un meuble posé, ou un petit objet posé sur un meuble (S03, même clic droit).
+      const known = sim.world.furniture.some((x) => x.id === intent.furniture) || sim.world.decor.some((x) => x.id === intent.furniture);
+      if (known && canAct(c, sim) && isHome(c)) takeFurniture(sim, c, intent.furniture);
       return;
     }
     case 'corner':
@@ -321,6 +337,8 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       // Le fauteuil et le guichet ont leurs règles (portée, heures, un seul au fauteuil).
       if (intent.menu === 'salon') openSalon(sim, c);
       else if (intent.menu === 'bakery') openBakery(sim, c);
+      else if (intent.menu === 'clothes_shop') openClothesShop(sim, c);
+      else if (intent.menu === 'wardrobe') openWardrobe(sim, c);
       else openMenu(sim, c, intent.menu);
       return;
     case 'bakery_buy':
@@ -335,6 +353,12 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
     case 'hair_offer_answer':
       answerHairOffer(sim, c, intent.accept);
       return;
+    case 'clothes_buy':
+      if (c.status === 'active' || c.status === 'menu') clothesBuy(sim, c, intent.item);
+      return;
+    case 'wear':
+      if (c.status === 'active' || c.status === 'menu') wearClothing(sim, c, intent.slot, intent.item);
+      return;
     case 'dialogue_next':
       dialogueNext(sim, c);
       return;
@@ -345,7 +369,8 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
       dialogueClose(sim, c);
       return;
     case 'buy':
-      purchase(sim, c, { source: 'grocery', item: intent.item, count: Math.floor(intent.count) });
+      // Au comptoir: l'épicerie d'Odette, ou la mercerie de Solange pour ce qu'elle vend (rideaux).
+      purchase(sim, c, { source: sim.content.items[intent.item]?.shop === 'haberdashery' ? 'haberdashery' : 'grocery', item: intent.item, count: Math.floor(intent.count) });
       return;
     case 'sell':
       sell(sim, c, intent.item, intent.quality, Math.floor(intent.count));

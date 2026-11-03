@@ -26,6 +26,8 @@
     { "id": "hint_omelette", "text": "Au réchaud de la maison, trois œufs font deux omelettes.", "trigger": { "on": "quest_started", "quest": "basile_omelette" }, "tier": "P0" },
     { "id": "forage_hint", "text": "Quelque chose se cueille à la lisière: approche-toi, puis {act} ou un clic pour le ramasser.", "trigger": { "on": "near_forage" }, "tier": "P0" },
     { "id": "sapling_hint", "text": "Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir.", "trigger": { "on": "aim_sapling" }, "tier": "P0" },
-    { "id": "board_hint", "text": "Le tableau du quai a de nouvelles annonces: approche-toi, puis {act} pour les lire.", "trigger": { "on": "near_board_annonce" }, "tier": "P0" }
+    { "id": "board_hint", "text": "Le tableau du quai a de nouvelles annonces: approche-toi, puis {act} pour les lire.", "trigger": { "on": "near_board_annonce" }, "tier": "P0" },
+    { "id": "fishing_hot_spot_hint", "text": "Tu vois ces ronds dans l'eau ? Ça gobe: c'est le coin qui frémit aujourd'hui. Les beaux poissons y sont plus nombreux.", "trigger": { "on": "fishing_hot_spot" }, "tier": "P1" },
+    { "id": "fishing_watch_hint", "text": "Reste immobile au bord de l'eau sans pêcher: tu verras briller les beaux poissons. Dis à l'autre où lancer.", "trigger": { "on": "fishing_watch" }, "tier": "P1" }
   ]
 }

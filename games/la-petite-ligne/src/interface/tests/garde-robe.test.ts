@@ -1,25 +1,25 @@
 // 0.12, garde-robe et mercerie vues par l'interface (contrat `docs/jeux/jeu-1/garde-robe-0-12.md`):
 // rayons dans l'ordre des onglets, vignettes (à toi, portée, trop chère, nouveautés, saison),
-// essayage, garde-robe, tenue de départ, portrait sans foulard aux couleurs du haut porté.
-// Chez les deux joueurs.
+// essayage, garde-robe, portrait sans foulard aux couleurs du haut porté, stock et nouveautés lus
+// comme la simulation. Chez les deux joueurs.
 import { describe, expect, it } from 'vitest';
-import type { CharacterId } from '../../etat/types';
+import { DEFAULT_WARDROBE, parseClothes } from '../../donnees/vetements';
+import { clothesStock, starterWear } from '../../etat/garde-robe';
+import type { CharacterId, Wear } from '../../etat/types';
 import { figureSvg } from '../apercu';
 import {
   type ClothesView,
-  type Wear,
   CLOTHING_SLOTS,
   catalogueOf,
   clothesShopModel,
-  defaultStarterWear,
-  starterOutfit,
+  clothesViewOf,
+  stockOfDay,
   wardrobeModel,
   wearIntents,
   withWear,
-  wornColors,
 } from '../modele-garde-robe';
 import { playerColors, portraitSvg } from '../portrait';
-import { uiContext } from './aides';
+import { newSim, uiContext } from './aides';
 
 const PLAYERS: readonly CharacterId[] = ['p1', 'p2'];
 
@@ -40,31 +40,30 @@ const item = (
   ...extra,
 });
 
-const CATALOGUE = catalogueOf([
-  item('tshirt_lin', 'top', 'T-shirt lin', 8),
-  item('pull_moutarde', 'top', 'Pull moutarde', 30),
-  item('mariniere_bleue', 'top', 'Marinière bleue', 24, {
-    couleurs: { principale: '#F2EBDD', secondaire: '#2F3F5C', motif: '#2F3F5C' },
-  }),
-  item('pantalon_toile', 'bottom', 'Pantalon de toile', 10),
-  item('salopette_bleue', 'bottom', 'Salopette bleue', 40, {
-    couvre: ['top'],
-    couleurs: { principale: '#3F5F8A', secondaire: '#E8C77A' },
-  }),
-  item('bottines_cuir', 'shoes', 'Bottines de cuir', 12),
-  item('ciré_jaune', 'outer', 'Ciré jaune', 35, { saison: 'autumn' }),
-  item('gilet_sauge', 'outer', 'Gilet sauge', 28, {
-    couleurs: { principale: '#8BA37B', secondaire: '#5F4B3A' },
-  }),
-  item('chapeau_paille', 'hat', 'Chapeau de paille', 18, { saison: 'summer' }),
+const CLOTHES = parseClothes(
   {
-    id: 'casse',
-    slot: 'gants',
-    nom: 'Gants',
-    prix: 3,
-    couleurs: { principale: '#000', secondaire: '#000' },
+    vetements: [
+      item('tshirt_lin', 'top', 'T-shirt lin', 70),
+      item('pull_moutarde', 'top', 'Pull moutarde', 150),
+      item('mariniere_bleue', 'top', 'Marinière bleue', 130, {
+        couleurs: { principale: '#F2EBDD', secondaire: '#2F3F5C', motif: '#2F3F5C' },
+      }),
+      item('pantalon_toile', 'bottom', 'Pantalon de toile', 140),
+      item('salopette_bleue', 'bottom', 'Salopette bleue', 220, {
+        couvre: ['top'],
+        couleurs: { principale: '#3F5F8A', secondaire: '#E8C77A' },
+      }),
+      item('bottines_cuir', 'shoes', 'Bottines de cuir', 160),
+      item('cire_jaune', 'outer', 'Ciré jaune', 380, { saison: 'autumn' }),
+      item('gilet_sauge', 'outer', 'Gilet sauge', 240, {
+        couleurs: { principale: '#8BA37B', secondaire: '#5F4B3A' },
+      }),
+      item('paille_naturel', 'hat', 'Chapeau de paille', 110, { saison: 'summer' }),
+    ],
   },
-]);
+  DEFAULT_WARDROBE,
+);
+const CATALOGUE = catalogueOf(CLOTHES);
 
 const WEAR: Wear = {
   top: 'tshirt_lin',
@@ -79,7 +78,7 @@ function view(over: Partial<ClothesView> = {}): ClothesView {
     catalogue: CATALOGUE,
     wardrobe: ['tshirt_lin', 'pantalon_toile', 'bottines_cuir', 'gilet_sauge'],
     wear: WEAR,
-    purse: 25,
+    purse: 140,
     stock: [...CATALOGUE.keys()],
     fresh: ['mariniere_bleue'],
     season: 'summer',
@@ -88,11 +87,6 @@ function view(over: Partial<ClothesView> = {}): ClothesView {
 }
 
 describe('mercerie et confection', () => {
-  it('contrôle les données: une pièce sans emplacement connu est écartée', () => {
-    expect(CATALOGUE.has('casse')).toBe(false);
-    expect(CATALOGUE.get('salopette_bleue')?.couvre).toEqual(['top']);
-  });
-
   for (const me of PLAYERS) {
     it(`chez ${me}: cinq onglets dans l'ordre, nouveautés d'abord, prix et pastilles`, () => {
       const ctx = uiContext(me);
@@ -108,11 +102,12 @@ describe('mercerie et confection', () => {
       expect(m.cards.map((c) => [c.id, c.state, c.missing, c.fresh])).toEqual([
         ['mariniere_bleue', 'buy', 0, true],
         ['tshirt_lin', 'worn', 0, false],
-        ['pull_moutarde', 'too_expensive', 5, false],
+        ['pull_moutarde', 'too_expensive', 10, false],
       ]);
       // Hors saison, le ciré n'est pas en vente; en été, le chapeau de paille l'est.
-      const outer = clothesShopModel(ctx, view(), 'outer', WEAR);
-      expect(outer.cards.map((c) => [c.id, c.state])).toEqual([['gilet_sauge', 'owned']]);
+      expect(
+        clothesShopModel(ctx, view(), 'outer', WEAR).cards.map((c) => [c.id, c.state]),
+      ).toEqual([['gilet_sauge', 'owned']]);
       expect(clothesShopModel(ctx, view(), 'hat', WEAR).cards.map((c) => c.seasonal)).toEqual([
         true,
       ]);
@@ -130,9 +125,9 @@ describe('mercerie et confection', () => {
       expect(withWear(WEAR, 'top', null)).toBe(WEAR);
       const jacket = withWear(WEAR, 'outer', 'gilet_sauge');
       expect(withWear(jacket, 'outer', null).outer).toBeNull();
-      expect(wearIntents(WEAR, { ...jacket, hat: 'chapeau_paille' })).toEqual([
+      expect(wearIntents(WEAR, { ...jacket, hat: 'paille_naturel' })).toEqual([
         { type: 'wear', slot: 'outer', item: 'gilet_sauge' },
-        { type: 'wear', slot: 'hat', item: 'chapeau_paille' },
+        { type: 'wear', slot: 'hat', item: 'paille_naturel' },
       ]);
     });
 
@@ -153,48 +148,69 @@ describe('mercerie et confection', () => {
           .canRemove,
       ).toBe(true);
     });
+
+    it(`chez ${me}: l'état réel donne la tenue, la garde-robe et le stock du jour de la simulation`, () => {
+      const ctx = uiContext(me);
+      const sim = newSim();
+      const c = sim.world.characters.find((x) => x.id === me) ?? null;
+      const v = clothesViewOf(ctx, sim.world, c);
+      const day = sim.world.clock.day;
+      expect(v?.stock).toEqual(
+        clothesStock(ctx.content.clothes, ctx.content.settings, sim.world.seed, day),
+      );
+      expect(v?.wear).toEqual(c?.appearance.wear);
+      // Le fonds permanent revient chaque semaine: il n'est jamais « nouveau ».
+      const { stock, fresh } = stockOfDay(
+        ctx.content.clothes,
+        ctx.content.settings,
+        sim.world.seed,
+        day + 14,
+      );
+      const lastWeek = clothesStock(
+        ctx.content.clothes,
+        ctx.content.settings,
+        sim.world.seed,
+        day + 7,
+      );
+      expect(fresh.every((id) => stock.includes(id) && !lastWeek.includes(id))).toBe(true);
+      expect(fresh.length).toBeLessThan(stock.length);
+    });
   }
 
   it('aucun montant écrit en dur: les prix passent par le texte commun de la monnaie', () => {
     const ctx = uiContext('p1');
     const texts = JSON.stringify(ctx.texts.extra.clothes);
-    expect(texts).not.toMatch(/\bsous\b/);
+    expect(texts).not.toMatch(/\bsous\b|aubrin/);
     expect(ctx.texts.game.ui.shop.price).toContain('{price}');
   });
 });
 
-describe('tenue de départ et portrait', () => {
-  it('propose haut, bas et chaussures sans pièce de saison ni salopette, une tenue différente par joueur', () => {
-    const s = starterOutfit(CATALOGUE);
-    expect(s.top.map((d) => d.id)).toEqual(['tshirt_lin', 'mariniere_bleue', 'pull_moutarde']);
-    expect(s.bottom.map((d) => d.id)).toEqual(['pantalon_toile']);
-    expect(s.shoes.map((d) => d.id)).toEqual(['bottines_cuir']);
-    expect(defaultStarterWear(s, 'p1', null)?.top).toBe('tshirt_lin');
-    expect(defaultStarterWear(s, 'p2', null)?.top).toBe('mariniere_bleue');
-    // La tenue déjà choisie (reprise) est gardée.
-    expect(defaultStarterWear(s, 'p2', { ...WEAR, top: 'pull_moutarde' })?.top).toBe(
-      'pull_moutarde',
-    );
-  });
-
+describe('portrait et silhouette', () => {
   for (const me of PLAYERS) {
     it(`chez ${me}: plus de foulard; le haut porté colore le portrait, le badge garde la couleur du profil`, () => {
-      const salopette = { ...WEAR, bottom: 'salopette_bleue', outer: 'gilet_sauge' };
-      const clothes = wornColors(salopette, CATALOGUE);
-      expect(clothes?.top.principale).toBe('#3F5F8A');
-      const colors = playerColors(me, { hair: 2, scarf: '#8D6CFF' }, clothes);
+      const salopette: Wear = { ...WEAR, bottom: 'salopette_bleue', outer: 'gilet_sauge' };
+      const colors = playerColors(me, { hair: 2, scarf: '#8D6CFF', wear: salopette }, CLOTHES);
       expect(colors).toMatchObject({
         top: '#3f5f8a',
         trim: '#e8c77a',
         scarf: '',
         badge: '#8d6cff',
+        outer: { main: '#8ba37b' },
       });
       const svg = portraitSvg(colors, 'good', '');
       expect(svg).not.toContain('M33 79c5 4');
       expect(svg).toContain('fill="#8ba37b"');
-      const figure = figureSvg(colors, { ...salopette, hat: 'chapeau_paille' }, CATALOGUE, 0);
+      const figure = figureSvg(colors, { ...salopette, hat: 'paille_naturel' }, CATALOGUE, 0);
       for (const c of ['#3f5f8a', '#8ba37b', '#d4a746']) expect(figure).toContain(c);
-      expect(CLOTHING_SLOTS).toHaveLength(5);
     });
   }
+
+  it('chaque tenue de départ du jeu se dessine avec ses vrais vêtements', () => {
+    const { clothes } = uiContext('p1').content;
+    for (let i = 0; i < clothes.settings.starters.length; i++) {
+      const wear = starterWear(clothes, i);
+      for (const slot of CLOTHING_SLOTS)
+        if (wear[slot] !== null) expect(clothes.byId[wear[slot] ?? '']).toBeDefined();
+    }
+  });
 });

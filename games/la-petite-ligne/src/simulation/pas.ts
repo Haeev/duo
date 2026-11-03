@@ -25,6 +25,7 @@ import { updateHairNoticed } from './salon';
 import { checkNight, updateAbsence, updateClock } from './horloge';
 import { applyIntent, arrive, endGesture, heldRepeat, updateCrafting } from './intentions';
 import { updateFishing } from './peche';
+import { updateFishingWorld } from './ombres';
 import { wanderHens } from './poules';
 import { updateQuests } from './quetes';
 import { updateTrain } from './train';
@@ -152,6 +153,7 @@ export function step(sim: Sim, input: StepInput): void {
     updateRoomWork(sim, controls, dt);
   }
   for (const c of world.characters) updateInside(sim, c);
+  updateFishingWorld(sim);
   updateDoors(sim);
   updateHolds(sim);
   updateSeats(sim);

@@ -1,60 +1,42 @@
 /**
  * Garde-robe et boutique de vêtements de la 0.12 (contrat `docs/jeux/jeu-1/garde-robe-0-12.md`)
  * vus par l'interface: rayons par emplacement, vignettes (nom, couleurs, prix, « Déjà à toi »,
- * nouveautés de la semaine), essayage dans l'aperçu, garde-robe, tenue de départ de la création.
- * Fonctions pures, testées dans Node. Les données (`vetements.json`), l'état (`appearance.wear`,
- * `wardrobe`, stock du lundi) et les intentions (`wear`, `clothes_buy`) sont ceux de la simulation:
- * ces modèles ne lisent que ce qu'on leur passe (`ClothesView`).
+ * nouveautés de la semaine), essayage dans l'aperçu, garde-robe. Fonctions pures, testées dans
+ * Node. Les données (`content.clothes`), l'état (`appearance.wear`, `wardrobe`), le stock du jour
+ * (`clothesStock`) et les intentions (`wear`, `clothes_buy`) sont ceux de la simulation.
  */
-import type { Season } from '../donnees/types';
+import { seasonOfDay } from '../donnees/calendrier';
+import type { Season, Settings } from '../donnees/types';
+import {
+  CLOTHING_SLOTS,
+  type ClothesContent,
+  type ClothingColors,
+  type ClothingDef,
+  REQUIRED_SLOTS,
+} from '../donnees/vetements';
+import { clothesStock } from '../etat/garde-robe';
+import type { ClothingSlot, Wear } from '../etat/types';
 import type { UiContext } from './contexte';
 
-/** Emplacements, dans l'ordre des onglets: Hauts, Vestes, Bas, Chaussures, Chapeaux. */
-export const CLOTHING_SLOTS = ['top', 'outer', 'bottom', 'shoes', 'hat'] as const;
-export type ClothingSlot = (typeof CLOTHING_SLOTS)[number];
-
-/** Emplacements qu'on ne peut pas laisser vides (contrat, section 1). */
-export const REQUIRED_SLOTS: readonly ClothingSlot[] = ['top', 'bottom', 'shoes'];
-
-export function isClothingSlot(value: unknown): value is ClothingSlot {
-  return typeof value === 'string' && (CLOTHING_SLOTS as readonly string[]).includes(value);
-}
+export { CLOTHING_SLOTS };
 
 export function isOptionalSlot(slot: ClothingSlot): slot is 'outer' | 'hat' {
-  return !REQUIRED_SLOTS.includes(slot);
-}
-
-export interface ClothingColors {
-  principale: string;
-  secondaire: string;
-  motif?: string;
-}
-
-/** Un vêtement de `vetements.json` (contrat, section 2). */
-export interface ClothingDef {
-  id: string;
-  slot: ClothingSlot;
-  style: string;
-  nom: string;
-  modele: string;
-  couleurs: ClothingColors;
-  prix: number;
-  saison?: Season;
-  couvre?: readonly ClothingSlot[];
-  /** Pièce de départ, proposée à la création (sinon: les moins chères de chaque emplacement). */
-  depart?: boolean;
-}
-
-/** Tenue portée (`Character.appearance.wear`, contrat, section 3). */
-export interface Wear {
-  top: string;
-  bottom: string;
-  shoes: string;
-  outer: string | null;
-  hat: string | null;
+  return !(REQUIRED_SLOTS as readonly ClothingSlot[]).includes(slot);
 }
 
 export type ClothingCatalogue = ReadonlyMap<string, ClothingDef>;
+
+const catalogues = new WeakMap<ClothesContent, ClothingCatalogue>();
+
+/** Les vêtements du contenu, par identifiant, dans l'ordre du fichier (lu une fois par contenu). */
+export function catalogueOf(clothes: ClothesContent): ClothingCatalogue {
+  let out = catalogues.get(clothes);
+  if (out === undefined) {
+    out = new Map(clothes.list.map((d) => [d.id, d]));
+    catalogues.set(clothes, out);
+  }
+  return out;
+}
 
 /** Ce que la boutique et la garde-robe lisent de l'état et des données. */
 export interface ClothesView {
@@ -64,19 +46,15 @@ export interface ClothesView {
   wear: Wear;
   /** Bourse disponible. */
   purse: number;
-  /** En vente cette semaine: le fonds permanent puis la sélection du lundi. */
+  /** En vente aujourd'hui (`clothesStock`). */
   stock: readonly string[];
-  /** Les nouveautés du lundi (marquées « Nouveau »). */
+  /** Les nouveautés de la semaine: en vente cette semaine, pas la semaine d'avant. */
   fresh: readonly string[];
   season: Season;
 }
 
 // ---------------------------------------------------------------------------
 // Tenue: essayer, porter, retirer
-
-export function wornIn(wear: Wear, slot: ClothingSlot): string | null {
-  return wear[slot];
-}
 
 /**
  * La tenue avec `item` à son emplacement (essayage ou « Porter »). Retirer (`null`) ne vaut que
@@ -166,7 +144,7 @@ function card(
     state: worn ? 'worn' : mine ? 'owned' : missing > 0 ? 'too_expensive' : 'buy',
     missing,
     fresh: fresh.has(def.id),
-    seasonal: def.saison !== undefined,
+    seasonal: def.saison !== null,
     trying: preview[def.slot] === def.id && !worn,
   };
 }
@@ -189,7 +167,7 @@ function stockOf(view: ClothesView): ClothingDef[] {
     const def = view.catalogue.get(id);
     if (def === undefined || seen.has(id)) continue;
     // Une pièce de saison ne se vend qu'en sa saison (contrat, section 2).
-    if (def.saison !== undefined && def.saison !== view.season) continue;
+    if (def.saison !== null && def.saison !== view.season) continue;
     seen.add(id);
     out.push(def);
   }
@@ -284,219 +262,43 @@ export function wardrobeModel(
 }
 
 // ---------------------------------------------------------------------------
-// Création: tenue de départ
+// Lecture de l'état
 
-/** Nombre de pièces proposées par emplacement à la création, faute de pièces marquées `depart`. */
-const STARTER_PER_SLOT = 4;
-
-export interface StarterOutfit {
-  top: ClothingDef[];
-  bottom: ClothingDef[];
-  shoes: ClothingDef[];
-}
-
-/**
- * Pièces de départ de la création (haut, bas, chaussures). Celles que les données marquent
- * `depart`, sinon les moins chères de chaque emplacement hors saison, sans les pièces qui en
- * couvrent une autre (une salopette ne se choisit pas à la création: elle cacherait le haut).
- */
-export function starterOutfit(catalogue: ClothingCatalogue): StarterOutfit {
-  const all = [...catalogue.values()];
-  const marked = all.some((d) => d.depart === true);
-  const pick = (slot: 'top' | 'bottom' | 'shoes'): ClothingDef[] => {
-    const list = all.filter(
-      (d) =>
-        d.slot === slot &&
-        (marked
-          ? d.depart === true
-          : d.saison === undefined && (d.couvre === undefined || d.couvre.length === 0)),
-    );
-    // Pièces marquées: dans l'ordre des données (celui du game designer); sinon les moins chères.
-    if (marked) return list;
-    return [...list]
-      .sort((a, b) => a.prix - b.prix || a.id.localeCompare(b.id))
-      .slice(0, STARTER_PER_SLOT);
-  };
-  return { top: pick('top'), bottom: pick('bottom'), shoes: pick('shoes') };
-}
-
-/** Tenue de départ par défaut: une pièce différente pour chaque joueur (p1 la première, p2 la deuxième). */
-export function defaultStarterWear(
-  starter: StarterOutfit,
-  player: 'p1' | 'p2',
-  current: Wear | null,
-): Wear | null {
-  const n = player === 'p1' ? 0 : 1;
-  const at = (list: ClothingDef[]): string | null => list[n % Math.max(1, list.length)]?.id ?? null;
-  const known = (list: ClothingDef[], id: string | undefined): string | null =>
-    id !== undefined && list.some((d) => d.id === id) ? id : null;
-  const top = known(starter.top, current?.top) ?? at(starter.top);
-  const bottom = known(starter.bottom, current?.bottom) ?? at(starter.bottom);
-  const shoes = known(starter.shoes, current?.shoes) ?? at(starter.shoes);
-  if (top === null || bottom === null || shoes === null) return null;
-  return { top, bottom, shoes, outer: null, hat: null };
-}
-
-// ---------------------------------------------------------------------------
-// Portrait 2D: couleurs du haut porté
-
-export interface WornColors {
-  /** Le haut visible (la salopette, si elle couvre le haut). */
-  top: ClothingColors;
-  /** La veste par-dessus, ou rien. */
-  outer: ClothingColors | null;
-}
-
-/** Couleurs du haut porté pour le portrait (le haut couvert laisse voir ce qui le couvre). */
-export function wornColors(wear: Wear, catalogue: ClothingCatalogue): WornColors | null {
-  const covering = CLOTHING_SLOTS.map((s) => wear[s])
-    .map((id) => (id === null ? undefined : catalogue.get(id)))
-    .find((d) => d !== undefined && d.slot !== 'top' && (d.couvre ?? []).includes('top'));
-  const top = covering ?? catalogue.get(wear.top);
-  if (top === undefined) return null;
-  const outer = wear.outer === null ? undefined : catalogue.get(wear.outer);
-  return { top: top.couleurs, outer: outer?.couleurs ?? null };
-}
-
-// ---------------------------------------------------------------------------
-// Lecture des données et de l'état (contrat, sections 2 et 3)
-
-const SEASONS: readonly Season[] = ['spring', 'summer', 'autumn', 'winter'];
-
-function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
-
-function stringList(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((x): x is string => typeof x === 'string') : [];
-}
-
-function isSeason(value: unknown): value is Season {
-  return typeof value === 'string' && (SEASONS as readonly string[]).includes(value);
-}
-
-function colorsOf(value: unknown): ClothingColors | null {
-  if (!isRecord(value)) return null;
-  const { principale, secondaire, motif } = value;
-  if (typeof principale !== 'string' || typeof secondaire !== 'string') return null;
-  return typeof motif === 'string' ? { principale, secondaire, motif } : { principale, secondaire };
-}
-
-/** Un vêtement des données, contrôlé (les données viennent du disque). */
-export function clothingDefOf(value: unknown): ClothingDef | null {
-  if (!isRecord(value)) return null;
-  const { id, slot, style, nom, modele, couleurs, prix, saison, couvre, depart } = value;
-  const colors = colorsOf(couleurs);
-  if (typeof id !== 'string' || !isClothingSlot(slot) || typeof nom !== 'string') return null;
-  if (typeof prix !== 'number' || !Number.isFinite(prix) || colors === null) return null;
-  const def: ClothingDef = {
-    id,
-    slot,
-    style: typeof style === 'string' ? style : id,
-    nom,
-    modele: typeof modele === 'string' ? modele : '',
-    couleurs: colors,
-    prix,
-  };
-  if (isSeason(saison)) def.saison = saison;
-  const covers = stringList(couvre).filter(isClothingSlot);
-  if (covers.length > 0) def.couvre = covers;
-  if (depart === true) def.depart = true;
-  return def;
-}
-
-/** Le catalogue des vêtements, quelle que soit sa forme (tableau, table ou `Map`). */
-export function catalogueOf(source: unknown): ClothingCatalogue {
-  let values: unknown[] = [];
-  if (source instanceof Map) values = [...(source as Map<unknown, unknown>).values()];
-  else if (Array.isArray(source)) values = source;
-  else if (isRecord(source)) values = Object.values(source);
-  const out = new Map<string, ClothingDef>();
-  for (const v of values) {
-    const def = clothingDefOf(v);
-    if (def !== null) out.set(def.id, def);
-  }
-  return out;
-}
-
-/** La tenue portée d'une apparence (`appearance.wear`), ou `null` si elle manque. */
-export function wearOf(appearance: unknown): Wear | null {
-  if (!isRecord(appearance)) return null;
-  const w = appearance.wear;
-  if (!isRecord(w)) return null;
-  const { top, bottom, shoes, outer, hat } = w;
-  if (typeof top !== 'string' || typeof bottom !== 'string' || typeof shoes !== 'string') {
-    return null;
-  }
-  return {
-    top,
-    bottom,
-    shoes,
-    outer: typeof outer === 'string' ? outer : null,
-    hat: typeof hat === 'string' ? hat : null,
-  };
-}
-
-const catalogues = new WeakMap<object, ClothingCatalogue>();
-
-/** Le catalogue du contenu chargé (`vetements.json`), lu une fois par contenu. */
-export function clothesCatalogue(ctx: UiContext): ClothingCatalogue {
-  const content: object = ctx.content;
-  let out = catalogues.get(content);
-  if (out === undefined) {
-    out = catalogueOf((content as { clothes?: unknown }).clothes);
-    catalogues.set(content, out);
-  }
-  return out;
-}
-
-/** Couleurs du haut porté pour le portrait d'une apparence (`null`: tenue d'avant la 0.12). */
-export function portraitClothes(ctx: UiContext, appearance: unknown): WornColors | null {
-  const wear = wearOf(appearance);
-  return wear === null ? null : wornColors(wear, clothesCatalogue(ctx));
-}
-
-/** Les vêtements possédés d'un personnage (`Character.wardrobe`). */
-export function wardrobeOf(character: unknown): string[] {
-  return isRecord(character) ? stringList(character.wardrobe) : [];
-}
-
-/**
- * Le stock de la mercerie (contrat, section 4): `clothesStock` de l'état, le fonds permanent
- * (`permanent`) et la sélection du lundi (`weekly`, les nouveautés). Sans stock dans l'état: tout
- * le catalogue de la saison, sans nouveauté.
- */
-export function clothesStockOf(
-  world: unknown,
-  catalogue: ClothingCatalogue,
+/** Les vêtements en vente et les nouveautés de la semaine (même tirage chez les deux joueurs). */
+export function stockOfDay(
+  clothes: ClothesContent,
+  settings: Pick<Settings, 'calendar'>,
+  seed: number,
+  day: number,
 ): { stock: string[]; fresh: string[] } {
-  const raw = isRecord(world) ? world.clothesStock : undefined;
-  if (isRecord(raw)) {
-    const weekly = stringList(raw.weekly);
-    return { stock: [...stringList(raw.permanent), ...weekly], fresh: weekly };
-  }
-  return { stock: [...catalogue.keys()], fresh: [] };
+  const stock = clothesStock(clothes, settings, seed, day);
+  const before = new Set(clothesStock(clothes, settings, seed, day - 7));
+  return { stock, fresh: stock.filter((id) => !before.has(id)) };
 }
 
-/** Ce que la mercerie et la garde-robe lisent pour un joueur, ou `null` sans tenue dans l'état. */
+/** Ce que la mercerie et la garde-robe lisent pour un joueur. */
 export function clothesViewOf(
   ctx: UiContext,
-  world: { readonly purse: number; readonly clock: { readonly day: number } },
-  character: { readonly appearance: unknown } | null,
-  season: Season,
+  world: {
+    readonly purse: number;
+    readonly seed: number;
+    readonly clock: { readonly day: number };
+  },
+  character: {
+    readonly appearance: { readonly wear: Readonly<Wear> };
+    readonly wardrobe: readonly string[];
+  } | null,
 ): ClothesView | null {
   if (character === null) return null;
-  const wear = wearOf(character.appearance);
-  if (wear === null) return null;
-  const catalogue = clothesCatalogue(ctx);
-  const { stock, fresh } = clothesStockOf(world, catalogue);
+  const clothes = ctx.content.clothes;
+  const { stock, fresh } = stockOfDay(clothes, ctx.content.settings, world.seed, world.clock.day);
   return {
-    catalogue,
-    wardrobe: wardrobeOf(character),
-    wear,
+    catalogue: catalogueOf(clothes),
+    wardrobe: character.wardrobe,
+    wear: { ...character.appearance.wear },
     purse: world.purse,
     stock,
     fresh,
-    season,
+    season: seasonOfDay(ctx.content.settings, world.clock.day),
   };
 }

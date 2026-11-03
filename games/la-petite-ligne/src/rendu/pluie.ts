@@ -17,6 +17,8 @@ import {
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import type { ResourceTracker } from './ressources';
 import { hash2 } from './bruit';
+import type { Rect } from '../etat/carte';
+import { SHELTER_SLOTS } from './abri';
 
 const SALT_X = 1;
 const SALT_Y = 2;
@@ -70,6 +72,17 @@ export class RainLayer {
    * `amount`: densité (0 sans pluie), `light`: version légère (moitié moins de
    * gouttes, pas d'éclaboussures).
    */
+  /** Abri du joueur local (`abri.ts`): pas de goutte au-dessus ni devant la pièce, pas d'éclaboussure dedans. */
+  setShelter(rects: readonly Rect[]): void {
+    const u = this.uniforms;
+    const count = Math.min(rects.length, SHELTER_SLOTS);
+    for (let i = 0; i < count; i += 1) {
+      const r = rects[i];
+      if (r !== undefined) u.uShelters.value[i]?.set(r.x, r.y, r.x + r.w, r.y + r.h);
+    }
+    u.uShelterCount.value = count;
+  }
+
   update(
     time: number,
     focus: Vector3,

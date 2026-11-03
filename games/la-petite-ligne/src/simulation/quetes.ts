@@ -141,6 +141,7 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
     if (quest.start.byEffect || world.quests.some((q) => q.id === quest.id)) continue;
     if (evaluateAll(sim, quest.start.when, NO_CONTEXT)) startQuest(sim, quest.id);
   }
+  withdrawExpired(sim);
   for (const state of world.quests) {
     if (state.status !== 'active') continue;
     const quest = def(sim, state.id);
@@ -179,6 +180,36 @@ export function updateQuests(sim: Sim, toolEvent: ToolEvent | null = null): bool
   }
   updateSecrets(sim);
   return toolConsumed;
+}
+
+/** Jour et heure du retrait d'une quête `expire`: le premier `weekday` à `time` après son démarrage. */
+export function expiryOf(quest: QuestDef, state: QuestState): { day: number; time: number } | null {
+  if (quest.expire === null) return null;
+  // Le jour 1 est un samedi (indice 0 de la semaine des données).
+  const startWeekday = (state.startedDay - 1) % 7;
+  const ahead = (quest.expire.weekday - startWeekday + 7) % 7;
+  return { day: state.startedDay + (ahead === 0 ? 7 : ahead), time: quest.expire.time };
+}
+
+/**
+ * 0.12 (`expire`): la quête active dont l'heure est passée se retire, sans reproche ni récompense;
+ * elle quitte l'état et peut redémarrer quand ses conditions de départ redeviennent vraies.
+ */
+function withdrawExpired(sim: Sim): void {
+  const { world } = sim;
+  const expired = world.quests.filter((state) => {
+    if (state.status !== 'active') return false;
+    const quest = def(sim, state.id);
+    const at = quest === undefined ? null : expiryOf(quest, state);
+    return at !== null && deadlineReached(sim, at);
+  });
+  if (expired.length === 0) return;
+  world.quests = world.quests.filter((q) => !expired.includes(q));
+  for (const state of expired) {
+    const text = def(sim, state.id)?.expire?.text;
+    if (text !== undefined) notifyKey(sim, 'both', 'quest', text, {});
+  }
+  sim.runtime.changed = true;
 }
 
 /** Texte de l'objectif en cours (`{order}` remplacé). */

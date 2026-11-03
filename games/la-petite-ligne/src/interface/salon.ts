@@ -20,7 +20,6 @@ import {
 } from './modele-salon';
 import { Panel, backKeys, price, purseBadge } from './panneau';
 import { playerColors, portraitSvg } from './portrait';
-import { portraitClothes } from './modele-garde-robe';
 
 // ---------------------------------------------------------------------------
 // Salon de Solange (section 2.3)
@@ -85,7 +84,6 @@ export class SalonPanel extends Panel {
       beard: sitter.appearance.beard,
     };
     const choice = this.choice ?? current;
-    const clothes = portraitClothes(ctx, sitter.appearance);
     const seat = this.port.seat(world);
     const received = seat === 'chair' ? this.port.received(world) : null;
     const priceModel = salonPrice(
@@ -97,7 +95,7 @@ export class SalonPanel extends Panel {
     );
     setPortrait(
       this.preview,
-      portraitSvg(playerColors(sitter.id, { ...sitter.appearance, ...choice }, clothes), 'great', ''),
+      portraitSvg(playerColors(sitter.id, { ...sitter.appearance, ...choice }, ctx.content.clothes), 'great', ''),
     );
     const partner = nameOf(world, ctx.partner);
     const sig = JSON.stringify([current, choice, seat, received, priceModel, partner, world.purse]);
@@ -158,7 +156,7 @@ export class SalonPanel extends Panel {
                   class: 'lpl-option__swatch',
                   style: `--lpl-swatch: ${o.color ?? 'transparent'}`,
                 })
-              : portrait(portraitSvg(playerColors(sitter.id, look, clothes), 'good', ''), 'small');
+              : portrait(portraitSvg(playerColors(sitter.id, look, ctx.content.clothes), 'good', ''), 'small');
           box.append(
             el('label', { class: 'lpl-option', title: o.salonOnly ? ctx.t(s.salonOnly) : null }, [
               input,

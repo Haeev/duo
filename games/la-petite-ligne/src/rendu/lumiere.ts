@@ -20,6 +20,7 @@ import {
   Fog,
   HemisphereLight,
   MathUtils,
+  ShaderChunk,
   Vector3,
   type OrthographicCamera,
   type Scene,
@@ -37,6 +38,25 @@ const LUMA_R = 0.2126;
 const LUMA_G = 0.7152;
 const LUMA_B = 0.0722;
 const SHADOW_NEAR = 0.5;
+/** Rotation du motif d'échantillonnage tirée par pixel (bruit IGN) dans le filtre PCF de Three.js. */
+const PCF_NOISE = 'float phi = interleavedGradientNoise( gl_FragCoord.xy ) * PI2;';
+
+/**
+ * Filtre d'ombre stable (retour S02 du 2026-11-02, « ombre du personnage en tache tramée »): le
+ * PCF de Three.js 0.187 tourne ses cinq échantillons d'un angle tiré par pixel. Là où l'ombre
+ * n'est que pénombre (jambes, piquets, lisses), ce bruit se lit comme une trame de points. Un
+ * motif fixe garde le bord doux (chaque échantillon est déjà filtré par le matériel) sans trame.
+ * Même nombre de programmes: le morceau de shader est changé une fois pour tous, avant toute
+ * compilation. Rien ne change si la version de Three.js n'a plus ce morceau.
+ */
+export function stabilizeShadowFilter(): void {
+  const chunks = ShaderChunk as unknown as Record<string, string>;
+  const source = chunks.shadowmap_pars_fragment;
+  if (source?.includes(PCF_NOISE) === true) {
+    chunks.shadowmap_pars_fragment = source.split(PCF_NOISE).join('float phi = 0.0;');
+  }
+}
+
 /** Plus bas que le sol le plus bas (lit de la rivière): l'empreinte de la vue part de là. */
 const LOWEST_GROUND = -0.5;
 /** Coins de l'écran en coordonnées normalisées. */

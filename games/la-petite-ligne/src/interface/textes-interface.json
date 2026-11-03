@@ -173,6 +173,7 @@
       "salon": "Au fauteuil de Solange",
       "bakery": "Au guichet du fournil",
       "clothes_shop": "À la mercerie",
+      "wardrobe": "Se change à la maison",
       "grocer": "Chez Odette",
       "room": "Regarde le chantier"
     },
@@ -235,6 +236,7 @@
     "shopChoicesLabel": "Que faire ?",
     "shopBuy": "Acheter des graines et des clous",
     "shopSell": "Vendre des récoltes",
+    "shopHaberdashery": "Voir ses rideaux",
     "goodbye": "Au revoir",
     "goodbyeKey": "au revoir",
     "readTitle": "{item}"
@@ -392,10 +394,13 @@
     "nothingToSell": "Rien à vendre dans ton sac pour l'instant.",
     "rate": "Odette paie {percent} % du prix de la coopérative.",
     "seedInfo": "Pousse en {days} jours, {yield} par case.",
-    "keysBuy": "acheter"
+    "keysBuy": "acheter",
+    "haberdasheryTitle": "Le comptoir de Solange",
+    "haberdasheryClosed": "Solange n'est pas à son comptoir pour l'instant."
   },
   "workbench": {
     "makes": "{inputs} pour {output}",
+    "fromChest": "{count} {item}, dont {chest} au coffre",
     "have": "Tu as : {list}",
     "fromCellar": "Le sac d'abord, puis le coffre de la maison.",
     "inProgress": "En cours…",
@@ -881,5 +886,28 @@
     "badge": "Ton badge brodé porte la couleur et le symbole de ton profil Duo : {profile}.",
     "takenStarter": "Aussi choisi par {partner}",
     "previewLabel": "Aperçu de ton personnage"
+  },
+  "fish": {
+    "tab": "Poissons",
+    "pageLabel": "Les poissons du carnet",
+    "count": "Poissons au carnet: {caught} sur {total}",
+    "here": "Tu es près de l'eau: {zone}.",
+    "unknown": "Pas encore pris",
+    "hintLocked": "On en parle au bourg, mais tu ne sais pas encore où.",
+    "zones": "Coins: {list}",
+    "seasons": "Saisons: {list}",
+    "hours": "Heures: {list}",
+    "favorite": "Il aime: {list}",
+    "price": "Prix chez Odette: {price}",
+    "released": "Remis à l'eau",
+    "caught": "Pris {count} fois",
+    "record": "Record: {cm} cm, {name}, jour {day}",
+    "first": "Première prise: jour {day}, {zone}",
+    "together": "ensemble",
+    "watching": "Au guet",
+    "scalesLabel": "{count} écailles sur 5",
+    "rarities": { "common": "Communs", "rare": "Rares", "epic": "Épiques", "legendary": "Légendaires", "mythic": "Mythiques" },
+    "seasonNames": { "spring": "printemps", "summer": "été", "autumn": "automne", "winter": "hiver" },
+    "favorites": { "rain": "la pluie", "mist": "la brume du matin", "spring": "le printemps", "summer": "l'été", "autumn": "l'automne", "winter": "l'hiver" }
   }
 }

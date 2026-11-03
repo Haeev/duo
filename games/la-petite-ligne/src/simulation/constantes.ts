@@ -46,9 +46,12 @@ export const MINUTES_PER_DAY = 1440;
  * jour 15 (tour 8: étapes, météo tirée, commande générée, totaux, courrier hebdomadaire).
  * 6: annonces, chantiers, catalogue (tour 9). 7: maison du tour 10 (besoins doux, pièces,
  * rangement à cases et râtelier, rideaux aux fenêtres, `inside`). 8: lettres sans leur texte
- * rendu (variante et variables, texte reconstitué depuis les données).
+ * rendu (variante et variables, texte reconstitué depuis les données). 9: petits objets posés sur les
+ * meubles (`decor`). 10: pêche de la 0.12 (carnet des poissons, grands pris, séries; les ombres ne
+ * sont pas sauvegardées). 11: garde-robe de la 0.12 (`appearance.wear` et `wardrobe` au lieu de
+ * `appearance.outfit`).
  */
-export const DATA_SCHEMA = 8;
+export const DATA_SCHEMA = 11;
 
 /** Taille du sac et de la barre d'outils (définies avec l'état, lues aussi par l'interface). */
 export { BAG_SLOTS, TOOLBAR_SLOTS } from '../etat/types';
@@ -59,5 +62,3 @@ export const SCHEDULE_PERIOD_TICKS = 15;
 /** Distance de vue d'une culture mûre pour l'astuce A10 (m). */
 export const RIPE_VIEW_DISTANCE = 10;
 
-/** Nombre de tenues proposées à la création (les couleurs vivent dans le rendu et l'interface). */
-export const OUTFIT_COUNT = 8;

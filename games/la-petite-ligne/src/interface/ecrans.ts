@@ -5,11 +5,12 @@
  */
 import { letterTitle } from '../etat/courrier';
 import { currentOrder } from '../donnees/commandes';
-import type { Intent } from '../etat/actions';
-import type { CharacterId, ReadonlyWorld } from '../etat/types';
+import type { CharacterId, ReadonlyWorld, Wear } from '../etat/types';
+import type { ClothesContent } from '../donnees/vetements';
+import { starterIndexOf, starterWear } from '../etat/garde-robe';
 import type { Layer, UiHost } from './composant';
 import { type Expression, PLAYER_BEARDS, PLAYER_HAIR_COLORS, PLAYER_HAIRS, PLAYER_OUTFITS, UI_SETTINGS, WEATHER_ICONS } from './config';
-import { type UiContext, characterOf, nameOf } from './contexte';
+import { characterOf, nameOf } from './contexte';
 import { button, chip, clear, el, icon, keycap, portrait, setAttr, setHidden, setPortrait, setText, secretStamp, token } from './dom';
 import { cleanName, contentVars, hourLabel, lowerFirst, profileSymbol, timeParts, weekdayOf } from './format';
 import { dayLabel, formModel, linesText, nextObjective, orderLines, orderQuest, orderQuestTitle, outfitTakenByPartner } from './modele';
@@ -19,7 +20,6 @@ import { releaseNotes } from './notes-version';
 import { type MomentHintModel, momentHintModel } from './modele-moments';
 import { type SeasonCard, seasonCard, weatherLabel } from '../etat/semaine';
 import { playerColors, portraitSvg } from './portrait';
-import { type StarterOutfit, type Wear, clothesCatalogue, defaultStarterWear, portraitClothes, starterOutfit, wearIntents, wearOf, wornColors } from './modele-garde-robe';
 import { FigurePreview } from './apercu';
 
 
@@ -72,9 +72,30 @@ class PlayerCard {
   }
 }
 
-function svgOf(ctx: UiContext, world: ReadonlyWorld, id: CharacterId, expression: Expression): string {
+/**
+ * La tenue de départ `index` (0.12) dans son option: une pastille par pièce (haut ou salopette, bas,
+ * chaussures) et le nom de la pièce du dessus; sans vêtements, la couleur et le nom d'avant.
+ */
+function starterLook(clothes: ClothesContent, index: number, fallbackColor: string, fallbackName: string): HTMLElement[] {
+  const wear = starterWear(clothes, index);
+  const bottom = clothes.byId[wear.bottom];
+  const covering = bottom?.couvre.includes('top') === true;
+  const pieces = (covering ? [bottom, clothes.byId[wear.shoes]] : [clothes.byId[wear.top], bottom, clothes.byId[wear.shoes]]).filter(
+    (d) => d !== undefined,
+  );
+  if (pieces.length === 0) return [el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${fallbackColor}` }), el('span', { text: fallbackName })];
+  const swatches = el(
+    'span',
+    { class: 'lpl-starter__swatches', 'aria-hidden': 'true' },
+    pieces.map((d) => el('span', { class: 'lpl-clothes__swatch', title: d.nom, style: `--lpl-swatch-a: ${d.couleurs.principale}; --lpl-swatch-b: ${d.couleurs.secondaire}` })),
+  );
+  const names = pieces.map((d) => d.nom).join(', ');
+  return [swatches, el('span', { class: 'lpl-starter__name', text: pieces[0]?.nom ?? fallbackName, title: names, 'aria-label': names })];
+}
+
+function svgOf(world: ReadonlyWorld, id: CharacterId, expression: Expression, clothes: ClothesContent): string {
   const c = characterOf(world, id);
-  return c === null ? '' : portraitSvg(playerColors(id, c.appearance, portraitClothes(ctx, c.appearance)), expression, '');
+  return c === null ? '' : portraitSvg(playerColors(id, c.appearance, clothes), expression, '');
 }
 
 // ---------------------------------------------------------------------------
@@ -219,15 +240,10 @@ export class CreationScreen implements Layer {
   private readonly otherStatus: HTMLSpanElement;
   private scarf = '#5CE1E6';
   /**
-   * 0.12: tenue de départ composée (haut, bas, chaussures) parmi les pièces de départ de
-   * `vetements.json`, avec la silhouette habillée; sans vêtements dans les données, l'ancienne
-   * couleur de tenue.
+   * 0.12: silhouette habillée de la tenue de départ choisie (rang `create_character.outfit`: la
+   * simulation prend les vêtements les plus proches des couleurs visées, `starterWear`).
    */
-  private readonly starter: StarterOutfit;
-  private starterWear: Wear | null;
   private readonly figure: FigurePreview | null;
-  private lastWorld: ReadonlyWorld | null = null;
-  private readonly starterTaken: { slot: 'top' | 'bottom' | 'shoes'; id: string; mark: HTMLSpanElement; text: HTMLSpanElement }[] = [];
 
   constructor(host: UiHost, world: ReadonlyWorld) {
     this.host = host;
@@ -238,11 +254,8 @@ export class CreationScreen implements Layer {
     this.hair = me?.appearance.hair ?? 0;
     this.hairColor = me?.appearance.hairColor ?? 0;
     this.beard = me?.appearance.beard ?? 0;
-    this.outfit = me?.appearance.outfit ?? 0;
-    const catalogue = clothesCatalogue(ctx);
-    this.starter = starterOutfit(catalogue);
-    this.starterWear = defaultStarterWear(this.starter, ctx.me, me === null ? null : wearOf(me.appearance));
-    this.figure = this.starterWear === null ? null : new FigurePreview(catalogue);
+    this.outfit = (me === null ? null : starterIndexOf(ctx.content.clothes, me.appearance.wear)) ?? 0;
+    this.figure = ctx.content.clothes.list.length === 0 ? null : new FigurePreview(ctx.content.clothes);
     this.scarf = me?.appearance.scarf ?? this.scarf;
     if (me?.created === true) this.mode = 'done';
     const titleId = uid('creation');
@@ -321,10 +334,15 @@ export class CreationScreen implements Layer {
     });
     beardGroup.append(beardOptions);
 
-    const outfitGroup = el('fieldset', { class: 'lpl-choice-group' }, [el('legend', { text: g.outfit })]);
+    const outfitGroup = el('fieldset', { class: 'lpl-choice-group lpl-starter' }, [el('legend', { text: this.figure === null ? g.outfit : ctx.t(ctx.texts.extra.clothes.starter) })]);
     const outfitOptions = el('div', { class: 'lpl-choice-group__options', 'data-nav': 'row' });
     const outfitName = uid('tenue');
+    // Deux rangs qui donnent les mêmes vêtements (couleurs visées proches) ne s'affichent qu'une fois.
+    const seenLooks = new Set<string>();
     PLAYER_OUTFITS.forEach((o, i) => {
+      const look = ctx.content.clothes.list.length === 0 ? String(i) : JSON.stringify(starterWear(ctx.content.clothes, i));
+      const duplicate = seenLooks.has(look) && i !== this.outfit;
+      seenLooks.add(look);
       const input = el('input', { type: 'radio', name: outfitName, value: String(i), 'data-nav-item': true });
       input.checked = i === this.outfit;
       input.addEventListener('change', () => {
@@ -337,7 +355,7 @@ export class CreationScreen implements Layer {
       this.outfitTaken.push(taken);
       this.outfitTakenText.push(takenText);
       outfitOptions.append(
-        el('label', { class: 'lpl-option' }, [input, el('span', { class: 'lpl-option__swatch', style: `--lpl-swatch: ${o.top}` }), x.outfits[i] ?? '', taken]),
+        el('label', { class: 'lpl-option lpl-starter__option', hidden: duplicate }, [input, ...starterLook(ctx.content.clothes, i, o.top, x.outfits[i] ?? ''), taken]),
       );
     });
     outfitGroup.append(outfitOptions);
@@ -348,8 +366,7 @@ export class CreationScreen implements Layer {
       token('self', symbol),
       ctx.t(this.figure === null ? x.scarf : c.badge, { profile: x.profiles[profileSymbol(this.scarf)] ?? '' }),
     ]);
-    const clothesGroup = this.figure === null ? outfitGroup : this.starterGroup(host);
-    this.fields.push(field, hairGroup, colorGroup, beardGroup, clothesGroup, scarfNote);
+    this.fields.push(field, hairGroup, colorGroup, beardGroup, outfitGroup, scarfNote);
 
     // La lettre de la coopérative, lue en attendant l'autre.
     const letterDef = Object.values(ctx.content.letters)[0];
@@ -413,17 +430,17 @@ export class CreationScreen implements Layer {
     this.render();
   }
 
-  private appearance(): { hair: number; hairColor: number; beard: number; outfit: number; scarf: string } {
-    return { hair: this.hair, hairColor: this.hairColor, beard: this.beard, outfit: this.outfit, scarf: this.scarf };
+  private appearance(): { hair: number; hairColor: number; beard: number; wear: Wear; scarf: string } {
+    const wear = starterWear(this.host.ctx.content.clothes, this.outfit);
+    return { hair: this.hair, hairColor: this.hairColor, beard: this.beard, wear, scarf: this.scarf };
   }
 
   private refreshPreview(): void {
     const { ctx } = this.host;
     const a = this.appearance();
-    // Les petits portraits portent la tenue de départ choisie (0.12).
-    const clothes = this.starterWear === null ? null : wornColors(this.starterWear, clothesCatalogue(ctx));
+    const clothes = ctx.content.clothes;
     setPortrait(this.preview, portraitSvg(playerColors(ctx.me, a, clothes), 'great', ''));
-    if (this.figure !== null && this.starterWear !== null) this.figure.show({ character: ctx.me, appearance: a, wear: this.starterWear });
+    this.figure?.show({ character: ctx.me, appearance: a });
     this.hairPortraits.forEach((face, i) => {
       setPortrait(face, portraitSvg(playerColors(ctx.me, { ...a, hair: i }, clothes), 'good', ''));
     });
@@ -444,54 +461,9 @@ export class CreationScreen implements Layer {
       return;
     }
     this.host.send({ type: 'create_character', name, hair: this.hair, outfit: this.outfit, hairColor: this.hairColor, beard: this.beard });
-    this.sendStarterWear();
     this.mode = 'done';
     this.render();
     this.edit.focus();
-  }
-
-  /** La tenue de départ: une rangée par emplacement (haut, bas, chaussures), pastilles aux couleurs des pièces. */
-  private starterGroup(host: UiHost): HTMLFieldSetElement {
-    const { ctx } = host;
-    const c = ctx.texts.extra.clothes;
-    const group = el('fieldset', { class: 'lpl-choice-group lpl-starter' }, [el('legend', { text: ctx.t(c.starter) })]);
-    for (const slot of ['top', 'bottom', 'shoes'] as const) {
-      const row = el('div', { class: 'lpl-choice-group__options lpl-choice-group__options--compact lpl-starter__row', 'data-nav': 'row' });
-      const name = uid(`depart-${slot}`);
-      for (const def of this.starter[slot]) {
-        const input = el('input', { type: 'radio', name, value: def.id, 'data-nav-item': true, 'data-key': `starter:${def.id}` });
-        input.checked = this.starterWear?.[slot] === def.id;
-        input.addEventListener('change', () => {
-          if (this.starterWear === null) return;
-          this.starterWear = { ...this.starterWear, [slot]: def.id };
-          this.refreshPreview();
-        });
-        const text = el('span');
-        const mark = el('span', { class: 'lpl-option__taken', hidden: true }, [token('other', host.symbol('other'), 'small'), text]);
-        this.starterTaken.push({ slot, id: def.id, mark, text });
-        row.append(
-          el('label', { class: 'lpl-option lpl-option--swatch lpl-starter__option' }, [
-            input,
-            el('span', { class: 'lpl-clothes__swatch', style: `--lpl-swatch-a: ${def.couleurs.principale}; --lpl-swatch-b: ${def.couleurs.secondaire}` }),
-            def.nom,
-            mark,
-          ]),
-        );
-      }
-      group.append(el('div', { class: 'lpl-starter__slot' }, [el('span', { class: 'lpl-starter__label', text: ctx.t(c.starterSlots[slot]) }), row]));
-    }
-    return group;
-  }
-
-  /** Après `create_character`: la tenue de départ choisie, emplacement par emplacement (intention `wear`). */
-  private sendStarterWear(): void {
-    const chosen = this.starterWear;
-    if (chosen === null) return;
-    const world = this.lastWorld;
-    const me = world === null ? null : characterOf(world, this.host.ctx.me);
-    // Sans tenue connue, toutes les pièces sont envoyées (la simulation ignore ce qui ne change rien).
-    const from = (me === null ? null : wearOf(me.appearance)) ?? { ...chosen, top: '', bottom: '', shoes: '' };
-    for (const intent of wearIntents(from, chosen)) this.host.send(intent as unknown as Intent);
   }
 
   /** Les deux personnages sont créés: « Le train entre en gare… ». */
@@ -528,19 +500,13 @@ export class CreationScreen implements Layer {
     const partnerName = nameOf(world, ctx.partner);
     setText(this.waiting.lastChild ?? this.waiting, ctx.t(x.common.waitingFor, { partner: partnerName }));
     // Deux tenues pareilles: seul le foulard distinguerait les personnages. On le dit, sans l'interdire.
-    this.lastWorld = world;
-    const otherWear = other?.created === true ? wearOf(other.appearance) : null;
-    for (const t of this.starterTaken) {
-      setHidden(t.mark, otherWear?.[t.slot] !== t.id);
-      setText(t.text, ctx.t(x.clothes.takenStarter, { partner: partnerName }));
-    }
     const takenOutfit = outfitTakenByPartner(world, ctx);
     this.outfitTaken.forEach((mark, i) => {
       setHidden(mark, i !== takenOutfit);
       setText(this.outfitTakenText[i] ?? mark, ctx.t(x.creation.outfitTaken, { partner: partnerName }));
     });
     if (other !== null) {
-      setPortrait(this.otherPortrait, portraitSvg(playerColors(other.id, other.appearance, portraitClothes(ctx, other.appearance)), 'good', ''));
+      setPortrait(this.otherPortrait, portraitSvg(playerColors(other.id, other.appearance, ctx.content.clothes), 'good', ''));
       setText(this.otherName, other.name);
       setAttr(this.otherCard, 'aria-label', other.name);
       const sig = other.created ? 'ready' : 'choosing';
@@ -643,7 +609,7 @@ export class BreakfastScreen implements Layer {
     if (sig === this.sig) return;
     this.sig = sig;
 
-    setPortrait(this.face, portraitSvg(playerColors(me.id, me.appearance, portraitClothes(ctx, me.appearance)), form.expression, form.name));
+    setPortrait(this.face, portraitSvg(playerColors(me.id, me.appearance, ctx.content.clothes), form.expression, form.name));
     clear(this.overline);
     const at = b.overline.indexOf('{weather}');
     const vars = { day: dayLabel(ctx, world.clock.day), time };
@@ -1035,8 +1001,8 @@ export class EndScreen implements Layer {
 
     const chipOf = (p: StageModel['self']): HTMLElement =>
       p.choice === null ? chip(p.chip, '', 'ui-hourglass') : chip(p.chip, 'ready', p.choice === 'stay' ? 'ui-check' : 'ui-moon');
-    this.self.set(m.self.name, ctx.texts.extra.common.you, chipOf(m.self), svgOf(ctx, world, ctx.me, 'radiant'));
-    this.other.set(m.other.name, null, chipOf(m.other), svgOf(ctx, world, ctx.partner, 'great'));
+    this.self.set(m.self.name, ctx.texts.extra.common.you, chipOf(m.self), svgOf(world, ctx.me, 'radiant', ctx.content.clothes));
+    this.other.set(m.other.name, null, chipOf(m.other), svgOf(world, ctx.partner, 'great', ctx.content.clothes));
 
     clear(this.text);
     this.text.append(el('strong', { text: m.text }));

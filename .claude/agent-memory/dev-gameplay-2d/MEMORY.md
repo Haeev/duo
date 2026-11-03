@@ -44,6 +44,9 @@ Apprentissages durables et vérifiés. Ni avancement ni secret. Voir aussi le ca
 - Un script de capture `.cjs` copié dans le paquet du jeu change de `__dirname`: ses chemins de sortie relatifs (`../../../..`) sortent du worktree. `capturer-garde-robe.cjs` lit `SORTIE` dans l'environnement.
 - `ctx.content` est figé par son type: un champ pas encore au contrat (vêtements) se lit par `(content as { clothes?: unknown }).clothes` puis un contrôle à l'exécution (`catalogueOf`), à remplacer par le champ typé à la fusion.
 - Le CSS du salon (`lpl-salon*`) n'existe pas: le panneau du fauteuil s'affiche avec les styles génériques.
+- Aperçu 3D des tenues (`InterfaceOptions.outfitPreview`): `null` tant que le rendu n'a pas chargé; le panneau retente toutes les 500 ms (`upgradePreview`). Captures avec le rendu: `rendu=leger` sur la page de démonstration (sinon SwiftShader bloque `page.screenshot` sur « waiting for fonts »), attentes par `waitForFunction` et clics à la souris (`page.mouse`), jamais `locator`.
+- Fusion de `interface.css` à conflits entrelacés: reconstruire (version de l'autre branche + sa propre section ajoutée en fin de fichier) plutôt que résoudre bloc à bloc, qui coupe des règles en deux.
+- Création 0.12: `wear` est refusé hors du coffre et de la mercerie; la tenue de départ passe par le rang `create_character.outfit` (`starterWear`).
 
 ## La Petite Ligne: tableau du quai et chantiers (tour 9)
 

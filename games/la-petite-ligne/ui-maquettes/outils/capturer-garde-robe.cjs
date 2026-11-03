@@ -36,13 +36,15 @@ const SORTIE =
 const ECRANS = [
   ['mercerie', 'mercerie', '.lpl-clothes', ['p1', 'p2']],
   ['mercerie-essai', 'mercerie', '.lpl-clothes', ['p1'], 'essai'],
-  ['mercerie-chapeaux', 'mercerie', '.lpl-clothes', ['p2'], 'chapeaux'],
+  ['mercerie-bas', 'mercerie', '.lpl-clothes', ['p2'], 'bas'],
   ['mercerie-court', 'mercerie-court', '.lpl-clothes', ['p1']],
-  ['garde-robe', 'garde-robe', '.lpl-storage', ['p1', 'p2'], 'garde-robe'],
+  ['garde-robe', 'garde-robe', '.lpl-clothes', ['p1', 'p2'], 'garde-robe'],
   ['creation', 'creation-coiffure', '.lpl-creation', ['p1', 'p2']],
 ];
 
 const TAILLES = [100, 150];
+// RENDU=1: avec le rendu 3D (aperçu de la mercerie en 3D), plus lent (SwiftShader).
+const RENDU = process.env.RENDU === '1';
 
 function controles() {
   const out = [];
@@ -89,6 +91,33 @@ function controles() {
   return [...new Set(out)];
 }
 
+/** Clic au centre du premier élément qui correspond (souris réelle, sans attente de `locator`). */
+async function clic(page, sel) {
+  const r = await page.evaluate((s) => {
+    const e = document.querySelector(s);
+    if (e === null) return null;
+    const b = e.getBoundingClientRect();
+    return { x: b.left + b.width / 2, y: b.top + b.height / 2 };
+  }, sel);
+  if (r === null) throw new Error(`absent: ${sel}`);
+  await page.mouse.click(r.x, r.y);
+  await page.waitForTimeout(400);
+}
+
+async function survol(page, sel, n) {
+  const r = await page.evaluate(
+    ([s, i]) => {
+      const e = document.querySelectorAll(s)[i];
+      if (e === undefined) return null;
+      const b = e.getBoundingClientRect();
+      return { x: b.left + b.width / 2, y: b.top + 12 };
+    },
+    [sel, n],
+  );
+  if (r !== null) await page.mouse.move(r.x, r.y);
+  await page.waitForTimeout(600);
+}
+
 (async () => {
   fs.mkdirSync(SORTIE, { recursive: true });
   const browser = await chromium.launch();
@@ -104,39 +133,46 @@ function controles() {
         page.on('console', (m) => {
           if (m.type() === 'error') erreurs.push(m.text());
         });
-        const url = `${BASE}src/interface/demo/index.html?scenario=${scenario}&joueur=${joueur}&taille=${taille}&autre=fige&temps=arrete&rendu=0`;
+        const url = `${BASE}src/interface/demo/index.html?scenario=${scenario}&joueur=${joueur}&taille=${taille}&autre=fige&temps=arrete${RENDU ? '&rendu=leger' : '&rendu=0'}`;
         await page.goto(url, { timeout: 600_000 });
         await page.waitForFunction(() => window.lplInterface?.ready === true, null, {
           timeout: 600_000,
         });
-        await page.locator(attente).first().waitFor({ timeout: 30_000 });
+        // Avec le rendu 3D (SwiftShader), les attentes de `locator` expirent: on lit le DOM directement.
+        await page.waitForFunction((sel) => document.querySelector(sel) !== null, attente, { timeout: 120_000 });
         await page.waitForTimeout(700);
+        if (RENDU && scenario !== 'creation-coiffure') {
+          // L'aperçu 3D arrive quand le rendu a chargé ses modèles (la silhouette 2D attend à sa place).
+          await page
+            .waitForFunction(() => document.querySelector('.lpl-figure--3d') !== null, null, {
+              timeout: 240_000,
+            })
+            .catch(() => undefined);
+          await page.waitForTimeout(1500);
+        }
         if (action === 'garde-robe') {
-          await page.locator('[data-key="wardrobe"]').click();
-          await page.locator('.lpl-clothes').first().waitFor({ timeout: 30_000 });
-          await page.waitForTimeout(500);
-          // Au clavier: E tourne l'aperçu, la flèche droite passe à la vignette suivante.
+          // Ouverte au coffre (menu `wardrobe`): E tourne l'aperçu, la flèche passe à la vignette suivante.
           await page.keyboard.press('KeyE');
           await page.keyboard.press('ArrowRight');
           await page.waitForTimeout(200);
         }
         if (action === 'essai') {
-          await page.locator('[data-key="try:pull_moutarde"]').click();
+          await clic(page, '[data-key="tab:top"]');
+          await clic(page, '.lpl-clothes__card:not([data-state="worn"]) [data-key^="try:"]');
           await page.keyboard.press('KeyE');
           await page.keyboard.press('KeyE');
-          await page.locator('[data-key="tab:outer"]').click();
-          await page.waitForTimeout(200);
-          await page.locator('.lpl-clothes__card').nth(1).hover();
+          await clic(page, '[data-key="tab:outer"]');
+          await survol(page, '.lpl-clothes__card', 1);
           await page.waitForTimeout(200);
         }
-        if (action === 'chapeaux') {
-          await page.locator('[data-key="tab:hat"]').click();
-          await page.waitForTimeout(200);
-          await page.locator('.lpl-clothes__card').first().hover();
+        if (action === 'bas') {
+          await clic(page, '[data-key="tab:bottom"]');
+          await survol(page, '.lpl-clothes__card', 0);
           await page.waitForTimeout(200);
         }
         const fichier = path.join(SORTIE, `garde-robe-${nom}-${joueur}-${taille}.png`);
-        await page.screenshot({ path: fichier });
+        // Avec le rendu 3D, une capture découpée évite l'attente des polices (fil occupé par SwiftShader).
+        await page.screenshot({ path: fichier, clip: { x: 0, y: 0, width: 1366, height: 768 }, timeout: 180_000 });
         const d = await page.evaluate(controles);
         const focus = await page.evaluate(
           () => document.activeElement?.textContent?.trim().slice(0, 30) ?? '',

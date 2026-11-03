@@ -5,8 +5,8 @@
  * souris; à droite les rayons par emplacement et leurs vignettes. Les modèles sont dans
  * `modele-garde-robe.ts`; l'état et les intentions passent par un port (`ClothesPort`).
  */
-import type { ReadonlyWorld } from '../etat/types';
-import { type OutfitPreview, PREVIEW_DRAG, PREVIEW_STEP } from './apercu';
+import type { ClothingSlot, ReadonlyWorld, Wear } from '../etat/types';
+import { type PanelPreview, PREVIEW_DRAG, PREVIEW_STEP } from './apercu';
 import type { UiHost } from './composant';
 import { characterOf } from './contexte';
 import { button, chip, el, icon, keycap, setText } from './dom';
@@ -14,8 +14,6 @@ import {
   type ClothesTab,
   type ClothesView,
   type ClothingCard,
-  type ClothingSlot,
-  type Wear,
   CLOTHING_SLOTS,
   clothesShopModel,
   isOptionalSlot,
@@ -30,11 +28,15 @@ export interface ClothesPort {
   view(world: ReadonlyWorld): ClothesView | null;
   buy(item: string): void;
   wear(slot: ClothingSlot, item: string | null): void;
-  /** Aperçu du personnage: 3D du rendu, ou silhouette 2D de repli. */
-  createPreview(): OutfitPreview;
+  /** Aperçu du personnage: 3D du rendu s'il est prêt, sinon silhouette 2D de repli. */
+  createPreview(): PanelPreview;
+  /** L'aperçu 3D s'il est devenu disponible (rendu chargé après l'ouverture du panneau), sinon `null`. */
+  upgradePreview(): PanelPreview | null;
 }
 
 export type ClothesMode = 'shop' | 'wardrobe';
+
+const UPGRADE_MS = 500;
 
 /** Dernier rayon ouvert, par mode: on retrouve sa place en rouvrant le panneau. */
 const lastSlot: Record<ClothesMode, ClothingSlot> = { shop: 'top', wardrobe: 'top' };
@@ -48,7 +50,9 @@ export class ClothesPanel extends Panel {
   /** Pièce survolée ou focalisée, montrée dans l'aperçu sans être essayée. */
   private hover: string | null = null;
   private angle = 0;
-  private readonly preview: OutfitPreview;
+  private preview: PanelPreview;
+  private lastUpgrade = 0;
+  private readonly viewport: HTMLDivElement;
   private readonly stage: HTMLDivElement;
   private readonly caption: HTMLParagraphElement;
   private readonly stageActions: HTMLDivElement;
@@ -93,6 +97,7 @@ export class ClothesPanel extends Panel {
       { class: 'lpl-clothes__viewport', role: 'img', 'aria-label': ctx.t(c.previewLabel) },
       [this.preview.element],
     );
+    this.viewport = viewport;
     viewport.addEventListener('pointerdown', (e) => {
       this.drag = { x: e.clientX, angle: this.angle, id: e.pointerId };
       viewport.setPointerCapture(e.pointerId);
@@ -193,7 +198,10 @@ export class ClothesPanel extends Panel {
     const me = characterOf(world, ctx.me);
     if (me === null) return;
     const wear = this.previewWear(view);
-    this.preview.show({ character: me.id, appearance: me.appearance, wear });
+    this.tryUpgrade();
+    // La place de l'aperçu suit la taille de l'interface (100 ou 150 %) et de la fenêtre.
+    this.preview.fit(this.viewport.clientWidth, this.viewport.clientHeight);
+    this.preview.show({ character: me.id, appearance: { ...me.appearance, wear } });
     const changed = CLOTHING_SLOTS.filter((s) => wear[s] !== view.wear[s]);
     const names = changed
       .map((s) => wear[s])
@@ -233,6 +241,20 @@ export class ClothesPanel extends Panel {
         ),
       );
     }
+  }
+
+  /** Silhouette 2D en attendant le rendu: on retente l'aperçu 3D toutes les demi-secondes. */
+  private tryUpgrade(): void {
+    if (this.preview.is3d) return;
+    const now = this.host.now();
+    if (now - this.lastUpgrade < UPGRADE_MS) return;
+    this.lastUpgrade = now;
+    const next = this.port.upgradePreview();
+    if (next === null) return;
+    this.preview.element.replaceWith(next.element);
+    this.preview.dispose();
+    this.preview = next;
+    this.preview.setAngle(this.angle);
   }
 
   private setHover(id: string | null): void {

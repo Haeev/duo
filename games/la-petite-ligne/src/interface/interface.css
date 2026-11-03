@@ -2023,6 +2023,65 @@
   margin: 0.15rem 0;
 }
 
+/* Pêche 0.12: onglet « Poissons » du carnet (section 7.4). Six onglets: on resserre encore. */
+.lpl-notebook .lpl-panel__header > .lpl-tabs .lpl-tab {
+  padding-inline: var(--lpl-space-2);
+}
+
+.lpl-fish-page {
+  display: grid;
+  gap: var(--lpl-space-3);
+}
+
+.lpl-fish-page__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: var(--lpl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lpl-fish-page__entry {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--lpl-space-2);
+  border-radius: var(--lpl-radius-m);
+  background: color-mix(in srgb, currentColor 6%, transparent);
+}
+
+.lpl-fish-page__entry[data-caught='false'] .lpl-fish-page__name {
+  opacity: 0.7;
+}
+
+/* Silhouette de l'ombre: longueur relative (0,3 m à 1,2 m). */
+.lpl-fish-page__shadow {
+  display: block;
+  width: calc(var(--lpl-fish-length) * 5rem);
+  height: 0.6rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, currentColor 35%, transparent);
+}
+
+.lpl-fish-page__fact {
+  display: block;
+}
+
+.lpl-fish-page__scales {
+  letter-spacing: 0.1em;
+}
+
+/* Pastille du guet (section 7.2): chez le seul guetteur, sous le portrait. */
+.lpl-watch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--lpl-radius-l);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  font-size: 0.85em;
+}
+
 /* Mercerie et garde-robe (0.12): l'aperçu à gauche reste en place, les rayons défilent à droite. */
 .lpl-clothes {
   display: grid;
@@ -2321,4 +2380,16 @@
 .lpl-starter__option .lpl-clothes__swatch {
   width: 1.75rem;
   height: 1.75rem;
+}
+
+/* Création (0.12): les trois pièces de chaque tenue de départ, côte à côte. */
+.lpl-starter__swatches {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.lpl-starter__swatches > .lpl-clothes__swatch {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
 }

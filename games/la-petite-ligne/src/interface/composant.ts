@@ -13,6 +13,7 @@ export type PanelTab =
   | 'quests'
   | 'mail'
   | 'bag'
+  | 'fish'
   | 'memories'
   | 'needs'
   | 'buy'

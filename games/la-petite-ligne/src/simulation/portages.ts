@@ -8,6 +8,7 @@ import type { Beam } from '../etat/types';
 import { type Sim, itemWithArticle, sayIfWritten } from './contexte';
 import { storeAtHome } from './rangement';
 import { TOWN, basketDue, basketPlaced } from './bourg';
+import { NO_CONTEXT, evaluateAll } from './conditions';
 
 function load(
   sim: Sim,
@@ -63,13 +64,42 @@ export function spawnLoads(sim: Sim): void {
   }
   const next = world.heavyDeliveries[0];
   const to = parcel === null ? undefined : sim.map.points[parcel.to];
-  if (parcel !== null && next !== undefined && to !== undefined) load(sim, parcel.item, 'parcel', parcel.from, to, next);
+  if (parcel !== null && next !== undefined && to !== undefined) {
+    load(sim, parcel.item, 'parcel', parcel.from, to, next);
+    return;
+  }
+  spawnQuestLoad(sim);
+}
+
+/** 0.12: la charge de quête dont l'étape est en cours (`reglages.carry.quests`), si son drapeau n'est pas levé. */
+function spawnQuestLoad(sim: Sim): void {
+  const { world } = sim;
+  for (const def of sim.content.settings.carry.quests) {
+    if (world.flags.includes(def.flag)) continue;
+    const state = world.quests.find((q) => q.id === def.quest);
+    if (state?.status !== 'active') continue;
+    const step = sim.content.quests.find((q) => q.id === def.quest)?.steps[state.step];
+    const to = sim.map.points[def.to];
+    if (step?.id !== def.step || to === undefined) continue;
+    if (!evaluateAll(sim, def.when, { ...NO_CONTEXT, baselines: state.baselines, quest: state.id })) continue;
+    load(sim, def.item, 'quest', def.from, to, null);
+    return;
+  }
 }
 
 /** La charge vient d'être posée: drapeau de la draisine, ou objet du colis au cellier. */
 export function loadPlaced(sim: Sim, beam: Beam): void {
   if (beam.purpose === 'basket') {
     basketPlaced(sim, beam.holders);
+    return;
+  }
+  if (beam.purpose === 'quest') {
+    const def = sim.content.settings.carry.quests.find((q) => q.item === beam.item);
+    if (def !== undefined) {
+      if (!sim.world.flags.includes(def.flag)) sim.world.flags.push(def.flag);
+      if (def.placedText !== null) sayIfWritten(sim, 'both', def.placedText);
+    }
+    sim.runtime.changed = true;
     return;
   }
   const { world } = sim;

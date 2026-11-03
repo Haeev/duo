@@ -28,11 +28,12 @@ import {
 } from 'three';
 import type { Season } from '../donnees/types';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
-import type { GameView, PickResult, Renderer, RendererOptions } from '../etat/vue';
+import type { GameView, OutfitPreview, OutfitPreviewOptions, PickResult, Renderer, RendererOptions } from '../etat/vue';
+import { createOutfitPreview } from './apercu-tenue';
 import { IsoCameraRig, type CameraCommand } from './camera';
 import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
 import { StaticDecor } from './decor';
-import { DaylightRig } from './lumiere';
+import { DaylightRig, stabilizeShadowFilter } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
 import { ModelLibrary } from './modeles';
 import { ShadowCasterCulling } from './ombre-tri';
@@ -59,6 +60,8 @@ import { SignsPart } from './signes';
 import { MomentsPart } from './moments';
 import { AmbientFaunaPart } from './faune-ambiance';
 import { HenLabels } from './etiquettes';
+import { FishShadowsPart } from './ombres-poissons';
+import { createStateFishingSource, type FishingSource } from './peche-vue';
 import { RENDER_EXTENSIONS, type RenderHooks } from './extensions';
 
 /**
@@ -105,6 +108,8 @@ export interface EngineOptions extends RendererOptions {
    * oui). Non pour des captures reproductibles en rendu logiciel.
    */
   adaptive?: boolean;
+  /** Pêche de la 0.12 (ombres, coin qui frémit, guet): l'état, sauf la page de démonstration. */
+  fishing?: FishingSource;
 }
 
 export class RenderEngine implements Renderer {
@@ -126,6 +131,8 @@ export class RenderEngine implements Renderer {
   private readonly pendingEvents: WorldEvent[] = [];
   private readonly parts: RenderPart[] = [];
   private materials: SharedMaterials | null = null;
+  /** Modèles chargés (aperçu de la boutique), `null` avant `load`. */
+  private library: ModelLibrary | null = null;
   private terrain: Terrain | null = null;
   private world: WorldParts | null = null;
   private reducedMotion: boolean;
@@ -151,6 +158,7 @@ export class RenderEngine implements Renderer {
   private readonly lamps = new LampBoard();
   /** Saison montée (palette et lumière), `null` avant la première image. */
   private season: Season | null = null;
+  private readonly fishingSource: FishingSource;
 
   constructor(options: EngineOptions) {
     this.view = options.view;
@@ -159,6 +167,7 @@ export class RenderEngine implements Renderer {
     this.light = options.quality === 'light';
     this.quality = this.light || options.adaptive === false ? null : new AdaptiveQuality();
     this.log = options.log;
+    this.fishingSource = options.fishing ?? createStateFishingSource();
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
       antialias: settings.antialias && !this.light,
@@ -171,6 +180,7 @@ export class RenderEngine implements Renderer {
     // Mode léger: aucune carte d'ombre (ni passe d'ombre, ni échantillonnage dans les shaders).
     this.renderer.shadowMap.enabled = !this.light;
     this.renderer.shadowMap.type = PCFShadowMap;
+    stabilizeShadowFilter();
     const canvas = this.renderer.domElement;
     canvas.style.display = 'block';
     canvas.style.width = '100%';
@@ -254,6 +264,7 @@ export class RenderEngine implements Renderer {
     await library.load((ratio) => {
       onProgress(ratio * LOAD_MODELS_SHARE);
     });
+    this.library = library;
     if (this.disposed) {
       return;
     }
@@ -403,11 +414,22 @@ export class RenderEngine implements Renderer {
       characters,
       effects,
       library,
+      content,
     );
     const signs = new SignsPart(materials, terrain, this.resources);
-    this.scene.add(fishing.group, signs.group);
+    const fishShadows = new FishShadowsPart(
+      map,
+      content,
+      materials,
+      terrain,
+      this.resources,
+      this.fishingSource,
+      this.daylight,
+    );
+    this.scene.add(fishing.group, signs.group, fishShadows.group);
     world.add(fishing);
     world.add(signs);
+    world.add(fishShadows);
     const railway = new RailwayPart(
       map,
       library,
@@ -615,6 +637,7 @@ export class RenderEngine implements Renderer {
         depth: -this.viewPoint.z,
         depthPerPixel,
         ground,
+        minHeight: RENDER_SETTINGS.characters.seeThroughMinHeight,
       });
     }
     this.pushMomentHole(world, terrain, pixelsPerMeter, elevation, depthPerPixel);
@@ -1056,6 +1079,16 @@ export class RenderEngine implements Renderer {
       }
     }
     return totals;
+  }
+
+  /** Aperçu 3D d'une tenue (boutique de vêtements de la 0.12): sa propre petite scène. */
+  createOutfitPreview(options: OutfitPreviewOptions): OutfitPreview | null {
+    if (this.library === null || this.disposed) return null;
+    const settings = RENDER_SETTINGS.renderer;
+    return createOutfitPreview(
+      { library: this.library, clothes: this.view.content.clothes, toneMapping: toneMapping(settings.toneMapping), exposure: settings.exposure },
+      options,
+    );
   }
 
   dispose(): void {

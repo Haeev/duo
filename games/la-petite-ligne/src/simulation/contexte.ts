@@ -145,7 +145,7 @@ export function newId(sim: Sim, prefix: string): string {
 
 /** Remplace `{nom}` dans un texte. Un nom absent reste tel quel (jetons de touches). */
 export function format(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{([a-zA-Z]+)\}/g, (whole, name: string) => {
+  return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });

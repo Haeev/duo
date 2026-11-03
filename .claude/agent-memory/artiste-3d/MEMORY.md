@@ -134,3 +134,31 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Tête ronde du joueur: bouche haute (hc - 0,02 à - 0,065), nez à hc - 0,016: moustache juste sous le nez; tout ce qui pend derrière la tête (queue, tresse, nuage) s'enfonce dans l'oreiller en pose `sleep`: mesurer avec `verifier/coiffures_couche.py`.
 - Vitest sans TTY n'écrit rien avant la fin (environ 30 min ici): lancer en arrière-plan sans `timeout`.
 - Contrôle d'emprise: `interieurs.blocked_cells` calcule les cases occupées depuis les boîtes des meubles posés (`Footprints`).
+
+## 0.12: chèvre, robes de poule, marché (vérifié le 2026-11-03)
+
+- Travail en parallèle avec d'autres artistes: nouveaux modèles dans un GLB à soi (`elevage.glb`, `marche.glb`: le jeu charge tous les `assets/modeles/*.glb` et cherche les nœuds par nom). Un GLB partagé (`ferme.glb`) touché par deux lots devra être reconstruit après fusion des scripts: le dire au manager.
+- Planches faites depuis les GLB exportés (`planche_v012.py`): import, `bpy.data.meshes.new_from_object` du maillage évalué par clip et image. Plus fiable que de poser des copies d'armature, et indépendant de la scène de construction. Garder les planches hors du script de construction: une reconstruction ne coûte plus que 30 s.
+- La machine est partagée (charge 30 à 45 sur 4 cœurs quand d'autres agents rendent): une planche Cycles prend 10 min au lieu de 1. Rendre une seule fois, après les corrections mesurables (sonde, contrôle de géométrie, validateur).
+- Quadrupède qui broute: abaisser l'attache du cou (base dans le poitrail) plutôt que de tordre la tête; pencher le poitrail fait descendre les pattes avant avec lui (sabots dans le sol): compenser par l'angle des pattes et le vérifier par la sonde, y compris dans les images intermédiaires (`step`) qui remplacent les angles des pattes.
+- `merge` de faune.py remplace le dict d'un os: une variante de pose (`bite`) qui redonne `goat_head` doit reprendre le tangage de base, sinon la tête se retourne.
+- Raie dorsale par couleur de facettes sur un ellipsoïde à 10 ou 12 pans: dents de scie, pas une raie. À éviter (ou une bande de `banded_ball`).
+- Variante d'oiseau plus petite (poussin) sur le squelette commun: la modeler à la taille de la poule autour des mêmes pivots et donner une échelle de racine (extra `scale`), sinon les clips la font pivoter autour d'os hors du corps.
+- Faucilles du coq: plumes plates de 5 à 8 cm à la base; à 1,4 cm elles se lisaient comme des tiges.
+- `inotifywait` n'est pas installé: attendre un fichier avec `until [ -f ... ]; do sleep 5; done` en arrière-plan.
+- Le garde-fou refuse un `python3 -c` contenant des `\'`: passer par un script écrit avec Write.
+
+## Garde-robe de la 0.12 (vérifié le 2026-11-03)
+
+- Vêtements modulaires des joueurs: couleurs dans la rangée 1 de `personnages.png` (`garde_robe.WEAR_SLOTS`), la rangée 0 reste au corps et à l'écusson du profil. Une seule texture par joueur, les pièces se fusionnent comme avant.
+- Enveloppes emboîtées par emplacement (corps x 0,9, hauts = `torso_rings`, par-dessus x 1,10 / 1,14): chaque pièce suit le même os que la partie du corps dessous, rien ne traverse dans les clips sans recalculer de poids.
+- Pièce plaquée sur une pente (écusson): `rot=(atan(-pente), 0, 0)` couche le haut vers +Y (l'arrière); le signe inverse l'enfonce à moitié dans la poitrine (vu sur la première planche).
+- Coupe ramenée sous un chapeau par écrasement radial: une masse plus large que la tête (nuage) se replie et sort inversée (`--peaux`). `recalc_face_normals` ne suffit pas; retourner chaque îlot de volume signé négatif.
+- Planches Cycles: ne jamais laisser deux rendus en arrière-plan en même temps (le premier `planche_*.py` lancé garde le CPU); 6 échantillons suffisent pour des planches de contrôle de 260 à 420 px (environ 10 s la vue).
+## Poissons 0.12 (vérifié le 2026-11-03)
+
+- Corps lofté triangulé à la main: colorier par quadrilatère (centre des 4 sommets), pas par triangle, sinon la limite dos et flanc fait des dents de scie.
+- Taches plaquées: lancer de rayons sur les triangles du corps (`BVHTree.FromPolygons` sur mes propres listes), polygone dans le plan du triangle touché, rétréci jusqu'à tenir dedans, décalé de 0,3 % de la longueur.
+- `lpl.board(..., mannequin=True)` pose le mannequin hors du cadrage (calculé sur les seules copies): mettre un mannequin comme premier nœud de la grille.
+- Rendus Cycles ici: 1800 x 1125 à 12 échantillons, environ 3 min par planche (machine partagée); deux Blender en parallèle ont fini tués (code 137).
+- Import de `personnages.glb` pour une vue « en main »: `rig.data.pose_position = "REST"`, sinon une pose importée reste. Main droite = côté -X Blender: caméra de ce côté.

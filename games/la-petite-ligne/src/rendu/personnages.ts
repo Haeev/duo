@@ -1,17 +1,15 @@
 /**
- * Personnages: les deux joueurs (foulard à la couleur de leur profil, coiffure
- * et tenue choisies) et les habitants, sur le squelette commun de
+ * Personnages: les deux joueurs (coiffure et vêtements portés, `habillage.ts`;
+ * plus de foulard depuis la 0.12) et les habitants, sur le squelette commun de
  * `personnages.glb`. Animations par `AnimationMixer` avec fondus enchaînés,
  * positions interpolées (`prev` vers `pos`), orientation lissée, outil en
  * main, clignement des yeux et expression selon la forme.
  */
-import { isSheltered } from '../etat/interieurs';
+import { isHome, isSheltered } from '../etat/interieurs';
 import {
   AnimationMixer,
   LoopOnce,
   LoopRepeat,
-  CanvasTexture,
-  Float32BufferAttribute,
   Group,
   Mesh,
   SkinnedMesh,
@@ -23,7 +21,6 @@ import {
   type Material,
   type Object3D,
 } from 'three';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type {
   WorldEvent,
   ActionKind,
@@ -40,19 +37,18 @@ import { ArmReach } from './portee';
 import type { Content } from '../donnees/types';
 import { seasonOfDay } from '../donnees/calendrier';
 import type { GameMap, MapProp } from '../etat/carte';
-import { BenchSeating, benchesWithBuilt, seatPlace, type BenchPlace, type BenchSeat } from '../etat/bancs';
 import {
-  BODY_COLORS,
-  HAIR_MESHES,
-  OUTFITS,
-  BEARD_MESHES,
-  HAIR_COLORS,
-  HAIR_FLATTENED_ASLEEP,
-  SCARF_MARK,
-  SCARF_SYMBOLS,
-  safeColor,
-  scarfMeshFor,
-} from './apparence';
+  BenchSeating,
+  FurnitureSeats,
+  benchesWithBuilt,
+  isFurnitureSeat,
+  seatPlace,
+  type BenchPlace,
+  type BenchSeat,
+  type SeatProp,
+} from '../etat/bancs';
+import { safeColor } from './apparence';
+import { type DressedFigure, PlayerDresser, PlayerTexture, mergeOutfit, playerMeshNames } from './habillage';
 import { smoothFactor } from './camera';
 import {
   dampAngle,
@@ -63,9 +59,8 @@ import {
   type PickRegistry,
   type PickTarget,
 } from './contexte';
-import { preparePaletteTexture, type SharedMaterials } from './materiaux';
+import type { SharedMaterials } from './materiaux';
 import { CHARACTERS_FILE, textHash, type ModelLibrary } from './modeles';
-import { PALETTE_CELL_PIXELS, characterSlotColumn, type CharacterSlot } from './palette';
 import { IDLE_POSES, RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { Terrain } from './terrain';
@@ -83,8 +78,6 @@ const PICK_HEIGHT = 1.8;
 const GROUND_HALF_LIFE = 0.06;
 const WALK_SCALE_MIN = 0.55;
 const WALK_SCALE_MAX = 1.7;
-const PLAYER_ROW = 0;
-const VECTOR_SIZE = 3;
 /** Bout de la canne à pêche de l'artiste: nœud vide, et sa place dans le repère de la prise s'il manque. */
 const ROD_TIP_NODE = 'fishing_rod_tip';
 const ROD_TIP = new Vector3(0, 1.34, 1.49);
@@ -93,6 +86,9 @@ const ROD_ITEM = 'fishing_rod';
 const FISH_CAST = 'fish_cast';
 const FISH_WAIT = 'fish_wait';
 const FISH_STRIKE = 'fish_strike';
+/** Montrer la prise à deux mains (2 s, R4 de la 0.12), joué après le ferrage s'il est livré. */
+export const FISH_SHOW = 'fish_show';
+const LEFT_HAND_SOCKET = 'socket_hand_l';
 const SIT_CHAIR = 'sit';
 const SIT_GROUND = 'sit_ground';
 const SIT_EAT = 'sit_eat';
@@ -102,7 +98,7 @@ const WAVE = 'wave';
 const PET = 'pet';
 /** Tenir l'échelle de Basile (geste « tenir » des moments rares). */
 const HOLD_LADDER = 'hold_ladder';
-const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE]);
+const FISH_CLIPS: ReadonlySet<string> = new Set([FISH_CAST, FISH_STRIKE, FISH_SHOW]);
 const NO_VARIANTS: readonly string[] = [];
 /** Attentes d'un joueur, et les mêmes avec la poule à caresser. */
 const PLAYER_VARIANTS = SETTINGS.idleVariants.players ?? NO_VARIANTS;
@@ -281,6 +277,7 @@ class CharacterFigure {
   private currentName = '';
   private readonly faces: Mesh[] = [];
   private readonly hand: Object3D | null;
+  private readonly leftHand: Object3D | null;
   private tool: Object3D | null = null;
   private toolName = '';
   private facing: number | null = null;
@@ -337,6 +334,7 @@ class CharacterFigure {
       }
     });
     this.hand = model.getObjectByName(HAND_SOCKET) ?? null;
+    this.leftHand = model.getObjectByName(LEFT_HAND_SOCKET) ?? null;
     this.offsets = new BoneOffsets(model);
     this.reach = new ArmReach(model, 'chest', 'upper_arm_r', 'forearm_r', HAND_SOCKET);
     this.idleNextAt = this.idleDelay();
@@ -548,6 +546,14 @@ class CharacterFigure {
     return true;
   }
 
+  /** Position (monde) de la prise d'une main; `false` si le modèle n'a pas son accroche. */
+  handPoint(side: 'left' | 'right', out: Vector3): boolean {
+    const hand = side === 'left' ? this.leftHand : this.hand;
+    if (hand === null) return false;
+    hand.getWorldPosition(out);
+    return true;
+  }
+
   setTool(
     library: ModelLibrary,
     model: string | null,
@@ -655,106 +661,24 @@ class CharacterFigure {
   }
 }
 
-/** Texture d'un joueur: celle des personnages, rangée 0 réécrite à ses couleurs. */
-class PlayerTexture {
-  readonly canvas = document.createElement('canvas');
-  readonly texture: CanvasTexture;
-  private key = '';
-
-  constructor(private readonly source: CanvasImageSource & { width: number; height: number }) {
-    this.canvas.width = source.width;
-    this.canvas.height = source.height;
-    this.texture = new CanvasTexture(this.canvas);
-    preparePaletteTexture(this.texture, true);
-  }
-
-  paint(id: CharacterId, outfit: number, scarf: string, hairColor: number): void {
-    const key = `${id}|${outfit}|${scarf}|${hairColor}`;
-    if (key === this.key) {
-      return;
-    }
-    this.key = key;
-    const context = this.canvas.getContext('2d');
-    if (context === null) {
-      return;
-    }
-    context.drawImage(this.source, 0, 0);
-    const colors: Partial<Record<CharacterSlot, string>> = {
-      ...BODY_COLORS[id],
-      ...(HAIR_COLORS[hairColor] ?? {}),
-      ...(OUTFITS[outfit]?.colors ?? OUTFITS[0]?.colors),
-      scarf: safeColor(scarf),
-      scarf_mark: SCARF_MARK,
-    };
-    for (const [slot, color] of Object.entries(colors) as [CharacterSlot, string][]) {
-      context.fillStyle = color;
-      context.fillRect(
-        characterSlotColumn(slot) * PALETTE_CELL_PIXELS,
-        PLAYER_ROW * PALETTE_CELL_PIXELS,
-        PALETTE_CELL_PIXELS,
-        PALETTE_CELL_PIXELS,
-      );
-    }
-    this.texture.needsUpdate = true;
-  }
-}
-
 interface PlayerEntry {
   figure: CharacterFigure;
   /** Assis au dernier rendu (place affichée), pour le glissement d'entrée et de sortie. */
   seated: boolean;
   /** Écart restant à résorber entre la position affichée et la cible (m), et son départ. */
   glide: { x: number; y: number; start: number };
-  texture: PlayerTexture | null;
-  meshes: Map<string, Object3D>;
-  look: string;
-  /** Géométrie d'origine du corps (partagée avec le GLB), et la fusion courante corps et vêtements. */
-  baseGeometry: BufferGeometry | null;
-  merged: BufferGeometry | null;
+  /** Corps, coiffure et vêtements fusionnés (`habillage.ts`), `null` pour le substitut sans modèle. */
+  dressed: DressedFigure | null;
 }
-
-/**
- * Fusionne le corps et les vêtements choisis en une seule géométrie animée:
- * un appel de dessin par joueur et un seul programme de shader pour tous les
- * personnages. Les pièces sans cibles de morphose en reçoivent des nulles,
- * pour avoir les mêmes attributs que le corps. `null` si c'est impossible.
- */
-function mergeOutfit(
-  base: BufferGeometry,
-  parts: readonly BufferGeometry[],
-): BufferGeometry | null {
-  const morphs = base.morphAttributes.position ?? [];
-  const prepared = parts.map((part) => {
-    const copy = part.clone();
-    const count = copy.getAttribute('position').count;
-    if (copy.morphAttributes.position === undefined && morphs.length > 0) {
-      copy.morphAttributes.position = morphs.map(
-        () => new Float32BufferAttribute(new Float32Array(count * VECTOR_SIZE), VECTOR_SIZE),
-      );
-    }
-    copy.morphTargetsRelative = base.morphTargetsRelative;
-    return copy;
-  });
-  const merged = mergeGeometries([base, ...prepared], false);
-  for (const copy of prepared) {
-    copy.dispose();
-  }
-  return merged;
-}
-
-const PLAYER_MESHES = [
-  'player_base',
-  ...HAIR_MESHES,
-  ...BEARD_MESHES.filter((name): name is NonNullable<typeof name> => name !== null),
-  ...new Set(OUTFITS.map((outfit) => outfit.mesh)),
-  ...SCARF_SYMBOLS.map((symbol) => symbol.mesh),
-];
 
 export class CharactersPart implements EventfulPart {
   readonly group = new Group();
   private readonly clips = new Map<string, AnimationClip>();
   private readonly players = new Map<CharacterId, PlayerEntry>();
   private readonly villagers = new Map<string, CharacterFigure>();
+  /** Habillage des joueurs (vêtements de la 0.12), partagé par les deux. */
+  private readonly dresser: PlayerDresser;
+  private readonly playerMeshes: string[];
 
   constructor(
     private readonly library: ModelLibrary,
@@ -771,6 +695,8 @@ export class CharactersPart implements EventfulPart {
     private readonly map: GameMap | null = null,
   ) {
     this.group.name = 'personnages';
+    this.dresser = new PlayerDresser(content.clothes, resources);
+    this.playerMeshes = playerMeshNames(content.clothes);
     for (const clip of library.animations(CHARACTERS_FILE)) {
       this.clips.set(clip.name, clip);
     }
@@ -828,13 +754,26 @@ export class CharactersPart implements EventfulPart {
     CharacterId,
     { clip: string; start: number; duration: number }
   >();
+  /** Geste à jouer une fois le geste en cours fini (montrer la prise après le ferrage). */
+  private readonly queuedShot = new Map<CharacterId, string>();
   private time = 0;
+
+  /** Le clip existe-t-il dans les animations de l'artiste ? */
+  hasClip(name: string): boolean {
+    return this.clips.has(name);
+  }
+
+  /** Prise d'une main d'un joueur (monde), `false` sans personnage ou sans accroche. */
+  handPoint(id: CharacterId, side: 'left' | 'right', out: Vector3): boolean {
+    return this.players.get(id)?.figure.handPoint(side, out) ?? false;
+  }
 
   handleEvent(event: WorldEvent): void {
     if (event.type === 'cast') {
       this.startOneShot(event.by, FISH_CAST);
     } else if (event.type === 'caught' || event.type === 'escaped') {
       this.startOneShot(event.by, FISH_STRIKE);
+      if (event.type === 'caught' && this.clips.has(FISH_SHOW)) this.queuedShot.set(event.by, FISH_SHOW);
     } else if (event.type === 'gave') {
       this.startOneShot(event.by, GIVE);
     } else if (event.type === 'sat_down') {
@@ -1022,16 +961,35 @@ export class CharactersPart implements EventfulPart {
     return character.seat;
   }
 
-  /** Écrit dans `benchPlace` la place `slot` du banc `id`; faux si le banc n'existe pas. */
-  private benchSeat(id: string, slot: number): boolean {
-    const prop = this.benches.find((bench) => bench.id === id);
+  /** Sièges posés dans la maison (chaises, fauteuils: S07), refaits quand un siège bouge. */
+  private readonly furnitureSeats = new FurnitureSeats();
+  private homeSeats: readonly SeatProp[] = [];
+
+  /**
+   * Écrit dans `benchPlace` la place `slot` du banc `id` (ou du siège posé de ce nom) et dans
+   * `seatLift` la hauteur où poser le corps; faux si le banc n'existe pas ou n'est pas atteint d'où
+   * est le personnage (une chaise de la maison, de dedans; un banc du dehors, pas d'un abri).
+   */
+  private benchSeat(id: string, slot: number, character: Parameters<typeof isHome>[0]): boolean {
+    const prop = this.benches.find((bench) => bench.id === id) ?? this.homeSeats.find((seat) => seat.id === id);
     if (prop === undefined) {
+      return false;
+    }
+    const home = isFurnitureSeat(prop);
+    if (home ? !isHome(character) : isSheltered(character)) {
       return false;
     }
     seatPlace(prop, slot, this.content.settings.benches, this.benchPlace);
     this.benchIsEdge = prop.category === EDGE_SEAT_CATEGORY;
+    // Assise du modèle (`seat_height` de l'artiste: 0,47 m la chaise, 0,42 m le fauteuil), le clip
+    // `sit` étant calé sur 0,47 m; un banc de la carte garde son réglage.
+    const height = home ? this.library.extras(prop.model).seat_height : undefined;
+    this.seatLift = (typeof height === 'number' ? height : SETTINGS.bench.seatHeight) - SETTINGS.sitClipSeatHeight;
     return true;
   }
+
+  /** Hauteur où poser le corps assis, lue par l'appelant juste après `benchSeat`. */
+  private seatLift = 0;
 
   /** Perche de chaque joueur: allumait-il à l'image d'avant, et quand il a commencé à la rabaisser. */
   private readonly poles = new Map<CharacterId, { lighting: boolean; lowerAt: number }>();
@@ -1206,24 +1164,19 @@ export class CharactersPart implements EventfulPart {
   }
 
   private createPlayer(character: DeepReadonly<Character>): PlayerEntry {
-    const model = this.library.cloneRig(RIG_NODE, PLAYER_MESHES);
+    const model = this.library.cloneRig(RIG_NODE, this.playerMeshes);
     const pick = this.picks.add({ kind: 'character', character: character.id });
-    const meshes = new Map<string, Object3D>();
-    let texture: PlayerTexture | null = null;
+    let dressed: DressedFigure | null = null;
     const shared = this.library.sharedCharacterMaterial();
     if (model !== null && shared?.map?.image !== undefined) {
-      texture = new PlayerTexture(
-        shared.map.image as CanvasImageSource & { width: number; height: number },
-      );
+      const texture = new PlayerTexture(shared.map.image as CanvasImageSource & { width: number; height: number });
       this.resources.track(texture.texture);
       const material = this.resources.trackMaterial(shared.clone());
       material.map = texture.texture;
       model.traverse((object) => {
-        if (object instanceof SkinnedMesh) {
-          object.material = material;
-          meshes.set(object.name, object);
-        }
+        if (object instanceof SkinnedMesh) object.material = material;
       });
+      dressed = this.dresser.prepare(model, texture);
     }
     const figure = new CharacterFigure(
       character.id,
@@ -1233,100 +1186,12 @@ export class CharactersPart implements EventfulPart {
       1,
     );
     this.group.add(figure.root);
-    const base = meshes.get('player_base');
-    const baseGeometry = base instanceof SkinnedMesh ? (base.geometry as BufferGeometry) : null;
-    if (baseGeometry !== null) {
-      // Les vêtements sont fusionnés dans le corps: leurs maillages sortent de la scène (ni dessin ni programme).
-      for (const [name, mesh] of meshes) {
-        if (name !== 'player_base') {
-          mesh.removeFromParent();
-        }
-      }
-    }
-    return {
-      figure,
-      texture,
-      meshes,
-      look: '',
-      baseGeometry,
-      merged: null,
-      seated: false,
-      glide: { x: 0, y: 0, start: 0 },
-    };
+    return { figure, dressed, seated: false, glide: { x: 0, y: 0, start: 0 } };
   }
 
   private dress(entry: PlayerEntry, character: DeepReadonly<Character>): void {
-    const { hair, hairColor, beard, outfit, scarf } = character.appearance;
-    const hairMesh = HAIR_MESHES[hair] ?? HAIR_MESHES[0];
-    // Couché, les coupes longues sont aplaties derrière la tête (pas dans l'oreiller).
-    const flat = character.status === 'sleeping' && HAIR_FLATTENED_ASLEEP.has(hairMesh);
-    const look = `${hair}|${hairColor}|${beard}|${outfit}|${scarf}|${flat ? 'couche' : ''}`;
-    if (look === entry.look) {
-      return;
-    }
-    entry.look = look;
-    const wanted = new Set([
-      'player_base',
-      hairMesh,
-      OUTFITS[outfit]?.mesh ?? OUTFITS[0]?.mesh ?? '',
-      scarfMeshFor(scarf),
-      BEARD_MESHES[beard] ?? '',
-    ]);
-    wanted.delete('');
-    const base = entry.meshes.get('player_base');
-    const parts = [...wanted]
-      .filter((name) => name !== 'player_base')
-      .map((name) => {
-        const mesh = entry.meshes.get(name);
-        if (!(mesh instanceof SkinnedMesh)) return null;
-        const geometry = mesh.geometry as BufferGeometry;
-        return flat && name === hairMesh ? this.flattenedHair(name, geometry) : geometry;
-      })
-      .filter((geometry): geometry is BufferGeometry => geometry !== null);
-    const merged =
-      base instanceof SkinnedMesh && entry.baseGeometry !== null
-        ? mergeOutfit(entry.baseGeometry, parts)
-        : null;
-    if (merged !== null && base instanceof SkinnedMesh) {
-      entry.merged?.dispose();
-      entry.merged = merged;
-      base.geometry = merged;
-      for (const [name, mesh] of entry.meshes) {
-        mesh.visible = name === 'player_base';
-      }
-    } else {
-      for (const [name, mesh] of entry.meshes) {
-        if (mesh.parent === null && base?.parent !== null && base?.parent !== undefined) {
-          base.parent.add(mesh);
-        }
-        mesh.visible = wanted.has(name);
-      }
-    }
-    entry.texture?.paint(character.id, outfit, scarf, hairColor);
-  }
-
-  /** Coupes aplaties pour le sommeil, faites une fois par coupe. */
-  private readonly flatHair = new Map<string, BufferGeometry>();
-
-  /**
-   * Coupe longue couchée: dans la pose de liaison (debout, nuque vers -Z), rien de la chevelure
-   * ne dépasse derrière la tête plus loin que le chignon (que l'oreiller reçoit sans s'y enfoncer),
-   * ni plus loin que `backDepth` dans le dos (sous les épaules, contre le matelas).
-   */
-  private flattenedHair(name: string, source: BufferGeometry): BufferGeometry {
-    const known = this.flatHair.get(name);
-    if (known !== undefined) return known;
-    const settings = SETTINGS.asleepHair;
-    const copy = this.resources.track(source.clone());
-    const position = copy.getAttribute('position');
-    for (let i = 0; i < position.count; i += 1) {
-      const limit = position.getY(i) > settings.headFromY ? settings.headDepth : settings.backDepth;
-      if (position.getZ(i) < limit) position.setZ(i, limit);
-    }
-    position.needsUpdate = true;
-    copy.computeBoundingSphere();
-    this.flatHair.set(name, copy);
-    return copy;
+    if (entry.dressed === null) return;
+    this.dresser.dress(entry.dressed, { id: character.id, appearance: character.appearance, asleep: character.status === 'sleeping' });
   }
 
   private createVillager(villager: DeepReadonly<VillagerState>): CharacterFigure {
@@ -1370,6 +1235,7 @@ export class CharactersPart implements EventfulPart {
   update(context: FrameContext): void {
     this.time = context.time;
     const world: ReadonlyWorld = context.world;
+    this.homeSeats = this.furnitureSeats.update(world.furniture, this.content.items);
     this.refreshBenches(world);
     if (this.highFivePending) {
       this.resolveHighFive(world);
@@ -1384,21 +1250,26 @@ export class CharactersPart implements EventfulPart {
       const moving = character.speed > SETTINGS.walkThreshold;
       const kind: ActionKind = character.status === 'sleeping' ? 'sleep' : character.action.kind;
       // Pêche: lancer et ferrer joués une fois, attente en boucle, enchaînés par des fondus courts.
+      const queued = this.queuedShot.get(character.id);
+      const before = this.oneShot.get(character.id);
+      if (queued !== undefined && (before === undefined || context.time - before.start >= before.duration)) {
+        this.queuedShot.delete(character.id);
+        this.startOneShot(character.id, queued);
+      }
       const shot = this.oneShot.get(character.id);
       const shotActive = shot !== undefined && context.time - shot.start < shot.duration;
       const fishing = character.fishing !== null || (shotActive && FISH_CLIPS.has(shot.clip));
       // Assis sur un banc par choix (place réservée par la simulation): posé à sa place, tourné
       // comme le banc, dos au dossier (`benchPlace`). Il y mange aussi (`sit_eat`).
       const benchSeat = this.seatOf(character);
-      const onBench =
-        benchSeat !== null && !isSheltered(character) && this.benchSeat(benchSeat.bench, benchSeat.slot);
+      const onBench = benchSeat !== null && this.benchSeat(benchSeat.bench, benchSeat.slot, character);
       const shown = this.shownSeats[character.id === 'p1' ? 0 : 1];
       if (shown !== undefined) {
         shown.seat = onBench ? benchSeat : null;
       }
       const seat =
         kind === 'sit' && !onBench ? this.seatAt(world, character.pos.x, character.pos.y) : null;
-      const benchLift = SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight;
+      const benchLift = this.seatLift;
       const walkScale = Math.min(
         WALK_SCALE_MAX,
         Math.max(WALK_SCALE_MIN, character.speed / SETTINGS.walkReferenceSpeed),
@@ -1538,7 +1409,7 @@ export class CharactersPart implements EventfulPart {
       const onBench =
         benchProp !== null &&
         villager.talkingWith.length === 0 &&
-        this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0);
+        this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0, villager);
       const clip = onBench ? SIT_CHAIR : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
       if (direction?.kind === 'look' && villager.talkingWith.length === 0) {
@@ -1619,7 +1490,7 @@ export class CharactersPart implements EventfulPart {
   dispose(): void {
     for (const entry of this.players.values()) {
       entry.figure.dispose();
-      entry.merged?.dispose();
+      entry.dressed?.merged?.dispose();
     }
     for (const figure of this.villagers.values()) {
       figure.dispose();

@@ -19,7 +19,7 @@ from mathutils import Vector
 
 import lpl
 from lpl import by_normal
-from interieurs import door_frame, fake_letters, glazed, pierced_wall
+from interieurs import door_frame, glazed, painted_word, pierced_wall
 
 
 def _B():
@@ -122,7 +122,7 @@ def bakery(A):
     # descend à 2,77 m juste au-dessus de l'auvent: pas de place), et la miche de fer forgé au coin
     fw = B.Face("left", hx, hy)
     fw.box(g2, (2.6, 0.05, 0.36), 0.1, 0.025, 2.55, "paint_cream")
-    fake_letters(g2, fw, 0.1, 0.055, 2.55, 11, w=0.16, h=0.22, gap=0.05, color="paint_red", seed=41)
+    painted_word(g2, fw, 0.1, 0.054, 2.55, "BOULANGERIE", 0.042, "paint_red")
     B.rod(g2, (-hx - 0.02, -hy + 0.25, 2.45), (-hx - 0.6, -hy + 0.25, 2.45), 0.02, "iron")
     g2.box((0.04, 0.05, 0.5), loc=(-hx - 0.45, -hy + 0.25, 2.2), color="iron")
     g2.sphere(1.0, loc=(-hx - 0.45, -hy + 0.25, 1.95), color="brass", segs=8, rings=4, scale=(0.18, 0.04, 0.12))
@@ -329,13 +329,13 @@ def school(A):
         f.box(g, (1.7 - k * 0.2, 0.84 - k * 0.28, 0.15), 0.0, 0.42 - k * 0.14, 0.075 + 0.15 * k, "stone_light")
     # plaque MAIRIE au-dessus de la porte, plaque ECOLE sur le mur de la cour
     f.box(g, (1.6, 0.05, 0.36), 0.0, 0.025, 3.15, "stone_light")
-    fake_letters(g, f, 0.0, 0.055, 3.15, 6, w=0.17, h=0.22, gap=0.07, color="black", seed=51)
+    painted_word(g, f, 0.0, 0.054, 3.15, "MAIRIE", 0.044, "black")
     fl = B.Face("left", hx, hy)
     door_frame(g, fl, 0.9, 1.0, 2.3, t, frame="stone_light", step="stone")
     fl.box(g, (0.86, 0.05, 2.19), 0.9, -t + 0.06, 1.1, "paint_blue")
     glazed(g, fl, -0.8, 0.9, 1.0, 2.9, t, frame="white_paint", shutter="paint_blue")
     fl.box(g, (1.1, 0.05, 0.3), 0.9, 0.025, 2.65, "stone_light")
-    fake_letters(g, fl, 0.9, 0.055, 2.65, 5, w=0.15, h=0.2, gap=0.06, color="black", seed=52)
+    painted_word(g, fl, 0.9, 0.054, 2.62, "ÉCOLE", 0.034, "black")
     for u in (-1.3, 1.3):
         glazed(g, B.Face("back", hx, hy), u, 0.9, 1.0, 2.9, t, frame="white_paint", shutter="paint_blue")
     glazed(g, B.Face("right", hx, hy), 0.0, 0.9, 1.0, 2.9, t, frame="white_paint", shutter="paint_blue")

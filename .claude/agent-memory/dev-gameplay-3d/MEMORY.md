@@ -280,7 +280,7 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 ## Tour 10, lot L3: intérieurs et rue Haute (La Petite Ligne, vérifié le 2026-11-02)
 
 - « Chez soi » contre « à l'abri »: `isHome(c)` et `isSheltered(c)` de `src/etat/interieurs.ts` remplacent l'ancien booléen `inHouse` (retiré). Aménagement, coucher, minuit, veillée, réchaud, astuces de l'heure: `isHome`; bancs du dehors, bêche, moments rares, lisière, tableau, poules: `isSheltered`.
-- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
+- Porte fermée = case de la couche dynamique marquée du code de son bâtiment (2 + rang dans `map.buildings`); `Blockers.door` dit quelle porte fermée on passe quand même (celle du bâtiment où l'on est; -1 pour les habitants). Toujours prendre `blockersFor(sim, pos)` pour un corps qui marche (hôte et prédiction de l'invité), `villagerBlockers(sim, id)` pour les habitants. `refreshBlockers` relit le masque des portes fermées à chaque appel: aucune horloge à surveiller ailleurs.
 - Un habitant ajouté au contenu n'existe pas dans une sauvegarde d'avant: `ensureVillagers` (habitants.ts) lui crée son état au premier pas, sans toucher à `sauvegarde.ts`.
 - Le robot pousse une charge à deux le long du chemin de son centre, qui ignore la largeur des porteurs: un coin de rocher le bloquait pour toujours. Écart de biais après une demi-seconde immobile (`beamDodge`).
 - Test: `sim.world.beam = null` en tête d'un test fait croire à TypeScript que `sim.world.beam` reste `null` ensuite (`never`); relire par une petite fonction (`const load = () => sim.world.beam`).
@@ -292,5 +292,67 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Mesurer avant de compacter: le robot longue vie écrit pour chaque aube `bytes` et `keys` (octets par champ) dans `test-results/longue-vie/parties/<partie>.json`; une partie de 84 jours prend environ 4 min 30. Comparer les relevés avant et après hors tailles (`ms`, `bytes`, `chars`, `keys`, `detail`) prouve que le gameplay n'a pas bougé.
 - Ne pas garder de texte rendu dans l'état: un identifiant, la variante et les variables suffisent. Pour migrer un texte rendu, transformer le gabarit en expression régulière (`{nom}` en groupe paresseux) et vérifier que le rendu redonne exactement le texte, sinon garder l'original.
 - Omettre les champs à leur valeur par défaut (`exactOptionalPropertyTypes` est actif: champ optionnel, jamais `undefined` écrit).
-- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD.
+- Fusion avec des changements non commités dans un worktree: commit temporaire, fusion, puis retour mixte (`reset --mixed`) sur la branche fusionnée si elle contenait déjà HEAD. Si la branche descend de HEAD et ne touche aucun fichier modifié, `git merge --ff-only` suffit, sans commit.
 
+## Pêche 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- L'état complet part vers l'invité à chaque changement (`runtime.changed`, au plus 5 fois par seconde, environ 45 Ko): un état qui bouge à chaque pas (nage des ombres) le ferait partir sans arrêt. Ne changer l'état qu'aux événements et laisser le rendu animer (disque `roam` garanti dans l'eau, déplacement `move` lu par `shadowPosAt`).
+- Les identifiants des annonces partagent l'espace des quêtes (`annonceQuests`): une annonce `odette_fry` aurait heurté la quête du même nom. Chercher l'identifiant dans `quetes.json` avant d'en créer un.
+- Ajouter une annonce change toute la suite tirée du tableau (T9-03 de `suite-tour9.test.ts`) et la table des récompenses (T9-04): mettre ces deux attendus à jour avec la raison.
+- Environnement très chargé (charge 45): les tests du robot de la démo dépassent leur délai de 300 s sans être faux. Preuve par une sonde jetable (partie entière, relevé dans le scratchpad) ou `--testTimeout`; `generer.ts` peut dépasser 50 min pour la référence du jour 62.
+- Un réglage de texte d'interface nouveau demande sa clé dans `textes.ts` (Valibot) en plus de `textes-interface.json`; le prix d'un objet s'écrit avec le gabarit `ui.hud.purse` de `textes.json` pour suivre le nom de la monnaie.
+- Outil isolé: un heredoc Python qui contient `\"` est refusé; écrire le script avec Write dans le scratchpad.
+
+## Patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Gabarits de texte: `format` (`simulation/contexte.ts`), `fill` (`interface/format.ts`) et celui de `etat/semaine.ts` ne lisaient que `[a-zA-Z]+`: `{henColor1}` restait brut. Nom de paramètre: `[a-zA-Z][a-zA-Z0-9]*` partout. Contrôle de toutes les répliques et lettres: `tests/textes-remplis.test.ts` (faire apparaître les poules d'abord, sinon `henVars` est vide).
+- Charge longue (poutre, 4,5 m): portée comptée jusqu'à son axe (`beamDistance`, `carry.lengths`, `carry.grip.reach`), pas jusqu'au centre; soulevée, elle garde son orientation et chaque porteur se range contre elle (`gripOffset`). Espace tenu contre une poutre couchée près d'un chantier la soulève.
+- Le gué de pierres du ru (`crossings` de nature `ford`) est réservé à `feel.steppingStoneVillagers` (Jeanne): un adulte y semble marcher dans l'eau. `Blockers.avoid` porte ces cases. Test: `tests/trajets-habitants.test.ts` (toutes les paires de points de chaque emploi du temps).
+- Vitest de ce jeu n'affiche pas le `console.log` d'un test: une sonde écrit dans un fichier du scratchpad (`writeFileSync`).
+- Outil isolé: une commande qui contient « .git » (même `--exclude-dir=.git`) ou plusieurs commandes git enchaînées est refusée; le contrôle des tirets passe par l'outil Grep (`[\x{2013}\x{2014}]`), une commande git par appel.
+- Un trajet d'habitant calculé avant l'arrivée du train n'est pas recalculé quand `train_at_platform` se bloque: Basile traverse le train à quai (samedi 10 h, vu le 2026-11-03, non corrigé).
+
+## Quêtes de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Les fichiers de `donnees/` ont une mise en forme à la main (un objet par ligne dans les tableaux): ne jamais les réécrire par `json.dumps` (diff énorme, conflits avec les lots parallèles). Insérer des lignes avant la fermeture du tableau, puis relire le JSON.
+- `ranges.stayAt` vaut 4 m: deux conditions `stayed_at` « un joueur à chaque bout » demandent plus de 8 m entre les points, sinon un seul joueur les remplit.
+- Une charge à deux garde les décalages des porteurs pris au moment de la lever: côte à côte, elle se coince entre les buissons du quai (x 45 à 49, y 19-20). Les tests portent l'un devant l'autre, reposent et reprennent quand ça bloque, et passent par le passage pavé x 43-44.
+- Payer dans un dialogue: choix à `correct: money_at_least`, effet `take_money`, dialogue sans `once` (le validateur refuse `"once": null`): il se rejoue tant que l'étape dure.
+- Validateur: `indefinite` commence par « un », « une » ou « des » suivi du nom exact; un objet `food` veut un `dish`; `day_at_least` reste dans les jours de la démo (1 à 8).
+- Avancer l'horloge à la main au-delà du départ d'un train (16 h) paie la commande: comparer la bourse juste avant le changement attendu, pas au début du test.
+
+## Patch 0.11.2: sièges posés et petits objets sur les meubles (La Petite Ligne, vérifié le 2026-11-03)
+
+- Sièges des meubles (chaise, fauteuil): `FurnitureSeats` d'`etat/bancs.ts` en fait des `SeatProp` (id du meuble, `slots` de `seatSlots`), mêlés aux bancs par `playerBenches`; `seatReachable` (dedans pour une chaise, dehors pour un banc) remplace les anciens `!isSheltered(c)`. `seatComfortFactor` (besoins) lisait déjà `seat.bench` comme un id de meuble.
+- Visée: le banc a le rang 9 (après tout geste dehors); une chaise de la maison doit avoir le rang des meubles (4), sinon la paillasse voisine prend Espace pour une sieste à midi.
+- Hauteur d'un dessus de meuble: rayon tiré d'en haut sur une instance du modèle (`Raycaster` ignore `visible`), mis en cache par place; les extras `top_height` et `seat_height` de `maison.glb` donnent table 0,78 m, chaise 0,47 m (le clip `sit` est calé sur 0,47 m), fauteuil 0,42 m.
+- Étagère (`shelf`): planches à 0,59, 1,09 et 1,65 m, 0,46 m de jour entre deux: ni la plume (0,47 m) ni le pot (0,66 m) n'y tiennent; le dessus à 1,65 m plus un pot touche l'égout du toit (mur à 2,4 m).
+- Générateur des références: le test unique dépasse 600 s (timeout signalé) mais écrit tous les fichiers; vérifier leur `dataSchema` et leur jour plutôt que le statut.
+## Défauts de rendu du patch 0.11.2 (La Petite Ligne, vérifié le 2026-11-03)
+
+- Pied des murs coupés (`coupe-murs.ts`): tout enfant du nœud de mur passe dans le pied (étal, cagettes de l'épicerie). Une face qui traverse la coupe est écrasée à la hauteur de coupe: une pièce accrochée à la façade devenait une plaque grise posée à plat. La section se calcule sur la seule maçonnerie (faces qui montent à plus de 1 m au-dessus de la coupe), et les faces qui traversent la coupe y sont rognées.
+- Trou de visibilité: son bord en trame de Bayer, posé sur un objet bas (rail, lisse de barrière), se lit comme « l'ombre du personnage en tache tramée ». Hauteur minimale par trou (`uCutDepths.w`): 1 m pour les personnages, 0,45 m pour les lieux des moments.
+- PCF de Three.js 0.187: rotation des 5 échantillons par bruit IGN par pixel, trame visible sur les ombres fines. `ShaderChunk.shadowmap_pars_fragment` modifié une fois avant toute compilation (`stabilizeShadowFilter` de `lumiere.ts`), aucun programme de plus.
+- Pluie vue de dedans: le champ du terrain (canal B) ne connaît que l'emprise des bâtiments de la carte, et les gouttes devant la pièce coupée se lisent comme de la pluie dedans. Abri du joueur local (`abri.ts`) lu par la pluie (goutte projetée au sol le long du regard) et par le sol mouillé des surfaces.
+- Objet sous un pixel de la page de démonstration: exposer le moteur un temps (`window.__engineDebug = engine`, à retirer), puis `engine.rig.ray(ndcX, ndcY).intersectObject(engine.scene, true)` en filtrant les ancêtres invisibles. Le pied de mur se reconnaît à son nom (`…_wall_front_pied`).
+- Captures avant et après sans second arbre: copier ses fichiers modifiés dans le scratchpad, écrire ceux de `HEAD` (`git show HEAD:<chemin> > <chemin>`), capturer, recopier (script `bascule.sh`). Vite recharge seul.
+- Caméra tournée (`orientation=`) en rendu logiciel: la rotation dure plusieurs images; attendre une dizaine d'images (`frames`) avant la capture, sinon le cadrage change d'une capture à l'autre.
+- Reconstruire `bourg.glb` seul: `LPL_SANS_PLANCHES=1 duo-python bourg.py`, puis dedup, weld, prune de gltf-transform comme `construire.sh` (1 min). Les octets changent à chaque construction (ordre des index) même sans modification du script.
+- Ombre « sans objet » devant la porte de la maisonnette: c'est celle de l'auvent (`door_canopy`), hors du cadre dans une capture serrée. La couverture s'arrêtait à 0,22 m du mur: un jour de lumière entre le mur et l'ombre.
+## Pêche 0.12, rendu (La Petite Ligne, vérifié le 2026-11-03)
+
+- `RenderEngine.frame` borne l'image à 0,1 s (`MAX_FRAME_SECONDS`): `lplRendu.advance(0.5)` n'avance le temps du rendu que de 0,1 s. Fondus (2 s) et éclats se capturent avec `dt` 0,1 et assez de pas (30 pas = 3 s).
+- Une bouffée émise pendant l'image où l'on capture est invisible (fondu d'entrée des formes sur 8 % de leur vie): un éclat de 0,35 s ne se voit qu'aux images suivantes, donc pas avec des pas de 0,5 s.
+- Sous forte charge (charge moyenne 40 à 50), `page.screenshot` d'une page 3D dépasse 5 min: lire le canevas (`toDataURL`) dans le même `evaluate` que `advance(dt)`, sans `preserveDrawingBuffer`.
+- Le dossier de travail temporaire de la session (scratchpad) est partagé par tous les membres: un `capture.cjs` et un `dist/` à la racine ont été écrasés en cours de mission. Tout mettre dans un sous-dossier à son nom, serveur sur un port à soi.
+- Ombres de poissons sans programme de plus: sprites couchés du programme des particules (groupe 2, `uGroupAlpha` à 1), tournés par `aAccel.z` = 1 et le cap dans `aVelocity.y`; forme `fish` dessinée dans le fragment (corps en fuseau, queue, sillage). Un seul appel pour toutes les ombres et leurs lueurs de guet.
+- Contrat des ombres avec la simulation (`etat/peche.ts` du lot 1): l'état ne change qu'aux événements; le rendu fait nager l'ombre dans le disque `roam` autour de `pos`, et lit un déplacement décidé par la simulation par `move` (`shadowPosAt`). Lecture concentrée dans `rendu/peche-vue.ts`.
+
+## Garde-robe de la 0.12 (La Petite Ligne, vérifié le 2026-11-03)
+
+- `personnages.glb` depuis la 0.12: `player_base` est un corps nu-neutre sans pieds (sous-vêtement `wear_under`), chaussures obligatoires; vêtements `wear_<slot>_<style>`, écusson `player_badge_<symbole>[_outer]`, coupes sous chapeau `player_hair_<coupe>_hat`. Couleurs des vêtements: rangée 1 de la texture (ordre `WEAR_SLOTS` de `garde_robe.py`), écrite par `habillage.ts`.
+- Les poids de peau du GLB ne sont pas triés: l'os principal d'un sommet est celui du plus grand des quatre poids, pas `skinIndex.x`.
+- Gonfler une pièce à facettes (une normale par face, sommets dédoublés) selon ses normales l'ouvre en fentes: gonfler depuis un axe (direction horizontale depuis le centre) pour que les sommets confondus bougent ensemble.
+- Aperçu 3D d'un panneau: second `WebGLRenderer` rendu à la demande (la lecture de pixels d'une cible du rendu principal donne du linéaire sans tone mapping). Ne jamais `dispose` les géométries du GLB depuis l'aperçu (elles servent au jeu): seulement ses copies, son matériau cloné et sa texture.
+- Capture avec Vite lancé par `npx vite &`: `kill $!` tue `npx`, pas Vite, qui garde le port; la capture suivante échoue en silence sur l'ancien serveur. Lancer `node_modules/.bin/vite` directement.
+- Le dossier scratchpad est partagé par tous les membres de la séance: un autre a réécrit mes `run.sh` et `capture.cjs`. Travailler dans un sous-dossier à soi (`scratchpad/dg3d/`).

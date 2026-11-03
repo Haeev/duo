@@ -33,8 +33,8 @@ import { henWrongAside } from './modele-secrets';
 import { dedupeToasts, toastKey, toastText, toastVisual, visibleToasts } from './notifications';
 import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
-import { portraitClothes } from './modele-garde-robe';
 import { typographier } from './typographie';
+import { isWatching } from '../etat/peche';
 
 /** Une icône de besoin du HUD (à côté du portrait, ou en petit sur la carte de l'autre). */
 interface NeedView {
@@ -114,6 +114,8 @@ export class Hud {
 
   private readonly self: HTMLDivElement;
   private readonly selfPortrait: HTMLSpanElement;
+  /** Pastille « Au guet » (pêche 0.12, section 7.2): chez le seul guetteur. */
+  private readonly watchBadge: HTMLSpanElement;
   private readonly selfName: HTMLSpanElement;
   private readonly selfMood: HTMLSpanElement;
   /** Besoins doux (tour 10): trois icônes à trois états, sans chiffre; l'état bas en un mot. */
@@ -249,9 +251,10 @@ export class Hud {
       ...this.selfNeedViews.map((v) => v.box),
       this.selfNeedNote,
     ]);
+    this.watchBadge = el('span', { class: 'lpl-watch-badge', hidden: true, 'data-key': 'watching' }, [icon('ui-eye'), x.fish.watching]);
     this.self = el('div', { class: 'lpl-self' }, [
       this.selfPortrait,
-      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.selfNeeds]),
+      el('span', { class: 'lpl-self__text' }, [this.selfName, this.selfMood, this.selfNeeds, this.watchBadge]),
     ]);
 
     // Bas centre: avancée de l'action, invite du survol, astuce, barre d'outils, barre d'aménagement.
@@ -457,7 +460,7 @@ export class Hud {
     const p = partnerModel(world, ctx, partnerChar === null ? null : absenceMinutes(world, partnerChar));
     setHidden(this.partner, p === null);
     if (p !== null && partnerChar !== null) {
-      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance, portraitClothes(ctx, partnerChar.appearance)), p.expression, ''));
+      setPortrait(this.partnerPortrait, portraitSvg(playerColors(partnerChar.id, partnerChar.appearance, ctx.content.clothes), p.expression, ''));
       setText(this.partnerName, p.name);
       setAttr(this.partner, 'aria-label', p.name);
       setIcon(this.partnerIcon, p.icon);
@@ -489,10 +492,11 @@ export class Hud {
 
     // Soi.
     const form = formModel(ctx, me);
-    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance, portraitClothes(ctx, me.appearance)), form.expression, form.name));
+    setPortrait(this.selfPortrait, portraitSvg(playerColors(me.id, me.appearance, ctx.content.clothes), form.expression, form.name));
     setText(this.selfName, me.name);
     setAttr(this.self, 'aria-label', ctx.t(ctx.texts.extra.hud.selfLabel, { name: me.name }));
     setText(this.selfMood, form.name);
+    setHidden(this.watchBadge, !isWatching(world.fishing, me.id));
     this.updateNeeds(world);
     this.updateNap(world);
 

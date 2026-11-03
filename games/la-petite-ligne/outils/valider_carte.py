@@ -794,6 +794,7 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
                 break
 
     # 6. Pêche, cueillette
+    controler_coins_peche(carte, rapport, libre)
     eau = [(x + 0.5, y + 0.5) for y in range(haut) for x in range(larg) if lignes[y][x] == "~"]
     for p in carte["points"]:
         if p.get("peche") or p["id"] == "river_ford":
@@ -893,6 +894,42 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None) -> dic
     if chr(0x2014) in texte or chr(0x2013) in texte:
         rapport.erreur("typographie: tiret cadratin ou demi-cadratin dans la carte")
     return resultats
+
+
+def controler_coins_peche(carte: dict, rapport: Rapport, libre: list[list[bool]]) -> None:
+    """Pêche 0.12 (C1): chaque case d'eau dans un seul coin, et chaque coin pêchable depuis une case libre."""
+    coins = carte.get("peche", {}).get("coins")
+    if coins is None:
+        return
+    legende = carte["terrain"]["legende"]
+    lignes = carte["terrain"]["lignes"]
+    haut, larg = len(lignes), len(lignes[0])
+    proprio: dict[tuple[int, int], str] = {}
+    for coin in coins:
+        cases_eau = []
+        for r in coin["rects"]:
+            for x, y in cases_rect(r):
+                if not (0 <= x < larg and 0 <= y < haut) or legende[lignes[y][x]].get("sol") != "water":
+                    continue
+                if (x, y) in proprio:
+                    rapport.erreur(f"coin de pêche {coin['id']}: case d'eau ({x}, {y}) déjà dans {proprio[(x, y)]}")
+                proprio[(x, y)] = coin["id"]
+                cases_eau.append((x, y))
+        if not cases_eau:
+            rapport.erreur(f"coin de pêche {coin['id']}: aucune case d'eau")
+            continue
+        portee = any(
+            0 <= ex + dx < larg and 0 <= ey + dy < haut and libre[ey + dy][ex + dx]
+            for ex, ey in cases_eau
+            for dy in range(-6, 7) for dx in range(-6, 7)
+            if dx * dx + dy * dy <= 36
+        )
+        if not portee:
+            rapport.erreur(f"coin de pêche {coin['id']}: aucune case libre à moins de 6 m")
+    for y in range(haut):
+        for x in range(larg):
+            if legende[lignes[y][x]].get("sol") == "water" and (x, y) not in proprio:
+                rapport.erreur(f"coins de pêche: case d'eau ({x}, {y}) hors de tout coin")
 
 
 def _composantes(cases: set[tuple[int, int]]) -> list[set[tuple[int, int]]]:

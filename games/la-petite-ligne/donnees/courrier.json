@@ -130,7 +130,9 @@
       ]
     },
     {"id": "basile_rooms", "from": "basile", "title": "Deux plans sur l'établi", "delivery": {"day": 23, "time": "06:00"}, "text": "Votre maisonnette est petite pour deux, ça se voit depuis la voie. J'ai tiré deux plans: un cellier contre le pignon ouest, une chambre derrière, côté bois. Choisissez par lequel commencer. Je fournis la charpente, vous apportez les planches et les bras. B."},
-    {"id": "solange_note", "from": "solange", "title": "Un mot de la mercerie", "delivery": {"byEffect": true}, "text": "Passez au salon, rue Haute, à l'angle. La première coupe est pour moi: c'est comme ça qu'on se présente, chez nous. Jeanne m'a tout dit de vous, je veux vérifier. Solange Mérigot (qui garde Jeanne pendant la tournée de Lucie)."}
+    {"id": "solange_note", "from": "solange", "title": "Un mot de la mercerie", "delivery": {"byEffect": true}, "text": "Passez au salon, rue Haute, à l'angle. La première coupe est pour moi: c'est comme ça qu'on se présente, chez nous. Jeanne m'a tout dit de vous, je veux vérifier. Solange Mérigot (qui garde Jeanne pendant la tournée de Lucie)."},
+    {"id": "odette_market_letter", "from": "odette", "title": "Le marché du dimanche", "delivery": {"byEffect": true}, "text": "Le dimanche, autrefois, la place sentait la fraise et le pain chaud. Il y avait des tréteaux partout. Moi, je ne peux pas quitter ma boutique. Mais vous, avec votre potager... Passez me voir. O."},
+    {"id": "firmin_goat_letter", "from": "firmin", "title": "Une chèvre pour la maisonnette", "delivery": {"byEffect": true}, "text": "Ta maisonnette avait une chèvre, du temps de l'ancien garde-barrière. Elle broutait le talus et ne passait jamais la voie: corde courte, disait-il. Une ferme des Combes en a une à placer. F."}
   ],
 
   "senders": [
@@ -138,6 +140,7 @@
     { "id": "basile", "label": "Basile" },
     { "id": "jeanne", "label": "Jeanne" },
     { "id": "firmin", "label": "Firmin, chef de halte" },
-    { "id": "solange", "label": "Solange Mérigot, mercerie-coiffure" }
+    { "id": "solange", "label": "Solange Mérigot, mercerie-coiffure" },
+    {"id": "odette", "label": "Odette, épicerie de la place"}
   ]
 }

@@ -18,7 +18,6 @@ import {
   roomSiteModel,
   storageModel,
 } from './modele-maison';
-import { wearOf } from './modele-garde-robe';
 import { Panel, backKeys } from './panneau';
 
 // ---------------------------------------------------------------------------
@@ -72,7 +71,7 @@ export class StoragePanel extends Panel {
       this.selected = null;
     this.selected ??= all.find((x) => x.c.item !== null)?.key ?? null;
     // 0.12: la garde-robe se range ici (armoire ou coffre de la maison), dès qu'on a une tenue.
-    const wardrobe = wearOf(me.appearance) !== null;
+    const wardrobe = ctx.content.clothes.list.length > 0;
     const sig = JSON.stringify([model, inBag, this.selected, wardrobe]);
     this.renderBody(sig, () =>
       this.nodes(model, inBag, all.find((x) => x.key === this.selected)?.c ?? null, wardrobe),
