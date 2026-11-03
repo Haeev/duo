@@ -97,7 +97,8 @@ describe('HUD', () => {
     sim.world.purse = 94;
     sim.world.proposals.push({ id: 'o1', by: 'p2', purchase: { source: 'grocery', item: 'mattress', count: 1 }, price: 120 });
     expect(purseModel(sim.world)).toEqual({ amount: 214, reserved: 120 });
-    expect(splitAmount('{amount} sous')).toEqual({ before: '', after: ' sous' });
+    expect(splitAmount('{amount} aubrins')).toEqual({ before: '', after: ' aubrins' });
+    expect(splitAmount('{amount} aubrins', 1)).toEqual({ before: '', after: ' aubrin' });
   });
 
   it("montre l'endurance discrète, plus visible quand elle baisse", () => {

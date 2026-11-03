@@ -14,6 +14,7 @@ import type {
   WorldEvent,
   WorldState,
 } from '../etat/types';
+import { agreeMoney } from '../donnees/monnaie';
 import type { Content } from '../donnees/types';
 import type { BuildingId } from '../etat/carte';
 import type { Blockers } from './grille';
@@ -145,10 +146,11 @@ export function newId(sim: Sim, prefix: string): string {
 
 /** Remplace `{nom}` dans un texte. Un nom absent reste tel quel (jetons de touches). */
 export function format(template: string, vars: Record<string, string | number>): string {
-  return template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
+  const filled = template.replace(/\{([a-zA-Z][a-zA-Z0-9]*)\}/g, (whole, name: string) => {
     const value = vars[name];
     return value === undefined ? whole : String(value);
   });
+  return agreeMoney(filled);
 }
 
 export function message(sim: Sim, key: string, vars: Record<string, string | number> = {}): string {

@@ -482,7 +482,7 @@ export function objectivesOf(runs: readonly { run: LongRun; m: RunMeasures }[], 
   const goalTotal = medians.reduce((n, r) => n + r.m.savingGoalSaturdays.total, 0);
   out.push({
     id: 'O-12',
-    label: 'un but d’épargne le samedi matin (un article ou chantier ouvert coûte plus que la bourse moins 150 sous), profil médian, jours 16 à 63',
+    label: 'un but d’épargne le samedi matin (un article ou chantier ouvert coûte plus que la bourse moins 150 aubrins), profil médian, jours 16 à 63',
     value: `${String(goalYes)}/${String(goalTotal)} samedis (${String(pct(goalYes, goalTotal))} %)`,
     threshold: '>= 60 %',
     held: pct(goalYes, goalTotal) >= 60,
@@ -500,8 +500,8 @@ export function objectivesOf(runs: readonly { run: LongRun; m: RunMeasures }[], 
   out.push({
     id: 'O-14',
     label: 'bourse qui dort: bourse au jour 63, profil médian',
-    value: `${purses.map(String).join(', ') || '-'} sous`,
-    threshold: '< 2 500 sous',
+    value: `${purses.map(String).join(', ') || '-'} aubrins`,
+    threshold: '< 2 500 aubrins',
     held: maxPurse !== null && maxPurse < 2500,
   });
   const done = medians.reduce((n, r) => n + r.m.annoncesDone.done, 0);

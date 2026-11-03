@@ -175,6 +175,10 @@ export const createFallbackInterface: CreateInterface = (options: InterfaceOptio
         for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'chest_deposit', item: s.item, quality: s.quality, count: s.count });
         for (const s of w.cellar) button(row(), `< ${itemLabel(view, s)}`, { type: 'chest_take', item: s.item, quality: s.quality, count: s.count });
         break;
+      case 'stall':
+        for (const s of bag) button(row(), `> ${itemLabel(view, s)}`, { type: 'stall_deposit', item: s.item, quality: s.quality, count: s.count });
+        for (const s of w.market?.stall ?? []) button(row(), `< ${itemLabel(view, s)}`, { type: 'stall_take', item: s.item, quality: s.quality, count: s.count });
+        break;
       case 'workbench':
       case 'stove':
         for (const r of Object.values(view.content.recipes)) {

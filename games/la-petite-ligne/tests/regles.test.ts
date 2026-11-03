@@ -38,7 +38,7 @@ function act(sim: Sim, by: CharacterId, intent: AuthoredIntent['intent']): void 
 }
 
 describe('règles', () => {
-  it("démarre au jour 1 à 10 h, scène d'arrivée jouée, courrier et 200 sous", () => {
+  it("démarre au jour 1 à 10 h, scène d'arrivée jouée, courrier et 200 aubrins", () => {
     const sim = started();
     expect(sim.world.phase).toBe('day');
     expect(sim.world.clock.day).toBe(1);
@@ -71,7 +71,7 @@ describe('règles', () => {
     expect(gardenCellAt(sim, a.cell)?.soil).toBe('tilled');
   });
 
-  it("gros achat: à partir de 100 sous, la somme est réservée et attend l'accord de l'autre (EC-04)", () => {
+  it("gros achat: à partir de 100 aubrins, la somme est réservée et attend l'accord de l'autre (EC-04)", () => {
     const sim = started();
     const counter = sim.map.points.grocery_counter;
     if (counter === undefined) throw new Error('comptoir absent');
@@ -93,10 +93,10 @@ describe('règles', () => {
     sim.world.purse = 3;
     act(sim, 'p1', { type: 'buy', item: 'nail', count: 2 });
     expect(sim.world.purse).toBe(3);
-    expect(character(sim, 'p1').notifications.at(-1)?.text).toBe('Il manque 1 sous.');
+    expect(character(sim, 'p1').notifications.at(-1)?.text).toBe('Il manque 1 aubrin.');
   });
 
-  it('commande complète: 540 sous au départ du train (EC-08)', () => {
+  it('commande complète: 540 aubrins au départ du train (EC-08)', () => {
     const sim = started();
     for (const line of sim.content.settings.order.trains[0]?.lines ?? []) addStack(sim.world.crate, line.item, 'ordinary', line.count);
     addStack(sim.world.crate, 'carrot', 'ordinary', 2);

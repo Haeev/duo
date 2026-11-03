@@ -10,6 +10,7 @@ import courrier from '../../donnees/courrier.json';
 import cultures from '../../donnees/cultures.json';
 import envies from '../../donnees/envies.json';
 import habitants from '../../donnees/habitants.json';
+import marche from '../../donnees/marche.json';
 import moments from '../../donnees/moments.json';
 import objets from '../../donnees/objets.json';
 import pieces from '../../donnees/pieces.json';
@@ -34,5 +35,6 @@ export const CONTENT_FILES: RawContentFiles = {
   chantiers,
   catalogue,
   pieces,
+  marche,
   vetements,
 };

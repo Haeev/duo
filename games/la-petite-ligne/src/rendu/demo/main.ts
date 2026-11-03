@@ -198,6 +198,24 @@ async function main(): Promise<void> {
   applyDemoDay(world, params, content);
   // Tour 9: chantiers, cadeaux, outils, objets de maison, cueillettes, assis (`tour9-exemple.ts`).
   applyTour9Example(world, map, content, params);
+  if (params.get('marche') === '1') {
+    // `marche=1` (0.12): l'étal posé et garni, la balance achetée, la sacoche de Lucie au banc du quai.
+    world.flags.push('market_open', 'stall_six_slots');
+    world.market = {
+      day: world.clock.day,
+      level: 'fair',
+      stall: [
+        { item: 'radish', quality: 'ordinary', count: 6 },
+        { item: 'egg', quality: 'ordinary', count: 4 },
+        { item: 'blackberry_jam', quality: 'ordinary', count: 2 },
+        { item: 'fresh_cheese', quality: 'ordinary', count: 2 },
+        { item: 'carrot', quality: 'ordinary', count: 3 },
+      ],
+      buyers: [],
+    };
+    world.cellar.push({ item: 'market_scale', quality: 'ordinary', count: 1 });
+    world.mail = { day: world.clock.day, items: [{ kind: 'letter', to: 'basile', taken: false, delivered: false }], carryOver: 0 };
+  }
   if (params.get('noms') === '1') {
     // `noms=1`: Camille connaît le nom des poules (étiquettes chez elle seule, quête des noms).
     world.hens.forEach((hen, index) => {

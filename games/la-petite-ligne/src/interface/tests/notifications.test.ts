@@ -12,7 +12,7 @@ describe('notifications', () => {
     const { content } = contentAndMap();
     const m = content.texts.messages;
     expect(messageKeyOf('Déjà pris par Sacha.', m)).toBe('already_taken');
-    expect(messageKeyOf('Il manque 40 sous.', m)).toBe('not_enough_money');
+    expect(messageKeyOf('Il manque 40 aubrins.', m)).toBe('not_enough_money');
     expect(messageKeyOf('Le train de samedi est en gare !', m)).toBe('train_arrived');
     expect(messageKeyOf('Un texte composé ailleurs.', m)).toBeNull();
   });
@@ -20,7 +20,7 @@ describe('notifications', () => {
   it('choisit le style: erreur, événement, ou le jeton de l’autre joueur', () => {
     const { content } = contentAndMap();
     const m = content.texts.messages;
-    expect(toastVisual(note('Il manque 40 sous.'), m)).toMatchObject({ variant: 'error', icon: 'ui-warning' });
+    expect(toastVisual(note('Il manque 40 aubrins.'), m)).toMatchObject({ variant: 'error', icon: 'ui-warning' });
     expect(toastVisual(note('Le train part dans une heure.'), m)).toMatchObject({ variant: 'event', icon: 'ui-train' });
     expect(toastVisual(note('Déjà pris par Sacha.'), m).partnerToken).toBe(true);
     // La clé donnée par la simulation l'emporte sur la reconnaissance du texte.

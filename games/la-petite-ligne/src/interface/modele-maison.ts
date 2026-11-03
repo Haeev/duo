@@ -456,7 +456,7 @@ export interface RoomOrderModel {
   use: string;
   price: number;
   state: RoomOrderState;
-  /** Texte de l'état, ou du bouton (« Commander pour 450 sous », « Proposer à Sacha: 1200 sous »). */
+  /** Texte de l'état, ou du bouton (« Commander pour 450 aubrins », « Proposer à Sacha: 1200 aubrins »). */
   text: string;
   /** Il faudra l'accord de l'autre (`bigPurchaseThreshold`). */
   big: boolean;

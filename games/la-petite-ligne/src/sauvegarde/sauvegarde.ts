@@ -9,6 +9,7 @@ import type { GameMap } from '../etat/carte';
 import type { CharacterId, Tree, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { letterFromRendered } from '../etat/courrier';
+import { renameOldCurrency } from '../donnees/monnaie';
 import { sanitizeCorner } from '../simulation/amenagement';
 import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
@@ -550,7 +551,8 @@ function migrateToFormat8(world: Record<string, unknown>, content: Content): voi
   world.letters = list.map((l: unknown) => {
     if (!isRecord(l) || !str(l.id) || typeof l.day !== 'number' || !str(l.title) || !str(l.from) || !str(l.text) || !Array.isArray(l.read)) throw new SaveError('sauvegarde: lettre invalide');
     const read = l.read.filter((id): id is CharacterId => id === 'p1' || id === 'p2');
-    return letterFromRendered(content, { id: l.id, day: l.day, title: l.title, from: l.from, text: l.text, read });
+    // Textes d'avant la 0.12: l'ancienne monnaie renommée d'abord, pour retrouver le gabarit d'aujourd'hui.
+    return letterFromRendered(content, { id: l.id, day: l.day, title: renameOldCurrency(l.title), from: l.from, text: renameOldCurrency(l.text), read });
   });
 }
 
@@ -751,6 +753,8 @@ function resume(
   }
   world.fishing = withoutTransientFishing({ fishing: world.fishing } as WorldState).fishing;
   for (const v of world.villagers) v.talkingWith = [];
+  renameSavedCurrency(world);
+  fillEconomyFields(world);
   world.stages.choice = { p1: null, p2: null };
   fillRegrowth(content, world);
   // Tour 10: `inside` se déduit de la position (pièces bâties comprises), quel que soit le format.
@@ -782,6 +786,30 @@ function resume(
  * du jour 16 (`trees.catchUpDays`, comme un arbre abattu tôt); abattu après, il redevient une
  * souche d'aujourd'hui (son jour est perdu).
  */
+/**
+ * 0.12 (section 1): les textes déjà rendus que garde une sauvegarde (notifications, lettres
+ * migrées) disaient « 30 sous ». Même format: on renomme au chargement, sans toucher aux sommes.
+ */
+function renameSavedCurrency(world: WorldState): void {
+  for (const c of world.characters) {
+    for (const n of c.notifications) n.text = renameOldCurrency(n.text);
+  }
+  for (const letter of world.letters) {
+    if (letter.legacy !== undefined) letter.legacy = { ...letter.legacy, text: renameOldCurrency(letter.legacy.text), title: renameOldCurrency(letter.legacy.title) };
+  }
+}
+
+/** 0.12 (lot L-économie): champs absents des sauvegardes d'avant, même format (valeurs de départ). */
+function fillEconomyFields(world: WorldState): void {
+  type Added = 'grocerSupply' | 'ardoise' | 'goodsSeen' | 'market' | 'mail';
+  const w = world as Omit<WorldState, Added> & Partial<Pick<WorldState, Added>>;
+  w.grocerSupply ??= {};
+  w.ardoise ??= null;
+  w.goodsSeen ??= [];
+  w.market ??= null;
+  w.mail ??= null;
+}
+
 /** `countersToday` d'une sauvegarde qui n'a que `countersAtDawn`: la différence, clé par clé. */
 function fillCountersToday(world: WorldState): void {
   const raw = world as Partial<WorldState> & { countersAtDawn?: Record<string, Record<string, number> | undefined> };

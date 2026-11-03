@@ -15,6 +15,8 @@ import { storeAtHome } from './rangement';
 import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
 import { deliverWeeklyItem } from './catalogue';
 import { creditImprovement, improvementName } from './chantiers';
+import { grocerAffordable } from '../etat/epicerie';
+import { recordGrocerSale } from './epicerie';
 import { buildingOpen } from './interieurs';
 
 /** Un habitant tient la boutique (activité `serve` au comptoir). */
@@ -173,11 +175,10 @@ export function cancelProposalsAtNight(sim: Sim): void {
   for (const p of [...sim.world.proposals]) withdraw(sim, p.by, false);
 }
 
-function qualityMultiplier(sim: Sim, quality: Quality): number {
-  return sim.content.qualities[quality].priceMultiplier;
-}
-
-/** Vendre à Odette: 80 % du prix, plafond quotidien (EC-02). */
+/**
+ * Vendre à Odette (EC-02; 0.12, section 2.2): prix selon la saison, l'offre et l'ardoise, unité
+ * par unité (`etat/epicerie.ts`), plafond quotidien.
+ */
 export function sell(sim: Sim, c: Character, item: string, quality: Quality, count: number): void {
   const s = sim.content.settings.economy.grocer;
   const def = sim.content.items[item];
@@ -186,19 +187,16 @@ export function sell(sim: Sim, c: Character, item: string, quality: Quality, cou
     say(sim, c.id, 'grocer_not_buying');
     return;
   }
-  const unit = def.sellPrice * qualityMultiplier(sim, quality) * s.buyRate;
-  const room = s.dailyCap - sim.world.grocerSoldToday;
   const have = countInBag(c, item, quality);
-  let n = Math.min(count, have);
-  while (n > 0 && Math.round(unit * n) > room) n--;
+  const { count: n, price } = grocerAffordable(sim.content, sim.world, item, quality, Math.min(count, have));
   if (n === 0) {
     if (have > 0) say(sim, c.id, 'grocer_daily_cap');
     return;
   }
   takeFromBag(c, item, n, quality);
-  const price = Math.round(unit * n);
   sim.world.purse += price;
   sim.world.grocerSoldToday += price;
+  recordGrocerSale(sim, item, n);
   emit(sim, { type: 'sold', by: c.id, item, count: n, price });
   if (n < count && have > n) say(sim, c.id, 'grocer_daily_cap');
 }

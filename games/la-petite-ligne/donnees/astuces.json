@@ -18,7 +18,7 @@
     { "id": "hint_workbench", "text": "À l'établi, un rondin donne quatre planches, et un plan devient un meuble.", "trigger": { "on": "near_point", "point": "sawmill_workbench" }, "tier": "P0" },
     { "id": "hint_furniture", "text": "La molette tourne le meuble, {act} le pose, {examine} le reprend.", "trigger": { "on": "holding_furniture" }, "tier": "P0" },
     { "id": "hint_crate", "text": "Dépose ici les produits de la commande. Ils partent samedi à 16 h.", "trigger": { "on": "near_point", "point": "coop_crate" }, "tier": "P0" },
-    { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} sous, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
+    { "id": "hint_big_purchase", "text": "À partir de {bigPurchase} aubrins, l'achat attend l'accord de l'autre.", "trigger": { "on": "big_purchase_attempt" }, "tier": "P0" },
     { "id": "hint_notebook", "text": "{notebook} ouvre le carnet: quêtes, courrier, sac.", "trigger": { "on": "letter_received" }, "tier": "P0" },
     { "id": "hint_fishing", "text": "Canne en main et face à l'eau, {act} lance la ligne. Le bouchon plonge ? {act}, vite !", "trigger": { "on": "near_point", "point": "river_ford" }, "tier": "P1" },
     { "id": "hint_handcar_push", "text": "Réparée, la draisine se pousse à deux: un de chaque côté, maintenez {act} ensemble et avancez.", "trigger": { "on": "near_point", "point": "handcar_shed" }, "tier": "P0" },

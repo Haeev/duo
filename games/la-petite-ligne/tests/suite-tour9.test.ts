@@ -328,7 +328,7 @@ describe('catalogue de la semaine, outils, poules, cadeaux (T9-07 à T9-10)', ()
 });
 
 describe('chantiers (T9-11)', () => {
-  it('un seul ouvert par file; 100 sous ou plus passent par l’accord; payé, bâti au matin avec le message; planches à Basile: 10 sous chacune, 20 au plus', () => {
+  it('un seul ouvert par file; 100 aubrins ou plus passent par l’accord; payé, bâti au matin avec le message; planches à Basile: 10 aubrins chacune, 20 au plus', () => {
     const sim = at(30, 12 * HOUR);
     const w = sim.world;
     w.purse = 5000;

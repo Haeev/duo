@@ -173,7 +173,7 @@ function afterDemo(seed: number): Sim {
 }
 
 describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
-  it('une ligne remplie rapporte au moins sa part x 380 sous, prime de 25 % à la commande complète; la lettre dit le même montant', () => {
+  it('une ligne remplie rapporte au moins sa part x 380 aubrins, prime de 25 % à la commande complète; la lettre dit le même montant', () => {
     for (const seed of [1, 2, 3, 20261030]) {
       const sim = afterDemo(seed);
       const order = sim.world.order.generated;
@@ -202,7 +202,7 @@ describe('paiement et lettres (T8-15, T8-18, sections 4.7 et 4.8)', () => {
       sendLetter(sim, 'coop_recap_generated');
       const letter = sim.world.letters.find((l) => l.id === 'coop_recap_generated@22');
       expect(letterTitleOf(sim, letter)).toBe('Bilan du samedi 22');
-      expect(letterTextOf(sim, letter)).toContain(`${String(result?.amount)} sous`);
+      expect(letterTextOf(sim, letter)).toContain(`${String(result?.amount)} aubrins`);
       expect(letterTextOf(sim, letter)).not.toContain('{');
       // La commande suivante est tirée au départ du train, pour samedi 29, avec un budget plus grand.
       expect(sim.world.order.generated?.train).toBe(29);

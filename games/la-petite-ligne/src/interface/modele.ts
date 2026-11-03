@@ -3,6 +3,7 @@
  * DOM), testées dans Node. Les composants comparent ces modèles d'une image à
  * l'autre et ne touchent le DOM que s'ils changent.
  */
+import { agreeMoney } from '../donnees/monnaie';
 import { isTrainDay } from '../donnees/calendrier';
 import { currentOrder, isGeneratedOrder } from '../donnees/commandes';
 import { rawText } from '../donnees/contenu';
@@ -163,11 +164,16 @@ export function purseModel(world: ReadonlyWorld): PurseModel {
   return { amount: world.purse + reserved, reserved };
 }
 
-/** Sépare `{amount} sous` en montant et unité (le montant a son propre style). */
-export function splitAmount(template: string): { before: string; after: string } {
+/**
+ * Sépare `{amount} aubrins` en montant et unité (le montant a son propre style); l'unité
+ * s'accorde au montant (`monnaie.ts`: « 1 aubrin », « 2 aubrins »).
+ */
+export function splitAmount(template: string, amount = 2): { before: string; after: string } {
   const at = template.indexOf('{amount}');
   if (at < 0) return { before: '', after: template };
-  return { before: template.slice(0, at), after: template.slice(at + '{amount}'.length) };
+  const shown = String(amount);
+  const after = agreeMoney(shown + template.slice(at + '{amount}'.length)).slice(shown.length);
+  return { before: template.slice(0, at), after };
 }
 
 // ---------------------------------------------------------------------------
@@ -278,6 +284,7 @@ const MENU_ICONS: Readonly<Record<MenuKind, string>> = {
   // Tour 10 (lot L6): icônes à choisir avec l'interface du salon et du guichet.
   salon: 'ui-notebook',
   bakery: 'ui-coin',
+  stall: 'ui-coin',
   // 0.12: icônes à choisir avec l'interface de la boutique de vêtements.
   clothes_shop: 'ui-coin',
   wardrobe: 'chest',
@@ -570,7 +577,7 @@ function isAnnonceQuest(id: string): boolean {
 
 /**
  * Les quêtes du carnet, rangées (tour 9, section 5.3): parmi les commandes faites, seulement les
- * deux dernières, avec leur résultat (« 5 lignes sur 5, 1137 sous »); les annonces à part, la
+ * deux dernières, avec leur résultat (« 5 lignes sur 5, 1137 aubrins »); les annonces à part, la
  * dernière faite ou retirée gardée au plus deux fois.
  */
 export function notebookQuests(world: ReadonlyWorld, ctx: UiContext): NotebookQuests {

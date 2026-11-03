@@ -14,6 +14,31 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { Currency } from './monnaie';
+import type { MarketSettings } from './marche';
+import type { MailRoundSettings } from './plis';
+
+/** Comptoir d'Odette (0.12, section 2.2 de `v0-12-conception.md`). */
+export interface GrocerPricing {
+  buyRate: number;
+  dailyCap: number;
+  buysAfterFlag: string;
+  /** Avant ce jour, prix fixes (`buyRate`, sans saison, offre ni ardoise): la démo reste celle du tour 9. */
+  pricesFromDay: number;
+  supply: {
+    floor: number;
+    slope: number;
+    /** Chaque aube, le compteur d'unités vendues de chaque article est multiplié par ce facteur (arrondi vers le bas). */
+    dawnDecay: number;
+    saturation: Record<string, number>;
+    categorySaturation: Record<string, number>;
+    defaultSaturation: number;
+  };
+  /** Facteur de saison par article (printemps, été, automne, hiver); absent: 1. */
+  seasonFactor: Record<string, readonly [number, number, number, number]>;
+  ardoise: { factor: number; max: number; time: number };
+  words: { plentyAtMost: number; wantedFrom: number };
+}
 import type { FishDef, FishingRules } from './poissons';
 import type { ClothesContent } from './vetements';
 
@@ -882,10 +907,14 @@ export interface Settings {
   /** D7. */
   tenderness: Tenderness;
   spawn: { point: string };
+  /** 0.12: les plis de Lucie (section 2.4), `null` sans tournée. */
+  mailRound: MailRoundSettings | null;
   economy: {
     startPurse: number;
+    /** La monnaie (0.12): nom, accord et icône, lus par `monnaie.ts`. */
+    currency: Currency;
     bigPurchaseThreshold: number;
-    grocer: { buyRate: number; dailyCap: number; buysAfterFlag: string };
+    grocer: GrocerPricing;
     /**
      * Une fenêtre de commande par semaine, dans l'ordre (la livraison arrive par le train); après
      * la dernière, une fenêtre par semaine (`repeatWeekly`, tour 8), ou aucune (`null`).
@@ -950,7 +979,8 @@ export interface Settings {
     /** « Rester à un point »: rayon (défaut dans `defauts.ts`). */
     stayAt: number;
   };
-  building: { twoPlayersSpeedMultiplier: number };
+  /** `twoPlayersRecipes` (0.12, section 2.5): recettes faites deux fois plus vite à deux devant le même poste. */
+  building: { twoPlayersSpeedMultiplier: number; twoPlayersRecipes: string[] };
   hints: { durationSeconds: number };
   absence: { minutes: number };
   /** Pêche (P1): `null` si `reglages.json` ne la décrit pas. */
@@ -1051,7 +1081,8 @@ export interface AnnonceReward {
 }
 
 export interface ImprovementSettings {
-  queues: Record<ImprovementQueue, { opensFromDay: number }>;
+  /** `quest` (0.12): la file n'ouvre qu'une fois cette quête commencée (la chevrerie avec la trame). */
+  queues: Record<ImprovementQueue, { opensFromDay: number; quest?: string }>;
   /** Versements proposés au tableau (en plus de « le reste »). */
   steps: readonly number[];
   plankDiscount: number;
@@ -1356,6 +1387,8 @@ export interface Content {
   catalogue: CatalogueDef | null;
   /** Tour 10: pièces à bâtir et fenêtres de la maisonnette (`pieces.json`), vides si le fichier manque. */
   home: HomeContent;
+  /** 0.12: le marché du dimanche (`marche.json`), `null` si le fichier manque. */
+  market: MarketSettings | null;
   /** 0.12: vêtements (`vetements.json`) et réglages de la garde-robe (`reglages.json`: `wardrobe`). */
   clothes: ClothesContent;
 }

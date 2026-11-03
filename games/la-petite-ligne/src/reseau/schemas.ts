@@ -27,7 +27,7 @@ const Count = v.pipe(Int, v.minValue(0), v.maxValue(999));
 const QualitySchema = v.picklist(['ordinary', 'fine']);
 const CharacterIdSchema = v.picklist(['p1', 'p2']);
 const MenuSchema = v.nullable(
-  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop', 'wardrobe', 'farm']),
+  v.picklist(['notebook', 'shop', 'catalogue', 'crate', 'workbench', 'stove', 'chest', 'proposal', 'letter', 'salon', 'bakery', 'clothes_shop', 'wardrobe', 'farm', 'stall']),
 );
 const CellSchema = v.strictObject({ cx: Int, cy: Int });
 
@@ -96,6 +96,10 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('crate_take'), ...stack }),
   v.strictObject({ type: v.literal('chest_deposit'), ...stack }),
   v.strictObject({ type: v.literal('chest_take'), ...stack }),
+  v.strictObject({ type: v.literal('stall_deposit'), ...stack }),
+  v.strictObject({ type: v.literal('stall_take'), ...stack }),
+  v.strictObject({ type: v.literal('market_level'), level: v.picklist(['soft', 'fair', 'strong']) }),
+  v.strictObject({ type: v.literal('market_serve'), villager: Id }),
   v.strictObject({ type: v.literal('storage_deposit_family'), family: Id }),
   v.strictObject({ type: v.literal('storage_sort') }),
   v.strictObject({ type: v.literal('room_deposit'), room: Id, item: Id, count: Count }),

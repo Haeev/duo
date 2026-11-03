@@ -33,6 +33,12 @@ import { TOWN, canDrinkChocolate, drinkChocolate, openBakery } from './bourg';
 import { SALON, chairTaken, openSalon, sitAtChair } from './salon';
 import { CLOTHES, openClothesShop } from './vetements';
 import { buildingOpen } from './interieurs';
+import { nearStall, stallPose, stallSetUp } from '../etat/marche';
+import { serveBuyer } from './marche';
+import { MAIL_POINT, deliverMail, mailWaiting, takeMail } from './plis';
+
+/** Cible de l'étal du dimanche (pas forcément un point de la carte: `stallPose`). */
+const STALL_POINT = 'market_stall';
 
 /** Ce sur quoi on peut agir. */
 export type Target =
@@ -72,6 +78,7 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
   [POINT.noticeBoard]: 'catalogue',
   [POINT.coopCrate]: 'crate',
   [POINT.workbench]: 'workbench',
+  [STALL_POINT]: 'stall',
   // 0.12: la basse-cour (état des bêtes, couvée, noms), au poulailler et à la chevrerie.
   [POINT.chickenCoop]: 'farm',
   [POINT.goatShed]: 'farm',
@@ -162,6 +169,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       }
       if (t.point === POINT.henFeeder) return sim.world.hens.length > 0 ? 'feed' : null;
       if (t.point === POINT.groceryCounter) return shopOpen(sim) ? 'open' : null;
+      if (t.point === STALL_POINT) return 'open';
+      if (t.point === MAIL_POINT) return mailWaiting(sim, c) ? 'open' : null;
       if (t.point === POINT.groceryCustomer) return insideShopOpen(sim, c) ? 'open' : null;
       if (t.point === TOWN.table) return canDrinkChocolate(sim, c) ? 'drink' : null;
       if (t.point === TOWN.window) return sim.world.flags.includes(TOWN.bakeryOpen) && !isSheltered(c) ? 'open' : null;
@@ -354,6 +363,12 @@ export function candidates(sim: Sim, c: Character): Target[] {
   for (const t of breedingTargets(sim, c, hen?.id ?? null)) out.push(t);
   const lantern = lanternTargetNear(sim, c);
   if (lantern !== null) out.push({ kind: 'lantern', place: lantern, pos: point(sim, lantern) });
+  // 0.12: l'étal du dimanche, posé sur la place (son point, ou le repli de `marche.json`).
+  const pose = stallSetUp(sim.content, sim.world) ? stallPose(sim.content, sim.map) : null;
+  if (pose !== null && nearStall(sim.content, sim.map, c.pos)) out.push({ kind: 'point', point: STALL_POINT, pos: pose.centre });
+  // 0.12: la sacoche de Lucie sur le banc du quai, tant qu'il y a des plis à prendre.
+  const bag = sim.content.settings.mailRound;
+  if (bag !== null && mailWaiting(sim, c)) out.push({ kind: 'point', point: MAIL_POINT, pos: point(sim, bag.point) });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
@@ -558,7 +573,9 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
   c.facing = Math.atan2(t.pos.y - c.pos.y, t.pos.x - c.pos.x);
   switch (verb) {
     case 'talk':
-      if (t.kind === 'villager') talkTo(sim, c, t.id);
+      // 0.12: un client qui attend à l'étal, et l'on est derrière: on le sert.
+      // Un pli pour lui dans le sac: il le prend (plis de Lucie).
+      if (t.kind === 'villager' && !serveBuyer(sim, c, t.id) && !deliverMail(sim, c, t.id)) talkTo(sim, c, t.id);
       return;
     case 'pickup':
       if (t.kind === 'ground_item') pickUp(sim, c, t.id);
@@ -579,6 +596,7 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       if (t.kind === 'station') openMenu(sim, c, t.menu);
       else if (t.kind === 'point' && t.point === TOWN.window) openBakery(sim, c);
       else if (t.kind === 'point' && t.point === SALON.bench) openSalon(sim, c);
+      else if (t.kind === 'point' && t.point === MAIL_POINT) takeMail(sim, c);
       else if (t.kind === 'point' && t.point === CLOTHES.counter) openClothesShop(sim, c);
       else if (t.kind === 'point') {
         const menu = POINT_MENUS[t.point];

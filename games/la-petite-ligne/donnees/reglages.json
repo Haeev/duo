@@ -37,11 +37,54 @@
     "mist": { "afterRain": 1.0, "base": { "spring": 0.08, "summer": 0.04, "autumn": 0.25, "winter": 0.15 }, "fadeFrom": "09:00", "until": "10:30", "biteWaitFactor": 0.75 }
   },
   "spawn": { "point": "train_stop" },
+  "mailRound": {
+    "enabledFlag": "mail_round_open",
+    "point": "quay_bench",
+    "from": "08:00",
+    "until": "18:00",
+    "earlyBefore": "12:00",
+    "earlyBonus": 3,
+    "noRoundWeekday": "sunday",
+    "counts": [{ "count": 2, "weight": 50 }, { "count": 3, "weight": 35 }, { "count": 4, "weight": 15 }],
+    "parcelShare": 0.3,
+    "pay": { "letter": 6, "parcel": 12 },
+    "items": { "letter": "mail_letter", "parcel": "mail_parcel" },
+    "recipients": ["odette", "basile", "achille", "solange", "jeanne"]
+  },
   "economy": {
     "startPurse": 200,
-    "currency": { "singular": "sou", "plural": "sous" },
+    "currency": { "singular": "aubrin", "plural": "aubrins", "icon": "ui-coin-aubrin" },
     "bigPurchaseThreshold": 100,
-    "grocer": { "buyRate": 0.8, "dailyCap": 300, "buysAfterFlag": "grocer_buys" },
+    "grocer": {
+      "buyRate": 0.8,
+      "dailyCap": 400,
+      "buysAfterFlag": "grocer_buys",
+      "pricesFromDay": 16,
+      "supply": {
+        "floor": 0.6,
+        "slope": 0.4,
+        "dawnDecay": 0.5,
+        "saturation": { "radish": 20, "carrot": 15, "lettuce": 6, "plank": 20, "egg": 12, "milk_can": 8, "fresh_cheese": 6, "blackberry_jam": 6, "elder_jelly": 6 },
+        "categorySaturation": { "forage": 10, "fish": 8 },
+        "defaultSaturation": 10
+      },
+      "seasonFactor": {
+        "radish": [1.0, 0.9, 1.0, 1.3],
+        "lettuce": [1.1, 0.9, 1.0, 1.3],
+        "carrot": [1.1, 1.0, 0.9, 1.2],
+        "egg": [0.9, 1.0, 1.1, 1.3],
+        "blackberry": [1.3, 0.9, 1.2, 1.3],
+        "hazelnut": [1.3, 1.3, 0.9, 1.2],
+        "cep": [1.3, 1.3, 0.9, 1.2],
+        "elderberry": [1.3, 1.3, 0.9, 1.2],
+        "dandelion": [0.9, 1.3, 1.3, 1.3],
+        "wild_garlic": [0.9, 1.3, 1.3, 1.3],
+        "fresh_cheese": [0.9, 1.0, 1.1, 1.3],
+        "milk_can": [0.9, 1.0, 1.1, 1.3]
+      },
+      "ardoise": { "factor": 1.5, "max": 10, "time": "07:00" },
+      "words": { "plentyAtMost": 0.85, "wantedFrom": 1.15 }
+    },
     "catalogue": {
       "windows": [
         { "orderDeadline": { "day": 7, "time": "24:00" }, "delivery": { "day": 8, "time": "10:00" } },
@@ -276,7 +319,7 @@
   "appearance": { "hairStyles": 15, "creationHairStyles": 12, "hairColors": 8 },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
   "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0, "eatTogether": 3.0, "stayAt": 4.0 },
-  "building": { "twoPlayersSpeedMultiplier": 2 },
+  "building": { "twoPlayersSpeedMultiplier": 2, "twoPlayersRecipes": ["cook_blackberry_jam", "cook_elder_jelly", "cook_roasted_hazelnuts", "cook_chanterelle_pan", "cook_fresh_cheese", "craft_crate", "craft_nest_box", "craft_market_stall"] },
   "hints": { "durationSeconds": 6, "oncePerPlayer": true, "maxVisible": 1 },
   "absence": { "tier": "P1", "minutes": 3 },
   "benches": { "slots": [-0.5, 0.5], "seatForward": 0, "standForward": 0.85, "sitRange": 1.4, "villagerReach": 0.8 },

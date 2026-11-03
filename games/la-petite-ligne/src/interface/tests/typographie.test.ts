@@ -30,7 +30,8 @@ describe('typographier', () => {
 
   it('lie les nombres à leur unité et à ce qu’ils comptent', () => {
     expect(typographier('9 h 20')).toBe(`9${NBSP}h${NBSP}20`);
-    expect(typographier('120 sous')).toBe(`120${NBSP}sous`);
+    expect(typographier('120 aubrins')).toBe(`120${NBSP}aubrins`);
+    expect(typographier('1 aubrin')).toBe(`1${NBSP}aubrin`);
     expect(typographier('3 œufs et 12 radis')).toBe(`3${NBSP}œufs et 12${NBSP}radis`);
     expect(typographier('2 lignes sur 4')).toBe(`2${NBSP}lignes sur 4`);
   });

@@ -2,6 +2,7 @@
  * Application des intentions des joueurs. L'hôte les valide toutes (portée,
  * fonds, état): une intention impossible est ignorée ou donne un message.
  */
+import { serveBuyer, setMarketLevel, stallMove } from './marche';
 import { nameAnimal, startBrood } from './poules';
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { Character, CharacterId, Quality } from '../etat/types';
@@ -158,14 +159,18 @@ function craft(sim: Sim, c: Character, recipeId: string): void {
   const recipe = sim.content.recipes[recipeId];
   if (recipe === undefined || !canAct(c, sim) && c.status !== 'menu') return;
   if (!sim.world.unlockedRecipes.includes(recipeId)) return;
-  const near =
+  const nearStation = (who: Character): boolean =>
     recipe.station === 'workbench'
-      ? nearPoint(sim, c, POINT.workbench, sim.content.settings.ranges.talk)
-      : isHome(c) && sim.world.furniture.some((f) => sim.content.items[f.item]?.station === 'stove');
-  if (!near || c.crafting !== null) return;
+      ? nearPoint(sim, who, POINT.workbench, sim.content.settings.ranges.talk)
+      : isHome(who) && sim.world.furniture.some((f) => sim.content.items[f.item]?.station === 'stove');
+  if (!nearStation(c) || c.crafting !== null) return;
   const paid = payMaterials(sim, c, recipe.inputs);
   if (!paid.ok) return;
-  const ticks = secondsToTicks(recipe.seconds * durationMultiplier(sim, c));
+  // 0.12 (section 2.5): à deux devant le même poste, conserves et artisanat vont deux fois plus vite.
+  const b = sim.content.settings.building;
+  const partner = sim.world.characters.find((o) => o.id !== c.id);
+  const together = b.twoPlayersRecipes.includes(recipeId) && partner !== undefined && !partner.absent && nearStation(partner);
+  const ticks = secondsToTicks((recipe.seconds * durationMultiplier(sim, c)) / (together ? b.twoPlayersSpeedMultiplier : 1));
   c.crafting = { recipe: recipeId, endsAt: sim.world.tick + ticks };
   const kind = recipe.station === 'stove' ? 'cook' : recipe.inputs.some((i) => i.item === ITEM.log) ? 'saw' : 'hammer';
   c.action = { kind, since: sim.world.tick, duration: ticks, target: null };
@@ -394,6 +399,16 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
     case 'crate_deposit':
     case 'crate_take':
       crateMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'crate_deposit');
+      return;
+    case 'stall_deposit':
+    case 'stall_take':
+      if (c.status === 'active' || c.status === 'menu') stallMove(sim, c, intent.item, intent.quality, Math.floor(intent.count), intent.type === 'stall_deposit');
+      return;
+    case 'market_level':
+      if (c.status === 'active' || c.status === 'menu') setMarketLevel(sim, c, intent.level);
+      return;
+    case 'market_serve':
+      if (c.status === 'active' || c.status === 'menu') serveBuyer(sim, c, intent.villager);
       return;
     case 'chest_deposit':
     case 'chest_take':

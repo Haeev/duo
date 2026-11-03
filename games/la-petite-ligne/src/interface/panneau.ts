@@ -3,6 +3,7 @@
  * réchaud, coffre): en-tête en bois, corps qui défile, pied avec les
  * touches. Le jeu continue derrière (PA-02).
  */
+import { CURRENCY, groupDigits } from '../donnees/monnaie';
 import type { ReadonlyWorld } from '../etat/types';
 import { purseModel, splitAmount } from './modele';
 import type { KeyInfo, Layer, UiHost } from './composant';
@@ -104,16 +105,17 @@ export abstract class Panel implements Layer {
 
 export function purseBadge(host: UiHost, world: ReadonlyWorld): HTMLSpanElement {
   const { ctx } = host;
-  const unit = splitAmount(ctx.texts.game.ui.hud.purse);
+  const amount = purseModel(world).amount;
+  const unit = splitAmount(ctx.texts.game.ui.hud.purse, amount);
   return el('span', { class: 'lpl-purse', 'aria-label': ctx.texts.extra.hud.purseLabel }, [
-    icon('ui-coin'),
-    el('span', { class: 'lpl-purse__amount', text: String(purseModel(world).amount) }),
+    icon(CURRENCY.icon),
+    el('span', { class: 'lpl-purse__amount', text: groupDigits(amount) }),
     el('span', { class: 'lpl-purse__unit', text: unit.after.trim() }),
   ]);
 }
 
 export function price(host: UiHost, amount: number): HTMLSpanElement {
-  return el('span', { class: 'lpl-product__price' }, [icon('ui-coin'), host.ctx.t(host.ctx.texts.game.ui.shop.price, { price: amount })]);
+  return el('span', { class: 'lpl-product__price' }, [icon(CURRENCY.icon), host.ctx.t(host.ctx.texts.game.ui.shop.price, { price: amount })]);
 }
 
 export function backKeys(host: UiHost, extra: readonly { keys: readonly string[]; text: string }[]): HTMLSpanElement {

@@ -398,6 +398,48 @@ ITEMS.seed_packet_radish = seedPacket('radish');
 ITEMS.seed_packet_lettuce = seedPacket('lettuce');
 ITEMS.seed_packet_carrot = seedPacket('carrot');
 
+// 0.12, lot L-économie (section 2.5 et 2.4): ingrédients, conserves, produits de la chèvre, artisanat,
+// plis de Lucie. Formes simples en attendant les modèles de l'artiste.
+Object.assign(ITEMS, {
+  sugar_packet: (b) => b.box([0.1, 0.14, 0.06], [0, 0, 0], 'paper', { base: true }),
+  jar: (b) => {
+    b.cylinder(0.05, 0.05, 0.1, [0, 0, 0], 'glass', { base: true, segments: 8 });
+    b.cylinder(0.052, 0.052, 0.015, [0, 0.1, 0], 'tin', { base: true, segments: 8 });
+  },
+  blackberry_jam: (b) => {
+    b.cylinder(0.05, 0.05, 0.1, [0, 0, 0], 'glass', { base: true, segments: 8 });
+    b.cylinder(0.045, 0.045, 0.08, [0, 0.005, 0], 'blackberry', { base: true, segments: 8 });
+    b.cylinder(0.055, 0.055, 0.02, [0, 0.1, 0], 'fabric_blue', { base: true, segments: 8 });
+  },
+  hazelnuts_roasted: (b) => {
+    b.cylinder(0.02, 0.06, 0.14, [0, 0, 0], 'paper_dark', { base: true, segments: 6 });
+    b.cylinder(0.055, 0.055, 0.03, [0, 0.13, 0], 'bark', { base: true, segments: 6 });
+  },
+  dish_chanterelle: (b) => {
+    b.cylinder(0.12, 0.1, 0.03, [0, 0, 0], 'iron', { base: true, segments: 10 });
+    b.cylinder(0.1, 0.1, 0.02, [0, 0.025, 0], 'paint_yellow', { base: true, segments: 10 });
+  },
+  milk_can: (b) => {
+    b.cylinder(0.09, 0.1, 0.3, [0, 0, 0], 'tin', { base: true, segments: 10 });
+    b.cylinder(0.04, 0.06, 0.08, [0, 0.3, 0], 'tin', { base: true, segments: 8 });
+  },
+  fresh_cheese: (b) => b.cylinder(0.06, 0.06, 0.05, [0, 0, 0], 'fabric_cream', { base: true, segments: 10 }),
+  nest_box: (b) => {
+    b.box([0.2, 0.26, 0.18], [0, 0, 0], 'wood_new', { base: true });
+    b.box([0.24, 0.03, 0.22], [0, 0.26, 0], 'wood', { base: true });
+    b.cylinder(0.03, 0.03, 0.01, [0, 0.15, 0.095], 'black', { base: true, segments: 8 });
+  },
+  parcel_small: (b) => {
+    b.box([0.3, 0.2, 0.22], [0, 0, 0], 'paper_dark', { base: true });
+    b.box([0.31, 0.02, 0.03], [0, 0.2, 0], 'burlap', { base: true });
+  },
+  market_scale: (b) => {
+    b.box([0.3, 0.04, 0.16], [0, 0, 0], 'iron', { base: true });
+    b.cylinder(0.012, 0.012, 0.22, [0, 0.04, 0], 'brass', { base: true, segments: 6 });
+    for (const x of [-0.12, 0.12]) b.cylinder(0.07, 0.06, 0.02, [x, 0.2, 0], 'brass', { base: true, segments: 10 });
+  },
+} satisfies Record<string, Builder>);
+
 // ---------------------------------------------------------------------------
 // Poissons de la 0.12 (en attendant les modèles de l'artiste): couchés sur le flanc au sol, la
 // tête vers +X, à la longueur moyenne de l'espèce (`lengthCm` de la conception, section 3.1).

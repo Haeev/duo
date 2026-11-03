@@ -92,7 +92,7 @@ export type Intent =
   | { type: 'clothes_buy'; item: string }
   // 0.12: porter un vêtement de sa garde-robe (`null`: ôter le par-dessus ou le chapeau), au coffre ou en cabine
   | { type: 'wear'; slot: ClothingSlot; item: string | null }
-  // Chantiers (tour 9): verser au chantier ouvert (`amount` sous, ou le reste: `null`), apporter des planches à Basile
+  // Chantiers (tour 9): verser au chantier ouvert (`amount` aubrins, ou le reste: `null`), apporter des planches à Basile
   | { type: 'improvement_pay'; improvement: string; amount: number | null }
   | { type: 'improvement_planks'; improvement: string; count: number }
   | { type: 'proposal_answer'; proposal: string; accept: boolean }
@@ -101,6 +101,11 @@ export type Intent =
   | { type: 'crate_take'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_deposit'; item: ItemId; quality: Quality; count: number }
   | { type: 'chest_take'; item: ItemId; quality: Quality; count: number }
+  // 0.12, marché du dimanche: garnir l'étal, reprendre, le prix de tout l'étal, servir un client (aussi par Espace sur lui)
+  | { type: 'stall_deposit'; item: ItemId; quality: Quality; count: number }
+  | { type: 'stall_take'; item: ItemId; quality: Quality; count: number }
+  | { type: 'market_level'; level: 'soft' | 'fair' | 'strong' }
+  | { type: 'market_serve'; villager: string }
   // Tour 10 (section 5): rangement à cases, « Tout déposer » par famille (catégorie d'objet), « Ranger »
   | { type: 'storage_deposit_family'; family: string }
   | { type: 'storage_sort' }

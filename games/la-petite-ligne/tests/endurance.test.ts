@@ -138,7 +138,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   const last = demoLastDay(content);
   expect(w.clock.day).toBe(last);
   expect(w.orderHistory, 'une commande payée par train').toHaveLength(content.settings.order.trains.length);
-  expect(w.orderHistory[0], 'commande 1 complète, 540 sous').toMatchObject({ complete: true, amount: 540 });
+  expect(w.orderHistory[0], 'commande 1 complète, 540 aubrins').toMatchObject({ complete: true, amount: 540 });
   w.orderHistory.forEach((o, i) => {
     expect(o.complete, `commande ${i + 1} complète`).toBe(true);
     expect(o.amount, `commande ${i + 1} payée en entier`).toBeGreaterThanOrEqual(fullOrderAmount(content, i));

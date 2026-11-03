@@ -325,6 +325,8 @@ export function soundsForEvent(
       break;
     }
     case 'sold':
+    case 'market_sale':
+    case 'mail_delivered':
       emit.ui('coins', event.by);
       break;
     case 'deposited':
@@ -439,6 +441,13 @@ export function soundsForEvent(
     case 'midnight':
     case 'night':
     case 'letter':
+    case 'ardoise_posted':
+    case 'market_opened':
+    case 'market_buyer_arrived':
+    case 'market_refused':
+    case 'market_closed':
+    case 'mail_ready':
+    case 'mail_returned':
     case 'save_point':
     case 'session_finish':
     case 'absence':
@@ -695,7 +704,7 @@ export class StateWatcher {
       for (const n of me.notifications) {
         if (n.id > this.lastNotification) {
           newest = Math.max(newest, n.id);
-          // Un refus (« Déjà pris », sac plein, « Il manque 40 sous ») n'a pas le carillon des bonnes nouvelles (revue S2):
+          // Un refus (« Déjà pris », sac plein, « Il manque 40 aubrins ») n'a pas le carillon des bonnes nouvelles (revue S2):
           // il a son son à lui, feutré, 600 ms au moins entre deux (`minIntervalMs` de `sons.json`).
           if (isRefusal(n, refusal)) refused = true;
           else if (NOTIFY_KINDS.has(n.kind)) notify = true;

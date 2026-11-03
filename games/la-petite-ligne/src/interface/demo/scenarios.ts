@@ -388,7 +388,7 @@ function tour9(sim: Sim, name: string, me: CharacterId, other: CharacterId): (()
       atBoard(sim, me);
       return undefined;
     case 'tableau-chantiers-accord':
-      // p1 propose de verser le reste (100 sous, l'accord de l'autre); chacun devant le tableau.
+      // p1 propose de verser le reste (100 aubrins, l'accord de l'autre); chacun devant le tableau.
       playUntil(sim, (s) => free(s) && at(s, 25, 13 * HOUR));
       sim.world.purse = Math.max(sim.world.purse, 320);
       atBoard(sim, 'p1');

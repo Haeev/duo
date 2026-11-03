@@ -4,6 +4,7 @@
  * barre d'aménagement, commandes de la caméra et du carnet à la souris.
  * Le DOM n'est touché que si une valeur affichée change.
  */
+import { CURRENCY, groupDigits } from '../donnees/monnaie';
 import { animalCardModel } from './modele-elevage';
 import { isHome } from '../etat/interieurs';
 import type { GameNotification, ReadonlyWorld } from '../etat/types';
@@ -88,6 +89,7 @@ export class Hud {
   private watchSig = '';
 
   private readonly purseAmount: HTMLSpanElement;
+  private readonly purseUnit: HTMLSpanElement;
   private readonly purseNote: HTMLSpanElement;
   private readonly purseDelta: HTMLSpanElement;
   private lastPurse: number | null = null;
@@ -200,13 +202,14 @@ export class Hud {
 
     const unit = splitAmount(ctx.texts.game.ui.hud.purse);
     this.purseAmount = el('span', { class: 'lpl-purse__amount' });
+    this.purseUnit = el('span', { class: 'lpl-purse__unit', text: unit.after.trim() });
     this.purseNote = el('span', { class: 'lpl-purse__note', hidden: true });
     this.purseDelta = el('span', { class: 'lpl-purse__delta', hidden: true });
     const purse = el('div', { class: 'lpl-purse', 'aria-label': x.hud.purseLabel }, [
-      icon('ui-coin'),
+      icon(CURRENCY.icon),
       unit.before.trim() === '' ? null : el('span', { class: 'lpl-purse__unit', text: unit.before.trim() }),
       this.purseAmount,
-      el('span', { class: 'lpl-purse__unit', text: unit.after.trim() }),
+      this.purseUnit,
       this.purseNote,
       this.purseDelta,
     ]);
@@ -443,7 +446,8 @@ export class Hud {
 
     // Bourse.
     const purse = purseModel(world);
-    setText(this.purseAmount, String(purse.amount));
+    setText(this.purseAmount, groupDigits(purse.amount));
+    setText(this.purseUnit, splitAmount(ctx.texts.game.ui.hud.purse, purse.amount).after.trim());
     setHidden(this.purseNote, purse.reserved === 0);
     setText(this.purseNote, ctx.t(ctx.texts.extra.hud.reserved, { amount: purse.reserved }));
     if (this.lastPurse !== null && purse.amount > this.lastPurse) {

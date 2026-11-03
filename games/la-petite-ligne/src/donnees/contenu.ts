@@ -20,6 +20,9 @@ import {
   DEFAULT_WEATHER,
 } from './defauts';
 import { ContentError, Reader } from './lecteur';
+import { agreeMoney } from './monnaie';
+import { parseMarket } from './marche';
+import { parseMailRound } from './plis';
 import {
   EMPTY_HOME,
   parseAppearance,
@@ -109,6 +112,8 @@ export interface RawContentFiles {
   catalogue?: unknown;
   /** Tour 10: pièces à bâtir et fenêtres (`pieces.json`); absent: ni pièce ni fenêtre. */
   pieces?: unknown;
+  /** 0.12: le marché du dimanche (`marche.json`); absent: pas de marché. */
+  marche?: unknown;
   /** 0.12: vêtements de la garde-robe (`vetements.json`); absent: aucun vêtement (essais seulement). */
   vetements?: unknown;
 }
@@ -2023,6 +2028,40 @@ function parseImprovementSettings(r: Reader | null): Settings['improvements'] {
   };
 }
 
+function numberRecord(r: Reader, min: number): Record<string, number> {
+  return Object.fromEntries(r.entries().map(([k, x]) => [k, x.integer(min)]));
+}
+
+/** Comptoir d'Odette (0.12, section 2.2). */
+function parseGrocerPricing(grocer: Reader): Settings['economy']['grocer'] {
+  const supply = grocer.at('supply');
+  const ardoise = grocer.at('ardoise');
+  const words = grocer.at('words');
+  const seasonFactor: Settings['economy']['grocer']['seasonFactor'] = {};
+  for (const [item, r] of grocer.at('seasonFactor').entries()) {
+    const f = r.items().map((x) => x.number());
+    if (f.length !== 4) r.fail('quatre facteurs attendus (printemps, été, automne, hiver)');
+    seasonFactor[item] = [f[0] ?? 1, f[1] ?? 1, f[2] ?? 1, f[3] ?? 1];
+  }
+  return {
+    buyRate: grocer.at('buyRate').number(),
+    dailyCap: grocer.at('dailyCap').integer(0),
+    buysAfterFlag: grocer.at('buysAfterFlag').string(),
+    pricesFromDay: grocer.at('pricesFromDay').integer(1),
+    supply: {
+      floor: supply.at('floor').number(),
+      slope: supply.at('slope').number(),
+      dawnDecay: supply.at('dawnDecay').number(),
+      saturation: numberRecord(supply.at('saturation'), 1),
+      categorySaturation: numberRecord(supply.at('categorySaturation'), 1),
+      defaultSaturation: supply.at('defaultSaturation').integer(1),
+    },
+    seasonFactor,
+    ardoise: { factor: ardoise.at('factor').number(), max: ardoise.at('max').integer(0), time: ardoise.at('time').time() },
+    words: { plentyAtMost: words.at('plentyAtMost').number(), wantedFrom: words.at('wantedFrom').number() },
+  };
+}
+
 function parseSettings(r: Reader): Settings {
   const clock = r.at('clock');
   const economy = r.at('economy');
@@ -2085,14 +2124,16 @@ function parseSettings(r: Reader): Settings {
     continuation: { mode: continuation === null ? 'same_save' : continuation.at('mode').oneOf(['same_save', 'new_game_per_stage'] as const) },
     tenderness: tenderness === null ? 'gentle' : tenderness.oneOf(TENDERNESS),
     spawn: { point: r.at('spawn').at('point').string() },
+    mailRound: parseMailRound(r.opt('mailRound')),
     economy: {
       startPurse: economy.at('startPurse').integer(0),
-      bigPurchaseThreshold: economy.at('bigPurchaseThreshold').integer(0),
-      grocer: {
-        buyRate: grocer.at('buyRate').number(),
-        dailyCap: grocer.at('dailyCap').integer(0),
-        buysAfterFlag: grocer.at('buysAfterFlag').string(),
+      currency: {
+        singular: economy.at('currency').at('singular').string(),
+        plural: economy.at('currency').at('plural').string(),
+        icon: economy.at('currency').at('icon').string(),
       },
+      bigPurchaseThreshold: economy.at('bigPurchaseThreshold').integer(0),
+      grocer: parseGrocerPricing(grocer),
       catalogue: { windows: catalogueWindows(catalogue, dayTime), repeatWeekly: parseRepeatWeekly(catalogue) },
     },
     order: {
@@ -2163,7 +2204,10 @@ function parseSettings(r: Reader): Settings {
       eatTogether: optNumber(ranges, 'eatTogether', DEFAULT_RANGES.eatTogether),
       stayAt: optNumber(ranges, 'stayAt', DEFAULT_RANGES.stayAt),
     },
-    building: { twoPlayersSpeedMultiplier: r.at('building').at('twoPlayersSpeedMultiplier').number() },
+    building: {
+      twoPlayersSpeedMultiplier: r.at('building').at('twoPlayersSpeedMultiplier').number(),
+      twoPlayersRecipes: r.at('building').opt('twoPlayersRecipes')?.stringList() ?? [],
+    },
     hints: { durationSeconds: r.at('hints').at('durationSeconds').number() },
     absence: { minutes: r.at('absence').at('minutes').number() },
     carry: parseCarry(r.opt('carry')),
@@ -2398,7 +2442,7 @@ export function rawText(texts: Texts, section: string, id: string, key: string):
 
 /** Remplace les `{clé}` connues (les autres restent, pour l'interface). */
 function fill(text: string, vars: Record<string, string>): string {
-  return text.replace(/\{(\w+)\}/g, (all, key: string) => vars[key] ?? all);
+  return agreeMoney(text.replace(/\{(\w+)\}/g, (all, key: string) => vars[key] ?? all));
 }
 
 /** Identifiant de la quête d'une annonce (une par variante quand il y en a plusieurs). */
@@ -2614,6 +2658,7 @@ export function loadContent(files: RawContentFiles): Content {
     improvements: files.chantiers === undefined ? [] : parseImprovements(root('chantiers.json', files.chantiers)),
     catalogue: files.catalogue === undefined ? null : parseCatalogue(root('catalogue.json', files.catalogue)),
     home: files.pieces === undefined ? EMPTY_HOME : parseHome(root('pieces.json', files.pieces)),
+    market: files.marche === undefined ? null : parseMarket(root('marche.json', files.marche)),
     clothes:
       files.vetements === undefined
         ? EMPTY_CLOTHES
@@ -2622,6 +2667,7 @@ export function loadContent(files: RawContentFiles): Content {
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
+  checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.
   const scale = content.settings.fishing?.rules.priceScale ?? 1;
   if (scale !== 1) {
@@ -2630,4 +2676,16 @@ export function loadContent(files: RawContentFiles): Content {
     }
   }
   return content;
+}
+
+/** Le marché ne cite que des habitants et des objets vendables du contenu. */
+function checkMarket(content: Content): void {
+  const m = content.market;
+  if (m === null) return;
+  for (const b of m.buyers) {
+    if (!content.villagers.some((v) => v.id === b.villager)) throw new ContentError(`marche.json: habitant inconnu « ${b.villager} »`);
+    for (const item of [...b.wants, b.likes]) {
+      if (typeof content.items[item]?.sellPrice !== 'number') throw new ContentError(`marche.json: « ${item} » n'est pas un objet vendable`);
+    }
+  }
 }

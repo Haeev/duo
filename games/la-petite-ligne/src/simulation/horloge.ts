@@ -20,6 +20,9 @@ import { morningEggs } from './poules';
 import { morningGoats } from './chevres';
 import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
+import { grocerDawn, postArdoise } from './epicerie';
+import { marketClock } from './marche';
+import { mailClock } from './plis';
 import { morningMoments } from './moments';
 import { morningWeather } from './meteo';
 import { morningForage, morningTrees } from './lisiere';
@@ -122,6 +125,9 @@ function timeTriggers(sim: Sim, before: number, after: number): void {
   trainClock(sim, before, after);
   catalogueClock(sim, before, after);
   deliverScheduledLetters(sim);
+  postArdoise(sim);
+  marketClock(sim, before, after);
+  mailClock(sim, before, after);
   for (const hint of sim.content.hints) {
     if (hint.trigger.on === 'time_reached' && crossed(before, after, hint.trigger.time)) {
       for (const c of sim.world.characters) {
@@ -187,6 +193,7 @@ export function morning(sim: Sim): void {
   morningGoats(sim);
   reopenCrate(sim);
   world.grocerSoldToday = 0;
+  grocerDawn(sim);
   for (const c of world.characters) {
     const bed = world.furniture.find((f) => f.id === c.bedId);
     const at = bed === undefined ? houseSpawn(sim) : { x: bed.cell.cx + 0.5, y: bed.cell.cy + 0.5 };

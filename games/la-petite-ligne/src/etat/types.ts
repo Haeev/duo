@@ -24,6 +24,8 @@
  * - Tout l'état est du JSON pur (ni Map, ni Set, ni classe): il se sauvegarde
  *   et se transmet tel quel.
  */
+import type { MarketLevel } from '../donnees/marche';
+import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
 import type { BuildingId } from './carte';
@@ -133,7 +135,7 @@ export interface WorldState {
    */
   breeding: BreedingState;
   train: TrainState;
-  /** Bourse commune, en sous, jamais négative. */
+  /** Bourse commune, en aubrins, jamais négative. */
   purse: number;
   /** Coffre de la maisonnette (cellier commun). */
   cellar: ItemStack[];
@@ -149,6 +151,16 @@ export interface WorldState {
   heavyDeliveries: ItemId[];
   /** Ventes du jour à l'épicerie (plafond quotidien). */
   grocerSoldToday: number;
+  /** 0.12 (section 2.2): unités vendues à Odette par article, oubliées de moitié à chaque aube (l'offre). */
+  grocerSupply: Record<ItemId, number>;
+  /** 0.12: l'ardoise du jour d'Odette (article à prix et demi, `sold` unités déjà vendues à ce prix), ou `null`. */
+  ardoise: { day: number; item: ItemId; sold: number } | null;
+  /** 0.12: articles vendables que le duo a déjà eus (ardoise, listes du marché: jamais un produit jamais vu). */
+  goodsSeen: ItemId[];
+  /** 0.12 (section 2.3): l'étal du dimanche (ce qu'il porte, son prix, les clients du jour), `null` avant la quête. */
+  market: MarketState | null;
+  /** 0.12 (section 2.4): la sacoche de Lucie du jour, `null` hors tournée. */
+  mail: MailState | null;
   proposals: Proposal[];
   quests: QuestState[];
   letters: Letter[];
@@ -290,7 +302,7 @@ export interface BoardAnnonce {
   posted: number;
   /** Échéance: elle se retire à cette heure si elle n'est pas faite. */
   deadline: { day: number; time: number };
-  /** Récompense en sous (section 1.4), fixée à l'affiche. */
+  /** Récompense en aubrins (section 1.4), fixée à l'affiche. */
   reward: number;
   state: 'open' | 'done' | 'expired';
   /** Qui l'a remise (dernier don ou scène à deux: `null`). */
@@ -571,6 +583,8 @@ export type MenuKind =
   | 'salon'
   /** Le guichet du fournil d'Achille (section 1.5): pain, pain chaud, brioche. */
   | 'bakery'
+  /** 0.12: l'étal du dimanche (garnir, choisir le prix). */
+  | 'stall'
   /** 0.12: la boutique de vêtements, au comptoir de la mercerie de Solange (essayer, acheter, se changer en cabine). */
   | 'clothes_shop'
   /** 0.12: se changer chez soi, au coffre (vêtements de sa garde-robe). */
@@ -1186,7 +1200,7 @@ export interface Proposal {
 }
 
 export interface PurchaseRequest {
-  /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en sous. */
+  /** `improvement` (tour 9): un versement à un chantier; `item` est le chantier, `count` la somme en aubrins. */
   source: 'grocery' | 'catalogue' | 'haberdashery' | 'improvement';
   item: ItemId;
   count: number;
@@ -1279,6 +1293,48 @@ export interface Letter {
 }
 
 export type NotificationKind = 'hint' | 'message' | 'quest' | 'letter' | 'proposal' | 'envie';
+
+/** Un client du marché du dimanche (section 2.3). */
+export interface MarketBuyer {
+  villager: string;
+  /** Minute de jeu de son arrivée (ou de son retour, après un premier départ). */
+  at: number;
+  list: { item: ItemId; count: number }[];
+  /** `coming`: pas encore là; `walking`: en route vers sa place; `waiting`: devant l'étal; `served`, `gone`: fini. */
+  status: 'coming' | 'walking' | 'waiting' | 'served' | 'gone';
+  /** Sa place dans la file (0 ou 1), quand il y est ou s'y rend. */
+  spot: number | null;
+  /** Minute du début de son attente devant l'étal. */
+  since: number;
+  /** Déjà reparti une fois (« Je repasse tout à l'heure »). */
+  returned: boolean;
+  /** Qui l'a servi, et à quelle minute (« servis à deux », compteur `market_served_together`). */
+  servedBy?: CharacterId;
+  servedAt?: number;
+}
+
+/** Un pli de la sacoche de Lucie: la sorte, le destinataire, pris au banc, livré. */
+export interface MailPli {
+  kind: MailKind;
+  to: string;
+  taken: boolean;
+  delivered: boolean;
+}
+
+export interface MailState {
+  day: number;
+  items: MailPli[];
+  /** Plis repris par Firmin à 18 h: ils reviennent dans la sacoche de la prochaine tournée (rien n'est perdu). */
+  carryOver: number;
+}
+
+export interface MarketState {
+  /** Dernier dimanche ouvert (les clients sont ceux de ce jour). */
+  day: number;
+  level: MarketLevel;
+  stall: ItemStack[];
+  buyers: MarketBuyer[];
+}
 
 export interface GameNotification {
   /** Identifiant unique (ordre d'arrivée). */
@@ -1374,6 +1430,18 @@ export type WorldEvent =
   | { type: 'bag_full'; by: CharacterId }
   | { type: 'bought'; by: CharacterId; item: ItemId; count: number; price: number }
   | { type: 'sold'; by: CharacterId; item: ItemId; count: number; price: number }
+  /** 0.12: l'ardoise d'Odette change (7 h). */
+  | { type: 'ardoise_posted'; item: ItemId }
+  /** 0.12, marché du dimanche: l'étal s'ouvre, un client arrive, une vente, un refus, l'étal se range. */
+  | { type: 'market_opened' }
+  | { type: 'market_buyer_arrived'; villager: string }
+  | { type: 'market_sale'; by: CharacterId; villager: string; items: { item: ItemId; count: number }[]; amount: number }
+  | { type: 'market_refused'; by: CharacterId; villager: string }
+  | { type: 'market_closed' }
+  /** 0.12, plis de Lucie: la sacoche est posée, un pli livré, Firmin reprend le reste à 18 h. */
+  | { type: 'mail_ready'; count: number }
+  | { type: 'mail_delivered'; by: CharacterId; villager: string; amount: number }
+  | { type: 'mail_returned' }
   | { type: 'deposited'; by: CharacterId; item: ItemId; count: number }
   | { type: 'money'; amount: number }
   | { type: 'order_paid'; amount: number; linesDone: number }

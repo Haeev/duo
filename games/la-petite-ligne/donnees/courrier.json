@@ -6,7 +6,7 @@
       "from": "coop",
       "title": "Bienvenue à la Halte d'Aubrune",
       "delivery": { "byEffect": true },
-      "text": "Bonjour à la nouvelle équipe de la Halte d'Aubrune ! La coopérative de la ligne vous souhaite la bienvenue. Voici {startPurse} sous pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: {order}. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine !"
+      "text": "Bonjour à la nouvelle équipe de la Halte d'Aubrune ! La coopérative de la ligne vous souhaite la bienvenue. Voici {startPurse} aubrins pour vos premiers pas, et notre première commande, à déposer dans la caisse du quai avant le départ du train, samedi prochain à 16 h: {order}. Ce que vous commandez au catalogue avant vendredi minuit arrive par le train. Bonne semaine !"
     },
     {
       "id": "basile_workbench",
@@ -28,8 +28,8 @@
       "title": "La commande est partie",
       "delivery": { "byEffect": true },
       "variants": [
-        { "when": [{ "type": "order_complete", "day": 8 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! Les radis d'Aubrune ont fait sensation à la ville." },
-        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci, et à samedi prochain !" }
+        { "when": [{ "type": "order_complete", "day": 8 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} aubrins. Merci ! Les radis d'Aubrune ont fait sensation à la ville." },
+        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} aubrins. Merci, et à samedi prochain !" }
       ]
     },
     {
@@ -100,8 +100,8 @@
       "title": "La deuxième commande est partie",
       "delivery": { "byEffect": true },
       "variants": [
-        { "when": [{ "type": "order_complete", "day": 15 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Les omelettes d'Aubrune sont arrivées encore tièdes. Merci, et à bientôt pour les Vergers !" },
-        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} sous. Merci ! La ligne vous doit déjà beaucoup." }
+        { "when": [{ "type": "order_complete", "day": 15 }], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} aubrins. Les omelettes d'Aubrune sont arrivées encore tièdes. Merci, et à bientôt pour les Vergers !" },
+        { "when": [], "text": "La coopérative a reçu {linesDone} lignes sur {linesTotal}: {amount} aubrins. Merci ! La ligne vous doit déjà beaucoup." }
       ]
     },
     {
@@ -118,21 +118,22 @@
       "delivery": { "byEffect": true, "instance": "train" },
       "variantsNoRepeat": true,
       "variants": [
-        { "when": [{ "type": "order_complete" }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} sous. Tout y était. Merci !" },
-        { "when": [{ "type": "order_complete" }], "text": "Commande complète: {amount} sous. Le chef de train a sifflé deux fois, c'est bon signe." },
-        { "when": [{ "type": "order_complete" }], "text": "Rien ne manquait: {amount} sous pour {linesTotal} lignes. La ville vous dit merci." },
-        { "when": [{ "type": "order_complete" }], "text": "Tout est arrivé en bon état: {amount} sous. À samedi !" },
-        { "when": [{ "type": "order_complete" }], "text": "Les cuisines de la ville ont tout pris: {amount} sous. Merci !" },
-        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} sous. Le reste viendra une autre fois, rien ne presse." },
-        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} sous pour {linesDoneText} sur {linesTotal}. Le train repart quand même le cœur léger." },
-        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "Merci pour ce qui était là: {amount} sous. La semaine prochaine sera la bonne." },
-        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} sous pour {linesDoneText} sur {linesTotal}. La coopérative garde confiance." }
+        { "when": [{ "type": "order_complete" }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} aubrins. Tout y était. Merci !" },
+        { "when": [{ "type": "order_complete" }], "text": "Commande complète: {amount} aubrins. Le chef de train a sifflé deux fois, c'est bon signe." },
+        { "when": [{ "type": "order_complete" }], "text": "Rien ne manquait: {amount} aubrins pour {linesTotal} lignes. La ville vous dit merci." },
+        { "when": [{ "type": "order_complete" }], "text": "Tout est arrivé en bon état: {amount} aubrins. À samedi !" },
+        { "when": [{ "type": "order_complete" }], "text": "Les cuisines de la ville ont tout pris: {amount} aubrins. Merci !" },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "La coopérative a reçu {linesDoneText} sur {linesTotal}: {amount} aubrins. Le reste viendra une autre fois, rien ne presse." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} aubrins pour {linesDoneText} sur {linesTotal}. Le train repart quand même le cœur léger." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "Merci pour ce qui était là: {amount} aubrins. La semaine prochaine sera la bonne." },
+        { "when": [{ "type": "not", "condition": { "type": "order_complete" } }], "text": "{amount} aubrins pour {linesDoneText} sur {linesTotal}. La coopérative garde confiance." }
       ]
     },
     {"id": "basile_rooms", "from": "basile", "title": "Deux plans sur l'établi", "delivery": {"day": 23, "time": "06:00"}, "text": "Votre maisonnette est petite pour deux, ça se voit depuis la voie. J'ai tiré deux plans: un cellier contre le pignon ouest, une chambre derrière, côté bois. Choisissez par lequel commencer. Je fournis la charpente, vous apportez les planches et les bras. B."},
     {"id": "solange_note", "from": "solange", "title": "Un mot de la mercerie", "delivery": {"byEffect": true}, "text": "Passez au salon, rue Haute, à l'angle. La première coupe est pour moi: c'est comme ça qu'on se présente, chez nous. Jeanne m'a tout dit de vous, je veux vérifier. Solange Mérigot (qui garde Jeanne pendant la tournée de Lucie)."},
     {"id": "odette_market_letter", "from": "odette", "title": "Le marché du dimanche", "delivery": {"byEffect": true}, "text": "Le dimanche, autrefois, la place sentait la fraise et le pain chaud. Il y avait des tréteaux partout. Moi, je ne peux pas quitter ma boutique. Mais vous, avec votre potager... Passez me voir. O."},
-    {"id": "firmin_goat_letter", "from": "firmin", "title": "Une chèvre pour la maisonnette", "delivery": {"byEffect": true}, "text": "Ta maisonnette avait une chèvre, du temps de l'ancien garde-barrière. Elle broutait le talus et ne passait jamais la voie: corde courte, disait-il. Une ferme des Combes en a une à placer. F."}
+    {"id": "firmin_goat_letter", "from": "firmin", "title": "Une chèvre pour la maisonnette", "delivery": {"byEffect": true}, "text": "Ta maisonnette avait une chèvre, du temps de l'ancien garde-barrière. Elle broutait le talus et ne passait jamais la voie: corde courte, disait-il. Une ferme des Combes en a une à placer. F."},
+    {"id": "firmin_aubrin", "from": "firmin", "title": "Le nom des pièces", "delivery": {"day": 16, "time": "06:00"}, "text": "La coopérative a enfin donné un nom à ses pièces: l'aubrin, comme la rivière. Rien ne change, un sou d'hier vaut un aubrin d'aujourd'hui. Odette a déjà repeint ses étiquettes; Basile dit que ça ne fera pas pousser les radis. F."}
   ],
 
   "senders": [
