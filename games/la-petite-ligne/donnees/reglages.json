@@ -328,7 +328,7 @@
   "appearance": { "hairStyles": 15, "creationHairStyles": 12, "hairColors": 8 },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },
   "ranges": { "action": 1.5, "talk": 2.5, "gesture": 2.0, "together": 15.0, "witness": 15.0, "eatTogether": 3.0, "stayAt": 4.0 },
-  "building": { "twoPlayersSpeedMultiplier": 2, "twoPlayersRecipes": ["cook_blackberry_jam", "cook_elder_jelly", "cook_roasted_hazelnuts", "cook_chanterelle_pan", "cook_fresh_cheese", "craft_crate", "craft_nest_box", "craft_market_stall"] },
+  "building": { "twoPlayersSpeedMultiplier": 2, "twoPlayersRecipes": ["cook_omelette", "cook_crunchy_radishes", "cook_vegetable_soup", "cook_blackberry_jam", "cook_elder_jelly", "cook_roasted_hazelnuts", "cook_chanterelle_pan", "cook_fresh_cheese", "craft_crate", "craft_nest_box", "craft_market_stall"] },
   "hints": { "durationSeconds": 6, "oncePerPlayer": true, "maxVisible": 1 },
   "absence": { "tier": "P1", "minutes": 3 },
   "benches": { "slots": [-0.5, 0.5], "seatForward": 0, "standForward": 0.85, "sitRange": 1.4, "villagerReach": 0.8 },
