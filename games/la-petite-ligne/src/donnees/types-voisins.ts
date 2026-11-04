@@ -85,8 +85,40 @@ export interface HabitSettings {
   knownInEarlierSaves: Record<string, string[]>;
 }
 
-/** Réglages des liens (`reglages.json`, `bonds`): ici, seulement le départ d'une partie reprise. */
+/** Réglages des liens (`reglages.json`, `bonds`, conception `v0-13-habitants.md`, section 6). */
 export interface BondSettings {
+  /** Lien de départ d'une partie reprise d'une version antérieure, par quête finie avec l'habitant. */
   earlierSaveStartPerQuest: number;
   earlierSaveStartMax: number;
+  /** Seuils des six niveaux (0 « De vue » à 5 « Comme la famille »), croissants, le premier à 0. */
+  levels: number[];
+  /** Plafond du lien (le seuil du dernier niveau). */
+  max: number;
+  gains: BondGains;
+  /** Être là à son habitude d'anniversaire: à moins de `distance` m pendant `seconds` s de jeu. */
+  birthdayPresence: { distance: number; seconds: number };
+  /** Sortes d'objets qui ne s'offrent pas (outils, objets de quête, charges portées). */
+  giftExcluded: string[];
+}
+
+/** Gains de lien (section 6.2); aucun n'est négatif. */
+export interface BondGains {
+  /** Première conversation du jour, par joueur. */
+  talk: number;
+  /** Cadeau, selon le goût (un cadeau qu'il n'aime pas ne donne rien et revient au sac). */
+  gift: { loves: number; likes: number; neutral: number };
+  /** Facteur du gain d'un cadeau le jour de son anniversaire. */
+  birthdayGiftFactor: number;
+  /** « Bon anniversaire » (choix de dialogue, une fois par joueur). */
+  birthdayWish: number;
+  /** Être là à son anniversaire (une fois par an, pour le duo). */
+  birthdayPresence: number;
+  /** Quête finie dont il est le donneur, sans `add_bond` pour lui dans ses effets. */
+  quest: number;
+  /** Étape de son histoire (quête `story`), sans `add_bond` pour lui dans ses effets. */
+  story: number;
+  /** Annonce du tableau remplie pour lui. */
+  annonce: number;
+  /** Toutes ses habitudes connues (une fois). */
+  allHabits: number;
 }

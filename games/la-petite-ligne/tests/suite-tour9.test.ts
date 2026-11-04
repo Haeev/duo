@@ -177,12 +177,15 @@ describe('le tableau des annonces (T9-01 à T9-05)', () => {
     p2.pos = { ...odette.pos };
     // (Le premier pas a payé la commande échue du jour 29: le monde a été avancé à la main.)
     const purse = w.purse;
+    const bond = w.bonds.odette ?? 0;
     step(sim, { controls: {}, intents: [{ by: 'p2', intent: { type: 'give', to: 'odette', item: 'radish', quality: 'ordinary', count: 6 } }] });
     expect(w.board.current?.state, JSON.stringify({ q: w.quests.find((q) => q.id === a.quest), c: [w.counters.duo['given:odette:hazelnut'], w.counters.duo['given:odette:radish']], v: odette, bags: [countInBag(p1, 'hazelnut'), countInBag(p2, 'radish')] })).toBe('done');
     expect(w.board.current?.by).toBe('p2');
     expect(sim.events).toContainEqual({ type: 'annonce_done', gabarit: 'odette_preserves', by: 'p2', amount: 125 });
     expect(sim.events).toContainEqual({ type: 'money', amount: 125 });
     expect(w.purse).toBe(purse + 125);
+    // 0.13 (lot H2, section 6.2): une annonce remplie pour elle, +50 au lien (et rien de plus pour sa quête).
+    expect(w.bonds.odette).toBe(bond + content.settings.bonds.gains.annonce);
     expect(w.characters.every((c) => c.heartToday.gesture)).toBe(true);
     expect(countInStacks(w.cellar, 'elder_jelly')).toBe(1);
     expect(w.quests.some((q) => q.id === a.quest)).toBe(false);

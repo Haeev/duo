@@ -28,7 +28,7 @@ import type { MarketLevel } from '../donnees/marche';
 import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
-import type { HabitSource, VillageWorldFields } from './types-voisins';
+import type { HabitSource, TasteLevel, VillageWorldFields } from './types-voisins';
 import type { BuildingId } from './carte';
 import type { FishingState, FishRarity } from './peche';
 
@@ -1598,3 +1598,16 @@ export type WorldEvent =
   | { type: 'sign_read'; by: CharacterId; sign: PointId }
   /** Un habitant dit quelque chose en passant (annonce de son habitude, section 7.3): bulle au-dessus de lui. */
   | { type: 'villager_remark'; villager: VillagerId; to: CharacterId; text: string }
+  // 0.13 (lot H2): amitié et cadeaux (sons du lot H8: `bond-chime`, `bond-level`, `gift-happy`, `gift-polite`, `birthday-chime`)
+  /** Un cadeau offert depuis le sac: son goût, le gain; `returned`: il ne l'aime pas, l'objet reste au sac. */
+  | { type: 'gift_offered'; by: CharacterId; villager: VillagerId; item: ItemId; taste: TasteLevel; gain: number; returned: boolean; birthday: boolean }
+  /** Le lien d'un habitant grandit (la lanterne frémit chez les deux); `by`: qui l'a fait, ou personne. */
+  | { type: 'bond_gain'; villager: VillagerId; amount: number; bond: number; by: CharacterId | null }
+  /** Un niveau d'amitié passé (une lanterne s'allume). */
+  | { type: 'bond_level'; villager: VillagerId; level: number }
+  /** Un goût écrit au carnet (au premier cadeau de cet objet, ou par une rumeur). */
+  | { type: 'taste_found'; villager: VillagerId; item: ItemId; taste: TasteLevel; by: CharacterId | null }
+  /** « Bon anniversaire ! » souhaité par ce joueur. */
+  | { type: 'birthday_wished'; by: CharacterId; villager: VillagerId }
+  /** Le duo est venu à son anniversaire (à son habitude d'anniversaire, assez longtemps). */
+  | { type: 'birthday_attended'; villager: VillagerId }

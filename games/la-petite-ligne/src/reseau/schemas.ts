@@ -5,7 +5,8 @@
  */
 import * as v from 'valibot';
 import type { ControlFrame, Intent } from '../etat/actions';
-import type { WorldEvent, WorldState } from '../etat/types';
+import type { WrittenWorld } from '../etat/habitants-ecrits';
+import type { WorldEvent } from '../etat/types';
 
 /** Canaux (0 à 15), les mêmes chez les deux. */
 export const CHANNEL = {
@@ -109,6 +110,7 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('craft'), recipe: Id }),
   v.strictObject({ type: v.literal('eat'), item: Id }),
   v.strictObject({ type: v.literal('give'), to: Id, ...stack }),
+  v.strictObject({ type: v.literal('gift'), villager: Id, item: Id }),
   v.strictObject({ type: v.literal('read_letter'), letter: Id }),
   v.strictObject({ type: v.literal('start_day') }),
   v.strictObject({ type: v.literal('get_up') }),
@@ -147,7 +149,7 @@ export type FastSnapshot = v.InferOutput<typeof FastSnapshotSchema>;
  * L'état complet vient de l'hôte, qui fait autorité: on contrôle sa forme
  * générale (de quoi éviter un plantage sur un message abîmé), pas chaque champ.
  */
-function looksLikeWorld(value: unknown): value is WorldState {
+function looksLikeWorld(value: unknown): value is WrittenWorld {
   if (typeof value !== 'object' || value === null) return false;
   const w = value as Record<string, unknown>;
   return (
@@ -166,7 +168,7 @@ function looksLikeWorld(value: unknown): value is WorldState {
 export const WorldMessageSchema = v.strictObject({
   /** Dernière commande de l'invité appliquée quand cet état a été pris. */
   ack: v.pipe(Int, v.minValue(-1)),
-  world: v.custom<WorldState>(looksLikeWorld, 'état du monde invalide'),
+  world: v.custom<WrittenWorld>(looksLikeWorld, 'état du monde invalide'),
 });
 export type WorldMessage = v.InferOutput<typeof WorldMessageSchema>;
 

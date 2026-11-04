@@ -7,6 +7,7 @@
 import { dayOfSeason, seasonOfDay, weekdayOf } from '../donnees/calendrier';
 import type { Condition, Content, ScheduleEntry, Since, Who } from '../donnees/types';
 import type { SpecialDayDef } from '../donnees/types-voisins';
+import { bondLevel, bondOf } from './amitie';
 import type { ReadonlyWorld, Weather } from './types';
 
 /** Un instant du calendrier: jour de la partie, minute du jour, temps qu'il fait. */
@@ -131,6 +132,8 @@ export function planningCondition(
       return world.decisions[c.decision] === c.option;
     case 'habit_known':
       return habitKnown(world, c.villager, c.habit);
+    case 'bond_at_least':
+      return bondLevel(content.settings.bonds, bondOf(world, c.villager)) >= c.level;
     case 'weather_was':
     case 'weather_tomorrow_is':
     case 'morning_mist':

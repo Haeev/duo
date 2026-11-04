@@ -3,10 +3,19 @@
  * des habitudes et les champs de l'amitié. Une sauvegarde d'avant se charge sans perte.
  */
 import type { Content } from '../donnees/types';
-import { emptyVillageFields } from '../etat/types-voisins';
+import { emptyVillageFields, type TasteLevel } from '../etat/types-voisins';
+
+const TASTES: readonly TasteLevel[] = ['loves', 'likes', 'neutral', 'dislikes'];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function marketBond(world: Record<string, unknown>, villager: string): number {
+  const counters = world.counters;
+  const duo = isRecord(counters) ? counters.duo : undefined;
+  const n = isRecord(duo) ? duo[`market_bond:${villager}`] : undefined;
+  return typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
 }
 
 /**
@@ -25,7 +34,9 @@ export function migrateToVillage(world: Record<string, unknown>, content: Conten
         q.status === 'done' &&
         content.quests.find((d) => d.id === q.id)?.giver === v.id,
     ).length;
-    const bond = Math.min(b.earlierSaveStartMax, done * b.earlierSaveStartPerQuest);
+    // Les ventes « Doux » du marché de la 0.12 comptaient déjà le lien à part (`market_bond:<habitant>`).
+    const market = marketBond(world, v.id);
+    const bond = Math.min(b.max, Math.min(b.earlierSaveStartMax, done * b.earlierSaveStartPerQuest) + market);
     if (bond > 0) fields.bonds[v.id] = bond;
   }
   for (const [villager, habits] of Object.entries(content.settings.habits.knownInEarlierSaves)) {
@@ -58,5 +69,11 @@ export function villageShapeError(data: Record<string, unknown>): string | null 
     return 'liens';
   if (!isRecord(data.tastesKnown) || !isRecord(data.decisions) || !isRecord(data.storyDone))
     return 'amitié';
+  // Lot H2: les goûts découverts et les étapes d'histoire faites se remplissent désormais.
+  for (const per of Object.values(data.tastesKnown))
+    if (!isRecord(per) || !Object.values(per).every((t) => TASTES.some((x) => x === t)))
+      return 'amitié';
+  for (const list of Object.values(data.storyDone))
+    if (!Array.isArray(list) || !list.every((x) => typeof x === 'string')) return 'amitié';
   return null;
 }

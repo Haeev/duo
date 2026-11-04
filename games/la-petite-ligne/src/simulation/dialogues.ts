@@ -17,8 +17,14 @@ import { henVars } from '../etat/secrets';
 import { fnv1a } from '../etat/tirage';
 import { answerHenCall, HEN_CALL_DIALOGUE, secretMistake } from './secrets';
 import { heardReveals, revealUse, sawInConversation, type RevealUse } from './voisins';
+import { BIRTHDAY_CHOICE, birthdayChoice, talkBond, wishBirthday } from './amitie';
 
 const GIVE_PREFIX = 'give:';
+
+/** Choix ajoutés par le jeu à une réplique (dons, « Bon anniversaire ! »): ils restent après les choix propres. */
+function extraChoice(id: string): boolean {
+  return id.startsWith(GIVE_PREFIX) || id === BIRTHDAY_CHOICE;
+}
 
 const annonceScenes = new WeakMap<Content, Set<string>>();
 
@@ -321,6 +327,7 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   const choices: DialogueChoiceView[] = [
     ...def.choices.map((ch) => ({ id: ch.id, text: format(ch.text, dialogueVars(sim, c.id)) })),
     ...giveChoices(sim, c, villager),
+    ...[birthdayChoice(sim, c, villager)].filter((x) => x !== null),
   ];
   c.dialogue = { dialogue: def.id, villager, lines: lineViews(sim, def, c.id), line: 0, choices };
   c.status = 'dialogue';
@@ -333,6 +340,8 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   v.met = true;
   // 0.13 (4.3): lui parler pendant son habitude l'écrit au carnet.
   sawInConversation(sim, c, v);
+  // 0.13 (lot H2, section 6.2): la première conversation du jour de ce joueur avec lui.
+  talkBond(sim, c, villager);
   bump(sim, `talked:${villager}`, c.id);
   emit(sim, { type: 'talk', by: c.id, villager });
   return true;
@@ -415,7 +424,10 @@ export function startScene(sim: Sim, dialogueId: string): void {
     v.met = true;
   }
   // Une scène avec un habitant compte comme une conversation, pour chacun des deux.
-  for (const c of sim.world.characters) bump(sim, `talked:${def.villager}`, c.id);
+  for (const c of sim.world.characters) {
+    talkBond(sim, c, def.villager);
+    bump(sim, `talked:${def.villager}`, c.id);
+  }
   emit(sim, { type: 'scene_started', dialogue: def.id, villager: def.villager });
   if (def.lines.length === 0) showSceneChoicesOrEnd(sim);
 }
@@ -552,6 +564,17 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
   }
   const d = c.dialogue;
   if (!d?.choices.some((ch) => ch.id === choice)) return;
+  if (choice === BIRTHDAY_CHOICE) {
+    const wish = wishBirthday(sim, c, d.villager);
+    d.choices = d.choices.filter((ch) => ch.id !== choice);
+    if (wish !== null) {
+      const start = d.lines.length;
+      d.lines.push({ speaker: c.id, text: wish.said }, { speaker: d.villager, text: wish.reply });
+      d.line = start;
+    }
+    sim.runtime.changed = true;
+    return;
+  }
   if (choice.startsWith(GIVE_PREFIX)) {
     const [, item, count] = choice.split(':');
     if (item !== undefined && count !== undefined) give(sim, c, d.villager, item, Number(count));
@@ -568,7 +591,7 @@ export function dialogueChoice(sim: Sim, c: Character, choice: string): void {
   d.lines.push({ speaker: c.id, text: format(picked.text, dialogueVars(sim, c.id)) });
   const reply = correct === false ? picked.replyWrong : picked.reply;
   for (const r of reply) d.lines.push({ speaker: r.speaker, text: format(r.text, dialogueVars(sim, c.id)) });
-  d.choices = d.choices.filter((ch) => ch.id.startsWith(GIVE_PREFIX));
+  d.choices = d.choices.filter((ch) => extraChoice(ch.id));
   d.line = start;
   // Compteurs des conditions `choice_made` (n'importe quel choix, ce choix, un choix juste), seulement
   // ceux que les données lisent: l'état transmis à l'invité reste petit (ADR 0007).
@@ -585,7 +608,7 @@ export function dialogueClose(sim: Sim, c: Character): void {
   const d = c.dialogue;
   if (d === null) return;
   const def = sim.content.dialogues[d.dialogue];
-  const ownChoicesLeft = d.choices.some((ch) => !ch.id.startsWith(GIVE_PREFIX)) && (def?.choices.length ?? 0) > 0;
+  const ownChoicesLeft = d.choices.some((ch) => !extraChoice(ch.id)) && (def?.choices.length ?? 0) > 0;
   endConversation(sim, c, d.line >= d.lines.length - 1 && !ownChoicesLeft);
 }
 

@@ -3,6 +3,7 @@
  * applique les intentions des deux joueurs dans leur ordre d'arrivée et
  * envoie à l'invité l'état, les positions et les événements.
  */
+import { writtenWorld } from '../etat/habitants-ecrits';
 import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
@@ -114,7 +115,8 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
   }
 
   function sendWorld(): void {
-    channels.world.send({ ack, world: sim.world });
+    // 0.13 (lot H2): les habitants sans leurs valeurs par défaut (`habitants-ecrits.ts`).
+    channels.world.send({ ack, world: writtenWorld(sim.world) });
     sentRevision = sim.world.revision;
     lastWorldTick = sim.world.tick;
   }

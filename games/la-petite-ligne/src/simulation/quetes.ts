@@ -20,6 +20,7 @@ import { queueHint } from './astuces';
 import { textVars } from './courrier';
 import { runEffects } from './effets';
 import { finishSecret, startSecret, updateSecrets } from './secrets';
+import { questBond } from './amitie';
 
 function def(sim: Sim, id: string): QuestDef | undefined {
   return sim.content.quests.find((q) => q.id === id);
@@ -84,6 +85,8 @@ function advance(sim: Sim, state: QuestState, quest: QuestDef, actor: CharacterI
     emit(sim, { type: 'quest_done', quest: quest.id });
     finishSecret(sim, quest.id);
     runEffects(sim, quest.completionEffects, actor);
+    // 0.13 (lot H2): l'étape d'histoire et le lien de son habitant (section 6.2).
+    questBond(sim, quest, actor);
     sim.world.revision += 1;
     sim.events.push({ type: 'save_point', reason: 'quest' });
     if (quest.repeat === 'each_train') restartForNextTrain(sim, state, quest);

@@ -19,6 +19,7 @@ import { startQuest } from './quetes';
 import { countInBag, countInStacks } from './sac';
 import { storeAtHome } from './rangement';
 import { runEffects } from './effets';
+import { addBond } from './amitie';
 
 /** Gabarits gardés pour la règle des 10 jours (deux annonces par semaine: 4 couvrent 14 jours). */
 export const BOARD_RECENT_KEPT = 4;
@@ -186,6 +187,8 @@ function complete(sim: Sim, a: BoardAnnonce): void {
   closeQuest(sim, a);
   world.purse += a.reward;
   emit(sim, { type: 'money', amount: a.reward });
+  // 0.13 (lot H2, section 6.2): une annonce remplie pour lui.
+  addBond(sim, def.giver, sim.content.settings.bonds.gains.annonce, a.by);
   emit(sim, { type: 'annonce_done', gabarit: a.gabarit, by: a.by, amount: a.reward });
   const rule = board.reward[def.kind];
   if (def.kind === 'together' && rule.heart > 0) {

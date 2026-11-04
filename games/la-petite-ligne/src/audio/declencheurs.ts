@@ -552,6 +552,17 @@ export function soundsForEvent(
     case 'sign_read':
     case 'villager_remark':
       break;
+    // 0.13 (lot H2): le cadeau prend le son existant en attendant `gift-happy` et `gift-polite` du
+    // lot H8; lanternes (`bond-chime`, `bond-level`), goûts et anniversaires (`birthday-chime`) attendent leurs sons.
+    case 'gift_offered':
+      emit.world('gift-give', villagerAt(world, event.villager) ?? characterAt(world, event.by), event.by);
+      break;
+    case 'bond_gain':
+    case 'bond_level':
+    case 'taste_found':
+    case 'birthday_wished':
+    case 'birthday_attended':
+      break;
   }
 }
 

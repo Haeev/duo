@@ -250,6 +250,7 @@ export function evaluate(sim: Sim, condition: Condition, ctx: ConditionContext):
     case 'birthday_of':
     case 'decision_made':
     case 'habit_known':
+    case 'bond_at_least':
       return planningCondition(sim.content, world, condition, momentOf(world));
   }
 }

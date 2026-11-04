@@ -24,6 +24,7 @@ import { type Sim, bump, emit, format, itemName, itemWithArticle, say } from './
 import { countInBag, takeFromBag } from './sac';
 import { storeAtHome } from './rangement';
 import { noteGoodsSeen } from './epicerie';
+import { addBond } from './amitie';
 
 /** Identifiant de point des places de la file (résolu par `marketPoint`, pas dans la carte). */
 export const MARKET_SPOT_PREFIX = 'market_spot:';
@@ -316,7 +317,8 @@ export function serveBuyer(sim: Sim, c: Character, villager: string): boolean {
   bump(sim, 'market_served', c.id);
   if (together) bump(sim, 'market_served_together', null);
   bump(sim, `market_served:${villager}`, c.id);
-  if (accepted && level.bond > 0) bump(sim, `market_bond:${villager}`, null, level.bond);
+  // 0.13 (lot H2): la vente au prix « Doux » nourrit son lien (le compteur `market_bond:` de la 0.12 passe dans `bonds` à la reprise).
+  if (accepted && level.bond > 0) addBond(sim, villager, level.bond, c.id);
   sim.runtime.changed = true;
   if (sold.length === 0) {
     say(sim, 'both', 'market_nothing', { name });

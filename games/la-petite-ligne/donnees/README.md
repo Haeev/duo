@@ -328,7 +328,33 @@ Contrôles (au chargement et par `valider_donnees.py`): chaque `habit` d'une ent
 
 Conditions nouvelles (section 3): `school_day`, `special_day`, `season_day_is`, `birthday_of`, `decision_made`, `habit_known`; effet nouveau (section 4): `reveal_habit`.
 
-**Réglages** (`reglages.json`, `habits`): `seeDistance` (10 m), `nightSeeDistance` (6 m) à partir de `nightFrom` (21:00), `watchSeconds` (2 s réelles), `arrivedDistance` (2 m du point), `doorDistance` (10 m: voir entrer ou sortir), `signRange`, `gossipAfterDays` (10, de 7 à 21), `logKept` (30 découvertes gardées pour la notification de retour), `announce` (`distance` 5 m, `minutes` 10 après le début de l'habitude, `bondAtLeast` 250: Voisinage), `windowPoints` (points vus du dehors: vitrine, fenêtre, établi derrière la vitre, corde des cloches), `knownInEarlierSaves` (habitudes déjà au carnet d'une partie reprise d'une version antérieure, par habitant, section 0); `bonds` (`earlierSaveStartPerQuest` 60, `earlierSaveStartMax` 250: lien de départ d'une partie reprise, par quête finie avec l'habitant).
+**Réglages** (`reglages.json`, `habits`): `seeDistance` (10 m), `nightSeeDistance` (6 m) à partir de `nightFrom` (21:00), `watchSeconds` (2 s réelles), `arrivedDistance` (2 m du point), `doorDistance` (10 m: voir entrer ou sortir), `signRange`, `gossipAfterDays` (10, de 7 à 21), `logKept` (30 découvertes gardées pour la notification de retour), `announce` (`distance` 5 m, `minutes` 10 après le début de l'habitude, `bondAtLeast` 250: Voisinage), `windowPoints` (points vus du dehors: vitrine, fenêtre, établi derrière la vitre, corde des cloches), `knownInEarlierSaves` (habitudes déjà au carnet d'une partie reprise d'une version antérieure, par habitant, section 0); `bonds` (`earlierSaveStartPerQuest` 60, `earlierSaveStartMax` 250: lien de départ d'une partie reprise, par quête finie avec l'habitant, plus ses ventes « Doux » du marché de la 0.12).
+
+### 2.13 Amitié et cadeaux (0.13, lot H2)
+
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 6. Un lien par habitant, commun au duo, de 0 à `bonds.max` (1000); il ne baisse jamais.
+
+**Goûts** (`habitants.json` et `habitants-0-13.json`, `villagers[].tastes`, facultatif): `{ "adore": [objets], "aime": [objets], "deteste": [{ "item", "reply" }] }`. Chaque objet existe dans `objets.json` et n'a qu'un goût par habitant (contrôlé au chargement). Un objet absent des trois listes lui est égal (« neutre »). `reply`: ce qu'il dit en rendant l'objet; sans elle, `messages.gift_reply_dislikes`. Un habitant de `habitants-0-13.json` qui complète un habitant de `habitants.json` remplace ses goûts s'il en donne.
+
+**Offrir** (intention `gift { villager, item }`): un objet du sac, à portée de conversation d'un habitant visible, en journée, hors scène (on peut le faire en lui parlant). Un cadeau accepté par habitant, par joueur et par jour. Objets qui ne s'offrent pas: sortes de `bonds.giftExcluded` (outils, objets de quête, charges, bêtes commandées). Le goût s'écrit au carnet au premier cadeau de l'objet (`tastesKnown`), ou par l'effet `reveal_taste` (une rumeur). Un objet qu'il n'aime pas revient au sac avec sa réplique, sans gain, et le cadeau du jour reste à faire.
+
+**Gains** (`reglages.json`, `bonds.gains`, section 6.2; aucun n'est négatif):
+
+| Clé | Valeur | Quand |
+|---|---|---|
+| `talk` | 10 | première conversation du jour de chaque joueur avec lui (une scène avec lui compte) |
+| `gift.loves`, `gift.likes`, `gift.neutral` | 60, 30, 10 | cadeau adoré, aimé, autre |
+| `birthdayGiftFactor` | 2 | le jour de son anniversaire, le gain du cadeau est multiplié (adoré: 120); il le dit, et ses habitudes d'anniversaire s'écrivent au carnet |
+| `birthdayWish` | 20 | choix « Bon anniversaire ! » de la conversation, ce jour-là, si son anniversaire est au carnet; une fois par joueur |
+| `birthdayPresence` | 20 | être là pendant son habitude d'anniversaire (`kind: birthday`): à moins de `bonds.birthdayPresence.distance` (10 m), `bonds.birthdayPresence.seconds` (30 s) en tout; une fois ce jour-là, pour le duo |
+| `quest` | 60 | quête finie dont il est le donneur (comme le départ d'une partie reprise), sauf annonces, quêtes de chaque semaine, et quêtes qui ont un `add_bond` pour lui |
+| `story` | 100 | étape de son histoire (champ de quête `story { villager, step }`), mêmes exceptions; l'étape s'inscrit dans `storyDone` |
+| `annonce` | 50 | annonce du tableau remplie pour lui |
+| `allHabits` | 50 | toutes ses habitudes connues, une fois |
+
+La vente au prix « Doux » du marché ajoute `marche.json` `levels.soft.bond` (2) au lien de l'habitant servi. **Niveaux** (`bonds.levels`): six seuils croissants, le premier à 0 (0, 100, 250, 450, 700, 1000); noms dans `textes.messages.bond_level_0` à `bond_level_5`. Au passage d'un niveau, notification chez les deux (`bond_level_up`, `bond_level_up_family` au dernier).
+
+Condition nouvelle: `bond_at_least` (`villager`, `level` 0 à 5), lue aussi dans les plannings; `gift_given` (`villager`, `taste` facultatif: `adore`, `aime`, `neutre`, `deteste`; compteurs `gift:<habitant>` et `gift:<habitant>:<goût>`, paramètres communs `count`, `who`, `since`). Effets nouveaux: `add_bond` (`villager`, `amount`), `reveal_taste` (`villager`, `item`). Champ de quête nouveau: `story` (`villager`, `step`).
 
 ## 3. Conditions
 
@@ -397,6 +423,8 @@ Paramètres communs des conditions qui comptent:
 | `birthday_of` | `villager` (`self`: l'habitant dont c'est le planning ou le dialogue) | 0.13: c'est l'anniversaire de cet habitant (son champ `birthday`) |
 | `decision_made` | `decision`, `option` | 0.13: la décision à deux a été prise avec cette option (lot H2) |
 | `habit_known` | `villager`, `habit` | 0.13: l'habitude est au carnet |
+| `bond_at_least` | `villager`, `level` (0 à 5) | 0.13 (lot H2): le niveau d'amitié avec l'habitant est atteint (section 2.13) |
+| `gift_given` | `villager`, `taste` facultatif (`adore`, `aime`, `neutre`, `deteste`), `count`, `who`, `since` | 0.13 (lot H2): un cadeau accepté, ou de ce goût (`deteste`: rendu) |
 | `animal_released`, `animal_named` | `animal` (`rooster`, `goat`), comptage | 0.12: compteurs `animal_released:<bête>`, `animal_named:<bête>` (section 3.1) |
 | `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spots`, `delivered`, `stall_stocked` | comptage | 0.12: compteurs `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spot`, `mail_delivered`, `stall_kind` (section 3.1) |
 | `given_to_stall` | `item` facultatif, comptage | 0.12: compteur `stall_given:<objet>` (`stall_given` sans objet) |
@@ -447,6 +475,8 @@ Drapeaux posés par les quêtes pour ces systèmes: `market_open` (l'étal est s
 
 | `if` | `condition`, `then`, `else` | applique `then` si la condition est vraie, sinon `else` |
 | `reveal_habit` | `villager`, `habit` | 0.13: écrit l'habitude au carnet (fin de quête, décision); rien si elle y est déjà |
+| `add_bond` | `villager`, `amount` | 0.13 (lot H2): ajoute au lien (jamais négatif, plafonné); dans les effets de fin d'une quête, il remplace le gain automatique de son habitant |
+| `reveal_taste` | `villager`, `item` | 0.13 (lot H2): écrit au carnet le goût de l'habitant pour cet objet (une rumeur) |
 | `reveal_secret` | `quest` | le secret de la quête devient visible des deux joueurs (fin d'une quête secrète: les noms des poules chez les deux) |
 
 `give_item` accepte aussi `to: "informed"` et `to: "doer"` (le rôle dans le secret de la quête en cours); `spawn_animals` accepte `shuffleVariantsBy` (groupe de variante: qui porte quelle couleur suit la permutation tirée par la graine, `hen_names`). Dans les conditions qui comptent, `who` accepte `"informed"` et `"doer"` dans une quête à secret; `looked_at` accepte `minDistance` (m) et `still` (immobile).

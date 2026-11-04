@@ -14,6 +14,7 @@ import { bodyCollides, findPath } from './grille';
 import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
 import { newVillagerState } from './monde';
 import { marketEntry, marketPoint } from './marche';
+import { watchBirthdays } from './amitie';
 import { announceHabits, currentHabit, notePlanning, sawAtDoor, watchHabits } from './voisins';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
@@ -175,5 +176,6 @@ export function updateVillagers(sim: Sim, dt: number): void {
   if (refresh) {
     watchHabits(sim);
     announceHabits(sim);
+    watchBirthdays(sim);
   }
 }

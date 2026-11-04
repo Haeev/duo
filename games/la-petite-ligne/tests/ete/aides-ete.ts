@@ -5,6 +5,7 @@
  */
 import { hashState } from '@duo/sdk/sim';
 import type { Content } from '../../src/donnees/types';
+import { worldFromWritten } from '../../src/etat/habitants-ecrits';
 import type { WorldState, Weather } from '../../src/etat/types';
 import { restoreWorld, snapshotOf } from '../../src/sauvegarde/sauvegarde';
 import type { Sim } from '../../src/simulation/contexte';
@@ -154,7 +155,7 @@ export function playSummer(options: SummerOptions): SummerRun {
       run.treesByDay[day] = w.trees.filter((t) => !t.felled).length;
       // Sauvegarde et reprise à chaque aube, en inversant hôte et invité (L-02).
       const snap = snapshotOf(sim);
-      const before = hashState(lasting(snap.data));
+      const before = hashState(lasting(worldFromWritten(snap.data)));
       sim = restoreWorld(sim.content, sim.map, structuredClone(snap.data), snap.dataSchema, [B, A]);
       if (hashState(lasting(sim.world)) !== before) run.resumeMismatches.push(day);
       robot = createRobot({ stages: 'stay', profile });

@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { hashState } from '@duo/sdk/sim';
 import { describe, expect, it } from 'vitest';
+import { worldFromWritten } from '../../src/etat/habitants-ecrits';
 import { stageScreen } from '../../src/etat/semaine';
 import { decodeSave, restoreWorld, snapshotOf } from '../../src/sauvegarde/sauvegarde';
 import { SIM_HZ } from '../../src/simulation/constantes';
@@ -58,7 +59,7 @@ describe('G2: sauvegardes de référence jouées jusqu’au samedi 43, reprise �
           day = sim.world.clock.day;
           dawns++;
           const snap = snapshotOf(sim);
-          const before = hashState(lasting(snap.data));
+          const before = hashState(lasting(worldFromWritten(snap.data)));
           sim = restoreWorld(content, map, structuredClone(snap.data), snap.dataSchema, swap ? [B, A] : [A, B]);
           swap = !swap;
           if (hashState(lasting(sim.world)) !== before) mismatches.push(day);

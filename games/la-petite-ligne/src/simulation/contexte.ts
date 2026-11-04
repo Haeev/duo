@@ -87,6 +87,8 @@ export interface Runtime {
   villagerHabits: Map<string, { habit: string | null; from: number }>;
   /** 0.13: secondes d'affilée où chaque joueur voit chaque habitant à son poste (`p1:firmin`, règle 4.3). */
   habitWatch: Map<string, number>;
+  /** 0.13 (lot H2): secondes passées près de chaque habitant pendant son anniversaire (règle 6.2). */
+  birthdayWatch: Map<string, number>;
 }
 
 export interface Sim {
@@ -123,6 +125,7 @@ export function createRuntime(map: GameMap): Runtime {
     villagerFacing: new Map(),
     villagerHabits: new Map(),
     habitWatch: new Map(),
+    birthdayWatch: new Map(),
   };
 }
 

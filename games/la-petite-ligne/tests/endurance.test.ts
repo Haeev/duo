@@ -2,6 +2,8 @@
 // plusieurs graines. Chaque partie doit finir (commande payée), sans blocage de l'horloge, sans
 // état incohérent, et l'état doit toujours tenir dans un message de 64 Kio (ADR 0007).
 import { dialogueDone } from '../src/etat/dialogues-faits';
+import { inMap } from '../src/etat/carte';
+import { writtenWorld } from '../src/etat/habitants-ecrits';
 import { describe, expect, it } from 'vitest';
 import type { WorldState } from '../src/etat/types';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
@@ -31,7 +33,11 @@ const MAX_STATE_BYTES = 64 * 1024;
 // 0.13 (lot H1): relevé de 35 à 40 Kio, à trancher avec l'architecte: les 15 habitants nouveaux
 // (environ 3 Ko, surtout hors du bourg) et le carnet des habitudes (environ 1,7 Ko à la fin de la
 // démo) donnent 38 148 à 39 613 octets sur les dix graines; plafond dur de 64 Kio inchangé.
-const ALERT_STATE_BYTES = 40 * 1024;
+// 0.13 (lot H2): les habitants s'écrivent sans leurs valeurs par défaut (`habitants-ecrits.ts`):
+// 35 266 à 36 752 octets sur les huit graines (amitié comprise). L'objectif de 35 Kio demande encore
+// environ 1 Ko (positions des habitants hors du message d'état, à trancher avec dev-reseau): alerte
+// à 37 Kio en attendant; plafond dur de 64 Kio inchangé.
+const ALERT_STATE_BYTES = 37 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */
@@ -49,7 +55,7 @@ interface Run {
 
 /** Octets du message d'état complet de l'hôte (`hote.ts`, `sendWorld`), comptés comme le SDK (UTF-8). */
 function stateMessageBytes(world: WorldState): number {
-  return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world }), 'utf8');
+  return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world: writtenWorld(world) }), 'utf8');
 }
 
 /** Heure de jeu absolue, en minutes depuis le jour 1 à minuit. */
@@ -62,8 +68,8 @@ function checkCoherent(w: WorldState): void {
   expect(w.purse).toBeGreaterThanOrEqual(0);
   for (const c of w.characters) {
     expect(Number.isFinite(c.pos.x) && Number.isFinite(c.pos.y), `${c.id} position finie`).toBe(true);
-    expect(c.pos.x, `${c.id} dans la carte`).toBeGreaterThanOrEqual(0);
-    expect(c.pos.y, `${c.id} dans la carte`).toBeGreaterThanOrEqual(0);
+    // 0.13: la grille commence en (originX, originY), négatifs pour la carte agrandie (lot L0).
+    expect(inMap(contentAndMap().map, Math.floor(c.pos.x), Math.floor(c.pos.y)), `${c.id} dans la carte: ${String(c.pos.x)}, ${String(c.pos.y)}`).toBe(true);
   }
 }
 
@@ -154,7 +160,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
-  expect(run.maxBytes, `état transmis sous 40 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
+  expect(run.maxBytes, `état transmis sous 37 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
   expectMomentsAndSecrets(sim);
 }
