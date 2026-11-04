@@ -6,6 +6,23 @@ Les changements de l'application Duo, version par version, écrits pour les deux
 
 ## [Non publié]
 
+## [0.3.1] - 2026-11-04
+
+Duo montre quand il télécharge la mise à jour d'un jeu et attend qu'elle soit installée avant de le lancer.
+
+### Ajouté
+
+- À chaque lancement de Duo, et à l'ouverture de la bibliothèque ou d'un salon si le dernier contrôle date de plus de 3 minutes, un contrôle rapide (3 secondes au plus) cherche les mises à jour des jeux.
+- Une mise à jour trouvée se télécharge tout de suite. Sur la carte du jeu et dans son salon, un bandeau l'indique avec une barre de progression (« Mise à jour de La Petite Ligne vers 0.13.0 : 45 % »), puis « installation », puis « à jour ».
+- Si le téléchargement échoue: un message clair, un bouton « Réessayer », et un bouton pour jouer quand même à la version installée.
+- Dans le salon, si les deux ordinateurs n'ont pas la même version du jeu, Duo le dit et indique qui doit mettre son jeu à jour.
+
+### Modifié
+
+- Pendant une mise à jour, les boutons pour héberger, rejoindre ou lancer ce jeu sont désactivés, avec la raison affichée.
+- Le téléchargement continue quand le salon est ouvert; seule une partie l'interrompt.
+- Sans Internet, ou si le catalogue ne répond pas dans le délai, rien n'est bloqué: tu joues à la version installée, et la bibliothèque affiche seulement « Impossible de vérifier les mises à jour ».
+
 ## [0.3.0] - 2026-11-04
 
 Sur le Mac, Duo ajoute le carnet de séance: Ctrl+N note en jeu ce que tu vois, avec les images des 10 secondes d'avant et d'après.

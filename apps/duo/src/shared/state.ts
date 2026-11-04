@@ -3,6 +3,7 @@
 // Les heures (`...At`) sont en millisecondes de l'horloge `Date.now()` de cette
 // machine: principal et vue la partagent.
 import type { PlayerColor } from './players';
+import type { GameUpdateView, UpdateCheckView } from './updates';
 
 export interface Profile {
   readonly pseudo: string;
@@ -43,6 +44,8 @@ export interface GameSummary {
   readonly saves: { readonly help: string | null; readonly onExit: boolean } | null;
   /** Sauvegarde gardée sur cet ordinateur (prototype: un emplacement, non répliqué). */
   readonly lastSave: SaveSummary | null;
+  /** Mise à jour en vue pour ce jeu (patch 0.3.1), `null` s'il est à jour. */
+  readonly update: GameUpdateView | null;
 }
 
 export type PeerView =
@@ -84,6 +87,16 @@ export interface SalonView {
   readonly peerReady: boolean;
   readonly peerSeat: PeerSeatState;
   readonly countdownEndsAt: number | null;
+  /**
+   * Versions différentes entre l'hôte et cette machine, `null` si identiques.
+   * `host-stale`: l'hôte a installé une version plus récente depuis l'ouverture du salon.
+   * `self-older` et `host-older`: vu de l'invité.
+   */
+  readonly versionGap: {
+    readonly kind: 'host-stale' | 'self-older' | 'host-older';
+    readonly hostVersion: string;
+    readonly selfVersion: string;
+  } | null;
 }
 
 export interface InvitationView {
@@ -193,4 +206,6 @@ export interface AppState {
   readonly notice: NoticeView | null;
   readonly toasts: readonly Toast[];
   readonly quitConfirm: boolean;
+  /** Dernière recherche des mises à jour (patch 0.3.1). */
+  readonly updateCheck: UpdateCheckView;
 }

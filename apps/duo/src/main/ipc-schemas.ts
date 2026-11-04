@@ -28,6 +28,9 @@ export const INTENT_SCHEMAS: {
   'window:toggle-fullscreen': NoArgument,
   'window:set-fullscreen': v.object({ fullscreen: v.boolean() }),
   'library:install-file': NoArgument,
+  'library:opened': NoArgument,
+  'update:retry': NoArgument,
+  'update:play-anyway': v.object({ gameId: v.pipe(v.string(), v.regex(/^[a-z][a-z0-9-]{1,31}$/)) }),
 };
 
 export type IntentCheck<C extends IntentChannel> =
