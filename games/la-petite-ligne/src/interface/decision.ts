@@ -13,7 +13,7 @@ import type { UiHost } from './composant';
 import { UI_SETTINGS } from './config';
 import { nameOf, type UiContext } from './contexte';
 import { button, el, icon, keepFocusOnGame, keycap, portrait, token } from './dom';
-import { portraitSvg, silhouetteSvg, villagerColors } from './portrait';
+import { silhouetteSvg, villagerPortraitHtml } from './portrait';
 
 export type DecisionPhase = 'choose' | 'waitingPartner' | 'waitingMe' | 'disagree' | 'agreed' | 'taken';
 
@@ -89,8 +89,7 @@ export function takenModel(ctx: UiContext, decision: string, option: string): De
 }
 
 function face(id: string, size: '' | 'small' | 'large'): HTMLSpanElement {
-  const colors = villagerColors(id);
-  return portrait(colors === null ? silhouetteSvg() : portraitSvg(colors, 'good', '', id), size);
+  return portrait(villagerPortraitHtml(id, 'good') ?? silhouetteSvg(), size);
 }
 
 export class DecisionPanel {

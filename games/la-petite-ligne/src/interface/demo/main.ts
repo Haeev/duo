@@ -54,6 +54,8 @@ declare global {
       pick(clientX: number, clientY: number): ReturnType<NonNullable<typeof renderer>['pick']>;
       /** Journal de la page: commandes de caméra et sons reçus de l'interface, intentions du joueur local. */
       log: { camera: string[]; intents: string[]; sounds: string[] };
+      /** 0.13: portraits 3D des habitants (adresse ou `null` par habitant) et mesure de leur rendu. */
+      portraits(): { urls: Record<string, string | null>; stats: { count: number; milliseconds: number } | null };
     };
   }
 }
@@ -136,6 +138,7 @@ const mountUi = (): GameInterface =>
       log.sounds.push(id);
     },
     outfitPreview: (options) => renderer?.createOutfitPreview?.(options) ?? null,
+    villagerPortrait: (id) => renderer?.villagerPortrait?.(id) ?? null,
   });
 let ui = mountUi();
 
@@ -258,6 +261,10 @@ async function start(): Promise<void> {
     world: () => sim.world,
     pick: (clientX, clientY) => renderer?.pick(clientX, clientY) ?? null,
     log,
+    portraits: () => ({
+      urls: Object.fromEntries(content.villagers.map((v) => [v.id, renderer?.villagerPortrait?.(v.id) ?? null])),
+      stats: renderer?.portraitStats?.() ?? null,
+    }),
     remount: (n) => {
       for (let i = 0; i < n; i++) {
         ui.dispose();

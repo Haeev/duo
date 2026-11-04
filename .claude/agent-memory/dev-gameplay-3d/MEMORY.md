@@ -518,3 +518,9 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Commit temporaire refusé par l'outil pour fusionner la branche de session: sauvegarder `git diff` dans le scratchpad, remettre seulement les fichiers en conflit (`git checkout -- <fichier>`), `merge --ff-only`, réappliquer les quelques lignes à la main.
 - Page de rendu avec la vraie simulation des habitants: `rendu.html?vie13=1&jour=&heure=&avance=` (`demo/vie13-exemple.ts`); `x`, `y` posent le joueur 1 (les bulles ne se montrent qu'à moins de 8 m de lui). Le port 6431 est pris par une autre séance: 6587.
 - Le son de la 0.13 joue les événements du village par leur nom (`AUDIO_SETTINGS.village.events`, champs `villager`, `by`, `at`) dans le `default` de `declencheurs.ts`; un type ajouté à `WorldEvent` doit avoir son `case` qui appelle `villageEventSound`, sinon il n'est plus joué.
+
+## Portraits 3D des habitants (La Petite Ligne 0.13, vérifié le 2026-11-04)
+
+- `rendu/portraits.ts`: un `WebGLRenderer` à part (alpha, fond transparent) rend chaque buste au chargement, `drawImage` du canevas WebGL dans un canevas 2D dans la même tâche (pas besoin de `preserveDrawingBuffer`), puis `toBlob` et `URL.createObjectURL`. Sous SwiftShader l'encodage PNG des 21 images met plusieurs secondes après `ready`: un panneau ouvert tôt garde le SVG tant que sa signature ne change pas (le dialogue met `hasVillagerPhoto` dans sa signature).
+- Cadrage: os `neck` (`getObjectByName`) et sommets posés (`SkinnedMesh.getVertexPosition` puis `matrixWorld`): point le plus haut (chapeau, loupe relevée) et largeur au-dessus des épaules (bords de chapeau). Les enfants et les grands sortent à la même taille de tête.
+- Panneau du carnet capturé en plein fondu d'entrée (`lpl-detail-in`): portrait pâle, ce n'est pas un défaut; capturer avec `animations=reduites`.

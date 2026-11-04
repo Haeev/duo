@@ -41,6 +41,7 @@ import { ProposalCards } from './proposition';
 import { DecisionPanel } from './decision';
 import { SOUND_ATTR, UiSoundGate, type UiSoundId, buttonSound, layerSounds } from './sons';
 import { loadUiTexts } from './textes';
+import { setVillagerPortraitSource } from './portrait';
 
 const SPRITE_ID = 'lpl-icones';
 /** Taille de départ de l'aperçu 3D des vêtements (points CSS), ajustée ensuite à sa place. */
@@ -101,6 +102,8 @@ class GameUi implements GameInterface, UiHost {
     this.view = options.view;
     this.cameraCommand = options.camera ?? null;
     this.outfitPreview = options.outfitPreview ?? null;
+    // 0.13: portraits des habitants tirés des modèles 3D, lus par tous les panneaux (`portrait.ts`).
+    setVillagerPortraitSource(options.villagerPortrait ?? null);
     this.sounds = new UiSoundGate(options.sound ?? null);
     const texts = loadUiTexts(options.view.content);
     this.ctx = createUiContext(options.view.content, options.view.map, texts, options.view.localCharacter(), (code) =>
@@ -316,6 +319,7 @@ class GameUi implements GameInterface, UiHost {
 
   dispose(): void {
     for (const off of this.cleanups.splice(0)) off();
+    setVillagerPortraitSource(null);
     this.mounted?.layer.dispose?.();
     this.mounted = null;
     this.root.remove();

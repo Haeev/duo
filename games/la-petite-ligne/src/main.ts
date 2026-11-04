@@ -123,6 +123,8 @@ async function main(): Promise<void> {
       },
       // 0.12: aperçu 3D de la boutique de vêtements (petite scène à part, rendue à la demande).
       outfitPreview: (options) => r.createOutfitPreview?.(options) ?? null,
+      // 0.13: portraits des habitants tirés de leur modèle 3D (rendus une fois au chargement).
+      villagerPortrait: (id) => r.villagerPortrait?.(id) ?? null,
     });
     const createAudio = await pickAudio();
     if (createAudio !== null) {

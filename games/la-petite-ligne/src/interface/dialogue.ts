@@ -14,7 +14,7 @@ import { itemIcon } from './modele';
 import { type HenCallModel, henCallModel } from './modele-secrets';
 import { HEN_COLORS } from './config';
 import { haberdasheryIsOpen, shopIsOpen } from './modele-panneaux';
-import { portraitSvg, villagerColors } from './portrait';
+import { hasVillagerPhoto, villagerPortraitHtml } from './portrait';
 import { SOUND_ATTR } from './sons';
 
 /** Ce que montre la boîte: une conversation, la scène à deux, ou un objet lu. */
@@ -148,8 +148,8 @@ export class DialogueBox implements Layer {
       this.face.classList.remove('lpl-dialogue__object');
     }
     setAttr(this.root, 'data-speaker', villagerId);
-    const colors = villagerId === null ? null : villagerColors(villagerId);
-    if (colors !== null && villagerId !== null) setPortrait(this.face, portraitSvg(colors, 'good', '', villagerId));
+    const face = villagerId === null ? null : villagerPortraitHtml(villagerId, 'good');
+    if (face !== null) setPortrait(this.face, face);
     setText(this.name, v === undefined ? '' : ctx.t(`${v.firstName} ${v.lastName}`));
     setText(this.role, v === undefined ? '' : ctx.t(v.role));
   }
@@ -218,7 +218,7 @@ export class DialogueBox implements Layer {
       const otherPick = scene.picks[ctx.partner] ?? null;
       const choosing = scene.choices.length > 0;
       const line = scene.lines[Math.min(scene.line, scene.lines.length - 1)];
-      const sig = JSON.stringify([scene.dialogue, scene.line, scene.lines.length, scene.choices, myPick, otherPick, scene.ready, partnerName]);
+      const sig = JSON.stringify([scene.dialogue, scene.line, scene.lines.length, scene.choices, myPick, otherPick, scene.ready, partnerName, hasVillagerPhoto(scene.villager)]);
       if (sig === this.sig) return;
       this.sig = sig;
       this.setSpeaker(scene.villager, null);
@@ -277,7 +277,9 @@ export class DialogueBox implements Layer {
     const atEnd = dlg.line >= dlg.lines.length - 1;
     const odetteShop = atEnd && dlg.choices.length === 0 && this.isShopKeeper(world, dlg.villager);
     const solangeShop = atEnd && dlg.choices.length === 0 && dlg.villager === 'solange' && haberdasheryIsOpen(world, ctx);
-    const sig = JSON.stringify([dlg.dialogue, dlg.line, dlg.lines.length, dlg.choices, odetteShop, solangeShop]);
+    // Le portrait 3D peut arriver après l'ouverture (image encodée juste après le chargement).
+    const photo = hasVillagerPhoto(dlg.villager);
+    const sig = JSON.stringify([dlg.dialogue, dlg.line, dlg.lines.length, dlg.choices, odetteShop, solangeShop, photo]);
     if (sig === this.sig) return;
     this.sig = sig;
     setHidden(this.sceneChip, true);

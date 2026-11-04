@@ -219,6 +219,43 @@ export function villagerColors(id: string): PortraitColors | null {
 }
 
 /**
+ * Source des portraits 3D des habitants (0.13, `InterfaceOptions.villagerPortrait`), posée par
+ * l'interface à sa création et retirée à sa sortie. Sans elle (mode secours, page sans rendu),
+ * le portrait dessiné.
+ */
+let photoSource: ((id: string) => string | null) | null = null;
+
+export function setVillagerPortraitSource(source: ((id: string) => string | null) | null): void {
+  photoSource = source;
+}
+
+/** Une adresse d'image admise pour un portrait: seulement celles que le rendu fabrique (`blob:`, `data:image/`). */
+function safePhotoUrl(url: string | null): string | null {
+  if (url === null) return null;
+  return url.startsWith('blob:') || url.startsWith('data:image/') ? url : null;
+}
+
+/** Vrai si le portrait 3D de cet habitant est prêt (les panneaux qui se figent le reprennent alors). */
+export function hasVillagerPhoto(id: string): boolean {
+  return safePhotoUrl(photoSource?.(id) ?? null) !== null;
+}
+
+/**
+ * Portrait d'un habitant: l'image tirée de son modèle 3D quand le rendu l'a faite (expression
+ * neutre), sinon le portrait dessiné. `null` pour un identifiant inconnu (ni image ni couleurs).
+ */
+export function villagerPortraitHtml(id: string, expression: Expression, label = ''): string | null {
+  const colors = villagerColors(id);
+  const url = safePhotoUrl(photoSource?.(id) ?? null);
+  if (url !== null) {
+    const bg = colors === null ? '#EEEEEE' : safeColor(colors.bg);
+    const role = label === '' ? 'alt="" aria-hidden="true"' : `alt="${escapeAttr(label)}"`;
+    return `<img class="lpl-portrait__photo" src="${escapeAttr(url)}" ${role} draggable="false" style="background:${bg}">`;
+  }
+  return colors === null ? null : portraitSvg(colors, expression, label, id);
+}
+
+/**
  * Silhouette d'un habitant pas encore rencontré (carnet des voisins, 0.13): tête et épaules
  * grises sur le papier creusé, un « ? » au milieu. Même cadre que `portraitSvg`.
  */

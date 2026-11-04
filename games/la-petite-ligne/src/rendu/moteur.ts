@@ -42,6 +42,7 @@ import { ShadowCasterCulling } from './ombre-tri';
 import { InteriorsPart, readInteriorHooks } from './interieurs';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { PerfMonitor } from './perf';
+import { renderVillagerPortraits, type VillagerPortraits } from './portraits';
 import {
   AdaptiveQuality,
   renderPixelSize,
@@ -159,6 +160,8 @@ export class RenderEngine implements Renderer {
   private reducedMotion: boolean;
   private time = 0;
   private loaded = false;
+  /** 0.13: portraits 3D des habitants, rendus une fois au chargement. */
+  private portraits: VillagerPortraits | null = null;
   private disposed = false;
   /** Style des personnages de la séance (`characters.style`): fixé à la construction. */
   private readonly characterStyle: CharacterStyle;
@@ -577,6 +580,10 @@ export class RenderEngine implements Renderer {
     this.perf.setMissingModels(library.missingModels());
     this.missing = library.missingModels();
     await this.warmUp();
+    if (await this.interrupted()) {
+      return;
+    }
+    this.renderPortraits(library);
     this.loaded = true;
     // Retour R13: de quoi comprendre au journal ce que voit chaque machine (ombres, écran, carte).
     const surface = this.surface();
@@ -591,6 +598,36 @@ export class RenderEngine implements Renderer {
       navigateur: graphics.userAgent,
     });
     onProgress(1);
+  }
+
+  /**
+   * Portraits des habitants tirés de leur modèle (0.13), rendus une fois dans un contexte à part.
+   * Un échec ne bloque jamais le jeu: l'interface garde alors les portraits dessinés.
+   */
+  private renderPortraits(library: ModelLibrary): void {
+    const settings = RENDER_SETTINGS.renderer;
+    try {
+      this.portraits = renderVillagerPortraits(
+        { library, content: this.view.content, toneMapping: toneMapping(settings.toneMapping), exposure: settings.exposure },
+        Math.min(window.devicePixelRatio, settings.maxPixelRatio),
+      );
+      this.log?.info('rendu: portraits des habitants', {
+        habitants: this.portraits.count,
+        millisecondes: Math.round(this.portraits.milliseconds),
+      });
+    } catch (error: unknown) {
+      this.log?.info('rendu: portraits des habitants non rendus', { message: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  /** Adresse du portrait 3D d'un habitant (`blob:`), `null` avant le chargement ou sans modèle. */
+  villagerPortrait(id: string): string | null {
+    return this.portraits?.url(id) ?? null;
+  }
+
+  /** Mesure du rendu des portraits au chargement (page de démonstration, tests de fumée). */
+  portraitStats(): { count: number; milliseconds: number } | null {
+    return this.portraits === null ? null : { count: this.portraits.count, milliseconds: this.portraits.milliseconds };
   }
 
   /** Rend la main au navigateur; vrai si le rendu a été libéré entre-temps (chargement abandonné). */
@@ -1215,6 +1252,8 @@ export class RenderEngine implements Renderer {
       return;
     }
     this.disposed = true;
+    this.portraits?.dispose();
+    this.portraits = null;
     this.unsubscribe();
     this.resizeObserver.disconnect();
     this.world?.dispose();
