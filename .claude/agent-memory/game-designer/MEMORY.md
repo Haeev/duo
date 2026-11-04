@@ -280,3 +280,12 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - À cette date, la règle 5.1 (deux histoires en cours, une neuve par jour, trois jours entre deux étapes) n'est pas codée: toutes les quêtes dont les conditions tiennent démarrent ensemble.
 - Six habitants de la démo: chaque quête porte `day_at_least 16` et chaque réplique est gardée par une étape de ces quêtes, pour ne rien changer aux jours 1 à 15. La grappe de sureau ne se cueille que du 1 au 14 de l'automne: ne pas en faire l'ingrédient d'une quête de printemps.
 - Le premier jour de classe de l'automne est le lundi 3 (le 1 est un samedi): une « rentrée » se cale sur `season_day_is [3]`.
+
+## Suites de Lucie, Armand, Berthe, Martial, Marthe, Honorine, Inès (lot H5, vérifié le 2026-11-04)
+
+- Depuis `ace5eb6`, la règle 5.1 est codée (`storyMayStart`, `bonds.storyPace`): une seule histoire neuve par jour, et les quêtes partent dans l'ordre de `quetes.json`. Un test qui joue les suites une à une tient les autres « finies » de côté et date du jour 1 la quête finie.
+- Décisions à deux (`decisions.json`): le panneau s'ouvre seul quand l'étape en cours cite `decision_made` (sans option, ou un `any` des options); la décision pose elle-même ses drapeaux. Dans un test: `step`, puis `voteDecision` des deux, puis 2 s.
+- Un bloc de choix vient en dernier dans `lines` (le chargeur refuse sinon, pas le validateur): la suite d'une scène va dans `same` et `different`. Une scène finie s'inscrit sans `@p1`: tester par `dialogueDone()`.
+- Une scène partagée ne vérifie pas que son habitant est là (sauf annonces): caler le `when` sur son emploi du temps, sinon il parle sans être à l'écran.
+- Les six habitants de la démo ont des compléments dans `habitants-0-13.json`: y insérer les répliques en cherchant `"id": "<habitant>"` touche les deux fichiers et double les identifiants. Choisir un seul fichier par habitant.
+- Robot à l'abri: faire partir la première quête d'une suite d'une rencontre (`dialogue_done <habitant>_meet`) d'un habitant que le robot ne va pas voir.

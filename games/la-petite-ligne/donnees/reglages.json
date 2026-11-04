@@ -339,6 +339,9 @@
     "lengths": { "beam": 4.5 },
     "grip": { "side": 0.45, "fromEnd": 0.3, "reach": 1.2, "apart": 1.3 },
     "quests": [
+      {"item": "lucie_satchel", "from": "train_stop", "to": "lucie_house_door", "quest": "lucie_return", "step": "carry", "flag": "lucie_satchel_carried", "placedText": "lucie_satchel_placed"},
+      {"item": "wheat_sacks", "from": "barn_door", "to": "mill_yard", "quest": "berthe_hamlet_sacks", "step": "carry", "flag": "wheat_sacks_carried", "placedText": "wheat_sacks_placed"},
+      {"item": "cracked_bell", "from": "church_square", "to": "train_stop", "quest": "martial_small_bell", "step": "carry", "when": [{"type": "weekday_is", "weekdays": ["saturday"]}, {"type": "time_is", "from": "07:00", "to": "16:00"}], "flag": "small_bell_shipped", "placedText": "small_bell_placed"},
       {"item": "station_clock", "from": "station_door", "to": "rail_cottage_west_door", "quest": "firmin_clock", "step": "carry", "flag": "station_clock_carried", "placedText": "station_clock_placed"},
       {"item": "saw_blade", "from": "sawmill_workbench", "to": "forge_door", "quest": "basile_blade", "step": "carry", "flag": "saw_blade_at_forge", "placedText": "saw_blade_placed"},
       {"item": "saw_blade_sharp", "from": "forge_door", "to": "sawmill_workbench", "quest": "basile_blade", "step": "back", "flag": "saw_blade_back", "placedText": "saw_blade_back_placed"},
