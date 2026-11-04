@@ -251,3 +251,13 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - `vegetation.ts`, `effets.ts` et `GARDEN_CAPACITY` (16) du rendu lisent le potager fixe de la carte: le signaler à chaque potager dynamique.
 - Un optimiseur glouton qui juge une fournée au prix d'avant la vente du jour se trompe (résultats non monotones); juger chaque fournée sur la vente complète du jour.
 - Le contrôle des tirets sur tout le dépôt dépasse 5 minutes à cause de `.claude/worktrees`: le lancer en arrière-plan, ou sur ses seuls fichiers d'abord.
+
+## Les six habitants de la démo dans les données (lot H4 suite, vérifié le 2026-11-04)
+
+- Leurs habitudes, plannings, goûts et appellations vivent dans `habitants.json`, pas dans `habitants-0-13.json`: des tests modifient le brut de `habitants.json` (`firminContent` de `tests/voisins-0-13.test.ts`, `schedule[4]` de Firmin) et une surcharge par le fichier 0.13 les contournerait.
+- Le script tient leurs plannings réels dans `SCHEDULES_DEMO` (entrées de la démo gardées, entrées neuves glissées à la bonne priorité); `controle_demo()` les compare au modèle minute par minute (jours 50 et 100) avec un évaluateur des conditions JSON (`json_cond_ok`). Pour les jours 1 à 15, comparer avant et après avec le même évaluateur (`Demo(...)` fait varier quêtes, dons, drapeaux de l'aube): 0 écart attendu.
+- Pièges trouvés: les anniversaires de Basile (4 du printemps) et de Jeanne (12) tombent dans la démo, et un drapeau de quête 0.13 (`lucie_back`, `bird_hide_built`) peut se poser avant le jour 16: leur ajouter `day_at_least 16`. Une entrée ancienne plus haut dans la liste peut rendre une habitude du document inatteignable (la soirée d'été de Jeanne, coupée à 18 h 30 par le retour avec Solange): suivre l'ordre réel, pas celui du document.
+- Un test qui suppose « seul Firmin a des habitudes » voit Odette à son comptoir dès qu'elle en a: retirer les habitudes des autres dans l'aide du test, et le dire au manager.
+- `valider_carte.py --plannings habitants.json` avertit au-delà de 3 000 nœuds A* (Basile vers `grave_cornu`: 3 029 et 3 218); ce sont des paires de points, pas forcément des trajets réels.
+- Garde de l'arbre isolé: `python3 - fichier <<'EOF'` passe; une commande qui écrit un fichier par heredoc puis lance python dessus, ou qui passe une variable shell, est refusée.
+- À `6a84481`, `robot` (D-01, `heavyDeliveries` avec `crystal_radio`) et `souvenirs` (jour 22 au lieu de 42) étaient déjà rouges: relancer avant et après pour comparer.
