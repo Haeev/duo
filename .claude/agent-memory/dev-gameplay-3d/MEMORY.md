@@ -428,3 +428,8 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - La sacoche de Lucie garde les plis non livrés d'un jour sur l'autre: 30 plis au jour 13 avec les robots, 62 au jour 25 (aucun robot ne livre). C'est le premier poste qui grossit avec le temps.
 - Pêche 0.12 et quête « N poissons d'une espèce »: le robot qui lance à l'aveugle au gué prend ce qui vient (goujons rares au gué, nombreux en amont et vers les sables). Il doit viser comme un joueur: berge face à l'ombre de l'espèce (`wantedShadowAnywhere`), se tourner (pas de 0,2), lancer assisté, remonter une ligne prise par une autre espèce (une fois par 20 s).
 - Sonde de taille: écrire aussi le JSON du pire état dans le scratchpad, puis chiffrer chaque idée de compactage en Python sur ce fichier (`copy.deepcopy`, octets avant et après) avant de toucher au code.
+
+## Notes du lot H1 (0.13, plannings), reportées par le manager
+- Vitest garde en cache les `import.meta.glob`: un nouveau fichier de données (ex. `habitants-0-13.json`) reste invisible tant que `fichiers.ts` ne change pas; vider le cache ou toucher le fichier.
+- Tout nouvel événement de simulation oblige à ajouter son cas dans `audio/declencheurs.ts` (le typage l'exige).
+- `src/reseau/schemas.ts` plafonnait à 16 habitants les positions envoyées à l'invité; porté à 32 pour les 21 habitants de la 0.13.
