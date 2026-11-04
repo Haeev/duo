@@ -3,7 +3,6 @@
  * applique les intentions des deux joueurs dans leur ordre d'arrivée et
  * envoie à l'invité l'état, les positions et les événements.
  */
-import { writtenWorld } from '../etat/habitants-ecrits';
 import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
@@ -21,6 +20,7 @@ import {
   type GuestInput,
   type WorldMessage,
 } from './schemas';
+import { sentWorld } from './etat-transmis';
 
 /** Commandes de l'invité gardées d'avance au plus (au-delà, on rattrape le retard). */
 const MAX_BUFFERED_FRAMES = 4;
@@ -52,7 +52,7 @@ export interface Host {
   queueLocal(intent: Intent): void;
   /** Un pas: commandes du joueur local, puis envoi à l'invité. Renvoie les événements du pas. */
   step(local: ControlFrame): readonly WorldEvent[];
-  /** Envoie tout de suite l'état complet (après une reprise de partie). */
+  /** Envoie tout de suite un instantané rapide puis l'état complet (départ, reprise de partie). */
   sendWorld(): void;
   dispose(): void;
 }
@@ -115,8 +115,9 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
   }
 
   function sendWorld(): void {
-    // 0.13 (lot H2): les habitants sans leurs valeurs par défaut (`habitants-ecrits.ts`).
-    channels.world.send({ ack, world: writtenWorld(sim.world) });
+    // 0.13: les habitants sans leurs valeurs par défaut ni leurs champs du canal rapide
+    // (`etat-transmis.ts`): l'invité reprend positions, caps et vitesses des instantanés.
+    channels.world.send({ ack, world: sentWorld(sim.world) });
     sentRevision = sim.world.revision;
     lastWorldTick = sim.world.tick;
   }
@@ -138,7 +139,12 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
       if ((w.revision !== sentRevision && due >= WORLD_EVERY_TICKS) || due >= WORLD_KEEPALIVE_TICKS) sendWorld();
       return sim.events;
     },
-    sendWorld,
+    sendWorld() {
+      // Hors d'un pas (départ, reprise): un instantané du même pas part juste avant, pour que
+      // l'invité place chaque habitant là où il est vraiment dès sa première image.
+      channels.fast.send(fastSnapshot());
+      sendWorld();
+    },
     dispose() {
       unsubscribe();
     },

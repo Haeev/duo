@@ -3,17 +3,19 @@
  * l'état de l'hôte, interpole les autres et prédit son propre déplacement pour
  * rester fluide, corrigé en douceur par les positions de l'hôte.
  */
-import { worldFromWritten } from '../etat/habitants-ecrits';
 import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
-import type { GameMap } from '../etat/carte';
+import { offstagePoint, type GameMap } from '../etat/carte';
 import type { Character, CharacterId, Vec2, WorldEvent, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { MOVE_DEADZONE, SIM_DT } from '../simulation/constantes';
 import { standingSpot } from '../simulation/bancs';
 import { type Sim, wrapWorld } from '../simulation/contexte';
 import { blockersFor, walkStep } from '../simulation/deplacement';
+import { placeAtTarget } from '../simulation/habitants';
+import { POINT } from '../simulation/ids';
+import { worldFromSent, type SentVillager, type VillagerPlace } from './etat-transmis';
 import {
   CHANNEL,
   EventsMessageSchema,
@@ -162,18 +164,23 @@ export function createGuest(
     return pos;
   }
 
-  const offWorld = channels.world.onMessage((message) => {
-    const world = worldFromWritten(message.world);
-    const mine = world.characters.find((c) => c.playerId === playerId);
-    if (mine !== undefined) localId = mine.id;
-    keepStanding(world, message.ack);
-    if (sim === null) sim = wrapWorld(content, map, world);
-    else {
-      sim.world = world;
-      sim.runtime.dynamicDirty = true;
+  /** Dernière valeur rapide connue d'un habitant (l'état complet n'a plus ses positions). */
+  function lastFastPlace(id: string): VillagerPlace | null {
+    for (let i = snapshots.length - 1; i >= 0; i--) {
+      const found = snapshots[i]?.snap.villagers.find((x) => x.id === id);
+      if (found !== undefined) return { x: found.x, y: found.y, f: found.f, s: found.s };
     }
-  });
+    return null;
+  }
 
+  /** Sans valeur rapide: le point de son planning, affiné ensuite par `placeAtTarget` (cap d'un habitant neuf sans poste). */
+  function plannedPoint(v: SentVillager): VillagerPlace {
+    const at = map.points[v.target] ?? map.points[POINT.offstage] ?? offstagePoint(map);
+    return { x: at.x, y: at.y, f: map.pointFacings[v.target] ?? Math.PI / 2, s: 0 };
+  }
+
+  // Le canal rapide s'abonne avant l'état: des messages reçus avant les écouteurs, l'instantané
+  // (envoyé juste avant l'état par `sendWorld`) est ainsi remis le premier.
   const offFast = channels.fast.onMessage((snap) => {
     snapshots.push({ snap, at: now() });
     if (snapshots.length > SNAPSHOTS_KEPT) snapshots.shift();
@@ -206,6 +213,20 @@ export function createGuest(
     predicted = next;
     // Plus aucun pas en attente: le cap de l'hôte fait foi (il tourne le personnage vers ce qu'il fait, sans marcher).
     if (pendingFrames.every((f) => f.moveX === 0 && f.moveY === 0)) predictedFacing = auth.f;
+  });
+
+  const offWorld = channels.world.onMessage((message) => {
+    const { world, unplaced } = worldFromSent(message.world, lastFastPlace, plannedPoint);
+    const mine = world.characters.find((c) => c.playerId === playerId);
+    if (mine !== undefined) localId = mine.id;
+    keepStanding(world, message.ack);
+    if (sim === null) sim = wrapWorld(content, map, world);
+    else {
+      sim.world = world;
+      sim.runtime.dynamicDirty = true;
+    }
+    const s = sim;
+    for (const v of s.world.villagers) if (unplaced.includes(v.id)) placeAtTarget(s, v);
   });
 
   const offEvents = channels.events.onMessage((message) => {

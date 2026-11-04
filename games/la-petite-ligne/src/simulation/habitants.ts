@@ -2,7 +2,7 @@
  * Habitants: emploi du temps (`habitants.json`, première entrée vraie) et
  * trajets à pied d'un point à l'autre. Ils traversent les personnages (PE-09).
  */
-import { inMap } from '../etat/carte';
+import { inMap, offstagePoint } from '../etat/carte';
 import type { Vec2, VillagerState } from '../etat/types';
 import type { VillagerDef } from '../donnees/types';
 import { evaluateAll, NO_CONTEXT } from './conditions';
@@ -95,6 +95,19 @@ export function placeVillagers(sim: Sim): void {
     v.speed = 0;
     sim.runtime.villagerPaths[v.id] = { target: entry.point, path: [] };
   }
+}
+
+/**
+ * Chez l'invité, un habitant reçu sans position rapide (état arrivé avant le premier instantané):
+ * il est posé là où `placeVillagers` le mettrait pour son point en cours, sans changer de point,
+ * tourné comme son poste le veut. C'est sa place exacte en début de partie et à chaque aube.
+ */
+export function placeAtTarget(sim: Sim, v: VillagerState): void {
+  const at = goalOf(sim, v, v.target) ?? sim.map.points[POINT.offstage] ?? offstagePoint(sim.map);
+  teleport(v, at.x, at.y);
+  const post = sim.map.pointFacings[v.target];
+  if (post !== undefined) v.facing = post;
+  v.speed = 0;
 }
 
 export function updateVillagers(sim: Sim, dt: number): void {

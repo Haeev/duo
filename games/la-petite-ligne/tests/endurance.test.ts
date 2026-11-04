@@ -3,7 +3,7 @@
 // état incohérent, et l'état doit toujours tenir dans un message de 64 Kio (ADR 0007).
 import { dialogueDone } from '../src/etat/dialogues-faits';
 import { inMap } from '../src/etat/carte';
-import { writtenWorld } from '../src/etat/habitants-ecrits';
+import { sentWorld } from '../src/reseau/etat-transmis';
 import { describe, expect, it } from 'vitest';
 import type { WorldState } from '../src/etat/types';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
@@ -37,7 +37,10 @@ const MAX_STATE_BYTES = 64 * 1024;
 // 35 266 à 36 752 octets sur les huit graines (amitié comprise). L'objectif de 35 Kio demande encore
 // environ 1 Ko (positions des habitants hors du message d'état, à trancher avec dev-reseau): alerte
 // à 37 Kio en attendant; plafond dur de 64 Kio inchangé.
-const ALERT_STATE_BYTES = 37 * 1024;
+// 0.13 (mission 0.13 de dev-reseau): positions, caps et vitesses des habitants hors du message
+// d'état (le canal rapide les porte, `reseau/etat-transmis.ts`): 33 495 à 35 448 octets sur les
+// huit graines (de 35 266 à 36 752 avant, 1 185 à 1 839 de moins). Alerte remise à 35 Kio.
+const ALERT_STATE_BYTES = 35 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
 /** Contrôle de taille et de cohérence toutes les dix secondes réelles. */
@@ -55,7 +58,7 @@ interface Run {
 
 /** Octets du message d'état complet de l'hôte (`hote.ts`, `sendWorld`), comptés comme le SDK (UTF-8). */
 function stateMessageBytes(world: WorldState): number {
-  return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world: writtenWorld(world) }), 'utf8');
+  return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world: sentWorld(world) }), 'utf8');
 }
 
 /** Heure de jeu absolue, en minutes depuis le jour 1 à minuit. */
@@ -160,7 +163,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
-  expect(run.maxBytes, `état transmis sous 37 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
+  expect(run.maxBytes, `état transmis sous 35 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);
   expectMomentsAndSecrets(sim);
 }
