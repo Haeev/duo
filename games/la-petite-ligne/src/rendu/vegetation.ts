@@ -20,8 +20,10 @@ import { inRect, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { hash2, valueNoise } from './bruit';
 import { ShapeBuilder } from './geometrie';
+import { bakeGeometry } from './decor';
 import { createInstanced, finishInstances } from './instances';
 import type { SharedMaterials } from './materiaux';
+import type { ModelLibrary } from './modeles';
 import type { PaletteCell } from './palette';
 import { RENDER_SETTINGS, type ForestClearing } from './reglages';
 import type { ResourceTracker } from './ressources';
@@ -57,6 +59,7 @@ const FLOWER_CELLS: readonly PaletteCell[] = [
   'flower_violet',
 ];
 const PEBBLE_CELLS: readonly PaletteCell[] = ['rock', 'rock_light', 'stone_light'];
+const SEED_FERN = 24;
 /** Marge sans arbre au-delà du bord jouable, puis densité qui monte avec la distance. */
 const TREE_RAMP = 0.035;
 const TREE_MAX_DENSITY = 0.42;
@@ -97,6 +100,25 @@ export function clearingShift(side: ForestClearing['side'], along: number): numb
   return shift;
 }
 
+/** Un modèle de l'artiste cuit en une géométrie (pièces placées, attributs communs), `null` s'il manque. */
+function bakedModel(library: ModelLibrary, name: string, resources: ResourceTracker): BufferGeometry | null {
+  if (!library.has(name)) return null;
+  const pieces = library.parts(name).map((part) => bakeGeometry(part.geometry, part.matrix));
+  const merged = pieces.length === 1 ? pieces[0] : mergeGeometries(pieces, false);
+  for (const piece of pieces) if (piece !== merged) piece.dispose();
+  return merged === undefined ? null : resources.track(merged);
+}
+
+/** Fougères du sous-bois (`foret013.glb`), ou `null` si l'une manque. */
+export function fernGeometries(
+  library: ModelLibrary,
+  resources: ResourceTracker,
+): { large: BufferGeometry; small: BufferGeometry } | null {
+  const large = bakedModel(library, 'fern', resources);
+  const small = bakedModel(library, 'fern_small', resources);
+  return large === null || small === null ? null : { large, small };
+}
+
 function pick<T>(items: readonly T[], value: number): T {
   const item = items[Math.min(items.length - 1, Math.floor(value * items.length))];
   if (item === undefined) {
@@ -126,14 +148,22 @@ export class Vegetation {
     resources: ResourceTracker,
     /** Part gardée (1 en mode normal, moins en mode léger). */
     private readonly share = 1,
+    /**
+     * Fougères du sous-bois (0.13): grande et petite, géométries cuites des modèles de l'artiste
+     * (`fern`, `fern_small`); absentes, le sous-bois n'a que ses touffes de mousse.
+     */
+    ferns: { large: BufferGeometry; small: BufferGeometry } | null = null,
   ) {
     this.group.name = 'vegetation';
     const occupied = map.props.filter((prop) => prop.rect !== null).map((prop) => prop.rect);
     const garden = new Set(map.garden.map((cell) => `${cell.cx}:${cell.cy}`));
-    const free = (cx: number, cy: number): boolean =>
+    const open = (cx: number, cy: number): boolean =>
       terrain.isGrass(cx, cy) &&
       !garden.has(`${cx}:${cy}`) &&
       !occupied.some((rect) => rect !== null && inRect(rect, cx + 0.5, cy + 0.5));
+    // Herbe des prés; le sous-bois (0.13) a son propre semis.
+    const free = (cx: number, cy: number): boolean => open(cx, cy) && !terrain.isUndergrowth(cx, cy);
+    const underwood = (cx: number, cy: number): boolean => open(cx, cy) && terrain.isUndergrowth(cx, cy);
 
     const tuft = new ShapeBuilder();
     for (const [x, z, tilt] of [
@@ -241,6 +271,38 @@ export class Vegetation {
       this.group.add(mesh);
     };
     scatter('touffes', tuft, tufts, TUFT_CELLS, SEED_TUFT, false);
+    // Sous-bois: fougères de l'artiste, cuites par morceau en un seul maillage (un appel par morceau,
+    // sans ombre); la litière et la mousse sont peintes par le shader des surfaces.
+    if (ferns !== null) {
+      const wood = SETTINGS.undergrowth;
+      const byChunk = new Map<string, BufferGeometry[]>();
+      for (const { cx, cy } of cells) {
+        if (!underwood(cx, cy) || hash2(cx, cy, SEED_FERN) >= wood.fernDensity * this.share) continue;
+        const source = hash2(cx, cy, SEED_FERN + 1) < wood.largeFernShare ? ferns.large : ferns.small;
+        const x = cx + 0.5 + (hash2(cx, cy, SEED_JITTER_X + SEED_FERN) - 0.5) * JITTER;
+        const y = cy + 0.5 + (hash2(cx, cy, SEED_JITTER_Y + SEED_FERN) - 0.5) * JITTER;
+        const size = TREE_SCALE_MIN + hash2(cx, cy, SEED_SCALE + SEED_FERN) * TREE_SCALE_SPREAD * 0.6;
+        position.set(x, terrain.heightAt(x, y), y);
+        rotation.setFromEuler(euler.set(0, hash2(cx, cy, SEED_ANGLE + SEED_FERN) * Math.PI * 2, 0));
+        scale.set(size, size, size);
+        const key = `${Math.floor(cx / chunk)}:${Math.floor(cy / chunk)}`;
+        const piece = source.clone().applyMatrix4(matrix.compose(position, rotation, scale));
+        const list = byChunk.get(key);
+        if (list === undefined) byChunk.set(key, [piece]);
+        else list.push(piece);
+      }
+      for (const [key, pieces] of byChunk) {
+        const merged = mergeGeometries(pieces, false);
+        for (const piece of pieces) piece.dispose();
+        merged.computeBoundingSphere();
+        const mesh = new Mesh(resources.track(merged), materials.palette);
+        mesh.name = `fougeres ${key}`;
+        mesh.matrixAutoUpdate = false;
+        mesh.castShadow = false;
+        mesh.receiveShadow = true;
+        this.group.add(mesh);
+      }
+    }
     // Fleurs: peu de triangles (23 chacune), par grands morceaux comme les galets.
     scatter('fleurs', flower, flowers, FLOWER_CELLS, SEED_FLOWER, false, RENDER_SETTINGS.terrain.pebbleChunk);
     scatter('galets', pebble, pebbles, PEBBLE_CELLS, SEED_PEBBLE, false, RENDER_SETTINGS.terrain.pebbleChunk);

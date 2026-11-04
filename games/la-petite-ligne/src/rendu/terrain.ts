@@ -16,7 +16,7 @@ import {
   Quaternion,
   Vector3,
 } from 'three';
-import type { GameMap, GroundKind, MapCrossing, MapProp, Rect } from '../etat/carte';
+import type { GameMap, GroundKind, GroundStyle, MapCrossing, MapProp, Rect } from '../etat/carte';
 import { cellIndex, cellX, cellY, inMap, inRect } from '../etat/carte';
 import { valueNoise, hash2 } from './bruit';
 import { isFord } from './champs';
@@ -24,7 +24,7 @@ import { layFordStones } from './gue';
 import { ShapeBuilder } from './geometrie';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import type { SharedMaterials } from './materiaux';
-import { paletteUv, type PaletteCell } from './palette';
+import { groundMarkUv, paletteUv, type GroundMark, type PaletteCell } from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import type { ResourceTracker } from './ressources';
@@ -35,6 +35,7 @@ import {
   type RiverField,
   type RiverStone,
 } from './riviere';
+import { inReach, millraceReaches, reachHeight, stillBasins, type ChannelReach } from './bief';
 import { isStreamCell, streamHeight, streamLayout, type StreamLayout } from './ru';
 import { mainLine } from './voie';
 
@@ -93,6 +94,15 @@ interface CellLook {
   /** Eau franchissable (gué). */
   ford: boolean;
   height: number;
+  /** Aspect de rendu (`map.groundStyles`): sous-bois, sentier de forêt, bief. */
+  style: GroundStyle | null;
+}
+
+/** Teinte d'une face du terrain: une case de la palette, ou un sol marqué (sous-bois, sentier de forêt). */
+type TerrainCell = PaletteCell | GroundMark;
+
+function terrainUv(cell: TerrainCell): { u: number; v: number } {
+  return cell === 'undergrowth' || cell === 'forest_path' ? groundMarkUv(cell) : paletteUv(cell);
 }
 
 class GeometryWriter {
@@ -107,7 +117,7 @@ class GeometryWriter {
   quad(
     points: readonly (readonly [number, number, number])[],
     normal: readonly [number, number, number],
-    cell: PaletteCell,
+    cell: TerrainCell,
   ): void {
     const [p0, p1, p2, p3] = points;
     if (p0 === undefined || p1 === undefined || p2 === undefined || p3 === undefined) {
@@ -118,7 +128,7 @@ class GeometryWriter {
     this.n.crossVectors(this.a, this.b);
     const facing = this.n.x * normal[0] + this.n.y * normal[1] + this.n.z * normal[2];
     const order = facing >= 0 ? [p0, p1, p2, p0, p2, p3] : [p0, p2, p1, p0, p3, p2];
-    const uv = paletteUv(cell);
+    const uv = terrainUv(cell);
     for (const p of order) {
       this.positions.push(p[0], p[1], p[2]);
       this.normals.push(normal[0], normal[1], normal[2]);
@@ -132,14 +142,14 @@ class GeometryWriter {
     p1: readonly [number, number, number],
     p2: readonly [number, number, number],
     normal: readonly [number, number, number],
-    cell: PaletteCell,
+    cell: TerrainCell,
   ): void {
     this.a.set(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]);
     this.b.set(p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]);
     this.n.crossVectors(this.a, this.b);
     const facing = this.n.x * normal[0] + this.n.y * normal[1] + this.n.z * normal[2];
     const order = facing >= 0 ? [p0, p1, p2] : [p0, p2, p1];
-    const uv = paletteUv(cell);
+    const uv = terrainUv(cell);
     for (const p of order) {
       this.positions.push(p[0], p[1], p[2]);
       this.normals.push(normal[0], normal[1], normal[2]);
@@ -154,7 +164,7 @@ class GeometryWriter {
   smoothTriangle(
     points: readonly (readonly [number, number, number])[],
     normals: readonly (readonly [number, number, number])[],
-    cell: PaletteCell,
+    cell: TerrainCell,
   ): void {
     const [p0, p1, p2] = points;
     const [n0, n1, n2] = normals;
@@ -172,7 +182,7 @@ class GeometryWriter {
     this.b.set(p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2]);
     this.n.crossVectors(this.a, this.b);
     const order: [number, number, number] = this.n.y >= 0 ? [0, 1, 2] : [0, 2, 1];
-    const uv = paletteUv(cell);
+    const uv = terrainUv(cell);
     for (const index of order) {
       const p = points[index];
       const normal = normals[index];
@@ -211,6 +221,10 @@ const SEED_REED = 151;
 const SEED_STREAM_STONE = 171;
 /** Rangées du ru avant l'embouchure vues comme de l'eau par le champ de la rivière. */
 const STREAM_MOUTH_ROWS = 2;
+/** Marche plus basse que ceci entre une case et le lit de la rivière: aucune face (m). */
+const BED_STEP_MIN = 0.005;
+/** Pas de côté pour lire le sol juste au-delà du bord d'un tronçon du bief (m). */
+const EDGE_PROBE = 0.02;
 const RIVER_STONE_CELLS: readonly PaletteCell[] = ['rock', 'rock_light', 'rock_dark', 'rock'];
 const REED_CELLS: readonly PaletteCell[] = ['grass_dark', 'moss', 'grass_dark', 'grass_dry'];
 /** Coins d'une case, dans l'ordre du pourtour: direction (sx, sy) vers le coin. */
@@ -247,6 +261,12 @@ export class Terrain {
   readonly water: Mesh[] = [];
   /** Surface du ru de la Côte, en morceaux (même programme que la rivière, courant vers le sud). */
   readonly streamWater: Mesh[] = [];
+  /** Surface du bief du moulin (0.13), en morceaux (même programme, courant vers l'est). */
+  readonly millraceWater: Mesh[] = [];
+  /** Surface des petits bassins d'eau dormante (0.13: source, mare de la pâture), même programme, sans courant. */
+  readonly pondWater: Mesh[] = [];
+  /** Petites eaux creusées (`bief.ts`): tronçons du bief du moulin, puis petits bassins. */
+  readonly channels: ChannelReach[];
   private readonly ext = SETTINGS.extension;
   /** Bornes de la grille (première case comprise, `gridX1` et `gridY1` exclues). */
   private readonly gridX0: number;
@@ -285,6 +305,10 @@ export class Terrain {
       }
     }
     this.stream = streamLayout(map, this.ext);
+    this.channels = [
+      ...millraceReaches(map, SETTINGS.millrace.bandReach),
+      ...stillBasins(map, this.stream, SETTINGS.millrace.basinMaxCells),
+    ];
     for (let cy = this.gridY0; cy < this.gridY1; cy += 1) {
       for (let cx = this.gridX0; cx < this.gridX1; cx += 1) {
         if (isFord(map, cx, cy) && !isStreamCell(this.stream, cx, cy)) {
@@ -308,12 +332,13 @@ export class Terrain {
     for (const rect of this.floorRects) {
       for (let cy = rect.y; cy < rect.y + rect.h; cy += 1) {
         for (let cx = rect.x; cx < rect.x + rect.w; cx += 1) {
-          if (cx >= 0 && cy >= 0 && cx < map.width && cy < map.height) this.underProp.add(cellIndex(map, cx, cy));
+          if (inMap(map, cx, cy)) this.underProp.add(cellIndex(map, cx, cy));
         }
       }
     }
     this.findCrossings();
     this.river = this.buildRiverField();
+    this.carveChannelsInRiverField();
     // Sol et creux du ru: même matériau, mêmes morceaux de `surfaceChunk` m. Le lit de la rivière
     // (berges quadrillées, pierres, roseaux: dense) garde ses tronçons de `stripSegment` m: dans
     // les morceaux du sol, la vue de la place gagnait 10 000 triangles pour 5 appels de moins.
@@ -339,6 +364,7 @@ export class Terrain {
     this.buildGround(writerFor(false));
     const stones = this.buildRiver(writerFor(true), pieceFor(true));
     this.buildStreamBed(writerFor(false), pieceFor(false));
+    this.buildMillraceBed(writerFor(false));
     for (const key of new Set([...writers.keys(), ...pieces.keys()])) {
       const writer = writers.get(key);
       const parts = [...(pieces.get(key) ?? [])];
@@ -371,6 +397,7 @@ export class Terrain {
     outer.matrixAutoUpdate = false;
     this.group.add(outer);
     this.buildStreamWater(materials, resources);
+    this.buildMillraceWater(materials, resources);
     this.river.texture = resources.track(riverTexture(this.river, stones));
   }
 
@@ -380,9 +407,20 @@ export class Terrain {
     return `${Math.floor((x + this.ext) / size)}:${Math.floor((y + this.ext) / size)}`;
   }
 
-  /** Vrai si la case est creusée par le ru. */
+  /** Vrai si la case est creusée par le ru ou par le bief du moulin (dessinée par eux). */
   isStream(cx: number, cy: number): boolean {
-    return isStreamCell(this.stream, cx, cy);
+    return isStreamCell(this.stream, cx, cy) || this.inMillrace(cx + 0.5, cy + 0.5);
+  }
+
+  /** Vrai si la case est dans le bief du moulin. */
+  isMillrace(cx: number, cy: number): boolean {
+    return this.inMillrace(cx + 0.5, cy + 0.5);
+  }
+
+  /** Vrai si le point est dans le bief du moulin (`edges`: bords compris). */
+  private inMillrace(x: number, y: number, edges = false): boolean {
+    for (const reach of this.channels) if (inReach(reach, x, y, edges)) return true;
+    return false;
   }
 
   /** Cases du gué (gravier entre deux bras d'eau): haut-fond de galets sous l'eau. */
@@ -395,12 +433,19 @@ export class Terrain {
     if (!this.insideBand(cx, cy)) {
       return 'land';
     }
-    if (this.isStream(cx, cy)) {
+    if (isStreamCell(this.stream, cx, cy)) {
       // Le ru sur la grève (deux rangées avant l'embouchure) compte comme de l'eau pour le champ
       // de la rivière: la ligne d'eau suit le ru jusqu'à elle, sans mur de sable entre les deux.
       // Plus haut, c'est de la terre (le creux est dessiné par le ru lui-même).
       const mouth = this.stream?.mouthY ?? 0;
       return cy >= mouth - STREAM_MOUTH_ROWS ? 'water' : 'land';
+    }
+    if (this.inMillrace(cx + 0.5, cy + 0.5)) {
+      // Bief: de la terre pour la rivière, sauf les deux rangées du canal de fuite avant elle (comme le ru).
+      const mouth = this.channels.find((reach) => reach.mouth && inReach(reach, cx + 0.5, cy + 0.5));
+      if (mouth === undefined) return 'land';
+      const along = mouth.axis === 'x' ? cx : cy;
+      return along >= mouth.along1 - STREAM_MOUTH_ROWS ? 'water' : 'land';
     }
     const look = this.look(cx, cy);
     if (look.ford) {
@@ -448,6 +493,47 @@ export class Terrain {
       y0,
       y1,
     );
+  }
+
+  /**
+   * Le ru et le bief dans le champ du lit de la rivière. Depuis la 0.13, le champ couvre toute la
+   * largeur de la carte entre la mare du bois et la rivière: là où il passe sur le ru ou le bief, il
+   * ne voyait que de la terre, et le shader de l'eau, qui lit la profondeur dans ce champ, peignait
+   * leur surface en écume (eau « au-dessus » du fond). On y écrit leur vrai fond (nœuds strictement
+   * dedans: les berges voisines, dessinées par le lit, ne bougent pas).
+   */
+  private carveChannelsInRiverField(): void {
+    const field = this.river;
+    const e = 1e-4;
+    const inside = (test: (x: number, y: number) => boolean, x: number, y: number): boolean =>
+      test(x - e, y - e) && test(x + e, y - e) && test(x - e, y + e) && test(x + e, y + e);
+    const inRu = (x: number, y: number): boolean => isStreamCell(this.stream, Math.floor(x), Math.floor(y));
+    const inBief = (x: number, y: number): boolean => this.inMillrace(x, y);
+    const updates: [number, number][] = [];
+    for (let j = 0; j < field.height; j += 1) {
+      const y = field.originY + j * field.step;
+      for (let i = 0; i < field.width; i += 1) {
+        const x = field.originX + i * field.step;
+        const ground = inside(inRu, x, y)
+          ? this.streamGround(x, y)
+          : inside(inBief, x, y)
+            ? this.millraceGround(x, y)
+            : null;
+        const index = j * field.width + i;
+        if (ground !== null) updates.push([index, Math.min(field.bed[index] ?? ground, ground)]);
+      }
+    }
+    for (const [index, height] of updates) field.bed[index] = height;
+  }
+
+  /** Plus basse hauteur du lit le long du côté `side` de la case (lue juste au-delà du bord). */
+  private bedEdgeHeight(cx: number, cy: number, side: { dx: number; dy: number }): number {
+    const e = 0.01;
+    const x = side.dx === 1 ? cx + 1 + e : side.dx === -1 ? cx - e : null;
+    const y = side.dy === 1 ? cy + 1 + e : side.dy === -1 ? cy - e : null;
+    const ends: [number, number][] =
+      x !== null ? [[x, cy + e], [x, cy + 1 - e]] : [[cx + e, y ?? cy], [cx + 1 - e, y ?? cy]];
+    return Math.min(...ends.map(([px, py]) => this.bedHeight(px, py)));
   }
 
   /** Hauteur dessinée du lit sous un point (berge, gué, fond), ou celle de la case hors du lit. */
@@ -703,7 +789,7 @@ export class Terrain {
       : kind === 'water'
         ? SETTINGS.heights.water
         : SETTINGS.heights[kind];
-    return { kind, ford, height };
+    return { kind, ford, height, style: this.map.groundStyles?.[index] ?? null };
   }
 
   /**
@@ -731,7 +817,7 @@ export class Terrain {
    * les deux surfaces se battaient à chaque image. Le modèle couvre toute son emprise.
    */
   coveredByFloorProp(cx: number, cy: number): boolean {
-    const inside = cx >= 0 && cy >= 0 && cx < this.map.width && cy < this.map.height;
+    const inside = inMap(this.map, cx, cy);
     return inside && this.underProp.has(cellIndex(this.map, cx, cy));
   }
 
@@ -763,7 +849,7 @@ export class Terrain {
     const ground = this.heightAt(x, y);
     const cx = Math.floor(x);
     const cy = Math.floor(y);
-    if (cx < 0 || cy < 0 || cx >= this.map.width || cy >= this.map.height) return ground;
+    if (!inMap(this.map, cx, cy)) return ground;
     if (this.map.ground[cellIndex(this.map, cx, cy)] !== 'rail') return ground;
     // Ligne (est-ouest): écart à son axe; voie de garage (une colonne nord-sud): écart au milieu de la colonne.
     const across = this.line.rows.has(cy) ? y - this.line.trackY : x - (cx + 0.5);
@@ -783,9 +869,12 @@ export class Terrain {
         return h;
       }
     }
-    if (this.isStream(Math.floor(x), Math.floor(y))) {
+    if (isStreamCell(this.stream, Math.floor(x), Math.floor(y))) {
       // Le ru (hors des ouvrages, déjà vus): la surface de l'eau, le haut des berges au bord.
       return Math.max(SETTINGS.waterSurface, this.streamGround(x, y));
+    }
+    if (this.inMillrace(x, y)) {
+      return Math.max(SETTINGS.waterSurface, this.millraceGround(x, y));
     }
     const look = this.look(Math.floor(x), Math.floor(y));
     if (look.kind === 'water' && !look.ford) {
@@ -805,6 +894,11 @@ export class Terrain {
   /** Vrai si l'herbe pousse là (touffes, fleurs, arbres du pourtour). */
   isGrass(cx: number, cy: number): boolean {
     return this.look(cx, cy).kind === 'grass' && !this.isStream(cx, cy);
+  }
+
+  /** Vrai sur le sous-bois (0.13): ses semis remplacent les fleurs et l'herbe des prés. */
+  isUndergrowth(cx: number, cy: number): boolean {
+    return this.look(cx, cy).style === 'undergrowth';
   }
 
   /**
@@ -831,9 +925,40 @@ export class Terrain {
     return h + (this.bedHeight(x, layout.mouthY) - h) * blend;
   }
 
-  private topCell(look: CellLook, cx: number, cy: number): PaletteCell {
+  /**
+   * Hauteur du creux du bief au point (union de ses tronçons: le plus bas l'emporte). Le haut des
+   * berges rejoint le sol dessiné de part et d'autre (herbe, grève); le canal de fuite rejoint le
+   * lit de la rivière sur sa dernière rangée.
+   */
+  private millraceGround(x: number, y: number): number {
+    let h = Number.POSITIVE_INFINITY;
+    for (const reach of this.channels) {
+      if (!inReach(reach, x, y, true)) continue;
+      const across = reach.axis === 'x' ? y : x;
+      const along = reach.axis === 'x' ? x : y;
+      const side = (value: number): number =>
+        reach.axis === 'x' ? this.bedHeight(along, value) : this.bedHeight(value, along);
+      const low = side(reach.across0 - EDGE_PROBE);
+      const high = side(reach.across1 + EDGE_PROBE);
+      const t = (across - reach.across0) / (reach.across1 - reach.across0);
+      let g = reachHeight(reach, x, y, low + (high - low) * Math.min(1, Math.max(0, t)));
+      const into = along - (reach.along1 - 1);
+      if (reach.mouth && into > 0) {
+        const s = Math.min(1, into);
+        const blend = s * s * (3 - 2 * s);
+        const bed = reach.axis === 'x' ? this.bedHeight(reach.along1, across) : this.bedHeight(across, reach.along1);
+        g += (bed - g) * blend;
+      }
+      h = Math.min(h, g);
+    }
+    return Number.isFinite(h) ? h : this.bedHeight(x, y);
+  }
+
+  private topCell(look: CellLook, cx: number, cy: number): TerrainCell {
     switch (look.kind) {
       case 'grass': {
+        // Sous-bois (0.13): litière et mousse, peintes par le shader des surfaces.
+        if (look.style === 'undergrowth') return 'undergrowth';
         const n = valueNoise(cx, cy, SETTINGS.grassPatchScale, NOISE_SEED_GRASS);
         return n < DARK_GRASS_BELOW
           ? 'grass_dark'
@@ -842,6 +967,7 @@ export class Terrain {
             : 'grass';
       }
       case 'path':
+        if (look.style === 'forestPath') return 'forest_path';
         return valueNoise(cx, cy, SETTINGS.grassPatchScale / 2, NOISE_SEED_PATH) > PATH_DARK_ABOVE
           ? 'path_dark'
           : 'path';
@@ -853,7 +979,9 @@ export class Terrain {
       case 'wood':
         return cx % 2 === 0 ? 'wood' : 'wood_dark';
       case 'floor':
-        return cy % 2 === 0 ? 'wood_new' : 'wood';
+        // Ce qui dépasse du modèle (0.13: pied de l'église, du moulin, du logis, plus larges que le
+        // bâtiment dessiné) est un pied de pierre, pas un plancher de planches en plein air.
+        return 'stone';
       case 'water':
         return look.ford ? 'cobble_dark' : 'water_deep';
       case 'rail':
@@ -904,7 +1032,7 @@ export class Terrain {
     look: CellLook,
     sx: number,
     sy: number,
-  ): PaletteCell | null {
+  ): TerrainCell | null {
     if (!ROUNDED_KINDS.has(look.kind)) {
       return null;
     }
@@ -913,29 +1041,31 @@ export class Terrain {
       [cx, cy + sy],
       [cx + sx, cy + sy],
     ];
-    let kind: GroundKind | null = null;
+    let kind: string | null = null;
     for (const [nx, ny] of neighbours) {
       if (!this.insideBand(nx, ny)) {
         return null;
       }
       const other = this.look(nx, ny);
+      // Même sol et même aspect: rien à arrondir (l'herbe contre le sous-bois s'arrondit aussi).
+      const otherKey = `${other.kind}:${other.style ?? ''}`;
       if (
-        other.kind === look.kind ||
+        otherKey === `${look.kind}:${look.style ?? ''}` ||
         Math.abs(other.height - look.height) > SETTINGS.cornerMaxStep ||
         !ROUNDED_KINDS.has(other.kind)
       ) {
         return null;
       }
-      if (kind !== null && other.kind !== kind) {
+      if (kind !== null && otherKey !== kind) {
         return null;
       }
-      kind = other.kind;
+      kind = otherKey;
     }
     return this.topCell(this.look(cx + sx, cy), cx + sx, cy);
   }
 
   /** Coins rognés d'une case (teinte par coin, `null` s'il reste droit); `null` si aucun. */
-  private roundedCorners(cx: number, cy: number, look: CellLook): (PaletteCell | null)[] | null {
+  private roundedCorners(cx: number, cy: number, look: CellLook): (TerrainCell | null)[] | null {
     const fills = CORNERS.map(([sx, sy]) => this.cornerFill(cx, cy, look, sx, sy));
     return fills.some((fill) => fill !== null) ? fills : null;
   }
@@ -950,8 +1080,8 @@ export class Terrain {
     cx: number,
     cy: number,
     height: number,
-    cell: PaletteCell,
-    fills: readonly (PaletteCell | null)[],
+    cell: TerrainCell,
+    fills: readonly (TerrainCell | null)[],
   ): void {
     const up = [0, 1, 0] as const;
     const radius = SETTINGS.cornerRadius;
@@ -1104,7 +1234,7 @@ export class Terrain {
       // Dessus: les cases voisines de même aspect sont fusionnées en bandes (moins de triangles),
       // sans déborder de leur morceau.
       let runStart = this.gridX0 - this.ext;
-      let runCell: PaletteCell | null = null;
+      let runCell: TerrainCell | null = null;
       let runHeight = 0;
       for (let cx = this.gridX0 - this.ext; cx <= this.gridX1 + this.ext; cx += 1) {
         const atEnd = cx === this.gridX1 + this.ext;
@@ -1165,15 +1295,19 @@ export class Terrain {
         const h = look.height;
         for (const side of SIDES) {
           const outside = !this.insideBand(cx + side.dx, cy + side.dy);
+          // Le lit de la rivière rejoint ses voisins à la hauteur de l'herbe: contre une case plus haute
+          // (sol de bâtiment, 0.13: cour de ferme et parvis en gravier), une marche jusqu'au lit,
+          // sinon on voyait le ciel par la fente.
+          const bedSide = !outside && this.inRiverBed(cx + side.dx, cy + side.dy);
           const neighbourHeight = outside
             ? ringHeight
-            : this.look(cx + side.dx, cy + side.dy).height;
+            : bedSide
+              ? this.bedEdgeHeight(cx, cy, side)
+              : this.look(cx + side.dx, cy + side.dy).height;
           if (
-            neighbourHeight === h ||
+            Math.abs(neighbourHeight - h) < (bedSide ? BED_STEP_MIN : FLAT_EPSILON) ||
             (!outside && neighbourHeight > h) ||
             (!outside && this.look(cx + side.dx, cy + side.dy).kind === 'wood') ||
-            // Le lit de la rivière rejoint ses voisins à leur hauteur: pas de marche.
-            (!outside && this.inRiverBed(cx + side.dx, cy + side.dy)) ||
             // Le creux du ru dessine lui-même ses berges et ses têtes contre le remblai.
             (!outside && this.isStream(cx + side.dx, cy + side.dy))
           ) {
@@ -1454,6 +1588,118 @@ export class Terrain {
             'stone_dark',
           );
         }
+      }
+    }
+  }
+
+  /**
+   * Creux du bief (`bief.ts`): berges raides, fond de galets sombres, chaperon de pierre au bord
+   * (un bief est maçonné); une tête de pierre là où un tronçon finit contre la terre.
+   */
+  private buildMillraceBed(writerAt: (x: number, y: number) => GeometryWriter): void {
+    const s = SETTINGS.stream;
+    const across = SETTINGS.millrace.across;
+    const surface = SETTINGS.waterSurface;
+    const tone = (h: number): PaletteCell =>
+      h < s.bed + s.toeRise + 0.02 ? 'rock_dark' : h < surface + 0.05 ? 'stone_dark' : 'stone';
+    const normalAt = (x: number, y: number): [number, number, number] => {
+      const e = 0.06;
+      const nx = -(this.millraceGround(x + e, y) - this.millraceGround(x - e, y)) / (2 * e);
+      const nz = -(this.millraceGround(x, y + e) - this.millraceGround(x, y - e)) / (2 * e);
+      const length = Math.hypot(nx, 1, nz);
+      return [nx / length, 1 / length, nz / length];
+    };
+    this.channels.forEach((reach, index) => {
+      const width = reach.across1 - reach.across0;
+      const world = (u: number, v: number): [number, number] => (reach.axis === 'x' ? [v, u] : [u, v]);
+      const point = (i: number, v: number): [number, number, number] => {
+        const [x, z] = world(reach.across0 + (i / (across - 1)) * width, v);
+        return [x, this.millraceGround(x, z), z];
+      };
+      // Un tronçon ne redessine pas ce qu'un tronçon d'avant couvre déjà (même hauteur: lutte de surfaces).
+      const owned = (x: number, z: number): boolean => this.channels.slice(0, index).every((other) => !inReach(other, x, z));
+      for (let v = reach.along0; v < reach.along1 - 1e-6; v += s.step) {
+        const v1 = Math.min(reach.along1, v + s.step);
+        for (let i = 0; i < across - 1; i += 1) {
+          const a = point(i, v);
+          const b = point(i + 1, v);
+          const c = point(i + 1, v1);
+          const d = point(i, v1);
+          const mx = (a[0] + c[0]) / 2;
+          const mz = (a[2] + c[2]) / 2;
+          if (!owned(mx, mz)) continue;
+          const writer = writerAt(mx, mz);
+          const cell = tone((a[1] + b[1] + c[1] + d[1]) / 4);
+          writer.smoothTriangle([a, c, b], [normalAt(a[0], a[2]), normalAt(c[0], c[2]), normalAt(b[0], b[2])], cell);
+          writer.smoothTriangle([a, d, c], [normalAt(a[0], a[2]), normalAt(d[0], d[2]), normalAt(c[0], c[2])], cell);
+        }
+      }
+      // Têtes: le bout d'un tronçon contre la terre (pas à l'embouchure), bande prolongée comprise.
+      const ends: [number, number][] = [[reach.along0, -1]];
+      if (!reach.mouth) ends.push([reach.along1, 1]);
+      for (const [v, toward] of ends) {
+        for (let i = 0; i < across - 1; i += 1) {
+          const a = point(i, v);
+          const b = point(i + 1, v);
+          const [ox, oz] = world((a[reach.axis === 'x' ? 2 : 0] + b[reach.axis === 'x' ? 2 : 0]) / 2, v + toward * EDGE_PROBE);
+          const beyond = this.inMillrace(ox, oz) ? this.millraceGround(ox, oz) : this.bedHeight(ox, oz);
+          if (beyond <= Math.max(a[1], b[1]) + 1e-3) continue;
+          const a2: [number, number, number] = [a[0], beyond, a[2]];
+          const b2: [number, number, number] = [b[0], beyond, b[2]];
+          const facing: [number, number, number] = reach.axis === 'x' ? [-toward, 0, 0] : [0, 0, -toward];
+          writerAt(a[0], a[2]).quad([a, b, b2, a2], facing, 'stone_dark');
+        }
+      }
+    });
+  }
+
+  /** Surface du bief et des bassins: là où leur fond passe sous l'eau, d'un seul tenant entre les tronçons. */
+  private buildMillraceWater(materials: SharedMaterials, resources: ResourceTracker): void {
+    const waters = new Map<string, GeometryWriter>();
+    const ponds = new Map<string, GeometryWriter>();
+    const surface = SETTINGS.waterSurface;
+    const step = SETTINGS.stream.step;
+    const strips = SETTINGS.millrace.waterStrips;
+    this.channels.forEach((reach, index) => {
+      const width = reach.across1 - reach.across0;
+      const world = (u: number, v: number): [number, number] => (reach.axis === 'x' ? [v, u] : [u, v]);
+      for (let v = reach.along0; v < reach.along1 - 1e-6; v += step) {
+        const v1 = Math.min(reach.along1, v + step);
+        for (let i = 0; i < strips; i += 1) {
+          const u0 = reach.across0 + (i / strips) * width;
+          const u1 = reach.across0 + ((i + 1) / strips) * width;
+          const corners = [world(u0, v), world(u0, v1), world(u1, v1), world(u1, v)];
+          const [mx, mz] = world((u0 + u1) / 2, (v + v1) / 2);
+          if (this.channels.slice(0, index).some((other) => inReach(other, mx, mz))) continue;
+          // Dessinée dès qu'un coin est sous l'eau: la berge, au-dessus, en cache le bord.
+          if (corners.every(([x, z]) => this.millraceGround(x, z) >= surface)) continue;
+          const key = this.chunkOf(mx, mz);
+          const into = reach.still ? ponds : waters;
+          let writer = into.get(key);
+          if (writer === undefined) {
+            writer = new GeometryWriter();
+            into.set(key, writer);
+          }
+          writer.quad(
+            corners.map(([x, z]) => [x, surface, z] as const),
+            [0, 1, 0],
+            'water',
+          );
+        }
+      }
+    });
+    for (const [list, writers, name] of [
+      [this.millraceWater, waters, 'eau du bief'],
+      [this.pondWater, ponds, 'eau dormante'],
+    ] as const) {
+      for (const [key, writer] of writers) {
+        const mesh = new Mesh(resources.track(writer.build()), materials.water);
+        mesh.name = `${name} ${key}`;
+        mesh.receiveShadow = true;
+        mesh.matrixAutoUpdate = false;
+        mesh.renderOrder = 1;
+        list.push(mesh);
+        this.group.add(mesh);
       }
     }
   }

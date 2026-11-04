@@ -88,6 +88,9 @@ export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
   ru_stepping_stones: ['ford_stones'],
   // Pas de modèle de pommier (non demandé au lot des modèles): le petit chêne en attendant.
   tree_apple: ['tree_oak_small'],
+  // 0.13 (`foret013.glb`): quatre tombes (dalle et stèle, pleine terre et croix de fer, granit et
+  // croix de pierre, vieille stèle moussue); `grave` seul n'en montre qu'une.
+  grave: ['grave_a', 'grave_b', 'grave_c', 'grave_d'],
 };
 
 /**
@@ -98,6 +101,9 @@ export const MODEL_VARIANTS: Readonly<Record<string, readonly string[]>> = {
  */
 export const MODEL_BY_PROP: Readonly<Record<string, string>> = {
   bush_41: 'bush_elder',
+  // 0.13: les hôtes des framboises du bois (`bramble` pour la simulation) sont des framboisiers.
+  forage_wood_02_host: 'raspberry_bush',
+  forage_wood_04_host: 'raspberry_bush',
 };
 
 const HASH_MULTIPLIER = 31;
@@ -424,4 +430,24 @@ export class ModelLibrary {
     });
     return parts;
   }
+}
+
+
+/** Clip en boucle d'un modèle de la carte (extras `animation` de l'artiste: roue du moulin), ou `null`. */
+export function loopClip(library: ModelLibrary, model: string): AnimationClip | null {
+  const name: unknown = library.extras(model).animation;
+  const file = library.source(library.resolve(model))?.file;
+  if (typeof name !== 'string' || file === undefined) return null;
+  return library.animations(file).find((clip) => clip.name === name) ?? null;
+}
+
+/** Nœuds que le clip en boucle d'un modèle fait bouger (vide sans clip). */
+export function animatedNodes(library: ModelLibrary, model: string): ReadonlySet<string> {
+  const clip = loopClip(library, model);
+  const out = new Set<string>();
+  for (const track of clip?.tracks ?? []) {
+    const dot = track.name.lastIndexOf('.');
+    out.add(dot > 0 ? track.name.slice(0, dot) : track.name);
+  }
+  return out;
 }

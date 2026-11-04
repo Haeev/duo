@@ -208,6 +208,30 @@ export class AmbiancePart implements ExtensionPart {
       for (const mesh of hooks.streamWater) mesh.material = stream.material;
       this.water.push(stream.uniforms);
     }
+    if (hooks.millraceWater.length > 0) {
+      // Le bief du moulin (0.13): même programme, courant vers l'est, eau plus calme que le ru.
+      const m = RENDER_SETTINGS.terrain.millrace;
+      const millrace = createWaterMaterial(this.field, this.surfaces, waterSettings.opacityDeep, waterSettings.foamAmount, {
+        flow: [Math.hypot(waterSettings.flow[0], waterSettings.flow[1]) * m.flowFactor, 0],
+        riffle: m.riffle,
+        depth: m.shaderDepth,
+      });
+      resources.track(millrace.material);
+      for (const mesh of hooks.millraceWater) mesh.material = millrace.material;
+      this.water.push(millrace.uniforms);
+    }
+    if (hooks.pondWater.length > 0) {
+      // Bassin de la source, mare de la pâture: même programme, eau dormante (un souffle de rides).
+      const m = RENDER_SETTINGS.terrain.millrace;
+      const pond = createWaterMaterial(this.field, this.surfaces, waterSettings.opacityDeep, waterSettings.foamAmount, {
+        flow: [waterSettings.flow[0] * m.pondFlow, waterSettings.flow[1] * m.pondFlow],
+        riffle: 0,
+        depth: m.shaderDepth,
+      });
+      resources.track(pond.material);
+      for (const mesh of hooks.pondWater) mesh.material = pond.material;
+      this.water.push(pond.uniforms);
+    }
 
     const glows = collectGlowSources(hooks.map, hooks.library, hooks.terrain);
     this.lights = groundLights(glows);

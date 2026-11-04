@@ -11,6 +11,7 @@ import { loadMap } from '../donnees/carte';
 import { MAP_FILES } from '../donnees/cartes-fichiers';
 import { CONTENT_FILES } from '../donnees/fichiers';
 import type { GameMap, MapProp } from '../etat/carte';
+import { inMap } from '../etat/carte';
 import { crossingProps } from './decor';
 import type { SharedMaterials } from './materiaux';
 import { MODEL_VARIANTS } from './modeles';
@@ -160,7 +161,33 @@ class GlbFile {
   }
 }
 
-const bourg = new GlbFile('bourg.glb');
+/** Plusieurs GLB lus comme un seul: chaque racine est cherchée dans le premier fichier qui l'a. */
+class GlbSet {
+  private readonly files: GlbFile[];
+
+  constructor(names: readonly string[]) {
+    this.files = names.map((name) => new GlbFile(name));
+  }
+
+  private fileOf(name: string): GlbFile | undefined {
+    return this.files.find((file) => file.roots().includes(name));
+  }
+
+  roots(): string[] {
+    return this.files.flatMap((file) => file.roots());
+  }
+
+  extras(name: string): Record<string, unknown> {
+    return this.fileOf(name)?.extras(name) ?? {};
+  }
+
+  upFaces(name: string): Face[] {
+    return this.fileOf(name)?.upFaces(name) ?? [];
+  }
+}
+
+// Décor du bourg, bâtiments neufs et forêt de la 0.13 (`village013.glb`, `foret013.glb`).
+const bourg = new GlbSet(['bourg.glb', 'village013.glb', 'foret013.glb']);
 const maison = new GlbFile('maison.glb');
 
 /** Nœud de l'artiste qui dessine un objet de la carte (variante présente, comme `ModelLibrary.resolve`). */
@@ -260,7 +287,7 @@ describe('couches de sol (R02): jamais deux surfaces à la même hauteur', () =>
         for (const point of samples(face, matrix)) {
           const cx = Math.floor(point.x);
           const cy = Math.floor(point.z);
-          if (cx < 0 || cy < 0 || cx >= map.width || cy >= map.height) continue;
+          if (!inMap(map, cx, cy)) continue;
           const look = ground.look(cx, cy);
           if (ground.coveredByFloorProp(cx, cy)) continue;
           if (!FLAT_KINDS.has(look.kind) || point.y - look.height > LOW) continue;

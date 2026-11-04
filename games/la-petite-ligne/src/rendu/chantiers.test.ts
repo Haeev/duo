@@ -46,9 +46,11 @@ describe('tour 9: noms des modèles cherchés par le rendu', () => {
     expect(Array.isArray(node(bourg, 'bush_elder')?.extras?.berry_spots)).toBe(true);
     expect(Array.isArray(node(bourg, 'bush_hazel')?.extras?.nut_spots)).toBe(true);
     expect(Array.isArray(node(bourg, 'bramble')?.extras?.berry_spots)).toBe(true);
+    // Les framboisiers de la 0.13 sont dans `foret013.glb`.
+    const forest = glb('foret013.glb');
     for (const [prop, model] of Object.entries(MODEL_BY_PROP)) {
       expect(map.props.some((p) => p.id === prop), prop).toBe(true);
-      expect(node(bourg, model), model).toBeDefined();
+      expect(node(bourg, model) ?? node(forest, model), model).toBeDefined();
     }
   });
 

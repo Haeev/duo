@@ -212,6 +212,26 @@ export function paletteUv(name: PaletteCell): PaletteUv {
 }
 
 /**
+ * Sols marqués du terrain (0.13): sous-bois et sentier de forêt pointent leur case (`moss`,
+ * `path_dark`) hors de son centre, au quart bas-gauche. Les modèles visent toujours le centre
+ * d'une case: le shader des surfaces (`surfaces.ts`) reconnaît ces sols sans case de plus.
+ */
+export const GROUND_MARKS = { undergrowth: 'moss', forest_path: 'path_dark' } as const satisfies Readonly<
+  Record<string, PaletteCell>
+>;
+export type GroundMark = keyof typeof GROUND_MARKS;
+/** Position du repère dans sa case (fraction du côté depuis le coin): au-dessous de `GROUND_MARK_BELOW`. */
+export const GROUND_MARK_AT = 0.2;
+export const GROUND_MARK_BELOW = 0.35;
+
+/** UV d'un sol marqué: la case de `GROUND_MARKS`, au repère plutôt qu'au centre. */
+export function groundMarkUv(mark: GroundMark): PaletteUv {
+  const centre = paletteUv(GROUND_MARKS[mark]);
+  const shift = (HALF_CELL - GROUND_MARK_AT) / PALETTE_GRID;
+  return { u: centre.u - shift, v: centre.v - shift };
+}
+
+/**
  * Texture des personnages: une rangée de 16 cases par personnage, mêmes rôles
  * de case pour tous (`CHAR_SLOTS` de `palette.py`). Les deux joueurs utilisent
  * la rangée 0, réécrite pour chacun (foulard, tenue).

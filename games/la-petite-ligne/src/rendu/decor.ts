@@ -12,9 +12,11 @@
 import type { BufferGeometry } from 'three';
 import { BufferAttribute, Group, Matrix4, Mesh, Quaternion, Vector3, type Material } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import type { Season } from '../donnees/types';
 import type { GameMap, MapProp } from '../etat/carte';
 import { yawFromQuarter } from './contexte';
-import type { ModelLibrary } from './modeles';
+import type { SharedMaterials } from './materiaux';
+import { animatedNodes, type ModelLibrary, type ModelPart } from './modeles';
 import { RENDER_SETTINGS } from './reglages';
 import type { ResourceTracker } from './ressources';
 import type { SubstituteHints } from './substituts';
@@ -66,15 +68,17 @@ export function propMatrix(prop: MapProp, ground: number, out: Matrix4): Matrix4
 /**
  * Ouvrages du ru (tour 10: ponceau, pont, passerelle, gué de pierres) vus comme des objets de la
  * carte posés au sol, au centre de leur emprise. Le ru coule le long de Z dans les modèles
- * (`flow_axis`), le long de y sur la carte: quart 0. La passerelle est tournée d'un demi-tour:
+ * (`flow_axis`), le long de y sur la carte: quart 0. La passerelle du ru est tournée d'un demi-tour:
  * la carte veut son garde-corps côté amont (nord), pour ne rien masquer à la caméra par défaut.
+ * Les ouvrages du bief du moulin (0.13: passerelle de la vanne, planches du halage) se posent au
+ * quart 0 (`flow_axis` de l'artiste): tournée, la vanne passerait à l'aval de la passerelle.
  */
 export function crossingProps(map: GameMap): MapProp[] {
   return map.crossings.map((crossing) => ({
     id: crossing.id,
     model: crossing.model,
     pos: { x: crossing.rect.x + crossing.rect.w / 2, y: crossing.rect.y + crossing.rect.h / 2 },
-    rotation: crossing.kind === 'footbridge' ? 2 : 0,
+    rotation: crossing.kind === 'footbridge' && crossing.crosses === 'ru' ? 2 : 0,
     rect: crossing.rect,
     height: 0,
     category: 'sol',
@@ -113,17 +117,68 @@ export interface ClockHand {
 
 const CLOCK_HAND = /_clock_(hour|minute)$/;
 
+/** Un point `[x, hauteur, z]` des extras de l'artiste, ou `null`. */
+function spot(value: unknown): Vector3 | null {
+  if (!Array.isArray(value) || value.length !== 3 || !value.every((n) => typeof n === 'number')) return null;
+  const [x, y, z] = value;
+  return new Vector3(x, y, z);
+}
+
+/**
+ * Petits modèles posés sur un modèle par ses extras (0.13: les neuf quilles et la boule de l'allée de
+ * quilles, `pin_spots` et `pin_model`, `ball_spot` et `ball_model`), dans le repère du modèle porteur.
+ */
+function placedOn(library: ModelLibrary, model: string): ModelPart[] {
+  const extras = library.extras(model);
+  const out: ModelPart[] = [];
+  const add = (name: unknown, at: Vector3 | null): void => {
+    if (typeof name !== 'string' || at === null || !library.has(name)) return;
+    const offset = new Matrix4().makeTranslation(at.x, at.y, at.z);
+    for (const part of library.parts(name)) out.push({ ...part, matrix: offset.clone().multiply(part.matrix) });
+  };
+  const pins: unknown = extras.pin_spots;
+  if (Array.isArray(pins)) for (const p of pins) add(extras.pin_model, spot(p));
+  add(extras.ball_model, spot(extras.ball_spot));
+  return out;
+}
+
+/** Saisons d'une pièce (`extras.seasons` de l'artiste: fruits et fleurs des arbres), `null` toute l'année. */
+function seasonsOf(library: ModelLibrary, name: string): readonly string[] | null {
+  const value: unknown = library.node(name)?.userData.seasons;
+  return Array.isArray(value) && value.every((item) => typeof item === 'string') ? value : null;
+}
+
+/** Morceau fusionné qui porte des pièces de saison: refait quand la saison change. */
+interface SeasonalBucket {
+  mesh: Mesh;
+  pieces: { geometry: BufferGeometry; seasons: readonly string[] | null }[];
+}
+
 export class StaticDecor {
   readonly group = new Group();
   readonly clockHands: ClockHand[] = [];
+  private readonly seasonal: SeasonalBucket[] = [];
+  private season: Season | null = null;
+  private readonly unsubscribe: () => void;
 
-  constructor(map: GameMap, library: ModelLibrary, terrain: Terrain, resources: ResourceTracker) {
+  constructor(
+    map: GameMap,
+    library: ModelLibrary,
+    terrain: Terrain,
+    private readonly resources: ResourceTracker,
+    private readonly materials: SharedMaterials,
+  ) {
     this.group.name = 'decor';
     const settings = RENDER_SETTINGS.terrain;
     const chunk = settings.chunkSize;
     const block = settings.chunkMergeBlock;
-    const pieces: { cell: string; block: string; material: Material; geometry: BufferGeometry }[] =
-      [];
+    const pieces: {
+      cell: string;
+      block: string;
+      material: Material;
+      geometry: BufferGeometry;
+      seasons: readonly string[] | null;
+    }[] = [];
     const cellTriangles = new Map<string, number>();
     const placement = new Matrix4();
     const world = new Matrix4();
@@ -149,8 +204,11 @@ export class StaticDecor {
       const cy = Math.floor(prop.pos.y / chunk);
       const cell = `${cx}:${cy}${suffix}`;
       const blockKey = `${Math.floor(cx / block)}:${Math.floor(cy / block)}+${suffix}`;
-      for (const part of library.parts(prop.model, propHints(prop), prop.id)) {
-        if (DYNAMIC_PART_NODES.has(part.name)) {
+      // Pièces animées (roue du moulin, 0.13): dessinées par `animes.ts`, le reste du modèle ici.
+      const animated = animatedNodes(library, prop.model);
+      const parts = [...library.parts(prop.model, propHints(prop), prop.id), ...placedOn(library, prop.model)];
+      for (const part of parts) {
+        if (DYNAMIC_PART_NODES.has(part.name) || animated.has(part.name)) {
           continue;
         }
         world.multiplyMatrices(placement, part.matrix);
@@ -168,37 +226,77 @@ export class StaticDecor {
           continue;
         }
         const geometry = bakeGeometry(part.geometry, world);
-        pieces.push({ cell, block: blockKey, material: part.material, geometry });
+        pieces.push({ cell, block: blockKey, material: part.material, geometry, seasons: seasonsOf(library, part.name) });
         const triangles = geometry.getAttribute('position').count / VERTICES_PER_TRIANGLE;
         cellTriangles.set(cell, (cellTriangles.get(cell) ?? 0) + triangles);
       }
     }
-    const buckets = new Map<string, { material: Material; geometries: BufferGeometry[] }>();
+    const buckets = new Map<
+      string,
+      { material: Material; pieces: { geometry: BufferGeometry; seasons: readonly string[] | null }[] }
+    >();
     for (const piece of pieces) {
       const heavy = (cellTriangles.get(piece.cell) ?? 0) >= settings.chunkMergeBelow;
       const bucketKey = `${heavy ? piece.cell : piece.block}|${piece.material.uuid}`;
       let bucket = buckets.get(bucketKey);
       if (bucket === undefined) {
-        bucket = { material: piece.material, geometries: [] };
+        bucket = { material: piece.material, pieces: [] };
         buckets.set(bucketKey, bucket);
       }
-      bucket.geometries.push(piece.geometry);
+      bucket.pieces.push({ geometry: piece.geometry, seasons: piece.seasons });
     }
+    this.season = materials.season;
     for (const [key, bucket] of buckets) {
-      if (bucket.geometries.length === 0) {
+      if (bucket.pieces.length === 0) {
         continue;
       }
-      const merged = mergeGeometries(bucket.geometries, false);
-      for (const geometry of bucket.geometries) {
-        geometry.dispose();
-      }
-      merged.computeBoundingSphere();
-      const mesh = new Mesh(resources.track(merged), bucket.material);
+      const seasonal = bucket.pieces.some((piece) => piece.seasons !== null);
+      const mesh = new Mesh(this.mergeFor(bucket.pieces, this.season), bucket.material);
       mesh.name = `decor ${key}`;
       mesh.castShadow = !key.includes(SHADOWLESS);
       mesh.receiveShadow = true;
       mesh.matrixAutoUpdate = false;
       this.group.add(mesh);
+      if (seasonal) {
+        // Fruits et fleurs: gardés à part pour refaire ce morceau à chaque saison (même nombre d'appels).
+        this.seasonal.push({ mesh, pieces: bucket.pieces });
+      } else {
+        for (const piece of bucket.pieces) piece.geometry.dispose();
+      }
     }
+    this.unsubscribe = materials.onPaletteChange(() => {
+      this.applySeason(this.materials.season);
+    });
+  }
+
+  /** Fusion des pièces d'un morceau qui sont de la saison (toutes celles sans saison). */
+  private mergeFor(
+    pieces: readonly { geometry: BufferGeometry; seasons: readonly string[] | null }[],
+    season: Season,
+  ): BufferGeometry {
+    const shown = pieces.filter((piece) => piece.seasons === null || piece.seasons.includes(season));
+    const merged = mergeGeometries(
+      shown.map((piece) => piece.geometry),
+      false,
+    );
+    merged.computeBoundingSphere();
+    return this.resources.track(merged);
+  }
+
+  /** Change de saison: refait les seuls morceaux qui portent des fruits ou des fleurs. */
+  applySeason(season: Season): void {
+    if (season === this.season) return;
+    this.season = season;
+    for (const bucket of this.seasonal) {
+      const old = bucket.mesh.geometry;
+      bucket.mesh.geometry = this.mergeFor(bucket.pieces, season);
+      this.resources.release(old);
+    }
+  }
+
+  dispose(): void {
+    this.unsubscribe();
+    for (const bucket of this.seasonal) for (const piece of bucket.pieces) piece.geometry.dispose();
+    this.seasonal.length = 0;
   }
 }

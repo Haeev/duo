@@ -17,6 +17,13 @@ export type GroundKind =
   | 'rail'
   | 'stone';
 
+/**
+ * Aspect d'une case pour le rendu seul (`rendu` de la légende du terrain, 0.13): sous-bois et
+ * sentier de forêt se distinguent de l'herbe et du chemin, le bief du moulin est creusé comme un
+ * cours d'eau vive. La simulation ne lit que `GroundKind`.
+ */
+export type GroundStyle = 'undergrowth' | 'forestPath' | 'millrace';
+
 export interface Rect {
   x: number;
   y: number;
@@ -187,6 +194,8 @@ export interface GameMap {
   ground: GroundKind[];
   /** Case infranchissable (murs, eau profonde, bâtiments, arbres debout). */
   blocked: boolean[];
+  /** Aspect de rendu de chaque case, rangé par `cellIndex` (`null`: celui de son sol). Absent: aucun. */
+  groundStyles?: (GroundStyle | null)[];
   /** Points nommés (rendez-vous, comptoirs, emplois du temps). */
   points: Record<PointId, Vec2>;
   /**
