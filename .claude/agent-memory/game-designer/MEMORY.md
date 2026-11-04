@@ -242,3 +242,12 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - `order.generated.products[].price` prime sur `sellPrice` (commandes et annonces): un plat sans prix de vente n'était payé qu'à la commande. Donner un `sellPrice` le rend aussi vendable chez Odette, à l'étal, sur l'ardoise et en « extra » de la caisse.
 - « Une heure de jeu » dans les documents du studio = une heure de l'horloge du jeu (42 s réelles), comme la pêche (15 la monnaie l'heure, environ 12 chez Odette). Toujours préciser l'unité.
 - Pour un « avant » de comparaison, copier les données dans le scratchpad avant de les toucher: `git show <commit>:fichier` est refusé par la garde de l'arbre isolé. `tests/robot.test.ts` dépasse 10 minutes: le lancer en arrière-plan.
+
+## Parcelles et offre d'Odette (conception 0.13, vérifié le 2026-11-04, script `simulations/parcelles_0_13.py`)
+
+- Le tableau des activités de `economie_chaines.py` compte au prix de base: il ignore l'offre d'Odette (`grocer.supply`: jusqu'à -40 % par légume, la moitié oubliée à l'aube) et son budget de 400 par jour. Dès 12 cases, l'offre retire près d'un quart du potager; au-delà de 40 parcelles, les légumes remplissent son budget. Tout équilibrage qui fait grandir une production doit simuler l'offre, pas le prix de base.
+- Le pré du jardin (x 1 à 15, y 28 à 35) a 100 cases posables, mais les cercles de corde des trois places de pâture du pré en couvrent 65: toute pose libre dans le pré entre en conflit avec la chèvre (`goats.spots`, corde 2,5 m).
+- `order.generated.resources.garden` (54) vaut 12 cases x 6 jours x 75 %: tout changement du nombre de cases doit le recalculer.
+- `vegetation.ts`, `effets.ts` et `GARDEN_CAPACITY` (16) du rendu lisent le potager fixe de la carte: le signaler à chaque potager dynamique.
+- Un optimiseur glouton qui juge une fournée au prix d'avant la vente du jour se trompe (résultats non monotones); juger chaque fournée sur la vente complète du jour.
+- Le contrôle des tirets sur tout le dépôt dépasse 5 minutes à cause de `.claude/worktrees`: le lancer en arrière-plan, ou sur ses seuls fichiers d'abord.
