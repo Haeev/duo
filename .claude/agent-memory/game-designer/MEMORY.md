@@ -261,3 +261,11 @@ Apprentissages durables (pièges, conventions, repères vérifiés). Pas d'avanc
 - `valider_carte.py --plannings habitants.json` avertit au-delà de 3 000 nœuds A* (Basile vers `grave_cornu`: 3 029 et 3 218); ce sont des paires de points, pas forcément des trajets réels.
 - Garde de l'arbre isolé: `python3 - fichier <<'EOF'` passe; une commande qui écrit un fichier par heredoc puis lance python dessus, ou qui passe une variable shell, est refusée.
 - À `6a84481`, `robot` (D-01, `heavyDeliveries` avec `crystal_radio`) et `souvenirs` (jour 22 au lieu de 42) étaient déjà rouges: relancer avant et après pour comparer.
+## Écrire des quêtes de la 0.13 (lot H5, vérifié le 2026-11-04)
+
+- `valider_donnees.py` accepte comme point tout identifiant de la carte, zones comprises (`pasture`, `farmyard_area`), mais la simulation ne connaît que `sim.map.points`: une scène ou un `stayed_at` sur une zone fait planter `autoStartScenes`. Prendre un point (`pasture_gate`), et le vérifier par un test (`sim.map.points[id]`).
+- Le lecteur TypeScript refuse un bloc de choix qui n'est pas la dernière ligne d'un dialogue; le validateur ne le voit pas. Les répliques d'après vont dans `same`/`different` ou dans chaque `reply`. Lancer `npx vitest run tests/contenu.test.ts` (3 s) après toute écriture de dialogues.
+- À cette date: `title` est un texte (pas de `title.variants`), une étape n'a pas de `when`, l'effet `open_decision` et la condition `habit_active` n'existent pas. Variante d'une décision: un seul identifiant de quête, étape à `any` de `all[decision_made, ...]`, objectif qui cite les deux options.
+- Une entrée partielle `{ "id", "dialogues" }` en fin de `habitants-0-13.json` ajoute des répliques à un habitant d'un autre lot sans toucher à son bloc (moins de conflits de fusion).
+- Le validateur refuse un `quest_done` vers une quête pas encore écrite; le lecteur du jeu, lui, ne le contrôle pas. Prouver le reste par une copie des données avec des quêtes factices.
+- Jour 1 = samedi: lundi = jour 3, jeudi = jour 6. Test ciblé hors du dépôt: `npx vitest run --dir <dossier>` depuis le jeu, avec des imports absolus.
