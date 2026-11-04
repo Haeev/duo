@@ -7,6 +7,7 @@ import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
 import { offstagePoint, type GameMap } from '../etat/carte';
+import type { FishShadow } from '../etat/peche';
 import type { Character, CharacterId, Vec2, WorldEvent, WorldState } from '../etat/types';
 import type { Content } from '../donnees/types';
 import { MOVE_DEADZONE, SIM_DT } from '../simulation/constantes';
@@ -21,10 +22,12 @@ import {
   EventsMessageSchema,
   FastSnapshotSchema,
   GuestInputSchema,
+  ShadowsMessageSchema,
   WorldMessageSchema,
   type EventsMessage,
   type FastSnapshot,
   type GuestInput,
+  type ShadowsMessage,
   type WorldMessage,
 } from './schemas';
 
@@ -47,6 +50,7 @@ export interface GuestChannels {
   world: NetChannel<WorldMessage>;
   fast: NetChannel<FastSnapshot>;
   events: NetChannel<EventsMessage>;
+  shadows: NetChannel<ShadowsMessage>;
 }
 
 export function openGuestChannels(net: Net): GuestChannels {
@@ -55,6 +59,7 @@ export function openGuestChannels(net: Net): GuestChannels {
     world: net.channel(CHANNEL.world, { mode: 'latest', schema: WorldMessageSchema }),
     fast: net.channel(CHANNEL.fast, { mode: 'latest', schema: FastSnapshotSchema }),
     events: net.channel(CHANNEL.events, { mode: 'reliable', schema: EventsMessageSchema }),
+    shadows: net.channel(CHANNEL.shadows, { mode: 'latest', schema: ShadowsMessageSchema }),
   };
 }
 
@@ -215,8 +220,16 @@ export function createGuest(
     if (pendingFrames.every((f) => f.moveX === 0 && f.moveY === 0)) predictedFacing = auth.f;
   });
 
+  // Les ombres s'abonnent aussi avant l'état: l'hôte les envoie juste avant l'état qui les a vues
+  // changer, et l'état ne les porte pas (`etat-transmis.ts`). Chaque état reçu reprend la dernière liste.
+  let shadows: FishShadow[] = [];
+  const offShadows = channels.shadows.onMessage((message) => {
+    shadows = message.shadows;
+    if (sim !== null) sim.world.fishing.shadows = shadows;
+  });
+
   const offWorld = channels.world.onMessage((message) => {
-    const { world, unplaced } = worldFromSent(message.world, lastFastPlace, plannedPoint);
+    const { world, unplaced } = worldFromSent(message.world, lastFastPlace, plannedPoint, shadows);
     const mine = world.characters.find((c) => c.playerId === playerId);
     if (mine !== undefined) localId = mine.id;
     keepStanding(world, message.ack);
@@ -359,6 +372,7 @@ export function createGuest(
     },
     dispose() {
       offWorld();
+      offShadows();
       offFast();
       offEvents();
       listeners.clear();

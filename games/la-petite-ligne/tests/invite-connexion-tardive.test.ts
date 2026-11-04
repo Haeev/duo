@@ -11,7 +11,7 @@ import type { VillagerState, WorldState } from '../src/etat/types';
 import { createHost, openHostChannels, type HostChannels } from '../src/reseau/hote';
 import { createGuest, openGuestChannels, type Guest, type GuestChannels } from '../src/reseau/invite';
 import { sentWorld, worldFromSent, type SentWorld } from '../src/reseau/etat-transmis';
-import { CHANNEL, EventsMessageSchema, FastSnapshotSchema, GuestInputSchema, WorldMessageSchema, type FastSnapshot } from '../src/reseau/schemas';
+import { CHANNEL, EventsMessageSchema, FastSnapshotSchema, GuestInputSchema, ShadowsMessageSchema, WorldMessageSchema, type FastSnapshot } from '../src/reseau/schemas';
 import { restoreWorld, snapshotOf } from '../src/sauvegarde/sauvegarde';
 import { createSession, type GameAction } from '../src/session';
 import { SIM_DT, SIM_HZ } from '../src/simulation/constantes';
@@ -62,9 +62,10 @@ function memoryLink(): { host: HostChannels; guest: GuestChannels; deliver(): vo
   const world = pair(CHANNEL.world, WorldMessageSchema);
   const fast = pair(CHANNEL.fast, FastSnapshotSchema);
   const events = pair(CHANNEL.events, EventsMessageSchema);
+  const shadows = pair(CHANNEL.shadows, ShadowsMessageSchema);
   return {
-    host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender },
-    guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver },
+    host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender, shadows: shadows.sender },
+    guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver, shadows: shadows.receiver },
     deliver() {
       while (queue.length > 0) queue.shift()?.();
     },
@@ -243,6 +244,7 @@ describe('état transmis sans les positions des habitants', () => {
       sent,
       (id) => (id === known.id ? { x: known.pos.x, y: known.pos.y, f: known.facing, s: known.speed } : null),
       () => ({ x: -3, y: -4, f: 1, s: 0 }),
+      [],
     );
     expect(unplaced).toEqual(others.map((x) => x.id));
     const relu = world.villagers.find((x) => x.id === known.id);

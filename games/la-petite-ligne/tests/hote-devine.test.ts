@@ -39,7 +39,7 @@ function hostAtDay(): HostBench {
       };
     },
   };
-  const channels: HostChannels = { input, world: silent(CHANNEL.world), fast: silent(CHANNEL.fast), events: silent(CHANNEL.events) };
+  const channels: HostChannels = { input, world: silent(CHANNEL.world), fast: silent(CHANNEL.fast), events: silent(CHANNEL.events), shadows: silent(CHANNEL.shadows) };
   const host = createHost(sim, channels, 'p1', 'p2');
   return {
     sim,

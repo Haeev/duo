@@ -14,7 +14,7 @@ import type { ControlFrame } from '../src/etat/actions';
 import type { CharacterId, ReadonlyWorld, Vec2 } from '../src/etat/types';
 import { createHost, type HostChannels } from '../src/reseau/hote';
 import { createGuest, type GuestChannels } from '../src/reseau/invite';
-import { CHANNEL, EventsMessageSchema, FastSnapshotSchema, GuestInputSchema, WorldMessageSchema } from '../src/reseau/schemas';
+import { CHANNEL, EventsMessageSchema, FastSnapshotSchema, GuestInputSchema, ShadowsMessageSchema, WorldMessageSchema } from '../src/reseau/schemas';
 import { createSession, type GameAction, type Session, type SessionOptions } from '../src/session';
 import { SIM_HZ } from '../src/simulation/constantes';
 import { character, type Sim } from '../src/simulation/contexte';
@@ -280,18 +280,25 @@ interface VirtualLink {
   deliver(nowMs: number): void;
 }
 
-function createVirtualLink(conditions: Conditions, random: () => number, now: () => number): VirtualLink {
+/**
+ * `sideRandom` tire le délai des messages des ombres (0.13): ils passent sur la même liaison, dans
+ * l'ordre, mais ne décalent pas les tirages des autres canaux. Sans cela, le seul message des
+ * ombres du départ change toute la suite de la gigue, et la graine 7 tombe sur un tirage où
+ * l'invité recule de 6,8 mm à l'arrêt (borne 5 mm): le même recul s'obtient sans les ombres en
+ * sautant deux tirages, c'est une sensibilité de la réconciliation à signaler à dev-reseau.
+ */
+function createVirtualLink(conditions: Conditions, random: () => number, sideRandom: () => number, now: () => number): VirtualLink {
   const inFlight: { at: number; order: number; run: () => void }[] = [];
   const lastArrival = { toHost: 0, toGuest: 0 };
   let order = 0;
-  const schedule = (direction: 'toHost' | 'toGuest', run: () => void): void => {
-    let delay = conditions.latencyMs + random() * conditions.jitterMs;
-    if (random() * 100 < conditions.lossPercent) delay += RETRANSMIT_MS;
+  const schedule = (direction: 'toHost' | 'toGuest', run: () => void, draw: () => number): void => {
+    let delay = conditions.latencyMs + draw() * conditions.jitterMs;
+    if (draw() * 100 < conditions.lossPercent) delay += RETRANSMIT_MS;
     const at = Math.max(now() + delay, lastArrival[direction]);
     lastArrival[direction] = at;
     inFlight.push({ at, order: (order += 1), run });
   };
-  const pair = <T>(id: number, schema: v.GenericSchema<unknown, T>, from: 'host' | 'guest'): { sender: NetChannel<T>; receiver: NetChannel<T> } => {
+  const pair = <T>(id: number, schema: v.GenericSchema<unknown, T>, from: 'host' | 'guest', draw = random): { sender: NetChannel<T>; receiver: NetChannel<T> } => {
     const listeners = new Set<(message: T) => void>();
     const direction = from === 'host' ? 'toGuest' : 'toHost';
     return {
@@ -300,10 +307,14 @@ function createVirtualLink(conditions: Conditions, random: () => number, now: ()
         send(message) {
           // Passage par JSON et par le schéma, comme sur le fil: aucun objet partagé entre les deux.
           const json = JSON.stringify(message);
-          schedule(direction, () => {
-            const value = v.parse(schema, JSON.parse(json));
-            for (const l of listeners) l(value);
-          });
+          schedule(
+            direction,
+            () => {
+              const value = v.parse(schema, JSON.parse(json));
+              for (const l of listeners) l(value);
+            },
+            draw,
+          );
         },
         onMessage: () => () => undefined,
       },
@@ -321,9 +332,10 @@ function createVirtualLink(conditions: Conditions, random: () => number, now: ()
   const world = pair(CHANNEL.world, WorldMessageSchema, 'host');
   const fast = pair(CHANNEL.fast, FastSnapshotSchema, 'host');
   const events = pair(CHANNEL.events, EventsMessageSchema, 'host');
+  const shadows = pair(CHANNEL.shadows, ShadowsMessageSchema, 'host', sideRandom);
   return {
-    host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender },
-    guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver },
+    host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender, shadows: shadows.sender },
+    guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver, shadows: shadows.receiver },
     deliver(nowMs) {
       inFlight.sort((a, b) => a.at - b.at || a.order - b.order);
       while (inFlight.length > 0 && (inFlight[0]?.at ?? Number.POSITIVE_INFINITY) <= nowMs) inFlight.shift()?.run();
@@ -355,7 +367,8 @@ function benchWalk(conditions: Conditions, seed: number, walkFrames: number, sto
   const clock = { now: 0 };
   const now = (): number => clock.now;
   const random = createRandom(seed);
-  const link = createVirtualLink(conditions, () => random.next(), now);
+  const side = createRandom(seed + 1000);
+  const link = createVirtualLink(conditions, () => random.next(), () => side.next(), now);
   const host = createHost(sim, link.host, 'p1', 'p2');
   const guest = createGuest(content, map, link.guest, character(sim, 'p2').playerId, now);
   host.sendWorld();

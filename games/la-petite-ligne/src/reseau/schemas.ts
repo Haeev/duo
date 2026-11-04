@@ -6,6 +6,7 @@
 import * as v from 'valibot';
 import type { ControlFrame, Intent } from '../etat/actions';
 import type { SentWorld } from './etat-transmis';
+import { FISH_RARITIES, SHADOW_SIZES, type FishShadow } from '../etat/peche';
 import type { WorldEvent } from '../etat/types';
 
 /** Canaux (0 à 15), les mêmes chez les deux. */
@@ -18,6 +19,8 @@ export const CHANNEL = {
   fast: 2,
   /** Hôte vers invité: événements ponctuels (sons, effets), fiable. */
   events: 3,
+  /** Hôte vers invité: ombres des poissons, quand elles changent; seul le dernier compte. */
+  shadows: 4,
 } as const;
 
 const Finite = v.pipe(v.number(), v.finite());
@@ -171,6 +174,36 @@ export const WorldMessageSchema = v.strictObject({
   world: v.custom<SentWorld>(looksLikeWorld, 'état du monde invalide'),
 });
 export type WorldMessage = v.InferOutput<typeof WorldMessageSchema>;
+
+const PointSchema = v.strictObject({ x: Finite, y: Finite });
+
+/** Une ombre de poisson (`etat/peche.ts`), contrôlée champ par champ: le rendu de l'invité la lit telle quelle. */
+const FishShadowSchema = v.strictObject({
+  id: v.pipe(Int, v.minValue(0)),
+  zone: Id,
+  fish: Id,
+  rarity: v.picklist(FISH_RARITIES),
+  size: v.picklist(SHADOW_SIZES),
+  pos: PointSchema,
+  roam: v.pipe(Finite, v.minValue(0)),
+  heading: Finite,
+  move: v.exactOptional(v.strictObject({ from: PointSchema, since: Int, until: Int })),
+  state: v.picklist(['free', 'approach', 'under', 'leaving', 'fleeing']),
+  line: v.exactOptional(CharacterIdSchema),
+  born: Int,
+  ends: Int,
+  watchOnly: v.exactOptional(v.literal(true)),
+}) satisfies v.GenericSchema<FishShadow>;
+
+/**
+ * Les ombres de tous les coins éveillés (la liste entière: un message perdu ou remplacé ne laisse
+ * rien de faux). 7 coins à 12 ombres au plus (`reglages.json`), plus celles qui s'effacent.
+ */
+export const ShadowsMessageSchema = v.strictObject({
+  tick: v.pipe(Int, v.minValue(0)),
+  shadows: v.pipe(v.array(FishShadowSchema), v.maxLength(128)),
+});
+export type ShadowsMessage = v.InferOutput<typeof ShadowsMessageSchema>;
 
 function looksLikeEvent(value: unknown): value is WorldEvent {
   return typeof value === 'object' && value !== null && typeof (value as Record<string, unknown>).type === 'string';
