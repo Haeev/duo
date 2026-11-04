@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "bubbles": { "seconds": 7, "range": 8 },
+  "scenes": [
+    {
+      "id": "mass", "ref": "S11", "tier": "P0", "from": "10:30", "to": "11:30",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "10:30" },
+      "groups": [
+        { "who": ["martial"], "spots": [{ "x": 101.2, "y": -11.0, "cap": 270 }], "activity": "chat" },
+        {
+          "who": ["honorine", "armand", "berthe", "margot", "marthe", "ambroise", "leon"], "activity": "stand",
+          "spots": [
+            { "x": 97.8, "y": -11.6, "cap": 90 }, { "x": 97.8, "y": -10.5, "cap": 90 },
+            { "x": 96.8, "y": -11.6, "cap": 90 }, { "x": 96.8, "y": -10.5, "cap": 90 },
+            { "x": 95.8, "y": -11.6, "cap": 90 }, { "x": 95.8, "y": -10.5, "cap": 90 },
+            { "x": 94.8, "y": -11.6, "cap": 90 }
+          ]
+        }
+      ],
+      "lines": []
+    },
+    {
+      "id": "mass_exit", "ref": "S11", "tier": "P0", "from": "11:30", "to": "11:50",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "11:29" },
+      "groups": [
+        { "who": ["martial", "honorine", "armand"], "at": { "x": 91.5, "y": -3.0 }, "radius": 0.7 },
+        { "who": ["berthe", "margot", "marthe"], "at": { "x": 99.0, "y": -2.8 }, "radius": 0.7 },
+        { "who": ["ambroise", "leon"], "at": { "x": 103.0, "y": -2.6 }, "radius": 0.55 }
+      ],
+      "lines": [
+        { "by": "martial", "text": "Merci d'être venus, et à dimanche prochain." },
+        { "by": "honorine", "text": "Vous avez prêché court, mon père. On vous en remercie." },
+        { "by": "armand", "text": "Le sermon sur la patience tombait bien, avec ma classe." },
+        { "by": "margot", "text": "Le chant du début était un peu haut pour moi." },
+        { "by": "berthe", "text": "Il manquait une voix grave, comme toujours." },
+        { "by": "marthe", "text": "J'ai sonné juste, cette fois. Vous avez entendu ?" },
+        { "by": "ambroise", "text": "Onze heures trente et deux minutes. Le clocher retarde." },
+        { "by": "leon", "text": "On peut aller jouer, maintenant ?" }
+      ]
+    },
+    {
+      "id": "sunday_cafe", "ref": "S11", "tier": "P0", "from": "11:50", "to": "12:40",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["church_nave"], "at": "11:29" },
+      "groups": [
+        {
+          "who": ["armand", "ambroise", "margot", "berthe"], "seated": true,
+          "spots": [
+            { "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 },
+            { "x": 89.1, "y": 21.5, "cap": 90 }, { "x": 89.9, "y": 21.5, "cap": 270 }
+          ]
+        }
+      ],
+      "lines": [
+        { "by": "armand", "text": "Un petit café après la messe, c'est presque une prière." },
+        { "by": "ambroise", "text": "Le café de Colette est à l'heure, lui." },
+        { "by": "margot", "text": "Je ne reste pas longtemps, les bêtes attendent." },
+        { "by": "berthe", "text": "Tu dis ça tous les dimanches, Margot." },
+        { "by": "armand", "text": "Qui a vu le chat ce matin ? Il dormait sur le muret." },
+        { "by": "ambroise", "text": "Encore une tasse et je retourne à mes pendules." }
+      ]
+    },
+    {
+      "id": "basket_at_odette", "ref": "S02", "tier": "P0", "from": "09:00", "to": "09:20",
+      "when": [{ "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] }],
+      "groups": [
+        {
+          "who": ["achille", "odette"],
+          "spots": [{ "x": 31.0, "y": 30.6, "cap": 90 }, { "x": 32.0, "y": 30.6, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "achille", "text": "Six miches et une couronne, comme d'habitude." },
+        { "by": "odette", "text": "Tu as encore de la farine sur le nez." },
+        { "by": "achille", "text": "La couronne est pour toi. Ne dis rien." },
+        { "by": "odette", "text": "Elle est encore chaude, celle-là." },
+        { "by": "achille", "text": "Le four a bien tiré, ce matin." },
+        { "by": "odette", "text": "Mets-les sur l'étagère du haut, mon chou." }
+      ]
+    },
+    {
+      "id": "quay_five", "ref": "S03", "tier": "P0", "from": "17:00", "to": "17:20",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] }],
+      "groups": [
+        { "who": ["lucie"], "at": "planning" },
+        { "who": ["firmin"], "spots": [{ "x": 34.3, "y": 19.4, "cap": 290 }] }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Les hameaux ?" },
+        { "by": "lucie", "text": "Toujours là." },
+        { "by": "firmin", "text": "Et toi ?" },
+        { "by": "lucie", "text": "Toujours là aussi." },
+        { "by": "firmin", "text": "Le vent tourne." },
+        { "by": "lucie", "text": "Il tourne tous les soirs, Firmin." }
+      ]
+    },
+    {
+      "id": "bench_handover", "ref": "S04", "tier": "P0", "from": "18:00", "to": "18:06",
+      "when": [{ "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["quay_bell", "rail_cottage_west_window", "train_stop"], "at": "17:59" },
+      "groups": [
+        { "who": ["ambroise"], "at": "planning" },
+        { "who": ["firmin"], "spots": [{ "x": 34.3, "y": 19.4, "cap": 290 }] }
+      ],
+      "lines": [
+        { "by": "ambroise", "text": "Bonsoir." },
+        { "by": "firmin", "text": "Bonsoir. Le journal est d'hier." },
+        { "by": "ambroise", "text": "Celui d'hier me suffit." },
+        { "by": "firmin", "text": "Le banc est à toi, je rentre." }
+      ]
+    },
+    {
+      "id": "manille", "ref": "S05", "tier": "P0", "from": "20:00", "to": "22:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["wednesday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["firmin_house", "sawmill_yard", "presbytery_door", "priest_garden"], "at": "19:59" },
+      "groups": [
+        {
+          "who": ["martial", "firmin", "basile"], "seated": true,
+          "spots": [{ "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 }, { "x": 89.1, "y": 21.5, "cap": 90 }]
+        }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Atout cœur !" },
+        { "by": "basile", "text": "Firmin, ta manche." },
+        { "by": "martial", "text": "Je ne triche pas, je prie." },
+        { "by": "basile", "text": "Le dix de pique, c'était le mien." },
+        { "by": "firmin", "text": "Encore une, la dernière." },
+        { "by": "martial", "text": "Tu dis ça depuis neuf heures." }
+      ]
+    },
+    {
+      "id": "terrace_lunch", "ref": "S07", "tier": "P0", "from": "12:00", "to": "12:10",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        {
+          "who": ["nour", "odette"],
+          "spots": [{ "x": 33.0, "y": 30.4, "cap": 90 }, { "x": 34.0, "y": 30.4, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "odette", "text": "Hier, tu as encore mangé debout." },
+        { "by": "nour", "text": "Je mange toujours debout." },
+        { "by": "odette", "text": "Assieds-toi dix minutes, les bêtes t'attendront." },
+        { "by": "nour", "text": "La vache des Moreau, elle, n'attend pas." },
+        { "by": "odette", "text": "Prends au moins une pomme pour la route." },
+        { "by": "nour", "text": "Merci, Odette. Demain, je m'assois. Promis." }
+      ]
+    },
+    {
+      "id": "kids_play", "ref": "S08", "tier": "P0", "from": "16:30", "to": "18:00",
+      "when": [{ "type": "school_day" }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        { "who": ["jeanne", "leon"], "at": { "x": 38.0, "y": 30.6 }, "radius": 0.6, "activity": "play" }
+      ],
+      "lines": [
+        { "by": "jeanne", "text": "Un moineau, deux moineaux, trois !" },
+        { "by": "leon", "text": "Celui-là, c'est une mésange, ça ne compte pas." },
+        { "by": "jeanne", "text": "Le loup, c'est toi. Compte jusqu'à dix !" },
+        { "by": "leon", "text": "Huit, neuf, dix... J'arrive !" },
+        { "by": "jeanne", "text": "Tu as marché sur la ligne de la marelle." },
+        { "by": "leon", "text": "Non, c'est la craie qui a bougé." }
+      ]
+    },
+    {
+      "id": "skittles_sunday", "ref": "S12", "tier": "P0", "from": "15:00", "to": "18:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["sunday"] }, { "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "groups": [
+        {
+          "who": ["mado", "paulin", "margot", "barnabe"],
+          "spots": [
+            { "x": 86.4, "y": 23.4, "cap": 90 }, { "x": 86.3, "y": 25.0, "cap": 50 },
+            { "x": 87.4, "y": 25.3, "cap": 20 }, { "x": 88.5, "y": 25.3, "cap": 340 }
+          ]
+        },
+        { "who": ["leon"], "spots": [{ "x": 92.6, "y": 24.4, "cap": 290 }], "activity": "play" }
+      ],
+      "lines": [
+        { "by": "mado", "text": "Regardez bien, je vise la reine." },
+        { "by": "margot", "text": "Sept ! Mado mène, encore une fois." },
+        { "by": "paulin", "text": "..." },
+        { "by": "barnabe", "text": "Mado a gagné, Mado a gagné, la la la !" },
+        { "by": "leon", "text": "Je les relève, ne lancez pas tout de suite !" },
+        { "by": "margot", "text": "Paulin, à toi. Et ne lance pas dans le fossé." }
+      ]
+    },
+    {
+      "id": "laundry_gossip", "ref": "S13", "tier": "P0", "from": "09:00", "to": "11:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["monday"] }],
+      "groups": [{ "who": ["margot", "colette"], "at": "planning" }],
+      "lines": [
+        { "by": "margot", "text": "Ambroise est à la lisière le lundi, il cueille." },
+        { "by": "colette", "text": "Berthe va voir partir le blé de Paulin, le samedi." },
+        { "by": "margot", "text": "Honorine allume son cierge tous les matins à huit heures." },
+        { "by": "colette", "text": "Achille ferme son fournil le lundi, il va pêcher." },
+        { "by": "margot", "text": "L'abbé part en tournée des hameaux à vélo, presque tous les jours." },
+        { "by": "colette", "text": "Mado prend sa sieste à la forge, l'été, après manger." },
+        { "by": "margot", "text": "Lucie trie son courrier sur le banc du quai, avant sept heures et demie." },
+        { "by": "colette", "text": "Inès déjeune sur son banc, devant la maison forestière." }
+      ]
+    },
+    {
+      "id": "choir_rehearsal", "ref": "S14", "tier": "P0", "from": "20:00", "to": "21:30",
+      "when": [{ "type": "weekday_is", "weekdays": ["friday"] }],
+      "cameFrom": { "points": ["church_nave"], "at": "20:00" },
+      "groups": [
+        { "who": ["armand"], "spots": [{ "x": 97.4, "y": -11.0, "cap": 270 }] },
+        {
+          "who": ["honorine", "margot", "barnabe", "marthe"],
+          "spots": [
+            { "x": 95.2, "y": -11.6, "cap": 90 }, { "x": 95.2, "y": -10.5, "cap": 90 },
+            { "x": 94.2, "y": -11.6, "cap": 90 }, { "x": 94.2, "y": -10.5, "cap": 90 }
+          ]
+        }
+      ],
+      "lines": [
+        { "by": "armand", "text": "On reprend au deuxième couplet. Les basses ?" },
+        { "by": "barnabe", "text": "Présent. Enfin, la basse, c'est moi." },
+        { "by": "honorine", "text": "Marthe chante trop fort, comme toujours." },
+        { "by": "marthe", "text": "Honorine traîne sur la fin, comme toujours." },
+        { "by": "margot", "text": "Mesdames, on est à l'église." },
+        { "by": "armand", "text": "Très bien. Encore une fois, plus doux." }
+      ]
+    },
+    {
+      "id": "milking_trio", "ref": "S17", "tier": "P0", "from": "18:00", "to": "19:00",
+      "when": [],
+      "groups": [
+        {
+          "who": ["paulin", "margot", "leon"],
+          "spots": [{ "x": 112.5, "y": 32.6, "cap": 270 }, { "x": 113.5, "y": 33.4, "cap": 250 }, { "x": 112.4, "y": 33.7, "cap": 330 }]
+        }
+      ],
+      "lines": [
+        { "by": "leon", "text": "Aïe ! Marguerite m'a encore donné un coup de queue." },
+        { "by": "margot", "text": "Elle t'aime bien." },
+        { "by": "leon", "text": "Elle a une drôle de façon de le dire." },
+        { "by": "paulin", "text": "Tiens le seau droit, Léon." },
+        { "by": "margot", "text": "Le pot est plein, je monte le lait." },
+        { "by": "leon", "text": "Demain, c'est moi qui trais. D'accord ?" }
+      ]
+    },
+    {
+      "id": "grain_quarrel", "ref": "S19", "tier": "P0", "from": "09:00", "to": "10:00",
+      "when": [{ "type": "weekday_is", "weekdays": ["saturday"] }],
+      "groups": [
+        { "who": ["firmin"], "spots": [{ "x": 38.5, "y": 16.4, "cap": 180 }] },
+        { "who": ["berthe", "paulin"], "at": "planning" }
+      ],
+      "lines": [
+        { "by": "firmin", "text": "Beau temps pour le blé." },
+        { "by": "berthe", "text": "..." },
+        { "by": "paulin", "text": "Douze sacs, ce samedi." },
+        { "by": "firmin", "text": "Le train sera à l'heure. Presque." },
+        { "by": "berthe", "text": "Ils sont lourds, ces sacs, pour un blé qui part si loin." },
+        { "by": "paulin", "text": "..." }
+      ]
+    },
+    {
+      "id": "evening_windows", "ref": "S20", "tier": "P0", "from": "21:00", "to": "21:30",
+      "when": [{ "type": "not", "condition": { "type": "weather_is", "weather": "rain" } }],
+      "cameFrom": { "points": ["lucie_house_door", "salon_counter"], "at": "20:59" },
+      "groups": [
+        {
+          "who": ["solange", "lucie"],
+          "spots": [{ "x": 75.0, "y": 28.5, "cap": 90 }, { "x": 78.0, "y": 28.5, "cap": 270 }]
+        }
+      ],
+      "lines": [
+        { "by": "lucie", "text": "Jeanne dort ?" },
+        { "by": "solange", "text": "Comme un loir. Et toi ?" },
+        { "by": "lucie", "text": "Pas encore. J'écoute la rue." },
+        { "by": "solange", "text": "Elle est bien calme, ce soir." },
+        { "by": "lucie", "text": "Bonne nuit, Solange." },
+        { "by": "solange", "text": "Bonne nuit. Ferme bien tes volets." }
+      ]
+    }
+  ],
+  "pauses": [
+    { "id": "angelus_pause", "ref": "S10", "at": ["07:00", "12:00", "19:00"], "minutes": 3, "clip": "look_up" }
+  ],
+  "seating": [
+    {
+      "point": "cafe_terrace", "activities": ["stand"],
+      "seats": [
+        { "x": 87.1, "y": 21.5, "cap": 90 }, { "x": 87.9, "y": 21.5, "cap": 270 },
+        { "x": 89.1, "y": 21.5, "cap": 90 }, { "x": 89.9, "y": 21.5, "cap": 270 }
+      ]
+    }
+  ],
+  "workPosts": [
+    { "point": "forge_yard", "activity": "work", "who": ["mado"], "at": { "x": 105.5, "y": 18.3 }, "cap": 0, "clip": "hammer", "tool": "hammer", "event": "forge_strike", "strokeSeconds": 0.667, "hearRange": 16 },
+    { "point": "forge_inside", "activity": "work", "clip": "hammer", "tool": "hammer", "event": "forge_strike", "strokeSeconds": 0.667, "hearRange": 12 },
+    { "point": "basile_at_workbench", "activity": "work", "who": ["basile"], "at": { "x": 14.6, "y": 8.0 }, "cap": 270, "clip": "saw", "tool": "saw", "event": "joinery_saw", "strokeSeconds": 0.6, "hearRange": 12 },
+    { "point": "mill_yard", "activity": "work", "clip": "hammer", "tool": "hammer" },
+    { "point": "rail_cottage_west_window", "activity": "work", "clip": "hammer_tap" },
+    { "point": "priest_garden", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "farm_garden", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "field_high_01", "activity": "work", "clip": "hoe", "tool": "hoe" },
+    { "point": "sexton_garden", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "cemetery_tap", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "lucie_garden", "activity": "work", "clip": "water", "tool": "watering_can" },
+    { "point": "shared_garden_plot", "activity": "work", "clip": "water", "tool": "watering_can_copper" },
+    { "point": "barn_door", "activity": "work", "clip": "feed" },
+    { "point": "farmyard", "activity": "work", "clip": "feed" },
+    { "point": "vet_yard", "activity": "work", "clip": "feed" },
+    { "point": "chicken_coop", "activity": "work", "clip": "feed" },
+    { "point": "vineyard", "activity": "work", "clip": "harvest" },
+    { "point": "threshing_floor", "activity": "work", "clip": "harvest" },
+    { "point": "mill_sluice", "activity": "work", "clip": "crank_turn" },
+    { "point": "forest_cut", "activity": "work", "clip": "chop", "tool": "felling_axe" },
+    { "point": "charcoal_kiln", "activity": "work", "clip": "chop", "tool": "felling_axe" },
+    { "point": "church_bell_rope", "activity": "work", "clip": "reach_up" },
+    { "point": "church_nave", "activity": "work", "clip": "idle" },
+    { "point": "mill_door", "activity": "work", "clip": "idle" },
+    { "point": "mill_inside", "activity": "work", "clip": "idle" },
+    { "point": "mairie_desk", "activity": "work", "clip": "idle" },
+    { "point": "clearing_center", "activity": "work", "clip": "idle" },
+    { "point": "spring", "activity": "work", "clip": "idle" },
+    { "point": "bakery_back", "activity": "work", "clip": "idle" }
+  ],
+  "cat": {
+    "when": [],
+    "walkSpeed": 0.35,
+    "fleeSpeed": 1.1,
+    "stayMinutes": [25, 60],
+    "rollChance": 0.3,
+    "rollSeconds": 2.667,
+    "flee": { "range": 2.6, "speedAbove": 2.0, "smoothingSeconds": 0.8, "distance": 3.5 },
+    "watchRange": 4,
+    "follow": { "chance": 0.05, "seconds": 20, "distance": 1.2 },
+    "habits": [
+      { "id": "rain_well", "from": "07:00", "to": "19:00", "when": [{ "type": "weather_is", "weather": "rain" }], "pose": "sleep", "spots": [{ "x": 37.6, "y": 28.4 }] },
+      { "id": "odette_arbor", "from": "07:00", "to": "10:00", "pose": "sleep", "spots": [{ "x": 33.2, "y": 30.2 }, { "x": 35.4, "y": 29.6 }] },
+      { "id": "bakery_crumbs", "from": "10:00", "to": "12:00", "pose": "idle", "cap": 0, "spots": [{ "x": 70.6, "y": 21.4 }, { "x": 72.5, "y": 21.3 }] },
+      { "id": "quay_nap", "from": "12:00", "to": "15:00", "pose": "sleep", "spots": [{ "x": 32.1, "y": 19.6 }, { "x": 34.1, "y": 19.8 }] },
+      { "id": "ambroise_window", "from": "15:00", "to": "17:00", "pose": "idle", "cap": 0, "spots": [{ "x": -13.5, "y": 22.4 }, { "x": -12.6, "y": 22.5 }] },
+      { "id": "farmyard_mother", "from": "17:00", "to": "19:00", "pose": "idle", "spots": [{ "x": 116.4, "y": 34.6 }, { "x": 115.6, "y": 33.6 }, { "x": 118.4, "y": 36.5 }] }
+    ]
+  }
+}

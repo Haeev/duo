@@ -17,6 +17,7 @@ import type {
 import type { TownSettings } from './bourg';
 import type { BondSettings, HabitDef, HabitRef, HabitSettings, SignDef, VillageCalendar } from './types-voisins';
 import type { Currency } from './monnaie';
+import type { VillageScenes } from './vie';
 import type { MarketSettings } from './marche';
 import type { MailRoundSettings } from './plis';
 
@@ -1504,4 +1505,6 @@ export interface Content {
   decisions: DecisionsContent;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants avec le décor, réactions aux joueurs (`gestes-0-13.json`). */
   villageLife: VillageLife;
+  /** 0.13 (lot H7): scènes entre habitants, pauses, places assises, postes de métier, chat (`vie.json`). */
+  village: VillageScenes;
 }

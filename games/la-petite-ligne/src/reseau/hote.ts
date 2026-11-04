@@ -146,7 +146,9 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
 
   function fastSnapshot(): FastSnapshot {
     const w = sim.world;
+    const cat = sim.runtime.cat;
     return {
+      ...(cat === null ? {} : { cat: { x: cat.pos.x, y: cat.pos.y, f: cat.facing, s: cat.speed, p: cat.pose, t: cat.since } }),
       tick: w.tick,
       ack,
       minutes: w.clock.minutes,

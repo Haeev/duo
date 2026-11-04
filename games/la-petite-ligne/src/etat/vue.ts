@@ -7,6 +7,7 @@
  * `src/interface/index.ts` avec elle. Ni le rendu ni l'interface n'importent la
  * simulation ou le réseau.
  */
+import type { CatSnapshot } from './chat';
 import type { Audio } from '@duo/sdk';
 import type { Intent } from './actions';
 import type { GameMap } from './carte';
@@ -38,6 +39,8 @@ export interface GameView {
   keyLabel(code: string): string;
   /** Rôle de cette machine, pour l'affichage de diagnostic seulement. */
   readonly role: 'host' | 'guest';
+  /** 0.13 (lot H7): le chat du bourg à cette image (`null`: pas de chat au bourg). */
+  cat?(): CatSnapshot | null;
 }
 
 /** Ce que le clic du joueur a touché, calculé par le rendu (lancer de rayon). */

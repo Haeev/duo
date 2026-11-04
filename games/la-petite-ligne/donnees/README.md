@@ -55,6 +55,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `moments.json` | les moments rares (tour 6): bêtes et gestes qui se jouent quand les deux joueurs regardent ensemble (section 2.10) |
 | `habitants-0-13.json` | 0.13, facultatif: les habitants nouveaux et les compléments des anciens, au format de `habitants.json`, fusionnés par identifiant (section 2.12) |
 | `calendrier.json` | 0.13: jours particuliers (messe, marché, fêtes, moisson...) et jours de classe; les anniversaires sont dans les habitants (section 2.12) |
+| `vie.json` | 0.13, facultatif: la vie du village, scènes entre habitants, pauses, places assises, postes de métier, chat du bourg (section 2.14) |
 
 ### 2.1 `objets.json`
 
@@ -355,6 +356,30 @@ Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 6. Un lien par habitan
 La vente au prix « Doux » du marché ajoute `marche.json` `levels.soft.bond` (2) au lien de l'habitant servi. **Niveaux** (`bonds.levels`): six seuils croissants, le premier à 0 (0, 100, 250, 450, 700, 1000); noms dans `textes.messages.bond_level_0` à `bond_level_5`. Au passage d'un niveau, notification chez les deux (`bond_level_up`, `bond_level_up_family` au dernier).
 
 Condition nouvelle: `bond_at_least` (`villager`, `level` 0 à 5), lue aussi dans les plannings; `gift_given` (`villager`, `taste` facultatif: `adore`, `aime`, `neutre`, `deteste`; compteurs `gift:<habitant>` et `gift:<habitant>:<goût>`, paramètres communs `count`, `who`, `since`). Effets nouveaux: `add_bond` (`villager`, `amount`), `reveal_taste` (`villager`, `item`). Champ de quête nouveau: `story` (`villager`, `step`).
+
+### 2.14 `vie.json`: la vie du village (0.13, lot H7)
+
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 7. Lu par `src/donnees/vie.ts` (scènes, pauses, places assises, postes, chat). Les gestes des habitants avec le décor et leurs réactions aux joueurs sont dans `gestes-0-13.json` (`src/donnees/gestes-0-13.ts`); un geste de ce fichier passe avant le clip d'un poste de métier. Fichier facultatif: absent, rien de tout cela. Rien n'ajoute de champ à l'état: une scène, une place ou un poste s'écrit dans le point visé de l'habitant (`VillagerState.target`, points virtuels `scene:<scène>:<groupe>:<rang>` et `seat:<point>:<rang>`, résolus par `src/etat/vie.ts`), lu pareil chez l'hôte et chez l'invité. Caps en degrés de boussole (`cap`: 0 nord, 90 est), positions en mètres du plan de la carte.
+
+**Scènes** (`scenes[]`, table 7.2): les habitants viennent à leur place, se tournent les uns vers les autres et des bulles passent au-dessus d'eux.
+
+| Champ | Valeurs |
+|---|---|
+| `id`, `ref`, `tier` | identifiant, numéro de la table 7.2 (`S11`), `P0` ou `P1` |
+| `from`, `to`, `when` | plage `[from, to[` et conditions du jour (mêmes conditions que les plannings) |
+| `cameFrom` | facultatif: `{ "points": [...], "at": "HH:MM" }`, un membre ne vient que si son planning, à la minute `at` (par défaut la minute d'avant `from`), le mettait à l'un de ces points (sortie de la messe: ceux qui étaient dans la nef). Sans `cameFrom`: il vient s'il est dans le bourg (ni chez lui, ni hors de la carte) à cet instant |
+| `groups[]` | `{ who, at, radius }`: en cercle autour de `at`, chacun tourné vers le centre; `{ who, spots: [{ x, y, cap }], seated }`: une place par membre, assise si `seated`; `{ who, at: "planning" }`: chacun reste au point de son planning et se tourne vers les autres. `activity` facultative (`chat` par défaut, clip `talk`; `play`) |
+| `lines[]` | réserve de bulles `{ by, text }`, dites à tour de rôle par les membres présents |
+
+Pendant la scène, elle passe avant le planning (comme l'étal du marché); à sa fin, chacun reprend son planning. `bubbles` (`{ seconds, range }`): une bulle toutes les `seconds` secondes, lue à moins de `range` m.
+
+**Pauses** (`pauses[]`, S10): `{ id, ref, at: ["07:00", ...], minutes, clip }`: aux heures dites, pendant `minutes` minutes de jeu, les habitants dehors s'arrêtent et jouent `clip`.
+
+**Places assises** (`seating[]`): `{ point, activities, seats: [{ x, y, cap }] }`: un habitant que son planning envoie à `point` pour l'une de ces activités prend la première place libre et s'y assoit (tables du café). Une place dans une case pleine (chaise d'une table) est atteinte par un dernier pas depuis la case libre voisine.
+
+**Postes de métier** (`workPosts[]`): `{ point, activity, clip, who?, at?, cap?, tool?, event?, strokeSeconds?, hearRange? }`: l'habitant (de `who`, sinon n'importe lequel) venu à `point` pour `activity` se tient en `at` (sinon au point), tourné selon `cap` (sinon comme le point), joue `clip` avec l'outil `tool` en main (modèle de `ferme.glb` ou de `personnages.glb`: marteau, scie, houe, arrosoir, hache); l'événement `event` (`forge_strike`, `joinery_saw` ou `joinery_plane`, joués par `AUDIO_SETTINGS.village.events`) part toutes les `strokeSeconds` quand un joueur est à moins de `hearRange` m. Un poste sans `at` remplace seulement le geste (jardins arrosés, potager à la houe, bêtes nourries). Un poste placé déjà tenu laisse le second habitant au point. Plusieurs habitants au même point ordinaire s'y répartissent (le point, puis deux couronnes de 0,75 et 1,4 m), dans l'ordre de la liste des habitants.
+
+**Chat** (`cat`, section 7.4): `when` (il est au bourg), `habits[]` (`{ id, from, to, when, pose: idle | sleep, cap?, spots: [{ x, y }] }`, la première qui tient; aucune: il est hors de la carte), `walkSpeed`, `fleeSpeed`, `stayMinutes` `[min, max]` (temps à une place avant la suivante), `rollChance` et `rollSeconds` (il se roule par terre en arrivant), `flee { range, speedAbove, smoothingSeconds, distance }` (un joueur qui arrive vite, vitesse lissée, le fait fuir; de petits pas le laissent approcher), `watchRange` (il regarde qui approche doucement), `follow { chance, seconds, distance }` (une approche douce sur `1 / chance` environ, il suit ce joueur un moment, à `distance` m derrière lui; événement `cat_follow`). Simulé par l'hôte (`src/simulation/chat.ts`, tirages par la graine), transmis à l'invité avec les positions rapides.
 
 ## 3. Conditions
 

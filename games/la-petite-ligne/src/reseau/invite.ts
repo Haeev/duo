@@ -3,6 +3,8 @@
  * l'état de l'hôte, interpole les autres et prédit son propre déplacement pour
  * rester fluide, corrigé en douceur par les positions de l'hôte.
  */
+import type { CatSnapshot } from '../etat/chat';
+import { lifePlace } from '../etat/vie';
 import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
@@ -80,6 +82,8 @@ export interface Guest {
   onEvent(listener: (event: WorldEvent) => void): () => void;
   /** Tick de l'hôte le plus récent reçu. */
   hostTick(): number;
+  /** 0.13 (lot H7): le chat du bourg, interpolé comme les habitants (`null`: pas de chat). */
+  cat(): CatSnapshot | null;
   dispose(): void;
 }
 
@@ -124,6 +128,7 @@ export function createGuest(
   let lastRender = 0;
   let predictedFacing: number | null = null;
   let latestTick = 0;
+  let catView: CatSnapshot | null = null;
   let ack = -1;
   // Relevé d'un banc par la prédiction (commande `seq`), en attendant que l'hôte l'ait appliqué:
   // les états et positions plus anciens le montrent encore assis.
@@ -180,6 +185,9 @@ export function createGuest(
 
   /** Sans valeur rapide: le point de son planning, affiné ensuite par `placeAtTarget` (cap d'un habitant neuf sans poste). */
   function plannedPoint(v: SentVillager): VillagerPlace {
+    // 0.13 (lot H7): une place de scène ou une chaise du café, résolue comme chez l'hôte.
+    const life = lifePlace(content, v.target);
+    if (life !== null) return { x: life.x, y: life.y, f: life.facing ?? Math.PI / 2, s: 0 };
     const at = map.points[v.target] ?? map.points[POINT.offstage] ?? offstagePoint(map);
     return { x: at.x, y: at.y, f: map.pointFacings[v.target] ?? Math.PI / 2, s: 0 };
   }
@@ -336,6 +344,15 @@ export function createGuest(
         if (world.beam !== null && a.snap.beam !== null && b.snap.beam !== null) {
           setMover(world.beam, lerp(a.snap.beam.x, b.snap.beam.x), lerp(a.snap.beam.y, b.snap.beam.y), lerpAngle(a.snap.beam.f, b.snap.beam.f, t), null);
         }
+        const ca = a.snap.cat;
+        const cb = b.snap.cat;
+        if (ca === undefined || cb === undefined) catView = null;
+        else {
+          const x = lerp(ca.x, cb.x);
+          const y = lerp(ca.y, cb.y);
+          // La pose et son départ viennent du plus récent des deux: la roulade part au même pas que chez l'hôte.
+          catView = { pos: { x, y }, prev: { x, y }, facing: lerpAngle(ca.f, cb.f, t), speed: lerp(ca.s, cb.s), pose: cb.p, since: cb.t, inside: null };
+        }
         world.train.progress = lerp(a.snap.train, b.snap.train);
         world.train.prevProgress = world.train.progress;
         world.clock.minutes = lerp(a.snap.minutes, b.snap.minutes);
@@ -369,6 +386,9 @@ export function createGuest(
     },
     hostTick() {
       return latestTick;
+    },
+    cat() {
+      return catView;
     },
     dispose() {
       offWorld();

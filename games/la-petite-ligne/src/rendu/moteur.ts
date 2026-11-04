@@ -73,6 +73,7 @@ import { MomentsPart } from './moments';
 import { AmbientFaunaPart } from './faune-ambiance';
 import { CatPart, NO_CAT, type CatSource } from './chat';
 import { HenLabels } from './etiquettes';
+import { VillagerBubbles } from './bulles';
 import { FishShadowsPart } from './ombres-poissons';
 import { createStateFishingSource, type FishingSource } from './peche-vue';
 import { MarketPart } from './marche';
@@ -125,7 +126,7 @@ export interface EngineOptions extends RendererOptions {
   adaptive?: boolean;
   /** Pêche de la 0.12 (ombres, coin qui frémit, guet): l'état, sauf la page de démonstration. */
   fishing?: FishingSource;
-  /** Le chat du bourg (0.13, `chat.ts`): aucun tant que la simulation n'en a pas (lot H7). */
+  /** Le chat du bourg (0.13, `chat.ts`); absent: celui de la vue (`GameView.cat`, lot H7). */
   cat?: CatSource;
   /** Style des personnages (par défaut `characters.style`); la page de rendu le change par `style=`. */
   characterStyle?: CharacterStyle;
@@ -203,7 +204,9 @@ export class RenderEngine implements Renderer {
           );
     this.log = options.log;
     this.fishingSource = options.fishing ?? createStateFishingSource();
-    this.catSource = options.cat ?? NO_CAT;
+    // 0.13 (lot H7): le chat de la simulation (hôte) ou du canal rapide (invité), lu par la vue.
+    const viewCat = options.view.cat?.bind(options.view);
+    this.catSource = options.cat ?? (viewCat === undefined ? NO_CAT : () => viewCat());
     this.characterStyle = options.characterStyle ?? RENDER_SETTINGS.characters.style;
     const settings = RENDER_SETTINGS.renderer;
     this.renderer = new WebGLRenderer({
@@ -461,6 +464,10 @@ export class RenderEngine implements Renderer {
     this.scene.add(moments.group, henLabels.group);
     world.add(moments);
     world.add(henLabels);
+    // 0.13 (lot H7): bulles des scènes entre habitants et remarques faites au joueur.
+    const bubbles = new VillagerBubbles(content, terrain, this.resources, this.rig.camera);
+    this.scene.add(bubbles.group);
+    world.add(bubbles);
     this.moments = moments;
     // Faune d'ambiance hors des moments: mésanges des buissons, papillons du pré.
     const fauna = new AmbientFaunaPart(map, library, materials, terrain, this.resources, this.rig.camera, this.light);
