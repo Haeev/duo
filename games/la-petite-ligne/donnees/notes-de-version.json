@@ -2,6 +2,24 @@
   "version": 1,
   "notes": [
     {
+      "version": "0.13.0",
+      "titre": "Le bourg s'agrandit",
+      "changements": [
+        "Le bourg s'agrandit: nouvelles rues, nouveaux lieux, et 21 habitants qui ont chacun leur métier, leur maison et leur journée.",
+        "Un onglet Voisins dans le carnet: les habitudes de chacun se découvrent en les observant ou en les écoutant, avec leur frise de la journée.",
+        "L'amitié grandit avec les conversations et les cadeaux; chaque habitant a ses goûts, ses anniversaires et ses histoires, qui se dévoilent à votre rythme.",
+        "78 nouvelles quêtes, et des récompenses qui changent vraiment le bourg.",
+        "Des décisions à prendre à deux, dont le nom du chat du bourg, qui arrive avec Margot.",
+        "Le village vit: la messe, le café et sa terrasse, la forge, l'angélus, les saluts du matin, la soupe de Colette et Odette, les anniversaires, le portage à deux sur le quai.",
+        "Les habitants font des gestes et réagissent à vous; vous avez 30 gestes à vous, et le chat se caresse.",
+        "Les parcelles se posent librement: 6 au départ, puis plus en défrichant et en achetant.",
+        "Les portraits des habitants sont tirés de leur modèle 3D, dans les dialogues, le carnet et les quêtes.",
+        "Un panneau Options en bas du carnet: qualité Auto, Haute, Moyenne ou Basse, ombres, netteté, particules. Si le jeu ralentit, la qualité baisse d'un cran et le dit.",
+        "Sur Mac, avec Duo 0.3.0: Ctrl+N note ce que tu vois, avec les 10 secondes d'avant et d'après, pour les retours de séance.",
+        "Réseau plus léger, et l'invité ne recule plus en marchant."
+      ]
+    },
+    {
       "version": "0.12.2",
       "titre": "Moins de texte, plus d'images",
       "changements": [

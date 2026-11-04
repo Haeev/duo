@@ -2,7 +2,7 @@
   "schema": 1,
   "id": "la-petite-ligne",
   "name": "La Petite Ligne",
-  "version": "0.12.2",
+  "version": "0.13.0",
   "sdk": "1.0",
   "view": "iso",
   "engine": "three",
@@ -16,7 +16,7 @@
   "entry": "index.html",
   "thumbnail": "vignette.png",
   "description": "Six semaines à deux à la Halte d'Aubrune, du printemps au premier jour de l'automne: retaper la maisonnette, faire pousser le potager et remplir la caisse du train chaque samedi.",
-  "whatsNew": "Des écrans en images plutôt qu'en texte, une icône par objet et par poisson, le salon de Solange en 3D, une économie où chaque transformation rapporte, et les retours du 3 novembre corrigés: sols, voie, train, déco, cadres, portage, ombres sur PC, Basile et son échelle.",
+  "whatsNew": "Le bourg s'agrandit: 21 habitants avec leur journée, un onglet Voisins, l'amitié et les cadeaux, 78 quêtes, des décisions à deux, le chat du bourg, la vie du village, des gestes, des parcelles libres, des portraits 3D et un panneau Options pour l'affichage.",
   "actions": [
     {
       "id": "up",
