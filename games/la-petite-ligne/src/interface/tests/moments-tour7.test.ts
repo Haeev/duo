@@ -444,6 +444,24 @@ describe('parties de robots: la ligne est vraie à chaque pas', () => {
     }, 120_000);
   }
 
+  // 0.13: le tilleul de la place (case 50, 24, à 8 m de la chevrette) dévie les marcheurs au
+  // hasard de la graine 3, qui ne voyaient plus « elle regarde » avec l'autre hors de place. La
+  // couverture de cette ligne ne dépend plus du hasard: une partie immobile, l'un à 7 m, la donne.
+  it('la chevrette, immobiles, l’un trop loin pour compter: aucune ligne fausse aux regards', () => {
+    const deer = momentSim('roe_deer', DEER_AT);
+    const at = point(deer.sim, 'roe_deer_graze');
+    place(deer.sim, 'p1', { x: at.x - 4, y: at.y + 0.5 }, at);
+    place(deer.sim, 'p2', { x: at.x - 7, y: at.y }, at);
+    const run = playChecked(
+      deer.sim,
+      30 * 60,
+      (_s, i) => ({ controls: { p1: still(i), p2: still(i) }, intents: [] }),
+      truthful('roe_deer'),
+    );
+    for (const l of run.lines) seen.deer.add(l);
+    expect([...run.lines]).toContain('Ne bouge plus : elle regarde !');
+  });
+
   it('les marcheurs ont vu toutes les lignes nouvelles (le contrôle a porté sur chacune)', () => {
     const all = (set: Set<string>): string => [...set].join(' / ');
     for (const part of ['même rive', 'Tourne-toi vers', 'Sans bouger'])

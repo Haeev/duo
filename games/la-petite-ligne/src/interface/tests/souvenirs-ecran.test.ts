@@ -71,7 +71,9 @@ describe.skipIf(executable === undefined)(
 
     async function open(scenario: string, me: CharacterId, extra = ''): Promise<Page> {
       const page = await browser.newPage({ viewport: { width: 1366, height: 768 } });
-      // Le premier chargement dépasse les 30 s par défaut de Playwright (Vite compile tout le jeu à la demande).
+      // `goto` attend la fin du module de la page, qui prépare la situation en faisant jouer les
+      // robots jusqu'au jour 12 (93 161 pas): 25 à 27 s en 0.12.2, 28 à 30 s en 0.13 (habitants et
+      // plannings), modules chargés en 1 à 2 s. Les 30 s par défaut de Playwright ne suffisent plus.
       await page.goto(
         `${base}src/interface/demo/index.html?scenario=${scenario}&joueur=${me}&autre=fige&rendu=0&temps=arrete${extra}`,
         { timeout: PAGE_MS },

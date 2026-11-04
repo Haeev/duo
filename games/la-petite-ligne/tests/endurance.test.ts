@@ -40,6 +40,10 @@ const MAX_STATE_BYTES = 64 * 1024;
 // 0.13 (mission 0.13 de dev-reseau): positions, caps et vitesses des habitants hors du message
 // d'état (le canal rapide les porte, `reseau/etat-transmis.ts`): 33 495 à 35 448 octets sur les
 // huit graines (de 35 266 à 36 752 avant, 1 185 à 1 839 de moins). Alerte remise à 35 Kio.
+// 0.13 (mission 0.13 de dev-gameplay-3d): les ombres des poissons sur leur canal, envoyées
+// seulement quand elles changent (`reseau/hote.ts`): 31 259 à 32 965 octets sur les huit graines
+// (33 540 à 35 674 avant, 2 091 à 3 162 de moins), soit 2 875 octets de marge au pire sous l'alerte.
+// Le message des ombres pèse 3 335 octets au plus (graine 7), sous le même plafond de 64 Kio.
 const ALERT_STATE_BYTES = 35 * 1024;
 /** Blocage: l'heure de jeu n'avance plus pendant cinq minutes réelles. */
 const STALL_TICKS = SIM_HZ * 60 * 5;
@@ -51,6 +55,8 @@ const SEEDS = [1, 7, 42, 99, 2026, 31_337, 123_456, 20_261_031];
 interface Run {
   ticks: number;
   maxBytes: number;
+  /** Plus gros message des ombres (canal `shadows`), sous le plafond de 64 Kio lui aussi. */
+  maxShadowBytes: number;
   /** Jours de journée où un joueur n'avait aucune envie (D5 de la revue du contenu). */
   daysWithoutEnvie: string[];
   longestStall: number;
@@ -59,6 +65,11 @@ interface Run {
 /** Octets du message d'état complet de l'hôte (`hote.ts`, `sendWorld`), comptés comme le SDK (UTF-8). */
 function stateMessageBytes(world: WorldState): number {
   return Buffer.byteLength(JSON.stringify({ ack: Number.MAX_SAFE_INTEGER, world: sentWorld(world) }), 'utf8');
+}
+
+/** Octets du message des ombres des poissons (`hote.ts`, `sendShadows`). */
+function shadowsMessageBytes(world: WorldState): number {
+  return Buffer.byteLength(JSON.stringify({ tick: world.tick, shadows: world.fishing.shadows }), 'utf8');
 }
 
 /** Heure de jeu absolue, en minutes depuis le jour 1 à minuit. */
@@ -85,6 +96,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
   let robot = createRobot({ riddle });
   let ticks = 0;
   let maxBytes = 0;
+  let maxShadowBytes = 0;
   let lastTime = gameTime(sim.world);
   let lastProgressTick = 0;
   let longestStall = 0;
@@ -110,6 +122,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
     }
     if (ticks % CHECK_EVERY === 0) {
       maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
+      maxShadowBytes = Math.max(maxShadowBytes, shadowsMessageBytes(sim.world));
       if (sim.world.phase === 'day' && sim.world.clock.day !== envieDay && sim.world.clock.day > 1) {
         envieDay = sim.world.clock.day;
         for (const c of sim.world.characters) if (c.envie === null) daysWithoutEnvie.push(`${c.id} jour ${envieDay}`);
@@ -123,7 +136,7 @@ function playToEnd(start: Sim, riddle: boolean, onDawn?: (sim: Sim) => Sim): { s
     }
   }
   maxBytes = Math.max(maxBytes, stateMessageBytes(sim.world));
-  return { sim, run: { ticks, maxBytes, longestStall, daysWithoutEnvie } };
+  return { sim, run: { ticks, maxBytes, maxShadowBytes, longestStall, daysWithoutEnvie } };
 }
 
 /** Quêtes de la semaine 2: les secondaires toujours; la draisine et l'énigme 2 si la remise est ouverte (énigme 1). */
@@ -162,6 +175,7 @@ function expectDemoFinished(sim: Sim, run: Run, keyExpected: boolean): void {
   expect(w.ending?.keyFound).toBe(keyExpected);
   expect(w.characters.every((c) => c.created)).toBe(true);
   expect(run.maxBytes, 'état sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
+  expect(run.maxShadowBytes, 'ombres sous 64 Kio').toBeLessThan(MAX_STATE_BYTES);
   expect(run.daysWithoutEnvie, 'une envie chaque jour pour chacun').toEqual([]);
   expect(run.maxBytes, `état transmis sous 35 Kio (alerte): ${String(run.maxBytes)} octets`).toBeLessThan(ALERT_STATE_BYTES);
   checkCoherent(w);

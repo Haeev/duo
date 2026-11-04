@@ -14,10 +14,12 @@ import {
   EventsMessageSchema,
   FastSnapshotSchema,
   GuestInputSchema,
+  ShadowsMessageSchema,
   WorldMessageSchema,
   type EventsMessage,
   type FastSnapshot,
   type GuestInput,
+  type ShadowsMessage,
   type WorldMessage,
 } from './schemas';
 import { sentWorld } from './etat-transmis';
@@ -36,6 +38,7 @@ export interface HostChannels {
   world: NetChannel<WorldMessage>;
   fast: NetChannel<FastSnapshot>;
   events: NetChannel<EventsMessage>;
+  shadows: NetChannel<ShadowsMessage>;
 }
 
 export function openHostChannels(net: Net): HostChannels {
@@ -44,6 +47,7 @@ export function openHostChannels(net: Net): HostChannels {
     world: net.channel(CHANNEL.world, { mode: 'latest', schema: WorldMessageSchema }),
     fast: net.channel(CHANNEL.fast, { mode: 'latest', schema: FastSnapshotSchema }),
     events: net.channel(CHANNEL.events, { mode: 'reliable', schema: EventsMessageSchema }),
+    shadows: net.channel(CHANNEL.shadows, { mode: 'latest', schema: ShadowsMessageSchema }),
   };
 }
 
@@ -66,6 +70,8 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
   let stale = 0;
   let sentRevision = -1;
   let lastWorldTick = -WORLD_EVERY_TICKS;
+  /** Ombres du dernier envoi, en JSON (`null`: rien d'envoyé encore). */
+  let sentShadows: string | null = null;
 
   const unsubscribe = channels.input.onMessage((message) => {
     for (const f of message.frames) {
@@ -114,9 +120,23 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
     };
   }
 
+  /**
+   * Les ombres partent avant l'état, et seulement si elles ont changé depuis le dernier envoi: le
+   * canal garde l'ordre d'envoi, l'invité a donc les ombres d'un état quand cet état arrive. Mode
+   * `latest`: la liste est entière, la dernière suffit, y compris après une reprise de la liaison.
+   */
+  function sendShadows(force: boolean): void {
+    const shadows = sim.world.fishing.shadows;
+    const json = JSON.stringify(shadows);
+    if (!force && json === sentShadows) return;
+    channels.shadows.send({ tick: sim.world.tick, shadows });
+    sentShadows = json;
+  }
+
   function sendWorld(): void {
     // 0.13: les habitants sans leurs valeurs par défaut ni leurs champs du canal rapide
     // (`etat-transmis.ts`): l'invité reprend positions, caps et vitesses des instantanés.
+    sendShadows(false);
     channels.world.send({ ack, world: sentWorld(sim.world) });
     sentRevision = sim.world.revision;
     lastWorldTick = sim.world.tick;
@@ -143,6 +163,7 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
       // Hors d'un pas (départ, reprise): un instantané du même pas part juste avant, pour que
       // l'invité place chaque habitant là où il est vraiment dès sa première image.
       channels.fast.send(fastSnapshot());
+      sendShadows(true);
       sendWorld();
     },
     dispose() {
