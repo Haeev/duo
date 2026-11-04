@@ -578,7 +578,9 @@
         "vignette": "Une lettre pliée en quatre, glissée sous un caillou.",
         "informed": "Firmin t'a répondu: « {secret} » C'est {partner} qui l'a dit à Jeanne.",
         "doer": "{partner} t'a confié la réponse de Firmin: « {secret} » Et tu l'as rapportée à Jeanne."
-      }
+      },
+      "barnabe_watch": {"vignette": "Une meule qui fume sous les étoiles.", "informed": "Tu as vu d'où sortait la fumée: « {secret} » {partner} a bouché le bon évent.", "doer": "{partner} t'a dit d'où sortait la fumée: « {secret} » Tu as bouché le bon évent."},
+      "nour_visit": {"vignette": "Une poule dans les bras, un carnet ouvert.", "informed": "Le carnet disait: « {secret} » C'est {partner} qui l'a dit à Nour.", "doer": "{partner} t'a lu le carnet: « {secret} » Et tu l'as dit à Nour."}
     }
   },
   "needs": {"belly": {"full": "Ventre plein", "ok": "Ça va", "low": "Petit creux"}, "rest": {"high": "Pleine énergie", "ok": "Ça va", "low": "Besoin de souffler", "empty": "Plus d'énergie"}, "heart": {"light": "Cœur léger", "ok": "Ça va", "missing": "Envie de compagnie"}},
