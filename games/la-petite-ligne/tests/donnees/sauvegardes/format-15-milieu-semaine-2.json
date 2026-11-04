@@ -1,0 +1,2851 @@
+{
+  "label": "mardi, jour 11, 12 h 00",
+  "progress": 0.16666771646930287,
+  "dataSchema": 15,
+  "data": {
+    "schema": 15,
+    "tick": 86679,
+    "revision": 33738,
+    "seed": 7,
+    "rng": [
+      -1908974154,
+      2979868300,
+      2888745925,
+      2372550300
+    ],
+    "phase": "day",
+    "clock": {
+      "day": 11,
+      "minutes": 720.0952380951562,
+      "running": true,
+      "stoppedBy": null,
+      "veillee": false
+    },
+    "weather": "sunny",
+    "weatherTomorrow": "rain",
+    "weatherLog": [],
+    "morningMist": false,
+    "stages": {
+      "passed": [],
+      "current": null,
+      "choice": {
+        "p1": null,
+        "p2": null
+      }
+    },
+    "characters": [
+      {
+        "id": "p1",
+        "playerId": "membre-a",
+        "name": "Camille",
+        "appearance": {
+          "hair": 1,
+          "hairColor": 1,
+          "beard": 0,
+          "wear": {
+            "top": "chemise_bleu_travail",
+            "bottom": "pantalon_bleu",
+            "shoes": "bottines_brunes",
+            "outer": null,
+            "hat": null
+          },
+          "scarf": "#e07a5f"
+        },
+        "wardrobe": [
+          "chemise_bleu_travail",
+          "pantalon_bleu",
+          "bottines_brunes"
+        ],
+        "created": true,
+        "titleReady": true,
+        "endReady": false,
+        "pos": {
+          "x": -7.0238059734599965,
+          "y": 35.42063432891
+        },
+        "prev": {
+          "x": -7.0238059734599965,
+          "y": 35.42063432891
+        },
+        "facing": 2.976443976175169,
+        "speed": 0,
+        "inside": null,
+        "hairChangedDay": null,
+        "hairNoticedBy": null,
+        "hairOffer": null,
+        "action": {
+          "kind": "idle",
+          "since": 85638,
+          "duration": 0,
+          "target": null
+        },
+        "status": "active",
+        "menu": null,
+        "dialogue": null,
+        "bag": [
+          {
+            "item": "hoe",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "watering_can",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "fishing_rod",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "garden_line",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "iron_box",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "riddle_card",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "axe",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "lettuce_seed",
+            "quality": "ordinary",
+            "count": 2
+          },
+          {
+            "item": "shed_key",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "carrot_seed",
+            "quality": "ordinary",
+            "count": 3
+          },
+          {
+            "item": "radish",
+            "quality": "fine",
+            "count": 33
+          },
+          {
+            "item": "emile_logbook",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "riddle_card_2",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "old_photo",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "egg",
+            "quality": "ordinary",
+            "count": 1
+          },
+          null,
+          {
+            "item": "bread",
+            "quality": "ordinary",
+            "count": 1
+          },
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "selected": 0,
+        "water": 0,
+        "placement": null,
+        "aim": {
+          "cell": {
+            "cx": -8,
+            "cy": 35
+          },
+          "verb": "clear",
+          "blocked": null
+        },
+        "destination": null,
+        "endurance": 102.33542857142804,
+        "enduranceMax": 104.83542857142804,
+        "needs": {
+          "belly": 40.993650793651994,
+          "sleep": 50,
+          "heart": 60.890476190470366,
+          "apartMinutes": 0,
+          "reunionsToday": 0,
+          "nappedToday": false,
+          "napStart": null,
+          "curtainsMorningDone": false,
+          "missingShown": false
+        },
+        "form": "good",
+        "envie": {
+          "id": "fresh_bread",
+          "done": false
+        },
+        "sharedEnvie": {
+          "id": "omelettes_together",
+          "done": false
+        },
+        "bedId": null,
+        "breakfastDone": true,
+        "nightChoice": null,
+        "hintsShown": [
+          "hint_move",
+          "hint_notebook",
+          "hint_act",
+          "hint_bench",
+          "hint_beam",
+          "hint_till",
+          "hint_toolbar",
+          "hint_water",
+          "hint_sow",
+          "hint_crate",
+          "hint_evening",
+          "hint_veillee",
+          "hint_seeds_shop",
+          "plot_clear",
+          "plot_free",
+          "plot_remove",
+          "hint_refill",
+          "hint_harvest",
+          "fishing_watch_hint",
+          "hint_order2",
+          "hint_big_purchase",
+          "hint_omelette",
+          "hint_workbench",
+          "hint_handcar_push"
+        ],
+        "notifications": [
+          {
+            "id": 585,
+            "kind": "message",
+            "text": "Firmin a posé la sacoche de Lucie sur le banc du quai : 23 plis à livrer.",
+            "key": "mail_ready",
+            "tick": 84153
+          },
+          {
+            "id": 587,
+            "kind": "quest",
+            "text": "Nouvelle quête: Le mot de Lucie",
+            "key": "quest_started",
+            "tick": 84153
+          },
+          {
+            "id": 595,
+            "kind": "quest",
+            "text": "La draisine roule. Les Vergers ne sont plus si loin.",
+            "key": "quest_done",
+            "tick": 84753
+          },
+          {
+            "id": 597,
+            "kind": "message",
+            "text": "Avec Basile: Voisinage. Une lanterne de plus s'allume.",
+            "key": "bond_level_up",
+            "tick": 84753
+          },
+          {
+            "id": 601,
+            "kind": "quest",
+            "text": "Le mot de Lucie: étape terminée.",
+            "key": "quest_step_done",
+            "tick": 84953
+          },
+          {
+            "id": 604,
+            "kind": "quest",
+            "text": "Basile a mangé chaud. 30 aubrins.",
+            "key": "quest_done",
+            "tick": 85052
+          },
+          {
+            "id": 606,
+            "kind": "quest",
+            "text": "Le mot de Lucie: étape terminée.",
+            "key": "quest_step_done",
+            "tick": 85111
+          },
+          {
+            "id": 608,
+            "kind": "quest",
+            "text": "L'argent de poche de Jeanne: 20 aubrins.",
+            "key": "quest_done",
+            "tick": 85260
+          },
+          {
+            "id": 610,
+            "kind": "message",
+            "text": "Du premier coup !",
+            "key": "secret_first_try",
+            "tick": 85260
+          },
+          {
+            "id": 612,
+            "kind": "message",
+            "text": "Avec Jeanne: Voisinage. Une lanterne de plus s'allume.",
+            "key": "bond_level_up",
+            "tick": 85260
+          },
+          {
+            "id": 614,
+            "kind": "message",
+            "text": "Achille: « Bon. Je l'ai descendue seul, à petits pas. Demain, si vous passez, je ne dirai pas non. »",
+            "key": "villager_says",
+            "tick": 86049
+          },
+          {
+            "id": 616,
+            "kind": "quest",
+            "text": "Nouvelle quête: Les oies sauvages",
+            "key": "quest_started",
+            "tick": 86679
+          }
+        ],
+        "supper": {
+          "bread": 0,
+          "simple": 0,
+          "stew": 0
+        },
+        "midnightReturn": false,
+        "lastInputTick": 86048,
+        "absent": false,
+        "needsSet": {
+          "belly": null,
+          "sleep": null,
+          "heart": null
+        },
+        "heartToday": {
+          "envie": false,
+          "sharedEnvie": false,
+          "ateTogether": false,
+          "gesture": true,
+          "firstTry": true
+        },
+        "hintQueue": [],
+        "lastHintTick": 83379,
+        "stays": {},
+        "lastMeal": null,
+        "envieHistory": [
+          "bench_moment",
+          "meal_shared",
+          "sow_more",
+          "crunchy_cook",
+          "news_odette",
+          "real_bed",
+          "eat_radishes",
+          "cook_soup",
+          "meet_jeanne_square",
+          "fresh_bread"
+        ],
+        "crafting": null,
+        "pin": null,
+        "seat": null,
+        "fishing": null,
+        "momentHint": null,
+        "holding": null
+      },
+      {
+        "id": "p2",
+        "playerId": "membre-b",
+        "name": "Sacha",
+        "appearance": {
+          "hair": 1,
+          "hairColor": 0,
+          "beard": 0,
+          "wear": {
+            "top": "tshirt_sauge",
+            "bottom": "salopette_verte",
+            "shoes": "bottines_brunes",
+            "outer": null,
+            "hat": null
+          },
+          "scarf": "#3d85c6"
+        },
+        "wardrobe": [
+          "tshirt_sauge",
+          "salopette_verte",
+          "bottines_brunes"
+        ],
+        "created": true,
+        "titleReady": true,
+        "endReady": false,
+        "pos": {
+          "x": 13.5,
+          "y": 30.323333333333345
+        },
+        "prev": {
+          "x": 13.5,
+          "y": 30.323333333333345
+        },
+        "facing": 1.5707963267948966,
+        "speed": 0,
+        "inside": null,
+        "hairChangedDay": null,
+        "hairNoticedBy": null,
+        "hairOffer": null,
+        "action": {
+          "kind": "idle",
+          "since": 85303,
+          "duration": 0,
+          "target": null
+        },
+        "status": "active",
+        "menu": null,
+        "dialogue": null,
+        "bag": [
+          {
+            "item": "hoe",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "watering_can",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "fishing_rod",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "garden_line",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "riddle_card",
+            "quality": "ordinary",
+            "count": 1
+          },
+          null,
+          {
+            "item": "axe",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "gudgeon",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "carrot_seed",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "double_bed",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "riddle_card_2",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "radish",
+            "quality": "fine",
+            "count": 1
+          },
+          {
+            "item": "bullhead",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "minnow",
+            "quality": "ordinary",
+            "count": 3
+          },
+          {
+            "item": "chub",
+            "quality": "ordinary",
+            "count": 5
+          },
+          {
+            "item": "stone_loach",
+            "quality": "ordinary",
+            "count": 1
+          },
+          {
+            "item": "log",
+            "quality": "ordinary",
+            "count": 1
+          },
+          null,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "selected": 9,
+        "water": 10,
+        "placement": null,
+        "aim": {
+          "cell": {
+            "cx": 13,
+            "cy": 31
+          },
+          "verb": "feed",
+          "blocked": null
+        },
+        "destination": null,
+        "endurance": 103.43542857142805,
+        "enduranceMax": 103.43542857142805,
+        "needs": {
+          "belly": 40.993650793651994,
+          "sleep": 50,
+          "heart": 75.89047619047037,
+          "apartMinutes": 0,
+          "reunionsToday": 0,
+          "nappedToday": false,
+          "napStart": null,
+          "curtainsMorningDone": false,
+          "missingShown": false
+        },
+        "form": "okay",
+        "envie": {
+          "id": "see_handcar",
+          "done": true
+        },
+        "sharedEnvie": {
+          "id": "omelettes_together",
+          "done": false
+        },
+        "bedId": null,
+        "breakfastDone": true,
+        "nightChoice": null,
+        "hintsShown": [
+          "hint_move",
+          "hint_notebook",
+          "hint_act",
+          "hint_bench",
+          "hint_till",
+          "hint_beam",
+          "hint_toolbar",
+          "hint_water",
+          "hint_sow",
+          "hint_crate",
+          "hint_evening",
+          "hint_veillee",
+          "hint_seeds_shop",
+          "plot_free",
+          "hint_workbench",
+          "hint_harvest",
+          "hint_furniture",
+          "fishing_watch_hint",
+          "hint_refill",
+          "hint_fishing",
+          "hint_order2",
+          "hint_big_purchase",
+          "hint_omelette",
+          "hint_handcar_push"
+        ],
+        "notifications": [
+          {
+            "id": 598,
+            "kind": "message",
+            "text": "Avec Basile: Voisinage. Une lanterne de plus s'allume.",
+            "key": "bond_level_up",
+            "tick": 84753
+          },
+          {
+            "id": 599,
+            "kind": "envie",
+            "text": "Envie réalisée: Aller voir la draisine.",
+            "key": "envie_done",
+            "tick": 84768
+          },
+          {
+            "id": 600,
+            "kind": "message",
+            "text": "Cœur léger: tu marches d'un bon pas.",
+            "key": "heart_light",
+            "tick": 84916
+          },
+          {
+            "id": 602,
+            "kind": "quest",
+            "text": "Le mot de Lucie: étape terminée.",
+            "key": "quest_step_done",
+            "tick": 84953
+          },
+          {
+            "id": 603,
+            "kind": "message",
+            "text": "Dans la caisse: 1 omelette.",
+            "key": "crate_deposited",
+            "tick": 84963
+          },
+          {
+            "id": 605,
+            "kind": "quest",
+            "text": "Basile a mangé chaud. 30 aubrins.",
+            "key": "quest_done",
+            "tick": 85052
+          },
+          {
+            "id": 607,
+            "kind": "quest",
+            "text": "Le mot de Lucie: étape terminée.",
+            "key": "quest_step_done",
+            "tick": 85111
+          },
+          {
+            "id": 609,
+            "kind": "quest",
+            "text": "L'argent de poche de Jeanne: 20 aubrins.",
+            "key": "quest_done",
+            "tick": 85260
+          },
+          {
+            "id": 611,
+            "kind": "message",
+            "text": "Du premier coup !",
+            "key": "secret_first_try",
+            "tick": 85260
+          },
+          {
+            "id": 613,
+            "kind": "message",
+            "text": "Avec Jeanne: Voisinage. Une lanterne de plus s'allume.",
+            "key": "bond_level_up",
+            "tick": 85260
+          },
+          {
+            "id": 615,
+            "kind": "message",
+            "text": "Achille: « Bon. Je l'ai descendue seul, à petits pas. Demain, si vous passez, je ne dirai pas non. »",
+            "key": "villager_says",
+            "tick": 86049
+          },
+          {
+            "id": 617,
+            "kind": "quest",
+            "text": "Nouvelle quête: Les oies sauvages",
+            "key": "quest_started",
+            "tick": 86679
+          }
+        ],
+        "supper": {
+          "bread": 0,
+          "simple": 0,
+          "stew": 0
+        },
+        "midnightReturn": false,
+        "lastInputTick": 85285,
+        "absent": false,
+        "needsSet": {
+          "belly": null,
+          "sleep": null,
+          "heart": null
+        },
+        "heartToday": {
+          "envie": true,
+          "sharedEnvie": false,
+          "ateTogether": false,
+          "gesture": true,
+          "firstTry": true
+        },
+        "hintQueue": [],
+        "lastHintTick": 78499,
+        "stays": {
+          "path_lamp": 48.5999999999998,
+          "chicken_coop": 47.09999999999989
+        },
+        "lastMeal": null,
+        "envieHistory": [
+          "watch_river",
+          "meal_shared",
+          "news_odette",
+          "water_all",
+          "crunchy_cook",
+          "pontoon_sit",
+          "fine_harvest",
+          "fresh_bread",
+          "decorate",
+          "see_handcar"
+        ],
+        "crafting": null,
+        "pin": null,
+        "seat": null,
+        "fishing": null,
+        "momentHint": null,
+        "holding": null
+      }
+    ],
+    "garden": [
+      {
+        "index": 0,
+        "cell": {
+          "cx": 7,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": true,
+        "crop": {
+          "crop": "lettuce",
+          "days": 2,
+          "stage": "young",
+          "ripe": false,
+          "wateredEveryDay": true,
+          "sownDay": 9,
+          "sownBy": "p1"
+        },
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 48494
+        }
+      },
+      {
+        "index": 1,
+        "cell": {
+          "cx": 8,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": true,
+        "crop": {
+          "crop": "lettuce",
+          "days": 2,
+          "stage": "young",
+          "ripe": false,
+          "wateredEveryDay": true,
+          "sownDay": 9,
+          "sownBy": "p1"
+        },
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 48506
+        }
+      },
+      {
+        "index": 2,
+        "cell": {
+          "cx": 9,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": true,
+        "crop": {
+          "crop": "lettuce",
+          "days": 2,
+          "stage": "young",
+          "ripe": false,
+          "wateredEveryDay": true,
+          "sownDay": 9,
+          "sownBy": "p1"
+        },
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63615
+        }
+      },
+      {
+        "index": 3,
+        "cell": {
+          "cx": 7,
+          "cy": 29
+        },
+        "soil": "tilled",
+        "wet": true,
+        "crop": {
+          "crop": "carrot",
+          "days": 2,
+          "stage": "young",
+          "ripe": false,
+          "wateredEveryDay": true,
+          "sownDay": 9,
+          "sownBy": "p1"
+        },
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63646
+        }
+      },
+      {
+        "index": 4,
+        "cell": {
+          "cx": 8,
+          "cy": 29
+        },
+        "soil": "tilled",
+        "wet": true,
+        "crop": {
+          "crop": "carrot",
+          "days": 2,
+          "stage": "young",
+          "ripe": false,
+          "wateredEveryDay": true,
+          "sownDay": 9,
+          "sownBy": "p1"
+        },
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63658
+        }
+      },
+      {
+        "index": 5,
+        "cell": {
+          "cx": 9,
+          "cy": 29
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63670
+        }
+      },
+      {
+        "index": 6,
+        "cell": {
+          "cx": 6,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 48525
+        }
+      },
+      {
+        "index": 7,
+        "cell": {
+          "cx": 10,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63690
+        }
+      },
+      {
+        "index": 8,
+        "cell": {
+          "cx": 6,
+          "cy": 29
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63718
+        }
+      },
+      {
+        "index": 9,
+        "cell": {
+          "cx": 10,
+          "cy": 29
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p2",
+          "tick": 48626
+        }
+      },
+      {
+        "index": 10,
+        "cell": {
+          "cx": 8,
+          "cy": 30
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63734
+        }
+      },
+      {
+        "index": 11,
+        "cell": {
+          "cx": 5,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p2",
+          "tick": 48988
+        }
+      },
+      {
+        "index": 12,
+        "cell": {
+          "cx": 11,
+          "cy": 28
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p1",
+          "tick": 63769
+        }
+      },
+      {
+        "index": 13,
+        "cell": {
+          "cx": 7,
+          "cy": 30
+        },
+        "soil": "tilled",
+        "wet": false,
+        "crop": null,
+        "lastHarvest": {
+          "by": "p2",
+          "tick": 49010
+        }
+      }
+    ],
+    "plots": {
+      "base": 6,
+      "bought": 0,
+      "clearedCells": [
+        [
+          -8,
+          29
+        ],
+        [
+          -7,
+          29
+        ],
+        [
+          -6,
+          29
+        ],
+        [
+          -5,
+          29
+        ],
+        [
+          -8,
+          30
+        ],
+        [
+          -7,
+          30
+        ],
+        [
+          -6,
+          30
+        ],
+        [
+          -5,
+          30
+        ],
+        [
+          -8,
+          31
+        ],
+        [
+          -7,
+          31
+        ],
+        [
+          -6,
+          31
+        ],
+        [
+          -5,
+          31
+        ],
+        [
+          -4,
+          29
+        ],
+        [
+          -3,
+          29
+        ],
+        [
+          -2,
+          29
+        ],
+        [
+          -1,
+          29
+        ],
+        [
+          -4,
+          30
+        ],
+        [
+          -3,
+          30
+        ],
+        [
+          -2,
+          30
+        ],
+        [
+          -1,
+          30
+        ],
+        [
+          -4,
+          31
+        ],
+        [
+          -3,
+          31
+        ],
+        [
+          -2,
+          31
+        ],
+        [
+          -1,
+          31
+        ],
+        [
+          -8,
+          33
+        ],
+        [
+          -7,
+          33
+        ],
+        [
+          -6,
+          33
+        ],
+        [
+          -5,
+          33
+        ],
+        [
+          -8,
+          34
+        ],
+        [
+          -7,
+          34
+        ],
+        [
+          -6,
+          34
+        ],
+        [
+          -5,
+          34
+        ]
+      ],
+      "stock": 10,
+      "lastRestockDay": 11,
+      "nextIndex": 14
+    },
+    "trees": [
+      {
+        "id": "tree_edge_01",
+        "kind": "oak",
+        "pos": {
+          "x": 16.5,
+          "y": 6.5
+        },
+        "hits": 3,
+        "felled": true,
+        "felledDay": 9,
+        "lastHitTick": 73688
+      },
+      {
+        "id": "tree_edge_02",
+        "kind": "fir",
+        "pos": {
+          "x": 18.5,
+          "y": 3.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 10873
+      },
+      {
+        "id": "tree_edge_03",
+        "kind": "oak",
+        "pos": {
+          "x": 20.5,
+          "y": 5.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 11927
+      },
+      {
+        "id": "tree_edge_04",
+        "kind": "fir",
+        "pos": {
+          "x": 22.5,
+          "y": 7.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 9296
+      },
+      {
+        "id": "tree_edge_05",
+        "kind": "oak",
+        "pos": {
+          "x": 24.5,
+          "y": 4.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 12625
+      },
+      {
+        "id": "tree_edge_06",
+        "kind": "fir",
+        "pos": {
+          "x": 26.5,
+          "y": 6.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 14097
+      },
+      {
+        "id": "tree_edge_07",
+        "kind": "oak",
+        "pos": {
+          "x": 28.5,
+          "y": 3.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 16674
+      },
+      {
+        "id": "tree_edge_08",
+        "kind": "fir",
+        "pos": {
+          "x": 30.5,
+          "y": 5.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": -1
+      },
+      {
+        "id": "tree_edge_09",
+        "kind": "oak",
+        "pos": {
+          "x": 32.5,
+          "y": 7.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": 15530
+      },
+      {
+        "id": "tree_edge_10",
+        "kind": "fir",
+        "pos": {
+          "x": 34.5,
+          "y": 4.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": -1
+      },
+      {
+        "id": "tree_edge_11",
+        "kind": "oak",
+        "pos": {
+          "x": 36.5,
+          "y": 6.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": -1
+      },
+      {
+        "id": "tree_edge_12",
+        "kind": "fir",
+        "pos": {
+          "x": 38.5,
+          "y": 3.5
+        },
+        "hits": 0,
+        "felled": false,
+        "felledDay": null,
+        "lastHitTick": -1
+      }
+    ],
+    "beam": null,
+    "constructions": [
+      {
+        "id": "house_beam",
+        "status": "done",
+        "elements": []
+      },
+      {
+        "id": "house_roof",
+        "status": "done",
+        "elements": [
+          {
+            "id": "roof_1",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_2",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_3",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_4",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_5",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_6",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_7",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_8",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_9",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "roof_10",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          }
+        ]
+      },
+      {
+        "id": "house_door",
+        "status": "done",
+        "elements": [
+          {
+            "id": "door",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          }
+        ]
+      },
+      {
+        "id": "chicken_coop",
+        "status": "done",
+        "elements": [
+          {
+            "id": "coop_floor",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "coop_wall_left",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "coop_wall_right",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          },
+          {
+            "id": "coop_roof",
+            "progress": 1,
+            "paid": true,
+            "done": true,
+            "workers": []
+          }
+        ]
+      }
+    ],
+    "furniture": [
+      {
+        "id": "f1",
+        "item": "straw_mattress",
+        "cell": {
+          "cx": 6,
+          "cy": 22
+        },
+        "rotation": 0,
+        "placedBy": null
+      },
+      {
+        "id": "f2",
+        "item": "straw_mattress",
+        "cell": {
+          "cx": 7,
+          "cy": 22
+        },
+        "rotation": 0,
+        "placedBy": null
+      },
+      {
+        "id": "f3",
+        "item": "stove",
+        "cell": {
+          "cx": 10,
+          "cy": 22
+        },
+        "rotation": 0,
+        "placedBy": null
+      },
+      {
+        "id": "f4",
+        "item": "chest",
+        "cell": {
+          "cx": 6,
+          "cy": 25
+        },
+        "rotation": 0,
+        "placedBy": null
+      },
+      {
+        "id": "f_rack",
+        "item": "tool_rack",
+        "cell": {
+          "cx": 6,
+          "cy": 23
+        },
+        "rotation": 1,
+        "placedBy": null
+      },
+      {
+        "id": "f233",
+        "item": "table",
+        "cell": {
+          "cx": 8,
+          "cy": 24
+        },
+        "rotation": 0,
+        "placedBy": "p2"
+      },
+      {
+        "id": "f235",
+        "item": "chair",
+        "cell": {
+          "cx": 8,
+          "cy": 22
+        },
+        "rotation": 0,
+        "placedBy": "p2"
+      },
+      {
+        "id": "f236",
+        "item": "shelf",
+        "cell": {
+          "cx": 9,
+          "cy": 22
+        },
+        "rotation": 1,
+        "placedBy": "p2"
+      }
+    ],
+    "decor": [],
+    "groundItems": [],
+    "villagers": [
+      {
+        "id": "firmin",
+        "pos": {
+          "x": 27.5,
+          "y": 18.5
+        },
+        "facing": 1.5707963267948966,
+        "target": "quay_bell",
+        "activity": "stand",
+        "met": true
+      },
+      {
+        "id": "odette",
+        "pos": {
+          "x": 29.5,
+          "y": 26.5
+        },
+        "facing": 0,
+        "target": "grocery_inside_counter",
+        "activity": "serve",
+        "met": true,
+        "inside": "grocery"
+      },
+      {
+        "id": "basile",
+        "pos": {
+          "x": 14.6,
+          "y": 8
+        },
+        "facing": -3.141592653589793,
+        "target": "basile_at_workbench",
+        "activity": "work",
+        "met": true
+      },
+      {
+        "id": "jeanne",
+        "pos": {
+          "x": 32.5,
+          "y": 17.65
+        },
+        "facing": -1.1071487177940904,
+        "target": "quay_bench",
+        "activity": "play",
+        "met": true
+      },
+      {
+        "id": "achille",
+        "pos": {
+          "x": 70.5,
+          "y": 21.5
+        },
+        "facing": 1.5707963267948966,
+        "target": "bakery_window",
+        "activity": "serve"
+      },
+      {
+        "id": "solange",
+        "pos": {
+          "x": -44,
+          "y": -50
+        },
+        "facing": 1.5707963267948966,
+        "target": "offstage",
+        "activity": "absent",
+        "visible": false
+      },
+      {
+        "id": "lucie",
+        "pos": {
+          "x": -44,
+          "y": -50
+        },
+        "facing": 1.5707963267948966,
+        "target": "offstage",
+        "activity": "absent",
+        "visible": false
+      },
+      {
+        "id": "armand",
+        "pos": {
+          "x": 77,
+          "y": 21.5
+        },
+        "facing": -1.5707963267948966,
+        "target": "school_gate",
+        "activity": "absent",
+        "visible": false
+      },
+      {
+        "id": "berthe",
+        "pos": {
+          "x": -9.5,
+          "y": 33.5
+        },
+        "facing": 1.5707963267948966,
+        "target": "mill_yard",
+        "activity": "work"
+      },
+      {
+        "id": "martial",
+        "pos": {
+          "x": -44,
+          "y": -50
+        },
+        "facing": 2.5829933382460304,
+        "target": "offstage",
+        "activity": "absent",
+        "visible": false
+      },
+      {
+        "id": "marthe",
+        "pos": {
+          "x": 120.16666666666681,
+          "y": -9.5
+        },
+        "facing": 3.141592653589793,
+        "target": "church_bell_rope",
+        "activity": "work",
+        "prev": {
+          "x": 120.22000000000014,
+          "y": -9.5
+        },
+        "speed": 1.6
+      },
+      {
+        "id": "honorine",
+        "pos": {
+          "x": 130.4,
+          "y": 24.5
+        },
+        "facing": 1.5707963267948966,
+        "target": "honorine_doorstep",
+        "activity": "stand"
+      },
+      {
+        "id": "ines",
+        "pos": {
+          "x": 61.5,
+          "y": -21.5
+        },
+        "facing": -0.34302394042069123,
+        "target": "spring",
+        "activity": "work"
+      },
+      {
+        "id": "barnabe",
+        "pos": {
+          "x": -12,
+          "y": -8.5
+        },
+        "facing": -2.775845352327456,
+        "target": "forest_cut",
+        "activity": "work"
+      },
+      {
+        "id": "mado",
+        "pos": {
+          "x": 105,
+          "y": 20
+        },
+        "facing": -1.2490457723982218,
+        "target": "forge_yard",
+        "activity": "work"
+      },
+      {
+        "id": "paulin",
+        "pos": {
+          "x": 111.5,
+          "y": 4.5
+        },
+        "facing": -2.2455372690173836,
+        "target": "field_high_01",
+        "activity": "work"
+      },
+      {
+        "id": "margot",
+        "pos": {
+          "x": 118.5,
+          "y": 24.5
+        },
+        "facing": -0.19739555984997637,
+        "target": "farm_garden",
+        "activity": "work"
+      },
+      {
+        "id": "leon",
+        "pos": {
+          "x": 77,
+          "y": 21.5
+        },
+        "facing": -1.5707963267948966,
+        "target": "school_gate",
+        "activity": "absent",
+        "visible": false
+      },
+      {
+        "id": "ambroise",
+        "pos": {
+          "x": -13.5,
+          "y": 22.5
+        },
+        "facing": 1.5707963267948966,
+        "target": "rail_cottage_west_window",
+        "activity": "work"
+      },
+      {
+        "id": "nour",
+        "pos": {
+          "x": 112.5,
+          "y": 32.5
+        },
+        "facing": -3.141592653589793,
+        "target": "barn_door",
+        "activity": "work"
+      },
+      {
+        "id": "colette",
+        "pos": {
+          "x": 92.5,
+          "y": 25.5
+        },
+        "facing": 1.1071487177942303,
+        "target": "shared_garden_plot",
+        "activity": "work"
+      }
+    ],
+    "hens": [
+      {
+        "id": "h156",
+        "name": "Bichette",
+        "variant": "hen_black",
+        "pos": {
+          "x": 15.30396642249677,
+          "y": 31.801088304636025
+        },
+        "prev": {
+          "x": 15.290649431437032,
+          "y": 31.811110057321688
+        },
+        "facing": -0.6451335602795375,
+        "wander": {
+          "x": 15.945812837220728,
+          "y": 31.31806432409212
+        },
+        "nameKnownBy": [
+          "p1",
+          "p2"
+        ],
+        "namedBy": "p2",
+        "happiness": 55,
+        "lastEggDay": 11
+      },
+      {
+        "id": "h157",
+        "name": "Cocotte",
+        "variant": "hen_white",
+        "pos": {
+          "x": 15.730086006036885,
+          "y": 32.908505833821145
+        },
+        "prev": {
+          "x": 15.730086006036885,
+          "y": 32.908505833821145
+        },
+        "facing": 2.078729240392671,
+        "wander": {
+          "x": 15.682290124287828,
+          "y": 32.994369577709584
+        },
+        "nameKnownBy": [
+          "p1",
+          "p2"
+        ],
+        "namedBy": "p2",
+        "happiness": 55,
+        "lastEggDay": 11
+      },
+      {
+        "id": "h158",
+        "name": "la Duchesse",
+        "variant": "hen_red",
+        "pos": {
+          "x": 16.579986006088088,
+          "y": 34.04186577283119
+        },
+        "prev": {
+          "x": 16.579986006088088,
+          "y": 34.04186577283119
+        },
+        "facing": 1.467870648481039,
+        "wander": {
+          "x": 16.589572052937,
+          "y": 34.13467227672227
+        },
+        "nameKnownBy": [
+          "p1",
+          "p2"
+        ],
+        "namedBy": "p2",
+        "happiness": 55,
+        "lastEggDay": 11
+      }
+    ],
+    "feederFilled": true,
+    "breeding": {
+      "rooster": null,
+      "chicks": [],
+      "brood": null,
+      "strawDay": null,
+      "grainRations": 0,
+      "goats": [],
+      "grazed": {},
+      "naming": [],
+      "namesUsed": [],
+      "nextNamer": "p1"
+    },
+    "train": {
+      "phase": "away",
+      "progress": 0,
+      "prevProgress": 0
+    },
+    "purse": 363,
+    "cellar": [
+      {
+        "item": "jay_feather",
+        "quality": "ordinary",
+        "count": 1
+      }
+    ],
+    "crate": [
+      {
+        "item": "carrot",
+        "quality": "fine",
+        "count": 10
+      },
+      {
+        "item": "omelette",
+        "quality": "ordinary",
+        "count": 4
+      },
+      {
+        "item": "lettuce",
+        "quality": "fine",
+        "count": 1
+      },
+      {
+        "item": "egg",
+        "quality": "ordinary",
+        "count": 8
+      },
+      {
+        "item": "trout",
+        "quality": "ordinary",
+        "count": 2
+      }
+    ],
+    "catalogueOrders": [
+      "crystal_radio"
+    ],
+    "catalogueOrderBy": [
+      "p1"
+    ],
+    "heavyDeliveries": [],
+    "handcarAt": {
+      "pos": {
+        "x": 54,
+        "y": 13.5
+      },
+      "facing": 3.141592653589793
+    },
+    "grocerSoldToday": 0,
+    "grocerSupply": {},
+    "ardoise": null,
+    "goodsSeen": [],
+    "market": null,
+    "mail": {
+      "day": 11,
+      "items": [
+        {
+          "to": "achille"
+        },
+        {
+          "to": "solange"
+        },
+        {
+          "to": "achille"
+        },
+        {
+          "to": "solange"
+        },
+        {
+          "kind": "parcel",
+          "to": "basile"
+        },
+        {
+          "to": "jeanne"
+        },
+        {
+          "to": "odette"
+        },
+        {
+          "to": "jeanne"
+        },
+        {
+          "kind": "parcel",
+          "to": "basile"
+        },
+        {
+          "to": "basile"
+        },
+        {
+          "kind": "parcel",
+          "to": "solange"
+        },
+        {
+          "kind": "parcel",
+          "to": "achille"
+        },
+        {
+          "to": "jeanne"
+        },
+        {
+          "kind": "parcel",
+          "to": "basile"
+        },
+        {
+          "to": "achille"
+        },
+        {
+          "kind": "parcel",
+          "to": "solange"
+        },
+        {
+          "to": "jeanne"
+        },
+        {
+          "to": "achille"
+        },
+        {
+          "to": "solange"
+        },
+        {
+          "to": "odette"
+        },
+        {
+          "to": "achille"
+        },
+        {
+          "kind": "parcel",
+          "to": "jeanne"
+        },
+        {
+          "kind": "parcel",
+          "to": "achille"
+        }
+      ],
+      "carryOver": 0
+    },
+    "proposals": [],
+    "quests": [
+      {
+        "id": "first_train",
+        "status": "done",
+        "step": 1,
+        "startedDay": 1
+      },
+      {
+        "id": "roof",
+        "status": "done",
+        "step": 3,
+        "startedDay": 1
+      },
+      {
+        "id": "meet_village",
+        "status": "done",
+        "step": 1,
+        "startedDay": 1
+      },
+      {
+        "id": "saturday_order",
+        "status": "done",
+        "step": 1,
+        "startedDay": 1
+      },
+      {
+        "id": "emile_riddle",
+        "status": "done",
+        "step": 1,
+        "startedDay": 1
+      },
+      {
+        "id": "first_sprouts",
+        "status": "done",
+        "step": 3,
+        "startedDay": 2
+      },
+      {
+        "id": "hens",
+        "status": "done",
+        "step": 2,
+        "startedDay": 2
+      },
+      {
+        "id": "planks",
+        "status": "done",
+        "step": 3,
+        "startedDay": 2
+      },
+      {
+        "id": "market_stall",
+        "status": "done",
+        "step": 3,
+        "startedDay": 3
+      },
+      {
+        "id": "jeanne_bet",
+        "status": "done",
+        "step": 2,
+        "startedDay": 3
+      },
+      {
+        "id": "achille_basket",
+        "status": "active",
+        "step": 0,
+        "startedDay": 4
+      },
+      {
+        "id": "jeanne_shuttlecock",
+        "status": "active",
+        "step": 0,
+        "startedDay": 4,
+        "baselines": {
+          "duo:given:jeanne:hen_feather": 0,
+          "p1:given:jeanne:hen_feather": 0,
+          "p2:given:jeanne:hen_feather": 0
+        },
+        "checklist": [
+          {
+            "label": "4 plumes",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "welcome_supper",
+        "status": "done",
+        "step": 2,
+        "startedDay": 4
+      },
+      {
+        "id": "lucie_round",
+        "status": "active",
+        "step": 0,
+        "startedDay": 4
+      },
+      {
+        "id": "hen_names",
+        "status": "done",
+        "step": 2,
+        "startedDay": 5
+      },
+      {
+        "id": "heron_watch",
+        "status": "done",
+        "step": 1,
+        "startedDay": 6
+      },
+      {
+        "id": "second_order",
+        "status": "active",
+        "step": 0,
+        "startedDay": 8
+      },
+      {
+        "id": "handcar",
+        "status": "done",
+        "step": 5,
+        "startedDay": 9
+      },
+      {
+        "id": "emile_riddle_2",
+        "status": "done",
+        "step": 1,
+        "startedDay": 9
+      },
+      {
+        "id": "odette_fry",
+        "status": "done",
+        "step": 1,
+        "startedDay": 9
+      },
+      {
+        "id": "basile_omelette",
+        "status": "done",
+        "step": 1,
+        "startedDay": 10
+      },
+      {
+        "id": "market_first",
+        "status": "active",
+        "step": 0,
+        "startedDay": 10,
+        "baselines": {
+          "duo:stall_kind": 0,
+          "p1:stall_kind": 0,
+          "p2:stall_kind": 0
+        },
+        "checklist": [
+          {
+            "label": "3 sortes",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "coq_arrive",
+        "status": "active",
+        "step": 0,
+        "startedDay": 10,
+        "baselines": {
+          "duo:nights": 9,
+          "p1:nights": 0,
+          "p2:nights": 0
+        }
+      },
+      {
+        "id": "market_crates",
+        "status": "active",
+        "step": 0,
+        "startedDay": 10,
+        "baselines": {
+          "duo:crafted:craft_crate": 0,
+          "p1:crafted:craft_crate": 0,
+          "p2:crafted:craft_crate": 0
+        },
+        "checklist": [
+          {
+            "label": "4 cagettes",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "odette_parcels",
+        "status": "done",
+        "step": 1,
+        "startedDay": 10
+      },
+      {
+        "id": "lucie_note",
+        "status": "done",
+        "step": 3,
+        "startedDay": 11
+      },
+      {
+        "id": "wild_geese",
+        "status": "active",
+        "step": 0,
+        "startedDay": 11,
+        "baselines": {
+          "duo:moment_seen:geese": 0,
+          "p1:moment_seen:geese": 0,
+          "p2:moment_seen:geese": 0
+        }
+      }
+    ],
+    "letters": [
+      {
+        "id": "coop_welcome",
+        "day": 1,
+        "read": [],
+        "vars": {
+          "startPurse": 200,
+          "order": "12 radis, 3 laitues, 6 œufs, 10 planches"
+        }
+      },
+      {
+        "id": "basile_workbench",
+        "day": 3,
+        "read": []
+      },
+      {
+        "id": "odette_market_letter",
+        "day": 3,
+        "read": []
+      },
+      {
+        "id": "coop_catalogue_reminder",
+        "day": 6,
+        "read": []
+      },
+      {
+        "id": "coop_recap",
+        "day": 8,
+        "read": [],
+        "variant": 0,
+        "vars": {
+          "linesDone": 4,
+          "linesTotal": 4,
+          "amount": 540
+        }
+      },
+      {
+        "id": "coop_vergers",
+        "day": 8,
+        "read": []
+      },
+      {
+        "id": "coop_order_2",
+        "day": 8,
+        "read": [],
+        "vars": {
+          "order": "15 carottes, 4 laitues, 8 œufs, 4 omelettes, 2 truites"
+        }
+      },
+      {
+        "id": "basile_handcar",
+        "day": 9,
+        "read": [],
+        "variant": 0
+      },
+      {
+        "id": "jeanne_key_note",
+        "day": 11,
+        "read": [],
+        "variant": 1
+      }
+    ],
+    "flags": [
+      "fishing_enabled",
+      "house_keys",
+      "eggs_enabled",
+      "grocer_buys",
+      "achille_here",
+      "week1_over",
+      "shed_open",
+      "stall_carried",
+      "market_open",
+      "handcar_pushed",
+      "handcar_ready"
+    ],
+    "worldStates": {
+      "handcar_shed": "open"
+    },
+    "unlockedRecipes": [
+      "craft_cellar_rack",
+      "saw_plank",
+      "cook_crunchy_radishes",
+      "cook_fresh_cheese",
+      "cook_omelette",
+      "craft_crate",
+      "cook_blackberry_jam",
+      "cook_elder_jelly",
+      "cook_roasted_hazelnuts",
+      "cook_chanterelle_pan",
+      "craft_nest_box",
+      "craft_table",
+      "craft_chair",
+      "craft_shelf",
+      "craft_double_bed",
+      "cook_vegetable_soup"
+    ],
+    "dialoguesDone": [
+      "firmin_arrival",
+      "odette_meeting@p2",
+      "odette_meeting@p1",
+      "basile_meeting@p2",
+      "basile_roof_done@p2",
+      "basile_meeting@p1",
+      "odette_hens_ask@p2",
+      "basile_planks_ask@p2",
+      "basile_planks_done@p2",
+      "odette_hens_done@p2",
+      "odette_market_talk@p1",
+      "basile_stall_ask@p2",
+      "jeanne_meeting@p2",
+      "jeanne_riddle_offer@p2",
+      "jeanne_bet_ask@p2",
+      "jeanne_hint_shadow@p2",
+      "jeanne_meeting@p1",
+      "jeanne_hint_shadow@p1",
+      "jeanne_riddle_done@p2",
+      "odette_supper_ask@p2",
+      "odette_hen_names_redirect@p2",
+      "odette_hen_names_tell@p1",
+      "odette_supper_scene",
+      "jeanne_heron_done@p2",
+      "firmin_end_full",
+      "firmin_end_vergers",
+      "firmin_end_key",
+      "odette_fry_ask@p2",
+      "firmin_hint_riddle2@p1",
+      "basile_handcar_look@p1",
+      "jeanne_bet_done@p2",
+      "basile_omelette_ask@p1",
+      "odette_fry_done@p2",
+      "odette_parcels_done@p1",
+      "basile_handcar_scene",
+      "jeanne_lucie_redirect@p1",
+      "jeanne_lucie_ask@p2",
+      "basile_omelette_done@p2",
+      "firmin_lucie_reply_2@p2",
+      "jeanne_lucie_quiz@p1"
+    ],
+    "scene": null,
+    "counters": {
+      "duo": {
+        "talked:firmin": 10,
+        "picked:iron_box": 1,
+        "talked:odette": 14,
+        "talked:basile": 11,
+        "tilled": 14,
+        "sowed": 35,
+        "sowed:radish": 19,
+        "sowed:lettuce": 10,
+        "sowed:carrot": 6,
+        "watered": 80,
+        "ate:bread": 3,
+        "ate": 12,
+        "needs_ate_together": 5,
+        "ate_together": 5,
+        "bed": 20,
+        "bed:straw_mattress": 20,
+        "nights": 10,
+        "friche_cleared": 32,
+        "plots_placed": 8,
+        "chopped": 9,
+        "crafted:saw_plank": 17,
+        "crafted": 28,
+        "fed": 10,
+        "harvested": 76,
+        "harvested:radish": 57,
+        "harvested:q:fine": 76,
+        "harvested:radish:q:fine": 57,
+        "given:basile": 22,
+        "given:basile:plank": 16,
+        "talked:jeanne": 14,
+        "crafted:craft_table": 1,
+        "placed": 3,
+        "placed:table": 1,
+        "picked:egg": 27,
+        "crafted:craft_chair": 1,
+        "placed:chair": 1,
+        "crafted:craft_shelf": 1,
+        "placed:shelf": 1,
+        "harvested:lettuce": 7,
+        "harvested:lettuce:q:fine": 7,
+        "given:odette": 9,
+        "given:odette:radish": 3,
+        "given:odette:lettuce": 2,
+        "reunion": 2,
+        "harvested:carrot": 12,
+        "harvested:carrot:q:fine": 12,
+        "crafted:cook_omelette": 4,
+        "ate:omelette": 3,
+        "moment_seen:heron": 1,
+        "crafted:cook_crunchy_radishes": 2,
+        "ate_together:table": 4,
+        "ate:crunchy_radishes": 4,
+        "moment_seen:fox": 1,
+        "crafted:cook_vegetable_soup": 1,
+        "ate:vegetable_soup": 2,
+        "witnessed:train_arrival": 2,
+        "witnessed:train_departure": 2,
+        "crafted:craft_double_bed": 1,
+        "caught": 17,
+        "caught:gudgeon": 5,
+        "caught_rarity:common": 14,
+        "moment_seen:kingfisher": 1,
+        "fish_record": 3,
+        "caught:minnow": 3,
+        "caught:trout": 2,
+        "caught_rare": 3,
+        "caught_rarity:rare": 3,
+        "caught:chub": 5,
+        "caught:stone_loach": 1,
+        "moment_seen:roe_deer": 1,
+        "given:basile:nail": 4,
+        "given:odette:gudgeon": 4,
+        "given:firmin": 2,
+        "given:firmin:odette_parcel": 1,
+        "given:basile:odette_parcel": 1,
+        "caught:bullhead": 1,
+        "given:basile:omelette": 1,
+        "given:firmin:lucie_letter": 1,
+        "choice:jeanne_lucie_quiz:correct": 1
+      },
+      "p1": {
+        "talked:firmin": 5,
+        "picked:iron_box": 1,
+        "talked:odette": 6,
+        "talked:basile": 4,
+        "tilled": 9,
+        "sowed": 22,
+        "sowed:radish": 9,
+        "sowed:lettuce": 8,
+        "sowed:carrot": 5,
+        "watered": 50,
+        "ate:bread": 1,
+        "ate": 6,
+        "bed": 10,
+        "bed:straw_mattress": 10,
+        "friche_cleared": 32,
+        "plots_placed": 8,
+        "fed": 5,
+        "harvested": 61,
+        "harvested:radish": 54,
+        "harvested:q:fine": 61,
+        "harvested:radish:q:fine": 54,
+        "talked:jeanne": 6,
+        "picked:egg": 12,
+        "harvested:lettuce": 4,
+        "harvested:lettuce:q:fine": 4,
+        "given:odette": 5,
+        "given:odette:radish": 3,
+        "given:odette:lettuce": 2,
+        "reunion": 1,
+        "harvested:carrot": 3,
+        "harvested:carrot:q:fine": 3,
+        "crafted:cook_crunchy_radishes": 2,
+        "crafted": 4,
+        "ate:crunchy_radishes": 4,
+        "witnessed:train_arrival": 1,
+        "witnessed:train_departure": 1,
+        "crafted:cook_omelette": 2,
+        "ate:omelette": 1,
+        "given:firmin": 1,
+        "given:firmin:odette_parcel": 1,
+        "choice:jeanne_lucie_quiz:correct": 1
+      },
+      "p2": {
+        "talked:firmin": 5,
+        "talked:odette": 8,
+        "talked:basile": 7,
+        "tilled": 5,
+        "sowed": 13,
+        "sowed:radish": 10,
+        "sowed:lettuce": 2,
+        "sowed:carrot": 1,
+        "watered": 30,
+        "ate:bread": 2,
+        "ate": 6,
+        "bed": 10,
+        "bed:straw_mattress": 10,
+        "chopped": 9,
+        "crafted:saw_plank": 17,
+        "crafted": 24,
+        "given:basile": 22,
+        "given:basile:plank": 16,
+        "talked:jeanne": 8,
+        "crafted:craft_table": 1,
+        "placed": 3,
+        "placed:table": 1,
+        "crafted:craft_chair": 1,
+        "placed:chair": 1,
+        "crafted:craft_shelf": 1,
+        "placed:shelf": 1,
+        "picked:egg": 15,
+        "fed": 5,
+        "reunion": 1,
+        "harvested": 15,
+        "harvested:radish": 3,
+        "harvested:q:fine": 15,
+        "harvested:radish:q:fine": 3,
+        "harvested:carrot": 9,
+        "harvested:carrot:q:fine": 9,
+        "harvested:lettuce": 3,
+        "harvested:lettuce:q:fine": 3,
+        "crafted:cook_omelette": 2,
+        "ate:omelette": 2,
+        "crafted:cook_vegetable_soup": 1,
+        "ate:vegetable_soup": 2,
+        "witnessed:train_arrival": 1,
+        "witnessed:train_departure": 1,
+        "crafted:craft_double_bed": 1,
+        "caught": 17,
+        "caught:gudgeon": 5,
+        "caught_rarity:common": 14,
+        "fish_record": 3,
+        "caught:minnow": 3,
+        "caught:trout": 2,
+        "caught_rare": 3,
+        "caught_rarity:rare": 3,
+        "caught:chub": 5,
+        "caught:stone_loach": 1,
+        "given:basile:nail": 4,
+        "given:odette": 4,
+        "given:odette:gudgeon": 4,
+        "given:basile:odette_parcel": 1,
+        "caught:bullhead": 1,
+        "given:basile:omelette": 1,
+        "given:firmin": 1,
+        "given:firmin:lucie_letter": 1
+      }
+    },
+    "countersToday": {
+      "duo": {
+        "watered": 5,
+        "picked:egg": 3,
+        "crafted:cook_omelette": 1,
+        "crafted": 1,
+        "talked:basile": 3,
+        "talked:jeanne": 3,
+        "given:basile": 1,
+        "given:basile:omelette": 1,
+        "given:firmin": 1,
+        "given:firmin:lucie_letter": 1,
+        "talked:firmin": 1,
+        "choice:jeanne_lucie_quiz:correct": 1,
+        "fed": 1
+      },
+      "p1": {
+        "needs:near_heart": 5.190476190474852,
+        "watered": 5,
+        "talked:basile": 1,
+        "talked:jeanne": 2,
+        "choice:jeanne_lucie_quiz:correct": 1
+      },
+      "p2": {
+        "needs:near_heart": 5.190476190474852,
+        "picked:egg": 3,
+        "crafted:cook_omelette": 1,
+        "crafted": 1,
+        "talked:basile": 2,
+        "needs:light_said": 1,
+        "talked:jeanne": 1,
+        "given:basile": 1,
+        "given:basile:omelette": 1,
+        "given:firmin": 1,
+        "given:firmin:lucie_letter": 1,
+        "talked:firmin": 1,
+        "fed": 1
+      }
+    },
+    "scripts": [],
+    "nextId": 617,
+    "heard": {
+      "p1": {
+        "habit_honorine_rain_0": 5359,
+        "odette_rain": 6208,
+        "habit_armand_summer_river_0": 13744,
+        "jeanne_lucie_quiz": 16425
+      },
+      "p2": {}
+    },
+    "heardOld": {
+      "key": "",
+      "p1": "",
+      "p2": ""
+    },
+    "orderIndex": 1,
+    "orderResult": null,
+    "orderHistory": [
+      {
+        "number": 1,
+        "day": 8,
+        "linesDone": 4,
+        "linesTotal": 4,
+        "complete": true,
+        "amount": 540
+      }
+    ],
+    "orderTotals": {
+      "orders": 1,
+      "linesDone": 4,
+      "linesTotal": 4,
+      "amount": 540
+    },
+    "order": {
+      "generated": null,
+      "budget": 1.9,
+      "misses": 0,
+      "recent": [
+        [
+          "radish",
+          "lettuce",
+          "egg",
+          "plank"
+        ],
+        [
+          "carrot",
+          "lettuce",
+          "egg",
+          "omelette",
+          "trout"
+        ]
+      ],
+      "ordered": [
+        "radish",
+        "lettuce",
+        "egg",
+        "plank",
+        "carrot",
+        "omelette",
+        "trout"
+      ]
+    },
+    "letterVariants": {},
+    "content": {
+      "firstDayWith": {}
+    },
+    "ending": null,
+    "session": {
+      "firstDay": 1,
+      "togetherMoments": 12,
+      "highlights": []
+    },
+    "moments": {
+      "today": {
+        "id": "geese",
+        "origin": "quest",
+        "day": 11,
+        "phase": "absent",
+        "phaseTick": 82892,
+        "startTick": null,
+        "elapsed": 0,
+        "paused": false,
+        "watchTicks": 0,
+        "watching": {
+          "p1": false,
+          "p2": false
+        },
+        "early": false,
+        "noticed": [],
+        "hintTo": null,
+        "shyUntil": 0
+      },
+      "history": [
+        {
+          "id": "heron",
+          "day": 6,
+          "weekday": 5,
+          "origin": "quest",
+          "seen": true
+        },
+        {
+          "id": "fox",
+          "day": 7,
+          "weekday": 6,
+          "origin": "ambient",
+          "seen": true
+        },
+        {
+          "id": "kingfisher",
+          "day": 9,
+          "weekday": 1,
+          "origin": "ambient",
+          "seen": true
+        },
+        {
+          "id": "roe_deer",
+          "day": 10,
+          "weekday": 2,
+          "origin": "ambient",
+          "seen": true
+        }
+      ],
+      "hintTurn": "p1"
+    },
+    "secrets": {
+      "turn": "p1",
+      "entries": [
+        {
+          "id": "hen_names",
+          "quest": "hen_names",
+          "informed": "p1",
+          "doer": "p2",
+          "variant": 4,
+          "errors": 0,
+          "revealed": true,
+          "shared": true,
+          "nudged": false
+        },
+        {
+          "id": "lucie_reply",
+          "quest": "lucie_note",
+          "informed": "p2",
+          "doer": "p1",
+          "variant": 2,
+          "errors": 0,
+          "revealed": true,
+          "shared": false,
+          "nudged": false
+        }
+      ]
+    },
+    "memories": {
+      "moments": [
+        {
+          "id": "heron",
+          "first": 6,
+          "hintTo": null,
+          "hintFrom": "jeanne",
+          "count": 1,
+          "last": 6
+        },
+        {
+          "id": "fox",
+          "first": 7,
+          "hintTo": "p2",
+          "hintFrom": null,
+          "count": 1,
+          "last": 7
+        },
+        {
+          "id": "kingfisher",
+          "first": 9,
+          "hintTo": "p1",
+          "hintFrom": "jeanne",
+          "count": 1,
+          "last": 9
+        },
+        {
+          "id": "roe_deer",
+          "first": 10,
+          "hintTo": "p2",
+          "hintFrom": "odette",
+          "count": 1,
+          "last": 10
+        }
+      ],
+      "secrets": [
+        {
+          "quest": "hen_names",
+          "day": 5,
+          "informed": "p1",
+          "firstTry": true,
+          "variant": 4
+        },
+        {
+          "quest": "lucie_note",
+          "day": 11,
+          "informed": "p2",
+          "firstTry": true,
+          "variant": 2
+        }
+      ]
+    },
+    "sharedEnvieRecent": [],
+    "board": {
+      "current": null,
+      "previous": null,
+      "recent": [],
+      "posted": [],
+      "uniquesGiven": []
+    },
+    "improvements": {},
+    "catalogueBought": {
+      "crystal_radio": 1
+    },
+    "giftsGiven": {},
+    "rooms": {},
+    "rack": [],
+    "upperStreetSince": 1,
+    "fishing": {
+      "shadows": [],
+      "zones": {},
+      "nextShadow": 396,
+      "hotSpot": {
+        "day": 11,
+        "zone": "downstream"
+      },
+      "watch": {
+        "p1": null,
+        "p2": null
+      },
+      "grands": {
+        "day": 11,
+        "list": []
+      },
+      "landing": null,
+      "log": {
+        "gudgeon": {
+          "count": 5,
+          "first": {
+            "day": 9,
+            "by": "p2",
+            "zone": "ford",
+            "together": false
+          },
+          "record": {
+            "cm": 13,
+            "by": "p2",
+            "day": 9
+          }
+        },
+        "minnow": {
+          "count": 3,
+          "first": {
+            "day": 9,
+            "by": "p2",
+            "zone": "ford",
+            "together": false
+          },
+          "record": {
+            "cm": 8,
+            "by": "p2",
+            "day": 9
+          }
+        },
+        "trout": {
+          "count": 2,
+          "first": {
+            "day": 9,
+            "by": "p2",
+            "zone": "ford",
+            "together": true
+          },
+          "record": {
+            "cm": 28,
+            "by": "p2",
+            "day": 9
+          }
+        },
+        "chub": {
+          "count": 5,
+          "first": {
+            "day": 9,
+            "by": "p2",
+            "zone": "ford",
+            "together": true
+          },
+          "record": {
+            "cm": 35,
+            "by": "p2",
+            "day": 9
+          }
+        },
+        "stone_loach": {
+          "count": 1,
+          "first": {
+            "day": 9,
+            "by": "p2",
+            "zone": "ford",
+            "together": true
+          },
+          "record": {
+            "cm": 8,
+            "by": "p2",
+            "day": 9
+          }
+        },
+        "bullhead": {
+          "count": 1,
+          "first": {
+            "day": 10,
+            "by": "p2",
+            "zone": "ford",
+            "together": false
+          },
+          "record": {
+            "cm": 10,
+            "by": "p2",
+            "day": 10
+          }
+        }
+      },
+      "grandsCaught": {},
+      "streak": {
+        "p1": null,
+        "p2": {
+          "fish": "trout",
+          "count": 1
+        }
+      },
+      "commonsInRow": 0,
+      "lastCatchZone": "ford"
+    },
+    "habits": {
+      "known": {
+        "mado": [
+          "train"
+        ],
+        "leon": [
+          "train",
+          "after_school"
+        ],
+        "berthe": [
+          "repair",
+          "home"
+        ],
+        "honorine": [
+          "rain"
+        ],
+        "armand": [
+          "summer_river"
+        ],
+        "nour": [
+          "lunch"
+        ]
+      },
+      "pending": {},
+      "log": [
+        "mado:train:1:seen:both",
+        "leon:train:1:seen:both",
+        "berthe:repair:3:seen:p1",
+        "honorine:rain:3:heard:p1",
+        "berthe:home:4:seen:p1",
+        "leon:after_school:4:seen:p2",
+        "armand:summer_river:9:heard:p1",
+        "nour:lunch:10:seen:p2"
+      ]
+    },
+    "bonds": {
+      "firmin": 360,
+      "odette": 530,
+      "basile": 320,
+      "jeanne": 250
+    },
+    "tastesKnown": {},
+    "decisions": {},
+    "storyDone": {}
+  }
+}

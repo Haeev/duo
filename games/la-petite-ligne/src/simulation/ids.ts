@@ -10,11 +10,17 @@ export const ITEM = {
   log: 'log',
   egg: 'egg',
   fishingRod: 'fishing_rod',
+  /** 0.13: le cordeau, pour poser et reprendre les parcelles. */
+  gardenLine: 'garden_line',
+  /** 0.13: la parcelle de la vitrine d'Odette (jamais dans un sac: l'achat monte le compteur). */
+  plot: 'plot',
 } as const;
 
 export const POINT = {
   well: 'well',
   waterBarrel: 'water_barrel',
+  /** 0.13 (parcelles libres, lot P5): le puisage du bief, au bord de la friche. Absent des anciennes cartes. */
+  millraceDraw: 'millrace_draw',
   groceryCounter: 'grocery_counter',
   groceryInsideCounter: 'grocery_inside_counter',
   /** La place du client au comptoir intérieur, face à Odette. */

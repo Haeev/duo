@@ -65,6 +65,9 @@ Règles:
 | `format-14-milieu-semaine-2.json` | 14 | mardi, jour 11, midi (0.13, lot H1) | 7 | `generer.ts` (0.13, lot H1) |
 | `format-14-fin-de-la-demo.json` | 14 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.13, lot H1) | 42 | `generer.ts` (0.13, lot H1) |
 | `format-14-ete-jour-25.json` | 14 | mardi 25 à midi (0.13, lot H1; sans référence du jeudi 62, comme les formats 12 et 13) | 7 | `generer.ts` (0.13, lot H1) |
+| `format-15-fin-semaine-1.json` | 15 | jour 8 à 16 h, commande 1 payée; parcelles libres (`plots`, parcelles posées où l'on veut, numéros stables) (0.13) | 42 | `generer.ts` (0.13, parcelles libres) |
+| `format-15-milieu-semaine-2.json` | 15 | mardi, jour 11, midi; 14 parcelles posées par le robot, friche entamée (0.13) | 7 | `generer.ts` (0.13, parcelles libres) |
+| `format-15-fin-de-la-demo.json` | 15 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.13) | 42 | `generer.ts` (0.13, parcelles libres; sans référence du mardi 25: le robot ne l'a pas atteint, colis lourd coincé au portage, et sans celle du jeudi 62) |
 
 ## Format en cours
 

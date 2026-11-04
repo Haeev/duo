@@ -39,6 +39,24 @@ export function newSim(seed = SEED, content: Content = contentAndMap().content):
   ]);
 }
 
+/**
+ * Le potager de la démo (0.13): les 12 parcelles de la zone `garden` (x 7 à 10, y 28 à 30), à leur
+ * place d'avant les parcelles libres, comme les pose la reprise d'une sauvegarde 0.12. Les tests des
+ * gestes (bêcher, arroser, récolter, « Déjà pris ») gardent ainsi leurs cases.
+ */
+export function demoGarden(sim: Sim): void {
+  sim.world.garden = sim.map.garden.map((cell, index) => ({
+    index,
+    cell: { cx: cell.cx, cy: cell.cy },
+    soil: 'grass',
+    wet: false,
+    crop: null,
+    lastHarvest: null,
+  }));
+  sim.world.plots.base = Math.max(sim.world.plots.base, sim.world.garden.length);
+  sim.world.plots.nextIndex = Math.max(sim.world.plots.nextIndex, sim.world.garden.length);
+}
+
 /** Buts d'après-midi des jours creux: un groupe de variantes par jour, une seule tirée par la graine (`quetes.json`). */
 export const AFTERNOON_GROUPS: Readonly<Record<string, readonly [string, string]>> = {
   afternoon_d6: ['odette_dandelions', 'heron_watch'],

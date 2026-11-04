@@ -3,7 +3,8 @@
  * lettre qui l'annonce, la mémoire du tirage, et le courrier hebdomadaire borné.
  */
 import { nextTrainDay } from '../donnees/calendrier';
-import { composeOrder, nextBudget } from '../etat/commande-generee';
+import { composeOrder, gardenCapacity, nextBudget } from '../etat/commande-generee';
+import { plotsOwned, plotsRented } from '../etat/parcelles';
 import type { OrderBook, OrderResult } from '../etat/types';
 import { type Sim, emit } from './contexte';
 
@@ -41,7 +42,13 @@ function matureTrees(sim: Sim): number {
  * le prochain train après `today`, si les commandes générées sont décrites. Ne fait rien si elle
  * existe déjà.
  */
+/** Le champ `garden` du tirage, seulement s'il est calculé (`exactOptionalPropertyTypes`). */
+function withGarden(garden: number | undefined): { garden?: number } {
+  return garden === undefined ? {} : { garden };
+}
+
 export function drawNextOrder(sim: Sim, today: number): void {
+
   const { world } = sim;
   const s = sim.content.settings;
   const g = s.order.generated;
@@ -64,6 +71,7 @@ export function drawNextOrder(sim: Sim, today: number): void {
     matureTrees: matureTrees(sim),
     book: world.order,
     hens: world.hens.length > 0 ? world.hens.length : 3,
+    ...withGarden(gardenCapacity(s, plotsOwned(sim.content, world) + plotsRented(world))),
   });
   world.order.generated = { number, train, drawnDay: today, lines, budget, lettersSent: [] };
   world.orderIndex = s.order.trains.length;

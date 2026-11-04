@@ -22,6 +22,7 @@ import { toolKindOf } from './catalogue';
 import { feedHens, petAnimal, pettableNear, strawCoop, takeStraw } from './poules';
 import { GOAT_REACH, fillPail, goatAct, goatLedBy, goatVerb, goatsThirsty, leadGoat, plantStake, pourPail, spotNear } from './chevres';
 import { chop, dig, gardenCellAt, gesture, harvest, refill, sow, till, water } from './potager';
+import { canClear, clearFriche, holdsGardenLine, placePlots } from './parcelles';
 import { isCurtains, placeFurniture, toggleCurtains } from './amenagement';
 import { beginNapIfAfternoon, eatFromBag } from './besoins';
 import { addToBag, countInBag, dropAt, giveToCharacter, heldStack, takeFromBag } from './sac';
@@ -90,6 +91,7 @@ const GHOST_CLICK_RADIUS = 1.5;
 const ACT_POINTS = [
   POINT.well,
   POINT.waterBarrel,
+  POINT.millraceDraw,
   POINT.groceryCounter,
   POINT.noticeBoard,
   POINT.coopCrate,
@@ -113,6 +115,12 @@ function frontPoint(c: Character, out: Vec2): Vec2 {
   out.x = c.pos.x + Math.cos(c.facing) * AIM_DISTANCE;
   out.y = c.pos.y + Math.sin(c.facing) * AIM_DISTANCE;
   return out;
+}
+
+/** La case devant le personnage (celle que vise Espace). */
+export function frontCell(c: Character): Cell {
+  const p = frontPoint(c, { x: 0, y: 0 });
+  return { cx: Math.floor(p.x), cy: Math.floor(p.y) };
 }
 
 export function furnitureCentre(sim: Sim, f: { item: string; cell: Cell; rotation: number }): Vec2 {
@@ -148,7 +156,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
     case 'station':
       return 'open';
     case 'point':
-      if (t.point === POINT.well || t.point === POINT.waterBarrel) {
+      if (t.point === POINT.well || t.point === POINT.waterBarrel || t.point === POINT.millraceDraw) {
+
         if (toolKindOf(sim, held?.item) === 'watering_can') return 'refill';
         const goats = sim.content.settings.goats;
         return goats !== null && goatsThirsty(sim) && countInBag(c, goats.pailItem) === 0 ? 'fill_pail' : null;
@@ -215,6 +224,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       if (goatLedBy(sim, c.id) !== null) return 'plant';
       const g = gardenCellAt(sim, t.cell);
       if (g !== null) return gardenVerb(sim, g, held?.item ?? null);
+      // 0.13: la houe sur une case de friche la défriche (avant de bêcher la terre libre).
+      if (held?.item === ITEM.hoe && canClear(sim, t.cell)) return 'clear';
       if (held?.item === ITEM.hoe && !isSheltered(c) && !isBlockedCell(refreshBlockers(sim), t.cell.cx, t.cell.cy)) return 'dig';
       return null;
     }
@@ -288,7 +299,7 @@ function tierOf(sim: Sim, c: Character, t: Target): number {
   // Une chaise de la maison (S07) se vise comme les autres meubles: la plus proche du regard passe
   // (sinon la paillasse voisine prenait Espace pour une sieste).
   if (t.kind === 'bench' && homeSeats(sim).some((x) => x.id === t.bench)) return TIER.station;
-  return t.kind === 'cell' && gardenCellAt(sim, t.cell) !== null ? GARDEN_TIER : TIER[t.kind];
+  return t.kind === 'cell' && (gardenCellAt(sim, t.cell) !== null || canClear(sim, t.cell)) ? GARDEN_TIER : TIER[t.kind];
 }
 
 function inCone(c: Character, pos: Vec2): boolean {
@@ -645,6 +656,9 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'dig':
       if (t.kind === 'cell') dig(sim, c, t.pos);
       return;
+    case 'clear':
+      if (t.kind === 'cell') clearFriche(sim, c, t.cell);
+      return;
     case 'fish':
       fishAct(sim, c);
       return;
@@ -703,6 +717,15 @@ export function actFront(sim: Sim, c: Character): void {
     return;
   }
   const best = bestTarget(sim, c);
+  // 0.13: le cordeau en main, Espace pose une parcelle sur la case devant soi (une parcelle déjà
+  // là garde ses gestes: récolter une culture mûre).
+  if (c.seat === null && holdsGardenLine(c) && (best === null || best.target.kind === 'cell')) {
+    const cell = frontCell(c);
+    if (gardenCellAt(sim, cell) === null) {
+      placePlots(sim, c, [cell]);
+      return;
+    }
+  }
   if (best !== null && best.verb !== null) {
     perform(sim, c, best.target, best.verb);
     return;

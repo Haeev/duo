@@ -15,9 +15,12 @@ import { storeAtHome } from './rangement';
 import { copiesLeft, onWeeklyCatalogue } from '../etat/catalogue';
 import { deliverWeeklyItem } from './catalogue';
 import { creditImprovement, improvementName } from './chantiers';
-import { grocerAffordable } from '../etat/epicerie';
+import { categorySoldKey, grocerAffordable } from '../etat/epicerie';
+
 import { recordGrocerSale } from './epicerie';
 import { buildingOpen } from './interieurs';
+import { deliverPlots, plotsBuyable } from './parcelles';
+import { ITEM } from './ids';
 
 /** Un habitant tient la boutique (activité `serve` au comptoir). */
 export function shopOpen(sim: Sim): boolean {
@@ -84,6 +87,15 @@ function deliver(sim: Sim, c: Character, request: PurchaseRequest, price: number
     creditImprovement(sim, c, request.item, price);
     return;
   }
+  // 0.13: une parcelle n'entre pas dans le sac, elle monte le compteur. Un gros achat accepté après
+  // coup ne prend que ce qui reste en rayon: le reste de la somme réservée revient à la bourse.
+  if (request.item === ITEM.plot) {
+    const n = deliverPlots(sim, c, request.count);
+    const paid = request.count > 0 ? Math.round((price * n) / request.count) : 0;
+    sim.world.purse += price - paid;
+    if (n > 0) emit(sim, { type: 'bought', by: c.id, item: request.item, count: n, price: paid });
+    return;
+  }
   if (request.source === 'catalogue') {
     for (let i = 0; i < request.count; i++) {
       sim.world.catalogueOrders.push(request.item);
@@ -117,8 +129,18 @@ export function purchase(sim: Sim, c: Character, request: PurchaseRequest): void
       return;
     }
   }
+  // 0.13: la parcelle se prend dans le rayon d'Odette, jusqu'au plafond (« Acheter 4 » avec 3 en rayon: 3).
+  if (request.item === ITEM.plot) {
+    const left = plotsBuyable(sim);
+    if (left === 0) {
+      say(sim, c.id, sim.world.plots.stock === 0 ? 'plot_stock_empty' : 'plot_cap_reached');
+      return;
+    }
+    request = { ...request, count: Math.min(request.count, left) };
+  }
   const price = purchasePrice(sim, request);
   if (price > sim.world.purse) {
+
     say(sim, c.id, 'not_enough_money', { missing: price - sim.world.purse });
     return;
   }
@@ -196,6 +218,12 @@ export function sell(sim: Sim, c: Character, item: string, quality: Quality, cou
   takeFromBag(c, item, n, quality);
   sim.world.purse += price;
   sim.world.grocerSoldToday += price;
+  // 0.13: ce que la catégorie a pris aujourd'hui (garde-fou des légumes), compteur du jour seulement.
+  const category = def.category;
+  if (category in sim.content.settings.economy.grocer.categoryCap) {
+    const key = categorySoldKey(category);
+    sim.world.countersToday.duo[key] = (sim.world.countersToday.duo[key] ?? 0) + price;
+  }
   recordGrocerSale(sim, item, n);
   emit(sim, { type: 'sold', by: c.id, item, count: n, price });
   if (n < count && have > n) say(sim, c.id, 'grocer_daily_cap');

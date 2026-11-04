@@ -14,7 +14,7 @@ import { placeCharacter, rotatedSize } from '../src/simulation/deplacement';
 import { step } from '../src/simulation/pas';
 import { gardenCellAt } from '../src/simulation/potager';
 import { addToBag } from '../src/simulation/sac';
-import { createRobot, newSim, play } from './aides';
+import { createRobot, demoGarden, newSim, play } from './aides';
 
 function send(sim: Sim, by: CharacterId, ...intents: Intent[]): WorldEvent[] {
   const list: AuthoredIntent[] = intents.map((intent) => ({ by, intent }));
@@ -58,10 +58,7 @@ function camilleAt(at: Vec2, facing: number, item: string | null): Sim {
       : c.bag.findIndex((s) => s?.item === item);
   if (slot < 0) throw new Error(`case pour ${item ?? 'la main libre'} absente`);
   c.selected = slot;
-  for (const g of sim.world.garden) {
-    g.soil = 'grass';
-    g.crop = null;
-  }
+  demoGarden(sim);
   step(sim, { controls: {}, intents: [] });
   return sim;
 }

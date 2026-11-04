@@ -351,13 +351,16 @@ export interface SlotModel {
   /** Nom accessible: « Radis, belle qualité, 6 ». */
   label: string;
   unusable: boolean;
+  /** 0.13: sur la case du cordeau, les parcelles libres à poser (`null` à 0 ou sur une autre case). */
+  badge: number | null;
 }
 
-export function slotModel(ctx: UiContext, c: ReadonlyCharacter, index: number): SlotModel {
+export function slotModel(ctx: UiContext, c: ReadonlyCharacter, index: number, plotsFree = 0): SlotModel {
   const stack: Readonly<ItemStack> | null = c.bag[index] ?? null;
   if (stack === null) {
-    return { index, item: null, icon: null, count: 0, fine: false, gauge: null, label: ctx.texts.extra.common.emptySlot, unusable: false };
+    return { index, item: null, icon: null, count: 0, fine: false, gauge: null, label: ctx.texts.extra.common.emptySlot, unusable: false, badge: null };
   }
+  const badge = stack.item === GARDEN_LINE && plotsFree > 0 ? plotsFree : null;
   const def = ctx.content.items[stack.item];
   const capacity = def?.capacity ?? null;
   const gauge = capacity !== null && capacity > 0 ? Math.max(0, Math.min(1, c.water / capacity)) : null;
@@ -366,6 +369,7 @@ export function slotModel(ctx: UiContext, c: ReadonlyCharacter, index: number): 
   if (gauge !== null && capacity !== null) parts.push(ctx.t(ctx.texts.extra.hud.water, { water: c.water, capacity }));
   if (fine) parts.push(ctx.texts.extra.common.fineQuality);
   if (stack.count > 1 || (def?.stack ?? 1) > 1) parts.push(String(stack.count));
+  if (badge !== null) parts.push(ctx.t(ctx.texts.extra.plots.freeLabel, { count: badge }));
   return {
     index,
     item: stack.item,
@@ -375,8 +379,12 @@ export function slotModel(ctx: UiContext, c: ReadonlyCharacter, index: number): 
     gauge,
     label: ctx.t(parts.join(', ')),
     unusable: gauge !== null && c.water <= 0,
+    badge,
   };
 }
+
+/** Le cordeau (0.13, `ITEM.gardenLine`): sa case porte la pastille des parcelles libres. */
+const GARDEN_LINE = 'garden_line';
 
 export interface ToolbarModel {
   slots: SlotModel[];
@@ -385,9 +393,9 @@ export interface ToolbarModel {
   detail: string;
 }
 
-export function toolbarModel(ctx: UiContext, c: ReadonlyCharacter): ToolbarModel {
+export function toolbarModel(ctx: UiContext, c: ReadonlyCharacter, plotsFree = 0): ToolbarModel {
   const slots: SlotModel[] = [];
-  for (let i = 0; i < UI_SETTINGS.toolbarSlots; i++) slots.push(slotModel(ctx, c, i));
+  for (let i = 0; i < UI_SETTINGS.toolbarSlots; i++) slots.push(slotModel(ctx, c, i, plotsFree));
   const stack = c.bag[c.selected] ?? null;
   let detail = '';
   let name = ctx.texts.extra.hud.emptyHand;

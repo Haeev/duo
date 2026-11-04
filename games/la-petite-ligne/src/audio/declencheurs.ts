@@ -296,7 +296,32 @@ export function soundsForEvent(
       emit.world(pick !== undefined && ctx.hasSound(pick) ? pick : 'pickup', characterAt(world, event.by), event.by);
       break;
     }
+    // 0.13, parcelles libres (section 5.5), en attendant les sons du sound designer (lot P5): un
+    // « toc » de maillet par rangée posée, la motte d'une reprise, le froissement d'un défrichage, le
+    // petit carillon d'une parcelle gagnée. Un refus a déjà son son par sa notification (`placement_`).
+    case 'plot_placed': {
+      const rows: number[] = [];
+      for (const cell of event.cells) {
+        if (rows.includes(cell.cy)) continue;
+        rows.push(cell.cy);
+        emit.world('hammer-tap', cellCenter(cell), event.by, (rows.length - 1) * d.plotRowSeconds);
+      }
+      break;
+    }
+    case 'plot_removed':
+      emit.world(event.returned === null ? 'hoe' : 'harvest', cellCenter(event.cell), event.by);
+      break;
+    case 'friche_cleared':
+      emit.world('grass-strike', cellCenter(event.cell), event.by);
+      break;
+    case 'plot_gained':
+      emit.ui('bond-chime', event.by);
+      break;
+    case 'plot_refused':
+    case 'plot_kept':
+      break;
     case 'chop_refused': {
+
       // Le refus de la hache est le son lui-même: un coup mat, sans `ui-refusal` (son.md 4.6).
       const tree = world.trees.find((t) => t.id === event.tree);
       emit.world('axe-thud-soft', tree === undefined ? characterAt(world, event.by) : { x: tree.pos.x, y: tree.pos.y }, event.by);

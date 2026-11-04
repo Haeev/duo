@@ -16,7 +16,7 @@ import { SIM_DT } from '../src/simulation/constantes';
 import { character } from '../src/simulation/contexte';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { createRobot } from '../src/simulation/robot';
-import { contentAndMap } from './aides';
+import { contentAndMap, demoGarden } from './aides';
 
 const STEP_MS = SIM_DT * 1000;
 /** Orientation de la caméra au départ (convention de `cameraYaw()`, ETAT.md, demande 1 du rendu). */
@@ -128,11 +128,9 @@ describe('chaîne clavier: SDK, commandes, séance', () => {
       const sim = b.host.hostSim();
       if (sim === null) throw new Error('hôte sans monde');
       const me = character(sim, b.host.view.localCharacter());
-      for (const g of sim.world.garden) {
-        g.soil = 'grass';
-        g.crop = null;
-      }
+      demoGarden(sim);
       // Départ sur l'herbe, à 5 m à l'ouest du potager (rangée sud, y = 30).
+
       const start: Vec2 = { x: 3.5, y: 31.5 };
       placeCharacter(sim, me, start);
       const hoe = me.bag.findIndex((s) => s?.item === 'hoe');

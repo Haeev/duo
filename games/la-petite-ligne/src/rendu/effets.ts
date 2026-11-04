@@ -39,6 +39,11 @@ import type { Terrain } from './terrain';
 
 const FX = RENDER_SETTINGS.effects;
 const HALF_CELL = 0.5;
+
+/** Clé numérique d'une case du potager (cases négatives comprises). */
+function gardenKey(cell: { readonly cx: number; readonly cy: number }): number {
+  return (cell.cx + 4096) * 8192 + (cell.cy + 4096);
+}
 const HIGHLIGHT_LIFT = 0.04;
 const HIGHLIGHT_GARDEN_LIFT = 0.14;
 const HIGHLIGHT_INSET = 0.94;
@@ -341,7 +346,9 @@ export class EffectsPart implements EventfulPart {
   private readonly holdRings: { mesh: Mesh; material: MeshBasicMaterial }[] = [];
   private bellSparkle = 0;
   private readonly jumps: Jump[] = [];
-  private readonly gardenCells: Set<string>;
+  /** Cases des parcelles posées (0.13: le potager bouge), relues quand la liste change. */
+  private readonly gardenCells = new Set<number>();
+  private gardenSignature = -1;
   private readonly tmp = new Vector3();
   private readonly target = new Vector3();
   private time = 0;
@@ -367,7 +374,6 @@ export class EffectsPart implements EventfulPart {
       share,
     );
     this.group.add(this.particles.mesh);
-    this.gardenCells = new Set(map.garden.map((cell) => `${cell.cx}:${cell.cy}`));
 
     // Cadre de la case visée: quatre baguettes, sans lumière, au-dessus du sol.
     const frame = new ShapeBuilder();
@@ -469,9 +475,20 @@ export class EffectsPart implements EventfulPart {
     return out.set(
       x,
       this.terrain.heightAt(x, y) +
-        (this.gardenCells.has(`${cell.cx}:${cell.cy}`) ? RENDER_SETTINGS.garden.tilledHeight : 0),
+        (this.gardenCells.has(gardenKey(cell)) ? RENDER_SETTINGS.garden.tilledHeight : 0),
       y,
     );
+  }
+
+  /** Relit les cases du potager si la liste des parcelles a changé (somme de leurs numéros et de leur nombre). */
+  private refreshGarden(context: FrameContext): void {
+    const garden = context.world.garden;
+    let signature = garden.length;
+    for (const g of garden) signature = (signature * 31 + g.index + 1) % 1_000_000_007;
+    if (signature === this.gardenSignature) return;
+    this.gardenSignature = signature;
+    this.gardenCells.clear();
+    for (const g of garden) this.gardenCells.add(gardenKey(g.cell));
   }
 
   jump(
@@ -500,10 +517,27 @@ export class EffectsPart implements EventfulPart {
   handleEvent(event: WorldEvent, context: FrameContext): void {
     const p = this.particles;
     const at = this.tmp;
+    this.refreshGarden(context);
     // Une chaîne de tests plutôt qu'un aiguillage: les événements sans effet visuel (sons, interface) passent sans bruit.
     if (event.type === 'tilled') {
       this.cellCenter(event.cell, at);
       p.emit('soil', at.x, at.y + HIGHLIGHT_LIFT, at.z);
+    } else if (event.type === 'plot_placed') {
+      // 0.13: deux piquets plantés et une petite poussière par parcelle posée.
+      for (const cell of event.cells) {
+        this.cellCenter(cell, at);
+        p.emit('dust', at.x, at.y, at.z);
+      }
+    } else if (event.type === 'plot_removed') {
+      // Les piquets sautent, la motte retombe; ce qui revient vole au sac.
+      this.cellCenter(event.cell, at);
+      p.emit('soil', at.x, at.y + HIGHLIGHT_LIFT, at.z);
+      if (event.returned !== null) this.jump(event.returned.item, at, event.by, event.returned.quality === 'fine', context.reducedMotion);
+    } else if (event.type === 'friche_cleared') {
+      // Les ronces disparaissent dans une bouffée de feuilles.
+      this.cellCenter(event.cell, at);
+      p.emit('leaf', at.x, at.y + HALF_CELL, at.z, 2);
+      if (event.gift) p.emit('sparkle', at.x, at.y + HALF_CELL, at.z);
     } else if (event.type === 'dig') {
       this.cellCenter(event.cell, at);
       p.emit('soil', at.x, at.y, at.z);
@@ -667,7 +701,9 @@ export class EffectsPart implements EventfulPart {
       this.highlight.visible = false;
       return;
     }
-    const garden = this.gardenCells.has(`${aim.cell.cx}:${aim.cell.cy}`);
+    this.refreshGarden(context);
+    const garden = this.gardenCells.has(gardenKey(aim.cell));
+
     this.cellCenter(aim.cell, this.tmp);
     this.highlight.position.set(
       this.tmp.x,

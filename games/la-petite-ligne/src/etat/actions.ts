@@ -67,6 +67,12 @@ export type Intent =
   | { type: 'take_furniture'; furniture: string }
   | { type: 'hold_furniture'; item: ItemId }
   | { type: 'cancel_placement' }
+  // 0.13, parcelles libres (cordeau en main): poser sur ces cases dans cet ordre (clic, Espace,
+  // rectangle tracé), reprendre les parcelles vides d'un rectangle (clic droit glissé), et le
+  // maintien de X ou du clic droit sur une parcelle (`null`: relâché).
+  | { type: 'plot_place'; cells: Cell[] }
+  | { type: 'plot_remove'; cells: Cell[] }
+  | { type: 'plot_hold'; cell: Cell | null }
   // Coin à soi (C): le carré de 2x2 cases le plus proche du point visé; au même endroit, le retire
   | { type: 'corner'; x: number; y: number }
   | { type: 'corner_clear' }

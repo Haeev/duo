@@ -14,7 +14,8 @@ import { starterWardrobe, starterWear } from '../etat/garde-robe';
 import { clothesBuy, openClothesShop, openWardrobe, wearClothing } from './vetements';
 import { TOOLBAR_SLOTS } from './constantes';
 import { type Sim, bump, character, distance, emit, faceToward, partnerOf, secondsToTicks } from './contexte';
-import { actFront, actOnClick, furnitureCentre, getUp, openMenu, pointerTarget, resolveClick } from './agir';
+import { actFront, actOnClick, frontCell, furnitureCentre, getUp, openMenu, pointerTarget, resolveClick } from './agir';
+import { holdPlot, holdsGardenLine, placePlots, removePlots } from './parcelles';
 import { standUp } from './bancs';
 import { clearCorner, designateCorner, placeFurniture, rotatePlacement, takeDecor, takeFurniture, toggleCurtains, topDecorOf, updatePlacement } from './amenagement';
 import { durationMultiplier, eatFromBag, spend } from './besoins';
@@ -101,7 +102,13 @@ function validPointer(target: ClickTarget | null): ClickTarget | null {
   return Number.isFinite(target.x) && Number.isFinite(target.y) ? target : null;
 }
 
+/** Une case reçue du réseau: deux entiers sûrs (la règle de pose dit ensuite si elle est sur la carte). */
+function validCell(cell: { cx: number; cy: number }): boolean {
+  return Number.isSafeInteger(cell.cx) && Number.isSafeInteger(cell.cy);
+}
+
 /** Une valeur choisie à l'écran, bornée à [0, `count` - 1] (une valeur absente garde l'actuelle). */
+
 function pick(value: number | undefined, count: number, current: number): number {
   if (value === undefined || !Number.isFinite(value)) return current;
   return Math.max(0, Math.min(count - 1, Math.round(value)));
@@ -135,6 +142,11 @@ function createCharacter(
 
 function examine(sim: Sim, c: Character): void {
   if (!canAct(c, sim)) return;
+  // 0.13: le cordeau en main, X reprend la parcelle devant soi (maintenue s'il y a une culture).
+  if (holdsGardenLine(c) && c.seat === null) {
+    holdPlot(sim, c, frontCell(c));
+    return;
+  }
   // 0.13 (section 4.4): un écriteau à portée se lit d'abord.
   if (readSign(sim, c)) return;
   if (!isHome(c)) {
@@ -356,6 +368,16 @@ export function applyIntent(sim: Sim, by: CharacterId, intent: Intent): void {
     }
     case 'corner':
       if (canAct(c, sim) && Number.isFinite(intent.x) && Number.isFinite(intent.y)) designateCorner(sim, c, intent.x, intent.y);
+      return;
+    case 'plot_place':
+      if (canAct(c, sim)) placePlots(sim, c, intent.cells.filter(validCell));
+      return;
+    case 'plot_remove':
+      if (canAct(c, sim)) removePlots(sim, c, intent.cells.filter(validCell));
+      return;
+    case 'plot_hold':
+      if (intent.cell === null) holdPlot(sim, c, null);
+      else if (canAct(c, sim) && validCell(intent.cell)) holdPlot(sim, c, intent.cell);
       return;
     case 'corner_clear':
       if (c.created) clearCorner(sim, c);

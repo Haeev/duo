@@ -13,7 +13,15 @@ import { isHome } from '../etat/interieurs';
 import type { Input } from '@duo/sdk';
 import type { ClickTarget, ControlFrame } from '../etat/actions';
 import { TOOLBAR_SLOTS } from '../etat/types';
-import type { GameInterface, GameView, PickResult, Renderer } from '../etat/vue';
+import type { GameInterface, GameView, PickResult, PlotPreview, Renderer } from '../etat/vue';
+import type { Cell } from '../etat/types';
+import { plotPlacement, rectCells } from '../etat/parcelles';
+
+/** Le cordeau (0.13): l'outil des parcelles libres (`ITEM.gardenLine` de la simulation). */
+const GARDEN_LINE = 'garden_line';
+/** Au plus tant de cases par tracé (`PLOT_RECT_MAX` de la simulation, schéma réseau). */
+const PLOT_RECT_MAX = 256;
+
 import type { GameAction } from '../session';
 
 export interface Controls {
@@ -23,6 +31,8 @@ export interface Controls {
 
 export interface ControlsOptions {
   input: Input<GameAction>;
+  /** Horloge locale en millisecondes (anneau du maintien); `performance.now` par défaut. */
+  now?: () => number;
   renderer: () => Renderer | null;
   ui: () => GameInterface | null;
   /** Position du canevas à l'écran (le pointeur du SDK est relatif à lui). */
@@ -122,10 +132,42 @@ function toTarget(pick: PickResult): ClickTarget {
   }
 }
 
+/** Distance devant soi de la case visée au clavier (comme `AIM_DISTANCE` de la simulation, m). */
+const FRONT_AHEAD = 0.9;
+
+/** Tracé en cours au cordeau (0.13): bouton, case du clic, et si le maintien de reprise court encore. */
+interface PlotDrag {
+  mode: 'place' | 'remove';
+  start: Cell;
+  last: Cell;
+  /** Pas local (ms) du début d'un maintien de reprise sur une culture, `null` sans maintien. */
+  holdSince: number | null;
+}
+
+function sameCell(a: Cell, b: Cell): boolean {
+  return a.cx === b.cx && a.cy === b.cy;
+}
+
+/** La case devant le personnage (prédite chez l'invité), celle que vise Espace. */
+function frontCellOf(me: { pos: { x: number; y: number }; facing: number }): Cell {
+  return { cx: Math.floor(me.pos.x + Math.cos(me.facing) * FRONT_AHEAD), cy: Math.floor(me.pos.y + Math.sin(me.facing) * FRONT_AHEAD) };
+}
+
 export function createControls(options: ControlsOptions): Controls {
   const { input } = options;
   let seq = 0;
   let rightWasDown = false;
+  /** 0.13: tracé au cordeau en cours, X tenu sur une parcelle, et le dernier aperçu envoyé. */
+  let plotDrag: PlotDrag | null = null;
+  let examineHold: number | null = null;
+  let plotShown = false;
+  const now = options.now ?? ((): number => performance.now());
+  const showPlots = (preview: PlotPreview | null): void => {
+    if (preview === null && !plotShown) return;
+    plotShown = preview !== null;
+    options.renderer()?.setPlotPreview?.(preview);
+    options.ui()?.setPlotPreview?.(preview);
+  };
   /** Clé de la dernière cible survolée envoyée à l'hôte, `null`: visée au clavier. */
   let hoverKey: string | null = null;
   let lastPointerX = Number.NaN;
@@ -174,12 +216,17 @@ export function createControls(options: ControlsOptions): Controls {
       // Survol: la souris qui bouge vise; Z Q S D, un menu ou la souris hors du jeu rendent la visée au clavier.
       const pointer = input.pointer;
       const placing = me?.placement !== null && me?.placement !== undefined;
+      // 0.13: le cordeau en main, la souris trace des parcelles au lieu de viser (section 5.1).
+      // Le contenu n'est lu que cordeau en main (les bancs d'essai des entrées n'en ont pas).
+      const holdsLine = me !== undefined && me.bag[me.selected]?.item === GARDEN_LINE;
+      const plotRules = holdsLine ? view.content.settings.garden.plots : null;
+      const lining = plotRules !== null && me !== undefined && !placing && !captured && world.phase === 'day' && me.status === 'active';
       const pointerMoved = pointer.x !== lastPointerX || pointer.y !== lastPointerY;
       lastPointerX = pointer.x;
       lastPointerY = pointer.y;
       const keyboardMove = mx !== 0 || my !== 0;
       let hovered: ClickTarget | null | undefined;
-      if (!pointer.inside || captured || renderer === null || me === undefined || keyboardMove) hovered = null;
+      if (!pointer.inside || captured || renderer === null || me === undefined || keyboardMove || lining) hovered = null;
       else if (pointerMoved || hoverKey !== null) {
         // Tant que la souris vise, on revise à chaque pas: un habitant passe sous elle, l'aperçu change de taille.
         const rect = options.canvasRect();
@@ -202,7 +249,76 @@ export function createControls(options: ControlsOptions): Controls {
       const rightPressed = pointer.right && !rightWasDown;
       rightWasDown = pointer.right;
       let clicked = false;
-      if (leftPressed && pointer.inside && renderer !== null && !captured) {
+      // 0.13: cordeau en main, clic gauche (poser) et clic droit (reprendre), glissés ou non.
+      let plotsTaken = false;
+      if (lining) {
+        plotsTaken = true;
+        const rect = options.canvasRect();
+        const ground = pointer.inside && !keyboardMove && renderer !== null ? (renderer.pickGround?.(rect.left + pointer.x, rect.top + pointer.y) ?? null) : null;
+        const pointed: Cell | null = ground === null ? null : { cx: Math.floor(ground.x), cy: Math.floor(ground.y) };
+        const front = frontCellOf(me);
+        // Hors de ta terre, l'aperçu reste devant le personnage (comme les meubles, R11).
+        const aimed = pointed !== null && plotPlacement(view.content, view.map, world, pointed, true) !== 'outside' ? pointed : front;
+        if (plotDrag === null && leftPressed && pointed !== null) plotDrag = { mode: 'place', start: pointed, last: pointed, holdSince: null };
+        else if (plotDrag === null && rightPressed && pointed !== null) {
+          plotDrag = { mode: 'remove', start: pointed, last: pointed, holdSince: null };
+          const g = world.garden.find((x) => x.cell.cx === pointed.cx && x.cell.cy === pointed.cy);
+          if (g !== undefined) {
+            view.send({ type: 'plot_hold', cell: pointed });
+            if (g.crop !== null) plotDrag.holdSince = now();
+          }
+        }
+        if (plotDrag !== null) {
+          if (pointed !== null) plotDrag.last = pointed;
+          const moved = !sameCell(plotDrag.start, plotDrag.last);
+          // Un glissé annule le maintien sur la culture du clic: le rectangle ne reprend que les vides.
+          if (moved && plotDrag.holdSince !== null) {
+            plotDrag.holdSince = null;
+            view.send({ type: 'plot_hold', cell: null });
+          }
+          const held = plotDrag.mode === 'place' ? input.isDown('click') : pointer.right;
+          const cells = rectCells(plotDrag.start, plotDrag.last, PLOT_RECT_MAX);
+          if (!held) {
+            if (plotDrag.mode === 'place') view.send({ type: 'plot_place', cells });
+            else if (moved) view.send({ type: 'plot_remove', cells });
+            if (plotDrag.mode === 'remove') view.send({ type: 'plot_hold', cell: null });
+            plotDrag = null;
+            showPlots({ mode: 'place', cells: [aimed], dragging: false, hold: null, pointer: pointed === null ? null : { x: rect.left + pointer.x, y: rect.top + pointer.y } });
+          } else {
+            const hold = plotDrag.holdSince === null ? null : Math.min(1, (now() - plotDrag.holdSince) / (plotRules.removeHoldSeconds * 1000));
+            showPlots({ mode: plotDrag.mode, cells, dragging: moved, hold, pointer: { x: rect.left + pointer.x, y: rect.top + pointer.y } });
+          }
+        } else {
+          // X tenu sur une parcelle (clavier): l'anneau du maintien, la case devant soi.
+          const xDown = input.isDown('examine');
+          if (input.wasPressed('examine')) {
+            const g = world.garden.find((x) => x.cell.cx === front.cx && x.cell.cy === front.cy);
+            examineHold = g?.crop === null || g === undefined ? null : now();
+          }
+          if (!xDown && examineHold !== null) {
+            examineHold = null;
+            view.send({ type: 'plot_hold', cell: null });
+          }
+          const hold = examineHold === null ? null : Math.min(1, (now() - examineHold) / (plotRules.removeHoldSeconds * 1000));
+          showPlots({
+            mode: examineHold === null ? 'place' : 'remove',
+            cells: [examineHold === null ? aimed : front],
+            dragging: false,
+            hold,
+            pointer: pointed === null || examineHold !== null ? null : { x: rect.left + pointer.x, y: rect.top + pointer.y },
+          });
+        }
+      } else {
+        // Plus de cordeau en main (pause, menu, autre outil): le tracé en cours est abandonné, rien n'est posé.
+        if (plotDrag?.holdSince !== null && plotDrag !== null) view.send({ type: 'plot_hold', cell: null });
+        if (examineHold !== null) view.send({ type: 'plot_hold', cell: null });
+        plotDrag = null;
+        examineHold = null;
+        showPlots(null);
+      }
+      if (plotsTaken) {
+        // Le clic gauche et le clic droit sont au cordeau; Espace et X passent par la simulation.
+      } else if (leftPressed && pointer.inside && renderer !== null && !captured) {
         const rect = options.canvasRect();
         const pick = renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
         if (pick !== null) {
@@ -213,7 +329,9 @@ export function createControls(options: ControlsOptions): Controls {
       }
       if (!clicked && input.wasPressed('act') && !captured) view.send({ type: 'act' });
       // Clic droit: en aménagement, tourne le meuble; sur un meuble posé, le reprend; sinon examine (comme X).
-      if (rightPressed && pointer.inside && !captured) {
+      if (plotsTaken) {
+        if (input.wasPressed('examine') && !rightPressed) view.send({ type: 'examine' });
+      } else if (rightPressed && pointer.inside && !captured) {
         const rect = options.canvasRect();
         const pick = placing || renderer === null ? null : renderer.pick(rect.left + pointer.x, rect.top + pointer.y);
         if (placing) view.send({ type: 'rotate_furniture', delta: 1 });

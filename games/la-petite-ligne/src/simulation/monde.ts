@@ -28,6 +28,7 @@ import { addToBag, addStack } from './sac';
 import { emptyBoard } from './annonces';
 import { emptyImprovements } from './chantiers';
 import { emptyVillageFields } from '../etat/types-voisins';
+import { startPlotCells } from '../etat/parcelles';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
 export interface PlayerInfo {
@@ -162,6 +163,20 @@ function newCharacter(content: Content, map: GameMap, id: CharacterId, player: P
   };
 }
 
+/** Les parcelles d'une partie neuve: celles de départ, et le rayon d'Odette (section 2.3). */
+export function newPlots(content: Content, map: GameMap): WorldState['plots'] {
+  const s = content.settings.garden.plots;
+  const placed = startPlotCells(content, map).length;
+  return {
+    base: s === null ? placed : s.start,
+    bought: 0,
+    clearedCells: [],
+    stock: s?.stockAtStart ?? 0,
+    lastRestockDay: content.settings.clock.firstDay.day,
+    nextIndex: placed,
+  };
+}
+
 /** Crée le monde. `players`: dans l'ordre p1, p2 (en pratique l'hôte puis l'invité). */
 export function createWorld(content: Content, map: GameMap, seed: number, players: readonly [PlayerInfo, PlayerInfo]): Sim {
   const s = content.settings;
@@ -207,7 +222,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     morningMist: false,
     stages: { passed: [], current: null, choice: { p1: null, p2: null } },
     characters,
-    garden: map.garden.map((cell, index) => ({
+    garden: startPlotCells(content, map).map((cell, index) => ({
       index,
       cell: { cx: cell.cx, cy: cell.cy },
       soil: 'grass',
@@ -215,6 +230,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
       crop: null,
       lastHarvest: null,
     })),
+    plots: newPlots(content, map),
     trees: map.trees.map((t) => ({ id: t.id, kind: t.kind, pos: { x: t.pos.x, y: t.pos.y }, hits: 0, felled: false, felledDay: null, lastHitTick: -1 })),
     beam:
       beamFrom === undefined
@@ -302,6 +318,8 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
   for (const c of characters) {
     for (const stack of content.startingInventory.eachPlayer) addToBag(sim, c, stack.item, 'ordinary', stack.count);
     if (s.fishing !== null && content.items[ITEM.fishingRod] !== undefined) addToBag(sim, c, ITEM.fishingRod, 'ordinary', 1);
+    // 0.13: le cordeau des parcelles libres, après la canne (les cases des outils d'avant ne bougent pas).
+    if (s.garden.plots !== null && content.items[ITEM.gardenLine] !== undefined) addToBag(sim, c, ITEM.gardenLine, 'ordinary', 1);
     const can = Object.values(content.items).find((i) => i.capacity !== null);
     c.water = can?.capacity ?? 0;
   }

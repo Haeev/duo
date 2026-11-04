@@ -245,6 +245,14 @@ const ITEMS: Record<string, Builder> = {
   },
   fishing_rod: (b) =>
     b.cylinder(0.01, 0.02, 1.6, [0, 0, 0], 'wood_new', { base: true, segments: 4 }),
+  // 0.13 (parcelles libres): le cordeau, une bobine de bois et sa ficelle, deux piquets pris avec elle.
+  garden_line: (b) => {
+    b.cylinder(0.06, 0.06, 0.03, [0, 0, 0], 'wood', { base: true, segments: 8 });
+    b.cylinder(0.045, 0.045, 0.12, [0, 0.03, 0], 'rope', { base: true, segments: 8 });
+    b.cylinder(0.06, 0.06, 0.03, [0, 0.15, 0], 'wood', { base: true, segments: 8 });
+    b.box([0.025, 0.42, 0.025], [0.09, 0, 0.02], 'wood_new', { base: true, rotation: [0, 0, -6] });
+    b.box([0.025, 0.42, 0.025], [0.12, 0, -0.03], 'wood_new', { base: true, rotation: [0, 0, -10] });
+  },
   // Tour 9: outils améliorés, cadeaux, cueillettes d'automne (substituts en attendant l'artiste).
   watering_can_copper: (b) => {
     b.cylinder(0.12, 0.13, 0.22, [0, 0, 0], 'brass', { base: true });
@@ -1287,6 +1295,18 @@ const EXACT: Record<string, Builder> = {
   ...VILLAGER_PROPS,
   ...TRAIN,
   ...DECOR,
+  // 0.13: la parcelle en herbe piquetée (aussi le dessin de la parcelle de la vitrine d'Odette).
+  garden_cell_grass: (b) => {
+    b.box([0.92, 0.04, 0.92], [0, 0, 0], 'grass', { base: true });
+    for (const [x, z] of [
+      [-0.43, -0.43],
+      [0.43, -0.43],
+      [-0.43, 0.43],
+      [0.43, 0.43],
+    ] as const) {
+      b.box([0.03, 0.18, 0.03], [x, 0, z], 'wood', { base: true });
+    }
+  },
   garden_cell_tilled: (b) => {
     mound(b, 'soil_tilled', 'soil_tilled_light');
   },

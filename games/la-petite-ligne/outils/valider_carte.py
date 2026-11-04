@@ -866,7 +866,16 @@ def controler(carte: dict, rapport: Rapport, chemin_donnees: Path | None, avant:
         g = zones["garden"]
         cases_g = {(x, y) for y in range(g["y"], g["y"] + g["h"]) for x in range(g["x"], g["x"] + g["w"])}
         cases_p = {(x, y) for x, y in lignes.cases() if lignes[y][x] == "p"}
-        if cases_g != cases_p:
+        if "garden_land" in zones:
+            # 0.13, parcelles libres: le potager se pose où l'on veut sur le pré du jardin; la zone `garden`
+            # (rect de départ des anciennes sauvegardes) y est, en herbe, et plus aucune case n'est en terre `p`.
+            gl = zones["garden_land"]
+            if cases_p:
+                rapport.erreur("potager: plus de terre 'p' avec le pré du jardin (garden_land): les parcelles se posent sur l'herbe")
+            if not cases_g <= {(x, y) for y in range(gl["y"], gl["y"] + gl["h"]) for x in range(gl["x"], gl["x"] + gl["w"])}:
+                rapport.erreur("potager: la zone garden doit être dans le pré du jardin (garden_land)")
+            controler_terre(carte, rapport, libre, occupe, zones, reglages)
+        elif cases_g != cases_p:
             rapport.erreur("potager: le code 'p' doit couvrir exactement la zone garden")
         if any(not libre[y][x] or (x, y) in occupe for x, y in cases_g):
             rapport.erreur("potager: une case est bloquée ou occupée par un objet")
@@ -1606,7 +1615,38 @@ def squelette(cases: set[tuple[int, int]]) -> set[tuple[int, int]]:
     return s
 
 
-def controler_0_13(carte: dict, rapport: Rapport, libre: Grille, lieux: Lieux, resultats: dict[str, Any],
+def controler_terre(carte: dict, rapport, libre, occupe, zones: dict, reglages: dict | None) -> None:
+    """Parcelles libres (PL-05): cases posables du pré du jardin et de la friche, comme le jeu les compte
+    (`src/etat/parcelles.ts`): ni bloquées, ni sous un objet ou un chantier, ni dans une zone interdite."""
+    plots = ((reglages or {}).get("garden") or {}).get("plots") or {}
+    interdites = set()
+    for zid in plots.get("forbiddenZones", ["hen_pen", "house_plan_reserved"]):
+        z = zones.get(zid)
+        if z:
+            interdites |= {(x, y) for y in range(z["y"], z["y"] + z["h"]) for x in range(z["x"], z["x"] + z["w"])}
+    chantiers = {(c_[0], c_[1]) for ch in carte.get("chantiers", []) for c_ in ch.get("cases", [])}
+    lignes = grille_terrain(carte)
+
+    def posable(x: int, y: int) -> bool:
+        return lignes.dans(x, y) and libre[y][x] and (x, y) not in occupe and (x, y) not in interdites and (x, y) not in chantiers
+
+    gl = zones["garden_land"]
+    pre = [(x, y) for y in range(gl["y"], gl["y"] + gl["h"]) for x in range(gl["x"], gl["x"] + gl["w"]) if posable(x, y)]
+    nature = (plots.get("land") or {}).get("clearable", "defricher")
+    friche = [(c_[0], c_[1]) for pc in carte.get("parcelles", []) if pc.get("nature") == nature for c_ in pc["cases"]]
+    friche_ok = [c_ for c_ in friche if posable(*c_)]
+    rapport.info(f"parcelles libres: {len(pre)} cases posables dans le pré du jardin, {len(friche_ok)} de friche")
+    if len(friche_ok) != len(friche):
+        rapport.erreur(f"parcelles libres: {len(friche) - len(friche_ok)} case(s) de friche bloquées ou occupées")
+    debut = plots.get("startRect")
+    if debut:
+        cases_d = [(x, y) for y in range(debut["y"], debut["y"] + debut["h"]) for x in range(debut["x"], debut["x"] + debut["w"])]
+        if any(c_ not in pre for c_ in cases_d):
+            rapport.erreur("parcelles libres: le rectangle de départ sort de la terre posable")
+
+
+def controler_0_13(
+carte: dict, rapport: Rapport, libre: Grille, lieux: Lieux, resultats: dict[str, Any],
                    avant: dict | None, plannings: dict | None) -> None:
     types = carte["types"]
     lignes = grille_terrain(carte)

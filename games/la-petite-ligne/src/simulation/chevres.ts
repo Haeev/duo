@@ -21,6 +21,7 @@ import {
   say,
 } from './contexte';
 import { gesture } from './potager';
+import { spotRefusedForPlots } from './parcelles';
 import { POINT } from './ids';
 import { addToBag, countInBag, giveToCharacter, takeFromBag } from './sac';
 import { caredToday, markCared, requestName, setGoatSpawner } from './poules';
@@ -39,10 +40,15 @@ export function goatSettings(sim: Pick<Sim, 'content'>): GoatSettings | null {
   return sim.content.settings.goats;
 }
 
-/** Une place libre (aucune autre chèvre n'y est attachée), la première dans l'ordre des réglages. */
+/**
+ * Une place libre (aucune autre chèvre n'y est attachée), la première dans l'ordre des réglages;
+ * 0.13: d'abord celles dont le cercle ne touche aucune parcelle (elle mangerait le potager).
+ */
 function freeSpot(sim: Sim, s: GoatSettings, except: Goat | null): string {
   const taken = new Set(sim.world.breeding.goats.filter((g) => g !== except).map((g) => g.stake));
-  return s.spots.find((id) => !taken.has(id)) ?? s.spots[0] ?? '';
+  return (
+    s.spots.find((id) => !taken.has(id) && !spotRefusedForPlots(sim, id)) ?? s.spots.find((id) => !taken.has(id)) ?? s.spots[0] ?? ''
+  );
 }
 
 /** La chevrette (quête) ou la deuxième chèvre (catalogue): à la porte de la chevrerie, à nommer. */
@@ -169,6 +175,11 @@ export function plantStake(sim: Sim, c: Character): void {
     );
     return;
   }
+  // 0.13: une place dont le cercle de corde touche une parcelle ne reçoit plus le piquet.
+  if (spotRefusedForPlots(sim, spot)) {
+    say(sim, c.id, 'goat_stake_plots');
+    return;
+  }
   goat.led = null;
   goat.stake = spot;
   const at = point(sim, spot);
@@ -256,8 +267,11 @@ export function updateGoats(
     }
     if (goat.home && minutes >= s.outAt) {
       goat.home = false;
+      // 0.13: une parcelle posée depuis dans le cercle de sa place: elle broute ailleurs.
+      if (spotRefusedForPlots(sim, goat.stake)) goat.stake = freeSpot(sim, s, goat);
       startGrazing(sim, s, goat);
     }
+
     if (goat.milking !== null) {
       milkStep(sim, s, goat, controls, dt);
       continue;

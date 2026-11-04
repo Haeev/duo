@@ -11,7 +11,25 @@ import { seasonIndexOf } from '../donnees/calendrier';
 import type { Content } from '../donnees/types';
 import type { Quality, ReadonlyWorld } from './types';
 
-type GrocerWorld = Pick<ReadonlyWorld, 'clock' | 'grocerSupply' | 'ardoise' | 'grocerSoldToday'>;
+type GrocerWorld = Pick<ReadonlyWorld, 'clock' | 'grocerSupply' | 'ardoise' | 'grocerSoldToday'> & {
+  readonly countersToday?: ReadonlyWorld['countersToday'];
+};
+
+/** Clé du compteur du jour de ce qu'Odette a payé pour une catégorie (`countersToday.duo`, remis à zéro à l'aube). */
+export function categorySoldKey(category: string): string {
+  return `grocer_category:${category}`;
+}
+
+/**
+ * Ce qui reste du plafond de la catégorie de cet objet aujourd'hui (0.13: au plus 250 aubrins de
+ * légumes bruts par jour), `Infinity` si sa catégorie n'en a pas.
+ */
+export function categoryRoom(content: Content, world: GrocerWorld, item: string): number {
+  const category = content.items[item]?.category;
+  const cap = category === undefined ? undefined : content.settings.economy.grocer.categoryCap[category];
+  if (cap === undefined || category === undefined) return Number.POSITIVE_INFINITY;
+  return Math.max(0, cap - (world.countersToday?.duo[categorySoldKey(category)] ?? 0));
+}
 
 export function dynamicPrices(content: Content, day: number): boolean {
   return day >= content.settings.economy.grocer.pricesFromDay;
@@ -103,7 +121,7 @@ export function grocerAffordable(
   quality: Quality,
   count: number,
 ): { count: number; price: number } {
-  const room = content.settings.economy.grocer.dailyCap - world.grocerSoldToday;
+  const room = Math.min(content.settings.economy.grocer.dailyCap - world.grocerSoldToday, categoryRoom(content, world, item));
   let n = 0;
   let price = 0;
   for (const p of grocerUnitPrices(content, world, item, quality, count)) {

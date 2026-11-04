@@ -36,6 +36,7 @@ import { updateHenCalls } from './secrets';
 import { forageHints } from './lisiere';
 import { boardHints, updateBoard } from './annonces';
 import { updateGifts } from './catalogue';
+import { plotHints, updatePlotHolds } from './parcelles';
 
 export interface StepInput {
   /** Commandes continues de chaque joueur pour ce pas (absent: rien de tenu). */
@@ -155,6 +156,7 @@ export function step(sim: Sim, input: StepInput): void {
     updateConstructions(sim, controls, dt);
     updateRoomWork(sim, controls, dt);
     updateGoats(sim, controls, dt);
+    updatePlotHolds(sim);
   }
   for (const c of world.characters) updateInside(sim, c);
   updateFishingWorld(sim);
@@ -188,6 +190,7 @@ export function step(sim: Sim, input: StepInput): void {
     nearHints(sim);
     forageHints(sim);
     boardHints(sim);
+    plotHints(sim);
   }
   for (const c of world.characters) {
     updatePlacement(sim, c);

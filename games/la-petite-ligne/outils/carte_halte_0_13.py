@@ -403,6 +403,15 @@ def terrain() -> None:
     terrain_nord()
     terrain_nord_est()
     terrain_est()
+    potager_libre()
+
+
+def potager_libre() -> None:
+    """Parcelles libres (docs/jeux/jeu-1/parcelles-libres-0-13.md, lot P5): les 12 cases de terre du potager de
+    la démo redeviennent le pré. Les parcelles se posent au cordeau sur le pré du jardin (zone `garden_land`):
+    sous une parcelle reprise, on retrouve l'herbe, pas un rectangle de terre nue. La zone `garden` reste (rect
+    de départ des anciennes sauvegardes et de la carte de secours)."""
+    r(".", 7, 28, 10, 30)
 
 
 # ---------------------------------------------------------------------------
@@ -732,6 +741,16 @@ def points_lieux() -> None:
       rotation=0, **imp)
     for n, (x, y) in enumerate(((-6.5, 30.5), (-2.5, 30.5), (-6.5, 34.5), (-2.5, 34.5)), start=1):
         P(f"wild_plot_{n:02d}", x, y, f"friche: parcelle à défricher {n}", **imp)
+    # Parcelles libres (lot P5): l'eau du bief à portée de la friche, pour arroser un grand potager sans aller
+    # au tonneau. Le point est sur l'eau (-8, 36), au coin sud-est du bief, dans le bas de la case: un clic sur
+    # la friche voisine (y 35) vise la friche, pas le bief (1,2 m). On puise depuis l'herbe de (-7, 36), au bout
+    # de l'allée de la friche (y 32) par le bord est des carrés.
+    P("millrace_draw", -7.5, 36.8, "le puisage du bief, au bord de la friche: remplir l'arrosoir", portee=1.5)
+    # Deux places de pâture hors de la terre cultivable (le pré du jardin peut se couvrir de parcelles):
+    # sur le bas-côté est de la route du gué, à moins de 10 m de la chevrerie, à plus de 3,5 m du rail; leur
+    # cercle de corde (2,5 m) ne touche aucune case du pré (x 15 au plus).
+    P("goat_graze_06", 21.5, 24.5, "pâture du bas-côté de la route du gué, en face de la chevrerie")
+    P("goat_graze_07", 21.5, 28.5, "pâture du bas-côté de la route du gué, en face du poulailler")
     P("log_yard", -6.5, 9.5, "au bord du parc à grumes de Basile", **imp)
     P("forest_cut", -12.0, -8.5, "la coupe de Basile: souches, piles, arbres marqués", rayon=2.0, **imp)
     P("charcoal_kiln", -8.5, -4.5, "la meule de Barnabé, au bord sud de la coupe, à plus de 6 m de tout arbre")
@@ -1216,6 +1235,9 @@ ZONES = [
     ("church_crossroads", (85, 21, 97, 23), "la placette du carrefour de l'Église"),
     ("shared_gardens", (91, 24, 98, 34), "les jardins de la Rive"),
     ("wild_plots", (-8, 29, -1, 35), "la friche du garde-barrière"),
+    ("garden_land", (1, 28, 15, 35), "le pré du jardin: la terre du garde-barrière où se posent les parcelles "
+                                     "(parcelles libres de la 0.13, 100 cases posables hors objets et coin des "
+                                     "poules), avec la friche une fois défrichée"),
     ("field_high_01_area", (109, 1, 115, 9), "le champ du Haut 1"),
     ("field_high_02_area", (117, 1, 123, 9), "le champ du Haut 2"),
     ("orchard_common", (129, 0, 137, 8), "le verger communal"),
@@ -1297,7 +1319,9 @@ RETOUCHES = [
     (rect(87, 15, 7, 6), "le café de la Côte"),
     (rect(85, 21, 13, 3), "placette du carrefour de l'Église (la route y reste pavée)"),
     (rect(91, 24, 8, 11), "jardins de la Rive"),
+    (rect(7, 28, 4, 3), "potager de la démo: ses 12 cases de terre redeviennent le pré (parcelles libres de la 0.13)"),
 ]
+
 
 
 def trajet_auto(libre: set, a: tuple[float, float], c: tuple[float, float]) -> list[list[float]]:
@@ -1449,6 +1473,10 @@ def objets() -> list[dict]:
 
 def donnees() -> None:
     """Zones, intérieurs, ouvrages, coins de pêche, ru: ajoutés aux listes du constructeur."""
+    # Parcelles libres (lot P5): la réserve du potager du jeu complet devient le pré du jardin, la terre où se
+    # posent les parcelles: entre la haie (x 0), le chemin de la maisonnette (y 27), la clôture de la rive (y 36)
+    # et la route du gué (x 17).
+    b.ZONES[:] = [z for z in b.ZONES if z["id"] != "garden_extension_reserved"]
     for ident, (x0, y0, x1, y1), role in ZONES:
         b.ZONES.append({"id": ident, "rect": rect_inclus(x0, y0, x1, y1), "role": role})
     b.INTERIEURS.extend(INTERIEURS)

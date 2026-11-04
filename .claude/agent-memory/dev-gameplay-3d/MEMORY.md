@@ -481,3 +481,15 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - `ShapeBuilder.build()` vide le constructeur: le réutiliser pour un second semis plante `mergeGeometries` (« reading 'index' »), la page ne devient jamais prête. Sonde d'une page qui ne démarre pas: script qui affiche console et `pageerror` jusqu'à `ready` (90 s), au lieu d'attendre la capture.
 - Copie de référence de HEAD pour comparer: `git archive HEAD games/la-petite-ligne packages` dans le scratchpad, lien `node_modules` à la racine de la copie, `cp -a` des `node_modules` du jeu et des paquets (liens relatifs pnpm), Vite sur un autre port.
 - Fichier de script nommé `types.py` dans le scratchpad: il masque le module `types` de Python (`json` plante à l'import). Nommer autrement.
+
+## Parcelles libres de la 0.13 (La Petite Ligne, vérifié le 2026-11-04)
+
+- Règles de pose pures dans `src/etat/parcelles.ts` (`plotPlacement`, `previewPlacement`), lues par la simulation, l'aperçu du rendu et le HUD: chez l'invité, la même fonction donne la prévision. Terre posable mise en cache par carte et réglages (`WeakMap`).
+- Forme compacte dans l'état transmis seulement (`sendPlot`/`readPlot` dans `sentWorld`/`worldFromSent`); la sauvegarde garde les objets complets (aller-retour exact, migrations simples). 40 parcelles en culture: 1,3 Ko contre 8,7 Ko.
+- `restoreWorld` copie la donnée lue avant `fillVillagerDefaults`: les références du format 15 sont les premières écrites sans les défauts des habitants, et le test « sauvegarde abîmée » exige qu'une sauvegarde refusée reste intacte.
+- Les tests de gestes qui visaient les 12 cases fixes appellent `demoGarden(sim)` (`tests/aides.ts`): les 12 parcelles de la zone `garden`, comme la reprise d'une 0.12.
+- Les bancs d'essai des entrées (`ressenti.test.ts`) donnent une vue sans `content`: n'y lire le contenu que quand l'outil concerné est en main.
+- `textHash` de chaînes voisines (« f-8:29 », « f-7:29 ») donne des valeurs presque linéaires: les ronciers sortaient alignés en pépinière. Prendre `hash2(cx, cy, graine)` de `bruit.ts`.
+- Un point d'action à moins de 1,2 m du centre d'une case vole le clic au sol sur cette case (`resolveClick`): le puisage du bief est posé dans le bas de sa case d'eau.
+- Le cordeau est ajouté après la canne dans `createWorld`, pas dans `startingInventory.eachPlayer`: les cases des outils d'avant ne bougent pas.
+- Outil isolé: les gros remplacements passent par `rep.py` du scratchpad (spécification `FILE`, `%%%%`, `@@@@` écrite avec Write); une fusion avec conflit dans un fichier généré (`icones.js`): prendre l'autre côté puis relancer le générateur; vérifier ensuite les marqueurs dans tous les fichiers (`grep -rln '^<<<<<<< '`), la fusion en commit temporaire les garde.

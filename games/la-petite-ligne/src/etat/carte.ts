@@ -249,6 +249,18 @@ export interface GameMap {
    * ou vide (carte de secours): pas d'ombres, la pêche tire comme avant dans les poissons du gué.
    */
   fishingZones?: FishingZone[];
+  /**
+   * Parcelles de la carte 0.13 (`parcelles`): friche à défricher, carrés partagés ou à louer,
+   * champs. Absent ou vide (carte de secours): aucune friche.
+   */
+  plotAreas?: MapPlotArea[];
+}
+
+/** Une parcelle de la carte (0.13): sa nature (`defricher`, `louer`, `partage`) et ses cases. */
+export interface MapPlotArea {
+  id: string;
+  nature: string;
+  cells: Cell[];
 }
 
 /** Coin de pêche: identifiant, nom (« le gué »), forme après « à » (« au gué »), rectangles de cases. */

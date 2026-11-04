@@ -381,6 +381,23 @@ const SupplementSchema = v.object({
   ] as const),
   build: strings(['holding', 'canPlace', 'blocked', 'rotate', 'move', 'place', 'take', 'store', 'corner'] as const),
   corner: strings(['designate', 'move'] as const),
+  /** 0.13, parcelles libres (section 5): compteur, pastilles du tracé, anneau, vignette d'Odette. */
+  plots: strings([
+    'counter',
+    'counterLabel',
+    'capLabel',
+    'freeLabel',
+    'plus',
+    'plusLabel',
+    'overLabel',
+    'holdSeed',
+    'holdHarvest',
+    'stock',
+    'stockLabel',
+    'stockEmpty',
+    'tomorrow',
+    'capReached',
+  ] as const),
   /** Barre de progression des actions qui durent (R10). `actions`: par genre d'action (`ActionKind`). */
   progress: v.object({
     ...strings(['label', 'craft', 'cook', 'build', 'buildTogether', 'buildPartner', 'chop', 'busy'] as const).entries,

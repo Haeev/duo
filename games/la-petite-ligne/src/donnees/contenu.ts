@@ -75,6 +75,7 @@ import type {
   AnnonceKind,
   AnnonceReward,
   CatalogueDef,
+  GardenPlotsSettings,
   GoatSettings,
   HappinessSettings,
   HenCareSettings,
@@ -1406,6 +1407,11 @@ function parseTrigger(r: Reader): HintTrigger {
     case 'near_board_annonce':
     case 'fishing_hot_spot':
     case 'fishing_watch':
+    case 'plot_free':
+    case 'plot_drag':
+    case 'plot_placed':
+    case 'near_friche':
+    case 'plot_migration':
       return { on };
     case 'near_point':
       return { on, point: r.at('point').string() };
@@ -2159,6 +2165,49 @@ function parseGrocerPricing(grocer: Reader): Settings['economy']['grocer'] {
     seasonFactor,
     ardoise: { factor: ardoise.at('factor').number(), max: ardoise.at('max').integer(0), time: ardoise.at('time').time() },
     words: { plentyAtMost: words.at('plentyAtMost').number(), wantedFrom: words.at('wantedFrom').number() },
+    categoryCap: numberRecord(grocer.opt('categoryCap') ?? new Reader(grocer.file, `${grocer.path}.categoryCap`, {}), 0),
+  };
+}
+
+/** Les parcelles libres (0.13, section 3 de `parcelles-libres-0-13.md`); absentes: le potager fixe. */
+function parseGardenPlots(r: Reader | null): GardenPlotsSettings | null {
+  if (r === null || r.isNull()) return null;
+  const rect = r.at('startRect');
+  const startRect = { x: rect.at('x').integer(), y: rect.at('y').integer(), w: rect.at('w').integer(1), h: rect.at('h').integer(1) };
+  const start = r.at('start').integer(1);
+  if (start > startRect.w * startRect.h) rect.fail(`${String(start)} parcelles de départ ne tiennent pas dans le rectangle`);
+  const stockMax = r.at('stockMax').integer(0);
+  const restockPerDay = r.at('restockPerDay').integer(0, stockMax);
+  const land = r.at('land');
+  const rental = r.opt('rental');
+  const price = r.at('price').integer(1);
+  return {
+    start,
+    startRect,
+    max: r.at('max').integer(start),
+    land: { zone: land.at('zone').string(), clearable: land.at('clearable').string() },
+    forbiddenZones: r.at('forbiddenZones').stringList(),
+    price,
+    shop: r.at('shop').oneOf(['grocery'] as const),
+    restockPerDay,
+    stockMax,
+    stockAtStart: r.at('stockAtStart').integer(0, stockMax),
+    stockAtMigration: r.at('stockAtMigration').integer(0, stockMax),
+    removeHoldSeconds: r.at('removeHoldSeconds').number(),
+    clearSeconds: r.at('clearSeconds').number(),
+    clearEndurance: r.at('clearEndurance').number(),
+    clearCellsPerPlot: r.at('clearCellsPerPlot').integer(1),
+    orderGardenPerPlot: r.at('orderGardenPerPlot').number(),
+    orderGardenPlotsCap: r.at('orderGardenPlotsCap').integer(0),
+    rental:
+      rental === null || rental.isNull()
+        ? null
+        : {
+            plots: rental.at('plots').stringList(),
+            rentPerCellPerWeek: rental.at('rentPerCellPerWeek').integer(0),
+            rentFromDay: rental.at('rentFromDay').integer(1),
+            landlord: rental.at('landlord').string(),
+          },
   };
 }
 
@@ -2244,6 +2293,7 @@ function parseSettings(r: Reader): Settings {
       generated: parseGenerated(order.opt('generated'), trains.length),
     },
     trees: parseTrees(r.at('trees')),
+    garden: { plots: parseGardenPlots(r.opt('garden')?.opt('plots') ?? null) },
     forage: parseForage(r.opt('forage')),
     hens: {
       eggsPerHenPerDay: r.at('hens').at('eggsPerHenPerDay').integer(0),

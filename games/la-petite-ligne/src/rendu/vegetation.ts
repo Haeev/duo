@@ -119,7 +119,13 @@ export function fernGeometries(
   return large === null || small === null ? null : { large, small };
 }
 
+/** Clé numérique d'une case (cases négatives comprises), pour `cover`. */
+function coverKey(cx: number, cy: number): number {
+  return (cx + 4096) * 8192 + (cy + 4096);
+}
+
 function pick<T>(items: readonly T[], value: number): T {
+
   const item = items[Math.min(items.length - 1, Math.floor(value * items.length))];
   if (item === undefined) {
     throw new Error('liste vide');
@@ -136,7 +142,13 @@ export class Vegetation {
     cells: PaletteCell[];
     /** Fleurs: aucune l'hiver (le pré givré n'en porte pas). */
     flowers: boolean;
+    /** Matrices d'origine (une case reprise retrouve ses touffes). */
+    matrices: ArrayLike<number>;
   }[] = [];
+  /** Instances de chaque case (rang du semis, rang de l'instance), pour `cover`. */
+  private readonly byCell = new Map<number, number[]>();
+  private covered = new Set<number>();
+  private coverNext = new Set<number>();
   private detail = 1;
   /** Arbres de la forêt du pourtour (cuits par tronçons, plus comptables par instance). */
   forestTrees = 0;
@@ -156,11 +168,9 @@ export class Vegetation {
   ) {
     this.group.name = 'vegetation';
     const occupied = map.props.filter((prop) => prop.rect !== null).map((prop) => prop.rect);
-    const garden = new Set(map.garden.map((cell) => `${cell.cx}:${cell.cy}`));
+    // 0.13: le potager n'est plus fixe; les touffes sous une parcelle se cachent (`cover`).
     const open = (cx: number, cy: number): boolean =>
-      terrain.isGrass(cx, cy) &&
-      !garden.has(`${cx}:${cy}`) &&
-      !occupied.some((rect) => rect !== null && inRect(rect, cx + 0.5, cy + 0.5));
+      terrain.isGrass(cx, cy) && !occupied.some((rect) => rect !== null && inRect(rect, cx + 0.5, cy + 0.5));
     // Herbe des prés; le sous-bois (0.13) a son propre semis.
     const free = (cx: number, cy: number): boolean => open(cx, cy) && !terrain.isUndergrowth(cx, cy);
     const underwood = (cx: number, cy: number): boolean => open(cx, cy) && terrain.isUndergrowth(cx, cy);
@@ -253,7 +263,12 @@ export class Vegetation {
         (a, b) => hash2(a.cx, a.cy, SEED_ORDER + seed) - hash2(b.cx, b.cy, SEED_ORDER + seed),
       );
       const cells: PaletteCell[] = [];
+      const entry = this.scattered.length;
       for (const { cx, cy } of shuffled) {
+        const key = coverKey(cx, cy);
+        const list = this.byCell.get(key);
+        if (list === undefined) this.byCell.set(key, [entry, mesh.count]);
+        else list.push(entry, mesh.count);
         const x = cx + 0.5 + (hash2(cx, cy, SEED_JITTER_X + seed) - 0.5) * JITTER;
         const y = cy + 0.5 + (hash2(cx, cy, SEED_JITTER_Y + seed) - 0.5) * JITTER;
         const size = TREE_SCALE_MIN + hash2(cx, cy, SEED_SCALE + seed) * TREE_SCALE_SPREAD;
@@ -267,7 +282,7 @@ export class Vegetation {
         mesh.count += 1;
       }
       finishInstances(mesh);
-      this.scattered.push({ mesh, full: mesh.count, cells, flowers: tints === FLOWER_CELLS });
+      this.scattered.push({ mesh, full: mesh.count, cells, flowers: tints === FLOWER_CELLS, matrices: mesh.instanceMatrix.array.slice() });
       this.group.add(mesh);
     };
     scatter('touffes', tuft, tufts, TUFT_CELLS, SEED_TUFT, false);
@@ -311,6 +326,37 @@ export class Vegetation {
     materials.onPaletteChange(() => {
       this.repaint(materials);
     });
+  }
+
+  /**
+   * 0.13 (PL-22): les touffes et les fleurs des cases couvertes par une parcelle disparaissent, et
+   * reviennent quand on la reprend. Seules les cases qui changent sont réécrites.
+   */
+  cover(plots: readonly { readonly cell: { readonly cx: number; readonly cy: number } }[]): void {
+    const next = this.coverNext;
+    next.clear();
+    for (const p of plots) next.add(coverKey(p.cell.cx, p.cell.cy));
+    let changed = next.size !== this.covered.size;
+    if (!changed) for (const key of next) if (!this.covered.has(key)) changed = true;
+    if (!changed) return;
+    const touched = new Set<InstancedMesh>();
+    const apply = (key: number, hidden: boolean): void => {
+      const list = this.byCell.get(key);
+      if (list === undefined) return;
+      for (let i = 0; i < list.length; i += 2) {
+        const entry = this.scattered[list[i] ?? -1];
+        const index = list[i + 1] ?? -1;
+        if (entry === undefined || index < 0) continue;
+        const array = entry.mesh.instanceMatrix.array;
+        for (let k = 0; k < 16; k++) array[index * 16 + k] = hidden ? 0 : (entry.matrices[index * 16 + k] ?? 0);
+        touched.add(entry.mesh);
+      }
+    };
+    for (const key of this.covered) if (!next.has(key)) apply(key, false);
+    for (const key of next) if (!this.covered.has(key)) apply(key, true);
+    for (const mesh of touched) mesh.instanceMatrix.needsUpdate = true;
+    this.coverNext = this.covered;
+    this.covered = next;
   }
 
   /** Relit la couleur de chaque semis dans la palette en vigueur. */
