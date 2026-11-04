@@ -737,6 +737,7 @@ export const NEIGHBOUR_POINT_PLACES: Readonly<Record<string, NeighbourPlace>> = 
   field_high_01: 'field',
   field_high_02: 'field',
   forest_cut: 'forest',
+  forest_cut_survey: 'forest',
   forest_edge_path: 'forest',
   clearing_center: 'forest',
   charcoal_kiln: 'forest',

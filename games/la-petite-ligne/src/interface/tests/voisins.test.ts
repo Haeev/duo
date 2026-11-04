@@ -136,6 +136,7 @@ describe('onglet Voisins: la fiche et la frise', () => {
   it('toutes les habitudes connues: plus aucune case inconnue pour les habitants de la 0.13', () => {
     const sim = middle();
     const ctx = uiContext();
+    sim.world.flags.push('solange_here', 'achille_here');
     for (const def of ctx.content.villagers)
       sim.world.habits.known[def.id] = def.habits.map((h) => h.id);
     for (const def of ctx.content.villagers.filter((v) => v.habits.length > 0)) {
