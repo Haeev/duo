@@ -92,10 +92,13 @@ def rect_inclus(x0: int, y0: int, x1: int, y1: int) -> dict:
 # ---------------------------------------------------------------------------
 # Légende et types neufs
 
+# `rendu`: aspect pour le rendu seul (la simulation ne lit que `sol`): sous-bois et sentier de forêt distincts de
+# l'herbe et du chemin, bief creusé comme un cours d'eau vive (lot L3).
 LEGENDE = {
     "h": {"nom": "sous-bois (litière de feuilles, fougères basses semées par le rendu)", "sol": "grass",
-          "franchissable": True, "pas": "herbe"},
-    ";": {"nom": "sentier de forêt (terre et feuilles)", "sol": "path", "franchissable": True, "pas": "terre"},
+          "franchissable": True, "pas": "herbe", "rendu": "sous_bois"},
+    ";": {"nom": "sentier de forêt (terre et feuilles)", "sol": "path", "franchissable": True, "pas": "terre",
+          "rendu": "sentier_foret"},
     "c": {"nom": "gravier (allées du cimetière, cour de ferme, allée du parvis)", "sol": "gravel",
           "franchissable": True, "pas": "pierre"},
     "l": {"nom": "terre cultivée (jardins, champs, potager collectif): ni la zone `garden` ni le potager de la "
@@ -107,7 +110,7 @@ LEGENDE = {
     "e": {"nom": "eau dormante (mare du bois, bassin de la source, mare de la pâture): sans poisson à ce tour",
           "sol": "water", "franchissable": False, "pas": None, "peche": False},
     "k": {"nom": "bief du moulin et canal de fuite (eau vive)", "sol": "water", "franchissable": False,
-          "pas": None},
+          "pas": None, "rendu": "bief"},
 }
 
 
@@ -131,6 +134,10 @@ TYPES = {
     "village_house_a": {"categorie": "batiment", "nom": "maison de village à un niveau (sacristain, hameau B)",
                         "emprise": [6, 6], "hauteur": 5.5, "toit": toit(3.0, "parallele"), "portes": {"porte": 2},
                         "interieur": False},
+    # Variante aux volets clos et sans pots (`village013.glb`): la maison B du hameau, inhabitée.
+    "village_house_a_shuttered": {"categorie": "batiment", "nom": "maison de village à un niveau, volets clos "
+                                  "(hameau B, inhabitée)", "emprise": [6, 6], "hauteur": 5.5,
+                                  "toit": toit(3.0, "parallele"), "portes": {"porte": 2}, "interieur": False},
     "village_house_b": {"categorie": "batiment", "nom": "maison de hameau à un niveau, glycine (hameau A et C)",
                         "emprise": [6, 6], "hauteur": 5.5, "toit": toit(3.0, "parallele"), "portes": {"porte": 2},
                         "interieur": False},
@@ -160,6 +167,10 @@ TYPES = {
     "lineman_house": {"categorie": "batiment", "nom": "maison de cheminots de la compagnie (un niveau et demi)",
                       "emprise": [6, 6], "hauteur": 6.0, "toit": toit(3.2, "parallele"), "portes": {"porte": 3},
                       "interieur": False},
+    # Variante aux volets clos (`village013.glb`): la maison de cheminots vide, à l'est.
+    "lineman_house_shuttered": {"categorie": "batiment", "nom": "maison de cheminots de la compagnie, volets clos "
+                                "(vide)", "emprise": [6, 6], "hauteur": 6.0, "toit": toit(3.2, "parallele"),
+                                "portes": {"porte": 3}, "interieur": False},
     "forester_house": {"categorie": "batiment", "nom": "maison forestière (logement de la garde, toit rouge)",
                        "emprise": [6, 6], "hauteur": 6.0, "toit": toit(3.0, "parallele"), "portes": {"porte": 3},
                        "interieur": False},
@@ -170,6 +181,10 @@ TYPES = {
                       "emprise": [1, 1], "hauteur": 2.6, "occultation": [0.3, 0.0, 2.6]},
     "cemetery_wall": {"categorie": "decor", "nom": "mur du cimetière (1,2 m, pierre et chaperon), tronçon d'un mètre",
                       "emprise": [1, 1], "hauteur": 1.2},
+    # Pile d'angle et deux demi-tronçons (vers +X et +Z du modèle): rotation 0 angle nord-ouest, 1 sud-ouest,
+    # 2 sud-est, 3 nord-est (`foret013.glb`). Un tronçon droit dans l'angle dépassait dehors de 0,3 m.
+    "cemetery_wall_corner": {"categorie": "decor", "nom": "angle du mur du cimetière (pile d'angle)",
+                             "emprise": [1, 1], "hauteur": 1.2},
     "cemetery_gate": {"categorie": "equipement", "nom": "grille du cimetière, ouverte le jour (vers l'allée)",
                       "emprise": [2, 1], "hauteur": 1.8, "franchissable": True},
     "grave": {"categorie": "decor", "nom": "tombe (dalle et stèle à l'ouest, pieds à l'est), 4 variantes",
@@ -422,7 +437,7 @@ def batiments() -> None:
     # Le hameau le long de la route, portes au sud sur la route; entre A et B, la cour de soins de Nour et le
     # chemin du passage de la ferme. La maison C en retrait de deux rangées, tournée vers la route.
     o("village_house_b", 118, 15, 0, "hamlet_house_a")
-    o("village_house_a", 130, 15, 0, "hamlet_house_b")
+    o("village_house_a_shuttered", 130, 15, 0, "hamlet_house_b")
     o("village_house_b", 128, 25, 2, "hamlet_house_c")
     # La ferme tournée au midi, la cour au sud-est des deux volumes hauts (vue de la caméra par défaut).
     o("farm_barn", 105, 29, 1, "barn")
@@ -434,7 +449,7 @@ def batiments() -> None:
     o("watermill", -17, 28, 1, "mill")
     o("mill_wheel", -14, 35, 1, "mill_wheel")
     o("lineman_house", -15, 16, 0, "rail_cottage_west")
-    o("lineman_house", -8, 16, 0, "rail_cottage_east")
+    o("lineman_house_shuttered", -8, 16, 0, "rail_cottage_east")
     o("forester_house", -10, -24, 0, "forester_house")
 
 
@@ -450,10 +465,14 @@ def eglise_et_cimetiere() -> None:
     # grille au sud au bout de l'allée de gravier qui vient du parvis.
     x0, y0, x1, y1 = 108, -20, 124, -4
     grille = (117, 118)
+    # Les quatre angles: une pile d'angle (rotations du modèle: 0 nord-ouest, 3 nord-est, 1 sud-ouest, 2 sud-est).
+    angles = {(x0, y0): 0, (x1, y0): 3, (x0, y1): 1, (x1, y1): 2}
     for x in range(x0, x1 + 1):
-        o("cemetery_wall", x, y0, 0)
-        if x not in grille:
-            o("cemetery_wall", x, y1, 0)
+        for y in (y0, y1):
+            if (x, y) in angles:
+                o("cemetery_wall_corner", x, y, angles[(x, y)])
+            elif y == y0 or x not in grille:
+                o("cemetery_wall", x, y, 0)
     # Une petite grille à l'ouest, face au chevet: on vient du bois et du nord de l'église sans faire le tour
     # du cimetière par l'est (le jeu cherche son chemin case par case: sans elle, il s'y épuise).
     grille_ouest = (-11, -10)
@@ -461,8 +480,10 @@ def eglise_et_cimetiere() -> None:
         if y not in grille_ouest:
             o("cemetery_wall", x0, y, 1)
         o("cemetery_wall", x1, y, 1)
+    # Le côté +Z de la grille (rotation 0) est dehors, vers l'allée où elle s'ouvre (substitut du rendu,
+    # `cemetery_gate`): rotation 3 pour celle de l'ouest, tournée vers l'allée du tour du chevet.
     o("cemetery_gate", grille[0], y1, 0, "cemetery_gate")
-    o("cemetery_gate", x0, grille_ouest[0], 1, "cemetery_gate_west")
+    o("cemetery_gate", x0, grille_ouest[0], 3, "cemetery_gate_west")
     # Quatre colonnes de tombes (2 m d'ouest en est, pieds à l'est), en groupes de quatre le long des allées
     # nord-sud; allée centrale de 4 m (x 115 à 118) de la grille à la croix.
     nommees = {(110, -18): "grave_cornu", (122, -8): "grave_valade", (119, -17): "grave_ferrand",
@@ -502,7 +523,8 @@ def carrefour_et_hameau() -> None:
     o("water_trough", 112, 36, 0, "farm_trough")
     o("cart", 119, 33, 0, "farm_cart")
     file_cloture([(125, y) for y in (31, 32, 34, 35, 36)], 1)
-    o("field_gate", 125, 33, 0, "pasture_gate")
+    # Dans l'axe de la clôture (rotation 1, comme elle): ouverte, elle tourne côté pâture.
+    o("field_gate", 125, 33, 1, "pasture_gate")
     for x in (126, 127, 134, 135):
         o("bush", x, 30)
     # Les jardins de la Rive: la pompe au bout ouest de l'allée transversale.

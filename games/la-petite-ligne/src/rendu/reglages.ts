@@ -160,6 +160,14 @@ export const RENDER_SETTINGS = {
       house_bedroom: 0.12,
       grocery_shop: 0.122,
       salon_room: 0.12,
+      // 0.13 (`village013.glb`): église, café, forge, menuiserie, logis de la ferme, moulin.
+      church_nave: 0.122,
+      church_choir: 0.12,
+      cafe_room: 0.12,
+      forge_workshop: 0.12,
+      joinery_workshop: 0.12,
+      farmhouse_hall: 0.12,
+      mill_millstones: 0.12,
     } as Readonly<Record<string, number>>,
     /**
      * Platelage des traversées (revue du directeur artistique, tour 5): lames
@@ -295,6 +303,15 @@ export const RENDER_SETTINGS = {
       /** Vitesse du courant du ru par rapport à celle de l'Aubrune (eau vive: plus vite). */
       flowFactor: 1.6,
     },
+    /**
+     * Bief du moulin (0.13, `bief.ts`): même creux que le ru, eau plus calme (le meunier règle le
+     * débit à la vanne), courant vers l'est; bandes d'eau en travers du bief; teinte du large
+     * (`fieldDepth`: étroit, il paraissait une flaque claire). Les eaux dormantes d'au plus
+     * `basinMaxCells` cases (bassin de la source, mare de la pâture) sont creusées de même, sans courant.
+     * Budget: `across` points en travers (17 pour le ru), et le bief ne court que `bandReach` m au-delà
+     * du bord de la carte (la forêt du pourtour le cache plus loin).
+     */
+    millrace: { riffle: 0.3, shaderDepth: 0.22, flowFactor: 1.2, waterStrips: 6, fieldDepth: 0.75, basinMaxCells: 12, pondFlow: 0.15, across: 9, bandReach: 8 },
     /** Bande de terrain prolongée au-delà de la carte (rivière, voie, forêt du pourtour). */
     extension: 26,
     /**
@@ -469,6 +486,12 @@ export const RENDER_SETTINGS = {
     /** Touffes d'herbe et fleurs semées sur l'herbe (part des cases). */
     tuftDensity: 0.32,
     flowerDensity: 0.07,
+    /**
+     * Sous-bois (0.13, cases `undergrowth`): ni fleurs ni touffes des prés, des fougères de l'artiste
+     * (`fern`, `fern_small`, sans ombre, cuites par morceau); la litière et la mousse sont peintes par
+     * le shader des surfaces. Part des cases, et part des grandes fougères parmi elles.
+     */
+    undergrowth: { fernDensity: 0.09, largeFernShare: 0.25 },
     /** Arbres du pourtour: densité selon la distance au bord (cases). */
     outerTreeDensity: 0.22,
     outerTreeStart: 2,
@@ -481,14 +504,13 @@ export const RENDER_SETTINGS = {
      */
     forestClearings: [
       /*
-       * Pâture de l'est, au droit du pré de l'est (zone `meadow`, y 24 à 33): derrière la haie du
-       * bord (x 62 et 63), le pré continue en pâture jusqu'au bois. Les bêtes qui y paissent
-       * empêchent la forêt de gagner; la chevrette en sort à l'aube pour rejoindre son faon.
-       * De y 18 à 36: tout ce que la caméra voit derrière le pré en orientation 0 (au sud-est,
-       * jusqu'à la promenade et la berge, y 34 à 37) et en orientation 3 (au nord-est); la
-       * lisière revient à sa place avant la voie (y 12 à 14).
+       * Champs et prés des hameaux voisins (0.13, v0-13-carte.md, section 10). Au tour 10, la pâture
+       * derrière le pré de l'est suivait l'ancien bord (x 98, y 18 à 36, 4 m). Le bord est passe en
+       * x 138, à moins de 10 m du hameau C et de la pâture de la ferme: les prés continuent derrière
+       * lui, la lisière recule de 6 m de y 15 à 45 (tout ce que la caméra voit derrière la pâture et
+       * le hameau en orientations 0 et 3), et revient à sa place avant la voie (y 12 à 14).
        */
-      { side: 'east', from: 18, to: 36, depth: 4, feather: 3, wobble: 0.8 },
+      { side: 'east', from: 15, to: 45, depth: 6, feather: 3, wobble: 0.8 },
       /*
        * Pré inondable du sud, face à l'anse de sable (rive sud, x 23 à 31, y 42 et 43): le
        * fond de vallée que l'Aubrune noie en hiver reste en prairie de fauche, le bois commence
@@ -939,6 +961,15 @@ export const RENDER_SETTINGS = {
     lamps: {
       grocery: { color: '#ffc27a', intensity: 7, height: 2.2, dayShare: 0.35 },
       salon: { color: '#ffe1b8', intensity: 6, height: 2.2, dayShare: 0.35 },
+      // 0.13: la nef est haute et grande (12 x 10 m): lampe plus haute et plus forte, lumière de cierges.
+      church: { color: '#ffe2bd', intensity: 10, height: 3.2, dayShare: 0.4 },
+      cafe: { color: '#ffd29a', intensity: 7, height: 2.2, dayShare: 0.35 },
+      // La forge: le rougeoiement du foyer.
+      forge: { color: '#ffa766', intensity: 7, height: 2.0, dayShare: 0.45 },
+      // La menuiserie fermée: jour gris des volets, poussière.
+      joinery: { color: '#e9dfc8', intensity: 5, height: 2.2, dayShare: 0.35 },
+      farmhouse: { color: '#ffc27f', intensity: 7, height: 2.2, dayShare: 0.35 },
+      mill: { color: '#f3e3c2', intensity: 6, height: 2.4, dayShare: 0.35 },
     } as Readonly<Record<string, { color: string; intensity: number; height: number; dayShare: number }>>,
     doorReach: 1.25,
     doorSeconds: 0.3,

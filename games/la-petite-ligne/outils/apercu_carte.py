@@ -61,6 +61,7 @@ BATIMENTS = {
     "church": ("#d9cfb8", "Église Saint-Aubin"),
     "presbytery_house": ("#c8b48c", "Presbytère"),
     "village_house_a": ("#d6b98a", "Maison"),
+    "village_house_a_shuttered": ("#c9b08a", "Maison (volets clos)"),
     "village_house_b": ("#d2a878", "Maison"),
     "cafe_house": ("#c98a6a", "Café de la Côte"),
     "forge_shop": ("#8a7a6a", "Forge"),
@@ -70,6 +71,7 @@ BATIMENTS = {
     "washhouse": ("#b8b0a0", "Lavoir"),
     "watermill": ("#c0a080", "Moulin de la Vanne"),
     "lineman_house": ("#c89a6a", "Cheminots"),
+    "lineman_house_shuttered": ("#b8906a", "Cheminots (volets clos)"),
     "forester_house": ("#b8644a", "Maison forestière"),
 }
 HABITANTS = {"firmin": "#2f5fa8", "odette": "#b33a3a", "basile": "#7a4a1f", "jeanne": "#7b3fa0",

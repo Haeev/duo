@@ -1141,6 +1141,58 @@ const DECOR: Record<string, Builder> = {
     b.box([0.55, 0.22, 0.28], [-0.6, 0, 0.75], 'wood', { base: true });
     b.box([0.47, 0.02, 0.2], [-0.6, 0.2, 0.75], 'water', { base: true });
   },
+  // 0.13: grille du cimetière (pas de modèle de l'artiste). Deux piliers de pierre au bout du mur, deux
+  // vantaux de fer ouverts à 80 degrés vers +Z: le côté +Z du modèle est dehors, la grille s'ouvre
+  // vers l'allée qui y mène (du parvis, du tour du chevet). Emprise de la carte: 2 x 1.
+  cemetery_gate: (b) => {
+    for (const x of [-0.84, 0.84]) {
+      // Plus épais que le mur (0,5 m, `cemetery_wall`), qu'ils terminent.
+      b.box([0.32, 1.5, 0.58], [x, 0, 0], 'stone', { base: true });
+      b.box([0.4, 0.08, 0.66], [x, 1.5, 0], 'stone_light', { base: true });
+      b.box([0.3, 0.12, 0.5], [x, 1.58, 0], 'stone_light', { base: true });
+    }
+    const open = 80;
+    for (const side of [-1, 1]) {
+      const hingeX = side * 0.68;
+      // Le vantail part du pilier vers le milieu, puis tourne vers +Z.
+      const angle = side < 0 ? -open : 180 + open;
+      const dx = Math.cos((angle * Math.PI) / 180);
+      const dz = -Math.sin((angle * Math.PI) / 180);
+      const at = (d: number, y: number): Triple => [hingeX + dx * d, y, dz * d];
+      for (const y of [0.12, 1.22]) {
+        b.box([0.68, 0.04, 0.03], at(0.34, y), 'iron', { base: true, rotation: [0, angle, 0] });
+      }
+      for (let i = 0; i < 6; i += 1) {
+        b.box([0.022, 1.2, 0.022], at(0.03 + i * 0.124, 0.08), 'iron', { base: true });
+      }
+    }
+  },
+  // 0.13: barrière de la pâture, ouverte. Poteau de gond à -X, poteau de loquet à +X (la clôture le long
+  // de X, comme `fence`); le vantail de cinq lisses tourné de 95 degrés vers +Z (côté pâture).
+  field_gate: (b) => {
+    b.box([0.13, 1.25, 0.13], [-0.44, 0, 0], 'wood_old_dark', { base: true });
+    b.box([0.1, 1.1, 0.1], [0.44, 0, 0], 'wood_old_dark', { base: true });
+    const angle = -95;
+    const dx = Math.cos((angle * Math.PI) / 180);
+    const dz = -Math.sin((angle * Math.PI) / 180);
+    const at = (d: number, y: number): Triple => [-0.44 + dx * d, y, dz * d];
+    for (const y of [0.22, 0.44, 0.66, 0.88, 1.06]) {
+      b.box([0.84, 0.07, 0.035], at(0.5, y), 'wood_old', { base: true, rotation: [0, angle, 0] });
+    }
+    for (const d of [0.1, 0.9]) b.box([0.07, 1.0, 0.05], at(d, 0.15), 'wood_old', { base: true });
+    // Écharpe en travers, du bas du gond au haut du bout.
+    b.box([0.9, 0.06, 0.03], at(0.5, 0.6), 'wood_old', { rotation: [0, angle, 52] });
+  },
+  // 0.13: tronc couché où l'on s'assoit (clairière du Vieux Chêne), dessus scié à 0,46 m sur deux cales.
+  log_bench: (b) => {
+    for (const x of [-0.6, 0.6]) b.box([0.22, 0.1, 0.42], [x, 0, 0], 'bark_dark', { base: true });
+    b.cylinder(0.22, 0.24, 1.86, [0, 0.25, 0], 'bark', { rotation: [0, 0, 90], segments: 7 });
+    b.box([1.7, 0.03, 0.24], [0, 0.44, 0], 'wood_old', { base: true });
+    for (const x of [-0.935, 0.935]) {
+      b.cylinder(0.21, 0.21, 0.02, [x, 0.25, 0], 'log_end', { rotation: [0, 0, 90], segments: 7 });
+    }
+    b.blob(0.12, [0.45, 0.16, 0.2], 'moss', { scale: [1.6, 0.5, 0.8] });
+  },
   straw_bale: (b) => {
     b.box([0.9, 0.45, 0.5], [0, 0, 0], 'straw', { base: true });
     for (const x of [-0.25, 0.25]) b.box([0.03, 0.46, 0.51], [x, 0, 0], 'straw_dark', { base: true });

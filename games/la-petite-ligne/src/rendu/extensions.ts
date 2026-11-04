@@ -47,6 +47,10 @@ export interface RenderHooks {
   water: readonly Mesh[];
   /** Surface du ru de la Côte, en morceaux (`terrain.streamWater`), vide sans ru. */
   streamWater: readonly Mesh[];
+  /** Surface du bief du moulin, en morceaux (`terrain.millraceWater`), vide sans bief. */
+  millraceWater: readonly Mesh[];
+  /** Surface des petits bassins d'eau dormante (`terrain.pondWater`), vide sans bassin. */
+  pondWater: readonly Mesh[];
   daylight: DaylightRig;
   /** Point d'émission du panache de la locomotive (`locomotive_smoke`), `null` sans modèle de train. */
   smokeEmitter(): Object3D | null;

@@ -6,6 +6,7 @@
 import {
   type GameMap,
   type GroundKind,
+  type GroundStyle,
   type MapHook,
   type MapImprovement,
   type MapProp,
@@ -23,6 +24,12 @@ import { houseBuilding, houseFromBuilding, parseBuildings, parseCrossings, parse
 import { ContentError, Reader } from './lecteur';
 
 const GROUND_KINDS: readonly GroundKind[] = ['grass', 'path', 'dirt', 'gravel', 'wood', 'floor', 'water', 'rail', 'stone'];
+/** `rendu` d'un code de terrain (0.13): aspect pour le rendu seul. */
+const GROUND_STYLES: Readonly<Record<string, GroundStyle>> = {
+  sous_bois: 'undergrowth',
+  sentier_foret: 'forestPath',
+  bief: 'millrace',
+};
 const TREE_TYPES: Readonly<Record<string, MapTree['kind']>> = { tree_oak: 'oak', tree_fir: 'fir' };
 /** `regarde` d'une accroche, en quarts de tour (convention des objets: 0 tourné vers le sud). */
 const FACING_QUARTERS: Readonly<Record<string, number>> = { sud: 0, est: 1, nord: 2, ouest: 3 };
@@ -61,17 +68,22 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
   // Sol, d'après la légende du terrain.
   const terrain = r.at('terrain');
   const legend = new Map<string, GroundKind>();
+  const styles = new Map<string, GroundStyle>();
   for (const [code, entry] of terrain.at('legende').entries()) {
     legend.set(code, entry.at('sol').oneOf(GROUND_KINDS));
+    const style = entry.opt('rendu');
+    if (style !== null) styles.set(code, need(GROUND_STYLES[style.oneOf(Object.keys(GROUND_STYLES))], style, 'aspect inconnu'));
   }
   const lines = terrain.at('lignes').items();
   if (lines.length !== height) terrain.at('lignes').fail(`${height} lignes attendues`);
   const ground: GroundKind[] = [];
+  const groundStyles: (GroundStyle | null)[] = [];
   lines.forEach((line) => {
     const text = line.string();
     if (text.length !== width) line.fail(`${width} cases attendues`);
     for (const code of text) {
       ground.push(need(legend.get(code), line, `code de terrain inconnu « ${code} »`));
+      groundStyles.push(styles.get(code) ?? null);
     }
   });
 
@@ -238,6 +250,7 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     height,
     ground,
     blocked,
+    ...(styles.size === 0 ? {} : { groundStyles }),
     points,
     pointFacings,
     hooks,

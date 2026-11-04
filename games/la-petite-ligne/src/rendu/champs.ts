@@ -42,6 +42,8 @@ export const FIELD_HEIGHT_MIN = -0.5;
 export const FIELD_HEIGHT_RANGE = 1.5;
 /** Catégorie des bâtiments de la carte (pas de pluie dessous). */
 const BUILDING_CATEGORY = 'batiment';
+/** Profondeur vue par le shader de l'eau dans le bief (0 au bord, 1 au large). */
+const MILLRACE_DEPTH = RENDER_SETTINGS.terrain.millrace.fieldDepth;
 /** Le gué: gravier dans le lit de la rivière, sans eau dans sa colonne à moins de ces cases. */
 const FORD_COLUMN_REACH = 5;
 const FORD_ROW_REACH = 6;
@@ -200,7 +202,9 @@ export function createTerrainField(map: GameMap, terrain: Terrain): TerrainField
           x < prop.rect.x + prop.rect.w &&
           y < prop.rect.y + prop.rect.h,
       );
-      const depth = water[i] === 1 ? Math.min(1, ((distance[i] ?? 0) - HALF_CELL) / depthCells) : 0;
+      const shore = water[i] === 1 ? Math.min(1, ((distance[i] ?? 0) - HALF_CELL) / depthCells) : 0;
+      // Le bief (0.13) est étroit mais creusé et maçonné: son eau prend la teinte du large, pas celle du bord.
+      const depth = water[i] === 1 && terrain.isMillrace(cx, cy) ? Math.max(shore, MILLRACE_DEPTH) : shore;
       data[i * RGBA] = Math.round(
         Math.min(1, Math.max(0, (ground - FIELD_HEIGHT_MIN) / FIELD_HEIGHT_RANGE)) * BYTE,
       );

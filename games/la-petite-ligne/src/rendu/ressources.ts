@@ -15,6 +15,12 @@ export class ResourceTracker {
     return item;
   }
 
+  /** Libère tout de suite une ressource remplacée (morceau refait à la saison), et cesse de la suivre. */
+  release(item: Disposable): void {
+    item.dispose();
+    this.items.delete(item);
+  }
+
   /** Suit les géométries, matériaux et textures de tout un sous-arbre. */
   trackObject<T extends Object3D>(root: T): T {
     root.traverse((object) => {

@@ -23,7 +23,16 @@ import {
   type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
-import { CHARACTER_SLOTS, PALETTE_CELLS, PALETTE_CELL_PIXELS, PALETTE_GRID, characterSlotColumn, type PaletteCell } from './palette';
+import {
+  CHARACTER_SLOTS,
+  GROUND_MARKS,
+  GROUND_MARK_BELOW,
+  PALETTE_CELLS,
+  PALETTE_CELL_PIXELS,
+  PALETTE_GRID,
+  characterSlotColumn,
+  type PaletteCell,
+} from './palette';
 import { RENDER_SETTINGS } from './reglages';
 import { AMBIANCE_SETTINGS } from './reglages-ambiance';
 import { RIVER_BED_MIN, RIVER_BED_RANGE, RIVER_SAND_RANGE } from './riviere';
@@ -681,7 +690,25 @@ const FRAGMENT_GROUND = /* glsl */ `
     vec4 river = ambRiver(vAmbWorld.xz);
     bool grassFace = groundIndex == ${cellIndex('grass_dark')} || groundIndex == ${cellIndex('grass')} || groundIndex == ${cellIndex('grass_light')};
     bool pathFace = groundIndex == ${cellIndex('path')} || groundIndex == ${cellIndex('path_dark')};
-    if (bedFace && river.a > 0.0) {
+    // Sols marqués du terrain (0.13, \`groundMarkUv\`): leur UV vise le quart bas-gauche de la case.
+    vec2 groundSub = fract(vMapUv * ${PALETTE_GRID}.0);
+    bool groundMarked = groundSub.x < ${GROUND_MARK_BELOW} && groundSub.y < ${GROUND_MARK_BELOW};
+    if (groundFace && groundMarked && groundIndex == ${cellIndex(GROUND_MARKS.undergrowth)}) {
+      // Sous-bois: mousse sombre et litière brune en taches serrées, quelques feuilles plus claires.
+      float litterNoise = texture(uAmbNoise, vAmbWorld.xz * uGroundParams.x * 2.6 + 0.61).r;
+      float leafNoise = texture(uAmbNoise, vAmbWorld.xz * 1.9 + 0.27).r;
+      vec3 moss = ambGreen(patchNoise) * vec3(0.66, 0.74, 0.56);
+      vec3 litter = mix(uGroundColors[8], uGroundColors[0], 0.3) * 0.92;
+      vec3 under = mix(moss, litter, smoothstep(0.45, 0.68, litterNoise) * 0.85);
+      float leaves = smoothstep(0.64, 0.72, leafNoise) * (1.0 - smoothstep(0.03, 0.08, groundPixel));
+      diffuseColor.rgb = mix(under, mix(uGroundColors[8], uGroundColors[6], 0.5), leaves * 0.45);
+    } else if (groundFace && groundMarked && groundIndex == ${cellIndex(GROUND_MARKS.forest_path)}) {
+      // Sentier de forêt: terre plus sombre et plus humide que les chemins du bourg, mêlée de feuilles.
+      float litterNoise = texture(uAmbNoise, vAmbWorld.xz * uGroundParams.x * 2.6 + 0.61).r;
+      vec3 earth = mix(ambPathColor(patchNoise), uGroundColors[8], 0.62) * 0.95;
+      vec3 litter = mix(uGroundColors[8], uGroundColors[0], 0.3) * 0.92;
+      diffuseColor.rgb = mix(earth, litter, smoothstep(0.55, 0.75, litterNoise) * 0.4);
+    } else if (bedFace && river.a > 0.0) {
       // Lit de la rivière; l'herbe y avance là où le bord du sable recule, ou le chemin le long
       // d'une promenade (canal A à moitié, \`riviere.ts\`): un coin de chemin arrondi reste en terre.
       vec3 bed = ambBed(vAmbWorld, river, patchNoise, groundPixel);

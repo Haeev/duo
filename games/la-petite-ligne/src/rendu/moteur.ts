@@ -33,6 +33,7 @@ import { createOutfitPreview } from './apercu-tenue';
 import { type Bounds, IsoCameraRig, type CameraCommand } from './camera';
 import { inMap, mapCentre, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
 import { PickRegistry, yawFromQuarter, type FrameContext, type RenderPart } from './contexte';
+import { AnimatedPropsPart } from './animes';
 import { StaticDecor } from './decor';
 import { DaylightRig, stabilizeShadowFilter } from './lumiere';
 import { createSharedMaterials, type SeeThroughHole, type SharedMaterials } from './materiaux';
@@ -54,7 +55,7 @@ import { RENDER_SETTINGS, type CharacterStyle } from './reglages';
 import { SEASON_RENDER_SETTINGS } from './reglages-saisons';
 import { ResourceTracker } from './ressources';
 import { Terrain } from './terrain';
-import { Vegetation } from './vegetation';
+import { Vegetation, fernGeometries } from './vegetation';
 import { WorldParts } from './monde';
 import { CharactersPart } from './personnages';
 import { HousePart } from './maison';
@@ -176,6 +177,8 @@ export class RenderEngine implements Renderer {
   private readonly lamps = new LampBoard();
   /** Saison montée (palette et lumière), `null` avant la première image. */
   private season: Season | null = null;
+  /** Décor fusionné (fruits et fleurs refaits à chaque saison). */
+  private decor: StaticDecor | null = null;
   private readonly fishingSource: FishingSource;
   private readonly catSource: CatSource;
   /** Bords de la grille que la caméra ne dépasse pas (origine comprise), fixés une fois. */
@@ -335,12 +338,13 @@ export class RenderEngine implements Renderer {
     if (await this.interrupted()) {
       return;
     }
-    this.vegetation = new Vegetation(map, terrain, materials, this.resources, share);
+    this.vegetation = new Vegetation(map, terrain, materials, this.resources, share, fernGeometries(library, this.resources));
     this.scene.add(this.vegetation.group);
     if (await this.interrupted()) {
       return;
     }
-    const decor = new StaticDecor(map, library, terrain, this.resources);
+    const decor = new StaticDecor(map, library, terrain, this.resources, materials);
+    this.decor = decor;
     if (await this.interrupted()) {
       return;
     }
@@ -357,6 +361,10 @@ export class RenderEngine implements Renderer {
     });
     this.world = world;
     this.parts.push(world);
+    // 0.13: la roue du moulin tourne (clip en boucle de l'artiste, pièces animées hors du décor fusionné).
+    const animated = new AnimatedPropsPart(map, library, terrain);
+    this.scene.add(animated.group);
+    world.add(animated);
     const content = this.view.content;
     const characters = new CharactersPart(
       library,
@@ -518,6 +526,8 @@ export class RenderEngine implements Renderer {
       terrain,
       water: terrain.water,
       streamWater: terrain.streamWater,
+      millraceWater: terrain.millraceWater,
+      pondWater: terrain.pondWater,
       daylight: this.daylight,
       smokeEmitter: () => railway.smokeEmitter(),
       trainState: () => railway.trainState(),
@@ -1175,6 +1185,7 @@ export class RenderEngine implements Renderer {
     this.unsubscribe();
     this.resizeObserver.disconnect();
     this.world?.dispose();
+    this.decor?.dispose();
     this.daylight.dispose();
     this.scene.clear();
     this.resources.dispose();
