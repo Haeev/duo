@@ -2,6 +2,7 @@
  * Viser et agir: ce que ferait Espace devant soi (case surlignée), ce que fait
  * un clic sur une cible, et l'exécution de l'action.
  */
+import { mealAtPoint, mealPoints, nearMeal, orderMeal } from './drapeaux';
 import type { ClickTarget } from '../etat/actions';
 import type { AimInfo, AimVerb, Cell, Character, GardenCell, MenuKind, Tree, Vec2 } from '../etat/types';
 import { isHome, isSheltered } from '../etat/interieurs';
@@ -111,6 +112,18 @@ const ACT_POINTS = [
   POINT.goatShed,
 ];
 
+const actPointsCache = new WeakMap<object, readonly string[]>();
+
+/** Points où l'on agit, plus ceux des repas payés (0.13), ajoutés une fois par contenu. */
+function actPoints(sim: Sim): readonly string[] {
+  let list = actPointsCache.get(sim.content);
+  if (list === undefined) {
+    list = [...ACT_POINTS, ...mealPoints(sim)];
+    actPointsCache.set(sim.content, list);
+  }
+  return list;
+}
+
 function frontPoint(c: Character, out: Vec2): Vec2 {
   out.x = c.pos.x + Math.cos(c.facing) * AIM_DISTANCE;
   out.y = c.pos.y + Math.sin(c.facing) * AIM_DISTANCE;
@@ -183,6 +196,11 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       if (t.point === POINT.groceryCustomer) return insideShopOpen(sim, c) ? 'open' : null;
       if (t.point === TOWN.table) return canDrinkChocolate(sim, c) ? 'drink' : null;
       if (t.point === TOWN.window) return sim.world.flags.includes(TOWN.bakeryOpen) && !isSheltered(c) ? 'open' : null;
+      {
+        // 0.13: soupe du jour au café, souper du dimanche à la pension (le drapeau de la quête les ouvre).
+        const meal = mealAtPoint(sim, t.point);
+        if (meal !== null) return nearMeal(sim, c, meal) ? meal.verb : null;
+      }
       if (t.point === SALON.chair) return c.inside === SALON.building && c.menu === null ? 'sit' : null;
       if (t.point === SALON.bench) return c.inside === SALON.building && c.menu === null && chairTaken(sim, c) ? 'open' : null;
       if (t.point === CLOTHES.counter) return c.inside === SALON.building && c.menu === null ? 'open' : null;
@@ -356,7 +374,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
     else if (def.station === 'stove') out.push({ kind: 'station', menu: 'stove', furniture: f.id, pos: centre });
     else if (def.storage === 'cellar') out.push({ kind: 'station', menu: 'chest', furniture: f.id, pos: centre });
   }
-  for (const id of ACT_POINTS) {
+  for (const id of actPoints(sim)) {
     const at = sim.map.points[id];
     if (at !== undefined && distance(c.pos, at) <= reach) out.push({ kind: 'point', point: id, pos: at });
   }
@@ -631,6 +649,13 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
     case 'drink':
       drinkChocolate(sim, c);
       return;
+    case 'soup':
+    case 'supper':
+      if (t.kind === 'point') {
+        const meal = mealAtPoint(sim, t.point);
+        if (meal !== null) orderMeal(sim, c, meal);
+      }
+      return;
     case 'curtains':
       if (t.kind === 'curtains') toggleCurtains(sim, c, t.furniture);
       return;
@@ -834,7 +859,7 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
       const at = { x: click.x, y: click.y };
       const beam = sim.world.beam;
       if (beam !== null && beamDistance(sim, beam, at) <= 1) return { kind: 'beam', pos: beamGrip(sim, beam, at) };
-      for (const id of ACT_POINTS) {
+      for (const id of actPoints(sim)) {
         const p = sim.map.points[id];
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
       }

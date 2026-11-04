@@ -356,6 +356,21 @@ La vente au prix « Doux » du marché ajoute `marche.json` `levels.soft.bond` (
 
 Condition nouvelle: `bond_at_least` (`villager`, `level` 0 à 5), lue aussi dans les plannings; `gift_given` (`villager`, `taste` facultatif: `adore`, `aime`, `neutre`, `deteste`; compteurs `gift:<habitant>` et `gift:<habitant>:<goût>`, paramètres communs `count`, `who`, `since`). Effets nouveaux: `add_bond` (`villager`, `amount`), `reveal_taste` (`villager`, `item`). Champ de quête nouveau: `story` (`villager`, `step`).
 
+### 2.14 Effets des drapeaux de quête (0.13, `reglages.json`, clé `flagEffects`)
+
+Ce que les drapeaux posés par les quêtes changent en jeu (lecteur: `src/donnees/effets-drapeaux.ts`). Sans le drapeau, rien ne change; la clé entière est facultative.
+
+| Clé | Effet |
+|---|---|
+| `recipeBonus[]` (`flag`, `recipe`, `extra`) | unités de plus à la fin de la fabrication (`saw_blade_sharp`: 5 planches par bûche) |
+| `works[]` (`flag`, `improvement`) | un chantier de la carte (`chantiers` de `halte.json`) existe dès que le drapeau est levé, sans tableau du quai (`hortense_bench_placed` ou `hortense_bench`: le banc sous le tilleul, avec ses deux places et ses cases bloquées) |
+| `autoFlags[]` | drapeaux levés d'office au départ (et à l'aube, pour les anciennes parties) si aucune donnée du jeu ne peut les poser par `set_flag` (`mill_running`) |
+| `spins[]` (`model`, `flag`) | l'objet animé de la carte ne tourne qu'avec le drapeau (la roue du moulin) |
+| `chairs[]` (`flag`, `seats[]`: `id`, `x`, `y`, `rotation`) | sièges à une place, utilisables avec le drapeau (`cafe_chairs_mended`); rotation de la carte (2: face au nord) |
+| `joinery` (`building`, `flag`, `quest`, `weekdays`, `hours`) | la menuiserie n'ouvre que ces jours et ces heures une fois le drapeau levé, et reste ouverte pendant la quête de Basile |
+| `meals[]` (`id`, `verb`, `flag`, `point`, `building`, `weekdays`, `from`, `to`, `price`, `item`, `perPlayerPerDay`, `offText`, `doneText`) | repas payés de la bourse commune, à un point de la carte, dans un bâtiment: la soupe du jour du café, le souper du dimanche de la pension. L'objet est un plat (`dish`, `foods`): le Ventre profite du repas pris ensemble |
+| `loans[]` (`flag`, `item`, `weekdays`, `lentText`, `returnText`) | objet prêté à chaque joueur au matin de ces jours, repris à l'aube suivante (les jumelles du mercredi) |
+
 ## 3. Conditions
 
 Une condition est un objet `{ "type": ..., paramètres }`. Une liste de conditions est vraie quand toutes le sont. `label` (texte) est accepté partout: il sert de ligne à cocher au carnet.

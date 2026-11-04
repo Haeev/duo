@@ -366,7 +366,9 @@ export class RenderEngine implements Renderer {
     this.world = world;
     this.parts.push(world);
     // 0.13: la roue du moulin tourne (clip en boucle de l'artiste, pièces animées hors du décor fusionné).
-    const animated = new AnimatedPropsPart(map, library, terrain);
+    // Elle ne tourne qu'avec le drapeau `mill_running` (levé d'office si aucune quête ne le pose).
+    const spins = new Map(this.view.content.settings.flagEffects.spins.map((x) => [x.model, x.flag] as const));
+    const animated = new AnimatedPropsPart(map, library, terrain, spins);
     this.scene.add(animated.group);
     world.add(animated);
     const content = this.view.content;

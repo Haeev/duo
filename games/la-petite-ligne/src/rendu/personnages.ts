@@ -43,10 +43,12 @@ import {
   benchesWithBuilt,
   isFurnitureSeat,
   seatPlace,
+  slotsOf,
   type BenchPlace,
   type BenchSeat,
   type SeatProp,
 } from '../etat/bancs';
+import { flagSeats, flaggedWorks } from '../etat/drapeaux';
 import { safeColor } from './apparence';
 import { type DressedFigure, PlayerDresser, PlayerTexture, mergeOutfit, playerMeshNames } from './habillage';
 import { smoothFactor } from './camera';
@@ -845,7 +847,7 @@ export class CharactersPart implements EventfulPart {
   private addBenchPicks(benches: readonly MapProp[]): void {
     const place: BenchPlace = { x: 0, y: 0, facing: 0 };
     for (const prop of benches) {
-      for (let slot = 0; slot < this.content.settings.benches.slots.length; slot += 1) {
+      for (let slot = 0; slot < slotsOf(prop, this.content.settings.benches).length; slot += 1) {
         seatPlace(prop, slot, this.content.settings.benches, place);
         const target = this.picks.add({ kind: 'ground', x: place.x, y: place.y });
         setStandingBox(
@@ -868,7 +870,10 @@ export class CharactersPart implements EventfulPart {
   /** Bancs des chantiers bâtis (banc du gué, banc du pignon), dans l'ordre de la simulation. */
   private refreshBenches(world: ReadonlyWorld): void {
     if (this.map === null) return;
-    let signature = 0;
+    const effects = this.content.settings.flagEffects;
+    const flagged = flaggedWorks(effects, world.flags);
+    const chairs = flagSeats(effects, world.flags);
+    let signature = (Math.imul(flagged.length, 31) + chairs.length) | 0;
     for (const def of this.content.improvements) {
       const day = world.improvements[def.id]?.builtDay ?? null;
       signature = (Math.imul(signature, 31) + (day === null ? 0 : day + 1)) | 0;
@@ -879,8 +884,11 @@ export class CharactersPart implements EventfulPart {
     for (const def of this.content.improvements) {
       if ((world.improvements[def.id]?.builtDay ?? null) !== null) this.builtIds.push(def.id);
     }
+    // Le banc d'Hortense et les chaises du café: les drapeaux de quête les rendent utilisables.
+    for (const id of flagged) if (!this.builtIds.includes(id)) this.builtIds.push(id);
     const before = new Set(this.benches);
-    this.benches = benchesWithBuilt(this.map, this.builtIds);
+    const built = benchesWithBuilt(this.map, this.builtIds);
+    this.benches = chairs.length === 0 ? built : [...built, ...chairs];
     this.addBenchPicks(this.benches.filter((bench) => !before.has(bench)));
   }
 

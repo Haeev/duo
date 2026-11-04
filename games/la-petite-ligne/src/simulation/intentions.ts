@@ -2,6 +2,7 @@
  * Application des intentions des joueurs. L'hôte les valide toutes (portée,
  * fonds, état): une intention impossible est ignorée ou donne un message.
  */
+import { recipeBonus } from './drapeaux';
 import { serveBuyer, setMarketLevel, stallMove } from './marche';
 import { nameAnimal, startBrood } from './poules';
 import type { ClickTarget, Intent } from '../etat/actions';
@@ -223,12 +224,14 @@ export function updateCrafting(sim: Sim, c: Character): void {
   c.crafting = null;
   const recipe = sim.content.recipes[job.recipe];
   if (recipe === undefined) return;
-  giveToCharacter(sim, c, recipe.output.item, 'ordinary', recipe.output.count);
+  // 0.13: la lame affûtée de Basile donne une planche de plus par bûche (`flagEffects.recipeBonus`).
+  const count = recipe.output.count + recipeBonus(sim, recipe.id);
+  giveToCharacter(sim, c, recipe.output.item, 'ordinary', count);
   spend(sim, c, recipe.id in sim.content.settings.endurance.costs ? recipe.id : recipe.station === 'stove' ? 'cook' : 'craft_furniture');
   bump(sim, `crafted:${recipe.id}`, c.id);
   bump(sim, 'crafted', c.id);
   c.action = { kind: 'idle', since: sim.world.tick, duration: 0, target: null };
-  emit(sim, { type: 'crafted', by: c.id, recipe: recipe.id, item: recipe.output.item, count: recipe.output.count });
+  emit(sim, { type: 'crafted', by: c.id, recipe: recipe.id, item: recipe.output.item, count });
   if (recipe.station === 'stove') emit(sim, { type: 'cooked', by: c.id, recipe: recipe.id });
 }
 

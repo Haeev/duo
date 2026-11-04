@@ -98,7 +98,12 @@ function applyEffect(sim: Sim, effect: Exclude<Effect, { type: 'if' } | { type: 
       sim.runtime.changed = true;
       return;
     case 'set_flag':
-      if (!world.flags.includes(effect.flag)) world.flags.push(effect.flag);
+      if (!world.flags.includes(effect.flag)) {
+        world.flags.push(effect.flag);
+        // Un drapeau peut poser un ouvrage (le banc d'Hortense): les cases bloquées se refont.
+        sim.runtime.dynamicDirty = true;
+        sim.runtime.changed = true;
+      }
       return;
     case 'start_quest':
       startQuest(sim, effect.quest);

@@ -307,7 +307,7 @@
       "none": 30, "bread": 50, "simple": 60, "stew": 80, "stewPlusDish": 100,
       "morning": 65, "decayPerHour": 4, "supperFromHour": 18, "supperFactor": 2, "together": 10, "togetherMinutes": 10,
       "fullAt": 60, "lowBelow": 25, "nightFloor": 30, "fullCostMultiplier": 0.8, "rumbleEveryMinutes": 60,
-      "foods": { "bread": 15, "warm_bread": 20, "crunchy_radishes": 20, "omelette": 30, "vegetable_soup": 35, "elder_jelly": 20, "brioche": 25, "hot_chocolate": 15 },
+      "foods": { "bread": 15, "warm_bread": 20, "crunchy_radishes": 20, "omelette": 30, "vegetable_soup": 35, "elder_jelly": 20, "brioche": 25, "hot_chocolate": 15, "cafe_soup": 30, "pension_supper": 45 },
       "byDish": { "bread": 15, "simple": 30, "stew": 35 }
     },
     "rest": {
@@ -363,6 +363,28 @@
   "storage": { "chest": 20, "shelf": 6, "oak_chest": 32, "cellar_rack": 12, "rackHooks": 12, "stackSize": 99, "oakChestPrice": 250 },
   "bakery": { "warmFrom": "06:00", "warmTo": "09:00", "breadUntil": "12:00", "closedWeekdays": ["monday"], "breadPrice": 5, "briochePrice": 12, "briocheWeekdays": ["sunday"], "dailyCapPerPlayer": { "bread": 4, "brioche": 2 }, "warmBecomesBreadAt": "12:00" },
   "salon": { "open": [["09:00", "12:00"], ["14:00", "18:00"]], "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday"], "saturdayFrom": "10:45", "cutPrice": 15, "colorPrice": 10, "bothPrice": 20 },
+  "flagEffects": {
+    "recipeBonus": [{ "flag": "saw_blade_sharp", "recipe": "saw_plank", "extra": 1 }],
+    "works": [{ "flag": "hortense_bench_placed", "improvement": "hortense_bench" }, { "flag": "hortense_bench", "improvement": "hortense_bench" }],
+    "autoFlags": ["mill_running"],
+    "spins": [{ "model": "mill_wheel", "flag": "mill_running" }],
+    "chairs": [
+      {
+        "flag": "cafe_chairs_mended",
+        "seats": [
+          { "id": "cafe_chair_west_table_south", "x": 87.5, "y": 22.5, "rotation": 2 },
+          { "id": "cafe_chair_west_table_west", "x": 86.5, "y": 21.5, "rotation": 1 },
+          { "id": "cafe_chair_east_table_south", "x": 89.5, "y": 22.5, "rotation": 2 }
+        ]
+      }
+    ],
+    "joinery": { "building": "joinery", "flag": "joinery_open", "quest": "basile_joinery", "weekdays": ["saturday"], "hours": [["09:00", "12:00"], ["14:00", "17:00"]] },
+    "meals": [
+      { "id": "cafe_soup", "verb": "soup", "flag": "soup_of_the_day", "point": "cafe_counter", "building": "cafe", "weekdays": [], "from": "11:00", "to": "20:00", "price": 12, "item": "cafe_soup", "perPlayerPerDay": 2, "offText": "cafe_soup_off", "doneText": "cafe_soup_done" },
+      { "id": "pension_supper", "verb": "supper", "flag": "pension_dining_open", "point": "grocery_dining_door", "building": "grocery", "weekdays": ["sunday"], "from": "17:00", "to": "19:00", "price": 15, "item": "pension_supper", "perPlayerPerDay": 1, "offText": "pension_supper_off", "doneText": "pension_supper_done" }
+    ],
+    "loans": [{ "flag": "binoculars_lent", "item": "binoculars", "weekdays": ["wednesday"], "lentText": "binoculars_lent_today", "returnText": "binoculars_returned" }]
+  },
   "grocer": { "hours": ["07:00", "19:00"], "chocolate": { "price": 5, "belly": 15, "until": "18:00", "seasons": ["autumn", "winter"], "rainAnySeason": true, "perPlayerPerDay": 1 } },
   "appearance": { "hairStyles": 15, "creationHairStyles": 12, "hairColors": 8 },
   "movement": { "walkSpeed": 3.5, "carrySpeedTogether": 1.8, "carrySpeedOneMoving": 0.9 },

@@ -15,6 +15,7 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { FlagEffects } from './effets-drapeaux';
 import type { BondSettings, HabitDef, HabitRef, HabitSettings, SignDef, VillageCalendar } from './types-voisins';
 import type { Currency } from './monnaie';
 import type { MarketSettings } from './marche';
@@ -1159,6 +1160,8 @@ export interface Settings {
   memories: MemorySettings;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
+  /** 0.13: effets en jeu des drapeaux posés par les quêtes (`reglages.flagEffects`). */
+  flagEffects: FlagEffects;
 }
 
 export interface BoardSettings {
