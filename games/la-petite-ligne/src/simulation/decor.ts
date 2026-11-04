@@ -139,7 +139,7 @@ interface Place {
 }
 
 function gesturesOf(sim: Sim): readonly DecorGestureDef[] {
-  return sim.content.village.gestures;
+  return sim.content.playerGestures;
 }
 
 function placesOf(sim: Sim, def: DecorGestureDef): Place[] {
@@ -847,7 +847,7 @@ export function updateDecor(
   sim: Sim,
   controls: Partial<Record<CharacterId, { moveX: number; moveY: number; actHeld: boolean }>>,
 ): void {
-  if (sim.content.village.gestures.length === 0) return;
+  if (sim.content.playerGestures.length === 0) return;
   const rt = decorRuntime(sim);
   if (rt.day !== sim.world.clock.day) {
     rt.day = sim.world.clock.day;

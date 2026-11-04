@@ -831,6 +831,8 @@ export const RENDER_SETTINGS = {
     crank: { hold: 'crank_hold', turn: 'crank_turn', turnSeconds: 1, wave: 'wave_back' },
     /** Hauteur d'assise de l'animation `sit` (m): le bassin y est posé quand la racine est au sol. */
     sitClipSeatHeight: 0.47,
+    /** 0.13 (lot H7): assise des chaises des tables du café (`seat_height` de `cafe_table`, `foret013.glb`). */
+    lifeSeatHeight: 0.47,
     /**
      * Coucher (retour R05): l'animation `sleep` pose le dos à cette hauteur (m) au-dessus de la
      * racine, celle du lit double; sur une couche plus basse (`sleep_height` du modèle: paillasse

@@ -56,7 +56,7 @@ function fakeRenderer(rig: IsoCameraRig): Renderer {
 
 function fakeView(): GameView {
   const world = {
-    characters: [{ id: 'p1', menu: null, placement: null, pos: { ...FOCUS }, facing: 0 }],
+    characters: [{ id: 'p1', menu: null, placement: null, bag: [], selected: 0, pos: { ...FOCUS }, facing: 0 }],
   };
   const view: Partial<GameView> = {
     world: () => world as unknown as ReturnType<GameView['world']>,

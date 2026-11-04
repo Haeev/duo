@@ -1,12 +1,12 @@
 /**
  * La vie du village (0.13, lot H7; section 7 de `v0-13-habitants.md`, README des données 2.13):
- * scènes entre habitants, postes de métier et chat du bourg, lus dans `vie.json`. Les gestes avec
- * le décor (7.1) ont leur lecteur à part (`vie-gestes.ts`), dans le même fichier de données.
+ * scènes entre habitants, pauses, places assises, postes de métier et chat du bourg, lus dans
+ * `vie.json`. Les gestes des habitants avec le décor et leurs réactions sont dans `gestes-0-13.json`
+ * (`gestes-0-13.ts`).
  */
 import { ContentError, type Reader } from './lecteur';
 import { WORK_STROKE_EVENTS, type WorkStrokeEvent } from '../etat/types';
 import type { Condition } from './types';
-import { parseDecorGestures, type DecorGestureDef } from './vie-gestes';
 
 /** Lit une liste de conditions (`when`), avec la règle de `contenu.ts`. */
 export type ConditionsReader = (r: Reader | null) => Condition[];
@@ -29,7 +29,7 @@ export type SceneGroupPlace =
 export interface SceneGroupDef {
   who: string[];
   place: SceneGroupPlace;
-  /** Activité jouée pendant la scène (`chat` par défaut; `sit_chat` pour une place assise). */
+  /** Activité jouée pendant la scène (`chat` par défaut; vide au point du planning: la sienne). */
   activity: string;
 }
 
@@ -61,9 +61,10 @@ export interface SceneDef {
 
 /** Poste de métier: là où un habitant fait son geste, devant l'outil (enclume, établi). */
 export interface WorkPostDef {
-  /** Point du planning et activité qui mènent au poste. */
+  /** Point du planning et activité qui mènent au poste; `who`: ses habitants (vide: tous). */
   point: string;
   activity: string;
+  who: string[];
   /** Où il se tient (centre du corps), `null`: au point; où il regarde (cap en radians), `null`: comme le point. */
   at: PlanPoint | null;
   facing: number | null;
@@ -139,25 +140,23 @@ export interface CatDef {
   follow: { chance: number; seconds: number; distance: number };
 }
 
-export interface VillageLife {
+export interface VillageScenes {
   scenes: SceneDef[];
   workPosts: WorkPostDef[];
   seating: SeatingDef[];
   pauses: VillagePauseDef[];
   cat: CatDef | null;
-  gestures: DecorGestureDef[];
   /** Bulles des scènes: une toutes les `bubbleSeconds` (s), lue à moins de `bubbleRange` m. */
   bubbleSeconds: number;
   bubbleRange: number;
 }
 
-export const EMPTY_VILLAGE_LIFE: VillageLife = {
+export const EMPTY_VILLAGE_SCENES: VillageScenes = {
   scenes: [],
   workPosts: [],
   seating: [],
   pauses: [],
   cat: null,
-  gestures: [],
   bubbleSeconds: 7,
   bubbleRange: 8,
 };
@@ -195,7 +194,8 @@ function parseGroup(g: Reader): SceneGroupDef {
     place = { kind: 'circle', at: point(at), radius: g.opt('radius')?.number() ?? 0.7 };
   }
   const activity = g.opt('activity');
-  return { who, place, activity: activity === null ? 'chat' : id(activity) };
+  // Au point du planning, il garde son activité (et le geste qui va avec) sauf si la scène en donne une.
+  return { who, place, activity: activity === null ? (place.kind === 'planning' ? '' : 'chat') : id(activity) };
 }
 
 function parseScenes(r: Reader | null, conditions: ConditionsReader): SceneDef[] {
@@ -243,6 +243,7 @@ function parseWorkPosts(r: Reader | null): WorkPostDef[] {
     return {
       point: id(p.at('point')),
       activity: id(p.at('activity')),
+      who: p.opt('who')?.items().map(id) ?? [],
       at: at === null ? null : point(at),
       facing: cap === null ? null : compassToFacing(cap.number()),
       clip: id(p.at('clip')),
@@ -311,9 +312,9 @@ function parseCat(r: Reader | null, conditions: ConditionsReader): CatDef | null
   };
 }
 
-/** `vie.json` (absent: aucune scène, aucun poste, pas de chat, aucun geste). */
-export function parseVillageLife(r: Reader | null, conditions: ConditionsReader): VillageLife {
-  if (r === null) return EMPTY_VILLAGE_LIFE;
+/** `vie.json` (absent: aucune scène, aucun poste, pas de chat). */
+export function parseVillageScenes(r: Reader | null, conditions: ConditionsReader): VillageScenes {
+  if (r === null) return EMPTY_VILLAGE_SCENES;
   const bubbles = r.opt('bubbles');
   return {
     scenes: parseScenes(r.opt('scenes'), conditions),
@@ -327,15 +328,14 @@ export function parseVillageLife(r: Reader | null, conditions: ConditionsReader)
       clip: id(p.at('clip')),
     })),
     cat: parseCat(r.opt('cat'), conditions),
-    gestures: parseDecorGestures(r.opt('gestures'), conditions),
-    bubbleSeconds: bubbles?.at('seconds').number() ?? EMPTY_VILLAGE_LIFE.bubbleSeconds,
-    bubbleRange: bubbles?.at('range').number() ?? EMPTY_VILLAGE_LIFE.bubbleRange,
+    bubbleSeconds: bubbles?.at('seconds').number() ?? EMPTY_VILLAGE_SCENES.bubbleSeconds,
+    bubbleRange: bubbles?.at('range').number() ?? EMPTY_VILLAGE_SCENES.bubbleRange,
   };
 }
 
 /** Les scènes et les postes ne citent que des habitants et des points connus. */
-export function checkVillageLife(
-  life: VillageLife,
+export function checkVillageScenes(
+  life: VillageScenes,
   villagers: readonly string[],
   points: ReadonlySet<string> | null,
 ): void {

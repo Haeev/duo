@@ -25,6 +25,7 @@ import type { BenchSettings } from '../donnees/types';
 import type { Character, DeepReadonly, PlacedFurniture, VillagerState, Vec2 } from '../etat/types';
 import type { ItemDef } from '../donnees/types';
 import { isHome, isSheltered } from '../etat/interieurs';
+import { flagSeats, flaggedWorks } from '../etat/drapeaux';
 import { SIM_HZ } from './constantes';
 import { type Sim, distance, emit } from './contexte';
 import { refreshBlockers, stopPath } from './deplacement';
@@ -41,7 +42,10 @@ const seating = new BenchSeating();
 
 /** Chantiers bâtis, dans l'ordre de `chantiers.json` (leurs bancs s'ajoutent à ceux de la carte). */
 function builtImprovements(sim: Sim): string[] {
-  return sim.content.improvements.filter((x) => (sim.world.improvements[x.id]?.builtDay ?? null) !== null).map((x) => x.id);
+  const built = sim.content.improvements.filter((x) => (sim.world.improvements[x.id]?.builtDay ?? null) !== null).map((x) => x.id);
+  // 0.13: le banc d'Hortense, posé sous le tilleul, est levé par un drapeau et non payé au tableau.
+  for (const id of flaggedWorks(sim.content.settings.flagEffects, sim.world.flags)) if (!built.includes(id)) built.push(id);
+  return built;
 }
 
 /** Sièges des meubles posés, par simulation (plusieurs simulations par fichier de test). */
@@ -64,7 +68,8 @@ export function homeSeats(sim: Sim): readonly SeatProp[] {
 export function playerBenches(sim: Sim): readonly SeatProp[] {
   const outdoor = benchesWithBuilt(sim.map, builtImprovements(sim));
   const home = homeSeats(sim);
-  return home.length === 0 ? outdoor : [...outdoor, ...home];
+  const chairs = flagSeats(sim.content.settings.flagEffects, sim.world.flags);
+  return home.length === 0 && chairs.length === 0 ? outdoor : [...outdoor, ...chairs, ...home];
 }
 
 export function playerBench(sim: Sim, id: string): SeatProp | null {

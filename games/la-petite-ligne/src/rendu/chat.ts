@@ -1,9 +1,9 @@
 /**
  * Le chat du bourg (0.13, section 7.4 de `v0-13-habitants.md`): le nœud `cat` de `faune.glb`, ses
  * clips `cat_idle`, `cat_walk`, `cat_sleep` et `cat_roll`, posé et animé d'après une vue minimale
- * (`CatView`). La simulation n'a pas encore de chat: le lot H7 la remplira (champ de l'état lu
- * par une `CatSource` passée au moteur, `EngineOptions.cat`); d'ici là, la page de démonstration
- * fournit la sienne et le jeu n'en montre aucun.
+ * (`CatView`). Depuis le lot H7, le jeu le lit dans la vue (`GameView.cat`: la simulation de
+ * l'hôte, `simulation/chat.ts`, ou le canal rapide chez l'invité); la page de démonstration peut
+ * fournir le sien par `EngineOptions.cat`.
  *
  * Tout se lit dans la vue: mêmes images chez l'hôte et chez l'invité. Sans modèle, le substitut
  * `cat` de `substituts.ts` prend la place (posé, tourné, sans animation).
@@ -33,7 +33,7 @@ const FAUNA_FILE = 'faune.glb';
 /** Ce que fait le chat: assis, en marche, endormi en rond, roulé sur le dos (caresse à deux). */
 export type CatPose = 'idle' | 'walk' | 'sleep' | 'roll';
 
-/** Vue du chat que le rendu lit à chaque image (remplie par la simulation au lot H7). */
+/** Vue du chat que le rendu lit à chaque image (`CatSnapshot` de `etat/chat.ts`). */
 export interface CatView {
   /** Position au pas courant et au pas d'avant (m, plan de la carte), pour l'interpolation. */
   readonly pos: Readonly<Vec2>;
@@ -52,7 +52,7 @@ export interface CatView {
 /** D'où vient le chat à cette image: `null`, pas de chat (la nuit, il chasse hors de la carte). */
 export type CatSource = (world: ReadonlyWorld) => CatView | null;
 
-/** Pas encore de chat dans l'état (avant le lot H7). */
+/** Aucun chat (vue sans chat, page de démonstration). */
 export const NO_CAT: CatSource = () => null;
 
 /** Clip de chaque pose. */
@@ -79,6 +79,8 @@ export class CatPart implements EventfulPart {
   private readonly point = { x: 0, y: 0 };
   /** Début de la roulade en cours (pas de la simulation), pour la relancer à chaque nouvelle caresse. */
   private rollSince = Number.NaN;
+  /** Instant du rendu (s) où la roulade en cours a commencé. */
+  private rollStart = 0;
   private interiorProbe: () => string | null = () => null;
 
   constructor(
@@ -158,12 +160,15 @@ export class CatPart implements EventfulPart {
       const action = this.play(name, 0, true);
       if (cat.since !== this.rollSince) {
         // Nouvelle caresse pendant la roulade: elle repart du début (temps imposé juste après).
+        // Départ compté sur l'horloge du rendu: chez l'invité, le pas de l'état complet peut dater
+        // de plusieurs secondes (les positions rapides, elles, sont à jour).
         this.rollSince = cat.since;
+        this.rollStart = context.time - Math.max(0, (context.world.tick - cat.since + context.alpha) / SIM_HZ);
         if (rolling) action?.reset().play();
       }
       const clip = this.clips.get(name);
       if (action !== null && clip !== undefined) {
-        const t = (context.world.tick - cat.since + context.alpha) / SIM_HZ;
+        const t = context.time - this.rollStart;
         action.time = Math.min(clip.duration - 1e-3, Math.max(0, t));
       }
     } else {

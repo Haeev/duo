@@ -8,6 +8,7 @@ import type { ControlFrame, Intent } from '../etat/actions';
 import type { SentWorld } from './etat-transmis';
 import { FISH_RARITIES, SHADOW_SIZES, type FishShadow } from '../etat/peche';
 import type { WorldEvent } from '../etat/types';
+import { CAT_POSES } from '../etat/chat';
 
 /** Canaux (0 à 15), les mêmes chez les deux. */
 export const CHANNEL = {
@@ -149,6 +150,10 @@ export const FastSnapshotSchema = v.strictObject({
   hens: v.pipe(v.array(MoverSchema), v.maxLength(24)),
   beam: v.nullable(v.strictObject({ x: Finite, y: Finite, f: Finite })),
   train: Finite,
+  // 0.13 (lot H7): le chat du bourg, simulé par l'hôte seul; absent: pas de chat au bourg.
+  cat: v.exactOptional(
+    v.strictObject({ x: Finite, y: Finite, f: Finite, s: Finite, p: v.picklist(CAT_POSES), t: v.pipe(Int, v.minValue(0)) }),
+  ),
 });
 export type FastSnapshot = v.InferOutput<typeof FastSnapshotSchema>;
 

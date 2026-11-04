@@ -201,6 +201,8 @@ TYPES = {
               "hauteur": 0.8},
     "plank_stack": {"categorie": "decor", "nom": "pile de planches qui sèchent sous l'auvent", "emprise": [2, 1],
                     "hauteur": 1.0},
+    "clothesline": {"categorie": "equipement", "nom": "étendoir à linge du lavoir (deux poteaux et une corde, draps)",
+                    "emprise": [2, 1], "hauteur": 1.8},
     "hand_pump": {"categorie": "equipement", "nom": "pompe à bras des jardins de la Rive", "emprise": [1, 1],
                   "hauteur": 1.4, "occultation": [0.3, 0.0, 1.4]},
     "water_trough": {"categorie": "decor", "nom": "abreuvoir de pierre", "emprise": [2, 1], "hauteur": 0.7},
@@ -453,6 +455,10 @@ def batiments() -> None:
     o("farm_house", 114, 27, 0, "farmhouse")
     # Le lavoir au bord de l'Aubrune, en aval du bourg; bas, au premier plan, ouvert au nord.
     o("washhouse", 99, 35, 2, "washhouse")
+    # L'étendoir du lavoir, sur l'herbe à l'est du chemin, au soleil devant le lavoir (ouvert au nord): le linge
+    # essoré s'y étend sans traverser le chemin. Deux cases d'est en ouest; on se tient au sud, entre la corde et
+    # le lavoir (la grange de la ferme cacherait un point posé plus au nord).
+    o("clothesline", 102, 33, 0, "washhouse_clothesline")
     # L'ouest: le moulin sur son bief (roue au sud), les deux maisons jumelles de la compagnie au bord de la
     # voie, près de la halte; la maison forestière au bout du chemin forestier.
     o("watermill", -17, 28, 1, "mill")
@@ -572,6 +578,9 @@ def ouest() -> None:
     # le bord de la carte; deux buissons ferment l'angle.
     o("bush", 0, 35, 0, "garden_hedge_corner_01")
     o("bush", 1, 36, 0, "garden_hedge_corner_02")
+    # Le puisage du bief (point `millrace_draw`, sur l'herbe à l'extrémité est du bief): un bloc de pierre au
+    # bord, une case à l'est du point, où l'on pose l'arrosoir pour le remplir; l'accès reste libre par la berge.
+    o("rock", -7, 36, 0, "millrace_draw_stone")
 
 
 def foret_lieux() -> None:
@@ -661,8 +670,10 @@ def points_lieux() -> None:
     P("cemetery_gate", 118.0, -2.5, "devant la grille du cimetière, au bout de l'allée du parvis",
       objet="cemetery_gate", rotation=2, **imp)
     P("cemetery_cross", 116.5, -10.5, "au pied de la croix du cimetière, dans l'allée centrale", **imp)
-    P("cemetery_tap", 120.5, -5.5, "la fontaine et les arrosoirs, contre le mur sud, à 2 m à l'est de la grille",
-      objet="cemetery_tap", portee=1.5)
+    # Marthe se tient sur la rangée libre le long du mur sud (y -5), à l'est de la fontaine: au nord, la case
+    # (120, -6) est la tombe grave_32, et à l'ouest on barrerait l'allée de la grille.
+    P("cemetery_tap", 121.5, -4.5, "la fontaine et les arrosoirs, contre le mur sud: on y puise à sa droite, sur la "
+      "rangée libre devant le mur", objet="cemetery_tap", portee=1.5)
     P("cemetery_bench", 116.0, -4.5, "le banc du cimetière, au soleil contre le mur sud, tourné vers la croix",
       objet="cemetery_bench", portee=1.5)
     P("grave_lacombe", 115.5, -11.5, "la tombe des Lacombe, près de la croix (les parents de Firmin et une place "
@@ -708,6 +719,8 @@ def points_lieux() -> None:
     P("shared_garden_pump", 92.5, 29.5, "à côté de la pompe des jardins de la Rive", objet="shared_garden_pump",
       **imp)
     P("shared_garden_plot", 92.5, 25.5, "dans un carré des jardins de la Rive", **imp)
+    P("washhouse_clothesline", 103.5, 34.5, "devant l'étendoir du lavoir, côté sud où pend le linge",
+      objet="washhouse_clothesline", portee=1.5, **imp)
     P("washhouse", 101.5, 34.5, "devant le lavoir, au bout du chemin", objet="washhouse", rotation=2, **imp)
     P("barn_door", 112.5, 32.5, "devant la porte de l'étable", objet="barn", rotation=3, **imp)
     P("farm_door", 118.5, 33.5, "devant le logis de la ferme, sur la cour", objet="farmhouse", rotation=2,
@@ -753,6 +766,8 @@ def points_lieux() -> None:
     P("goat_graze_07", 21.5, 28.5, "pâture du bas-côté de la route du gué, en face du poulailler")
     P("log_yard", -6.5, 9.5, "au bord du parc à grumes de Basile", **imp)
     P("forest_cut", -12.0, -8.5, "la coupe de Basile: souches, piles, arbres marqués", rayon=2.0, **imp)
+    P("forest_cut_survey", -9.5, -9.5, "le bord est de la coupe, à 2,7 m du poste de Barnabé: Inès relève les "
+      "souches et marque les arbres à abattre", rayon=1.0)
     P("charcoal_kiln", -8.5, -4.5, "la meule de Barnabé, au bord sud de la coupe, à plus de 6 m de tout arbre")
     P("forester_house_door", -6.5, -17.5, "devant la maison forestière", objet="forester_house", rotation=0, **imp)
     P("forester_bench", -4.0, -17.5, "le banc devant la maison forestière, à droite de la porte",

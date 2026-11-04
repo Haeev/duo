@@ -55,7 +55,8 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `moments.json` | les moments rares (tour 6): bêtes et gestes qui se jouent quand les deux joueurs regardent ensemble (section 2.10) |
 | `habitants-0-13.json` | 0.13, facultatif: les habitants nouveaux et les compléments des anciens, au format de `habitants.json`, fusionnés par identifiant (section 2.12) |
 | `calendrier.json` | 0.13: jours particuliers (messe, marché, fêtes, moisson...) et jours de classe; les anniversaires sont dans les habitants (section 2.12) |
-| `vie.json` | 0.13, facultatif: la vie du village, scènes entre habitants, pauses, places assises, postes de métier, chat du bourg, gestes avec le décor (section 2.14) |
+| `gestes-joueurs.json` | 0.13: les gestes des joueurs avec le décor, table 7.1 (section 2.16) |
+| `vie.json` | 0.13, facultatif: la vie du village, scènes entre habitants, pauses, places assises, postes de métier, chat du bourg (section 2.14) |
 
 ### 2.1 `objets.json`
 
@@ -357,9 +358,24 @@ La vente au prix « Doux » du marché ajoute `marche.json` `levels.soft.bond` (
 
 Condition nouvelle: `bond_at_least` (`villager`, `level` 0 à 5), lue aussi dans les plannings; `gift_given` (`villager`, `taste` facultatif: `adore`, `aime`, `neutre`, `deteste`; compteurs `gift:<habitant>` et `gift:<habitant>:<goût>`, paramètres communs `count`, `who`, `since`). Effets nouveaux: `add_bond` (`villager`, `amount`), `reveal_taste` (`villager`, `item`). Champ de quête nouveau: `story` (`villager`, `step`).
 
-### 2.14 `vie.json`: la vie du village (0.13, lot H7)
+### 2.14 Effets des drapeaux de quête (0.13, `reglages.json`, clé `flagEffects`)
 
-Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 7. Lu par `src/donnees/vie.ts` (scènes, pauses, places assises, postes, chat) et `src/donnees/vie-gestes.ts` (gestes avec le décor). Fichier facultatif: absent, rien de tout cela. Rien n'ajoute de champ à l'état: une scène, une place ou un poste s'écrit dans le point visé de l'habitant (`VillagerState.target`, points virtuels `scene:<scène>:<groupe>:<rang>` et `seat:<point>:<rang>`, résolus par `src/etat/vie.ts`), lu pareil chez l'hôte et chez l'invité. Caps en degrés de boussole (`cap`: 0 nord, 90 est), positions en mètres du plan de la carte.
+Ce que les drapeaux posés par les quêtes changent en jeu (lecteur: `src/donnees/effets-drapeaux.ts`). Sans le drapeau, rien ne change; la clé entière est facultative.
+
+| Clé | Effet |
+|---|---|
+| `recipeBonus[]` (`flag`, `recipe`, `extra`) | unités de plus à la fin de la fabrication (`saw_blade_sharp`: 5 planches par bûche) |
+| `works[]` (`flag`, `improvement`) | un chantier de la carte (`chantiers` de `halte.json`) existe dès que le drapeau est levé, sans tableau du quai (`hortense_bench_placed` ou `hortense_bench`: le banc sous le tilleul, avec ses deux places et ses cases bloquées) |
+| `autoFlags[]` | drapeaux levés d'office au départ (et à l'aube, pour les anciennes parties) si aucune donnée du jeu ne peut les poser par `set_flag` (`mill_running`) |
+| `spins[]` (`model`, `flag`) | l'objet animé de la carte ne tourne qu'avec le drapeau (la roue du moulin) |
+| `chairs[]` (`flag`, `seats[]`: `id`, `x`, `y`, `rotation`) | sièges à une place, utilisables avec le drapeau (`cafe_chairs_mended`); rotation de la carte (2: face au nord) |
+| `joinery` (`building`, `flag`, `quest`, `weekdays`, `hours`) | la menuiserie n'ouvre que ces jours et ces heures une fois le drapeau levé, et reste ouverte pendant la quête de Basile |
+| `meals[]` (`id`, `verb`, `flag`, `point`, `building`, `weekdays`, `from`, `to`, `price`, `item`, `perPlayerPerDay`, `offText`, `doneText`) | repas payés de la bourse commune, à un point de la carte, dans un bâtiment: la soupe du jour du café, le souper du dimanche de la pension. L'objet est un plat (`dish`, `foods`): le Ventre profite du repas pris ensemble |
+| `loans[]` (`flag`, `item`, `weekdays`, `lentText`, `returnText`) | objet prêté à chaque joueur au matin de ces jours, repris à l'aube suivante (les jumelles du mercredi) |
+
+### 2.15 `vie.json`: la vie du village (0.13, lot H7)
+
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 7. Lu par `src/donnees/vie.ts` (scènes, pauses, places assises, postes, chat). Les gestes des habitants avec le décor et leurs réactions aux joueurs sont dans `gestes-0-13.json` (`src/donnees/gestes-0-13.ts`); un geste de ce fichier passe avant le clip d'un poste de métier. Fichier facultatif: absent, rien de tout cela. Rien n'ajoute de champ à l'état: une scène, une place ou un poste s'écrit dans le point visé de l'habitant (`VillagerState.target`, points virtuels `scene:<scène>:<groupe>:<rang>` et `seat:<point>:<rang>`, résolus par `src/etat/vie.ts`), lu pareil chez l'hôte et chez l'invité. Caps en degrés de boussole (`cap`: 0 nord, 90 est), positions en mètres du plan de la carte.
 
 **Scènes** (`scenes[]`, table 7.2): les habitants viennent à leur place, se tournent les uns vers les autres et des bulles passent au-dessus d'eux.
 
@@ -377,26 +393,15 @@ Pendant la scène, elle passe avant le planning (comme l'étal du marché); à s
 
 **Places assises** (`seating[]`): `{ point, activities, seats: [{ x, y, cap }] }`: un habitant que son planning envoie à `point` pour l'une de ces activités prend la première place libre et s'y assoit (tables du café). Une place dans une case pleine (chaise d'une table) est atteinte par un dernier pas depuis la case libre voisine.
 
-**Postes de métier** (`workPosts[]`): `{ point, activity, clip, at?, cap?, tool?, event?, strokeSeconds?, hearRange? }`: l'habitant venu à `point` pour `activity` se tient en `at` (sinon au point), tourné selon `cap` (sinon comme le point), joue `clip` avec l'outil `tool` en main (modèle de `ferme.glb` ou de `personnages.glb`: marteau, scie, houe, arrosoir, hache); l'événement `event` (`forge_strike`, `joinery_saw` ou `joinery_plane`, joués par `AUDIO_SETTINGS.village.events`) part toutes les `strokeSeconds` quand un joueur est à moins de `hearRange` m. Un poste sans `at` remplace seulement le geste (jardins arrosés, potager à la houe, bêtes nourries).
+**Postes de métier** (`workPosts[]`): `{ point, activity, clip, who?, at?, cap?, tool?, event?, strokeSeconds?, hearRange? }`: l'habitant (de `who`, sinon n'importe lequel) venu à `point` pour `activity` se tient en `at` (sinon au point), tourné selon `cap` (sinon comme le point), joue `clip` avec l'outil `tool` en main (modèle de `ferme.glb` ou de `personnages.glb`: marteau, scie, houe, arrosoir, hache); l'événement `event` (`forge_strike`, `joinery_saw` ou `joinery_plane`, joués par `AUDIO_SETTINGS.village.events`) part toutes les `strokeSeconds` quand un joueur est à moins de `hearRange` m. Un poste sans `at` remplace seulement le geste (jardins arrosés, potager à la houe, bêtes nourries). Un poste placé déjà tenu laisse le second habitant au point. Plusieurs habitants au même point ordinaire s'y répartissent (le point, puis deux couronnes de 0,75 et 1,4 m), dans l'ordre de la liste des habitants.
 
-**Chat** (`cat`, section 7.4): `when` (il est au bourg), `habits[]` (`{ id, from, to, when, pose: idle | sleep, cap?, spots: [{ x, y }] }`, la première qui tient; aucune: il est hors de la carte), `walkSpeed`, `fleeSpeed`, `stayMinutes` `[min, max]` (temps à une place avant la suivante), `rollChance` et `rollSeconds` (il se roule par terre en arrivant), `flee { range, speedAbove, smoothingSeconds, distance }` (un joueur qui arrive vite, vitesse lissée, le fait fuir; de petits pas le laissent approcher), `watchRange` (il regarde qui approche doucement). Simulé par l'hôte (`src/simulation/chat.ts`, tirages par la graine), transmis à l'invité avec les positions rapides.
+**Chat** (`cat`, section 7.4): `when` (il est au bourg), `habits[]` (`{ id, from, to, when, pose: idle | sleep, cap?, spots: [{ x, y }] }`, la première qui tient; aucune: il est hors de la carte), `walkSpeed`, `fleeSpeed`, `stayMinutes` `[min, max]` (temps à une place avant la suivante), `rollChance` et `rollSeconds` (il se roule par terre en arrivant), `flee { range, speedAbove, smoothingSeconds, distance }` (un joueur qui arrive vite, vitesse lissée, le fait fuir; de petits pas le laissent approcher), `watchRange` (il regarde qui approche doucement), `follow { chance, seconds, distance }` (une approche douce sur `1 / chance` environ, il suit ce joueur un moment, à `distance` m derrière lui; événement `cat_follow`). Simulé par l'hôte (`src/simulation/chat.ts`, tirages par la graine), transmis à l'invité avec les positions rapides.
 
-**Gestes avec le décor** (`gestures[]`, table 7.1; lus par `src/donnees/vie-gestes.ts`, joués par `src/simulation/decor.ts`). Un geste est un appui devant un objet de la carte, décidé par l'hôte; l'invité envoie ses appuis (Agir, Agir maintenu, Examiner) comme pour le reste et voit la même chose (clip du personnage, son, notification, drapeaux du monde).
+### 2.16 `gestes-joueurs.json`: les gestes des joueurs avec le décor (0.13, lot H7)
 
-| Champ | Valeurs |
-|---|---|
-| `id`, `ref`, `tier` | identifiant, numéro de la table 7.1, `P0` ou `P1`. Plusieurs entrées peuvent porter le même `ref` (le puits: se pencher et crier; une tombe par entrée) |
-| `points`, `spots` | points de `halte.json` et/ou lieux `{ x, y }` où le geste se fait; `reach` (m, sinon `ranges.action`) |
-| `verb` | `act` (un appui), `hold` (maintenu), `examine` (X, ou Espace/clic aussi). Deux gestes d'un appui au même lieu se relaient (registre, puis horaire) |
-| `kind` | `plain` (par défaut), `charge` (maintenir pour charger, relâcher pour lancer: `chargeIdeal`, `chargeMax`, `maxScore`, `showScore`), `rhythm` (`rhythmSteps` appuis, chacun dans `rhythmSeconds`; répliques étiquetées `fail` et `win`), `dwell` (rester `dwellSeconds`; avec `rain`, l'abri se prend tout seul), `pages` (affiche, registre: `pick` `week` ou `cycle`), `forecast` (girouette: étiquettes `sunny`, `cloudy`, `rain`, `again`; juste quatre fois sur cinq), `together` (les deux joueurs dans `duo.windowSeconds`: étiquettes `win` et `wait`) |
-| `when`, `rain`, `heldItems`, `villagerPresent`, `perDay`, `onceFlag` | conditions du geste (mêmes conditions que partout), pluie obligatoire, objet en main consommé, habitant visible à moins de 6 m, nombre par jour et par joueur, drapeau qui bloque (avec `flagDays`: expire) |
-| `label`, `clip`, `clipSeconds` | invite montrée au survol et à la visée, clip de `personnages.glb` (`pickup`, `hammer_tap`, `crank_turn`, `give`, `look_up`, `reach_up`, `pet`, `wave`, `drink`, `sit_ground`, table `ACTION_FOR_CLIP`), durée |
-| `sound`, `event`, `then` | son du catalogue (événement `decor_gesture`), ou événement nommé attendu par le son (`well_peek`, `well_shout`, `lookout_shout`, `washhouse_scrub`, `skim_stone`, `sluice_opened`, `bell_rope_pull`, `bells_rung`, `harmonium_note`, `harmonium_chord`, avec `by` et `at`); `then`: un second événement après `seconds` |
-| `lines[]`, `pick`, `lineEvery` | réserve de répliques `{ text, when, tag, near }` (`near`: habitant présent), tirées « la moins récente » (`least_recent`); un maintien répété ne parle que tous les `lineEvery` coups; `{n}` vaut le score |
-| `holdSeconds`, `repeatSeconds`, `cooldownSeconds` | durée avant l'effet d'un maintien, répétition, repos entre deux gestes d'un joueur (la main reste, muette) |
-| `heart`, `rest`, `cost`, `bond`, `find`, `fillCan`, `effectsEvery` | Cœur et Repos (endurance) gagnés, aubrins payés, lien `{ villager, amount }` (une fois par semaine), trouvaille `{ item, count, oneIn }`, remplit l'arrosoir tenu; les gains ne valent qu'à la première fois du jour sauf `effectsEvery` |
-| `setFlag` | drapeau du monde écrit, `{by}` remplacé par le joueur, `flagDays` jours (les noms en `decor:` sont lus par le rendu: cierges, initiales, fleurs) |
-| `duo` | `{ windowSeconds, lines, heart, memory, event }`: le même geste de l'autre dans la fenêtre donne la variante (réplique, Cœur une fois par jour, souvenir en notification une fois, son `event` à la place du geste) |
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 7.1. Contenu: `content.playerGestures`. Ne pas confondre avec `gestes-0-13.json` (gestes des habitants).
+
+Fichier `gestes-joueurs.json`, clé `gestures[]` (table 7.1; lus par `src/donnees/vie-gestes.ts`, joués par `src/simulation/decor.ts`). Un geste est un appui devant un objet de la carte, décidé par l'hôte; l'invité envoie ses appuis (Agir, Agir maintenu, Examiner) comme pour le reste et voit la même chose (clip du personnage, son, notification, drapeaux du monde).
 
 ## 3. Conditions
 

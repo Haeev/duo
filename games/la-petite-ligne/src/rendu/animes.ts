@@ -21,13 +21,18 @@ interface Looping {
   mixer: AnimationMixer;
   action: AnimationAction;
   duration: number;
+  /** Drapeau qui met la boucle en marche, `null`: toujours. */
+  flag: string | null;
+  /** Temps de marche cumulé (s): la roue ne vieillit pas à l'arrêt, elle repart de sa pose. */
+  clock: number;
 }
 
 export class AnimatedPropsPart implements EventfulPart {
   readonly group = new Group();
   private readonly loops: Looping[] = [];
 
-  constructor(map: GameMap, library: ModelLibrary, terrain: Terrain) {
+  /** `spins`: modèle animé -> drapeau qui le met en marche (`reglages.flagEffects.spins`); sans entrée, il tourne toujours. */
+  constructor(map: GameMap, library: ModelLibrary, terrain: Terrain, spins: ReadonlyMap<string, string> = new Map()) {
     this.group.name = 'objets animes';
     for (const prop of map.props) {
       const clip = loopClip(library, prop.model);
@@ -51,12 +56,19 @@ export class AnimatedPropsPart implements EventfulPart {
       const mixer = new AnimationMixer(root);
       const action = mixer.clipAction(clip);
       action.play();
-      this.loops.push({ mixer, action, duration: Math.max(clip.duration, 1e-3) });
+      this.loops.push({ mixer, action, duration: Math.max(clip.duration, 1e-3), flag: spins.get(prop.model) ?? null, clock: 0 });
     }
   }
 
   update(context: FrameContext): void {
-    for (const loop of this.loops) loop.mixer.setTime(context.time % loop.duration);
+    for (const loop of this.loops) {
+      if (loop.flag === null) {
+        loop.mixer.setTime(context.time % loop.duration);
+      } else if (context.world.flags.includes(loop.flag)) {
+        loop.clock += context.dt;
+        loop.mixer.setTime(loop.clock % loop.duration);
+      }
+    }
   }
 
   dispose(): void {

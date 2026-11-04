@@ -2,6 +2,7 @@
  * Déplacements des personnages: clavier (direction), clic au sol (trajet A*),
  * portage de la poutre à deux (GE-02), retour forcé et rassemblements.
  */
+import { flaggedWorks } from '../etat/drapeaux';
 import type { ControlFrame } from '../etat/actions';
 import { type GameMap, buildingAt, cellIndex, inMap } from '../etat/carte';
 import { isHome } from '../etat/interieurs';
@@ -50,6 +51,10 @@ export function refreshBlockers(sim: Sim): Blockers {
     for (const x of sim.content.improvements) {
       if ((sim.world.improvements[x.id]?.builtDay ?? null) === null) continue;
       for (const cell of x.cells) markCell(map, layer, cell.cx, cell.cy, 1);
+    }
+    // 0.13: les ouvrages levés par un drapeau (le banc d'Hortense) occupent aussi leurs cases.
+    for (const id of flaggedWorks(sim.content.settings.flagEffects, sim.world.flags)) {
+      for (const cell of map.improvements?.[id]?.cells ?? []) markCell(map, layer, cell.cx, cell.cy, 1);
     }
     const gates = armedCells(sim.content, sim.world.moments.today);
     if (gates !== null) {

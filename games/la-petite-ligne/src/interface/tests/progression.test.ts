@@ -181,6 +181,8 @@ describe('invite du survol', () => {
       call: true,
       light: true,
       drink: true,
+      soup: true,
+      supper: true,
       curtains: true,
     };
     const verbs = uiContext().texts.extra.aim.verbs;

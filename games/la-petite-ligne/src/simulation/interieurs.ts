@@ -7,6 +7,7 @@
  * de son bâtiment (`blockersFor`): jamais coincé à la fermeture, jamais déplacé. La règle ne lit
  * que la carte et l'horloge du monde: l'hôte et la prédiction de l'invité voient la même porte.
  */
+import { joineryOpen } from './drapeaux';
 import { type BuildingId, type GameMap, type MapBuilding, HOUSE_BUILDING, buildingAt, cellIndex, inMap } from '../etat/carte';
 import type { Character, CharacterId, Vec2 } from '../etat/types';
 import { weekdayOf } from '../donnees/calendrier';
@@ -63,6 +64,8 @@ export function hoursOpen(town: TownSettings, hours: string | null, day: number,
 }
 
 export function buildingOpen(sim: Sim, b: MapBuilding): boolean {
+  // 0.13: la menuiserie de Basile n'ouvre que le samedi, une fois sa quête finie.
+  if (b.id === sim.content.settings.flagEffects.joinery?.building) return joineryOpen(sim);
   const { clock } = sim.world;
   return hoursOpen(sim.content.settings.town, b.hours, clock.day, clock.minutes);
 }

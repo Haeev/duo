@@ -605,6 +605,13 @@ export function soundsForEvent(
     case 'decor_together':
       if (ctx.hasSound('reunion-chime')) emit.world('reunion-chime', event.at, event.by, 0.25);
       break;
+    // 0.13 (lot H7): coups d'outil des postes de métier, joués par la table des événements du village.
+    case 'forge_strike':
+    case 'joinery_saw':
+    case 'joinery_plane':
+    case 'cat_follow':
+      villageEventSound(raw, ctx, settings, emit);
+      break;
     // 0.13 (lot H2): le paquet change de mains, puis la réaction de l'habitant chez qui offre.
     case 'gift_offered': {
       const g = settings.village.gifts;

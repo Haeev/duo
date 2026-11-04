@@ -4,7 +4,7 @@
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
 import type { VillageLife } from './gestes-0-13';
-import type { VillageLife as VillageSceneLife } from './vie';
+import type { DecorGestureDef } from './vie-gestes';
 import type {
   AppearanceSettings,
   BakerySettings,
@@ -16,8 +16,10 @@ import type {
   StorageSettings,
 } from './maison';
 import type { TownSettings } from './bourg';
+import type { FlagEffects } from './effets-drapeaux';
 import type { BondSettings, HabitDef, HabitRef, HabitSettings, SignDef, VillageCalendar } from './types-voisins';
 import type { Currency } from './monnaie';
+import type { VillageScenes } from './vie';
 import type { MarketSettings } from './marche';
 import type { MailRoundSettings } from './plis';
 
@@ -1160,6 +1162,8 @@ export interface Settings {
   memories: MemorySettings;
   /** Valeurs de ressenti que `reglages.json` ne fixe pas encore (voir `defauts.ts`). */
   feel: FeelSettings;
+  /** 0.13: effets en jeu des drapeaux posés par les quêtes (`reglages.flagEffects`). */
+  flagEffects: FlagEffects;
 }
 
 export interface BoardSettings {
@@ -1505,6 +1509,8 @@ export interface Content {
   decisions: DecisionsContent;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants avec le décor, réactions aux joueurs (`gestes-0-13.json`). */
   villageLife: VillageLife;
-  /** 0.13 (lot H7): scènes, postes de métier, chat, gestes de décor des joueurs (`vie.json`). */
-  village: VillageSceneLife;
+  /** 0.13 (lot H7): scènes entre habitants, pauses, places assises, postes de métier, chat (`vie.json`). */
+  village: VillageScenes;
+  /** 0.13 (lot H7, section 7.1): gestes des joueurs avec le décor (`gestes-joueurs.json`). */
+  playerGestures: DecorGestureDef[];
 }

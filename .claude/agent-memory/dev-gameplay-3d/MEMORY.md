@@ -510,3 +510,11 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Mémoire de la simulation hors sauvegarde sans toucher `Runtime`: `WeakMap<Runtime, ...>` dans le module (le `Sim` garde le même `runtime` d'un pas à l'autre).
 - Gros plans de la page de rendu: `vue=X+S,Y+T` avec (S, T) = (-0,9, -0,9) en orientation 0 et (+0,9, +0,9) en orientation 2; un habitant dans un intérieur ne se voit qu'avec le joueur local dans le même bâtiment (`c.inside = 'church'`).
 - Fusionner la branche de session avec des changements non commités qui touchent les mêmes fichiers: commit temporaire, `git rebase <branche>`, puis `git reset --soft HEAD~1` (puis `git reset` pour tout désindexer).
+## Vie du village de la 0.13 (lot H7, vérifié le 2026-11-04)
+
+- Scène, chaise ou poste sans champ d'état nouveau: un point virtuel dans `VillagerState.target` (`scene:<id>:<groupe>:<rang>`, `seat:<point>:<rang>`), résolu par `etat/vie.ts` (pur) chez l'hôte, chez l'invité et dans le rendu; la simulation le choisit dans `currentEntry` (`lifeEntry`), avant le planning, comme `market_spot:`. `target` et `activity` partent déjà dans l'état écrit.
+- Le chat vit dans `sim.runtime.cat` (hôte seul, ni sauvegardé ni dans le message d'état) et part par le canal rapide (`FastSnapshot.cat`, facultatif); le rendu le lit par `GameView.cat()`. Rien ne change la taille de l'état transmis.
+- L'angélus (pause de 12 h à 12 h 03) fige tous les marcheurs dehors: un test de trajet à midi pile n'avance pas. Prendre 12 h 05.
+- Commit temporaire refusé par l'outil pour fusionner la branche de session: sauvegarder `git diff` dans le scratchpad, remettre seulement les fichiers en conflit (`git checkout -- <fichier>`), `merge --ff-only`, réappliquer les quelques lignes à la main.
+- Page de rendu avec la vraie simulation des habitants: `rendu.html?vie13=1&jour=&heure=&avance=` (`demo/vie13-exemple.ts`); `x`, `y` posent le joueur 1 (les bulles ne se montrent qu'à moins de 8 m de lui). Le port 6431 est pris par une autre séance: 6587.
+- Le son de la 0.13 joue les événements du village par leur nom (`AUDIO_SETTINGS.village.events`, champs `villager`, `by`, `at`) dans le `default` de `declencheurs.ts`; un type ajouté à `WorldEvent` doit avoir son `case` qui appelle `villageEventSound`, sinon il n'est plus joué.

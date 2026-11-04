@@ -21,6 +21,8 @@ import {
   DEFAULT_TREES,
   DEFAULT_WEATHER,
 } from './defauts';
+import { checkVillageScenes, parseVillageScenes } from './vie';
+import { parseDecorGestures } from './vie-gestes';
 import { ContentError, Reader } from './lecteur';
 import { agreeMoney } from './monnaie';
 import { parseMarket } from './marche';
@@ -39,7 +41,7 @@ import {
 } from './maison';
 import { townFrom } from './bourg';
 import { parseVillageLife } from './gestes-0-13';
-import { checkVillageLife, parseVillageLife as parseVillage } from './vie';
+import { parseFlagEffects } from './effets-drapeaux';
 import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import {
@@ -147,8 +149,10 @@ export interface RawContentFiles {
   decisions?: unknown;
   /** 0.13 (lot H7, seconde moitié): gestes des habitants et réactions aux joueurs (`gestes-0-13.json`); absent: rien. */
   gestes013?: unknown;
-  /** 0.13 (lot H7): la vie du village (`vie.json`); absent: ni scène, ni poste, ni chat, ni geste de décor. */
+  /** 0.13 (lot H7): scènes, pauses, places assises, postes de métier, chat (`vie.json`); absent: rien de cela. */
   vie?: unknown;
+  /** 0.13 (lot H7): gestes des joueurs avec le décor (`gestes-joueurs.json`); absent: aucun. */
+  gestesJoueurs?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2384,6 +2388,7 @@ function parseSettings(r: Reader): Settings {
     secrets: parseSecretSettings(r.opt('secrets')),
     memories: parseMemorySettings(r.opt('memories'), parseCalendar(r)),
     feel: parseFeel(r.opt('feel')),
+    flagEffects: parseFlagEffects(r.opt('flagEffects')),
   };
 }
 
@@ -2464,6 +2469,8 @@ function checkReferences(content: Content): void {
         case 'set_world_state':
         case 'pay_order':
         case 'end_stage':
+          break;
+        case 'open_decision':
           break;
       }
     }
@@ -2841,18 +2848,19 @@ export function loadContent(files: RawContentFiles): Content {
     villageCalendar: parseVillageCalendar(files.calendrier === undefined ? null : root('calendrier.json', files.calendrier), settings, villagers),
     signs: signsOf(villagers),
     decisions: files.decisions === undefined ? NO_DECISIONS : parseDecisions(root('decisions.json', files.decisions), parseEffect),
-    village: parseVillage(files.vie === undefined ? null : root('vie.json', files.vie), (r) => conditions(r, 'game_start')),
     villageLife: parseVillageLife(
       files.gestes013,
       files.habitants013 === undefined ? [files.habitants] : [files.habitants, files.habitants013],
     ),
+    playerGestures: parseDecorGestures(files.gestesJoueurs === undefined ? null : root('gestes-joueurs.json', files.gestesJoueurs).opt('gestures'), (r) => conditions(r, 'game_start')),
+    village: parseVillageScenes(files.vie === undefined ? null : root('vie.json', files.vie), (r) => conditions(r, 'game_start')),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
   checkVillageReferences(content);
   checkDecisionVillagers(content.decisions, content.villagers);
-  checkVillageLife(content.village, content.villagers.map((v) => v.id), null);
+  checkVillageScenes(content.village, content.villagers.map((v) => v.id), null);
   checkTastes(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.

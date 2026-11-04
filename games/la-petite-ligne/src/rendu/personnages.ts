@@ -43,10 +43,12 @@ import {
   benchesWithBuilt,
   isFurnitureSeat,
   seatPlace,
+  slotsOf,
   type BenchPlace,
   type BenchSeat,
   type SeatProp,
 } from '../etat/bancs';
+import { flagSeats, flaggedWorks } from '../etat/drapeaux';
 import { safeColor } from './apparence';
 import { type DressedFigure, PlayerDresser, PlayerTexture, mergeOutfit, playerMeshNames } from './habillage';
 import { smoothFactor } from './camera';
@@ -73,6 +75,7 @@ import { IDLE_CLIP, applyBoneRest, boneRestOf, idleClipOf } from './gabarit';
 import { CLIP_FOR_ACTION } from './gestes';
 import { VillagerGestures, gestureClipAt } from '../etat/gestes-habitants';
 import type { GestureDef } from '../donnees/gestes-0-13';
+import { lifePlace, villagePause, workPostOf } from '../etat/vie';
 import {
   VillagerCarry,
   accessoryMaterial,
@@ -114,6 +117,8 @@ const LEFT_HAND_SOCKET = 'socket_hand_l';
 const SIT_CHAIR = 'sit';
 const SIT_GROUND = 'sit_ground';
 const SIT_EAT = 'sit_eat';
+/** Arrêté à moins de cela de sa place assise (scène, table du café): dessiné assis (comme `BenchSeating`). */
+const LIFE_SEAT_TOLERANCE = 0.02;
 const GIVE = 'give';
 const HIGH_FIVE = 'high_five';
 const WAVE = 'wave';
@@ -216,14 +221,22 @@ const BLINK_TARGET = 'blink';
 const TALK_EXPRESSION_WEIGHT = 0.4;
 
 /** Ce qu'un habitant fait selon son activité d'emploi du temps (et son poste, pour le travail). */
-function villagerClip(villager: DeepReadonly<VillagerState>): string {
+function villagerClip(villager: DeepReadonly<VillagerState>, content: Content, world: ReadonlyWorld): string {
   if (villager.speed > SETTINGS.walkThreshold) {
     return 'walk';
   }
   if (villager.talkingWith.length > 0) {
     return 'talk';
   }
+  // 0.13 (lot H7): l'angélus (dehors, il lève la tête), le geste du poste de métier.
+  const pause = villager.inside === null ? villagePause(content, world.clock.minutes) : null;
+  if (pause !== null) return pause.clip;
+  // Un poste placé (enclume) ne se joue qu'à sa place: qui attend à côté n'y tape pas.
+  const post = workPostOf(content, villager.target, villager.activity, villager.id);
+  if (post !== null && (post.at === null || Math.hypot(villager.pos.x - post.at.x, villager.pos.y - post.at.y) < 0.1)) return post.clip;
   switch (villager.activity) {
+    case 'chat':
+      return 'talk';
     case 'work':
       return SETTINGS.villagerWork[villager.target] ?? SETTINGS.villagerWorkDefault;
     case 'play':
@@ -845,7 +858,7 @@ export class CharactersPart implements EventfulPart {
   private addBenchPicks(benches: readonly MapProp[]): void {
     const place: BenchPlace = { x: 0, y: 0, facing: 0 };
     for (const prop of benches) {
-      for (let slot = 0; slot < this.content.settings.benches.slots.length; slot += 1) {
+      for (let slot = 0; slot < slotsOf(prop, this.content.settings.benches).length; slot += 1) {
         seatPlace(prop, slot, this.content.settings.benches, place);
         const target = this.picks.add({ kind: 'ground', x: place.x, y: place.y });
         setStandingBox(
@@ -868,7 +881,10 @@ export class CharactersPart implements EventfulPart {
   /** Bancs des chantiers bâtis (banc du gué, banc du pignon), dans l'ordre de la simulation. */
   private refreshBenches(world: ReadonlyWorld): void {
     if (this.map === null) return;
-    let signature = 0;
+    const effects = this.content.settings.flagEffects;
+    const flagged = flaggedWorks(effects, world.flags);
+    const chairs = flagSeats(effects, world.flags);
+    let signature = (Math.imul(flagged.length, 31) + chairs.length) | 0;
     for (const def of this.content.improvements) {
       const day = world.improvements[def.id]?.builtDay ?? null;
       signature = (Math.imul(signature, 31) + (day === null ? 0 : day + 1)) | 0;
@@ -879,8 +895,11 @@ export class CharactersPart implements EventfulPart {
     for (const def of this.content.improvements) {
       if ((world.improvements[def.id]?.builtDay ?? null) !== null) this.builtIds.push(def.id);
     }
+    // Le banc d'Hortense et les chaises du café: les drapeaux de quête les rendent utilisables.
+    for (const id of flagged) if (!this.builtIds.includes(id)) this.builtIds.push(id);
     const before = new Set(this.benches);
-    this.benches = benchesWithBuilt(this.map, this.builtIds);
+    const built = benchesWithBuilt(this.map, this.builtIds);
+    this.benches = chairs.length === 0 ? built : [...built, ...chairs];
     this.addBenchPicks(this.benches.filter((bench) => !before.has(bench)));
   }
 
@@ -1709,22 +1728,41 @@ export class CharactersPart implements EventfulPart {
         benchProp !== null &&
         villager.talkingWith.length === 0 &&
         this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0, villager);
-      const gesture = onBench ? null : (this.decorGestures?.gestureOf(villager, world) ?? null);
-      const clip = onBench ? SIT_CHAIR : gesture !== null ? gestureClipAt(gesture, context.time, villager.id) : villagerClip(villager);
+      // 0.13 (lot H7): assis à une place de scène ou à une table du café, arrêté dessus.
+      const life = onBench ? null : lifePlace(this.content, villager.target);
+      const lifeSeated =
+        life !== null && life.seated && villager.speed <= SETTINGS.walkThreshold && villager.talkingWith.length === 0 &&
+        Math.hypot(villager.pos.x - life.x, villager.pos.y - life.y) < LIFE_SEAT_TOLERANCE;
+      if (lifeSeated) {
+        this.benchPlace.x = life.x;
+        this.benchPlace.y = life.y;
+        this.benchPlace.facing = life.facing ?? villager.facing;
+      }
+      const seated = onBench || lifeSeated;
+      const gesture = seated ? null : (this.decorGestures?.gestureOf(villager, world) ?? null);
+      const clip = seated
+        ? SIT_CHAIR
+        : gesture !== null
+          ? gestureClipAt(gesture, context.time, villager.id)
+          : villagerClip(villager, this.content, world);
       this.villagerAttention(figure, villager, world, context.time, clip);
       if (direction?.kind === 'look' && villager.talkingWith.length === 0) {
         figure.lookAt(direction);
       }
-      const request = this.villagerAccessories(figure, villager, world, onBench, clip, gesture);
+      const request = this.villagerAccessories(figure, villager, world, seated, clip, gesture);
       const gestureFacing = gesture === null ? null : (this.decorGestures?.facingOf(gesture, villager) ?? null);
+      // 0.13 (lot H7): l'outil du poste de métier (marteau, arrosoir...) quand il en joue le geste.
+      const post = gesture === null ? workPostOf(this.content, villager.target, villager.activity, villager.id) : null;
+      const postTool = post?.tool ?? null;
+      if (postTool !== null && clip === post?.clip) figure.setTool(this.library, postTool, this.propSwap);
       figure.update(
         context,
         this.terrain,
-        onBench ? this.benchPlace : villager.prev,
-        onBench ? this.benchPlace : villager.pos,
-        onBench ? this.benchPlace.facing : (gestureFacing ?? villager.facing),
+        seated ? this.benchPlace : villager.prev,
+        seated ? this.benchPlace : villager.pos,
+        seated ? this.benchPlace.facing : (gestureFacing ?? villager.facing),
         this.posture(`habitant ${villager.id}`, clip === SIT_CHAIR, villager.speed > SETTINGS.walkThreshold, request),
-        onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : 0,
+        onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : lifeSeated ? SETTINGS.lifeSeatHeight - SETTINGS.sitClipSeatHeight : 0,
         SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
       );
       const props = this.villagerProps.get(villager.id);

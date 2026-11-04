@@ -2,6 +2,7 @@
  * Contexte de la simulation: l'état du monde, le contenu, la carte, le
  * générateur, les événements du pas et des caches qui ne se sauvegardent pas.
  */
+import type { CatState } from './chat';
 import { createRandom, type RandomSource } from '@duo/sdk/sim';
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { GameMap } from '../etat/carte';
@@ -95,6 +96,8 @@ export interface Runtime {
    * droit tenu), case et pas du début; elle aboutit après `removeHoldSeconds`, relâchée elle s'annule.
    */
   plotHold: Record<CharacterId, { cell: Cell; since: number } | null>;
+  /** 0.13 (lot H7): le chat du bourg, simulé par l'hôte (`chat.ts`), `null` hors du bourg. */
+  cat: CatState | null;
 }
 
 export interface Sim {
@@ -133,6 +136,7 @@ export function createRuntime(map: GameMap): Runtime {
     habitWatch: new Map(),
     birthdayWatch: new Map(),
     plotHold: { p1: null, p2: null },
+    cat: null,
   };
 }
 
