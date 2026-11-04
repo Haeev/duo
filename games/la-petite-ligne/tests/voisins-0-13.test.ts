@@ -32,20 +32,29 @@ const B = { id: 'membre-b', name: 'Sacha', color: '#3d85c6' };
 
 interface RawVillager {
   id: string;
-  schedule: { habit?: string }[];
+  schedule: { habit?: string; when?: unknown[]; from?: string; point?: string }[];
   habits?: unknown[];
 }
 
 /**
- * Le contenu du jeu, Firmin muni de deux habitudes d'essai (ses entrées existantes, données de la
- * démo inchangées): la cloche du quai (une rumeur de Basile) et chez lui (un écriteau).
+ * Le contenu du jeu, Firmin réduit à deux habitudes d'essai sur ses entrées de toujours (sans
+ * condition): la cloche du quai (une rumeur de Basile) et chez lui (un écriteau). Ses autres
+ * entrées restent, sans habitude: elles ne s'écrivent pas au carnet. Les cinq autres habitants de
+ * habitants.json perdent leurs habitudes, pour qu'Odette, à son comptoir, ne soit pas vue en même temps.
  */
 function firminContent(): Content {
   const files = structuredClone(CONTENT_FILES);
   const raw = files.habitants as { villagers: RawVillager[] };
+  for (const v of raw.villagers) {
+    for (const e of v.schedule) delete e.habit;
+    delete v.habits;
+  }
   const firmin = raw.villagers.find((v) => v.id === 'firmin');
   if (firmin === undefined) throw new Error('Firmin absent');
-  const [, , , home, quay, evening] = firmin.schedule;
+  const always = firmin.schedule.filter((e) => e.when === undefined);
+  const home = always.find((e) => e.point === 'firmin_house' && e.from === '06:00');
+  const quay = always.find((e) => e.point === 'quay_bell');
+  const evening = always.find((e) => e.point === 'firmin_house' && e.from === '18:00');
   if (home === undefined || quay === undefined || evening === undefined)
     throw new Error('planning de Firmin changé');
   home.habit = 'home';

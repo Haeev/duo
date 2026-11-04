@@ -7,16 +7,21 @@ Lancer (bibliothèque standard seule, graine fixe, moins de 30 s):
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --tableaux      tableaux Markdown des plannings
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --json FICHIER  plannings au format de habitants.json
   python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --croise DOC    relit les tableaux du document
-  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --croise FICHIER.json
-      relit games/la-petite-ligne/donnees/habitants-0-13.json: plannings et habitudes identiques
-      à la sortie --json, rumeurs, modèles et échelles, goûts, quotidien minimal, typographie
-  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --maj FICHIER.json
-      reporte plannings, habitudes et anniversaires du script dans ce fichier (textes gardés)
+  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --croise FICHIER.json [FICHIER.json ...]
+      relit games/la-petite-ligne/donnees/habitants.json (les six de la démo: plannings réels,
+      habitudes, annonces, rumeurs, anniversaires, goûts, appellations) et habitants-0-13.json
+      (les quinze de la 0.13: en plus modèles, échelles, quotidien minimal), typographie comprise;
+      on peut passer les deux fichiers et le document dans la même commande
+  python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --maj FICHIER.json [FICHIER.json ...]
+      reporte plannings, habitudes (annonces comprises) et anniversaires du script dans ce fichier,
+      plus goûts et appellations pour les six de habitants.json (dialogues gardés tels quels)
 
 Contrôles: chaque point cité est dans la liste des lieux; chaque habitant a une entrée
 pour chaque minute de 6 h à 24 h, chaque jour, chaque saison et chaque temps; chaque
 habitude a au moins une façon de l'apprendre par dialogue ou écriteau; aucun tiret
-cadratin ni demi-cadratin dans les textes.
+cadratin ni demi-cadratin dans les textes; chaque annonce vise une habitude connue; les
+plannings réels des six habitants de la démo donnent, minute par minute dès le jour 43, la
+même habitude, le même point et la même activité que leur modèle (controle_demo).
 """
 
 from __future__ import annotations
@@ -240,6 +245,15 @@ def H(v: Villager, hid: str, kind: str, label: str, reveals: list, entries: list
         v.entries.append(Entry(full, parse_days(days), parse_windows(windows), point, activity, cond))
 
 
+def E(v: Villager, hid: str, entries: list) -> None:
+    """Ajoute des entrées à une habitude déjà déclarée (entrées de la démo intercalées, ordre de habitants.json)."""
+    full = f"{v.id}_{hid}"
+    assert full in v.habits, full
+    for days, windows, point, activity, *rest in entries:
+        cond = rest[0] if rest else {}
+        v.entries.append(Entry(full, parse_days(days), parse_windows(windows), point, activity, cond))
+
+
 SCHOOL = {"school": True}  # lundi, mardi, jeudi, vendredi, hors été
 DRY = {"weather_not": "rain"}
 RAIN = {"weather": "rain"}
@@ -272,7 +286,7 @@ H(v, "rain", "pluie", "Sous la pluie, il garde le quai depuis la porte de la hal
   [("tous", "08:00-18:00", "station_door", "stand", {**RAIN, **LATE})])
 H(v, "lucie_bench", "apres", "Depuis le retour de Lucie, il s'assoit avec elle sur le banc du quai, de 17 h à 18 h",
   [("dit", "jeanne", "Tous les jours à 5 h du soir, ma tante va s'asseoir sur le banc du quai, à côté de Firmin. Par hasard, elle dit.")],
-  [("lu ma me je ve sa", "17:00-18:00", "quay_bench", "stand", {"flag": "lucie_back"})])
+  [("lu ma me je ve sa", "17:00-18:00", "quay_bench", "stand", {"flag": "lucie_back", **LATE})])
 H(v, "quay", "routine", "Tous les jours, à la cloche du quai, de 8 h à 18 h",
   [("dit", "firmin", "De 8 h à 6 h du soir, je suis à ma cloche. Comme Émile, et comme personne d'autre.")],
   [("tous", "08:00-18:00", "quay_bell", "stand")])
@@ -294,7 +308,7 @@ H(v, "mass", "jour", "Le dimanche, elle ferme pour la messe, de 10 h 30 à 11 h 
   [("di", "10:30-11:30", "church_nave", "stand", LATE)])
 H(v, "sunday_plis", "jour", "Le dimanche, mise en plis par Solange à la petite table, de 14 h à 16 h",
   [("dit", "solange", "Le dimanche à 2 h, je fais la mise en plis d'Odette, à sa petite table. Elle parle, je frise.")],
-  [("di", "14:00-16:00", "grocery_table", "host")])
+  [("di", "14:00-16:00", "grocery_table", "host", LATE)])
 H(v, "sunday_terrace", "jour", "Le dimanche, tricot avec Honorine sur la terrasse, de 16 h à 18 h (s'il ne pleut pas)",
   [("dit", "honorine", "Le dimanche à 4 h, Odette et moi, on tricote sur sa terrasse. Elle tricote mal, mais elle parle bien.")],
   [("di", "16:00-18:00", "grocery_terrace", "stand", {**DRY, **LATE})])
@@ -322,12 +336,16 @@ H(v, "home", "maison", "Chez elle, au-dessus de l'épicerie, avant 7 h et après
 
 # --- Basile -----------------------------------------------------------------
 v = villager("basile", "Basile Cornu", "72 ans", "menuisier retraité, scierie", ("spring", 4), "sawmill_yard", "existe")
+# Le banc d'été passe avant tout (première entrée de habitants.json): même le dimanche, il prend le frais dans sa cour.
+H(v, "summer_yard", "saison", "L'été, il prend le frais dans la cour de la scierie, de 18 h à 19 h 30",
+  [("dit", "basile", "L'été, après l'établi, je m'assois dans la cour. L'odeur du bois chaud, ça se respire.")],
+  [("tous", "18:00-19:30", "sawmill_yard", "stand", {"season": ["summer"]})])
 H(v, "lumignons", "jour", "Au Dimanche des lumignons, une lanterne pour Hortense, de 17 h à 20 h",
   [("dit", "basile", "Au Dimanche des lumignons, je pose une lanterne pour Hortense. Elle avait peur du noir, alors je reste un peu.")],
   [("di", "17:00-20:00", "grave_cornu", "stand", {"special": "lumignons"})])
 H(v, "birthday", "anniv", "Le 4 du printemps, son anniversaire: il va planter un chêne à la clairière du Vieux Chêne, de 8 h à 18 h",
   [("dit", "jeanne", "Le 4 du printemps, c'est l'anniversaire de Basile. Il va planter un chêne au bois. Il dit qu'il en a planté soixante-douze !")],
-  [("tous", "08:00-18:00", "clearing_center", "work", {"birthday": True})])
+  [("tous", "08:00-18:00", "clearing_center", "work", {"birthday": True, **LATE})])
 H(v, "train", "jour", "Le samedi, au train de 9 h 30 à 16 h 30",
   [("dit", "basile", "Le samedi, je vais au train: il y a toujours une caisse que personne ne sait porter.")],
   [("sa", "09:30-16:30", "train_stop", "wait_train", {"existing": "train_day"})])
@@ -347,9 +365,6 @@ H(v, "sunday_square", "jour", "Le dimanche, il taille des bouts de bois sous le 
 H(v, "sunday_rest", "jour", "Le dimanche, l'atelier est fermé: il reste chez lui le reste du jour",
   [("dit", "odette", "Le dimanche, Basile ferme son atelier. Ne frappe pas, il fait semblant de ne pas entendre.")],
   [("di", "06:00-24:00", "sawmill_yard", "home", LATE)])
-H(v, "summer_yard", "saison", "L'été, il prend le frais dans la cour de la scierie, de 18 h à 19 h 30",
-  [("dit", "basile", "L'été, après l'établi, je m'assois dans la cour. L'odeur du bois chaud, ça se respire.")],
-  [("tous", "18:00-19:30", "sawmill_yard", "stand", {"season": ["summer"]})])
 H(v, "workbench", "routine", "À son établi de 8 h à 18 h (le dimanche aussi pendant les deux premières semaines)",
   [("dit", "basile", "À l'établi de 8 h à 6 h du soir. Le bois n'aime pas qu'on le brusque, moi non plus.")],
   [("tous", "08:00-18:00", "basile_at_workbench", "work")])
@@ -359,12 +374,11 @@ H(v, "home", "maison", "Chez lui, au-dessus de la scierie, avant 8 h et après 1
 
 # --- Jeanne -----------------------------------------------------------------
 v = villager("jeanne", "Jeanne Ribot", "10 ans et demi", "nièce de la factrice, en séjour pour l'année", ("spring", 12), "lucie_house_door", "existe")
+# Ordre de habitants.json (entrées de la démo gardées, entrées neuves glissées entre elles): les variantes
+# de pluie et la soirée d'été s'intercalent, d'où E() qui rattache une entrée à une habitude déjà déclarée.
 H(v, "birthday", "anniv", "Le 12 du printemps, son anniversaire: un goûter sur la place, de 15 h à 17 h",
   [("dit", "leon", "Le 12 du printemps, c'est l'anniversaire de Jeanne. Elle fait un goûter sur la place à 3 h. Elle a dit que tu pouvais venir.")],
-  [("tous", "15:00-17:00", "village_square", "host", {"birthday": True})])
-H(v, "train", "jour", "Le samedi, elle regarde le train depuis le quai, de 9 h 30 à 16 h 30",
-  [("dit", "firmin", "Le samedi, Jeanne ne quitte pas le quai tant que le train est là. Elle compte les wagons, alors qu'il n'y en a que deux.")],
-  [("sa", "09:30-16:30", "train_stop", "wait_train", {"existing": "train_day"})])
+  [("tous", "15:00-17:00", "village_square", "host", {"birthday": True, **LATE})])
 H(v, "recess", "routine", "Les jours de classe, récréation dans la cour à 10 h et à 14 h 30 (20 minutes)",
   [("dit", "jeanne", "À la récré de 10 h et de 2 h et demie, on joue au loup dans la cour. Léon triche, il court trop vite.")],
   [("lu ma je ve", "10:00-10:20,14:30-14:50", "school_yard", "play", {**SCHOOL, "from_day": 43})])
@@ -374,39 +388,42 @@ H(v, "school", "routine", "Les jours de classe (lundi, mardi, jeudi, vendredi, h
   [("lu ma je ve", "08:00-16:30", "school_gate", "absent", {**SCHOOL, "from_day": 43})])
 H(v, "after_school", "routine", "Les jours de classe, sur la place de 16 h 30 à 18 h 30 (sous le toit du puits s'il pleut)",
   [("dit", "solange", "Après la classe, Jeanne file sur la place. S'il pleut, elle se met sous le toit du puits avec Léon.")],
-  [("lu ma je ve", "16:30-18:30", "well_shelter", "play", {**SCHOOL, "from_day": 43, **RAIN}),
+  [("lu ma je ve", "16:30-18:30", "well_shelter", "play", {**SCHOOL, "from_day": 43, "existing": "rain_well_roof"}),
+   ("lu ma je ve", "16:30-18:30", "quay_bench", "play", {**SCHOOL, "from_day": 43, "existing": "rain_no_roof"}),
    ("lu ma je ve", "16:30-18:30", "village_square", "play", {**SCHOOL, "from_day": 43})])
 H(v, "hopscotch", "routine", "Le soir, la marelle de 18 h 30 à 20 h (avec ses craies, s'il ne pleut pas)",
   [("dit", "jeanne", "Le soir après 6 h et demie, je fais la marelle avec mes craies, s'il ne pleut pas. Tu sais sauter à cloche-pied ?")],
   [("tous", "18:30-20:00", "hopscotch", "play", {"existing": "chalk_box", **DRY})])
 H(v, "rain", "pluie", "Sous la pluie, elle joue sous le toit du puits (ou sur le banc du quai), de 8 h à 18 h",
   [("dit", "jeanne", "Quand il pleut, je joue sous le toit du puits. Les gouttes font de la musique sur les tuiles.")],
-  [("tous", "08:00-18:00", "well_shelter", "play", {"existing": "rain_well_roof"}),
-   ("tous", "08:00-18:00", "quay_bench", "play", {"existing": "rain_no_roof"})])
+  [("tous", "08:00-18:00", "well_shelter", "play", {"existing": "rain_well_roof"})])
+H(v, "home", "maison", "Chez sa tante Lucie, en face de la mercerie, avant 8 h et après 18 h 30 (20 h avec la marelle)",
+  [("dit", "jeanne", "Je dors chez tante Lucie, la maison en face de chez Solange. Ma fenêtre donne sur les pommiers.")],
+  [("tous", "18:30-24:00", "lucie_house_door", "home")])
+H(v, "evening_square", "routine", "En fin d'après-midi, sur la place de 18 h à 18 h 30, puis Solange la ramène",
+  [("dit", "solange", "À 6 h du soir, je descends chercher Jeanne sur la place. Elle dit toujours encore cinq minutes.")],
+  [("tous", "18:00-21:00", "village_square", "play", {"season": ["summer"]})])
+H(v, "train", "jour", "Le samedi, elle regarde le train depuis le quai, de 9 h 30 à 16 h 30",
+  [("dit", "firmin", "Le samedi, Jeanne ne quitte pas le quai tant que le train est là. Elle compte les wagons, alors qu'il n'y en a que deux.")],
+  [("sa", "09:30-16:30", "train_stop", "wait_train", {"existing": "train_day"})])
+E(v, "rain", [("tous", "08:00-18:00", "quay_bench", "play", {"existing": "rain_no_roof"})])
+E(v, "home", [("tous", "06:00-08:00", "lucie_house_door", "home")])
 H(v, "hide", "apres", "Depuis « La cabane des oiseaux »: le mercredi, à la cabane de la mare de 14 h à 17 h (s'il ne pleut pas)",
   [("dit", "ines", "Le mercredi, Jeanne est à sa cabane de la mare dès 2 h. Elle compte les poules d'eau et elle me corrige quand je me trompe.")],
-  [("me", "14:00-17:00", "bird_hide", "play", {**DRY, "flag": "bird_hide_built"})])
+  [("me", "14:00-17:00", "bird_hide", "play", {**DRY, "flag": "bird_hide_built", **LATE})])
 H(v, "wednesday_birds", "routine", "Le mercredi, elle guette les oiseaux à l'orée avec Léon, de 14 h à 17 h (hors hiver, s'il ne pleut pas)",
   [("dit", "ines", "Le mercredi après-midi, Jeanne et Léon viennent à l'orée compter les oiseaux. Ils se disputent pour chaque mésange.")],
   [("me", "14:00-17:00", "forest_edge_path", "play", {**DRY, **LATE, "season": ["spring", "summer", "autumn"]})])
 H(v, "sunday_berge", "jour", "Le dimanche, promenade sur la berge avec Solange, de 10 h à 12 h",
   [("dit", "solange", "Le dimanche matin, je promène Jeanne sur la berge, de 10 h à midi. Elle ramasse tous les galets du monde.")],
-  [("di", "10:00-12:00", "riverbank", "play", {"existing": "solange_here"})])
-H(v, "summer_square", "saison", "L'été, sur la place de 18 h à 21 h",
-  [("dit", "jeanne", "L'été, je reste sur la place jusqu'à 9 h du soir ! Tante Lucie dit oui parce qu'il fait jour.")],
-  [("tous", "18:00-21:00", "village_square", "play", {"season": ["summer"]})])
+  [("di", "10:00-12:00", "riverbank", "play", {"existing": "solange_here", **LATE})])
 H(v, "morning_bench", "routine", "Le matin, sur le banc du quai de 8 h à 12 h",
   [("dit", "firmin", "Le matin, Jeanne s'installe sur mon banc du quai. Elle me pose des questions jusqu'à midi.")],
   [("tous", "08:00-12:00", "quay_bench", "play")])
 H(v, "riverbank", "routine", "L'après-midi, au bord de l'Aubrune de 12 h à 18 h",
   [("dit", "jeanne", "L'après-midi, je suis au bord de l'Aubrune. Les galets plats, c'est là qu'ils sont.")],
   [("tous", "12:00-18:00", "riverbank", "play")])
-H(v, "evening_square", "routine", "En fin d'après-midi, sur la place de 18 h à 18 h 30, puis Solange la ramène",
-  [("dit", "solange", "À 6 h du soir, je descends chercher Jeanne sur la place. Elle dit toujours encore cinq minutes.")],
-  [("tous", "18:00-18:30", "village_square", "play")])
-H(v, "home", "maison", "Chez sa tante Lucie, en face de la mercerie, avant 8 h et après 18 h 30 (20 h avec la marelle)",
-  [("dit", "jeanne", "Je dors chez tante Lucie, la maison en face de chez Solange. Ma fenêtre donne sur les pommiers.")],
-  [("tous", "06:00-08:00,18:30-24:00", "lucie_house_door", "home")])
+E(v, "evening_square", [("tous", "18:00-20:00", "village_square", "play")])
 
 # --- Achille ----------------------------------------------------------------
 v = villager("achille", "Achille Pradel", "38 ans", "boulanger", ("summer", 13), "bakery_window", "existe")
@@ -451,7 +468,7 @@ v = villager("solange", "Solange Mérigot", "52 ans", "coiffeuse, mercière et c
 H(v, "lumignons", "jour", "Au Dimanche des lumignons, un lumignon pour sa mère, de 17 h à 20 h",
   [("dit", "solange", "Au Dimanche des lumignons, je pose un lumignon pour ma mère. Elle tenait la mercerie avant moi; elle aurait détesté mes rideaux.")],
   [("di", "17:00-20:00", "grave_merigot", "stand", {"special": "lumignons"})])
-H(v, "birthday", "anniv", "Le 10 de l'automne, son anniversaire: elle ouvre la malle du théâtre au salon, de 18 h à 20 h",
+H(v, "birthday", "anniv", "Le 10 de l'automne, son anniversaire: elle ouvre la malle du théâtre au salon, de 18 h 30 à 20 h",
   [("dit", "lucie", "Le 10 de l'automne, Solange a son anniversaire. Elle ouvre la malle du théâtre le soir au salon, et elle ne veut pas qu'on le sache.")],
   [("tous", "18:30-20:00", "salon_counter", "host", {"birthday": True})])
 H(v, "train", "jour", "Le samedi, au train de 10 h à 10 h 45 pour ses colis de tissu",
@@ -1236,6 +1253,356 @@ RUMEURS: dict[tuple[str, str], list[tuple[str, str]]] = {
 }
 
 
+# Les six habitants de la démo (lot H4, suite): une rumeur pour chaque habitude qui n'en avait pas.
+RUMEURS.update({
+    ("firmin", "train"): [("ambroise", "Le samedi, Firmin plante sa casquette sur le quai dès 6 h et ne la retire qu'au départ du train, à 5 h. Il attend ce train comme on attend une excuse.")],
+    ("firmin", "summer_bench"): [("odette", "L'été, Firmin ne rentre pas à 6 h: il prend le frais sur le banc du quai jusqu'à 8 h du soir. Il appelle ça des heures supplémentaires.")],
+    ("firmin", "rain"): [("jeanne", "Quand il pleut, Firmin reste sous la porte de la halte toute la journée. Il dit que la cloche n'a pas besoin de lui pour se mouiller.")],
+    ("firmin", "quay"): [("odette", "De 8 h à 6 h du soir, Firmin est à sa cloche du quai. Le jour où il n'y est pas, je fais chercher le médecin.")],
+    ("firmin", "home"): [("basile", "Firmin rentre à 6 h du soir, dans sa maison aux tuiles rondes, derrière la voie. Avant 8 h du matin, inutile de frapper: il se rase.")],
+    ("odette", "lumignons"): [("honorine", "Au Dimanche des lumignons, Odette porte trois bougies sur la tombe des Ferrand. La troisième, c'est pour son frère. Elle croit que personne ne le sait.")],
+    ("odette", "mass"): [("martial", "Le dimanche, Odette ferme boutique pour la messe de 10 h 30. Elle s'assoit au fond, près de la porte, pour rouvrir la première.")],
+    ("odette", "summer_terrace"): [("colette", "L'été, Odette sort sur sa terrasse après la fermeture, de 8 h à 9 h du soir. Elle dit qu'elle prend le frais. Elle compte mes clients.")],
+    ("odette", "market"): [("jeanne", "Le dimanche matin, Odette passe une fois à ton étal. Elle soupèse tout, elle discute tout, et elle achète quand même.")],
+    ("odette", "counter"): [("firmin", "Odette tient son comptoir de 7 h à 8 h du soir. Si elle n'y est pas, c'est qu'elle goûte ses confitures dans l'arrière-boutique.")],
+    ("odette", "home"): [("solange", "À 8 h du soir, Odette monte chez elle, au-dessus de l'épicerie. Sa lampe reste allumée tard: elle écrit des lettres qu'elle n'envoie jamais.")],
+    ("basile", "lumignons"): [("marthe", "Au Dimanche des lumignons, Basile pose une lanterne sur la tombe d'Hortense et reste jusqu'à 8 h. Je ferme la grille derrière lui.")],
+    ("basile", "train"): [("firmin", "Le samedi, Basile descend au train à 9 h 30 et reste jusqu'à 4 h 30. Il porte les caisses des autres. Les siennes, il n'en a jamais.")],
+    ("basile", "sunday_square"): [("jeanne", "Le dimanche après-midi, Basile taille des bouts de bois sous le tilleul de la place. Si tu restes assez longtemps, il t'en donne un. Moi, j'ai un écureuil.")],
+    ("basile", "summer_yard"): [("achille", "L'été, le soir, Basile prend le frais dans la cour de la scierie jusqu'à 7 h et demie. Il respire son bois comme moi mon pain.")],
+    ("basile", "workbench"): [("odette", "Basile est à son établi de 8 h à 6 h du soir. J'entends sa scie depuis mon comptoir: c'est ma pendule à moi.")],
+    ("basile", "home"): [("mado", "Le soir, Basile reste chez lui, au-dessus de la scierie. Je lui monte une soupe, des fois. Il dit qu'il n'a pas faim, puis il la finit.")],
+    ("jeanne", "recess"): [("armand", "La récréation, c'est à 10 h et à 2 h et demie, vingt minutes. Jeanne court plus vite que Léon, mais seulement quand il la regarde.")],
+    ("jeanne", "hopscotch"): [("odette", "Le soir, après 6 h et demie, Jeanne fait la marelle sur la place avec ses craies. Les jours de pluie, elle boude à sa fenêtre.")],
+    ("jeanne", "rain"): [("firmin", "Quand il pleut, Jeanne joue sous le toit du puits. Elle compte les gouttes, et le soir elle me donne le total.")],
+    ("jeanne", "riverbank"): [("achille", "L'après-midi, de midi à 6 h, Jeanne est au bord de l'Aubrune à chercher des galets plats. Elle en a ramassé plus que je n'ai cuit de miches.")],
+    ("jeanne", "home"): [("lucie", "Jeanne dort chez moi, en face de la mercerie. À 6 h et demie, Solange me la ramène avec des tresses neuves.")],
+    ("achille", "monday_terrace"): [("colette", "Le lundi, de midi à 2 h, Achille déjeune sur la terrasse d'Odette. Chez moi, jamais. Je ne lui en veux pas, mais je compte.")],
+    ("achille", "train"): [("firmin", "Le samedi à 10 h, Achille vient prendre ses sacs de farine au train. Il les porte sur l'épaule et il dort debout entre deux.")],
+    ("achille", "window"): [("jeanne", "Le pain chaud d'Achille, c'est de 6 h à 9 h au guichet, sauf le lundi. Après, il est encore bon, mais il ne fume plus.")],
+    ("achille", "evening_fish"): [("leon", "Le soir, de 5 h et demie à 7 h, Achille pêche au gué. Il ne prend presque rien. Il dit qu'il ne cherche pas.")],
+    ("achille", "home"): [("lucie", "Achille se couche à 7 h du soir, au-dessus du fournil, et le four le réveille à 3 h. Je lui dis bonsoir à l'heure où d'autres goûtent.")],
+    ("solange", "lumignons"): [("lucie", "Au Dimanche des lumignons, Solange pose un lumignon sur la tombe de sa mère, de 5 h à 8 h du soir. Elle lui raconte les potins de la mercerie.")],
+    ("solange", "train"): [("firmin", "Le samedi à 10 h, Solange descend chercher ses colis de tissu au train. À 10 h 45, elle est déjà repartie ouvrir son salon.")],
+    ("solange", "monday_window"): [("odette", "Le lundi, le salon de Solange est fermé, mais elle coud à sa vitrine de 10 h à 4 h. Frappe à la vitre en passant, elle lève toujours la tête.")],
+    ("solange", "salon"): [("jeanne", "Le salon de Solange, c'est du mardi au samedi, le matin et l'après-midi. Entre midi et 2 h, elle monte manger, et les ciseaux font la sieste.")],
+    ("solange", "home"): [("achille", "Le midi et le soir, Solange est chez elle, sous le toit de la mercerie. Elle chante en faisant sa vaisselle. Ça m'endort mieux qu'une berceuse.")],
+})
+
+# ---------------------------------------------------------------------------
+# 3 ter. Annonces (section 7.3, `habits[].announce`)
+# ---------------------------------------------------------------------------
+# Ce qu'un habitant dit en passant quand il part vers une habitude (lien Voisinage et plus,
+# croisé à moins de 5 m dans les 10 premières minutes). Une par habitude marquante: aucune pour
+# une habitude qui commence à 6 h (il n'a pas à marcher), ni quand il ne change pas de point
+# (Achille qui passe de la sieste au guichet), ni pour le passage à l'étal (sans planning).
+ANNONCES: dict[tuple[str, str], str] = {
+    ("firmin", "lumignons"): "Je vais éclairer les miens. Ce soir, le cimetière brille plus que la gare.",
+    ("firmin", "birthday"): "Odette m'a dit de passer à 6 h. Je ne vois pas du tout pourquoi.",
+    ("firmin", "season_grave"): "Premier dimanche de la saison: je porte des fleurs à mes parents.",
+    ("firmin", "summer_bench"): "Je vais prendre le frais sur le banc. Les rails aussi en ont besoin.",
+    ("firmin", "manille"): "C'est mercredi: la manille m'attend !",
+    ("firmin", "lucie_bench"): "Cinq heures. Je vais m'asseoir un peu sur le banc. Sans raison.",
+    ("firmin", "quay"): "À ma cloche ! Le quai n'attend pas.",
+    ("firmin", "home"): "Six heures. Je rentre, la journée est pliée.",
+    ("odette", "lumignons"): "Je file chez mes parents, avec mes trois bougies.",
+    ("odette", "birthday"): "Je ferme ! C'est ma fête, et ma terrasse m'attend.",
+    ("odette", "mass"): "Je ferme pour la messe. Une heure, pas une minute de plus !",
+    ("odette", "sunday_plis"): "Solange arrive pour mes plis. Je vais enfin m'asseoir.",
+    ("odette", "sunday_terrace"): "Honorine m'attend avec ses aiguilles. Moi, j'apporte les nouvelles.",
+    ("odette", "monday_grave"): "Je porte des fleurs à mes parents. Je reviens à 2 h et demie !",
+    ("odette", "summer_terrace"): "Je sors prendre le frais. Le bourg défile, je ne veux rien rater.",
+    ("odette", "home"): "Huit heures, je tire le rideau. Bonne soirée !",
+    ("basile", "lumignons"): "Je vais poser la lanterne d'Hortense.",
+    ("basile", "birthday"): "Je monte planter mon chêne. Un par an, c'est la règle.",
+    ("basile", "train"): "Je descends au train. Il y aura une caisse pour moi.",
+    ("basile", "thursday_grave"): "Je vais voir Hortense.",
+    ("basile", "manille"): "La manille. Firmin va tricher, je vais le laisser faire.",
+    ("basile", "sunday_wood"): "Je monte voir mes arbres.",
+    ("basile", "sunday_square"): "Je vais tailler un bout de bois sous le tilleul.",
+    ("basile", "workbench"): "À l'établi. Le bois attend.",
+    ("jeanne", "birthday"): "C'est mon goûter d'anniversaire ! Viens sur la place !",
+    ("jeanne", "train"): "Le train ! Je vais compter les wagons !",
+    ("jeanne", "school"): "J'y vais, sinon le maître va encore soupirer !",
+    ("jeanne", "after_school"): "Fini, l'école ! Je file sur la place !",
+    ("jeanne", "hopscotch"): "Je vais à la marelle ! Tu viens sauter ?",
+    ("jeanne", "hide"): "Je file à ma cabane ! Après, chut, il faut se taire.",
+    ("jeanne", "wednesday_birds"): "Mercredi ! Je monte à l'orée compter les oiseaux !",
+    ("jeanne", "sunday_berge"): "Je vais à la berge avec Solange. Je veux trouver un galet troué !",
+    ("achille", "monday_pontoon"): "Lundi: je vais au ponton. Le poisson dort encore, moi aussi.",
+    ("achille", "monday_terrace"): "Je descends déjeuner chez Odette. Le seul jour où je ne cuis rien.",
+    ("achille", "train"): "Je descends chercher ma farine au train.",
+    ("achille", "basket"): "Je descends la panière. Il est 9 h, tu peux régler ta montre.",
+    ("achille", "lunch"): "Je vais manger mon quignon sur le banc.",
+    ("achille", "evening_fish"): "Je vais au gué. Les truites vont encore se moquer de moi.",
+    ("achille", "home"): "Au lit. Le four se lève avant moi.",
+    ("solange", "lumignons"): "Je vais porter un lumignon à ma mère.",
+    ("solange", "birthday"): "Je file au salon: ce soir, j'ouvre une malle. Ne le répète pas.",
+    ("solange", "train"): "Je descends chercher mes tissus au train. Le salon ouvre à 10 h 45 !",
+    ("solange", "fetch"): "Je vais chercher Jeanne sur la place. Elle va dire encore cinq minutes.",
+    ("solange", "sunday_berge"): "Je promène Jeanne sur la berge. La patience, ça s'apprend au bord de l'eau.",
+    ("solange", "sunday_plis"): "Je file chez Odette, ses plis m'attendent.",
+    ("solange", "chorale"): "Je file à la chorale !",
+    ("lucie", "birthday"): "C'est ma fête ! Pas de tournée cet après-midi: je photographie la place.",
+    ("lucie", "train"): "Les sacs postaux m'attendent au train !",
+    ("lucie", "round"): "En tournée ! Les hameaux m'attendent, et leurs chiens aussi.",
+    ("lucie", "lunch"): "Je file manger avec Achille. Il me garde le quignon.",
+    ("lucie", "photo_lookout"): "Je monte au belvédère, la lumière est bonne.",
+    ("lucie", "photo_church"): "Je vais photographier l'église. Elle ne bouge jamais, c'est reposant.",
+    ("lucie", "quay_bench"): "Je vais m'asseoir sur le banc du quai. Par hasard.",
+    ("lucie", "sunday_walk"): "Je vais aux galets avec Jeanne !",
+    ("armand", "birthday"): "Je vais jouer un peu d'harmonium à l'église. Seul, c'est mieux.",
+    ("armand", "mass"): "L'harmonium m'attend. J'ai répété toute la semaine.",
+    ("armand", "chronicle"): "Honorine m'attend pour sa chronique. J'ai pris trois crayons.",
+    ("armand", "chorale"): "La chorale ! J'espère que Solange ne comptera pas mes fausses notes.",
+    ("armand", "mairie"): "J'ouvre la mairie. Les registres ne se remplissent pas tout seuls.",
+    ("armand", "lookout"): "Je monte dessiner au belvédère. Les fleurs posent mieux que mes élèves.",
+    ("armand", "summer_river"): "Je descends peindre sur la berge.",
+    ("berthe", "birthday"): "C'est ma fête ! La meule chôme, et moi je fais des crêpes.",
+    ("berthe", "friday_flour"): "Je monte la farine au fournil. Achille va encore dire merci trois fois.",
+    ("berthe", "weighing"): "À la bascule ! Paulin va encore discuter les grammes.",
+    ("berthe", "watch_train"): "Je vais regarder partir le blé de Paulin. Ça me fend le cœur.",
+    ("berthe", "mass"): "La messe. J'ai mis ma blouse propre, la farine attendra.",
+    ("berthe", "sunday_bief"): "Je vais voir mon bief. L'eau me raconte sa semaine.",
+    ("berthe", "lunch_cafe"): "Je descends déjeuner chez Colette.",
+    ("martial", "birthday"): "C'est ma fête ! Je fais le tour du bourg à vélo, sonnette comprise.",
+    ("martial", "sunday_parvis"): "Au parvis ! Il faut accueillir mes paroissiens.",
+    ("martial", "sunday_hamlets"): "Je pédale vers les hameaux. Le bon Dieu m'attend en haut de la côte.",
+    ("martial", "open"): "J'ouvre l'église ! Même le bon Dieu aime l'air du matin.",
+    ("martial", "manille"): "La manille ! Je demanderai pardon dimanche.",
+    ("martial", "rounds"): "En tournée ! Quatre hameaux, et une côte de plus chaque année.",
+    ("martial", "wednesday_bike"): "Je vais graisser mon vélo. Il le mérite plus que moi.",
+    ("martial", "saturday_church"): "Je prépare l'église pour demain. Marthe va vérifier derrière moi.",
+    ("marthe", "lumignons"): "À la grille. Les lumignons ne se distribuent pas seuls.",
+    ("marthe", "angelus"): "L'angélus. Je ne suis jamais en retard, moi.",
+    ("marthe", "sisters_terrace"): "Je vais tricoter avec ma sœur. N'en dis rien, je n'en reviens pas moi-même.",
+    ("marthe", "dress_walk"): "La robe sort aujourd'hui. Ma sœur et moi, sur le parvis.",
+    ("marthe", "chorale"): "La chorale. Je chante juste, c'est déjà ça.",
+    ("marthe", "cemetery"): "Au cimetière. Mes morts aiment l'ordre.",
+    ("marthe", "evening_bench"): "Je vais m'asseoir sur mon banc. Personne ne me le prend.",
+    ("honorine", "lumignons"): "Je vais voir mon Octave, avec sa bougie.",
+    ("honorine", "mass"): "À la messe ! À mon âge, je soigne mes relations là-haut.",
+    ("honorine", "sunday_terrace"): "Je descends chez Odette, le tricot sous le bras.",
+    ("honorine", "friday_grave"): "Je vais raconter la semaine à Octave.",
+    ("honorine", "thursday_shop"): "Jeudi, mes courses. Odette me garde les nouvelles avec le beurre.",
+    ("honorine", "chorale"): "La chorale ! Je chante à droite, et je chante plus fort.",
+    ("honorine", "dress_walk"): "Notre robe sort aujourd'hui ! Ma sœur et moi, comme autrefois.",
+    ("ines", "birthday"): "Je passe la journée au belvédère. N'en dis rien à personne.",
+    ("ines", "sunday_nour"): "Nour monte pour le thé. Je sors les tasses.",
+    ("ines", "patrol_clearing"): "Tournée à la clairière. Le vieux chêne attend son bonjour.",
+    ("ines", "patrol_coupe"): "Je vais marquer des arbres. Les bons partent, les beaux restent.",
+    ("ines", "wednesday_kids"): "Les enfants m'attendent à l'orée. Ils vont se disputer pour une mésange.",
+    ("ines", "with_barnabe"): "Je rejoins Barnabé à la coupe. On l'entend chanter d'ici.",
+    ("ines", "shopping"): "Je descends chez Odette. Elle va encore me poser des questions.",
+    ("barnabe", "birthday"): "C'est ma fête ! Je vais chanter sur la place, à pleine voix !",
+    ("barnabe", "chorale"): "À la chorale ! Armand dit que je fais trembler les vitraux.",
+    ("barnabe", "sunday_quilles"): "Aux quilles ! Cette fois, je les couche toutes.",
+    ("barnabe", "rain"): "Il pleut: je descends aider Mado à la forge.",
+    ("barnabe", "coupe"): "À la coupe ! Un arbre, ça s'abat mieux en chantant.",
+    ("barnabe", "kiln"): "Je monte ma meule. Il faut du temps et pas de vent.",
+    ("barnabe", "delivery"): "Je descends le charbon à la forge. Mado l'attend.",
+    ("mado", "birthday"): "Forge éteinte ! Aujourd'hui, je tiens les quilles.",
+    ("mado", "monday_farm"): "Je file au Pré-Long, les faux des Delmas m'attendent.",
+    ("mado", "train"): "Mes barres de fer arrivent ! Je descends au train.",
+    ("mado", "sunday_quilles"): "Aux quilles ! Je vais montrer à Barnabé comment on vise.",
+    ("mado", "summer_siesta"): "Trop chaud pour le fer. Je monte souffler un peu.",
+    ("mado", "yard"): "Je range la cour. Un outil par clou, sinon rien.",
+    ("paulin", "weighing"): "À la bascule. Berthe lit, moi je vérifie.",
+    ("paulin", "watch_mill"): "Je vais voir moudre mon blé. De mes yeux.",
+    ("paulin", "train"): "Je charge mes sacs au train.",
+    ("paulin", "quilles"): "Aux quilles ! Mado ne va pas gagner tous les dimanches.",
+    ("paulin", "field"): "Au champ. Le blé ne pousse pas en me regardant.",
+    ("paulin", "lunch"): "À table ! Margot n'aime pas qu'on soit en retard.",
+    ("margot", "birthday"): "Mon goûter ! Viens dans la cour, il y aura du gâteau.",
+    ("margot", "laundry"): "Au lavoir avec Colette ! On lave le linge, et le reste du bourg avec.",
+    ("margot", "mill_thursday"): "Je file au moulin. Pas un mot à Paulin.",
+    ("margot", "mass"): "À la messe, avec Léon. Il va dormir, mais propre.",
+    ("margot", "sunday_quilles"): "Je vais compter les points des quilles. Il faut une personne honnête.",
+    ("margot", "chorale"): "La chorale ! Je chante faux, mais avec plaisir.",
+    ("margot", "garden"): "Au courtil, mes carottes m'attendent.",
+    ("leon", "birthday"): "C'est mon anniversaire ! Je vais sur le quai voir passer le monde !",
+    ("leon", "after_school"): "Libre ! Je fonce sur la place !",
+    ("leon", "hide"): "À la cabane ! Jeanne a dit qu'elle était à moi aussi.",
+    ("leon", "wednesday_birds"): "À l'orée ! Je vais compter plus de mésanges que Jeanne.",
+    ("leon", "train"): "Le train ! Je vais voir la locomotive !",
+    ("leon", "quilles"): "Aux quilles ! C'est moi qui les relève, le plus vite du bourg !",
+    ("leon", "summer_fishing"): "Je vais pêcher au bout de la pâture. À la main !",
+    ("ambroise", "birthday"): "Je remonte les horloges du bourg. Toutes, même celle de la halte. Hélas.",
+    ("ambroise", "clocks_together"): "Huit heures. Je vais régler la pendule avec Firmin. À la seconde.",
+    ("ambroise", "clockcheck"): "Je vais comparer ma montre à la pendule. Elle va encore avancer.",
+    ("ambroise", "manille"): "La manille. Je vérifierai que Firmin distribue à l'heure.",
+    ("ambroise", "monday_forest"): "Je vais cueillir à la lisière. Les champignons, eux, sont ponctuels.",
+    ("ambroise", "newspaper"): "Mon journal, sur le banc du quai. Maintenant que Firmin est rentré.",
+    ("nour", "birthday"): "C'est ma fête ! Pas de tournée: je vais déjeuner longtemps chez Odette.",
+    ("nour", "duo_visit"): "Je passe voir tes bêtes !",
+    ("nour", "rounds"): "En tournée ! Trois hameaux et une vache qui boite.",
+    ("nour", "lunch"): "Je déjeune chez Odette. J'ai une faim de loup.",
+    ("nour", "walk"): "Je vais marcher sur la berge. Il faut que je souffle, moi aussi.",
+    ("nour", "sunday_ines"): "Je monte boire le thé chez Inès.",
+    ("colette", "birthday"): "C'est ma fête ! Ce soir, l'accordéon sur la terrasse. Viens danser !",
+    ("colette", "tuesday_garden"): "Café fermé: je vais à mon carré de la Rive.",
+    ("colette", "tuesday_accordion"): "Je vais m'exercer à l'accordéon. Préviens les oiseaux.",
+    ("colette", "laundry"): "Au lavoir ! Margot apporte le linge, moi les nouvelles.",
+    ("colette", "manille"): "La manille, ce soir: je sors les cartes et la patience.",
+    ("colette", "sunday_terrace"): "J'ouvre la terrasse ! La messe, ça donne soif.",
+}
+
+# ---------------------------------------------------------------------------
+# 3 quater. Goûts et appellations des six habitants de la démo (fiches 2.3, lot H4)
+# ---------------------------------------------------------------------------
+# Le galet troué de Jeanne (`holed_pebble`, section 7.1) n'est pas encore dans objets.json:
+# il rejoindra ses « adore » avec l'objet.
+GOUTS_DEMO: dict[str, dict] = {
+    "firmin": {"adore": ["trout", "wool_scarf", "bread"], "aime": ["chub", "flower_pot", "plank", "roasted_hazelnuts"],
+               "deteste": [{"item": "dandelion", "reply": "Ça, c'est pour les lapins."},
+                           {"item": "wild_garlic", "reply": "De l'ail des ours ? Je dois parler aux voyageurs, moi."}]},
+    "odette": {"adore": ["coffee_mill", "elder_jelly", "blackberry_jam"], "aime": ["flower_pot", "egg", "fresh_cheese", "chanterelle"],
+               "deteste": [{"item": "gudgeon", "reply": "Un goujon ? Ça sent la vase, remporte-le."},
+                           {"item": "log", "reply": "Un rondin ? Je ne fais pas de feu dans ma boutique."}]},
+    "basile": {"adore": ["leather_apron", "vegetable_soup"], "aime": ["hazelnut", "plank", "omelette", "bread"],
+               "deteste": [{"item": "blackberry_jam", "reply": "Trop sucré pour mes dents. Garde-la."},
+                           {"item": "flower_pot", "reply": "Elles mourraient chez moi. Je n'ai pas la main."}]},
+    "jeanne": {"adore": ["chalk_box", "blackberry", "jay_feather"], "aime": ["hen_feather", "brioche", "hot_chocolate", "blackberry_jam"],
+               "deteste": [{"item": "wild_garlic", "reply": "Beurk, ça pique le nez !"},
+                           {"item": "cep", "reply": "Il a une tête de crapaud. Je n'en veux pas !"}]},
+    "achille": {"adore": ["trout", "hourglass"], "aime": ["hazelnut", "egg", "chub", "perch"],
+                "deteste": [{"item": "bread", "reply": "Du pain ? À moi ?"},
+                            {"item": "brioche", "reply": "J'en rêve la nuit. Je n'en veux pas le jour."}]},
+    "solange": {"adore": ["horn_comb", "flower_pot"], "aime": ["jay_feather", "dandelion", "elder_jelly", "curtains"],
+                "deteste": [{"item": "chub", "reply": "Les arêtes, très peu pour moi."},
+                            {"item": "log", "reply": "Un rondin ? Je coupe des cheveux, pas du bois."}]},
+}
+# Appellations de la section 7.3 (Basile dit seulement le prénom).
+APPELLATIONS_DEMO: dict[str, str | None] = {"firmin": "chef", "odette": "mon chou", "basile": None, "jeanne": "camarade",
+                                            "achille": "mon levain", "solange": "ma muse"}
+
+# ---------------------------------------------------------------------------
+# 3 quinquies. Plannings réels des six habitants de la démo (habitants.json)
+# ---------------------------------------------------------------------------
+# Leurs entrées d'avant la 0.13 restent telles quelles et dans le même ordre (des tests épinglent
+# les jours 1 à 15); chacune reçoit son `habit` (aucun pour l'arrivée, les quêtes de la démo et la
+# vie hors du bourg avant l'arrivée de Solange), et les entrées neuves du modèle s'y glissent à la
+# bonne priorité. `controle_demo()` prouve que ces plannings et le modèle (tableaux 3.2) donnent la
+# même habitude, le même point et la même activité à chaque minute, dès le jour 16.
+SCHEDULES_DEMO: dict[str, list[dict]] = {
+    "firmin": [
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "special_day", "id": "lumignons"}], "habit": "lumignons", "from": "17:00", "to": "20:00", "point": "grave_lacombe", "activity": "stand"},
+        {"when": [{"type": "birthday_of", "villager": "self"}], "habit": "birthday", "from": "18:00", "to": "21:00", "point": "grocery_terrace", "activity": "host"},
+        {"when": [{"type": "season_is", "seasons": ["summer"]}], "habit": "summer_bench", "from": "18:00", "to": "20:00", "point": "quay_bench", "activity": "stand"},
+        {"when": [{"type": "day_is", "days": [1]}], "habit": "train", "from": "06:00", "to": "18:00", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "any", "conditions": [{"type": "day_is", "days": [8, 15]}, {"type": "all", "conditions": [{"type": "day_at_least", "day": 22}, {"type": "weekday_is", "weekdays": ["saturday"]}]}]}], "habit": "train", "from": "06:00", "to": "17:00", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "season_day_is", "days": [2]}, {"type": "day_at_least", "day": 16}], "habit": "season_grave", "from": "07:00", "to": "08:00", "point": "grave_lacombe", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "weather_is", "weather": "rain"}, {"type": "day_at_least", "day": 16}], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_counter", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "day_at_least", "day": 16}], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_terrace", "activity": "stand"},
+        {"when": [{"type": "weather_is", "weather": "rain"}, {"type": "day_at_least", "day": 16}], "habit": "rain", "from": "08:00", "to": "18:00", "point": "station_door", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]}, {"type": "flag", "flag": "lucie_back"}, {"type": "day_at_least", "day": 16}], "habit": "lucie_bench", "from": "17:00", "to": "18:00", "point": "quay_bench", "activity": "stand"},
+        {"habit": "home", "from": "06:00", "to": "08:00", "point": "firmin_house", "activity": "home"},
+        {"habit": "quay", "from": "08:00", "to": "18:00", "point": "quay_bell", "activity": "stand"},
+        {"habit": "home", "from": "18:00", "to": "24:00", "point": "firmin_house", "activity": "home"},
+    ],
+    "odette": [
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "special_day", "id": "lumignons"}], "habit": "lumignons", "from": "17:00", "to": "20:00", "point": "grave_ferrand", "activity": "stand"},
+        {"when": [{"type": "birthday_of", "villager": "self"}], "habit": "birthday", "from": "18:00", "to": "21:00", "point": "grocery_terrace", "activity": "host"},
+        {"when": [{"type": "season_is", "seasons": ["summer"]}], "habit": "summer_terrace", "from": "20:00", "to": "21:00", "point": "grocery_terrace", "activity": "stand"},
+        {"when": [{"type": "step_active", "quest": "welcome_supper", "step": "supper"}, {"type": "day_at_least", "day": 5}], "from": "19:00", "to": "21:00", "point": "grocery_terrace", "activity": "host"},
+        {"when": [{"type": "any", "conditions": [{"type": "day_is", "days": [8, 15]}, {"type": "all", "conditions": [{"type": "day_at_least", "day": 22}, {"type": "weekday_is", "weekdays": ["saturday"]}]}]}], "habit": "counter", "from": "09:30", "to": "16:30", "point": "grocery_inside_counter", "activity": "serve"},
+        {"when": [{"type": "day_is", "days": [13]}], "from": "08:00", "to": "12:00", "point": "village_square", "activity": "serve"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "day_at_least", "day": 16}], "habit": "mass", "from": "10:30", "to": "11:30", "point": "church_nave", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "day_at_least", "day": 16}], "habit": "sunday_plis", "from": "14:00", "to": "16:00", "point": "grocery_table", "activity": "host"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}, {"type": "day_at_least", "day": 16}], "habit": "sunday_terrace", "from": "16:00", "to": "18:00", "point": "grocery_terrace", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "day_at_least", "day": 16}], "habit": "sunday_rest", "from": "13:00", "to": "14:00", "point": "grocery_door", "activity": "home"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "day_at_least", "day": 16}], "habit": "sunday_rest", "from": "16:00", "to": "20:00", "point": "grocery_door", "activity": "home"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday"]}, {"type": "day_at_least", "day": 16}], "habit": "monday_grave", "from": "14:00", "to": "14:30", "point": "grave_ferrand", "activity": "stand"},
+        {"habit": "home", "from": "06:00", "to": "07:00", "point": "grocery_door", "activity": "home"},
+        {"habit": "counter", "from": "07:00", "to": "20:00", "point": "grocery_inside_counter", "activity": "serve"},
+        {"habit": "home", "from": "20:00", "to": "24:00", "point": "grocery_door", "activity": "home"},
+    ],
+    "basile": [
+        {"when": [{"type": "season_is", "seasons": ["summer"]}], "habit": "summer_yard", "from": "18:00", "to": "19:30", "point": "sawmill_yard", "activity": "stand"},
+        {"when": [{"type": "day_is", "days": [1]}, {"type": "not", "condition": {"type": "built", "construction": "house_roof"}}], "from": "06:00", "to": "18:00", "point": "basile_by_beam", "activity": "stand"},
+        {"when": [{"type": "any", "conditions": [{"type": "day_is", "days": [8, 15]}, {"type": "all", "conditions": [{"type": "day_at_least", "day": 22}, {"type": "weekday_is", "weekdays": ["saturday"]}]}]}], "habit": "train", "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "quest_active", "quest": "basile_lost"}], "from": "12:00", "to": "18:00", "point": "nest_oak_basile", "activity": "work"},
+        {"when": [{"type": "quest_active", "quest": "handcar"}], "from": "08:00", "to": "18:00", "point": "handcar_shed", "activity": "work"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "special_day", "id": "lumignons"}], "habit": "lumignons", "from": "17:00", "to": "20:00", "point": "grave_cornu", "activity": "stand"},
+        {"when": [{"type": "birthday_of", "villager": "self"}, {"type": "day_at_least", "day": 16}], "habit": "birthday", "from": "08:00", "to": "18:00", "point": "clearing_center", "activity": "work"},
+        {"when": [{"type": "weekday_is", "weekdays": ["thursday"]}, {"type": "day_at_least", "day": 16}], "habit": "thursday_grave", "from": "06:30", "to": "07:30", "point": "grave_cornu", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "weather_is", "weather": "rain"}, {"type": "day_at_least", "day": 16}], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_counter", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "day_at_least", "day": 16}], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_terrace", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}, {"type": "day_at_least", "day": 16}], "habit": "sunday_wood", "from": "09:00", "to": "12:00", "point": "forest_cut", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}, {"type": "day_at_least", "day": 16}], "habit": "sunday_square", "from": "14:00", "to": "18:00", "point": "square_lime_tree", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "day_at_least", "day": 16}], "habit": "sunday_rest", "from": "06:00", "to": "24:00", "point": "sawmill_yard", "activity": "home"},
+        {"habit": "home", "from": "06:00", "to": "08:00", "point": "sawmill_yard", "activity": "home"},
+        {"habit": "workbench", "from": "08:00", "to": "18:00", "point": "basile_at_workbench", "activity": "work"},
+        {"habit": "home", "from": "18:00", "to": "24:00", "point": "sawmill_yard", "activity": "home"},
+    ],
+    "jeanne": [
+        {"when": [{"type": "birthday_of", "villager": "self"}, {"type": "day_at_least", "day": 16}], "habit": "birthday", "from": "15:00", "to": "17:00", "point": "village_square", "activity": "host"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}], "habit": "recess", "from": "10:00", "to": "10:20", "point": "school_yard", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}], "habit": "recess", "from": "14:30", "to": "14:50", "point": "school_yard", "activity": "play"},
+        {"when": [{"type": "flag", "flag": "solange_here"}, {"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "habit": "school", "from": "08:00", "to": "16:30", "point": "school_gate", "activity": "absent"},
+        {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "habit": "school", "from": "08:00", "to": "08:30", "point": "village_exit", "activity": "stand"},
+        {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "habit": "school", "from": "08:30", "to": "16:30", "point": "offstage", "activity": "absent"},
+        {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "weather_is", "weather": "rain"}, {"type": "improvement_built", "id": "well_roof"}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "well_shelter", "activity": "play"},
+        {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "weather_is", "weather": "rain"}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "quay_bench", "activity": "play"},
+        {"when": [{"type": "season_is", "seasons": ["autumn"]}, {"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "village_square", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}], "habit": "school", "from": "08:00", "to": "16:30", "point": "school_gate", "activity": "absent"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}, {"type": "weather_is", "weather": "rain"}, {"type": "improvement_built", "id": "well_roof"}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "well_shelter", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}, {"type": "weather_is", "weather": "rain"}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "quay_bench", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday", "tuesday", "thursday", "friday"]}, {"type": "school_day"}, {"type": "day_at_least", "day": 43}], "habit": "after_school", "from": "16:30", "to": "18:30", "point": "village_square", "activity": "play"},
+        {"when": [{"type": "given", "villager": "jeanne", "item": "chalk_box"}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}], "habit": "hopscotch", "from": "18:30", "to": "20:00", "point": "hopscotch", "activity": "play"},
+        {"when": [{"type": "day_at_least", "day": 16}, {"type": "weather_is", "weather": "rain"}, {"type": "improvement_built", "id": "well_roof"}], "habit": "rain", "from": "08:00", "to": "18:00", "point": "well_shelter", "activity": "play"},
+        {"when": [{"type": "not", "condition": {"type": "day_at_least", "day": 3}}], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent"},
+        {"when": [{"type": "flag", "flag": "solange_here"}], "habit": "home", "from": "18:30", "to": "24:00", "point": "lucie_house_door", "activity": "home"},
+        {"when": [{"type": "season_is", "seasons": ["summer"]}, {"type": "day_at_least", "day": 3}], "habit": "evening_square", "from": "18:00", "to": "21:00", "point": "village_square", "activity": "play"},
+        {"when": [{"type": "any", "conditions": [{"type": "day_is", "days": [8, 15]}, {"type": "all", "conditions": [{"type": "day_at_least", "day": 22}, {"type": "weekday_is", "weekdays": ["saturday"]}]}]}], "habit": "train", "from": "09:30", "to": "16:30", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "any", "conditions": [{"type": "day_is", "days": [12]}, {"type": "day_at_least", "day": 16}]}, {"type": "weather_is", "weather": "rain"}], "habit": "rain", "from": "08:00", "to": "18:00", "point": "quay_bench", "activity": "play"},
+        {"when": [{"type": "flag", "flag": "solange_here"}], "habit": "home", "from": "06:00", "to": "08:00", "point": "lucie_house_door", "activity": "home"},
+        {"from": "06:00", "to": "08:00", "point": "offstage", "activity": "home"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}, {"type": "flag", "flag": "bird_hide_built"}, {"type": "day_at_least", "day": 16}], "habit": "hide", "from": "14:00", "to": "17:00", "point": "bird_hide", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["wednesday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}, {"type": "day_at_least", "day": 16}, {"type": "season_is", "seasons": ["spring", "summer", "autumn"]}], "habit": "wednesday_birds", "from": "14:00", "to": "17:00", "point": "forest_edge_path", "activity": "play"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "flag", "flag": "solange_here"}, {"type": "day_at_least", "day": 16}], "habit": "sunday_berge", "from": "10:00", "to": "12:00", "point": "riverbank", "activity": "play"},
+        {"habit": "morning_bench", "from": "08:00", "to": "12:00", "point": "quay_bench", "activity": "play"},
+        {"habit": "riverbank", "from": "12:00", "to": "18:00", "point": "riverbank", "activity": "play"},
+        {"habit": "evening_square", "from": "18:00", "to": "20:00", "point": "village_square", "activity": "play"},
+        {"from": "20:00", "to": "24:00", "point": "offstage", "activity": "home"},
+    ],
+    "achille": [
+        {"when": [{"type": "not", "condition": {"type": "flag", "flag": "achille_here"}}], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent"},
+        {"when": [{"type": "any", "conditions": [{"type": "step_active", "quest": "achille_basket", "step": "go_bakery"}, {"type": "step_active", "quest": "achille_basket", "step": "carry"}]}, {"type": "not", "condition": {"type": "weekday_is", "weekdays": ["monday"]}}], "from": "06:00", "to": "11:00", "point": "bakery_window", "activity": "stand"},
+        {"when": [{"type": "any", "conditions": [{"type": "step_active", "quest": "achille_basket", "step": "go_bakery"}, {"type": "step_active", "quest": "achille_basket", "step": "carry"}]}, {"type": "not", "condition": {"type": "weekday_is", "weekdays": ["monday"]}}], "from": "11:00", "to": "11:30", "point": "grocery_door", "activity": "stand"},
+        {"when": [{"type": "birthday_of", "villager": "self"}], "habit": "birthday", "from": "14:00", "to": "17:00", "point": "bakery_window", "activity": "serve"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday"]}, {"type": "not", "condition": {"type": "weather_is", "weather": "rain"}}], "habit": "monday_pontoon", "from": "08:00", "to": "12:00", "point": "fishing_pontoon", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday"]}], "habit": "monday_pontoon", "from": "06:00", "to": "12:00", "point": "bakery_window", "activity": "home"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday"]}], "habit": "monday_terrace", "from": "12:00", "to": "14:00", "point": "grocery_terrace", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["saturday"]}], "habit": "train", "from": "10:00", "to": "11:00", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]}], "habit": "window", "from": "06:00", "to": "09:00", "point": "bakery_window", "activity": "serve"},
+        {"when": [{"type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]}], "habit": "basket", "from": "09:00", "to": "09:30", "point": "grocery_door", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]}], "habit": "window", "from": "09:30", "to": "12:00", "point": "bakery_window", "activity": "serve"},
+        {"habit": "lunch", "from": "12:00", "to": "13:00", "point": "upper_street_bench", "activity": "stand"},
+        {"habit": "sleep", "from": "13:00", "to": "17:30", "point": "bakery_window", "activity": "home"},
+        {"when": [{"type": "weather_is", "weather": "rain"}], "habit": "evening_fish", "from": "17:30", "to": "19:00", "point": "bakery_window", "activity": "stand"},
+        {"habit": "evening_fish", "from": "17:30", "to": "19:00", "point": "fishing_ford_north", "activity": "stand"},
+        {"habit": "home", "from": "19:00", "to": "24:00", "point": "bakery_window", "activity": "home"},
+        {"habit": "home", "from": "06:00", "to": "24:00", "point": "bakery_window", "activity": "home"},
+    ],
+    "solange": [
+        {"when": [{"type": "not", "condition": {"type": "flag", "flag": "solange_here"}}], "from": "06:00", "to": "24:00", "point": "offstage", "activity": "absent"},
+        {"when": [{"type": "weekday_is", "weekdays": ["saturday"]}], "habit": "train", "from": "10:00", "to": "10:45", "point": "train_stop", "activity": "wait_train"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}, {"type": "special_day", "id": "lumignons"}], "habit": "lumignons", "from": "17:00", "to": "20:00", "point": "grave_merigot", "activity": "stand"},
+        {"when": [{"type": "birthday_of", "villager": "self"}], "habit": "birthday", "from": "18:30", "to": "20:00", "point": "salon_counter", "activity": "host"},
+        {"habit": "fetch", "from": "18:00", "to": "18:30", "point": "village_square", "activity": "stand"},
+        {"habit": "fetch", "from": "18:30", "to": "19:00", "point": "lucie_house_door", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}], "habit": "sunday_berge", "from": "10:00", "to": "12:00", "point": "riverbank", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["sunday"]}], "habit": "sunday_plis", "from": "14:00", "to": "16:00", "point": "grocery_table", "activity": "stand"},
+        {"when": [{"type": "weekday_is", "weekdays": ["monday"]}], "habit": "monday_window", "from": "10:00", "to": "16:00", "point": "salon_window", "activity": "work"},
+        {"when": [{"type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday"]}], "habit": "salon", "from": "09:00", "to": "12:00", "point": "salon_counter", "activity": "serve"},
+        {"when": [{"type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday"]}], "habit": "salon", "from": "14:00", "to": "18:00", "point": "salon_counter", "activity": "serve"},
+        {"when": [{"type": "weekday_is", "weekdays": ["friday"]}, {"type": "day_at_least", "day": 16}], "habit": "chorale", "from": "20:00", "to": "21:30", "point": "church_nave", "activity": "stand"},
+        {"habit": "home", "from": "06:00", "to": "24:00", "point": "salon_counter", "activity": "home"},
+    ],
+}
+
+
 def rumeurs_de(v: Villager, hid: str) -> list[tuple[str, str]]:
     """Rumeurs de l'habitude `hid` (identifiant complet) de l'habitant v."""
     return RUMEURS.get((v.id, hid[len(v.id) + 1:]), [])
@@ -1337,6 +1704,100 @@ def _entry_at(v: Villager, ctx: Ctx, minute: int) -> Entry | None:
     return None
 
 
+@dataclass
+class Demo:
+    """Ce que valent, dans une évaluation, les conditions propres à la démo (quêtes, dons, chantiers)."""
+    quests_active: bool = False  # step_active, quest_active
+    given: bool = True  # la boîte de craies donnée à Jeanne
+    built: bool = True  # le toit de la maisonnette
+    town_flags: frozenset = frozenset({"solange_here", "achille_here"})  # posés à l'aube pendant la démo
+
+
+def json_cond_ok(cond: dict, ctx: Ctx, demo: Demo) -> bool:
+    """Évalue une condition au format de habitants.json (même règle que le moteur, sous les hypothèses de `demo`)."""
+    t = cond["type"]
+    if t == "all":
+        return all(json_cond_ok(c, ctx, demo) for c in cond["conditions"])
+    if t == "any":
+        return any(json_cond_ok(c, ctx, demo) for c in cond["conditions"])
+    if t == "not":
+        return not json_cond_ok(cond["condition"], ctx, demo)
+    if t == "weekday_is":
+        return WEEKDAY_ID[ctx.weekday] in cond["weekdays"]
+    if t == "weather_is":
+        return ctx.weather == cond["weather"]
+    if t == "season_is":
+        return ctx.season in cond["seasons"]
+    if t == "day_is":
+        return ctx.day in cond["days"]
+    if t == "day_at_least":
+        return ctx.day >= cond["day"]
+    if t == "flag":
+        return cond["flag"] in ctx.flags or cond["flag"] in demo.town_flags
+    if t == "given":
+        return demo.given
+    if t == "improvement_built":
+        return "no_well_roof" not in ctx.flags
+    if t == "built":
+        return demo.built
+    if t in ("step_active", "quest_active"):
+        return demo.quests_active
+    if t == "special_day":
+        return cond["id"] in ctx.special
+    if t == "season_day_is":
+        return ctx.season_day in cond["days"]
+    if t == "birthday_of":
+        return ctx.birthday
+    if t == "school_day":
+        return ctx.weekday in ("lu", "ma", "je", "ve") and ctx.season != "summer"
+    if t == "decision_made":
+        return f"{cond['decision']}:{cond['option']}" in ctx.choices
+    raise ValueError(f"condition inconnue du script: {t}")
+
+
+def json_entry_at(schedule: list, ctx: Ctx, minute: int, demo: Demo) -> dict | None:
+    for e in schedule:
+        if not hm(e["from"]) <= minute < hm(e["to"]):
+            continue
+        if all(json_cond_ok(c, ctx, demo) for c in e.get("when", [])):
+            return e
+    return None
+
+
+ALL_FLAGS = frozenset({"lucie_back", "clocks_reconciled", "mouture_settled", "valley_flour", "nour_visits", "armand_chronicle",
+                       "mill_running", "sisters_reconciled", "bird_hide_built", "barnabe_choir"})
+
+
+def controle_demo() -> list[str]:
+    """Les plannings réels des six (SCHEDULES_DEMO) et leur modèle donnent la même chose à chaque minute, dès le jour 43."""
+    errors: list[str] = []
+    for v in VILLAGERS:
+        if v.id not in SCHEDULES_DEMO:
+            continue
+        sched = SCHEDULES_DEMO[v.id]
+        habits = {short_habit(v, h) for h in v.habits}
+        for e in sched:
+            if "habit" in e and e["habit"] not in habits:
+                errors.append(f"{v.id}: entrée d'une habitude inconnue ({e['habit']})")
+        for flags, choices in ((frozenset(), frozenset()), (frozenset({"no_well_roof"}), frozenset()), (ALL_FLAGS, frozenset())):
+            for day in (50, 100):
+                for ctx in scenarios(day, flags, choices):
+                    # Un anniversaire ne tombe jamais un samedi ni un jour particulier (section 2.2).
+                    for bday in (False, True) if ctx.weekday != "sa" and not ctx.special else (False,):
+                        ctx.birthday = bday
+                        for minute in range(6 * 60, 24 * 60, 10):
+                            m = entry_at(v, ctx, minute)
+                            r = json_entry_at(sched, ctx, minute, Demo())
+                            got = None if r is None else (r.get("habit"), r["point"], r["activity"])
+                            want = None if m is None else (short_habit(v, m.habit), m.point, m.activity)
+                            if got != want:
+                                errors.append(f"{v.id}: {ctx.season} {ctx.weekday} {ctx.weather} jour {day} {fmt_h(minute)}"
+                                              f"{' anniversaire' if bday else ''}: données {got}, modèle {want}")
+                                break
+                        ctx.birthday = False
+    return errors
+
+
 def scenarios(day: int = 100, flags: frozenset = frozenset(), choices: frozenset = frozenset()):
     seen = set()
     for season in SAISONS:
@@ -1365,6 +1826,11 @@ def iter_texts():
                 yield v.id, h.id, r[2]
             for _by, text in rumeurs_de(v, h.id):
                 yield v.id, h.id, text
+            if (v.id, short_habit(v, h.id)) in ANNONCES:
+                yield v.id, h.id, ANNONCES[(v.id, short_habit(v, h.id))]
+    for vid, tastes in GOUTS_DEMO.items():
+        for d in tastes["deteste"]:
+            yield vid, f"{vid}.tastes", d["reply"]
 
 
 def controles() -> list[str]:
@@ -1420,6 +1886,15 @@ def controles() -> list[str]:
         for e in v.entries:
             if id(e) not in used:
                 errors.append(f"{v.id}: entrée jamais atteinte ({e.habit}, {e.point})")
+    # Annonces: une habitude connue, jamais le passage à l'étal (il n'y a pas de trajet à annoncer).
+    for (vid, hid), _text in ANNONCES.items():
+        v = next((x for x in VILLAGERS if x.id == vid), None)
+        h = None if v is None else v.habits.get(f"{vid}_{hid}")
+        if h is None:
+            errors.append(f"annonce pour une habitude inconnue: {vid}.{hid}")
+        elif h.kind == "marche":
+            errors.append(f"annonce pour un passage au marché: {vid}.{hid}")
+    errors += controle_demo()
     return errors
 
 
@@ -1534,8 +2009,19 @@ def to_json_conditions(cond: dict) -> list:
         elif k == "birthday":
             out.append({"type": "birthday_of", "villager": "self"})
         elif k == "existing":
-            out.append({"type": "existing", "keep": val})
+            out += EXISTING_JSON[val]
     return out
+
+
+# Conditions déjà écrites dans habitants.json, telles que les entrées neuves des six habitants de la
+# démo les reprennent. `rain_no_roof` suit toujours l'entrée `rain_well_roof` de la même habitude.
+EXISTING_JSON = {
+    "train_day": [{"type": "any", "conditions": [{"type": "day_is", "days": [8, 15]}, {"type": "all", "conditions": [{"type": "day_at_least", "day": 22}, {"type": "weekday_is", "weekdays": ["saturday"]}]}]}],
+    "rain_well_roof": [{"type": "weather_is", "weather": "rain"}, {"type": "improvement_built", "id": "well_roof"}],
+    "rain_no_roof": [{"type": "weather_is", "weather": "rain"}],
+    "chalk_box": [{"type": "given", "villager": "jeanne", "item": "chalk_box"}],
+    "solange_here": [{"type": "flag", "flag": "solange_here"}],
+}
 
 
 # Sortes d'habitudes dans les données (donnees/README.md, section 2.12); le document garde les noms français.
@@ -1557,10 +2043,17 @@ def export_data() -> dict:
                 if when:
                     item = {"when": when, **item}
                 sched.append(item)
-        habits = [{"id": short_habit(v, h.id), "kind": KIND_JSON[h.kind], "label": h.label,
-                   "reveals": [{"by": r[1], "text": r[2]} if r[0] == "dit" else {"sign": r[1], "text": r[2]} for r in h.reveals]
-                   + [{"by": by, "text": text} for by, text in rumeurs_de(v, h.id)]}
-                  for h in v.habits.values()]
+        if v.id in SCHEDULES_DEMO:
+            sched = [dict(e) for e in SCHEDULES_DEMO[v.id]]
+        habits = []
+        for h in v.habits.values():
+            hid = short_habit(v, h.id)
+            item = {"id": hid, "kind": KIND_JSON[h.kind], "label": h.label,
+                    "reveals": [{"by": r[1], "text": r[2]} if r[0] == "dit" else {"sign": r[1], "text": r[2]} for r in h.reveals]
+                    + [{"by": by, "text": text} for by, text in rumeurs_de(v, h.id)]}
+            if (v.id, hid) in ANNONCES:
+                item["announce"] = ANNONCES[(v.id, hid)]
+            habits.append(item)
         data.append({"id": v.id, "birthday": {"season": v.birthday[0], "day": v.birthday[1]}, "schedule": sched, "habits": habits})
     return {"villagers": data}
 
@@ -1931,8 +2424,30 @@ GENRE_RE = re.compile(
 )
 
 
+def check_text(where: str, text: str, errors: list[str]) -> None:
+    """Typographie et tournures des textes d'habitants (mêmes règles que le validateur du jeu)."""
+    for d in DASHES:
+        if d in text:
+            errors.append(f"{where}: tiret interdit")
+    found = GENRE_RE.search(text)
+    if found:
+        errors.append(f"{where}: tournure à relire « {found.group(0)} »")
+    if " :" in text or " ;" in text:
+        errors.append(f"{where}: espace avant un deux-points ou un point-virgule")
+    if re.search(r"\{[a-zA-Z]+\}", text):
+        errors.append(f"{where}: espace réservé dans un texte d'habitant")
+    if re.search(r"\bmois\b", text):
+        errors.append(f"{where}: « mois » (le bourg compte en saisons)")
+    if re.search(r"[0-9](?: | )sous?\b", text):
+        errors.append(f"{where}: ancienne monnaie")
+
+
 def croise_json(path: str) -> list[str]:
-    """Relit un fichier de données des habitants (habitants-0-13.json) et le compare au script."""
+    """Relit un fichier de données des habitants (habitants.json ou habitants-0-13.json) contre le script.
+
+    Les six habitants de la démo vivent dans habitants.json: plannings réels (SCHEDULES_DEMO),
+    habitudes, annonces, anniversaires, goûts et appellations. Les quinze de la 0.13 vivent dans
+    habitants-0-13.json, avec en plus modèles, échelles et quotidien minimal."""
     errors: list[str] = []
     data = json.load(open(path, encoding="utf-8"))
     donnees = os.path.dirname(os.path.abspath(path))
@@ -1940,9 +2455,15 @@ def croise_json(path: str) -> list[str]:
     exported = {v["id"]: v for v in export_data()["villagers"]}
     items = {i["id"] for i in json.load(open(os.path.join(donnees, "objets.json"), encoding="utf-8"))["items"]}
     models = set(json.load(open(os.path.join(jeu, "assets", "modeles", "index.json"), encoding="utf-8")))
-    old = json.load(open(os.path.join(donnees, "habitants.json"), encoding="utf-8"))["villagers"]
+    old_path = os.path.join(donnees, "habitants.json")
+    new_path = os.path.join(donnees, "habitants-0-13.json")
+    is_old = os.path.abspath(path) == os.path.abspath(old_path)
+    old = json.load(open(old_path, encoding="utf-8"))["villagers"]
+    others = [] if not os.path.exists(new_path) or not is_old else json.load(open(new_path, encoding="utf-8"))["villagers"]
     old_ids = {v["id"] for v in old}
-    seen_dialogues = {d["id"] for v in old for d in v["dialogues"]}
+    # Dialogues déjà écrits ailleurs (l'autre fichier): pour les doublons d'identifiants et de textes.
+    seen_dialogues = {d["id"] for v in (others if is_old else old) for d in v["dialogues"]}
+    first_lines = {(v["id"], d["lines"][0].get("text")) for v in old + others + data["villagers"] for d in v["dialogues"] if d["lines"]}
     all_ids = {v.id for v in VILLAGERS}
     texts: list[tuple[str, str]] = []
     for v in data["villagers"]:
@@ -1950,20 +2471,31 @@ def croise_json(path: str) -> list[str]:
         if vid not in exported:
             errors.append(f"{vid}: habitant absent du script")
             continue
-        if vid in old_ids:
+        demo = vid in SCHEDULES_DEMO
+        if demo and not is_old:
+            errors.append(f"{vid}: habitant de la démo, à garder dans habitants.json (tests des jours 1 à 15)")
+        if not demo and is_old:
+            errors.append(f"{vid}: habitant de la 0.13, attendu dans habitants-0-13.json")
+        if not demo and not is_old and vid in old_ids:
             errors.append(f"{vid}: déjà dans habitants.json")
         ref = exported[vid]
         if v["schedule"] != ref["schedule"]:
             errors.append(f"{vid}: planning différent de la sortie --json")
-        if v["habits"] != ref["habits"]:
+        if v.get("habits") != ref["habits"]:
             errors.append(f"{vid}: habitudes différentes de la sortie --json")
-        if v["birthday"] != ref["birthday"]:
+        if v.get("birthday") != ref["birthday"]:
             errors.append(f"{vid}: anniversaire différent du script")
-        if v["model"] != f"villager_{vid}" or v["model"] not in models:
-            errors.append(f"{vid}: modèle {v['model']} absent de assets/modeles/index.json")
-        if abs(v["scale"] - ECHELLES.get(vid, 1.0)) > 1e-9:
-            errors.append(f"{vid}: échelle {v['scale']} au lieu de {ECHELLES.get(vid, 1.0)}")
-        tastes = v["tastes"]
+        if demo:
+            if v.get("tastes") != GOUTS_DEMO[vid]:
+                errors.append(f"{vid}: goûts différents de GOUTS_DEMO")
+            if v.get("endearment") != APPELLATIONS_DEMO[vid]:
+                errors.append(f"{vid}: appellation différente de APPELLATIONS_DEMO")
+        else:
+            if v["model"] != f"villager_{vid}" or v["model"] not in models:
+                errors.append(f"{vid}: modèle {v['model']} absent de assets/modeles/index.json")
+            if abs(v["scale"] - ECHELLES.get(vid, 1.0)) > 1e-9:
+                errors.append(f"{vid}: échelle {v['scale']} au lieu de {ECHELLES.get(vid, 1.0)}")
+        tastes = v.get("tastes", {"adore": [], "aime": [], "deteste": []})
         listed = tastes["adore"] + tastes["aime"] + [d["item"] for d in tastes["deteste"]]
         for item in listed:
             if item not in items:
@@ -1971,12 +2503,18 @@ def croise_json(path: str) -> list[str]:
         if len(listed) != len(set(listed)):
             errors.append(f"{vid}: un objet dans deux listes de goûts")
         texts += [(f"{vid}.tastes", d["reply"]) for d in tastes["deteste"]]
-        for h in v["habits"]:
+        for h in v.get("habits", []):
             texts.append((f"{vid}.{h['id']}", h["label"]))
+            if "announce" in h:
+                texts.append((f"{vid}.{h['id']}.announce", h["announce"]))
             for r in h["reveals"]:
                 texts.append((f"{vid}.{h['id']}", r["text"]))
+                if "by" in r and (r["by"], r["text"]) in first_lines:
+                    errors.append(f"{vid}.{h['id']}: la rumeur de {r['by']} redit une de ses répliques existantes")
             if not any(r.get("by") not in (None, vid) for r in h["reveals"]):
                 errors.append(f"{vid}.{h['id']}: aucune rumeur (réplique d'un autre habitant) pour le rattrapage")
+        if demo:
+            continue  # leurs dialogues sont ceux de la démo, relus par valider_donnees.py
         counts = {k: 0 for k in QUOTIDIEN}
         for d in v["dialogues"]:
             if d["id"] in seen_dialogues:
@@ -1998,24 +2536,15 @@ def croise_json(path: str) -> list[str]:
         for k, n in QUOTIDIEN.items():
             if counts.get(k, 0) < n:
                 errors.append(f"{vid}: {counts.get(k, 0)} répliques « {k} » au lieu de {n}")
+    if is_old:
+        missing = sorted(set(SCHEDULES_DEMO) - {v["id"] for v in data["villagers"]})
+        if missing:
+            errors.append(f"habitants de la démo absents: {', '.join(missing)}")
     seen_texts: dict[str, str] = {}
     for where, text in texts:
-        for d in DASHES:
-            if d in text:
-                errors.append(f"{where}: tiret interdit")
-        found = GENRE_RE.search(text)
-        if found:
-            errors.append(f"{where}: tournure à relire « {found.group(0)} »")
-        if " :" in text or " ;" in text:
-            errors.append(f"{where}: espace avant un deux-points ou un point-virgule")
-        if re.search(r"\{[a-zA-Z]+\}", text):
-            errors.append(f"{where}: espace réservé dans un texte d'habitant")
-        if re.search(r"\bmois\b", text):
-            errors.append(f"{where}: « mois » (le bourg compte en saisons)")
-        if re.search(r"[0-9](?: | )sous?\b", text):
-            errors.append(f"{where}: ancienne monnaie")
+        check_text(where, text, errors)
         if "." in where:
-            continue  # libellés, révélations et goûts: une même phrase peut servir plusieurs habitudes
+            continue  # libellés, révélations, annonces et goûts: une même phrase peut servir plusieurs habitudes
         if text in seen_texts:
             errors.append(f"{where}: même texte que {seen_texts[text]}")
         seen_texts.setdefault(text, where)
@@ -2024,6 +2553,15 @@ def croise_json(path: str) -> list[str]:
         if text in reveal_texts:
             errors.append(f"{where}: réplique du quotidien identique à une révélation")
     return errors
+
+
+def json_inline(x) -> str:
+    """Un objet JSON sur une ligne, à la façon de habitants.json: `{ "a": 1 }`, `[1, 2]`."""
+    if isinstance(x, dict):
+        return "{ " + ", ".join(f"{json.dumps(k, ensure_ascii=False)}: {json_inline(v)}" for k, v in x.items()) + " }" if x else "{}"
+    if isinstance(x, list):
+        return "[" + ", ".join(json_inline(v) for v in x) + "]"
+    return json.dumps(x, ensure_ascii=False)
 
 
 def dump_villagers(data: dict) -> str:
@@ -2048,8 +2586,74 @@ def dump_villagers(data: dict) -> str:
     return "\n".join(parts) + "\n"
 
 
+def maj_demo(path: str) -> None:
+    """Reporte dans habitants.json, pour les six de la démo, les champs tenus par le script (plannings,
+    habitudes, anniversaires, goûts, appellations) sans toucher à la mise en forme de leurs dialogues:
+    chaque champ est réécrit à sa place, une entrée de planning ou une habitude par ligne."""
+    text = open(path, encoding="utf-8").read()
+    lines = text.split("\n")
+    exported = {v["id"]: v for v in export_data()["villagers"]}
+    out: list[str] = []
+    i = 0
+    current = None
+    pending: dict[str, object] = {}
+    ind = "      "
+
+    def emit_fields(keys: list[str]) -> None:
+        for k in keys:
+            if k not in pending:
+                continue
+            val = pending.pop(k)
+            if k in ("schedule", "habits"):
+                out.append(f'{ind}"{k}": [')
+                out.extend(f"{ind}  {json_inline(e)}" + ("," if n < len(val) - 1 else "") for n, e in enumerate(val))
+                out.append(f"{ind}],")
+            elif val is not None or k != "endearment":
+                out.append(f'{ind}"{k}": {json_inline(val)},')
+
+    while i < len(lines):
+        ln = lines[i]
+        m = re.match(r'^      "id": "([a-z_]+)",$', ln)
+        if m and m.group(1) in SCHEDULES_DEMO:
+            current = m.group(1)
+            ref = exported[current]
+            pending = {"birthday": ref["birthday"], "endearment": APPELLATIONS_DEMO[current], "tastes": GOUTS_DEMO[current],
+                       "schedule": ref["schedule"], "habits": ref["habits"]}
+            out.append(ln)
+            i += 1
+            continue
+        if current is not None:
+            km = re.match(r'^      "([A-Za-z]+)": ', ln)
+            key = km.group(1) if km else None
+            if key in ("birthday", "endearment", "tastes", "schedule", "habits"):
+                # Saute l'ancienne valeur (une ligne, ou un tableau jusqu'à sa ligne fermante).
+                if ln.rstrip().endswith("["):
+                    while not re.match(r"^      \],?$", lines[i]):
+                        i += 1
+                i += 1
+                if key == "birthday":
+                    emit_fields(["birthday"])
+                continue
+            if key == "homeLabel":
+                out.append(ln)
+                emit_fields(["endearment", "tastes"])
+                i += 1
+                continue
+            if key == "dialogues":
+                emit_fields(["birthday", "endearment", "tastes", "schedule", "habits"])
+                current = None
+        out.append(ln)
+        i += 1
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(out))
+    json.load(open(path, encoding="utf-8"))  # le fichier reste du JSON valide
+
+
 def maj_json(path: str) -> None:
     """Reporte plannings, habitudes et anniversaires du script dans un fichier existant, textes inchangés."""
+    if os.path.basename(path) == "habitants.json":
+        maj_demo(path)
+        return
     data = json.load(open(path, encoding="utf-8"))
     exported = {v["id"]: v for v in export_data()["villagers"]}
     for v in data["villagers"]:
@@ -2063,7 +2667,8 @@ def maj_json(path: str) -> None:
 def main() -> None:
     args = sys.argv[1:]
     if "--maj" in args:
-        maj_json(args[args.index("--maj") + 1])
+        for cible in [a for a in args[args.index("--maj") + 1:] if a.endswith(".json")]:
+            maj_json(cible)
         return
     if "--tableaux" in args:
         print(tableaux())
@@ -2072,13 +2677,15 @@ def main() -> None:
         export_json(args[args.index("--json") + 1])
         return
     if "--croise" in args:
-        cible = args[args.index("--croise") + 1]
-        if cible.endswith(".json"):
-            errs = croise_json(cible)
-            print("\n".join(errs) if errs else "Données des habitants conformes au script (plannings, habitudes, rumeurs, goûts, quotidien, typographie).")
-            sys.exit(1 if errs else 0)
-        errs = croise(cible)
-        print("\n".join(errs) if errs else "Tableaux du document identiques aux données du script.")
+        cibles = [a for a in args[args.index("--croise") + 1:] if not a.startswith("--")]
+        errs = []
+        for cible in cibles:
+            if cible.endswith(".json"):
+                errs += [f"{os.path.basename(cible)}: {e}" for e in croise_json(cible)]
+            else:
+                errs += croise(cible)
+        print("\n".join(errs) if errs else "Conforme au script: " + ", ".join(os.path.basename(c) for c in cibles)
+              + " (plannings, habitudes, annonces, rumeurs, goûts, quotidien, typographie; tableaux du document).")
         sys.exit(1 if errs else 0)
     errs = controles()
     print("Contrôles:", "aucune erreur" if not errs else "")

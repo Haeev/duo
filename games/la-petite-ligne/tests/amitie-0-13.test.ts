@@ -563,7 +563,7 @@ describe('réseau: même amitié chez les deux machines', () => {
       placeVillagers(sim);
       const guestId = guest.view.localCharacter();
       const me = character(sim, guestId);
-      // Firmin, à sa cloche de 8 h à 18 h; ses goûts ne sont pas encore écrits (lot H4): tout lui est égal.
+      // Firmin, à sa cloche de 8 h à 18 h; le radis et la brioche lui sont égaux (ni adorés, ni aimés, ni détestés).
       addToBag(sim, me, 'radish', 'ordinary', 1);
       addToBag(sim, me, 'brioche', 'ordinary', 1);
       for (let i = 0; i < 3; i++) await tick();

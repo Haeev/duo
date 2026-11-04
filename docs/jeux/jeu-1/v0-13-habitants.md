@@ -5,7 +5,7 @@
 | Jeu | `jeu-1`, La Petite Ligne |
 | Version visée | 0.13.0 (après la 0.12), puis 0.13.1 pour les étapes d'amitié avancées |
 | Statut | proposition à valider par le client (deux questions, section 11) |
-| Version du document | 1 |
+| Version du document | 2 |
 | Date | 2026-11-03 |
 | Rédaction | game-designer, sur brief du manager (demande du client: une vingtaine d'habitants avec leur histoire, des suites de quêtes qui se croisent, des plannings découverts dans le carnet; ajout du client: la vie du village) |
 | Carte | `v0-13-carte.md` (level designer, en parallèle): ses identifiants de lieux sont la référence (sections 7.3 et 8); ce document y range les habitants et demande quelques points de plus (section 1.3) |
@@ -22,7 +22,7 @@
 | # | Ce qui arrive | Section |
 |---|---|---|
 | 1 | 21 habitants: les 6 de la démo, Lucie qui revient, 14 nouveaux, tous logés dans les 13 logis neufs et les maisons existantes | 1, 2 |
-| 2 | Un planning par habitant: semaine type, variantes de pluie, de saison, jours particuliers (messe, marché, manille, chorale, quilles, lessive, moisson, Dimanche des lumignons, anniversaires): 255 habitudes | 3 |
+| 2 | Un planning par habitant: semaine type, variantes de pluie, de saison, jours particuliers (messe, marché, manille, chorale, quilles, lessive, moisson, Dimanche des lumignons, anniversaires): 254 habitudes | 3 |
 | 3 | La page « Voisins » du carnet: chaque habitude se révèle quand l'un des deux la voit, l'entend en dialogue ou la lit sur un écriteau; une habitude inconnue montre son créneau en pointillé; le carnet dit « où est-il sans doute maintenant » | 4 |
 | 4 | Une suite de 3 ou 4 quêtes par habitant (78 quêtes), 10 croisements, 4 décisions à deux qui changent les plannings de deux habitants | 5 |
 | 5 | L'amitié visible: cinq lanternes, des gains pour parler, offrir, aider, fêter; jamais de perte | 6 |
@@ -449,7 +449,7 @@ Chaque fiche: caractère, histoire en cinq étapes (HA-02, étapes 3 et 5 en sc�
 
 **Format.** Celui de `habitants.json` (`schedule[]`: `{ when?, from, to, point, activity }`, la première entrée vraie l'emporte), avec un champ nouveau `habit`: l'identifiant de l'habitude à laquelle l'entrée appartient (une habitude peut avoir plusieurs entrées: la manille sur la terrasse, ou au comptoir s'il pleut). Les habitudes elles-mêmes (`habits[]`: `id`, `kind`, `label` du carnet, `reveals[]`) sont un tableau nouveau de chaque habitant. `python3 -I docs/jeux/jeu-1/simulations/v0_13_habitants.py --json FICHIER` écrit les deux au bon format; le lot données (H4) les reporte dans `habitants.json`.
 
-**Les six habitants de la démo.** Leurs entrées existantes restent telles quelles, dans le même ordre (des tests épinglent leurs positions des jours 1 à 15); on leur ajoute le champ `habit` et des entrées neuves, toutes avec `day_at_least 16` quand elles changeraient une journée de la démo. Dans les tableaux, « existant: … » renvoie à une condition déjà écrite dans `habitants.json`.
+**Les six habitants de la démo.** Leurs entrées existantes restent telles quelles, dans le même ordre (des tests épinglent leurs positions des jours 1 à 15); on leur ajoute le champ `habit` et des entrées neuves, toutes avec `day_at_least 16` quand elles changeraient une journée de la démo. Dans les tableaux, « existant: … » renvoie à une condition déjà écrite dans `habitants.json`. Les entrées neuves se glissent entre les anciennes à la priorité voulue (les quêtes de la démo gardent la main), et chaque entrée ancienne reçoit son `habit`, sauf l'arrivée, les quêtes de la démo et la vie hors du bourg avant l'arrivée de Solange. Tombent dans la démo, donc commencent au jour 16: les anniversaires de Basile (4 du printemps) et de Jeanne (12 du printemps), le banc de Firmin avec Lucie, la mise en plis du dimanche chez Odette, la cabane de Jeanne. Le tableau de chacun suit l'ordre réel de `habitants.json`; le script le prouve minute par minute (`controle_demo`, dès le jour 43) et le contrôle des jours 1 à 15 compare les points et les activités d'avant et d'après: aucun écart. La soirée d'été de Jeanne sur la place, déjà écrite, cède à 18 h 30 devant le retour chez Lucie avec Solange: elle se range dans « en fin d'après-midi, sur la place » (14 habitudes pour Jeanne au lieu de 15).
 
 **Conditions nouvelles** (moteur, lot H1):
 
@@ -500,7 +500,7 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 | 6 | `manille` | me | 20 h à 22 h | `cafe_counter` | stand | pluie; dès le jour 16 |
 | 7 | `manille` | me | 20 h à 22 h | `cafe_terrace` | stand | dès le jour 16 |
 | 8 | `rain` | tous | 8 h à 18 h | `station_door` | stand | pluie; dès le jour 16 |
-| 9 | `lucie_bench` | lu ma me je ve sa | 17 h à 18 h | `quay_bench` | stand | `lucie_back` |
+| 9 | `lucie_bench` | lu ma me je ve sa | 17 h à 18 h | `quay_bench` | stand | `lucie_back`; dès le jour 16 |
 | 10 | `quay` | tous | 8 h à 18 h | `quay_bell` | stand |  |
 | 11 | `home` | tous | 6 h à 8 h, 18 h à 24 h | `firmin_house` | home |  |
 
@@ -524,7 +524,7 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 | 1 | `lumignons` | di | 17 h à 20 h | `grave_ferrand` | stand | jour: `lumignons` |
 | 2 | `birthday` | tous | 18 h à 21 h | `grocery_terrace` | host | anniversaire |
 | 3 | `mass` | di | 10 h 30 à 11 h 30 | `church_nave` | stand | dès le jour 16 |
-| 4 | `sunday_plis` | di | 14 h à 16 h | `grocery_table` | host |  |
+| 4 | `sunday_plis` | di | 14 h à 16 h | `grocery_table` | host | dès le jour 16 |
 | 5 | `sunday_terrace` | di | 16 h à 18 h | `grocery_terrace` | stand | sans pluie; dès le jour 16 |
 | 6 | `sunday_rest` | di | 13 h à 14 h, 16 h à 20 h | `grocery_door` | home | dès le jour 16 |
 | 7 | `monday_grave` | lu | 14 h à 14 h 30 | `grave_ferrand` | stand | dès le jour 16 |
@@ -550,21 +550,22 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 
 | # | Habitude | Jours | Heures | Point | Activité | Conditions |
 |---|---|---|---|---|---|---|
-| 1 | `lumignons` | di | 17 h à 20 h | `grave_cornu` | stand | jour: `lumignons` |
-| 2 | `birthday` | tous | 8 h à 18 h | `clearing_center` | work | anniversaire |
-| 3 | `train` | sa | 9 h 30 à 16 h 30 | `train_stop` | wait_train | existant: train_day |
-| 4 | `thursday_grave` | je | 6 h 30 à 7 h 30 | `grave_cornu` | stand | dès le jour 16 |
-| 5 | `manille` | me | 20 h à 22 h | `cafe_counter` | stand | pluie; dès le jour 16 |
-| 6 | `manille` | me | 20 h à 22 h | `cafe_terrace` | stand | dès le jour 16 |
-| 7 | `sunday_wood` | di | 9 h à 12 h | `forest_cut` | stand | sans pluie; dès le jour 16 |
-| 8 | `sunday_square` | di | 14 h à 18 h | `square_lime_tree` | stand | sans pluie; dès le jour 16 |
-| 9 | `sunday_rest` | di | 6 h à 24 h | `sawmill_yard` | home | dès le jour 16 |
-| 10 | `summer_yard` | tous | 18 h à 19 h 30 | `sawmill_yard` | stand | été |
+| 1 | `summer_yard` | tous | 18 h à 19 h 30 | `sawmill_yard` | stand | été |
+| 2 | `lumignons` | di | 17 h à 20 h | `grave_cornu` | stand | jour: `lumignons` |
+| 3 | `birthday` | tous | 8 h à 18 h | `clearing_center` | work | anniversaire; dès le jour 16 |
+| 4 | `train` | sa | 9 h 30 à 16 h 30 | `train_stop` | wait_train | existant: train_day |
+| 5 | `thursday_grave` | je | 6 h 30 à 7 h 30 | `grave_cornu` | stand | dès le jour 16 |
+| 6 | `manille` | me | 20 h à 22 h | `cafe_counter` | stand | pluie; dès le jour 16 |
+| 7 | `manille` | me | 20 h à 22 h | `cafe_terrace` | stand | dès le jour 16 |
+| 8 | `sunday_wood` | di | 9 h à 12 h | `forest_cut` | stand | sans pluie; dès le jour 16 |
+| 9 | `sunday_square` | di | 14 h à 18 h | `square_lime_tree` | stand | sans pluie; dès le jour 16 |
+| 10 | `sunday_rest` | di | 6 h à 24 h | `sawmill_yard` | home | dès le jour 16 |
 | 11 | `workbench` | tous | 8 h à 18 h | `basile_at_workbench` | work |  |
 | 12 | `home` | tous | 6 h à 8 h, 18 h à 24 h | `sawmill_yard` | home |  |
 
 | Habitude | Sorte | Au carnet | Comment l'apprendre (en plus de la voir) |
 |---|---|---|---|
+| `summer_yard` | saison | L'été, il prend le frais dans la cour de la scierie, de 18 h à 19 h 30 | Basile: « L'été, après l'établi, je m'assois dans la cour. L'odeur du bois chaud, ça se respire. » |
 | `lumignons` | jour | Au Dimanche des lumignons, une lanterne pour Hortense, de 17 h à 20 h | Basile: « Au Dimanche des lumignons, je pose une lanterne pour Hortense. Elle avait peur du noir, alors je reste un peu. » |
 | `birthday` | anniv | Le 4 du printemps, son anniversaire: il va planter un chêne à la clairière du Vieux Chêne, de 8 h à 18 h | Jeanne: « Le 4 du printemps, c'est l'anniversaire de Basile. Il va planter un chêne au bois. Il dit qu'il en a planté soixante-douze ! » |
 | `train` | jour | Le samedi, au train de 9 h 30 à 16 h 30 | Basile: « Le samedi, je vais au train: il y a toujours une caisse que personne ne sait porter. » |
@@ -573,7 +574,6 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 | `sunday_wood` | jour | Le dimanche, il va voir ses arbres à la coupe, de 9 h à 12 h (s'il ne pleut pas) | Inès: « Le dimanche matin, Basile monte au bois voir ses arbres. Il les appelle par leur nom, et ils ne lui répondent pas, ce qui l'arrange. » |
 | `sunday_square` | jour | Le dimanche, il taille des bouts de bois sous le tilleul de la place, de 14 h à 18 h (s'il ne pleut pas) | Basile: « Le dimanche après-midi, je taille des bouts de bois sous le tilleul de la place. Ça occupe les mains. » |
 | `sunday_rest` | jour | Le dimanche, l'atelier est fermé: il reste chez lui le reste du jour | Odette: « Le dimanche, Basile ferme son atelier. Ne frappe pas, il fait semblant de ne pas entendre. » |
-| `summer_yard` | saison | L'été, il prend le frais dans la cour de la scierie, de 18 h à 19 h 30 | Basile: « L'été, après l'établi, je m'assois dans la cour. L'odeur du bois chaud, ça se respire. » |
 | `workbench` | routine | À son établi de 8 h à 18 h (le dimanche aussi pendant les deux premières semaines) | Basile: « À l'établi de 8 h à 6 h du soir. Le bois n'aime pas qu'on le brusque, moi non plus. » |
 | `home` | maison | Chez lui, au-dessus de la scierie, avant 8 h et après 18 h | Basile: « Le soir, je suis chez moi, au-dessus de la scierie. À mon âge, le soir commence tôt. » |
 
@@ -581,41 +581,42 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 
 | # | Habitude | Jours | Heures | Point | Activité | Conditions |
 |---|---|---|---|---|---|---|
-| 1 | `birthday` | tous | 15 h à 17 h | `village_square` | host | anniversaire |
-| 2 | `train` | sa | 9 h 30 à 16 h 30 | `train_stop` | wait_train | existant: train_day |
-| 3 | `recess` | lu ma je ve | 10 h à 10 h 20, 14 h 30 à 14 h 50 | `school_yard` | play | jour de classe; dès le jour 43 |
-| 4 | `school` | lu ma je ve | 8 h à 16 h 30 | `school_gate` | absent | jour de classe; dès le jour 43 |
-| 5 | `after_school` | lu ma je ve | 16 h 30 à 18 h 30 | `well_shelter` | play | jour de classe; dès le jour 43; pluie |
+| 1 | `birthday` | tous | 15 h à 17 h | `village_square` | host | anniversaire; dès le jour 16 |
+| 2 | `recess` | lu ma je ve | 10 h à 10 h 20, 14 h 30 à 14 h 50 | `school_yard` | play | jour de classe; dès le jour 43 |
+| 3 | `school` | lu ma je ve | 8 h à 16 h 30 | `school_gate` | absent | jour de classe; dès le jour 43 |
+| 4 | `after_school` | lu ma je ve | 16 h 30 à 18 h 30 | `well_shelter` | play | jour de classe; dès le jour 43; existant: rain_well_roof |
+| 5 | `after_school` | lu ma je ve | 16 h 30 à 18 h 30 | `quay_bench` | play | jour de classe; dès le jour 43; existant: rain_no_roof |
 | 6 | `after_school` | lu ma je ve | 16 h 30 à 18 h 30 | `village_square` | play | jour de classe; dès le jour 43 |
 | 7 | `hopscotch` | tous | 18 h 30 à 20 h | `hopscotch` | play | existant: chalk_box; sans pluie |
 | 8 | `rain` | tous | 8 h à 18 h | `well_shelter` | play | existant: rain_well_roof |
-| 9 | `rain` | tous | 8 h à 18 h | `quay_bench` | play | existant: rain_no_roof |
-| 10 | `hide` | me | 14 h à 17 h | `bird_hide` | play | sans pluie; `bird_hide_built` |
-| 11 | `wednesday_birds` | me | 14 h à 17 h | `forest_edge_path` | play | sans pluie; dès le jour 16; printemps, été, automne |
-| 12 | `sunday_berge` | di | 10 h à 12 h | `riverbank` | play | existant: solange_here |
-| 13 | `summer_square` | tous | 18 h à 21 h | `village_square` | play | été |
-| 14 | `morning_bench` | tous | 8 h à 12 h | `quay_bench` | play |  |
-| 15 | `riverbank` | tous | 12 h à 18 h | `riverbank` | play |  |
-| 16 | `evening_square` | tous | 18 h à 18 h 30 | `village_square` | play |  |
-| 17 | `home` | tous | 6 h à 8 h, 18 h 30 à 24 h | `lucie_house_door` | home |  |
+| 9 | `home` | tous | 18 h 30 à 24 h | `lucie_house_door` | home |  |
+| 10 | `evening_square` | tous | 18 h à 21 h | `village_square` | play | été |
+| 11 | `train` | sa | 9 h 30 à 16 h 30 | `train_stop` | wait_train | existant: train_day |
+| 12 | `rain` | tous | 8 h à 18 h | `quay_bench` | play | existant: rain_no_roof |
+| 13 | `home` | tous | 6 h à 8 h | `lucie_house_door` | home |  |
+| 14 | `hide` | me | 14 h à 17 h | `bird_hide` | play | sans pluie; `bird_hide_built`; dès le jour 16 |
+| 15 | `wednesday_birds` | me | 14 h à 17 h | `forest_edge_path` | play | sans pluie; dès le jour 16; printemps, été, automne |
+| 16 | `sunday_berge` | di | 10 h à 12 h | `riverbank` | play | existant: solange_here; dès le jour 16 |
+| 17 | `morning_bench` | tous | 8 h à 12 h | `quay_bench` | play |  |
+| 18 | `riverbank` | tous | 12 h à 18 h | `riverbank` | play |  |
+| 19 | `evening_square` | tous | 18 h à 20 h | `village_square` | play |  |
 
 | Habitude | Sorte | Au carnet | Comment l'apprendre (en plus de la voir) |
 |---|---|---|---|
 | `birthday` | anniv | Le 12 du printemps, son anniversaire: un goûter sur la place, de 15 h à 17 h | Léon: « Le 12 du printemps, c'est l'anniversaire de Jeanne. Elle fait un goûter sur la place à 3 h. Elle a dit que tu pouvais venir. » |
-| `train` | jour | Le samedi, elle regarde le train depuis le quai, de 9 h 30 à 16 h 30 | Firmin: « Le samedi, Jeanne ne quitte pas le quai tant que le train est là. Elle compte les wagons, alors qu'il n'y en a que deux. » |
 | `recess` | routine | Les jours de classe, récréation dans la cour à 10 h et à 14 h 30 (20 minutes) | Jeanne: « À la récré de 10 h et de 2 h et demie, on joue au loup dans la cour. Léon triche, il court trop vite. » |
 | `school` | routine | Les jours de classe (lundi, mardi, jeudi, vendredi, hors été), à l'école de 8 h à 16 h 30 | écriteau `school_sign`: « École de la Halte. Classe le lundi, le mardi, le jeudi et le vendredi, de 8 h 30 à 16 h 30. »<br>Armand: « Jeanne est à l'école le lundi, le mardi, le jeudi et le vendredi. Le mercredi, elle est libre comme l'air, hélas pour mes leçons. » |
 | `after_school` | routine | Les jours de classe, sur la place de 16 h 30 à 18 h 30 (sous le toit du puits s'il pleut) | Solange: « Après la classe, Jeanne file sur la place. S'il pleut, elle se met sous le toit du puits avec Léon. » |
 | `hopscotch` | routine | Le soir, la marelle de 18 h 30 à 20 h (avec ses craies, s'il ne pleut pas) | Jeanne: « Le soir après 6 h et demie, je fais la marelle avec mes craies, s'il ne pleut pas. Tu sais sauter à cloche-pied ? » |
 | `rain` | pluie | Sous la pluie, elle joue sous le toit du puits (ou sur le banc du quai), de 8 h à 18 h | Jeanne: « Quand il pleut, je joue sous le toit du puits. Les gouttes font de la musique sur les tuiles. » |
+| `home` | maison | Chez sa tante Lucie, en face de la mercerie, avant 8 h et après 18 h 30 (20 h avec la marelle) | Jeanne: « Je dors chez tante Lucie, la maison en face de chez Solange. Ma fenêtre donne sur les pommiers. » |
+| `evening_square` | routine | En fin d'après-midi, sur la place de 18 h à 18 h 30, puis Solange la ramène | Solange: « À 6 h du soir, je descends chercher Jeanne sur la place. Elle dit toujours encore cinq minutes. » |
+| `train` | jour | Le samedi, elle regarde le train depuis le quai, de 9 h 30 à 16 h 30 | Firmin: « Le samedi, Jeanne ne quitte pas le quai tant que le train est là. Elle compte les wagons, alors qu'il n'y en a que deux. » |
 | `hide` | apres | Depuis « La cabane des oiseaux »: le mercredi, à la cabane de la mare de 14 h à 17 h (s'il ne pleut pas) | Inès: « Le mercredi, Jeanne est à sa cabane de la mare dès 2 h. Elle compte les poules d'eau et elle me corrige quand je me trompe. » |
 | `wednesday_birds` | routine | Le mercredi, elle guette les oiseaux à l'orée avec Léon, de 14 h à 17 h (hors hiver, s'il ne pleut pas) | Inès: « Le mercredi après-midi, Jeanne et Léon viennent à l'orée compter les oiseaux. Ils se disputent pour chaque mésange. » |
 | `sunday_berge` | jour | Le dimanche, promenade sur la berge avec Solange, de 10 h à 12 h | Solange: « Le dimanche matin, je promène Jeanne sur la berge, de 10 h à midi. Elle ramasse tous les galets du monde. » |
-| `summer_square` | saison | L'été, sur la place de 18 h à 21 h | Jeanne: « L'été, je reste sur la place jusqu'à 9 h du soir ! Tante Lucie dit oui parce qu'il fait jour. » |
 | `morning_bench` | routine | Le matin, sur le banc du quai de 8 h à 12 h | Firmin: « Le matin, Jeanne s'installe sur mon banc du quai. Elle me pose des questions jusqu'à midi. » |
 | `riverbank` | routine | L'après-midi, au bord de l'Aubrune de 12 h à 18 h | Jeanne: « L'après-midi, je suis au bord de l'Aubrune. Les galets plats, c'est là qu'ils sont. » |
-| `evening_square` | routine | En fin d'après-midi, sur la place de 18 h à 18 h 30, puis Solange la ramène | Solange: « À 6 h du soir, je descends chercher Jeanne sur la place. Elle dit toujours encore cinq minutes. » |
-| `home` | maison | Chez sa tante Lucie, en face de la mercerie, avant 8 h et après 18 h 30 (20 h avec la marelle) | Jeanne: « Je dors chez tante Lucie, la maison en face de chez Solange. Ma fenêtre donne sur les pommiers. » |
 
 #### Achille Pradel (`achille`)
 
@@ -666,7 +667,7 @@ Pour chaque habitant, deux tableaux: les entrées dans l'ordre de priorité (la 
 | Habitude | Sorte | Au carnet | Comment l'apprendre (en plus de la voir) |
 |---|---|---|---|
 | `lumignons` | jour | Au Dimanche des lumignons, un lumignon pour sa mère, de 17 h à 20 h | Solange: « Au Dimanche des lumignons, je pose un lumignon pour ma mère. Elle tenait la mercerie avant moi; elle aurait détesté mes rideaux. » |
-| `birthday` | anniv | Le 10 de l'automne, son anniversaire: elle ouvre la malle du théâtre au salon, de 18 h à 20 h | Lucie: « Le 10 de l'automne, Solange a son anniversaire. Elle ouvre la malle du théâtre le soir au salon, et elle ne veut pas qu'on le sache. » |
+| `birthday` | anniv | Le 10 de l'automne, son anniversaire: elle ouvre la malle du théâtre au salon, de 18 h 30 à 20 h | Lucie: « Le 10 de l'automne, Solange a son anniversaire. Elle ouvre la malle du théâtre le soir au salon, et elle ne veut pas qu'on le sache. » |
 | `train` | jour | Le samedi, au train de 10 h à 10 h 45 pour ses colis de tissu | écriteau `salon_sign`: « Le samedi, le salon ouvre à 10 h 45 (colis du train). »<br>Solange: « Le samedi, à 10 h, je descends au train chercher mes colis de tissu. Le salon ouvre à 10 h 45, pas avant. » |
 | `fetch` | routine | Tous les jours, elle va chercher Jeanne sur la place à 18 h, puis la ramène chez Lucie | Jeanne: « À 6 h, Solange vient me chercher sur la place, et on remonte ensemble. Elle marche vite pour quelqu'un qui dit qu'elle est vieille. » |
 | `sunday_berge` | jour | Le dimanche, promenade sur la berge avec Jeanne, de 10 h à 12 h | Jeanne: « Le dimanche matin, Solange m'emmène sur la berge. Elle dit que les galets, c'est bon pour la patience. » |
@@ -1196,8 +1197,8 @@ Contrôles du script: aucun trou (chaque habitant a une entrée pour chaque tran
 |---|---|---|---|---|---|
 | Firmin Lacombe | 10 | 9 | 11.3 | 10 | 0 |
 | Odette Ferrand | 11 | 8 | 12.5 | 11 | 4 |
-| Basile Cornu | 11 | 9 | 9.6 | 11 | 0 |
-| Jeanne Ribot | 15 | 13 | 9.4 | 15 | 1 |
+| Basile Cornu | 11 | 9 | 9.7 | 11 | 0 |
+| Jeanne Ribot | 14 | 12 | 8.9 | 14 | 1 |
 | Achille Pradel | 10 | 8 | 8.1 | 10 | 3 |
 | Solange Mérigot | 10 | 9 | 7.3 | 10 | 3 |
 | Lucie Arnaud | 13 | 10 | 4.8 | 13 | 0 |
@@ -1215,7 +1216,7 @@ Contrôles du script: aucun trou (chaque habitant a une entrée pour chaque tran
 | Ambroise Pélissier | 9 | 8 | 6.0 | 9 | 2 |
 | Nour Belkacem | 12 | 9 | 6.4 | 11 | 2 |
 | Colette Lafon | 11 | 8 | 9.8 | 10 | 4 |
-| **Total** | **255** | | | | |
+| **Total** | **254** | | | | |
 
 Lecture: entre 3 et 12 heures de jeu visibles par jour selon le métier (Armand est en classe, Lucie en tournée: on les guette à des heures précises, c'est ce qui rend leur page intéressante). Chaque habitant a entre 8 et 17 habitudes.
 
@@ -1278,7 +1279,7 @@ La condition « 2 secondes » évite les découvertes en traversant l'écran à 
 
 - Indice par habitant: « Habitudes: n sur N » (N compte les habitudes déjà possibles; une habitude d'une quête non faite ne compte pas).
 - Toutes connues: tampon « Réglé comme une horloge » sur la page, lien +50 avec l'habitant (une fois), et une réplique de lui (« Tu sais où me trouver mieux que moi. »).
-- Indice global sur la couverture de l'onglet: « Le bourg: 140 habitudes sur 255 ». À 100 %: un objet mural unique, le « calendrier du bourg » (le planning de tout le monde à la craie, posé au mur de la maisonnette).
+- Indice global sur la couverture de l'onglet: « Le bourg: 140 habitudes sur 254 ». À 100 %: un objet mural unique, le « calendrier du bourg » (le planning de tout le monde à la craie, posé au mur de la maisonnette).
 
 ### 4.7 « Où est-il sans doute maintenant ? »
 
@@ -1299,7 +1300,7 @@ Une habitude dont la condition a été vraie 10 jours de jeu sans être découve
 | Une scène arrête l'horloge | les découvertes restent possibles (2 s réelles), utile au marché |
 | Une habitude change par une décision | la nouvelle s'écrit d'elle-même; l'ancienne est barrée |
 | Partie reprise d'une version antérieure | habitudes de départ de la section 0; aucune découverte ne se perd à la sauvegarde |
-| Taille de l'état | un ensemble de bits par habitant (255 habitudes: 32 octets), plus le jour et le joueur de chaque découverte pour la notification de retour (bornée aux 30 dernières) |
+| Taille de l'état | un ensemble de bits par habitant (254 habitudes: 32 octets), plus le jour et le joueur de chaque découverte pour la notification de retour (bornée aux 30 dernières) |
 
 ### 4.10 Textes d'interface
 
@@ -1332,11 +1333,11 @@ Modèle (section 8 du script): chaque joueur passe chaque heure de jeu dans un s
 
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 34 % | 46 % | 25 % | 31 % | 14 % | 10 % | 12 % |
-| 14 | 52 % | 67 % | 43 % | 62 % | 43 % | 19 % | 19 % |
-| 21 | 64 % | 78 % | 59 % | 81 % | 57 % | 33 % | 31 % |
-| 42 | 84 % | 91 % | 81 % | 100 % | 93 % | 62 % | 56 % |
-| 63 | 92 % | 97 % | 90 % | 100 % | 93 % | 81 % | 75 % |
+| 7 | 34 % | 46 % | 25 % | 38 % | 15 % | 10 % | 6 % |
+| 14 | 52 % | 69 % | 42 % | 75 % | 38 % | 14 % | 12 % |
+| 21 | 64 % | 79 % | 57 % | 88 % | 54 % | 29 % | 31 % |
+| 42 | 84 % | 91 % | 81 % | 100 % | 92 % | 62 % | 56 % |
+| 63 | 92 % | 97 % | 90 % | 100 % | 92 % | 76 % | 75 % |
 | 84 | 97 % | 99 % | 99 % | 100 % | 100 % | 90 % | 88 % |
 | 168 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 | 336 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
@@ -1345,12 +1346,12 @@ Modèle (section 8 du script): chaque joueur passe chaque heure de jeu dans un s
 
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 34 % | 46 % | 25 % | 38 % | 14 % | 14 % | 12 % |
-| 14 | 50 % | 64 % | 42 % | 62 % | 36 % | 19 % | 25 % |
-| 21 | 63 % | 75 % | 58 % | 88 % | 57 % | 33 % | 31 % |
-| 42 | 84 % | 90 % | 83 % | 100 % | 93 % | 62 % | 56 % |
-| 63 | 92 % | 96 % | 90 % | 100 % | 93 % | 81 % | 75 % |
-| 84 | 96 % | 98 % | 94 % | 100 % | 100 % | 90 % | 88 % |
+| 7 | 32 % | 45 % | 25 % | 38 % | 15 % | 10 % | 6 % |
+| 14 | 49 % | 63 % | 42 % | 62 % | 38 % | 14 % | 19 % |
+| 21 | 62 % | 75 % | 57 % | 75 % | 54 % | 29 % | 31 % |
+| 42 | 83 % | 90 % | 81 % | 100 % | 92 % | 62 % | 53 % |
+| 63 | 91 % | 96 % | 90 % | 100 % | 92 % | 76 % | 75 % |
+| 84 | 95 % | 98 % | 94 % | 100 % | 100 % | 86 % | 81 % |
 | 168 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 | 336 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 
@@ -1358,14 +1359,14 @@ Modèle (section 8 du script): chaque joueur passe chaque heure de jeu dans un s
 
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 25 % | 38 % | 13 % | 12 % | 0 % | 5 % | 6 % |
-| 14 | 34 % | 52 % | 20 % | 38 % | 0 % | 10 % | 6 % |
-| 21 | 41 % | 60 % | 28 % | 50 % | 0 % | 14 % | 6 % |
-| 42 | 56 % | 70 % | 46 % | 62 % | 64 % | 33 % | 6 % |
-| 63 | 62 % | 76 % | 57 % | 75 % | 64 % | 38 % | 6 % |
-| 84 | 66 % | 78 % | 61 % | 88 % | 79 % | 43 % | 6 % |
-| 168 | 74 % | 83 % | 72 % | 100 % | 86 % | 57 % | 6 % |
-| 336 | 79 % | 87 % | 83 % | 100 % | 93 % | 67 % | 6 % |
+| 7 | 24 % | 39 % | 13 % | 12 % | 0 % | 5 % | 0 % |
+| 14 | 33 % | 52 % | 22 % | 38 % | 0 % | 5 % | 0 % |
+| 21 | 40 % | 60 % | 29 % | 50 % | 0 % | 10 % | 6 % |
+| 42 | 55 % | 70 % | 49 % | 62 % | 58 % | 24 % | 6 % |
+| 63 | 62 % | 75 % | 57 % | 75 % | 62 % | 33 % | 6 % |
+| 84 | 65 % | 78 % | 61 % | 88 % | 77 % | 38 % | 6 % |
+| 168 | 73 % | 82 % | 74 % | 88 % | 85 % | 52 % | 6 % |
+| 336 | 79 % | 87 % | 81 % | 100 % | 85 % | 67 % | 6 % |
 
 Lecture: la moitié du bourg en deux semaines, 84 % en six, 97 % au bout d'un an (84 jours), tout avant la fin de la deuxième année. La colonne « apres » (habitudes nées des quêtes) est sous-estimée: le modèle n'ouvre que celle du retour de Lucie, alors que le jeu les écrit d'elles-mêmes à la fin de chaque quête (4.5). Les répliques et les écriteaux font la différence (sans eux, 80 % au bout de quatre ans: les habitudes des jours particuliers et des anniversaires ne se rencontrent presque pas par hasard). Le rattrapage pèse peu en moyenne et rattrape la fin de la collection, comme voulu. Hypothèse à remesurer avec les robots une fois le lot H1 livré (le modèle de déplacement est grossier).
 
@@ -1836,7 +1837,7 @@ Une scène est légère: les habitants sont déjà à leur point de planning; il
 | Une prise rare ou mieux (pêche 0.12) | tous, surtout Achille, Léon, Firmin | sur le coup, à moins de 6 m dans l'heure: « Une perche pareille ! Tu la mets en vitrine ? »; le lendemain, la nouvelle circule (HA-03): « Il paraît que Camille a sorti une truite de 40 cm. » | une fois par prise; la rumeur une fois par habitant |
 | Le prénom selon l'amitié | tous | De vue: « Bonjour ! »; Connaissance: « Bonjour, Camille ! »; Voisinage: un signe de la main à 12 m, et le prénom; Amitié: il vient à 3 m pour une réplique s'il est libre; Grande amitié et plus: son appellation à lui | appellations, toutes accordées à un nom et jamais au joueur: Firmin « chef », Odette « mon chou », Jeanne « camarade », Achille « mon levain », Solange « ma muse », Lucie « mon timbre », Berthe « ma farine », l'abbé « brave âme », Honorine « mon petit cœur », Barnabé « l'oiseau », Mado « la jeunesse », Margot « mon trésor », Léon « chef de gare », Nour « collègue », Colette « mon rayon de soleil »; Basile, Armand, Marthe, Inès, Paulin et Ambroise disent seulement le prénom (c'est leur façon) |
 | Les deux ensemble | tous | « Toujours ensemble, vous deux ! » | les deux joueurs à moins de 4 m l'un de l'autre et de l'habitant; une fois par habitant et par semaine |
-| Il part vers une habitude | lien Voisinage et plus | « Je file à la chorale ! » « Je vais voir Hortense. » | croisé à moins de 5 m dans les 10 minutes de jeu avant l'habitude; révèle l'habitude (4.4); une fois par habitude et par jour |
+| Il part vers une habitude | lien Voisinage et plus | « Je file à la chorale ! » « Je vais voir Hortense. » | croisé à moins de 5 m dans les 10 minutes de jeu avant l'habitude; révèle l'habitude (4.4); une fois par habitude et par jour; 148 annonces écrites pour les 21 habitants (`habits[].announce`, table `ANNONCES` du script), jamais pour une habitude qui commence à 6 h, sans changement de lieu, ni pour le passage à l'étal |
 | Ce que tu tiens en main | tous | un objet qu'il adore, en main à moins de 3 m: « Oh, c'est une gelée de sureau ? » | révèle « Adore: gelée de sureau » au carnet; une fois par objet |
 | La nuit | habitants dehors après 22 h (Colette, Barnabé les soirs de cuite) | « Tu ne dors pas ? Moi non plus. » | une fois par nuit |
 | Un geste de décor sous ses yeux | les témoins (7.0) | Léon après un ricochet: « Six ! Je t'ai vu ! » | une fois par geste et par jour |
@@ -1942,16 +1943,16 @@ Pour le manager (pas pour le client): la limite de la partie au jour 64 rend inj
 ```text
 Contrôles: aucune erreur
 
-Points: 90 cités, 28 déjà sur la carte, 62 nouveaux
-Nouveaux: barn_door, bird_hide, cafe_counter, cafe_door, cafe_terrace, cemetery_bench, cemetery_gate, cemetery_tap, charcoal_kiln, church_bell_rope, church_nave, church_porch, church_square, clearing_center, farm_door, farm_garden, farmyard, field_high_01, forest_cut, forest_edge_path, forest_pond, forester_bench, forester_house_door, forge_door, forge_inside, forge_yard, grave_cornu, grave_ferrand, grave_lacombe, grave_merigot, grave_valade, hamlet_house_a_door, hamlet_house_c_door, honorine_doorstep, honorine_window, joinery_yard, lookout, lucie_garden, mairie_desk, mill_door, mill_inside, mill_race_bank, mill_sluice, mill_yard, pasture_bank, pasture_gate, presbytery_door, priest_garden, rail_cottage_west_door, rail_cottage_west_window, school_lodging_door, school_yard, sexton_garden, sexton_house_door, shared_garden_plot, skittles_alley, spring, square_lime_tree, threshing_floor, vet_yard, vineyard, washhouse
+Points: 90 cités, 90 déjà sur la carte, 0 nouveaux
+Nouveaux: 
 
 Statistiques des plannings
 | Habitant | Habitudes | Dont visibles | Heures visibles par jour (moyenne de l'année, temps tirés) | Apprises par dialogue | Par écriteau |
 |---|---|---|---|---|---|
 | Firmin Lacombe | 10 | 9 | 11.3 | 10 | 0 |
 | Odette Ferrand | 11 | 8 | 12.5 | 11 | 4 |
-| Basile Cornu | 11 | 9 | 9.6 | 11 | 0 |
-| Jeanne Ribot | 15 | 13 | 9.4 | 15 | 1 |
+| Basile Cornu | 11 | 9 | 9.7 | 11 | 0 |
+| Jeanne Ribot | 14 | 12 | 8.9 | 14 | 1 |
 | Achille Pradel | 10 | 8 | 8.1 | 10 | 3 |
 | Solange Mérigot | 10 | 9 | 7.3 | 10 | 3 |
 | Lucie Arnaud | 13 | 10 | 4.8 | 13 | 0 |
@@ -1969,17 +1970,17 @@ Statistiques des plannings
 | Ambroise Pélissier | 9 | 8 | 6.0 | 9 | 2 |
 | Nour Belkacem | 12 | 9 | 6.4 | 11 | 2 |
 | Colette Lafon | 11 | 8 | 9.8 | 10 | 4 |
-| **Total** | **255** | | | | |
+| **Total** | **254** | | | | |
 
 Découverte des habitudes (part connue, médiane)
 règle proposée (vu, dialogues, écriteaux, rattrapage) (60 duos)
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 34 % | 46 % | 25 % | 31 % | 14 % | 10 % | 12 % |
-| 14 | 52 % | 67 % | 43 % | 62 % | 43 % | 19 % | 19 % |
-| 21 | 64 % | 78 % | 59 % | 81 % | 57 % | 33 % | 31 % |
-| 42 | 84 % | 91 % | 81 % | 100 % | 93 % | 62 % | 56 % |
-| 63 | 92 % | 97 % | 90 % | 100 % | 93 % | 81 % | 75 % |
+| 7 | 34 % | 46 % | 25 % | 38 % | 15 % | 10 % | 6 % |
+| 14 | 52 % | 69 % | 42 % | 75 % | 38 % | 14 % | 12 % |
+| 21 | 64 % | 79 % | 57 % | 88 % | 54 % | 29 % | 31 % |
+| 42 | 84 % | 91 % | 81 % | 100 % | 92 % | 62 % | 56 % |
+| 63 | 92 % | 97 % | 90 % | 100 % | 92 % | 76 % | 75 % |
 | 84 | 97 % | 99 % | 99 % | 100 % | 100 % | 90 % | 88 % |
 | 168 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 | 336 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
@@ -1987,26 +1988,26 @@ règle proposée (vu, dialogues, écriteaux, rattrapage) (60 duos)
 sans rattrapage (60 duos)
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 34 % | 46 % | 25 % | 38 % | 14 % | 14 % | 12 % |
-| 14 | 50 % | 64 % | 42 % | 62 % | 36 % | 19 % | 25 % |
-| 21 | 63 % | 75 % | 58 % | 88 % | 57 % | 33 % | 31 % |
-| 42 | 84 % | 90 % | 83 % | 100 % | 93 % | 62 % | 56 % |
-| 63 | 92 % | 96 % | 90 % | 100 % | 93 % | 81 % | 75 % |
-| 84 | 96 % | 98 % | 94 % | 100 % | 100 % | 90 % | 88 % |
+| 7 | 32 % | 45 % | 25 % | 38 % | 15 % | 10 % | 6 % |
+| 14 | 49 % | 63 % | 42 % | 62 % | 38 % | 14 % | 19 % |
+| 21 | 62 % | 75 % | 57 % | 75 % | 54 % | 29 % | 31 % |
+| 42 | 83 % | 90 % | 81 % | 100 % | 92 % | 62 % | 53 % |
+| 63 | 91 % | 96 % | 90 % | 100 % | 92 % | 76 % | 75 % |
+| 84 | 95 % | 98 % | 94 % | 100 % | 100 % | 86 % | 81 % |
 | 168 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 | 336 | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % | 100 % |
 
 vu seulement (60 duos)
 | Jour | tout | routine | jour | pluie | saison | anniv | apres |
 |---|---|---|---|---|---|---|---|
-| 7 | 25 % | 38 % | 13 % | 12 % | 0 % | 5 % | 6 % |
-| 14 | 34 % | 52 % | 20 % | 38 % | 0 % | 10 % | 6 % |
-| 21 | 41 % | 60 % | 28 % | 50 % | 0 % | 14 % | 6 % |
-| 42 | 56 % | 70 % | 46 % | 62 % | 64 % | 33 % | 6 % |
-| 63 | 62 % | 76 % | 57 % | 75 % | 64 % | 38 % | 6 % |
-| 84 | 66 % | 78 % | 61 % | 88 % | 79 % | 43 % | 6 % |
-| 168 | 74 % | 83 % | 72 % | 100 % | 86 % | 57 % | 6 % |
-| 336 | 79 % | 87 % | 83 % | 100 % | 93 % | 67 % | 6 % |
+| 7 | 24 % | 39 % | 13 % | 12 % | 0 % | 5 % | 0 % |
+| 14 | 33 % | 52 % | 22 % | 38 % | 0 % | 5 % | 0 % |
+| 21 | 40 % | 60 % | 29 % | 50 % | 0 % | 10 % | 6 % |
+| 42 | 55 % | 70 % | 49 % | 62 % | 58 % | 24 % | 6 % |
+| 63 | 62 % | 75 % | 57 % | 75 % | 62 % | 33 % | 6 % |
+| 84 | 65 % | 78 % | 61 % | 88 % | 77 % | 38 % | 6 % |
+| 168 | 73 % | 82 % | 74 % | 88 % | 85 % | 52 % | 6 % |
+| 336 | 79 % | 87 % | 81 % | 100 % | 85 % | 67 % | 6 % |
 
 Amitié et suites de quêtes
 | Duo | Règle | Étapes faites au jour 84 | Étapes par jour, j1 à 21 | j22 à 63 | j64 à 126 | j127 à 252 | j253 à 336 | Suites finies au jour 336 | Actives en moyenne (j1 à 84) | Habitants « Comme la famille » au jour 336 |
@@ -2052,3 +2053,4 @@ Jour médian de chaque étape (duo médian, règle proposée; part des duos qui 
 | Version | Date | Changement |
 |---|---|---|
 | 1 | 2026-11-03 | première version (game-designer): 21 habitants, plannings, carnet, suites de quêtes, amitié, vie du village; lieux alignés sur `v0-13-carte.md` |
+| 2 | 2026-11-04 | lot H4, suite (game-designer): les six habitants de la démo reçoivent dans `habitants.json` leurs habitudes, plannings réels, rumeurs, goûts, appellations; 148 annonces pour les 21; Jeanne passe à 14 habitudes; tableaux 3.2 des six dans l'ordre réel des données |
