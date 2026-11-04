@@ -615,6 +615,13 @@ const FURNITURE: Record<string, Builder> = {
   small_vase: (b) => { smallVase(b, 'white_paint'); },
   small_vase_blue: (b) => { smallVase(b, 'ceramic_blue'); },
   small_vase_terracotta: (b) => { smallVase(b, 'brick'); },
+  // 0.13: étendoir du lavoir, en attendant son modèle: deux poteaux, une corde, deux draps.
+  clothesline: (b) => {
+    for (const x of [-0.9, 0.9]) b.cylinder(0.04, 0.04, 1.8, [x, 0, 0], 'wood_old', { base: true, segments: 6 });
+    b.box([1.84, 0.02, 0.02], [0, 1.72, 0], 'iron', { base: true });
+    b.box([0.6, 0.7, 0.02], [-0.42, 1.0, 0], 'white_paint', { base: true });
+    b.box([0.5, 0.6, 0.02], [0.4, 1.1, 0], 'white_paint', { base: true });
+  },
   oil_lamp: (b) => {
     b.cylinder(0.1, 0.12, 0.1, [0, 0, 0], 'brass', { base: true, segments: 8 });
     b.cylinder(0.07, 0.07, 0.22, [0, 0.1, 0], 'glass_lamp', { base: true, segments: 8 });
