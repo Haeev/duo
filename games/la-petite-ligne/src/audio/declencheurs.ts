@@ -18,6 +18,7 @@ import { seasonOfDay, weekdayOf } from '../donnees/calendrier';
 import type { Cell, CharacterId, ReadonlyWorld, Vec2, WorldEvent } from '../etat/types';
 import type { AudioSettings } from './reglages';
 import { isRefusal, refusalTexts } from '../interface/refus';
+import { VillagerGestures } from '../etat/gestes-habitants';
 
 export interface SoundRequest {
   sound: string;
@@ -881,6 +882,39 @@ export class StateWatcher {
 
     this.hens(ctx, now, emit);
     this.tour10(ctx, emit, loops, first);
+    this.decorGestureSounds(ctx, dt, emit);
+  }
+
+  /** 0.13 (lot H7): gestes des habitants avec le décor, lus dans l'état comme le rendu (`gestes-habitants.ts`). */
+  private decorGestures: VillagerGestures | null = null;
+  /** Secondes avant le prochain son du geste de chaque habitant. */
+  private readonly gestureTimers = new Map<string, number>();
+
+  /**
+   * Son d'un geste d'habitant (arrosoir, battoir, hache, houe...), placé sur lui, à son rythme
+   * (`sound.everySeconds`), seulement si le joueur local est à moins de `sound.range` m: le reste du
+   * bourg ne fait pas de bruit de fond. Le premier coup part dès qu'on arrive à portée.
+   */
+  private decorGestureSounds(ctx: TriggerContext, dt: number, emit: Emitter): void {
+    const { world, local } = ctx;
+    if (world.phase !== 'day') return;
+    this.decorGestures ??= new VillagerGestures(ctx.content, ctx.map);
+    const me = world.characters.find((c) => c.id === local);
+    for (const v of world.villagers) {
+      const gesture = me === undefined ? null : this.decorGestures.gestureOf(v, world);
+      const sound = gesture?.sound ?? null;
+      if (me === undefined || sound === null || Math.hypot(me.pos.x - v.pos.x, me.pos.y - v.pos.y) > sound.range || me.inside !== v.inside) {
+        this.gestureTimers.delete(v.id);
+        continue;
+      }
+      const left = (this.gestureTimers.get(v.id) ?? 0) - dt;
+      if (left > 0) {
+        this.gestureTimers.set(v.id, left);
+        continue;
+      }
+      this.gestureTimers.set(v.id, left + Math.max(0.25, sound.everySeconds));
+      emit.world(sound.id, { x: v.pos.x, y: v.pos.y }, null);
+    }
   }
 
   /**

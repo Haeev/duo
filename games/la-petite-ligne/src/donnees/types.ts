@@ -3,6 +3,7 @@
  * `donnees/contenu.ts`. Les noms de champs suivent les fichiers JSON.
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
+import type { VillageLife } from './gestes-0-13';
 import type {
   AppearanceSettings,
   BakerySettings,
@@ -1501,4 +1502,6 @@ export interface Content {
   signs: Record<string, SignDef>;
   /** 0.13: décisions à deux (`decisions.json`), vides si le fichier manque. */
   decisions: DecisionsContent;
+  /** 0.13 (lot H7, seconde moitié): gestes des habitants avec le décor, réactions aux joueurs (`gestes-0-13.json`). */
+  villageLife: VillageLife;
 }

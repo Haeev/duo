@@ -29,6 +29,10 @@ import type { RawContentFiles } from './contenu';
  */
 const extraVillagers = import.meta.glob<unknown>('../../donnees/habitants-0-13.json', { eager: true, import: 'default' });
 const habitants013 = Object.values(extraVillagers)[0];
+/** 0.13 (lot H7, seconde moitié): gestes des habitants et réactions aux joueurs, facultatif comme le précédent. */
+const gestures013 = Object.values(
+  import.meta.glob<unknown>('../../donnees/gestes-0-13.json', { eager: true, import: 'default' }),
+)[0];
 
 export const CONTENT_FILES: RawContentFiles = {
   objets,
@@ -50,4 +54,5 @@ export const CONTENT_FILES: RawContentFiles = {
   calendrier,
   decisions,
   ...(habitants013 === undefined ? {} : { habitants013 }),
+  ...(gestures013 === undefined ? {} : { gestes013: gestures013 }),
 };

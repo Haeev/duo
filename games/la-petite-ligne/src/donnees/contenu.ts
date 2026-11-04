@@ -38,6 +38,7 @@ import {
   parseStorageSettings,
 } from './maison';
 import { townFrom } from './bourg';
+import { parseVillageLife } from './gestes-0-13';
 import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
 import {
@@ -143,6 +144,8 @@ export interface RawContentFiles {
   calendrier?: unknown;
   /** 0.13: décisions à deux (`decisions.json`); absent: aucune. */
   decisions?: unknown;
+  /** 0.13 (lot H7, seconde moitié): gestes des habitants et réactions aux joueurs (`gestes-0-13.json`); absent: rien. */
+  gestes013?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2835,6 +2838,10 @@ export function loadContent(files: RawContentFiles): Content {
     villageCalendar: parseVillageCalendar(files.calendrier === undefined ? null : root('calendrier.json', files.calendrier), settings, villagers),
     signs: signsOf(villagers),
     decisions: files.decisions === undefined ? NO_DECISIONS : parseDecisions(root('decisions.json', files.decisions), parseEffect),
+    villageLife: parseVillageLife(
+      files.gestes013,
+      files.habitants013 === undefined ? [files.habitants] : [files.habitants, files.habitants013],
+    ),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');

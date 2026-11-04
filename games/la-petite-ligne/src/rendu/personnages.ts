@@ -71,6 +71,8 @@ import { holdSpecFor, ToolHolder } from './prise';
 import { plantedFootSpeed } from './foulee';
 import { IDLE_CLIP, applyBoneRest, boneRestOf, idleClipOf } from './gabarit';
 import { CLIP_FOR_ACTION } from './gestes';
+import { VillagerGestures, gestureClipAt } from '../etat/gestes-habitants';
+import type { GestureDef } from '../donnees/gestes-0-13';
 import {
   VillagerCarry,
   accessoryMaterial,
@@ -751,7 +753,11 @@ export class CharactersPart implements EventfulPart {
     this.bikeReference = this.footSpeed(rig, SETTINGS.bikes.walkClip) ?? this.walkReference;
     const shared = library.sharedCharacterMaterial();
     this.propSwap = shared === null ? null : { palette: shared, held: accessoryMaterial(materials.held, shared, resources) };
+    this.decorGestures = map === null ? null : new VillagerGestures(content, map);
   }
+
+  /** 0.13 (lot H7): gestes des habitants avec le décor (`gestes-0-13.json`), `null` sans carte (essais). */
+  private readonly decorGestures: VillagerGestures | null;
 
   /** Accessoires des habitants peints dans la texture des personnages, sans programme de plus (`accessoryMaterial`). */
   private readonly propSwap: MaterialSwap | null;
@@ -1417,6 +1423,7 @@ export class CharactersPart implements EventfulPart {
     world: ReadonlyWorld,
     onBench: boolean,
     clip: string,
+    gesture: GestureDef | null = null,
   ): ClipRequest {
     const props = this.villagerProps.get(villager.id);
     const moving = villager.speed > SETTINGS.walkThreshold;
@@ -1441,6 +1448,7 @@ export class CharactersPart implements EventfulPart {
       const piece = scarf?.when(world, this.content) === true ? scarf.model : (props.worn?.model ?? null);
       worn.body.geometry = (piece === null ? undefined : worn.dressed.get(piece)) ?? worn.plain;
     }
+    if (gesture !== null) return this.gestureAccessories(figure, props.carry, gesture, clip);
     const carried = props.carried;
     // Mains posées sur le guidon ou l'accordéon: il tourne la tête, pas le buste (la main resterait en l'air).
     figure.setLookBody(carried === null || carried.mount === 'hand');
@@ -1459,6 +1467,19 @@ export class CharactersPart implements EventfulPart {
         : { name: carried.stillClip ?? SETTINGS.carryOne.idle, timeScale: 1, fade: SETTINGS.walkFadeSeconds };
     }
     return moving || situation.talking || carried.stillClip === null ? walk : { name: carried.stillClip, timeScale: 1 };
+  }
+
+  /**
+   * Geste avec le décor (0.13, lot H7): son accessoire en main ou devant soi remplace ceux de
+   * l'habitude (pas de vélo à côté de qui bêche), et le clip du geste se joue en fondu.
+   */
+  private gestureAccessories(figure: CharacterFigure, carry: VillagerCarry, gesture: GestureDef, clip: string): ClipRequest {
+    const prop = gesture.prop;
+    figure.setTool(this.library, prop?.mount === 'hand' ? prop.model : null, this.propSwap);
+    carry.setChest(prop?.mount === 'chest' ? prop.model : null);
+    carry.setBike(null);
+    figure.setLookBody(prop?.mount !== 'chest');
+    return { name: clip, timeScale: 1, fade: SETTINGS.crossFadeSeconds };
   }
 
   update(context: FrameContext): void {
@@ -1688,18 +1709,20 @@ export class CharactersPart implements EventfulPart {
         benchProp !== null &&
         villager.talkingWith.length === 0 &&
         this.benchSeat(benchProp.id, this.seating.slot[index] ?? 0, villager);
-      const clip = onBench ? SIT_CHAIR : villagerClip(villager);
+      const gesture = onBench ? null : (this.decorGestures?.gestureOf(villager, world) ?? null);
+      const clip = onBench ? SIT_CHAIR : gesture !== null ? gestureClipAt(gesture, context.time, villager.id) : villagerClip(villager);
       this.villagerAttention(figure, villager, world, context.time, clip);
       if (direction?.kind === 'look' && villager.talkingWith.length === 0) {
         figure.lookAt(direction);
       }
-      const request = this.villagerAccessories(figure, villager, world, onBench, clip);
+      const request = this.villagerAccessories(figure, villager, world, onBench, clip, gesture);
+      const gestureFacing = gesture === null ? null : (this.decorGestures?.facingOf(gesture, villager) ?? null);
       figure.update(
         context,
         this.terrain,
         onBench ? this.benchPlace : villager.prev,
         onBench ? this.benchPlace : villager.pos,
-        onBench ? this.benchPlace.facing : villager.facing,
+        onBench ? this.benchPlace.facing : (gestureFacing ?? villager.facing),
         this.posture(`habitant ${villager.id}`, clip === SIT_CHAIR, villager.speed > SETTINGS.walkThreshold, request),
         onBench ? SETTINGS.bench.seatHeight - SETTINGS.sitClipSeatHeight : 0,
         SETTINGS.idleVariants[villager.id] ?? NO_VARIANTS,
