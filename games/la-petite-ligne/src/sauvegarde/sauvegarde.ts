@@ -16,7 +16,8 @@ import { sanitizeSeat } from '../simulation/bancs';
 import { DATA_SCHEMA, MINUTES_PER_HOUR } from '../simulation/constantes';
 import { fillOpenDecisions, migrateToVillage, villageShapeError } from './voisins';
 import { stageCanContinue } from '../donnees/calendrier';
-import { type Sim, format, notifyKey, wrapWorld } from '../simulation/contexte';
+import { type Sim, format, notifyKey, say, wrapWorld } from '../simulation/contexte';
+
 import { startScene } from '../simulation/dialogues';
 import { runEffects } from '../simulation/effets';
 import { variantOf } from '../simulation/conditions';
@@ -25,7 +26,7 @@ import { isCurtains, rehangCurtains, settleDecor } from '../simulation/amenageme
 import { wakeNeedsAfterMigration } from '../simulation/besoins';
 import { buildingAt, offstagePoint } from '../etat/carte';
 import { isTool } from '../etat/maison';
-import { addStack } from '../simulation/sac';
+import { addStack, addToBag } from '../simulation/sac';
 import { type StepInput, step } from '../simulation/pas';
 import { settleSavedClimax } from '../simulation/moments';
 import { memoriesFromSave } from '../simulation/souvenirs';
@@ -38,6 +39,8 @@ import { settleRegrownTrees } from '../simulation/lisiere';
 import { migrateToWardrobe, settleWardrobe, wardrobeShapeOk } from './garde-robe';
 import { emptyBreeding } from '../etat/elevage';
 import { storeAtHome } from '../simulation/rangement';
+import { queueHint } from '../simulation/astuces';
+import { ITEM } from '../simulation/ids';
 
 /** Ce que le SDK enregistre (`SaveSnapshot`). */
 export interface WorldSnapshot {
@@ -155,6 +158,7 @@ function checkWorld(data: unknown): WorldState {
   checkFishing(data.fishing);
   if (!wardrobeShapeOk(characters)) throw new SaveError('sauvegarde: garde-robe invalide');
   checkBreeding(data);
+  checkPlots(data.plots);
   const village = villageShapeError(data);
   if (village !== null) throw new SaveError(`sauvegarde: ${village} invalide`);
   return data as unknown as WorldState;
@@ -519,7 +523,65 @@ function migrate(data: unknown, dataSchema: number, content: Content, map: GameM
   if (dataSchema < 13 && isRecord(data)) migrateToFormat13(data);
   // Format 14 (0.13, lot H1): carnet des habitudes et champs de l'amitié, avec le départ d'une partie reprise.
   if (dataSchema < 14 && isRecord(data)) migrateToVillage(data, content);
+  // Format 15 (0.13, parcelles libres): les carrés du potager deviennent des parcelles posées au même endroit.
+  if (dataSchema < 15 && isRecord(data)) migrateToPlots(data, content);
   return data;
+}
+
+/**
+ * Format 15 (0.13, `parcelles-libres-0-13.md` section 4): chaque case du potager fixe devient une
+ * parcelle à soi au même endroit, avec son sol, son eau, sa culture et sa dernière récolte; son
+ * numéro reste le sien (0 à 11). Possédées: autant que de cases (au moins `start`), rien d'acheté,
+ * aucune friche défrichée; le rayon d'Odette plein (`stockAtMigration`). Les cordeaux sont donnés
+ * à la reprise (`giveGardenLines`).
+ */
+export function migrateToPlots(world: Record<string, unknown>, content: Content): void {
+  const s = content.settings.garden.plots;
+  const garden = Array.isArray(world.garden) ? world.garden : [];
+  let next = 0;
+  for (const g of garden) {
+    if (isRecord(g) && typeof g.index === 'number' && Number.isFinite(g.index)) next = Math.max(next, Math.floor(g.index) + 1);
+  }
+  const clock = world.clock;
+  const day = isRecord(clock) && typeof clock.day === 'number' ? clock.day : content.settings.clock.firstDay.day;
+  world.plots = {
+    base: Math.max(garden.length, s?.start ?? 0),
+    bought: 0,
+    clearedCells: [],
+    stock: s?.stockAtMigration ?? 0,
+    lastRestockDay: day,
+    nextIndex: Math.max(next, garden.length),
+  };
+}
+
+/** Le cordeau de chaque joueur après la migration au format 15: la barre, sinon le sac, sinon le coffre. */
+function giveGardenLines(sim: Sim): void {
+  const item = sim.content.items[ITEM.gardenLine];
+  if (item === undefined || sim.content.settings.garden.plots === null) return;
+  let stored = false;
+  for (const c of sim.world.characters) {
+    if (c.bag.some((stack) => stack?.item === ITEM.gardenLine)) continue;
+    const left = addToBag(sim, c, ITEM.gardenLine, 'ordinary', 1);
+    if (left > 0) {
+      storeAtHome(sim, ITEM.gardenLine, 'ordinary', left);
+      stored = true;
+    }
+    queueHint(sim, c.id, { on: 'plot_migration' });
+  }
+  if (stored) say(sim, 'both', 'bag_full_to_chest');
+}
+
+/** Compteur des parcelles (format 15): nombres entiers positifs et cases défrichées `[cx, cy]`. */
+function checkPlots(plots: unknown): void {
+  if (!isRecord(plots)) throw new SaveError('sauvegarde: parcelles invalides');
+  for (const key of ['base', 'bought', 'stock', 'lastRestockDay', 'nextIndex']) {
+    const n = plots[key];
+    if (typeof n !== 'number' || !Number.isInteger(n) || n < 0) throw new SaveError('sauvegarde: parcelles invalides');
+  }
+  const cleared = plots.clearedCells;
+  if (!Array.isArray(cleared) || !cleared.every((c) => Array.isArray(c) && c.length === 2 && c.every((n) => Number.isInteger(n)))) {
+    throw new SaveError('sauvegarde: parcelles invalides');
+  }
 }
 
 /**
@@ -730,8 +792,10 @@ export function restoreWorld(
   dataSchema: number,
   players: readonly [PlayerInfo, PlayerInfo],
 ): Sim {
-  // Habitants écrits sans leurs valeurs par défaut (0.13, lot H2): elles reviennent avant les contrôles.
-  const world = checkWorld(fillVillagerDefaults(migrate(data, dataSchema, content, map)));
+  // Habitants écrits sans leurs valeurs par défaut (0.13, lot H2): elles reviennent avant les contrôles,
+  // sur une copie (une sauvegarde refusée reste telle qu'elle a été lue; les références du format 15 sont
+  // les premières écrites sans ces défauts).
+  const world = checkWorld(fillVillagerDefaults(migrate(structuredClone(data), dataSchema, content, map)));
   trialRun(content, map, structuredClone(world), dataSchema, players);
   return resume(content, map, world, dataSchema, players);
 }
@@ -841,6 +905,8 @@ function resume(
   if (dataSchema < 12 && grain !== undefined && world.hens.length > 0) storeAtHome(sim, grain, 'ordinary', 1);
   // R19 (0.12.2): une souche que la règle de repousse rend déjà adulte se relève à la reprise.
   settleRegrownTrees(sim);
+  // Format 15 (0.13): un cordeau par joueur pour le potager devenu libre.
+  if (dataSchema < 15) giveGardenLines(sim);
   // R01: qui est resté pris dans un meuble (sauvegarde d'avant les règles de pose) est dégagé.
   freeStuck(sim);
   // Une sortie pendant l'apogée la compte comme vue (la récompense est donnée au début): l'état

@@ -39,6 +39,40 @@ export interface GrocerPricing {
   seasonFactor: Record<string, readonly [number, number, number, number]>;
   ardoise: { factor: number; max: number; time: number };
   words: { plentyAtMost: number; wantedFrom: number };
+  /**
+   * 0.13 (parcelles libres, section 3): au plus tant d'aubrins payés chaque jour par catégorie
+   * d'objet (`crop`: 250, les légumes bruts), dans le plafond du jour. Absente: aucun.
+   */
+  categoryCap: Record<string, number>;
+}
+
+/** Les parcelles libres (0.13, `reglages.garden.plots`, `parcelles-libres-0-13.md` section 3). */
+export interface GardenPlotsSettings {
+  /** Parcelles de départ d'une partie neuve, posées dans `startRect`. */
+  start: number;
+  startRect: { x: number; y: number; w: number; h: number };
+  /** Parcelles possédées au plus (achetées, offertes par la friche, de départ). */
+  max: number;
+  /** La terre à soi: une zone de la carte, et les parcelles de la carte de cette nature (la friche). */
+  land: { zone: string; clearable: string };
+  /** Zones où aucune parcelle ne se pose (le coin des poules, la réserve de la maison). */
+  forbiddenZones: readonly string[];
+  price: number;
+  shop: 'grocery';
+  restockPerDay: number;
+  stockMax: number;
+  stockAtStart: number;
+  stockAtMigration: number;
+  /** Maintien pour reprendre une parcelle qui porte une culture (secondes réelles). */
+  removeHoldSeconds: number;
+  clearSeconds: number;
+  clearEndurance: number;
+  clearCellsPerPlot: number;
+  /** Ressource potager de la commande générée: cases-jours par parcelle, au plus tant de parcelles. */
+  orderGardenPerPlot: number;
+  orderGardenPlotsCap: number;
+  /** Lot P6 (location des carrés de la Rive): lu, pas encore joué. */
+  rental: { plots: readonly string[]; rentPerCellPerWeek: number; rentFromDay: number; landlord: string } | null;
 }
 import type { FishDef, FishingRules } from './poissons';
 import type { ClothesContent } from './vetements';
@@ -720,7 +754,17 @@ export type HintTrigger =
   | { on: 'near_board_annonce' }
   /** Pêche 0.12: première prise au coin qui frémit, premier guet (`fishing_hot_spot`, `fishing_watch`). */
   | { on: 'fishing_hot_spot' }
-  | { on: 'fishing_watch' };
+  | { on: 'fishing_watch' }
+  /**
+   * 0.13, parcelles libres (section 5.4): une parcelle libre sans le cordeau en main (`plot_free`),
+   * le cordeau pris à la souris (`plot_drag`), la première parcelle posée (`plot_placed`), la houe
+   * près de la friche (`near_friche`), la reprise d'une partie d'avant les parcelles (`plot_migration`).
+   */
+  | { on: 'plot_free' }
+  | { on: 'plot_drag' }
+  | { on: 'plot_placed' }
+  | { on: 'near_friche' }
+  | { on: 'plot_migration' };
 
 export interface HintDef {
   id: string;
@@ -988,6 +1032,8 @@ export interface Settings {
     generated: GeneratedOrderSettings | null;
   };
   trees: TreeSettings;
+  /** Le potager (0.13: parcelles libres); `plots` `null`: le potager fixe de la zone `garden`. */
+  garden: { plots: GardenPlotsSettings | null };
   /** Cueillette (tour 8), ou `null`. */
   forage: ForageSettings | null;
   hens: { eggsPerHenPerDay: number; feedRequired: boolean; max: number; care: HenCareSettings | null };

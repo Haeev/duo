@@ -37,6 +37,12 @@ import { type RefusalTexts, notificationSort, refusalTexts } from './refus';
 import { playerColors, portraitSvg } from './portrait';
 import { typographier } from './typographie';
 import { isWatching } from '../etat/peche';
+import type { PlotPreview } from '../etat/vue';
+import { plotCounter, plotCursor } from './modele-parcelles';
+import { pastille } from './vitrine';
+
+/** Le cordeau (0.13): l'objet dont la case porte la pastille des parcelles libres. */
+const GARDEN_LINE_ITEM = 'garden_line';
 import { habitToast } from './modele-voisins';
 import { habitToastItem } from './voisins';
 
@@ -59,6 +65,8 @@ interface SlotView {
   key: HTMLSpanElement;
   icon: SVGSVGElement;
   count: HTMLSpanElement;
+  /** 0.13: pastille des parcelles libres sur la case du cordeau. */
+  badge: HTMLSpanElement;
   quality: SVGSVGElement;
   gauge: HTMLSpanElement;
   lastCount: number;
@@ -147,6 +155,18 @@ export class Hud {
   private tipUntil = 0;
 
   private readonly toolbar: HTMLDivElement;
+  /** 0.13 (parcelles libres, section 5): compteur au-dessus de la barre, et ce qui suit le pointeur. */
+  private readonly plotCounterEl: HTMLDivElement;
+  private readonly plotCounterText: HTMLSpanElement;
+  private readonly plotCounterLock: SVGSVGElement;
+  private readonly plotReason: HTMLSpanElement;
+  private readonly plotCursor: HTMLDivElement;
+  private readonly plotPlus: HTMLSpanElement;
+  private readonly plotCursorReason: HTMLSpanElement;
+  private readonly plotRing: SVGSVGElement;
+  private readonly plotRingIcon: SVGSVGElement;
+  private plotPreview: PlotPreview | null = null;
+  private plotSig = '';
   private readonly toolbarHeld: HTMLSpanElement;
   private readonly toolbarDetail: HTMLElement;
   /** Dans la maison: la touche du coin à soi. */
@@ -309,7 +329,28 @@ export class Hud {
       this.newUntil.push(0);
       slotsBox.append(view.button);
     }
+    this.plotCounterText = el('span', { class: 'lpl-plot-counter__text', 'aria-hidden': 'true' });
+    this.plotCounterLock = icon('ui-lock', 'lpl-icon lpl-plot-counter__lock');
+    this.plotReason = el('span', { class: 'lpl-plot-reason', hidden: true, 'aria-live': 'polite' });
+    this.plotCounterEl = el('div', { class: 'lpl-plot-counter', role: 'status', hidden: true }, [
+      el('span', { class: 'lpl-plot-counter__box' }, [icon('garden-line', 'lpl-icon lpl-plot-counter__icon'), this.plotCounterText, this.plotCounterLock]),
+      this.plotReason,
+    ]);
+    this.plotPlus = el('span', { class: 'lpl-plot-cursor__plus', hidden: true });
+    this.plotCursorReason = el('span', { class: 'lpl-plot-cursor__reason', hidden: true });
+    this.plotRingIcon = icon('seed-radish', 'lpl-icon lpl-plot-cursor__ring-icon');
+    this.plotRing = svgEl('svg', { class: 'lpl-plot-cursor__ring', viewBox: '0 0 40 40', 'aria-hidden': 'true' });
+    this.plotRing.append(
+      svgEl('circle', { class: 'lpl-plot-cursor__track', cx: '20', cy: '20', r: '17' }),
+      svgEl('circle', { class: 'lpl-plot-cursor__arc', cx: '20', cy: '20', r: '17', pathLength: '100' }),
+    );
+    this.plotCursor = el('div', { class: 'lpl-plot-cursor', hidden: true, 'aria-hidden': 'true' }, [
+      el('span', { class: 'lpl-plot-cursor__hold' }, [this.plotRing, this.plotRingIcon]),
+      this.plotPlus,
+      this.plotCursorReason,
+    ]);
     this.toolbar = el('div', { class: 'lpl-toolbar' }, [
+      this.plotCounterEl,
       el('p', { class: 'lpl-toolbar__label' }, [this.toolbarHeld, this.toolbarDetail, this.toolbarCorner]),
       slotsBox,
     ]);
@@ -371,7 +412,8 @@ export class Hud {
       el('div', { class: 'lpl-hud__top-left' }, [this.clock, purse, this.watch, this.toasts]),
       el('div', { class: 'lpl-hud__top-right' }, [this.partner, this.objective]),
       el('div', { class: 'lpl-hud__bottom-left' }, [this.self]),
-      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.animalCard, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build]),
+      el('div', { class: 'lpl-hud__bottom' }, [this.nap, this.progress, this.animalCard, this.aimPrompt, this.invite, this.tip, this.toolbar, this.build, this.plotCursor]),
+
       el('div', { class: 'lpl-hud__bottom-right' }, [shortcuts]),
     ]);
   }
@@ -381,14 +423,15 @@ export class Hud {
     const key = el('span', { class: 'lpl-slot__key', 'aria-hidden': 'true', text: keyLabel });
     const slotIcon = icon('hoe', 'lpl-slot__icon');
     const count = el('span', { class: 'lpl-slot__count', hidden: true });
+    const badge = el('span', { class: 'lpl-slot__badge', 'aria-hidden': 'true', hidden: true });
     const quality = icon('ui-star', 'lpl-slot__quality');
     quality.toggleAttribute('hidden', true);
     const gauge = el('span', { class: 'lpl-slot__gauge', 'aria-hidden': 'true', hidden: true });
-    const b = button([key, slotIcon, count, quality, gauge], () => {
+    const b = button([key, slotIcon, count, badge, quality, gauge], () => {
       this.host.send({ type: 'select_slot', slot: index });
     }, { class: 'lpl-slot', attrs: { 'aria-selected': 'false' } });
     keepFocusOnGame(b);
-    return { button: b, key, icon: slotIcon, count, quality, gauge, lastCount: 0, lastItem: null };
+    return { button: b, key, icon: slotIcon, count, badge, quality, gauge, lastCount: 0, lastItem: null };
   }
 
   /** Heure seule (appelée à chaque image: compare une chaîne). */
@@ -539,8 +582,9 @@ export class Hud {
     const placing = me.placement !== null;
     setHidden(this.toolbar, placing);
     setHidden(this.build, !placing);
+    this.updatePlots(world, me);
     if (me.placement !== null) this.updateBuild(me.placement, characterOf(world, ctx.partner)?.name ?? '');
-    else this.updateToolbar(me, now);
+    else this.updateToolbar(me, now, plotCounter(world, ctx)?.free ?? 0);
   }
 
   /** Entrée ou clic sur l'invite: ouvrir ou fermer les rideaux, regarder le chantier. Vrai si une invite était là. */
@@ -612,8 +656,67 @@ export class Hud {
     setStyleVar(this.watchRing, '--lpl-value', String(Math.round((ring ?? 0) * 100)));
   }
 
-  private updateToolbar(me: NonNullable<ReturnType<typeof characterOf>>, now: number): void {
-    const model = toolbarModel(this.host.ctx, me);
+  /** 0.13: l'aperçu du cordeau, posé par les entrées à chaque pas. */
+  setPlotPreview(preview: PlotPreview | null): void {
+    this.plotPreview = preview;
+  }
+
+  /**
+   * Le compteur des parcelles (cordeau en main), la raison d'un refus au clavier, et ce qui suit le
+   * pointeur: pastille du tracé, raison, anneau du maintien (section 5). Refait seulement s'il change.
+   */
+  private updatePlots(world: ReadonlyWorld, me: NonNullable<ReturnType<typeof characterOf>>): void {
+    const { ctx } = this.host;
+    const holding = me.bag[me.selected]?.item === GARDEN_LINE_ITEM && me.placement === null;
+    const counter = holding ? plotCounter(world, ctx) : null;
+    const preview = holding ? this.plotPreview : null;
+    const cursor = plotCursor(world, ctx, preview);
+    const pointer = preview?.pointer ?? null;
+    const sig = JSON.stringify([counter, cursor, pointer === null ? null : [Math.round(pointer.x), Math.round(pointer.y)]]);
+    if (sig === this.plotSig) return;
+    this.plotSig = sig;
+    setHidden(this.plotCounterEl, counter === null);
+    if (counter !== null) {
+      setText(this.plotCounterText, counter.text);
+      setAttr(this.plotCounterEl, 'aria-label', counter.label);
+      setAttr(this.plotCounterEl, 'data-cap', counter.atCap ? 'true' : null);
+      setAttr(this.plotCounterEl, 'data-full', counter.free === 0 && !counter.atCap ? 'true' : null);
+      this.plotCounterLock.toggleAttribute('hidden', !counter.atCap);
+    }
+    // Au clavier (sans pointeur), la raison s'écrit à côté du compteur; à la souris, près du pointeur.
+    const reason = cursor?.reason ?? null;
+    setHidden(this.plotReason, reason === null || pointer !== null);
+    if (reason !== null && pointer === null) this.fillReason(this.plotReason, reason);
+    setHidden(this.plotCursor, cursor === null || pointer === null);
+    if (cursor === null || pointer === null) return;
+    setStyleVar(this.plotCursor, '--lpl-x', `${String(Math.round(pointer.x))}px`);
+    setStyleVar(this.plotCursor, '--lpl-y', `${String(Math.round(pointer.y))}px`);
+    const hold = cursor.hold;
+    const holdBox = this.plotRing.parentElement;
+    if (holdBox !== null) setHidden(holdBox, hold === null);
+    if (hold !== null) {
+      setStyleVar(this.plotRing, '--lpl-value', String(Math.round(hold.progress * 100)));
+      setIcon(this.plotRingIcon, hold.icon);
+    }
+    const plus = cursor.plus;
+    setHidden(this.plotPlus, plus === null);
+    if (plus !== null) {
+      clear(this.plotPlus);
+      this.plotPlus.append(pastille({ icon: 'ui-plot', text: plus.text, tone: plus.crossed ? 'missing' : 'ok', crossed: plus.crossed, label: plus.label }));
+      if (plus.counter !== null) this.plotPlus.append(pastille({ icon: 'garden-line', text: plus.counter, tone: 'missing', crossed: true, label: plus.label }));
+    }
+    setHidden(this.plotCursorReason, reason === null);
+    if (reason !== null) this.fillReason(this.plotCursorReason, reason);
+  }
+
+  private fillReason(target: HTMLElement, reason: { icon: string; crossed: boolean; text: string }): void {
+    clear(target);
+    target.append(pastille({ icon: reason.icon, text: reason.text, tone: 'missing', crossed: reason.crossed, label: reason.text }));
+  }
+
+  private updateToolbar(me: NonNullable<ReturnType<typeof characterOf>>, now: number, plotsFree: number): void {
+    const model = toolbarModel(this.host.ctx, me, plotsFree);
+
     setText(this.toolbarHeld, model.held);
     setText(this.toolbarDetail, model.detail);
     setHidden(this.toolbarDetail, model.detail === '');
@@ -635,6 +738,8 @@ export class Hud {
     if (slot.icon !== null) setIcon(view.icon, slot.icon);
     setHidden(view.count, slot.count <= 1);
     setText(view.count, String(slot.count));
+    setHidden(view.badge, slot.badge === null);
+    setText(view.badge, slot.badge === null ? '' : String(slot.badge));
     setHidden(view.quality, !slot.fine);
     setHidden(view.gauge, slot.gauge === null);
     if (slot.gauge !== null) setStyleVar(view.gauge, '--lpl-value', `${Math.round(slot.gauge * 100)}%`);

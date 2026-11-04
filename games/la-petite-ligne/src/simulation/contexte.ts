@@ -6,6 +6,7 @@ import { createRandom, type RandomSource } from '@duo/sdk/sim';
 import type { ClickTarget, Intent } from '../etat/actions';
 import type { GameMap } from '../etat/carte';
 import type {
+  Cell,
   Character,
   CharacterId,
   GameNotification,
@@ -89,6 +90,11 @@ export interface Runtime {
   habitWatch: Map<string, number>;
   /** 0.13 (lot H2): secondes passées près de chaque habitant pendant son anniversaire (règle 6.2). */
   birthdayWatch: Map<string, number>;
+  /**
+   * 0.13 (parcelles libres): reprise maintenue d'une parcelle qui porte une culture (X ou clic
+   * droit tenu), case et pas du début; elle aboutit après `removeHoldSeconds`, relâchée elle s'annule.
+   */
+  plotHold: Record<CharacterId, { cell: Cell; since: number } | null>;
 }
 
 export interface Sim {
@@ -126,6 +132,7 @@ export function createRuntime(map: GameMap): Runtime {
     villagerHabits: new Map(),
     habitWatch: new Map(),
     birthdayWatch: new Map(),
+    plotHold: { p1: null, p2: null },
   };
 }
 

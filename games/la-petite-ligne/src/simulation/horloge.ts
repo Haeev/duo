@@ -21,6 +21,8 @@ import { morningGoats } from './chevres';
 import { morningGrowth } from './potager';
 import { crossed, trainClock } from './train';
 import { grocerDawn, postArdoise } from './epicerie';
+import { restockPlots } from './parcelles';
+
 import { marketClock } from './marche';
 import { mailClock } from './plis';
 import { morningMoments } from './moments';
@@ -194,6 +196,7 @@ export function morning(sim: Sim): void {
   reopenCrate(sim);
   world.grocerSoldToday = 0;
   grocerDawn(sim);
+  restockPlots(sim);
   for (const c of world.characters) {
     const bed = world.furniture.find((f) => f.id === c.bedId);
     const at = bed === undefined ? houseSpawn(sim) : { x: bed.cell.cx + 0.5, y: bed.cell.cy + 0.5 };

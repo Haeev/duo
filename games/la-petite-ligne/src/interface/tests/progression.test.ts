@@ -149,6 +149,7 @@ describe('invite du survol', () => {
     const all: Record<AimVerb, true> = {
       fish: true,
       till: true,
+      clear: true,
       sow: true,
       water: true,
       harvest: true,

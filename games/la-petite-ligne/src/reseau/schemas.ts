@@ -76,6 +76,9 @@ export const IntentSchema = v.variant('type', [
   v.strictObject({ type: v.literal('place_furniture'), cell: CellSchema, rotation: Int }),
   v.strictObject({ type: v.literal('take_furniture'), furniture: Id }),
   v.strictObject({ type: v.literal('hold_furniture'), item: Id }),
+  v.strictObject({ type: v.literal('plot_place'), cells: v.pipe(v.array(CellSchema), v.maxLength(256)) }),
+  v.strictObject({ type: v.literal('plot_remove'), cells: v.pipe(v.array(CellSchema), v.maxLength(256)) }),
+  v.strictObject({ type: v.literal('plot_hold'), cell: v.nullable(CellSchema) }),
   v.strictObject({ type: v.literal('corner'), x: Finite, y: Finite }),
   v.strictObject({ type: v.literal('corner_clear') }),
   v.strictObject({ type: v.literal('cancel_placement') }),
@@ -163,6 +166,10 @@ function looksLikeWorld(value: unknown): value is SentWorld {
     Array.isArray(w.characters) &&
     w.characters.length === 2 &&
     Array.isArray(w.garden) &&
+    w.garden.every((p) => Array.isArray(p)) &&
+    typeof w.plots === 'object' &&
+    w.plots !== null &&
+
     Array.isArray(w.villagers) &&
     typeof w.clock === 'object' &&
     w.clock !== null

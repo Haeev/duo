@@ -44,6 +44,11 @@ function matches(trigger: HintTrigger, signal: HintSignal): boolean {
     case 'near_board_annonce':
     case 'fishing_hot_spot':
     case 'fishing_watch':
+    case 'plot_free':
+    case 'plot_drag':
+    case 'plot_placed':
+    case 'near_friche':
+    case 'plot_migration':
       return true;
   }
 }

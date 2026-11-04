@@ -15,7 +15,7 @@ import './vitrine.css';
 import spriteIcones from '../../ui-maquettes/icones.svg?raw';
 import type { Intent } from '../etat/actions';
 import type { MenuKind, ReadonlyWorld, WorldEvent } from '../etat/types';
-import type { CameraCommand, GameInterface, GameView, InterfaceOptions } from '../etat/vue';
+import type { CameraCommand, GameInterface, GameView, InterfaceOptions, PlotPreview } from '../etat/vue';
 import { NotebookPanel, startMemorySession } from './carnet';
 import type { KeyInfo, Layer, PanelTab, UiHost } from './composant';
 import { UI_SETTINGS } from './config';
@@ -307,6 +307,11 @@ class GameUi implements GameInterface, UiHost {
 
   capturesMovement(): boolean {
     return this.mounted !== null;
+  }
+
+  /** 0.13: l'aperçu du cordeau, transmis au HUD (pastille du tracé, anneau, raison du refus). */
+  setPlotPreview(preview: PlotPreview | null): void {
+    this.hud.setPlotPreview(preview);
   }
 
   dispose(): void {

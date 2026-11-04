@@ -265,6 +265,18 @@ export function parseLevelMap(files: Record<string, unknown>): GameMap {
     startFurniture,
     seats,
     improvements,
+    plotAreas: (r.opt('parcelles')?.items() ?? []).map((a) => ({
+      id: a.at('id').string(),
+      nature: a.at('nature').string(),
+      cells: a
+        .at('cases')
+        .items()
+        .map((cell) => {
+          const [cx, cy] = cell.numberList();
+          if (cx === undefined || cy === undefined || !Number.isInteger(cx) || !Number.isInteger(cy)) return cell.fail('[cx, cy] attendu');
+          return { cx, cy };
+        }),
+    })),
     fishingZones: (r.opt('peche')?.opt('coins')?.items() ?? []).map((z) => ({
       id: z.at('id').string(),
       name: z.at('nom').string(),

@@ -24,6 +24,18 @@ export interface OrderDrawInput {
   book: Readonly<Pick<OrderBook, 'budget' | 'recent' | 'ordered'>>;
   /** Poules au tirage (tour 9: la capacité d'œufs suit leur nombre); absent: 3. */
   hens?: number;
+  /**
+   * 0.13 (parcelles libres, section 2.8): ressource du potager en cases-jours, calculée au tirage
+   * (`gardenCapacity`); absente: la valeur fixe des réglages (`resources.garden`).
+   */
+  garden?: number;
+}
+
+/** Ressource du potager d'une commande (PL-20): `orderGardenPerPlot` x parcelles possédées et louées, au plus `orderGardenPlotsCap`. */
+export function gardenCapacity(settings: Pick<Settings, 'garden'>, plots: number): number | undefined {
+  const s = settings.garden.plots;
+  if (s === null) return undefined;
+  return Math.round(s.orderGardenPerPlot * Math.min(plots, s.orderGardenPlotsCap) * 1000) / 1000;
 }
 
 type Rules = Pick<Settings, 'calendar' | 'forage'> & { feel?: Pick<Settings['feel'], 'fishWeights' | 'fishWeightsBySeason'> };
@@ -138,10 +150,10 @@ export function clashes(g: GeneratedOrderSettings, a: string, b: string): boolea
   return base(a).some((x) => ofB.includes(x));
 }
 
-function capacity(g: GeneratedOrderSettings, p: OrderProduct, hens: number): number {
+function capacity(g: GeneratedOrderSettings, p: OrderProduct, hens: number, garden: number | undefined): number {
   switch (p.resource) {
     case 'garden':
-      return g.resources.garden;
+      return garden ?? g.resources.garden;
     case 'eggs': {
       // Tour 9: poules x œufs par semaine (5,4 x 3 = 16,2, comme avant); arrondi au millième.
       const per = g.eggsPerHenPerWeek;
@@ -186,7 +198,7 @@ function quantity(
     if (count > cap || count * p.cost > room + 1e-9) count = Math.max(p.min, Math.floor(units));
     return { item: p.item, count, share: count * p.cost };
   }
-  const c = capacity(g, p, input.hens ?? 3);
+  const c = capacity(g, p, input.hens ?? 3, input.garden);
   const minShare = (p.min * p.cost) / c;
   if (minShare > room + 1e-9) return null;
   const s = Math.min(share, room);

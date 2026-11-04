@@ -28,6 +28,7 @@ import type { MarketLevel } from '../donnees/marche';
 import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
+import type { PlotRefusal } from './parcelles';
 import type { HabitSource, TasteLevel, VillageWorldFields } from './types-voisins';
 import type { BuildingId } from './carte';
 import type { FishingState, FishRarity } from './peche';
@@ -116,7 +117,10 @@ export interface WorldState extends VillageWorldFields {
   /** Étapes de la partie (tour 8): franchies, en cours d'écran, choix des deux joueurs. */
   stages: StagesState;
   characters: Character[];
+  /** Le potager: les parcelles posées (0.13: où l'on veut sur sa terre, format 15). */
   garden: GardenCell[];
+  /** Compteur des parcelles, rayon d'Odette et friche défrichée (0.13, format 15). */
+  plots: PlotsState;
   trees: Tree[];
   /** Poutre du toit (geste à deux « porter »). `null` une fois posée. */
   beam: Beam | null;
@@ -693,6 +697,8 @@ export type AimVerb =
   | 'place'
   | 'give'
   | 'dig'
+  /** Défricher une case de friche à la houe (0.13, parcelles libres). */
+  | 'clear'
   /** S'asseoir sur la place libre d'un banc. */
   | 'sit'
   /** Tenir l'échelle de Basile (geste « tenir », moment rare). */
@@ -789,8 +795,10 @@ export interface PlacedDecor {
 export type CellSoil = 'grass' | 'tilled';
 
 export interface GardenCell {
-  /** Index dans le potager (0 à 11). */
+  /** Numéro stable de la parcelle (`plots.nextIndex` à la pose), jamais réutilisé. */
   index: number;
+  /** 0.13: `rented` pour une parcelle louée (lot P6), fixe et hors du compteur; absente: à soi. */
+  kind?: 'rented';
   cell: Cell;
   soil: CellSoil;
   /** Arrosée aujourd'hui (arrosoir ou pluie): la culture poussera demain matin. */
@@ -801,6 +809,25 @@ export interface GardenCell {
 }
 
 export type CropStage = 'seed' | 'sprout' | 'young' | 'ripe';
+
+/**
+ * Les parcelles libres (0.13, `parcelles-libres-0-13.md` section 2): possédées = `base` + `bought`
+ * + une par `clearCellsPerPlot` cases de friche défrichées, au plus `max` des réglages.
+ */
+export interface PlotsState {
+  /** Parcelles de départ (6 en partie neuve, 12 à la reprise d'une 0.12). */
+  base: number;
+  /** Achetées chez Odette. */
+  bought: number;
+  /** Cases de friche défrichées, `[cx, cy]`, dans l'ordre du défrichage. */
+  clearedCells: [number, number][];
+  /** Parcelles en rayon chez Odette. */
+  stock: number;
+  /** Jour du dernier réapprovisionnement du rayon. */
+  lastRestockDay: number;
+  /** Numéro de la prochaine parcelle posée. */
+  nextIndex: number;
+}
 
 export interface CropState {
   crop: CropId;
@@ -1431,6 +1458,14 @@ export type WorldEvent =
   | { type: 'refilled'; by: CharacterId; at: PointId }
   | { type: 'harvested'; by: CharacterId; cell: Cell; item: ItemId; quality: Quality; count: number }
   | { type: 'already_taken'; by: CharacterId; other: CharacterId; cell: Cell }
+  // 0.13, parcelles libres (section 5.5): pose (un tracé: ses cases dans l'ordre), refus, reprise,
+  // cultures laissées par un rectangle de reprise, friche défrichée, parcelle gagnée.
+  | { type: 'plot_placed'; by: CharacterId; cells: Cell[] }
+  | { type: 'plot_refused'; by: CharacterId; cell: Cell; reason: PlotRefusal }
+  | { type: 'plot_removed'; by: CharacterId; cell: Cell; returned: { item: ItemId; quality: Quality; count: number } | null }
+  | { type: 'plot_kept'; by: CharacterId; cells: Cell[] }
+  | { type: 'friche_cleared'; by: CharacterId; cell: Cell; gift: boolean }
+  | { type: 'plot_gained'; by: CharacterId; source: 'shop' | 'friche'; count: number }
   | { type: 'chop'; by: CharacterId; tree: string; felled: boolean }
   /** La hache refusée sur une souche (`stump`) ou un rejet trop jeune (`young`, il tremble un peu). */
   | { type: 'chop_refused'; by: CharacterId; tree: string; reason: 'stump' | 'young' }

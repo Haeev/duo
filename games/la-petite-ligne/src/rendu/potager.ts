@@ -6,10 +6,15 @@
  * la souche rejette (chêne) ou Basile replante (sapin), jusqu'à l'arbre adulte (tour 8).
  */
 import { Euler, Matrix4, Quaternion, Vector3 } from 'three';
-import type { GardenCell, DeepReadonly, Tree } from '../etat/types';
+import type { Cell, GardenCell, DeepReadonly, Tree } from '../etat/types';
+import type { GameMap } from '../etat/carte';
+import { fricheCells } from '../etat/parcelles';
+import type { Content } from '../donnees/types';
+
 import type { FrameContext, PickRegistry, PickTarget } from './contexte';
 import { setStandingBox } from './contexte';
 import { InstancedBatches } from './lots';
+import { hash2 } from './bruit';
 import type { SharedMaterials } from './materiaux';
 import { textHash, type ModelLibrary } from './modeles';
 import type { EventfulPart } from './monde';
@@ -21,7 +26,15 @@ import type { Settings } from '../donnees/types';
 import { treeGrowth } from '../etat/repousse';
 
 const SETTINGS = RENDER_SETTINGS.garden;
-const GARDEN_CAPACITY = 16;
+/**
+ * Instances par modèle du potager (0.13, PL-22): 40 parcelles à soi et 40 louées au plus, avec
+ * une marge (une sauvegarde d'avant le plafond, un tracé qui arrive pendant une reprise).
+ */
+export const GARDEN_CAPACITY = 96;
+/** Ronciers de la friche (0.13): une case de friche au plus chacun. */
+const FRICHE_CAPACITY = 64;
+const FRICHE_MODEL = 'bush_bramble';
+const BRAMBLE_SEED = 41;
 const RIPE_SWAY = 0.06;
 const RIPE_SWAY_SPEED = 1.7;
 const POP_START_SCALE = 0.55;
@@ -94,6 +107,12 @@ function easeOutBack(t: number, overshoot: number): number {
 export class GardenPart implements EventfulPart {
   readonly batches: InstancedBatches;
   readonly trees: InstancedBatches;
+  /** 0.13: les ronciers des cases de friche pas encore défrichées. */
+  readonly friche: InstancedBatches;
+  /** 0.13: instant où chaque parcelle posée commence à sortir de terre (vague d'un rectangle). */
+  private readonly appearAt = new Map<string, number>();
+  private readonly fricheCells: readonly Cell[];
+  private readonly fricheMatrices: Matrix4[];
   private readonly lastStage = new Map<string, string>();
   private readonly popStart = new Map<string, number>();
   private readonly shakeStart = new Map<string, number>();
@@ -117,7 +136,10 @@ export class GardenPart implements EventfulPart {
     resources: ResourceTracker,
     private readonly picks: PickRegistry,
     private readonly treeRules: Settings['trees'] | null = null,
+    plots: { content: Content; map: GameMap } | null = null,
   ) {
+    this.fricheCells = plots === null ? [] : fricheCells(plots.content, plots.map);
+    this.friche = new InstancedBatches('friche', library, materials, resources, FRICHE_CAPACITY, false);
     // Cultures et mottes restent basses: leur ombre ne se verrait pas, on l'économise.
     this.batches = new InstancedBatches(
       'potager',
@@ -138,11 +160,23 @@ export class GardenPart implements EventfulPart {
       RENDER_SETTINGS.terrain.edgeTreeChunk,
     );
     this.library = library;
+    this.fricheMatrices = this.fricheCells.map((cell) => this.brambleMatrix(cell));
   }
+
 
   private readonly library: ModelLibrary;
 
   handleEvent(event: WorldEvent, context: FrameContext): void {
+    if (event.type === 'plot_placed') {
+      if (context.reducedMotion) return;
+      // Rangée par rangée, dans l'ordre du tracé: la première rangée tout de suite.
+      const rows: number[] = [];
+      for (const cell of event.cells) {
+        if (!rows.includes(cell.cy)) rows.push(cell.cy);
+        this.appearAt.set(cellKey(cell), this.time + rows.indexOf(cell.cy) * SETTINGS.waveSeconds);
+      }
+      return;
+    }
     if (event.type === 'chop_refused') {
       if (event.reason === 'young') {
         this.shakeStart.set(event.tree, this.time);
@@ -172,12 +206,44 @@ export class GardenPart implements EventfulPart {
   update(context: FrameContext): void {
     this.time = context.time;
     this.updateGarden(context.world.garden, context);
+    this.updateFriche(context);
     this.updateTrees(context.world.trees, context);
+  }
+
+  /** Un roncier bas sur chaque case de friche encore à défricher (taille et cap tirés de la case). */
+  private updateFriche(context: FrameContext): void {
+    this.friche.begin();
+    const cleared = context.world.plots.clearedCells;
+    this.fricheCells.forEach((cell, i) => {
+      const placed = this.fricheMatrices[i];
+      if (placed === undefined || cleared.some(([cx, cy]) => cx === cell.cx && cy === cell.cy)) return;
+      this.friche.add(FRICHE_MODEL, placed);
+    });
+    this.friche.end();
+  }
+
+  /** Place de chaque roncier, tirée de sa case une fois pour toutes (rien d'alloué par image). */
+  private brambleMatrix(cell: Cell): Matrix4 {
+    // Un roncier bas et étalé, jamais deux pareils: écart, cap, taille et allongement tirés de la case.
+    const jx = hash2(cell.cx, cell.cy, BRAMBLE_SEED) - 0.5;
+    const jy = hash2(cell.cx, cell.cy, BRAMBLE_SEED + 1) - 0.5;
+    const size = hash2(cell.cx, cell.cy, BRAMBLE_SEED + 2);
+    const stretch = hash2(cell.cx, cell.cy, BRAMBLE_SEED + 3);
+    const x = cell.cx + 0.5 + jx * SETTINGS.brambleJitter;
+    const y = cell.cy + 0.5 + jy * SETTINGS.brambleJitter;
+    const [low, high] = SETTINGS.brambleScale;
+    const s = low + size * (high - low);
+    this.position.set(x, this.terrain.heightAt(x, y), y);
+    this.rotation.setFromEuler(this.euler.set(0, hash2(cell.cx, cell.cy, BRAMBLE_SEED + 4) * Math.PI * 2, 0));
+    this.scale.set(s * (1 + 0.45 * stretch), s * (0.65 + 0.3 * (1 - stretch)), s * (1 + 0.25 * size));
+    return new Matrix4().compose(this.position, this.rotation, this.scale);
   }
 
   private updateGarden(cells: readonly DeepReadonly<GardenCell>[], context: FrameContext): void {
     this.batches.begin();
-    cells.forEach((cell, index) => {
+    for (const cell of cells) {
+      // Numéro stable de la parcelle (0.13): le cap des plants ne change pas quand une voisine part.
+      const index = cell.index;
       const x = cell.cell.cx + 0.5;
       const y = cell.cell.cy + 0.5;
       const ground = this.terrain.heightAt(x, y);
@@ -187,9 +253,21 @@ export class GardenPart implements EventfulPart {
           : cell.wet
             ? 'garden_cell_tilled_wet'
             : 'garden_cell_tilled';
-      this.matrix.makeTranslation(x, ground, y);
-      this.batches.add(soil, this.matrix);
       const key = cellKey(cell.cell);
+      // Une parcelle qui vient d'être posée sort de terre (vague du rectangle).
+      const appear = this.appearAt.get(key);
+      const u = appear === undefined ? 1 : (context.time - appear) / SETTINGS.plotAppearSeconds;
+      if (u >= 1 && appear !== undefined) this.appearAt.delete(key);
+      if (u < 1) {
+        const grow = u <= 0 ? 0.001 : Math.max(0.001, easeOutBack(u, SETTINGS.growPopOvershoot));
+        this.position.set(x, ground, y);
+        this.rotation.identity();
+        this.scale.set(grow, grow, grow);
+        this.matrix.compose(this.position, this.rotation, this.scale);
+      } else {
+        this.matrix.makeTranslation(x, ground, y);
+      }
+      this.batches.add(soil, this.matrix);
       const crop = cell.crop;
       const stage = crop === null ? '' : `${crop.crop}_stage_${crop.stage}`;
       if (this.lastStage.get(key) !== stage) {
@@ -199,7 +277,7 @@ export class GardenPart implements EventfulPart {
         this.lastStage.set(key, stage);
       }
       if (crop === null) {
-        return;
+        continue;
       }
       const popAt = this.popStart.get(key);
       const t =
@@ -213,7 +291,7 @@ export class GardenPart implements EventfulPart {
       this.rotation.setFromEuler(this.euler.set(sway, (index * Math.PI) / 2, sway / 2));
       this.scale.setScalar(size);
       this.batches.add(stage, this.matrix.compose(this.position, this.rotation, this.scale));
-    });
+    }
     this.batches.end();
   }
 

@@ -17,7 +17,7 @@ import { SIM_DT, SIM_HZ } from '../src/simulation/constantes';
 import { placeCharacter, walkStep } from '../src/simulation/deplacement';
 import type { Blockers } from '../src/simulation/grille';
 import { step } from '../src/simulation/pas';
-import { createRobot, newSim, play } from './aides';
+import { createRobot, demoGarden, newSim, play } from './aides';
 
 /** Jour 1, scène finie; Sacha au comptoir; Camille à `at`, tournée vers `facing`, l'outil `tool` en main. */
 function camille(at: Vec2, facing: number, tool: string): Sim {
@@ -33,10 +33,7 @@ function camille(at: Vec2, facing: number, tool: string): Sim {
   if (slot < 0 || slot >= 10) throw new Error(`${tool} absent de la barre`);
   c.selected = slot;
   c.water = 8;
-  for (const g of sim.world.garden) {
-    g.soil = 'grass';
-    g.crop = null;
-  }
+  demoGarden(sim);
   step(sim, { controls: {}, intents: [] });
   return sim;
 }

@@ -12,6 +12,11 @@
 /** Clés des messages de refus dans `textes.json`. */
 export const REFUSAL_KEYS: ReadonlySet<string> = new Set([
   'already_taken',
+  // 0.13, parcelles libres: les refus hors des raisons de pose (`placement_plot_*`).
+  'plot_rented_locked',
+  'goat_stake_plots',
+  'plot_cap_reached',
+  'plot_stock_empty',
   'not_enough_money',
   'bag_full',
   'grocer_not_buying',

@@ -37,6 +37,28 @@ import { Panel, backKeys } from './panneau';
 import { builtList, chantierCard } from './tableau';
 import { SOUND_ATTR } from './sons';
 import { type VitrineItem, Vitrine, detailActions, detailHead, flyCoin, need, pastille, pastilles } from './vitrine';
+import { type PlotCounterModel, plotCounter } from './modele-parcelles';
+import { plotsRoom } from '../etat/parcelles';
+import { categoryRoom } from '../etat/epicerie';
+
+/** La parcelle de la vitrine d'Odette (0.13, `ITEM.plot`). */
+const PLOT_ITEM = 'plot';
+
+interface PlotShopModel {
+  stock: number;
+  /** Ce qui s'achète maintenant: le rayon, borné par le plafond. */
+  buyable: number;
+  atCap: boolean;
+  counter: PlotCounterModel;
+}
+
+function plotShop(world: ReadonlyWorld, ctx: UiHost['ctx']): PlotShopModel | null {
+  const counter = plotCounter(world, ctx);
+  if (counter === null) return null;
+  const room = plotsRoom(ctx.content, world);
+  return { stock: world.plots.stock, buyable: Math.min(world.plots.stock, room), atCap: room === 0, counter };
+}
+
 
 // ---------------------------------------------------------------------------
 // Caisse de la coopérative
@@ -302,10 +324,14 @@ export class ShopPanel extends Panel {
       const me = characterOf(world, ctx.me);
       const owned = Object.fromEntries(entries.map((e) => [e.item, me === null ? 0 : countIn(me.bag, e.item)]));
       const vitrine = this.vitrines.buy;
-      const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName, owned, vitrine.page]);
+      // 0.13: la vignette « Parcelle » suit le rayon et le compteur (parcelles libres).
+      const plots = plotShop(world, ctx);
+      const sig = JSON.stringify(['buy', entries, open, world.purse, partnerName, owned, vitrine.page, plots]);
       this.renderBody(sig, () => {
         const focus = entries[defaultProduct(entries)]?.item ?? null;
-        const items = entries.map((e) => this.buyItem(e, world.purse, partnerName, owned[e.item] ?? 0));
+        const items = entries.map((e) =>
+          e.item === PLOT_ITEM && plots !== null ? this.plotItem(e, plots, world.purse, partnerName) : this.buyItem(e, world.purse, partnerName, owned[e.item] ?? 0),
+        );
         const closed = this.shop === 'haberdashery' ? k.haberdasheryClosed : k.closedNotice;
         const notice = open ? null : el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(closed)]);
         return [notice, vitrine.build(items, focus === null ? null : `item:${focus}`)];
@@ -332,10 +358,96 @@ export class ShopPanel extends Panel {
       }
       if (!open) strip.push(el('p', { class: 'lpl-vitrine__notice' }, [icon('ui-lock'), ctx.t(k.closedNotice)]));
       if (entries.length === 0) return [...strip, el('div', { class: 'lpl-empty', text: ctx.t(k.nothingToSell) })];
-      const canSell = (e: SellEntry): boolean => budget.buys && budget.room >= e.unit && open;
+      // 0.13: le garde-fou d'une catégorie (250 aubrins de légumes par jour) grise aussi la vignette.
+      const canSell = (e: SellEntry): boolean => budget.buys && budget.room >= e.unit && categoryRoom(ctx.content, world, e.item) >= e.unit && open;
       const items = entries.map((e) => this.sellItem(e, canSell(e)));
       return [...strip, vitrine.build(items, entries[0] === undefined ? null : `item:${entries[0].item}:${entries[0].quality}`)];
     });
+  }
+
+  /**
+   * 0.13 (parcelles libres, section 5.3): la vignette « Parcelle ». Prix, rayon et compteur en
+   * pastilles; « Acheter 1 », et « Acheter 4 » (ou ce qui reste en rayon), qui part en proposition à
+   * l'autre au-delà du seuil des gros achats. Rayon vide: grisée, la lune (« demain »). Plafond: barrée.
+   */
+  private plotItem(e: BuyEntry, plots: PlotShopModel, purse: number, partnerName: string): VitrineItem {
+    const { ctx } = this.host;
+    const v = ctx.texts.extra.vitrine;
+    const k = ctx.texts.extra.shop;
+    const t = ctx.texts.extra.plots;
+    const threshold = ctx.content.settings.economy.bigPurchaseThreshold;
+    const bulk = Math.min(UI_SETTINGS.shopBulk, plots.buyable);
+    const blocked = plots.buyable === 0;
+    const buy = (count: number, from: Element | null): boolean => {
+      if (e.waiting || blocked || e.price * count > purse) return false;
+      this.host.send({ type: 'buy', item: e.item, count });
+      if (from !== null) flyCoin(from, 'buy');
+      return true;
+    };
+    const stockPastille = {
+      icon: 'shelf',
+      text: ctx.t(t.stock, { count: plots.stock }),
+      tone: plots.stock === 0 ? ('missing' as const) : ('count' as const),
+      crossed: plots.stock === 0,
+      label: ctx.t(plots.stock === 0 ? t.stockEmpty : t.stockLabel, { count: plots.stock }),
+    };
+    const counterPastille = {
+      icon: 'garden-line',
+      text: plots.counter.text,
+      tone: plots.atCap ? ('missing' as const) : ('info' as const),
+      crossed: plots.atCap,
+      label: plots.atCap ? ctx.t(t.capReached, { owned: plots.counter.owned }) : plots.counter.label,
+    };
+    const label = plots.atCap
+      ? ctx.t(t.capReached, { owned: plots.counter.owned })
+      : plots.stock === 0
+        ? ctx.t(t.stockEmpty)
+        : e.missing > 0
+          ? ctx.t(v.missingLabel, { name: e.name, price: e.price, missing: e.missing })
+          : ctx.t(v.priceLabel, { name: e.name, price: e.price });
+    return {
+      key: `item:${e.item}`,
+      tile: {
+        icon: e.icon,
+        name: e.name,
+        label,
+        badge: plots.atCap
+          ? { icon: null, text: plots.counter.text, tone: 'missing', crossed: true }
+          : { icon: null, text: String(e.price), tone: e.missing > 0 ? 'missing' : 'price' },
+        corner: e.waiting ? 'ui-hourglass' : plots.atCap ? 'ui-lock' : plots.stock === 0 ? 'ui-moon' : null,
+        state: e.waiting ? 'wait' : blocked ? 'locked' : e.missing > 0 ? 'missing' : null,
+      },
+      detail: () => {
+        const actions: (HTMLElement | null)[] = [];
+        if (e.waiting) actions.push(chip(ctx.t(ctx.texts.extra.catalogue.waitingPartner, { partner: partnerName }), 'waiting', 'ui-hourglass'));
+        else {
+          const one = button(ctx.t(k.buyCount, { count: 1 }), () => {
+            buy(1, one);
+          }, { class: 'lpl-button lpl-button--primary', attrs: { 'data-nav-item': true, 'data-key': `buy:${e.item}`, 'aria-disabled': blocked || e.missing > 0 ? 'true' : null } });
+          actions.push(one);
+          if (bulk > 1) {
+            const big = e.price * bulk >= threshold;
+            const label = big ? [token('other', this.host.symbol('other'), 'small'), ctx.t(k.propose, { partner: partnerName })] : ctx.t(k.buyCount, { count: bulk });
+            const many = button(label, () => {
+              buy(bulk, big ? null : many);
+            }, { attrs: { 'data-nav-item': true, 'data-key': `bulk:${e.item}`, 'aria-disabled': e.price * bulk > purse ? 'true' : null } });
+            actions.push(many);
+          }
+        }
+        return [
+          ...detailHead(e.icon, e.name, e.info),
+          pastilles([
+            e.missing > 0
+              ? { icon: CURRENCY.icon, text: `${String(purse)}/${String(e.price)}`, tone: 'missing', crossed: true, label: ctx.t(ctx.texts.extra.common.missingMoney, { missing: e.missing }) }
+              : { icon: CURRENCY.icon, text: String(e.price), tone: 'price', label: ctx.t(ctx.texts.game.ui.shop.price, { price: e.price }) },
+            stockPastille,
+            counterPastille,
+          ]),
+          detailActions(actions),
+        ];
+      },
+      act: (tile) => buy(1, tile),
+    };
   }
 
   private buyItem(e: BuyEntry, purse: number, partnerName: string, owned: number): VitrineItem {

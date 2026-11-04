@@ -490,3 +490,14 @@ Apprentissages vérifiés le 2026-10-31 en codant `games/la-petite-ligne/src/int
 - Les effets d'une étape (`steps[].effects`) jouent quand l'étape se FINIT (`advance`), pas quand elle commence: pour ouvrir quelque chose au début d'une étape, le mettre sur l'étape d'avant, ou le déduire de l'étape en cours (décisions: ouverture automatique quand l'étape cite `decision_made`, sous `all` et `any`).
 - Un test qui fait des pas sur un monde neuf: la scène d'arrivée de Firmin se lance d'elle-même et suspend tous les scripts d'effets (`world.scene`); la marquer vue (`dialoguesDone`) avant.
 - L'invité ne reçoit l'état qu'à cadence limitée: compter une quinzaine de pas avant de lire `guest.view.world()` dans un test réseau.
+## Parcelles libres de la 0.13 (La Petite Ligne, vérifié le 2026-11-04)
+
+- Règles de pose pures dans `src/etat/parcelles.ts` (`plotPlacement`, `previewPlacement`), lues par la simulation, l'aperçu du rendu et le HUD: chez l'invité, la même fonction donne la prévision. Terre posable mise en cache par carte et réglages (`WeakMap`).
+- Forme compacte dans l'état transmis seulement (`sendPlot`/`readPlot` dans `sentWorld`/`worldFromSent`); la sauvegarde garde les objets complets (aller-retour exact, migrations simples). 40 parcelles en culture: 1,3 Ko contre 8,7 Ko.
+- `restoreWorld` copie la donnée lue avant `fillVillagerDefaults`: les références du format 15 sont les premières écrites sans les défauts des habitants, et le test « sauvegarde abîmée » exige qu'une sauvegarde refusée reste intacte.
+- Les tests de gestes qui visaient les 12 cases fixes appellent `demoGarden(sim)` (`tests/aides.ts`): les 12 parcelles de la zone `garden`, comme la reprise d'une 0.12.
+- Les bancs d'essai des entrées (`ressenti.test.ts`) donnent une vue sans `content`: n'y lire le contenu que quand l'outil concerné est en main.
+- `textHash` de chaînes voisines (« f-8:29 », « f-7:29 ») donne des valeurs presque linéaires: les ronciers sortaient alignés en pépinière. Prendre `hash2(cx, cy, graine)` de `bruit.ts`.
+- Un point d'action à moins de 1,2 m du centre d'une case vole le clic au sol sur cette case (`resolveClick`): le puisage du bief est posé dans le bas de sa case d'eau.
+- Le cordeau est ajouté après la canne dans `createWorld`, pas dans `startingInventory.eachPlayer`: les cases des outils d'avant ne bougent pas.
+- Outil isolé: les gros remplacements passent par `rep.py` du scratchpad (spécification `FILE`, `%%%%`, `@@@@` écrite avec Write); une fusion avec conflit dans un fichier généré (`icones.js`): prendre l'autre côté puis relancer le générateur; vérifier ensuite les marqueurs dans tous les fichiers (`grep -rln '^<<<<<<< '`), la fusion en commit temporaire les garde.

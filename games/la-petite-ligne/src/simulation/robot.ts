@@ -27,6 +27,8 @@ import { holdsRod, waterAhead } from './peche';
 import { shadowVisibleTo } from '../etat/peche';
 import { toolKindOf } from './catalogue';
 import { inSowingSeason } from './potager';
+import { fricheCells, fricheToClear, landCells, plotPlacement, plotsFree, plotsRoom } from '../etat/parcelles';
+
 import { counterRemaining, evaluateAll, NO_CONTEXT, orderSatisfied } from './conditions';
 import { catalogueOffers } from '../etat/catalogue';
 import { improvementRemaining, improvementView, openImprovement } from './chantiers';
@@ -249,6 +251,59 @@ function orderSeedPlan(sim: Sim, day: number, last: number): string[] {
     if (wantedOf(sim, crop.harvest) + ingredientNeed(sim, crop.harvest) > inBags(sim, crop.harvest) + growing) plan.push(crop.id);
   }
   return plan;
+}
+
+/** Au-delà de cette bourse, le robot achète une parcelle s'il y en a en rayon (lot P4). */
+const ROBOT_PLOT_PURSE = 300;
+/** Le robot défriche le matin, avant cette heure, s'il lui reste de l'endurance. */
+const ROBOT_CLEAR_UNTIL = 11 * HOUR;
+const ROBOT_CLEAR_ENDURANCE = 30;
+
+/**
+ * Le potager qui grandit (0.13, lot P4): une parcelle libre se pose sur la case de la terre la plus
+ * proche de la porte; une parcelle s'achète chez Odette quand le rayon en a et que la bourse
+ * dépasse 300; le matin, la friche se défriche tant qu'il en reste.
+ */
+function expandGarden(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
+  const s = sim.content.settings.garden.plots;
+  if (s === null || countInBag(c, ITEM.gardenLine) === 0) return false;
+  const free = plotsFree(sim.content, sim.world);
+  if (free > 0) {
+    const door = pt(sim, 'house_door');
+    const cells = landCells(sim.content, sim.map)
+      .filter((cell) => plotPlacement(sim.content, sim.map, sim.world, cell) === null)
+      .sort((a, b) => Math.hypot(a.cx + 0.5 - door.x, a.cy + 0.5 - door.y) - Math.hypot(b.cx + 0.5 - door.x, b.cy + 0.5 - door.y) || a.cy - b.cy || a.cx - b.cx)
+      .slice(0, free);
+    if (cells.length > 0) {
+      m.job = 'poser des parcelles';
+      if (!selectItem(c, ITEM.gardenLine, out)) return true;
+      out.push({ type: 'plot_place', cells });
+      // La houe en main ensuite: Espace ne pose pas de parcelle par mégarde.
+      out.push({ type: 'select_slot', slot: Math.max(0, c.bag.findIndex((x) => x?.item === ITEM.hoe)) });
+      m.waitUntil = sim.world.tick + 2;
+      return true;
+    }
+  }
+  // Semaine 2 de la démo: la bourse sert d'abord au colis lourd du catalogue (`orderHeavy`).
+  const spare = afterDemo(sim) || sim.world.orderIndex === 0;
+  if (spare && plotsRoom(sim.content, sim.world) > 0 && sim.world.plots.stock > 0 && sim.world.purse > ROBOT_PLOT_PURSE + s.price && shopOpen(sim)) {
+    const counter = pt(sim, POINT.groceryCounter);
+    if (c.menu !== 'shop') return goAct(sim, c, m, 'parcelle', ground(counter), counter, 1.2, out);
+    const count = Math.max(1, Math.min(sim.world.plots.stock, Math.floor((sim.content.settings.economy.bigPurchaseThreshold - 1) / s.price)));
+    out.push({ type: 'buy', item: ITEM.plot, count });
+    out.push({ type: 'menu', menu: null });
+    m.waitUntil = sim.world.tick + 2;
+    return true;
+  }
+  if (sim.world.clock.minutes < ROBOT_CLEAR_UNTIL && c.endurance > ROBOT_CLEAR_ENDURANCE && countInBag(c, ITEM.hoe) > 0) {
+    const cell = fricheCells(sim.content, sim.map).find((f) => fricheToClear(sim.content, sim.map, sim.world, f) && (m.skip[`defricher:${f.cx}:${f.cy}`] ?? 0) <= sim.world.tick);
+    if (cell !== undefined) {
+      if (!selectItem(c, ITEM.hoe, out)) return true;
+      const p = { x: cell.cx + 0.5, y: cell.cy + 0.5 };
+      return goAct(sim, c, m, `defricher:${cell.cx}:${cell.cy}`, ground(p), p, 1.2, out);
+    }
+  }
+  return false;
 }
 
 function garden(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
@@ -1849,7 +1904,7 @@ export function createRobot(options: RobotOptions = {}): Robot {
       weekTwoQuests(sim, c, m, out) ||
       genericQuests(sim, c, m, out) ||
       orderHeavy(sim, c, m, out) ||
-      (c.id === 'p1' ? garden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
+      (c.id === 'p1' ? garden(sim, c, m, out) || expandGarden(sim, c, m, out) || hens(sim, c, m, out) || sellExtra(sim, c, m, out) : false) ||
       (c.id === 'p2'
         ? coop(sim, c, m, f, out) ||
           fishForOrder(sim, c, m, f, out) ||

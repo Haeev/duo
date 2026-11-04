@@ -23,7 +23,10 @@
  * `coin=<id>`, `guet=1`, `approche=1` (voir `peche12-exemple.ts`). Habitants de la 0.13:
  * `habitants13=1|messe`, `chat=`, `loupe=oeil` (voir `habitants13-exemple.ts`). `style=lisse` (ou
  * `facettes`): style des personnages, pour comparer (plan de qualité visuelle, décision D1).
- * `temoins=1|marche`: les trois témoins de l'étape A parmi des habitants d'avant (`temoins-exemple.ts`). Touches: G repère, J lancer,
+ * `temoins=1|marche`: les trois témoins de l'étape A parmi des habitants d'avant (`temoins-exemple.ts`).
+ * Parcelles libres de la 0.13: `parcelles=6|20|40`, `friche=<n>`, `apercu=vert|rouge|rect|reprise`
+ * (voir `parcelles13-exemple.ts`). Touches: G repère, J lancer,
+
  * K poisson pris, L poisson échappé.
  */
 import { applyBreedingExample } from './elevage-exemple';
@@ -49,6 +52,7 @@ import { applyTour10Example } from './tour10-exemple';
 import { createPeche12Demo } from './peche12-exemple';
 import { applyHabitants13Example } from './habitants13-exemple';
 import { applyTemoinsExample } from './temoins-exemple';
+import { applyPlotsExample } from './parcelles13-exemple';
 import { dayOfSeason, SEASONS } from '../../donnees/calendrier';
 import type { Wear, WorldState } from '../../etat/types';
 
@@ -269,6 +273,8 @@ async function main(): Promise<void> {
   const habitants13 = applyHabitants13Example(world, params);
   // Étape A de la qualité visuelle: planche de décision des trois témoins (`temoins-exemple.ts`).
   const temoins = applyTemoinsExample(world, params);
+  // 0.13: parcelles libres (`parcelles=6|20|40`, `friche=<n>`, `apercu=vert|rouge|rect|reprise`).
+  const plotPreview = applyPlotsExample(world, map, content, params);
   const listeners = new Set<(event: WorldEvent) => void>();
   const local: CharacterId = 'p1';
   const peche12 = createPeche12Demo(params, local);
@@ -346,6 +352,7 @@ async function main(): Promise<void> {
   };
   window.lplRendu = handle;
   await engine.load(() => undefined);
+  if (plotPreview !== null) engine.setPlotPreview(plotPreview);
   loading?.remove();
   if (params.get('repli') === '1') {
     // `adaptatif=1&repli=1`: image d'un PC à la peine (dernier palier, ombres coupées).

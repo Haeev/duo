@@ -302,6 +302,9 @@ export const ITEM_ICONS: Readonly<Record<ItemId, string>> = {
   watering_can: 'watering-can',
   axe: 'axe',
   fishing_rod: 'fishing-rod',
+  // 0.13: le cordeau et la parcelle de la vitrine d'Odette (parcelles libres).
+  garden_line: 'garden-line',
+  plot: 'ui-plot',
   // Les outils améliorés gardent le dessin de leur outil, dans leur matière.
   watering_can_copper: 'watering-can-copper',
   axe_forged: 'axe-forged',

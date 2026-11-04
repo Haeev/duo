@@ -28,7 +28,7 @@ import {
 } from 'three';
 import type { Season } from '../donnees/types';
 import type { CharacterId, ReadonlyWorld, WorldEvent } from '../etat/types';
-import type { GameView, OutfitPreview, OutfitPreviewOptions, PickResult, Renderer, RendererOptions } from '../etat/vue';
+import type { GameView, OutfitPreview, OutfitPreviewOptions, PickResult, PlotPreview, Renderer, RendererOptions } from '../etat/vue';
 import { createOutfitPreview } from './apercu-tenue';
 import { type Bounds, IsoCameraRig, type CameraCommand } from './camera';
 import { inMap, mapCentre, mapMaxX, mapMaxY, mapMinX, mapMinY } from '../etat/carte';
@@ -62,6 +62,8 @@ import { HousePart } from './maison';
 import { ImprovementsPart } from './chantiers';
 import { LampBoard } from './lampes';
 import { GardenPart } from './potager';
+import { PlotPreviewPart } from './parcelles';
+
 import { FarmLifePart } from './vie';
 import { EffectsPart } from './effets';
 import { RailwayPart } from './voie';
@@ -171,6 +173,8 @@ export class RenderEngine implements Renderer {
   private readonly quality: AdaptiveQuality | null;
   private readonly log: RendererOptions['log'];
   private vegetation: Vegetation | null = null;
+  private plotPreview: PlotPreviewPart | null = null;
+  private pendingPlotPreview: PlotPreview | null = null;
   private moments: MomentsPart | null = null;
   private readonly shadowCulling = new ShadowCasterCulling();
   /** Allumage des lampadaires (tour 9), écrit par les chantiers, lu par l'ambiance. */
@@ -393,7 +397,13 @@ export class RenderEngine implements Renderer {
       this.resources,
       this.picks,
       content.settings.trees,
+      { content, map },
     );
+    // 0.13: l'aperçu du cordeau (parcelles libres), posé par les entrées (`setPlotPreview`).
+    const plotPreview = new PlotPreviewPart(content, map, library, materials, terrain, this.resources);
+    plotPreview.set(this.pendingPlotPreview);
+    this.plotPreview = plotPreview;
+    this.scene.add(plotPreview.group);
     const farm = new FarmLifePart(
       library,
       materials,
@@ -408,6 +418,7 @@ export class RenderEngine implements Renderer {
       house.group,
       garden.batches.group,
       garden.trees.group,
+      garden.friche.group,
       farm.group,
     );
     world.add(characters);
@@ -420,6 +431,7 @@ export class RenderEngine implements Renderer {
     // R14: la charge portée à deux se pose dans les mains des porteurs (personnages mis à jour avant).
     farm.setCarryProbe((holders, out) => characters.carrierHands(holders, out));
     world.add(garden);
+    world.add(plotPreview);
     world.add(farm);
     // 0.12: coq, poussines, chèvres, piquets et cordes, litière, herbe rase.
     const breeding = new BreedingPart(map, content, library, materials, terrain, this.resources);
@@ -655,6 +667,8 @@ export class RenderEngine implements Renderer {
     this.vegetation?.setDetail(
       this.rig.viewWidth() >= scatter.scatterFarViewWidth ? scatter.scatterFarShare : 1,
     );
+    // 0.13: sous une parcelle, ni touffe ni fleur (elles reviennent quand on la reprend).
+    this.vegetation?.cover(world.garden);
     context.night = this.daylight.night;
     context.reducedMotion = this.reducedMotion;
     if (this.world !== null) {
@@ -994,6 +1008,12 @@ export class RenderEngine implements Renderer {
   setReducedMotion(reduced: boolean): void {
     this.reducedMotion = reduced;
     this.rig.setReducedMotion(reduced);
+  }
+
+  /** 0.13: l'aperçu du cordeau, mis à jour par les entrées à chaque pas (gardé jusqu'au chargement). */
+  setPlotPreview(preview: PlotPreview | null): void {
+    this.pendingPlotPreview = preview;
+    this.plotPreview?.set(preview);
   }
 
   pick(clientX: number, clientY: number): PickResult | null {

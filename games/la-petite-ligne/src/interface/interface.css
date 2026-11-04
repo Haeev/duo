@@ -2394,6 +2394,142 @@
   height: 1.5rem;
 }
 
+/* 0.13, parcelles libres (section 5.2): compteur « posées/possédées » au-dessus de la barre, cordeau en main. */
+.lpl-plot-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.lpl-plot-counter__box {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.625rem 0.125rem 0.375rem;
+  border: var(--lpl-border) solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: var(--lpl-color-paper-raised);
+  color: var(--lpl-color-ink);
+  font-family: var(--lpl-font-display);
+  font-size: var(--lpl-text-lg);
+  font-weight: var(--lpl-weight-display);
+  line-height: 1.2;
+}
+
+.lpl-plot-counter__icon {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+/* Au plafond, un petit cadenas doré: l'icône du plafond, pas un manque. */
+.lpl-plot-counter__lock {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: #b8902f;
+}
+
+.lpl-plot-counter[data-cap='true'] .lpl-plot-counter__box {
+  border-color: #b8902f;
+}
+
+/* Posées = possédées: le compteur barré (la couleur n'est jamais seule). */
+.lpl-plot-counter[data-full='true'] .lpl-plot-counter__text {
+  text-decoration: line-through;
+  text-decoration-color: var(--lpl-color-error);
+  text-decoration-thickness: 0.125rem;
+}
+
+/* Pastille des parcelles libres sur la case du cordeau (en haut à gauche: le nombre des piles reste en bas à droite). */
+.lpl-slot__badge {
+  position: absolute;
+  top: -0.375rem;
+  left: -0.375rem;
+  min-width: 1.125rem;
+  padding: 0 0.25rem;
+  border: 0.0625rem solid var(--lpl-color-ink);
+  border-radius: var(--lpl-radius-pill);
+  background: #dfe9dc;
+  color: var(--lpl-color-ink);
+  font-size: var(--lpl-text-xs);
+  font-weight: 800;
+  line-height: 1.1rem;
+  text-align: center;
+}
+
+/* Ce qui suit le pointeur pendant un tracé: anneau du maintien, pastille du compteur prévisionnel, raison. */
+.lpl-plot-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  pointer-events: none;
+  transform: translate(calc(var(--lpl-x, 0px) - 1.25rem), calc(var(--lpl-y, 0px) - 1.25rem));
+}
+
+.lpl-plot-cursor__hold {
+  position: relative;
+  display: inline-block;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.lpl-plot-cursor__ring {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.lpl-plot-cursor__track,
+.lpl-plot-cursor__arc {
+  fill: none;
+  stroke-width: 3.5;
+}
+
+.lpl-plot-cursor__track {
+  stroke: rgb(42 37 34 / 0.35);
+}
+
+.lpl-plot-cursor__arc {
+  stroke: var(--lpl-color-brass);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--lpl-value, 0));
+}
+
+.lpl-plot-cursor__ring-icon {
+  position: absolute;
+  inset: 0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lpl-plot-cursor__plus,
+.lpl-plot-cursor__reason {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-left: 1.75rem;
+  transform: translateY(-1.25rem);
+}
+
+.lpl-plot-reason .lpl-pastille,
+.lpl-plot-cursor__reason .lpl-pastille {
+  animation: lpl-plot-reason-pop var(--lpl-duration-fast, 0.15s) var(--lpl-ease, ease-out);
+}
+
+@keyframes lpl-plot-reason-pop {
+  from {
+    transform: scale(1.25);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
 /*
   0.13, sept onglets au carnet (Voisins en plus): le nom ne s'écrit que sur l'onglet ouvert, les
   autres gardent leur icône (bulle au survol, nom accessible complet). L'en-tête retient une

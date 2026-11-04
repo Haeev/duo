@@ -223,6 +223,8 @@ HINT_TRIGGERS: dict[str, set[str]] = {
     "near_board_annonce": set(),
     # Pêche 0.12: première prise au coin qui frémit, premier guet.
     "fishing_hot_spot": set(), "fishing_watch": set(),
+    # 0.13, parcelles libres (parcelles-libres-0-13.md, section 5.4).
+    "plot_free": set(), "plot_drag": set(), "plot_placed": set(), "near_friche": set(), "plot_migration": set(),
 }
 
 PLACEHOLDERS = {"habit", "level", "speaker", "player", "startPurse", "order", "linesDone", "linesTotal", "amount", "partner", "missing", "item", "price",

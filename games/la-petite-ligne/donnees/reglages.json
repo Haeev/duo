@@ -83,7 +83,8 @@
         "milk_can": [0.9, 1.0, 1.1, 1.3]
       },
       "ardoise": { "factor": 1.5, "max": 10, "time": "07:00" },
-      "words": { "plentyAtMost": 0.85, "wantedFrom": 1.15 }
+      "words": { "plentyAtMost": 0.85, "wantedFrom": 1.15 },
+      "categoryCap": { "crop": 250 }
     },
     "catalogue": {
       "windows": [
@@ -178,7 +179,33 @@
       ]
     }
   },
-  "garden": { "cells": 12, "layout": { "w": 4, "d": 3 }, "zone": "garden", "startState": "grass" },
+  "garden": {
+    "cells": 12,
+    "layout": { "w": 4, "d": 3 },
+    "zone": "garden",
+    "startState": "grass",
+    "plots": {
+      "note": "0.13, parcelles-libres-0-13.md section 3: parcelles d'une case, posées au cordeau sur la terre du garde-barrière (zone garden_land, friche défrichée).",
+      "start": 6,
+      "startRect": { "x": 7, "y": 28, "w": 3, "h": 2 },
+      "max": 40,
+      "land": { "zone": "garden_land", "clearable": "defricher" },
+      "forbiddenZones": ["hen_pen", "house_plan_reserved"],
+      "price": 30,
+      "shop": "grocery",
+      "restockPerDay": 2,
+      "stockMax": 10,
+      "stockAtStart": 2,
+      "stockAtMigration": 10,
+      "removeHoldSeconds": 0.6,
+      "clearSeconds": 1.2,
+      "clearEndurance": 3,
+      "clearCellsPerPlot": 4,
+      "orderGardenPerPlot": 4.5,
+      "orderGardenPlotsCap": 24,
+      "rental": { "plots": ["shared_plot_02", "shared_plot_04"], "rentPerCellPerWeek": 3, "rentFromDay": 22, "landlord": "armand" }
+    }
+  },
   "quality": { "fineIfWateredEveryDay": true },
   "trees": { "count": 12, "zone": "forest_edge", "chopsPerTree": 3, "logsPerTree": 2, "regrow": true, "regrowFromDay": 1, "catchUpDays": 0, "stumpDays": 2, "saplingDays": 4, "saplingScale": { "first": 0.3, "perDay": 0.15, "max": 0.8 } },
   "forage": {
@@ -242,7 +269,7 @@
     "outAt": "07:00",
     "speed": 0.5,
     "pailItem": "water_pail",
-    "spots": ["goat_graze_01", "goat_graze_02", "goat_graze_03", "goat_graze_04", "goat_graze_05"],
+    "spots": ["goat_graze_01", "goat_graze_02", "goat_graze_03", "goat_graze_04", "goat_graze_05", "goat_graze_06", "goat_graze_07"],
     "railClearance": 3.5,
     "names": ["Noisette", "Bergamote", "Réglisse", "Châtaigne", "Quenotte", "Biscotte"],
     "extraItem": "goat_extra"

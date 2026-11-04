@@ -846,7 +846,37 @@ export const RENDER_SETTINGS = {
     /** Pop d'un stade qui change (s) et dépassement de l'échelle. */
     growPopSeconds: 0.45,
     growPopOvershoot: 0.18,
+    /**
+     * 0.13 (parcelles libres, section 5.5): une parcelle posée sort de terre (s), et un rectangle
+     * pose ses rangées en vague, `waveSeconds` d'écart (coupé par la réduction des animations).
+     */
+    plotAppearSeconds: 0.28,
+    waveSeconds: 0.04,
+    /** Roncier d'une case de friche pas encore défrichée: échelle et écart au centre de la case (m). */
+    brambleScale: [0.42, 0.62] as const,
+    brambleJitter: 0.25,
   },
+
+  /** 0.13: aperçu du cordeau (`parcelles.ts`). */
+  plotPreview: {
+    colors: { ok: '#7fcf6a', refused: '#d9584f', extra: '#c9c2b0' },
+    opacity: 0.55,
+    extraOpacity: 0.85,
+    pulse: 0.08,
+    pulseHz: 1.6,
+    /** Cadre de la ficelle (m): côté, épaisseur, hauteur des piquets, et levée au-dessus du sol. */
+    inset: 0.92,
+    line: 0.025,
+    stakeHeight: 0.22,
+    lift: 0.03,
+    /** Hachures et croix d'un refus: au-dessus de la parcelle fantôme (m). */
+    markLift: 0.12,
+    /** Tremblement du fantôme rouge à un refus de l'hôte. */
+    shakeSeconds: 0.3,
+    shakeSpeed: 60,
+    shakeAmplitude: 0.05,
+  },
+
 
   effects: {
     /** Objet récolté qui saute au sac. */

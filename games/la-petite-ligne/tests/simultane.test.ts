@@ -9,7 +9,7 @@ import { SIM_HZ } from '../src/simulation/constantes';
 import { placeCharacter } from '../src/simulation/deplacement';
 import { step } from '../src/simulation/pas';
 import { dropAt } from '../src/simulation/sac';
-import { createRobot, newSim, play } from './aides';
+import { createRobot, demoGarden, newSim, play } from './aides';
 
 /**
  * Monde au jour 1, scène d'arrivée finie, la case du coin sud-est du potager mûre, les deux
@@ -18,6 +18,7 @@ import { createRobot, newSim, play } from './aides';
 function readyToHarvest(): Sim {
   const sim = newSim(5);
   play(sim, createRobot(), (s) => s.world.phase === 'day' && s.world.clock.running && s.world.scene === null, SIM_HZ * 600);
+  demoGarden(sim);
   const cell = sim.world.garden[11];
   if (cell === undefined) throw new Error('potager incomplet');
   cell.soil = 'tilled';

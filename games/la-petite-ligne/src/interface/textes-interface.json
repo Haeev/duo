@@ -513,6 +513,7 @@
       "place": "Poser",
       "give": "Donner ce que tu tiens",
       "dig": "Bêcher ici",
+      "clear": "Défricher",
       "sit": "S'asseoir",
       "hold": "Tenir l'échelle",
       "call": "Appeler la poule",
@@ -532,7 +533,24 @@
     },
     "nap": "Faire la sieste"
   },
+  "plots": {
+    "counter": "{placed}/{owned}",
+    "counterLabel": "Parcelles posées : {placed} sur {owned}",
+    "capLabel": "Au plafond : {owned} parcelles",
+    "freeLabel": "{count} parcelles à poser",
+    "plus": "+{count}",
+    "plusLabel": "{count} parcelles de plus",
+    "overLabel": "{count} cases, {free} parcelles libres seulement",
+    "holdSeed": "Maintiens : la graine revient au sac",
+    "holdHarvest": "Maintiens : la récolte va au sac",
+    "stock": "×{count}",
+    "stockLabel": "En rayon : {count}",
+    "stockEmpty": "Plus en rayon : il en revient demain matin",
+    "tomorrow": "demain",
+    "capReached": "Ton potager est au plafond : {owned} parcelles"
+  },
   "corner": {
+
     "designate": "désigner ton coin (2x2 cases rien qu'à toi)",
     "move": "déplacer ton coin, ou le retirer en visant le même endroit"
   },

@@ -10,7 +10,8 @@
 import type { Audio } from '@duo/sdk';
 import type { Intent } from './actions';
 import type { GameMap } from './carte';
-import type { Appearance, CharacterId, DeepReadonly, ReadonlyWorld, WorldEvent } from './types';
+import type { Appearance, Cell, CharacterId, DeepReadonly, ReadonlyWorld, WorldEvent } from './types';
+
 import type { Content } from '../donnees/types';
 
 export interface GameView {
@@ -67,6 +68,24 @@ export interface RendererOptions {
   log?: { info(message: string, data?: unknown): void };
 }
 
+/**
+ * L'aperçu du cordeau (0.13, parcelles libres, section 5.1), calculé chez chaque joueur par les
+ * entrées: la case visée, ou le rectangle en cours de tracé. Le rendu et l'interface le dessinent
+ * avec les règles pures de `etat/parcelles.ts`; l'hôte, seul, décide de ce qui est posé.
+ */
+export interface PlotPreview {
+  /** `place`: poser (clic gauche); `remove`: reprendre (clic droit, X). */
+  mode: 'place' | 'remove';
+  /** Cases du tracé, dans l'ordre de pose (une seule hors d'un glissé). */
+  cells: readonly Cell[];
+  /** Un rectangle est en cours de tracé (bouton tenu et glissé). */
+  dragging: boolean;
+  /** Reprise maintenue d'une culture: avancée de 0 à 1, `null` sans maintien. */
+  hold: number | null;
+  /** Le pointeur à l'écran (coordonnées client) pour l'anneau et la pastille; `null` au clavier. */
+  pointer: { x: number; y: number } | null;
+}
+
 export interface Renderer {
   /** Charge les assets et compile les shaders. Appelée une fois. */
   load(onProgress: (ratio: number) => void): Promise<void>;
@@ -85,6 +104,8 @@ export interface Renderer {
   pickGround?(clientX: number, clientY: number): { x: number; y: number } | null;
   /** Statistiques de dessin pour l'indicateur de développement. */
   stats(): { drawCalls: number; triangles: number };
+  /** 0.13: l'aperçu du cordeau à dessiner (`null`: aucun). */
+  setPlotPreview?(preview: PlotPreview | null): void;
   /**
    * Aperçu 3D d'une tenue pour la boutique de vêtements (0.12): une petite scène à part, le
    * personnage seul. `null` avant `load` ou sans modèle des personnages.
@@ -157,6 +178,8 @@ export interface GameInterface {
   handleKey(code: string): boolean;
   /** Vrai si un menu de l'interface capte le clavier (on ne marche pas). */
   capturesMovement(): boolean;
+  /** 0.13: l'aperçu du cordeau (pastille du tracé, anneau de maintien, raison du refus); `null`: aucun. */
+  setPlotPreview?(preview: PlotPreview | null): void;
   dispose(): void;
 }
 

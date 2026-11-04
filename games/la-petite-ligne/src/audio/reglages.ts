@@ -70,6 +70,8 @@ export interface AudioSettings {
     treeCrackSeconds: number;
     treeFallSeconds: number;
     digFoundSeconds: number;
+    /** 0.13: écart entre les « toc » des rangées d'un rectangle de parcelles (la vague du rendu). */
+    plotRowSeconds: number;
     stampSeconds: number;
     /** Tour 9: la lisse se verrouille à la fin de l'armement (s). */
     gateLockSeconds: number;
@@ -337,6 +339,7 @@ export const AUDIO_SETTINGS: AudioSettings = {
     treeCrackSeconds: 0.15,
     treeFallSeconds: 1.3,
     digFoundSeconds: 0.25,
+    plotRowSeconds: 0.04,
     stampSeconds: 0.25,
     gateLockSeconds: 2.5,
     duoDoneSeconds: 0.35,

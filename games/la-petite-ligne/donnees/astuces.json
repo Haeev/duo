@@ -28,6 +28,11 @@
     { "id": "sapling_hint", "text": "Ce jeune arbre repousse: dans quelques jours, la hache pourra de nouveau servir.", "trigger": { "on": "aim_sapling" }, "tier": "P0" },
     { "id": "board_hint", "text": "Le tableau du quai a de nouvelles annonces: approche-toi, puis {act} pour les lire.", "trigger": { "on": "near_board_annonce" }, "tier": "P0" },
     { "id": "fishing_hot_spot_hint", "text": "Tu vois ces ronds dans l'eau ? Ça gobe: c'est le coin qui frémit aujourd'hui. Les beaux poissons y sont plus nombreux.", "trigger": { "on": "fishing_hot_spot" }, "tier": "P1" },
+    { "id": "plot_free", "text": "Une parcelle t'attend: prends le cordeau et pose-la sur l'herbe du jardin.", "trigger": { "on": "plot_free" }, "tier": "P0" },
+    { "id": "plot_drag", "text": "Clic maintenu: trace plusieurs parcelles d'un coup.", "trigger": { "on": "plot_drag" }, "tier": "P0" },
+    { "id": "plot_remove", "text": "{examine} sur une parcelle: tu la reprends.", "trigger": { "on": "plot_placed" }, "tier": "P0" },
+    { "id": "plot_clear", "text": "Quatre cases défrichées, une parcelle de plus.", "trigger": { "on": "near_friche" }, "tier": "P0" },
+    { "id": "plot_migration", "text": "Ton potager est libre: prends le cordeau pour poser ou déplacer tes parcelles.", "trigger": { "on": "plot_migration" }, "tier": "P0" },
     { "id": "fishing_watch_hint", "text": "Reste immobile au bord de l'eau sans pêcher: tu verras briller les beaux poissons. Dis à l'autre où lancer.", "trigger": { "on": "fishing_watch" }, "tier": "P1" }
   ]
 }

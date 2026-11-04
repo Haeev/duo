@@ -39,8 +39,12 @@ export function ticksPerGameMinute(sim: Sim): number {
 
 /** Dépense d'endurance d'une action (coûts de `reglages.endurance.costs`); Ventre plein: 20 % de moins. */
 export function spend(sim: Sim, c: Character, cost: string, factor = 1): void {
+  spendPoints(sim, c, sim.content.settings.endurance.costs[cost] ?? 0, factor);
+}
+
+/** Dépense `base` points d'endurance (avant multiplicateurs), comme `spend` pour un coût lu ailleurs (défricher, 0.13). */
+export function spendPoints(sim: Sim, c: Character, base: number, factor = 1): void {
   const e = sim.content.settings.endurance;
-  const base = e.costs[cost] ?? 0;
   if (base <= 0 || c.endurance <= 0) return;
   const soft = sim.content.settings.needs.soft;
   const full = c.needs.belly >= soft.belly.fullAt ? soft.belly.fullCostMultiplier : 1;
