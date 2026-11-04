@@ -381,9 +381,10 @@
       "when": [{ "type": "weekday_is", "weekdays": ["tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] }],
       "groups": [
         {
-          "who": ["achille", "odette"],
-          "spots": [{ "x": 31.0, "y": 30.6, "cap": 90 }, { "x": 32.0, "y": 30.6, "cap": 270 }]
-        }
+          "who": ["achille"],
+          "spots": [{ "x": 31.5, "y": 26.5, "cap": 270 }]
+        },
+        { "who": ["odette"], "at": "planning" }
       ],
       "lines": [
         { "by": "achille", "text": "Six miches et une couronne, comme d'habitude." },
