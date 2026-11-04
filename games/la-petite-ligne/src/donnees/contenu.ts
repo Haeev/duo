@@ -22,6 +22,7 @@ import {
   DEFAULT_WEATHER,
 } from './defauts';
 import { checkVillageScenes, parseVillageScenes } from './vie';
+import { parseDecorGestures } from './vie-gestes';
 import { ContentError, Reader } from './lecteur';
 import { agreeMoney } from './monnaie';
 import { parseMarket } from './marche';
@@ -150,6 +151,8 @@ export interface RawContentFiles {
   gestes013?: unknown;
   /** 0.13 (lot H7): scènes, pauses, places assises, postes de métier, chat (`vie.json`); absent: rien de cela. */
   vie?: unknown;
+  /** 0.13 (lot H7): gestes des joueurs avec le décor (`gestes-joueurs.json`); absent: aucun. */
+  gestesJoueurs?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -2849,6 +2852,7 @@ export function loadContent(files: RawContentFiles): Content {
       files.gestes013,
       files.habitants013 === undefined ? [files.habitants] : [files.habitants, files.habitants013],
     ),
+    playerGestures: parseDecorGestures(files.gestesJoueurs === undefined ? null : root('gestes-joueurs.json', files.gestesJoueurs).opt('gestures'), (r) => conditions(r, 'game_start')),
     village: parseVillageScenes(files.vie === undefined ? null : root('vie.json', files.vie), (r) => conditions(r, 'game_start')),
   };
   content.quests.push(...annonceQuests(content));

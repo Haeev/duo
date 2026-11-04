@@ -55,6 +55,7 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `moments.json` | les moments rares (tour 6): bêtes et gestes qui se jouent quand les deux joueurs regardent ensemble (section 2.10) |
 | `habitants-0-13.json` | 0.13, facultatif: les habitants nouveaux et les compléments des anciens, au format de `habitants.json`, fusionnés par identifiant (section 2.12) |
 | `calendrier.json` | 0.13: jours particuliers (messe, marché, fêtes, moisson...) et jours de classe; les anniversaires sont dans les habitants (section 2.12) |
+| `gestes-joueurs.json` | 0.13: les gestes des joueurs avec le décor, table 7.1 (section 2.16) |
 | `vie.json` | 0.13, facultatif: la vie du village, scènes entre habitants, pauses, places assises, postes de métier, chat du bourg (section 2.14) |
 
 ### 2.1 `objets.json`
@@ -395,6 +396,12 @@ Pendant la scène, elle passe avant le planning (comme l'étal du marché); à s
 **Postes de métier** (`workPosts[]`): `{ point, activity, clip, who?, at?, cap?, tool?, event?, strokeSeconds?, hearRange? }`: l'habitant (de `who`, sinon n'importe lequel) venu à `point` pour `activity` se tient en `at` (sinon au point), tourné selon `cap` (sinon comme le point), joue `clip` avec l'outil `tool` en main (modèle de `ferme.glb` ou de `personnages.glb`: marteau, scie, houe, arrosoir, hache); l'événement `event` (`forge_strike`, `joinery_saw` ou `joinery_plane`, joués par `AUDIO_SETTINGS.village.events`) part toutes les `strokeSeconds` quand un joueur est à moins de `hearRange` m. Un poste sans `at` remplace seulement le geste (jardins arrosés, potager à la houe, bêtes nourries). Un poste placé déjà tenu laisse le second habitant au point. Plusieurs habitants au même point ordinaire s'y répartissent (le point, puis deux couronnes de 0,75 et 1,4 m), dans l'ordre de la liste des habitants.
 
 **Chat** (`cat`, section 7.4): `when` (il est au bourg), `habits[]` (`{ id, from, to, when, pose: idle | sleep, cap?, spots: [{ x, y }] }`, la première qui tient; aucune: il est hors de la carte), `walkSpeed`, `fleeSpeed`, `stayMinutes` `[min, max]` (temps à une place avant la suivante), `rollChance` et `rollSeconds` (il se roule par terre en arrivant), `flee { range, speedAbove, smoothingSeconds, distance }` (un joueur qui arrive vite, vitesse lissée, le fait fuir; de petits pas le laissent approcher), `watchRange` (il regarde qui approche doucement), `follow { chance, seconds, distance }` (une approche douce sur `1 / chance` environ, il suit ce joueur un moment, à `distance` m derrière lui; événement `cat_follow`). Simulé par l'hôte (`src/simulation/chat.ts`, tirages par la graine), transmis à l'invité avec les positions rapides.
+
+### 2.16 `gestes-joueurs.json`: les gestes des joueurs avec le décor (0.13, lot H7)
+
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, section 7.1. Contenu: `content.playerGestures`. Ne pas confondre avec `gestes-0-13.json` (gestes des habitants).
+
+Fichier `gestes-joueurs.json`, clé `gestures[]` (table 7.1; lus par `src/donnees/vie-gestes.ts`, joués par `src/simulation/decor.ts`). Un geste est un appui devant un objet de la carte, décidé par l'hôte; l'invité envoie ses appuis (Agir, Agir maintenu, Examiner) comme pour le reste et voit la même chose (clip du personnage, son, notification, drapeaux du monde).
 
 ## 3. Conditions
 

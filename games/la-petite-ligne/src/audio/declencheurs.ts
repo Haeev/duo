@@ -585,6 +585,26 @@ export function soundsForEvent(
     case 'sign_read':
     case 'villager_remark':
       break;
+    // 0.13 (lot H7, section 7.1): les gestes des joueurs avec le décor. Les dix noms du son
+    // (`settings.village.events`) ont leur place `by`/`at`; les autres gestes jouent leur son du catalogue.
+    case 'washhouse_scrub':
+    case 'skim_stone':
+    case 'well_peek':
+    case 'well_shout':
+    case 'lookout_shout':
+    case 'sluice_opened':
+    case 'bell_rope_pull':
+    case 'bells_rung':
+    case 'harmonium_note':
+    case 'harmonium_chord':
+      villageEventSound(raw, ctx, settings, emit);
+      break;
+    case 'decor_gesture':
+      if (event.sound !== null && ctx.hasSound(event.sound)) emit.world(event.sound, event.at, event.by);
+      break;
+    case 'decor_together':
+      if (ctx.hasSound('reunion-chime')) emit.world('reunion-chime', event.at, event.by, 0.25);
+      break;
     // 0.13 (lot H7): coups d'outil des postes de métier, joués par la table des événements du village.
     case 'forge_strike':
     case 'joinery_saw':

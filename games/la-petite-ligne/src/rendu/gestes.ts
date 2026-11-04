@@ -29,4 +29,15 @@ export const CLIP_FOR_ACTION: Readonly<Record<ActionKind, string>> = {
   refill: 'give',
   // Tour 9 (les lanternes): la perche levée vers la lanterne, puis rabaissée.
   light: 'pole_raise',
+  // 0.13 (lot H7): gestes avec le décor, un clip existant par famille.
+  decor_lean: 'pickup',
+  decor_tap: 'hammer_tap',
+  decor_crank: 'crank_turn',
+  decor_offer: 'give',
+  decor_look: 'look_up',
+  decor_reach: 'reach_up',
+  decor_pet: 'pet',
+  decor_wave: 'wave',
+  decor_drink: 'drink',
+  decor_sit: 'sit_ground',
 };

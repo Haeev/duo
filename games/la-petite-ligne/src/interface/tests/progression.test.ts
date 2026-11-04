@@ -169,6 +169,7 @@ describe('invite du survol', () => {
       brush: true,
       milk: true,
       goat_hold: true,
+      decor: true,
       open: true,
       sleep: true,
       feed: true,

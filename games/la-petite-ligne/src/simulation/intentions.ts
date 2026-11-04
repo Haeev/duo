@@ -34,6 +34,7 @@ import { nightChoice, startDay, startGame } from './horloge';
 import { ITEM, POINT } from './ids';
 import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
 import { examineWater } from './peche';
+import { examineDecor } from './decor';
 import { readSign } from './voisins';
 
 const NAME_MAX = 16;
@@ -149,7 +150,9 @@ function examine(sim: Sim, c: Character): void {
     holdPlot(sim, c, frontCell(c));
     return;
   }
-  // 0.13 (section 4.4): un écriteau à portée se lit d'abord.
+  // 0.13 (section 7.1): un registre, une affiche, une girouette se regardent avec X, avant les écriteaux voisins.
+  if (c.seat === null && examineDecor(sim, c)) return;
+  // 0.13 (section 4.4): un écriteau à portée se lit.
   if (readSign(sim, c)) return;
   if (!isHome(c)) {
     examineWater(sim, c);

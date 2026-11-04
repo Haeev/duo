@@ -4,6 +4,7 @@
  */
 import type { CharacterId, CropStage, Quality, Weather } from '../etat/types';
 import type { VillageLife } from './gestes-0-13';
+import type { DecorGestureDef } from './vie-gestes';
 import type {
   AppearanceSettings,
   BakerySettings,
@@ -1510,4 +1511,6 @@ export interface Content {
   villageLife: VillageLife;
   /** 0.13 (lot H7): scènes entre habitants, pauses, places assises, postes de métier, chat (`vie.json`). */
   village: VillageScenes;
+  /** 0.13 (lot H7, section 7.1): gestes des joueurs avec le décor (`gestes-joueurs.json`). */
+  playerGestures: DecorGestureDef[];
 }

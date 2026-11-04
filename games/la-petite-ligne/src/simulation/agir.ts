@@ -38,6 +38,7 @@ import { buildingOpen } from './interieurs';
 import { nearStall, stallPose, stallSetUp } from '../etat/marche';
 import { serveBuyer } from './marche';
 import { MAIL_POINT, deliverMail, mailWaiting, takeMail } from './plis';
+import { decorTargets, performDecor } from './decor';
 
 /** Cible de l'étal du dimanche (pas forcément un point de la carte: `stallPose`). */
 const STALL_POINT = 'market_stall';
@@ -70,7 +71,9 @@ export type Target =
   /** Le piquet d'une chèvre (prendre la corde). */
   | { kind: 'stake'; goat: string; pos: Vec2 }
   /** Une place de pâture libre, pour qui mène la chèvre (planter le piquet). */
-  | { kind: 'spot'; spot: string; pos: Vec2 };
+  | { kind: 'spot'; spot: string; pos: Vec2 }
+  /** Un geste avec le décor (0.13, section 7.1): `gesture` est celui que prendrait un appui, `label` son invite. */
+  | { kind: 'decor'; gesture: string; label: string; pos: Vec2; holdOnly: boolean };
 
 /** Points du bourg où l'on agit, et le menu qu'ils ouvrent s'il y en a un. */
 const POINT_MENUS: Partial<Record<string, MenuKind>> = {
@@ -89,6 +92,8 @@ const POINT_MENUS: Partial<Record<string, MenuKind>> = {
 const BENCH_CLICK_RADIUS = 1.2;
 /** Un clic au sol à moins de tant du point d'un chantier (m) vise le chantier (la porte, le poulailler). */
 const GHOST_CLICK_RADIUS = 1.5;
+/** Un clic au sol à moins de tant d'un lieu de geste de décor (m) le vise. */
+const DECOR_CLICK_RADIUS = 1.2;
 const ACT_POINTS = [
   POINT.well,
   POINT.waterBarrel,
@@ -200,6 +205,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
         // 0.13: soupe du jour au café, souper du dimanche à la pension (le drapeau de la quête les ouvre).
         const meal = mealAtPoint(sim, t.point);
         if (meal !== null) return nearMeal(sim, c, meal) ? meal.verb : null;
+        // Un point de repas sans repas ouvert n'a rien à ouvrir: le café du comptoir (geste de décor) passe.
+        if (mealPoints(sim).includes(t.point)) return null;
       }
       if (t.point === SALON.chair) return c.inside === SALON.building && c.menu === null ? 'sit' : null;
       if (t.point === SALON.bench) return c.inside === SALON.building && c.menu === null && chairTaken(sim, c) ? 'open' : null;
@@ -231,6 +238,8 @@ export function verbOf(sim: Sim, c: Character, t: Target): AimVerb | null {
       return goatLedBy(sim, c.id) === null ? 'lead' : null;
     case 'spot':
       return 'plant';
+    case 'decor':
+      return 'decor';
     case 'bench': {
       const prop = playerBench(sim, t.bench);
       // On ne s'assoit qu'en journée de jeu (pas à l'écran de fin, B-T5-09).
@@ -273,6 +282,8 @@ const TIER: Record<Target['kind'], number> = {
   animal: 4.5,
   stake: 5.5,
   spot: 2,
+  // 0.13: après les points d'action voisins (le puits refait le plein avant de se pencher), avant le partenaire.
+  decor: 4,
   ground_item: 1,
   beam: 2,
   place: 3,
@@ -296,7 +307,7 @@ const TIER: Record<Target['kind'], number> = {
 const GARDEN_TIER = TIER.partner;
 
 /** Objets qu'un habitant ne masque pas quand on les vise de plus près que lui. */
-const OBJECT_KINDS: ReadonlySet<Target['kind']> = new Set<Target['kind']>(['point', 'station', 'beam']);
+const OBJECT_KINDS: ReadonlySet<Target['kind']> = new Set<Target['kind']>(['point', 'station', 'beam', 'decor']);
 
 /**
  * Un habitant assis sur un banc passe après la place libre à côté de lui: Espace devant le banc
@@ -317,6 +328,8 @@ function tierOf(sim: Sim, c: Character, t: Target): number {
   // Une chaise de la maison (S07) se vise comme les autres meubles: la plus proche du regard passe
   // (sinon la paillasse voisine prenait Espace pour une sieste).
   if (t.kind === 'bench' && homeSeats(sim).some((x) => x.id === t.bench)) return TIER.station;
+  // Un geste qui se tient (battoir, boule) ne passe pas avant un geste d'un appui tout proche.
+  if (t.kind === 'decor' && t.holdOnly) return TIER.decor + 0.2;
   return t.kind === 'cell' && (gardenCellAt(sim, t.cell) !== null || canClear(sim, t.cell)) ? GARDEN_TIER : TIER[t.kind];
 }
 
@@ -398,6 +411,7 @@ export function candidates(sim: Sim, c: Character): Target[] {
   // 0.12: la sacoche de Lucie sur le banc du quai, tant qu'il y a des plis à prendre.
   const bag = sim.content.settings.mailRound;
   if (bag !== null && mailWaiting(sim, c)) out.push({ kind: 'point', point: MAIL_POINT, pos: point(sim, bag.point) });
+  for (const g of decorTargets(sim, c)) out.push({ kind: 'decor', gesture: g.gesture, label: g.label, pos: g.pos, holdOnly: g.holdOnly });
   const front = frontPoint(c, { x: 0, y: 0 });
   const cell = { cx: Math.floor(front.x), cy: Math.floor(front.y) };
   out.push({ kind: 'cell', cell, pos: { x: cell.cx + 0.5, y: cell.cy + 0.5 } });
@@ -485,6 +499,7 @@ export function updateAim(sim: Sim, c: Character): void {
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: pointed.verb, blocked: null, source: 'pointer' };
     const animal = animalOf(pointed.target);
     if (animal !== undefined) aim.animal = animal;
+    if (pointed.target.kind === 'decor') aim.label = pointed.target.label;
   } else if (water !== null) {
     aim = { cell: { cx: Math.floor(water.x), cy: Math.floor(water.y) }, verb: 'fish', blocked: null };
   } else if (best !== null) {
@@ -492,6 +507,7 @@ export function updateAim(sim: Sim, c: Character): void {
     aim = { cell: { cx: Math.floor(pos.x), cy: Math.floor(pos.y) }, verb: best.verb, blocked: null };
     const animal = animalOf(best.target);
     if (animal !== undefined) aim.animal = animal;
+    if (best.target.kind === 'decor') aim.label = best.target.label;
     if (best.verb !== null) queueHint(sim, c.id, { on: 'near_interactable' });
     if (best.target.kind === 'cell' && sim.world.trees.some((t) => t.felled)) {
       const young = youngTreeAhead(sim, c);
@@ -519,6 +535,7 @@ export function updateAim(sim: Sim, c: Character): void {
       before.cell.cy === aim.cell.cy &&
       before.verb === aim.verb &&
       before.source === aim.source &&
+      before.label === aim.label &&
       before.animal === aim.animal);
   if (!same) {
     c.aim = aim;
@@ -664,6 +681,9 @@ export function perform(sim: Sim, c: Character, t: Target, verb: AimVerb): void 
       return;
     case 'hold':
       if (t.kind === 'hold') takeHold(sim, c, t.point);
+      return;
+    case 'decor':
+      if (t.kind === 'decor') performDecor(sim, c, t.gesture, t.pos);
       return;
     case 'light':
       if (t.kind === 'lantern') lightLantern(sim, c, t.place);
@@ -863,6 +883,9 @@ export function resolveClick(sim: Sim, c: Character, click: ClickTarget): Target
         const p = sim.map.points[id];
         if (p !== undefined && distance(p, at) <= 1.2) return { kind: 'point', point: id, pos: p };
       }
+      // 0.13: un geste avec le décor (cierges, puits, lavoir...), survolé ou cliqué même de loin.
+      const decor = decorTargets(sim, c, { at, radius: DECOR_CLICK_RADIUS })[0];
+      if (decor !== undefined) return { kind: 'decor', gesture: decor.gesture, label: decor.label, pos: decor.pos, holdOnly: decor.holdOnly };
       // 0.12: un clic sur une bête de l'élevage (ou tout près d'elle), après les points d'action.
       const animal = animalAt(sim, at);
       if (animal !== null) return animal;

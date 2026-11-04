@@ -531,7 +531,8 @@
       "plant": "Planter le piquet",
       "brush": "Brosser la chèvre",
       "milk": "Traire (garde la touche enfoncée)",
-      "goat_hold": "Tenir la chèvre (garde la touche enfoncée)"
+      "goat_hold": "Tenir la chèvre (garde la touche enfoncée)",
+      "decor": "Agir"
     },
     "nap": "Faire la sieste"
   },

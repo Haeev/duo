@@ -69,6 +69,7 @@ import { EffectsPart } from './effets';
 import { RailwayPart } from './voie';
 import { FishingPart } from './peche';
 import { SignsPart } from './signes';
+import { DecorGesturesPart } from './gestes-decor';
 import { MomentsPart } from './moments';
 import { AmbientFaunaPart } from './faune-ambiance';
 import { CatPart, NO_CAT, type CatSource } from './chat';
@@ -516,9 +517,12 @@ export class RenderEngine implements Renderer {
       this.fishingSource,
       this.daylight,
     );
-    this.scene.add(fishing.group, signs.group, fishShadows.group);
+    // 0.13 (lot H7): cierges, initiales du banc, fleurs des tombes, ronds dans l'eau (gestes avec le décor).
+    const decorGestures = new DecorGesturesPart(map, terrain, this.resources);
+    this.scene.add(fishing.group, signs.group, fishShadows.group, decorGestures.group);
     world.add(fishing);
     world.add(signs);
+    world.add(decorGestures);
     world.add(fishShadows);
     const railway = new RailwayPart(
       map,
