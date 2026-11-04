@@ -281,24 +281,22 @@ interface VirtualLink {
 }
 
 /**
- * `sideRandom` tire le délai des messages des ombres (0.13): ils passent sur la même liaison, dans
- * l'ordre, mais ne décalent pas les tirages des autres canaux. Sans cela, le seul message des
- * ombres du départ change toute la suite de la gigue, et la graine 7 tombe sur un tirage où
- * l'invité recule de 6,8 mm à l'arrêt (borne 5 mm): le même recul s'obtient sans les ombres en
- * sautant deux tirages, c'est une sensibilité de la réconciliation à signaler à dev-reseau.
+ * Un seul tirage pour tous les canaux, dans l'ordre d'envoi: un message de plus ou de moins (les
+ * ombres du départ, 0.13) décale toute la suite de la gigue, et le balayage plus bas décale aussi
+ * les tirages de départ pour éprouver d'autres suites.
  */
-function createVirtualLink(conditions: Conditions, random: () => number, sideRandom: () => number, now: () => number): VirtualLink {
+function createVirtualLink(conditions: Conditions, random: () => number, now: () => number): VirtualLink {
   const inFlight: { at: number; order: number; run: () => void }[] = [];
   const lastArrival = { toHost: 0, toGuest: 0 };
   let order = 0;
-  const schedule = (direction: 'toHost' | 'toGuest', run: () => void, draw: () => number): void => {
-    let delay = conditions.latencyMs + draw() * conditions.jitterMs;
-    if (draw() * 100 < conditions.lossPercent) delay += RETRANSMIT_MS;
+  const schedule = (direction: 'toHost' | 'toGuest', run: () => void): void => {
+    let delay = conditions.latencyMs + random() * conditions.jitterMs;
+    if (random() * 100 < conditions.lossPercent) delay += RETRANSMIT_MS;
     const at = Math.max(now() + delay, lastArrival[direction]);
     lastArrival[direction] = at;
     inFlight.push({ at, order: (order += 1), run });
   };
-  const pair = <T>(id: number, schema: v.GenericSchema<unknown, T>, from: 'host' | 'guest', draw = random): { sender: NetChannel<T>; receiver: NetChannel<T> } => {
+  const pair = <T>(id: number, schema: v.GenericSchema<unknown, T>, from: 'host' | 'guest'): { sender: NetChannel<T>; receiver: NetChannel<T> } => {
     const listeners = new Set<(message: T) => void>();
     const direction = from === 'host' ? 'toGuest' : 'toHost';
     return {
@@ -307,14 +305,10 @@ function createVirtualLink(conditions: Conditions, random: () => number, sideRan
         send(message) {
           // Passage par JSON et par le schéma, comme sur le fil: aucun objet partagé entre les deux.
           const json = JSON.stringify(message);
-          schedule(
-            direction,
-            () => {
-              const value = v.parse(schema, JSON.parse(json));
-              for (const l of listeners) l(value);
-            },
-            draw,
-          );
+          schedule(direction, () => {
+            const value = v.parse(schema, JSON.parse(json));
+            for (const l of listeners) l(value);
+          });
         },
         onMessage: () => () => undefined,
       },
@@ -332,7 +326,7 @@ function createVirtualLink(conditions: Conditions, random: () => number, sideRan
   const world = pair(CHANNEL.world, WorldMessageSchema, 'host');
   const fast = pair(CHANNEL.fast, FastSnapshotSchema, 'host');
   const events = pair(CHANNEL.events, EventsMessageSchema, 'host');
-  const shadows = pair(CHANNEL.shadows, ShadowsMessageSchema, 'host', sideRandom);
+  const shadows = pair(CHANNEL.shadows, ShadowsMessageSchema, 'host');
   return {
     host: { input: input.receiver, world: world.sender, fast: fast.sender, events: events.sender, shadows: shadows.sender },
     guest: { input: input.sender, world: world.receiver, fast: fast.receiver, events: events.receiver, shadows: shadows.receiver },
@@ -350,8 +344,11 @@ interface BenchRun {
   authority: Vec2;
 }
 
-/** L'invité marche `walkFrames` images vers l'est puis s'arrête `stopFrames` images. */
-function benchWalk(conditions: Conditions, seed: number, walkFrames: number, stopFrames: number): BenchRun {
+/**
+ * L'invité marche `walkFrames` images vers l'est puis s'arrête `stopFrames` images. `skippedDraws`
+ * tirages de la gigue sont jetés avant le départ: même graine, autre suite de délais.
+ */
+function benchWalk(conditions: Conditions, seed: number, walkFrames: number, stopFrames: number, skippedDraws = 0): BenchRun {
   const { content, map } = contentAndMap();
   const sim = newSim();
   play(sim, createRobot(), (s) => s.world.phase === 'day' && s.world.clock.running && s.world.scene === null, SIM_HZ * 600);
@@ -367,8 +364,8 @@ function benchWalk(conditions: Conditions, seed: number, walkFrames: number, sto
   const clock = { now: 0 };
   const now = (): number => clock.now;
   const random = createRandom(seed);
-  const side = createRandom(seed + 1000);
-  const link = createVirtualLink(conditions, () => random.next(), () => side.next(), now);
+  for (let i = 0; i < skippedDraws; i++) random.next();
+  const link = createVirtualLink(conditions, () => random.next(), now);
   const host = createHost(sim, link.host, 'p1', 'p2');
   const guest = createGuest(content, map, link.guest, character(sim, 'p2').playerId, now);
   host.sendWorld();
@@ -422,4 +419,45 @@ describe("invité: réconciliation douce sous un LAN chargé", () => {
       }
     }
   }, 120_000);
+
+  // Mission 0.13: avant le correctif de `hote.ts`, 17 essais sur 1 000 (200 graines, 5 décalages,
+  // 2 s de marche) et 91 sur 1 000 (marche de 20 images) reculaient de 7 à 107 mm en une image à
+  // l'arrêt: l'hôte écartait des pas de marche en rattrapant un retard, ou devinait « immobile » à
+  // la place d'un départ. Graine 7 avec 2 tirages sautés: 36 mm.
+  it("balayage de la gigue: l'invité à l'arrêt ne recule jamais visiblement, marche longue ou courte", () => {
+    const { content } = contentAndMap();
+    const perFrame = content.settings.movement.walkSpeed / FRAME_HZ;
+    const conditions: Conditions = { latencyMs: 80, jitterMs: 20, lossPercent: 2 };
+    const failures: string[] = [];
+    let worstBack = 0;
+    let runs = 0;
+    for (const walkFrames of [2 * FRAME_HZ, 20]) {
+      for (const skipped of [0, 1, 2, 3]) {
+        for (let seed = 1; seed <= 50; seed++) {
+          const run = benchWalk(conditions, seed, walkFrames, FRAME_HZ, skipped);
+          runs += 1;
+          const name = `graine ${seed}, ${skipped} tirages sautés, marche de ${walkFrames} images`;
+          if (walkFrames >= FRAME_HZ) {
+            const walk = smoothness(run.shown.slice(15, walkFrames), perFrame);
+            if (walk.frozen > 0 || walk.jumps > 0 || walk.worstRelative >= 0.35) failures.push(`${name}: marche (mm) ${walk.series}`);
+          }
+          const stop = run.shown.slice(walkFrames);
+          const last = stop[stop.length - 1];
+          if (last === undefined) {
+            failures.push(`${name}: aucune image à l'arrêt`);
+            continue;
+          }
+          const gap = Math.hypot(last.x - run.authority.x, last.y - run.authority.y);
+          if (gap >= 0.01) failures.push(`${name}: écart final ${(gap * 1000).toFixed(1)} mm`);
+          for (let i = 1; i < stop.length; i++) {
+            const back = (stop[i]?.x ?? 0) - (stop[i - 1]?.x ?? 0);
+            worstBack = Math.min(worstBack, back);
+            if (back <= -0.005) failures.push(`${name}: recul de ${(-back * 1000).toFixed(1)} mm à l'image ${i}`);
+          }
+        }
+      }
+    }
+    expect(runs).toBe(400);
+    expect(failures, `pire recul: ${(-worstBack * 1000).toFixed(2)} mm`).toEqual([]);
+  }, 300_000);
 });

@@ -7,6 +7,7 @@ import { movingAnimals } from '../etat/elevage';
 import type { Net, NetChannel } from '@duo/sdk';
 import type { ControlFrame, Intent } from '../etat/actions';
 import type { CharacterId, WorldEvent } from '../etat/types';
+import { MOVE_DEADZONE } from '../simulation/constantes';
 import type { Sim } from '../simulation/contexte';
 import { step } from '../simulation/pas';
 import {
@@ -24,8 +25,17 @@ import {
 } from './schemas';
 import { sentWorld } from './etat-transmis';
 
-/** Commandes de l'invité gardées d'avance au plus (au-delà, on rattrape le retard). */
-const MAX_BUFFERED_FRAMES = 4;
+/**
+ * Commandes de l'invité gardées d'avance (coussin contre la gigue): au-delà, on rattrape le retard
+ * en écartant celles qui ne changent rien (immobile, Espace dans le même état que la précédente).
+ */
+const IDLE_BUFFERED_FRAMES = 1;
+/**
+ * Au-delà, on écarte aussi des pas de marche (filet de sécurité: l'invité reculerait alors
+ * d'autant). Sur le lien du banc (80 ms, 20 ms de gigue, réémission de 200 ms), le retard reste
+ * sous 8 commandes: 12 (400 ms) n'est atteint que par une machine figée.
+ */
+const MAX_BUFFERED_FRAMES = 12;
 /** Sans nouvelles de l'invité pendant ce nombre de pas (200 ms à 30 pas par seconde), ses commandes sont relâchées. */
 const STALE_FRAMES = 6;
 /** L'état complet part au plus tous les N pas (5 fois par seconde), et seulement s'il a changé. */
@@ -82,10 +92,35 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
     for (const intent of message.intents) pending.push({ by: remote, intent });
   });
 
+  /** La commande ne change rien après `before`: ni pas, ni appui ou relâchement d'Espace. */
+  function idleAfter(f: ControlFrame, before: ControlFrame | null): boolean {
+    return Math.hypot(f.moveX, f.moveY) < MOVE_DEADZONE && f.actHeld === (before?.actHeld ?? false);
+  }
+
+  /**
+   * Rattrapage d'un retard (rafale après un trou). On n'écarte jamais un pas de marche sous le
+   * plafond: l'invité compte chaque commande jusqu'à `ack` comme jouée et ne rejoue que les
+   * suivantes. Un pas écarté laisserait sa prédiction en avance d'autant, et il reculerait à
+   * l'arrêt (deux pas écartés: 23 cm, graine 7 du banc de gigue).
+   */
+  function catchUp(): void {
+    let before = lastGuest;
+    for (let i = 0; i < guestFrames.length && guestFrames.length > IDLE_BUFFERED_FRAMES; ) {
+      const f = guestFrames[i];
+      if (f === undefined) break;
+      if (idleAfter(f, before)) guestFrames.splice(i, 1);
+      else {
+        before = f;
+        i += 1;
+      }
+    }
+    if (guestFrames.length > MAX_BUFFERED_FRAMES) guestFrames.splice(0, guestFrames.length - MAX_BUFFERED_FRAMES);
+  }
+
   function nextGuestFrame(): ControlFrame | undefined {
     // Une commande déjà jouée d'avance (devinée, voir plus bas) est écartée à son arrivée.
     while ((guestFrames[0]?.seq ?? Number.POSITIVE_INFINITY) <= ack) guestFrames.shift();
-    if (guestFrames.length > MAX_BUFFERED_FRAMES) guestFrames.splice(0, guestFrames.length - MAX_BUFFERED_FRAMES);
+    catchUp();
     const next = guestFrames.shift();
     if (next !== undefined) {
       lastGuest = next;
@@ -95,13 +130,16 @@ export function createHost(sim: Sim, channels: HostChannels, local: CharacterId,
     }
     stale += 1;
     if (lastGuest === null || stale > STALE_FRAMES) return undefined;
-    // Commande en retard (gigue, réémission): on rejoue la dernière à sa place, et elle compte
-    // pour le numéro suivant. Sinon l'invité ferait un pas de trop à chaque retard (la devinée,
-    // puis la vraie), corrigé chez lui par un à-coup. Les numéros se suivent (`commandes.ts`).
+    // Commande en retard (gigue, réémission): on rejoue la dernière à sa place. Si elle marchait,
+    // la devinée compte pour le numéro suivant: sinon l'invité ferait un pas de trop à chaque retard
+    // (la devinée, puis la vraie), corrigé chez lui par un à-coup. Les numéros se suivent
+    // (`commandes.ts`). Immobile, on attend la vraie sans avancer le numéro: une devinée immobile à
+    // la place d'un départ ôterait ce pas pour de bon, et l'invité reculerait en s'arrêtant (5 pas
+    // perdus au départ: 67 mm par image, graine 7 du banc de gigue, marche de 20 images).
     // Seul le déplacement se devine: Espace tenu deviné après un relâchement pourrait lancer un
     // geste de trop (répétition d'Espace tenu), alors qu'un geste lancé un pas plus tard ne se
     // voit pas. Exception: la poutre déjà tenue, qu'un pas relâché ferait tomber.
-    ack += 1;
+    if (Math.hypot(lastGuest.moveX, lastGuest.moveY) >= MOVE_DEADZONE) ack += 1;
     const holdingBeam = sim.world.beam?.holders.includes(remote) === true;
     return { seq: ack, moveX: lastGuest.moveX, moveY: lastGuest.moveY, actHeld: lastGuest.actHeld && holdingBeam };
   }
