@@ -223,7 +223,9 @@ describe('élevage de la 0.12', () => {
     const { content, map } = contentAndMap();
     const goats = content.settings.goats;
     if (goats === null) throw new Error('réglages');
-    expect(goats.spots).toHaveLength(5);
+    // 0.13 (parcelles-libres-0-13.md, lot P5): deux places hors de la terre cultivable, au bord de
+    // la route du gué; elles passent la même vérification de la voie que les cinq de la 0.12.
+    expect(goats.spots).toHaveLength(7);
     for (const id of goats.spots) {
       const at = map.points[id];
       expect(at, id).toBeDefined();
@@ -254,10 +256,12 @@ describe('élevage de la 0.12', () => {
     plantStake(sim, p1);
     expect(goat.led).toBe('p1');
     expect(p1.notifications.at(-1)?.key).toBe('goat_stake_rail');
-    p1.pos = { x: 8.5, y: 33.4 };
+    // 0.13: les places du pré (03 à 05) refusent le piquet quand une parcelle touche leur cercle
+    // (parcelles-libres-0-13.md, section 2.4); on plante au bord de la route du gué.
+    p1.pos = { x: 21.5, y: 24.4 };
     plantStake(sim, p1);
     expect(goat.led).toBeNull();
-    expect(goat.stake).toBe('goat_graze_04');
+    expect(goat.stake).toBe('goat_graze_06');
     expect(goat.freshToday).toBe(true);
   });
 
@@ -352,12 +356,13 @@ describe('contrat des quêtes de la 0.12 (README des données, section 3.1)', ()
     startBrood(sim, p1, hen.id);
     expect(sim.world.counters.duo.brood_started).toBe(1);
     // Le piquet planté à une place non broutée la veille: `goat_grazed_spot`, une fois par jour.
+    // Places hors du pré du jardin (0.13: les parcelles de départ y refusent le piquet).
     leadGoat(sim, p1, goat);
-    p1.pos = { x: 8.5, y: 33.4 };
+    p1.pos = { x: 21.5, y: 24.4 };
     plantStake(sim, p1);
     expect(sim.world.counters.duo.goat_grazed_spot).toBe(1);
     leadGoat(sim, p1, goat);
-    p1.pos = { x: 4.5, y: 31.4 };
+    p1.pos = { x: 21.5, y: 28.4 };
     plantStake(sim, p1);
     expect(sim.world.counters.duo.goat_grazed_spot).toBe(1);
   });

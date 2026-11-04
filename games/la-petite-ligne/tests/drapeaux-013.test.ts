@@ -12,7 +12,7 @@ import { sitDown, freeSeatsNear, playerBench } from '../src/simulation/bancs';
 import { updateCrafting } from '../src/simulation/intentions';
 import { buildingOpen } from '../src/simulation/interieurs';
 import { countInBag } from '../src/simulation/sac';
-import { newSim } from './aides';
+import { contentAndMap, newSim } from './aides';
 
 function raise(sim: Sim, flag: string): void {
   if (!sim.world.flags.includes(flag)) sim.world.flags.push(flag);
@@ -160,10 +160,21 @@ describe('drapeaux de la 0.13', () => {
     for (const c of sim.world.characters) expect(countInBag(c, 'binoculars')).toBe(0);
   });
 
-  it("moulin: la roue (et le son, les habitants) partent d'office tant qu'aucune quête ne pose le drapeau", () => {
+  // 0.13 (v0-13-habitants.md, `mill` et `berthe_sluice`): le moulin est arrêté jusqu'à la vanne
+  // levée de la première quête de Berthe, qui pose `mill_running`; le départ d'office ne vaut
+  // plus que si aucune donnée ne pose le drapeau.
+  it('moulin: arrêté tant que la quête de Berthe peut lever la vanne; sans elle, la roue part d’office', () => {
     const sim = newSim(18);
-    expect(sim.world.flags).not.toContain('mill_running');
     raiseAutoFlags(sim);
-    expect(sim.world.flags).toContain('mill_running');
+    expect(sim.world.flags).not.toContain('mill_running');
+    const content = structuredClone(contentAndMap().content);
+    content.quests = content.quests.map((q) => ({
+      ...q,
+      completionEffects: q.completionEffects.filter((e) => !(e.type === 'set_flag' && e.flag === 'mill_running')),
+    }));
+    const without = newSim(18, content);
+    expect(without.world.flags).not.toContain('mill_running');
+    raiseAutoFlags(without);
+    expect(without.world.flags).toContain('mill_running');
   });
 });

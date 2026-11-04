@@ -462,7 +462,7 @@ describe('automne: cueillette, école de Jeanne (T9-18, T9-19)', () => {
     expect(cepRain).toBeGreaterThan(cepDry * 1.3);
   });
 
-  it('T9-18: les jours d’école d’automne, Jeanne est absente de 8 h 30 à 16 h 30, sur la place de 16 h 30 à 18 h 30; le mercredi, comme dans la démo', () => {
+  it('T9-18: les jours d’école d’automne, Jeanne est à l’école de 8 h 30 à 16 h 30 (cour à la récréation), sur la place de 16 h 30 à 18 h 30; le mercredi, comme dans la démo', () => {
     const where = (day: number, minutes: number): string => {
       const sim = at(day, minutes);
       sim.world.weather = 'sunny';
@@ -472,8 +472,14 @@ describe('automne: cueillette, école de Jeanne (T9-18, T9-19)', () => {
     };
     // Jour 45: lundi d'automne; 47: mercredi.
     expect(weekdayOf(45)).toBe(2);
-    expect(where(45, 10 * HOUR)).toBe('absente');
-    expect(where(45, 17 * HOUR)).toBe('village_square');
+    expect(where(45, 9 * HOUR)).toBe('absente');
+    // 0.13 (v0-13-habitants.md, planning de Jeanne, habitude `recess`): la récréation de 10 h à
+    // 10 h 20 et de 14 h 30 à 14 h 50 se passe dans la cour, visible depuis le portail.
+    expect(where(45, 10 * HOUR + 10)).toBe('school_yard');
+    expect(where(45, 11 * HOUR)).toBe('absente');
+    // 0.13 (scène S08 `kids_play`, vie.json): après la classe, Jeanne et Léon jouent sur la place,
+    // au pied du puits; la cible est alors la place de la scène, pas le point `village_square`.
+    expect(where(45, 17 * HOUR)).toBe('scene:kids_play:0:0');
     expect(where(47, 10 * HOUR)).toBe('quay_bench');
     // L'été, pas d'école.
     expect(where(31, 10 * HOUR)).toBe('quay_bench');
