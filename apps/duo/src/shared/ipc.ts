@@ -26,6 +26,10 @@ export interface IntentArgs {
   'window:toggle-fullscreen': null;
   'window:set-fullscreen': { fullscreen: boolean };
   'library:install-file': null;
+  /** Bibliothèque affichée: contrôle rapide des mises à jour si le dernier est ancien. */
+  'library:opened': null;
+  'update:retry': null;
+  'update:play-anyway': { gameId: string };
 }
 
 export type IntentChannel = keyof IntentArgs;
@@ -51,6 +55,9 @@ export const INTENT_CHANNELS = [
   'window:toggle-fullscreen',
   'window:set-fullscreen',
   'library:install-file',
+  'library:opened',
+  'update:retry',
+  'update:play-anyway',
 ] as const satisfies readonly IntentChannel[];
 
 // Garde de compilation: chaque canal de IntentArgs figure dans la liste.

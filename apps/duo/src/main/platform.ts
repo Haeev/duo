@@ -26,6 +26,9 @@ import { publicSettings, type MachineStore, type SettingsFile } from './data/sto
 import type { GameEntry } from './games/catalog';
 import type { InstallOutcome } from './games/installer';
 import { readReleaseNotes } from './games/release-notes';
+import type { UpdatesSnapshot } from './games/updater';
+import { launchGate } from '../shared/updates';
+import { compareVersions } from '@duo/paquet';
 
 type InstallSuccess = Extract<InstallOutcome, { ok: true }>;
 import {
@@ -70,10 +73,22 @@ export interface PlatformDeps {
   readonly games: readonly GameEntry[];
   /** Boîte de dialogue du système puis installation (`null`: rien choisi). */
   readonly installFromFile: () => Promise<InstallOutcome | null>;
-  /** Passage au repos (bibliothèque) ou en activité (salon, invitation, partie). */
+  /**
+   * Téléchargements des jeux permis (pas de partie) ou non. Depuis 0.3.1 le salon
+   * les laisse continuer, pour y afficher la progression.
+   */
   readonly onIdleChange: (idle: boolean) => void;
+  /** Recherche des mises à jour; `null` sans catalogue (versions de test). */
+  readonly updates: UpdateControls | null;
   /** Quitter Duo après confirmation (M-15). */
   readonly requestQuit: () => void;
+}
+
+export interface UpdateControls {
+  /** Contrôle rapide si le dernier date de plus de quelques minutes. */
+  checkIfStale(): void;
+  retry(): void;
+  playAnyway(gameId: string): void;
 }
 
 interface RunningMatch {
@@ -120,6 +135,7 @@ export class Platform {
   private gameHost: GameHost | null = null;
   private publishQueued = false;
   private lastIdle = true;
+  private updates: UpdatesSnapshot = { check: { kind: 'never' }, games: new Map() };
   private hintTimer: ReturnType<typeof setTimeout> | null = null;
   private autosaveTimer: ReturnType<typeof setInterval> | null = null;
   /** Pastille « Nouveau » figée à l'entrée dans le salon, jusqu'à sa fermeture. */
@@ -261,6 +277,7 @@ export class Platform {
       notice: this.notice,
       toasts: this.toasts,
       quitConfirm: this.quitConfirm,
+      updateCheck: this.updates.check,
     };
   }
 
@@ -304,6 +321,7 @@ export class Platform {
         return { ok: true };
       }
       case 'salon:open':
+        this.deps.updates?.checkIfStale();
         return this.openSalon((arg as IntentArgs['salon:open']).gameId);
       case 'salon:close':
         liaison.closeSalon();
@@ -315,15 +333,32 @@ export class Platform {
         liaison.selectSave(save === null ? 'new' : choice, save);
         return { ok: true };
       }
-      case 'salon:join':
+      case 'salon:join': {
+        this.deps.updates?.checkIfStale();
+        const gameId = this.sessions.peer?.salon?.game.id;
+        if (gameId !== undefined && this.blockedByUpdate(gameId)) {
+          return { ok: false, error: 'mise à jour du jeu en cours' };
+        }
         liaison.joinSalon();
         return { ok: true };
+      }
       case 'salon:leave':
         liaison.leaveSalon();
         return { ok: true };
-      case 'salon:ready':
-        liaison.setReady((arg as IntentArgs['salon:ready']).ready);
+      case 'salon:ready': {
+        const ready = (arg as IntentArgs['salon:ready']).ready;
+        // Même règle que l'interface: pas de lancement pendant une mise à jour ou entre deux versions.
+        const salon = this.salonView();
+        if (
+          ready &&
+          salon !== null &&
+          (this.blockedByUpdate(salon.game.id) || salon.versionGap !== null)
+        ) {
+          return { ok: false, error: 'mise à jour du jeu en cours ou versions différentes' };
+        }
+        liaison.setReady(ready);
         return { ok: true };
+      }
       case 'match:pause':
         liaison.requestPause();
         return { ok: true };
@@ -355,6 +390,15 @@ export class Platform {
         return { ok: true };
       case 'library:install-file':
         return this.installFromFile();
+      case 'library:opened':
+        this.deps.updates?.checkIfStale();
+        return { ok: true };
+      case 'update:retry':
+        this.deps.updates?.retry();
+        return { ok: true };
+      case 'update:play-anyway':
+        this.deps.updates?.playAnyway((arg as IntentArgs['update:play-anyway']).gameId);
+        return { ok: true };
     }
   }
 
@@ -370,15 +414,42 @@ export class Platform {
     );
   }
 
+  /** Pas de partie en cours ni en arrêt: les mises à jour peuvent se télécharger et s'installer. */
+  canUpdate(): boolean {
+    return this.running === null && this.stopping === null;
+  }
+
+  /** État des mises à jour publié par la recherche. */
+  setUpdates(snapshot: UpdatesSnapshot): void {
+    this.updates = snapshot;
+    this.publish();
+  }
+
+  private blockedByUpdate(gameId: string): boolean {
+    return launchGate(this.updates.games.get(gameId) ?? null, this.updates.check).kind !== 'open';
+  }
+
   /** Version que Duo fait tourner pour ce jeu, `null` s'il est absent. */
   gameVersion(id: string): string | null {
     return this.games.get(id)?.manifest.version ?? null;
   }
 
-  /** Catalogue relu après une installation: appelé seulement au repos. */
+  /** Catalogue relu après une installation: jamais pendant une partie. */
   async setGames(games: readonly GameEntry[]): Promise<void> {
     this.games = new Map(games.map((game) => [game.manifest.id, game]));
     await this.refreshSaveSummaries();
+    // Salon de l'hôte encore vide: il annonce tout de suite la nouvelle version.
+    const salon = this.sessions.own.salon;
+    const installed = salon === null ? undefined : this.games.get(salon.game.id);
+    if (
+      salon !== null &&
+      installed !== undefined &&
+      !salon.guestJoined &&
+      this.sessions.own.match === null &&
+      installed.manifest.version !== salon.game.version
+    ) {
+      this.deps.liaison.openSalon({ ...salon.game, version: installed.manifest.version });
+    }
     this.publish();
   }
 
@@ -454,7 +525,7 @@ export class Platform {
     queueMicrotask(() => {
       this.publishQueued = false;
       try {
-        const idle = this.isIdle();
+        const idle = this.canUpdate();
         if (idle !== this.lastIdle) {
           this.lastIdle = idle;
           this.deps.onIdleChange(idle);
@@ -502,6 +573,7 @@ export class Platform {
           ? null
           : { help: manifest.saves.help ?? null, onExit: manifest.saves.moments.includes('exit') },
       lastSave: this.saveSummaries.get(manifest.id) ?? null,
+      update: this.updates.games.get(manifest.id) ?? null,
     };
   }
 
@@ -539,7 +611,24 @@ export class Platform {
       peerReady: salon.ready[other],
       peerSeat: !joined ? 'waiting' : this.linkUp && this.peer !== null ? 'joined' : 'lost',
       countdownEndsAt: salon.countdownEndsAt,
+      versionGap: this.versionGap(self, salon.game.version, game.manifest.version),
     };
+  }
+
+  /** Le protocole porte déjà la version de l'hôte; l'invité compare avec la sienne. */
+  private versionGap(
+    self: Role,
+    hostVersion: string,
+    selfVersion: string,
+  ): SalonView['versionGap'] {
+    if (hostVersion === selfVersion) return null;
+    const kind =
+      self === 'host'
+        ? 'host-stale'
+        : compareVersions(selfVersion, hostVersion) < 0
+          ? 'self-older'
+          : 'host-older';
+    return { kind, hostVersion, selfVersion };
   }
 
   private newsFor(game: GameEntry): SalonNews {

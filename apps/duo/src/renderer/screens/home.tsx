@@ -1,12 +1,14 @@
 // Accueil (E05), bibliothèque (E07) et bandeau d'invitation (E06), UX section 2.
 import { signal } from '@preact/signals';
 import type { JSX } from 'preact';
-import { useRef } from 'preact/hooks';
+import { useEffect, useRef } from 'preact/hooks';
 import type { AppState, GameSummary, InvitationView, Profile } from '../../shared/state';
+import type { UpdateCheckView } from '../../shared/updates';
 import { send } from '../bridge';
 import { durationRange, fullscreenKey, t, when } from '../textes';
 import { Icon, Logo, PlayerName, PlayerSymbol, Sky } from '../ui/components';
 import { markScreenChange, useEscape, useInitialFocus } from '../ui/keyboard';
+import { UpdateBanner, gateFor, gateReason, majTextes } from '../ui/update-banner';
 
 export type Tab = 'home' | 'library' | 'settings';
 
@@ -158,6 +160,7 @@ function Home({ state, profile }: { state: AppState; profile: Profile }): JSX.El
                 class="bouton bouton-principal bouton-grand"
                 ref={hostButton}
                 data-testid="accueil-rejoindre"
+                disabled={gateReason(gateFor(invitation.game, state.updateCheck)) !== null}
                 onClick={() => {
                   void send('salon:join', null);
                 }}
@@ -174,6 +177,9 @@ function Home({ state, profile }: { state: AppState; profile: Profile }): JSX.El
 
 function Library({ state }: { state: AppState }): JSX.Element {
   const first = useInitialFocus<HTMLButtonElement>('bibliotheque');
+  useEffect(() => {
+    void send('library:opened', null);
+  }, []);
   const grid = useRef<HTMLDivElement>(null);
   useEscape(() => {
     markScreenChange();
@@ -208,25 +214,41 @@ function Library({ state }: { state: AppState }): JSX.Element {
         </p>
       ) : (
         <div class="grille-jeux" ref={grid} onKeyDown={onArrow}>
-          {state.games.map((game, index) => (
-            <button
-              key={game.id}
-              type="button"
-              class="vignette"
-              ref={index === 0 ? first : null}
-              data-testid={`jeu-${game.id}`}
-              aria-label={`${game.name}, ${gameDetail(game)}`}
-              onClick={() => {
-                void send('salon:open', { gameId: game.id });
-              }}
-            >
-              <img class="vignette-image" src={game.thumbnailUrl} alt="" aria-hidden="true" />
-              <span class="vignette-nom">{game.name}</span>
-              <span class="petit texte-second">{gameDetail(game)}</span>
-              <span class="petit texte-second vignette-description">{game.description}</span>
-            </button>
-          ))}
+          {state.games.map((game, index) => {
+            const reason = gateReason(gateFor(game, state.updateCheck));
+            return (
+              <div key={game.id} class="vignette-cadre">
+                <button
+                  type="button"
+                  class="vignette"
+                  ref={index === 0 ? first : null}
+                  data-testid={`jeu-${game.id}`}
+                  aria-label={`${game.name}, ${gameDetail(game)}`}
+                  disabled={reason !== null}
+                  onClick={() => {
+                    void send('salon:open', { gameId: game.id });
+                  }}
+                >
+                  <img class="vignette-image" src={game.thumbnailUrl} alt="" aria-hidden="true" />
+                  <span class="vignette-nom">{game.name}</span>
+                  <span class="petit texte-second">{gameDetail(game)}</span>
+                  <span class="petit texte-second vignette-description">{game.description}</span>
+                </button>
+                <UpdateBanner game={game} />
+                {reason !== null && (
+                  <p class="petit texte-second" data-testid={`raison-${game.id}`}>
+                    {reason}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
+      )}
+      {state.updateCheck.kind === 'unreachable' && (
+        <p class="petit texte-second" data-testid="maj-injoignable">
+          {majTextes.injoignable}
+        </p>
       )}
       <div class="bibliotheque-actions">
         {/* Recours sans Internet (ADR 0010, point 7): même vérification qu'un téléchargement. */}
@@ -283,9 +305,12 @@ function SettingsScreen({ state }: { state: AppState }): JSX.Element {
 
 export function InvitationBanner({
   invitation,
+  check,
 }: {
   invitation: InvitationView;
+  check: UpdateCheckView;
 }): JSX.Element | null {
+  const reason = gateReason(gateFor(invitation.game, check));
   const key = invitationKey(invitation);
   const join = useInitialFocus<HTMLButtonElement>(key);
   useEscape(
@@ -316,6 +341,12 @@ export function InvitationBanner({
           {invitation.game.name} · {gameDetail(invitation.game)}
         </p>
         <p class="petit texte-second">{t.invitation.sauvegarde(saveText)}</p>
+        <UpdateBanner game={invitation.game} />
+        {reason !== null && (
+          <p class="petit texte-second" data-testid="invitation-raison">
+            {reason}
+          </p>
+        )}
       </div>
       <div class="bandeau-actions">
         <button
@@ -323,6 +354,7 @@ export function InvitationBanner({
           class="bouton bouton-principal"
           ref={join}
           data-testid="invitation-rejoindre"
+          disabled={reason !== null}
           onClick={() => {
             void send('salon:join', null);
           }}
@@ -358,7 +390,9 @@ export function Launcher({ state, profile }: { state: AppState; profile: Profile
           <SettingsScreen state={state} />
         )}
       </main>
-      {state.invitation !== null && <InvitationBanner invitation={state.invitation} />}
+      {state.invitation !== null && (
+        <InvitationBanner invitation={state.invitation} check={state.updateCheck} />
+      )}
     </div>
   );
 }

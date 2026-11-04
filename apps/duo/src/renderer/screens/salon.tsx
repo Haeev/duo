@@ -4,9 +4,21 @@ import type { JSX } from 'preact';
 import { useState } from 'preact/hooks';
 import type { AppState, Profile, SalonNews, SalonView } from '../../shared/state';
 import { send } from '../bridge';
-import { durationRange, t, when } from '../textes';
+import { durationRange, fr, t, when } from '../textes';
 import { ActionList, Chip, Dialog, Icon, PlayerCard, Sky, useCountdown } from '../ui/components';
 import { useEscape, useInitialFocus } from '../ui/keyboard';
+import { UpdateBanner, gateFor, gateReason } from '../ui/update-banner';
+
+function versionGapText(gap: NonNullable<SalonView['versionGap']>, peer: string): string {
+  switch (gap.kind) {
+    case 'host-stale':
+      return fr`Le jeu vient d'être mis à jour en version ${gap.selfVersion}. Ferme le salon et rouvre-le pour jouer ensemble.`;
+    case 'self-older':
+      return fr`Tu as la version ${gap.selfVersion}, ${peer} a la version ${gap.hostVersion}. Mets ton jeu à jour pour jouer ensemble.`;
+    case 'host-older':
+      return fr`Tu as la version ${gap.selfVersion}, ${peer} a la version ${gap.hostVersion}. ${peer} doit mettre son jeu à jour pour jouer ensemble.`;
+  }
+}
 
 function readyChip(ready: boolean): JSX.Element {
   return ready ? (
@@ -147,6 +159,9 @@ export function Salon({
   const [confirmLeave, setConfirmLeave] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const seconds = useCountdown(salon.countdownEndsAt);
+  const gap = salon.versionGap;
+  const reason = gateReason(gateFor(salon.game, state.updateCheck));
+  const blocked = reason !== null || gap !== null;
   const main = useInitialFocus<HTMLButtonElement>(
     `${salon.game.id}:${seconds === null ? 'salon' : 'decompte'}`,
   );
@@ -227,11 +242,18 @@ export function Salon({
               <Icon name="warning" /> {t.salon.connexionPerdue(peerName)}
             </p>
           )}
+          <UpdateBanner game={salon.game} />
+          {gap !== null && (
+            <p class="texte-erreur" data-testid="salon-versions">
+              <Icon name="warning" /> {versionGapText(gap, peerName)}
+            </p>
+          )}
           <button
             type="button"
             class={`bouton bouton-grand ${salon.selfReady ? 'bouton-secondaire' : 'bouton-principal'}`}
             ref={main}
             aria-pressed={salon.selfReady}
+            disabled={blocked && !salon.selfReady}
             data-testid="salon-pret"
             onClick={() => {
               void send('salon:ready', { ready: !salon.selfReady });
@@ -239,8 +261,8 @@ export function Salon({
           >
             {salon.selfReady ? t.salon.pasEncore : t.salon.cestParti}
           </button>
-          <p class="texte-second">
-            {host || !salon.selfReady ? t.salon.aide : t.salon.aideInvite(peerName)}
+          <p class="texte-second" data-testid="salon-aide">
+            {reason ?? (host || !salon.selfReady ? t.salon.aide : t.salon.aideInvite(peerName))}
           </p>
           <div class="carte">
             <h2 class="surtitre">{t.salon.commandes}</h2>

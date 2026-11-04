@@ -270,7 +270,7 @@ async function start(): Promise<void> {
     return outcome;
   };
   const url = catalogueUrl();
-  const updater =
+  const updater: GameUpdater | null =
     url === null
       ? null
       : new GameUpdater({
@@ -280,8 +280,11 @@ async function start(): Promise<void> {
           incomingDir: path.join(gamesDir, '.incoming'),
           install: (request) => installer.install(request),
           effectiveVersion: (id) => platform.gameVersion(id),
-          isIdle: () => platform.isIdle(),
+          isIdle: () => platform.canUpdate(),
           allowUrl: allowPackageUrl,
+          onStatus: (snapshot) => {
+            platform.setUpdates(snapshot);
+          },
           onInstalled: async (outcome) => {
             await afterInstall(outcome);
             platform.announceInstalled(outcome);
@@ -290,7 +293,7 @@ async function start(): Promise<void> {
         });
   let updaterStarted = false;
 
-  const platform = new Platform({
+  const platform: Platform = new Platform({
     journal,
     store,
     saves: new LocalSaves(userData),
@@ -302,6 +305,20 @@ async function start(): Promise<void> {
     settings: loaded.settings,
     games: catalog.games,
     installFromFile,
+    updates:
+      updater === null
+        ? null
+        : {
+            checkIfStale: () => {
+              updater.checkIfStale();
+            },
+            retry: () => {
+              void updater.retry();
+            },
+            playAnyway: (gameId) => {
+              updater.playAnyway(gameId);
+            },
+          },
     onIdleChange: (idle) => {
       if (idle) updater?.resume();
       else updater?.suspend();

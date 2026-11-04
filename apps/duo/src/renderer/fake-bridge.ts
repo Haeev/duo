@@ -26,6 +26,7 @@ const GAME: GameSummary = {
   ],
   saves: { help: 'Le jeu enregistre à l’aube et en quittant.', onExit: true },
   lastSave: { label: 'Jour 3', writtenAt: Date.now() - 86_400_000 },
+  update: null,
 };
 
 const BASE: AppState = {
@@ -44,6 +45,7 @@ const BASE: AppState = {
   notice: null,
   toasts: [],
   quitConfirm: false,
+  updateCheck: { kind: 'ok' },
 };
 
 const SALON: SalonView = {
@@ -75,6 +77,7 @@ const SALON: SalonView = {
   peerReady: true,
   peerSeat: 'joined',
   countdownEndsAt: null,
+  versionGap: null,
 };
 
 const MATCH: MatchView = {
@@ -231,6 +234,9 @@ export function createFakeBridge(scenario: string | null): DuoApi {
           break;
         case 'window:toggle-fullscreen':
         case 'library:install-file':
+        case 'library:opened':
+        case 'update:retry':
+        case 'update:play-anyway':
           break;
       }
       return Promise.resolve(ok);
