@@ -14,21 +14,23 @@ import { bodyCollides, findPath } from './grille';
 import { POINT, VILLAGER_BEHIND_POINTS } from './ids';
 import { newVillagerState } from './monde';
 import { marketEntry, marketPoint } from './marche';
+import { announceHabits, currentHabit, notePlanning, sawAtDoor, watchHabits } from './voisins';
 
 /** Activités où l'habitant n'est pas dans le bourg (on ne peut pas lui parler). */
 const HIDDEN_ACTIVITIES = new Set(['home', 'absent']);
 
-function currentEntry(sim: Sim, def: VillagerDef): { point: string; activity: string } {
+/** L'entrée du planning en cours: point, activité, habitude (0.13) et minute de début. */
+function currentEntry(sim: Sim, def: VillagerDef): { point: string; activity: string; habit: string | null; from: number } {
+  const m = Math.min(sim.world.clock.minutes, MINUTES_PER_DAY - 1);
   // 0.12: un client du marché du dimanche va à sa place devant l'étal, puis reprend sa journée.
   const market = marketEntry(sim, def.id);
-  if (market !== null) return market;
-  const m = Math.min(sim.world.clock.minutes, MINUTES_PER_DAY - 1);
+  if (market !== null) return { ...market, habit: def.habits.find((h) => h.kind === 'market')?.id ?? null, from: Math.floor(m) };
   for (const entry of def.schedule) {
     if (m < entry.from || m >= entry.to) continue;
     if (!evaluateAll(sim, entry.when, NO_CONTEXT)) continue;
-    return { point: entry.point, activity: entry.activity };
+    return { point: entry.point, activity: entry.activity, habit: entry.habit, from: entry.from };
   }
-  return { point: POINT.offstage, activity: 'absent' };
+  return { point: POINT.offstage, activity: 'absent', habit: null, from: Math.floor(m) };
 }
 
 function teleport(v: VillagerState, x: number, y: number): void {
@@ -81,11 +83,14 @@ export function placeVillagers(sim: Sim): void {
     const v = sim.world.villagers.find((x) => x.id === def.id);
     if (v === undefined) continue;
     const entry = currentEntry(sim, def);
-    const at = goalOf(sim, v, entry.point) ?? point(sim, POINT.offstage);
+    notePlanning(sim, def, v, entry.habit, entry.from);
+    const goal = goalOf(sim, v, entry.point);
+    const at = goal ?? point(sim, POINT.offstage);
     teleport(v, at.x, at.y);
     v.target = entry.point;
     v.activity = entry.activity;
-    v.visible = entry.point !== POINT.offstage && !HIDDEN_ACTIVITIES.has(entry.activity);
+    // 0.13: un point pas encore sur la carte (carte agrandie en cours) vaut hors du bourg.
+    v.visible = goal !== undefined && entry.point !== POINT.offstage && !HIDDEN_ACTIVITIES.has(entry.activity);
     v.speed = 0;
     sim.runtime.villagerPaths[v.id] = { target: entry.point, path: [] };
   }
@@ -101,11 +106,14 @@ export function updateVillagers(sim: Sim, dt: number): void {
     v.speed = 0;
     if (refresh) {
       const entry = currentEntry(sim, def);
+      const wasHidden = HIDDEN_ACTIVITIES.has(v.activity);
+      const habitBefore = notePlanning(sim, def, v, entry.habit, entry.from);
       if (entry.point !== v.target || entry.activity !== v.activity) {
         v.target = entry.point;
         v.activity = entry.activity;
         sim.runtime.changed = true;
-        if (entry.point === POINT.offstage) {
+        // 0.13: un point pas encore sur la carte (carte agrandie en cours) vaut hors du bourg.
+        if (entry.point === POINT.offstage || goalOf(sim, v, entry.point) === undefined) {
           const off = point(sim, POINT.offstage);
           teleport(v, off.x, off.y);
           v.visible = false;
@@ -116,7 +124,10 @@ export function updateVillagers(sim: Sim, dt: number): void {
           // Il arrive d'en dehors du bourg: il apparaît directement là où il va (sur un banc,
           // devant sa place, donc assis), jamais au milieu d'une emprise d'où il ressortirait.
           const at = goalOf(sim, v, entry.point);
-          if (at !== undefined && !inMap(sim.map, Math.floor(v.pos.x), Math.floor(v.pos.y))) teleport(v, at.x, at.y);
+          const offMap = !inMap(sim.map, Math.floor(v.pos.x), Math.floor(v.pos.y));
+          // 0.13: il sort de chez lui (pas du hors-carte): qui est là voit la fin de son habitude chez soi.
+          if (!offMap && wasHidden) sawAtDoor(sim, v, habitBefore);
+          if (at !== undefined && offMap) teleport(v, at.x, at.y);
           v.visible = true;
         }
         routeTo(sim, v, entry.point);
@@ -140,6 +151,8 @@ export function updateVillagers(sim: Sim, dt: number): void {
       if (post !== undefined && v.visible) v.facing = post;
       const hidden = HIDDEN_ACTIVITIES.has(v.activity);
       if (hidden && v.visible) {
+        // 0.13: il passe sa porte (ou s'en va hors du bourg) sous les yeux de qui est là.
+        sawAtDoor(sim, v, currentHabit(sim, v.id));
         v.visible = false;
         sim.runtime.changed = true;
       }
@@ -157,5 +170,10 @@ export function updateVillagers(sim: Sim, dt: number): void {
     }
     v.facing = Math.atan2(next.y - v.prev.y, next.x - v.prev.x);
     v.speed = speed;
+  }
+  // 0.13 (section 4.3, 7.3): ce que les joueurs voient d'eux, au rythme des plannings.
+  if (refresh) {
+    watchHabits(sim);
+    announceHabits(sim);
   }
 }

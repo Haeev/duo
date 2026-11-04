@@ -28,6 +28,7 @@ import type { MarketLevel } from '../donnees/marche';
 import type { MailKind } from '../donnees/plis';
 import type { Effect, Season, StageId } from '../donnees/types';
 import type { BenchSeat } from './bancs';
+import type { HabitSource, VillageWorldFields } from './types-voisins';
 import type { BuildingId } from './carte';
 import type { FishingState, FishRarity } from './peche';
 
@@ -92,7 +93,8 @@ export type Weather = 'sunny' | 'cloudy' | 'rain';
 // ---------------------------------------------------------------------------
 // Racine
 
-export interface WorldState {
+/** 0.13 (format 14): carnet des habitudes et champs de l'amitié (`types-voisins.ts`). */
+export interface WorldState extends VillageWorldFields {
   /** Format de la sauvegarde (`dataSchema`). */
   schema: number;
   /** Pas de simulation écoulés depuis la création du monde. */
@@ -1589,3 +1591,10 @@ export type WorldEvent =
   | { type: 'ate_together' }
   /** Le rangement est plein: le couvercle bute (`chest-full`). */
   | { type: 'storage_full'; by: CharacterId }
+  // 0.13 (lot H1): carnet des habitudes
+  /** Une habitude écrite au carnet (`by`: un joueur, les deux ensemble, ou personne: effet, reprise). */
+  | { type: 'habit_found'; villager: VillagerId; habit: string; source: HabitSource; by: CharacterId | 'both' | null }
+  /** Un écriteau lu (Examiner): ses lignes sont dans `content.signs`. */
+  | { type: 'sign_read'; by: CharacterId; sign: PointId }
+  /** Un habitant dit quelque chose en passant (annonce de son habitude, section 7.3): bulle au-dessus de lui. */
+  | { type: 'villager_remark'; villager: VillagerId; to: CharacterId; text: string }

@@ -37,6 +37,18 @@ import {
 import { townFrom } from './bourg';
 import { parseFishDef, parseFishingRules } from './poissons';
 import { EMPTY_CLOTHES, parseClothes, parseWardrobeSettings } from './vetements';
+import {
+  checkHabits,
+  checkVillageReferences,
+  habitExists,
+  parseBondSettings,
+  parseHabits,
+  parseHabitSettings,
+  parseVillageCalendar,
+  resolveSelf,
+  revealDialogues,
+  signsOf,
+} from './voisins';
 import type {
   AnimalDef,
   ClockPace,
@@ -116,6 +128,10 @@ export interface RawContentFiles {
   marche?: unknown;
   /** 0.12: vêtements de la garde-robe (`vetements.json`); absent: aucun vêtement (essais seulement). */
   vetements?: unknown;
+  /** 0.13: habitants nouveaux et compléments, fusionnés par identifiant (`habitants-0-13.json`); absent: rien. */
+  habitants013?: unknown;
+  /** 0.13: jours particuliers et classe (`calendrier.json`); absent: aucun. */
+  calendrier?: unknown;
 }
 
 const WEATHERS: readonly Weather[] = ['sunny', 'cloudy', 'rain'];
@@ -344,7 +360,18 @@ function parseConditionBody(r: Reader, type: string, since: Since): Condition {
     case 'weather_tomorrow_is':
       return { type, weather: r.at('weather').oneOf(WEATHERS) };
     case 'morning_mist':
+    case 'school_day':
       return { type };
+    case 'special_day':
+      return { type, id: r.at('id').string() };
+    case 'season_day_is':
+      return { type, days: r.at('days').items().map((d) => d.integer(1)) };
+    case 'birthday_of':
+      return { type, villager: r.at('villager').string() };
+    case 'decision_made':
+      return { type, decision: r.at('decision').string(), option: r.at('option').string() };
+    case 'habit_known':
+      return { type, villager: r.at('villager').string(), habit: r.at('habit').string() };
     case 'tenderness_at_least':
       return { type, level: r.at('level').oneOf(TENDERNESS) };
     case 'stage_due':
@@ -542,6 +569,8 @@ function conditions(r: Reader | null, since: Since): Condition[] {
 export function parseEffect(r: Reader): Effect {
   const type = r.at('type').string();
   switch (type) {
+    case 'reveal_habit':
+      return { type, villager: r.at('villager').string(), habit: r.at('habit').string() };
     case 'give_item':
       return {
         type,
@@ -850,47 +879,79 @@ function parseDialogue(r: Reader, villager: string): DialogueDef {
   };
 }
 
-function parseVillagers(r: Reader): { villagers: VillagerDef[]; dialogues: Record<string, DialogueDef> } {
+/** Champ d'un habitant: obligatoire pour un habitant nouveau, sinon celui d'avant s'il manque. */
+function villagerField<T>(v: Reader, base: VillagerDef | null, key: string, read: (r: Reader) => T, keep: (b: VillagerDef) => T): T {
+  if (base === null) return read(v.at(key));
+  const r = v.opt(key);
+  return r === null ? keep(base) : read(r);
+}
+
+function parseBirthday(r: Reader): VillagerDef['birthday'] {
+  return { season: r.at('season').oneOf(SEASONS), day: r.at('day').integer(1) };
+}
+
+function parseScheduleEntry(s: Reader): ScheduleEntry {
+  return {
+    when: conditions(s.opt('when'), 'game_start'),
+    from: s.at('from').time(),
+    to: s.at('to').time(),
+    point: s.at('point').string(),
+    activity: s.at('activity').string(),
+    habit: optString(s, 'habit'),
+  };
+}
+
+/**
+ * Un habitant de `habitants.json`, ou d'`habitants-0-13.json` (0.13, README 2.12): s'il complète
+ * un habitant déjà lu (`base`), chaque champ donné remplace le sien, et ses dialogues s'ajoutent.
+ */
+function parseVillager(v: Reader, base: VillagerDef | null, dialogues: Record<string, DialogueDef>, habitsRequired: boolean): VillagerDef {
+  const id = v.at('id').string();
+  const own = (v.opt('dialogues')?.items() ?? (base === null ? v.at('dialogues').items() : [])).map((d) => {
+    const dialogue = parseDialogue(d, id);
+    if (dialogue.id in dialogues) d.at('id').fail(`dialogue en double « ${dialogue.id} »`);
+    dialogues[dialogue.id] = dialogue;
+    return dialogue;
+  });
+  const villager: VillagerDef = {
+    id,
+    firstName: villagerField(v, base, 'firstName', (r) => r.string(), (b) => b.firstName),
+    lastName: villagerField(v, base, 'lastName', (r) => r.string(), (b) => b.lastName),
+    label: villagerField(v, base, 'label', (r) => r.string(), (b) => b.label),
+    role: villagerField(v, base, 'role', (r) => r.string(), (b) => b.role),
+    model: villagerField(v, base, 'model', (r) => r.string(), (b) => b.model),
+    scale: villagerField(v, base, 'scale', (r) => r.number(), (b) => b.scale),
+    soundMotif: villagerField(v, base, 'soundMotif', (r) => r.string(), (b) => b.soundMotif),
+    schedule: villagerField(v, base, 'schedule', (r) => r.items().map(parseScheduleEntry), (b) => b.schedule),
+    dialogues: [...(base?.dialogues ?? []), ...own],
+    habits: base !== null ? villagerField(v, base, 'habits', parseHabits, (b) => b.habits) : parseHabits(habitsRequired ? v.at('habits') : v.opt('habits')),
+    birthday: base !== null ? villagerField(v, base, 'birthday', parseBirthday, (b) => b.birthday) : v.opt('birthday') === null ? null : parseBirthday(v.at('birthday')),
+  };
+  resolveSelf(villager.schedule.flatMap((e) => e.when), id);
+  for (const d of own) resolveSelf(d.when, id);
+  return villager;
+}
+
+function parseVillagers(r: Reader, extra: Reader | null): { villagers: VillagerDef[]; dialogues: Record<string, DialogueDef> } {
   const dialogues: Record<string, DialogueDef> = {};
   const villagers = r
     .at('villagers')
     .items()
-    .map((v): VillagerDef => {
-      const id = v.at('id').string();
-      const schedule = v
-        .at('schedule')
-        .items()
-        .map(
-          (s): ScheduleEntry => ({
-            when: conditions(s.opt('when'), 'game_start'),
-            from: s.at('from').time(),
-            to: s.at('to').time(),
-            point: s.at('point').string(),
-            activity: s.at('activity').string(),
-          }),
-        );
-      const own = v
-        .at('dialogues')
-        .items()
-        .map((d) => {
-          const dialogue = parseDialogue(d, id);
-          if (dialogue.id in dialogues) d.at('id').fail(`dialogue en double « ${dialogue.id} »`);
-          dialogues[dialogue.id] = dialogue;
-          return dialogue;
-        });
-      return {
-        id,
-        firstName: v.at('firstName').string(),
-        lastName: v.at('lastName').string(),
-        label: v.at('label').string(),
-        role: v.at('role').string(),
-        model: v.at('model').string(),
-        scale: v.at('scale').number(),
-        soundMotif: v.at('soundMotif').string(),
-        schedule,
-        dialogues: own,
-      };
-    });
+    .map((v) => parseVillager(v, null, dialogues, false));
+  for (const v of extra?.at('villagers').items() ?? []) {
+    const id = v.at('id').string();
+    const at = villagers.findIndex((x) => x.id === id);
+    const base = villagers[at];
+    if (base === undefined) villagers.push(parseVillager(v, null, dialogues, true));
+    else villagers[at] = parseVillager(v, base, dialogues, true);
+  }
+  const seen = new Set<string>();
+  for (const v of villagers) {
+    if (seen.has(v.id)) throw new ContentError(`habitants: habitant en double « ${v.id} »`);
+    seen.add(v.id);
+  }
+  revealDialogues(villagers, dialogues);
+  checkHabits(villagers);
   return { villagers, dialogues };
 }
 
@@ -2099,6 +2160,8 @@ function parseSettings(r: Reader): Settings {
   const continuation = r.opt('continuation');
   return {
     profile: r.at('profile').string(),
+    habits: parseHabitSettings(r.opt('habits')),
+    bonds: parseBondSettings(r.opt('bonds')),
     calendar: parseCalendar(r),
     clock: {
       secondsPerGameMinute: base,
@@ -2282,6 +2345,9 @@ function checkReferences(content: Content): void {
           break;
         case 'reveal_secret':
           if ((content.quests.find((q) => q.id === e.quest)?.secret ?? null) === null) fail(`${where}: quête sans secret « ${e.quest} »`);
+          break;
+        case 'reveal_habit':
+          if (!habitExists(content.villagers, e)) fail(`${where}: habitude inconnue « ${e.villager}.${e.habit} »`);
           break;
         case 'give_money':
         case 'take_money':
@@ -2628,11 +2694,12 @@ export function loadContent(files: RawContentFiles): Content {
 
   const start = objets.at('startingInventory');
   const { crops, qualities } = parseCrops(cultures);
-  const { villagers, dialogues } = parseVillagers(habitants);
+  const { villagers, dialogues } = parseVillagers(habitants, files.habitants013 === undefined ? null : root('habitants-0-13.json', files.habitants013));
+  const settings = parseSettings(reglages);
   const { letters, senders } = parseLetters(courrier);
   const envieData = parseEnvies(envies);
   const content: Content = {
-    settings: parseSettings(reglages),
+    settings,
     items: parseItems(objets),
     recipes: parseRecipes(objets),
     constructions: parseConstructions(objets),
@@ -2663,10 +2730,13 @@ export function loadContent(files: RawContentFiles): Content {
       files.vetements === undefined
         ? EMPTY_CLOTHES
         : parseClothes(files.vetements, parseWardrobeSettings(reglages.opt('wardrobe'))),
+    villageCalendar: parseVillageCalendar(files.calendrier === undefined ? null : root('calendrier.json', files.calendrier), settings, villagers),
+    signs: signsOf(villagers),
   };
   content.quests.push(...annonceQuests(content));
   if (new Set(content.quests.map((q) => q.id)).size !== content.quests.length) throw new ContentError('quête en double (annonces, cadeaux et quetes.json)');
   checkReferences(content);
+  checkVillageReferences(content);
   checkMarket(content);
   // Pêche 0.12 (section 8.1): un seul coefficient met tous les prix de poissons à l'échelle de la monnaie.
   const scale = content.settings.fishing?.rules.priceScale ?? 1;

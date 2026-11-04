@@ -384,7 +384,9 @@ describe('répliques du quotidien après la démo (T8-23, section 5.5)', () => {
 
   it('les 70 répliques nouvelles sont dans les données, avec leurs conditions', () => {
     const ids = Object.keys(content.dialogues);
-    const added = ids.filter((id) => /_(g\d|ls\d|su\d|rain2|day16)$/.test(id));
+    // Les répliques du tour 8, chez les habitants de la démo (les 15 de la 0.13 ont des identifiants du même genre).
+    const demoVillagers = new Set(['firmin', 'odette', 'basile', 'jeanne', 'achille', 'solange']);
+    const added = ids.filter((id) => /_(g\d|ls\d|su\d|rain2|day16)$/.test(id) && demoVillagers.has(content.dialogues[id]?.villager ?? ''));
     expect(added).toHaveLength(64 + 4);
     expect(ids).toContain('odette_rain_tomorrow');
     expect(ids).toContain('firmin_crate_full_week');

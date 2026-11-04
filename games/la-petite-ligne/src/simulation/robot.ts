@@ -188,6 +188,8 @@ function social(sim: Sim, c: Character, m: Memory, out: Intent[]): boolean {
     if (!v.visible || v.talkingWith.length > 0) continue;
     // La rue Haute (tour 10) attend la fin de la démo: ses quêtes sont dans `town`.
     if (TOWN_VILLAGERS.has(v.id)) continue;
+    // 0.13: les habitants nouveaux attendent le robot de leurs quêtes (lot H5); la démo se joue comme avant.
+    if (!DEMO_VILLAGERS.has(v.id)) continue;
     const d = pickDialogue(sim, v.id, c.id);
     if (d === null || d.kind === 'daily') continue;
     if ((d.kind === 'quest' || d.kind === 'hint') && d.once === null) continue;
@@ -1088,6 +1090,8 @@ function beam(sim: Sim, c: Character, m: Memory, f: { held: boolean; mx: number;
 
 /** Habitants de la rue Haute (tour 10): le robot ne les suit qu'après la démo, dans `town`. */
 const TOWN_VILLAGERS: ReadonlySet<string> = new Set([TOWN.achille, TOWN.solange]);
+/** Habitants de la démo que le robot va voir (les quinze de la 0.13 n'ont pas encore de quêtes à jouer). */
+const DEMO_VILLAGERS: ReadonlySet<string> = new Set(['firmin', 'odette', 'basile', 'jeanne', TOWN.achille, TOWN.solange]);
 /** Heure où le robot boit son chocolat chez Odette, et le pain du matin (avant 9 h: pain chaud). */
 const CHOCOLATE_FROM = 15 * HOUR;
 const BREAD_UNTIL = 8 * HOUR + 30;

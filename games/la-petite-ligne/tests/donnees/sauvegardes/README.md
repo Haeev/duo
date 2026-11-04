@@ -61,6 +61,10 @@ Règles:
 | `format-13-milieu-semaine-2.json` | 13 | mardi, jour 11, midi (0.12.1) | 7 | `generer.ts` (0.12.1) |
 | `format-13-fin-de-la-demo.json` | 13 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.12.1) | 42 | `generer.ts` (0.12.1) |
 | `format-13-ete-jour-25.json` | 13 | mardi 25 à midi (0.12.1; sans référence du jeudi 62, comme le format 12) | 7 | `generer.ts` (0.12.1) |
+| `format-14-fin-semaine-1.json` | 14 | jour 8 à 16 h, commande 1 payée; 21 habitants, carnet des habitudes et champs de l'amitié (0.13, lot H1) | 42 | `generer.ts` (0.13, lot H1) |
+| `format-14-milieu-semaine-2.json` | 14 | mardi, jour 11, midi (0.13, lot H1) | 7 | `generer.ts` (0.13, lot H1) |
+| `format-14-fin-de-la-demo.json` | 14 | jour 15 à 16 h, écran d'étape « Deux semaines » (0.13, lot H1) | 42 | `generer.ts` (0.13, lot H1) |
+| `format-14-ete-jour-25.json` | 14 | mardi 25 à midi (0.13, lot H1; sans référence du jeudi 62, comme les formats 12 et 13) | 7 | `generer.ts` (0.13, lot H1) |
 
 ## Format en cours
 

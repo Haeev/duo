@@ -16,6 +16,7 @@ import { evaluate } from './conditions';
 import { henVars } from '../etat/secrets';
 import { fnv1a } from '../etat/tirage';
 import { answerHenCall, HEN_CALL_DIALOGUE, secretMistake } from './secrets';
+import { heardReveals, revealUse, sawInConversation, type RevealUse } from './voisins';
 
 const GIVE_PREFIX = 'give:';
 
@@ -171,8 +172,14 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
     if (best === null || d.priority > best.priority) best = d;
   }
   if (best !== null) return best;
-  const daily = eligibleDailies(sim, villager, who);
+  // 0.13 (section 4.4): une réplique révélatrice d'une habitude née d'une quête pas encore faite attend.
+  const uses = new Map<DialogueDef, RevealUse>();
+  for (const d of eligibleDailies(sim, villager, who)) uses.set(d, revealUse(sim, d));
+  const daily = [...uses.keys()].filter((d) => uses.get(d) !== 'hidden');
   if (daily.length === 0) return null;
+  // Rattrapage (4.8): une habitude en attente depuis `habits.gossipAfterDays` jours passe avant tout le quotidien.
+  const overdue = daily.filter((d) => uses.get(d) === 'overdue');
+  if (overdue.length > 0) return leastRecent(sim, overdue, heard);
   // Répliques datées (jour du train, pluie): la plus prioritaire, une fois par jour. Après la démo
   // (tour 8, section 5.5), seulement si ce joueur ne l'a pas entendue depuis `datedRepeatDays`
   // jours; sinon elle rejoint la réserve ordinaire.
@@ -188,9 +195,16 @@ export function pickDialogue(sim: Sim, villager: string, who: CharacterId): Dial
     if (dated === null || d.priority > dated.priority) dated = d;
   }
   if (dated !== null) return dated;
+  // 0.13 (4.4): une réplique qui révèle une habitude encore inconnue passe avant les ordinaires.
+  const fresh = daily.filter((d) => uses.get(d) === 'fresh');
+  if (fresh.length > 0) return leastRecent(sim, fresh, heard);
   // Sinon la moins récemment entendue par ce joueur (jamais entendue d'abord), au hasard à égalité.
   const ordinary = daily.filter((d) => d.priority < story || recentlyHeard(d));
-  const pool = ordinary.length > 0 ? ordinary : daily;
+  return leastRecent(sim, ordinary.length > 0 ? ordinary : daily, heard);
+}
+
+/** La moins récemment entendue par ce joueur (jamais entendue d'abord), au hasard à égalité. */
+function leastRecent(sim: Sim, pool: readonly DialogueDef[], heard: (id: string) => number | undefined): DialogueDef {
   let oldest = Infinity;
   for (const d of pool) oldest = Math.min(oldest, heard(d.id) ?? -1);
   return sim.rng.pick(pool.filter((d) => (heard(d.id) ?? -1) === oldest));
@@ -317,6 +331,8 @@ export function talkTo(sim: Sim, c: Character, villager: string): boolean {
   turnToTalk(sim, v, c.pos);
   if (!v.talkingWith.includes(c.id)) v.talkingWith.push(c.id);
   v.met = true;
+  // 0.13 (4.3): lui parler pendant son habitude l'écrit au carnet.
+  sawInConversation(sim, c, v);
   bump(sim, `talked:${villager}`, c.id);
   emit(sim, { type: 'talk', by: c.id, villager });
   return true;
@@ -344,6 +360,7 @@ function endConversation(sim: Sim, c: Character, completed: boolean): void {
     if (!done.includes(`${def.id}@${c.id}`)) done.push(`${def.id}@${c.id}`);
   }
   hearDialogue(sim, c.id, def);
+  heardReveals(sim, c, def);
   runEffects(sim, def.effects, c.id);
 }
 
@@ -475,6 +492,18 @@ function sceneChoice(sim: Sim, c: Character, choice: string): void {
 }
 
 /** Lance d'elle-même une scène à deux quand ses conditions sont vraies et que les deux sont au rendez-vous. */
+const sharedScenesCache = new WeakMap<Content, DialogueDef[]>();
+
+/** Les scènes à deux qui se lancent d'elles-mêmes, dans l'ordre du contenu (0.13: 750 dialogues, relus à chaque pas). */
+function sharedScenes(content: Content): DialogueDef[] {
+  let list = sharedScenesCache.get(content);
+  if (list === undefined) {
+    list = Object.values(content.dialogues).filter((d) => d.shared && d.kind === 'scene' && d.point !== null);
+    sharedScenesCache.set(content, list);
+  }
+  return list;
+}
+
 export function autoStartScenes(sim: Sim): void {
   const { world } = sim;
   if (world.scene !== null || world.phase !== 'day' || world.scripts.length > 0) return;
@@ -483,8 +512,8 @@ export function autoStartScenes(sim: Sim): void {
   );
   if (!free) return;
   const range = sim.content.settings.ranges.talk;
-  for (const def of Object.values(sim.content.dialogues)) {
-    if (!def.shared || def.kind !== 'scene' || def.point === null) continue;
+  for (const def of sharedScenes(sim.content)) {
+    if (def.point === null) continue;
     if (def.once === 'duo' && dialogueDone(world.dialoguesDone, def.id)) continue;
     const at = point(sim, def.point);
     if (!world.characters.every((c) => distance(c.pos, at) <= range)) continue;

@@ -53,6 +53,8 @@ Le code remplace `{nom}` dans les textes. Seuls ceux-ci existent (le validateur 
 | `textes.json` | forme du matin, messages, interface du jeu, écran de nuit, écran de fin |
 | `reglages.json` | toutes les valeurs de réglage de la démo |
 | `moments.json` | les moments rares (tour 6): bêtes et gestes qui se jouent quand les deux joueurs regardent ensemble (section 2.10) |
+| `habitants-0-13.json` | 0.13, facultatif: les habitants nouveaux et les compléments des anciens, au format de `habitants.json`, fusionnés par identifiant (section 2.12) |
+| `calendrier.json` | 0.13: jours particuliers (messe, marché, fêtes, moisson...) et jours de classe; les anniversaires sont dans les habitants (section 2.12) |
 
 ### 2.1 `objets.json`
 
@@ -268,6 +270,66 @@ Objets du tour 9 (`objets.json`): catégories `animal_order` (une poule livrée 
 
 Réglages du tour 9 (`reglages.json`): `board` (`fromDay`, `post` jour de la semaine et sorte, `postTime`, `deadlineDays`, `deadlineTime`, `noRepeatDays`, `weights.neverPosted` et `sameGiver`, `reward.help` et `reward.together`: `factor`, `add`, `min`, `max`, `round`, `heart`, `keepDone`), `improvements` (`queues.<file>.opensFromDay`, `steps`, `plankDiscount`, `plankDiscountMax`), `hens.max`, `order.generated` (`fishCostFromWeights`, `fishCostReferenceSeason`, `roundTo`, `lineMax`, `extraLineMinShare`, `maxLines`, `resources.eggsPerHenPerWeek`), `forage.items[].days` (plage de jours de saison), `forage.rainBoost` (une liste; l'ancienne forme objet est encore lue), `clock.lastDay` au samedi 64 et l'étape `autumn_end`.
 
+### 2.12 Habitudes, `habitants-0-13.json` et `calendrier.json` (0.13, lot H1)
+
+Conception: `docs/jeux/jeu-1/v0-13-habitants.md`, sections 3 et 4. Le moteur lit tout ici: aucune habitude, aucun jour particulier, aucune heure n'est écrite dans le code.
+
+**Champs nouveaux d'un habitant** (`habitants.json` et `habitants-0-13.json`, `villagers[]`):
+
+| Champ | Type | Valeurs |
+|---|---|---|
+| `schedule[].habit` | identifiant, facultatif | l'habitude à laquelle appartient l'entrée (`habits[].id` du même habitant). Une habitude peut avoir plusieurs entrées (la manille sur la terrasse, au comptoir s'il pleut; deux plages horaires). Une entrée sans `habit` ne s'apprend jamais (elle n'est pas au carnet) |
+| `habits[]` | liste, facultative (vide par défaut) | les habitudes du carnet, dans l'ordre des tableaux 3.2: `{ id, kind, label, reveals, announce? }` |
+| `habits[].id` | identifiant | unique pour cet habitant (`manille`, `sunday_plis`); ailleurs, une habitude se désigne par le couple `villager` et `habit` |
+| `habits[].kind` | texte | `routine`, `home` (chez soi), `rain` (variante de pluie), `season` (variante de saison), `day` (jour particulier), `after_quest` (née d'une quête), `market` (passage à l'étal du marché, tenu par `marche.json`, sans entrée de planning), `birthday`. Colonne « Sorte » du document: routine, maison, pluie, saison, jour, apres, marche, anniv |
+| `habits[].label` | texte | la ligne du carnet (« Le mercredi, la manille au café de 20 h à 22 h (sur la terrasse, au comptoir s'il pleut) ») |
+| `habits[].reveals[]` | liste | comment l'apprendre en plus de la voir: `{ "by": habitant, "text": réplique }` (une réplique dite par `by`, lui-même ou un autre: la rumeur) ou `{ "sign": écriteau, "text": ligne }` (une ligne de l'écriteau, identifiant du point de carte posé devant lui) |
+| `habits[].announce` | texte, facultatif | ce qu'il dit en passant quand il part vers cette habitude (« Je file à la chorale ! », section 7.3); absent: il ne l'annonce pas |
+| `birthday` | objet, facultatif | `{ season, day }`: son anniversaire (jour de saison, 1 à `reglages.calendar.seasonDays`), la seule source des anniversaires (condition `birthday_of`); jamais un samedi, jamais un jour particulier `noBirthday` de `calendrier.json`, jamais deux le même jour |
+| `age`, `homeLabel`, `endearment`, `tastes` | | lus par d'autres lots (carnet, amitié: `tastes` est `{ adore[], aime[], deteste[{ item, reply }] }`, lot H2); ignorés par le lot H1 |
+
+Exemple (Firmin, extrait):
+
+```json
+{
+  "id": "firmin",
+  "schedule": [
+    { "when": [{ "type": "weekday_is", "weekdays": ["wednesday"] }, { "type": "weather_is", "weather": "rain" }, { "type": "day_at_least", "day": 16 }], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_counter", "activity": "stand" },
+    { "when": [{ "type": "weekday_is", "weekdays": ["wednesday"] }, { "type": "day_at_least", "day": 16 }], "habit": "manille", "from": "20:00", "to": "22:00", "point": "cafe_terrace", "activity": "stand" },
+    { "habit": "quay", "from": "08:00", "to": "18:00", "point": "quay_bell", "activity": "stand" }
+  ],
+  "habits": [
+    { "id": "manille", "kind": "routine", "label": "Le mercredi, la manille au café de 20 h à 22 h (sur la terrasse, au comptoir s'il pleut)", "announce": "C'est mercredi: la manille m'attend !", "reveals": [
+      { "by": "basile", "text": "Le mercredi soir, manille au café de la Côte. Firmin triche. L'abbé aussi, mais lui, il demande pardon." },
+      { "by": "colette", "text": "Le mercredi, s'il pleut, mes joueurs de manille s'installent au comptoir. Ils font plus de bruit que la pluie." }
+    ] },
+    { "id": "quay", "kind": "routine", "label": "Tous les jours, à la cloche du quai, de 8 h à 18 h", "reveals": [{ "by": "firmin", "text": "De 8 h à 6 h du soir, je suis à ma cloche. Comme Émile, et comme personne d'autre." }] }
+  ]
+}
+```
+
+Contrôles (au chargement et par `valider_donnees.py`): chaque `habit` d'une entrée existe dans `habits`; identifiants uniques; chaque habitude a au moins une entrée, sauf `market`; `by` est un habitant connu; chaque habitude devrait avoir au moins une réplique ou un écriteau (avertissement). Une entrée dont le point n'est pas encore sur la carte met l'habitant hors du bourg (invisible) jusqu'à ce que le point existe. La sortie `--json` de `v0_13_habitants.py` est à reprendre avec ces noms de sortes et sans la condition provisoire `existing` (la remplacer par les conditions écrites dans `habitants.json`).
+
+**Répliques révélatrices.** Le code fait de chaque `reveals[]` `{ by, text }` une réplique du quotidien de `by` (identifiant `habit_<habitant>_<habitude>_<rang>`, à ne pas réutiliser). Tant que l'habitude est inconnue, elle passe avant les autres répliques ordinaires (en dessous des quêtes et des répliques datées); entendue jusqu'au bout, elle écrit l'habitude au carnet. Connue, elle rejoint la réserve ordinaire. Elle ne se dit que si toutes ses habitudes sont possibles dans l'état présent (une de leurs entrées tient un jour ou l'autre avec les drapeaux, les quêtes et les décisions du moment, sans être couverte par une entrée d'avant qui tient tous les jours, comme la tournée de Lucie avant son retour), et se tait quand l'une disparaît (Berthe et `mouture_settled`). Un écriteau n'écrit au carnet que les habitudes possibles. Le même texte du même habitant pour plusieurs habitudes (Lucie et ses trois lieux de photo) fait une seule réplique qui les révèle toutes. Rattrapage (section 4.8): une habitude qui a tenu `habits.gossipAfterDays` jours (habitant rencontré) sans être connue passe avant tout le quotidien chez les habitants qui ont une réplique sur elle.
+
+**Écriteaux.** Examiner à moins de `habits.signRange` du point de l'écriteau (le level designer pose un point du même identifiant devant lui) montre ses lignes et écrit au carnet toutes les habitudes qui le citent.
+
+**`habitants-0-13.json`** (facultatif): `{ "version": 1, "villagers": [ ... ] }`, au format de `habitants.json`. Fusion par identifiant:
+
+- un habitant nouveau: tous les champs de `habitants.json` sont obligatoires (`firstName`, `lastName`, `label`, `role`, `model`, `scale`, `soundMotif`, `schedule`, `dialogues`), plus `habits`; il se range après ceux de `habitants.json`, dans l'ordre du fichier;
+- un habitant déjà dans `habitants.json`: seul `id` est obligatoire; chaque champ donné remplace celui de `habitants.json` (`schedule` et `habits` en entier), sauf `dialogues`, qui s'ajoute à la suite (identifiants uniques dans tout le jeu). Les entrées existantes des six habitants de la démo gardent leur ordre et leurs conditions (des tests épinglent leurs positions des jours 1 à 15): on leur ajoute `habit` et des entrées neuves.
+
+**`calendrier.json`**:
+
+| Champ | Type | Valeurs |
+|---|---|---|
+| `school` | objet | `weekdays` (jours de classe, `monday`...), `holidaySeasons` (saisons de vacances: `summer`) |
+| `specialDays[]` | liste | `{ id, name, weekdays?, seasonDays?, from?, to?, noSchool?, noBirthday?, tier? }`: le jour est particulier quand son jour de la semaine est dans `weekdays` ou quand son jour de saison est dans `seasonDays.<saison>` (`{ "summer": [17, 18] }`, jours 1 à `reglages.calendar.seasonDays`); au moins l'un des deux. `name`: pour le carnet (« la moisson »). `from`, `to`: heures publiques, pour l'interface seulement (les heures de chacun sont dans son planning). `noSchool`: pas de classe ce jour-là. `noBirthday`: jamais d'anniversaire ce jour-là (fêtes, moisson, battage, lumignons). `tier`: `P1` pour les fêtes dont le cadre n'existe pas encore |
+
+Conditions nouvelles (section 3): `school_day`, `special_day`, `season_day_is`, `birthday_of`, `decision_made`, `habit_known`; effet nouveau (section 4): `reveal_habit`.
+
+**Réglages** (`reglages.json`, `habits`): `seeDistance` (10 m), `nightSeeDistance` (6 m) à partir de `nightFrom` (21:00), `watchSeconds` (2 s réelles), `arrivedDistance` (2 m du point), `doorDistance` (10 m: voir entrer ou sortir), `signRange`, `gossipAfterDays` (10, de 7 à 21), `logKept` (30 découvertes gardées pour la notification de retour), `announce` (`distance` 5 m, `minutes` 10 après le début de l'habitude, `bondAtLeast` 250: Voisinage), `windowPoints` (points vus du dehors: vitrine, fenêtre, établi derrière la vitre, corde des cloches), `knownInEarlierSaves` (habitudes déjà au carnet d'une partie reprise d'une version antérieure, par habitant, section 0); `bonds` (`earlierSaveStartPerQuest` 60, `earlierSaveStartMax` 250: lien de départ d'une partie reprise, par quête finie avec l'habitant).
+
 ## 3. Conditions
 
 Une condition est un objet `{ "type": ..., paramètres }`. Une liste de conditions est vraie quand toutes le sont. `label` (texte) est accepté partout: il sert de ligne à cocher au carnet.
@@ -329,6 +391,12 @@ Paramètres communs des conditions qui comptent:
 | `order_complete` | `day` facultatif | toutes les lignes de la commande du train de ce jour sont dans la caisse (sans `day`: la commande en cours, celle du prochain train, comme `firmin_crate_full_week`); après le départ de ce train (`pay_order`), garde la réponse du moment du départ |
 | `counter` | `key`, comptage | 0.12: le compteur nommé `key` (`world.counters`) atteint `count`; pour un système qui compte sans condition à lui (section 3.1) |
 | `money_at_least` | `amount` | 0.12: la bourse commune a au moins cette somme; sert de `correct` à un choix payant (section 4.2) |
+| `school_day` | | 0.13: jour de classe (`calendrier.school`: jour de la semaine de classe, hors saison de vacances, hors jour particulier `noSchool`) |
+| `special_day` | `id` | 0.13: le jour est ce jour particulier de `calendrier.specialDays` |
+| `season_day_is` | `days` (liste) | 0.13: le jour de la saison (1 à `reglages.calendar.seasonDays`) est dans la liste; le premier dimanche d'une saison est le jour 2 |
+| `birthday_of` | `villager` (`self`: l'habitant dont c'est le planning ou le dialogue) | 0.13: c'est l'anniversaire de cet habitant (son champ `birthday`) |
+| `decision_made` | `decision`, `option` | 0.13: la décision à deux a été prise avec cette option (lot H2) |
+| `habit_known` | `villager`, `habit` | 0.13: l'habitude est au carnet |
 | `animal_released`, `animal_named` | `animal` (`rooster`, `goat`), comptage | 0.12: compteurs `animal_released:<bête>`, `animal_named:<bête>` (section 3.1) |
 | `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spots`, `delivered`, `stall_stocked` | comptage | 0.12: compteurs `brood_started`, `brood_hatched`, `milked`, `goat_grazed_spot`, `mail_delivered`, `stall_kind` (section 3.1) |
 | `given_to_stall` | `item` facultatif, comptage | 0.12: compteur `stall_given:<objet>` (`stall_given` sans objet) |
@@ -378,6 +446,7 @@ Drapeaux posés par les quêtes pour ces systèmes: `market_open` (l'étal est s
 | `end_demo` | | ancien nom: vaut `end_stage` de l'étape `demo` |
 
 | `if` | `condition`, `then`, `else` | applique `then` si la condition est vraie, sinon `else` |
+| `reveal_habit` | `villager`, `habit` | 0.13: écrit l'habitude au carnet (fin de quête, décision); rien si elle y est déjà |
 | `reveal_secret` | `quest` | le secret de la quête devient visible des deux joueurs (fin d'une quête secrète: les noms des poules chez les deux) |
 
 `give_item` accepte aussi `to: "informed"` et `to: "doer"` (le rôle dans le secret de la quête en cours); `spawn_animals` accepte `shuffleVariantsBy` (groupe de variante: qui porte quelle couleur suit la permutation tirée par la graine, `hen_names`). Dans les conditions qui comptent, `who` accepte `"informed"` et `"doer"` dans une quête à secret; `looked_at` accepte `minDistance` (m) et `still` (immobile).

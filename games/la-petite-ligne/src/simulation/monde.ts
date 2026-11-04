@@ -27,6 +27,7 @@ import { emptyOrderBook } from './semaine';
 import { addToBag, addStack } from './sac';
 import { emptyBoard } from './annonces';
 import { emptyImprovements } from './chantiers';
+import { emptyVillageFields } from '../etat/types-voisins';
 
 /** Ce que la plateforme dit d'un joueur: identifiant stable, pseudo, couleur du profil. */
 export interface PlayerInfo {
@@ -278,6 +279,7 @@ export function createWorld(content: Content, map: GameMap, seed: number, player
     rack: [],
     upperStreetSince: 1,
     fishing: emptyFishing(),
+    ...emptyVillageFields(),
   };
 
   // Pêche (P1): décrite dans les réglages, elle est ouverte dès le début.

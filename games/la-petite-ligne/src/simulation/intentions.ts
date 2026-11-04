@@ -30,6 +30,7 @@ import { nightChoice, startDay, startGame } from './horloge';
 import { ITEM, POINT } from './ids';
 import { clampSlot, giveToCharacter, payMaterials, takeFromBag } from './sac';
 import { examineWater } from './peche';
+import { readSign } from './voisins';
 
 const NAME_MAX = 16;
 
@@ -133,6 +134,8 @@ function createCharacter(
 
 function examine(sim: Sim, c: Character): void {
   if (!canAct(c, sim)) return;
+  // 0.13 (section 4.4): un écriteau à portée se lit d'abord.
+  if (readSign(sim, c)) return;
   if (!isHome(c)) {
     examineWater(sim, c);
     return;

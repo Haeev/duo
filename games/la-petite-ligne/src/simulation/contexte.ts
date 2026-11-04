@@ -80,6 +80,13 @@ export interface Runtime {
    * la fin de la conversation. Hors sauvegarde: au pire, il garde le cap de la conversation.
    */
   villagerFacing: Map<string, number>;
+  /**
+   * 0.13: l'habitude de l'entrée de planning en cours de chaque habitant et sa minute de début, relues
+   * à chaque mise à jour des plannings (hors sauvegarde: refaites dans la demi-seconde).
+   */
+  villagerHabits: Map<string, { habit: string | null; from: number }>;
+  /** 0.13: secondes d'affilée où chaque joueur voit chaque habitant à son poste (`p1:firmin`, règle 4.3). */
+  habitWatch: Map<string, number>;
 }
 
 export interface Sim {
@@ -114,6 +121,8 @@ export function createRuntime(map: GameMap): Runtime {
     doorCarryNotified: false,
     chocolateAt: { p1: null, p2: null },
     villagerFacing: new Map(),
+    villagerHabits: new Map(),
+    habitWatch: new Map(),
   };
 }
 
