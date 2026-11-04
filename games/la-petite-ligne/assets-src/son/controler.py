@@ -32,7 +32,8 @@ SORTIE = RACINE_DEPOT / "games" / "la-petite-ligne" / "assets" / "son"
 DESIGN = RACINE_DEPOT / "design" / "son" / "la-petite-ligne"
 SR = 48000
 PLAFOND_DBTP = -1.0
-POIDS_MAX_MO = 20.0
+# Plafond du poids des sons du jeu: 30 Mo (retour S6 du client).
+POIDS_MAX_MO = 30.0
 
 
 def mesurer_ebur128(fichier: Path) -> dict:

@@ -162,6 +162,7 @@ function frame(over: Partial<BrainFrame>): BrainFrame {
     syncs: [],
     trainDay: false,
     momentFiles: new Set(),
+    villageFiles: new Set(),
     momentDuck: { db: 0, attackSeconds: 0.5, releaseSeconds: 2 },
     bed: null,
     timeline: { arrival: null, departure: null },

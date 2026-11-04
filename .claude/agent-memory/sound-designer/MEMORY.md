@@ -110,3 +110,12 @@ Apprentissages durables (pièges, conventions, astuces vérifiées). Pas d'avanc
 - Un tuba seul (sol 2) met 91 % de l'énergie sous 300 Hz, même transposé d'une octave (sol 3 = 196 Hz): le doubler deux octaves plus haut au cor, tuba 5 dB sous le cor (35 %).
 - `cerveau.test.ts` (robot sur toute la démo) a un délai fixe de 120 s dans son `beforeAll` (l'option `--hookTimeout` ne le remplace pas); avec une charge de 28 sur 4 cœurs il passe en 103 à 119 s et peut expirer: le relancer seul avant de soupçonner le catalogue.
 - Le poids du jeu approche le plafond de `controler.py` (19,7 Mo sur 20 après la 0.13): compter environ 0,2 Mo par ambiance de 30 à 40 s et 50 Ko par motif stéréo de 4 s.
+
+## La Petite Ligne: 0.13, branchement (vérifié le 2026-11-04)
+
+- Un son ponctuel dont le fichier n'est pas décodé est perdu (`moteur.play` demande le décodage et rend `null`); une boucle (`LoopWish`) réessaie à chaque image. Tout dossier non résident joué en ponctuel doit être demandé à l'avance: `AUDIO_SETTINGS.village.places` (par lieu) et `BrainFrame.villageFiles`, ou `PRELOADED_FOLDERS` de `moteur.ts` pour ce qui sonne partout (`carnet/`).
+- Une ambiance placée se fait par `LoopWish` d'un son du bus `ambience` (le moteur la passe derrière les murs dans un intérieur); une ambiance non placée réglée par la position s'écrit dans `frame.ambience` après `ambienceLevels` (lit `updateBed` pour tout identifiant de la carte).
+- Événements pas encore dans `WorldEvent`: les jouer dans le `default` du `switch` de `soundsForEvent`, sur `const raw: { readonly type: string } = event` pris avant le `switch` (dans `default`, `event` est `never`); quand le type arrive avec son `case`, la table ne joue plus, pas de doublon.
+- La géométrie du train du son (`slideDistanceM` 70) ne suit pas le rendu depuis R06 (`trainSlides` de `rendu/voie.ts`: entrée depuis le bord est de la carte): ce qui dépend de la position visible (sifflet aux passages à niveau) se calcule à part.
+- Prettier n'est pas appliqué aux fichiers de `src/audio` (27 fichiers hors format avant toute retouche): ne pas reformater, seuls `tsc` et `eslint` comptent.
+- Commande refusée dans un worktree isolé: `git show HEAD:...` suivi d'une redirection; `magick` absent (ImageMagick 6: `convert`).

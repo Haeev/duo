@@ -143,8 +143,11 @@ const ZONE_FOLDERS: readonly { folder: string; fromX: number; reach: number }[] 
   { folder: 'maison/', fromX: 0, reach: 20 },
 ];
 const ZONE_RELEASE_MARGIN_M = 10;
-/** Décodés au lancement, libérables (question S4 du tour 10). */
-const PRELOADED_FOLDERS: readonly string[] = ['besoins/'];
+/**
+ * Décodés au lancement, libérables (question S4 du tour 10); `carnet/` (0.13: cadeaux, amitié,
+ * carnet) sonne partout et à tout moment (question S5).
+ */
+const PRELOADED_FOLDERS: readonly string[] = ['besoins/', 'carnet/'];
 const PANNER_FAR = 10000;
 /** Écart relatif de gain de distance sous lequel on ne réécrit pas le gain d'une voix. */
 const DISTANCE_GAIN_STEP = 0.02;
@@ -191,6 +194,8 @@ export class AudioEngine {
   private momentDuckDb = 0;
   /** Fichiers du moment du jour demandés au cache. */
   private readonly momentFiles = new Set<string>();
+  /** 0.13: fichiers des lieux proches et des cloches (`BrainFrame.villageFiles`). */
+  private readonly villageFiles = new Set<string>();
   private readonly musicPause: GainNode;
   private readonly effectsIn: GainNode;
   private readonly effectsLimiter: DynamicsCompressorNode;
@@ -343,6 +348,7 @@ export class AudioEngine {
     this.updateZoneBuffers();
     this.updateTrainBuffers(frame.trainDay);
     this.updateMomentBuffers(frame.momentFiles);
+    this.updateVillageBuffers(frame.villageFiles, frame.momentFiles);
     for (const command of frame.music) this.music(command);
     this.retryPending(now);
     const live = this.options.live?.() ?? this.ctx.state === 'running';
@@ -926,6 +932,20 @@ export class AudioEngine {
       if (wanted.has(file)) continue;
       this.momentFiles.delete(file);
       this.cache.release(file);
+    }
+  }
+
+  /** Comme les moments: décodés quand l'écouteur approche du lieu, libérés quand il s'en va. */
+  private updateVillageBuffers(wanted: ReadonlySet<string>, moments: ReadonlySet<string>): void {
+    for (const file of wanted) {
+      if (this.villageFiles.has(file)) continue;
+      this.villageFiles.add(file);
+      void this.cache.request(file);
+    }
+    for (const file of this.villageFiles) {
+      if (wanted.has(file)) continue;
+      this.villageFiles.delete(file);
+      if (!moments.has(file)) this.cache.release(file);
     }
   }
 
