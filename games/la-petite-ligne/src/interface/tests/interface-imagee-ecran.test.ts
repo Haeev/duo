@@ -139,7 +139,7 @@ describe.skipIf(executable === undefined)('interface imagée 0.12.2 au clavier (
       await expect.poll(() => page.locator('.lpl-tab[aria-selected="true"]').innerText()).toMatch(/Basile/);
       await page.keyboard.press('KeyQ');
       await expect.poll(() => page.locator('.lpl-tab[aria-selected="true"]').innerText()).toMatch(/Fabriquer/);
-      expect(await page.locator('.lpl-recipe').count()).toBeGreaterThan(0);
+      await expect.poll(() => page.locator('.lpl-recipe').count()).toBeGreaterThan(0);
       expect(errors).toEqual([]);
       await page.close();
     },
