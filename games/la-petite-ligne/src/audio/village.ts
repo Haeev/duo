@@ -16,6 +16,9 @@ import { distanceBetween, distanceToRect } from './espace';
 import { type AudioSettings, dbToGain, type VillagePlace } from './reglages';
 import { type SequenceCatalogue, type SequenceShot, SequenceRun } from './sequences';
 
+/** Un habitant compte comme attablé à moins de tant du point de l'ambiance (m). */
+const SEATED_NEAR_M = 8;
+
 const MINUTES_PER_HOUR = 60;
 /** Un habitant est arrivé à son point à moins de tant (m). */
 const AT_POINT_M = 2.5;
@@ -219,8 +222,17 @@ export class VillageSounds {
       if (world.phase !== 'day') continue;
       if (rule.hours !== null && !inHours(hour, rule.hours[0], rule.hours[1])) continue;
       if (rule.whenVillagerAt !== null) {
+        // Le murmure n'a de sens que si l'on voit des habitants attablés: arrivés près du lieu,
+        // à une place (`seat:<point>:...`) ou au point lui-même (demande du client, 2026-11-04).
         const points = rule.whenVillagerAt;
-        if (!world.villagers.some((v) => v.visible && points.includes(v.target))) continue;
+        const anchors = this.ambienceAt.get(rule.key) ?? [];
+        const seated = world.villagers.some((v) => {
+          if (!v.visible) return false;
+          const target = v.target.startsWith('seat:') ? (v.target.split(':')[1] ?? '') : v.target;
+          if (!points.includes(target)) return false;
+          return anchors.some((at) => distanceBetween(v.pos, at) <= SEATED_NEAR_M);
+        });
+        if (!seated) continue;
       }
       const points = this.ambienceAt.get(rule.key) ?? [];
       points.forEach((at, index) => {
